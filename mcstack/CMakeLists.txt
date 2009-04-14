@@ -6,8 +6,7 @@ set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
 ${CMAKE_SOURCE_DIR}/geobase 
 ${CMAKE_SOURCE_DIR}/base 
-${CMAKE_SOURCE_DIR}/example/mcstack 
-)
+${CMAKE_SOURCE_DIR}/mcstack  )
 
 include_directories( ${INCLUDE_DIRECTORIES})
 
