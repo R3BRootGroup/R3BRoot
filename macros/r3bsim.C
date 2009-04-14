@@ -2,12 +2,12 @@ void r3bsim(Int_t nEvents = 1)
 {
   
   TString dir = getenv("VMCWORKDIR");
-  TString r3bdir = dir + "/r3b/macros";
+  TString r3bdir = dir + "/macros";
 
-  TString r3b_geomdir = dir + "/r3b/geometry";
+  TString r3b_geomdir = dir + "/geometry";
   gSystem->Setenv("GEOMPATH",r3b_geomdir.Data());
 
-  TString r3b_confdir = dir + "/example/gconfig";
+  TString r3b_confdir = dir + "gconfig";
   gSystem->Setenv("CONFIG_DIR",r3b_confdir.Data());
 
 // Output files
@@ -28,7 +28,7 @@ void r3bsim(Int_t nEvents = 1)
   // ------------------------------------------------------------------------
 
   // ----  Load libraries   -------------------------------------------------
-  gROOT->LoadMacro("$VMCWORKDIR/example/gconfig/basiclibs.C");
+  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
   gSystem->Load("libGeoBase");
   gSystem->Load("libParBase");
