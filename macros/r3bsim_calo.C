@@ -1,4 +1,4 @@
-void r3bsim(Int_t nEvents = 1)
+void r3bsim_calo(Int_t nEvents = 1)
 {
   
   TString dir = getenv("VMCWORKDIR");
