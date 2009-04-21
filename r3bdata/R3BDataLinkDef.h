@@ -11,6 +11,7 @@
 #pragma link C++ class R3BMCTrack+;
 
 #pragma link C++ class R3BCalPoint+;
+#pragma link C++ class R3BCaloPoint+;
 #pragma link C++ class R3BDchPoint+;
 #pragma link C++ class R3BGfiPoint+;
 #pragma link C++ class R3BLandPoint+;
