@@ -22,10 +22,11 @@ set(R3BDATA_SRCS
 R3BMCStack.cxx
 R3BMCTrack.cxx
 calData/R3BCalPoint.cxx
+caloData/R3BCaloPoint.cxx 
 dchData/R3BDchPoint.cxx
-gfiData/R3BGfiPoint.cxx
+gfiData/R3BGfiPoint.cxx 
 landData/R3BLandPoint.cxx
-mtofData/R3BmTofPoint.cxx
+mtofData/R3BmTofPoint.cxx 
 tofData/R3BTofPoint.cxx
 trackerData/R3BTraPoint.cxx)
 
