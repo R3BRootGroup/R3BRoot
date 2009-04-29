@@ -5,12 +5,13 @@
 set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
 #put here all directories where header files are located
-${FAIRROOT_SOURCE_DIR}/r3bbase 
-${FAIRROOT_SOURCE_DIR}/passive
-${FAIRROOT_SOURCE_DIR}/mcstack 
-${FAIRROOT_SOURCE_DIR}/base
-${FAIRROOT_SOURCE_DIR}/parbase 
-${FAIRROOT_SOURCE_DIR}/geobase )
+${R3BROOT_SOURCE_DIR}/r3bbase 
+#${R3BROOT_SOURCE_DIR}/passive
+#${R3BROOT_SOURCE_DIR}/mcstack 
+${R3BROOT_SOURCE_DIR}/base
+#${R3BROOT_SOURCE_DIR}/parbase 
+#${R3BROOT_SOURCE_DIR}/geobase 
+)
 
 include_directories( ${INCLUDE_DIRECTORIES})
 

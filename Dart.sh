@@ -90,4 +90,4 @@ echo "************************"
 
 cd $SOURCEDIR
 
-ctest -S $SOURCEDIR/FairRoot_test.cmake -V --VV 
+ctest -S $SOURCEDIR/R3BRoot_test.cmake -V --VV 

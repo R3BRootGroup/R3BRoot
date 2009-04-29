@@ -5,20 +5,20 @@
 set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
 #put here all directories where header files are located
-${FAIRROOT_SOURCE_DIR}/base
-${FAIRROOT_SOURCE_DIR}/passive
-${FAIRROOT_SOURCE_DIR}/mcstack
-${FAIRROOT_SOURCE_DIR}/gfi
-${FAIRROOT_SOURCE_DIR}/r3bdata/calData
-${FAIRROOT_SOURCE_DIR}/r3bdata/dchData
-${FAIRROOT_SOURCE_DIR}/r3bdata/gfiData
-${FAIRROOT_SOURCE_DIR}/r3bdata/mtofData
-${FAIRROOT_SOURCE_DIR}/r3bdata/tofData
-${FAIRROOT_SOURCE_DIR}/r3bdata/landData
-${FAIRROOT_SOURCE_DIR}/r3bdata/trackerData
-${FAIRROOT_SOURCE_DIR}/base
-${FAIRROOT_SOURCE_DIR}/parbase  
-${FAIRROOT_SOURCE_DIR}/geobase )
+${R3BROOT_SOURCE_DIR}/base
+${R3BROOT_SOURCE_DIR}/passive
+${R3BROOT_SOURCE_DIR}/mcstack
+${R3BROOT_SOURCE_DIR}/gfi
+${R3BROOT_SOURCE_DIR}/r3bdata/calData
+${R3BROOT_SOURCE_DIR}/r3bdata/dchData
+${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
+${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
+${R3BROOT_SOURCE_DIR}/r3bdata/tofData
+${R3BROOT_SOURCE_DIR}/r3bdata/landData
+${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
+${R3BROOT_SOURCE_DIR}/base
+${R3BROOT_SOURCE_DIR}/parbase  
+${R3BROOT_SOURCE_DIR}/geobase )
 
 include_directories( ${INCLUDE_DIRECTORIES})
 

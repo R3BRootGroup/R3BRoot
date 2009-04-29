@@ -148,6 +148,11 @@ void r3bsim(Int_t nEvents = 1)
   cout << "Real time " << rtime << " s, CPU time " << ctime 
        << "s" << endl << endl;
   // ------------------------------------------------------------------------
+
+  cout << " Test passed" << endl;
+  cout << " All ok " << endl;
+  exit(0);
+
 }
 
 
