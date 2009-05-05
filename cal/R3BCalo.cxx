@@ -1692,6 +1692,7 @@ void R3BCalo::ConstructGeometry() {
    AddSensitiveVolume(pcrystalLog16);
    fNbOfSensitiveVol+=64;
 
+
    // Shape: testTrap17 type: TGeoTrap
    ddz     = 8.000000;
    theta  = 1.473302;
@@ -1704,7 +1705,7 @@ void R3BCalo::ConstructGeometry() {
    bl2    = 1.882764;
    tl2    = 1.790286;
    alpha2 = 0.000000;
-   TGeoShape *ptestTrap17_18 = new TGeoTrap("testTrap17", dz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
+   TGeoShape *ptestTrap17_18 = new TGeoTrap("testTrap17", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog17
    TGeoVolume*
    pcrystalLog17 = new TGeoVolume("crystalLog17",ptestTrap17_18, pMed9);
@@ -1857,7 +1858,6 @@ void R3BCalo::ConstructGeometry() {
    fNbOfSensitiveVol+=64;
 
 
-
    // Shape: testTrap19 type: TGeoTrap
    ddz     = 8.500000;
    theta  = 1.359243;
@@ -1942,7 +1942,7 @@ void R3BCalo::ConstructGeometry() {
 
 
    // Shape: testTrap20 type: TGeoTrap
-   dz     = 8.500000;
+   ddz     = 8.500000;
    theta  = 1.302650;
    phi    = 35.096986;
    h1     = 0.839767;
@@ -1953,7 +1953,7 @@ void R3BCalo::ConstructGeometry() {
    bl2    = 1.590237;
    tl2    = 1.493826;
    alpha2 = 0.000000;
-   TGeoShape *ptestTrap20_21 = new TGeoTrap("testTrap20", dz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
+   TGeoShape *ptestTrap20_21 = new TGeoTrap("testTrap20", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog20
    TGeoVolume*
    pcrystalLog20 = new TGeoVolume("crystalLog20",ptestTrap20_21, pMed9);
@@ -2902,6 +2902,10 @@ void R3BCalo::ConstructGeometry() {
    pcarbonFiberTestLog2->SetVisLeaves(kTRUE);
    pWorld->AddNode(pcarbonFiberTestLog2, 0, pMatrix9220);
 
+
+   // END OF CALIFA ROOT
+   // Geometry Description
+   // CHECK ME ! <D.Bertini@gsi.de>
 
 }
 
