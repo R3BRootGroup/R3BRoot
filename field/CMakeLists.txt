@@ -4,10 +4,9 @@
 
 set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
-${R3BROOT_SOURCE_DIR}/base 
-${R3BROOT_SOURCE_DIR}/field 
-${R3BROOT_SOURCE_DIR}/parbase 
-)
+${FAIRROOT_SOURCE_DIR}/base  
+${FAIRROOT_SOURCE_DIR}/field  
+${FAIRROOT_SOURCE_DIR}/parbase  )
 
 include_directories( ${INCLUDE_DIRECTORIES})
 
