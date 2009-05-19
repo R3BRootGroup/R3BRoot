@@ -3,6 +3,7 @@
 // -------------------------------------------------------------------------
 #include "R3BFieldPar.h"
 #include "R3BFieldMap.h"
+#include "R3BFieldConst.h"
 
 #include "FairParamList.h"
 
