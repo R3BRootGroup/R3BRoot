@@ -43,7 +43,7 @@ set(FIELD_SRCS ${FIELD_SRCS} ${FIELD_DICTIONARY})
 
 add_library(Field SHARED ${FIELD_SRCS})
 target_link_libraries(Field ${ROOT_LIBRARIES})
-set_target_properties(Field PROPERTIES ${R3BROOT_LIBRARY_PROPERTIES})
+set_target_properties(Field PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
 
 ################ install ###################
 install(TARGETS Field DESTINATION ${CMAKE_BINARY_DIR}/lib)

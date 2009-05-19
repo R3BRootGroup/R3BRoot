@@ -42,6 +42,7 @@ void r3bsim(Int_t nEvents = 1)
   gSystem->Load("libR3BPassive");
   gSystem->Load("libR3BData");
   gSystem->Load("libR3BCal");
+  gSystem->Load("libR3BCalo");
   gSystem->Load("libR3BDch");
   gSystem->Load("libR3BGfi");
   gSystem->Load("libR3BLand");
@@ -77,8 +78,8 @@ void r3bsim(Int_t nEvents = 1)
   run->AddModule(mag);
 
   // Crystal Calorimeter
-  FairDetector* calo = new R3BCal("Calo", kTRUE);
-  run->AddModule(calo);
+  FairDetector* calB = new R3BCal("CalB", kTRUE);
+  run->AddModule(calB);
 
   // DCH drift chambers
   FairDetector* dch = new R3BDch("Dch", kTRUE);
@@ -103,6 +104,10 @@ void r3bsim(Int_t nEvents = 1)
   // Tracker
   FairDetector* tra = new R3BTra("Tracker", kTRUE);
   run->AddModule(tra);
+
+  // R3b  Calorimeter
+//  FairDetector* calo = new R3BCalo("Calo", kTRUE);
+//  run->AddModule(calo);
 
 
   // -----   Create PrimaryGenerator   --------------------------------------
