@@ -17,7 +17,7 @@
 
 // Includes from CBMROOT
 #include "R3BFieldMap.h"
-#include "R3BFieldMapCreator.h"
+//#include "R3BFieldMapCreator.h"
 #include "R3BFieldMapData.h"
 #include "R3BFieldPar.h"
 
@@ -103,46 +103,6 @@ R3BFieldMap::R3BFieldMap(R3BFieldPar* fieldPar) {
 // ------------------------------------------------------------------------
 
 
-
-// ------------  Constructor from R3BFieldMapCreator  ---------------------
-R3BFieldMap::R3BFieldMap(R3BFieldMapCreator* creator) {
-  fType  = 1;
-  fPosX  = fPosY  = fPosZ  = 0.;
-  fXmin  = fYmin  = fZmin  = 0.;
-  fXmax  = fYmax  = fZmax  = 0.;
-  fXstep = fYstep = fZstep = 0.;
-  fNx    = fNy    = fNz    = 0;
-  fScale = 1.;
-  fBx    = fBy    = fBz    = NULL;
-  if ( ! creator ) {
-    cerr << "-W- R3BFieldMap: no creator given!" << endl;
-    fName     = "";
-    fFileName = "";
-    fType     = 1;
-  }
-  else {
-    fType = 1;
-    fName = creator->GetMapName();
-    fXmin = creator->GetXmin();
-    fXmax = creator->GetXmax();
-    fYmin = creator->GetYmin();
-    fYmax = creator->GetYmax();
-    fZmin = creator->GetZmin();
-    fZmax = creator->GetZmax();
-    fNx   = creator->GetNx();
-    fNy   = creator->GetNy();
-    fNz   = creator->GetNz();
-    fXstep = ( fXmax - fXmin ) / Double_t( fNx - 1 );
-    fYstep = ( fYmax - fYmin ) / Double_t( fNy - 1 );
-    fZstep = ( fZmax - fZmin ) / Double_t( fNz - 1 );
-    fBx = creator->GetBx();
-    fBy = creator->GetBy();
-    fBz = creator->GetBz();
-    fScale = 1.;
-    fPosX = fPosY = fPosZ = 0.;
-  }
-}
-// ------------------------------------------------------------------------
 
 
 
