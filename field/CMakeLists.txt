@@ -4,9 +4,9 @@
 
 set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
-${FAIRROOT_SOURCE_DIR}/base  
-${FAIRROOT_SOURCE_DIR}/field  
-${FAIRROOT_SOURCE_DIR}/parbase  )
+${R3BROOT_SOURCE_DIR}/base  
+${R3BROOT_SOURCE_DIR}/field  
+${R3BROOT_SOURCE_DIR}/parbase  )
 
 include_directories( ${INCLUDE_DIRECTORIES})
 
@@ -43,7 +43,7 @@ set(FIELD_SRCS ${FIELD_SRCS} ${FIELD_DICTIONARY})
 
 add_library(Field SHARED ${FIELD_SRCS})
 target_link_libraries(Field ${ROOT_LIBRARIES})
-set_target_properties(Field PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
+set_target_properties(Field PROPERTIES ${R3BROOT_LIBRARY_PROPERTIES})
 
 ################ install ###################
 install(TARGETS Field DESTINATION ${CMAKE_BINARY_DIR}/lib)
