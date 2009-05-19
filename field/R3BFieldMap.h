@@ -19,7 +19,7 @@
 #include "FairField.h"
 
 class TArrayF;
-class R3BFieldMapCreator;
+//class R3BFieldMapCreator;
 class R3BFieldMapData;
 class R3BFieldPar;
 
@@ -46,7 +46,7 @@ public:
 
 
   /** Constructor from R3BFieldMapCreator **/
-  R3BFieldMap(R3BFieldMapCreator* creator);
+ // R3BFieldMap(R3BFieldMapCreator* creator);
 
 
   /** Destructor **/
