@@ -34,19 +34,19 @@ public:
 
 
   /** Default constructor **/
-  CbmFieldMapData();
+  R3BFieldMapData();
 
 
   /** Standard constructor **/
-  CbmFieldMapData(const char* name);
+  R3BFieldMapData(const char* name);
 
 
-  /** Constructor from an existing CbmFieldMap **/
-  CbmFieldMapData(const char* name, const CbmFieldMap& map);
+  /** Constructor from an existing R3BFieldMap **/
+  R3BFieldMapData(const char* name, const R3BFieldMap& map);
   
 
   /** Destructor **/
-  virtual ~CbmFieldMapData();
+  virtual ~R3BFieldMapData();
 
 
   /** Accessors to field parameters in local coordinate system **/
@@ -90,7 +90,7 @@ public:
   TArrayF* fBz;
 
 
-  ClassDef(CbmFieldMapData,1) 
+  ClassDef(R3BFieldMapData,1)
 
 };
 
