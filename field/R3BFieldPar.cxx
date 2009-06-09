@@ -143,15 +143,16 @@ void R3BFieldPar::SetParameters(FairField* field) {
   }
 
   else if ( fType >=1 && fType <= kMaxFieldMapType ) {              // field map
-    R3BFieldMap* fieldMap = (R3BFieldMap*) field;
-    fBx = fBy = fBz = 0.;
-    fXmin = fXmax = fYmin = fYmax = fZmin = fZmax = 0.;
-    
-    fMapName = field->GetName();
-    fPosX   = fieldMap->GetPositionX();
-    fPosY   = fieldMap->GetPositionY();
-    fPosZ   = fieldMap->GetPositionZ();
-    fScale  = fieldMap->GetScale();
+// to be implemented for the  case of R3B
+//    R3BFieldMap* fieldMap = (R3BFieldMap*) field;
+//    fBx = fBy = fBz = 0.;
+//    fXmin = fXmax = fYmin = fYmax = fZmin = fZmax = 0.;
+//
+//    fMapName = field->GetName();
+//    fPosX   = fieldMap->GetPositionX();
+//    fPosY   = fieldMap->GetPositionY();
+//    fPosZ   = fieldMap->GetPositionZ();
+//    fScale  = fieldMap->GetScale();
 
   }
 
