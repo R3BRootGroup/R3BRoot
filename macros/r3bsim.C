@@ -34,7 +34,7 @@ void r3bsim(Int_t nEvents = 1)
   gSystem->Load("libParBase");
   gSystem->Load("libBase");
   gSystem->Load("libMCStack");
-//  gSystem->Load("libField");
+  gSystem->Load("libField");
   gSystem->Load("libGen");
 
   //----  Load R3B specific libraries ---------------------------------------
@@ -78,36 +78,48 @@ void r3bsim(Int_t nEvents = 1)
   run->AddModule(mag);
 
   // Crystal Calorimeter
-  FairDetector* calB = new R3BCal("CalB", kTRUE);
-  run->AddModule(calB);
+  //FairDetector* calB = new R3BCal("CalB", kTRUE);
+  //run->AddModule(calB);
 
   // DCH drift chambers
-  FairDetector* dch = new R3BDch("Dch", kTRUE);
-  run->AddModule(dch);
+  //FairDetector* dch = new R3BDch("Dch", kTRUE);
+  //run->AddModule(dch);
 
   // GFI detector
-  FairDetector* gfi = new R3BGfi("Gfi", kTRUE);
-  run->AddModule(gfi);
+  //FairDetector* gfi = new R3BGfi("Gfi", kTRUE);
+  //run->AddModule(gfi);
 
   // Land Detector
-  FairDetector* land = new R3BLand("Land", kTRUE);
-  run->AddModule(land);
+  //FairDetector* land = new R3BLand("Land", kTRUE);
+  //run->AddModule(land);
 
   // Tof
-  FairDetector* tof = new R3BTof("Tof", kTRUE);
-  run->AddModule(tof);
+  //FairDetector* tof = new R3BTof("Tof", kTRUE);
+  //run->AddModule(tof);
 
   // mTof
-  FairDetector* mTof = new R3BmTof("mTof", kTRUE);
-  run->AddModule(mTof);
+  //FairDetector* mTof = new R3BmTof("mTof", kTRUE);
+  //run->AddModule(mTof);
 
   // Tracker
-  FairDetector* tra = new R3BTra("Tracker", kTRUE);
-  run->AddModule(tra);
+  //FairDetector* tra = new R3BTra("Tracker", kTRUE);
+  //run->AddModule(tra);
 
   // R3b  Calorimeter
 //  FairDetector* calo = new R3BCalo("Calo", kTRUE);
 //  run->AddModule(calo);
+
+
+  // -----   Create magnetic field   ----------------------------------------
+  Int_t typeOfMagneticField = 0;
+  Int_t fieldScale = 1;
+  Bool_t fVerbose = kTRUE;
+  R3BFieldMap* magField = new R3BFieldMap(typeOfMagneticField,fVerbose);
+
+  magField->SetPosition(0., 0., 0.);
+  magField->SetScale(fieldScale);
+  run->SetField(magField);
+
 
 
   // -----   Create PrimaryGenerator   --------------------------------------
@@ -156,7 +168,6 @@ void r3bsim(Int_t nEvents = 1)
 
   cout << " Test passed" << endl;
   cout << " All ok " << endl;
-  exit(0);
 
 }
 
