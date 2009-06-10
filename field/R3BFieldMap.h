@@ -36,7 +36,7 @@ public:
   R3BFieldMap(const char* mapName, const char* fileType = "R");
   /** Constructor from R3BFieldPar **/
   R3BFieldMap(R3BFieldPar* fieldPar);
-  R3BFieldMap(Int_t ftype);
+  R3BFieldMap(Int_t ftype,Bool_t verbosity=kFALSE);
 
 
   /** Destructor **/
@@ -58,7 +58,7 @@ public:
   /** Main GetField function */
   virtual void GetFieldValue(const Double_t point[3], Double_t* bField);
 
-
+  void SetVerbose(Bool_t verbosity){ fVerbose = verbosity;}
 
 
 
@@ -99,6 +99,8 @@ public:
 
   TRotation* gRot;
   TVector3* gTrans;
+
+  Bool_t fVerbose;
 
   ClassDef(R3BFieldMap,1)
 
