@@ -49,13 +49,14 @@ R3BFieldMap::R3BFieldMap(const char* mapName, const char* fileType)
 
 
 // ------------------------------------------------------------------------
-R3BFieldMap::R3BFieldMap(Int_t type)
+R3BFieldMap::R3BFieldMap(Int_t type,Bool_t verbosity)
   : FairField("R3Bmap") {
 
 // specific to R3B to be consistent  with the geometry of the Aladin Magnet
 // Problem : Hardcoded parameters to avoid using the parameter container
 // factory <D.Bertini@gsi.de>
 
+  fVerbose = verbosity;
 
   Double_t DistanceToTarget = 350.0;  //cm
   Double_t Correction = -119.94; // cm
@@ -78,8 +79,9 @@ R3BFieldMap::R3BFieldMap(Int_t type)
 // Magnetic field map types definition
   typeField = type;
 
-  cout << " ----------- R3BFieldMap constructor ------------------" << endl;
-  cout << "   typeField  "<< typeField << endl;
+  cout << " -I- R3BFieldMap::ctor  " << endl;
+  cout << " -I- R3BFieldMap::ctor  typeField:  "    << typeField    << endl;
+  cout << " -I- R3BFieldMap::ctor  Aladin angle:  " << Aladin_angle << endl;
 
 
   //initial values
@@ -111,21 +113,41 @@ R3BFieldMap::R3BFieldMap(Int_t type)
 
 #include "magField/Aladin/ALADIN.dat"
 
-    if(typeField == 0){
+  cout << " -I- R3BFieldMap::ctor  field map loaded ..  " <<  endl;
+  cout << " -I- R3BFieldMap::ctor  filename: magField/Aladin/ALADIN.dat "
+        <<  endl;
+
+  if(typeField == 0){
+     // Normal
       for(Int_t i=0;i<numberOfPointsInGrid;i++){
 	Bxfield[i] = xfield[i]*1E-01*10.; //kG
 	Byfield[i] = yfield[i]*1E-01*10.; //kG
 	Bzfield[i] = zfield[i]*1E-01*10.; //kG
       };
     }
-    else{
+   else{
+     // inverse values?
       for(Int_t i=0;i<numberOfPointsInGrid;i++){
 	Bxfield[i] = -xfield[i]*1E-01*10.; //kG
 	Byfield[i] = -yfield[i]*1E-01*10.; //kG
 	Bzfield[i] = -zfield[i]*1E-01*10.; //kG
       }; 
     }
-    //
+
+   // verbose mode
+
+  cout << "fVerbose " << fVerbose << endl;
+
+  if (fVerbose == kTRUE){
+   for(Int_t i=0;i<numberOfPointsInGrid;i++){
+	if ( Bxfield[i] != 0 &&    Byfield[i] != 0 &&  Bzfield[i] != 0 ){
+	cout << " Grid Point: " << i << " FieldX: " <<  Bxfield[i]
+	                             << " FieldY: " <<  Byfield[i]
+	                             << " FieldZ: " <<  Bzfield[i] << endl;
+	}
+    }
+  }
+
   }
 
   // -- R3B MAGNET --
