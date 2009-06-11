@@ -66,14 +66,13 @@ R3BFieldMap::R3BFieldMap(Int_t type,Bool_t verbosity)
 
   Double_t DistanceFromtargetToAladinCenter
 	     = DistanceToTarget + Correction;
-// Transformations
+// Transformations inverse
   gRot = new TRotation();
-  gRot->RotateY(Aladin_angle);
-
+  gRot->RotateY(-1.*Aladin_angle*(TMath::Pi())/180.);
   gTrans   = new TVector3(0.0,
-			      Aladin_gap/2.0 + Yoke_thickness/2.0,
-                              DistanceFromtargetToAladinCenter
-			     );
+			  0.0,
+                         -1.* DistanceFromtargetToAladinCenter
+			  );
 
 
 // Magnetic field map types definition
@@ -201,6 +200,10 @@ void  R3BFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField){
  // <D.Bertini@gsi.de>
 
 
+ Double_t Bfield[3];
+
+//   cout << "-I- get field values  for field type" << typeField << endl;
+   
  if ( typeField==0 || typeField==1 || typeField==3 ) {
 
 // local
@@ -210,26 +213,16 @@ void  R3BFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField){
  TVector3 localPoint(point[0],point[1],point[2]);
 
 
- cout << "Local Point: "
-     << localPoint.X()
-     << "-" <<
-        localPoint.Y()
-     << "-" <<
-        localPoint.Z()
-     << endl;
+// cout << "Local Point: " << localPoint.X() << " : " << localPoint.Y()
+//      << " : " << localPoint.Z()
+//      << endl;
 
  localPoint.Transform(*gRot);
  localPoint = localPoint + (*gTrans);
 
- cout << "Transf. Point: "
-     << localPoint.X()
-     << "-" <<
-        localPoint.Y()
-     << "-" <<
-        localPoint.Z()
-     << endl;
-
- Double_t Bfield[3];
+// cout << "Transf. Point: " << localPoint.X() << " : " <<
+//        localPoint.Y() << " : " <<  localPoint.Z()    
+//      << endl;
 
 
  // test area
@@ -241,6 +234,8 @@ void  R3BFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField){
         localPoint.Z() <= initialZ+((stepsInZ-1)*gridStep) ) {
 
 
+//    cout << "-I-  inside  the magnetic area! " << endl;
+    
  Int_t returnValue = GetLinesArrayForPosition(&localPoint, linesArray);
 
 
@@ -282,14 +277,18 @@ void  R3BFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField){
 	  (1-t)*(1-u)*v*Bzfield[linesArray->At(6)] +
 	  t*(1-u)*v*Bzfield[linesArray->At(7)];
 
+//	cout <<"-I- corresponding  B values : Bx By Bz "
+//	     << Bfield[0] << " - " << Bfield[1] << " - " << Bfield[2] << endl;
+	
      }
+     
 
  } //!returnValue
 
 
  else if (returnValue==1){
- //  cout << "-I- R3BFieldMap Point "
- //       << localPoint  << " is just in one grid point!" << endl;
+      cout << "-I- R3BFieldMap Point "
+        << " is just in one grid point!" << endl;
 	
 	Bfield[0] = Bxfield[linesArray->At(0)];
 	Bfield[1] = Byfield[linesArray->At(0)];
@@ -297,9 +296,9 @@ void  R3BFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField){
  } //returnValue ==1
 
   else{
-      // cout << "-E- R3BFieldMap::GetFieldValue(): Point " << localPoint
-      //      << ", but return value from GetLinesArrayForPosition() not valid!!"
-      //      << endl;
+       cout << "-E- R3BFieldMap::GetFieldValue(): Point " 
+            << ", but return value from GetLinesArrayForPosition() not valid!!"
+             << endl;
 
       Bfield[0] = 0;
       Bfield[1] = 0;
@@ -309,8 +308,8 @@ void  R3BFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField){
  } //!outside of field area
 
  else{
-     //cout << "-E- in R3BFieldMap::GetFieldValue(): Point " << localPoint
-     //     << " is outside the map field!" << endl;
+    // cout << "-E- in R3BFieldMap::GetFieldValue(): Point " 
+    //       << " is outside the map field!" << endl;
       
       Bfield[0] = 0;
       Bfield[1] = 0;
@@ -320,10 +319,10 @@ void  R3BFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField){
  // localPoint;
  }
 else if ( typeField == 2 ){
-//    cout << "-I- R3BFieldMap typeField 2"<< endl;
-//    Bfield[0] = 0.;
-//    Bfield[1] = -1. *10. ; //kGauss
-//    Bfield[2] = 0.;
+   // cout << "-I- R3BFieldMap typeField 2"<< endl;
+     Bfield[0] = 0.;
+     Bfield[1] = -1. *10. ; //kGauss
+     Bfield[2] = 0.;
   }
 }
 
@@ -388,7 +387,7 @@ Int_t R3BFieldMap::GetLinesArrayForPosition(TVector3* pos, TArrayI* lines){
 //
   TVector3* posAux = new TVector3();
   Int_t tmp  = GetLineForPosition(pos);
-  lines->AddAt(0,tmp);
+  lines->AddAt(tmp,0);
   Int_t tmpPos = lines->At(0);
   GetPositionForLine(tmpPos,posAux);
   if( (*posAux) == (*pos) ) {
@@ -397,13 +396,13 @@ Int_t R3BFieldMap::GetLinesArrayForPosition(TVector3* pos, TArrayI* lines){
   }  
 
   //Faster method
-  lines->AddAt(1, lines->At(0) + stepsInY * stepsInZ);
-  lines->AddAt(2, lines->At(1) + stepsInZ);
-  lines->AddAt(3, lines->At(2) + 1);
-  lines->AddAt(4, lines->At(0) + stepsInZ);
-  lines->AddAt(5, lines->At(4) + 1);
-  lines->AddAt(6, lines->At(0) + 1);
-  lines->AddAt(7, lines->At(1) + 1);
+  lines->AddAt(lines->At(0) + stepsInY * stepsInZ,1);
+  lines->AddAt(lines->At(1) + stepsInZ,2);
+  lines->AddAt(lines->At(2) + 1,3);
+  lines->AddAt(lines->At(0) + stepsInZ,4);
+  lines->AddAt(lines->At(4) + 1,5);
+  lines->AddAt(lines->At(0) + 1,6);
+  lines->AddAt(lines->At(1) + 1,7);
 
   return 0;
 
