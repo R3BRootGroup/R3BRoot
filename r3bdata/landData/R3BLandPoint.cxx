@@ -45,8 +45,8 @@ R3BLandPoint::~R3BLandPoint() { }
 
 // -----   Public method Print   -------------------------------------------
 void R3BLandPoint::Print(const Option_t* opt) const {
-  cout << "-I- R3BLandPoint: STS Point for track " << fTrackID 
-       << " in detector " << fDetectorID << endl;
+  cout << "-I- R3BLandPoint: LAND Point for track " << fTrackID
+	<< " in detector " << fDetectorID << " DetName" << fDetName << endl;
   cout << "    Position (" << fX << ", " << fY << ", " << fZ
        << ") cm" << endl;
   cout << "    Momentum (" << fPx << ", " << fPy << ", " << fPz

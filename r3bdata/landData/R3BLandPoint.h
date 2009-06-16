@@ -78,18 +78,18 @@ class R3BLandPoint : public FairMCPoint
   /** Modifiers **/
   void SetPositionOut(TVector3 pos);
   void SetMomentumOut(TVector3 mom);
-
+  void SetDetName(TString Name){ fDetName = Name; }
 
   /** Output to screen **/
   virtual void Print(const Option_t* opt) const;
-
+  TString  GetDetName()const { return fDetName; }
 
 
  protected:
 
   Double32_t fX_out,  fY_out,  fZ_out;
   Double32_t fPx_out, fPy_out, fPz_out;
-
+  TString fDetName;
 
 
   ClassDef(R3BLandPoint,1)
