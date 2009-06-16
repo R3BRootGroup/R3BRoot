@@ -25,10 +25,16 @@ calData/R3BCalPoint.cxx
 caloData/R3BCaloPoint.cxx 
 dchData/R3BDchPoint.cxx
 gfiData/R3BGfiPoint.cxx 
-landData/R3BLandPoint.cxx
 mtofData/R3BmTofPoint.cxx 
 tofData/R3BTofPoint.cxx
-trackerData/R3BTraPoint.cxx)
+trackerData/R3BTraPoint.cxx
+landData/R3BLandPoint.cxx
+landData/R3BLandHit.cxx
+landData/R3BPaddleCrystalHit.cxx)
+
+
+
+
 
 if(RULE_CHECKER_FOUND)
 CHECK_RULES("${R3BDATA_SRCS}" "${INCLUDE_DIRECTORIES}" R3BDATA_RULES)
