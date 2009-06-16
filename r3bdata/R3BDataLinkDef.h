@@ -14,10 +14,12 @@
 #pragma link C++ class R3BCaloPoint+;
 #pragma link C++ class R3BDchPoint+;
 #pragma link C++ class R3BGfiPoint+;
-#pragma link C++ class R3BLandPoint+;
 #pragma link C++ class R3BmTofPoint+;
 #pragma link C++ class R3BTofPoint+;
 #pragma link C++ class R3BTraPoint+;
+#pragma link C++ class R3BLandPoint+;
+#pragma link C++ class R3BLandHit+;
+#pragma link C++ class R3BPaddleCrystalHit+;
 
 
 #endif
