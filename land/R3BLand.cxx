@@ -92,16 +92,17 @@ R3BLand::~R3BLand() {
 
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BLand::ProcessHits(FairVolume* vol) {
-//      cout << " -I process hit called for:" <<  vol->GetName() << endl;
+      cout << " -I process hit called for:" <<  vol->GetName() << endl;
 // Set parameters at entrance of volume. Reset ELoss.
 
-//    if ( vol ) {
-//        cout << " Name Id:copy "
-//            << vol->getName() << " : " << vol->getMCid() << " : " << vol->getCopyNo() << endl;
-//        Int_t copyNo=0;
-//        cout << " Geant: " << gMC->CurrentVolID(copyNo) << ":" << copyNo << endl;
-//    }
-
+     if ( vol ) {
+         cout << " Name Id:copy "
+            << vol->getName() << " : " << vol->getMCid() << " : " << vol->getCopyNo() << endl;
+         Int_t copyNo=0;
+         cout << " Geant: " << gMC->CurrentVolID(copyNo) << ":" << copyNo << endl;
+     }
+     return kTRUE;
+     
     if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
     fTime   = gMC->TrackTime() * 1.0e09;
@@ -456,7 +457,7 @@ void R3BLand::ConstructGeometry() {
    zz = -45.;
 
    aLand->AddNode(trap,2,new TGeoCombiTrans(xx,yy,zz,rot1));
-   fNbOfSensitiveVol+=1;
+ 
 
    TGeoRotation *rot2 = new TGeoRotation();
    rot2->RotateX(0.);
@@ -466,7 +467,12 @@ void R3BLand::ConstructGeometry() {
    yy = -95.;
    zz = -45.;
    aLand->AddNode(trap,3,new TGeoCombiTrans(xx,yy,zz,rot2));
-   fNbOfSensitiveVol+=1;
+
+
+   
+   AddSensitiveVolume(padle_h_box3);
+   AddSensitiveVolume(padle_h_box5);
+   fNbOfSensitiveVol+=2;
 
 
    //paddles
@@ -543,6 +549,8 @@ void R3BLand::ConstructGeometry() {
    tx=0.;
    ty=0.;
    tz=0.;
+
+ 
 
  for ( Int_t i = 0; i < 5; i++ )
  {
