@@ -38,7 +38,7 @@ class R3BLandPoint : public FairMCPoint
    *@param length   Track length since creation [cm]
    *@param eLoss    Energy deposit [GeV]
    **/
-  R3BLandPoint(Int_t trackID, Int_t detID, TVector3 posIn, 
+  R3BLandPoint(Int_t trackID, Int_t detID, Int_t copyNo, TVector3 posIn,
 	      TVector3 posOut, TVector3 momIn, TVector3 momOut,
 	      Double_t tof, Double_t length, Double_t eLoss);
 
@@ -90,7 +90,7 @@ class R3BLandPoint : public FairMCPoint
   Double32_t fX_out,  fY_out,  fZ_out;
   Double32_t fPx_out, fPy_out, fPz_out;
   TString fDetName;
-
+  Int_t fCopyNo;
 
   ClassDef(R3BLandPoint,1)
 
