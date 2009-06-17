@@ -120,6 +120,7 @@ class R3BLand : public FairDetector
 	active volume. **/
     Int_t          fTrackID;           //!  track index
     Int_t          fVolumeID;          //!  volume id
+    Int_t          fCopyNo;            //!  copy no
     TLorentzVector fPosIn, fPosOut;    //!  position
     TLorentzVector fMomIn, fMomOut;    //!  momentum
     Double32_t     fTime;              //!  time
@@ -135,7 +136,7 @@ class R3BLand : public FairDetector
      **
      ** Adds a LandPoint to the HitCollection
      **/
-    R3BLandPoint* AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
+    R3BLandPoint* AddHit(Int_t trackID, Int_t detID, Int_t copyNo,TVector3 posIn,
 			TVector3 pos_out, TVector3 momIn, 
 			TVector3 momOut, Double_t time, 
 			Double_t length, Double_t eLoss);
