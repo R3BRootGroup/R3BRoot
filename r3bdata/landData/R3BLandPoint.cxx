@@ -15,13 +15,14 @@ using std::flush;
 R3BLandPoint::R3BLandPoint() : FairMCPoint() {
   fX_out      = fY_out  = fZ_out  = 0.;
   fPx_out     = fPy_out = fPz_out = 0.;
+  fCopyNo     = -1 ;
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Standard constructor   ------------------------------------------
-R3BLandPoint::R3BLandPoint(Int_t trackID, Int_t detID, TVector3 posIn, 
+R3BLandPoint::R3BLandPoint(Int_t trackID, Int_t detID, Int_t copyNo,TVector3 posIn,
 			 TVector3 posOut, TVector3 momIn, TVector3 momOut,
 			 Double_t tof, Double_t length, Double_t eLoss) 
   : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss) {
@@ -31,6 +32,7 @@ R3BLandPoint::R3BLandPoint(Int_t trackID, Int_t detID, TVector3 posIn,
   fPx_out = momOut.Px();
   fPy_out = momOut.Py();
   fPz_out = momOut.Pz();
+  fCopyNo = copyNo;
 }
 // -------------------------------------------------------------------------
 
@@ -46,7 +48,7 @@ R3BLandPoint::~R3BLandPoint() { }
 // -----   Public method Print   -------------------------------------------
 void R3BLandPoint::Print(const Option_t* opt) const {
   cout << "-I- R3BLandPoint: LAND Point for track " << fTrackID
-	<< " in detector " << fDetectorID << " DetName" << fDetName << endl;
+	<< " in detector " << fDetectorID << " CopyNo: " << fCopyNo << endl;
   cout << "    Position (" << fX << ", " << fY << ", " << fZ
        << ") cm" << endl;
   cout << "    Momentum (" << fPx << ", " << fPy << ", " << fPz
