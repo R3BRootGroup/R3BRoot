@@ -92,8 +92,10 @@ R3BLand::~R3BLand() {
 
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BLand::ProcessHits(FairVolume* vol) {
-     cout << " -I process hit called for:" <<  vol->GetName() << endl;
-// Set parameters at entrance of volume. Reset ELoss.
+
+
+/*     cout << " -I process hit called for:" <<  vol->GetName() << endl;
+//  Set parameters at entrance of volume. Reset ELoss.
 
      if ( vol ) {
          cout << " -I- FairVolume name Id:copy "
@@ -102,37 +104,21 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
 	 cout << "-I- Corresponding Geant: " << gMC->CurrentVolID(copyNo) << ":" << copyNo << endl;
 	 cout << "-I- Looking @ hiearchy ... " << endl;
 
-        // FairGeoNode* node = vol->getGeoNode();
-        // FairGeoNode* mother = node->getMotherNode();
-        //
-	// cout << "  Mother Node (id: copy) " << mother->getMCid() << " : "
-	//                                    << mother->getCopyNo() << endl;
+         FairGeoNode* node = vol->getGeoNode();
+         FairGeoNode* mother = node->getMotherNode();
 
-     }
+	 cout << "  Mother Node (id: copy) " << mother->getMCid() << " : "
+	 << mother->getCopyNo() << endl;
+}
+*/
 
-
- // Additional hiearchy info test
-
-  Int_t cp1 = -1;
-  Int_t cp2 = -1;
-  Int_t cp3 = -1;
-  Int_t cp4 = -1;
-
-  Int_t id1 =  gMC->CurrentVolOffID(1, cp1); //
-  Int_t id2 =  gMC->CurrentVolOffID(2, cp2); //
-  Int_t id3 =  gMC->CurrentVolOffID(3, cp3); //
-  Int_t id4 =  gMC->CurrentVolOffID(4, cp4);
-
-  Int_t copyNo=0;
-  cout << " Geant (vol, cp): " << gMC->CurrentVolID(copyNo) << ":" << copyNo << endl;
-  cout << "-I-  vol hiearchy... " << endl;
-  cout << " (1) " << id1 << " : " << cp1 << endl;
-  cout << " (2) " << id2 << " : " << cp2 << endl;
-  cout << " (3) " << id3 << " : " << cp3 << endl;
-  cout << " (4) " << id4 << " : " << cp4 << endl;
-  return kTRUE;
-
-
+  // get Geometry hiearchical Information
+  Int_t cp1=-1;
+  Int_t cp2=-1;
+  Int_t volId1=-1;
+  Int_t volId2=-1;
+  volId1 =  gMC->CurrentVolID(cp1);
+  volId2 =  gMC->CurrentVolOffID(2, cp2);
 
     if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
@@ -150,10 +136,6 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
        gMC->IsTrackStop()       ||
        gMC->IsTrackDisappeared()   ) {
     fTrackID  = gMC->GetStack()->GetCurrentTrackNumber();
-    Int_t copyNo=0;
- // get VolId and CopyNo
-    fVolumeID = gMC->CurrentVolID(copyNo);
-    fCopyNo =  copyNo;
     gMC->TrackPosition(fPosOut);
     gMC->TrackMomentum(fMomOut);
     if (fELoss == 0. ) return kFALSE;
@@ -198,7 +180,7 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
       fPosOut.SetZ(newpos[2]);
     }
 
-    AddHit(fTrackID, fVolumeID, fCopyNo,
+    AddHit(fTrackID, fVolumeID, cp1, cp2,
 	   TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
 	   TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
 	   TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
@@ -306,17 +288,18 @@ void R3BLand::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
 }
 
 // -----   Private method AddHit   --------------------------------------------
-R3BLandPoint* R3BLand::AddHit(Int_t trackID, Int_t detID, Int_t copyNo, TVector3 posIn,
-			    TVector3 posOut, TVector3 momIn, 
-			    TVector3 momOut, Double_t time, 
-			    Double_t length, Double_t eLoss) {
+R3BLandPoint* R3BLand::AddHit(Int_t trackID, Int_t detID, Int_t id1, Int_t id2,
+			     TVector3 posIn,
+			     TVector3 posOut, TVector3 momIn,
+			     TVector3 momOut, Double_t time,
+			     Double_t length, Double_t eLoss) {
   TClonesArray& clref = *fLandCollection;
   Int_t size = clref.GetEntriesFast();
   if (fVerboseLevel>1) 
     cout << "-I- R3BLand: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
 	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
 	 << trackID << ", energy loss " << eLoss*1e06 << " keV" << endl;
-  return new(clref[size]) R3BLandPoint(trackID, detID, copyNo, posIn, posOut,
+  return new(clref[size]) R3BLandPoint(trackID, detID, id1, id2,  posIn, posOut,
 				      momIn, momOut, time, length, eLoss);
 }
 // -----   Public method ConstructGeometry   ----------------------------------
