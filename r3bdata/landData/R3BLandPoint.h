@@ -38,9 +38,10 @@ class R3BLandPoint : public FairMCPoint
    *@param length   Track length since creation [cm]
    *@param eLoss    Energy deposit [GeV]
    **/
-  R3BLandPoint(Int_t trackID, Int_t detID, Int_t copyNo, TVector3 posIn,
-	      TVector3 posOut, TVector3 momIn, TVector3 momOut,
-	      Double_t tof, Double_t length, Double_t eLoss);
+  R3BLandPoint(Int_t trackID, Int_t detID, Int_t sector,
+	       Int_t paddle, TVector3 posIn,
+	       TVector3 posOut, TVector3 momIn, TVector3 momOut,
+	       Double_t tof, Double_t length, Double_t eLoss);
 
 
   /** Copy constructor **/
@@ -61,6 +62,9 @@ class R3BLandPoint : public FairMCPoint
   Double_t GetPxOut() const { return fPx_out; }
   Double_t GetPyOut() const { return fPy_out; }
   Double_t GetPzOut() const { return fPz_out; }
+  Int_t    GetSector() const { return fSector;}
+  Int_t    GetPaddle() const { return fPaddle;}
+
   void PositionIn(TVector3& pos)  { pos.SetXYZ(fX, fY, fZ); }
   void PositionOut(TVector3& pos) { pos.SetXYZ(fX_out,fY_out,fZ_out); }
   void MomentumOut(TVector3& mom) { mom.SetXYZ(fPx_out,fPy_out,fPz_out); }
@@ -78,19 +82,17 @@ class R3BLandPoint : public FairMCPoint
   /** Modifiers **/
   void SetPositionOut(TVector3 pos);
   void SetMomentumOut(TVector3 mom);
-  void SetDetName(TString Name){ fDetName = Name; }
 
   /** Output to screen **/
   virtual void Print(const Option_t* opt) const;
-  TString  GetDetName()const { return fDetName; }
 
 
  protected:
 
   Double32_t fX_out,  fY_out,  fZ_out;
   Double32_t fPx_out, fPy_out, fPz_out;
-  TString fDetName;
-  Int_t fCopyNo;
+  Int_t fSector;
+  Int_t fPaddle;
 
   ClassDef(R3BLandPoint,1)
 
