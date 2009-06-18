@@ -136,10 +136,11 @@ class R3BLand : public FairDetector
      **
      ** Adds a LandPoint to the HitCollection
      **/
-    R3BLandPoint* AddHit(Int_t trackID, Int_t detID, Int_t copyNo,TVector3 posIn,
-			TVector3 pos_out, TVector3 momIn, 
-			TVector3 momOut, Double_t time, 
-			Double_t length, Double_t eLoss);
+    R3BLandPoint* AddHit(Int_t trackID, Int_t detID, Int_t id1, Int_t id2,
+			 TVector3 posIn,
+			 TVector3 pos_out, TVector3 momIn,
+			 TVector3 momOut, Double_t time,
+			 Double_t length, Double_t eLoss);
 
 
     /** Private method ResetParameters
