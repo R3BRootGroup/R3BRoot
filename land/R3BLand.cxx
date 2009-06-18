@@ -112,13 +112,13 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
 }
 */
 
-  // get Geometry hiearchical Information
+  // --- get Geometry hiearchical Information
   Int_t cp1=-1;
   Int_t cp2=-1;
   Int_t volId1=-1;
   Int_t volId2=-1;
   volId1 =  gMC->CurrentVolID(cp1);
-  volId2 =  gMC->CurrentVolOffID(2, cp2);
+  volId2 =  gMC->CurrentVolOffID(1, cp2);
 
     if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
@@ -180,7 +180,7 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
       fPosOut.SetZ(newpos[2]);
     }
 
-    AddHit(fTrackID, fVolumeID, cp1, cp2,
+    AddHit(fTrackID, fVolumeID, cp2, cp1,
 	   TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
 	   TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
 	   TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
@@ -300,7 +300,7 @@ R3BLandPoint* R3BLand::AddHit(Int_t trackID, Int_t detID, Int_t id1, Int_t id2,
 	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
 	 << trackID << ", energy loss " << eLoss*1e06 << " keV" << endl;
   return new(clref[size]) R3BLandPoint(trackID, detID, id1, id2,  posIn, posOut,
-				      momIn, momOut, time, length, eLoss);
+				      momIn, momOut, time, length, eLoss*1e06);
 }
 // -----   Public method ConstructGeometry   ----------------------------------
 void R3BLand::ConstructGeometry() {
@@ -499,8 +499,8 @@ void R3BLand::ConstructGeometry() {
    rot3->RotateZ(0.);
    xx = 0.;
    yy = -95.;
+   
    zz = -49.875;
-
    aLand->AddNode(padle_h_box3,4,new TGeoCombiTrans(xx,yy,zz,rot3));
    zz = -49.;
    aLand->AddNode(padle_h_box4,5,new TGeoCombiTrans(xx,yy,zz,rot3));
@@ -528,10 +528,9 @@ void R3BLand::ConstructGeometry() {
 
    xx = 0.;
    yy = -95.;
+
    zz = -49.5;
    aLand->AddNode(padle_h_box5,15,new TGeoCombiTrans(xx,yy,zz,rot3));
-//   zz = -49.5;
-//   aLand->AddNode(padle_h_box5,16,new TGeoCombiTrans(xx,yy,zz,rot3));
    zz = -48.5;
    aLand->AddNode(padle_h_box5,16,new TGeoCombiTrans(xx,yy,zz,rot3));
    zz = -47.5;
@@ -546,24 +545,23 @@ void R3BLand::ConstructGeometry() {
    aLand->AddNode(padle_h_box5,21,new TGeoCombiTrans(xx,yy,zz,rot3));
    zz = -42.5;
    aLand->AddNode(padle_h_box5,22,new TGeoCombiTrans(xx,yy,zz,rot3));
-   zz = -42.5;
-   aLand->AddNode(padle_h_box5,23,new TGeoCombiTrans(xx,yy,zz,rot3));
    zz = -41.5;
-   aLand->AddNode(padle_h_box5,24,new TGeoCombiTrans(xx,yy,zz,rot3));
+   aLand->AddNode(padle_h_box5,23,new TGeoCombiTrans(xx,yy,zz,rot3));
    zz = -40.5;
-   aLand->AddNode(padle_h_box5,25,new TGeoCombiTrans(xx,yy,zz,rot3));
+   aLand->AddNode(padle_h_box5,24,new TGeoCombiTrans(xx,yy,zz,rot3));
+
 
  //------------------------- Horizontal Assembly Multiplication & Rotation -----------------------------------------------------------------------  
 
 
-   cout << " -I- Assembly: aLand serial nb: " << aLand->GetNumber() << endl;
-   cout << " -I- now couting subnodes ... " << aLand->GetNdaughters() << endl;
-   aLand->CountNodes(1000,1);
+   // cout << " -I- Assembly: aLand serial nb: " << aLand->GetNumber() << endl;
+   // cout << " -I- now couting subnodes ... " << aLand->GetNdaughters() << endl;
+   //aLand->CountNodes(1000,1);
 
 
   TGeoVolume *cell = new TGeoVolumeAssembly("CELL");
 
-   cout << " -I- Assembly: cell serial nb: " << cell->GetNumber() << endl;
+  // cout << " -I- Assembly: cell serial nb: " << cell->GetNumber() << endl;
 
 
    TGeoRotation *rot4 = new TGeoRotation();
