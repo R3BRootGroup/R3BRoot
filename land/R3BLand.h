@@ -11,8 +11,11 @@
 #define R3BDCH_H
 
 #include "FairDetector.h"
-
 #include "TLorentzVector.h"
+#include <iostream>
+#include <map>
+
+using namespace std;
 
 class TClonesArray;
 class R3BLandPoint;
@@ -109,9 +112,12 @@ class R3BLand : public FairDetector
    ** Constructs the STS geometry
    **/
   virtual void ConstructGeometry();
+  virtual void Initialize();
+  virtual void SetSpecialPhysicsCuts(){;}
 
 
-//  void SaveGeoParams();
+
+  //  void SaveGeoParams();
 
   private:
 
@@ -121,6 +127,7 @@ class R3BLand : public FairDetector
     Int_t          fTrackID;           //!  track index
     Int_t          fVolumeID;          //!  volume id
     Int_t          fCopyNo;            //!  copy no
+    Int_t          fPaddleTyp;               //!  box number
     TLorentzVector fPosIn, fPosOut;    //!  position
     TLorentzVector fMomIn, fMomOut;    //!  momentum
     Double32_t     fTime;              //!  time
@@ -136,7 +143,7 @@ class R3BLand : public FairDetector
      **
      ** Adds a LandPoint to the HitCollection
      **/
-    R3BLandPoint* AddHit(Int_t trackID, Int_t detID, Int_t id1, Int_t id2,
+    R3BLandPoint* AddHit(Int_t trackID, Int_t detID, Int_t box, Int_t id1, Int_t id2,
 			 TVector3 posIn,
 			 TVector3 pos_out, TVector3 momIn,
 			 TVector3 momOut, Double_t time,
@@ -148,6 +155,9 @@ class R3BLand : public FairDetector
      ** Resets the private members for the track parameters
      **/
     void ResetParameters();
+
+    /** Map of MCis with fixed VolID */
+    map <Int_t,Int_t> fMapMcId;
 
 
     ClassDef(R3BLand,1);
