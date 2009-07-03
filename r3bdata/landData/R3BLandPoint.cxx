@@ -16,14 +16,15 @@ R3BLandPoint::R3BLandPoint() : FairMCPoint() {
   fX_out      = fY_out  = fZ_out  = 0.;
   fPx_out     = fPy_out = fPz_out = 0.;
   fSector     = -1 ;
-  fPaddle     = -1 ;
+  fPaddleTyp  = -1 ;
+  fPaddleNb   = -1 ;
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Standard constructor   ------------------------------------------
-R3BLandPoint::R3BLandPoint(Int_t trackID, Int_t detID, Int_t sector,
+R3BLandPoint::R3BLandPoint(Int_t trackID, Int_t detID, Int_t box, Int_t sector,
 			   Int_t paddle, TVector3 posIn,
 			   TVector3 posOut, TVector3 momIn, TVector3 momOut,
 			   Double_t tof, Double_t length, Double_t eLoss)
@@ -35,7 +36,9 @@ R3BLandPoint::R3BLandPoint(Int_t trackID, Int_t detID, Int_t sector,
   fPy_out = momOut.Py();
   fPz_out = momOut.Pz();
   fSector = sector;
-  fPaddle = paddle;
+  fPaddleTyp = box;
+  fPaddleNb = paddle;
+
 }
 // -------------------------------------------------------------------------
 
@@ -53,7 +56,8 @@ void R3BLandPoint::Print(const Option_t* opt) const {
   cout << "-I- R3BLandPoint: LAND Point for track " << fTrackID
 	<< " in detector " << fDetectorID
 	<< " Sector: " << fSector
-	<< " Paddle: " << fPaddle << endl;
+	<< " PaddleTyp: " << fPaddleTyp
+	<< " PaddleNb: " << fPaddleNb << endl;
 
   cout << "    Position (" << fX << ", " << fY << ", " << fZ
        << ") cm" << endl;
