@@ -38,7 +38,7 @@ class R3BLandPoint : public FairMCPoint
    *@param length   Track length since creation [cm]
    *@param eLoss    Energy deposit [GeV]
    **/
-  R3BLandPoint(Int_t trackID, Int_t detID, Int_t sector,
+  R3BLandPoint(Int_t trackID, Int_t box, Int_t detID, Int_t sector,
 	       Int_t paddle, TVector3 posIn,
 	       TVector3 posOut, TVector3 momIn, TVector3 momOut,
 	       Double_t tof, Double_t length, Double_t eLoss);
@@ -63,7 +63,8 @@ class R3BLandPoint : public FairMCPoint
   Double_t GetPyOut() const { return fPy_out; }
   Double_t GetPzOut() const { return fPz_out; }
   Int_t    GetSector() const { return fSector;}
-  Int_t    GetPaddle() const { return fPaddle;}
+  Int_t    GetPaddleType() const { return fPaddleTyp;}
+  Int_t    GetPaddleNb() const { return fPaddleNb;}
 
   void PositionIn(TVector3& pos)  { pos.SetXYZ(fX, fY, fZ); }
   void PositionOut(TVector3& pos) { pos.SetXYZ(fX_out,fY_out,fZ_out); }
@@ -92,7 +93,8 @@ class R3BLandPoint : public FairMCPoint
   Double32_t fX_out,  fY_out,  fZ_out;
   Double32_t fPx_out, fPy_out, fPz_out;
   Int_t fSector;
-  Int_t fPaddle;
+  Int_t fPaddleNb;
+  Int_t fPaddleTyp;
 
   ClassDef(R3BLandPoint,1)
 
