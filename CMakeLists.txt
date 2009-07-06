@@ -110,6 +110,7 @@ add_subdirectory (tracker)
 add_subdirectory (r3bdata)
 add_subdirectory (field)
 add_subdirectory (macros) 
+add_subdirectory (eventdisplay) 
 
 Option(BUILD_DOXYGEN "Build Doxygen" OFF)
 if(BUILD_DOXYGEN)

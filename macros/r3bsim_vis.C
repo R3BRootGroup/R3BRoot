@@ -1,4 +1,4 @@
-void r3bsim(Int_t nEvents = 1)
+void r3bsim_vis(Int_t nEvents = 1)
 {
   
   TString dir = getenv("VMCWORKDIR");
@@ -53,7 +53,7 @@ void r3bsim(Int_t nEvents = 1)
  
   // -----   Create simulation run   ----------------------------------------
   FairRunSim* run = new FairRunSim();
-  run->SetName("TGeant4");              // Transport engine
+  run->SetName("TGeant3");              // Transport engine
   run->SetOutputFile(OutFile.Data());          // Output file
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
   
@@ -133,11 +133,11 @@ void r3bsim(Int_t nEvents = 1)
   // -----   Create PrimaryGenerator   --------------------------------------
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
-  Double_t pdgId=11; // pion beam
+  Double_t pdgId=211; // pion beam
   Double_t theta1= 0.;  // polar angle distribution
   Double_t theta2= 5..;
-  Double_t momentum=10.; // 10 GeV/c
-  FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 10);
+  Double_t momentum=3.; // 10 GeV/c
+  FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 1);
   boxGen->SetThetaRange (   theta1,   theta2);
   boxGen->SetPRange     (momentum,momentum);
   boxGen->SetPhiRange   (0.,360.);
@@ -145,7 +145,10 @@ void r3bsim(Int_t nEvents = 1)
   primGen->AddGenerator(boxGen);
 
   run->SetGenerator(primGen);
-
+ 
+ //-------Set visualisation flag to true------------------------------------
+  run->SetStoreTraj(kTRUE);
+ 
   // -----   Initialize simulation run   ------------------------------------
   run->Init();
 
