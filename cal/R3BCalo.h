@@ -135,7 +135,8 @@ class R3BCalo : public FairDetector
      **
      ** Adds a CaloPoint to the HitCollection
      **/
-    R3BCaloPoint* AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
+    R3BCaloPoint* AddHit(Int_t trackID, Int_t detID, Int_t volid, Int_t copy,
+			TVector3 posIn,
 			TVector3 pos_out, TVector3 momIn, 
 			TVector3 momOut, Double_t time, 
 			Double_t length, Double_t eLoss);
