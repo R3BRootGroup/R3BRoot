@@ -572,7 +572,8 @@ void R3BTra::ConstructGeometry() {
    // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
    // Shape: SiVacuumSphereWorld type: TGeoSphere
    rmin   = 0.000000;
-   rmax   = 24.250000;
+   rmax   = 25.00000;
+   // rmax   = 24.250000;
    theta1 = 0.000000;
    theta2 = 180.000000;
    phi1   = 0.000000;
