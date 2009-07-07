@@ -91,15 +91,14 @@ R3BCalo::~R3BCalo() {
 
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BCalo::ProcessHits(FairVolume* vol) {
-//      cout << " -I process hit called for:" <<  vol->GetName() << endl;
-// Set parameters at entrance of volume. Reset ELoss.
 
-//    if ( vol ) {
-//        cout << " Name Id:copy "
-//            << vol->getName() << " : " << vol->getMCid() << " : " << vol->getCopyNo() << endl;
-//        Int_t copyNo=0;
-//        cout << " Geant: " << gMC->CurrentVolID(copyNo) << ":" << copyNo << endl;
-//    }
+
+   // Getting the Infos from Crystal Volumes
+   Int_t cp1=-1;
+   Int_t volId1=-1;
+   // Crystals Ids
+   volId1 =  gMC->CurrentVolID(cp1);
+
 
     if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
@@ -162,7 +161,7 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol) {
       fPosOut.SetZ(newpos[2]);
     }
 
-    AddHit(fTrackID, fVolumeID,
+    AddHit(fTrackID, fVolumeID, volId1 , cp1 ,
 	   TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
 	   TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
 	   TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
@@ -270,7 +269,7 @@ void R3BCalo::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
 }
 
 // -----   Private method AddHit   --------------------------------------------
-R3BCaloPoint* R3BCalo::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
+R3BCaloPoint* R3BCalo::AddHit(Int_t trackID, Int_t detID, Int_t volid , Int_t copy, TVector3 posIn,
 			    TVector3 posOut, TVector3 momIn, 
 			    TVector3 momOut, Double_t time, 
 			    Double_t length, Double_t eLoss) {
@@ -280,7 +279,7 @@ R3BCaloPoint* R3BCalo::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
     cout << "-I- R3BCalo: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
 	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
 	 << trackID << ", energy loss " << eLoss*1e06 << " keV" << endl;
-  return new(clref[size]) R3BCaloPoint(trackID, detID, posIn, posOut,
+  return new(clref[size]) R3BCaloPoint(trackID, detID, volid, copy , posIn, posOut,
 				      momIn, momOut, time, length, eLoss);
 }
 // -----   Public method ConstructGeometry   ----------------------------------
@@ -2847,8 +2846,6 @@ void R3BCalo::ConstructGeometry() {
 
    AddSensitiveVolume(pcrystalLog30);
    fNbOfSensitiveVol+=64;
-
-
 
 
    // H - Structure
