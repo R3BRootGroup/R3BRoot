@@ -202,7 +202,6 @@ void  R3BFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField){
 
  Double_t Bfield[3];
 
-//   cout << "-I- get field values  for field type" << typeField << endl;
    
  if ( typeField==0 || typeField==1 || typeField==3 ) {
 
@@ -230,11 +229,11 @@ void  R3BFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField){
         localPoint.Y() <= initialY+((stepsInY-1)*gridStep) &&
         localPoint.Z() <= initialZ+((stepsInZ-1)*gridStep) ) {
 
-
 //   cout << "-I-  inside  the magnetic area! " << endl;
 //   cout << "Transf. Point: " << localPoint.X() << " : " <<
 //        localPoint.Y() << " : " <<  localPoint.Z()
 //       << endl;
+
     
  Int_t returnValue = GetLinesArrayForPosition(&localPoint, linesArray);
 
@@ -322,6 +321,11 @@ else if ( typeField == 2 ){
      Bfield[1] = -1.*10.; //kGauss
      Bfield[2] = 0.;
   }
+
+ // return the values
+ bField[0] = Bfield[0];
+ bField[1] = Bfield[1];
+ bField[2] = Bfield[2];
 
 }
 
