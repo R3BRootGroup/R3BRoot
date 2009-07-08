@@ -91,15 +91,10 @@ R3BDch::~R3BDch() {
 
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BDch::ProcessHits(FairVolume* vol) {
-//      cout << " -I process hit called for:" <<  vol->GetName() << endl;
 // Set parameters at entrance of volume. Reset ELoss.
-
-//    if ( vol ) {
-//        cout << " Name Id:copy "
-//            << vol->getName() << " : " << vol->getMCid() << " : " << vol->getCopyNo() << endl;
-//        Int_t copyNo=0;
-//        cout << " Geant: " << gMC->CurrentVolID(copyNo) << ":" << copyNo << endl;
-//    }
+// get Info from DCH planes
+    Int_t planeNr = -1;
+    gMC->CurrentVolID(planeNr);
 
     if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
@@ -162,7 +157,8 @@ Bool_t R3BDch::ProcessHits(FairVolume* vol) {
       fPosOut.SetZ(newpos[2]);
     }
 
-    AddHit(fTrackID, fVolumeID,
+
+    AddHit(fTrackID, fVolumeID, planeNr ,
 	   TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
 	   TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
 	   TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
@@ -270,7 +266,7 @@ void R3BDch::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
 }
 
 // -----   Private method AddHit   --------------------------------------------
-R3BDchPoint* R3BDch::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
+R3BDchPoint* R3BDch::AddHit(Int_t trackID, Int_t detID, Int_t plane, TVector3 posIn,
 			    TVector3 posOut, TVector3 momIn, 
 			    TVector3 momOut, Double_t time, 
 			    Double_t length, Double_t eLoss) {
@@ -280,7 +276,7 @@ R3BDchPoint* R3BDch::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
     cout << "-I- R3BDch: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
 	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
 	 << trackID << ", energy loss " << eLoss*1e06 << " keV" << endl;
-  return new(clref[size]) R3BDchPoint(trackID, detID, posIn, posOut,
+  return new(clref[size]) R3BDchPoint(trackID, detID, plane, posIn, posOut,
 				      momIn, momOut, time, length, eLoss);
 }
 // -----   Public method ConstructGeometry   ----------------------------------
@@ -616,7 +612,6 @@ void R3BDch::ConstructGeometry() {
    // add sensitive volume to DCH
    AddSensitiveVolume(pDCHLog_82ab9d8);
    fNbOfSensitiveVol+=1;
-
 
 }
 
