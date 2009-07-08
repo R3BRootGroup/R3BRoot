@@ -61,7 +61,7 @@ R3BFieldMap::R3BFieldMap(Int_t type,Bool_t verbosity)
   Double_t DistanceToTarget = 350.0;  //cm
   Double_t Correction = -119.94; // cm
   Double_t Aladin_gap = 50.;    //cm
-  Double_t Aladin_angle = -7.3; // degree
+  Double_t Aladin_angle = +7.3; // degree
   Double_t Yoke_thickness = 50.; //cm
 
   Double_t DistanceFromtargetToAladinCenter
@@ -220,9 +220,6 @@ void  R3BFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField){
  localPoint.Transform(*gRot);
  localPoint = localPoint + (*gTrans);
 
-// cout << "Transf. Point: " << localPoint.X() << " : " <<
-//        localPoint.Y() << " : " <<  localPoint.Z()    
-//      << endl;
 
 
  // test area
@@ -234,7 +231,10 @@ void  R3BFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField){
         localPoint.Z() <= initialZ+((stepsInZ-1)*gridStep) ) {
 
 
-//    cout << "-I-  inside  the magnetic area! " << endl;
+//   cout << "-I-  inside  the magnetic area! " << endl;
+//   cout << "Transf. Point: " << localPoint.X() << " : " <<
+//        localPoint.Y() << " : " <<  localPoint.Z()
+//       << endl;
     
  Int_t returnValue = GetLinesArrayForPosition(&localPoint, linesArray);
 
@@ -277,9 +277,7 @@ void  R3BFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField){
 	  (1-t)*(1-u)*v*Bzfield[linesArray->At(6)] +
 	  t*(1-u)*v*Bzfield[linesArray->At(7)];
 
-//	cout <<"-I- corresponding  B values : Bx By Bz "
-//	     << Bfield[0] << " - " << Bfield[1] << " - " << Bfield[2] << endl;
-	
+
      }
      
 
@@ -321,9 +319,10 @@ void  R3BFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField){
 else if ( typeField == 2 ){
    // cout << "-I- R3BFieldMap typeField 2"<< endl;
      Bfield[0] = 0.;
-     Bfield[1] = -1. *10. ; //kGauss
+     Bfield[1] = -1.*10.; //kGauss
      Bfield[2] = 0.;
   }
+
 }
 
 
