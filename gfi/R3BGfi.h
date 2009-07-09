@@ -135,7 +135,7 @@ class R3BGfi : public FairDetector
      **
      ** Adds a GfiPoint to the HitCollection
      **/
-    R3BGfiPoint* AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
+    R3BGfiPoint* AddHit(Int_t trackID, Int_t detID, Int_t plane, TVector3 posIn,
 			TVector3 pos_out, TVector3 momIn, 
 			TVector3 momOut, Double_t time, 
 			Double_t length, Double_t eLoss);
