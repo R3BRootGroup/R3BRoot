@@ -93,8 +93,12 @@ R3BDch::~R3BDch() {
 Bool_t R3BDch::ProcessHits(FairVolume* vol) {
 // Set parameters at entrance of volume. Reset ELoss.
 // get Info from DCH planes
+    Int_t copyNo  = -1;
     Int_t planeNr = -1;
-    gMC->CurrentVolID(planeNr);
+// Get the Geo info from MC Point
+    gMC->CurrentVolID(copyNo);
+    gMC->CurrentVolOffID(1,planeNr);
+
 
     if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
@@ -115,7 +119,9 @@ Bool_t R3BDch::ProcessHits(FairVolume* vol) {
     fVolumeID = vol->getMCid();
     gMC->TrackPosition(fPosOut);
     gMC->TrackMomentum(fMomOut);
-    if (fELoss == 0. ) return kFALSE;
+
+  // <D.B> remove this test  here or not ????
+ //   if (fELoss == 0. ) return kFALSE;
     
     if (gMC->IsTrackExiting()) {
       const Double_t* oldpos;
