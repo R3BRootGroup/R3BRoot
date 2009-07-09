@@ -15,7 +15,7 @@ using std::flush;
 R3BDchPoint::R3BDchPoint() : FairMCPoint() {
   fX_out      = fY_out  = fZ_out  = 0.;
   fPx_out     = fPy_out = fPz_out = 0.;
-  fPlane      = -1;
+  fModule      = -1;
 }
 // -------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ R3BDchPoint::R3BDchPoint(Int_t trackID, Int_t detID, Int_t plane, TVector3 posIn
   fPx_out = momOut.Px();
   fPy_out = momOut.Py();
   fPz_out = momOut.Pz();
-  fPlane  = plane;
+  fModule  = plane;
 }
 // -------------------------------------------------------------------------
 
