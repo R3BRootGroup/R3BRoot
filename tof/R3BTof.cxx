@@ -91,15 +91,8 @@ R3BTof::~R3BTof() {
 
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BTof::ProcessHits(FairVolume* vol) {
-//      cout << " -I process hit called for:" <<  vol->GetName() << endl;
-// Set parameters at entrance of volume. Reset ELoss.
 
-//    if ( vol ) {
-//        cout << " Name Id:copy "
-//            << vol->getName() << " : " << vol->getMCid() << " : " << vol->getCopyNo() << endl;
-//        Int_t copyNo=0;
-//        cout << " Geant: " << gMC->CurrentVolID(copyNo) << ":" << copyNo << endl;
-//    }
+  // Simple Det PLane
 
     if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
