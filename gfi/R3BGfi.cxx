@@ -91,17 +91,11 @@ R3BGfi::~R3BGfi() {
 
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BGfi::ProcessHits(FairVolume* vol) {
-//      cout << " -I process hit called for:" <<  vol->GetName() << endl;
-// Set parameters at entrance of volume. Reset ELoss.
 
-//    if ( vol ) {
-//        cout << " Name Id:copy "
-//            << vol->getName() << " : " << vol->getMCid() << " : " << vol->getCopyNo() << endl;
-//        Int_t copyNo=0;
-//        cout << " Geant: " << gMC->CurrentVolID(copyNo) << ":" << copyNo << endl;
-//    }
+   // Simple Det PLane
 
-    if ( gMC->IsTrackEntering() ) {
+
+   if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
     fTime   = gMC->TrackTime() * 1.0e09;
     fLength = gMC->TrackLength();
