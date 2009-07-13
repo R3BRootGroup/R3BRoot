@@ -40,6 +40,7 @@
 #include "TGeoTube.h"
 #include "TGeoBoolNode.h"
 #include "TGeoCompositeShape.h"
+#include "TGeoShapeAssembly.h"
 #include <iostream>
 
 using std::cout;
@@ -88,10 +89,21 @@ R3BTra::~R3BTra() {
 }
 // -------------------------------------------------------------------------
 
+// ----   Initialize   -----------------------------------------------------
 
+void R3BTra::Initialize()
+{
+  FairDetector::Initialize();
+
+    cout << "-I- R3BTra initialisation" << endl;
+    cout << "-I- Vol ID" << endl;
+    cout << "-I- MC ID Tracker : " << gMC->VolId("TraLog")<< endl;
+
+}
 
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BTra::ProcessHits(FairVolume* vol) {
+
 //      cout << " -I process hit called for:" <<  vol->GetName() << endl;
 // Set parameters at entrance of volume. Reset ELoss.
 
@@ -102,16 +114,20 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
 //        cout << " Geant: " << gMC->CurrentVolID(copyNo) << ":" << copyNo << endl;
 //    }
 
+
     if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
     fTime   = gMC->TrackTime() * 1.0e09;
     fLength = gMC->TrackLength();
     gMC->TrackPosition(fPosIn);
     gMC->TrackMomentum(fMomIn);
+    //cout << "X,Y,X tracker=" << fPosIn(0) << " " << fPosIn(1) << " " << fPosIn(2) << endl;
+    //cout << "track length=" << fLength << endl;
   }
 
   // Sum energy loss for all steps in the active volume
-  fELoss += gMC->Edep();
+      fELoss += gMC->Edep();
+    //cout << "Tracker Eloss=" << fELoss << "  " << gMC->Edep() << endl;
 
   // Set additional parameters at exit of active volume. Create R3BTraPoint.
   if ( gMC->IsTrackExiting()    ||
@@ -198,6 +214,16 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
 // -----   Public method EndOfEvent   -----------------------------------------
 void R3BTra::BeginEvent() {
 
+  cout << "-I- begin tracker event called ##########" << endl;
+
+  if(gGeoManager){
+    TGeoVolume * vol=gGeoManager->FindVolumeFast("TraLog");
+  
+    if(vol){
+      cout << "id tracker serial number : " << vol->GetNumber() << endl;
+    }
+  }
+
 //  if (! kGeoSaved ) {
 //      SaveGeoParams();
 //  cout << "-I STS geometry parameters saved " << endl;
@@ -219,7 +245,7 @@ void R3BTra::EndOfEvent() {
 
 // -----   Public method Register   -------------------------------------------
 void R3BTra::Register() {
-  FairRootManager::Instance()->Register("TRAPoint", GetName(), fTraCollection, kTRUE);
+  FairRootManager::Instance()->Register("TraPoint", GetName(), fTraCollection, kTRUE);
 }
 // ----------------------------------------------------------------------------
 
@@ -284,6 +310,8 @@ R3BTraPoint* R3BTra::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
   return new(clref[size]) R3BTraPoint(trackID, detID, posIn, posOut,
 				      momIn, momOut, time, length, eLoss);
 }
+
+
 // -----   Public method ConstructGeometry   ----------------------------------
 void R3BTra::ConstructGeometry() {
 
@@ -317,7 +345,7 @@ void R3BTra::ConstructGeometry() {
  // Vacuum
   TGeoMaterial *matVacuum = new TGeoMaterial("Vacuum", 0,0,0);
   TGeoMedium *pMed1 = new TGeoMedium("Vacuum",1, matVacuum);
-  pMed1->Print();
+  //pMed1->Print();
 
 // Mixture: Air
   nel     = 2;
@@ -341,12 +369,16 @@ void R3BTra::ConstructGeometry() {
    radl    = 9.351106;
    absl    = 456.628489;
    TGeoMaterial*
-   pMat22 = new TGeoMaterial("Silicon", a,z,density,radl,absl);
+   pMat22 = new TGeoMaterial("Silicon", a,z,density); 
+
    pMat22->SetIndex(21);
 // Medium: Silicon
    numed   = 21;  // medium number
+   cout << "numed=" <<  numed << endl;
    TGeoMedium*
-   pMed22 = new TGeoMedium("Silicon", numed,pMat22, par);
+     pMed22 = new TGeoMedium("Silicon", numed,pMat22);
+   pMed22->Print();
+
 // Material: Copper
    a       = 63.540000;
    z       = 29.000000;
@@ -571,32 +603,16 @@ void R3BTra::ConstructGeometry() {
 
    // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
    // Shape: SiVacuumSphereWorld type: TGeoSphere
-   rmin   = 0.000000;
-   rmax   = 24.250000;
-   theta1 = 0.000000;
-   theta2 = 180.000000;
-   phi1   = 0.000000;
-   phi2   = 360.000000;
-   TGeoShape *pSiVacuumSphereWorld_2 = new TGeoSphere("SiVacuumSphereWorld",rmin,rmax,theta1, theta2,phi1,phi2);
-   // Volume: SiVacuumLogWorld
-   TGeoVolume*
-   pSiVacuumLogWorld_82abed8 = new TGeoVolume("SiVacuumLogWorld",pSiVacuumSphereWorld_2, pMed1);
-   pSiVacuumLogWorld_82abed8->SetVisLeaves(kTRUE);
-   pWorld->AddNode(pSiVacuumLogWorld_82abed8, 0, pMatrix2);
-   // Shape: TraBoxWorld type: TGeoBBox
-   dx = 3.650000;
-   dy = 2.120000;
-   dz = 0.020000;
-   TGeoShape *pTraBoxWorld_3 = new TGeoBBox("TraBoxWorld", dx,dy,dz);
-   // Volume: TraLogWorld
-   TGeoVolume*
-   pTraLogWorld_82ac0c0 = new TGeoVolume("TraLogWorld",pTraBoxWorld_3, pMed1);
-   pTraLogWorld_82ac0c0->SetVisLeaves(kTRUE);
-   pSiVacuumLogWorld_82abed8->AddNode(pTraLogWorld_82ac0c0, 0, pMatrix4);
-   pSiVacuumLogWorld_82abed8->AddNode(pTraLogWorld_82ac0c0, 1, pMatrix6);
-   pSiVacuumLogWorld_82abed8->AddNode(pTraLogWorld_82ac0c0, 2, pMatrix8);
-   pSiVacuumLogWorld_82abed8->AddNode(pTraLogWorld_82ac0c0, 3, pMatrix10);
-   pSiVacuumLogWorld_82abed8->AddNode(pTraLogWorld_82ac0c0, 4, pMatrix12);
+
+   // Si Shape & volume: TraBox type: TGeoBBox
+   dx = 3.600000;
+   dy = 2.070000;
+   dz = 0.015000;
+   // Volume: TraLog
+   TGeoVolume *TraLog = gGeoManager->MakeBox("TraLog",pMed22,dx,dy,dz);
+   cout << " tracker: " << TraLog->GetNumber() << endl;
+
+
    // Shape: MontagePlatform type: TGeoTubeSeg
    rmin = 2.750000;
    rmax = 18.000000;
@@ -607,8 +623,8 @@ void R3BTra::ConstructGeometry() {
    // Volume: MontagePlatformLog
    TGeoVolume*
    pMontagePlatformLog_82ac400 = new TGeoVolume("MontagePlatformLog",pMontagePlatform_5, pMed25);
-   pMontagePlatformLog_82ac400->SetVisLeaves(kTRUE);
-   pSiVacuumLogWorld_82abed8->AddNode(pMontagePlatformLog_82ac400, 0, pMatrix14);
+
+
    // Shape: MontageRing type: TGeoTubeSeg
    rmin = 12.000000;
    rmax = 15.000000;
@@ -619,22 +635,8 @@ void R3BTra::ConstructGeometry() {
    // Volume: MontageRingLog
    TGeoVolume*
    pMontageRingLog_82ac5a8 = new TGeoVolume("MontageRingLog",pMontageRing_6, pMed25);
-   pMontageRingLog_82ac5a8->SetVisLeaves(kTRUE);
-   pSiVacuumLogWorld_82abed8->AddNode(pMontageRingLog_82ac5a8, 0, pMatrix16);
-   // Shape: electronicBox type: TGeoBBox
-   dx = 4.000000;
-   dy = 3.500000;
-   dz = 1.000000;
-   TGeoShape *pelectronicBox_7 = new TGeoBBox("electronicBox", dx,dy,dz);
-   // Volume: electronicsLog
-   TGeoVolume*
-   pelectronicsLog_82ac750 = new TGeoVolume("electronicsLog",pelectronicBox_7, pMed21);
-   pelectronicsLog_82ac750->SetVisLeaves(kTRUE);
-   pSiVacuumLogWorld_82abed8->AddNode(pelectronicsLog_82ac750, 0, pMatrix18);
-   pSiVacuumLogWorld_82abed8->AddNode(pelectronicsLog_82ac750, 1, pMatrix20);
-   pSiVacuumLogWorld_82abed8->AddNode(pelectronicsLog_82ac750, 2, pMatrix22);
-   pSiVacuumLogWorld_82abed8->AddNode(pelectronicsLog_82ac750, 3, pMatrix24);
-   pSiVacuumLogWorld_82abed8->AddNode(pelectronicsLog_82ac750, 4, pMatrix26);
+
+
    // Shape: targetWheel type: TGeoTubeSeg
    rmin = 0.410000;
    rmax = 5.300000;
@@ -645,8 +647,8 @@ void R3BTra::ConstructGeometry() {
    // Volume: targetWheelLog
    TGeoVolume*
    ptargetWheelLog_82acad0 = new TGeoVolume("targetWheelLog",ptargetWheel_9, pMed21);
-   ptargetWheelLog_82acad0->SetVisLeaves(kTRUE);
-   pSiVacuumLogWorld_82abed8->AddNode(ptargetWheelLog_82acad0, 0, pMatrix28);
+
+
    // Shape: targetWheel2 type: TGeoTubeSeg
    rmin = 9.500000;
    rmax = 10.000000;
@@ -657,18 +659,8 @@ void R3BTra::ConstructGeometry() {
    // Volume: targetWheel2Log
    TGeoVolume*
    ptargetWheel2Log_82acca0 = new TGeoVolume("targetWheel2Log",ptargetWheel2_10, pMed21);
-   ptargetWheel2Log_82acca0->SetVisLeaves(kTRUE);
-   pSiVacuumLogWorld_82abed8->AddNode(ptargetWheel2Log_82acca0, 0, pMatrix30);
-   // Shape: TraBox type: TGeoBBox
-   dx = 3.600000;
-   dy = 2.070000;
-   dz = 0.015000;
-   TGeoShape *pTraBox_4 = new TGeoBBox("TraBox", dx,dy,dz);
-   // Volume: TraLog
-   TGeoVolume*
-   pTraLog_82ac230 = new TGeoVolume("TraLog",pTraBox_4, pMed22);
-   pTraLog_82ac230->SetVisLeaves(kTRUE);
-   pTraLogWorld_82ac0c0->AddNode(pTraLog_82ac230, 0, pMatrix32);
+
+
    // Shape: innerElectronicBox type: TGeoBBox
    dx = 3.800000;
    dy = 3.300000;
@@ -677,12 +669,52 @@ void R3BTra::ConstructGeometry() {
    // Volume: innerElectronicsLog
    TGeoVolume*
    pinnerElectronicsLog_82ac8f8 = new TGeoVolume("innerElectronicsLog",pinnerElectronicBox_8, pMed1);
-   pinnerElectronicsLog_82ac8f8->SetVisLeaves(kTRUE);
-   pelectronicsLog_82ac750->AddNode(pinnerElectronicsLog_82ac8f8, 0, pMatrix34);
+
+   //
+   // Make elementary assembly of the whole structure.
+   //
+
+   TGeoVolume *aTra = new TGeoVolumeAssembly("ATRA");
+
+    aTra->AddNode(ptargetWheel2Log_82acca0,1, pMatrix30);
+ 
+    aTra->AddNode(pinnerElectronicsLog_82ac8f8,1, pMatrix18);
+    aTra->AddNode(pinnerElectronicsLog_82ac8f8,2, pMatrix20);
+    aTra->AddNode(pinnerElectronicsLog_82ac8f8,3, pMatrix22);
+    aTra->AddNode(pinnerElectronicsLog_82ac8f8,4, pMatrix24);
+    aTra->AddNode(pinnerElectronicsLog_82ac8f8,5, pMatrix26);
+
+    aTra->AddNode(ptargetWheelLog_82acad0,1, pMatrix28);
+
+    aTra->AddNode(pMontageRingLog_82ac5a8,1, pMatrix16);
+
+    aTra->AddNode(pMontagePlatformLog_82ac400,1, pMatrix14);
+   
+    AddSensitiveVolume(TraLog);
+    fNbOfSensitiveVol+=1;
+
+    aTra->AddNode(TraLog,1, pMatrix4);
+    aTra->AddNode(TraLog,2, pMatrix6);
+    aTra->AddNode(TraLog,3, pMatrix8);
+    aTra->AddNode(TraLog,4, pMatrix10);
+    aTra->AddNode(TraLog,5, pMatrix12);
 
 
-  AddSensitiveVolume(pTraLog_82ac230);
-  fNbOfSensitiveVol+=1;
+
+    //
+
+    TGeoRotation *rotg = new TGeoRotation();
+    rotg->RotateX(0.);
+    rotg->RotateY(0.);
+    rotg->RotateZ(0.);
+    dx=0.0;
+    dy=0.0;
+    dz=0.0;
+
+    pWorld->AddNode(aTra,1, new TGeoCombiTrans(tx,ty,tz,rotg));
+
+
+
 }
 
 

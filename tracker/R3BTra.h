@@ -109,6 +109,7 @@ class R3BTra : public FairDetector
    ** Constructs the STS geometry
    **/
   virtual void ConstructGeometry();
+  virtual void Initialize();
 
 
 //  void SaveGeoParams();
@@ -120,6 +121,7 @@ class R3BTra : public FairDetector
 	active volume. **/
     Int_t          fTrackID;           //!  track index
     Int_t          fVolumeID;          //!  volume id
+    Int_t          fsector;            //!  volume id
     TLorentzVector fPosIn, fPosOut;    //!  position
     TLorentzVector fMomIn, fMomOut;    //!  momentum
     Double32_t     fTime;              //!  time

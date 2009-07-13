@@ -53,13 +53,13 @@ void r3bsim_vis(Int_t nEvents = 1)
  
   // -----   Create simulation run   ----------------------------------------
   FairRunSim* run = new FairRunSim();
-  run->SetName("TGeant3");              // Transport engine
+  run->SetName("TGeant4");              // Transport engine
   run->SetOutputFile(OutFile.Data());          // Output file
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
   
 
   // -----   Create media   -------------------------------------------------
-  run->SetMaterials("media_pnd.geo");       // Materials
+    run->SetMaterials("media_pnd.geo");       // Materials
   
   // -----   Create R3B geometry --------------------------------------------
 
@@ -74,14 +74,13 @@ void r3bsim_vis(Int_t nEvents = 1)
   run->AddModule(target);
 
   //R3B Magnet definition
-  FairModule* mag = new R3BMagnet("AladinMagnet");
-  run->AddModule(mag);
+  //FairModule* mag = new R3BMagnet("AladinMagnet");
+  //run->AddModule(mag);
 
 
   // Land Detector
-  FairDetector* land = new R3BLand("Land", kTRUE);
-  run->AddModule(land);
-
+  //FairDetector* land = new R3BLand("Land", kTRUE);
+  //run->AddModule(land);
 
 
   // Crystal Calorimeter
@@ -109,8 +108,8 @@ void r3bsim_vis(Int_t nEvents = 1)
   //run->AddModule(mTof);
 
   // Tracker
-  //FairDetector* tra = new R3BTra("Tracker", kTRUE);
-  //run->AddModule(tra);
+  FairDetector* tra = new R3BTra("Tracker", kTRUE);
+  run->AddModule(tra);
 
   // R3b  Calorimeter
 //  FairDetector* calo = new R3BCalo("Calo", kTRUE);
@@ -120,7 +119,7 @@ void r3bsim_vis(Int_t nEvents = 1)
   // -----   Create magnetic field   ----------------------------------------
   Int_t typeOfMagneticField = 0;
   Int_t fieldScale = 1;
-//  Bool_t fVerbose = kTRUE;
+  //  Bool_t fVerbose = kTRUE;
   Bool_t fVerbose = kFALSE;
 
   R3BFieldMap* magField = new R3BFieldMap(typeOfMagneticField,fVerbose);
@@ -132,11 +131,12 @@ void r3bsim_vis(Int_t nEvents = 1)
 
   // -----   Create PrimaryGenerator   --------------------------------------
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
-
-  Double_t pdgId=211; // pion beam
+  
+  //Double_t pdgId=211; // pion beam
+  Double_t pdgId=2212; //  proton (cf g4 pdg)
   Double_t theta1= 0.;  // polar angle distribution
-  Double_t theta2= 5..;
-  Double_t momentum=3.; // 10 GeV/c
+  Double_t theta2= 0.1;
+  Double_t momentum=.7; // GeV/c
   FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 1);
   boxGen->SetThetaRange (   theta1,   theta2);
   boxGen->SetPRange     (momentum,momentum);

@@ -5,9 +5,9 @@
 #pragma link off all functions;
  
 #pragma link C++ class R3BGeoTra+;
-#pragma link C++ class R3BGeoTraPar;
+#pragma link C++ class R3BGeoTraPar+;
 #pragma link C++ class R3BTra+;
-#pragma link C++ class R3BTraContFact;
+#pragma link C++ class R3BTraContFact+;
 
 #endif
 

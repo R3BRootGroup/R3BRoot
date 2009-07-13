@@ -21,7 +21,8 @@ R3BTraPoint::R3BTraPoint() : FairMCPoint() {
 
 
 // -----   Standard constructor   ------------------------------------------
-R3BTraPoint::R3BTraPoint(Int_t trackID, Int_t detID, TVector3 posIn, 
+R3BTraPoint::R3BTraPoint(Int_t trackID, Int_t detID, 
+			 TVector3 posIn, 
 			 TVector3 posOut, TVector3 momIn, TVector3 momOut,
 			 Double_t tof, Double_t length, Double_t eLoss) 
   : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss) {
@@ -46,7 +47,7 @@ R3BTraPoint::~R3BTraPoint() { }
 // -----   Public method Print   -------------------------------------------
 void R3BTraPoint::Print(const Option_t* opt) const {
   cout << "-I- R3BTraPoint: STS Point for track " << fTrackID 
-       << " in detector " << fDetectorID << endl;
+       << " in detector " << fDetectorID << endl;	
   cout << "    Position (" << fX << ", " << fY << ", " << fZ
        << ") cm" << endl;
   cout << "    Momentum (" << fPx << ", " << fPy << ", " << fPz
