@@ -1,4 +1,4 @@
-void r3tra(Int_t nEvents = 1)
+void r3btra(Int_t nEvents = 1)
 {
   
   TString dir = getenv("VMCWORKDIR");
