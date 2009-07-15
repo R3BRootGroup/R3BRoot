@@ -112,8 +112,23 @@ void R3BTra::SetSpecialPhysicsCuts(){
    if (gGeoManager) {
      TGeoMedium* pSi = gGeoManager->GetMedium("Silicon");
      if ( pSi ) {
-	gMC->Gstpar(pSi->GetId(),"LOSS",3);
-        Double_t cutE = fCutE; // GeV-> 1 keV
+      // Setting processes for Si only
+	 gMC->Gstpar(pSi->GetId()  ,"LOSS",3);
+         gMC->Gstpar(pSi->GetId()  ,"STRA",1.0);
+         gMC->Gstpar(pSi->GetId()  ,"PAIR",1.0);
+	 gMC->Gstpar(pSi->GetId()  ,"COMP",1.0);
+	 gMC->Gstpar(pSi->GetId()  ,"PHOT",1.0);
+         gMC->Gstpar(pSi->GetId()  ,"ANNI",1.0);
+	 gMC->Gstpar(pSi->GetId()  ,"BREM",1.0);
+	 gMC->Gstpar(pSi->GetId()  ,"HADR",1.0);
+         gMC->Gstpar(pSi->GetId()  ,"ANNI",1.0);
+	 gMC->Gstpar(pSi->GetId()  ,"BREM",1.0);
+	 gMC->Gstpar(pSi->GetId()  ,"HADR",1.0);
+         gMC->Gstpar(pSi->GetId()  ,"DRAY",1.0);
+	 gMC->Gstpar(pSi->GetId()  ,"RAYL",1.0);
+
+	 // Setting Energy-CutOff for Si Only
+	Double_t cutE = fCutE; // GeV-> 1 keV
 
 	cout << "-I- R3bTra Silicon Medium Id " << pSi->GetId()
 	    << " Energy Cut-Off : " << cutE
