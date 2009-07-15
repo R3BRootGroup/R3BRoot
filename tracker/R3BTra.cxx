@@ -95,9 +95,46 @@ void R3BTra::Initialize()
 {
   FairDetector::Initialize();
 
+   cout << endl;
     cout << "-I- R3BTra initialisation" << endl;
     cout << "-I- Vol ID" << endl;
     cout << "-I- MC ID Tracker : " << gMC->VolId("TraLog")<< endl;
+
+}
+
+
+void R3BTra::SetSpecialPhysicsCuts(){
+
+   cout << endl;
+
+   cout << "-I- R3BTra Adding customized Physics cut ... " << endl;
+
+   if (gGeoManager) {
+     TGeoMedium* pSi = gGeoManager->GetMedium("Silicon");
+     if ( pSi ) {
+	gMC->Gstpar(pSi->GetId(),"LOSS",3);
+        Double_t cutE = fCutE; // GeV-> 1 keV
+
+	cout << "-I- R3bTra Silicon Medium Id " << pSi->GetId()
+	    << " Energy Cut-Off : " << cutE
+	    << endl;
+        cout << endl;
+        //Si
+	gMC->Gstpar(pSi->GetId(),"CUTGAM",cutE);   /** gammas (GeV)*/
+        gMC->Gstpar(pSi->GetId(),"CUTELE",cutE);   /** electrons (GeV)*/
+	gMC->Gstpar(pSi->GetId(),"CUTNEU",cutE);   /** neutral hadrons (GeV)*/
+	gMC->Gstpar(pSi->GetId(),"CUTHAD",cutE);   /** charged hadrons (GeV)*/
+	gMC->Gstpar(pSi->GetId(),"CUTMUO",cutE);   /** muons (GeV)*/
+	gMC->Gstpar(pSi->GetId(),"BCUTE",cutE);    /** electron bremsstrahlung (GeV)*/
+	gMC->Gstpar(pSi->GetId(),"BCUTM",cutE);    /** muon and hadron bremsstrahlung(GeV)*/
+	gMC->Gstpar(pSi->GetId(),"DCUTE",cutE);    /** delta-rays by electrons (GeV)*/
+	gMC->Gstpar(pSi->GetId(),"DCUTM",cutE);    /** delta-rays by muons (GeV)*/
+        gMC->Gstpar(pSi->GetId(),"PPCUTM",cutE);   /** direct pair production by muons (GeV)*/
+
+     }
+
+ } //!gGeoManager
+
 
 }
 
@@ -113,6 +150,9 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
 //        Int_t copyNo=0;
 //        cout << " Geant: " << gMC->CurrentVolID(copyNo) << ":" << copyNo << endl;
 //    }
+
+
+
 
 
     if ( gMC->IsTrackEntering() ) {
@@ -619,10 +659,10 @@ void R3BTra::ConstructGeometry() {
    dz   = 0.150000;
    phi1 = 0.000000;
    phi2 = 360.000000;
-   TGeoShape *pMontagePlatform_5 = new TGeoTubeSeg("MontagePlatform",rmin,rmax,dz,phi1,phi2);
+   TGeoShape *pMontagePlatform = new TGeoTubeSeg("MontagePlatform",rmin,rmax,dz,phi1,phi2);
    // Volume: MontagePlatformLog
    TGeoVolume*
-   pMontagePlatformLog_82ac400 = new TGeoVolume("MontagePlatformLog",pMontagePlatform_5, pMed25);
+   pMontagePlatformLog = new TGeoVolume("MontagePlatformLog",pMontagePlatform, pMed25);
 
 
    // Shape: MontageRing type: TGeoTubeSeg
@@ -631,10 +671,10 @@ void R3BTra::ConstructGeometry() {
    dz   = 0.250000;
    phi1 = 0.000000;
    phi2 = 360.000000;
-   TGeoShape *pMontageRing_6 = new TGeoTubeSeg("MontageRing",rmin,rmax,dz,phi1,phi2);
+   TGeoShape *pMontageRing = new TGeoTubeSeg("MontageRing",rmin,rmax,dz,phi1,phi2);
    // Volume: MontageRingLog
    TGeoVolume*
-   pMontageRingLog_82ac5a8 = new TGeoVolume("MontageRingLog",pMontageRing_6, pMed25);
+   pMontageRingLog = new TGeoVolume("MontageRingLog",pMontageRing, pMed25);
 
 
    // Shape: targetWheel type: TGeoTubeSeg
@@ -643,10 +683,10 @@ void R3BTra::ConstructGeometry() {
    dz   = 0.100000;
    phi1 = 0.000000;
    phi2 = 360.000000;
-   TGeoShape *ptargetWheel_9 = new TGeoTubeSeg("targetWheel",rmin,rmax,dz,phi1,phi2);
+   TGeoShape *ptargetWheel = new TGeoTubeSeg("targetWheel",rmin,rmax,dz,phi1,phi2);
    // Volume: targetWheelLog
    TGeoVolume*
-   ptargetWheelLog_82acad0 = new TGeoVolume("targetWheelLog",ptargetWheel_9, pMed21);
+   ptargetWheelLog = new TGeoVolume("targetWheelLog",ptargetWheel, pMed21);
 
 
    // Shape: targetWheel2 type: TGeoTubeSeg
@@ -655,20 +695,20 @@ void R3BTra::ConstructGeometry() {
    dz   = 0.100000;
    phi1 = 0.000000;
    phi2 = 360.000000;
-   TGeoShape *ptargetWheel2_10 = new TGeoTubeSeg("targetWheel2",rmin,rmax,dz,phi1,phi2);
+   TGeoShape *ptargetWheel2 = new TGeoTubeSeg("targetWheel2",rmin,rmax,dz,phi1,phi2);
    // Volume: targetWheel2Log
    TGeoVolume*
-   ptargetWheel2Log_82acca0 = new TGeoVolume("targetWheel2Log",ptargetWheel2_10, pMed21);
+   ptargetWheel2Log = new TGeoVolume("targetWheel2Log",ptargetWheel2, pMed21);
 
 
    // Shape: innerElectronicBox type: TGeoBBox
    dx = 3.800000;
    dy = 3.300000;
    dz = 0.800000;
-   TGeoShape *pinnerElectronicBox_8 = new TGeoBBox("innerElectronicBox", dx,dy,dz);
+   TGeoShape *pinnerElectronicBox = new TGeoBBox("innerElectronicBox", dx,dy,dz);
    // Volume: innerElectronicsLog
    TGeoVolume*
-   pinnerElectronicsLog_82ac8f8 = new TGeoVolume("innerElectronicsLog",pinnerElectronicBox_8, pMed1);
+   pinnerElectronicsLog = new TGeoVolume("innerElectronicsLog",pinnerElectronicBox, pMed1);
 
    //
    // Make elementary assembly of the whole structure.
@@ -676,19 +716,19 @@ void R3BTra::ConstructGeometry() {
 
    TGeoVolume *aTra = new TGeoVolumeAssembly("ATRA");
 
-    aTra->AddNode(ptargetWheel2Log_82acca0,1, pMatrix30);
+    aTra->AddNode(ptargetWheel2Log,1, pMatrix30);
  
-    aTra->AddNode(pinnerElectronicsLog_82ac8f8,1, pMatrix18);
-    aTra->AddNode(pinnerElectronicsLog_82ac8f8,2, pMatrix20);
-    aTra->AddNode(pinnerElectronicsLog_82ac8f8,3, pMatrix22);
-    aTra->AddNode(pinnerElectronicsLog_82ac8f8,4, pMatrix24);
-    aTra->AddNode(pinnerElectronicsLog_82ac8f8,5, pMatrix26);
+    aTra->AddNode(pinnerElectronicsLog ,1, pMatrix18);
+    aTra->AddNode(pinnerElectronicsLog ,2, pMatrix20);
+    aTra->AddNode(pinnerElectronicsLog ,3, pMatrix22);
+    aTra->AddNode(pinnerElectronicsLog ,4, pMatrix24);
+    aTra->AddNode(pinnerElectronicsLog ,5, pMatrix26);
 
-    aTra->AddNode(ptargetWheelLog_82acad0,1, pMatrix28);
+    aTra->AddNode(ptargetWheelLog ,1, pMatrix28);
 
-    aTra->AddNode(pMontageRingLog_82ac5a8,1, pMatrix16);
+    aTra->AddNode(pMontageRingLog ,1, pMatrix16);
 
-    aTra->AddNode(pMontagePlatformLog_82ac400,1, pMatrix14);
+    aTra->AddNode(pMontagePlatformLog ,1, pMatrix14);
    
     AddSensitiveVolume(TraLog);
     fNbOfSensitiveVol+=1;
@@ -698,8 +738,6 @@ void R3BTra::ConstructGeometry() {
     aTra->AddNode(TraLog,3, pMatrix8);
     aTra->AddNode(TraLog,4, pMatrix10);
     aTra->AddNode(TraLog,5, pMatrix12);
-
-
 
     //
 
@@ -714,10 +752,7 @@ void R3BTra::ConstructGeometry() {
     pWorld->AddNode(aTra,1, new TGeoCombiTrans(tx,ty,tz,rotg));
 
 
-
 }
-
-
 
 /*
 void R3BTra::ConstructGeometry() {
