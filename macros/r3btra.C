@@ -53,7 +53,7 @@ void r3btra(Int_t nEvents = 1)
  
   // -----   Create simulation run   ----------------------------------------
   FairRunSim* run = new FairRunSim();
-  run->SetName("TGeant4");              // Transport engine
+  run->SetName("TGeant3");              // Transport engine
   run->SetOutputFile(OutFile.Data());          // Output file
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
   
@@ -73,15 +73,30 @@ void r3btra(Int_t nEvents = 1)
   run->AddModule(target);
 
   //R3B Magnet definition
-//  FairModule* mag = new R3BMagnet("AladinMagnet");
-//  run->AddModule(mag);
+  FairModule* mag = new R3BMagnet("AladinMagnet");
+  run->AddModule(mag);
 
   // Tracker
-  R3BTra* tra = new R3BTra("Tracker", kTRUE);
-  tra->SetEnergyCutOff(1.0E-06);  // Cut-Off -> 1KeV only in Si
+  FairDetector* tra = new R3BTra("Tracker", kTRUE);
+  Double_t fCutOffSi = 1.0e-06;  // Cut-Off -> 10KeV only in Si
+  ((R3BTra*) tra)->SetEnergyCutOff(fCutOffSi);
   run->AddModule(tra);
 
 
+  // DCH drift chambers
+   FairDetector* dch = new R3BDch("Dch", kTRUE);
+   run->AddModule(dch);
+
+   // Tof
+  FairDetector* tof = new R3BTof("Tof", kTRUE);
+  Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
+  ((R3BTof*) tof)->SetEnergyCutOff(fCutOffSci);
+  run->AddModule(tof);
+
+  // mTof
+  FairDetector* mTof = new R3BmTof("mTof", kTRUE);
+  ((R3BmTof*) mTof)->SetEnergyCutOff(fCutOffSci);
+  run->AddModule(mTof);
 
 
   // -----   Create magnetic field   ----------------------------------------
@@ -100,15 +115,15 @@ void r3btra(Int_t nEvents = 1)
   // -----   Create PrimaryGenerator   --------------------------------------
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
-  Double_t pdgId=11; // pion beam
+  Double_t pdgId=211; // pion beam
   Double_t theta1= 0.;  // polar angle distribution
-  Double_t theta2= 30.;
-  Double_t momentum=0.5; // 10 GeV/c
-  FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 10);
+  Double_t theta2= 7.;
+  Double_t momentum=.8; // 10 GeV/c
+  FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 50);
   boxGen->SetThetaRange (   theta1,   theta2);
-  boxGen->SetPRange     (momentum,momentum);
+  boxGen->SetPRange     (momentum,momentum*2.);
   boxGen->SetPhiRange   (0.,360.);
-  boxGen->SetXYZ(0.0,0.0,+0.5);
+  boxGen->SetXYZ(0.0,0.0,-1.5);
   primGen->AddGenerator(boxGen);
 
   run->SetGenerator(primGen);
@@ -122,7 +137,7 @@ void r3btra(Int_t nEvents = 1)
   run->Init();
 
   // ------  Increase nb of step for CALO
-  Int_t nSteps = 15000;
+  Int_t nSteps = -15000;
   gMC->SetMaxNStep(nSteps);
 
   // -----   Runtime database   ---------------------------------------------
@@ -136,7 +151,7 @@ void r3btra(Int_t nEvents = 1)
 
 
   // -----   Start run   ----------------------------------------------------
-  run->Run(3);
+  run->Run(10);
   
   // -----   Finish   -------------------------------------------------------
   timer.Stop();
