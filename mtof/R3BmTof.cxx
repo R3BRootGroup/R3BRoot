@@ -107,7 +107,7 @@ void R3BmTof::SetSpecialPhysicsCuts(){
    cout << "-I- R3BmTof Adding customized Physics cut ... " << endl;
 
    if (gGeoManager) {
-     TGeoMedium* pSi = gGeoManager->GetMedium("plasticForTOF");
+     TGeoMedium* pSi = gGeoManager->GetMedium("plasticFormTOF");
      if ( pSi ) {
       // Setting processes for Si only
          gMC->Gstpar(pSi->GetId()  ,"LOSS",3);
@@ -157,6 +157,8 @@ Bool_t R3BmTof::ProcessHits(FairVolume* vol) {
 
   // Simple Det plane
 
+
+   
     if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
     fTime   = gMC->TrackTime() * 1.0e09;
@@ -168,6 +170,7 @@ Bool_t R3BmTof::ProcessHits(FairVolume* vol) {
   // Sum energy loss for all steps in the active volume
   fELoss += gMC->Edep();
 
+ 
   // Set additional parameters at exit of active volume. Create R3BmTofPoint.
   if ( gMC->IsTrackExiting()    ||
        gMC->IsTrackStop()       ||
@@ -372,7 +375,7 @@ void R3BmTof::ConstructGeometry() {
  // Vacuum
   TGeoMaterial *matVacuum = new TGeoMaterial("Vacuum", 0,0,0);
   TGeoMedium *pMed1 = new TGeoMedium("Vacuum",1, matVacuum);
-  pMed1->Print();
+  //pMed1->Print();
 
 // Mixture: Air
   nel     = 2;
@@ -394,7 +397,7 @@ void R3BmTof::ConstructGeometry() {
    nel     = 2;
    density = 1.032000;
    TGeoMixture*
-   pMat34 = new TGeoMixture("plasticForTOF", nel,density);
+   pMat34 = new TGeoMixture("plasticFormTOF", nel,density);
       a = 12.010700;   z = 6.000000;   w = 0.914708;  // C
    pMat34->DefineElement(0,a,z,w);
       a = 1.007940;   z = 1.000000;   w = 0.085292;  // H
@@ -403,7 +406,7 @@ void R3BmTof::ConstructGeometry() {
 // Medium: plasticForTOF
    numed   = 33;  // medium number
    TGeoMedium*
-   pMed34 = new TGeoMedium("plasticForTOF", numed,pMat34, par);
+   pMed34 = new TGeoMedium("plasticFormTOF", numed,pMat34, par);
 
     // TRANSFORMATION MATRICES
    // Combi transformation: 
@@ -436,7 +439,6 @@ void R3BmTof::ConstructGeometry() {
 
   AddSensitiveVolume(pmTOFLog);
   fNbOfSensitiveVol+=1;
-
 }
 
 
