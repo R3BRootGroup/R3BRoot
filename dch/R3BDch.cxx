@@ -318,7 +318,7 @@ void R3BDch::ConstructGeometry() {
  // Vacuum
   TGeoMaterial *matVacuum = new TGeoMaterial("Vacuum", 0,0,0);
   TGeoMedium *pMed1 = new TGeoMedium("Vacuum",1, matVacuum);
-  pMed1->Print();
+//  pMed1->Print();
 
 // Mixture: Air
   nel     = 2;
@@ -516,13 +516,13 @@ void R3BDch::ConstructGeometry() {
    dx = 55.400000;
    dy = 44.200000;
    dz = 4.061200;
-   TGeoShape *pDCHBoxWorld_2 = new TGeoBBox("DCHBoxWorld", dx,dy,dz);
+   TGeoShape *pDCHBoxWorld = new TGeoBBox("DCHBoxWorld", dx,dy,dz);
    // Volume: DCHLogWorld
    TGeoVolume*
-   pDCHLogWorld_82ab830 = new TGeoVolume("DCHLogWorld",pDCHBoxWorld_2, pMed1);
-   pDCHLogWorld_82ab830->SetVisLeaves(kTRUE);
-   pWorld->AddNode(pDCHLogWorld_82ab830, 0, pMatrix2);
-   pWorld->AddNode(pDCHLogWorld_82ab830, 1, pMatrix4);
+   pDCHLogWorld = new TGeoVolume("DCHLogWorld",pDCHBoxWorld, pMed2);
+   pDCHLogWorld->SetVisLeaves(kTRUE);
+   pWorld->AddNode(pDCHLogWorld, 0, pMatrix2);
+   pWorld->AddNode(pDCHLogWorld, 1, pMatrix4);
 
    // Shape: heliumBag type: TGeoPara
    dx    = 55.400000;
@@ -532,24 +532,24 @@ void R3BDch::ConstructGeometry() {
    theta = 0.000000;
    phi   = 0.000000;
 
-   TGeoShape *pheliumBag_10 =
+   TGeoShape *pheliumBagv =
        new TGeoPara("heliumBag",dx,dy,dz,alpha,theta,phi);
    // Volume: heliumBag
    TGeoVolume*
-   pheliumBag_82ac5a0 = new TGeoVolume("heliumBag",pheliumBag_10, pMed4);
-   pheliumBag_82ac5a0->SetVisLeaves(kTRUE);
-   pWorld->AddNode(pheliumBag_82ac5a0, 0, pMatrix6);
+   pheliumBag = new TGeoVolume("heliumBag",pheliumBagv, pMed4);
+   pheliumBag->SetVisLeaves(kTRUE);
+   pWorld->AddNode(pheliumBag, 0, pMatrix6);
 
    // Shape: DCHBox type: TGeoBBox
    dx = 51.400000;
    dy = 40.200000;
    dz = 4.060000;
-   TGeoShape *pDCHBox_3 = new TGeoBBox("DCHBox", dx,dy,dz);
+   TGeoShape *pDCHBox = new TGeoBBox("DCHBox", dx,dy,dz);
    // Volume: DCHLog
    TGeoVolume*
-   pDCHLog_82ab9d8 = new TGeoVolume("DCHLog",pDCHBox_3, pMed33);
-   pDCHLog_82ab9d8->SetVisLeaves(kTRUE);
-   pDCHLogWorld_82ab830->AddNode(pDCHLog_82ab9d8, 0, pMatrix8);
+   pDCHLog = new TGeoVolume("DCHLog",pDCHBox, pMed33);
+   pDCHLog->SetVisLeaves(kTRUE);
+   pDCHLogWorld->AddNode(pDCHLog, 0, pMatrix8);
 
 
 
@@ -557,66 +557,66 @@ void R3BDch::ConstructGeometry() {
    dx = 55.400000;
    dy = 2.000000;
    dz = 4.061200;
-   TGeoShape *pUpFrame_4 = new TGeoBBox("UpFrame", dx,dy,dz);
+   TGeoShape *pUpFrame = new TGeoBBox("UpFrame", dx,dy,dz);
    // Volume: logicUpFrame
    TGeoVolume*
-   plogicUpFrame_82abb70 = new TGeoVolume("logicUpFrame",pUpFrame_4, pMed21);
-   plogicUpFrame_82abb70->SetVisLeaves(kTRUE);
-   pDCHLogWorld_82ab830->AddNode(plogicUpFrame_82abb70, 0, pMatrix10);
+   plogicUpFrame = new TGeoVolume("logicUpFrame",pUpFrame, pMed21);
+   plogicUpFrame->SetVisLeaves(kTRUE);
+   pDCHLogWorld->AddNode(plogicUpFrame, 0, pMatrix10);
    // Shape: DownFrame type: TGeoBBox
    dx = 55.400000;
    dy = 2.000000;
    dz = 4.061200;
-   TGeoShape *pDownFrame_5 = new TGeoBBox("DownFrame", dx,dy,dz);
+   TGeoShape *pDownFrame = new TGeoBBox("DownFrame", dx,dy,dz);
    // Volume: logicDownFrame
    TGeoVolume*
-   plogicDownFrame_82abd38 = new TGeoVolume("logicDownFrame",pDownFrame_5, pMed21);
-   plogicDownFrame_82abd38->SetVisLeaves(kTRUE);
-   pDCHLogWorld_82ab830->AddNode(plogicDownFrame_82abd38, 0, pMatrix12);
+   plogicDownFrame = new TGeoVolume("logicDownFrame",pDownFrame, pMed21);
+   plogicDownFrame->SetVisLeaves(kTRUE);
+   pDCHLogWorld->AddNode(plogicDownFrame, 0, pMatrix12);
    // Shape: RightFrame type: TGeoBBox
    dx = 2.000000;
    dy = 40.200000;
    dz = 4.060000;
-   TGeoShape *pRightFrame_6 = new TGeoBBox("RightFrame", dx,dy,dz);
+   TGeoShape *pRightFrame = new TGeoBBox("RightFrame", dx,dy,dz);
    // Volume: logicRightFrame
    TGeoVolume*
-   plogicRightFrame_82abed8 = new TGeoVolume("logicRightFrame",pRightFrame_6, pMed21);
-   plogicRightFrame_82abed8->SetVisLeaves(kTRUE);
-   pDCHLogWorld_82ab830->AddNode(plogicRightFrame_82abed8, 0, pMatrix14);
+   plogicRightFrame = new TGeoVolume("logicRightFrame",pRightFrame, pMed21);
+   plogicRightFrame->SetVisLeaves(kTRUE);
+   pDCHLogWorld->AddNode(plogicRightFrame, 0, pMatrix14);
    // Shape: LeftFrame type: TGeoBBox
    dx = 2.000000;
    dy = 40.200000;
    dz = 4.060000;
-   TGeoShape *pLeftFrame_7 = new TGeoBBox("LeftFrame", dx,dy,dz);
+   TGeoShape *pLeftFrame = new TGeoBBox("LeftFrame", dx,dy,dz);
    // Volume: logicLeftFrame
    TGeoVolume*
-   plogicLeftFrame_82ac078 = new TGeoVolume("logicLeftFrame",pLeftFrame_7, pMed21);
-   plogicLeftFrame_82ac078->SetVisLeaves(kTRUE);
-   pDCHLogWorld_82ab830->AddNode(plogicLeftFrame_82ac078, 0, pMatrix16);
+   plogicLeftFrame = new TGeoVolume("logicLeftFrame",pLeftFrame, pMed21);
+   plogicLeftFrame->SetVisLeaves(kTRUE);
+   pDCHLogWorld->AddNode(plogicLeftFrame, 0, pMatrix16);
    // Shape: FrontFrame type: TGeoBBox
    dx = 51.400000;
    dy = 40.200000;
    dz = 0.000600;
-   TGeoShape *pFrontFrame_8 = new TGeoBBox("FrontFrame", dx,dy,dz);
+   TGeoShape *pFrontFrame = new TGeoBBox("FrontFrame", dx,dy,dz);
    // Volume: logicFrontFrame
    TGeoVolume*
-   plogicFrontFrame_82ac218 = new TGeoVolume("logicFrontFrame",pFrontFrame_8, pMed15);
-   plogicFrontFrame_82ac218->SetVisLeaves(kTRUE);
-   pDCHLogWorld_82ab830->AddNode(plogicFrontFrame_82ac218, 0, pMatrix18);
+   plogicFrontFrame = new TGeoVolume("logicFrontFrame",pFrontFrame, pMed15);
+   plogicFrontFrame->SetVisLeaves(kTRUE);
+   pDCHLogWorld->AddNode(plogicFrontFrame, 0, pMatrix18);
    // Shape: BackFrame type: TGeoBBox
    dx = 51.400000;
    dy = 40.200000;
    dz = 0.000600;
-   TGeoShape *pBackFrame_9 = new TGeoBBox("BackFrame", dx,dy,dz);
+   TGeoShape *pBackFrame = new TGeoBBox("BackFrame", dx,dy,dz);
    // Volume: logicBackFrame
    TGeoVolume*
-   plogicBackFrame_82ac3b8 = new TGeoVolume("logicBackFrame",pBackFrame_9, pMed15);
-   plogicBackFrame_82ac3b8->SetVisLeaves(kTRUE);
-   pDCHLogWorld_82ab830->AddNode(plogicBackFrame_82ac3b8, 0, pMatrix20);
+   plogicBackFrame = new TGeoVolume("logicBackFrame",pBackFrame, pMed15);
+   plogicBackFrame->SetVisLeaves(kTRUE);
+   pDCHLogWorld->AddNode(plogicBackFrame, 0, pMatrix20);
 
 
    // add sensitive volume to DCH
-   AddSensitiveVolume(pDCHLog_82ab9d8);
+   AddSensitiveVolume(pDCHLog);
    fNbOfSensitiveVol+=1;
 
 }
