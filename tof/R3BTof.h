@@ -110,6 +110,10 @@ class R3BTof : public FairDetector
    **/
   virtual void ConstructGeometry();
 
+   virtual void Initialize();
+   virtual void SetSpecialPhysicsCuts();
+   void SetEnergyCutOff( Double_t cutE ){fCutE = cutE;}
+   Double_t  GetEnergyCutOff ( ) {return fCutE;}
 
 //  void SaveGeoParams();
 
@@ -125,6 +129,7 @@ class R3BTof : public FairDetector
     Double32_t     fTime;              //!  time
     Double32_t     fLength;            //!  length
     Double32_t     fELoss;             //!  energy loss
+     Double32_t     fCutE;              //!  Sec. Energy Cut-Off
 
     Int_t          fPosIndex;          //!
     TClonesArray*  fTofCollection;     //!  The hit collection
