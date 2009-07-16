@@ -26,7 +26,7 @@ void Config()
 
   // ******* GEANT3  specific configuration for simulated Runs  *******
     geant3->SetTRIG(1);         //Number of events to be processed
-    geant3->SetSWIT(4, 100);
+    geant3->SetSWIT(4, 10);
     geant3->SetDEBU(0, 0, 1);
   
     geant3->SetRAYL(1);
