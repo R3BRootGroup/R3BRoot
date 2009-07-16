@@ -52,22 +52,13 @@ void R3BTarget::ConstructGeometry(){
    a       = 207.190000;
    z       = 82.000000;
    density = 11.350000;
-   radl    = 0.561705;
-   absl    = 182.471644;
-   pMat = new TGeoMaterial("Lead", a,z,density,radl,absl);
+//   radl    = 0.561705;
+//   absl    = 182.471644;
+   pMat = new TGeoMaterial("Lead", a,z,density);
    pMat->SetIndex(600);
 // Medium: Lead
    numed   = 26;  // medium number
-   par[0]  = 0.000000; // isvol
-   par[1]  = 0.000000; // ifield
-   par[2]  = 0.000000; // fieldm
-   par[3]  = 0.000000; // tmaxfd
-   par[4]  = 0.000000; // stemax
-   par[5]  = 0.000000; // deemax
-   par[6]  = 0.000000; // epsil
-   par[7]  = 0.000000; // stmin
-
-   pMed  = new TGeoMedium("Lead", numed,pMat, par);
+   pMed  = new TGeoMedium("Lead", numed,pMat);
 
    // TRANSFORMATION MATRICES
    // Combi transformation: 
