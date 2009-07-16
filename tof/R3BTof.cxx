@@ -56,6 +56,7 @@ R3BTof::R3BTof() : FairDetector("R3BTof", kTRUE, kSTS) {
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
+  fCutE=1.0e-03; // 1 MeV default
 }
 // -------------------------------------------------------------------------
 
@@ -71,6 +72,7 @@ R3BTof::R3BTof(const char* name, Bool_t active)
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
+  fCutE=1.0e-03; // 1MeV default
 }
 // -------------------------------------------------------------------------
 
@@ -86,6 +88,68 @@ R3BTof::~R3BTof() {
   }
 }
 // -------------------------------------------------------------------------
+
+
+void R3BTof::Initialize()
+{
+  FairDetector::Initialize();
+
+   cout << endl;
+    cout << "-I- R3BTof initialisation" << endl;
+    cout << "-I- Vol ID" << endl;
+    cout << "-I- MC ID Scintill. volume : " << gMC->VolId("TOFLog")<< endl;
+
+}
+
+
+void R3BTof::SetSpecialPhysicsCuts(){
+
+   cout << endl;
+
+   cout << "-I- R3BTof Adding customized Physics cut ... " << endl;
+
+   if (gGeoManager) {
+     TGeoMedium* pSi = gGeoManager->GetMedium("plasticForTOF");
+     if ( pSi ) {
+      // Setting processes for Si only
+	 gMC->Gstpar(pSi->GetId()  ,"LOSS",3);
+         gMC->Gstpar(pSi->GetId()  ,"STRA",1.0);
+         gMC->Gstpar(pSi->GetId()  ,"PAIR",1.0);
+	 gMC->Gstpar(pSi->GetId()  ,"COMP",1.0);
+	 gMC->Gstpar(pSi->GetId()  ,"PHOT",1.0);
+         gMC->Gstpar(pSi->GetId()  ,"ANNI",1.0);
+	 gMC->Gstpar(pSi->GetId()  ,"BREM",1.0);
+	 gMC->Gstpar(pSi->GetId()  ,"HADR",1.0);
+         gMC->Gstpar(pSi->GetId()  ,"DRAY",1.0);
+         gMC->Gstpar(pSi->GetId()  ,"DCAY",1.0);
+         gMC->Gstpar(pSi->GetId()  ,"MULS",1.0);
+	 gMC->Gstpar(pSi->GetId()  ,"RAYL",1.0);
+
+	 // Setting Energy-CutOff for Si Only
+	Double_t cutE = fCutE; // GeV-> 1 keV
+
+	cout << "-I- R3bTof Scintillator Medium Id " << pSi->GetId()
+	    << " Energy Cut-Off : " << cutE
+	    << endl;
+        cout << endl;
+        //Si
+	gMC->Gstpar(pSi->GetId(),"CUTGAM",cutE);   /** gammas (GeV)*/
+        gMC->Gstpar(pSi->GetId(),"CUTELE",cutE);   /** electrons (GeV)*/
+	gMC->Gstpar(pSi->GetId(),"CUTNEU",cutE);   /** neutral hadrons (GeV)*/
+	gMC->Gstpar(pSi->GetId(),"CUTHAD",cutE);   /** charged hadrons (GeV)*/
+	gMC->Gstpar(pSi->GetId(),"CUTMUO",cutE);   /** muons (GeV)*/
+	gMC->Gstpar(pSi->GetId(),"BCUTE",cutE);    /** electron bremsstrahlung (GeV)*/
+	gMC->Gstpar(pSi->GetId(),"BCUTM",cutE);    /** muon and hadron bremsstrahlung(GeV)*/
+	gMC->Gstpar(pSi->GetId(),"DCUTE",cutE);    /** delta-rays by electrons (GeV)*/
+	gMC->Gstpar(pSi->GetId(),"DCUTM",cutE);    /** delta-rays by muons (GeV)*/
+        gMC->Gstpar(pSi->GetId(),"PPCUTM",-1.);   /** direct pair production by muons (GeV)*/
+
+     }
+
+ } //!gGeoManager
+
+
+}
 
 
 
@@ -365,15 +429,15 @@ void R3BTof::ConstructGeometry() {
    dx = 94.450000;
    dy = 73.450000;
    dz = 0.500000;
-   TGeoShape *pTOFBox_2 = new TGeoBBox("TOFBox", dx,dy,dz);
+   TGeoShape *pTOFBox = new TGeoBBox("TOFBox", dx,dy,dz);
    // Volume: TOFLog
    TGeoVolume*
-   pTOFLog_82aae70 = new TGeoVolume("TOFLog",pTOFBox_2, pMed34);
-   pTOFLog_82aae70->SetVisLeaves(kTRUE);
+   pTOFLog = new TGeoVolume("TOFLog",pTOFBox, pMed34);
+   pTOFLog->SetVisLeaves(kTRUE);
 
-   pWorld->AddNode(pTOFLog_82aae70, 0, pMatrix2);
+   pWorld->AddNode(pTOFLog, 0, pMatrix2);
 
-   AddSensitiveVolume(pTOFLog_82aae70);
+   AddSensitiveVolume(pTOFLog);
    fNbOfSensitiveVol+=1;
 
 
