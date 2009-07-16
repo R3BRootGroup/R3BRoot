@@ -109,12 +109,14 @@ class R3BmTof : public FairDetector
    ** Constructs the STS geometry
    **/
   virtual void ConstructGeometry();
-
+  virtual void Initialize();
+  virtual void SetSpecialPhysicsCuts();
+  void SetEnergyCutOff( Double_t cutE ){fCutE = cutE;}
+  Double_t  GetEnergyCutOff ( ) {return fCutE;}
 
 //  void SaveGeoParams();
 
   private:
-
 
     /** Track information to be stored until the track leaves the
 	active volume. **/
@@ -125,6 +127,7 @@ class R3BmTof : public FairDetector
     Double32_t     fTime;              //!  time
     Double32_t     fLength;            //!  length
     Double32_t     fELoss;             //!  energy loss
+    Double32_t     fCutE;              //!  Sec. Energy Cut-Off
 
     Int_t          fPosIndex;          //!
     TClonesArray*  fmTofCollection;     //!  The hit collection
