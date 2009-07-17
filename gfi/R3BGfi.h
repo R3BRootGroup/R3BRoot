@@ -104,12 +104,15 @@ class R3BGfi : public FairDetector
 			  Int_t offset);
 
 
-  /** Virtaul method Construct geometry
+  /** Virtual method Construct geometry
    **
    ** Constructs the STS geometry
    **/
   virtual void ConstructGeometry();
-
+  virtual void Initialize();
+  virtual void SetSpecialPhysicsCuts();
+  void SetEnergyCutOff( Double_t cutE ){fCutE = cutE;}
+  Double_t  GetEnergyCutOff ( ) {return fCutE;}
 
 //  void SaveGeoParams();
 
@@ -125,7 +128,7 @@ class R3BGfi : public FairDetector
     Double32_t     fTime;              //!  time
     Double32_t     fLength;            //!  length
     Double32_t     fELoss;             //!  energy loss
-
+    Double32_t     fCutE;              //!
     Int_t          fPosIndex;          //!
     TClonesArray*  fGfiCollection;     //!  The hit collection
     Bool_t         kGeoSaved;          //!
