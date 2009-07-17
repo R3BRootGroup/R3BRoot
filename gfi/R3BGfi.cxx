@@ -56,6 +56,7 @@ R3BGfi::R3BGfi() : FairDetector("R3BGfi", kTRUE, kSTS) {
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
+  fCutE=1.e-03;
 }
 // -------------------------------------------------------------------------
 
@@ -71,6 +72,7 @@ R3BGfi::R3BGfi(const char* name, Bool_t active)
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
+  fCutE=1.e-03;
 }
 // -------------------------------------------------------------------------
 
@@ -87,6 +89,66 @@ R3BGfi::~R3BGfi() {
 }
 // -------------------------------------------------------------------------
 
+void R3BGfi::Initialize()
+{
+  FairDetector::Initialize();
+
+   cout << endl;
+    cout << "-I- R3BGfi initialisation" << endl;
+    cout << "-I- Vol ID" << endl;
+    cout << "-I- MC ID Scintill. volume : " << gMC->VolId("GFILog")<< endl;
+
+}
+
+
+void R3BGfi::SetSpecialPhysicsCuts(){
+
+   cout << endl;
+
+   cout << "-I- R3BGfi Adding customized Physics cut ... " << endl;
+
+   if (gGeoManager) {
+     TGeoMedium* pSi = gGeoManager->GetMedium("plasticForGFI");
+     if ( pSi ) {
+      // Setting processes for Si only
+         gMC->Gstpar(pSi->GetId()  ,"LOSS",3);
+         gMC->Gstpar(pSi->GetId()  ,"STRA",1.0);
+         gMC->Gstpar(pSi->GetId()  ,"PAIR",1.0);
+	 gMC->Gstpar(pSi->GetId()  ,"COMP",1.0);
+	 gMC->Gstpar(pSi->GetId()  ,"PHOT",1.0);
+         gMC->Gstpar(pSi->GetId()  ,"ANNI",1.0);
+	 gMC->Gstpar(pSi->GetId()  ,"BREM",1.0);
+	 gMC->Gstpar(pSi->GetId()  ,"HADR",1.0);
+         gMC->Gstpar(pSi->GetId()  ,"DRAY",1.0);
+         gMC->Gstpar(pSi->GetId()  ,"DCAY",1.0);
+         gMC->Gstpar(pSi->GetId()  ,"MULS",1.0);
+	 gMC->Gstpar(pSi->GetId()  ,"RAYL",1.0);
+
+	 // Setting Energy-CutOff for Si Only
+	Double_t cutE = fCutE; // GeV-> 1 keV
+
+	cout << "-I- R3bGFI Scintillator Medium Id " << pSi->GetId()
+	    << " Energy Cut-Off : " << cutE
+	     << " GeV " << endl;
+        cout << endl;
+        //Si
+	gMC->Gstpar(pSi->GetId(),"CUTGAM",cutE);   /** gammas (GeV)*/
+        gMC->Gstpar(pSi->GetId(),"CUTELE",cutE);   /** electrons (GeV)*/
+	gMC->Gstpar(pSi->GetId(),"CUTNEU",cutE);   /** neutral hadrons (GeV)*/
+	gMC->Gstpar(pSi->GetId(),"CUTHAD",cutE);   /** charged hadrons (GeV)*/
+	gMC->Gstpar(pSi->GetId(),"CUTMUO",cutE);   /** muons (GeV)*/
+	gMC->Gstpar(pSi->GetId(),"BCUTE",cutE);    /** electron bremsstrahlung (GeV)*/
+	gMC->Gstpar(pSi->GetId(),"BCUTM",cutE);    /** muon and hadron bremsstrahlung(GeV)*/
+	gMC->Gstpar(pSi->GetId(),"DCUTE",cutE);    /** delta-rays by electrons (GeV)*/
+	gMC->Gstpar(pSi->GetId(),"DCUTM",cutE);    /** delta-rays by muons (GeV)*/
+        gMC->Gstpar(pSi->GetId(),"PPCUTM",-1.);   /** direct pair production by muons (GeV)*/
+
+     }
+
+ } //!gGeoManager
+
+
+}
 
 
 // -----   Public method ProcessHits  --------------------------------------
@@ -111,6 +173,8 @@ Bool_t R3BGfi::ProcessHits(FairVolume* vol) {
   // Sum energy loss for all steps in the active volume
   fELoss += gMC->Edep();
 
+
+  
   // Set additional parameters at exit of active volume. Create R3BGfiPoint.
   if ( gMC->IsTrackExiting()    ||
        gMC->IsTrackStop()       ||
@@ -341,7 +405,7 @@ void R3BGfi::ConstructGeometry() {
 
   TGeoMaterial *matAl = new TGeoMaterial("Aluminum", a,z,density,radl,absl);
   TGeoMedium* pMed21 = new TGeoMedium("Aluminum",3, matAl);
-  pMed21->Print();
+//  pMed21->Print();
 
 
    // TRANSFORMATION MATRICES
@@ -433,67 +497,67 @@ void R3BGfi::ConstructGeometry() {
    dx = 29.000000;
    dy = 29.000000;
    dz = 0.050000;
-   TGeoShape *pGFIBoxWorld_2 = new TGeoBBox("GFIBoxWorld", dx,dy,dz);
+   TGeoShape *pGFIBoxWorld = new TGeoBBox("GFIBoxWorld", dx,dy,dz);
    // Volume: GFILogWorld
    TGeoVolume*
-   pGFILogWorld_82ab420 = new TGeoVolume("GFILogWorld",pGFIBoxWorld_2, pMed1);
-   pGFILogWorld_82ab420->SetVisLeaves(kTRUE);
-   pWorld->AddNode(pGFILogWorld_82ab420, 0, pMatrix2);
-   pWorld->AddNode(pGFILogWorld_82ab420, 1, pMatrix4);
+   pGFILogWorld = new TGeoVolume("GFILogWorld",pGFIBoxWorld, pMed1);
+   pGFILogWorld->SetVisLeaves(kTRUE);
+   pWorld->AddNode(pGFILogWorld, 0, pMatrix2);
+   pWorld->AddNode(pGFILogWorld, 1, pMatrix4);
    // Shape: GFIBox type: TGeoBBox
    dx = 25.000000;
    dy = 25.000000;
    dz = 0.050000;
-   TGeoShape *pGFIBox_3 = new TGeoBBox("GFIBox", dx,dy,dz);
+   TGeoShape *pGFIBox = new TGeoBBox("GFIBox", dx,dy,dz);
    // Volume: GFILog
    TGeoVolume*
-   pGFILog_82ab5c8 = new TGeoVolume("GFILog",pGFIBox_3, pMed35);
-   pGFILog_82ab5c8->SetVisLeaves(kTRUE);
-   pGFILogWorld_82ab420->AddNode(pGFILog_82ab5c8, 0, pMatrix6);
+   pGFILog = new TGeoVolume("GFILog",pGFIBox, pMed35);
+   pGFILog->SetVisLeaves(kTRUE);
+   pGFILogWorld->AddNode(pGFILog, 0, pMatrix6);
 
    // Shape: UpFrame type: TGeoBBox
    dx = 29.000000;
    dy = 2.000000;
    dz = 0.050000;
-   TGeoShape *pUpFrame_4 = new TGeoBBox("UpFrame", dx,dy,dz);
+   TGeoShape *pUpFrame = new TGeoBBox("UpFrame", dx,dy,dz);
    // Volume: logicUpFrame
    TGeoVolume*
-   plogicUpFrame_82ab760 = new TGeoVolume("logicUpFrame",pUpFrame_4, pMed21);
-   plogicUpFrame_82ab760->SetVisLeaves(kTRUE);
-   pGFILogWorld_82ab420->AddNode(plogicUpFrame_82ab760, 0, pMatrix8);
+   plogicUpFrame = new TGeoVolume("logicUpFrame",pUpFrame, pMed21);
+   plogicUpFrame->SetVisLeaves(kTRUE);
+   pGFILogWorld->AddNode(plogicUpFrame, 0, pMatrix8);
    // Shape: DownFrame type: TGeoBBox
    dx = 29.000000;
    dy = 2.000000;
    dz = 0.050000;
-   TGeoShape *pDownFrame_5 = new TGeoBBox("DownFrame", dx,dy,dz);
+   TGeoShape *pDownFrame = new TGeoBBox("DownFrame", dx,dy,dz);
    // Volume: logicDownFrame
    TGeoVolume*
-   plogicDownFrame_82ab928 = new TGeoVolume("logicDownFrame",pDownFrame_5, pMed21);
-   plogicDownFrame_82ab928->SetVisLeaves(kTRUE);
-   pGFILogWorld_82ab420->AddNode(plogicDownFrame_82ab928, 0, pMatrix10);
+   plogicDownFrame = new TGeoVolume("logicDownFrame",pDownFrame, pMed21);
+   plogicDownFrame->SetVisLeaves(kTRUE);
+   pGFILogWorld->AddNode(plogicDownFrame, 0, pMatrix10);
    // Shape: RightFrame type: TGeoBBox
    dx = 2.000000;
    dy = 25.000000;
    dz = 0.050000;
-   TGeoShape *pRightFrame_6 = new TGeoBBox("RightFrame", dx,dy,dz);
+   TGeoShape *pRightFrame = new TGeoBBox("RightFrame", dx,dy,dz);
    // Volume: logicRightFrame
    TGeoVolume*
-   plogicRightFrame_82abac8 = new TGeoVolume("logicRightFrame",pRightFrame_6, pMed21);
-   plogicRightFrame_82abac8->SetVisLeaves(kTRUE);
-   pGFILogWorld_82ab420->AddNode(plogicRightFrame_82abac8, 0, pMatrix12);
+   plogicRightFrame = new TGeoVolume("logicRightFrame",pRightFrame, pMed21);
+   plogicRightFrame->SetVisLeaves(kTRUE);
+   pGFILogWorld->AddNode(plogicRightFrame, 0, pMatrix12);
    // Shape: LeftFrame type: TGeoBBox
    dx = 2.000000;
    dy = 25.000000;
    dz = 0.050000;
-   TGeoShape *pLeftFrame_7 = new TGeoBBox("LeftFrame", dx,dy,dz);
+   TGeoShape *pLeftFrame = new TGeoBBox("LeftFrame", dx,dy,dz);
    // Volume: logicLeftFrame
    TGeoVolume*
-   plogicLeftFrame_82abc68 = new TGeoVolume("logicLeftFrame",pLeftFrame_7, pMed21);
-   plogicLeftFrame_82abc68->SetVisLeaves(kTRUE);
-   pGFILogWorld_82ab420->AddNode(plogicLeftFrame_82abc68, 0, pMatrix14);
+   plogicLeftFrame = new TGeoVolume("logicLeftFrame",pLeftFrame, pMed21);
+   plogicLeftFrame->SetVisLeaves(kTRUE);
+   pGFILogWorld->AddNode(plogicLeftFrame, 0, pMatrix14);
 
   // Add the sensitive part
-   AddSensitiveVolume(pGFILog_82ab5c8);
+   AddSensitiveVolume(pGFILog);
    fNbOfSensitiveVol+=1;
 }
 
