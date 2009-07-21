@@ -23,11 +23,13 @@
 #include "TParticle.h"
 #include "TVirtualMC.h"
 #include "TObjArray.h"
+#include "TRotation.h"
 
 // includes for modeling
 #include "TGeoManager.h"
 #include "TParticle.h"
 #include "TVirtualMC.h"
+#include "TVector3.h"
 #include "TGeoMatrix.h"
 #include "TGeoMaterial.h"
 #include "TGeoMedium.h"
@@ -38,11 +40,18 @@
 #include "TGeoCone.h"
 #include "TGeoBoolNode.h"
 #include "TGeoCompositeShape.h"
+#include "TGeoTube.h"
+#include "TGeoBoolNode.h"
+#include "TGeoCompositeShape.h"
 #include <iostream>
+// try the mathematical ROOT package
+#include "Math/Rotation3D.h"
+#include "Math/Point3D.h"
 
 using std::cout;
 using std::cerr;
 using std::endl;
+
 
 
 
@@ -55,6 +64,7 @@ R3BCal::R3BCal() : FairDetector("R3BCal", kTRUE, kSTS) {
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
+  fGeoVersion = 1;
 }
 // -------------------------------------------------------------------------
 
@@ -70,6 +80,7 @@ R3BCal::R3BCal(const char* name, Bool_t active)
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
+  fGeoVersion = 1;
 }
 // -------------------------------------------------------------------------
 
@@ -282,8 +293,1124 @@ R3BCalPoint* R3BCal::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
   return new(clref[size]) R3BCalPoint(trackID, detID, posIn, posOut,
 				      momIn, momOut, time, length, eLoss);
 }
-// -----   Public method ConstructGeometry   ----------------------------------
+
+
 void R3BCal::ConstructGeometry() {
+
+   if (fGeoVersion == 1 ) return ConstructGeometry1();
+   else
+   return ConstructGeometry2();    
+}
+
+
+void R3BCal::ConstructGeometry2(){
+   cout << endl;
+   cout << "-I- R3bCal ConstructGeometry2() called " << endl;
+   cout << endl;
+
+
+  // out-of-file geometry definition
+   Double_t dx,dy,dz;
+   Double_t dx1, dx2, dy1, dy2;
+   Double_t vert[20], par[20];
+   Double_t theta, phi, h1, bl1, tl1, alpha1, h2, bl2, tl2, alpha2;
+   Double_t twist;
+   Double_t origin[3];
+   Double_t rmin, rmax, rmin1, rmax1, rmin2, rmax2;
+   Double_t r, rlo, rhi;
+   Double_t a,b;
+   Double_t point[3], norm[3];
+   Double_t rin, stin, rout, stout;
+   Double_t thx, phx, thy, phy, thz, phz;
+   Double_t alpha, theta1, theta2, phi1, phi2, dphi;
+   Double_t tr[3], rot[9];
+   Double_t z, density, radl, absl, w;
+   Double_t lx,ly,lz,tx,ty,tz;
+   Double_t xvert[50], yvert[50];
+   Double_t zsect,x0,y0,scale0;
+   Int_t nel, numed, nz, nedges, nvert;
+   TGeoBoolNode *pBoolNode = 0;
+
+// --- Local Material definition
+
+// Mixture: Air
+  nel     = 2;
+  density = 0.001290;
+  TGeoMixture*
+  pMat2 = new TGeoMixture("Air", nel,density);
+  a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+  pMat2->DefineElement(0,a,z,w);
+  a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+  pMat2->DefineElement(1,a,z,w);
+  pMat2->SetIndex(1);
+  // Medium: Air
+  numed   = 1;  // medium number
+  TGeoMedium*
+  pMed2 = new TGeoMedium("Air", numed,pMat2);
+  
+ // Mixture: CsI
+  nel     = 2;
+  density = 4.510000;
+  TGeoMixture*
+      pMat9 = new TGeoMixture("CsIn", nel,density);
+  a = 132.905450;   z = 55.000000;   w = 0.511549;  // CS
+  pMat9->DefineElement(0,a,z,w);
+  a = 126.904470;   z = 53.000000;   w = 0.488451;  // I
+  pMat9->DefineElement(1,a,z,w);
+  pMat9->SetIndex(601);
+
+  TGeoMedium* pMed9 = new TGeoMedium("CsIn", 2,pMat9);
+
+ // Material: Aluminum
+  a       = 26.980000;
+  z       = 13.000000;
+  density = 2.700000;
+  radl    = 8.875105;
+  absl    = 388.793113;
+
+  TGeoMaterial *matAl = new TGeoMaterial("Aluminum", a,z,density,radl,absl);
+  TGeoMedium* pMed21 = new TGeoMedium("Aluminum",3, matAl);
+
+// ---- Geometry Definition 
+   // Get the top Volume
+    TGeoVolume *top =  gGeoManager->GetTopVolume();
+
+   // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
+   // Shape: CBSphereWorld type: TGeoSphere
+   rmin   = 24.250000;
+   rmax   = 70.000000;
+   theta1 = 0.000000;
+   theta2 = 180.000000;
+   phi1   = 0.000000;
+   phi2   = 360.000000;
+   TGeoShape *pCBSphereWorld  = new TGeoSphere("CBSphereWorld",rmin,rmax,theta1, theta2,phi1,phi2);
+   // Volume: CBLogWorld
+   TGeoVolume*
+   pCBLogWorld  = new TGeoVolume("CBLogWorld",pCBSphereWorld, pMed2);
+   pCBLogWorld->SetVisLeaves(kTRUE);
+
+   TGeoRotation	*pGlobalRot = 
+      createMatrix(TMath::Pi()*TMath::RadToDeg()/2.,
+		   0.0,
+		   0.0);
+   TGeoTranslation *pGlobalt = new TGeoTranslation(0.0,0.0,0.0);
+   TGeoCombiTrans *pGlobalc = new TGeoCombiTrans(*pGlobalt,*pGlobalRot);  
+
+
+   // add the sphere as Mother Volume
+   top->AddNode(pCBLogWorld, 0, pGlobalc);
+
+
+
+   
+   // Shape: PGON type: TGeoPgon
+   phi1    = 0.000000;
+   dphi    = 360.000000;
+   nedges = 5;
+   nz      = 2;
+   Double_t zPlane[2]={-10.0,10.0};
+   Double_t rInner[2]={0.,0.};
+   Double_t rOuter[2]={3.688,6.638};
+   TGeoPgon *pgon = new TGeoPgon("PGON",phi1,dphi,nedges,nz);
+   pgon->DefineSection(0, zPlane[0],rInner[0],rOuter[0]);
+   pgon->DefineSection(1, zPlane[1],rInner[1],rOuter[1]);
+   TGeoShape *pPGON = pgon;
+
+Double_t NAJA_X[12] = {-184.0195,184.0195,0,0,-297.7205,-297.7205,297.7205,297.7205,0,0,-184.0195,184.0195};
+Double_t NAJA_Y[12] = {297.7205,297.7205,184.0195,184.0195,0,0,0,0,-184.0195,-184.0195,-297.7205,-297.7205};
+Double_t NAJA_Z[12] = {0,0,297.7205,-297.7205,-184.0195,184.0195,-184.0195,184.0195,297.7205,-297.7205,0,0};
+
+TVector3 NAJA_Rot_col_X[12];
+NAJA_Rot_col_X[0].SetXYZ(TMath::Sin(18.000000*TMath::Pi()/180)*TMath::Cos(211.720000*TMath::Pi()/180),
+                       TMath::Sin(72.000000*TMath::Pi()/180)*TMath::Cos(31.720000*TMath::Pi()/180),
+                       TMath::Sin(90.000000*TMath::Pi()/180)*TMath::Cos(121.720000*TMath::Pi()/180));
+
+NAJA_Rot_col_X[1].SetXYZ(TMath::Sin(18.000000*TMath::Pi()/180)*TMath::Cos(328.280000*TMath::Pi()/180),
+                       TMath::Sin(108.000000*TMath::Pi()/180)*TMath::Cos(328.280000*TMath::Pi()/180),
+                       TMath::Sin(90.000000*TMath::Pi()/180)*TMath::Cos(58.280000*TMath::Pi()/180));
+
+NAJA_Rot_col_X[2].SetXYZ(TMath::Sin(99.350000*TMath::Pi()/180)*TMath::Cos(15.450000*TMath::Pi()/180),
+                       TMath::Sin(120.000000*TMath::Pi()/180)*TMath::Cos(110.905000*TMath::Pi()/180),
+                       TMath::Sin(31.718000*TMath::Pi()/180)*TMath::Cos(90.000000*TMath::Pi()/180));
+
+NAJA_Rot_col_X[3].SetXYZ(TMath::Sin(80.650000*TMath::Pi()/180)*TMath::Cos(15.450000*TMath::Pi()/180),
+                       TMath::Sin(120.000000*TMath::Pi()/180)*TMath::Cos(290.905000*TMath::Pi()/180),
+                       TMath::Sin(148.282000*TMath::Pi()/180)*TMath::Cos(90.000000*TMath::Pi()/180));
+
+NAJA_Rot_col_X[4].SetXYZ(TMath::Sin(105.24000*TMath::Pi()/180)*TMath::Cos(80.310000*TMath::Pi()/180),
+                       TMath::Sin(144.00000*TMath::Pi()/180)*TMath::Cos(328.28620*TMath::Pi()/180),
+                       TMath::Sin(121.717186*TMath::Pi()/180)*TMath::Cos(180.0035095*TMath::Pi()/180));
+
+NAJA_Rot_col_X[5].SetXYZ(TMath::Sin(74.760000*TMath::Pi()/180)*TMath::Cos(80.310000*TMath::Pi()/180),
+                       TMath::Sin(144.000000*TMath::Pi()/180)*TMath::Cos(148.286600*TMath::Pi()/180),
+                       TMath::Sin(58.2822647*TMath::Pi()/180)*TMath::Cos(180.0037079*TMath::Pi()/180));
+
+NAJA_Rot_col_X[6].SetXYZ(TMath::Sin(105.240000*TMath::Pi()/180)*TMath::Cos(99.690000*TMath::Pi()/180),
+                       TMath::Sin(36.000000*TMath::Pi()/180)*TMath::Cos(31.713800*TMath::Pi()/180),
+                       TMath::Sin(121.717000*TMath::Pi()/180)*TMath::Cos(359.9964905*TMath::Pi()/180));
+
+NAJA_Rot_col_X[7].SetXYZ(TMath::Sin(74.760000*TMath::Pi()/180)*TMath::Cos(99.690000*TMath::Pi()/180),
+                       TMath::Sin(36.000000*TMath::Pi()/180)*TMath::Cos(211.713560*TMath::Pi()/180),
+                       TMath::Sin(58.282450*TMath::Pi()/180)*TMath::Cos(359.996300*TMath::Pi()/180));
+
+NAJA_Rot_col_X[8].SetXYZ(TMath::Sin(99.350000*TMath::Pi()/180)*TMath::Cos(344.550000*TMath::Pi()/180),
+                       TMath::Sin(60.000000*TMath::Pi()/180)*TMath::Cos(69.095000*TMath::Pi()/180),
+                       TMath::Sin(31.717600*TMath::Pi()/180)*TMath::Cos(270.000000*TMath::Pi()/180));
+
+NAJA_Rot_col_X[9].SetXYZ(TMath::Sin(80.650000*TMath::Pi()/180)*TMath::Cos(344.550000*TMath::Pi()/180),
+                       TMath::Sin(60.000000*TMath::Pi()/180)*TMath::Cos(249.095000*TMath::Pi()/180),
+                       TMath::Sin(148.282400*TMath::Pi()/180)*TMath::Cos(270.000000*TMath::Pi()/180));
+
+NAJA_Rot_col_X[10].SetXYZ(TMath::Sin(18.000000*TMath::Pi()/180)*TMath::Cos(148.280000*TMath::Pi()/180),
+                       TMath::Sin(108.000000*TMath::Pi()/180)*TMath::Cos(328.280000*TMath::Pi()/180),
+                       TMath::Sin(90.000000*TMath::Pi()/180)*TMath::Cos(238.280000*TMath::Pi()/180));
+
+NAJA_Rot_col_X[11].SetXYZ(TMath::Sin(18.000000*TMath::Pi()/180)*TMath::Cos(31.720000*TMath::Pi()/180),
+                       TMath::Sin(72.000000*TMath::Pi()/180)*TMath::Cos(211.720000*TMath::Pi()/180),
+                       TMath::Sin(90.000000*TMath::Pi()/180)*TMath::Cos(301.720000*TMath::Pi()/180));
+
+
+TVector3 NAJA_Rot_col_Y[12];
+NAJA_Rot_col_Y[0].SetXYZ(TMath::Sin(18.000000*TMath::Pi()/180)*TMath::Sin(211.720000*TMath::Pi()/180),
+                    TMath::Sin(72.000000*TMath::Pi()/180)*TMath::Sin(31.720000*TMath::Pi()/180),
+                    TMath::Sin(90.000000*TMath::Pi()/180)*TMath::Sin(121.720000*TMath::Pi()/180));
+
+NAJA_Rot_col_Y[1].SetXYZ(TMath::Sin(18.000000*TMath::Pi()/180)*TMath::Sin(328.280000*TMath::Pi()/180),
+                    TMath::Sin(108.000000*TMath::Pi()/180)*TMath::Sin(328.280000*TMath::Pi()/180),
+                    TMath::Sin(90.000000*TMath::Pi()/180)*TMath::Sin(58.280000*TMath::Pi()/180));
+
+NAJA_Rot_col_Y[2].SetXYZ(TMath::Sin(99.350000*TMath::Pi()/180)*TMath::Sin(15.450000*TMath::Pi()/180),
+                    TMath::Sin(120.000000*TMath::Pi()/180)*TMath::Sin(110.905000*TMath::Pi()/180),
+                    TMath::Sin(31.718000*TMath::Pi()/180)*TMath::Sin(90.000000*TMath::Pi()/180));
+
+NAJA_Rot_col_Y[3].SetXYZ(TMath::Sin(80.650000*TMath::Pi()/180)*TMath::Sin(15.450000*TMath::Pi()/180),
+                    TMath::Sin(120.000000*TMath::Pi()/180)*TMath::Sin(290.905000*TMath::Pi()/180),
+                    TMath::Sin(148.282000*TMath::Pi()/180)*TMath::Sin(90.000000*TMath::Pi()/180));
+
+NAJA_Rot_col_Y[4].SetXYZ(TMath::Sin(105.24000*TMath::Pi()/180)*TMath::Sin(80.310000*TMath::Pi()/180),
+                    TMath::Sin(144.00000*TMath::Pi()/180)*TMath::Sin(328.28620*TMath::Pi()/180),
+                    TMath::Sin(121.717186*TMath::Pi()/180)*TMath::Sin(180.0035095*TMath::Pi()/180));
+
+NAJA_Rot_col_Y[5].SetXYZ(TMath::Sin(74.760000*TMath::Pi()/180)*TMath::Sin(80.310000*TMath::Pi()/180),
+                    TMath::Sin(144.000000*TMath::Pi()/180)*TMath::Sin(148.286600*TMath::Pi()/180),
+                    TMath::Sin(58.2822647*TMath::Pi()/180)*TMath::Sin(180.0037079*TMath::Pi()/180));
+
+NAJA_Rot_col_Y[6].SetXYZ(TMath::Sin(105.240000*TMath::Pi()/180)*TMath::Sin(99.690000*TMath::Pi()/180),
+                    TMath::Sin(36.000000*TMath::Pi()/180)*TMath::Sin(31.713800*TMath::Pi()/180),
+                    TMath::Sin(121.717000*TMath::Pi()/180)*TMath::Sin(359.9964905*TMath::Pi()/180));
+
+NAJA_Rot_col_Y[7].SetXYZ(TMath::Sin(74.760000*TMath::Pi()/180)*TMath::Sin(99.690000*TMath::Pi()/180),
+                    TMath::Sin(36.000000*TMath::Pi()/180)*TMath::Sin(211.713560*TMath::Pi()/180),
+                    TMath::Sin(58.282450*TMath::Pi()/180)*TMath::Sin(359.996300*TMath::Pi()/180));
+
+NAJA_Rot_col_Y[8].SetXYZ(TMath::Sin(99.350000*TMath::Pi()/180)*TMath::Sin(344.550000*TMath::Pi()/180),
+                    TMath::Sin(60.000000*TMath::Pi()/180)*TMath::Sin(69.095000*TMath::Pi()/180),
+                    TMath::Sin(31.717600*TMath::Pi()/180)*TMath::Sin(270.000000*TMath::Pi()/180));
+
+NAJA_Rot_col_Y[9].SetXYZ(TMath::Sin(80.650000*TMath::Pi()/180)*TMath::Sin(344.550000*TMath::Pi()/180),
+                    TMath::Sin(60.000000*TMath::Pi()/180)*TMath::Sin(249.095000*TMath::Pi()/180),
+                    TMath::Sin(148.282400*TMath::Pi()/180)*TMath::Sin(270.000000*TMath::Pi()/180));
+
+NAJA_Rot_col_Y[10].SetXYZ(TMath::Sin(18.000000*TMath::Pi()/180)*TMath::Sin(148.280000*TMath::Pi()/180),
+                    TMath::Sin(108.000000*TMath::Pi()/180)*TMath::Sin(328.280000*TMath::Pi()/180),
+                    TMath::Sin(90.000000*TMath::Pi()/180)*TMath::Sin(238.280000*TMath::Pi()/180));
+
+NAJA_Rot_col_Y[11].SetXYZ(TMath::Sin(18.000000*TMath::Pi()/180)*TMath::Sin(31.720000*TMath::Pi()/180),
+                    TMath::Sin(72.000000*TMath::Pi()/180)*TMath::Sin(211.720000*TMath::Pi()/180),
+                    TMath::Sin(90.000000*TMath::Pi()/180)*TMath::Sin(301.720000*TMath::Pi()/180));
+
+
+TVector3 NAJA_Rot_col_Z[12];
+NAJA_Rot_col_Z[0].SetXYZ(TMath::Cos(18.000000*TMath::Pi()/180),
+                 TMath::Cos(72.000000*TMath::Pi()/180),
+                 TMath::Cos(90.000000*TMath::Pi()/180));
+NAJA_Rot_col_Z[1].SetXYZ(TMath::Cos(18.000000*TMath::Pi()/180),
+                 TMath::Cos(108.000000*TMath::Pi()/180),
+                 TMath::Cos(90.000000*TMath::Pi()/180));
+NAJA_Rot_col_Z[2].SetXYZ(TMath::Cos(99.350000*TMath::Pi()/180),
+                 TMath::Cos(120.000000*TMath::Pi()/180),
+                 TMath::Cos(31.718000*TMath::Pi()/180));
+NAJA_Rot_col_Z[3].SetXYZ(TMath::Cos(80.650000*TMath::Pi()/180),
+                 TMath::Cos(120.000000*TMath::Pi()/180),
+                 TMath::Cos(148.282000*TMath::Pi()/180));
+NAJA_Rot_col_Z[4].SetXYZ(TMath::Cos(105.24000*TMath::Pi()/180),
+                 TMath::Cos(144.00000*TMath::Pi()/180),
+                 TMath::Cos(121.717186*TMath::Pi()/180));
+NAJA_Rot_col_Z[5].SetXYZ(TMath::Cos(74.760000*TMath::Pi()/180),
+                 TMath::Cos(144.000000*TMath::Pi()/180),
+                 TMath::Cos(58.2822647*TMath::Pi()/180));
+NAJA_Rot_col_Z[6].SetXYZ(TMath::Cos(105.240000*TMath::Pi()/180),
+                 TMath::Cos(36.000000*TMath::Pi()/180),
+                 TMath::Cos(121.717000*TMath::Pi()/180));
+NAJA_Rot_col_Z[7].SetXYZ(TMath::Cos(74.760000*TMath::Pi()/180),
+                 TMath::Cos(36.000000*TMath::Pi()/180),
+                 TMath::Cos(58.282450*TMath::Pi()/180));
+NAJA_Rot_col_Z[8].SetXYZ(TMath::Cos(99.350000*TMath::Pi()/180),
+                 TMath::Cos(60.000000*TMath::Pi()/180),
+                 TMath::Cos(31.717600*TMath::Pi()/180));
+NAJA_Rot_col_Z[9].SetXYZ(TMath::Cos(80.650000*TMath::Pi()/180),
+                 TMath::Cos(60.000000*TMath::Pi()/180),
+                 TMath::Cos(148.282400*TMath::Pi()/180));
+NAJA_Rot_col_Z[10].SetXYZ(TMath::Cos(18.000000*TMath::Pi()/180),
+                 TMath::Cos(108.000000*TMath::Pi()/180),
+                 TMath::Cos(90.000000*TMath::Pi()/180));
+NAJA_Rot_col_Z[11].SetXYZ(TMath::Cos(18.000000*TMath::Pi()/180),
+                 TMath::Cos(72.000000*TMath::Pi()/180),
+                 TMath::Cos(90.000000*TMath::Pi()/180));
+
+
+  // Volume: crystalLogNAJA
+   TGeoVolume *
+   pcrystalLogNAJA  = new TGeoVolume("crystalLogNAJA",pPGON, pMed9);
+   AddSensitiveVolume(pcrystalLogNAJA);
+   pcrystalLogNAJA->SetVisLeaves(kTRUE);
+
+
+   // -- First part defined 
+   TGeoRotation *pRot=NULL;
+      for(Int_t iter1=0 ; iter1<12 ; iter1++) {
+
+	 Double_t fRotation[9] = {
+	    NAJA_Rot_col_X[iter1].X(),NAJA_Rot_col_X[iter1].Y(),NAJA_Rot_col_X[iter1].Z(),
+	    NAJA_Rot_col_Y[iter1].X(),NAJA_Rot_col_Y[iter1].Y(),NAJA_Rot_col_Y[iter1].Z(),
+	    NAJA_Rot_col_Z[iter1].X(),NAJA_Rot_col_Z[iter1].Y(),NAJA_Rot_col_Z[iter1].Z(),                               
+	 };
+
+	 pRot = new TGeoRotation();
+	 pRot->SetMatrix(fRotation);
+	   
+	 dx =  NAJA_X[iter1]/10.;
+	 dy =  NAJA_Y[iter1]/10.;
+	 dz =  NAJA_Z[iter1]/10.;
+
+	 TGeoTranslation *trans = new TGeoTranslation(dx,dy,dz);
+	 TGeoCombiTrans *combi = new TGeoCombiTrans(*trans,*pRot);
+	 
+	 pCBLogWorld->AddNode(pcrystalLogNAJA, iter1, combi); 
+	 
+   }//! for iter1  
+
+   //-- Adding single crystal
+
+ // Shape: TRB1 type: TGeoTrap
+   dz     = 10.000000;
+   theta  = 0.000000;
+   phi    = 0.000000;
+   h1     = 1.542000;
+   bl1    = 4.848000;
+   tl1    = 2.658000;
+   alpha1 = 0.000000;
+   h2     = 2.778000;
+   bl2    = 8.726000;
+   tl2    = 4.780000;
+   alpha2 = 0.000000;
+   TGeoShape *pTRB1 = new TGeoTrap("TRB1", dz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
+   // Shape: TRB2 type: TGeoTrap
+   dz     = 10.000000;
+   theta  = 0.000000;
+   phi    = 0.000000;
+   h1     = 1.863000;
+   bl1    = 4.850000;
+   tl1    = 2.162000;
+   alpha1 = 0.000000;
+   h2     = 3.353000;
+   bl2    = 8.730000;
+   tl2    = 3.892000;
+   alpha2 = 0.000000;
+   TGeoShape *pTRB2 = new TGeoTrap("TRB2", dz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
+   // Combi transformation: TRB
+   dx = 0.000000;
+   dy = -4.748000;
+   dz = -0.292480;
+   // Rotation: 
+   thx = 90.000000;    phx = 180.000000;
+   thy = 97.775000;    phy = 270.000000;
+   thz = 7.775000;    phz = 270.000000;
+   TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans* pMatrix2 = new TGeoCombiTrans("TRB", dx,dy,dz,pMatrix3);
+   // Union for TRB1 and TRB2 
+   pBoolNode = new TGeoUnion(pTRB1,pTRB2,0,pMatrix2);
+   // Shape: TRB type: TGeoCompositeShape
+   TGeoShape *pTRB = new TGeoCompositeShape("TRB", pBoolNode);
+   pTRB->SetTitle("TRB1+TRB2:TRB");
+   // Volume: crystalLogNAJB
+   TGeoVolume*
+   pcrystalLogNAJB  = new TGeoVolume("crystalLogNAJB",pTRB, pMed9);
+
+
+Double_t NAJB_X[60] = {-93.1805,93.1805,-152.88,-152.88,152.88,152.88,-241.4999,-241.4999,-54.7505,54.7505,241.4999,241.4999,54.7505,-54.7505,-88.6375,88.6375,88.6375,-88.6375,-247.3589,-302.1269,-302.1269,-247.3589,0,247.3589,302.1269,302.1269,247.3589,0,-337.3685,-337.3685,337.3685,337.3685,0,-247.3589,-302.1269,-302.1269,-247.3589,0,247.3589,302.1269,302.1269,247.3589,88.6375,-88.6375,-88.6375,88.6375,54.7505,-54.7505,-241.4999,-241.4999,-54.7505,54.7505,241.4999,241.4999,-152.88,-152.88,152.88,152.88,-93.1805,93.1805};
+Double_t NAJB_Y[60] = {337.3685,337.3685,302.1129,302.1129,302.1129,302.1129,247.3274,247.3274,241.4789,241.4789,247.3274,247.3274,241.4789,241.4789,152.873,152.873,152.873,152.873,54.775,88.6375,88.6375,54.775,98.056,54.775,88.6375,88.6375,54.775,98.056,0,0,0,0,-98.056,-54.775,-88.6375,-88.6375,-54.775,-98.056,-54.775,-88.6375,-88.6375,-54.775,-152.873,-152.873,-152.873,-152.873,-241.4789,-241.4789,-247.3274,-247.3274,-241.4789,-241.4789,-247.3274,-247.3274,-302.1129,-302.1129,-302.1129,-302.1129,-337.3685,-337.3685};
+Double_t NAJB_Z[60] = {0,0,-88.6305,88.6305,88.6305,-88.6305,-54.831,54.831,247.3659,247.3659,54.831,-54.831,-247.3659,-247.3659,302.1129,302.1129,-302.1129,-302.1129,-241.4824,-152.8485,152.8485,241.4824,335.9824,241.4824,152.8485,-152.8485,-241.4824,-335.9824,-93.1805,93.1805,-93.1805,93.1805,335.9824,241.4824,152.8485,-152.8485,-241.4824,-335.9824,-241.4824,-152.8485,152.8485,241.4824,302.1129,302.1129,-302.1129,-302.1129,247.3659,247.3659,54.831,-54.831,-247.3659,-247.3659,-54.831,54.831,88.6305,-88.6305,-88.6305,88.6305,0,0};
+
+TVector3 NAJB_Rot_col_X[60];
+NAJB_Rot_col_X[0].SetXYZ(TMath::Sin(179.999939*TMath::Pi()/180)*TMath::Cos(-121.714996*TMath::Pi()/180),
+                       TMath::Sin(89.999969*TMath::Pi()/180)*TMath::Cos(-163.721970*TMath::Pi()/180),
+                       TMath::Sin(90.000076*TMath::Pi()/180)*TMath::Cos(106.278061*TMath::Pi()/180));
+
+NAJB_Rot_col_X[1].SetXYZ(TMath::Sin(0.000003*TMath::Pi()/180)*TMath::Cos(-121.720016*TMath::Pi()/180),
+                       TMath::Sin(90.000076*TMath::Pi()/180)*TMath::Cos(-16.278015*TMath::Pi()/180),
+                       TMath::Sin(89.999969*TMath::Pi()/180)*TMath::Cos(73.721939*TMath::Pi()/180));
+
+NAJB_Rot_col_X[2].SetXYZ(TMath::Sin(108.000031*TMath::Pi()/180)*TMath::Cos(-148.279999*TMath::Pi()/180),
+                       TMath::Sin(23.548264*TMath::Pi()/180)*TMath::Cos(169.926025*TMath::Pi()/180),
+                       TMath::Sin(104.668808*TMath::Pi()/180)*TMath::Cos(116.841034*TMath::Pi()/180));
+
+NAJB_Rot_col_X[3].SetXYZ(TMath::Sin(108.000092*TMath::Pi()/180)*TMath::Cos(31.719986*TMath::Pi()/180),
+                       TMath::Sin(156.451691*TMath::Pi()/180)*TMath::Cos(169.926025*TMath::Pi()/180),
+                       TMath::Sin(75.331177*TMath::Pi()/180)*TMath::Cos(116.841034*TMath::Pi()/180));
+
+NAJB_Rot_col_X[4].SetXYZ(TMath::Sin(71.999969*TMath::Pi()/180)*TMath::Cos(-31.720016*TMath::Pi()/180),
+                       TMath::Sin(156.451691*TMath::Pi()/180)*TMath::Cos(10.073961*TMath::Pi()/180),
+                       TMath::Sin(75.331177*TMath::Pi()/180)*TMath::Cos(63.158966*TMath::Pi()/180));
+
+NAJB_Rot_col_X[5].SetXYZ(TMath::Sin(71.999908*TMath::Pi()/180)*TMath::Cos(148.279953*TMath::Pi()/180),
+                       TMath::Sin(23.548248*TMath::Pi()/180)*TMath::Cos(10.073951*TMath::Pi()/180),
+                       TMath::Sin(104.668808*TMath::Pi()/180)*TMath::Cos(63.158966*TMath::Pi()/180));
+
+NAJB_Rot_col_X[6].SetXYZ(TMath::Sin(35.999985*TMath::Pi()/180)*TMath::Cos(-148.279999*TMath::Pi()/180),
+                       TMath::Sin(55.488815*TMath::Pi()/180)*TMath::Cos(50.572174*TMath::Pi()/180),
+                       TMath::Sin(99.004181*TMath::Pi()/180)*TMath::Cos(134.317352*TMath::Pi()/180));
+
+NAJB_Rot_col_X[7].SetXYZ(TMath::Sin(35.999985*TMath::Pi()/180)*TMath::Cos(31.719986*TMath::Pi()/180),
+                       TMath::Sin(124.511108*TMath::Pi()/180)*TMath::Cos(50.572174*TMath::Pi()/180),
+                       TMath::Sin(80.995865*TMath::Pi()/180)*TMath::Cos(134.317398*TMath::Pi()/180));
+
+NAJB_Rot_col_X[8].SetXYZ(TMath::Sin(71.998657*TMath::Pi()/180)*TMath::Cos(-148.283234*TMath::Pi()/180),
+                       TMath::Sin(50.469315*TMath::Pi()/180)*TMath::Cos(-42.728638*TMath::Pi()/180),
+                       TMath::Sin(45.035828*TMath::Pi()/180)*TMath::Cos(102.779205*TMath::Pi()/180));
+
+NAJB_Rot_col_X[9].SetXYZ(TMath::Sin(108.001343*TMath::Pi()/180)*TMath::Cos(148.283234*TMath::Pi()/180),
+                       TMath::Sin(50.469315*TMath::Pi()/180)*TMath::Cos(-137.271378*TMath::Pi()/180),
+                       TMath::Sin(45.035828*TMath::Pi()/180)*TMath::Cos(77.220795*TMath::Pi()/180));
+
+NAJB_Rot_col_X[10].SetXYZ(TMath::Sin(143.999985*TMath::Pi()/180)*TMath::Cos(-31.720016*TMath::Pi()/180),
+                       TMath::Sin(124.511169*TMath::Pi()/180)*TMath::Cos(129.427750*TMath::Pi()/180),
+                       TMath::Sin(80.995819*TMath::Pi()/180)*TMath::Cos(45.682571*TMath::Pi()/180));
+
+NAJB_Rot_col_X[11].SetXYZ(TMath::Sin(143.999985*TMath::Pi()/180)*TMath::Cos(148.279953*TMath::Pi()/180),
+                       TMath::Sin(55.488846*TMath::Pi()/180)*TMath::Cos(129.427811*TMath::Pi()/180),
+                       TMath::Sin(99.004181*TMath::Pi()/180)*TMath::Cos(45.682571*TMath::Pi()/180));
+
+NAJB_Rot_col_X[12].SetXYZ(TMath::Sin(108.001343*TMath::Pi()/180)*TMath::Cos(-31.716766*TMath::Pi()/180),
+                       TMath::Sin(129.530640*TMath::Pi()/180)*TMath::Cos(-137.271317*TMath::Pi()/180),
+                       TMath::Sin(134.964142*TMath::Pi()/180)*TMath::Cos(77.220795*TMath::Pi()/180));
+
+NAJB_Rot_col_X[13].SetXYZ(TMath::Sin(71.998657*TMath::Pi()/180)*TMath::Cos(31.716766*TMath::Pi()/180),
+                       TMath::Sin(129.530640*TMath::Pi()/180)*TMath::Cos(-42.728607*TMath::Pi()/180),
+                       TMath::Sin(134.964142*TMath::Pi()/180)*TMath::Cos(102.779205*TMath::Pi()/180));
+
+NAJB_Rot_col_X[14].SetXYZ(TMath::Sin(59.997574*TMath::Pi()/180)*TMath::Cos(-69.094238*TMath::Pi()/180),
+                       TMath::Sin(85.992615*TMath::Pi()/180)*TMath::Cos(23.223938*TMath::Pi()/180),
+                       TMath::Sin(30.324402*TMath::Pi()/180)*TMath::Cos(120.102737*TMath::Pi()/180));
+
+NAJB_Rot_col_X[15].SetXYZ(TMath::Sin(120.002426*TMath::Pi()/180)*TMath::Cos(69.094284*TMath::Pi()/180),
+                       TMath::Sin(85.992615*TMath::Pi()/180)*TMath::Cos(156.776047*TMath::Pi()/180),
+                       TMath::Sin(30.324402*TMath::Pi()/180)*TMath::Cos(59.897247*TMath::Pi()/180));
+
+NAJB_Rot_col_X[16].SetXYZ(TMath::Sin(120.002426*TMath::Pi()/180)*TMath::Cos(-110.905762*TMath::Pi()/180),
+                       TMath::Sin(94.007385*TMath::Pi()/180)*TMath::Cos(156.776047*TMath::Pi()/180),
+                       TMath::Sin(149.675552*TMath::Pi()/180)*TMath::Cos(59.897308*TMath::Pi()/180));
+
+NAJB_Rot_col_X[17].SetXYZ(TMath::Sin(59.997574*TMath::Pi()/180)*TMath::Cos(110.905701*TMath::Pi()/180),
+                       TMath::Sin(94.007385*TMath::Pi()/180)*TMath::Cos(23.223938*TMath::Pi()/180),
+                       TMath::Sin(149.675552*TMath::Pi()/180)*TMath::Cos(120.102692*TMath::Pi()/180));
+
+NAJB_Rot_col_X[18].SetXYZ(TMath::Sin(119.999146*TMath::Pi()/180)*TMath::Cos(-69.093414*TMath::Pi()/180),
+                       TMath::Sin(58.443619*TMath::Pi()/180)*TMath::Cos(-138.326401*TMath::Pi()/180),
+                       TMath::Sin(133.631973*TMath::Pi()/180)*TMath::Cos(167.512238*TMath::Pi()/180));
+
+NAJB_Rot_col_X[19].SetXYZ(TMath::Sin(143.997803*TMath::Pi()/180)*TMath::Cos(31.715622*TMath::Pi()/180),
+                       TMath::Sin(113.163864*TMath::Pi()/180)*TMath::Cos(-94.359375*TMath::Pi()/180),
+                       TMath::Sin(115.899887*TMath::Pi()/180)*TMath::Cos(163.649902*TMath::Pi()/180));
+
+NAJB_Rot_col_X[20].SetXYZ(TMath::Sin(143.997803*TMath::Pi()/180)*TMath::Cos(-148.284317*TMath::Pi()/180),
+                       TMath::Sin(66.836121*TMath::Pi()/180)*TMath::Cos(-94.359436*TMath::Pi()/180),
+                       TMath::Sin(64.100113*TMath::Pi()/180)*TMath::Cos(163.649902*TMath::Pi()/180));
+
+NAJB_Rot_col_X[21].SetXYZ(TMath::Sin(119.999146*TMath::Pi()/180)*TMath::Cos(110.906570*TMath::Pi()/180),
+                       TMath::Sin(121.556427*TMath::Pi()/180)*TMath::Cos(-138.326401*TMath::Pi()/180),
+                       TMath::Sin(46.368011*TMath::Pi()/180)*TMath::Cos(167.512238*TMath::Pi()/180));
+
+NAJB_Rot_col_X[22].SetXYZ(TMath::Sin(90.000076*TMath::Pi()/180)*TMath::Cos(-0.000001*TMath::Pi()/180),
+                       TMath::Sin(106.278061*TMath::Pi()/180)*TMath::Cos(90.000076*TMath::Pi()/180),
+                       TMath::Sin(16.277985*TMath::Pi()/180)*TMath::Cos(89.999969*TMath::Pi()/180));
+
+NAJB_Rot_col_X[23].SetXYZ(TMath::Sin(60.000854*TMath::Pi()/180)*TMath::Cos(-110.906570*TMath::Pi()/180),
+                       TMath::Sin(121.556366*TMath::Pi()/180)*TMath::Cos(-41.673569*TMath::Pi()/180),
+                       TMath::Sin(46.368011*TMath::Pi()/180)*TMath::Cos(12.487767*TMath::Pi()/180));
+
+NAJB_Rot_col_X[24].SetXYZ(TMath::Sin(36.002151*TMath::Pi()/180)*TMath::Cos(148.284378*TMath::Pi()/180),
+                       TMath::Sin(66.836121*TMath::Pi()/180)*TMath::Cos(-85.640564*TMath::Pi()/180),
+                       TMath::Sin(64.100113*TMath::Pi()/180)*TMath::Cos(16.350067*TMath::Pi()/180));
+
+NAJB_Rot_col_X[25].SetXYZ(TMath::Sin(36.002136*TMath::Pi()/180)*TMath::Cos(-31.715652*TMath::Pi()/180),
+                       TMath::Sin(113.163864*TMath::Pi()/180)*TMath::Cos(-85.640564*TMath::Pi()/180),
+                       TMath::Sin(115.899887*TMath::Pi()/180)*TMath::Cos(16.350067*TMath::Pi()/180));
+
+NAJB_Rot_col_X[26].SetXYZ(TMath::Sin(60.000854*TMath::Pi()/180)*TMath::Cos(69.093414*TMath::Pi()/180),
+                       TMath::Sin(58.443573*TMath::Pi()/180)*TMath::Cos(-41.673553*TMath::Pi()/180),
+                       TMath::Sin(133.631973*TMath::Pi()/180)*TMath::Cos(12.487760*TMath::Pi()/180));
+
+NAJB_Rot_col_X[27].SetXYZ(TMath::Sin(89.999908*TMath::Pi()/180)*TMath::Cos(180.000000*TMath::Pi()/180),
+                       TMath::Sin(73.721939*TMath::Pi()/180)*TMath::Cos(89.999969*TMath::Pi()/180),
+                       TMath::Sin(163.721970*TMath::Pi()/180)*TMath::Cos(90.000076*TMath::Pi()/180));
+
+NAJB_Rot_col_X[28].SetXYZ(TMath::Sin(89.999969*TMath::Pi()/180)*TMath::Cos(89.999969*TMath::Pi()/180),
+                       TMath::Sin(163.721970*TMath::Pi()/180)*TMath::Cos(-0.000009*TMath::Pi()/180),
+                       TMath::Sin(106.278061*TMath::Pi()/180)*TMath::Cos(180.000000*TMath::Pi()/180));
+
+NAJB_Rot_col_X[29].SetXYZ(TMath::Sin(89.999908*TMath::Pi()/180)*TMath::Cos(-89.999908*TMath::Pi()/180),
+                       TMath::Sin(16.278000*TMath::Pi()/180)*TMath::Cos(0.000002*TMath::Pi()/180),
+                       TMath::Sin(73.721939*TMath::Pi()/180)*TMath::Cos(-180.000000*TMath::Pi()/180));
+
+NAJB_Rot_col_X[30].SetXYZ(TMath::Sin(89.999969*TMath::Pi()/180)*TMath::Cos(-89.999969*TMath::Pi()/180),
+                       TMath::Sin(163.721970*TMath::Pi()/180)*TMath::Cos(180.000000*TMath::Pi()/180),
+                       TMath::Sin(106.278061*TMath::Pi()/180)*TMath::Cos(-0.000001*TMath::Pi()/180));
+
+NAJB_Rot_col_X[31].SetXYZ(TMath::Sin(90.000076*TMath::Pi()/180)*TMath::Cos(90.000076*TMath::Pi()/180),
+                       TMath::Sin(16.278015*TMath::Pi()/180)*TMath::Cos(-179.999939*TMath::Pi()/180),
+                       TMath::Sin(73.721939*TMath::Pi()/180)*TMath::Cos(0.000000*TMath::Pi()/180));
+
+NAJB_Rot_col_X[32].SetXYZ(TMath::Sin(89.999969*TMath::Pi()/180)*TMath::Cos(-180.000000*TMath::Pi()/180),
+                       TMath::Sin(106.278061*TMath::Pi()/180)*TMath::Cos(-89.999969*TMath::Pi()/180),
+                       TMath::Sin(16.277985*TMath::Pi()/180)*TMath::Cos(-89.999969*TMath::Pi()/180));
+
+NAJB_Rot_col_X[33].SetXYZ(TMath::Sin(60.000854*TMath::Pi()/180)*TMath::Cos(69.093414*TMath::Pi()/180),
+                       TMath::Sin(121.556366*TMath::Pi()/180)*TMath::Cos(138.326401*TMath::Pi()/180),
+                       TMath::Sin(46.368011*TMath::Pi()/180)*TMath::Cos(-167.512238*TMath::Pi()/180));
+
+NAJB_Rot_col_X[34].SetXYZ(TMath::Sin(36.002136*TMath::Pi()/180)*TMath::Cos(-31.715622*TMath::Pi()/180),
+                       TMath::Sin(66.836060*TMath::Pi()/180)*TMath::Cos(94.359436*TMath::Pi()/180),
+                       TMath::Sin(64.100113*TMath::Pi()/180)*TMath::Cos(-163.649902*TMath::Pi()/180));
+
+NAJB_Rot_col_X[35].SetXYZ(TMath::Sin(36.002136*TMath::Pi()/180)*TMath::Cos(148.284317*TMath::Pi()/180),
+                       TMath::Sin(113.163864*TMath::Pi()/180)*TMath::Cos(94.359436*TMath::Pi()/180),
+                       TMath::Sin(115.899887*TMath::Pi()/180)*TMath::Cos(-163.649902*TMath::Pi()/180));
+
+NAJB_Rot_col_X[36].SetXYZ(TMath::Sin(60.000854*TMath::Pi()/180)*TMath::Cos(-110.906570*TMath::Pi()/180),
+                       TMath::Sin(58.443573*TMath::Pi()/180)*TMath::Cos(138.326401*TMath::Pi()/180),
+                       TMath::Sin(133.631973*TMath::Pi()/180)*TMath::Cos(-167.512238*TMath::Pi()/180));
+
+NAJB_Rot_col_X[37].SetXYZ(TMath::Sin(89.999969*TMath::Pi()/180)*TMath::Cos(0.000001*TMath::Pi()/180),
+                       TMath::Sin(73.721939*TMath::Pi()/180)*TMath::Cos(-89.999969*TMath::Pi()/180),
+                       TMath::Sin(163.721970*TMath::Pi()/180)*TMath::Cos(-89.999969*TMath::Pi()/180));
+
+NAJB_Rot_col_X[38].SetXYZ(TMath::Sin(119.999146*TMath::Pi()/180)*TMath::Cos(110.906570*TMath::Pi()/180),
+                       TMath::Sin(58.443573*TMath::Pi()/180)*TMath::Cos(41.673584*TMath::Pi()/180),
+                       TMath::Sin(133.631973*TMath::Pi()/180)*TMath::Cos(-12.487763*TMath::Pi()/180));
+
+NAJB_Rot_col_X[39].SetXYZ(TMath::Sin(143.997864*TMath::Pi()/180)*TMath::Cos(-148.284317*TMath::Pi()/180),
+                       TMath::Sin(113.163925*TMath::Pi()/180)*TMath::Cos(85.640564*TMath::Pi()/180),
+                       TMath::Sin(115.899887*TMath::Pi()/180)*TMath::Cos(-16.350067*TMath::Pi()/180));
+
+NAJB_Rot_col_X[40].SetXYZ(TMath::Sin(143.997803*TMath::Pi()/180)*TMath::Cos(31.715637*TMath::Pi()/180),
+                       TMath::Sin(66.836121*TMath::Pi()/180)*TMath::Cos(85.640610*TMath::Pi()/180),
+                       TMath::Sin(64.100113*TMath::Pi()/180)*TMath::Cos(-16.350067*TMath::Pi()/180));
+
+NAJB_Rot_col_X[41].SetXYZ(TMath::Sin(119.999146*TMath::Pi()/180)*TMath::Cos(-69.093414*TMath::Pi()/180),
+                       TMath::Sin(121.556427*TMath::Pi()/180)*TMath::Cos(41.673553*TMath::Pi()/180),
+                       TMath::Sin(46.368011*TMath::Pi()/180)*TMath::Cos(-12.487760*TMath::Pi()/180));
+
+NAJB_Rot_col_X[42].SetXYZ(TMath::Sin(59.997574*TMath::Pi()/180)*TMath::Cos(110.905762*TMath::Pi()/180),
+                       TMath::Sin(85.992615*TMath::Pi()/180)*TMath::Cos(-156.776047*TMath::Pi()/180),
+                       TMath::Sin(30.324402*TMath::Pi()/180)*TMath::Cos(-59.897247*TMath::Pi()/180));
+
+NAJB_Rot_col_X[43].SetXYZ(TMath::Sin(120.002426*TMath::Pi()/180)*TMath::Cos(-110.905701*TMath::Pi()/180),
+                       TMath::Sin(85.992615*TMath::Pi()/180)*TMath::Cos(-23.223938*TMath::Pi()/180),
+                       TMath::Sin(30.324402*TMath::Pi()/180)*TMath::Cos(-120.102737*TMath::Pi()/180));
+
+NAJB_Rot_col_X[44].SetXYZ(TMath::Sin(120.002426*TMath::Pi()/180)*TMath::Cos(69.094238*TMath::Pi()/180),
+                       TMath::Sin(94.007385*TMath::Pi()/180)*TMath::Cos(-23.223938*TMath::Pi()/180),
+                       TMath::Sin(149.675552*TMath::Pi()/180)*TMath::Cos(-120.102692*TMath::Pi()/180));
+
+NAJB_Rot_col_X[45].SetXYZ(TMath::Sin(59.997574*TMath::Pi()/180)*TMath::Cos(-69.094284*TMath::Pi()/180),
+                       TMath::Sin(94.007385*TMath::Pi()/180)*TMath::Cos(-156.776047*TMath::Pi()/180),
+                       TMath::Sin(149.675552*TMath::Pi()/180)*TMath::Cos(-59.897308*TMath::Pi()/180));
+
+NAJB_Rot_col_X[46].SetXYZ(TMath::Sin(71.998657*TMath::Pi()/180)*TMath::Cos(31.716766*TMath::Pi()/180),
+                       TMath::Sin(50.469315*TMath::Pi()/180)*TMath::Cos(137.271317*TMath::Pi()/180),
+                       TMath::Sin(45.035828*TMath::Pi()/180)*TMath::Cos(-77.220795*TMath::Pi()/180));
+
+NAJB_Rot_col_X[47].SetXYZ(TMath::Sin(108.001343*TMath::Pi()/180)*TMath::Cos(-31.716766*TMath::Pi()/180),
+                       TMath::Sin(50.469315*TMath::Pi()/180)*TMath::Cos(42.728607*TMath::Pi()/180),
+                       TMath::Sin(45.035828*TMath::Pi()/180)*TMath::Cos(-102.779205*TMath::Pi()/180));
+
+NAJB_Rot_col_X[48].SetXYZ(TMath::Sin(143.999985*TMath::Pi()/180)*TMath::Cos(148.279953*TMath::Pi()/180),
+                       TMath::Sin(124.511169*TMath::Pi()/180)*TMath::Cos(-50.572174*TMath::Pi()/180),
+                       TMath::Sin(80.995819*TMath::Pi()/180)*TMath::Cos(-134.317398*TMath::Pi()/180));
+
+NAJB_Rot_col_X[49].SetXYZ(TMath::Sin(143.999985*TMath::Pi()/180)*TMath::Cos(-31.719986*TMath::Pi()/180),
+                       TMath::Sin(55.488846*TMath::Pi()/180)*TMath::Cos(-50.572174*TMath::Pi()/180),
+                       TMath::Sin(99.004181*TMath::Pi()/180)*TMath::Cos(-134.317398*TMath::Pi()/180));
+
+NAJB_Rot_col_X[50].SetXYZ(TMath::Sin(108.001343*TMath::Pi()/180)*TMath::Cos(148.283234*TMath::Pi()/180),
+                       TMath::Sin(129.530640*TMath::Pi()/180)*TMath::Cos(42.728638*TMath::Pi()/180),
+                       TMath::Sin(134.964142*TMath::Pi()/180)*TMath::Cos(-102.779205*TMath::Pi()/180));
+
+NAJB_Rot_col_X[51].SetXYZ(TMath::Sin(71.998657*TMath::Pi()/180)*TMath::Cos(-148.283234*TMath::Pi()/180),
+                       TMath::Sin(129.530640*TMath::Pi()/180)*TMath::Cos(137.271378*TMath::Pi()/180),
+                       TMath::Sin(134.964142*TMath::Pi()/180)*TMath::Cos(-77.220795*TMath::Pi()/180));
+
+NAJB_Rot_col_X[52].SetXYZ(TMath::Sin(35.999969*TMath::Pi()/180)*TMath::Cos(31.720001*TMath::Pi()/180),
+                       TMath::Sin(55.488815*TMath::Pi()/180)*TMath::Cos(-129.427811*TMath::Pi()/180),
+                       TMath::Sin(99.004181*TMath::Pi()/180)*TMath::Cos(-45.682571*TMath::Pi()/180));
+
+NAJB_Rot_col_X[53].SetXYZ(TMath::Sin(35.999985*TMath::Pi()/180)*TMath::Cos(-148.279953*TMath::Pi()/180),
+                       TMath::Sin(124.511108*TMath::Pi()/180)*TMath::Cos(-129.427811*TMath::Pi()/180),
+                       TMath::Sin(80.995865*TMath::Pi()/180)*TMath::Cos(-45.682571*TMath::Pi()/180));
+
+NAJB_Rot_col_X[54].SetXYZ(TMath::Sin(71.999969*TMath::Pi()/180)*TMath::Cos(148.279953*TMath::Pi()/180),
+                       TMath::Sin(156.451691*TMath::Pi()/180)*TMath::Cos(-169.926025*TMath::Pi()/180),
+                       TMath::Sin(75.331177*TMath::Pi()/180)*TMath::Cos(-116.841034*TMath::Pi()/180));
+
+NAJB_Rot_col_X[55].SetXYZ(TMath::Sin(71.999908*TMath::Pi()/180)*TMath::Cos(-31.719986*TMath::Pi()/180),
+                       TMath::Sin(23.548248*TMath::Pi()/180)*TMath::Cos(-169.926025*TMath::Pi()/180),
+                       TMath::Sin(104.668808*TMath::Pi()/180)*TMath::Cos(-116.841034*TMath::Pi()/180));
+
+NAJB_Rot_col_X[56].SetXYZ(TMath::Sin(108.000031*TMath::Pi()/180)*TMath::Cos(31.720001*TMath::Pi()/180),
+                       TMath::Sin(23.548264*TMath::Pi()/180)*TMath::Cos(-10.073964*TMath::Pi()/180),
+                       TMath::Sin(104.668808*TMath::Pi()/180)*TMath::Cos(-63.158966*TMath::Pi()/180));
+
+NAJB_Rot_col_X[57].SetXYZ(TMath::Sin(108.000092*TMath::Pi()/180)*TMath::Cos(-148.279999*TMath::Pi()/180),
+                       TMath::Sin(156.451691*TMath::Pi()/180)*TMath::Cos(-10.073964*TMath::Pi()/180),
+                       TMath::Sin(75.331177*TMath::Pi()/180)*TMath::Cos(-63.158966*TMath::Pi()/180));
+
+NAJB_Rot_col_X[58].SetXYZ(TMath::Sin(0.000003*TMath::Pi()/180)*TMath::Cos(58.279968*TMath::Pi()/180),
+                       TMath::Sin(90.000076*TMath::Pi()/180)*TMath::Cos(163.721970*TMath::Pi()/180),
+                       TMath::Sin(89.999969*TMath::Pi()/180)*TMath::Cos(-106.278061*TMath::Pi()/180));
+
+NAJB_Rot_col_X[59].SetXYZ(TMath::Sin(179.999939*TMath::Pi()/180)*TMath::Cos(58.285004*TMath::Pi()/180),
+                       TMath::Sin(89.999969*TMath::Pi()/180)*TMath::Cos(16.278000*TMath::Pi()/180),
+                       TMath::Sin(90.000076*TMath::Pi()/180)*TMath::Cos(-73.721939*TMath::Pi()/180));
+
+
+TVector3 NAJB_Rot_col_Y[60];
+NAJB_Rot_col_Y[0].SetXYZ(TMath::Sin(179.999939*TMath::Pi()/180)*TMath::Sin(-121.714996*TMath::Pi()/180),
+                    TMath::Sin(89.999969*TMath::Pi()/180)*TMath::Sin(-163.721970*TMath::Pi()/180),
+                    TMath::Sin(90.000076*TMath::Pi()/180)*TMath::Sin(106.278061*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[1].SetXYZ(TMath::Sin(0.000003*TMath::Pi()/180)*TMath::Sin(-121.720016*TMath::Pi()/180),
+                    TMath::Sin(90.000076*TMath::Pi()/180)*TMath::Sin(-16.278015*TMath::Pi()/180),
+                    TMath::Sin(89.999969*TMath::Pi()/180)*TMath::Sin(73.721939*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[2].SetXYZ(TMath::Sin(108.000031*TMath::Pi()/180)*TMath::Sin(-148.279999*TMath::Pi()/180),
+                    TMath::Sin(23.548264*TMath::Pi()/180)*TMath::Sin(169.926025*TMath::Pi()/180),
+                    TMath::Sin(104.668808*TMath::Pi()/180)*TMath::Sin(116.841034*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[3].SetXYZ(TMath::Sin(108.000092*TMath::Pi()/180)*TMath::Sin(31.719986*TMath::Pi()/180),
+                    TMath::Sin(156.451691*TMath::Pi()/180)*TMath::Sin(169.926025*TMath::Pi()/180),
+                    TMath::Sin(75.331177*TMath::Pi()/180)*TMath::Sin(116.841034*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[4].SetXYZ(TMath::Sin(71.999969*TMath::Pi()/180)*TMath::Sin(-31.720016*TMath::Pi()/180),
+                    TMath::Sin(156.451691*TMath::Pi()/180)*TMath::Sin(10.073961*TMath::Pi()/180),
+                    TMath::Sin(75.331177*TMath::Pi()/180)*TMath::Sin(63.158966*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[5].SetXYZ(TMath::Sin(71.999908*TMath::Pi()/180)*TMath::Sin(148.279953*TMath::Pi()/180),
+                    TMath::Sin(23.548248*TMath::Pi()/180)*TMath::Sin(10.073951*TMath::Pi()/180),
+                    TMath::Sin(104.668808*TMath::Pi()/180)*TMath::Sin(63.158966*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[6].SetXYZ(TMath::Sin(35.999985*TMath::Pi()/180)*TMath::Sin(-148.279999*TMath::Pi()/180),
+                    TMath::Sin(55.488815*TMath::Pi()/180)*TMath::Sin(50.572174*TMath::Pi()/180),
+                    TMath::Sin(99.004181*TMath::Pi()/180)*TMath::Sin(134.317352*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[7].SetXYZ(TMath::Sin(35.999985*TMath::Pi()/180)*TMath::Sin(31.719986*TMath::Pi()/180),
+                    TMath::Sin(124.511108*TMath::Pi()/180)*TMath::Sin(50.572174*TMath::Pi()/180),
+                    TMath::Sin(80.995865*TMath::Pi()/180)*TMath::Sin(134.317398*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[8].SetXYZ(TMath::Sin(71.998657*TMath::Pi()/180)*TMath::Sin(-148.283234*TMath::Pi()/180),
+                    TMath::Sin(50.469315*TMath::Pi()/180)*TMath::Sin(-42.728638*TMath::Pi()/180),
+                    TMath::Sin(45.035828*TMath::Pi()/180)*TMath::Sin(102.779205*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[9].SetXYZ(TMath::Sin(108.001343*TMath::Pi()/180)*TMath::Sin(148.283234*TMath::Pi()/180),
+                    TMath::Sin(50.469315*TMath::Pi()/180)*TMath::Sin(-137.271378*TMath::Pi()/180),
+                    TMath::Sin(45.035828*TMath::Pi()/180)*TMath::Sin(77.220795*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[10].SetXYZ(TMath::Sin(143.999985*TMath::Pi()/180)*TMath::Sin(-31.720016*TMath::Pi()/180),
+                    TMath::Sin(124.511169*TMath::Pi()/180)*TMath::Sin(129.427750*TMath::Pi()/180),
+                    TMath::Sin(80.995819*TMath::Pi()/180)*TMath::Sin(45.682571*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[11].SetXYZ(TMath::Sin(143.999985*TMath::Pi()/180)*TMath::Sin(148.279953*TMath::Pi()/180),
+                    TMath::Sin(55.488846*TMath::Pi()/180)*TMath::Sin(129.427811*TMath::Pi()/180),
+                    TMath::Sin(99.004181*TMath::Pi()/180)*TMath::Sin(45.682571*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[12].SetXYZ(TMath::Sin(108.001343*TMath::Pi()/180)*TMath::Sin(-31.716766*TMath::Pi()/180),
+                    TMath::Sin(129.530640*TMath::Pi()/180)*TMath::Sin(-137.271317*TMath::Pi()/180),
+                    TMath::Sin(134.964142*TMath::Pi()/180)*TMath::Sin(77.220795*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[13].SetXYZ(TMath::Sin(71.998657*TMath::Pi()/180)*TMath::Sin(31.716766*TMath::Pi()/180),
+                    TMath::Sin(129.530640*TMath::Pi()/180)*TMath::Sin(-42.728607*TMath::Pi()/180),
+                    TMath::Sin(134.964142*TMath::Pi()/180)*TMath::Sin(102.779205*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[14].SetXYZ(TMath::Sin(59.997574*TMath::Pi()/180)*TMath::Sin(-69.094238*TMath::Pi()/180),
+                    TMath::Sin(85.992615*TMath::Pi()/180)*TMath::Sin(23.223938*TMath::Pi()/180),
+                    TMath::Sin(30.324402*TMath::Pi()/180)*TMath::Sin(120.102737*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[15].SetXYZ(TMath::Sin(120.002426*TMath::Pi()/180)*TMath::Sin(69.094284*TMath::Pi()/180),
+                    TMath::Sin(85.992615*TMath::Pi()/180)*TMath::Sin(156.776047*TMath::Pi()/180),
+                    TMath::Sin(30.324402*TMath::Pi()/180)*TMath::Sin(59.897247*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[16].SetXYZ(TMath::Sin(120.002426*TMath::Pi()/180)*TMath::Sin(-110.905762*TMath::Pi()/180),
+                    TMath::Sin(94.007385*TMath::Pi()/180)*TMath::Sin(156.776047*TMath::Pi()/180),
+                    TMath::Sin(149.675552*TMath::Pi()/180)*TMath::Sin(59.897308*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[17].SetXYZ(TMath::Sin(59.997574*TMath::Pi()/180)*TMath::Sin(110.905701*TMath::Pi()/180),
+                    TMath::Sin(94.007385*TMath::Pi()/180)*TMath::Sin(23.223938*TMath::Pi()/180),
+                    TMath::Sin(149.675552*TMath::Pi()/180)*TMath::Sin(120.102692*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[18].SetXYZ(TMath::Sin(119.999146*TMath::Pi()/180)*TMath::Sin(-69.093414*TMath::Pi()/180),
+                    TMath::Sin(58.443619*TMath::Pi()/180)*TMath::Sin(-138.326401*TMath::Pi()/180),
+                    TMath::Sin(133.631973*TMath::Pi()/180)*TMath::Sin(167.512238*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[19].SetXYZ(TMath::Sin(143.997803*TMath::Pi()/180)*TMath::Sin(31.715622*TMath::Pi()/180),
+                    TMath::Sin(113.163864*TMath::Pi()/180)*TMath::Sin(-94.359375*TMath::Pi()/180),
+                    TMath::Sin(115.899887*TMath::Pi()/180)*TMath::Sin(163.649902*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[20].SetXYZ(TMath::Sin(143.997803*TMath::Pi()/180)*TMath::Sin(-148.284317*TMath::Pi()/180),
+                    TMath::Sin(66.836121*TMath::Pi()/180)*TMath::Sin(-94.359436*TMath::Pi()/180),
+                    TMath::Sin(64.100113*TMath::Pi()/180)*TMath::Sin(163.649902*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[21].SetXYZ(TMath::Sin(119.999146*TMath::Pi()/180)*TMath::Sin(110.906570*TMath::Pi()/180),
+                    TMath::Sin(121.556427*TMath::Pi()/180)*TMath::Sin(-138.326401*TMath::Pi()/180),
+                    TMath::Sin(46.368011*TMath::Pi()/180)*TMath::Sin(167.512238*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[22].SetXYZ(TMath::Sin(90.000076*TMath::Pi()/180)*TMath::Sin(-0.000001*TMath::Pi()/180),
+                    TMath::Sin(106.278061*TMath::Pi()/180)*TMath::Sin(90.000076*TMath::Pi()/180),
+                    TMath::Sin(16.277985*TMath::Pi()/180)*TMath::Sin(89.999969*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[23].SetXYZ(TMath::Sin(60.000854*TMath::Pi()/180)*TMath::Sin(-110.906570*TMath::Pi()/180),
+                    TMath::Sin(121.556366*TMath::Pi()/180)*TMath::Sin(-41.673569*TMath::Pi()/180),
+                    TMath::Sin(46.368011*TMath::Pi()/180)*TMath::Sin(12.487767*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[24].SetXYZ(TMath::Sin(36.002151*TMath::Pi()/180)*TMath::Sin(148.284378*TMath::Pi()/180),
+                    TMath::Sin(66.836121*TMath::Pi()/180)*TMath::Sin(-85.640564*TMath::Pi()/180),
+                    TMath::Sin(64.100113*TMath::Pi()/180)*TMath::Sin(16.350067*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[25].SetXYZ(TMath::Sin(36.002136*TMath::Pi()/180)*TMath::Sin(-31.715652*TMath::Pi()/180),
+                    TMath::Sin(113.163864*TMath::Pi()/180)*TMath::Sin(-85.640564*TMath::Pi()/180),
+                    TMath::Sin(115.899887*TMath::Pi()/180)*TMath::Sin(16.350067*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[26].SetXYZ(TMath::Sin(60.000854*TMath::Pi()/180)*TMath::Sin(69.093414*TMath::Pi()/180),
+                    TMath::Sin(58.443573*TMath::Pi()/180)*TMath::Sin(-41.673553*TMath::Pi()/180),
+                    TMath::Sin(133.631973*TMath::Pi()/180)*TMath::Sin(12.487760*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[27].SetXYZ(TMath::Sin(89.999908*TMath::Pi()/180)*TMath::Sin(180.000000*TMath::Pi()/180),
+                    TMath::Sin(73.721939*TMath::Pi()/180)*TMath::Sin(89.999969*TMath::Pi()/180),
+                    TMath::Sin(163.721970*TMath::Pi()/180)*TMath::Sin(90.000076*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[28].SetXYZ(TMath::Sin(89.999969*TMath::Pi()/180)*TMath::Sin(89.999969*TMath::Pi()/180),
+                    TMath::Sin(163.721970*TMath::Pi()/180)*TMath::Sin(-0.000009*TMath::Pi()/180),
+                    TMath::Sin(106.278061*TMath::Pi()/180)*TMath::Sin(180.000000*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[29].SetXYZ(TMath::Sin(89.999908*TMath::Pi()/180)*TMath::Sin(-89.999908*TMath::Pi()/180),
+                    TMath::Sin(16.278000*TMath::Pi()/180)*TMath::Sin(0.000002*TMath::Pi()/180),
+                    TMath::Sin(73.721939*TMath::Pi()/180)*TMath::Sin(-180.000000*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[30].SetXYZ(TMath::Sin(89.999969*TMath::Pi()/180)*TMath::Sin(-89.999969*TMath::Pi()/180),
+                    TMath::Sin(163.721970*TMath::Pi()/180)*TMath::Sin(180.000000*TMath::Pi()/180),
+                    TMath::Sin(106.278061*TMath::Pi()/180)*TMath::Sin(-0.000001*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[31].SetXYZ(TMath::Sin(90.000076*TMath::Pi()/180)*TMath::Sin(90.000076*TMath::Pi()/180),
+                    TMath::Sin(16.278015*TMath::Pi()/180)*TMath::Sin(-179.999939*TMath::Pi()/180),
+                    TMath::Sin(73.721939*TMath::Pi()/180)*TMath::Sin(0.000000*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[32].SetXYZ(TMath::Sin(89.999969*TMath::Pi()/180)*TMath::Sin(-180.000000*TMath::Pi()/180),
+                    TMath::Sin(106.278061*TMath::Pi()/180)*TMath::Sin(-89.999969*TMath::Pi()/180),
+                    TMath::Sin(16.277985*TMath::Pi()/180)*TMath::Sin(-89.999969*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[33].SetXYZ(TMath::Sin(60.000854*TMath::Pi()/180)*TMath::Sin(69.093414*TMath::Pi()/180),
+                    TMath::Sin(121.556366*TMath::Pi()/180)*TMath::Sin(138.326401*TMath::Pi()/180),
+                    TMath::Sin(46.368011*TMath::Pi()/180)*TMath::Sin(-167.512238*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[34].SetXYZ(TMath::Sin(36.002136*TMath::Pi()/180)*TMath::Sin(-31.715622*TMath::Pi()/180),
+                    TMath::Sin(66.836060*TMath::Pi()/180)*TMath::Sin(94.359436*TMath::Pi()/180),
+                    TMath::Sin(64.100113*TMath::Pi()/180)*TMath::Sin(-163.649902*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[35].SetXYZ(TMath::Sin(36.002136*TMath::Pi()/180)*TMath::Sin(148.284317*TMath::Pi()/180),
+                    TMath::Sin(113.163864*TMath::Pi()/180)*TMath::Sin(94.359436*TMath::Pi()/180),
+                    TMath::Sin(115.899887*TMath::Pi()/180)*TMath::Sin(-163.649902*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[36].SetXYZ(TMath::Sin(60.000854*TMath::Pi()/180)*TMath::Sin(-110.906570*TMath::Pi()/180),
+                    TMath::Sin(58.443573*TMath::Pi()/180)*TMath::Sin(138.326401*TMath::Pi()/180),
+                    TMath::Sin(133.631973*TMath::Pi()/180)*TMath::Sin(-167.512238*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[37].SetXYZ(TMath::Sin(89.999969*TMath::Pi()/180)*TMath::Sin(0.000001*TMath::Pi()/180),
+                    TMath::Sin(73.721939*TMath::Pi()/180)*TMath::Sin(-89.999969*TMath::Pi()/180),
+                    TMath::Sin(163.721970*TMath::Pi()/180)*TMath::Sin(-89.999969*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[38].SetXYZ(TMath::Sin(119.999146*TMath::Pi()/180)*TMath::Sin(110.906570*TMath::Pi()/180),
+                    TMath::Sin(58.443573*TMath::Pi()/180)*TMath::Sin(41.673584*TMath::Pi()/180),
+                    TMath::Sin(133.631973*TMath::Pi()/180)*TMath::Sin(-12.487763*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[39].SetXYZ(TMath::Sin(143.997864*TMath::Pi()/180)*TMath::Sin(-148.284317*TMath::Pi()/180),
+                    TMath::Sin(113.163925*TMath::Pi()/180)*TMath::Sin(85.640564*TMath::Pi()/180),
+                    TMath::Sin(115.899887*TMath::Pi()/180)*TMath::Sin(-16.350067*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[40].SetXYZ(TMath::Sin(143.997803*TMath::Pi()/180)*TMath::Sin(31.715637*TMath::Pi()/180),
+                    TMath::Sin(66.836121*TMath::Pi()/180)*TMath::Sin(85.640610*TMath::Pi()/180),
+                    TMath::Sin(64.100113*TMath::Pi()/180)*TMath::Sin(-16.350067*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[41].SetXYZ(TMath::Sin(119.999146*TMath::Pi()/180)*TMath::Sin(-69.093414*TMath::Pi()/180),
+                    TMath::Sin(121.556427*TMath::Pi()/180)*TMath::Sin(41.673553*TMath::Pi()/180),
+                    TMath::Sin(46.368011*TMath::Pi()/180)*TMath::Sin(-12.487760*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[42].SetXYZ(TMath::Sin(59.997574*TMath::Pi()/180)*TMath::Sin(110.905762*TMath::Pi()/180),
+                    TMath::Sin(85.992615*TMath::Pi()/180)*TMath::Sin(-156.776047*TMath::Pi()/180),
+                    TMath::Sin(30.324402*TMath::Pi()/180)*TMath::Sin(-59.897247*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[43].SetXYZ(TMath::Sin(120.002426*TMath::Pi()/180)*TMath::Sin(-110.905701*TMath::Pi()/180),
+                    TMath::Sin(85.992615*TMath::Pi()/180)*TMath::Sin(-23.223938*TMath::Pi()/180),
+                    TMath::Sin(30.324402*TMath::Pi()/180)*TMath::Sin(-120.102737*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[44].SetXYZ(TMath::Sin(120.002426*TMath::Pi()/180)*TMath::Sin(69.094238*TMath::Pi()/180),
+                    TMath::Sin(94.007385*TMath::Pi()/180)*TMath::Sin(-23.223938*TMath::Pi()/180),
+                    TMath::Sin(149.675552*TMath::Pi()/180)*TMath::Sin(-120.102692*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[45].SetXYZ(TMath::Sin(59.997574*TMath::Pi()/180)*TMath::Sin(-69.094284*TMath::Pi()/180),
+                    TMath::Sin(94.007385*TMath::Pi()/180)*TMath::Sin(-156.776047*TMath::Pi()/180),
+                    TMath::Sin(149.675552*TMath::Pi()/180)*TMath::Sin(-59.897308*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[46].SetXYZ(TMath::Sin(71.998657*TMath::Pi()/180)*TMath::Sin(31.716766*TMath::Pi()/180),
+                    TMath::Sin(50.469315*TMath::Pi()/180)*TMath::Sin(137.271317*TMath::Pi()/180),
+                    TMath::Sin(45.035828*TMath::Pi()/180)*TMath::Sin(-77.220795*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[47].SetXYZ(TMath::Sin(108.001343*TMath::Pi()/180)*TMath::Sin(-31.716766*TMath::Pi()/180),
+                    TMath::Sin(50.469315*TMath::Pi()/180)*TMath::Sin(42.728607*TMath::Pi()/180),
+                    TMath::Sin(45.035828*TMath::Pi()/180)*TMath::Sin(-102.779205*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[48].SetXYZ(TMath::Sin(143.999985*TMath::Pi()/180)*TMath::Sin(148.279953*TMath::Pi()/180),
+                    TMath::Sin(124.511169*TMath::Pi()/180)*TMath::Sin(-50.572174*TMath::Pi()/180),
+                    TMath::Sin(80.995819*TMath::Pi()/180)*TMath::Sin(-134.317398*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[49].SetXYZ(TMath::Sin(143.999985*TMath::Pi()/180)*TMath::Sin(-31.719986*TMath::Pi()/180),
+                    TMath::Sin(55.488846*TMath::Pi()/180)*TMath::Sin(-50.572174*TMath::Pi()/180),
+                    TMath::Sin(99.004181*TMath::Pi()/180)*TMath::Sin(-134.317398*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[50].SetXYZ(TMath::Sin(108.001343*TMath::Pi()/180)*TMath::Sin(148.283234*TMath::Pi()/180),
+                    TMath::Sin(129.530640*TMath::Pi()/180)*TMath::Sin(42.728638*TMath::Pi()/180),
+                    TMath::Sin(134.964142*TMath::Pi()/180)*TMath::Sin(-102.779205*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[51].SetXYZ(TMath::Sin(71.998657*TMath::Pi()/180)*TMath::Sin(-148.283234*TMath::Pi()/180),
+                    TMath::Sin(129.530640*TMath::Pi()/180)*TMath::Sin(137.271378*TMath::Pi()/180),
+                    TMath::Sin(134.964142*TMath::Pi()/180)*TMath::Sin(-77.220795*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[52].SetXYZ(TMath::Sin(35.999969*TMath::Pi()/180)*TMath::Sin(31.720001*TMath::Pi()/180),
+                    TMath::Sin(55.488815*TMath::Pi()/180)*TMath::Sin(-129.427811*TMath::Pi()/180),
+                    TMath::Sin(99.004181*TMath::Pi()/180)*TMath::Sin(-45.682571*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[53].SetXYZ(TMath::Sin(35.999985*TMath::Pi()/180)*TMath::Sin(-148.279953*TMath::Pi()/180),
+                    TMath::Sin(124.511108*TMath::Pi()/180)*TMath::Sin(-129.427811*TMath::Pi()/180),
+                    TMath::Sin(80.995865*TMath::Pi()/180)*TMath::Sin(-45.682571*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[54].SetXYZ(TMath::Sin(71.999969*TMath::Pi()/180)*TMath::Sin(148.279953*TMath::Pi()/180),
+                    TMath::Sin(156.451691*TMath::Pi()/180)*TMath::Sin(-169.926025*TMath::Pi()/180),
+                    TMath::Sin(75.331177*TMath::Pi()/180)*TMath::Sin(-116.841034*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[55].SetXYZ(TMath::Sin(71.999908*TMath::Pi()/180)*TMath::Sin(-31.719986*TMath::Pi()/180),
+                    TMath::Sin(23.548248*TMath::Pi()/180)*TMath::Sin(-169.926025*TMath::Pi()/180),
+                    TMath::Sin(104.668808*TMath::Pi()/180)*TMath::Sin(-116.841034*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[56].SetXYZ(TMath::Sin(108.000031*TMath::Pi()/180)*TMath::Sin(31.720001*TMath::Pi()/180),
+                    TMath::Sin(23.548264*TMath::Pi()/180)*TMath::Sin(-10.073964*TMath::Pi()/180),
+                    TMath::Sin(104.668808*TMath::Pi()/180)*TMath::Sin(-63.158966*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[57].SetXYZ(TMath::Sin(108.000092*TMath::Pi()/180)*TMath::Sin(-148.279999*TMath::Pi()/180),
+                    TMath::Sin(156.451691*TMath::Pi()/180)*TMath::Sin(-10.073964*TMath::Pi()/180),
+                    TMath::Sin(75.331177*TMath::Pi()/180)*TMath::Sin(-63.158966*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[58].SetXYZ(TMath::Sin(0.000003*TMath::Pi()/180)*TMath::Sin(58.279968*TMath::Pi()/180),
+                    TMath::Sin(90.000076*TMath::Pi()/180)*TMath::Sin(163.721970*TMath::Pi()/180),
+                    TMath::Sin(89.999969*TMath::Pi()/180)*TMath::Sin(-106.278061*TMath::Pi()/180));
+
+NAJB_Rot_col_Y[59].SetXYZ(TMath::Sin(179.999939*TMath::Pi()/180)*TMath::Sin(58.285004*TMath::Pi()/180),
+                    TMath::Sin(89.999969*TMath::Pi()/180)*TMath::Sin(16.278000*TMath::Pi()/180),
+                    TMath::Sin(90.000076*TMath::Pi()/180)*TMath::Sin(-73.721939*TMath::Pi()/180));
+
+
+TVector3 NAJB_Rot_col_Z[60];
+NAJB_Rot_col_Z[0].SetXYZ(TMath::Cos(179.999939*TMath::Pi()/180),
+                 TMath::Cos(89.999969*TMath::Pi()/180),
+                 TMath::Cos(90.000076*TMath::Pi()/180));
+NAJB_Rot_col_Z[1].SetXYZ(TMath::Cos(0.000003*TMath::Pi()/180),
+                 TMath::Cos(90.000076*TMath::Pi()/180),
+                 TMath::Cos(89.999969*TMath::Pi()/180));
+NAJB_Rot_col_Z[2].SetXYZ(TMath::Cos(108.000031*TMath::Pi()/180),
+                 TMath::Cos(23.548264*TMath::Pi()/180),
+                 TMath::Cos(104.668808*TMath::Pi()/180));
+NAJB_Rot_col_Z[3].SetXYZ(TMath::Cos(108.000092*TMath::Pi()/180),
+                 TMath::Cos(156.451691*TMath::Pi()/180),
+                 TMath::Cos(75.331177*TMath::Pi()/180));
+NAJB_Rot_col_Z[4].SetXYZ(TMath::Cos(71.999969*TMath::Pi()/180),
+                 TMath::Cos(156.451691*TMath::Pi()/180),
+                 TMath::Cos(75.331177*TMath::Pi()/180));
+NAJB_Rot_col_Z[5].SetXYZ(TMath::Cos(71.999908*TMath::Pi()/180),
+                 TMath::Cos(23.548248*TMath::Pi()/180),
+                 TMath::Cos(104.668808*TMath::Pi()/180));
+NAJB_Rot_col_Z[6].SetXYZ(TMath::Cos(35.999985*TMath::Pi()/180),
+                 TMath::Cos(55.488815*TMath::Pi()/180),
+                 TMath::Cos(99.004181*TMath::Pi()/180));
+NAJB_Rot_col_Z[7].SetXYZ(TMath::Cos(35.999985*TMath::Pi()/180),
+                 TMath::Cos(124.511108*TMath::Pi()/180),
+                 TMath::Cos(80.995865*TMath::Pi()/180));
+NAJB_Rot_col_Z[8].SetXYZ(TMath::Cos(71.998657*TMath::Pi()/180),
+                 TMath::Cos(50.469315*TMath::Pi()/180),
+                 TMath::Cos(45.035828*TMath::Pi()/180));
+NAJB_Rot_col_Z[9].SetXYZ(TMath::Cos(108.001343*TMath::Pi()/180),
+                 TMath::Cos(50.469315*TMath::Pi()/180),
+                 TMath::Cos(45.035828*TMath::Pi()/180));
+NAJB_Rot_col_Z[10].SetXYZ(TMath::Cos(143.999985*TMath::Pi()/180),
+                 TMath::Cos(124.511169*TMath::Pi()/180),
+                 TMath::Cos(80.995819*TMath::Pi()/180));
+NAJB_Rot_col_Z[11].SetXYZ(TMath::Cos(143.999985*TMath::Pi()/180),
+                 TMath::Cos(55.488846*TMath::Pi()/180),
+                 TMath::Cos(99.004181*TMath::Pi()/180));
+NAJB_Rot_col_Z[12].SetXYZ(TMath::Cos(108.001343*TMath::Pi()/180),
+                 TMath::Cos(129.530640*TMath::Pi()/180),
+                 TMath::Cos(134.964142*TMath::Pi()/180));
+NAJB_Rot_col_Z[13].SetXYZ(TMath::Cos(71.998657*TMath::Pi()/180),
+                 TMath::Cos(129.530640*TMath::Pi()/180),
+                 TMath::Cos(134.964142*TMath::Pi()/180));
+NAJB_Rot_col_Z[14].SetXYZ(TMath::Cos(59.997574*TMath::Pi()/180),
+                 TMath::Cos(85.992615*TMath::Pi()/180),
+                 TMath::Cos(30.324402*TMath::Pi()/180));
+NAJB_Rot_col_Z[15].SetXYZ(TMath::Cos(120.002426*TMath::Pi()/180),
+                 TMath::Cos(85.992615*TMath::Pi()/180),
+                 TMath::Cos(30.324402*TMath::Pi()/180));
+NAJB_Rot_col_Z[16].SetXYZ(TMath::Cos(120.002426*TMath::Pi()/180),
+                 TMath::Cos(94.007385*TMath::Pi()/180),
+                 TMath::Cos(149.675552*TMath::Pi()/180));
+NAJB_Rot_col_Z[17].SetXYZ(TMath::Cos(59.997574*TMath::Pi()/180),
+                 TMath::Cos(94.007385*TMath::Pi()/180),
+                 TMath::Cos(149.675552*TMath::Pi()/180));
+NAJB_Rot_col_Z[18].SetXYZ(TMath::Cos(119.999146*TMath::Pi()/180),
+                 TMath::Cos(58.443619*TMath::Pi()/180),
+                 TMath::Cos(133.631973*TMath::Pi()/180));
+NAJB_Rot_col_Z[19].SetXYZ(TMath::Cos(143.997803*TMath::Pi()/180),
+                 TMath::Cos(113.163864*TMath::Pi()/180),
+                 TMath::Cos(115.899887*TMath::Pi()/180));
+NAJB_Rot_col_Z[20].SetXYZ(TMath::Cos(143.997803*TMath::Pi()/180),
+                 TMath::Cos(66.836121*TMath::Pi()/180),
+                 TMath::Cos(64.100113*TMath::Pi()/180));
+NAJB_Rot_col_Z[21].SetXYZ(TMath::Cos(119.999146*TMath::Pi()/180),
+                 TMath::Cos(121.556427*TMath::Pi()/180),
+                 TMath::Cos(46.368011*TMath::Pi()/180));
+NAJB_Rot_col_Z[22].SetXYZ(TMath::Cos(90.000076*TMath::Pi()/180),
+                 TMath::Cos(106.278061*TMath::Pi()/180),
+                 TMath::Cos(16.277985*TMath::Pi()/180));
+NAJB_Rot_col_Z[23].SetXYZ(TMath::Cos(60.000854*TMath::Pi()/180),
+                 TMath::Cos(121.556366*TMath::Pi()/180),
+                 TMath::Cos(46.368011*TMath::Pi()/180));
+NAJB_Rot_col_Z[24].SetXYZ(TMath::Cos(36.002151*TMath::Pi()/180),
+                 TMath::Cos(66.836121*TMath::Pi()/180),
+                 TMath::Cos(64.100113*TMath::Pi()/180));
+NAJB_Rot_col_Z[25].SetXYZ(TMath::Cos(36.002136*TMath::Pi()/180),
+                 TMath::Cos(113.163864*TMath::Pi()/180),
+                 TMath::Cos(115.899887*TMath::Pi()/180));
+NAJB_Rot_col_Z[26].SetXYZ(TMath::Cos(60.000854*TMath::Pi()/180),
+                 TMath::Cos(58.443573*TMath::Pi()/180),
+                 TMath::Cos(133.631973*TMath::Pi()/180));
+NAJB_Rot_col_Z[27].SetXYZ(TMath::Cos(89.999908*TMath::Pi()/180),
+                 TMath::Cos(73.721939*TMath::Pi()/180),
+                 TMath::Cos(163.721970*TMath::Pi()/180));
+NAJB_Rot_col_Z[28].SetXYZ(TMath::Cos(89.999969*TMath::Pi()/180),
+                 TMath::Cos(163.721970*TMath::Pi()/180),
+                 TMath::Cos(106.278061*TMath::Pi()/180));
+NAJB_Rot_col_Z[29].SetXYZ(TMath::Cos(89.999908*TMath::Pi()/180),
+                 TMath::Cos(16.278000*TMath::Pi()/180),
+                 TMath::Cos(73.721939*TMath::Pi()/180));
+NAJB_Rot_col_Z[30].SetXYZ(TMath::Cos(89.999969*TMath::Pi()/180),
+                 TMath::Cos(163.721970*TMath::Pi()/180),
+                 TMath::Cos(106.278061*TMath::Pi()/180));
+NAJB_Rot_col_Z[31].SetXYZ(TMath::Cos(90.000076*TMath::Pi()/180),
+                 TMath::Cos(16.278015*TMath::Pi()/180),
+                 TMath::Cos(73.721939*TMath::Pi()/180));
+NAJB_Rot_col_Z[32].SetXYZ(TMath::Cos(89.999969*TMath::Pi()/180),
+                 TMath::Cos(106.278061*TMath::Pi()/180),
+                 TMath::Cos(16.277985*TMath::Pi()/180));
+NAJB_Rot_col_Z[33].SetXYZ(TMath::Cos(60.000854*TMath::Pi()/180),
+                 TMath::Cos(121.556366*TMath::Pi()/180),
+                 TMath::Cos(46.368011*TMath::Pi()/180));
+NAJB_Rot_col_Z[34].SetXYZ(TMath::Cos(36.002136*TMath::Pi()/180),
+                 TMath::Cos(66.836060*TMath::Pi()/180),
+                 TMath::Cos(64.100113*TMath::Pi()/180));
+NAJB_Rot_col_Z[35].SetXYZ(TMath::Cos(36.002136*TMath::Pi()/180),
+                 TMath::Cos(113.163864*TMath::Pi()/180),
+                 TMath::Cos(115.899887*TMath::Pi()/180));
+NAJB_Rot_col_Z[36].SetXYZ(TMath::Cos(60.000854*TMath::Pi()/180),
+                 TMath::Cos(58.443573*TMath::Pi()/180),
+                 TMath::Cos(133.631973*TMath::Pi()/180));
+NAJB_Rot_col_Z[37].SetXYZ(TMath::Cos(89.999969*TMath::Pi()/180),
+                 TMath::Cos(73.721939*TMath::Pi()/180),
+                 TMath::Cos(163.721970*TMath::Pi()/180));
+NAJB_Rot_col_Z[38].SetXYZ(TMath::Cos(119.999146*TMath::Pi()/180),
+                 TMath::Cos(58.443573*TMath::Pi()/180),
+                 TMath::Cos(133.631973*TMath::Pi()/180));
+NAJB_Rot_col_Z[39].SetXYZ(TMath::Cos(143.997864*TMath::Pi()/180),
+                 TMath::Cos(113.163925*TMath::Pi()/180),
+                 TMath::Cos(115.899887*TMath::Pi()/180));
+NAJB_Rot_col_Z[40].SetXYZ(TMath::Cos(143.997803*TMath::Pi()/180),
+                 TMath::Cos(66.836121*TMath::Pi()/180),
+                 TMath::Cos(64.100113*TMath::Pi()/180));
+NAJB_Rot_col_Z[41].SetXYZ(TMath::Cos(119.999146*TMath::Pi()/180),
+                 TMath::Cos(121.556427*TMath::Pi()/180),
+                 TMath::Cos(46.368011*TMath::Pi()/180));
+NAJB_Rot_col_Z[42].SetXYZ(TMath::Cos(59.997574*TMath::Pi()/180),
+                 TMath::Cos(85.992615*TMath::Pi()/180),
+                 TMath::Cos(30.324402*TMath::Pi()/180));
+NAJB_Rot_col_Z[43].SetXYZ(TMath::Cos(120.002426*TMath::Pi()/180),
+                 TMath::Cos(85.992615*TMath::Pi()/180),
+                 TMath::Cos(30.324402*TMath::Pi()/180));
+NAJB_Rot_col_Z[44].SetXYZ(TMath::Cos(120.002426*TMath::Pi()/180),
+                 TMath::Cos(94.007385*TMath::Pi()/180),
+                 TMath::Cos(149.675552*TMath::Pi()/180));
+NAJB_Rot_col_Z[45].SetXYZ(TMath::Cos(59.997574*TMath::Pi()/180),
+                 TMath::Cos(94.007385*TMath::Pi()/180),
+                 TMath::Cos(149.675552*TMath::Pi()/180));
+NAJB_Rot_col_Z[46].SetXYZ(TMath::Cos(71.998657*TMath::Pi()/180),
+                 TMath::Cos(50.469315*TMath::Pi()/180),
+                 TMath::Cos(45.035828*TMath::Pi()/180));
+NAJB_Rot_col_Z[47].SetXYZ(TMath::Cos(108.001343*TMath::Pi()/180),
+                 TMath::Cos(50.469315*TMath::Pi()/180),
+                 TMath::Cos(45.035828*TMath::Pi()/180));
+NAJB_Rot_col_Z[48].SetXYZ(TMath::Cos(143.999985*TMath::Pi()/180),
+                 TMath::Cos(124.511169*TMath::Pi()/180),
+                 TMath::Cos(80.995819*TMath::Pi()/180));
+NAJB_Rot_col_Z[49].SetXYZ(TMath::Cos(143.999985*TMath::Pi()/180),
+                 TMath::Cos(55.488846*TMath::Pi()/180),
+                 TMath::Cos(99.004181*TMath::Pi()/180));
+NAJB_Rot_col_Z[50].SetXYZ(TMath::Cos(108.001343*TMath::Pi()/180),
+                 TMath::Cos(129.530640*TMath::Pi()/180),
+                 TMath::Cos(134.964142*TMath::Pi()/180));
+NAJB_Rot_col_Z[51].SetXYZ(TMath::Cos(71.998657*TMath::Pi()/180),
+                 TMath::Cos(129.530640*TMath::Pi()/180),
+                 TMath::Cos(134.964142*TMath::Pi()/180));
+NAJB_Rot_col_Z[52].SetXYZ(TMath::Cos(35.999969*TMath::Pi()/180),
+                 TMath::Cos(55.488815*TMath::Pi()/180),
+                 TMath::Cos(99.004181*TMath::Pi()/180));
+NAJB_Rot_col_Z[53].SetXYZ(TMath::Cos(35.999985*TMath::Pi()/180),
+                 TMath::Cos(124.511108*TMath::Pi()/180),
+                 TMath::Cos(80.995865*TMath::Pi()/180));
+NAJB_Rot_col_Z[54].SetXYZ(TMath::Cos(71.999969*TMath::Pi()/180),
+                 TMath::Cos(156.451691*TMath::Pi()/180),
+                 TMath::Cos(75.331177*TMath::Pi()/180));
+NAJB_Rot_col_Z[55].SetXYZ(TMath::Cos(71.999908*TMath::Pi()/180),
+                 TMath::Cos(23.548248*TMath::Pi()/180),
+                 TMath::Cos(104.668808*TMath::Pi()/180));
+NAJB_Rot_col_Z[56].SetXYZ(TMath::Cos(108.000031*TMath::Pi()/180),
+                 TMath::Cos(23.548264*TMath::Pi()/180),
+                 TMath::Cos(104.668808*TMath::Pi()/180));
+NAJB_Rot_col_Z[57].SetXYZ(TMath::Cos(108.000092*TMath::Pi()/180),
+                 TMath::Cos(156.451691*TMath::Pi()/180),
+                 TMath::Cos(75.331177*TMath::Pi()/180));
+NAJB_Rot_col_Z[58].SetXYZ(TMath::Cos(0.000003*TMath::Pi()/180),
+                 TMath::Cos(90.000076*TMath::Pi()/180),
+                 TMath::Cos(89.999969*TMath::Pi()/180));
+NAJB_Rot_col_Z[59].SetXYZ(TMath::Cos(179.999939*TMath::Pi()/180),
+                 TMath::Cos(89.999969*TMath::Pi()/180),
+                 TMath::Cos(90.000076*TMath::Pi()/180));
+
+
+// m1_TRB1/2
+TVector3 col_X_m1_TRB1(TMath::Sin(90.*TMath::Pi()/180)*TMath::Cos(0.*TMath::Pi()/180),
+                       TMath::Sin(93.525*TMath::Pi()/180)*TMath::Cos(90.*TMath::Pi()/180),
+                       TMath::Sin(3.525*TMath::Pi()/180)*TMath::Cos(90.*TMath::Pi()/180));
+TVector3 col_Y_m1_TRB1(TMath::Sin(90.*TMath::Pi()/180)*TMath::Sin(0.*TMath::Pi()/180),
+                       TMath::Sin(93.525*TMath::Pi()/180)*TMath::Sin(90.*TMath::Pi()/180),
+                       TMath::Sin(3.525*TMath::Pi()/180)*TMath::Sin(90.*TMath::Pi()/180));
+TVector3 col_Z_m1_TRB1(TMath::Cos(90.*TMath::Pi()/180),
+                       TMath::Cos(93.525*TMath::Pi()/180),
+                       TMath::Cos(3.525*TMath::Pi()/180));
+TVector3 col_X_m2_TRB2(TMath::Sin(90.*TMath::Pi()/180)*TMath::Cos(180.*TMath::Pi()/180),
+                       TMath::Sin(94.25*TMath::Pi()/180)*TMath::Cos(270.*TMath::Pi()/180),
+                       TMath::Sin(4.25*TMath::Pi()/180)*TMath::Cos(270.*TMath::Pi()/180));
+TVector3 col_Y_m2_TRB2(TMath::Sin(90.*TMath::Pi()/180)*TMath::Sin(180.*TMath::Pi()/180),
+                       TMath::Sin(94.25*TMath::Pi()/180)*TMath::Sin(270.*TMath::Pi()/180),
+                       TMath::Sin(4.25*TMath::Pi()/180)*TMath::Sin(270.*TMath::Pi()/180));
+TVector3 col_Z_m2_TRB2(TMath::Cos(90.*TMath::Pi()/180),
+                       TMath::Cos(94.25*TMath::Pi()/180),
+                       TMath::Cos(4.25*TMath::Pi()/180));
+
+
+
+   //--- Additional Ring  rotation 
+    TGeoRotation *m1_TRB1 = new TGeoRotation();     
+    Double_t fRotable0[9] = {
+	    col_X_m1_TRB1.X(),col_X_m1_TRB1.Y(),col_X_m1_TRB1.Z(),
+	    col_Y_m1_TRB1.X(),col_Y_m1_TRB1.Y(),col_Y_m1_TRB1.Z(),
+	    col_Z_m1_TRB1.X(),col_Z_m1_TRB1.Y(),col_Z_m1_TRB1.Z(),
+	 };
+    m1_TRB1->SetMatrix(fRotable0);
+
+   //--- First part defined 
+   TGeoRotation *pIndividualRot=NULL;
+   TGeoRotation *pRingRot = NULL;
+
+   ROOT::Math::XYZPoint tra1_TRB1(0.,21.56/10.,0.);
+      
+      for(Int_t iter2=0 ; iter2<2 ; iter2++) {
+
+	 Double_t fRotable1[9] = {
+	    NAJB_Rot_col_X[iter2].X(),NAJB_Rot_col_X[iter2].Y(),NAJB_Rot_col_X[iter2].Z(),
+	    NAJB_Rot_col_Y[iter2].X(),NAJB_Rot_col_Y[iter2].Y(),NAJB_Rot_col_Y[iter2].Z(),
+	    NAJB_Rot_col_Z[iter2].X(),NAJB_Rot_col_Z[iter2].Y(),NAJB_Rot_col_Z[iter2].Z()
+	 };
+	 
+	 pIndividualRot = new TGeoRotation();
+	 pIndividualRot->SetMatrix(fRotable1);
+
+
+	 ROOT::Math::Rotation3D *pIndRot = new ROOT::Math::Rotation3D(
+					    fRotable1[0],fRotable1[1],fRotable1[2],
+					    fRotable1[3],fRotable1[4],fRotable1[5],
+					    fRotable1[6],fRotable1[7],fRotable1[8]
+					    );
+	 ROOT::Math::Rotation3D pIndRotInv = pIndRot->Inverse();
+	 //G4ThreeVector(NAJB_X[iter1],NAJB_Y[iter1],NAJB_Z[iter1])
+	 // + ((pIndividualRingRot->inverse())*tra1_TRB1)
+	 dx =  NAJB_X[iter2]/10.;
+	 dy =  NAJB_Y[iter2]/10.;
+	 dz =  NAJB_Z[iter2]/10.;
+	 ROOT::Math::XYZPoint tt(dx,dy,dz);
+	 ROOT::Math::XYZPoint ttt(0.0,0.0,0.0);
+         ttt = pIndRotInv * tt;  
+
+	 // pRingRot = m1_TRB1 * pIndividualRot * pGlobalRot(=Unity)
+         pRingRot = new TGeoRotation(*m1_TRB1);
+         pRingRot->MultiplyBy(pIndividualRot);  
+
+
+       	 TGeoTranslation *trans = new TGeoTranslation(ttt.X(),ttt.Y(),ttt.Z());
+	 TGeoCombiTrans *combi = new TGeoCombiTrans(*trans,*pRingRot);
+	 
+	 pCBLogWorld->AddNode(pcrystalLogNAJA, iter2, combi); 
+	 
+   }//! for iter2  
+
+
+
+/*
+ for(G4int iter1=0 ; iter1<60 ; iter1++) {
+     pIndividualRingRot = 
+         new G4RotationMatrix(NAJB_Rot_col_X[iter1],NAJB_Rot_col_Y[iter1],NAJB_Rot_col_Z[iter1]);
+     pRingRot =  
+         new G4RotationMatrix(((*m1_TRB1)*(*pIndividualRingRot)*(*pGlobalRot)));
+	 
+	 crystalPhysNAJB = 
+    new G4PVPlacement(pRingRot,G4ThreeVector(NAJB_X[iter1],NAJB_Y[iter1],NAJB_Z[iter1])
+    + ((pIndividualRingRot->inverse())*tra1_TRB1),
+    crystalLogNAJB,"crystalPhysNAJB",
+    worldLog,false,iter1);
+				  
+}
+*/
+
+
+      
+}   
+
+
+
+// -----   Public method ConstructGeometry   ----------------------------------
+void R3BCal::ConstructGeometry1() {
 
   // out-of-file geometry definition
    Double_t dx,dy,dz;
@@ -315,21 +1442,36 @@ void R3BCal::ConstructGeometry() {
  // Vacuum
   TGeoMaterial *matVacuum = new TGeoMaterial("Vacuum", 0,0,0);
   TGeoMedium *pMed1 = new TGeoMedium("Vacuum",1, matVacuum);
-  pMed1->Print();
 
- 
+// Mixture: Air
+  nel     = 2;
+  density = 0.001290;
+  TGeoMixture*
+  pMat2 = new TGeoMixture("Air", nel,density);
+  a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+  pMat2->DefineElement(0,a,z,w);
+  a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+  pMat2->DefineElement(1,a,z,w);
+  pMat2->SetIndex(1);
+  // Medium: Air
+  numed   = 1;  // medium number
+  TGeoMedium*
+  pMed2 = new TGeoMedium("Air", numed,pMat2);
+
+
+  
  // Mixture: CsI
   nel     = 2;
   density = 4.510000;
   TGeoMixture*
-      pMat9 = new TGeoMixture("CsIn", nel,density);
+      pMat9 = new TGeoMixture("CsI", nel,density);
   a = 132.905450;   z = 55.000000;   w = 0.511549;  // CS
   pMat9->DefineElement(0,a,z,w);
   a = 126.904470;   z = 53.000000;   w = 0.488451;  // I
   pMat9->DefineElement(1,a,z,w);
   pMat9->SetIndex(601);
 
-  TGeoMedium* pMed9 = new TGeoMedium("CsIn", 2,pMat9);
+  TGeoMedium* pMed9 = new TGeoMedium("CsI", 2,pMat9);
 
  // Material: Aluminum
   a       = 26.980000;
@@ -2050,7 +3192,7 @@ void R3BCal::ConstructGeometry() {
    bl1    = 4.848000;
    tl1    = 2.658000;
    alpha1 = 0.000000;
-   h2     = 2.778000;
+   h2     = 2.778000; 
    bl2    = 8.726000;
    tl2    = 4.780000;
    alpha2 = 0.000000;
@@ -2387,43 +3529,45 @@ void R3BCal::ConstructGeometry() {
 }
 
 
+TGeoRotation* R3BCal::createMatrix( Double_t phi, Double_t theta, Double_t psi){
 
-/*
-void R3BCal::ConstructGeometry() {
-  
-  FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
-  FairGeoInterface* geoFace = geoLoad->getGeoInterface();
-  R3BGeoCal*       stsGeo  = new R3BGeoCal();
-  stsGeo->setGeomFile(GetGeometryFileName());
-  geoFace->addGeoModule(stsGeo);
+  // Rotation
+  TGeoRotation * matrix = new TGeoRotation("");
 
-  Bool_t rc = geoFace->readSet(stsGeo);
-  if (rc) stsGeo->create(geoLoad->getGeoBuilder());
-  TList* volList = stsGeo->getListOfVolumes();
-  // store geo parameter
-  FairRun *fRun = FairRun::Instance();
-  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
-  R3BGeoCalPar* par=(R3BGeoCalPar*)(rtdb->getContainer("R3BGeoCalPar"));
-  TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
-  TObjArray *fPassNodes = par->GetGeoPassiveNodes();
+  Double_t rm[9];
 
-  TListIter iter(volList);
-  FairGeoNode* node   = NULL;
-  FairGeoVolume *aVol=NULL;
+  Double_t degrad = TMath::Pi()/180.;
 
-  while( (node = (FairGeoNode*)iter.Next()) ) {
-      aVol = dynamic_cast<FairGeoVolume*> ( node );
-       if ( node->isSensitive()  ) {
-           fSensNodes->AddLast( aVol );
-       }else{
-           fPassNodes->AddLast( aVol );
-       }
-  }
-  par->setChanged();
-  par->setInputVersion(fRun->GetRunId(),1);
-  ProcessNodes( volList );
+  // define trigonometry
+  Double_t  sinPhi   = sin( degrad*phi )  ;
+  Double_t  cosPhi   = TMath::Cos( degrad*phi )  ;
+  Double_t  sinTheta = sin( degrad*theta );
+  Double_t  cosTheta = TMath::Cos( degrad*theta );
+  Double_t  sinPsi   = sin( degrad*psi )  ;
+  Double_t  cosPsi   = TMath::Cos( degrad*psi )  ;
+
+
+  // filling from Euler definition a la G4 !
+
+  rm[0] =   cosPsi * cosPhi - cosTheta * sinPhi * sinPsi;
+  rm[1] =   cosPsi * sinPhi + cosTheta * cosPhi * sinPsi;
+  rm[2] =   sinPsi * sinTheta;
+
+  rm[3] = - sinPsi * cosPhi - cosTheta * sinPhi * cosPsi;
+  rm[4] = - sinPsi * sinPhi + cosTheta * cosPhi * cosPsi;
+  rm[5] =   cosPsi * sinTheta;
+
+  rm[6] =   sinTheta * sinPhi;
+  rm[7] = - sinTheta * cosPhi;
+  rm[8] =   cosTheta;
+
+
+  matrix->SetMatrix( (const Double_t*) &rm[0] );
+
+ return matrix;
 
 }
-*/
+
+
 
 ClassImp(R3BCal)
