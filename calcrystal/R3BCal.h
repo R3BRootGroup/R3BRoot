@@ -17,6 +17,7 @@
 class TClonesArray;
 class R3BCalPoint;
 class FairVolume;
+class TGeoRotation;
 
 
 
@@ -106,10 +107,12 @@ class R3BCal : public FairDetector
 
   /** Virtaul method Construct geometry
    **
-   ** Constructs the STS geometry
+   ** Constructs the CAL CRYSTAL geometry
    **/
   virtual void ConstructGeometry();
-
+  virtual void ConstructGeometry1();
+  virtual void ConstructGeometry2();
+  void SetGeometryVersion( Int_t vers ) { fGeoVersion = vers;}
 
 //  void SaveGeoParams();
 
@@ -130,7 +133,9 @@ class R3BCal : public FairDetector
     TClonesArray*  fCalCollection;     //!  The hit collection
     Bool_t         kGeoSaved;          //!
     TList *flGeoPar; //!
+    Int_t fGeoVersion;
 
+    
     /** Private method AddHit
      **
      ** Adds a CalPoint to the HitCollection
@@ -146,7 +151,7 @@ class R3BCal : public FairDetector
      ** Resets the private members for the track parameters
      **/
     void ResetParameters();
-
+   TGeoRotation* createMatrix( Double_t phi, Double_t theta, Double_t psi);
 
     ClassDef(R3BCal,1);
 
