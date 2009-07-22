@@ -1331,23 +1331,29 @@ TVector3 col_Z_m2_TRB2(TMath::Cos(90.*TMath::Pi()/180),
 
 
 
-   //--- Additional Ring  rotation 
-    TGeoRotation *m1_TRB1 = new TGeoRotation();     
+    // - Adapted from R3BSim Geant4 definition
+    // - Using the new templated Math ROOT Library
+    // - <D.Bertini@gsi.de>
+
+
+   //-  TRB1
+   //--- Fill info for global Rotation / Translation
     Double_t fRotable0[9] = {
 	    col_X_m1_TRB1.X(),col_X_m1_TRB1.Y(),col_X_m1_TRB1.Z(),
 	    col_Y_m1_TRB1.X(),col_Y_m1_TRB1.Y(),col_Y_m1_TRB1.Z(),
 	    col_Z_m1_TRB1.X(),col_Z_m1_TRB1.Y(),col_Z_m1_TRB1.Z(),
 	 };
-    m1_TRB1->SetMatrix(fRotable0);
-
-   //--- First part defined 
+    ROOT::Math::XYZPoint tra1_TRB1(0.,21.56/10.,0.);
+    ROOT::Math::Rotation3D *pm1_TRB1 = new ROOT::Math::Rotation3D(
+					    fRotable0[0],fRotable0[3],fRotable0[6],
+					    fRotable0[1],fRotable0[4],fRotable0[7],
+					    fRotable0[2],fRotable0[5],fRotable0[8]
+					    );
+   //--- Single Crystal definition
    TGeoRotation *pIndividualRot=NULL;
    TGeoRotation *pRingRot = NULL;
 
-   ROOT::Math::XYZPoint tra1_TRB1(0.,21.56/10.,0.);
-      
-      for(Int_t iter2=0 ; iter2<2 ; iter2++) {
-
+      for(Int_t iter2=0 ; iter2<60 ; iter2++) {
 	 Double_t fRotable1[9] = {
 	    NAJB_Rot_col_X[iter2].X(),NAJB_Rot_col_X[iter2].Y(),NAJB_Rot_col_X[iter2].Z(),
 	    NAJB_Rot_col_Y[iter2].X(),NAJB_Rot_col_Y[iter2].Y(),NAJB_Rot_col_Y[iter2].Z(),
@@ -1359,52 +1365,1252 @@ TVector3 col_Z_m2_TRB2(TMath::Cos(90.*TMath::Pi()/180),
 
 
 	 ROOT::Math::Rotation3D *pIndRot = new ROOT::Math::Rotation3D(
-					    fRotable1[0],fRotable1[1],fRotable1[2],
-					    fRotable1[3],fRotable1[4],fRotable1[5],
-					    fRotable1[6],fRotable1[7],fRotable1[8]
+					    fRotable1[0],fRotable1[3],fRotable1[6],
+					    fRotable1[1],fRotable1[4],fRotable1[7],
+					    fRotable1[2],fRotable1[5],fRotable1[8]
 					    );
+
+	 
 	 ROOT::Math::Rotation3D pIndRotInv = pIndRot->Inverse();
-	 //G4ThreeVector(NAJB_X[iter1],NAJB_Y[iter1],NAJB_Z[iter1])
-	 // + ((pIndividualRingRot->inverse())*tra1_TRB1)
 	 dx =  NAJB_X[iter2]/10.;
 	 dy =  NAJB_Y[iter2]/10.;
 	 dz =  NAJB_Z[iter2]/10.;
 	 ROOT::Math::XYZPoint tt(dx,dy,dz);
 	 ROOT::Math::XYZPoint ttt(0.0,0.0,0.0);
-         ttt = pIndRotInv * tt;  
+	 ttt = pIndRotInv * tra1_TRB1;
+	 ttt.SetX(ttt.X() + tt.X());
+	 ttt.SetY(ttt.Y() + tt.Y());
+	 ttt.SetZ(ttt.Z() + tt.Z());
 
-	 // pRingRot = m1_TRB1 * pIndividualRot * pGlobalRot(=Unity)
-         pRingRot = new TGeoRotation(*m1_TRB1);
-         pRingRot->MultiplyBy(pIndividualRot);  
-
-
+	 ROOT::Math::Rotation3D pRingTmp;
+         pRingTmp = (*pm1_TRB1) * (*pIndRot);
+	 Double_t fRotable2[9]={0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+	 pRingTmp.GetComponents(
+					    fRotable2[0],fRotable2[3],fRotable2[6],
+					    fRotable2[1],fRotable2[4],fRotable2[7],
+					    fRotable2[2],fRotable2[5],fRotable2[8]
+	    );
+	 pRingRot = new TGeoRotation();
+	 pRingRot->SetMatrix(fRotable2);
        	 TGeoTranslation *trans = new TGeoTranslation(ttt.X(),ttt.Y(),ttt.Z());
 	 TGeoCombiTrans *combi = new TGeoCombiTrans(*trans,*pRingRot);
 	 
-	 pCBLogWorld->AddNode(pcrystalLogNAJA, iter2, combi); 
+         // Add the Node in CBLogWorld
+	 pCBLogWorld->AddNode(pcrystalLogNAJB, iter2, combi);
 	 
    }//! for iter2  
 
 
 
-/*
- for(G4int iter1=0 ; iter1<60 ; iter1++) {
-     pIndividualRingRot = 
-         new G4RotationMatrix(NAJB_Rot_col_X[iter1],NAJB_Rot_col_Y[iter1],NAJB_Rot_col_Z[iter1]);
-     pRingRot =  
-         new G4RotationMatrix(((*m1_TRB1)*(*pIndividualRingRot)*(*pGlobalRot)));
+   //-- TRC  part
+   // Shape: TRC1 type: TGeoTrap
+   dz     = 10.000000;
+   theta  = 0.000000;
+   phi    = 0.000000;
+   h1     = 2.209000;
+   bl1    = 3.614000;
+   tl1    = 4.265000;
+   alpha1 = 0.000000;
+   h2     = 3.976000;
+   bl2    = 6.505000;
+   tl2    = 7.676000;
+   alpha2 = 0.000000;
+   TGeoShape *pTRC1  = new TGeoTrap("TRC1", dz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
+   // Shape: TRC2 type: TGeoTrap
+   dz     = 10.000000;
+   theta  = 0.000000;
+   phi    = 0.000000;
+   h1     = 0.808000;
+   bl1    = 4.302000;
+   tl1    = 0.001000;
+   alpha1 = 0.000000;
+   h2     = 1.454000;
+   bl2    = 7.743504;
+   tl2    = 0.005324;
+   alpha2 = 0.000000;
+   TGeoShape *pTRC2  = new TGeoTrap("TRC2", dz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
+   // Combi transformation: TRC_21
+   dx = 0.000000;
+   dy = 4.229809;
+   dz = 0.040235;
+   // Rotation: 
+   thx = 90.000000;    phx = 360.000000;
+   thy = 96.883000;    phy = 90.000000;
+   thz = 6.883000;    phz = 90.000000;
+   TGeoRotation *pMatrix5 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans* pMatrix4 = new TGeoCombiTrans("TRC_21", dx,dy,dz,pMatrix5);
+   pBoolNode = new TGeoUnion(pTRC1,pTRC2,0,pMatrix4);
+   // Shape: TRC_21 type: TGeoCompositeShape
+   TGeoShape *pTRC_21 = new TGeoCompositeShape("TRC_21", pBoolNode);
+   pTRC_21->SetTitle("TRC1+TRC2:TRC_21");
+   // Shape: TRC3 type: TGeoTrap
+   dz     = 10.000000;
+   theta  = 0.000000;
+   phi    = 0.000000;
+   h1     = 1.046000;
+   bl1    = 3.618000;
+   tl1    = 0.001000;
+   alpha1 = 0.000000;
+   h2     = 1.883000;
+   bl2    = 6.515776;
+   tl2    = 0.003459;
+   alpha2 = 0.000000;
+   TGeoShape *pTRC3 = new TGeoTrap("TRC3", dz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
+   // Combi transformation: TRC
+   dx = 0.000000;
+   dy = -4.557794;
+   dz = -0.043355;
+   // Rotation: 
+   thx = 90.000000;    phx = 180.000000;
+   thy = 97.428000;    phy = 270.000000;
+   thz = 7.428000;    phz = 270.000000;
+   TGeoRotation *pMatrix7 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans* pMatrix6 = new TGeoCombiTrans("TRC", dx,dy,dz,pMatrix7);
+   pBoolNode = new TGeoUnion(pTRC_21,pTRC3,0,pMatrix6);
+   // Shape: TRC type: TGeoCompositeShape
+   TGeoShape *pTRC_11 = new TGeoCompositeShape("TRC", pBoolNode);
+   pTRC_11->SetTitle("TRC_21+TRC3:TRC");
+   // Volume: crystalLogNAJC
+   TGeoVolume*
+   pcrystalLogNAJC = new TGeoVolume("crystalLogNAJC",pTRC_11, pMed9);
+
+Double_t NAJC_X[60] = {-49.014,49.014,49.014,-49.014,0,0,-205.674,-205.674,-156.8805,156.8805,205.674,205.674,156.8805,-156.8805,-235.7959,-302.589,-235.7809,235.7809,302.589,235.7809,-332.9059,-332.9059,-107.2383,107.2383,332.9059,332.9059,96.2395,-96.2395,-175.8994,-175.8994,175.8994,175.8994,107.2383,-107.2383,-332.9059,-332.9059,-96.2395,96.2395,332.9059,332.9059,-235.7809,-302.589,-235.7809,235.7809,302.589,235.7809,156.8805,-156.8805,-205.674,-205.674,-156.8805,156.8805,205.674,205.674,0,0,49.014,-49.014,-49.014,49.014};
+Double_t NAJC_Y[60] = {332.9094,332.9094,332.9094,332.9094,302.7429,302.7429,235.7669,235.795,205.6319,205.6319,235.795,235.7669,205.6319,205.6319,156.891,175.8994,156.891,156.891,175.8994,156.891,97.237,97.237,54.6468,54.6468,97.237,97.237,49.042,49.042,0,0,0,0,-54.6468,-54.6468,-97.237,-97.237,-49.042,-49.042,-97.237,-97.237,-156.891,-175.8994,-156.891,-156.891,-175.8994,-156.9645,-205.6319,-205.6319,-235.7669,-235.795,-205.6319,-205.6319,-235.795,-235.7669,-302.7429,-302.7429,-332.9094,-332.9094,-332.9094,-332.9094};
+Double_t NAJC_Z[60] = {96.278,96.278,-96.278,-96.278,175.6334,-175.6334,-156.8805,156.8385,235.8054,235.8054,156.8385,-156.8805,-235.8054,-235.8054,-205.6529,0,205.6529,205.6529,0,-205.6529,-47.089,47.089,370.9639,370.9639,47.089,-47.089,-332.9164,-332.9164,-302.589,302.589,-302.589,302.589,370.9639,370.9639,47.089,-47.089,-332.9164,-332.9164,-47.089,47.089,205.6529,0,-205.6529,-205.6529,0,205.5969,235.8054,235.8054,156.8805,-156.8385,-235.8054,-235.8054,-156.8385,156.8805,175.6334,-175.6334,96.278,96.278,-96.278,-96.278};
+
+TVector3 NAJC_Rot_col_X[60];
+NAJC_Rot_col_X[0].SetXYZ(sin(144.001129*TMath::Pi()/180)*cos(31.714935*TMath::Pi()/180),
+                       sin(121.226883*TMath::Pi()/180)*cos(178.276993*TMath::Pi()/180),
+                       sin(73.921265*TMath::Pi()/180)*cos(98.340836*TMath::Pi()/180));
+
+NAJC_Rot_col_X[1].SetXYZ(sin(35.998871*TMath::Pi()/180)*cos(-31.714935*TMath::Pi()/180),
+                       sin(121.226883*TMath::Pi()/180)*cos(1.722995*TMath::Pi()/180),
+                       sin(73.921265*TMath::Pi()/180)*cos(81.659164*TMath::Pi()/180));
+
+NAJC_Rot_col_X[2].SetXYZ(sin(35.999969*TMath::Pi()/180)*cos(148.279953*TMath::Pi()/180),
+                       sin(58.773056*TMath::Pi()/180)*cos(1.721368*TMath::Pi()/180),
+                       sin(106.080643*TMath::Pi()/180)*cos(81.656204*TMath::Pi()/180));
+
+NAJC_Rot_col_X[3].SetXYZ(sin(144.000153*TMath::Pi()/180)*cos(-148.285461*TMath::Pi()/180),
+                       sin(58.773270*TMath::Pi()/180)*cos(178.272949*TMath::Pi()/180),
+                       sin(106.080688*TMath::Pi()/180)*cos(98.338043*TMath::Pi()/180));
+
+NAJC_Rot_col_X[4].SetXYZ(sin(89.999908*TMath::Pi()/180)*cos(-179.999939*TMath::Pi()/180),
+                       sin(30.164978*TMath::Pi()/180)*cos(-89.999908*TMath::Pi()/180),
+                       sin(59.834961*TMath::Pi()/180)*cos(89.999969*TMath::Pi()/180));
+
+NAJC_Rot_col_X[5].SetXYZ(sin(89.999802*TMath::Pi()/180)*cos(-0.002833*TMath::Pi()/180),
+                       sin(149.833023*TMath::Pi()/180)*cos(-90.002701*TMath::Pi()/180),
+                       sin(120.167007*TMath::Pi()/180)*cos(89.997025*TMath::Pi()/180));
+
+NAJC_Rot_col_X[6].SetXYZ(sin(72.001923*TMath::Pi()/180)*cos(-148.282684*TMath::Pi()/180),
+                       sin(32.983261*TMath::Pi()/180)*cos(91.678024*TMath::Pi()/180),
+                       sin(116.629028*TMath::Pi()/180)*cos(131.092255*TMath::Pi()/180));
+
+NAJC_Rot_col_X[7].SetXYZ(sin(72.001495*TMath::Pi()/180)*cos(31.717911*TMath::Pi()/180),
+                       sin(147.019424*TMath::Pi()/180)*cos(91.674408*TMath::Pi()/180),
+                       sin(63.374359*TMath::Pi()/180)*cos(131.091690*TMath::Pi()/180));
+
+NAJC_Rot_col_X[8].SetXYZ(sin(59.997574*TMath::Pi()/180)*cos(-110.905701*TMath::Pi()/180),
+                       sin(57.033188*TMath::Pi()/180)*cos(1.087461*TMath::Pi()/180),
+                       sin(47.647202*TMath::Pi()/180)*cos(127.333786*TMath::Pi()/180));
+
+NAJC_Rot_col_X[9].SetXYZ(sin(120.002365*TMath::Pi()/180)*cos(110.905762*TMath::Pi()/180),
+                       sin(57.033188*TMath::Pi()/180)*cos(178.912521*TMath::Pi()/180),
+                       sin(47.647202*TMath::Pi()/180)*cos(52.666214*TMath::Pi()/180));
+
+NAJC_Rot_col_X[10].SetXYZ(sin(107.998550*TMath::Pi()/180)*cos(-31.717896*TMath::Pi()/180),
+                       sin(147.019424*TMath::Pi()/180)*cos(88.325638*TMath::Pi()/180),
+                       sin(63.374359*TMath::Pi()/180)*cos(48.908279*TMath::Pi()/180));
+
+NAJC_Rot_col_X[11].SetXYZ(sin(108.000031*TMath::Pi()/180)*cos(148.279953*TMath::Pi()/180),
+                       sin(32.982681*TMath::Pi()/180)*cos(88.323837*TMath::Pi()/180),
+                       sin(116.626938*TMath::Pi()/180)*cos(48.904816*TMath::Pi()/180));
+
+NAJC_Rot_col_X[12].SetXYZ(sin(120.000229*TMath::Pi()/180)*cos(-69.097076*TMath::Pi()/180),
+                       sin(122.967331*TMath::Pi()/180)*cos(178.911270*TMath::Pi()/180),
+                       sin(132.354141*TMath::Pi()/180)*cos(52.662109*TMath::Pi()/180));
+
+NAJC_Rot_col_X[13].SetXYZ(sin(59.997574*TMath::Pi()/180)*cos(69.094299*TMath::Pi()/180),
+                       sin(122.966812*TMath::Pi()/180)*cos(1.087461*TMath::Pi()/180),
+                       sin(132.352798*TMath::Pi()/180)*cos(127.333786*TMath::Pi()/180));
+
+NAJC_Rot_col_X[14].SetXYZ(sin(143.997803*TMath::Pi()/180)*cos(-31.715652*TMath::Pi()/180),
+                       sin(90.912369*TMath::Pi()/180)*cos(-122.971481*TMath::Pi()/180),
+                       sin(125.986862*TMath::Pi()/180)*cos(146.365906*TMath::Pi()/180));
+
+NAJC_Rot_col_X[15].SetXYZ(sin(0.002820*TMath::Pi()/180)*cos(177.780685*TMath::Pi()/180),
+                       sin(89.998596*TMath::Pi()/180)*cos(59.832993*TMath::Pi()/180),
+                       sin(90.002533*TMath::Pi()/180)*cos(149.833023*TMath::Pi()/180));
+
+NAJC_Rot_col_X[16].SetXYZ(sin(144.001022*TMath::Pi()/180)*cos(148.285355*TMath::Pi()/180),
+                       sin(89.086578*TMath::Pi()/180)*cos(-122.972015*TMath::Pi()/180),
+                       sin(54.016281*TMath::Pi()/180)*cos(146.364716*TMath::Pi()/180));
+
+NAJC_Rot_col_X[17].SetXYZ(sin(35.998978*TMath::Pi()/180)*cos(-148.285355*TMath::Pi()/180),
+                       sin(89.086578*TMath::Pi()/180)*cos(-57.027939*TMath::Pi()/180),
+                       sin(54.016281*TMath::Pi()/180)*cos(33.635269*TMath::Pi()/180));
+
+NAJC_Rot_col_X[18].SetXYZ(sin(179.999939*TMath::Pi()/180)*cos(135.715851*TMath::Pi()/180),
+                       sin(89.999908*TMath::Pi()/180)*cos(120.165039*TMath::Pi()/180),
+                       sin(90.000076*TMath::Pi()/180)*cos(30.164993*TMath::Pi()/180));
+
+NAJC_Rot_col_X[19].SetXYZ(sin(35.999680*TMath::Pi()/180)*cos(31.714813*TMath::Pi()/180),
+                       sin(90.911392*TMath::Pi()/180)*cos(-57.030579*TMath::Pi()/180),
+                       sin(125.984406*TMath::Pi()/180)*cos(33.631210*TMath::Pi()/180));
+
+NAJC_Rot_col_X[20].SetXYZ(sin(119.999146*TMath::Pi()/180)*cos(69.093414*TMath::Pi()/180),
+                       sin(148.730469*TMath::Pi()/180)*cos(-92.836624*TMath::Pi()/180),
+                       sin(98.015121*TMath::Pi()/180)*cos(163.756393*TMath::Pi()/180));
+
+NAJC_Rot_col_X[21].SetXYZ(sin(120.000946*TMath::Pi()/180)*cos(-110.903458*TMath::Pi()/180),
+                       sin(31.269562*TMath::Pi()/180)*cos(-92.845917*TMath::Pi()/180),
+                       sin(81.990341*TMath::Pi()/180)*cos(163.756561*TMath::Pi()/180));
+
+NAJC_Rot_col_X[22].SetXYZ(sin(71.998657*TMath::Pi()/180)*cos(-31.716751*TMath::Pi()/180),
+                       sin(88.528030*TMath::Pi()/180)*cos(58.761581*TMath::Pi()/180),
+                       sin(18.065536*TMath::Pi()/180)*cos(153.279816*TMath::Pi()/180));
+
+NAJC_Rot_col_X[23].SetXYZ(sin(107.998169*TMath::Pi()/180)*cos(31.717102*TMath::Pi()/180),
+                       sin(88.526611*TMath::Pi()/180)*cos(121.238419*TMath::Pi()/180),
+                       sin(18.062485*TMath::Pi()/180)*cos(26.715042*TMath::Pi()/180));
+
+NAJC_Rot_col_X[24].SetXYZ(sin(59.999924*TMath::Pi()/180)*cos(110.903030*TMath::Pi()/180),
+                       sin(31.269562*TMath::Pi()/180)*cos(-87.160690*TMath::Pi()/180),
+                       sin(81.987610*TMath::Pi()/180)*cos(16.241531*TMath::Pi()/180));
+
+NAJC_Rot_col_X[25].SetXYZ(sin(59.999969*TMath::Pi()/180)*cos(-69.096970*TMath::Pi()/180),
+                       sin(148.730408*TMath::Pi()/180)*cos(-87.160736*TMath::Pi()/180),
+                       sin(98.012375*TMath::Pi()/180)*cos(16.241531*TMath::Pi()/180));
+
+NAJC_Rot_col_X[26].SetXYZ(sin(107.998398*TMath::Pi()/180)*cos(-148.281860*TMath::Pi()/180),
+                       sin(91.476761*TMath::Pi()/180)*cos(121.238251*TMath::Pi()/180),
+                       sin(161.936996*TMath::Pi()/180)*cos(26.704483*TMath::Pi()/180));
+
+NAJC_Rot_col_X[27].SetXYZ(sin(72.001816*TMath::Pi()/180)*cos(148.282852*TMath::Pi()/180),
+                       sin(91.473373*TMath::Pi()/180)*cos(58.761581*TMath::Pi()/180),
+                       sin(161.937485*TMath::Pi()/180)*cos(153.284943*TMath::Pi()/180));
+
+NAJC_Rot_col_X[28].SetXYZ(sin(89.999908*TMath::Pi()/180)*cos(-89.999969*TMath::Pi()/180),
+                       sin(59.834961*TMath::Pi()/180)*cos(179.999939*TMath::Pi()/180),
+                       sin(149.834991*TMath::Pi()/180)*cos(-180.0000*TMath::Pi()/180));
+
+NAJC_Rot_col_X[29].SetXYZ(sin(90.002869*TMath::Pi()/180)*cos(89.999802*TMath::Pi()/180),
+                       sin(120.167007*TMath::Pi()/180)*cos(-179.998413*TMath::Pi()/180),
+                       sin(30.166962*TMath::Pi()/180)*cos(179.994980*TMath::Pi()/180));
+
+NAJC_Rot_col_X[30].SetXYZ(sin(90.002869*TMath::Pi()/180)*cos(89.999863*TMath::Pi()/180),
+                       sin(59.832993*TMath::Pi()/180)*cos(0.001541*TMath::Pi()/180),
+                       sin(149.833023*TMath::Pi()/180)*cos(-0.004976*TMath::Pi()/180));
+
+NAJC_Rot_col_X[31].SetXYZ(sin(89.999969*TMath::Pi()/180)*cos(-89.999908*TMath::Pi()/180),
+                       sin(120.165039*TMath::Pi()/180)*cos(0.000006*TMath::Pi()/180),
+                       sin(30.164993*TMath::Pi()/180)*cos(-0.000001*TMath::Pi()/180));
+
+NAJC_Rot_col_X[32].SetXYZ(sin(72.001816*TMath::Pi()/180)*cos(148.282898*TMath::Pi()/180),
+                       sin(88.526611*TMath::Pi()/180)*cos(-121.238419*TMath::Pi()/180),
+                       sin(18.062500*TMath::Pi()/180)*cos(-26.715073*TMath::Pi()/180));
+
+NAJC_Rot_col_X[33].SetXYZ(sin(107.998398*TMath::Pi()/180)*cos(-148.281860*TMath::Pi()/180),
+                       sin(88.523224*TMath::Pi()/180)*cos(-58.761688*TMath::Pi()/180),
+                       sin(18.063004*TMath::Pi()/180)*cos(-153.295486*TMath::Pi()/180));
+
+NAJC_Rot_col_X[34].SetXYZ(sin(59.999924*TMath::Pi()/180)*cos(-69.096970*TMath::Pi()/180),
+                       sin(31.269547*TMath::Pi()/180)*cos(92.839310*TMath::Pi()/180),
+                       sin(81.987610*TMath::Pi()/180)*cos(-163.758408*TMath::Pi()/180));
+
+NAJC_Rot_col_X[35].SetXYZ(sin(59.999969*TMath::Pi()/180)*cos(110.903030*TMath::Pi()/180),
+                       sin(148.730408*TMath::Pi()/180)*cos(92.839249*TMath::Pi()/180),
+                       sin(98.012375*TMath::Pi()/180)*cos(-163.758408*TMath::Pi()/180));
+
+NAJC_Rot_col_X[36].SetXYZ(sin(107.998169*TMath::Pi()/180)*cos(31.717087*TMath::Pi()/180),
+                       sin(91.473328*TMath::Pi()/180)*cos(-58.761581*TMath::Pi()/180),
+                       sin(161.937485*TMath::Pi()/180)*cos(-153.284897*TMath::Pi()/180));
+
+NAJC_Rot_col_X[37].SetXYZ(sin(71.998657*TMath::Pi()/180)*cos(-31.716766*TMath::Pi()/180),
+                       sin(91.471954*TMath::Pi()/180)*cos(-121.238419*TMath::Pi()/180),
+                       sin(161.934418*TMath::Pi()/180)*cos(-26.720200*TMath::Pi()/180));
+
+NAJC_Rot_col_X[38].SetXYZ(sin(120.000946*TMath::Pi()/180)*cos(-110.903458*TMath::Pi()/180),
+                       sin(148.730408*TMath::Pi()/180)*cos(87.154083*TMath::Pi()/180),
+                       sin(98.009598*TMath::Pi()/180)*cos(-16.243423*TMath::Pi()/180));
+
+NAJC_Rot_col_X[39].SetXYZ(sin(119.999146*TMath::Pi()/180)*cos(69.093414*TMath::Pi()/180),
+                       sin(31.269516*TMath::Pi()/180)*cos(87.163361*TMath::Pi()/180),
+                       sin(81.984879*TMath::Pi()/180)*cos(-16.243607*TMath::Pi()/180));
+
+NAJC_Rot_col_X[40].SetXYZ(sin(35.999680*TMath::Pi()/180)*cos(31.714874*TMath::Pi()/180),
+                       sin(89.088608*TMath::Pi()/180)*cos(122.969406*TMath::Pi()/180),
+                       sin(54.015533*TMath::Pi()/180)*cos(-146.368759*TMath::Pi()/180));
+
+NAJC_Rot_col_X[41].SetXYZ(sin(179.999939*TMath::Pi()/180)*cos(-44.284103*TMath::Pi()/180),
+                       sin(89.999908*TMath::Pi()/180)*cos(-59.834961*TMath::Pi()/180),
+                       sin(90.000076*TMath::Pi()/180)*cos(-149.834991*TMath::Pi()/180));
+
+NAJC_Rot_col_X[42].SetXYZ(sin(35.998962*TMath::Pi()/180)*cos(-148.285355*TMath::Pi()/180),
+                       sin(90.913406*TMath::Pi()/180)*cos(122.972015*TMath::Pi()/180),
+                       sin(125.983643*TMath::Pi()/180)*cos(-146.364716*TMath::Pi()/180));
+
+NAJC_Rot_col_X[43].SetXYZ(sin(144.000977*TMath::Pi()/180)*cos(148.285355*TMath::Pi()/180),
+                       sin(90.913406*TMath::Pi()/180)*cos(57.027939*TMath::Pi()/180),
+                       sin(125.983643*TMath::Pi()/180)*cos(-33.635284*TMath::Pi()/180));
+
+NAJC_Rot_col_X[44].SetXYZ(sin(0.002835*TMath::Pi()/180)*cos(177.685333*TMath::Pi()/180),
+                       sin(90.001389*TMath::Pi()/180)*cos(-120.167007*TMath::Pi()/180),
+                       sin(89.997452*TMath::Pi()/180)*cos(-30.166962*TMath::Pi()/180));
+
+NAJC_Rot_col_X[45].SetXYZ(sin(143.997803*TMath::Pi()/180)*cos(-31.715607*TMath::Pi()/180),
+                       sin(89.087616*TMath::Pi()/180)*cos(57.028473*TMath::Pi()/180),
+                       sin(54.013092*TMath::Pi()/180)*cos(-33.634064*TMath::Pi()/180));
+
+NAJC_Rot_col_X[46].SetXYZ(sin(59.999268*TMath::Pi()/180)*cos(69.096420*TMath::Pi()/180),
+                       sin(57.035294*TMath::Pi()/180)*cos(-178.913727*TMath::Pi()/180),
+                       sin(47.643875*TMath::Pi()/180)*cos(-52.665833*TMath::Pi()/180));
+
+NAJC_Rot_col_X[47].SetXYZ(sin(120.000229*TMath::Pi()/180)*cos(-69.097031*TMath::Pi()/180),
+                       sin(57.032654*TMath::Pi()/180)*cos(-1.088669*TMath::Pi()/180),
+                       sin(47.645844*TMath::Pi()/180)*cos(-127.337875*TMath::Pi()/180));
+
+NAJC_Rot_col_X[48].SetXYZ(sin(108.000092*TMath::Pi()/180)*cos(148.279999*TMath::Pi()/180),
+                       sin(147.017288*TMath::Pi()/180)*cos(-91.676147*TMath::Pi()/180),
+                       sin(63.373047*TMath::Pi()/180)*cos(-131.095139*TMath::Pi()/180));
+
+NAJC_Rot_col_X[49].SetXYZ(sin(107.998505*TMath::Pi()/180)*cos(-31.717911*TMath::Pi()/180),
+                       sin(32.980560*TMath::Pi()/180)*cos(-91.674408*TMath::Pi()/180),
+                       sin(116.625626*TMath::Pi()/180)*cos(-131.091690*TMath::Pi()/180));
+
+NAJC_Rot_col_X[50].SetXYZ(sin(120.002426*TMath::Pi()/180)*cos(110.905701*TMath::Pi()/180),
+                       sin(122.966782*TMath::Pi()/180)*cos(-1.087466*TMath::Pi()/180),
+                       sin(132.352707*TMath::Pi()/180)*cos(-127.333725*TMath::Pi()/180));
+
+NAJC_Rot_col_X[51].SetXYZ(sin(59.997635*TMath::Pi()/180)*cos(-110.905762*TMath::Pi()/180),
+                       sin(122.966782*TMath::Pi()/180)*cos(-178.912521*TMath::Pi()/180),
+                       sin(132.352707*TMath::Pi()/180)*cos(-52.666229*TMath::Pi()/180));
+
+NAJC_Rot_col_X[52].SetXYZ(sin(72.001434*TMath::Pi()/180)*cos(31.717896*TMath::Pi()/180),
+                       sin(32.980560*TMath::Pi()/180)*cos(-88.325638*TMath::Pi()/180),
+                       sin(116.625626*TMath::Pi()/180)*cos(-48.908279*TMath::Pi()/180));
+
+NAJC_Rot_col_X[53].SetXYZ(sin(72.001923*TMath::Pi()/180)*cos(-148.282684*TMath::Pi()/180),
+                       sin(147.016739*TMath::Pi()/180)*cos(-88.321976*TMath::Pi()/180),
+                       sin(63.370972*TMath::Pi()/180)*cos(-48.907745*TMath::Pi()/180));
+
+NAJC_Rot_col_X[54].SetXYZ(sin(89.999802*TMath::Pi()/180)*cos(-0.002818*TMath::Pi()/180),
+                       sin(30.166946*TMath::Pi()/180)*cos(89.997299*TMath::Pi()/180),
+                       sin(59.832993*TMath::Pi()/180)*cos(-90.002914*TMath::Pi()/180));
+
+NAJC_Rot_col_X[55].SetXYZ(sin(89.999969*TMath::Pi()/180)*cos(179.999939*TMath::Pi()/180),
+                       sin(149.834991*TMath::Pi()/180)*cos(89.999908*TMath::Pi()/180),
+                       sin(120.165039*TMath::Pi()/180)*cos(-89.999969*TMath::Pi()/180));
+
+NAJC_Rot_col_X[56].SetXYZ(sin(144.000214*TMath::Pi()/180)*cos(-148.285461*TMath::Pi()/180),
+                       sin(121.226715*TMath::Pi()/180)*cos(-1.727005*TMath::Pi()/180),
+                       sin(73.919296*TMath::Pi()/180)*cos(-81.661942*TMath::Pi()/180));
+
+NAJC_Rot_col_X[57].SetXYZ(sin(35.999985*TMath::Pi()/180)*cos(148.279999*TMath::Pi()/180),
+                       sin(121.226944*TMath::Pi()/180)*cos(-178.278625*TMath::Pi()/180),
+                       sin(73.919357*TMath::Pi()/180)*cos(-98.343781*TMath::Pi()/180));
+
+NAJC_Rot_col_X[58].SetXYZ(sin(35.998840*TMath::Pi()/180)*cos(-31.714935*TMath::Pi()/180),
+                       sin(58.773117*TMath::Pi()/180)*cos(-178.276993*TMath::Pi()/180),
+                       sin(106.078720*TMath::Pi()/180)*cos(-98.340836*TMath::Pi()/180));
+
+NAJC_Rot_col_X[59].SetXYZ(sin(144.001083*TMath::Pi()/180)*cos(31.714920*TMath::Pi()/180),
+                       sin(58.773117*TMath::Pi()/180)*cos(-1.722990*TMath::Pi()/180),
+                       sin(106.078720*TMath::Pi()/180)*cos(-81.659164*TMath::Pi()/180));
+
+
+TVector3 NAJC_Rot_col_Y[60];
+NAJC_Rot_col_Y[0].SetXYZ(sin(144.001129*TMath::Pi()/180)*sin(31.714935*TMath::Pi()/180),
+                    sin(121.226883*TMath::Pi()/180)*sin(178.276993*TMath::Pi()/180),
+                    sin(73.921265*TMath::Pi()/180)*sin(98.340836*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[1].SetXYZ(sin(35.998871*TMath::Pi()/180)*sin(-31.714935*TMath::Pi()/180),
+                    sin(121.226883*TMath::Pi()/180)*sin(1.722995*TMath::Pi()/180),
+                    sin(73.921265*TMath::Pi()/180)*sin(81.659164*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[2].SetXYZ(sin(35.999969*TMath::Pi()/180)*sin(148.279953*TMath::Pi()/180),
+                    sin(58.773056*TMath::Pi()/180)*sin(1.721368*TMath::Pi()/180),
+                    sin(106.080643*TMath::Pi()/180)*sin(81.656204*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[3].SetXYZ(sin(144.000153*TMath::Pi()/180)*sin(-148.285461*TMath::Pi()/180),
+                    sin(58.773270*TMath::Pi()/180)*sin(178.272949*TMath::Pi()/180),
+                    sin(106.080688*TMath::Pi()/180)*sin(98.338043*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[4].SetXYZ(sin(89.999908*TMath::Pi()/180)*sin(-179.999939*TMath::Pi()/180),
+                    sin(30.164978*TMath::Pi()/180)*sin(-89.999908*TMath::Pi()/180),
+                    sin(59.834961*TMath::Pi()/180)*sin(89.999969*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[5].SetXYZ(sin(89.999802*TMath::Pi()/180)*sin(-0.002833*TMath::Pi()/180),
+                    sin(149.833023*TMath::Pi()/180)*sin(-90.002701*TMath::Pi()/180),
+                    sin(120.167007*TMath::Pi()/180)*sin(89.997025*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[6].SetXYZ(sin(72.001923*TMath::Pi()/180)*sin(-148.282684*TMath::Pi()/180),
+                    sin(32.983261*TMath::Pi()/180)*sin(91.678024*TMath::Pi()/180),
+                    sin(116.629028*TMath::Pi()/180)*sin(131.092255*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[7].SetXYZ(sin(72.001495*TMath::Pi()/180)*sin(31.717911*TMath::Pi()/180),
+                    sin(147.019424*TMath::Pi()/180)*sin(91.674408*TMath::Pi()/180),
+                    sin(63.374359*TMath::Pi()/180)*sin(131.091690*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[8].SetXYZ(sin(59.997574*TMath::Pi()/180)*sin(-110.905701*TMath::Pi()/180),
+                    sin(57.033188*TMath::Pi()/180)*sin(1.087461*TMath::Pi()/180),
+                    sin(47.647202*TMath::Pi()/180)*sin(127.333786*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[9].SetXYZ(sin(120.002365*TMath::Pi()/180)*sin(110.905762*TMath::Pi()/180),
+                    sin(57.033188*TMath::Pi()/180)*sin(178.912521*TMath::Pi()/180),
+                    sin(47.647202*TMath::Pi()/180)*sin(52.666214*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[10].SetXYZ(sin(107.998550*TMath::Pi()/180)*sin(-31.717896*TMath::Pi()/180),
+                    sin(147.019424*TMath::Pi()/180)*sin(88.325638*TMath::Pi()/180),
+                    sin(63.374359*TMath::Pi()/180)*sin(48.908279*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[11].SetXYZ(sin(108.000031*TMath::Pi()/180)*sin(148.279953*TMath::Pi()/180),
+                    sin(32.982681*TMath::Pi()/180)*sin(88.323837*TMath::Pi()/180),
+                    sin(116.626938*TMath::Pi()/180)*sin(48.904816*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[12].SetXYZ(sin(120.000229*TMath::Pi()/180)*sin(-69.097076*TMath::Pi()/180),
+                    sin(122.967331*TMath::Pi()/180)*sin(178.911270*TMath::Pi()/180),
+                    sin(132.354141*TMath::Pi()/180)*sin(52.662109*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[13].SetXYZ(sin(59.997574*TMath::Pi()/180)*sin(69.094299*TMath::Pi()/180),
+                    sin(122.966812*TMath::Pi()/180)*sin(1.087461*TMath::Pi()/180),
+                    sin(132.352798*TMath::Pi()/180)*sin(127.333786*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[14].SetXYZ(sin(143.997803*TMath::Pi()/180)*sin(-31.715652*TMath::Pi()/180),
+                    sin(90.912369*TMath::Pi()/180)*sin(-122.971481*TMath::Pi()/180),
+                    sin(125.986862*TMath::Pi()/180)*sin(146.365906*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[15].SetXYZ(sin(0.002820*TMath::Pi()/180)*sin(177.780685*TMath::Pi()/180),
+                    sin(89.998596*TMath::Pi()/180)*sin(59.832993*TMath::Pi()/180),
+                    sin(90.002533*TMath::Pi()/180)*sin(149.833023*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[16].SetXYZ(sin(144.001022*TMath::Pi()/180)*sin(148.285355*TMath::Pi()/180),
+                    sin(89.086578*TMath::Pi()/180)*sin(-122.972015*TMath::Pi()/180),
+                    sin(54.016281*TMath::Pi()/180)*sin(146.364716*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[17].SetXYZ(sin(35.998978*TMath::Pi()/180)*sin(-148.285355*TMath::Pi()/180),
+                    sin(89.086578*TMath::Pi()/180)*sin(-57.027939*TMath::Pi()/180),
+                    sin(54.016281*TMath::Pi()/180)*sin(33.635269*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[18].SetXYZ(sin(179.999939*TMath::Pi()/180)*sin(135.715851*TMath::Pi()/180),
+                    sin(89.999908*TMath::Pi()/180)*sin(120.165039*TMath::Pi()/180),
+                    sin(90.000076*TMath::Pi()/180)*sin(30.164993*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[19].SetXYZ(sin(35.999680*TMath::Pi()/180)*sin(31.714813*TMath::Pi()/180),
+                    sin(90.911392*TMath::Pi()/180)*sin(-57.030579*TMath::Pi()/180),
+                    sin(125.984406*TMath::Pi()/180)*sin(33.631210*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[20].SetXYZ(sin(119.999146*TMath::Pi()/180)*sin(69.093414*TMath::Pi()/180),
+                    sin(148.730469*TMath::Pi()/180)*sin(-92.836624*TMath::Pi()/180),
+                    sin(98.015121*TMath::Pi()/180)*sin(163.756393*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[21].SetXYZ(sin(120.000946*TMath::Pi()/180)*sin(-110.903458*TMath::Pi()/180),
+                    sin(31.269562*TMath::Pi()/180)*sin(-92.845917*TMath::Pi()/180),
+                    sin(81.990341*TMath::Pi()/180)*sin(163.756561*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[22].SetXYZ(sin(71.998657*TMath::Pi()/180)*sin(-31.716751*TMath::Pi()/180),
+                    sin(88.528030*TMath::Pi()/180)*sin(58.761581*TMath::Pi()/180),
+                    sin(18.065536*TMath::Pi()/180)*sin(153.279816*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[23].SetXYZ(sin(107.998169*TMath::Pi()/180)*sin(31.717102*TMath::Pi()/180),
+                    sin(88.526611*TMath::Pi()/180)*sin(121.238419*TMath::Pi()/180),
+                    sin(18.062485*TMath::Pi()/180)*sin(26.715042*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[24].SetXYZ(sin(59.999924*TMath::Pi()/180)*sin(110.903030*TMath::Pi()/180),
+                    sin(31.269562*TMath::Pi()/180)*sin(-87.160690*TMath::Pi()/180),
+                    sin(81.987610*TMath::Pi()/180)*sin(16.241531*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[25].SetXYZ(sin(59.999969*TMath::Pi()/180)*sin(-69.096970*TMath::Pi()/180),
+                    sin(148.730408*TMath::Pi()/180)*sin(-87.160736*TMath::Pi()/180),
+                    sin(98.012375*TMath::Pi()/180)*sin(16.241531*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[26].SetXYZ(sin(107.998398*TMath::Pi()/180)*sin(-148.281860*TMath::Pi()/180),
+                    sin(91.476761*TMath::Pi()/180)*sin(121.238251*TMath::Pi()/180),
+                    sin(161.936996*TMath::Pi()/180)*sin(26.704483*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[27].SetXYZ(sin(72.001816*TMath::Pi()/180)*sin(148.282852*TMath::Pi()/180),
+                    sin(91.473373*TMath::Pi()/180)*sin(58.761581*TMath::Pi()/180),
+                    sin(161.937485*TMath::Pi()/180)*sin(153.284943*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[28].SetXYZ(sin(89.999908*TMath::Pi()/180)*sin(-89.999969*TMath::Pi()/180),
+                    sin(59.834961*TMath::Pi()/180)*sin(179.999939*TMath::Pi()/180),
+                    sin(149.834991*TMath::Pi()/180)*sin(-180.0000*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[29].SetXYZ(sin(90.002869*TMath::Pi()/180)*sin(89.999802*TMath::Pi()/180),
+                    sin(120.167007*TMath::Pi()/180)*sin(-179.998413*TMath::Pi()/180),
+                    sin(30.166962*TMath::Pi()/180)*sin(179.994980*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[30].SetXYZ(sin(90.002869*TMath::Pi()/180)*sin(89.999863*TMath::Pi()/180),
+                    sin(59.832993*TMath::Pi()/180)*sin(0.001541*TMath::Pi()/180),
+                    sin(149.833023*TMath::Pi()/180)*sin(-0.004976*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[31].SetXYZ(sin(89.999969*TMath::Pi()/180)*sin(-89.999908*TMath::Pi()/180),
+                    sin(120.165039*TMath::Pi()/180)*sin(0.000006*TMath::Pi()/180),
+                    sin(30.164993*TMath::Pi()/180)*sin(-0.000001*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[32].SetXYZ(sin(72.001816*TMath::Pi()/180)*sin(148.282898*TMath::Pi()/180),
+                    sin(88.526611*TMath::Pi()/180)*sin(-121.238419*TMath::Pi()/180),
+                    sin(18.062500*TMath::Pi()/180)*sin(-26.715073*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[33].SetXYZ(sin(107.998398*TMath::Pi()/180)*sin(-148.281860*TMath::Pi()/180),
+                    sin(88.523224*TMath::Pi()/180)*sin(-58.761688*TMath::Pi()/180),
+                    sin(18.063004*TMath::Pi()/180)*sin(-153.295486*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[34].SetXYZ(sin(59.999924*TMath::Pi()/180)*sin(-69.096970*TMath::Pi()/180),
+                    sin(31.269547*TMath::Pi()/180)*sin(92.839310*TMath::Pi()/180),
+                    sin(81.987610*TMath::Pi()/180)*sin(-163.758408*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[35].SetXYZ(sin(59.999969*TMath::Pi()/180)*sin(110.903030*TMath::Pi()/180),
+                    sin(148.730408*TMath::Pi()/180)*sin(92.839249*TMath::Pi()/180),
+                    sin(98.012375*TMath::Pi()/180)*sin(-163.758408*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[36].SetXYZ(sin(107.998169*TMath::Pi()/180)*sin(31.717087*TMath::Pi()/180),
+                    sin(91.473328*TMath::Pi()/180)*sin(-58.761581*TMath::Pi()/180),
+                    sin(161.937485*TMath::Pi()/180)*sin(-153.284897*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[37].SetXYZ(sin(71.998657*TMath::Pi()/180)*sin(-31.716766*TMath::Pi()/180),
+                    sin(91.471954*TMath::Pi()/180)*sin(-121.238419*TMath::Pi()/180),
+                    sin(161.934418*TMath::Pi()/180)*sin(-26.720200*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[38].SetXYZ(sin(120.000946*TMath::Pi()/180)*sin(-110.903458*TMath::Pi()/180),
+                    sin(148.730408*TMath::Pi()/180)*sin(87.154083*TMath::Pi()/180),
+                    sin(98.009598*TMath::Pi()/180)*sin(-16.243423*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[39].SetXYZ(sin(119.999146*TMath::Pi()/180)*sin(69.093414*TMath::Pi()/180),
+                    sin(31.269516*TMath::Pi()/180)*sin(87.163361*TMath::Pi()/180),
+                    sin(81.984879*TMath::Pi()/180)*sin(-16.243607*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[40].SetXYZ(sin(35.999680*TMath::Pi()/180)*sin(31.714874*TMath::Pi()/180),
+                    sin(89.088608*TMath::Pi()/180)*sin(122.969406*TMath::Pi()/180),
+                    sin(54.015533*TMath::Pi()/180)*sin(-146.368759*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[41].SetXYZ(sin(179.999939*TMath::Pi()/180)*sin(-44.284103*TMath::Pi()/180),
+                    sin(89.999908*TMath::Pi()/180)*sin(-59.834961*TMath::Pi()/180),
+                    sin(90.000076*TMath::Pi()/180)*sin(-149.834991*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[42].SetXYZ(sin(35.998962*TMath::Pi()/180)*sin(-148.285355*TMath::Pi()/180),
+                    sin(90.913406*TMath::Pi()/180)*sin(122.972015*TMath::Pi()/180),
+                    sin(125.983643*TMath::Pi()/180)*sin(-146.364716*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[43].SetXYZ(sin(144.000977*TMath::Pi()/180)*sin(148.285355*TMath::Pi()/180),
+                    sin(90.913406*TMath::Pi()/180)*sin(57.027939*TMath::Pi()/180),
+                    sin(125.983643*TMath::Pi()/180)*sin(-33.635284*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[44].SetXYZ(sin(0.002835*TMath::Pi()/180)*sin(177.685333*TMath::Pi()/180),
+                    sin(90.001389*TMath::Pi()/180)*sin(-120.167007*TMath::Pi()/180),
+                    sin(89.997452*TMath::Pi()/180)*sin(-30.166962*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[45].SetXYZ(sin(143.997803*TMath::Pi()/180)*sin(-31.715607*TMath::Pi()/180),
+                    sin(89.087616*TMath::Pi()/180)*sin(57.028473*TMath::Pi()/180),
+                    sin(54.013092*TMath::Pi()/180)*sin(-33.634064*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[46].SetXYZ(sin(59.999268*TMath::Pi()/180)*sin(69.096420*TMath::Pi()/180),
+                    sin(57.035294*TMath::Pi()/180)*sin(-178.913727*TMath::Pi()/180),
+                    sin(47.643875*TMath::Pi()/180)*sin(-52.665833*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[47].SetXYZ(sin(120.000229*TMath::Pi()/180)*sin(-69.097031*TMath::Pi()/180),
+                    sin(57.032654*TMath::Pi()/180)*sin(-1.088669*TMath::Pi()/180),
+                    sin(47.645844*TMath::Pi()/180)*sin(-127.337875*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[48].SetXYZ(sin(108.000092*TMath::Pi()/180)*sin(148.279999*TMath::Pi()/180),
+                    sin(147.017288*TMath::Pi()/180)*sin(-91.676147*TMath::Pi()/180),
+                    sin(63.373047*TMath::Pi()/180)*sin(-131.095139*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[49].SetXYZ(sin(107.998505*TMath::Pi()/180)*sin(-31.717911*TMath::Pi()/180),
+                    sin(32.980560*TMath::Pi()/180)*sin(-91.674408*TMath::Pi()/180),
+                    sin(116.625626*TMath::Pi()/180)*sin(-131.091690*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[50].SetXYZ(sin(120.002426*TMath::Pi()/180)*sin(110.905701*TMath::Pi()/180),
+                    sin(122.966782*TMath::Pi()/180)*sin(-1.087466*TMath::Pi()/180),
+                    sin(132.352707*TMath::Pi()/180)*sin(-127.333725*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[51].SetXYZ(sin(59.997635*TMath::Pi()/180)*sin(-110.905762*TMath::Pi()/180),
+                    sin(122.966782*TMath::Pi()/180)*sin(-178.912521*TMath::Pi()/180),
+                    sin(132.352707*TMath::Pi()/180)*sin(-52.666229*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[52].SetXYZ(sin(72.001434*TMath::Pi()/180)*sin(31.717896*TMath::Pi()/180),
+                    sin(32.980560*TMath::Pi()/180)*sin(-88.325638*TMath::Pi()/180),
+                    sin(116.625626*TMath::Pi()/180)*sin(-48.908279*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[53].SetXYZ(sin(72.001923*TMath::Pi()/180)*sin(-148.282684*TMath::Pi()/180),
+                    sin(147.016739*TMath::Pi()/180)*sin(-88.321976*TMath::Pi()/180),
+                    sin(63.370972*TMath::Pi()/180)*sin(-48.907745*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[54].SetXYZ(sin(89.999802*TMath::Pi()/180)*sin(-0.002818*TMath::Pi()/180),
+                    sin(30.166946*TMath::Pi()/180)*sin(89.997299*TMath::Pi()/180),
+                    sin(59.832993*TMath::Pi()/180)*sin(-90.002914*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[55].SetXYZ(sin(89.999969*TMath::Pi()/180)*sin(179.999939*TMath::Pi()/180),
+                    sin(149.834991*TMath::Pi()/180)*sin(89.999908*TMath::Pi()/180),
+                    sin(120.165039*TMath::Pi()/180)*sin(-89.999969*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[56].SetXYZ(sin(144.000214*TMath::Pi()/180)*sin(-148.285461*TMath::Pi()/180),
+                    sin(121.226715*TMath::Pi()/180)*sin(-1.727005*TMath::Pi()/180),
+                    sin(73.919296*TMath::Pi()/180)*sin(-81.661942*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[57].SetXYZ(sin(35.999985*TMath::Pi()/180)*sin(148.279999*TMath::Pi()/180),
+                    sin(121.226944*TMath::Pi()/180)*sin(-178.278625*TMath::Pi()/180),
+                    sin(73.919357*TMath::Pi()/180)*sin(-98.343781*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[58].SetXYZ(sin(35.998840*TMath::Pi()/180)*sin(-31.714935*TMath::Pi()/180),
+                    sin(58.773117*TMath::Pi()/180)*sin(-178.276993*TMath::Pi()/180),
+                    sin(106.078720*TMath::Pi()/180)*sin(-98.340836*TMath::Pi()/180));
+
+NAJC_Rot_col_Y[59].SetXYZ(sin(144.001083*TMath::Pi()/180)*sin(31.714920*TMath::Pi()/180),
+                    sin(58.773117*TMath::Pi()/180)*sin(-1.722990*TMath::Pi()/180),
+                    sin(106.078720*TMath::Pi()/180)*sin(-81.659164*TMath::Pi()/180));
+
+
+TVector3 NAJC_Rot_col_Z[60];
+NAJC_Rot_col_Z[0].SetXYZ(cos(144.001129*TMath::Pi()/180),
+                 cos(121.226883*TMath::Pi()/180),
+                 cos(73.921265*TMath::Pi()/180));
+NAJC_Rot_col_Z[1].SetXYZ(cos(35.998871*TMath::Pi()/180),
+                 cos(121.226883*TMath::Pi()/180),
+                 cos(73.921265*TMath::Pi()/180));
+NAJC_Rot_col_Z[2].SetXYZ(cos(35.999969*TMath::Pi()/180),
+                 cos(58.773056*TMath::Pi()/180),
+                 cos(106.080643*TMath::Pi()/180));
+NAJC_Rot_col_Z[3].SetXYZ(cos(144.000153*TMath::Pi()/180),
+                 cos(58.773270*TMath::Pi()/180),
+                 cos(106.080688*TMath::Pi()/180));
+NAJC_Rot_col_Z[4].SetXYZ(cos(89.999908*TMath::Pi()/180),
+                 cos(30.164978*TMath::Pi()/180),
+                 cos(59.834961*TMath::Pi()/180));
+NAJC_Rot_col_Z[5].SetXYZ(cos(89.999802*TMath::Pi()/180),
+                 cos(149.833023*TMath::Pi()/180),
+                 cos(120.167007*TMath::Pi()/180));
+NAJC_Rot_col_Z[6].SetXYZ(cos(72.001923*TMath::Pi()/180),
+                 cos(32.983261*TMath::Pi()/180),
+                 cos(116.629028*TMath::Pi()/180));
+NAJC_Rot_col_Z[7].SetXYZ(cos(72.001495*TMath::Pi()/180),
+                 cos(147.019424*TMath::Pi()/180),
+                 cos(63.374359*TMath::Pi()/180));
+NAJC_Rot_col_Z[8].SetXYZ(cos(59.997574*TMath::Pi()/180),
+                 cos(57.033188*TMath::Pi()/180),
+                 cos(47.647202*TMath::Pi()/180));
+NAJC_Rot_col_Z[9].SetXYZ(cos(120.002365*TMath::Pi()/180),
+                 cos(57.033188*TMath::Pi()/180),
+                 cos(47.647202*TMath::Pi()/180));
+NAJC_Rot_col_Z[10].SetXYZ(cos(107.998550*TMath::Pi()/180),
+                 cos(147.019424*TMath::Pi()/180),
+                 cos(63.374359*TMath::Pi()/180));
+NAJC_Rot_col_Z[11].SetXYZ(cos(108.000031*TMath::Pi()/180),
+                 cos(32.982681*TMath::Pi()/180),
+                 cos(116.626938*TMath::Pi()/180));
+NAJC_Rot_col_Z[12].SetXYZ(cos(120.000229*TMath::Pi()/180),
+                 cos(122.967331*TMath::Pi()/180),
+                 cos(132.354141*TMath::Pi()/180));
+NAJC_Rot_col_Z[13].SetXYZ(cos(59.997574*TMath::Pi()/180),
+                 cos(122.966812*TMath::Pi()/180),
+                 cos(132.352798*TMath::Pi()/180));
+NAJC_Rot_col_Z[14].SetXYZ(cos(143.997803*TMath::Pi()/180),
+                 cos(90.912369*TMath::Pi()/180),
+                 cos(125.986862*TMath::Pi()/180));
+NAJC_Rot_col_Z[15].SetXYZ(cos(0.002820*TMath::Pi()/180),
+                 cos(89.998596*TMath::Pi()/180),
+                 cos(90.002533*TMath::Pi()/180));
+NAJC_Rot_col_Z[16].SetXYZ(cos(144.001022*TMath::Pi()/180),
+                 cos(89.086578*TMath::Pi()/180),
+                 cos(54.016281*TMath::Pi()/180));
+NAJC_Rot_col_Z[17].SetXYZ(cos(35.998978*TMath::Pi()/180),
+                 cos(89.086578*TMath::Pi()/180),
+                 cos(54.016281*TMath::Pi()/180));
+NAJC_Rot_col_Z[18].SetXYZ(cos(179.999939*TMath::Pi()/180),
+                 cos(89.999908*TMath::Pi()/180),
+                 cos(90.000076*TMath::Pi()/180));
+NAJC_Rot_col_Z[19].SetXYZ(cos(35.999680*TMath::Pi()/180),
+                 cos(90.911392*TMath::Pi()/180),
+                 cos(125.984406*TMath::Pi()/180));
+NAJC_Rot_col_Z[20].SetXYZ(cos(119.999146*TMath::Pi()/180),
+                 cos(148.730469*TMath::Pi()/180),
+                 cos(98.015121*TMath::Pi()/180));
+NAJC_Rot_col_Z[21].SetXYZ(cos(120.000946*TMath::Pi()/180),
+                 cos(31.269562*TMath::Pi()/180),
+                 cos(81.990341*TMath::Pi()/180));
+NAJC_Rot_col_Z[22].SetXYZ(cos(71.998657*TMath::Pi()/180),
+                 cos(88.528030*TMath::Pi()/180),
+                 cos(18.065536*TMath::Pi()/180));
+NAJC_Rot_col_Z[23].SetXYZ(cos(107.998169*TMath::Pi()/180),
+                 cos(88.526611*TMath::Pi()/180),
+                 cos(18.062485*TMath::Pi()/180));
+NAJC_Rot_col_Z[24].SetXYZ(cos(59.999924*TMath::Pi()/180),
+                 cos(31.269562*TMath::Pi()/180),
+                 cos(81.987610*TMath::Pi()/180));
+NAJC_Rot_col_Z[25].SetXYZ(cos(59.999969*TMath::Pi()/180),
+                 cos(148.730408*TMath::Pi()/180),
+                 cos(98.012375*TMath::Pi()/180));
+NAJC_Rot_col_Z[26].SetXYZ(cos(107.998398*TMath::Pi()/180),
+                 cos(91.476761*TMath::Pi()/180),
+                 cos(161.936996*TMath::Pi()/180));
+NAJC_Rot_col_Z[27].SetXYZ(cos(72.001816*TMath::Pi()/180),
+                 cos(91.473373*TMath::Pi()/180),
+                 cos(161.937485*TMath::Pi()/180));
+NAJC_Rot_col_Z[28].SetXYZ(cos(89.999908*TMath::Pi()/180),
+                 cos(59.834961*TMath::Pi()/180),
+                 cos(149.834991*TMath::Pi()/180));
+NAJC_Rot_col_Z[29].SetXYZ(cos(90.002869*TMath::Pi()/180),
+                 cos(120.167007*TMath::Pi()/180),
+                 cos(30.166962*TMath::Pi()/180));
+NAJC_Rot_col_Z[30].SetXYZ(cos(90.002869*TMath::Pi()/180),
+                 cos(59.832993*TMath::Pi()/180),
+                 cos(149.833023*TMath::Pi()/180));
+NAJC_Rot_col_Z[31].SetXYZ(cos(89.999969*TMath::Pi()/180),
+                 cos(120.165039*TMath::Pi()/180),
+                 cos(30.164993*TMath::Pi()/180));
+NAJC_Rot_col_Z[32].SetXYZ(cos(72.001816*TMath::Pi()/180),
+                 cos(88.526611*TMath::Pi()/180),
+                 cos(18.062500*TMath::Pi()/180));
+NAJC_Rot_col_Z[33].SetXYZ(cos(107.998398*TMath::Pi()/180),
+                 cos(88.523224*TMath::Pi()/180),
+                 cos(18.063004*TMath::Pi()/180));
+NAJC_Rot_col_Z[34].SetXYZ(cos(59.999924*TMath::Pi()/180),
+                 cos(31.269547*TMath::Pi()/180),
+                 cos(81.987610*TMath::Pi()/180));
+NAJC_Rot_col_Z[35].SetXYZ(cos(59.999969*TMath::Pi()/180),
+                 cos(148.730408*TMath::Pi()/180),
+                 cos(98.012375*TMath::Pi()/180));
+NAJC_Rot_col_Z[36].SetXYZ(cos(107.998169*TMath::Pi()/180),
+                 cos(91.473328*TMath::Pi()/180),
+                 cos(161.937485*TMath::Pi()/180));
+NAJC_Rot_col_Z[37].SetXYZ(cos(71.998657*TMath::Pi()/180),
+                 cos(91.471954*TMath::Pi()/180),
+                 cos(161.934418*TMath::Pi()/180));
+NAJC_Rot_col_Z[38].SetXYZ(cos(120.000946*TMath::Pi()/180),
+                 cos(148.730408*TMath::Pi()/180),
+                 cos(98.009598*TMath::Pi()/180));
+NAJC_Rot_col_Z[39].SetXYZ(cos(119.999146*TMath::Pi()/180),
+                 cos(31.269516*TMath::Pi()/180),
+                 cos(81.984879*TMath::Pi()/180));
+NAJC_Rot_col_Z[40].SetXYZ(cos(35.999680*TMath::Pi()/180),
+                 cos(89.088608*TMath::Pi()/180),
+                 cos(54.015533*TMath::Pi()/180));
+NAJC_Rot_col_Z[41].SetXYZ(cos(179.999939*TMath::Pi()/180),
+                 cos(89.999908*TMath::Pi()/180),
+                 cos(90.000076*TMath::Pi()/180));
+NAJC_Rot_col_Z[42].SetXYZ(cos(35.998962*TMath::Pi()/180),
+                 cos(90.913406*TMath::Pi()/180),
+                 cos(125.983643*TMath::Pi()/180));
+NAJC_Rot_col_Z[43].SetXYZ(cos(144.000977*TMath::Pi()/180),
+                 cos(90.913406*TMath::Pi()/180),
+                 cos(125.983643*TMath::Pi()/180));
+NAJC_Rot_col_Z[44].SetXYZ(cos(0.002835*TMath::Pi()/180),
+                 cos(90.001389*TMath::Pi()/180),
+                 cos(89.997452*TMath::Pi()/180));
+NAJC_Rot_col_Z[45].SetXYZ(cos(143.997803*TMath::Pi()/180),
+                 cos(89.087616*TMath::Pi()/180),
+                 cos(54.013092*TMath::Pi()/180));
+NAJC_Rot_col_Z[46].SetXYZ(cos(59.999268*TMath::Pi()/180),
+                 cos(57.035294*TMath::Pi()/180),
+                 cos(47.643875*TMath::Pi()/180));
+NAJC_Rot_col_Z[47].SetXYZ(cos(120.000229*TMath::Pi()/180),
+                 cos(57.032654*TMath::Pi()/180),
+                 cos(47.645844*TMath::Pi()/180));
+NAJC_Rot_col_Z[48].SetXYZ(cos(108.000092*TMath::Pi()/180),
+                 cos(147.017288*TMath::Pi()/180),
+                 cos(63.373047*TMath::Pi()/180));
+NAJC_Rot_col_Z[49].SetXYZ(cos(107.998505*TMath::Pi()/180),
+                 cos(32.980560*TMath::Pi()/180),
+                 cos(116.625626*TMath::Pi()/180));
+NAJC_Rot_col_Z[50].SetXYZ(cos(120.002426*TMath::Pi()/180),
+                 cos(122.966782*TMath::Pi()/180),
+                 cos(132.352707*TMath::Pi()/180));
+NAJC_Rot_col_Z[51].SetXYZ(cos(59.997635*TMath::Pi()/180),
+                 cos(122.966782*TMath::Pi()/180),
+                 cos(132.352707*TMath::Pi()/180));
+NAJC_Rot_col_Z[52].SetXYZ(cos(72.001434*TMath::Pi()/180),
+                 cos(32.980560*TMath::Pi()/180),
+                 cos(116.625626*TMath::Pi()/180));
+NAJC_Rot_col_Z[53].SetXYZ(cos(72.001923*TMath::Pi()/180),
+                 cos(147.016739*TMath::Pi()/180),
+                 cos(63.370972*TMath::Pi()/180));
+NAJC_Rot_col_Z[54].SetXYZ(cos(89.999802*TMath::Pi()/180),
+                 cos(30.166946*TMath::Pi()/180),
+                 cos(59.832993*TMath::Pi()/180));
+NAJC_Rot_col_Z[55].SetXYZ(cos(89.999969*TMath::Pi()/180),
+                 cos(149.834991*TMath::Pi()/180),
+                 cos(120.165039*TMath::Pi()/180));
+NAJC_Rot_col_Z[56].SetXYZ(cos(144.000214*TMath::Pi()/180),
+                 cos(121.226715*TMath::Pi()/180),
+                 cos(73.919296*TMath::Pi()/180));
+NAJC_Rot_col_Z[57].SetXYZ(cos(35.999985*TMath::Pi()/180),
+                 cos(121.226944*TMath::Pi()/180),
+                 cos(73.919357*TMath::Pi()/180));
+NAJC_Rot_col_Z[58].SetXYZ(cos(35.998840*TMath::Pi()/180),
+                 cos(58.773117*TMath::Pi()/180),
+                 cos(106.078720*TMath::Pi()/180));
+NAJC_Rot_col_Z[59].SetXYZ(cos(144.001083*TMath::Pi()/180),
+                 cos(58.773117*TMath::Pi()/180),
+                 cos(106.078720*TMath::Pi()/180));
+
+
+/// here the loop now ....
+// m1_TRB1/2
+Double_t pi = TMath::Pi();
+TVector3 col_X_m1_TRC1(sin(90.*pi/180)*cos(0.*pi/180),
+                       sin(90.545*pi/180)*cos(90.*pi/180),
+                       sin(0.545*pi/180)*cos(90.*pi/180));
+TVector3 col_Y_m1_TRC1(sin(90.*pi/180)*sin(0.*pi/180),
+                       sin(90.545*pi/180)*sin(90.*pi/180),
+                       sin(0.545*pi/180)*sin(90.*pi/180));
+TVector3 col_Z_m1_TRC1(cos(90.*pi/180),
+                       cos(90.545*pi/180),
+                       cos(0.545*pi/180));
+TVector3 col_X_m2_TRC2(sin(90.*pi/180)*cos(0.*pi/180),
+                       sin(97.428*pi/180)*cos(90.*pi/180),
+                       sin(7.428*pi/180)*cos(90.*pi/180));
+TVector3 col_Y_m2_TRC2(sin(90.*pi/180)*sin(0.*pi/180),
+                       sin(97.428*pi/180)*sin(90.*pi/180),
+                       sin(7.428*pi/180)*sin(90.*pi/180));
+TVector3 col_Z_m2_TRC2(cos(90.*pi/180),
+                       cos(97.428*pi/180),
+                       cos(7.428*pi/180));
+TVector3 col_X_m3_TRC3(sin(90.*pi/180)*cos(180.*pi/180),
+                       sin(96.883*pi/180)*cos(270.*pi/180),
+                       sin(6.883*pi/180)*cos(270.*pi/180));
+TVector3 col_Y_m3_TRC3(sin(90.*pi/180)*sin(180.*pi/180),
+                       sin(96.883*pi/180)*sin(270.*pi/180),
+                       sin(6.883*pi/180)*sin(270.*pi/180));
+TVector3 col_Z_m3_TRC3(cos(90.*pi/180),
+                       cos(96.883*pi/180),
+                       cos(6.883*pi/180));
+
+
+    // - Adapted from R3BSim Geant4 definition
+    // - Using the new templated Math ROOT Library
+    // - <D.Bertini@gsi.de>
+
+
+   //-  TRB1
+   //--- Fill info for global Rotation / Translation
+    Double_t fRotable0_0[9] = {
+	    col_X_m1_TRC1.X(),col_X_m1_TRC1.Y(),col_X_m1_TRC1.Z(),
+	    col_Y_m1_TRC1.X(),col_Y_m1_TRC1.Y(),col_Y_m1_TRC1.Z(),
+	    col_Z_m1_TRC1.X(),col_Z_m1_TRC1.Y(),col_Z_m1_TRC1.Z(),
+	 };
+    ROOT::Math::XYZPoint tra1_TRC1(0.,3.33/10.,0.);
+    ROOT::Math::Rotation3D *pm1_TRC1 = new ROOT::Math::Rotation3D(
+					    fRotable0_0[0],fRotable0_0[3],fRotable0_0[6],
+					    fRotable0_0[1],fRotable0_0[4],fRotable0_0[7],
+					    fRotable0_0[2],fRotable0_0[5],fRotable0_0[8]
+					    );
+   //--- Single Crystal definition
+   TGeoRotation *pIndividualRot_0=NULL;
+   TGeoRotation *pRingRot_0 = NULL;
+
+      for(Int_t iter2=0 ; iter2<60 ; iter2++) {
+	 Double_t fRotable1_0[9] = {
+	    NAJC_Rot_col_X[iter2].X(),NAJC_Rot_col_X[iter2].Y(),NAJC_Rot_col_X[iter2].Z(),
+	    NAJC_Rot_col_Y[iter2].X(),NAJC_Rot_col_Y[iter2].Y(),NAJC_Rot_col_Y[iter2].Z(),
+	    NAJC_Rot_col_Z[iter2].X(),NAJC_Rot_col_Z[iter2].Y(),NAJC_Rot_col_Z[iter2].Z()
+	 };
 	 
-	 crystalPhysNAJB = 
-    new G4PVPlacement(pRingRot,G4ThreeVector(NAJB_X[iter1],NAJB_Y[iter1],NAJB_Z[iter1])
-    + ((pIndividualRingRot->inverse())*tra1_TRB1),
-    crystalLogNAJB,"crystalPhysNAJB",
-    worldLog,false,iter1);
-				  
-}
-*/
+	 pIndividualRot_0 = new TGeoRotation();
+	 pIndividualRot_0->SetMatrix(fRotable1_0);
 
 
-      
+	 ROOT::Math::Rotation3D *pIndRot_0 = new ROOT::Math::Rotation3D(
+					    fRotable1_0[0],fRotable1_0[3],fRotable1_0[6],
+					    fRotable1_0[1],fRotable1_0[4],fRotable1_0[7],
+					    fRotable1_0[2],fRotable1_0[5],fRotable1_0[8]
+					    );
+
+	 
+	 ROOT::Math::Rotation3D pIndRotInv_0 = pIndRot_0->Inverse();
+	 dx =  NAJC_X[iter2]/10.;
+	 dy =  NAJC_Y[iter2]/10.;
+	 dz =  NAJC_Z[iter2]/10.;
+	 ROOT::Math::XYZPoint tt_0(dx,dy,dz);
+	 ROOT::Math::XYZPoint ttt_0(0.0,0.0,0.0);
+	 ttt_0 = pIndRotInv_0 * tra1_TRC1;
+	 ttt_0.SetX(ttt_0.X() + tt_0.X());
+	 ttt_0.SetY(ttt_0.Y() + tt_0.Y());
+	 ttt_0.SetZ(ttt_0.Z() + tt_0.Z());
+
+	 ROOT::Math::Rotation3D pRingTmp_0;
+         pRingTmp_0 = (*pm1_TRC1) * (*pIndRot_0);
+	 Double_t fRotable2_0[9]={0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+	 pRingTmp_0.GetComponents(
+					    fRotable2_0[0],fRotable2_0[3],fRotable2_0[6],
+					    fRotable2_0[1],fRotable2_0[4],fRotable2_0[7],
+					    fRotable2_0[2],fRotable2_0[5],fRotable2_0[8]
+	    );
+	 pRingRot_0 = new TGeoRotation();
+	 pRingRot_0->SetMatrix(fRotable2_0);
+       	 TGeoTranslation *trans_0 = new TGeoTranslation(ttt_0.X(),ttt_0.Y(),ttt_0.Z());
+	 TGeoCombiTrans *combi_0 = new TGeoCombiTrans(*trans_0,*pRingRot_0);
+	 
+         // Add the Node in CBLogWorld
+	 pCBLogWorld->AddNode(pcrystalLogNAJC, iter2, combi_0);
+	 
+   }//! for iter2  
+
+
+
+
+
+// TRAP part
+// some other specs
+   // Shape: TRAP1 type: TGeoTrap
+   dz     = 10.000000;
+   theta  = 0.000000;
+   phi    = 0.000000;
+   h1     = 1.702000;
+   bl1    = 5.068000;
+   tl1    = 2.162000;
+   alpha1 = 0.000000;
+   h2     = 3.064000;
+   bl2    = 9.122000;
+   tl2    = 3.890000;
+   alpha2 = 0.000000;
+   TGeoShape *pTRAP1 = new TGeoTrap("TRAP1", dz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
+   // Shape: TRAP2 type: TGeoTrap
+   dz     = 10.000000;
+   theta  = 0.000000;
+   phi    = 0.000000;
+   h1     = 1.702000;
+   bl1    = 5.068000;
+   tl1    = 2.162000;
+   alpha1 = 0.000000;
+   h2     = 3.064000;
+   bl2    = 9.122000;
+   tl2    = 3.890000;
+   alpha2 = 0.000000;
+   TGeoShape *pTRAP2 = new TGeoTrap("TRAP2", dz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
+   // Combi transformation: TRAP
+   dx = 0.000000;
+   dy = -4.745065;
+   dz = -0.322321;
+   // Rotation: 
+   thx = 90.000000;    phx = 180.000000;
+   thy = 97.772000;    phy = 270.000000;
+   thz = 7.772000;    phz = 270.000000;
+   TGeoRotation *pMatrix9 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans* pMatrix8 = new TGeoCombiTrans("TRAP", dx,dy,dz,pMatrix9);
+   pBoolNode = new TGeoUnion(pTRAP1,pTRAP2,0,pMatrix8);
+   // Shape: TRAP type: TGeoCompositeShape
+   TGeoShape *pTRAP = new TGeoCompositeShape("TRAP", pBoolNode);
+   pTRAP->SetTitle("TRAP1+TRAP2:TRAP");
+   // Volume: crystalLogNAJD
+   TGeoVolume*
+   pcrystalLogNAJD = new TGeoVolume("crystalLogNAJD",pTRAP, pMed9);
+
+Double_t NAJD_X[27] = {0,-108.157,108.157,108.157,-108.157,-283.1569,-283.1569,283.1569,283.1569,-175,-175,175,175,350,-175,-175,175,175,-283.1569,-283.1569,283.1569,283.1569,108.157,-108.157,-108.157,108.157,0};
+Double_t NAJD_Y[27] = {350,283.2094,283.2094,283.2094,283.2094,174.9965,174.9965,174.9965,174.9965,108.1815,108.1815,108.1815,108.1815,0,-108.178,-108.1815,-108.1815,-108.178,-174.9965,-174.9965,-174.9965,-174.9965,-283.2094,-283.2094,-283.2094,-283.2094,-350};
+Double_t NAJD_Z[27] = {0,174.9124,174.9124,-174.9124,-174.9124,-108.164,108.164,108.164,-108.164,-283.1464,283.1464,283.1464,-283.1464,0,283.1464,-283.1464,-283.1464,283.1464,108.164,-108.164,-108.164,108.164,174.9124,174.9124,-174.9124,-174.9124,0};
+ 
+TVector3 NAJD_Rot_col_X[27];
+NAJD_Rot_col_X[0].SetXYZ(sin(0.000003*TMath::Pi()/180)*cos(-121.720016*TMath::Pi()/180),
+                       sin(90.000076*TMath::Pi()/180)*cos(-0.006011*TMath::Pi()/180),
+                       sin(89.999969*TMath::Pi()/180)*cos(89.993958*TMath::Pi()/180));
+
+NAJD_Rot_col_X[1].SetXYZ(sin(108.000092*TMath::Pi()/180)*cos(31.719986*TMath::Pi()/180),
+                       sin(144.002945*TMath::Pi()/180)*cos(148.288147*TMath::Pi()/180),
+                       sin(60.003204*TMath::Pi()/180)*cos(110.909149*TMath::Pi()/180));
+
+NAJD_Rot_col_X[2].SetXYZ(sin(71.999969*TMath::Pi()/180)*cos(-31.720016*TMath::Pi()/180),
+                       sin(144.002945*TMath::Pi()/180)*cos(31.711823*TMath::Pi()/180),
+                       sin(60.003204*TMath::Pi()/180)*cos(69.090851*TMath::Pi()/180));
+
+NAJD_Rot_col_X[3].SetXYZ(sin(71.999908*TMath::Pi()/180)*cos(148.279953*TMath::Pi()/180),
+                       sin(35.997025*TMath::Pi()/180)*cos(31.711823*TMath::Pi()/180),
+                       sin(119.996796*TMath::Pi()/180)*cos(69.090851*TMath::Pi()/180));
+
+NAJD_Rot_col_X[4].SetXYZ(sin(108.000031*TMath::Pi()/180)*cos(-148.279999*TMath::Pi()/180),
+                       sin(35.997040*TMath::Pi()/180)*cos(148.288147*TMath::Pi()/180),
+                       sin(119.996796*TMath::Pi()/180)*cos(110.909149*TMath::Pi()/180));
+
+NAJD_Rot_col_X[5].SetXYZ(sin(35.999985*TMath::Pi()/180)*cos(-148.279999*TMath::Pi()/180),
+                       sin(59.998718*TMath::Pi()/180)*cos(69.093582*TMath::Pi()/180),
+                       sin(107.998230*TMath::Pi()/180)*cos(148.281921*TMath::Pi()/180));
+
+NAJD_Rot_col_X[6].SetXYZ(sin(35.999985*TMath::Pi()/180)*cos(31.719986*TMath::Pi()/180),
+                       sin(120.001266*TMath::Pi()/180)*cos(69.093582*TMath::Pi()/180),
+                       sin(72.001770*TMath::Pi()/180)*cos(148.281921*TMath::Pi()/180));
+
+NAJD_Rot_col_X[7].SetXYZ(sin(143.999985*TMath::Pi()/180)*cos(-31.720016*TMath::Pi()/180),
+                       sin(120.001266*TMath::Pi()/180)*cos(110.906418*TMath::Pi()/180),
+                       sin(72.001770*TMath::Pi()/180)*cos(31.718048*TMath::Pi()/180));
+
+NAJD_Rot_col_X[8].SetXYZ(sin(143.999985*TMath::Pi()/180)*cos(148.279953*TMath::Pi()/180),
+                       sin(59.998718*TMath::Pi()/180)*cos(110.906418*TMath::Pi()/180),
+                       sin(107.998230*TMath::Pi()/180)*cos(31.718033*TMath::Pi()/180));
+
+NAJD_Rot_col_X[9].SetXYZ(sin(119.999146*TMath::Pi()/180)*cos(-69.093414*TMath::Pi()/180),
+                       sin(71.999146*TMath::Pi()/180)*cos(-148.280991*TMath::Pi()/180),
+                       sin(144.000320*TMath::Pi()/180)*cos(148.285690*TMath::Pi()/180));
+
+NAJD_Rot_col_X[10].SetXYZ(sin(119.999146*TMath::Pi()/180)*cos(110.906570*TMath::Pi()/180),
+                       sin(108.000854*TMath::Pi()/180)*cos(-148.281036*TMath::Pi()/180),
+                       sin(35.999664*TMath::Pi()/180)*cos(148.285690*TMath::Pi()/180));
+
+NAJD_Rot_col_X[11].SetXYZ(sin(60.000854*TMath::Pi()/180)*cos(-110.906570*TMath::Pi()/180),
+                       sin(108.000854*TMath::Pi()/180)*cos(-31.718948*TMath::Pi()/180),
+                       sin(35.999664*TMath::Pi()/180)*cos(31.714279*TMath::Pi()/180));
+
+NAJD_Rot_col_X[12].SetXYZ(sin(60.000854*TMath::Pi()/180)*cos(69.093414*TMath::Pi()/180),
+                       sin(71.999146*TMath::Pi()/180)*cos(-31.718948*TMath::Pi()/180),
+                       sin(144.000320*TMath::Pi()/180)*cos(31.714249*TMath::Pi()/180));
+
+NAJD_Rot_col_X[13].SetXYZ(sin(90.000076*TMath::Pi()/180)*cos(90.000076*TMath::Pi()/180),
+                       sin(0.006011*TMath::Pi()/180)*cos(-179.979675*TMath::Pi()/180),
+                       sin(89.993958*TMath::Pi()/180)*cos(0.000000*TMath::Pi()/180));
+
+NAJD_Rot_col_X[14].SetXYZ(sin(60.000854*TMath::Pi()/180)*cos(69.093414*TMath::Pi()/180),
+                       sin(108.000854*TMath::Pi()/180)*cos(148.280991*TMath::Pi()/180),
+                       sin(35.999664*TMath::Pi()/180)*cos(-148.285690*TMath::Pi()/180));
+
+NAJD_Rot_col_X[15].SetXYZ(sin(60.000854*TMath::Pi()/180)*cos(-110.906570*TMath::Pi()/180),
+                       sin(71.999146*TMath::Pi()/180)*cos(148.281036*TMath::Pi()/180),
+                       sin(144.000320*TMath::Pi()/180)*cos(-148.285690*TMath::Pi()/180));
+
+NAJD_Rot_col_X[16].SetXYZ(sin(119.999146*TMath::Pi()/180)*cos(110.906570*TMath::Pi()/180),
+                       sin(71.999146*TMath::Pi()/180)*cos(31.718964*TMath::Pi()/180),
+                       sin(144.000320*TMath::Pi()/180)*cos(-31.714264*TMath::Pi()/180));
+
+NAJD_Rot_col_X[17].SetXYZ(sin(119.999146*TMath::Pi()/180)*cos(-69.093414*TMath::Pi()/180),
+                       sin(108.000854*TMath::Pi()/180)*cos(31.718948*TMath::Pi()/180),
+                       sin(35.999664*TMath::Pi()/180)*cos(-31.714249*TMath::Pi()/180));
+
+NAJD_Rot_col_X[18].SetXYZ(sin(143.999985*TMath::Pi()/180)*cos(148.279953*TMath::Pi()/180),
+                       sin(120.001266*TMath::Pi()/180)*cos(-69.093582*TMath::Pi()/180),
+                       sin(72.001770*TMath::Pi()/180)*cos(-148.281921*TMath::Pi()/180));
+
+NAJD_Rot_col_X[19].SetXYZ(sin(143.999985*TMath::Pi()/180)*cos(-31.719986*TMath::Pi()/180),
+                       sin(59.998718*TMath::Pi()/180)*cos(-69.093582*TMath::Pi()/180),
+                       sin(107.998230*TMath::Pi()/180)*cos(-148.281921*TMath::Pi()/180));
+
+NAJD_Rot_col_X[20].SetXYZ(sin(35.999969*TMath::Pi()/180)*cos(31.720001*TMath::Pi()/180),
+                       sin(59.998718*TMath::Pi()/180)*cos(-110.906418*TMath::Pi()/180),
+                       sin(107.998230*TMath::Pi()/180)*cos(-31.718048*TMath::Pi()/180));
+
+NAJD_Rot_col_X[21].SetXYZ(sin(35.999985*TMath::Pi()/180)*cos(-148.279953*TMath::Pi()/180),
+                       sin(120.001266*TMath::Pi()/180)*cos(-110.906418*TMath::Pi()/180),
+                       sin(72.001770*TMath::Pi()/180)*cos(-31.718033*TMath::Pi()/180));
+
+NAJD_Rot_col_X[22].SetXYZ(sin(108.000092*TMath::Pi()/180)*cos(-148.279999*TMath::Pi()/180),
+                       sin(144.002945*TMath::Pi()/180)*cos(-31.711838*TMath::Pi()/180),
+                       sin(60.003204*TMath::Pi()/180)*cos(-69.090851*TMath::Pi()/180));
+
+NAJD_Rot_col_X[23].SetXYZ(sin(71.999969*TMath::Pi()/180)*cos(148.279953*TMath::Pi()/180),
+                       sin(144.002945*TMath::Pi()/180)*cos(-148.288147*TMath::Pi()/180),
+                       sin(60.003204*TMath::Pi()/180)*cos(-110.909149*TMath::Pi()/180));
+
+NAJD_Rot_col_X[24].SetXYZ(sin(71.999908*TMath::Pi()/180)*cos(-31.719986*TMath::Pi()/180),
+                       sin(35.997025*TMath::Pi()/180)*cos(-148.288147*TMath::Pi()/180),
+                       sin(119.996796*TMath::Pi()/180)*cos(-110.909149*TMath::Pi()/180));
+
+NAJD_Rot_col_X[25].SetXYZ(sin(108.000031*TMath::Pi()/180)*cos(31.720001*TMath::Pi()/180),
+                       sin(35.997040*TMath::Pi()/180)*cos(-31.711838*TMath::Pi()/180),
+                       sin(119.996796*TMath::Pi()/180)*cos(-69.090851*TMath::Pi()/180));
+
+NAJD_Rot_col_X[26].SetXYZ(sin(0.000003*TMath::Pi()/180)*cos(58.279968*TMath::Pi()/180),
+                       sin(90.000076*TMath::Pi()/180)*cos(179.993988*TMath::Pi()/180),
+                       sin(89.999969*TMath::Pi()/180)*cos(-90.006027*TMath::Pi()/180));
+
+
+TVector3 NAJD_Rot_col_Y[27];
+NAJD_Rot_col_Y[0].SetXYZ(sin(0.000003*TMath::Pi()/180)*sin(-121.720016*TMath::Pi()/180),
+                    sin(90.000076*TMath::Pi()/180)*sin(-0.006011*TMath::Pi()/180),
+                    sin(89.999969*TMath::Pi()/180)*sin(89.993958*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[1].SetXYZ(sin(108.000092*TMath::Pi()/180)*sin(31.719986*TMath::Pi()/180),
+                    sin(144.002945*TMath::Pi()/180)*sin(148.288147*TMath::Pi()/180),
+                    sin(60.003204*TMath::Pi()/180)*sin(110.909149*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[2].SetXYZ(sin(71.999969*TMath::Pi()/180)*sin(-31.720016*TMath::Pi()/180),
+                    sin(144.002945*TMath::Pi()/180)*sin(31.711823*TMath::Pi()/180),
+                    sin(60.003204*TMath::Pi()/180)*sin(69.090851*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[3].SetXYZ(sin(71.999908*TMath::Pi()/180)*sin(148.279953*TMath::Pi()/180),
+                    sin(35.997025*TMath::Pi()/180)*sin(31.711823*TMath::Pi()/180),
+                    sin(119.996796*TMath::Pi()/180)*sin(69.090851*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[4].SetXYZ(sin(108.000031*TMath::Pi()/180)*sin(-148.279999*TMath::Pi()/180),
+                    sin(35.997040*TMath::Pi()/180)*sin(148.288147*TMath::Pi()/180),
+                    sin(119.996796*TMath::Pi()/180)*sin(110.909149*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[5].SetXYZ(sin(35.999985*TMath::Pi()/180)*sin(-148.279999*TMath::Pi()/180),
+                    sin(59.998718*TMath::Pi()/180)*sin(69.093582*TMath::Pi()/180),
+                    sin(107.998230*TMath::Pi()/180)*sin(148.281921*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[6].SetXYZ(sin(35.999985*TMath::Pi()/180)*sin(31.719986*TMath::Pi()/180),
+                    sin(120.001266*TMath::Pi()/180)*sin(69.093582*TMath::Pi()/180),
+                    sin(72.001770*TMath::Pi()/180)*sin(148.281921*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[7].SetXYZ(sin(143.999985*TMath::Pi()/180)*sin(-31.720016*TMath::Pi()/180),
+                    sin(120.001266*TMath::Pi()/180)*sin(110.906418*TMath::Pi()/180),
+                    sin(72.001770*TMath::Pi()/180)*sin(31.718048*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[8].SetXYZ(sin(143.999985*TMath::Pi()/180)*sin(148.279953*TMath::Pi()/180),
+                    sin(59.998718*TMath::Pi()/180)*sin(110.906418*TMath::Pi()/180),
+                    sin(107.998230*TMath::Pi()/180)*sin(31.718033*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[9].SetXYZ(sin(119.999146*TMath::Pi()/180)*sin(-69.093414*TMath::Pi()/180),
+                    sin(71.999146*TMath::Pi()/180)*sin(-148.280991*TMath::Pi()/180),
+                    sin(144.000320*TMath::Pi()/180)*sin(148.285690*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[10].SetXYZ(sin(119.999146*TMath::Pi()/180)*sin(110.906570*TMath::Pi()/180),
+                    sin(108.000854*TMath::Pi()/180)*sin(-148.281036*TMath::Pi()/180),
+                    sin(35.999664*TMath::Pi()/180)*sin(148.285690*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[11].SetXYZ(sin(60.000854*TMath::Pi()/180)*sin(-110.906570*TMath::Pi()/180),
+                    sin(108.000854*TMath::Pi()/180)*sin(-31.718948*TMath::Pi()/180),
+                    sin(35.999664*TMath::Pi()/180)*sin(31.714279*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[12].SetXYZ(sin(60.000854*TMath::Pi()/180)*sin(69.093414*TMath::Pi()/180),
+                    sin(71.999146*TMath::Pi()/180)*sin(-31.718948*TMath::Pi()/180),
+                    sin(144.000320*TMath::Pi()/180)*sin(31.714249*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[13].SetXYZ(sin(90.000076*TMath::Pi()/180)*sin(90.000076*TMath::Pi()/180),
+                    sin(0.006011*TMath::Pi()/180)*sin(-179.979675*TMath::Pi()/180),
+                    sin(89.993958*TMath::Pi()/180)*sin(0.000000*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[14].SetXYZ(sin(60.000854*TMath::Pi()/180)*sin(69.093414*TMath::Pi()/180),
+                    sin(108.000854*TMath::Pi()/180)*sin(148.280991*TMath::Pi()/180),
+                    sin(35.999664*TMath::Pi()/180)*sin(-148.285690*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[15].SetXYZ(sin(60.000854*TMath::Pi()/180)*sin(-110.906570*TMath::Pi()/180),
+                    sin(71.999146*TMath::Pi()/180)*sin(148.281036*TMath::Pi()/180),
+                    sin(144.000320*TMath::Pi()/180)*sin(-148.285690*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[16].SetXYZ(sin(119.999146*TMath::Pi()/180)*sin(110.906570*TMath::Pi()/180),
+                    sin(71.999146*TMath::Pi()/180)*sin(31.718964*TMath::Pi()/180),
+                    sin(144.000320*TMath::Pi()/180)*sin(-31.714264*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[17].SetXYZ(sin(119.999146*TMath::Pi()/180)*sin(-69.093414*TMath::Pi()/180),
+                    sin(108.000854*TMath::Pi()/180)*sin(31.718948*TMath::Pi()/180),
+                    sin(35.999664*TMath::Pi()/180)*sin(-31.714249*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[18].SetXYZ(sin(143.999985*TMath::Pi()/180)*sin(148.279953*TMath::Pi()/180),
+                    sin(120.001266*TMath::Pi()/180)*sin(-69.093582*TMath::Pi()/180),
+                    sin(72.001770*TMath::Pi()/180)*sin(-148.281921*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[19].SetXYZ(sin(143.999985*TMath::Pi()/180)*sin(-31.719986*TMath::Pi()/180),
+                    sin(59.998718*TMath::Pi()/180)*sin(-69.093582*TMath::Pi()/180),
+                    sin(107.998230*TMath::Pi()/180)*sin(-148.281921*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[20].SetXYZ(sin(35.999969*TMath::Pi()/180)*sin(31.720001*TMath::Pi()/180),
+                    sin(59.998718*TMath::Pi()/180)*sin(-110.906418*TMath::Pi()/180),
+                    sin(107.998230*TMath::Pi()/180)*sin(-31.718048*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[21].SetXYZ(sin(35.999985*TMath::Pi()/180)*sin(-148.279953*TMath::Pi()/180),
+                    sin(120.001266*TMath::Pi()/180)*sin(-110.906418*TMath::Pi()/180),
+                    sin(72.001770*TMath::Pi()/180)*sin(-31.718033*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[22].SetXYZ(sin(108.000092*TMath::Pi()/180)*sin(-148.279999*TMath::Pi()/180),
+                    sin(144.002945*TMath::Pi()/180)*sin(-31.711838*TMath::Pi()/180),
+                    sin(60.003204*TMath::Pi()/180)*sin(-69.090851*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[23].SetXYZ(sin(71.999969*TMath::Pi()/180)*sin(148.279953*TMath::Pi()/180),
+                    sin(144.002945*TMath::Pi()/180)*sin(-148.288147*TMath::Pi()/180),
+                    sin(60.003204*TMath::Pi()/180)*sin(-110.909149*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[24].SetXYZ(sin(71.999908*TMath::Pi()/180)*sin(-31.719986*TMath::Pi()/180),
+                    sin(35.997025*TMath::Pi()/180)*sin(-148.288147*TMath::Pi()/180),
+                    sin(119.996796*TMath::Pi()/180)*sin(-110.909149*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[25].SetXYZ(sin(108.000031*TMath::Pi()/180)*sin(31.720001*TMath::Pi()/180),
+                    sin(35.997040*TMath::Pi()/180)*sin(-31.711838*TMath::Pi()/180),
+                    sin(119.996796*TMath::Pi()/180)*sin(-69.090851*TMath::Pi()/180));
+
+NAJD_Rot_col_Y[26].SetXYZ(sin(0.000003*TMath::Pi()/180)*sin(58.279968*TMath::Pi()/180),
+                    sin(90.000076*TMath::Pi()/180)*sin(179.993988*TMath::Pi()/180),
+                    sin(89.999969*TMath::Pi()/180)*sin(-90.006027*TMath::Pi()/180));
+
+
+TVector3 NAJD_Rot_col_Z[27];
+NAJD_Rot_col_Z[0].SetXYZ(cos(0.000003*TMath::Pi()/180),
+                 cos(90.000076*TMath::Pi()/180),
+                 cos(89.999969*TMath::Pi()/180));
+NAJD_Rot_col_Z[1].SetXYZ(cos(108.000092*TMath::Pi()/180),
+                 cos(144.002945*TMath::Pi()/180),
+                 cos(60.003204*TMath::Pi()/180));
+NAJD_Rot_col_Z[2].SetXYZ(cos(71.999969*TMath::Pi()/180),
+                 cos(144.002945*TMath::Pi()/180),
+                 cos(60.003204*TMath::Pi()/180));
+NAJD_Rot_col_Z[3].SetXYZ(cos(71.999908*TMath::Pi()/180),
+                 cos(35.997025*TMath::Pi()/180),
+                 cos(119.996796*TMath::Pi()/180));
+NAJD_Rot_col_Z[4].SetXYZ(cos(108.000031*TMath::Pi()/180),
+                 cos(35.997040*TMath::Pi()/180),
+                 cos(119.996796*TMath::Pi()/180));
+NAJD_Rot_col_Z[5].SetXYZ(cos(35.999985*TMath::Pi()/180),
+                 cos(59.998718*TMath::Pi()/180),
+                 cos(107.998230*TMath::Pi()/180));
+NAJD_Rot_col_Z[6].SetXYZ(cos(35.999985*TMath::Pi()/180),
+                 cos(120.001266*TMath::Pi()/180),
+                 cos(72.001770*TMath::Pi()/180));
+NAJD_Rot_col_Z[7].SetXYZ(cos(143.999985*TMath::Pi()/180),
+                 cos(120.001266*TMath::Pi()/180),
+                 cos(72.001770*TMath::Pi()/180));
+NAJD_Rot_col_Z[8].SetXYZ(cos(143.999985*TMath::Pi()/180),
+                 cos(59.998718*TMath::Pi()/180),
+                 cos(107.998230*TMath::Pi()/180));
+NAJD_Rot_col_Z[9].SetXYZ(cos(119.999146*TMath::Pi()/180),
+                 cos(71.999146*TMath::Pi()/180),
+                 cos(144.000320*TMath::Pi()/180));
+NAJD_Rot_col_Z[10].SetXYZ(cos(119.999146*TMath::Pi()/180),
+                 cos(108.000854*TMath::Pi()/180),
+                 cos(35.999664*TMath::Pi()/180));
+NAJD_Rot_col_Z[11].SetXYZ(cos(60.000854*TMath::Pi()/180),
+                 cos(108.000854*TMath::Pi()/180),
+                 cos(35.999664*TMath::Pi()/180));
+NAJD_Rot_col_Z[12].SetXYZ(cos(60.000854*TMath::Pi()/180),
+                 cos(71.999146*TMath::Pi()/180),
+                 cos(144.000320*TMath::Pi()/180));
+NAJD_Rot_col_Z[13].SetXYZ(cos(90.000076*TMath::Pi()/180),
+                 cos(0.006011*TMath::Pi()/180),
+                 cos(89.993958*TMath::Pi()/180));
+NAJD_Rot_col_Z[14].SetXYZ(cos(60.000854*TMath::Pi()/180),
+                 cos(108.000854*TMath::Pi()/180),
+                 cos(35.999664*TMath::Pi()/180));
+NAJD_Rot_col_Z[15].SetXYZ(cos(60.000854*TMath::Pi()/180),
+                 cos(71.999146*TMath::Pi()/180),
+                 cos(144.000320*TMath::Pi()/180));
+NAJD_Rot_col_Z[16].SetXYZ(cos(119.999146*TMath::Pi()/180),
+                 cos(71.999146*TMath::Pi()/180),
+                 cos(144.000320*TMath::Pi()/180));
+NAJD_Rot_col_Z[17].SetXYZ(cos(119.999146*TMath::Pi()/180),
+                 cos(108.000854*TMath::Pi()/180),
+                 cos(35.999664*TMath::Pi()/180));
+NAJD_Rot_col_Z[18].SetXYZ(cos(143.999985*TMath::Pi()/180),
+                 cos(120.001266*TMath::Pi()/180),
+                 cos(72.001770*TMath::Pi()/180));
+NAJD_Rot_col_Z[19].SetXYZ(cos(143.999985*TMath::Pi()/180),
+                 cos(59.998718*TMath::Pi()/180),
+                 cos(107.998230*TMath::Pi()/180));
+NAJD_Rot_col_Z[20].SetXYZ(cos(35.999969*TMath::Pi()/180),
+                 cos(59.998718*TMath::Pi()/180),
+                 cos(107.998230*TMath::Pi()/180));
+NAJD_Rot_col_Z[21].SetXYZ(cos(35.999985*TMath::Pi()/180),
+                 cos(120.001266*TMath::Pi()/180),
+                 cos(72.001770*TMath::Pi()/180));
+NAJD_Rot_col_Z[22].SetXYZ(cos(108.000092*TMath::Pi()/180),
+                 cos(144.002945*TMath::Pi()/180),
+                 cos(60.003204*TMath::Pi()/180));
+NAJD_Rot_col_Z[23].SetXYZ(cos(71.999969*TMath::Pi()/180),
+                 cos(144.002945*TMath::Pi()/180),
+                 cos(60.003204*TMath::Pi()/180));
+NAJD_Rot_col_Z[24].SetXYZ(cos(71.999908*TMath::Pi()/180),
+                 cos(35.997025*TMath::Pi()/180),
+                 cos(119.996796*TMath::Pi()/180));
+NAJD_Rot_col_Z[25].SetXYZ(cos(108.000031*TMath::Pi()/180),
+                 cos(35.997040*TMath::Pi()/180),
+                 cos(119.996796*TMath::Pi()/180));
+NAJD_Rot_col_Z[26].SetXYZ(cos(0.000003*TMath::Pi()/180),
+                 cos(90.000076*TMath::Pi()/180),
+                 cos(89.999969*TMath::Pi()/180));
+
+
+
+
+
+
+
+//////
+
 }   
 
 
