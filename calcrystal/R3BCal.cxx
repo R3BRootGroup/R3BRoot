@@ -1400,8 +1400,6 @@ TVector3 col_Z_m2_TRB2(TMath::Cos(90.*TMath::Pi()/180),
 	 
    }//! for iter2  
 
-
-
    //-- TRC  part
    // Shape: TRC1 type: TGeoTrap
    dz     = 10.000000;
@@ -2248,8 +2246,6 @@ TVector3 col_Z_m3_TRC3(cos(90.*pi/180),
 
 
 
-
-
 // TRAP part
 // some other specs
    // Shape: TRAP1 type: TGeoTrap
@@ -2604,12 +2600,95 @@ NAJD_Rot_col_Z[26].SetXYZ(cos(0.000003*TMath::Pi()/180),
                  cos(89.999969*TMath::Pi()/180));
 
 
+TVector3 col_X_m1_TRAP1(sin(90.*TMath::Pi()/180)*cos(0.*TMath::Pi()/180),
+                       sin(93.886*TMath::Pi()/180)*cos(90.*TMath::Pi()/180),
+                       sin(3.886*TMath::Pi()/180)*cos(90.*TMath::Pi()/180));
+TVector3 col_X_m2_TRAP2(sin(90.*TMath::Pi()/180)*cos(180.*TMath::Pi()/180),
+                       sin(93.886*TMath::Pi()/180)*cos(270.*TMath::Pi()/180),
+                       sin(3.886*TMath::Pi()/180)*cos(270.*TMath::Pi()/180));
+TVector3 col_Y_m1_TRAP1(sin(90.*TMath::Pi()/180)*sin(0.*TMath::Pi()/180),
+                       sin(93.886*TMath::Pi()/180)*sin(90.*TMath::Pi()/180),
+                       sin(3.886*TMath::Pi()/180)*sin(90.*TMath::Pi()/180));
+TVector3 col_Y_m2_TRAP2(sin(90.*TMath::Pi()/180)*sin(180.*TMath::Pi()/180),
+                       sin(93.886*TMath::Pi()/180)*sin(270.*TMath::Pi()/180),
+                       sin(3.886*TMath::Pi()/180)*sin(270.*TMath::Pi()/180));
+TVector3 col_Z_m1_TRAP1(cos(90.*TMath::Pi()/180),
+                       cos(93.886*TMath::Pi()/180),
+                       cos(3.886*TMath::Pi()/180));
+TVector3 col_Z_m2_TRAP2(cos(90.*TMath::Pi()/180),
+                       cos(93.886*TMath::Pi()/180),
+                       cos(3.886*TMath::Pi()/180));
 
 
+    // - Adapted from R3BSim Geant4 definition
+    // - Using the new templated Math ROOT Library
+    // - <D.Bertini@gsi.de>
 
 
+   //-  TRB1
+   //--- Fill info for global Rotation / Translation
+    Double_t fRotable0_1[9] = {
+	    col_X_m1_TRAP1.X(),col_X_m1_TRAP1.Y(),col_X_m1_TRAP1.Z(),
+	    col_Y_m1_TRAP1.X(),col_Y_m1_TRAP1.Y(),col_Y_m1_TRAP1.Z(),
+	    col_Z_m1_TRAP1.X(),col_Z_m1_TRAP1.Y(),col_Z_m1_TRAP1.Z(),
+	 };
+    ROOT::Math::XYZPoint tra1_TRAP1(0.,23.78/10.,0.);
+    ROOT::Math::Rotation3D *pm1_TRAP1 = new ROOT::Math::Rotation3D(
+					    fRotable0_1[0],fRotable0_1[3],fRotable0_1[6],
+					    fRotable0_1[1],fRotable0_1[4],fRotable0_1[7],
+					    fRotable0_1[2],fRotable0_1[5],fRotable0_1[8]
+					    );
+   //--- Single Crystal definition
+   TGeoRotation *pIndividualRot_1=NULL;
+   TGeoRotation *pRingRot_1 = NULL;
 
-//////
+      for(Int_t iter2=0 ; iter2<27 ; iter2++) {
+	 Double_t fRotable1_1[9] = {
+	    NAJD_Rot_col_X[iter2].X(),NAJD_Rot_col_X[iter2].Y(),NAJD_Rot_col_X[iter2].Z(),
+	    NAJD_Rot_col_Y[iter2].X(),NAJD_Rot_col_Y[iter2].Y(),NAJD_Rot_col_Y[iter2].Z(),
+	    NAJD_Rot_col_Z[iter2].X(),NAJD_Rot_col_Z[iter2].Y(),NAJD_Rot_col_Z[iter2].Z()
+	 };
+	 
+	 pIndividualRot_1 = new TGeoRotation();
+	 pIndividualRot_1->SetMatrix(fRotable1_1);
+
+
+	 ROOT::Math::Rotation3D *pIndRot_1 = new ROOT::Math::Rotation3D(
+					    fRotable1_1[0],fRotable1_1[3],fRotable1_1[6],
+					    fRotable1_1[1],fRotable1_1[4],fRotable1_1[7],
+					    fRotable1_1[2],fRotable1_1[5],fRotable1_1[8]
+					    );
+
+	 
+	 ROOT::Math::Rotation3D pIndRotInv_1 = pIndRot_1->Inverse();
+	 dx =  NAJD_X[iter2]/10.;
+	 dy =  NAJD_Y[iter2]/10.;
+	 dz =  NAJD_Z[iter2]/10.;
+	 ROOT::Math::XYZPoint tt_1(dx,dy,dz);
+	 ROOT::Math::XYZPoint ttt_1(0.0,0.0,0.0);
+	 ttt_1 = pIndRotInv_1 * tra1_TRAP1;
+	 ttt_1.SetX(ttt_1.X() + tt_1.X());
+	 ttt_1.SetY(ttt_1.Y() + tt_1.Y());
+	 ttt_1.SetZ(ttt_1.Z() + tt_1.Z());
+
+	 ROOT::Math::Rotation3D pRingTmp_1;
+         pRingTmp_1 = (*pm1_TRAP1) * (*pIndRot_1);
+	 Double_t fRotable2_1[9]={0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
+	 pRingTmp_1.GetComponents(
+					    fRotable2_1[0],fRotable2_1[3],fRotable2_1[6],
+					    fRotable2_1[1],fRotable2_1[4],fRotable2_1[7],
+					    fRotable2_1[2],fRotable2_1[5],fRotable2_1[8]
+	    );
+	 pRingRot_1 = new TGeoRotation();
+	 pRingRot_1->SetMatrix(fRotable2_1);
+       	 TGeoTranslation *trans_1 = new TGeoTranslation(ttt_1.X(),ttt_1.Y(),ttt_1.Z());
+	 TGeoCombiTrans *combi_1 = new TGeoCombiTrans(*trans_1,*pRingRot_1);
+	 
+         // Add the Node in CBLogWorld
+	 pCBLogWorld->AddNode(pcrystalLogNAJD, iter2, combi_1);
+	 
+   }//! for iter2  
+
 
 }   
 
