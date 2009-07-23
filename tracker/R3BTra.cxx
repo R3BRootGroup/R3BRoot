@@ -281,13 +281,13 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
 // -----   Public method EndOfEvent   -----------------------------------------
 void R3BTra::BeginEvent() {
 
-  cout << "-I- begin tracker event called ##########" << endl;
+//  cout << "-I- begin tracker event called ##########" << endl;
 
   if(gGeoManager){
     TGeoVolume * vol=gGeoManager->FindVolumeFast("TraLog");
   
     if(vol){
-      cout << "id tracker serial number : " << vol->GetNumber() << endl;
+       //    cout << "id tracker serial number : " << vol->GetNumber() << endl;
     }
   }
 
