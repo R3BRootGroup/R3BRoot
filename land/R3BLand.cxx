@@ -95,9 +95,9 @@ void R3BLand::Initialize()
 
 cout << "-I- R3BLand initialistion " << endl;
 cout << "-I- Vol ID " << endl;
-cout << "-I- MC id box3 : " << gMC->VolId("padle_h_box3") << endl;
-cout << "-I- MC id box4 : " << gMC->VolId("padle_h_box4") << endl;
-cout << "-I- MC id box5 : " << gMC->VolId("padle_h_box5") << endl;
+//cout << "-I- MC id box3 : " << gMC->VolId("padle_h_box3") << endl;
+//cout << "-I- MC id box4 : " << gMC->VolId("padle_h_box4") << endl;
+//cout << "-I- MC id box5 : " << gMC->VolId("padle_h_box5") << endl;
 
  Int_t id1 = gMC->VolId("padle_h_box3");
  Int_t id2 = gMC->VolId("padle_h_box4");
@@ -185,10 +185,10 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
       }
 
       if ( fPosIn.Z() < 30. && newpos[2] > 30.02 ) {
-	cerr << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] 
+	cerr << "-I- R3BLand : 2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] 
 	     << " with safety = " << safety << endl;
-	cerr << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << endl;
-	cerr << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << endl;
+	cerr << "-I- R3BLand oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << endl;
+	cerr << "-I- R3BLand newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << endl;
       }
 
       fPosOut.SetX(newpos[0]);
@@ -230,19 +230,19 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
 
 // -----   Public method EndOfEvent   -----------------------------------------
 void R3BLand::BeginEvent() {
-    cout << "-I- begin event called ############################# " << endl;
+   // cout << "-I- begin event called ############################# " << endl;
 
     if (gGeoManager) {
 
     TGeoVolume * vol = gGeoManager->FindVolumeFast("padle_h_box3");
 
-    cout << "UID box3 : " << gGeoManager->GetUID("padle_h_box3") << endl;
-    cout << "UID box4 : " << gGeoManager->GetUID("padle_h_box4") << endl;
-    cout << "UID box5 : " << gGeoManager->GetUID("padle_h_box5") << endl;
+    // cout << "UID box3 : " << gGeoManager->GetUID("padle_h_box3") << endl;
+    //cout << "UID box4 : " << gGeoManager->GetUID("padle_h_box4") << endl;
+    //cout << "UID box5 : " << gGeoManager->GetUID("padle_h_box5") << endl;
 
 	    if (vol) {
 
-		cout << "id box3 serial number: " << vol->GetNumber() << endl;
+	       //	cout << "id box3 serial number: " << vol->GetNumber() << endl;
 
 	    }
 
@@ -460,7 +460,7 @@ void R3BLand::ConstructGeometry() {
 				    padle_h_dim3y,
 				    padle_h_dim3z);
 
-    cout << " box3: " << padle_h_box3->GetNumber() << endl;
+  //cout << " box3: " << padle_h_box3->GetNumber() << endl;
 
 
 
@@ -474,7 +474,7 @@ void R3BLand::ConstructGeometry() {
 				    padle_h_dim4y,
 				    padle_h_dim4z);
 
-    cout << " box4: " << padle_h_box4->GetNumber() << endl;
+  // cout << " box4: " << padle_h_box4->GetNumber() << endl;
 
 
   //------------------ BC408 sheets -----------------------------------------
@@ -490,7 +490,7 @@ void R3BLand::ConstructGeometry() {
 				    padle_h_dim5z);
 
 
-  cout << " box5: " << padle_h_box5->GetNumber() << endl;
+  // cout << " box5: " << padle_h_box5->GetNumber() << endl;
 
 
  // Make the elementary assembly of the whole structure
