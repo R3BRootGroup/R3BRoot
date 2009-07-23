@@ -1,3 +1,15 @@
+//   ----- General Macro for R3B simulation 
+//
+//   Usage inside ROOT interpreter: 
+//        1) root -l
+//        2)[root] .L r3ball.C 
+//                         
+//        3)[root] r3ball( nevt,
+//                         CALVersion,    // (0 -> CALIFA, 1-> Crystal BALL )
+//                         TargetType,    // "LeadTarget" 
+//                         Visualization, // kFalse or kTRUE   
+//                         fMC )          // "TGeant3" or "TGeant4"   
+
 void r3ball(Int_t nEvents = 1,
 	    Int_t fCaloVersion = 0,
 	    TString Target = "LeadTarget",
