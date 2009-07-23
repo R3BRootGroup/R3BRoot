@@ -9,6 +9,15 @@
 #ifndef FAIRDETECTORLIST_H
 #define FAIRDETECTORLIST_H 1
  
-enum DetectorId {kREF, kMVD, kSTS, kRICH, kMUCH, kTRD, kTOF, kECAL, kZDC, kSTT,kTutDet};
+enum DetectorId {kREF,
+		 kCAL,
+		 kCALIFA,
+		 kTRA,
+		 kTOF,
+		 kMTOF,
+		 kGFI,
+		 kDCH,
+		 kLAND ,
+		 kTutDet};
 
 #endif
