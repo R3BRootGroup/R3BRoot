@@ -48,7 +48,7 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BCalo::R3BCalo() : FairDetector("R3BCalo", kTRUE, kSTS) {
+R3BCalo::R3BCalo() : FairDetector("R3BCalo", kTRUE, kCALIFA) {
   ResetParameters();
   fCaloCollection = new TClonesArray("R3BCaloPoint");
   fPosIndex = 0;
@@ -63,7 +63,7 @@ R3BCalo::R3BCalo() : FairDetector("R3BCalo", kTRUE, kSTS) {
 
 // -----   Standard constructor   ------------------------------------------
 R3BCalo::R3BCalo(const char* name, Bool_t active) 
-  : FairDetector(name, active, kSTS) {
+  : FairDetector(name, active, kCALIFA) {
   ResetParameters();
   fCaloCollection = new TClonesArray("R3BCaloPoint");
   fPosIndex = 0;
@@ -199,7 +199,7 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol) {
     
     // Increment number of CaloPoints for this track
     FairStack* stack = (FairStack*) gMC->GetStack();
-    stack->AddPoint(kSTS);
+    stack->AddPoint(kCALIFA);
     
     ResetParameters();
   }
