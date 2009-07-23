@@ -48,7 +48,7 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BDch::R3BDch() : FairDetector("R3BDch", kTRUE, kSTS) {
+R3BDch::R3BDch() : FairDetector("R3BDch", kTRUE, kDCH) {
   ResetParameters();
   fDchCollection = new TClonesArray("R3BDchPoint");
   fPosIndex = 0;
@@ -63,7 +63,7 @@ R3BDch::R3BDch() : FairDetector("R3BDch", kTRUE, kSTS) {
 
 // -----   Standard constructor   ------------------------------------------
 R3BDch::R3BDch(const char* name, Bool_t active) 
-  : FairDetector(name, active, kSTS) {
+  : FairDetector(name, active, kDCH) {
   ResetParameters();
   fDchCollection = new TClonesArray("R3BDchPoint");
   fPosIndex = 0;
@@ -173,7 +173,7 @@ Bool_t R3BDch::ProcessHits(FairVolume* vol) {
     
     // Increment number of DchPoints for this track
     FairStack* stack = (FairStack*) gMC->GetStack();
-    stack->AddPoint(kSTS);
+    stack->AddPoint(kDCH);
     
     ResetParameters();
   }
