@@ -80,9 +80,9 @@ void r3bcal(Int_t nEvents = 1)
   run->AddModule(mag);
 
 
-   FairDetector* cal = new R3BCal("CrystalCal", kTRUE);
-   ((R3BCal*)cal)->SetGeometryVersion(2);
-   run->AddModule(cal);
+  //R3B Crystal Calorimeter
+  FairDetector* cal = new R3BCal("CrystalCal", kTRUE);
+  run->AddModule(cal);
 
 
   // Tracker
@@ -160,7 +160,7 @@ void r3bcal(Int_t nEvents = 1)
 
 
   // -----   Start run   ----------------------------------------------------
-//  run->Run(10);
+  run->Run(1);
   
   // -----   Finish   -------------------------------------------------------
   timer.Stop();
