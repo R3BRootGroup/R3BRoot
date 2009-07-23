@@ -86,6 +86,35 @@ R3BCalo::~R3BCalo() {
   }
 }
 // -------------------------------------------------------------------------
+void R3BCalo::Initialize()
+{
+  FairDetector::Initialize();
+
+   cout << endl;
+    cout << "-I- R3BCalo initialisation" << endl;
+    cout << "-I- Getting Vol IDs" << endl;
+    Char_t buffer[126];
+
+    for (Int_t i=0;i<30;i++ ) {
+     sprintf(buffer,"crystalLog%i",i+1);
+     cout << "-I- R3BCalo Crystal Nb   : " << i << " connected to Mc:ID ---> " <<  gMC->VolId(buffer)<< endl;
+     fCrystalType[i] = gMC->VolId(buffer);
+    }
+
+}
+
+
+void R3BCalo::SetSpecialPhysicsCuts(){
+
+   cout << endl;
+
+   cout << "-I- R3BCal Adding customized Physics cut ... " << endl;
+   cout << "-I- Yet not implemented !... " << endl;
+
+   cout << endl;
+
+}
+
 
 
 
@@ -98,7 +127,7 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol) {
    Int_t volId1=-1;
    // Crystals Ids
    volId1 =  gMC->CurrentVolID(cp1);
-
+   Int_t fType = GetCrystalType(volId1);
 
     if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
@@ -161,7 +190,7 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol) {
       fPosOut.SetZ(newpos[2]);
     }
 
-    AddHit(fTrackID, fVolumeID, volId1 , cp1 ,
+    AddHit(fTrackID, fVolumeID, fType , cp1 ,
 	   TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
 	   TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
 	   TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
