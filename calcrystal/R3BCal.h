@@ -114,7 +114,14 @@ class R3BCal : public FairDetector
   virtual void ConstructGeometry2();
   void SetGeometryVersion( Int_t vers ) { fGeoVersion = vers;}
 
-//  void SaveGeoParams();
+  virtual void Initialize();
+  virtual void SetSpecialPhysicsCuts();
+  void SetEnergyCutOff( Double_t cutE ){fCutE = cutE;}
+  Double_t  GetEnergyCutOff ( ) {return fCutE;}
+
+
+
+
 
   private:
 
@@ -128,6 +135,7 @@ class R3BCal : public FairDetector
     Double32_t     fTime;              //!  time
     Double32_t     fLength;            //!  length
     Double32_t     fELoss;             //!  energy loss
+    Double32_t     fCutE;             //!  energy loss
 
     Int_t          fPosIndex;          //!
     TClonesArray*  fCalCollection;     //!  The hit collection
@@ -135,12 +143,16 @@ class R3BCal : public FairDetector
     TList *flGeoPar; //!
     Int_t fGeoVersion;
 
+    Int_t fTypeA;
+    Int_t fTypeB;
+    Int_t fTypeC;
+    Int_t fTypeD;
     
     /** Private method AddHit
      **
      ** Adds a CalPoint to the HitCollection
      **/
-    R3BCalPoint* AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
+    R3BCalPoint* AddHit(Int_t trackID, Int_t detID, Int_t type, Int_t cp, TVector3 posIn,
 			TVector3 pos_out, TVector3 momIn, 
 			TVector3 momOut, Double_t time, 
 			Double_t length, Double_t eLoss);
@@ -153,9 +165,23 @@ class R3BCal : public FairDetector
     void ResetParameters();
    TGeoRotation* createMatrix( Double_t phi, Double_t theta, Double_t psi);
 
+    Int_t  GetCrystalType(Int_t volID);
+
+
     ClassDef(R3BCal,1);
 
 };
+
+inline Int_t R3BCal::GetCrystalType(Int_t volID) {
+Int_t type=-1;
+
+if (volID==fTypeA) { type=1;return (type);}
+if (volID==fTypeB) { type=2;return (type);}
+if (volID==fTypeC) { type=3;return (type);}
+if (volID==fTypeD) { type=4;return (type);}
+
+return type;
+}
 
 
 inline void R3BCal::ResetParameters() {
