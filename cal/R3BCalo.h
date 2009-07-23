@@ -110,6 +110,12 @@ class R3BCalo : public FairDetector
    **/
   virtual void ConstructGeometry();
 
+  virtual void Initialize();
+  virtual void SetSpecialPhysicsCuts();
+  void SetEnergyCutOff( Double_t cutE ){fCutE = cutE;}
+  Double_t  GetEnergyCutOff ( ) {return fCutE;}
+
+
 
 //  void SaveGeoParams();
 
@@ -125,11 +131,13 @@ class R3BCalo : public FairDetector
     Double32_t     fTime;              //!  time
     Double32_t     fLength;            //!  length
     Double32_t     fELoss;             //!  energy loss
-
+    Double32_t     fCutE;             //!  energy loss
     Int_t          fPosIndex;          //!
     TClonesArray*  fCaloCollection;     //!  The hit collection
     Bool_t         kGeoSaved;          //!
     TList *flGeoPar; //!
+    Int_t fCrystalType[30];
+
 
     /** Private method AddHit
      **
@@ -149,10 +157,24 @@ class R3BCalo : public FairDetector
     void ResetParameters();
    TGeoRotation* createMatrix( Double_t phi, Double_t theta, Double_t psi);
 
-
+   Int_t  GetCrystalType(Int_t volID);
 
     ClassDef(R3BCalo,1);
 };
+
+inline Int_t R3BCalo::GetCrystalType(Int_t volID) {
+Int_t type=-1;
+
+for (Int_t i=0;i<30;i++ ){
+    if (volID==fCrystalType[i]) {
+	type=i+1; //
+	return (type);
+    }
+}
+return type;
+}
+
+
 
 
 inline void R3BCalo::ResetParameters() {
