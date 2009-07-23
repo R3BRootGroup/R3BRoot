@@ -48,7 +48,7 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BTof::R3BTof() : FairDetector("R3BTof", kTRUE, kSTS) {
+R3BTof::R3BTof() : FairDetector("R3BTof", kTRUE, kTOF) {
   ResetParameters();
   fTofCollection = new TClonesArray("R3BTofPoint");
   fPosIndex = 0;
@@ -64,7 +64,7 @@ R3BTof::R3BTof() : FairDetector("R3BTof", kTRUE, kSTS) {
 
 // -----   Standard constructor   ------------------------------------------
 R3BTof::R3BTof(const char* name, Bool_t active) 
-  : FairDetector(name, active, kSTS) {
+  : FairDetector(name, active, kTOF) {
   ResetParameters();
   fTofCollection = new TClonesArray("R3BTofPoint");
   fPosIndex = 0;
@@ -228,7 +228,7 @@ Bool_t R3BTof::ProcessHits(FairVolume* vol) {
     
     // Increment number of TofPoints for this track
     FairStack* stack = (FairStack*) gMC->GetStack();
-    stack->AddPoint(kSTS);
+    stack->AddPoint(kTOF);
     
     ResetParameters();
   }

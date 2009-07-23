@@ -50,7 +50,7 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BTra::R3BTra() : FairDetector("R3BTra", kTRUE, kSTS) {
+R3BTra::R3BTra() : FairDetector("R3BTra", kTRUE, kTRA) {
   ResetParameters();
   fTraCollection = new TClonesArray("R3BTraPoint");
   fPosIndex = 0;
@@ -66,7 +66,7 @@ R3BTra::R3BTra() : FairDetector("R3BTra", kTRUE, kSTS) {
 
 // -----   Standard constructor   ------------------------------------------
 R3BTra::R3BTra(const char* name, Bool_t active) 
-  : FairDetector(name, active, kSTS) {
+  : FairDetector(name, active, kTRA) {
   ResetParameters();
   fTraCollection = new TClonesArray("R3BTraPoint");
   fPosIndex = 0;
@@ -255,7 +255,7 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
     
     // Increment number of TraPoints for this track
     FairStack* stack = (FairStack*) gMC->GetStack();
-    stack->AddPoint(kSTS);
+    stack->AddPoint(kTRA);
     
     ResetParameters();
   }

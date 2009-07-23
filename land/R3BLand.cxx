@@ -49,7 +49,7 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BLand::R3BLand() : FairDetector("R3BLand", kTRUE, kSTS) {
+R3BLand::R3BLand() : FairDetector("R3BLand", kTRUE, kLAND) {
   ResetParameters();
   fLandCollection = new TClonesArray("R3BLandPoint");
   fPosIndex = 0;
@@ -64,7 +64,7 @@ R3BLand::R3BLand() : FairDetector("R3BLand", kTRUE, kSTS) {
 
 // -----   Standard constructor   ------------------------------------------
 R3BLand::R3BLand(const char* name, Bool_t active) 
-  : FairDetector(name, active, kSTS) {
+  : FairDetector(name, active, kLAND) {
   ResetParameters();
   fLandCollection = new TClonesArray("R3BLandPoint");
   fPosIndex = 0;
@@ -205,7 +205,7 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
     
     // Increment number of LandPoints for this track
     FairStack* stack = (FairStack*) gMC->GetStack();
-    stack->AddPoint(kSTS);
+    stack->AddPoint(kLAND);
     
     ResetParameters();
   }

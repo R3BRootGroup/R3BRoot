@@ -48,7 +48,7 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BGfi::R3BGfi() : FairDetector("R3BGfi", kTRUE, kSTS) {
+R3BGfi::R3BGfi() : FairDetector("R3BGfi", kTRUE, kGFI) {
   ResetParameters();
   fGfiCollection = new TClonesArray("R3BGfiPoint");
   fPosIndex = 0;
@@ -64,7 +64,7 @@ R3BGfi::R3BGfi() : FairDetector("R3BGfi", kTRUE, kSTS) {
 
 // -----   Standard constructor   ------------------------------------------
 R3BGfi::R3BGfi(const char* name, Bool_t active) 
-  : FairDetector(name, active, kSTS) {
+  : FairDetector(name, active, kGFI) {
   ResetParameters();
   fGfiCollection = new TClonesArray("R3BGfiPoint");
   fPosIndex = 0;
@@ -234,7 +234,7 @@ Bool_t R3BGfi::ProcessHits(FairVolume* vol) {
     
     // Increment number of GfiPoints for this track
     FairStack* stack = (FairStack*) gMC->GetStack();
-    stack->AddPoint(kSTS);
+    stack->AddPoint(kGFI);
     
     ResetParameters();
   }
