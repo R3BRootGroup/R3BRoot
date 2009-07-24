@@ -33,15 +33,13 @@ eventDisplay()
   FairRunAna *fRun= new FairRunAna();
  
   fRun->SetInputFile("r3bsim.root");
-  
-  //fRun->SetInputFile("../dsk/sim_dsk.root");
- // fRun->SetInputFile("../dsk/sim_dsk.g4native.root");
+
   fRun->SetOutputFile("test.root");
   fRun->LoadGeometry();
 
   FairEventManager *fMan= new FairEventManager();
   FairMCTracks *Track =  new FairMCTracks ("Monte-Carlo Tracks");
-  FairMCPointDraw *LandPoints =   new FairMCPointDraw ("LandPoint",kOrange,  kFullSquare);
+//  FairMCPointDraw *LandPoints =   new FairMCPointDraw ("LandPoint",kOrange,  kFullSquare);
 
                                                                
   fMan->AddTask(Track);
