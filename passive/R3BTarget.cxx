@@ -495,7 +495,7 @@ void R3BTarget::ConstructGeometry4(){
    pTarget3_log = new TGeoVolume("Target3",pTarget3, pMed15);
    pTarget3_log->SetVisLeaves(kTRUE);
    pTargetEnveloppe_log->AddNode(pTarget3_log, 0, pMatrix8);
-   pTargetEnveloppe_log->AddNode(pTarget3_log, 0, pMatrix10);
+   pTargetEnveloppe_log->AddNode(pTarget3_log, 1, pMatrix10);
 
 }
 
