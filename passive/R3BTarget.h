@@ -3,6 +3,8 @@
 
 #include "FairDetector.h"
 #include "FairModule.h"
+#include <TString.h>
+
 
 class R3BTarget : public FairModule {
   public:
@@ -10,7 +12,15 @@ class R3BTarget : public FairModule {
     R3BTarget();
     virtual ~R3BTarget();
     virtual void ConstructGeometry();
-    ClassDef(R3BTarget,1) 
+
+ protected:
+     TString *fTargetName;
+     void ConstructGeometry1();
+     void ConstructGeometry2();
+     void ConstructGeometry3();
+     void ConstructGeometry4();
+
+    ClassDef(R3BTarget,1)
   
 };
 
