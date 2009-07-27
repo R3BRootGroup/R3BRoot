@@ -21,21 +21,53 @@
 #include "TGeoMaterial.h"
 #include "TGeoMedium.h"
 #include "TGeoBBox.h"
+#include "TGeoPara.h"
+#include "TGeoTube.h"
+#include "TGeoBoolNode.h"
+
+#include <iostream>
+
+using namespace std;
 
 R3BTarget::~R3BTarget()
 {
+if (fTargetName ) delete fTargetName;
 }
+
+
 R3BTarget::R3BTarget()
 {
+fTargetName=NULL;
 }
 
 R3BTarget::R3BTarget(const char * name,  const char * title)
   : FairModule(name ,title)
 {
+
+fTargetName =  new TString(name);
+
 }
 
+
 void R3BTarget::ConstructGeometry(){
-// test of out-of-file geometry definition
+
+ if (*fTargetName == "LeadTarget") return  ConstructGeometry1();
+ if (*fTargetName == "Para")       return  ConstructGeometry2();
+ if (*fTargetName == "Para45")     return  ConstructGeometry3();
+ if (*fTargetName == "LiH")        return  ConstructGeometry4();
+
+}
+
+
+
+void R3BTarget::ConstructGeometry1(){
+
+    cout << endl;
+    cout << "-I- R3BTarget:: ConstructGeometry() "<< endl;
+    cout << "-I- R3BTarget Target type:lead target (200mg/cm2) "<< endl;
+    cout << endl;
+
+  // test of out-of-file geometry definition
 
   Double_t dx, dy, dz;
   Double_t thx, thy, thz;
@@ -88,44 +120,384 @@ void R3BTarget::ConstructGeometry(){
 
 }
 
+void R3BTarget::ConstructGeometry2(){
 
-/*
-void R3BTarget::ConstructGeometry()
-{
-	FairGeoLoader *loader=FairGeoLoader::Instance();
-	FairGeoInterface *GeoInterface =loader->getGeoInterface();
-	R3BGeoTarget *MGeo=new R3BGeoTarget();
-	MGeo->setGeomFile(GetGeometryFileName());
-	GeoInterface->addGeoModule(MGeo);
-	Bool_t rc = GeoInterface->readSet(MGeo);
-	if ( rc ) MGeo->create(loader->getGeoBuilder());
+    cout << endl;
+    cout << "-I- R3BTarget:: ConstructGeometry() "<< endl;
+    cout << "-I- R3BTarget Target type: Parafine @ 0 deg  "<< endl;
+    cout << endl;
 
-        TList* volList = MGeo->getListOfVolumes();
-        // store geo parameter
-        FairRun *fRun = FairRun::Instance();
-        FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
-        R3BGeoPassivePar* par=(R3BGeoPassivePar*)(rtdb->getContainer("R3BGeoPassivePar"));
-        TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
-        TObjArray *fPassNodes = par->GetGeoPassiveNodes();
+   Double_t dx,dy,dz;
+   Double_t dx1, dx2, dy1, dy2;
+   Double_t vert[20], par[20];
+   Double_t theta, phi, h1, bl1, tl1, alpha1, h2, bl2, tl2, alpha2;
+   Double_t twist;
+   Double_t origin[3];
+   Double_t rmin, rmax, rmin1, rmax1, rmin2, rmax2;
+   Double_t r, rlo, rhi;
+   Double_t a,b;
+   Double_t point[3], norm[3];
+   Double_t rin, stin, rout, stout;
+   Double_t thx, phx, thy, phy, thz, phz;
+   Double_t alpha, theta1, theta2, phi1, phi2, dphi;
+   Double_t tr[3], rot[9];
+   Double_t z, density, radl, absl, w;
+   Double_t lx,ly,lz,tx,ty,tz;
+   Double_t xvert[50], yvert[50];
+   Double_t zsect,x0,y0,scale0;
+   Int_t nel, numed, nz, nedges, nvert;
+   TGeoBoolNode *pBoolNode = 0;
 
-        TListIter iter(volList);
-        FairGeoNode* node   = NULL;
-        FairGeoVolume *aVol=NULL;
+   // MATERIALS, MIXTURES AND TRACKING MEDIA
+// Mixture: Air
+   nel     = 2;
+   density = 0.001290;
+   TGeoMixture*
+   pMat2 = new TGeoMixture("Air", nel,density);
+      a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+   pMat2->DefineElement(0,a,z,w);
+      a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+   pMat2->DefineElement(1,a,z,w);
+   pMat2->SetIndex(1);
+// Medium: Air
+   numed   = 1;  // medium number
+   TGeoMedium *
+   pMed2 = new TGeoMedium("Air", numed,pMat2);
+// Mixture: CH2
+   nel     = 2;
+   density = 0.930000;
+   TGeoMixture*
+   pMat16 = new TGeoMixture("CH2", nel,density);
+      a = 12.010700;   z = 6.000000;   w = 0.856281;  // C
+   pMat16->DefineElement(0,a,z,w);
+      a = 1.007940;   z = 1.000000;   w = 0.143719;  // H
+   pMat16->DefineElement(1,a,z,w);
+   pMat16->SetIndex(15);
+// Medium: CH2
+   numed   = 15;  // medium number
+   TGeoMedium *
+   pMed16 = new TGeoMedium("CH2", numed,pMat16);
 
-        while( (node = (FairGeoNode*)iter.Next()) ) {
-            aVol = dynamic_cast<FairGeoVolume*> ( node );
-            if ( node->isSensitive()  ) {
-                fSensNodes->AddLast( aVol );
-            }else{
-                fPassNodes->AddLast( aVol );
-            }
-        }
-	ProcessNodes( volList );
-        par->setChanged();
-        par->setInputVersion(fRun->GetRunId(),1);
+   // TRANSFORMATION MATRICES
+   // Combi transformation: 
+   dx = 0.000000;
+   dy = 0.000000;
+   dz = 0.000000;
+   // Rotation: 
+   thx = 90.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 0.000000;    phz = 0.000000;
+   TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+   pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
+
+   TGeoVolume *top =  gGeoManager->GetTopVolume();
+
+   // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
+   // Shape: Parafin0deg type: TGeoTubeSeg
+   rmin = 0.000000;
+   rmax = 1.000000;
+   dz   = 0.005500;
+   phi1 = 0.000000;
+   phi2 = 360.000000;
+   TGeoShape *pParafin0deg = new TGeoTubeSeg("Parafin0deg",rmin,rmax,dz,phi1,phi2);
+   // Volume: Parafin0deg
+   TGeoVolume*
+   pParafin0deg_log = new TGeoVolume("Parafin0deg",pParafin0deg, pMed16);
+   pParafin0deg_log->SetVisLeaves(kTRUE);
+   top->AddNode(pParafin0deg_log, 0, pMatrix2);
 
 }
-*/
+
+void R3BTarget::ConstructGeometry3(){
+    cout << endl;
+    cout << "-I- R3BTarget:: ConstructGeometry() "<< endl;
+    cout << "-I- R3BTarget Target type; Parafine @ 45 deg "<< endl;
+    cout << endl;
+
+
+   Double_t dx,dy,dz;
+   Double_t dx1, dx2, dy1, dy2;
+   Double_t vert[20], par[20];
+   Double_t theta, phi, h1, bl1, tl1, alpha1, h2, bl2, tl2, alpha2;
+   Double_t twist;
+   Double_t origin[3];
+   Double_t rmin, rmax, rmin1, rmax1, rmin2, rmax2;
+   Double_t r, rlo, rhi;
+   Double_t a,b;
+   Double_t point[3], norm[3];
+   Double_t rin, stin, rout, stout;
+   Double_t thx, phx, thy, phy, thz, phz;
+   Double_t alpha, theta1, theta2, phi1, phi2, dphi;
+   Double_t tr[3], rot[9];
+   Double_t z, density, radl, absl, w;
+   Double_t lx,ly,lz,tx,ty,tz;
+   Double_t xvert[50], yvert[50];
+   Double_t zsect,x0,y0,scale0;
+   Int_t nel, numed, nz, nedges, nvert;
+   TGeoBoolNode *pBoolNode = 0;
+
+   // MATERIALS, MIXTURES AND TRACKING MEDIA
+// Mixture: Air
+   nel     = 2;
+   density = 0.001290;
+   TGeoMixture*
+   pMat2 = new TGeoMixture("Air", nel,density);
+      a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+   pMat2->DefineElement(0,a,z,w);
+      a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+   pMat2->DefineElement(1,a,z,w);
+   pMat2->SetIndex(1);
+// Medium: Air
+   numed   = 1;  // medium number
+   TGeoMedium *
+   pMed2 = new TGeoMedium("Air", numed,pMat2);
+// Mixture: CH2
+   nel     = 2;
+   density = 0.930000;
+   TGeoMixture*
+   pMat16 = new TGeoMixture("CH2", nel,density);
+      a = 12.010700;   z = 6.000000;   w = 0.856281;  // C
+   pMat16->DefineElement(0,a,z,w);
+      a = 1.007940;   z = 1.000000;   w = 0.143719;  // H
+   pMat16->DefineElement(1,a,z,w);
+   pMat16->SetIndex(15);
+// Medium: CH2
+   numed   = 15;  // medium number
+   TGeoMedium *
+   pMed16 = new TGeoMedium("CH2", numed,pMat16);
+
+   // TRANSFORMATION MATRICES
+   // Combi transformation: 
+   dx = 0.000000;
+   dy = 0.000000;
+   dz = 0.000000;
+   // Rotation: 
+   thx = 135.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 45.000000;    phz = 0.000000;
+   TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+   pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
+
+
+   TGeoVolume *top =  gGeoManager->GetTopVolume();
+
+
+   // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
+   // Shape: Para45deg type: TGeoPara
+   dx    = 1.450000;
+   dy    = 1.000000;
+   dz    = 0.005500;
+   alpha = 0.000000;
+   theta = 45.000000;
+   phi   = -180.000000;
+   TGeoShape *pPara45deg = new TGeoPara("Para45deg",dx,dy,dz,alpha,theta,phi);
+   // Volume: Para45deg
+   TGeoVolume*
+   pPara45deg_log = new TGeoVolume("Para45deg",pPara45deg, pMed16);
+   pPara45deg_log->SetVisLeaves(kTRUE);
+   top->AddNode(pPara45deg_log, 0, pMatrix2);
+
+}
+
+
+
+void R3BTarget::ConstructGeometry4(){
+
+    cout << endl;
+    cout << "-I- R3BTarget:: ConstructGeometry() "<< endl;
+    cout << "-I- R3BTarget Target type: LiH "<< endl;
+    cout << endl;
+
+
+   Double_t dx,dy,dz;
+   Double_t dx1, dx2, dy1, dy2;
+   Double_t vert[20], par[20];
+   Double_t theta, phi, h1, bl1, tl1, alpha1, h2, bl2, tl2, alpha2;
+   Double_t twist;
+   Double_t origin[3];
+   Double_t rmin, rmax, rmin1, rmax1, rmin2, rmax2;
+   Double_t r, rlo, rhi;
+   Double_t a,b;
+   Double_t point[3], norm[3];
+   Double_t rin, stin, rout, stout;
+   Double_t thx, phx, thy, phy, thz, phz;
+   Double_t alpha, theta1, theta2, phi1, phi2, dphi;
+   Double_t tr[3], rot[9];
+   Double_t z, density, radl, absl, w;
+   Double_t lx,ly,lz,tx,ty,tz;
+   Double_t xvert[50], yvert[50];
+   Double_t zsect,x0,y0,scale0;
+   Int_t nel, numed, nz, nedges, nvert;
+   TGeoBoolNode *pBoolNode = 0;
+
+   // MATERIALS, MIXTURES AND TRACKING MEDIA
+// Mixture: Air
+   nel     = 2;
+   density = 0.001290;
+   TGeoMixture*
+   pMat2 = new TGeoMixture("Air", nel,density);
+      a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+   pMat2->DefineElement(0,a,z,w);
+      a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+   pMat2->DefineElement(1,a,z,w);
+   pMat2->SetIndex(1);
+// Medium: Air
+   numed   = 1;  // medium number
+   TGeoMedium *
+   pMed2 = new TGeoMedium("Air", numed,pMat2);
+
+
+
+// Mixture: Mylar
+   nel     = 3;
+   density = 1.397000;
+   TGeoMixture*
+   pMat15 = new TGeoMixture("Mylar", nel,density);
+      a = 12.010700;   z = 6.000000;   w = 0.625010;  // C
+   pMat15->DefineElement(0,a,z,w);
+      a = 1.007940;   z = 1.000000;   w = 0.041961;  // H
+   pMat15->DefineElement(1,a,z,w);
+      a = 15.999400;   z = 8.000000;   w = 0.333029;  // O
+   pMat15->DefineElement(2,a,z,w);
+   pMat15->SetIndex(14);
+// Medium: Mylar
+   numed   = 14;  // medium number
+   TGeoMedium *
+   pMed15 = new TGeoMedium("Mylar", numed,pMat15);
+
+// Material: H2
+   a       = 1.007940;
+   z       = 1.000000;
+   density = 0.070800;
+   radl    = 816.908193;
+   absl    = 4956.556132;
+   TGeoMaterial*
+   pMat3 = new TGeoMaterial("H2", a,z,density,radl,absl);
+   pMat3->SetIndex(2);
+// Medium: H2
+   numed   = 2;  // medium number
+   TGeoMedium *
+   pMed3 = new TGeoMedium("H2", numed,pMat3);
+
+
+
+
+
+   // TRANSFORMATION MATRICES
+   // Combi transformation: 
+   dx = 0.000000;
+   dy = 0.000000;
+   dz = 0.000000;
+   // Rotation: 
+   thx = 90.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 0.000000;    phz = 0.000000;
+   TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+   pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
+   // Combi transformation: 
+   dx = 0.000000;
+   dy = 0.000000;
+   dz = 1.765000;
+   // Rotation: 
+   thx = 90.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 0.000000;    phz = 0.000000;
+   TGeoRotation *pMatrix5 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+   pMatrix4 = new TGeoCombiTrans("", dx,dy,dz,pMatrix5);
+   // Combi transformation: 
+   dx = 0.000000;
+   dy = 0.000000;
+   dz = 0.007500;
+   // Rotation: 
+   thx = 90.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 0.000000;    phz = 0.000000;
+   TGeoRotation *pMatrix7 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+   pMatrix6 = new TGeoCombiTrans("", dx,dy,dz,pMatrix7);
+   // Combi transformation: 
+   dx = 0.000000;
+   dy = 0.000000;
+   dz = 0.007500;
+   // Rotation: 
+   thx = 90.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 0.000000;    phz = 0.000000;
+   TGeoRotation *pMatrix9 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+   pMatrix8 = new TGeoCombiTrans("", dx,dy,dz,pMatrix9);
+   // Combi transformation: 
+   dx = 0.000000;
+   dy = 0.000000;
+   dz = 3.522500;
+   // Rotation: 
+   thx = 90.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 0.000000;    phz = 0.000000;
+   TGeoRotation *pMatrix11 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+   pMatrix10 = new TGeoCombiTrans("", dx,dy,dz,pMatrix11);
+
+   TGeoVolume *top =  gGeoManager->GetTopVolume();
+
+
+   // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
+   // Shape: TargetEnveloppe type: TGeoTubeSeg
+   rmin = 0.000000;
+   rmax = 1.015000;
+   dz   = 7.045000;
+   phi1 = 0.000000;
+   phi2 = 360.000000;
+   TGeoShape *pTargetEnveloppe = new TGeoTubeSeg("TargetEnveloppe",rmin,rmax,dz,phi1,phi2);
+   // Volume: TargetEnveloppe
+   TGeoVolume*
+   pTargetEnveloppe_log = new TGeoVolume("TargetEnveloppe",pTargetEnveloppe, pMed2);
+   pTargetEnveloppe_log->SetVisLeaves(kTRUE);
+   top->AddNode(pTargetEnveloppe_log, 0, pMatrix2);
+
+   // Shape: Target1 type: TGeoTubeSeg
+   rmin = 1.000000;
+   rmax = 1.015000;
+   dz   = 1.750000;
+   phi1 = 0.000000;
+   phi2 = 360.000000;
+   TGeoShape *pTarget1 = new TGeoTubeSeg("Target1",rmin,rmax,dz,phi1,phi2);
+   // Volume: Target1
+   TGeoVolume*
+   pTarget1_log = new TGeoVolume("Target1",pTarget1, pMed15);
+   pTarget1_log->SetVisLeaves(kTRUE);
+   pTargetEnveloppe_log->AddNode(pTarget1_log, 0, pMatrix4);
+   // Shape: Target2 type: TGeoTubeSeg
+   rmin = 0.000000;
+   rmax = 1.000000;
+   dz   = 1.750000;
+   phi1 = 0.000000;
+   phi2 = 360.000000;
+   TGeoShape *pTarget2 = new TGeoTubeSeg("Target2",rmin,rmax,dz,phi1,phi2);
+   // Volume: Target2
+   TGeoVolume*
+   pTarget2_log = new TGeoVolume("Target2",pTarget2, pMed3);
+   pTarget2_log->SetVisLeaves(kTRUE);
+   pTargetEnveloppe_log->AddNode(pTarget2_log, 0, pMatrix6);
+   // Shape: Target3 type: TGeoTubeSeg
+   rmin = 0.000000;
+   rmax = 1.015000;
+   dz   = 0.007500;
+   phi1 = 0.000000;
+   phi2 = 360.000000;
+   TGeoShape *pTarget3 = new TGeoTubeSeg("Target3",rmin,rmax,dz,phi1,phi2);
+   // Volume: Target3
+   TGeoVolume*
+   pTarget3_log = new TGeoVolume("Target3",pTarget3, pMed15);
+   pTarget3_log->SetVisLeaves(kTRUE);
+   pTargetEnveloppe_log->AddNode(pTarget3_log, 0, pMatrix8);
+   pTargetEnveloppe_log->AddNode(pTarget3_log, 0, pMatrix10);
+
+}
 
 ClassImp(R3BTarget)
 
