@@ -361,7 +361,7 @@ void R3BDch::ConstructGeometry() {
 
   TGeoMaterial *matAl = new TGeoMaterial("Aluminum", a,z,density,radl,absl);
   TGeoMedium* pMed21 = new TGeoMedium("Aluminum",3, matAl);
-  pMed21->Print();
+  //pMed21->Print();
 
 // Mixture: Mylar
   nel     = 3;
