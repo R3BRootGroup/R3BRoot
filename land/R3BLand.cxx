@@ -369,7 +369,6 @@ void R3BLand::ConstructGeometry() {
  // Vacuum
   TGeoMaterial *matVacuum = new TGeoMaterial("Vacuum", 0,0,0);
   TGeoMedium *pMed1 = new TGeoMedium("Vacuum",1, matVacuum);
-  pMed1->Print();
 
 // Mixture: Air
   nel     = 2;
@@ -632,8 +631,8 @@ void R3BLand::ConstructGeometry() {
  }
 
 
-   cout << " -I- Assembly: cell count nodes (1) "  <<   cell->GetNdaughters() << endl;
-   cout << " -I- total : " << cell->CountNodes(5000,0) << endl;
+ //  cout << " -I- R3BLand Assembly: cell count nodes (1) "  <<   cell->GetNdaughters() << endl;
+ //  cout << " -I- R3BLand total : " << cell->CountNodes(5000,0) << endl;
 
 
 //------------------------- Vertical Assembly Multiplication & Rotation -----------------------------------------------------------------------  
@@ -655,8 +654,8 @@ void R3BLand::ConstructGeometry() {
   }
  }
 
-   cout << " -I- Assembly: cell count nodes (2) "  <<  cell->GetNdaughters() << endl;
-   cout << " -I- total " << cell->CountNodes(5000,0) << endl;
+ //  cout << " -I- R3BLand  Assembly: cell count nodes (2) "  <<  cell->GetNdaughters() << endl;
+ //  cout << " -I- R3BLand total " << cell->CountNodes(5000,0) << endl;
 
 
 
