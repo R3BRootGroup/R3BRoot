@@ -188,7 +188,7 @@ void r3ball(Int_t nEvents = 1,
   rtdb->print();
    
   // -----   Start run   ----------------------------------------------------
-  run->Run(nEvents);
+  if (nEvents>0) run->Run(nEvents);
   
   // -----   Finish   -------------------------------------------------------
   timer.Stop();
