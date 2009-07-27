@@ -441,10 +441,9 @@ void R3BTra::ConstructGeometry() {
    pMat22->SetIndex(21);
 // Medium: Silicon
    numed   = 21;  // medium number
-   cout << "numed=" <<  numed << endl;
    TGeoMedium*
      pMed22 = new TGeoMedium("Silicon", numed,pMat22);
-   pMed22->Print();
+   //pMed22->Print();
 
 // Material: Copper
    a       = 63.540000;
@@ -677,7 +676,6 @@ void R3BTra::ConstructGeometry() {
    dz = 0.015000;
    // Volume: TraLog
    TGeoVolume *TraLog = gGeoManager->MakeBox("TraLog",pMed22,dx,dy,dz);
-   cout << " tracker: " << TraLog->GetNumber() << endl;
 
 
    // Shape: MontagePlatform type: TGeoTubeSeg
