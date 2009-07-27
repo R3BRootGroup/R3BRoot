@@ -59,7 +59,7 @@ void r3bsim_vis(Int_t nEvents = 1)
   
 
   // -----   Create media   -------------------------------------------------
-    run->SetMaterials("media_pnd.geo");       // Materials
+    run->SetMaterials("media_r3b.geo");       // Materials
   
   // -----   Create R3B geometry --------------------------------------------
 

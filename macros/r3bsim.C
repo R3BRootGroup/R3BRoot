@@ -31,7 +31,7 @@ Int_t r3bsim(){
    // Main function call
    r3ball(  nEvents,
             fCalVersion,
-            target1,
+            target4,
 	    fEventDisplay,
 	    fMC
           );      

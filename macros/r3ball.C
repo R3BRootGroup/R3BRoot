@@ -77,7 +77,7 @@ void r3ball(Int_t nEvents = 1,
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
   
   // -----   Create media   -------------------------------------------------
-  run->SetMaterials("media_pnd.geo");       // Materials
+  run->SetMaterials("media_r3b.geo");       // Materials
   
 
   // -----   Create R3B geometry --------------------------------------------
