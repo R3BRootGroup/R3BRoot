@@ -9,22 +9,29 @@ Int_t r3bsim(){
    //---------------------------------
 
    // Number of Simulated Events
-   Int_t nEvents =2;
+   Int_t nEvents =0;
+
    // Calorimeter version
    //  0 --> CALIFA
    //  1 --> CrystalBall   
    Int_t fCalVersion = 0;
-   // Target 
-   TString target="LeadTarget";
-   // EventDisplay connected 
+
+   // Target
+   TString target1="LeadTarget";
+   TString target2="Para";
+   TString target3="Para45";
+   TString target4="LiH";
+
+   // EventDisplay connected
    Bool_t fEventDisplay=kTRUE;
+
    // Monte Carlo engine used
    TString fMC ="TGeant3";
 
    // Main function call
    r3ball(  nEvents,
             fCalVersion,
-            target, 
+            target1,
 	    fEventDisplay,
 	    fMC
           );      
