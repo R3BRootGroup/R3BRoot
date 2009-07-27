@@ -364,7 +364,7 @@ void R3BGfi::ConstructGeometry() {
  // Vacuum
   TGeoMaterial *matVacuum = new TGeoMaterial("Vacuum", 0,0,0);
   TGeoMedium *pMed1 = new TGeoMedium("Vacuum",1, matVacuum);
-  pMed1->Print();
+//  pMed1->Print();
 
 // Mixture: Air
   nel     = 2;
