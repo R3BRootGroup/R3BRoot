@@ -111,6 +111,8 @@ add_subdirectory (r3bdata)
 add_subdirectory (field)
 add_subdirectory (macros) 
 add_subdirectory (eventdisplay) 
+add_subdirectory (r3bgen) 
+
 
 Option(BUILD_DOXYGEN "Build Doxygen" OFF)
 if(BUILD_DOXYGEN)
