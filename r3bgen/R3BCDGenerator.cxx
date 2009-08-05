@@ -1,19 +1,3 @@
-/////////////////////////////////////////////////////////////////
-//*-- AUTHOR : Saul Beceiro Novo        saul.beceiro@rai.usc.es
-//             Hector Alvarez-Pol       hapol@fpddux.usc.es
-//*-- Date: 03/2007
-//*-- Last Update: 03/05/07 by Hector Alvarez
-// --------------------------------------------------------------
-// Description:
-//   Coulomb Disociation generators interface
-//
-// --------------------------------------------------------------
-// Comments:
-// 
-//    - 03/05/07 Cleaning and moving to svn repository
-//
-// --------------------------------------------------------------
-/////////////////////////////////////////////////////////////////
 
 #include "R3BCDGenerator.h"
 #include "TRandom.h"

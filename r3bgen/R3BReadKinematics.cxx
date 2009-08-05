@@ -1,13 +1,15 @@
 /////////////////////////////////////////////////////////////////
 //*-- AUTHOR : Oleg Kiselev		O.Kiselev@gsi.de
-//*-- Date: 11/2005
-//*-- Last Update: 20/07/05 Hector Alvarez
+//             Denis Bertini            <D.Bertini@gsi.de>   
+//*-- Date: 08/2009
+//*-- Last Update: 08/08/09 Denis Bertini
 // --------------------------------------------------------------
 // Description:
 //   Event generator kinematics reader
 //
 // --------------------------------------------------------------
 // Comments:
+//          - 05/08/09  <D.Bertini@gsi.de>
 // 
 // --------------------------------------------------------------
 //

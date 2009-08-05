@@ -1,29 +1,3 @@
-/////////////////////////////////////////////////////////////////
-//*-- AUTHOR : Marc Labiche		labi-ph0@paisley.ac.uk
-//	       Oleg Kiselev		O.Kiselev@gsi.de
-//             Hector Alvarez-Pol       hapol@fpddux.usc.es
-//             Saúl Beceiro             saul.beceiro@rai.usc.es
-//             Denis Bertini            <D.Bertini@gsi.de>
-//*-- Date: 08/2009
-//*-- Last Update: 03/08/2009 <D.Bertini@gsi.de>
-// --------------------------------------------------------------
-// Description:
-//   Event generator interface for R3B
-//
-// --------------------------------------------------------------
-// Comments:
-//   - 03/08/09 Adapting to R3Broot event generator factory
-//     <D.Bertini@gsi.de>
-//
-//   - 11/04/08 Adding a methode to do back tracking momentum
-//     reconstruction. Positions after magnet are taken to give
-//     initial trajectories.
-//   - 05/01/06 Adding a simple primary particle for testing
-//   - 27/01/05 Cleaning and improving calculations
-//   - 25/11/04 Created based on example/novice/N01 structure
-// 
-// --------------------------------------------------------------
-/////////////////////////////////////////////////////////////////
 
 #include "FairPrimaryGenerator.h"
 #include "R3BPrimaryGenerator.h"

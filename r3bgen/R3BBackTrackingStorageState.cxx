@@ -1,21 +1,3 @@
-/////////////////////////////////////////////////////////////////
-//*-- AUTHOR : Saul Beceiro Novo        saul.beceiro@rai.usc.es
-//           
-//*-- Date: 03/2008
-//*-- Last Update: 25/03/08 by Saul Beceiro
-// --------------------------------------------------------------
-// Description:
-//   Storage intermediate state in the iterations needed 
-//   for the convergency of the momentum calculation
-//
-// --------------------------------------------------------------
-// Comments:
-// 
-//   
-//
-// --------------------------------------------------------------
-/////////////////////////////////////////////////////////////////
-
 #include "R3BBackTrackingStorageState.h"
 #include <iostream>
 

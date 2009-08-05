@@ -1,15 +1,16 @@
 /////////////////////////////////////////////////////////////////
 //*-- AUTHOR : Saul Beceiro Novo        saul.beceiro@rai.usc.es
 //             Hector Alvarez-Pol       hapol@fpddux.usc.es
-//*-- Date: 03/2007
-//*-- Last Update: 07/05/07 by Hector Alvarez
+//             Denis Bertini            D.Bertini@gsi.de    
+//*-- Date: 05/2009
+//*-- Last Update: 05/08/09 by <D.Bertini@gsi.de>
 // --------------------------------------------------------------
 // Description:
 //   Coulomb Disociation generators interface
 //
 // --------------------------------------------------------------
 // Comments:
-// 
+//     - 05/08/09  Adapting to R3BRoot 
 //     - 07/05/07 Adding setters for including emittance
 //     - 03/05/07 Cleaning and moving to svn repository
 //

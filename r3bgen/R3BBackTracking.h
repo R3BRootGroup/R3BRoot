@@ -1,15 +1,15 @@
 /////////////////////////////////////////////////////////////////
 //*-- AUTHOR : Saul Beceiro Novo        saul.beceiro@rai.usc.es
 //           
-//*-- Date: 03/2008
-//*-- Last Update: 24/03/08 by Saul Beceiro
+//*-- Date: 08/2009
+//*-- Last Update: 05/08/09 by <D.Bertini@gsi.de>
 // --------------------------------------------------------------
 // Description:
 //   Back Tracking reconstruction generators interface
 //
 // --------------------------------------------------------------
 // Comments:
-// 
+//           - Adapted for R3BRoot
 //   
 //
 // --------------------------------------------------------------

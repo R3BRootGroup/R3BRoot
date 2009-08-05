@@ -1,7 +1,8 @@
 /////////////////////////////////////////////////////////////////
 //*-- AUTHOR : Hector Alvarez-Pol     hapol@fpddux.usc.es
-//*-- Date: 05/2007
-//*-- Last Update: 07/05/07 by Hector Alvarez
+
+//*-- Date: 08/2009
+//*-- Last Update: 05/08/09 by <D.Bertini@gsi.de>
 // --------------------------------------------------------------
 // Description:
 //   The information from the beam parameters used for the reaction
@@ -9,6 +10,7 @@
 //
 // --------------------------------------------------------------
 // Comments:
+//     - 05/08/09 changes for Root compat. 
 //
 //     - 07/05/07 Data structure for beam parameters  
 //

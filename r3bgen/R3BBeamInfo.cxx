@@ -1,18 +1,3 @@
-/////////////////////////////////////////////////////////////////
-//*-- AUTHOR : Hector Alvarez-Pol     hapol@fpddux.usc.es
-//*-- Date: 01/2006
-//*-- Last Update: 07/05/07 by Hector Alvarez
-// --------------------------------------------------------------
-// Description:
-//   The information from the beam parameters used for the reaction
-//   vertex. Information to be accessed in the ROOT file per event
-//
-// --------------------------------------------------------------
-// Comments:
-//
-//     - 07/05/07 Data structure for beam parameters  
-//
-/////////////////////////////////////////////////////////////////
 
 #include "R3BBeamInfo.h"
 

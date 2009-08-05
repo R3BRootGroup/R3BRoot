@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////
 //*-- AUTHOR : Saul Beceiro Novo        saul.beceiro@rai.usc.es
 //           
-//*-- Date: 03/2008
-//*-- Last Update: 25/03/08 by Saul Beceiro
+//*-- Date: 05/2009
+//*-- Last Update: 05/08/09 by <D.Bertini@gsi.de>
 // --------------------------------------------------------------
 // Description:
 //   Storage intermediate state in the iterations needed 
@@ -10,7 +10,7 @@
 //
 // --------------------------------------------------------------
 // Comments:
-// 
+//       - Adapted for R3BRoot 
 //   
 //
 // --------------------------------------------------------------
