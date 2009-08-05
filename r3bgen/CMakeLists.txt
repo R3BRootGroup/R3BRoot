@@ -21,7 +21,7 @@ ${CMAKE_SOURCE_DIR}/geobase
 ${CMAKE_SOURCE_DIR}/field 
 ${CMAKE_SOURCE_DIR}/base 
 ${CMAKE_SOURCE_DIR}/generators 
-${CMAKE_SOURCE_DIR}/r3bgenerators 
+${CMAKE_SOURCE_DIR}/r3bgen
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
