@@ -9,7 +9,7 @@ Int_t r3bsim(){
    //---------------------------------
 
    // Number of Simulated Events
-   Int_t nEvents =0;
+   Int_t nEvents = 1;
 
    // Calorimeter version
    //  0 --> CALIFA
