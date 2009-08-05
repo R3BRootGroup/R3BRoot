@@ -58,6 +58,7 @@ void r3ball(Int_t nEvents = 1,
 
   //----  Load R3B specific libraries ---------------------------------------
   gSystem->Load("libR3Bbase");
+  gSystem->Load("libR3BGen");
   gSystem->Load("libR3BPassive");
   gSystem->Load("libR3BData");
   gSystem->Load("libR3BCal");
