@@ -12,7 +12,7 @@ R3BPrimaryGenerator::R3BPrimaryGenerator()
   :gammasFlag("off"),decaySchemeFlag("off"),reactionFlag("off"),reactionType("Elas"),
    dissociationFlag("off"), backTrackingFlag("off"),beamInteractionFlag("off"),rndmFlag("off"),
    rndmEneFlag("off"),boostFlag("off"),fPDGType(2212),
-    simEmittanceFlag("off"),sigmaXInEmittance(10),sigmaXPrimeInEmittance(0.001),
+    simEmittanceFlag("off"),sigmaXInEmittance(1.),sigmaXPrimeInEmittance(0.0001),
     fPDGMass(0.),fMult(1),fP(0.),fPdir(0.,0.,1.),fCharge(0),fPol(0.,0.,0.),
     fPos(0.,0.,0.),fTime(0.) {
 
@@ -48,7 +48,7 @@ R3BPrimaryGenerator::R3BPrimaryGenerator()
   FairRunSim* run = FairRunSim::Instance();
   if ( ! run ) {
     cout << "-E- R3BPrimaryGenerator: No FairRun instantiated!" << endl;
-    Fatal("R3BPrimaryGenerator", "No FairRun instantiateed!");
+    Fatal("R3BPrimaryGenerator", "No FairRun instantiated!");
   }
   // - add the Ion definition
   run->AddNewIon(fIon);
@@ -354,7 +354,7 @@ Bool_t R3BPrimaryGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 	Double_t sigma = FWHM/2.35;
 
 	// ----  Lead target Definition
-	if (targetType=="leadTarget") {
+	if (targetType=="LeadTarget") {
 	    Double_t R;
 	    Double_t teta;
 
@@ -536,8 +536,6 @@ Bool_t R3BPrimaryGenerator::ReadEvent(FairPrimaryGenerator* primGen)
       //Lorentz boost
       if(boostFlag == "on" && !doNotBoost){
 	  //atomic mass unit  or proton mass
-	  //G4double amu = 931.494013 * MeV; // amu
-	  //G4double amu = 938.2723 * MeV;     // approx. proton mass
 	  Double_t amu = 0.;
 	  fPDGType = 2212;
 	  pdgBase->GetParticle(fPDGType);
@@ -628,7 +626,7 @@ Bool_t R3BPrimaryGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 	  Double_t FWHM  = 1.;  //cm
 	  Double_t sigma = FWHM/2.35; //cm
 
-	  if (targetType=="leadTarget") {
+	  if (targetType=="LeadTarget") {
 	      Double_t R;
 	      Double_t teta;
 	      do {
