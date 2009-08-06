@@ -106,8 +106,21 @@ public:
   void SetRndmEneFlag(TString val){ rndmEneFlag = val;}
   void SetBoostFlag(TString val){ boostFlag = val;}
   void SetBeamEnergy(Double_t val){ meanKinEnergyBeam = val;}
+  void SetSigmaBeamEnergy(Double_t val){ sigmaKinEnergyBeam = val;}
+
   void SetParticlePrim(TString val){ particlePrim = val;}
-  void SetEnergyPrim(Double_t val){ kinEnergyPrim = val;}
+
+  void SetEnergyPrim(Double_t val){
+      if ( reactionFlag.CompareTo("on") == 0 ){
+         cout << "-I- R3BPrimaryGenerator::SetEnergyPrim()  \
+                 FLAG(Reaction) is on " << endl;
+         cout << "-I  R3BPrimaryGenerator::SetEnergyPrim()  \
+                 Sampling between [50.,400.] MeV activated ..."<< endl;
+       }
+
+      kinEnergyPrim = val;
+
+  }
 
   void SetTargetType(TString ans){targetType=ans;} 
   void SetReactionFlag(TString val){reactionFlag=val;} 
