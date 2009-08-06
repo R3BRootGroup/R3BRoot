@@ -1,4 +1,15 @@
-//   ----- General Macro for R3B simulation 
+//  -------------------------------------------------------------------------
+//
+//   ----- General Macro for R3B simulation
+//
+//         Author: Denis Bertini <D.Bertini@gsi.de>
+//
+//         Last Update: 06/08/09
+//
+//
+//
+//
+//  -------------------------------------------------------------------------
 //
 //   Usage inside ROOT interpreter: 
 //        1) root -l
@@ -9,6 +20,11 @@
 //                         TargetType,    // "LeadTarget" 
 //                         Visualization, // kFalse or kTRUE   
 //                         fMC )          // "TGeant3" or "TGeant4"   
+//
+//
+//  -------------------------------------------------------------------------
+
+
 
 void r3ball(Int_t nEvents = 1,
 	    Int_t fCaloVersion = 0,
@@ -136,7 +152,7 @@ void r3ball(Int_t nEvents = 1,
   FairDetector* land = new R3BLand("Land", kTRUE);
   run->AddModule(land);
  
-  // -----   Create magnetic field   ----------------------------------------
+  // -----   Create R3B  magnetic field ----------------------------------------
   Int_t typeOfMagneticField = 0;
   Int_t fieldScale = 1;
   Bool_t fVerbose = kFALSE;
