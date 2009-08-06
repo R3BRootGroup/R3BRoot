@@ -53,6 +53,8 @@ R3BPrimaryGenerator::R3BPrimaryGenerator()
   // - add the Ion definition
   run->AddNewIon(fIon);
 
+  Init();
+
  }
 
 R3BPrimaryGenerator::~R3BPrimaryGenerator() {

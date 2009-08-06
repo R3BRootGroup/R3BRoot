@@ -92,23 +92,24 @@ Char_t buffer[MAX];
 	{
 	i++;
 	infile_xsec >> T_xsec[i] >> CrossSection_t[i];	//readout of data	
-	cout << i << " " << T_xsec[i] << " " << CrossSection_t[i] <<  endl;
+
+	 //  cout << i << " " << T_xsec[i] << " " << CrossSection_t[i] <<  endl;
 	nbins = i;
 	}	
 //Int_Tegral of cross section
     for(i=0;i<nbins;i++){
 	  Integral = Integral + CrossSection_t[i];
 		} 
-	cout << " Integral " << Integral << endl;
+       // cout << " Integral " << Integral << endl;
 
 //Integrated cross section - probability
    Icross_section[0] = CrossSection_t[0]/Integral;
-	 cout << "Cross_section[0] " << CrossSection_t[0]  << endl;
-	 cout << "Icross_section[0] " <<  Icross_section[0] << endl;
+       //  cout << "Cross_section[0] " << CrossSection_t[0]  << endl;
+       //  cout << "Icross_section[0] " <<  Icross_section[0] << endl;
 		 
    for(i=1;i<nbins;i++){	 
 	  Icross_section[i] = Icross_section[i-1] + CrossSection_t[i]/Integral;
-		cout << "i" << i << "Icross_section[i]" <<  Icross_section[i]   << endl;
+	 //       cout << "i" << i << "Icross_section[i]" <<  Icross_section[i]   << endl;
 		} 
 	 
 }

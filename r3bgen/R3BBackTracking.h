@@ -41,7 +41,7 @@ private:
   Double_t  y0;
   Double_t  z0; 
 
-  ifstream* inputFile;
+  ifstream* inputFile; //!
    
 public:
   
@@ -72,7 +72,7 @@ public:
   void SetY0(Double_t p){y0=p;}
   void SetZ0(Double_t p){z0=p;}
 
-   ClassDef(R3BBackTracking,1) //ROOT CINT
+   ClassDef(R3BBackTracking,0) //ROOT CINT
 
 };
 #endif

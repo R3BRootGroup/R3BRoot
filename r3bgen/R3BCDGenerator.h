@@ -40,7 +40,7 @@ private:
   Double_t  pz2;
   Double_t  E2;  //energy for particle 1
 
-  ifstream* inputFile;
+  ifstream* inputFile;  //!
    
 public:
   
@@ -68,6 +68,6 @@ public:
   void SetE2(Double_t E){E2=E;}
   
 
-  ClassDef(R3BCDGenerator,1);
+  ClassDef(R3BCDGenerator,0);
 };
 #endif
