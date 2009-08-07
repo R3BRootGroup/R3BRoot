@@ -660,7 +660,7 @@ Bool_t R3BPrimaryGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 	      Double_t anglerad = 45.* TMath::Pi()/180.;
 
 	      Double_t GaussX = gRandom->Gaus(0.,sigma);
-	      while( fabs(GaussX) >  ( TargetSizeX/2. * TMath::Sin(anglerad) ) )
+	      while( TMath::Abs(GaussX) >  ( TargetSizeX/2. * TMath::Sin(anglerad) ) )
 		  GaussX= gRandom->Gaus(0.,sigma);
 
 	      Double_t GaussY = gRandom->Gaus(0.,sigma);
