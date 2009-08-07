@@ -20,23 +20,23 @@ R3BPrimaryGenerator::R3BPrimaryGenerator()
   // Constructor: init values are filled
   //  
 
-
   //Initial Values
-  TVector3 zero;
   kinEnergyPrim = 1e-03;      // GeV - kinetic energy of the primary
   meanKinEnergyBeam = 700. * 1e-03;// GeV - kinetic energy mean of the beam (per nucleon)
   sigmaKinEnergyBeam = 1.e-03 ; // GeV - kinetic energy sigma of the beam
   
-  Int_t n_particle = 1;
+//  Int_t n_particle = 1;
 
   //init value for targets (final values come from ROOT Macros)
-  targetType = "Parafin0Deg";
-  targetHalfThicknessPara =(0.11/2.)/10.; // cm
-  targetThicknessLiH = 3.5;  // cm
-  targetRadius = 1.;   // cm
+   targetType = "Parafin0Deg";
+   targetHalfThicknessPara =(0.11/2.)/10.; // cm
+   targetThicknessLiH = 3.5;  // cm
+   targetRadius = 1.;   // cm
 
-
-  cout << "-I- R3BPrimaryGenerator::R3BPrimaryGenerator() Ion Defs... " << endl;
+     
+   cout << endl;
+   cout << endl;    
+   cout << "-I- R3BPrimaryGenerator::R3BPrimaryGenerator() Ion Defs... " << endl;
 
   // Define the ion for CD
   Char_t buffer[20];
@@ -52,7 +52,7 @@ R3BPrimaryGenerator::R3BPrimaryGenerator()
   }
   // - add the Ion definition
   run->AddNewIon(fIon);
-
+  isDumped = kFALSE; 
   Init();
 
  }
@@ -66,17 +66,15 @@ R3BPrimaryGenerator::~R3BPrimaryGenerator() {
 void R3BPrimaryGenerator::Init()
 {
   Int_t verboselevel;
- // Set User setting
-  cout <<  "-I- R3BPrimaryGenerator::Init() -> Set User Settings ..." << endl;
-  PrintParameters();
 
   // reading now the input files
 
-  cout << " -I- R3BPrimaryGenerator::Init() ->  Reading Kinematics  ... " << endl;
+  
+  cout << "-I- R3BPrimaryGenerator::Init() ->  Reading Kinematics  ... " << endl;
   pReadKinematics = new R3BReadKinematics();
-  cout << " -I- R3BPrimaryGenerator::Init() ->  Coulomb Dissocation Loaded ..." << endl;
+  cout << "-I- R3BPrimaryGenerator::Init() ->  Coulomb Dissocation Loaded ..." << endl;
   pCDGenerator = new R3BCDGenerator();
-  cout << " -I- R3BPrimaryGenerator::Init() ->  Back Tracking loaded ...  " << endl;
+  cout << "-I- R3BPrimaryGenerator::Init() ->  Back Tracking loaded ...  " << endl;
   pBackTrackingGenerator = new R3BBackTracking();
   
  // Check for User Particle type
@@ -87,8 +85,9 @@ void R3BPrimaryGenerator::Init()
 
   } else {
       fPDGMass = particle->Mass();
-      cout << " -I- R3BGenerator PDG Particle defined: " << fPDGType
-	  << " Mass: " << fPDGMass << endl;
+      cout << " -I- R3BPrimaryGenerator PDG Particle defined: " << fPDGType
+	  << " Mass (GeV) : " << fPDGMass << endl;
+      cout << endl; 
   }
 
 }
@@ -443,6 +442,9 @@ Bool_t R3BPrimaryGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     Double_t fY = y0;
     Double_t fZ = z0;
 
+
+    cout << " -I- R3BPrimaryGenerator : Reaction process: " <<  GetReactionType()
+         << " with Target: " << GetTargetType() << endl;
     printf(" -I- R3BPrimaryGenerator : Pdg=%d, p=(%.2f, %.2f, %.2f) GeV, x=(%.1f, %.1f, %.1f) cm \n",
 	     fPDGType, px, py, pz, fX, fY, fZ);
 
@@ -676,7 +678,7 @@ Bool_t R3BPrimaryGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 	  }
 
 	  if (targetType=="LiH") {//  LiH Target
-	      Double_t ThicknessMyl = 0.15*1./10.;
+	     Double_t ThicknessMyl = 0.15*1./10.; // cm 
 
 	      Double_t RL= TMath::Abs(gRandom->Gaus(0.,sigma));
 	      while(RL > targetRadius )
@@ -702,6 +704,8 @@ Bool_t R3BPrimaryGenerator::ReadEvent(FairPrimaryGenerator* primGen)
       Double_t fY = y0;
       Double_t fZ = z0;
 
+      cout << " -I- R3BPrimaryGenerator : Gamma process: " 
+           << " with Target: " << GetTargetType() << endl;      
       printf(" -I- RR3PrimaryGenerator :\
 	     Pdg=%d, p=(%.2f, %.2f, %.2f) GeV, x=(%.1f, %.1f, %.1f) cm\n",
 	     fPDGType, px, py, pz, fX, fY, fZ);
@@ -795,6 +799,7 @@ Bool_t R3BPrimaryGenerator::ReadEvent(FairPrimaryGenerator* primGen)
       Double_t fY = y0;
       Double_t fZ = z0;
 
+      cout << " -I- R3BPrimaryGenerator : Dissociation process: " <<  endl;
       printf(" -I- RR3PrimaryGenerator : \
 	     Pdg=%d, p=(%.2f, %.2f, %.2f) GeV, x=(%.1f, %.1f, %.1f) cm\n",
 	     fPDGType, px, py, pz, fX, fY, fZ);
@@ -940,186 +945,188 @@ void R3BPrimaryGenerator::PrintParameters()
 
   TString off("off");
 
+
+    cout<<"-I- R3BPrimaryGenerator::PrintParams() : User Setting  " << endl;
   Int_t pdg_id  =   GetPrimPDGCode();
   if (pdg_id != 0 ) {
                    fPDGType = pdg_id ;
    }else {
 
-     cout<<"-I- R3BPrimaryGenerator::Init() : no Primary Particle defined ! " << endl;
-     cout<<"-I- R3BPrimaryGenerator::Init() : assuming a Proton beam ... "<< endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : no Primary Particle defined ! " << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : assuming a Proton beam ... "<< endl;
   }
 
   // flags definitions
 
    TString flag = GetBeamInteractionFlag() ;
   if ( flag.CompareTo(off) == 0 ) {
-     cout<<"-I- R3BPrimaryGenerator::Init() : FLAG(BeamInteraction) -> OFF"<< endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : FLAG(BeamInteraction) -> OFF"<< endl;
   }else{
-     cout<<"-I- R3BPrimaryGenerator::Init() : FLAG(BeamInteraction) -> "<< flag.Data() << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : FLAG(BeamInteraction) -> "<< flag.Data() << endl;
   }
 
    flag = GetRndmFlag() ;
   if ( flag.CompareTo(off) == 0 ) {
-     cout<<"-I- R3BPrimaryGenerator::Init() : FLAG(Rndm) -> OFF"<< endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : FLAG(Rndm) -> OFF"<< endl;
   }else{
-     cout<<"-I- R3BPrimaryGenerator::Init() : FLAG(Rndm) -> "<< flag.Data() << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : FLAG(Rndm) -> "<< flag.Data() << endl;
   }
 
    flag = GetRndmEneFlag() ;
   if ( flag.CompareTo(off) == 0 ) {
-     cout<<"-I- R3BPrimaryGenerator::Init() : FLAG(Rndm) -> OFF"<< endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : FLAG(Rndm) -> OFF"<< endl;
   }else{
-     cout<<"-I- R3BPrimaryGenerator::Init() : FLAG(Rndm) -> "<< flag.Data() << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : FLAG(Rndm) -> "<< flag.Data() << endl;
   }
 
 
    flag = GetBoostFlag() ;
   if ( flag.CompareTo(off) == 0 ) {
-     cout<<"-I- R3BPrimaryGenerator::Init() : FLAG(Boost) -> OFF"<< endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : FLAG(Boost) -> OFF"<< endl;
   }else{
-     cout<<"-I- R3BPrimaryGenerator::Init() : FLAG(Boost) -> "<< flag.Data() << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : FLAG(Boost) -> "<< flag.Data() << endl;
   }
 
 
    flag =  GetReactionFlag() ;
   if ( flag.CompareTo(off) == 0 ) {
-     cout<<"-I- R3BPrimaryGenerator::Init() : FLAG(Reaction) -> OFF"<< endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : FLAG(Reaction) -> OFF"<< endl;
   }else{
-     cout<<"-I- R3BPrimaryGenerator::Init() : FLAG(Reaction) -> "<< flag.Data() << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : FLAG(Reaction) -> "<< flag.Data() << endl;
   }
 
 
    flag = GetGammasFlag() ;
   if ( flag.CompareTo(off) == 0 ) {
-     cout<<"-I- R3BPrimaryGenerator::Init() : FLAG(Gammas) -> OFF"<< endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : FLAG(Gammas) -> OFF"<< endl;
   }else{
-     cout<<"-I- R3BPrimaryGenerator::Init() : FLAG(Gammas) -> "<< flag.Data() << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : FLAG(Gammas) -> "<< flag.Data() << endl;
   }
 
 
    flag = GetDecaySchemeFlag() ;
   if ( flag.CompareTo(off) == 0 ) {
-     cout<<"-I- R3BPrimaryGenerator::Init() : FLAG(DecayScheme) -> OFF"<< endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : FLAG(DecayScheme) -> OFF"<< endl;
   }else{
-     cout<<"-I- R3BPrimaryGenerator::Init() : FLAG(DecayScheme) -> "<< flag.Data() << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : FLAG(DecayScheme) -> "<< flag.Data() << endl;
   }
 
 
    flag = GetDissociationFlag() ;
   if ( flag.CompareTo(off) == 0 ) {
-     cout<<"-I- R3BPrimaryGenerator::Init() : FLAG(Dissociation) -> OFF"<< endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : FLAG(Dissociation) -> OFF"<< endl;
   }else{
-     cout<<"-I- R3BPrimaryGenerator::Init() : FLAG(Dissociation) -> "<< flag.Data() << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : FLAG(Dissociation) -> "<< flag.Data() << endl;
   }
 
 
    flag = GetBackTrackingFlag() ;
   if ( flag.CompareTo(off) == 0 ) {
-     cout<<"-I- R3BPrimaryGenerator::Init() : FLAG(BackTracking) -> OFF"<< endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : FLAG(BackTracking) -> OFF"<< endl;
   }else{
-     cout<<"-I- R3BPrimaryGenerator::Init() : FLAG(BackTracking) -> "<< flag.Data() << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : FLAG(BackTracking) -> "<< flag.Data() << endl;
   }
 
    flag = GetSimEmittanceFlag() ;
   if ( flag.CompareTo(off) == 0 ) {
-     cout<<"-I- R3BPrimaryGenerator::Init() : FLAG(SimEmittance) -> OFF"<< endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : FLAG(SimEmittance) -> OFF"<< endl;
   }else{
-     cout<<"-I- R3BPrimaryGenerator::Init() : FLAG(SimEmittance) -> "<< flag.Data() << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : FLAG(SimEmittance) -> "<< flag.Data() << endl;
   }
 
   // Target & Reaction type
 
   flag =  GetTargetType() ;
   if ( flag.CompareTo("") == 0 ) {
-     cout<<"-I- R3BPrimaryGenerator::Init() : TYPE(Target) -> not User defined! "<< endl;
-     cout<<"-I- R3BPrimaryGenerator::Init() : TYPE(Target) -> Parafin 0 Deg (Default) " << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : TYPE(Target) -> not User defined! "<< endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : TYPE(Target) -> Parafin 0 Deg (Default) " << endl;
   }else{
-     cout<<"-I- R3BPrimaryGenerator::Init() : TYPE(Target) -> "<< flag.Data() << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : TYPE(Target) -> "<< flag.Data() << endl;
   }
 
   flag = GetReactionType();
   if ( flag.CompareTo("") == 0 ) {
-     cout<<"-I- R3BPrimaryGenerator::Init() : TYPE(Reaction) -> not User defined !"<< endl;
-     cout<<"-I- R3BPrimaryGenerator::Init() : TYPE(Target) -> Elastic (Default) " << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : TYPE(Reaction) -> not User defined !"<< endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : TYPE(Target) -> Elastic (Default) " << endl;
   }else{
-     cout<<"-I- R3BPrimaryGenerator::Init() : TYPE(Reaction) -> "<< flag.Data() << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : TYPE(Reaction) -> "<< flag.Data() << endl;
   }
 
   // Parameters
 
   Double_t val = GetBeamEnergy();
   if ( val == 0 ) {
-     cout<<"-I- R3BPrimaryGenerator::Init() : PARAM(BeamEnergy) -> not User defined !"<< endl;
-     cout<<"-I- R3BPrimaryGenerator::Init() : PARAM(BeamEnergy) -> 0.7 GeV (Default)  " << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : PARAM(BeamEnergy) -> not User defined !"<< endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : PARAM(BeamEnergy) -> 0.7 GeV (Default)  " << endl;
   }else{
-     cout<<"-I- R3BPrimaryGenerator::Init() : PARAM(BeamEnergy) -> "<< val << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : PARAM(BeamEnergy) -> "<< val << endl;
   }
 
 
    val = GetEnergyPrim();
   if ( val == 0 ) {
-     cout<<"-I- R3BPrimaryGenerator::Init() : PARAM(PrimEnergy) -> not User defined !"<< endl;
-     cout<<"-I- R3BPrimaryGenerator::Init() : PARAM(PrimEnergy) -> 1. e-03 GeV (Default)  " << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : PARAM(PrimEnergy) -> not User defined !"<< endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : PARAM(PrimEnergy) -> 1. e-03 GeV (Default)  " << endl;
   }else{
-     cout<<"-I- R3BPrimaryGenerator::Init() : PARAM(PrimEnergy) -> "<< val << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : PARAM(PrimEnergy) -> "<< val << endl;
   }
 
   val = GetNumberOfParticles();
   if ( val == 0 ) {
-     cout<<"-I- R3BPrimaryGenerator::Init() : PARAM(Multiplicity) -> not User defined !"<< endl;
-     cout<<"-I- R3BPrimaryGenerator::Init() : PARAM(Multiplicity) -> 1. (Default)  " << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : PARAM(Multiplicity) -> not User defined !"<< endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : PARAM(Multiplicity) -> 1. (Default)  " << endl;
   }else{
-     cout<<"-I- R3BPrimaryGenerator::Init() : PARAM(Multiplicity) -> "<< val << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : PARAM(Multiplicity) -> "<< val << endl;
   }
 
 
    val = GetTargetHalfThicknessPara();
   if ( val == 0 ) {
-     cout<<"-I- R3BPrimaryGenerator::Init() : PARAM(TargHalf) -> not User defined !"<< endl;
-     cout<<"-I- R3BPrimaryGenerator::Init() : PARAM(TargHalf) -> 0.11/2. mm (Default)  " << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : PARAM(TargHalf) -> not User defined !"<< endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : PARAM(TargHalf) -> 0.11/2. mm (Default)  " << endl;
   }else{
-     cout<<"-I- R3BPrimaryGenerator::Init() : PARAM(TargHalf) -> "<< val << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : PARAM(TargHalf) -> "<< val << endl;
   }
 
 
    val = GetTargetThicknessLiH();
   if ( val == 0 ) {
-     cout<<"-I- R3BPrimaryGenerator::Init() : PARAM(TargLiH) -> not User defined !"<< endl;
-     cout<<"-I- R3BPrimaryGenerator::Init() : PARAM(TargLiH) -> 3.5 cm (Default)  " << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : PARAM(TargLiH) -> not User defined !"<< endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : PARAM(TargLiH) -> 3.5 cm (Default)  " << endl;
   }else{
-     cout<<"-I- R3BPrimaryGenerator::Init() : PARAM(TargLiH) -> "<< val << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : PARAM(TargLiH) -> "<< val << endl;
   }
 
 
 
    val = GetTargetRadius();
   if ( val == 0 ) {
-     cout<<"-I- R3BPrimaryGenerator::Init() : PARAM(TargRadius) -> not User defined !"<< endl;
-     cout<<"-I- R3BPrimaryGenerator::Init() : PARAM(TargRadius) -> 1. cm (Default)  " << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : PARAM(TargRadius) -> not User defined !"<< endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : PARAM(TargRadius) -> 1. cm (Default)  " << endl;
   }else{
-     cout<<"-I- R3BPrimaryGenerator::Init() : PARAM(TargRadius) -> "<< val << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : PARAM(TargRadius) -> "<< val << endl;
   }
 
 
 
    val = GetSigmaXInEmittance();
   if ( (val == 0) && (GetSimEmittanceFlag().CompareTo(off) == 0) ) {
-     cout<<"-E- R3BPrimaryGenerator::Init() : PARAM(SigmaEmittance) -> not defined !"<< endl;
-     cout<<"-E- R3BPrimaryGenerator::Init() : Sigma Emittance needs definition ..." << endl;
+     cout<<"-E- R3BPrimaryGenerator::PrintParams() : PARAM(SigmaEmittance) -> not defined !"<< endl;
+     cout<<"-E- R3BPrimaryGenerator::PrintParams() : Sigma Emittance needs definition ..." << endl;
 
   }else{
-     cout<<"-I- R3BPrimaryGenerator::Init() : PARAM(SigmaEmittance) -> "<< val << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : PARAM(SigmaEmittance) -> "<< val << endl;
   }
 
 
    val = GetSigmaXPrimeInEmittance();
 
   if ( (val == 0) && (GetSimEmittanceFlag().CompareTo(off) == 0) ) {
-     cout<<"-E- R3BPrimaryGenerator::Init() : PARAM(SigmaPrimEmittance) -> not defined !"<< endl;
-     cout<<"-E- R3BPrimaryGenerator::Init() : Sigma Prim. Emittance needs definition ..." << endl;
+     cout<<"-E- R3BPrimaryGenerator::PrintParams() : PARAM(SigmaPrimEmittance) -> not defined !"<< endl;
+     cout<<"-E- R3BPrimaryGenerator::PrintParams() : Sigma Prim. Emittance needs definition ..." << endl;
 
   }else{
-     cout<<"-I- R3BPrimaryGenerator::Init() : PARAM(SigmaPrimEmittance) -> "<< val << endl;
+     cout<<"-I- R3BPrimaryGenerator::PrintParams() : PARAM(SigmaPrimEmittance) -> "<< val << endl;
   }
 
 

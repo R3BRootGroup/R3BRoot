@@ -85,12 +85,11 @@ private:
   TVector3 fPos;                    // Vertex position
   Double_t fTime;                   // Decay Time
   TString particlePrim;
-
+  Bool_t isDumped;
 
 public:
   R3BPrimaryGenerator();
   ~R3BPrimaryGenerator();
-
 
   /** Initializer **/
   void Init();
@@ -105,7 +104,9 @@ public:
   void SetRndmFlag(TString val){ rndmFlag = val;}
   void SetRndmEneFlag(TString val){ rndmEneFlag = val;}
   void SetBoostFlag(TString val){ boostFlag = val;}
-  void SetBeamEnergy(Double_t val){ meanKinEnergyBeam = val;}
+  void SetBeamEnergy(Double_t val){ 
+     meanKinEnergyBeam = val;
+  }
   void SetSigmaBeamEnergy(Double_t val){ sigmaKinEnergyBeam = val;}
 
   void SetParticlePrim(TString val){ particlePrim = val;}
