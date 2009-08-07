@@ -13,6 +13,7 @@ eventDisplay()
   //----  Load R3B specific libraries ---------------------------------------
   gSystem->Load("libR3Bbase");
   gSystem->Load("libR3BPassive");
+  gSystem->Load("libR3BGen");
   gSystem->Load("libR3BData");
   gSystem->Load("libR3BCal");
   gSystem->Load("libR3BCalo");
@@ -39,7 +40,7 @@ eventDisplay()
 
   FairEventManager *fMan= new FairEventManager();
   FairMCTracks *Track =  new FairMCTracks ("Monte-Carlo Tracks");
-//  FairMCPointDraw *LandPoints =   new FairMCPointDraw ("LandPoint",kOrange,  kFullSquare);
+  FairMCPointDraw *LandPoints =   new FairMCPointDraw ("LandPoint",kOrange,  kFullSquare);
 
                                                                
   fMan->AddTask(Track);

@@ -19,8 +19,8 @@
 //                         CALVersion,    // (0 -> CALIFA, 1-> Crystal BALL )
 //                         TargetType,    // "LeadTarget" 
 //                         Visualization, // kFalse or kTRUE   
-//                         fMC )          // "TGeant3" or "TGeant4"   
-//
+//                         fMC ,        // "TGeant3" or "TGeant4"   
+//                         fGenerator   // Generator type
 //
 //  -------------------------------------------------------------------------
 
@@ -30,7 +30,8 @@ void r3ball(Int_t nEvents = 1,
 	    Int_t fCaloVersion = 0,
 	    TString Target = "LeadTarget",
             Bool_t fVis=kFALSE,
-            TString fMC="TGeant3")
+            TString fMC="TGeant3",
+            TString fGenerator="box")
 {
   
   TString dir = getenv("VMCWORKDIR");
@@ -165,8 +166,13 @@ void r3ball(Int_t nEvents = 1,
 
 
   // -----   Create PrimaryGenerator   --------------------------------------
+
+  // 1 - Create the Main API class for the Generator
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
+
+  if (fGenerator.CompareTo("box") == 0  ) {
+  // 2- Define the BOX generator
   Double_t pdgId=211; // pion beam
   Double_t theta1= 0.;  // polar angle distribution
   Double_t theta2= 7.;
@@ -176,10 +182,62 @@ void r3ball(Int_t nEvents = 1,
   boxGen->SetPRange     (momentum,momentum*2.);
   boxGen->SetPhiRange   (0.,360.);
   boxGen->SetXYZ(0.0,0.0,-1.5);
+  // add the box generator
   primGen->AddGenerator(boxGen);
+  } 
+  
+ if (fGenerator.CompareTo("r3b") == 0  ) {
+  R3BPrimaryGenerator *pR3bGen = new R3BPrimaryGenerator();
+
+  // R3bGen properties
+  pR3bGen->SetBeamInteractionFlag("off");
+  pR3bGen->SetBeamInteractionFlag("off");
+  pR3bGen->SetRndmFlag("off");
+  pR3bGen->SetRndmEneFlag("off");
+  pR3bGen->SetBoostFlag("off");
+  pR3bGen->SetReactionFlag("on");
+  pR3bGen->SetGammasFlag("off");
+  pR3bGen->SetDecaySchemeFlag("off");
+  pR3bGen->SetDissociationFlag("off");
+  pR3bGen->SetBackTrackingFlag("off");
+  pR3bGen->SetSimEmittanceFlag("off");
+
+  // R3bGen Parameters
+  pR3bGen->SetBeamEnergy(1.); // Beam Energy in GeV
+  pR3bGen->SetSigmaBeamEnergy(1.e-03); // Sigma(Ebeam) GeV
+  pR3bGen->SetParticleDefinition(2212); // Use Particle Pdg Code
+  pR3bGen->SetEnergyPrim(0.3); // Particle Energy in MeV
+  Int_t fMultiplicity = 50;
+  pR3bGen->SetNumberOfParticles(fMultiplicity); // Mult.
+
+  // Reaction type
+  //        1: "Elas"
+  //        2: "iso"
+  //        3: "Trans"
+  pR3bGen->SetReactionType("Elas");
+
+  // Target  type
+  //        1: "LeadTarget"
+  //        2: "Parafin0Deg"
+  //        3: "Parafin45Deg"
+  //        4: "LiH"
+
+  pR3bGen->SetTargetType(Target.Data());
+  Double_t thickness = (0.11/2.)/10.;  // cm
+  pR3bGen->SetTargetHalfThicknessPara(thickness); // cm
+  pR3bGen->SetTargetThicknessLiH(3.5); // cm
+  pR3bGen->SetTargetRadius(1.); // cm
+
+  pR3bGen->SetSigmaXInEmittance(1.); //cm
+  pR3bGen->SetSigmaXPrimeInEmittance(0.0001); //cm
+
+  // Dump the User settings
+  pR3bGen->PrintParameters();  
+  primGen->AddGenerator(pR3bGen);
+  }
+
 
   run->SetGenerator(primGen);
-
 
 
   //-------Set visualisation flag to true------------------------------------

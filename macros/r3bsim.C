@@ -27,13 +27,19 @@ Int_t r3bsim(){
 
    // Monte Carlo engine used
    TString fMC ="TGeant3";
-
+   
+   // Generator Type
+   //        "box " : box generator
+   //        "r3b"  : R3B specific generator  
+   TString fGene="box";
+   
    // Main function call
    r3ball(  nEvents,
             fCalVersion,
             target4,
 	    fEventDisplay,
-	    fMC
+	    fMC,
+	    fGene 
           );      
 
 }
