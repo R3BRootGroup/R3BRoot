@@ -22,7 +22,10 @@
 #include "TGeoBoolNode.h"
 #include "TGeoCompositeShape.h"
 #include "TGeoManager.h"
-#include <iostream.h>
+
+#include <iostream>
+
+using namespace std;
 
 R3BMagnet::~R3BMagnet()
 {
