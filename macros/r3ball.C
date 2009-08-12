@@ -6,7 +6,9 @@
 //
 //         Last Update: 06/08/09
 //
-//
+//         Comments:
+//               - 12/08/09 Adding R3B Special Physics List
+//               - 06/08/09 Adding R3B specific Event Generator
 //
 //
 //  -------------------------------------------------------------------------
@@ -31,7 +33,9 @@ void r3ball(Int_t nEvents = 1,
 	    TString Target = "LeadTarget",
             Bool_t fVis=kFALSE,
             TString fMC="TGeant3",
-            TString fGenerator="box")
+	    TString fGenerator="box",
+            Bool_t fUserPList= kFALSE
+	   )
 {
   
   TString dir = getenv("VMCWORKDIR");
@@ -93,7 +97,16 @@ void r3ball(Int_t nEvents = 1,
   run->SetName(fMC.Data());              // Transport engine
   run->SetOutputFile(OutFile.Data());          // Output file
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
-  
+
+  //  R3B Special Physics List in G4 case
+  if ( (fUserPList  == kTRUE ) &&
+       (fMC.CompareTo("TGeant4")   == 0)
+      ){
+       run->SetUserConfig("g4R3bConfig.C");
+       run->SetUserCuts("SetR3BCuts.C");
+   }
+
+
   // -----   Create media   -------------------------------------------------
   run->SetMaterials("media_r3b.geo");       // Materials
   
@@ -103,7 +116,8 @@ void r3ball(Int_t nEvents = 1,
   FairModule* cave= new R3BCave("CAVE");
   cave->SetGeometryFileName("r3b_cave.geo");
   run->AddModule(cave);
-  
+
+
   //R3B Target definition
   FairModule* target= new R3BTarget(Target.Data());
   run->AddModule(target);
