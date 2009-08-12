@@ -11,35 +11,47 @@ Int_t r3bsim(){
    // Number of Simulated Events
    Int_t nEvents = 1;
 
-   // Calorimeter version
+   // Calorimeter type
    //  0 --> CALIFA
    //  1 --> CrystalBall   
    Int_t fCalVersion = 0;
 
-   // Target
+   // Target type
    TString target1="LeadTarget";
    TString target2="Para";
    TString target3="Para45";
    TString target4="LiH";
 
-   // EventDisplay connected
+   // EventDisplay        fEventDisplay
+   //
+   //       connected       kTRUE
+   //   not connected       kFALSE
+
    Bool_t fEventDisplay=kTRUE;
 
-   // Monte Carlo engine used
-   TString fMC ="TGeant3";
+   // Monte Carlo engine type
+   TString fMC ="TGeant4";
    
-   // Generator Type
+   // Event Generator Type
    //        "box " : box generator
    //        "r3b"  : R3B specific generator  
    TString fGene="box";
-   
-   // Main function call
+
+   // Case Geant4 : loading R3B Special Physic List
+   //
+   //     VMC Standard  -->  kFALSE
+   //     R3B Special   -->  kTRUE;
+
+   Bool_t fUserPList= kTRUE;
+
+   // Main Sim function call
    r3ball(  nEvents,
             fCalVersion,
             target4,
 	    fEventDisplay,
 	    fMC,
-	    fGene 
+	    fGene,
+            fUserPList
           );      
 
 }
