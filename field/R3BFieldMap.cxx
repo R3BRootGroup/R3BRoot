@@ -60,9 +60,9 @@ R3BFieldMap::R3BFieldMap(Int_t type,Bool_t verbosity)
 
   Double_t DistanceToTarget = 350.0;  //cm
   Double_t Correction = -119.94; // cm
-  Double_t Aladin_gap = 50.;    //cm
+ // Double_t Aladin_gap = 50.;    //cm
   Double_t Aladin_angle = +7.3; // degree
-  Double_t Yoke_thickness = 50.; //cm
+ // Double_t Yoke_thickness = 50.; //cm
 
   Double_t DistanceFromtargetToAladinCenter
 	     = DistanceToTarget + Correction;
@@ -200,7 +200,7 @@ void  R3BFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField){
  // <D.Bertini@gsi.de>
 
 
- Double_t Bfield[3];
+	Double_t Bfield[3]={0.0,0.0,0.0};
 
    
  if ( typeField==0 || typeField==1 || typeField==3 ) {

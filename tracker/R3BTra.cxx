@@ -224,7 +224,7 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
       }
       
       gGeoManager->SetCurrentDirection(newdirection);
-      TGeoNode *bla = gGeoManager->FindNextBoundary(2);
+   //   TGeoNode *bla = gGeoManager->FindNextBoundary(2);
       safety = gGeoManager->GetSafeDistance();
 
 
@@ -384,34 +384,34 @@ void R3BTra::ConstructGeometry() {
 
   // out-of-file geometry definition
    Double_t dx,dy,dz;
-   Double_t dx1, dx2, dy1, dy2;
-   Double_t vert[20], par[20];
-   Double_t theta, phi, h1, bl1, tl1, alpha1, h2, bl2, tl2, alpha2;
-   Double_t twist;
-   Double_t origin[3];
-   Double_t rmin, rmax, rmin1, rmax1, rmin2, rmax2;
-   Double_t r, rlo, rhi;
-   Double_t a,b;
-   Double_t point[3], norm[3];
-   Double_t rin, stin, rout, stout;
+ //  Double_t dx1, dx2, dy1, dy2;
+   Double_t par[20];
+//   Double_t theta, phi, h1, bl1, tl1, alpha1, h2, bl2, tl2, alpha2;
+  // Double_t twist;
+   //Double_t origin[3];
+   Double_t rmin, rmax;
+   //Double_t r, rlo, rhi;
+   Double_t a;
+   //Double_t point[3], norm[3];
+   //Double_t rin, stin, rout, stout;
    Double_t thx, phx, thy, phy, thz, phz;
-   Double_t alpha, theta1, theta2, phi1, phi2, dphi;
-   Double_t tr[3], rot[9];
+   Double_t  phi1, phi2;
+   //Double_t tr[3], rot[9];
    Double_t z, density, radl, absl, w;
-   Double_t lx,ly,lz,tx,ty,tz;
-   Double_t xvert[50], yvert[50];
-   Double_t zsect,x0,y0,scale0;
-   Int_t nel, numed, nz, nedges, nvert;
+   Double_t tx,ty,tz;
+   //Double_t xvert[50], yvert[50];
+   //Double_t zsect,x0,y0,scale0;
+   Int_t nel, numed;
 
-   TGeoBoolNode *pBoolNode = 0;
+   //TGeoBoolNode *pBoolNode = 0;
 
 
 /****************************************************************************/
 // Material definition
 
  // Vacuum
-  TGeoMaterial *matVacuum = new TGeoMaterial("Vacuum", 0,0,0);
-  TGeoMedium *pMed1 = new TGeoMedium("Vacuum",1, matVacuum);
+ // TGeoMaterial *matVacuum = new TGeoMaterial("Vacuum", 0,0,0);
+ // TGeoMedium *pMed1 = new TGeoMedium("Vacuum",1, matVacuum);
   //pMed1->Print();
 
 // Mixture: Air
@@ -481,9 +481,9 @@ void R3BTra::ConstructGeometry() {
    thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
    thz = 0.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-   pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
+   //TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+  // TGeoCombiTrans*
+  // pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
    // Combi transformation: 
    dx = 0.000000;
    dy = 0.000000;
@@ -503,9 +503,9 @@ void R3BTra::ConstructGeometry() {
    thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
    thz = 0.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix33 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-   pMatrix32 = new TGeoCombiTrans("", dx,dy,dz,pMatrix33);
+  // TGeoRotation *pMatrix33 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+  // TGeoCombiTrans*
+  // pMatrix32 = new TGeoCombiTrans("", dx,dy,dz,pMatrix33);
    // Combi transformation: 
    dx = 0.000000;
    dy = -2.100000;
@@ -591,9 +591,9 @@ void R3BTra::ConstructGeometry() {
    thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
    thz = 0.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix35 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-   pMatrix34 = new TGeoCombiTrans("", dx,dy,dz,pMatrix35);
+  // TGeoRotation *pMatrix35 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+ //  TGeoCombiTrans*
+ //  pMatrix34 = new TGeoCombiTrans("", dx,dy,dz,pMatrix35);
    // Combi transformation: 
    dx = -2.100000;
    dy = -8.000000;
@@ -770,9 +770,9 @@ void R3BTra::ConstructGeometry() {
     rotg->RotateX(0.);
     rotg->RotateY(0.);
     rotg->RotateZ(0.);
-    dx=0.0;
-    dy=0.0;
-    dz=0.0;
+    dx=tx=0.0;
+    dy=ty=0.0;
+    dz=tz=0.0;
 
     pWorld->AddNode(aTra,1, new TGeoCombiTrans(tx,ty,tz,rotg));
 

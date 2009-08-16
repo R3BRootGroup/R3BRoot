@@ -35,7 +35,8 @@ R3BReadKinematics::R3BReadKinematics(){
 
 Double_t a,b,c,d,e,f,j, h,k,l,m,n;
 Double_t Integral = 0.;
-Int_t i, nbins;
+Int_t i;
+Int_t	nbins = 0;	
 const Int_t MAX = 140;
 Char_t buffer[MAX];
 

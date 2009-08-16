@@ -65,7 +65,7 @@ R3BPrimaryGenerator::~R3BPrimaryGenerator() {
 
 void R3BPrimaryGenerator::Init()
 {
-  Int_t verboselevel;
+ // Int_t verboselevel;
 
   // reading now the input files
 
@@ -935,7 +935,7 @@ Bool_t R3BPrimaryGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 
 
   }// ! Mutliplicity
-
+	return kTRUE;
 }
 
 

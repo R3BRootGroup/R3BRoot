@@ -73,8 +73,8 @@ void R3BMagnet::ConstructGeometry(){
    pMat2->DefineElement(1,a,z,w);
    pMat2->SetIndex(700);
    numed   = 1;  // medium number
-   TGeoMedium*
-   pMed2 = new TGeoMedium("Air", numed,pMat2);
+ //  TGeoMedium*
+ //  pMed2 = new TGeoMedium("Air", numed,pMat2);
 
 
  // <D.Bertini@gsi.de>
@@ -482,6 +482,7 @@ void R3BMagnet::ConstructGeometry(){
 
 Bool_t R3BMagnet::CheckIfSensitive(std::string name){
 	// just to get rid of the warrning during run, not need this is a passive element! 
+	return kTRUE;
 }
 
 void R3BMagnet::ConstructASCIIGeometry(){
