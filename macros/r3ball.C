@@ -18,7 +18,7 @@
 //        2)[root] .L r3ball.C 
 //                         
 //        3)[root] r3ball( nevt,
-//                         CALVersion,    // (0 -> CALIFA, 1-> Crystal BALL )
+//                         fDetList,     // List of Detectors
 //                         TargetType,    // "LeadTarget" 
 //                         Visualization, // kFalse or kTRUE   
 //                         fMC ,        // "TGeant3" or "TGeant4"   
@@ -29,7 +29,7 @@
 
 
 void r3ball(Int_t nEvents = 1,
-	    Int_t fCaloVersion = 0,
+	    TObjArray& fDetList,
 	    TString Target = "LeadTarget",
             Bool_t fVis=kFALSE,
             TString fMC="TGeant3",
@@ -37,7 +37,8 @@ void r3ball(Int_t nEvents = 1,
             Bool_t fUserPList= kFALSE
 	   )
 {
-  
+
+
   TString dir = getenv("VMCWORKDIR");
   TString r3bdir = dir + "/macros";
 
@@ -119,54 +120,69 @@ void r3ball(Int_t nEvents = 1,
 
 
   //R3B Target definition
-  FairModule* target= new R3BTarget(Target.Data());
-  run->AddModule(target);
-  
+  if (fDetList.FindObject("TARGET") ) {
+    FairModule* target= new R3BTarget(Target.Data());
+    run->AddModule(target);
+  }
+
   //R3B Magnet definition
-  FairModule* mag = new R3BMagnet("AladinMagnet");
-  run->AddModule(mag);
-  
-  if (fCaloVersion == 1) {
+  if (fDetList.FindObject("ALADIN") ) {
+    FairModule* mag = new R3BMagnet("AladinMagnet");
+    run->AddModule(mag);
+  }
+
+  if (fDetList.FindObject("CRYSTALBALL") ) {
   //R3B Crystal Calorimeter
-  FairDetector* cal = new R3BCal("CrystalCal", kTRUE);
-  run->AddModule(cal);
+    FairDetector* cal = new R3BCal("CrystalCal", kTRUE);
+    run->AddModule(cal);
   } else {
   // CALIFA Calorimeter
-  FairDetector* calo = new R3BCalo("Califa", kTRUE);
-  run->AddModule(calo);
+    FairDetector* calo = new R3BCalo("Califa", kTRUE);
+    run->AddModule(calo);
   }
   
   // Tracker
-  FairDetector* tra = new R3BTra("Tracker", kTRUE);
-  Double_t fCutOffSi = 1.0e-06;  // Cut-Off -> 10KeV only in Si
-  ((R3BTra*) tra)->SetEnergyCutOff(fCutOffSi);
-  run->AddModule(tra);
-  
+  if (fDetList.FindObject("TRACKER")  ) {
+    FairDetector* tra = new R3BTra("Tracker", kTRUE);
+    Double_t fCutOffSi = 1.0e-06;  // Cut-Off -> 10KeV only in Si
+    ((R3BTra*) tra)->SetEnergyCutOff(fCutOffSi);
+    run->AddModule(tra);
+  }
   
   // DCH drift chambers
-  FairDetector* dch = new R3BDch("Dch", kTRUE);
-  run->AddModule(dch);
-  
+  if (fDetList.FindObject("DCH") ) {
+    FairDetector* dch = new R3BDch("Dch", kTRUE);
+    run->AddModule(dch);
+  }
+
   // Tof
-  FairDetector* tof = new R3BTof("Tof", kTRUE);
-  Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
-  ((R3BTof*) tof)->SetEnergyCutOff(fCutOffSci);
-  run->AddModule(tof);
-  
+  if (fDetList.FindObject("TOF") ) {
+    FairDetector* tof = new R3BTof("Tof", kTRUE);
+    Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
+    ((R3BTof*) tof)->SetEnergyCutOff(fCutOffSci);
+    run->AddModule(tof);
+  }
+
   // mTof
-  FairDetector* mTof = new R3BmTof("mTof", kTRUE);
-  ((R3BmTof*) mTof)->SetEnergyCutOff(fCutOffSci);
-  run->AddModule(mTof);
+  if (fDetList.FindObject("MTOF") ) {
+    FairDetector* mTof = new R3BmTof("mTof", kTRUE);
+    ((R3BmTof*) mTof)->SetEnergyCutOff(fCutOffSci);
+    run->AddModule(mTof);
+  }
 
   // GFI detector
-  FairDetector* gfi = new R3BGfi("Gfi", kTRUE);
-  ((R3BGfi*) gfi)->SetEnergyCutOff(fCutOffSci);
-  run->AddModule(gfi);
+  if (fDetList.FindObject("GFI") ) {
+    FairDetector* gfi = new R3BGfi("Gfi", kTRUE);
+    ((R3BGfi*) gfi)->SetEnergyCutOff(fCutOffSci);
+    run->AddModule(gfi);
+  }
 
   // Land Detector
+  if (fDetList.FindObject("LAND") ) {
   FairDetector* land = new R3BLand("Land", kTRUE);
   run->AddModule(land);
- 
+  }
+
   // -----   Create R3B  magnetic field ----------------------------------------
   Int_t typeOfMagneticField = 0;
   Int_t fieldScale = 1;
