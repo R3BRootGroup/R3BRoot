@@ -94,9 +94,8 @@ void R3BGfi::Initialize()
   FairDetector::Initialize();
 
    cout << endl;
-    cout << "-I- R3BGfi initialisation" << endl;
-    cout << "-I- Vol ID" << endl;
-    cout << "-I- MC ID Scintill. volume : " << gMC->VolId("GFILog")<< endl;
+   cout << "-I- R3BGfi: initialisation" << endl;
+   cout << "-I- R3BGfi: Sci. Vol. (McId) " << gMC->VolId("GFILog")<< endl;
 
 }
 
@@ -105,7 +104,7 @@ void R3BGfi::SetSpecialPhysicsCuts(){
 
    cout << endl;
 
-   cout << "-I- R3BGfi Adding customized Physics cut ... " << endl;
+   cout << "-I- R3BGfi: Adding customized Physics cut ... " << endl;
 
    if (gGeoManager) {
      TGeoMedium* pSi = gGeoManager->GetMedium("plasticForGFI");
@@ -127,7 +126,7 @@ void R3BGfi::SetSpecialPhysicsCuts(){
 	 // Setting Energy-CutOff for Si Only
 	Double_t cutE = fCutE; // GeV-> 1 keV
 
-	cout << "-I- R3bGFI Scintillator Medium Id " << pSi->GetId()
+	cout << "-I- R3bGfi Scintillator Medium Id " << pSi->GetId()
 	    << " Energy Cut-Off : " << cutE
 	     << " GeV " << endl;
         cout << endl;
@@ -336,77 +335,116 @@ void R3BGfi::ConstructGeometry() {
 
   // out-of-file geometry definition
    Double_t dx,dy,dz;
- //  Double_t dx1, dx2, dy1, dy2;
- //  Double_t vert[20], par[20];
- //  Double_t theta, phi, h1, bl1, tl1, alpha1, h2, bl2, tl2, alpha2;
- //  Double_t twist;
- //  Double_t origin[3];
- //  Double_t rmin, rmax, rmin1, rmax1, rmin2, rmax2;
- //  Double_t r, rlo, rhi;
    Double_t a;
- //  Double_t point[3], norm[3];
- //  Double_t rin, stin, rout, stout;
    Double_t thx, phx, thy, phy, thz, phz;
-  // Double_t alpha, theta1, theta2, phi1, phi2, dphi;
-  // Double_t tr[3], rot[9];
    Double_t z, density, radl, absl, w;
-  // Double_t lx,ly,lz,tx,ty,tz;
- //  Double_t xvert[50], yvert[50];
- //  Double_t zsect,x0,y0,scale0;
    Int_t nel, numed;
-
- //  TGeoBoolNode *pBoolNode = 0;
 
 
 /****************************************************************************/
 // Material definition
 
  // Vacuum
-  TGeoMaterial *matVacuum = new TGeoMaterial("Vacuum", 0,0,0);
-  TGeoMedium *pMed1 = new TGeoMedium("Vacuum",1, matVacuum);
-//  pMed1->Print();
 
-// Mixture: Air
-  nel     = 2;
-  density = 0.001290;
-  TGeoMixture*
-  pMat2 = new TGeoMixture("Air", nel,density);
-  a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
-  pMat2->DefineElement(0,a,z,w);
-  a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
-  pMat2->DefineElement(1,a,z,w);
-  pMat2->SetIndex(1);
-  // Medium: Air
-  numed   = 1;  // medium number
-//  TGeoMedium*
-//  pMed2 = new TGeoMedium("Air", numed,pMat2);
+  TGeoMedium * pMed1=NULL;
+   if (gGeoManager->GetMedium("Vacuum") ){
+       pMed1=gGeoManager->GetMedium("Vacuum");
+   }else{
+   TGeoMaterial *matVacuum = new TGeoMaterial("Vacuum", 0,0,0);
+   Double_t par[8];
+   par[0]  = 0.000000; // isvol
+   par[1]  = 0.000000; // ifield
+   par[2]  = 0.000000; // fieldm
+   par[3]  = 0.000000; // tmaxfd
+   par[4]  = 0.000000; // stemax
+   par[5]  = 0.000000; // deemax
+   par[6]  = 0.000100; // epsil
+   par[7]  = 0.000000; // stmin
+   pMed1 = new TGeoMedium("Vacuum",1, matVacuum,par);
+   }
+
+    // Mixture: Air
+   TGeoMedium * pMed2=NULL;
+   if (gGeoManager->GetMedium("Air") ){
+       pMed2=gGeoManager->GetMedium("Air");
+   }else{
+    nel     = 2;
+    density = 0.001290;
+    TGeoMixture*
+	pMat2 = new TGeoMixture("Air", nel,density);
+    a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+    pMat2->DefineElement(0,a,z,w);
+    a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+    pMat2->DefineElement(1,a,z,w);
+    pMat2->SetIndex(1);
+    // Medium: Air
+    numed   = 1;  // medium number
+    Double_t par[8];
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 0.000000; // tmaxfd
+    par[4]  = 0.000000; // stemax
+    par[5]  = 0.000000; // deemax
+    par[6]  = 0.000100; // epsil
+    par[7]  = 0.000000; // stmin
+    pMed2 = new TGeoMedium("Air", numed,pMat2, par);
+   }
 
   // Mixture: plasticForGFI
-  nel     = 2;
-  density = 1.032000;
-  TGeoMixture*
-      pMat35 = new TGeoMixture("plasticForGFI", nel,density);
-  a = 12.010700;   z = 6.000000;   w = 0.914708;  // C
-  pMat35->DefineElement(0,a,z,w);
-  a = 1.007940;   z = 1.000000;   w = 0.085292;  // H
-  pMat35->DefineElement(1,a,z,w);
-  pMat35->SetIndex(34);
-  // Medium: plasticForGFI
-  numed   = 34;  // medium number
-  TGeoMedium*
-      pMed35 = new TGeoMedium("plasticForGFI", numed,pMat35);
+   TGeoMedium * pMed35=NULL;
+   if (gGeoManager->GetMedium("plasticForGFI") ){
+       pMed35=gGeoManager->GetMedium("plasticForGFI");
+   }else{
+     nel     = 2;
+     density = 1.032000;
+     TGeoMixture*
+	 pMat35 = new TGeoMixture("plasticForGFI", nel,density);
+     a = 12.010700;   z = 6.000000;   w = 0.914708;  // C
+     pMat35->DefineElement(0,a,z,w);
+     a = 1.007940;   z = 1.000000;   w = 0.085292;  // H
+     pMat35->DefineElement(1,a,z,w);
+     pMat35->SetIndex(34);
+     // Medium: plasticForGFI
+     numed   = 34;  // medium number
+     Double_t par[8];
+     par[0]  = 0.000000; // isvol
+     par[1]  = 0.000000; // ifield
+     par[2]  = 0.000000; // fieldm
+     par[3]  = 0.000000; // tmaxfd
+     par[4]  = 0.000000; // stemax
+     par[5]  = 0.000000; // deemax
+     par[6]  = 0.000100; // epsil
+     par[7]  = 0.000000; // stmin
+     pMed35 = new TGeoMedium("plasticForGFI", numed,pMat35,par);
+ }
+
 
  // Material: Aluminum
-  a       = 26.980000;
-  z       = 13.000000;
-  density = 2.700000;
-  radl    = 8.875105;
-  absl    = 388.793113;
+   TGeoMedium * pMed21=NULL;
+   if (gGeoManager->GetMedium("Aluminum") ){
+       pMed21=gGeoManager->GetMedium("Aluminum");
+   }else{
+     a       = 26.980000;
+     z       = 13.000000;
+     density = 2.700000;
+     radl    = 8.875105;
+     absl    = 388.793113;
 
-  TGeoMaterial *matAl = new TGeoMaterial("Aluminum", a,z,density,radl,absl);
-  TGeoMedium* pMed21 = new TGeoMedium("Aluminum",3, matAl);
-//  pMed21->Print();
+     TGeoMaterial *matAl
+	 = new TGeoMaterial("Aluminum", a,z,density,radl,absl);
 
+     Double_t par[8];
+     par[0]  = 0.000000; // isvol
+     par[1]  = 0.000000; // ifield
+     par[2]  = 0.000000; // fieldm
+     par[3]  = 0.000000; // tmaxfd
+     par[4]  = 0.000000; // stemax
+     par[5]  = 0.000000; // deemax
+     par[6]  = 0.000100; // epsil
+     par[7]  = 0.000000; // stmin
+     pMed21 = new TGeoMedium("Aluminum",3, matAl,par);
+   }
 
    // TRANSFORMATION MATRICES
    // Combi transformation: 

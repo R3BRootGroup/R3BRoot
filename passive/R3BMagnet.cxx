@@ -41,41 +41,70 @@ R3BMagnet::R3BMagnet(const char * name, const char *Title)
 
 
 
-
-
 void R3BMagnet::ConstructGeometry(){
 
     Double_t degrad = TMath::Pi()/180.;
-
+    Double_t w       =        0.;
+    Double_t a       =        0.;
+    Double_t z       =        0.;
+    Double_t density =        0.;
+    Double_t radl    =        0.;
+    Double_t absl    =        0.;
+    Int_t numed      =        0 ;
  // Specific Material definition
  // --  Material: Iron
-   Double_t w       =        0.;
-   Double_t a       = 55.850000;
-   Double_t z       = 26.000000;
-   Double_t density = 7.870000;
-   Double_t radl    = 1.757717;
-   Double_t absl    = 169.994418;
-   TGeoMaterial*
-   pMatFe = new TGeoMaterial("Iron", a,z,density,radl,absl);
-   pMatFe->SetIndex(701);
-   Int_t numed   = 23;  // medium number
-   TGeoMedium*
-   pMedFe = new TGeoMedium("Iron", numed,pMatFe);
+   TGeoMedium * pMedFe=NULL;
+   if (gGeoManager->GetMedium("Iron") ){
+       pMedFe=gGeoManager->GetMedium("Iron");
+   }else{
+    w       =        0.;
+    a       = 55.850000;
+    z       = 26.000000;
+    density = 7.870000;
+    radl    = 1.757717;
+    absl    = 169.994418;
+    TGeoMaterial*
+	pMatFe = new TGeoMaterial("Iron", a,z,density,radl,absl);
+    pMatFe->SetIndex(701);
+    numed   = 23;  // medium number
+    Double_t par[8];
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 0.000000; // tmaxfd
+    par[4]  = 0.000000; // stemax
+    par[5]  = 0.000000; // deemax
+    par[6]  = 0.000100; // epsil
+    par[7]  = 0.000000; // stmin
+    pMedFe = new TGeoMedium("Iron", numed,pMatFe, par);
+   }
 
  // -- Mixture: Air
-   Int_t nel     = 2;
-   density = 0.001290;
-   TGeoMixture*
-   pMat2 = new TGeoMixture("Air", nel,density);
-      a = 14.006740;   z = 7.000000;  w = 0.700000;  // N
-   pMat2->DefineElement(0,a,z,w);
-      a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
-   pMat2->DefineElement(1,a,z,w);
-   pMat2->SetIndex(700);
-   numed   = 1;  // medium number
- //  TGeoMedium*
- //  pMed2 = new TGeoMedium("Air", numed,pMat2);
-
+    TGeoMedium * pMed2=NULL;
+   if (gGeoManager->GetMedium("Air") ){
+       pMed2=gGeoManager->GetMedium("Air");
+   }else{
+     Int_t nel     = 2;
+     density = 0.001290;
+     TGeoMixture*
+	 pMat2 = new TGeoMixture("Air", nel,density);
+     a = 14.006740;   z = 7.000000;  w = 0.700000;  // N
+     pMat2->DefineElement(0,a,z,w);
+     a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+     pMat2->DefineElement(1,a,z,w);
+     pMat2->SetIndex(700);
+     numed   = 1;  // medium number
+     Double_t par[8];
+     par[0]  = 0.000000; // isvol
+     par[1]  = 0.000000; // ifield
+     par[2]  = 0.000000; // fieldm
+     par[3]  = 0.000000; // tmaxfd
+     par[4]  = 0.000000; // stemax
+     par[5]  = 0.000000; // deemax
+     par[6]  = 0.000100; // epsil
+     par[7]  = 0.000000; // stmin
+     pMed2 = new TGeoMedium("Air", numed,pMat2, par );
+   }
 
  // <D.Bertini@gsi.de>
  // version adapted from ALADIN magnet

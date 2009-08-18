@@ -104,11 +104,11 @@ void R3BCal::Initialize()
 
    cout << endl;
     cout << "-I- R3BCal initialisation" << endl;
-    cout << "-I- Vol ID" << endl;
-    cout << "-I- Crystal A   : " << gMC->VolId("crystalLogNAJA")<< endl;
-    cout << "-I- Crystal B   : " << gMC->VolId("crystalLogNAJB")<< endl;
-    cout << "-I- Crystal C   : " << gMC->VolId("crystalLogNAJC")<< endl;
-    cout << "-I- Crystal D   : " << gMC->VolId("crystalLogNAJD")<< endl;
+    cout << "-I- R3BCal: Vol. (McId)" << endl;
+    cout << "-I- R3BCal: Crystal A   : " << gMC->VolId("crystalLogNAJA")<< endl;
+    cout << "-I- R3BCal: Crystal B   : " << gMC->VolId("crystalLogNAJB")<< endl;
+    cout << "-I- R3BCal: Crystal C   : " << gMC->VolId("crystalLogNAJC")<< endl;
+    cout << "-I- R3BCal: Crystal D   : " << gMC->VolId("crystalLogNAJD")<< endl;
 
     // Crystals type ID
     //  type   ID
@@ -129,8 +129,8 @@ void R3BCal::SetSpecialPhysicsCuts(){
 
    cout << endl;
 
-   cout << "-I- R3BCal Adding customized Physics cut ... " << endl;
-   cout << "-I- Yet not implemented !... " << endl;
+   cout << "-I- R3BCal: Adding customized Physics cut ... " << endl;
+   cout << "-I- R3BCal: Yet not implemented !... " << endl;
 
    cout << endl;
 
@@ -348,69 +348,100 @@ void R3BCal::ConstructGeometry2(){
 
   // out-of-file geometry definition
    Double_t dx,dy,dz;
-  // Double_t dx1, dx2, dy1, dy2;
-  // Double_t vert[20], par[20];
    Double_t theta, phi, h1, bl1, tl1, alpha1, h2, bl2, tl2, alpha2;
-  // Double_t twist;
-  // Double_t origin[3];
    Double_t rmin, rmax, rmin1, rmax1, rmin2, rmax2;
-  // Double_t r, rlo, rhi;
    Double_t a;
-  // Double_t point[3], norm[3];
-  // Double_t rin, stin, rout, stout;
    Double_t thx, phx, thy, phy, thz, phz;
    Double_t theta1, theta2, phi1, phi2, dphi;
-   //Double_t tr[3], rot[9];
    Double_t z, density, radl, absl, w;
-  // Double_t lx,ly,lz,tx,ty,tz;
-  // Double_t xvert[50], yvert[50];
- //Double_t zsect,x0,y0,scale0;
    Int_t nel, numed, nz, nedges;
    TGeoBoolNode *pBoolNode = 0;
 
 // --- Local Material definition
 
 // Mixture: Air
-  nel     = 2;
-  density = 0.001290;
-  TGeoMixture*
-  pMat2 = new TGeoMixture("Air", nel,density);
-  a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
-  pMat2->DefineElement(0,a,z,w);
-  a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
-  pMat2->DefineElement(1,a,z,w);
-  pMat2->SetIndex(1);
-  // Medium: Air
-  numed   = 1;  // medium number
-  TGeoMedium*
-  pMed2 = new TGeoMedium("Air", numed,pMat2);
-  
+  TGeoMedium * pMed2=NULL;
+   if (gGeoManager->GetMedium("Air") ){
+       pMed2=gGeoManager->GetMedium("Air");
+  }else{
+    nel     = 2;
+    density = 0.001290;
+    TGeoMixture*
+	pMat2 = new TGeoMixture("Air", nel,density);
+    a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+    pMat2->DefineElement(0,a,z,w);
+    a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+    pMat2->DefineElement(1,a,z,w);
+    pMat2->SetIndex(1);
+    // Medium: Air
+    numed   = 1;  // medium number
+    Double_t par[8];
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 0.000000; // tmaxfd
+    par[4]  = 0.000000; // stemax
+    par[5]  = 0.000000; // deemax
+    par[6]  = 0.000100; // epsil
+    par[7]  = 0.000000; // stmin
+    pMed2 = new TGeoMedium("Air", numed,pMat2, par);
+  }
+
+
  // Mixture: CsI
-  nel     = 2;
-  density = 4.510000;
-  TGeoMixture*
-      pMat9 = new TGeoMixture("CsIn", nel,density);
-  a = 132.905450;   z = 55.000000;   w = 0.511549;  // CS
-  pMat9->DefineElement(0,a,z,w);
-  a = 126.904470;   z = 53.000000;   w = 0.488451;  // I
-  pMat9->DefineElement(1,a,z,w);
-  pMat9->SetIndex(601);
+  TGeoMedium * pMed9=NULL;
+   if (gGeoManager->GetMedium("CsIn") ){
+       pMed9=gGeoManager->GetMedium("CsIn");
+  }else{
+    nel     = 2;
+    density = 4.510000;
+    TGeoMixture*
+	pMat9 = new TGeoMixture("CsIn", nel,density);
+    a = 132.905450;   z = 55.000000;   w = 0.511549;  // CS
+    pMat9->DefineElement(0,a,z,w);
+    a = 126.904470;   z = 53.000000;   w = 0.488451;  // I
+    pMat9->DefineElement(1,a,z,w);
+    pMat9->SetIndex(601);
+    Double_t par[8];
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 0.000000; // tmaxfd
+    par[4]  = 0.000000; // stemax
+    par[5]  = 0.000000; // deemax
+    par[6]  = 0.000100; // epsil
+    par[7]  = 0.000000; // stmin
+    pMed9 = new TGeoMedium("CsIn", 2,pMat9, par);
+  }
 
-  TGeoMedium* pMed9 = new TGeoMedium("CsIn", 2,pMat9);
 
- // Material: Aluminum
-  a       = 26.980000;
-  z       = 13.000000;
-  density = 2.700000;
-  radl    = 8.875105;
-  absl    = 388.793113;
+   // Material: Aluminum
+  TGeoMedium * pMed21=NULL;
+   if (gGeoManager->GetMedium("Aluminum") ){
+       pMed21=gGeoManager->GetMedium("Aluminum");
+  }else{
+      a       = 26.980000;
+      z       = 13.000000;
+      density = 2.700000;
+      radl    = 8.875105;
+      absl    = 388.793113;
+      TGeoMaterial *matAl = new TGeoMaterial("Aluminum", a,z,density,radl,absl);
+      Double_t par[8];
+      par[0]  = 0.000000; // isvol
+      par[1]  = 0.000000; // ifield
+      par[2]  = 0.000000; // fieldm
+      par[3]  = 0.000000; // tmaxfd
+      par[4]  = 0.000000; // stemax
+      par[5]  = 0.000000; // deemax
+      par[6]  = 0.000100; // epsil
+      par[7]  = 0.000000; // stmin
+      pMed21 = new TGeoMedium("Aluminum",3, matAl, par);
+  }
 
-  TGeoMaterial *matAl = new TGeoMaterial("Aluminum", a,z,density,radl,absl);
-  TGeoMedium* pMed21 = new TGeoMedium("Aluminum",3, matAl);
 
-// ---- Geometry Definition 
+   // ---- Geometry Definition
    // Get the top Volume
-    TGeoVolume *top =  gGeoManager->GetTopVolume();
+      TGeoVolume *top =  gGeoManager->GetTopVolume();
 
    // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
    // Shape: CBSphereWorld type: TGeoSphere

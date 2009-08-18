@@ -93,9 +93,8 @@ void R3BmTof::Initialize()
   FairDetector::Initialize();
 
    cout << endl;
-    cout << "-I- R3BmTof initialisation" << endl;
-    cout << "-I- Vol ID" << endl;
-    cout << "-I- MC ID Scintill. volume : " << gMC->VolId("mTOFLog")<< endl;
+   cout << "-I- R3BmTof: initialisation" << endl;
+   cout << "-I- R3BmTof: Sci. Vol. (McId) " << gMC->VolId("mTOFLog")<< endl;
 
 }
 
@@ -104,7 +103,7 @@ void R3BmTof::SetSpecialPhysicsCuts(){
 
    cout << endl;
 
-   cout << "-I- R3BmTof Adding customized Physics cut ... " << endl;
+   cout << "-I- R3BmTof: Adding customized Physics cut ... " << endl;
 
    if (gGeoManager) {
      TGeoMedium* pSi = gGeoManager->GetMedium("plasticFormTOF");
@@ -347,68 +346,74 @@ void R3BmTof::ConstructGeometry() {
 
   // out-of-file geometry definition
    Double_t dx,dy,dz;
- //  Double_t dx1, dx2, dy1, dy2;
    Double_t  par[20];
-  // Double_t theta, phi, h1, bl1, tl1, alpha1, h2, bl2, tl2, alpha2;
-  // Double_t twist;
-  // Double_t origin[3];
-   //Double_t rmin, rmax, rmin1, rmax1, rmin2, rmax2;
-  // Double_t r, rlo, rhi;
    Double_t a;
-  // Double_t point[3], norm[3];
-  // Double_t rin, stin, rout, stout;
    Double_t thx, phx, thy, phy, thz, phz;
-  // Double_t alpha, theta1, theta2, phi1, phi2, dphi;
- //  Double_t tr[3], rot[9];
    Double_t z, density, w;
-  // Double_t lx,ly,lz,tx,ty,tz;
-  // Double_t xvert[50], yvert[50];
-  // Double_t zsect,x0,y0,scale0;
    Int_t nel, numed;
-
-  // TGeoBoolNode *pBoolNode = 0;
-
 
 /****************************************************************************/
 // Material definition
 
- // Vacuum
-  //TGeoMaterial *matVacuum = new TGeoMaterial("Vacuum", 0,0,0);
-  //TGeoMedium *pMed1 = new TGeoMedium("Vacuum",1, matVacuum);
-  //pMed1->Print();
+   // Mixture: Air
+  TGeoMedium * pMed2=NULL;
+   if (gGeoManager->GetMedium("Air") ){
+       pMed2=gGeoManager->GetMedium("Air");
+   }else{
+     nel     = 2;
+     density = 0.001290;
+     TGeoMixture*
+	 pMat2 = new TGeoMixture("Air", nel,density);
+     a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+     pMat2->DefineElement(0,a,z,w);
+     a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+     pMat2->DefineElement(1,a,z,w);
+     pMat2->SetIndex(1);
+     // Medium: Air
+     numed   = 1;  // medium number
+     Double_t par[8];
+     par[0]  = 0.000000; // isvol
+     par[1]  = 0.000000; // ifield
+     par[2]  = 0.000000; // fieldm
+     par[3]  = 0.000000; // tmaxfd
+     par[4]  = 0.000000; // stemax
+     par[5]  = 0.000000; // deemax
+     par[6]  = 0.000100; // epsil
+     par[7]  = 0.000000; // stmin
+     pMed2 = new TGeoMedium("Air", numed,pMat2, par);
+   }
 
-// Mixture: Air
-  nel     = 2;
-  density = 0.001290;
-  TGeoMixture*
-  pMat2 = new TGeoMixture("Air", nel,density);
-  a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
-  pMat2->DefineElement(0,a,z,w);
-  a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
-  pMat2->DefineElement(1,a,z,w);
-  pMat2->SetIndex(1);
-  // Medium: Air
-  numed   = 1;  // medium number
- // TGeoMedium*
- // pMed2 = new TGeoMedium("Air", numed,pMat2);
+
+  // Mixture: plasticForTOF
+  TGeoMedium * pMed34=NULL;
+   if (gGeoManager->GetMedium("plasticFormTOF") ){
+       pMed34=gGeoManager->GetMedium("plasticFormTOF");
+   }else{
+     nel     = 2;
+     density = 1.032000;
+     TGeoMixture*
+	 pMat34 = new TGeoMixture("plasticFormTOF", nel,density);
+     a = 12.010700;   z = 6.000000;   w = 0.914708;  // C
+     pMat34->DefineElement(0,a,z,w);
+     a = 1.007940;   z = 1.000000;   w = 0.085292;  // H
+     pMat34->DefineElement(1,a,z,w);
+     pMat34->SetIndex(33);
+     // Medium: plasticForTOF
+     numed   = 33;  // medium number
+     Double_t par[8];
+     par[0]  = 0.000000; // isvol
+     par[1]  = 0.000000; // ifield
+     par[2]  = 0.000000; // fieldm
+     par[3]  = 0.000000; // tmaxfd
+     par[4]  = 0.000000; // stemax
+     par[5]  = 0.000000; // deemax
+     par[6]  = 0.000100; // epsil
+     par[7]  = 0.000000; // stmin
+     pMed34 = new TGeoMedium("plasticFormTOF", numed,pMat34,par);
+   }
 
 
- // Mixture: plasticForTOF
-   nel     = 2;
-   density = 1.032000;
-   TGeoMixture*
-   pMat34 = new TGeoMixture("plasticFormTOF", nel,density);
-      a = 12.010700;   z = 6.000000;   w = 0.914708;  // C
-   pMat34->DefineElement(0,a,z,w);
-      a = 1.007940;   z = 1.000000;   w = 0.085292;  // H
-   pMat34->DefineElement(1,a,z,w);
-   pMat34->SetIndex(33);
-// Medium: plasticForTOF
-   numed   = 33;  // medium number
-   TGeoMedium*
-   pMed34 = new TGeoMedium("plasticFormTOF", numed,pMat34, par);
-
-    // TRANSFORMATION MATRICES
+   // TRANSFORMATION MATRICES
    // Combi transformation: 
    dx = 151.000000;
    dy = 0.000000;

@@ -79,18 +79,30 @@ void R3BTarget::ConstructGeometry1(){
   TGeoMaterial *pMat=NULL;
   TGeoMedium   *pMed=NULL;
 
+  if (gGeoManager->GetMedium("Lead") ){
+       cout << "-I- TGeoManager: Lead Medium already defined " << endl;
+       pMed = gGeoManager->GetMedium("Lead");
+   }else{
   // Material definition
   // Material: Lead
    a       = 207.190000;
    z       = 82.000000;
    density = 11.350000;
-//   radl    = 0.561705;
-//   absl    = 182.471644;
    pMat = new TGeoMaterial("Lead", a,z,density);
    pMat->SetIndex(600);
 // Medium: Lead
    numed   = 26;  // medium number
-   pMed  = new TGeoMedium("Lead", numed,pMat);
+   Double_t par[8];
+   par[0]  = 0.000000; // isvol
+   par[1]  = 0.000000; // ifield
+   par[2]  = 0.000000; // fieldm
+   par[3]  = 0.000000; // tmaxfd
+   par[4]  = 0.000000; // stemax
+   par[5]  = 0.000000; // deemax
+   par[6]  = 0.000100; // epsil
+   par[7]  = 0.000000; // stmin
+   pMed  = new TGeoMedium("Lead", numed,pMat, par);
+  }
 
    // TRANSFORMATION MATRICES
    // Combi transformation: 
@@ -128,55 +140,69 @@ void R3BTarget::ConstructGeometry2(){
     cout << endl;
 
    Double_t dx,dy,dz;
-  // Double_t dx1, dx2, dy1, dy2;
-  // Double_t vert[20], par[20];
-  // Double_t theta, phi, h1, bl1, tl1, alpha1, h2, bl2, tl2, alpha2;
-  // Double_t twist;
-  // Double_t origin[3];
-  // Double_t rmin, rmax, rmin1, rmax1, rmin2, rmax2;
-  // Double_t r, rlo, rhi;
    Double_t a;
-  // Double_t point[3], norm[3];
-  // Double_t rin, stin, rout, stout;
    Double_t thx, phx, thy, phy, thz, phz;
    Double_t  phi1, phi2;
-   //Double_t tr[3], rot[9];
    Double_t z, density, w;
-  // Double_t lx,ly,lz,tx,ty,tz;
-  // Double_t xvert[50], yvert[50];
-  // Double_t zsect,x0,y0,scale0;
    Int_t nel, numed;
-  // TGeoBoolNode *pBoolNode = 0;
 
    // MATERIALS, MIXTURES AND TRACKING MEDIA
-// Mixture: Air
-   nel     = 2;
-   density = 0.001290;
-   TGeoMixture*
-   pMat2 = new TGeoMixture("Air", nel,density);
-      a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
-   pMat2->DefineElement(0,a,z,w);
-      a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
-   pMat2->DefineElement(1,a,z,w);
-   pMat2->SetIndex(1);
-// Medium: Air
-   numed   = 1;  // medium number
-  // TGeoMedium *
-  // pMed2 = new TGeoMedium("Air", numed,pMat2);
+
+   TGeoMedium * pMed2=NULL;
+   if (gGeoManager->GetMedium("Air") ){
+       pMed2=gGeoManager->GetMedium("Air");
+   }else{
+       // Mixture: Air
+       nel     = 2;
+       density = 0.001290;
+       TGeoMixture*
+	   pMat2 = new TGeoMixture("Air", nel,density);
+       a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+       pMat2->DefineElement(0,a,z,w);
+       a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+       pMat2->DefineElement(1,a,z,w);
+       pMat2->SetIndex(1);
+       numed = 14;
+       Double_t par[8];
+       par[0]  = 0.000000; // isvol
+       par[1]  = 0.000000; // ifield
+       par[2]  = 0.000000; // fieldm
+       par[3]  = 0.000000; // tmaxfd
+       par[4]  = 0.000000; // stemax
+       par[5]  = 0.000000; // deemax
+       par[6]  = 0.000100; // epsil
+       par[7]  = 0.000000; // stmin
+       pMed2 = new TGeoMedium("Air", numed,pMat2,par);
+   }
+
 // Mixture: CH2
-   nel     = 2;
-   density = 0.930000;
-   TGeoMixture*
-   pMat16 = new TGeoMixture("CH2", nel,density);
-      a = 12.010700;   z = 6.000000;   w = 0.856281;  // C
-   pMat16->DefineElement(0,a,z,w);
-      a = 1.007940;   z = 1.000000;   w = 0.143719;  // H
-   pMat16->DefineElement(1,a,z,w);
-   pMat16->SetIndex(15);
-// Medium: CH2
-   numed   = 15;  // medium number
-   TGeoMedium *
-   pMed16 = new TGeoMedium("CH2", numed,pMat16);
+   TGeoMedium * pMed16=NULL;
+   if (gGeoManager->GetMedium("CH2") ){
+       cout << "-I- TGeoManager: CH2 Medium already defined " << endl;
+       pMed16=gGeoManager->GetMedium("CH2");
+   }else{
+     nel = 2;
+     density = 0.930000;
+     TGeoMixture*
+	 pMat16 = new TGeoMixture("CH2", nel,density);
+     a = 12.010700;   z = 6.000000;   w = 0.856281;  // C
+     pMat16->DefineElement(0,a,z,w);
+     a = 1.007940;   z = 1.000000;   w = 0.143719;  // H
+     pMat16->DefineElement(1,a,z,w);
+     pMat16->SetIndex(15);
+     // Medium: CH2
+     numed   = 15;  // medium number
+     Double_t par[8];
+      par[0]  = 0.000000; // isvol
+      par[1]  = 0.000000; // ifield
+      par[2]  = 0.000000; // fieldm
+      par[3]  = 0.000000; // tmaxfd
+      par[4]  = 0.000000; // stemax
+      par[5]  = 0.000000; // deemax
+      par[6]  = 0.000100; // epsil
+      par[7]  = 0.000000; // stmin
+     pMed16 = new TGeoMedium("CH2", numed,pMat16, par);
+   }
 
    // TRANSFORMATION MATRICES
    // Combi transformation: 
@@ -217,55 +243,70 @@ void R3BTarget::ConstructGeometry3(){
 
 
    Double_t dx,dy,dz;
- //  Double_t dx1, dx2, dy1, dy2;
- //  Double_t vert[20], par[20];
    Double_t theta, phi;
-  // Double_t twist;
-  // Double_t origin[3];
-  // Double_t rmin, rmax, rmin1, rmax1, rmin2, rmax2;
-  // Double_t r, rlo, rhi;
    Double_t a;
-  // Double_t point[3], norm[3];
-  // Double_t rin, stin, rout, stout;
    Double_t thx, phx, thy, phy, thz, phz;
    Double_t alpha;
-  // Double_t tr[3], rot[9];
    Double_t z, density, w;
-  // Double_t lx,ly,lz,tx,ty,tz;
-  // Double_t xvert[50], yvert[50];
-  // Double_t zsect,x0,y0,scale0;
    Int_t nel, numed;
-  // TGeoBoolNode *pBoolNode = 0;
 
    // MATERIALS, MIXTURES AND TRACKING MEDIA
-// Mixture: Air
-   nel     = 2;
-   density = 0.001290;
-   TGeoMixture*
-   pMat2 = new TGeoMixture("Air", nel,density);
-      a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
-   pMat2->DefineElement(0,a,z,w);
-      a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
-   pMat2->DefineElement(1,a,z,w);
-   pMat2->SetIndex(1);
-// Medium: Air
-   numed   = 1;  // medium number
-  // TGeoMedium *
-  // pMed2 = new TGeoMedium("Air", numed,pMat2);
-// Mixture: CH2
-   nel     = 2;
-   density = 0.930000;
-   TGeoMixture*
-   pMat16 = new TGeoMixture("CH2", nel,density);
-      a = 12.010700;   z = 6.000000;   w = 0.856281;  // C
-   pMat16->DefineElement(0,a,z,w);
-      a = 1.007940;   z = 1.000000;   w = 0.143719;  // H
-   pMat16->DefineElement(1,a,z,w);
-   pMat16->SetIndex(15);
-// Medium: CH2
-   numed   = 15;  // medium number
-   TGeoMedium *
-   pMed16 = new TGeoMedium("CH2", numed,pMat16);
+
+   // Mixture: Air
+   TGeoMedium * pMed2=NULL;
+   if (gGeoManager->GetMedium("Air") ){
+       pMed2=gGeoManager->GetMedium("Air");
+   }else{
+     nel     = 2;
+     density = 0.001290;
+     TGeoMixture*
+	 pMat2 = new TGeoMixture("Air", nel,density);
+     a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+     pMat2->DefineElement(0,a,z,w);
+     a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+     pMat2->DefineElement(1,a,z,w);
+     pMat2->SetIndex(1);
+     // Medium: Air
+     numed   = 1;  // medium number
+     Double_t par[8];
+     par[0]  = 0.000000; // isvol
+     par[1]  = 0.000000; // ifield
+     par[2]  = 0.000000; // fieldm
+     par[3]  = 0.000000; // tmaxfd
+     par[4]  = 0.000000; // stemax
+     par[5]  = 0.000000; // deemax
+     par[6]  = 0.000100; // epsil
+     par[7]  = 0.000000; // stmin
+     pMed2 = new TGeoMedium("Air", numed,pMat2, par);
+   }
+
+   // Mixture: CH2
+   TGeoMedium * pMed16=NULL;
+   if (gGeoManager->GetMedium("CH2") ){
+       pMed16=gGeoManager->GetMedium("CH2");
+   }else{
+    nel     = 2;
+    density = 0.930000;
+    TGeoMixture*
+	pMat16 = new TGeoMixture("CH2", nel,density);
+    a = 12.010700;   z = 6.000000;   w = 0.856281;  // C
+    pMat16->DefineElement(0,a,z,w);
+    a = 1.007940;   z = 1.000000;   w = 0.143719;  // H
+    pMat16->DefineElement(1,a,z,w);
+    pMat16->SetIndex(15);
+    // Medium: CH2
+    numed   = 15;  // medium number
+    Double_t par[8];
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 0.000000; // tmaxfd
+    par[4]  = 0.000000; // stemax
+    par[5]  = 0.000000; // deemax
+    par[6]  = 0.000100; // epsil
+    par[7]  = 0.000000; // stmin
+    pMed16 = new TGeoMedium("CH2", numed,pMat16, par);
+   }
 
    // TRANSFORMATION MATRICES
    // Combi transformation: 
@@ -312,80 +353,101 @@ void R3BTarget::ConstructGeometry4(){
 
 
    Double_t dx,dy,dz;
- //  Double_t dx1, dx2, dy1, dy2;
-//   Double_t vert[20], par[20];
-//   Double_t theta, phi, h1, bl1, tl1, alpha1, h2, bl2, tl2, alpha2;
- //  Double_t twist;
- //  Double_t origin[3];
- //  Double_t rmin, rmax, rmin1, rmax1, rmin2, rmax2;
- //  Double_t r, rlo, rhi;
    Double_t a;
-  // Double_t point[3], norm[3];
-  // Double_t rin, stin, rout, stout;
    Double_t thx, phx, thy, phy, thz, phz;
    Double_t  phi1, phi2;
-  // Double_t tr[3], rot[9];
    Double_t z, density, radl, absl, w;
-  // Double_t lx,ly,lz,tx,ty,tz;
-  // Double_t xvert[50], yvert[50];
-  // Double_t zsect,x0,y0,scale0;
    Int_t nel, numed;
-  // TGeoBoolNode *pBoolNode = 0;
 
    // MATERIALS, MIXTURES AND TRACKING MEDIA
-// Mixture: Air
-   nel     = 2;
-   density = 0.001290;
-   TGeoMixture*
-   pMat2 = new TGeoMixture("Air", nel,density);
-      a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
-   pMat2->DefineElement(0,a,z,w);
-      a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
-   pMat2->DefineElement(1,a,z,w);
-   pMat2->SetIndex(1);
-// Medium: Air
-   numed   = 1;  // medium number
-   TGeoMedium *
-   pMed2 = new TGeoMedium("Air", numed,pMat2);
 
-
+   // Mixture: Air
+   TGeoMedium * pMed2=NULL;
+   if (gGeoManager->GetMedium("Air") ){
+       pMed2=gGeoManager->GetMedium("Air");
+   }else{
+    nel     = 2;
+    density = 0.001290;
+    TGeoMixture*
+	pMat2 = new TGeoMixture("Air", nel,density);
+    a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+    pMat2->DefineElement(0,a,z,w);
+    a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+    pMat2->DefineElement(1,a,z,w);
+    pMat2->SetIndex(1);
+    // Medium: Air
+    numed   = 1;  // medium number
+    Double_t par[8];
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 0.000000; // tmaxfd
+    par[4]  = 0.000000; // stemax
+    par[5]  = 0.000000; // deemax
+    par[6]  = 0.000100; // epsil
+    par[7]  = 0.000000; // stmin
+    pMed2 = new TGeoMedium("Air", numed,pMat2, par);
+   }
 
 // Mixture: Mylar
-   nel     = 3;
-   density = 1.397000;
-   TGeoMixture*
-   pMat15 = new TGeoMixture("Mylar", nel,density);
-      a = 12.010700;   z = 6.000000;   w = 0.625010;  // C
-   pMat15->DefineElement(0,a,z,w);
-      a = 1.007940;   z = 1.000000;   w = 0.041961;  // H
-   pMat15->DefineElement(1,a,z,w);
-      a = 15.999400;   z = 8.000000;   w = 0.333029;  // O
-   pMat15->DefineElement(2,a,z,w);
-   pMat15->SetIndex(14);
-// Medium: Mylar
-   numed   = 14;  // medium number
-   TGeoMedium *
-   pMed15 = new TGeoMedium("Mylar", numed,pMat15);
+   TGeoMedium * pMed15=NULL;
+   if (gGeoManager->GetMedium("Mylar") ){
+       pMed15=gGeoManager->GetMedium("Mylar");
+   }else{
+    nel     = 3;
+    density = 1.397000;
+    TGeoMixture*
+	pMat15 = new TGeoMixture("Mylar", nel,density);
+    a = 12.010700;   z = 6.000000;   w = 0.625010;  // C
+    pMat15->DefineElement(0,a,z,w);
+    a = 1.007940;   z = 1.000000;   w = 0.041961;  // H
+    pMat15->DefineElement(1,a,z,w);
+    a = 15.999400;   z = 8.000000;   w = 0.333029;  // O
+    pMat15->DefineElement(2,a,z,w);
+    pMat15->SetIndex(14);
+    // Medium: Mylar
+    numed   = 14;  // medium number
+    Double_t par[8];
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 0.000000; // tmaxfd
+    par[4]  = 0.000000; // stemax
+    par[5]  = 0.000000; // deemax
+    par[6]  = 0.000100; // epsil
+    par[7]  = 0.000000; // stmin
+    pMed15 = new TGeoMedium("Mylar", numed,pMat15,par);
+   }
 
-// Material: H2
-   a       = 1.007940;
-   z       = 1.000000;
-   density = 0.070800;
-   radl    = 816.908193;
-   absl    = 4956.556132;
-   TGeoMaterial*
-   pMat3 = new TGeoMaterial("H2", a,z,density,radl,absl);
-   pMat3->SetIndex(2);
-// Medium: H2
-   numed   = 2;  // medium number
-   TGeoMedium *
-   pMed3 = new TGeoMedium("H2", numed,pMat3);
+    // Material: H2
+   TGeoMedium * pMed3=NULL;
+   if (gGeoManager->GetMedium("H2") ){
+       pMed3=gGeoManager->GetMedium("H2");
+   }else{
+      a       = 1.007940;
+      z       = 1.000000;
+      density = 0.070800;
+      radl    = 816.908193;
+      absl    = 4956.556132;
+      TGeoMaterial*
+	  pMat3 = new TGeoMaterial("H2", a,z,density,radl,absl);
+      pMat3->SetIndex(2);
+      // Medium: H2
+      numed   = 2;  // medium number
+      Double_t par[8];
+      par[0]  = 0.000000; // isvol
+      par[1]  = 0.000000; // ifield
+      par[2]  = 0.000000; // fieldm
+      par[3]  = 0.000000; // tmaxfd
+      par[4]  = 0.000000; // stemax
+      par[5]  = 0.000000; // deemax
+      par[6]  = 0.000100; // epsil
+      par[7]  = 0.000000; // stmin
+      pMed3 = new TGeoMedium("H2", numed,pMat3,par);
+   }
 
 
-
-
-
-   // TRANSFORMATION MATRICES
+      // TRANSFORMATION MATRICES
    // Combi transformation: 
    dx = 0.000000;
    dy = 0.000000;

@@ -91,13 +91,13 @@ void R3BCalo::Initialize()
   FairDetector::Initialize();
 
    cout << endl;
-    cout << "-I- R3BCalo initialisation" << endl;
-    cout << "-I- Getting Vol IDs" << endl;
+   cout << "-I- R3BCalo: initialisation" << endl;
+   cout << "-I- R3BCalo: Vol (McId) def." << endl;
     Char_t buffer[126];
 
     for (Int_t i=0;i<30;i++ ) {
      sprintf(buffer,"crystalLog%i",i+1);
-     cout << "-I- R3BCalo Crystal Nb   : " << i << " connected to Mc:ID ---> " <<  gMC->VolId(buffer)<< endl;
+     cout << "-I- R3BCalo: Crystal Nb   : " << i << " connected to (McId) ---> " <<  gMC->VolId(buffer)<< endl;
      fCrystalType[i] = gMC->VolId(buffer);
     }
 
@@ -108,8 +108,8 @@ void R3BCalo::SetSpecialPhysicsCuts(){
 
    cout << endl;
 
-   cout << "-I- R3BCal Adding customized Physics cut ... " << endl;
-   cout << "-I- Yet not implemented !... " << endl;
+   cout << "-I- R3BCalo: Adding customized Physics cut ... " << endl;
+   cout << "-I- R3BCalo: Yet not implemented !... " << endl;
 
    cout << endl;
 
@@ -315,71 +315,75 @@ R3BCaloPoint* R3BCalo::AddHit(Int_t trackID, Int_t detID, Int_t volid , Int_t co
 void R3BCalo::ConstructGeometry() {
 
   // out-of-file geometry definition
- //  Double_t dx1, dx2, dy1, dy2;
- //  Double_t vert[20], par[20];
    Double_t h1, bl1, tl1, alpha1, h2, bl2, tl2, alpha2;
-  // Double_t twist;
- //  Double_t origin[3];
    Double_t rmin, rmax, rmin1, rmax1, rmin2, rmax2;
-  // Double_t r, rlo, rhi;
    Double_t a;
-   //Double_t point[3], norm[3];
-  // Double_t rin, stin, rout, stout;
    Double_t thx, phx, thy, phy, thz, phz;
    Double_t phi1, phi2;
-  // Double_t tr[3], rot[9];
    Double_t z, density, w;
- //  Double_t lx,ly,lz,tx,ty,tz;
-   //Double_t xvert[50], yvert[50];
-  // Double_t zsect,x0,y0,scale0;
    Int_t nel, numed;
-
-  // TGeoBoolNode *pBoolNode = 0;
 
 
 /****************************************************************************/
 // Material definition
 
+
   // Mixture: CsI
-  nel     = 2;
-  density = 4.510000;
-  TGeoMixture*
-      pMat9 = new TGeoMixture("CsIn", nel,density);
-  a = 132.905450;   z = 55.000000;   w = 0.511549;  // CS
-  pMat9->DefineElement(0,a,z,w);
-  a = 126.904470;   z = 53.000000;   w = 0.488451;  // I
-  pMat9->DefineElement(1,a,z,w);
-  numed = 801;
-  pMat9->SetIndex(numed);
-  TGeoMedium* pMed9 = new TGeoMedium("CsIn", numed,pMat9);
+  TGeoMedium * pMed9=NULL;
+   if (gGeoManager->GetMedium("CsIn") ){
+       pMed9=gGeoManager->GetMedium("CsIn");
+   }else{
+       nel     = 2;
+       density = 4.510000;
+       TGeoMixture*
+	   pMat9 = new TGeoMixture("CsIn", nel,density);
+       a = 132.905450;   z = 55.000000;   w = 0.511549;  // CS
+       pMat9->DefineElement(0,a,z,w);
+       a = 126.904470;   z = 53.000000;   w = 0.488451;  // I
+       pMat9->DefineElement(1,a,z,w);
+       numed = 801;
+       pMat9->SetIndex(numed);
+       Double_t par[8];
+       par[0]  = 0.000000; // isvol
+       par[1]  = 0.000000; // ifield
+       par[2]  = 0.000000; // fieldm
+       par[3]  = 0.000000; // tmaxfd
+       par[4]  = 0.000000; // stemax
+       par[5]  = 0.000000; // deemax
+       par[6]  = 0.000100; // epsil
+       par[7]  = 0.000000; // stmin
+       pMed9 = new TGeoMedium("CsIn", numed,pMat9, par);
+  }
 
-
-
-
- // Vacuum
-//  TGeoMaterial *matVacuum = new TGeoMaterial("Vacuum", 0,0,0);
-//  TGeoMedium *pMed1 = new TGeoMedium("Vacuum",1, matVacuum);
-//  pMed1->Print();
-
-
-// Mixture: CarbonFibre
-   nel     = 3;
-   density = 1.690000;
-  TGeoMixture*
-   pMat19 = new TGeoMixture("CarbonFibre", nel,density);
+   // Mixture: CarbonFibre
+   TGeoMedium * pMed19=NULL;
+   if (gGeoManager->GetMedium("CarbonFibre") ){
+       pMed19=gGeoManager->GetMedium("CarbonFibre");
+   }else{
+      nel     = 3;
+      density = 1.690000;
+      TGeoMixture*
+	  pMat19 = new TGeoMixture("CarbonFibre", nel,density);
       a = 12.010700;   z = 6.000000;   w = 0.844907;  // C
-   pMat19->DefineElement(0,a,z,w);
+      pMat19->DefineElement(0,a,z,w);
       a = 1.007940;   z = 1.000000;   w = 0.042543;  // H
-   pMat19->DefineElement(1,a,z,w);
+      pMat19->DefineElement(1,a,z,w);
       a = 15.999400;   z = 8.000000;   w = 0.112550;  // O
-   pMat19->DefineElement(2,a,z,w);
-// Medium: CarbonFibre
-   numed   = 802;  // medium number
-   pMat19->SetIndex(numed);
-   TGeoMedium*
-   pMed19 = new TGeoMedium("CarbonFibre", numed,pMat19);
-
-
+      pMat19->DefineElement(2,a,z,w);
+      // Medium: CarbonFibre
+      numed   = 802;  // medium number
+      pMat19->SetIndex(numed);
+      Double_t par[8];
+      par[0]  = 0.000000; // isvol
+      par[1]  = 0.000000; // ifield
+      par[2]  = 0.000000; // fieldm
+      par[3]  = 0.000000; // tmaxfd
+      par[4]  = 0.000000; // stemax
+      par[5]  = 0.000000; // deemax
+      par[6]  = 0.000100; // epsil
+      par[7]  = 0.000000; // stmin
+      pMed19 = new TGeoMedium("CarbonFibre", numed,pMat19,par);
+   }
 
 
 /****************************************************************************/

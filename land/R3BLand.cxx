@@ -93,11 +93,10 @@ void R3BLand::Initialize()
 
   FairDetector::Initialize();
 
-cout << "-I- R3BLand initialistion " << endl;
-cout << "-I- Vol ID " << endl;
-//cout << "-I- MC id box3 : " << gMC->VolId("padle_h_box3") << endl;
-//cout << "-I- MC id box4 : " << gMC->VolId("padle_h_box4") << endl;
-//cout << "-I- MC id box5 : " << gMC->VolId("padle_h_box5") << endl;
+  cout << "-I- R3BLand: initialisation " << endl;
+  cout << "-I- R3BLand: Paddle B3 (McId): " << gMC->VolId("padle_h_box3") << endl;
+  cout << "-I- R3BLand: Paddle B4 (McId): " << gMC->VolId("padle_h_box4") << endl;
+  cout << "-I- R3BLand: Paddle B5 (McId): " << gMC->VolId("padle_h_box5") << endl;
 
  Int_t id1 = gMC->VolId("padle_h_box3");
  Int_t id2 = gMC->VolId("padle_h_box4");
@@ -342,73 +341,104 @@ void R3BLand::ConstructGeometry() {
   // out-of-file geometry definition
    Double_t dz;
    Double_t dx1, dx2, dy1, dy2;
-  // Double_t vert[20], par[20];
-  // Double_t theta, phi, h1, bl1, tl1, alpha1, h2, bl2, tl2, alpha2;
-   //Double_t twist;
-   //Double_t origin[3];
-   //Double_t rmin, rmax, rmin1, rmax1, rmin2, rmax2;
-   //Double_t r, rlo, rhi;
    Double_t a;
-   //Double_t point[3], norm[3];
- //  Double_t rin, stin, rout, stout;
-   //Double_t thx, phx, thy, phy, thz, phz;
-   //Double_t alpha, theta1, theta2, phi1, phi2, dphi;
-   //Double_t tr[3], rot[9];
    Double_t z, density, w;
    Double_t tx,ty,tz;
-   //Double_t xvert[50], yvert[50];
-   //Double_t zsect,x0,y0,scale0;
    Int_t nel, numed;
-
-   //sTGeoBoolNode *pBoolNode = 0;
-
+   Double_t radl,absl;
 
 /****************************************************************************/
 // Material definition
 
- // Vacuum
-//  TGeoMaterial *matVacuum = new TGeoMaterial("Vacuum", 0,0,0);
-  //TGeoMedium *pMed1 = new TGeoMedium("Vacuum",1, matVacuum);
+   // Mixture: Air
+   TGeoMedium * pMed2=NULL;
+   if (gGeoManager->GetMedium("Air") ){
+       pMed2=gGeoManager->GetMedium("Air");
+   }else{
+    nel     = 2;
+    density = 0.001290;
+    TGeoMixture*
+	pMat2 = new TGeoMixture("Air", nel,density);
+    a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+    pMat2->DefineElement(0,a,z,w);
+    a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+    pMat2->DefineElement(1,a,z,w);
+    pMat2->SetIndex(1);
+    // Medium: Air
+    numed   = 1;  // medium number
+    Double_t par[8];
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 0.000000; // tmaxfd
+    par[4]  = 0.000000; // stemax
+    par[5]  = 0.000000; // deemax
+    par[6]  = 0.000100; // epsil
+    par[7]  = 0.000000; // stmin
+    pMed2 = new TGeoMedium("Air", numed,pMat2, par);
+   }
 
-// Mixture: Air
-  nel     = 2;
-  density = 0.001290;
-  TGeoMixture*
-  pMat2 = new TGeoMixture("Air", nel,density);
-  a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
-  pMat2->DefineElement(0,a,z,w);
-  a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
-  pMat2->DefineElement(1,a,z,w);
-  pMat2->SetIndex(1);
-  // Medium: Air
-  numed   = 1;  // medium number
-//  TGeoMedium*
- // pMed2 = new TGeoMedium("Air", numed,pMat2);
-
-//  TGeoMaterial *vacuum = new TGeoMaterial("vacuum",0,0,0);
-  TGeoMaterial *Fe = new TGeoMaterial("Fe",55.84,26,7.87);
-  //TGeoMaterial *Cu = new TGeoMaterial("Cu",63.549,29,8.92);
 
 //------------------Creat media----------------------------------
-  TGeoMedium *Iron = new TGeoMedium("Iron",800,Fe);
+ // --  Material: Iron
+   TGeoMedium * pMedFe=NULL;
+   if (gGeoManager->GetMedium("Iron") ){
+       pMedFe=gGeoManager->GetMedium("Iron");
+   }else{
+    w       =        0.;
+    a       = 55.850000;
+    z       = 26.000000;
+    density = 7.870000;
+    radl    = 1.757717;
+    absl    = 169.994418;
+    TGeoMaterial*
+	pMatFe = new TGeoMaterial("Iron", a,z,density,radl,absl);
+    pMatFe->SetIndex(701);
+    numed   = 23;  // medium number
+    Double_t par[8];
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 0.000000; // tmaxfd
+    par[4]  = 0.000000; // stemax
+    par[5]  = 0.000000; // deemax
+    par[6]  = 0.000100; // epsil
+    par[7]  = 0.000000; // stmin
+    pMedFe = new TGeoMedium("Iron", numed,pMatFe, par);
+   }
+
+   TGeoMedium *Iron = pMedFe;
 
  // BC408 plastic medium
  // Mixture: BC408
-   nel     = 2;
-   density = 1.032000;
-   TGeoMixture*
-   pMat37 = new TGeoMixture("BC408", nel,density);
-      a = 1.007940;   z = 1.000000;   w = 0.520000;  // H
-   pMat37->DefineElement(0,a,z,w);
-      a = 12.010700;   z = 6.000000;   w = 0.480000;  // C
-   pMat37->DefineElement(1,a,z,w);
-   pMat37->SetIndex(36);
-// Medium: BC408
-   numed   = 36;  // medium number
-   TGeoMedium*
-   pMed37 = new TGeoMedium("BC408", numed,pMat37);
+   TGeoMedium * pMed37=NULL;
+   if (gGeoManager->GetMedium("BC408") ){
+       pMed37=gGeoManager->GetMedium("BC408");
+   }else{
+     nel     = 2;
+     density = 1.032000;
+     TGeoMixture*
+	 pMat37 = new TGeoMixture("BC408", nel,density);
+     a = 1.007940;   z = 1.000000;   w = 0.520000;  // H
+     pMat37->DefineElement(0,a,z,w);
+     a = 12.010700;   z = 6.000000;   w = 0.480000;  // C
+     pMat37->DefineElement(1,a,z,w);
+     pMat37->SetIndex(36);
+     // Medium: BC408
+     numed   = 36;  // medium number
+     Double_t par[8];
+     par[0]  = 0.000000; // isvol
+     par[1]  = 0.000000; // ifield
+     par[2]  = 0.000000; // fieldm
+     par[3]  = 0.000000; // tmaxfd
+     par[4]  = 0.000000; // stemax
+     par[5]  = 0.000000; // deemax
+     par[6]  = 0.000100; // epsil
+     par[7]  = 0.000000; // stmin
+     pMed37 = new TGeoMedium("BC408", numed,pMat37,par);
+   }
 
-//
+   //
 // <DB> Attempt to use TGeo Assemblies
 // to model neutron detectors 25.03.09
 //
