@@ -1,10 +1,10 @@
-#include "R3BModule.h"
+#include "R3BDetector.h"
 
 #include <iostream>
 using namespace std;
 
 // -----   Default constructor   -------------------------------------------
-R3BModule::R3BModule() : FairModule() {
+R3BDetector::R3BDetector() : FairDetector() {
  // Create Matrix Unity
     fGlobalRot = new TGeoRotation();
 
@@ -14,8 +14,8 @@ R3BModule::R3BModule() : FairModule() {
 }
 
 // -----   Standard constructor   ------------------------------------------
-R3BModule::R3BModule( const Char_t* Name, const Char_t* title, Bool_t Active)
-    : FairModule(Name,title,Active) {
+R3BDetector::R3BDetector( const Char_t* Name, Bool_t Active, Int_t detid)
+    : FairDetector(Name,Active,detid) {
 
  // Create Matrix Unity
     fGlobalRot = new TGeoRotation();
@@ -27,11 +27,11 @@ R3BModule::R3BModule( const Char_t* Name, const Char_t* title, Bool_t Active)
 }
 
 // -----   Destructor   ----------------------------------------------------
-R3BModule::~R3BModule() {
+R3BDetector::~R3BDetector() {
 
 }
 
-void R3BModule::SetRotAngles(Double_t phi, Double_t theta, Double_t psi){
+void R3BDetector::SetRotAngles(Double_t phi, Double_t theta, Double_t psi){
  // Euler Angles definition
  // This represent the composition of : first a rotation about Z axis with
  // angle phi, then a rotation with theta about the rotated X axis, and
@@ -41,12 +41,12 @@ void R3BModule::SetRotAngles(Double_t phi, Double_t theta, Double_t psi){
 
 }
 
-void R3BModule::SetTranslation(Double_t tx, Double_t ty, Double_t tz){
+void R3BDetector::SetTranslation(Double_t tx, Double_t ty, Double_t tz){
 
   fGlobalTrans->SetTranslation(tx,ty,tz);
 
 }
 
 
-ClassImp(R3BModule)
+ClassImp(R3BDetector)
   
