@@ -50,7 +50,7 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BTra::R3BTra() : FairDetector("R3BTra", kTRUE, kTRA) {
+R3BTra::R3BTra() : R3BDetector("R3BTra", kTRUE, kTRA) {
   ResetParameters();
   fTraCollection = new TClonesArray("R3BTraPoint");
   fPosIndex = 0;
@@ -66,7 +66,7 @@ R3BTra::R3BTra() : FairDetector("R3BTra", kTRUE, kTRA) {
 
 // -----   Standard constructor   ------------------------------------------
 R3BTra::R3BTra(const char* name, Bool_t active) 
-  : FairDetector(name, active, kTRA) {
+  : R3BDetector(name, active, kTRA) {
   ResetParameters();
   fTraCollection = new TClonesArray("R3BTraPoint");
   fPosIndex = 0;
@@ -701,8 +701,25 @@ void R3BTra::ConstructGeometry() {
 
 
    // Shape: World type: TGeoBBox
-   TGeoVolume* pWorld = gGeoManager->GetTopVolume();
+   TGeoVolume* pAWorld = gGeoManager->GetTopVolume();
+   pAWorld->SetVisLeaves(kTRUE);
+
+   // Create a global Mother Volume
+   dx = 200.000000;
+   dy = 200.000000;
+   dz = 200.000000;
+   TGeoShape *pBoxWorld = new TGeoBBox("TraBoxWorld", dx,dy,dz);
+   TGeoVolume*
+   pWorld  = new TGeoVolume("TraBoxLogWorld",pBoxWorld, pMed2);
    pWorld->SetVisLeaves(kTRUE);
+   TGeoCombiTrans *pGlobalc = GetGlobalPosition();
+
+   // add the sphere as Mother Volume
+   pAWorld->AddNode(pWorld, 0, pGlobalc);
+
+
+
+
 
 
    // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY

@@ -49,7 +49,7 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BLand::R3BLand() : FairDetector("R3BLand", kTRUE, kLAND) {
+R3BLand::R3BLand() : R3BDetector("R3BLand", kTRUE, kLAND) {
   ResetParameters();
   fLandCollection = new TClonesArray("R3BLandPoint");
   fPosIndex = 0;
@@ -64,7 +64,7 @@ R3BLand::R3BLand() : FairDetector("R3BLand", kTRUE, kLAND) {
 
 // -----   Standard constructor   ------------------------------------------
 R3BLand::R3BLand(const char* name, Bool_t active) 
-  : FairDetector(name, active, kLAND) {
+  : R3BDetector(name, active, kLAND) {
   ResetParameters();
   fLandCollection = new TClonesArray("R3BLandPoint");
   fPosIndex = 0;
@@ -339,7 +339,7 @@ R3BLandPoint* R3BLand::AddHit(Int_t trackID, Int_t detID, Int_t box, Int_t id1, 
 void R3BLand::ConstructGeometry() {
 
   // out-of-file geometry definition
-   Double_t dz;
+   Double_t dx,dy,dz;
    Double_t dx1, dx2, dy1, dy2;
    Double_t a;
    Double_t z, density, w;
@@ -443,8 +443,23 @@ void R3BLand::ConstructGeometry() {
 // to model neutron detectors 25.03.09
 //
 
-   TGeoVolume* vWorld = gGeoManager->GetTopVolume();
+   TGeoVolume* pAWorld = gGeoManager->GetTopVolume();
+   pAWorld->SetVisLeaves(kTRUE);
+
+   // Create a global Mother Volume
+   dx = 500.000000;
+   dy = 500.000000;
+   dz = 500.000000;
+   TGeoShape *pBoxWorld = new TGeoBBox("LandBoxWorld", dx,dy,dz);
+   TGeoVolume*
+   vWorld  = new TGeoVolume("LandBoxLogWorld",pBoxWorld, pMed2);
    vWorld->SetVisLeaves(kTRUE);
+   TGeoCombiTrans *pGlobalc = GetGlobalPosition();
+
+   // add the sphere as Mother Volume
+   pAWorld->AddNode(vWorld, 0, pGlobalc);
+
+
 
     // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
   Double_t padle_h_dim1x = 100.1;

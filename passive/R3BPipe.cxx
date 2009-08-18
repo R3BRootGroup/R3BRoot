@@ -28,29 +28,16 @@ R3BPipe::R3BPipe()
 }
 
 R3BPipe::R3BPipe(const char * name, const char * title)
-  : FairModule(name ,title)
+  : R3BModule(name ,title)
 {
 }
 
 void R3BPipe::ConstructGeometry(){
   
- // FairRun *fRun = FairRun::Instance();
- // FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
- // R3BGeoPassivePar* par=(R3BGeoPassivePar*)(rtdb->getContainer("R3BGeoPassivePar"));
   
   FairGeoLoader *loader=FairGeoLoader::Instance();
   FairGeoInterface *GeoInterface =loader->getGeoInterface();
- // FairGeoMedia *Media =  GeoInterface->getMedia();
- // FairGeoBuilder *geobuild = loader->getGeoBuilder();
   
-  // Call materials
- // FairGeoMedium *medVacuum  = Media->getMedium("vacuum");
- // FairGeoMedium *medSteel   = Media->getMedium("steel");
- // FairGeoMedium *medAlBe    = Media->getMedium("Al+Be");
-  
- // Int_t nMedVacuum = geobuild->createMedium(medVacuum);
- // Int_t nMedSteel  = geobuild->createMedium(medSteel);
- // Int_t nMedAlBe   = geobuild->createMedium(medAlBe);
   
   Double_t parPipeLeft[9] = { 0., 360., 2,
 			      -200.,  7.9, 8.,

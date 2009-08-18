@@ -48,7 +48,7 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BCalo::R3BCalo() : FairDetector("R3BCalo", kTRUE, kCALIFA) {
+R3BCalo::R3BCalo() : R3BDetector("R3BCalo", kTRUE, kCALIFA) {
   ResetParameters();
   fCaloCollection = new TClonesArray("R3BCaloPoint");
   fPosIndex = 0;
@@ -63,7 +63,7 @@ R3BCalo::R3BCalo() : FairDetector("R3BCalo", kTRUE, kCALIFA) {
 
 // -----   Standard constructor   ------------------------------------------
 R3BCalo::R3BCalo(const char* name, Bool_t active) 
-  : FairDetector(name, active, kCALIFA) {
+  : R3BDetector(name, active, kCALIFA) {
   ResetParameters();
   fCaloCollection = new TClonesArray("R3BCaloPoint");
   fPosIndex = 0;
@@ -385,6 +385,34 @@ void R3BCalo::ConstructGeometry() {
       pMed19 = new TGeoMedium("CarbonFibre", numed,pMat19,par);
    }
 
+  // Mixture: Air
+  TGeoMedium * pMed2=NULL;
+   if (gGeoManager->GetMedium("Air") ){
+       pMed2=gGeoManager->GetMedium("Air");
+  }else{
+    nel     = 2;
+    density = 0.001290;
+    TGeoMixture*
+	pMat2 = new TGeoMixture("Air", nel,density);
+    a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+    pMat2->DefineElement(0,a,z,w);
+    a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+    pMat2->DefineElement(1,a,z,w);
+    pMat2->SetIndex(1);
+    // Medium: Air
+    numed   = 1;  // medium number
+    Double_t par[8];
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 0.000000; // tmaxfd
+    par[4]  = 0.000000; // stemax
+    par[5]  = 0.000000; // deemax
+    par[6]  = 0.000100; // epsil
+    par[7]  = 0.000000; // stmin
+    pMed2 = new TGeoMedium("Air", numed,pMat2, par);
+  }
+
 
 /****************************************************************************/
 //  Root geometry definition of the Barrel Calorimeter
@@ -395,7 +423,26 @@ void R3BCalo::ConstructGeometry() {
 /****************************************************************************/
    //WORLD
 
-   TGeoVolume *pWorld  =  gGeoManager->GetTopVolume();
+   TGeoVolume *pAWorld  =  gGeoManager->GetTopVolume();
+
+   // Defintion of the Mother Volume
+   Double_t theta1 = 0.000000;
+   Double_t theta2 = 180.000000;
+   rmin   = 0.0000;
+   rmax   = 300.000000;
+   phi1   = 0.000000;
+   phi2   = 360.000000;
+   TGeoShape *pCBWorld  =
+             new TGeoSphere("CBSphereWorld",rmin,rmax,theta1, theta2,phi1,phi2);
+   TGeoVolume*
+   pWorld  = new TGeoVolume("CBLogWorld",pCBWorld, pMed2);
+   pWorld->SetVisLeaves(kTRUE);
+
+   TGeoCombiTrans *pGlobalc = GetGlobalPosition();
+
+  // add the sphere as Mother Volume
+   pAWorld->AddNode(pWorld, 0, pGlobalc);
+
 
    // TRAP1
    Double_t ddz, theta, phi;

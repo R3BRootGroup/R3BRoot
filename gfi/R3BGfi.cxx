@@ -48,7 +48,7 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BGfi::R3BGfi() : FairDetector("R3BGfi", kTRUE, kGFI) {
+R3BGfi::R3BGfi() : R3BDetector("R3BGfi", kTRUE, kGFI) {
   ResetParameters();
   fGfiCollection = new TClonesArray("R3BGfiPoint");
   fPosIndex = 0;
@@ -64,7 +64,7 @@ R3BGfi::R3BGfi() : FairDetector("R3BGfi", kTRUE, kGFI) {
 
 // -----   Standard constructor   ------------------------------------------
 R3BGfi::R3BGfi(const char* name, Bool_t active) 
-  : FairDetector(name, active, kGFI) {
+  : R3BDetector(name, active, kGFI) {
   ResetParameters();
   fGfiCollection = new TClonesArray("R3BGfiPoint");
   fPosIndex = 0;
@@ -527,8 +527,24 @@ void R3BGfi::ConstructGeometry() {
 
 
    // World definition
-   TGeoVolume* pWorld = gGeoManager->GetTopVolume();
+   TGeoVolume* pAWorld = gGeoManager->GetTopVolume();
+   pAWorld->SetVisLeaves(kTRUE);
+
+   // Create a global Mother Volume
+   dx = 300.000000;
+   dy = 300.000000;
+   dz = 300.000000;
+   TGeoShape *pBoxWorld = new TGeoBBox("GfiBoxWorld", dx,dy,dz);
+   TGeoVolume*
+   pWorld  = new TGeoVolume("GfiBoxLogWorld",pBoxWorld, pMed2);
    pWorld->SetVisLeaves(kTRUE);
+   TGeoCombiTrans *pGlobalc = GetGlobalPosition();
+
+   // add the sphere as Mother Volume
+   pAWorld->AddNode(pWorld, 0, pGlobalc);
+
+
+
 
    // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
    // Shape: GFIBoxWorld type: TGeoBBox

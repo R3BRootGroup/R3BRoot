@@ -48,7 +48,7 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BmTof::R3BmTof() : FairDetector("R3BmTof", kTRUE, kMTOF) {
+R3BmTof::R3BmTof() : R3BDetector("R3BmTof", kTRUE, kMTOF) {
   ResetParameters();
   fmTofCollection = new TClonesArray("R3BmTofPoint");
   fPosIndex = 0;
@@ -64,7 +64,7 @@ R3BmTof::R3BmTof() : FairDetector("R3BmTof", kTRUE, kMTOF) {
 
 // -----   Standard constructor   ------------------------------------------
 R3BmTof::R3BmTof(const char* name, Bool_t active) 
-  : FairDetector(name, active, kMTOF) {
+  : R3BDetector(name, active, kMTOF) {
   ResetParameters();
   fmTofCollection = new TClonesArray("R3BmTofPoint");
   fPosIndex = 0;
@@ -425,9 +425,24 @@ void R3BmTof::ConstructGeometry() {
    TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
    pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
+
+
    // Shape: World type: TGeoBBox
-   TGeoVolume* pWorld = gGeoManager->GetTopVolume();
+   TGeoVolume* pAWorld = gGeoManager->GetTopVolume();
+   pAWorld->SetVisLeaves(kTRUE);
+
+   // Create a global Mother Volume
+   dx = 200.000000;
+   dy = 200.000000;
+   dz = 200.000000;
+   TGeoShape *pBoxWorld = new TGeoBBox("mTofBoxWorld", dx,dy,dz);
+   TGeoVolume*
+   pWorld  = new TGeoVolume("mTofBoxLogWorld",pBoxWorld, pMed2);
    pWorld->SetVisLeaves(kTRUE);
+   TGeoCombiTrans *pGlobalc = GetGlobalPosition();
+
+   // add the sphere as Mother Volume
+   pAWorld->AddNode(pWorld, 0, pGlobalc);
 
  
    // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY

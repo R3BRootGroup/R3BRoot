@@ -135,7 +135,6 @@ R3BFieldMap::R3BFieldMap(Int_t type,Bool_t verbosity)
 
    // verbose mode
 
-  cout << "fVerbose " << fVerbose << endl;
 
   if (fVerbose == kTRUE){
    for(Int_t i=0;i<numberOfPointsInGrid;i++){

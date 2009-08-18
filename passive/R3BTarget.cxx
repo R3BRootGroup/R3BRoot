@@ -41,7 +41,7 @@ fTargetName=NULL;
 }
 
 R3BTarget::R3BTarget(const char * name,  const char * title)
-  : FairModule(name ,title)
+  : R3BModule(name ,title)
 {
 
 fTargetName =  new TString(name);
@@ -128,7 +128,10 @@ void R3BTarget::ConstructGeometry1(){
    pleadTarget_log->SetVisLeaves(kTRUE);
 
    TGeoVolume *top =  gGeoManager->GetTopVolume();
-   top->AddNode(pleadTarget_log, 0, pMatrix);
+
+   TGeoCombiTrans* pGlobal = GetGlobalPosition();
+   TGeoHMatrix pPos = (*pGlobal) * (*pMatrix);
+   top->AddNode(pleadTarget_log, 0, new TGeoHMatrix(pPos));
 
 }
 

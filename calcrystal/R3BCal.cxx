@@ -57,7 +57,7 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BCal::R3BCal() : FairDetector("R3BCal", kTRUE, kCAL) {
+R3BCal::R3BCal() : R3BDetector("R3BCal", kTRUE, kCAL) {
   ResetParameters();
   fCalCollection = new TClonesArray("R3BCalPoint");
   fPosIndex = 0;
@@ -73,7 +73,7 @@ R3BCal::R3BCal() : FairDetector("R3BCal", kTRUE, kCAL) {
 
 // -----   Standard constructor   ------------------------------------------
 R3BCal::R3BCal(const char* name, Bool_t active) 
-  : FairDetector(name, active, kCAL) {
+  : R3BDetector(name, active, kCAL) {
   ResetParameters();
   fCalCollection = new TClonesArray("R3BCalPoint");
   fPosIndex = 0;
@@ -464,9 +464,11 @@ void R3BCal::ConstructGeometry2(){
    TGeoTranslation *pGlobalt = new TGeoTranslation(0.0,0.0,0.0);
    TGeoCombiTrans *pGlobalc = new TGeoCombiTrans(*pGlobalt,*pGlobalRot);  
 
+   TGeoCombiTrans *pG = GetGlobalPosition();
+   TGeoHMatrix pTotal = (*pG) * (*pGlobalc);
 
    // add the sphere as Mother Volume
-   top->AddNode(pCBLogWorld, 0, pGlobalc);
+   top->AddNode(pCBLogWorld, 0, new TGeoHMatrix(pTotal));
 
 
 

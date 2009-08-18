@@ -35,7 +35,7 @@ R3BMagnet::R3BMagnet()
 }
 
 R3BMagnet::R3BMagnet(const char * name, const char *Title)
-  : FairModule(name ,Title)
+  : R3BModule(name ,Title)
 {
 }
 
@@ -222,10 +222,17 @@ void R3BMagnet::ConstructGeometry(){
    TGeoVolume* pVolFeYoke_right = new TGeoVolume("FeYokeVolright",solidFeYoke_right, pMedFe);
    pVolFeYoke_right->SetVisLeaves(kTRUE);
 
-   pWorld->AddNode(pVolFeYoke_up,   1, t1);
-   pWorld->AddNode(pVolFeYoke_down, 2, t2);
-   pWorld->AddNode(pVolFeYoke_left, 3, t3);
-   pWorld->AddNode(pVolFeYoke_right,4, t4);
+   TGeoCombiTrans* pGlobal = GetGlobalPosition();
+   TGeoHMatrix pt1 = (*pGlobal) * (*t1);
+   TGeoHMatrix pt2 = (*pGlobal) * (*t2);
+   TGeoHMatrix pt3 = (*pGlobal) * (*t3);
+   TGeoHMatrix pt4 = (*pGlobal) * (*t4);
+
+
+   pWorld->AddNode(pVolFeYoke_up,   1, new TGeoHMatrix(pt1));
+   pWorld->AddNode(pVolFeYoke_down, 2, new TGeoHMatrix(pt2));
+   pWorld->AddNode(pVolFeYoke_left, 3, new TGeoHMatrix(pt3));
+   pWorld->AddNode(pVolFeYoke_right,4, new TGeoHMatrix(pt4));
 
 }
 
