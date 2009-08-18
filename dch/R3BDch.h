@@ -111,9 +111,12 @@ class R3BDch : public FairDetector
   virtual void ConstructGeometry();
 
 
-//  void SaveGeoParams();
+  virtual void Initialize();
+  virtual void SetSpecialPhysicsCuts();
+  void SetEnergyCutOff( Double_t cutE ){fCutE = cutE;}
+  Double_t  GetEnergyCutOff ( ) {return fCutE;}
 
-  private:
+private:
 
 
     /** Track information to be stored until the track leaves the
@@ -125,6 +128,7 @@ class R3BDch : public FairDetector
     Double32_t     fTime;              //!  time
     Double32_t     fLength;            //!  length
     Double32_t     fELoss;             //!  energy loss
+    Double32_t     fCutE;              //!  Sec. Energy Cut-Off
 
     Int_t          fPosIndex;          //!
     TClonesArray*  fDchCollection;     //!  The hit collection
