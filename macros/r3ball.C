@@ -135,7 +135,9 @@ void r3ball(Int_t nEvents = 1,
   //R3B Crystal Calorimeter
     FairDetector* cal = new R3BCal("CrystalCal", kTRUE);
     run->AddModule(cal);
-  } else {
+  }
+
+  if (fDetList.FindObject("CALIFA") ) {
   // CALIFA Calorimeter
     FairDetector* calo = new R3BCalo("Califa", kTRUE);
     run->AddModule(calo);
