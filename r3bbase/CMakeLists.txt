@@ -23,8 +23,7 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(R3B_SRCS
 #Put here your sourcefiles
-R3BDetPoint.cxx 
-)
+R3BModule.cxx   )
 
 # fill list of header files from list of source files
 # by exchanging the file extension
