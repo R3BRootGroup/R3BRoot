@@ -25,7 +25,7 @@ Int_t r3bsim(){
    //   Geant4:                 "TGeant4"
    //   Fluka :                 "TFluka"
 
-   TString fMC ="TGeant4";
+   TString fMC ="TGeant3";
 
    //-------------------------------------------------
    // Primaries generation
@@ -87,13 +87,14 @@ Int_t r3bsim(){
     TObjArray fDetList;
     fDetList.Add(&det1);
     fDetList.Add(&det2);
-    fDetList.Add(&det3);
+    fDetList.Add(&det4);
     fDetList.Add(&det5);
     fDetList.Add(&det6);
     fDetList.Add(&det7);
     fDetList.Add(&det8);
     fDetList.Add(&det9);
     fDetList.Add(&det10);
+
 
    //-------------------------------------------------
    //- N# of Sim. Events   |    nEvents     (Int_t)
