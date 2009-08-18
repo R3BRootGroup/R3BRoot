@@ -2,11 +2,11 @@
 #define R3BTarget_H
 
 #include "FairDetector.h"
-#include "FairModule.h"
+#include "R3BModule.h"
 #include <TString.h>
 
 
-class R3BTarget : public FairModule {
+class R3BTarget : public R3BModule {
   public:
     R3BTarget(const char * name, const char *Title="R3B Target");
     R3BTarget();

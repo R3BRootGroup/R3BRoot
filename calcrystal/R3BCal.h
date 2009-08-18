@@ -10,7 +10,7 @@
 #ifndef R3BCAL_H
 #define R3BCAL_H
 
-#include "FairDetector.h"
+#include "R3BDetector.h"
 
 #include "TLorentzVector.h"
 
@@ -21,7 +21,7 @@ class TGeoRotation;
 
 
 
-class R3BCal : public FairDetector
+class R3BCal : public R3BDetector
 {
 
  public:

@@ -10,7 +10,7 @@
 #ifndef R3BDCH_H
 #define R3BDCH_H
 
-#include "FairDetector.h"
+#include "R3BDetector.h"
 
 #include "TLorentzVector.h"
 
@@ -20,7 +20,7 @@ class FairVolume;
 
 
 
-class R3BDch : public FairDetector
+class R3BDch : public R3BDetector
 {
 
  public:

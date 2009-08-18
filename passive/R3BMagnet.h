@@ -6,10 +6,10 @@
 #include "TClonesArray.h"
 #include "FairDetector.h"
 #include "FairModule.h"
-#include "FairModule.h"
+#include "R3BModule.h"
 #include "TGeoMatrix.h"
 
-class R3BMagnet : public FairModule {
+class R3BMagnet : public R3BModule {
 
 private:
    TGeoCombiTrans *gLobalPos;

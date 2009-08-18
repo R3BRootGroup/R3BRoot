@@ -5,10 +5,10 @@
 #include "TArrayI.h"
 #include "TClonesArray.h"
 #include "FairDetector.h"
-#include "FairModule.h"
+#include "R3BModule.h"
 
 
-class R3BPipe : public FairModule {
+class R3BPipe : public R3BModule {
   public:
     R3BPipe(const char * name, const char *Title="R3B Pipe");
     R3BPipe();
