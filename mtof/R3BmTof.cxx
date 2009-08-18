@@ -428,10 +428,11 @@ void R3BmTof::ConstructGeometry() {
 
 
    // Shape: World type: TGeoBBox
-   TGeoVolume* pAWorld = gGeoManager->GetTopVolume();
-   pAWorld->SetVisLeaves(kTRUE);
+   TGeoVolume* pWorld = gGeoManager->GetTopVolume();
+   pWorld->SetVisLeaves(kTRUE);
 
    // Create a global Mother Volume
+   /*
    dx = 200.000000;
    dy = 200.000000;
    dz = 200.000000;
@@ -443,6 +444,7 @@ void R3BmTof::ConstructGeometry() {
 
    // add the sphere as Mother Volume
    pAWorld->AddNode(pWorld, 0, pGlobalc);
+   */
 
  
    // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY

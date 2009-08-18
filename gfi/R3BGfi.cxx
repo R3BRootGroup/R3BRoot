@@ -527,10 +527,11 @@ void R3BGfi::ConstructGeometry() {
 
 
    // World definition
-   TGeoVolume* pAWorld = gGeoManager->GetTopVolume();
-   pAWorld->SetVisLeaves(kTRUE);
+   TGeoVolume* pWorld = gGeoManager->GetTopVolume();
+   pWorld->SetVisLeaves(kTRUE);
 
    // Create a global Mother Volume
+   /*
    dx = 300.000000;
    dy = 300.000000;
    dz = 300.000000;
@@ -542,7 +543,7 @@ void R3BGfi::ConstructGeometry() {
 
    // add the sphere as Mother Volume
    pAWorld->AddNode(pWorld, 0, pGlobalc);
-
+   */
 
 
 

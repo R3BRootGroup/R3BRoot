@@ -423,9 +423,10 @@ void R3BCalo::ConstructGeometry() {
 /****************************************************************************/
    //WORLD
 
-   TGeoVolume *pAWorld  =  gGeoManager->GetTopVolume();
+   TGeoVolume *pWorld  =  gGeoManager->GetTopVolume();
 
    // Defintion of the Mother Volume
+   /*
    Double_t theta1 = 0.000000;
    Double_t theta2 = 180.000000;
    rmin   = 0.0000;
@@ -442,7 +443,7 @@ void R3BCalo::ConstructGeometry() {
 
   // add the sphere as Mother Volume
    pAWorld->AddNode(pWorld, 0, pGlobalc);
-
+   */
 
    // TRAP1
    Double_t ddz, theta, phi;

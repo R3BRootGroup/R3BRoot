@@ -701,13 +701,15 @@ void R3BTra::ConstructGeometry() {
 
 
    // Shape: World type: TGeoBBox
-   TGeoVolume* pAWorld = gGeoManager->GetTopVolume();
-   pAWorld->SetVisLeaves(kTRUE);
+   TGeoVolume* pWorld = gGeoManager->GetTopVolume();
+   pWorld->SetVisLeaves(kTRUE);
+
+   /*
 
    // Create a global Mother Volume
-   dx = 200.000000;
-   dy = 200.000000;
-   dz = 200.000000;
+   dx = 100.000000;
+   dy = 100.000000;
+   dz = 100.000000;
    TGeoShape *pBoxWorld = new TGeoBBox("TraBoxWorld", dx,dy,dz);
    TGeoVolume*
    pWorld  = new TGeoVolume("TraBoxLogWorld",pBoxWorld, pMed2);
@@ -717,7 +719,7 @@ void R3BTra::ConstructGeometry() {
    // add the sphere as Mother Volume
    pAWorld->AddNode(pWorld, 0, pGlobalc);
 
-
+   */
 
 
 

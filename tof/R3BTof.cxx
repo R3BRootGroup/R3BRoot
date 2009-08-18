@@ -426,13 +426,14 @@ void R3BTof::ConstructGeometry() {
    pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
 
    //Top Volume
-   TGeoVolume* pAWorld = gGeoManager->GetTopVolume();
-   pAWorld->SetVisLeaves(kTRUE);
+   TGeoVolume* pWorld = gGeoManager->GetTopVolume();
+   pWorld->SetVisLeaves(kTRUE);
 
    // Create a global Mother Volume
-   dx = 300.000000;
-   dy = 300.000000;
-   dz = 300.000000;
+   /*
+   dx = 100.000000;
+   dy = 100.000000;
+   dz = 100.000000;
    TGeoShape *pBoxWorld = new TGeoBBox("TofBoxWorld", dx,dy,dz);
    TGeoVolume*
    pWorld  = new TGeoVolume("TofBoxLogWorld",pBoxWorld, pMed2);
@@ -441,7 +442,7 @@ void R3BTof::ConstructGeometry() {
 
    // add the sphere as Mother Volume
    pAWorld->AddNode(pWorld, 0, pGlobalc);
-
+   */
 
 
    // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY

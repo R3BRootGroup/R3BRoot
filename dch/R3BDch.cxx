@@ -574,10 +574,11 @@ void R3BDch::ConstructGeometry() {
    pMatrix6 = new TGeoCombiTrans("", dx,dy,dz,pMatrix7);
 
    // SET TOP VOLUME OF GEOMETRY
-   TGeoVolume * pAWorld = gGeoManager->GetTopVolume();
-   pAWorld->SetVisLeaves(kTRUE);
+   TGeoVolume * pWorld = gGeoManager->GetTopVolume();
+   pWorld->SetVisLeaves(kTRUE);
 
    // Create a global Mother Volume
+   /*
    dx = 100.000000;
    dy = 100.000000;
    dz = 100.000000;
@@ -589,7 +590,7 @@ void R3BDch::ConstructGeometry() {
 
    // add the sphere as Mother Volume
    pAWorld->AddNode(pWorld, 0, pGlobalc);
-
+   */
 
    // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
    // Shape: DCHBoxWorld type: TGeoBBox

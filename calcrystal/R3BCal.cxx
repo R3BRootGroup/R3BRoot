@@ -441,7 +441,7 @@ void R3BCal::ConstructGeometry2(){
 
    // ---- Geometry Definition
    // Get the top Volume
-      TGeoVolume *top =  gGeoManager->GetTopVolume();
+   TGeoVolume *top =  gGeoManager->GetTopVolume();
 
    // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
    // Shape: CBSphereWorld type: TGeoSphere
@@ -471,8 +471,6 @@ void R3BCal::ConstructGeometry2(){
    top->AddNode(pCBLogWorld, 0, new TGeoHMatrix(pTotal));
 
 
-
-   
    // Shape: PGON type: TGeoPgon
    phi1    = 0.000000;
    dphi    = 360.000000;

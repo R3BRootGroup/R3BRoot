@@ -443,10 +443,11 @@ void R3BLand::ConstructGeometry() {
 // to model neutron detectors 25.03.09
 //
 
-   TGeoVolume* pAWorld = gGeoManager->GetTopVolume();
-   pAWorld->SetVisLeaves(kTRUE);
+   TGeoVolume* vWorld = gGeoManager->GetTopVolume();
+   vWorld->SetVisLeaves(kTRUE);
 
    // Create a global Mother Volume
+   /*
    dx = 500.000000;
    dy = 500.000000;
    dz = 500.000000;
@@ -458,7 +459,7 @@ void R3BLand::ConstructGeometry() {
 
    // add the sphere as Mother Volume
    pAWorld->AddNode(vWorld, 0, pGlobalc);
-
+   */
 
 
     // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
