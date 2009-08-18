@@ -119,7 +119,7 @@ void r3ball(Int_t nEvents = 1,
   //  This represent the composition of : first a rotation about Z axis with
   //  angle phi, then a rotation with theta about the rotated X axis, and
   //  finally a rotation with psi about the new Z axis.
-  Double_t phi,theta,psi
+  Double_t phi,theta,psi;
 
   //- Global Translation
   Double_t tx,ty,tz;
@@ -142,8 +142,8 @@ void r3ball(Int_t nEvents = 1,
       tx    =  0.0; // (cm)
       ty    =  0.0; // (cm)
       tz    =  0.0; // (cm)
-      target->SetRotAngles(phi,theta,psi);
-      target->SetTranslation(tx,ty,tz);
+    //  target->SetRotAngles(phi,theta,psi);
+    //  target->SetTranslation(tx,ty,tz);
       run->AddModule(target);
   }
 
@@ -256,6 +256,7 @@ void r3ball(Int_t nEvents = 1,
       mTof->SetRotAngles(phi,theta,psi);
       mTof->SetTranslation(tx,ty,tz);
       // User defined Energy CutOff
+      Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
       ((R3BmTof*) mTof)->SetEnergyCutOff(fCutOffSci);
       run->AddModule(mTof);
   }
@@ -273,6 +274,7 @@ void r3ball(Int_t nEvents = 1,
       gfi->SetRotAngles(phi,theta,psi);
       gfi->SetTranslation(tx,ty,tz);
       // User defined Energy CutOff
+      Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
       ((R3BGfi*) gfi)->SetEnergyCutOff(fCutOffSci);
       run->AddModule(gfi);
   }
