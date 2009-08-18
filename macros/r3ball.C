@@ -4,9 +4,11 @@
 //
 //         Author: Denis Bertini <D.Bertini@gsi.de>
 //
-//         Last Update: 06/08/09
+//         Last Update: 17/08/09
 //
 //         Comments:
+//               - 17/08/09 Adding R3BModule R3BDetector
+//                          for global positionning
 //               - 12/08/09 Adding R3B Special Physics List
 //               - 06/08/09 Adding R3B specific Event Generator
 //
@@ -112,6 +114,17 @@ void r3ball(Int_t nEvents = 1,
   run->SetMaterials("media_r3b.geo");       // Materials
   
 
+  // Global Transformation
+  //- Global Rotation (Euler Angles definition)
+  //  This represent the composition of : first a rotation about Z axis with
+  //  angle phi, then a rotation with theta about the rotated X axis, and
+  //  finally a rotation with psi about the new Z axis.
+  Double_t phi,theta,psi
+
+  //- Global Translation
+  Double_t tx,ty,tz;
+
+
   // -----   Create R3B geometry --------------------------------------------
   //R3B Cave definition
   FairModule* cave= new R3BCave("CAVE");
@@ -121,68 +134,162 @@ void r3ball(Int_t nEvents = 1,
 
   //R3B Target definition
   if (fDetList.FindObject("TARGET") ) {
-    FairModule* target= new R3BTarget(Target.Data());
-    run->AddModule(target);
+      R3BModule* target= new R3BTarget(Target.Data());
+      // Global position of the Module
+      phi   =  0.0; // (deg)
+      theta =  0.0; // (deg)
+      psi   =  0.0; // (deg)
+      tx    =  0.0; // (cm)
+      ty    =  0.0; // (cm)
+      tz    =  0.0; // (cm)
+      target->SetRotAngles(phi,theta,psi);
+      target->SetTranslation(tx,ty,tz);
+      run->AddModule(target);
   }
 
   //R3B Magnet definition
   if (fDetList.FindObject("ALADIN") ) {
-    FairModule* mag = new R3BMagnet("AladinMagnet");
-    run->AddModule(mag);
+      R3BModule* mag = new R3BMagnet("AladinMagnet");
+      // Global position of the Module
+      phi   =  0.0; // (deg)
+      theta =  0.0; // (deg)
+      psi   =  0.0; // (deg)
+      tx    =  0.0; // (cm)
+      ty    =  0.0; // (cm)
+      tz    =  0.0; // (cm)
+      mag->SetRotAngles(phi,theta,psi);
+      mag->SetTranslation(tx,ty,tz);
+      run->AddModule(mag);
   }
 
   if (fDetList.FindObject("CRYSTALBALL") ) {
-  //R3B Crystal Calorimeter
-    FairDetector* cal = new R3BCal("CrystalCal", kTRUE);
-    run->AddModule(cal);
+      //R3B Crystal Calorimeter
+      R3BDetector* cal = new R3BCal("CrystalCal", kTRUE);
+      // Global position of the Module
+      phi   =  0.0; // (deg)
+      theta =  0.0; // (deg)
+      psi   =  0.0; // (deg)
+      tx    =  0.0; // (cm)
+      ty    =  0.0; // (cm)
+      tz    =  0.0; // (cm)
+      cal->SetRotAngles(phi,theta,psi);
+      cal->SetTranslation(tx,ty,tz);
+      run->AddModule(cal);
   }
 
   if (fDetList.FindObject("CALIFA") ) {
-  // CALIFA Calorimeter
-    FairDetector* calo = new R3BCalo("Califa", kTRUE);
-    run->AddModule(calo);
+      // CALIFA Calorimeter
+      R3BDetector* calo = new R3BCalo("Califa", kTRUE);
+      // Global position of the Module
+      phi   =  0.0; // (deg)
+      theta =  0.0; // (deg)
+      psi   =  0.0; // (deg)
+      tx    =  0.0; // (cm)
+      ty    =  0.0; // (cm)
+      tz    =  0.0; // (cm)
+      calo->SetRotAngles(phi,theta,psi);
+      calo->SetTranslation(tx,ty,tz);
+      run->AddModule(calo);
   }
-  
+
   // Tracker
   if (fDetList.FindObject("TRACKER")  ) {
-    FairDetector* tra = new R3BTra("Tracker", kTRUE);
-    Double_t fCutOffSi = 1.0e-06;  // Cut-Off -> 10KeV only in Si
-    ((R3BTra*) tra)->SetEnergyCutOff(fCutOffSi);
-    run->AddModule(tra);
+      R3BDetector* tra = new R3BTra("Tracker", kTRUE);
+      // Global position of the Module
+      phi   =  0.0; // (deg)
+      theta =  0.0; // (deg)
+      psi   =  0.0; // (deg)
+      tx    =  0.0; // (cm)
+      ty    =  0.0; // (cm)
+      tz    =  0.0; // (cm)
+      tra->SetRotAngles(phi,theta,psi);
+      tra->SetTranslation(tx,ty,tz);
+      // User defined Energy CutOff
+      Double_t fCutOffSi = 1.0e-06;  // Cut-Off -> 10KeV only in Si
+      ((R3BTra*) tra)->SetEnergyCutOff(fCutOffSi);
+      run->AddModule(tra);
   }
   
   // DCH drift chambers
   if (fDetList.FindObject("DCH") ) {
-    FairDetector* dch = new R3BDch("Dch", kTRUE);
-    run->AddModule(dch);
+      R3BDetector* dch = new R3BDch("Dch", kTRUE);
+      // Global position of the Module
+      phi   =  0.0; // (deg)
+      theta =  0.0; // (deg)
+      psi   =  0.0; // (deg)
+      tx    =  0.0; // (cm)
+      ty    =  0.0; // (cm)
+      tz    =  0.0; // (cm)
+      dch->SetRotAngles(phi,theta,psi);
+      dch->SetTranslation(tx,ty,tz);
+      run->AddModule(dch);
   }
 
   // Tof
   if (fDetList.FindObject("TOF") ) {
-    FairDetector* tof = new R3BTof("Tof", kTRUE);
-    Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
-    ((R3BTof*) tof)->SetEnergyCutOff(fCutOffSci);
-    run->AddModule(tof);
+      R3BDetector* tof = new R3BTof("Tof", kTRUE);
+      // Global position of the Module
+      phi   =  0.0; // (deg)
+      theta =  0.0; // (deg)
+      psi   =  0.0; // (deg)
+      tx    =  0.0; // (cm)
+      ty    =  0.0; // (cm)
+      tz    =  0.0; // (cm)
+      tof->SetRotAngles(phi,theta,psi);
+      tof->SetTranslation(tx,ty,tz);
+      // User defined Energy CutOff
+      Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
+      ((R3BTof*) tof)->SetEnergyCutOff(fCutOffSci);
+      run->AddModule(tof);
   }
 
   // mTof
   if (fDetList.FindObject("MTOF") ) {
-    FairDetector* mTof = new R3BmTof("mTof", kTRUE);
-    ((R3BmTof*) mTof)->SetEnergyCutOff(fCutOffSci);
-    run->AddModule(mTof);
+      R3BDetector* mTof = new R3BmTof("mTof", kTRUE);
+      // Global position of the Module
+      phi   =  0.0; // (deg)
+      theta =  0.0; // (deg)
+      psi   =  0.0; // (deg)
+      tx    =  0.0; // (cm)
+      ty    =  0.0; // (cm)
+      tz    =  0.0; // (cm)
+      mTof->SetRotAngles(phi,theta,psi);
+      mTof->SetTranslation(tx,ty,tz);
+      // User defined Energy CutOff
+      ((R3BmTof*) mTof)->SetEnergyCutOff(fCutOffSci);
+      run->AddModule(mTof);
   }
 
   // GFI detector
   if (fDetList.FindObject("GFI") ) {
-    FairDetector* gfi = new R3BGfi("Gfi", kTRUE);
-    ((R3BGfi*) gfi)->SetEnergyCutOff(fCutOffSci);
-    run->AddModule(gfi);
+      R3BDetector* gfi = new R3BGfi("Gfi", kTRUE);
+      // Global position of the Module
+      phi   =  0.0; // (deg)
+      theta =  0.0; // (deg)
+      psi   =  0.0; // (deg)
+      tx    =  0.0; // (cm)
+      ty    =  0.0; // (cm)
+      tz    =  0.0; // (cm)
+      gfi->SetRotAngles(phi,theta,psi);
+      gfi->SetTranslation(tx,ty,tz);
+      // User defined Energy CutOff
+      ((R3BGfi*) gfi)->SetEnergyCutOff(fCutOffSci);
+      run->AddModule(gfi);
   }
 
   // Land Detector
   if (fDetList.FindObject("LAND") ) {
-  FairDetector* land = new R3BLand("Land", kTRUE);
-  run->AddModule(land);
+      R3BDetector* land = new R3BLand("Land", kTRUE);
+      // Global position of the Module
+      phi   =  0.0; // (deg)
+      theta =  0.0; // (deg)
+      psi   =  0.0; // (deg)
+      tx    =  0.0; // (cm)
+      ty    =  0.0; // (cm)
+      tz    =  0.0; // (cm)
+      land->SetRotAngles(phi,theta,psi);
+      land->SetTranslation(tx,ty,tz);
+      run->AddModule(land);
   }
 
   // -----   Create R3B  magnetic field ----------------------------------------
@@ -190,6 +297,9 @@ void r3ball(Int_t nEvents = 1,
   Int_t fieldScale = 1;
   Bool_t fVerbose = kFALSE;
 
+  //NB: <D.B>
+  // If the Global Position of the Magnet is changed
+  // the Field Map has to be transformed accordingly
   R3BFieldMap* magField = new R3BFieldMap(typeOfMagneticField,fVerbose);
   magField->SetPosition(0., 0., 0.);
   magField->SetScale(fieldScale);
