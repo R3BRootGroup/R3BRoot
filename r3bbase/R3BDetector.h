@@ -1,28 +1,28 @@
-#ifndef R3BMODULE_H
-#define R3BMODULE_H 1
+#ifndef R3BDETECTOR_H
+#define R3BDETECTOR_H 1
 
 
-#include "FairModule.h"
+#include "FairDetector.h"
 
 #include "TObject.h"
 #include "TVector3.h"
 #include "TGeoMatrix.h"
 
 
-class R3BModule : public FairModule
+class R3BDetector : public FairDetector
 {
  public:
 
   /** Default constructor **/
-  R3BModule();
+  R3BDetector();
 
 
   /** Constructor with arguments
    **/
-  R3BModule(const char* Name, const char* title, Bool_t Active=kFALSE);
+  R3BDetector(const char* Name,  Bool_t Active , Int_t detId=0);
 
   /** Destructor **/
-  virtual ~R3BModule();
+  virtual ~R3BDetector();
 
   /** Transformation **/
   void SetRotAngles(Double_t phi, Double_t theta, Double_t psi);
@@ -39,7 +39,7 @@ protected:
     TGeoTranslation *fGlobalTrans;
 
 
-  ClassDef(R3BModule,1)
+  ClassDef(R3BDetector,1)
 
 };
 
