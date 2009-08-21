@@ -115,13 +115,20 @@ void r3ball(Int_t nEvents = 1,
   
 
   // Global Transformation
-  //- Global Rotation (Euler Angles definition)
-  //  This represent the composition of : first a rotation about Z axis with
-  //  angle phi, then a rotation with theta about the rotated X axis, and
-  //  finally a rotation with psi about the new Z axis.
+
+  //- Two ways for a Volume Rotation are supported
+  //-- 1) Global Rotation (Euler Angles definition)
+  //-- This represent the composition of : first a rotation about Z axis with
+  //-- angle phi, then a rotation with theta about the rotated X axis, and
+  //-- finally a rotation with psi about the new Z axis.
   Double_t phi,theta,psi;
 
-  //- Global Translation
+  //-- 2) Rotation in Ref. Frame of the Volume
+  //-- Rotation is Using Local Ref. Frame axis angles
+  Double_t thetaX,thetaY,thetaZ;
+
+
+  //- Global Translation  Lab. frame.
   Double_t tx,ty,tz;
 
 
@@ -135,15 +142,21 @@ void r3ball(Int_t nEvents = 1,
   //R3B Target definition
   if (fDetList.FindObject("TARGET") ) {
       R3BModule* target= new R3BTarget(Target.Data());
-      // Global position of the Module
-      phi   =  0.0; // (deg)
-      theta =  0.0; // (deg)
-      psi   =  0.0; // (deg)
+      // Global Lab. Rotation
+      phi    =  0.0; // (deg)
+      theta  =  0.0; // (deg)
+      psi    =  0.0; // (deg)
+      // Rotation in Ref. Frame.
+      thetaX =  0.0; // (deg)
+      thetaY =  0.0; // (deg)
+      thetaZ =  0.0; // (deg)
+      // Global translation in Lab
       tx    =  0.0; // (cm)
       ty    =  0.0; // (cm)
       tz    =  0.0; // (cm)
-    //  target->SetRotAngles(phi,theta,psi);
-    //  target->SetTranslation(tx,ty,tz);
+     //target->SetRotAnglesEuler(phi,theta,psi);
+     target->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
+     target->SetTranslation(tx,ty,tz);
       run->AddModule(target);
   }
 
@@ -154,10 +167,16 @@ void r3ball(Int_t nEvents = 1,
       phi   =  0.0; // (deg)
       theta =  0.0; // (deg)
       psi   =  0.0; // (deg)
+      // Rotation in Ref. Frame.
+      thetaX =  0.0; // (deg)
+      thetaY =  0.0; // (deg)
+      thetaZ =  0.0; // (deg)
+      // Global translation in Lab
       tx    =  0.0; // (cm)
       ty    =  0.0; // (cm)
       tz    =  0.0; // (cm)
-      mag->SetRotAngles(phi,theta,psi);
+      //mag->SetRotAnglesEuler(phi,theta,psi);
+      mag->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       mag->SetTranslation(tx,ty,tz);
       run->AddModule(mag);
   }
@@ -169,10 +188,16 @@ void r3ball(Int_t nEvents = 1,
       phi   =  0.0; // (deg)
       theta =  0.0; // (deg)
       psi   =  0.0; // (deg)
+      // Rotation in Ref. Frame.
+      thetaX =  0.0; // (deg)
+      thetaY =  0.0; // (deg)
+      thetaZ =  0.0; // (deg)
+      // Global translation in Lab
       tx    =  0.0; // (cm)
       ty    =  0.0; // (cm)
       tz    =  0.0; // (cm)
-      cal->SetRotAngles(phi,theta,psi);
+      //cal->SetRotAnglesEuler(phi,theta,psi);
+      cal->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       cal->SetTranslation(tx,ty,tz);
       run->AddModule(cal);
   }
@@ -184,10 +209,16 @@ void r3ball(Int_t nEvents = 1,
       phi   =  0.0; // (deg)
       theta =  0.0; // (deg)
       psi   =  0.0; // (deg)
+      // Rotation in Ref. Frame.
+      thetaX =  0.0; // (deg)
+      thetaY =  0.0; // (deg)
+      thetaZ =  0.0; // (deg)
+      // Global translation in Lab
       tx    =  0.0; // (cm)
       ty    =  0.0; // (cm)
       tz    =  0.0; // (cm)
-      calo->SetRotAngles(phi,theta,psi);
+      //calo->SetRotAnglesEuler(phi,theta,psi);
+      calo->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       calo->SetTranslation(tx,ty,tz);
       run->AddModule(calo);
   }
@@ -199,10 +230,16 @@ void r3ball(Int_t nEvents = 1,
       phi   =  0.0; // (deg)
       theta =  0.0; // (deg)
       psi   =  0.0; // (deg)
+      // Rotation in Ref. Frame.
+      thetaX =  0.0; // (deg)
+      thetaY =  0.0; // (deg)
+      thetaZ =  0.0; // (deg)
+      // Global translation in Lab
       tx    =  0.0; // (cm)
       ty    =  0.0; // (cm)
       tz    =  0.0; // (cm)
-      tra->SetRotAngles(phi,theta,psi);
+      //tra->SetRotAnglesEuler(phi,theta,psi);
+      tra->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       tra->SetTranslation(tx,ty,tz);
       // User defined Energy CutOff
       Double_t fCutOffSi = 1.0e-06;  // Cut-Off -> 10KeV only in Si
@@ -217,10 +254,16 @@ void r3ball(Int_t nEvents = 1,
       phi   =  0.0; // (deg)
       theta =  0.0; // (deg)
       psi   =  0.0; // (deg)
+      // Rotation in Ref. Frame.
+      thetaX =  0.0; // (deg)
+      thetaY =  0.0; // (deg)
+      thetaZ =  0.0; // (deg)
+      // Global translation in Lab
       tx    =  0.0; // (cm)
       ty    =  0.0; // (cm)
       tz    =  0.0; // (cm)
-      dch->SetRotAngles(phi,theta,psi);
+     //dch->SetRotAnglesEuler(phi,theta,psi);
+      dch->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       dch->SetTranslation(tx,ty,tz);
       run->AddModule(dch);
   }
@@ -229,13 +272,18 @@ void r3ball(Int_t nEvents = 1,
   if (fDetList.FindObject("TOF") ) {
       R3BDetector* tof = new R3BTof("Tof", kTRUE);
       // Global position of the Module
-      phi   =  0.0; // (deg)
-      theta =  0.0; // (deg)
-      psi   =  0.0; // (deg)
-      tx    =  0.0; // (cm)
-      ty    =  0.0; // (cm)
-      tz    =  0.0; // (cm)
-      tof->SetRotAngles(phi,theta,psi);
+      thetaX   =  0.0; // (deg)
+      thetaY   =  0.0; // (deg)
+      thetaZ   =  0.0; // (deg)
+      // Rotation in Ref. Frame.
+      thetaX =  0.0; // (deg)
+      thetaY =  0.0; // (deg)
+      thetaZ =  0.0; // (deg)
+      // Global translation in Lab
+      tx       =  0.0; // (cm)
+      ty       =  0.0; // (cm)
+      tz       =  0.0; // (cm)
+      tof->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       tof->SetTranslation(tx,ty,tz);
       // User defined Energy CutOff
       Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
@@ -250,10 +298,16 @@ void r3ball(Int_t nEvents = 1,
       phi   =  0.0; // (deg)
       theta =  0.0; // (deg)
       psi   =  0.0; // (deg)
+      // Rotation in Ref. Frame.
+      thetaX =  0.0; // (deg)
+      thetaY =  0.0; // (deg)
+      thetaZ =  0.0; // (deg)
+      // Global translation in Lab
       tx    =  0.0; // (cm)
       ty    =  0.0; // (cm)
       tz    =  0.0; // (cm)
-      mTof->SetRotAngles(phi,theta,psi);
+      //mTof->SetRotAnglesEuler(phi,theta,psi);
+      mTof->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       mTof->SetTranslation(tx,ty,tz);
       // User defined Energy CutOff
       Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
@@ -268,10 +322,15 @@ void r3ball(Int_t nEvents = 1,
       phi   =  0.0; // (deg)
       theta =  0.0; // (deg)
       psi   =  0.0; // (deg)
+      // Rotation in Ref. Frame.
+      thetaX =  0.0; // (deg)
+      thetaY =  0.0; // (deg)
+      thetaZ =  0.0; // (deg)
+      // Global translation in Lab
       tx    =  0.0; // (cm)
       ty    =  0.0; // (cm)
       tz    =  0.0; // (cm)
-      gfi->SetRotAngles(phi,theta,psi);
+      gfi->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       gfi->SetTranslation(tx,ty,tz);
       // User defined Energy CutOff
       Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
@@ -286,10 +345,16 @@ void r3ball(Int_t nEvents = 1,
       phi   =  0.0; // (deg)
       theta =  0.0; // (deg)
       psi   =  0.0; // (deg)
+      // Rotation in Ref. Frame.
+      thetaX =  0.0; // (deg)
+      thetaY =  0.0; // (deg)
+      thetaZ =  0.0; // (deg)
+      // Global translation in Lab
       tx    =  0.0; // (cm)
       ty    =  0.0; // (cm)
       tz    =  0.0; // (cm)
-      land->SetRotAngles(phi,theta,psi);
+      //land->SetRotAnglesEuler(phi,theta,psi);
+      land->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       land->SetTranslation(tx,ty,tz);
       run->AddModule(land);
   }
