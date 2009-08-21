@@ -100,7 +100,7 @@ Int_t r3bsim(){
    //- N# of Sim. Events   |    nEvents     (Int_t)
    //-------------------------------------------------
 
-   Int_t nEvents = 2;
+   Int_t nEvents = 10;
 
    //-------------------------------------------------
    //- EventDisplay        |    fEventDisplay (Bool_t)
@@ -108,7 +108,7 @@ Int_t r3bsim(){
    //   connected:              kTRUE
    //   not connected:          kFALSE
 
-   Bool_t fEventDisplay=kFALSE;
+   Bool_t fEventDisplay=kTRUE;
 
    // Main Sim function call
    r3ball(  nEvents,
