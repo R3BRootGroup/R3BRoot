@@ -129,9 +129,8 @@ void R3BTarget::ConstructGeometry1(){
 
    TGeoVolume *top =  gGeoManager->GetTopVolume();
 
-   TGeoCombiTrans* pGlobal = GetGlobalPosition();
-   TGeoHMatrix pPos = (*pGlobal) * (*pMatrix);
-   top->AddNode(pleadTarget_log, 0, new TGeoHMatrix(pPos));
+   TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix);
+   top->AddNode(pleadTarget_log, 0, pGlobal);
 
 }
 
@@ -234,7 +233,9 @@ void R3BTarget::ConstructGeometry2(){
    TGeoVolume*
    pParafin0deg_log = new TGeoVolume("Parafin0deg",pParafin0deg, pMed16);
    pParafin0deg_log->SetVisLeaves(kTRUE);
-   top->AddNode(pParafin0deg_log, 0, pMatrix2);
+
+   TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix2);
+   top->AddNode(pParafin0deg_log, 0, pGlobal);
 
 }
 
@@ -341,7 +342,10 @@ void R3BTarget::ConstructGeometry3(){
    TGeoVolume*
    pPara45deg_log = new TGeoVolume("Para45deg",pPara45deg, pMed16);
    pPara45deg_log->SetVisLeaves(kTRUE);
-   top->AddNode(pPara45deg_log, 0, pMatrix2);
+
+   TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix2);
+
+   top->AddNode(pPara45deg_log, 0, pGlobal);
 
 }
 
@@ -522,7 +526,12 @@ void R3BTarget::ConstructGeometry4(){
    TGeoVolume*
    pTargetEnveloppe_log = new TGeoVolume("TargetEnveloppe",pTargetEnveloppe, pMed2);
    pTargetEnveloppe_log->SetVisLeaves(kTRUE);
-   top->AddNode(pTargetEnveloppe_log, 0, pMatrix2);
+
+   // Position Mother Volume
+   TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix2);
+   top->AddNode(pTargetEnveloppe_log, 0, pGlobal);
+
+
 
    // Shape: Target1 type: TGeoTubeSeg
    rmin = 1.000000;

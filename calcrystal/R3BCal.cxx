@@ -464,11 +464,11 @@ void R3BCal::ConstructGeometry2(){
    TGeoTranslation *pGlobalt = new TGeoTranslation(0.0,0.0,0.0);
    TGeoCombiTrans *pGlobalc = new TGeoCombiTrans(*pGlobalt,*pGlobalRot);  
 
-   TGeoCombiTrans *pG = GetGlobalPosition();
-   TGeoHMatrix pTotal = (*pG) * (*pGlobalc);
+ //  TGeoCombiTrans *pG = GetGlobalPosition();
+ //  TGeoHMatrix pTotal = (*pG) * (*pGlobalc);
 
    // add the sphere as Mother Volume
-   top->AddNode(pCBLogWorld, 0, new TGeoHMatrix(pTotal));
+   top->AddNode(pCBLogWorld, 0, GetGlobalPosition(pGlobalc));
 
 
    // Shape: PGON type: TGeoPgon

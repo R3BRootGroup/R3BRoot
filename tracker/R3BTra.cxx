@@ -831,7 +831,8 @@ void R3BTra::ConstructGeometry() {
     dy=ty=0.0;
     dz=tz=0.0;
 
-    pWorld->AddNode(aTra,1, new TGeoCombiTrans(tx,ty,tz,rotg));
+    TGeoCombiTrans *t0 = new TGeoCombiTrans(tx,ty,tz,rotg);
+    pWorld->AddNode(aTra,1, GetGlobalPosition(t0));
 
 
 }

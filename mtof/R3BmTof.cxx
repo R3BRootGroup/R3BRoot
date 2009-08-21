@@ -457,7 +457,15 @@ void R3BmTof::ConstructGeometry() {
    TGeoVolume *
    pmTOFLog = new TGeoVolume("mTOFLog",pmTOFBox, pMed34);
    pmTOFLog->SetVisLeaves(kTRUE);
-   pWorld->AddNode(pmTOFLog, 0, pMatrix2);
+
+   TGeoCombiTrans *pGlobal = GetGlobalPosition(pMatrix2);
+
+   if (pGlobal){
+       pWorld->AddNode(pmTOFLog, 0, pGlobal);
+   }else{
+       pWorld->AddNode(pmTOFLog, 0, pMatrix2);
+   }
+
 
   AddSensitiveVolume(pmTOFLog);
   fNbOfSensitiveVol+=1;

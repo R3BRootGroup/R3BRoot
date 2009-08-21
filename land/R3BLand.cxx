@@ -712,9 +712,11 @@ void R3BLand::ConstructGeometry() {
    rotg->RotateZ(0.);
    tx = 0.0;
    ty = 0.0;
-   tz = 1000.0;
+   tz = 1000.0; // cm
 
-  vWorld->AddNode(cell,1,new TGeoCombiTrans(tx,ty,tz,rotg) );
+   TGeoCombiTrans *t0 = new TGeoCombiTrans(tx,ty,tz,rotg);
+
+  vWorld->AddNode(cell,1, GetGlobalPosition(t0) );
 
 }
 

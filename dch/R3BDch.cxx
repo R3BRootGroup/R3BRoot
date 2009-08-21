@@ -577,19 +577,19 @@ void R3BDch::ConstructGeometry() {
    TGeoVolume * pWorld = gGeoManager->GetTopVolume();
    pWorld->SetVisLeaves(kTRUE);
 
-   // Create a global Mother Volume
+   //Create a global Mother Volume
    /*
    dx = 100.000000;
    dy = 100.000000;
    dz = 100.000000;
-   TGeoShape *pBoxWorld = new TGeoBBox("BoxWorld", dx,dy,dz);
+   TGeoShape *pBoxWorld = new TGeoBBox("DCHBoxWorld", dx,dy,dz);
    TGeoVolume*
-   pWorld  = new TGeoVolume("BoxLogWorld",pBoxWorld, pMed2);
+   pWorld  = new TGeoVolume("DCHBoxLogWorld",pBoxWorld, pMed2);
    pWorld->SetVisLeaves(kTRUE);
-   TGeoCombiTrans *pGlobalc = GetGlobalPosition();
-
+   TGeoCombiTrans * t0 = new TGeoCombiTrans();
+   TGeoCombiTrans *pGlobalc = GetGlobalPosition(t0);
    // add the sphere as Mother Volume
-   pAWorld->AddNode(pWorld, 0, pGlobalc);
+   pAWorld->AddNodeOverlap(pWorld, 0, pGlobalc);
    */
 
    // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
@@ -602,8 +602,10 @@ void R3BDch::ConstructGeometry() {
    TGeoVolume*
    pDCHLogWorld = new TGeoVolume("DCHLogWorld",pDCHBoxWorld, pMed2);
    pDCHLogWorld->SetVisLeaves(kTRUE);
-   pWorld->AddNode(pDCHLogWorld, 0, pMatrix2);
-   pWorld->AddNode(pDCHLogWorld, 1, pMatrix4);
+
+
+   pWorld->AddNode(pDCHLogWorld, 0, GetGlobalPosition(pMatrix2));
+   pWorld->AddNode(pDCHLogWorld, 1, GetGlobalPosition(pMatrix4));
 
    // Shape: heliumBag type: TGeoPara
    dx    = 55.400000;
@@ -619,7 +621,7 @@ void R3BDch::ConstructGeometry() {
    TGeoVolume*
    pheliumBag = new TGeoVolume("heliumBag",pheliumBagv, pMed4);
    pheliumBag->SetVisLeaves(kTRUE);
-   pWorld->AddNode(pheliumBag, 0, pMatrix6);
+   pWorld->AddNode(pheliumBag, 0, GetGlobalPosition(pMatrix6));
 
    // Shape: DCHBox type: TGeoBBox
    dx = 51.400000;

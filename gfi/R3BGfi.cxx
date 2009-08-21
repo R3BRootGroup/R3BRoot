@@ -346,108 +346,108 @@ void R3BGfi::ConstructGeometry() {
 
  // Vacuum
 
-  TGeoMedium * pMed1=NULL;
+   TGeoMedium * pMed1=NULL;
    if (gGeoManager->GetMedium("Vacuum") ){
        pMed1=gGeoManager->GetMedium("Vacuum");
    }else{
-   TGeoMaterial *matVacuum = new TGeoMaterial("Vacuum", 0,0,0);
-   Double_t par[8];
-   par[0]  = 0.000000; // isvol
-   par[1]  = 0.000000; // ifield
-   par[2]  = 0.000000; // fieldm
-   par[3]  = 0.000000; // tmaxfd
-   par[4]  = 0.000000; // stemax
-   par[5]  = 0.000000; // deemax
-   par[6]  = 0.000100; // epsil
-   par[7]  = 0.000000; // stmin
-   pMed1 = new TGeoMedium("Vacuum",1, matVacuum,par);
+       TGeoMaterial *matVacuum = new TGeoMaterial("Vacuum", 0,0,0);
+       Double_t par[8];
+       par[0]  = 0.000000; // isvol
+       par[1]  = 0.000000; // ifield
+       par[2]  = 0.000000; // fieldm
+       par[3]  = 0.000000; // tmaxfd
+       par[4]  = 0.000000; // stemax
+       par[5]  = 0.000000; // deemax
+       par[6]  = 0.000100; // epsil
+       par[7]  = 0.000000; // stmin
+       pMed1 = new TGeoMedium("Vacuum",1, matVacuum,par);
    }
 
-    // Mixture: Air
+   // Mixture: Air
    TGeoMedium * pMed2=NULL;
    if (gGeoManager->GetMedium("Air") ){
        pMed2=gGeoManager->GetMedium("Air");
    }else{
-    nel     = 2;
-    density = 0.001290;
-    TGeoMixture*
-	pMat2 = new TGeoMixture("Air", nel,density);
-    a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
-    pMat2->DefineElement(0,a,z,w);
-    a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
-    pMat2->DefineElement(1,a,z,w);
-    pMat2->SetIndex(1);
-    // Medium: Air
-    numed   = 1;  // medium number
-    Double_t par[8];
-    par[0]  = 0.000000; // isvol
-    par[1]  = 0.000000; // ifield
-    par[2]  = 0.000000; // fieldm
-    par[3]  = 0.000000; // tmaxfd
-    par[4]  = 0.000000; // stemax
-    par[5]  = 0.000000; // deemax
-    par[6]  = 0.000100; // epsil
-    par[7]  = 0.000000; // stmin
-    pMed2 = new TGeoMedium("Air", numed,pMat2, par);
+       nel     = 2;
+       density = 0.001290;
+       TGeoMixture*
+	   pMat2 = new TGeoMixture("Air", nel,density);
+       a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+       pMat2->DefineElement(0,a,z,w);
+       a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+       pMat2->DefineElement(1,a,z,w);
+       pMat2->SetIndex(1);
+       // Medium: Air
+       numed   = 1;  // medium number
+       Double_t par[8];
+       par[0]  = 0.000000; // isvol
+       par[1]  = 0.000000; // ifield
+       par[2]  = 0.000000; // fieldm
+       par[3]  = 0.000000; // tmaxfd
+       par[4]  = 0.000000; // stemax
+       par[5]  = 0.000000; // deemax
+       par[6]  = 0.000100; // epsil
+       par[7]  = 0.000000; // stmin
+       pMed2 = new TGeoMedium("Air", numed,pMat2, par);
    }
 
-  // Mixture: plasticForGFI
+   // Mixture: plasticForGFI
    TGeoMedium * pMed35=NULL;
    if (gGeoManager->GetMedium("plasticForGFI") ){
        pMed35=gGeoManager->GetMedium("plasticForGFI");
    }else{
-     nel     = 2;
-     density = 1.032000;
-     TGeoMixture*
-	 pMat35 = new TGeoMixture("plasticForGFI", nel,density);
-     a = 12.010700;   z = 6.000000;   w = 0.914708;  // C
-     pMat35->DefineElement(0,a,z,w);
-     a = 1.007940;   z = 1.000000;   w = 0.085292;  // H
-     pMat35->DefineElement(1,a,z,w);
-     pMat35->SetIndex(34);
-     // Medium: plasticForGFI
-     numed   = 34;  // medium number
-     Double_t par[8];
-     par[0]  = 0.000000; // isvol
-     par[1]  = 0.000000; // ifield
-     par[2]  = 0.000000; // fieldm
-     par[3]  = 0.000000; // tmaxfd
-     par[4]  = 0.000000; // stemax
-     par[5]  = 0.000000; // deemax
-     par[6]  = 0.000100; // epsil
-     par[7]  = 0.000000; // stmin
-     pMed35 = new TGeoMedium("plasticForGFI", numed,pMat35,par);
- }
+       nel     = 2;
+       density = 1.032000;
+       TGeoMixture*
+	   pMat35 = new TGeoMixture("plasticForGFI", nel,density);
+       a = 12.010700;   z = 6.000000;   w = 0.914708;  // C
+       pMat35->DefineElement(0,a,z,w);
+       a = 1.007940;   z = 1.000000;   w = 0.085292;  // H
+       pMat35->DefineElement(1,a,z,w);
+       pMat35->SetIndex(34);
+       // Medium: plasticForGFI
+       numed   = 34;  // medium number
+       Double_t par[8];
+       par[0]  = 0.000000; // isvol
+       par[1]  = 0.000000; // ifield
+       par[2]  = 0.000000; // fieldm
+       par[3]  = 0.000000; // tmaxfd
+       par[4]  = 0.000000; // stemax
+       par[5]  = 0.000000; // deemax
+       par[6]  = 0.000100; // epsil
+       par[7]  = 0.000000; // stmin
+       pMed35 = new TGeoMedium("plasticForGFI", numed,pMat35,par);
+   }
 
 
- // Material: Aluminum
+   // Material: Aluminum
    TGeoMedium * pMed21=NULL;
    if (gGeoManager->GetMedium("Aluminum") ){
        pMed21=gGeoManager->GetMedium("Aluminum");
    }else{
-     a       = 26.980000;
-     z       = 13.000000;
-     density = 2.700000;
-     radl    = 8.875105;
-     absl    = 388.793113;
+       a       = 26.980000;
+       z       = 13.000000;
+       density = 2.700000;
+       radl    = 8.875105;
+       absl    = 388.793113;
 
-     TGeoMaterial *matAl
-	 = new TGeoMaterial("Aluminum", a,z,density,radl,absl);
+       TGeoMaterial *matAl
+	   = new TGeoMaterial("Aluminum", a,z,density,radl,absl);
 
-     Double_t par[8];
-     par[0]  = 0.000000; // isvol
-     par[1]  = 0.000000; // ifield
-     par[2]  = 0.000000; // fieldm
-     par[3]  = 0.000000; // tmaxfd
-     par[4]  = 0.000000; // stemax
-     par[5]  = 0.000000; // deemax
-     par[6]  = 0.000100; // epsil
-     par[7]  = 0.000000; // stmin
-     pMed21 = new TGeoMedium("Aluminum",3, matAl,par);
+       Double_t par[8];
+       par[0]  = 0.000000; // isvol
+       par[1]  = 0.000000; // ifield
+       par[2]  = 0.000000; // fieldm
+       par[3]  = 0.000000; // tmaxfd
+       par[4]  = 0.000000; // stemax
+       par[5]  = 0.000000; // deemax
+       par[6]  = 0.000100; // epsil
+       par[7]  = 0.000000; // stmin
+       pMed21 = new TGeoMedium("Aluminum",3, matAl,par);
    }
 
    // TRANSFORMATION MATRICES
-   // Combi transformation: 
+   // Combi transformation:
    dx = 73.700000;
    dy = 0.000000;
    dz = 525.400000;
@@ -530,35 +530,30 @@ void R3BGfi::ConstructGeometry() {
    TGeoVolume* pWorld = gGeoManager->GetTopVolume();
    pWorld->SetVisLeaves(kTRUE);
 
-   // Create a global Mother Volume
-   /*
-   dx = 300.000000;
-   dy = 300.000000;
-   dz = 300.000000;
-   TGeoShape *pBoxWorld = new TGeoBBox("GfiBoxWorld", dx,dy,dz);
-   TGeoVolume*
-   pWorld  = new TGeoVolume("GfiBoxLogWorld",pBoxWorld, pMed2);
-   pWorld->SetVisLeaves(kTRUE);
-   TGeoCombiTrans *pGlobalc = GetGlobalPosition();
-
-   // add the sphere as Mother Volume
-   pAWorld->AddNode(pWorld, 0, pGlobalc);
-   */
-
+ 
 
 
    // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
    // Shape: GFIBoxWorld type: TGeoBBox
-   dx = 29.000000;
-   dy = 29.000000;
+   dx = 28.24000;
+   dy = 29.00000;
    dz = 0.050000;
    TGeoShape *pGFIBoxWorld = new TGeoBBox("GFIBoxWorld", dx,dy,dz);
    // Volume: GFILogWorld
    TGeoVolume*
-   pGFILogWorld = new TGeoVolume("GFILogWorld",pGFIBoxWorld, pMed1);
+   pGFILogWorld = new TGeoVolume("GFILogWorld",pGFIBoxWorld, pMed2);
    pGFILogWorld->SetVisLeaves(kTRUE);
-   pWorld->AddNode(pGFILogWorld, 0, pMatrix2);
-   pWorld->AddNode(pGFILogWorld, 1, pMatrix4);
+
+   // Global positioning
+
+   TGeoCombiTrans *pGlobal1 = GetGlobalPosition(pMatrix2);
+   TGeoCombiTrans *pGlobal2 = GetGlobalPosition(pMatrix4);
+
+   pWorld->AddNode( pGFILogWorld, 0, pGlobal1 );
+   pWorld->AddNode( pGFILogWorld, 1, pGlobal2 );
+
+
+
    // Shape: GFIBox type: TGeoBBox
    dx = 25.000000;
    dy = 25.000000;

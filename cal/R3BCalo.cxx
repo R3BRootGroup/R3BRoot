@@ -423,27 +423,26 @@ void R3BCalo::ConstructGeometry() {
 /****************************************************************************/
    //WORLD
 
-   TGeoVolume *pWorld  =  gGeoManager->GetTopVolume();
+   TGeoVolume *pAWorld  =  gGeoManager->GetTopVolume();
 
    // Defintion of the Mother Volume
-   /*
-   Double_t theta1 = 0.000000;
-   Double_t theta2 = 180.000000;
-   rmin   = 0.0000;
-   rmax   = 300.000000;
-   phi1   = 0.000000;
-   phi2   = 360.000000;
-   TGeoShape *pCBWorld  =
-             new TGeoSphere("CBSphereWorld",rmin,rmax,theta1, theta2,phi1,phi2);
+
+   Double_t length = 300.;
+
+   TGeoShape *pCBWorld = new TGeoBBox("Califa_box",
+				      length/2.0,
+				      length/2.0,
+				      length/2.0);
+
    TGeoVolume*
-   pWorld  = new TGeoVolume("CBLogWorld",pCBWorld, pMed2);
-   pWorld->SetVisLeaves(kTRUE);
+       pWorld  = new TGeoVolume("CalifaWorld",pCBWorld, pMed2);
 
-   TGeoCombiTrans *pGlobalc = GetGlobalPosition();
+   TGeoCombiTrans *t0 = new TGeoCombiTrans();
+   TGeoCombiTrans *pGlobalc = GetGlobalPosition(t0);
 
-  // add the sphere as Mother Volume
-   pAWorld->AddNode(pWorld, 0, pGlobalc);
-   */
+   // add the sphere as Mother Volume
+   pAWorld->AddNodeOverlap(pWorld, 0, pGlobalc);
+
 
    // TRAP1
    Double_t ddz, theta, phi;

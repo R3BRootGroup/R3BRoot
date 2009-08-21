@@ -131,8 +131,23 @@ void R3BMagnet::ConstructGeometry(){
     rot_mirror->RotateZ(180.0);
     rot_mirror->RotateY(Aladin_angle);
 // Geometry description
-   TGeoVolume *pWorld =  gGeoManager->GetTopVolume();
-// Yoke UP
+   TGeoVolume *pAWorld =  gGeoManager->GetTopVolume();
+
+   //Enveloppe
+   TGeoShape *aladin_box = new TGeoBBox("Aladin_Box",
+                                            Aladin_length/2.0,
+					    Aladin_length/2.0,
+					    Aladin_length/2.0);
+
+
+   TGeoVolume* pWorld = new TGeoVolume("Aladin_box",aladin_box, pMed2);
+   TGeoCombiTrans *t0 = new TGeoCombiTrans();
+   TGeoCombiTrans *pGlobal = GetGlobalPosition(t0);
+   pAWorld->AddNodeOverlap(pWorld, 0, pGlobal );
+
+
+
+   // Yoke UP
    TGeoShape *solidFeYoke_up = new TGeoBBox("FeYoke_up",
                                             Aladin_width/2.0,
 					    Yoke_thickness/2.0,
@@ -222,17 +237,12 @@ void R3BMagnet::ConstructGeometry(){
    TGeoVolume* pVolFeYoke_right = new TGeoVolume("FeYokeVolright",solidFeYoke_right, pMedFe);
    pVolFeYoke_right->SetVisLeaves(kTRUE);
 
-   TGeoCombiTrans* pGlobal = GetGlobalPosition();
-   TGeoHMatrix pt1 = (*pGlobal) * (*t1);
-   TGeoHMatrix pt2 = (*pGlobal) * (*t2);
-   TGeoHMatrix pt3 = (*pGlobal) * (*t3);
-   TGeoHMatrix pt4 = (*pGlobal) * (*t4);
 
 
-   pWorld->AddNode(pVolFeYoke_up,   1, new TGeoHMatrix(pt1));
-   pWorld->AddNode(pVolFeYoke_down, 2, new TGeoHMatrix(pt2));
-   pWorld->AddNode(pVolFeYoke_left, 3, new TGeoHMatrix(pt3));
-   pWorld->AddNode(pVolFeYoke_right,4, new TGeoHMatrix(pt4));
+   pWorld->AddNode(pVolFeYoke_up,   1, t1);
+   pWorld->AddNode(pVolFeYoke_down, 2, t2);
+   pWorld->AddNode(pVolFeYoke_left, 3, t3);
+   pWorld->AddNode(pVolFeYoke_right,4, t4);
 
 }
 

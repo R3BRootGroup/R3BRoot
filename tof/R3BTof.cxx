@@ -414,10 +414,11 @@ void R3BTof::ConstructGeometry() {
 
   // TRANSFORMATION MATRICES
    // Combi transformation: 
-   dx = 419.700000;
-   dy = 0.000000;
-   dz = 952.400000;
-   // Rotation: 
+    dx = 419.700000;
+    dy = 0.000000;
+    dz = 952.400000;
+   // dz = 0.;
+   // Rotation:
    thx = 121.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
    thz = 31.000000;    phz = 0.000000;
@@ -429,20 +430,6 @@ void R3BTof::ConstructGeometry() {
    TGeoVolume* pWorld = gGeoManager->GetTopVolume();
    pWorld->SetVisLeaves(kTRUE);
 
-   // Create a global Mother Volume
-   /*
-   dx = 100.000000;
-   dy = 100.000000;
-   dz = 100.000000;
-   TGeoShape *pBoxWorld = new TGeoBBox("TofBoxWorld", dx,dy,dz);
-   TGeoVolume*
-   pWorld  = new TGeoVolume("TofBoxLogWorld",pBoxWorld, pMed2);
-   pWorld->SetVisLeaves(kTRUE);
-   TGeoCombiTrans *pGlobalc = GetGlobalPosition();
-
-   // add the sphere as Mother Volume
-   pAWorld->AddNode(pWorld, 0, pGlobalc);
-   */
 
 
    // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
@@ -456,11 +443,16 @@ void R3BTof::ConstructGeometry() {
    pTOFLog = new TGeoVolume("TOFLog",pTOFBox, pMed34);
    pTOFLog->SetVisLeaves(kTRUE);
 
-   pWorld->AddNode(pTOFLog, 0, pMatrix2);
+   TGeoCombiTrans *pGlobal = GetGlobalPosition(pMatrix2);
+
+   if (pGlobal){
+       pWorld->AddNode(pTOFLog, 0, pGlobal);
+   }else{
+       pWorld->AddNode(pTOFLog, 0, pMatrix2);
+   }
 
    AddSensitiveVolume(pTOFLog);
    fNbOfSensitiveVol+=1;
-
 
 }
 
