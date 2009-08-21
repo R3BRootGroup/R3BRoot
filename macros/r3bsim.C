@@ -25,7 +25,7 @@ Int_t r3bsim(){
    //   Geant4:                 "TGeant4"
    //   Fluka :                 "TFluka"
 
-   TString fMC ="TGeant3";
+   TString fMC ="TGeant4";
 
    //-------------------------------------------------
    // Primaries generation
@@ -100,7 +100,7 @@ Int_t r3bsim(){
    //- N# of Sim. Events   |    nEvents     (Int_t)
    //-------------------------------------------------
 
-   Int_t nEvents = 1;
+   Int_t nEvents = 2;
 
    //-------------------------------------------------
    //- EventDisplay        |    fEventDisplay (Bool_t)
@@ -108,7 +108,7 @@ Int_t r3bsim(){
    //   connected:              kTRUE
    //   not connected:          kFALSE
 
-   Bool_t fEventDisplay=kTRUE;
+   Bool_t fEventDisplay=kFALSE;
 
    // Main Sim function call
    r3ball(  nEvents,
