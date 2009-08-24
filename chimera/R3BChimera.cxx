@@ -112,7 +112,7 @@ void R3BChimera::SetSpecialPhysicsCuts(){
    cout << "-I- R3BChimera: Adding customized Physics cut ... " << endl;
 
    if (gGeoManager) {
-     TGeoMedium* pSi = gGeoManager->GetMedium("plasticForTOF");
+     TGeoMedium* pSi = gGeoManager->GetMedium("CsI");
      if ( pSi ) {
       // Setting processes for Si only
 	 gMC->Gstpar(pSi->GetId()  ,"LOSS",3);
@@ -278,7 +278,7 @@ void R3BChimera::EndOfEvent() {
 
 // -----   Public method Register   -------------------------------------------
 void R3BChimera::Register() {
-  FairRootManager::Instance()->Register("TOFPoint", GetName(), fChimeraCollection, kTRUE);
+  FairRootManager::Instance()->Register("ChimeraPoint", GetName(), fChimeraCollection, kTRUE);
 }
 // ----------------------------------------------------------------------------
 
