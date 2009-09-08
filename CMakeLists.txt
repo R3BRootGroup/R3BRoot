@@ -113,7 +113,8 @@ add_subdirectory (field)
 add_subdirectory (macros)  
 add_subdirectory (eventdisplay)  
 add_subdirectory (r3bgen) 
-add_subdirectory (plists) 
+add_subdirectory (plists)
+add_subdirectory (lumon) 
 
 
 Option(BUILD_DOXYGEN "Build Doxygen" OFF)
