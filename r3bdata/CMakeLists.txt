@@ -27,6 +27,7 @@ dchData/R3BDchPoint.cxx
 gfiData/R3BGfiPoint.cxx 
 mtofData/R3BmTofPoint.cxx 
 tofData/R3BTofPoint.cxx
+lumonData/ELILuMonPoint.cxx
 chimeraData/R3BChimeraPoint.cxx
 trackerData/R3BTraPoint.cxx
 trackerData/R3BTraHit.cxx
@@ -34,8 +35,6 @@ trackerData/R3BSitrackerHit.cxx
 landData/R3BLandPoint.cxx
 landData/R3BLandHit.cxx
 landData/R3BPaddleCrystalHit.cxx)
-
-
 
 
 if(RULE_CHECKER_FOUND)
