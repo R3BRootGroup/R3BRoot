@@ -440,7 +440,7 @@ void eliall(Int_t nEvents = 1,
   Double_t pdgId=22; // gamma beam
   Double_t theta1= 0.;  // polar angle distribution
   Double_t theta2= .1;
-  Double_t momentum=.1; // 0.1 GeV/c
+  Double_t momentum=.2; // 0.1 GeV/c
   FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 50);
   boxGen->SetThetaRange (   theta1,   theta2);
   boxGen->SetPRange     (momentum,momentum);
