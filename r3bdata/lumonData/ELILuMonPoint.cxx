@@ -15,13 +15,14 @@ using std::flush;
 ELILuMonPoint::ELILuMonPoint() : FairMCPoint() {
   fX_out      = fY_out  = fZ_out  = 0.;
   fPx_out     = fPy_out = fPz_out = 0.;
+  fCrystalNb  = -1;
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Standard constructor   ------------------------------------------
-ELILuMonPoint::ELILuMonPoint(Int_t trackID, Int_t detID, TVector3 posIn, 
+ELILuMonPoint::ELILuMonPoint(Int_t trackID, Int_t detID, Int_t copy,TVector3 posIn,
 			 TVector3 posOut, TVector3 momIn, TVector3 momOut,
 			 Double_t tof, Double_t length, Double_t eLoss) 
   : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss) {
@@ -31,6 +32,7 @@ ELILuMonPoint::ELILuMonPoint(Int_t trackID, Int_t detID, TVector3 posIn,
   fPx_out = momOut.Px();
   fPy_out = momOut.Py();
   fPz_out = momOut.Pz();
+  fCrystalNb = copy;
 }
 // -------------------------------------------------------------------------
 
