@@ -155,6 +155,10 @@ void ELILuMon::SetSpecialPhysicsCuts(){
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t ELILuMon::ProcessHits(FairVolume* vol) {
 
+   Int_t copyNo  = -1;
+   gMC->CurrentVolID(copyNo);
+
+
   // Simple Det PLane
 
     if ( gMC->IsTrackEntering() ) {
@@ -218,7 +222,7 @@ Bool_t ELILuMon::ProcessHits(FairVolume* vol) {
       fPosOut.SetZ(newpos[2]);
     }
 
-    AddHit(fTrackID, fVolumeID,
+    AddHit(fTrackID, fVolumeID, copyNo,
 	   TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
 	   TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
 	   TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
@@ -326,7 +330,7 @@ void ELILuMon::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
 }
 
 // -----   Private method AddHit   --------------------------------------------
-ELILuMonPoint* ELILuMon::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
+ELILuMonPoint* ELILuMon::AddHit(Int_t trackID, Int_t detID,  Int_t copy, TVector3 posIn,
 			    TVector3 posOut, TVector3 momIn, 
 			    TVector3 momOut, Double_t time, 
 			    Double_t length, Double_t eLoss) {
@@ -336,7 +340,7 @@ ELILuMonPoint* ELILuMon::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
     cout << "-I- ELILuMon: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
 	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
 	 << trackID << ", energy loss " << eLoss*1e06 << " keV" << endl;
-  return new(clref[size]) ELILuMonPoint(trackID, detID, posIn, posOut,
+  return new(clref[size]) ELILuMonPoint(trackID, detID, copy, posIn, posOut,
 				      momIn, momOut, time, length, eLoss);
 }
 // -----   Public method ConstructGeometry   ----------------------------------
