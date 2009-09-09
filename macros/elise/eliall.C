@@ -52,8 +52,8 @@ void eliall(Int_t nEvents = 1,
   gSystem->Setenv("CONFIG_DIR",r3b_confdir.Data());
 
 // Output files
-  TString OutFile = "r3bsim.root";
-  TString ParFile = "r3bpar.root";
+  TString OutFile = "elisim.root";
+  TString ParFile = "elipar.root";
 
 
   // In general, the following parts need not be touched
