@@ -142,7 +142,7 @@ class ELILuMon : public R3BDetector
      **
      ** Adds a LuMonPoint to the HitCollection
      **/
-    ELILuMonPoint* AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
+    ELILuMonPoint* AddHit(Int_t trackID, Int_t detID, Int_t copy, TVector3 posIn,
 			TVector3 pos_out, TVector3 momIn, 
 			TVector3 momOut, Double_t time, 
 			Double_t length, Double_t eLoss);
