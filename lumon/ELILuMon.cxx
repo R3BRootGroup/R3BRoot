@@ -96,7 +96,7 @@ void ELILuMon::Initialize()
 
    cout << endl;
    cout << "-I- ELILuMon: initialisation" << endl;
-   cout << "-I- ELILuMon: Sci. Vol. (McId) " << gMC->VolId("TOFLog")<< endl;
+   cout << "-I- ELILuMon: Sci. Vol. (McId) " << gMC->VolId("LuMonLog")<< endl;
 
 }
 
@@ -387,8 +387,8 @@ void ELILuMon::ConstructGeometry1() {
    Float_t dPP = 8.28 ;
    Int_t   nPP = 3;
    sumWeight = 0;
-   for (i=0; i<nP; i++) sumWeight += aPP[i]*wPP[i];
-   for (i=0; i<nP; i++) wPP[i] *= aPP[i]/sumWeight;
+   for (i=0; i<nPP; i++) sumWeight += aPP[i]*wPP[i];
+   for (i=0; i<nPP; i++) wPP[i] *= aPP[i]/sumWeight;
    material = gGeoManager->Mixture("PbWO",aPP,zPP,dPP,nPP,wPP,kMatPbWO);
    material->Print();
    
