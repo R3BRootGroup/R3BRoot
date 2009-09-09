@@ -33,7 +33,7 @@ eventDisplay()
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *fRun= new FairRunAna();
  
-  fRun->SetInputFile("r3bsim.root");
+  fRun->SetInputFile("elisim.root");
 
   fRun->SetOutputFile("test.root");
   fRun->LoadGeometry();
