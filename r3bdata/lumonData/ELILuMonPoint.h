@@ -38,7 +38,7 @@ class ELILuMonPoint : public FairMCPoint
    *@param length   Track length since creation [cm]
    *@param eLoss    Energy deposit [GeV]
    **/
-  ELILuMonPoint(Int_t trackID, Int_t detID, TVector3 posIn, 
+  ELILuMonPoint(Int_t trackID, Int_t detID, Int_t copy, TVector3 posIn,
 	      TVector3 posOut, TVector3 momIn, TVector3 momOut,
 	      Double_t tof, Double_t length, Double_t eLoss);
 
@@ -89,7 +89,7 @@ class ELILuMonPoint : public FairMCPoint
 
   Double32_t fX_out,  fY_out,  fZ_out;
   Double32_t fPx_out, fPy_out, fPz_out;
-
+  Int_t fCrystalNb;
 
 
   ClassDef(ELILuMonPoint,1)
