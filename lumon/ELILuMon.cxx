@@ -274,7 +274,7 @@ void ELILuMon::EndOfEvent() {
 
 // -----   Public method Register   -------------------------------------------
 void ELILuMon::Register() {
-  FairRootManager::Instance()->Register("TOFPoint", GetName(), fLuMonCollection, kTRUE);
+  FairRootManager::Instance()->Register("LuMonPoint", GetName(), fLuMonCollection, kTRUE);
 }
 // ----------------------------------------------------------------------------
 
@@ -346,7 +346,6 @@ void ELILuMon::ConstructGeometry() {
 }
 
 void ELILuMon::ConstructGeometry1() {
-
 
    //-  Some Material definition
    TGeoMaterial *material = 0;
@@ -427,11 +426,14 @@ void ELILuMon::ConstructGeometry1() {
    // Rotation (Unity) 
    TGeoRotation *pRot = new TGeoRotation();
 
-   Double_t step = 2.1;
+   Double_t step = 2.1;  // step size of 2.1 cm
 
+   // Single Crystal Module Size
    dx = -2.1;
    dy = -2.1;
    dz = +200.0;
+
+   // Numbering for the copies
    Int_t nb=0;
 
    for (Int_t iCol = 0; iCol<3 ;iCol++){
@@ -441,182 +443,18 @@ void ELILuMon::ConstructGeometry1() {
       }
    }
    
-/*   
-   TGeoCombiTrans *pGlobal = GetGlobalPosition(pMatrix2);
 
-   if (pGlobal){
-       pWorld->AddNode(pLuMonLog, 0, pGlobal);
-   }else{
-       pWorld->AddNode(pLuMonLog, 0, pMatrix2);
-   }
-*/
-
-   
+   // Declare all modules as sensitive
    AddSensitiveVolume(pLuMonLog);
    fNbOfSensitiveVol+=1;
 
-
-
-   
-   
-   
 }
 
 
 void ELILuMon::ConstructGeometry2() {
-
-  // out-of-file geometry definition
-   Double_t dx,dy,dz;
-   Double_t a;
-   Double_t thx, phx, thy, phy, thz, phz;
-   Double_t z, density, w;
-   Int_t nel, numed;
-
-
-/****************************************************************************/
-// Material definition
-
-
-  // Mixture: Air
-  TGeoMedium * pMed2=NULL;
-   if (gGeoManager->GetMedium("Air") ){
-       pMed2=gGeoManager->GetMedium("Air");
-   }else{
-     nel     = 2;
-     density = 0.001290;
-     TGeoMixture*
-	 pMat2 = new TGeoMixture("Air", nel,density);
-     a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
-     pMat2->DefineElement(0,a,z,w);
-     a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
-     pMat2->DefineElement(1,a,z,w);
-     pMat2->SetIndex(1);
-     // Medium: Air
-     numed   = 1;  // medium number
-     Double_t par[8];
-     par[0]  = 0.000000; // isvol
-     par[1]  = 0.000000; // ifield
-     par[2]  = 0.000000; // fieldm
-     par[3]  = 0.000000; // tmaxfd
-     par[4]  = 0.000000; // stemax
-     par[5]  = 0.000000; // deemax
-     par[6]  = 0.000100; // epsil
-     par[7]  = 0.000000; // stmin
-     pMed2 = new TGeoMedium("Air", numed,pMat2, par);
-   }
-
-
-  // Mixture: plasticForTOF
-  TGeoMedium * pMed34=NULL;
-   if (gGeoManager->GetMedium("plasticForTOF") ){
-       pMed34=gGeoManager->GetMedium("plasticForTOF");
-   }else{
-     nel     = 2;
-     density = 1.032000;
-     TGeoMixture*
-	 pMat34 = new TGeoMixture("plasticForTOF", nel,density);
-     a = 12.010700;   z = 6.000000;   w = 0.914708;  // C
-     pMat34->DefineElement(0,a,z,w);
-     a = 1.007940;   z = 1.000000;   w = 0.085292;  // H
-     pMat34->DefineElement(1,a,z,w);
-     pMat34->SetIndex(33);
-     // Medium: plasticForTOF
-     numed   = 33;  // medium number
-     Double_t par[8];
-     par[0]  = 0.000000; // isvol
-     par[1]  = 0.000000; // ifield
-     par[2]  = 0.000000; // fieldm
-     par[3]  = 0.000000; // tmaxfd
-     par[4]  = 0.000000; // stemax
-     par[5]  = 0.000000; // deemax
-     par[6]  = 0.000100; // epsil
-     par[7]  = 0.000000; // stmin
-     pMed34 = new TGeoMedium("plasticForTOF", numed,pMat34,par);
-   }
-
-
-  // TRANSFORMATION MATRICES
-   // Combi transformation: 
-    dx = 419.700000;
-    dy = 0.000000;
-    dz = 952.400000;
-   // dz = 0.;
-   // Rotation:
-   thx = 121.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = 31.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-   pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
-
-   //Top Volume
-   TGeoVolume* pWorld = gGeoManager->GetTopVolume();
-   pWorld->SetVisLeaves(kTRUE);
-
-
-
-   // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
-   // Shape: TOFBox type: TGeoBBox
-   dx = 94.450000;
-   dy = 73.450000;
-   dz = 0.500000;
-   TGeoShape *pTOFBox = new TGeoBBox("TOFBox", dx,dy,dz);
-   // Volume: TOFLog
-   TGeoVolume*
-   pTOFLog = new TGeoVolume("TOFLog",pTOFBox, pMed34);
-   pTOFLog->SetVisLeaves(kTRUE);
-
-   TGeoCombiTrans *pGlobal = GetGlobalPosition(pMatrix2);
-
-   if (pGlobal){
-       pWorld->AddNode(pTOFLog, 0, pGlobal);
-   }else{
-       pWorld->AddNode(pTOFLog, 0, pMatrix2);
-   }
-
-   AddSensitiveVolume(pTOFLog);
-   fNbOfSensitiveVol+=1;
-
+// Dummy function
 }
 
 
-
-/*
-void ELILuMon::ConstructGeometry() {
-  
-  FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
-  FairGeoInterface* geoFace = geoLoad->getGeoInterface();
-  ELIGeoLuMon*       stsGeo  = new ELIGeoLuMon();
-  stsGeo->setGeomFile(GetGeometryFileName());
-  geoFace->addGeoModule(stsGeo);
-
-  Bool_t rc = geoFace->readSet(stsGeo);
-  if (rc) stsGeo->create(geoLoad->getGeoBuilder());
-  TList* volList = stsGeo->getListOfVolumes();
-  // store geo parameter
-  FairRun *fRun = FairRun::Instance();
-  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
-  ELIGeoLuMonPar* par=(ELIGeoLuMonPar*)(rtdb->getContainer("ELIGeoLuMonPar"));
-  TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
-  TObjArray *fPassNodes = par->GetGeoPassiveNodes();
-
-  TListIter iter(volList);
-  FairGeoNode* node   = NULL;
-  FairGeoVolume *aVol=NULL;
-
-  while( (node = (FairGeoNode*)iter.Next()) ) {
-      aVol = dynamic_cast<FairGeoVolume*> ( node );
-       if ( node->isSensitive()  ) {
-           fSensNodes->AddLast( aVol );
-       }else{
-           fPassNodes->AddLast( aVol );
-       }
-  }
-  par->setChanged();
-  par->setInputVersion(fRun->GetRunId(),1);
-  ProcessNodes( volList );
-
-}
-*/
 
 ClassImp(ELILuMon)
