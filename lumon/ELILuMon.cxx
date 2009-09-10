@@ -361,7 +361,7 @@ void ELILuMon::ConstructGeometry1() {
    // material Lead
    Int_t kMatLead=601;
    material = gGeoManager->Material("Pb", 207.2, 82., 11.35,kMatLead);
-   material->Print();
+   //material->Print();
    
    // mixtrure Scintillator (CH)
    Int_t kMatPoly=602;
@@ -374,12 +374,12 @@ void ELILuMon::ConstructGeometry1() {
    for (i=0; i<nP; i++) sumWeight += aP[i]*wP[i];
    for (i=0; i<nP; i++) wP[i] *= aP[i]/sumWeight;
    material = gGeoManager->Mixture("Scintillator",aP,zP,dP,nP,wP,kMatPoly);
-   material->Print();
+  // material->Print();
    
    // Iron 
    Int_t kMatFe=603;
    material = gGeoManager->Material("Fe", 55.8, 26., 7.87, kMatFe);
-   material->Print();
+  // material->Print();
    
    
    // Mixtrure Scintillator (PbWO)
@@ -393,23 +393,23 @@ void ELILuMon::ConstructGeometry1() {
    for (i=0; i<nPP; i++) sumWeight += aPP[i]*wPP[i];
    for (i=0; i<nPP; i++) wPP[i] *= aPP[i]/sumWeight;
    material = gGeoManager->Mixture("PbWO",aPP,zPP,dPP,nPP,wPP,kMatPbWO);
-   material->Print();
+  // material->Print();
    
    
    //- Media Definition
    Int_t kMedLead=601, kMedScin=602, kMedFe=603, kMedPbWO=604;
    TGeoMedium*
    pMed1 = gGeoManager->Medium("Lead"        , kMedLead, kMatLead, 0, 0, 0., 10.0, 0.1, 0.1, 0.1, 0.1);
-   pMed1->Print();
+   //pMed1->Print();
    TGeoMedium*
    pMed2 = gGeoManager->Medium("Scintillator", kMedScin, kMatPoly, 1, 0, 0., 10.0, 0.1, 0.1, 0.1, 0.1);
-   pMed2->Print();
+  // pMed2->Print();
    TGeoMedium*
    pMed3 = gGeoManager->Medium("Iron", kMedFe, kMatFe, 0, 0, 0., 10.0, 0.1, 0.1, 0.1, 0.1);
-   pMed3->Print();
+  // pMed3->Print();
    TGeoMedium*
    pMed4 = gGeoManager->Medium("PbWO", kMedPbWO, kMatPbWO, 1, 0, 0., 10.0, 0.1, 0.1, 0.1, 0.1);
-   pMed4->Print(); 
+  // pMed4->Print();
    
    //- Volumes 
 
@@ -435,15 +435,18 @@ void ELILuMon::ConstructGeometry1() {
    // Single Crystal Module Size
    dx = -2.1;
    dy = -2.1;
-   dz = +200.0;
+   dz = 200.0+ 22.5/2.;
 
    // Numbering for the copies
    Int_t nb=0;
 
    for (Int_t iCol = 0; iCol<3 ;iCol++){
       for (Int_t iRow = 0; iRow<3; iRow++) {
-	 pWorld->AddNode( pLuMonLog,nb,  new TGeoCombiTrans("", dx+iCol*step,dy+iRow*step,dz,pRot));
-	 nb++;
+	  pWorld->AddNode( pLuMonLog,nb,
+		   GetGlobalPosition(
+				     new TGeoCombiTrans("", dx+iCol*step,dy+iRow*step,dz,pRot)
+				    ));
+	  nb++;
       }
    }
    
