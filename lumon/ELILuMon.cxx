@@ -39,6 +39,7 @@
 #include "TGeoCone.h"
 #include "TGeoBoolNode.h"
 #include "TGeoCompositeShape.h"
+#include "TGeoShapeAssembly.h"
 #include <iostream>
 
 using std::cout;
@@ -417,35 +418,47 @@ void ELILuMon::ConstructGeometry1() {
    TGeoVolume* pWorld = gGeoManager->GetTopVolume();
    pWorld->SetVisLeaves(kTRUE);
 
-   
-   Double_t dx = 2.1/2.;
-   Double_t dy = 2.1/2.;
-   Double_t dz = 22.5/2.;
-   TGeoShape *pLuMonBox = new TGeoBBox("LUMONBox", dx,dy,dz);
+   // Rotation (Unity)
+   TGeoRotation *pRot = new TGeoRotation();
+
+   // Single Crystal size
+   Double_t bx = 2.1/2.;
+   Double_t by = 2.1/2.;
+   Double_t bz = 22.5/2.;
+
+   Double_t dx= 0.0;
+   Double_t dy= 0.0;
+   Double_t dz= 200 + bz; // distance target->Entrance of Crystal volume
+
+   TGeoVolume *cell = new TGeoVolumeAssembly("CELL");
+   pWorld->AddNode(cell,0,
+                   GetGlobalPosition(
+		   new TGeoCombiTrans("",dx,dy,dz,pRot)
+                   )
+		  );
+
+
+   TGeoShape *pLuMonBox = new TGeoBBox("LUMONBox", bx,by,bz);
    // Volume: LuMon
    TGeoVolume*
    pLuMonLog = new TGeoVolume("LUMONLog",pLuMonBox, pMed4);
    pLuMonLog->SetVisLeaves(kTRUE);
 
-   // Rotation (Unity) 
-   TGeoRotation *pRot = new TGeoRotation();
 
    Double_t step = 2.1;  // step size of 2.1 cm
 
    // Single Crystal Module Size
    dx = -2.1;
    dy = -2.1;
-   dz = 200.0+ 22.5/2.;
 
    // Numbering for the copies
    Int_t nb=0;
 
    for (Int_t iCol = 0; iCol<3 ;iCol++){
       for (Int_t iRow = 0; iRow<3; iRow++) {
-	  pWorld->AddNode( pLuMonLog,nb,
-		   GetGlobalPosition(
-				     new TGeoCombiTrans("", dx+iCol*step,dy+iRow*step,dz,pRot)
-				    ));
+	  cell->AddNode( pLuMonLog,nb,
+			new TGeoCombiTrans("", dx+iCol*step,dy+iRow*step,0.0,pRot)
+		       );
 	  nb++;
       }
    }
