@@ -61,7 +61,7 @@ set(GENERATORS_SRCS ${GENERATORS_SRCS}  ${GENERATORS_DICTIONARY})
 
 
 add_library(R3BGen SHARED ${GENERATORS_SRCS})
-target_link_libraries(R3BGen ${ROOT_LIBRARIES} Pluto)
+#target_link_libraries(R3BGen ${ROOT_LIBRARIES} Pluto)
 set_target_properties(R3BGen PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
 
 ################ install ###################
