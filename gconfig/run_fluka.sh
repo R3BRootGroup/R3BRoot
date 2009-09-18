@@ -14,8 +14,13 @@
 # by Andreas Morsch
 
 # Adapted to FairRoot by M. Al-Turany
+# 
+# Updated by <D.Bertini@gsi.de> 
+#          Date: Sep 18/2009
+#          Fluka version ---->   2008.3b1
 
-echo "Preparing Fluka working directory ..." 
+echo " " 
+echo "-I- TFluka: Preparing Fluka working directory ..." 
 
 CURDIR=`pwd`
 WORKDIR=$CURDIR"/fluka_out"
@@ -28,8 +33,18 @@ mkdir $WORKDIR
 cd $WORKDIR
 
 # Link here some special Fluka files needed
-ln -s $FLUPRO/neuxsc_72.bin neuxsc.bin
+ln -s $FLUPRO/neuxsc-ind_260.bin neuxsc.bin
+ln -s $FLUPRO/sigmapi.bin sigmapi.bin
+ln -s $FLUPRO/elasct.bin elasct.bin
+ln -s $FLUPRO/nuclear.bin nuclear.bin
+
+ln -s $FLUPRO/fluodt.dat fluodt.dat
 ln -s $FLUPRO/random.dat random.dat
+ln -s $FLUPRO/sidan.dat  sidan.dat
+ln -s $FLUPRO/sidae.dat  sidae.dat
+ln -s $FLUPRO/sidapi.dat sidapi.dat
+ln -s $FLUPRO/sidap.dat  sidap.dat
+
 
 # Copy the random seed
 cp $FLUPRO/random.dat old.seed
@@ -42,4 +57,5 @@ ln -s fluka.out fort.11
 ln -fs $VMCWORKDIR/gconfig/flConfig.C flConfig.C
 cp $FLUVMC/input/coreFlukaVmc.inp coreFlukaVmc.inp
 
-echo "Preparing Fluka working directory ... finished" 
+echo "-I- TFluka: Preparing Fluka working directory ... finished" 
+echo " " 
