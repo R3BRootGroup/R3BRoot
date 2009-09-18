@@ -12,16 +12,28 @@
 /// \file fllibs.C
 /// \brief Macro for loading FLUKA libraries
 
+
+#if !defined(__CINT__) || defined(__MAKECINT__)
+
 #include <iostream>
+
+#include <TSystem.h>
+#include <TString.h>
+
+#endif
+
 
 void fllibs()
 {
 /// Macro function for loading FLUKA libraries
 
-  cout << "Loading Fluka libraries ..." << endl;
+    cout << endl;
+    cout << "-I- TFluka: Loading Fluka libraries ..." << endl;
 
-  gSystem->Load("libfluka.so");
-  
-  cout << "Loading Fluka libraries ... finished" << endl;
+    gSystem->Load("libfluka.so");
+
+    cout << "-I- TFluka: Loading Fluka libraries ... finished" << endl;
+    cout << endl;
+
 }
 
