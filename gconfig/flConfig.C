@@ -5,12 +5,19 @@ void Config()
 
     new  TFluka("C++ Interface to Fluka", 1/*verbositylevel*/);
 
-    cout << "GConfig: Fluka has been created." << endl;
+    cout << "GConfig: TFluka has been created." << endl;
   
     FairStack *st = new FairStack();
     st->SetMinPoints(0);
     gMC->SetStack( st ) ;
+
+
+// Set basic processes
     gMC->SetProcess("CKOV",1);
+    gMC->SetProcess("DRAY",1);
+    gMC->SetProcess("LOSS",1);
+    gMC->SetProcess("HADR",1);
+
 
    // set the common cuts 
     TString configm(gSystem->Getenv("VMCWORKDIR"));
