@@ -33,6 +33,10 @@ eventDisplay()
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *fRun= new FairRunAna();
  
+ 
+  TFile* file = new TFile("elipar.root");
+  file->Get("FairBaseParSet"); 
+ 
   fRun->SetInputFile("elisim.root");
 
   fRun->SetOutputFile("test.root");

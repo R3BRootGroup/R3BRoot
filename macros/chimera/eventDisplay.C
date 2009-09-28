@@ -33,6 +33,9 @@ eventDisplay()
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *fRun= new FairRunAna();
  
+  TFile* file = new TFile("r3bpar.root");
+  file->Get("FairBaseParSet"); 
+ 
   fRun->SetInputFile("r3bsim.root");
 
   fRun->SetOutputFile("test.root");
