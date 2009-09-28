@@ -112,10 +112,12 @@ class R3BLand : public R3BDetector
    ** Constructs the STS geometry
    **/
   virtual void ConstructGeometry();
+  virtual void ConstructGeometry1();
+  virtual void ConstructGeometry2();
   virtual void Initialize();
   virtual void SetSpecialPhysicsCuts(){;}
-
-
+  void SetGeomVersion(Int_t vers ) { fVersion = vers; }
+ 
 
   //  void SaveGeoParams();
 
@@ -138,7 +140,9 @@ class R3BLand : public R3BDetector
     TClonesArray*  fLandCollection;     //!  The hit collection
     Bool_t         kGeoSaved;          //!
     TList *flGeoPar; //!
-
+    Int_t fVersion; 
+  
+    
     /** Private method AddHit
      **
      ** Adds a LandPoint to the HitCollection
