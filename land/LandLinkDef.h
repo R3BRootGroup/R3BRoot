@@ -7,6 +7,7 @@
 #pragma link C++ class R3BGeoLand+;
 #pragma link C++ class R3BGeoLandPar;
 #pragma link C++ class R3BLand+;
+#pragma link C++ class R3BLandDigitizer+;
 #pragma link C++ class R3BLandContFact;
 
 #endif
