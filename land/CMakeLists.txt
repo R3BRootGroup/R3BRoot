@@ -32,7 +32,8 @@ set(R3BCAL_SRCS
 R3BLand.cxx  
 R3BGeoLand.cxx   
 R3BGeoLandPar.cxx   
-R3BLandContFact.cxx   
+R3BLandContFact.cxx
+R3BLandDigitizer.cxx
 )
 
 # fill list of header files from list of source files
