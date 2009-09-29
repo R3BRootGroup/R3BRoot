@@ -129,13 +129,21 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
   Int_t volId1=-1;
   Int_t volId2=-1;
 
+
+  if ( fVersion == 1) {
   // Crystals Ids
   volId1 =  gMC->CurrentVolID(cp1);
   // Lead - Crystal numbering scheme
   fPaddleTyp = fMapMcId[volId1];
   // Mother Assembly def
   volId2 =  gMC->CurrentVolOffID(1, cp2);
+  }
 
+  if ( (fVersion == 2) || ( fVersion == 3) ){
+
+  volId1 =  gMC->CurrentVolID(cp1);
+  volId2 =  gMC->CurrentVolOffID(1, cp2);
+  }
 
    if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
@@ -715,7 +723,8 @@ void R3BLand::ConstructGeometry1() {
 }
 
 void R3BLand::ConstructGeometry2() {   
-
+  // This is the  defintion for RPC based Land
+  // Detector
   // out-of-file geometry definition
    Double_t dx,dy,dz;
    Double_t dx1, dx2, dy1, dy2;
@@ -857,6 +866,7 @@ void R3BLand::ConstructGeometry2() {
     vWorld->SetVisLeaves(kTRUE);
     
 // -- Define paddle
+    // Volume : GAS
     Double_t padx = 99.8;
     Double_t pady = 24.8;
     Double_t padz = 0.015;
@@ -864,12 +874,16 @@ void R3BLand::ConstructGeometry2() {
 				       padx,
 				       pady,
 				       padz);
-    
-    // Volume: MOD1
+
     TGeoVolume*
        pGas = new TGeoVolume("GAS",pad_gas, pMed_gas);
     pGas->SetVisLeaves(kTRUE);
-    
+
+    // Add Gas as a sensitive volume
+    AddSensitiveVolume(pGas);
+
+
+    // Volume GLASS
     padx = 99.8;
     pady = 24.8;
     padz = 0.05;
@@ -877,11 +891,11 @@ void R3BLand::ConstructGeometry2() {
 				       padx,
 				       pady,
 				       padz);
-    // Volume: Glass
     TGeoVolume*
        pGlas = new TGeoVolume("GLAS",pad_glas, pMed_glas);
     pGlas->SetVisLeaves(kTRUE);
-    
+
+    // Volume : IRON
     padx = 100.0;
     pady = 25.0;
     padz = 1.02;
