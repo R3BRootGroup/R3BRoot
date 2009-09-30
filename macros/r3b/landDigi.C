@@ -4,7 +4,7 @@ void landDigi(){
   TString inFile      = "r3bsim.root";
   TString parFile     = "r3bpar.root"; 
   // Output file
-  TString outFile = "land_digi.root";
+  TString outFile     = "land_digi.root";
 
 
   
@@ -48,11 +48,11 @@ void landDigi(){
   Int_t iVerbose = 1;
   //Connect the Digitization  Task
 
-  R3BLandDigitizer* land  = new R3BLandDigitizer("LandDigits",iVerbose);
+  R3BLandDigitizer* land  = new R3BLandDigitizer();
   fRun->AddTask(land);
 
   // Runtime DataBase info
-  FairRuntimeDb* rtdb = run->GetRuntimeDb();
+  FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
   FairParRootFileIo*  parIo1 = new FairParRootFileIo();
   parIo1->open(parFile.Data());
   rtdb->setFirstInput(parIo1);
@@ -67,7 +67,7 @@ void landDigi(){
   
   // -----   Intialise and run   --------------------------------------------
   fRun->Init();
-  fRun->Run(0, nEvents); //process the number selected
+  fRun->Run(0, nEvents);
 
   // -----   Finish   -------------------------------------------------------
   timer.Stop();
