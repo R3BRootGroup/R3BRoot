@@ -36,6 +36,15 @@ class R3BLandDigitizer : public FairTask
 
   protected:
   TClonesArray* fLandPoints;
+
+  //- Table data 
+  Double_t x_pos[200],y_pos[200],z_pos[200];
+  Double_t tof[200],pm[200][2];
+  Double_t paddle_E[200][9];
+  Double_t part_E[50],part_n[50],first_hit[4];
+  Int_t nuhits[200];
+
+
   
   private:
   virtual void SetParContainers();
