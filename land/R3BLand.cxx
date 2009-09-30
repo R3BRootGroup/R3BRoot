@@ -920,43 +920,44 @@ void R3BLand::ConstructGeometry2() {
     Double_t tz = 0.0;
     
   //- Create a Module 
-    
-    tz = 0.77;
-    pMod1->AddNode(pGlas,0, new TGeoCombiTrans(tx,ty,tz,rot));
+
+    //- GAS sensitive part
     tz = 0.705;
-    pMod1->AddNode(pGas,1, new TGeoCombiTrans(tx,ty,tz,rot));
-
-    tz = 0.640;
-    pMod1->AddNode(pGlas,2, new TGeoCombiTrans(tx,ty,tz,rot));
+    pMod1->AddNode(pGas,0, new TGeoCombiTrans(tx,ty,tz,rot));
     tz = 0.575;
-    pMod1->AddNode(pGas,3, new TGeoCombiTrans(tx,ty,tz,rot));
-    tz = 0.510; 
-    pMod1->AddNode(pGlas,4, new TGeoCombiTrans(tx,ty,tz,rot));
+    pMod1->AddNode(pGas,1, new TGeoCombiTrans(tx,ty,tz,rot));
     tz = 0.445;
-    pMod1->AddNode(pGas,5, new TGeoCombiTrans(tx,ty,tz,rot));
-    tz = 0.38;  
-    pMod1->AddNode(pGlas,6, new TGeoCombiTrans(tx,ty,tz,rot));
+    pMod1->AddNode(pGas,2, new TGeoCombiTrans(tx,ty,tz,rot));
     tz = 0.315;
-    pMod1->AddNode(pGas,7, new TGeoCombiTrans(tx,ty,tz,rot));
-    tz = 0.25; 
-    pMod1->AddNode(pGlas,8, new TGeoCombiTrans(tx,ty,tz,rot));
-
-    tz = -0.250;
-    pMod1->AddNode(pGlas,9, new TGeoCombiTrans(tx,ty,tz,rot));
+    pMod1->AddNode(pGas,3, new TGeoCombiTrans(tx,ty,tz,rot));
     tz = -0.315;
-    pMod1->AddNode(pGas,10, new TGeoCombiTrans(tx,ty,tz,rot));
-    tz = -0.380;
-    pMod1->AddNode(pGlas,11, new TGeoCombiTrans(tx,ty,tz,rot));
+    pMod1->AddNode(pGas,4, new TGeoCombiTrans(tx,ty,tz,rot));
     tz = -0.445;
-    pMod1->AddNode(pGas,12, new TGeoCombiTrans(tx,ty,tz,rot));
-    tz = -0.510; 
-    pMod1->AddNode(pGlas,13, new TGeoCombiTrans(tx,ty,tz,rot));
+    pMod1->AddNode(pGas,5, new TGeoCombiTrans(tx,ty,tz,rot));
     tz = -0.575;
-    pMod1->AddNode(pGas,14, new TGeoCombiTrans(tx,ty,tz,rot));
-    tz = -0.640;  
-    pMod1->AddNode(pGlas,15, new TGeoCombiTrans(tx,ty,tz,rot));
+    pMod1->AddNode(pGas,6, new TGeoCombiTrans(tx,ty,tz,rot));
     tz = -0.705;
-    pMod1->AddNode(pGas,16, new TGeoCombiTrans(tx,ty,tz,rot));
+    pMod1->AddNode(pGas,7, new TGeoCombiTrans(tx,ty,tz,rot));
+
+    //- GLASS passive part 
+    tz = 0.77;
+    pMod1->AddNode(pGlas,8, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = 0.640;
+    pMod1->AddNode(pGlas,9, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = 0.510; 
+    pMod1->AddNode(pGlas,10, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = 0.38;  
+    pMod1->AddNode(pGlas,11, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = 0.25; 
+    pMod1->AddNode(pGlas,12, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = -0.250;
+    pMod1->AddNode(pGlas,13, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = -0.380;
+    pMod1->AddNode(pGlas,14, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = -0.510; 
+    pMod1->AddNode(pGlas,15, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = -0.640;  
+    pMod1->AddNode(pGlas,16, new TGeoCombiTrans(tx,ty,tz,rot));
     tz = -0.770; 
     pMod1->AddNode(pGlas,17, new TGeoCombiTrans(tx,ty,tz,rot));      
 
