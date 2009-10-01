@@ -40,6 +40,11 @@ InitStatus R3BLandDigitizer::Init() {
   //fDigis = new TClonesArray("R3BLandDigi",1000);
   //ioman->Register("LandDigi", "Digital response in Land", fDigis, kTRUE);
 
+  // Initialise control histograms
+
+  h_ne = new TH1F("ne","primary_el",100,1.,50.);
+  
+
   
   return kSUCCESS;
 
@@ -67,7 +72,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
    Reset();
 
 //-Now do the job event/event    
-   cout << " Entries in LandPoint " << fLandPoints->GetEntries() << endl;
+   // cout << " Entries in LandPoint " << fLandPoints->GetEntries() << endl;
    Int_t nentries = fLandPoints->GetEntries();
    
    for (Int_t l=0;l<nentries;l++){
@@ -77,9 +82,8 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
       Int_t gap = land_obj->GetPaddleNb();
       //cout << "-I- LANDOBJ Paddle " << paddle << "gap " << gap << endl;
       Double_t eloss = land_obj->GetEnergyLoss();  
-      // cout << "-I- LANDOBJ Eloss : " << eloss << endl;
-        if (eloss > 0 ) {
 
+      if (eloss > 0 ) {
 	   Double_t ne = 0.0;  
 	   if ( tof[paddle] < 1.e-15 ){
 	      tof[paddle] = land_obj->GetTime(); // time since part. start [ns] 
@@ -89,8 +93,10 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
            // Check the Units of Tof in [ns] here    
 	   if ( ( land_obj->GetTime()-tof[paddle] )*1e+9 < 1. ){
 	     ne = eloss * 1e+9 / 25.; 
-	      cout << "-I- LANDOBJ Nb of el: " << ne << endl;  
+	     //   cout << "-I- LANDOBJ Nb of el: " << ne << endl;  
 	   }
+	   
+           h_ne ->Fill( ne );  
 
 	   // Check the Ne ??  
 	   Int_t ine = (Int_t) (ne+0.5);
@@ -124,7 +130,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
                   else {
 		     Double_t f1 = TMath::Log(1-(1-kk)/(nbar-kk));
 		     Double_t f2=  TMath::Log((nbar-kk)*(1-zz)/nbar/(1-kk) );
-		     avan =1.+ 1./(f1*f2);
+		     avan =1.+ (1./f1)*(f2);
 		  }
 
                   // QDC Saturation   
@@ -145,7 +151,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 		 TMath::Exp((alpha-eta)*(0.3-xx)-1)*1.e+12;
 	      if ( qcharge>2.56 ) qcharge = 2.56;
               qcharge = qq2 ;
-	      cout << "-I LandObj  Qcharge: " << qcharge << endl;
+	           cout << "-I LandObj  Qcharge: " << qcharge << endl;
 
 
 
@@ -187,7 +193,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 
 void R3BLandDigitizer::Reset(){
 // Clear the structure
-   cout << " -I- Digit Reset() called " << endl;
+//   cout << " -I- Digit Reset() called " << endl;
 
    for(Int_t i=0;i<200;i++) {
       nuhits[i]=0;
@@ -217,7 +223,9 @@ void R3BLandDigitizer::Reset(){
 void R3BLandDigitizer::Finish()
 {
 // here event. write histos
-   cout << " -I- Digit Finish() called " << endl;
+//   cout << " -I- Digit Finish() called " << endl;
+// Write control histograms
+   h_ne->Write();
 }
 
 ClassImp(R3BLandDigitizer)

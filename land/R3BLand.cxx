@@ -852,7 +852,8 @@ void R3BLand::ConstructGeometry2() {
     par[5]  = 0.005000; // deemax
     par[6]  = 0.001000; // epsil
     par[7]  = 0.001000; // stmin
-    
+
+
     TGeoMedium*
     pMed_gas = new TGeoMedium("RPCGAS", numed,pMat_gas, par);
 
@@ -981,11 +982,12 @@ void R3BLand::ConstructGeometry2() {
 	     tx = 0.0;
 	     ty = -75.3+(j)*50.2;
 	     tz = posZ +i*2.14;
-	     vWorld->AddNode(pMod1,(i)*4+j, new TGeoCombiTrans(tx,ty,tz,rot) );
+	     
+	     vWorld->AddNode(pMod1,(i)*4+j, GetGlobalPosition( new TGeoCombiTrans(tx,ty,tz,rot)) );
              ty = 0.0;
 	     tx = -75.3+(j)*50.2;
 	     tz = posZ +(i+1)*2.14;
-	     vWorld->AddNode(pMod1,(i+1)*4+j, new TGeoCombiTrans(tx,ty,tz,pRot2) );
+	     vWorld->AddNode(pMod1,(i+1)*4+j, GetGlobalPosition( new TGeoCombiTrans(tx,ty,tz,pRot2)) );
 	  }
 	  
        } 
@@ -994,8 +996,8 @@ void R3BLand::ConstructGeometry2() {
     
     // Module Only 
     if ( fVersion == 2 ){
-       tz = posZ;
-       vWorld->AddNode(pMod1,0, new TGeoCombiTrans(tx,ty,tz,rot));             
+       tz = 0.0; //- Put the Module@origin
+       vWorld->AddNode(pMod1,0, GetGlobalPosition(new TGeoCombiTrans(tx,ty,tz,rot)));             
     }
     
     
