@@ -155,7 +155,7 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
 
   // Sum energy loss for all steps in the active volume
   fELoss += gMC->Edep();
-
+  
   // Set additional parameters at exit of active volume. Create R3BLandPoint.
   if ( gMC->IsTrackExiting()    ||
        gMC->IsTrackStop()       ||
@@ -163,6 +163,7 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
     fTrackID  = gMC->GetStack()->GetCurrentTrackNumber();
     gMC->TrackPosition(fPosOut);
     gMC->TrackMomentum(fMomOut);
+
     if (fELoss == 0. ) return kFALSE;
     
     if (gMC->IsTrackExiting()) {
@@ -329,7 +330,7 @@ R3BLandPoint* R3BLand::AddHit(Int_t trackID, Int_t detID, Int_t box, Int_t id1, 
 	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
 	 << trackID << ", energy loss " << eLoss*1e06 << " keV" << endl;
   return new(clref[size]) R3BLandPoint(trackID, detID, box, id1, id2,  posIn, posOut,
-				      momIn, momOut, time, length, eLoss*1e06);
+				      momIn, momOut, time, length, eLoss);
 }
 // -----   Public method ConstructGeometry   ----------------------------------
 void R3BLand::ConstructGeometry() {
@@ -827,7 +828,7 @@ void R3BLand::ConstructGeometry2() {
 
 //-- Mixture: RPC Gas
     nel     = 4;
-    density = 0.0053;
+    density = 0.0053; // [g/cm3]
     Double_t agas[4] = {1.,12.,19.,32.};
     Double_t zgas[4] = {1.,6.,9.,16.};
     Double_t wgas[4] = {2.2,1.9,4.,0.85};
