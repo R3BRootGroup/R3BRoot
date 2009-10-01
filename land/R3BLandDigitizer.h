@@ -44,7 +44,9 @@ class R3BLandDigitizer : public FairTask
   Double_t part_E[50],part_n[50],first_hit[4];
   Int_t nuhits[200];
 
-
+  //- Control Hitograms
+  TH1F *h_ne;
+  
   
   private:
   virtual void SetParContainers();
