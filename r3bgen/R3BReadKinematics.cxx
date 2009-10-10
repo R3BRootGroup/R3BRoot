@@ -58,7 +58,7 @@ Char_t buffer[MAX];
     TString kine1 = WorkDir+"/input/kine/KINR.OUT.12c_p_p_0MeV_400MeV_long.dat";
     ifstream infile(kine1.Data());
 
-     if (!infile);
+     if (!infile) exit(0);
      for(i=0;i<17;i++){
 	  infile.getline(buffer, MAX);//readout header
 //	  cout << "i=" << i << " buffer" << infile.rdbuf() <<  G4endl;
