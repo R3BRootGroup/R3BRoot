@@ -41,9 +41,8 @@ InitStatus R3BLandDigitizer::Init() {
   //ioman->Register("LandDigi", "Digital response in Land", fDigis, kTRUE);
 
   // Initialise control histograms
-
-  h_ne = new TH1F("ne","primary_el",100,1.,50.);
-  
+  h_ne = new TH1F("Ne","primary_el",30,0.,30.);
+  h_ch = new TH1F("Charge","",1000,0.,1.);
 
   
   return kSUCCESS;
@@ -71,89 +70,84 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 //-Reset local arrays 
    Reset();
 
-//-Now do the job event/event    
-   // cout << " Entries in LandPoint " << fLandPoints->GetEntries() << endl;
+// Create Stockastic Avalanche
+
+//-Now do the job event/event
+
    Int_t nentries = fLandPoints->GetEntries();
-   
-   for (Int_t l=0;l<nentries;l++){
+
+for (Int_t l=0;l<nentries;l++){
       // Get the Land Object in array
       R3BLandPoint *land_obj = (R3BLandPoint*) fLandPoints->At(l);
       Int_t paddle = land_obj->GetSector();
       Int_t gap = land_obj->GetPaddleNb();
-      //cout << "-I- LANDOBJ Paddle " << paddle << "gap " << gap << endl;
       Double_t eloss = land_obj->GetEnergyLoss();  
 
       if (eloss > 0 ) {
-	   Double_t ne = 0.0;  
+
+	   Double_t ne = 0.0;
 	   if ( tof[paddle] < 1.e-15 ){
 	      tof[paddle] = land_obj->GetTime(); // time since part. start [ns] 
 	      //cout << "-I- LANDOBJ tof " << tof[paddle] << endl;  
 	   }//! tof > 1e-15
 	   
            // Check the Units of Tof in [ns] here    
-	   if ( ( land_obj->GetTime()-tof[paddle] )*1e+9 < 1. ){
+	   if ( ( land_obj->GetTime()-tof[paddle] )*1e+9 < 100. ){
 	     ne = eloss * 1e+9 / 25.; 
-	     //   cout << "-I- LANDOBJ Nb of el: " << ne << endl;  
-	   }
+	  // cout << "-I- LANDOBJ Nb of el: " << ne << endl;
 	   
-           h_ne ->Fill( ne );  
-
+           h_ne ->Fill( ne );
 	   // Check the Ne ??  
 	   Int_t ine = (Int_t) (ne+0.5);
+
+           // Loop over primary electrons
 	   for (Int_t i=0;i<ine;i++ ){
 	      Double_t zz = gRandom->Rndm();     
 	      Double_t xx = zz * 0.3;
               Double_t dd =0.3;       // [mm]
-	      Double_t lambda = 0.1;  // [mm]
+
 	      Double_t vv = 0.21e-3;  // [mm/ps]
-	      Double_t tt = ( xx - lambda ) / vv ;
+              Double_t nsteps = xx/0.0025; // mm
+	      Double_t dt = 0.0025 / vv ;   // ps
+              Double_t tt = dt*nsteps; 
 	      //  cout << "-I LandOBJ tt: " <<  tt << endl;
 	      Double_t alpha = 123.0;
 	      Double_t eta = 10.5;
-	      Double_t l1=0.008;
-              Double_t tsat = TMath::Log(1.6e+7)/(alpha-eta)/vv;   
-              Double_t qq=0.0;
-	      Double_t qq2=0.0;
+              Double_t wfield = 0.5;
 
-	      Int_t itt = (Int_t) (tt);
-	      for (Int_t j=0;j<itt;j++){
-		  Double_t strom = 0.0;
-		  if ( j < Int_t(tsat) ) strom=0.5*1.6022e-19*vv*TMath::Exp((alpha-eta)*vv*j*1.);
-		  else
-		     strom=0.5*1.6022e-19*vv*1.6e+7;    
-		  qq=qq+strom;
-		  Double_t nbar = TMath::Exp((alpha-eta)*vv*j*1.);
+
+	      Double_t qq2=0.0;
+              Double_t f1=0.0;
+              Double_t f2=0.0;
+
+	      Int_t ix = (int) (nsteps);
+
+           // Add on Avan
+           /*   for (Int_t j=1;j<ix+1;j++){
+	        Double_t nbar = TMath::Exp((alpha-eta)*j*0.0025);
 		  Double_t kk = eta/alpha;
 		  zz = gRandom->Rndm();
 		  Double_t avan =0.0;
-		  if ( zz < (kk*(nbar-1)/(nbar-kk))) avan =0.0; 
+ 	          if ( zz < (kk*(nbar-1.)/(nbar-kk))) avan =0.0;
                   else {
-		     Double_t f1 = TMath::Log(1-(1-kk)/(nbar-kk));
-		     Double_t f2=  TMath::Log((nbar-kk)*(1-zz)/nbar/(1-kk) );
-		     avan =1.+ (1./f1)*(f2);
+		     f1 = TMath::Log(1.-(1.-kk)/(nbar-kk));
+		     f2=  TMath::Log((nbar-kk)*(1.-zz)/nbar/(1.-kk));
+		     avan =1.+ f2/f1;
 		  }
-
+		  //cout << "-I- LandOBJ f1:" << f1 << " f2: " << f2 << endl;
                   // QDC Saturation   
 		  if (avan > 1.6e+7 ) avan = 1.6e+7;
-		  if (avan < 0. ) avan = 0.0;
-		  //  cout << "-I- LandOBJ Avalanche:" << xx << " avan: " << avan << endl;
-		  
-		   Double_t current = 0.5*vv*1.6022e-19*avan;
-		   qq2=qq2+current;
+		  //cout << "-I- LandOBJ Avalanche:" << j << " avan: " << avan << endl;
+		  Double_t current = wfield*vv*1.6022e-19*avan;
+		  //cout << "-I- LandOBJ current:" << current << endl;
+		  qq2=qq2+current*dt;
 	      }// !j
+            */
 
-	      qq  =  qq *1e+12;
-	      qq2 =  qq2*1e+12;
-
-              // ??? is qcharge recalculated here or it is "qq2"??
-	      
-	      Double_t qcharge = 0.5 / (alpha-eta)*1.6022e-19*
-		 TMath::Exp((alpha-eta)*(0.3-xx)-1)*1.e+12;
-	      if ( qcharge>2.56 ) qcharge = 2.56;
-              qcharge = qq2 ;
-	           cout << "-I LandObj  Qcharge: " << qcharge << endl;
-
-
+              qq2= 0.5 / (alpha-eta)*1.6022e-19* TMath::Exp((alpha-eta)*(0.3-xx)-1)*1.e+12;
+              Double_t qcharge = qq2 ;
+              // Fill Charge Control hist.
+	      h_ch->Fill(qcharge);
 
 	      //??? The processHit has to be changed and Hit Info also !!!
 	      x_pos[paddle]  = x_pos[paddle] + land_obj->GetXOut() *qcharge;
@@ -164,7 +158,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 	      paddle_E[paddle][gap] = paddle_E[paddle][gap] + qcharge;
 	      paddle_E[paddle][9] = paddle_E[paddle][9] + qcharge;
 
-	      Int_t first =  (Int_t) (paddle/20.)/2.;
+	      Int_t first =  (Int_t) ((paddle/20.)/2.);
 	      Int_t second = (Int_t) (paddle/20./2.);
 
 	      // ?? here what is the diff ??
@@ -182,12 +176,11 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 	      if (paddle_E[paddle][gap]>2.5) continue;
 
 	   }//! ine
-	   
+	  }//!tof 
 	}//! eloss	 
            
    }//! MC hits   
 
-   
 }
 // -------------------------------------------------------------------------
 
@@ -226,6 +219,7 @@ void R3BLandDigitizer::Finish()
 //   cout << " -I- Digit Finish() called " << endl;
 // Write control histograms
    h_ne->Write();
+   h_ch->Write();
 }
 
 ClassImp(R3BLandDigitizer)

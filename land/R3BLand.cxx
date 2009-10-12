@@ -57,6 +57,7 @@ R3BLand::R3BLand() : R3BDetector("R3BLand", kTRUE, kLAND) {
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
+  fVersion =1;
 }
 // -------------------------------------------------------------------------
 
@@ -72,6 +73,7 @@ R3BLand::R3BLand(const char* name, Bool_t active)
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
+  fVersion = 1;
 }
 // -------------------------------------------------------------------------
 
@@ -93,6 +95,7 @@ void R3BLand::Initialize()
 
   FairDetector::Initialize();
 
+  if (fVersion == 1 ) {
   cout << "-I- R3BLand: initialisation " << endl;
   cout << "-I- R3BLand: Paddle B3 (McId): " << gMC->VolId("padle_h_box3") << endl;
   cout << "-I- R3BLand: Paddle B4 (McId): " << gMC->VolId("padle_h_box4") << endl;
@@ -111,6 +114,12 @@ void R3BLand::Initialize()
  fMapMcId[id2]=2;
  fMapMcId[id3]=3;
 
+ } else {
+ // do nothing for the moment
+
+ }
+
+
 
 }
 
@@ -127,13 +136,21 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
   Int_t volId1=-1;
   Int_t volId2=-1;
 
+
+  if ( fVersion == 1) {
   // Crystals Ids
   volId1 =  gMC->CurrentVolID(cp1);
   // Lead - Crystal numbering scheme
   fPaddleTyp = fMapMcId[volId1];
   // Mother Assembly def
   volId2 =  gMC->CurrentVolOffID(1, cp2);
+  }
 
+  if ( (fVersion == 2) || ( fVersion == 3) ){
+
+  volId1 =  gMC->CurrentVolID(cp1);
+  volId2 =  gMC->CurrentVolOffID(1, cp2);
+  }
 
    if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
@@ -211,20 +228,8 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
 
   return kTRUE;
 }
-// ----------------------------------------------------------------------------
-//void R3BLand::SaveGeoParams(){
-//
-//  cout << " -I Save STS geo params " << endl;
-//
-//  TFolder *mf = (TFolder*) gDirectory->FindObjectAny("cbmroot");
-//  cout << " mf: " << mf << endl;
-//  TFolder *stsf = NULL;
-//  if (mf ) stsf = (TFolder*) mf->FindObjectAny(GetName());
-//  cout << " stsf: " << stsf << endl;
-//  if (stsf) stsf->Add( flGeoPar0 ) ;
- //  FairRootManager::Instance()->WriteFolder();
-//  mf->Write("cbmroot",TObject::kWriteDelete);
-//}
+
+
 
 
 // -----   Public method EndOfEvent   -----------------------------------------
@@ -264,8 +269,6 @@ void R3BLand::EndOfEvent() {
   ResetParameters();
 }
 // ----------------------------------------------------------------------------
-
-
 
 // -----   Public method Register   -------------------------------------------
 void R3BLand::Register() {
@@ -331,12 +334,18 @@ R3BLandPoint* R3BLand::AddHit(Int_t trackID, Int_t detID, Int_t box, Int_t id1, 
   if (fVerboseLevel>1) 
     cout << "-I- R3BLand: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
 	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
-	 << trackID << ", energy loss " << eLoss*1e06 << " keV" << endl;
+	 << trackID << ", energy loss " << eLoss  << " GeV" << endl;
   return new(clref[size]) R3BLandPoint(trackID, detID, box, id1, id2,  posIn, posOut,
-				      momIn, momOut, time, length, eLoss*1e06);
+				      momIn, momOut, time, length, eLoss);
 }
 // -----   Public method ConstructGeometry   ----------------------------------
 void R3BLand::ConstructGeometry() {
+   if (fVersion == 1 ) return ConstructGeometry1();
+   if ((fVersion == 2 ) || (fVersion ==3 )) return ConstructGeometry2();
+   cout << "-I- R3BLand  ConstruGeometry() : unknown Geometry  !!! " << endl; 
+}
+
+void R3BLand::ConstructGeometry1() {   
 
   // out-of-file geometry definition
    Double_t dx,dy,dz;
@@ -554,7 +563,7 @@ void R3BLand::ConstructGeometry() {
    TGeoRotation *rot1 = new TGeoRotation();
    rot1->RotateX(0.);
    rot1->RotateY(90.);
-   rot1->RotateZ(0.);
+   rot1->RotateZ(90.);
    xx = 105.1;
    yy = -95.;
    zz = -45.;
@@ -564,8 +573,8 @@ void R3BLand::ConstructGeometry() {
 
    TGeoRotation *rot2 = new TGeoRotation();
    rot2->RotateX(0.);
-   rot2->RotateY(270.);
-   rot2->RotateZ(0.);
+   rot2->RotateY(90.);
+   rot2->RotateZ(270.);
    xx = -105.1;
    yy = -95.;
    zz = -45.;
@@ -587,6 +596,7 @@ void R3BLand::ConstructGeometry() {
    rot3->RotateZ(0.);
    xx = 0.;
    yy = -95.;
+   
    zz = -49.875;
    // normaly seq from 4
    aLand->AddNode(padle_h_box3,1,new TGeoCombiTrans(xx,yy,zz,rot3));
@@ -616,6 +626,7 @@ void R3BLand::ConstructGeometry() {
 
    xx = 0.;
    yy = -95.;
+
    zz = -49.5;
    aLand->AddNode(padle_h_box5,1,new TGeoCombiTrans(xx,yy,zz,rot3));
    zz = -48.5;
@@ -718,44 +729,299 @@ void R3BLand::ConstructGeometry() {
 
 }
 
+void R3BLand::ConstructGeometry2() {   
+  // This is the  defintion for RPC based Land
+  // Detector
+  // out-of-file geometry definition
+   Double_t dx,dy,dz;
+   Double_t dx1, dx2, dy1, dy2;
+   Double_t a;
+   Double_t z, density, w;
+   Int_t nel, numed;
+   Double_t radl,absl;
+
+   Double_t  sumWeight = 0.0;
+
+/****************************************************************************/
+// Material definition
+// User tracking media parameters   
+
+    Double_t par[8];
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 10.00000; // tmaxfd
+    par[4]  = 0.100000; // stemax
+    par[5]  = 0.050000; // deemax
+    par[6]  = 0.001000; // epsil
+    par[7]  = 0.001000; // stmin
+   
+//-- Mixture: Air
+   TGeoMedium * pMed2=NULL;
+   if (gGeoManager->GetMedium("Air") ){
+       pMed2=gGeoManager->GetMedium("Air");
+   }else{
+    nel     = 2;
+    density = 0.001290;
+    TGeoMixture*
+	pMat2 = new TGeoMixture("Air", nel,density);
+    a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+    pMat2->DefineElement(0,a,z,w);
+    a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+    pMat2->DefineElement(1,a,z,w);
+    pMat2->SetIndex(1);
+    // Medium: Air
+    numed   = 22;  // medium number
+    pMed2 = new TGeoMedium("Air", numed,pMat2, par);
+   }
+
+//--  Material: Iron
+   TGeoMedium * pMedFe=NULL;
+   if (gGeoManager->GetMedium("Iron") ){
+       pMedFe=gGeoManager->GetMedium("Iron");
+   }else{
+    w       =        0.;
+    a       = 55.850000;
+    z       = 26.000000;
+    density = 7.870000;
+    radl    = 1.757717;
+    absl    = 169.994418;
+    TGeoMaterial*
+	pMatFe = new TGeoMaterial("Iron", a,z,density,radl,absl);
+    pMatFe->SetIndex(701);
+    numed   = 23;  // medium number
+    pMedFe = new TGeoMedium("Iron", numed,pMatFe, par);
+   }
+
+//-- Mixture: PolyStyrene
+    nel     = 2;
+    density = 1.032;
+    Double_t aps[2] = {12.011,1.008};
+    Double_t zps[2] = {6.,1.};
+    Double_t wps[2] = {1.,1.104};
+
+    // renormalized
+    sumWeight = 0.0;
+    for (Int_t i=0; i<nel; i++) sumWeight += aps[i]*wps[i];
+    for (Int_t i=0; i<nel; i++) wps[i] *= aps[i]/sumWeight;
 
 
-/*
-void R3BLand::ConstructGeometry() {
-  
-  FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
-  FairGeoInterface* geoFace = geoLoad->getGeoInterface();
-  R3BGeoLand*       stsGeo  = new R3BGeoLand();
-  stsGeo->setGeomFile(GetGeometryFileName());
-  geoFace->addGeoModule(stsGeo);
 
-  Bool_t rc = geoFace->readSet(stsGeo);
-  if (rc) stsGeo->create(geoLoad->getGeoBuilder());
-  TList* volList = stsGeo->getListOfVolumes();
-  // store geo parameter
-  FairRun *fRun = FairRun::Instance();
-  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
-  R3BGeoLandPar* par=(R3BGeoLandPar*)(rtdb->getContainer("R3BGeoLandPar"));
-  TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
-  TObjArray *fPassNodes = par->GetGeoPassiveNodes();
+    TGeoMixture*
+    pMat_ps = new TGeoMixture("PS", nel,density);
 
-  TListIter iter(volList);
-  FairGeoNode* node   = NULL;
-  FairGeoVolume *aVol=NULL;
+    pMat_ps->DefineElement(0,aps[0],zps[0],wps[0]);
+    pMat_ps->DefineElement(1,aps[1],zps[1],wps[1]);
+    pMat_ps->SetIndex(24);
+    // Medium: Air
+    numed   = 24;  // medium number
+    TGeoMedium*
+    pMed_ps = new TGeoMedium("PS", numed,pMat_ps, par);
 
-  while( (node = (FairGeoNode*)iter.Next()) ) {
-      aVol = dynamic_cast<FairGeoVolume*> ( node );
-       if ( node->isSensitive()  ) {
-           fSensNodes->AddLast( aVol );
-       }else{
-           fPassNodes->AddLast( aVol );
-       }
-  }
-  par->setChanged();
-  par->setInputVersion(fRun->GetRunId(),1);
-  ProcessNodes( volList );
+//-- Mixture: Quartz Glas
+    nel     = 2;
+    density = 2.5;
+    Double_t aglas[2] = {16.,28.};
+    Double_t zglas[2] = {8.,14.};
+    Double_t wglas[2] = {2.,1.};
+    // renormalized
+    sumWeight = 0.0;
+    for (Int_t i=0; i<nel; i++) sumWeight += aglas[i]*wglas[i];
+    for (Int_t i=0; i<nel; i++) wglas[i] *= aglas[i]/sumWeight;
+    
+    TGeoMixture*
+    pMat_glas = new TGeoMixture("QGLASS", nel,density);
 
+    pMat_glas->DefineElement(0,aglas[0],zglas[0],wglas[0]);
+    pMat_glas->DefineElement(1,aglas[1],zglas[1],wglas[1]);
+    pMat_glas->SetIndex(24);
+    // Medium: Quartz glas
+    numed   = 25;  // medium number
+    TGeoMedium*
+    pMed_glas = new TGeoMedium("QGLAS", numed,pMat_glas, par);
+    
+
+//-- Geometry defintion
+
+//-- Mixture: RPC Gas
+    nel     = 4;
+    density = 0.0053;
+    Double_t agas[4] = {1.,12.,19.,32.};
+    Double_t zgas[4] = {1.,6.,9.,16.};
+    Double_t wgas[4] = {2.2,1.9,4.,0.85};
+
+    // renormalized
+    sumWeight = 0.0;
+    for (Int_t i=0; i<nel; i++) sumWeight += agas[i]*wgas[i];
+    for (Int_t i=0; i<nel; i++) wgas[i] *= agas[i]/sumWeight;
+
+
+    TGeoMixture*
+    pMat_gas = new TGeoMixture("RPCGAS", nel,density);
+
+    pMat_gas->DefineElement(0,agas[0],zgas[0],wgas[0]);
+    pMat_gas->DefineElement(1,agas[1],zgas[1],wgas[1]);
+    pMat_gas->DefineElement(2,agas[2],zgas[2],wgas[2]);
+    pMat_gas->DefineElement(3,agas[3],zgas[3],wgas[3]);
+    pMat_gas->SetIndex(25);
+    // Medium: RPCgas
+    numed   = 26;  // medium number
+    // More fine steping def. in Gas
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 10.00000; // tmaxfd
+    par[4]  = 0.010000; // stemax
+    par[5]  = 0.005000; // deemax
+    par[6]  = 0.001000; // epsil
+    par[7]  = 0.001000; // stmin
+    
+    TGeoMedium*
+    pMed_gas = new TGeoMedium("RPCGAS", numed,pMat_gas, par);
+
+
+
+
+
+//-- Main Geometry definition
+//-- Get the top volume (CAVE) from the TGeoManager class
+    
+    TGeoVolume* vWorld = gGeoManager->GetTopVolume();
+    vWorld->SetVisLeaves(kTRUE);
+    
+// -- Define paddle
+    // Volume : GAS
+    Double_t padx = 99.8;
+    Double_t pady = 24.8;
+    Double_t padz = 0.015;
+    TGeoShape* pad_gas = new TGeoBBox("paddle_gas1",
+				       padx,
+				       pady,
+				       padz);
+
+    TGeoVolume*
+       pGas = new TGeoVolume("GAS",pad_gas, pMed_gas);
+    pGas->SetVisLeaves(kTRUE);
+
+    // Add Gas as a sensitive volume
+    AddSensitiveVolume(pGas);
+
+
+    // Volume GLASS
+    padx = 99.8;
+    pady = 24.8;
+    padz = 0.05;
+    TGeoShape* pad_glas = new TGeoBBox("paddle_glas",
+				       padx,
+				       pady,
+				       padz);
+    TGeoVolume*
+       pGlas = new TGeoVolume("GLAS",pad_glas, pMed_glas);
+    pGlas->SetVisLeaves(kTRUE);
+
+    // Volume : IRON
+    padx = 100.0;
+    pady = 25.0;
+    padz = 1.02;
+    TGeoShape* pad_mod1 = new TGeoBBox("paddle_mod1",
+				       padx,
+				       pady,
+				       padz);    
+  // Volume: MOD1
+    TGeoVolume*
+       pMod1 = new TGeoVolume("MOD1",pad_mod1, pMedFe);
+    pMod1->SetVisLeaves(kTRUE);
+    
+    
+    
+    TGeoRotation *rot = new TGeoRotation();
+    rot->RotateX(0.);
+    rot->RotateY(0.);
+    rot->RotateZ(0.);
+    
+    Double_t tx = 0.0;
+    Double_t ty = 0.0;
+    Double_t tz = 0.0;
+    
+  //- Create a Module 
+    
+    tz = 0.77;
+    pMod1->AddNode(pGlas,0, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = 0.705;
+    pMod1->AddNode(pGas,1, new TGeoCombiTrans(tx,ty,tz,rot));
+
+    tz = 0.640;
+    pMod1->AddNode(pGlas,2, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = 0.575;
+    pMod1->AddNode(pGas,3, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = 0.510; 
+    pMod1->AddNode(pGlas,4, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = 0.445;
+    pMod1->AddNode(pGas,5, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = 0.38;  
+    pMod1->AddNode(pGlas,6, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = 0.315;
+    pMod1->AddNode(pGas,7, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = 0.25; 
+    pMod1->AddNode(pGlas,8, new TGeoCombiTrans(tx,ty,tz,rot));
+
+    tz = -0.250;
+    pMod1->AddNode(pGlas,9, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = -0.315;
+    pMod1->AddNode(pGas,10, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = -0.380;
+    pMod1->AddNode(pGlas,11, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = -0.445;
+    pMod1->AddNode(pGas,12, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = -0.510; 
+    pMod1->AddNode(pGlas,13, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = -0.575;
+    pMod1->AddNode(pGas,14, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = -0.640;  
+    pMod1->AddNode(pGlas,15, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = -0.705;
+    pMod1->AddNode(pGas,16, new TGeoCombiTrans(tx,ty,tz,rot));
+    tz = -0.770; 
+    pMod1->AddNode(pGlas,17, new TGeoCombiTrans(tx,ty,tz,rot));      
+
+    
+   // Full Geometry Definition
+     Double_t posZ =1000.;
+
+    if ( fVersion == 3 ){
+       Double_t thx,thy,thz;
+       Double_t phx,phy,phz;
+       thx = 90.0;    phx = 270.0;
+       thy = 90.0;    phy = 0.0;
+       thz = 0.0;     phz = 0.0;
+       TGeoRotation *pRot2 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+       
+       
+       for ( Int_t i=0;i<50;i+=2){
+	  
+	  for (Int_t j=0;j<4;j++){
+	     tx = 0.0;
+	     ty = -75.3+(j)*50.2;
+	     tz = posZ +i*2.14;
+	     vWorld->AddNode(pMod1,(i)*4+j, new TGeoCombiTrans(tx,ty,tz,rot) );
+             ty = 0.0;
+	     tx = -75.3+(j)*50.2;
+	     tz = posZ +(i+1)*2.14;
+	     vWorld->AddNode(pMod1,(i+1)*4+j, new TGeoCombiTrans(tx,ty,tz,pRot2) );
+	  }
+	  
+       } 
+       
+    }//! version 3
+    
+    // Module Only 
+    if ( fVersion == 2 ){
+       tz = posZ;
+       vWorld->AddNode(pMod1,0, new TGeoCombiTrans(tx,ty,tz,rot));             
+    }
+    
+    
+//!end of construction
 }
-*/
 
 ClassImp(R3BLand)

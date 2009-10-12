@@ -46,6 +46,7 @@ class R3BLandDigitizer : public FairTask
 
   //- Control Hitograms
   TH1F *h_ne;
+  TH1F *h_ch;
   
   
   private:
