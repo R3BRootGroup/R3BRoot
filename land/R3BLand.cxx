@@ -563,31 +563,27 @@ void R3BLand::ConstructGeometry1() {
    TGeoRotation *rot1 = new TGeoRotation();
    rot1->RotateX(0.);
    rot1->RotateY(90.);
-   rot1->RotateZ(90.);
+   rot1->RotateZ(0.);
    xx = 105.1;
    yy = -95.;
    zz = -45.;
 
    aLand->AddNode(trap,2,new TGeoCombiTrans(xx,yy,zz,rot1));
- 
 
    TGeoRotation *rot2 = new TGeoRotation();
    rot2->RotateX(0.);
-   rot2->RotateY(90.);
-   rot2->RotateZ(270.);
+   rot2->RotateY(270.);
+   rot2->RotateZ(0.);
    xx = -105.1;
    yy = -95.;
    zz = -45.;
    aLand->AddNode(trap,3,new TGeoCombiTrans(xx,yy,zz,rot2));
 
-
-   
    AddSensitiveVolume(padle_h_box3); //Fe
    AddSensitiveVolume(padle_h_box4); //Fe
    AddSensitiveVolume(padle_h_box5); //Scint.
 
    fNbOfSensitiveVol+=3; //? FIXME
-
 
    //paddles
    TGeoRotation *rot3 = new TGeoRotation();
