@@ -322,9 +322,9 @@ else if ( typeField == 2 ){
   }
 
  // return the values
- bField[0] = Bfield[0];
- bField[1] = Bfield[1];
- bField[2] = Bfield[2];
+ bField[0] = Bfield[0]*fScale;
+ bField[1] = Bfield[1]*fScale;
+ bField[2] = Bfield[2]*fScale;
 
 }
 
