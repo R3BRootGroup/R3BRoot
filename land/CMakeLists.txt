@@ -30,11 +30,12 @@ link_directories( ${LINK_DIRECTORIES})
 set(R3BCAL_SRCS
 #Put here your sourcefiles
 R3BLand.cxx  
-R3BGeoLand.cxx   
+R3BNeuLand.cxx   
+R3BGeoLand.cxx    
 R3BGeoLandPar.cxx   
-R3BLandContFact.cxx
-R3BLandDigitizer.cxx
-)
+R3BLandContFact.cxx 
+R3BLandDigitizer.cxx 
+R3BNeuLandDigitizer.cxx )
 
 # fill list of header files from list of source files
 # by exchanging the file extension
