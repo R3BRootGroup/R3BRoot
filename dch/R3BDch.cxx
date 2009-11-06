@@ -56,6 +56,7 @@ R3BDch::R3BDch() : R3BDetector("R3BDch", kTRUE, kDCH) {
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
+  kHelium = kTRUE;
 }
 // -------------------------------------------------------------------------
 
@@ -71,6 +72,7 @@ R3BDch::R3BDch(const char* name, Bool_t active)
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
+  kHelium = kTRUE;
 }
 // -------------------------------------------------------------------------
 
@@ -621,7 +623,10 @@ void R3BDch::ConstructGeometry() {
    TGeoVolume*
    pheliumBag = new TGeoVolume("heliumBag",pheliumBagv, pMed4);
    pheliumBag->SetVisLeaves(kTRUE);
+
+   if (kHelium == kTRUE){
    pWorld->AddNode(pheliumBag, 0, GetGlobalPosition(pMatrix6));
+   }
 
    // Shape: DCHBox type: TGeoBBox
    dx = 51.400000;
