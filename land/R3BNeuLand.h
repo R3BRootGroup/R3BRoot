@@ -1,14 +1,14 @@
 // -------------------------------------------------------------------------
-// -----                        R3BLand header file                     -----
+// -----                        R3BNeuLand header file                     -----
 // -----                  Created 26/03/09  by D.Bertini               -----
 // -------------------------------------------------------------------------
 
-/**  R3BLand.h
+/**  R3BNeuLand.h
  **/
 
 
-#ifndef R3BLAND_H
-#define R3BLAND_H
+#ifndef R3BNEULAND_H
+#define R3BNEULAND_H
 
 #include "R3BDetector.h"
 #include "TLorentzVector.h"
@@ -23,30 +23,30 @@ class FairVolume;
 
 
 
-class R3BLand : public R3BDetector
+class R3BNeuLand : public R3BDetector
 {
 
  public:
 
   /** Default constructor **/
-  R3BLand();
+  R3BNeuLand();
 
 
   /** Standard constructor.
    *@param name    detetcor name
    *@param active  sensitivity flag
    **/
-  R3BLand(const char* name, Bool_t active);
+  R3BNeuLand(const char* name, Bool_t active);
 
 
   /** Destructor **/
-  virtual ~R3BLand();
+  virtual ~R3BNeuLand();
 
 
   /** Virtual method ProcessHits
    **
    ** Defines the action to be taken when a step is inside the
-   ** active volume. Creates a R3BLandPoint and adds it to the
+   ** active volume. Creates a R3BNeuLandPoint and adds it to the
    ** collection.
    *@param vol  Pointer to the active volume
    **/
@@ -115,7 +115,8 @@ class R3BLand : public R3BDetector
   virtual void ConstructGeometry1();
   virtual void Initialize();
   virtual void SetSpecialPhysicsCuts(){;}
-
+  void SetGeomVersion(Int_t vers ) { fVersion = vers; }
+ 
 
   //  void SaveGeoParams();
 
@@ -138,6 +139,7 @@ class R3BLand : public R3BDetector
     TClonesArray*  fLandCollection;     //!  The hit collection
     Bool_t         kGeoSaved;          //!
     TList *flGeoPar; //!
+    Int_t fVersion;                    //! geometry version
   
     
     /** Private method AddHit
@@ -161,12 +163,12 @@ class R3BLand : public R3BDetector
     map <Int_t,Int_t> fMapMcId;
 
 
-    ClassDef(R3BLand,1);
+    ClassDef(R3BNeuLand,1);
 
 };
 
 
-inline void R3BLand::ResetParameters() {
+inline void R3BNeuLand::ResetParameters() {
   fTrackID = fVolumeID = 0;
   fPosIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fPosOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
