@@ -343,12 +343,11 @@ void r3ball(Int_t nEvents = 1,
   // Land Detector
   if (fDetList.FindObject("LAND") ) {
       // Geometry version for Land
-      //  1 : Old Land
+      //  1 : new RPC based Land
       //  2 : 1 RPC Module
-      //  3 : new RPC based Land
-      Int_t version = 3;
-      R3BDetector* land = new R3BLand("Land", kTRUE);
-      ((R3BLand*) land)->SetGeomVersion(version);
+      Int_t version = 2;
+      R3BDetector* land = new R3BNeuLand("Land", kTRUE);
+      ((R3BNeuLand*) land)->SetGeomVersion(version);
 
       // Global position of the Module
       phi   =  0.0; // (deg)
