@@ -115,6 +115,7 @@ class R3BDch : public R3BDetector
   virtual void SetSpecialPhysicsCuts();
   void SetEnergyCutOff( Double_t cutE ){fCutE = cutE;}
   Double_t  GetEnergyCutOff ( ) {return fCutE;}
+  void SetHeliumBag( Bool_t bag ) {kHelium = bag;}
 
 private:
 
@@ -133,6 +134,7 @@ private:
     Int_t          fPosIndex;          //!
     TClonesArray*  fDchCollection;     //!  The hit collection
     Bool_t         kGeoSaved;          //!
+    Bool_t         kHelium;            //! Helium bag part
     TList *flGeoPar; //!
 
     /** Private method AddHit
