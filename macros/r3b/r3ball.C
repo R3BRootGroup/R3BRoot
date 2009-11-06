@@ -252,6 +252,7 @@ void r3ball(Int_t nEvents = 1,
   // DCH drift chambers
   if (fDetList.FindObject("DCH") ) {
       R3BDetector* dch = new R3BDch("Dch", kTRUE);
+      ((R3BDch*) dch )->SetHeliumBag(kTRUE);
       // Global position of the Module
       phi   =  0.0; // (deg)
       theta =  0.0; // (deg)
