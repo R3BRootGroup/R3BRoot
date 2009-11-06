@@ -48,7 +48,7 @@ void landDigi(){
   Int_t iVerbose = 1;
   //Connect the Digitization  Task
 
-  R3BLandDigitizer* land  = new R3BLandDigitizer();
+  R3BNeuLandDigitizer* land  = new R3BNeuLandDigitizer();
   fRun->AddTask(land);
 
   // Runtime DataBase info
