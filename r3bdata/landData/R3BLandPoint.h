@@ -65,6 +65,7 @@ class R3BLandPoint : public FairMCPoint
   Int_t    GetSector() const { return fSector;}
   Int_t    GetPaddleType() const { return fPaddleTyp;}
   Int_t    GetPaddleNb() const { return fPaddleNb;}
+  Double_t GetLightYield() const {return fLightYield;}
 
   void PositionIn(TVector3& pos)  { pos.SetXYZ(fX, fY, fZ); }
   void PositionOut(TVector3& pos) { pos.SetXYZ(fX_out,fY_out,fZ_out); }
