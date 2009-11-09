@@ -111,6 +111,13 @@ void R3BLand::Initialize()
  fMapMcId[id2]=2;
  fMapMcId[id3]=3;
 
+ //<D.B> Check me
+ // Initialise variables from Birk law
+ Double_t dP = 1.032 ;
+ // Set constants for Birk's Law implentation
+ fBirkC0 =  1;
+ fBirkC1 =  0.013/dP;
+ fBirkC2 =  9.6e-6/(dP * dP);
 
 }
 
@@ -196,12 +203,36 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
       fPosOut.SetZ(newpos[2]);
     }
 
+    // Apply Birk's law ( Adapted from G3BIRK/Geant3)
+    Double_t lightYield =  fELoss ;
+    // Correction for all charge states
+    if (gMC->TrackCharge()!=0) {
+	  Float_t birkC1Mod = 0;
+          // Apply correction for higher charge states
+	  if (fBirkC0==1){
+	  if (TMath::Abs(gMC->TrackCharge())>=2)
+	    birkC1Mod=fBirkC1*7.2/12.6;
+	  else
+	    birkC1Mod=fBirkC1;
+	  }
+
+	Double_t dedxcm=0.;
+	if (gMC->TrackStep()>0) 
+	  dedxcm=1000.*gMC->Edep()/gMC->TrackStep();
+	else
+	  dedxcm=0;
+	lightYield=lightYield/(1.+birkC1Mod*dedxcm+fBirkC2*dedxcm*dedxcm);
+     }
+
+
+
+
     AddHit(fTrackID, fVolumeID,   fPaddleTyp,   cp2, cp1,
 	   TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
 	   TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
 	   TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
 	   TVector3(fMomOut.Px(), fMomOut.Py(), fMomOut.Pz()),
-	   fTime, fLength, fELoss);
+	   fTime, fLength, fELoss, lightYield);
     
     // Increment number of LandPoints for this track
     FairStack* stack = (FairStack*) gMC->GetStack();
@@ -312,7 +343,7 @@ R3BLandPoint* R3BLand::AddHit(Int_t trackID, Int_t detID, Int_t box, Int_t id1, 
 			     TVector3 posIn,
 			     TVector3 posOut, TVector3 momIn,
 			     TVector3 momOut, Double_t time,
-			     Double_t length, Double_t eLoss) {
+			     Double_t length, Double_t eLoss, Double_t lightYield) {
   TClonesArray& clref = *fLandCollection;
   Int_t size = clref.GetEntriesFast();
   if (fVerboseLevel>1) 
@@ -320,7 +351,7 @@ R3BLandPoint* R3BLand::AddHit(Int_t trackID, Int_t detID, Int_t box, Int_t id1, 
 	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
 	 << trackID << ", energy loss " << eLoss  << " GeV" << endl;
   return new(clref[size]) R3BLandPoint(trackID, detID, box, id1, id2,  posIn, posOut,
-				      momIn, momOut, time, length, eLoss);
+				      momIn, momOut, time, length, eLoss, lightYield);
 }
 // -----   Public method ConstructGeometry   ----------------------------------
 void R3BLand::ConstructGeometry() {

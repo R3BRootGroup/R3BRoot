@@ -18,7 +18,7 @@
 using namespace std;
 
 class TClonesArray;
-class R3BLandPoint;
+class R3BNeuLandPoint;
 class FairVolume;
 
 
@@ -46,7 +46,7 @@ class R3BNeuLand : public R3BDetector
   /** Virtual method ProcessHits
    **
    ** Defines the action to be taken when a step is inside the
-   ** active volume. Creates a R3BNeuLandPoint and adds it to the
+   ** active volume. Creates a R3BNeuNeuLandPoint and adds it to the
    ** collection.
    *@param vol  Pointer to the active volume
    **/
@@ -144,9 +144,9 @@ class R3BNeuLand : public R3BDetector
     
     /** Private method AddHit
      **
-     ** Adds a LandPoint to the HitCollection
+     ** Adds a NeuLandPoint to the HitCollection
      **/
-    R3BLandPoint* AddHit(Int_t trackID, Int_t detID, Int_t box, Int_t id1, Int_t id2,
+    R3BNeuLandPoint* AddHit(Int_t trackID, Int_t detID, Int_t box, Int_t id1, Int_t id2,
 			 TVector3 posIn,
 			 TVector3 pos_out, TVector3 momIn,
 			 TVector3 momOut, Double_t time,

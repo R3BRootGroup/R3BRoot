@@ -5,7 +5,7 @@
 #include "R3BNeuLand.h"
 
 #include "R3BGeoLand.h"
-#include "R3BLandPoint.h"
+#include "R3BNeuLandPoint.h"
 #include "R3BGeoLandPar.h"
 
 #include "FairGeoInterface.h"
@@ -51,7 +51,7 @@ using std::endl;
 // -----   Default constructor   -------------------------------------------
 R3BNeuLand::R3BNeuLand() : R3BDetector("R3BNeuLand", kTRUE, kLAND) {
   ResetParameters();
-  fLandCollection = new TClonesArray("R3BLandPoint");
+  fLandCollection = new TClonesArray("R3BNeuLandPoint");
   fPosIndex = 0;
   kGeoSaved = kFALSE;
   flGeoPar = new TList();
@@ -67,7 +67,7 @@ R3BNeuLand::R3BNeuLand() : R3BDetector("R3BNeuLand", kTRUE, kLAND) {
 R3BNeuLand::R3BNeuLand(const char* name, Bool_t active) 
   : R3BDetector(name, active, kLAND) {
   ResetParameters();
-  fLandCollection = new TClonesArray("R3BLandPoint");
+  fLandCollection = new TClonesArray("R3BNeuLandPoint");
   fPosIndex = 0;
   kGeoSaved = kFALSE;
   flGeoPar = new TList();
@@ -126,7 +126,7 @@ Bool_t R3BNeuLand::ProcessHits(FairVolume* vol) {
   // Sum energy loss for all steps in the active volume
   fELoss += gMC->Edep();
 
-  // Set additional parameters at exit of active volume. Create R3BLandPoint.
+  // Set additional parameters at exit of active volume. Create R3BNeuLandPoint.
   if ( gMC->IsTrackExiting()    ||
        gMC->IsTrackStop()       ||
        gMC->IsTrackDisappeared()   ) {
@@ -182,7 +182,7 @@ Bool_t R3BNeuLand::ProcessHits(FairVolume* vol) {
 	   TVector3(fMomOut.Px(), fMomOut.Py(), fMomOut.Pz()),
 	   fTime, fLength, fELoss);
     
-    // Increment number of LandPoints for this track
+    // Increment number of NeuLandPoints for this track
     FairStack* stack = (FairStack*) gMC->GetStack();
     stack->AddPoint(kLAND);
     
@@ -235,7 +235,7 @@ void R3BNeuLand::EndOfEvent() {
 
 // -----   Public method Register   -------------------------------------------
 void R3BNeuLand::Register() {
-  FairRootManager::Instance()->Register("LandPoint", GetName(), fLandCollection, kTRUE);
+  FairRootManager::Instance()->Register("NeuLandPoint", GetName(), fLandCollection, kTRUE);
 }
 // ----------------------------------------------------------------------------
 
@@ -274,12 +274,12 @@ void R3BNeuLand::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) 
   Int_t nEntries = cl1->GetEntriesFast();
   cout << "-I- R3BNeuLand: " << nEntries << " entries to add." << endl;
   TClonesArray& clref = *cl2;
-  R3BLandPoint* oldpoint = NULL;
+  R3BNeuLandPoint* oldpoint = NULL;
    for (Int_t i=0; i<nEntries; i++) {
-   oldpoint = (R3BLandPoint*) cl1->At(i);
+   oldpoint = (R3BNeuLandPoint*) cl1->At(i);
     Int_t index = oldpoint->GetTrackID() + offset;
     oldpoint->SetTrackID(index);
-    new (clref[fPosIndex]) R3BLandPoint(*oldpoint);
+    new (clref[fPosIndex]) R3BNeuLandPoint(*oldpoint);
     fPosIndex++;
   }
    cout << " -I- R3BNeuLand: " << cl2->GetEntriesFast() << " merged entries."
@@ -287,7 +287,7 @@ void R3BNeuLand::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) 
 }
 
 // -----   Private method AddHit   --------------------------------------------
-R3BLandPoint* R3BNeuLand::AddHit(Int_t trackID, Int_t detID, Int_t box, Int_t id1, Int_t id2,
+R3BNeuLandPoint* R3BNeuLand::AddHit(Int_t trackID, Int_t detID, Int_t box, Int_t id1, Int_t id2,
 			     TVector3 posIn,
 			     TVector3 posOut, TVector3 momIn,
 			     TVector3 momOut, Double_t time,
@@ -298,7 +298,7 @@ R3BLandPoint* R3BNeuLand::AddHit(Int_t trackID, Int_t detID, Int_t box, Int_t id
     cout << "-I- R3BNeuLand: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
 	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
 	 << trackID << ", energy loss " << eLoss  << " GeV" << endl;
-  return new(clref[size]) R3BLandPoint(trackID, detID, box, id1, id2,  posIn, posOut,
+  return new(clref[size]) R3BNeuLandPoint(trackID, detID, box, id1, id2,  posIn, posOut,
 				      momIn, momOut, time, length, eLoss);
 }
 // -----   Public method ConstructGeometry   ----------------------------------

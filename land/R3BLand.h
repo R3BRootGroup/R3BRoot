@@ -138,7 +138,7 @@ class R3BLand : public R3BDetector
     TClonesArray*  fLandCollection;     //!  The hit collection
     Bool_t         kGeoSaved;          //!
     TList *flGeoPar; //!
-  
+    Double_t fBirkC0,fBirkC1,fBirkC2;
     
     /** Private method AddHit
      **
@@ -148,7 +148,7 @@ class R3BLand : public R3BDetector
 			 TVector3 posIn,
 			 TVector3 pos_out, TVector3 momIn,
 			 TVector3 momOut, Double_t time,
-			 Double_t length, Double_t eLoss);
+			 Double_t length, Double_t eLoss,Double_t lightYield);
 
 
     /** Private method ResetParameters
