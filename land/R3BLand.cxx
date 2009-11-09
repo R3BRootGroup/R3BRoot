@@ -207,7 +207,7 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
     Double_t lightYield =  fELoss ;
     // Correction for all charge states
     if (gMC->TrackCharge()!=0) {
-	  Float_t birkC1Mod = 0;
+	  Double_t birkC1Mod = 0;
           // Apply correction for higher charge states
 	  if (fBirkC0==1){
 	  if (TMath::Abs(gMC->TrackCharge())>=2)
