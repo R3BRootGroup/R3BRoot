@@ -1,15 +1,15 @@
 // -------------------------------------------------------------------------
-// -----                      R3BLandPoint header file                  -----
+// -----                      R3BNeuLandPoint header file                  -----
 // -----                  Created 26/03/09  by D.Bertini               -----
 // -------------------------------------------------------------------------
 
 
-/**  R3BLandPoint.h
+/**  R3BNeuLandPoint.h
  **/
 
 
-#ifndef R3BLANDPOINT_H
-#define R3BLANDPOINT_H
+#ifndef R3BNeuLANDPOINT_H
+#define R3BNeuLANDPOINT_H
 
 
 #include "TObject.h"
@@ -18,13 +18,13 @@
 #include "FairMCPoint.h"
 
 
-class R3BLandPoint : public FairMCPoint 
+class R3BNeuLandPoint : public FairMCPoint 
 {
 
  public:
 
   /** Default constructor **/
-  R3BLandPoint();
+  R3BNeuLandPoint();
 
 
   /** Constructor with arguments
@@ -38,18 +38,18 @@ class R3BLandPoint : public FairMCPoint
    *@param length   Track length since creation [cm]
    *@param eLoss    Energy deposit [GeV]
    **/
-  R3BLandPoint(Int_t trackID, Int_t box, Int_t detID, Int_t sector,
+  R3BNeuLandPoint(Int_t trackID, Int_t box, Int_t detID, Int_t sector,
 	       Int_t paddle, TVector3 posIn,
 	       TVector3 posOut, TVector3 momIn, TVector3 momOut,
-	       Double_t tof, Double_t length, Double_t eLoss, Double_t ligthYield);
+	       Double_t tof, Double_t length, Double_t eLoss);
 
 
   /** Copy constructor **/
-  R3BLandPoint(const R3BLandPoint& point) { *this = point; };
+  R3BNeuLandPoint(const R3BNeuLandPoint& point) { *this = point; };
 
 
   /** Destructor **/
-  virtual ~R3BLandPoint();
+  virtual ~R3BNeuLandPoint();
 
 
   /** Accessors **/
@@ -95,22 +95,21 @@ class R3BLandPoint : public FairMCPoint
   Int_t fSector;
   Int_t fPaddleNb;
   Int_t fPaddleTyp;
-  Double_t fLightYield;
 
-  ClassDef(R3BLandPoint,1)
+  ClassDef(R3BNeuLandPoint,1)
 
 };
 
 
 
-inline void R3BLandPoint::SetPositionOut(TVector3 pos) {
+inline void R3BNeuLandPoint::SetPositionOut(TVector3 pos) {
   fX_out = pos.X();
   fY_out = pos.Y();
   fZ_out = pos.Z();
 }
 
 
-inline void R3BLandPoint::SetMomentumOut(TVector3 mom) {
+inline void R3BNeuLandPoint::SetMomentumOut(TVector3 mom) {
   fPx_out = mom.Px();
   fPy_out = mom.Py();
   fPz_out = mom.Pz();

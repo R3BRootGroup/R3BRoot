@@ -1,8 +1,8 @@
 // -------------------------------------------------------------------------
-// -----                      R3BLandPoint source file                  -----
+// -----                      R3BNeuLandPoint source file                  -----
 // -------------------------------------------------------------------------
 
-#include "R3BLandPoint.h"
+#include "R3BNeuLandPoint.h"
 
 #include <iostream>
 
@@ -12,23 +12,22 @@ using std::flush;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BLandPoint::R3BLandPoint() : FairMCPoint() {
+R3BNeuLandPoint::R3BNeuLandPoint() : FairMCPoint() {
   fX_out      = fY_out  = fZ_out  = 0.;
   fPx_out     = fPy_out = fPz_out = 0.;
   fSector     = -1 ;
   fPaddleTyp  = -1 ;
   fPaddleNb   = -1 ;
-  fLightYield = -1 ;
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Standard constructor   ------------------------------------------
-R3BLandPoint::R3BLandPoint(Int_t trackID, Int_t detID, Int_t box, Int_t sector,
+R3BNeuLandPoint::R3BNeuLandPoint(Int_t trackID, Int_t detID, Int_t box, Int_t sector,
 			   Int_t paddle, TVector3 posIn,
 			   TVector3 posOut, TVector3 momIn, TVector3 momOut,
-			   Double_t tof, Double_t length, Double_t eLoss, Double_t lightYield)
+			   Double_t tof, Double_t length, Double_t eLoss)
   : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss) {
   fX_out  = posOut.X();
   fY_out  = posOut.Y();
@@ -39,7 +38,6 @@ R3BLandPoint::R3BLandPoint(Int_t trackID, Int_t detID, Int_t box, Int_t sector,
   fSector = sector;
   fPaddleTyp = box;
   fPaddleNb = paddle;
-  fLightYield = lightYield;
 
 }
 // -------------------------------------------------------------------------
@@ -47,15 +45,15 @@ R3BLandPoint::R3BLandPoint(Int_t trackID, Int_t detID, Int_t box, Int_t sector,
 
 
 // -----   Destructor   ----------------------------------------------------
-R3BLandPoint::~R3BLandPoint() { }
+R3BNeuLandPoint::~R3BNeuLandPoint() { }
 // -------------------------------------------------------------------------
 
 
 
 
 // -----   Public method Print   -------------------------------------------
-void R3BLandPoint::Print(const Option_t* opt) const {
-  cout << "-I- R3BLandPoint: LAND Point for track " << fTrackID
+void R3BNeuLandPoint::Print(const Option_t* opt) const {
+  cout << "-I- R3BNeuLandPoint: LAND Point for track " << fTrackID
 	<< " in detector " << fDetectorID
 	<< " Sector: " << fSector
 	<< " PaddleTyp: " << fPaddleTyp
@@ -73,7 +71,7 @@ void R3BLandPoint::Print(const Option_t* opt) const {
 
 
 // -----   Point x coordinate from linear extrapolation   ------------------
-Double_t R3BLandPoint::GetX(Double_t z) const {
+Double_t R3BNeuLandPoint::GetX(Double_t z) const {
   //  cout << fZ << " " << z << " " << fZ_out << endl;
   if ( (fZ_out-z)*(fZ-z) >= 0. ) return (fX_out+fX)/2.;
   Double_t dz = fZ_out - fZ;
@@ -84,7 +82,7 @@ Double_t R3BLandPoint::GetX(Double_t z) const {
 
 
 // -----   Point y coordinate from linear extrapolation   ------------------
-Double_t R3BLandPoint::GetY(Double_t z) const {
+Double_t R3BNeuLandPoint::GetY(Double_t z) const {
   if ( (fZ_out-z)*(fZ-z) >= 0. ) return (fY_out+fY)/2.;
   Double_t dz = fZ_out - fZ;
   //  if ( TMath::Abs(dz) < 1.e-3 ) return (fY_out+fY)/2.;
@@ -95,7 +93,7 @@ Double_t R3BLandPoint::GetY(Double_t z) const {
 
 
 // -----   Public method IsUsable   ----------------------------------------
-Bool_t R3BLandPoint::IsUsable() const {
+Bool_t R3BNeuLandPoint::IsUsable() const {
   Double_t dz = fZ_out - fZ;
   if ( TMath::Abs(dz) < 1.e-4 ) return kFALSE;
   return kTRUE;
@@ -103,4 +101,4 @@ Bool_t R3BLandPoint::IsUsable() const {
 // -------------------------------------------------------------------------
 
 
-ClassImp(R3BLandPoint)
+ClassImp(R3BNeuLandPoint)

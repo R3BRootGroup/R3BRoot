@@ -33,6 +33,7 @@ trackerData/R3BTraPoint.cxx
 trackerData/R3BTraHit.cxx
 trackerData/R3BSitrackerHit.cxx
 landData/R3BLandPoint.cxx
+landData/R3BNeuLandPoint.cxx
 landData/R3BLandHit.cxx
 landData/R3BPaddleCrystalHit.cxx)
 
