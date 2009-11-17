@@ -5,6 +5,21 @@
 #include "FairRuntimeDb.h"
 
 
+
+// includes for modeling
+#include "TGeoManager.h"
+#include "TParticle.h"
+#include "TVirtualMC.h"
+#include "TGeoMatrix.h"
+#include "TGeoMaterial.h"
+#include "TGeoMedium.h"
+#include "TGeoBBox.h"
+#include "TGeoCompositeShape.h"
+#include "TGeoShapeAssembly.h"
+
+
+
+
 #include "TVector3.h"
 #include "TMath.h"
 #include "TRandom.h"
@@ -76,13 +91,105 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 
    Int_t nentries = fLandPoints->GetEntries();
 
+
+
 for (Int_t l=0;l<nentries;l++){
       // Get the Land Object in array
       R3BLandPoint *land_obj = (R3BLandPoint*) fLandPoints->At(l);
       Int_t paddle = land_obj->GetSector();
       Int_t gap = land_obj->GetPaddleNb();
-      Double_t eloss = land_obj->GetEnergyLoss();  
 
+
+      // -- <DB>
+      // -- Example how to use the ROOT Geometry navigation
+      // -- System to recover Geometrical information for
+      // -- the analysis part
+
+
+      // 1)
+      // Calculate point in the middle of the detector. This is
+      // for safety reasons, because the point at exit is slightly
+      // outside of the active volume. If one does not use a point
+      // in the detector one will get a wrong volume from the
+      // geomanager. Navigate to the correct volume to get all
+      // necessary information about this volume
+
+      Double_t x_mean = (land_obj->GetXIn()+land_obj->GetXOut())/2.;
+      Double_t y_mean = (land_obj->GetYIn()+land_obj->GetYOut())/2.;
+      Double_t z_mean = (land_obj->GetZIn()+land_obj->GetZOut())/2.;
+
+      // 2)
+      // Find the corresponding Node containing these coordinates
+
+      gGeoManager->FindNode(x_mean, y_mean, z_mean);
+
+      //3)
+      // Get the corresponding Node containing this point
+      TGeoNode* curNode = gGeoManager->GetCurrentNode();
+      TGeoMedium *med = curNode->GetMedium();
+
+      //4)
+      // Navigator should properly calculate the transformation
+      // ( Matrix Product) taking  full volume hiearchy into account.
+
+      const Double_t *global_point = gGeoManager->GetCurrentPoint();
+      Double_t local_point[3];
+      gGeoManager->MasterToLocal(global_point, local_point);
+      TGeoHMatrix *matrix = gGeoManager->GetCurrentMatrix();
+
+      //5)
+      // TGeoHMatrix is a special transformation representation
+      //
+      //         r11  r12  r13   tx
+      //         r21  r22  r23   ty
+      //         r31  r32  r33   tz
+      //          0    0    0    1
+      //
+      //  where: rij are the 3x3 rotation matrix components,
+      //         tx, ty, tz are the translation components
+      // Get the corresponding Rotation/Translation
+
+      cout << "-I- Global Matrices representation for Node: "
+	   << curNode->GetName() <<  endl;
+      const Double_t *rot = matrix->GetRotationMatrix();
+      const Double_t *tr  = matrix->GetTranslation();
+
+      printf("-I- Global Matrix Info: %s - tr=%d  rot=%d  refl=%d  scl=%d\n",
+	     matrix->GetName(),
+	     (Int_t) matrix->IsTranslation(),
+	     (Int_t) matrix->IsRotation(),
+	     (Int_t) matrix->IsReflection(),
+	     (Int_t) matrix->IsScale()
+	    );
+
+      // Global Rotation
+      printf("%10.6f%12.6f%12.6f \n", rot[0], rot[1], rot[2]);
+      printf("%10.6f%12.6f%12.6f \n", rot[3], rot[4], rot[5]);
+      printf("%10.6f%12.6f%12.6f \n", rot[6], rot[7], rot[8]);
+
+      // Global Translation
+      printf(" Tx = %10.6f\n", tr[0]);
+      printf(" Ty = %10.6f\n", tr[1]);
+      printf(" Tz = %10.6f\n", tr[2]);
+
+      // 6)
+      // Get Shape Info
+      TGeoVolume *curvol = gGeoManager->GetCurrentVolume();
+      TGeoBBox *shape = (TGeoBBox*)curvol->GetShape();
+
+      Float_t sizex = shape->GetDX();
+      Float_t sizey = shape->GetDY();
+      Float_t sizez = shape->GetDZ();
+
+      cout << "-I- Corresponding Current Shape BBox: (X,Y,Z) " << " X (cm): "
+	  << sizex << " Y(cm): " << sizey << " Z (cm): " << sizez << endl;
+
+      // <DB>
+      // End of example
+
+
+
+      Double_t eloss = land_obj->GetEnergyLoss();
       if (eloss > 0 ) {
 
 	   Double_t ne = 0.0;
