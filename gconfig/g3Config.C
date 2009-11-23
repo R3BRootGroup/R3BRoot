@@ -31,11 +31,11 @@ void Config()
   
     geant3->SetRAYL(1);
     geant3->SetSTRA(1);
-    geant3->SetAUTO(0);         //Select automatic STMIN etc... calc. (AUTO 1) or manual (AUTO 0)
+    geant3->SetAUTO(1);         //Select automatic STMIN etc... calc. (AUTO 1) or manual (AUTO 0)
     geant3->SetABAN(0);         //Restore 3.16 behaviour for abandoned tracks
     geant3->SetOPTI(2);         //Select optimisation level for GEANT geometry searches (0,1,2)
     geant3->SetERAN(5.e-7);
-    geant3->SetCKOV(1);     // cerenkov photons 
+    geant3->SetCKOV(1);     // cerenkov photons
   // set common stuff 
     TString configm(gSystem->Getenv("VMCWORKDIR"));
     TString cuts = configm + "/gconfig/SetCuts.C";
