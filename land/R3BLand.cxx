@@ -357,11 +357,370 @@ R3BLandPoint* R3BLand::AddHit(Int_t trackID, Int_t detID, Int_t box, Int_t id1, 
 void R3BLand::ConstructGeometry() {
 
 // Scintillators based Land Detector
-    return ConstructGeometry1();
+    return ConstructGeometry2();
 
 }
 
 void R3BLand::ConstructGeometry1() {   
+
+  // out-of-file geometry definition
+   Double_t dx,dy,dz;
+   Double_t dx1, dx2, dy1, dy2;
+   Double_t a;
+   Double_t z, density, w;
+   Double_t tx,ty,tz;
+   Int_t nel, numed;
+   Double_t radl,absl;
+
+   /****************************************************************************/
+   // Material definition
+
+   // Mixture: Air
+   TGeoMedium * pMed2=NULL;
+   if (gGeoManager->GetMedium("Air") ){
+      pMed2=gGeoManager->GetMedium("Air");
+   }
+   else{
+      nel     = 2;
+      density = 0.001290;
+      TGeoMixture*
+	pMat2 = new TGeoMixture("Air", nel,density);
+      a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+      pMat2->DefineElement(0,a,z,w);
+      a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+      pMat2->DefineElement(1,a,z,w);
+      pMat2->SetIndex(1);
+      // Medium: Air
+      numed   = 1;  // medium number
+      Double_t par[8];
+      par[0]  = 0.000000; // isvol
+      par[1]  = 0.000000; // ifield
+      par[2]  = 0.000000; // fieldm
+      par[3]  = 0.000000; // tmaxfd
+      par[4]  = 0.000000; // stemax
+      par[5]  = 0.000000; // deemax
+      par[6]  = 0.000100; // epsil
+      par[7]  = 0.000000; // stmin
+      pMed2 = new TGeoMedium("Air", numed,pMat2, par);
+   }
+
+
+//------------------Creat media----------------------------------
+ // --  Material: Iron
+   TGeoMedium * pMedFe=NULL;
+   if (gGeoManager->GetMedium("Iron") ){
+      pMedFe=gGeoManager->GetMedium("Iron");
+   }
+   else{
+      w       =        0.;
+      a       = 55.850000;
+      z       = 26.000000;
+      density = 7.870000;
+      radl    = 1.757717;
+      absl    = 169.994418;
+      TGeoMaterial*
+	pMatFe = new TGeoMaterial("Iron", a,z,density,radl,absl);
+      pMatFe->SetIndex(701);
+      numed   = 23;  // medium number
+      Double_t par[8];
+      par[0]  = 0.000000; // isvol
+      par[1]  = 0.000000; // ifield
+      par[2]  = 0.000000; // fieldm
+      par[3]  = 0.000000; // tmaxfd
+      par[4]  = 0.000000; // stemax
+      par[5]  = 0.000000; // deemax
+      par[6]  = 0.000100; // epsil
+      par[7]  = 0.000000; // stmin
+      pMedFe = new TGeoMedium("Iron", numed,pMatFe, par);
+   }
+
+   TGeoMedium *Iron = pMedFe;
+
+   // BC408 plastic medium
+   // Mixture: BC408
+   TGeoMedium * pMed37=NULL;
+   if (gGeoManager->GetMedium("BC408") ){
+      pMed37=gGeoManager->GetMedium("BC408");
+   }
+   else{
+      nel     = 2;
+      density = 1.032000;
+      TGeoMixture*
+	 pMat37 = new TGeoMixture("BC408", nel,density);
+      a = 1.007940;   z = 1.000000;   w = 0.520000;  // H
+      pMat37->DefineElement(0,a,z,w);
+      a = 12.010700;   z = 6.000000;   w = 0.480000;  // C
+      pMat37->DefineElement(1,a,z,w);
+      pMat37->SetIndex(36);
+      // Medium: BC408
+      numed   = 36;  // medium number
+      Double_t par[8];
+      par[0]  = 0.000000; // isvol
+      par[1]  = 0.000000; // ifield
+      par[2]  = 0.000000; // fieldm
+      par[3]  = 0.000000; // tmaxfd
+      par[4]  = 0.000000; // stemax
+      par[5]  = 0.000000; // deemax
+      par[6]  = 0.000100; // epsil
+      par[7]  = 0.000000; // stmin
+      pMed37 = new TGeoMedium("BC408", numed,pMat37,par);
+   }
+
+   //
+
+   TGeoVolume* vWorld = gGeoManager->GetTopVolume();
+   vWorld->SetVisLeaves(kTRUE);
+
+   // Create a global Mother Volume
+   /*
+   dx = 500.000000;
+   dy = 500.000000;
+   dz = 500.000000;
+   TGeoShape *pBoxWorld = new TGeoBBox("LandBoxWorld", dx,dy,dz);
+   TGeoVolume*
+   vWorld  = new TGeoVolume("LandBoxLogWorld",pBoxWorld, pMed2);
+   vWorld->SetVisLeaves(kTRUE);
+   TGeoCombiTrans *pGlobalc = GetGlobalPosition();
+
+   // add the sphere as Mother Volume
+   pAWorld->AddNode(vWorld, 0, pGlobalc);
+   */
+
+
+   // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
+   Double_t padle_h_dim1x = 100.0;
+   Double_t padle_h_dim1y = 5.1;
+   Double_t padle_h_dim1z = 5.1;
+   TGeoShape* padle_h_box1 = new TGeoBBox("padle_h_box1",
+					 padle_h_dim1x,
+					 padle_h_dim1y,
+					 padle_h_dim1z);
+   Double_t padle_h_dim2x = 100.0;
+   Double_t padle_h_dim2y = 5.0;
+   Double_t padle_h_dim2z = 5.0;
+   TGeoShape* padle_h_box2 = new TGeoBBox("padle_h_box2",
+					 padle_h_dim2x,
+					 padle_h_dim2y,
+					 padle_h_dim2z);
+
+   // Create a composite shape
+   TGeoCompositeShape *sheetbox
+    = new TGeoCompositeShape("diffbox", "padle_h_box1 - padle_h_box2");
+   // Corresponding boolean volume
+   TGeoVolume *bvol = new TGeoVolume("sheetbox",sheetbox,Iron);
+    //end-cap list
+   dx1 = 5.100000;
+   dx2 = 2.510000;
+   dy1 = 5.100000;
+   dy2 = 2.510000;
+   dz  = 5.000000;
+
+   TGeoVolume *trap = gGeoManager->MakeTrd2("atrap",pMed37,dx1,dx2,dy1,dy2,dz);
+ 
+   // sheet Iron list
+   //------------------ Iron sheets -----------------------------------------
+   Double_t padle_h_dim3x = 100.0;
+   Double_t padle_h_dim3y = 5.0;
+   Double_t padle_h_dim3z = 0.125;
+
+   TGeoVolume *padle_h_box3
+    =gGeoManager->MakeBox("padle_h_box3",Iron,
+                                    padle_h_dim3x,
+				    padle_h_dim3y,
+				    padle_h_dim3z);
+
+   //cout << " box3: " << padle_h_box3->GetNumber() << endl;
+
+   Double_t padle_h_dim4x = 100.0;
+   Double_t padle_h_dim4y = 5.0;
+   Double_t padle_h_dim4z = 0.25;
+
+   TGeoVolume *padle_h_box4
+    =gGeoManager->MakeBox("padle_h_box4",Iron,
+                                    padle_h_dim4x,
+				    padle_h_dim4y,
+				    padle_h_dim4z);
+
+   // cout << " box4: " << padle_h_box4->GetNumber() << endl;
+
+   //------------------ BC408 sheets -----------------------------------------
+   Double_t padle_h_dim5x = 100.0;
+   Double_t padle_h_dim5y = 5.0;
+   Double_t padle_h_dim5z = 0.25;
+
+   TGeoVolume *padle_h_box5
+    =gGeoManager->MakeBox("padle_h_box5",pMed37,
+                                    padle_h_dim5x,
+				    padle_h_dim5y,
+				    padle_h_dim5z);
+
+
+   // cout << " box5: " << padle_h_box5->GetNumber() << endl;
+
+   // Make the elementary assembly of the whole structure
+   TGeoVolume *aLand = new TGeoVolumeAssembly("ALAND");
+
+   TGeoRotation *rot0 = new TGeoRotation();
+   rot0->RotateX(0.);
+   rot0->RotateY(0.);
+   rot0->RotateZ(0.);
+   Double_t xx = 0.;
+   Double_t yy = 0.;
+   Double_t zz = 0.;
+
+   aLand->AddNode(bvol,1,new TGeoCombiTrans(xx,yy,zz,rot0));
+
+   TGeoRotation *rot1 = new TGeoRotation();
+   rot1->RotateX(0.);
+   rot1->RotateY(90.);
+   rot1->RotateZ(0.);
+   xx = 105.;
+   yy = 0.;
+   zz = 0.;
+
+   aLand->AddNode(trap,2,new TGeoCombiTrans(xx,yy,zz,rot1));
+
+   TGeoRotation *rot2 = new TGeoRotation();
+   rot2->RotateX(0.);
+   rot2->RotateY(270.);
+   rot2->RotateZ(0.);
+   xx = -105.;
+   yy = 0.;
+   zz = 0.;
+   aLand->AddNode(trap,3,new TGeoCombiTrans(xx,yy,zz,rot2));
+
+   //   AddSensitiveVolume(padle_h_box3); //Fe
+   //   AddSensitiveVolume(padle_h_box4); //Fe
+   AddSensitiveVolume(padle_h_box5); //Scint.
+
+   fNbOfSensitiveVol+=1; //? FIXME
+
+   //paddles
+   TGeoRotation *rot3 = new TGeoRotation();
+   rot3->RotateX(0.);
+   rot3->RotateY(0.);
+   rot3->RotateZ(0.);
+   xx = 0.;
+   yy = 0.;
+   zz = -4.875;
+   // normaly seq from 4
+   aLand->AddNode(padle_h_box3,1,new TGeoCombiTrans(xx,yy,zz,rot3));
+   zz = -4.;
+   aLand->AddNode(padle_h_box4,1,new TGeoCombiTrans(xx,yy,zz,rot3));
+   zz = -3.;
+   aLand->AddNode(padle_h_box4,2,new TGeoCombiTrans(xx,yy,zz,rot3));
+   zz = -2.;
+   aLand->AddNode(padle_h_box4,3,new TGeoCombiTrans(xx,yy,zz,rot3));
+   zz = -1.;
+   aLand->AddNode(padle_h_box4,4,new TGeoCombiTrans(xx,yy,zz,rot3));
+   zz =  0.;
+   aLand->AddNode(padle_h_box4,5,new TGeoCombiTrans(xx,yy,zz,rot3));
+   zz =  1.;
+   aLand->AddNode(padle_h_box4,6,new TGeoCombiTrans(xx,yy,zz,rot3));
+   zz =  2.;
+   aLand->AddNode(padle_h_box4,7,new TGeoCombiTrans(xx,yy,zz,rot3));
+   zz =  3.;
+   aLand->AddNode(padle_h_box4,8,new TGeoCombiTrans(xx,yy,zz,rot3));
+   zz =  4.;
+   aLand->AddNode(padle_h_box4,9,new TGeoCombiTrans(xx,yy,zz,rot3));
+   zz =  4.875;
+   aLand->AddNode(padle_h_box3,2,new TGeoCombiTrans(xx,yy,zz,rot3));
+
+
+   //bc408 paddles
+
+   xx = 0.;
+   yy = 0.;
+   zz = -4.5;
+   aLand->AddNode(padle_h_box5,1,new TGeoCombiTrans(xx,yy,zz,rot3));
+   zz = -3.5;
+   aLand->AddNode(padle_h_box5,2,new TGeoCombiTrans(xx,yy,zz,rot3));
+   zz = -2.5;
+   aLand->AddNode(padle_h_box5,3,new TGeoCombiTrans(xx,yy,zz,rot3));
+   zz = -1.5;
+   aLand->AddNode(padle_h_box5,4,new TGeoCombiTrans(xx,yy,zz,rot3));
+   zz = -0.5;
+   aLand->AddNode(padle_h_box5,5,new TGeoCombiTrans(xx,yy,zz,rot3));
+   zz =  0.5;
+   aLand->AddNode(padle_h_box5,6,new TGeoCombiTrans(xx,yy,zz,rot3));
+   zz =  1.5;
+   aLand->AddNode(padle_h_box5,7,new TGeoCombiTrans(xx,yy,zz,rot3));
+   zz =  2.5;
+   aLand->AddNode(padle_h_box5,8,new TGeoCombiTrans(xx,yy,zz,rot3));
+   zz =  3.5;
+   aLand->AddNode(padle_h_box5,9,new TGeoCombiTrans(xx,yy,zz,rot3));
+   zz =  4.5;
+   aLand->AddNode(padle_h_box5,10,new TGeoCombiTrans(xx,yy,zz,rot3));
+
+
+   //------------------------- Horizontal Assembly Multiplication & Rotation -----------------------------------------------------------------------  
+
+   // cout << " -I- Assembly: aLand serial nb: " << aLand->GetNumber() << endl;
+   // cout << " -I- now couting subnodes ... " << aLand->GetNdaughters() << endl;
+   //aLand->CountNodes(1000,1);
+
+   TGeoVolume *cell = new TGeoVolumeAssembly("CELL");
+
+   // cout << " -I- Assembly: cell serial nb: " << cell->GetNumber() << endl;
+
+   TGeoRotation *rot4 = new TGeoRotation();
+   rot4->RotateX(0.);
+   rot4->RotateY(0.);
+   rot4->RotateZ(0.);
+
+   tx=0.;
+   ty=0.;
+   tz=0.;
+
+   for ( Int_t i = 0; i < 5; i++ ){
+      for( Int_t j = 0; j < 20; j++ ){
+         tx=0.;
+         ty=-96.9 + j*10.2;
+         tz=-45.9 + i*20.4;
+         Int_t nindex = (j+20*i)+1; //1-100
+         cell->AddNode(aLand,nindex,new TGeoCombiTrans(tx,ty,tz,rot4));
+      }
+   }
+
+   //  cout << " -I- R3BLand Assembly: cell count nodes (1) "  <<   cell->GetNdaughters() << endl;
+   //  cout << " -I- R3BLand total : " << cell->CountNodes(5000,0) << endl;
+
+
+   //------------------------- Vertical Assembly Multiplication & Rotation -----------------------------------------------------------------------  
+
+   TGeoRotation *rot5 = new TGeoRotation();
+   rot5->RotateX(0.);
+   rot5->RotateY(0.);
+   rot5->RotateZ(90.);
+
+   for ( Int_t i = 0; i < 5; i++ ){
+      for( Int_t j = 0; j < 20; j++ ){
+         tx=-96.9 + j*10.2;
+         ty=0.;
+         tz=-35.7 + i*20.4;
+         Int_t nindex2 = (j+20*i)+101; //101 200
+         cell->AddNode(aLand,nindex2,new TGeoCombiTrans(tx,ty,tz,rot5));
+      }
+   }
+
+   //  cout << " -I- R3BLand  Assembly: cell count nodes (2) "  <<  cell->GetNdaughters() << endl;
+   //  cout << " -I- R3BLand total " << cell->CountNodes(5000,0) << endl;
+
+   TGeoRotation *rotg = new TGeoRotation();
+   rotg->RotateX(0.);
+   rotg->RotateY(0.);
+   rotg->RotateZ(0.);
+   tx = 0.0;
+   ty = 0.0;
+   tz = 0.0; // cm
+
+   TGeoCombiTrans *t0 = new TGeoCombiTrans(tx,ty,tz,rotg);
+
+   vWorld->AddNode(cell,1, GetGlobalPosition(t0) );
+
+}
+
+void R3BLand::ConstructGeometry2() {   
 
   // out-of-file geometry definition
    Double_t dx,dy,dz;
@@ -378,29 +737,30 @@ void R3BLand::ConstructGeometry1() {
    // Mixture: Air
    TGeoMedium * pMed2=NULL;
    if (gGeoManager->GetMedium("Air") ){
-       pMed2=gGeoManager->GetMedium("Air");
-   }else{
-    nel     = 2;
-    density = 0.001290;
-    TGeoMixture*
+      pMed2=gGeoManager->GetMedium("Air");
+   }
+   else{
+      nel     = 2;
+      density = 0.001290;
+      TGeoMixture*
 	pMat2 = new TGeoMixture("Air", nel,density);
-    a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
-    pMat2->DefineElement(0,a,z,w);
-    a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
-    pMat2->DefineElement(1,a,z,w);
-    pMat2->SetIndex(1);
-    // Medium: Air
-    numed   = 1;  // medium number
-    Double_t par[8];
-    par[0]  = 0.000000; // isvol
-    par[1]  = 0.000000; // ifield
-    par[2]  = 0.000000; // fieldm
-    par[3]  = 0.000000; // tmaxfd
-    par[4]  = 0.000000; // stemax
-    par[5]  = 0.000000; // deemax
-    par[6]  = 0.000100; // epsil
-    par[7]  = 0.000000; // stmin
-    pMed2 = new TGeoMedium("Air", numed,pMat2, par);
+      a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+      pMat2->DefineElement(0,a,z,w);
+      a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+      pMat2->DefineElement(1,a,z,w);
+      pMat2->SetIndex(1);
+      // Medium: Air
+      numed   = 1;  // medium number
+      Double_t par[8];
+      par[0]  = 0.000000; // isvol
+      par[1]  = 0.000000; // ifield
+      par[2]  = 0.000000; // fieldm
+      par[3]  = 0.000000; // tmaxfd
+      par[4]  = 0.000000; // stemax
+      par[5]  = 0.000000; // deemax
+      par[6]  = 0.000100; // epsil
+      par[7]  = 0.000000; // stmin
+      pMed2 = new TGeoMedium("Air", numed,pMat2, par);
    }
 
 
@@ -408,28 +768,29 @@ void R3BLand::ConstructGeometry1() {
  // --  Material: Iron
    TGeoMedium * pMedFe=NULL;
    if (gGeoManager->GetMedium("Iron") ){
-       pMedFe=gGeoManager->GetMedium("Iron");
-   }else{
-    w       =        0.;
-    a       = 55.850000;
-    z       = 26.000000;
-    density = 7.870000;
-    radl    = 1.757717;
-    absl    = 169.994418;
-    TGeoMaterial*
+      pMedFe=gGeoManager->GetMedium("Iron");
+   }
+   else{
+      w       =        0.;
+      a       = 55.850000;
+      z       = 26.000000;
+      density = 7.870000;
+      radl    = 1.757717;
+      absl    = 169.994418;
+      TGeoMaterial*
 	pMatFe = new TGeoMaterial("Iron", a,z,density,radl,absl);
-    pMatFe->SetIndex(701);
-    numed   = 23;  // medium number
-    Double_t par[8];
-    par[0]  = 0.000000; // isvol
-    par[1]  = 0.000000; // ifield
-    par[2]  = 0.000000; // fieldm
-    par[3]  = 0.000000; // tmaxfd
-    par[4]  = 0.000000; // stemax
-    par[5]  = 0.000000; // deemax
-    par[6]  = 0.000100; // epsil
-    par[7]  = 0.000000; // stmin
-    pMedFe = new TGeoMedium("Iron", numed,pMatFe, par);
+      pMatFe->SetIndex(701);
+      numed   = 23;  // medium number
+      Double_t par[8];
+      par[0]  = 0.000000; // isvol
+      par[1]  = 0.000000; // ifield
+      par[2]  = 0.000000; // fieldm
+      par[3]  = 0.000000; // tmaxfd
+      par[4]  = 0.000000; // stemax
+      par[5]  = 0.000000; // deemax
+      par[6]  = 0.000100; // epsil
+      par[7]  = 0.000000; // stmin
+      pMedFe = new TGeoMedium("Iron", numed,pMatFe, par);
    }
 
    TGeoMedium *Iron = pMedFe;
@@ -438,390 +799,121 @@ void R3BLand::ConstructGeometry1() {
  // Mixture: BC408
    TGeoMedium * pMed37=NULL;
    if (gGeoManager->GetMedium("BC408") ){
-       pMed37=gGeoManager->GetMedium("BC408");
-   }else{
-     nel     = 2;
-     density = 1.032000;
-     TGeoMixture*
-	 pMat37 = new TGeoMixture("BC408", nel,density);
-     a = 1.007940;   z = 1.000000;   w = 0.520000;  // H
-     pMat37->DefineElement(0,a,z,w);
-     a = 12.010700;   z = 6.000000;   w = 0.480000;  // C
-     pMat37->DefineElement(1,a,z,w);
-     pMat37->SetIndex(36);
-     // Medium: BC408
-     numed   = 36;  // medium number
-     Double_t par[8];
-     par[0]  = 0.000000; // isvol
-     par[1]  = 0.000000; // ifield
-     par[2]  = 0.000000; // fieldm
-     par[3]  = 0.000000; // tmaxfd
-     par[4]  = 0.000000; // stemax
-     par[5]  = 0.000000; // deemax
-     par[6]  = 0.000100; // epsil
-     par[7]  = 0.000000; // stmin
-     pMed37 = new TGeoMedium("BC408", numed,pMat37,par);
+      pMed37=gGeoManager->GetMedium("BC408");
+   }
+   else{
+      nel     = 2;
+      density = 1.032000;
+      TGeoMixture*
+	  pMat37 = new TGeoMixture("BC408", nel,density);
+      a = 1.007940;   z = 1.000000;   w = 0.520000;  // H
+      pMat37->DefineElement(0,a,z,w);
+      a = 12.010700;   z = 6.000000;   w = 0.480000;  // C
+      pMat37->DefineElement(1,a,z,w);
+      pMat37->SetIndex(36);
+      // Medium: BC408
+      numed   = 36;  // medium number
+      Double_t par[8];
+      par[0]  = 0.000000; // isvol
+      par[1]  = 0.000000; // ifield
+      par[2]  = 0.000000; // fieldm
+      par[3]  = 0.000000; // tmaxfd
+      par[4]  = 0.000000; // stemax
+      par[5]  = 0.000000; // deemax
+      par[6]  = 0.000100; // epsil
+      par[7]  = 0.000000; // stmin
+      pMed37 = new TGeoMedium("BC408", numed,pMat37,par);
    }
 
    //
    const Int_t geometry=0;
    
-   if(geometry == 0) {
-      TGeoVolume* vWorld = gGeoManager->GetTopVolume();
-      vWorld->SetVisLeaves(kTRUE);
-
-      // Create a global Mother Volume
-      /*
-      dx = 500.000000;
-      dy = 500.000000;
-      dz = 500.000000;
-      TGeoShape *pBoxWorld = new TGeoBBox("LandBoxWorld", dx,dy,dz);
-      TGeoVolume*
-      vWorld  = new TGeoVolume("LandBoxLogWorld",pBoxWorld, pMed2);
-      vWorld->SetVisLeaves(kTRUE);
-      TGeoCombiTrans *pGlobalc = GetGlobalPosition();
-
-      // add the sphere as Mother Volume
-      pAWorld->AddNode(vWorld, 0, pGlobalc);
-      */
-
-
-      // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
-      Double_t padle_h_dim1x = 100.0;
-      Double_t padle_h_dim1y = 5.1;
-      Double_t padle_h_dim1z = 5.1;
-      TGeoShape* padle_h_box1 = new TGeoBBox("padle_h_box1",
-					 padle_h_dim1x,
-					 padle_h_dim1y,
-					 padle_h_dim1z);
-      Double_t padle_h_dim2x = 100.0;
-      Double_t padle_h_dim2y = 5.0;
-      Double_t padle_h_dim2z = 5.0;
-      TGeoShape* padle_h_box2 = new TGeoBBox("padle_h_box2",
-					 padle_h_dim2x,
-					 padle_h_dim2y,
-					 padle_h_dim2z);
-
-      // Create a composite shape
-      TGeoCompositeShape *sheetbox
-       = new TGeoCompositeShape("diffbox", "padle_h_box1 - padle_h_box2");
-      // Corresponding boolean volume
-      TGeoVolume *bvol = new TGeoVolume("sheetbox",sheetbox,Iron);
-
-      //end-cap list
-      dx1 = 5.100000;
-      dx2 = 2.510000;
-      dy1 = 5.100000;
-      dy2 = 2.510000;
-      dz  = 5.000000;
- 
-      TGeoVolume *trap = gGeoManager->MakeTrd2("atrap",pMed37,dx1,dx2,dy1,dy2,dz);
- 
-      // sheet Iron list
-      //------------------ Iron sheets -----------------------------------------
-      Double_t padle_h_dim3x = 100.0;
-      Double_t padle_h_dim3y = 5.0;
-      Double_t padle_h_dim3z = 0.125;
-
-      TGeoVolume *padle_h_box3
-       =gGeoManager->MakeBox("padle_h_box3",Iron,
-                                    padle_h_dim3x,
-				    padle_h_dim3y,
-				    padle_h_dim3z);
-
-      //cout << " box3: " << padle_h_box3->GetNumber() << endl;
-
-
-
-      Double_t padle_h_dim4x = 100.0;
-      Double_t padle_h_dim4y = 5.0;
-      Double_t padle_h_dim4z = 0.25;
-
-      TGeoVolume *padle_h_box4
-       =gGeoManager->MakeBox("padle_h_box4",Iron,
-                                    padle_h_dim4x,
-				    padle_h_dim4y,
-				    padle_h_dim4z);
-
-      // cout << " box4: " << padle_h_box4->GetNumber() << endl;
-
-
-      //------------------ BC408 sheets -----------------------------------------
-      Double_t padle_h_dim5x = 100.0;
-      Double_t padle_h_dim5y = 5.0;
-      Double_t padle_h_dim5z = 0.25;
-
-
-      TGeoVolume *padle_h_box5
-       =gGeoManager->MakeBox("padle_h_box5",pMed37,
-                                    padle_h_dim5x,
-				    padle_h_dim5y,
-				    padle_h_dim5z);
-
-
-      // cout << " box5: " << padle_h_box5->GetNumber() << endl;
-
-
-      // Make the elementary assembly of the whole structure
-      TGeoVolume *aLand = new TGeoVolumeAssembly("ALAND");
-
-      TGeoRotation *rot0 = new TGeoRotation();
-      rot0->RotateX(0.);
-      rot0->RotateY(0.);
-      rot0->RotateZ(0.);
-      Double_t xx = 0.;
-      Double_t yy = 0.;
-      Double_t zz = 0.;
-
-      aLand->AddNode(bvol,1,new TGeoCombiTrans(xx,yy,zz,rot0));
-
-      TGeoRotation *rot1 = new TGeoRotation();
-      rot1->RotateX(0.);
-      rot1->RotateY(90.);
-      rot1->RotateZ(0.);
-      xx = 105.;
-      yy = 0.;
-      zz = 0.;
-
-      aLand->AddNode(trap,2,new TGeoCombiTrans(xx,yy,zz,rot1));
-
-      TGeoRotation *rot2 = new TGeoRotation();
-      rot2->RotateX(0.);
-      rot2->RotateY(270.);
-      rot2->RotateZ(0.);
-      xx = -105.;
-      yy = 0.;
-      zz = 0.;
-      aLand->AddNode(trap,3,new TGeoCombiTrans(xx,yy,zz,rot2));
-
-      //   AddSensitiveVolume(padle_h_box3); //Fe
-      //   AddSensitiveVolume(padle_h_box4); //Fe
-      AddSensitiveVolume(padle_h_box5); //Scint.
-
-      fNbOfSensitiveVol+=1; //? FIXME
-
-      //paddles
-      TGeoRotation *rot3 = new TGeoRotation();
-      rot3->RotateX(0.);
-      rot3->RotateY(0.);
-      rot3->RotateZ(0.);
-      xx = 0.;
-      yy = 0.;
-   
-      zz = -4.875;
-      // normaly seq from 4
-      aLand->AddNode(padle_h_box3,1,new TGeoCombiTrans(xx,yy,zz,rot3));
-      zz = -4.;
-      aLand->AddNode(padle_h_box4,1,new TGeoCombiTrans(xx,yy,zz,rot3));
-      zz = -3.;
-      aLand->AddNode(padle_h_box4,2,new TGeoCombiTrans(xx,yy,zz,rot3));
-      zz = -2.;
-      aLand->AddNode(padle_h_box4,3,new TGeoCombiTrans(xx,yy,zz,rot3));
-      zz = -1.;
-      aLand->AddNode(padle_h_box4,4,new TGeoCombiTrans(xx,yy,zz,rot3));
-      zz =  0.;
-      aLand->AddNode(padle_h_box4,5,new TGeoCombiTrans(xx,yy,zz,rot3));
-      zz =  1.;
-      aLand->AddNode(padle_h_box4,6,new TGeoCombiTrans(xx,yy,zz,rot3));
-      zz =  2.;
-      aLand->AddNode(padle_h_box4,7,new TGeoCombiTrans(xx,yy,zz,rot3));
-      zz =  3.;
-      aLand->AddNode(padle_h_box4,8,new TGeoCombiTrans(xx,yy,zz,rot3));
-      zz =  4.;
-      aLand->AddNode(padle_h_box4,9,new TGeoCombiTrans(xx,yy,zz,rot3));
-      zz =  4.875;
-      aLand->AddNode(padle_h_box3,2,new TGeoCombiTrans(xx,yy,zz,rot3));
-
-
-      //bc408 paddles
-
-      xx = 0.;
-      yy = 0.;
-
-      zz = -4.5;
-      aLand->AddNode(padle_h_box5,1,new TGeoCombiTrans(xx,yy,zz,rot3));
-      zz = -3.5;
-      aLand->AddNode(padle_h_box5,2,new TGeoCombiTrans(xx,yy,zz,rot3));
-      zz = -2.5;
-      aLand->AddNode(padle_h_box5,3,new TGeoCombiTrans(xx,yy,zz,rot3));
-      zz = -1.5;
-      aLand->AddNode(padle_h_box5,4,new TGeoCombiTrans(xx,yy,zz,rot3));
-      zz = -0.5;
-      aLand->AddNode(padle_h_box5,5,new TGeoCombiTrans(xx,yy,zz,rot3));
-      zz =  0.5;
-      aLand->AddNode(padle_h_box5,6,new TGeoCombiTrans(xx,yy,zz,rot3));
-      zz =  1.5;
-      aLand->AddNode(padle_h_box5,7,new TGeoCombiTrans(xx,yy,zz,rot3));
-      zz =  2.5;
-      aLand->AddNode(padle_h_box5,8,new TGeoCombiTrans(xx,yy,zz,rot3));
-      zz =  3.5;
-      aLand->AddNode(padle_h_box5,9,new TGeoCombiTrans(xx,yy,zz,rot3));
-      zz =  4.5;
-      aLand->AddNode(padle_h_box5,10,new TGeoCombiTrans(xx,yy,zz,rot3));
-
-
-      //------------------------- Horizontal Assembly Multiplication & Rotation -----------------------------------------------------------------------  
-
-
-      // cout << " -I- Assembly: aLand serial nb: " << aLand->GetNumber() << endl;
-      // cout << " -I- now couting subnodes ... " << aLand->GetNdaughters() << endl;
-      //aLand->CountNodes(1000,1);
-
-
-      TGeoVolume *cell = new TGeoVolumeAssembly("CELL");
-
-      // cout << " -I- Assembly: cell serial nb: " << cell->GetNumber() << endl;
-
-
-      TGeoRotation *rot4 = new TGeoRotation();
-      rot4->RotateX(0.);
-      rot4->RotateY(0.);
-      rot4->RotateZ(0.);
-
-      tx=0.;
-      ty=0.;
-      tz=0.;
-
- 
-
-      for ( Int_t i = 0; i < 5; i++ ){
-         for( Int_t j = 0; j < 20; j++ ){
-            tx=0.;
-            ty=-96.9 + j*10.2;
-            tz=-45.9 + i*20.4;
-            Int_t nindex = (j+20*i)+1; //1-100
-            cell->AddNode(aLand,nindex,new TGeoCombiTrans(tx,ty,tz,rot4));
-         }
-      }
-
-
-      //  cout << " -I- R3BLand Assembly: cell count nodes (1) "  <<   cell->GetNdaughters() << endl;
-      //  cout << " -I- R3BLand total : " << cell->CountNodes(5000,0) << endl;
-
-
-      //------------------------- Vertical Assembly Multiplication & Rotation -----------------------------------------------------------------------  
-
-      TGeoRotation *rot5 = new TGeoRotation();
-      rot5->RotateX(0.);
-      rot5->RotateY(0.);
-      rot5->RotateZ(90.);
-
-      for ( Int_t i = 0; i < 5; i++ ){
-         for( Int_t j = 0; j < 20; j++ ){
-            tx=-96.9 + j*10.2;
-            ty=0.;
-            tz=-35.7 + i*20.4;
-            Int_t nindex2 = (j+20*i)+101; //101 200
-            cell->AddNode(aLand,nindex2,new TGeoCombiTrans(tx,ty,tz,rot5));
-         }
-      }
-
-      //  cout << " -I- R3BLand  Assembly: cell count nodes (2) "  <<  cell->GetNdaughters() << endl;
-      //  cout << " -I- R3BLand total " << cell->CountNodes(5000,0) << endl;
-
-      TGeoRotation *rotg = new TGeoRotation();
-      rotg->RotateX(0.);
-      rotg->RotateY(0.);
-      rotg->RotateZ(0.);
-      tx = 0.0;
-      ty = 0.0;
-      tz = 0.0; // cm
-
-      TGeoCombiTrans *t0 = new TGeoCombiTrans(tx,ty,tz,rotg);
-
-      vWorld->AddNode(cell,1, GetGlobalPosition(t0) );
-
-   }  
-   else if(geometry ==1){
-
-      TGeoVolume* vWorld = gGeoManager->GetTopVolume();
-      vWorld->SetVisLeaves(kTRUE);
+   TGeoVolume* vWorld = gGeoManager->GetTopVolume();
+   vWorld->SetVisLeaves(kTRUE);
       
-      // different geometry for testing the Neuland detector
-      // only scintillators 5cm x 5cm x 200cm
-      //------------------ BC408 sheets -----------------------------------------
-      Double_t padle_h_dim5x = 100.0;
-      Double_t padle_h_dim5y = 2.5;
-      Double_t padle_h_dim5z = 2.5;
+   // different geometry for testing the Neuland detector
+   // only scintillators 5cm x 5cm x 200cm
+   //------------------ BC408 sheets -----------------------------------------
+   Double_t padle_h_dim5x = 100.0;
+   Double_t padle_h_dim5y = 2.5;
+   Double_t padle_h_dim5z = 2.5;
 
-
-      TGeoVolume *padle_h_box5
-        =gGeoManager->MakeBox("padle_h_box5",pMed37,
+   TGeoVolume *padle_h_box5
+     =gGeoManager->MakeBox("padle_h_box5",pMed37,
                                     padle_h_dim5x,
 				    padle_h_dim5y,
 				    padle_h_dim5z);
 
-      // Make the elementary assembly of the whole structure
-      TGeoVolume *aLand = new TGeoVolumeAssembly("ALAND");
+   // Make the elementary assembly of the whole structure
+   TGeoVolume *aLand = new TGeoVolumeAssembly("ALAND");
 
-      //paddles
-      TGeoRotation *rot3 = new TGeoRotation();
-      rot3->RotateX(0.);
-      rot3->RotateY(0.);
-      rot3->RotateZ(0.);
-      Double_t xx = 0.;
-      Double_t yy = 0.;
-      Double_t zz = 0.;
-      aLand->AddNode(padle_h_box5,1,new TGeoCombiTrans(xx,yy,zz,rot3));
+   //paddles
+   TGeoRotation *rot3 = new TGeoRotation();
+   rot3->RotateX(0.);
+   rot3->RotateY(0.);
+   rot3->RotateZ(0.);
+   Double_t xx = 0.;
+   Double_t yy = 0.;
+   Double_t zz = 0.;
+   aLand->AddNode(padle_h_box5,1,new TGeoCombiTrans(xx,yy,zz,rot3));
 
-      AddSensitiveVolume(padle_h_box5); //Scint.
+   AddSensitiveVolume(padle_h_box5); //Scint.
 
-      fNbOfSensitiveVol+=1; //? FIXME
+   fNbOfSensitiveVol+=1; //? FIXME
 
-      TGeoVolume *cell = new TGeoVolumeAssembly("CELL");
+   TGeoVolume *cell = new TGeoVolumeAssembly("CELL");
 
-      // cout << " -I- Assembly: cell serial nb: " << cell->GetNumber() << endl;
+   // cout << " -I- Assembly: cell serial nb: " << cell->GetNumber() << endl;
 
+   TGeoRotation *rot4 = new TGeoRotation();
+   rot4->RotateX(0.);
+   rot4->RotateY(0.);
+   rot4->RotateZ(0.);
+   tx=0.;
+   ty=0.;
+   tz=0.;
 
-      TGeoRotation *rot4 = new TGeoRotation();
-      rot4->RotateX(0.);
-      rot4->RotateY(0.);
-      rot4->RotateZ(0.);
-      tx=0.;
-      ty=0.;
-      tz=0.;
-
-      for ( Int_t i = 0; i < 20; i++ ){
-         for( Int_t j = 0; j < 40; j++ ){
-            tx=0.;
-            ty=-97.5 + j*5.0;
-            tz=-97.5 + i*10.;
-            Int_t nindex = (j+40*i)+1; //1-400
-            cell->AddNode(aLand,nindex,new TGeoCombiTrans(tx,ty,tz,rot4));
-         }
+   for ( Int_t i = 0; i < 20; i++ ){
+      for( Int_t j = 0; j < 40; j++ ){
+         tx=0.;
+         ty=-97.5 + j*5.0;
+         tz=-97.5 + i*10.;
+         Int_t nindex = (j+40*i)+1; //1-400
+         cell->AddNode(aLand,nindex,new TGeoCombiTrans(tx,ty,tz,rot4));
       }
-
-//------------------------- Vertical Assembly Multiplication & Rotation -----------------------------------------------------------------------  
-
-      TGeoRotation *rot5 = new TGeoRotation();
-      rot5->RotateX(0.);
-      rot5->RotateY(0.);
-      rot5->RotateZ(90.);
-
-      for ( Int_t i = 0; i < 20; i++ ){
-         for( Int_t j = 0; j < 40; j++ ){
-            tx=-97.5 + j*5.0;
-            ty=0.;
-            tz=-92.5 + i*10.;
-            Int_t nindex2 = (j+40*i)+401; //401 800
-            cell->AddNode(aLand,nindex2,new TGeoCombiTrans(tx,ty,tz,rot5));
-         }
-      }
-
-      TGeoRotation *rotg = new TGeoRotation();
-      rotg->RotateX(0.);
-      rotg->RotateY(0.);
-      rotg->RotateZ(0.);
-      tx = 0.0;
-      ty = 0.0;
-      tz = 0.0; // cm
-
-      TGeoCombiTrans *t0 = new TGeoCombiTrans(tx,ty,tz,rotg);
-   
-      vWorld->AddNode(cell,1, GetGlobalPosition(t0) );
-
    }
+
+   //------------------------- Vertical Assembly Multiplication & Rotation -----------------------------------------------------------------------  
+
+   TGeoRotation *rot5 = new TGeoRotation();
+   rot5->RotateX(0.);
+   rot5->RotateY(0.);
+   rot5->RotateZ(90.);
+
+   for ( Int_t i = 0; i < 20; i++ ){
+      for( Int_t j = 0; j < 40; j++ ){
+         tx=-97.5 + j*5.0;
+         ty=0.;
+         tz=-92.5 + i*10.;
+         Int_t nindex2 = (j+40*i)+801; //401 800
+         cell->AddNode(aLand,nindex2,new TGeoCombiTrans(tx,ty,tz,rot5));
+      }
+   }
+
+   TGeoRotation *rotg = new TGeoRotation();
+   rotg->RotateX(0.);
+   rotg->RotateY(0.);
+   rotg->RotateZ(0.);
+   tx = 0.0;
+   ty = 0.0;
+   tz = 0.0; // cm
+
+   TGeoCombiTrans *t0 = new TGeoCombiTrans(tx,ty,tz,rotg);
+   
+   vWorld->AddNode(cell,1, GetGlobalPosition(t0) );
+
 }
+
 
 
 ClassImp(R3BLand)
