@@ -9,6 +9,7 @@
 class TClonesArray;
 class TObjectArray;
 class TH1F;
+class TH2F;
 
 
 class R3BLandDigitizer : public FairTask
@@ -36,18 +37,31 @@ class R3BLandDigitizer : public FairTask
 
   protected:
   TClonesArray* fLandPoints;
+  TClonesArray* fLandMCTrack; 
 
   //- Table data 
-  Double_t x_pos[200],y_pos[200],z_pos[200];
-  Double_t tof[200],pm[200][2];
-  Double_t paddle_E[200][9];
-  Double_t part_E[50],part_n[50],first_hit[4];
-  Int_t nuhits[200];
+//  const Int_t npaddles = 200;  //number of paddles
+//  const Int_t nplanes = 10;  //number of planes
+
 
   //- Control Hitograms
-  TH1F *h_ne;
-  TH1F *h_ch;
+  TH1F *hPMl;
+  TH1F *hPMr;
+  TH1F *hTotalEnergy;
+  TH1F *hTotalLight;
+  TH1F *hMult;
+  TH1F *hParticle;
+  TH1F *hPaddleEnergy;
+  TH1F *hFirstEnergy;
+
+  TH1F *hDeltaPx1;
+  TH1F *hDeltaPy1;
+  TH1F *hDeltaPz1;
+  TH1F *hDeltaPx2;
+  TH1F *hDeltaPy2;
+  TH1F *hDeltaPz2;
   
+  TH2F *hElossLight;
   
   private:
   virtual void SetParContainers();
