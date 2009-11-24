@@ -5,6 +5,7 @@
 #include "FairTask.h"
 #include <map>
 #include <string>
+#include "R3BLandDigiPar.h"
 
 class TClonesArray;
 class TObjectArray;
@@ -39,10 +40,8 @@ class R3BLandDigitizer : public FairTask
   TClonesArray* fLandPoints;
   TClonesArray* fLandMCTrack; 
 
-  //- Table data 
-//  const Int_t npaddles = 200;  //number of paddles
-//  const Int_t nplanes = 10;  //number of planes
-
+  // Parameter class
+  R3BLandDigiPar* fLandDigiPar;
 
   //- Control Hitograms
   TH1F *hPMl;

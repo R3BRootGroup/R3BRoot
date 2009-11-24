@@ -7,6 +7,7 @@
 #include "R3BGeoLand.h"
 #include "R3BLandPoint.h"
 #include "R3BGeoLandPar.h"
+#include "R3BLandDigiPar.h"
 
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
@@ -911,6 +912,19 @@ void R3BLand::ConstructGeometry2() {
    TGeoCombiTrans *t0 = new TGeoCombiTrans(tx,ty,tz,rotg);
    
    vWorld->AddNode(cell,1, GetGlobalPosition(t0) );
+
+
+  // Now save some basic  geometry parameters
+  // Get the parameter factory
+  FairRun *fRun = FairRun::Instance();
+  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
+  R3BLandDigiPar* par=(R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
+  // max_paddle 200;
+  // max_plane 10
+  par->SetMaxPaddle(200) ;
+  par->SetMaxPlane(10);
+  par->setChanged();
+  //par->setInputVersion(fRun->GetRunId(),1);
 
 }
 

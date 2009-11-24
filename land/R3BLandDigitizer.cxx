@@ -42,6 +42,27 @@ R3BLandDigitizer::~R3BLandDigitizer() {
 }
 
 
+void R3BLandDigitizer::SetParContainers() {
+
+  // Get run and runtime database
+  FairRunAna* run = FairRunAna::Instance();
+  if ( ! run ) Fatal("SetParContainers", "No analysis run");
+
+  FairRuntimeDb* rtdb = run->GetRuntimeDb();
+  if ( ! rtdb ) Fatal("SetParContainers", "No runtime database");
+
+  fLandDigiPar = (R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
+
+  if ( fLandDigiPar ) {
+      cout << "-I- R3BLandDigitizer::SetParContainers() "<< endl;
+      cout << "-I- Container R3BLandDigiPar  loaded " << endl;
+  }
+
+}
+
+
+
+
 InitStatus R3BLandDigitizer::Init() {
 
   // Get input array 
@@ -115,21 +136,16 @@ InitStatus R3BLandDigitizer::Init() {
   hElossLight->GetXaxis()->SetTitle("Energy (MeV)");
   hElossLight->GetYaxis()->SetTitle("Light (MeV)");
 
+  // Parameter retrieval
+  // Only after Init one retrieve the Digitization Parameters!
+  cout << "-I- Max Paddle: "<<  fLandDigiPar->GetMaxPaddle() << endl;
+  cout << "-I- Max Plane: "<<   fLandDigiPar->GetMaxPlane() << endl;
+
+
   return kSUCCESS;
 
 }
 
-void R3BLandDigitizer::SetParContainers() {
-
-  // Get run and runtime database
-  FairRunAna* run = FairRunAna::Instance();
-  if ( ! run ) Fatal("SetParContainers", "No analysis run");
-
-  //FairRuntimeDb* db = run->GetRuntimeDb();
-  //if ( ! db ) Fatal("SetParContainers", "No runtime database");
-
- 
-}
 
 // -------------------------------------------------------------------------
 
@@ -342,7 +358,9 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
               
          // identify x and y paddles and calculate light transmission to the PM's
 	 // first plane are horizontal paddles
-	 
+
+         //<DB> Check me !
+	 /*
 	 if(paddle > 100) {
 	    // vertical paddles
 	    PMLtime[paddle][m] = time+(plength-y)/20.;
@@ -361,6 +379,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
             PMRlight[paddle][m] = PMRlight[paddle][m]+light*exp(-att*(plength+x));
             PMRenergy[paddle][m] = PMRenergy[paddle][m]+eloss*exp(-att*(plength+x));
          }
+	 */
 
       }//! eloss	 
            

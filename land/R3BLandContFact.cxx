@@ -15,10 +15,9 @@
 //#include "R3BLandParRootFileIo.h"
 //#include "R3BLandParAsciiFileIo.h"
 #include "R3BGeoLandPar.h"
-//#include "R3BLandDigiPar.h"
+#include "R3BLandDigiPar.h"
 
 #include "FairRuntimeDb.h"
-//#include "CbmParTest.h"
 #include "FairParRootFileIo.h"
 #include "FairParAsciiFileIo.h"
 
@@ -45,39 +44,29 @@ R3BLandContFact::R3BLandContFact() {
 void R3BLandContFact::setAllContainers() {
   /** Creates the Container objects with all accepted contexts and adds them to
    *  the list of containers for the STS library.*/
-   /*
+
     FairContainer* p1= new FairContainer("R3BLandDigiPar",
-                                          "Sts Digitisation Parameters",
+                                          "Land Digitisation Parameters",
                                           "TestDefaultContext");
     p1->addContext("TestNonDefaultContext");
 
-    FairContainer* p2= new FairContainer("CbmGeoStsPar",
-                                          "Sts Geometry Parameters",
-                                          "TestDefaultContext");
-    p2->addContext("TestNonDefaultContext");
 
     containers->Add(p1);
-    containers->Add(p2);
-    */
 }
 
 FairParSet* R3BLandContFact::createContainer(FairContainer* c) {
   /** Landls the constructor of the corresponding parameter container.
    * For an actual context, which is not an empty string and not the default context
    * of this container, the name is concatinated with the context. */
-  /*
+
   const char* name=c->GetName();
-  cout << " -I container name " << name << endl;
+  cout << " -I-R3BLandContFact (create container name): " << name << endl;
   FairParSet* p=0;
   if (strcmp(name,"R3BLandDigiPar")==0) {
     p=new R3BLandDigiPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
   }
-  if (strcmp(name,"CbmGeoStsPar")==0) {
-    p=new CbmGeoStsPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
-  }
   return p;
-  */
-  return NULL;
+
 }
 
 void  R3BLandContFact::activateParIo(FairParIo* io) {
