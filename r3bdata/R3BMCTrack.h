@@ -1,34 +1,31 @@
 // -------------------------------------------------------------------------
 // -----                      R3BMCTrack header file                   -----
-// -----                  Created 03/08/04  by V. Friese               -----
-// -----                  Adapted to Panda  M. Al-Turany               -----
+// -----                  Created 03/08/04                             -----
 // -------------------------------------------------------------------------
 
 
 /** R3BMCTrack.h
- *@author V.Friese <v.friese@gsi.de>
- **
- ** Data class for storing Monte Carlo tracks processed by the R3BStack.
- ** A MCTrack can be a primary track put into the simulation or a
- ** secondary one produced by the transport through decay or interaction.
  **/
 
 
 #ifndef R3BMCTRACK_H
 #define R3BMCTRACK_H 1
 
+
 #include "R3BDetectorList.h"
+
+#include "TLorentzVector.h"
 #include "TObject.h"
 #include "TParticle.h"
 #include "TVector3.h"
-#include "TLorentzVector.h"
 
 #ifndef ROOT_TParticlePDG
-#include "TParticlePDG.h"
+ #include "TParticlePDG.h"
 #endif
 #ifndef ROOT_TDatabasePDG
-#include "TDatabasePDG.h"
+ #include "TDatabasePDG.h"
 #endif
+
 
 class R3BMCTrack : public TObject
 {
@@ -41,9 +38,9 @@ class R3BMCTrack : public TObject
 
 
   /**  Standard constructor  **/
-  R3BMCTrack(Int_t pdgCode, Int_t motherID, TVector3 startVvertex, 
-	     Double_t startTime, TVector3 momentum, Int_t  nPoint=0);
-
+  R3BMCTrack(Int_t pdgCode, Int_t motherID, Double_t px, Double_t py,
+	     Double_t pz, Double_t x, Double_t y, Double_t z, 
+	     Double_t t, Int_t nPoints);
 
   /**  Copy constructor  **/
   R3BMCTrack(const R3BMCTrack& track);
@@ -58,38 +55,37 @@ class R3BMCTrack : public TObject
 
 
   /**  Output to screen  **/
-  void Print(Int_t iTrack) const;
+  void Print(Int_t iTrack=0) const;
 
 
   /**  Accessors  **/
-  Int_t    GetPdgCode()     const { return fPdgCode; }
-  Int_t    GetMotherID()    const { return fMotherID; }
-  TVector3 GetStartVertex() const { return TVector3(fStartX, fStartY,fStartZ);}
-  Double_t GetStartTime()   const { return fStartT; }
-  TVector3 GetMomentum()    const { return TVector3(fPx, fPy, fPz); }
+  Int_t    GetPdgCode()  const { return fPdgCode; }
+  Int_t    GetMotherId() const { return fMotherId; }
+  Double_t GetPx()       const { return fPx; }
+  Double_t GetPy()       const { return fPy; }
+  Double_t GetPz()       const { return fPz; }
+  Double_t GetStartX()   const { return fStartX; }
+  Double_t GetStartY()   const { return fStartY; }
+  Double_t GetStartZ()   const { return fStartZ; }
+  Double_t GetStartT()   const { return fStartT; }
+  Double_t GetMass()     const;
+  Double_t GetEnergy()   const;
   Double_t GetPt()       const { return TMath::Sqrt(fPx*fPx+fPy*fPy); }
-  /*
-  Int_t GetStsPoints()  const { return   (fPoints &  15        )        ; }
-  */
-   
-  Int_t  GetNPoints(DetectorId detId)  const;  
+  Double_t GetP() const { return TMath::Sqrt(fPx*fPx+fPy*fPy+fPz*fPz); }
+  Double_t GetRapidity() const;
+  void GetMomentum(TVector3& momentum); 
+  void Get4Momentum(TLorentzVector& momentum);
+  void GetStartVertex(TVector3& vertex);
+
+
+  /** Accessors to the number of MCPoints in the detectors **/
+  Int_t GetNPoints(DetectorId detId)  const;
+
+
   /**  Modifiers  **/
-  
-  void SetMotherID(Int_t id) { fMotherID = id; }
-  /*
-  void SetStsPoints(Int_t np);
-  */ 
- 
-  
-  /**  Add one detector point to the fPoint variable  **/
- /*
-  void AddStsPoint()  { SetStsPoints(  GetStsPoints()  + 1 ); }
- */ 
- 
-  
-  void SetNPoints(Int_t iDet, Int_t  np);
-  
-  TLorentzVector Get4Momentum() const;
+  void SetMotherId(Int_t id) { fMotherId = id; }
+  void SetNPoints(Int_t iDet, Int_t np);
+
 
 
 private:
@@ -97,33 +93,54 @@ private:
   /**  PDG particle code  **/
   Int_t  fPdgCode;
 
-  /** Momentum components at production [GeV]  **/
-  Double32_t fPx, fPy, fPz;
+  /**  Index of mother track. -1 for primary particles.  **/
+  Int_t  fMotherId;
 
-  /**  Index of mother track. Zero for primary particles.  **/
-  Int_t  fMotherID;
+  /** Momentum components at start vertex [GeV]  **/
+  Double32_t fPx, fPy, fPz;
 
   /** Coordinates of start vertex [cm, ns]  **/
   Double32_t fStartX, fStartY, fStartZ, fStartT;
 
   /**  Bitvector representing the number of MCPoints for this track in 
    **  each subdetector. The detectors are represented by
-   **  This goes to fPoints:
-   **  CAL:  Bit  0 -  1  (2 bit max. value 3)
-   **  DCH:  Bit  2 -  3  (2 bit max. value 3)
-   **  GFI:  Bit  4 -  5  (2 bit max. value 3)
-   **  LAND:  Bit  6 -  7  (2 bit max. value 3)
-   **  MTOF:  Bit  8 -  9  (2 bit max. value 3)
-   **  TOF:  Bit 10 - 11  (2 bit max. value 3)
-   **  TRA:  Bit 12 - 13  (2 bit max. value 3)
-   
-   **  The respective point numbers can be accessed and modified **/
+   **  REF:         Bit  0      (1 bit,  max. value  1)
+   **  The respective point numbers can be accessed and modified 
+   **  with the inline functions. 
+   **  Bits 26-31 are spare for potential additional detectors.
+   **/
+  Int_t fNPoints;
 
-  Int_t  fPoints;
 
   ClassDef(R3BMCTrack,1);
 
 };
+
+
+
+// ==========   Inline functions   ========================================
+
+inline Double_t R3BMCTrack::GetEnergy() const {
+  Double_t mass = GetMass();
+  return TMath::Sqrt(mass*mass + fPx*fPx + fPy*fPy + fPz*fPz );
+}
+
+
+inline void R3BMCTrack::GetMomentum(TVector3& momentum) { 
+  momentum.SetXYZ(fPx,fPy,fPz); 
+}
+
+
+inline void R3BMCTrack::Get4Momentum(TLorentzVector& momentum) {
+  momentum.SetXYZT(fPx,fPy,fPz,GetEnergy()); 
+}
+
+
+inline void R3BMCTrack::GetStartVertex(TVector3& vertex) { 
+  vertex.SetXYZ(fStartX,fStartY,fStartZ); 
+}
+
+
 
 
 

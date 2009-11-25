@@ -10,7 +10,7 @@
 #define R3BDETECTORLIST_H 1
 
 enum DetectorId {
-    kDCH,kCAL,kLAND,kGFI,kMTOF,kTOF,kTRA};
+   kREF,kDCH,kCAL,kLAND,kGFI,kMTOF,kTOF,kTRA,kCALIFA,};
     
 /** Unique identifier for all Panda Point and Hit types **/
 

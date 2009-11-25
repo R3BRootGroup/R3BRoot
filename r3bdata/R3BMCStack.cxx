@@ -251,7 +251,7 @@ void R3BStack::UpdateTrackIndex(TRefArray* detList) {
   // First update mother ID in MCTracks
   for (Int_t i=0; i<fNTracks; i++) {
     R3BMCTrack* track = (R3BMCTrack*)fTracks->At(i);
-    Int_t iMotherOld = track->GetMotherID();
+    Int_t iMotherOld = track->GetMotherId();
     fIndexIter = fIndexMap.find(iMotherOld);
     if (fIndexIter == fIndexMap.end()) {
       cout << "-E- R3BStack: Particle index " << iMotherOld 
@@ -259,7 +259,7 @@ void R3BStack::UpdateTrackIndex(TRefArray* detList) {
       Fatal("R3BStack::UpdateTrackIndex",
 		"Particle index not found in map");
     }
-    track->SetMotherID( (*fIndexIter).second );
+    track->SetMotherId( (*fIndexIter).second );
   }
 
   // Now iterate through all active detectors
