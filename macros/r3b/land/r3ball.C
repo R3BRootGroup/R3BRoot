@@ -345,9 +345,10 @@ void r3ball(Int_t nEvents = 1,
       // Geometry version for Land
       //  1 : new RPC based Land
       //  2 : 1 RPC Module
-      Int_t version = 2;
-      R3BDetector* land = new R3BNeuLand("Land", kTRUE);
-      ((R3BNeuLand*) land)->SetGeomVersion(version);
+      // Int_t version = 2;
+      //R3BDetector* land = new R3BNeuLand("Land", kTRUE);
+      R3BDetector* land = new R3BLand("Land", kTRUE);
+      //((R3BNeuLand*) land)->SetGeomVersion(version);
 
       // Global position of the Module
       phi   =  0.0; // (deg)
@@ -360,7 +361,7 @@ void r3ball(Int_t nEvents = 1,
       // Global translation in Lab
       tx    =  0.0; // (cm)
       ty    =  0.0; // (cm)
-      tz    =  1000.0; // (cm)
+      tz    =  1050.0; // (cm)
       //land->SetRotAnglesEuler(phi,theta,psi);
       land->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       land->SetTranslation(tx,ty,tz);
@@ -443,15 +444,17 @@ void r3ball(Int_t nEvents = 1,
 
   if (fGenerator.CompareTo("box") == 0  ) {
   // 2- Define the BOX generator
-  Double_t pdgId  = 13; // muon (-) beam
+  Double_t pdgId  = 2112; // neutron beam
   Double_t theta1 = 0.;  // polar angle distribution
-  Double_t theta2 = 0.1;
-  Double_t momentum=3.; // 10 GeV/c
-  FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 50);
+  Double_t theta2 = 2.;
+  // LAND deuterium breakup : 0.765,1.0555,1.2254,1.4713,1.7629 MeV/c
+  //                           270,  470,   600,   800,   1050 MeV
+  Double_t momentum= 0.765; // GeV/c
+  FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 1);
   boxGen->SetThetaRange (   theta1,   theta2);
   boxGen->SetPRange     (momentum,momentum*1.);
   boxGen->SetPhiRange   (0.,360.);
-  boxGen->SetXYZ(0.0,0.0,-10.0);
+  boxGen->SetXYZ(0.0,0.0,0.0);
   // add the box generator
   primGen->AddGenerator(boxGen);
   } 
@@ -522,6 +525,8 @@ void r3ball(Int_t nEvents = 1,
 
   // ------  Increase nb of step for CALO
   Int_t nSteps = -15000;
+  // + means print information
+  
   gMC->SetMaxNStep(nSteps);
 
   // -----   Runtime database   ---------------------------------------------
