@@ -175,12 +175,13 @@ class R3BStack : public FairGenericStack
    *@param iTrack  Track number
    **/
   void AddPoint(DetectorId iDet, Int_t iTrack);
-
+ 
 
   /** Accessors **/
   TParticle* GetParticle(Int_t trackId) const;
   TClonesArray* GetListOfParticles() { return fParticles; }
 
+  void SetDebug(Bool_t t ) { fDebug= t ; }
 
 
  private:
@@ -227,7 +228,7 @@ class R3BStack : public FairGenericStack
   Int_t      fMinPoints;
   Double32_t fEnergyCut;
   Bool_t     fStoreMothers;
-
+  Bool_t     fDebug;
 
   /** Mark tracks for output using selection criteria  **/
   void SelectTracks();

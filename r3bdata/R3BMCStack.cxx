@@ -30,9 +30,10 @@ R3BStack::R3BStack(Int_t size) {
   fNPrimaries = fNParticles = fNTracks = 0;
   fIndex = 0;
   fStoreSecondaries = kTRUE;
-  fMinPoints        = 1;
+  fMinPoints        = 0;
   fEnergyCut        = 0.;
   fStoreMothers     = kTRUE;
+  fDebug            = kFALSE;
 }
 
 // -------------------------------------------------------------------------
@@ -182,6 +183,20 @@ void R3BStack::FillTrackArray() {
   fIndexMap.clear();
   fNTracks = 0;
 
+  //<DB> if no selection than no selection
+  /*
+  if ( fMinPoints == 0 ) {
+     
+   for (Int_t iPart=0; iPart<fNParticles; iPart++) {
+      R3BMCTrack* track = 
+	new( (*fTracks)[fNTracks]) R3BMCTrack(GetParticle(iPart));
+      fNTracks++;
+    }
+   cout << "-I- R3BStack: no select. MCTracks forwarded : " << fNParticles << endl; 
+   return;
+  }//! fMinPoints
+  */
+   
   // --> Check tracks for selection criteria
   SelectTracks();
 
@@ -209,6 +224,7 @@ void R3BStack::FillTrackArray() {
       fNTracks++;
     
     }else{
+      if (fDebug) cout << "-D- R3BMCStack IndexMap ---> -2 for iPart: " << iPart << endl;    
       fIndexMap[iPart] = -2;
     }
 
@@ -228,6 +244,7 @@ void R3BStack::FillTrackArray() {
 // -----   Public method UpdateTrackIndex   --------------------------------
 void R3BStack::UpdateTrackIndex(TRefArray* detList) {
 
+  if ( fMinPoints == 0 ) return;  
   cout << "-I- R3BStack: Updating track indizes...";
   Int_t nColl = 0;
 
@@ -251,7 +268,6 @@ void R3BStack::UpdateTrackIndex(TRefArray* detList) {
   FairDetector* det = NULL;
   while( (det = (FairDetector*)detIter->Next() ) ) {
 
-
     // --> Get hit collections from detector
     Int_t iColl = 0;
     TClonesArray* hitArray;
@@ -264,6 +280,8 @@ void R3BStack::UpdateTrackIndex(TRefArray* detList) {
 	FairMCPoint* point = (FairMCPoint*)hitArray->At(iPoint);
 	Int_t iTrack = point->GetTrackID();
 
+	if (fDebug) cout << "-D- R3BMCStack TrackID Get : " << iTrack << endl;
+
 	fIndexIter = fIndexMap.find(iTrack);
 	if (fIndexIter == fIndexMap.end()) {
 	  cout << "-E- R3BStack: Particle index " << iTrack 
@@ -271,7 +289,13 @@ void R3BStack::UpdateTrackIndex(TRefArray* detList) {
 	  Fatal("R3BStack::UpdateTrackIndex",
 		"Particle index not found in map");
 	}
-	point->SetTrackID((*fIndexIter).second);
+	if (fDebug) cout << "-D- R3BMCStack TrackID Set : " << (*fIndexIter).second << endl; 
+	if ( ((*fIndexIter).second ) < 0 ) {
+	   point->SetTrackID(iTrack);
+	}else{
+	   point->SetTrackID((*fIndexIter).second);
+	}
+
       }
 
     }   // Collections of this detector
