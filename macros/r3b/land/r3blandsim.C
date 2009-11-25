@@ -25,7 +25,7 @@ Int_t r3blandsim(){
    //   Geant4:                 "TGeant4"
    //   Fluka :                 "TFluka"
 
-   TString fMC ="TGeant3";
+   TString fMC ="TGeant4";
 
    //-------------------------------------------------
    // Primaries generation
@@ -100,7 +100,7 @@ Int_t r3blandsim(){
    //- N# of Sim. Events   |    nEvents     (Int_t)
    //-------------------------------------------------
 
-   Int_t nEvents = 2;
+   Int_t nEvents = 1000;
 
    //-------------------------------------------------
    //- EventDisplay        |    fEventDisplay (Bool_t)
