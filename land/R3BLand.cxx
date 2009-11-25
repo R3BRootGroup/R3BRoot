@@ -358,7 +358,7 @@ R3BLandPoint* R3BLand::AddHit(Int_t trackID, Int_t detID, Int_t box, Int_t id1, 
 void R3BLand::ConstructGeometry() {
 
 // Scintillators based Land Detector
-    return ConstructGeometry2();
+    return ConstructGeometry1();
 
 }
 
