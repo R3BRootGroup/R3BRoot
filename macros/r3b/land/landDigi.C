@@ -1,10 +1,13 @@
 void landDigi(){
 
   // Input files
-  TString inFile      = "r3bsim.root";
-  TString parFile     = "r3bpar.root"; 
-  // Output file
+   TString inFile      = "r3bsim.root";
+   TString parFile     = "r3bpar.root";
+//  TString inFile      = "/data.local2/mheil/fairroot_results/r3bsim800MeVgeant3hadr5.root"; 
+//  TString parFile     = "/data.local2/mheil/fairroot_results/r3bpar800MeVgeant3hadr5.root";
+  // Output file         
   TString outFile     = "land_digi.root";
+//  TString outFile     = "/data.local2/mheil/fairroot_results/land_digi800MeVgeant3hadr5.root";
 
 
   
@@ -48,7 +51,7 @@ void landDigi(){
   Int_t iVerbose = 1;
   //Connect the Digitization  Task
 
-  R3BNeuLandDigitizer* land  = new R3BNeuLandDigitizer();
+  R3BLandDigitizer* land  = new R3BLandDigitizer();
   fRun->AddTask(land);
 
   // Runtime DataBase info
@@ -63,7 +66,7 @@ void landDigi(){
   fRun->LoadGeometry();
   
   // Number of events to process
-  Int_t nEvents = 2;
+  Int_t nEvents = 10000;
   
   // -----   Intialise and run   --------------------------------------------
   fRun->Init();
