@@ -28,7 +28,8 @@ void Config()
    cout << "-I- R3B Config(): has been created..." << endl;
 
 /// create the Specific stack
-   FairStack *stack = new FairStack(1000); 
+   R3BStack *stack = new R3BStack(1000); 
+   stack->SetDebug(kFALSE);
    stack->StoreSecondaries(kTRUE);
    stack->SetMinPoints(0);
    geant4->SetStack(stack);

@@ -18,10 +18,14 @@ void Config()
       cout << "-I- G3Config: Geant3 native has been created."
              << endl;
   }
-  // create Fair Specific Stack
-  FairStack *st = new FairStack();
+  // create R3B  Specific Stack
+  R3BStack *st = new R3BStack();
+  // Set debug mode
+  st->SetDebug(kFALSE);
   st->SetMinPoints(0);
   st->StoreSecondaries(kTRUE);
+
+  
   geant3->SetStack( st ) ;
 
   // ******* GEANT3  specific configuration for simulated Runs  *******
