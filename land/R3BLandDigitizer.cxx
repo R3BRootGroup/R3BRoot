@@ -27,7 +27,7 @@
 
 
 #include "R3BLandPoint.h"
-#include "FairMCTrack.h"		
+#include "R3BMCTrack.h"		
 using std::cout;
 using std::endl;
 
@@ -206,7 +206,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
    // Get parameter from original neutron   
    // Access to Monte Carlo Info
    //  get object from the TclonesArray at index=TrackID
-   FairMCTrack *aTrack = (FairMCTrack*) fLandMCTrack->At(0);
+   R3BMCTrack *aTrack = (R3BMCTrack*) fLandMCTrack->At(0);
 
    PDG = aTrack->GetPdgCode();
    px0 = aTrack->GetPx()*1000.;  
@@ -219,9 +219,9 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
    z0 = aTrack->GetStartZ();  
    t0 = aTrack->GetStartT();
       
-   //cout << "primary particle " << PDG << endl;
-   //cout << "px, py, pz " << px0 << "  " << py0 << "  " << pz0 << endl;
-   //cout << "Ptransversal, P total " << pt0 << "  " << p0 << endl;
+   cout << "primary particle " << PDG << endl;
+   cout << "px, py, pz " << px0 << "  " << py0 << "  " << pz0 << endl;
+   cout << "Ptransversal, P total " << pt0 << " P: " << p0 << endl;
    
 
    for (Int_t l=0;l<nentries;l++){
@@ -243,7 +243,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
       // Access to Monte Carlo Info
       //  get object from the TclonesArray at index=TrackID
       if(TrackId>0){
-         aTrack = (FairMCTrack*) fLandMCTrack->At(TrackId);
+         aTrack = (R3BMCTrack*) fLandMCTrack->At(TrackId);
          temp[l][11] = aTrack->GetPdgCode();
       }
       else{
