@@ -75,73 +75,125 @@ InitStatus R3BLandDigitizer::Init() {
   //fDigis = new TClonesArray("R3BLandDigi",1000);
   //ioman->Register("LandDigi", "Digital response in Land", fDigis, kTRUE);
 
-  // Initialise control histograms
-  hPMl = new TH1F("PM_left","Arrival times of left PM",1000,0.,1000.);
-  hPMl->GetXaxis()->SetTitle("Time (ns)");
-  hPMl->GetYaxis()->SetTitle("Counts");
-
-  hPMr = new TH1F("PM_right","Arrival times of right PM",1000,0.,1000.);
-  hPMr->GetXaxis()->SetTitle("Time (ns)");
-  hPMr->GetYaxis()->SetTitle("Counts");
-
-  hTotalEnergy = new TH1F("Total_Energy","Total energy deposit",20000,0.,2000.);
-  hTotalEnergy->GetXaxis()->SetTitle("Energy (MeV)");
-  hTotalEnergy->GetYaxis()->SetTitle("Counts");
-
-  hTotalLight = new TH1F("Total_Light","Total light detected (energy equivalent)",20000,0.,2000.);
-  hTotalLight->GetXaxis()->SetTitle("Energy (MeV)");
-  hTotalLight->GetYaxis()->SetTitle("Counts");
-
-  hMult = new TH1F("Multiplicity","Paddle multiplicity",100,0.,100.);
-  hMult->GetXaxis()->SetTitle("Multiplicity");
-  hMult->GetYaxis()->SetTitle("Counts");
-
-  hParticle = new TH1F("Particle","PID of particle which produced the energy loss",3000,0.,3000.);
-  hParticle->GetXaxis()->SetTitle("Particle ID");
-  hParticle->GetYaxis()->SetTitle("Counts");
-  
-  hPaddleEnergy = new TH1F("PaddleEnergy","Energy deposit in one paddle",1000,0.,500.);
-  hPaddleEnergy->GetXaxis()->SetTitle("Energy (MeV)");
-  hPaddleEnergy->GetYaxis()->SetTitle("Counts");
-
-  hFirstEnergy = new TH1F("FirstEnergy","First energy deposit in a paddle",1000,0.,100.);
-  hFirstEnergy->GetXaxis()->SetTitle("Energy (MeV)");
-  hFirstEnergy->GetYaxis()->SetTitle("Counts");
-
-  hDeltaPx1 = new TH1F("DeltaPx1","difference in reconstucted momenta px (ideal case)",1000,-50.,50.);
-  hDeltaPx1->GetXaxis()->SetTitle("Delta Px (MeV/c)");
-  hDeltaPx1->GetYaxis()->SetTitle("Counts");
-
-  hDeltaPy1 = new TH1F("DeltaPy1","difference in reconstucted momenta py (ideal case)",1000,-50.,50.);
-  hDeltaPy1->GetXaxis()->SetTitle("Delta Py (MeV/c)");
-  hDeltaPy1->GetYaxis()->SetTitle("Counts");
-
-  hDeltaPz1 = new TH1F("DeltaPz1","difference in reconstucted momenta pz (ideal case)",1000,-150.,50.);
-  hDeltaPz1->GetXaxis()->SetTitle("Delta Pz (MeV/c)");
-  hDeltaPz1->GetYaxis()->SetTitle("Counts");
-
-  hDeltaPx2 = new TH1F("DeltaPx2","difference in reconstucted momenta px (exp case)",1000,-50.,50.);
-  hDeltaPx2->GetXaxis()->SetTitle("Delta Px (MeV/c)");
-  hDeltaPx2->GetYaxis()->SetTitle("Counts");
-
-  hDeltaPy2 = new TH1F("DeltaPy2","difference in reconstucted momenta py (exp case)",1000,-50.,50.);
-  hDeltaPy2->GetXaxis()->SetTitle("Delta Py (MeV/c)");
-  hDeltaPy2->GetYaxis()->SetTitle("Counts");
-
-  hDeltaPz2 = new TH1F("DeltaPz2","difference in reconstucted momenta pz (exp case)",1000,-150.,50.);
-  hDeltaPz2->GetXaxis()->SetTitle("Delta Pz (MeV/c)");
-  hDeltaPz2->GetYaxis()->SetTitle("Counts");
-
-  hElossLight = new TH2F("ElossLight","Light quenching for protons",100,0.,100.,100,0.,100.);
-  hElossLight->GetXaxis()->SetTitle("Energy (MeV)");
-  hElossLight->GetYaxis()->SetTitle("Light (MeV)");
-
   // Parameter retrieval
   // Only after Init one retrieve the Digitization Parameters!
-  cout << "-I- Max Paddle: "<<  fLandDigiPar->GetMaxPaddle() << endl;
-  cout << "-I- Max Plane: "<<   fLandDigiPar->GetMaxPlane() << endl;
+  npaddles = fLandDigiPar->GetMaxPaddle()+1;
+  nplanes = fLandDigiPar->GetMaxPlane();
+  cout<<"# paddles: "<<npaddles<<"  # planes: "<<nplanes<<endl;
+  plength = 100.; // half length of paddle
+  att = 0.008; // light attenuation factor [1/cm]
+  mn = 939.565; // mass of neutron in MeV/c**2
+  c = 2.99792458E8;
 
+  // Initialise control histograms
+     hPMl = new TH1F("PM_left","Arrival times of left PM",1000,0.,1000.);
+     hPMl->GetXaxis()->SetTitle("Time (ns)");
+     hPMl->GetYaxis()->SetTitle("Counts");
 
+     hPMr = new TH1F("PM_right","Arrival times of right PM",1000,0.,1000.);
+     hPMr->GetXaxis()->SetTitle("Time (ns)");
+     hPMr->GetYaxis()->SetTitle("Counts");
+
+     hTotalEnergy = new TH1F("Total_Energy","Total energy deposit",20000,0.,2000.);
+     hTotalEnergy->GetXaxis()->SetTitle("Energy (MeV)");
+     hTotalEnergy->GetYaxis()->SetTitle("Counts");
+
+     hTotalLight = new TH1F("Total_Light","Total light detected (energy equivalent)",500,0.,100.);
+     hTotalLight->GetXaxis()->SetTitle("Energy (MeV)");
+     hTotalLight->GetYaxis()->SetTitle("Counts");
+  
+     hParticle = new TH1F("Particle","PID of particle which produced the energy loss",3000,0.,3000.);
+     hParticle->GetXaxis()->SetTitle("Particle ID");
+     hParticle->GetYaxis()->SetTitle("Counts");
+  
+     hPaddleEnergy = new TH1F("PaddleEnergy","Energy deposit in one paddle",1000,0.,500.);
+     hPaddleEnergy->GetXaxis()->SetTitle("Energy (MeV)");
+     hPaddleEnergy->GetYaxis()->SetTitle("Counts");
+
+     hFirstEnergy = new TH1F("FirstEnergy","First energy deposit in a paddle",1000,0.,100.);
+     hFirstEnergy->GetXaxis()->SetTitle("Energy (MeV)");
+     hFirstEnergy->GetYaxis()->SetTitle("Counts");
+
+     hDeltaPx1 = new TH1F("DeltaPx1","difference in reconstucted momenta px (ideal case)",1000,-50.,50.);
+     hDeltaPx1->GetXaxis()->SetTitle("Delta Px (MeV/c)");
+     hDeltaPx1->GetYaxis()->SetTitle("Counts");
+
+     hDeltaPy1 = new TH1F("DeltaPy1","difference in reconstucted momenta py (ideal case)",1000,-50.,50.);
+     hDeltaPy1->GetXaxis()->SetTitle("Delta Py (MeV/c)");
+     hDeltaPy1->GetYaxis()->SetTitle("Counts");
+
+     hDeltaPz1 = new TH1F("DeltaPz1","difference in reconstucted momenta pz (ideal case)",1000,-150.,50.);
+     hDeltaPz1->GetXaxis()->SetTitle("Delta Pz (MeV/c)");
+     hDeltaPz1->GetYaxis()->SetTitle("Counts");
+
+     hDeltaPx2 = new TH1F("DeltaPx2","difference in reconstucted momenta px (exp case)",1000,-50.,50.);
+     hDeltaPx2->GetXaxis()->SetTitle("Delta Px (MeV/c)");
+     hDeltaPx2->GetYaxis()->SetTitle("Counts");
+
+     hDeltaPy2 = new TH1F("DeltaPy2","difference in reconstucted momenta py (exp case)",1000,-50.,50.);
+     hDeltaPy2->GetXaxis()->SetTitle("Delta Py (MeV/c)");
+     hDeltaPy2->GetYaxis()->SetTitle("Counts");
+ 
+     hDeltaPz2 = new TH1F("DeltaPz2","difference in reconstucted momenta pz (exp case)",1000,-150.,50.);
+     hDeltaPz2->GetXaxis()->SetTitle("Delta Pz (MeV/c)");
+     hDeltaPz2->GetYaxis()->SetTitle("Counts");
+
+     hElossLight = new TH2F("ElossLight","Light quenching for protons",100,0.,100.,100,0.,100.);
+     hElossLight->GetXaxis()->SetTitle("Energy (MeV)");
+     hElossLight->GetYaxis()->SetTitle("Light (MeV)");
+
+     hNeutmult1 = new TH1F("Neutmult1","Neutron multiplicity from beta beam considerations",20,-0.5,19.5);
+     hNeutmult1->GetXaxis()->SetTitle("Multiplicity");
+     hNeutmult1->GetYaxis()->SetTitle("Counts");
+     
+     hNeutmult2 = new TH1F("Neutmult2","Neutron multiplicity from speed of light considerations",20,-0.5,19.5);
+     hNeutmult2->GetXaxis()->SetTitle("Multiplicity");
+     hNeutmult2->GetYaxis()->SetTitle("Counts");
+
+     hDeltaP1 = new TH1F("DeltaP1","difference in reconstucted momenta using beta beam",1000,-150.,50.);
+     hDeltaP1->GetXaxis()->SetTitle("Delta P (MeV/c)");
+     hDeltaP1->GetYaxis()->SetTitle("Counts");
+
+     hDeltaP2 = new TH1F("DeltaP2","difference in reconstucted momenta using measured beta",1000,-150.,50.);
+     hDeltaP2->GetXaxis()->SetTitle("Delta P (MeV/c)");
+     hDeltaP2->GetYaxis()->SetTitle("Counts");
+
+     hDeltaX = new TH1F("DeltaX","error in x determination",300,-150.,150.);
+     hDeltaX->GetXaxis()->SetTitle("x position (cm)");
+     hDeltaX->GetYaxis()->SetTitle("Counts");
+     
+     hDeltaY = new TH1F("DeltaY","error in y determination",300,-150.,150.);
+     hDeltaY->GetXaxis()->SetTitle("y position (cm)");
+     hDeltaY->GetYaxis()->SetTitle("Counts");
+     
+     hDeltaZ = new TH1F("DeltaZ","error in z determination",300,-150.,150.);
+     hDeltaZ->GetXaxis()->SetTitle("z position (cm)");
+     hDeltaZ->GetYaxis()->SetTitle("Counts");
+     
+     hDeltaT = new TH1F("DeltaT","error in time determination",2000,-10.,10.);
+     hDeltaT->GetXaxis()->SetTitle("time (ns)");
+     hDeltaT->GetYaxis()->SetTitle("Counts");
+
+     hFirstMedia = new TH1F("FirstMedia","First media hit",10,0.,10.);
+     hFirstMedia->GetXaxis()->SetTitle("Media");
+     hFirstMedia->GetYaxis()->SetTitle("Counts");
+     
+  if(npaddles<202){
+     //LAND detector
+
+     hMult = new TH1F("Multiplicity","Paddle multiplicity",20,-0.5,19.5);
+     hMult->GetXaxis()->SetTitle("Multiplicity");
+     hMult->GetYaxis()->SetTitle("Counts");
+
+  }
+  else if(npaddles>202){
+     //Neuland detector
+
+     hMult = new TH1F("Multiplicity","Paddle multiplicity",100,0.,100.);
+     hMult->GetXaxis()->SetTitle("Multiplicity");
+     hMult->GetYaxis()->SetTitle("Counts");
+
+  }  
   return kSUCCESS;
 
 }
@@ -159,18 +211,20 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 //-Now do the job event/event
    //cout<<"**** In land digitizer ****"<< endl;
 
+   Double_t timeRes;
+   if(npaddles<202){
+      //LAND detector
+      timeRes = 0.2;//ns
+   }
+   else if(npaddles>201){
+      //NeuLAND detector
+      timeRes = 0.1;//ns  
+   }
 
-   Int_t npaddles = 200+1;  //number of paddles
-   Int_t nplanes = 10;  //number of planes
-   Double_t plength = 100.; // half length of paddle
-   Double_t att = 0.008; // light attenuation factor [1/cm]
-   Double_t mn = 939.565; // mass of neutron in MeV/c**2
-   Double_t c = 2.99792458E8;
-   
    Int_t nentries = fLandPoints->GetEntries();
    
-   Double_t hit[nentries][12];
-   Double_t temp[nentries][12];
+   Double_t hit[nentries][14];
+   Double_t temp[nentries][14];
    Double_t PMLtime[npaddles][100],PMRtime[npaddles][100];
    Double_t PMLlight[npaddles][100],PMRlight[npaddles][100];
    Double_t PMLenergy[npaddles][100],PMRenergy[npaddles][100];
@@ -184,11 +238,11 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
    Double_t xpos[npaddles],ypos[npaddles],zpos[npaddles];
    Double_t xpos_temp[npaddles],ypos_temp[npaddles],zpos_temp[npaddles];
    Double_t beta,gamma,px,py,pz,p;
-   Double_t firstHitX,firstHitY,firstHitZ,firstT;
+   Double_t firstHitX,firstHitY,firstHitZ,firstT,firstMedia;
    Double_t E_lab;
    Double_t xpaddle[npaddles],ypaddle[npaddles],zpaddle[npaddles];
    Int_t PDG;
-   Double_t px0,py0,pz0,pt0,p0,x0,y0,z0,t0;
+   Double_t px0,py0,pz0,pt0,p0,x0,y0,z0,t0,s,rr;
 
    // reset    
    for (Int_t j=0;j<npaddles;j++){      
@@ -207,7 +261,8 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
    // Access to Monte Carlo Info
    //  get object from the TclonesArray at index=TrackID
    R3BMCTrack *aTrack = (R3BMCTrack*) fLandMCTrack->At(0);
-
+   
+   px0=0;
    PDG = aTrack->GetPdgCode();
    px0 = aTrack->GetPx()*1000.;  
    py0 = aTrack->GetPy()*1000.;  
@@ -219,9 +274,9 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
    z0 = aTrack->GetStartZ();  
    t0 = aTrack->GetStartT();
       
-   cout << "primary particle " << PDG << endl;
-   cout << "px, py, pz " << px0 << "  " << py0 << "  " << pz0 << endl;
-   cout << "Ptransversal, P total " << pt0 << " P: " << p0 << endl;
+   //cout << "primary particle " << PDG << endl;
+   //cout << "px, py, pz " << px0 << "  " << py0 << "  " << pz0 << endl;
+   //cout << "Ptransversal, P total " << pt0 << "  " << p0 << endl;
    
 
    for (Int_t l=0;l<nentries;l++){
@@ -240,16 +295,12 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
       temp[l][9] = land_obj->GetZOut();	  
       temp[l][10] = land_obj->GetTime();
       TrackId = land_obj->GetTrackID();
-      // Access to Monte Carlo Info
-      //  get object from the TclonesArray at index=TrackID
-      if(TrackId>0){
-         aTrack = (R3BMCTrack*) fLandMCTrack->At(TrackId);
-         temp[l][11] = aTrack->GetPdgCode();
-      }
-      else{
-         temp[l][11] = aTrack->GetPdgCode();
-      }
-      //cout << "TrackID " << TrackId << "  PDG code " << temp[l][11] << endl;
+      aTrack = (R3BMCTrack*) fLandMCTrack->At(TrackId);
+      temp[l][11] = aTrack->GetPdgCode();
+      temp[l][12] = land_obj->GetPaddleType();
+      temp[l][13] = TrackId;
+   
+
       if(temp[l][11]==2212){
          hElossLight->Fill(temp[l][2],temp[l][3],1.);
          //cout << "Eloss " << temp[l][2] << "  Light " << temp[l][3] << endl;
@@ -281,6 +332,8 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
       hit[i][9] = temp[index][9];
       hit[i][10] = temp[index][10];
       hit[i][11] = temp[index][11];
+      hit[i][12] = temp[index][12];
+      hit[i][13] = temp[index][13];
       temp[index][10] = 100000.;
 
    }	   
@@ -298,10 +351,14 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
       Double_t yOut = hit[l][8];
       Double_t zOut = hit[l][9];
       Double_t time = hit[l][10];
+      Int_t media = int(hit[l][12]);
            
       Double_t x = (xIn+xOut)/2.;
       Double_t y = (yIn+yOut)/2.;
       Double_t z = (zIn+zOut)/2.;
+
+      //cout<<"z in "<< zIn << endl;
+      //cout<<"z out "<< zOut << endl;
      
       Int_t PID = int(hit[l][11]);
       
@@ -310,23 +367,35 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
          firstHitY = y;
          firstHitZ = z;
          firstT = time;
+         firstMedia=media;
+	 
+/*
+         aTrack = (R3BMCTrack*) fLandMCTrack->At(int(hit[l][13]));
+   
+         cout <<"paddle type "<<temp[l][12]<<endl;
+         cout<<"PID "<< aTrack->GetPdgCode() << endl;
+         cout<<"PID "<< PID << endl;
+
+         cout<<"PX "<< aTrack->GetPx()*1000. << endl;
+         cout<<"PY "<< aTrack->GetPy()*1000. << endl;      
+         cout<<"PZ "<< aTrack->GetPz()*1000. << endl;
+
+         cout<<"1st entry # "<< l << " of " << nentries << endl;
+         cout<<"1st paddle # "<< paddle << "  " << hit[l][0] << endl;
+         cout<<"1st scint # "<< scint << "  " << hit[l][1] << endl;
+         cout<<"1st Eloss "<< eloss << endl;
+         cout<<"1st Light "<< light << endl;
+         cout<<"1st X "<< x << endl;
+         cout<<"1st Y "<< y << endl;      
+         cout<<"1st Z "<< z << endl;
+         cout<<"1st Media "<< media << endl;      
+         cout<<"1st time "<< time << endl;
+*/
       }
       
-/*      
-//      if(hit[l][0]==229 || hit[l][0]==229 || hit[l][0]==229){
-      cout<<"entry # "<< l << " of " << nentries << endl;
-      cout<<"paddle # "<< paddle << "  " << hit[l][0] << endl;
-      cout<<"scint # "<< scint << "  " << hit[l][1] << endl;
-      cout<<"Eloss "<< eloss << endl;
-      cout<<"Light "<< light << endl;
-      cout<<"X "<< x << endl;
-      cout<<"Y "<< y << endl;      
-      cout<<"Z "<< z << endl;
-      cout<<"time "<< time << endl;
-//      }
-*/  
               
-      if (eloss > 0. ) {
+      if (eloss > 0. && media == 3) {
+	 
          // store Particle ID which caused the energy loss
          if(eloss > 1.) hParticle->Fill(PID,1.);
 
@@ -359,9 +428,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
          // identify x and y paddles and calculate light transmission to the PM's
 	 // first plane are horizontal paddles
 
-         //<DB> Check me !
-	 /*
-	 if(paddle > 100) {
+	 if(paddle > (npaddles-1)/2) {
 	    // vertical paddles
 	    PMLtime[paddle][m] = time+(plength-y)/20.;
             PMLlight[paddle][m] = PMLlight[paddle][m]+light*exp(-att*(plength-y));
@@ -379,7 +446,6 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
             PMRlight[paddle][m] = PMRlight[paddle][m]+light*exp(-att*(plength+x));
             PMRenergy[paddle][m] = PMRenergy[paddle][m]+eloss*exp(-att*(plength+x));
          }
-	 */
 
       }//! eloss	 
            
@@ -403,7 +469,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 	    // This is supposed to mimic a QDC and a TDC
 	    // check if light is larger than threshold and register time
             // Take also time resolution of sigma=200 ps into account
-            Double_t num=gRandom->Gaus(0.,0.2);
+            Double_t num=gRandom->Gaus(0.,timeRes);
 	    tofl=PMLtime[i][j]+num;
 	    multl=multl+1;
 	    lightl=0.;	   
@@ -413,7 +479,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 	       if(TMath::Abs(PMLtime[i][k]-tofl) < 100.) {
   	          lightl=lightl+PMLlight[i][k];
   	          enerl=enerl+PMLenergy[i][k];
-	          if(i==110){
+	          if(i<41){
                      // control histograms
 	             hPMl ->Fill(PMLtime[i][k],PMLlight[i][k]);
                   }
@@ -428,7 +494,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 	    // This is supposed to mimic a QDC and a TDC
 	    // check if light is larger than threshold and register time
             // Take also time resolution of sigma=200 ps into account
-            Double_t num=gRandom->Gaus(0.,0.2);
+            Double_t num=gRandom->Gaus(0.,timeRes);
 	    tofr=PMRtime[i][j]+num;
 	    multr=multr+1;
 	    lightr=0.;	   
@@ -438,7 +504,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 	       if(TMath::Abs(PMRtime[i][k]-tofr) < 100.) {
   	          lightr=lightr+PMRlight[i][k];
   	          enerr=enerr+PMRenergy[i][k];
-	          if(i==110){
+	          if(i<41){
                      // control histograms
 	             hPMr ->Fill(PMRtime[i][k],PMRlight[i][k]);
                   }
@@ -454,7 +520,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
          QDC2_temp[mult] = sqrt(enerl*enerr);
          TDC_temp[mult] = (tofl + tofr) / 2. - 5.;
 	 
-	 if(i > 100) {
+	 if(i > (npaddles-1)/2) {
 	    // vertical paddles
 	    xpos_temp[mult] = xpaddle[i];
 	    ypos_temp[mult] = (tofr - tofl)*10.;	    
@@ -505,22 +571,37 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
       
    }	  
    if(mult>0){
-      //cout<<"POS ist  "<< xpos[1] << "  " << ypos[1]<< "  " << zpos[1] << endl;
-      //cout<<"POS soll "<< firstHitX << "  " << firstHitY << "  " << firstHitZ << endl;
+
+      // Record the difference in detection of visible light and real position or time
+      hDeltaX->Fill(firstHitX-xpos[1],1.);
+      hDeltaY->Fill(firstHitY-ypos[1],1.);
+      hDeltaZ->Fill(firstHitZ-zpos[1],1.);
+      hDeltaT->Fill(firstT-TDC[1],1.);
+      hFirstMedia->Fill(firstMedia,1.);   
+      
+      
+//      cout<<"POS ist  "<< xpos[1] << "  " << ypos[1]<< "  " << zpos[1] <<"  "<< TDC[1]<< endl;
+//      cout<<"POS soll "<< firstHitX << "  " << firstHitY << "  " << firstHitZ <<"  "<< firstT<< endl;
+      
+//      cout<<"DeltaT "<< TDC[1]-firstT << endl;
 
       // Reconstruct neutron momentum with first hit.
       // First with the ideal position from simulations.
       // This gives us a hint about maximum possible resolution.
 
-//      px=mn*(firstHitX-x0)/(firstT-t0)*1.E7/c; 
-//      py=mn*(firstHitY-y0)/(firstT-t0)*1.E7/c; 
+      s = sqrt((firstHitX-x0)*(firstHitX-x0)+
+                        (firstHitY-y0)*(firstHitY-y0)+
+                        (firstHitZ-z0)*(firstHitZ-z0));
       
-      px=pz0*(firstHitX-x0)/(firstHitZ-z0);
-      py=pz0*(firstHitY-y0)/(firstHitZ-z0);
-
-      beta=(firstHitZ-z0)/(firstT-t0)*1.E7/c;
+      beta=s/(firstT-t0)*1.E7/c;
+      //cout<<"beta "<< beta << endl;
       gamma=1./sqrt(1.-beta*beta);
-      pz=beta*gamma*mn;
+      p=beta*gamma*mn;    
+      rr=sqrt((firstHitX-x0)*(firstHitX-x0)+
+              (firstHitY-y0)*(firstHitY-y0));
+      pz=cos(atan(rr/(firstHitZ-z0)))*p;
+      px=pz*(firstHitX-x0)/(firstHitZ-z0);
+      py=pz*(firstHitY-y0)/(firstHitZ-z0);
 
       // Lorentz Transformation
       E_lab=sqrt(pz0*pz0+mn*mn);
@@ -535,21 +616,22 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
       //cout<<"momentum exp "<< px << "  " << py << "  " << pz << endl;
       //cout<<"momentum sim "<< px0 << "  " << py0 << "  " << pz0 << endl;
   
-      beta=sqrt(firstHitX*firstHitX+firstHitY*firstHitY+firstHitZ*firstHitZ)/
-      firstT*1.E7/c;
-      gamma=1./sqrt(1-beta*beta);
-      p=beta*gamma*mn;
-
-      //cout<<"Beta "<< beta << " Gamma " << gamma << " P " << p << endl;
 
       // Now reconstruction of momenta with real measured quantities
    
-      px=pz0*(xpos[1]-x0)/(zpos[1]-z0); 
-      py=pz0*(ypos[1]-y0)/(zpos[1]-z0); 
- 
-      beta=(zpos[1]-z0)/(TDC[1]-t0)*1.E7/c;
+      s = sqrt((xpos[1]-x0)*(xpos[1]-x0)+
+               (ypos[1]-y0)*(ypos[1]-y0)+
+               (zpos[1]-z0)*(zpos[1]-z0));
+      
+      beta=s/(TDC[1]-t0)*1.E7/c;
+      //cout<<"beta "<< beta << endl;
       gamma=1./sqrt(1.-beta*beta);
-      pz=beta*gamma*mn;
+      p=beta*gamma*mn;    
+      rr=sqrt((xpos[1]-x0)*(xpos[1]-x0)+
+              (ypos[1]-y0)*(ypos[1]-y0));
+      pz=cos(atan(rr/(zpos[1]-z0)))*p;
+      px=pz*(xpos[1]-x0)/(zpos[1]-z0);
+      py=pz*(ypos[1]-y0)/(zpos[1]-z0);
 
       // Lorentz Transformation
       E_lab=sqrt(pz0*pz0+mn*mn);
@@ -561,6 +643,8 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
       hDeltaPy2 ->Fill(py-py0,1.);
       hDeltaPz2 ->Fill(pz,1.);
 
+      hDeltaP1->Fill(px0*px0+py0*py0-(px*px+py*py+pz*pz));
+      
       //cout<<"momentum exp "<< px << "  " << py << "  " << pz << endl;
       //cout<<"momentum sim "<< px0 << "  " << py0 << "  " << pz0 << endl;
  
@@ -578,8 +662,94 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
       hFirstEnergy->Fill(QDC[1],1.);
 
       //cout<<"Total light "<< TotalLight << endl;
+      //cout<<"Total energy "<< TotalEnergy << endl;
       
    }
+
+   // Analyse multiple neutron hits     
+   Int_t neutmult1,neutmult2,flag_new;
+   Double_t neut2x[npaddles],neut2y[npaddles],neut2z[npaddles],neut2t[npaddles];
+   Double_t neut1x[npaddles],neut1y[npaddles],neut1z[npaddles],neut1t[npaddles];
+   Double_t deltat,deltar,deltaz,dt,dx,dy,dz;
+   if (mult==0) {
+      neutmult1=0;
+      neutmult2=0;
+   }   	
+   if (mult>0) {
+      neutmult1=1;
+      neut1x[1]=xpos[1];
+      neut1y[1]=ypos[1];
+      neut1z[1]=zpos[1];
+      neut1t[1]=TDC[1];
+      neutmult2=1;
+      neut2x[1]=xpos[1];
+      neut2y[1]=ypos[1];
+      neut2z[1]=zpos[1];
+      neut2t[1]=TDC[1];
+   }	
+   for (Int_t i=2;i<mult+1;i++){
+      flag_new=1;
+      for (Int_t j=1;j<neutmult2+1;j++){
+         deltat=TDC[i]-neut2t[j];
+         deltar=sqrt((xpos[i]-neut2x[j])*(xpos[i]-neut2x[j])+
+    	             (ypos[i]-neut2y[j])*(ypos[i]-neut2y[j])+
+     		     (zpos[i]-neut2z[j])*(zpos[i]-neut2z[j]));
+
+//         cout<<"neutron "<<neut2x[j]<<"  "<<neut2y[j]<<"  "<<neut2z[j]<<endl;		     
+//         cout<<"time "<<TDC[i]<<"  "<<neut2t[j]<<endl;		     
+	 
+         Double_t speed = TMath::Abs(deltar/deltat/c/100./1.E-9);
+//	 cout<<"speed "<<speed<<" distance "<< deltar<< " time "<<deltat<<endl;
+         if(speed<1.1 || deltar<20. || deltat<0.2) {
+            flag_new=0;
+	 }
+      }
+      if (flag_new==1) {
+         neutmult2=neutmult2+1;
+         neut2x[neutmult2]=xpos[i];
+         neut2y[neutmult2]=ypos[i];
+         neut2z[neutmult2]=zpos[i];  
+         neut2t[neutmult2]=TDC[i];  	    
+//         cout<<"**** another neutron needed ****"<<endl;
+//         cout<<"pos "<<xpos[i]<<"  "<<ypos[i]<<"  "<<zpos[i]<<endl;
+      }
+
+      // calculate ToF for the distance with nominal beam energy
+      beta=pz0/sqrt(pz0*pz0+mn*mn);
+      deltaz=zpos[i]-zpos[1];
+      deltat=TDC[i]-TDC[1];
+      dt=deltaz/beta/c/100.;
+
+      Double_t beta1=deltaz/deltat/1.E-9/100./c;
+      
+//      cout<<"beta "<<beta<<" beta1 "<<beta1<<endl;
+
+      if(TMath::Abs(beta-beta1)<0.2) {
+         flag_new=1;
+         for (Int_t j=1;j<neutmult1+1;j++){
+	    dx=(neut1x[j]-xpos[j]);
+	    dy=(neut1y[j]-ypos[j]);
+	    dz=(neut1z[j]-zpos[j]);
+	    if(sqrt(dx*dx+dy*dy+dz*dz)<20.) {
+//	       cout<<"Too close to the hit "<< j<<endl;
+	       flag_new=0;
+	    }
+	 }
+         if (flag_new==1) {
+	    neutmult1=neutmult1+1;
+	    neut1x[neutmult1]=xpos[i];
+	    neut1y[neutmult1]=ypos[i];
+	    neut1z[neutmult1]=zpos[i];  
+	    neut1t[neutmult1]=TDC[i];
+//            cout<<"new neutron "<<endl;
+//            cout<<"beta "<<deltaz/deltat/c/100.<<endl;
+//            cout<<"pos "<<xpos[i]<<"  "<<ypos[i]<<"  "<<zpos[i]<<endl;
+	 }
+      }
+   }
+   hNeutmult1->Fill(neutmult1);
+   hNeutmult2->Fill(neutmult2);
+
 }
 // -------------------------------------------------------------------------
 
@@ -612,6 +782,17 @@ void R3BLandDigitizer::Finish()
    hTotalLight->Write();
    hTotalEnergy->Write();
    hElossLight->Write();
+
+   hNeutmult1->Write();
+   hNeutmult2->Write();
+
+   hDeltaX->Write();
+   hDeltaY->Write();
+   hDeltaZ->Write();
+   hDeltaT->Write();
+
+   hFirstMedia->Write();
+   
 }
 
 ClassImp(R3BLandDigitizer)
