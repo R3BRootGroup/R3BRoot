@@ -449,8 +449,8 @@ void r3ball(Int_t nEvents = 1,
   Double_t theta2 = 2.;
   // LAND deuterium breakup : 0.765,1.0555,1.2254,1.4713,1.7629 MeV/c
   //                           270,  470,   600,   800,   1050 MeV
-  Double_t momentum= 0.765; // GeV/c
-  FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 1);
+  Double_t momentum= 1.7629; // GeV/c
+  FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 2);
   boxGen->SetThetaRange (   theta1,   theta2);
   boxGen->SetPRange     (momentum,momentum*1.);
   boxGen->SetPhiRange   (0.,360.);
@@ -551,7 +551,7 @@ void r3ball(Int_t nEvents = 1,
   cout << "Real time " << rtime << " s, CPU time " << ctime 
        << "s" << endl << endl;
   // ------------------------------------------------------------------------
-
+ 
   cout << " Test passed" << endl;
   cout << " All ok " << endl;
 
