@@ -61,6 +61,27 @@ class R3BLandDigitizer : public FairTask
   TH1F *hDeltaPz2;
   
   TH2F *hElossLight;
+
+  TH1F *hNeutmult1;
+  TH1F *hNeutmult2;
+
+  TH1F *hDeltaP1;
+  TH1F *hDeltaP2;
+
+  TH1F *hDeltaX;
+  TH1F *hDeltaY;
+  TH1F *hDeltaZ;
+  TH1F *hDeltaT;
+ 
+  TH1F *hFirstMedia;
+
+  Int_t npaddles;
+  Int_t nplanes;
+
+  Double_t plength; // half length of paddle
+  Double_t att; // light attenuation factor [1/cm]
+  Double_t mn; // mass of neutron in MeV/c**2
+  Double_t c;
   
   private:
   virtual void SetParContainers();
