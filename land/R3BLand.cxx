@@ -590,11 +590,11 @@ void R3BLand::ConstructGeometry1() {
    zz = 0.;
    aLand->AddNode(trap,3,new TGeoCombiTrans(xx,yy,zz,rot2));
 
-   //   AddSensitiveVolume(padle_h_box3); //Fe
-   //   AddSensitiveVolume(padle_h_box4); //Fe
+      AddSensitiveVolume(padle_h_box3); //Fe
+      AddSensitiveVolume(padle_h_box4); //Fe
    AddSensitiveVolume(padle_h_box5); //Scint.
 
-   fNbOfSensitiveVol+=1; //? FIXME
+   fNbOfSensitiveVol+=3; //? FIXME
 
    //paddles
    TGeoRotation *rot3 = new TGeoRotation();
@@ -718,6 +718,19 @@ void R3BLand::ConstructGeometry1() {
    TGeoCombiTrans *t0 = new TGeoCombiTrans(tx,ty,tz,rotg);
 
    vWorld->AddNode(cell,1, GetGlobalPosition(t0) );
+
+  // Now save some basic  geometry parameters
+  // Get the parameter factory
+  FairRun *fRun = FairRun::Instance();
+  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
+  R3BLandDigiPar* par=(R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
+  // max_paddle 200;
+  // max_plane 10
+  par->SetMaxPaddle(200) ;
+  par->SetMaxPlane(10);
+  par->setChanged();
+  //par->setInputVersion(fRun->GetRunId(),1);
+
 
 }
 
@@ -921,8 +934,8 @@ void R3BLand::ConstructGeometry2() {
   R3BLandDigiPar* par=(R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
   // max_paddle 200;
   // max_plane 10
-  par->SetMaxPaddle(200) ;
-  par->SetMaxPlane(10);
+  par->SetMaxPaddle(1600) ;
+  par->SetMaxPlane(20);
   par->setChanged();
   //par->setInputVersion(fRun->GetRunId(),1);
 
