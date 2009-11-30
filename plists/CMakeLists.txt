@@ -5,21 +5,14 @@
 set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
 #put here all directories where header files are located
-${R3BROOT_SOURCE_DIR}/base
-${R3BROOT_SOURCE_DIR}/passive
-${R3BROOT_SOURCE_DIR}/mcstack
-${R3BROOT_SOURCE_DIR}/tof
-${R3BROOT_SOURCE_DIR}/r3bdata/calData
-${R3BROOT_SOURCE_DIR}/r3bdata/dchData
-${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
-${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
-${R3BROOT_SOURCE_DIR}/r3bdata/tofData
-${R3BROOT_SOURCE_DIR}/r3bdata/landData
-${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
-${R3BROOT_SOURCE_DIR}/base
-${R3BROOT_SOURCE_DIR}/parbase
-${R3BROOT_SOURCE_DIR}/geobase
-${R3BROOT_SOURCE_DIR}/plists
+${HYPROOT_SOURCE_DIR}/base
+${HYPROOT_SOURCE_DIR}/passive
+${HYPROOT_SOURCE_DIR}/mcstack
+${HYPROOT_SOURCE_DIR}/tof
+${HYPROOT_SOURCE_DIR}/base
+${HYPROOT_SOURCE_DIR}/parbase
+${HYPROOT_SOURCE_DIR}/geobase
+${HYPROOT_SOURCE_DIR}/plists
 ${GEANT4_INCLUDE_DIR}
 ${CLHEP_INCLUDE_DIR}
 ${GEANT4VMC_INCLUDE_DIR}
@@ -30,6 +23,11 @@ include_directories( ${INCLUDE_DIRECTORIES})
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
 ) 
+
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2")
+set(CMAKE_CXX_FLAGS_RELEASE        "-O2")
+set(CMAKE_CXX_FLAGS_DEBUG          "-g -O2 -fno-reorder-blocks -fno-schedule-insns -fno-inline")
+set(CMAKE_CXX_FLAGS_DEBUG          "-g")
 
 link_directories( ${LINK_DIRECTORIES})
 
