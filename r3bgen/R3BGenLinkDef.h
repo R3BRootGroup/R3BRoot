@@ -12,6 +12,7 @@
 #pragma link C++ class  R3BBeamInfo+;
 #pragma link C++ class  R3BBackTracking+;
 #pragma link C++ class  R3BBackTrackingStorageState+;
+#pragma link C++ class  R3BAsciiGenerator+;
 
 
 #endif
