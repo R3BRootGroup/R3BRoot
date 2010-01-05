@@ -40,6 +40,7 @@ R3BCDGenerator.cxx
 R3BBeamInfo.cxx
 R3BBackTracking.cxx
 R3BBackTrackingStorageState.cxx
+R3BAsciiGenerator.cxx
 )
 
 if(RULE_CHECKER_FOUND)
