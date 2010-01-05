@@ -441,6 +441,14 @@ void r3ball(Int_t nEvents = 1,
   // 1 - Create the Main API class for the Generator
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
+  if (fGenerator.CompareTo("ascii") == 0  ) {
+  TString evtFile = "evt_gen.dat";
+  TString iFile = dir + "/input/" + evtFile;
+  R3BAsciiGenerator* gen = new R3BAsciiGenerator(iFile.Data());
+  // add the ascii generator
+  primGen->AddGenerator(gen);
+  } 
+
 
   if (fGenerator.CompareTo("box") == 0  ) {
   // 2- Define the BOX generator
