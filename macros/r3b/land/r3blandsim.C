@@ -25,16 +25,17 @@ Int_t r3blandsim(){
    //   Geant4:                 "TGeant4"
    //   Fluka :                 "TFluka"
 
-   TString fMC ="TGeant4";
+   TString fMC ="TGeant3";
 
    //-------------------------------------------------
    // Primaries generation
    // Event Generator Type |   fGene       (TString)
    //-------------------------------------------------
    // Box generator:             "box"
+   // Ascii generator:           "ascii"
    // R3B spec. generator:       "r3b"
 
-   TString fGene="box";
+   TString fGene="ascii";
 
    //-------------------------------------------------
    // Secondaries  generation (G4 only)
@@ -100,7 +101,7 @@ Int_t r3blandsim(){
    //- N# of Sim. Events   |    nEvents     (Int_t)
    //-------------------------------------------------
 
-   Int_t nEvents = 1000;
+   Int_t nEvents = 3;
 
    //-------------------------------------------------
    //- EventDisplay        |    fEventDisplay (Bool_t)
