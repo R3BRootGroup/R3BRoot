@@ -1,0 +1,14 @@
+## <DB. January 2010> 
+## Simple script to produce PDF format out of
+## manual tex file.
+
+rm -f *.{blg,bbl,toc,out,log,aux,pdf,dvi}
+
+latex manual
+bibtex manual
+#makeindex manual.nlo -s nomencl.ist -o manual.nls
+latex manual
+latex manual
+latex manual
+
+dvipdfm -p a4 -o manual.pdf manual.dvi
