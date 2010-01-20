@@ -101,8 +101,8 @@ Bool_t R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen) {
   for (Int_t itrack=0; itrack<nTracks; itrack++) {
 
       *fInputFile >> iPid  >> iZ >> iA >> px >> py >> pz >> vx >> vy >> vz;
-
-     /* cout << "-I- R3BAsciiGenerator: iPid: " << iPid <<
+     /*
+      cout << "-I- R3BAsciiGenerator: iPid: " << iPid <<
 	  ",   A = " << iA << " Z = " << iZ <<
 	  " px = "  << px <<
 	  " py = "  << py <<
@@ -126,9 +126,10 @@ Bool_t R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen) {
 	  }
 	  pdgType = part->PdgCode();
       }
-      else pdgType = iPid;  // "normal" particle
+      else pdgType = iA;  // "normal" particle
 
       // Give track to PrimaryGenerator
+      //cout << "PDG : " << pdgType << endl;
       primGen->AddTrack(pdgType, px, py, pz, vx, vy, vz);
 
   }//! tracks
