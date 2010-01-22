@@ -75,12 +75,17 @@ class R3BLandDigitizer : public FairTask
  
   TH1F *hFirstMedia;
 
+  TH1F *hMinv;
+  TH1F *hMinv0;
+
   Int_t npaddles;
   Int_t nplanes;
 
   Double_t plength; // half length of paddle
   Double_t att; // light attenuation factor [1/cm]
   Double_t mn; // mass of neutron in MeV/c**2
+  Double_t mnu; // mass of neutron in atomic mass units
+  Double_t amu; //atomic mass unit in MeV/c**2
   Double_t c;
   
   private:

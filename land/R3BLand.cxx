@@ -358,7 +358,10 @@ R3BLandPoint* R3BLand::AddHit(Int_t trackID, Int_t detID, Int_t box, Int_t id1, 
 void R3BLand::ConstructGeometry() {
 
 // Scintillators based Land Detector
-    return ConstructGeometry1();
+//    return ConstructGeometry1(); // standard LAND geometry
+//    return ConstructGeometry2(); // Neuland with 5x5x200cm BC408
+//    return ConstructGeometry3(); // Neuland with 3x3x200cm BC408
+    return ConstructGeometry4(); // Neuland with 10x10x200cm BC408
 
 }
 
@@ -735,6 +738,9 @@ void R3BLand::ConstructGeometry1() {
 }
 
 void R3BLand::ConstructGeometry2() {   
+   // different geometry for testing the Neuland detector
+   // only scintillators 5cm x 5cm x 200cm
+   //------------------ BC408 sheets -----------------------------------------
 
   // out-of-file geometry definition
    Double_t dx,dy,dz;
@@ -941,6 +947,426 @@ void R3BLand::ConstructGeometry2() {
 
 }
 
+
+void R3BLand::ConstructGeometry3() {   
+   // different geometry for testing the Neuland detector
+   // only scintillators 3cm x 3cm x 200cm
+   //------------------ BC408 sheets -----------------------------------------
+
+  // out-of-file geometry definition
+   Double_t dx,dy,dz;
+   Double_t dx1, dx2, dy1, dy2;
+   Double_t a;
+   Double_t z, density, w;
+   Double_t tx,ty,tz;
+   Int_t nel, numed;
+   Double_t radl,absl;
+
+/****************************************************************************/
+// Material definition
+
+   // Mixture: Air
+   TGeoMedium * pMed2=NULL;
+   if (gGeoManager->GetMedium("Air") ){
+      pMed2=gGeoManager->GetMedium("Air");
+   }
+   else{
+      nel     = 2;
+      density = 0.001290;
+      TGeoMixture*
+	pMat2 = new TGeoMixture("Air", nel,density);
+      a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+      pMat2->DefineElement(0,a,z,w);
+      a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+      pMat2->DefineElement(1,a,z,w);
+      pMat2->SetIndex(1);
+      // Medium: Air
+      numed   = 1;  // medium number
+      Double_t par[8];
+      par[0]  = 0.000000; // isvol
+      par[1]  = 0.000000; // ifield
+      par[2]  = 0.000000; // fieldm
+      par[3]  = 0.000000; // tmaxfd
+      par[4]  = 0.000000; // stemax
+      par[5]  = 0.000000; // deemax
+      par[6]  = 0.000100; // epsil
+      par[7]  = 0.000000; // stmin
+      pMed2 = new TGeoMedium("Air", numed,pMat2, par);
+   }
+
+
+//------------------Creat media----------------------------------
+ // --  Material: Iron
+   TGeoMedium * pMedFe=NULL;
+   if (gGeoManager->GetMedium("Iron") ){
+      pMedFe=gGeoManager->GetMedium("Iron");
+   }
+   else{
+      w       =        0.;
+      a       = 55.850000;
+      z       = 26.000000;
+      density = 7.870000;
+      radl    = 1.757717;
+      absl    = 169.994418;
+      TGeoMaterial*
+	pMatFe = new TGeoMaterial("Iron", a,z,density,radl,absl);
+      pMatFe->SetIndex(701);
+      numed   = 23;  // medium number
+      Double_t par[8];
+      par[0]  = 0.000000; // isvol
+      par[1]  = 0.000000; // ifield
+      par[2]  = 0.000000; // fieldm
+      par[3]  = 0.000000; // tmaxfd
+      par[4]  = 0.000000; // stemax
+      par[5]  = 0.000000; // deemax
+      par[6]  = 0.000100; // epsil
+      par[7]  = 0.000000; // stmin
+      pMedFe = new TGeoMedium("Iron", numed,pMatFe, par);
+   }
+
+   TGeoMedium *Iron = pMedFe;
+
+ // BC408 plastic medium
+ // Mixture: BC408
+   TGeoMedium * pMed37=NULL;
+   if (gGeoManager->GetMedium("BC408") ){
+      pMed37=gGeoManager->GetMedium("BC408");
+   }
+   else{
+      nel     = 2;
+      density = 1.032000;
+      TGeoMixture*
+	  pMat37 = new TGeoMixture("BC408", nel,density);
+      a = 1.007940;   z = 1.000000;   w = 0.520000;  // H
+      pMat37->DefineElement(0,a,z,w);
+      a = 12.010700;   z = 6.000000;   w = 0.480000;  // C
+      pMat37->DefineElement(1,a,z,w);
+      pMat37->SetIndex(36);
+      // Medium: BC408
+      numed   = 36;  // medium number
+      Double_t par[8];
+      par[0]  = 0.000000; // isvol
+      par[1]  = 0.000000; // ifield
+      par[2]  = 0.000000; // fieldm
+      par[3]  = 0.000000; // tmaxfd
+      par[4]  = 0.000000; // stemax
+      par[5]  = 0.000000; // deemax
+      par[6]  = 0.000100; // epsil
+      par[7]  = 0.000000; // stmin
+      pMed37 = new TGeoMedium("BC408", numed,pMat37,par);
+   }
+
+   //
+   const Int_t geometry=0;
+   
+   TGeoVolume* vWorld = gGeoManager->GetTopVolume();
+   vWorld->SetVisLeaves(kTRUE);
+      
+   // different geometry for testing the Neuland detector
+   // only scintillators 3cm x 3cm x 200cm
+   //------------------ BC408 sheets -----------------------------------------
+   Double_t padle_h_dim5x = 100.0;
+   Double_t padle_h_dim5y = 1.5;
+   Double_t padle_h_dim5z = 1.5;
+
+   TGeoVolume *padle_h_box5
+     =gGeoManager->MakeBox("padle_h_box5",pMed37,
+                                    padle_h_dim5x,
+				    padle_h_dim5y,
+				    padle_h_dim5z);
+
+   // Make the elementary assembly of the whole structure
+   TGeoVolume *aLand = new TGeoVolumeAssembly("ALAND");
+
+   //paddles
+   TGeoRotation *rot3 = new TGeoRotation();
+   rot3->RotateX(0.);
+   rot3->RotateY(0.);
+   rot3->RotateZ(0.);
+   Double_t xx = 0.;
+   Double_t yy = 0.;
+   Double_t zz = 0.;
+   aLand->AddNode(padle_h_box5,1,new TGeoCombiTrans(xx,yy,zz,rot3));
+
+   AddSensitiveVolume(padle_h_box5); //Scint.
+
+   fNbOfSensitiveVol+=1; //? FIXME
+
+   TGeoVolume *cell = new TGeoVolumeAssembly("CELL");
+
+   // cout << " -I- Assembly: cell serial nb: " << cell->GetNumber() << endl;
+
+   TGeoRotation *rot4 = new TGeoRotation();
+   rot4->RotateX(0.);
+   rot4->RotateY(0.);
+   rot4->RotateZ(0.);
+   tx=0.;
+   ty=0.;
+   tz=0.;
+
+   for ( Int_t i = 0; i < 34; i++ ){
+      for( Int_t j = 0; j < 68; j++ ){
+         tx=0.;
+         ty=-100.5 + j*3.0;
+         tz=-100.5 + i*6.;
+         Int_t nindex = (j+68*i)+1; //1-2312
+         cell->AddNode(aLand,nindex,new TGeoCombiTrans(tx,ty,tz,rot4));
+      }
+   }
+
+   //------------------------- Vertical Assembly Multiplication & Rotation -----------------------------------------------------------------------  
+
+   TGeoRotation *rot5 = new TGeoRotation();
+   rot5->RotateX(0.);
+   rot5->RotateY(0.);
+   rot5->RotateZ(90.);
+
+   for ( Int_t i = 0; i < 34; i++ ){
+      for( Int_t j = 0; j < 68; j++ ){
+         tx=-100.5 + j*3.0;
+         ty=0.;
+         tz=-97.5 + i*6.;
+         Int_t nindex2 = (j+68*i)+2313; //2312 4624
+         cell->AddNode(aLand,nindex2,new TGeoCombiTrans(tx,ty,tz,rot5));
+      }
+   }
+
+   TGeoRotation *rotg = new TGeoRotation();
+   rotg->RotateX(0.);
+   rotg->RotateY(0.);
+   rotg->RotateZ(0.);
+   tx = 0.0;
+   ty = 0.0;
+   tz = 0.0; // cm
+
+   TGeoCombiTrans *t0 = new TGeoCombiTrans(tx,ty,tz,rotg);
+   
+   vWorld->AddNode(cell,1, GetGlobalPosition(t0) );
+
+
+  // Now save some basic  geometry parameters
+  // Get the parameter factory
+  FairRun *fRun = FairRun::Instance();
+  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
+  R3BLandDigiPar* par=(R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
+  // max_paddle 200;
+  // max_plane 10
+  par->SetMaxPaddle(4624) ;
+  par->SetMaxPlane(34);
+  par->setChanged();
+  //par->setInputVersion(fRun->GetRunId(),1);
+
+}
+
+void R3BLand::ConstructGeometry4() {   
+   // different geometry for testing the Neuland detector
+   // only scintillators 10cm x 10cm x 200cm
+   //------------------ BC408 sheets -----------------------------------------
+
+  // out-of-file geometry definition
+   Double_t dx,dy,dz;
+   Double_t dx1, dx2, dy1, dy2;
+   Double_t a;
+   Double_t z, density, w;
+   Double_t tx,ty,tz;
+   Int_t nel, numed;
+   Double_t radl,absl;
+
+/****************************************************************************/
+// Material definition
+
+   // Mixture: Air
+   TGeoMedium * pMed2=NULL;
+   if (gGeoManager->GetMedium("Air") ){
+      pMed2=gGeoManager->GetMedium("Air");
+   }
+   else{
+      nel     = 2;
+      density = 0.001290;
+      TGeoMixture*
+	pMat2 = new TGeoMixture("Air", nel,density);
+      a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+      pMat2->DefineElement(0,a,z,w);
+      a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+      pMat2->DefineElement(1,a,z,w);
+      pMat2->SetIndex(1);
+      // Medium: Air
+      numed   = 1;  // medium number
+      Double_t par[8];
+      par[0]  = 0.000000; // isvol
+      par[1]  = 0.000000; // ifield
+      par[2]  = 0.000000; // fieldm
+      par[3]  = 0.000000; // tmaxfd
+      par[4]  = 0.000000; // stemax
+      par[5]  = 0.000000; // deemax
+      par[6]  = 0.000100; // epsil
+      par[7]  = 0.000000; // stmin
+      pMed2 = new TGeoMedium("Air", numed,pMat2, par);
+   }
+
+
+//------------------Creat media----------------------------------
+ // --  Material: Iron
+   TGeoMedium * pMedFe=NULL;
+   if (gGeoManager->GetMedium("Iron") ){
+      pMedFe=gGeoManager->GetMedium("Iron");
+   }
+   else{
+      w       =        0.;
+      a       = 55.850000;
+      z       = 26.000000;
+      density = 7.870000;
+      radl    = 1.757717;
+      absl    = 169.994418;
+      TGeoMaterial*
+	pMatFe = new TGeoMaterial("Iron", a,z,density,radl,absl);
+      pMatFe->SetIndex(701);
+      numed   = 23;  // medium number
+      Double_t par[8];
+      par[0]  = 0.000000; // isvol
+      par[1]  = 0.000000; // ifield
+      par[2]  = 0.000000; // fieldm
+      par[3]  = 0.000000; // tmaxfd
+      par[4]  = 0.000000; // stemax
+      par[5]  = 0.000000; // deemax
+      par[6]  = 0.000100; // epsil
+      par[7]  = 0.000000; // stmin
+      pMedFe = new TGeoMedium("Iron", numed,pMatFe, par);
+   }
+
+   TGeoMedium *Iron = pMedFe;
+
+ // BC408 plastic medium
+ // Mixture: BC408
+   TGeoMedium * pMed37=NULL;
+   if (gGeoManager->GetMedium("BC408") ){
+      pMed37=gGeoManager->GetMedium("BC408");
+   }
+   else{
+      nel     = 2;
+      density = 1.032000;
+      TGeoMixture*
+	  pMat37 = new TGeoMixture("BC408", nel,density);
+      a = 1.007940;   z = 1.000000;   w = 0.520000;  // H
+      pMat37->DefineElement(0,a,z,w);
+      a = 12.010700;   z = 6.000000;   w = 0.480000;  // C
+      pMat37->DefineElement(1,a,z,w);
+      pMat37->SetIndex(36);
+      // Medium: BC408
+      numed   = 36;  // medium number
+      Double_t par[8];
+      par[0]  = 0.000000; // isvol
+      par[1]  = 0.000000; // ifield
+      par[2]  = 0.000000; // fieldm
+      par[3]  = 0.000000; // tmaxfd
+      par[4]  = 0.000000; // stemax
+      par[5]  = 0.000000; // deemax
+      par[6]  = 0.000100; // epsil
+      par[7]  = 0.000000; // stmin
+      pMed37 = new TGeoMedium("BC408", numed,pMat37,par);
+   }
+
+   //
+   const Int_t geometry=0;
+   
+   TGeoVolume* vWorld = gGeoManager->GetTopVolume();
+   vWorld->SetVisLeaves(kTRUE);
+      
+   // different geometry for testing the Neuland detector
+   // only scintillators 5cm x 5cm x 200cm
+   //------------------ BC408 sheets -----------------------------------------
+   Double_t padle_h_dim5x = 100.0;
+   Double_t padle_h_dim5y = 5.;
+   Double_t padle_h_dim5z = 5.;
+
+   TGeoVolume *padle_h_box5
+     =gGeoManager->MakeBox("padle_h_box5",pMed37,
+                                    padle_h_dim5x,
+				    padle_h_dim5y,
+				    padle_h_dim5z);
+
+   // Make the elementary assembly of the whole structure
+   TGeoVolume *aLand = new TGeoVolumeAssembly("ALAND");
+
+   //paddles
+   TGeoRotation *rot3 = new TGeoRotation();
+   rot3->RotateX(0.);
+   rot3->RotateY(0.);
+   rot3->RotateZ(0.);
+   Double_t xx = 0.;
+   Double_t yy = 0.;
+   Double_t zz = 0.;
+   aLand->AddNode(padle_h_box5,1,new TGeoCombiTrans(xx,yy,zz,rot3));
+
+   AddSensitiveVolume(padle_h_box5); //Scint.
+
+   fNbOfSensitiveVol+=1; //? FIXME
+
+   TGeoVolume *cell = new TGeoVolumeAssembly("CELL");
+
+   // cout << " -I- Assembly: cell serial nb: " << cell->GetNumber() << endl;
+
+   TGeoRotation *rot4 = new TGeoRotation();
+   rot4->RotateX(0.);
+   rot4->RotateY(0.);
+   rot4->RotateZ(0.);
+   tx=0.;
+   ty=0.;
+   tz=0.;
+
+   for ( Int_t i = 0; i < 10; i++ ){
+      for( Int_t j = 0; j < 20; j++ ){
+         tx=0.;
+         ty=-95. + j*10.0;
+         tz=-95. + i*20.;
+         Int_t nindex = (j+20*i)+1; //1-200
+         cell->AddNode(aLand,nindex,new TGeoCombiTrans(tx,ty,tz,rot4));
+      }
+   }
+
+   //------------------------- Vertical Assembly Multiplication & Rotation -----------------------------------------------------------------------  
+
+   TGeoRotation *rot5 = new TGeoRotation();
+   rot5->RotateX(0.);
+   rot5->RotateY(0.);
+   rot5->RotateZ(90.);
+
+   for ( Int_t i = 0; i < 10; i++ ){
+      for( Int_t j = 0; j < 20; j++ ){
+         tx=-95. + j*10.0;
+         ty=0.;
+         tz=-85. + i*20.;
+         Int_t nindex2 = (j+20*i)+201; //201 400
+         cell->AddNode(aLand,nindex2,new TGeoCombiTrans(tx,ty,tz,rot5));
+      }
+   }
+
+   TGeoRotation *rotg = new TGeoRotation();
+   rotg->RotateX(0.);
+   rotg->RotateY(0.);
+   rotg->RotateZ(0.);
+   tx = 0.0;
+   ty = 0.0;
+   tz = 0.0; // cm
+
+   TGeoCombiTrans *t0 = new TGeoCombiTrans(tx,ty,tz,rotg);
+   
+   vWorld->AddNode(cell,1, GetGlobalPosition(t0) );
+
+
+  // Now save some basic  geometry parameters
+  // Get the parameter factory
+  FairRun *fRun = FairRun::Instance();
+  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
+  R3BLandDigiPar* par=(R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
+  // max_paddle 200;
+  // max_plane 10
+  par->SetMaxPaddle(400) ;
+  par->SetMaxPlane(20);
+  par->setChanged();
+  //par->setInputVersion(fRun->GetRunId(),1);
+
+}
 
 
 ClassImp(R3BLand)

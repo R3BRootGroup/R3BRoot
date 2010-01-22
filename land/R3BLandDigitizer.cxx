@@ -83,6 +83,8 @@ InitStatus R3BLandDigitizer::Init() {
   plength = 100.; // half length of paddle
   att = 0.008; // light attenuation factor [1/cm]
   mn = 939.565; // mass of neutron in MeV/c**2
+  mnu = 1.0086649; // mass of neutron in atomic mass units
+  amu = 931.494028; //atomic mass unit in MeV/c**2
   c = 2.99792458E8;
 
   // Initialise control histograms
@@ -178,6 +180,14 @@ InitStatus R3BLandDigitizer::Init() {
      hFirstMedia->GetXaxis()->SetTitle("Media");
      hFirstMedia->GetYaxis()->SetTitle("Counts");
      
+     hMinv = new TH1F("Minv","Minv",1000,0.,10.);
+     hMinv->GetXaxis()->SetTitle("Erel (MeV)");
+     hMinv->GetYaxis()->SetTitle("Counts");
+
+     hMinv0 = new TH1F("Minv0","Minv0",10000,0.,10.);
+     hMinv0->GetXaxis()->SetTitle("Erel (MeV)");
+     hMinv0->GetYaxis()->SetTitle("Counts");
+    
   if(npaddles<202){
      //LAND detector
 
@@ -209,16 +219,18 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
    Reset();
 
 //-Now do the job event/event
-   //cout<<"**** In land digitizer ****"<< endl;
+//   cout<<"**** In land digitizer ****"<< endl;
 
    Double_t timeRes;
    if(npaddles<202){
       //LAND detector
       timeRes = 0.2;//ns
+      timeRes = 0.0;//ns
    }
    else if(npaddles>201){
       //NeuLAND detector
       timeRes = 0.1;//ns  
+      timeRes = 0.0;//ns  
    }
 
    Int_t nentries = fLandPoints->GetEntries();
@@ -237,12 +249,13 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
    Int_t TrackId=0;
    Double_t xpos[npaddles],ypos[npaddles],zpos[npaddles];
    Double_t xpos_temp[npaddles],ypos_temp[npaddles],zpos_temp[npaddles];
-   Double_t beta,gamma,px,py,pz,p;
+   Double_t beta,gamma,pnx,pny,pnz,pnzcm,p,betaNeut,betaFrag,gammaNeut,gammaFrag;
    Double_t firstHitX,firstHitY,firstHitZ,firstT,firstMedia;
    Double_t E_lab;
    Double_t xpaddle[npaddles],ypaddle[npaddles],zpaddle[npaddles];
    Int_t PDG;
-   Double_t px0,py0,pz0,pt0,p0,x0,y0,z0,t0,s,rr;
+   Double_t pnx0,pny0,pnz0,pnt0,pn0,xn0,yn0,zn0,tn0,en,s,rr;
+   Double_t pfx0,pfy0,pfz0,pft0,pf0,xf0,yf0,zf0,tf0;
 
    // reset    
    for (Int_t j=0;j<npaddles;j++){      
@@ -257,28 +270,48 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
       }
    }
 
-   // Get parameter from original neutron   
+   // Get parameter from original neutron and fragment
    // Access to Monte Carlo Info
    //  get object from the TclonesArray at index=TrackID
-   R3BMCTrack *aTrack = (R3BMCTrack*) fLandMCTrack->At(0);
-   
-   px0=0;
-   PDG = aTrack->GetPdgCode();
-   px0 = aTrack->GetPx()*1000.;  
-   py0 = aTrack->GetPy()*1000.;  
-   pz0 = aTrack->GetPz()*1000.;  
-   pt0 = aTrack->GetPt();  
-   p0 = aTrack->GetP();  
-   x0 = aTrack->GetStartX();  
-   y0 = aTrack->GetStartY();  
-   z0 = aTrack->GetStartZ();  
-   t0 = aTrack->GetStartT();
-      
-   //cout << "primary particle " << PDG << endl;
-   //cout << "px, py, pz " << px0 << "  " << py0 << "  " << pz0 << endl;
-   //cout << "Ptransversal, P total " << pt0 << "  " << p0 << endl;
-   
+   R3BMCTrack *aTrack1 = (R3BMCTrack*) fLandMCTrack->At(0); 
+   R3BMCTrack *aTrack2 = (R3BMCTrack*) fLandMCTrack->At(1); 
 
+   if ( aTrack1->GetMotherId() >=0 ) cout << " Problem track1 not a primary track" << endl; 
+   if ( aTrack2->GetMotherId() >=0 ) cout << " Problem track2 not a primary track" << endl;    
+
+// Fragment
+   PDG = aTrack1->GetPdgCode();
+   pfx0 = aTrack1->GetPx()*1000.;  
+   pfy0 = aTrack1->GetPy()*1000.;  
+   pfz0 = aTrack1->GetPz()*1000.;  
+   pft0 = aTrack1->GetPt();  
+   pf0 = aTrack1->GetP()*1000.;  
+   xf0 = aTrack1->GetStartX();  
+   yf0 = aTrack1->GetStartY();  
+   zf0 = aTrack1->GetStartZ();  
+   tf0 = aTrack1->GetStartT();
+
+//   cout << "primary particle 1 " << PDG << endl;
+//   cout << "px, py, pz " << pfx0 << "  " << pfy0 << "  " << pfz0 << endl;
+//   cout << "Ptransversal, P total " << pft0 << "  " << pf0 << endl;
+
+//Neutron
+   PDG = aTrack2->GetPdgCode();
+   if (PDG != 2112) cout << " Second particle is not a neutron" << endl; 
+   pnx0 = aTrack2->GetPx()*1000.;  
+   pny0 = aTrack2->GetPy()*1000.;  
+   pnz0 = aTrack2->GetPz()*1000.;  
+   pnt0 = aTrack2->GetPt();  
+   pn0 = aTrack2->GetP()*1000.;  
+   xn0 = aTrack2->GetStartX();  
+   yn0 = aTrack2->GetStartY();  
+   zn0 = aTrack2->GetStartZ();  
+   tn0 = aTrack2->GetStartT();
+      
+//   cout << "primary particle 2 " << PDG << endl;
+//   cout << "px, py, pz " << pnx0 << "  " << pny0 << "  " << pnz0 << endl;
+//   cout << "Ptransversal, P total " << pnt0 << "  " << pn0 << endl;
+   
    for (Int_t l=0;l<nentries;l++){
       // Get the Land Object in array
       R3BLandPoint *land_obj = (R3BLandPoint*) fLandPoints->At(l);
@@ -295,7 +328,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
       temp[l][9] = land_obj->GetZOut();	  
       temp[l][10] = land_obj->GetTime();
       TrackId = land_obj->GetTrackID();
-      aTrack = (R3BMCTrack*) fLandMCTrack->At(TrackId);
+      R3BMCTrack *aTrack = (R3BMCTrack*) fLandMCTrack->At(TrackId);
       temp[l][11] = aTrack->GetPdgCode();
       temp[l][12] = land_obj->GetPaddleType();
       temp[l][13] = TrackId;
@@ -585,73 +618,112 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
       
 //      cout<<"DeltaT "<< TDC[1]-firstT << endl;
 
+
+// calculate beta gamma of fragment. This has to go to the digitizer of the ToF wall later.
+      Double_t af,ef,mf;
+      af=10.;     
+      mf = af*amu; // mass of fragment in MeV/c**2
+      betaFrag=pf0/sqrt(pf0*pf0+mf*mf);
+      gammaFrag=1./sqrt(1.-betaFrag*betaFrag);          
+      ef = gammaFrag*af; //total energy of fragment
+
+
+
       // Reconstruct neutron momentum with first hit.
       // First with the ideal position from simulations.
       // This gives us a hint about maximum possible resolution.
 
-      s = sqrt((firstHitX-x0)*(firstHitX-x0)+
-                        (firstHitY-y0)*(firstHitY-y0)+
-                        (firstHitZ-z0)*(firstHitZ-z0));
+      s = sqrt((firstHitX-xn0)*(firstHitX-xn0)+
+                        (firstHitY-yn0)*(firstHitY-yn0)+
+                        (firstHitZ-zn0)*(firstHitZ-zn0));
       
-      beta=s/(firstT-t0)*1.E7/c;
-      //cout<<"beta "<< beta << endl;
-      gamma=1./sqrt(1.-beta*beta);
-      p=beta*gamma*mn;    
-      rr=sqrt((firstHitX-x0)*(firstHitX-x0)+
-              (firstHitY-y0)*(firstHitY-y0));
-      pz=cos(atan(rr/(firstHitZ-z0)))*p;
-      px=pz*(firstHitX-x0)/(firstHitZ-z0);
-      py=pz*(firstHitY-y0)/(firstHitZ-z0);
+      betaNeut=s/(firstT-tn0)*1.E7/c;
+      //cout<<"beta "<< betaNeut << endl;
+      gammaNeut=1./sqrt(1.-betaNeut*betaNeut);
+      p=betaNeut*gammaNeut*mn;    
+      rr=sqrt((firstHitX-xn0)*(firstHitX-xn0)+
+              (firstHitY-yn0)*(firstHitY-yn0));
+      pnz=cos(atan(rr/(firstHitZ-zn0)))*p;
+      pnx=pnz*(firstHitX-xn0)/(firstHitZ-zn0);
+      pny=pnz*(firstHitY-yn0)/(firstHitZ-zn0);
+      en = gammaNeut*mnu; //total energy neutron
+
+//      betaNeut=pn0/sqrt(pn0*pn0+mn*mn);
+//      gammaNeut=1./sqrt(1.-betaNeut*betaNeut);          
+//      en = gammaNeut*mnu;
+      
+// calculate invariant mass with ideal quantities for a check
+      Double_t xinv0;
+      
+      xinv0=(sqrt((ef*amu+en*amu)*(ef*amu+en*amu)-
+           ((pnx+pfx0)*(pnx+pfx0) + (pny+pfy0)*(pny+pfy0) +
+	   (pnz+pfz0)*(pnz+pfz0)))
+           - af*amu - mn );
+      hMinv0->Fill(xinv0);
+      
+//      cout<<"Minv0 "<<xinv0<<endl;
+//      cout<<"first Hit "<<firstHitX<<"  "<<firstHitY<<"  "<< firstHitZ<<endl;
+      
 
       // Lorentz Transformation
-      E_lab=sqrt(pz0*pz0+mn*mn);
-      beta=pz0/sqrt(pz0*pz0+mn*mn);
+      E_lab=sqrt(pnz0*pnz0+mn*mn);
+      beta=pnz0/sqrt(pnz0*pnz0+mn*mn);
       gamma=1./sqrt(1.-beta*beta);      
-      pz=-1.*beta*gamma*E_lab+gamma*pz;
+      pnzcm=-1.*beta*gamma*E_lab+gamma*pnz;
 
-      hDeltaPx1 ->Fill(px-px0,1.);
-      hDeltaPy1 ->Fill(py-py0,1.);
-      hDeltaPz1 ->Fill(pz,1.);
+      hDeltaPx1 ->Fill(pnx-pnx0,1.);
+      hDeltaPy1 ->Fill(pny-pny0,1.);
+      hDeltaPz1 ->Fill(pnzcm,1.);
 
-      //cout<<"momentum exp "<< px << "  " << py << "  " << pz << endl;
-      //cout<<"momentum sim "<< px0 << "  " << py0 << "  " << pz0 << endl;
+      //cout<<"momentum exp "<< pnx << "  " << pny << "  " << pnzcm << endl;
+      //cout<<"momentum sim "<< pnx0 << "  " << pny0 << "  " << pnz0 << endl;
   
 
       // Now reconstruction of momenta with real measured quantities
    
-      s = sqrt((xpos[1]-x0)*(xpos[1]-x0)+
-               (ypos[1]-y0)*(ypos[1]-y0)+
-               (zpos[1]-z0)*(zpos[1]-z0));
+      s = sqrt((xpos[1]-xn0)*(xpos[1]-xn0)+
+               (ypos[1]-yn0)*(ypos[1]-yn0)+
+               (zpos[1]-zn0)*(zpos[1]-zn0));
       
-      beta=s/(TDC[1]-t0)*1.E7/c;
-      //cout<<"beta "<< beta << endl;
-      gamma=1./sqrt(1.-beta*beta);
-      p=beta*gamma*mn;    
-      rr=sqrt((xpos[1]-x0)*(xpos[1]-x0)+
-              (ypos[1]-y0)*(ypos[1]-y0));
-      pz=cos(atan(rr/(zpos[1]-z0)))*p;
-      px=pz*(xpos[1]-x0)/(zpos[1]-z0);
-      py=pz*(ypos[1]-y0)/(zpos[1]-z0);
+      betaNeut=s/(TDC[1]-tn0)*1.E7/c;
+      //cout<<"beta "<< betaNeut << endl;
+      gammaNeut=1./sqrt(1.-betaNeut*betaNeut);
+      p=betaNeut*gammaNeut*mn;    
+      rr=sqrt((xpos[1]-xn0)*(xpos[1]-xn0)+
+              (ypos[1]-yn0)*(ypos[1]-yn0));
+      pnz=cos(atan(rr/(zpos[1]-zn0)))*p;
+      pnx=pnz*(xpos[1]-xn0)/(zpos[1]-zn0);
+      pny=pnz*(ypos[1]-yn0)/(zpos[1]-zn0);
+      en = gammaNeut*mnu; //total energy neutron
+
+// calculate invariant mass with real measured quantities
+      Double_t xinv;
+      
+      xinv=(sqrt((ef*amu+en*amu)*(ef*amu+en*amu)-
+           ((pnx+pfx0)*(pnx+pfx0) + (pny+pfy0)*(pny+pfy0) + (pnz+pfz0)*(pnz+pfz0)))
+           - af*amu - mn );
+      hMinv->Fill(xinv);
+//      cout<<"Minv "<<xinv<<endl;
 
       // Lorentz Transformation
-      E_lab=sqrt(pz0*pz0+mn*mn);
-      beta=pz0/sqrt(pz0*pz0+mn*mn);
+      E_lab=sqrt(pnz0*pnz0+mn*mn);
+      beta=pnz0/sqrt(pnz0*pnz0+mn*mn);
       gamma=1./sqrt(1.-beta*beta);      
-      pz=-1.*beta*gamma*E_lab+gamma*pz;
+      pnzcm=-1.*beta*gamma*E_lab+gamma*pnz;
 
-      hDeltaPx2 ->Fill(px-px0,1.);
-      hDeltaPy2 ->Fill(py-py0,1.);
-      hDeltaPz2 ->Fill(pz,1.);
+      hDeltaPx2 ->Fill(pnx-pnx0,1.);
+      hDeltaPy2 ->Fill(pny-pny0,1.);
+      hDeltaPz2 ->Fill(pnzcm,1.);
 
-      hDeltaP1->Fill(px0*px0+py0*py0-(px*px+py*py+pz*pz));
+      hDeltaP1->Fill(pnx0*pnx0+pny0*pny0-(pnx*pnx+pny*pny+pnzcm*pnzcm));
       
-      //cout<<"momentum exp "<< px << "  " << py << "  " << pz << endl;
-      //cout<<"momentum sim "<< px0 << "  " << py0 << "  " << pz0 << endl;
+      //cout<<"momentum exp "<< pnx << "  " << pny << "  " << pnz << endl;
+      //cout<<"momentum sim "<< pnx0 << "  " << pny0 << "  " << pnz0 << endl;
  
-      beta=sqrt(xpos[1]*xpos[1]+ypos[1]*ypos[1]+zpos[1]*zpos[1])/
-      TDC[1]*1.E7/c;
-      gamma=1./sqrt(1-beta*beta);
-      p=beta*gamma*mn;
+//      beta=sqrt(xpos[1]*xpos[1]+ypos[1]*ypos[1]+zpos[1]*zpos[1])/
+//      TDC[1]*1.E7/c;
+//      gamma=1./sqrt(1-beta*beta);
+//      p=beta*gamma*mn;
 
       //cout<<"Beta "<< beta << " Gamma " << gamma << " P " << p << endl;
    
@@ -663,8 +735,9 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 
       //cout<<"Total light "<< TotalLight << endl;
       //cout<<"Total energy "<< TotalEnergy << endl;
-      
-   }
+     
+
+   }  
 
    // Analyse multiple neutron hits     
    Int_t neutmult1,neutmult2,flag_new;
@@ -715,7 +788,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
       }
 
       // calculate ToF for the distance with nominal beam energy
-      beta=pz0/sqrt(pz0*pz0+mn*mn);
+      beta=pnz0/sqrt(pnz0*pnz0+mn*mn);
       deltaz=zpos[i]-zpos[1];
       deltat=TDC[i]-TDC[1];
       dt=deltaz/beta/c/100.;
@@ -792,6 +865,8 @@ void R3BLandDigitizer::Finish()
    hDeltaT->Write();
 
    hFirstMedia->Write();
+   hMinv->Write();
+   hMinv0->Write();
    
 }
 

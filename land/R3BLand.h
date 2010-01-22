@@ -114,6 +114,8 @@ class R3BLand : public R3BDetector
   virtual void ConstructGeometry();
   virtual void ConstructGeometry1();
   virtual void ConstructGeometry2();
+  virtual void ConstructGeometry3();
+  virtual void ConstructGeometry4();
   virtual void Initialize();
   virtual void SetSpecialPhysicsCuts(){;}
 
