@@ -311,6 +311,14 @@ void  R3BFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField){
       Bfield[1] = 0;
       Bfield[2] = 0;
   }
+ // Reset heap memory
+
+ if (linesArray) {
+     delete linesArray;
+     linesArray=NULL;
+ }
+
+
  // linesArray
  // localPoint;
  }
@@ -406,6 +414,7 @@ Int_t R3BFieldMap::GetLinesArrayForPosition(TVector3* pos, TArrayI* lines){
   lines->AddAt(lines->At(0) + 1,6);
   lines->AddAt(lines->At(1) + 1,7);
 
+  if (posAux) delete posAux;
   return 0;
 
 }
