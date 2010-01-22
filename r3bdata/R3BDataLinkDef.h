@@ -22,6 +22,7 @@
 #pragma link C++ class R3BSitrackerHit+;
 #pragma link C++ class R3BLandPoint+;
 #pragma link C++ class R3BNeuLandPoint+;
+#pragma link C++ class R3BLandDigi+;
 #pragma link C++ class R3BLandHit+;
 #pragma link C++ class R3BPaddleCrystalHit+;
 #pragma link C++ class ELILuMonPoint+;
