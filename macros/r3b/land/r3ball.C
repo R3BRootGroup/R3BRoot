@@ -420,7 +420,7 @@ void r3ball(Int_t nEvents = 1,
   
   // -----   Create R3B  magnetic field ----------------------------------------
   Int_t typeOfMagneticField = 0;
-  Int_t fieldScale = 1;
+  Double_t fieldScale = 1.25;
   Bool_t fVerbose = kFALSE;
 
   //NB: <D.B>
