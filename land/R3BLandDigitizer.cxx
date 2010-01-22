@@ -237,9 +237,9 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
    
    Double_t hit[nentries][14];
    Double_t temp[nentries][14];
-   Double_t PMLtime[npaddles][100],PMRtime[npaddles][100];
-   Double_t PMLlight[npaddles][100],PMRlight[npaddles][100];
-   Double_t PMLenergy[npaddles][100],PMRenergy[npaddles][100];
+   Double_t PMLtime[npaddles][20],PMRtime[npaddles][20];
+   Double_t PMLlight[npaddles][20],PMRlight[npaddles][20];
+   Double_t PMLenergy[npaddles][20],PMRenergy[npaddles][20];
    Int_t PMmult[npaddles];   
    Double_t QDC[npaddles],TDC[npaddles],QDC2[npaddles];
    Double_t QDC_temp[npaddles],TDC_temp[npaddles],QDC2_temp[npaddles];
@@ -260,7 +260,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
    // reset    
    for (Int_t j=0;j<npaddles;j++){      
       PMmult[j]=0;
-      for (Int_t i=0;i<100;i++){            
+      for (Int_t i=0;i<20;i++){            
 	 PMLtime[j][i]=0.;
          PMLlight[j][i]=0.;
          PMLenergy[j][i]=0.;
