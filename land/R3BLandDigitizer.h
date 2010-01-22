@@ -6,6 +6,7 @@
 #include <map>
 #include <string>
 #include "R3BLandDigiPar.h"
+#include "R3BLandDigi.h"
 
 class TClonesArray;
 class TObjectArray;
@@ -36,9 +37,15 @@ class R3BLandDigitizer : public FairTask
   virtual void Finish();
   virtual void Reset();
 
+
+  R3BLandDigi* AddHit(Int_t paddleNr, Double_t tdcR, Double_t tdcL,
+		     Double_t qdcR,Double_t qdcL );
+
+
   protected:
   TClonesArray* fLandPoints;
   TClonesArray* fLandMCTrack; 
+  TClonesArray* fLandDigi;
 
   // Parameter class
   R3BLandDigiPar* fLandDigiPar;

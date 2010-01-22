@@ -72,8 +72,8 @@ InitStatus R3BLandDigitizer::Init() {
   fLandMCTrack = (TClonesArray*) ioman->GetObject("MCTrack");
    
   // Register output array LandDigi
-  //fDigis = new TClonesArray("R3BLandDigi",1000);
-  //ioman->Register("LandDigi", "Digital response in Land", fDigis, kTRUE);
+  fLandDigi = new TClonesArray("R3BLandDigi",1000);
+  ioman->Register("LandDigi", "Digital response in Land", fLandDigi, kTRUE);
 
   // Parameter retrieval
   // Only after Init one retrieve the Digitization Parameters!
@@ -867,7 +867,33 @@ void R3BLandDigitizer::Finish()
    hFirstMedia->Write();
    hMinv->Write();
    hMinv0->Write();
-   
+
+
+   // Here is an example how to fill the R3BLandDigi structure
+   Double_t dummy = 1.1;
+   Double_t tdcL = dummy;
+   Double_t tdcR = dummy;
+   Double_t qdcL = dummy;
+   Double_t qdcR = dummy;
+   Int_t paddleNr = 32;
+
+   // calling AddHit function will create a object
+   // R3BLandDigi in memory and will automatically
+   // add it to the array
+   // sothat :  1 call  to AddHit() 1 object in array
+   //           n calls to AddHit() n object in array
+
+   AddHit( paddleNr, tdcR, tdcL, qdcR, qdcL );
+
+
+}
+
+R3BLandDigi* R3BLandDigitizer::AddHit(Int_t paddleNr, Double_t tdcR, Double_t tdcL,
+				     Double_t qdcR,Double_t qdcL){
+  // It fills the R3BLandDigi array
+  TClonesArray& clref = *fLandDigi;
+  Int_t size = clref.GetEntriesFast();
+  return new(clref[size]) R3BLandDigi(paddleNr,tdcR,tdcL,qdcR,qdcL);
 }
 
 ClassImp(R3BLandDigitizer)
