@@ -86,22 +86,22 @@ Int_t r3blandsim(){
     TObjString det10("LAND");
 
     TObjArray fDetList;
+//    fDetList.Add(&det1);
+    fDetList.Add(&det2);
+//    fDetList.Add(&det4);
+//    fDetList.Add(&det5);
+//    fDetList.Add(&det6);
+//    fDetList.Add(&det7);
+//    fDetList.Add(&det8);
+//    fDetList.Add(&det9);
     fDetList.Add(&det10);
- /*   fDetList.Add(&det2);
-    fDetList.Add(&det4);
-    fDetList.Add(&det5);
-    fDetList.Add(&det6);
-    fDetList.Add(&det7);
-    fDetList.Add(&det8);
-    fDetList.Add(&det9);
-    fDetList.Add(&det10);
- */
+
 
    //-------------------------------------------------
    //- N# of Sim. Events   |    nEvents     (Int_t)
    //-------------------------------------------------
 
-   Int_t nEvents = 3;
+   Int_t nEvents = 100;
 
    //-------------------------------------------------
    //- EventDisplay        |    fEventDisplay (Bool_t)
@@ -112,12 +112,12 @@ Int_t r3blandsim(){
    Bool_t fEventDisplay=kTRUE;
 
     // Magnet Field definition
-   Bool_t fR3BMagnet = kFALSE;
+   Bool_t fR3BMagnet = kTRUE;
 
    // Main Sim function call
    r3ball(  nEvents,
             fDetList,
-            target4,
+            target1,
 	    fEventDisplay,
 	    fMC,
 	    fGene,
