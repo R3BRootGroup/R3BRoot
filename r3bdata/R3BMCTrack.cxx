@@ -36,6 +36,7 @@ R3BMCTrack::R3BMCTrack(Int_t pdgCode, Int_t motherId, Double_t px,
   fStartT = t;
   if (nPoints >= 0) fNPoints = nPoints;
   else              fNPoints = 0;
+  fMass = 0.0;
 }
 // -------------------------------------------------------------------------
 
@@ -51,6 +52,7 @@ R3BMCTrack::R3BMCTrack(const R3BMCTrack& track) {
 
 // -----   Constructor from TParticle   ------------------------------------
 R3BMCTrack::R3BMCTrack(TParticle* part) {
+
   fPdgCode  = part->GetPdgCode();
   fMotherId = part->GetMother(0);
   fPx       = part->Px();
@@ -61,6 +63,8 @@ R3BMCTrack::R3BMCTrack(TParticle* part) {
   fStartZ   = part->Vz();
   fStartT   = part->T()*1e09;
   fNPoints  = 0;
+  fMass     = part->GetMass();
+
 }
 // -------------------------------------------------------------------------
 
@@ -89,12 +93,13 @@ void R3BMCTrack::Print(Int_t trackId) const {
 
 // -----   Public method GetMass   -----------------------------------------
 Double_t R3BMCTrack::GetMass() const {
-  if ( TDatabasePDG::Instance() ) {
-    TParticlePDG* particle = TDatabasePDG::Instance()->GetParticle(fPdgCode);
-    if ( particle ) return particle->Mass();
-    else return 0.;
-  }
-  return 0.;
+//  if ( TDatabasePDG::Instance() ) {
+//    TParticlePDG* particle = TDatabasePDG::Instance()->GetParticle(fPdgCode);
+//    if ( particle ) return particle->Mass();
+//    else return 0.;
+//  }
+    //  return 0.;
+  return fMass;
 }
 // -------------------------------------------------------------------------
 
