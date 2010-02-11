@@ -111,6 +111,9 @@ private:
    **/
   Int_t fNPoints;
 
+  // case of HIons
+  Double32_t fMass;
+
 
   ClassDef(R3BMCTrack,1);
 
@@ -139,8 +142,6 @@ inline void R3BMCTrack::Get4Momentum(TLorentzVector& momentum) {
 inline void R3BMCTrack::GetStartVertex(TVector3& vertex) { 
   vertex.SetXYZ(fStartX,fStartY,fStartZ); 
 }
-
-
 
 
 
