@@ -227,6 +227,8 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
 
 
 
+//    cout << "-I- Hit MC Registration  TrackID: " << fTrackID << " PaddleTyp " << fPaddleTyp
+//         << " Sector " << cp2 << " PaddleNb " << cp1 << endl;
 
     AddHit(fTrackID, fVolumeID,   fPaddleTyp,   cp2, cp1,
 	   TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
@@ -358,10 +360,10 @@ R3BLandPoint* R3BLand::AddHit(Int_t trackID, Int_t detID, Int_t box, Int_t id1, 
 void R3BLand::ConstructGeometry() {
 
 // Scintillators based Land Detector
-//    return ConstructGeometry1(); // standard LAND geometry
+    return ConstructGeometry1(); // standard LAND geometry
 //    return ConstructGeometry2(); // Neuland with 5x5x200cm BC408
 //    return ConstructGeometry3(); // Neuland with 3x3x200cm BC408
-    return ConstructGeometry4(); // Neuland with 10x10x200cm BC408
+//    return ConstructGeometry4(); // Neuland with 10x10x200cm BC408
 
 }
 
