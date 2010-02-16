@@ -456,7 +456,11 @@ void R3BNeuLand::ConstructGeometry1() {
     par[7]  = 0.001000; // stmin
     
     TGeoMedium*
-    pMed_gas = new TGeoMedium("RPCGAS", numed,pMat_gas, par);
+    pMed_gas1 = new TGeoMedium("RPCGAS", numed,pMat_gas, par);
+
+// Other RPC gas definition
+    TGeoMedium *
+      pMed_gas2 =gGeoManager->GetMedium("RPCgas");    
 
 
 //-- Main Geometry definition
@@ -476,7 +480,7 @@ void R3BNeuLand::ConstructGeometry1() {
 				       padz);
 
     TGeoVolume*
-       pGas = new TGeoVolume("GAS",pad_gas, pMed_gas);
+       pGas = new TGeoVolume("GAS",pad_gas, pMed_gas1);
     pGas->SetVisLeaves(kTRUE);
 
     // Add Gas as a sensitive volume
@@ -562,7 +566,7 @@ void R3BNeuLand::ConstructGeometry1() {
 
     
    // Full Geometry Definition
-     Double_t posZ =1000.;
+     Double_t posZ =0.0;
 
     if ( fVersion == 1 ){
        Double_t thx,thy,thz;
