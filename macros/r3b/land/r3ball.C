@@ -368,6 +368,65 @@ void r3ball(Int_t nEvents = 1,
       run->AddModule(land);
   }
 
+
+  // Land Detector
+  if (fDetList.FindObject("RPCFLAND") ) {
+      // Geometry version for Land
+      //  1 : new RPC based Land
+      //  2 : 1 RPC Module
+      Int_t version = 1;
+      R3BDetector* land = new R3BNeuLand("Land", kTRUE);
+     ((R3BNeuLand*) land)->SetGeomVersion(version);
+ 
+      // Global position of the Module
+      phi   =  0.0; // (deg)
+      theta =  0.0; // (deg)
+      psi   =  0.0; // (deg)
+      // Rotation in Ref. Frame.
+      thetaX =  0.0; // (deg)
+      thetaY =  0.0; // (deg)
+      thetaZ =  0.0; // (deg)
+      // Global translation in Lab
+      tx    =  0.0; // (cm)
+      ty    =  0.0; // (cm)
+      tz    =  1050.0; // (cm)
+      //land->SetRotAnglesEuler(phi,theta,psi);
+      land->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
+      land->SetTranslation(tx,ty,tz);
+      run->AddModule(land);
+  }
+
+  // Land Detector
+  if (fDetList.FindObject("RPCMLAND") ) {
+      // Geometry version for Land
+      //  1 : new RPC based Land
+      //  2 : 1 RPC Module
+      Int_t version = 2;
+      R3BDetector* land = new R3BNeuLand("Land", kTRUE);
+      (R3BNeuLand*) land)->SetGeomVersion(version);
+
+      // Global position of the Module
+      phi   =  0.0; // (deg)
+      theta =  0.0; // (deg)
+      psi   =  0.0; // (deg)
+      // Rotation in Ref. Frame.
+      thetaX =  0.0; // (deg)
+      thetaY =  0.0; // (deg)
+      thetaZ =  0.0; // (deg)
+      // Global translation in Lab
+      tx    =  0.0; // (cm)
+      ty    =  0.0; // (cm)
+      tz    =  0.0; // (cm)
+      //land->SetRotAnglesEuler(phi,theta,psi);
+      land->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
+      land->SetTranslation(tx,ty,tz);
+      run->AddModule(land);
+  }
+
+
+
+
+
   // Chimera
   if (fDetList.FindObject("CHIMERA") ) {
       R3BDetector* chim = new R3BChimera("Chimera", kTRUE);

@@ -72,7 +72,11 @@ Int_t r3blandsim(){
    //                            TRACKER
    //                            GFI
    //
-   //   Neutron:                 LAND
+   //   Neutron Detector
+   //   Plastic                  LAND
+   //   RPC                      
+   //                            RPCFLAND
+   //                            RPCMLAND
 
     TObjString det1("TARGET");
     TObjString det2("ALADIN");
@@ -84,6 +88,8 @@ Int_t r3blandsim(){
     TObjString det8("TRACKER");
     TObjString det9("GFI");
     TObjString det10("LAND");
+    TObjString det11("RPCMLAND");
+    TObjString det12("RPCFLAND");
 
     TObjArray fDetList;
 //    fDetList.Add(&det1);
@@ -94,14 +100,15 @@ Int_t r3blandsim(){
 //    fDetList.Add(&det7);
 //    fDetList.Add(&det8);
 //    fDetList.Add(&det9);
-    fDetList.Add(&det10);
+//    fDetList.Add(&det10);
+    fDetList.Add(&det11);
 
 
    //-------------------------------------------------
    //- N# of Sim. Events   |    nEvents     (Int_t)
    //-------------------------------------------------
 
-   Int_t nEvents = 100;
+   Int_t nEvents = 10;
 
    //-------------------------------------------------
    //- EventDisplay        |    fEventDisplay (Bool_t)
