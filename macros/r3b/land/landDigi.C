@@ -3,12 +3,8 @@ void landDigi(){
   // Input files
    TString inFile      = "r3bsim.root";
    TString parFile     = "r3bpar.root";
-//  TString inFile      = "/data.local2/mheil/fairroot_results/r3bsim800MeVgeant3hadr5.root"; 
-//  TString parFile     = "/data.local2/mheil/fairroot_results/r3bpar800MeVgeant3hadr5.root";
   // Output file         
   TString outFile     = "land_digi.root";
-//  TString outFile     = "/data.local2/mheil/fairroot_results/land_digi800MeVgeant3hadr5.root";
-
 
   
   // ----  Load libraries   -------------------------------------------------
@@ -50,9 +46,14 @@ void landDigi(){
   // (0=quiet, 1=event level, 2=track level, 3=debug)
   Int_t iVerbose = 1;
   //Connect the Digitization  Task
-
   R3BLandDigitizer* land  = new R3BLandDigitizer();
+  //Connect the Tracking Task
+  R3BNeutronTracker* tracker  = new R3BNeutronTracker();
+
+
+
   fRun->AddTask(land);
+  fRun->AddTask(tracker);
 
   // Runtime DataBase info
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
