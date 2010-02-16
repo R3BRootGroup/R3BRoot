@@ -37,7 +37,8 @@ R3BGeoLandPar.cxx
 R3BLandContFact.cxx 
 R3BLandDigitizer.cxx 
 R3BNeuLandDigitizer.cxx 
-R3BLandDigiPar.cxx)
+R3BLandDigiPar.cxx
+R3BNeutronTracker.cxx)
 
 # fill list of header files from list of source files
 # by exchanging the file extension
