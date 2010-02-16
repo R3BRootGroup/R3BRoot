@@ -13,6 +13,11 @@ class TObjectArray;
 class TH1F;
 class TH2F;
 
+struct PM_RES
+{
+  Double_t Ltime,Rtime,LlightCFD,RlightCFD,LlightQDC,RlightQDC,Lenergy,Renergy;
+};
+
 
 class R3BLandDigitizer : public FairTask
 {
@@ -38,8 +43,9 @@ class R3BLandDigitizer : public FairTask
   virtual void Reset();
 
 
-  R3BLandDigi* AddHit(Int_t paddleNr, Double_t tdcR, Double_t tdcL,
-		     Double_t qdcR,Double_t qdcL );
+  R3BLandDigi* AddHit(Int_t paddleNr, Double_t tdcL, Double_t tdcR, Double_t tdc,
+     Double_t qdcL, Double_t qdcR, Double_t qdc, Double_t xx,Double_t yy, Double_t zz,
+     Double_t x0, Double_t y0, Double_t z0, Double_t t0 );
 
 
   protected:
@@ -53,27 +59,14 @@ class R3BLandDigitizer : public FairTask
   //- Control Hitograms
   TH1F *hPMl;
   TH1F *hPMr;
-  TH1F *hTotalEnergy;
   TH1F *hTotalLight;
-  TH1F *hMult;
+  TH1F *hMult1;
+  TH1F *hMult2;
   TH1F *hParticle;
   TH1F *hPaddleEnergy;
   TH1F *hFirstEnergy;
-
-  TH1F *hDeltaPx1;
-  TH1F *hDeltaPy1;
-  TH1F *hDeltaPz1;
-  TH1F *hDeltaPx2;
-  TH1F *hDeltaPy2;
-  TH1F *hDeltaPz2;
   
   TH2F *hElossLight;
-
-  TH1F *hNeutmult1;
-  TH1F *hNeutmult2;
-
-  TH1F *hDeltaP1;
-  TH1F *hDeltaP2;
 
   TH1F *hDeltaX;
   TH1F *hDeltaY;
@@ -81,9 +74,6 @@ class R3BLandDigitizer : public FairTask
   TH1F *hDeltaT;
  
   TH1F *hFirstMedia;
-
-  TH1F *hMinv;
-  TH1F *hMinv0;
 
   Int_t npaddles;
   Int_t nplanes;
@@ -94,7 +84,9 @@ class R3BLandDigitizer : public FairTask
   Double_t mnu; // mass of neutron in atomic mass units
   Double_t amu; //atomic mass unit in MeV/c**2
   Double_t c;
-  
+  Double_t cMedia; // speed of light in material in cm/ns
+  Double_t calFactor; //calibration factor energy of LAND paddles
+  PM_RES **PM_res;
   private:
   virtual void SetParContainers();
 
