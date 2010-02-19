@@ -14,6 +14,7 @@
 #include "TLorentzVector.h"
 #include <iostream>
 #include <map>
+#include <TGeoMedium.h>
 
 using namespace std;
 
@@ -113,6 +114,7 @@ class R3BNeuLand : public R3BDetector
    **/
   virtual void ConstructGeometry();
   virtual void ConstructGeometry1();
+  virtual void ConstructGeometry2();
   virtual void Initialize();
   virtual void SetSpecialPhysicsCuts(){;}
   void SetGeomVersion(Int_t vers ) { fVersion = vers; }
@@ -161,6 +163,18 @@ class R3BNeuLand : public R3BDetector
 
     /** Map of MCis with fixed VolID */
     map <Int_t,Int_t> fMapMcId;
+
+
+    Int_t fIdMedFe;
+    Int_t fIdMedGlass;
+    Int_t fIdMedGas;
+
+   
+   TGeoMedium * pMedFe;
+   TGeoMedium* pMed_glas;
+   TGeoMedium* pMed_gas;
+
+
 
 
     ClassDef(R3BNeuLand,1);
