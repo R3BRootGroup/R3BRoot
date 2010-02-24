@@ -33,12 +33,12 @@ void R3BPassiveContFact::setAllContainers() {
    *  the list of containers for the STS library.*/
 
 
-  //  FairContainer* p= new FairContainer("R3BGeoPassivePar",
-  //                                        "Passive Geometry Parameters",
-  //                                        "TestDefaultContext");
-  //  p->addContext("TestNonDefaultContext");
+    FairContainer* p= new FairContainer("R3BGeoPassivePar",
+                                          "Passive Geometry Parameters",
+                                          "TestDefaultContext");
+    p->addContext("TestNonDefaultContext");
 
-  //  containers->Add(p);
+    containers->Add(p);
 
 }
 
@@ -50,7 +50,7 @@ FairParSet* R3BPassiveContFact::createContainer(FairContainer* c) {
   const char* name=c->GetName();
   FairParSet *p=NULL;
   if (strcmp(name,"R3BGeoPassivePar")==0) {
-  //  p=new R3BGeoPassivePar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
+    p=new R3BGeoPassivePar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
   }
   return p;
 }
