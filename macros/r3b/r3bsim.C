@@ -25,7 +25,7 @@ Int_t r3bsim(){
    //   Geant4:                 "TGeant4"
    //   Fluka :                 "TFluka"
 
-   TString fMC ="TGeant4";
+   TString fMC ="TGeant3";
 
    //-------------------------------------------------
    // Primaries generation
@@ -57,7 +57,7 @@ Int_t r3bsim(){
    //-------------------------------------------------
    //   Target:                  TARGET
    //   Magnet:                  ALADIN
-   //
+   //                            GLAD
    //-------------------------------------------------
    //-  Sensitiv            |    fDetName
    //-------------------------------------------------
@@ -73,8 +73,9 @@ Int_t r3bsim(){
    //
    //   Neutron:                 LAND
 
-    TObjString det1("TARGET");
-    TObjString det2("ALADIN");
+    TObjString det0("TARGET");
+    TObjString det1("ALADIN");
+    TObjString det2("GLAD");
     TObjString det3("CALIFA");
     TObjString det4("CRYSTALBALL");
     TObjString det5("TOF");
@@ -85,7 +86,7 @@ Int_t r3bsim(){
     TObjString det10("LAND");
 
     TObjArray fDetList;
-    fDetList.Add(&det1);
+    fDetList.Add(&det0);
     fDetList.Add(&det2);
     fDetList.Add(&det4);
     fDetList.Add(&det5);
@@ -100,7 +101,7 @@ Int_t r3bsim(){
    //- N# of Sim. Events   |    nEvents     (Int_t)
    //-------------------------------------------------
 
-   Int_t nEvents = 10;
+   Int_t nEvents = 1;
 
    //-------------------------------------------------
    //- EventDisplay        |    fEventDisplay (Bool_t)
