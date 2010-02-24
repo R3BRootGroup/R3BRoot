@@ -77,28 +77,28 @@ public:
   /** Map file name **/
   TString fFileName;
   /** Global scaling factor (w.r.t. map on file) **/
-  Double_t fScale;             
+  Double_t fScale;        //!       
 
   /** Local Variables **/
-  Int_t stepsInX;
-  Int_t stepsInY;
-  Int_t stepsInZ;       //steps in the field map along each direction
-  Double_t initialX;
-  Double_t initialY;
-  Double_t initialZ; //initial coordinates in field map
-  Double_t gridStep;                     //distance between points in field map
+  Int_t stepsInX;        //!   
+  Int_t stepsInY;        //! 
+  Int_t stepsInZ;        //! steps in the field map along each direction
+  Double_t initialX;     //!
+  Double_t initialY;     //!
+  Double_t initialZ;     //! initial coordinates in field map
+  Double_t gridStep;     //! distance between points in field map
 
-  Double_t* Bxfield;                     //!field values obtained from field map
-  Double_t* Byfield;                     //!
-  Double_t* Bzfield;                     //!
+  Double_t* Bxfield;     //! field values obtained from field map
+  Double_t* Byfield;     //!
+  Double_t* Bzfield;     //!
 
 
-  Int_t typeField;  // 0 for ALADIN field map,
+  Int_t typeField;  //! 0 for ALADIN field map,
                     // 1 for R3B map, 2 for other possib .
                     // 3 ALADIN inverted for back tracking
 
-  TRotation* gRot;
-  TVector3* gTrans;
+  TRotation* gRot;   //!
+  TVector3* gTrans;  //! 
 
   Bool_t fVerbose;
 

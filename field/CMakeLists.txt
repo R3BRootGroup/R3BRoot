@@ -21,7 +21,9 @@ R3BFieldConst.cxx
 R3BFieldContFact.cxx    
 R3BFieldMap.cxx
 R3BFieldPar.cxx          
-R3BFieldCreator.cxx  )
+R3BFieldCreator.cxx
+R3BGladFieldMap.cxx
+)
 
 if(RULE_CHECKER_FOUND)
   CHECK_RULES("${FIELD_SRCS}" "${INCLUDE_DIRECTORIES}" FIELD_RULES)
