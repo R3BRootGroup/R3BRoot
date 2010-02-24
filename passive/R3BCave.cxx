@@ -35,9 +35,11 @@ void R3BCave::ConstructGeometry()
 
         TList* volList = MGeo->getListOfVolumes();
         // store geo parameter
-        FairRun *fRun = FairRun::Instance();
+
+	FairRun *fRun = FairRun::Instance();
         FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
-        R3BGeoPassivePar* par=(R3BGeoPassivePar*)(rtdb->getContainer("R3BGeoPassivePar"));
+        /*
+	R3BGeoPassivePar* par=(R3BGeoPassivePar*)(rtdb->getContainer("R3BGeoPassivePar"));
         TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
         TObjArray *fPassNodes = par->GetGeoPassiveNodes();
 
@@ -55,6 +57,7 @@ void R3BCave::ConstructGeometry()
         }
         par->setChanged();
         par->setInputVersion(fRun->GetRunId(),1);
+	*/
 
 }
 

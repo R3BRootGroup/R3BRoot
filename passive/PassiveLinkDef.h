@@ -7,6 +7,7 @@
 #pragma link off all functions;
  
 #pragma link C++ class  R3BMagnet+;
+#pragma link C++ class  R3BGladMagnet+;
 #pragma link C++ class  R3BTarget+;
 #pragma link C++ class  R3BPipe+;
 #pragma link C++ class  R3BCave+;

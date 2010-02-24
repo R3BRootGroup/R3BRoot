@@ -26,6 +26,7 @@ R3BGeoPassivePar.cxx
 R3BGeoPipe.cxx        
 R3BGeoTarget.cxx      
 R3BMagnet.cxx         
+R3BGladMagnet.cxx         
 R3BPassiveContFact.cxx
 R3BPipe.cxx           
 R3BTarget.cxx 
