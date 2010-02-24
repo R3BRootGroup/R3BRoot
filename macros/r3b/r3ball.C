@@ -116,8 +116,11 @@ void r3ball(Int_t nEvents = 1,
   run->SetMaterials("media_r3b.geo");       // Materials
   
 
-  // Global Transformation
+  // Magnetic field map type
+   Int_t fFieldMap = 0;
 
+
+  // Global Transformations
   //- Two ways for a Volume Rotation are supported
   //-- 1) Global Rotation (Euler Angles definition)
   //-- This represent the composition of : first a rotation about Z axis with
@@ -164,6 +167,7 @@ void r3ball(Int_t nEvents = 1,
 
   //R3B Magnet definition
   if (fDetList.FindObject("ALADIN") ) {
+      fFieldMap = 0;
       R3BModule* mag = new R3BMagnet("AladinMagnet");
       // Global position of the Module
       phi   =  0.0; // (deg)
@@ -182,6 +186,29 @@ void r3ball(Int_t nEvents = 1,
       mag->SetTranslation(tx,ty,tz);
       run->AddModule(mag);
   }
+
+    //R3B Magnet definition
+  if (fDetList.FindObject("GLAD") ) {
+      fFieldMap = 1;
+      R3BModule* mag = new R3BGladMagnet("GladMagnet");
+      // Global position of the Module
+      phi   =  0.0; // (deg)
+      theta =  0.0; // (deg)
+      psi   =  0.0; // (deg)
+      // Rotation in Ref. Frame.
+      thetaX =  0.0; // (deg)
+      thetaY =  0.0; // (deg)
+      thetaZ =  0.0; // (deg)
+      // Global translation in Lab
+      tx    =  0.0; // (cm)
+      ty    =  0.0; // (cm)
+      tz    =  0.0; // (cm)
+      //mag->SetRotAnglesEuler(phi,theta,psi);
+      mag->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
+      mag->SetTranslation(tx,ty,tz);
+      run->AddModule(mag);
+  }
+
 
   if (fDetList.FindObject("CRYSTALBALL") ) {
       //R3B Crystal Calorimeter
@@ -420,15 +447,30 @@ void r3ball(Int_t nEvents = 1,
   //NB: <D.B>
   // If the Global Position of the Magnet is changed
   // the Field Map has to be transformed accordingly
-  R3BFieldMap* magField = new R3BFieldMap(typeOfMagneticField,fVerbose);
-  magField->SetPosition(0., 0., 0.);
-  magField->SetScale(fieldScale);
 
-  if ( fR3BMagnet == kTRUE ) {
-      run->SetField(magField);
-  } else {
-      run->SetField(NULL);
-  }
+  if (fFieldMap == 0) {
+    R3BFieldMap* magField = new R3BFieldMap(typeOfMagneticField,fVerbose);
+    magField->SetPosition(0., 0., 0.);
+    magField->SetScale(fieldScale);
+
+    if ( fR3BMagnet == kTRUE ) {
+	run->SetField(magField);
+    } else {
+	run->SetField(NULL);
+    }
+  } else if(fFieldMap == 1){
+    R3BGladFieldMap* magField = new R3BGladFieldMap("R3BGladMap");
+    magField->SetPosition(0., 0., +350-119.94);
+    magField->SetScale(fieldScale);
+
+    if ( fR3BMagnet == kTRUE ) {
+	run->SetField(magField);
+    } else {
+	run->SetField(NULL);
+    }
+  }  //! end of field map section
+
+
 
   // -----   Create PrimaryGenerator   --------------------------------------
 
