@@ -51,7 +51,7 @@ R3BMCTrack::R3BMCTrack(const R3BMCTrack& track) {
 
 
 // -----   Constructor from TParticle   ------------------------------------
-R3BMCTrack::R3BMCTrack(TParticle* part) {
+R3BMCTrack::R3BMCTrack(TParticle* part, Int_t fMC) {
 
   fPdgCode  = part->GetPdgCode();
   fMotherId = part->GetMother(0);

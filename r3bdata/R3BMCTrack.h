@@ -47,7 +47,7 @@ class R3BMCTrack : public TObject
 
 
   /**  Constructor from TParticle  **/
-  R3BMCTrack(TParticle* particle);
+  R3BMCTrack(TParticle* particle, Int_t fMC);
 
 
   /**  Destructor  **/
