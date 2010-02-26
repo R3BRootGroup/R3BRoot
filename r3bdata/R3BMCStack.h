@@ -221,7 +221,7 @@ class R3BStack : public FairGenericStack
   Int_t fNParticles;    //! Number of entries in fParticles
   Int_t fNTracks;       //! Number of entries in fTracks
   Int_t fIndex;         //! Used for merging
-
+  Int_t fMC;            //! index for MC units testing
 
   /** Variables defining the criteria for output selection **/
   Bool_t     fStoreSecondaries;

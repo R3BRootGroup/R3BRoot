@@ -13,6 +13,7 @@
 #include "TLorentzVector.h"
 #include "TParticle.h"
 #include "TRefArray.h"
+#include "TVirtualMC.h"
 
 #include <list>
 #include <iostream>
@@ -34,6 +35,11 @@ R3BStack::R3BStack(Int_t size) {
   fEnergyCut        = 0.;
   fStoreMothers     = kTRUE;
   fDebug            = kFALSE;
+  TString MCName = gMC->GetName(); 
+  if (MCName.CompareTo("TGeant4") == 0 ){
+    fMC=1; 
+  }else fMC=0;
+ 
 }
 
 // -------------------------------------------------------------------------
@@ -214,14 +220,18 @@ void R3BStack::FillTrackArray() {
 
     if (store) {
       R3BMCTrack* track = 
-	new( (*fTracks)[fNTracks]) R3BMCTrack(GetParticle(iPart));
+	new( (*fTracks)[fNTracks]) R3BMCTrack(GetParticle(iPart),fMC);
       fIndexMap[iPart] = fNTracks;
       // --> Set the number of points in the detectors for this track
       for (Int_t iDet=kCAL; iDet<=kTRA; iDet++) {
 	pair<Int_t, Int_t> a(iPart, iDet);
 	track->SetNPoints(iDet, fPointsMap[a]);
       }
+
       fNTracks++;
+      //cout << "-I- TParticle time " << GetParticle(iPart)->T() << endl;
+      //cout << "-I- MC Track time " << track->GetStartT() << endl;
+
     
     }else{
       if (fDebug) cout << "-D- R3BMCStack IndexMap ---> -2 for iPart: " << iPart << endl;    
