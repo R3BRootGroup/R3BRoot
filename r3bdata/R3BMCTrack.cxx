@@ -61,7 +61,15 @@ R3BMCTrack::R3BMCTrack(TParticle* part) {
   fStartX   = part->Vx();
   fStartY   = part->Vy();
   fStartZ   = part->Vz();
-  fStartT   = part->T()*1e09;
+ 
+  if (fMC == 0 ) {
+    //G3 
+      fStartT   = part->T()*1e09;
+   }else if (fMC == 1 ){
+    //G4 
+    fStartT   = part->T();
+  }
+
   fNPoints  = 0;
   fMass     = part->GetMass();
 
