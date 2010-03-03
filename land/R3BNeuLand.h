@@ -115,6 +115,7 @@ class R3BNeuLand : public R3BDetector
   virtual void ConstructGeometry();
   virtual void ConstructGeometry1();
   virtual void ConstructGeometry2();
+  virtual void ConstructGeometry3();
   virtual void Initialize();
   virtual void SetSpecialPhysicsCuts(){;}
   void SetGeomVersion(Int_t vers ) { fVersion = vers; }
@@ -124,13 +125,16 @@ class R3BNeuLand : public R3BDetector
 
   private:
 
-
     /** Track information to be stored until the track leaves the
 	active volume. **/
     Int_t          fTrackID;           //!  track index
-    Int_t          fVolumeID;          //!  volume id
-    Int_t          fCopyNo;            //!  copy no
-    Int_t          fPaddleTyp;               //!  box number
+    Int_t          fMot0TrackID;       //!  0th mother track index
+    Int_t          fMot1TrackID;       //!  1st mother track index
+    Int_t          fMot2TrackID;       //!  2nd mother track index
+    Int_t          fMot3TrackID;       //!  3rd mother track index
+    Int_t          fDetID;             //!  detector id
+    Int_t          fSegID;             //!  detector segment id
+    Int_t          fCellID;            //!  detector cell id
     TLorentzVector fPosIn, fPosOut;    //!  position
     TLorentzVector fMomIn, fMomOut;    //!  momentum
     Double32_t     fTime;              //!  time
@@ -138,7 +142,7 @@ class R3BNeuLand : public R3BDetector
     Double32_t     fELoss;             //!  energy loss
 
     Int_t          fPosIndex;          //!
-    TClonesArray*  fLandCollection;     //!  The hit collection
+    TClonesArray*  fLandCollection;    //!  The hit collection
     Bool_t         kGeoSaved;          //!
     TList *flGeoPar; //!
     Int_t fVersion;                    //! geometry version
@@ -148,11 +152,13 @@ class R3BNeuLand : public R3BDetector
      **
      ** Adds a NeuLandPoint to the HitCollection
      **/
-    R3BNeuLandPoint* AddHit(Int_t trackID, Int_t detID, Int_t box, Int_t id1, Int_t id2,
-			 TVector3 posIn,
-			 TVector3 pos_out, TVector3 momIn,
-			 TVector3 momOut, Double_t time,
-			 Double_t length, Double_t eLoss);
+    R3BNeuLandPoint* AddHit(Int_t trackID,
+			    Int_t mot0trackID, Int_t mot1trackID, Int_t mot2trackID, Int_t mot3trackID,
+			    Int_t detID, Int_t segID, Int_t cellID,
+			    TVector3 posIn,
+			    TVector3 pos_out, TVector3 momIn,
+			    TVector3 momOut, Double_t time,
+			    Double_t length, Double_t eLoss);
 
 
     /** Private method ResetParameters
@@ -168,13 +174,23 @@ class R3BNeuLand : public R3BDetector
     Int_t fIdMedFe;
     Int_t fIdMedGlass;
     Int_t fIdMedGas;
-
-   
+ 
    TGeoMedium * pMedFe;
    TGeoMedium* pMed_glas;
    TGeoMedium* pMed_gas;
 
+   // veriosn 4
+   Int_t fIDMedSteel;
+   Int_t fIDMedGlass;
+   Int_t fIDMedGas;
 
+   TGeoMedium* pMedAir;
+   TGeoMedium* pMedSteel;
+   TGeoMedium* pMedGlass;
+   TGeoMedium* pMedBak;
+   TGeoMedium* pMedGas;
+
+   
 
 
     ClassDef(R3BNeuLand,1);
@@ -183,7 +199,8 @@ class R3BNeuLand : public R3BDetector
 
 
 inline void R3BNeuLand::ResetParameters() {
-  fTrackID = fVolumeID = 0;
+  fTrackID = fDetID = fSegID = fCellID = -1;
+  fMot0TrackID = fMot1TrackID = fMot2TrackID = fMot3TrackID = -1;
   fPosIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fPosOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fMomIn.SetXYZM(0.0, 0.0, 0.0, 0.0);

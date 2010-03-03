@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-// -----                        R3BNeuLand source file                     -----
+// -----                        R3BNeuLand source file                 -----
 // -----                  Created 26/03/09  by D.Bertini               -----
 // -------------------------------------------------------------------------
 #include "R3BNeuLand.h"
@@ -41,6 +41,7 @@
 #include "TGeoCompositeShape.h"
 #include "TGeoShapeAssembly.h"
 #include <iostream>
+#include <math.h>
 
 using std::cout;
 using std::cerr;
@@ -58,11 +59,16 @@ R3BNeuLand::R3BNeuLand() : R3BDetector("R3BNeuLand", kTRUE, kLAND) {
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
   fVersion =1;
-
+  
   fIdMedFe = -1;
   fIdMedGlass = -1;
   fIdMedGas = -1;
-
+  
+  // version 4
+  fIDMedSteel = -1;
+  fIDMedGlass = -1;
+  fIDMedGas = -1;
+  
 
 }
 // -------------------------------------------------------------------------
@@ -84,6 +90,11 @@ R3BNeuLand::R3BNeuLand(const char* name, Bool_t active)
   fIdMedFe = -1;
   fIdMedGlass = -1;
   fIdMedGas = -1;
+
+  // version 4
+  fIDMedSteel = -1;
+  fIDMedGlass = -1;
+  fIDMedGas = -1;
 
 }
 
@@ -109,29 +120,25 @@ Bool_t R3BNeuLand::ProcessHits(FairVolume* vol) {
   Int_t cp1=-1;
   Int_t cp2=-1;
   Int_t cp3=-1;
+  Int_t cp4=-1;
 
   Int_t volId1=-1;
   Int_t volId2=-1;
   Int_t volId3=-1;
+  Int_t volId4=-1;
 
   Int_t iMed = gMC->CurrentMedium();   
   //  cout << " iMed " << iMed << " iMedGas:  " << fIdMedGas << endl; 
 
-  if ( iMed == fIdMedFe ) {
-    cout << " in Fe: Track Pid " << gMC->TrackPid() << endl;
+
+  //if ( iMed == fIdMedFe ) {
+  if ( iMed == fIDMedSteel ) {
+    //cout << " in Steel: Track Pid " << gMC->TrackPid() << endl;
    }
 
-  if (iMed == fIdMedGas){
+  //if (iMed == fIdMedGas){
+  if (iMed == fIDMedGas){
 
-    volId1 =  gMC->CurrentVolID(cp1);
-    volId2 =  gMC->CurrentVolOffID(1, cp2);
-    volId3 =  gMC->CurrentVolOffID(2, cp3);
-    
-    //  cout << " ProcessHit Volume: " << vol->getName() << " Id2: " << volId2 
-    //	 << " copyNr2: " << cp2  
-    //	 << " Id3: " << volId3  << " copyNr3 " << cp3 
-    //	 << " Id1: " << volId1  << " copyNr1 " << cp1 << endl; 
-    
     if ( gMC->IsTrackEntering() ) {
       fELoss  = 0.;
       fTime   = gMC->TrackTime() * 1.0e09;
@@ -141,13 +148,41 @@ Bool_t R3BNeuLand::ProcessHits(FairVolume* vol) {
     }
     
     // Sum energy loss for all steps in the active volume
-    fELoss += gMC->Edep();
-    
+    fELoss += gMC->Edep() * 1E+6; //keV
+    //cout << " Eloss: " << gMC->Edep()*1E+6 << endl;
+
     // Set additional parameters at exit of active volume. Create R3BNeuLandPoint.
     if ( gMC->IsTrackExiting()    ||
 	 gMC->IsTrackStop()       ||
 	 gMC->IsTrackDisappeared()   ) {
+      
       fTrackID  = gMC->GetStack()->GetCurrentTrackNumber();
+      fMot0TrackID  = gMC->GetStack()->GetCurrentTrack()->GetMother(0);
+      fMot1TrackID  = gMC->GetStack()->GetCurrentTrack()->GetMother(1);
+      fMot2TrackID  = gMC->GetStack()->GetCurrentTrack()->GetMother(2);
+      fMot3TrackID  = gMC->GetStack()->GetCurrentTrack()->GetMother(3);
+      //cout << " fTrackID " << fTrackID << endl;
+      //cout << " fMot0TrackID " << fMot0TrackID << endl;
+      //cout << " fMot1TrackID " << fMot1TrackID << endl;
+      //cout << " fMot2TrackID " << fMot2TrackID << endl;
+      //cout << " fMot3TrackID " << fMot3TrackID << endl;
+
+    volId1 =  gMC->CurrentVolID(cp1);
+    volId2 =  gMC->CurrentVolOffID(1, cp2);
+    volId3 =  gMC->CurrentVolOffID(2, cp3);
+    volId4 =  gMC->CurrentVolOffID(3, cp4);
+    fDetID = cp4;
+    fSegID = cp3;
+    fCellID = cp2;
+
+    //cout << " ProcessHit Volume: " << vol->getName() << " Id2: " << volId2 
+    //<< " copyNr2: " << cp2  
+    //<< " Id3: " << volId3  << " copyNr3: " << cp3 
+    //<< " Id4: " << volId4  << " copyNr4: " << cp4 
+    //<< " Id1: " << volId1  << " copyNr1: " << cp1 << endl; 
+
+
+
       gMC->TrackPosition(fPosOut);
       gMC->TrackMomentum(fMomOut);
       if (fELoss == 0. ) return kFALSE;
@@ -190,7 +225,8 @@ Bool_t R3BNeuLand::ProcessHits(FairVolume* vol) {
 	fPosOut.SetZ(newpos[2]);
       }
       
-      AddHit(fTrackID, fVolumeID,   cp3,   cp2, cp1,
+      AddHit(fTrackID, fMot0TrackID, fMot1TrackID, fMot2TrackID, fMot3TrackID,
+	     fDetID, fSegID, fCellID,
 	     TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
 	     TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
 	     TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
@@ -224,9 +260,15 @@ void R3BNeuLand::BeginEvent() {
     }
 
     // Store the Materials Id
-    fIdMedFe    = pMedFe->GetId();
-    fIdMedGlass = pMed_glas->GetId();
-    fIdMedGas   = pMed_gas->GetId();
+    // version 3
+    //fIdMedFe    = pMedFe->GetId();
+    //fIdMedGlass = pMed_glas->GetId();
+    //fIdMedGas   = pMed_gas->GetId();
+
+    // version 4
+    fIDMedSteel    = pMedSteel->GetId();
+    fIDMedGlass = pMedGlass->GetId();
+    fIDMedGas   = pMedGas->GetId();
 
 }
 
@@ -294,18 +336,21 @@ void R3BNeuLand::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) 
 }
 
 // -----   Private method AddHit   --------------------------------------------
-R3BNeuLandPoint* R3BNeuLand::AddHit(Int_t trackID, Int_t detID, Int_t box, Int_t id1, Int_t id2,
-			     TVector3 posIn,
-			     TVector3 posOut, TVector3 momIn,
-			     TVector3 momOut, Double_t time,
-			     Double_t length, Double_t eLoss) {
+R3BNeuLandPoint* R3BNeuLand::AddHit(Int_t trackID,
+				    Int_t mot0trackID, Int_t mot1trackID, Int_t mot2trackID, Int_t mot3trackID,
+				    Int_t detID, Int_t segID, Int_t cellID,
+				    TVector3 posIn,
+				    TVector3 posOut, TVector3 momIn,
+				    TVector3 momOut, Double_t time,
+				    Double_t length, Double_t eLoss) {
   TClonesArray& clref = *fLandCollection;
   Int_t size = clref.GetEntriesFast();
   if (fVerboseLevel>1) 
     cout << "-I- R3BNeuLand: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
 	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
 	 << trackID << ", energy loss " << eLoss  << " GeV" << endl;
-  return new(clref[size]) R3BNeuLandPoint(trackID, detID, box, id1, id2,  posIn, posOut,
+  return new(clref[size]) R3BNeuLandPoint(trackID, mot0trackID, mot1trackID, mot2trackID, mot3trackID,
+					  detID, segID, cellID, posIn, posOut,
 				      momIn, momOut, time, length, eLoss);
 }
 // -----   Public method ConstructGeometry   ----------------------------------
@@ -314,6 +359,8 @@ void R3BNeuLand::ConstructGeometry() {
 
    // New Design for RPC
    if ((fVersion == 3 )) return ConstructGeometry2();
+   // New Design for RPC
+   if ((fVersion == 4 )) return ConstructGeometry3();
 
    cout << "-I- R3BNeuLand  ConstruGeometry() :unknown Geometry version  !!! " << endl;
 }
@@ -841,11 +888,303 @@ void R3BNeuLand::ConstructGeometry2() {
     tz = 0.0;
 
     // add divided volume to top Volume
+    if ( fVersion == 3 ){
     vWorld->AddNode(aRPCModule,1, new TGeoCombiTrans(tx,ty,tz,rot) );
+    }
+} // version 3
 
-}
+void R3BNeuLand::ConstructGeometry3() {
+  Double_t dx,dy,dz;
+  //Double_t dx1, dx2, dy1, dy2;
+  Double_t a;
+  Double_t z, density, w;
+  Int_t nel, numed, aw;
+  //Double_t radl,absl;
+  
+  Double_t par[8];
+  par[0]  = 0.000000; // isvol
+  par[1]  = 0.000000; // ifield
+  par[2]  = 0.000000; // fieldm
+  par[3]  = 10.00000; // tmaxfd
+  par[4]  = 0.100000; // stemax
+  par[5]  = 0.050000; // deemax
+  par[6]  = 0.001000; // epsil
+  par[7]  = 0.001000; // stmin
 
 
+   // -- Elements
 
+  TGeoElement* elH = new TGeoElement("Hydrogen", "H", z= 1., a= 1.00794);
+  TGeoElement* elC = new TGeoElement("Nitrogen", "C", z= 6., a= 12.0107);
+  TGeoElement* elN = new TGeoElement("Nitrogen", "N", z= 7., a= 14.007);
+  TGeoElement* elO = new TGeoElement("Oxygen", "O", z= 8., a= 28.0855);
+  TGeoElement* elF = new TGeoElement("Fluorine", "F", z= 9., a= 18.9984032);
+  TGeoElement* elNa = new TGeoElement("Sodium", "Na", z= 11., a= 22.98976928);
+  TGeoElement* elMg = new TGeoElement("Magnesium", "Mg", z= 12., a= 24.3050);
+  TGeoElement* elSi = new TGeoElement("Silicon", "Si", z= 14., a= 28.0855);
+  TGeoElement* elS = new TGeoElement("Sulfur", "S", z= 16., a= 32.065);
+  TGeoElement* elCa = new TGeoElement("Calcium", "Ca", z= 20., a= 40.078);
+  TGeoElement* elCr = new TGeoElement("Chromium", "Cr", z= 24., a= 51.9961);
+  TGeoElement* elFe = new TGeoElement("Iron", "Fe", z= 26., a= 55.845);
+  TGeoElement* elNi = new TGeoElement("Nickel", "Ni", z= 28., a= 58.6934);
+
+
+  // -- Materials
+
+  // Air
+    nel     = 2;
+    density = 0.001290;
+    TGeoMixture* pMatAir = new TGeoMixture("Air", nel,density);
+    w = 0.700000;  // 70 % N
+    pMatAir->AddElement(elN,w);
+    w = 0.300000;  // 30 % O
+    pMatAir->AddElement(elO,w);
+    pMatAir->SetIndex(1);
+    
+    // Stainless steel
+    nel     = 3;
+    density = 7.9;
+    TGeoMixture* pMatSteel = new TGeoMixture("Steel", nel,density);
+    w = 0.710000;  // 71 % Fe
+    pMatSteel->AddElement(elFe,w);
+    w = 0.180000;  // 18 % Cr
+    pMatSteel->AddElement(elCr,w);
+    w = 0.110000;  // 11 % Ni
+    pMatSteel->AddElement(elNi,w);
+    pMatSteel->SetIndex(2);
+    
+    // SiO2
+    nel     = 2;
+    density = 2.634;
+    TGeoMixture* pMatSiO2 = new TGeoMixture("SiO2", nel,density);
+    aw = 1;  // 1 Si in chemical formula
+    pMatSiO2->AddElement(elSi,aw);
+    aw = 2;  // 2 O in chemical formula
+    pMatSiO2->AddElement(elO,aw);
+    pMatSiO2->SetIndex(3);
+
+    // Na2O
+    nel     = 2;
+    density = 2.27;
+    TGeoMixture* pMatNa2O = new TGeoMixture("Na2O", nel,density);
+    aw = 2;  // 2 Na in chemical formula
+    pMatNa2O->AddElement(elNa,aw);
+    aw = 1;  // 1 O in chemical formula
+    pMatNa2O->AddElement(elO,aw);
+    pMatNa2O->SetIndex(4);
+
+    // CaO
+    nel     = 2;
+    density = 3.35;
+    TGeoMixture* pMatCaO = new TGeoMixture("CaO", nel,density);
+    aw = 1;  // 1 Ca in chemical formula
+    pMatCaO->AddElement(elCa,aw);
+    aw = 1;  // 1 O in chemical formula
+    pMatCaO->AddElement(elO,aw);
+    pMatCaO->SetIndex(5);
+
+    // MgO
+    nel     = 2;
+    density = 3.58;
+    TGeoMixture* pMatMgO = new TGeoMixture("MgO", nel,density);
+    aw = 1;  // 1 Mg in chemical formula
+    pMatMgO->AddElement(elMg,aw);
+    aw = 1;  // 1 O in chemical formula
+    pMatMgO->AddElement(elO,aw);
+    pMatMgO->SetIndex(6);
+
+    // Soda-lime glass: 73% SiO2, 14% Na2O, 9% CaO, 4% MgO
+    nel     = 4;
+    density = 2.53;
+    TGeoMixture* pMatGlass = new TGeoMixture("Glass", nel,density);
+    w = 0.73;  // 73% SiO2
+    pMatGlass->AddElement(pMatSiO2,w);
+    w = 0.14;  // 14% Na2O
+    pMatGlass->AddElement(pMatNa2O,w);
+    w = 0.09;  // 9% CaO
+    pMatGlass->AddElement(pMatCaO,w);
+    w = 0.04;  // 4% MgO
+    pMatGlass->AddElement(pMatMgO,w);
+    pMatGlass->SetIndex(7);
+
+    // Freon: C2H2F4
+    nel     = 3;
+    density = 0.00425;
+    TGeoMixture* pMatFreon = new TGeoMixture("Freon", nel,density);
+    aw = 2;  // 2 C in chemical formula
+    pMatFreon->AddElement(elC,aw);
+    aw = 2;  // 2 H in chemical formula
+    pMatFreon->AddElement(elH,aw);
+    aw = 4;  // 4 F in chemical formula
+    pMatFreon->AddElement(elF,aw);
+    pMatFreon->SetIndex(8);
+
+    // SF6
+    nel     = 2;
+    density = 0.006164;
+    TGeoMixture* pMatSF6 = new TGeoMixture("SF6", nel,density);
+    aw = 1;  // 1 S in chemical formula
+    pMatSF6->AddElement(elS,aw);
+    aw = 6;  // 6 F in chemical formula
+    pMatSF6->AddElement(elF,aw);
+    pMatSF6->SetIndex(9);
+
+    // Isobutane: C4H10
+    nel     = 2;
+    density = 0.00251;
+    TGeoMixture* pMatIbut = new TGeoMixture("Ibut", nel,density);
+    aw = 4;  // 4 C in chemical formula
+    pMatIbut->AddElement(elC,aw);
+    aw = 10;  // 10 H in chemical formula
+    pMatIbut->AddElement(elH,aw);
+    pMatIbut->SetIndex(10);
+
+    // RPCgas: 84% Freon, 10% SF6, 6% Isobutane
+    nel     = 3;
+    density = 0.0053;
+    TGeoMixture* pMatRPCgas = new TGeoMixture("RPCgas", nel,density);
+    w = 0.84;  // 84% Isobutane
+    pMatRPCgas->AddElement(pMatFreon,w);
+    w = 0.10;  // 10% SF6
+    pMatRPCgas->AddElement(pMatSF6,w);
+    w = 0.06;  // 6% Isobutane
+    pMatRPCgas->AddElement(pMatIbut,w);
+    pMatSF6->SetIndex(11);
+    
+    // Bakelite: C43H38O7
+    nel     = 3;
+    density = 1.25;
+    TGeoMixture* pMatBak = new TGeoMixture("Bak", nel,density);
+    aw = 43;  // 43 C in chemical formula
+    pMatBak->AddElement(elC,aw);
+    aw = 38;  // 38 H in chemical formula
+    pMatBak->AddElement(elH,aw);
+    aw = 7;  // 38 O in chemical formula
+    pMatBak->AddElement(elO,aw);
+    pMatBak->SetIndex(12);
+    
+    // -- Media
+
+    // Air
+    numed   = 22;
+    pMedAir = new TGeoMedium("Air", numed,pMatAir, par);
+    numed   = 23;
+    pMedSteel = new TGeoMedium("Steel", numed,pMatSteel, par);
+    numed   = 24;
+    pMedGlass = new TGeoMedium("Glass", numed,pMatGlass, par);
+    numed   = 26;
+    pMedBak = new TGeoMedium("Bakelite", numed,pMatBak, par);
+    numed   = 25;  // medium number
+    // More fine steping def. in Gas
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 10.00000; // tmaxfd
+    par[4]  = 0.0010000; // stemax
+    par[5]  = 0.005000; // deemax
+    par[6]  = 0.001000; // epsil
+    par[7]  = 0.001000; // stmin
+    pMedGas = new TGeoMedium("Gas", numed,pMatRPCgas, par);
+
+        
+     //-- Main Geometry definition
+    //-- Get the top volume (CAVE) from the TGeoManager class
+    
+    TGeoVolume* vWorld = gGeoManager->GetTopVolume();
+    vWorld->SetVisLeaves(kTRUE);
+    
+    // RPC prototype FZD
+    Double_t padx = 10.0; // half length in cm
+    Double_t pady = 20.0; // half length in cm
+    Double_t padz = 0.2875; // half length in cm
+    TGeoShape* pad_mod1 = new TGeoBBox("paddle_mod1",
+				       padx,
+				       pady,
+				       padz);    
+    // Volume: Steel + Glass + Gas
+    TGeoVolume* pMod1 = new TGeoVolume("STEELVOL",pad_mod1, pMedSteel);
+    //TGeoVolume* pMod1 = new TGeoVolume("STEELVOL",pad_mod1, pMedBak);
+    AddSensitiveVolume(pMod1);
+    
+    Double_t delta_Steel = 0.2; // thickness of steel in cm
+    Double_t delta_Glass = 0.095; // thickness of glass sheet
+    Double_t delta_Gas = 0.03; // thickness of gas gap
+    
+    
+    Double_t ndiv = ceil(( 2*padz - delta_Steel ) / (delta_Glass+delta_Gas));
+    Double_t start_z = -padz + delta_Steel ;
+    Double_t step = (delta_Glass+delta_Gas);
+    
+    cout << "ndiv: " << ndiv << " start_z: " << start_z << " step: " << step << endl;
+    
+    
+    TGeoVolume *divVolGlass =
+      gGeoManager->Division("GLASSSLICE","STEELVOL",3, ndiv , start_z , step, pMedGlass->GetId()); 
+    
+    TGeoVolume *divVolGas =
+      gGeoManager->Division("GASCELL","GLASSSLICE",3, 1 ,-step/2+delta_Glass , step-delta_Glass, pMedGas->GetId());     
+    AddSensitiveVolume(divVolGas);
+     cout << " start_z2: " << (-step/2+delta_Glass) << " step2: " << step-delta_Glass << endl;
+    
+    // Store the Materials Id
+    //fIDMedSteel    = pMedSteel->GetId();
+    //fIDMedGlass = pMedGlass->GetId();
+    //fIDMedGas   = pMedGas->GetId();
+
+    
+    // Volume: glass + steel
+    Double_t apadx = padx; // half length in cm
+    Double_t apady = pady; // half length in cm
+    Double_t apadz = (delta_Glass + delta_Steel)/2; // half length in cm
+    TGeoShape* pad_mod2 = new TGeoBBox("paddle_mod2",
+				       apadx,
+				       apady,
+				       apadz);    
+    TGeoVolume*
+      pMod2 = new TGeoVolume("GLASSVOL",pad_mod2, pMedGlass);
+    
+    TGeoVolume *divVolAnode =
+      gGeoManager->Division("AnodeSLICE","GLASSVOL",3, 1 , -apadz+delta_Glass , 2*apadz-delta_Glass, pMedSteel->GetId()); 
+    cout << " start_z3: " << (-apadz+delta_Glass) << " step3: " << 2*apadz-delta_Glass  << endl;
+
+    TGeoRotation *rot1 = new TGeoRotation("rot1",0,180,0);
+    TGeoRotation *rot = new TGeoRotation();
+    rot->RotateX(0.);
+    rot->RotateY(0.);
+    rot->RotateZ(0.);
+    
+    Double_t tx = 0.0;
+    Double_t ty = 0.0;
+    Double_t tz = 0.0;
+
+    // Make the elementary assembly of the whole structure
+    TGeoVolume *aRPCModule = new TGeoVolumeAssembly("RPCMODULE"); 
+   
+    // add divided volume to top Volume
+    aRPCModule->AddNode(pMod1,    11, new TGeoCombiTrans(tx,ty,tz,rot) ); // index cp3
+    tz = padz + apadz;
+    aRPCModule->AddNode(pMod2, 2, new TGeoCombiTrans(tx,ty,tz,rot) );
+    tz = padz + apadz + 2 * apadz;
+    rot->RotateX(180.);
+    aRPCModule->AddNode(pMod2, 3, new TGeoCombiTrans(tx,ty,tz,rot1) );
+    tz = padz + apadz + 2 * apadz + apadz + padz;
+    rot->RotateX(180.);
+    aRPCModule->AddNode(pMod1,    12, new TGeoCombiTrans(tx,ty,tz,rot1) ); // index cp3
+
+    rot->RotateX(0.);
+    rot->RotateY(0.);
+    rot->RotateZ(0.);
+    tx = 0.0;
+    ty = 0.0;
+    tz = 0.0;
+
+    // add divided volume to top Volume
+    vWorld->AddNode(aRPCModule,101, new TGeoCombiTrans(tx,ty,tz,rot) );
+    //rot->RotateX(180.);
+    //vWorld->AddNode(pMod1,1, new TGeoCombiTrans(tx,ty,tz,rot) );
+    tz = padz + 2 * (delta_Glass + delta_Steel) + padz + padz + delta_Glass + delta_Steel;
+    vWorld->AddNode(aRPCModule,102, new TGeoCombiTrans(tx,ty,tz,rot) );
+  
+} // version 4
 
 ClassImp(R3BNeuLand)
