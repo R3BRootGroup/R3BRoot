@@ -15,19 +15,25 @@ using std::flush;
 R3BNeuLandPoint::R3BNeuLandPoint() : FairMCPoint() {
   fX_out      = fY_out  = fZ_out  = 0.;
   fPx_out     = fPy_out = fPz_out = 0.;
-  fSector     = -1 ;
-  fPaddleTyp  = -1 ;
-  fPaddleNb   = -1 ;
+  fMot0TrackID = -1 ;
+  fMot1TrackID = -1 ;
+  fMot2TrackID = -1 ;
+  fMot3TrackID = -1 ;
+  fDetID = -1 ;
+  fSegID  = -1 ;
+  fCellID   = -1 ;
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Standard constructor   ------------------------------------------
-R3BNeuLandPoint::R3BNeuLandPoint(Int_t trackID, Int_t detID, Int_t box, Int_t sector,
-			   Int_t paddle, TVector3 posIn,
-			   TVector3 posOut, TVector3 momIn, TVector3 momOut,
-			   Double_t tof, Double_t length, Double_t eLoss)
+R3BNeuLandPoint::R3BNeuLandPoint(Int_t trackID,
+				 Int_t mot0trackID, Int_t mot1trackID, Int_t mot2trackID, Int_t mot3trackID,
+				 Int_t detID, Int_t segID, Int_t cellID,
+				 TVector3 posIn,
+				 TVector3 posOut, TVector3 momIn, TVector3 momOut,
+				 Double_t tof, Double_t length, Double_t eLoss)
   : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss) {
   fX_out  = posOut.X();
   fY_out  = posOut.Y();
@@ -35,10 +41,13 @@ R3BNeuLandPoint::R3BNeuLandPoint(Int_t trackID, Int_t detID, Int_t box, Int_t se
   fPx_out = momOut.Px();
   fPy_out = momOut.Py();
   fPz_out = momOut.Pz();
-  fSector = sector;
-  fPaddleTyp = box;
-  fPaddleNb = paddle;
-
+  fMot0TrackID = mot0trackID;
+  fMot1TrackID = mot1trackID;
+  fMot2TrackID = mot2trackID;
+  fMot3TrackID = mot3trackID;
+  fDetID = detID;
+  fSegID = segID;
+  fCellID = cellID;
 }
 // -------------------------------------------------------------------------
 
@@ -54,10 +63,9 @@ R3BNeuLandPoint::~R3BNeuLandPoint() { }
 // -----   Public method Print   -------------------------------------------
 void R3BNeuLandPoint::Print(const Option_t* opt) const {
   cout << "-I- R3BNeuLandPoint: LAND Point for track " << fTrackID
-	<< " in detector " << fDetectorID
-	<< " Sector: " << fSector
-	<< " PaddleTyp: " << fPaddleTyp
-	<< " PaddleNb: " << fPaddleNb << endl;
+	<< " in detector " << fDetID
+	<< " Segment: " << fSegID
+       << " Cell: " << fCellID << endl;
 
   cout << "    Position (" << fX << ", " << fY << ", " << fZ
        << ") cm" << endl;
