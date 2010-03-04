@@ -28,6 +28,9 @@ class R3BLandDigi : public TObject
    Double_t tdc, Double_t qdcL, Double_t qdcR, Double_t qdc,
    Double_t xx, Double_t yy, Double_t zz,
    Double_t x0, Double_t y0, Double_t z0, Double_t T0);
+
+	R3BLandDigi(Int_t paddle, Double_t tdcR, Double_t tdcL,
+			               Double_t qdcR, Double_t qdcL);
    
   /** Copy constructor **/
   R3BLandDigi(const R3BLandDigi& point) { *this = point; };
