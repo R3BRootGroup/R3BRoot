@@ -179,7 +179,7 @@ class R3BNeuLand : public R3BDetector
    TGeoMedium* pMed_glas;
    TGeoMedium* pMed_gas;
 
-   // veriosn 4
+   // version 4
    Int_t fIDMedSteel;
    Int_t fIDMedGlass;
    Int_t fIDMedGas;
@@ -189,9 +189,11 @@ class R3BNeuLand : public R3BDetector
    TGeoMedium* pMedGlass;
    TGeoMedium* pMedBak;
    TGeoMedium* pMedGas;
+   TGeoMedium* pMedAl;
 
    
-
+   Int_t cellid1, cellid2, cellid3, cellid4, cellid5, cellid6;
+   Int_t secondaries;
 
     ClassDef(R3BNeuLand,1);
 

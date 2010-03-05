@@ -46,13 +46,36 @@ InitStatus R3BNeuLandDigitizer::Init() {
   //ioman->Register("LandDigi", "Digital response in Land", fDigis, kTRUE);
   
   // Initialise control histograms
+  TString elossNamesP[6] = {"Eloss-p 1", "Eloss-p 2", "Eloss-p 3",
+			   "Eloss-p 4", "Eloss-p 5", "Eloss-p 6"};
+  TString elossNamesE[6] = {"Eloss-e 1", "Eloss-e 2", "Eloss-e 3",
+			   "Eloss-e 4", "Eloss-e 5", "Eloss-e 6"};
+  TString elossTitlesP[6] = {"Eloss-p in gas [keV] 1",
+			    "Eloss-p in gas [keV] 2",
+			    "Eloss-p in gas [keV] 3",
+			    "Eloss-p in gas [keV] 4",
+			    "Eloss-p in gas [keV] 5",
+			    "Eloss-p in gas [keV] 6"};
+  TString elossTitlesE[6] = {"Eloss-e in gas [keV] 1",
+			    "Eloss-e in gas [keV] 2",
+			    "Eloss-e in gas [keV] 3",
+			    "Eloss-e in gas [keV] 4",
+			    "Eloss-e in gas [keV] 5",
+			    "Eloss-e in gas [keV] 6"};
+
+  for(Int_t i=0;i<6;i++){
+    h_eloss_p[i] = new TH1F(elossNamesP[i], elossTitlesP[i] , 1000 , 0. , 300.);
+    h_eloss_e[i] = new TH1F(elossNamesE[i], elossTitlesE[i] , 1000 , 0. , 300.);
+  }
+
+
   h_pdg = new TH1F("PDG","Code of particle deposited energy in gas",3000,-220.,3000.);
-  h_eloss = new TH1F("Eloss","Energy loss in gas [keV]",100,0.,50.);
   h_ne = new TH1F("Ne","primary_el",100,0.,100.);
   h_ch = new TH1F("Charge","",1000,0.,1.);
   h_time = new TH1F("Time [ns]","",100,0.,1000.);
-  h_energy = new TH1F("Total energy [MeV]","",1000,0.,4000.);
-  h_zpos = new TH1F("Zpos [mm]","",1000,-1.,30.);
+  h_energy = new TH1F("Total energy [MeV]","",100000,0.,4000.);
+  h_zpos_e = new TH1F("Zpos electron [mm]","",5000,0.,15.);
+  h_zpos_p = new TH1F("Zpos proton [mm]","",5000,0.,15.);
   h_xpos = new TH1F("Xpos [mm]","",100,-50.,50.);
   h_ypos = new TH1F("Ypos [mm]","",100,-50.,50.);
   h_xpos1_vs_ypos1 = new TH2F("Xpos1 [mm] vs Ypos1 [mm]","",100,-50.,50.,100,-50.,50.);
@@ -71,6 +94,7 @@ InitStatus R3BNeuLandDigitizer::Init() {
   h_pdg_vs_m3pdg = new TH2F("PDG vs m3PDG","",3000,-10000.,10000.,3000,-10000.,10000.);
   h_energy_vs_eloss = new TH2F("Total energy [MeV] vs Eloss [keV]","",100,0.,4000.,100,0.,50.);
   h_energy_vs_pdg = new TH2F("Total energy [MeV] vs PDG [keV]","",10000,0.,4000.,100,-220.,3000.);
+  h_energy_vs_zpos = new TH2F("Total energy [MeV] vs Zpos [mm]","",10000,0.,4000.,1000,-1.,30.);
   h_trackid_vs_m0trackid = new TH2F("TrackId vs m0TrackId","",4002,-1.5,4000.5,4002,-1.5,4000.5);
   h_trackid_vs_m1trackid = new TH2F("TrackId vs m1TrackId","",4002,-1.5,4000.5,4002,-1.5,4000.5);
   h_trackid_vs_m2trackid = new TH2F("TrackId vs m2TrackId","",4002,-1.5,4000.5,4002,-1.5,4000.5);
@@ -102,17 +126,15 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
   //-Reset local arrays 
   Reset();
   
-  // Create Stockastic Avalanche
+  // Create Stochastic Avalanche
   
   //-Now do the job event/event
   //Int_t no_interaction = 0;
   Int_t nentries = fLandPoints->GetEntries();
   if(nentries==0){
     no_interaction = no_interaction + 1;
-    cout << " no_interaction: " << no_interaction << endl;
   }
 
-  
   for (Int_t l=0;l<nentries;l++){
     // Get the Land Object in array
     R3BNeuLandPoint *land_obj = (R3BNeuLandPoint*) fLandPoints->At(l);
@@ -140,10 +162,8 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
     Double_t xPos = land_obj->GetX(zIn * 0.1) * 10;
     Double_t yPos = land_obj->GetY(zIn * 0.1) * 10;
     Double_t time = land_obj->GetTime();
-    
-    //cout << " energy: " << eloss << endl;
 
-    
+
     if(Mot0TrackId>-1){
       R3BMCTrack *aMot0Track = (R3BMCTrack*) fLandMCTrack->At(Mot0TrackId);
       mot0PID = aMot0Track->GetPdgCode();
@@ -181,65 +201,99 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
       Mot3TrackId=mot3PID=-1;
     }
 
-    if (eloss > 0.0 ) {
-      if(detId == 101){
-	
-	h_pdg->Fill(PID);
-	h_time->Fill(time);
-	h_eloss->Fill( eloss );
-	h_xpos->Fill( xPos );
-	h_ypos->Fill( yPos );
-	h_zpos->Fill( zIn );
-	
-	//if(PID == 2212){
-	if(segId == 11){
-	  if(cellId == 1){
-	    h_xpos1_vs_ypos1->Fill(xPos , yPos );
-	    //h_pdg_vs_m0pdg->Fill(PID, mot0PID);
-	    //h_pdg_vs_m1pdg->Fill(PID, mot1PID);
-	    //h_pdg_vs_m2pdg->Fill(PID, mot2PID);
-	    //h_pdg_vs_m3pdg->Fill(PID, mot3PID);
-	  }
-	  if(cellId == 2){
-	    h_xpos2_vs_ypos2->Fill(xPos , yPos );
-	  }
-	  if(cellId == 3){
-	    h_xpos3_vs_ypos3->Fill(xPos , yPos );
-	  }
-	} //segID
-	if(segId == 12){
-	  if(cellId == 3){
-	    h_xpos4_vs_ypos4->Fill(xPos , yPos );
-	  }
-	  if(cellId == 2){
-	    h_xpos5_vs_ypos5->Fill(xPos , yPos );
-	  }
-	  if(cellId == 1){
-	    h_xpos6_vs_ypos6->Fill(xPos , yPos );
-	  }
-	} //segID
-	//} // PID
-	
-	h_pdg_vs_eloss->Fill(PID , eloss ); // keV
-	h_zpos_vs_pdg->Fill(zIn, PID);
-	h_zpos_vs_eloss->Fill(zIn, eloss);
-	h_zpos_vs_time->Fill(zIn, time);
-	h_pdg_vs_m0pdg->Fill(PID, mot0PID);
-	h_pdg_vs_m1pdg->Fill(PID, mot1PID);
-	h_pdg_vs_m2pdg->Fill(PID, mot2PID);
-	h_pdg_vs_m3pdg->Fill(PID, mot3PID);
-	if(PID == 11){
-	  h_trackid_vs_m0trackid->Fill(TrackId, Mot0TrackId);
-	  h_trackid_vs_m1trackid->Fill(TrackId, Mot1TrackId);
-	  h_trackid_vs_m2trackid->Fill(TrackId, Mot2TrackId);
-	  h_trackid_vs_m3trackid->Fill(TrackId, Mot3TrackId);
-	}
-	h_energy->Fill( energy ); // MeV
-	h_energy_vs_eloss->Fill(energy , eloss );
-	h_energy_vs_pdg->Fill(energy , PID);
-      } // detID
-      /*
+    
+    //    if (eloss > 0.0 ) {
+	switch(segId){
+	case 11:
+	  switch(cellId){
+	  case 1:
+	    if (PID == 2212 ) {
+	      h_eloss_p[0]->Fill(eloss);
+	    }
+	    if (PID == 11 ) {
+	      h_eloss_e[0]->Fill(eloss);
+	    }
+	    break; // case 1
+	  case 2:
+	    if (PID == 2212 ) {
+	      h_eloss_p[1]->Fill(eloss);
+	    }
+	    if (PID == 11 ) {
+	      h_eloss_e[1]->Fill(eloss);
+	    }
+	    break; // case 2
+	  case 3:
+	    if (PID == 2212 ) {
+	    h_eloss_p[2]->Fill(eloss);
+	    }
+	    if (PID == 11 ) {
+	    h_eloss_e[2]->Fill(eloss);
+	    }
+	    break; // case 3
+	  } // cellId
+	  break; // case 11
+	case 12:
+	  switch(cellId){
+	  case 3:
+	    if (PID == 2212 ) {
+	      h_eloss_p[3]->Fill(eloss);
+	    }
+	    if (PID == 11 ) {
+	      h_eloss_e[3]->Fill(eloss);
+	    }
+	    break; // case 3
+	  case 2:
+	    if (PID == 2212 ) {
+	      h_eloss_p[4]->Fill(eloss);
+	    }
+	    if (PID == 11 ) {
+	      h_eloss_e[4]->Fill(eloss);
+	    }
+	    break; // case 2
+	  case 1:
+	    if (PID == 2212 ) {
+	      h_eloss_p[5]->Fill(eloss);
+	    }
+	    if (PID == 11 ) {
+	      h_eloss_e[5]->Fill(eloss);
+	    }
+	    break; // case 1
+	  } // cellId
+	  break; // case 12
+	} // segId
 
+      h_pdg->Fill(PID);
+      h_time->Fill(time);
+      h_xpos->Fill( xPos );
+      h_ypos->Fill( yPos );
+      if(PID == 11) h_zpos_e->Fill( zIn );
+      if(PID == 2212) h_zpos_p->Fill( zIn );
+      h_energy_vs_zpos->Fill(energy, zIn );
+      h_xpos1_vs_ypos1->Fill(xPos , yPos );
+      h_xpos2_vs_ypos2->Fill(xPos , yPos );
+      h_xpos3_vs_ypos3->Fill(xPos , yPos );
+      h_xpos4_vs_ypos4->Fill(xPos , yPos );
+      h_xpos5_vs_ypos5->Fill(xPos , yPos );
+      h_xpos6_vs_ypos6->Fill(xPos , yPos );
+      h_pdg_vs_eloss->Fill(PID , eloss ); // keV
+      h_zpos_vs_pdg->Fill(zIn, PID);
+      h_zpos_vs_eloss->Fill(zIn, eloss);
+      h_zpos_vs_time->Fill(zIn, time);
+      h_pdg_vs_m0pdg->Fill(PID, mot0PID);
+      h_pdg_vs_m1pdg->Fill(PID, mot1PID);
+      h_pdg_vs_m2pdg->Fill(PID, mot2PID);
+      h_pdg_vs_m3pdg->Fill(PID, mot3PID);
+      h_trackid_vs_m0trackid->Fill(TrackId, Mot0TrackId);
+      h_trackid_vs_m1trackid->Fill(TrackId, Mot1TrackId);
+      h_trackid_vs_m2trackid->Fill(TrackId, Mot2TrackId);
+      h_trackid_vs_m3trackid->Fill(TrackId, Mot3TrackId);
+      h_energy->Fill( energy ); // MeV
+      h_energy_vs_eloss->Fill(energy , eloss );
+      h_energy_vs_pdg->Fill(energy , PID);
+      
+
+      
+      /*
       Double_t ne = 0.0;
       if ( tof[paddle] < 1.e-15 ){
 	tof[paddle] = land_obj->GetTime(); // time since part. start [ns] 
@@ -333,14 +387,15 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 	  
 	}//! ine
 	}//!tof */
-    }//! eloss	 
+      //}//! eloss	 
     
   }//! MC hits   
   
 }
 // -------------------------------------------------------------------------
 
-void R3BNeuLandDigitizer::Reset(){
+void R3BNeuLandDigitizer::Reset()
+{
   // Clear the structure
   //   cout << " -I- Digit Reset() called " << endl;
   
@@ -374,7 +429,10 @@ void R3BNeuLandDigitizer::Finish()
   // here event. write histos
   //   cout << " -I- Digit Finish() called " << endl;
   // Write control histograms
-  h_eloss->Write();
+  for(Int_t i=0;i<6;i++){
+    h_eloss_p[i]->Write();
+    h_eloss_e[i]->Write();
+  }
   h_ne->Write();
   h_ch->Write();
   h_pdg->Write();
@@ -388,7 +446,8 @@ void R3BNeuLandDigitizer::Finish()
   h_xpos4_vs_ypos4->Write();
   h_xpos5_vs_ypos5->Write();
   h_xpos6_vs_ypos6->Write();
-  h_zpos->Write();
+  h_zpos_e->Write();
+  h_zpos_p->Write();
   h_pdg_vs_eloss->Write();
   h_zpos_vs_pdg->Write();
   h_zpos_vs_eloss->Write();
@@ -399,10 +458,13 @@ void R3BNeuLandDigitizer::Finish()
   h_pdg_vs_m3pdg->Write();
   h_energy_vs_eloss->Write();
   h_energy_vs_pdg->Write();
+  h_energy_vs_zpos->Write();
   h_trackid_vs_m0trackid->Write();
   h_trackid_vs_m1trackid->Write();
   h_trackid_vs_m2trackid->Write();
   h_trackid_vs_m3trackid->Write();
+
+  cout << " Number of non-interacting primaries: " << no_interaction << endl;
 }
 
 ClassImp(R3BNeuLandDigitizer)

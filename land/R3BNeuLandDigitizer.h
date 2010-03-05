@@ -47,7 +47,8 @@ class R3BNeuLandDigitizer : public FairTask
   Int_t nuhits[200];
 
   //- Control Hitograms
-  TH1F *h_eloss;
+  TH1F *h_eloss_p[6];
+  TH1F *h_eloss_e[6];
   TH1F *h_pdg;
   TH1F *h_ne;
   TH1F *h_ch;
@@ -55,7 +56,8 @@ class R3BNeuLandDigitizer : public FairTask
   TH1F *h_energy;
   TH1F *h_xpos;
   TH1F *h_ypos;
-  TH1F *h_zpos;
+  TH1F *h_zpos_e;
+  TH1F *h_zpos_p;
   TH2F *h_xpos1_vs_ypos1;
   TH2F *h_xpos2_vs_ypos2;
   TH2F *h_xpos3_vs_ypos3;
@@ -72,6 +74,7 @@ class R3BNeuLandDigitizer : public FairTask
   TH2F *h_pdg_vs_m3pdg;
   TH2F *h_energy_vs_eloss;
   TH2F *h_energy_vs_pdg;
+  TH2F *h_energy_vs_zpos;
   TH2F *h_trackid_vs_m0trackid;
   TH2F *h_trackid_vs_m1trackid;
   TH2F *h_trackid_vs_m2trackid;
@@ -81,7 +84,7 @@ class R3BNeuLandDigitizer : public FairTask
   Int_t mot1PID;
   Int_t mot2PID;
   Int_t mot3PID;
-  
+
   private:
   virtual void SetParContainers();
 
