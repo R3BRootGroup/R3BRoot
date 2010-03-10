@@ -189,6 +189,7 @@ class R3BNeuLand : public R3BDetector
    TGeoMedium* pMedGlass;
    TGeoMedium* pMedBak;
    TGeoMedium* pMedGas;
+   TGeoMedium* pMedGasInactive;
    TGeoMedium* pMedAl;
 
    
@@ -210,6 +211,5 @@ inline void R3BNeuLand::ResetParameters() {
   fTime = fLength = fELoss = 0;
   fPosIndex = 0;
 };
-
 
 #endif 

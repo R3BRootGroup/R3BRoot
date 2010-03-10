@@ -48,8 +48,24 @@ class R3BNeuLandDigitizer : public FairTask
 
   //- Control Hitograms
   TH1F *h_eloss_p[6];
+  TH1F *h_pxout_p[6];
+  TH1F *h_pyout_p[6];
+  TH1F *h_pzout_p[6];
+  TH1F *h_xin_p[6];
+  TH1F *h_yin_p[6];
+  TH1F *h_zin_p[6];
+  TH1F *h_mom_p[6];
+  TH1F *h_etot_p[6];
+  TH2F *h_etot_eloss_p[6];
+
   TH1F *h_eloss_e[6];
+  TH1F *h_etot_e[6];
+  TH2F *h_etot_eloss_e[6];
+
   TH1F *h_pdg;
+  TH1F *h_detid;
+  TH1F *h_segid;
+  TH1F *h_cellid;
   TH1F *h_ne;
   TH1F *h_ch;
   TH1F *h_time;

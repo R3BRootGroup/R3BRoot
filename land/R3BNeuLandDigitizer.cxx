@@ -47,29 +47,134 @@ InitStatus R3BNeuLandDigitizer::Init() {
   
   // Initialise control histograms
   TString elossNamesP[6] = {"Eloss-p 1", "Eloss-p 2", "Eloss-p 3",
-			   "Eloss-p 4", "Eloss-p 5", "Eloss-p 6"};
+			    "Eloss-p 4", "Eloss-p 5", "Eloss-p 6"};
   TString elossNamesE[6] = {"Eloss-e 1", "Eloss-e 2", "Eloss-e 3",
-			   "Eloss-e 4", "Eloss-e 5", "Eloss-e 6"};
+			    "Eloss-e 4", "Eloss-e 5", "Eloss-e 6"};
+  TString PxOutNamesP[6] = {"PxOut-p 1", "PxOut-p 2", "PxOut-p 3",
+			    "PxOut-p 4", "PxOut-p 5", "PxOut-p 6"};
+  TString PyOutNamesP[6] = {"PyOut-p 1", "PyOut-p 2", "PyOut-p 3",
+			    "PyOut-p 4", "PyOut-p 5", "PyOut-p 6"};
+  TString PzOutNamesP[6] = {"PzOut-p 1", "PzOut-p 2", "PzOut-p 3",
+			    "PzOut-p 4", "PzOut-p 5", "PzOut-p 6"};
+  TString xInNamesP[6] = {"xIn-p 1", "xIn-p 2", "xIn-p 3",
+			  "xIn-p 4", "xIn-p 5", "xIn-p 6"};
+  TString yInNamesP[6] = {"yIn-p 1", "yIn-p 2", "yIn-p 3",
+			  "yIn-p 4", "yIn-p 5", "yIn-p 6"};
+  TString zInNamesP[6] = {"zIn-p 1", "zIn-p 2", "zIn-p 3",
+			  "zIn-p 4", "zIn-p 5", "zIn-p 6"};
+  TString momNamesP[6] = {"Momentum-p 1", "Momentum-p 2", "Momentum-p 3",
+			  "Momentum-p 4", "Momentum-p 5", "Momentum-p 6"};
+  TString etotNamesP[6] = {"Total energy-p 1", "Total energy-p 2", "Total energy-p 3",
+			   "Total energy-p 4", "Total energy-p 5", "Total energy-p 6"};
+  TString etotNamesE[6] = {"Total energy-e 1", "Total energy-e 2", "Total energy-e 3",
+			   "Total energy-e 4", "Total energy-e 5", "Total energy-e 6"};
+  TString etot_elossNamesP[6] = {"Total energy-p vs Eloss-p 1", "Total energy-p vs Eloss-p 2",
+				 "Total energy-p vs Eloss-p 3", "Total energy-p vs Eloss-p 4",
+				 "Total energy-p vs Eloss-p 5", "Total energy-p vs Eloss-p 6"};
+  TString etot_elossNamesE[6] = {"Total energy-e vs Eloss-e 1", "Total energy-e vs Eloss-e 2",
+				 "Total energy-e vs Eloss-e 3", "Total energy-e vs Eloss-e 4",
+				 "Total energy-e vs Eloss-e 5", "Total energy-e vs Eloss-e 6"};
+
   TString elossTitlesP[6] = {"Eloss-p in gas [keV] 1",
-			    "Eloss-p in gas [keV] 2",
-			    "Eloss-p in gas [keV] 3",
-			    "Eloss-p in gas [keV] 4",
-			    "Eloss-p in gas [keV] 5",
-			    "Eloss-p in gas [keV] 6"};
+			     "Eloss-p in gas [keV] 2",
+			     "Eloss-p in gas [keV] 3",
+			     "Eloss-p in gas [keV] 4",
+			     "Eloss-p in gas [keV] 5",
+			     "Eloss-p in gas [keV] 6"};
   TString elossTitlesE[6] = {"Eloss-e in gas [keV] 1",
-			    "Eloss-e in gas [keV] 2",
-			    "Eloss-e in gas [keV] 3",
-			    "Eloss-e in gas [keV] 4",
-			    "Eloss-e in gas [keV] 5",
-			    "Eloss-e in gas [keV] 6"};
+			     "Eloss-e in gas [keV] 2",
+			     "Eloss-e in gas [keV] 3",
+			     "Eloss-e in gas [keV] 4",
+			     "Eloss-e in gas [keV] 5",
+			     "Eloss-e in gas [keV] 6"};
+  TString PxOutTitlesP[6] = {"PxOut-p in gas [MeV/c] 1",
+			     "PxOut-p in gas [MeV/c] 2",
+			     "PxOut-p in gas [MeV/c] 3",
+			     "PxOut-p in gas [MeV/c] 4",
+			     "PxOut-p in gas [MeV/c] 5",
+			     "PxOut-p in gas [MeV/c] 6"};
+  TString PyOutTitlesP[6] = {"PyOut-p in gas [MeV/c] 1",
+			     "PyOut-p in gas [MeV/c] 2",
+			     "PyOut-p in gas [MeV/c] 3",
+			     "PyOut-p in gas [MeV/c] 4",
+			     "PyOut-p in gas [MeV/c] 5",
+			     "PyOut-p in gas [MeV/c] 6"};
+  TString PzOutTitlesP[6] = {"PzOut-p in gas [MeV/c] 1",
+			     "PzOut-p in gas [MeV/c] 2",
+			     "PzOut-p in gas [MeV/c] 3",
+			     "PzOut-p in gas [MeV/c] 4",
+			     "PzOut-p in gas [MeV/c] 5",
+			     "PzOut-p in gas [MeV/c] 6"};
+  TString xInTitlesP[6] = {"xIn-p in gas [mm] 1",
+			   "xIn-p in gas [mm] 2",
+			   "xIn-p in gas [mm] 3",
+			   "xIn-p in gas [mm] 4",
+			   "xIn-p in gas [mm] 5",
+			   "xIn-p in gas [mm] 6"};
+  TString yInTitlesP[6] = {"yIn-p in gas [mm] 1",
+			   "yIn-p in gas [mm] 2",
+			   "yIn-p in gas [mm] 3",
+			   "yIn-p in gas [mm] 4",
+			   "yIn-p in gas [mm] 5",
+			   "yIn-p in gas [mm] 6"};
+  TString zInTitlesP[6] = {"zIn-p in gas [mm] 1",
+			   "zIn-p in gas [mm] 2",
+			   "zIn-p in gas [mm] 3",
+			   "zIn-p in gas [mm] 4",
+			   "zIn-p in gas [mm] 5",
+			   "zIn-p in gas [mm] 6"};
+  TString momTitlesP[6] = {"Momentum-p in gas [MeV/c] 1",
+			   "Momentum-p in gas [MeV/c] 2",
+			   "Momentum-p in gas [MeV/c] 3",
+			   "Momentum-p in gas [MeV/c] 4",
+			   "Momentum-p in gas [MeV/c] 5",
+			   "Momentum-p in gas [MeV/c] 6"};
+  TString etotTitlesP[6] = {"Total energy-p in gas [MeV] 1",
+			    "Total energy-p in gas [MeV] 2",
+			    "Total energy-p in gas [MeV] 3",
+			    "Total energy-p in gas [MeV] 4",
+			    "Total energy-p in gas [MeV] 5",
+			    "Total energy-p in gas [MeV] 6"};
+  TString etotTitlesE[6] = {"Total energy-e in gas [keV] 1",
+			    "Total energy-e in gas [keV] 2",
+			    "Total energy-e in gas [keV] 3",
+			    "Total energy-e in gas [keV] 4",
+			    "Total energy-e in gas [keV] 5",
+			    "Total energy-e in gas [keV] 6"};
+  TString etot_elossTitlesP[6] = {"Total energy-p [MeV] vs Eloss [keV] in gas 1",
+				  "Total energy-p [MeV] vs Eloss [keV] in gas 2",
+				  "Total energy-p [MeV] vs Eloss [keV] in gas 3",
+				  "Total energy-p [MeV] vs Eloss [keV] in gas 4",
+				  "Total energy-p [MeV] vs Eloss [keV] in gas 5",
+				  "Total energy-p [MeV] vs Eloss [keV] in gas 6"};
+  TString etot_elossTitlesE[6] = {"Total energy-e [keV] vs Eloss [keV] in gas 1",
+				  "Total energy-e [keV] vs Eloss [keV] in gas 2",
+				  "Total energy-e [keV] vs Eloss [keV] in gas 3",
+				  "Total energy-e [keV] vs Eloss [keV] in gas 4",
+				  "Total energy-e [keV] vs Eloss [keV] in gas 5",
+				  "Total energy-e [keV] vs Eloss [keV] in gas 6"};
 
   for(Int_t i=0;i<6;i++){
-    h_eloss_p[i] = new TH1F(elossNamesP[i], elossTitlesP[i] , 1000 , 0. , 300.);
-    h_eloss_e[i] = new TH1F(elossNamesE[i], elossTitlesE[i] , 1000 , 0. , 300.);
+    h_eloss_p[i] = new TH1F(elossNamesP[i], elossTitlesP[i] , 3110 , -10.5 , 300.5);
+    h_eloss_e[i] = new TH1F(elossNamesE[i], elossTitlesE[i] , 3110 , -10.5 , 300.5);
+    h_xin_p[i] = new TH1F(xInNamesP[i], xInTitlesP[i] , 210 , -10.5 , 10.5);
+    h_yin_p[i] = new TH1F(yInNamesP[i], yInTitlesP[i] , 210 , -10.5 , 10.5);
+    h_zin_p[i] = new TH1F(zInNamesP[i], zInTitlesP[i] , 160 , -0.5 , 15.5);
+    h_pxout_p[i] = new TH1F(PxOutNamesP[i], PxOutTitlesP[i] , 1001 , -500.5 , 500.5);
+    h_pyout_p[i] = new TH1F(PyOutNamesP[i], PyOutTitlesP[i] , 1001 , -500.5 , 500.5);
+    h_pzout_p[i] = new TH1F(PzOutNamesP[i], PzOutTitlesP[i] , 1101 , -100.5 , 1000.5);
+    h_mom_p[i] = new TH1F(momNamesP[i], momTitlesP[i] , 1051 , -50.5 , 1000.5);
+    h_etot_p[i] = new TH1F(etotNamesP[i], etotTitlesP[i] , 1101 , 899.5 , 2000.5);
+    h_etot_e[i] = new TH1F(etotNamesE[i], etotTitlesE[i] , 1501 , 499.5 , 2000.5);
+    h_etot_eloss_p[i] = new TH2F(etot_elossNamesP[i], etot_elossTitlesP[i] , 1101 , 899.5 , 2000.5, 3110 , -10.5 , 300.5);
+    h_etot_eloss_e[i] = new TH2F(etot_elossNamesE[i], etot_elossTitlesE[i] , 1501 , 499.5 , 2000.5, 3110 , -10.5 , 300.5);
   }
 
 
   h_pdg = new TH1F("PDG","Code of particle deposited energy in gas",3000,-220.,3000.);
+  h_detid = new TH1F("DetId","DetId", 10 , 95.5, 105.5);
+  h_segid = new TH1F("SegId","SegId", 10 , 7.5, 17.5);
+  h_cellid = new TH1F("CellId","CellId", 10 , -5.5, 4.5);
   h_ne = new TH1F("Ne","primary_el",100,0.,100.);
   h_ch = new TH1F("Charge","",1000,0.,1.);
   h_time = new TH1F("Time [ns]","",100,0.,1000.);
@@ -157,11 +262,24 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
     R3BMCTrack *aTrack = (R3BMCTrack*) fLandMCTrack->At(TrackId);
     Int_t PID = aTrack->GetPdgCode();
     Double_t eloss = land_obj->GetEnergyLoss();
-    Double_t energy = aTrack->GetEnergy() * 1E3; //MeV
+    Double_t energy = aTrack->GetEnergy();
+    if(PID == 2212) energy = energy * 1E3; //MeV
+    if(PID == 11) energy = energy * 1E6; //keV
+    Double_t startx = aTrack->GetStartX() * 10;
+    Double_t starty = aTrack->GetStartY() * 10;
+    Double_t startz = aTrack->GetStartZ() * 10;
+    Double_t xIn = land_obj->GetXIn() * 10;
+    Double_t yIn = land_obj->GetYIn() * 10;
     Double_t zIn = land_obj->GetZIn() * 10;
+    Double_t zOut = land_obj->GetZOut() * 10;
     Double_t xPos = land_obj->GetX(zIn * 0.1) * 10;
     Double_t yPos = land_obj->GetY(zIn * 0.1) * 10;
     Double_t time = land_obj->GetTime();
+    Double_t PxOut = land_obj->GetPxOut() * 1E3; // MeV/c
+    Double_t PyOut = land_obj->GetPyOut() * 1E3; // MeV/c
+    Double_t PzOut = land_obj->GetPzOut() * 1E3; // MeV/c
+
+    Double_t momentum = sqrt( PxOut * PxOut + PyOut * PyOut + PzOut * PzOut);
 
 
     if(Mot0TrackId>-1){
@@ -207,27 +325,73 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 	case 11:
 	  switch(cellId){
 	  case 1:
-	    if (PID == 2212 ) {
+	    if (PID == 2212 ){
 	      h_eloss_p[0]->Fill(eloss);
+	      h_pxout_p[0]->Fill(PxOut);
+	      h_pyout_p[0]->Fill(PyOut);
+	      h_pzout_p[0]->Fill(PzOut);
+	      h_xin_p[0]->Fill(xIn);
+	      h_yin_p[0]->Fill(yIn);
+	      h_zin_p[0]->Fill(zIn);
+	      h_mom_p[0]->Fill(momentum);
+	      h_etot_p[0]->Fill(energy);
+	      h_etot_eloss_p[0]->Fill(energy,eloss);
+	      //cout << " PxOut: " << PxOut << " PyOut: " << PyOut << " PzOut: " << PzOut << endl;
+	      //cout << " startx: " << startx << " starty: " << starty
+	      //	   << " xIn: " << xIn << " yIn: " << yIn
+	      //	   << " eloss: " << eloss << " startz: " << startz
+	      //     	   << " zIn: " << zIn << " zOut: " << zOut << endl;
 	    }
-	    if (PID == 11 ) {
+	    if (PID == 11 ){
 	      h_eloss_e[0]->Fill(eloss);
+	      h_etot_e[0]->Fill(energy);
+	      h_etot_eloss_e[0]->Fill(energy,eloss);
 	    }
 	    break; // case 1
 	  case 2:
-	    if (PID == 2212 ) {
+	    if (PID == 2212 ){
 	      h_eloss_p[1]->Fill(eloss);
+	      h_pxout_p[1]->Fill(PxOut);
+	      h_pyout_p[1]->Fill(PyOut);
+	      h_pzout_p[1]->Fill(PzOut);
+	      h_xin_p[1]->Fill(xIn);
+	      h_yin_p[1]->Fill(yIn);
+	      h_zin_p[1]->Fill(zIn);
+	      h_mom_p[1]->Fill(momentum);
+	      h_etot_p[1]->Fill(energy);
+	      h_etot_eloss_p[1]->Fill(energy,eloss);
+	      //cout << " startx: " << startx << " starty: " << starty
+	      //	   << " xIn: " << xIn << " yIn: " << yIn
+	      //   	   << " eloss: " << eloss << " startz: " << startz
+	      //    	   << " zIn: " << zIn << " zOut: " << zOut << endl;
 	    }
-	    if (PID == 11 ) {
+	    if (PID == 11 ){
 	      h_eloss_e[1]->Fill(eloss);
+	      h_etot_e[1]->Fill(energy);
+	      h_etot_eloss_e[1]->Fill(energy,eloss);
 	    }
 	    break; // case 2
 	  case 3:
-	    if (PID == 2212 ) {
-	    h_eloss_p[2]->Fill(eloss);
+	    if (PID == 2212 ){
+	      h_eloss_p[2]->Fill(eloss);
+	      h_pxout_p[2]->Fill(PxOut);
+	      h_pyout_p[2]->Fill(PyOut);
+	      h_pzout_p[2]->Fill(PzOut);
+	      h_xin_p[2]->Fill(xIn);
+	      h_yin_p[2]->Fill(yIn);
+	      h_zin_p[2]->Fill(zIn);
+	      h_mom_p[2]->Fill(momentum);
+	      h_etot_p[2]->Fill(energy);
+	      h_etot_eloss_p[2]->Fill(energy,eloss);
+	    //cout << " startx: " << startx << " starty: " << starty
+	    //    	   << " xIn: " << xIn << " yIn: " << yIn
+	    //	      	   << " eloss: " << eloss << " startz: " << startz
+	    //     	   << " zIn: " << zIn << " zOut: " << zOut << endl;
 	    }
-	    if (PID == 11 ) {
-	    h_eloss_e[2]->Fill(eloss);
+	    if (PID == 11 ){
+	      h_eloss_e[2]->Fill(eloss);
+	      h_etot_e[2]->Fill(energy);
+	      h_etot_eloss_e[2]->Fill(energy,eloss);
 	    }
 	    break; // case 3
 	  } // cellId
@@ -235,39 +399,88 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 	case 12:
 	  switch(cellId){
 	  case 3:
-	    if (PID == 2212 ) {
+	    if (PID == 2212 ){
 	      h_eloss_p[3]->Fill(eloss);
+	      h_pxout_p[3]->Fill(PxOut);
+	      h_pyout_p[3]->Fill(PyOut);
+	      h_pzout_p[3]->Fill(PzOut);
+	      h_xin_p[3]->Fill(xIn);
+	      h_yin_p[3]->Fill(yIn);
+	      h_zin_p[3]->Fill(zIn);
+	      h_mom_p[3]->Fill(momentum);
+	      h_etot_p[3]->Fill(energy);
+	      h_etot_eloss_p[3]->Fill(energy,eloss);
+	      //cout << " PxOut: " << PxOut << " PyOut: " << PyOut << " PzOut: " << PzOut << endl;
+	      //cout << " startx: " << startx << " starty: " << starty
+	      //	   << " xIn: " << xIn << " yIn: " << yIn
+	      //	   << " eloss: " << eloss << " startz: " << startz
+	      //	   << " zIn: " << zIn << " zOut: " << zOut << endl;
 	    }
-	    if (PID == 11 ) {
+	    if (PID == 11 ){
 	      h_eloss_e[3]->Fill(eloss);
+	      h_etot_e[3]->Fill(energy);
+	      h_etot_eloss_e[3]->Fill(energy,eloss);
 	    }
 	    break; // case 3
 	  case 2:
-	    if (PID == 2212 ) {
+	    if (PID == 2212 ){
 	      h_eloss_p[4]->Fill(eloss);
+	      h_pxout_p[4]->Fill(PxOut);
+	      h_pyout_p[4]->Fill(PyOut);
+	      h_pzout_p[4]->Fill(PzOut);
+	      h_xin_p[4]->Fill(xIn);
+	      h_yin_p[4]->Fill(yIn);
+	      h_zin_p[4]->Fill(zIn);
+	      h_mom_p[4]->Fill(momentum);
+	      h_etot_p[4]->Fill(energy);
+	      h_etot_eloss_p[4]->Fill(energy,eloss);
+	      //cout << " eloss: " << eloss << " startz: " << startz
+	      //    	   << " zIn: " << zIn << " zOut: " << zOut << endl;
 	    }
-	    if (PID == 11 ) {
+	    if (PID == 11 ){
 	      h_eloss_e[4]->Fill(eloss);
+	      h_etot_e[4]->Fill(energy);
+	      h_etot_eloss_e[4]->Fill(energy,eloss);
 	    }
 	    break; // case 2
 	  case 1:
-	    if (PID == 2212 ) {
+	    if (PID == 2212 ){
 	      h_eloss_p[5]->Fill(eloss);
+	      h_pxout_p[5]->Fill(PxOut);
+	      h_pyout_p[5]->Fill(PyOut);
+	      h_pzout_p[5]->Fill(PzOut);
+	      h_xin_p[5]->Fill(xIn);
+	      h_yin_p[5]->Fill(yIn);
+	      h_zin_p[5]->Fill(zIn);
+	      h_mom_p[5]->Fill(momentum);
+	      h_etot_p[5]->Fill(energy);
+	      h_etot_eloss_p[5]->Fill(energy,eloss);
+	      //cout << " eloss: " << eloss << " startz: " << startz
+	      //   	   << " zIn: " << zIn << " zOut: " << zOut << endl;
 	    }
-	    if (PID == 11 ) {
+	    if (PID == 11 ){
 	      h_eloss_e[5]->Fill(eloss);
+	      h_etot_e[5]->Fill(energy);
+	      h_etot_eloss_e[5]->Fill(energy,eloss);
 	    }
 	    break; // case 1
 	  } // cellId
 	  break; // case 12
 	} // segId
-
+	
       h_pdg->Fill(PID);
+      h_detid->Fill(detId);
+      h_segid->Fill(segId);
+      h_cellid->Fill(cellId);
       h_time->Fill(time);
       h_xpos->Fill( xPos );
       h_ypos->Fill( yPos );
-      if(PID == 11) h_zpos_e->Fill( zIn );
-      if(PID == 2212) h_zpos_p->Fill( zIn );
+      h_zpos_e->Fill( zIn );
+      h_zpos_p->Fill( zIn );
+      //      if(startz == zIn){
+      //      if(PID == 11) h_zpos_e->Fill( zIn );
+      //      if(PID == 2212) h_zpos_p->Fill( zIn );
+      //      }
       h_energy_vs_zpos->Fill(energy, zIn );
       h_xpos1_vs_ypos1->Fill(xPos , yPos );
       h_xpos2_vs_ypos2->Fill(xPos , yPos );
@@ -431,11 +644,26 @@ void R3BNeuLandDigitizer::Finish()
   // Write control histograms
   for(Int_t i=0;i<6;i++){
     h_eloss_p[i]->Write();
+    h_pxout_p[i]->Write();
+    h_pyout_p[i]->Write();
+    h_pzout_p[i]->Write();
+    h_xin_p[i]->Write();
+    h_yin_p[i]->Write();
+    h_zin_p[i]->Write();
+    h_mom_p[i]->Write();
+    h_etot_p[i]->Write();
+    h_etot_eloss_p[i]->Write();
+
     h_eloss_e[i]->Write();
+    h_etot_e[i]->Write();
+    h_etot_eloss_e[i]->Write();
   }
   h_ne->Write();
   h_ch->Write();
   h_pdg->Write();
+  h_detid->Write();
+  h_segid->Write();
+  h_cellid->Write();
   h_time->Write();
   h_energy->Write();
   h_xpos->Write();
