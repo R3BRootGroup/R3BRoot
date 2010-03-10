@@ -11,6 +11,7 @@
 #pragma link C++ class R3BFieldContFact+;
 #pragma link C++ class R3BFieldMap+;
 #pragma link C++ class R3BGladFieldMap+;
+#pragma link C++ class R3BAladinFieldMap+;
 #pragma link C++ class R3BFieldPar+;
 #pragma link C++ class R3BFieldCreator+;
 
