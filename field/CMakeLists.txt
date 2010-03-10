@@ -23,7 +23,8 @@ R3BFieldMap.cxx
 R3BFieldPar.cxx          
 R3BFieldCreator.cxx
 R3BGladFieldMap.cxx
-)
+R3BFieldInterp.cxx
+R3BAladinFieldMap.cxx  )
 
 if(RULE_CHECKER_FOUND)
   CHECK_RULES("${FIELD_SRCS}" "${INCLUDE_DIRECTORIES}" FIELD_RULES)
