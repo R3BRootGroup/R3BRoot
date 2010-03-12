@@ -127,14 +127,13 @@ class R3BNeuLand : public R3BDetector
 
     /** Track information to be stored until the track leaves the
 	active volume. **/
+    Int_t          fEventID;           //!  track index
     Int_t          fTrackID;           //!  track index
     Int_t          fMot0TrackID;       //!  0th mother track index
-    Int_t          fMot1TrackID;       //!  1st mother track index
-    Int_t          fMot2TrackID;       //!  2nd mother track index
-    Int_t          fMot3TrackID;       //!  3rd mother track index
     Int_t          fDetID;             //!  detector id
-    Int_t          fSegID;             //!  detector segment id
     Int_t          fCellID;            //!  detector cell id
+    Int_t          fCellHits;          //!  number of hits in the cells in an event
+    Double_t       fTotalEloss;        //!  total energy loss in the cells in an event
     TLorentzVector fPosIn, fPosOut;    //!  position
     TLorentzVector fMomIn, fMomOut;    //!  momentum
     Double32_t     fTime;              //!  time
@@ -152,9 +151,10 @@ class R3BNeuLand : public R3BDetector
      **
      ** Adds a NeuLandPoint to the HitCollection
      **/
-    R3BNeuLandPoint* AddHit(Int_t trackID,
-			    Int_t mot0trackID, Int_t mot1trackID, Int_t mot2trackID, Int_t mot3trackID,
-			    Int_t detID, Int_t segID, Int_t cellID,
+    R3BNeuLandPoint* AddHit(Int_t eventID, Int_t trackID,
+			    Int_t mot0trackID,
+			    Int_t detID, Int_t cellID,
+			    Int_t cellhits, Double_t totaleloss,
 			    TVector3 posIn,
 			    TVector3 pos_out, TVector3 momIn,
 			    TVector3 momOut, Double_t time,
@@ -195,6 +195,8 @@ class R3BNeuLand : public R3BDetector
    
    Int_t cellid1, cellid2, cellid3, cellid4, cellid5, cellid6;
    Int_t secondaries;
+   Int_t cp1, cp2;
+   Int_t volId1, volId2;
 
     ClassDef(R3BNeuLand,1);
 
@@ -202,8 +204,8 @@ class R3BNeuLand : public R3BDetector
 
 
 inline void R3BNeuLand::ResetParameters() {
-  fTrackID = fDetID = fSegID = fCellID = -1;
-  fMot0TrackID = fMot1TrackID = fMot2TrackID = fMot3TrackID = -1;
+  fEventID = fTrackID = fDetID = fCellID = -1;
+  fMot0TrackID = -1;
   fPosIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fPosOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fMomIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
