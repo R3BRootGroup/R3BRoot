@@ -15,12 +15,9 @@ using std::flush;
 R3BNeuLandPoint::R3BNeuLandPoint() : FairMCPoint() {
   fX_out      = fY_out  = fZ_out  = 0.;
   fPx_out     = fPy_out = fPz_out = 0.;
+  fEventID = -1;
   fMot0TrackID = -1 ;
-  fMot1TrackID = -1 ;
-  fMot2TrackID = -1 ;
-  fMot3TrackID = -1 ;
   fDetID = -1 ;
-  fSegID  = -1 ;
   fCellID   = -1 ;
 }
 // -------------------------------------------------------------------------
@@ -28,9 +25,10 @@ R3BNeuLandPoint::R3BNeuLandPoint() : FairMCPoint() {
 
 
 // -----   Standard constructor   ------------------------------------------
-R3BNeuLandPoint::R3BNeuLandPoint(Int_t trackID,
-				 Int_t mot0trackID, Int_t mot1trackID, Int_t mot2trackID, Int_t mot3trackID,
-				 Int_t detID, Int_t segID, Int_t cellID,
+R3BNeuLandPoint::R3BNeuLandPoint(Int_t eventID, Int_t trackID,
+				 Int_t mot0trackID,
+				 Int_t detID, Int_t cellID,
+				 Int_t cellhits, Double_t totaleloss,
 				 TVector3 posIn,
 				 TVector3 posOut, TVector3 momIn, TVector3 momOut,
 				 Double_t tof, Double_t length, Double_t eLoss)
@@ -41,13 +39,12 @@ R3BNeuLandPoint::R3BNeuLandPoint(Int_t trackID,
   fPx_out = momOut.Px();
   fPy_out = momOut.Py();
   fPz_out = momOut.Pz();
+  fEventID = eventID;
   fMot0TrackID = mot0trackID;
-  fMot1TrackID = mot1trackID;
-  fMot2TrackID = mot2trackID;
-  fMot3TrackID = mot3trackID;
   fDetID = detID;
-  fSegID = segID;
   fCellID = cellID;
+  fCellHits = cellhits;
+  fTotalEloss = totaleloss;
 }
 // -------------------------------------------------------------------------
 
@@ -64,7 +61,6 @@ R3BNeuLandPoint::~R3BNeuLandPoint() { }
 void R3BNeuLandPoint::Print(const Option_t* opt) const {
   cout << "-I- R3BNeuLandPoint: LAND Point for track " << fTrackID
 	<< " in detector " << fDetID
-	<< " Segment: " << fSegID
        << " Cell: " << fCellID << endl;
 
   cout << "    Position (" << fX << ", " << fY << ", " << fZ
