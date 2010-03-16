@@ -79,7 +79,8 @@ class R3BNeuLandDigitizer : public FairTask
   TH2F *h_cellhits_vs_totaleloss;
 
   Int_t no_interaction;
-  Int_t mot0PID;
+  Int_t distcount;
+  Int_t NoOfPEvt;
 
   private:
   virtual void SetParContainers();

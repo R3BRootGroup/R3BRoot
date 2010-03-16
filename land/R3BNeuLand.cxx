@@ -1187,8 +1187,10 @@ void R3BNeuLand::ConstructGeometry3() {
     Double_t delta_Steel = 0.2; // thickness of steel in cm
     Double_t delta_Glass = 0.095; // thickness of glass sheet
     Double_t delta_Gas = 0.03; // thickness of gas gap
+    Double_t delta_AnodeGap = 0.3; // thickness of gap between the anode strips
+    Double_t delta_Strip = 2.5; // strip width
 
-    Double_t ShX = 10.0; // half length in cm
+    Double_t ShX = (8 * delta_Strip + 7 * delta_AnodeGap)/2; // half length in cm
     Double_t ShY = 20.0; // half length in cm
 
     TGeoShape* ShCase = new TGeoBBox("ShCase", ShX, ShY, delta_Case/2);
@@ -1196,12 +1198,14 @@ void R3BNeuLand::ConstructGeometry3() {
     TGeoShape* ShSteel = new TGeoBBox("ShSteel", ShX, ShY, delta_Steel/2);
     TGeoShape* ShGlass = new TGeoBBox("ShGlass", ShX, ShY, delta_Glass/2);
     TGeoShape* ShGas = new TGeoBBox("ShGas", ShX, ShY, delta_Gas/2);
+    TGeoShape* ShAnodeGap = new TGeoBBox("ShAnodeGap", delta_AnodeGap/2, ShY, delta_Steel/2);
    
     TGeoVolume* pCase = new TGeoVolume("MODVOL1", ShCase, pMedAl);
     TGeoVolume* pGap = new TGeoVolume("MODVOL2", ShGap, pMedGasInactive);
     TGeoVolume* pSteel = new TGeoVolume("MODVOL3", ShSteel, pMedSteel);
     TGeoVolume* pGlass = new TGeoVolume("MODVOL4", ShGlass, pMedGlass);
-    TGeoVolume* pGas = new TGeoVolume("MODVOL5", ShGas, pMedGas);
+    TGeoVolume* pAnodeGap = new TGeoVolume("MODVOL5", ShAnodeGap, pMedGasInactive);
+    TGeoVolume* pGas = new TGeoVolume("MODVOL6", ShGas, pMedGas);
     AddSensitiveVolume(pGas);
 
     TGeoRotation *rot = new TGeoRotation("rot",0,0,0);
@@ -1231,8 +1235,38 @@ void R3BNeuLand::ConstructGeometry3() {
     pMod1->AddNode(pGlass, 17, new TGeoCombiTrans(tx,ty,tz,rot) ); // Glass
     tz = tz + delta_Glass/2 + delta_Steel/2;
     pMod1->AddNode(pSteel, 18, new TGeoCombiTrans(tx,ty,tz,rot) ); // Steel-Anode
+    tx = -ShX + delta_Strip + delta_AnodeGap/2;
+    pMod1->AddNode(pAnodeGap, 31, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 1
+    tx = tx + delta_Strip + delta_AnodeGap;
+    pMod1->AddNode(pAnodeGap, 32, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 2
+    tx = tx + delta_Strip + delta_AnodeGap;
+    pMod1->AddNode(pAnodeGap, 33, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 3
+    tx = tx + delta_Strip + delta_AnodeGap;
+    pMod1->AddNode(pAnodeGap, 34, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 4
+    tx = tx + delta_Strip + delta_AnodeGap;
+    pMod1->AddNode(pAnodeGap, 35, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 5
+    tx = tx + delta_Strip + delta_AnodeGap;
+    pMod1->AddNode(pAnodeGap, 36, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 6
+    tx = tx + delta_Strip + delta_AnodeGap;
+    pMod1->AddNode(pAnodeGap, 37, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 7
+    tx = 0.0;
     tz = tz + delta_Steel/2 + delta_Steel/2;
     pMod1->AddNode(pSteel, 19, new TGeoCombiTrans(tx,ty,tz,rot) ); // Steel-Anode
+    tx = -ShX + delta_Strip + delta_AnodeGap/2;
+    pMod1->AddNode(pAnodeGap, 41, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 1
+    tx = tx + delta_Strip + delta_AnodeGap;
+    pMod1->AddNode(pAnodeGap, 42, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 2
+    tx = tx + delta_Strip + delta_AnodeGap;
+    pMod1->AddNode(pAnodeGap, 43, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 3
+    tx = tx + delta_Strip + delta_AnodeGap;
+    pMod1->AddNode(pAnodeGap, 44, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 4
+    tx = tx + delta_Strip + delta_AnodeGap;
+    pMod1->AddNode(pAnodeGap, 45, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 5
+    tx = tx + delta_Strip + delta_AnodeGap;
+    pMod1->AddNode(pAnodeGap, 46, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 6
+    tx = tx + delta_Strip + delta_AnodeGap;
+    pMod1->AddNode(pAnodeGap, 47, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 7
+    tx = 0.0;
     tz = tz + delta_Steel/2 + delta_Glass/2;
     pMod1->AddNode(pGlass, 20, new TGeoCombiTrans(tx,ty,tz,rot) ); // Glass
     tz = tz + delta_Glass/2 + delta_Gas/2;

@@ -45,7 +45,7 @@ InitStatus R3BNeuLandDigitizer::Init() {
   //fDigis = new TClonesArray("R3BNeuLandDigi",1000);
   //ioman->Register("LandDigi", "Digital response in Land", fDigis, kTRUE);
   
-  // Initialise control histograms
+  // Initialize control histograms
   TString elossNamesP[6] = {"Eloss-p 1", "Eloss-p 2", "Eloss-p 3",
 			    "Eloss-p 4", "Eloss-p 5", "Eloss-p 6"};
   TString elossNamesE[6] = {"Eloss-e 1", "Eloss-e 2", "Eloss-e 3",
@@ -170,38 +170,45 @@ InitStatus R3BNeuLandDigitizer::Init() {
 				  "Total energy-e [keV] vs Eloss [keV] in gas 5",
 				  "Total energy-e [keV] vs Eloss [keV] in gas 6"};
 
-  for(Int_t i=0;i<6;i++){
-    h_eloss_p[i] = new TH1F(elossNamesP[i], elossTitlesP[i] , 3110 , -10.05 , 300.05);
-    h_eloss_e[i] = new TH1F(elossNamesE[i], elossTitlesE[i] , 3110 , -10.05 , 300.05);
-    h_xin_p[i] = new TH1F(xInNamesP[i], xInTitlesP[i] , 210 , -10.05 , 10.05);
-    h_yin_p[i] = new TH1F(yInNamesP[i], yInTitlesP[i] , 210 , -10.05 , 10.05);
-    h_zin_p[i] = new TH1F(zInNamesP[i], zInTitlesP[i] , 165 , 4.0 , 20.5);
-    h_pxout_p[i] = new TH1F(PxOutNamesP[i], PxOutTitlesP[i] , 1001 , -500.5 , 500.5);
-    h_pyout_p[i] = new TH1F(PyOutNamesP[i], PyOutTitlesP[i] , 1001 , -500.5 , 500.5);
-    h_pzout_p[i] = new TH1F(PzOutNamesP[i], PzOutTitlesP[i] , 1101 , -100.5 , 1000.5);
-    h_mom_p[i] = new TH1F(momNamesP[i], momTitlesP[i] , 1051 , -50.5 , 1000.5);
-    h_etot_p[i] = new TH1F(etotNamesP[i], etotTitlesP[i] , 1101 , 899.5 , 2000.5);
-    h_etot_e[i] = new TH1F(etotNamesE[i], etotTitlesE[i] , 950 , 495 , 9995);
-    h_time_p[i] = new TH1F(timeNamesP[i], timeTitlesP[i] , 1000 , -0.1 , 1.9);
-    h_time_e[i] = new TH1F(timeNamesE[i], timeTitlesE[i] , 1000 , -0.1 , 2.9);
-    h_etot_eloss_p[i] = new TH2F(etot_elossNamesP[i], etot_elossTitlesP[i] , 1101 , 899.5 , 2000.5, 3110 , -10.5 , 300.5);
-    h_etot_eloss_e[i] = new TH2F(etot_elossNamesE[i], etot_elossTitlesE[i] , 950 , 500.5 , 10000.5, 3110 , -10.5 , 300.5);
+  h_detid = new TH1F("DetID","Detector ID where deposition occured", 101, 99.5, 200.5);
+  h_cellid = new TH1F("CellID","Gas cell ID where deposition occured", 10, 0.5, 10.5);
+
+  h_trackid = new TH1F("TrackID","Track ID which deposited energy", 102, -1.5, 100.5);
+  h_pdg = new TH1F("PDG","Code of particle deposited energy in gas", 3221, -220.5, 3000.5);
+  h_mot0trackid = new TH1F("Mot0TrackID","Mother of Track ID which deposited energy", 102, -1.5, 100.5);
+
+  h_toteloss = new TH1F("Total Eloss", "Total energy loss in an event", 3101, -10.05, 300.05);
+  h_cellhits = new TH1F("Cell Hits","Number of hits in the gas cells in an event", 16, -0.5, 15.5);
+
+  h_pdg_vs_m0pdg = new TH2F("PDG vs m0PDG","",3221, -220.5, 3000.5, 3221, -220.5, 3000.5);
+  h_trackid_vs_m0trackid = new TH2F("TrackId vs Mot0TrackId","TrackId vs Mother of TrackId", 102, -1.5, 100.5, 102, -1.5, 100.5);
+  h_cellhits_vs_totaleloss = new TH2F("Cell Hits vs Total Eloss","Number of hits vs Total Eloss in an event", 16, -0.5, 15.5, 3101, -10.05 , 300.05);
+
+  for(Int_t i=0; i<6; i++) {
+    h_time_p[i] = new TH1F(timeNamesP[i], timeTitlesP[i], 1001, -0.001, 2.001);
+    h_time_e[i] = new TH1F(timeNamesE[i], timeTitlesE[i], 1001, -0.0015, 3.0015);
+    h_etot_p[i] = new TH1F(etotNamesP[i], etotTitlesP[i], 1101, 899.5, 2000.5);
+    h_etot_e[i] = new TH1F(etotNamesE[i], etotTitlesE[i], 951, 495, 10005);
+    h_pxout_p[i] = new TH1F(PxOutNamesP[i], PxOutTitlesP[i], 1001, -500.5, 500.5);
+    h_pyout_p[i] = new TH1F(PyOutNamesP[i], PyOutTitlesP[i], 1001, -500.5, 500.5);
+    h_pzout_p[i] = new TH1F(PzOutNamesP[i], PzOutTitlesP[i], 1101, -100.5, 1000.5);
+    h_mom_p[i] = new TH1F(momNamesP[i], momTitlesP[i], 1051, -50.5, 1000.5);
+
+    h_eloss_p[i] = new TH1F(elossNamesP[i], elossTitlesP[i], 3101, -10.05, 300.05);
+    h_eloss_e[i] = new TH1F(elossNamesE[i], elossTitlesE[i], 3101, -10.05, 300.05);
+
+    h_etot_eloss_p[i] = new TH2F(etot_elossNamesP[i], etot_elossTitlesP[i], 1101, 899.5, 2000.5, 3101, -10.5, 300.5);
+    h_etot_eloss_e[i] = new TH2F(etot_elossNamesE[i], etot_elossTitlesE[i], 951, 500.5, 10000.5, 3101, -10.5, 300.5);
+
+    h_xin_p[i] = new TH1F(xInNamesP[i], xInTitlesP[i], 201, 3.95, 24.05);
+    h_yin_p[i] = new TH1F(yInNamesP[i], yInTitlesP[i], 201, -10.05, 10.05);
+    h_zin_p[i] = new TH1F(zInNamesP[i], zInTitlesP[i], 161, 3.95, 20.05);
+
   }
 
 
-  h_pdg = new TH1F("PDG","Code of particle deposited energy in gas", 3220, -220., 3000.);
-  h_cellid = new TH1F("CellID","Gas cell ID where deposition occured", 10, 0.5, 10.5);
-  h_detid = new TH1F("DetID","Detector ID where deposition occured", 101, 99.5, 200.5);
-  h_trackid = new TH1F("TrackID","Track ID which deposited energy", 102, -1.5, 100.5);
-  h_mot0trackid = new TH1F("Mot0TrackID","Mother of Track ID which deposited energy", 102, -1.5, 100.5);
-  h_cellhits = new TH1F("Cell Hits","Number of hits in the gas cells in an event", 16, -0.5, 15.5);
-  h_toteloss = new TH1F("Total Eloss", "Total energy loss in an event" , 3110 , -10.5 , 300.5);
   h_ne = new TH1F("Ne","primary_el",100,0.,100.);
   h_ch = new TH1F("Charge","",1000,0.,1.);
-  h_pdg_vs_m0pdg = new TH2F("PDG vs m0PDG","",3221,-220.5,3000.5,3221,-220.5,3000.5);
-  h_trackid_vs_m0trackid = new TH2F("TrackId vs Mot0TrackId","TrackId vs Mother of TrackId",102,-1.5,100.5,102,-1.5,100.5);
-  h_cellhits_vs_totaleloss = new TH2F("Cell Hits vs Total Eloss","Number of hits vs Total Eloss in an event", 16, -0.5, 15.5, 3110 , -10.5 , 300.5);
-
   
   return kSUCCESS;
 
@@ -228,199 +235,300 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
   //-Reset local arrays 
   Reset();
   
-  // Create Stochastic Avalanche
-  
-  //-Now do the job event/event
-  
-
   Int_t nentries = fLandPoints->GetEntries();
-  if(nentries==0){
-    no_interaction = no_interaction + 1;
-  }
   
-  for (Int_t l=0;l<nentries;l++){
-    // Get the Land Object in array
-    
-    R3BNeuLandPoint *land_obj = (R3BNeuLandPoint*) fLandPoints->At(l);
-    Int_t eventId = land_obj->GetEventID();
-    Int_t detId = land_obj->GetDetID();
-    Int_t cellId = land_obj->GetCellID();
-    
-    Int_t TrackId = land_obj->GetTrackID();
-    Int_t Mot0TrackId = land_obj->GetMot0TrackID();
-    
-    R3BMCTrack *aTrack = (R3BMCTrack*) fLandMCTrack->At(TrackId);
-    Int_t PID = aTrack->GetPdgCode();
-    Double_t eloss = land_obj->GetEnergyLoss();
-    Double_t totaleloss = land_obj->GetTotalEloss();
-    Int_t cellhits = land_obj->GetCellHits();
-    Double_t energy = aTrack->GetEnergy();
-    if(PID == 2212) energy = energy * 1E3; //MeV
-    if(PID == 11) energy = energy * 1E6; //keV
-    Double_t startx = aTrack->GetStartX() * 10;
-    Double_t starty = aTrack->GetStartY() * 10;
-    Double_t startz = aTrack->GetStartZ() * 10;
-    Double_t xIn = land_obj->GetXIn() * 10;
-    Double_t yIn = land_obj->GetYIn() * 10;
-    Double_t zIn = land_obj->GetZIn() * 10;
-    Double_t zOut = land_obj->GetZOut() * 10;
-    Double_t xPos = land_obj->GetX(zIn * 0.1) * 10;
-    Double_t yPos = land_obj->GetY(zIn * 0.1) * 10;
-    Double_t time = land_obj->GetTime();
-    Double_t PxOut = land_obj->GetPxOut() * 1E3; // MeV/c
-    Double_t PyOut = land_obj->GetPyOut() * 1E3; // MeV/c
-    Double_t PzOut = land_obj->GetPzOut() * 1E3; // MeV/c
-    
-    Double_t momentum = sqrt( PxOut * PxOut + PyOut * PyOut + PzOut * PzOut);
-    
-    
-    if(Mot0TrackId>-1){
-      R3BMCTrack *aMot0Track = (R3BMCTrack*) fLandMCTrack->At(Mot0TrackId);
-      mot0PID = aMot0Track->GetPdgCode();
-    }
-       
-    switch(cellId){
-    case 1:
-      if (PID == 2212 ){
-	h_eloss_p[0]->Fill(eloss);
-	h_pxout_p[0]->Fill(PxOut);
-	h_pyout_p[0]->Fill(PyOut);
-	h_pzout_p[0]->Fill(PzOut);
-	h_xin_p[0]->Fill(xIn);
-	h_yin_p[0]->Fill(yIn);
-	h_zin_p[0]->Fill(zIn);
-	h_mom_p[0]->Fill(momentum);
-	h_etot_p[0]->Fill(energy);
-	h_time_p[0]->Fill(time);
-	h_etot_eloss_p[0]->Fill(energy,eloss);
-      }
-      if (PID == 11 ){
-	h_eloss_e[0]->Fill(eloss);
-	h_etot_e[0]->Fill(energy);
-	h_time_e[0]->Fill(time);
-	h_etot_eloss_e[0]->Fill(energy,eloss);
-      }
-      break; // case 1
-    case 2:
-      if (PID == 2212 ){
-	h_eloss_p[1]->Fill(eloss);
-	h_pxout_p[1]->Fill(PxOut);
-	h_pyout_p[1]->Fill(PyOut);
-	h_pzout_p[1]->Fill(PzOut);
-	h_xin_p[1]->Fill(xIn);
-	h_yin_p[1]->Fill(yIn);
-	h_zin_p[1]->Fill(zIn);
-	h_mom_p[1]->Fill(momentum);
-	h_etot_p[1]->Fill(energy);
-	h_time_p[1]->Fill(time);
-	h_etot_eloss_p[1]->Fill(energy,eloss);
-      }
-      if (PID == 11 ){
-	h_eloss_e[1]->Fill(eloss);
-	h_etot_e[1]->Fill(energy);
-	h_time_e[1]->Fill(time);
-	h_etot_eloss_e[1]->Fill(energy,eloss);
-      }
-      break; // case 2
-    case 3:
-      if (PID == 2212 ){
-	h_eloss_p[2]->Fill(eloss);
-	h_pxout_p[2]->Fill(PxOut);
-	h_pyout_p[2]->Fill(PyOut);
-	h_pzout_p[2]->Fill(PzOut);
-	h_xin_p[2]->Fill(xIn);
-	h_yin_p[2]->Fill(yIn);
-	h_zin_p[2]->Fill(zIn);
-	h_mom_p[2]->Fill(momentum);
-	h_etot_p[2]->Fill(energy);
-	h_time_p[2]->Fill(time);
-	h_etot_eloss_p[2]->Fill(energy,eloss);
-      }
-      if (PID == 11 ){
-	h_eloss_e[2]->Fill(eloss);
-	h_etot_e[2]->Fill(energy);
-	h_time_e[2]->Fill(time);
-	h_etot_eloss_e[2]->Fill(energy,eloss);
-      }
-      break; // case 3
-    case 4:
-      if (PID == 2212 ){
-	h_eloss_p[3]->Fill(eloss);
-	h_pxout_p[3]->Fill(PxOut);
-	h_pyout_p[3]->Fill(PyOut);
-	h_pzout_p[3]->Fill(PzOut);
-	h_xin_p[3]->Fill(xIn);
-	h_yin_p[3]->Fill(yIn);
-	h_zin_p[3]->Fill(zIn);
-	h_mom_p[3]->Fill(momentum);
-	h_etot_p[3]->Fill(energy);
-	h_time_p[3]->Fill(time);
-	h_etot_eloss_p[3]->Fill(energy,eloss);
-      }
-      if (PID == 11 ){
-	h_eloss_e[3]->Fill(eloss);
-	h_etot_e[3]->Fill(energy);
-	h_time_e[3]->Fill(time);
-	h_etot_eloss_e[3]->Fill(energy,eloss);
-      }
-      break; // case 4
-    case 5:
-      if (PID == 2212 ){
-	h_eloss_p[4]->Fill(eloss);
-	h_pxout_p[4]->Fill(PxOut);
-	h_pyout_p[4]->Fill(PyOut);
-	h_pzout_p[4]->Fill(PzOut);
-	h_xin_p[4]->Fill(xIn);
-	h_yin_p[4]->Fill(yIn);
-	h_zin_p[4]->Fill(zIn);
-	h_mom_p[4]->Fill(momentum);
-	h_etot_p[4]->Fill(energy);
-	h_time_p[4]->Fill(time);
-	h_etot_eloss_p[4]->Fill(energy,eloss);
-      }
-      if (PID == 11 ){
-	h_eloss_e[4]->Fill(eloss);
-	h_etot_e[4]->Fill(energy);
-	h_time_e[4]->Fill(time);
-	h_etot_eloss_e[4]->Fill(energy,eloss);
-      }
-      break; // case 5
-    case 6:
-      if (PID == 2212 ){
-	h_eloss_p[5]->Fill(eloss);
-	h_pxout_p[5]->Fill(PxOut);
-	h_pyout_p[5]->Fill(PyOut);
-	h_pzout_p[5]->Fill(PzOut);
-	h_xin_p[5]->Fill(xIn);
-	h_yin_p[5]->Fill(yIn);
-	h_zin_p[5]->Fill(zIn);
-	h_mom_p[5]->Fill(momentum);
-	h_etot_p[5]->Fill(energy);
-	h_time_p[5]->Fill(time);
-	h_etot_eloss_p[5]->Fill(energy,eloss);
-      }
-      if (PID == 11 ){
-	h_eloss_e[5]->Fill(eloss);
-	h_etot_e[5]->Fill(energy);
-	h_time_e[5]->Fill(time);
-	h_etot_eloss_e[5]->Fill(energy,eloss);
-      }
-      break; // case 6
-    } // cellId
+  Int_t eventId[nentries];
+  Int_t detId[nentries];
+  Int_t cellId[nentries];
 
-      h_pdg->Fill(PID);
-      h_detid->Fill(detId);
-      h_cellid->Fill(cellId);
-      h_trackid->Fill(TrackId);
-      h_mot0trackid->Fill(Mot0TrackId);
-      if(l == nentries-1){
-	h_toteloss->Fill(totaleloss);
-	h_cellhits->Fill(cellhits);
-	h_cellhits_vs_totaleloss->Fill(cellhits, totaleloss);
+  Int_t TrackId[nentries];
+  R3BMCTrack* aTrack[nentries];
+  Int_t PID[nentries];
+  Int_t Mot0TrackId[nentries];
+  R3BMCTrack* aMot0Track[nentries];
+  Int_t mot0PID[nentries];
+
+  Double_t time[nentries];
+  Double_t energy[nentries];
+  Double_t PxOut[nentries];
+  Double_t PyOut[nentries];
+  Double_t PzOut[nentries];
+  Double_t momentum[nentries];
+
+  Double_t eloss[nentries];
+  Double_t totaleloss[nentries];
+  Int_t cellhits[nentries];
+
+  Double_t xIn[nentries];
+  Double_t yIn[nentries];
+  Double_t xOut[nentries];
+  Double_t yOut[nentries];
+  Double_t zIn[nentries];
+  Double_t zOut[nentries];
+  Double_t xAv[nentries];
+  Double_t yAv[nentries];
+
+  Bool_t pDetEvt[nentries];
+
+  if(nentries == 0) no_interaction = no_interaction + 1;
+  
+  if(nentries > 0) {    
+    for (Int_t l=0; l<nentries; l++) {
+      R3BNeuLandPoint* land_obj = (R3BNeuLandPoint*) fLandPoints->At(l);
+      eventId[l] = land_obj->GetEventID();
+      detId[l] = land_obj->GetDetID();
+      cellId[l] = land_obj->GetCellID();
+
+      TrackId[l] = land_obj->GetTrackID();
+      aTrack[l] = (R3BMCTrack*) fLandMCTrack->At(TrackId[l]);
+      PID[l] = aTrack[l]->GetPdgCode();
+      if(PID[l] == 2212) {
+	pDetEvt[l] = kTRUE;
       }
-      h_pdg_vs_m0pdg->Fill(PID, mot0PID);
-      h_trackid_vs_m0trackid->Fill(TrackId, Mot0TrackId);
- 
+      else {
+	pDetEvt[l] = kFALSE;
+      }
+      Mot0TrackId[l] = land_obj->GetMot0TrackID();
+      aMot0Track[l] = (R3BMCTrack*) fLandMCTrack->At(Mot0TrackId[l]);
+      mot0PID[l] = aMot0Track[l]->GetPdgCode();
+
+      time[l] = land_obj->GetTime();
+      energy[l] = aTrack[l]->GetEnergy();
+      if(PID[l] == 2212) energy[l] = energy[l] * 1E3; //MeV
+      if(PID[l] == 11) energy[l] = energy[l] * 1E6; //keV
+      PxOut[l] = land_obj->GetPxOut() * 1E3; // MeV/c
+      PyOut[l] = land_obj->GetPyOut() * 1E3; // MeV/c
+      PzOut[l] = land_obj->GetPzOut() * 1E3; // MeV/c
+      momentum[l] = sqrt( PxOut[l] * PxOut[l] + PyOut[l] * PyOut[l] + PzOut[l] * PzOut[l]);
+
+      eloss[l] = land_obj->GetEnergyLoss();
+      totaleloss[l] = land_obj->GetTotalEloss();
+      cellhits[l] = land_obj->GetCellHits();
+      
+      xIn[l] = land_obj->GetXIn() * 10;
+      yIn[l] = land_obj->GetYIn() * 10;
+      xOut[l] = land_obj->GetXOut() * 10;
+      yOut[l] = land_obj->GetYOut() * 10;
+      zIn[l] = land_obj->GetZIn() * 10;
+      zOut[l] = land_obj->GetZOut() * 10;
+      xAv[l] = ( xIn[l] + xOut[l] ) / 2;
+      yAv[l] = ( yIn[l] + yOut[l] ) / 2;  
+    } // nentries for
+  } // nentries > 0
+  
+
+  // event info
+  /* 
+  if(nentries > 0) {
+    cout << " eventId: " << eventId[0] << endl;
+    for (Int_t l=0; l<nentries; l++) {
+      cout << " cellId: " << cellId[l] << " PID: " << PID[l] << " mot0PID: " << mot0PID[l]
+	   << " time: " << time[l] << " energy: " << energy[l] << " eloss: " << eloss[l] << endl;
+      if(l == nentries-1) cout << " cellhits: " << cellhits[l] << " totaleloss: " << totaleloss[l] << endl;
+    } // nentries for
+  } // nentries > 0
+  */
+
+  
+  if(nentries > 0) {
+    //cout << " eventId: " << eventId[0] << endl;
+    for (Int_t l=0; l<nentries; l++) {
+
+      if(l == 0) {
+	if(pDetEvt[0] == kTRUE) {
+	  NoOfPEvt = NoOfPEvt + 1;
+	}
+      }
+      if(l > 0) {
+	if(pDetEvt[l-1] == kTRUE) {
+	  pDetEvt[l] = kFALSE;
+	  if(pDetEvt[l] == kTRUE) {
+	    NoOfPEvt = NoOfPEvt + 1;
+	  }
+	}
+      }
+      
+      // fill histograms
+      h_detid->Fill(detId[l]);
+      h_cellid->Fill(cellId[l]);
+      h_trackid->Fill(TrackId[l]);
+      h_pdg->Fill(PID[l]);
+      h_mot0trackid->Fill(Mot0TrackId[l]);
+      
+      if(l == nentries-1) {
+	h_toteloss->Fill(totaleloss[l]);
+	h_cellhits->Fill(cellhits[l]);
+	h_cellhits_vs_totaleloss->Fill(cellhits[l], totaleloss[l]);
+      }
+      
+      h_pdg_vs_m0pdg->Fill(PID[l], mot0PID[l]);
+      h_trackid_vs_m0trackid->Fill(TrackId[l], Mot0TrackId[l]);
+      
+      switch(cellId[l]){
+      case 1:
+	if (PID[l] == 2212 ){
+	  h_time_p[0]->Fill(time[l]);
+	  h_etot_p[0]->Fill(energy[l]);
+	  h_pxout_p[0]->Fill(PxOut[l]);
+	  h_pyout_p[0]->Fill(PyOut[l]);
+	  h_pzout_p[0]->Fill(PzOut[l]);
+	  h_mom_p[0]->Fill(momentum[l]);
+	  
+	  h_eloss_p[0]->Fill(eloss[l]);
+	  h_etot_eloss_p[0]->Fill(energy[l],eloss[l]);
+	  
+	  h_xin_p[0]->Fill(xIn[l]);
+	  h_yin_p[0]->Fill(yIn[l]);
+	  h_zin_p[0]->Fill(zIn[l]);
+	}
+	if (PID[l] == 11 ){
+	  h_time_e[0]->Fill(time[l]);
+	  h_etot_e[0]->Fill(energy[l]);
+	  
+	  h_eloss_e[0]->Fill(eloss[l]);
+	  h_etot_eloss_e[0]->Fill(energy[l],eloss[l]);
+	}
+	break; // case 1
+      case 2:
+	if (PID[l] == 2212 ){
+	  h_time_p[1]->Fill(time[l]);
+	  h_etot_p[1]->Fill(energy[l]);
+	  h_pxout_p[1]->Fill(PxOut[l]);
+	  h_pyout_p[1]->Fill(PyOut[l]);
+	  h_pzout_p[1]->Fill(PzOut[l]);
+	  h_mom_p[1]->Fill(momentum[l]);
+	  
+	  h_eloss_p[1]->Fill(eloss[l]);
+	  h_etot_eloss_p[1]->Fill(energy[l],eloss[l]);
+	  
+	  h_xin_p[1]->Fill(xIn[l]);
+	  h_yin_p[1]->Fill(yIn[l]);
+	  h_zin_p[1]->Fill(zIn[l]);
+	}
+	if (PID[l] == 11 ){
+	  h_time_e[1]->Fill(time[l]);
+	  h_etot_e[1]->Fill(energy[l]);
+	  
+	  h_eloss_e[1]->Fill(eloss[l]);
+	  h_etot_eloss_e[1]->Fill(energy[l],eloss[l]);
+	}
+	break; // case 2
+      case 3:
+	if (PID[l] == 2212 ){
+	  h_time_p[2]->Fill(time[l]);
+	  h_etot_p[2]->Fill(energy[l]);
+	  h_pxout_p[2]->Fill(PxOut[l]);
+	  h_pyout_p[2]->Fill(PyOut[l]);
+	  h_pzout_p[2]->Fill(PzOut[l]);
+	  h_mom_p[2]->Fill(momentum[l]);
+	  
+	  h_eloss_p[2]->Fill(eloss[l]);
+	  h_etot_eloss_p[2]->Fill(energy[l],eloss[l]);
+	  
+	  h_xin_p[2]->Fill(xIn[l]);
+	  h_yin_p[2]->Fill(yIn[l]);
+	  h_zin_p[2]->Fill(zIn[l]);
+	}
+	if (PID[l] == 11 ){
+	  h_time_e[2]->Fill(time[l]);
+	  h_etot_e[2]->Fill(energy[l]);
+	  
+	  h_eloss_e[2]->Fill(eloss[l]);
+	  h_etot_eloss_e[2]->Fill(energy[l],eloss[l]);
+	}
+	break; // case 3
+      case 4:
+	if (PID[l] == 2212 ){
+	  h_time_p[3]->Fill(time[l]);
+	  h_etot_p[3]->Fill(energy[l]);
+	  h_pxout_p[3]->Fill(PxOut[l]);
+	  h_pyout_p[3]->Fill(PyOut[l]);
+	  h_pzout_p[3]->Fill(PzOut[l]);
+	  h_mom_p[3]->Fill(momentum[l]);
+	  
+	  h_eloss_p[3]->Fill(eloss[l]);
+	  h_etot_eloss_p[3]->Fill(energy[l],eloss[l]);
+	  
+	  h_xin_p[3]->Fill(xIn[l]);
+	  h_yin_p[3]->Fill(yIn[l]);
+	  h_zin_p[3]->Fill(zIn[l]);
+	}
+	if (PID[l] == 11 ){
+	  h_time_e[3]->Fill(time[l]);
+	  h_etot_e[3]->Fill(energy[l]);
+	  
+	  h_eloss_e[3]->Fill(eloss[l]);
+	  h_etot_eloss_e[3]->Fill(energy[l],eloss[l]);
+	}
+	break; // case 4
+      case 5:
+	if (PID[l] == 2212 ){
+	  h_time_p[4]->Fill(time[l]);
+	  h_etot_p[4]->Fill(energy[l]);
+	  h_pxout_p[4]->Fill(PxOut[l]);
+	  h_pyout_p[4]->Fill(PyOut[l]);
+	  h_pzout_p[4]->Fill(PzOut[l]);
+	  h_mom_p[4]->Fill(momentum[l]);
+	  
+	  h_eloss_p[4]->Fill(eloss[l]);
+	  h_etot_eloss_p[4]->Fill(energy[l],eloss[l]);
+	  
+	  h_xin_p[4]->Fill(xIn[l]);
+	  h_yin_p[4]->Fill(yIn[l]);
+	  h_zin_p[4]->Fill(zIn[l]);
+	}
+	if (PID[l] == 11 ){
+	  h_time_e[4]->Fill(time[l]);
+	  h_etot_e[4]->Fill(energy[l]);
+	  
+	  h_eloss_e[4]->Fill(eloss[l]);
+	  h_etot_eloss_e[4]->Fill(energy[l],eloss[l]);
+	}
+	break; // case 5
+      case 6:
+	if (PID[l] == 2212 ){
+	  h_time_p[5]->Fill(time[l]);
+	  h_etot_p[5]->Fill(energy[l]);
+	  h_pxout_p[5]->Fill(PxOut[l]);
+	  h_pyout_p[5]->Fill(PyOut[l]);
+	  h_pzout_p[5]->Fill(PzOut[l]);
+	  h_mom_p[5]->Fill(momentum[l]);
+	  
+	  h_eloss_p[5]->Fill(eloss[l]);
+	  h_etot_eloss_p[5]->Fill(energy[l],eloss[l]);
+	  
+	  h_xin_p[5]->Fill(xIn[l]);
+	  h_yin_p[5]->Fill(yIn[l]);
+	  h_zin_p[5]->Fill(zIn[l]);
+	}
+	if (PID[l] == 11 ){
+	  h_time_e[5]->Fill(time[l]);
+	  h_etot_e[5]->Fill(energy[l]);
+	  
+	  h_eloss_e[5]->Fill(eloss[l]);
+	  h_etot_eloss_e[5]->Fill(energy[l],eloss[l]);
+	}
+	break; // case 1
+      } // cellId
+      
+      
+      for (Int_t j=0; j<l; j++) {
+	Double_t dist = sqrt ( (xAv[l] - xAv[j]) * (xAv[l] - xAv[j]) + (yAv[l] - yAv[j]) * (yAv[l] - yAv[j]) );
+	if(dist > 100){ // 100 mm
+	  distcount = distcount + 1;
+	} // dist > 100 mm
+	else {
+	  // add 
+	} // dist < 100 mm
+	if(cellId[l] == cellId[j]) {
+	  //cout  << " cellId["<< l << "] = " << "cellId[" << j << "]" << endl;
+	} // cellID if
+      } // netries for compare
+    } // nentries for
+  } // nentries > 0
+  
+  // Conversion of Eloss to charge
+
       /*
       Double_t ne = 0.0;
       if ( tof[paddle] < 1.e-15 ){
@@ -517,8 +625,6 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 	}//!tof */
       //}//! eloss	 
     
-  }//! MC hits   
- 
 }
 // -------------------------------------------------------------------------
 
@@ -557,38 +663,47 @@ void R3BNeuLandDigitizer::Finish()
   // here event. write histos
   //   cout << " -I- Digit Finish() called " << endl;
   // Write control histograms
+
+  h_detid->Write();
+  h_cellid->Write();
+
+  h_trackid->Write();
+  h_pdg->Write();
+  h_mot0trackid->Write();
+  h_trackid_vs_m0trackid->Write();
+  h_pdg_vs_m0pdg->Write();
+
+  h_toteloss->Write();
+  h_cellhits->Write();
+  h_cellhits_vs_totaleloss->Write();
+
+  h_ne->Write();
+  h_ch->Write();
+
+
   for(Int_t i=0;i<6;i++){
-    h_eloss_p[i]->Write();
+    h_time_p[i]->Write();
+    h_etot_p[i]->Write();
+    h_time_e[i]->Write();
+    h_etot_e[i]->Write();
     h_pxout_p[i]->Write();
     h_pyout_p[i]->Write();
     h_pzout_p[i]->Write();
+    h_mom_p[i]->Write();
+
+    h_eloss_p[i]->Write();
+    h_eloss_e[i]->Write();
+    h_etot_eloss_p[i]->Write();
+    h_etot_eloss_e[i]->Write();
+
     h_xin_p[i]->Write();
     h_yin_p[i]->Write();
     h_zin_p[i]->Write();
-    h_mom_p[i]->Write();
-    h_etot_p[i]->Write();
-    h_time_p[i]->Write();
-    h_etot_eloss_p[i]->Write();
-
-    h_eloss_e[i]->Write();
-    h_etot_e[i]->Write();
-    h_time_e[i]->Write();
-    h_etot_eloss_e[i]->Write();
   }
-  h_ne->Write();
-  h_ch->Write();
-  h_pdg->Write();
-  h_detid->Write();
-  h_cellid->Write();
-  h_trackid->Write();
-  h_mot0trackid->Write();
-  h_toteloss->Write();
-  h_cellhits->Write();
-  h_pdg_vs_m0pdg->Write();
-  h_trackid_vs_m0trackid->Write();
-  h_cellhits_vs_totaleloss->Write();
 
-  cout << " Number of non-interacting primaries: " << no_interaction << endl;
+  cout << " Number of primaries deposit no energy in gas layers: " << no_interaction << endl;
+  cout << " Number of hits where distance is larger than 10 cm: " << distcount << endl;
+  cout << " Number of events in which proton is detected: " << NoOfPEvt << endl;
 }
 
 ClassImp(R3BNeuLandDigitizer)
