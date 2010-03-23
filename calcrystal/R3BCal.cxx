@@ -530,7 +530,7 @@ NAJA_Rot_col_X[9].SetXYZ(TMath::Sin(80.650000*TMath::Pi()/180)*TMath::Cos(344.55
                        TMath::Sin(148.282400*TMath::Pi()/180)*TMath::Cos(270.000000*TMath::Pi()/180));
 
 NAJA_Rot_col_X[10].SetXYZ(TMath::Sin(18.000000*TMath::Pi()/180)*TMath::Cos(148.280000*TMath::Pi()/180),
-                       TMath::Sin(108.000000*TMath::Pi()/180)*TMath::Cos(328.280000*TMath::Pi()/180),
+                       TMath::Sin(108.000000*TMath::Pi()/180)*TMath::Cos(148.280000*TMath::Pi()/180),
                        TMath::Sin(90.000000*TMath::Pi()/180)*TMath::Cos(238.280000*TMath::Pi()/180));
 
 NAJA_Rot_col_X[11].SetXYZ(TMath::Sin(18.000000*TMath::Pi()/180)*TMath::Cos(31.720000*TMath::Pi()/180),
@@ -580,7 +580,7 @@ NAJA_Rot_col_Y[9].SetXYZ(TMath::Sin(80.650000*TMath::Pi()/180)*TMath::Sin(344.55
                     TMath::Sin(148.282400*TMath::Pi()/180)*TMath::Sin(270.000000*TMath::Pi()/180));
 
 NAJA_Rot_col_Y[10].SetXYZ(TMath::Sin(18.000000*TMath::Pi()/180)*TMath::Sin(148.280000*TMath::Pi()/180),
-                    TMath::Sin(108.000000*TMath::Pi()/180)*TMath::Sin(328.280000*TMath::Pi()/180),
+                    TMath::Sin(108.000000*TMath::Pi()/180)*TMath::Sin(148.280000*TMath::Pi()/180),
                     TMath::Sin(90.000000*TMath::Pi()/180)*TMath::Sin(238.280000*TMath::Pi()/180));
 
 NAJA_Rot_col_Y[11].SetXYZ(TMath::Sin(18.000000*TMath::Pi()/180)*TMath::Sin(31.720000*TMath::Pi()/180),
