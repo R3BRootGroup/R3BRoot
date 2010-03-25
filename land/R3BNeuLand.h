@@ -134,6 +134,7 @@ class R3BNeuLand : public R3BDetector
     Int_t          fCellID;            //!  detector cell id
     Int_t          fCellHits;          //!  number of hits in the cells in an event
     Double_t       fTotalEloss;        //!  total energy loss in the cells in an event
+    Double_t       fMass;              //!  mass
     TLorentzVector fPosIn, fPosOut;    //!  position
     TLorentzVector fMomIn, fMomOut;    //!  momentum
     Double32_t     fTime;              //!  time
@@ -154,7 +155,7 @@ class R3BNeuLand : public R3BDetector
     R3BNeuLandPoint* AddHit(Int_t eventID, Int_t trackID,
 			    Int_t mot0trackID,
 			    Int_t detID, Int_t cellID,
-			    Int_t cellhits, Double_t totaleloss,
+			    Int_t cellhits, Double_t totaleloss, Double_t mass,
 			    TVector3 posIn,
 			    TVector3 pos_out, TVector3 momIn,
 			    TVector3 momOut, Double_t time,
@@ -211,7 +212,7 @@ inline void R3BNeuLand::ResetParameters() {
   fPosOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fMomIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fMomOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
-  fTime = fLength = fELoss = 0;
+  fTime = fLength = fELoss = fMass = 0;
   fPosIndex = 0;
 };
 

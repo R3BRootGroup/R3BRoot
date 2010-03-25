@@ -188,6 +188,7 @@ Bool_t R3BNeuLand::ProcessHits(FairVolume* vol) {
       fDetID = cp2;
       fCellID = cp1;
       fCellHits = fCellHits + 1;
+      fMass = gMC->ParticleMass(trackpid_gas); // GeV/c2
       //cout << " fEventID: " << fEventID << endl;
       //cout << " fTrackID: " << fTrackID << endl;
       //cout << " fMot0TrackID: " << fMot0TrackID << endl;
@@ -265,7 +266,7 @@ Bool_t R3BNeuLand::ProcessHits(FairVolume* vol) {
     
     AddHit(fEventID, fTrackID, fMot0TrackID,
     	   fDetID, fCellID,
-    	   fCellHits, fTotalEloss,
+    	   fCellHits, fTotalEloss, fMass,
     	   TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
     	   TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
     	   TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
@@ -397,7 +398,7 @@ void R3BNeuLand::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) 
 R3BNeuLandPoint* R3BNeuLand::AddHit(Int_t eventID, Int_t trackID,
 				    Int_t mot0trackID,
 				    Int_t detID, Int_t cellID,
-				    Int_t cellhits, Double_t totaleloss,
+				    Int_t cellhits, Double_t totaleloss, Double_t mass,
 				    TVector3 posIn,
 				    TVector3 posOut, TVector3 momIn,
 				    TVector3 momOut, Double_t time,
@@ -409,8 +410,8 @@ R3BNeuLandPoint* R3BNeuLand::AddHit(Int_t eventID, Int_t trackID,
 	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
 	 << trackID << ", energy loss " << eLoss  << " GeV" << endl;
   return new(clref[size]) R3BNeuLandPoint(eventID, trackID, mot0trackID,
-					  detID, cellID, cellhits, totaleloss, posIn, posOut,
-					  momIn, momOut, time, length, eLoss);
+					  detID, cellID, cellhits, totaleloss, mass,
+					  posIn, posOut, momIn, momOut, time, length, eLoss);
 }
 // -----   Public method ConstructGeometry   ----------------------------------
 void R3BNeuLand::ConstructGeometry() {
@@ -965,7 +966,7 @@ void R3BNeuLand::ConstructGeometry3() {
    // -- Elements
 
   TGeoElement* elH = new TGeoElement("Hydrogen", "H", z= 1., a= 1.00794);
-  TGeoElement* elC = new TGeoElement("Nitrogen", "C", z= 6., a= 12.0107);
+  TGeoElement* elC = new TGeoElement("Carbon", "C", z= 6., a= 12.0107);
   TGeoElement* elN = new TGeoElement("Nitrogen", "N", z= 7., a= 14.007);
   TGeoElement* elO = new TGeoElement("Oxygen", "O", z= 8., a= 28.0855);
   TGeoElement* elF = new TGeoElement("Fluorine", "F", z= 9., a= 18.9984032);

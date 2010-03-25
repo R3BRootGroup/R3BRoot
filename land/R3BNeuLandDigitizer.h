@@ -56,11 +56,13 @@ class R3BNeuLandDigitizer : public FairTask
   TH1F *h_zin_p[6];
   TH1F *h_mom_p[6];
   TH1F *h_etot_p[6];
+  TH1F *h_ekin_p[6];
   TH1F *h_time_p[6];
   TH2F *h_etot_eloss_p[6];
 
   TH1F *h_eloss_e[6];
   TH1F *h_etot_e[6];
+  TH1F *h_ekin_e[6];
   TH1F *h_time_e[6];
   TH2F *h_etot_eloss_e[6];
 
@@ -71,12 +73,23 @@ class R3BNeuLandDigitizer : public FairTask
   TH1F *h_mot0trackid;
   TH1F *h_toteloss;
   TH1F *h_cellhits;
-  TH1F *h_ne;
-  TH1F *h_ch;
+  TH1F *h_ne_p;
+  TH1F *h_ne_e;
+  TH1F *h_ne_exp_p;
+  TH1F *h_ne_exp_e;
+  TH1F *h_qind_p;
+  TH1F *h_qind_e;
+  TH1F *h_tentr_e;
+  TH1F *h_tentr_p;
+  TH1F *h_qindtot;
   TH1F *h_time;
+  TH2F *h_gamma_eloss_p;
+  TH2F *h_gamma_eloss_e;
   TH2F *h_pdg_vs_m0pdg;
   TH2F *h_trackid_vs_m0trackid;
   TH2F *h_cellhits_vs_totaleloss;
+  TH2F *h_qind_tof_p;
+  TH2F *h_qind_tof_e;
 
   Int_t no_interaction;
   Int_t distcount;
