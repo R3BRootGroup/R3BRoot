@@ -41,7 +41,7 @@ class R3BNeuLandPoint : public FairMCPoint
   R3BNeuLandPoint(Int_t eventID, Int_t trackID,
 		  Int_t mot0trackID,
 		  Int_t detID, Int_t cellID,
-		  Int_t cellhits, Double_t totaleloss,
+		  Int_t cellhits, Double_t totaleloss, Double_t mass,
 		  TVector3 posIn,
 		  TVector3 posOut, TVector3 momIn, TVector3 momOut,
 		  Double_t tof, Double_t length, Double_t eLoss);
@@ -71,6 +71,7 @@ class R3BNeuLandPoint : public FairMCPoint
   Double_t GetPxOut() const { return fPx_out; }
   Double_t GetPyOut() const { return fPy_out; }
   Double_t GetPzOut() const { return fPz_out; }
+  Double_t GetMass() const { return fMass; }
 
   void PositionIn(TVector3& pos)  { pos.SetXYZ(fX, fY, fZ); }
   void PositionOut(TVector3& pos) { pos.SetXYZ(fX_out,fY_out,fZ_out); }
@@ -104,6 +105,7 @@ class R3BNeuLandPoint : public FairMCPoint
   Int_t fCellID;
   Int_t fCellHits;
   Double_t fTotalEloss;
+  Double_t fMass;
 
   ClassDef(R3BNeuLandPoint,1)
 

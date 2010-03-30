@@ -19,6 +19,7 @@ R3BNeuLandPoint::R3BNeuLandPoint() : FairMCPoint() {
   fMot0TrackID = -1 ;
   fDetID = -1 ;
   fCellID   = -1 ;
+  fMass = 0.0;
 }
 // -------------------------------------------------------------------------
 
@@ -28,7 +29,7 @@ R3BNeuLandPoint::R3BNeuLandPoint() : FairMCPoint() {
 R3BNeuLandPoint::R3BNeuLandPoint(Int_t eventID, Int_t trackID,
 				 Int_t mot0trackID,
 				 Int_t detID, Int_t cellID,
-				 Int_t cellhits, Double_t totaleloss,
+				 Int_t cellhits, Double_t totaleloss, Double_t mass,
 				 TVector3 posIn,
 				 TVector3 posOut, TVector3 momIn, TVector3 momOut,
 				 Double_t tof, Double_t length, Double_t eLoss)
@@ -45,6 +46,7 @@ R3BNeuLandPoint::R3BNeuLandPoint(Int_t eventID, Int_t trackID,
   fCellID = cellID;
   fCellHits = cellhits;
   fTotalEloss = totaleloss;
+  fMass = mass;
 }
 // -------------------------------------------------------------------------
 
