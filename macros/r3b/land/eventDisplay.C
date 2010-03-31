@@ -29,12 +29,14 @@ eventDisplay()
   gSystem->Load("libEve");
   gSystem->Load("libEventDisplay");
 
-                                     
+
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *fRun= new FairRunAna();
  
   TFile* file = new TFile("r3bpar.root");
-  file->Get("FairBaseParSet"); 
+
+
+ // file->Get("FairBaseParSet");
 
  // -----   Runtime database   ---------------------------------------------
 
@@ -49,18 +51,25 @@ eventDisplay()
   fRun->SetInputFile("r3bsim.root");
 
   fRun->SetOutputFile("test.root");
+
+
+
   fRun->LoadGeometry();
 
+
   FairEventManager *fMan= new FairEventManager();
-  FairMCTracks *Track =  new FairMCTracks ("Monte-Carlo Tracks");
-  FairMCPointDraw *LandPoints =   new FairMCPointDraw ("LandPoint",kOrange,  kFullSquare);
+
+
+  //  FairMCTracks *Track =  new FairMCTracks ("Monte-Carlo Tracks");
+//  FairMCPointDraw *LandPoints =   new FairMCPointDraw ("LandPoint",kOrange,  kFullSquare);
 
                                                                
-  fMan->AddTask(Track);
+//  fMan->AddTask(Track);
   
-  fMan->AddTask(LandPoints);
+ // fMan->AddTask(LandPoints);
     
   fMan->Init();                     
-  
+
+
 
 }
