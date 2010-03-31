@@ -129,12 +129,12 @@ class R3BTof : public R3BDetector
     Double32_t     fTime;              //!  time
     Double32_t     fLength;            //!  length
     Double32_t     fELoss;             //!  energy loss
-     Double32_t     fCutE;              //!  Sec. Energy Cut-Off
+     Double32_t     fCutE;             //!  Sec. Energy Cut-Off
 
     Int_t          fPosIndex;          //!
     TClonesArray*  fTofCollection;     //!  The hit collection
     Bool_t         kGeoSaved;          //!
-    TList *flGeoPar; //!
+    TList *flGeoPar;                   //!
 
     /** Private method AddHit
      **
