@@ -39,12 +39,6 @@ class R3BNeuLandDigitizer : public FairTask
   TClonesArray* fLandPoints;
   TClonesArray* fLandMCTrack; 
 
-  //- Table data 
-  Double_t x_pos[200],y_pos[200],z_pos[200];
-  Double_t tof[200],pm[200][2];
-  Double_t paddle_E[200][9];
-  Double_t part_E[50],part_n[50],first_hit[4];
-  Int_t nuhits[200];
 
   //- Control Hitograms
   TH1F *h_eloss_p[6];
@@ -83,6 +77,8 @@ class R3BNeuLandDigitizer : public FairTask
   TH1F *h_tentr_p;
   TH1F *h_qindtot;
   TH1F *h_time;
+  TH1F *h_stripflag;
+  TH1F *h_xav;
   TH2F *h_gamma_eloss_p;
   TH2F *h_gamma_eloss_e;
   TH2F *h_pdg_vs_m0pdg;
@@ -90,6 +86,11 @@ class R3BNeuLandDigitizer : public FairTask
   TH2F *h_cellhits_vs_totaleloss;
   TH2F *h_qind_tof_p;
   TH2F *h_qind_tof_e;
+
+  TH1F *h_diff;
+  TH1F *h_diffx;
+  TH1F *h_diffy;
+  TH1F *h_diffz;
 
   Int_t no_interaction;
   Int_t distcount;

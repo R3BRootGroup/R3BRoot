@@ -14,11 +14,9 @@
 #include <iostream>
 
 
-//#include "R3BLandPoint.h"
 #include "R3BNeuLandPoint.h"
 #include "R3BMCTrack.h"
 
-		
 using std::cout;
 using std::endl;
 
@@ -118,6 +116,24 @@ InitStatus R3BNeuLandDigitizer::Init() {
   TString ekinTitlesP[6];
   TString ekinTitlesE[6];
 
+  TString elossXtitP = "energy loss of protons [keV]";
+  TString elossXtitE = "energy loss of electrons [keV]";
+  TString PxOutXtitP = "momentum x component of protons [MeV/c]";
+  TString PyOutXtitP = "momentum y component of protons [MeV/c]";
+  TString PzOutXtitP = "momentum z component of protons [MeV/c]";
+  TString xInXtitP = "entering position x component of protons [mm]";
+  TString yInXtitP = "entering position y component of protons [mm]";
+  TString zInXtitP = "entering position z component of protons [mm]";
+  TString momXtitP = "momentum of protons [MeV/c]";
+  TString etotXtitP = "total energy of protons [MeV]";
+  TString timeXtitP = "time for protons [ns]";
+  TString timeXtitE = "time for electrons [ns]";
+  TString etotXtitE = "total energy for electrons [keV]";
+  TString ekinXtitP = "kinetic energy for protons [MeV]";
+  TString ekinXtitE = "kinetic energy for electrons [keV]";
+
+  TString cntTitle = "counts";
+
   char num[] = "012345";
   char *nm;
   nm = num;
@@ -161,18 +177,40 @@ InitStatus R3BNeuLandDigitizer::Init() {
   }
 
   h_detid = new TH1F("DetID","Detector ID where deposition occured", 100, 99.5, 199.5);
+  h_detid->SetXTitle("detector ID");
+  h_detid->SetYTitle(cntTitle);
   h_cellid = new TH1F("CellID","Gas cell ID where deposition occured", 10, 0.5, 10.5);
+  h_cellid->SetXTitle("cell ID");
+  h_cellid->SetYTitle(cntTitle);
 
   h_trackid = new TH1F("TrackID","Track ID which deposited energy", 100, -1.5, 98.5);
+  h_trackid->SetXTitle("track ID");
+  h_trackid->SetYTitle(cntTitle);
   h_pdg = new TH1F("PDG","Code of particle deposited energy in gas", 3220, -220.5, 2999.5);
+  h_pdg->SetXTitle("particle ID");
+  h_pdg->SetYTitle(cntTitle);
   h_mot0trackid = new TH1F("Mot0TrackID","Mother of Track ID which deposited energy", 100, -1.5, 98.5);
+  h_mot0trackid->SetXTitle("mother track ID");
+  h_mot0trackid->SetYTitle(cntTitle);
 
   h_toteloss = new TH1F("TotEloss", "Total energy loss in an event", 3100, -10.05, 299.95);
+  h_toteloss->SetXTitle("total energy loss in an event [keV]");
+  h_toteloss->SetYTitle(cntTitle);
   h_cellhits = new TH1F("Cell_Hits","Number of hits in the gas cells in an event", 16, -0.5, 15.5);
+  h_cellhits->SetXTitle("number of hits in the gas cells in an event");
+  h_cellhits->SetYTitle(cntTitle);
 
-  h_pdg_vs_m0pdg = new TH2F("PDG_vs_m0PDG","PDG vs m0PDG",3220, -220.5, 2999.5, 3220, -220.5, 2999.5);
-  h_trackid_vs_m0trackid = new TH2F("TrackId_vs_Mot0TrackId","TrackId vs Mother of TrackId", 100, -1.5, 98.5, 100, -1.5, 98.5);
+  h_pdg_vs_m0pdg = new TH2F("PDG_vs_m0PDG","PDG vs m0PDG", 3220, -220.5, 2999.5, 3220, -220.5, 2999.5);
+  h_pdg_vs_m0pdg->SetXTitle("particle ID");
+  h_pdg_vs_m0pdg->SetYTitle("mother particle ID");
+  h_trackid_vs_m0trackid = new TH2F("TrackId_vs_Mot0TrackId","TrackId vs Mother of TrackId",
+				    100, -1.5, 98.5, 100, -1.5, 98.5);
+  h_trackid_vs_m0trackid->SetXTitle("track ID");
+  h_trackid_vs_m0trackid->SetYTitle("mother track ID");
   h_cellhits_vs_totaleloss = new TH2F("Cell_Hits_vs_Total Eloss","Number of hits vs Total Eloss in an event", 16, -0.5, 15.5, 3100, -10.05 , 299.95);
+  h_cellhits_vs_totaleloss->SetXTitle("number of hits in the gas cells in an event");
+  h_cellhits_vs_totaleloss->SetYTitle("total energy loss in an event [keV]");
+
 
   for(Int_t i=0; i<6; i++) {
     h_time_p[i] = new TH1F(timeNamesP[i], timeTitlesP[i], 1000, -0.001, 1.999);
@@ -196,22 +234,103 @@ InitStatus R3BNeuLandDigitizer::Init() {
     h_yin_p[i] = new TH1F(yInNamesP[i], yInTitlesP[i], 200, -9.95, 10.05);
     h_zin_p[i] = new TH1F(zInNamesP[i], zInTitlesP[i], 160, 3.95, 19.95);
 
+    
+    h_time_p[i]->SetXTitle(timeXtitP);
+    h_time_e[i]->SetXTitle(timeXtitE);
+    h_etot_p[i]->SetXTitle(etotXtitP);
+    h_etot_e[i]->SetXTitle(etotXtitE);
+    h_ekin_p[i]->SetXTitle(ekinXtitP);
+    h_ekin_e[i]->SetXTitle(ekinXtitE);
+    h_pxout_p[i]->SetXTitle(PxOutXtitP);
+    h_pyout_p[i]->SetXTitle(PyOutXtitP);
+    h_pzout_p[i]->SetXTitle(PzOutXtitP);
+    h_mom_p[i]->SetXTitle(momXtitP);
+
+    h_eloss_p[i]->SetXTitle(elossXtitP);
+    h_eloss_e[i]->SetXTitle(elossXtitE);
+
+    h_etot_eloss_p[i]->SetXTitle(etotXtitP);
+    h_etot_eloss_e[i]->SetXTitle(etotXtitE);
+
+    h_xin_p[i]->SetXTitle(xInXtitP);
+    h_yin_p[i]->SetXTitle(yInXtitP);
+    h_zin_p[i]->SetXTitle(zInXtitP);
+
+    h_time_p[i]->SetYTitle(cntTitle);
+    h_time_e[i]->SetYTitle(cntTitle);
+    h_etot_p[i]->SetYTitle(cntTitle);
+    h_etot_e[i]->SetYTitle(cntTitle);
+    h_ekin_p[i]->SetYTitle(cntTitle);
+    h_ekin_e[i]->SetYTitle(cntTitle);
+    h_pxout_p[i]->SetYTitle(cntTitle);
+    h_pyout_p[i]->SetYTitle(cntTitle);
+    h_pzout_p[i]->SetYTitle(cntTitle);
+    h_mom_p[i]->SetYTitle(cntTitle);
+
+    h_eloss_p[i]->SetYTitle(cntTitle);
+    h_eloss_e[i]->SetYTitle(cntTitle);
+
+    h_etot_eloss_p[i]->SetYTitle(elossXtitP);
+    h_etot_eloss_e[i]->SetYTitle(elossXtitE);
+
+    h_xin_p[i]->SetYTitle(cntTitle);
+    h_yin_p[i]->SetYTitle(cntTitle);
+    h_zin_p[i]->SetYTitle(cntTitle);
+
   }
 
 
-  h_ne_p = new TH1F("NeP","Number of electrons based on Eloss P",200,0.5,200.5);
-  h_ne_e = new TH1F("NeE","Number of electrons based on Eloss E",200,0.5,200.5);
-  h_ne_exp_p = new TH1F("NeExpP","Expected number of electrons P",200,0.5,200.5);
-  h_ne_exp_e = new TH1F("NeExpE","Expected number of electrons E",200,0.5,200.5);
+  h_ne_p = new TH1F("NeP","Number of electrons based on Eloss P",200,-1.5,198.5);
+  h_ne_p->SetXTitle("number of initial avalanche electrons based on Eloss for protons");
+  h_ne_p->SetYTitle(cntTitle);
+  h_ne_e = new TH1F("NeE","Number of electrons based on Eloss E",200,-1.5,198.5);
+  h_ne_e->SetXTitle("number of initial avalanche electrons based on Eloss for electrons");
+  h_ne_e->SetYTitle(cntTitle);
+  h_ne_exp_p = new TH1F("NeExpP","Expected number of electrons P",200,-1.5,198.5);
+  h_ne_exp_p->SetXTitle("expected number of initial avalanche electrons based on Lippmann for protons");
+  h_ne_exp_p->SetYTitle(cntTitle);
+  h_ne_exp_e = new TH1F("NeExpE","Expected number of electrons E",200,-1.5,198.5);
+  h_ne_exp_e->SetXTitle("expected number of initial avalanche electrons based on Lippmann for electrons");
+  h_ne_exp_e->SetYTitle(cntTitle);
   h_gamma_eloss_p = new TH2F("GammaP vs ElossP", "Gamma P vs Eloss P", 200, -0.005, 1.995, 3100, -10.05, 299.95);
-  h_gamma_eloss_e = new TH2F("GammaE vs ElossE", "Gamma E vs Eloss E", 200, -0.5, 199.5, 3100, -10.05, 299.95);
+  h_gamma_eloss_p->SetXTitle("Lorentz factor gamma for protons");
+  h_gamma_eloss_p->SetYTitle(elossXtitP);
+  h_gamma_eloss_e = new TH2F("GammaE vs ElossE", "Gamma E vs Eloss E", 1000, 60.005, 79.995, 200, -0.05, 19.95);
+  h_gamma_eloss_e->SetXTitle("Lorentz factor gamma for electrons");
+  h_gamma_eloss_e->SetYTitle(elossXtitE);
   h_qind_p = new TH1F("QindP","Induced charge P [pC]", 100, 0.5, 100.5);
+  h_qind_p->SetXTitle("individual induced charge for protons [pC]");
+  h_qind_p->SetYTitle(cntTitle);
   h_qind_e = new TH1F("QindE","Induced charge E [pC]", 1000, -0.01, 19.99);
+  h_qind_e->SetXTitle("individual induced charge for electrons [pC]");
+  h_qind_e->SetYTitle(cntTitle);
   h_tentr_p = new TH1F("TentrP","Time for entries P [pC]", 500, -0.001, 0.999);
+  h_tentr_p->SetXTitle("individual time for protons [ns]");
+  h_tentr_p->SetYTitle(cntTitle);
   h_tentr_e = new TH1F("TentrE","Time for entries E [pC]", 500, -0.001, 0.999);
+  h_tentr_e->SetXTitle("individual time for electrons [ns]");
+  h_tentr_e->SetYTitle(cntTitle);
   h_qind_tof_p = new TH2F("QindP vs TOFP","Induced charge P [pC] vs TOF P [ns]", 100, 0.5, 100.5, 500, -0.001, 0.999);
+  h_qind_tof_p->SetXTitle("individual induced charge for protons [pC]");
+  h_qind_tof_p->SetYTitle("individual TOF for protons [ns]");
   h_qind_tof_e = new TH2F("QindE vs TOFE","Induced charge E [pC] vs TOF E [ns]", 1000, -0.01, 19.99, 500, -0.001, 0.999);
+  h_qind_tof_e->SetXTitle("individual induced charge for electrons [pC]");
+  h_qind_tof_e->SetYTitle("individual TOF for electrons [ns]");
   h_qindtot = new TH1F("QindTotal","Total induced charge [pC]", 1000, -0.05, 99.95);
+  h_qindtot->SetXTitle("total induced charge [pC]");
+  h_qindtot->SetYTitle(cntTitle);
+  h_stripflag = new TH1F("StripFlag","StripFlag", 16, -0.5, 15.5);
+  h_stripflag->SetXTitle("number of strip hit");
+  h_stripflag->SetYTitle(cntTitle);
+  h_xav = new TH1F("xAv","Average x hit position [mm]", 1000, -150, 150);
+  h_xav->SetXTitle("average x hit position [mm]");
+  h_xav->SetYTitle(cntTitle);
+
+  h_diff = new TH1F("Diff","Diff", 10000, 0, 10);
+  h_diffx = new TH1F("Diffx","Diffx", 100, -100, 100);
+  h_diffy = new TH1F("Diffy","Diffy", 100, -100, 100);
+  h_diffz = new TH1F("Diffz","Diffz", 10000, -40, 40);
+
   
   return kSUCCESS;
 
@@ -283,16 +402,22 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
   Double_t Tentr[nentries];
   Double_t TOF[nentries];
 
+  Int_t StripFlag[nentries];
+  Double_t xmin[9];
+  Double_t xmax[9];
+
   Double_t QindTotal = 0.0;
   
   // count the number of events in which no energy deposition occurred
   if(nentries == 0) no_interaction = no_interaction + 1;
   // end counting events in which no energy deposition occurred
-  
+
   // fill arrays
   if(nentries > 0) {
     for (Int_t l=0; l<nentries; l++) {
+
       R3BNeuLandPoint* land_obj = (R3BNeuLandPoint*) fLandPoints->At(l);
+
       eventId[l] = land_obj->GetEventID();
       detId[l] = land_obj->GetDetID();
       cellId[l] = land_obj->GetCellID();
@@ -346,16 +471,36 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
       zOut[l] = land_obj->GetZOut() * 10; // mm
       xAv[l] = ( xIn[l] + xOut[l] ) / 2; // mm
       yAv[l] = ( yIn[l] + yOut[l] ) / 2; // mm
+
+      Double_t delta_AnodeGap = 3; // thickness of gap between the anode strips in mm
+      Double_t delta_Strip = 25; // strip width in mm
+      Double_t ShX = (8 * delta_Strip + 7 * delta_AnodeGap)/2; // half length in mm
+
+      for(Int_t i=0; i<8; i++) {
+
+	xmin[i+1] = -ShX + i * (delta_Strip + delta_AnodeGap);
+	xmax[i+1] = -ShX + i * (delta_Strip + delta_AnodeGap) + delta_Strip;
+
+      }
+
+      StripFlag[l] = 0;
+
+      for(Int_t i=0; i<8; i++) {
+	if(xmin[i+1] <= xAv[l] && xAv[l] <= xmax[i+1]) StripFlag[l] = i+1;
+	if(xmax[i+1] < xAv[l] && xAv[l] < xmin[i+2]) StripFlag[l] = i+9;
+      }
+
     } // nentries for
   } // nentries > 0
   // end filling arrays
 
+  R3BNeuLandPoint* land_obj1 = (R3BNeuLandPoint*) fLandPoints->At(0);
   
   // analyze events
   if(nentries > 0) {
     //cout << " eventId: " << eventId[0] << endl;
-    for (Int_t l=0; l<nentries; l++) {
-      /*
+      for (Int_t l=0; l<nentries; l++) {
+       /*
       // event info
       cout << " cellId: " << cellId[l] << " PID: " << PID[l] << " mot0PID: " << mot0PID[l]
 	   << " time: " << time[l] << " energy: " << energy[l] << " eloss: " << eloss[l] << endl;
@@ -378,7 +523,6 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 	}
       }
       // end counting events in which proton is involved
-     
 
       // fill histograms for checking
       h_detid->Fill(detId[l]);
@@ -554,21 +698,29 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 	}
 	break; // case 6
       } // cellId
+
+      h_stripflag->Fill(StripFlag[l]);
+      h_xav->Fill(xAv[l]);
       // end filling histograms for checking
       
       // determine the expected number of electrons produced
       NofClusters[l] = 0;
       NeExp[l] = 0;
       Ne[l] = 0;
-      //Qind[l] = 0.0;
+      Qind[l] = 0.0;
       Tentr[l] = 0.0;
       TOF[l] = 0.0;
 
-      NofClusters[l] = (Int_t) ( (2 * gRandom->Rndm() -1) + (6.35867 + 2.26851 / (gamma[l]-1)) * 0.3 + 0.5 );
+      Double_t FanoFactor = 0.25;
+      Double_t NofClMean = ( 9.64747 + 2.37356 / (gamma[l]-1) - 3.67386 * exp(-7.62724E-2 * (gamma[l]-1)) ) * 0.3; // for RPCgas
+      //Double_t NofClMean = ( 9.88155 + 2.65187 / (gamma[l]-1) - 3.59594 * exp(-9.50971E-2 * (gamma[l]-1)) ) * 0.3; // for Isobutane
+      //Double_t NofClMean = ( 3.30233 + 7.73277E-1 / (gamma[l]-1) - 1.17864 * exp(-7.25717E-2 * (gamma[l]-1)) ) * 0.3; // for Methane
+      Double_t NofClMeanUnc = sqrt(NofClMean * FanoFactor);
+      NofClusters[l] = (Int_t) ( (2 * gRandom->Rndm() - 1) * NofClMeanUnc + NofClMean + 0.5 );
 
       for(Int_t k=1; k<=NofClusters[l]; k++) {
 	Double_t Rnd = gRandom->Rndm();
-	if(Rnd <= 0.66) NeExp[l] = NeExp[l] + 1;
+	if(Rnd <= 0.66) NeExp[l] = NeExp[l] + 1; // for RPCgas
 	else if(Rnd <= 0.855) NeExp[l] = NeExp[l] + 2;
 	else if(Rnd <= 0.925) NeExp[l] = NeExp[l] + 3;
 	else if(Rnd <= 0.960) NeExp[l] = NeExp[l] + 4;
@@ -577,15 +729,32 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 	else if(Rnd <= 0.992) NeExp[l] = NeExp[l] + 7;
 	else if(Rnd <= 0.997) NeExp[l] = NeExp[l] + 8;
 	else if(Rnd <= 1.000) NeExp[l] = NeExp[l] + 9;
+	/*
+	if(Rnd <= 0.84) NeExp[l] = NeExp[l] + 1; // for Isobutane and Methane
+	else if(Rnd <= 0.946) NeExp[l] = NeExp[l] + 2;
+	else if(Rnd <= 0.971) NeExp[l] = NeExp[l] + 3;
+	else if(Rnd <= 0.982) NeExp[l] = NeExp[l] + 4;
+	else if(Rnd <= 0.9885) NeExp[l] = NeExp[l] + 5;
+	else if(Rnd <= 0.993) NeExp[l] = NeExp[l] + 6;
+	else if(Rnd <= 0.996) NeExp[l] = NeExp[l] + 7;
+	else if(Rnd <= 0.9985) NeExp[l] = NeExp[l] + 8;
+	else if(Rnd <= 1.000) NeExp[l] = NeExp[l] + 9;
+	*/
       } // NofClusters for
       // end determining the expected number of electrons produced
       
       // calculating number of electrons based on eloss
-      Double_t IonYield = 35; // eV
-      Ne[l] = (Int_t) (1E3 * eloss[l] / IonYield + 0.5);
-      //cout << " NofClusters: " << NofClusters[l] << " Ne: " << Ne << " NeExp: " << NeExp[l] << endl;
-      // end calculating number of electrons based on eloss
+      Double_t IonYield = 40; // eV, for RPCgas
+      //Double_t IonYield = 15; // eV, for Isobutane
+      //Double_t IonYield = 27; // eV, for Methane
+      Double_t NeMean = 1E3 * eloss[l] / IonYield;
+      Double_t NeMeanUnc = sqrt(NeMean * FanoFactor);
 
+      Ne[l] = (Int_t) ((2 * gRandom->Rndm() - 1) * NeMeanUnc + NeMean + 0.5);
+      //Ne[l] = (Int_t) (1E3 * eloss[l] / IonYield + 0.5);
+      //cout << " NofClusters: " << NofClusters[l] << " NeMean: " << NeMean << " NeExp: " << NeExp[l] << endl;
+      // end calculating number of electrons based on eloss
+      
       
       // calculating the induced charge
       Double_t HV = 10; // kV
@@ -598,11 +767,11 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
       Double_t alpha = 9.321 - 1.30858 * eField + 3.50827E-2 * pow(eField,2) - 1.06524E-4 * pow(eField,3); // Townsend coefficient in 1/mm
       Double_t eta = -8.8903 + 1473.86 / (eField - 22.0970); // Attachment coefficient in 1/mm
       Double_t k_ratio = eta / alpha;
-      Double_t wField = 1.25; // weighing field in 1/mm
+      Double_t wField = 0.7; // weighting field in 1/mm
       Double_t e0 = 1.6022E-7; // elementary charge in pC
       Double_t Dtr = (135.721 - 0.456232 * eField + 1.01483E-3 * pow(eField,2)) / 10; // transversal diffusion coefficient in micrometer/mm
       Double_t Dtrans = sqrt(Dtr * dzStep / 1E3); // transversal diffusion coefficient in sqrt(mm) ????
-
+      
       /*
       // info
       cout << " WField: " << eField
@@ -616,14 +785,28 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
       Int_t NofSteps[Ne[l]];
       Int_t NofStepsL = 0;
       Double_t zRnd[Ne[l]];
-	
+      
       for(Int_t b=0; b<Ne[l]; b++) {
 	zRnd[b] = 10 * tGasGap * gRandom->Rndm();
 	NofSteps[b] = (Int_t) (zRnd[b] / dzStep + 0.5);
 	if(NofSteps[b] > NofStepsL) NofStepsL = NofSteps[b];
       }
 
+      Double_t CorrDist = 0.1; // Correlation distance in mm
 
+      for(Int_t b=0; b<Ne[l]; b++) {
+	for(Int_t c=0; c<b; c++) {
+	  if( fabs(zRnd[b] - zRnd[c]) <= CorrDist ) {
+	    //cout << " entry: " << l << " electron1: " << b << " zRnd1: " << zRnd[b]
+	    //	 << " electron2: " << c << " zRnd2: " << zRnd[c] << endl;
+	    zRnd[b] = ( zRnd[b] + zRnd[c] ) / 2;
+	    NofSteps[c] = 0;
+	    zRnd[c] = -1;
+	    //cout << "modified zRnd1: " << zRnd[b] << endl;
+	  }
+	}
+      }
+      
       ULong64_t NeAvInd[Ne[l]][NofStepsL];
       Double_t RadInd[Ne[l]];
 
@@ -654,8 +837,6 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 	  if(m > NofSteps[a]) {
 	    NeAvInd[a][m] = 0;
 	    RadInd[a] = 0.0;
-	    //xInd[a] = 0.0;
-	    //yInd[a] = 0.0;
 	  }
 	  
 	  else {
@@ -737,7 +918,7 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
       }
       
 
-      Double_t TOFgate = 0.1; // ns
+      Double_t TOFgate = 4.0; // ns
 
       for(Int_t j=0; j<l; j++) {
 	if( fabs( TOF[l] - TOF[j] ) >= TOFgate) {
@@ -766,145 +947,25 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 	} // cellID if
       } // nentries for j<l compare
 
-
+      Double_t diff = sqrt( pow( (xIn[l] - xOut[l]), 2) + pow( (yIn[l] - yOut[l]), 2) );
+      h_diff->Fill(diff);
+      h_diffx->Fill(xIn[l] - xOut[l]);
+      h_diffy->Fill(yIn[l] - yOut[l]);
+      h_diffz->Fill(zIn[l] - zOut[l]);
+      
     } // nentries for
     
-    if(QindTotal > 0.0) h_qindtot->Fill(QindTotal);
+    h_qindtot->Fill(QindTotal);
     
   } // nentries > 0
   
 
 
-
-  // Conversion of Eloss to charge
-
-      /*
-      Double_t ne = 0.0;
-      if ( tof[paddle] < 1.e-15 ){
-	tof[paddle] = land_obj->GetTime(); // time since part. start [ns] 
-	//cout << "-I- LANDOBJ tof " << tof[paddle] << endl;  
-      }//! tof > 1e-15
-      
-       // Check the Units of Tof in [ns] here    
-      if ( ( land_obj->GetTime()-tof[paddle] )*1e+9 < 100. ){
-	//ne = eloss * 1e+9 / 25.; 
-	ne = eloss * 1e+3 / 25.; 
-	// cout << "-I- LANDOBJ Nb of el: " << ne << endl;
-	
-	h_ne ->Fill( ne );
-	// Check the Ne ??  
-	Int_t ine = (Int_t) (ne+0.5);
-	
-	// Loop over primary electrons
-	for (Int_t i=0;i<ine;i++ ){
-	  Double_t zz = gRandom->Rndm();
-	  Double_t xx = zz * 0.3;
-	  Double_t dd =0.3;       // [mm]
-	  
-	  Double_t vv = 0.21e-3;  // [mm/ps]
-	  Double_t nsteps = xx/0.0025; // mm
-	  Double_t dt = 0.0025 / vv ;   // ps
-	  Double_t tt = dt*nsteps; 
-	  //  cout << "-I LandOBJ tt: " <<  tt << endl;
-	  Double_t alpha = 123.0;
-	  Double_t eta = 10.5;
-	  Double_t wfield = 0.5;
-	  
-	  
-	  Double_t qq2=0.0;
-	  Double_t f1=0.0;
-	  Double_t f2=0.0;
-	  
-	  Int_t ix = (int) (nsteps);
-      */
-	  // Add on Avan
-	  /*   for (Int_t j=1;j<ix+1;j++){
-	       Double_t nbar = TMath::Exp((alpha-eta)*j*0.0025);
-	       Double_t kk = eta/alpha;
-	       zz = gRandom->Rndm();
-	       Double_t avan =0.0;
-	       if ( zz < (kk*(nbar-1.)/(nbar-kk))) avan =0.0;
-	       else {
-	       f1 = TMath::Log(1.-(1.-kk)/(nbar-kk));
-	       f2=  TMath::Log((nbar-kk)*(1.-zz)/nbar/(1.-kk));
-	       avan =1.+ f2/f1;
-	       }
-	       //cout << "-I- LandOBJ f1:" << f1 << " f2: " << f2 << endl;
-	       // QDC Saturation   
-	       if (avan > 1.6e+7 ) avan = 1.6e+7;
-	       //cout << "-I- LandOBJ Avalanche:" << j << " avan: " << avan << endl;
-	       Double_t current = wfield*vv*1.6022e-19*avan;
-	       //cout << "-I- LandOBJ current:" << current << endl;
-	       qq2=qq2+current*dt;
-	       }// !j
-	  */
-	  /*
-	  qq2= 0.5 / (alpha-eta)*1.6022e-19* TMath::Exp((alpha-eta)*(0.3-xx)-1)*1.e+12;
-	  Double_t qcharge = qq2 ;
-	  // Fill Charge Control hist.
-	  h_ch->Fill(qcharge);
-	  
-	  //??? The processHit has to be changed and Hit Info also !!!
-	  x_pos[paddle]  = x_pos[paddle] + land_obj->GetXOut() *qcharge;
-	  y_pos[paddle]  = y_pos[paddle] + land_obj->GetYOut() *qcharge;
-	  z_pos[paddle]  = z_pos[paddle] + land_obj->GetZOut() *qcharge;
-	  nuhits[paddle] = nuhits[paddle] +1;
-	  
-	  paddle_E[paddle][gap] = paddle_E[paddle][gap] + qcharge;
-	  paddle_E[paddle][9] = paddle_E[paddle][9] + qcharge;
-	  
-	  Int_t first =  (Int_t) ((paddle/20.)/2.);
-	  Int_t second = (Int_t) (paddle/20./2.);
-	  
-	  // ?? here what is the diff ??
-	  if(first==second){
-	    pm[paddle][1] = pm[paddle][1]+qcharge;
-	    pm[paddle][2] = pm[paddle][2]+qcharge;
-	    
-	  }else{
-	    
-	    pm[paddle][1] = pm[paddle][1]+qcharge;
-	    pm[paddle][2] = pm[paddle][2]+qcharge;
-	    
-	  }
-	  
-	  if (paddle_E[paddle][gap]>2.5) continue;
-	  
-	}//! ine
-	}//!tof */
-      //}//! eloss	 
-    
 }
 // -------------------------------------------------------------------------
 
 void R3BNeuLandDigitizer::Reset()
 {
-  // Clear the structure
-  //   cout << " -I- Digit Reset() called " << endl;
-  
-  for(Int_t i=0;i<200;i++) {
-    nuhits[i]=0;
-    x_pos[i]=y_pos[i]=z_pos[i]=0.0;
-    tof[i]=0.0;
-    
-    for (Int_t j=0;j<2;j++){
-      pm[i][j]=0.0;
-    }
-    for (Int_t k=0;k<9;k++){
-      paddle_E[i][k]=0.0;
-    }
-    
-  } 
-  
-  for(Int_t i=0;i<50;i++) {
-    part_E[i] = part_n[i] = 0.0;      
-  }
-  
-  for(Int_t i=0;i<4;i++) {
-    first_hit[i] = 0.0;      
-  }   
-  
-  // if (fDigis ) fDigis->Clear();
 }   
 
 void R3BNeuLandDigitizer::Finish()
@@ -939,7 +1000,13 @@ void R3BNeuLandDigitizer::Finish()
   h_tentr_e->Write();
   h_qind_tof_p->Write();
   h_qind_tof_e->Write();
+  h_stripflag->Write();
+  h_xav->Write();
 
+  h_diff->Write();
+  h_diffx->Write();
+  h_diffy->Write();
+  h_diffz->Write();
 
   for(Int_t i=0;i<6;i++){
     h_time_p[i]->Write();
