@@ -166,25 +166,25 @@ class R3BNeuLand : public R3BDetector
   void ResetParameters();
   
   /** Map of MCis with fixed VolID */
-  map <Int_t,Int_t> fMapMcId;
-  
-  Int_t fIDMedGas;
-  
-  TGeoMedium* pMedAir;
-  TGeoMedium* pMedSteel;
-  TGeoMedium* pMedGlass;
-  TGeoMedium* pMedBak;
-  TGeoMedium* pMedGas;
-  TGeoMedium* pMedGasInactive;
-  TGeoMedium* pMedAl;
+  map <Int_t,Int_t> fMapMcId;                                        //!
+
+  Int_t fIDMedGas;                                                   //!
+
+  TGeoMedium* pMedAir;                                               //!
+  TGeoMedium* pMedSteel;                                             //!
+  TGeoMedium* pMedGlass;                                             //!
+  TGeoMedium* pMedBak;                                               //!
+  TGeoMedium* pMedGas;                                               //!
+  TGeoMedium* pMedGasInactive;                                       //!
+  TGeoMedium* pMedAl;                                                //!
     
   
-  Int_t cellid1, cellid2, cellid3, cellid4, cellid5, cellid6;
-  Int_t secondaries;
-  Int_t cp1, cp2;
-  Int_t volId1, volId2;
+  Int_t cellid1, cellid2, cellid3, cellid4, cellid5, cellid6;        //!
+  Int_t secondaries;                                                 //!
+  Int_t cp1, cp2;                                                    //!
+  Int_t volId1, volId2;                                              //!
 
-  Int_t ent_part, exit_part;
+  Int_t ent_part, exit_part;                                         //!
   
   ClassDef(R3BNeuLand,1);
   

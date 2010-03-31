@@ -138,10 +138,10 @@ class R3BLand : public R3BDetector
     Double32_t     fELoss;             //!  energy loss
 
     Int_t          fPosIndex;          //!
-    TClonesArray*  fLandCollection;     //!  The hit collection
+    TClonesArray*  fLandCollection;    //!  The hit collection
     Bool_t         kGeoSaved;          //!
-    TList *flGeoPar; //!
-    Double_t fBirkC0,fBirkC1,fBirkC2;
+    TList *flGeoPar;                   //!
+    Double_t fBirkC0,fBirkC1,fBirkC2;  //!
     
     /** Private method AddHit
      **
@@ -161,7 +161,7 @@ class R3BLand : public R3BDetector
     void ResetParameters();
 
     /** Map of MCis with fixed VolID */
-    map <Int_t,Int_t> fMapMcId;
+    map <Int_t,Int_t> fMapMcId;       //!
 
 
     ClassDef(R3BLand,1);
