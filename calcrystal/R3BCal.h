@@ -135,18 +135,18 @@ class R3BCal : public R3BDetector
     Double32_t     fTime;              //!  time
     Double32_t     fLength;            //!  length
     Double32_t     fELoss;             //!  energy loss
-    Double32_t     fCutE;             //!  energy loss
+    Double32_t     fCutE;              //!  energy loss
 
     Int_t          fPosIndex;          //!
     TClonesArray*  fCalCollection;     //!  The hit collection
     Bool_t         kGeoSaved;          //!
-    TList *flGeoPar; //!
-    Int_t fGeoVersion;
+    TList *flGeoPar;                   //!
+    Int_t fGeoVersion;                 //!
 
-    Int_t fTypeA;
-    Int_t fTypeB;
-    Int_t fTypeC;
-    Int_t fTypeD;
+    Int_t fTypeA;                      //!
+    Int_t fTypeB;                      //!
+    Int_t fTypeC;                      //!
+    Int_t fTypeD;                      //!
     
     /** Private method AddHit
      **
