@@ -132,7 +132,7 @@ class R3BGfi : public R3BDetector
     Int_t          fPosIndex;          //!
     TClonesArray*  fGfiCollection;     //!  The hit collection
     Bool_t         kGeoSaved;          //!
-    TList *flGeoPar; //!
+    TList *flGeoPar;                   //!
 
     /** Private method AddHit
      **
