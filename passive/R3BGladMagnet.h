@@ -12,7 +12,7 @@
 class R3BGladMagnet : public R3BModule {
 
 private:
-   TGeoCombiTrans *gLobalPos; //!
+   TGeoCombiTrans *gLobalPos;  //!
 
 public:
     R3BGladMagnet(const char * name, const char *Title="R3BGlad Magnet");

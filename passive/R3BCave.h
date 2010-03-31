@@ -14,7 +14,7 @@ class R3BCave : public FairModule {
     
 
 private:
-     Double_t world[3];
+     Double_t world[3]; //!
      ClassDef(R3BCave,1) //R3BCaveSD
 };
 

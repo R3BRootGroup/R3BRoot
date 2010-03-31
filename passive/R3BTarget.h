@@ -14,7 +14,7 @@ class R3BTarget : public R3BModule {
     virtual void ConstructGeometry();
 
  protected:
-     TString *fTargetName;
+     TString *fTargetName; //!
      void ConstructGeometry1();
      void ConstructGeometry2();
      void ConstructGeometry3();
