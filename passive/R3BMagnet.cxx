@@ -239,10 +239,10 @@ void R3BMagnet::ConstructGeometry(){
 
 
 
-   pWorld->AddNode(pVolFeYoke_up,   1, t1);
-   pWorld->AddNode(pVolFeYoke_down, 2, t2);
-   pWorld->AddNode(pVolFeYoke_left, 3, t3);
-   pWorld->AddNode(pVolFeYoke_right,4, t4);
+   pWorld->AddNodeOverlap(pVolFeYoke_up,   1, t1);
+   pWorld->AddNodeOverlap(pVolFeYoke_down, 2, t2);
+   pWorld->AddNodeOverlap(pVolFeYoke_left, 3, t3);
+   pWorld->AddNodeOverlap(pVolFeYoke_right,4, t4);
 
 }
 
