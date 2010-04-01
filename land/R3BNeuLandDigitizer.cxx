@@ -301,7 +301,7 @@ InitStatus R3BNeuLandDigitizer::Init() {
   h_qind_p = new TH1F("QindP","Induced charge P [pC]", 100, 0.5, 100.5);
   h_qind_p->SetXTitle("individual induced charge for protons [pC]");
   h_qind_p->SetYTitle(cntTitle);
-  h_qind_e = new TH1F("QindE","Induced charge E [pC]", 1000, -0.01, 19.99);
+  h_qind_e = new TH1F("QindE","Induced charge E [pC]", 100, -0.1, 19.9);
   h_qind_e->SetXTitle("individual induced charge for electrons [pC]");
   h_qind_e->SetYTitle(cntTitle);
   h_tentr_p = new TH1F("TentrP","Time for entries P [pC]", 500, -0.001, 0.999);
@@ -313,13 +313,13 @@ InitStatus R3BNeuLandDigitizer::Init() {
   h_qind_tof_p = new TH2F("QindP vs TOFP","Induced charge P [pC] vs TOF P [ns]", 100, 0.5, 100.5, 500, -0.001, 0.999);
   h_qind_tof_p->SetXTitle("individual induced charge for protons [pC]");
   h_qind_tof_p->SetYTitle("individual TOF for protons [ns]");
-  h_qind_tof_e = new TH2F("QindE vs TOFE","Induced charge E [pC] vs TOF E [ns]", 1000, -0.01, 19.99, 500, -0.001, 0.999);
+  h_qind_tof_e = new TH2F("QindE vs TOFE","Induced charge E [pC] vs TOF E [ns]", 100, -0.1, 19.9, 500, -0.001, 0.999);
   h_qind_tof_e->SetXTitle("individual induced charge for electrons [pC]");
   h_qind_tof_e->SetYTitle("individual TOF for electrons [ns]");
-  h_qindtot = new TH1F("QindTotal","Total induced charge [pC]", 1000, -0.05, 99.95);
+  h_qindtot = new TH1F("QindTotal","Total induced charge [pC]", 100, -0.1, 19.9);
   h_qindtot->SetXTitle("total induced charge [pC]");
   h_qindtot->SetYTitle(cntTitle);
-  h_stripflag = new TH1F("StripFlag","StripFlag", 16, -0.5, 15.5);
+  h_stripflag = new TH1F("StripFlag","StripFlag", 17, -1.5, 15.5);
   h_stripflag->SetXTitle("number of strip hit");
   h_stripflag->SetYTitle(cntTitle);
   h_xav = new TH1F("xAv","Average x hit position [mm]", 1000, -150, 150);
@@ -331,7 +331,52 @@ InitStatus R3BNeuLandDigitizer::Init() {
   h_diffy = new TH1F("Diffy","Diffy", 100, -100, 100);
   h_diffz = new TH1F("Diffz","Diffz", 10000, -40, 40);
 
-  
+  TString qindNameE = "QindStrE";
+  TString tofNameE = "TOFStrE";
+  TString qindtotNameE = "QindTotStrE";
+
+  TString qindTitleE = "Individual induced charge E (strip) [pC] ";
+  TString tofTitleE = "Individual TOF E (strip) [ns]";
+  TString qindtotTitleE = "Total induced charge E (strip) [pC] ";
+
+  TString qindNamesE[8];
+  TString tofNamesE[8];
+  TString qindtotNamesE[8];
+
+  TString qindTitlesE[8];
+  TString tofTitlesE[8];
+  TString qindtotTitlesE[8];
+
+  TString qindXtitE = "induced charge for electrons [pC]";
+  TString tofXtitE = "TOF for electrons [ns]";
+  TString qindtotXtitE = "induced charge [pC]";
+
+  char num1[] = "01234567";
+  char *nm1;
+  nm1 = num1;
+
+  for(Int_t i = 0; nm1[i]; i++) {
+    qindNamesE[i] = qindNameE + nm1[i];
+    tofNamesE[i] = tofNameE + nm1[i];
+    qindtotNamesE[i] = qindtotNameE + nm1[i];
+
+    qindTitlesE[i] = qindTitleE + nm1[i];
+    tofTitlesE[i] = tofTitleE + nm1[i];
+    qindtotTitlesE[i] = qindtotTitleE + nm1[i];
+  }
+
+  for(Int_t i=0; i<8; i++) {
+    h_qindstr_e[i] = new TH1F(qindNamesE[i],qindTitlesE[i], 100, -0.1, 19.9);
+    h_qindstr_e[i]->SetXTitle(qindXtitE);
+    h_qindstr_e[i]->SetYTitle(cntTitle);
+    h_tofstr_e[i] = new TH1F(tofNamesE[i],tofTitlesE[i], 500, -0.001, 0.999);
+    h_qindstr_e[i]->SetXTitle(tofXtitE);
+    h_qindstr_e[i]->SetYTitle(cntTitle);
+    h_qindtotstr[i] = new TH1F(qindtotNamesE[i],qindtotTitlesE[i], 100, -0.1, 19.9);
+    h_qindtotstr[i]->SetXTitle(qindtotXtitE);
+    h_qindtotstr[i]->SetYTitle(cntTitle);
+  }
+
   return kSUCCESS;
 
 }
@@ -399,14 +444,19 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
   Int_t NeExp[nentries];
   Int_t Ne[nentries];
   Double_t Qind[nentries];
+  Double_t QindStr[nentries][8];
   Double_t Tentr[nentries];
+  Double_t TentrStr[nentries][8];
   Double_t TOF[nentries];
+  Double_t TOFStr[nentries][8];
 
   Int_t StripFlag[nentries];
-  Double_t xmin[9];
-  Double_t xmax[9];
+  Double_t xmin[8];
+  Double_t xmax[8];
 
   Double_t QindTotal = 0.0;
+  Double_t QindTotStr[8];
+  Bool_t StripFlagAfter[8];
   
   // count the number of events in which no energy deposition occurred
   if(nentries == 0) no_interaction = no_interaction + 1;
@@ -472,22 +522,22 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
       xAv[l] = ( xIn[l] + xOut[l] ) / 2; // mm
       yAv[l] = ( yIn[l] + yOut[l] ) / 2; // mm
 
-      Double_t delta_AnodeGap = 3; // thickness of gap between the anode strips in mm
+      delta_AnodeGap = 3; // thickness of gap between the anode strips in mm
       Double_t delta_Strip = 25; // strip width in mm
       Double_t ShX = (8 * delta_Strip + 7 * delta_AnodeGap)/2; // half length in mm
 
       for(Int_t i=0; i<8; i++) {
 
-	xmin[i+1] = -ShX + i * (delta_Strip + delta_AnodeGap);
-	xmax[i+1] = -ShX + i * (delta_Strip + delta_AnodeGap) + delta_Strip;
+	xmin[i] = -ShX + i * (delta_Strip + delta_AnodeGap);
+	xmax[i] = -ShX + i * (delta_Strip + delta_AnodeGap) + delta_Strip;
 
       }
 
       StripFlag[l] = 0;
 
       for(Int_t i=0; i<8; i++) {
-	if(xmin[i+1] <= xAv[l] && xAv[l] <= xmax[i+1]) StripFlag[l] = i+1;
-	if(xmax[i+1] < xAv[l] && xAv[l] < xmin[i+2]) StripFlag[l] = i+9;
+	if(xmin[i] <= xAv[l] && xAv[l] <= xmax[i]) StripFlag[l] = i;
+	if(xmax[i] < xAv[l] && xAv[l] < xmin[i+1]) StripFlag[l] = i+8;
       }
 
     } // nentries for
@@ -495,6 +545,7 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
   // end filling arrays
 
   R3BNeuLandPoint* land_obj1 = (R3BNeuLandPoint*) fLandPoints->At(0);
+
   
   // analyze events
   if(nentries > 0) {
@@ -895,7 +946,7 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 	
 	Qind[l] += wField * e0 * NeAvStep * dzStep; // pC
 	Tentr[l] += m * dtStep; // ns
-	
+
 	//if(Qind[l] < 0) {
 	  //cout << " entry: " << l <<  endl;
 	  //cout << "step: " << m << " NeAvStep end: " << NeAvStep << " Qind: " << Qind[l] << endl;
@@ -906,6 +957,52 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 
       TOF[l] = time[l] + Tentr[l];
       
+
+      for(Int_t d=0; d<8; d++) {
+	StripFlagAfter[d] = kFALSE;
+      }
+
+      for(Int_t d=0; d<8; d++) {
+	if(d < 7){
+	  QindStr[l][d] = 0;
+	  QindStr[l][d+1] = 0;
+	  TOFStr[l][d] = 0;
+	  TOFStr[l][d+1] = 0;
+	}
+	if(d == 8) {
+	  QindStr[l][d] = 0;
+	  TOFStr[l][d] = 0;
+	}
+	if(StripFlag[l] == d) {
+	  QindStr[l][d] = Qind[l];
+	  TentrStr[l][d] = Tentr[l];
+	  TOFStr[l][d] = TOF[l];
+	  h_qindstr_e[d]->Fill(QindStr[l][d]);
+	  h_tofstr_e[d]->Fill(TOFStr[l][d]);
+	  StripFlagAfter[d] = kTRUE;
+	}
+	if(StripFlag[l] == d + 8) {
+	  QindStr[l][d] = Qind[l] * (xAv[l] - xmin[d]) / delta_AnodeGap;
+	  QindStr[l][d+1] = Qind[l] - QindStr[l][d];
+	  TentrStr[l][d] = Tentr[l];
+	  TentrStr[l][d+1] = Tentr[l];
+	  TOFStr[l][d] = TOF[l];
+	  TOFStr[l][d+1] = TOF[l];
+	  h_qindstr_e[d]->Fill(QindStr[l][d]);
+	  h_qindstr_e[d+1]->Fill(QindStr[l][d+1]);
+	  h_tofstr_e[d]->Fill(TOFStr[l][d]);
+	  h_tofstr_e[d+1]->Fill(TOFStr[l][d+1]);
+	  StripFlagAfter[d] = kTRUE;
+	  StripFlagAfter[d+1] = kTRUE;
+	}
+	//cout << " StripFlag: " << StripFlag[l] << " QindStr: " << QindStr[l][d] << endl;
+      }
+
+      //for(Int_t d=0; d<8; d++) {
+      //if(StripFlag[l] == 10) {
+      //  cout << " StripFlag = 10! " << " StripFlagAfter[" << d << "]: " << StripFlagAfter[d] << endl;
+      //}
+      //} 
       
       if (PID[l] == 2212) {
 	h_ne_exp_p->Fill(NeExp[l]);
@@ -919,7 +1016,7 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 	h_ne_exp_e->Fill(NeExp[l]);
 	h_ne_e->Fill(Ne[l]);
 	h_gamma_eloss_e->Fill(gamma[l], eloss[l]);
-	if(Qind[l] > 0) h_qind_e->Fill(Qind[l]);
+	h_qind_e->Fill(Qind[l]);
 	h_tentr_e->Fill(Tentr[l]);
 	h_qind_tof_e->Fill(Qind[l], TOF[l]);
       }
@@ -929,7 +1026,7 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 
       for(Int_t j=0; j<l; j++) {
 	if( fabs( TOF[l] - TOF[j] ) >= TOFgate) {
-	  if(Qind[l] > 0.0) h_qindtot->Fill(Qind[l]);
+	  h_qindtot->Fill(Qind[l]);
 	  break;
 	}
 	else {
@@ -938,8 +1035,21 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 	}
       }
       
-
-
+      for(Int_t d=0; d<8; d++) {
+	if(StripFlagAfter[d] == kTRUE) {
+	  for(Int_t j=0; j<l; j++) {
+	    if( fabs( TOFStr[l][d] - TOFStr[j][d] ) >= TOFgate) {
+	      h_qindtotstr[d]->Fill(QindStr[l][d]);
+	      break;
+	    }
+	    else {
+	      QindTotStr[d] += QindStr[l][d];
+	      break;
+	    }
+	  }
+	}
+      }
+      
       // check the distance between entries
       for (Int_t j=0; j<l; j++) {
 	Double_t dist = sqrt ( (xAv[l] - xAv[j]) * (xAv[l] - xAv[j]) + (yAv[l] - yAv[j]) * (yAv[l] - yAv[j]) );
@@ -963,11 +1073,15 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
     } // nentries for
     
     h_qindtot->Fill(QindTotal);
+
+    for(Int_t d=0; d<8; d++) {
+      if(StripFlagAfter[d] == kTRUE) h_qindtotstr[d]->Fill(QindTotStr[d]);
+    }
     
   } // nentries > 0
   
-
-
+  
+  
 }
 // -------------------------------------------------------------------------
 
@@ -1035,6 +1149,12 @@ void R3BNeuLandDigitizer::Finish()
     h_xin_p[i]->Write();
     h_yin_p[i]->Write();
     h_zin_p[i]->Write();
+  }
+
+  for(Int_t i=0;i<8;i++){
+    h_qindstr_e[i]->Write();
+    h_tofstr_e[i]->Write();
+    h_qindtotstr[i]->Write();
   }
 
   cout << " Number of primaries deposit no energy in gas layers: " << no_interaction << endl;

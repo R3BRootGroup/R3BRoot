@@ -56,7 +56,7 @@ R3BNeuLand::R3BNeuLand() : R3BDetector("R3BNeuLand", kTRUE, kLAND) {
   kGeoSaved = kFALSE;
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
-  fVerboseLevel = 1;
+  fVerboseLevel = 0;
   fVersion = 1;
   
   fIDMedGas = -1;
@@ -81,7 +81,7 @@ R3BNeuLand::R3BNeuLand(const char* name, Bool_t active)
   kGeoSaved = kFALSE;
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
-  fVerboseLevel = 1;
+  fVerboseLevel = 0;
   fVersion = 1;
   
   fIDMedGas = -1;

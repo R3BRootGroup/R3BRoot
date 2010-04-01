@@ -60,6 +60,11 @@ class R3BNeuLandDigitizer : public FairTask
   TH1F *h_time_e[6];
   TH2F *h_etot_eloss_e[6];
 
+  TH1F *h_qindstr_e[8];
+  TH1F *h_tofstr_e[8];
+  TH1F *h_qindtotstr[8];
+
+
   TH1F *h_pdg;
   TH1F *h_detid;
   TH1F *h_cellid;
@@ -95,6 +100,8 @@ class R3BNeuLandDigitizer : public FairTask
   Int_t no_interaction;
   Int_t distcount;
   Int_t NoOfPEvt;
+
+  Double_t delta_AnodeGap;
 
   private:
   virtual void SetParContainers();
