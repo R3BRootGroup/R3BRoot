@@ -120,8 +120,6 @@ Bool_t R3BNeuLand::ProcessHits(FairVolume* vol) {
   volId2=-1;
 
   Int_t iMed = gMC->CurrentMedium();
-  Double_t nsecondaries = gMC->NSecondaries();
-  secondaries += nsecondaries;
   
   Int_t cp0;
   Int_t volid = gMC->CurrentVolID(cp0);
@@ -135,7 +133,7 @@ Bool_t R3BNeuLand::ProcessHits(FairVolume* vol) {
   }
   
   if (iMed == fIDMedGas) {
-    Double_t trackpid_gas = gMC->TrackPid();
+    Int_t trackpid_gas = gMC->TrackPid();
     Double_t maxstep_gas = gMC->MaxStep();
     Double_t trackstep_gas = gMC->TrackStep();
     //cout << " TrackPid in Gas " << trackpid_gas << endl;
@@ -331,7 +329,6 @@ void R3BNeuLand::Print() const {
   //cout << "cellID=4: " << cellid4 << endl;
   //cout << "cellID=5: " << cellid5 << endl;
   //cout << "cellID=6: " << cellid6 << endl;
-  //cout << "secondaries: " << secondaries << endl;
   //cout << " Id1: " << volId1  << " cp1: " << cp1
   //   << " Id2: " << volId2  << " cp2: " << cp2
   //   << " Id3: " << volId3  << " cp3: " << cp3
@@ -405,20 +402,20 @@ void R3BNeuLand::ConstructGeometry3() {
   
   // -- Elements
   
-  TGeoElement* elH = new TGeoElement("Hydrogen", "H", z= 1., a= 1.00794);
-  TGeoElement* elC = new TGeoElement("Carbon", "C", z= 6., a= 12.0107);
-  TGeoElement* elN = new TGeoElement("Nitrogen", "N", z= 7., a= 14.007);
-  TGeoElement* elO = new TGeoElement("Oxygen", "O", z= 8., a= 28.0855);
-  TGeoElement* elF = new TGeoElement("Fluorine", "F", z= 9., a= 18.9984032);
-  TGeoElement* elNa = new TGeoElement("Sodium", "Na", z= 11., a= 22.98976928);
-  TGeoElement* elMg = new TGeoElement("Magnesium", "Mg", z= 12., a= 24.3050);
-  TGeoElement* elAl = new TGeoElement("Aluminum", "Al", z= 13., a= 26.9815);
-  TGeoElement* elSi = new TGeoElement("Silicon", "Si", z= 14., a= 28.0855);
-  TGeoElement* elS = new TGeoElement("Sulfur", "S", z= 16., a= 32.065);
-  TGeoElement* elCa = new TGeoElement("Calcium", "Ca", z= 20., a= 40.078);
-  TGeoElement* elCr = new TGeoElement("Chromium", "Cr", z= 24., a= 51.9961);
-  TGeoElement* elFe = new TGeoElement("Iron", "Fe", z= 26., a= 55.845);
-  TGeoElement* elNi = new TGeoElement("Nickel", "Ni", z= 28., a= 58.6934);
+  TGeoElement* elH = new TGeoElement("Hydrogen", "H", z= 1, a= 1.00794);
+  TGeoElement* elC = new TGeoElement("Carbon", "C", z= 6, a= 12.0107);
+  TGeoElement* elN = new TGeoElement("Nitrogen", "N", z= 7, a= 14.007);
+  TGeoElement* elO = new TGeoElement("Oxygen", "O", z= 8, a= 28.0855);
+  TGeoElement* elF = new TGeoElement("Fluorine", "F", z= 9, a= 18.9984032);
+  TGeoElement* elNa = new TGeoElement("Sodium", "Na", z= 11, a= 22.98976928);
+  TGeoElement* elMg = new TGeoElement("Magnesium", "Mg", z= 12, a= 24.3050);
+  TGeoElement* elAl = new TGeoElement("Aluminum", "Al", z= 13, a= 26.9815);
+  TGeoElement* elSi = new TGeoElement("Silicon", "Si", z= 14, a= 28.0855);
+  TGeoElement* elS = new TGeoElement("Sulfur", "S", z= 16, a= 32.065);
+  TGeoElement* elCa = new TGeoElement("Calcium", "Ca", z= 20, a= 40.078);
+  TGeoElement* elCr = new TGeoElement("Chromium", "Cr", z= 24, a= 51.9961);
+  TGeoElement* elFe = new TGeoElement("Iron", "Fe", z= 26, a= 55.845);
+  TGeoElement* elNi = new TGeoElement("Nickel", "Ni", z= 28, a= 58.6934);
   
   
   // -- Materials

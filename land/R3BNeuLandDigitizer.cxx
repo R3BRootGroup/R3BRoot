@@ -788,11 +788,9 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
       
       for(Int_t b=0; b<Ne[l]; b++) {
 	zRnd[b] = 10 * tGasGap * gRandom->Rndm();
-	NofSteps[b] = (Int_t) (zRnd[b] / dzStep + 0.5);
-	if(NofSteps[b] > NofStepsL) NofStepsL = NofSteps[b];
       }
 
-      Double_t CorrDist = 0.1; // Correlation distance in mm
+      Double_t CorrDist = 0.0; // Correlation distance in mm
 
       for(Int_t b=0; b<Ne[l]; b++) {
 	for(Int_t c=0; c<b; c++) {
@@ -806,6 +804,15 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 	  }
 	}
       }
+
+      for(Int_t b=0; b<Ne[l]; b++) {
+	if(zRnd[b] > -1) {
+	  NofSteps[b] = (Int_t) (zRnd[b] / dzStep + 0.5);
+	  if(NofSteps[b] > NofStepsL) NofStepsL = NofSteps[b];
+	}
+      }
+      
+      
       
       ULong64_t NeAvInd[Ne[l]][NofStepsL];
       Double_t RadInd[Ne[l]];
