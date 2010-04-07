@@ -60,8 +60,6 @@ class R3BNeuLandDigitizer : public FairTask
   TH1F *h_time_e[6];
   TH2F *h_etot_eloss_e[6];
 
-  TH1F *h_qindstr_e[8];
-  TH1F *h_tofstr_e[8];
   TH1F *h_qindtotstr[8];
 
 

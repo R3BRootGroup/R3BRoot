@@ -13,7 +13,6 @@
 #include <string>
 #include <iostream>
 
-
 #include "R3BNeuLandPoint.h"
 #include "R3BMCTrack.h"
 
@@ -331,24 +330,14 @@ InitStatus R3BNeuLandDigitizer::Init() {
   h_diffy = new TH1F("Diffy","Diffy", 100, -100, 100);
   h_diffz = new TH1F("Diffz","Diffz", 10000, -40, 40);
 
-  TString qindNameE = "QindStrE";
-  TString tofNameE = "TOFStrE";
   TString qindtotNameE = "QindTotStrE";
 
-  TString qindTitleE = "Individual induced charge E (strip) [pC] ";
-  TString tofTitleE = "Individual TOF E (strip) [ns]";
   TString qindtotTitleE = "Total induced charge E (strip) [pC] ";
 
-  TString qindNamesE[8];
-  TString tofNamesE[8];
   TString qindtotNamesE[8];
 
-  TString qindTitlesE[8];
-  TString tofTitlesE[8];
   TString qindtotTitlesE[8];
 
-  TString qindXtitE = "induced charge for electrons [pC]";
-  TString tofXtitE = "TOF for electrons [ns]";
   TString qindtotXtitE = "induced charge [pC]";
 
   char num1[] = "01234567";
@@ -356,22 +345,12 @@ InitStatus R3BNeuLandDigitizer::Init() {
   nm1 = num1;
 
   for(Int_t i = 0; nm1[i]; i++) {
-    qindNamesE[i] = qindNameE + nm1[i];
-    tofNamesE[i] = tofNameE + nm1[i];
     qindtotNamesE[i] = qindtotNameE + nm1[i];
 
-    qindTitlesE[i] = qindTitleE + nm1[i];
-    tofTitlesE[i] = tofTitleE + nm1[i];
     qindtotTitlesE[i] = qindtotTitleE + nm1[i];
   }
 
   for(Int_t i=0; i<8; i++) {
-    h_qindstr_e[i] = new TH1F(qindNamesE[i],qindTitlesE[i], 100, -0.1, 19.9);
-    h_qindstr_e[i]->SetXTitle(qindXtitE);
-    h_qindstr_e[i]->SetYTitle(cntTitle);
-    h_tofstr_e[i] = new TH1F(tofNamesE[i],tofTitlesE[i], 500, -0.001, 0.999);
-    h_qindstr_e[i]->SetXTitle(tofXtitE);
-    h_qindstr_e[i]->SetYTitle(cntTitle);
     h_qindtotstr[i] = new TH1F(qindtotNamesE[i],qindtotTitlesE[i], 100, -0.1, 19.9);
     h_qindtotstr[i]->SetXTitle(qindtotXtitE);
     h_qindtotstr[i]->SetYTitle(cntTitle);
@@ -457,6 +436,10 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
   Double_t QindTotal = 0.0;
   Double_t QindTotStr[8];
   Bool_t StripFlagAfter[8];
+  Bool_t UsedEntry[nentries];
+  Bool_t UsedEntryStr[nentries][8];
+  
+  for(Int_t d=0; d<8; d++) QindTotStr[d] = 0.0;
   
   // count the number of events in which no energy deposition occurred
   if(nentries == 0) no_interaction = no_interaction + 1;
@@ -530,35 +513,44 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 
 	xmin[i] = -ShX + i * (delta_Strip + delta_AnodeGap);
 	xmax[i] = -ShX + i * (delta_Strip + delta_AnodeGap) + delta_Strip;
+	StripFlagAfter[i] = kFALSE;
 
       }
 
       StripFlag[l] = 0;
 
       for(Int_t i=0; i<8; i++) {
-	if(xmin[i] <= xAv[l] && xAv[l] <= xmax[i]) StripFlag[l] = i;
-	if(xmax[i] < xAv[l] && xAv[l] < xmin[i+1]) StripFlag[l] = i+8;
+	if(xmin[i] <= xAv[l] && xAv[l] <= xmax[i]) {
+	  StripFlag[l] = i;
+	  StripFlagAfter[i] = kTRUE;
+	}
+	if(xmax[i] < xAv[l] && xAv[l] < xmin[i+1]) {
+	  StripFlag[l] = i+8;
+	  StripFlagAfter[i] = kTRUE;
+	  StripFlagAfter[i+1] = kTRUE;
+	}
       }
-
+      
     } // nentries for
   } // nentries > 0
   // end filling arrays
-
+  
   R3BNeuLandPoint* land_obj1 = (R3BNeuLandPoint*) fLandPoints->At(0);
-
+  
   
   // analyze events
   if(nentries > 0) {
     //cout << " eventId: " << eventId[0] << endl;
-      for (Int_t l=0; l<nentries; l++) {
-       /*
+    //cout << " NofEntries: " << nentries << endl;
+    for (Int_t l=0; l<nentries; l++) {
+      /*
       // event info
       cout << " cellId: " << cellId[l] << " PID: " << PID[l] << " mot0PID: " << mot0PID[l]
-	   << " time: " << time[l] << " energy: " << energy[l] << " eloss: " << eloss[l] << endl;
+      << " time: " << time[l] << " energy: " << energy[l] << " eloss: " << eloss[l] << endl;
       if(l == nentries-1) cout << " cellhits: " << cellhits[l] << " totaleloss: " << totaleloss[l] << endl;
       // end event info
       */
-
+      
       // count the events in which proton is involved
       if(l == 0) {
 	if(pDetEvt[0] == kTRUE) {
@@ -574,7 +566,7 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 	}
       }
       // end counting events in which proton is involved
-
+      
       // fill histograms for checking
       h_detid->Fill(detId[l]);
       h_cellid->Fill(cellId[l]);
@@ -841,11 +833,11 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 	zRnd[b] = 10 * tGasGap * gRandom->Rndm();
       }
 
-      Double_t CorrDist = 0.0; // Correlation distance in mm
-
+      Double_t CorrDist = 0.3; // Correlation distance in mm
+      
       for(Int_t b=0; b<Ne[l]; b++) {
 	for(Int_t c=0; c<b; c++) {
-	  if( fabs(zRnd[b] - zRnd[c]) <= CorrDist ) {
+	  if( TMath::Abs(zRnd[b] - zRnd[c]) <= CorrDist ) {
 	    //cout << " entry: " << l << " electron1: " << b << " zRnd1: " << zRnd[b]
 	    //	 << " electron2: " << c << " zRnd2: " << zRnd[c] << endl;
 	    zRnd[b] = ( zRnd[b] + zRnd[c] ) / 2;
@@ -855,7 +847,7 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 	  }
 	}
       }
-
+      
       for(Int_t b=0; b<Ne[l]; b++) {
 	if(zRnd[b] > -1) {
 	  NofSteps[b] = (Int_t) (zRnd[b] / dzStep + 0.5);
@@ -867,22 +859,22 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
       
       ULong64_t NeAvInd[Ne[l]][NofStepsL];
       Double_t RadInd[Ne[l]];
-
+      
       Double_t sRnd;
       Double_t nbar;
       Double_t f1;
       Double_t f2;
-
+      
       //cout << " entry: " << l <<  endl;
-
+      
       // calculate the number of electrons in avalanche
       for(Int_t a=0; a<Ne[l]; a++) {
-
+	
 	//cout << " electron: " << a << " NofSteps: " << NofSteps[a] << " NofStepsL: " << NofStepsL << endl;
 	
 	NeAvInd[a][0] = 0;
 	RadInd[a] = 0.0;
-
+	
       	// Do the steps for the individual electrons
        	for(Int_t m=1; m<NofStepsL+1; m++) {
 	  
@@ -898,8 +890,8 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 	  }
 	  
 	  else {
-	    RadInd[a] = fabs(m * gRandom->Gaus(0, Dtrans * sqrt(dzStep))); // mm
-
+	    RadInd[a] = TMath::Abs(m * gRandom->Gaus(0, Dtrans * sqrt(dzStep))); // mm
+	    
 	    sRnd = gRandom->Rndm();
 	    nbar = exp( (alpha-eta) * m * dzStep );
 	    
@@ -922,7 +914,7 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 	  //cout << "step: " << m << " NeAvInd end: " << NeAvInd[a][m] << " RadInd: " << RadInd[a] << endl;
 	  
 	} // for m < NofStepsL
-
+	
       } // for a < Ne[l]
       
       ULong64_t NeAvStep;
@@ -946,63 +938,40 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 	
 	Qind[l] += wField * e0 * NeAvStep * dzStep; // pC
 	Tentr[l] += m * dtStep; // ns
-
+	
 	//if(Qind[l] < 0) {
-	  //cout << " entry: " << l <<  endl;
-	  //cout << "step: " << m << " NeAvStep end: " << NeAvStep << " Qind: " << Qind[l] << endl;
+	//cout << " entry: " << l <<  endl;
+	//cout << "step: " << m << " NeAvStep end: " << NeAvStep << " Qind: " << Qind[l] << endl;
 	//}
 	
       } // m < NofStepsL
       
-
-      TOF[l] = time[l] + Tentr[l];
       
+      TOF[l] = time[l] + Tentr[l];
 
       for(Int_t d=0; d<8; d++) {
-	StripFlagAfter[d] = kFALSE;
-      }
-
+	QindStr[l][d] = 0;
+	TentrStr[l][d] = 0;
+	TOFStr[l][d] = 0;
+      } 
+      
       for(Int_t d=0; d<8; d++) {
-	if(d < 7){
-	  QindStr[l][d] = 0;
-	  QindStr[l][d+1] = 0;
-	  TOFStr[l][d] = 0;
-	  TOFStr[l][d+1] = 0;
-	}
-	if(d == 8) {
-	  QindStr[l][d] = 0;
-	  TOFStr[l][d] = 0;
-	}
 	if(StripFlag[l] == d) {
 	  QindStr[l][d] = Qind[l];
 	  TentrStr[l][d] = Tentr[l];
 	  TOFStr[l][d] = TOF[l];
-	  h_qindstr_e[d]->Fill(QindStr[l][d]);
-	  h_tofstr_e[d]->Fill(TOFStr[l][d]);
-	  StripFlagAfter[d] = kTRUE;
 	}
 	if(StripFlag[l] == d + 8) {
-	  QindStr[l][d] = Qind[l] * (xAv[l] - xmin[d]) / delta_AnodeGap;
+	  QindStr[l][d] = Qind[l] * TMath::Abs(xAv[l] - xmax[d]) / delta_AnodeGap;
 	  QindStr[l][d+1] = Qind[l] - QindStr[l][d];
 	  TentrStr[l][d] = Tentr[l];
 	  TentrStr[l][d+1] = Tentr[l];
 	  TOFStr[l][d] = TOF[l];
 	  TOFStr[l][d+1] = TOF[l];
-	  h_qindstr_e[d]->Fill(QindStr[l][d]);
-	  h_qindstr_e[d+1]->Fill(QindStr[l][d+1]);
-	  h_tofstr_e[d]->Fill(TOFStr[l][d]);
-	  h_tofstr_e[d+1]->Fill(TOFStr[l][d+1]);
-	  StripFlagAfter[d] = kTRUE;
-	  StripFlagAfter[d+1] = kTRUE;
 	}
-	//cout << " StripFlag: " << StripFlag[l] << " QindStr: " << QindStr[l][d] << endl;
+	//cout << " QindStr[" << l << "][" << d << "]: " << QindStr[l][d] << endl;
       }
-
-      //for(Int_t d=0; d<8; d++) {
-      //if(StripFlag[l] == 10) {
-      //  cout << " StripFlag = 10! " << " StripFlagAfter[" << d << "]: " << StripFlagAfter[d] << endl;
-      //}
-      //} 
+      
       
       if (PID[l] == 2212) {
 	h_ne_exp_p->Fill(NeExp[l]);
@@ -1021,34 +990,6 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 	h_qind_tof_e->Fill(Qind[l], TOF[l]);
       }
       
-
-      Double_t TOFgate = 4.0; // ns
-
-      for(Int_t j=0; j<l; j++) {
-	if( fabs( TOF[l] - TOF[j] ) >= TOFgate) {
-	  h_qindtot->Fill(Qind[l]);
-	  break;
-	}
-	else {
-	  QindTotal += Qind[l];
-	  break;
-	}
-      }
-      
-      for(Int_t d=0; d<8; d++) {
-	if(StripFlagAfter[d] == kTRUE) {
-	  for(Int_t j=0; j<l; j++) {
-	    if( fabs( TOFStr[l][d] - TOFStr[j][d] ) >= TOFgate) {
-	      h_qindtotstr[d]->Fill(QindStr[l][d]);
-	      break;
-	    }
-	    else {
-	      QindTotStr[d] += QindStr[l][d];
-	      break;
-	    }
-	  }
-	}
-      }
       
       // check the distance between entries
       for (Int_t j=0; j<l; j++) {
@@ -1056,14 +997,8 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
 	if(dist > 100){ // 100 mm
 	  distcount = distcount + 1;
 	} // dist > 100 mm
-	else {
-	  
-	} // dist < 100 mm
-	if(cellId[l] == cellId[j]) {
-	  //cout  << " cellId["<< l << "] = " << "cellId[" << j << "]" << endl;
-	} // cellID if
       } // nentries for j<l compare
-
+      
       Double_t diff = sqrt( pow( (xIn[l] - xOut[l]), 2) + pow( (yIn[l] - yOut[l]), 2) );
       h_diff->Fill(diff);
       h_diffx->Fill(xIn[l] - xOut[l]);
@@ -1072,11 +1007,45 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
       
     } // nentries for
     
-    h_qindtot->Fill(QindTotal);
 
+    Double_t TOFgate = 1.5; // ns
+    
+    for(Int_t l=0; l<nentries; l++) UsedEntry[l] = kFALSE;
+
+    for(Int_t l=0; l<nentries; l++) {
+      QindTotal = 0;
+      if(UsedEntry[l] == kFALSE) {
+	for(Int_t j=0; j<nentries; j++) {
+	  if( TMath::Abs( TOF[l] - TOF[j] ) < TOFgate) {
+	    QindTotal += Qind[j];
+	    UsedEntry[j] = kTRUE;
+	  }
+	}
+	h_qindtot->Fill(QindTotal);
+      }
+    }      
+    
     for(Int_t d=0; d<8; d++) {
-      if(StripFlagAfter[d] == kTRUE) h_qindtotstr[d]->Fill(QindTotStr[d]);
+      for(Int_t l=0; l<nentries; l++) UsedEntryStr[l][d] = kFALSE;
+    }    
+    
+    for(Int_t d=0; d<8; d++) {
+      if(StripFlagAfter[d] == kTRUE) {
+	for(Int_t l=0; l<nentries; l++) {
+	  QindTotStr[d] = 0;
+	  if(UsedEntryStr[l][d] == kFALSE) {
+	    for(Int_t j=0; j<nentries; j++) {
+	      if( TMath::Abs( TOFStr[l][d] - TOFStr[j][d] ) < TOFgate) {
+		QindTotStr[d] += QindStr[j][d];
+		UsedEntryStr[j][d] = kTRUE;
+	      }
+	    }
+	    h_qindtotstr[d]->Fill(QindTotStr[d]);
+	  }
+	}      
+      }
     }
+    
     
   } // nentries > 0
   
@@ -1152,8 +1121,6 @@ void R3BNeuLandDigitizer::Finish()
   }
 
   for(Int_t i=0;i<8;i++){
-    h_qindstr_e[i]->Write();
-    h_tofstr_e[i]->Write();
     h_qindtotstr[i]->Write();
   }
 
