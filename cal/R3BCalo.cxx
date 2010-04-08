@@ -101,6 +101,10 @@ void R3BCalo::Initialize()
      fCrystalType[i] = gMC->VolId(buffer);
     }
 
+  TGeoVolume *vol = gGeoManager->GetVolume("CalifaWorld");
+  vol->SetVisibility(kFALSE);
+
+
 }
 
 
