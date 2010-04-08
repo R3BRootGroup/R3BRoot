@@ -3,29 +3,21 @@
 
 #include "FairTask.h"
 
-struct lightPulse
+struct pulse
 {
 	double time;
 	double segmentTime;
-	double energy;
+	double amplitude;
 	int segment;
-	lightPulse* nextActivePulse;
-	lightPulse* prevoiusActivePulse;
-};
-
-struct timeEnergyStruct
-{
-	double energy;
-	double time;
-	int segment;
+	pulse* nextActivePulse;
+	pulse* prevoiusActivePulse;
 };
 
 struct pulseShapeParamaterStruct
 {
-	double a1, c1;
-	double a2, c2;
-	double a3, c3;
-	double a4, c4;
+	double* offset;
+	double* a;
+	double* c;
 };
 
 struct cfdPulseDefiningParameterStruct
@@ -36,21 +28,25 @@ struct cfdPulseDefiningParameterStruct
 class R3BConstantFraction
 {
 	private:
-		double deltaTime; 					//Timeshift for negative pulses
-		double amplitudeScaling; 		//Decrease of amplitude of negative pulses
-		double triggerThreshold;		//Threshold for the trigger (leading edge)
+		double delay; 					//Timeshift for negative pulses
+		double fraction; 		//Decrease of amplitude of negative pulses
+		double threshold;		//Threshold for the trigger (leading edge)
 
 		double* segmentTimePosition;
 		pulseShapeParamaterStruct pulseShapeParameters;
 		int nrOfPulseSegments;
 
+		pulse* pulses;
+		pulse** pulsePointer;
+		int arrayCapacity;
+
 		bool useLeadingEdge;
 		
 		double calibrationTimeShift;
 
-		static bool comp (lightPulse * hit_a, lightPulse * hit_b);
-		double IterateThroughTime(int totalNumOfPulses, lightPulse** pulsePointer);
-		void PulseParameterGenerator (Double_t amplitude, Double_t time, Int_t segment, double* pulseParameters);
+		static bool comp (pulse* hit_a, pulse* hit_b);
+		double IterateThroughTime(int totalNumOfPulses);
+		void PulseParameterGenerator (double amplitude, double time, int segment, double* pulseParameters);
 		double PrimitiveParabel(double x, double xCenter,double a, double c);
 
 		double FindZero(double A, double B, double C, double time, double nextTime);
@@ -58,7 +54,7 @@ class R3BConstantFraction
 	public:
 		void Init(cfdPulseDefiningParameterStruct* parameters);
 		double Calculate(int nrOfPaddleHits, double* pmHitTimes, double* pmHitEnergies);
-		void SetParameters(double _threshold, double _deltaTime, double _amplitudeScaling);
+		void SetParameters(double _threshold, double _delay, double _fraction);
 		void SetParameters(double _threshold);
 		~R3BConstantFraction();
 };

@@ -9,6 +9,7 @@
 #include "R3BLandPoint.h"
 #include "R3BConstantFraction.h"
 #include "TStopwatch.h"
+#include <vector>
 
 class TClonesArray;
 class TObjectArray;
@@ -22,8 +23,7 @@ class R3BLandDigitizer_CFD : public FairTask
  public:
 
   /** Default constructor **/  
-  R3BLandDigitizer_CFD();
-  R3BLandDigitizer_CFD(Int_t _iVerbose);
+  R3BLandDigitizer_CFD(Int_t _iVerbose=1);
 
 
   /** Destructor **/
@@ -55,13 +55,70 @@ class R3BLandDigitizer_CFD : public FairTask
   // Parameter class
   R3BLandDigiPar* fLandDigiPar;
 
+	struct R3BLandDigitizer_CFD_Paddle_Hit
+	{
+		R3BLandDigitizer_CFD_Paddle_Hit* previousHit;
+		Double_t time;
+		Int_t segment;
+		Double_t energyDepo;
+		R3BLandPoint* hitData;
+
+		R3BLandDigitizer_CFD_Paddle_Hit()
+		{
+			previousHit = NULL;
+			time = 0.;
+			segment=0;
+			energyDepo = 0.;
+			hitData = NULL;
+		}
+	};
+
+	struct R3BLandDigitizer_CFD_Paddle_PM
+	{
+		Int_t nrEvents;
+		Int_t indexSortedStart;
+		Double_t tdc;
+		Double_t qdc;
+		R3BLandDigitizer_CFD_Paddle_Hit* pulse;
+
+		R3BLandDigitizer_CFD_Paddle_PM()
+		{
+			nrEvents = 0;
+			indexSortedStart = -1;
+			tdc = 0.;
+			qdc = 0.;
+			pulse = NULL;
+		}
+	};
+
+	struct R3BLandDigitizer_CFD_Paddle
+	{
+		int nrOfHits;
+		R3BLandDigitizer_CFD_Paddle_PM* Left;
+		R3BLandDigitizer_CFD_Paddle_PM* Right;
+
+		R3BLandDigitizer_CFD_Paddle()
+		{
+			nrOfHits = 0;
+			Left = new R3BLandDigitizer_CFD_Paddle_PM;
+			Right = new R3BLandDigitizer_CFD_Paddle_PM;
+		}
+	};
+
   Int_t nPaddles;
+	R3BLandDigitizer_CFD_Paddle* paddles;
+	std::vector<R3BLandDigitizer_CFD_Paddle_Hit> paddleHits;
 
   Double_t plength; 	// half length of paddle
   Double_t att; 			// light attenuation factor [1/cm]
   Double_t v_eff;			// Effective speed of light in scintillator [cm/ns]
   Double_t inv_v_eff;	// Inverse effective speed of light in scintillator [ns/cm]
 	Double_t qdcGate;
+
+	std::vector<double> timeOfHitsLeft;
+	std::vector<double> timeOfHitsRight;
+	std::vector<double> energyOfHitsLeft;
+	std::vector<double> energyOfHitsRight;
   
   private:
   virtual void SetParContainers();
