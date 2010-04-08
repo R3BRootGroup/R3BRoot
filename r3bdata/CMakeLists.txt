@@ -24,18 +24,19 @@ R3BMCTrack.cxx
 calData/R3BCalPoint.cxx
 caloData/R3BCaloPoint.cxx 
 dchData/R3BDchPoint.cxx
+dchData/R3BDchFullPoint.cxx 
 gfiData/R3BGfiPoint.cxx 
-mtofData/R3BmTofPoint.cxx 
+mtofData/R3BmTofPoint.cxx  
 tofData/R3BTofPoint.cxx
-lumonData/ELILuMonPoint.cxx
+lumonData/ELILuMonPoint.cxx 
 chimeraData/R3BChimeraPoint.cxx
-trackerData/R3BTraPoint.cxx
+trackerData/R3BTraPoint.cxx 
 trackerData/R3BTraHit.cxx
-trackerData/R3BSitrackerHit.cxx
+trackerData/R3BSitrackerHit.cxx 
 landData/R3BLandPoint.cxx
-landData/R3BNeuLandPoint.cxx
+landData/R3BNeuLandPoint.cxx 
 landData/R3BLandDigi.cxx 
-landData/R3BLandHit.cxx
+landData/R3BLandHit.cxx 
 landData/R3BPaddleCrystalHit.cxx
 landData/R3BNeutronTrack.cxx)
 
