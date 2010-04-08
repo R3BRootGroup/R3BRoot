@@ -15,6 +15,7 @@
 #include "TLorentzVector.h"
 
 class TClonesArray;
+class R3BDchFullPoint;
 class R3BDchPoint;
 class FairVolume;
 
@@ -109,6 +110,8 @@ class R3BDch : public R3BDetector
    ** Constructs the STS geometry
    **/
   virtual void ConstructGeometry();
+  virtual void ConstructGeometry1();
+  virtual void ConstructGeometry2();
 
 
   virtual void Initialize();
@@ -116,9 +119,20 @@ class R3BDch : public R3BDetector
   void SetEnergyCutOff( Double_t cutE ){fCutE = cutE;}
   Double_t  GetEnergyCutOff ( ) {return fCutE;}
   void SetHeliumBag( Bool_t bag ) {kHelium = bag;}
+  void SetDynamicStepSize(Bool_t step) {fDynamicStepSize=step;}
+
+
+  // renormalization of MC step size
+  Double_t BetheBloch(Double_t bg);
+  void SetStepToNextCollision();
+  void SetVerbosity(Bool_t verb ) { fVerbose=verb;}
+
+  void PrintInfo();
+  void RecordFullMcHit();
+  void RecordPartialMcHit();
+  void FindNodePath(TObjArray* arr);
 
 private:
-
 
     /** Track information to be stored until the track leaves the
 	active volume. **/
@@ -130,21 +144,31 @@ private:
     Double32_t     fLength;            //!  length
     Double32_t     fELoss;             //!  energy loss
     Double32_t     fCutE;              //!  Sec. Energy Cut-Off
-
     Int_t          fPosIndex;          //!
     TClonesArray*  fDchCollection;     //!  The hit collection
     Bool_t         kGeoSaved;          //!
-    Bool_t         kHelium;            //! Helium bag part
-    TList *flGeoPar; //!
+    Bool_t         kHelium;            //!  Helium bag part
+    TList         *flGeoPar;           //!
+    Bool_t         fVerbose;           //!
+    Bool_t         fDynamicStepSize;   //!
+    // Sensitive Ref Node
+    TGeoMatrix* refMatrix;                 //! Trans reference Node
 
     /** Private method AddHit
      **
      ** Adds a DchPoint to the HitCollection
      **/
-    R3BDchPoint* AddHit(Int_t trackID, Int_t detID, Int_t plane, TVector3 posIn,
-			TVector3 pos_out, TVector3 momIn, 
-			TVector3 momOut, Double_t time, 
-			Double_t length, Double_t eLoss);
+    R3BDchFullPoint* AddFullHit(Int_t trackId, Int_t mod, Int_t layer, Int_t cell, TVector3 pos,
+			        TVector3 lpos, TVector3 mom,
+			        TVector3 lmom, Double_t time,
+			        Double_t length, Double_t eLoss);
+
+    R3BDchPoint* AddHit(Int_t trackId, Int_t mod, Int_t layer, Int_t cell, TVector3 posIn,
+			    TVector3 pos_out, TVector3 momIn,
+			    TVector3 momOut,
+			    TVector3 lpos1, TVector3 lmom1,
+                            TVector3 lpos2, TVector3 lmom2,
+			    Double_t time, Double_t length, Double_t eLoss);
 
 
     /** Private method ResetParameters
