@@ -13,29 +13,56 @@ using std::flush;
 
 // -----   Default constructor   -------------------------------------------
 R3BDchPoint::R3BDchPoint() : FairMCPoint() {
-  fX_out      = fY_out  = fZ_out  = 0.;
-  fPx_out     = fPy_out = fPz_out = 0.;
-  fModule      = -1;
+
+  fX_out      = fY_out  = fZ_out  = -99999.;
+  fPx_out     = fPy_out = fPz_out = -99999.;
+
+  fLocalX_in      = fLocalY_in  = fLocalZ_in  = -99999.;
+  fLocalPx_in     = fLocalPy_in = fLocalPz_in = -99999.;
+  fLocalX_out      = fLocalY_out  = fLocalZ_out  = -99999.;
+  fLocalPx_out     = fLocalPy_out = fLocalPz_out = -99999.;
+
+  fModule     = fLayer  = fCell   = -99999;
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Standard constructor   ------------------------------------------
-R3BDchPoint::R3BDchPoint(Int_t trackID, Int_t detID, Int_t plane, TVector3 posIn,
+R3BDchPoint::R3BDchPoint(Int_t trackId, Int_t mod, Int_t layer, Int_t cell,TVector3 posIn,
 			 TVector3 posOut, TVector3 momIn, TVector3 momOut,
+			 TVector3 lpos1, TVector3 lmom1,
+			 TVector3 lpos2, TVector3 lmom2,
 			 Double_t tof, Double_t length, Double_t eLoss) 
-  : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss) {
+: FairMCPoint(trackId, mod, posIn, momIn, tof, length, eLoss) {
+
+
   fX_out  = posOut.X();
   fY_out  = posOut.Y();
   fZ_out  = posOut.Z();
   fPx_out = momOut.Px();
   fPy_out = momOut.Py();
   fPz_out = momOut.Pz();
-  fModule  = plane;
-}
-// -------------------------------------------------------------------------
 
+  fLocalX_in  = lpos1.X();
+  fLocalY_in  = lpos1.Y();
+  fLocalZ_in  = lpos1.Z();
+  fLocalPx_in = lmom1.Px();
+  fLocalPy_in = lmom1.Py();
+  fLocalPz_in = lmom1.Pz();
+
+  fLocalX_out  = lpos2.X();
+  fLocalY_out  = lpos2.Y();
+  fLocalZ_out  = lpos2.Z();
+  fLocalPx_out = lmom2.Px();
+  fLocalPy_out = lmom2.Py();
+  fLocalPz_out = lmom2.Pz();
+
+  fModule  = mod;
+  fLayer  = layer;
+  fCell   = cell;
+
+}
 
 
 // -----   Destructor   ----------------------------------------------------
@@ -59,6 +86,26 @@ void R3BDchPoint::Print(const Option_t* opt) const {
 // -------------------------------------------------------------------------
 
 
+
+// -----   Local Point x coordinate from linear extrapolation   ------------------
+Double_t R3BDchPoint::GetLocalX(Double_t z) const {
+  //  cout << fZ << " " << z << " " << fZ_out << endl;
+  if ( (fLocalZ_out-z)*(fLocalZ_in-z) >= 0. ) return (fLocalX_out+fLocalX_in)/2.;
+  Double_t dz = fLocalZ_out - fLocalZ_in;
+  return ( fLocalX_in + (z-fLocalZ_in) / dz * (fLocalX_out-fLocalX_in) );
+}
+// -------------------------------------------------------------------------
+
+
+
+// -----   Local Point y coordinate from linear extrapolation   ------------------
+Double_t R3BDchPoint::GetLocalY(Double_t z) const {
+  if ( (fLocalZ_out-z)*(fLocalZ_in-z) >= 0. ) return (fLocalY_out+fLocalY_in)/2.;
+  Double_t dz = fLocalZ_out - fLocalZ_in;
+  //  if ( TMath::Abs(dz) < 1.e-3 ) return (fY_out+fY)/2.;
+  return ( fLocalY_in + (z-fLocalZ_in) / dz * (fLocalY_out-fLocalY_in) );
+}
+// -------------------------------------------------------------------------
 
 // -----   Point x coordinate from linear extrapolation   ------------------
 Double_t R3BDchPoint::GetX(Double_t z) const {

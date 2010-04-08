@@ -38,8 +38,10 @@ class R3BDchPoint : public FairMCPoint
    *@param length   Track length since creation [cm]
    *@param eLoss    Energy deposit [GeV]
    **/
-  R3BDchPoint(Int_t trackID, Int_t detID, Int_t plane, TVector3 posIn,
+  R3BDchPoint(Int_t trackId, Int_t mod, Int_t layer, Int_t cell, TVector3 posIn,
 	      TVector3 posOut, TVector3 momIn, TVector3 momOut,
+	      TVector3 lpos1, TVector3 lmom1,
+	      TVector3 lpos2, TVector3 lmom2,
 	      Double_t tof, Double_t length, Double_t eLoss);
 
 
@@ -61,14 +63,25 @@ class R3BDchPoint : public FairMCPoint
   Double_t GetPxOut() const { return fPx_out; }
   Double_t GetPyOut() const { return fPy_out; }
   Double_t GetPzOut() const { return fPz_out; }
+
   void PositionIn(TVector3& pos)  { pos.SetXYZ(fX, fY, fZ); }
+  void MomentumIn(TVector3& mom) { mom.SetXYZ(fPx,fPy,fPz); }
+
   void PositionOut(TVector3& pos) { pos.SetXYZ(fX_out,fY_out,fZ_out); }
   void MomentumOut(TVector3& mom) { mom.SetXYZ(fPx_out,fPy_out,fPz_out); }
+
+  void LocalPositionIn(TVector3& pos)  { pos.SetXYZ(fLocalX_in, fLocalY_in, fLocalZ_in); }
+  void LocalMomentumIn(TVector3& mom) { mom.SetXYZ(fLocalPx_in,fLocalPy_in,fLocalPz_in); }
+
+  void LocalPositionOut(TVector3& pos) { pos.SetXYZ(fLocalX_out,fLocalY_out,fLocalZ_out); }
+  void LocalMomentumOut(TVector3& mom) { mom.SetXYZ(fLocalPx_out,fLocalPy_out,fLocalPz_out); }
 
 
   /** Point coordinates at given z from linear extrapolation **/
   Double_t GetX(Double_t z) const;
   Double_t GetY(Double_t z) const;
+  Double_t GetLocalX(Double_t z) const;
+  Double_t GetLocalY(Double_t z) const;
 
 
   /** Check for distance between in and out **/
@@ -89,7 +102,14 @@ class R3BDchPoint : public FairMCPoint
 
   Double32_t fX_out,  fY_out,  fZ_out;
   Double32_t fPx_out, fPy_out, fPz_out;
+  Double32_t fLocalX_in, fLocalY_in,fLocalZ_in;
+  Double32_t fLocalPx_in, fLocalPy_in,fLocalPz_in;
+  Double32_t fLocalX_out, fLocalY_out,fLocalZ_out;
+  Double32_t fLocalPx_out, fLocalPy_out,fLocalPz_out;
+
   Int_t fModule;
+  Int_t fLayer;
+  Int_t fCell;
 
 
   ClassDef(R3BDchPoint,1)
