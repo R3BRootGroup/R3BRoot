@@ -122,6 +122,10 @@ void R3BCal::Initialize()
     fTypeC = gMC->VolId("crystalLogNAJC");
     fTypeD = gMC->VolId("crystalLogNAJD");
 
+   TGeoVolume *vol = gGeoManager->GetVolume("CBLogWorld");
+  vol->SetVisibility(kFALSE);
+
+
 }
 
 
