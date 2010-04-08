@@ -90,6 +90,7 @@ Int_t r3blandsim(){
     TObjString det10("LAND");
     TObjString det11("RPCMLAND");
     TObjString det12("RPCFLAND");
+		TObjString det13("SCINTNEULAND");
 
     TObjArray fDetList;
 //    fDetList.Add(&det1);

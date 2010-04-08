@@ -12,6 +12,7 @@
 
 #include "R3BDetector.h"
 #include "TLorentzVector.h"
+#include "TGeoMedium.h"
 #include <iostream>
 #include <map>
 
@@ -112,12 +113,10 @@ class R3BLand : public R3BDetector
    ** Constructs the STS geometry
    **/
   virtual void ConstructGeometry();
-  virtual void ConstructGeometry1();
-  virtual void ConstructGeometry2();
-  virtual void ConstructGeometry3();
-  virtual void ConstructGeometry4();
   virtual void Initialize();
   virtual void SetSpecialPhysicsCuts(){;}
+
+	void UseNeuLand(Double_t _paddle_length, Double_t _paddle_width, Double_t _paddle_depth, Double_t _neuLAND_depth);
 
 
   //  void SaveGeoParams();
@@ -138,10 +137,16 @@ class R3BLand : public R3BDetector
     Double32_t     fELoss;             //!  energy loss
 
     Int_t          fPosIndex;          //!
-    TClonesArray*  fLandCollection;    //!  The hit collection
+    TClonesArray*  fLandCollection;     //!  The hit collection
     Bool_t         kGeoSaved;          //!
-    TList *flGeoPar;                   //!
-    Double_t fBirkC0,fBirkC1,fBirkC2;  //!
+    TList *flGeoPar; 									 //!
+    Double_t fBirkC0,fBirkC1,fBirkC2;	 //!
+
+		bool useNeuLAND;
+		Double_t neuLAND_paddle_dimx;			// half of the length [cm]
+		Double_t neuLAND_paddle_dimy;			// half of the width [cm]
+		Double_t neuLAND_paddle_dimz;			// half of the depth [cm]
+		Double_t neuLAND_depth_dim;				// total detector depth [cm]
     
     /** Private method AddHit
      **
@@ -153,6 +158,11 @@ class R3BLand : public R3BDetector
 			 TVector3 momOut, Double_t time,
 			 Double_t length, Double_t eLoss,Double_t lightYield);
 
+		//Constructs the NeuLand Geometry
+		void ConstructNeuLandGeometry(TGeoVolume* vWorld,	TGeoMedium *Iron, TGeoMedium *BC408);
+
+		//Construct Land Geometry
+		void ConstructLandGeometry(TGeoVolume* vWorld, TGeoMedium *Iron, TGeoMedium *BC408);
 
     /** Private method ResetParameters
      **
@@ -161,7 +171,7 @@ class R3BLand : public R3BDetector
     void ResetParameters();
 
     /** Map of MCis with fixed VolID */
-    map <Int_t,Int_t> fMapMcId;       //!
+    map <Int_t,Int_t> fMapMcId;
 
 
     ClassDef(R3BLand,1);

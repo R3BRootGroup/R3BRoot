@@ -368,6 +368,37 @@ void r3ball(Int_t nEvents = 1,
       run->AddModule(land);
   }
 
+	// NeuLand Scintillator Detector
+  if (fDetList.FindObject("SCINTNEULAND")) {
+
+      R3BDetector* land = new R3BLand("Land", kTRUE);
+
+			//Construct NeuLand
+			Double_t paddle_dimx=100;   // half of the length [cm]
+			Double_t paddle_dimy=2.5;   // half of the width [cm]
+			Double_t paddle_dimz=2.5;   // half of the depth [cm]
+			Double_t detector_dimz=100; // total detector depth [cm]
+			((R3BLand*) land)->UseNeuLand(paddle_dimx, paddle_dimy, paddle_dimz, detector_dimz);
+
+      // Global position of the Module
+      phi   =  0.0; // (deg)
+      theta =  0.0; // (deg)
+      psi   =  0.0; // (deg)
+      // Rotation in Ref. Frame.
+      thetaX =  0.0; // (deg)
+      thetaY =  0.0; // (deg)
+      thetaZ =  0.0; // (deg)
+      // Global translation in Lab
+      tx    =  0.0; // (cm)
+      ty    =  0.0; // (cm)
+      tz    =  1050.0; // (cm)
+      //land->SetRotAnglesEuler(phi,theta,psi);
+      land->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
+      land->SetTranslation(tx,ty,tz);
+
+      run->AddModule(land);
+  }
+
 
   // Land Detector
   if (fDetList.FindObject("RPCFLAND") ) {
