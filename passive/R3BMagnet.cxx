@@ -143,7 +143,7 @@ void R3BMagnet::ConstructGeometry(){
    TGeoVolume* pWorld = new TGeoVolume("Aladin_box",aladin_box, pMed2);
    TGeoCombiTrans *t0 = new TGeoCombiTrans();
    TGeoCombiTrans *pGlobal = GetGlobalPosition(t0);
-   pAWorld->AddNodeOverlap(pWorld, 0, pGlobal );
+   //pAWorld->AddNodeOverlap(pWorld, 0, pGlobal );
 
 
 
@@ -239,10 +239,10 @@ void R3BMagnet::ConstructGeometry(){
 
 
 
-   pWorld->AddNodeOverlap(pVolFeYoke_up,   1, t1);
-   pWorld->AddNodeOverlap(pVolFeYoke_down, 2, t2);
-   pWorld->AddNodeOverlap(pVolFeYoke_left, 3, t3);
-   pWorld->AddNodeOverlap(pVolFeYoke_right,4, t4);
+   pAWorld->AddNode(pVolFeYoke_up,   1, t1);
+   pAWorld->AddNode(pVolFeYoke_down, 2, t2);
+   pAWorld->AddNode(pVolFeYoke_left, 3, t3);
+   pAWorld->AddNode(pVolFeYoke_right,4, t4);
 
 }
 
