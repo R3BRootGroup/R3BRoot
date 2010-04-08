@@ -1,16 +1,17 @@
 // -------------------------------------------------------------------------
 // -----                        R3BCal header file                     -----
 // -----                  Created 26/03/09  by D.Bertini               -----
+// -----        new Version: 08/04/10 <wranne@student.chalmers.se>     -----
 // -------------------------------------------------------------------------
 
 /**  R3BCal.h
  **/
 
-
 #ifndef R3BCAL_H
 #define R3BCAL_H
 
 #include "R3BDetector.h"
+#include "TGeoSphere.h"
 
 #include "TLorentzVector.h"
 
@@ -19,6 +20,20 @@ class R3BCalPoint;
 class FairVolume;
 class TGeoRotation;
 
+struct xb_crystal
+{
+  int no;
+  int type;
+  double theta, phi, psi;
+  bool active;
+};
+
+struct xb_crystal_mod
+{
+  int no;
+  int mod;
+  double delta;
+};
 
 
 class R3BCal : public R3BDetector
@@ -102,7 +117,7 @@ class R3BCal : public R3BDetector
    *@param offset  Index offset
    **/
   virtual void CopyClones(TClonesArray* cl1, TClonesArray* cl2,
-			  Int_t offset);
+        Int_t offset);
 
 
   /** Virtaul method Construct geometry
@@ -110,9 +125,6 @@ class R3BCal : public R3BDetector
    ** Constructs the CAL CRYSTAL geometry
    **/
   virtual void ConstructGeometry();
-  virtual void ConstructGeometry1();
-  virtual void ConstructGeometry2();
-  void SetGeometryVersion( Int_t vers ) { fGeoVersion = vers;}
 
   virtual void Initialize();
   virtual void SetSpecialPhysicsCuts();
@@ -120,14 +132,10 @@ class R3BCal : public R3BDetector
   Double_t  GetEnergyCutOff ( ) {return fCutE;}
 
 
-
-
-
   private:
 
-
     /** Track information to be stored until the track leaves the
-	active volume. **/
+  active volume. **/
     Int_t          fTrackID;           //!  track index
     Int_t          fVolumeID;          //!  volume id
     TLorentzVector fPosIn, fPosOut;    //!  position
@@ -153,9 +161,9 @@ class R3BCal : public R3BDetector
      ** Adds a CalPoint to the HitCollection
      **/
     R3BCalPoint* AddHit(Int_t trackID, Int_t detID, Int_t type, Int_t cp, TVector3 posIn,
-			TVector3 pos_out, TVector3 momIn, 
-			TVector3 momOut, Double_t time, 
-			Double_t length, Double_t eLoss);
+      TVector3 pos_out, TVector3 momIn, 
+      TVector3 momOut, Double_t time, 
+      Double_t length, Double_t eLoss);
 
 
     /** Private method ResetParameters
@@ -163,9 +171,11 @@ class R3BCal : public R3BDetector
      ** Resets the private members for the track parameters
      **/
     void ResetParameters();
-   TGeoRotation* createMatrix( Double_t phi, Double_t theta, Double_t psi);
 
     Int_t  GetCrystalType(Int_t volID);
+    void insertCrystal(xb_crystal *crystal, TGeoVolume **crystalVolumes, TGeoVolume *worldVolume, double r);
+    TGeoShape* createCrystal(double *arbCrystals);
+
 
 
     ClassDef(R3BCal,1);
