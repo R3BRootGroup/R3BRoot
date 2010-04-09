@@ -31,9 +31,10 @@ link_directories( ${LINK_DIRECTORIES})
 set(R3BCAL_SRCS
 #Put here your sourcefiles
 R3BCal.cxx  
-R3BGeoCal.cxx   
-R3BGeoCalPar.cxx   
-R3BCalContFact.cxx   
+R3BCalv0.cxx   
+R3BGeoCal.cxx    
+R3BGeoCalPar.cxx    
+R3BCalContFact.cxx 
 )
 
 # fill list of header files from list of source files
