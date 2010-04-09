@@ -105,7 +105,7 @@ class R3BLand : public R3BDetector
    *@param offset  Index offset
    **/
   virtual void CopyClones(TClonesArray* cl1, TClonesArray* cl2,
-			  Int_t offset);
+        Int_t offset);
 
 
   /** Virtaul method Construct geometry
@@ -116,7 +116,7 @@ class R3BLand : public R3BDetector
   virtual void Initialize();
   virtual void SetSpecialPhysicsCuts(){;}
 
-	void UseNeuLand(Double_t _paddle_length, Double_t _paddle_width, Double_t _paddle_depth, Double_t _neuLAND_depth);
+  void UseNeuLand(Double_t _paddle_length, Double_t _paddle_width, Double_t _paddle_depth, Double_t _neuLAND_depth);
 
 
   //  void SaveGeoParams();
@@ -125,7 +125,7 @@ class R3BLand : public R3BDetector
 
 
     /** Track information to be stored until the track leaves the
-	active volume. **/
+  active volume. **/
     Int_t          fTrackID;           //!  track index
     Int_t          fVolumeID;          //!  volume id
     Int_t          fCopyNo;            //!  copy no
@@ -137,32 +137,32 @@ class R3BLand : public R3BDetector
     Double32_t     fELoss;             //!  energy loss
 
     Int_t          fPosIndex;          //!
-    TClonesArray*  fLandCollection;     //!  The hit collection
+    TClonesArray*  fLandCollection;    //!  The hit collection
     Bool_t         kGeoSaved;          //!
-    TList *flGeoPar; 									 //!
-    Double_t fBirkC0,fBirkC1,fBirkC2;	 //!
+    TList *flGeoPar;                   //!
+    Double_t fBirkC0,fBirkC1,fBirkC2;  //!
 
-		bool useNeuLAND;
-		Double_t neuLAND_paddle_dimx;			// half of the length [cm]
-		Double_t neuLAND_paddle_dimy;			// half of the width [cm]
-		Double_t neuLAND_paddle_dimz;			// half of the depth [cm]
-		Double_t neuLAND_depth_dim;				// total detector depth [cm]
+    bool useNeuLAND;
+    Double_t neuLAND_paddle_dimx;      // half of the length [cm]
+    Double_t neuLAND_paddle_dimy;      // half of the width [cm]
+    Double_t neuLAND_paddle_dimz;      // half of the depth [cm]
+    Double_t neuLAND_depth_dim;        // total detector depth [cm]
     
     /** Private method AddHit
      **
      ** Adds a LandPoint to the HitCollection
      **/
     R3BLandPoint* AddHit(Int_t trackID, Int_t detID, Int_t box, Int_t id1, Int_t id2,
-			 TVector3 posIn,
-			 TVector3 pos_out, TVector3 momIn,
-			 TVector3 momOut, Double_t time,
-			 Double_t length, Double_t eLoss,Double_t lightYield);
+       TVector3 posIn,
+       TVector3 pos_out, TVector3 momIn,
+       TVector3 momOut, Double_t time,
+       Double_t length, Double_t eLoss,Double_t lightYield);
 
-		//Constructs the NeuLand Geometry
-		void ConstructNeuLandGeometry(TGeoVolume* vWorld,	TGeoMedium *Iron, TGeoMedium *BC408);
+    //Constructs the NeuLand Geometry
+    void ConstructNeuLandGeometry(TGeoVolume* vWorld,  TGeoMedium *Iron, TGeoMedium *BC408);
 
-		//Construct Land Geometry
-		void ConstructLandGeometry(TGeoVolume* vWorld, TGeoMedium *Iron, TGeoMedium *BC408);
+    //Construct Land Geometry
+    void ConstructLandGeometry(TGeoVolume* vWorld, TGeoMedium *Iron, TGeoMedium *BC408);
 
     /** Private method ResetParameters
      **
