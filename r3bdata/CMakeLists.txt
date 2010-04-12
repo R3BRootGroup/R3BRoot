@@ -38,7 +38,9 @@ landData/R3BNeuLandPoint.cxx
 landData/R3BLandDigi.cxx 
 landData/R3BLandHit.cxx 
 landData/R3BPaddleCrystalHit.cxx
-landData/R3BNeutronTrack.cxx)
+landData/R3BNeutronTrack.cxx
+dchData/R3BDchDigi.cxx  
+)
 
 
 if(RULE_CHECKER_FOUND)
