@@ -10,6 +10,7 @@ ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/mcstack 
 ${R3BROOT_SOURCE_DIR}/dch
+${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/calData
 ${R3BROOT_SOURCE_DIR}/r3bdata/dchData
 ${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
@@ -33,6 +34,8 @@ R3BDch.cxx
 R3BGeoDch.cxx   
 R3BGeoDchPar.cxx   
 R3BDchContFact.cxx   
+R3BDchDigiPar.cxx
+R3BDchDigitizer.cxx
 )
 
 # fill list of header files from list of source files
