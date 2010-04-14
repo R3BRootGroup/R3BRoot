@@ -32,6 +32,7 @@ set(R3BCAL_SRCS
 #Put here your sourcefiles
 R3BLand.cxx  
 R3BNeuLand.cxx   
+R3BNeuLandv1.cxx   
 R3BGeoLand.cxx    
 R3BGeoLandPar.cxx   
 R3BLandContFact.cxx 
