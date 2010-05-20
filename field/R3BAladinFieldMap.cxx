@@ -68,7 +68,8 @@ void R3BAladinFieldMap::Init() {
 
   if (gInitialized) return;
 
-  gInitialized = kTRUE;
+  gFringeField=kTRUE;
+
 
   af_box[0][0].SetXYZ( 123.300, 0.00,  -10.0);
   af_box[0][1].SetXYZ(-123.224, 0.00,  -10.0);
@@ -219,7 +220,7 @@ void R3BAladinFieldMap::Init() {
 	     = DistanceToTarget + Correction;
   // Transformations inverse
   gRot = new TRotation();
-  gRot->RotateY(-1.*Glad_angle*(TMath::Pi())/180.);
+  gRot->RotateY(-1.*Glad_angle);
   gTrans   = new TVector3(0.0,
 			  0.0,
                          -1.* DistanceFromtargetToAladinCenter
@@ -227,6 +228,9 @@ void R3BAladinFieldMap::Init() {
 
   cout << "-I- R3BAladinFieldMap::Init() called ----------------------  " << endl;
   InitField();
+
+  //Init has been called
+  gInitialized = kTRUE;
 
 }
 
@@ -400,11 +404,11 @@ void R3BAladinFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField)
 
   double z_abs = TMath::Abs(c.Z());
 
-  if (z_abs > 160.0){
+  if ((gFringeField==kFALSE) && (z_abs > 160.0) ){
       bField[0]= 0.0;
       bField[1]= 0.0;
       bField[2]= 0.0;
-      return; // claim to be fully outside the field
+      return; // the fringe field is cut back/forward
   }
   // for each field map, there is one mar transformation to do
   // to get into each field map's coordinate system.
@@ -538,7 +542,7 @@ void R3BAladinFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField)
 
   double wsuminv = fFieldSign/wsum;
 
-  if (z_abs > 150.0)
+  if ( (gFringeField==kFALSE) && (z_abs > 150.0))
     {
       // Between 150 and 160 cm, we force the field down to 0
       double factor = 0.1 * (160. - z_abs);
