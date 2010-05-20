@@ -7,13 +7,12 @@ eventDisplay()
   gSystem->Load("libParBase");
   gSystem->Load("libBase");
   gSystem->Load("libMCStack");
-  gSystem->Load("libField");
   gSystem->Load("libGen");
 
   //----  Load R3B specific libraries ---------------------------------------
   gSystem->Load("libR3Bbase");
-  gSystem->Load("libR3BPassive");
   gSystem->Load("libR3BGen");
+  gSystem->Load("libR3BPassive");
   gSystem->Load("libR3BData");
   gSystem->Load("libR3BCal");
   gSystem->Load("libR3BCalo");
@@ -23,20 +22,17 @@ eventDisplay()
   gSystem->Load("libR3BmTof");
   gSystem->Load("libR3BTof");
   gSystem->Load("libR3BTra");
-  
-  
+
   //----  Load vis. specific libraries ---------------------------------------
   gSystem->Load("libEve");
   gSystem->Load("libEventDisplay");
 
-
+                                     
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *fRun= new FairRunAna();
  
   TFile* file = new TFile("r3bpar.root");
-
-
- // file->Get("FairBaseParSet");
+  file->Get("FairBaseParSet"); 
 
  // -----   Runtime database   ---------------------------------------------
 
@@ -51,25 +47,15 @@ eventDisplay()
   fRun->SetInputFile("r3bsim.root");
 
   fRun->SetOutputFile("test.root");
-
-
-
   fRun->LoadGeometry();
 
-
   FairEventManager *fMan= new FairEventManager();
-
-
-  //  FairMCTracks *Track =  new FairMCTracks ("Monte-Carlo Tracks");
-//  FairMCPointDraw *LandPoints =   new FairMCPointDraw ("LandPoint",kOrange,  kFullSquare);
+  FairMCTracks *Track =  new FairMCTracks ("Monte-Carlo Tracks");
 
                                                                
-//  fMan->AddTask(Track);
-  
- // fMan->AddTask(LandPoints);
+  fMan->AddTask(Track);
     
   fMan->Init();                     
-
-
+  
 
 }
