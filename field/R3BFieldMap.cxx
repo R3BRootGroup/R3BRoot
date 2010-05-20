@@ -68,7 +68,7 @@ R3BFieldMap::R3BFieldMap(Int_t type,Bool_t verbosity)
 	     = DistanceToTarget + Correction;
 // Transformations inverse
   gRot = new TRotation();
-  gRot->RotateY(-1.*Aladin_angle*(TMath::Pi())/180.);
+  gRot->RotateY(-1.*Aladin_angle);
   gTrans   = new TVector3(0.0,
 			  0.0,
                          -1.* DistanceFromtargetToAladinCenter

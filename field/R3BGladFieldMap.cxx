@@ -120,7 +120,7 @@ void R3BGladFieldMap::Init() {
 	     = DistanceToTarget + Correction;
 // Transformations inverse
   gRot = new TRotation();
-  gRot->RotateY(-1.*Glad_angle*(TMath::Pi())/180.);
+  gRot->RotateY(-1.*Glad_angle);
   gTrans   = new TVector3(0.0,
 			  0.0,
                          -1.* DistanceFromtargetToAladinCenter
