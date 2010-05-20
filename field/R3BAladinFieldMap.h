@@ -162,7 +162,7 @@ public:
 
   void SetCurrent(Double_t aCurrent ) { fCurrent=aCurrent;}
   Double_t GetCurrent() { return fCurrent;}
-
+  void SetFringeField(Bool_t set ) {gFringeField=set;}
 
 	
  protected:
@@ -246,7 +246,7 @@ public:
 
   TVector3 af_box[2][2] ;            //!
   TVector3 af_mag[2][2] ;            //!
-
+  Bool_t gFringeField;               //!
 
 
 
