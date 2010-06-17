@@ -214,7 +214,7 @@ void R3BAladinFieldMap::Init() {
   // parameters here
   // <DB> check me !!
   Double_t DistanceToTarget = 350.0;  //cm
-  Double_t Correction = -119.94; // cm
+  Double_t Correction = -117.5; // cm
   Double_t Glad_angle = +7.3; // degree
   Double_t DistanceFromtargetToAladinCenter
 	     = DistanceToTarget + Correction;
@@ -393,23 +393,45 @@ void R3BAladinFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField)
   // first we need to decompose the position into the magnet coordinates.
   //printf ("Vectorized  p: %10.5f %10.5f %10.5f : ",p.X(),p.Y(),p.Z());
 
-  // Inverse transformation for Position
-  TVector3 c(p.X(),p.Y(),p.Z());
-  c.Transform(*gRot);
-  c = c + (*gTrans);
+       
+  Double_t DistanceToTarget = 350.0;  //cm
+  Double_t Correction = -114.5; // cm
+  Double_t Magnet_angle = +7.3; // degree
 
-  // get_xyz(c,p);
+
+  Double_t xx = 0.;
+  Double_t yy = 0.;
+  Double_t zz = 0.;
+
+  
+
+
+
+  Double_t angle = -1.*Magnet_angle*TMath::Pi()/180.;
+
+  // Translation
+  Double_t zt = point[2] - (DistanceToTarget + Correction);   
+
+  // Rotation
+  xx= zt*TMath::Sin(angle) + point[0]*TMath::Cos(angle);
+  yy= point[1];
+  zz= zt*TMath::Cos(angle) - point[0]*TMath::Sin(angle);
+
+  // Assign to c
+  TVector3 c(xx,yy,zz); 
+
   //printf ("c: %10.5f %10.5f %10.5f\n",c.X(),c.Y(),c.Z());
   // c is in the magnet coordinate system.
 
   double z_abs = TMath::Abs(c.Z());
 
-  if ((gFringeField==kFALSE) && (z_abs > 160.0) ){
+  if ((gFringeField==kFALSE) && (z_abs > (160.0/1.)) ){
       bField[0]= 0.0;
       bField[1]= 0.0;
       bField[2]= 0.0;
       return; // the fringe field is cut back/forward
   }
+
   // for each field map, there is one mar transformation to do
   // to get into each field map's coordinate system.
 
@@ -542,24 +564,25 @@ void R3BAladinFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField)
 
   double wsuminv = fFieldSign/wsum;
 
-  if ( (gFringeField==kFALSE) && (z_abs > 150.0))
-    {
+  if ( (z_abs>120.0) && (z_abs <= 160.) )
+    { 
       // Between 150 and 160 cm, we force the field down to 0
-      double factor = 0.1 * (160. - z_abs);
+      double factor = 0.025 * (160. - z_abs);
       wsuminv *= factor;
     }
+  if ( z_abs> 160.) wsuminv=0.0;
 
   for (int i = 0; i < 3; i++)
-    Bi[i] *= wsuminv;
+    Bi[i] *= wsuminv; 
 
   // And then transformed into world coordinates
   // rotate_field(B,Bi[0],Bi[1],Bi[2]);
   TVector3 BLab(Bi[0],Bi[1],Bi[2]);
   BLab.Transform(*gRot);
   // copy value @ end
-  bField[0] = BLab.X()*10.; // [kGauss]
-  bField[1] = BLab.Y()*10.; // [kGauss]
-  bField[2] = BLab.Z()*10.; // [kGauss]
+  bField[0] = -1.*BLab.X()*10.; // [kGauss]
+  bField[1] = -1.*BLab.Y()*10.; // [kGauss]
+  bField[2] = -1.*BLab.Z()*10.; // [kGauss]
 
  // cout << "-I- ALADIN --> X: " << p.X() << " Y: " << p.Y() << "Z:" << p.Z() << endl;
  // cout << "-I- ALADIN --> Bx: " << bField[0] << " By: " << bField[1] << "Bz:" << bField[2] << endl;
