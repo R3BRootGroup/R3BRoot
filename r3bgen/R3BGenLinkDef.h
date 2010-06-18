@@ -13,6 +13,7 @@
 #pragma link C++ class  R3BBackTracking+;
 #pragma link C++ class  R3BBackTrackingStorageState+;
 #pragma link C++ class  R3BAsciiGenerator+;
+#pragma link C++ class  R3BLandGenerator+;
 #pragma link C++ class  R3BCosmicGenerator+;
 
 
