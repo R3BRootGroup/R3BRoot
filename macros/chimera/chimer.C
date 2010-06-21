@@ -76,27 +76,16 @@ Int_t chimer(){
     TObjString det1("TARGET");
     TObjString det2("ALADIN");
     TObjString det3("CALIFA");
-    TObjString det4("CRYSTALBALL");
-    TObjString det5("TOF");
-    TObjString det6("MTOF");
-    TObjString det7("DCH");
-    TObjString det8("TRACKER");
-    TObjString det9("GFI");
-    TObjString det10("LAND");
-    TObjString det11("CHIMERA");
+    TObjString det4("ATOF");
+    TObjString det5("CHIMERA");
+    TObjString det6("LAND");
 
     TObjArray fDetList;
     fDetList.Add(&det1);
-    fDetList.Add(&det11);
-    fDetList.Add(&det10);
-   // fDetList.Add(&det4);
-   // fDetList.Add(&det5);
-   // fDetList.Add(&det6);
-   // fDetList.Add(&det7);
-   // fDetList.Add(&det8);
-   // fDetList.Add(&det9);
-   // fDetList.Add(&det10);
-
+    fDetList.Add(&det4);
+    fDetList.Add(&det5);
+    fDetList.Add(&det6);
+ 
 
    //-------------------------------------------------
    //- N# of Sim. Events   |    nEvents     (Int_t)

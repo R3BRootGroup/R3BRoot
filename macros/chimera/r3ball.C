@@ -93,6 +93,7 @@ void r3ball(Int_t nEvents = 1,
   gSystem->Load("libR3BLand");
   gSystem->Load("libR3BmTof");
   gSystem->Load("libR3BTof");
+  gSystem->Load("libR3BATof");
   gSystem->Load("libR3BTra");
   gSystem->Load("libR3BChimera");
   gSystem->Load("libELILuMon");
@@ -386,9 +387,8 @@ void r3ball(Int_t nEvents = 1,
   }
 
   // Luminosity detector
-  if (fDetList.FindObject("LUMON") ) {
-      R3BDetector* lumon = new ELILuMon("LuMon", kTRUE);
-      //lumon->SetGeometryFileName("lumon.root");
+  if (fDetList.FindObject("ATOF") ) {
+      R3BDetector* atof = new R3BATof("AladinTof", kTRUE);
       // Global position of the Module
       thetaX   =  0.0; // (deg)
       thetaY   =  0.0; // (deg)
@@ -398,15 +398,15 @@ void r3ball(Int_t nEvents = 1,
       thetaY =  0.0; // (deg)
       thetaZ =  0.0; // (deg)
       // Global translation in Lab
-      tx       =  0.0; // (cm)
+      tx       =  -100.0; // (cm)
       ty       =  0.0; // (cm)
-      tz       =  200.0; // (cm)
-      lumon->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      lumon->SetTranslation(tx,ty,tz);
+      tz       =  489.0; // (cm)
+      atof->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
+      atof->SetTranslation(tx,ty,tz);
       // User defined Energy CutOff
       //Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
       //((ELILuMon*) lumon)->SetEnergyCutOff(fCutOffSci);
-      run->AddModule(lumon);
+      run->AddModule(atof);
   }
 
 
