@@ -28,6 +28,7 @@ dchData/R3BDchFullPoint.cxx
 gfiData/R3BGfiPoint.cxx 
 mtofData/R3BmTofPoint.cxx  
 tofData/R3BTofPoint.cxx
+atofData/R3BATofPoint.cxx
 lumonData/ELILuMonPoint.cxx 
 chimeraData/R3BChimeraPoint.cxx
 trackerData/R3BTraPoint.cxx 
