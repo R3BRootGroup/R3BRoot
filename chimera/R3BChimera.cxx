@@ -373,6 +373,19 @@ void R3BChimera::ConstructRootGeometry() {
 	cout << "-I- no TGEO defined ! " << endl;
     }
 
+   TGeoVolume *cell = new TGeoVolumeAssembly("CHIM");
+
+  // Rotation (Unity)
+   TGeoRotation *pRot = new TGeoRotation();
+   pRot->RotateY(180.0);
+
+   Cave->AddNode(cell,0,
+                   GetGlobalPosition(
+		   new TGeoCombiTrans("",0.,0.,0.,pRot)
+                   )
+		  ); 
+
+
 
    TFile *f=new TFile(GetGeometryFileName().Data());
   
@@ -389,7 +402,7 @@ void R3BChimera::ConstructRootGeometry() {
     TGeoHMatrix *global = gGeoManager->GetHMatrix();             
     gGeoManager->GetListOfMatrices()->Remove(global); //Remove the Identity matrix 
 
-   ExpandNode(chimerTop,Cave);
+   ExpandNode(chimerTop,cell);
  
 }
 
