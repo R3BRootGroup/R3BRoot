@@ -42,6 +42,7 @@ R3BBackTracking.cxx
 R3BBackTrackingStorageState.cxx
 R3BAsciiGenerator.cxx
 R3BCosmicGenerator.cxx
+R3BLandGenerator.cxx
 )
 
 if(RULE_CHECKER_FOUND)
