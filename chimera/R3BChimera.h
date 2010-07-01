@@ -119,6 +119,9 @@ class R3BChimera : public R3BDetector
    void ConstructASCIIGeometry(){;}
   // construct detector from .root file 
   void ConstructRootGeometry();
+  // New Geometry construct by Paolo. Russoto
+  void ConstructMechGeometry();
+ 
   // recursively add volumes to the geoManager
   void ExpandNode(TGeoVolume *fVol, TGeoVolume *Cave);
 
