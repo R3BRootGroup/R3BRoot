@@ -15,14 +15,14 @@ using std::flush;
 R3BCaloPoint::R3BCaloPoint() : FairMCPoint() {
   fX_out      = fY_out  = fZ_out  = 0.;
   fPx_out     = fPy_out = fPz_out = 0.;
-  fCrystalType = fCrystalNb = -1;
+  fCrystalType = fCrystalCopy = fCrystalId = -1;
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Standard constructor   ------------------------------------------
-R3BCaloPoint::R3BCaloPoint(Int_t trackID, Int_t detID, Int_t volid, Int_t copy,
+R3BCaloPoint::R3BCaloPoint(Int_t trackID, Int_t detID, Int_t volid, Int_t copy, Int_t ident,
 			 TVector3 posIn, TVector3 posOut, TVector3 momIn, TVector3 momOut,
 			 Double_t tof, Double_t length, Double_t eLoss) 
   : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss) {
@@ -33,7 +33,8 @@ R3BCaloPoint::R3BCaloPoint(Int_t trackID, Int_t detID, Int_t volid, Int_t copy,
   fPy_out = momOut.Py();
   fPz_out = momOut.Pz();
   fCrystalType = volid;
-  fCrystalNb = copy;
+  fCrystalCopy = copy;
+  fCrystalId = ident;
 }
 // -------------------------------------------------------------------------
 
