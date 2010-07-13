@@ -1,11 +1,13 @@
 // -------------------------------------------------------------------------
-// -----                        R3BCalo source file                     -----
+// -----                        R3BCalo source file                    -----
 // -----                  Created 26/03/09  by D.Bertini               -----
+// -----			Last modification 09/07/10 by H.Alvarez			   -----
 // -------------------------------------------------------------------------
 #include "R3BCalo.h"
 
 #include "R3BGeoCalo.h"
 #include "R3BCaloPoint.h"
+#include "R3BCaloCrystalHit.h"
 #include "R3BGeoCaloPar.h"
 
 #include "FairGeoInterface.h"
@@ -51,6 +53,7 @@ using std::endl;
 R3BCalo::R3BCalo() : R3BDetector("R3BCalo", kTRUE, kCALIFA) {
   ResetParameters();
   fCaloCollection = new TClonesArray("R3BCaloPoint");
+  fCaloCrystalHitCollection = new TClonesArray("R3BCaloCrystalHit");
   fPosIndex = 0;
   kGeoSaved = kFALSE;
   flGeoPar = new TList();
@@ -66,6 +69,7 @@ R3BCalo::R3BCalo(const char* name, Bool_t active)
   : R3BDetector(name, active, kCALIFA) {
   ResetParameters();
   fCaloCollection = new TClonesArray("R3BCaloPoint");
+  fCaloCrystalHitCollection = new TClonesArray("R3BCaloCrystalHit");
   fPosIndex = 0;
   kGeoSaved = kFALSE;
   flGeoPar = new TList();
@@ -84,6 +88,10 @@ R3BCalo::~R3BCalo() {
     fCaloCollection->Delete();
     delete fCaloCollection;
   }
+  if (fCaloCrystalHitCollection) {
+	fCaloCrystalHitCollection->Delete();
+	delete fCaloCrystalHitCollection;
+  }
 }
 // -------------------------------------------------------------------------
 void R3BCalo::Initialize()
@@ -95,12 +103,19 @@ void R3BCalo::Initialize()
    cout << "-I- R3BCalo: Vol (McId) def." << endl;
     Char_t buffer[126];
 
-    for (Int_t i=0;i<30;i++ ) {
+	//HAPOL TODO -> Check the VolId() datamember to asign dinamically different crystal logical
+	//	volumenes in different geometries. Setting now a fixed number, maybe not using all
+	for (Int_t i=0;i<30;i++ ) {
      sprintf(buffer,"crystalLog%i",i+1);
      cout << "-I- R3BCalo: Crystal Nb   : " << i << " connected to (McId) ---> " <<  gMC->VolId(buffer)<< endl;
      fCrystalType[i] = gMC->VolId(buffer);
     }
-
+	for (Int_t i=0;i<24;i++ ) {
+		sprintf(buffer,"Alveolus_%i",i+1);
+		cout << "-I- R3BCalo: Alveolus_ Nb   : " << i+1 << " connected to (McId) ---> " <<  gMC->VolId(buffer)<< endl;
+		fAlveolusType[i] = gMC->VolId(buffer);
+    }
+	
   TGeoVolume *vol = gGeoManager->GetVolume("CalifaWorld");
   vol->SetVisibility(kFALSE);
 
@@ -124,15 +139,38 @@ void R3BCalo::SetSpecialPhysicsCuts(){
 
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BCalo::ProcessHits(FairVolume* vol) {
-
-
+	
+	
+	//TODO HAPOL: ensure a working system also for v4.0b! NEVER TESTED!
+	
+	//The present scheme here done works nicely with 7.05
+	// crystalType = alveolus type (from 1 to 24)   [Basically the alveolus number]
+	// crystalCopy = (alveolus copy - 1) * 4 + crystals copy (from 1 to 160)  [Not exactly azimuthal]
+	// crystalId = (alveolus type-1)*160 + (alvelous copy-1)*4 + (crystal copy)  (from 1 to 3840)
+	//				crystalID is asingle identifier per crystal!
+	
    // Getting the Infos from Crystal Volumes
-   Int_t cp1=-1;
-   Int_t volId1=-1;
+   Int_t cp1 = -1; Int_t volId1 = -1; Int_t cpAlv = -1; Int_t volIdAlv = -1; Int_t cpCry = -1; Int_t volIdCry = -1;
    // Crystals Ids
    volId1 =  gMC->CurrentVolID(cp1);
-   Int_t fType = GetCrystalType(volId1);
+   volIdCry =  gMC->CurrentVolOffID(1,cpCry);
+   volIdAlv =  gMC->CurrentVolOffID(2,cpAlv);
+	
+	Int_t crystalType = 0;
+	Int_t crystalCopy = 0;
+	Int_t crystalId = 0;
 
+	if(geometryVersion==0) crystalType = GetCrystalType(volIdAlv);
+	else {
+	  crystalType = GetAlveolusType(volIdAlv);
+	  crystalCopy = cpAlv * 4 + cpCry;
+	  crystalId = (crystalType-1)*160 + cpAlv * 4 + cpCry;
+	}
+		
+	if (fVerboseLevel>1) 
+		cout << "-I- R3BCalo: Processing Points in Alveolus Nb " << volIdAlv << ", copy Nb " << cpAlv 
+		<< ", crystal copy Nb " << cpCry << " and unique crystal identifier " << crystalId << endl;
+	
     if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
     fTime   = gMC->TrackTime() * 1.0e09;
@@ -194,7 +232,7 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol) {
       fPosOut.SetZ(newpos[2]);
     }
 
-    AddHit(fTrackID, fVolumeID, fType , cp1 ,
+    AddHit(fTrackID, fVolumeID, crystalType , crystalCopy , crystalId,
 	   TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
 	   TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
 	   TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
@@ -205,6 +243,27 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol) {
     FairStack* stack = (FairStack*) gMC->GetStack();
     stack->AddPoint(kCALIFA);
     
+	//Adding a crystalHit support
+	Int_t nCrystalHits = fCaloCrystalHitCollection->GetEntriesFast();
+	Bool_t existHit = 0;
+	  	  
+	if(nCrystalHits==0) AddCrystalHit(crystalType , crystalCopy , crystalId, fELoss, fTime);
+	else {
+	  for(Int_t i=0;i<nCrystalHits;i++) {
+		if( ((R3BCaloCrystalHit *)(fCaloCrystalHitCollection->At(i)))->GetCrystalId() == crystalId ) {
+		  ((R3BCaloCrystalHit *)(fCaloCrystalHitCollection->At(i)))->AddMoreEnergy(fELoss);
+		  if( ((R3BCaloCrystalHit *)(fCaloCrystalHitCollection->At(i)))->GetTime() > fTime ) {
+		    ((R3BCaloCrystalHit *)(fCaloCrystalHitCollection->At(i)))->SetTime(fTime);
+		  }	
+		  existHit=1; //to avoid the creation of a new CrystalHit
+		  break;      
+		}
+	  } 
+	  if(!existHit) AddCrystalHit(crystalType , crystalCopy , crystalId, fELoss, fTime);	
+	}
+	 
+	existHit=0;
+	
     ResetParameters();
   }
 
@@ -239,8 +298,60 @@ void R3BCalo::BeginEvent() {
 // -----   Public method EndOfEvent   -----------------------------------------
 void R3BCalo::EndOfEvent() {
 
+/*
+	Int_t nHits = fCaloCollection->GetEntriesFast();
+	if(nHits>0) {
+	  //Int_t* detectorIdArray = new Int_t[nHits];	
+	  Int_t* takeHitFromPointArray = new Int_t[nHits];			
+	  Int_t* crystalTypesArray = new Int_t[nHits];			
+	  Int_t* crystalCopyArray = new Int_t[nHits];	
+	  Int_t* crystalIdArray = new Int_t[nHits];			
+	  Double_t* crystalEnergyArray = new Double_t[nHits];	
+	  Double_t* crystalTimeArray = new Double_t[nHits];			
+	  Double_t* accumulatedEnergyArray = new Double_t[nHits];			
+
+	  for(Int_t i=0;i<nHits;i++){
+		//detectorIdArray[i] = ((R3BCaloPoint *)(fCaloCollection->At(i)))->GetDetectorID();
+		crystalTypesArray[i] = ((R3BCaloPoint *)(fCaloCollection->At(i)))->GetCrystalType();
+		crystalCopyArray[i] = ((R3BCaloPoint *)(fCaloCollection->At(i)))->GetCrystalCopy();
+		crystalIdArray[i] = ((R3BCaloPoint *)(fCaloCollection->At(i)))->GetCrystalId();
+		crystalEnergyArray[i] = ((R3BCaloPoint *)(fCaloCollection->At(i)))->GetEnergyLoss();
+		crystalTimeArray[i] = ((R3BCaloPoint *)(fCaloCollection->At(i)))->GetTime();
+		accumulatedEnergyArray[i] = ((R3BCaloPoint *)(fCaloCollection->At(i)))->GetEnergyLoss();
+		takeHitFromPointArray[i] = 0;
+	  } 
+	
+	
+	  if (fVerboseLevel>1) 
+	    for(Int_t i=0;i<nHits;i++){
+		  cout << "  TEST Points " << crystalTypesArray[i] << "  " 
+			   << crystalCopyArray[i] << "  " << crystalEnergyArray[i]<< "  " << crystalTimeArray[i] << endl;
+	    }
+	
+	  takeHitFromPointArray[0] = 1;
+
+	  for (Int_t i=1;i<nHits;i++) {
+	    for(Int_t j=0;j<i;j++){
+		  if(crystalIdArray[i]==crystalIdArray[j]){
+			accumulatedEnergyArray[j] += crystalEnergyArray[i];
+			if(crystalTimeArray[i]<crystalTimeArray[j]) crystalTimeArray[j]=crystalTimeArray[i];
+		  }
+		  else takeHitFromPointArray[i] = 1;
+		}
+	  }
+			
+	  for (Int_t i=1;i<nHits;i++) {
+		if(takeHitFromPointArray[i]==1)
+		  AddCrystalHit(crystalTypesArray[i], crystalCopyArray[i], crystalIdArray[i],
+						accumulatedEnergyArray[i], crystalTimeArray[i]);
+	  }
+	}
+	*/
+	
   if (fVerboseLevel) Print();
+
   fCaloCollection->Clear();
+  fCaloCrystalHitCollection->Clear();
 
   ResetParameters();
 }
@@ -251,6 +362,8 @@ void R3BCalo::EndOfEvent() {
 // -----   Public method Register   -------------------------------------------
 void R3BCalo::Register() {
   FairRootManager::Instance()->Register("CrystalPoint", GetName(), fCaloCollection, kTRUE);
+  FairRootManager::Instance()->Register("CrystalHit", GetName(), fCaloCrystalHitCollection, kTRUE);
+
 }
 // ----------------------------------------------------------------------------
 
@@ -258,6 +371,7 @@ void R3BCalo::Register() {
 
 // -----   Public method GetCollection   --------------------------------------
 TClonesArray* R3BCalo::GetCollection(Int_t iColl) const {
+	//HAPOL TODO -- DO I NEED TO RETURN A fCaloCrystalHitColletion????
   if (iColl == 0) return fCaloCollection;
   else return NULL;
 }
@@ -270,6 +384,9 @@ void R3BCalo::Print() const {
   Int_t nHits = fCaloCollection->GetEntriesFast();
   cout << "-I- R3BCalo: " << nHits << " points registered in this event." 
        << endl;
+  Int_t nCrystalHits = fCaloCrystalHitCollection->GetEntriesFast();
+  cout << "-I- R3BCalo: " << nCrystalHits << " hits registered in this event." 
+	<< endl;
 }
 // ----------------------------------------------------------------------------
 
@@ -278,6 +395,7 @@ void R3BCalo::Print() const {
 // -----   Public method Reset   ----------------------------------------------
 void R3BCalo::Reset() {
   fCaloCollection->Clear();
+  fCaloCrystalHitCollection->Clear();
   ResetParameters();
 }
 // ----------------------------------------------------------------------------
@@ -302,26 +420,70 @@ void R3BCalo::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
 }
 
 // -----   Private method AddHit   --------------------------------------------
-R3BCaloPoint* R3BCalo::AddHit(Int_t trackID, Int_t detID, Int_t volid , Int_t copy, TVector3 posIn,
-			    TVector3 posOut, TVector3 momIn, 
-			    TVector3 momOut, Double_t time, 
-			    Double_t length, Double_t eLoss) {
+R3BCaloPoint* R3BCalo::AddHit(Int_t trackID, Int_t detID, Int_t volid , Int_t copy, Int_t ident, 
+							  TVector3 posIn, TVector3 posOut, TVector3 momIn, TVector3 momOut, 
+							  Double_t time, Double_t length, Double_t eLoss) {
   TClonesArray& clref = *fCaloCollection;
   Int_t size = clref.GetEntriesFast();
   if (fVerboseLevel>1) 
     cout << "-I- R3BCalo: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
 	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
 	 << trackID << ", energy loss " << eLoss*1e06 << " keV" << endl;
-  return new(clref[size]) R3BCaloPoint(trackID, detID, volid, copy , posIn, posOut,
+  return new(clref[size]) R3BCaloPoint(trackID, detID, volid, copy , ident, posIn, posOut,
 				      momIn, momOut, time, length, eLoss);
 }
+
+// -----   Private method AddHit   --------------------------------------------
+R3BCaloCrystalHit* R3BCalo::AddCrystalHit(Int_t type, Int_t copy, Int_t ident,
+									 Double_t energy, Double_t time) {
+	TClonesArray& clref = *fCaloCrystalHitCollection;
+	Int_t size = clref.GetEntriesFast();
+	if (fVerboseLevel>1) 
+		cout << "-I- R3BCalo: Adding Hit in detector type " << type << ", and copy " << copy 
+		<< " with unique identifier " << ident << ", depositing " << energy*1e06 << " keV" << endl;
+	return new(clref[size]) R3BCaloCrystalHit(type, copy, ident, energy, time);
+}
+
+
+
+// -----  Public method SelectGeometryVersion  ----------------------------------
+void R3BCalo::SelectGeometryVersion(Int_t version)
+{	
+	geometryVersion=version;
+}
+
+
 // -----   Public method ConstructGeometry   ----------------------------------
 void R3BCalo::ConstructGeometry() {
 
+	//Switch between different geometries of CALIFA calorimeter
+	if (geometryVersion==0)	{
+		cout << "-I- R3BCalo: Constructing old (v5) geometry translated from R3BSim ... " << endl;
+		ConstructOldGeometry();
+	}
+	else if (geometryVersion==1) {
+		cout << "-I- R3BCalo: Constructing CALIFA v7.05 geometry ... " << endl;
+		ConstructV705Geometry();
+	}
+	else if (geometryVersion==2) {
+		cout << "-I- R3BCalo: Constructing an user defined geometry ... " << endl;
+		ConstructUserDefinedGeometry();
+	}
+	else 
+		cout << "-E- R3BCalo: Selected a wrong geometry version ... " << endl;
+	
+}
+
+	
+	
+	
+// -----   Public method ConstructOldGeometry   ----------------------------------
+void R3BCalo::ConstructOldGeometry() {
+	
   // out-of-file geometry definition
    Double_t h1, bl1, tl1, alpha1, h2, bl2, tl2, alpha2;
    Double_t rmin, rmax, rmin1, rmax1, rmin2, rmax2;
-   Double_t a;
+   Double_t aMat;
    Double_t thx, phx, thy, phy, thz, phz;
    Double_t phi1, phi2;
    Double_t z, density, w;
@@ -333,20 +495,20 @@ void R3BCalo::ConstructGeometry() {
 
 
   // Mixture: CsI
-  TGeoMedium * pMed9=NULL;
-   if (gGeoManager->GetMedium("CsIn") ){
-       pMed9=gGeoManager->GetMedium("CsIn");
+  TGeoMedium * pCsIMedium=NULL;
+   if (gGeoManager->GetMedium("CsI") ){
+       pCsIMedium=gGeoManager->GetMedium("CsI");
    }else{
        nel     = 2;
        density = 4.510000;
        TGeoMixture*
-	   pMat9 = new TGeoMixture("CsIn", nel,density);
-       a = 132.905450;   z = 55.000000;   w = 0.511549;  // CS
-       pMat9->DefineElement(0,a,z,w);
-       a = 126.904470;   z = 53.000000;   w = 0.488451;  // I
-       pMat9->DefineElement(1,a,z,w);
+	   pCsIMaterial = new TGeoMixture("CsIn", nel,density);
+       aMat = 132.905450;   z = 55.000000;   w = 0.511549;  // CS
+       pCsIMaterial->DefineElement(0,aMat,z,w);
+       aMat = 126.904470;   z = 53.000000;   w = 0.488451;  // I
+       pCsIMaterial->DefineElement(1,aMat,z,w);
        numed = 801;
-       pMat9->SetIndex(numed);
+       pCsIMaterial->SetIndex(numed);
        Double_t par[8];
        par[0]  = 0.000000; // isvol
        par[1]  = 0.000000; // ifield
@@ -356,27 +518,27 @@ void R3BCalo::ConstructGeometry() {
        par[5]  = 0.000000; // deemax
        par[6]  = 0.000100; // epsil
        par[7]  = 0.000000; // stmin
-       pMed9 = new TGeoMedium("CsIn", numed,pMat9, par);
+       pCsIMedium = new TGeoMedium("CsIn", numed,pCsIMaterial, par);
   }
 
    // Mixture: CarbonFibre
-   TGeoMedium * pMed19=NULL;
+   TGeoMedium * pCarbonFibreMedium=NULL;
    if (gGeoManager->GetMedium("CarbonFibre") ){
-       pMed19=gGeoManager->GetMedium("CarbonFibre");
+       pCarbonFibreMedium=gGeoManager->GetMedium("CarbonFibre");
    }else{
       nel     = 3;
       density = 1.690000;
       TGeoMixture*
-	  pMat19 = new TGeoMixture("CarbonFibre", nel,density);
-      a = 12.010700;   z = 6.000000;   w = 0.844907;  // C
-      pMat19->DefineElement(0,a,z,w);
-      a = 1.007940;   z = 1.000000;   w = 0.042543;  // H
-      pMat19->DefineElement(1,a,z,w);
-      a = 15.999400;   z = 8.000000;   w = 0.112550;  // O
-      pMat19->DefineElement(2,a,z,w);
+	  pCarbonFibreMaterial = new TGeoMixture("CarbonFibre", nel,density);
+      aMat = 12.010700;   z = 6.000000;   w = 0.844907;  // C
+      pCarbonFibreMaterial->DefineElement(0,aMat,z,w);
+      aMat = 1.007940;   z = 1.000000;   w = 0.042543;  // H
+      pCarbonFibreMaterial->DefineElement(1,aMat,z,w);
+      aMat = 15.999400;   z = 8.000000;   w = 0.112550;  // O
+      pCarbonFibreMaterial->DefineElement(2,aMat,z,w);
       // Medium: CarbonFibre
       numed   = 802;  // medium number
-      pMat19->SetIndex(numed);
+      pCarbonFibreMaterial->SetIndex(numed);
       Double_t par[8];
       par[0]  = 0.000000; // isvol
       par[1]  = 0.000000; // ifield
@@ -386,23 +548,23 @@ void R3BCalo::ConstructGeometry() {
       par[5]  = 0.000000; // deemax
       par[6]  = 0.000100; // epsil
       par[7]  = 0.000000; // stmin
-      pMed19 = new TGeoMedium("CarbonFibre", numed,pMat19,par);
+      pCarbonFibreMedium = new TGeoMedium("CarbonFibre", numed,pCarbonFibreMaterial,par);
    }
 
   // Mixture: Air
-  TGeoMedium * pMed2=NULL;
+  TGeoMedium * pAirMedium=NULL;
    if (gGeoManager->GetMedium("Air") ){
-       pMed2=gGeoManager->GetMedium("Air");
+       pAirMedium=gGeoManager->GetMedium("Air");
   }else{
     nel     = 2;
     density = 0.001290;
     TGeoMixture*
-	pMat2 = new TGeoMixture("Air", nel,density);
-    a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
-    pMat2->DefineElement(0,a,z,w);
-    a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
-    pMat2->DefineElement(1,a,z,w);
-    pMat2->SetIndex(1);
+	pAirMaterial = new TGeoMixture("Air", nel,density);
+    aMat = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+    pAirMaterial->DefineElement(0,aMat,z,w);
+    aMat = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+    pAirMaterial->DefineElement(1,aMat,z,w);
+    pAirMaterial->SetIndex(1);
     // Medium: Air
     numed   = 1;  // medium number
     Double_t par[8];
@@ -414,7 +576,7 @@ void R3BCalo::ConstructGeometry() {
     par[5]  = 0.000000; // deemax
     par[6]  = 0.000100; // epsil
     par[7]  = 0.000000; // stmin
-    pMed2 = new TGeoMedium("Air", numed,pMat2, par);
+    pAirMedium = new TGeoMedium("Air", numed,pAirMaterial, par);
   }
 
 
@@ -439,10 +601,10 @@ void R3BCalo::ConstructGeometry() {
 				      length/2.0);
 
    TGeoVolume*
-       pWorld  = new TGeoVolume("CalifaWorld",pCBWorld, pMed2);
+       pWorld  = new TGeoVolume("CalifaWorld",pCBWorld, pAirMedium);
 
-   TGeoCombiTrans *t0 = new TGeoCombiTrans();
-   TGeoCombiTrans *pGlobalc = GetGlobalPosition(t0);
+   TGeoCombiTrans *t00 = new TGeoCombiTrans();
+   TGeoCombiTrans *pGlobalc = GetGlobalPosition(t00);
 
    // add the sphere as Mother Volume
    pAWorld->AddNodeOverlap(pWorld, 0, pGlobalc);
@@ -464,7 +626,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap1_2 = new TGeoTrap("testTrap1", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog1
    TGeoVolume*
-   pcrystalLog1  = new TGeoVolume("crystalLog1",ptestTrap1_2, pMed9);
+   pcrystalLog1  = new TGeoVolume("crystalLog1",ptestTrap1_2, pCsIMedium);
    pcrystalLog1->SetVisLeaves(kTRUE);
    Double_t fac= TMath::RadToDeg();
 
@@ -549,7 +711,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap2_3 = new TGeoTrap("testTrap2", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog2
    TGeoVolume*
-   pcrystalLog2 = new TGeoVolume("crystalLog2",ptestTrap2_3, pMed9);
+   pcrystalLog2 = new TGeoVolume("crystalLog2",ptestTrap2_3, pCsIMedium);
    pcrystalLog2->SetVisLeaves(kTRUE);
 
   //code here
@@ -634,7 +796,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap3_4 = new TGeoTrap("testTrap3", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog3
    TGeoVolume*
-   pcrystalLog3 = new TGeoVolume("crystalLog3",ptestTrap3_4, pMed9);
+   pcrystalLog3 = new TGeoVolume("crystalLog3",ptestTrap3_4, pCsIMedium);
    pcrystalLog3->SetVisLeaves(kTRUE);
 
    // code here
@@ -718,7 +880,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap4_5 = new TGeoTrap("testTrap4", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog4
    TGeoVolume*
-   pcrystalLog4 = new TGeoVolume("crystalLog4",ptestTrap4_5, pMed9);
+   pcrystalLog4 = new TGeoVolume("crystalLog4",ptestTrap4_5, pCsIMedium);
    pcrystalLog4->SetVisLeaves(kTRUE);
 
    // code here
@@ -800,7 +962,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap5_6 = new TGeoTrap("testTrap5", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog5
    TGeoVolume*
-   pcrystalLog5 = new TGeoVolume("crystalLog5",ptestTrap5_6, pMed9);
+   pcrystalLog5 = new TGeoVolume("crystalLog5",ptestTrap5_6, pCsIMedium);
    pcrystalLog5->SetVisLeaves(kTRUE);
 
    // code here
@@ -881,7 +1043,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap6_7 = new TGeoTrap("testTrap6", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog6
    TGeoVolume*
-   pcrystalLog6 = new TGeoVolume("crystalLog6",ptestTrap6_7, pMed9);
+   pcrystalLog6 = new TGeoVolume("crystalLog6",ptestTrap6_7, pCsIMedium);
    pcrystalLog6->SetVisLeaves(kTRUE);
 
    // code here
@@ -967,7 +1129,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap7_8 = new TGeoTrap("testTrap7", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog7
    TGeoVolume*
-   pcrystalLog7 = new TGeoVolume("crystalLog7",ptestTrap7_8, pMed9);
+   pcrystalLog7 = new TGeoVolume("crystalLog7",ptestTrap7_8, pCsIMedium);
    pcrystalLog7->SetVisLeaves(kTRUE);
 
    // code here
@@ -1051,7 +1213,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap8_9 = new TGeoTrap("testTrap8", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog8
    TGeoVolume*
-   pcrystalLog8 = new TGeoVolume("crystalLog8",ptestTrap8_9, pMed9);
+   pcrystalLog8 = new TGeoVolume("crystalLog8",ptestTrap8_9, pCsIMedium);
    pcrystalLog8->SetVisLeaves(kTRUE);
 
    Double_t fullOrientedCrystalCentersX8[64] = {-68.987,-116.541009134,-162.972664642,-207.834804300,-250.695381179,-291.141624492,-328.784014808,-363.260035329,-394.237663132,-421.418566727,-444.540979154,-463.382218940,-477.760834647,-487.538352346,-492.620609197,-492.958660287,-488.549250000,-479.434843367,-465.703217107,-447.486614287,-424.960470750,-398.341725573,-367.886731823,-333.888787738,-296.675312105,-256.604691037,-214.062826520,-169.459419965,-123.224026560,-75.801918418,-27.649796364,20.768608344,68.987000000,116.541009134,162.972664643,207.834804300,250.695381179,291.141624492,328.784014808,363.260035329,394.237663132,421.418566727,444.540979154,463.382218940,477.760834647,487.538352346,492.620609197,492.958660287,488.549250000,479.434843367,465.703217107,447.486614287,424.960470750,398.341725573,367.886731823,333.888787738,296.675312105,256.604691037,214.062826520,169.459419965,123.224026560,75.801918418,27.649796364,-20.768608344};
@@ -1131,7 +1293,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap9_10 = new TGeoTrap("testTrap9", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog9
    TGeoVolume*
-   pcrystalLog9 = new TGeoVolume("crystalLog9",ptestTrap9_10, pMed9);
+   pcrystalLog9 = new TGeoVolume("crystalLog9",ptestTrap9_10, pCsIMedium);
    pcrystalLog9->SetVisLeaves(kTRUE);
 
 
@@ -1217,7 +1379,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap10_11 = new TGeoTrap("testTrap10", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog10
    TGeoVolume*
-   pcrystalLog10 = new TGeoVolume("crystalLog10",ptestTrap10_11, pMed9);
+   pcrystalLog10 = new TGeoVolume("crystalLog10",ptestTrap10_11, pCsIMedium);
    pcrystalLog10->SetVisLeaves(kTRUE);
 
 
@@ -1299,7 +1461,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap11_12 = new TGeoTrap("testTrap11", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog11
    TGeoVolume*
-   pcrystalLog11 = new TGeoVolume("crystalLog11",ptestTrap11_12, pMed9);
+   pcrystalLog11 = new TGeoVolume("crystalLog11",ptestTrap11_12, pCsIMedium);
    pcrystalLog11->SetVisLeaves(kTRUE);
 
 
@@ -1384,7 +1546,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap12_13 = new TGeoTrap("testTrap12", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog12
    TGeoVolume*
-   pcrystalLog12 = new TGeoVolume("crystalLog12",ptestTrap12_13, pMed9);
+   pcrystalLog12 = new TGeoVolume("crystalLog12",ptestTrap12_13, pCsIMedium);
    pcrystalLog12->SetVisLeaves(kTRUE);
 
 
@@ -1466,7 +1628,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap13_14 = new TGeoTrap("testTrap13", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog13
    TGeoVolume*
-   pcrystalLog13 = new TGeoVolume("crystalLog13",ptestTrap13_14, pMed9);
+   pcrystalLog13 = new TGeoVolume("crystalLog13",ptestTrap13_14, pCsIMedium);
    pcrystalLog13->SetVisLeaves(kTRUE);
 
 
@@ -1548,7 +1710,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap14_15 = new TGeoTrap("testTrap14", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog14
    TGeoVolume*
-   pcrystalLog14 = new TGeoVolume("crystalLog14",ptestTrap14_15, pMed9);
+   pcrystalLog14 = new TGeoVolume("crystalLog14",ptestTrap14_15, pCsIMedium);
    pcrystalLog14->SetVisLeaves(kTRUE);
 
   Double_t fullOrientedCrystalCentersX14[64] = {-65.019875,-104.698257618,-143.368338782,-180.657704469,-216.207237706,-249.674577052,-280.737413735,-309.096595657,-334.479008394,-356.640205435,-375.366762338,-390.478332124,-401.829382114,-409.310595492,-412.849924084,-412.413282220,-408.004875000,-399.667157796,-387.480427382,-371.562048633,-352.065324240,-329.178018316,-303.120548129,-274.143861361,-242.527019345,-208.574509555,-172.613313219,-134.989756316,-96.066174268,-56.217422446,-15.827266114,24.715315442,65.019875000,104.698257618,143.368338782,180.657704469,216.207237706,249.674577052,280.737413735,309.096595657,334.479008394,356.640205435,375.366762339,390.478332124,401.829382114,409.310595492,412.849924084,412.413282220,408.004875000,399.667157796,387.480427382,371.562048633,352.065324240,329.178018316,303.120548129,274.143861361,242.527019345,208.574509555,172.613313219,134.989756316,96.066174268,56.217422446,15.827266114,-24.715315442};
@@ -1629,7 +1791,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap15_16 = new TGeoTrap("testTrap15", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog15
    TGeoVolume*
-   pcrystalLog15 = new TGeoVolume("crystalLog15",ptestTrap15_16, pMed9);
+   pcrystalLog15 = new TGeoVolume("crystalLog15",ptestTrap15_16, pCsIMedium);
    pcrystalLog15->SetVisLeaves(kTRUE);
 
    Double_t fullOrientedCrystalCentersX15[64] = {-64.160625,-102.132427487,-139.120638867,-174.769042443,-208.734324601,-240.689381108,-270.326467301,-297.360161838,-321.530115464,-342.603558311,-360.377541605,-374.680892171,-385.375860924,-392.359449469,-395.564402030,-394.959853161,-390.551625000,-382.382171193,-370.530168046,-355.109756828,-336.269444529,-314.190673656,-289.086074841,-261.197419095,-230.793289418,-198.166494200,-163.631247314,-127.520142066,-90.180948140,-51.973262386,-13.265045704,25.570920620,64.160625000,102.132427487,139.120638867,174.769042443,208.734324601,240.689381109,270.326467301,297.360161839,321.530115464,342.603558311,360.377541605,374.680892171,385.375860924,392.359449469,395.564402030,394.959853161,390.551625000,382.382171193,370.530168046,355.109756828,336.269444529,314.190673656,289.086074841,261.197419095,230.793289418,198.166494200,163.631247313,127.520142066,90.180948140,51.973262386,13.265045704,-25.570920620};
@@ -1709,7 +1871,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap16_17 = new TGeoTrap("testTrap16", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog16
    TGeoVolume*
-   pcrystalLog16 = new TGeoVolume("crystalLog16",ptestTrap16_17, pMed9);
+   pcrystalLog16 = new TGeoVolume("crystalLog16",ptestTrap16_17, pCsIMedium);
    pcrystalLog16->SetVisLeaves(kTRUE);
 
 
@@ -1791,7 +1953,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap17_18 = new TGeoTrap("testTrap17", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog17
    TGeoVolume*
-   pcrystalLog17 = new TGeoVolume("crystalLog17",ptestTrap17_18, pMed9);
+   pcrystalLog17 = new TGeoVolume("crystalLog17",ptestTrap17_18, pCsIMedium);
    pcrystalLog17->SetVisLeaves(kTRUE);
 
 
@@ -1875,7 +2037,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap18_19 = new TGeoTrap("testTrap18", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog18
    TGeoVolume*
-   pcrystalLog18 = new TGeoVolume("crystalLog18",ptestTrap18_19, pMed9);
+   pcrystalLog18 = new TGeoVolume("crystalLog18",ptestTrap18_19, pCsIMedium);
    pcrystalLog18->SetVisLeaves(kTRUE);
 
   Double_t fullOrientedCrystalCentersX18[64] = {-61.48575,-94.146595008,-125.900756841,-156.442425560,-185.477468202,-212.726261432,-237.926384477,-260.835146375,-281.231923227,-298.920282921,-313.729876884,-325.518080631,-334.171367315,-339.606401055,-341.770839505,-340.643837940,-336.236250000,-328.590523168,-317.780289971,-303.909658866,-287.112211612,-267.549716808,-245.410571975,-220.907989178,-194.277941684,-165.776891409,-135.679319047,-104.275080673,-71.866616269,-38.766037065,-5.292119731,28.232763608,61.485750000,94.146595008,125.900756841,156.442425560,185.477468202,212.726261432,237.926384477,260.835146375,281.231923227,298.920282921,313.729876884,325.518080631,334.171367315,339.606401055,341.770839505,340.643837940,336.236250000,328.590523167,317.780289971,303.909658866,287.112211612,267.549716808,245.410571975,220.907989178,194.277941684,165.776891409,135.679319047,104.275080673,71.866616269,38.766037065,5.292119731,-28.232763608};
@@ -1956,7 +2118,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap19_20 = new TGeoTrap("testTrap19", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog19
    TGeoVolume*
-   pcrystalLog19 = new TGeoVolume("crystalLog19",ptestTrap19_20, pMed9);
+   pcrystalLog19 = new TGeoVolume("crystalLog19",ptestTrap19_20, pCsIMedium);
    pcrystalLog19->SetVisLeaves(kTRUE);
 
 
@@ -2039,7 +2201,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap20_21 = new TGeoTrap("testTrap20", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog20
    TGeoVolume*
-   pcrystalLog20 = new TGeoVolume("crystalLog20",ptestTrap20_21, pMed9);
+   pcrystalLog20 = new TGeoVolume("crystalLog20",ptestTrap20_21, pCsIMedium);
    pcrystalLog20->SetVisLeaves(kTRUE);
 
 
@@ -2123,7 +2285,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap21_22 = new TGeoTrap("testTrap21", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog21
    TGeoVolume*
-   pcrystalLog21 = new TGeoVolume("crystalLog21",ptestTrap21_22, pMed9);
+   pcrystalLog21 = new TGeoVolume("crystalLog21",ptestTrap21_22, pCsIMedium);
    pcrystalLog21->SetVisLeaves(kTRUE);
 
 
@@ -2208,7 +2370,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap22_23 = new TGeoTrap("testTrap22", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog22
    TGeoVolume*
-   pcrystalLog22 = new TGeoVolume("crystalLog22",ptestTrap22_23, pMed9);
+   pcrystalLog22 = new TGeoVolume("crystalLog22",ptestTrap22_23, pCsIMedium);
    pcrystalLog22->SetVisLeaves(kTRUE);
 
 
@@ -2290,7 +2452,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap23_24 = new TGeoTrap("testTrap23", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog23
    TGeoVolume*
-   pcrystalLog23 = new TGeoVolume("crystalLog23",ptestTrap23_24, pMed9);
+   pcrystalLog23 = new TGeoVolume("crystalLog23",ptestTrap23_24, pCsIMedium);
    pcrystalLog23->SetVisLeaves(kTRUE);
 
 
@@ -2373,7 +2535,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap24_25 = new TGeoTrap("testTrap24", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog24
    TGeoVolume*
-   pcrystalLog24 = new TGeoVolume("crystalLog24",ptestTrap24_25, pMed9);
+   pcrystalLog24 = new TGeoVolume("crystalLog24",ptestTrap24_25, pCsIMedium);
    pcrystalLog24->SetVisLeaves(kTRUE);
 
 
@@ -2455,7 +2617,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap25_26 = new TGeoTrap("testTrap25", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog25
    TGeoVolume*
-   pcrystalLog25 = new TGeoVolume("crystalLog25",ptestTrap25_26, pMed9);
+   pcrystalLog25 = new TGeoVolume("crystalLog25",ptestTrap25_26, pCsIMedium);
    pcrystalLog25->SetVisLeaves(kTRUE);
 
 
@@ -2538,7 +2700,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap26_27 = new TGeoTrap("testTrap26", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog26
    TGeoVolume*
-   pcrystalLog26 = new TGeoVolume("crystalLog26",ptestTrap26_27, pMed9);
+   pcrystalLog26 = new TGeoVolume("crystalLog26",ptestTrap26_27, pCsIMedium);
    pcrystalLog26->SetVisLeaves(kTRUE);
 
 
@@ -2620,7 +2782,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap27_28 = new TGeoTrap("testTrap27", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog27
    TGeoVolume*
-   pcrystalLog27 = new TGeoVolume("crystalLog27",ptestTrap27_28, pMed9);
+   pcrystalLog27 = new TGeoVolume("crystalLog27",ptestTrap27_28, pCsIMedium);
    pcrystalLog27->SetVisLeaves(kTRUE);
 
 
@@ -2702,7 +2864,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap28_29 = new TGeoTrap("testTrap28", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog28
    TGeoVolume*
-   pcrystalLog28 = new TGeoVolume("crystalLog28",ptestTrap28_29, pMed9);
+   pcrystalLog28 = new TGeoVolume("crystalLog28",ptestTrap28_29, pCsIMedium);
    pcrystalLog28->SetVisLeaves(kTRUE);
 
 
@@ -2784,7 +2946,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap29_30 = new TGeoTrap("testTrap29", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog29
    TGeoVolume*
-   pcrystalLog29 = new TGeoVolume("crystalLog29",ptestTrap29_30, pMed9);
+   pcrystalLog29 = new TGeoVolume("crystalLog29",ptestTrap29_30, pCsIMedium);
    pcrystalLog29->SetVisLeaves(kTRUE);
 
 
@@ -2865,7 +3027,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *ptestTrap30_31 = new TGeoTrap("testTrap30", ddz,theta,phi,h1,bl1,tl1,alpha1,h2,bl2,tl2,alpha2);
    // Volume: crystalLog30
    TGeoVolume*
-   pcrystalLog30 = new TGeoVolume("crystalLog30",ptestTrap30_31, pMed9);
+   pcrystalLog30 = new TGeoVolume("crystalLog30",ptestTrap30_31, pCsIMedium);
    pcrystalLog30->SetVisLeaves(kTRUE);
 
 
@@ -2965,7 +3127,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *pcarbonFiberProtoZero_32 = new TGeoTubeSeg("carbonFiberProtoZero",rmin,rmax,ddz,phi1,phi2);
    // Volume: carbonFiberTestLog1
    TGeoVolume*
-   pcarbonFiberTestLog1 = new TGeoVolume("carbonFiberTestLog1",pcarbonFiberProtoZero_32, pMed19);
+   pcarbonFiberTestLog1 = new TGeoVolume("carbonFiberTestLog1",pcarbonFiberProtoZero_32, pCarbonFibreMedium);
    pcarbonFiberTestLog1->SetVisLeaves(kTRUE);
    pWorld->AddNode(pcarbonFiberTestLog1, 0, pMatrix9218);
    // Shape: carbonFiberTest2 type: TGeoConeSeg
@@ -2979,7 +3141,7 @@ void R3BCalo::ConstructGeometry() {
    TGeoShape *pcarbonFiberTest2_33 = new TGeoConeSeg("carbonFiberTest2", ddz,rmin1,rmax1,rmin2,rmax2,phi1,phi2);
    // Volume: carbonFiberTestLog2
    TGeoVolume*
-   pcarbonFiberTestLog2 = new TGeoVolume("carbonFiberTestLog2",pcarbonFiberTest2_33, pMed19);
+   pcarbonFiberTestLog2 = new TGeoVolume("carbonFiberTestLog2",pcarbonFiberTest2_33, pCarbonFibreMedium);
    pcarbonFiberTestLog2->SetVisLeaves(kTRUE);
    pWorld->AddNode(pcarbonFiberTestLog2, 0, pMatrix9220);
 
@@ -3029,6 +3191,323 @@ TGeoRotation* R3BCalo::createMatrix( Double_t phi, Double_t theta, Double_t psi)
  return matrix;
 
 }
+
+// -----   Public method ConstructGeometry   ----------------------------------
+void R3BCalo::ConstructV705Geometry() {
+	
+	
+	/****************************************************************************/
+	// Material definition
+	
+	Double_t aMat;
+	Double_t z, density, w;
+	Int_t nel, numed;
+	
+	
+	// Mixture: CsI
+	TGeoMedium * pCsIMedium=NULL;
+	if (gGeoManager->GetMedium("CsI") ){
+		pCsIMedium=gGeoManager->GetMedium("CsI");
+	}else{
+		nel     = 2;
+		density = 4.510000;
+		TGeoMixture*
+		pCsIMaterial = new TGeoMixture("CsIn", nel,density);
+		aMat = 132.905450;   z = 55.000000;   w = 0.511549;  // CS
+		pCsIMaterial->DefineElement(0,aMat,z,w);
+		aMat = 126.904470;   z = 53.000000;   w = 0.488451;  // I
+		pCsIMaterial->DefineElement(1,aMat,z,w);
+		numed = 801;
+		pCsIMaterial->SetIndex(numed);
+		Double_t par[8];
+		par[0]  = 0.000000; // isvol
+		par[1]  = 0.000000; // ifield
+		par[2]  = 0.000000; // fieldm
+		par[3]  = 0.000000; // tmaxfd
+		par[4]  = 0.000000; // stemax
+		par[5]  = 0.000000; // deemax
+		par[6]  = 0.000100; // epsil
+		par[7]  = 0.000000; // stmin
+		pCsIMedium = new TGeoMedium("CsIn", numed,pCsIMaterial, par);
+	}
+	
+	// Mixture: CarbonFibre
+	TGeoMedium * pCarbonFibreMedium=NULL;
+	if (gGeoManager->GetMedium("CarbonFibre") ){
+		pCarbonFibreMedium=gGeoManager->GetMedium("CarbonFibre");
+	}else{
+		nel     = 3;
+		density = 1.690000;
+		TGeoMixture*
+		pCarbonFibreMaterial = new TGeoMixture("CarbonFibre", nel,density);
+		aMat = 12.010700;   z = 6.000000;   w = 0.844907;  // C
+		pCarbonFibreMaterial->DefineElement(0,aMat,z,w);
+		aMat = 1.007940;   z = 1.000000;   w = 0.042543;  // H
+		pCarbonFibreMaterial->DefineElement(1,aMat,z,w);
+		aMat = 15.999400;   z = 8.000000;   w = 0.112550;  // O
+		pCarbonFibreMaterial->DefineElement(2,aMat,z,w);
+		// Medium: CarbonFibre
+		numed   = 802;  // medium number
+		pCarbonFibreMaterial->SetIndex(numed);
+		Double_t par[8];
+		par[0]  = 0.000000; // isvol
+		par[1]  = 0.000000; // ifield
+		par[2]  = 0.000000; // fieldm
+		par[3]  = 0.000000; // tmaxfd
+		par[4]  = 0.000000; // stemax
+		par[5]  = 0.000000; // deemax
+		par[6]  = 0.000100; // epsil
+		par[7]  = 0.000000; // stmin
+		pCarbonFibreMedium = new TGeoMedium("CarbonFibre", numed,pCarbonFibreMaterial,par);
+	}
+	
+	// Mixture: Wrapping component
+	TGeoMedium * pWrappingMedium=NULL;
+	if (gGeoManager->GetMedium("mylar") ){
+		pWrappingMedium=gGeoManager->GetMedium("mylar");
+	}else{ // CARBON FIBER DEFINITION HERE!!! CHANGE IT TO WHATEVER IS USED!!
+		nel     = 3;
+		density = 1.690000;
+		TGeoMixture*
+		pWrappingMaterial = new TGeoMixture("Wrapping", nel,density);
+		aMat = 12.010700;   z = 6.000000;   w = 0.844907;  // C
+		pWrappingMaterial->DefineElement(0,aMat,z,w);
+		aMat = 1.007940;   z = 1.000000;   w = 0.042543;  // H
+		pWrappingMaterial->DefineElement(1,aMat,z,w);
+		aMat = 15.999400;   z = 8.000000;   w = 0.112550;  // O
+		pWrappingMaterial->DefineElement(2,aMat,z,w);
+		// Medium: CarbonFibre
+		numed   = 803;  // medium number
+		pWrappingMaterial->SetIndex(numed);
+		Double_t par[8];
+		par[0]  = 0.000000; // isvol
+		par[1]  = 0.000000; // ifield
+		par[2]  = 0.000000; // fieldm
+		par[3]  = 0.000000; // tmaxfd
+		par[4]  = 0.000000; // stemax
+		par[5]  = 0.000000; // deemax
+		par[6]  = 0.000100; // epsil
+		par[7]  = 0.000000; // stmin
+		pWrappingMedium = new TGeoMedium("Wrapping", numed,pWrappingMaterial,par);
+	}
+	
+	
+	// Mixture: Air
+	TGeoMedium * pAirMedium=NULL;
+	if (gGeoManager->GetMedium("Air") ){
+		pAirMedium=gGeoManager->GetMedium("Air");
+	}else{
+		nel     = 2;
+		density = 0.001290;
+		TGeoMixture*
+		pAirMaterial = new TGeoMixture("Air", nel,density);
+		aMat = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+		pAirMaterial->DefineElement(0,aMat,z,w);
+		aMat = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+		pAirMaterial->DefineElement(1,aMat,z,w);
+		pAirMaterial->SetIndex(1);
+		// Medium: Air
+		numed   = 1;  // medium number
+		Double_t par[8];
+		par[0]  = 0.000000; // isvol
+		par[1]  = 0.000000; // ifield
+		par[2]  = 0.000000; // fieldm
+		par[3]  = 0.000000; // tmaxfd
+		par[4]  = 0.000000; // stemax
+		par[5]  = 0.000000; // deemax
+		par[6]  = 0.000100; // epsil
+		par[7]  = 0.000000; // stmin
+		pAirMedium = new TGeoMedium("Air", numed,pAirMaterial, par);
+	}
+	
+	
+	//WORLD
+	
+	TGeoVolume *pAWorld  =  gGeoManager->GetTopVolume();
+	
+	// Defintion of the Mother Volume
+	
+	Double_t length = 300.;
+	
+	TGeoShape *pCBWorld = new TGeoBBox("Califa_box",
+									   length/2.0,
+									   length/2.0,
+									   length/2.0);
+	
+	TGeoVolume*
+	pWorld  = new TGeoVolume("CalifaWorld",pCBWorld, pAirMedium);
+	
+	TGeoCombiTrans *t0 = new TGeoCombiTrans();
+	TGeoCombiTrans *pGlobalc = GetGlobalPosition(t0);
+	
+	// add the sphere as Mother Volume
+	pAWorld->AddNodeOverlap(pWorld, 0, pGlobalc);
+	
+	
+	//finally the v7.05 code
+	
+#include "perlScripts/CLF705_Geometry.geo"
+
+}
+	
+
+// -----   Public method ConstructGeometry   ----------------------------------
+void R3BCalo::ConstructUserDefinedGeometry() {
+	
+	
+	/****************************************************************************/
+	// Material definition
+	
+	Double_t aMat;
+	Double_t z, density, w;
+	Int_t nel, numed;
+	
+	
+	// Mixture: CsI
+	TGeoMedium * pCsIMedium=NULL;
+	if (gGeoManager->GetMedium("CsI") ){
+		pCsIMedium=gGeoManager->GetMedium("CsI");
+	}else{
+		nel     = 2;
+		density = 4.510000;
+		TGeoMixture*
+		pCsIMaterial = new TGeoMixture("CsIn", nel,density);
+		aMat = 132.905450;   z = 55.000000;   w = 0.511549;  // CS
+		pCsIMaterial->DefineElement(0,aMat,z,w);
+		aMat = 126.904470;   z = 53.000000;   w = 0.488451;  // I
+		pCsIMaterial->DefineElement(1,aMat,z,w);
+		numed = 801;
+		pCsIMaterial->SetIndex(numed);
+		Double_t par[8];
+		par[0]  = 0.000000; // isvol
+		par[1]  = 0.000000; // ifield
+		par[2]  = 0.000000; // fieldm
+		par[3]  = 0.000000; // tmaxfd
+		par[4]  = 0.000000; // stemax
+		par[5]  = 0.000000; // deemax
+		par[6]  = 0.000100; // epsil
+		par[7]  = 0.000000; // stmin
+		pCsIMedium = new TGeoMedium("CsIn", numed,pCsIMaterial, par);
+	}
+	
+	// Mixture: CarbonFibre
+	TGeoMedium * pCarbonFibreMedium=NULL;
+	if (gGeoManager->GetMedium("CarbonFibre") ){
+		pCarbonFibreMedium=gGeoManager->GetMedium("CarbonFibre");
+	}else{
+		nel     = 3;
+		density = 1.690000;
+		TGeoMixture*
+		pCarbonFibreMaterial = new TGeoMixture("CarbonFibre", nel,density);
+		aMat = 12.010700;   z = 6.000000;   w = 0.844907;  // C
+		pCarbonFibreMaterial->DefineElement(0,aMat,z,w);
+		aMat = 1.007940;   z = 1.000000;   w = 0.042543;  // H
+		pCarbonFibreMaterial->DefineElement(1,aMat,z,w);
+		aMat = 15.999400;   z = 8.000000;   w = 0.112550;  // O
+		pCarbonFibreMaterial->DefineElement(2,aMat,z,w);
+		// Medium: CarbonFibre
+		numed   = 802;  // medium number
+		pCarbonFibreMaterial->SetIndex(numed);
+		Double_t par[8];
+		par[0]  = 0.000000; // isvol
+		par[1]  = 0.000000; // ifield
+		par[2]  = 0.000000; // fieldm
+		par[3]  = 0.000000; // tmaxfd
+		par[4]  = 0.000000; // stemax
+		par[5]  = 0.000000; // deemax
+		par[6]  = 0.000100; // epsil
+		par[7]  = 0.000000; // stmin
+		pCarbonFibreMedium = new TGeoMedium("CarbonFibre", numed,pCarbonFibreMaterial,par);
+	}
+	
+	// Mixture: Wrapping component
+	TGeoMedium * pWrappingMedium=NULL;
+	if (gGeoManager->GetMedium("mylar") ){
+		pWrappingMedium=gGeoManager->GetMedium("mylar");
+	}else{ // CARBON FIBER DEFINITION HERE!!! CHANGE IT TO WHATEVER IS USED!!
+		nel     = 3;
+		density = 1.690000;
+		TGeoMixture*
+		pWrappingMaterial = new TGeoMixture("Wrapping", nel,density);
+		aMat = 12.010700;   z = 6.000000;   w = 0.844907;  // C
+		pWrappingMaterial->DefineElement(0,aMat,z,w);
+		aMat = 1.007940;   z = 1.000000;   w = 0.042543;  // H
+		pWrappingMaterial->DefineElement(1,aMat,z,w);
+		aMat = 15.999400;   z = 8.000000;   w = 0.112550;  // O
+		pWrappingMaterial->DefineElement(2,aMat,z,w);
+		// Medium: CarbonFibre
+		numed   = 803;  // medium number
+		pWrappingMaterial->SetIndex(numed);
+		Double_t par[8];
+		par[0]  = 0.000000; // isvol
+		par[1]  = 0.000000; // ifield
+		par[2]  = 0.000000; // fieldm
+		par[3]  = 0.000000; // tmaxfd
+		par[4]  = 0.000000; // stemax
+		par[5]  = 0.000000; // deemax
+		par[6]  = 0.000100; // epsil
+		par[7]  = 0.000000; // stmin
+		pWrappingMedium = new TGeoMedium("Wrapping", numed,pWrappingMaterial,par);
+	}
+	
+	// Mixture: Air
+	TGeoMedium * pAirMedium=NULL;
+	if (gGeoManager->GetMedium("Air") ){
+		pAirMedium=gGeoManager->GetMedium("Air");
+	}else{
+		nel     = 2;
+		density = 0.001290;
+		TGeoMixture*
+		pAirMaterial = new TGeoMixture("Air", nel,density);
+		aMat = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+		pAirMaterial->DefineElement(0,aMat,z,w);
+		aMat = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+		pAirMaterial->DefineElement(1,aMat,z,w);
+		pAirMaterial->SetIndex(1);
+		// Medium: Air
+		numed   = 1;  // medium number
+		Double_t par[8];
+		par[0]  = 0.000000; // isvol
+		par[1]  = 0.000000; // ifield
+		par[2]  = 0.000000; // fieldm
+		par[3]  = 0.000000; // tmaxfd
+		par[4]  = 0.000000; // stemax
+		par[5]  = 0.000000; // deemax
+		par[6]  = 0.000100; // epsil
+		par[7]  = 0.000000; // stmin
+		pAirMedium = new TGeoMedium("Air", numed,pAirMaterial, par);
+	}
+	
+	
+	//WORLD
+	
+	TGeoVolume *pAWorld  =  gGeoManager->GetTopVolume();
+	
+	// Defintion of the Mother Volume
+	
+	Double_t length = 300.;
+	
+	TGeoShape *pCBWorld = new TGeoBBox("Califa_box",
+									   length/2.0,
+									   length/2.0,
+									   length/2.0);
+	
+	TGeoVolume*
+	pWorld  = new TGeoVolume("CalifaWorld",pCBWorld, pAirMedium);
+	
+	TGeoCombiTrans *t0 = new TGeoCombiTrans();
+	TGeoCombiTrans *pGlobalc = GetGlobalPosition(t0);
+	
+	// add the sphere as Mother Volume
+	pAWorld->AddNodeOverlap(pWorld, 0, pGlobalc);
+
+	
+	// finally the user defined code:
+	
+#include "perlScripts/UserDefinedGeometry.geo"
+	
+}
+
 
 
 /*

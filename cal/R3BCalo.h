@@ -1,6 +1,7 @@
 // -------------------------------------------------------------------------
-// -----                        R3BCalo header file                     -----
+// -----                        R3BCalo header file                    -----
 // -----                  Created 26/03/09  by D.Bertini               -----
+// -----			Last modification 09/07/10 by H.Alvarez			   -----
 // -------------------------------------------------------------------------
 
 /**  R3BCalo.h
@@ -16,6 +17,7 @@
 
 class TClonesArray;
 class R3BCaloPoint;
+class R3BCaloCrystalHit;
 class FairVolume;
 class TGeoRotation;
 
@@ -60,6 +62,7 @@ class R3BCalo : public R3BDetector
 
   /** Virtual method EndOfEvent
    **
+   ** Added support for R3BCaloCrystalHit
    ** If verbosity level is set, print hit collection at the
    ** end of the event and resets it afterwards.
    **/
@@ -104,11 +107,38 @@ class R3BCalo : public R3BDetector
 			  Int_t offset);
 
 
-  /** Virtaul method Construct geometry
+  /** Virtual method Construct geometry
    **
    ** Constructs the STS geometry
    **/
   virtual void ConstructGeometry();
+	
+	/** Public method ConstructOldGeometry
+	 **
+	 ** Defines the CALIFA v5 geometry (from a R3BSim translation, never tested)
+	 **/
+  void ConstructOldGeometry();
+	
+	/** Public method ConstructV705Geometry
+	 **
+	 ** Defines the CALIFA v7.05 geometry (geometry defined by perl script)
+	 **/
+  void ConstructV705Geometry();
+
+	/** Public method ConstructUserDefinedGeometry
+	 **
+	 ** Defines a CALIFA geometry defined by the user from the perl scripts output
+	 **/
+  void ConstructUserDefinedGeometry();
+	
+	/** Public method SelectGeometryVersion
+	 **
+	 ** Defines the geometry 
+	 *@param version  Integer parameter used to select the geometry: 
+	 **				0 CALIFA V5 (old), 1 CALIFA V7.05, 2 USER DEFINED 
+	 **/
+  void SelectGeometryVersion(Int_t version);
+	
 
   virtual void Initialize();
   virtual void SetSpecialPhysicsCuts();
@@ -131,25 +161,38 @@ class R3BCalo : public R3BDetector
     Double32_t     fTime;              //!  time
     Double32_t     fLength;            //!  length
     Double32_t     fELoss;             //!  energy loss
-    Double32_t     fCutE;             //!  energy loss
+    Double32_t     fCutE;              //!  energy loss
     Int_t          fPosIndex;          //!
-    TClonesArray*  fCaloCollection;     //!  The hit collection
+    TClonesArray*  fCaloCollection;    //!  The hit collection
+    TClonesArray*  fCaloCrystalHitCollection;    //!  The hit collection
     Bool_t         kGeoSaved;          //!
-    TList *flGeoPar; //!
+    TList *flGeoPar;				//!
+
     Int_t fCrystalType[30];
+    Int_t fAlveolusType[24];
 
-
-    /** Private method AddHit
+	// Selecting the geometry of the CALIFA calorimeter
+	Int_t geometryVersion;
+    	
+	
+	/** Private method AddHit
      **
      ** Adds a CaloPoint to the HitCollection
      **/
-    R3BCaloPoint* AddHit(Int_t trackID, Int_t detID, Int_t volid, Int_t copy,
+    R3BCaloPoint* AddHit(Int_t trackID, Int_t detID, Int_t volid, Int_t copy, Int_t ident,
 			TVector3 posIn,
 			TVector3 pos_out, TVector3 momIn, 
 			TVector3 momOut, Double_t time, 
 			Double_t length, Double_t eLoss);
 
-
+	/** Private method AddCrystalHit
+     **
+     ** Adds a CaloCrystalhit to the HitCollection
+     **/
+    R3BCaloCrystalHit* AddCrystalHit(Int_t type, Int_t copy, Int_t ident,
+									 Double_t energy, Double_t tof);
+	
+	
     /** Private method ResetParameters
      **
      ** Resets the private members for the track parameters
@@ -158,6 +201,7 @@ class R3BCalo : public R3BDetector
    TGeoRotation* createMatrix( Double_t phi, Double_t theta, Double_t psi);
 
    Int_t  GetCrystalType(Int_t volID);
+	Int_t  GetAlveolusType(Int_t volID);
 
     ClassDef(R3BCalo,1);
 };
@@ -173,6 +217,19 @@ for (Int_t i=0;i<30;i++ ){
 }
 return type;
 }
+
+inline Int_t R3BCalo::GetAlveolusType(Int_t volID) {
+	Int_t type=-1;
+	
+	for (Int_t i=0;i<24;i++ ){
+		if (volID==fAlveolusType[i]) {
+			type=i+1; //
+			return (type);
+		}
+	}
+	return type;
+}
+
 
 
 
