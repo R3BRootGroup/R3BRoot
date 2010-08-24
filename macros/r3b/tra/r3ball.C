@@ -532,7 +532,7 @@ void r3ball(Int_t nEvents = 1,
   } 
   
  if (fGenerator.CompareTo("r3b") == 0  ) {
-  R3BPrimaryGenerator *pR3bGen = new R3BPrimaryGenerator();
+  R3BSpecificGenerator *pR3bGen = new R3BSpecificGenerator();
 
   // R3bGen properties
   pR3bGen->SetBeamInteractionFlag("off");
