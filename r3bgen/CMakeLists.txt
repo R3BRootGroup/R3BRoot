@@ -35,6 +35,7 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(GENERATORS_SRCS
 R3BPrimaryGenerator.cxx
+R3BSpecificGenerator.cxx
 R3BReadKinematics.cxx
 R3BCDGenerator.cxx
 R3BBeamInfo.cxx
@@ -44,6 +45,8 @@ R3BAsciiGenerator.cxx
 R3BCosmicGenerator.cxx
 R3BLandGenerator.cxx
 R3BCALIFATestGenerator.cxx
+R3BAsciiIQMDGen.cxx
+R3BAsciiUrQMDGen.cxx
 )
 
 if(RULE_CHECKER_FOUND)
