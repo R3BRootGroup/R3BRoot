@@ -1,0 +1,26 @@
+1***************************************************************************************************
+ *                                                                                                 *
+ *    G E A N T  Version 3.2111      DATE/TIME 100824/1052          R U N      1                   *
+ *                                                                                                 *
+ *      Data structure   Date   Time    GVERSN    ZVERSN                                           *
+ *                                                                                                 *
+ *           INIT       100824  1052    3.2111     3.77                                            *
+ *           KINE       100824  1052    3.2111     3.77                                            *
+ *           HITS       100824  1052    3.2111     3.77                                            *
+ *           DIGI       100824  1052    3.2111     3.77                                            *
+ *                                                                                                 *
+ *                                                                                                 *
+ *              Standard TPAR for this run are                                                     *
+ *                                                                                                 *
+ *  CUTGAM=100.00 keV  CUTELE=100.00 keV  CUTNEU=100.00  eV  CUTHAD=100.00 keV  CUTMUO=100.00 keV  *
+ *  BCUTE =100.00 keV  BCUTM =100.00 keV  DCUTE = 10.00 TeV  DCUTM = 10.00 TeV  PPCUTM=  2.04 MeV  *
+ *  IPAIR=  1.  ICOMP=  1.  IPHOT=  1.  IPFIS=  0.  IDRAY=  0.  IANNI=  1.  IBREM=  1.  IHADR=  1. *
+ *  IMUNU=  1.  IDCAY=  1.  ILOSS=  2.  IMULS=  1.  IRAYL=  1.  ILABS=  1.  ISYNC=  0.  ISTRA=  1. *
+ *                                                                                                 *
+
+ ***** GPHYSI error, CUTS must be greater than 10 KeV *****
+
+ *                                                                                                 *
+ ***************************************************************************************************
+
+
