@@ -1,0 +1,23 @@
+#particle definitios A, Z, mass/amu Iisospin Iisospin3 Ispin Iparity lifetime/s width/GeV stable ndecays
+#3 2 3.0160293 2 2 2 +1 1e10 1e-10 1 0	
+#decay channels: nchannel bratio ndaughters daughters(i=1 to ndaughters)
+#particle definition: A, Z, mass/amu Iisospin Iisospin3 Ispin Iparity lifetime/s width/GeV stable ndecays
+4 1 4.0278346 3 -3 5 -1 1.39e-22 0.0040 0 1
+#decay channels: nchannel bratio ndaughters daughters(i=1 to ndaughters)
+1 100. 2  2112 1000010030
+#particle definition: A, Z, mass/amu Iisospin Iisospin3 Ispin Iparity lifetime/s width/GeV stable ndecays
+4 3 4.0271823 3 3 5 -1 9.1e-23 0.00603 0 1   
+#decay channels: nchannel bratio ndaughters daughters(i=1 to ndaughters)
+1 100. 2  2212 1000020030 
+#particle definition: A, Z, mass/amu Iisospin Iisospin3 Ispin Iparity lifetime/s width/GeV stable ndecays
+5 1 5.0395429 2 -4 2 +1 9.1e-22 0.00199 0 1 
+#decay channels: nchannel bratio ndaughters daughters(i=1 to ndaughters)
+1 100. 3 2112 2112 1000010030
+#particle definition: A, Z, mass/amu Iisospin Iisospin3 Ispin Iparity lifetime/s width/GeV stable ndecays
+5 2 5.0122236  2 -2 4 -1 7.6e-22 0.0060 0 1
+#decay channels: nchannel bratio ndaughters daughters(i=1 to ndaughter
+1 100. 2 2112 1000020040
+#particle definition: A, Z, mass/amu Iisospin Iisospin3 Ispin Iparity lifetime/s width/GeV stable ndecays
+5 3 5.0125378  2 2 4 -1 3.70e-22 0.0015 0 1
+#decay channels: nchannel bratio ndaughters daughters(i=1 to ndaughters)
+1 100. 2 2212 1000020040
