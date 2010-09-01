@@ -29,7 +29,8 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(R3BCALO_SRCS
 #Put here your sourcefiles
-R3BCalo.cxx  
+R3BCalo.cxx
+R3BCaloHitFinder.cxx  
 R3BGeoCalo.cxx   
 R3BGeoCaloPar.cxx   
 R3BCaloContFact.cxx   
