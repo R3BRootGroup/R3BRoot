@@ -361,7 +361,7 @@ void R3BCalo::EndOfEvent() {
 
 // -----   Public method Register   -------------------------------------------
 void R3BCalo::Register() {
-  FairRootManager::Instance()->Register("CrystalPoint", GetName(), fCaloCollection, kTRUE);
+  //FairRootManager::Instance()->Register("CrystalPoint", GetName(), fCaloCollection, kTRUE);
   FairRootManager::Instance()->Register("CrystalHit", GetName(), fCaloCrystalHitCollection, kTRUE);
 
 }
