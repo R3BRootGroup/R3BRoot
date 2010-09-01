@@ -494,16 +494,19 @@ void r3ball(Int_t nEvents = 1,
   if (fGenerator.CompareTo("gammas") == 0  ) {
 	// 2- Define the CALIFA Test gamma generator
 	Double_t pdgId=22; // gamma emission
+	//Double_t pdgId=2212; // proton emission
 	Double_t theta1= 0.;  // polar angle distribution
 	Double_t theta2= 180.;
-	Double_t momentum=0.001; // 1 MeV/c 
-	Int_t multiplicity = 5;
+	Double_t momentum=0.001; // 0.001 GeV/c 
+	//Double_t momentum=0.75; // 0.75 GeV/c 
+	Int_t multiplicity = 2;
 	R3BCALIFATestGenerator* gammasGen = new R3BCALIFATestGenerator(pdgId, multiplicity);
 	gammasGen->SetThetaRange ( theta1,   theta2);
 	gammasGen->SetCosTheta();
 	gammasGen->SetPRange(momentum,momentum);
 	gammasGen->SetPhiRange(0.,360.);
-	gammasGen->SetXYZ(0.0,0.0,-1.5);
+	//gammasGen->SetXYZ(0.0,0.0,-1.5);
+	gammasGen->SetXYZ(0.0,0.0,0);
 	gammasGen->SetLorentzBoost(0.82);
 	// add the gamma generator
 	primGen->AddGenerator(gammasGen);
