@@ -18,8 +18,13 @@ R3BPrimaryGenerator::~R3BPrimaryGenerator() {
 void R3BPrimaryGenerator::AddTrack(Int_t pdgid, Double_t px, Double_t py,
 				   Double_t pz, Double_t vx, Double_t vy,
 				   Double_t vz, Int_t parent,Bool_t wanttracking,Double_t e) {
-    Int_t Z,A,pdg1;
-    Bool_t flag;
+  static Int_t iprim=0;
+  Double_t mass; 
+  Int_t warn=0;
+  iprim++;
+  cout<<" primary# "<<iprim<<endl;
+  Int_t Z,A,pdg1;
+  Bool_t flag;
 
     // ---> Add event vertex to track vertex
     vx += fVertex.X();
@@ -38,8 +43,18 @@ void R3BPrimaryGenerator::AddTrack(Int_t pdgid, Double_t px, Double_t py,
     if ( ! pdgBase ) Fatal("R3BPrimaryGenerator",
 			   "No TDatabasePDG instantiated");
     TParticlePDG* pdgPart = pdgBase->GetParticle(pdgid);
-    if ( ! pdgPart ) {
 
+     if(pdgid==1114||pdgid==2114||pdgid==2214||pdgid==2224||pdgid==0){
+      cout<<"delta found!"<<endl;
+      return;}
+
+    if ( ! pdgPart ) {
+       cout<<"pdg that is not found....."<<pdgid<<endl;
+       
+    if(pdgid>1000000000&&pdgid<1000010000){
+      cout<<"problematic cluster found!"<<endl;
+      return;}
+    
 	this->ExtendIon2(pdgid);
 	//if(flag){return;}
 
@@ -221,11 +236,11 @@ Bool_t R3BPrimaryGenerator::ExtendIon(Int_t pdgid){
 void R3BPrimaryGenerator::ExtendIon2(Int_t pdgid){
     Int_t pdg1,pdg2;
     Int_t Z,A;
-    Double_t mass,lifetime;
+    Double_t lifetime;
     char* pname;
     Double_t amu=0.931494028;
-    //pname=Form("A%d_Z%d",A,Z);
-    //cout<<pname<<endl;
+
+   
     TDatabasePDG* db=TDatabasePDG::Instance();
     cout<<"pdgid= "<<pdgid<<endl;
     pdg1=pdgid-1000000000;
@@ -237,15 +252,14 @@ void R3BPrimaryGenerator::ExtendIon2(Int_t pdgid){
     cout<<"Z= "<<Z<<" A= "<<A<<endl;
     pname=Form("A%d_Z%d",A,Z);
     cout<<pname<<endl;
-    gMC->DefineIon(Form("A%d_Z%d",A,Z),Z,A,Z,0.0,A*amu);
+  
+    db->AddParticle(Form("%s_l",pname),("%s_l",pname),A*amu,1,0.0,Z*3,"Ion",pdgid+1);
+    gMC->DefineIon(Form("A%d_Z%d",A,Z),Z,A,Z,A*amu);
 
-    mass=gMC->ParticleMass(pdgid);
-    lifetime=gMC->ParticleLifeTime(pdgid);
-    cout<<" mass= "<<mass<<endl;
-    //pname=gMC->ParticleName(pdgid);
-
-    db->AddParticle(pname,pname,mass,1,0.0,Z,"nucleus",pdgid);
-    //gMC->DefineIon(Form("A%d_Z%d",A,Z),Z,A,Z,0.0,A*amu);
+    
+    cout<<" mass= "<<A*amu<<endl;
+    TString name=gMC->ParticleName(pdgid);
+    cout<<"name is "<<name<<endl;
 
 }
 

@@ -66,7 +66,7 @@ Bool_t R3BAsciiIQMDGen::ReadEvent(FairPrimaryGenerator* primGen){
   Double_t Ep, b;
   Int_t eventID, at,zt,ap,zp,newpart;
   Double_t srp,crp, phi_rplane;
-  Double_t Y,beta,gamma;
+  Double_t Y,beta,gamma, betal,gammal;
   Double_t rmsx, rmsy,rmsz;
   Double_t evx, evy,evz;
   Double_t sigx, sigy,sigz;
@@ -82,7 +82,7 @@ Bool_t R3BAsciiIQMDGen::ReadEvent(FairPrimaryGenerator* primGen){
   Double_t pxx,pyy,pzz;
   Double_t mass[800],mn[800];
   Int_t imod[800],iclus[800], nclus[800];
-  Double_t itctl[800],rini[800],pini[800];
+  Double_t itctl1[800],itcl2[800],itcl3[800],rini[800],pini[800];
   Int_t idtotPDG[800];
 
   //particle counter 
@@ -93,8 +93,8 @@ Bool_t R3BAsciiIQMDGen::ReadEvent(FairPrimaryGenerator* primGen){
   Double_t px_c[500],py_c[500],pz_c[500];
   Int_t nn[500], nz[500],npi[500];
   Int_t pdgID[500],g3ID[500];
-  Double_t pt_c,e_c,Y_c;
-  Double_t Ylab_c, elab_c,et_c,pzlab_c;
+  Double_t pt_c,e_c,Y_c,Ylab_c;
+  Double_t beta_c,gamma_c,the_c,elab_c,et_c,pzlab_c;
   Double_t p4tot[4][500];
   Int_t irtyp;
   char* name_c[500];
@@ -128,18 +128,21 @@ Bool_t R3BAsciiIQMDGen::ReadEvent(FairPrimaryGenerator* primGen){
     //equal speed system used by IQMD 
     //which is = NN CMS for symmetric system
     
-   
-    gamma = 1. + Ep/amu;
-    beta=TMath::Sqrt(1.-1./(gamma*gamma));
+    Ep=Ep/1000.;
+    Ep=0.4;
+    gammal = 1. + Ep/(amu);
+    betal=TMath::Sqrt(1.-1./(gammal*gammal));
     //CMS velocity
-    beta=beta*ap*amu*gamma/(ap*amu*gamma+at*amu);
+    beta=betal*ap*amu*gammal/(ap*amu*gammal+at*amu);
+    gamma=1.0/(TMath::Sqrt(1-beta*beta));
     //CMS rapidity
     Y=0.5*TMath::Log((1.+beta)/(1.-beta));
-    
+    //the=TMath::ATanH(beta);
     if ( ap!=at ){
-      beta=beta*gamma/(gamma+1.);
+      beta=betal*gammal/(gammal+1.);
       //CMS rapidity
-      Y=0.5*TMath::Log((1.+beta)/(1.-beta));        
+      Y=0.5*TMath::Log((1.+beta)/(1.-beta));
+      //the=TMath::ATanH(beta);
     }
     
     //total number of particles
@@ -147,6 +150,7 @@ Bool_t R3BAsciiIQMDGen::ReadEvent(FairPrimaryGenerator* primGen){
     
     cout<<"evt# "<<eventID<<" Ep= "<<Ep<<" Y= "<<Y<<endl;
     cout<<"b= "<<b<<" total particles= "<<totpart<<" new particles= "<<newpart<<" reaction plane= "<<phi_rplane<<" time "<<wtime<<endl;
+    cout<<"betal= "<<betal<<" gammal= "<<gammal<<" beta=  "<<beta<<" gamma= "<<gamma<<endl;
     
     //initialise counters needed for event vertex
  
@@ -177,7 +181,7 @@ Bool_t R3BAsciiIQMDGen::ReadEvent(FairPrimaryGenerator* primGen){
       pz[i]=pzz;
       if(fscanf(fiqmd,"%lf %d %d",&mass[i], &imod[i],&mn[i])){;}
       if(fscanf(fiqmd,"%d %d",&nclus[i],&iclus[i])){;}
-      if(fscanf(fiqmd,"%d %lf %lf",&itctl,&rini,&pini)){;}
+      if(fscanf(fiqmd,"%d %d %d %lf %lf",&itctl1,&itcl2,&itcl3,&rini,&pini)){;}
       //nothing more on this line
       if(fgets(c,518,fiqmd)){;}
       
@@ -197,7 +201,6 @@ Bool_t R3BAsciiIQMDGen::ReadEvent(FairPrimaryGenerator* primGen){
       }//end on rms
     }//end on all particles
     //initialise event vectors
-   
   
 
     sigx=rmsx/(1.0*innuc);//spread2 x 
@@ -218,7 +221,8 @@ Bool_t R3BAsciiIQMDGen::ReadEvent(FairPrimaryGenerator* primGen){
       nn[j]      = 0;//cluster A/from p and n
       nz[j]      = 0;//cluster Z/from p
       npi[j]     = 0;//other particles in cluster
-     
+      pdgID[j]   =0;
+      mass_c[j]  =0.;
     }// end loop on clusters
     
     //reset the counters
@@ -228,8 +232,8 @@ Bool_t R3BAsciiIQMDGen::ReadEvent(FairPrimaryGenerator* primGen){
     
     
     for(i=0;i<totpart;i++){//run over all particles
-    
-      j = iclus[i]-1;//the cluster index j
+      
+        j = iclus[i]-1;//the cluster index j
      
       
       //averaging properties of the clusters
@@ -240,7 +244,8 @@ Bool_t R3BAsciiIQMDGen::ReadEvent(FairPrimaryGenerator* primGen){
       px_c[j] = px_c[j] + px[i];
       py_c[j] = py_c[j] + py[i];
       pz_c[j] = pz_c[j] + pz[i];
-      
+      mass_c[j]=mass_c[j] +mass[i];
+     if(imod[i]==2)  nz[j]=nz[j]+1;
      
       
       if ( imod[i]<3 )
@@ -248,16 +253,19 @@ Bool_t R3BAsciiIQMDGen::ReadEvent(FairPrimaryGenerator* primGen){
       else 
 	npi[j]=npi[j]+1;
       
+    }//end loop over all particles
     
+     
+    for(i=0;i<totpart;i++){//loop over all particles
+      
       
       if(imod[i]==1)
 	// neutron
 	idtotPDG[i] = 2112;
       else if(imod[i]==2)
 	//proton
-	{idtotPDG[i] =2212;
-	  nz[j]=nz[j]+1;}
-      
+	idtotPDG[i] =2212;
+	 
       else if(imod[i]==3)
 	//Delta -
 	idtotPDG[i] = 1114;
@@ -282,44 +290,48 @@ Bool_t R3BAsciiIQMDGen::ReadEvent(FairPrimaryGenerator* primGen){
       else{
 	cout<<"<I-MCQMD>: Itype not specified in IQMD "<< imod[i]<<" taken as particle "<<endl;
 	idtotPDG[i] = 0;}//end of imod dispatching
-	
+      
+
 	//check if the particle is unclusterised
-      if(nclus[i]==1){pdgID[iclus[i]-1]=idtotPDG[i];
-
-	mass_c[iclus[i]-1]=mass[i];
-
+      if(nclus[i]==1)pdgID[iclus[i]-1]=idtotPDG[i];
+      //check for pionic/delta clusters having one nucleon; 
+      if(nn[iclus[i]-1]==1){
+	if(imod[i]<3)pdgID[iclus[i]-1]==idtotPDG[i];
       }
-
+      //check for pure pionic/delta clusters to discard
+      if(nclus[i]>1&&nn[iclus[i]-1]==0)pdgID[iclus[i]-1]=0;
+    
     }//end loop over all particles!
     
     
     for(k=0;k<Nclus;k++){//loop on clusters
-      
+    
       if (nn[k]>1){
 
-	px_c[k]=pz_c[k]/nn[k];
-	py_c[k]=py_c[k]/nn[k];
-	pz_c[k]=pz_c[k]/nn[k];
+	x_c[k]=x_c[k]/(nn[k]*1.0);
+	y_c[k]=y_c[k]/(nn[k]*1.0);
+ 	z_c[k]=z_c[k]/(nn[k]*1.0);
 
 	  //construct pdg code number for cluster
 	pdgID[k]=1000000000 +10000*nz[k] +10*nn[k];
 
       //defining ion
       name_c[k]=Form("A%d_Z%d",nn[k],nz[k]);
-     
-     
-      mass_c[k]=gMC->ParticleMass(pdgID[k]);
-      if(mass_c[k]<0)mass_c[k]=nn[k]*amu;
+      mass_c[k]=nn[k]*amu;
+
     
       }
-      
+    
       
 
-      pz_c[k]=-1.0*pz_c[k];
+      //pz_c[k]=-1.0*pz_c[k];
 
       //cluster pt, E and Y              
       pt_c = TMath::Sqrt(px_c[k]*px_c[k] + py_c[k]*py_c[k]);
       e_c = TMath::Sqrt(pt_c*pt_c + pz_c[k]*pz_c[k] + mass_c[k]*mass_c[k]);
+      //gamma_c=1.+(e_c-mass_c[k])/mass_c[k];
+      //beta_c=TMath::Sqrt(1.-1./(gamma_c*gamma_c));
+      //the_c=TMath::ATanH(beta_c);
       Y_c = 0.5*TMath::Log((e_c+pz_c[k])/(e_c-pz_c[k]));
       
       //particle lab system rapidity
@@ -327,18 +339,32 @@ Bool_t R3BAsciiIQMDGen::ReadEvent(FairPrimaryGenerator* primGen){
       
       //particle E and pz in lab system
       et_c=TMath::Sqrt(pt_c*pt_c +mass_c[k]*mass_c[k]);
+      //elab_c=gammal*(e_c-betal*pz_c[k]);
+      //pzlab_c=gammal*(pz_c[k]-betal*e_c);
+
       elab_c=et_c*TMath::CosH(Ylab_c);
       pzlab_c=et_c*TMath::SinH(Ylab_c);
+      
       
       //particle lab 4-vector p
       p4tot[0][k]=elab_c;
       p4tot[1][k]=px_c[k];
       p4tot[2][k]=py_c[k];
       p4tot[3][k]=pzlab_c;
-      
+     //  evx=x_c[k];
+//       evy=y_c[k];
+//       evz=z_c[k];
+
+
+      cout<<"px= "<<px_c[k]<<" py= "<<py_c[k]<<" pz= "<<pz_c[k]<<endl; 
+      cout<<"p41= "<<p4tot[0][k]<<" p42= "<<p4tot[1][k]<<" p43= "<<p4tot[2][k]<<" p44= "<<p4tot[3][k]<<endl;
+      cout<<" evx= "<<evx<<" evy= "<<evy<<" evz= "<<evz<<endl;
+      cout<<nn[k]<<" "<<nz[k]<<" "<<pdgID[k]<<endl;
       primGen->AddTrack(pdgID[k],p4tot[1][k],p4tot[2][k],p4tot[3][k],evx,evy,evz);
       
+      
     }//end loop on clusters
+    
    
     return kTRUE;
     
