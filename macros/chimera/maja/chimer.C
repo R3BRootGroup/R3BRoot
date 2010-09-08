@@ -79,13 +79,14 @@ Int_t chimer(){
     TObjString det4("ATOF");
     TObjString det5("CHIMERA");
     TObjString det6("LAND");
+    TObjString det7 ("R3BVETO");
 
     TObjArray fDetList;
     //fDetList.Add(&det1);
     fDetList.Add(&det4);
     fDetList.Add(&det5);
     fDetList.Add(&det6);
- 
+    fDetList.Add(&det7);
 
    //-------------------------------------------------
    //- N# of Sim. Events   |    nEvents     (Int_t)

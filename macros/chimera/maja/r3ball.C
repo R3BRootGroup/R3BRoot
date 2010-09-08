@@ -91,6 +91,7 @@ void r3ball(Int_t nEvents = 1,
   gSystem->Load("libR3BDch");
   gSystem->Load("libR3BGfi");
   gSystem->Load("libR3BLand");
+  gSystem->Load("libR3BVeto");
   gSystem->Load("libR3BmTof");
   gSystem->Load("libR3BTof");
   gSystem->Load("libR3BATof");
@@ -294,6 +295,33 @@ void r3ball(Int_t nEvents = 1,
       run->AddModule(tof);
   }
 
+   if (fDetList.FindObject("R3BVETO") ) {
+     
+      R3BDetector* veto = new R3BVeto("Veto", kTRUE);
+      //veto->SetGeometryFileName("veto.root");
+      Double_t mytheta= 45..;      
+      Double_t dist   =751.; 
+      
+      // Global position of the Module
+      thetaX   =  0.0; // (deg)
+      thetaY   =  0.0; // (deg)
+      thetaZ   =  0.0; // (deg)
+      // Rotation in Ref. Frame.
+      thetaX =  0.0; // (deg)
+      thetaY =  -mytheta; // (deg)
+      thetaZ =  0.0; // (deg)
+      // Global translation in Lab
+      tx       =  (dist-70.5)*sin(mytheta*3.14159/180.); // (cm)
+      ty       =  0.0; // (cm)
+      tz       =  (dist-70.5)*cos(mytheta*3.14159/180.); // (cm)
+      veto->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
+      veto->SetTranslation(tx,ty,tz);
+      // User defined Energy CutOff
+      Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
+      ((R3BTof*) veto)->SetEnergyCutOff(fCutOffSci);
+      run->AddModule(veto);
+  }
+
   // mTof
   if (fDetList.FindObject("MTOF") ) {
       R3BDetector* mTof = new R3BmTof("mTof", kTRUE);
@@ -350,12 +378,12 @@ void r3ball(Int_t nEvents = 1,
       psi   =  0.0; // (deg)
       // Rotation in Ref. Frame.
       thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
+      thetaY =   -mytheta; // (deg)
       thetaZ =  0.0; // (deg)
       // Global translation in Lab
-      tx    =  0.0; // (cm)
+      tx    =  dist*sin(mytheta*3.14159/180.);  // (cm)
       ty    =  0.0; // (cm)
-      tz    =  1000.0; // (cm)
+      tz    =   dist*cos(mytheta*3.14159/180.); // (cm)
       //land->SetRotAnglesEuler(phi,theta,psi);
       land->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       land->SetTranslation(tx,ty,tz);
@@ -400,7 +428,7 @@ void r3ball(Int_t nEvents = 1,
       // Global translation in Lab
       tx       =  -100.0; // (cm)
       ty       =  0.0; // (cm)
-      tz       =  489.0; // (cm)
+      tz       =  500.5; // (cm)
       atof->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       atof->SetTranslation(tx,ty,tz);
       // User defined Energy CutOff
@@ -437,7 +465,7 @@ void r3ball(Int_t nEvents = 1,
 
   if (fGenerator.CompareTo("box") == 0  ) {
   // 2- Define the BOX generator 
-  Double_t pdgId=1000030050; // Li5 beam
+  Double_t pdgId=2212; // p beam
   Double_t theta1= 0.;  // polar angle distribution
   Double_t theta2= 7.;
   Double_t momentum=.8; // 10 GeV/c
@@ -528,7 +556,9 @@ void r3ball(Int_t nEvents = 1,
 //   db->ReadPDGTable("/u/mzoric/chimera/r3broot/input/chimera/new_ionlist.in");
 
   // -----   Initialize simulation run   ------------------------------------
+  cout<<"breakpoint1"<<endl;
   run->Init();
+  cout<<"breakpoint2"<<endl;
 
   // ------  Increase nb of step for CALO
   Int_t nSteps = -15000;
