@@ -10,12 +10,12 @@
 #define R3BDETECTORLIST_H 1
 
 enum DetectorId {
-   kREF,kDCH,kCAL,kLAND,kGFI,kMTOF,kTOF,kTRA,kCALIFA,};
+   kREF,kDCH,kCAL,kLAND,kGFI,kMTOF,kTOF,kTRA,kCALIFA,kVETO};
     
 /** Unique identifier for all Panda Point and Hit types **/
 
 enum fDetectorType {  
-   kUnknown,kDchPoint,kCalPoint,kLandPoint,kGfiPoint,kmTofPoint,kTofPoint,kTraPoint};
+   kUnknown,kDchPoint,kCalPoint,kLandPoint,kGfiPoint,kmTofPoint,kTofPoint,kVetoPoint,kTraPoint};
 
 
 enum SensorSide { kTOP, kBOTTOM };
