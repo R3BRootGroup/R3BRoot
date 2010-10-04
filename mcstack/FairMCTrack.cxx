@@ -81,11 +81,10 @@ void FairMCTrack::Print(Int_t trackId) const {
        << ", CALIFA " << GetNPoints(kCALIFA) << ", TRACKER " << GetNPoints(kTRA)
        << ", TOF " << GetNPoints(kTOF) << ", mTOF " << GetNPoints(kMTOF)
        << ", GFI " << GetNPoints(kGFI) << ", DCH " << GetNPoints(kDCH) 
-       << ", LAND " << GetNPoints(kLAND) << endl;
+       << ", LAND " << GetNPoints(kLAND)
+       << ", VETO " << GetNPoints(kVETO) << endl;
 }
 // -------------------------------------------------------------------------
-
-
 
 // -----   Public method GetMass   -----------------------------------------
 Double_t FairMCTrack::GetMass() const {
@@ -123,6 +122,7 @@ Int_t FairMCTrack::GetNPoints(DetectorId detId) const {
   else if ( detId == kGFI  ) return ( (fNPoints & (15 << 20) ) >> 20);
   else if ( detId == kDCH ) return ( (fNPoints & ( 1 << 24) ) >> 24);
   else if ( detId == kLAND  ) return ( (fNPoints & ( 1 << 25) ) >> 25);
+  else if ( detId == kVETO  ) return ( (fNPoints & ( 1 << 26) ) >> 26);
   else {
     cout << "-E- FairMCTrack::GetNPoints: Unknown detector ID "
 	 << detId << endl;
@@ -188,6 +188,12 @@ void FairMCTrack::SetNPoints(Int_t iDet, Int_t nPoints) {
     if      ( nPoints < 0 ) nPoints = 0;
     else if ( nPoints > 1 ) nPoints = 1;
     fNPoints = ( fNPoints & ( ~ (  1 << 25 ) ) )  |  ( nPoints << 25 );
+  }
+
+  else if ( iDet == kVETO ) {
+    if      ( nPoints < 0 ) nPoints = 0;
+    else if ( nPoints > 1 ) nPoints = 1;
+    fNPoints = ( fNPoints & ( ~ (  1 << 26 ) ) )  |  ( nPoints << 26 );
   }
 
   else cout << "-E- FairMCTrack::SetNPoints: Unknown detector ID "

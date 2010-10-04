@@ -17,7 +17,8 @@ enum DetectorId {kREF,
 		 kMTOF,
 		 kGFI,
 		 kDCH,
-		 kLAND ,
+		 kLAND,
+                 kVETO,
 		 kTutDet};
 
 #endif
