@@ -40,8 +40,8 @@ class R3BNeuLandPoint : public FairMCPoint
    **/
   R3BNeuLandPoint(Int_t eventID, Int_t trackID,
 		  Int_t mot0trackID,
-		  Int_t detID, Int_t cellID,
-		  Int_t cellhits, Double_t totaleloss, Double_t mass,
+		  Int_t detID, Int_t cellID, Int_t segID,
+		  Double_t mass,
 		  TVector3 posIn,
 		  TVector3 posOut, TVector3 momIn, TVector3 momOut,
 		  Double_t tof, Double_t length, Double_t eLoss);
@@ -60,8 +60,7 @@ class R3BNeuLandPoint : public FairMCPoint
   Int_t GetMot0TrackID()   const { return fMot0TrackID; }
   Int_t GetDetID() const { return fDetID; }
   Int_t GetCellID() const { return fCellID; }
-  Int_t GetCellHits() const { return fCellHits; }
-  Double_t GetTotalEloss() const { return fTotalEloss; }
+  Int_t GetSegID() const { return fSegID; }
   Double_t GetXIn()   const { return fX; }
   Double_t GetYIn()   const { return fY; }
   Double_t GetZIn()   const { return fZ; }
@@ -103,8 +102,7 @@ class R3BNeuLandPoint : public FairMCPoint
   Int_t fMot0TrackID;
   Int_t fDetID;
   Int_t fCellID;
-  Int_t fCellHits;
-  Double_t fTotalEloss;
+  Int_t fSegID;
   Double_t fMass;
 
   ClassDef(R3BNeuLandPoint,1)
