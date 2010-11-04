@@ -251,8 +251,8 @@ Bool_t R3BNeuLandv1::ProcessHits(FairVolume* vol) {
       } // IsTrackExiting
       
       AddHit(fEventID, fTrackID, fMot0TrackID,
-	     fDetID, fCellID,
-	     fCellHits, fTotalEloss, fMass,
+	     fDetID, fCellID, fSegID,
+	     fMass,
 	     TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
 	     TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
 	     TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
@@ -352,8 +352,8 @@ void R3BNeuLandv1::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset
 // -----   Private method AddHit   --------------------------------------------
 R3BNeuLandPoint* R3BNeuLandv1::AddHit(Int_t eventID, Int_t trackID,
 				    Int_t mot0trackID,
-				    Int_t detID, Int_t cellID,
-				    Int_t cellhits, Double_t totaleloss, Double_t mass,
+				    Int_t detID, Int_t cellID, Int_t segID,
+				    Double_t mass,
 				    TVector3 posIn,
 				    TVector3 posOut, TVector3 momIn,
 				    TVector3 momOut, Double_t time,
@@ -365,7 +365,7 @@ R3BNeuLandPoint* R3BNeuLandv1::AddHit(Int_t eventID, Int_t trackID,
 	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
 	 << trackID << ", energy loss " << eLoss  << " GeV" << endl;
   return new(clref[size]) R3BNeuLandPoint(eventID, trackID, mot0trackID,
-					  detID, cellID, cellhits, totaleloss, mass,
+					  detID, cellID, segID, mass,
 					  posIn, posOut, momIn, momOut, time, length, eLoss);
 }
 // -----   Public method ConstructGeometry   ----------------------------------

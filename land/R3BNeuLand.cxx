@@ -42,6 +42,8 @@
 #include <iostream>
 #include <math.h>
 
+#include "parameters.h"
+
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -60,13 +62,6 @@ R3BNeuLand::R3BNeuLand() : R3BDetector("R3BNeuLand", kTRUE, kLAND) {
   fVersion = 1;
   
   fIDMedGas = -1;
-  cp1=-1;
-  cp2=-1;
-  volId1=-1;
-  volId2=-1;
-  
-  fCellHits = 0;
-  fTotalEloss = 0;
 }
 // -------------------------------------------------------------------------
 
@@ -85,13 +80,6 @@ R3BNeuLand::R3BNeuLand(const char* name, Bool_t active)
   fVersion = 1;
   
   fIDMedGas = -1;
-  cp1=-1;
-  cp2=-1;
-  volId1=-1;
-  volId2=-1;
-
-  fCellHits = 0;
-  fTotalEloss = 0;
 }
 
 R3BNeuLand::~R3BNeuLand() {
@@ -112,34 +100,28 @@ void R3BNeuLand::Initialize()
 
 Bool_t R3BNeuLand::ProcessHits(FairVolume* vol) {
   
-  // --- get Geometry hiearchical Information
-  cp1=-1;
-  cp2=-1;
-  
-  volId1=-1;
-  volId2=-1;
-
   Int_t iMed = gMC->CurrentMedium();
-  
-  Int_t cp0;
-  Int_t volid = gMC->CurrentVolID(cp0);
+  volId1 =  gMC->CurrentVolID(cellNum);
+  volId2 =  gMC->CurrentVolOffID(1,unitNum);
 
-
-  if( gMC->TrackPid() == 11) {
-    
-    if( cp0 == 11 && gMC->IsTrackEntering() && gMC->Etot() > 0.030 ) ent_part = ent_part + 1;
-    if( cp0 == 26 && gMC->IsTrackExiting() && gMC->Etot() > 0.003 ) exit_part = exit_part + 1;
-    
+  Int_t UnitLayerNum = (Int_t) floor(unitNum/NofSegs);
+  for(int j=0;j<2*NofCells;j++) {
+    if(j == cellNum) {
+      if(j<NofCells) {
+	fCellID = j;
+	fDetlayerid = 2*UnitLayerNum;
+      }
+      if(j>=NofCells) {
+	fCellID = j - NofCells;
+	fDetlayerid = 2*UnitLayerNum+1;
+      }
+    }
   }
-  
+
+  fSegID = (Int_t) unitNum%NofSegs;
+
+
   if (iMed == fIDMedGas) {
-    Int_t trackpid_gas = gMC->TrackPid();
-    Double_t maxstep_gas = gMC->MaxStep();
-    Double_t trackstep_gas = gMC->TrackStep();
-    //cout << " TrackPid in Gas " << trackpid_gas << endl;
-    //cout << " MaxStep in Gas " << maxstep_gas << endl;
-    //cout << " TrackStep in Gas " << trackstep_gas << endl;
-    
     if ( gMC->IsTrackEntering() ) {
       fELoss  = 0.;
       fTime   = gMC->TrackTime() * 1.0e09;
@@ -148,69 +130,18 @@ Bool_t R3BNeuLand::ProcessHits(FairVolume* vol) {
       gMC->TrackMomentum(fMomIn);
     }
     
-    // Sum energy loss for all steps in the active volume
     fELoss += gMC->Edep() * 1E+6; // keV
-    fTotalEloss += gMC->Edep() * 1E+6;
-    //cout << " Eloss: " << gMC->Edep()*1E+6 << endl;
-    
-    // Set additional parameters at exit of active volume. Create R3BNeuLandPoint.
-    //if ( gMC->IsTrackExiting()    ||
-    //	 gMC->IsTrackStop()       ||
-    //	 gMC->IsTrackDisappeared()   ) {
-    
-    //fTrackID  = gMC->GetStack()->GetCurrentTrackNumber();
-    //fMot0TrackID  = gMC->GetStack()->GetCurrentTrack()->GetMother(0);
-    //cout << " fTrackID " << fTrackID << endl;
-    //cout << " fMot0TrackID " << fMot0TrackID << endl;
-    
-    volId1 =  gMC->CurrentVolID(cp1);
-    volId2 =  gMC->CurrentVolOffID(1, cp2);
-    fDetID = cp2;
-    fCellID = cp1;
     
     if(fELoss > 0.0){
       fEventID = gMC->CurrentEvent();
       fTrackID  = gMC->GetStack()->GetCurrentTrackNumber();
       fMot0TrackID  = gMC->GetStack()->GetCurrentTrack()->GetMother(0);
-      volId1 =  gMC->CurrentVolID(cp1);
-      volId2 =  gMC->CurrentVolOffID(1, cp2);
-      fDetID = cp2;
-      fCellID = cp1;
-      fCellHits = fCellHits + 1;
-      fMass = gMC->ParticleMass(trackpid_gas); // GeV/c2
-      //cout << " fEventID: " << fEventID << endl;
-      //cout << " fTrackID: " << fTrackID << endl;
-      //cout << " fMot0TrackID: " << fMot0TrackID << endl;
-      //cout << " fCellID: " << fCellID << endl;
-      //cout << " fELoss: " << fELoss << endl;
-      //cout << " fCellHits: " << fCellHits << endl;
-      //cout << " fTotalEloss: " << fTotalEloss << endl;
-      
-      if(trackpid_gas==2212){
-	if(cp1 == 1){
-	  cellid1 = cellid1 + 1;
-	}
-	if(cp1 == 2){
-	  cellid2 = cellid2 + 1;
-	}		
-	if(cp1 == 3){
-	  cellid3 = cellid3 + 1;
-	}		
-	if(cp1 == 4){
-	  cellid4 = cellid4 + 1;
-	}		
-	if(cp1 == 5){
-	  cellid5 = cellid5 + 1;
-	}		
-	if(cp1 == 6){
-	  cellid6 = cellid6 + 1;
-	}		
-      }
+      fMass = gMC->ParticleMass(gMC->TrackPid()); // GeV/c2
       
       gMC->TrackPosition(fPosOut);
       gMC->TrackMomentum(fMomOut);
-      if (fELoss == 0. ) return kFALSE;
-      
+
+            
       if (gMC->IsTrackExiting()) {
 	const Double_t* oldpos;
 	const Double_t* olddirection;
@@ -250,21 +181,53 @@ Bool_t R3BNeuLand::ProcessHits(FairVolume* vol) {
 	
       } // IsTrackExiting
       
-      AddHit(fEventID, fTrackID, fMot0TrackID,
-	     fDetID, fCellID,
-	     fCellHits, fTotalEloss, fMass,
-	     TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
-	     TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
-	     TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
-	     TVector3(fMomOut.Px(), fMomOut.Py(), fMomOut.Pz()),
-	     fTime, fLength, fELoss);
       
+      cout << " fEventID: " << fEventID
+	   << " fTrackID: " << fTrackID
+	   << " fMot0TrackID: " << fMot0TrackID
+	   << " fDetlayerid: " << fDetlayerid
+	   << " fSegID: " << fSegID
+	   << " fCellID: " << fCellID
+	   << " fMass: " << fMass
+	   << " fTime: " << fTime
+	   << " fELoss: " << fELoss
+	   << endl;
+      
+      if ( gMC->IsTrackExiting()    ||
+	   gMC->IsTrackStop()       ||
+	   gMC->IsTrackDisappeared()   ) {
+	
+	if(gMC->IsTrackExiting()) cout << " Track is exiting " << endl;
+	if(gMC->IsTrackStop()) cout << " Track is stopped " << endl;
+	if(gMC->IsTrackDisappeared()) cout << " Track is disappeared " << endl;
+	
+	cout << " fEventID: " << fEventID
+	     << " fTrackID: " << fTrackID
+	     << " fMot0TrackID: " << fMot0TrackID
+	     << " fDetlayerid: " << fDetlayerid
+	     << " fSegID: " << fSegID
+	     << " fCellID: " << fCellID
+	     << " fMass: " << fMass
+	     << " fTime: " << fTime
+	     << " fELoss: " << fELoss
+	     << endl;
+	
+
+	AddHit(fEventID, fTrackID, fMot0TrackID,
+	       fDetlayerid, fCellID, fSegID,
+	       fMass,
+	       TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
+	       TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
+	       TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
+	       TVector3(fMomOut.Px(), fMomOut.Py(), fMomOut.Pz()),
+	       fTime, fLength, fELoss);
+	
       // Increment number of NeuLandPoints for this track
-      FairStack* stack = (FairStack*) gMC->GetStack();
-      stack->AddPoint(kLAND);
-      
-      ResetParameters();
-      //} // IsTrackExiting, IsTrackStop, IsTrackDisappeared
+	FairStack* stack = (FairStack*) gMC->GetStack();
+	stack->AddPoint(kLAND);
+	
+      } // IsTrackExiting, IsTrackStop, IsTrackDisappeared
+      //ResetParameters();
     } // fELoss > 0
   } // ! iMed == Gas 
   return kTRUE;
@@ -274,13 +237,11 @@ Bool_t R3BNeuLand::ProcessHits(FairVolume* vol) {
 void R3BNeuLand::BeginEvent() {
   
   if (gGeoManager) {
-    TGeoVolume * vol = gGeoManager->FindVolumeFast("divVolGas");
+    TGeoVolume * vol = gGeoManager->FindVolumeFast("Gas2Log");
   }
   
   fIDMedGas = pMedGas->GetId();
-  
-  fCellHits = 0;
-  fTotalEloss = 0.0;
+
 }
 
 
@@ -288,14 +249,6 @@ void R3BNeuLand::EndOfEvent() {
   
   if (fVerboseLevel) Print();
   fLandCollection->Clear();
-  
-  if(fTotalEloss > 0.0){
-    //cout << " END OF EVENT" << endl;
-    //cout << " fTotalEloss: " << fTotalEloss << endl;
-    //cout << " fCellHits: " << fCellHits << endl;
-  }
-  
-  //cout << " Entering particles: " << ent_part << " Exiting particles: " << exit_part << endl;
 
   ResetParameters();
 }
@@ -321,20 +274,6 @@ TClonesArray* R3BNeuLand::GetCollection(Int_t iColl) const {
 // -----   Public method Print   ----------------------------------------------
 void R3BNeuLand::Print() const {
   Int_t nHits = fLandCollection->GetEntriesFast();
-  //cout << "-I- R3BNeuLand: " << nHits << " points registered in this event." 
-  //   << endl;
-  //cout << "cellID=1: " << cellid1 << endl;
-  //cout << "cellID=2: " << cellid2 << endl;
-  //cout << "cellID=3: " << cellid3 << endl;
-  //cout << "cellID=4: " << cellid4 << endl;
-  //cout << "cellID=5: " << cellid5 << endl;
-  //cout << "cellID=6: " << cellid6 << endl;
-  //cout << " Id1: " << volId1  << " cp1: " << cp1
-  //   << " Id2: " << volId2  << " cp2: " << cp2
-  //   << " Id3: " << volId3  << " cp3: " << cp3
-  //   << " Id4: " << volId4  << " cp4: " << cp4
-  //   << " Id5: " << volId5  << " cp5: " << cp5
-  //   << " Id6: " << volId6  << " cp6: " << cp6 << endl;
 }
 // ----------------------------------------------------------------------------
 
@@ -369,8 +308,8 @@ void R3BNeuLand::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) 
 // -----   Private method AddHit   --------------------------------------------
 R3BNeuLandPoint* R3BNeuLand::AddHit(Int_t eventID, Int_t trackID,
 				    Int_t mot0trackID,
-				    Int_t detID, Int_t cellID,
-				    Int_t cellhits, Double_t totaleloss, Double_t mass,
+				    Int_t detlayerid, Int_t cellID, Int_t segID,
+				    Double_t mass,
 				    TVector3 posIn,
 				    TVector3 posOut, TVector3 momIn,
 				    TVector3 momOut, Double_t time,
@@ -379,23 +318,21 @@ R3BNeuLandPoint* R3BNeuLand::AddHit(Int_t eventID, Int_t trackID,
   Int_t size = clref.GetEntriesFast();
   if (fVerboseLevel>1) 
     cout << "-I- R3BNeuLand: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
-	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
+	 << ", " << posIn.Z() << ") cm,  detector " << detlayerid << ", track "
 	 << trackID << ", energy loss " << eLoss  << " GeV" << endl;
   return new(clref[size]) R3BNeuLandPoint(eventID, trackID, mot0trackID,
-					  detID, cellID, cellhits, totaleloss, mass,
+					  detlayerid, cellID, segID, mass,
 					  posIn, posOut, momIn, momOut, time, length, eLoss);
 }
 // -----   Public method ConstructGeometry   ----------------------------------
 void R3BNeuLand::ConstructGeometry() {
 
-  // New Design for RPC
-  if ((fVersion == 3 )) return ConstructGeometry3();
+  if ((fVersion == 1 )) return ConstructGeometry1();
   
   cout << "-I- R3BNeuLand  ConstructGeometry() :unknown Geometry version  !!! " << endl;
 }
 
-void R3BNeuLand::ConstructGeometry3() {
-  Double_t dx,dy,dz;
+void R3BNeuLand::ConstructGeometry1() {
   Double_t a;
   Double_t z, density, w;
   Int_t nel, numed, aw;
@@ -405,7 +342,7 @@ void R3BNeuLand::ConstructGeometry3() {
   TGeoElement* elH = new TGeoElement("Hydrogen", "H", z= 1, a= 1.00794);
   TGeoElement* elC = new TGeoElement("Carbon", "C", z= 6, a= 12.0107);
   TGeoElement* elN = new TGeoElement("Nitrogen", "N", z= 7, a= 14.007);
-  TGeoElement* elO = new TGeoElement("Oxygen", "O", z= 8, a= 28.0855);
+  TGeoElement* elO = new TGeoElement("Oxygen", "O", z= 8, a= 15.9994);
   TGeoElement* elF = new TGeoElement("Fluorine", "F", z= 9, a= 18.9984032);
   TGeoElement* elNa = new TGeoElement("Sodium", "Na", z= 11, a= 22.98976928);
   TGeoElement* elMg = new TGeoElement("Magnesium", "Mg", z= 12, a= 24.3050);
@@ -416,7 +353,8 @@ void R3BNeuLand::ConstructGeometry3() {
   TGeoElement* elCr = new TGeoElement("Chromium", "Cr", z= 24, a= 51.9961);
   TGeoElement* elFe = new TGeoElement("Iron", "Fe", z= 26, a= 55.845);
   TGeoElement* elNi = new TGeoElement("Nickel", "Ni", z= 28, a= 58.6934);
-  
+  TGeoElement* elPb = new TGeoElement("Lead", "Pb", z= 82, a= 207.2);
+
   
   // -- Materials
   
@@ -570,6 +508,36 @@ void R3BNeuLand::ConstructGeometry3() {
   pMatMet->AddElement(elH,aw);
   pMatMet->SetIndex(14);
   
+  // Paraffin: C20H42 (- C40H82)
+  nel     = 2;
+  density = 0.93;
+  TGeoMixture* pMatPar = new TGeoMixture("Par", nel,density);
+  aw = 20;  // 20 C in chemical formula
+  pMatPar->AddElement(elC,aw);
+  aw = 42;  // 42 H in chemical formula
+  pMatPar->AddElement(elH,aw);
+  pMatPar->SetIndex(15);
+
+  // Pb
+  nel     = 1;
+  density = 11.43;
+  TGeoMixture* pMatPb = new TGeoMixture("Lead", nel,density);
+  w = 1.000000;
+  pMatPb->AddElement(elPb,w);
+  pMatPb->SetIndex(16);
+
+  // Mylar: C10H8O4
+  nel     = 3;
+  density = 1.4;
+  TGeoMixture* pMatMyl = new TGeoMixture("Myl", nel,density);
+  aw = 10;  // 10 C in chemical formula
+  pMatMyl->AddElement(elC,aw);
+  aw = 8;  // 8 H in chemical formula
+  pMatMyl->AddElement(elH,aw);
+  aw = 4;  // 4 O in chemical formula
+  pMatMyl->AddElement(elO,aw);
+  pMatMyl->SetIndex(17);
+
   // -- Media
   
   Double_t par[8];
@@ -608,6 +576,15 @@ void R3BNeuLand::ConstructGeometry3() {
   numed   = 28;
   //pMedGas = new TGeoMedium("Gas", numed,pMatRPCgas, par);
   pMedGasInactive = new TGeoMedium("GasInactive", numed, pMatRPCgas);
+  numed   = 29;
+  //pMedPar = new TGeoMedium("Paraffin", numed,pMatPar, par);
+  pMedPar = new TGeoMedium("Paraffin", numed, pMatPar);
+  numed   = 30;
+  //pMedPb = new TGeoMedium("Lead", numed,pMatPb, par);
+  pMedPb = new TGeoMedium("Lead", numed, pMatPb);
+  numed   = 31;
+  //pMedMyl = new TGeoMedium("Mylar", numed,pMatMyl, par);
+  pMedMyl = new TGeoMedium("Mylar", numed, pMatMyl);
  
   // More fine stepping def. in Gas
   par[0]  =   -1.0; // isvol
@@ -627,125 +604,153 @@ void R3BNeuLand::ConstructGeometry3() {
   //-- Main Geometry definition
   //-- Get the top volume (CAVE) from the TGeoManager class
   
-  TGeoVolume* vWorld = gGeoManager->GetTopVolume();
-  vWorld->SetVisLeaves(kTRUE);
-  vWorld->SetVisContainers(kTRUE);
+  TGeoVolume* WorldLog = gGeoManager->GetTopVolume();
+  WorldLog->SetVisLeaves(kTRUE);
+  WorldLog->SetVisContainers(kTRUE);
   
-  // RPC prototype FZD
-  Double_t delta_Case = 0.1; // thickness of case in cm
-  Double_t delta_Gap = 0.3; // thickness of gap between case and converter in cm
-  Double_t delta_Steel = 0.2; // thickness of steel in cm
-  Double_t delta_Glass = 0.095; // thickness of glass sheet
-  Double_t delta_Gas = 0.03; // thickness of gas gap
-  Double_t delta_AnodeGap = 0.3; // thickness of gap between the anode strips in cm
-  Double_t delta_Strip = 2.5; // strip width in cm
+  TGeoShape* St1Sol = new TGeoBBox("St1Box",DetW/2,DetH/2+SegGapWidth/2,St1T/2);
+  TGeoVolume* St1Log = new TGeoVolume("St1Log",St1Sol, pMedSteel);
+  AddSensitiveVolume(St1Log);
+
+  TGeoShape* Gas1Sol = new TGeoBBox("Gas1Box",DetW/2,DetH/2,Gas1T/2);
+  TGeoVolume* Gas1Log = new TGeoVolume("Gas1Log",Gas1Sol, pMedGasInactive);
+  AddSensitiveVolume(Gas1Log);
+
+  TGeoShape* Myl1Sol = new TGeoBBox("Myl1Box",DetW/2,DetH/2,Myl1T/2);
+  TGeoVolume* Myl1Log = new TGeoVolume("Myl1Log",Myl1Sol, pMedMyl);
+  AddSensitiveVolume(Myl1Log);
+
+  TGeoShape* GlassSol = new TGeoBBox("GlassBox",DetW/2,DetH/2,GlassT/2);
+  TGeoVolume* GlassLog = new TGeoVolume("GlassLog",GlassSol, pMedGlass);
+  AddSensitiveVolume(GlassLog);
+
+  TGeoShape* Gas2Sol = new TGeoBBox("Gas2Box",DetW/2,DetH/2,Gas2T/2);
+  TGeoVolume* Gas2Log = new TGeoVolume("Gas2Log",Gas2Sol, pMedGas);
+  AddSensitiveVolume(Gas2Log);
+
+  TGeoShape* Myl2Sol = new TGeoBBox("Myl2Box",DetW/2,DetH/2,Myl2T/2);
+  TGeoVolume* Myl2Log = new TGeoVolume("Myl2Log",Myl2Sol, pMedMyl);
+  AddSensitiveVolume(Myl2Log);
+
+  TGeoShape* Gas3Sol = new TGeoBBox("Gas3Box",DetW/2,DetH/2,St2T/2);
+  TGeoVolume* Gas3Log = new TGeoVolume("Gas3Log",Gas3Sol, pMedGasInactive);
+  AddSensitiveVolume(Gas3Log);
+
+  TGeoShape* St2Sol = new TGeoBBox("St2Box",DetW/2,StripWidth/2,St2T/2);
+  TGeoVolume* St2Log = new TGeoVolume("St2Log",St2Sol, pMedSteel);
+  AddSensitiveVolume(St2Log);
+
+  Double_t xPos,yPos,zPos;
+  Double_t yPosRel,zPosRel;
+  TGeoRotation *rot2 = new TGeoRotation("rot",0,0,0);
   
-  Double_t ShX = (8 * delta_Strip + 7 * delta_AnodeGap)/2; // half length in cm
-  Double_t ShY = 20.0; // half length in cm
-  
-  TGeoShape* ShCase = new TGeoBBox("ShCase", ShX, ShY, delta_Case/2);
-  TGeoShape* ShGap = new TGeoBBox("ShGap", ShX, ShY, delta_Gap/2);
-  TGeoShape* ShSteel = new TGeoBBox("ShSteel", ShX, ShY, delta_Steel/2);
-  TGeoShape* ShGlass = new TGeoBBox("ShGlass", ShX, ShY, delta_Glass/2);
-  TGeoShape* ShGas = new TGeoBBox("ShGas", ShX, ShY, delta_Gas/2);
-  TGeoShape* ShAnodeGap = new TGeoBBox("ShAnodeGap", delta_AnodeGap/2, ShY, delta_Steel/2);
-  
-  TGeoVolume* pCase = new TGeoVolume("MODVOL1", ShCase, pMedAl);
-  AddSensitiveVolume(pCase);
-  TGeoVolume* pGap = new TGeoVolume("MODVOL2", ShGap, pMedGasInactive);
-  TGeoVolume* pSteel = new TGeoVolume("MODVOL3", ShSteel, pMedSteel);
-  TGeoVolume* pGlass = new TGeoVolume("MODVOL4", ShGlass, pMedGlass);
-  TGeoVolume* pAnodeGap = new TGeoVolume("MODVOL5", ShAnodeGap, pMedGasInactive);
-  TGeoVolume* pGas = new TGeoVolume("MODVOL6", ShGas, pMedGas);
-  AddSensitiveVolume(pGas);
-  
-  TGeoRotation *rot = new TGeoRotation("rot",0,0,0);
-  Double_t tx = 0.0;
-  Double_t ty = 0.0;
-  Double_t tz = 0.0;
-  
-  TGeoVolume* pMod1 = new TGeoVolumeAssembly("RPCMODULE"); 
-  pMod1->AddNode(pCase, 11, new TGeoCombiTrans(tx,ty,tz,rot) ); // Case
-  tz = delta_Case/2 + delta_Gap/2;
-  pMod1->AddNode(pGap, 12, new TGeoCombiTrans(tx,ty,tz,rot) ); // Gap
-  tz = tz + delta_Gap/2 + delta_Steel/2;
-  pMod1->AddNode(pSteel, 13, new TGeoCombiTrans(tx,ty,tz,rot) ); // Steel
-  tz = tz + delta_Steel/2 + delta_Glass/2;
-  pMod1->AddNode(pGlass, 14, new TGeoCombiTrans(tx,ty,tz,rot) );  // Glass
-  tz = tz + delta_Glass/2 + delta_Gas/2;
-  pMod1->AddNode(pGas, 1, new TGeoCombiTrans(tx,ty,tz,rot) ); // Gas 1
-  tz = tz + delta_Gas/2 + delta_Glass/2;
-  pMod1->AddNode(pGlass, 15, new TGeoCombiTrans(tx,ty,tz,rot) ); // Glass
-  tz = tz + delta_Glass/2 + delta_Gas/2;
-  pMod1->AddNode(pGas, 2, new TGeoCombiTrans(tx,ty,tz,rot) ); // Gas 2
-  tz = tz + delta_Gas/2 + delta_Glass/2;
-  pMod1->AddNode(pGlass, 16, new TGeoCombiTrans(tx,ty,tz,rot) ); // Glass
-  tz = tz + delta_Glass/2 + delta_Gas/2;
-  pMod1->AddNode(pGas, 3, new TGeoCombiTrans(tx,ty,tz,rot) ); // Gas 3
-  tz = tz + delta_Gas/2 + delta_Glass/2;
-  pMod1->AddNode(pGlass, 17, new TGeoCombiTrans(tx,ty,tz,rot) ); // Glass
-  tz = tz + delta_Glass/2 + delta_Steel/2;
-  pMod1->AddNode(pSteel, 18, new TGeoCombiTrans(tx,ty,tz,rot) ); // Steel-Anode
-  tx = -ShX + delta_Strip + delta_AnodeGap/2;
-  pMod1->AddNode(pAnodeGap, 31, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 1
-  tx = tx + delta_Strip + delta_AnodeGap;
-  pMod1->AddNode(pAnodeGap, 32, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 2
-  tx = tx + delta_Strip + delta_AnodeGap;
-  pMod1->AddNode(pAnodeGap, 33, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 3
-  tx = tx + delta_Strip + delta_AnodeGap;
-  pMod1->AddNode(pAnodeGap, 34, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 4
-  tx = tx + delta_Strip + delta_AnodeGap;
-  pMod1->AddNode(pAnodeGap, 35, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 5
-  tx = tx + delta_Strip + delta_AnodeGap;
-  pMod1->AddNode(pAnodeGap, 36, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 6
-  tx = tx + delta_Strip + delta_AnodeGap;
-  pMod1->AddNode(pAnodeGap, 37, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 7
-  tx = 0.0;
-  tz = tz + delta_Steel/2 + delta_Steel/2;
-  pMod1->AddNode(pSteel, 19, new TGeoCombiTrans(tx,ty,tz,rot) ); // Steel-Anode
-  tx = -ShX + delta_Strip + delta_AnodeGap/2;
-  pMod1->AddNode(pAnodeGap, 41, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 1
-  tx = tx + delta_Strip + delta_AnodeGap;
-  pMod1->AddNode(pAnodeGap, 42, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 2
-  tx = tx + delta_Strip + delta_AnodeGap;
-  pMod1->AddNode(pAnodeGap, 43, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 3
-  tx = tx + delta_Strip + delta_AnodeGap;
-  pMod1->AddNode(pAnodeGap, 44, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 4
-  tx = tx + delta_Strip + delta_AnodeGap;
-  pMod1->AddNode(pAnodeGap, 45, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 5
-  tx = tx + delta_Strip + delta_AnodeGap;
-  pMod1->AddNode(pAnodeGap, 46, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 6
-  tx = tx + delta_Strip + delta_AnodeGap;
-  pMod1->AddNode(pAnodeGap, 47, new TGeoCombiTrans(tx,ty,tz,rot) ); // Anode Gap 7
-  tx = 0.0;
-  tz = tz + delta_Steel/2 + delta_Glass/2;
-  pMod1->AddNode(pGlass, 20, new TGeoCombiTrans(tx,ty,tz,rot) ); // Glass
-  tz = tz + delta_Glass/2 + delta_Gas/2;
-  pMod1->AddNode(pGas, 4, new TGeoCombiTrans(tx,ty,tz,rot) ); // Gas 4
-  tz = tz + delta_Gas/2 + delta_Glass/2;
-  pMod1->AddNode(pGlass, 21, new TGeoCombiTrans(tx,ty,tz,rot) ); // Glass
-  tz = tz + delta_Glass/2 + delta_Gas/2;
-  pMod1->AddNode(pGas, 5, new TGeoCombiTrans(tx,ty,tz,rot) ); // Gas 5
-  tz = tz + delta_Gas/2 + delta_Glass/2;
-  pMod1->AddNode(pGlass, 22, new TGeoCombiTrans(tx,ty,tz,rot) ); // Glass
-  tz = tz + delta_Glass/2 + delta_Gas/2;
-  pMod1->AddNode(pGas, 6, new TGeoCombiTrans(tx,ty,tz,rot) ); // Gas 6
-  tz = tz + delta_Gas/2 + delta_Glass/2;
-  pMod1->AddNode(pGlass, 23, new TGeoCombiTrans(tx,ty,tz,rot) ); // Glass
-  tz = tz + delta_Glass/2 + delta_Steel/2;
-  pMod1->AddNode(pSteel, 24, new TGeoCombiTrans(tx,ty,tz,rot) ); // Steel
-  tz = tz+ delta_Steel/2 + delta_Gap/2;
-  pMod1->AddNode(pGap, 25, new TGeoCombiTrans(tx,ty,tz,rot) ); // Gap
-  tz = tz + delta_Gap/2 + delta_Case/2;
-  pMod1->AddNode(pCase, 26, new TGeoCombiTrans(tx,ty,tz,rot) ); // Case
-  
-  tx = 0.0;
-  ty = 0.0;
-  tz = 0.0;
-  
-  // add divided volume to top Volume
-  vWorld->AddNode(pMod1, 101, new TGeoCombiTrans(tx,ty,tz,rot) ); // index: cp2
-  
-} // version 4
+  xPos = 0;
+  yPos = 0;
+  zPos = 0;
+  yPosRel = 0;
+  zPosRel = 0;
+
+  TGeoVolumeAssembly* assemblyDetector = new TGeoVolumeAssembly("ASSEMBLYDET"); 
+  yPosRel = 0;
+  zPosRel = -(St1T/2+Gas1T+Myl1T+(NofCells/2)*(Gas2T+GlassT)+GlassT+Myl2T+St2T/2);
+  rot2->RotateY(0);
+  assemblyDetector->AddNode(St1Log,1001,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+  zPosRel = zPosRel + St1T/2 + Gas1T/2;
+  assemblyDetector->AddNode(Gas1Log,1101,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+  zPosRel = zPosRel + Gas1T/2 + Myl1T/2;
+  assemblyDetector->AddNode(Myl1Log,1201,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+  zPosRel = zPosRel + Myl1T/2 + GlassT/2;
+  assemblyDetector->AddNode(GlassLog,20,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+  zPosRel = zPosRel + GlassT/2 + Gas2T/2;
+  for(Int_t i=0;i<NofCells/2;i++) {
+    assemblyDetector->AddNode(Gas2Log,i,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+    zPosRel = zPosRel + Gas2T/2 + GlassT/2;
+    assemblyDetector->AddNode(GlassLog,i+21,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+    if(i<NofCells/2-1) {
+      zPosRel = zPosRel + GlassT/2 + Gas2T/2;
+    }
+  }
+  zPosRel = zPosRel + GlassT/2 + Myl2T/2;
+  assemblyDetector->AddNode(Myl2Log,1202,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+  zPosRel = zPosRel + Myl2T/2 + St2T/2;
+  assemblyDetector->AddNode(Gas3Log,1301,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+  yPosRel = -DetH/2 + StripWidth/2;
+  for(Int_t i=0;i<NofStrips;i++) {
+    assemblyDetector->AddNode(St2Log,130+i,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+    yPosRel = yPosRel + StripWidth + AnGapWidth;
+  }
+  yPosRel = 0;
+  zPosRel = zPosRel + St2T/2 + Myl2T/2;
+  assemblyDetector->AddNode(Myl2Log,1203,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+  zPosRel = zPosRel + Myl2T/2 + GlassT/2;
+  assemblyDetector->AddNode(GlassLog,24,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+  zPosRel = zPosRel + GlassT/2 + Gas2T/2;
+  for(Int_t i=0;i<NofCells/2;i++) {
+    assemblyDetector->AddNode(Gas2Log,i+NofCells/2,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+    zPosRel = zPosRel + Gas2T/2 + GlassT/2;
+    assemblyDetector->AddNode(GlassLog,i+25,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+    if(i<NofCells/2-1) {
+      zPosRel = zPosRel + GlassT/2 + Gas2T/2;
+    }
+  }
+  zPosRel = zPosRel + GlassT/2 + Myl1T/2;
+  assemblyDetector->AddNode(Myl1Log,1204,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+  zPosRel = zPosRel + Myl1T/2 + St1T/2;
+  assemblyDetector->AddNode(St1Log,1002,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+  ///// first half of unit ends /////
+  zPosRel = zPosRel + St1T/2 + St1T/2;
+  assemblyDetector->AddNode(St1Log,1003,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+  zPosRel = zPosRel + St1T/2 + Myl1T/2;
+  assemblyDetector->AddNode(Myl1Log,1205,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+  zPosRel = zPosRel + Myl1T/2 + GlassT/2;
+  assemblyDetector->AddNode(GlassLog,28,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+  zPosRel = zPosRel + GlassT/2 + Gas2T/2;
+  for(Int_t i=0;i<NofCells/2;i++) {
+    assemblyDetector->AddNode(Gas2Log,i+2*NofCells/2,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+    zPosRel = zPosRel + Gas2T/2 + GlassT/2;
+    assemblyDetector->AddNode(GlassLog,i+29,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+    if(i<NofCells/2-1) {
+      zPosRel = zPosRel + GlassT/2 + Gas2T/2;
+    }
+  }
+  zPosRel = zPosRel + GlassT/2 + Myl2T/2;
+  assemblyDetector->AddNode(Myl2Log,1206,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+  zPosRel = zPosRel + Myl2T/2 + St2T/2;
+  assemblyDetector->AddNode(Gas3Log,1302,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+  yPosRel = -DetH/2 + StripWidth/2;
+  for(Int_t i=0;i<NofStrips;i++) {
+    assemblyDetector->AddNode(St2Log,130+NofStrips+i,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+    yPosRel = yPosRel + StripWidth + AnGapWidth;
+  }
+  yPosRel = 0;
+  zPosRel = zPosRel + St2T/2 + Myl2T/2;
+  assemblyDetector->AddNode(Myl2Log,1207,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+  zPosRel = zPosRel + Myl2T/2 + GlassT/2;
+  assemblyDetector->AddNode(GlassLog,32,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+  zPosRel = zPosRel + GlassT/2 + Gas2T/2;
+  for(Int_t i=0;i<NofCells/2;i++) {
+    assemblyDetector->AddNode(Gas2Log,i+3*NofCells/2,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+    zPosRel = zPosRel + Gas2T/2 + GlassT/2;
+    assemblyDetector->AddNode(GlassLog,i+33,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+    if(i<NofCells/2-1) {
+      zPosRel = zPosRel + GlassT/2 + Gas2T/2;
+    }
+  }
+  zPosRel = zPosRel + GlassT/2 + Myl1T/2;
+  assemblyDetector->AddNode(Myl1Log,1208,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+  zPosRel = zPosRel + Myl1T/2 + Gas1T/2;
+  assemblyDetector->AddNode(Gas1Log,1102,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+  zPosRel = zPosRel + Gas1T/2 + St1T/2;
+  assemblyDetector->AddNode(St1Log,1004,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+
+  for(Int_t i=0;i<NofUnitLayers;i++) {
+    if(i>0) zPos = zPos + UnitT;
+    yPos = -LayerH/2 + SegGapWidth/2 + DetH/2;
+    for(Int_t j=0;j<NofSegs;j++) {
+      WorldLog->AddNode(assemblyDetector,i*NofSegs+j,new TGeoCombiTrans(xPos,yPos,zPos,rot2));
+      yPos = yPos + DetH + SegGapWidth;
+    }
+  }
+}
 
 ClassImp(R3BNeuLand)

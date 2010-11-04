@@ -113,7 +113,7 @@ class R3BNeuLand : public R3BDetector
    ** Constructs the STS geometry
    **/
   virtual void ConstructGeometry();
-  virtual void ConstructGeometry3();
+  virtual void ConstructGeometry1();
   virtual void Initialize();
   virtual void SetSpecialPhysicsCuts(){;}
   void SetGeomVersion(Int_t vers ) { fVersion = vers; }
@@ -127,10 +127,9 @@ class R3BNeuLand : public R3BDetector
   Int_t          fEventID;           //!  track index
   Int_t          fTrackID;           //!  track index
   Int_t          fMot0TrackID;       //!  0th mother track index
-  Int_t          fDetID;             //!  detector id
+  Int_t          fDetlayerid;             //!  detector id
+  Int_t          fSegID;             //!  detector id
   Int_t          fCellID;            //!  detector cell id
-  Int_t          fCellHits;          //!  number of hits in the cells in an event
-  Double_t       fTotalEloss;        //!  total energy loss in the cells in an event
   Double_t       fMass;              //!  mass
   TLorentzVector fPosIn, fPosOut;    //!  position
   TLorentzVector fMomIn, fMomOut;    //!  momentum
@@ -151,8 +150,8 @@ class R3BNeuLand : public R3BDetector
    **/
   R3BNeuLandPoint* AddHit(Int_t eventID, Int_t trackID,
 			  Int_t mot0trackID,
-			  Int_t detID, Int_t cellID,
-			  Int_t cellhits, Double_t totaleloss, Double_t mass,
+			  Int_t detlayerid, Int_t cellID, Int_t segID,
+			  Double_t mass,
 			  TVector3 posIn,
 			  TVector3 pos_out, TVector3 momIn,
 			  TVector3 momOut, Double_t time,
@@ -177,14 +176,13 @@ class R3BNeuLand : public R3BDetector
   TGeoMedium* pMedGas;                                               //!
   TGeoMedium* pMedGasInactive;                                       //!
   TGeoMedium* pMedAl;                                                //!
-    
-  
-  Int_t cellid1, cellid2, cellid3, cellid4, cellid5, cellid6;        //!
-  Int_t secondaries;                                                 //!
-  Int_t cp1, cp2;                                                    //!
-  Int_t volId1, volId2;                                              //!
+  TGeoMedium* pMedPar;                                                //!
+  TGeoMedium* pMedPb;                                                //!
+  TGeoMedium* pMedMyl;                                                //!
 
-  Int_t ent_part, exit_part;                                         //!
+  
+  Int_t cellNum, unitNum;                                                    //!
+  Int_t volId1, volId2;                                              //!
   
   ClassDef(R3BNeuLand,1);
   
@@ -192,7 +190,7 @@ class R3BNeuLand : public R3BDetector
 
 
 inline void R3BNeuLand::ResetParameters() {
-  fEventID = fTrackID = fDetID = fCellID = -1;
+  fEventID = fTrackID = fDetlayerid = fCellID = fSegID = -1;
   fMot0TrackID = -1;
   fPosIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fPosOut.SetXYZM(0.0, 0.0, 0.0, 0.0);

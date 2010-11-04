@@ -129,6 +129,7 @@ class R3BNeuLandv1 : public R3BDetector
   Int_t          fMot0TrackID;       //!  0th mother track index
   Int_t          fDetID;             //!  detector id
   Int_t          fCellID;            //!  detector cell id
+  Int_t          fSegID;            //!  detector cell id
   Int_t          fCellHits;          //!  number of hits in the cells in an event
   Double_t       fTotalEloss;        //!  total energy loss in the cells in an event
   Double_t       fMass;              //!  mass
@@ -151,8 +152,8 @@ class R3BNeuLandv1 : public R3BDetector
    **/
   R3BNeuLandPoint* AddHit(Int_t eventID, Int_t trackID,
 			  Int_t mot0trackID,
-			  Int_t detID, Int_t cellID,
-			  Int_t cellhits, Double_t totaleloss, Double_t mass,
+			  Int_t detID, Int_t cellID, Int_t segID,
+			  Double_t mass,
 			  TVector3 posIn,
 			  TVector3 pos_out, TVector3 momIn,
 			  TVector3 momOut, Double_t time,
@@ -192,7 +193,7 @@ class R3BNeuLandv1 : public R3BDetector
 
 
 inline void R3BNeuLandv1::ResetParameters() {
-  fEventID = fTrackID = fDetID = fCellID = -1;
+  fEventID = fTrackID = fDetID = fCellID = fSegID = -1;
   fMot0TrackID = -1;
   fPosIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fPosOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
