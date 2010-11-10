@@ -673,11 +673,14 @@ void R3BNeuLand::ConstructGeometry1() {
   zPosRel = zPosRel + GlassT/2 + Myl2T/2;
   assemblyDetector->AddNode(Myl2Log,1202,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
   zPosRel = zPosRel + Myl2T/2 + St2T/2;
-  assemblyDetector->AddNode(Gas3Log,1301,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
   yPosRel = -DetH/2 + StripWidth/2;
   for(Int_t i=0;i<NofStrips;i++) {
     assemblyDetector->AddNode(St2Log,130+i,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
-    yPosRel = yPosRel + StripWidth + AnGapWidth;
+    if(i<NofStrips-1) {
+      yPosRel = yPosRel + StripWidth/2 + AnGapWidth/2;
+      assemblyDetector->AddNode(Gas3Log,1300+i,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+      yPosRel = yPosRel + AnGapWidth/2 + StripWidth/2;
+    }
   }
   yPosRel = 0;
   zPosRel = zPosRel + St2T/2 + Myl2T/2;
@@ -716,11 +719,14 @@ void R3BNeuLand::ConstructGeometry1() {
   zPosRel = zPosRel + GlassT/2 + Myl2T/2;
   assemblyDetector->AddNode(Myl2Log,1206,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
   zPosRel = zPosRel + Myl2T/2 + St2T/2;
-  assemblyDetector->AddNode(Gas3Log,1302,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
   yPosRel = -DetH/2 + StripWidth/2;
   for(Int_t i=0;i<NofStrips;i++) {
     assemblyDetector->AddNode(St2Log,130+NofStrips+i,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
-    yPosRel = yPosRel + StripWidth + AnGapWidth;
+    if(i<NofStrips-1) {
+      yPosRel = yPosRel + StripWidth/2 + AnGapWidth/2;
+      assemblyDetector->AddNode(Gas3Log,1400+i,new TGeoCombiTrans(0,yPosRel,zPosRel,rot2));
+      yPosRel = yPosRel + AnGapWidth/2 + StripWidth/2;
+    }
   }
   yPosRel = 0;
   zPosRel = zPosRel + St2T/2 + Myl2T/2;
