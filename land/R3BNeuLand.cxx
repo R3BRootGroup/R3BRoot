@@ -632,7 +632,7 @@ void R3BNeuLand::ConstructGeometry1() {
   TGeoVolume* Myl2Log = new TGeoVolume("Myl2Log",Myl2Sol, pMedMyl);
   AddSensitiveVolume(Myl2Log);
 
-  TGeoShape* Gas3Sol = new TGeoBBox("Gas3Box",DetW/2,DetH/2,St2T/2);
+  TGeoShape* Gas3Sol = new TGeoBBox("Gas3Box",DetW/2,AnGapWidth/2,St2T/2);
   TGeoVolume* Gas3Log = new TGeoVolume("Gas3Log",Gas3Sol, pMedGasInactive);
   AddSensitiveVolume(Gas3Log);
 
