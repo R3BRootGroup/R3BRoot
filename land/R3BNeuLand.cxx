@@ -181,7 +181,7 @@ Bool_t R3BNeuLand::ProcessHits(FairVolume* vol) {
 	
       } // IsTrackExiting
       
-      
+      /*      
       cout << " fEventID: " << fEventID
 	   << " fTrackID: " << fTrackID
 	   << " fMot0TrackID: " << fMot0TrackID
@@ -192,15 +192,15 @@ Bool_t R3BNeuLand::ProcessHits(FairVolume* vol) {
 	   << " fTime: " << fTime
 	   << " fELoss: " << fELoss
 	   << endl;
-      
+      */
       if ( gMC->IsTrackExiting()    ||
 	   gMC->IsTrackStop()       ||
 	   gMC->IsTrackDisappeared()   ) {
-	
+	/*
 	if(gMC->IsTrackExiting()) cout << " Track is exiting " << endl;
 	if(gMC->IsTrackStop()) cout << " Track is stopped " << endl;
 	if(gMC->IsTrackDisappeared()) cout << " Track is disappeared " << endl;
-	
+       	
 	cout << " fEventID: " << fEventID
 	     << " fTrackID: " << fTrackID
 	     << " fMot0TrackID: " << fMot0TrackID
@@ -211,7 +211,7 @@ Bool_t R3BNeuLand::ProcessHits(FairVolume* vol) {
 	     << " fTime: " << fTime
 	     << " fELoss: " << fELoss
 	     << endl;
-	
+	*/	
 
 	AddHit(fEventID, fTrackID, fMot0TrackID,
 	       fDetlayerid, fCellID, fSegID,

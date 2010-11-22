@@ -31,7 +31,11 @@ R3BNeuLandDigitizer::~R3BNeuLandDigitizer() {
 
 
 InitStatus R3BNeuLandDigitizer::Init() {
-  
+
+  NofNeuLandPoints = 0;
+  NofEvts = 0;
+  NofProtEvts = 0;
+
   // Get input array 
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) Fatal("Init", "No FairRootManager");
@@ -75,7 +79,6 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
   Reset();
   
   Int_t NofEntr = fLandPoints->GetEntries();
-  cout << " NofEntr: " << NofEntr << endl;
   
   Int_t eventID[NofEntr];
   Int_t trackID[NofEntr];
@@ -104,6 +107,8 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
   Double_t KinE[NofEntr];
   Double_t xAv[NofEntr];
   Double_t yAv[NofEntr];
+  
+  Bool_t ProtFlag[NofEntr];
 
   // fill arrays
   if(NofEntr > 0) {
@@ -134,6 +139,9 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
       R3BMCTrack* aTrack = (R3BMCTrack*) fLandMCTrack->At(trackID[l]);
       partID[l] = aTrack->GetPdgCode();
 
+      if(partID[l] == 2212) ProtFlag[l] = 1;
+      else ProtFlag[l] = 0;
+
       if(trackID[l] > 0) {
 	R3BMCTrack* aTrack1 = (R3BMCTrack*) fLandMCTrack->At(parentTrackID[l]);
 	parentPartID[l] = aTrack->GetPdgCode();
@@ -148,24 +156,22 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
       h_yAv->Fill(yAv[l]);
       h_eDepTot->Fill(eDepTot[l]);
 
-
-
     } // for(NofEntr)
   } // if(NofEntr)
 
-  for (Int_t l=0; l<NofEntr; l++) {
-    if(l==0) cout << " eventID: " << eventID[l] << endl;
-    cout << "   EntrNum: " << l << endl;
-    cout << "     trackID: " << trackID[l] << " parentTrackID: " << parentTrackID[l] << endl;
-    cout << "     detLayerID: " << detLayerID[l] << " segID: " << segID[l]
-	 << " cellID: " << cellID[l] << endl;
-    cout << "     mass: " << mass[l] << " time: " << time[l]
-	 << " eDepTot: " << eDepTot[l] << endl;
-    cout << "     PosIn: " << xIn[l] << "," << yIn[l] << "," << zIn[l] 
-	 << " PosOut: " <<  xOut[l] << "," << yOut[l] << "," << zOut[l] << endl;
-    
 
+
+  NofEvts++;
+  NofNeuLandPoints += NofEntr;
+  
+  Bool_t UsedProtEvt = 0;
+  for (Int_t l=0; l<NofEntr; l++) {
+    if(UsedProtEvt == 0 && ProtFlag[l] == 1) {
+      NofProtEvts++;
+      UsedProtEvt = 1;
+    }
   }
+
 }
 // -------------------------------------------------------------------------
 
@@ -175,6 +181,9 @@ void R3BNeuLandDigitizer::Reset()
 
 void R3BNeuLandDigitizer::Finish()
 {
+  cout << " Number of NeuLandPoints: " << NofNeuLandPoints << endl;
+  cout << " Percentage of events with proton involvement: " << 100*NofProtEvts/NofEvts << "%"<< endl;
+
   h_time->Write();
   h_xAv->Write();
   h_yAv->Write();

@@ -35,12 +35,16 @@ class R3BNeuLandDigitizer : public FairTask
   virtual void Finish();
   virtual void Reset();
 
+  Int_t NofNeuLandPoints;
+  Int_t NofEvts;
+  Int_t NofProtEvts;
+
   protected:
   TClonesArray* fLandPoints;
   TClonesArray* fLandMCTrack; 
 
 
-  //- Control Hitograms
+  //- Control Histograms
   TH1F *h_time;
   TH1F *h_xAv;
   TH1F *h_yAv;
