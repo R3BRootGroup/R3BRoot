@@ -30,6 +30,7 @@ class R3BTraPoint : public FairMCPoint
   /** Constructor with arguments
    *@param trackID  Index of MCTrack
    *@param detID    Detector ID
+   *@param detVolID Detector Copy ID  // added by Marc
    *@param posIn    Ccoordinates at entrance to active volume [cm]
    *@param posOut   Coordinates at exit of active volume [cm]
    *@param momIn    Momentum of track at entrance [GeV]
@@ -38,7 +39,7 @@ class R3BTraPoint : public FairMCPoint
    *@param length   Track length since creation [cm]
    *@param eLoss    Energy deposit [GeV]
    **/
-  R3BTraPoint(Int_t trackID, Int_t detID,
+  R3BTraPoint(Int_t trackID, Int_t detID, Int_t detCopyID, // detCopyID added by Marc
 	      TVector3 posIn, 
 	      TVector3 posOut, TVector3 momIn, TVector3 momOut,
 	      Double_t tof, Double_t length, Double_t eLoss);
@@ -53,6 +54,7 @@ class R3BTraPoint : public FairMCPoint
 
 
   /** Accessors **/
+  Int_t GetDetCopyID()   const { return fDetCopyID; } // added by Marc
   Double_t GetXIn()   const { return fX; }
   Double_t GetYIn()   const { return fY; }
   Double_t GetZIn()   const { return fZ; }
@@ -81,6 +83,7 @@ class R3BTraPoint : public FairMCPoint
   /** Modifiers **/
   void SetPositionOut(TVector3 pos);
   void SetMomentumOut(TVector3 mom);
+  void SetDetCopyID(Int_t id)       { fDetCopyID = id; }; // added by Marc
 
 
   /** Output to screen **/
@@ -92,6 +95,7 @@ class R3BTraPoint : public FairMCPoint
 
   Double32_t fX_out,  fY_out,  fZ_out;
   Double32_t fPx_out, fPy_out, fPz_out;
+  Int_t fDetCopyID; // added by Marc
 
 
 
