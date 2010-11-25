@@ -3,6 +3,7 @@
 // -----            Created 26/03/09  by D.Bertini                     -----
 // -----        new Version: 20/07/09 <D.Bertini@gsi.de>               -----
 // -----        new Version: 08/04/10 <wranne@student.chalmers.se>     -----
+// -----        new Version: 25/11/10 <>                               -----
 // -------------------------------------------------------------------------
 #include "R3BCal.h"
 
