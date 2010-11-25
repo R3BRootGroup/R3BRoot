@@ -66,8 +66,8 @@ public:
   void SetXYZ   (Double32_t x=0, Double32_t y=0, Double32_t z=0) {
 		fX=x; fY=y; fZ=z; fPointVtxIsSet=kTRUE;}
 	
-  void SetBoxXYZ (Double32_t x1=0, Double32_t y1=0, Double32_t x2=0, Double32_t y2=0, Double32_t z=0) {
-		fX1=x1; fY1=y1; fX2=x2; fY2=y2; fZ=z; fBoxVtxIsSet=kTRUE;}
+  void SetBoxXYZ (Double32_t x1=0, Double32_t y1=0, Double32_t x2=0, Double32_t y2=0, Double32_t z1=0, Double32_t z2=0) {
+		fX1=x1; fY1=y1; fX2=x2; fY2=y2; fZ1=z1; fZ2=z2; fBoxVtxIsSet=kTRUE;}
 	
   void SetDebug(Bool_t debug=0) {fDebug = debug;}
 	
@@ -101,7 +101,7 @@ private:
   Double32_t fPMin,   fPMax;       // Momentum range in lab system  
   Double32_t fThetaMin, fThetaMax; // Polar angle range in lab system [degree]
   Double32_t fX, fY, fZ;           // Point vertex coordinates [cm]
-  Double32_t fX1, fY1, fX2, fY2;   // Box vertex coords (x1,y1)->(x2,y2)
+  Double32_t fX1, fY1, fZ1, fX2, fY2, fZ2;   // Box vertex coords (x1,y1,z1)->(x2,y2,z2)
 	
   Bool_t     fEtaRangeIsSet;       // True if eta range is set
   Bool_t     fYRangeIsSet;         // True if rapidity range is set

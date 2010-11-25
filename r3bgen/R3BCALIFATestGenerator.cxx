@@ -17,7 +17,7 @@ R3BCALIFATestGenerator::R3BCALIFATestGenerator() :
 fPDGType(0),fMult(0),fPDGMass(0),fPtMin(0),fPtMax(0),
 fPhiMin(0),fPhiMax(0),fEtaMin(0),fEtaMax(0),fYMin(0),fYMax(0),
 fPMin(0),fPMax(0),fThetaMin(0),fThetaMax(0),fX(0),fY(0),fZ(0),
-fX1(0),fY1(0),fX2(0),fY2(0),
+fX1(0),fY1(0), fZ1(0),fX2(0),fY2(0),fZ2(0),
 fEtaRangeIsSet(0),fYRangeIsSet(0),fThetaRangeIsSet(0),
 fCosThetaIsSet(0),fPtRangeIsSet(0),fPRangeIsSet(0),
 fPointVtxIsSet(0),fBoxVtxIsSet(0),fDebug(0),
@@ -32,7 +32,7 @@ R3BCALIFATestGenerator::R3BCALIFATestGenerator(Int_t pdgid, Int_t mult) :
 fPDGType(pdgid),fMult(mult),fPDGMass(0),fPtMin(0),fPtMax(0),
 fEtaMin(0),fEtaMax(0),fYMin(0),fYMax(0),
 fPMin(0),fPMax(0),fThetaMin(0),fThetaMax(0),fX(0),fY(0),fZ(0),
-fX1(0),fY1(0),fX2(0),fY2(0),
+fX1(0),fY1(0), fZ1(0),fX2(0),fY2(0),fZ2(0),
 fEtaRangeIsSet(0), fYRangeIsSet(0),fThetaRangeIsSet(0),
 fCosThetaIsSet(0), fPtRangeIsSet(0), fPRangeIsSet(0),
 fPointVtxIsSet(0),fBoxVtxIsSet(0),fDebug(0),
@@ -133,6 +133,7 @@ Bool_t R3BCALIFATestGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     if (fBoxVtxIsSet) {
       fX = gRandom->Uniform(fX1,fX2);
       fY = gRandom->Uniform(fY1,fY2);
+	  fZ = gRandom->Uniform(fZ1,fZ2);
     }
 
 	if(fNuclearDecayChainIsSet){
