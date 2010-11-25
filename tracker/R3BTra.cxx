@@ -200,7 +200,8 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
        gMC->IsTrackStop()       ||
        gMC->IsTrackDisappeared()   ) {
     fTrackID  = gMC->GetStack()->GetCurrentTrackNumber();
-    fVolumeID = vol->getMCid();
+    fVolumeID = vol->getMCid(); //getCopyNo(); //getMCid();
+    fDetCopyID = vol->getCopyNo();  // added by Marc
     gMC->TrackPosition(fPosOut);
     gMC->TrackMomentum(fMomOut);
     if (fELoss == 0. ) return kFALSE;
@@ -245,7 +246,7 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
       fPosOut.SetZ(newpos[2]);
     }
 
-    AddHit(fTrackID, fVolumeID,
+    AddHit(fTrackID, fVolumeID, fDetCopyID,   // fdetCopyID, added by Marc
 	   TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
 	   TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
 	   TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
@@ -363,7 +364,7 @@ void R3BTra::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
 }
 
 // -----   Private method AddHit   --------------------------------------------
-R3BTraPoint* R3BTra::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
+R3BTraPoint* R3BTra::AddHit(Int_t trackID, Int_t detID, Int_t detCopyID, TVector3 posIn, // Int_t detCopyID added by Marc
 			    TVector3 posOut, TVector3 momIn, 
 			    TVector3 momOut, Double_t time, 
 			    Double_t length, Double_t eLoss) {
@@ -373,8 +374,8 @@ R3BTraPoint* R3BTra::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
     cout << "-I- R3BTra: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
 	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
 	 << trackID << ", energy loss " << eLoss*1e06 << " keV" << endl;
-  return new(clref[size]) R3BTraPoint(trackID, detID, posIn, posOut,
-				      momIn, momOut, time, length, eLoss);
+  return new(clref[size]) R3BTraPoint(trackID, detID, detCopyID, posIn, posOut,
+				      momIn, momOut, time, length, eLoss); // detCopy added by Marc
 }
 
 
@@ -383,7 +384,7 @@ void R3BTra::ConstructGeometry() {
 
   // out-of-file geometry definition
    Double_t dx,dy,dz;
-   Double_t par[20];
+   // Double_t par[20];
    Double_t rmin, rmax;
    Double_t a;
    Double_t thx, phx, thy, phy, thz, phz;
@@ -510,194 +511,698 @@ void R3BTra::ConstructGeometry() {
 
 
 
- // TRANSFORMATION MATRICES
+   // TRANSFORMATION MATRICES
+   
+   // Detectors
+
+   // First layer
+   
    // Combi transformation: 
    dx = 0.000000;
-   dy = 0.000000;
-   dz = 0.000000;
-   // Rotation: 
-   thx = 90.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = 0.000000;    phz = 0.000000;
-   //TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-  // TGeoCombiTrans*
-  // pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
-   // Combi transformation: 
-   dx = 0.000000;
-   dy = 0.000000;
-   dz = 10.820000;
-   // Rotation: 
-   thx = 90.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = 0.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix5 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-   pMatrix4 = new TGeoCombiTrans("", dx,dy,dz,pMatrix5);
-   // Combi transformation: 
-   dx = 0.000000;
-   dy = 0.000000;
-   dz = 0.000000;
-   // Rotation: 
-   thx = 90.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = 0.000000;    phz = 0.000000;
-  // TGeoRotation *pMatrix33 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-  // TGeoCombiTrans*
-  // pMatrix32 = new TGeoCombiTrans("", dx,dy,dz,pMatrix33);
-   // Combi transformation: 
-   dx = 0.000000;
-   dy = -2.100000;
-   dz = 4.470000;
+   dy = -4.83000; 
+   dz = 15.0000;
+   //dz = 6.20000;
    // Rotation: 
    thx = 0.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 0.000000;
    thz = 90.000000;    phz = 90.000000;
-   TGeoRotation *pMatrix7 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
-   pMatrix6 = new TGeoCombiTrans("", dx,dy,dz,pMatrix7);
+     pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
+   
    // Combi transformation: 
-   dx = 0.000000;
-   dy = 2.100000;
-   dz = 4.470000;
+   dx = -3.42000;
+   dy = -3.42000; 
+   dz = 15.0000;
+   //dz = 6.20000;
    // Rotation: 
-   thx = 180.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 0.000000;
-   thz = 90.000000;    phz = 270.000000;
-   TGeoRotation *pMatrix9 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 315.000000;
+   thz = 90.000000;    phz = 45.000000;
+   TGeoRotation *pMatrix5 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
-   pMatrix8 = new TGeoCombiTrans("", dx,dy,dz,pMatrix9);
+     pMatrix4 = new TGeoCombiTrans("", dx,dy,dz,pMatrix5);
+   
    // Combi transformation: 
-   dx = 2.100000;
-   dy = 0.000000;
-   dz = 4.470000;
+   dx = -4.83000;
+   dy = 0.00000; 
+   dz = 15.0000;
+   //dz = 6.20000;
    // Rotation: 
    thx = 180.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
    thz = 90.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix11 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoRotation *pMatrix7 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
-   pMatrix10 = new TGeoCombiTrans("", dx,dy,dz,pMatrix11);
+     pMatrix6 = new TGeoCombiTrans("", dx,dy,dz,pMatrix7);
+   
    // Combi transformation: 
-   dx = -2.100000;
-   dy = 0.000000;
-   dz = 4.470000;
+   dx = -3.42000;
+   dy = 3.42000; 
+   dz = 15.0000;
+   //dz = 6.20000;
    // Rotation: 
    thx = 0.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = 90.000000;    phz = 180.000000;
+   thy = 90.000000;    phy = 45.000000;
+   thz = 90.000000;    phz = 315.000000;
+   TGeoRotation *pMatrix9 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix8 = new TGeoCombiTrans("", dx,dy,dz,pMatrix9);
+   
+   // Combi transformation: 
+   dx = 0.000000;
+   dy = 4.8300; 
+   dz = 15.0000;
+   //dz = 6.20000;
+   // Rotation: 
+   thx = 180.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 0.000000;
+   thz = 90.000000;    phz = 90.000000;
+   TGeoRotation *pMatrix11 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix10 = new TGeoCombiTrans("", dx,dy,dz,pMatrix11);
+   
+   // Combi transformation: 
+   dx = 3.42000;
+   dy = 3.42000; 
+   dz = 15.0000;
+   //dz = 6.20000;
+   // Rotation: 
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 315.000000;
+   thz = 90.000000;    phz = 45.000000;
    TGeoRotation *pMatrix13 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
-   pMatrix12 = new TGeoCombiTrans("", dx,dy,dz,pMatrix13);
+     pMatrix12 = new TGeoCombiTrans("", dx,dy,dz,pMatrix13);
+   
    // Combi transformation: 
-   dx = 0.000000;
-   dy = -14.090000;
-   dz = 0.000000;
+   dx = 4.83000;
+   dy = 0.00000; 
+   dz = 15.0000;
+   //dz = 6.20000;
    // Rotation: 
-   thx = 90.000000;    phx = 0.000000;
-   thy = 0.000000;    phy = 0.000000;
-   thz = 90.000000;    phz = 270.000000;
+   thx = 180.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 90.000000;    phz = 0.000000;
    TGeoRotation *pMatrix15 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
-   pMatrix14 = new TGeoCombiTrans("", dx,dy,dz,pMatrix15);
+     pMatrix14 = new TGeoCombiTrans("", dx,dy,dz,pMatrix15);
+   
    // Combi transformation: 
-   dx = 0.000000;
-   dy = -17.000000;
-   dz = 0.000000;
+   dx = 3.42000;
+   dy = -3.42000; 
+   dz = 15.0000;
+   //dz = 6.20000;
    // Rotation: 
-   thx = 90.000000;    phx = 0.000000;
-   thy = 0.000000;    phy = 0.000000;
-   thz = 90.000000;    phz = 270.000000;
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 45.000000;
+   thz = 90.000000;    phz = 315.000000;
    TGeoRotation *pMatrix17 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
-   pMatrix16 = new TGeoCombiTrans("", dx,dy,dz,pMatrix17);
+     pMatrix16 = new TGeoCombiTrans("", dx,dy,dz,pMatrix17);
+   
    // Combi transformation: 
-   dx = 0.000000;
-   dy = -8.000000;
-   dz = 10.820000;
+   dx = -0.000000;
+   dy = -4.83000; 
+   dz = 18.6000;
    // Rotation: 
-   thx = 90.000000;    phx = 270.000000;
+   thx = 0.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 0.000000;
-   thz = 0.000000;    phz = 0.000000;
+   thz = 90.000000;    phz = 90.000000;
    TGeoRotation *pMatrix19 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
-   pMatrix18 = new TGeoCombiTrans("", dx,dy,dz,pMatrix19);
+     pMatrix18 = new TGeoCombiTrans("", dx,dy,dz,pMatrix19);
+
    // Combi transformation: 
-   dx = 0.000000;
-   dy = 0.000000;
-   dz = 0.000000;
+   dx = -3.42000;
+   dy = -3.42000; 
+   dz = 18.60000;
    // Rotation: 
-   thx = 90.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = 0.000000;    phz = 0.000000;
-  // TGeoRotation *pMatrix35 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
- //  TGeoCombiTrans*
- //  pMatrix34 = new TGeoCombiTrans("", dx,dy,dz,pMatrix35);
-   // Combi transformation: 
-   dx = -2.100000;
-   dy = -8.000000;
-   dz = 4.470000;
-   // Rotation: 
-   thx = 90.000000;    phx = 90.000000;
-   thy = 0.000000;    phy = 0.000000;
-   thz = 90.000000;    phz = 360.000000;
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 315.000000;
+   thz = 90.000000;    phz = 45.000000;
    TGeoRotation *pMatrix21 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
-   pMatrix20 = new TGeoCombiTrans("", dx,dy,dz,pMatrix21);
+     pMatrix20 = new TGeoCombiTrans("", dx,dy,dz,pMatrix21);
+   
    // Combi transformation: 
-   dx = 2.100000;
-   dy = 8.000000;
-   dz = 4.470000;
+   dx = -4.830000;
+   dy = 0.00000; 
+   dz = 18.60000;
    // Rotation: 
-   thx = 90.000000;    phx = 90.000000;
-   thy = 180.000000;    phy = 0.000000;
-   thz = 90.000000;    phz = 180.000000;
+   thx = 180.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 90.000000;    phz = 0.000000;
    TGeoRotation *pMatrix23 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
-   pMatrix22 = new TGeoCombiTrans("", dx,dy,dz,pMatrix23);
+     pMatrix22 = new TGeoCombiTrans("", dx,dy,dz,pMatrix23);
+   
    // Combi transformation: 
-   dx = 8.000000;
-   dy = -2.100000;
-   dz = 4.470000;
+   dx = -3.42000;
+   dy = 3.42000; 
+   dz = 18.60000;
    // Rotation: 
-   thx = 90.000000;    phx = 0.000000;
-   thy = 180.000000;    phy = 0.000000;
-   thz = 90.000000;    phz = 90.000000;
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 45.000000;
+   thz = 90.000000;    phz = 315.000000;
    TGeoRotation *pMatrix25 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
-   pMatrix24 = new TGeoCombiTrans("", dx,dy,dz,pMatrix25);
+     pMatrix24 = new TGeoCombiTrans("", dx,dy,dz,pMatrix25);
+   
    // Combi transformation: 
-   dx = -8.000000;
-   dy = 2.100000;
-   dz = 4.470000;
+   dx = 0.000000;
+   dy = 4.8300; 
+   dz = 18.60000;
    // Rotation: 
-   thx = 90.000000;    phx = 0.000000;
-   thy = 180.000000;    phy = 0.000000;
+   thx = 180.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 0.000000;
    thz = 90.000000;    phz = 90.000000;
    TGeoRotation *pMatrix27 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
-   pMatrix26 = new TGeoCombiTrans("", dx,dy,dz,pMatrix27);
+     pMatrix26 = new TGeoCombiTrans("", dx,dy,dz,pMatrix27);
+   
    // Combi transformation: 
-   dx = -6.240000;
-   dy = -3.900000;
-   dz = 0.000000;
+   dx = 3.42000;
+   dy = 3.42000; 
+   dz = 18.60000;
    // Rotation: 
-   thx = 90.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = 0.000000;    phz = 0.000000;
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 315.000000;
+   thz = 90.000000;    phz = 45.000000;
    TGeoRotation *pMatrix29 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
-   pMatrix28 = new TGeoCombiTrans("", dx,dy,dz,pMatrix29);
+     pMatrix28 = new TGeoCombiTrans("", dx,dy,dz,pMatrix29);
+   
    // Combi transformation: 
-   dx = -6.240000;
-   dy = -3.900000;
-   dz = 0.000000;
+   dx = 4.83000;
+   dy = 0.00000; 
+   dz = 18.60000;
+   // Rotation: 
+   thx = 180.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 90.000000;    phz = 0.000000;
+   TGeoRotation *pMatrix31 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix30 = new TGeoCombiTrans("", dx,dy,dz,pMatrix31);
+   
+   // Combi transformation: 
+   dx = 3.42000;
+   dy = -3.42000; 
+   dz = 18.60000;
+   // Rotation: 
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 45.000000;
+   thz = 90.000000;    phz = 315.000000;
+   TGeoRotation *pMatrix33 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix32 = new TGeoCombiTrans("", dx,dy,dz,pMatrix33);
+
+   // Second layer
+
+   // Combi transformation: 
+   dx = 0.00000;
+   dy = -10.86000; 
+   dz = 15.0000;
+   //dz = 6.20000;
+   // Rotation: 
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 0.000000;
+   thz = 90.000000;    phz = 90.000000;
+   TGeoRotation *pMatrix67 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix66 = new TGeoCombiTrans("", dx,dy,dz,pMatrix67);
+   
+   // Combi transformation: 
+   dx = -7.67000;
+   dy = -7.67000; 
+   dz = 15.0000;
+   //dz = 6.20000;
+   // Rotation: 
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 315.000000;
+   thz = 90.000000;    phz = 45.000000;
+   TGeoRotation *pMatrix69 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix68 = new TGeoCombiTrans("", dx,dy,dz,pMatrix69);
+
+   // Combi transformation: 
+   dx = -10.86000;
+   dy = 0.00000; 
+   dz = 15.0000;
+   //dz = 6.20000;
+   // Rotation: 
+   thx = 180.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 90.000000;    phz = 0.000000;
+   TGeoRotation *pMatrix71 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix70 = new TGeoCombiTrans("", dx,dy,dz,pMatrix71);
+   
+   // Combi transformation: 
+   dx = -7.67000;
+   dy = 7.67000; 
+   dz = 15.0000;
+   //dz = 6.20000;
+   // Rotation: 
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 45.000000;
+   thz = 90.000000;    phz = 315.000000;
+   TGeoRotation *pMatrix73 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix72 = new TGeoCombiTrans("", dx,dy,dz,pMatrix73);
+   
+   // Combi transformation: 
+   dx = 0.000000;
+   dy = 10.8600; 
+   dz = 15.0000;
+   //dz = 6.20000;
+   // Rotation: 
+   thx = 180.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 0.000000;
+   thz = 90.000000;    phz = 90.000000;
+   TGeoRotation *pMatrix75 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix74 = new TGeoCombiTrans("", dx,dy,dz,pMatrix75);
+   
+   // Combi transformation: 
+   dx = 7.67000;
+   dy = 7.67000; 
+   dz = 15.0000;
+   //dz = 6.20000;
+   // Rotation: 
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 315.000000;
+   thz = 90.000000;    phz = 45.000000;
+   TGeoRotation *pMatrix77 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix76 = new TGeoCombiTrans("", dx,dy,dz,pMatrix77);
+   
+   // Combi transformation: 
+   dx = 10.86000;
+   dy = 0.00000; 
+   dz = 15.0000;
+   //dz = 6.20000;
+   // Rotation: 
+   thx = 180.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 90.000000;    phz = 0.000000;
+   TGeoRotation *pMatrix79 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix78 = new TGeoCombiTrans("", dx,dy,dz,pMatrix79);
+   
+   // Combi transformation: 
+   dx = 7.67000;
+   dy = -7.67000; 
+   dz = 15.0000;
+   //dz = 6.20000;
+   // Rotation: 
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 45.000000;
+   thz = 90.000000;    phz = 315.000000;
+   TGeoRotation *pMatrix81 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix80 = new TGeoCombiTrans("", dx,dy,dz,pMatrix81);
+
+   // Combi transformation: 
+   dx = 0.00000;
+   dy = -10.86000; 
+   dz = 18.60000;
+   // Rotation: 
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 0.000000;
+   thz = 90.000000;    phz = 90.000000;
+   TGeoRotation *pMatrix83 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix82 = new TGeoCombiTrans("", dx,dy,dz,pMatrix83);
+   
+   // Combi transformation: 
+   dx = -7.67000;
+   dy = -7.67000; 
+   dz = 18.6000;
+   // Rotation: 
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 315.000000;
+   thz = 90.000000;    phz = 45.000000;
+   TGeoRotation *pMatrix85 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix84 = new TGeoCombiTrans("", dx,dy,dz,pMatrix85);
+
+   // Combi transformation: 
+   dx = -10.86000;
+   dy = 0.00000; 
+   dz = 18.60000;
+   // Rotation: 
+   thx = 180.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 90.000000;    phz = 0.000000;
+   TGeoRotation *pMatrix87 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix86 = new TGeoCombiTrans("", dx,dy,dz,pMatrix87);
+   
+   // Combi transformation: 
+   dx = -7.67000;
+   dy = 7.67000; 
+   dz = 18.60000;
+   // Rotation: 
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 45.000000;
+   thz = 90.000000;    phz = 315.000000;
+   TGeoRotation *pMatrix89 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix88 = new TGeoCombiTrans("", dx,dy,dz,pMatrix89);
+   
+   // Combi transformation: 
+   dx = 0.000000;
+   dy = 10.8600; 
+   dz = 18.60000;
+   // Rotation: 
+   thx = 180.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 0.000000;
+   thz = 90.000000;    phz = 90.000000;
+   TGeoRotation *pMatrix91 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix90 = new TGeoCombiTrans("", dx,dy,dz,pMatrix91);
+   
+   // Combi transformation: 
+   dx = 7.67000;
+   dy = 7.67000; 
+   dz = 18.60000;
+   // Rotation: 
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 315.000000;
+   thz = 90.000000;    phz = 45.000000;
+   TGeoRotation *pMatrix93 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix92 = new TGeoCombiTrans("", dx,dy,dz,pMatrix93);
+   
+   // Combi transformation: 
+   dx = 10.86000;
+   dy = 0.00000; 
+   dz = 18.60000;
+   // Rotation: 
+   thx = 180.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 90.000000;    phz = 0.000000;
+   TGeoRotation *pMatrix95 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix94 = new TGeoCombiTrans("", dx,dy,dz,pMatrix95);
+   
+   // Combi transformation: 
+   dx = 7.67000;
+   dy = -7.67000; 
+   dz = 18.60000;
+   // Rotation: 
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 45.000000;
+   thz = 90.000000;    phz = 315.000000;
+   TGeoRotation *pMatrix97 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix96 = new TGeoCombiTrans("", dx,dy,dz,pMatrix97);
+
+  // Third layer
+
+   // Combi transformation: 
+   dx = 0.00000;
+   dy = -13.28000; 
+   dz = 15.0000;
+   //dz = 6.20000;
+   // Rotation: 
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 0.000000;
+   thz = 90.000000;    phz = 90.000000;
+   TGeoRotation *pMatrix35 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix34 = new TGeoCombiTrans("", dx,dy,dz,pMatrix35);
+   
+   // Combi transformation: 
+   dx = -9.39000;
+   dy = -9.39000; 
+   dz = 15.0000;
+   //dz = 6.20000;
+   // Rotation: 
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 315.000000;
+   thz = 90.000000;    phz = 45.000000;
+   TGeoRotation *pMatrix37 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix36 = new TGeoCombiTrans("", dx,dy,dz,pMatrix37);
+
+   // Combi transformation: 
+   dx = -13.28000;
+   dy = 0.00000; 
+   dz = 15.0000;
+   //dz = 6.20000;
+   // Rotation: 
+   thx = 180.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 90.000000;    phz = 0.000000;
+   TGeoRotation *pMatrix39 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix38 = new TGeoCombiTrans("", dx,dy,dz,pMatrix39);
+   
+   // Combi transformation: 
+   dx = -9.39000;
+   dy = 9.39000; 
+   dz = 15.0000;
+   //dz = 6.20000;
+   // Rotation: 
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 45.000000;
+   thz = 90.000000;    phz = 315.000000;
+   TGeoRotation *pMatrix41 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix40 = new TGeoCombiTrans("", dx,dy,dz,pMatrix41);
+   
+   // Combi transformation: 
+   dx = 0.000000;
+   dy = 13.2800; 
+   dz = 15.0000;
+   //dz = 6.20000;
+   // Rotation: 
+   thx = 180.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 0.000000;
+   thz = 90.000000;    phz = 90.000000;
+   TGeoRotation *pMatrix43 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix42 = new TGeoCombiTrans("", dx,dy,dz,pMatrix43);
+   
+   // Combi transformation: 
+   dx = 9.39000;
+   dy = 9.39000; 
+   dz = 15.0000;
+   //dz = 6.20000;
+   // Rotation: 
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 315.000000;
+   thz = 90.000000;    phz = 45.000000;
+   TGeoRotation *pMatrix45 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix44 = new TGeoCombiTrans("", dx,dy,dz,pMatrix45);
+   
+   // Combi transformation: 
+   dx = 13.28000;
+   dy = 0.00000; 
+   dz = 15.0000;
+   //dz = 6.20000;
+   // Rotation: 
+   thx = 180.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 90.000000;    phz = 0.000000;
+   TGeoRotation *pMatrix47 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix46 = new TGeoCombiTrans("", dx,dy,dz,pMatrix47);
+   
+   // Combi transformation: 
+   dx = 9.39000;
+   dy = -9.39000; 
+   dz = 15.0000;
+   //dz = 6.20000;
+   // Rotation: 
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 45.000000;
+   thz = 90.000000;    phz = 315.000000;
+   TGeoRotation *pMatrix49 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix48 = new TGeoCombiTrans("", dx,dy,dz,pMatrix49);
+
+   // Combi transformation: 
+   dx = 0.00000;
+   dy = -13.28000; 
+   dz = 18.60000;
+   // Rotation: 
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 0.000000;
+   thz = 90.000000;    phz = 90.000000;
+   TGeoRotation *pMatrix51 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix50 = new TGeoCombiTrans("", dx,dy,dz,pMatrix51);
+   
+   // Combi transformation: 
+   dx = -9.39000;
+   dy = -9.39000; 
+   dz = 18.6000;
+   // Rotation: 
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 315.000000;
+   thz = 90.000000;    phz = 45.000000;
+   TGeoRotation *pMatrix53 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix52 = new TGeoCombiTrans("", dx,dy,dz,pMatrix53);
+
+   // Combi transformation: 
+   dx = -13.28000;
+   dy = 0.00000; 
+   dz = 18.60000;
+   // Rotation: 
+   thx = 180.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 90.000000;    phz = 0.000000;
+   TGeoRotation *pMatrix55 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix54 = new TGeoCombiTrans("", dx,dy,dz,pMatrix55);
+   
+   // Combi transformation: 
+   dx = -9.39000;
+   dy = 9.39000; 
+   dz = 18.60000;
+   // Rotation: 
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 45.000000;
+   thz = 90.000000;    phz = 315.000000;
+   TGeoRotation *pMatrix57 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix56 = new TGeoCombiTrans("", dx,dy,dz,pMatrix57);
+   
+   // Combi transformation: 
+   dx = 0.000000;
+   dy = 13.2800; 
+   dz = 18.60000;
+   // Rotation: 
+   thx = 180.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 0.000000;
+   thz = 90.000000;    phz = 90.000000;
+   TGeoRotation *pMatrix59 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix58 = new TGeoCombiTrans("", dx,dy,dz,pMatrix59);
+   
+   // Combi transformation: 
+   dx = 9.39000;
+   dy = 9.39000; 
+   dz = 18.60000;
+   // Rotation: 
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 315.000000;
+   thz = 90.000000;    phz = 45.000000;
+   TGeoRotation *pMatrix61 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix60 = new TGeoCombiTrans("", dx,dy,dz,pMatrix61);
+   
+   // Combi transformation: 
+   dx = 13.28000;
+   dy = 0.00000; 
+   dz = 18.60000;
+   // Rotation: 
+   thx = 180.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 90.000000;    phz = 0.000000;
+   TGeoRotation *pMatrix63 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix62 = new TGeoCombiTrans("", dx,dy,dz,pMatrix63);
+   
+   // Combi transformation: 
+   dx = 9.39000;
+   dy = -9.39000; 
+   dz = 18.60000;
+   // Rotation: 
+   thx = 0.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 45.000000;
+   thz = 90.000000;    phz = 315.000000;
+   TGeoRotation *pMatrix65 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix64 = new TGeoCombiTrans("", dx,dy,dz,pMatrix65);
+   
+   // End caps
+
+   // Combi transformation: 
+   dx = 0.000000;
+   dy = -7.150000;
+   dz = 35.000000;
    // Rotation: 
    thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
    thz = 0.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix31 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoRotation *pMatrix99 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
-   pMatrix30 = new TGeoCombiTrans("", dx,dy,dz,pMatrix31);
+   pMatrix98 = new TGeoCombiTrans("", dx,dy,dz,pMatrix99);
+
+   // Combi transformation: 
+   dx = 0.000000;
+   dy = 7.150000;
+   dz = 35.000000;
+   // Rotation: 
+   thx = 90.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 0.000000;    phz = 0.000000;
+   TGeoRotation *pMatrix101 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+   pMatrix100 = new TGeoCombiTrans("", dx,dy,dz,pMatrix101);
+
+   // Combi transformation: 
+   dx = 0.000000;
+   dy = -8.350000;
+   dz = 40.00000;
+   // Rotation: 
+   thx = 90.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 0.000000;    phz = 0.000000;
+   TGeoRotation *pMatrix103 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+   pMatrix102 = new TGeoCombiTrans("", dx,dy,dz,pMatrix103);
+
+   // Combi transformation: 
+   dx = 0.000000;
+   dy = 8.350000;
+   dz = 40.00000;
+   // Rotation: 
+   thx = 90.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 0.000000;    phz = 0.000000;
+   TGeoRotation *pMatrix105 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+     pMatrix104 = new TGeoCombiTrans("", dx,dy,dz,pMatrix105);
+
+   // Beam pipe
+
+   // Combi transformation: 
+   //dx = 0.000000;
+   //dy = 0.000000;
+   //dz = 15.000000;
+   // Rotation: 
+   //thx = 90.000000;    phx = 0.000000;
+   //thy = 90.000000;    phy = 90.000000;
+   //thz = 0.000000;    phz = 0.000000;
+   //TGeoRotation *pMatrix59 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   //TGeoCombiTrans*
+   //  pMatrix58 = new TGeoCombiTrans("", dx,dy,dz,pMatrix59);
+
+
+   // Mounting platform 
+
+   // Electronics modules
+
+   // Target 
+
+   // Combi transformation: 
+   //dx = -6.240000;
+   //dy = -3.900000;
+   //dz = 0.000000;
+   // Rotation: 
+   //thx = 90.000000;    phx = 0.000000;
+   //thy = 90.000000;    phy = 90.000000;
+   //thz = 0.000000;    phz = 0.000000;
+   //TGeoRotation *pMatrix35 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   //TGeoCombiTrans*
+   //pMatrix34 = new TGeoCombiTrans("", dx,dy,dz,pMatrix35);
 
 
    // Shape: World type: TGeoBBox
@@ -721,20 +1226,54 @@ void R3BTra::ConstructGeometry() {
 
    */
 
-
-
-
    // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
    // Shape: SiVacuumSphereWorld type: TGeoSphere
 
    // Si Shape & volume: TraBox type: TGeoBBox
-   dx = 3.600000;
-   dy = 2.070000;
+   dx = 15.00000;
+   dy = 2.000000;
+   dz = 0.005000;
+   // Volume: TraLog
+   TGeoVolume *TraLog1 = gGeoManager->MakeBox("TraLog1",pMed22,dx,dy,dz);
+
+   // Si Shape & volume: TraBox type: TGeoBBox
+   dx = 15.00000;
+   dy = 5.50000;
    dz = 0.015000;
    // Volume: TraLog
-   TGeoVolume *TraLog = gGeoManager->MakeBox("TraLog",pMed22,dx,dy,dz);
+   TGeoVolume *TraLog2 = gGeoManager->MakeBox("TraLog2",pMed22,dx,dy,dz);
 
+   // Si Shape & volume: TraBox type: TGeoBBox
+   dx = 15.00000;
+   dy = 4.500000;
+   dz = 0.015000;
+   // Volume: TraLog
+   TGeoVolume *TraLog3 = gGeoManager->MakeBox("TraLog3",pMed22,dx,dy,dz);
 
+   // Si Shape & volume: TraBox type: TGeoBBox
+   dx = 13.500000;
+   dy = 7.1500000;
+   dz = 0.015000;
+   // Volume: TraLog
+   TGeoVolume *TraLog4 = gGeoManager->MakeBox("TraLog4",pMed22,dx,dy,dz);
+
+   // Si Shape & volume: TraBox type: TGeoBBox
+   dx = 13.500000;
+   dy = 8.3500000;
+   dz = 0.015000;
+   // Volume: TraLog
+   TGeoVolume *TraLog5 = gGeoManager->MakeBox("TraLog5",pMed22,dx,dy,dz);
+
+   // Shape: MontagePlatform type: TGeoTubeSeg
+   rmin = 5.0000;
+   rmax = 11.000000;
+   dz   = 0.0150000;
+   phi1 = 0.000000;
+   phi2 = 360.000000;
+   TGeoShape *Tra6 = new TGeoTubeSeg("Tra6",rmin,rmax,dz,phi1,phi2);
+   // Volume: MontagePlatformLog
+   TGeoVolume* TraLog6 = new TGeoVolume("TraLog6",Tra6, pMed22);
+   
    // Shape: MontagePlatform type: TGeoTubeSeg
    rmin = 2.750000;
    rmax = 18.000000;
@@ -746,6 +1285,16 @@ void R3BTra::ConstructGeometry() {
    TGeoVolume*
    pMontagePlatformLog = new TGeoVolume("MontagePlatformLog",pMontagePlatform, pMed25);
 
+   // Shape: BeamPipe type: TGeoTubeSeg
+   rmin = 1.800000;
+   rmax = 2.000000;
+   dz   = 20.00000;
+   phi1 = 0.000000;
+   phi2 = 360.000000;
+   TGeoShape *pBeamPipe = new TGeoTubeSeg("BeamPipe",rmin,rmax,dz,phi1,phi2);
+   // Volume: BeamPipeLog
+   TGeoVolume*
+   pBeamPipeLog = new TGeoVolume("BeamPipeLog",pBeamPipe, pMed21);
 
    // Shape: MontageRing type: TGeoTubeSeg
    rmin = 12.000000;
@@ -798,42 +1347,105 @@ void R3BTra::ConstructGeometry() {
 
    TGeoVolume *aTra = new TGeoVolumeAssembly("ATRA");
 
-    aTra->AddNode(ptargetWheel2Log,1, pMatrix30);
+   //aTra->AddNode(ptargetWheel2Log,1, pMatrix30);
  
-    aTra->AddNode(pinnerElectronicsLog ,1, pMatrix18);
-    aTra->AddNode(pinnerElectronicsLog ,2, pMatrix20);
-    aTra->AddNode(pinnerElectronicsLog ,3, pMatrix22);
-    aTra->AddNode(pinnerElectronicsLog ,4, pMatrix24);
-    aTra->AddNode(pinnerElectronicsLog ,5, pMatrix26);
-
-    aTra->AddNode(ptargetWheelLog ,1, pMatrix28);
-
-    aTra->AddNode(pMontageRingLog ,1, pMatrix16);
-
-    aTra->AddNode(pMontagePlatformLog ,1, pMatrix14);
+   //aTra->AddNode(pinnerElectronicsLog ,1, pMatrix18);
+   //aTra->AddNode(pinnerElectronicsLog ,2, pMatrix20);
+   //aTra->AddNode(pinnerElectronicsLog ,3, pMatrix22);
+   //aTra->AddNode(pinnerElectronicsLog ,4, pMatrix24);
+   // aTra->AddNode(pinnerElectronicsLog ,5, pMatrix26);
+   // aTra->AddNode(pinnerElectronicsLog ,6, pMatrix32); 
    
-    AddSensitiveVolume(TraLog);
-    fNbOfSensitiveVol+=1;
+   //aTra->AddNode(ptargetWheelLog ,1, pMatrix28); 
+   
+   //aTra->AddNode(pMontageRingLog ,1, pMatrix16);
+      
+   //aTra->AddNode(pBeamPipeLog,1,pMatrix58);
+   
+   AddSensitiveVolume(TraLog1);
+   AddSensitiveVolume(TraLog2);
+   AddSensitiveVolume(TraLog3);
+   AddSensitiveVolume(TraLog4);
+   AddSensitiveVolume(TraLog5);
+   fNbOfSensitiveVol+=1;
 
-    aTra->AddNode(TraLog,1, pMatrix4);
-    aTra->AddNode(TraLog,2, pMatrix6);
-    aTra->AddNode(TraLog,3, pMatrix8);
-    aTra->AddNode(TraLog,4, pMatrix10);
-    aTra->AddNode(TraLog,5, pMatrix12);
+   // First layer
+   
+   aTra->AddNode(TraLog1,1, pMatrix2);
+   aTra->AddNode(TraLog1,2, pMatrix4);
+   aTra->AddNode(TraLog1,3, pMatrix6); 
+   aTra->AddNode(TraLog1,4, pMatrix8); 
+   aTra->AddNode(TraLog1,5, pMatrix10); 
+   aTra->AddNode(TraLog1,6, pMatrix12); 
+   aTra->AddNode(TraLog1,7, pMatrix14); 
+   aTra->AddNode(TraLog1,8, pMatrix16); 
+   //aTra->AddNode(TraLog1,9, pMatrix18);
+   //aTra->AddNode(TraLog1,10, pMatrix20);
+   //aTra->AddNode(TraLog1,11, pMatrix22); 
+   //aTra->AddNode(TraLog1,12, pMatrix24); 
+   //aTra->AddNode(TraLog1,13, pMatrix26); 
+   //aTra->AddNode(TraLog1,14, pMatrix28); 
+   //aTra->AddNode(TraLog1,15, pMatrix30); 
+   //aTra->AddNode(TraLog1,16, pMatrix32);
 
-    //
+   // Second layer
 
-    TGeoRotation *rotg = new TGeoRotation();
-    rotg->RotateX(0.);
-    rotg->RotateY(0.);
-    rotg->RotateZ(0.);
-    dx=tx=0.0;
-    dy=ty=0.0;
-    dz=tz=0.0;
+   aTra->AddNode(TraLog3,9, pMatrix66); 
+   aTra->AddNode(TraLog3,10, pMatrix68);
+   aTra->AddNode(TraLog3,11, pMatrix70); 
+   aTra->AddNode(TraLog3,12, pMatrix72);
+   aTra->AddNode(TraLog3,13, pMatrix74); 
+   aTra->AddNode(TraLog3,14, pMatrix76);
+   aTra->AddNode(TraLog3,15, pMatrix78); 
+   aTra->AddNode(TraLog3,16, pMatrix80);
+   //aTra->AddNode(TraLog3,41, pMatrix82); 
+   //aTra->AddNode(TraLog3,42, pMatrix84);
+   //aTra->AddNode(TraLog3,43, pMatrix86); 
+   //aTra->AddNode(TraLog3,44, pMatrix88);
+   //aTra->AddNode(TraLog3,45, pMatrix90); 
+   //aTra->AddNode(TraLog3,46, pMatrix92);
+   //aTra->AddNode(TraLog3,47, pMatrix94); 
+   //aTra->AddNode(TraLog3,48, pMatrix96);
 
-    TGeoCombiTrans *t0 = new TGeoCombiTrans(tx,ty,tz,rotg);
-    pWorld->AddNode(aTra,1, GetGlobalPosition(t0));
+  // Third layer 
 
+   aTra->AddNode(TraLog2,17, pMatrix34); 
+   aTra->AddNode(TraLog2,18, pMatrix36);
+   aTra->AddNode(TraLog2,19, pMatrix38); 
+   aTra->AddNode(TraLog2,20, pMatrix40);
+   aTra->AddNode(TraLog2,21, pMatrix42); 
+   aTra->AddNode(TraLog2,22, pMatrix44);
+   aTra->AddNode(TraLog2,23, pMatrix46); 
+   aTra->AddNode(TraLog2,24, pMatrix48);
+   //aTra->AddNode(TraLog2,25, pMatrix50); 
+   //aTra->AddNode(TraLog2,26, pMatrix52);
+   //aTra->AddNode(TraLog2,27, pMatrix54); 
+   //aTra->AddNode(TraLog2,28, pMatrix56);
+   //aTra->AddNode(TraLog2,29, pMatrix58); 
+   //aTra->AddNode(TraLog2,30, pMatrix60);
+   //aTra->AddNode(TraLog2,31, pMatrix62); 
+   //aTra->AddNode(TraLog2,32, pMatrix64);
+
+   // End Caps
+
+   aTra->AddNode(TraLog4,25, pMatrix98);
+   aTra->AddNode(TraLog4,26, pMatrix100);
+   aTra->AddNode(TraLog5,27, pMatrix102);
+   aTra->AddNode(TraLog5,28, pMatrix104);
+   
+   //
+   
+   TGeoRotation *rotg = new TGeoRotation();
+   rotg->RotateX(0.);
+   rotg->RotateY(0.);
+   rotg->RotateZ(0.);
+   dx=tx=0.0;
+   dy=ty=0.0;
+   dz=tz=0.0;
+   
+   TGeoCombiTrans *t0 = new TGeoCombiTrans(tx,ty,tz,rotg);
+   pWorld->AddNode(aTra,1, GetGlobalPosition(t0));
+   
 
 }
 

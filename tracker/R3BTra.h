@@ -123,6 +123,7 @@ class R3BTra : public R3BDetector
 	active volume. **/
     Int_t          fTrackID;           //!  track index
     Int_t          fVolumeID;          //!  volume id
+    Int_t          fDetCopyID;       //!  Det volume id  // added by Marc
     Int_t          fsector;            //!  volume id
     TLorentzVector fPosIn, fPosOut;    //!  position
     TLorentzVector fMomIn, fMomOut;    //!  momentum
@@ -139,7 +140,8 @@ class R3BTra : public R3BDetector
      **
      ** Adds a TraPoint to the HitCollection
      **/
-    R3BTraPoint* AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
+    R3BTraPoint* AddHit(Int_t trackID, Int_t detID, Int_t detCopyID,    // Int_t detCopyID added by Marc
+			TVector3 posIn,
 			TVector3 pos_out, TVector3 momIn, 
 			TVector3 momOut, Double_t time, 
 			Double_t length, Double_t eLoss);
@@ -158,7 +160,7 @@ class R3BTra : public R3BDetector
 
 
 inline void R3BTra::ResetParameters() {
-  fTrackID = fVolumeID = 0;
+  fTrackID = fVolumeID = 0; fDetCopyID = 0;   // fDetCopyID added by Marc
   fPosIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fPosOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fMomIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
