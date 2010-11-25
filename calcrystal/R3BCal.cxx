@@ -3,7 +3,7 @@
 // -----            Created 26/03/09  by D.Bertini                     -----
 // -----        new Version: 20/07/09 <D.Bertini@gsi.de>               -----
 // -----        new Version: 08/04/10 <wranne@student.chalmers.se>     -----
-// -----        new Version: 25/11/10 <>                               -----
+// -----        new Version: 25/11/10 <marc.labiche@stfc.ac.uk>        -----
 // -------------------------------------------------------------------------
 #include "R3BCal.h"
 
@@ -406,6 +406,33 @@ void R3BCal::ConstructGeometry(){
     pMed2 = new TGeoMedium("Air", numed,pMat2, par);
   }
 
+ // Mixture: NaI
+  TGeoMedium * pMed10=NULL;
+   if (gGeoManager->GetMedium("NaIn") ){
+       pMed10=gGeoManager->GetMedium("NaIn");
+  }else{
+    nel     = 2;
+    density = 3.670000;
+    TGeoMixture*
+	pMat10 = new TGeoMixture("NaIn", nel,density);
+    a = 22.989770;   z = 11.000000;   w = 0.15337;  // Na
+    pMat10->DefineElement(0,a,z,w);
+    a = 126.904470;   z = 53.000000;   w = 0.84663;  // I
+    pMat10->DefineElement(1,a,z,w);
+    pMat10->SetIndex(611);
+    Double_t par[8];
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 0.000000; // tmaxfd
+    par[4]  = 0.000000; // stemax
+    par[5]  = 0.000000; // deemax
+    par[6]  = 0.000100; // epsil
+    par[7]  = 0.000000; // stmin
+    pMed10 = new TGeoMedium("NaIn", 2,pMat10, par);
+  }
+
+
  // Mixture: CsI
   TGeoMedium * pMed9=NULL;
   if (gGeoManager->GetMedium("CsIn") )
@@ -460,22 +487,22 @@ void R3BCal::ConstructGeometry(){
   // Create volume: crystalLogNAJA
   TGeoShape *pTRA = createCrystal(xb_crystal_parts[0]);
   pTRA->SetTitle("TRA1+TRA2");
-  TGeoVolume* pcrystalLogNAJA = new TGeoVolume("crystalLogNAJA",pTRA, pMed9);
+  TGeoVolume* pcrystalLogNAJA = new TGeoVolume("crystalLogNAJA",pTRA, pMed10);
 
   // Create volume: crystalLogNAJB
   TGeoShape *pTRB = createCrystal(xb_crystal_parts[1]);
   pTRB->SetTitle("TRB1+TRB2");
-  TGeoVolume* pcrystalLogNAJB = new TGeoVolume("crystalLogNAJB",pTRB, pMed9);
+  TGeoVolume* pcrystalLogNAJB = new TGeoVolume("crystalLogNAJB",pTRB, pMed10);
 
   // Create volume: crystalLogNAJC
   TGeoShape *pTRC = createCrystal(xb_crystal_parts[2]);
   pTRC->SetTitle("TRC1+TRC2");
-  TGeoVolume* pcrystalLogNAJC = new TGeoVolume("crystalLogNAJC",pTRC, pMed9);
+  TGeoVolume* pcrystalLogNAJC = new TGeoVolume("crystalLogNAJC",pTRC, pMed10);
 
   // Create volume: crystalLogNAJC
   TGeoShape *pTRD = createCrystal(xb_crystal_parts[3]);
   pTRD->SetTitle("TRD1+TRD2");
-  TGeoVolume* pcrystalLogNAJD = new TGeoVolume("crystalLogNAJD",pTRD, pMed9);
+  TGeoVolume* pcrystalLogNAJD = new TGeoVolume("crystalLogNAJD",pTRD, pMed10);
 
   TGeoVolume* crystalVolumes[]={pcrystalLogNAJA,
                                 pcrystalLogNAJB,
