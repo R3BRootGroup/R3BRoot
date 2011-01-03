@@ -94,8 +94,8 @@ void r3ball(Int_t nEvents = 1,
  
   // -----   Create simulation run   ----------------------------------------
   FairRunSim* run = new FairRunSim();
-  run->SetName(fMC.Data());              // Transport engine
-  run->SetOutputFile(OutFile.Data());          // Output file
+  run->SetName(fMC.Data());                  // Transport engine
+  run->SetOutputFile(OutFile.Data());        // Output file
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
 
   //  R3B Special Physics List in G4 case
@@ -232,6 +232,8 @@ void r3ball(Int_t nEvents = 1,
 	  //Selecting the geometry
 	  // 0 CALIFA V5 (old), 1 CALIFA V7.05, 2 USER DEFINED
 	  ((R3BCalo *)calo)->SelectGeometryVersion(1);
+	  //Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
+	  ((R3BCalo *)calo)->SetNonUniformity(1.0);
       // Global position of the Module
       phi   =  0.0; // (deg)
       theta =  0.0; // (deg)
@@ -496,18 +498,23 @@ void r3ball(Int_t nEvents = 1,
 	Double_t pdgId=22; // gamma emission
 	//Double_t pdgId=2212; // proton emission
 	Double_t theta1= 0.;  // polar angle distribution
-	Double_t theta2= 180.;
-	Double_t momentum=0.001; // 0.001 GeV/c 
-	//Double_t momentum=0.75; // 0.75 GeV/c 
-	Int_t multiplicity = 2;
+	Double_t theta2= 180.;	
+	Double_t momentum=0.002; // 0.010 GeV/c = 10 MeV/c 
+	//Double_t momentum=0.808065; // 0.808065 GeV/c (300MeV Kin Energy for protons) 
+	//Double_t momentum=0.31016124; // 0.31016124 GeV/c (50MeV Kin Energy for protons)
+	//Double_t momentum=0.4442972; // 0.4442972 GeV/c (100MeV Kin Energy for protons)
+	//Double_t momentum=0.5509999; // 0.5509999 GeV/c (150MeV Kin Energy for protons)
+	//Double_t momentum=0.64405; // 0.64405 GeV/c (200MeV Kin Energy for protons) 
+	Int_t multiplicity = 1;
 	R3BCALIFATestGenerator* gammasGen = new R3BCALIFATestGenerator(pdgId, multiplicity);
-	gammasGen->SetThetaRange ( theta1,   theta2);
+	gammasGen->SetThetaRange (theta1,   theta2);
 	gammasGen->SetCosTheta();
 	gammasGen->SetPRange(momentum,momentum);
 	gammasGen->SetPhiRange(0.,360.);
 	//gammasGen->SetXYZ(0.0,0.0,-1.5);
-	gammasGen->SetXYZ(0.0,0.0,0);
-	gammasGen->SetLorentzBoost(0.82);
+	//gammasGen->SetXYZ(0.0,0.0,0);
+	gammasGen->SetBoxXYZ(-0.1,0.1,-0.1,0.1,-0.1,0.1);
+	gammasGen->SetLorentzBoost(0.8197505718204776); //beta=0.81975 for 700 A MeV
 	// add the gamma generator
 	primGen->AddGenerator(gammasGen);
   } 

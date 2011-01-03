@@ -23,7 +23,7 @@ Int_t r3bsim(){
    //   Geant4:                 "TGeant4"
    //   Fluka :                 "TFluka"
 
-   TString fMC ="TGeant3";
+   TString fMC ="TGeant4";
 
    //-------------------------------------------------
    // Primaries generation
@@ -85,7 +85,7 @@ Int_t r3bsim(){
     TObjString det10("LAND");
 
     TObjArray fDetList;
-    //fDetList.Add(&det0);
+    fDetList.Add(&det0);
     //fDetList.Add(&det2);
     fDetList.Add(&det3);
     //fDetList.Add(&det5);
@@ -100,7 +100,7 @@ Int_t r3bsim(){
    //- N# of Sim. Events   |    nEvents     (Int_t)
    //-------------------------------------------------
 
-   Int_t nEvents = 10000;
+   Int_t nEvents = 100000;
 
    //-------------------------------------------------
    //- EventDisplay        |    fEventDisplay (Bool_t)
@@ -118,11 +118,11 @@ Int_t r3bsim(){
    // Main Sim function call
    r3ball(  nEvents,
             fDetList,
-            target4,
-	    fEventDisplay,
-	    fMC,
-	    fGene,
-	    fUserPList,
+            target2,
+		    fEventDisplay,
+	        fMC,
+	        fGene,
+	        fUserPList,
             fR3BMagnet
           );      
 

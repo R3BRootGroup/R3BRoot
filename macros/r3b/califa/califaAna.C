@@ -94,7 +94,9 @@ void califaAna(Int_t nEvents = 1) {
 	//fRun->LoadGeometry(); //Needed for what??
 	
 	R3BCaloHitFinder* caloHF = new R3BCaloHitFinder();
-	
+	caloHF->SelectGeometryVersion(0);          // 0 for version 5.0, 1 for version 7.05, 2 for version 7.07
+	caloHF->SetDetectionThreshold(0.000050);   //50 KeV
+	caloHF->SetExperimentalResolution(5.);    //5% at 1 MeV
 	fRun->AddTask(caloHF);
 	
 	// Number of events to process
