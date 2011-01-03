@@ -139,12 +139,18 @@ class R3BCalo : public R3BDetector
 	 **/
   void SelectGeometryVersion(Int_t version);
 	
+	/** Public method SetNonUniformity
+	 **
+	 ** Defines the fNonUniformity parameter in % deviation from the central value 
+	 *@param nonU  Double parameter setting the maximum non-uniformity allowed 
+	 **/	
+  void SetNonUniformity( Double_t nonU );
 
+	
   virtual void Initialize();
   virtual void SetSpecialPhysicsCuts();
   void SetEnergyCutOff( Double_t cutE ){fCutE = cutE;}
   Double_t  GetEnergyCutOff ( ) {return fCutE;}
-
 
 
 //  void SaveGeoParams();
@@ -172,8 +178,9 @@ class R3BCalo : public R3BDetector
     Int_t fAlveolusType[24];
 
 	// Selecting the geometry of the CALIFA calorimeter
-	Int_t geometryVersion;
-    	
+	Int_t fGeometryVersion;
+	// Adding some non-uniformity preliminary description
+	Double_t  fNonUniformity;
 	
 	/** Private method AddHit
      **
@@ -192,6 +199,14 @@ class R3BCalo : public R3BDetector
     R3BCaloCrystalHit* AddCrystalHit(Int_t type, Int_t copy, Int_t ident,
 									 Double_t energy, Double_t tof);
 	
+	/** Private method NUSmearing
+     **
+     ** Smears the energy according to some non-uniformity distribution	
+	 ** Very simple preliminary scheme where the NU is introduced as a flat random
+	 ** distribution with limits fNonUniformity (%) of the energy value.
+	 **/
+    Double_t NUSmearing(Double_t inputEnergy);
+	
 	
     /** Private method ResetParameters
      **
@@ -201,7 +216,7 @@ class R3BCalo : public R3BDetector
    TGeoRotation* createMatrix( Double_t phi, Double_t theta, Double_t psi);
 
    Int_t  GetCrystalType(Int_t volID);
-	Int_t  GetAlveolusType(Int_t volID);
+   Int_t  GetAlveolusType(Int_t volID);
 
     ClassDef(R3BCalo,1);
 };

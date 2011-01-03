@@ -59,6 +59,7 @@ R3BCalo::R3BCalo() : R3BDetector("R3BCalo", kTRUE, kCALIFA) {
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
+  fNonUniformity = 0.;
 }
 // -------------------------------------------------------------------------
 
@@ -75,6 +76,7 @@ R3BCalo::R3BCalo(const char* name, Bool_t active)
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
+  fNonUniformity = 0.;
 }
 // -------------------------------------------------------------------------
 
@@ -139,16 +141,7 @@ void R3BCalo::SetSpecialPhysicsCuts(){
 
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BCalo::ProcessHits(FairVolume* vol) {
-	
-	
-	//TODO HAPOL: ensure a working system also for v4.0b! NEVER TESTED!
-	
-	//The present scheme here done works nicely with 7.05
-	// crystalType = alveolus type (from 1 to 24)   [Basically the alveolus number]
-	// crystalCopy = (alveolus copy - 1) * 4 + crystals copy (from 1 to 160)  [Not exactly azimuthal]
-	// crystalId = (alveolus type-1)*160 + (alvelous copy-1)*4 + (crystal copy)  (from 1 to 3840)
-	//				crystalID is asingle identifier per crystal!
-	
+		
    // Getting the Infos from Crystal Volumes
    Int_t cp1 = -1; Int_t volId1 = -1; Int_t cpAlv = -1; Int_t volIdAlv = -1; Int_t cpCry = -1; Int_t volIdCry = -1;
    // Crystals Ids
@@ -156,17 +149,53 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol) {
    volIdCry =  gMC->CurrentVolOffID(1,cpCry);
    volIdAlv =  gMC->CurrentVolOffID(2,cpAlv);
 	
-	Int_t crystalType = 0;
-	Int_t crystalCopy = 0;
-	Int_t crystalId = 0;
+   Int_t crystalType = 0;
+   Int_t crystalCopy = 0;
+   Int_t crystalId = 0;
 
-	if(geometryVersion==0) crystalType = GetCrystalType(volIdAlv);
-	else {
-	  crystalType = GetAlveolusType(volIdAlv);
+	if(fGeometryVersion==0) {
+		//The present scheme here done works nicely with 5.0
+		// crystalType = crystal type (from 1 to 30)   
+		// crystalCopy = crystal copy (from 1 to 512 for crystal types from 1 to 6 (BARREL), 
+		//							   from 1 to 64 for crystal types from 7 to 30 (ENDCAP))
+		// crystalId = (crystal type-1) *512 + crystal copy  (from 1 to 3072) for the BARREL
+		// crystalId = 3072 + (crystal type-7) *64 + crystal copy  (from 3073 to 4608) for the ENDCAP
+		//
+		crystalType = GetCrystalType(volId1);
+		//cout << " CHECKKKKKK ____ crystal Type "<< crystalType << endl;
+		crystalCopy = cp1 + 1;
+		//cout << " CHECKKKKKK ____ crystal Copy "<< crystalCopy << endl;
+		if(crystalType<7) {//del 1 al 6 hay 512 de cada tipo; del 7 al 30 solo hay 64 de cada tipo
+			crystalId = (crystalType-1)*512+crystalCopy;
+		}
+		else if(crystalType<31){
+			crystalId = 3072+(crystalType-7)*64+crystalCopy;
+		}
+		else cout << "-E- R3BCalo: Impossible crystalType for geometry 5.0" << endl;
+
+		//cout << " CHECKKKKKK ____ crystal iD "<< crystalId << endl;
+
+	}
+   else if (fGeometryVersion==1)	{
+      //The present scheme here done works nicely with 7.05
+	  // crystalType = alveolus type (from 1 to 24)   [Basically the alveolus number]
+	  // crystalCopy = (alveolus copy - 1) * 4 + crystals copy (from 1 to 160)  [Not exactly azimuthal]
+	  // crystalId = (alveolus type-1)*160 + (alvelous copy-1)*4 + (crystal copy)  (from 1 to 3840)
+	  //				crystalID is asingle identifier per crystal!
+      crystalType = GetAlveolusType(volIdAlv);
 	  crystalCopy = cpAlv * 4 + cpCry;
 	  crystalId = (crystalType-1)*160 + cpAlv * 4 + cpCry;
 	}
-		
+	if (fGeometryVersion==2)	{
+	  //The present scheme here done works nicely with 7.07
+	  // crystalType = alveolus type (from 1 to 20)   [Basically the alveolus number]
+	  // crystalCopy = (alveolus copy - 1) * 4 + crystals copy (from 1 to 128)  [Not exactly azimuthal]
+	  // crystalId = (alveolus type-1)*128 + (alvelous copy-1)*4 + (crystal copy)  (from 1 to 2560)
+	  crystalType = GetAlveolusType(volIdAlv);
+	  crystalCopy = cpAlv * 4 + cpCry;
+	  crystalId = (crystalType-1)*128 + cpAlv * 4 + cpCry;
+	}
+	
 	if (fVerboseLevel>1) 
 		cout << "-I- R3BCalo: Processing Points in Alveolus Nb " << volIdAlv << ", copy Nb " << cpAlv 
 		<< ", crystal copy Nb " << cpCry << " and unique crystal identifier " << crystalId << endl;
@@ -203,16 +232,15 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol) {
       oldpos = gGeoManager->GetCurrentPoint();
       olddirection = gGeoManager->GetCurrentDirection();
       
-//       cout << "1st direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] << endl;
+//cout << "1st direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] << endl;
 
       for (Int_t i=0; i<3; i++){
 	newdirection[i] = -1*olddirection[i];
       }
       
       gGeoManager->SetCurrentDirection(newdirection);
-    //  TGeoNode *bla = gGeoManager->FindNextBoundary(2);
+//TGeoNode *bla = gGeoManager->FindNextBoundary(2);
       safety = gGeoManager->GetSafeDistance();
-
 
       gGeoManager->SetCurrentDirection(-newdirection[0],-newdirection[1],-newdirection[2]);
       
@@ -247,11 +275,11 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol) {
 	Int_t nCrystalHits = fCaloCrystalHitCollection->GetEntriesFast();
 	Bool_t existHit = 0;
 	  	  
-	if(nCrystalHits==0) AddCrystalHit(crystalType , crystalCopy , crystalId, fELoss, fTime);
+	if(nCrystalHits==0) AddCrystalHit(crystalType , crystalCopy , crystalId, NUSmearing(fELoss), fTime);
 	else {
 	  for(Int_t i=0;i<nCrystalHits;i++) {
 		if( ((R3BCaloCrystalHit *)(fCaloCrystalHitCollection->At(i)))->GetCrystalId() == crystalId ) {
-		  ((R3BCaloCrystalHit *)(fCaloCrystalHitCollection->At(i)))->AddMoreEnergy(fELoss);
+		  ((R3BCaloCrystalHit *)(fCaloCrystalHitCollection->At(i)))->AddMoreEnergy(NUSmearing(fELoss));
 		  if( ((R3BCaloCrystalHit *)(fCaloCrystalHitCollection->At(i)))->GetTime() > fTime ) {
 		    ((R3BCaloCrystalHit *)(fCaloCrystalHitCollection->At(i)))->SetTime(fTime);
 		  }	
@@ -259,7 +287,7 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol) {
 		  break;      
 		}
 	  } 
-	  if(!existHit) AddCrystalHit(crystalType , crystalCopy , crystalId, fELoss, fTime);	
+	  if(!existHit) AddCrystalHit(crystalType , crystalCopy , crystalId, NUSmearing(fELoss), fTime);	
 	}
 	 
 	existHit=0;
@@ -433,7 +461,7 @@ R3BCaloPoint* R3BCalo::AddHit(Int_t trackID, Int_t detID, Int_t volid , Int_t co
 				      momIn, momOut, time, length, eLoss);
 }
 
-// -----   Private method AddHit   --------------------------------------------
+// -----   Private method AddCrystalHit   --------------------------------------------
 R3BCaloCrystalHit* R3BCalo::AddCrystalHit(Int_t type, Int_t copy, Int_t ident,
 									 Double_t energy, Double_t time) {
 	TClonesArray& clref = *fCaloCrystalHitCollection;
@@ -444,12 +472,28 @@ R3BCaloCrystalHit* R3BCalo::AddCrystalHit(Int_t type, Int_t copy, Int_t ident,
 	return new(clref[size]) R3BCaloCrystalHit(type, copy, ident, energy, time);
 }
 
+// -----   Private method NUSmearing  --------------------------------------------
+Double_t R3BCalo::NUSmearing(Double_t inputEnergy) {
+	// Very simple preliminary scheme where the NU is introduced as a flat random
+	// distribution with limits fNonUniformity (%) of the energy value.
+	//
+	return gRandom->Uniform(inputEnergy-inputEnergy*fNonUniformity/100,inputEnergy+inputEnergy*fNonUniformity/100);
+}
+
 
 
 // -----  Public method SelectGeometryVersion  ----------------------------------
 void R3BCalo::SelectGeometryVersion(Int_t version)
 {	
-	geometryVersion=version;
+	fGeometryVersion=version;
+}
+
+
+// -----  Public method SetNonUniformity  ----------------------------------
+void R3BCalo::SetNonUniformity(Double_t nonU)
+{	
+	fNonUniformity = nonU;
+	cout << "-I- R3BCalo::SetNonUniformity to " << fNonUniformity << " %." << endl;
 }
 
 
@@ -457,15 +501,15 @@ void R3BCalo::SelectGeometryVersion(Int_t version)
 void R3BCalo::ConstructGeometry() {
 
 	//Switch between different geometries of CALIFA calorimeter
-	if (geometryVersion==0)	{
+	if (fGeometryVersion==0)	{
 		cout << "-I- R3BCalo: Constructing old (v5) geometry translated from R3BSim ... " << endl;
 		ConstructOldGeometry();
 	}
-	else if (geometryVersion==1) {
+	else if (fGeometryVersion==1) {
 		cout << "-I- R3BCalo: Constructing CALIFA v7.05 geometry ... " << endl;
 		ConstructV705Geometry();
 	}
-	else if (geometryVersion==2) {
+	else if (fGeometryVersion==2) {
 		cout << "-I- R3BCalo: Constructing an user defined geometry ... " << endl;
 		ConstructUserDefinedGeometry();
 	}
@@ -3208,6 +3252,8 @@ void R3BCalo::ConstructV705Geometry() {
 	TGeoMedium * pCsIMedium=NULL;
 	if (gGeoManager->GetMedium("CsI") ){
 		pCsIMedium=gGeoManager->GetMedium("CsI");
+	//if (gGeoManager->GetMedium("aluminium") ){
+	//	pCsIMedium=gGeoManager->GetMedium("aluminium");
 	}else{
 		nel     = 2;
 		density = 4.510000;

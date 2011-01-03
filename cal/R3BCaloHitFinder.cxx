@@ -9,6 +9,7 @@
 #include "TGeoMatrix.h"
 
 #include "TClonesArray.h"
+#include "TRandom.h"
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
@@ -22,6 +23,9 @@ using std::endl;
 
 
 R3BCaloHitFinder::R3BCaloHitFinder() : FairTask("R3B CALIFA Hit Finder ") { 
+	fGeometryVersion=1; //default version 7.05
+	fThreshold=0.;	   //no threshold
+	fCrystalResolution=0.; //perfect crystals
 }
 
 
@@ -108,7 +112,7 @@ void R3BCaloHitFinder::Exec(Option_t* opt) {
 	Double_t testPolar, testAzimuthal;
 	
 	//THIS COULD COME FROM THE PARAMETERS IN THE FUTURE???
-	Double_t deltaPolar = 0.25; //around 14.3 degrees
+	Double_t deltaPolar = 0.25; //0.25 around 14.3 degrees, 2.5 for the complete calorimeter
 	Double_t deltaAzimuthal = 0.25;
 
 	R3BCaloCrystalHit** crystalHit;
@@ -131,6 +135,14 @@ void R3BCaloHitFinder::Exec(Option_t* opt) {
 	Int_t crystalWithHigherEnergy = 0;
 	Int_t unusedCrystals = crystalHits;
 	
+	//removing those crystals with energy below the threshold
+	for(Int_t i=0;i<crystalHits;i++){
+		if(crystalHit[i]->GetEnergy()<fThreshold){
+			usedCrystalHits[i] = 1;
+			unusedCrystals--;
+		}
+	}
+	
 	while (unusedCrystals>0) {
 		//First, finding the crystal with higher energy from the unused crystalHits
 		
@@ -142,7 +154,7 @@ void R3BCaloHitFinder::Exec(Option_t* opt) {
 		usedCrystalHits[crystalWithHigherEnergy] = 1; unusedCrystals--; crystalsInHit++;
 		
 		//Second, energy and angles come from the crystal with the higher energy
-		energy = crystalHit[crystalWithHigherEnergy]->GetEnergy();
+		energy = ExpResSmearing(crystalHit[crystalWithHigherEnergy]->GetEnergy());
 		GetAngles(crystalHit[crystalWithHigherEnergy]->GetCrystalId(),&polarAngle,&azimuthalAngle);
 				
 		//Third, finding closest hits and adding their energy
@@ -161,7 +173,7 @@ void R3BCaloHitFinder::Exec(Option_t* opt) {
 			
 				if(TMath::Abs(polarAngle - testPolar) < deltaPolar && 
 				   TMath::Abs(angle1 - angle2) < deltaAzimuthal ) {
-					energy += crystalHit[i]->GetEnergy(); 
+					energy += ExpResSmearing(crystalHit[i]->GetEnergy()); 
 					usedCrystalHits[i] = 1; unusedCrystals--; crystalsInHit++;
 				}
 			}
@@ -198,111 +210,227 @@ void R3BCaloHitFinder::Finish()
 	// here event. write histos
 	//   cout << " -I- Digit Finish() called " << endl;
 	// Write control histograms
-	
-	
+		
 }
+
+
+// -----  Public method SelectGeometryVersion  ----------------------------------
+void R3BCaloHitFinder::SelectGeometryVersion(Int_t version)
+{	
+	fGeometryVersion=version;
+}
+
+
+// -----  Public method SetExperimentalResolution  ----------------------------------
+void R3BCaloHitFinder::SetExperimentalResolution(Double_t crystalRes)
+{	
+	fCrystalResolution=crystalRes;
+	cout << "-I- R3BCaloHitFinder::SetExperimentalResolution to " << fCrystalResolution << "% @ 1 MeV." << endl;
+}
+
+
+// -----  Public method SetDetectionThreshold  ----------------------------------
+void R3BCaloHitFinder::SetDetectionThreshold(Double_t thresholdEne)
+{	
+	fThreshold=thresholdEne;
+	cout << "-I- R3BCaloHitFinder::SetDetectionThreshold to " << fThreshold << " GeV." << endl;
+}
+
+
 
 
 // ---- Public method GetAngles   --------------------------------------------------
 void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal)
 {
-	//The present scheme here done works nicely with 7.05
-	// crystalType = alveolus type (from 1 to 24)   [Basically the alveolus number]
-	// crystalCopy = (alveolus copy - 1) * 4 + crystals copy (from 1 to 160)  [Not exactly azimuthal]
-	// crystalId = (alveolus type-1)*160 + (alvelous copy-1)*4 + (crystal copy)  (from 1 to 3840)
-	//				crystalID is asingle identifier per crystal!
-	//That is:
-	// crystalId = (crystalType-1)*160 + cpAlv * 4 + cpCry;
-	//
-	Int_t crystalType = (Int_t)((iD-1)/160) + 1;	//Alv type (from 1 to 24) 
-	Int_t crystalCopy = ((iD-1)%160) + 1;			//CrystalCopy (from 1 to 160)
-	Int_t alveolusCopy =(Int_t)(((iD-1)%160)/4) +1; //Alveolus copy (from 1 to 40)
-	Int_t crystalInAlveolus = (iD-1)%4 + 1;         //Crystal number in alveolus (from 1 to 4)
-	
-	Int_t alveoliType[24]={1,1,2,2,2,2,2,3,3,3,3,4,4,4,4,4,4,4,4,5,5,6,6,6};
-
+   	
 	Double_t local[3]={0,0,0};
 	Double_t master[3];
+	Int_t crystalType = 0;
+	Int_t crystalCopy = 0;
+	Int_t alveolusCopy =0;
+	Int_t crystalInAlveolus=0;
 	
 	TGeoVolume *pAWorld  =  gGeoManager->GetTopVolume();
+	if(fGeometryVersion==0){
+		//The present scheme here done works nicely with 5.0
+		// crystalType = crystal type (from 1 to 30)   
+		// crystalCopy = crystal copy (from 1 to 512 for crystal types from 1 to 6 (BARREL), 
+		//							   from 1 to 64 for crystal types from 7 to 30 (ENDCAP))
+		// crystalId = (crystal type-1) *512 + crystal copy  (from 1 to 3072) for the BARREL
+		// crystalId = 3072 + (crystal type-7) *64 + crystal copy  (from 3073 to 4608) for the ENDCAP
+		//
+		if(iD<3073)
+			crystalType = (Int_t)((iD-1)/512) + 1;	//crystal type (from 1 to 30)
+		else	
+			crystalType = (Int_t)((iD-3073)/64) + 7;	//crystal type (from 1 to 30)
 
-	Char_t nameVolume[200];
-	if(crystalInAlveolus<3) 
-		sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iA_%i/Crystal_%iA_1",
-				crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus, alveoliType[crystalType-1]);
-	else 
-		sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iB_%i/Crystal_%iB_1", 
-				crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus, alveoliType[crystalType-1]);
-	
-	//cout << gGeoManager->GetPath()<<endl;
-	gGeoManager->cd(nameVolume);
-	TGeoNode* currentNode = gGeoManager->GetCurrentNode();
-	currentNode->LocalToMaster(local, master);
-	if(crystalInAlveolus<3) 
-		sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iA_%i",
-				crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus);
-	else 
-		sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iB_%i", 
-				crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus);
+		if(iD<3073)	
+			crystalCopy = ((iD-1)%512) + 1;			//CrystalCopy (from 1 to 512)
+		else	
+			crystalCopy = ((iD-3073)%64) + 1;			//CrystalCopy (from 1 to 160)
 
-	gGeoManager->cd(nameVolume);
-	currentNode = gGeoManager->GetCurrentNode();
-	local[0]=master[0];local[1]=master[1];local[2]=master[2];
-	currentNode->LocalToMaster(local, master);
-
-	sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i",crystalType, alveolusCopy-1);
-	gGeoManager->cd(nameVolume);
-	currentNode = gGeoManager->GetCurrentNode();
-	local[0]=master[0];local[1]=master[1];local[2]=master[2];
-	currentNode->LocalToMaster(local, master);
-	
-	sprintf(nameVolume, "/cave_1/CalifaWorld_0");
-	gGeoManager->cd(nameVolume);
-	currentNode = gGeoManager->GetCurrentNode();
-	local[0]=master[0];local[1]=master[1];local[2]=master[2];
-	currentNode->LocalToMaster(local, master);
 		
+		Char_t nameVolume[200]; 
+		//in the crystalLog creation description in cal/R3BCalo.cxx for v5.0, the crystalCopy begins in 0!!!
+		sprintf(nameVolume, "/cave_1/CalifaWorld_0/crystalLog%i_%i",crystalType,crystalCopy-1); 
+		
+		gGeoManager->cd(nameVolume);
+		TGeoNode* currentNode = gGeoManager->GetCurrentNode();
+		currentNode->LocalToMaster(local, master);
+				
+		sprintf(nameVolume, "/cave_1/CalifaWorld_0");
+		gGeoManager->cd(nameVolume);
+		currentNode = gGeoManager->GetCurrentNode();
+		local[0]=master[0];local[1]=master[1];local[2]=master[2];
+		currentNode->LocalToMaster(local, master);		
+		
+	}
+	else if(fGeometryVersion==1){
+		//The present scheme here done works nicely with 7.05
+		// crystalType = alveolus type (from 1 to 24)   [Basically the alveolus number]
+		// crystalCopy = (alveolus copy - 1) * 4 + crystals copy (from 1 to 160)  [Not exactly azimuthal]
+		// crystalId = (alveolus type-1)*160 + (alvelous copy-1)*4 + (crystal copy)  (from 1 to 3840)
+		//				crystalID is asingle identifier per crystal!
+		//That is:
+		// crystalId = (crystalType-1)*160 + cpAlv * 4 + cpCry;
+		//
+		crystalType = (Int_t)((iD-1)/160) + 1;	//Alv type (from 1 to 24) 
+		crystalCopy = ((iD-1)%160) + 1;			//CrystalCopy (from 1 to 160)
+		alveolusCopy =(Int_t)(((iD-1)%160)/4) +1; //Alveolus copy (from 1 to 40)
+		crystalInAlveolus = (iD-1)%4 + 1;         //Crystal number in alveolus (from 1 to 4)
+	
+		Int_t alveoliType[24]={1,1,2,2,2,2,2,3,3,3,3,4,4,4,4,4,4,4,4,5,5,6,6,6};
+		Char_t nameVolume[200];
+		if(crystalInAlveolus<3) 
+			sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iA_%i/Crystal_%iA_1",
+					crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus, alveoliType[crystalType-1]);
+		else 
+			sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iB_%i/Crystal_%iB_1", 
+					crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus, alveoliType[crystalType-1]);
+		
+		//cout << gGeoManager->GetPath()<<endl;
+		gGeoManager->cd(nameVolume);
+		TGeoNode* currentNode = gGeoManager->GetCurrentNode();
+		currentNode->LocalToMaster(local, master);
+		if(crystalInAlveolus<3) 
+			sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iA_%i",
+					crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus);
+		else 
+			sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iB_%i", 
+					crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus);
+		
+		gGeoManager->cd(nameVolume);
+		currentNode = gGeoManager->GetCurrentNode();
+		local[0]=master[0];local[1]=master[1];local[2]=master[2];
+		currentNode->LocalToMaster(local, master);
+		
+		sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i",crystalType, alveolusCopy-1);
+		gGeoManager->cd(nameVolume);
+		currentNode = gGeoManager->GetCurrentNode();
+		local[0]=master[0];local[1]=master[1];local[2]=master[2];
+		currentNode->LocalToMaster(local, master);
+		
+		sprintf(nameVolume, "/cave_1/CalifaWorld_0");
+		gGeoManager->cd(nameVolume);
+		currentNode = gGeoManager->GetCurrentNode();
+		local[0]=master[0];local[1]=master[1];local[2]=master[2];
+		currentNode->LocalToMaster(local, master);		
+	}
+	else if(fGeometryVersion==2){
+		//The present scheme here done works nicely with 7.07
+		// crystalType = alveolus type (from 1 to 20)   [Basically the alveolus number]
+		// crystalCopy = (alveolus copy - 1) * 4 + crystals copy (from 1 to 128)  [Not exactly azimuthal]
+		// crystalId = (alveolus type-1)*128 + (alvelous copy-1)*4 + (crystal copy)  (from 1 to 2560)
+		//				crystalID is asingle identifier per crystal!
+		//That is:
+		// crystalId = (crystalType-1)*128 + cpAlv * 4 + cpCry;
+		//
+		crystalType = (Int_t)((iD-1)/128) + 1;	//Alv type (from 1 to 20) 
+		crystalCopy = ((iD-1)%128) + 1;			//CrystalCopy (from 1 to 128)
+		alveolusCopy =(Int_t)(((iD-1)%128)/4) +1; //Alveolus copy (from 1 to 32)
+		crystalInAlveolus = (iD-1)%4 + 1;         //Crystal number in alveolus (from 1 to 4)
+		
+		Int_t alveoliType[20]={1,1,2,2,2,3,3,4,4,4,5,5,6,6,6,7,7,7,8,8};
+		
+		Char_t nameVolume[200];
+		if(crystalInAlveolus<3) 
+			sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iA_%i/Crystal_%iA_1",
+					crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus, alveoliType[crystalType-1]);
+		else 
+			sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iB_%i/Crystal_%iB_1", 
+					crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus, alveoliType[crystalType-1]);
+		
+		//cout << gGeoManager->GetPath()<<endl;
+		gGeoManager->cd(nameVolume);
+		TGeoNode* currentNode = gGeoManager->GetCurrentNode();
+		currentNode->LocalToMaster(local, master);
+		if(crystalInAlveolus<3) 
+			sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iA_%i",
+					crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus);
+		else 
+			sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iB_%i", 
+					crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus);
+		
+		gGeoManager->cd(nameVolume);
+		currentNode = gGeoManager->GetCurrentNode();
+		local[0]=master[0];local[1]=master[1];local[2]=master[2];
+		currentNode->LocalToMaster(local, master);
+		
+		sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i",crystalType, alveolusCopy-1);
+		gGeoManager->cd(nameVolume);
+		currentNode = gGeoManager->GetCurrentNode();
+		local[0]=master[0];local[1]=master[1];local[2]=master[2];
+		currentNode->LocalToMaster(local, master);
+		
+		sprintf(nameVolume, "/cave_1/CalifaWorld_0");
+		gGeoManager->cd(nameVolume);
+		currentNode = gGeoManager->GetCurrentNode();
+		local[0]=master[0];local[1]=master[1];local[2]=master[2];
+		currentNode->LocalToMaster(local, master);
+	}
 	
 	//cout << "-I- R3BCaloHitFinder::GetAngles: position of crystal center: "<<master[0] << ", "<<master[1] << ", "<<master[2] << endl;
 	TVector3 masterV(master[0],master[1],master[2]);
 	//masterV.Print();
 	*polar=masterV.Theta();
 	*azimuthal=masterV.Phi();
-	//cout << "-I- R3BCaloHitFinder::GetAngles: theta: "<< *polar <<", phi: "<< *azimuthal <<endl;
+	//cout << "-I- R3BCaloHitFinder::GetAngles: theta: "<< *polar <<", phi: "<< *azimuthal << "for crystal iD " << iD <<endl;
 }
 
 
 
+// -----   Private method ExpResSmeaåring  --------------------------------------------
+Double_t R3BCaloHitFinder::ExpResSmearing(Double_t inputEnergy) {
+	// Smears the energy according to some Experimental Resolution distribution 
+	// Very simple preliminary scheme where the Experimental Resolution 
+	// is introduced as a gaus random distribution with a width given by the 
+	// parameter fCrystalResolution(in % @ MeV). Scales according to 1/sqrt(E)	
+	//
+	// The formula is   TF1("name","0.058*x/sqrt(x)",0,10) for 3% at 1MeV (3.687 @ 662keV)
+	//  ( % * energy ) / sqrt( energy )
+	// and then the % is given at 1 MeV!!
+	//
+	if(fCrystalResolution == 0) return inputEnergy;
+	else{
+		//Energy in MeV, that is the reason for the factor 1000...
+		Double_t randomIs = gRandom->Gaus(0,inputEnergy*fCrystalResolution*1000/(235*sqrt(inputEnergy*1000)));
+		//cout << "randomIs " << randomIs  << " for and Energy of "<< rawEnergy  << endl;
+		return inputEnergy + randomIs/1000;
+	}
+
+}
+
+// -----   Private method AddHit  --------------------------------------------
 R3BCaloHit* R3BCaloHitFinder::AddHit(UInt_t Nbcrystals,Double_t ene,Double_t pAngle,Double_t aAngle){   
 	// It fills the R3BLandDigi array
 	TClonesArray& clref = *fCaloHitCA;
 	Int_t size = clref.GetEntriesFast();	
-	cout << "-I- R3BCaloHitFinder: Adding CaloHit from " << Nbcrystals 
-		<< " crystalHits, depositing " << ene*1e06 << " keV" << endl;
+	//cout << "-I- R3BCaloHitFinder: Adding CaloHit from " << Nbcrystals 
+	//	<< " crystalHits, depositing " << ene*1e06 << " keV" << endl;
 	return new(clref[size]) R3BCaloHit(Nbcrystals, ene, pAngle, aAngle);  
 }
 
-
-/*
-Double_t diffuseEnergy(Double_t rawEnergy){
-	//
-	// Diffuses the energy in the crystal in an gaussian way...
-	// Trying to simulate the intrinsic crystal resolution
-	// The formula is   TF1("name","0.058*x/sqrt(x)",0,10) for 3% at 1MeV (3.687 @ 662keV)
-	//
-	//  ( % * energy ) / sqrt( energy )
-	//
-	// and then the % is given at 1 MeV!!
-	Double_t crystalResolution = theDiffusionParameters.getResolution(); 
-	if(rawEnergy<=0) return rawEnergy;
-	if(crystalResolution == 0) return rawEnergy;
-	else{
-		Double_t randomIs = rGen->Gaus(0,rawEnergy*crystalResolution/(235*sqrt(rawEnergy)));
-		//cout << "randomIs " << randomIs  << " for and Energy of "<< rawEnergy  << endl;
-		return rawEnergy + randomIs;
-	}
-}
- 
+/* 
  
  Double_t GetCMEnergy(Double_t theta, Double_t energy){
  //
