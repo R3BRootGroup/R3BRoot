@@ -12,12 +12,11 @@
 # How to: 
 #	1) select the following parameters:
 #	$alveolarThickness (in cm): the thickness of the alveolar structure
+#	$wrappingThickness (in cm): the thickness of the wrapping material
 #	@crystalLength (in cm): length of each crystal type (there are 12 crystal models)
 #   2) run the perl script
-#	perl createTGeo_CLF705_2.pl
-#	3) check the output file 
-#	root -l CLF705_TGeo_Test_2.C
-#	[check the geometry with a 3D browser]
+#	perl createGeometryCLF705.pl
+#	3) the output file has to be compiled in R3BRoot
 #
 ###################################################################################
 # SOME CONSTRUCTION PARAMETERS!
@@ -216,7 +215,6 @@ for ($h = 0; $h<=$#Alv_dx1; $h++) {
 print OUTPUTFILE "\n //Positioning in space of alveoli \n";
 print OUTPUTFILE "\t Double_t phiEuler=0; Double_t thetaEuler = 0; Double_t psiEuler=0; \n\n";
 print OUTPUTFILE "\t Double_t rotAngle = 0; \t"; 
-
 for ($h = 0; $h<=$#Alv_dx1; $h++) {
 	for($m = 0; $m<4; $m++) {		
 		############################################################################################################

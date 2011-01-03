@@ -12,7 +12,8 @@
 # How to: 
 #	1) select the following parameters:
 #	$alveolarThickness (in cm): the thickness of the alveolar structure
-#	@crystalLength (in cm): length of each crystal type (there are 12 crystal models)
+#	$wrappingThickness (in cm): the thickness of the wrapping material
+#	@crystalLength (in cm): length of each crystal type (there are 16 crystal models)
 #   2) run the perl script
 #	perl createGeometryCLF707.pl
 #	3) the output file has to be compiled in R3BRoot
