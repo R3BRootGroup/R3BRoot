@@ -14,6 +14,7 @@ void R3BLandDigiPar::putParams(FairParamList* list)
   if(!list) return;
   list->add("max_paddle", (Int_t)nMaxPaddle);
   list->add("max_plane", (Int_t)nMaxPlane);
+  list->add("paddle_length", (Double_t)paddleLength);
 }
 
 Bool_t R3BLandDigiPar::getParams(FairParamList* list)
@@ -24,6 +25,7 @@ Bool_t R3BLandDigiPar::getParams(FairParamList* list)
   
   if (!list->fill("max_paddle", &nMaxPaddle)) return kFALSE;
   if (!list->fill("max_plane", &nMaxPlane)) return kFALSE;
+  if (!list->fill("paddle_length", &paddleLength)) return kFALSE;
   return kTRUE;
 }
 
@@ -33,6 +35,7 @@ void R3BLandDigiPar::Print()
     std::cout<<"-I- Land Digi Parameters:"<<std::endl;
     std::cout<<"   Max Paddle   = "<<nMaxPaddle<<std::endl;
     std::cout<<"   Max Plane   = "<<nMaxPlane<<std::endl;
+    std::cout<<"   Paddle Length   = "<<paddleLength<<std::endl;
 }
 
 ClassImp(R3BLandDigiPar);
