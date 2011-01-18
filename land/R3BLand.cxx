@@ -114,7 +114,7 @@ void R3BLand::Initialize()
   // Initialise variables from Birk law
   Double_t dP = 1.032 ;
   // Set constants for Birk's Law implentation
-  fBirkC0 =  1;
+  fBirkC0 =  1.;
   fBirkC1 =  0.013/dP;
   fBirkC2 =  9.6e-6/(dP * dP);
 
@@ -143,6 +143,7 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
 
   if ( gMC->IsTrackEntering() ) {
    fELoss  = 0.;
+   fLightYield = 0.;
    fTime  = gMC->TrackTime() * 1.0e09;
    fLength = gMC->TrackLength();
    gMC->TrackPosition(fPosIn);
@@ -151,6 +152,41 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
 
   // Sum energy loss for all steps in the active volume
   fELoss += gMC->Edep();
+//  cout<<"fELoss: "<<fELoss<<endl;
+
+  // Apply Birk's law ( Adapted from G3BIRK/Geant3)
+  Double_t lightYield =  gMC->Edep() ;
+/*  
+  const Double_t* cpos;
+  cpos = gGeoManager->GetCurrentPoint();
+  cout<<"current pos: "<<cpos[0]<<"  "<<cpos[1]<<"  "<<cpos[2]<<endl;
+  cout<<"particle: "<<gMC->TrackPid()<<endl;
+  cout<<"step: "<<gMC->TrackStep()<<endl;
+  cout<<"fELoss: "<<fELoss<<endl;
+*/  
+  // Correction for all charge states
+  if (gMC->TrackCharge()!=0) {
+    Double_t birkC1Mod = 0;
+     // Apply correction for higher charge states
+    if (fBirkC0==1){
+      if (TMath::Abs(gMC->TrackCharge())>=2)
+        birkC1Mod=fBirkC1*7.2/12.6;
+      else
+        birkC1Mod=fBirkC1;
+    }
+
+    Double_t dedxcm=0.;
+    if (gMC->TrackStep()>0)
+    {
+      dedxcm=1000.*gMC->Edep()/gMC->TrackStep();
+//      cout<<"Edep: "<<gMC->Edep()<<" Trackstep: "<<gMC->TrackStep()<<endl;
+      lightYield=lightYield/(1.+birkC1Mod*dedxcm+fBirkC2*dedxcm*dedxcm);
+//      cout<<"dedxcm "<<dedxcm<<" factor "<<1./(1.+birkC1Mod*dedxcm+fBirkC2*dedxcm*dedxcm)
+//      <<" light yield "<<lightYield<<endl;
+      fLightYield=fLightYield+lightYield;
+//      cout<<"fLightYield: "<<fLightYield<<endl;
+    }
+  }
 
 
   // Set additional parameters at exit of active volume. Create R3BLandPoint.
@@ -196,26 +232,6 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
       fPosOut.SetZ(newpos[2]);
     }
 
-    // Apply Birk's law ( Adapted from G3BIRK/Geant3)
-    Double_t lightYield =  fELoss ;
-    // Correction for all charge states
-    if (gMC->TrackCharge()!=0) {
-      Double_t birkC1Mod = 0;
-       // Apply correction for higher charge states
-      if (fBirkC0==1){
-        if (TMath::Abs(gMC->TrackCharge())>=2)
-          birkC1Mod=fBirkC1*7.2/12.6;
-        else
-          birkC1Mod=fBirkC1;
-      }
-
-      Double_t dedxcm=0.;
-      if (gMC->TrackStep()>0)
-      {
-        dedxcm=1000.*gMC->Edep()/gMC->TrackStep();
-        lightYield=lightYield/(1.+birkC1Mod*dedxcm+fBirkC2*dedxcm*dedxcm);
-      }
-    }
 
 
     AddHit(fTrackID, fVolumeID,  fPaddleTyp,  cp2, cp1,
@@ -223,7 +239,7 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
       TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
       TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
       TVector3(fMomOut.Px(), fMomOut.Py(), fMomOut.Pz()),
-      fTime, fLength, fELoss, lightYield);
+      fTime, fLength, fELoss, fLightYield);
      
      // Increment number of LandPoints for this track
     FairStack* stack = (FairStack*) gMC->GetStack();
@@ -325,13 +341,17 @@ R3BLandPoint* R3BLand::AddHit(Int_t trackID, Int_t detID, Int_t box, Int_t id1, 
 }
 
 // -----  Public method UseNeuLand  ----------------------------------
-void R3BLand::UseNeuLand(Double_t paddle_length, Double_t paddle_width, Double_t paddle_depth, Double_t neuLAND_depth)
+void R3BLand::UseNeuLand(Double_t paddle_length, Double_t paddle_width, Double_t paddle_depth, 
+Double_t neuLAND_depth, Double_t paddle_gap, Double_t paddle_wrapping)
 {
   useNeuLAND=true;
   neuLAND_paddle_dimx = paddle_length;    // half of the length [cm]
   neuLAND_paddle_dimy = paddle_width;      // half of the width [cm]
   neuLAND_paddle_dimz = paddle_depth;      // half of the depth [cm]
   neuLAND_depth_dim   = neuLAND_depth;    // total detector depth [cm]
+  neuLAND_gap_dim   =paddle_gap;    // total detector depth [cm]
+  neuLAND_wrapping_dim   = paddle_wrapping;    // total detector depth [cm]
+  
 }
 
 // -----  Public method ConstructGeometry  ----------------------------------
@@ -406,6 +426,36 @@ void R3BLand::ConstructGeometry() {
     par[7]  = 0.000000; // stmin
     pMed37 = new TGeoMedium("BC408", numed,pMat37,par);
   }
+
+// Material: Alu
+  TGeoMedium * pMedAl=NULL;
+  if (gGeoManager->GetMedium("aluminium") ){
+    pMedAl=gGeoManager->GetMedium("aluminium");
+  }
+  else{
+    w     =      0.;
+    a     = 26.981538;
+    z     = 13.000000;
+    density = 2.70000;
+    radl   = 8.875105;
+    absl   = 388.793113;
+    TGeoMaterial*
+    pMatAl = new TGeoMaterial("Aluminium", a,z,density,radl,absl);
+    pMatAl->SetIndex(13);
+    numed  = 27;  // medium number
+    Double_t par[8];
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 0.000000; // tmaxfd
+    par[4]  = 0.000000; // stemax
+    par[5]  = 0.000000; // deemax
+    par[6]  = 0.000100; // epsil
+    par[7]  = 0.000000; // stmin
+    pMedFe = new TGeoMedium("Aluminium", numed,pMatAl, par);
+  }
+
+  TGeoMedium *Aluminium = pMedAl;
 
   TGeoVolume* vWorld = gGeoManager->GetTopVolume();
   vWorld->SetVisLeaves(kTRUE);
@@ -588,7 +638,7 @@ void R3BLand::ConstructLandGeometry(  TGeoVolume* vWorld,  TGeoMedium *Iron, TGe
 // --------------------------------------------------------------------------------
 // Construct NeuLand Geometry
 // --------------------------------------------------------------------------------
-void R3BLand::ConstructNeuLandGeometry(  TGeoVolume* vWorld,  TGeoMedium *Iron, TGeoMedium *BC408)
+void R3BLand::ConstructNeuLandGeometry(  TGeoVolume* vWorld,  TGeoMedium *Aluminium, TGeoMedium *BC408)
 {
   Double_t tx,ty,tz;
 
@@ -596,9 +646,24 @@ void R3BLand::ConstructNeuLandGeometry(  TGeoVolume* vWorld,  TGeoMedium *Iron, 
   TGeoVolume *padle_h_box5 = gGeoManager->MakeBox("padle_h_box5",BC408,
         neuLAND_paddle_dimx, neuLAND_paddle_dimy, neuLAND_paddle_dimz);
 
+  //------------------ wrapping ------------------------------------------
+  TGeoShape* padle_h_box1 = new TGeoBBox("padle_h_box1",
+      neuLAND_paddle_dimx, neuLAND_paddle_dimy+neuLAND_wrapping_dim, neuLAND_paddle_dimz+neuLAND_wrapping_dim);
+  TGeoShape* padle_h_box2 = new TGeoBBox("padle_h_box2",
+       neuLAND_paddle_dimx, neuLAND_paddle_dimy, neuLAND_paddle_dimz);
+
+  // Create a composite shape
+  TGeoCompositeShape *wrapping = new TGeoCompositeShape("diffbox", "padle_h_box1 - padle_h_box2");
+  TGeoVolume *bvol = new TGeoVolume("wrapping",wrapping,Aluminium);
+
+
   // Make the elementary assembly of the whole structure
   TGeoVolume *aLand = new TGeoVolumeAssembly("ALAND");
 
+  Double_t total_dimx=neuLAND_paddle_dimx;
+  Double_t total_dimy=neuLAND_paddle_dimy+neuLAND_wrapping_dim+neuLAND_gap_dim;
+  Double_t total_dimz=neuLAND_paddle_dimz+neuLAND_wrapping_dim+neuLAND_gap_dim;
+  
   //paddles
   TGeoRotation *zeroRotation= new TGeoRotation();
   zeroRotation->RotateX(0.);
@@ -613,7 +678,9 @@ void R3BLand::ConstructNeuLandGeometry(  TGeoVolume* vWorld,  TGeoMedium *Iron, 
   Double_t xx = 0.;
   Double_t yy = 0.;
   Double_t zz = 0.;
+  
   aLand->AddNode(padle_h_box5,1,new TGeoCombiTrans(xx,yy,zz,zeroRotation));
+  aLand->AddNode(bvol,1,new TGeoCombiTrans(xx,yy,zz,zeroRotation));
 
   AddSensitiveVolume(padle_h_box5); //Scint.
 
@@ -623,11 +690,11 @@ void R3BLand::ConstructNeuLandGeometry(  TGeoVolume* vWorld,  TGeoMedium *Iron, 
 
   int nindex=0, i=0;
   tx=0.;
-  tz=-neuLAND_depth_dim + neuLAND_paddle_dimz;
-  for (tz=-neuLAND_depth_dim+neuLAND_paddle_dimz; tz < neuLAND_depth_dim; tz+=neuLAND_paddle_dimz*2)
+  tz=-neuLAND_depth_dim + total_dimz;
+  for (tz=-neuLAND_depth_dim+total_dimz; tz < neuLAND_depth_dim; tz+=total_dimz*2)
   {
     i++;
-    for (ty=-neuLAND_paddle_dimx + neuLAND_paddle_dimy; ty < neuLAND_paddle_dimx; ty+=neuLAND_paddle_dimy*2)
+    for (ty=-total_dimx + total_dimy; ty < total_dimx; ty+=total_dimy*2)
     {
       nindex++;
       if (i % 2 == 1)
@@ -650,7 +717,8 @@ void R3BLand::ConstructNeuLandGeometry(  TGeoVolume* vWorld,  TGeoMedium *Iron, 
   FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
   R3BLandDigiPar* par=(R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
   par->SetMaxPaddle(nindex) ;
-  par->SetMaxPlane((Int_t)neuLAND_depth_dim/neuLAND_paddle_dimy);
+  par->SetMaxPlane((Int_t)(neuLAND_depth_dim/total_dimy));
+  par->SetPaddleLength(neuLAND_paddle_dimx);
   par->setChanged();
   //par->setInputVersion(fRun->GetRunId(),1);
 }
