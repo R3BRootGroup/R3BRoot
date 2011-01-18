@@ -21,7 +21,8 @@ void Config()
   // create R3B  Specific Stack
   R3BStack *st = new R3BStack();
   // Set debug mode
-  st->SetDebug(kFALSE);
+//  st->SetDebug(kFALSE);
+  st->SetDebug(kTRUE);
   st->SetMinPoints(0);
   st->StoreSecondaries(kTRUE);
 
@@ -30,9 +31,12 @@ void Config()
 
   // ******* GEANT3  specific configuration for simulated Runs  *******
     geant3->SetTRIG(1);         //Number of events to be processed
-    geant3->SetSWIT(4, 10);
-    geant3->SetDEBU(0, 0, 1);
-  
+//    geant3->SetSWIT(4, 10);
+//    geant3->SetDEBU(0, 0, 1);
+    cout<<"test test **************************************************"<<endl;
+    geant3->SetSWIT(2, 2);
+    geant3->SetDEBU(1, 100, 2); 
+     
     geant3->SetRAYL(1);
     geant3->SetSTRA(1);
     geant3->SetAUTO(1);         //Select automatic STMIN etc... calc. (AUTO 1) or manual (AUTO 0)
