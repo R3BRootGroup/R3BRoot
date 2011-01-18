@@ -25,16 +25,18 @@ class R3BLandDigiPar : public FairParGenericSet
 	/** Accessor functions **/
 	const Int_t GetMaxPaddle() { return  nMaxPaddle;}
 	const Int_t GetMaxPlane() { return  nMaxPlane;}
+	const Double_t GetPaddleLength() { return  paddleLength;}
 	void SetMaxPaddle(Int_t paddle ){nMaxPaddle=paddle;}
 	void SetMaxPlane(Int_t pla){nMaxPlane=pla;}
+	void SetPaddleLength(Double_t length){paddleLength=length;}
 
   private:
   // Digi. Parameters
   Int_t nMaxPaddle;
   Int_t nMaxPlane;
+  Double_t paddleLength;
 
-
-   ClassDef(R3BLandDigiPar,1); //
+   ClassDef(R3BLandDigiPar,2); //
 };
 
 #endif /* !R3BLANDDIGIPAR_H*/
