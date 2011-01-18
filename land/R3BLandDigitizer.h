@@ -77,7 +77,7 @@ class R3BLandDigitizer : public FairTask
 
   Int_t npaddles;
   Int_t nplanes;
-
+  Int_t paddle_per_plane;
   Double_t plength; // half length of paddle
   Double_t att; // light attenuation factor [1/cm]
   Double_t mn; // mass of neutron in MeV/c**2
