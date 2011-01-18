@@ -562,8 +562,9 @@ void R3BAladinFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField)
       //printf (")\n");
     }
 
-  double wsuminv = fFieldSign/wsum;
-
+  double wsuminv=0.0;
+  if(wsum!=0.) wsuminv = fFieldSign/wsum;
+  
   if ( (z_abs>120.0) && (z_abs <= 160.) )
     { 
       // Between 150 and 160 cm, we force the field down to 0
@@ -584,8 +585,8 @@ void R3BAladinFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField)
   bField[1] = -1.*BLab.Y()*10.; // [kGauss]
   bField[2] = -1.*BLab.Z()*10.; // [kGauss]
 
- // cout << "-I- ALADIN --> X: " << p.X() << " Y: " << p.Y() << "Z:" << p.Z() << endl;
- // cout << "-I- ALADIN --> Bx: " << bField[0] << " By: " << bField[1] << "Bz:" << bField[2] << endl;
+//  cout << "-I- ALADIN --> X: " << p.X() << " Y: " << p.Y() << "Z:" << p.Z() << endl;
+//  cout << "-I- ALADIN --> Bx: " << bField[0] << " By: " << bField[1] << "Bz:" << bField[2] << endl;
 
   return;
 }
