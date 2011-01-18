@@ -79,7 +79,9 @@ InitStatus R3BLandDigitizer::Init() {
   // Only after Init one retrieve the Digitization Parameters!
   npaddles = fLandDigiPar->GetMaxPaddle()+1;
   nplanes = fLandDigiPar->GetMaxPlane();
-  cout<<"# paddles: "<<npaddles<<"  # planes: "<<nplanes<<endl;
+  paddle_per_plane=(npaddles-1)/nplanes;
+  cout<<"# paddles: "<<npaddles-1<<"  # planes: "<<nplanes<<endl;
+  cout<<"paddles per plane: "<<paddle_per_plane<<endl;
   mn = 939.565; // mass of neutron in MeV/c**2
   mnu = 1.0086649; // mass of neutron in atomic mass units
   amu = 931.494028; //atomic mass unit in MeV/c**2
@@ -87,9 +89,9 @@ InitStatus R3BLandDigitizer::Init() {
   cMedia = 20.;// speed of light in material in [cm/ns]
 
   PM_res=new PM_RES*[npaddles];
-  for (int i=0;i<npaddles;i++)
+  for (int i=0;i<npaddles;i++){
     PM_res[i]=new PM_RES[1500];
-    
+  }  
   // Initialise control histograms
      hPMl = new TH1F("PM_left","Arrival times of left PM",1000,0.,1000.);
      hPMl->GetXaxis()->SetTitle("Time (ns)");
@@ -99,7 +101,7 @@ InitStatus R3BLandDigitizer::Init() {
      hPMr->GetXaxis()->SetTitle("Time (ns)");
      hPMr->GetYaxis()->SetTitle("Counts");
 
-     hTotalLight = new TH1F("Total_Light","Total light detected (energy equivalent)",5000,0.,1000.);
+     hTotalLight = new TH1F("Total_Light","Total light detected (energy equivalent)",1000,0.,1000.);
      hTotalLight->GetXaxis()->SetTitle("Energy (MeV)");
      hTotalLight->GetYaxis()->SetTitle("Counts");
   
@@ -138,15 +140,15 @@ InitStatus R3BLandDigitizer::Init() {
      hFirstMedia = new TH1F("FirstMedia","First media hit",10,0.,10.);
      hFirstMedia->GetXaxis()->SetTitle("Media");
      hFirstMedia->GetYaxis()->SetTitle("Counts");
-         
+        
   if(npaddles<202){
      //LAND detector
 
-     hMult1 = new TH1F("Multiplicity1","Paddle multiplicity",20,-0.5,19.5);
+     hMult1 = new TH1F("Multiplicity1","Paddle multiplicity if two Pms have fired",20,-0.5,19.5);
      hMult1->GetXaxis()->SetTitle("Multiplicity");
      hMult1->GetYaxis()->SetTitle("Counts");
 
-     hMult2 = new TH1F("Multiplicity2","Paddle multiplicity",20,-0.5,19.5);
+     hMult2 = new TH1F("Multiplicity2","Paddle multiplicity if one PM has fired",20,-0.5,19.5);
      hMult2->GetXaxis()->SetTitle("Multiplicity");
      hMult2->GetYaxis()->SetTitle("Counts");
   }
@@ -199,7 +201,8 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
    Double_t lambda=0.693147/2.5; // in [1/ns]
 
 // half of the length of a scintillator
-   plength = 100.; // in [cm]
+   plength = fLandDigiPar->GetPaddleLength(); // in [cm]
+//   cout<<"paddle length: "<<plength<<endl;
 
 // length of time gate for QDC
    Double_t tofRange = 100.;//in [ns]
@@ -234,7 +237,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
    Int_t PDG;
    Double_t pnx0,pny0,pnz0,pnt0,pn0,xn0,yn0,zn0,tn0,en,s,rr;
    Double_t pfx0,pfy0,pfz0,pft0,pf0,xf0,yf0,zf0,tf0;
-   
+
    // reset    
    for (Int_t j=0;j<npaddles;j++){      
       TotalEnergy[j]=0.;
@@ -247,7 +250,8 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
    //  get object from the TclonesArray at index=TrackID
    R3BMCTrack *aTrack1 = (R3BMCTrack*) fLandMCTrack->At(0); 
    R3BMCTrack *aTrack2 = (R3BMCTrack*) fLandMCTrack->At(1); 
-
+   
+  
    if ( aTrack1->GetMotherId() >=0 ) cout << " Problem track1 not a primary track" << endl; 
    if ( aTrack2->GetMotherId() >=0 ) cout << " Problem track2 not a primary track" << endl;    
 
@@ -267,6 +271,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 //   cout << "px, py, pz " << pfx0 << "  " << pfy0 << "  " << pfz0 << endl;
 //   cout << "Ptransversal, P total " << pft0 << "  " << pf0 << endl;
 
+
 //Neutron
    PDG = aTrack2->GetPdgCode();
    if (PDG != 2112) cout << " Second particle is not a neutron" << endl; 
@@ -283,6 +288,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 //   cout << "primary particle 2 " << PDG << endl;
 //   cout << "px, py, pz " << pnx0 << "  " << pny0 << "  " << pnz0 << endl;
 //   cout << "Ptransversal, P total " << pnt0 << "  " << pn0 << endl;
+
       
    
    for (Int_t l=0;l<nentries;l++){
@@ -404,17 +410,10 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
          // identify x and y paddles and calculate light transmission to the PM's
 	 // first plane are horizontal paddles
     
-	 if(paddle > (npaddles-1)/2) {
-	    // vertical paddles
-	    PM_res[paddle][m].Ltime = time+(plength-y)/cMedia;
-            PM_res[paddle][m].LlightCFD = light*exp(-att*(plength-y));
-            PM_res[paddle][m].LlightQDC = light*exp(-att*(plength-y));
+//         cout<<"paddle "<<paddle<<"  "<<(int)(((paddle-1)/40.))/2.<<"  "<<(int)((int)(((paddle-1)/40.))/2.)<<endl;
 
-	    PM_res[paddle][m].Rtime = time+(plength+y)/cMedia;
-            PM_res[paddle][m].RlightCFD = light*exp(-att*(plength+y));
-            PM_res[paddle][m].RlightQDC = light*exp(-att*(plength+y));
-         }
-	 else {
+//	 if(paddle > (npaddles-1)/2) {
+         if((int)(((paddle-1)/paddle_per_plane))/2.==(int)((int)(((paddle-1)/paddle_per_plane))/2.)){
 	    // horizontal paddles
 	    PM_res[paddle][m].Ltime = time+(plength-x)/cMedia;
             PM_res[paddle][m].LlightCFD = light*exp(-att*(plength-x));
@@ -423,6 +422,16 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 	    PM_res[paddle][m].Rtime = time+(plength+x)/cMedia;
             PM_res[paddle][m].RlightCFD = light*exp(-att*(plength+x));
             PM_res[paddle][m].RlightQDC = light*exp(-att*(plength+x));
+         }
+	 else {
+	    // vertical paddles
+	    PM_res[paddle][m].Ltime = time+(plength-y)/cMedia;
+            PM_res[paddle][m].LlightCFD = light*exp(-att*(plength-y));
+            PM_res[paddle][m].LlightQDC = light*exp(-att*(plength-y));
+
+	    PM_res[paddle][m].Rtime = time+(plength+y)/cMedia;
+            PM_res[paddle][m].RlightCFD = light*exp(-att*(plength+y));
+            PM_res[paddle][m].RlightQDC = light*exp(-att*(plength+y));
          }
 
       }//! eloss	 
@@ -557,19 +566,20 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
          QDC_temp[mult1] = calFactor*exp(plength*att)*sqrt(lightl*lightr);
          TDC_temp[mult1] = (tofl + tofr) / 2. - plength/cMedia;
 	 
-	 if(i > (npaddles-1)/2) {
-	    // vertical paddles
-	    xpos_temp[mult1] = xpaddle[i];
-	    ypos_temp[mult1] = (tofr - tofl)/2.*cMedia;	    
-	    zpos_temp[mult1] = zpaddle[i];
-//	    cout << "delta tof y " << (tofl - tofr) << endl; 
-         }
-	 else {
+//	 if(i > (npaddles-1)/2) {
+         if((int)(((i-1)/paddle_per_plane))/2.==(int)((int)(((i-1)/paddle_per_plane))/2.)){
 	    //horizontal paddles
 	    xpos_temp[mult1] = (tofr - tofl)/2.*cMedia;
 	    ypos_temp[mult1] = ypaddle[i];	    
 	    zpos_temp[mult1] = zpaddle[i];
 //	    cout << "delta tof x " << (tofl - tofr) << endl; 
+         }
+	 else {
+	    // vertical paddles
+	    xpos_temp[mult1] = xpaddle[i];
+	    ypos_temp[mult1] = (tofr - tofl)/2.*cMedia;	    
+	    zpos_temp[mult1] = zpaddle[i];
+//	    cout << "delta tof y " << (tofl - tofr) << endl; 
          }
 	 
          // Here is an example how to fill the R3BLandDigi structure
