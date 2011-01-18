@@ -12,7 +12,6 @@
 //
 //--------------------------------------------------------------------
 
-
 Int_t r3blandsim(){
 
    // Load the Main Simulation macro
@@ -36,6 +35,7 @@ Int_t r3blandsim(){
    // R3B spec. generator:       "r3b"
 
    TString fGene="ascii";
+//   TString fGene="box";
 
    //-------------------------------------------------
    // Secondaries  generation (G4 only)
@@ -90,26 +90,26 @@ Int_t r3blandsim(){
     TObjString det10("LAND");
     TObjString det11("RPCMLAND");
     TObjString det12("RPCFLAND");
-		TObjString det13("SCINTNEULAND");
+    TObjString det13("SCINTNEULAND");
 
     TObjArray fDetList;
 //    fDetList.Add(&det1);
     fDetList.Add(&det2);
-//    fDetList.Add(&det4);
+    fDetList.Add(&det4);
 //    fDetList.Add(&det5);
-//    fDetList.Add(&det6);
+    fDetList.Add(&det6);
 //    fDetList.Add(&det7);
 //    fDetList.Add(&det8);
-//    fDetList.Add(&det9);
+    fDetList.Add(&det9);
 //    fDetList.Add(&det10);
-    fDetList.Add(&det11);
+    fDetList.Add(&det13);
 
 
    //-------------------------------------------------
    //- N# of Sim. Events   |    nEvents     (Int_t)
    //-------------------------------------------------
 
-   Int_t nEvents = 10;
+   Int_t nEvents = 10000; //23347;
 
    //-------------------------------------------------
    //- EventDisplay        |    fEventDisplay (Bool_t)
