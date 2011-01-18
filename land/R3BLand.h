@@ -116,7 +116,8 @@ class R3BLand : public R3BDetector
   virtual void Initialize();
   virtual void SetSpecialPhysicsCuts(){;}
 
-  void UseNeuLand(Double_t _paddle_length, Double_t _paddle_width, Double_t _paddle_depth, Double_t _neuLAND_depth);
+  void UseNeuLand(Double_t _paddle_length, Double_t _paddle_width, Double_t _paddle_depth, 
+  Double_t _neuLAND_depth, Double_t _paddle_gap, Double_t _wrapping);
 
 
   //  void SaveGeoParams();
@@ -135,6 +136,7 @@ class R3BLand : public R3BDetector
     Double32_t     fTime;              //!  time
     Double32_t     fLength;            //!  length
     Double32_t     fELoss;             //!  energy loss
+    Double32_t     fLightYield;        //!  light yield
 
     Int_t          fPosIndex;          //!
     TClonesArray*  fLandCollection;    //!  The hit collection
@@ -147,6 +149,8 @@ class R3BLand : public R3BDetector
     Double_t neuLAND_paddle_dimy;      // half of the width [cm]
     Double_t neuLAND_paddle_dimz;      // half of the depth [cm]
     Double_t neuLAND_depth_dim;        // total detector depth [cm]
+    Double_t neuLAND_gap_dim;          // half of air gap between two scintillators [cm]
+    Double_t neuLAND_wrapping_dim;        // thickness of wrapping [cm]
     
     /** Private method AddHit
      **
@@ -174,7 +178,7 @@ class R3BLand : public R3BDetector
     map <Int_t,Int_t> fMapMcId;
 
 
-    ClassDef(R3BLand,1);
+    ClassDef(R3BLand,2);
 
 };
 
@@ -185,7 +189,7 @@ inline void R3BLand::ResetParameters() {
   fPosOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fMomIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fMomOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
-  fTime = fLength = fELoss = 0;
+  fTime = fLength = fELoss = fLightYield = 0;
   fPosIndex = 0;
 };
 
