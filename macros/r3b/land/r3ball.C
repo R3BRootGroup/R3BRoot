@@ -103,6 +103,10 @@ void r3ball(Int_t nEvents = 1,
   run->SetOutputFile(OutFile.Data());          // Output file
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
 
+
+  // Magnetic field map type
+  Int_t fFieldMap = 0;
+
   //  R3B Special Physics List in G4 case
   if ( (fUserPList  == kTRUE ) &&
        (fMC.CompareTo("TGeant4")   == 0)
@@ -115,10 +119,6 @@ void r3ball(Int_t nEvents = 1,
   // -----   Create media   -------------------------------------------------
   run->SetMaterials("media_r3b.geo");       // Materials
   
-
-  // Magnetic field map type
-   Int_t fFieldMap = 0;
-
 
   // Global Transformations
   //- Two ways for a Volume Rotation are supported
@@ -159,10 +159,10 @@ void r3ball(Int_t nEvents = 1,
       tx    =  0.0; // (cm)
       ty    =  0.0; // (cm)
       tz    =  0.0; // (cm)
-     //target->SetRotAnglesEuler(phi,theta,psi);
-     target->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-     target->SetTranslation(tx,ty,tz);
-      //run->AddModule(target);
+      //target->SetRotAnglesEuler(phi,theta,psi);
+      target->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
+      target->SetTranslation(tx,ty,tz);
+      run->AddModule(target);
   }
 
   //R3B Magnet definition
@@ -184,7 +184,7 @@ void r3ball(Int_t nEvents = 1,
       //mag->SetRotAnglesEuler(phi,theta,psi);
       mag->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       mag->SetTranslation(tx,ty,tz);
-      //run->AddModule(mag);
+      run->AddModule(mag);
   }
 
     //R3B Magnet definition
@@ -228,7 +228,7 @@ void r3ball(Int_t nEvents = 1,
       //cal->SetRotAnglesEuler(phi,theta,psi);
       cal->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       cal->SetTranslation(tx,ty,tz);
-      //run->AddModule(cal);
+      run->AddModule(cal);
   }
 
   if (fDetList.FindObject("CALIFA") ) {
@@ -342,7 +342,7 @@ void r3ball(Int_t nEvents = 1,
       // User defined Energy CutOff
       Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
       ((R3BmTof*) mTof)->SetEnergyCutOff(fCutOffSci);
-      //run->AddModule(mTof);
+      run->AddModule(mTof);
   }
 
   // GFI detector
@@ -365,7 +365,7 @@ void r3ball(Int_t nEvents = 1,
       // User defined Energy CutOff
       Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
       ((R3BGfi*) gfi)->SetEnergyCutOff(fCutOffSci);
-      //run->AddModule(gfi);
+      run->AddModule(gfi);
   }
 
   // Land Detector
@@ -382,10 +382,42 @@ void r3ball(Int_t nEvents = 1,
       // Global translation in Lab
       tx    =  0.0; // (cm)
       ty    =  0.0; // (cm)
-      tz    =  1000.0; // (cm)
+      tz    =  1050.0; // (cm)
       //land->SetRotAnglesEuler(phi,theta,psi);
       land->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       land->SetTranslation(tx,ty,tz);
+      run->AddModule(land);
+  }
+	// NeuLand Scintillator Detector
+  if (fDetList.FindObject("SCINTNEULAND")) {
+
+      R3BDetector* land = new R3BLand("Land", kTRUE);
+
+			//Construct NeuLand
+			Double_t paddle_dimx=102.;   // half of the length [cm]
+			Double_t paddle_dimy=2.5;   // half of the width [cm]
+			Double_t paddle_dimz=2.5;   // half of the depth [cm]
+			Double_t detector_dimz=153; // total detector depth [cm]
+			Double_t air_gap=0.02;        // half of air gap between two scintillator bars [cm]
+			Double_t wrapping=0.03;      // thickness of wrapping material [cm]
+			((R3BLand*) land)->UseNeuLand(paddle_dimx, paddle_dimy, paddle_dimz, detector_dimz, air_gap, wrapping);
+
+      // Global position of the Module
+      phi   =  0.0; // (deg)
+      theta =  0.0; // (deg)
+      psi   =  0.0; // (deg)
+      // Rotation in Ref. Frame.
+      thetaX =  0.0; // (deg)
+      thetaY =  0.0; // (deg)
+      thetaZ =  0.0; // (deg)
+      // Global translation in Lab
+      tx    =  0.0; // (cm)
+      ty    =  0.0; // (cm)
+      tz    =  1150.0; // (cm)
+      //land->SetRotAnglesEuler(phi,theta,psi);
+      land->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
+      land->SetTranslation(tx,ty,tz);
+
       run->AddModule(land);
   }
 
@@ -441,16 +473,22 @@ void r3ball(Int_t nEvents = 1,
   
   // -----   Create R3B  magnetic field ----------------------------------------
   Int_t typeOfMagneticField = 0;
-  Int_t fieldScale = 1;
+  Double_t fieldScale = 1.;
   Bool_t fVerbose = kFALSE;
+
+
 
   //NB: <D.B>
   // If the Global Position of the Magnet is changed
   // the Field Map has to be transformed accordingly
-
+  cout<<"***************************"<<endl;
+  cout<<"fFieldMap "<<fFieldMap<<endl;
+  cout<<"fR3BMagnet "<<fR3BMagnet<<endl;
+  
   if (fFieldMap == 0) {
-    R3BFieldMap* magField = new R3BFieldMap(typeOfMagneticField,fVerbose);
-    magField->SetPosition(0., 0., 0.);
+    R3BAladinFieldMap* magField = new R3BAladinFieldMap("AladinMaps");
+    Double_t fMeasCurrent = 2000.;// I_current [A]
+    magField->SetCurrent(fMeasCurrent);
     magField->SetScale(fieldScale);
 
     if ( fR3BMagnet == kTRUE ) {
@@ -471,24 +509,30 @@ void r3ball(Int_t nEvents = 1,
   }  //! end of field map section
 
 
-
   // -----   Create PrimaryGenerator   --------------------------------------
 
   // 1 - Create the Main API class for the Generator
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
+  if (fGenerator.CompareTo("ascii") == 0  ) {
+  TString evtFile = "evt_gen.dat";
+  TString iFile = dir + "/input/" + evtFile;
+  R3BAsciiGenerator* gen = new R3BAsciiGenerator(iFile.Data());
+  // add the ascii generator
+  primGen->AddGenerator(gen);
+  } 
 
   if (fGenerator.CompareTo("box") == 0  ) {
   // 2- Define the BOX generator
-  Double_t pdgId=211; // pion beam
+  Double_t pdgId=2212; // pion beam
   Double_t theta1= 0.;  // polar angle distribution
-  Double_t theta2= 7.;
-  Double_t momentum=.8; // 10 GeV/c
+  Double_t theta2= 0.;
+  Double_t momentum=1.692041; // 10 GeV/c
   FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 1);
   boxGen->SetThetaRange (   theta1,   theta2);
-  boxGen->SetPRange     (momentum,momentum*2.);
+  boxGen->SetPRange     (momentum,momentum*1.);
   boxGen->SetPhiRange   (0.,360.);
-  boxGen->SetXYZ(0.0,0.0,-1.5);
+  boxGen->SetXYZ(2.5,2.5,972.5);
   // add the box generator
   primGen->AddGenerator(boxGen);
   } 
