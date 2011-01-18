@@ -1,4 +1,3 @@
-
 #include "R3BNeutronTrack.h"
 
 #include <iostream>
@@ -10,30 +9,37 @@ using std::flush;
 
 // -----   Default constructor   -------------------------------------------
 R3BNeutronTrack::R3BNeutronTrack() {
-  fTdcL     = fTdcR    =  fQdcR  = fQdcL = 0.;
-  fPaddleNb = -1;
+  fX  = fY  = fZ  = 0.;
+  fX_out      = fY_out  = fZ_out  = 0.;
+  fPx_out     = fPy_out = fPz_out = 0.;
 }
-R3BNeutronTrack::R3BNeutronTrack(Int_t paddle, Double_t tdcR, Double_t tdcL,
-			               Double_t qdcR, Double_t qdcL){
-    fTdcL    = tdcR;
-    fTdcR    = tdcL;
-    fQdcL    = qdcR;
-    fQdcR    = qdcL;
 
-    fPaddleNb = paddle;
+R3BNeutronTrack::R3BNeutronTrack(TVector3 posIn, 
+TVector3 posOut, TVector3 momOut, Double_t tof){
+  fX  = posIn.X();
+  fY  = posIn.Y();
+  fZ  = posIn.Z();
+  fX_out  = posOut.X();
+  fY_out  = posOut.Y();
+  fZ_out  = posOut.Z();
+  fPx_out = momOut.Px();
+  fPy_out = momOut.Py();
+  fPz_out = momOut.Pz();
+
 }
 
 // -----   Destructor   ----------------------------------------------------
+
 R3BNeutronTrack::~R3BNeutronTrack() { }
 
 // -----   Public method Print   -------------------------------------------
 void R3BNeutronTrack::Print(const Option_t* opt) const {
 
   cout << "-I- R3BNeutronTrack: LAND Digi in detector " << endl;
-  cout << "    PaddleNr: " << fPaddleNb << endl;
-  cout << "    TdcR: " << fTdcR << "    TdcL " << fTdcL << endl;
-  cout << "    QdcR: " << fQdcR << "    QdcL " << fQdcL << endl;
-
+  cout << "    Position (" << fX << ", " << fY << ", " << fZ
+       << ") cm" << endl;
+  cout << "    Momentum (" << fPx_out << ", " << fPy_out << ", " << fPz_out
+       << ") GeV" << endl;
 
 }
 // -------------------------------------------------------------------------
