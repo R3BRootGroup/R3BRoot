@@ -46,7 +46,7 @@ R3BCosmicGenerator::R3BCosmicGenerator(Int_t pdgid, Int_t mult, Double32_t E_Thr
   SetPhiRange  ();
 }
 // ------------------------------------------------------------------------
-void R3BCosmicGenerator::Init()
+Bool_t R3BCosmicGenerator::Init()
 {
   // Initialize generator
 
@@ -61,6 +61,7 @@ void R3BCosmicGenerator::Init()
   TParticlePDG *particle = pdgBase->GetParticle(fPDGType);
   if (! particle) Fatal("R3BCosmicGenerator","PDG code %d not defined.",fPDGType);
   fPDGMass = particle->Mass();
+  return kTRUE;
 }
 
 //---------------------------------------------------------------------------

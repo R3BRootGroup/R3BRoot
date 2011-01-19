@@ -92,7 +92,7 @@ public:
   ~R3BSpecificGenerator();
 
   /** Initializer **/
-  void Init();
+  virtual Bool_t Init();
 
    /** Creates an event with given type and multiplicity.
    **@param primGen  pointer to the FairSpecificGenerator

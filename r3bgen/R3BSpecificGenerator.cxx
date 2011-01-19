@@ -63,7 +63,7 @@ R3BSpecificGenerator::~R3BSpecificGenerator() {
   //
 }
 
-void R3BSpecificGenerator::Init()
+Bool_t R3BSpecificGenerator::Init()
 {
  // Int_t verboselevel;
 
@@ -89,7 +89,7 @@ void R3BSpecificGenerator::Init()
 	  << " Mass (GeV) : " << fPDGMass << endl;
       cout << endl; 
   }
-
+  return kTRUE;
 }
 
 // ------------------------------------------------------------------------

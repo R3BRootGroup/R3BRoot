@@ -43,7 +43,7 @@ fGammasDefinedInNuclearDecay(0), fBetaOfEmittingFragment(0), fGammaFactor(1)
   SetPhiRange  ();
 }
 // ------------------------------------------------------------------------
-void R3BCALIFATestGenerator::Init()
+Bool_t R3BCALIFATestGenerator::Init()
 {
   // Initialize generator
 	
@@ -79,6 +79,7 @@ void R3BCALIFATestGenerator::Init()
 	TParticlePDG *particle = pdgBase->GetParticle(fPDGType);
 	if (! particle) Fatal("R3BCALIFATestGenerator","PDG code %d not defined.",fPDGType);
 	fPDGMass = particle->Mass();
+  return kTRUE;
 }
 
 // ------------------------------------------------------------------------
