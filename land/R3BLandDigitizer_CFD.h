@@ -44,7 +44,8 @@ class R3BLandDigitizer_CFD : public FairTask
 
 
   R3BLandDigi* AddHit(Int_t paddleNr, Double_t tdcR, Double_t tdcL,
-		     Double_t qdcR,Double_t qdcL );
+		     Double_t qdcR,Double_t qdcL, 
+				 double x0, double y0, double z0, double t0 );
 
 
   protected:
@@ -106,6 +107,8 @@ class R3BLandDigitizer_CFD : public FairTask
 	};
 
   Int_t nPaddles;
+  Int_t nPlanes;
+  Int_t nrPaddlePerPlane;
 	R3BLandDigitizer_CFD_Paddle* paddles;
 	std::vector<R3BLandDigitizer_CFD_Paddle_Hit> paddleHits;
 

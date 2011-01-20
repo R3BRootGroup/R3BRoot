@@ -361,7 +361,7 @@ void r3ball(Int_t nEvents = 1,
       // Global translation in Lab
       tx    =  0.0; // (cm)
       ty    =  0.0; // (cm)
-      tz    =  1050.0; // (cm)
+      tz    =  1054.0 + 51.9; // (cm)
       //land->SetRotAnglesEuler(phi,theta,psi);
       land->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       land->SetTranslation(tx,ty,tz);
@@ -374,11 +374,18 @@ void r3ball(Int_t nEvents = 1,
       R3BDetector* land = new R3BLand("Land", kTRUE);
 
 			//Construct NeuLand
-			Double_t paddle_dimx=100;   // half of the length [cm]
-			Double_t paddle_dimy=2.5;   // half of the width [cm]
-			Double_t paddle_dimz=2.5;   // half of the depth [cm]
-			Double_t detector_dimz=100; // total detector depth [cm]
-			((R3BLand*) land)->UseNeuLand(paddle_dimx, paddle_dimy, paddle_dimz, detector_dimz);
+			Double_t paddle_dimx=100;         // half of the length [cm]
+			Double_t paddle_dimy=1.5;         // half of the width [cm]
+			Double_t paddle_dimz=1.5;         // half of the depth [cm]
+			Double_t detector_dimz = 100;     // half detector depth [cm]
+			Double_t paddle_gap = 0.05;       // half length of gap between paddles [cm]
+			Double_t paddle_wrapping = 0.01;  // thickness of the wrapping [cm]
+			((R3BLand*) land)->UseNeuLand(paddle_dimx, paddle_dimy, paddle_dimz, detector_dimz,  paddle_gap, paddle_wrapping);
+
+      double total_dimz=paddle_dimz + paddle_gap + paddle_wrapping;
+      double posZ = - total_dimz;
+      while(posZ - (total_dimz*3 - paddle_gap) > -detector_dimz)
+        posZ -= total_dimz*2;
 
       // Global position of the Module
       phi   =  0.0; // (deg)
@@ -391,7 +398,7 @@ void r3ball(Int_t nEvents = 1,
       // Global translation in Lab
       tx    =  0.0; // (cm)
       ty    =  0.0; // (cm)
-      tz    =  1050.0; // (cm)
+      tz    =  1054.0 - posZ + paddle_dimz + paddle_wrapping; // (cm)
       //land->SetRotAnglesEuler(phi,theta,psi);
       land->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       land->SetTranslation(tx,ty,tz);
@@ -544,7 +551,7 @@ void r3ball(Int_t nEvents = 1,
   Double_t pdgId  = 2112; // neutron beam
   Double_t theta1 = 0.;  // polar angle distribution
   Double_t theta2 = 2.;
-  // LAND deuterium breakup : 0.765,1.0555,1.2254,1.4713,1.7629 MeV/c
+  // LAND deuterium breakup : 0.765,1.0555,1.2254,1.4713,1.7629 GeV/c
   //                           270,  470,   600,   800,   1050 MeV
   Double_t momentum= 1.0555; // GeV/c
   FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 1);

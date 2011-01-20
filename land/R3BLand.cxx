@@ -348,7 +348,7 @@ Double_t neuLAND_depth, Double_t paddle_gap, Double_t paddle_wrapping)
   neuLAND_paddle_dimx = paddle_length;    // half of the length [cm]
   neuLAND_paddle_dimy = paddle_width;      // half of the width [cm]
   neuLAND_paddle_dimz = paddle_depth;      // half of the depth [cm]
-  neuLAND_depth_dim   = neuLAND_depth;    // total detector depth [cm]
+  neuLAND_depth_dim   = neuLAND_depth;    // half detector depth [cm]
   neuLAND_gap_dim   =paddle_gap;    // total detector depth [cm]
   neuLAND_wrapping_dim   = paddle_wrapping;    // total detector depth [cm]
   
@@ -600,19 +600,27 @@ void R3BLand::ConstructLandGeometry(  TGeoVolume* vWorld,  TGeoMedium *Iron, TGe
   rot4->RotateZ(90.);
 
   tx=0.;
-  int nindex=0, i=0;
-  for (tz=-45.9; i < 10; tz+=10.2)
+  int nrPaddle=0, nrPlane=0;
+
+  // Assembly includes spacing of 0.1cm on eather side of LAND paddles
+  double spacing =0.2;
+
+  // With LAND centerd around (0,0,0) the start of assembly is calculated with spacings
+  double startZ=-(10.2 * 10 + 9 * spacing - 10.2)/2;
+  double startY=-(10.2 * 20 + 19 * spacing - 10.2)/2;
+
+  for (tz=startZ; nrPlane < 10; tz+=10.2+spacing)
   {
-    i++;
+    nrPlane++;
     int j=0;
-    for (ty=-96.9; j < 20; ty+=10.2)
+    for (ty=startY; j < 20; ty+=10.2+spacing)
     {
       j++;
-      nindex++;
-      if (i % 2 == 1)
-        cell->AddNode(aLand,nindex,new TGeoCombiTrans(tx,ty,tz,zeroRotation));
+      nrPaddle++;
+      if (nrPlane % 2 == 1)
+        cell->AddNode(aLand,nrPaddle,new TGeoCombiTrans(tx,ty,tz,zeroRotation));
       else
-        cell->AddNode(aLand,nindex,new TGeoCombiTrans(ty,tx,tz,rot4));
+        cell->AddNode(aLand,nrPaddle,new TGeoCombiTrans(ty,tx,tz,rot4));
     }
   }
 
@@ -631,6 +639,10 @@ void R3BLand::ConstructLandGeometry(  TGeoVolume* vWorld,  TGeoMedium *Iron, TGe
   R3BLandDigiPar* par=(R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
   par->SetMaxPaddle(200) ;
   par->SetMaxPlane(10);
+  par->SetPaddleLength(padle_h_dim1x);
+  par->SetPaddleHeight(padle_h_dim1y);
+  par->SetPaddleDepth(padle_h_dim1z);
+  par->SetPaddleSpacing(spacing);
   par->setChanged();
   //par->setInputVersion(fRun->GetRunId(),1);
 }
@@ -688,19 +700,29 @@ void R3BLand::ConstructNeuLandGeometry(  TGeoVolume* vWorld,  TGeoMedium *Alumin
 
   TGeoVolume *cell = new TGeoVolumeAssembly("CELL");
 
-  int nindex=0, i=0;
+  // Assembly includes spacing neuLAND paddles [cm]
+
+  int nrPaddle=0, nrPlane=0;
   tx=0.;
-  tz=-neuLAND_depth_dim + total_dimz;
-  for (tz=-neuLAND_depth_dim+total_dimz; tz < neuLAND_depth_dim; tz+=total_dimz*2)
+
+  double startZ = - total_dimz;
+  while(startZ - (total_dimz*3 - neuLAND_gap_dim) > -neuLAND_depth_dim)
+    startZ -= total_dimz*2;
+
+  double startY = - total_dimy;
+  while(startY - (total_dimy*3 - neuLAND_gap_dim) > -neuLAND_paddle_dimx)
+    startY -= total_dimy*2;
+
+  for (tz=startZ; tz < neuLAND_depth_dim - total_dimz + neuLAND_wrapping_dim; tz+=total_dimz*2)
   {
-    i++;
-    for (ty=-total_dimx + total_dimy; ty < total_dimx; ty+=total_dimy*2)
+    nrPlane++;
+    for (ty=startY; ty < neuLAND_paddle_dimx - total_dimy + neuLAND_wrapping_dim; ty+=total_dimy*2)
     {
-      nindex++;
-      if (i % 2 == 1)
-        cell->AddNode(aLand,nindex,new TGeoCombiTrans(tx,ty,tz,zeroRotation));
+      nrPaddle++;
+      if (nrPlane % 2 == 1)
+        cell->AddNode(aLand,nrPaddle,new TGeoCombiTrans(tx,ty,tz,zeroRotation));
       else
-        cell->AddNode(aLand,nindex,new TGeoCombiTrans(ty,tx,tz,rot1));
+        cell->AddNode(aLand,nrPaddle,new TGeoCombiTrans(ty,tx,tz,rot1));
     }
   }
 
@@ -716,9 +738,13 @@ void R3BLand::ConstructNeuLandGeometry(  TGeoVolume* vWorld,  TGeoMedium *Alumin
   FairRun *fRun = FairRun::Instance();
   FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
   R3BLandDigiPar* par=(R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
-  par->SetMaxPaddle(nindex) ;
-  par->SetMaxPlane((Int_t)(neuLAND_depth_dim/total_dimy));
+  par->SetMaxPaddle(nrPaddle) ;
+  par->SetMaxPlane(nrPlane);
   par->SetPaddleLength(neuLAND_paddle_dimx);
+  par->SetPaddleHeight(neuLAND_paddle_dimy);
+  par->SetPaddleDepth(neuLAND_paddle_dimz);
+  par->SetPaddleSpacing(neuLAND_gap_dim);
+  par->SetPaddleWrapping(neuLAND_wrapping_dim);
   par->setChanged();
   //par->setInputVersion(fRun->GetRunId(),1);
 }

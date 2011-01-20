@@ -25,6 +25,7 @@
 #include <string>
 #include <iostream>
 #include <stdlib.h>
+#include <limits>
 
 #include "R3BMCTrack.h"		
 
@@ -77,8 +78,10 @@ InitStatus R3BLandDigitizer_CFD::Init() {
   // Parameter retrieval
   // Only after Init one retrieve the Digitization Parameters!
   nPaddles = fLandDigiPar->GetMaxPaddle();
+  nPlanes = fLandDigiPar->GetMaxPlane();
+  nrPaddlePerPlane = nPaddles/nPlanes;
 
-  plength = 100.; // half length of paddles
+  plength = fLandDigiPar->GetPaddleLength(); // half length of paddles
 	att = 0.008; // light attenuation factor [1/cm]
 	v_eff = 16.; // Effective speed of light in scintillator [cm/ns]
 	inv_v_eff = 1/v_eff; // Inverse effective speed of light in scintillator [ns/cm]
@@ -104,17 +107,23 @@ InitStatus R3BLandDigitizer_CFD::Init() {
 void R3BLandDigitizer_CFD::SetCfdParameters(double threshold, double delay, double fraction)
 {
 	if(iVerbose > 0)
-		cout << "\nR3BLandDigitizer_CFD: Using Constant Fraction Discriminator...\n";
+		cout << "\n<I> R3BLandDigitizer_CFD: Using Constant Fraction Discriminator...\n";
 
-	cfd->SetParameters(threshold, delay, fraction);
+  double attComp = 0.525; //compensation for energy loss due to attenuation and Birks law
+                         //Calibrated with muons in 2m paddles
+
+	cfd->SetParameters(threshold*attComp, delay, fraction);
 }
 
 void R3BLandDigitizer_CFD::SetLeParameters(double threshold)
 {
 	if(iVerbose > 0)
-		cout << "\nR3BLandDigitizer_CFD: Using Leading Edge Discriminator...\n";
+		cout << "\n<I> R3BLandDigitizer_CFD: Using Leading Edge Discriminator...\n";
 
-	cfd->SetParameters(threshold);
+  double attComp = 0.525; //compensation for energy loss due to attenuation and Birks law
+                         //Calibrated with muons in 2m paddles
+
+	cfd->SetParameters(threshold*attComp);
 }
 
 
@@ -140,8 +149,8 @@ void R3BLandDigitizer_CFD::Exec(Option_t* opt)
 		if (inScintilator && energyLoss)
 		{
 			// Get the Land Object in array
-			paddleHits[iEntry].hitData = land_obj;
-			paddleHits[nentries+iEntry].hitData = land_obj;
+			paddleHits[iEntry].hitData = land_obj;            //Left paddles
+			paddleHits[nentries+iEntry].hitData = land_obj;   //Right paddles
 
 			Int_t paddleNr = int(land_obj->GetSector()-1); //note that paddles starts at 1
 
@@ -161,7 +170,7 @@ void R3BLandDigitizer_CFD::Exec(Option_t* opt)
 
 			Double_t pos;
 
-			if(paddleNr > (nPaddles)/2)
+			if((paddleNr/nrPaddlePerPlane)%2 == 1)
 			{
 				// vertical paddles
 				pos = (land_obj->GetYIn() + land_obj->GetYOut()) * 0.5;
@@ -209,6 +218,11 @@ void R3BLandDigitizer_CFD::Exec(Option_t* opt)
 			paddles[iPaddles].Left->tdc = cfd->Calculate(nrOfPaddleHits, &timeOfHitsLeft[0], &energyOfHitsLeft[0]);
 			paddles[iPaddles].Right->tdc = cfd->Calculate(nrOfPaddleHits, &timeOfHitsRight[0], &energyOfHitsRight[0]);
 
+      if (paddles[iPaddles].Left->tdc > qdcGate)
+        paddles[iPaddles].Left->tdc = std::numeric_limits<double>::quiet_NaN();
+      if (paddles[iPaddles].Right->tdc > qdcGate)
+        paddles[iPaddles].Right->tdc = std::numeric_limits<double>::quiet_NaN();
+      
 			//Calculate QDC
 			if (!TMath::IsNaN(paddles[iPaddles].Left->tdc) || !TMath::IsNaN(paddles[iPaddles].Right->tdc))
 			{	
@@ -221,18 +235,28 @@ void R3BLandDigitizer_CFD::Exec(Option_t* opt)
 						paddles[iPaddles].Right->qdc += energyOfHitsRight[iHit];
 				}
 
-				//Save the data from the paddles
-				AddHit( iPaddles, paddles[iPaddles].Right->tdc, paddles[iPaddles].Left->tdc, paddles[iPaddles].Right->qdc, paddles[iPaddles].Left->qdc );
-
-				if (iVerbose > 1)
-				{
-					cout << "   Paddle number: " << iPaddles << endl;
-					cout << "      QDC Left: " << paddles[iPaddles].Left->qdc << endl;
-					cout << "      CFD Left: " << paddles[iPaddles].Left->tdc << endl;
-
-					cout << "      QDC Right: " << paddles[iPaddles].Right->qdc << endl;
-					cout << "      CFD Right: " << paddles[iPaddles].Right->tdc << endl << endl;
-				}
+        //Exact data of the hit
+        double x0 = (paddles[iPaddles].Right->pulse->hitData->GetXIn()
+                     + paddles[iPaddles].Right->pulse->hitData->GetXOut())/2;
+        double y0 = (paddles[iPaddles].Right->pulse->hitData->GetYIn() 
+                     + paddles[iPaddles].Right->pulse->hitData->GetYOut())/2;
+        double z0 = (paddles[iPaddles].Right->pulse->hitData->GetZIn() 
+                     + paddles[iPaddles].Right->pulse->hitData->GetZOut())/2;
+        double t0 = paddles[iPaddles].Right->pulse->hitData->GetTime();
+        
+        //Save the data from the paddles
+        AddHit( iPaddles, paddles[iPaddles].Right->tdc, paddles[iPaddles].Left->tdc, paddles[iPaddles].Right->qdc, paddles[iPaddles].Left->qdc,
+                x0, y0, z0, t0);
+        
+        if (iVerbose > 1)
+        {
+          cout << "   Paddle number: " << iPaddles << endl;
+          cout << "      QDC Left: " << paddles[iPaddles].Left->qdc << endl;
+          cout << "      CFD Left: " << paddles[iPaddles].Left->tdc << endl;
+          
+          cout << "      QDC Right: " << paddles[iPaddles].Right->qdc << endl;
+          cout << "      CFD Right: " << paddles[iPaddles].Right->tdc << endl << endl;
+        }
 			}
 		}
 	}
@@ -266,11 +290,13 @@ void R3BLandDigitizer_CFD::FinishEvent()
 }
 
 R3BLandDigi* R3BLandDigitizer_CFD::AddHit(Int_t paddleNr, Double_t tdcR, Double_t tdcL,
-					  Double_t qdcR,Double_t qdcL){
+					  Double_t qdcR,Double_t qdcL,
+						double x0, double y0, double z0, double t0 ){
   // It fills the R3BLandDigi array
   TClonesArray& clref = *fLandDigi;
   Int_t size = clref.GetEntriesFast();
-  return new(clref[size]) R3BLandDigi(paddleNr, tdcR, tdcL, qdcR, qdcL);
+  return new(clref[size]) R3BLandDigi(paddleNr, tdcR, tdcL, qdcR, qdcL, 
+																			x0, y0, z0, t0);
 }
 
 ClassImp(R3BLandDigitizer_CFD)

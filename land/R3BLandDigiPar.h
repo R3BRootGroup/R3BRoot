@@ -26,15 +26,27 @@ class R3BLandDigiPar : public FairParGenericSet
 	const Int_t GetMaxPaddle() { return  nMaxPaddle;}
 	const Int_t GetMaxPlane() { return  nMaxPlane;}
 	const Double_t GetPaddleLength() { return  paddleLength;}
+	const Double_t GetPaddleHeight() { return  paddleHeight;}
+	const Double_t GetPaddleDepth() { return  paddleDepth;}
+	const Double_t GetPaddleSpacing() { return  paddleSpacing; }
+	const Double_t GetPaddleWrapping() { return  paddleWrapping; }
 	void SetMaxPaddle(Int_t paddle ){nMaxPaddle=paddle;}
 	void SetMaxPlane(Int_t pla){nMaxPlane=pla;}
 	void SetPaddleLength(Double_t length){paddleLength=length;}
+	void SetPaddleHeight(Double_t height){paddleHeight=height;}
+	void SetPaddleDepth(Double_t depth){paddleDepth=depth;}
+	void SetPaddleSpacing(Double_t space){paddleSpacing=space;}
+	void SetPaddleWrapping(Double_t wrap){paddleWrapping=wrap;}
 
   private:
   // Digi. Parameters
   Int_t nMaxPaddle;
   Int_t nMaxPlane;
   Double_t paddleLength;
+  Double_t paddleHeight;
+  Double_t paddleDepth;
+  Double_t paddleSpacing;
+  Double_t paddleWrapping;
 
    ClassDef(R3BLandDigiPar,2); //
 };

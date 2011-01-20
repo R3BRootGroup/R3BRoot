@@ -37,18 +37,22 @@ R3BLandDigi::R3BLandDigi(Int_t paddle, Double_t tdcL, Double_t tdcR,
 }
 
 R3BLandDigi::R3BLandDigi(Int_t paddle, Double_t tdcR, Double_t tdcL,
-			               Double_t qdcR, Double_t qdcL){
+			               Double_t qdcR, Double_t qdcL,
+										 double x0, double y0, double z0, double t0){
 
-		fTdc = fQdc = fxx = fyy = fzz = fx0 = fy0 = fz0 = fT0 = 0.;
+		fTdc = fQdc = fxx = fyy = fzz = 0.;
 
     fTdcL    = tdcR;
     fTdcR    = tdcL;
     fQdcL    = qdcR;
     fQdcR    = qdcL;
+		fx0      = x0;
+		fy0      = y0;
+		fz0      = z0;
+		fT0      = t0;
 
     fPaddleNb = paddle;
 }
-
 // -----   Destructor   ----------------------------------------------------
 R3BLandDigi::~R3BLandDigi() { }
 

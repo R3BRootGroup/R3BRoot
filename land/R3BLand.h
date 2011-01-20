@@ -148,7 +148,7 @@ class R3BLand : public R3BDetector
     Double_t neuLAND_paddle_dimx;      // half of the length [cm]
     Double_t neuLAND_paddle_dimy;      // half of the width [cm]
     Double_t neuLAND_paddle_dimz;      // half of the depth [cm]
-    Double_t neuLAND_depth_dim;        // total detector depth [cm]
+    Double_t neuLAND_depth_dim;        // half detector depth [cm]
     Double_t neuLAND_gap_dim;          // half of air gap between two scintillators [cm]
     Double_t neuLAND_wrapping_dim;        // thickness of wrapping [cm]
     
