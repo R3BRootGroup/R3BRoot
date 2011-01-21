@@ -452,7 +452,7 @@ void R3BLand::ConstructGeometry() {
     par[5]  = 0.000000; // deemax
     par[6]  = 0.000100; // epsil
     par[7]  = 0.000000; // stmin
-    pMedFe = new TGeoMedium("Aluminium", numed,pMatAl, par);
+    pMedAl = new TGeoMedium("Aluminium", numed,pMatAl, par);
   }
 
   TGeoMedium *Aluminium = pMedAl;
@@ -462,7 +462,7 @@ void R3BLand::ConstructGeometry() {
 
   //Switch between Land and NeuLand
   if (useNeuLAND)
-    ConstructNeuLandGeometry(vWorld, Iron, pMed37);
+    ConstructNeuLandGeometry(vWorld, Aluminium, pMed37);
   else
     ConstructLandGeometry(vWorld, Iron, pMed37);
 
@@ -658,17 +658,6 @@ void R3BLand::ConstructNeuLandGeometry(  TGeoVolume* vWorld,  TGeoMedium *Alumin
   TGeoVolume *padle_h_box5 = gGeoManager->MakeBox("padle_h_box5",BC408,
         neuLAND_paddle_dimx, neuLAND_paddle_dimy, neuLAND_paddle_dimz);
 
-  //------------------ wrapping ------------------------------------------
-  TGeoShape* padle_h_box1 = new TGeoBBox("padle_h_box1",
-      neuLAND_paddle_dimx, neuLAND_paddle_dimy+neuLAND_wrapping_dim, neuLAND_paddle_dimz+neuLAND_wrapping_dim);
-  TGeoShape* padle_h_box2 = new TGeoBBox("padle_h_box2",
-       neuLAND_paddle_dimx, neuLAND_paddle_dimy, neuLAND_paddle_dimz);
-
-  // Create a composite shape
-  TGeoCompositeShape *wrapping = new TGeoCompositeShape("diffbox", "padle_h_box1 - padle_h_box2");
-  TGeoVolume *bvol = new TGeoVolume("wrapping",wrapping,Aluminium);
-
-
   // Make the elementary assembly of the whole structure
   TGeoVolume *aLand = new TGeoVolumeAssembly("ALAND");
 
@@ -692,7 +681,20 @@ void R3BLand::ConstructNeuLandGeometry(  TGeoVolume* vWorld,  TGeoMedium *Alumin
   Double_t zz = 0.;
   
   aLand->AddNode(padle_h_box5,1,new TGeoCombiTrans(xx,yy,zz,zeroRotation));
-  aLand->AddNode(bvol,1,new TGeoCombiTrans(xx,yy,zz,zeroRotation));
+
+  //------------------ wrapping ------------------------------------------
+  if (neuLAND_wrapping_dim > 0.0)
+  {
+    TGeoShape* padle_h_box1 = new TGeoBBox("padle_h_box1",
+        neuLAND_paddle_dimx, neuLAND_paddle_dimy+neuLAND_wrapping_dim, neuLAND_paddle_dimz+neuLAND_wrapping_dim);
+    TGeoShape* padle_h_box2 = new TGeoBBox("padle_h_box2",
+         neuLAND_paddle_dimx+1, neuLAND_paddle_dimy, neuLAND_paddle_dimz);
+
+    // Create a composite shape
+    TGeoCompositeShape *wrapping = new TGeoCompositeShape("diffbox", "padle_h_box1 - padle_h_box2");
+    TGeoVolume *bvol = new TGeoVolume("wrapping",wrapping,Aluminium);
+    aLand->AddNode(bvol,1,new TGeoCombiTrans(xx,yy,zz,zeroRotation));
+  }
 
   AddSensitiveVolume(padle_h_box5); //Scint.
 
