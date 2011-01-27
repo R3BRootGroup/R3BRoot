@@ -38,12 +38,17 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+#include "G4Version.hh"
 #include "G4EmHadronBuilder.h"
 
 #include "G4ParticleDefinition.hh"
 #include "G4ProcessManager.hh"
 
+#if G4VERSION_NUMBER > 922
+#include "G4hMultipleScattering.hh"
+#else
 #include "G4MultipleScattering.hh"
+#endif
 
 #include "G4hIonisation.hh"
 #include "G4ionIonisation.hh"
@@ -88,14 +93,21 @@ void G4EmHadronBuilder::ConstructProcess()
 
       if (particleName == "GenericIon" || particleName == "alpha" || particleName == "He3") {
 
-        pmanager->AddProcess(new G4MultipleScattering, -1, 1,1);
+#if G4VERSION_NUMBER > 922
+        pmanager->AddProcess(new G4hMultipleScattering,-1,1,1);
+#else
+        pmanager->AddProcess(new G4MultipleScattering,-1,1,1);
+#endif
         pmanager->AddProcess(new G4ionIonisation,      -1, 2,2);
 
       } else if ((!particle->IsShortLived()) &&
 	         (particle->GetPDGCharge() != 0.0) &&
 	         (particle->GetParticleName() != "chargedgeantino")) {
-
+#if G4VERSION_NUMBER > 922
+        pmanager->AddProcess(new G4hMultipleScattering,-1,1,1);
+#else
         pmanager->AddProcess(new G4MultipleScattering,-1,1,1);
+#endif
         pmanager->AddProcess(new G4hIonisation,       -1,2,2);
       }
     }

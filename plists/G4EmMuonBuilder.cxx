@@ -39,11 +39,16 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+#include "G4Version.hh"
 #include "G4EmMuonBuilder.h"
 #include "G4ParticleDefinition.hh"
 #include "G4ProcessManager.hh"
 
+#if G4VERSION_NUMBER > 922
+#include "G4MuMultipleScattering.hh"
+#else
 #include "G4MultipleScattering.hh"
+#endif
 
 #include "G4MuIonisation.hh"
 #include "G4MuBremsstrahlung.hh"
@@ -82,7 +87,13 @@ void G4EmMuonBuilder::ConstructParticle()
 void G4EmMuonBuilder::ConstructProcess()
 {
   // Common processes for mu+ and mu-
+
+#if G4VERSION_NUMBER > 922
+  G4MuMultipleScattering* mumsc  = new G4MuMultipleScattering();
+#else
   G4MultipleScattering* mumsc  = new G4MultipleScattering();
+#endif
+
   G4MuIonisation*       muion  = new G4MuIonisation();
   G4MuBremsstrahlung*   mubrem = new G4MuBremsstrahlung();
   G4MuPairProduction*   mupair = new G4MuPairProduction();

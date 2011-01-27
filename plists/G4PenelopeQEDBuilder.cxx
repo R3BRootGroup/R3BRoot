@@ -38,6 +38,7 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
+#include "G4Version.hh"
 #include "G4PenelopeQEDBuilder.h"
 #include "G4ParticleDefinition.hh"
 #include "G4ProcessManager.hh"
@@ -47,7 +48,11 @@
 #include "G4PenelopePhotoElectric.hh"
 #include "G4PenelopeRayleigh.hh"
 
+#if G4VERSION_NUMBER > 922
+#include "G4eMultipleScattering.hh"
+#else
 #include "G4MultipleScattering.hh"
+#endif
 
 #include "G4PenelopeIonisation.hh"
 #include "G4PenelopeBremsstrahlung.hh"
@@ -94,7 +99,14 @@ void G4PenelopeQEDBuilder::ConstructProcess()
   particle = G4Electron::Electron();
   pmanager = particle->GetProcessManager();
 
-  pmanager->AddProcess(new G4MultipleScattering,     -1, 1,1);
+ 
+#if G4VERSION_NUMBER > 922
+        pmanager->AddProcess(new G4eMultipleScattering,-1,1,1);
+#else
+        pmanager->AddProcess(new G4MultipleScattering,-1,1,1);
+#endif
+
+
   pmanager->AddProcess(new G4PenelopeIonisation,     -1, 2,2);
   pmanager->AddProcess(new G4PenelopeBremsstrahlung, -1,-1,3);
 
@@ -102,7 +114,12 @@ void G4PenelopeQEDBuilder::ConstructProcess()
   particle = G4Positron::Positron();
   pmanager = particle->GetProcessManager();
 
-  pmanager->AddProcess(new G4MultipleScattering,    -1, 1,1);
+ #if G4VERSION_NUMBER > 922
+        pmanager->AddProcess(new G4eMultipleScattering,-1,1,1);
+#else
+        pmanager->AddProcess(new G4MultipleScattering,-1,1,1);
+#endif
+ 
   pmanager->AddProcess(new G4PenelopeIonisation,    -1, 2,2);
   pmanager->AddProcess(new G4PenelopeBremsstrahlung,-1,-1,3);
   pmanager->AddProcess(new G4PenelopeAnnihilation,   0,-1,4);

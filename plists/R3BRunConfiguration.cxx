@@ -1,11 +1,14 @@
-
+#include "G4Version.hh"
 #include "R3BRunConfiguration.h"
 
 #include "TG4ComposedPhysicsList.h"
 #include "TG4SpecialPhysicsList.h"
 
+#if G4VERSION_NUMBER > 922
+#include <QGSP_BERT.hh>
+#else
 #include <LHEP_BERT.hh>
-
+#endif
 #include "R3BPhysicsList.h"
 
 //_____________________________________________________________________________
