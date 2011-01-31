@@ -117,6 +117,7 @@ add_subdirectory (eventdisplay)
 add_subdirectory (r3bgen) 
 add_subdirectory (plists)
 add_subdirectory (lumon) 
+add_subdirectory (evtvis)  
 
 
 Option(BUILD_DOXYGEN "Build Doxygen" OFF)
