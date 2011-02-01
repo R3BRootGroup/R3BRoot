@@ -62,9 +62,13 @@ fi
 # set the ctest model to command line parameter
 export ctest_model=$1
 
+# test for architecture
+arch=$(uname -s | tr '[A-Z]' '[a-z]')
+chip=$(uname -m | tr '[A-Z]' '[a-z]')
+
 # extract information about the system and the machine and set
 # environment variables used by ctest
-SYSTEM=$(uname -o)-$(uname -m)
+SYSTEM=$arch-$chip
 if test -z $CXX ; then
   COMPILER=gcc;
   GCC_VERSION=$(gcc -dumpversion)
@@ -75,10 +79,18 @@ fi
 
 export LABEL1=${LINUX_FLAVOUR}-$SYSTEM-$COMPILER$GCC_VERSION-fairsoft_$FAIRSOFT_VERSION
 export LABEL=$(echo $LABEL1 | sed -e 's#/#_#g')
-export SITE=$(hostname -f)
 
 # get the number of processors
-export number_of_processors=$(cat /proc/cpuinfo | grep processor | wc -l)
+# and information about the host
+if [ "$arch" = "linux" ];
+then
+  export number_of_processors=$(cat /proc/cpuinfo | grep processor | wc -l)
+  export SITE=$(hostname -f)
+elif [ "$arch" = "darwin" ];
+then
+  export number_of_processors=$(sysctl -n hw.ncpu)
+  export SITE=$(hostname -s)
+fi
 
 echo "************************"
 date
