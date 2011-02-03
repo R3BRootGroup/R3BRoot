@@ -4,6 +4,9 @@
 #include "TGeoManager.h"
 #include "TDatabasePDG.h"
 
+#include <iostream>
+using namespace std;
+
 
 R3BEventManager *R3BEventManager::fgRinstance= 0;
 
@@ -15,6 +18,7 @@ R3BEventManager * R3BEventManager::Instance(){
 R3BEventManager::R3BEventManager()
   :FairEventManager()
 {
+  cout << " calling ctor Event Manager" << endl;
    fgRinstance=this;
 }
 
