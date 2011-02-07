@@ -8,49 +8,48 @@ void Config()
   TString* gModel = fRun->GetGeoModel();
   TGeant3* geant3 = NULL;
   if ( strncmp(gModel->Data(),"TGeo",4) == 0 ) {
-     geant3
-          = new  TGeant3TGeo("C++ Interface to Geant3");
-      cout << "-I- G3Config: Geant3 with TGeo has been created."
-           << endl;
+	geant3
+	  = new  TGeant3TGeo("C++ Interface to Geant3");
+	cout << "-I- G3Config: Geant3 with TGeo has been created."
+		 << endl;
   }else{
-     geant3
-          = new  TGeant3("C++ Interface to Geant3");
-      cout << "-I- G3Config: Geant3 native has been created."
-             << endl;
+	geant3
+	  = new  TGeant3("C++ Interface to Geant3");
+	cout << "-I- G3Config: Geant3 native has been created."
+		 << endl;
   }
   // create R3B  Specific Stack
   R3BStack *st = new R3BStack();
-  // Set debug mode
-//  st->SetDebug(kFALSE);
+  // Stack debug mode
+  //st->SetDebug(kFALSE);
   st->SetDebug(kTRUE);
   st->SetMinPoints(0);
   st->StoreSecondaries(kTRUE);
-
   
   geant3->SetStack( st ) ;
-
+  
   // ******* GEANT3  specific configuration for simulated Runs  *******
-    geant3->SetTRIG(1);         //Number of events to be processed
-//    geant3->SetSWIT(4, 10);
-//    geant3->SetDEBU(0, 0, 1);
-    cout<<"test test **************************************************"<<endl;
-    geant3->SetSWIT(2, 2);
-    geant3->SetDEBU(1, 100, 2); 
-     
-    geant3->SetRAYL(1);
-    geant3->SetSTRA(1);
-    geant3->SetAUTO(1);         //Select automatic STMIN etc... calc. (AUTO 1) or manual (AUTO 0)
-    geant3->SetABAN(0);         //Restore 3.16 behaviour for abandoned tracks
-    geant3->SetOPTI(2);         //Select optimisation level for GEANT geometry searches (0,1,2)
-    geant3->SetERAN(5.e-7);
-    geant3->SetCKOV(1);     // cerenkov photons
+  geant3->SetTRIG(1);         //Number of events to be processed
+  geant3->SetSWIT(4, 10);
+  geant3->SetDEBU(0, 0, 1);
+  
+  //<DB> Command for debugging purpose
+  //geant3->SetSWIT(2, 2);
+  //geant3->SetDEBU(1, 100, 2); 
+  
+  geant3->SetRAYL(1);
+  geant3->SetSTRA(1);
+  geant3->SetAUTO(1);         //Select automatic STMIN etc... calc. (AUTO 1) or manual (AUTO 0)
+  geant3->SetABAN(0);         //Restore 3.16 behaviour for abandoned tracks
+  geant3->SetOPTI(2);         //Select optimisation level for GEANT geometry searches (0,1,2)
+  geant3->SetERAN(5.e-7);
+  geant3->SetCKOV(1);     // cerenkov photons
   // set common stuff 
-    TString configm(gSystem->Getenv("VMCWORKDIR"));
-    TString cuts = configm + "/gconfig/SetCuts.C";
-    cout << "Physics cuts with script \n "<<  cuts.Data() << endl;
-    Int_t cut=gROOT->LoadMacro(cuts.Data());
-    if(cut==0)gInterpreter->ProcessLine("SetCuts()"); 
-
+  TString configm(gSystem->Getenv("VMCWORKDIR"));
+  TString cuts = configm + "/gconfig/SetCuts.C";
+  cout << "Physics cuts with script \n "<<  cuts.Data() << endl;
+  Int_t cut=gROOT->LoadMacro(cuts.Data());
+  if(cut==0)gInterpreter->ProcessLine("SetCuts()"); 
 }
 
 
