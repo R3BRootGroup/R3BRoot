@@ -2,7 +2,6 @@
 //
 // Configuration macro for Geant3 VirtualMC 
 
-
 void Config()
 {
   FairRunSim *fRun = FairRunSim::Instance();
@@ -45,7 +44,7 @@ void Config()
   geant3->SetOPTI(2);         //Select optimisation level for GEANT geometry searches (0,1,2)
   geant3->SetERAN(5.e-7);
   geant3->SetCKOV(1);     // cerenkov photons
-    geant3->SetHADR(5);     // gcalor
+  //    geant3->SetHADR(5);     // gcalor
   // set common stuff 
   TString configm(gSystem->Getenv("VMCWORKDIR"));
   TString cuts = configm + "/gconfig/SetCuts.C";
