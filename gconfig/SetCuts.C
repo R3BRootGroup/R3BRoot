@@ -27,7 +27,8 @@ void SetCuts()
   gMC->SetProcess("DRAY",0); /**delta-ray*/
   gMC->SetProcess("ANNI",1); /**annihilation*/
   gMC->SetProcess("BREM",1); /**bremsstrahlung*/
-  gMC->SetProcess("HADR",1); /**hadronic process*/
+//  gMC->SetProcess("HADR",1); /**hadronic process*/
+  gMC->SetProcess("HADR",5); /**hadronic process*/
   gMC->SetProcess("MUNU",1); /**muon nuclear interaction*/
   gMC->SetProcess("DCAY",1); /**decay*/
   gMC->SetProcess("LOSS",2); /**energy loss*/
