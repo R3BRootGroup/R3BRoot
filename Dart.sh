@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 function print_example(){
 echo "##################################################################"
 echo "# To set the required parameters as source and the build         #"
