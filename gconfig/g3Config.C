@@ -2,6 +2,7 @@
 //
 // Configuration macro for Geant3 VirtualMC 
 
+
 void Config()
 {
   FairRunSim *fRun = FairRunSim::Instance();
