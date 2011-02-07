@@ -15,8 +15,12 @@
 
 Int_t r3bsim(){
 
+  
+  TString macro_r3ball= getenv("VMCWORKDIR");
+  macro_r3ball+="/macros/r3b/r3ball.C"; 
+
    // Load the Main Simulation macro
-   gROOT->LoadMacro("r3ball.C");
+    gROOT->LoadMacro(macro_r3ball.Data());
 
    //-------------------------------------------------
    // Monte Carlo type     |    fMC        (TString)
