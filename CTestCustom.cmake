@@ -50,6 +50,7 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
         # -- Root warnings which should not show up in the test setup
         "/include/G__ci.h:"
         "/include/TAttImage.h:"
+        "/include/TBuffer.h:"
         "/include/TCollectionProxyInfo.h"
         "/include/TCut.h:"
         "/include/TEveBoxSet.h:"
