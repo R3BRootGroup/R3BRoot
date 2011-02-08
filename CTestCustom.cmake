@@ -34,6 +34,10 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
  	# -- CLHEP and Pluto warnings
         "/include/CLHEP/"
         "PParticle.h"
+        "PDataBase.h"
+        "PMesh.h"
+        "PStaticData.h"
+        "PUtils.h"
 
         # -- warnings from ubuntu systems which are a little to much
         # -- probably defined warn-unused-result. ignoring the result
@@ -65,8 +69,10 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
         "/include/TMap.h:"
         "/include/TMatrixT.h:"
         "/include/TMatrixTSym.h:"
+        "/include/TMemberInspector.h:"
         "/include/TObjArray.h:"
         "/include/TRefArray.h:"
+        "/include/Math/GenVector/AxisAngle.h:"
         "/include/Minuit2/BasicFunctionGradient.h:"
         "/include/Minuit2/MnUserParameterState.h:"
         "/include/Minuit2/StackAllocator.h:"
@@ -90,23 +96,23 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
         "/geant3/TGeant3/TGeant3TGeo.h:"
 
         # ignore warnings from Fair base classes for the timebeeing
-	"FairAsciiGenerator.h:"
-	"FairPrimaryGenerator.h:"
-	"FairGeoMedium.h:"
-	"FairDetParAsciiFileIo.h:"
-	"FairParamList.h:"
-	"FairDetParRootFileIo.h:"
-	"FairIonGenerator.cxx:"
-	"FairParIo.h:"
-	"FairRtdbRun.h:"
-	"FairBoxGenerator.cxx:"
-	"FairDetParAsciiFileIo.cxx:"
-	"FairIonGenerator.h:"
-	"FairParRootFileIo.h:"
-	"FairLink.cxx:"
-	"FairParAsciiFileIo.h:"
-	"FairShieldGenerator.h:"
-	"FairShieldGenerator.cxx:"	
+	"FairAsciiGenerator.h"
+	"FairPrimaryGenerator.h"
+	"FairGeoMedium.h"
+	"FairDetParAsciiFileIo.h"
+	"FairParamList.h"
+	"FairDetParRootFileIo.h"
+	"FairIonGenerator.cxx"
+	"FairParIo.h"
+	"FairRtdbRun.h"
+	"FairBoxGenerator.cxx"
+	"FairDetParAsciiFileIo.cxx"
+	"FairIonGenerator.h"
+	"FairParRootFileIo.h"
+	"FairLink.cxx"
+	"FairParAsciiFileIo.h"
+	"FairShieldGenerator.h"
+	"FairShieldGenerator.cxx"	
   )
 
 # -----------------------------------------------------------
