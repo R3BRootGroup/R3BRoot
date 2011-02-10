@@ -5,11 +5,10 @@
 set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
 #put here all directories where header files are located
-${HYPROOT_SOURCE_DIR}/base
+${R3BROOT_SOURCE_DIR}/base
 ${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/mcstack
 ${R3BROOT_SOURCE_DIR}/tof
-${R3BROOT_SOURCE_DIR}/base
 ${R3BROOT_SOURCE_DIR}/parbase
 ${R3BROOT_SOURCE_DIR}/geobase
 ${R3BROOT_SOURCE_DIR}/plists
