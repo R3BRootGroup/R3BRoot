@@ -88,8 +88,8 @@ void R3BMCTracks::Exec(Option_t* option)
 
       //Set Title / Tooltip
       char title[100];
-      sprintf(title,"pdg: %i\nTrackID: %i, MotherID: %i\nE: %f MeV\nT: %f ns",
-	      tr->GetPDG(), i,P->GetMother(0), PEnergy, P->T());
+      sprintf(title,"pdg: %i, name: %s\nTrackID: %i, MotherID: %i\nE: %f MeV\nT: %f ns",
+	      tr->GetPDG(), P->GetTitle(), i,P->GetMother(0), PEnergy, P->T());
       track->SetTitle(title);
       
       //Set the line width depending on energy
