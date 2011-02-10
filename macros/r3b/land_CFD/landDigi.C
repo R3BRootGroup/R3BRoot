@@ -2,14 +2,11 @@
 void landDigi(){
 
   // Input files
-   TString inFile      = "r3bsim.root";
-   TString parFile     = "r3bpar.root";
-//  TString inFile      = "/data.local2/mheil/fairroot_results/r3bsim800MeVgeant3hadr5.root"; 
-//  TString parFile     = "/data.local2/mheil/fairroot_results/r3bpar800MeVgeant3hadr5.root";
+  TString inFile      = "r3bsim.root";
+  TString parFile     = "r3bpar.root";
+
   // Output file         
   TString outFile     = "land_digi.root";
-//  TString outFile     = "/data.local2/mheil/fairroot_results/land_digi800MeVgeant3hadr5.root";
-
 
   
   // ----  Load libraries   -------------------------------------------------
@@ -35,8 +32,6 @@ void landDigi(){
   gSystem->Load("libR3BLand");
 
 
-
-
   // -----   Timer   --------------------------------------------------------
   TStopwatch timer;
   timer.Start();
@@ -53,8 +48,8 @@ void landDigi(){
 
   //Connect the Digitization  Task
   R3BLandDigitizer_CFD* land  = new R3BLandDigitizer_CFD(iVerbose);
-	double triggerThreshold=0.3;
-	double timeShift=2;
+	double triggerThreshold=0.7;  //[MeV]
+	double timeShift=2;						//[ns]
 	double amplitudeScaling=0.7;
 	land->SetCfdParameters(triggerThreshold, timeShift,amplitudeScaling);			//Use CFD
 //	land->SetLeParameters(triggerThreshold);																		//Use LE

@@ -1,3 +1,20 @@
+
+/******************************************/
+/*                                        */
+/*        Code for digitisation of        */
+/*        detectors with CFD or LE        */
+/*                                        */
+/*   Hits within same paddle/readout are  */
+/*   grouped together and sent to CFD/LE  */
+/*      which gives time and energy       */
+/*           for detected hit             */
+/*                                        */
+/*        Johan Gill & Staffan Wranne     */
+/*               10/2 2011                */
+/*                                        */
+/******************************************/
+
+
 #include "R3BLandDigitizer_CFD.h"
 #include "TClonesArray.h"
 #include "FairRootManager.h"

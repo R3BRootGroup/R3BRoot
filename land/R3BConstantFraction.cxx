@@ -1,7 +1,23 @@
+
+/******************************************/
+/*                                        */
+/*      Class simulating a CFD or LE      */
+/*                                        */
+/*       Each hit generates a pulse       */
+/* proportional to the energy of the hit. */
+/*  Overlapping pulses are superimposed   */
+/*                                        */
+/*        Johan Gill & Staffan Wranne     */
+/*               10/2 2011                */
+/*                                        */
+/******************************************/
+
+
 #include "R3BConstantFraction.h"
 
 #include <cstdlib>
 #include <iostream>
+#include <limits>
 #include "TMath.h"
 
 using std::cout; using std::endl;
@@ -24,7 +40,7 @@ void R3BConstantFraction::Init(cfdPulseDefiningParameterStruct* parameters)
   //Calculate the parameters
   a0 = 1;    // Does not matter, disapear when normalising
   c0 = 0;    // The curve begins at y=0;
-  a1 =  a0*x1/(x1-x2);
+  a1 = a0*x1/(x1-x2);
   c1 = a0*x1*x1-a1*(x1-x2)*(x1-x2);
   a2 = -c1/((x3-x2)*(x3-x2)-(x3-x2)*(x3-x4));
   c2 = c1;
@@ -58,8 +74,13 @@ void R3BConstantFraction::Init(cfdPulseDefiningParameterStruct* parameters)
   pulseShapeParameters.c[3] = c3/area;
   pulseShapeParameters.offset[3]=x4;
 
+  threshold *= pulseShapeParameters.c[2];  //Convert MeV to pulseheight
+
   calibrationTimeShift=0;
   arrayCapacity=0;
+  pulses=NULL;
+  pulsePointer=NULL;  
+
   if ( ! useLeadingEdge)
   {
     // Calibrating the time of the CFD
@@ -76,12 +97,28 @@ void R3BConstantFraction::Init(cfdPulseDefiningParameterStruct* parameters)
     //Resetting the real trigger threshold
     threshold=thresholdTemp;
   }
+  else
+  {
+    // Calibrating the time of the LE
+    double thresholdTemp=threshold;
+    threshold=0.5*pulseShapeParameters.c[2];      //Setting a low trigger for our calibration pulse
+    int nrOfCalibrateHits=1;
+    double pmCalibrateHitTimes[] = {0};
+    double pmCalibrateEnergies[] = {1};
+  
+    double cfdTime = Calculate(nrOfCalibrateHits, pmCalibrateHitTimes, pmCalibrateEnergies);
+
+    calibrationTimeShift = pmCalibrateHitTimes[0] - cfdTime;
+
+    //Resetting the real trigger threshold
+    threshold=thresholdTemp;
+  }
 }
 
 void R3BConstantFraction::SetParameters(double _threshold, double _delay, double _fraction)
 {
-  threshold=_threshold;
-  delay=_delay;
+  threshold=_threshold;  
+  delay=-TMath::Abs(_delay);
   fraction=_fraction;
   useLeadingEdge=false;
 }
@@ -98,6 +135,7 @@ double R3BConstantFraction::PrimitiveParabel(double x, double xCentre,double a, 
   return a/3*(x-xCentre)*(x-xCentre)*(x-xCentre)+c*x;
 }
 
+// Prepare the pulses 
 double R3BConstantFraction::Calculate(int nrOfPaddleHits, double* hitTimes, double* hitAmplitudes)
 {
   int totalNumOfPulses=0;
@@ -120,23 +158,33 @@ double R3BConstantFraction::Calculate(int nrOfPaddleHits, double* hitTimes, doub
   //Fill the arrays
   for (int index =0; index < nrOfPaddleHits; index++)
   {
-    pulses[index].amplitude = hitAmplitudes[index];
-    pulses[index].time = hitTimes[index];
-    pulses[index].segmentTime = hitTimes[index];
-    pulses[index].segment = 0;
-    pulses[index].nextActivePulse = NULL;
-    pulses[index].prevoiusActivePulse = NULL;
-    pulsePointer[index]=&pulses[index];
-
-    if(! useLeadingEdge)
+    if ( useLeadingEdge )
     {
-      pulses[index+nrOfPaddleHits].amplitude = -hitAmplitudes[index]*fraction;
-      pulses[index+nrOfPaddleHits].time = hitTimes[index] + delay;
-      pulses[index+nrOfPaddleHits].segmentTime = hitTimes[index] + delay;
+      pulses[index].amplitude = hitAmplitudes[index];
+      pulses[index].time = hitTimes[index];
+      pulses[index].segmentTime = hitTimes[index];
+      pulses[index].segment = 0;
+      pulses[index].nextActivePulse = NULL;
+      pulses[index].prevoiusActivePulse = NULL;
+      pulsePointer[index]=&pulses[index];
+    }
+    else
+    {
+      pulses[index +nrOfPaddleHits].amplitude = hitAmplitudes[index];
+      pulses[index+nrOfPaddleHits].time = hitTimes[index];
+      pulses[index+nrOfPaddleHits].segmentTime = hitTimes[index];
       pulses[index+nrOfPaddleHits].segment = 0;
       pulses[index+nrOfPaddleHits].nextActivePulse = NULL;
       pulses[index+nrOfPaddleHits].prevoiusActivePulse = NULL;
       pulsePointer[index+nrOfPaddleHits]=&pulses[index+nrOfPaddleHits];
+      
+      pulses[index].amplitude = -hitAmplitudes[index]*fraction;
+      pulses[index].time = hitTimes[index] + delay;
+      pulses[index].segmentTime = hitTimes[index] + delay;
+      pulses[index].segment = 0;
+      pulses[index].nextActivePulse = NULL;
+      pulses[index].prevoiusActivePulse = NULL;
+      pulsePointer[index]=&pulses[index];
     }
   }
 
@@ -150,23 +198,28 @@ double R3BConstantFraction::Calculate(int nrOfPaddleHits, double* hitTimes, doub
   return cfdTime;
 }
 
-//double R3BConstantFraction::IterateThroughTime(int totalNumOfPulses, pulse** pulsePointer)
 double R3BConstantFraction::IterateThroughTime(int totalNumOfPulses)
 {
   int nrOfPulsesLeft = totalNumOfPulses - 1;
   double time = 0, nextTime = 0, valueOfExtremum=0;
   double pulseParameters[3];
-  double A,B,C;
+  double A,B,C, Atot, Btot, Ctot;
+//  double Atemp, Btemp, Ctemp;
   bool triggered = false;
-  pulse* active=NULL;
-  pulse* negActive=NULL;
-  pulse* tempPointer=active;
+  double timeFirstActive;
+  double timeForZero= std::numeric_limits<double>::quiet_NaN();
+  pulse* tempPointer=NULL;
+
+/* Function uses double linked list with all active pulses */
+  pulse* lastActive=NULL;      //Points to last active pulse
+  pulse* firstActive=NULL;   //Points to first active pulse
 
   //Check all the pulses
   std::pop_heap(pulsePointer, pulsePointer + nrOfPulsesLeft+1, comp);
   while (true)
   {
-    pulse* &aPulsePointer = pulsePointer[nrOfPulsesLeft];
+    //Get the pulse with the next segment in time
+    pulse* aPulsePointer = pulsePointer[nrOfPulsesLeft];
 
     // Get start time from the next point in time
     time = aPulsePointer->segmentTime;
@@ -175,23 +228,29 @@ double R3BConstantFraction::IterateThroughTime(int totalNumOfPulses)
     // If new active pulse, add to list of active pulses
     if (aPulsePointer->segment == 1)
     {
-      if (active == NULL)
-        negActive = aPulsePointer;
+      if (lastActive == NULL)
+      {
+        firstActive = aPulsePointer;
+        timeFirstActive = time;
+      }
       else
-        active->prevoiusActivePulse = aPulsePointer;
-      aPulsePointer->nextActivePulse = active;
-      active = aPulsePointer;
+        lastActive->prevoiusActivePulse = aPulsePointer;
+
+      aPulsePointer->nextActivePulse = lastActive;
+      lastActive = aPulsePointer;
     }
+
+    time-= timeFirstActive;   //Time is relative the first active pulse
     
     // If the pulse is to be removed from the list of active pulses
     if (aPulsePointer->segment > 4)
     {
       nrOfPulsesLeft--;
-      negActive = negActive->prevoiusActivePulse;
-      if (negActive == NULL)
-        active = NULL;
+      firstActive = firstActive->prevoiusActivePulse;
+      if (firstActive == NULL)
+        lastActive = NULL;
       else
-        negActive->nextActivePulse = NULL;
+        firstActive->nextActivePulse = NULL;
     }
     else  // Else, update the time and push in to heap
     {
@@ -201,70 +260,89 @@ double R3BConstantFraction::IterateThroughTime(int totalNumOfPulses)
 
     // Pop from heap to get time of stop
     std::pop_heap(pulsePointer, pulsePointer + nrOfPulsesLeft+1, comp);
-    nextTime=pulsePointer[nrOfPulsesLeft]->segmentTime;
+    nextTime=pulsePointer[nrOfPulsesLeft]->segmentTime - timeFirstActive;
 
     //Calculate the curve parameters for the current time interval
     A=0; B=0; C=0;
-    tempPointer=active;
+    Atot=0; Btot=0; Ctot=0;
+
+    tempPointer=lastActive;
+
     while (tempPointer != NULL)  // Loop the active pulses
     {
-      if (tempPointer->amplitude > 0 || triggered)
-      {
-        PulseParameterGenerator(tempPointer->amplitude, tempPointer->time, tempPointer->segment-1, pulseParameters);
 
+      PulseParameterGenerator(tempPointer->amplitude, tempPointer->time - timeFirstActive,
+                              tempPointer->segment-1, pulseParameters);
+
+      //Sums up all pulses
+      Atot += pulseParameters[0];
+      Btot += pulseParameters[1];
+      Ctot += pulseParameters[2];
+
+      //Sums up positive pulses
+      if (tempPointer->amplitude > 0)
+      {
         A += pulseParameters[0];
         B += pulseParameters[1];
         C += pulseParameters[2];
       }
+
       tempPointer = tempPointer->nextActivePulse;
     }
 
     //Search for leading edge
-    if (! triggered)
-    {
-      double xPosOfExtremum = -B/(2*A);      //Calculated with the derivative
-      double valueOfEndPoint = A*nextTime*nextTime + B*nextTime + C;
+    double xPosOfExtremum = -B/(2*A);      //Calculated with the derivative
+    double valueOfEndPoint = A*nextTime*nextTime + B*nextTime + C;
 
-      if (valueOfEndPoint > threshold)
+    if (valueOfEndPoint > threshold)
+    {
+      if (useLeadingEdge)
+        return FindZero(A, B, C-threshold, time, nextTime)+timeFirstActive;
+      else
+        triggered = true;
+    }
+    else if (xPosOfExtremum > time && xPosOfExtremum < nextTime)
+    {
+      valueOfExtremum = A*xPosOfExtremum*xPosOfExtremum + B*xPosOfExtremum + C;
+      if (valueOfExtremum > threshold )
       {
         if (useLeadingEdge)
-          return FindZero(A, B, C-threshold, time, nextTime);
+          return FindZero(A, B, C-threshold, time, nextTime)+timeFirstActive;
         else
           triggered = true;
       }
-      else if (xPosOfExtremum > time && xPosOfExtremum < nextTime)
-      {
-        valueOfExtremum = A*xPosOfExtremum*xPosOfExtremum + B*xPosOfExtremum + C;
-        if (valueOfExtremum > threshold )
-        {
-          if (useLeadingEdge)
-            return FindZero(A, B, C-threshold, time, nextTime);
-          else
-          triggered = true;
-        }
-      }
     }
-    else  //Search for zero
-    {
-      double valueOfStartPoint = A*time*time + B*time + C;
-      double valueOfEndPoint = A*nextTime*nextTime + B*nextTime + C;
+    else
+      triggered = false;
 
-      if(valueOfStartPoint > 0 && valueOfEndPoint < 0)
-        return FindZero(A, B, C, time, nextTime);
+    //Search for zero
+    if (valueOfEndPoint > 0.1*threshold)
+    {
+      double valueOfStartPoint = Atot*time*time + Btot*time + Ctot;
+      valueOfEndPoint = Atot*nextTime*nextTime + Btot*nextTime + Ctot;
+
+      if(valueOfStartPoint < 0.0 && valueOfEndPoint > 0.0)
+        timeForZero = FindZero(Atot, Btot, Ctot, time, nextTime)+timeFirstActive;
+      else if (valueOfStartPoint > 0.0 && valueOfEndPoint < 0.0)
+        timeForZero = std::numeric_limits<double>::quiet_NaN();
     }
+
+    // Have we passed the threshold and crossed zero?
+    if (triggered && ! TMath::IsNaN(timeForZero))
+      return timeForZero;
 
     // If at the end of the last active pulse, remove
-    if (pulsePointer[nrOfPulsesLeft]->segment == 4 && negActive == active)
+    if (pulsePointer[nrOfPulsesLeft]->segment == 4 && firstActive == lastActive)
     {
-      if (nrOfPulsesLeft == 0)
-        return TMath::Sqrt(-1);  // No more pulses to search, return NaN
+          if (nrOfPulsesLeft == 0)
+        return std::numeric_limits<double>::quiet_NaN();
 
       nrOfPulsesLeft--;
-      negActive = negActive->prevoiusActivePulse;
-      if (negActive == NULL)
-        active = NULL;
+      firstActive = firstActive->prevoiusActivePulse;
+      if (firstActive == NULL)
+        lastActive = NULL;
       else
-        negActive->nextActivePulse = NULL;
+        firstActive->nextActivePulse = NULL;
 
       std::pop_heap(pulsePointer, pulsePointer + nrOfPulsesLeft+1, comp);
     }
@@ -275,22 +353,27 @@ double R3BConstantFraction::IterateThroughTime(int totalNumOfPulses)
 
 double R3BConstantFraction::FindZero(double A, double B, double C, double time, double nextTime)
 {
-    //The zero is close
-    //Solve the quadratic function
-    //x_{1,2}=1/(2*A)*(-B +- sqrt(B^2-4AC))
-    double sqrt=TMath::Sqrt(B*B-4*A*C);
-    double denominator= 1/(2*A);
-    double x_1=(-B-sqrt)*denominator;
-    double x_2=(-B+sqrt)*denominator;
+  //The zero is close
+  //Solve the quadratic function
+  //x_{1,2}=1/(2*A)*(-B +- sqrt(B^2-4AC))
 
-    if (x_1 >= time && x_1 <= nextTime) 
-      return x_1;
-    else if (x_2 >= time && x_2 <= nextTime)
-      return x_2;
-    else
-      Fatal("R3BConstantFraction::FindZero","No zero found"); 
+  double sqrt, x_1, x_2;
+
+  sqrt=TMath::Sqrt(B*B-4*A*C);
+  
+  double denominator= 1/(2*A);
+  x_1=(-B-sqrt)*denominator;
+  x_2=(-B+sqrt)*denominator;
+  
+  if (x_1 >= time && x_1 <= nextTime)
+    return x_1;
+  else if (x_2 >= time && x_2 <= nextTime)
+    return x_2;
+  else
+    Fatal("R3BConstantFraction::FindZero","No zero found"); 
 }
 
+//Compare function for heap
 bool R3BConstantFraction::comp (pulse * hit_a, pulse * hit_b)
 {
   if (hit_a->segmentTime < hit_b->segmentTime)
