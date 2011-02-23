@@ -371,6 +371,8 @@ void r3ball(Int_t nEvents = 1,
   // Land Detector
   if (fDetList.FindObject("LAND") ) {
       R3BDetector* land = new R3BLand("Land", kTRUE);
+      // verbose level 2 ( step info activated )
+      land->SetVerboseLevel(1);
       // Global position of the Module
       phi   =  0.0; // (deg)
       theta =  0.0; // (deg)
@@ -392,7 +394,8 @@ void r3ball(Int_t nEvents = 1,
   if (fDetList.FindObject("SCINTNEULAND")) {
 
       R3BDetector* land = new R3BLand("Land", kTRUE);
-
+      // verbose level 2 ( step info activated )
+      land->SetVerboseLevel(1);
 			//Construct NeuLand
 			Double_t paddle_dimx=102.;   // half of the length [cm]
 			Double_t paddle_dimy=2.5;   // half of the width [cm]
