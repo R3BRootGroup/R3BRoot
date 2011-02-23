@@ -177,6 +177,7 @@ class R3BLand : public R3BDetector
     /** Map of MCis with fixed VolID */
     map <Int_t,Int_t> fMapMcId;
 
+    void StepHistory();
 
     ClassDef(R3BLand,2);
 

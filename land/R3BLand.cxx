@@ -8,13 +8,14 @@
 #include "R3BLandPoint.h"
 #include "R3BGeoLandPar.h"
 #include "R3BLandDigiPar.h"
+#include "R3BMCStack.h"
 
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
 #include "FairGeoNode.h"
 #include "FairGeoRootBuilder.h"
 #include "FairRootManager.h"
-#include "FairStack.h"
+//#include "FairStack.h"
 #include "FairRuntimeDb.h"
 #include "FairRun.h"
 #include "FairVolume.h"
@@ -232,6 +233,10 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
       fPosOut.SetZ(newpos[2]);
     }
 
+    // <DB>  Before filling MC info for current track
+	//       print step info if verbose > 1
+    if (fVerboseLevel>1) StepHistory();
+
 
 
     AddHit(fTrackID, fVolumeID,  fPaddleTyp,  cp2, cp1,
@@ -241,8 +246,9 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
       TVector3(fMomOut.Px(), fMomOut.Py(), fMomOut.Pz()),
       fTime, fLength, fELoss, fLightYield);
      
+
      // Increment number of LandPoints for this track
-    FairStack* stack = (FairStack*) gMC->GetStack();
+    R3BStack* stack = (R3BStack*) gMC->GetStack();
     stack->AddPoint(kLAND);
      
     ResetParameters();
@@ -750,5 +756,79 @@ void R3BLand::ConstructNeuLandGeometry(  TGeoVolume* vWorld,  TGeoMedium *Alumin
   par->setChanged();
   //par->setInputVersion(fRun->GetRunId(),1);
 }
+
+
+void R3BLand::StepHistory(){
+  // <DB> dump of step info.
+  static Int_t iStepN;
+
+  // Particle being tracked
+  const char *sParticle;
+  switch(gMC->TrackPid()){
+    case 2212:          sParticle="proton"    ;break;
+    case 2112:          sParticle="neutron"   ;break;
+    case 22:            sParticle="gamma"     ;break;
+    case 50000050:      sParticle="ckov"      ;break;
+    case 111:           sParticle="pi0"       ;break;  
+    case 211:           sParticle="pi+"       ;break;  
+    case -211:          sParticle="Pi-"       ;break;  
+    case 1000010020:            sParticle="deuteron"        ;break;
+    case 1000010030:            sParticle="triton"        ;break;
+    case 1000020030:            sParticle="he3"        ;break;
+    case 1000020040:            sParticle="alpha"        ;break;
+    default:            sParticle="not known" ;break;
+  }
+
+
+  TString flag="-I- STEPINFO: tracking status: ";
+  if(gMC->IsTrackAlive()) {
+    if(gMC->IsTrackEntering())      flag="enters to";
+    else if(gMC->IsTrackExiting())  flag="exits from";
+    else if(gMC->IsTrackInside())   flag="inside";
+  } else {
+    if(gMC->IsTrackStop())          flag="stopped in";
+  }
+  
+  //Where am i ?
+  Int_t vid=0,copy=0;
+  //current volume and his mother are always there
+  TString path=gMC->CurrentVolName(); path.Prepend("-");path.Prepend(gMC->CurrentVolOffName(1));
+  vid=gMC->CurrentVolOffID(2,copy);  if(vid) {path.Prepend("-");path.Prepend(gMC->VolName(vid));}
+  vid=gMC->CurrentVolOffID(3,copy);  if(vid) {path.Prepend("-");path.Prepend(gMC->VolName(vid));}
+  
+  printf("step  (nr=%i): %s (%i) %s %s m=%.6f GeV q=%.1f dEdX=%.4f Etot=%.4f \n",
+  iStepN,sParticle,gMC->TrackPid(),flag.Data(),path.Data(),gMC->TrackMass(),gMC->TrackCharge(),gMC->Edep()*1e9,gMC->Etot());
+  
+  Double_t gMcTrackPos[3]; gMC->TrackPosition(gMcTrackPos[0],gMcTrackPos[1],gMcTrackPos[2]);
+  Double_t  gMcTrackPosLoc[3]; gMC->Gmtod(gMcTrackPos,gMcTrackPosLoc,1);
+  printf(" : track Position (MARS) x: %5.3lf, y: %5.3lf, z: %5.3lf (r: %5.3lf) ---> (LOC) x: %5.3f, y: %5.3f, z: %5.3f",
+          gMcTrackPos[0],gMcTrackPos[1],gMcTrackPos[2],
+          TMath::Sqrt(gMcTrackPos[0]*gMcTrackPos[0]+gMcTrackPos[1]*gMcTrackPos[1]+gMcTrackPos[2]*gMcTrackPos[2]),
+          gMcTrackPosLoc[0],gMcTrackPosLoc[1],gMcTrackPosLoc[2]);
+  
+  printf("step (nr=%i): tid=%i flags alive=%i disap=%i enter=%i exit=%i inside=%i out=%i stop=%i new=%i",
+		 iStepN,  gMC->GetStack()->GetCurrentTrackNumber(),
+		 gMC->IsTrackAlive(), gMC->IsTrackDisappeared(),gMC->IsTrackEntering(), gMC->IsTrackExiting(),
+		 gMC->IsTrackInside(),gMC->IsTrackOut(),        gMC->IsTrackStop(),     gMC->IsNewTrack());
+  
+  Float_t a,z,den,rad,abs; a=z=den=rad=abs=-1;
+  Int_t mid=gMC->CurrentMaterial(a,z,den,rad,abs);
+  printf("step (nr=%i): mid=%i a=%7.2f z=%7.2f den=%9.4f rad=%9.2f abs=%9.2f\n\n",iStepN,mid,a,z,den,rad,abs);
+  
+  TArrayI proc;  gMC->StepProcesses(proc); 
+  printf("-I- STEPINFO: Processes in this step:\n");
+  for ( int i = 0 ; i < proc.GetSize(); i++)
+  {
+    printf("-I- Process involved --->   code: %i : name: %s\n", proc.At(i) , TMCProcessName[proc.At(i)]);
+  }
+  printf("-I- STEPINFO: end of process list\n");
+  
+  iStepN++;
+
+}
+
+
+
+
 
 ClassImp(R3BLand)
