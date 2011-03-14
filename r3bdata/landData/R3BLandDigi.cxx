@@ -13,12 +13,12 @@ using std::flush;
 
 // -----   Default constructor   -------------------------------------------
 R3BLandDigi::R3BLandDigi() {
-  fTdcL = fTdcR = fQdcR = fQdcL = fTdc = fQdc = fxx = fyy = fzz = fx0 = fy0 = fz0 = fT0 = 0.;
+  fTdcL = fTdcR = fQdcR = fQdcL = fTdc = fQdc = fxx = fyy = fzz = 0.;
   fPaddleNb = -1;
 }
 R3BLandDigi::R3BLandDigi(Int_t paddle, Double_t tdcL, Double_t tdcR,
    Double_t tdc, Double_t qdcL, Double_t qdcR, Double_t qdc,
-   Double_t xx,Double_t yy, Double_t zz, Double_t x0,Double_t y0, Double_t z0,Double_t T0 ){
+   Double_t xx,Double_t yy, Double_t zz ){
     fTdcL    = tdcL;
     fTdcR    = tdcR;
     fTdc    = tdc;    
@@ -28,17 +28,12 @@ R3BLandDigi::R3BLandDigi(Int_t paddle, Double_t tdcL, Double_t tdcR,
     fxx    = xx;
     fyy    = yy;
     fzz    = zz;
-    fx0    = x0;
-    fy0    = y0;
-    fz0    = z0;
-    fT0    = T0;
 
     fPaddleNb = paddle;
 }
 
 R3BLandDigi::R3BLandDigi(Int_t paddle, Double_t tdcR, Double_t tdcL,
-			               Double_t qdcR, Double_t qdcL,
-										 double x0, double y0, double z0, double t0){
+			               Double_t qdcR, Double_t qdcL){
 
 		fTdc = fQdc = fxx = fyy = fzz = 0.;
 
@@ -46,13 +41,10 @@ R3BLandDigi::R3BLandDigi(Int_t paddle, Double_t tdcR, Double_t tdcL,
     fTdcR    = tdcL;
     fQdcL    = qdcR;
     fQdcR    = qdcL;
-		fx0      = x0;
-		fy0      = y0;
-		fz0      = z0;
-		fT0      = t0;
 
     fPaddleNb = paddle;
 }
+
 // -----   Destructor   ----------------------------------------------------
 R3BLandDigi::~R3BLandDigi() { }
 
