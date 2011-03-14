@@ -8,6 +8,7 @@
 #include "R3BLandDigiPar.h"
 #include "R3BLandDigi.h"
 #include "TLorentzVector.h"
+#include "R3BLandFirstHits.h"
 
 class TClonesArray;
 class TObjectArray;
@@ -77,6 +78,7 @@ class R3BNeutronTracker : public FairTask
   TClonesArray* fLandPoints;
   TClonesArray* fLandMCTrack; 
   TClonesArray* fLandDigi;
+  TClonesArray* fLandFirstHits;
 
   // Parameter class
   R3BLandDigiPar* fLandDigiPar;
@@ -86,14 +88,11 @@ class R3BNeutronTracker : public FairTask
   TClonesArray* fNeutronTracks;
 
   // Add here control hist for tracker
-  TH1F *hNeutmult1;
-  TH1F *hNeutmult2;
-  TH1F *hNeutmult3;
-  TH1F *hNeutmult4;
-  TH1F *hNeutmult5;
-  TH1F *hNeutmult6;
+  TH1F *hNeutmult;
   TH1F *hMinv;
   TH1F *hMinv0;
+  TH1F *hMinv1;
+  TH1F *hMinv2;
   TH1F *hDeltaPx1;
   TH1F *hDeltaPy1;
   TH1F *hDeltaPz1;
@@ -103,10 +102,28 @@ class R3BNeutronTracker : public FairTask
   TH1F *hClusterSize;
   TH1F *hClusterEnergy;
   TH1F *hClusters;
+  TH1F *hClusters1;  
+  TH1F *hClusters2;  
   TH1F *hHits;
   TH2F *hClusterNo_vs_Size;
+
+  TH1F *hDeltaX;
+  TH1F *hDeltaY;
+  TH1F *hDeltaZ;
+  TH1F *hDeltaT;
+
+  TH1F *hDeltaP1;
+  TH1F *hDeltaP2;
+  TH1F *hDeltaP3;
+  TH1F *hDeltaP4;
+  TH1F *hDeltaP5;
+  TH1F *hDeltaP6;
+
+  TH1F *hDelta;
+
   Int_t npaddles;
   Int_t nplanes;
+  Int_t printing;
 
   Double_t beamEnergy;
   Double_t beamBeta;

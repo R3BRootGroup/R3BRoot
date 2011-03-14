@@ -58,6 +58,7 @@ R3BLand::R3BLand() : R3BDetector("R3BLand", kTRUE, kLAND) {
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
+  fLandFirstHits = new TClonesArray("R3BLandFirstHits");
 }
 // -------------------------------------------------------------------------
 
@@ -73,6 +74,7 @@ R3BLand::R3BLand(const char* name, Bool_t active)
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
+  fLandFirstHits = new TClonesArray("R3BLandFirstHits");
 }
 // -------------------------------------------------------------------------
 
@@ -84,6 +86,10 @@ R3BLand::~R3BLand() {
   if (fLandCollection) {
    fLandCollection->Delete();
    delete fLandCollection;
+  }
+  if (fLandFirstHits) {
+   fLandFirstHits->Delete();
+   delete fLandFirstHits;
   }
 }
 // -------------------------------------------------------------------------
@@ -126,6 +132,11 @@ void R3BLand::Initialize()
 
 // -----  Public method ProcessHits  --------------------------------------
 Bool_t R3BLand::ProcessHits(FairVolume* vol) {
+
+    // <DB>  Before filling MC info for current track
+	//       print step info if verbose > 1
+//    cout<<"Test verbose: "<<fVerboseLevel<<endl;
+    if (fVerboseLevel>1) StepHistory();
 
   // --- get Geometry hiearchical Information
   Int_t cp1=-1;
@@ -233,10 +244,6 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
       fPosOut.SetZ(newpos[2]);
     }
 
-    // <DB>  Before filling MC info for current track
-	//       print step info if verbose > 1
-    if (fVerboseLevel>1) StepHistory();
-
 
 
     AddHit(fTrackID, fVolumeID,  fPaddleTyp,  cp2, cp1,
@@ -260,27 +267,48 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol) {
 
 
 
-// -----  Public method EndOfEvent  -----------------------------------------
+// -----  Public method BeginOfEvent  -----------------------------------------
 void R3BLand::BeginEvent() {
    //cout << "-I- begin event called ############################# " << endl;
 
 //   if (gGeoManager)
 //   TGeoVolume * vol = gGeoManager->FindVolumeFast("padle_h_box3");
+   for(Int_t l=0;l<6;l++){
+      firstHitX[l]=0.;
+      firstHitY[l]=0.;
+      firstHitZ[l]=0.;
+      firstT[l]=0.;      
+   }
 }
+
+void R3BLand::FinishEvent() {
+   AddHit1(firstHitX[0], firstHitY[0], firstHitZ[0], firstT[0],
+           firstHitX[1], firstHitY[1], firstHitZ[1], firstT[1],
+           firstHitX[2], firstHitY[2], firstHitZ[2], firstT[2],
+           firstHitX[3], firstHitY[3], firstHitZ[3], firstT[3],
+           firstHitX[4], firstHitY[4], firstHitZ[4], firstT[4],	   	   
+           firstHitX[5], firstHitY[5], firstHitZ[5], firstT[5]);
+
+
+}
+
+
+
 
 // -----  Public method EndOfEvent  -----------------------------------------
 void R3BLand::EndOfEvent() {
 
   if (fVerboseLevel) Print();
-  fLandCollection->Clear();
+  Reset();
+ 
 
-  ResetParameters();
 }
 // ----------------------------------------------------------------------------
 
 // -----  Public method Register  -------------------------------------------
 void R3BLand::Register() {
   FairRootManager::Instance()->Register("LandPoint", GetName(), fLandCollection, kTRUE);
+  FairRootManager::Instance()->Register("LandFirstHits", GetName(), fLandFirstHits, kTRUE);
 }
 // ----------------------------------------------------------------------------
 
@@ -300,6 +328,9 @@ void R3BLand::Print() const {
   Int_t nHits = fLandCollection->GetEntriesFast();
   cout << "-I- R3BLand: " << nHits << " points registered in this event." 
      << endl;
+  nHits = fLandFirstHits->GetEntriesFast();
+  cout << "-I- R3BLandFirstHits: " << nHits << " points registered in this event." 
+     << endl;
 }
 // ----------------------------------------------------------------------------
 
@@ -307,7 +338,10 @@ void R3BLand::Print() const {
 
 // -----  Public method Reset  ----------------------------------------------
 void R3BLand::Reset() {
+  cout << "------------------------- Reset() called " << endl;
   fLandCollection->Clear();
+  ResetParameters();
+  fLandFirstHits->Clear();
   ResetParameters();
 }
 // ----------------------------------------------------------------------------
@@ -339,16 +373,29 @@ R3BLandPoint* R3BLand::AddHit(Int_t trackID, Int_t detID, Int_t box, Int_t id1, 
   TClonesArray& clref = *fLandCollection;
   Int_t size = clref.GetEntriesFast();
   if (fVerboseLevel>1) 
+/*
    cout << "-I- R3BLand: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
    << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
    << trackID << ", energy loss " << eLoss  << " GeV" << endl;
+*/
   return new(clref[size]) R3BLandPoint(trackID, detID, box, id1, id2,  posIn, posOut,
             momIn, momOut, time, length, eLoss, lightYield);
 }
 
+R3BLandFirstHits* R3BLand::AddHit1(Double_t x0, Double_t y0, Double_t z0, Double_t t0,
+                                   Double_t x1, Double_t y1, Double_t z1, Double_t t1,
+                                   Double_t x2, Double_t y2, Double_t z2, Double_t t2,
+                                   Double_t x3, Double_t y3, Double_t z3, Double_t t3,
+                                   Double_t x4, Double_t y4, Double_t z4, Double_t t4,
+                                   Double_t x5, Double_t y5, Double_t z5, Double_t t5){
+  TClonesArray& clref = *fLandFirstHits;
+  Int_t size = clref.GetEntriesFast();
+  return new(clref[size]) R3BLandFirstHits(x0,y0,z0,t0,x1,y1,z1,t1,x2,y2,z2,t2,x3,y3,z3,t3,x4,y4,z4,t4,x5,y5,z5,t5);
+}
+
 // -----  Public method UseNeuLand  ----------------------------------
 void R3BLand::UseNeuLand(Double_t paddle_length, Double_t paddle_width, Double_t paddle_depth, 
-Double_t neuLAND_depth, Double_t paddle_gap, Double_t paddle_wrapping)
+Double_t neuLAND_depth, Double_t paddle_gap, Double_t paddle_wrapping1, Double_t paddle_wrapping2)
 {
   useNeuLAND=true;
   neuLAND_paddle_dimx = paddle_length;    // half of the length [cm]
@@ -356,7 +403,8 @@ Double_t neuLAND_depth, Double_t paddle_gap, Double_t paddle_wrapping)
   neuLAND_paddle_dimz = paddle_depth;      // half of the depth [cm]
   neuLAND_depth_dim   = neuLAND_depth;    // half detector depth [cm]
   neuLAND_gap_dim   =paddle_gap;    // total detector depth [cm]
-  neuLAND_wrapping_dim   = paddle_wrapping;    // total detector depth [cm]
+  neuLAND_wrapping1_dim   = paddle_wrapping1;    // thickness of wrapping material [cm]
+  neuLAND_wrapping2_dim   = paddle_wrapping2;    // thickness of wrapping material [cm]
   
 }
 
@@ -413,7 +461,7 @@ void R3BLand::ConstructGeometry() {
     nel    = 2;
     density = 1.032000;
     TGeoMixture*
-   pMat37 = new TGeoMixture("BC408", nel,density);
+    pMat37 = new TGeoMixture("BC408", nel,density);
     a = 1.007940;  z = 1.000000;  w = 0.520000;  // H
     pMat37->DefineElement(0,a,z,w);
     a = 12.010700;  z = 6.000000;  w = 0.480000;  // C
@@ -432,6 +480,38 @@ void R3BLand::ConstructGeometry() {
     par[7]  = 0.000000; // stmin
     pMed37 = new TGeoMedium("BC408", numed,pMat37,par);
   }
+
+  // plastic wrapping
+  // Mixture: CH2
+  TGeoMedium * pMed38=NULL;
+  if (gGeoManager->GetMedium("CH2") ){
+    pMed38=gGeoManager->GetMedium("CH2");
+  }
+  else{
+    nel    = 2;
+    density = 1.0;
+    TGeoMixture*
+    pMat38 = new TGeoMixture("CH2", nel,density);
+    a = 1.007940;  z = 1.000000;  w = 0.66;  // H
+    pMat38->DefineElement(0,a,z,w);
+    a = 12.010700;  z = 6.000000;  w = 0.34;  // C
+    pMat38->DefineElement(1,a,z,w);
+    pMat38->SetIndex(38);
+    // Medium: CH2
+    numed  = 38;  // medium number
+    Double_t par[8];
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 0.000000; // tmaxfd
+    par[4]  = 0.000000; // stemax
+    par[5]  = 0.000000; // deemax
+    par[6]  = 0.000100; // epsil
+    par[7]  = 0.000000; // stmin
+    pMed38 = new TGeoMedium("CH2", numed,pMat38,par);
+  }
+  
+  
 
 // Material: Alu
   TGeoMedium * pMedAl=NULL;
@@ -458,7 +538,7 @@ void R3BLand::ConstructGeometry() {
     par[5]  = 0.000000; // deemax
     par[6]  = 0.000100; // epsil
     par[7]  = 0.000000; // stmin
-    pMedAl = new TGeoMedium("Aluminium", numed,pMatAl, par);
+    pMedAl = new TGeoMedium("Aluminium", numed, pMatAl, par);
   }
 
   TGeoMedium *Aluminium = pMedAl;
@@ -468,7 +548,7 @@ void R3BLand::ConstructGeometry() {
 
   //Switch between Land and NeuLand
   if (useNeuLAND)
-    ConstructNeuLandGeometry(vWorld, Aluminium, pMed37);
+    ConstructNeuLandGeometry(vWorld, Aluminium, pMed37, pMed38);
   else
     ConstructLandGeometry(vWorld, Iron, pMed37);
 
@@ -656,7 +736,8 @@ void R3BLand::ConstructLandGeometry(  TGeoVolume* vWorld,  TGeoMedium *Iron, TGe
 // --------------------------------------------------------------------------------
 // Construct NeuLand Geometry
 // --------------------------------------------------------------------------------
-void R3BLand::ConstructNeuLandGeometry(  TGeoVolume* vWorld,  TGeoMedium *Aluminium, TGeoMedium *BC408)
+void R3BLand::ConstructNeuLandGeometry(  TGeoVolume* vWorld,  TGeoMedium *Aluminium, 
+                                         TGeoMedium *BC408, TGeoMedium *CH2)
 {
   Double_t tx,ty,tz;
 
@@ -664,12 +745,42 @@ void R3BLand::ConstructNeuLandGeometry(  TGeoVolume* vWorld,  TGeoMedium *Alumin
   TGeoVolume *padle_h_box5 = gGeoManager->MakeBox("padle_h_box5",BC408,
         neuLAND_paddle_dimx, neuLAND_paddle_dimy, neuLAND_paddle_dimz);
 
+  //------------------ wrapping Alu------------------------------------------
+  TGeoShape* padle_h_box1 = new TGeoBBox("padle_h_box1",
+      neuLAND_paddle_dimx, 
+      neuLAND_paddle_dimy+neuLAND_wrapping1_dim, 
+      neuLAND_paddle_dimz+neuLAND_wrapping1_dim);
+  TGeoShape* padle_h_box2 = new TGeoBBox("padle_h_box2",
+       neuLAND_paddle_dimx, 
+       neuLAND_paddle_dimy, 
+       neuLAND_paddle_dimz);
+
+  // Create a composite shape
+  TGeoCompositeShape *wrapping1 = new TGeoCompositeShape("diffbox", "padle_h_box1 - padle_h_box2");
+  TGeoVolume *bvol1 = new TGeoVolume("wrapping1",wrapping1,Aluminium);
+
+  //------------------ wrapping Tape------------------------------------------
+  TGeoShape* padle_h_box3 = new TGeoBBox("padle_h_box3",
+      neuLAND_paddle_dimx, 
+      neuLAND_paddle_dimy+neuLAND_wrapping1_dim+neuLAND_wrapping2_dim, 
+      neuLAND_paddle_dimz+neuLAND_wrapping1_dim+neuLAND_wrapping2_dim);
+  TGeoShape* padle_h_box4 = new TGeoBBox("padle_h_box4",
+       neuLAND_paddle_dimx, 
+       neuLAND_paddle_dimy+neuLAND_wrapping1_dim, 
+       neuLAND_paddle_dimz+neuLAND_wrapping1_dim);
+
+  // Create a composite shape
+  TGeoCompositeShape *wrapping2 = new TGeoCompositeShape("diffbox", "padle_h_box3 - padle_h_box4");
+  TGeoVolume *bvol2 = new TGeoVolume("wrapping2",wrapping2,CH2);
+
+
+
   // Make the elementary assembly of the whole structure
   TGeoVolume *aLand = new TGeoVolumeAssembly("ALAND");
 
   Double_t total_dimx=neuLAND_paddle_dimx;
-  Double_t total_dimy=neuLAND_paddle_dimy+neuLAND_wrapping_dim+neuLAND_gap_dim;
-  Double_t total_dimz=neuLAND_paddle_dimz+neuLAND_wrapping_dim+neuLAND_gap_dim;
+  Double_t total_dimy=neuLAND_paddle_dimy+neuLAND_wrapping1_dim+neuLAND_wrapping2_dim+neuLAND_gap_dim;
+  Double_t total_dimz=neuLAND_paddle_dimz+neuLAND_wrapping1_dim+neuLAND_wrapping2_dim+neuLAND_gap_dim;
   
   //paddles
   TGeoRotation *zeroRotation= new TGeoRotation();
@@ -687,52 +798,79 @@ void R3BLand::ConstructNeuLandGeometry(  TGeoVolume* vWorld,  TGeoMedium *Alumin
   Double_t zz = 0.;
   
   aLand->AddNode(padle_h_box5,1,new TGeoCombiTrans(xx,yy,zz,zeroRotation));
-
-  //------------------ wrapping ------------------------------------------
-  if (neuLAND_wrapping_dim > 0.0)
-  {
-    TGeoShape* padle_h_box1 = new TGeoBBox("padle_h_box1",
-        neuLAND_paddle_dimx, neuLAND_paddle_dimy+neuLAND_wrapping_dim, neuLAND_paddle_dimz+neuLAND_wrapping_dim);
-    TGeoShape* padle_h_box2 = new TGeoBBox("padle_h_box2",
-         neuLAND_paddle_dimx+1, neuLAND_paddle_dimy, neuLAND_paddle_dimz);
-
-    // Create a composite shape
-    TGeoCompositeShape *wrapping = new TGeoCompositeShape("diffbox", "padle_h_box1 - padle_h_box2");
-    TGeoVolume *bvol = new TGeoVolume("wrapping",wrapping,Aluminium);
-    aLand->AddNode(bvol,1,new TGeoCombiTrans(xx,yy,zz,zeroRotation));
-  }
+  aLand->AddNode(bvol1,1,new TGeoCombiTrans(xx,yy,zz,zeroRotation));
+  aLand->AddNode(bvol2,1,new TGeoCombiTrans(xx,yy,zz,zeroRotation));
 
   AddSensitiveVolume(padle_h_box5); //Scint.
 
   fNbOfSensitiveVol+=1; //? FIXME
 
+// positioning of the paddles for packed geometry
+
   TGeoVolume *cell = new TGeoVolumeAssembly("CELL");
 
-  // Assembly includes spacing neuLAND paddles [cm]
-
-  int nrPaddle=0, nrPlane=0;
+  int nindex=0, i=0;
   tx=0.;
-
-  double startZ = - total_dimz;
-  while(startZ - (total_dimz*3 - neuLAND_gap_dim) > -neuLAND_depth_dim)
-    startZ -= total_dimz*2;
-
-  double startY = - total_dimy;
-  while(startY - (total_dimy*3 - neuLAND_gap_dim) > -neuLAND_paddle_dimx)
-    startY -= total_dimy*2;
-
-  for (tz=startZ; tz < neuLAND_depth_dim - total_dimz + neuLAND_wrapping_dim; tz+=total_dimz*2)
+  tz=-neuLAND_depth_dim + total_dimz;
+  for (tz=-neuLAND_depth_dim+total_dimz; tz < neuLAND_depth_dim; tz+=total_dimz*2)
   {
-    nrPlane++;
-    for (ty=startY; ty < neuLAND_paddle_dimx - total_dimy + neuLAND_wrapping_dim; ty+=total_dimy*2)
+    i++;
+    for (ty=-total_dimx + total_dimy; ty < total_dimx; ty+=total_dimy*2)
     {
-      nrPaddle++;
-      if (nrPlane % 2 == 1)
-        cell->AddNode(aLand,nrPaddle,new TGeoCombiTrans(tx,ty,tz,zeroRotation));
+      nindex++;
+      if (i % 2 == 1)
+        cell->AddNode(aLand,nindex,new TGeoCombiTrans(tx,ty,tz,zeroRotation));
       else
-        cell->AddNode(aLand,nrPaddle,new TGeoCombiTrans(ty,tx,tz,rot1));
+        cell->AddNode(aLand,nindex,new TGeoCombiTrans(ty,tx,tz,rot1));
     }
   }
+
+
+
+
+// positioning of the paddles for loose geometry
+/*
+  TGeoVolume *cell = new TGeoVolumeAssembly("CELL");
+
+  int nindex=0, i=0;
+  tx=0.;
+  tz=-neuLAND_depth_dim + total_dimz;
+  for (tz=-neuLAND_depth_dim+total_dimz; tz < neuLAND_depth_dim; tz+=total_dimz*2)
+  {
+    i++;
+    // first 10 paddles in a plane have double distance 
+    for (ty=-total_dimx + total_dimy; ty < -50.; ty+=total_dimy*4)
+    {
+      nindex++;
+      if (i % 2 == 1)
+        cell->AddNode(aLand,nindex,new TGeoCombiTrans(tx,ty,tz,zeroRotation));
+      else
+        cell->AddNode(aLand,nindex,new TGeoCombiTrans(ty,tx,tz,rot1));
+    }
+    // middle 20 paddles in a plane are closed packed 
+    for (ty=-19.*total_dimy; ty < 50.; ty+=total_dimy*2)
+    {
+      nindex++;
+      if (i % 2 == 1)
+        cell->AddNode(aLand,nindex,new TGeoCombiTrans(tx,ty,tz,zeroRotation));
+      else
+        cell->AddNode(aLand,nindex,new TGeoCombiTrans(ty,tx,tz,rot1));
+    }
+    // last 10 paddles in a plane have double distance 
+    for (ty=23.*total_dimy; ty < total_dimx; ty+=total_dimy*4)
+    {
+      nindex++;
+      if (i % 2 == 1)
+        cell->AddNode(aLand,nindex,new TGeoCombiTrans(tx,ty,tz,zeroRotation));
+      else
+        cell->AddNode(aLand,nindex,new TGeoCombiTrans(ty,tx,tz,rot1));
+    }
+
+    
+  }
+
+*/
+
 
   tx = 0.0;
   ty = 0.0;
@@ -746,13 +884,9 @@ void R3BLand::ConstructNeuLandGeometry(  TGeoVolume* vWorld,  TGeoMedium *Alumin
   FairRun *fRun = FairRun::Instance();
   FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
   R3BLandDigiPar* par=(R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
-  par->SetMaxPaddle(nrPaddle) ;
-  par->SetMaxPlane(nrPlane);
+  par->SetMaxPaddle(nindex) ;
+  par->SetMaxPlane((Int_t)(neuLAND_depth_dim/total_dimy));
   par->SetPaddleLength(neuLAND_paddle_dimx);
-  par->SetPaddleHeight(neuLAND_paddle_dimy);
-  par->SetPaddleDepth(neuLAND_paddle_dimz);
-  par->SetPaddleSpacing(neuLAND_gap_dim);
-  par->SetPaddleWrapping(neuLAND_wrapping_dim);
   par->setChanged();
   //par->setInputVersion(fRun->GetRunId(),1);
 }
@@ -796,38 +930,86 @@ void R3BLand::StepHistory(){
   vid=gMC->CurrentVolOffID(2,copy);  if(vid) {path.Prepend("-");path.Prepend(gMC->VolName(vid));}
   vid=gMC->CurrentVolOffID(3,copy);  if(vid) {path.Prepend("-");path.Prepend(gMC->VolName(vid));}
   
-  printf("step  (nr=%i): %s (%i) %s %s m=%.6f GeV q=%.1f dEdX=%.4f Etot=%.4f \n",
-  iStepN,sParticle,gMC->TrackPid(),flag.Data(),path.Data(),gMC->TrackMass(),gMC->TrackCharge(),gMC->Edep()*1e9,gMC->Etot());
+//  printf("step  (nr=%i): %s (%i) %s %s m=%.6f GeV q=%.1f dEdX=%.4f Etot=%.4f \n",
+//  iStepN,sParticle,gMC->TrackPid(),flag.Data(),path.Data(),gMC->TrackMass(),gMC->TrackCharge(),gMC->Edep()*1e9,gMC->Etot());
   
   Double_t gMcTrackPos[3]; gMC->TrackPosition(gMcTrackPos[0],gMcTrackPos[1],gMcTrackPos[2]);
   Double_t  gMcTrackPosLoc[3]; gMC->Gmtod(gMcTrackPos,gMcTrackPosLoc,1);
-  printf(" : track Position (MARS) x: %5.3lf, y: %5.3lf, z: %5.3lf (r: %5.3lf) ---> (LOC) x: %5.3f, y: %5.3f, z: %5.3f",
-          gMcTrackPos[0],gMcTrackPos[1],gMcTrackPos[2],
-          TMath::Sqrt(gMcTrackPos[0]*gMcTrackPos[0]+gMcTrackPos[1]*gMcTrackPos[1]+gMcTrackPos[2]*gMcTrackPos[2]),
-          gMcTrackPosLoc[0],gMcTrackPosLoc[1],gMcTrackPosLoc[2]);
+//  printf(" : track Position (MARS) x: %5.3lf, y: %5.3lf, z: %5.3lf (r: %5.3lf) ---> (LOC) x: %5.3f, y: %5.3f, z: %5.3f",
+//          gMcTrackPos[0],gMcTrackPos[1],gMcTrackPos[2],
+//          TMath::Sqrt(gMcTrackPos[0]*gMcTrackPos[0]+gMcTrackPos[1]*gMcTrackPos[1]+gMcTrackPos[2]*gMcTrackPos[2]),
+//          gMcTrackPosLoc[0],gMcTrackPosLoc[1],gMcTrackPosLoc[2]);
   
-  printf("step (nr=%i): tid=%i flags alive=%i disap=%i enter=%i exit=%i inside=%i out=%i stop=%i new=%i",
-		 iStepN,  gMC->GetStack()->GetCurrentTrackNumber(),
-		 gMC->IsTrackAlive(), gMC->IsTrackDisappeared(),gMC->IsTrackEntering(), gMC->IsTrackExiting(),
-		 gMC->IsTrackInside(),gMC->IsTrackOut(),        gMC->IsTrackStop(),     gMC->IsNewTrack());
+//  printf("step (nr=%i): tid=%i flags alive=%i disap=%i enter=%i exit=%i inside=%i out=%i stop=%i new=%i",
+//		 iStepN,  gMC->GetStack()->GetCurrentTrackNumber(),
+//		 gMC->IsTrackAlive(), gMC->IsTrackDisappeared(),gMC->IsTrackEntering(), gMC->IsTrackExiting(),
+//		 gMC->IsTrackInside(),gMC->IsTrackOut(),        gMC->IsTrackStop(),     gMC->IsNewTrack());
   
   Float_t a,z,den,rad,abs; a=z=den=rad=abs=-1;
   Int_t mid=gMC->CurrentMaterial(a,z,den,rad,abs);
-  printf("step (nr=%i): mid=%i a=%7.2f z=%7.2f den=%9.4f rad=%9.2f abs=%9.2f\n\n",iStepN,mid,a,z,den,rad,abs);
-  
+//  printf("step (nr=%i): mid=%i a=%7.2f z=%7.2f den=%9.4f rad=%9.2f abs=%9.2f\n\n",iStepN,mid,a,z,den,rad,abs);
+
+/*  
   TArrayI proc;  gMC->StepProcesses(proc); 
   printf("-I- STEPINFO: Processes in this step:\n");
   for ( int i = 0 ; i < proc.GetSize(); i++)
   {
     printf("-I- Process involved --->   code: %i : name: %s\n", proc.At(i) , TMCProcessName[proc.At(i)]);
   }
-  printf("-I- STEPINFO: end of process list\n");
+  printf("-I- STEPINFO: end of process list\n");  
+*/
+
+  Int_t Nprim=gMC->GetStack()->GetNprimary();
+
+  Int_t trackNo=gMC->GetStack()->GetCurrentTrackNumber();
+  Int_t motherNo=gMC->GetStack()->GetCurrentParentTrackNumber();
+  Double_t time=gMC->TrackTime();
+/*
+  cout << "Prim: " << Nprim<<endl;
+  cout << "TrackID: " << trackNo<<endl;
+  cout << "MotherID: " << motherNo <<endl;
+  cout << "time: " << time <<endl;
+*/  
+  if(gMC->TrackPid()==2112 && motherNo<0){
+  // we have a primary neutron
+     TArrayI proc;  gMC->StepProcesses(proc); 
+     for ( int i = 0 ; i < proc.GetSize(); i++){
+//        printf("-I- Process involved --->   code: %i : name: %s\n", proc.At(i) , TMCProcessName[proc.At(i)]);
+     
+        if(proc.At(i)!=22 && proc.At(i)!=23 && proc.At(i)!=31 && proc.At(i)!=43 &&  proc.At(i)!=13){
+           cout<<"new primary neutron interaction: " << proc.At(i) <<"  "<< TMCProcessName[proc.At(i)] <<endl;
+	
+	}
+  
+// make histogram with first interaction
+  
+        if(proc.At(i)==22 && trackNo<7){
+	   // elastic scattering
+//           cout<<"primary neutron interaction elastic"<<endl;
+           firstHitX[trackNo-1] = gMcTrackPos[0];
+           firstHitY[trackNo-1] = gMcTrackPos[1];
+           firstHitZ[trackNo-1] = gMcTrackPos[2];
+           firstT[trackNo-1] = time;
+  
+        }
+
+        if(proc.At(i)==23 && trackNo<7){
+	   // elastic scattering
+//           cout<<"primary neutron interaction inelastic"<<endl;
+           firstHitX[trackNo-1] = gMcTrackPos[0];
+           firstHitY[trackNo-1] = gMcTrackPos[1];
+           firstHitZ[trackNo-1] = gMcTrackPos[2];
+           firstT[trackNo-1] = time;
+  
+        }
+     }  
+  }
   
   iStepN++;
 
 }
 
-
+void R3BLand::FinishRun() {cout << "-I- finishing  run"<< endl;}
 
 
 

@@ -44,9 +44,7 @@ class R3BLandDigitizer : public FairTask
 
 
   R3BLandDigi* AddHit(Int_t paddleNr, Double_t tdcL, Double_t tdcR, Double_t tdc,
-     Double_t qdcL, Double_t qdcR, Double_t qdc, Double_t xx,Double_t yy, Double_t zz,
-     Double_t x0, Double_t y0, Double_t z0, Double_t t0 );
-
+     Double_t qdcL, Double_t qdcR, Double_t qdc, Double_t xx,Double_t yy, Double_t zz );
 
   protected:
   TClonesArray* fLandPoints;
@@ -67,14 +65,7 @@ class R3BLandDigitizer : public FairTask
   TH1F *hFirstEnergy;
   
   TH2F *hElossLight;
-
-  TH1F *hDeltaX;
-  TH1F *hDeltaY;
-  TH1F *hDeltaZ;
-  TH1F *hDeltaT;
  
-  TH1F *hFirstMedia;
-
   Int_t npaddles;
   Int_t nplanes;
   Int_t paddle_per_plane;

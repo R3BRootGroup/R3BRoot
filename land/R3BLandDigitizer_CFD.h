@@ -44,8 +44,7 @@ class R3BLandDigitizer_CFD : public FairTask
 
 
   R3BLandDigi* AddHit(Int_t paddleNr, Double_t tdcR, Double_t tdcL,
-		     Double_t qdcR,Double_t qdcL, 
-				 double x0, double y0, double z0, double t0 );
+		     Double_t qdcR,Double_t qdcL);
 
 
   protected:

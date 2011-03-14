@@ -262,8 +262,7 @@ void R3BLandDigitizer_CFD::Exec(Option_t* opt)
         double t0 = paddles[iPaddles].Right->pulse->hitData->GetTime();
         
         //Save the data from the paddles
-        AddHit( iPaddles, paddles[iPaddles].Right->tdc, paddles[iPaddles].Left->tdc, paddles[iPaddles].Right->qdc, paddles[iPaddles].Left->qdc,
-                x0, y0, z0, t0);
+        AddHit( iPaddles, paddles[iPaddles].Right->tdc, paddles[iPaddles].Left->tdc, paddles[iPaddles].Right->qdc, paddles[iPaddles].Left->qdc);
         
         if (iVerbose > 1)
         {
@@ -306,14 +305,13 @@ void R3BLandDigitizer_CFD::FinishEvent()
 	}
 }
 
+
 R3BLandDigi* R3BLandDigitizer_CFD::AddHit(Int_t paddleNr, Double_t tdcR, Double_t tdcL,
-					  Double_t qdcR,Double_t qdcL,
-						double x0, double y0, double z0, double t0 ){
+					  Double_t qdcR,Double_t qdcL ){
   // It fills the R3BLandDigi array
   TClonesArray& clref = *fLandDigi;
   Int_t size = clref.GetEntriesFast();
-  return new(clref[size]) R3BLandDigi(paddleNr, tdcR, tdcL, qdcR, qdcL, 
-																			x0, y0, z0, t0);
+  return new(clref[size]) R3BLandDigi(paddleNr, tdcR, tdcL, qdcR, qdcL); 
 }
 
 ClassImp(R3BLandDigitizer_CFD)

@@ -191,11 +191,13 @@ void R3BLandDigiAnalyser::Exec(Option_t* opt)
             if (iVerbose > 2)
             {
               // Plot the difference between actual and reconstructed hit
+/* this has to be changed. The first hits are now in R3BLandFirstHits and not anymore in R3BLandDigi	
+//comment by M. Heil      
               diffHists[0]->Fill(hits[nValidHits].x-digi_obj->GetX0());
               diffHists[1]->Fill(hits[nValidHits].y-digi_obj->GetY0());
               diffHists[2]->Fill(hits[nValidHits].z-digi_obj->GetZ0()+landPlacementZ-(nPlanes/2*paddle_dimz +(nPlanes-1)/2*paddle_spacing));
               diffHists[3]->Fill(hits[nValidHits].t-digi_obj->GetT0());
-              
+*/              
               double vel= TMath::Sqrt(hits[nValidHits].x * hits[nValidHits].x + 
                                       hits[nValidHits].y * hits[nValidHits].y +
                                       hits[nValidHits].z * hits[nValidHits].z +landPlacementZ)/hits[nValidHits].t;

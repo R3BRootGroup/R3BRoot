@@ -15,6 +15,7 @@
 #include "TGeoMedium.h"
 #include <iostream>
 #include <map>
+#include "R3BLandFirstHits.h"
 
 using namespace std;
 
@@ -69,7 +70,7 @@ class R3BLand : public R3BDetector
    **/
 
   virtual void EndOfEvent();
-
+  virtual void FinishEvent();
 
 
   /** Virtual method Register
@@ -78,6 +79,8 @@ class R3BLand : public R3BDetector
    **/
   virtual void Register();
 
+
+  virtual void FinishRun();
 
   /** Accessor to the hit collection **/
   virtual TClonesArray* GetCollection(Int_t iColl) const;
@@ -117,8 +120,8 @@ class R3BLand : public R3BDetector
   virtual void SetSpecialPhysicsCuts(){;}
 
   void UseNeuLand(Double_t _paddle_length, Double_t _paddle_width, Double_t _paddle_depth, 
-  Double_t _neuLAND_depth, Double_t _paddle_gap, Double_t _wrapping);
-
+  Double_t _neuLAND_depth, Double_t _paddle_gap, Double_t _wrapping1, Double_t _wrapping2);
+ 
 
   //  void SaveGeoParams();
 
@@ -140,9 +143,13 @@ class R3BLand : public R3BDetector
 
     Int_t          fPosIndex;          //!
     TClonesArray*  fLandCollection;    //!  The hit collection
+    TClonesArray*  fLandFirstHits;     //!  First Hits    
     Bool_t         kGeoSaved;          //!
     TList *flGeoPar;                   //!
     Double_t fBirkC0,fBirkC1,fBirkC2;  //!
+
+    Int_t          fMotherID;          //!  Mother ID
+    Int_t          fNprim;             //!  Number of primaries
 
     bool useNeuLAND;
     Double_t neuLAND_paddle_dimx;      // half of the length [cm]
@@ -150,7 +157,13 @@ class R3BLand : public R3BDetector
     Double_t neuLAND_paddle_dimz;      // half of the depth [cm]
     Double_t neuLAND_depth_dim;        // half detector depth [cm]
     Double_t neuLAND_gap_dim;          // half of air gap between two scintillators [cm]
-    Double_t neuLAND_wrapping_dim;        // thickness of wrapping [cm]
+    Double_t neuLAND_wrapping1_dim;        // thickness of wrapping [cm] (Alu)
+    Double_t neuLAND_wrapping2_dim;        // thickness of wrapping [cm] (Tape)
+
+    Double_t firstHitX[6];             // position and time of first our hits
+    Double_t firstHitY[6];
+    Double_t firstHitZ[6];
+    Double_t firstT[6];
     
     /** Private method AddHit
      **
@@ -162,8 +175,17 @@ class R3BLand : public R3BDetector
        TVector3 momOut, Double_t time,
        Double_t length, Double_t eLoss,Double_t lightYield);
 
+    R3BLandFirstHits* AddHit1(Double_t x0, Double_t y0, Double_t z0, Double_t T0,
+                              Double_t x1, Double_t y1, Double_t z1, Double_t T1,
+                              Double_t x2, Double_t y2, Double_t z2, Double_t T2,
+                              Double_t x3, Double_t y3, Double_t z3, Double_t T3,
+                              Double_t x4, Double_t y4, Double_t z4, Double_t T4,
+                              Double_t x5, Double_t y5, Double_t z5, Double_t T5);
+
+
     //Constructs the NeuLand Geometry
-    void ConstructNeuLandGeometry(TGeoVolume* vWorld,  TGeoMedium *Iron, TGeoMedium *BC408);
+    void ConstructNeuLandGeometry(TGeoVolume* vWorld,  TGeoMedium *Aluminium, 
+    TGeoMedium *BC408, TGeoMedium *CH2);
 
     //Construct Land Geometry
     void ConstructLandGeometry(TGeoVolume* vWorld, TGeoMedium *Iron, TGeoMedium *BC408);
@@ -179,7 +201,7 @@ class R3BLand : public R3BDetector
 
     void StepHistory();
 
-    ClassDef(R3BLand,2);
+    ClassDef(R3BLand,3);
 
 };
 

@@ -162,7 +162,7 @@ void r3ball(Int_t nEvents = 1,
       //target->SetRotAnglesEuler(phi,theta,psi);
       target->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       target->SetTranslation(tx,ty,tz);
-      run->AddModule(target);
+//      run->AddModule(target);
   }
 
   //R3B Magnet definition
@@ -228,7 +228,7 @@ void r3ball(Int_t nEvents = 1,
       //cal->SetRotAnglesEuler(phi,theta,psi);
       cal->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       cal->SetTranslation(tx,ty,tz);
-      run->AddModule(cal);
+      //run->AddModule(cal);
   }
 
   if (fDetList.FindObject("CALIFA") ) {
@@ -388,22 +388,24 @@ void r3ball(Int_t nEvents = 1,
       //land->SetRotAnglesEuler(phi,theta,psi);
       land->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       land->SetTranslation(tx,ty,tz);
-      run->AddModule(land);
+      //run->AddModule(land);
   }
 	// NeuLand Scintillator Detector
   if (fDetList.FindObject("SCINTNEULAND")) {
 
       R3BDetector* land = new R3BLand("Land", kTRUE);
       // verbose level 2 ( step info activated )
-      land->SetVerboseLevel(1);
+      land->SetVerboseLevel(2);
 			//Construct NeuLand
-			Double_t paddle_dimx=102.;   // half of the length [cm]
-			Double_t paddle_dimy=2.5;   // half of the width [cm]
-			Double_t paddle_dimz=2.5;   // half of the depth [cm]
-			Double_t detector_dimz=153; // total detector depth [cm]
-			Double_t air_gap=0.02;        // half of air gap between two scintillator bars [cm]
-			Double_t wrapping=0.03;      // thickness of wrapping material [cm]
-			((R3BLand*) land)->UseNeuLand(paddle_dimx, paddle_dimy, paddle_dimz, detector_dimz, air_gap, wrapping);
+			Double_t paddle_dimx=100.;   // half of the length [cm]
+			Double_t paddle_dimy=2.4;   // half of the width [cm]
+			Double_t paddle_dimz=2.4;   // half of the depth [cm]
+			Double_t detector_dimz=125; // total detector depth [cm]
+			Double_t air_gap=0.03;        // half of air gap between two scintillator bars [cm]
+			Double_t wrapping1=0.02;      // thickness of wrapping material Alu [cm]
+			Double_t wrapping2=0.05;      // thickness of wrapping material Tape [cm]
+			((R3BLand*) land)->UseNeuLand(paddle_dimx, paddle_dimy, paddle_dimz, detector_dimz, 
+			air_gap, wrapping1, wrapping2);
 
       // Global position of the Module
       phi   =  0.0; // (deg)
@@ -416,7 +418,7 @@ void r3ball(Int_t nEvents = 1,
       // Global translation in Lab
       tx    =  0.0; // (cm)
       ty    =  0.0; // (cm)
-      tz    =  1150.0; // (cm)
+      tz    =  3500.0; // (cm)
       //land->SetRotAnglesEuler(phi,theta,psi);
       land->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       land->SetTranslation(tx,ty,tz);
@@ -527,10 +529,12 @@ void r3ball(Int_t nEvents = 1,
 
   if (fGenerator.CompareTo("box") == 0  ) {
   // 2- Define the BOX generator
-  Double_t pdgId=2212; // pion beam
-  Double_t theta1= 0.;  // polar angle distribution
-  Double_t theta2= 0.;
+  Double_t pdgId=2212; // neutron
+  Double_t theta1= 0.1;  // polar angle distribution
+  Double_t theta2= 0.1;
   Double_t momentum=1.692041; // 10 GeV/c
+//  Double_t momentum=sqrt(2.*500.*938.27231)/1000.; // 10 GeV/c
+//  Double_t momentum=1215.649/1000.;  // 600 MeV 
   FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 1);
   boxGen->SetThetaRange (   theta1,   theta2);
   boxGen->SetPRange     (momentum,momentum*1.);

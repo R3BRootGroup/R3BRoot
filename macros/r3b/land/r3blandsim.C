@@ -95,7 +95,7 @@ Int_t r3blandsim(){
     TObjArray fDetList;
 //    fDetList.Add(&det1);
     fDetList.Add(&det2);
-    fDetList.Add(&det4);
+//    fDetList.Add(&det4);
 //    fDetList.Add(&det5);
     fDetList.Add(&det6);
 //    fDetList.Add(&det7);
@@ -109,7 +109,7 @@ Int_t r3blandsim(){
    //- N# of Sim. Events   |    nEvents     (Int_t)
    //-------------------------------------------------
 
-   Int_t nEvents = 1; //23347;
+   Int_t nEvents = 10000; //23347;
 
    //-------------------------------------------------
    //- EventDisplay        |    fEventDisplay (Bool_t)

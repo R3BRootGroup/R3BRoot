@@ -21,8 +21,8 @@ void Config()
   // create R3B  Specific Stack
   R3BStack *st = new R3BStack();
   // Stack debug mode
-  //st->SetDebug(kFALSE);
-  st->SetDebug(kTRUE);
+  st->SetDebug(kFALSE);
+  //st->SetDebug(kTRUE);
   st->SetMinPoints(0);
   st->StoreSecondaries(kTRUE);
   

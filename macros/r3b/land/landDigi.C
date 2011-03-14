@@ -1,17 +1,14 @@
 void landDigi(){
 
   // Input files
-   TString inFile1      = "/data.local2/mheil/fairroot_results/Neuland_plastic/neu_dec2010/r3bsim_10m_2x2x3m_5cm_6n_600MeV.root";
-//   TString inFile2      = "/data.local2/mheil/fairroot_results/Neuland_plastic/neu_dec2010/r3bsim_10m_2x2x3m_5cm_1n_131Sn_600MeV_kb_2.root";
-//   TString inFile3      = "/data.local2/mheil/fairroot_results/Neuland_plastic/neu_dec2010/r3bsim_10m_2x2x3m_5cm_1n_131Sn_600MeV_kb_3.root";
-//   TString inFile4      = "/data.local2/mheil/fairroot_results/Neuland_plastic/neu_dec2010/r3bsim_10m_2x2x3m_5cm_1n_131Sn_600MeV_kb_4.root";
-//   TString inFile      = "/data.local2/mheil/fairroot_results/land/r3bsim_10m_land_1n_170MeV.root";
-//   TString inFile      = "r3bsim_4n_400MeV.root";
-   TString parFile     = "/data.local2/mheil/fairroot_results/Neuland_plastic/neu_dec2010/r3bpar_10m_2x2x3m_5cm_6n_600MeV.root";
+   TString inFile1="/data.local2/mheil/fairroot_results/comp_RPC/r3bsim_2x2x2.5m_35m_131Sn_1n_1000AMeV_100keV.root";
+//   TString inFile1      = "r3bsim.root";
+   TString parFile="/data.local2/mheil/fairroot_results/comp_RPC/r3bpar_2x2x2.5m_35m_131Sn_1n_1000AMeV_100keV.root";
 //   TString parFile     = "/data.local2/mheil/fairroot_results/land/r3bpar_10m_land_1n_170MeV.root";
-//   TString parFile     = "r3bpar_4n_400MeV.root";
+//   TString parFile     = "r3bpar.root";
   // Output file         
-  TString outFile     = "/data.local2/mheil/fairroot_results/Neuland_plastic/neu_dec2010/land_digi_10m_2x2x3m_5cm_6n_600MeV.root";
+  TString outFile ="/data.local2/mheil/fairroot_results/comp_RPC/land_digi_2x2x2.5m_35m_131Sn_1n_1000AMeV_100keV.root";
+//  TString outFile     = "land_digi.root";
 
   
   // ----  Load libraries   -------------------------------------------------
@@ -64,8 +61,17 @@ void landDigi(){
 
   // -----   beam energy per nucleon  --------------------------------------
 
-  Double_t beamEnergy=600.;
-  Double_t beamBeta=0.7937626;
+//  Double_t beamEnergy=200.;
+//  Double_t beamBeta=0.5676881;
+
+//  Double_t beamEnergy=600.;
+//  Double_t beamBeta=0.7937626;
+
+  Double_t beamEnergy=1000.;
+  Double_t beamBeta=0.8760237;
+
+
+
   ((R3BNeutronTracker*) tracker)->UseBeam(beamEnergy,beamBeta);
 
   fRun->AddTask(land);

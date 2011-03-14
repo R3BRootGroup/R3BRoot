@@ -30,6 +30,7 @@
 #include "R3BLandDigi.h"
 #include "R3BMCTrack.h"		
 #include "R3BNeutronTrack.h"
+#include "R3BLandFirstHits.h"
 
 using std::cout;
 using std::endl;
@@ -74,6 +75,7 @@ InitStatus R3BNeutronTracker::Init() {
   fLandPoints = (TClonesArray*) ioman->GetObject("LandPoint");
   fLandMCTrack = (TClonesArray*) ioman->GetObject("MCTrack");
   fLandDigi = (TClonesArray*) ioman->GetObject("LandDigi");
+  fLandFirstHits = (TClonesArray*) ioman->GetObject("LandFirstHits");
 
   // New structure created by the Neutron Tracker
   fNeutronTracks = new TClonesArray("R3BNeutronTrack");
@@ -81,12 +83,13 @@ InitStatus R3BNeutronTracker::Init() {
 
   npaddles = fLandDigiPar->GetMaxPaddle()+1;
   nplanes = fLandDigiPar->GetMaxPlane();
-  cout<<"# paddles: "<<npaddles<<"  # planes: "<<nplanes<<endl;
+  cout<<"# paddles: "<<npaddles-1<<"  # planes: "<<nplanes<<endl;
   amu = 931.494028; //atomic mass unit in MeV/c**2
-  mNeutron=1.0086649*amu;
+  mNeutron=1.0086649156*amu;
   c = 2.99792458E8;
-  cMedia = 20.;// speed of light in material in [cm/ns]
+  cMedia = 14.;// speed of light in material in [cm/ns]
   eventNo=0;
+  printing=0;
   
   PM_hit=new PM_HIT[npaddles];
   PRIM_part=new PRIM_PART[11];
@@ -94,38 +97,66 @@ InitStatus R3BNeutronTracker::Init() {
   NEUT1_hit=new NEUT1_HIT[100];
   NEUT2_hit=new NEUT2_HIT[100];
   Cluster=new CLUSTER[100];
-
-  hNeutmult1 = new TH1F("Neutmult1","Neutron multiplicity from beta beam considerations",20,-0.5,19.5);
-  hNeutmult1->GetXaxis()->SetTitle("Multiplicity");
-  hNeutmult1->GetYaxis()->SetTitle("Counts");
      
-  hNeutmult2 = new TH1F("Neutmult2","Neutron multiplicity from speed of light considerations",20,-0.5,19.5);
-  hNeutmult2->GetXaxis()->SetTitle("Multiplicity");
-  hNeutmult2->GetYaxis()->SetTitle("Counts");
+  hNeutmult = new TH1F("Neutmult","Neutron multiplicity from energy considerations",10,-0.5,9.5);
+  hNeutmult->GetXaxis()->SetTitle("Number of Neutrons");
+  hNeutmult->GetYaxis()->SetTitle("Counts");
 
-  hNeutmult3 = new TH1F("Neutmult3","Neutron multiplicity from cluster size considerations",20,-0.5,19.5);
-  hNeutmult3->GetXaxis()->SetTitle("Multiplicity");
-  hNeutmult3->GetYaxis()->SetTitle("Counts");
-
-  hNeutmult4 = new TH1F("Neutmult4","Neutron multiplicity from multiplicity considerations",20,-0.5,19.5);
-  hNeutmult4->GetXaxis()->SetTitle("Multiplicity");
-  hNeutmult4->GetYaxis()->SetTitle("Counts");
-
-  hNeutmult5 = new TH1F("Neutmult5","Neutron multiplicity from energy considerations",10,-0.5,9.5);
-  hNeutmult5->GetXaxis()->SetTitle("Number of Neutrons");
-  hNeutmult5->GetYaxis()->SetTitle("Counts");
-
-  hNeutmult6 = new TH1F("Neutmult6","Neutron multiplicity from multiplicity and energy considerations",20,-0.5,19.5);
-  hNeutmult6->GetXaxis()->SetTitle("Multiplicity");
-  hNeutmult6->GetYaxis()->SetTitle("Counts");
-
-  hMinv = new TH1F("Minv","Minv",1000,0.,10.);
-  hMinv->GetXaxis()->SetTitle("Erel (MeV)");
+  hMinv = new TH1F("Minv","Minv for reconstructed hits",10000,0.,10000.);
+  hMinv->GetXaxis()->SetTitle("Erel (keV)");
   hMinv->GetYaxis()->SetTitle("Counts");
 
-  hMinv0 = new TH1F("Minv0","Minv0",1000,0.,10.);
-  hMinv0->GetXaxis()->SetTitle("Erel (MeV)");
+  hMinv1 = new TH1F("Minv1","Minv for first hits",10000,0.,10000.);
+  hMinv1->GetXaxis()->SetTitle("Erel (keV)");
+  hMinv1->GetYaxis()->SetTitle("Counts");
+
+  hMinv2 = new TH1F("Minv2","Minv for selected hits",10000,0.,10000.);
+  hMinv2->GetXaxis()->SetTitle("Erel (keV)");
+  hMinv2->GetYaxis()->SetTitle("Counts");
+
+  hMinv0 = new TH1F("Minv0","Minv for ideal hits",10000,0.,10000.);
+  hMinv0->GetXaxis()->SetTitle("Erel (keV)");
   hMinv0->GetYaxis()->SetTitle("Counts");
+
+  hDeltaX = new TH1F("DeltaX","error in x determination",300,-150.,150.);
+  hDeltaX->GetXaxis()->SetTitle("x position (cm)");
+  hDeltaX->GetYaxis()->SetTitle("Counts");
+     
+  hDeltaY = new TH1F("DeltaY","error in y determination",300,-150.,150.);
+  hDeltaY->GetXaxis()->SetTitle("y position (cm)");
+  hDeltaY->GetYaxis()->SetTitle("Counts");
+     
+  hDeltaZ = new TH1F("DeltaZ","error in z determination",500,-250.,250.);
+  hDeltaZ->GetXaxis()->SetTitle("z position (cm)");
+  hDeltaZ->GetYaxis()->SetTitle("Counts");
+     
+  hDeltaT = new TH1F("DeltaT","error in time determination",2000,-10.,10.);
+  hDeltaT->GetXaxis()->SetTitle("time (ns)");
+  hDeltaT->GetYaxis()->SetTitle("Counts");
+
+  hDeltaP1 = new TH1F("DeltaP1","difference in reconstucted momenta for 1st neutron)",1000,-150.,150.);
+  hDeltaP1->GetXaxis()->SetTitle("Delta P (MeV/c)");
+  hDeltaP1->GetYaxis()->SetTitle("Counts");
+  
+  hDeltaP2 = new TH1F("DeltaP2","difference in reconstucted momenta for 2nd neutron)",1000,-150.,150.);
+  hDeltaP2->GetXaxis()->SetTitle("Delta P (MeV/c)");
+  hDeltaP2->GetYaxis()->SetTitle("Counts");
+  
+  hDeltaP3 = new TH1F("DeltaP3","difference in reconstucted momenta for 3rd neutron)",1000,-150.,150.);
+  hDeltaP3->GetXaxis()->SetTitle("Delta P (MeV/c)");
+  hDeltaP3->GetYaxis()->SetTitle("Counts");
+  
+  hDeltaP4 = new TH1F("DeltaP4","difference in reconstucted momenta for 4th neutron)",1000,-150.,150.);
+  hDeltaP4->GetXaxis()->SetTitle("Delta P (MeV/c)");
+  hDeltaP4->GetYaxis()->SetTitle("Counts");
+  
+  hDeltaP5 = new TH1F("DeltaP5","difference in reconstucted momenta for 5th neutron)",1000,-150.,150.);
+  hDeltaP5->GetXaxis()->SetTitle("Delta P (MeV/c)");
+  hDeltaP5->GetYaxis()->SetTitle("Counts");
+  
+  hDeltaP6 = new TH1F("DeltaP6","difference in reconstucted momenta for 6th neutron)",1000,-150.,150.);
+  hDeltaP6->GetXaxis()->SetTitle("Delta P (MeV/c)");
+  hDeltaP6->GetYaxis()->SetTitle("Counts");  
 
   hDeltaPx1 = new TH1F("DeltaPx1","difference in reconstucted momenta px (ideal case)",1000,-50.,50.);
   hDeltaPx1->GetXaxis()->SetTitle("Delta Px (MeV/c)");
@@ -135,7 +166,7 @@ InitStatus R3BNeutronTracker::Init() {
   hDeltaPy1->GetXaxis()->SetTitle("Delta Py (MeV/c)");
   hDeltaPy1->GetYaxis()->SetTitle("Counts");
 
-  hDeltaPz1 = new TH1F("DeltaPz1","difference in reconstucted momenta pz (ideal case)",1000,-150.,50.);
+  hDeltaPz1 = new TH1F("DeltaPz1","difference in reconstucted momenta pz (ideal case)",1000,-150.,150.);
   hDeltaPz1->GetXaxis()->SetTitle("Delta Pz (MeV/c)");
   hDeltaPz1->GetYaxis()->SetTitle("Counts");
 
@@ -147,7 +178,7 @@ InitStatus R3BNeutronTracker::Init() {
   hDeltaPy2->GetXaxis()->SetTitle("Delta Py (MeV/c)");
   hDeltaPy2->GetYaxis()->SetTitle("Counts");
  
-  hDeltaPz2 = new TH1F("DeltaPz2","difference in reconstucted momenta pz (exp case)",1000,-150.,50.);
+  hDeltaPz2 = new TH1F("DeltaPz2","difference in reconstucted momenta pz (exp case)",1000,-150.,150.);
   hDeltaPz2->GetXaxis()->SetTitle("Delta Pz (MeV/c)");
   hDeltaPz2->GetYaxis()->SetTitle("Counts");
 
@@ -159,17 +190,29 @@ InitStatus R3BNeutronTracker::Init() {
   hClusterEnergy->GetXaxis()->SetTitle("Energy (MeV)");
   hClusterEnergy->GetYaxis()->SetTitle("Counts");
 
-  hClusters = new TH1F("Cluster","Number of clusters in one event",20,0.,20);
+  hHits = new TH1F("Hits","Number of hits in one event",500,0.,500);
+  hHits->GetXaxis()->SetTitle("number of hits");
+  hHits->GetYaxis()->SetTitle("Counts");
+
+  hClusters = new TH1F("Cluster","Number of clusters in one event",100,0.,100);
   hClusters->GetXaxis()->SetTitle("number of clusters");
   hClusters->GetYaxis()->SetTitle("Counts");
 
-  hHits = new TH1F("Hits","Number of hits in one event",50,0.,50);
-  hHits->GetXaxis()->SetTitle("number of hits");
-  hHits->GetYaxis()->SetTitle("Counts");
+  hClusters1 = new TH1F("Cluster1","Number of clusters after eliminating elastic scattering",100,-0.5,99.5);
+  hClusters1->GetXaxis()->SetTitle("number of clusters");
+  hClusters1->GetYaxis()->SetTitle("Counts");
+
+  hClusters2 = new TH1F("Cluster2","Number of clusters after deleting low energy and late events",100,-0.5,99.5);
+  hClusters2->GetXaxis()->SetTitle("number of clusters");
+  hClusters2->GetYaxis()->SetTitle("Counts");
 
   hClusterNo_vs_Size = new TH2F("hClusterNo_vs_Size","Cluster length vs. Size",100,0.,100,100,0.,100);
   hClusterNo_vs_Size->GetXaxis()->SetTitle("Total cluster length");
   hClusterNo_vs_Size->GetYaxis()->SetTitle("No of clusters");
+
+  hDelta = new TH1F("Delta","distance between two primary interactions",300,-150.,150.);
+  hDelta->GetXaxis()->SetTitle("distance (cm)");
+  hDelta->GetYaxis()->SetTitle("Counts");
 
   return kSUCCESS;
 
@@ -185,10 +228,10 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
 //-Reset local arrays 
    Reset();
    eventNo+=1;
-   cout<<"Neutron #: "<<eventNo-1<<endl;
+   if(eventNo/1000. == (int)eventNo/1000.) cout<<"Neutron #: "<<eventNo-1<<endl;
 
-//   cout<<"beam energy: "<<beamEnergy<<" AMeV"<<endl;
-//   cout<<"beam velocity: "<<beamBeta<<endl;
+   cout<<"beam energy: "<<beamEnergy<<" AMeV"<<endl;
+   cout<<"beam velocity: "<<beamBeta<<endl;
    Int_t nentries = fLandDigi->GetEntries();
    Double_t temp[npaddles][14];
    Int_t nPrim=0;
@@ -218,7 +261,7 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
 
       if(particleID==2112){
          //neutron
-         PRIM_part[nPrim].M = aTrack1->GetMass();
+         PRIM_part[nPrim].M = aTrack1->GetMass()*1000.;
 	 PRIM_part[nPrim].A=1.0086649;
 	 PRIM_part[nPrim].M=PRIM_part[nPrim].A*amu;
          PRIM_part[nPrim].pdg = aTrack1->GetPdgCode();
@@ -234,7 +277,7 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
       }
       else if(particleID==2212){
          //proton
-         PRIM_part[nPrim].M = aTrack1->GetMass();
+         PRIM_part[nPrim].M = aTrack1->GetMass()*1000.;
 	 PRIM_part[nPrim].A=1.0072765;
 	 PRIM_part[nPrim].M=PRIM_part[nPrim].A*amu;
          PRIM_part[nPrim].pdg = aTrack1->GetPdgCode();
@@ -250,9 +293,11 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
       }
       else{
 	 //fragment
-         PRIM_frag[0].M = aTrack1->GetMass();
+         PRIM_frag[0].M = aTrack1->GetMass()*1000.;
+//	 cout<<"prim M "<<PRIM_frag[0].M<<endl;
          PRIM_frag[0].A=131.;
-         PRIM_frag[0].M=PRIM_frag[0].A*amu;
+         PRIM_frag[0].M=PRIM_frag[0].A*amu; 
+//	 cout<<"prim M "<<PRIM_frag[0].M<<endl;
          PRIM_frag[0].pdg = aTrack1->GetPdgCode();
          PRIM_frag[0].px = aTrack1->GetPx()*1000.;  
          PRIM_frag[0].py = aTrack1->GetPy()*1000.;  
@@ -287,16 +332,66 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
       temp[l][6] = land_obj->GetQdc();  
       temp[l][7] = land_obj->GetXX();  
       temp[l][8] = land_obj->GetYY();  
-      temp[l][9] = land_obj->GetZZ();  
-      temp[l][10] = land_obj->GetX0();  
-      temp[l][11] = land_obj->GetY0();  
-      temp[l][12] = land_obj->GetZ0();  
-      temp[l][13] = land_obj->GetT0();  
+      temp[l][9] = land_obj->GetZZ(); 
+      
+       
 
       sumTotalEnergy += temp[l][6];
       
    }//loop over entries
 
+   // Get first hits for comparison later
+   Double_t firstHitX[6],firstHitY[6],firstHitZ[6],firstT[6];
+
+//   Int_t nentr = fLandFirstHits->GetEntries();
+
+//   cout<<"entries: "<<nentr<<endl;
+   R3BLandFirstHits *land_obj1 = (R3BLandFirstHits*) fLandFirstHits->At(0);
+   
+   firstHitX[0] = land_obj1->GetX0();  
+   firstHitY[0] = land_obj1->GetY0();  
+   firstHitZ[0] = land_obj1->GetZ0();  
+   firstT[0] = 1.E9*land_obj1->GetT0();  
+   firstHitX[1] = land_obj1->GetX1();  
+   firstHitY[1] = land_obj1->GetY1();  
+   firstHitZ[1] = land_obj1->GetZ1();  
+   firstT[1] = 1.E9*land_obj1->GetT1();  
+   firstHitX[2] = land_obj1->GetX2();  
+   firstHitY[2] = land_obj1->GetY2();  
+   firstHitZ[2] = land_obj1->GetZ2();  
+   firstT[2] = 1.E9*land_obj1->GetT2();  
+   firstHitX[3] = land_obj1->GetX3();  
+   firstHitY[3] = land_obj1->GetY3();  
+   firstHitZ[3] = land_obj1->GetZ3();  
+   firstT[3] = 1.E9*land_obj1->GetT3();  
+
+   if(nPrim>4){
+      firstHitX[4] = land_obj1->GetX4();  
+      firstHitY[4] = land_obj1->GetY4();  
+      firstHitZ[4] = land_obj1->GetZ4();  
+      firstT[4] = 1.E9*land_obj1->GetT4();  
+      firstHitX[5] = land_obj1->GetX5();  
+      firstHitY[5] = land_obj1->GetY5();  
+      firstHitZ[5] = land_obj1->GetZ5();  
+      firstT[5] = 1.E9*land_obj1->GetT5();  
+   }
+   
+   for (Int_t l=0;l<nPrim;l++){   
+      for (Int_t k=l+1;k<nPrim;k++){
+         Double_t dist=sqrt((firstHitX[l]-firstHitX[k])*(firstHitX[l]-firstHitX[k])+
+	                    (firstHitY[l]-firstHitY[k])*(firstHitY[l]-firstHitY[k])+
+	                    (firstHitZ[l]-firstHitZ[k])*(firstHitZ[l]-firstHitZ[k]));
+         hDelta->Fill(dist);
+      }
+   }
+   
+   if(printing){
+      for (Int_t l=0;l<6;l++){   
+         cout<<"First Hits: "<< firstHitX[l]<<"  "<<firstHitY[l]<<"  "
+                              <<firstHitZ[l]<<"  "<< firstT[l]<<endl;
+      }			 
+   }
+  
    //cout<<"sort hits"<<endl;
    // sort hits for time
    for (Int_t i=0;i<nentries;i++){
@@ -319,152 +414,130 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
       PM_hit[i].x = temp[index][7];  
       PM_hit[i].y = temp[index][8];  
       PM_hit[i].z = temp[index][9];  
-      PM_hit[i].x0 = temp[index][10];  
-      PM_hit[i].y0 = temp[index][11];  
-      PM_hit[i].z0 = temp[index][12];  
-      PM_hit[i].t0 = temp[index][13];  
       temp[index][3] = 100000.;
 
-/*
-      cout<<"hit # "<<i<<endl;
-      cout<<"paddle # "<<PM_hit[i].paddle<<endl;
-      cout<<"tdc "<<PM_hit[i].tdcL<<"  "<<PM_hit[i].tdcR<<"  "<<PM_hit[i].tdc<<endl;
-      cout<<"qdc "<<PM_hit[i].qdcL<<"  "<<PM_hit[i].qdcR<<"  "<<PM_hit[i].qdc<<endl;
-      cout<<"pos "<<PM_hit[i].x<<"  "<<PM_hit[i].y<<"  "<<PM_hit[i].z<<endl;
-*/           
+      if(printing){
+         cout<<"hit # "<<i<<endl;
+         cout<<"paddle # "<<PM_hit[i].paddle<<endl;
+         cout<<"tdc "<<PM_hit[i].tdcL<<"  "<<PM_hit[i].tdcR<<"  "<<PM_hit[i].tdc<<endl;
+         cout<<"qdc "<<PM_hit[i].qdcL<<"  "<<PM_hit[i].qdcR<<"  "<<PM_hit[i].qdc<<endl;
+         cout<<"pos "<<PM_hit[i].x<<"  "<<PM_hit[i].y<<"  "<<PM_hit[i].z<<endl;
+      }           
    }	  
 
    // find clusters and mark the position of the cluster by 
    // time of first hit, position of first hit, and total energy 
-   Double_t dio=10.61; //2 times the diogonal of one paddle
-   Double_t distance, posx, posy, posz, post, delt,delz;
+   Double_t dio=10.6; //3 times half the diogonal of a paddle
+   Double_t distance, posx, posy, posz, post, delt, delx, dely, delz;
    Int_t hits=0;
    Int_t Nclusters=0;
 //   cout<<"nentries: "<<nentries<<endl;
    hHits->Fill(nentries);
    if (nentries>0) {
 
-      Nclusters=1;
-      Cluster[0].xStart = PM_hit[0].x;
-      Cluster[0].yStart = PM_hit[0].y;
-      Cluster[0].zStart = PM_hit[0].z;
-      Cluster[0].tStart = PM_hit[0].tdc;
-      Cluster[0].e = PM_hit[0].qdc;
-      Cluster[0].size = 1;
-      Cluster[0].tStop = PM_hit[0].tdc;
-      Cluster[0].xEnd = PM_hit[0].x;
-      Cluster[0].yEnd = PM_hit[0].y;
-      Cluster[0].zEnd = PM_hit[0].z;
-
-      for (Int_t l=1;l<nentries;l++){
-         temp[l-1][0] = PM_hit[l].x;
-         temp[l-1][1] = PM_hit[l].y;  
-         temp[l-1][2] = PM_hit[l].z;       
-         temp[l-1][3] = PM_hit[l].tdc;       
-         temp[l-1][4] = PM_hit[l].qdc;
-         temp[l-1][5] = PM_hit[l].paddle;
+      for (Int_t l=0;l<nentries;l++){
+         temp[l][0] = PM_hit[l].x;
+         temp[l][1] = PM_hit[l].y;  
+         temp[l][2] = PM_hit[l].z;       
+         temp[l][3] = PM_hit[l].tdc;       
+         temp[l][4] = PM_hit[l].qdc;
+         temp[l][5] = PM_hit[l].paddle;
+         temp[l][6] = 0;     // belongs to cluster #
       }
-   
-      posx = PM_hit[0].x;
-      posy = PM_hit[0].y;
-      posz = PM_hit[0].z;
+           
+      Int_t oldPaddle = 0;
       
-      post= PM_hit[0].tdc;
-      hits=nentries-1;
-//      cout<<"reference pos "<<posx<<"  "<<posy<<"  "<<posz<<endl;
-//      cout<<"reference paddle "<< PM_hit[0].paddle<<endl;	 
-
-      for (Int_t l=0;l<nentries-1;l++){
-         Double_t min=1000.;
-	 Double_t mindt=0.;
-	 Double_t maxz=-10.;
-         Int_t index = 0;
+      for (Int_t l=0;l<nentries;l++){
+         posx = temp[l][0];
+         posy = temp[l][1];
+         posz = temp[l][2];
+         post = temp[l][3];        
+	 oldPaddle = (int)temp[l][5];
 	 Int_t neighbor=0;
-         // find next neighbor with smallest time difference
-	 Int_t i=0;
-         while (i<hits){
-            distance = sqrt((temp[i][0]-posx)*(temp[i][0]-posx)+
-    	                   (temp[i][1]-posy)*(temp[i][1]-posy)+
-     		           (temp[i][2]-posz)*(temp[i][2]-posz));
-	    delt = temp[i][3] - post;
-	    delz = temp[i][2] - posz;
-/*
-            cout<<"current pos "<<temp[i][0]<<"  "<<temp[i][1]<<"  "<<temp[i][2]<<endl;
-            cout<<"current paddle "<< temp[i][5]<<endl;	 
-            cout<<"distance x "<<temp[i][0]-posx<<endl;
-            cout<<"distance y "<<temp[i][1]-posy<<endl;
-            cout<<"distance z "<<temp[i][2]-posz<<endl;
-*/	    
+
+         if(printing){
+            cout<<"reference pos "<<posx<<"  "<<posy<<"  "<<posz<<endl;
+            cout<<"reference paddle "<< temp[l][5]<<endl;	 
+         }
+	 
+         // find neighbor
+         for (Int_t k=l;k<nentries;k++){
+	    delt = temp[k][3] - post;
+	    delx = temp[k][0] - posx;
+	    dely = temp[k][1] - posy;
+	    delz = temp[k][2] - posz;
             
-	    // sometimes two hits are close together but one is earlier although it is slightly further away.
-	    // in this case one has to take the earlier one:
-            if(distance < dio && delt>0.0 && delt<1.){
-               if (delz>maxz){
-	          maxz=delz;
-	          neighbor +=1;
-                  min = distance;
-	          mindt = delt;
-//                  index = i;
+            
+            if(TMath::Abs(delx) < 7.5 && TMath::Abs(dely) < 7.5 &&
+	    TMath::Abs(delz) < 7.5 && delt>=0.0 && delt<1.0){
+               // This is a neighbor
+
+	       // check if this cluster already exists
+	       if(temp[l][6]>0){
+	          if(l!=k){
+  	             // inside cluster
+		     Int_t clusNo=(int)temp[l][6];
+
+                     if(printing){
+                        cout<<"Neighbor paddle "<< temp[k][5]<<endl;	 
+                        cout<<"distance x "<<delx<<endl;
+                        cout<<"distance y "<<dely<<endl;
+                        cout<<"distance z "<<delz<<endl;
+                        cout<<"delta t "<<delt<<endl;	       
+                        cout<<"adding energy "<<temp[k][4]<<endl;
+                
+		        cout<<"Existing cluster  "<< clusNo <<endl;	 
+                     }
+		     
+		     temp[k][6]=Nclusters;
+                     Cluster[clusNo-1].e = Cluster[clusNo-1].e + temp[k][4];
+                     Cluster[clusNo-1].size = Cluster[clusNo-1].size + 1;
+		     if(temp[k][3]>Cluster[clusNo-1].tStop){
+                        Cluster[clusNo-1].tStop = temp[k][3];
+                        Cluster[clusNo-1].xEnd = temp[k][0];
+                        Cluster[clusNo-1].yEnd = temp[k][1];
+                        Cluster[clusNo-1].zEnd = temp[k][2];
+                     }
+		  }
+	       }	      
+	       else{
+                  // new cluster
+                  Nclusters+=1; 
+		      
+//		  cout<<"New cluster  "<< Nclusters <<endl;	 
+                  
+		  Cluster[Nclusters-1].xStart = temp[k][0];
+                  Cluster[Nclusters-1].yStart = temp[k][1];
+                  Cluster[Nclusters-1].zStart = temp[k][2];
+                  Cluster[Nclusters-1].tStart = temp[k][3];
+                  Cluster[Nclusters-1].e = temp[k][4];
+                  Cluster[Nclusters-1].size = 1;
+                  Cluster[Nclusters-1].xEnd = temp[k][0];
+                  Cluster[Nclusters-1].yEnd = temp[k][1];
+                  Cluster[Nclusters-1].zEnd = temp[k][2];
+                  Cluster[Nclusters-1].tStop = temp[k][3];
+		  temp[k][6]=Nclusters;	       
 	       }
             }
-	    i+=1;
          }
-	 if (neighbor>0) {  
-	    // inside cluster
-            Cluster[Nclusters-1].e = Cluster[Nclusters-1].e + temp[index][4];
-            Cluster[Nclusters-1].size = Cluster[Nclusters-1].size + 1;
-            Cluster[Nclusters-1].tStop = temp[index][3];
-            Cluster[Nclusters-1].xEnd = temp[index][0];
-            Cluster[Nclusters-1].yEnd = temp[index][1];
-            Cluster[Nclusters-1].zEnd = temp[index][2];
-         }
-         else {
-            // new cluster
-            Nclusters+=1;     
-            Cluster[Nclusters-1].xStart = temp[index][0];
-            Cluster[Nclusters-1].yStart = temp[index][1];
-            Cluster[Nclusters-1].zStart = temp[index][2];
-            Cluster[Nclusters-1].tStart = temp[index][3];
-            Cluster[Nclusters-1].e = temp[index][4];
-            Cluster[Nclusters-1].size = 1;
-            Cluster[Nclusters-1].tStop = temp[index][3];
-            Cluster[Nclusters-1].xEnd = temp[index][0];
-            Cluster[Nclusters-1].yEnd = temp[index][1];
-            Cluster[Nclusters-1].zEnd = temp[index][2];
-	 }
-         posx = temp[index][0];
-         posy = temp[index][1];
-         posz = temp[index][2];
-         post = temp[index][3];
 
-         hits=hits-1;
-//         cout<<"reference pos "<<posx<<"  "<<posy<<"  "<<posz<<endl;
-//         cout<<"reference paddle "<< temp[index][5]<<endl;	 
-
-         for (i=index;i<hits;i++){
-            temp[i][0] = temp[i+1][0];
-            temp[i][1] = temp[i+1][1];
-            temp[i][2] = temp[i+1][2];
-            temp[i][3] = temp[i+1][3];
-            temp[i][4] = temp[i+1][4];
-         }
 
       }
 
-//      cout<< "number of clusters: " << Nclusters  <<  endl;
+      cout<< "number of clusters: " << Nclusters  <<  endl;
       hClusters->Fill(Nclusters);
       Double_t MaxSize=0;
       Double_t MaxEnergy=0;
 
       for (Int_t i=0;i<Nclusters;i++){
-/*         
-         cout<< "cluster start: " << Cluster[i].xStart<<"  "<<Cluster[i].yStart<<"  "<<Cluster[i].zStart << endl;
-         cout<< "cluster end  : " << Cluster[i].xEnd<<"  "<<Cluster[i].yEnd<<"  "<<Cluster[i].zEnd << endl;
-         cout<< "cluster energy: " << Cluster[i].e << endl;
-         cout<< "cluster time start: " << Cluster[i].tStart << endl;
-         cout<< "cluster time stop: " << Cluster[i].tStop << endl;
-         cout<< "cluster size: " << Cluster[i].size << endl;
-*/
+         if(printing){         
+            cout<< "cluster start: " << Cluster[i].xStart<<"  "<<Cluster[i].yStart<<"  "<<Cluster[i].zStart << endl;
+            cout<< "cluster end  : " << Cluster[i].xEnd<<"  "<<Cluster[i].yEnd<<"  "<<Cluster[i].zEnd << endl;
+            cout<< "cluster energy: " << Cluster[i].e << endl;
+            cout<< "cluster time start: " << Cluster[i].tStart << endl;
+            cout<< "cluster time stop: " << Cluster[i].tStop << endl;
+            cout<< "cluster size: " << Cluster[i].size << endl;
+         }
          if(Cluster[i].size>MaxSize) MaxSize=Cluster[i].size;
          if(Cluster[i].e>MaxEnergy) MaxEnergy=Cluster[i].e;
 //         hClusterSize->Fill(Cluster[i].size);	
@@ -808,7 +881,7 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
 	    if(p3bmax>p3min && p3bmin<p3max && theta4max>theta4Measuredmin && theta4min<theta4Measuredmax &&
 	       K4bmax>protonEnergy && K4bmin<protonEnergy && theta56*180./3.14>120.){
 
-//               cout<<"!!!! elastic scattering !!!!"<<endl;
+//               cout<<"Elastic scattering between "<<i<<" and "<<j<<endl;
 	       //remember which hit was elastic scattering
 	       elastic[elasticCount]=j;
 	       origin[elasticCount]=i;
@@ -859,7 +932,7 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
 	 Nclusters=Nclusters-1;
          //Cluster size of elastic scattering event is added to the original one
 //         cout<<"adding "<<Cluster[origin[i]].size<<" and "<<Cluster[elastic[i]].size<<endl;
-	 Cluster[origin[i]].size += Cluster[elastic[i]].size;
+//	 Cluster[origin[i]].size += Cluster[elastic[i]].size;
 	 
          for (Int_t k=elastic[i];k<Nclusters;k++){         
 	    // delete Cluster 	    
@@ -878,117 +951,42 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
 	 
       }
 //      cout<< "number of clusters: " << Nclusters  <<  endl;
+      hClusters1->Fill(Nclusters);
 
       // determine how many neutrons from sum energy considerations
 
-      Double_t neutmult4=0.116*nentries/beamEnergy*400.;
-//      cout<< "neutmult from multiplicity: " << neutmult4  <<  endl;
-      hNeutmult4->Fill(neutmult4);
+      Double_t neutmult=0.01*sumTotalEnergy/beamEnergy*600.;
+//      Double_t neutmult=0.0112*sumTotalEnergy/beamEnergy*600.;  //200 MeV
 
-      Double_t neutmult5=0.009756*sumTotalEnergy/beamEnergy*600.;
-//      cout<< "neutmult from energy: " << neutmult5  <<  endl;
-      if(neutmult5<0.5) neutmult5=0.5;
-      hNeutmult5->Fill(neutmult5);
-      Int_t numneut=(int)(neutmult5+0.5);
+//      cout<< "neutmult from energy: " << neutmult  <<  endl;
+      if(neutmult<0.5) neutmult=0.5;
+      hNeutmult->Fill(neutmult);
+      Int_t numneut=(int)(neutmult+0.5);
 
-      hNeutmult6->Fill((neutmult4+neutmult5)/2.);
 
       for (Int_t i=0;i<Nclusters;i++){
-/*
-         cout<< "Vor sortieren !!!!!!"<<endl;
-         cout<< "cluster start: " << Cluster[i].xStart<<"  "<<Cluster[i].yStart<<"  "<<Cluster[i].zStart << endl;
-         cout<< "cluster end  : " << Cluster[i].xEnd<<"  "<<Cluster[i].yEnd<<"  "<<Cluster[i].zEnd << endl;
-         cout<< "cluster energy: " << Cluster[i].e << endl;
-         cout<< "cluster time start: " << Cluster[i].tStart << endl;
-         cout<< "cluster time stop: " << Cluster[i].tStop << endl;
-         cout<< "cluster size: " << Cluster[i].size << endl;
-*/
+         if(printing){
+            cout<< "Vor sortieren !!!!!!"<<endl;
+            cout<< "cluster start: " << Cluster[i].xStart<<"  "<<Cluster[i].yStart<<"  "<<Cluster[i].zStart << endl;
+            cout<< "cluster end  : " << Cluster[i].xEnd<<"  "<<Cluster[i].yEnd<<"  "<<Cluster[i].zEnd << endl;
+            cout<< "cluster energy: " << Cluster[i].e << endl;
+            cout<< "cluster time start: " << Cluster[i].tStart << endl;
+            cout<< "cluster time stop: " << Cluster[i].tStop << endl;
+            cout<< "cluster size: " << Cluster[i].size << endl;
+         }
          Double_t dt=Cluster[i].tStart;
          Double_t dr=sqrt(Cluster[i].xStart*Cluster[i].xStart + Cluster[i].yStart*Cluster[i].yStart +
 	 Cluster[i].zStart*Cluster[i].zStart);
          Double_t betaCluster=dr/dt*1.E7/c;
-//	 cout<<"cluster beta: "<<betaCluster<<endl;
+         if(printing){       
+	    cout<<"cluster beta: "<<betaCluster<<endl;
+	 }
       }
+      Double_t dt,dr;
 
       // From the sum energy we know best how many neutrons there are. 
       // Now we have to find the correct position and time for them
       // we sort according to closest beta compared to beam
-      for (Int_t k=0;k<Nclusters;k++){ 
-         temp[k][0] = Cluster[k].xStart;
-         temp[k][1] = Cluster[k].yStart;
-         temp[k][2] = Cluster[k].zStart;
-         temp[k][3] = Cluster[k].tStart;
-         temp[k][4] = Cluster[k].e;
-         temp[k][5] = Cluster[k].size;
-         temp[k][6] = Cluster[k].tStop;
-         temp[k][7] = Cluster[k].xEnd;
-         temp[k][8] = Cluster[k].yEnd;
-         temp[k][9] = Cluster[k].zEnd;
-      }
-
-      for (Int_t i=0;i<Nclusters;i++){ 
-         Double_t maxEnergy=0;
-         Double_t betaMin=1.;
-	 Int_t index=0;
-         for (Int_t k=0;k<Nclusters;k++){ 
-
-            Double_t dt=temp[k][3];
-            Double_t dr=sqrt(temp[k][0]*temp[k][0] + temp[k][1]*temp[k][1] +
-	                     temp[k][2]*temp[k][2]);
-            Double_t betaCluster=dr/dt*1.E7/c;
-	    Double_t deltaBeta = TMath:: Abs(betaCluster-beamBeta);
-            if(deltaBeta<betaMin){
-	       betaMin=deltaBeta;
-	       index=k;
-	    }
-/*
-            if(temp[k][4]>maxEnergy){
-	       maxEnergy=temp[k][4];
-	       index=k;
-	    }
-*/	    
-         }
-         Cluster[i].xStart = temp[index][0];
-         Cluster[i].yStart = temp[index][1];
-         Cluster[i].zStart = temp[index][2];
-         Cluster[i].tStart = temp[index][3];
-         Cluster[i].e = temp[index][4];
-         Cluster[i].size = temp[index][5];
-         Cluster[i].tStop = temp[index][6];
-         Cluster[i].xEnd = temp[index][7];
-         Cluster[i].yEnd = temp[index][8];
-         Cluster[i].zEnd = temp[index][9];
-         temp[index][3] = 10000.;
-         temp[index][4] = 10000.;
-
-      }
-      for (Int_t i=0;i<Nclusters;i++){
-/*
-         cout<< "Nach sortieren !!!!!!"<<endl;
-         cout<< "cluster start: " << Cluster[i].xStart<<"  "<<Cluster[i].yStart<<"  "<<Cluster[i].zStart << endl;
-         cout<< "cluster end  : " << Cluster[i].xEnd<<"  "<<Cluster[i].yEnd<<"  "<<Cluster[i].zEnd << endl;
-         cout<< "cluster energy: " << Cluster[i].e << endl;
-         cout<< "cluster time start: " << Cluster[i].tStart << endl;
-         cout<< "cluster time stop: " << Cluster[i].tStop << endl;
-         cout<< "cluster size: " << Cluster[i].size << endl;
-*/
-         Double_t dt=Cluster[i].tStart;
-         Double_t dr=sqrt(Cluster[i].xStart*Cluster[i].xStart + Cluster[i].yStart*Cluster[i].yStart +
-	 Cluster[i].zStart*Cluster[i].zStart);
-         Double_t betaCluster=dr/dt*1.E7/c;
-//	 cout<<"cluster beta: "<<betaCluster<<endl;
-      }
-
-
-      for (Int_t i=0;i<numneut;i++){
-         NEUT1_hit[i].x = Cluster[i].xStart;
-         NEUT1_hit[i].y = Cluster[i].yStart;
-         NEUT1_hit[i].z = Cluster[i].zStart;
-         NEUT1_hit[i].t = Cluster[i].tStart;
-      }	 
-
-
-
 
       Int_t deleteMe[100];
       
@@ -997,22 +995,25 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
       }
       for (Int_t k=0;k<Nclusters;k++){ 
          // check if the time is reonable by beta calculations 
-         Double_t dt=Cluster[k].tStart;
-         Double_t dr=sqrt(Cluster[k].xStart*Cluster[k].xStart + Cluster[k].yStart*Cluster[k].yStart +
+         dt=Cluster[k].tStart;
+         dr=sqrt(Cluster[k].xStart*Cluster[k].xStart + Cluster[k].yStart*Cluster[k].yStart +
 	 Cluster[k].zStart*Cluster[k].zStart);
-         Double_t betaCluster=dr/dt*1.E7/c;
+
+//         Double_t betaCluster=dr/dt*1.E7/c;
+         Double_t betaCluster=Cluster[k].zStart/dt*1.E7/c;
+
 //	 cout<<"betaCluster: "<<betaCluster<<endl;
-         if( TMath:: Abs(betaCluster-beamBeta)/beamBeta>0.01){
-            // delete this cluster because it is not inside beta window
-	      deleteMe[k]=1;
-//	      cout<<"delete cluster"<<endl;
+         if((TMath:: Abs(betaCluster-beamBeta)>0.05*600./beamEnergy)){
+	    deleteMe[k]=1;	 
 	 }
+	 if(Cluster[k].e<2.5 && k>0){
+         // delete this cluster because it is not inside beta window
+	 // But not first hit
+	   deleteMe[k]=1;
+//	   cout<<"delete cluster"<<endl;
+         }	 
       }
 
-      Double_t totalLength=0.;
-      for (Int_t i=0;i<Nclusters;i++){         
-         totalLength += Cluster[i].size;
-      }
       for (Int_t i=Nclusters;i>0;i--){         
          if (deleteMe[i]){
 	    Nclusters -=1;
@@ -1031,28 +1032,238 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
             }
 	 }
       }
-      Int_t neutmult3=Nclusters;
-//      cout<< "neutmult from number of cluster: " << neutmult3  <<  endl;
-      hNeutmult3->Fill(neutmult3);
-    
       for (Int_t i=0;i<Nclusters;i++){
-/*         
-         cout<< "cluster start: " << Cluster[i].xStart<<"  "<<Cluster[i].yStart<<"  "<<Cluster[i].zStart << endl;
-         cout<< "cluster end  : " << Cluster[i].xEnd<<"  "<<Cluster[i].yEnd<<"  "<<Cluster[i].zEnd << endl;
-         cout<< "cluster energy: " << Cluster[i].e << endl;
-         cout<< "cluster time start: " << Cluster[i].tStart << endl;
-         cout<< "cluster time stop: " << Cluster[i].tStop << endl;
-         cout<< "cluster size: " << Cluster[i].size << endl;
-*/
-         Double_t dt=Cluster[i].tStart;
-         Double_t dr=sqrt(Cluster[i].xStart*Cluster[i].xStart + Cluster[i].yStart*Cluster[i].yStart +
+         if(printing){
+            cout<< "Nach löschen !!!!!!"<<endl;
+            cout<< "cluster start: " << Cluster[i].xStart<<"  "<<Cluster[i].yStart<<"  "<<Cluster[i].zStart << endl;
+            cout<< "cluster end  : " << Cluster[i].xEnd<<"  "<<Cluster[i].yEnd<<"  "<<Cluster[i].zEnd << endl;
+            cout<< "cluster energy: " << Cluster[i].e << endl;
+            cout<< "cluster time start: " << Cluster[i].tStart << endl;
+            cout<< "cluster time stop: " << Cluster[i].tStop << endl;
+            cout<< "cluster size: " << Cluster[i].size << endl;
+	    
+         }
+         dt=Cluster[i].tStart;
+         dr=sqrt(Cluster[i].xStart*Cluster[i].xStart + Cluster[i].yStart*Cluster[i].yStart +
 	 Cluster[i].zStart*Cluster[i].zStart);
          Double_t betaCluster=dr/dt*1.E7/c;
-//	 cout<<"cluster beta: "<<betaCluster<<endl;
+         if(printing){
+   	    cout<<"cluster beta: "<<betaCluster<<endl;
+	 }
       }
-    
-      hClusterNo_vs_Size->Fill(nentries,totalLength);      
 
+      // From the sum energy we know best how many neutrons there are. 
+      // Now we have to find the correct position and time for them
+/*
+      // we sort first according to cluster energy
+      for (Int_t k=1;k<Nclusters;k++){ 
+         temp[k][0] = Cluster[k].xStart;
+         temp[k][1] = Cluster[k].yStart;
+         temp[k][2] = Cluster[k].zStart;
+         temp[k][3] = Cluster[k].tStart;
+         temp[k][4] = Cluster[k].e;
+         temp[k][5] = Cluster[k].size;
+         temp[k][6] = Cluster[k].tStop;
+         temp[k][7] = Cluster[k].xEnd;
+         temp[k][8] = Cluster[k].yEnd;
+         temp[k][9] = Cluster[k].zEnd;
+      }
+      // First cluster always stays first cluster
+      for (Int_t i=1;i<Nclusters;i++){ 
+         Double_t maxEnergy=0;
+	 Int_t index=1;
+         for (Int_t k=1;k<Nclusters;k++){ 
+            if(temp[k][4]>maxEnergy){
+	       maxEnergy=temp[k][4];
+	       index=k;
+	    }
+         }
+         Cluster[i].xStart = temp[index][0];
+         Cluster[i].yStart = temp[index][1];
+         Cluster[i].zStart = temp[index][2];
+         Cluster[i].tStart = temp[index][3];
+         Cluster[i].e = temp[index][4];
+         Cluster[i].size = temp[index][5];
+         Cluster[i].tStop = temp[index][6];
+         Cluster[i].xEnd = temp[index][7];
+         Cluster[i].yEnd = temp[index][8];
+         Cluster[i].zEnd = temp[index][9];
+         temp[index][4] = 0.;
+
+      }
+*/      
+      // now we sort according to closest beta compared to beam
+      for (Int_t k=1;k<Nclusters;k++){ 
+         temp[k][0] = Cluster[k].xStart;
+         temp[k][1] = Cluster[k].yStart;
+         temp[k][2] = Cluster[k].zStart;
+         temp[k][3] = Cluster[k].tStart;
+         temp[k][4] = Cluster[k].e;
+         temp[k][5] = Cluster[k].size;
+         temp[k][6] = Cluster[k].tStop;
+         temp[k][7] = Cluster[k].xEnd;
+         temp[k][8] = Cluster[k].yEnd;
+         temp[k][9] = Cluster[k].zEnd;
+      }
+      // First cluster always stays first cluster
+      if(printing){
+         cout<<"beam Beta: "<<beamBeta<<endl;
+      }
+
+      for (Int_t i=1;i<Nclusters;i++){ 
+         Double_t betaMax=0.;
+         Double_t betaMin=10.;
+	 Int_t index=1;
+         for (Int_t k=1;k<Nclusters;k++){ 
+
+            dt=temp[k][3];
+            dr=sqrt(temp[k][0]*temp[k][0] + temp[k][1]*temp[k][1] +
+	            temp[k][2]*temp[k][2]);
+
+            Double_t betaCluster=temp[k][2]/dt*1.E7/c;
+//            Double_t betaCluster=dr/dt*1.E7/c;
+//	    Double_t deltaBeta = TMath:: Abs(betaCluster-beamBeta);
+	    Double_t deltaBeta = 1./temp[k][4] * TMath:: Abs(betaCluster-beamBeta);
+
+            if(deltaBeta<betaMin){
+	       betaMin=deltaBeta;
+	       index=k;
+	    }
+         }
+         Cluster[i].xStart = temp[index][0];
+         Cluster[i].yStart = temp[index][1];
+         Cluster[i].zStart = temp[index][2];
+         Cluster[i].tStart = temp[index][3];
+         Cluster[i].e = temp[index][4];
+         Cluster[i].size = temp[index][5];
+         Cluster[i].tStop = temp[index][6];
+         Cluster[i].xEnd = temp[index][7];
+         Cluster[i].yEnd = temp[index][8];
+         Cluster[i].zEnd = temp[index][9];
+         temp[index][3] = 10000.;
+         temp[index][4] = 1.;
+
+      }
+
+/*
+      // we sort then according to cluster energy
+      for (Int_t k=1;k<Nclusters;k++){ 
+         temp[k][0] = Cluster[k].xStart;
+         temp[k][1] = Cluster[k].yStart;
+         temp[k][2] = Cluster[k].zStart;
+         temp[k][3] = Cluster[k].tStart;
+         temp[k][4] = Cluster[k].e;
+         temp[k][5] = Cluster[k].size;
+         temp[k][6] = Cluster[k].tStop;
+         temp[k][7] = Cluster[k].xEnd;
+         temp[k][8] = Cluster[k].yEnd;
+         temp[k][9] = Cluster[k].zEnd;
+      }
+      // First cluster always stays first cluster
+      for (Int_t i=1;i<Nclusters;i++){ 
+         Double_t maxEnergy=0;
+	 Int_t index=1;
+         for (Int_t k=1;k<Nclusters;k++){ 
+            if(temp[k][4]>maxEnergy){
+	       maxEnergy=temp[k][4];
+	       index=k;
+	    }
+         }
+         Cluster[i].xStart = temp[index][0];
+         Cluster[i].yStart = temp[index][1];
+         Cluster[i].zStart = temp[index][2];
+         Cluster[i].tStart = temp[index][3];
+         Cluster[i].e = temp[index][4];
+         Cluster[i].size = temp[index][5];
+         Cluster[i].tStop = temp[index][6];
+         Cluster[i].xEnd = temp[index][7];
+         Cluster[i].yEnd = temp[index][8];
+         Cluster[i].zEnd = temp[index][9];
+         temp[index][4] = 0.;
+
+      }
+
+*/
+      
+      for (Int_t i=0;i<Nclusters;i++){
+         if(printing){
+            cout<< "Nach sortieren !!!!!!"<<endl;
+            cout<< "cluster start: " << Cluster[i].xStart<<"  "<<Cluster[i].yStart<<"  "<<Cluster[i].zStart << endl;
+            cout<< "cluster end  : " << Cluster[i].xEnd<<"  "<<Cluster[i].yEnd<<"  "<<Cluster[i].zEnd << endl;
+            cout<< "cluster energy: " << Cluster[i].e << endl;
+            cout<< "cluster time start: " << Cluster[i].tStart << endl;
+            cout<< "cluster time stop: " << Cluster[i].tStop << endl;
+            cout<< "cluster size: " << Cluster[i].size << endl;
+	    
+         }
+         dt=Cluster[i].tStart;
+         dr=sqrt(Cluster[i].xStart*Cluster[i].xStart + Cluster[i].yStart*Cluster[i].yStart +
+	 Cluster[i].zStart*Cluster[i].zStart);
+         Double_t betaCluster=Cluster[i].zStart/dt*1.E7/c;
+//         Double_t betaCluster=dr/dt*1.E7/c;
+         if(printing){
+   	    cout<<"cluster beta: "<<betaCluster<<endl;
+	 }
+      }
+
+
+      hClusters2->Fill(Nclusters);
+
+      Double_t totalLength=0.;
+      for (Int_t i=0;i<Nclusters;i++){         
+         totalLength += Cluster[i].size;
+      }
+          
+      
+// These are the selected neutron hits and times
+      for (Int_t i=0;i<numneut;i++){
+         NEUT1_hit[i].x = Cluster[i].xStart;
+         NEUT1_hit[i].y = Cluster[i].yStart;
+         NEUT1_hit[i].z = Cluster[i].zStart;
+         NEUT1_hit[i].t = Cluster[i].tStart;
+         NEUT2_hit[i].x = Cluster[i].xStart;
+         NEUT2_hit[i].y = Cluster[i].yStart;
+         NEUT2_hit[i].z = Cluster[i].zStart;
+         NEUT2_hit[i].t = Cluster[i].tStart;
+
+         if(printing){   
+            cout<<"Final Hits: "<< NEUT1_hit[i].x <<"  "<<NEUT1_hit[i].y<<"  "
+                              <<NEUT1_hit[i].z<<"  "<< NEUT1_hit[i].t<<endl;
+	 } 
+      }	 
+
+
+// Let's check how good the determined positions are:
+      distance=0.;
+      Double_t minDis=1000.;
+      Double_t diff=0.;
+      Double_t min=100000.;
+      
+      Int_t closest=0;
+      if(numneut==(nPrim-1)){
+         for (Int_t i=0;i<numneut;i++){         
+            for (Int_t j=0;j<numneut;j++){
+               distance=sqrt((firstHitX[i]-NEUT2_hit[j].x)*(firstHitX[i]-NEUT2_hit[j].x)+
+	                     (firstHitY[i]-NEUT2_hit[j].y)*(firstHitY[i]-NEUT2_hit[j].y)+
+	                     (firstHitZ[i]-NEUT2_hit[j].z)*(firstHitZ[i]-NEUT2_hit[j].z));
+               if (distance<minDis){
+	          minDis=distance;
+	          closest=j;
+   	       }			  
+	    }
+            hDeltaX->Fill(firstHitX[i]-NEUT2_hit[closest].x,1.);
+            hDeltaY->Fill(firstHitY[i]-NEUT2_hit[closest].y,1.);
+            hDeltaZ->Fill(firstHitZ[i]-NEUT2_hit[closest].z,1.);
+            hDeltaT->Fill(firstT[i]-NEUT2_hit[closest].t,1.);
+  	    NEUT2_hit[closest].x=1000.;
+  	    NEUT2_hit[closest].y=1000.;
+	    NEUT2_hit[closest].z=0.;
+	    minDis=1000.;
+  	    closest=0;
+         }
+      }
+      
+      hClusterNo_vs_Size->Fill(nentries,totalLength);      
 
 
       // Reconstruct neutron momentum with first hit.
@@ -1071,16 +1282,15 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
                     PRIM_part[i].M*PRIM_part[i].M); // beta
             gamma[i]=1./sqrt(1.-beta[i]*beta[i]); // gamma         
             momentumT[i]=PRIM_part[i].p;
-            momentumZ[i]=PRIM_part[i].pz;
             momentumX[i]=PRIM_part[i].px;
             momentumY[i]=PRIM_part[i].py;
+            momentumZ[i]=PRIM_part[i].pz;
             energy[i] = gamma[i]*PRIM_part[i].A*amu; //total energy
-/*
-            cout<<" beta gamma "<<beta[i]<<"  "<<gamma[i]<<endl;
-            cout<<" energy "<<energy[i]<<endl;
-            cout<<" momentum "<<PRIM_part[i].px<<"  "<<PRIM_part[i].py<<"  "<<PRIM_part[i].pz<<endl;
-*/	 
-	 
+            if(printing){
+               cout<<" beta gamma "<<beta[i]<<"  "<<gamma[i]<<endl;
+  	       cout<<" momentum T "<<momentumT[i]<<endl;
+	       cout<<" momentum "<<momentumX[i]<<"  "<<momentumY[i]<<"  "<<momentumZ[i]<<endl;
+	    }	 
 	    sum_energy+=energy[i];
 	    sum_momentumX+=momentumX[i];
 	    sum_momentumY+=momentumY[i];
@@ -1099,30 +1309,27 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
       sum_momentumY+=PRIM_frag[0].py;
       sum_momentumZ+=PRIM_frag[0].pz;
       sum_masses+=PRIM_frag[0].M;
-/*      
-      cout<<" frag beta gamma "<<beta_frag<<"  "<<gamma_frag<<endl;
-      cout<<" frag energy "<<energy_frag<<endl;
-      cout<<" frag momentum "<<PRIM_frag[0].px<<"  "<<PRIM_frag[0].py<<"  "<<PRIM_frag[0].pz<<endl;
-*/	 
       
       // calculate invariant mass with ideal quantities for a check
       Double_t xinv0;
       xinv0=(sqrt(sum_energy*sum_energy-
            (sum_momentumX*sum_momentumX + sum_momentumY*sum_momentumY +
-	   sum_momentumZ*sum_momentumZ))
+	    sum_momentumZ*sum_momentumZ))
            - sum_masses );
-      hMinv0->Fill(xinv0);
-//      cout<<"xinv0 "<<xinv0<<endl;
-              
+      hMinv0->Fill(xinv0*1000.);
+      if(printing){   
+         cout<<"xinv0 "<<xinv0*1000.<<endl;
+      }        
 
       // Now reconstruction of momenta with real measured quantities
-
+      Double_t xinv=0;
+      if(Nclusters>=numneut){
+         // invariant mass calculation makes only sense if we have enough cluster   
       sum_energy=0.;
       sum_momentumX=0.;
       sum_momentumY=0.;
       sum_momentumZ=0.;
       sum_masses=0.;
-
 
       for (Int_t i=0;i<numneut;i++){
          // add up momentum of neutrons
@@ -1132,8 +1339,7 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
                   NEUT1_hit[i].z*NEUT1_hit[i].z);
 
          rr = sqrt(NEUT1_hit[i].x*NEUT1_hit[i].x+
-                   NEUT1_hit[i].y*NEUT1_hit[i].y);
-	    
+                   NEUT1_hit[i].y*NEUT1_hit[i].y);	    
 	    
 	 beta[i]=s/NEUT1_hit[i].t*1.E7/c;
 	 gamma[i]=1./sqrt(1.-beta[i]*beta[i]); // gamma 
@@ -1142,13 +1348,11 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
          momentumX[i]=momentumZ[i]*NEUT1_hit[i].x/NEUT1_hit[i].z;
          momentumY[i]=momentumZ[i]*NEUT1_hit[i].y/NEUT1_hit[i].z;
          energy[i] = gamma[i]*1.0086649*amu; //total energy neutron
-
-/*
-	 cout<<" beta gamma "<<beta[i]<<"  "<<gamma[i]<<endl;
-	 cout<<" momentum T "<<momentumT[i]<<endl;
-	 cout<<" momentum "<<momentumX[i]<<"  "<<momentumY[i]<<"  "<<momentumZ[i]<<endl;
-*/
-
+         if(printing){
+	    cout<<" beta gamma "<<beta[i]<<"  "<<gamma[i]<<endl;
+	    cout<<" momentum T "<<momentumT[i]<<endl;
+	    cout<<" momentum "<<momentumX[i]<<"  "<<momentumY[i]<<"  "<<momentumZ[i]<<endl;
+         }
 /*
          // Lorentz Transformation in z
          E_lab=sqrt(PRIM_part[i].pz*PRIM_part[i].pz+PRIM_part[i].M*PRIM_part[i].M);
@@ -1194,16 +1398,161 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
       cout<<" frag momentum "<<PRIM_frag[0].px<<"  "<<PRIM_frag[0].py<<"  "<<PRIM_frag[0].pz<<endl;
 */
       // calculate invariant mass
-      Double_t xinv;
       xinv=(sqrt(sum_energy*sum_energy-
            (sum_momentumX*sum_momentumX + sum_momentumY*sum_momentumY +
 	   sum_momentumZ*sum_momentumZ))
            - sum_masses );
-      if(numneut==(nPrim-1)) hMinv->Fill(xinv);
-//      cout<<"xinv "<<xinv<<endl;
+      if(numneut==(nPrim-1)) hMinv->Fill(xinv*1000.);
+      if(numneut==(nPrim-1) && Nclusters==(nPrim-1)) hMinv2->Fill(xinv*1000.);
+      if(printing){   
+         cout<<"numNeut "<<numneut<<endl;
+         cout<<"xinv "<<xinv*1000.<<endl;
+      }
+// record difference in momenta 
+      diff=0.;
+      min=100000.;
+      
+      closest=0;
+      if(numneut==(nPrim-1)){
+         for (Int_t i=0;i<numneut;i++){         
+            for (Int_t j=0;j<numneut;j++){
+               diff=sqrt((momentumX[j]-PRIM_part[i+1].px)*(momentumX[j]-PRIM_part[i+1].px)+
+	                 (momentumY[j]-PRIM_part[i+1].py)*(momentumY[j]-PRIM_part[i+1].py)+
+	                 (momentumZ[j]-PRIM_part[i+1].pz)*(momentumZ[j]-PRIM_part[i+1].pz));
+               if (diff<min){
+	          min=diff;
+	          closest=j;
+	       }			  
+	    }
+            hDeltaPx2->Fill(momentumX[closest]-PRIM_part[i+1].px,1.);
+            hDeltaPy2->Fill(momentumY[closest]-PRIM_part[i+1].py,1.);
+            hDeltaPz2->Fill(momentumZ[closest]-PRIM_part[i+1].pz,1.);
+
+            if(i==0) hDeltaP1->Fill(momentumT[closest]-PRIM_part[i+1].p);
+            if(i==1) hDeltaP2->Fill(momentumT[closest]-PRIM_part[i+1].p);
+            if(i==2) hDeltaP3->Fill(momentumT[closest]-PRIM_part[i+1].p);
+            if(i==3) hDeltaP4->Fill(momentumT[closest]-PRIM_part[i+1].p);
+            if(i==4) hDeltaP5->Fill(momentumT[closest]-PRIM_part[i+1].p);
+            if(i==5) hDeltaP6->Fill(momentumT[closest]-PRIM_part[i+1].p);
+
+   	    momentumX[closest]=0.;
+	    momentumY[closest]=0.;
+	    momentumZ[closest]=0.;
+	    min=100000.;
+	    closest=0;
+         }
+      }
+      }
+//******************************************************************
+// Now reconstruction of momenta with first hits
+
+      numneut=nPrim-1;
+      for (Int_t i=0;i<numneut;i++){
+         NEUT1_hit[i].x = firstHitX[i];
+         NEUT1_hit[i].y = firstHitY[i];
+         NEUT1_hit[i].z = firstHitZ[i];
+         NEUT1_hit[i].t = firstT[i];
+         NEUT2_hit[i].x = firstHitX[i];
+         NEUT2_hit[i].y = firstHitY[i];
+         NEUT2_hit[i].z = firstHitZ[i];
+         NEUT2_hit[i].t = firstT[i];
+
+      }	 
+      sum_energy=0.;
+      sum_momentumX=0.;
+      sum_momentumY=0.;
+      sum_momentumZ=0.;
+      sum_masses=0.;
+
+      for (Int_t i=0;i<numneut;i++){
+         // add up momentum of neutrons
+	 // neutron: beta is calculated with position and time of first hit
+         s = sqrt(NEUT1_hit[i].x*NEUT1_hit[i].x+
+                  NEUT1_hit[i].y*NEUT1_hit[i].y+
+                  NEUT1_hit[i].z*NEUT1_hit[i].z);
+
+         rr = sqrt(NEUT1_hit[i].x*NEUT1_hit[i].x+
+                   NEUT1_hit[i].y*NEUT1_hit[i].y);	    
+	    
+	 beta[i]=s/NEUT1_hit[i].t*1.E7/c;
+	 gamma[i]=1./sqrt(1.-beta[i]*beta[i]); // gamma 
+         momentumT[i]=beta[i]*gamma[i]*mNeutron;
+         momentumZ[i]=cos(atan(rr/NEUT1_hit[i].z))*momentumT[i];
+         momentumX[i]=momentumZ[i]*NEUT1_hit[i].x/NEUT1_hit[i].z;
+         momentumY[i]=momentumZ[i]*NEUT1_hit[i].y/NEUT1_hit[i].z;
+         energy[i] = gamma[i]*1.0086649*amu; //total energy neutron
+         if(printing){
+	    cout<<" beta gamma "<<beta[i]<<"  "<<gamma[i]<<endl;
+	    cout<<" momentum T "<<momentumT[i]<<endl;
+	    cout<<" momentum "<<momentumX[i]<<"  "<<momentumY[i]<<"  "<<momentumZ[i]<<endl;
+         }
+
+	 sum_energy+=energy[i];
+	 sum_momentumX+=momentumX[i];
+	 sum_momentumY+=momentumY[i];
+	 sum_momentumZ+=momentumZ[i];
+	 sum_masses+=mNeutron;
+      }
+      	
+      // fragment: This information have to come later from the Tracker
+      sum_energy+=energy_frag;
+      sum_momentumX+=PRIM_frag[0].px;
+      sum_momentumY+=PRIM_frag[0].py;
+      sum_momentumZ+=PRIM_frag[0].pz;
+      sum_masses+=PRIM_frag[0].M;
+
+      // calculate invariant mass
+      xinv=(sqrt(sum_energy*sum_energy-
+           (sum_momentumX*sum_momentumX + sum_momentumY*sum_momentumY +
+	   sum_momentumZ*sum_momentumZ))
+           - sum_masses );
+      if(numneut==(nPrim-1)) hMinv1->Fill(xinv*1000.);
+
+      if(printing){   
+         cout<<"numNeut "<<numneut<<endl;
+         cout<<"xinv1 "<<xinv*1000.<<endl;
+      }
+// record difference in momenta 
+      diff=0.;
+      min=100000.;
+      
+      closest=0;
+      if(numneut==(nPrim-1)){
+         for (Int_t i=0;i<numneut;i++){         
+            for (Int_t j=0;j<numneut;j++){
+               diff=sqrt((momentumX[j]-PRIM_part[i+1].px)*(momentumX[j]-PRIM_part[i+1].px)+
+	                 (momentumY[j]-PRIM_part[i+1].py)*(momentumY[j]-PRIM_part[i+1].py)+
+	                 (momentumZ[j]-PRIM_part[i+1].pz)*(momentumZ[j]-PRIM_part[i+1].pz));
+               if (diff<min){
+	          min=diff;
+	          closest=j;
+	       }			  
+	    }
+            hDeltaPx1->Fill(momentumX[closest]-PRIM_part[i+1].px);
+            hDeltaPy1->Fill(momentumY[closest]-PRIM_part[i+1].py);
+            hDeltaPz1->Fill(momentumZ[closest]-PRIM_part[i+1].pz);
+	    	    	
+   	    momentumX[closest]=0.;
+	    momentumY[closest]=0.;
+	    momentumZ[closest]=0.;
+	    min=100000.;
+	    closest=0;
+         }
+      }
 
 
-   }  
+
+
+
+
+
+
+
+
+   } // end if entries >0
+   
+   
+
 /*
 //      TrackId = land_obj->GetTrackID();
       Int_t TrackId=0;
@@ -1256,15 +1605,17 @@ void R3BNeutronTracker::Finish()
 // here event. write histos
 //   cout << " -I- Digit Finish() called " << endl;
 // Write control histograms
-   hNeutmult1->Write();
-   hNeutmult2->Write();
-   hNeutmult3->Write();
-   hNeutmult4->Write();
-   hNeutmult5->Write();
-   hNeutmult6->Write();
+   hHits->Write();	
+   hClusters->Write();	
+   hClusters1->Write();
+   hClusters2->Write();
+
+   hNeutmult->Write();
 
    hMinv->Write();
    hMinv0->Write();
+   hMinv1->Write();
+   hMinv2->Write();
 
    hDeltaPx1->Write();
    hDeltaPy1->Write();
@@ -1273,11 +1624,23 @@ void R3BNeutronTracker::Finish()
    hDeltaPy2->Write();
    hDeltaPz2->Write();
 
+   hDeltaX->Write();
+   hDeltaY->Write();
+   hDeltaZ->Write();
+   hDeltaT->Write();
+
+   hDeltaP1->Write();
+   hDeltaP2->Write();
+   hDeltaP3->Write();
+   hDeltaP4->Write();
+   hDeltaP5->Write();
+   hDeltaP6->Write();
+   
    hClusterSize->Write();	
    hClusterEnergy->Write();	
-   hClusters->Write();	
-   hHits->Write();	
    hClusterNo_vs_Size->Write();
+
+   hDelta->Write();
     
 }
 

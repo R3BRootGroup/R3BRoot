@@ -34,7 +34,7 @@ eventDisplay()
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *fRun= new FairRunAna();
  
-  //  TFile* file = new TFile("/data.local2/mheil/fairroot_results/Neuland_plastic/neu_dec2010/r3bpar_10m_2x2x3m_5cm_6n_600MeV.root");
+//    TFile* file = new TFile("/data.local2/mheil/fairroot_results/comp_RPC/r3bpar_2x2x2.5m_12.5m_128Sn_4n_600AMeV_3000keV.root");
 //  TFile* file = new TFile("/data.local2/mheil/fairroot_results/land/r3bpar_10m_land_1n_170MeV.root");
   TFile* file = new TFile("r3bpar.root");
   file->Get("FairBaseParSet"); 
@@ -43,7 +43,7 @@ eventDisplay()
 
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
   FairParRootFileIo* parIn = new FairParRootFileIo();
-  //parIn->open("/data.local2/mheil/fairroot_results/Neuland_plastic/neu_dec2010/r3bpar_10m_2x2x3m_5cm_6n_600MeV.root");
+//  parIn->open("/data.local2/mheil/fairroot_results/comp_RPC/r3bpar_2x2x2.5m_12.5m_128Sn_4n_600AMeV_3000keV.root");
 //  parIn->open("/data.local2/mheil/fairroot_results/land/r3bpar_10m_land_1n_170MeV.root");
   parIn->open("r3bpar.root");
   rtdb->print();
@@ -51,7 +51,7 @@ eventDisplay()
 
  //-------
  
-//  fRun->SetInputFile("/data.local2/mheil/fairroot_results/Neuland_plastic/neu_dec2010/r3bsim_10m_2x2x3m_5cm_6n_600MeV.root");
+//  fRun->SetInputFile("/data.local2/mheil/fairroot_results/comp_RPC/r3bsim_2x2x2.5m_12.5m_128Sn_4n_600AMeV_3000keV.root");
 //  fRun->SetInputFile("/data.local2/mheil/fairroot_results/land/r3bsim_10m_land_1n_400MeV.root");
  fRun->SetInputFile("r3bsim.root");
 //  fRun->AddFriend("land_digi.root"); // 2nd file where LandHits or whatever are stored
