@@ -39,6 +39,7 @@ R3BLandContFact.cxx
 R3BLandDigitizer.cxx 
 R3BNeutronTracker.cxx
 R3BNeuLandDigitizer.cxx 
+R3BLandData.cxx 
 R3BLandDigiPar.cxx
 R3BConstantFraction.cxx
 R3BLandDigitizer_CFD.cxx
