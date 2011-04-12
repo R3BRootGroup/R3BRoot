@@ -25,8 +25,13 @@ void Config()
 /// When more than one options are selected, they should be separated with '+'
 /// character: eg. stepLimit+specialCuts.
 
-   TG4RunConfiguration* runConfiguration 
-           = new TG4RunConfiguration("geomRoot", "QGSP_BERT_EMV", "stepLimiter+specialCuts+specialControls");
+    gSystem->Load("libR3BPlist.so");
+
+  TG4RunConfiguration* runConfiguration 
+             = new TG4RunConfiguration("geomRoot", "QGSP_BERT_EMV", "stepLimiter+specialCuts+specialControls");
+
+  //TG4RunConfiguration* runConfiguration 
+  //         = new TG4RunConfiguration("geomRoot", "emStandard", "stepLimiter+specialCuts+specialControls");
 
 /// Create the G4 VMC 
    TGeant4* geant4 = new TGeant4("TGeant4", "The Geant4 Monte Carlo", runConfiguration);

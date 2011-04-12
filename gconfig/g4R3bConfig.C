@@ -19,7 +19,9 @@ void Config()
 
    // Create the Run Configuration
    R3BRunConfiguration* runConfiguration
-           = new R3BRunConfiguration("geomRoot");
+     = new R3BRunConfiguration("geomRoot","stepLimiter+specialCuts+specialControls");
+   //R3BRunConfiguration* runConfiguration
+   //  = new R3BRunConfiguration("geomRootToGeant4", "stepLimiter+specialCuts+specialControls");
 
 /// Create the G4 VMC 
    TGeant4* geant4 = new TGeant4("TGeant4", "The Geant4 Monte Carlo",
