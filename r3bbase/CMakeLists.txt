@@ -4,6 +4,7 @@
 
 set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
+${R3BROOT_SOURCE_DIR}/fairtools
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase 
 #${R3BROOT_SOURCE_DIR}/passive
