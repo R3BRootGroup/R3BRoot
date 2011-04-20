@@ -94,7 +94,17 @@ void califaAna(Int_t nEvents = 1) {
 	//fRun->LoadGeometry(); //Needed for what??
 	
 	R3BCaloHitFinder* caloHF = new R3BCaloHitFinder();
-	caloHF->SelectGeometryVersion(0);          // 0 for version 5.0, 1 for version 7.05, 2 for version 7.07
+	//Selecting the geometry version
+	// 0- CALIFA 5.0, including BARREL and ENDCAP.
+	// 1- CALIFA 7.05, only BARREL
+	// 2- CALIFA 7.07, only BARREL
+	// 3- CALIFA 7.09, only BARREL (ongoing work)
+	// 4- CALIFA 7.17, only ENDCAP (in CsI[Tl])
+	// 5- CALIFA 7.07+7.17, 
+	// 6- CALIFA 7.09+7.17, (ongoing work)
+	// 10- CALIFA 8.00, (ongoing work) 
+	// ...
+	caloHF->SelectGeometryVersion(5);          
 	caloHF->SetDetectionThreshold(0.000050);   //50 KeV
 	caloHF->SetExperimentalResolution(5.);    //5% at 1 MeV
 	fRun->AddTask(caloHF);
