@@ -40,8 +40,16 @@ public:
 	 **
 	 ** Defines the geometry 
 	 *@param version  Integer parameter used to select the geometry: 
-	 **                             0 CALIFA V5 (old), 1 CALIFA V7.05, 2 USER DEFINED 
-	 **/
+	 **	0- CALIFA 5.0, including BARREL and ENDCAP.
+	 **	1- CALIFA 7.05, only BARREL
+	 ** 2- CALIFA 7.07, only BARREL
+	 ** 3- CALIFA 7.09, only BARREL (ongoing work)
+	 ** 4- CALIFA 7.17, only ENDCAP (in CsI[Tl])
+	 ** 5- CALIFA 7.07+7.17, 
+	 ** 6- CALIFA 7.09+7.17, (ongoing work)
+	 ** 10- CALIFA 8.00, (ongoing work) 
+	 ** ...
+	 **/	
 	void SelectGeometryVersion(Int_t version);
 	
 	/** Public method SetExperimentalResolution

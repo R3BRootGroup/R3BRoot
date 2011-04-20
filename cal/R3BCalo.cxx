@@ -1,7 +1,7 @@
 // -------------------------------------------------------------------------
 // -----                        R3BCalo source file                    -----
 // -----                  Created 26/03/09  by D.Bertini               -----
-// -----			Last modification 09/07/10 by H.Alvarez			   -----
+// -----			Last modification 28/03/11 by H.Alvarez			   -----
 // -------------------------------------------------------------------------
 #include "R3BCalo.h"
 
@@ -60,6 +60,7 @@ R3BCalo::R3BCalo() : R3BDetector("R3BCalo", kTRUE, kCALIFA) {
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
   fNonUniformity = 0.;
+  fGeometryVersion = 1;
 }
 // -------------------------------------------------------------------------
 
@@ -77,6 +78,7 @@ R3BCalo::R3BCalo(const char* name, Bool_t active)
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
   fNonUniformity = 0.;
+  fGeometryVersion = 1;
 }
 // -------------------------------------------------------------------------
 
@@ -103,8 +105,49 @@ void R3BCalo::Initialize()
    cout << endl;
    cout << "-I- R3BCalo: initialisation" << endl;
    cout << "-I- R3BCalo: Vol (McId) def." << endl;
-    Char_t buffer[126];
 
+   Char_t buffer[126];
+
+   //Taken into different geometries during the initialization phase:
+   // 0 - OLD CALIFA 5.0, including BARREL and ENDCAP:  
+   //   NOTE: THERE IS NO WARRANTY THAT THIS VERSION WORKS CORRECTLY IN R3BROOT
+   //   Contains 30 different crystal types, repeated 64 times (64 copies)
+   //
+   // 1- CALIFA 7.05, only BARREL
+   //   Each ring is made of 40 alveoli of 4 crystals each. There are 24 alveoli along the polar angle
+   //   for a total of 40x24=960 alveoli or 3840 crystals. There are 12 different crystal shapes: 
+   //     @alveoliType=(1,1,2,2,2,2,2,3,3,3,3,4,4,4,4,4,4,4,4,5,5,6,6,6);
+   //
+   //     Volumes: Alveolus_[1,24] made of CrystalWithWrapping_[1,6][A,B] made of Crystal_[1,6][A,B]
+   //	
+   // 2- CALIFA 7.07, only BARREL
+   //   Each ring is made of 32 alveoli of 4 crystals each. There are 20 alveoli along the polar angle
+   //   for a total of 32x20=640 alveoli or 2560 crystals. There are 16 different crystal shapes: 
+   //     @alveoliType=(1,1,2,2,2,3,3,4,4,4,5,5,6,6,6,7,7,7,8,8);
+   //
+   //     Volumes: Alveolus_[1,20] made of CrystalWithWrapping_[1,8][A,B] made of Crystal_[1,8][A,B]
+   //		
+   // 3- CALIFA 7.09, only BARREL (ongoing work)
+   //
+   //
+   // 4- CALIFA 7.17, only ENDCAP (in CsI[Tl])
+   //   Each ring is made of 32 alveoli of 8, 8 and 7 crystals each. There are 3 alveoli along the polar angle
+   //   for a total of 32x3=96 alveoli or 736 crystals. There are 23 different crystal shapes: 
+   //     @alveoliType=(8,8,7);
+   //
+   //     Volumes: Alveolus_EC_[1,3] made of CrystalWithWrapping_[1,23] made of Crystal_[1,23]
+   //
+   // 5- CALIFA 7.07+7.17
+   //   See above the two components
+   //
+   // 6- CALIFA 7.09+7.17, (ongoing work)
+   //   See above the two components
+   //
+	
+   // 10- CALIFA 8.00, (ongoing work) 
+	
+	
+	
 	//HAPOL TODO -> Check the VolId() datamember to asign dinamically different crystal logical
 	//	volumenes in different geometries. Setting now a fixed number, maybe not using all
 	for (Int_t i=0;i<30;i++ ) {
@@ -112,10 +155,15 @@ void R3BCalo::Initialize()
      cout << "-I- R3BCalo: Crystal Nb   : " << i << " connected to (McId) ---> " <<  gMC->VolId(buffer)<< endl;
      fCrystalType[i] = gMC->VolId(buffer);
     }
-	for (Int_t i=0;i<24;i++ ) {
+	for (Int_t i=0;i<32;i++ ) {  //32 is the larger possible alveolus number (v7.05) in barrel
 		sprintf(buffer,"Alveolus_%i",i+1);
 		cout << "-I- R3BCalo: Alveolus_ Nb   : " << i+1 << " connected to (McId) ---> " <<  gMC->VolId(buffer)<< endl;
 		fAlveolusType[i] = gMC->VolId(buffer);
+    }
+	for (Int_t i=0;i<3;i++ ) {   //3 is the larger possible alveolus number (v7.17) in endcap
+		sprintf(buffer,"Alveolus_EC_%i",i+1);
+		cout << "-I- R3BCalo: Alveolus_EC Nb   : " << i+1 << " connected to (McId) ---> " <<  gMC->VolId(buffer)<< endl;
+		fAlveolusECType[i] = gMC->VolId(buffer);
     }
 	
   TGeoVolume *vol = gGeoManager->GetVolume("CalifaWorld");
@@ -143,12 +191,15 @@ void R3BCalo::SetSpecialPhysicsCuts(){
 Bool_t R3BCalo::ProcessHits(FairVolume* vol) {
 		
    // Getting the Infos from Crystal Volumes
-   Int_t cp1 = -1; Int_t volId1 = -1; Int_t cpAlv = -1; Int_t volIdAlv = -1; Int_t cpCry = -1; Int_t volIdCry = -1;
+   Int_t cp1 = -1; Int_t volId1 = -1; Int_t cpAlv = -1; Int_t cpSupAlv = -1; Int_t volIdAlv = -1;Int_t volIdSupAlv = -1; Int_t cpCry = -1; Int_t volIdCry = -1;
    // Crystals Ids
+   int crysNum;
+   const char* bufferName = gMC->CurrentVolName();
    volId1 =  gMC->CurrentVolID(cp1);
    volIdCry =  gMC->CurrentVolOffID(1,cpCry);
    volIdAlv =  gMC->CurrentVolOffID(2,cpAlv);
-	
+   volIdSupAlv =  gMC->CurrentVolOffID(3,cpSupAlv); //needed for versions 8.0# and later
+
    Int_t crystalType = 0;
    Int_t crystalCopy = 0;
    Int_t crystalId = 0;
@@ -172,9 +223,7 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol) {
 			crystalId = 3072+(crystalType-7)*64+crystalCopy;
 		}
 		else cout << "-E- R3BCalo: Impossible crystalType for geometry 5.0" << endl;
-
 		//cout << " CHECKKKKKK ____ crystal iD "<< crystalId << endl;
-
 	}
    else if (fGeometryVersion==1)	{
       //The present scheme here done works nicely with 7.05
@@ -182,11 +231,13 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol) {
 	  // crystalCopy = (alveolus copy - 1) * 4 + crystals copy (from 1 to 160)  [Not exactly azimuthal]
 	  // crystalId = (alveolus type-1)*160 + (alvelous copy-1)*4 + (crystal copy)  (from 1 to 3840)
 	  //				crystalID is asingle identifier per crystal!
-      crystalType = GetAlveolusType(volIdAlv);
+	  crystalType = GetAlveolusType(volIdAlv);
 	  crystalCopy = cpAlv * 4 + cpCry;
 	  crystalId = (crystalType-1)*160 + cpAlv * 4 + cpCry;
+	  if(crystalType>24 || crystalType<1 || crystalCopy>160 || crystalCopy<1 || crystalId>3840 || crystalId<1) 
+		  cout << "-E- R3BCalo: Wrong crystal number in geometryVersion 1. " << endl;
 	}
-	if (fGeometryVersion==2)	{
+   else if (fGeometryVersion==2)	{
 	  //The present scheme here done works nicely with 7.07
 	  // crystalType = alveolus type (from 1 to 20)   [Basically the alveolus number]
 	  // crystalCopy = (alveolus copy - 1) * 4 + crystals copy (from 1 to 128)  [Not exactly azimuthal]
@@ -194,7 +245,57 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol) {
 	  crystalType = GetAlveolusType(volIdAlv);
 	  crystalCopy = cpAlv * 4 + cpCry;
 	  crystalId = (crystalType-1)*128 + cpAlv * 4 + cpCry;
+	   if(crystalType>20 || crystalType<1 || crystalCopy>128 || crystalCopy<1 || crystalId>2560 || crystalId<1) 
+		   cout << "-E- R3BCalo: Wrong crystal number in geometryVersion 2. " << endl;
 	}
+   else if(fGeometryVersion==3){
+	   //The present scheme here done works with 7.09 (ongoing work)
+   }
+   else if(fGeometryVersion==4){ 
+	   //The present scheme here done works nicely with 7.17
+	   // crystalType = crystals type (from 1 to 23)
+	   // crystalCopy = alveolus copy (from 1 to 32) 
+	   // crystalId = 3000 + (alvelous copy-1)*23 + (crystal copy-1)  (from 3000 to 3736)
+	   if( GetAlveolusECType(volIdAlv) !=-1 ) {
+		   sscanf(bufferName,"%*8c %d",&crysNum);
+		   crystalType = crysNum;
+		   //crystalType = cpCry+1;
+		   crystalCopy = cpAlv+1;
+		   crystalId = 3000 + cpAlv*23 + (crystalType-1);
+		   if(crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736) 
+			   cout << "-E- R3BCalo: Wrong crystal number in geometryVersion 4. " << endl;		   
+	   }
+	   else cout << "-E- R3BCalo: Wrong alveolus volume in geometryVersion 4. " << endl;
+   }
+   else if(fGeometryVersion==5){
+	   //The present scheme here done works nicely with 7.07+7.17
+	   //see the explanation for geometries 2 and 4
+	   if(GetAlveolusType(volIdAlv)!=-1){
+		   crystalType = GetAlveolusType(volIdAlv);
+		   crystalCopy = cpAlv * 4 + cpCry;
+		   crystalId = (crystalType-1)*128 + cpAlv * 4 + cpCry;
+		   if(crystalType>20 || crystalType<1 || crystalCopy>128 || crystalCopy<1 || crystalId>2560 || crystalId<1) 
+			   cout << "-E- R3BCalo: Wrong crystal number in geometryVersion 5 (barrel). " << endl;
+	   }
+	   else{
+		   sscanf(bufferName,"%*8c %d",&crysNum);
+		   crystalType = crysNum;
+		   //crystalType = cpCry+1;
+		   crystalCopy = cpAlv+1;
+		   crystalId = 3000 + cpAlv*23 + (crystalType-1);
+		   if(crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736) 
+			   cout << "-E- R3BCalo: Wrong crystal number in geometryVersion 5 (endcap). " << endl;		   
+	   }
+   }
+   else if(fGeometryVersion==6){
+	   //The present scheme here done works with 7.09+7.17
+	   //see the explanation for geometries 3 and 4
+   }
+   else if(fGeometryVersion==10){
+	   //The present scheme here done works with 8.??
+
+   }
+   else cout << "-E- R3BCalo: Geometry version not available in R3BCalo::ProcessHits(). " << endl;
 	
 	if (fVerboseLevel>1) 
 		cout << "-I- R3BCalo: Processing Points in Alveolus Nb " << volIdAlv << ", copy Nb " << cpAlv 
@@ -400,7 +501,8 @@ void R3BCalo::Register() {
 // -----   Public method GetCollection   --------------------------------------
 TClonesArray* R3BCalo::GetCollection(Int_t iColl) const {
 	//HAPOL TODO -- DO I NEED TO RETURN A fCaloCrystalHitColletion????
-  if (iColl == 0) return fCaloCollection;
+  //if (iColl == 0) return fCaloCollection;
+  if (iColl == 0) return fCaloCrystalHitCollection;
   else return NULL;
 }
 // ----------------------------------------------------------------------------
@@ -505,17 +607,11 @@ void R3BCalo::ConstructGeometry() {
 		cout << "-I- R3BCalo: Constructing old (v5) geometry translated from R3BSim ... " << endl;
 		ConstructOldGeometry();
 	}
-	else if (fGeometryVersion==1) {
-		cout << "-I- R3BCalo: Constructing CALIFA v7.05 geometry ... " << endl;
-		ConstructV705Geometry();
-	}
-	else if (fGeometryVersion==2) {
-		cout << "-I- R3BCalo: Constructing an user defined geometry ... " << endl;
+	else if (fGeometryVersion>0 && fGeometryVersion<7 ) {
+		cout << "-I- R3BCalo: Constructing CALIFA. Geometry version: " << fGeometryVersion << endl;
 		ConstructUserDefinedGeometry();
-	}
-	else 
+	}	else 
 		cout << "-E- R3BCalo: Selected a wrong geometry version ... " << endl;
-	
 }
 
 	
@@ -3237,8 +3333,7 @@ TGeoRotation* R3BCalo::createMatrix( Double_t phi, Double_t theta, Double_t psi)
 }
 
 // -----   Public method ConstructGeometry   ----------------------------------
-void R3BCalo::ConstructV705Geometry() {
-	
+void R3BCalo::ConstructUserDefinedGeometry() {
 	
 	/****************************************************************************/
 	// Material definition
@@ -3392,168 +3487,10 @@ void R3BCalo::ConstructV705Geometry() {
 	
 	//finally the v7.05 code
 	
-#include "perlScripts/CLF705_Geometry.geo"
+#include "perlScripts/CALIFA.geo"
 
 }
 	
-
-// -----   Public method ConstructGeometry   ----------------------------------
-void R3BCalo::ConstructUserDefinedGeometry() {
-	
-	
-	/****************************************************************************/
-	// Material definition
-	
-	Double_t aMat;
-	Double_t z, density, w;
-	Int_t nel, numed;
-	
-	
-	// Mixture: CsI
-	TGeoMedium * pCsIMedium=NULL;
-	if (gGeoManager->GetMedium("CsI") ){
-		pCsIMedium=gGeoManager->GetMedium("CsI");
-	}else{
-		nel     = 2;
-		density = 4.510000;
-		TGeoMixture*
-		pCsIMaterial = new TGeoMixture("CsIn", nel,density);
-		aMat = 132.905450;   z = 55.000000;   w = 0.511549;  // CS
-		pCsIMaterial->DefineElement(0,aMat,z,w);
-		aMat = 126.904470;   z = 53.000000;   w = 0.488451;  // I
-		pCsIMaterial->DefineElement(1,aMat,z,w);
-		numed = 801;
-		pCsIMaterial->SetIndex(numed);
-		Double_t par[8];
-		par[0]  = 0.000000; // isvol
-		par[1]  = 0.000000; // ifield
-		par[2]  = 0.000000; // fieldm
-		par[3]  = 0.000000; // tmaxfd
-		par[4]  = 0.000000; // stemax
-		par[5]  = 0.000000; // deemax
-		par[6]  = 0.000100; // epsil
-		par[7]  = 0.000000; // stmin
-		pCsIMedium = new TGeoMedium("CsIn", numed,pCsIMaterial, par);
-	}
-	
-	// Mixture: CarbonFibre
-	TGeoMedium * pCarbonFibreMedium=NULL;
-	if (gGeoManager->GetMedium("CarbonFibre") ){
-		pCarbonFibreMedium=gGeoManager->GetMedium("CarbonFibre");
-	}else{
-		nel     = 3;
-		density = 1.690000;
-		TGeoMixture*
-		pCarbonFibreMaterial = new TGeoMixture("CarbonFibre", nel,density);
-		aMat = 12.010700;   z = 6.000000;   w = 0.844907;  // C
-		pCarbonFibreMaterial->DefineElement(0,aMat,z,w);
-		aMat = 1.007940;   z = 1.000000;   w = 0.042543;  // H
-		pCarbonFibreMaterial->DefineElement(1,aMat,z,w);
-		aMat = 15.999400;   z = 8.000000;   w = 0.112550;  // O
-		pCarbonFibreMaterial->DefineElement(2,aMat,z,w);
-		// Medium: CarbonFibre
-		numed   = 802;  // medium number
-		pCarbonFibreMaterial->SetIndex(numed);
-		Double_t par[8];
-		par[0]  = 0.000000; // isvol
-		par[1]  = 0.000000; // ifield
-		par[2]  = 0.000000; // fieldm
-		par[3]  = 0.000000; // tmaxfd
-		par[4]  = 0.000000; // stemax
-		par[5]  = 0.000000; // deemax
-		par[6]  = 0.000100; // epsil
-		par[7]  = 0.000000; // stmin
-		pCarbonFibreMedium = new TGeoMedium("CarbonFibre", numed,pCarbonFibreMaterial,par);
-	}
-	
-	// Mixture: Wrapping component
-	TGeoMedium * pWrappingMedium=NULL;
-	if (gGeoManager->GetMedium("mylar") ){
-		pWrappingMedium=gGeoManager->GetMedium("mylar");
-	}else{ // CARBON FIBER DEFINITION HERE!!! CHANGE IT TO WHATEVER IS USED!!
-		nel     = 3;
-		density = 1.690000;
-		TGeoMixture*
-		pWrappingMaterial = new TGeoMixture("Wrapping", nel,density);
-		aMat = 12.010700;   z = 6.000000;   w = 0.844907;  // C
-		pWrappingMaterial->DefineElement(0,aMat,z,w);
-		aMat = 1.007940;   z = 1.000000;   w = 0.042543;  // H
-		pWrappingMaterial->DefineElement(1,aMat,z,w);
-		aMat = 15.999400;   z = 8.000000;   w = 0.112550;  // O
-		pWrappingMaterial->DefineElement(2,aMat,z,w);
-		// Medium: CarbonFibre
-		numed   = 803;  // medium number
-		pWrappingMaterial->SetIndex(numed);
-		Double_t par[8];
-		par[0]  = 0.000000; // isvol
-		par[1]  = 0.000000; // ifield
-		par[2]  = 0.000000; // fieldm
-		par[3]  = 0.000000; // tmaxfd
-		par[4]  = 0.000000; // stemax
-		par[5]  = 0.000000; // deemax
-		par[6]  = 0.000100; // epsil
-		par[7]  = 0.000000; // stmin
-		pWrappingMedium = new TGeoMedium("Wrapping", numed,pWrappingMaterial,par);
-	}
-	
-	// Mixture: Air
-	TGeoMedium * pAirMedium=NULL;
-	if (gGeoManager->GetMedium("Air") ){
-		pAirMedium=gGeoManager->GetMedium("Air");
-	}else{
-		nel     = 2;
-		density = 0.001290;
-		TGeoMixture*
-		pAirMaterial = new TGeoMixture("Air", nel,density);
-		aMat = 14.006740;   z = 7.000000;   w = 0.700000;  // N
-		pAirMaterial->DefineElement(0,aMat,z,w);
-		aMat = 15.999400;   z = 8.000000;   w = 0.300000;  // O
-		pAirMaterial->DefineElement(1,aMat,z,w);
-		pAirMaterial->SetIndex(1);
-		// Medium: Air
-		numed   = 1;  // medium number
-		Double_t par[8];
-		par[0]  = 0.000000; // isvol
-		par[1]  = 0.000000; // ifield
-		par[2]  = 0.000000; // fieldm
-		par[3]  = 0.000000; // tmaxfd
-		par[4]  = 0.000000; // stemax
-		par[5]  = 0.000000; // deemax
-		par[6]  = 0.000100; // epsil
-		par[7]  = 0.000000; // stmin
-		pAirMedium = new TGeoMedium("Air", numed,pAirMaterial, par);
-	}
-	
-	
-	//WORLD
-	
-	TGeoVolume *pAWorld  =  gGeoManager->GetTopVolume();
-	
-	// Defintion of the Mother Volume
-	
-	Double_t length = 300.;
-	
-	TGeoShape *pCBWorld = new TGeoBBox("Califa_box",
-									   length/2.0,
-									   length/2.0,
-									   length/2.0);
-	
-	TGeoVolume*
-	pWorld  = new TGeoVolume("CalifaWorld",pCBWorld, pAirMedium);
-	
-	TGeoCombiTrans *t0 = new TGeoCombiTrans();
-	TGeoCombiTrans *pGlobalc = GetGlobalPosition(t0);
-	
-	// add the sphere as Mother Volume
-	pAWorld->AddNodeOverlap(pWorld, 0, pGlobalc);
-
-	
-	// finally the user defined code:
-	
-#include "perlScripts/UserDefinedGeometry.geo"
-	
-}
-
 
 
 /*

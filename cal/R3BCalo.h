@@ -1,7 +1,7 @@
 // -------------------------------------------------------------------------
 // -----                        R3BCalo header file                    -----
 // -----                  Created 26/03/09  by D.Bertini               -----
-// -----			Last modification 09/07/10 by H.Alvarez			   -----
+// -----			Last modification 28/03/11 by H.Alvarez			   -----
 // -------------------------------------------------------------------------
 
 /**  R3BCalo.h
@@ -57,18 +57,16 @@ class R3BCalo : public R3BDetector
    ** If verbosity level is set, print hit collection at the
    ** end of the event and resets it afterwards.
    **/
-
   virtual void BeginEvent();
 
+	
   /** Virtual method EndOfEvent
    **
    ** Added support for R3BCaloCrystalHit
    ** If verbosity level is set, print hit collection at the
    ** end of the event and resets it afterwards.
    **/
-
   virtual void EndOfEvent();
-
 
 
   /** Virtual method Register
@@ -113,31 +111,37 @@ class R3BCalo : public R3BDetector
    **/
   virtual void ConstructGeometry();
 	
+	
 	/** Public method ConstructOldGeometry
 	 **
 	 ** Defines the CALIFA v5 geometry (from a R3BSim translation, never tested)
 	 **/
   void ConstructOldGeometry();
-	
-	/** Public method ConstructV705Geometry
-	 **
-	 ** Defines the CALIFA v7.05 geometry (geometry defined by perl script)
-	 **/
-  void ConstructV705Geometry();
 
+	
 	/** Public method ConstructUserDefinedGeometry
 	 **
 	 ** Defines a CALIFA geometry defined by the user from the perl scripts output
 	 **/
   void ConstructUserDefinedGeometry();
 	
+	
 	/** Public method SelectGeometryVersion
 	 **
 	 ** Defines the geometry 
 	 *@param version  Integer parameter used to select the geometry: 
-	 **				0 CALIFA V5 (old), 1 CALIFA V7.05, 2 USER DEFINED 
+	 **	0- CALIFA 5.0, including BARREL and ENDCAP.
+	 **	1- CALIFA 7.05, only BARREL
+	 ** 2- CALIFA 7.07, only BARREL
+	 ** 3- CALIFA 7.09, only BARREL (ongoing work)
+	 ** 4- CALIFA 7.17, only ENDCAP (in CsI[Tl])
+	 ** 5- CALIFA 7.07+7.17, 
+	 ** 6- CALIFA 7.09+7.17, (ongoing work)
+	 ** 10- CALIFA 8.00, (ongoing work) 
+	 ** ...
 	 **/
   void SelectGeometryVersion(Int_t version);
+	
 	
 	/** Public method SetNonUniformity
 	 **
@@ -157,7 +161,6 @@ class R3BCalo : public R3BDetector
 
   private:
 
-
     /** Track information to be stored until the track leaves the
 	active volume. **/
     Int_t          fTrackID;           //!  track index
@@ -175,7 +178,8 @@ class R3BCalo : public R3BDetector
     TList *flGeoPar;				//!
 
     Int_t fCrystalType[30];
-    Int_t fAlveolusType[24];
+    Int_t fAlveolusType[32];
+    Int_t fAlveolusECType[3];
 
 	// Selecting the geometry of the CALIFA calorimeter
 	Int_t fGeometryVersion;
@@ -192,12 +196,14 @@ class R3BCalo : public R3BDetector
 			TVector3 momOut, Double_t time, 
 			Double_t length, Double_t eLoss);
 
+	
 	/** Private method AddCrystalHit
      **
      ** Adds a CaloCrystalhit to the HitCollection
      **/
     R3BCaloCrystalHit* AddCrystalHit(Int_t type, Int_t copy, Int_t ident,
 									 Double_t energy, Double_t tof);
+	
 	
 	/** Private method NUSmearing
      **
@@ -213,10 +219,12 @@ class R3BCalo : public R3BDetector
      ** Resets the private members for the track parameters
      **/
     void ResetParameters();
+	
    TGeoRotation* createMatrix( Double_t phi, Double_t theta, Double_t psi);
 
    Int_t  GetCrystalType(Int_t volID);
    Int_t  GetAlveolusType(Int_t volID);
+   Int_t  GetAlveolusECType(Int_t volID);
 
     ClassDef(R3BCalo,1);
 };
@@ -236,7 +244,7 @@ return type;
 inline Int_t R3BCalo::GetAlveolusType(Int_t volID) {
 	Int_t type=-1;
 	
-	for (Int_t i=0;i<24;i++ ){
+	for (Int_t i=0;i<32;i++ ){
 		if (volID==fAlveolusType[i]) {
 			type=i+1; //
 			return (type);
@@ -245,9 +253,17 @@ inline Int_t R3BCalo::GetAlveolusType(Int_t volID) {
 	return type;
 }
 
-
-
-
+inline Int_t R3BCalo::GetAlveolusECType(Int_t volID) {
+	Int_t type=-1;
+	
+	for (Int_t i=0;i<3;i++ ){
+		if (volID==fAlveolusECType[i]) {
+			type=i+1; //
+			return (type);
+		}
+	}
+	return type;
+}
 
 inline void R3BCalo::ResetParameters() {
   fTrackID = fVolumeID = 0;
@@ -258,6 +274,5 @@ inline void R3BCalo::ResetParameters() {
   fTime = fLength = fELoss = 0;
   fPosIndex = 0;
 };
-
 
 #endif 
