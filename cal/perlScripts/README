@@ -3,7 +3,16 @@ Last update by Hector Alvarez Pol @ USC (hector.alvarez@usc.es), 20/04/2011
 ----------------------------------------------------------------------------------
 THE FOLLOWING TEXT IS ONLY VALID FOR SVN VERSIONS ABOVE r11649
 
-How to run different CALIFA geometry versions (in three steps):
+
+----------------------------
+HOW TO RUN CALIFA (short version)
+1 - select a geometry, run the corresponding perl script with your favorite parameters.
+2 - link or copy the output file of the perl script to a cal/perlScripts/CALIFA.geo file
+3 - recompile the cal code  
+4 - run your macros, selecting the proper geometry version in the R3BCalo and R3BCaloHitFinder objects (function SelectGeometryVersion())
+----------------------------
+
+How to run different CALIFA geometry versions (in three steps, longer version):
 
 
 1- Select the geometry version from the existing models.
