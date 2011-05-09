@@ -89,6 +89,11 @@ class R3BNeutronTracker : public FairTask
 
   // Add here control hist for tracker
   TH1F *hNeutmult;
+  TH1F *hErel1;
+  TH1F *hErel2;
+  TH1F *hErel3;
+  TH1F *hErel4;
+  
   TH1F *hMinv;
   TH1F *hMinv0;
   TH1F *hMinv1;
@@ -111,6 +116,8 @@ class R3BNeutronTracker : public FairTask
   TH1F *hDeltaY;
   TH1F *hDeltaZ;
   TH1F *hDeltaT;
+
+  TH1F *hFirstHitZ;
 
   TH1F *hDeltaP1;
   TH1F *hDeltaP2;
@@ -138,6 +145,7 @@ class R3BNeutronTracker : public FairTask
   PM_HIT *PM_hit;
   PRIM_PART *PRIM_part;
   PRIM_PART *PRIM_frag;
+  PRIM_PART *PRIM_gamma;
   NEUT1_HIT *NEUT1_hit;
   NEUT2_HIT *NEUT2_hit;
   CLUSTER *Cluster;

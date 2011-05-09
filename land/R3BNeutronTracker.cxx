@@ -84,7 +84,9 @@ InitStatus R3BNeutronTracker::Init() {
   npaddles = fLandDigiPar->GetMaxPaddle()+1;
   nplanes = fLandDigiPar->GetMaxPlane();
   cout<<"# paddles: "<<npaddles-1<<"  # planes: "<<nplanes<<endl;
-  amu = 931.494028; //atomic mass unit in MeV/c**2
+//  amu = 931.494028; //atomic mass unit in MeV/c**2
+  amu = 931.49432; //atomic mass unit in MeV/c**2
+
   mNeutron=1.0086649156*amu;
   c = 2.99792458E8;
   cMedia = 14.;// speed of light in material in [cm/ns]
@@ -94,6 +96,7 @@ InitStatus R3BNeutronTracker::Init() {
   PM_hit=new PM_HIT[npaddles];
   PRIM_part=new PRIM_PART[11];
   PRIM_frag=new PRIM_PART[1];
+  PRIM_gamma=new PRIM_PART[1];  
   NEUT1_hit=new NEUT1_HIT[100];
   NEUT2_hit=new NEUT2_HIT[100];
   Cluster=new CLUSTER[100];
@@ -102,20 +105,36 @@ InitStatus R3BNeutronTracker::Init() {
   hNeutmult->GetXaxis()->SetTitle("Number of Neutrons");
   hNeutmult->GetYaxis()->SetTitle("Counts");
 
-  hMinv = new TH1F("Minv","Minv for reconstructed hits",10000,0.,10000.);
-  hMinv->GetXaxis()->SetTitle("Erel (keV)");
+  hErel1 = new TH1F("Erel1","Erel for 1 neutron",400,0.,40.);
+  hErel1->GetXaxis()->SetTitle("Erel (MeV)");
+  hErel1->GetYaxis()->SetTitle("Counts");
+
+  hErel2 = new TH1F("Erel2","Erel for 2 neutron",400,0.,40.);
+  hErel2->GetXaxis()->SetTitle("Erel (MeV)");
+  hErel2->GetYaxis()->SetTitle("Counts");
+
+  hErel3 = new TH1F("Erel3","Erel for 3 neutron",400,0.,40.);
+  hErel3->GetXaxis()->SetTitle("Erel (MeV)");
+  hErel3->GetYaxis()->SetTitle("Counts");
+
+  hErel4 = new TH1F("Erel4","Erel for 4 neutron",400,0.,40.);
+  hErel4->GetXaxis()->SetTitle("Erel (MeV)");
+  hErel4->GetYaxis()->SetTitle("Counts");
+
+  hMinv = new TH1F("Minv","Minv for reconstructed hits",400,0.,40.);
+  hMinv->GetXaxis()->SetTitle("Erel (MeV)");
   hMinv->GetYaxis()->SetTitle("Counts");
 
-  hMinv1 = new TH1F("Minv1","Minv for first hits",10000,0.,10000.);
-  hMinv1->GetXaxis()->SetTitle("Erel (keV)");
+  hMinv1 = new TH1F("Minv1","Minv for first hits",400,0.,40.);
+  hMinv1->GetXaxis()->SetTitle("Erel (MeV)");
   hMinv1->GetYaxis()->SetTitle("Counts");
 
-  hMinv2 = new TH1F("Minv2","Minv for selected hits",10000,0.,10000.);
-  hMinv2->GetXaxis()->SetTitle("Erel (keV)");
+  hMinv2 = new TH1F("Minv2","Minv for selected hits",400,0.,40.);
+  hMinv2->GetXaxis()->SetTitle("Erel (MeV)");
   hMinv2->GetYaxis()->SetTitle("Counts");
 
-  hMinv0 = new TH1F("Minv0","Minv for ideal hits",10000,0.,10000.);
-  hMinv0->GetXaxis()->SetTitle("Erel (keV)");
+  hMinv0 = new TH1F("Minv0","Minv for ideal hits",400,0.,40.);
+  hMinv0->GetXaxis()->SetTitle("Erel (MeV)");
   hMinv0->GetYaxis()->SetTitle("Counts");
 
   hDeltaX = new TH1F("DeltaX","error in x determination",300,-150.,150.);
@@ -214,6 +233,10 @@ InitStatus R3BNeutronTracker::Init() {
   hDelta->GetXaxis()->SetTitle("distance (cm)");
   hDelta->GetYaxis()->SetTitle("Counts");
 
+  hFirstHitZ = new TH1F("FirstHitZ","z positions of first hits",200,1000.,2000.);
+  hFirstHitZ->GetXaxis()->SetTitle("z position (cm)");
+  hFirstHitZ->GetYaxis()->SetTitle("Counts");
+
   return kSUCCESS;
 
 }
@@ -234,12 +257,20 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
    cout<<"beam velocity: "<<beamBeta<<endl;
    Int_t nentries = fLandDigi->GetEntries();
    Double_t temp[npaddles][14];
+
    Int_t nPrim=0;
+   Int_t nPrimNeutrons=0;
+   
    Double_t momentumT[10],momentumX[10],momentumY[10],momentumZ[10],energy[10];
    Double_t beta[10], gamma[10],rr,s;  
    Double_t sum_momentumX,sum_momentumY,sum_momentumZ,sum_masses,sum_energy;
    Double_t betaNeutron,E_lab,pnzcm;
-   
+   Double_t Egamma=0;
+   Double_t gamma_px=0.;
+   Double_t gamma_py=0.;
+   Double_t gamma_pz=0.;
+   Double_t m_proj=67.93187*amu;   
+      
    // Get parameter from original neutrons and fragment
    // Access to Monte Carlo Info
    //  get object from the TclonesArray at index=TrackID
@@ -274,6 +305,7 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
          PRIM_part[nPrim].y = aTrack1->GetStartY();  
          PRIM_part[nPrim].z = aTrack1->GetStartZ();  
          PRIM_part[nPrim].t = aTrack1->GetStartT();
+         nPrimNeutrons=nPrimNeutrons+1;
       }
       else if(particleID==2212){
          //proton
@@ -291,13 +323,60 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
          PRIM_part[nPrim].z = aTrack1->GetStartZ();  
          PRIM_part[nPrim].t = aTrack1->GetStartT();
       }
+      else if(particleID==22){
+         //gamma
+         PRIM_gamma[0].M = aTrack1->GetMass();
+//	 PRIM_gamma[0].A=0;
+//	 PRIM_gamma[0].M=PRIM_gamma[nPrim].A*amu;
+         PRIM_gamma[0].pdg = aTrack1->GetPdgCode();
+         PRIM_gamma[0].px = aTrack1->GetPx()*1000.;  
+         PRIM_gamma[0].py = aTrack1->GetPy()*1000.;  
+         PRIM_gamma[0].pz = aTrack1->GetPz()*1000.;  
+         PRIM_gamma[0].pt = aTrack1->GetPt()*1000.;  
+         PRIM_gamma[0].p = aTrack1->GetP()*1000.;  
+         PRIM_gamma[0].x = aTrack1->GetStartX();  
+         PRIM_gamma[0].y = aTrack1->GetStartY();  
+         PRIM_gamma[0].z = aTrack1->GetStartZ();  
+         PRIM_gamma[0].t = aTrack1->GetStartT();
+
+	 cout<<"gamma "<< PRIM_gamma[0].px<< "  " << PRIM_gamma[0].py<<"  "<<PRIM_gamma[0].pz<<endl;
+
+         Egamma=Egamma+PRIM_gamma[0].p;
+	 gamma_px=gamma_px+PRIM_gamma[0].px;
+	 gamma_py=gamma_py+PRIM_gamma[0].py;
+	 gamma_pz=gamma_pz+PRIM_gamma[0].pz;
+
+	 gamma_px=0.;
+	 gamma_py=0.;
+	 gamma_pz=0.;
+	 
+	 cout<<"p gamma "<< PRIM_gamma[0].p<<endl;	 
+
+	 cout<<"E gamma "<< Egamma<<endl;	 
+      }
       else{
 	 //fragment
-         PRIM_frag[0].M = aTrack1->GetMass()*1000.;
+         PRIM_frag[0].M = aTrack1->GetMass();
+
 //	 cout<<"prim M "<<PRIM_frag[0].M<<endl;
-         PRIM_frag[0].A=131.;
+	 cout<<"Mass "<<PRIM_frag[0].M/0.92827231<<endl;
+
+         PRIM_frag[0].A=PRIM_frag[0].M/0.92827231;
+
+         if(TMath::Abs(PRIM_frag[0].A-67.)<0.01){
+	   PRIM_frag[0].A=66.931569;
+	 }
+         if(TMath::Abs(PRIM_frag[0].A-66.)<0.01){
+	   PRIM_frag[0].A=65.92914;
+	 }
+         if(TMath::Abs(PRIM_frag[0].A-65.)<0.01){
+	   PRIM_frag[0].A=64.930084;
+	 }
+         if(TMath::Abs(PRIM_frag[0].A-64.)<0.01){
+	   PRIM_frag[0].A=63.927967;
+	 }
+	 
          PRIM_frag[0].M=PRIM_frag[0].A*amu; 
-//	 cout<<"prim M "<<PRIM_frag[0].M<<endl;
          PRIM_frag[0].pdg = aTrack1->GetPdgCode();
          PRIM_frag[0].px = aTrack1->GetPx()*1000.;  
          PRIM_frag[0].py = aTrack1->GetPy()*1000.;  
@@ -365,18 +444,17 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
    firstHitZ[3] = land_obj1->GetZ3();  
    firstT[3] = 1.E9*land_obj1->GetT3();  
 
-   if(nPrim>4){
-      firstHitX[4] = land_obj1->GetX4();  
-      firstHitY[4] = land_obj1->GetY4();  
-      firstHitZ[4] = land_obj1->GetZ4();  
-      firstT[4] = 1.E9*land_obj1->GetT4();  
-      firstHitX[5] = land_obj1->GetX5();  
-      firstHitY[5] = land_obj1->GetY5();  
-      firstHitZ[5] = land_obj1->GetZ5();  
-      firstT[5] = 1.E9*land_obj1->GetT5();  
-   }
+   firstHitX[4] = land_obj1->GetX4();  
+   firstHitY[4] = land_obj1->GetY4();  
+   firstHitZ[4] = land_obj1->GetZ4();  
+   firstT[4] = 1.E9*land_obj1->GetT4();  
+   firstHitX[5] = land_obj1->GetX5();  
+   firstHitY[5] = land_obj1->GetY5();  
+   firstHitZ[5] = land_obj1->GetZ5();  
+   firstT[5] = 1.E9*land_obj1->GetT5();  
    
    for (Int_t l=0;l<nPrim;l++){   
+      hFirstHitZ->Fill(firstHitZ[l]);
       for (Int_t k=l+1;k<nPrim;k++){
          Double_t dist=sqrt((firstHitX[l]-firstHitX[k])*(firstHitX[l]-firstHitX[k])+
 	                    (firstHitY[l]-firstHitY[k])*(firstHitY[l]-firstHitY[k])+
@@ -955,7 +1033,7 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
 
       // determine how many neutrons from sum energy considerations
 
-      Double_t neutmult=0.01*sumTotalEnergy/beamEnergy*600.;
+      Double_t neutmult=0.0098*sumTotalEnergy/beamEnergy*600.;
 //      Double_t neutmult=0.0112*sumTotalEnergy/beamEnergy*600.;  //200 MeV
 
 //      cout<< "neutmult from energy: " << neutmult  <<  endl;
@@ -1240,7 +1318,7 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
       Double_t min=100000.;
       
       Int_t closest=0;
-      if(numneut==(nPrim-1)){
+      if(numneut==nPrimNeutrons){
          for (Int_t i=0;i<numneut;i++){         
             for (Int_t j=0;j<numneut;j++){
                distance=sqrt((firstHitX[i]-NEUT2_hit[j].x)*(firstHitX[i]-NEUT2_hit[j].x)+
@@ -1286,16 +1364,17 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
             momentumY[i]=PRIM_part[i].py;
             momentumZ[i]=PRIM_part[i].pz;
             energy[i] = gamma[i]*PRIM_part[i].A*amu; //total energy
-            if(printing){
+//            if(printing){
                cout<<" beta gamma "<<beta[i]<<"  "<<gamma[i]<<endl;
   	       cout<<" momentum T "<<momentumT[i]<<endl;
 	       cout<<" momentum "<<momentumX[i]<<"  "<<momentumY[i]<<"  "<<momentumZ[i]<<endl;
-	    }	 
+//	    }	 
 	    sum_energy+=energy[i];
 	    sum_momentumX+=momentumX[i];
 	    sum_momentumY+=momentumY[i];
 	    sum_momentumZ+=momentumZ[i];
 	    sum_masses+=PRIM_part[i].M;
+            cout<<"mass "<<sum_masses<<"  "<<PRIM_part[i].M<<endl;
       	 }
       }
       // fragment: This information have to come later from the Tracker
@@ -1304,22 +1383,47 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
       Double_t gamma_frag=1./sqrt(1.-beta_frag*beta_frag); // gamma         
       Double_t energy_frag = gamma_frag*PRIM_frag[0].A*amu; //total energy
 
+      cout<<"result1 "<<sum_momentumX<<"  "<<sum_momentumY<<"  "<<sum_momentumZ<<endl;
+      cout<<" beta gamma frag"<<beta_frag<<"  "<<gamma_frag<<endl;
+      cout<<" Energie frag "<<energy_frag<<"  "<<PRIM_frag[0].A <<endl;
+      
       sum_energy+=energy_frag;
       sum_momentumX+=PRIM_frag[0].px;
       sum_momentumY+=PRIM_frag[0].py;
       sum_momentumZ+=PRIM_frag[0].pz;
       sum_masses+=PRIM_frag[0].M;
+
+      cout<<"adding frag "<<PRIM_frag[0].px<<"  "<<PRIM_frag[0].py<<"  "<<PRIM_frag[0].pz<<endl;
+      cout<<"result2 "<<sum_momentumX<<"  "<<sum_momentumY<<"  "<<sum_momentumZ<<endl;
+      cout<<"mass "<<sum_masses<<"  "<<PRIM_frag[0].M<<endl;
+
+      // gamma: This information have to come later from the Tracker
+//      sum_energy+=Egamma*sqrt((1+beamBeta)/(1-beamBeta));
+      sum_energy+=Egamma;      
+//      sum_momentumX+=PRIM_gamma[0].px*sqrt((1+beamBeta)/(1-beamBeta));
+      sum_momentumX+=gamma_px;
+      sum_momentumY+=gamma_py;
+      sum_momentumZ+=gamma_pz;
+      cout<<"adding gamma "<<gamma_px<<"  "<<gamma_py<<"  "<<gamma_pz<<endl;
+      cout<<"result3 "<<sum_momentumX<<"  "<<sum_momentumY<<"  "<<sum_momentumZ<<endl;
+      cout<<"Egamma "<<Egamma<<endl;
+     
       
       // calculate invariant mass with ideal quantities for a check
       Double_t xinv0;
-      xinv0=(sqrt(sum_energy*sum_energy-
+//      xinv0=sqrt(sum_energy*sum_energy-
+//           (sum_momentumX*sum_momentumX + sum_momentumY*sum_momentumY +
+//	    sum_momentumZ*sum_momentumZ))- sum_masses ;
+
+      xinv0=sqrt(sum_energy*sum_energy-
            (sum_momentumX*sum_momentumX + sum_momentumY*sum_momentumY +
-	    sum_momentumZ*sum_momentumZ))
-           - sum_masses );
-      hMinv0->Fill(xinv0*1000.);
-      if(printing){   
-         cout<<"xinv0 "<<xinv0*1000.<<endl;
-      }        
+	    sum_momentumZ*sum_momentumZ)) - m_proj ;
+	    
+      hMinv0->Fill(xinv0);
+//      if(printing){   
+         cout<<"xinv0 "<<xinv0<<endl;
+//      }        
+
 
       // Now reconstruction of momenta with real measured quantities
       Double_t xinv=0;
@@ -1397,23 +1501,37 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
       cout<<" frag energy "<<energy_frag<<endl;
       cout<<" frag momentum "<<PRIM_frag[0].px<<"  "<<PRIM_frag[0].py<<"  "<<PRIM_frag[0].pz<<endl;
 */
+      // gamma: This information have to come later from the Tracker
+      sum_energy+=Egamma;
+      sum_momentumX+=gamma_px;
+      sum_momentumY+=gamma_py;
+      sum_momentumZ+=gamma_pz;
+      
       // calculate invariant mass
+//      xinv=(sqrt(sum_energy*sum_energy-
+//           (sum_momentumX*sum_momentumX + sum_momentumY*sum_momentumY +
+//	   sum_momentumZ*sum_momentumZ)) - sum_masses);
       xinv=(sqrt(sum_energy*sum_energy-
            (sum_momentumX*sum_momentumX + sum_momentumY*sum_momentumY +
-	   sum_momentumZ*sum_momentumZ))
-           - sum_masses );
-      if(numneut==(nPrim-1)) hMinv->Fill(xinv*1000.);
-      if(numneut==(nPrim-1) && Nclusters==(nPrim-1)) hMinv2->Fill(xinv*1000.);
-      if(printing){   
+	   sum_momentumZ*sum_momentumZ)) - m_proj);
+	   
+      if(numneut==(nPrimNeutrons)) hMinv->Fill(xinv);
+      if(numneut==1) hErel1->Fill(xinv);
+      if(numneut==2) hErel2->Fill(xinv);
+      if(numneut==3) hErel3->Fill(xinv);
+      if(numneut==4) hErel4->Fill(xinv);
+     
+      if(numneut==(nPrimNeutrons) && Nclusters==(nPrimNeutrons)) hMinv2->Fill(xinv);
+//      if(printing){   
          cout<<"numNeut "<<numneut<<endl;
-         cout<<"xinv "<<xinv*1000.<<endl;
-      }
+         cout<<"xinv "<<xinv<<endl;
+//      }
 // record difference in momenta 
       diff=0.;
       min=100000.;
       
       closest=0;
-      if(numneut==(nPrim-1)){
+      if(numneut==(nPrimNeutrons)){
          for (Int_t i=0;i<numneut;i++){         
             for (Int_t j=0;j<numneut;j++){
                diff=sqrt((momentumX[j]-PRIM_part[i+1].px)*(momentumX[j]-PRIM_part[i+1].px)+
@@ -1446,7 +1564,7 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
 //******************************************************************
 // Now reconstruction of momenta with first hits
 
-      numneut=nPrim-1;
+      numneut=nPrimNeutrons;
       for (Int_t i=0;i<numneut;i++){
          NEUT1_hit[i].x = firstHitX[i];
          NEUT1_hit[i].y = firstHitY[i];
@@ -1501,23 +1619,29 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
       sum_momentumZ+=PRIM_frag[0].pz;
       sum_masses+=PRIM_frag[0].M;
 
+      // gamma: This information have to come later from the Tracker
+      sum_energy+=Egamma;
+      sum_momentumX+=gamma_px;
+      sum_momentumY+=gamma_py;
+      sum_momentumZ+=gamma_pz;
+      
       // calculate invariant mass
       xinv=(sqrt(sum_energy*sum_energy-
            (sum_momentumX*sum_momentumX + sum_momentumY*sum_momentumY +
 	   sum_momentumZ*sum_momentumZ))
-           - sum_masses );
-      if(numneut==(nPrim-1)) hMinv1->Fill(xinv*1000.);
+           - sum_masses);
+      if(numneut==nPrimNeutrons) hMinv1->Fill(xinv);
 
       if(printing){   
          cout<<"numNeut "<<numneut<<endl;
-         cout<<"xinv1 "<<xinv*1000.<<endl;
+         cout<<"xinv1 "<<xinv<<endl;
       }
 // record difference in momenta 
       diff=0.;
       min=100000.;
       
       closest=0;
-      if(numneut==(nPrim-1)){
+      if(numneut==(nPrimNeutrons)){
          for (Int_t i=0;i<numneut;i++){         
             for (Int_t j=0;j<numneut;j++){
                diff=sqrt((momentumX[j]-PRIM_part[i+1].px)*(momentumX[j]-PRIM_part[i+1].px)+
@@ -1617,6 +1741,11 @@ void R3BNeutronTracker::Finish()
    hMinv1->Write();
    hMinv2->Write();
 
+   hErel1->Write();
+   hErel2->Write();
+   hErel3->Write();
+   hErel4->Write();
+
    hDeltaPx1->Write();
    hDeltaPy1->Write();
    hDeltaPz1->Write();
@@ -1641,7 +1770,8 @@ void R3BNeutronTracker::Finish()
    hClusterNo_vs_Size->Write();
 
    hDelta->Write();
-    
+   
+   hFirstHitZ->Write();
 }
 
 R3BNeutronTrack* R3BNeutronTracker::AddHit(TVector3 posIn,
