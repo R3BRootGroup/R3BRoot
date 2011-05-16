@@ -111,10 +111,6 @@ void R3BCaloHitFinder::Exec(Option_t* opt) {
 	Int_t crystalsInHit=0;  //used crystals in each CaloHit
 	Double_t testPolar, testAzimuthal;
 	
-	//THIS COULD COME FROM THE PARAMETERS IN THE FUTURE???
-	Double_t deltaPolar = 0.25; //0.25 around 14.3 degrees, 2.5 for the complete calorimeter
-	Double_t deltaAzimuthal = 0.25;
-
 	R3BCaloCrystalHit** crystalHit;
 
 	Int_t crystalHits;				// Nb of CrystalHits in current event
@@ -163,16 +159,16 @@ void R3BCaloHitFinder::Exec(Option_t* opt) {
 				GetAngles(crystalHit[i]->GetCrystalId(), &testPolar, &testAzimuthal);
 			
 				//Dealing with the particular definition of azimuthal angles (discontinuity in pi and -pi)
-				if(azimuthalAngle + deltaAzimuthal > TMath::Pi()) {
+				if(azimuthalAngle + fDeltaAzimuthal > TMath::Pi()) {
 					angle1 = azimuthalAngle-TMath::Pi(); angle2 = testAzimuthal-TMath::Pi();
 				}
-				else if(azimuthalAngle - deltaAzimuthal < -TMath::Pi()){
+				else if(azimuthalAngle - fDeltaAzimuthal < -TMath::Pi()){
 					angle1 = azimuthalAngle+TMath::Pi(); angle2 = testAzimuthal+TMath::Pi();
 				}
 				else {angle1 = azimuthalAngle; angle2 = testAzimuthal;}
 			
-				if(TMath::Abs(polarAngle - testPolar) < deltaPolar && 
-				   TMath::Abs(angle1 - angle2) < deltaAzimuthal ) {
+				if(TMath::Abs(polarAngle - testPolar) < fDeltaPolar && 
+				   TMath::Abs(angle1 - angle2) < fDeltaAzimuthal ) {
 					energy += ExpResSmearing(crystalHit[i]->GetEnergy()); 
 					usedCrystalHits[i] = 1; unusedCrystals--; crystalsInHit++;
 				}
@@ -595,7 +591,7 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal)
 
 
 
-// -----   Private method ExpResSmeaåring  --------------------------------------------
+// -----   Private method ExpResSmearing  --------------------------------------------
 Double_t R3BCaloHitFinder::ExpResSmearing(Double_t inputEnergy) {
 	// Smears the energy according to some Experimental Resolution distribution 
 	// Very simple preliminary scheme where the Experimental Resolution 
@@ -613,8 +609,18 @@ Double_t R3BCaloHitFinder::ExpResSmearing(Double_t inputEnergy) {
 		//cout << "randomIs " << randomIs  << " for and Energy of "<< rawEnergy  << endl;
 		return inputEnergy + randomIs/1000;
 	}
-
 }
+
+// -----   Public method SetAngularWindow  --------------------------------------------
+void R3BCaloHitFinder::SetAngularWindow(Double_t deltaPolar, Double_t deltaAzimuthal) {
+	//
+	// Set the angular window open around the crystal with the largest energy
+	// to search for additional crystal hits and addback to the same cal hit
+	// [0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
+	fDeltaPolar = deltaPolar;
+	fDeltaAzimuthal = deltaAzimuthal;
+}
+
 
 // -----   Private method AddHit  --------------------------------------------
 R3BCaloHit* R3BCaloHitFinder::AddHit(UInt_t Nbcrystals,Double_t ene,Double_t pAngle,Double_t aAngle){   

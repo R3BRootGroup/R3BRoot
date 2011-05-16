@@ -67,6 +67,14 @@ public:
 	 **/
 	void SetDetectionThreshold(Double_t thresholdEne);
 	
+	/** Public method SetAngularWindow
+     **
+     ** Sets the angular window open around the crystal with the largest energy
+	 ** to search for additional crystal hits and addback to the same cal hit
+	 **/
+    void SetAngularWindow(Double_t deltaPolar, Double_t deltaAzimuthal);
+	
+	
 	
 		
 protected:
@@ -94,6 +102,10 @@ protected:
 	Double_t fThreshold;
 	// Experimental resolution @ 1 MeV  
 	Double_t fCrystalResolution;
+	// Angular window (polar) 
+	Double_t fDeltaPolar;
+	// Angular window (azimuthal) 
+	Double_t fDeltaAzimuthal;
 
 	// Parameter class
 	//R3BCaloHitFinderPar* fCaloHitFinderPar;
@@ -108,6 +120,7 @@ private:
 	 ** parameter fCrystalResolution(in % @ MeV). Scales according to 1/sqrt(E)
 	 **/
     Double_t ExpResSmearing(Double_t inputEnergy);
+	
 	
 	/** Private method AddHit
      **
