@@ -34,7 +34,7 @@ Int_t r3blandsim(){
    // Ascii generator:           "ascii"
    // R3B spec. generator:       "r3b"
 
-   TString fGene="ascii";
+   TString fGene="land";
 //   TString fGene="box";
 
    //-------------------------------------------------
@@ -97,19 +97,19 @@ Int_t r3blandsim(){
     fDetList.Add(&det2);
 //    fDetList.Add(&det4);
 //    fDetList.Add(&det5);
-    fDetList.Add(&det6);
+//    fDetList.Add(&det6);
 //    fDetList.Add(&det7);
 //    fDetList.Add(&det8);
-    fDetList.Add(&det9);
-//    fDetList.Add(&det10);
-    fDetList.Add(&det13);
+//    fDetList.Add(&det9);
+    fDetList.Add(&det10);
+//    fDetList.Add(&det13);
 
 
    //-------------------------------------------------
    //- N# of Sim. Events   |    nEvents     (Int_t)
    //-------------------------------------------------
 
-   Int_t nEvents = 10000; //23347;
+   Int_t nEvents = 1; //23347;
 
    //-------------------------------------------------
    //- EventDisplay        |    fEventDisplay (Bool_t)
