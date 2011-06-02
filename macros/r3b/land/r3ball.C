@@ -35,7 +35,7 @@ void r3ball(Int_t nEvents = 1,
 	    TString Target = "LeadTarget",
             Bool_t fVis=kFALSE,
             TString fMC="TGeant4",
-	    TString fGenerator="land",
+	    TString fGenerator="ascii",
 	    Bool_t fUserPList= kFALSE,
             Bool_t fR3BMagnet= kTRUE
 	   )
@@ -393,7 +393,7 @@ void r3ball(Int_t nEvents = 1,
 	// NeuLand Scintillator Detector
   if (fDetList.FindObject("SCINTNEULAND")) {
 
-      R3BDetector* land = new R3BLand("Land", kTRUE);
+      R3BDetector* land = new R3BLand("NeuLand", kTRUE);
       // verbose level 2 ( step info activated )
       land->SetVerboseLevel(2);
 			//Construct NeuLand
@@ -418,7 +418,7 @@ void r3ball(Int_t nEvents = 1,
       // Global translation in Lab
       tx    =  0.0; // (cm)
       ty    =  0.0; // (cm)
-      tz    =  3500.0; // (cm)
+      tz    =  1200.0; // (cm)
       //land->SetRotAnglesEuler(phi,theta,psi);
       land->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       land->SetTranslation(tx,ty,tz);
@@ -520,9 +520,7 @@ void r3ball(Int_t nEvents = 1,
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
   if (fGenerator.CompareTo("ascii") == 0  ) {
-  TString evtFile = "evt_gen.dat";
-  TString iFile = dir + "/input/" + evtFile;
-  R3BAsciiGenerator* gen = new R3BAsciiGenerator(iFile.Data());
+
   // add the ascii generator
   primGen->AddGenerator(gen);
   } 
@@ -542,6 +540,7 @@ void r3ball(Int_t nEvents = 1,
   boxGen->SetXYZ(2.5,2.5,972.5);
   // add the box generator
   primGen->AddGenerator(boxGen);
+  
   } 
 
   if (fGenerator.CompareTo("land") == 0  ) {
@@ -556,7 +555,9 @@ void r3ball(Int_t nEvents = 1,
   //boxGen->SetXYZ(0.0,0.0,-1.5);
   
   //  const char fname = output.root
-  R3BLandGenerator* LandGen = new R3BLandGenerator("output.root");
+  TString evtFile = "evt_land.root";
+  TString iFile = dir + "/input/" + evtFile;
+  R3BLandGenerator* LandGen = new R3BLandGenerator(iFile.Data());
   
   // add the box generator
   primGen->AddGenerator(LandGen);
@@ -613,10 +614,8 @@ void r3ball(Int_t nEvents = 1,
   primGen->AddGenerator(pR3bGen);
   }
 
-
   run->SetGenerator(primGen);
-
-
+  
   //-------Set visualisation flag to true------------------------------------
   if (fVis==kTRUE){
      run->SetStoreTraj(kTRUE);
