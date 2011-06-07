@@ -162,7 +162,7 @@ void r3ball(Int_t nEvents = 1,
       //target->SetRotAnglesEuler(phi,theta,psi);
       target->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       target->SetTranslation(tx,ty,tz);
-//      run->AddModule(target);
+      run->AddModule(target);
   }
 
   //R3B Magnet definition
@@ -206,7 +206,7 @@ void r3ball(Int_t nEvents = 1,
       //mag->SetRotAnglesEuler(phi,theta,psi);
       mag->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       mag->SetTranslation(tx,ty,tz);
-      //run->AddModule(mag);
+      run->AddModule(mag);
   }
 
 
@@ -228,7 +228,7 @@ void r3ball(Int_t nEvents = 1,
       //cal->SetRotAnglesEuler(phi,theta,psi);
       cal->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       cal->SetTranslation(tx,ty,tz);
-      //run->AddModule(cal);
+      run->AddModule(cal);
   }
 
   if (fDetList.FindObject("CALIFA") ) {
@@ -249,7 +249,7 @@ void r3ball(Int_t nEvents = 1,
       //calo->SetRotAnglesEuler(phi,theta,psi);
       calo->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       calo->SetTranslation(tx,ty,tz);
-      //run->AddModule(calo);
+      run->AddModule(calo);
   }
 
   // Tracker
@@ -273,7 +273,7 @@ void r3ball(Int_t nEvents = 1,
       // User defined Energy CutOff
       Double_t fCutOffSi = 1.0e-06;  // Cut-Off -> 10KeV only in Si
       ((R3BTra*) tra)->SetEnergyCutOff(fCutOffSi);
-      //run->AddModule(tra);
+      run->AddModule(tra);
   }
   
   // DCH drift chambers
@@ -295,7 +295,7 @@ void r3ball(Int_t nEvents = 1,
      //dch->SetRotAnglesEuler(phi,theta,psi);
       dch->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       dch->SetTranslation(tx,ty,tz);
-      //run->AddModule(dch);
+      run->AddModule(dch);
   }
 
   // Tof
@@ -318,7 +318,7 @@ void r3ball(Int_t nEvents = 1,
       // User defined Energy CutOff
       Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
       ((R3BTof*) tof)->SetEnergyCutOff(fCutOffSci);
-      //run->AddModule(tof);
+      run->AddModule(tof);
   }
 
   // mTof
@@ -388,7 +388,7 @@ void r3ball(Int_t nEvents = 1,
       //land->SetRotAnglesEuler(phi,theta,psi);
       land->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       land->SetTranslation(tx,ty,tz);
-      //run->AddModule(land);
+      run->AddModule(land);
   }
 	// NeuLand Scintillator Detector
   if (fDetList.FindObject("SCINTNEULAND")) {
@@ -447,7 +447,7 @@ void r3ball(Int_t nEvents = 1,
       // User defined Energy CutOff
       //Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
       //((R3BChimera*) chim)->SetEnergyCutOff(fCutOffSci);
-      //run->AddModule(chim);
+      run->AddModule(chim);
   }
 
   // Luminosity detector
@@ -471,7 +471,7 @@ void r3ball(Int_t nEvents = 1,
       // User defined Energy CutOff
       //Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
       //((ELILuMon*) lumon)->SetEnergyCutOff(fCutOffSci);
-      //run->AddModule(lumon);
+      run->AddModule(lumon);
   }
 
 
@@ -520,7 +520,8 @@ void r3ball(Int_t nEvents = 1,
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
   if (fGenerator.CompareTo("ascii") == 0  ) {
-
+  TString evtFile = "evt_gen.dat";
+  TString iFile = dir + "/input/" + evtFile;
   // add the ascii generator
   primGen->AddGenerator(gen);
   } 
