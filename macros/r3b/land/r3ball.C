@@ -522,6 +522,7 @@ void r3ball(Int_t nEvents = 1,
   if (fGenerator.CompareTo("ascii") == 0  ) {
   TString evtFile = "evt_gen.dat";
   TString iFile = dir + "/input/" + evtFile;
+  R3BAsciiGenerator* gen = new R3BAsciiGenerator(iFile.Data());  
   // add the ascii generator
   primGen->AddGenerator(gen);
   } 
