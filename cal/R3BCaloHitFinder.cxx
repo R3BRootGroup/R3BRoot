@@ -26,6 +26,8 @@ R3BCaloHitFinder::R3BCaloHitFinder() : FairTask("R3B CALIFA Hit Finder ") {
 	fGeometryVersion=1; //default version 7.05
 	fThreshold=0.;	   //no threshold
 	fCrystalResolution=0.; //perfect crystals
+	fDeltaPolar=0.25;
+	fDeltaAzimuthal=0.25;
 }
 
 
