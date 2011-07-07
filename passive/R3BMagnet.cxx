@@ -114,10 +114,12 @@ void R3BMagnet::ConstructGeometry(){
     Double_t Aladin_length = 176.0; //1.70*m; Field length is 1.4 m
     Double_t Aladin_gap = 50.;    //cm
     // Angle / beam axis check me ! (-7.3 deg , +7.2 deg ?)
-    Double_t Aladin_angle = +7.3; // degree
+    //Double_t Aladin_angle = +7.3; // degree
+    Double_t Aladin_angle = -7.0; // degree
     Double_t DistanceToTarget = 350.0;  //cm
     Double_t Yoke_thickness = 50.;     //cm
-    Double_t Correction = -119.94;   //cm
+//    Double_t Correction = -119.94;   //cm
+    Double_t Correction = -95.0;   //cm
 // Define distance  from target ??? FIXME
 //    Double_t DistanceFromtargetToAladinCenter
 //	     = DistanceToTarget + Aladin_length/2.0;
