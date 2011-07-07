@@ -22,7 +22,7 @@ void Config()
   R3BStack *st = new R3BStack();
   // Stack debug mode
   st->SetDebug(kFALSE);
-  //st->SetDebug(kTRUE);
+//  st->SetDebug(kTRUE);
   st->SetMinPoints(0);
   st->StoreSecondaries(kTRUE);
   
@@ -34,8 +34,8 @@ void Config()
   geant3->SetDEBU(0, 0, 1);
   
   //<DB> Command for debugging purpose
-  //geant3->SetSWIT(2, 2);
-  //geant3->SetDEBU(1, 100, 2); 
+//  geant3->SetSWIT(2, 2);
+//  geant3->SetDEBU(1, 100, 2); 
   
   geant3->SetRAYL(1);
   geant3->SetSTRA(1);
