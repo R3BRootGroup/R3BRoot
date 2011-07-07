@@ -448,11 +448,17 @@ void R3BGfi::ConstructGeometry() {
 
    // TRANSFORMATION MATRICES
    // Combi transformation:
+   dx = -71.973310;
+   dy = 0.000000;
+   dz = 513.967775;
+/*
    dx = 73.700000;
    dy = 0.000000;
    dz = 525.400000;
+*/
    // Rotation: 
-   thx = 106.700000;    phx = 0.000000;
+   thx = -106.700000;    phx = 0.000000;
+//   thx = 106.700000;    phx = 0.000000;   
    thy = 90.000000;    phy = 90.000000;
    thz = 16.700000;    phz = 0.000000;
    TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
@@ -514,11 +520,17 @@ void R3BGfi::ConstructGeometry() {
    TGeoCombiTrans*
    pMatrix14 = new TGeoCombiTrans("", dx,dy,dz,pMatrix15);
    // Combi transformation: 
+   dx = -145.270039;
+   dy = 0.000000;
+   dz = 730.318956;
+/*
    dx = 141.800000;
    dy = 0.000000;
    dz = 727.300000;
+*/   
    // Rotation: 
-   thx = 106.700000;    phx = 0.000000;
+   thx = -106.700000;    phx = 0.000000;
+//   thx = 106.700000;    phx = 0.000000;   
    thy = 90.000000;    phy = 90.000000;
    thz = 16.700000;    phz = 0.000000;
    TGeoRotation *pMatrix5 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
