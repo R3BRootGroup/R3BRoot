@@ -112,6 +112,8 @@ class R3BDch : public R3BDetector
   virtual void ConstructGeometry();
   virtual void ConstructGeometry1();
   virtual void ConstructGeometry2();
+  virtual void ConstructGeometryJustyna();
+   
 
 
   virtual void Initialize();
