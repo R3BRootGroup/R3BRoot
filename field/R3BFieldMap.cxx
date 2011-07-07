@@ -59,9 +59,11 @@ R3BFieldMap::R3BFieldMap(Int_t type,Bool_t verbosity)
   fVerbose = verbosity;
 
   Double_t DistanceToTarget = 350.0;  //cm
-  Double_t Correction = -119.94; // cm
+  //Double_t Correction = -119.94; // cm
+  Double_t Correction = -95.0; // cm
  // Double_t Aladin_gap = 50.;    //cm
-  Double_t Aladin_angle = +7.3; // degree
+ // Double_t Aladin_angle = +7.3; // degree
+  Double_t Aladin_angle = -7.0; // degree
  // Double_t Yoke_thickness = 50.; //cm
 
   Double_t DistanceFromtargetToAladinCenter
