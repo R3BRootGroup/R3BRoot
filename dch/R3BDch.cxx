@@ -669,7 +669,276 @@ R3BDchPoint* R3BDch::AddHit(Int_t trackId, Int_t mod, Int_t layer, Int_t cell, T
 }
 // -----   Public method ConstructGeometry   ----------------------------------
 void R3BDch::ConstructGeometry() {
-  return ConstructGeometry2();
+  return ConstructGeometryJustyna();
+}
+
+void R3BDch::ConstructGeometryJustyna() {
+ // out-of-file geometry definition
+   Double_t dx,dy,dz;
+   Double_t theta, phi;
+   Double_t a;
+   Double_t thx, phx, thy, phy, thz, phz;
+   Double_t alpha;
+   Double_t z, density, radl, absl, w;
+   Int_t nel, numed;
+
+   Int_t matIndex = gGeoManager->GetListOfMaterials()->GetEntries();
+   cout << " Matindex : " << matIndex<< endl;
+
+   //-------------    Material definition
+   // Mixture: Air
+   TGeoMedium * pMed2=NULL;
+   if (gGeoManager->GetMedium("Air") ){
+       pMed2=gGeoManager->GetMedium("Air");
+   }else{
+    nel     = 2;
+    density = 0.001290;
+    TGeoMixture*
+	pMat2 = new TGeoMixture("Air", nel,density);
+    a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+    pMat2->DefineElement(0,a,z,w);
+    a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+    pMat2->DefineElement(1,a,z,w);
+    matIndex++;
+    pMat2->SetIndex(matIndex);
+    // Medium: Air
+    numed   = matIndex;  // medium number
+  
+    pMed2 = new TGeoMedium("Air", numed,pMat2);
+   }
+
+   // Material: Aluminum
+   TGeoMedium * pMed21=NULL;
+   if (gGeoManager->GetMedium("Aluminum") ){
+       pMed21=gGeoManager->GetMedium("Aluminum");
+   }else{
+      a       = 26.980000;
+      z       = 13.000000;
+      density = 2.700000;
+      matIndex++;
+      numed=matIndex;
+      TGeoMaterial *matAl
+	   = new TGeoMaterial("Aluminum", a,z,density);
+      pMed21 = new TGeoMedium("Aluminum",numed, matAl);
+   }
+
+
+
+
+   // Mixture: Mylar
+   TGeoMedium * pMed15=NULL;
+   if (gGeoManager->GetMedium("Mylar") ){
+       pMed15=gGeoManager->GetMedium("Mylar");
+   }else{
+       nel     = 3;
+       density = 1.397000;
+       TGeoMixture*
+	   pMat15 = new TGeoMixture("Mylar", nel,density);
+       a = 12.010700;   z = 6.000000;   w = 0.625010;  // C
+       pMat15->DefineElement(0,a,z,w);
+       a = 1.007940;   z = 1.000000;   w = 0.041961;  // H
+       pMat15->DefineElement(1,a,z,w);
+       a = 15.999400;   z = 8.000000;   w = 0.333029;  // O
+       pMat15->DefineElement(2,a,z,w);
+       matIndex++;
+       pMat15->SetIndex(matIndex);
+       // Medium: Mylar
+       numed   = matIndex;  // medium number
+    pMed15 = new TGeoMedium("mylar", numed,pMat15);
+   }
+
+
+
+   // Material: HeliumGas
+   TGeoMedium * pMed4=NULL;
+   if (gGeoManager->GetMedium("HeliumGas") ){
+       pMed4=gGeoManager->GetMedium("HeliumGas");
+   }else{
+       a       = 4.000000;
+       z       = 2.000000;
+       density = 0.000125;
+       TGeoMaterial*
+	   pMat4 = new TGeoMaterial("HeliumGas", a,z,density);
+       matIndex++;
+       pMat4->SetIndex(matIndex);
+       // Medium: HeliumGas
+       numed   = matIndex;  // medium number
+
+     pMed4 = new TGeoMedium("HeliumGas", numed,pMat4);
+   }
+
+  // DCH Gas definition
+  Float_t aP[3]={39.948,12.0107,15.9994};
+  Float_t zP[3]={18.,6.,8.};
+  Float_t wP[3]={0.8, 0.054582,0.145418} ;
+  Float_t dP = 0.001017 ;
+  Int_t   nP = 3;
+  //sumWeight = 0;
+  //for (i=0; i<nP; i++) sumWeight += aP[i]*wP[i];
+  //for (i=0; i<nP; i++) wP[i] *= aP[i]/sumWeight;
+  matIndex++;
+  TGeoMaterial* pMat33 = gGeoManager->Mixture("DCHGas",aP,zP,dP,nP,wP,matIndex);
+  TGeoMedium* pMed33 = new TGeoMedium("DCHGas",matIndex,pMat33);
+
+
+
+
+   // Mixture: mixtureForDCH
+   /*
+   TGeoMedium * pMed33=NULL;
+   if (gGeoManager->GetMedium("mixtureForDCH") ){
+       pMed33=gGeoManager->GetMedium("mixtureForDCH");
+   }else{
+      nel     = 3;
+      density = 0.001017;
+      TGeoMixture*
+	  pMat33 = new TGeoMixture("mixtureForDCH", nel,density);
+      a = 39.948000;   z = 18.000000;   w = 0.800000;  // AR
+      pMat33->DefineElement(0,a,z,w);
+      a = 12.010700;   z = 6.000000;   w = 0.054582;  // C
+      pMat33->DefineElement(1,a,z,w);
+      a = 15.999400;   z = 8.000000;   w = 0.145418;  // O
+      pMat33->DefineElement(2,a,z,w);
+      matIndex++;
+      pMat33->SetIndex(600);
+      // Medium: mixtureForDCH
+      numed   = 602;  // medium number
+  
+      pMed33 = new TGeoMedium("mixtureForDCH", numed,pMat33);
+   }
+   */
+
+
+
+   //Get Top Volume
+   TGeoVolume* vWorld = gGeoManager->GetTopVolume();
+   vWorld->SetVisLeaves(kTRUE);
+   // Define DCH Geometry
+
+   // Gas box
+   Double_t gasDx = 106.4/2.; // [cm]
+   Double_t gasDy = 83.4/2.;  // [cm]
+   Double_t gasDz = 4.06;     // [cm]
+
+   TGeoShape* pGasBox = new TGeoBBox("GasBox",
+				     gasDx,
+				     gasDy,
+				     gasDz);
+   TGeoVolume*
+       pGasDchLog = new TGeoVolume("GASBoxLog",pGasBox, pMed33);
+   pGasDchLog->SetVisLeaves(kTRUE);
+   pGasDchLog->SetVisContainers(kTRUE);
+
+
+   // Al Frame
+   Double_t alDx = 125.8/2.; // [cm]
+   Double_t alDy = 103.4/2.; // [cm]
+   Double_t alDz = 4.06;     // [cm]
+
+   TGeoShape* pAlBox = new TGeoBBox("AlBox",
+					 alDx,
+					 alDy,
+					 alDz);
+
+   TGeoVolume*
+   pAlDchLog = new TGeoVolume("ALBoxLog",pAlBox, pMed21);
+   pAlDchLog->SetVisLeaves(kTRUE);
+
+
+   // Add gas layer as sensitive
+   AddSensitiveVolume(pGasDchLog);
+
+   // Mylar Entrance exit windows
+   Double_t mylDx= gasDx; //[cm]
+   Double_t mylDy= gasDy; //[cm]
+   Double_t mylDz= 0.0006; //[cm]
+   TGeoShape* pMylarBox = new TGeoBBox("MylarBox",
+					 mylDx,
+					 mylDy,
+					 mylDz);
+
+   TGeoVolume*
+   pMylDchLog = new TGeoVolume("MYLBoxLog",pMylarBox, pMed15);
+   pMylDchLog->SetVisLeaves(kTRUE);
+
+
+
+   // First assembly
+   TGeoVolume *dch1 = new TGeoVolumeAssembly("DCH1");
+
+   TGeoRotation *rot = new TGeoRotation();
+   rot->RotateX(0.);
+   rot->RotateY(0.);
+   rot->RotateZ(0.);
+   Double_t tx = -3.5;
+   Double_t ty = -5.;
+   Double_t tz = 0.;
+
+   TGeoCombiTrans*
+   pTransfo1 = new TGeoCombiTrans("", 0.,0.,0.,rot);
+   TGeoCombiTrans*
+   pTransfo2 = new TGeoCombiTrans("", tx,ty,tz,rot);
+
+   dch1->AddNode(pAlDchLog,0,pTransfo1);
+   pAlDchLog->AddNode(pGasDchLog,0,pTransfo2);
+   // Mylar Windows front+back
+   dch1->AddNode(pMylDchLog,0,new TGeoCombiTrans("", tx,ty,-alDz-mylDz,rot));
+   dch1->AddNode(pMylDchLog,1,new TGeoCombiTrans("", tx,ty, alDz+mylDz,rot));
+
+
+
+   // Global Positioning
+   Double_t pDch1x = -123.22 ; 
+   Double_t pDch1y = 3.6 ; 
+   Double_t pDch1z = 444.13 ; 
+
+   Double_t pDch2x = -167.0 ;
+   Double_t pDch2y = 1.02 ; 
+   Double_t pDch2z = 535.1 ; 
+   
+   Double_t aDch1 = -31.0 ; 
+   Double_t aDch2 = -31.0 ; 
+
+   TGeoRotation *gRot1 = new TGeoRotation();
+   gRot1->RotateX(0.);
+   gRot1->RotateY(aDch1);
+   gRot1->RotateZ(8.880000);
+   
+   TGeoRotation *gRot2 = new TGeoRotation();
+   gRot2->RotateX(0.);
+   gRot2->RotateY(aDch2);
+   gRot2->RotateZ(-9.350000);
+
+
+
+   // Helium Bag definition
+   Double_t heDx= alDx ; //[cm]
+   Double_t heDy= alDy ; //[cm]
+   Double_t heDz=(pDch2z-pDch1z)*0.953874/2.; //[cm]
+   alpha=0.;     //[degre]
+   Double_t beta =0.;     //[degre]
+   phi  =15.20; //[degre]
+
+   TGeoShape* pHePara = new TGeoPara("HePara", heDx, heDy, heDz,
+				     alpha,beta,phi);
+
+   TGeoVolume*
+   pHeDchLog = new TGeoVolume("HeParaLog",pHePara, pMed4);
+   pHeDchLog->SetVisLeaves(kTRUE);
+
+
+
+
+   vWorld->AddNode(dch1,0,new TGeoCombiTrans("",pDch1x,pDch1y,pDch1z,gRot1) );
+   vWorld->AddNode(dch1,1,new TGeoCombiTrans("",pDch2x,pDch2y,pDch2z,gRot2) );
+
+   if(kHelium)
+   vWorld->AddNode(pHeDchLog,0,new TGeoCombiTrans("",(pDch1x+pDch2x)/2.,
+						      pDch2y,
+						      (pDch1z+pDch2z)/2.,
+						      gRot1) );
+
+  dch1->SetVisContainers(kTRUE);
 }
 
 void R3BDch::ConstructGeometry2() {
@@ -890,8 +1159,8 @@ void R3BDch::ConstructGeometry2() {
    // Global Positioning
    Double_t pDch1x = 128.7 ; 
    Double_t pDch1y = 0.0 ; 
-   Double_t pDch1z = 443.9 ; 
-
+   Double_t pDch1z = 443.9 ;
+    
    Double_t pDch2x = 169.1 ;
    Double_t pDch2y = 0.0 ; 
    Double_t pDch2z = 535.8 ; 
@@ -1341,7 +1610,6 @@ void R3BDch::ConstructGeometry1() {
    fNbOfSensitiveVol+=1;
 
 }
-
 
 
 /*
