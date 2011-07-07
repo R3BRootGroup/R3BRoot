@@ -214,8 +214,11 @@ void R3BAladinFieldMap::Init() {
   // parameters here
   // <DB> check me !!
   Double_t DistanceToTarget = 350.0;  //cm
-  Double_t Correction = -117.5; // cm
-  Double_t Glad_angle = +7.3; // degree
+  //Double_t Correction = -117.5; // cm
+  //Double_t Correction = -350.5; // cm
+  Double_t Correction = -95.0; // cm
+  //Double_t Glad_angle = +7.3; // degree
+  Double_t Glad_angle = -7.0; // degree
   Double_t DistanceFromtargetToAladinCenter
 	     = DistanceToTarget + Correction;
   // Transformations inverse
@@ -226,7 +229,7 @@ void R3BAladinFieldMap::Init() {
                          -1.* DistanceFromtargetToAladinCenter
 			  );
 
-  cout << "-I- R3BAladinFieldMap::Init() called ----------------------  " << endl;
+  cout << "Justyna-I- R3BAladinFieldMap::Init() called ----------------------  " << endl;
   InitField();
 
   //Init has been called
@@ -395,8 +398,10 @@ void R3BAladinFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField)
 
        
   Double_t DistanceToTarget = 350.0;  //cm
-  Double_t Correction = -114.5; // cm
-  Double_t Magnet_angle = +7.3; // degree
+//  Double_t Correction = -114.5; // cm
+  Double_t Correction = -95.0; // cm
+//  Double_t Magnet_angle = +7.3; // degree
+  Double_t Magnet_angle = -7.0; // degree
 
 
   Double_t xx = 0.;
