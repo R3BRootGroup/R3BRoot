@@ -415,6 +415,20 @@ void R3BmTof::ConstructGeometry() {
 
    // TRANSFORMATION MATRICES
    // Combi transformation: 
+   dx = -154.815998;
+   dy = 0.000000;
+   dz = 761.755160;
+   // Rotation: 
+   thx = -106.700000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 16.700000;    phz = 0.000000;
+   TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+   pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
+
+/*
+   // TRANSFORMATION MATRICES
+   // Combi transformation: 
    dx = 151.000000;
    dy = 0.000000;
    dz = 758.000000;
@@ -425,7 +439,7 @@ void R3BmTof::ConstructGeometry() {
    TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
    pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
-
+*/
 
    // Shape: World type: TGeoBBox
    TGeoVolume* pWorld = gGeoManager->GetTopVolume();
