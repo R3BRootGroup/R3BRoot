@@ -33,7 +33,10 @@ set(R3BCAL_SRCS
 R3BTof.cxx  
 R3BGeoTof.cxx   
 R3BGeoTofPar.cxx   
-R3BTofContFact.cxx   
+R3BTofContFact.cxx 
+R3BTofDigiPar.cxx
+R3BTofDigitizer.cxx
+/u/jmargan/fairroot_160311/r3broot/r3bdata/tofData/R3BTofDigi.cxx   
 )
 
 # fill list of header files from list of source files
