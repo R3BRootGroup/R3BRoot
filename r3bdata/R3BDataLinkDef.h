@@ -19,6 +19,7 @@
 #pragma link C++ class R3BGfiPoint+;
 #pragma link C++ class R3BmTofPoint+;
 #pragma link C++ class R3BTofPoint+;
+#pragma link C++ class R3BTofDigi+;
 #pragma link C++ class R3BATofPoint+;
 #pragma link C++ class R3BVetoPoint+;
 #pragma link C++ class R3BChimeraPoint+;
