@@ -10,7 +10,7 @@
 
 #ifndef R3BTOFDIGI_H
 #define R3BTOFDDIGI_H
-//#define R3BTOFDIGI_H
+
 
 #include "TObject.h"
 #include "TVector3.h"
