@@ -45,7 +45,8 @@ landData/R3BLandFirstHits.cxx
 landData/R3BLandHit.cxx 
 landData/R3BPaddleCrystalHit.cxx
 landData/R3BNeutronTrack.cxx
-dchData/R3BDchDigi.cxx  
+dchData/R3BDchDigi.cxx
+tofData/R3BTofDigi.cxx  
 )
 
 
