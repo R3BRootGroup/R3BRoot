@@ -28,7 +28,8 @@
 
 #include "R3BTofPoint.h"
 //#include "/u/jmargan/fairroot_160311/r3broot/r3bdata/R3BMCTrack.h"
-#include "R3BMCTrack.h"
+#include "../R3BMCTrack.h"
+//#include "R3BMCTrack.h"
 		
 using std::cout;
 using std::endl;
@@ -104,7 +105,7 @@ void R3BTofDigitizer::Exec(Option_t* opt) {
 
    Reset();
    eventNoTof+=1;
-     if(eventNoTof/1000. == (int)eventNoTof/1000.) cout<<"Event #: "<<eventNoTof-1<<endl;
+//     if(eventNoTof/1000. == (int)eventNoTof/1000.) cout<<"Event #: "<<eventNoTof-1<<endl;
      
      Int_t nentriesTof = fTofPoints->GetEntries();
      Int_t TrackIdTof=0;
@@ -174,7 +175,7 @@ void R3BTofDigitizer::Exec(Option_t* opt) {
      TfwYhis->Fill(tfwy_p1);
      TfwThis->Fill(tfwt_p1);
 
-     cout<<" tfmul "<<tfmul<<" tfwx_p1 "<<tfwx_p1<<" tfwy_p1 "<<tfwy_p1<<" PID "<<PID<<" mother "<<mother<<endl;
+     cout<<"TFW - proton tof wall "<<PID<<endl;
      tfmul++;
      
      }
