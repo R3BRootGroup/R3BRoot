@@ -44,10 +44,13 @@ R3BBackTracking.cxx
 R3BBackTrackingStorageState.cxx
 R3BAsciiGenerator.cxx
 R3BCosmicGenerator.cxx
+R3Bp2pGenerator.cxx
 R3BLandGenerator.cxx
 R3BCALIFATestGenerator.cxx
 R3BAsciiIQMDGen.cxx
 R3BAsciiUrQMDGen.cxx
+R3BIonGenerator.cxx
+
 )
 
 if(RULE_CHECKER_FOUND)
