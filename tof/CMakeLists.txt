@@ -36,9 +36,7 @@ R3BGeoTof.cxx
 R3BGeoTofPar.cxx   
 R3BTofContFact.cxx 
 R3BTofDigiPar.cxx
-R3BTofDigitizer.cxx
-R3BTof2pDigiPar.cxx
-R3BTof2pDigitizer.cxx  
+R3BTofDigitizer.cxx  
 )
 
 # fill list of header files from list of source files
