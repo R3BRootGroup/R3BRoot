@@ -119,6 +119,7 @@ Bool_t R3Bp2pGenerator::ReadEvent(FairPrimaryGenerator* primGen) {
     primGen->AddTrack(pdgID, pX1, pY1, pZ1, vx, vy, vz);
     primGen->AddTrack(pdgID, pXA, pYA, pZA, vx, vy, vz);
 
+    /* To keep the input Theta1 and ThetaA in output Trees and compare with results:
     FairMCEventHeader* event=primGen->GetEvent();
     if ( event && (! event->IsSet()) ) {
       //     event->SetEventID(eventID);
@@ -128,6 +129,7 @@ Bool_t R3Bp2pGenerator::ReadEvent(FairPrimaryGenerator* primGen) {
      event->SetPhi2(PhiA);
      event->MarkSet(kTRUE);
     }
+    */
 
   return kTRUE;
 }
