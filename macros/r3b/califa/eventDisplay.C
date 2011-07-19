@@ -41,6 +41,7 @@ eventDisplay()
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
   FairParRootFileIo* parIn = new FairParRootFileIo();
   parIn->open("r3bpar.root");
+  rtdb->setFirstInput(parIn);
   rtdb->print();
 
 
@@ -49,16 +50,15 @@ eventDisplay()
   fRun->SetInputFile("r3bsim.root");
 
   fRun->SetOutputFile("test.root");
-  fRun->LoadGeometry();
+  //fRun->LoadGeometry();
 
   FairEventManager *fMan= new FairEventManager();
   FairMCTracks *Track =  new FairMCTracks ("Monte-Carlo Tracks");
-  FairMCPointDraw *LandPoints =   new FairMCPointDraw ("LandPoint",kOrange,  kFullSquare);
+  //FairMCPointDraw *LandPoints =   new FairMCPointDraw ("LandPoint",kOrange,  kFullSquare);
 
                                                                
   fMan->AddTask(Track);
-  
-  fMan->AddTask(LandPoints);
+  //fMan->AddTask(LandPoints);
     
   fMan->Init();                     
   
