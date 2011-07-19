@@ -57,19 +57,10 @@ void califaAna(Int_t nEvents = 1) {
 	
 	//----  Load R3B specific libraries ---------------------------------------
 	gSystem->Load("libR3Bbase");
-	//gSystem->Load("libR3BGen");
 	gSystem->Load("libR3BPassive");
 	gSystem->Load("libR3BData");
 	gSystem->Load("libR3BCal");
 	gSystem->Load("libR3BCalo");
-	//gSystem->Load("libR3BDch");
-	//gSystem->Load("libR3BGfi");
-	//gSystem->Load("libR3BLand");
-	//gSystem->Load("libR3BmTof");
-	//gSystem->Load("libR3BTof");
-	//gSystem->Load("libR3BTra");
-	//gSystem->Load("libR3BChimera");
-	//gSystem->Load("libELILuMon");
 	
 	
 	// -----   Create analysis run   ----------------------------------------
@@ -105,8 +96,10 @@ void califaAna(Int_t nEvents = 1) {
 	// 10- CALIFA 8.00, (ongoing work) 
 	// ...
 	caloHF->SelectGeometryVersion(5);          
-	caloHF->SetDetectionThreshold(0.000050);   //50 KeV
-	caloHF->SetExperimentalResolution(5.);    //5% at 1 MeV
+	caloHF->SetDetectionThreshold(0.000050);//50 KeV
+	caloHF->SetExperimentalResolution(5.);  //5% at 1 MeV
+	caloHF->SetAngularWindow(3.2,3.2);      //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
+
 	fRun->AddTask(caloHF);
 	
 	// Number of events to process

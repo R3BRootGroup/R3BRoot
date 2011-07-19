@@ -89,7 +89,6 @@ void r3ball(Int_t nEvents = 1,
   gSystem->Load("libR3BmTof");
   gSystem->Load("libR3BTof");
   gSystem->Load("libR3BTra");
-  gSystem->Load("libR3BChimera");
   gSystem->Load("libELILuMon");
  
   // -----   Create simulation run   ----------------------------------------
@@ -395,30 +394,6 @@ void r3ball(Int_t nEvents = 1,
       land->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       land->SetTranslation(tx,ty,tz);
       run->AddModule(land);
-  }
-
-  // Chimera
-  if (fDetList.FindObject("CHIMERA") ) {
-      R3BDetector* chim = new R3BChimera("Chimera", kTRUE);
-      chim->SetGeometryFileName("chimera.root");
-      // Global position of the Module
-      thetaX   =  0.0; // (deg)
-      thetaY   =  0.0; // (deg)
-      thetaZ   =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx       =  0.0; // (cm)
-      ty       =  0.0; // (cm)
-      tz       =  0.0; // (cm)
-      chim->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      chim->SetTranslation(tx,ty,tz);
-      // User defined Energy CutOff
-      //Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
-      //((R3BChimera*) chim)->SetEnergyCutOff(fCutOffSci);
-      run->AddModule(chim);
   }
 
   // Luminosity detector

@@ -22,27 +22,18 @@ void checkResults() {
 	
 	//SETTINGS 
 	char calVersion[50] = "7.07+7.17";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.??)
-	Double_t Eproj = 15;              //Gamma Energy in projectile frame in MeV 
+	Double_t Eproj = 5.00;              //Gamma Energy in projectile frame in MeV 
 	Int_t totalEvents = 100000;        //Events
 	Int_t multiplicity = 1;           //Multiplicity (particles per event)
 	
 	Double_t threshold=0.050;		  //Threshold in MeV
 	Int_t ExpRes=5;			          //Exp. Resol in MeV
 
-	//SOME PREVIOUS RESULT (plot first the energy corrected and check it)!
-	Double_t mean = 9.86456e+00;       //Mean of energy peak fit
-	Double_t sigma = 2.22069e-01;      //Sigma of energy peak fit
-	Double_t mean_barrel = 9.89064e+00;       //Mean of energy peak fit
-	Double_t sigma_barrel = 2.09266e-01;      //Sigma of energy peak fit
-	Double_t mean_endcap = 9.80438e+00;       //Mean of energy peak fit
-	Double_t sigma_endcap = 2.44836e-01;      //Sigma of energy peak fit
-	Double_t sigmaPol = 1.84747e-02;   //Sigma of polar angle fit
-	
 	//FOR THE HISTOGRAMS AND PLOTS:
-	Double_t maxE = 16.40;               //Maximum energy in MeV in the histos
-	
-	sprintf(title0,"%s","/Users/hapol/r3broot/macros/r3b/califa/RESULTS_Apr11/2115/E/califaAna.root");  	
- 	sprintf(title1,"%s","/Users/hapol/r3broot/macros/r3b/califa/RESULTS_Apr11/2115/r3bsim.root");  	
+	Double_t maxE = 6;               //Maximum energy in MeV in the histos
+
+	sprintf(title0,"%s","/Users/hapol/r3broot/macros/r3b/califa/RESULTS_Apr11/2105/E/califaAna.root");  	
+ 	sprintf(title1,"%s","/Users/hapol/r3broot/macros/r3b/califa/RESULTS_Apr11/2105/r3bsim.root");  	
 	TFile *file0 = TFile::Open(title0);
 	TFile *file1 = TFile::Open(title1);
 	
@@ -127,19 +118,10 @@ void checkResults() {
 	
 	//----  Load R3B specific libraries ---------------------------------------
 	gSystem->Load("libR3Bbase");
-	//gSystem->Load("libR3BGen");
 	gSystem->Load("libR3BPassive");
 	gSystem->Load("libR3BData");
 	gSystem->Load("libR3BCal");
 	gSystem->Load("libR3BCalo");
-	//gSystem->Load("libR3BDch");
-	//gSystem->Load("libR3BGfi");
-	//gSystem->Load("libR3BLand");
-	//gSystem->Load("libR3BmTof");
-	//gSystem->Load("libR3BTof");
-	//gSystem->Load("libR3BTra");
-	//gSystem->Load("libR3BChimera");
-	//gSystem->Load("libELILuMon");
 	
 	
 	gROOT->SetStyle("Default");
@@ -564,10 +546,19 @@ void checkResults() {
 	
 	c4->cd(2);
 	h2_CC->Fit("gaus","","",Eproj-0.05*Eproj,Eproj+0.05*Eproj); 
+	//getting the value of the fit parameters
+	TF1 *myfunc = h2_CC->GetFunction("gaus");
+	Double_t mean = myfunc->GetParameter(1); //value of 2st parameter (mean)
+	Double_t sigma = myfunc->GetParameter(2); //value of 2st parameter (sigma)
+	cout<< "TESTING mean: "<<mean <<",  sigma: "<< sigma<< endl;
 	h2_CC->Draw(); 
 	correlations_2->SetFrameBorderMode(0); correlations_2->SetLogy();
 	c4->cd(3); gStyle->SetOptStat(1); gStyle->SetOptFit(1); 
 	h3_CC->Fit("gaus","","",-0.03,0.03); 
+	//getting the value of the fit parameters
+	TF1 *myfuncPol = h3_CC->GetFunction("gaus");
+	Double_t sigmaPol = myfuncPol->GetParameter(2); //value of 2st parameter (mean)
+	cout<< "TESTING sigmaPol: "<< sigmaPol<< endl;
 	h3_CC->Draw(); 
 	correlations_3->SetFrameBorderMode(0);
 	c4->cd(4); gStyle->SetOptStat(1); gStyle->SetOptFit(1); 
@@ -677,6 +668,11 @@ void checkResults() {
 	
 		c4_barrel->cd(2);
 		h2_CC_barrel->Fit("gaus","","",Eproj-0.05*Eproj,Eproj+0.05*Eproj); 
+		//getting the value of the fit parameters
+		TF1 *myfunc_barrel = h2_CC_barrel->GetFunction("gaus");
+		Double_t mean_barrel = myfunc_barrel->GetParameter(1); //value of 2st parameter (mean)
+		Double_t sigma_barrel = myfunc_barrel->GetParameter(2); //value of 2st parameter (mean)
+		cout<< "TESTING mean_barrel: "<<mean_barrel <<",  sigma_barrel: "<< sigma_barrel<< endl;
 		h2_CC_barrel->Draw(); 
 		correlations_barrel_2->SetFrameBorderMode(0); correlations_barrel_2->SetLogy();
 		c4_barrel->cd(3); gStyle->SetOptStat(1); gStyle->SetOptFit(1); 
@@ -761,6 +757,11 @@ void checkResults() {
 		
 		c4_endcap->cd(2);
 		h2_CC_endcap->Fit("gaus","","",Eproj-0.05*Eproj,Eproj+0.05*Eproj); 
+		//getting the value of the fit parameters
+		TF1 *myfunc_endcap = h2_CC_endcap->GetFunction("gaus");
+		Double_t mean_endcap = myfunc_endcap->GetParameter(1); //value of 2st parameter (mean)
+		Double_t sigma_endcap = myfunc_endcap->GetParameter(2); //value of 2st parameter (mean)
+		cout<< "TESTING mean_endcap: "<<mean_endcap <<",  sigma_endcap: "<< sigma_endcap<< endl;
 		h2_CC_endcap->Draw(); 
 		correlations_endcap_2->SetFrameBorderMode(0); correlations_endcap_2->SetLogy();
 		c4_endcap->cd(3); gStyle->SetOptStat(1); gStyle->SetOptFit(1); 
@@ -781,8 +782,17 @@ void checkResults() {
 		c4_endcap->cd();
 	}
 	
-	
-	
+	//IN CASE THE FIt IS NOT AUTOMATICALLY DONE PROPERLY...
+	//SOME PREVIOUS RESULT (plot first the energy corrected and check it)!
+	if(0){
+		mean = 4.98171e+00;       //Mean of energy peak fit
+		sigma = 9.16487e-02;      //Sigma of energy peak fit
+		mean_barrel = 4.99329e+00;       //Mean of energy peak fit
+		sigma_barrel = 7.58946e-02;      //Sigma of energy peak fit
+		mean_endcap = 4.94582e+00;       //Mean of energy peak fit
+		sigma_endcap = 1.16033e-01;      //Sigma of energy peak fit
+		sigmaPol = 1.84747e-02;   //Sigma of polar angle fit
+	}
 	
 	//DATA
 	//Previous calculations
