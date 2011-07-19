@@ -81,7 +81,7 @@ $date = "$Month/$Day/$Year $Hour:$Minute:$Second";
 # Working with the data to create the TGeo!
 ######################################################
 # First the general macro structure
-print OUTPUTFILE " //Generated ",$date , " from macro createGeometryCLF707.pl by Hector Alvarez Pol (hector.alvarez@usc.es) \n";
+print OUTPUTFILE " //Generated ",$date , " from macro createGeometryCLF707717.pl by Hector Alvarez Pol (hector.alvarez@usc.es) \n";
 print OUTPUTFILE "\n";
 print OUTPUTFILE " //Alveolus\n";
 # Entering in the construction of the alveoli
