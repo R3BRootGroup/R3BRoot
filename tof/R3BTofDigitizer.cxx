@@ -116,13 +116,13 @@ void R3BTofDigitizer::Exec(Option_t* opt) {
      Double_t tfwx_p1;
      Double_t tfwy_p1;
      Double_t tfwt_p1;
-   
+     Double_t tfwpath_p1;
    
 
    for (Int_t l=0;l<nentriesTof;l++){
-    
+//cout<<"Point 1"<<endl;    
      R3BTofPoint *tof_obj = (R3BTofPoint*) fTofPoints->At(l);     
-     
+//     if (tof_obj==NULL) continue;
      TOFeloss = tof_obj->GetEnergyLoss()*1000;
      
      TrackIdTof = tof_obj->GetTrackID();
@@ -144,37 +144,52 @@ void R3BTofDigitizer::Exec(Option_t* opt) {
   tfwx_p1=0;
   tfwy_p1=0;
   tfwt_p1=0;
+  tfwpath_p1=0;
   
    for (Int_t l=0;l<nentriesTof;l++){
-    
+//cout<<"Point 2"<<endl;    
      R3BTofPoint *tof_obj = (R3BTofPoint*) fTofPoints->At(l);     
-          
+//     if (tof_obj==NULL) continue;     
      TrackIdTof = tof_obj->GetTrackID();
      R3BMCTrack *aTrack = (R3BMCTrack*) fTofMCTrack->At(TrackIdTof);   
      Int_t PID = aTrack->GetPdgCode();
      Int_t mother = aTrack->GetMotherId();
-     
-     Double_t fX = tof_obj->GetXIn();
-     Double_t fY = tof_obj->GetYIn();
-     Double_t fZ = tof_obj->GetZIn();
+ 
+     Double_t fX_in = tof_obj->GetXIn();
+     Double_t fY_in = tof_obj->GetYIn();
+     Double_t fZ_in = tof_obj->GetZIn();
+     Double_t fX_out = tof_obj->GetXOut();
+     Double_t fY_out = tof_obj->GetYOut();
+     Double_t fZ_out = tof_obj->GetZOut();
      Double_t ftime = tof_obj->GetTime();
+     Double_t flength = tof_obj->GetLength();
+     
+     Double_t fX = ((fX_in + fX_out)/2);
+     Double_t fY = ((fY_in + fY_out)/2);
+     Double_t fZ = ((fZ_in + fZ_out)/2); 
+ 
     
     
     // offset - position of detector x: -417.359574; y: +2.4; z: +960.777114
-    // angle = 31 degrees
+    // angle = -31 degrees
     // cos(angle) = 0.857167301
-    //sin(angle) = 0.515038075
+    //sin(angle) = -0.515038075
     
 //     if (total_energy_dch1>0. && total_energy_dch2>0. && total_energy_tof>0. && PID==2212){
     if (PID==2212 && mother<0){
-     tfwx_p1=(((fX+417.359574) * 0.857167301) - ((fZ - 960.777114) * 0.515038075));
+     tfwx_p1=(((fX+417.359574) * 0.857167301) - ((fZ - 960.777114) * (-0.515038075)));
+//     tfwx_p1=(((fX+421.33683) * 0.857167301) - ((fZ - 958.387337) * (-0.515038075)));  //Christoph
      tfwy_p1=(fY-2.4);
+//     tfwy_p1=(fY-2.12);  //Christoph
      tfwt_p1=ftime;
+     tfwpath_p1=flength;
+     
      TfwXhis->Fill(tfwx_p1);
      TfwYhis->Fill(tfwy_p1);
      TfwThis->Fill(tfwt_p1);
+     
 
-     cout<<"TFW - proton tof wall "<<PID<<endl;
+//     cout<<"TFW - proton tof wall "<<PID<<endl;
      tfmul++;
      
      }
@@ -183,7 +198,7 @@ void R3BTofDigitizer::Exec(Option_t* opt) {
 
 
 
-AddHit(tfmul,tfwx_p1,tfwy_p1,tfwt_p1);
+AddHit(tfmul,tfwx_p1,tfwy_p1,tfwt_p1,tfwpath_p1);
 
 //     cout<<"addhit"<<nentriesTof<<" tfmul "<<tfmul<<" tfwx_p1 "<<tfwx_p1<<" tfwy_p1 "<<tfwy_p1<<endl;
 
@@ -212,10 +227,10 @@ void R3BTofDigitizer::Finish()
 
 }
 
-R3BTofDigi* R3BTofDigitizer::AddHit(Int_t tfmul,Double_t tfwx_p1,Double_t tfwy_p1,Double_t tfwt_p1){   
+R3BTofDigi* R3BTofDigitizer::AddHit(Int_t tfmul,Double_t tfwx_p1,Double_t tfwy_p1,Double_t tfwt_p1,Double_t tfwpath_p1){   
   TClonesArray& clref = *fTofDigi;
   Int_t size = clref.GetEntriesFast();
-  return new(clref[size]) R3BTofDigi(tfmul,tfwx_p1,tfwy_p1,tfwt_p1);
+  return new(clref[size]) R3BTofDigi(tfmul,tfwx_p1,tfwy_p1,tfwt_p1,tfwpath_p1);
  
 }
 
