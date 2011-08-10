@@ -10,6 +10,8 @@
 #pragma link C++ class R3BDchDigitizer+;
 #pragma link C++ class R3BDchDigiPar+;
 #pragma link C++ class R3BDchContFact;
+#pragma link C++ class R3BDch2pDigitizer+;
+#pragma link C++ class R3BDch2pDigiPar+;
 
 #endif
 
