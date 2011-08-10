@@ -414,14 +414,29 @@ void R3BmTof::ConstructGeometry() {
 
 
    // TRANSFORMATION MATRICES
-   // Combi transformation: 
-   dx = -154.815998;
-   dy = 0.000000;
-   dz = 761.755160;
+   // Combi transformation:
+   //NTF position 
+   dx = -154.815998;//Justyna
+   dy = 0.000000;  //Justyna
+   dz = 761.755160;//Justyna
+   
+//   dx = -154.10721;//Christoph
+//   dy = 0.92;  //Christoph
+//   dz = 761.967807;//Christoph
    // Rotation: 
    thx = -106.700000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
-   thz = 16.700000;    phz = 0.000000;
+   thz = -16.700000;    phz = 0.000000;   
+   
+/*    dx = -171.1;
+    dy = 2.400000;
+    dz = 548.95;
+   // dz = 0.;
+   // Rotation:
+   thx = -121.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = -31.000000;    phz = 0.000000;*/
+   
    TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
    pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
@@ -466,6 +481,11 @@ void R3BmTof::ConstructGeometry() {
    dx = 24.000000;
    dy = 24.000000;
    dz = 0.250000;
+   
+/*   dx = 94.450000;  //TFW size
+   dy = 73.450000;
+   dz = 0.500000;*/
+   
    TGeoShape *pmTOFBox = new TGeoBBox("mTOFBox", dx,dy,dz);
    // Volume: mTOFLog
    TGeoVolume *
