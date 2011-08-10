@@ -517,9 +517,10 @@ void R3BTra::ConstructGeometry() {
 
    // SST03 position
    // Combi transformation: 
-   dx = 0.038230;
-   dy = -0.006402;
-   dz = 10.69;
+   dx = 0.0;    //it should be move by 0.038230 but it doesn't work I'll move it in digitizer   
+   dy = 0.0;   //it should be move by -0.006402 but it doesn't work I'll move it in digitizer
+   dz = 10.69; //Justyna
+//   dz = 10.69; //Christoph
    // Rotation: 
    thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
@@ -531,9 +532,10 @@ void R3BTra::ConstructGeometry() {
    
    // SSt06 position
    // Combi transformation: 
-   dx = -0.038495;
-   dy = 0.00798;
-   dz = 13.35;
+   dx = 0.0;   //it should be move by -0.038495 but it doesn't work I'll move it in digitizer
+   dy = 0.0;     //it should be move by 0.00798 but it doesn't work I'll move it in digitizer
+   dz = 13.35; //Justyna
+//   dz = 13.35; //Christoph
    // Rotation: 
    thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
@@ -541,6 +543,8 @@ void R3BTra::ConstructGeometry() {
    TGeoRotation *pMatrix103 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
    pMatrix102 = new TGeoCombiTrans("", dx,dy,dz,pMatrix103);
+
+
 
 
 
@@ -604,17 +608,23 @@ void R3BTra::ConstructGeometry() {
 
    //SST03 shape 
    // Si Shape & volume: TraBox type: TGeoBBox
-   dx = 7.04;
+/*   dx = 7.04;
    dy = 3.9936;
-   dz = 0.03;
+   dz = 0.03;*/
+   dx = 3.52;
+   dy = 1.9968;
+   dz = 0.015;
    // Volume: TraLog
    TGeoVolume *TraLog4 = gGeoManager->MakeBox("TraLog4",pMed22,dx,dy,dz);
 
    //SST06 shape 
    // Si Shape & volume: TraBox type: TGeoBBox
-   dx = 7.04;
+/*   dx = 7.04;
    dy = 3.9936;
-   dz = 0.03;
+   dz = 0.03;*/
+   dx = 3.52;
+   dy = 1.9968;
+   dz = 0.015;
    // Volume: TraLog
    TGeoVolume *TraLog5 = gGeoManager->MakeBox("TraLog5",pMed22,dx,dy,dz);
 
@@ -749,10 +759,10 @@ void R3BTra::ConstructGeometry() {
    dx=tx=0.0;
    dy=ty=0.0;
    dz=tz=0.0;
+
    
    TGeoCombiTrans *t0 = new TGeoCombiTrans(tx,ty,tz,rotg);
    pWorld->AddNode(aTra,1, GetGlobalPosition(t0));
-   
 
 }
 
