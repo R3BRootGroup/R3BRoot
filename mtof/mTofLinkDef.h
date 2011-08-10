@@ -7,6 +7,8 @@
 #pragma link C++ class R3BGeomTof+;
 #pragma link C++ class R3BGeomTofPar;
 #pragma link C++ class R3BmTof+;
+#pragma link C++ class R3BmTofDigitizer+;
+#pragma link C++ class R3BmTofDigiPar+;
 #pragma link C++ class R3BmTofContFact;
 
 #endif
