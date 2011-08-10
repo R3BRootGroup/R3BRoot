@@ -63,6 +63,13 @@ class R3BDchPoint : public FairMCPoint
   Double_t GetPxOut() const { return fPx_out; }
   Double_t GetPyOut() const { return fPy_out; }
   Double_t GetPzOut() const { return fPz_out; }
+  
+  Double_t GetXLocalIn() const { return fLocalX_in; }
+  Double_t GetYLocalIn() const { return fLocalY_in; }
+  
+  Double_t GetXLocalOut() const { return fLocalX_out; }
+  Double_t GetYLocalOut() const { return fLocalY_out; }
+  
 
   void PositionIn(TVector3& pos)  { pos.SetXYZ(fX, fY, fZ); }
   void MomentumIn(TVector3& mom) { mom.SetXYZ(fPx,fPy,fPz); }
