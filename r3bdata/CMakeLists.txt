@@ -46,7 +46,16 @@ landData/R3BLandHit.cxx
 landData/R3BPaddleCrystalHit.cxx
 landData/R3BNeutronTrack.cxx
 dchData/R3BDchDigi.cxx
-tofData/R3BTofDigi.cxx  
+dchData/R3BDch2pDigi.cxx
+tofData/R3BTofDigi.cxx
+tofData/R3BTof2pDigi.cxx
+mtofData/R3BmTofDigi.cxx
+gfiData/R3BGfiDigi.cxx 
+trackerData/R3BTraDigi.cxx
+trackerData/R3BTra2pDigi.cxx
+trackerData/R3BTraFraDigi.cxx
+trackerData/R3BTargetDigi.cxx
+trackerData/R3BTarget2pDigi.cxx 
 )
 
 
