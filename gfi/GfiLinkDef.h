@@ -8,6 +8,8 @@
 #pragma link C++ class R3BGeoGfiPar;
 #pragma link C++ class R3BGfi+;
 #pragma link C++ class R3BGfiContFact;
+#pragma link C++ class R3BGfiDigiPar+;
+#pragma link C++ class R3BGfiDigitizer+;
 
 #endif
 
