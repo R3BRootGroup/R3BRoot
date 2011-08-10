@@ -110,8 +110,8 @@ class R3BDch : public R3BDetector
    ** Constructs the STS geometry
    **/
   virtual void ConstructGeometry();
-  virtual void ConstructGeometry1();
-  virtual void ConstructGeometry2();
+/*  virtual void ConstructGeometry1();
+  virtual void ConstructGeometry2();*/
   virtual void ConstructGeometryJustyna();
    
 
