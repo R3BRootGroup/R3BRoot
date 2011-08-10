@@ -11,6 +11,7 @@ ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/mcstack 
 ${R3BROOT_SOURCE_DIR}/tracker
+${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/calData
 ${R3BROOT_SOURCE_DIR}/r3bdata/dchData
 ${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
@@ -33,7 +34,17 @@ set(R3BCAL_SRCS
 R3BTra.cxx  
 R3BGeoTra.cxx   
 R3BGeoTraPar.cxx   
-R3BTraContFact.cxx   
+R3BTraContFact.cxx
+R3BTraDigiPar.cxx
+R3BTraDigitizer.cxx
+R3BTargetDigiPar.cxx
+R3BTargetDigitizer.cxx
+R3BTra2pDigiPar.cxx
+R3BTra2pDigitizer.cxx
+R3BTraFraDigiPar.cxx
+R3BTraFraDigitizer.cxx
+R3BTarget2pDigiPar.cxx
+R3BTarget2pDigitizer.cxx   
 )
 
 # fill list of header files from list of source files
