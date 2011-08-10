@@ -888,13 +888,23 @@ void R3BDch::ConstructGeometryJustyna() {
 
 
    // Global Positioning
-   Double_t pDch1x = -123.22 ; 
-   Double_t pDch1y = 3.6 ; 
-   Double_t pDch1z = 444.13 ; 
+   
+   Double_t pDch1x = -123.22 ; //Justyna 
+   Double_t pDch1y = 3.6 ;     //Justyna
+   Double_t pDch1z = 444.13 ;  //Justyna
 
-   Double_t pDch2x = -167.0 ;
-   Double_t pDch2y = 1.02 ; 
-   Double_t pDch2z = 535.1 ; 
+   Double_t pDch2x = -167.0 ;  //Justyna
+   Double_t pDch2y = 1.02 ;    //Justyna
+   Double_t pDch2z = 535.1 ;   //Justyna
+   
+//   Double_t pDch1x = -132.233355 ; //Christoph  
+//   Double_t pDch1y = 1.037475 ;     //Christoph 
+//   Double_t pDch1z = 438.710168 ;  //Christoph
+
+//   Double_t pDch2x = -170.8653 ;  //Christoph
+//   Double_t pDch2y = 2.075139 ;    //Christoph
+//   Double_t pDch2z = 538.614091 ;   //Christoph
+   
    
    Double_t aDch1 = -31.0 ; 
    Double_t aDch2 = -31.0 ; 
@@ -902,13 +912,14 @@ void R3BDch::ConstructGeometryJustyna() {
    TGeoRotation *gRot1 = new TGeoRotation();
    gRot1->RotateX(0.);
    gRot1->RotateY(aDch1);
-   gRot1->RotateZ(8.880000);
+   gRot1->RotateZ(-8.880000); //Justyna
+//   gRot1->RotateZ(-2.5); //Christoph
    
    TGeoRotation *gRot2 = new TGeoRotation();
    gRot2->RotateX(0.);
    gRot2->RotateY(aDch2);
-   gRot2->RotateZ(-9.350000);
-
+   gRot2->RotateZ(9.350000); //Justyna
+//   gRot2->RotateZ(8.4); //Christoph
 
 
    // Helium Bag definition
@@ -940,7 +951,7 @@ void R3BDch::ConstructGeometryJustyna() {
 
   dch1->SetVisContainers(kTRUE);
 }
-
+/* tutaj
 void R3BDch::ConstructGeometry2() {
  // out-of-file geometry definition
    Double_t dx,dy,dz;
@@ -1050,7 +1061,7 @@ void R3BDch::ConstructGeometry2() {
   TGeoMedium* pMed33 = new TGeoMedium("DCHGas",matIndex,pMat33);
 
 
-
+tutaj*/
 
    // Mixture: mixtureForDCH
    /*
@@ -1078,7 +1089,7 @@ void R3BDch::ConstructGeometry2() {
    */
 
 
-
+/*tutaj
    //Get Top Volume
    TGeoVolume* vWorld = gGeoManager->GetTopVolume();
    vWorld->SetVisLeaves(kTRUE);
@@ -1217,10 +1228,10 @@ void R3BDch::ConstructGeometry1() {
    Double_t z, density, radl, absl, w;
    Int_t nel, numed;
 
-
+tutaj*/
 /****************************************************************************/
 // Material definition
-
+/* tutaj
    // Mixture: Air
    TGeoMedium * pMed2=NULL;
    if (gGeoManager->GetMedium("Air") ){
@@ -1480,7 +1491,7 @@ void R3BDch::ConstructGeometry1() {
    // SET TOP VOLUME OF GEOMETRY
    TGeoVolume * pWorld = gGeoManager->GetTopVolume();
    pWorld->SetVisLeaves(kTRUE);
-
+tutaj*/
    //Create a global Mother Volume
    /*
    dx = 100.000000;
@@ -1495,7 +1506,7 @@ void R3BDch::ConstructGeometry1() {
    // add the sphere as Mother Volume
    pAWorld->AddNodeOverlap(pWorld, 0, pGlobalc);
    */
-
+/*tutaj
    // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
    // Shape: DCHBoxWorld type: TGeoBBox
    dx = 55.400000;
@@ -1610,7 +1621,7 @@ void R3BDch::ConstructGeometry1() {
    fNbOfSensitiveVol+=1;
 
 }
-
+tutaj*/
 
 /*
 void R3BDch::ConstructGeometry() {
