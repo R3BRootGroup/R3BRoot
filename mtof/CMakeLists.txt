@@ -11,6 +11,7 @@ ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/mcstack 
 ${R3BROOT_SOURCE_DIR}/mtof
+${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/calData
 ${R3BROOT_SOURCE_DIR}/r3bdata/dchData
 ${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
@@ -33,7 +34,9 @@ set(R3BCAL_SRCS
 R3BmTof.cxx  
 R3BGeomTof.cxx   
 R3BGeomTofPar.cxx   
-R3BmTofContFact.cxx   
+R3BmTofContFact.cxx 
+R3BmTofDigiPar.cxx
+R3BmTofDigitizer.cxx
 )
 
 # fill list of header files from list of source files
