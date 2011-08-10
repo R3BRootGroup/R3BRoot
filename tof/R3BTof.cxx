@@ -155,14 +155,17 @@ void R3BTof::SetSpecialPhysicsCuts(){
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BTof::ProcessHits(FairVolume* vol) {
 
-  // Simple Det PLane
+   // debug
+    static Int_t evt;     
 
+  // Simple Det PLane
     if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
     fTime   = gMC->TrackTime() * 1.0e09;
     fLength = gMC->TrackLength();
     gMC->TrackPosition(fPosIn);
     gMC->TrackMomentum(fMomIn);
+//    cout << "-I- evt: " << evt++ << " track entering " << endl;
   }
 
   // Sum energy loss for all steps in the active volume
@@ -414,17 +417,37 @@ void R3BTof::ConstructGeometry() {
 
   // TRANSFORMATION MATRICES
    // Combi transformation: 
-    dx = -417.359574;
+    dx = -417.359574; //Justyna
+    dy = 2.400000;    //Justyna
+    dz = 960.777114;  //Justyna 
+    
+//    dx = -421.33683; //Christoph
+//    dy = 2.12;    //Christoph
+//    dz = 958.387337;  //Christoph
+      
+/*    dx = -171.1;  //position directrly (15cm) after DCH2
     dy = 2.400000;
-    dz = 960.777114;
+    dz = 548.95;*/
    // dz = 0.;
-   // Rotation:
+/*   // Rotation:
    thx = -121.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
-   thz = 31.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   thz = -31.000000;    phz = 0.000000;*/  //this
+
+//   TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);  //this
+   TGeoRotation *gRot = new TGeoRotation();
+   gRot->RotateX(0.);
+   gRot->RotateY(-31.000000);
+   gRot->RotateZ(0.);
+
    TGeoCombiTrans*
-   pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
+//   pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);  //this
+   pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,gRot);  //this
+
+
+
+
+
 
 
 /* PREVIOUS!!!
