@@ -448,9 +448,14 @@ void R3BGfi::ConstructGeometry() {
 
    // TRANSFORMATION MATRICES
    // Combi transformation:
-   dx = -71.973310;
-   dy = 0.000000;
-   dz = 513.967775;
+   //GFI1 position
+   dx = -71.973310; //Justyna
+   dy = 0.000000;   //Justyna
+   dz = 513.967775; //Justyna
+   
+//   dx = -88.55368;  //Christoph
+//   dy = 0.92;   //Christoph
+//   dz = 515.015418; //Christoph
 /*
    dx = 73.700000;
    dy = 0.000000;
@@ -460,7 +465,7 @@ void R3BGfi::ConstructGeometry() {
    thx = -106.700000;    phx = 0.000000;
 //   thx = 106.700000;    phx = 0.000000;   
    thy = 90.000000;    phy = 90.000000;
-   thz = 16.700000;    phz = 0.000000;
+   thz = -16.700000;    phz = 0.000000;
    TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
    pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
@@ -519,10 +524,15 @@ void R3BGfi::ConstructGeometry() {
    TGeoRotation *pMatrix15 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
    pMatrix14 = new TGeoCombiTrans("", dx,dy,dz,pMatrix15);
-   // Combi transformation: 
-   dx = -145.270039;
-   dy = 0.000000;
-   dz = 730.318956;
+   // Combi transformation:
+   //GFI2 position 
+   dx = -145.270039; //Justyna
+   dy = 0.000000;    //Justyna
+   dz = 730.318956;  //Justyna
+   
+//   dx = -149.791168;  //Christoph
+//   dy = 0.920000;   //Christoph
+//   dz = 744.623074; //Christoph
 /*
    dx = 141.800000;
    dy = 0.000000;
@@ -532,7 +542,7 @@ void R3BGfi::ConstructGeometry() {
    thx = -106.700000;    phx = 0.000000;
 //   thx = 106.700000;    phx = 0.000000;   
    thy = 90.000000;    phy = 90.000000;
-   thz = 16.700000;    phz = 0.000000;
+   thz = -16.700000;    phz = 0.000000;
    TGeoRotation *pMatrix5 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
    pMatrix4 = new TGeoCombiTrans("", dx,dy,dz,pMatrix5);
