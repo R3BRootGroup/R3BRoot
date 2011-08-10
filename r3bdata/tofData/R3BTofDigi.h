@@ -24,7 +24,7 @@ class R3BTofDigi : public TObject
 
   /** Default constructor **/
   R3BTofDigi();
-  R3BTofDigi(Int_t tfmul,Double_t tfwx_p1,Double_t tfwy_p1,Double_t tfwt_p1);
+  R3BTofDigi(Int_t tfmul,Double_t tfwx_p1,Double_t tfwy_p1,Double_t tfwt_p1,Double_t tfwpath_p1);
   
   /** Copy constructor **/
   R3BTofDigi(const R3BTofDigi& point) { *this = point; };
@@ -47,6 +47,9 @@ class R3BTofDigi : public TObject
   
   void Settfwt_p1(Double_t time){Tft_p1 = time;}
   Double_t Gettfwt_p1(){return Tft_p1;}
+  
+  void Settfwpath_p1(Double_t length){Tfpath_p1 = length;}
+  Double_t Gettfwpath_p1(){return Tfpath_p1;}  
 
 
  protected:
@@ -55,6 +58,7 @@ class R3BTofDigi : public TObject
    Double32_t Tfx_p1;
    Double32_t Tfy_p1;
    Double32_t Tft_p1;
+   Double32_t Tfpath_p1;
 
   ClassDef(R3BTofDigi,1)
 
