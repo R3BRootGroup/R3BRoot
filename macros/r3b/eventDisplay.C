@@ -49,7 +49,6 @@ eventDisplay()
   fRun->SetInputFile("r3bsim.root");
 
   fRun->SetOutputFile("test.root");
-  fRun->LoadGeometry();
 
   FairEventManager *fMan= new FairEventManager();
   FairMCTracks *Track =  new FairMCTracks ("Monte-Carlo Tracks");
