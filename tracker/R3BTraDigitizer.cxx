@@ -170,8 +170,8 @@ void R3BTraDigitizer::Exec(Option_t* opt) {
      Double_t fY = ((fY_In + fY_Out)/2);     
 
 
-//    if(PID==1000080150 && mother<0){
-    if(PID==1000170310 && mother<0){  //Christoph 1p
+    if(PID==1000080150 && mother<0){
+    //if(PID==1000170310 && mother<0){  //Christoph 1p
     
       if (DetID==15)
       {
