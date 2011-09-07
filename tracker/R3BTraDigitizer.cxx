@@ -177,16 +177,16 @@ void R3BTraDigitizer::Exec(Option_t* opt) {
       {
         ss03_se_f = 2000;
 //	ss03_spos_f = (-0.038230 + (3.5 + fX)); //detectors couldn't be shifted in simulation, they are shifted here 0.038230 
-//	ss03_spos_f = (3.5 + fX);
-        ss03_spos_f = (-0.039 + (3.5 + fX));  //Christoph
+	ss03_spos_f = (3.5 + fX);
+        //ss03_spos_f = (-0.039 + (3.5 + fX));  //Christoph
 	ss03_sbw_f = 2;
 	ss03_sarea_f = 0;
 	ss03_seta_f = 0;
 	  
 	ss03_ke_f = 2000;
 //	ss03_kpos_f = (3.9936-(-0.006402 + (2 + fY)));//detectors couldn't be shifted in simulation, they are shifted here -0.006402 
-//        ss03_kpos_f = (2 + fY);
-	ss03_kpos_f = ((-0.01035 + (2 + fY)));  //Christoph (no swop)!!!
+	ss03_kpos_f = (2 + fY);
+	//ss03_kpos_f = ((-0.01035 + (2 + fY)));  //Christoph (no swop)!!!
 	ss03_kbw_f = 2;  //kpos for 1 SST swop (with 3.9936-) - requirement for tracker
 	ss03_karea_f = 0;
 	ss03_keta_f = 0;
@@ -196,16 +196,16 @@ void R3BTraDigitizer::Exec(Option_t* opt) {
       {
         ss06_se_f = 2000;
 //	ss06_spos_f = (0.038495 + (3.5 + fX));//detectors couldn't be shifted in simulation, they are shifted here -0.038495 
-//	ss06_spos_f = (3.5 + fX);
-	ss06_spos_f = (0.039 + (3.5 + fX));  //Christoph
+	ss06_spos_f = (3.5 + fX);
+	//ss06_spos_f = (0.039 + (3.5 + fX));  //Christoph
 	ss06_sbw_f = 2;
 	ss06_sarea_f = 0;
 	ss06_seta_f = 0;
 	  
 	ss06_ke_f = 2000;
 //	ss06_kpos_f = (0.00798 + (2 + fY));//detectors couldn't be shifted in simulation, they are shifted here 0.00798
-//	ss06_kpos_f = (2 + fY);
-	ss06_kpos_f = (0.01035 + (2 + fY));  //Christoph
+	ss06_kpos_f = (2 + fY);
+	//ss06_kpos_f = (0.01035 + (2 + fY));  //Christoph
 	ss06_kbw_f = 2;
 	ss06_karea_f = 0;
 	ss06_keta_f = 0;	
@@ -220,16 +220,16 @@ void R3BTraDigitizer::Exec(Option_t* opt) {
       {
         ss03_se_p1 = 50;
 //	ss03_spos_p1 = (-0.038230 + (3.5 + fX)); //detectors couldn't be shifted in simulation, they are shifted here 0.038230
-//	ss03_spos_p1 = (3.5 + fX);
-	ss03_spos_f = (-0.039 + (3.5 + fX));  //Christoph
+	ss03_spos_p1 = (3.5 + fX);
+	//ss03_spos_f = (-0.039 + (3.5 + fX));  //Christoph
 	ss03_sbw_p1 = 2;
 	ss03_sarea_p1 = 0;
 	ss03_seta_p1 = 0;
 	  
 	ss03_ke_p1 = 50;
 //	ss03_kpos_p1 = (3.9936-(-0.006402 + (2 + fY))); //detectors couldn't be shifted in simulation, they are shifted here -0.006402
-//	ss03_kpos_p1 = (2 + fY);
-	ss03_kpos_f = ((-0.01035 + (2 + fY)));  //Christoph (no swop)!!!
+	ss03_kpos_p1 = (2 + fY);
+	//ss03_kpos_f = ((-0.01035 + (2 + fY)));  //Christoph (no swop)!!!
 	ss03_kbw_p1 = 2;   //kpos for 1 SST swop (with 3.9936-) - requirement for tracker 
 	ss03_karea_p1 = 0;
 	ss03_keta_p1 = 0;
@@ -240,16 +240,16 @@ void R3BTraDigitizer::Exec(Option_t* opt) {
       {
         ss06_se_p1 = 50;
 //	ss06_spos_p1 = (0.038495 + (3.5 + fX));//detectors couldn't be shifted in simulation, they are shifted here -0.038495
-//	ss06_spos_p1 = (3.5 + fX);
-	ss06_spos_f = (0.039 + (3.5 + fX));  //Christoph
+	ss06_spos_p1 = (3.5 + fX);
+	//ss06_spos_f = (0.039 + (3.5 + fX));  //Christoph
 	ss06_sbw_p1 = 2;
 	ss06_sarea_p1 = 0;
 	ss06_seta_p1 = 0;
 	  
 	ss06_ke_p1 = 50;
 //	ss06_kpos_p1 = (0.00798 + (2 + fY));//detectors couldn't be shifted in simulation, they are shifted here 0.00798
-//	ss06_kpos_p1 = (2 + fY);
-	ss06_kpos_f = (0.01035 + (2 + fY));  //Christoph
+	ss06_kpos_p1 = (2 + fY);
+	//ss06_kpos_f = (0.01035 + (2 + fY));  //Christoph
 	ss06_kbw_p1 = 2;
 	ss06_karea_p1 = 0;
 	ss06_keta_p1 = 0;

@@ -209,6 +209,7 @@ void R3BTargetDigitizer::Exec(Option_t* opt) {
    //  sqrt(MeV^2/c^2 - MeV^2/c^2)=MeV/c
    //estar=sqrt(E2-p2)-MASS_17NE_MEV_C2; // *c2
    //estar=sqrt(E2-p2)-MASS_16F_MEV_C2; // *c2
+   //estar=sqrt(E2-p2)-(MASS_15O_MEV_C2+MASS_PROTON_MEV_C2)+1.0; // *c2 // shift by 1 extra MeV, not to start at 0.
    estar=sqrt(E2-p2)-(MASS_15O_MEV_C2+MASS_PROTON_MEV_C2); // *c2
   
    
