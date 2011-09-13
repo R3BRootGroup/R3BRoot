@@ -905,21 +905,25 @@ void R3BDch::ConstructGeometryJustyna() {
 //   Double_t pDch2y = 2.075139 ;    //Christoph
 //   Double_t pDch2z = 538.614091 ;   //Christoph
    
-   
+
+   //The order of rotation matters!!! Rotate first z, and then y! Felix
+
    Double_t aDch1 = -31.0 ; 
    Double_t aDch2 = -31.0 ; 
 
    TGeoRotation *gRot1 = new TGeoRotation();
    gRot1->RotateX(0.);
-   gRot1->RotateY(aDch1);
    gRot1->RotateZ(-8.880000); //Justyna
+   //gRot1->RotateZ(+8.880000); //Felix
 //   gRot1->RotateZ(-2.5); //Christoph
+   gRot1->RotateY(aDch1);
    
    TGeoRotation *gRot2 = new TGeoRotation();
    gRot2->RotateX(0.);
-   gRot2->RotateY(aDch2);
    gRot2->RotateZ(9.350000); //Justyna
+   //gRot2->RotateZ(-9.350000); //Felix
 //   gRot2->RotateZ(8.4); //Christoph
+   gRot2->RotateY(aDch2);
 
 
    // Helium Bag definition
