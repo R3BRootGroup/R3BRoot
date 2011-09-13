@@ -29,6 +29,24 @@
 #include "R3BDchPoint.h"
 #include "R3BMCTrack.h"
 		
+//hardcoded detector centres wrt target, from Ralf's Tracker: world coords (wrt target) of detector centres, in centimeters.
+//PDC1:    x0=-123.219446 y0=3.597104 z0=444.126271
+//PDC2:    x0=-167.015888 y0=1.016917 z0=535.093884
+//PDC1 angle:    x0=0.000000 y0=31.000000 z0=8.880000
+//PDC2 angle:    x0=0.000000 y0=31.000000 z0=-9.350000
+#define PDC1_X0	-123.219446
+#define PDC1_Y0	3.597104
+#define PDC1_Z0	444.126271
+#define PDC2_X0	-167.015888
+#define PDC2_Y0	1.016917
+#define PDC2_Z0	535.093884
+#define PDC1_Aparm	31.000000
+#define PDC1_Atilt	8.880000
+//#define PDC1_Atilt	-8.880000
+#define PDC2_Aparm	31.000000
+#define PDC2_Atilt	-9.350000
+//#define PDC2_Atilt	9.350000
+
 using std::cout;
 using std::endl;
 		
@@ -210,10 +228,20 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
      Double_t fPx = dch_obj->GetPx();
      Double_t fPy = dch_obj->GetPy();
      Double_t fPz = dch_obj->GetPz();
+
      Double_t fX_Local_In = dch_obj->GetXLocalIn();
      Double_t fY_Local_In = dch_obj->GetYLocalIn();
+     //Double_t fZ_Local_In = dch_obj->GetZLocalIn();
      Double_t fX_Local_Out = dch_obj->GetXLocalOut();
      Double_t fY_Local_Out = dch_obj->GetYLocalOut();
+     //Double_t fZ_Local_Out = dch_obj->GetZLocalOut();
+
+     Double_t fX_Global_In = dch_obj->GetXIn();
+     Double_t fY_Global_In = dch_obj->GetYIn();
+     Double_t fZ_Global_In = dch_obj->GetZIn();
+     Double_t fX_Global_Out = dch_obj->GetXOut();
+     Double_t fY_Global_Out = dch_obj->GetYOut();
+     Double_t fZ_Global_Out = dch_obj->GetZOut();
      TrackId = dch_obj->GetTrackID();
      R3BMCTrack *aTrack = (R3BMCTrack*) fDchMCTrack->At(TrackId);   
      Int_t PID = aTrack->GetPdgCode();
@@ -222,18 +250,36 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
      Double_t fPy_track = aTrack->GetPy();
      Double_t fPz_track = aTrack->GetPz();
      
-     Double_t fX_Local = ((fX_Local_In + fX_Local_Out)/2);
-     Double_t fY_Local = ((fY_Local_In + fY_Local_Out)/2);
+     Double_t fX_Local_sim = ((fX_Local_In + fX_Local_Out)/2);
+     Double_t fY_Local_sim = ((fY_Local_In + fY_Local_Out)/2);
+     //Double_t fZ_Local_sim = ((fZ_Local_In + fZ_Local_Out)/2);
+     //Need modifications
+     Double_t fX_Global = ((fX_Global_In + fX_Global_Out)/2);
+     Double_t fY_Global = ((fY_Global_In + fY_Global_Out)/2);
+     Double_t fZ_Global = ((fZ_Global_In + fZ_Global_Out)/2);
 
+     //hardcoded detector centres wrt target, from Ralf's Tracker:
+     //PDC1:    x0=-123.219446 y0=3.597104 z0=444.126271
+     //PDC2:    x0=-167.015888 y0=1.016917 z0=535.093884
 
-
-
+     Double_t fX_Local = 0.;	//initialisation, values will be PDC-specific
+     Double_t fY_Local = 0.; 
+     Double_t fZ_Local = 0.;
 
     if(PID==2212 && mother<0){
     if (DetID==0)
     {
-     Pdx1_p1 += fX_Local;
-     Pdy1_p1 += fY_Local;
+     //Check tilt direction, positive or negative angle?! Make it consistent with rotations in R3BDch.cxx !!!
+     fX_Local	= (fX_Global-PDC1_X0)*cos(PDC1_Atilt*TMath::Pi()/180.)/cos(PDC1_Aparm*TMath::Pi()/180.) - (fY_Global-PDC1_Y0)*sin(PDC1_Atilt*TMath::Pi()/180.);
+     fY_Local	= (fX_Global-PDC1_X0)*sin(PDC1_Atilt*TMath::Pi()/180.)/cos(PDC1_Aparm*TMath::Pi()/180.) + (fY_Global-PDC1_Y0)*cos(PDC1_Atilt*TMath::Pi()/180.);
+	
+	//control printouts
+	std::cout << "PDC1: glo_x: " << fX_Global << ", glo_y: "<< fY_Global << ", glo_z: "<< fZ_Global << std::endl;
+	std::cout << "PDC1: loc_x: " << fX_Local << ", loc_y: "<< fY_Local << ", loc_z: "<< fZ_Local << std::endl;
+	//std::cout << "PDC1: sloc_x: " << fX_Local_sim << ", sloc_y: "<< fY_Local_sim << std::endl;
+     
+     Pdx1_p1 = fX_Local;	// not += !!!
+     Pdy1_p1 = fY_Local;	// not += !!!
      DCH1Px->Fill(fPx);
      DCH1Py->Fill(fPy);
      DCH1Pz->Fill(fPz);
@@ -243,13 +289,20 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
 //     cout<<"Dch1 - first drift chamber "<<PID<<endl;
      pd1mul++;
     }
-    
-
      
     if (DetID==1)
     {
-     Pdx2_p1 += fX_Local;
-     Pdy2_p1 += fY_Local;
+     //Check tilt direction, positive or negative angle?! Make it consistent with rotations in R3BDch.cxx !!!
+     fX_Local	= (fX_Global-PDC2_X0)*cos(PDC2_Atilt*TMath::Pi()/180.)/cos(PDC2_Aparm*TMath::Pi()/180.) - (fY_Global-PDC2_Y0)*sin(PDC2_Atilt*TMath::Pi()/180.);
+     fY_Local	= (fX_Global-PDC2_X0)*sin(PDC2_Atilt*TMath::Pi()/180.)/cos(PDC2_Aparm*TMath::Pi()/180.) + (fY_Global-PDC2_Y0)*cos(PDC2_Atilt*TMath::Pi()/180.);
+     
+     	//control printouts
+	std::cout << "PDC2: glo_x: " << fX_Global << ", glo_y: "<< fY_Global << ", glo_z: "<< fZ_Global << std::endl;
+	std::cout << "PDC2: loc_x: " << fX_Local << ", loc_y: "<< fY_Local << ", loc_z: "<< fZ_Local << std::endl;
+	//std::cout << "PDC2: sloc_x: " << fX_Local_sim << ", sloc_y: "<< fY_Local_sim << std::endl;
+     
+     Pdx2_p1 = fX_Local;	// not += !!!
+     Pdy2_p1 = fY_Local;	// not += !!!
      DCH2Px->Fill(fPx);
      DCH2Py->Fill(fPy);
      DCH2Pz->Fill(fPz);
