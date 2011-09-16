@@ -1,7 +1,8 @@
 // -------------------------------------------------------------------------
 // -----                        R3BCalo header file                    -----
 // -----                  Created 26/03/09  by D.Bertini               -----
-// -----			Last modification 28/03/11 by H.Alvarez			   -----
+// -----		Last modification 28/03/11 by H.Alvarez	       -----
+// -----                                  15/09/11 by Enrico Fiori     ----- 
 // -------------------------------------------------------------------------
 
 /**  R3BCalo.h
@@ -159,6 +160,13 @@ class R3BCalo : public R3BDetector
 
 //  void SaveGeoParams();
 
+// method to get theta and phi for a crystal, from R3BCaloHitFinder.cxx
+// modified 06/09/11  E Fiori
+  /** Public method  GetAngles **/
+  void GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal, Double_t* rho);
+
+
+
   private:
 
     /** Track information to be stored until the track leaves the
@@ -202,7 +210,7 @@ class R3BCalo : public R3BDetector
      ** Adds a CaloCrystalhit to the HitCollection
      **/
     R3BCaloCrystalHit* AddCrystalHit(Int_t type, Int_t copy, Int_t ident,
-									 Double_t energy, Double_t tof);
+				     Double_t energy, Double_t tof, Double_t theta, Double_t phi, Double_t rho);
 	
 	
 	/** Private method NUSmearing
