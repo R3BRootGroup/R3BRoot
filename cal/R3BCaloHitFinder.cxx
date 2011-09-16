@@ -1,7 +1,8 @@
 // -------------------------------------------------------------------------
 // -----                   R3BCaloHitFinder source file                -----
 // -----                  Created 27/08/10  by H.Alvarez               -----
-// -----			Last modification 01/09/10 by H.Alvarez			   -----
+// -----		Last modification 01/09/10 by H.Alvarez        -----
+// -----                                  15/09/11 by Enrico Fiori     ----- 
 // -------------------------------------------------------------------------
 #include "R3BCaloHitFinder.h"
 #include "TMath.h"
@@ -107,11 +108,14 @@ void R3BCaloHitFinder::Exec(Option_t* opt) {
 	Double_t energy=0.;				// caloHits energy
 	Double_t polarAngle=0.;			// caloHits reconstructed polar angle
 	Double_t azimuthalAngle=0.;		// caloHits reconstructed azimuthal angle
+	Double_t rhoAngle=0.;		// caloHits reconstructed rho
 	Double_t angle1,angle2;
 	
 	Int_t* usedCrystalHits=0; //array to control the CrystalHits
 	Int_t crystalsInHit=0;  //used crystals in each CaloHit
-	Double_t testPolar, testAzimuthal;
+	Double_t testPolar=0 ;
+	Double_t testAzimuthal=0 ;
+	Double_t testRho =0 ;
 	
 	R3BCaloCrystalHit** crystalHit;
 
@@ -142,8 +146,7 @@ void R3BCaloHitFinder::Exec(Option_t* opt) {
 	}
 	
 	while (unusedCrystals>0) {
-		//First, finding the crystal with higher energy from the unused crystalHits
-		
+		//************ First, finding the crystal with higher energy from the unused crystalHits
 		for(Int_t i=1;i<crystalHits;i++) {
 			if (!usedCrystalHits[i] && crystalHit[i]->GetEnergy() > crystalHit[crystalWithHigherEnergy]->GetEnergy())     
 				crystalWithHigherEnergy = i;
@@ -151,30 +154,69 @@ void R3BCaloHitFinder::Exec(Option_t* opt) {
 		
 		usedCrystalHits[crystalWithHigherEnergy] = 1; unusedCrystals--; crystalsInHit++;
 		
-		//Second, energy and angles come from the crystal with the higher energy
+		//************ Second, energy and angles come from the crystal with the higher energy
 		energy = ExpResSmearing(crystalHit[crystalWithHigherEnergy]->GetEnergy());
-		GetAngles(crystalHit[crystalWithHigherEnergy]->GetCrystalId(),&polarAngle,&azimuthalAngle);
+		GetAngles(crystalHit[crystalWithHigherEnergy]->GetCrystalId(),&polarAngle,&azimuthalAngle, &rhoAngle);
+
 				
-		//Third, finding closest hits and adding their energy
+		//************ Third, finding closest hits and adding their energy
+		// Clusterization: you want to put a condition on the angle between the highest 
+		// energy crystal and the others. This is done by using the TVector3 classes and 
+		// not with different DeltaAngle on theta and phi, to get a proper solid angle 
+		// and not a "square" one.                    Enrico Fiori 
+		TVector3 refAngle(1);     // EF
+		refAngle.SetTheta(polarAngle);
+		refAngle.SetPhi(azimuthalAngle);
 		for(Int_t i=0;i<crystalHits;i++){
-			if (!usedCrystalHits[i] ) {
-				GetAngles(crystalHit[i]->GetCrystalId(), &testPolar, &testAzimuthal);
-			
-				//Dealing with the particular definition of azimuthal angles (discontinuity in pi and -pi)
-				if(azimuthalAngle + fDeltaAzimuthal > TMath::Pi()) {
-					angle1 = azimuthalAngle-TMath::Pi(); angle2 = testAzimuthal-TMath::Pi();
-				}
-				else if(azimuthalAngle - fDeltaAzimuthal < -TMath::Pi()){
-					angle1 = azimuthalAngle+TMath::Pi(); angle2 = testAzimuthal+TMath::Pi();
-				}
-				else {angle1 = azimuthalAngle; angle2 = testAzimuthal;}
-			
-				if(TMath::Abs(polarAngle - testPolar) < fDeltaPolar && 
-				   TMath::Abs(angle1 - angle2) < fDeltaAzimuthal ) {
-					energy += ExpResSmearing(crystalHit[i]->GetEnergy()); 
-					usedCrystalHits[i] = 1; unusedCrystals--; crystalsInHit++;
-				}
-			}
+		  if (!usedCrystalHits[i] ) {
+		    GetAngles(crystalHit[i]->GetCrystalId(), &testPolar, &testAzimuthal, &testRho);
+		    
+		    TVector3 testAngle(1);       //EF
+		    testAngle.SetTheta(testPolar);
+		    testAngle.SetPhi(testAzimuthal);
+
+		    // Check if the angle between the two vectors is less than the reference angle.
+		    switch (fClusteringAlgorithmSelector) {
+		    case 1: {  //square window
+		      //Dealing with the particular definition of azimuthal angles (discontinuity in pi and -pi)
+		      if(azimuthalAngle + fDeltaAzimuthal > TMath::Pi()) {
+			angle1 = azimuthalAngle-TMath::Pi(); angle2 = testAzimuthal-TMath::Pi();
+		      }
+		      else if(azimuthalAngle - fDeltaAzimuthal < -TMath::Pi()){
+			angle1 = azimuthalAngle+TMath::Pi(); angle2 = testAzimuthal+TMath::Pi();
+		      }
+		      else {angle1 = azimuthalAngle; angle2 = testAzimuthal;}
+		      if(TMath::Abs(polarAngle - testPolar) < fDeltaPolar && 
+			 TMath::Abs(angle1 - angle2) < fDeltaAzimuthal ) {
+			energy += ExpResSmearing(crystalHit[i]->GetEnergy()); 
+			usedCrystalHits[i] = 1; unusedCrystals--; crystalsInHit++;
+		      }
+		      break; }
+		    case 2:  //round window
+		      // The angle is scaled to a reference distance (e.g. here is set to 35 cm) 
+		      // to take into account Califa's non-spherical geometry. 
+		      // The reference angle will then have to be defined in relation to this reference distance:
+		      // for example, 10° at 35 cm corresponds to ~6cm, setting a fDeltaAngleClust=10 means that 
+		      // the gamma rays will be allowed to travel 6 cm in the CsI, no matter the position of the crystal they hit.
+		      if( ((refAngle.Angle(testAngle))*((testRho+rhoAngle)/(35.*2.))) < fDeltaAngleClust )  {
+			energy += ExpResSmearing(crystalHit[i]->GetEnergy()); 
+			usedCrystalHits[i] = 1; unusedCrystals--; crystalsInHit++;
+		      }
+		      break ;
+		    case 3: {  //round window scaled with energy
+		      // The same as before but the angular window is scaled according to the 
+		      // energy of the hit in the higher energy crystal. It needs a parameter that should be calibrated.
+		      Double_t fDeltaAngleClustScaled = fDeltaAngleClust * (crystalHit[crystalWithHigherEnergy]->GetEnergy()*fParCluster1);
+		      if( ((refAngle.Angle(testAngle))*((testRho+rhoAngle)/(35.*2.))) < fDeltaAngleClustScaled )  {
+			energy += ExpResSmearing(crystalHit[i]->GetEnergy()); 
+			usedCrystalHits[i] = 1; unusedCrystals--; crystalsInHit++;
+		      }
+		      break; }
+		    case 4: // round window scaled with the energy of the _two_ hits (to be tested and implemented!!)
+		    // More advanced: the condition on the distance between the two hits is function of the energy of both hits
+		      break;		    
+		    }
+		  }
 		}
 
 		AddHit(crystalsInHit, energy, polarAngle, azimuthalAngle);
@@ -236,7 +278,7 @@ void R3BCaloHitFinder::SetDetectionThreshold(Double_t thresholdEne)
 
 
 // ---- Public method GetAngles   --------------------------------------------------
-void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal)
+void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal, Double_t* rho)
 {
    	
 	Double_t local[3]={0,0,0};
@@ -588,6 +630,7 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal)
 	//masterV.Print();
 	*polar=masterV.Theta();
 	*azimuthal=masterV.Phi();
+	*rho=masterV.Mag();
 	//cout << "-I- R3BCaloHitFinder::GetAngles: theta: "<< *polar <<", phi: "<< *azimuthal << "for crystal iD " << iD <<endl;
 }
 
@@ -613,14 +656,30 @@ Double_t R3BCaloHitFinder::ExpResSmearing(Double_t inputEnergy) {
 	}
 }
 
+
+// -----   Public method SetClusteringAlgorithm  --------------------------------------------
+void R3BCaloHitFinder::SetClusteringAlgorithm(Int_t ClusteringAlgorithmSelector, Double_t ParCluster1) {
+  // Select the clustering algorithm and the parameters of some of them
+  // ClusteringAlgorithmSelector = 1  ->  square window
+  // ClusteringAlgorithmSelector = 2  ->  round window
+  // ClusteringAlgorithmSelector = 3  ->  advanced round window with opening proportional to the 
+  //                                     energy of the hit, need ParCluster1
+  // ClusteringAlgorithmSelector = 4  ->  advanced round window with opening proportional to the
+  //                                     energy of the two hit, need ParCluster1 NOT YET IMPLEMENTED!
+  fClusteringAlgorithmSelector = ClusteringAlgorithmSelector ;
+  fParCluster1 = ParCluster1 ;
+}
+
 // -----   Public method SetAngularWindow  --------------------------------------------
-void R3BCaloHitFinder::SetAngularWindow(Double_t deltaPolar, Double_t deltaAzimuthal) {
+void R3BCaloHitFinder::SetAngularWindow(Double_t deltaPolar, Double_t deltaAzimuthal, Double_t DeltaAngleClust) {
 	//
 	// Set the angular window open around the crystal with the largest energy
 	// to search for additional crystal hits and addback to the same cal hit
 	// [0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
 	fDeltaPolar = deltaPolar;
 	fDeltaAzimuthal = deltaAzimuthal;
+	fDeltaAngleClust = DeltaAngleClust ;
+
 }
 
 
