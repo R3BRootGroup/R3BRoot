@@ -1,7 +1,8 @@
 // -------------------------------------------------------------------------
 // -----                   R3BCaloHitFinder source file                -----
 // -----                  Created 27/08/10  by H.Alvarez               -----
-// -----			Last modification 27/08/10 by H.Alvarez			   -----
+// -----	      	Last modification 27/08/10 by H.Alvarez	       -----
+// -----                                  15/09/11 by Enrico Fiori     ----- 
 // -------------------------------------------------------------------------
 
 /**  R3BCaloHitFinder.h
@@ -34,7 +35,7 @@ public:
 	virtual void Reset();
 	
 	/** Public method  GetAngles **/
-	void GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal);
+	void GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal, Double_t* rho);
 	
 	/** Public method SelectGeometryVersion
 	 **
@@ -68,12 +69,26 @@ public:
 	void SetDetectionThreshold(Double_t thresholdEne);
 	
 	/** Public method SetAngularWindow
-     **
-     ** Sets the angular window open around the crystal with the largest energy
+	 **
+	 ** Sets the angular window open around the crystal with the largest energy
 	 ** to search for additional crystal hits and addback to the same cal hit
 	 **/
-    void SetAngularWindow(Double_t deltaPolar, Double_t deltaAzimuthal);
-	
+	void SetAngularWindow(Double_t deltaPolar, Double_t deltaAzimuthal, Double_t DeltaAngleClust);
+
+	/** Public method SetClusteringAlgorithm
+	 **
+	 ** Select the clustering algorithm to be used and set the parameter to be used by one of them
+	 //  1  ->  square window
+	 //  2  ->  round window
+	 //  3  ->  advanced round window with opening proportional to the 
+	 //         energy of the hit, need ParCluster1
+	 //  4  ->  advanced round window with opening proportional to the
+	 //         energy of the two hit, need ParCluster1 NOT IMPLEMENTED YET!
+	 ** 
+	 **/	
+	void SetClusteringAlgorithm(Int_t ClusteringAlgorithmSelector, Double_t ParCluster1) ;
+
+
 	
 	
 		
@@ -106,6 +121,12 @@ protected:
 	Double_t fDeltaPolar;
 	// Angular window (azimuthal) 
 	Double_t fDeltaAzimuthal;
+	// Angular opening used for the clustering condition
+	Double_t fDeltaAngleClust ;
+	// Clustering algorithm selector
+	Int_t fClusteringAlgorithmSelector ;
+	// Clustering parameter 1
+	Double_t fParCluster1 ;
 
 	// Parameter class
 	//R3BCaloHitFinderPar* fCaloHitFinderPar;
