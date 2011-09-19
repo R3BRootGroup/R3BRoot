@@ -35,6 +35,9 @@ public:
 	virtual void Reset();
 	
 	/** Public method  GetAngles **/
+	void GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal);
+
+	/** Public method  GetAngles **/
 	void GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal, Double_t* rho);
 	
 	/** Public method SelectGeometryVersion
