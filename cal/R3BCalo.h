@@ -1,8 +1,72 @@
+<<<<<<< .working
         // -------------------------------------------------------------------------
 	// -----                        R3BCalo header file                    -----
 	// -----                  Created 26/03/09  by D.Bertini               -----
 	// -----                        Last modification 28/03/11 by H.Alvarez                    -----
 	// -------------------------------------------------------------------------
+=======
+// -------------------------------------------------------------------------
+// -----                        R3BCalo header file                    -----
+// -----                  Created 26/03/09  by D.Bertini               -----
+// -----			Last modification 28/03/11 by H.Alvarez			   -----
+// -------------------------------------------------------------------------
+
+/**  R3BCalo.h
+ **/
+
+
+#ifndef R3BCALO_H
+#define R3BCALO_H
+
+#include "R3BDetector.h"
+
+#include "TLorentzVector.h"
+
+class TClonesArray;
+class R3BCaloPoint;
+class R3BCaloCrystalHit;
+class FairVolume;
+class TGeoRotation;
+
+
+class R3BCalo : public R3BDetector
+{
+
+ public:
+
+  /** Default constructor **/
+  R3BCalo();
+
+
+  /** Standard constructor.
+   *@param name    detetcor name
+   *@param active  sensitivity flag
+   **/
+  R3BCalo(const char* name, Bool_t active);
+
+
+  /** Destructor **/
+  virtual ~R3BCalo();
+
+
+  /** Virtual method ProcessHits
+   **
+   ** Defines the action to be taken when a step is inside the
+   ** active volume. Creates a R3BCaloPoint and adds it to the
+   ** collection.
+   *@param vol  Pointer to the active volume
+   **/
+  virtual Bool_t ProcessHits(FairVolume* vol = 0);
+
+
+  /** Virtual method BeginEvent
+   **
+   ** If verbosity level is set, print hit collection at the
+   ** end of the event and resets it afterwards.
+   **/
+  virtual void BeginEvent();
+
+>>>>>>> .merge-right.r11651
 	
 	/**  R3BCalo.h
 	 **/
@@ -25,11 +89,61 @@
 	class R3BCalo : public R3BDetector
 	{
 	
+<<<<<<< .working
 	 public:
+=======
+  virtual void Initialize();
+  virtual void SetSpecialPhysicsCuts();
+  void SetEnergyCutOff( Double_t cutE ){fCutE = cutE;}
+  Double_t  GetEnergyCutOff ( ) {return fCutE;}
+
+
+//  void SaveGeoParams();
+
+  private:
+
+    /** Track information to be stored until the track leaves the
+	active volume. **/
+    Int_t          fTrackID;           //!  track index
+    Int_t          fVolumeID;          //!  volume id
+    TLorentzVector fPosIn, fPosOut;    //!  position
+    TLorentzVector fMomIn, fMomOut;    //!  momentum
+    Double32_t     fTime;              //!  time
+    Double32_t     fLength;            //!  length
+    Double32_t     fELoss;             //!  energy loss
+    Double32_t     fCutE;              //!  energy loss
+    Int_t          fPosIndex;          //!
+    TClonesArray*  fCaloCollection;    //!  The hit collection
+    TClonesArray*  fCaloCrystalHitCollection;    //!  The hit collection
+    Bool_t         kGeoSaved;          //!
+    TList *flGeoPar;				//!
+
+    Int_t fCrystalType[30];
+    Int_t fAlveolusType[32];
+    Int_t fAlveolusECType[3];
+
+	// Selecting the geometry of the CALIFA calorimeter
+	Int_t fGeometryVersion;
+	// Adding some non-uniformity preliminary description
+	Double_t  fNonUniformity;
+>>>>>>> .merge-right.r11651
 	
 	  /** Default constructor **/
 	  R3BCalo();
 	
+<<<<<<< .working
+=======
+	/** Private method AddCrystalHit
+     **
+     ** Adds a CaloCrystalhit to the HitCollection
+     **/
+    R3BCaloCrystalHit* AddCrystalHit(Int_t type, Int_t copy, Int_t ident,
+<<<<<<< .working
+									 Double_t energy, Double_t tof);
+>>>>>>> .merge-right.r11651
+=======
+									 Double_t energy, Double_t tof);
+>>>>>>> .merge-right.r11651
 	
 	  /** Standard constructor.
 	   *@param name    detetcor name
