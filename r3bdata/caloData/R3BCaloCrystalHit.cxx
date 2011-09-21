@@ -1,6 +1,5 @@
 // -------------------------------------------------------------------------
 // -----                      R3BCaloCrystalHit source file                  -----
-// -----               Modified 05/09/11 by Enrico Fiori                  -----
 // -------------------------------------------------------------------------
 
 #include "R3BCaloCrystalHit.h"
@@ -23,7 +22,7 @@ R3BCaloCrystalHit::R3BCaloCrystalHit() : FairMultiLinkedData() {
 
 // -----   Standard constructor   ------------------------------------------
 R3BCaloCrystalHit::R3BCaloCrystalHit(Int_t type, Int_t copy, Int_t ident,
-				     Double_t energy, Double_t time, Double_t theta, Double_t phi, Double_t rho) 
+									 Double_t energy, Double_t time) 
   : FairMultiLinkedData() {
   
   fCrystalId = ident;
@@ -31,10 +30,6 @@ R3BCaloCrystalHit::R3BCaloCrystalHit(Int_t type, Int_t copy, Int_t ident,
   fCrystalCopy = copy;
   fEnergy = energy;
   fTime = time;
-  fCrystalTheta = theta ;  // EF 05/09/11
-  fCrystalPhi   = phi   ;  // EF 05/09/11
-  fCrystalRho   = rho   ;  // EF 05/09/11
-
 }
 // -------------------------------------------------------------------------
 

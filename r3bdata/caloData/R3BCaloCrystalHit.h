@@ -1,7 +1,6 @@
 // -------------------------------------------------------------------------
 // -----                  R3BCaloCrystalHit header file                -----
 // -----               Created 08/07/10  by H. Alvarez Pol             -----
-// -----               Modified 05/09/11 by Enrico Fiori                  -----
 // -------------------------------------------------------------------------
 
 /**  R3BCaloCrystalHit.h
@@ -30,7 +29,7 @@ public:
    *@param fTime      Time since event start [ns]
    **/
 	R3BCaloCrystalHit(Int_t type, Int_t copy, Int_t ident,
-			  Double_t energy, Double_t time, Double_t theta, Double_t phi, Double_t rho);
+					  Double_t energy, Double_t time);
 
   /** Copy constructor **/
   R3BCaloCrystalHit(const R3BCaloCrystalHit& hit) { *this = hit; };
@@ -63,10 +62,6 @@ protected:
   Int_t fCrystalType;  //crystal type
   Int_t fCrystalCopy;  //crystal copy
   Int_t fCrystalId;    //crystal unique identifier
-  Double32_t fCrystalTheta;  // Crystal theta EF 05/09/11
-  Double32_t fCrystalPhi;    // Crystal phi   EF 05/09/11
-  Double32_t fCrystalRho;    // Crystal rho   EF 05/09/11
-
 
   ClassDef(R3BCaloCrystalHit,1)
 
