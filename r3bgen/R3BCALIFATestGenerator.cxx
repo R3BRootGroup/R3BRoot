@@ -152,7 +152,7 @@ Bool_t R3BCALIFATestGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 	//if Sum(branchingRatios)<1, the leftover probability (up to 1) is defined as environmental noise
 	doNotBoost=1; 
 	}
-	  
+	  /*
 	if (fLorentzBoostIsSet && !doNotBoost){
 		
 	  //Lorentz transformation Pz(lab) = gamma * Pz(cm) + gamma * beta * E
@@ -160,8 +160,25 @@ Bool_t R3BCALIFATestGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 	  //we can separate the gamma factor corresponding to each direction
 	  Double32_t gammaMomentum=TMath::Sqrt(px*px+py*py+pz*pz);
 	  pz = (pz + fBetaOfEmittingFragment * gammaMomentum) / fGammaFactor;
-	}
-	  
+		*/
+		
+		
+	  if (fPDGType == 22 && fLorentzBoostIsSet && !doNotBoost){ /// for gamma-rays
+		  //Lorentz transformation Pz(lab) = gamma * Pz(cm) + gamma * beta * E
+		  //As each Lorentz transformation can be performed sequencially,
+		  //we can separate the gamma factor corresponding to each direction
+		  Double32_t gammaMomentum=TMath::Sqrt(px*px+py*py+pz*pz);
+		  pz = (pz + fBetaOfEmittingFragment * gammaMomentum) / fGammaFactor;
+	  }
+		else if (fLorentzBoostIsSet && !doNotBoost){ /// for any massive particle
+			//Lorentz transformation Pz(lab) = gamma * Pz(cm) + gamma * beta * E
+			//As each Lorentz transformation can be performed sequencially,
+			//we can separate the gamma factor corresponding to each direction
+			Double32_t particleEnergy = TMath::Sqrt(px*px + py*py + pz*pz + fPDGMass*fPDGMass);
+			pz = (pz + fBetaOfEmittingFragment * particleEnergy) / fGammaFactor;
+		}
+
+
     if (fDebug)
       printf("CALIFATestGen: kf=%d, p=(%.2f, %.2f, %.2f) GeV, x=(%.1f, %.1f, %.1f) cm\n",
 	     fPDGType, px, py, pz, fX, fY, fZ);
