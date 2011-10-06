@@ -1,4 +1,4 @@
- //Generated 10/5/2011 12:50:56 from macro createGeometryCLF709718.pl by Hector Alvarez Pol (hector.alvarez.es) 
+ //Generated 10/6/2011 10:35:54 from macro createGeometryCLF709718.pl by Hector Alvarez Pol (hector.alvarez.es) 
 
  //Alveolus
 	 TGeoVolume *Alveolus_1 = gGeoManager->MakeTrd2("Alveolus_1", pCarbonFibreMedium,2.96,4.04375886320505,1.85,2.51444170011313,10); 
