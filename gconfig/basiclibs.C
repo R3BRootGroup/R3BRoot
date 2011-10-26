@@ -17,7 +17,6 @@ void basiclibs()
   gSystem->Load("libMinuit");
   gSystem->Load("libTree"); 
   */
-  gSystem->Load("libGdml");
   gSystem->Load("libRIO");
   gSystem->Load("libGeom");
   gSystem->Load("libGeomPainter");
