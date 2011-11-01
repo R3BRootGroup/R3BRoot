@@ -40,7 +40,9 @@ class R3BTarget2pDigitizer : public FairTask
 
 
   R3BTarget2pDigi* AddHit(Double_t ss03_smul,Double_t ss03_kmul,Double_t ss06_smul,Double_t ss06_kmul,
-  Double_t x0,Double_t y0,Double_t t0,Double_t estar);
+  Double_t x0,Double_t y0,Double_t t0,Double_t estar,Double_t Pxf,Double_t Pyf,Double_t Pzf,Double_t Pf_tot,Double_t f_beta,
+Double_t Pxp1,Double_t Pyp1,Double_t Pzp1,Double_t Pp1_tot,Double_t p1_beta,Double_t Pxp2,Double_t Pyp2,Double_t Pzp2,
+Double_t Pp2_tot,Double_t p2_beta);
 
 
   protected:
