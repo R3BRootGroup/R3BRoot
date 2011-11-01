@@ -166,7 +166,6 @@ void R3BTarget2pDigitizer::Exec(Option_t* opt) {
      Double_t Px = aTrack->GetPx();
      Double_t Py = aTrack->GetPy();
      Double_t Pz = aTrack->GetPz();
-     
           
    if (mother<0){
      
@@ -216,7 +215,10 @@ void R3BTarget2pDigitizer::Exec(Option_t* opt) {
       y0=fY;
       t0=fT;
    }       
-
+  
+      
+      
+      
  } 
   
    Double_t px=SQR(Pxp1+Pxp2+Pxf);
@@ -265,11 +267,13 @@ void R3BTarget2pDigitizer::Exec(Option_t* opt) {
 //    if(PID==1000160300 && mother<0){  //Christoph 2p
     
       if (DetID==15)
+//      if (DetID==14)
       {
         ss03_smul++;
 	ss03_kmul++;   
       }     
       if (DetID==16)
+//      if (DetID==15)
       {  
         ss06_smul++;
 	ss06_kmul++;   
@@ -280,35 +284,41 @@ void R3BTarget2pDigitizer::Exec(Option_t* opt) {
      if(PID==2212 && mother<0){
      
       if (DetID==15 && l==0)
+//      if (DetID==14 && l==0)
       { 
         ss03_smul++;
 	ss03_kmul++;   
       }
       if (DetID==15 && l>1)
+//      if (DetID==14 && l>1)
       { 
         ss03_smul++;
 	ss03_kmul++;   
       } 
            
-      if (DetID==16 && l==0)
+      if (DetID==16 && l==1)
+//      if (DetID==15 && l==0)
       { 
         ss06_smul++;
 	ss06_kmul++;   
       }
-      if (DetID==16 && l>0)
+      if (DetID==16 && l>1)
+//      if (DetID==15 && l>0)
       { 
         ss06_smul++;
 	ss06_kmul++;   
       }
       
-    }     
+    } 
+    
+    
 
  }
 
 
 
 
-AddHit(ss03_smul,ss03_kmul,ss06_smul,ss06_kmul,x0,y0,t0,estar);
+AddHit(ss03_smul,ss03_kmul,ss06_smul,ss06_kmul,x0,y0,t0,estar,Pxf,Pyf,Pzf,Pf_tot,f_beta,Pxp1,Pyp1,Pzp1,Pp1_tot,p1_beta,Pxp2,Pyp2,Pzp2,Pp2_tot,p2_beta);
 
 
 }
@@ -332,10 +342,13 @@ void R3BTarget2pDigitizer::Finish()
 }
 
 R3BTarget2pDigi* R3BTarget2pDigitizer::AddHit(Double_t ss03_smul,Double_t ss03_kmul,Double_t ss06_smul,Double_t ss06_kmul,
-Double_t x0,Double_t y0,Double_t t0,Double_t estar){   
+Double_t x0,Double_t y0,Double_t t0,Double_t estar,Double_t Pxf,Double_t Pyf,Double_t Pzf,Double_t Pf_tot,Double_t f_beta,
+Double_t Pxp1,Double_t Pyp1,Double_t Pzp1,Double_t Pp1_tot,Double_t p1_beta,Double_t Pxp2,Double_t Pyp2,Double_t Pzp2,
+Double_t Pp2_tot,Double_t p2_beta){   
   TClonesArray& clref = *fTarget2pDigi;
   Int_t size = clref.GetEntriesFast();
-  return new(clref[size]) R3BTarget2pDigi(ss03_smul,ss03_kmul,ss06_smul,ss06_kmul,x0,y0,t0,estar);
+  return new(clref[size]) R3BTarget2pDigi(ss03_smul,ss03_kmul,ss06_smul,ss06_kmul,x0,y0,t0,estar,Pxf,Pyf,Pzf,Pf_tot,f_beta,
+  Pxp1,Pyp1,Pzp1,Pp1_tot,p1_beta,Pxp2,Pyp2,Pzp2,Pp2_tot,p2_beta);
  
 }
 
