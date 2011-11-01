@@ -105,11 +105,17 @@ void R3BTof2pDigitizer::Exec(Option_t* opt) {
      Double_t tfwy_p1;
      Double_t tfwt_p1;
      Double_t tfwpath_p1;
+     Double_t tfwpx_p1;
+     Double_t tfwpy_p1;
+     Double_t tfwpz_p1;
      
      Double_t tfwx_p2;
      Double_t tfwy_p2;
      Double_t tfwt_p2;
      Double_t tfwpath_p2;
+     Double_t tfwpx_p2;
+     Double_t tfwpy_p2;
+     Double_t tfwpz_p2;
    
 
 //********************* energy looping *********************//
@@ -140,11 +146,18 @@ void R3BTof2pDigitizer::Exec(Option_t* opt) {
   tfwy_p1=0;
   tfwt_p1=0;
   tfwpath_p1=0;
+  tfwpx_p1=0;
+  tfwpy_p1=0;
+  tfwpz_p1=0;
   
   tfwx_p2=0;
   tfwy_p2=0;
   tfwt_p2=0;
   tfwpath_p2=0;
+  tfwpx_p2=0;
+  tfwpy_p2=0;
+  tfwpz_p2=0;
+  
   
    for (Int_t l=0;l<nentriesTof;l++){
     
@@ -161,12 +174,22 @@ void R3BTof2pDigitizer::Exec(Option_t* opt) {
      Double_t fX_out = tof_obj->GetXOut();
      Double_t fY_out = tof_obj->GetYOut();
      Double_t fZ_out = tof_obj->GetZOut();
+     Double_t PX_in = tof_obj->GetPx();
+     Double_t PY_in = tof_obj->GetPy();
+     Double_t PZ_in = tof_obj->GetPz();
+     Double_t PX_out = tof_obj->GetPxOut();
+     Double_t PY_out = tof_obj->GetPyOut();
+     Double_t PZ_out = tof_obj->GetPzOut();
      Double_t ftime = tof_obj->GetTime();
      Double_t flength = tof_obj->GetLength();
      
      Double_t fX = ((fX_in + fX_out)/2);
      Double_t fY = ((fY_in + fY_out)/2);
      Double_t fZ = ((fZ_in + fZ_out)/2);
+     
+     Double_t PX = ((PX_in + PX_out)/2);
+     Double_t PY = ((PY_in + PY_out)/2);
+     Double_t PZ = ((PZ_in + PZ_out)/2);
     
     
     // offset - position of detector x: -417.359574; y: +2.4; z: +960.777114
@@ -183,6 +206,11 @@ void R3BTof2pDigitizer::Exec(Option_t* opt) {
 //       tfwy_p1=(fY-2.12);  //Christoph
        tfwt_p1=ftime;
        tfwpath_p1=flength;
+       tfwpx_p1=PX;
+       tfwpy_p1=PY;
+       tfwpz_p1=PZ;
+       
+//       cout<<"TFW 1p X "<<fX<<" Y "<<fY<<" Z "<<fZ<<endl;
 //       cout<<"TFW - first proton"<<endl;
      }
      if (l>0){
@@ -192,6 +220,11 @@ void R3BTof2pDigitizer::Exec(Option_t* opt) {
 //       tfwy_p2=(fY-2.12);  //Christoph
        tfwt_p2=ftime;
        tfwpath_p2=flength;
+       tfwpx_p2=PX;
+       tfwpy_p2=PY;
+       tfwpz_p2=PZ;
+       
+//       cout<<"TFW 2p X "<<fX<<" Y "<<fY<<" Z "<<fZ<<endl;
 //       cout<<"TFW - second proton "<<endl;
      }
 
@@ -202,7 +235,8 @@ void R3BTof2pDigitizer::Exec(Option_t* opt) {
 
 
 
-AddHit(tfmul,tfwx_p1,tfwy_p1,tfwt_p1,tfwx_p2,tfwy_p2,tfwt_p2,tfwpath_p1,tfwpath_p2);
+AddHit(tfmul,tfwx_p1,tfwy_p1,tfwt_p1,tfwx_p2,tfwy_p2,tfwt_p2,tfwpath_p1,tfwpath_p2,tfwpx_p1,tfwpy_p1,tfwpz_p1,tfwpx_p2,
+tfwpy_p2,tfwpz_p2);
 
 //     cout<<"addhit"<<nentriesTof<<" tfmul "<<tfmul<<" tfwx_p1 "<<tfwx_p1<<" tfwy_p1 "<<tfwy_p1<<endl;
 
@@ -228,10 +262,12 @@ void R3BTof2pDigitizer::Finish()
 }
 
 R3BTof2pDigi* R3BTof2pDigitizer::AddHit(Int_t tfmul,Double_t tfwx_p1,Double_t tfwy_p1,Double_t tfwt_p1,
-Double_t tfwx_p2,Double_t tfwy_p2,Double_t tfwt_p2,Double_t tfwpath_p1,Double_t tfwpath_p2){   
+Double_t tfwx_p2,Double_t tfwy_p2,Double_t tfwt_p2,Double_t tfwpath_p1,Double_t tfwpath_p2,Double_t tfwpx_p1,
+Double_t tfwpy_p1,Double_t tfwpz_p1,Double_t tfwpx_p2,Double_t tfwpy_p2,Double_t tfwpz_p2){   
   TClonesArray& clref = *fTof2pDigi;
   Int_t size = clref.GetEntriesFast();
-  return new(clref[size]) R3BTof2pDigi(tfmul,tfwx_p1,tfwy_p1,tfwt_p1,tfwx_p2,tfwy_p2,tfwt_p2,tfwpath_p1,tfwpath_p2);
+  return new(clref[size]) R3BTof2pDigi(tfmul,tfwx_p1,tfwy_p1,tfwt_p1,tfwx_p2,tfwy_p2,tfwt_p2,tfwpath_p1,tfwpath_p2,
+  tfwpx_p1,tfwpy_p1,tfwpz_p1,tfwpx_p2,tfwpy_p2,tfwpz_p2);
  
 }
 
