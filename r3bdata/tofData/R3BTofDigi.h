@@ -24,7 +24,8 @@ class R3BTofDigi : public TObject
 
   /** Default constructor **/
   R3BTofDigi();
-  R3BTofDigi(Int_t tfmul,Double_t tfwx_p1,Double_t tfwy_p1,Double_t tfwt_p1,Double_t tfwpath_p1);
+  R3BTofDigi(Int_t tfmul,Double_t tfwx_p1,Double_t tfwy_p1,Double_t tfwt_p1,Double_t tfwpath_p1,Double_t tfwpx_p1,
+  Double_t tfwpy_p1,Double_t tfwpz_p1);
   
   /** Copy constructor **/
   R3BTofDigi(const R3BTofDigi& point) { *this = point; };
@@ -49,7 +50,16 @@ class R3BTofDigi : public TObject
   Double_t Gettfwt_p1(){return Tft_p1;}
   
   void Settfwpath_p1(Double_t length){Tfpath_p1 = length;}
-  Double_t Gettfwpath_p1(){return Tfpath_p1;}  
+  Double_t Gettfwpath_p1(){return Tfpath_p1;}
+  
+  void Settfwpx_p2(Int_t mom){Tfwpx_p2 = mom;}
+  Double_t Gettfwpx_p2(){return Tfwpx_p2;}
+  
+  void Settfwpy_p2(Int_t mom){Tfwpy_p2 = mom;}
+  Double_t Gettfwpy_p2(){return Tfwpy_p2;}
+  
+  void Settfwpz_p2(Int_t mom){Tfwpz_p2 = mom;}
+  Double_t Gettfwpz_p2(){return Tfwpz_p2;}  
 
 
  protected:
@@ -59,6 +69,9 @@ class R3BTofDigi : public TObject
    Double32_t Tfy_p1;
    Double32_t Tft_p1;
    Double32_t Tfpath_p1;
+   Double32_t Tfwpx_p1;
+   Double32_t Tfwpy_p1;
+   Double32_t Tfwpz_p1;
 
   ClassDef(R3BTofDigi,1)
 
