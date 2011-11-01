@@ -32,11 +32,8 @@
 #define SQR(x) ((x)*(x))
 #define U_MEV_C2 931.494
 #define MASS_PROTON_MEV_C2 938.272046 //938.279
-//#define MASS_17NE_MEV_C2   29796.65565 //Ar
-//#define MASS_15O_MEV_C2    28860.78 //Cl
-#define MASS_17NE_MEV_C2	15846.9
-#define MASS_16F_MEV_C2		14910.1
-#define MASS_15O_MEV_C2		13971.3
+#define MASS_17NE_MEV_C2   29796.65565 //Ar //15846.9
+#define MASS_15O_MEV_C2    28860.78 //Cl //13971.3
 		
 using std::cout;
 using std::endl;
@@ -160,7 +157,7 @@ void R3BTargetDigitizer::Exec(Option_t* opt) {
      
      
    if (mother<0 && PID==1000080150){
-   //if (mother<0 && PID==1000170310){  //Christoph
+//   if (mother<0 && PID==1000170310){  //Christoph
    Pxf=(Px*1000);
    Pyf=(Py*1000);
    Pzf=(Pz*1000);
@@ -207,10 +204,7 @@ void R3BTargetDigitizer::Exec(Option_t* opt) {
   
 
    //  sqrt(MeV^2/c^2 - MeV^2/c^2)=MeV/c
-   //estar=sqrt(E2-p2)-MASS_17NE_MEV_C2; // *c2
-   //estar=sqrt(E2-p2)-MASS_16F_MEV_C2; // *c2
-   //estar=sqrt(E2-p2)-(MASS_15O_MEV_C2+MASS_PROTON_MEV_C2)+1.0; // *c2 // shift by 1 extra MeV, not to start at 0.
-   estar=sqrt(E2-p2)-(MASS_15O_MEV_C2+MASS_PROTON_MEV_C2); // *c2
+   estar=sqrt(E2-p2)-MASS_17NE_MEV_C2; // *c2
   
    
 //   cout<<"Estar In "<<Estar<<endl;
@@ -238,7 +232,7 @@ void R3BTargetDigitizer::Exec(Option_t* opt) {
      Int_t mother = aTrack->GetMotherId();     
 
     if(PID==1000080150 && mother<0){
-    //if(PID==1000170310 && mother<0){ //Christoph
+//    if(PID==1000170310 && mother<0){ //Christoph
     
       if (DetID==15)
       {
@@ -273,7 +267,7 @@ void R3BTargetDigitizer::Exec(Option_t* opt) {
 
 
 
-AddHit(ss03_smul,ss03_kmul,ss06_smul,ss06_kmul,x0,y0,t0,estar);
+AddHit(ss03_smul,ss03_kmul,ss06_smul,ss06_kmul,x0,y0,t0,estar,Pxf,Pyf,Pzf,Pf_tot,f_beta,Pxp1,Pyp1,Pzp1,Pp1_tot,p1_beta);
 
 
 }
@@ -298,10 +292,12 @@ void R3BTargetDigitizer::Finish()
 }
 
 R3BTargetDigi* R3BTargetDigitizer::AddHit(Double_t ss03_smul,Double_t ss03_kmul,Double_t ss06_smul,Double_t ss06_kmul,
-Double_t x0,Double_t y0,Double_t t0,Double_t estar){   
+Double_t x0,Double_t y0,Double_t t0,Double_t estar,Double_t Pxf,Double_t Pyf,Double_t Pzf,Double_t Pf_tot,Double_t f_beta,
+Double_t Pxp1,Double_t Pyp1,Double_t Pzp1,Double_t Pp1_tot,Double_t p1_beta){   
   TClonesArray& clref = *fTargetDigi;
   Int_t size = clref.GetEntriesFast();
-  return new(clref[size]) R3BTargetDigi(ss03_smul,ss03_kmul,ss06_smul,ss06_kmul,x0,y0,t0,estar);
+  return new(clref[size]) R3BTargetDigi(ss03_smul,ss03_kmul,ss06_smul,ss06_kmul,x0,y0,t0,estar,Pxf,Pyf,Pzf,Pf_tot,f_beta,
+  Pxp1,Pyp1,Pzp1,Pp1_tot,p1_beta);
  
 }
 
