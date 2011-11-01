@@ -25,7 +25,9 @@ class R3BTarget2pDigi : public TObject
   /** Default constructor **/
   R3BTarget2pDigi();
   R3BTarget2pDigi(Double_t ss03_smul,Double_t ss03_kmul,Double_t ss06_smul,Double_t ss06_kmul,
-  Double_t x0,Double_t y0,Double_t t0,Double_t estar);
+  Double_t x0,Double_t y0,Double_t t0,Double_t estar,Double_t Pxf,Double_t Pyf,Double_t Pzf,Double_t Pf_tot,Double_t f_beta,
+Double_t Pxp1,Double_t Pyp1,Double_t Pzp1,Double_t Pp1_tot,Double_t p1_beta,Double_t Pxp2,Double_t Pyp2,Double_t Pzp2,
+Double_t Pp2_tot,Double_t p2_beta);
   
   /** Copy constructor **/
   R3BTarget2pDigi(const R3BTarget2pDigi& point) { *this = point; };
@@ -65,6 +67,40 @@ class R3BTarget2pDigi : public TObject
   
   void Setestar(Double_t energy){Estar = energy;}
   Double_t Getestar(){return Estar;}
+  
+  
+  void SetPxf(Double_t mom){pxf = mom;}
+  Double_t GetPxf(){return pxf;}
+  void SetPyf(Double_t mom){pyf = mom;}
+  Double_t GetPyf(){return pyf;}
+  void SetPzf(Double_t mom){pzf = mom;}
+  Double_t GetPzf(){return pzf;}
+  void SetPf_tot(Double_t mom){pf_tot = mom;}
+  Double_t GetPf_tot(){return pf_tot;}
+  void Setf_beta(Double_t vel){f_Beta = vel;}
+  Double_t Getf_beta(){return f_Beta;}
+  
+  void SetPxp1(Double_t mom){pxp1 = mom;}
+  Double_t GetPxp1(){return pxp1;}
+  void SetPyp1(Double_t mom){pyp1 = mom;}
+  Double_t GetPyp1(){return pyp1;}
+  void SetPzp1(Double_t mom){pzp1 = mom;}
+  Double_t GetPzp1(){return pzp1;}
+  void SetPp1_tot(Double_t mom){pp1_tot = mom;}
+  Double_t GetPp1_tot(){return pp1_tot;}
+  void Setp1_beta(Double_t vel){p1_Beta = vel;}
+  Double_t Getp1_beta(){return p1_Beta;}
+  
+  void SetPxp2(Double_t mom){pxp2 = mom;}
+  Double_t GetPxp2(){return pxp2;}
+  void SetPyp2(Double_t mom){pyp2 = mom;}
+  Double_t GetPyp2(){return pyp2;}
+  void SetPzp2(Double_t mom){pzp2 = mom;}
+  Double_t GetPzp2(){return pzp2;}
+  void SetPp2_tot(Double_t mom){pp2_tot = mom;}
+  Double_t GetPp2_tot(){return pp2_tot;}
+  void Setp2_beta(Double_t vel){p2_Beta = vel;}
+  Double_t Getp2_beta(){return p2_Beta;}
 
 
     
@@ -81,7 +117,25 @@ class R3BTarget2pDigi : public TObject
      Double32_t Y0;
      Double32_t T0;
      
-     Double32_t Estar; 
+     Double32_t Estar;
+     
+     Double32_t pxf;
+     Double32_t pyf;
+     Double32_t pzf;
+     Double32_t pf_tot;
+     Double32_t f_Beta;
+     
+     Double32_t pxp1;
+     Double32_t pyp1;
+     Double32_t pzp1;
+     Double32_t pp1_tot;
+     Double32_t p1_Beta;
+     
+     Double32_t pxp2;
+     Double32_t pyp2;
+     Double32_t pzp2;
+     Double32_t pp2_tot;
+     Double32_t p2_Beta;
      
      
   
