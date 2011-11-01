@@ -25,11 +25,23 @@ R3BTargetDigi::R3BTargetDigi() {
      
      Estar=0;
      
+     pxf=0;
+     pyf=0;
+     pzf=0;
+     pf_tot=0;
+     f_Beta=0;
+     
+     pxp1=0;
+     pyp1=0;
+     pzp1=0;
+     pp1_tot=0;
+     p1_Beta=0;
    
 }
 
 R3BTargetDigi::R3BTargetDigi(Double_t ss03_smul,Double_t ss03_kmul,Double_t ss06_smul,Double_t ss06_kmul,
-Double_t x0,Double_t y0,Double_t t0,Double_t estar) {
+Double_t x0,Double_t y0,Double_t t0,Double_t estar,Double_t Pxf,Double_t Pyf,Double_t Pzf,Double_t Pf_tot,Double_t f_beta,
+Double_t Pxp1,Double_t Pyp1,Double_t Pzp1,Double_t Pp1_tot,Double_t p1_beta) {
 
 
      Ss03_smul=ss03_smul;
@@ -43,6 +55,17 @@ Double_t x0,Double_t y0,Double_t t0,Double_t estar) {
      
      Estar=estar;
      
+     pxf=Pxf;
+     pyf=Pyf;
+     pzf=Pzf;
+     pf_tot=Pf_tot;
+     f_Beta=f_beta;
+     
+     pxp1=Pxp1;
+     pyp1=Pyp1;
+     pzp1=Pzp1;
+     pp1_tot=Pp1_tot;
+     p1_Beta=p1_beta;
 
 
    
