@@ -52,14 +52,14 @@ class R3BTofDigi : public TObject
   void Settfwpath_p1(Double_t length){Tfpath_p1 = length;}
   Double_t Gettfwpath_p1(){return Tfpath_p1;}
   
-  void Settfwpx_p2(Int_t mom){Tfwpx_p2 = mom;}
-  Double_t Gettfwpx_p2(){return Tfwpx_p2;}
+  void Settfwpx_p1(Int_t mom){Tfwpx_p1 = mom;}
+  Double_t Gettfwpx_p1(){return Tfwpx_p1;}
   
-  void Settfwpy_p2(Int_t mom){Tfwpy_p2 = mom;}
-  Double_t Gettfwpy_p2(){return Tfwpy_p2;}
+  void Settfwpy_p1(Int_t mom){Tfwpy_p1 = mom;}
+  Double_t Gettfwpy_p1(){return Tfwpy_p1;}
   
-  void Settfwpz_p2(Int_t mom){Tfwpz_p2 = mom;}
-  Double_t Gettfwpz_p2(){return Tfwpz_p2;}  
+  void Settfwpz_p1(Int_t mom){Tfwpz_p1 = mom;}
+  Double_t Gettfwpz_p1(){return Tfwpz_p1;}  
 
 
  protected:
