@@ -102,6 +102,9 @@ void R3BmTofDigitizer::Exec(Option_t* opt) {
   Double_t ntfy;
   Double_t ntft;
   Double_t ntfpath;
+  Double_t ntfpx;
+  Double_t ntfpy;
+  Double_t ntfpz;
 
 
 //******************** NTF ********************//
@@ -109,6 +112,9 @@ void R3BmTofDigitizer::Exec(Option_t* opt) {
   ntfx=0;
   ntfy=0;
   ntft=0;
+  ntfpx=0;
+  ntfpy=0;
+  ntfpz=0;
   
    for (Int_t l=0;l<nentriesmTof;l++){
 //   cout<<"entries-mTof "<<l<<endl;
@@ -127,12 +133,22 @@ void R3BmTofDigitizer::Exec(Option_t* opt) {
      Double_t fX_out = mtof_obj->GetXOut();
      Double_t fY_out = mtof_obj->GetYOut();
      Double_t fZ_out = mtof_obj->GetZOut();
+     Double_t PX_in = mtof_obj->GetPx();
+     Double_t PY_in = mtof_obj->GetPy();
+     Double_t PZ_in = mtof_obj->GetPz();
+     Double_t PX_out = mtof_obj->GetPxOut();
+     Double_t PY_out = mtof_obj->GetPyOut();
+     Double_t PZ_out = mtof_obj->GetPzOut();
      Double_t ftime = mtof_obj->GetTime();
      Double_t flength = mtof_obj->GetLength();
      
      Double_t fX = ((fX_in + fX_out)/2);
      Double_t fY = ((fY_in + fY_out)/2);
      Double_t fZ = ((fZ_in + fZ_out)/2);
+     
+     Double_t PX = ((PX_in + PX_out)/2);
+     Double_t PY = ((PY_in + PY_out)/2);
+     Double_t PZ = ((PZ_in + PZ_out)/2);
 
      
     
@@ -153,14 +169,20 @@ void R3BmTofDigitizer::Exec(Option_t* opt) {
 //     ntfy=(fY-0.92);  //Christoph
      ntft=ftime;
      ntfpath=flength;
+     ntfpx=PX;
+     ntfpy=PY;
+     ntfpz=PZ;
+     
+     
      NtfXhis->Fill(ntfx);
 //     cout<<"NTF - fragment tof wall "<<PID<<endl;
+//     cout<<"NTF X "<<fX<<" Y "<<fY<<" Z "<<fZ<<endl;
      ntmul++;
      }
      
    }
 
-AddHit(ntmul,ntfx,ntfy,ntft,ntfpath);
+AddHit(ntmul,ntfx,ntfy,ntft,ntfpath,ntfpx,ntfpy,ntfpz);
 
 
 }
@@ -183,10 +205,11 @@ void R3BmTofDigitizer::Finish()
 
 }
 
-R3BmTofDigi* R3BmTofDigitizer::AddHit(Int_t ntmul,Double_t ntfx,Double_t ntfy,Double_t ntft,Double_t ntfpath){   
+R3BmTofDigi* R3BmTofDigitizer::AddHit(Int_t ntmul,Double_t ntfx,Double_t ntfy,Double_t ntft,Double_t ntfpath,Double_t ntfpx,
+Double_t ntfpy,Double_t ntfpz){   
   TClonesArray& clref = *fmTofDigi;
   Int_t size = clref.GetEntriesFast();
-  return new(clref[size]) R3BmTofDigi(ntmul,ntfx,ntfy,ntft,ntfpath);
+  return new(clref[size]) R3BmTofDigi(ntmul,ntfx,ntfy,ntft,ntfpath,ntfpx,ntfpy,ntfpz);
  
 }
 
