@@ -39,7 +39,8 @@ class R3BmTofDigitizer : public FairTask
   virtual void Reset();
 
 
-  R3BmTofDigi* AddHit(Int_t ntmul,Double_t ntfx,Double_t ntfy,Double_t ntft,Double_t ntfpath);
+  R3BmTofDigi* AddHit(Int_t ntmul,Double_t ntfx,Double_t ntfy,Double_t ntft,Double_t ntfpath,Double_t ntfpx,Double_t ntfpy,
+  Double_t ntfpz);
 
 
   protected:
