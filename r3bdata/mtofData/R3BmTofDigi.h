@@ -25,7 +25,8 @@ class R3BmTofDigi : public TObject
 
   /** Default constructor **/
   R3BmTofDigi();
-  R3BmTofDigi(Int_t ntmul,Double_t ntfx,Double_t ntfy,Double_t ntft,Double_t ntfpath);
+  R3BmTofDigi(Int_t ntmul,Double_t ntfx,Double_t ntfy,Double_t ntft,Double_t ntfpath,Double_t ntfpx,
+Double_t ntfpy,Double_t ntfpz);
   
   /** Copy constructor **/
   R3BmTofDigi(const R3BmTofDigi& point) { *this = point; };
@@ -51,6 +52,16 @@ class R3BmTofDigi : public TObject
   
   void Setntfpath(Double_t length){Ntpath = length;}
   Double_t Getntfpath(){return Ntpath;}
+  
+  void Setntfpx(Int_t mom){Ntfpx = mom;}
+  Double_t Getntfpx(){return Ntfpx;}
+  
+  void Setntfpy(Int_t mom){Ntfpy = mom;}
+  Double_t Getntfpy(){return Ntfpy;}
+  
+  void Setntfpz(Int_t mom){Ntfpz = mom;}
+  Double_t Getntfpz(){return Ntfpz;}
+  
 
 
  protected:
@@ -60,6 +71,9 @@ class R3BmTofDigi : public TObject
    Double32_t Nty;
    Double32_t Ntt;
    Double32_t Ntpath;
+   Double32_t Ntfpx;
+   Double32_t Ntfpy;
+   Double32_t Ntfpz;
 
   ClassDef(R3BmTofDigi,1)
 
