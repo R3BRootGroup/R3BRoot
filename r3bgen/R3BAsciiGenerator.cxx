@@ -42,7 +42,10 @@ R3BAsciiGenerator::R3BAsciiGenerator(const char* fileName) {
 
   // Re-Open the file for standard streaming ...
   fInputFile = new ifstream(fFileName);
-   
+
+  fX=fY=fZ=0.0;
+  fPointVtxIsSet=kFALSE;
+ 
 }
 // ------------------------------------------------------------------------
 
@@ -130,7 +133,12 @@ Bool_t R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen) {
 
       // Give track to PrimaryGenerator
       //cout << "PDG : " << pdgType << endl;
+
+      if (fPointVtxIsSet){ 
+      primGen->AddTrack(pdgType, px, py, pz, fX, fY, fZ);
+      }else{    
       primGen->AddTrack(pdgType, px, py, pz, vx, vy, vz);
+      }
 
   }//! tracks
 
