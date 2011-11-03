@@ -45,7 +45,12 @@ class R3BAsciiGenerator : public FairGenerator
    **/
   virtual Bool_t ReadEvent(FairPrimaryGenerator* primGen);
 
-
+ void SetXYZ   (Double32_t x=0, Double32_t y=0, Double32_t z=0) {
+      fX=x;
+      fY=y;
+      fZ=z;
+      fPointVtxIsSet=kTRUE;
+   }
 
  private:
 
@@ -68,7 +73,11 @@ class R3BAsciiGenerator : public FairGenerator
   /** STL map from ion name to FairIon **/
   std::map<TString, FairIon*> fIonMap;       //!
 	
-	
+  Double32_t fX, fY, fZ;           // Point vertex coordinates [cm]	
+  Bool_t     fPointVtxIsSet;       // True if point vertex is set
+
+
+
   ClassDef(R3BAsciiGenerator,1);
 
 };
