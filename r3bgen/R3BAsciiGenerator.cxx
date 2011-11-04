@@ -9,6 +9,7 @@
 
 #include "TDatabasePDG.h"
 #include "TParticlePDG.h"
+#include "TRandom.h"
 
 #include <iostream>
 
@@ -45,6 +46,8 @@ R3BAsciiGenerator::R3BAsciiGenerator(const char* fileName) {
 
   fX=fY=fZ=0.0;
   fPointVtxIsSet=kFALSE;
+  fDX=fDY=fDZ=0.0;
+  fBoxVtxIsSet=kFALSE;
  
 }
 // ------------------------------------------------------------------------
@@ -135,10 +138,17 @@ Bool_t R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen) {
       //cout << "PDG : " << pdgType << endl;
 
       if (fPointVtxIsSet){ 
-      primGen->AddTrack(pdgType, px, py, pz, fX, fY, fZ);
-      }else{    
-      primGen->AddTrack(pdgType, px, py, pz, vx, vy, vz);
+	vx = fX;
+	vy = fY;
+	vz = fZ;
+	if (fBoxVtxIsSet) {
+	  vx = gRandom->Gaus(fX,fDX);
+	  vy = gRandom->Gaus(fY,fDY); 
+	  vz = gRandom->Gaus(fZ,fDZ); 
+	}         	
       }
+
+      primGen->AddTrack(pdgType, px, py, pz, vx, vy, vz);
 
   }//! tracks
 
