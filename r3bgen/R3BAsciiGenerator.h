@@ -52,6 +52,14 @@ class R3BAsciiGenerator : public FairGenerator
       fPointVtxIsSet=kTRUE;
    }
 
+ void SetDxDyDz(Double32_t sx=0, Double32_t sy=0, Double32_t sz=0) {
+      fDX=sx;
+      fDY=sy;
+      fDZ=sz;
+      fBoxVtxIsSet=kTRUE;
+
+ } 
+
  private:
 
   ifstream*      fInputFile;          //! Input file stream
@@ -75,6 +83,8 @@ class R3BAsciiGenerator : public FairGenerator
 	
   Double32_t fX, fY, fZ;           // Point vertex coordinates [cm]	
   Bool_t     fPointVtxIsSet;       // True if point vertex is set
+  Double32_t fDX, fDY, fDZ;           // Point vertex coordinates [cm]	
+  Bool_t     fBoxVtxIsSet;       // True if point vertex is set
 
 
 
