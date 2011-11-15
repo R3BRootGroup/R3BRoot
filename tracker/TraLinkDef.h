@@ -18,6 +18,7 @@
 #pragma link C++ class R3BTraFraDigiPar+;
 #pragma link C++ class R3BTarget2pDigitizer+;
 #pragma link C++ class R3BTarget2pDigiPar+;
+#pragma link C++ class R3BTraHitFinder+;
 
 #endif
 

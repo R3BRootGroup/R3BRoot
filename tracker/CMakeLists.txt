@@ -45,6 +45,7 @@ R3BTraFraDigiPar.cxx
 R3BTraFraDigitizer.cxx
 R3BTarget2pDigiPar.cxx
 R3BTarget2pDigitizer.cxx   
+R3BTraHitFinder.cxx
 )
 
 # fill list of header files from list of source files
