@@ -29,6 +29,7 @@
 #pragma link C++ class R3BChimeraPoint+;
 #pragma link C++ class R3BTraPoint+;
 #pragma link C++ class R3BTraHit+;
+#pragma link C++ class R3BTrackerHit+;
 #pragma link C++ class R3BTraDigi+;
 #pragma link C++ class R3BTra2pDigi+;
 #pragma link C++ class R3BTraFraDigi+;

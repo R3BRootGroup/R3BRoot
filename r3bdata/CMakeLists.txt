@@ -38,6 +38,7 @@ chimeraData/R3BChimeraPoint.cxx
 trackerData/R3BTraPoint.cxx 
 trackerData/R3BTraHit.cxx
 trackerData/R3BSitrackerHit.cxx 
+trackerData/R3BTrackerHit.cxx
 landData/R3BLandPoint.cxx
 landData/R3BNeuLandPoint.cxx 
 landData/R3BLandDigi.cxx 
@@ -49,7 +50,7 @@ dchData/R3BDchDigi.cxx
 dchData/R3BDch2pDigi.cxx
 tofData/R3BTofDigi.cxx
 tofData/R3BTof2pDigi.cxx
-mtofData/R3BmTofDigi.cxx
+tofData/R3BmTofDigi.cxx
 gfiData/R3BGfiDigi.cxx 
 trackerData/R3BTraDigi.cxx
 trackerData/R3BTra2pDigi.cxx
