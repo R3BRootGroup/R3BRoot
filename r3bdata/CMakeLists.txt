@@ -50,7 +50,7 @@ dchData/R3BDchDigi.cxx
 dchData/R3BDch2pDigi.cxx
 tofData/R3BTofDigi.cxx
 tofData/R3BTof2pDigi.cxx
-tofData/R3BmTofDigi.cxx
+mtofData/R3BmTofDigi.cxx
 gfiData/R3BGfiDigi.cxx 
 trackerData/R3BTraDigi.cxx
 trackerData/R3BTra2pDigi.cxx
