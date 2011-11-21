@@ -55,6 +55,7 @@ void R3BTarget::ConstructGeometry(){
  if (*fTargetName == "Para")       return  ConstructGeometry2();
  if (*fTargetName == "Para45")     return  ConstructGeometry3();
  if (*fTargetName == "LiH")        return  ConstructGeometry4();
+ if (*fTargetName == "CTarget")    return  ConstructGeometry5(); 
 
 }
 
@@ -570,6 +571,80 @@ void R3BTarget::ConstructGeometry4(){
    pTarget3_log->SetVisLeaves(kTRUE);
    pTargetEnveloppe_log->AddNode(pTarget3_log, 0, pMatrix8);
    pTargetEnveloppe_log->AddNode(pTarget3_log, 1, pMatrix10);
+
+}
+
+void R3BTarget::ConstructGeometry5(){
+
+    cout << endl;
+    cout << "-I- R3BTarget:: ConstructGeometry() "<< endl;
+    cout << "-I- R3BTarget Target type:carbon target (2.01 mm) "<< endl;
+    cout << endl;
+
+  // test of out-of-file geometry definition
+
+  Double_t dx, dy, dz;
+  Double_t thx, thy, thz;
+  Double_t phx, phy, phz;
+  Double_t a, z, density;
+  //Double_t par[20];
+  Int_t numed;
+
+  TGeoMaterial *pMat=NULL;
+  TGeoMedium   *pMed=NULL;
+
+  if (gGeoManager->GetMedium("Carbon") ){
+       cout << "-I- TGeoManager: Carbon Medium already defined " << endl;
+       pMed = gGeoManager->GetMedium("Carbon");
+   }else{
+  // Material definition
+  // Material: Carbon
+   a       = 12.011000;
+   z       = 6.000000;
+   density = 2.260000;
+   pMat = new TGeoMaterial("Carbon", a,z,density);
+   pMat->SetIndex(12);
+// Medium: Carbon
+   numed   = 12;  // medium number
+   Double_t par[8];
+   par[0]  = 0.000000; // isvol
+   par[1]  = 0.000000; // ifield
+   par[2]  = 0.000000; // fieldm
+   par[3]  = 0.000000; // tmaxfd
+   par[4]  = 0.000000; // stemax
+   par[5]  = 0.000000; // deemax
+   par[6]  = 0.000100; // epsil
+   par[7]  = 0.000000; // stmin
+   pMed  = new TGeoMedium("Carbon", numed,pMat, par);
+  }
+
+   // TRANSFORMATION MATRICES
+   // Combi transformation: 
+   dx = 0.000000;
+   dy = 0.000000;
+   dz = 0.000000;
+   // Rotation: 
+   thx = 90.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 0.000000;     phz = 0.000000;
+   TGeoRotation *pRot = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans* pMatrix =
+                   new TGeoCombiTrans("", dx,dy,dz,pRot);
+
+ // Shape: CarbonTarget type: TGeoBBox
+   dx = 1.600000;
+   dy = 1.200000;
+   dz = 0.008810;
+   TGeoShape *pCarbonTarget = new TGeoBBox("CarbonTarget", dx,dy,dz);
+ // Volume: CarbonTarget_log
+   TGeoVolume* pCarbonTarget_log
+               = new TGeoVolume("CarbonTarget_log",pCarbonTarget, pMed);
+   pCarbonTarget_log->SetVisLeaves(kTRUE);
+
+   TGeoVolume *top =  gGeoManager->GetTopVolume();
+
+   TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix);
+   top->AddNode(pCarbonTarget_log, 0, pGlobal);
 
 }
 
