@@ -19,6 +19,7 @@ class R3BTarget : public R3BModule {
      void ConstructGeometry2();
      void ConstructGeometry3();
      void ConstructGeometry4();
+     void ConstructGeometry5();
 
     ClassDef(R3BTarget,1)
   
