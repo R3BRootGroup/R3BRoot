@@ -147,12 +147,14 @@ void R3BCalo::Initialize()
   // 5- CALIFA 7.07+7.17
   //   See above the two components
   //
-  // 6- CALIFA 7.09+7.17, (ongoing work)
+  // 6- CALIFA 7.09+7.17
   //   See above the two components
   //
-
-  // 10- CALIFA 8.00, (ongoing work)
-
+  // 10- CALIFA 8.11, only BARREL
+	//   The first 15 rings are made of 32 alveoli of 4 crystals each. The last ring are made of 32
+  //   alveoli of 1 crystal each. There are 16 alveoli along the polar angle for a total of 32x16=512
+  //   alveoli and 32x15x4+32=1952 crystals. There are 11 (actually 5x2+1) different crystal shapes:
+	//
 
 
   //HAPOL TODO -> Check the VolId() datamember to assign dinamically different crystal logical
@@ -207,7 +209,7 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
   volId1 =  gMC->CurrentVolID(cp1);
   volIdCry =  gMC->CurrentVolOffID(1,cpCry);
   volIdAlv =  gMC->CurrentVolOffID(2,cpAlv);
-  volIdSupAlv =  gMC->CurrentVolOffID(3,cpSupAlv); //needed for versions 8.0# and later
+  volIdSupAlv =  gMC->CurrentVolOffID(3,cpSupAlv); //needed for versions 8.# and later
 
   Int_t crystalType = 0;
   Int_t crystalCopy = 0;
@@ -267,7 +269,6 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
     }
     if (crystalType>19 || crystalType<1 || crystalCopy>128 || crystalCopy<1 || crystalId>2144 || crystalId<1)
       cout << "-E- R3BCalo: Wrong crystal number in geometryVersion 3. " << endl;
-
   } else if (fGeometryVersion==4) {
     //The present scheme here done works nicely with 7.17
     // crystalType = crystals type (from 1 to 23)
@@ -304,14 +305,12 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
     //The present scheme here done works with 7.09+7.17
     //see the explanation for geometries 3 and 4
     if (GetAlveolusType(volIdAlv)!=-1) {
-
       if (GetAlveolusType(volIdAlv)<17) {
         crystalType = GetAlveolusType(volIdAlv);
         crystalCopy = cpAlv * 4 + cpCry;
         crystalId = (crystalType-1)*128 + cpAlv * 4 + cpCry;
       }
       // Crystaltypes 17-19 are large crystals which fill type 6 alveoli, as opposed to the smaller crystals of which 4 fit in the other alveoli.
-
       else if (GetAlveolusType(volIdAlv)>16&&GetAlveolusType(volIdAlv)<20) {
         crystalType = GetAlveolusType(volIdAlv);
         crystalCopy = cpAlv + cpCry;
@@ -329,14 +328,28 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
       if (crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736)
         cout << "-E- R3BCalo: Wrong crystal number in geometryVersion 6 (endcap). " << endl;
     }
-
-
-
   } else if (fGeometryVersion==10) {
-    //The present scheme here done works with 8.??
-
+    //The present scheme here done works with 8.11
+    // crystalType = alveolus type (from 1 to 17)   [Basically the alveolus number]
+    // crystalCopy = alveolus copy * 4 + crystals copy +1 (from 1 to 128)  [Not exactly azimuthal]
+    // crystalId = 1 to 32 for the first 32 crystals (single crystal in each alveoli)
+		//             32 + (alveolus type-2)*128 + (alvelous copy)*4 + (crystal copy) + 1        (from 1 to 1952)
+		//
+		//cout << "volIdSupAlv" << volIdSupAlv <<" "<<GetAlveolusType(volIdSupAlv)<<endl;
+		if (GetAlveolusType(volIdSupAlv)==1) {
+			crystalType = GetAlveolusType(volIdSupAlv); //note that there one level more (alveolusInner)
+			crystalCopy = cpSupAlv+1;                   //only one crystal per alveoli in this ring, running from 1 to 32
+			crystalId = cpSupAlv+1;                     //only one crystal per alveoli in this ring, running from 1 to 32
+		}
+		else if (GetAlveolusType(volIdSupAlv)>1 && GetAlveolusType(volIdSupAlv)<17) {
+			crystalType = GetAlveolusType(volIdSupAlv);      //note that there one level more (alveolusInner)
+			crystalCopy = cpSupAlv*4+cpCry+1;  			         //running from 0*4+0+1=1 to 31*4+3+1=128 
+			crystalId = 32+(crystalType-2)*128+cpSupAlv*4+cpCry+1; //running from 32+0*128+0*4+0+1=1 to 32+14*128+31*4+3+1=1952
+		}
+		if (crystalType>16 || crystalType<1 || crystalCopy>128 || crystalCopy<1 || crystalId>1952 || crystalId<1)
+			cout << "-E- R3BCalo: Wrong crystal number in geometryVersion 10. " << endl;
   } else cout << "-E- R3BCalo: Geometry version not available in R3BCalo::ProcessHits(). " << endl;
-
+	
   if (fVerboseLevel>1)
     cout << "-I- R3BCalo: Processing Points in Alveolus Nb " << volIdAlv << ", copy Nb " << cpAlv
          << ", crystal copy Nb " << cpCry << " and unique crystal identifier " << crystalId << endl;
@@ -657,7 +670,7 @@ void R3BCalo::ConstructGeometry()
   if (fGeometryVersion==0)  {
     cout << "-I- R3BCalo: Constructing old (v5) geometry translated from R3BSim ... " << endl;
     ConstructOldGeometry();
-  } else if (fGeometryVersion>0 && fGeometryVersion<7 ) {
+  } else if (fGeometryVersion>0 && fGeometryVersion<11 ) {
     cout << "-I- R3BCalo: Constructing CALIFA. Geometry version: " << fGeometryVersion << endl;
     ConstructUserDefinedGeometry();
   } else
