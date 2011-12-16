@@ -1,7 +1,7 @@
 // -------------------------------------------------------------------------
 // -----                   R3BCaloHitFinder source file                -----
 // -----                  Created 27/08/10  by H.Alvarez               -----
-// -----                Last modification 27/08/10 by H.Alvarez        -----
+// -----                Last modification 06/12/11 by H.Alvarez        -----
 // -----                                  15/09/11 by Enrico Fiori     -----
 // -------------------------------------------------------------------------
 
@@ -47,11 +47,11 @@ class R3BCaloHitFinder : public FairTask
      **     0- CALIFA 5.0, including BARREL and ENDCAP.
      **     1- CALIFA 7.05, only BARREL
      ** 2- CALIFA 7.07, only BARREL
-     ** 3- CALIFA 7.09, only BARREL (ongoing work)
+     ** 3- CALIFA 7.09, only BARREL 
      ** 4- CALIFA 7.17, only ENDCAP (in CsI[Tl])
      ** 5- CALIFA 7.07+7.17,
      ** 6- CALIFA 7.09+7.17,
-     ** 10- CALIFA 8.00, (ongoing work)
+     ** 10- CALIFA 8.11, only BARREL
      ** ...
      **/
     void SelectGeometryVersion(Int_t version);
@@ -76,7 +76,7 @@ class R3BCaloHitFinder : public FairTask
      ** Sets the angular window open around the crystal with the largest energy
      ** to search for additional crystal hits and addback to the same cal hit
      **/
-    void SetAngularWindow(Double_t deltaPolar, Double_t deltaAzimuthal, Double_t DeltaAngleClust);
+    void SetAngularWindow(Double_t deltaPolar, Double_t deltaAzimuthal, Double_t DeltaAngleClust=0.);
 
     /** Public method SetClusteringAlgorithm
      **

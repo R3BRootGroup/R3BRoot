@@ -1,7 +1,7 @@
 // -------------------------------------------------------------------------
 // -----                   R3BCaloHitFinder source file                -----
 // -----                  Created 27/08/10  by H.Alvarez               -----
-// -----    Last modification 01/09/10 by H.Alvarez        -----
+// -----                Last modification 06/12/11 by H.Alvarez        -----
 // -----                                  15/09/11 by Enrico Fiori     -----
 // -------------------------------------------------------------------------
 #include "R3BCaloHitFinder.h"
@@ -30,6 +30,9 @@ R3BCaloHitFinder::R3BCaloHitFinder() : FairTask("R3B CALIFA Hit Finder ")
   fCrystalResolution=0.; //perfect crystals
   fDeltaPolar=0.25;
   fDeltaAzimuthal=0.25;
+	fDeltaAngleClust=0;
+	fClusteringAlgorithmSelector=1;
+	fParCluster1=0;
 }
 
 
@@ -290,157 +293,9 @@ void R3BCaloHitFinder::SetDetectionThreshold(Double_t thresholdEne)
 // ---- Public method GetAngles   --------------------------------------------------
 void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal)
 {
-
-  Double_t local[3]={0,0,0};
-  Double_t master[3];
-  Int_t crystalType = 0;
-  Int_t crystalCopy = 0;
-  Int_t alveolusCopy =0;
-  Int_t crystalInAlveolus=0;
-
-  TGeoVolume *pAWorld  =  gGeoManager->GetTopVolume();
-  if (fGeometryVersion==0) {
-    //The present scheme here done works nicely with 5.0
-    // crystalType = crystal type (from 1 to 30)
-    // crystalCopy = crystal copy (from 1 to 512 for crystal types from 1 to 6 (BARREL),
-    //                 from 1 to 64 for crystal types from 7 to 30 (ENDCAP))
-    // crystalId = (crystal type-1) *512 + crystal copy  (from 1 to 3072) for the BARREL
-    // crystalId = 3072 + (crystal type-7) *64 + crystal copy  (from 3073 to 4608) for the ENDCAP
-    //
-    if (iD<3073)
-      crystalType = (Int_t)((iD-1)/512) + 1;  //crystal type (from 1 to 30)
-    else
-      crystalType = (Int_t)((iD-3073)/64) + 7;  //crystal type (from 1 to 30)
-
-    if (iD<3073)
-      crystalCopy = ((iD-1)%512) + 1;     //CrystalCopy (from 1 to 512)
-    else
-      crystalCopy = ((iD-3073)%64) + 1;     //CrystalCopy (from 1 to 160)
-
-
-    Char_t nameVolume[200];
-    //in the crystalLog creation description in cal/R3BCalo.cxx for v5.0, the crystalCopy begins in 0!!!
-    sprintf(nameVolume, "/cave_1/CalifaWorld_0/crystalLog%i_%i",crystalType,crystalCopy-1);
-
-    gGeoManager->cd(nameVolume);
-    TGeoNode* currentNode = gGeoManager->GetCurrentNode();
-    currentNode->LocalToMaster(local, master);
-
-    sprintf(nameVolume, "/cave_1/CalifaWorld_0");
-    gGeoManager->cd(nameVolume);
-    currentNode = gGeoManager->GetCurrentNode();
-    local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
-    currentNode->LocalToMaster(local, master);
-
-  } else if (fGeometryVersion==1) {
-    //The present scheme here done works nicely with 7.05
-    // crystalType = alveolus type (from 1 to 24)   [Basically the alveolus number]
-    // crystalCopy = (alveolus copy - 1) * 4 + crystals copy (from 1 to 160)  [Not exactly azimuthal]
-    // crystalId = (alveolus type-1)*160 + (alvelous copy-1)*4 + (crystal copy)  (from 1 to 3840)
-    //        crystalID is asingle identifier per crystal!
-    //That is:
-    // crystalId = (crystalType-1)*160 + cpAlv * 4 + cpCry;
-    //
-    crystalType = (Int_t)((iD-1)/160) + 1;  //Alv type (from 1 to 24)
-    crystalCopy = ((iD-1)%160) + 1;     //CrystalCopy (from 1 to 160)
-    alveolusCopy =(Int_t)(((iD-1)%160)/4) +1; //Alveolus copy (from 1 to 40)
-    crystalInAlveolus = (iD-1)%4 + 1;         //Crystal number in alveolus (from 1 to 4)
-
-    Int_t alveoliType[24]={1,1,2,2,2,2,2,3,3,3,3,4,4,4,4,4,4,4,4,5,5,6,6,6};
-    Char_t nameVolume[200];
-    if (crystalInAlveolus<3)
-      sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iA_%i/Crystal_%iA_1",
-              crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus, alveoliType[crystalType-1]);
-    else
-      sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iB_%i/Crystal_%iB_1",
-              crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus, alveoliType[crystalType-1]);
-
-    //cout << gGeoManager->GetPath()<<endl;
-    gGeoManager->cd(nameVolume);
-    TGeoNode* currentNode = gGeoManager->GetCurrentNode();
-    currentNode->LocalToMaster(local, master);
-    if (crystalInAlveolus<3)
-      sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iA_%i",
-              crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus);
-    else
-      sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iB_%i",
-              crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus);
-
-    gGeoManager->cd(nameVolume);
-    currentNode = gGeoManager->GetCurrentNode();
-    local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
-    currentNode->LocalToMaster(local, master);
-
-    sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i",crystalType, alveolusCopy-1);
-    gGeoManager->cd(nameVolume);
-    currentNode = gGeoManager->GetCurrentNode();
-    local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
-    currentNode->LocalToMaster(local, master);
-
-    sprintf(nameVolume, "/cave_1/CalifaWorld_0");
-    gGeoManager->cd(nameVolume);
-    currentNode = gGeoManager->GetCurrentNode();
-    local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
-    currentNode->LocalToMaster(local, master);
-  } else if (fGeometryVersion==2) {
-    //The present scheme here done works nicely with 7.07
-    // crystalType = alveolus type (from 1 to 20)   [Basically the alveolus number]
-    // crystalCopy = (alveolus copy - 1) * 4 + crystals copy (from 1 to 128)  [Not exactly azimuthal]
-    // crystalId = (alveolus type-1)*128 + (alvelous copy-1)*4 + (crystal copy)  (from 1 to 2560)
-    //        crystalID is asingle identifier per crystal!
-    //That is:
-    // crystalId = (crystalType-1)*128 + cpAlv * 4 + cpCry;
-    //
-    crystalType = (Int_t)((iD-1)/128) + 1;  //Alv type (from 1 to 20)
-    crystalCopy = ((iD-1)%128) + 1;     //CrystalCopy (from 1 to 128)
-    alveolusCopy =(Int_t)(((iD-1)%128)/4) +1; //Alveolus copy (from 1 to 32)
-    crystalInAlveolus = (iD-1)%4 + 1;         //Crystal number in alveolus (from 1 to 4)
-
-    Int_t alveoliType[20]={1,1,2,2,2,3,3,4,4,4,5,5,6,6,6,7,7,7,8,8};
-
-    Char_t nameVolume[200];
-    if (crystalInAlveolus<3)
-      sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iA_%i/Crystal_%iA_1",
-              crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus, alveoliType[crystalType-1]);
-    else
-      sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iB_%i/Crystal_%iB_1",
-              crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus, alveoliType[crystalType-1]);
-
-    //cout << gGeoManager->GetPath()<<endl;
-    gGeoManager->cd(nameVolume);
-    TGeoNode* currentNode = gGeoManager->GetCurrentNode();
-    currentNode->LocalToMaster(local, master);
-    if (crystalInAlveolus<3)
-      sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iA_%i",
-              crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus);
-    else
-      sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iB_%i",
-              crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus);
-
-    gGeoManager->cd(nameVolume);
-    currentNode = gGeoManager->GetCurrentNode();
-    local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
-    currentNode->LocalToMaster(local, master);
-
-    sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i",crystalType, alveolusCopy-1);
-    gGeoManager->cd(nameVolume);
-    currentNode = gGeoManager->GetCurrentNode();
-    local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
-    currentNode->LocalToMaster(local, master);
-
-    sprintf(nameVolume, "/cave_1/CalifaWorld_0");
-    gGeoManager->cd(nameVolume);
-    currentNode = gGeoManager->GetCurrentNode();
-    local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
-    currentNode->LocalToMaster(local, master);
-  }
-
-  //cout << "-I- R3BCaloHitFinder::GetAngles: position of crystal center: "<<master[0] << ", "<<master[1] << ", "<<master[2] << endl;
-  TVector3 masterV(master[0],master[1],master[2]);
-  //masterV.Print();
-  *polar=masterV.Theta();
-  *azimuthal=masterV.Phi();
-  //cout << "-I- R3BCaloHitFinder::GetAngle:s theta: "<< *polar <<", phi: "<< *azimuthal << "for crystal iD " << iD <<endl;
+	//Old GetAngles with two arguments...
+	Double_t rho=0;
+	GetAngles(iD, polar, azimuthal, &rho);
 }
 
 
@@ -591,8 +446,9 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
     local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
     currentNode->LocalToMaster(local, master);
   } else if (fGeometryVersion==3) {
-
-
+		//
+		//The present scheme here done works with 7.09
+		//
     Char_t nameVolume[200];
     if (iD<2049) {
       Int_t alveoliType[19]={1,1,2,2,3,3,3,3,3,3,4,4,4,5,5,5,6,6,6};
@@ -1076,11 +932,119 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
       currentNode->LocalToMaster(local, master);
 
     }
-
-
   } else if (fGeometryVersion==10) {
-    //The present scheme here done works with 8.??
+    //The present scheme here done works with 8.11
+    // crystalType = alveolus type (from 1 to 17)   [Basically the alveolus number]
+    // crystalCopy = alveolus copy * 4 + crystals copy +1 (from 1 to 128)  [Not exactly azimuthal]
+    // crystalId = 1 to 32 for the first 32 crystals (single crystal in each alveoli)
+		//             32 + (alveolus type-2)*128 + (alvelous copy)*4 + (crystal copy) + 1        (from 1 to 1952)
+		//
+		if(iD<33) crystalType = 1;  //Alv type 1
+		else crystalType = (Int_t)((iD-33)/128) + 2;  //Alv type (from 2 to 16)
+		if(iD<33) crystalCopy = iD;     //for Alv type 1 
+		else crystalCopy = ((iD-33)%128) + 1;         //CrystalCopy (from 1 to 128)
+    if(iD<33) alveolusCopy = iD;    //Alv type 1 
+		else alveolusCopy =(Int_t)(((iD-33)%128)/4) +1; //Alveolus copy (from 1 to 32)
+		if(iD<33) crystalInAlveolus =1;          //Alv type 1
+		else crystalInAlveolus = (iD-33)%4 + 1;         //Crystal number in alveolus (from 1 to 4)
 
+		//cout << " -------       crystalID="<< iD <<  "         crystalType="
+    //  << crystalType <<  "        crystalCopy="<< crystalCopy<<  "        alveolusCopy="<< alveolusCopy <<  "        crystalInAlveolus="<< crystalInAlveolus<<endl;
+
+		
+    Int_t alveoliType[16]={1,2,2,2,2,3,3,4,4,4,5,5,5,6,6,6};
+
+    Char_t nameVolume[200];
+      sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/AlveolusInner_%i_1/CrystalWithWrapping_%i_%i_%i/Crystal_%i_%i_1",
+              crystalType, alveolusCopy-1, crystalType, alveoliType[crystalType-1], crystalInAlveolus, crystalInAlveolus-1, alveoliType[crystalType-1], crystalInAlveolus);
+
+		// The definition of the crystals is different in this particular EndCap design:
+		// the origin for each crystal is the alveoli corner
+		if (crystalType==1) {
+			local[0]=27.108/8; local[1]=-28.0483/8; local[2]=0;
+		} else if (crystalType==2 || crystalType==3 || crystalType==4 || crystalType==5) {
+			if(crystalInAlveolus==1){
+				local[0]=37.4639/8; local[1]=-8.57573/8; local[2]=0;
+			} else if(crystalInAlveolus==2) {
+				local[0]=37.4639/8; local[1]=-31.1043/8; local[2]=0;
+			} else if(crystalInAlveolus==3) {
+				local[0]=9.52012/8; local[1]=-8.57573/8; local[2]=0;
+			} else if(crystalInAlveolus==4){
+				local[0]=9.52012/8; local[1]=-31.1043/8; local[2]=0;
+			}
+		} else if (crystalType==6 || crystalType==7) {
+			if(crystalInAlveolus==1){
+				local[0]=38.3282/8; local[1]=-5.49819/8; local[2]=0;
+			} else if(crystalInAlveolus==2) {
+				local[0]=38.3282/8; local[1]=-23.0538/8; local[2]=0;
+			} else if(crystalInAlveolus==3) {
+				local[0]=8.66384/8; local[1]=-5.49819/8; local[2]=0;
+			} else if(crystalInAlveolus==4){
+				local[0]=8.66384/8; local[1]=-23.0538/8; local[2]=0;
+			}
+		} else if (crystalType==8 || crystalType==9 || crystalType==10) {
+			if(crystalInAlveolus==1){
+				local[0]=38.3683/8; local[1]=-4.71618/8; local[2]=0;
+			} else if(crystalInAlveolus==2) {
+				local[0]=38.3683/8; local[1]=-19.8438/8; local[2]=0;
+			} else if(crystalInAlveolus==3) {
+				local[0]=8.43569/8; local[1]=-4.71618/8; local[2]=0;
+			} else if(crystalInAlveolus==4){
+				local[0]=8.43569/8; local[1]=-19.8438/8; local[2]=0;
+			}
+		} else if (crystalType==11 || crystalType==12 || crystalType==13) {
+			if(crystalInAlveolus==1){
+				local[0]=38.3495/8; local[1]=-4.70373/8; local[2]=0;
+			} else if(crystalInAlveolus==2) {
+				local[0]=38.3495/8; local[1]=-19.8403/8; local[2]=0;
+			} else if(crystalInAlveolus==3) {
+				local[0]=8.66654/8; local[1]=-4.70373/8; local[2]=0;
+			} else if(crystalInAlveolus==4){
+				local[0]=8.66654/8; local[1]=-19.8403/8; local[2]=0;
+			}
+		} else if (crystalType==14 || crystalType==15 || crystalType==16) {
+			if(crystalInAlveolus==1){
+				local[0]=37.9075/8; local[1]=-4.66458/8; local[2]=0;
+			} else if(crystalInAlveolus==2) {
+				local[0]=37.9075/8; local[1]=-19.8474/8; local[2]=0;
+			} else if(crystalInAlveolus==3) {
+				local[0]=9.07247/8; local[1]=-19.8474/8; local[2]=0;
+			} else if(crystalInAlveolus==4){
+				local[0]=9.07247/8; local[1]=-4.66458/8; local[2]=0;
+			}
+		}		
+
+		//cout << gGeoManager->GetPath()<<endl;
+    gGeoManager->cd(nameVolume);
+    TGeoNode* currentNode = gGeoManager->GetCurrentNode();
+    currentNode->LocalToMaster(local, master);
+
+		sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/AlveolusInner_%i_1/CrystalWithWrapping_%i_%i_%i",
+						crystalType, alveolusCopy-1, crystalType, alveoliType[crystalType-1], crystalInAlveolus, crystalInAlveolus-1);
+    gGeoManager->cd(nameVolume);
+    currentNode = gGeoManager->GetCurrentNode();
+    local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
+    currentNode->LocalToMaster(local, master);
+
+		sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/AlveolusInner_%i_1",
+								crystalType, alveolusCopy-1, crystalType);
+    gGeoManager->cd(nameVolume);
+    currentNode = gGeoManager->GetCurrentNode();
+    local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
+    currentNode->LocalToMaster(local, master);
+		
+    sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i",crystalType, alveolusCopy-1);
+    gGeoManager->cd(nameVolume);
+    currentNode = gGeoManager->GetCurrentNode();
+    local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
+    currentNode->LocalToMaster(local, master);
+		
+    sprintf(nameVolume, "/cave_1/CalifaWorld_0");
+    gGeoManager->cd(nameVolume);
+    currentNode = gGeoManager->GetCurrentNode();
+    local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
+    currentNode->LocalToMaster(local, master);
+		
   } else cout << "-E- R3BCaloHitFinder: Geometry version not available in R3BCalo::ProcessHits(). " << endl;
 
 
@@ -1140,7 +1104,7 @@ void R3BCaloHitFinder::SetAngularWindow(Double_t deltaPolar, Double_t deltaAzimu
   // [0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
   fDeltaPolar = deltaPolar;
   fDeltaAzimuthal = deltaAzimuthal;
-  fDeltaAngleClust = DeltaAngleClust ;
+  fDeltaAngleClust = DeltaAngleClust;
 
 }
 
