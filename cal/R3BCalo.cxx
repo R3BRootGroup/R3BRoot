@@ -130,7 +130,7 @@ void R3BCalo::Initialize()
   //
   //     Volumes: Alveolus_[1,20] made of CrystalWithWrapping_[1,8][A,B] made of Crystal_[1,8][A,B]
   //
-  // 3- CALIFA 7.09, only BARREL
+  // 3- CALIFA 7.09, only BARREL (bp)
   //   The first 16 rings are made of 32 alveoli of 4 crystals each. The last 3 rings are made of 32
   //   alveoli of 1 crystal each. There are 19 alveoli along the polar angle for a total of 32x19=608
   //   alveoli or 2144 crystals. There are 11 different crystal shapes:
@@ -144,7 +144,7 @@ void R3BCalo::Initialize()
   //
   //     Volumes: Alveolus_EC_[1,3] made of CrystalWithWrapping_[1,23] made of Crystal_[1,23]
   //
-  // 5- CALIFA 7.07+7.17
+  // 5- CALIFA 7.07+7.17 (bp)
   //   See above the two components
   //
   // 6- CALIFA 7.09+7.17
@@ -265,7 +265,7 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
     else if (GetAlveolusType(volIdAlv)>16&&GetAlveolusType(volIdAlv)<20) {
       crystalType = GetAlveolusType(volIdAlv);
       crystalCopy = cpAlv + cpCry;
-      crystalId = (crystalType-1)*32 + cpAlv + cpCry;
+      crystalId = 2048 + (crystalType-17)*32 + cpAlv + cpCry;
     }
     if (crystalType>19 || crystalType<1 || crystalCopy>128 || crystalCopy<1 || crystalId>2144 || crystalId<1)
       cout << "-E- R3BCalo: Wrong crystal number in geometryVersion 3. " << endl;
@@ -311,10 +311,12 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
         crystalId = (crystalType-1)*128 + cpAlv * 4 + cpCry;
       }
       // Crystaltypes 17-19 are large crystals which fill type 6 alveoli, as opposed to the smaller crystals of which 4 fit in the other alveoli.
-      else if (GetAlveolusType(volIdAlv)>16&&GetAlveolusType(volIdAlv)<20) {
+  //    else if (GetAlveolusType(volIdAlv)>16&&GetAlveolusType(volIdAlv)<20) {
+        else if (GetAlveolusType(volIdAlv)>16) {
         crystalType = GetAlveolusType(volIdAlv);
         crystalCopy = cpAlv + cpCry;
-        crystalId = (crystalType-1)*32 + cpAlv + cpCry;
+    //    crystalId = 2048 + (crystalType-1)*32 + cpAlv + cpCry;
+        crystalId = 2048 + (crystalType-17)*32 + cpAlv + cpCry;
       }
 
       if (crystalType>19 || crystalType<1 || crystalCopy>128 || crystalCopy<1 || crystalId>2144 || crystalId<1)
@@ -403,10 +405,11 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
       }
 
       if ( fPosIn.Z() < 30. && newpos[2] > 30.02 ) {
-        cerr << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2]
-             << " with safety = " << safety << endl;
-        cerr << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << endl;
-        cerr << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << endl;
+//        cerr << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2]
+//             << " with safety = " << safety << endl;
+//        cerr << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << endl;
+//        cerr << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << endl;
+//*bp
       }
 
       fPosOut.SetX(newpos[0]);

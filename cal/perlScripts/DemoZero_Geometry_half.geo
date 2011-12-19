@@ -104,6 +104,4 @@
 
 	 phiEuler = 180.*TMath::ATan2(0.02377314188053887200,0.680773712221798)/TMath::Pi(); 
 	 thetaEuler = 180.*TMath::ATan2(0.02377314188053887200/TMath::Sin(TMath::Pi()*phiEuler/180.),0.7321079090358749700)/TMath::Pi(); 
-	 psiEuler = 180.*TMath::ASin(-4.961077993545572900E-018/TMath::Sin(TMath::Pi()*thetaEuler/180.))/TMath::Pi(); 
-	 
-
+	 psiEuler = 180.*TMath::ASin(-4.961077993545572900E-018/TMath::Sin(TMath::Pi()*thetaEuler/180.))/TMath::Pi();
