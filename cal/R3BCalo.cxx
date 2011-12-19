@@ -144,7 +144,7 @@ void R3BCalo::Initialize()
   //
   //     Volumes: Alveolus_EC_[1,3] made of CrystalWithWrapping_[1,23] made of Crystal_[1,23]
   //
-  // 5- CALIFA 7.07+7.17 (bp)
+  // 5- CALIFA 7.07+7.17 
   //   See above the two components
   //
   // 6- CALIFA 7.09+7.17
