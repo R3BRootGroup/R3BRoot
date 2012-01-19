@@ -43,18 +43,22 @@
 #include "G4ParticleDefinition.hh"
 #include "G4ProcessManager.hh"
 
-#include "G4LowEnergyCompton.hh"
-#include "G4LowEnergyGammaConversion.hh"
-#include "G4LowEnergyPhotoElectric.hh"
-#include "G4LowEnergyRayleigh.hh"
-
-
 #if G4VERSION_NUMBER > 922
 #include "G4eMultipleScattering.hh"
 #else
 #include "G4MultipleScattering.hh"
 #endif
 
+#include "G4Gamma.hh"
+#include "G4Electron.hh"
+#include "G4Positron.hh"
+
+// ----- G4 version lower than 9.5 ------ 
+#if G4VERSION_NUMBER < 950
+#include "G4LowEnergyCompton.hh"
+#include "G4LowEnergyGammaConversion.hh"
+#include "G4LowEnergyPhotoElectric.hh"
+#include "G4LowEnergyRayleigh.hh"
 
 #include "G4LowEnergyIonisation.hh"
 #include "G4LowEnergyBremsstrahlung.hh"
@@ -63,9 +67,40 @@
 #include "G4eBremsstrahlung.hh"
 #include "G4eplusAnnihilation.hh"
 
-#include "G4Gamma.hh"
-#include "G4Electron.hh"
-#include "G4Positron.hh"
+
+// ----- G4 version 9.5 ------ 
+#else
+
+#include "G4PhysicsListHelper.hh"
+// gamma
+#include "G4PhotoElectricEffect.hh"
+#include "G4LivermorePhotoElectricModel.hh"
+
+#include "G4ComptonScattering.hh"
+#include "G4LivermoreComptonModel.hh"
+
+#include "G4GammaConversion.hh"
+#include "G4LivermoreGammaConversionModel.hh"
+
+#include "G4RayleighScattering.hh" 
+#include "G4LivermoreRayleighModel.hh"
+
+// e-
+#include "G4eMultipleScattering.hh"
+#include "G4UniversalFluctuation.hh"
+
+#include "G4eIonisation.hh"
+#include "G4LivermoreIonisationModel.hh"
+
+#include "G4eBremsstrahlung.hh"
+#include "G4LivermoreBremsstrahlungModel.hh"
+
+// e+
+#include "G4eplusAnnihilation.hh"
+#include "G4PenelopeAnnihilationModel.hh"
+
+#endif
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -91,6 +126,10 @@ void G4LowEnergyQEDBuilder::ConstructParticle()
 
 void G4LowEnergyQEDBuilder::ConstructProcess()
 {
+ 
+// ----- G4 version lower than 9.5 ------ 
+#if G4VERSION_NUMBER < 950
+
   // Add standard EM Processes for gamma
   G4ParticleDefinition* particle = G4Gamma::Gamma();
   G4ProcessManager* pmanager = particle->GetProcessManager();
@@ -130,6 +169,72 @@ void G4LowEnergyQEDBuilder::ConstructProcess()
   pmanager->AddProcess(new G4eIonisation,        -1, 2,2);
   pmanager->AddProcess(new G4eBremsstrahlung,    -1,-1,3);
   pmanager->AddProcess(new G4eplusAnnihilation,   0,-1,4);
+
+
+// ----- G4 version 9.5 ------ 
+#else
+
+  G4PhysicsListHelper* ph = G4PhysicsListHelper::GetPhysicsListHelper();
+
+  // Add standard EM Processes for gamma
+  G4ParticleDefinition* particle = G4Gamma::Gamma();
+
+  G4PhotoElectricEffect* thePhotoElectricEffect = new G4PhotoElectricEffect();
+  thePhotoElectricEffect->SetModel(new G4LivermorePhotoElectricModel());
+  ph->RegisterProcess(thePhotoElectricEffect, particle);
+
+  G4ComptonScattering* theComptonScattering = new G4ComptonScattering();
+  theComptonScattering->SetModel(new G4LivermoreComptonModel());
+  ph->RegisterProcess(theComptonScattering, particle);
+
+  G4GammaConversion* theGammaConversion = new G4GammaConversion();
+  theGammaConversion->SetModel(new G4LivermoreGammaConversionModel());
+  ph->RegisterProcess(theGammaConversion, particle);
+
+  G4RayleighScattering* theRayleigh = new G4RayleighScattering();
+  theRayleigh->SetModel(new G4LivermoreRayleighModel());
+  ph->RegisterProcess(theRayleigh, particle);
+    
+  // Add standard EM Processes for e-
+  particle = G4Electron::Electron();
+
+  G4eMultipleScattering* msc = new G4eMultipleScattering();
+  ph->RegisterProcess(msc, particle);
+     
+  // Ionisation
+  G4eIonisation* eIoni = new G4eIonisation();
+  eIoni->SetEmModel(new G4LivermoreIonisationModel());
+  eIoni->SetFluctModel(new G4UniversalFluctuation() );
+  ph->RegisterProcess(eIoni, particle);
+      
+  // Bremsstrahlung
+  G4eBremsstrahlung* eBrem = new G4eBremsstrahlung();
+  eBrem->SetEmModel(new G4LivermoreBremsstrahlungModel());
+  ph->RegisterProcess(eBrem, particle);
+
+  // Add standard EM Processes for e+
+  particle = G4Positron::Positron();
+
+  //G4eMultipleScattering* msc = new G4eMultipleScattering();
+  ph->RegisterProcess(msc, particle);
+
+  // Ionisation
+  //G4eIonisation* eIoni = new G4eIonisation();
+  eIoni->SetEmModel(new G4LivermoreIonisationModel());
+  eIoni->SetFluctModel(new G4UniversalFluctuation() );
+  ph->RegisterProcess(eIoni, particle);
+      
+  // Bremsstrahlung
+  //G4eBremsstrahlung* eBrem = new G4eBremsstrahlung();
+  eBrem->SetEmModel(new G4LivermoreBremsstrahlungModel());
+  ph->RegisterProcess(eBrem, particle);
+
+  //Annihilation
+  G4eplusAnnihilation* eAnni = new G4eplusAnnihilation();
+  eAnni->SetModel(new G4PenelopeAnnihilationModel());
+  ph->RegisterProcess(eAnni, particle);
+
+#endif
 
 }
 
