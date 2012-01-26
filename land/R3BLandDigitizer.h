@@ -42,6 +42,8 @@ class R3BLandDigitizer : public FairTask
   virtual void Finish();
   virtual void Reset();
 
+  inline void UseBeam(const Double_t& beamEnergy) {  fBeamEnergy = beamEnergy;  }
+
 
   R3BLandDigi* AddHit(Int_t paddleNr, Double_t tdcL, Double_t tdcR, Double_t tdc,
      Double_t qdcL, Double_t qdcR, Double_t qdc, Double_t xx,Double_t yy, Double_t zz );
@@ -58,6 +60,12 @@ class R3BLandDigitizer : public FairTask
   TH1F *hPMl;
   TH1F *hPMr;
   TH1F *hTotalLight;
+  TH1F *hTotalLight1;
+  TH1F *hTotalEnergy;
+  TH1F *hTotalEnergy1;
+  TH1F *hTotalLightRel;
+  TH1F *hTotalEnergyRel;
+  TH1F *hTotalLightRel2;
   TH1F *hMult1;
   TH1F *hMult2;
   TH1F *hParticle;
@@ -66,6 +74,7 @@ class R3BLandDigitizer : public FairTask
   
   TH2F *hElossLight;
  
+  Int_t eventNo;
   Int_t npaddles;
   Int_t nplanes;
   Int_t paddle_per_plane;
@@ -77,6 +86,7 @@ class R3BLandDigitizer : public FairTask
   Double_t c;
   Double_t cMedia; // speed of light in material in cm/ns
   Double_t calFactor; //calibration factor energy of LAND paddles
+  Double_t fBeamEnergy;
   PM_RES **PM_res;
   private:
   virtual void SetParContainers();
