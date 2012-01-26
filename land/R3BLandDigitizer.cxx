@@ -73,7 +73,7 @@ InitStatus R3BLandDigitizer::Init() {
    
   // Register output array LandDigi
   fLandDigi = new TClonesArray("R3BLandDigi",1000);
-  ioman->Register("LandDigi", "Digital response in Land", fLandDigi, kTRUE);
+  ioman->Register("LandDigi", "Digital response in Land", fLandDigi, kFALSE);
 
   // Parameter retrieval
   // Only after Init one retrieve the Digitization Parameters!
@@ -87,6 +87,7 @@ InitStatus R3BLandDigitizer::Init() {
   amu = 931.494028; //atomic mass unit in MeV/c**2
   c = 2.99792458E8;
   cMedia = 14.;// speed of light in material in [cm/ns]
+  eventNo=0;
 
   PM_res=new PM_RES*[npaddles];
   for (int i=0;i<npaddles;i++){
@@ -101,10 +102,34 @@ InitStatus R3BLandDigitizer::Init() {
      hPMr->GetXaxis()->SetTitle("Time (ns)");
      hPMr->GetYaxis()->SetTitle("Counts");
 
-     hTotalLight = new TH1F("Total_Light","Total light detected (energy equivalent)",5000,0.,2000.);
+     hTotalLight = new TH1F("Total_Light","Total light detected (energy equivalent)",5000,0.,1000.);
      hTotalLight->GetXaxis()->SetTitle("Energy (MeV)");
      hTotalLight->GetYaxis()->SetTitle("Counts");
+
+     hTotalLight1 = new TH1F("Total_Light1","Total light detected (energy equivalent)",55,-0.02,1.08);
+     hTotalLight1->GetXaxis()->SetTitle("Energy/Ebeam");
+     hTotalLight1->GetYaxis()->SetTitle("Counts");
   
+     hTotalEnergy = new TH1F("Total_Energy","Total energy detected",5000,0.,5000.);
+     hTotalEnergy->GetXaxis()->SetTitle("Energy (MeV)");
+     hTotalEnergy->GetYaxis()->SetTitle("Counts");
+
+     hTotalEnergy1 = new TH1F("Total_Energy1","Total energy detected / Ebeam",55,-0.02,1.08);
+     hTotalEnergy1->GetXaxis()->SetTitle("Energy/Ebeam");
+     hTotalEnergy1->GetYaxis()->SetTitle("Counts");
+     
+     hTotalLightRel = new TH1F("Total_Light_rel","Relative Total light detected (energy equivalent)",1000,0.,1000.);
+     hTotalLightRel->GetXaxis()->SetTitle("Energy/Ebeam");
+     hTotalLightRel->GetYaxis()->SetTitle("Counts");
+  
+     hTotalLightRel2 = new TH1F("Total_Light_rel2","Relative Total light detected (energy equivalent)",55,0.,1.1);
+     hTotalLightRel2->GetXaxis()->SetTitle("Energy/Ebeam");
+     hTotalLightRel2->GetYaxis()->SetTitle("Counts");
+  
+     hTotalEnergyRel = new TH1F("Total_Energy_rel","Relative Total energy detected",5000,0.,5000);
+     hTotalEnergyRel->GetXaxis()->SetTitle("Energy/Ebeam");
+     hTotalEnergyRel->GetYaxis()->SetTitle("Counts");
+
      hParticle = new TH1F("Particle","PID of particle which produced the energy loss",3000,0.,3000.);
      hParticle->GetXaxis()->SetTitle("Particle ID");
      hParticle->GetYaxis()->SetTitle("Counts");
@@ -117,7 +142,7 @@ InitStatus R3BLandDigitizer::Init() {
      hFirstEnergy->GetXaxis()->SetTitle("Energy (MeV)");
      hFirstEnergy->GetYaxis()->SetTitle("Counts");
 
-     hElossLight = new TH2F("ElossLight","Light quenching for protons",100,0.,100.,100,0.,100.);
+     hElossLight = new TH2F("ElossLight","Light quenching for protons",200,0.,1000.,200,0.,1000.);
      hElossLight->GetXaxis()->SetTitle("Energy (MeV)");
      hElossLight->GetYaxis()->SetTitle("Light (MeV)");
         
@@ -151,8 +176,8 @@ InitStatus R3BLandDigitizer::Init() {
 // -------------------------------------------------------------------------
 
 // -----   Public method Exec   --------------------------------------------
-void R3BLandDigitizer::Exec(Option_t* opt) {
- 
+void R3BLandDigitizer::Exec(Option_t* opt)
+{
 //-Reset entries in output arrays
 //-Reset local arrays 
    Reset();
@@ -163,6 +188,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 // The user can adjust here some basic variables:
 // **********************************************   
 // time resolution of the scintillator in sigma
+   eventNo=eventNo+1;
    Double_t timeRes;
    if(npaddles<202){
       //LAND detector
@@ -170,33 +196,32 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
    }
    else if(npaddles>201){
       //NeuLAND detector
-      timeRes = 0.1;//ns  
+     timeRes = 0.15;//ns  
    }
-//   timeRes = 0.2;//0.25 //ns
 
 // light attenuation of plastic scintillator
-   att = 0.005; // in [1/cm]
-//   att = 0.008; // in [1/cm]
+//   att = 0.005; // in [1/cm]
+   att = 0.008; // in [1/cm]
 // decay constant of BC408 scintillator
-   Double_t lambda=0.693147/2.5; // in [1/ns]
+//   Double_t lambda=0.693147/2.5; // in [1/ns] This lambda is actually a t1/2
+//   Double_t lambda=1./3.1; // in [1/ns]
+   Double_t lambda=1./2.1; // in [1/ns]
 
 // half of the length of a scintillator
    plength = fLandDigiPar->GetPaddleLength(); // in [cm]
-   cout<<"paddle length: "<<plength<<endl;
 
 // length of time gate for QDC
-   Double_t tofRange = 100.;//in [ns]
+   Double_t tofRange = 400.;//in [ns]
    
 // energy calibration factor   
-   calFactor=0.3; 
-//   calFactor=1.0;   
+//   calFactor=0.6; 
+   calFactor=0.4;   
 // Individual thresholds for PM's 
    Double_t thresh[npaddles];
    for (Int_t i=0;i<npaddles;i++){
-      Double_t ran=(gRandom->Rndm(0)-0.5)*0.1;   
+      Double_t ran=(gRandom->Rndm(0)-0.5)*0.15;   
       // here one has the possibility to assign individual thresholds
-      thresh[i] = 0.42857+ran; // [MeV] for geant4
-//      thresh[i] = .1; // [MeV] for geant4
+      thresh[i] = 0.16+ran; // [MeV] for geant4
    }
    
 //****************************************************   
@@ -204,7 +229,8 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
    Int_t PMmult[npaddles];   
    Double_t QDC[npaddles],TDC[npaddles];
    Double_t QDC_temp[npaddles],TDC_temp[npaddles];
-   Double_t TotalEnergy[npaddles];
+   Double_t TotalEnergy;
+   Double_t TotalEnergyLee;
    Double_t TotalLight = 0;
    Int_t mult1=0;
    Int_t mult2=0;   
@@ -215,130 +241,17 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
    Double_t E_lab;
    Double_t xpaddle[npaddles],ypaddle[npaddles],zpaddle[npaddles];
    Int_t PDG;
-   Double_t pnx0[4],pny0[4],pnz0[4],pnt0[4],pn0[4],xn0[4],yn0[4],zn0[4],tn0[4];
    Double_t en,s,rr;
-   Double_t pfx0,pfy0,pfz0,pft0,pf0,xf0,yf0,zf0,tf0;
 
    // reset    
+   TotalEnergy=0.;
+   TotalEnergyLee=0.;
+   
    for (Int_t j=0;j<npaddles;j++){      
-      TotalEnergy[j]=0.;
       PMmult[j]=0;
       memset(PM_res[j],0,1500*sizeof(PM_RES));
    }
 
-   // Get parameter from original neutron and fragment
-   // Access to Monte Carlo Info
-   //  get object from the TclonesArray at index=TrackID
-   R3BMCTrack *aTrack1 = (R3BMCTrack*) fLandMCTrack->At(0); 
-   R3BMCTrack *aTrack2 = (R3BMCTrack*) fLandMCTrack->At(1); 
-   R3BMCTrack *aTrack3 = (R3BMCTrack*) fLandMCTrack->At(2); 
-   R3BMCTrack *aTrack4 = (R3BMCTrack*) fLandMCTrack->At(3); 
-   R3BMCTrack *aTrack5 = (R3BMCTrack*) fLandMCTrack->At(4); 
-   
-   Int_t numParticle=1; //number of primary neutrons; max 4
-  
-   if ( aTrack1->GetMotherId() >=0 ) cout << " Problem track1 not a primary track" << endl; 
-//   if ( aTrack2->GetMotherId() >=0 ) cout << " Problem track2 not a primary track" << endl;    
-
-// Fragment
-   PDG = aTrack1->GetPdgCode();
-   pfx0 = aTrack1->GetPx()*1000.;  
-   pfy0 = aTrack1->GetPy()*1000.;  
-   pfz0 = aTrack1->GetPz()*1000.;  
-   pft0 = aTrack1->GetPt();  
-   pf0 = aTrack1->GetP()*1000.;  
-   xf0 = aTrack1->GetStartX();  
-   yf0 = aTrack1->GetStartY();  
-   zf0 = aTrack1->GetStartZ();  
-   tf0 = aTrack1->GetStartT();
-
-//   cout << "primary particle 1 " << PDG << endl;
-//   cout << "px, py, pz " << pfx0 << "  " << pfy0 << "  " << pfz0 << endl;
-//   cout << "Ptransversal, P total " << pft0 << "  " << pf0 << endl;
-
-   if(numParticle>1){
-// first Neutron
-     if ( aTrack2->GetMotherId() >=0 ) cout << " Problem track2 not a primary track" << endl;    
-
-     PDG = aTrack2->GetPdgCode();
-     if (PDG != 2112) cout << " Second particle is not a neutron" << endl; 
-     pnx0[0] = aTrack2->GetPx()*1000.;  
-     pny0[0] = aTrack2->GetPy()*1000.;  
-     pnz0[0] = aTrack2->GetPz()*1000.;  
-     pnt0[0] = aTrack2->GetPt();  
-     pn0[0] = aTrack2->GetP()*1000.;  
-     xn0[0] = aTrack2->GetStartX();  
-     yn0[0] = aTrack2->GetStartY();  
-     zn0[0] = aTrack2->GetStartZ();  
-     tn0[0] = aTrack2->GetStartT();
-      
-//   cout << "primary particle 2 " << PDG << endl;
-//   cout << "px, py, pz " << pnx0 << "  " << pny0 << "  " << pnz0 << endl;
-//   cout << "Ptransversal, P total " << pnt0 << "  " << pn0 << endl;
-   }
-      
-   if(numParticle>2){
-// second Neutron
-     if ( aTrack3->GetMotherId() >=0 ) cout << " Problem track3 not a primary track" << endl;    
-
-     PDG = aTrack3->GetPdgCode();
-     if (PDG != 2112) cout << " Third particle is not a neutron" << endl; 
-     pnx0[1] = aTrack3->GetPx()*1000.;  
-     pny0[1] = aTrack3->GetPy()*1000.;  
-     pnz0[1] = aTrack3->GetPz()*1000.;  
-     pnt0[1] = aTrack3->GetPt();  
-     pn0[1] = aTrack3->GetP()*1000.;  
-     xn0[1] = aTrack3->GetStartX();  
-     yn0[1] = aTrack3->GetStartY();  
-     zn0[1] = aTrack3->GetStartZ();  
-     tn0[1] = aTrack3->GetStartT();
-      
-//   cout << "primary particle 2 " << PDG << endl;
-//   cout << "px, py, pz " << pnx0 << "  " << pny0 << "  " << pnz0 << endl;
-//   cout << "Ptransversal, P total " << pnt0 << "  " << pn0 << endl;
-   }
-   
-   if(numParticle>3){
-// third Neutron
-     if ( aTrack4->GetMotherId() >=0 ) cout << " Problem track4 not a primary track" << endl;    
-
-     PDG = aTrack4->GetPdgCode();
-     if (PDG != 2112) cout << " Fourth particle is not a neutron" << endl; 
-     pnx0[2] = aTrack4->GetPx()*1000.;  
-     pny0[2] = aTrack4->GetPy()*1000.;  
-     pnz0[2] = aTrack4->GetPz()*1000.;  
-     pnt0[2] = aTrack4->GetPt();  
-     pn0[2] = aTrack4->GetP()*1000.;  
-     xn0[2] = aTrack4->GetStartX();  
-     yn0[2] = aTrack4->GetStartY();  
-     zn0[2] = aTrack4->GetStartZ();  
-     tn0[2] = aTrack4->GetStartT();
-      
-//   cout << "primary particle 2 " << PDG << endl;
-//   cout << "px, py, pz " << pnx0 << "  " << pny0 << "  " << pnz0 << endl;
-//   cout << "Ptransversal, P total " << pnt0 << "  " << pn0 << endl;
-   }
-   
-   if(numParticle>4){
-// fourth Neutron
-     if ( aTrack5->GetMotherId() >=0 ) cout << " Problem track5 not a primary track" << endl;    
-
-     PDG = aTrack5->GetPdgCode();
-     if (PDG != 2112) cout << " Fifth particle is not a neutron" << endl; 
-     pnx0[3] = aTrack5->GetPx()*1000.;  
-     pny0[3] = aTrack5->GetPy()*1000.;  
-     pnz0[3] = aTrack5->GetPz()*1000.;  
-     pnt0[3] = aTrack5->GetPt();  
-     pn0[3] = aTrack5->GetP()*1000.;  
-     xn0[3] = aTrack5->GetStartX();  
-     yn0[3] = aTrack5->GetStartY();  
-     zn0[3] = aTrack5->GetStartZ();  
-     tn0[3] = aTrack5->GetStartT();
-      
-//   cout << "primary particle 2 " << PDG << endl;
-//   cout << "px, py, pz " << pnx0 << "  " << pny0 << "  " << pnz0 << endl;
-//   cout << "Ptransversal, P total " << pnt0 << "  " << pn0 << endl;
-   }
    
    for (Int_t l=0;l<nentries;l++){
       //cout<<"loop over entries "<<l<<endl;
@@ -347,8 +260,8 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 
       Int_t paddle = int(land_obj->GetSector())-1; //note that paddle starts at 1 
       Int_t scint = int(land_obj->GetPaddleNb());
-      Double_t eloss = land_obj->GetEnergyLoss()*1000.;  
-      Double_t light = land_obj->GetLightYield()*1000.;  
+      Double_t eloss = land_obj->GetEnergyLoss()*1000.*calFactor;  
+      Double_t light = land_obj->GetLightYield()*1000.*calFactor;  
       Double_t xIn = land_obj->GetXIn();
       Double_t yIn = land_obj->GetYIn();
       Double_t zIn = land_obj->GetZIn();
@@ -369,28 +282,13 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
       Double_t y = yIn;
       Double_t z = zIn;
      
-      if(PID==2212){
-         hElossLight->Fill(eloss,light,1.);
+      
+      if (eloss > 0. && media == 3) {
+        TotalEnergy+=eloss;     
+        TotalEnergyLee+=light;
       }
-      
-      TotalEnergy[paddle]+=light;
-      
       Int_t mother = aTrack->GetMotherId();
-//      cout<<"mother "<<mother<<endl; 
-/*            
-      if((mother-1) < numParticle && firstT[mother-1]==0.){
-         firstHitX[mother-1] = x;
-         firstHitY[mother-1] = y;
-         firstHitZ[mother-1] = z;
-         firstT[mother-1] = time;
-         firstMedia[mother-1]=media;
 
-//      cout<<"first Hit "<< x<<"  "<< y<<"  "<<z<<"  "<<time << endl;
-//      cout<<"out "<< xOut<<"  "<< yOut<<"  "<<zOut << endl;
-//      cout<<"media "<< media << endl;
-	 
-      }
-*/      
       if(1>2){
          cout<< "entry "<<l<<endl;
          cout<< "TrackId "<<TrackId<<endl;
@@ -420,6 +318,8 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
          PMmult[paddle] = PMmult[paddle] + 1;
 	 
          Int_t m = PMmult[paddle]; 
+//	 cout << "multi per paddle: "<<m<<endl;
+//           cout<< "light yield "<<light<<endl;
 	 
 	 if (m>1500) {
 	   cout<<"Too many hits in one paddle: "<< m<< " hits"<<endl;
@@ -496,11 +396,47 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
            
    }//! MC hits   
 
+   hElossLight->Fill(TotalEnergy,TotalEnergyLee,1.);
+   hTotalEnergy->Fill(TotalEnergy);  
+   hTotalEnergy1->Fill(TotalEnergy/calFactor/fBeamEnergy);  
+   hTotalLightRel->Fill(TotalEnergyLee);  
+   hTotalLight1->Fill(TotalEnergyLee/calFactor/fBeamEnergy);  
+   hTotalEnergyRel->Fill(TotalEnergy);  
 
+//    cout << "-I- R3BLandDigitizer : energy=" << TotalEnergy << ",  light=" << TotalEnergyLee << "." << endl;
+   
    // Check for leading edge
+   Double_t triggerTime=1e10;
+   for(Int_t i = 0; i < npaddles; i++) {
+      for (Int_t j = 0; j < PMmult[i]; j++) {
+
+	PM_res[i][j+1].Lenergy=lambda*PM_res[i][j+1].LlightCFD;
+	PM_res[i][j+1].Lenergy=PM_res[i][j+1].Lenergy+PM_res[i][j].Lenergy* 
+	  exp(-lambda*(PM_res[i][j+1].Ltime-PM_res[i][j].Ltime));       
+
+	if(PM_res[i][j+1].Lenergy > thresh[i]) {
+	  if(PM_res[i][j+1].Ltime < triggerTime) {
+	    triggerTime = PM_res[i][j+1].Ltime;
+	  }// find minimum
+	}// if above threshold
+
+	PM_res[i][j+1].Renergy=lambda*PM_res[i][j+1].RlightCFD;
+	PM_res[i][j+1].Renergy=PM_res[i][j+1].Renergy+PM_res[i][j].Renergy* 
+	  exp(-lambda*(PM_res[i][j+1].Rtime-PM_res[i][j].Rtime));       
+
+	if(PM_res[i][j+1].Renergy > thresh[i]) {
+	  if(PM_res[i][j+1].Rtime < triggerTime) {
+	    triggerTime = PM_res[i][j+1].Rtime;
+	  }// find minimum
+	}// if above threshold
+
+      }// digis
+   }// paddles
+
+//    cout << "-I- R3BLandDigitizer : triggerTime=" << triggerTime << "." << endl;
 
    Double_t temp[1500][3];
-   
+      
    for (Int_t i=0;i<npaddles;i++){
       //cout<<"loop over paddles "<<i<<endl; 
 
@@ -561,11 +497,22 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 
       
       for (Int_t j=0;j<PMmult[i];j++){
-         PM_res[i][j+1].Lenergy=lambda*PM_res[i][j+1].LlightCFD;
-	 PM_res[i][j+1].Lenergy=PM_res[i][j+1].Lenergy+PM_res[i][j].Lenergy* 
-	 exp(-lambda*(PM_res[i][j+1].Ltime-PM_res[i][j].Ltime));       
+/*
+         cout<<"j: "<<j<<"  "<< PMmult[i] <<endl;
+         cout<<"energy: "<<PM_res[i][j+1].Lenergy<<endl;
+         cout<<"light: "<<PM_res[i][j+1].LlightCFD<<endl;
+         cout<<"new energy: "<< lambda*PM_res[i][j+1].LlightCFD<<endl;
+         cout<<"times: "<< PM_res[i][j+1].Ltime<<"  "<<PM_res[i][j].Ltime <<endl;
+*/	 
+//         cout<<"adding energy: "<< PM_res[i][j].Lenergy* 
+//	 exp(-lambda*(PM_res[i][j+1].Ltime-PM_res[i][j].Ltime))<<endl;
+//         cout<<"result: "<<PM_res[i][j+1].Lenergy<<endl;
+
+//         PM_res[i][j+1].Lenergy=PM_res[i][j+1].LlightCFD;
+
 
          if(PM_res[i][j+1].Lenergy>thresh[i] && multl==0) {
+//             if (triggerTime==0.) triggerTime=PM_res[i][j+1].Ltime;
 	    // This is supposed to mimic a QDC and a TDC
 	    // check if light is larger than threshold and register time
             // Take also time resolution of sigma=timeRes ps into account
@@ -575,7 +522,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 	    lightl=0.;	   
             for(Int_t k=1;k<=PMmult[i];k++){
 	    // add all times inside +- tofRange (ns) for QDC 
-	       if(TMath::Abs(PM_res[i][k].Ltime-tofl+tofRange/2.) < tofRange) {
+	       if(TMath::Abs(PM_res[i][k].Ltime-triggerTime+tofRange/2.) < tofRange) {
   	          lightl=lightl+PM_res[i][k].LlightQDC;
 	          if(i<68){
                      // control histograms
@@ -586,11 +533,10 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 	 
 	 }
 	 	 
-         PM_res[i][j+1].Renergy=lambda*PM_res[i][j+1].RlightCFD;
-	 PM_res[i][j+1].Renergy=PM_res[i][j+1].Renergy+PM_res[i][j].Renergy* 
-	 exp(-lambda*(PM_res[i][j+1].Rtime-PM_res[i][j].Rtime));       
+//         PM_res[i][j+1].Renergy=lambda*PM_res[i][j+1].RlightCFD;
 
          if(PM_res[i][j+1].Renergy>thresh[i] && multr==0) {
+//             if (triggerTime==0.) triggerTime=PM_res[i][j+1].Rtime;
 	    // This is supposed to mimic a QDC and a TDC
 	    // check if light is larger than threshold and register time
             // Take also time resolution of sigma=timeRes ps into account
@@ -600,7 +546,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 	    lightr=0.;	   
             for(Int_t k=1;k<=PMmult[i];k++){
 	    // add all times inside +- tofRange (ns) for QDC 
-	       if(TMath::Abs(PM_res[i][k].Rtime-tofr+tofRange/2.) < tofRange) {
+	       if(TMath::Abs(PM_res[i][k].Rtime-triggerTime+tofRange/2.) < tofRange) {
   	          lightr=lightr+PM_res[i][k].RlightQDC;
 	          if(i<68){
                      // control histograms
@@ -623,7 +569,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 	 mult1=mult1+1;
 //	 cout << "light l and r " <<  lightl<<"  "<<lightr << endl;	 
 
-         QDC_temp[mult1] = calFactor*sqrt(exp(2.*plength*att)*lightl*lightr);
+         QDC_temp[mult1] = sqrt(lightl*lightr)*exp((2.*plength)*att/2.);
 //	 cout << "QDC " <<  QDC_temp[mult1] << endl;	 
          TDC_temp[mult1] = (tofl + tofr) / 2. - plength/cMedia;
 	 
@@ -676,6 +622,7 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
 //   cout << "multiplicity " << mult1 << endl;
    
    // sort final hits for time again
+   TotalLight=0.;
    for (Int_t i=1;i<mult1+1;i++){
       Double_t min = 100000.;
       Int_t index = 0;
@@ -700,15 +647,16 @@ void R3BLandDigitizer::Exec(Option_t* opt) {
       TotalLight=TotalLight+QDC[i];
    }	  
 
+//    cout << "-I- R3BLandDigitizer : totalLight=" << TotalLight << "." << endl;
+   
       // control histograms
    if(mult2>0){
       hMult2 ->Fill(mult2,1.);
    }      
    hMult1 ->Fill(mult1,1.);
    hTotalLight->Fill(TotalLight,1.);      
+   hTotalLightRel2->Fill(TotalLight/200.,1.);
    hFirstEnergy->Fill(QDC[1],1.);
-
-
 }
 // -------------------------------------------------------------------------
 
@@ -734,6 +682,13 @@ void R3BLandDigitizer::Finish()
    hPaddleEnergy->Write();
    
    hTotalLight->Write();
+   hTotalLight1->Write();
+   hTotalEnergy->Write();
+   hTotalEnergy1->Write();
+   hTotalLightRel->Write();
+   hTotalLightRel2->Write();
+   hTotalEnergyRel->Write();
+
    hElossLight->Write();
 
 }
@@ -742,9 +697,9 @@ R3BLandDigi* R3BLandDigitizer::AddHit(Int_t paddleNr, Double_t tdcL, Double_t td
    Double_t tdc, Double_t qdcL, Double_t qdcR, Double_t qdc, 
    Double_t xx, Double_t yy, Double_t zz){   
   // It fills the R3BLandDigi array
-  TClonesArray& clref = *fLandDigi;
-  Int_t size = clref.GetEntriesFast();
-  return new(clref[size]) R3BLandDigi(paddleNr,tdcL,tdcR,tdc,qdcL,qdcR,qdc,xx,yy,zz);
+  R3BLandDigi *digi =
+    new((*fLandDigi)[fLandDigi->GetEntriesFast()]) R3BLandDigi(paddleNr,tdcL,tdcR,tdc,qdcL,qdcR,qdc,xx,yy,zz);
+  return digi;
 }
 	      
 
