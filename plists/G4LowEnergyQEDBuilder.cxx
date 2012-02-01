@@ -215,19 +215,7 @@ void G4LowEnergyQEDBuilder::ConstructProcess()
   // Add standard EM Processes for e+
   particle = G4Positron::Positron();
 
-  //G4eMultipleScattering* msc = new G4eMultipleScattering();
   ph->RegisterProcess(msc, particle);
-
-  // Ionisation
-  //G4eIonisation* eIoni = new G4eIonisation();
-  eIoni->SetEmModel(new G4LivermoreIonisationModel());
-  eIoni->SetFluctModel(new G4UniversalFluctuation() );
-  ph->RegisterProcess(eIoni, particle);
-      
-  // Bremsstrahlung
-  //G4eBremsstrahlung* eBrem = new G4eBremsstrahlung();
-  eBrem->SetEmModel(new G4LivermoreBremsstrahlungModel());
-  ph->RegisterProcess(eBrem, particle);
 
   //Annihilation
   G4eplusAnnihilation* eAnni = new G4eplusAnnihilation();
