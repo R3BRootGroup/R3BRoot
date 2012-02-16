@@ -111,7 +111,8 @@ void R3BDch::Initialize()
 
    cout << endl;
    cout << "-I- R3BDch: initialisation" << endl;
-   cout << "-I- R3BDch: Gas. Vol: (McId) " << gMC->VolId("GASBoxLog")<< endl;
+   //cout << "-I- R3BDch: Gas. Vol: (McId) " << gMC->VolId("GASBoxLog")<< endl;
+   cout << "-I- R3BDch: Gas. Vol: (McId) " << gMC->VolId("ActGASBoxLog")<< endl;
 
    // get the transformation matrixes for
    // the sensitive nodes.
@@ -124,7 +125,8 @@ void R3BDch::Initialize()
 }
 
 void R3BDch::FindNodePath(TObjArray * arr) {
- TString sVol = "GASBoxLog";
+ //TString sVol = "GASBoxLog";
+ TString sVol = "ActGASBoxLog";
  TString topName = gGeoManager->GetTopNode()->GetName();
  TString path = "/" + topName;
 
@@ -234,10 +236,10 @@ void R3BDch::RecordFullMcHit(){
      gMC->CurrentVolOffID(0,ModuleNr0);
      gMC->CurrentVolOffID(1,ModuleNr1);
      gMC->CurrentVolOffID(2,ModuleNr2); //! Module No
-     gMC->CurrentVolOffID(3,ModuleNr3);
+     gMC->CurrentVolOffID(3,ModuleNr3);	//!! changed !!!
 
     // Detector plane
-     Int_t mod = ModuleNr2;
+     Int_t mod = ModuleNr3;	//formerly 2
     // MC Track Info
      Int_t trackId = gMC->GetStack()->GetCurrentTrackNumber();
      Double_t time   = gMC->TrackTime() * 1.0e09;
@@ -298,10 +300,11 @@ void R3BDch::RecordPartialMcHit(){
      gMC->CurrentVolOffID(0,ModuleNr0);
      gMC->CurrentVolOffID(1,ModuleNr1);
      gMC->CurrentVolOffID(2,ModuleNr2); //! Module No
-     gMC->CurrentVolOffID(3,ModuleNr3);
+     gMC->CurrentVolOffID(3,ModuleNr3);	//!!! changed
+
 
     // Detector plane
-     Int_t mod = ModuleNr2;
+    Int_t mod = ModuleNr3;	//formerly 2
 
     // Standard registration
      if ( gMC->IsTrackEntering() ) {
@@ -815,10 +818,26 @@ void R3BDch::ConstructGeometryJustyna() {
    vWorld->SetVisLeaves(kTRUE);
    // Define DCH Geometry
 
+   //Active volume	(envelope box enclosing the sense wires)	
+   Double_t actGasDx = 99.07/2.; // [cm]	//99.07326
+   Double_t actGasDy = 77.60/2.;  // [cm]	//77.59584
+   Double_t actGasDz = 5.20/2.;     // [cm]
+   //distance of x and y planes centres is 4 cm. Distance between the first x halfplane and the second y halfplane is 4cm + 2*0.69*cos30 cm.
+
+   TGeoShape* pActGasBox = new TGeoBBox("ActGasBox",
+		   actGasDx,
+		   actGasDy,
+		   actGasDz);
+   TGeoVolume*
+	   pActGasDchLog = new TGeoVolume("ActGASBoxLog",pActGasBox, pMed33);
+   pActGasDchLog->SetVisLeaves(kTRUE);
+   pActGasDchLog->SetVisContainers(kTRUE);
+
+
    // Gas box
    Double_t gasDx = 106.4/2.; // [cm]
    Double_t gasDy = 83.4/2.;  // [cm]
-   Double_t gasDz = 4.06;     // [cm]
+   Double_t gasDz = 7.50;     // [cm]	
 
    TGeoShape* pGasBox = new TGeoBBox("GasBox",
 				     gasDx,
@@ -833,7 +852,8 @@ void R3BDch::ConstructGeometryJustyna() {
    // Al Frame
    Double_t alDx = 125.8/2.; // [cm]
    Double_t alDy = 103.4/2.; // [cm]
-   Double_t alDz = 4.06;     // [cm]
+   //Double_t alDz = 4.06;     // [cm]
+   Double_t alDz = 7.50;     // [cm]	//modified
 
    TGeoShape* pAlBox = new TGeoBBox("AlBox",
 					 alDx,
@@ -846,7 +866,8 @@ void R3BDch::ConstructGeometryJustyna() {
 
 
    // Add gas layer as sensitive
-   AddSensitiveVolume(pGasDchLog);
+   //AddSensitiveVolume(pGasDchLog);
+   AddSensitiveVolume(pActGasDchLog);
 
    // Mylar Entrance exit windows
    Double_t mylDx= gasDx; //[cm]
@@ -870,32 +891,48 @@ void R3BDch::ConstructGeometryJustyna() {
    rot->RotateX(0.);
    rot->RotateY(0.);
    rot->RotateZ(0.);
-   Double_t tx = -3.5;
-   Double_t ty = -5.;
+   //Double_t tx = -3.5;	//correct values? active-area vs Al frame offsets?
+   //Double_t ty = -5.;
+   Double_t tx = +3.5;	//corrected values, active-area vs Al frame offsets. F.Wamers.
+   Double_t ty = -3.5;
    Double_t tz = 0.;
 
    TGeoCombiTrans*
    pTransfo1 = new TGeoCombiTrans("", 0.,0.,0.,rot);
    TGeoCombiTrans*
    pTransfo2 = new TGeoCombiTrans("", tx,ty,tz,rot);
+   TGeoCombiTrans*
+   pTransfo3 = new TGeoCombiTrans("", -tx,-ty,-tz,rot); //new, in order to compensate Al vs Gas
 
-   dch1->AddNode(pAlDchLog,0,pTransfo1);
-   pAlDchLog->AddNode(pGasDchLog,0,pTransfo2);
+   dch1->AddNode(pAlDchLog,0,pTransfo3);	//1->3
+   pAlDchLog->AddNode(pGasDchLog,0,pTransfo2);	//place gas in aluminum, shifted
+   pGasDchLog->AddNode(pActGasDchLog, 0,pTransfo1);	//place active in gas, centrally
    // Mylar Windows front+back
-   dch1->AddNode(pMylDchLog,0,new TGeoCombiTrans("", tx,ty,-alDz-mylDz,rot));
-   dch1->AddNode(pMylDchLog,1,new TGeoCombiTrans("", tx,ty, alDz+mylDz,rot));
+   //dch1->AddNode(pMylDchLog,0,new TGeoCombiTrans("", tx,ty,-alDz-mylDz,rot));
+   //dch1->AddNode(pMylDchLog,1,new TGeoCombiTrans("", tx,ty, alDz+mylDz,rot));
+   dch1->AddNode(pMylDchLog,0,new TGeoCombiTrans("", 0.,0.,-alDz-mylDz,rot));
+   dch1->AddNode(pMylDchLog,1,new TGeoCombiTrans("", 0.,0., alDz+mylDz,rot));
 
 
 
    // Global Positioning
-   
-   Double_t pDch1x = -123.22 ; //Justyna 
-   Double_t pDch1y = 3.6 ;     //Justyna
-   Double_t pDch1z = 444.13 ;  //Justyna
+   //in agreement with the s318 tracker, those are supposed to be the centres of the active volumes!!!
+   //Double_t pDch1x = -123.22 ; //Justyna 
+   //Double_t pDch1y = 3.6 ;     //Justyna
+   //Double_t pDch1z = 444.13 ;  //Justyna
 
-   Double_t pDch2x = -167.0 ;  //Justyna
-   Double_t pDch2y = 1.02 ;    //Justyna
-   Double_t pDch2z = 535.1 ;   //Justyna
+   //Double_t pDch2x = -167.0 ;  //Justyna
+   //Double_t pDch2y = 1.02 ;    //Justyna
+   //Double_t pDch2z = 535.1 ;   //Justyna
+
+   //use identical values as for the tracker config and the digitizer. F. Wamers. 
+   Double_t pDch1x = -123.219446 ; //Felix 
+   Double_t pDch1y = 3.597104 ;     //Felix
+   Double_t pDch1z = 444.126271 ;  //Felix
+
+   Double_t pDch2x = -167.015888 ;  //Felix
+   Double_t pDch2y = 1.016917 ;    //Felix
+   Double_t pDch2z = 535.093884 ;   //Felix
    
 //   Double_t pDch1x = -132.233355 ; //Christoph  
 //   Double_t pDch1y = 1.037475 ;     //Christoph 

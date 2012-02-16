@@ -47,6 +47,26 @@
 #define PDC2_Atilt	-9.350000
 //#define PDC2_Atilt	9.350000
 
+//Dead wire areas, determined from s318 DHIT data:
+#define PDC1_X_DEAD_1_LO	22.16	//cm, DHIT level, >
+#define PDC1_X_DEAD_1_HI	23.55	//cm, DHIT level, <=
+#define PDC1_Y_DEAD_1_LO	13.85	//cm, DHIT level, >
+#define PDC1_Y_DEAD_1_HI	15.24	//cm, DHIT level, <=
+#define PDC1_Y_DEAD_2_LO	54.73	//cm, DHIT level, >
+#define PDC1_Y_DEAD_2_HI	55.42	//cm, DHIT level, <=
+#define PDC1_Y_DEAD_3_LO	58.88	//cm, DHIT level, >
+#define PDC1_Y_DEAD_3_HI	60.97	//cm, DHIT level, <=
+#define PDC1_Y_DEAD_4_LO	64.41	//cm, DHIT level, >
+#define PDC1_Y_DEAD_4_HI	66.50	//cm, DHIT level, <=
+#define PDC2_X_DEAD_1_LO	13.84	//cm, DHIT level, >
+#define PDC2_X_DEAD_1_HI	15.26	//cm, DHIT level, <=
+
+//Size of active area
+//#define PDC_L_X		100.0	//length of active area
+//#define PDC_L_Y		80.0	//length of active area
+#define PDC_L_X		99.07	//x length of active area
+#define PDC_L_Y		77.60	//y length of active area
+
 using std::cout;
 using std::endl;
 		
@@ -123,19 +143,19 @@ InitStatus R3BDchDigitizer::Init() {
      DCH2Pz->GetYaxis()->SetTitle("Counts");
      
      
-     DCH1X = new TH1F("DCH1X","DCH1X",500,-50.,50.);
+     DCH1X = new TH1F("DCH1X","DCH1X",2400,-120,120);
      DCH1X->GetXaxis()->SetTitle("Position");
      DCH1X->GetYaxis()->SetTitle("Counts");
      
-     DCH2X = new TH1F("DCH2X","DCH2X",500,-50.,50);
+     DCH2X = new TH1F("DCH2X","DCH2X",2400,-120,120);
      DCH2X->GetXaxis()->SetTitle("Position");
      DCH2X->GetYaxis()->SetTitle("Counts");
      
-     DCH1Y = new TH1F("DCH1Y","DCH1Y",500,-50.,50);
+     DCH1Y = new TH1F("DCH1Y","DCH1Y",2000,-100,100);
      DCH1Y->GetXaxis()->SetTitle("Position");
      DCH1Y->GetYaxis()->SetTitle("Counts");
      
-     DCH2Y = new TH1F("DCH2Y","DCH2Y",500,-50.,50.);
+     DCH2Y = new TH1F("DCH2Y","DCH2Y",2000,-100,100);
      DCH2Y->GetXaxis()->SetTitle("Position");
      DCH2Y->GetYaxis()->SetTitle("Counts");
      
@@ -183,12 +203,12 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
      Double_t DCH1eloss;
      Double_t DCH2eloss;
 
-     Int_t pd1mul;
-     Int_t pd2mul;
-     Double_t Pdx1_p1;
-     Double_t Pdx2_p1;
-     Double_t Pdy1_p1;
-     Double_t Pdy2_p1;
+     Int_t pd1mul = 0;
+     Int_t pd2mul = 0;
+     Double_t Pdx1_p1 = -1000.;	//so they stay at that when not set otherwise. -> Easy to disentangle
+     Double_t Pdx2_p1 = -1000.;
+     Double_t Pdy1_p1 = -1000.;
+     Double_t Pdy2_p1 = -1000.;
      
 
    
@@ -215,8 +235,6 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
    }
    
 //******************** DCH **************************//   
-  pd1mul=0;
-  pd2mul=0;
   
   
    for (Int_t l=0;l<nentriesDch;l++){
@@ -253,6 +271,7 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
      Double_t fX_Local_sim = ((fX_Local_In + fX_Local_Out)/2);
      Double_t fY_Local_sim = ((fY_Local_In + fY_Local_Out)/2);
      //Double_t fZ_Local_sim = ((fZ_Local_In + fZ_Local_Out)/2);
+
      //Need modifications
      Double_t fX_Global = ((fX_Global_In + fX_Global_Out)/2);
      Double_t fY_Global = ((fY_Global_In + fY_Global_Out)/2);
@@ -266,53 +285,71 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
      Double_t fY_Local = 0.; 
      Double_t fZ_Local = 0.;
 
-    if(PID==2212 && mother<0){
-    if (DetID==0)
-    {
+    if(PID==2212 && mother<0) {
+      if (DetID==0) {
      //Check tilt direction, positive or negative angle?! Make it consistent with rotations in R3BDch.cxx !!!
-     fX_Local	= (fX_Global-PDC1_X0)*cos(PDC1_Atilt*TMath::Pi()/180.)/cos(PDC1_Aparm*TMath::Pi()/180.) - (fY_Global-PDC1_Y0)*sin(PDC1_Atilt*TMath::Pi()/180.);
-     fY_Local	= (fX_Global-PDC1_X0)*sin(PDC1_Atilt*TMath::Pi()/180.)/cos(PDC1_Aparm*TMath::Pi()/180.) + (fY_Global-PDC1_Y0)*cos(PDC1_Atilt*TMath::Pi()/180.);
+     //using this manual calculation (based on the manual offsets above), a consistency with the s318 tracker is achieved. F. Wamers.    
+     //fX_Local	= (fX_Global-PDC1_X0)*cos(PDC1_Atilt*TMath::Pi()/180.)/cos(PDC1_Aparm*TMath::Pi()/180.) - (fY_Global-PDC1_Y0)*sin(PDC1_Atilt*TMath::Pi()/180.);
+     //fY_Local	= (fX_Global-PDC1_X0)*sin(PDC1_Atilt*TMath::Pi()/180.)/cos(PDC1_Aparm*TMath::Pi()/180.) + (fY_Global-PDC1_Y0)*cos(PDC1_Atilt*TMath::Pi()/180.);
+     fX_Local	= fX_Local_sim;	//values identical to manual ones. both correct.
+     fY_Local	= fY_Local_sim;
 	
 	//control printouts
 	std::cout << "PDC1: glo_x: " << fX_Global << ", glo_y: "<< fY_Global << ", glo_z: "<< fZ_Global << std::endl;
+	std::cout << "PDC1: sloc_x: " << fX_Local_sim << ", sloc_y: "<< fY_Local_sim << std::endl;
 	std::cout << "PDC1: loc_x: " << fX_Local << ", loc_y: "<< fY_Local << ", loc_z: "<< fZ_Local << std::endl;
-	//std::cout << "PDC1: sloc_x: " << fX_Local_sim << ", sloc_y: "<< fY_Local_sim << std::endl;
      
+     ////Here, discard events where areas of dead wires were hit:
+     if ( (fX_Local+PDC_L_X/2>PDC1_X_DEAD_1_LO && fX_Local+PDC_L_X/2<=PDC1_X_DEAD_1_HI)
+      ||  (fY_Local+PDC_L_Y/2>PDC1_Y_DEAD_1_LO && fY_Local+PDC_L_Y/2<=PDC1_Y_DEAD_1_HI)
+      ||  (fY_Local+PDC_L_Y/2>PDC1_Y_DEAD_2_LO && fY_Local+PDC_L_Y/2<=PDC1_Y_DEAD_2_HI)
+      ||  (fY_Local+PDC_L_Y/2>PDC1_Y_DEAD_3_LO && fY_Local+PDC_L_Y/2<=PDC1_Y_DEAD_3_HI)
+      ||  (fY_Local+PDC_L_Y/2>PDC1_Y_DEAD_4_LO && fY_Local+PDC_L_Y/2<=PDC1_Y_DEAD_4_HI) ) {
+	    continue;
+     }
+
      Pdx1_p1 = fX_Local;	// not += !!!
      Pdy1_p1 = fY_Local;	// not += !!!
      DCH1Px->Fill(fPx);
      DCH1Py->Fill(fPy);
      DCH1Pz->Fill(fPz);
-     DCH1X->Fill(fX_Local);
-     DCH1Y->Fill(fY_Local);
+     DCH1X->Fill(fX_Local+PDC_L_X/2);	//modified by additional addon
+     DCH1Y->Fill(fY_Local+PDC_L_Y/2);
      TrackPxVSDCH1Px->Fill(fPx,fPx_track);
 //     cout<<"Dch1 - first drift chamber "<<PID<<endl;
      pd1mul++;
     }
-     
+
     if (DetID==1)
     {
-     //Check tilt direction, positive or negative angle?! Make it consistent with rotations in R3BDch.cxx !!!
-     fX_Local	= (fX_Global-PDC2_X0)*cos(PDC2_Atilt*TMath::Pi()/180.)/cos(PDC2_Aparm*TMath::Pi()/180.) - (fY_Global-PDC2_Y0)*sin(PDC2_Atilt*TMath::Pi()/180.);
-     fY_Local	= (fX_Global-PDC2_X0)*sin(PDC2_Atilt*TMath::Pi()/180.)/cos(PDC2_Aparm*TMath::Pi()/180.) + (fY_Global-PDC2_Y0)*cos(PDC2_Atilt*TMath::Pi()/180.);
+     //Check tilt direction, positive or negative angle?! Make it consistent with rotations in R3BDch.cxx !!!\
+     //using this manual calculation (based on the manual offsets above), a consistency with the s318 tracker is achieved. F. Wamers.    
+     //fX_Local	= (fX_Global-PDC2_X0)*cos(PDC2_Atilt*TMath::Pi()/180.)/cos(PDC2_Aparm*TMath::Pi()/180.) - (fY_Global-PDC2_Y0)*sin(PDC2_Atilt*TMath::Pi()/180.);
+     //fY_Local	= (fX_Global-PDC2_X0)*sin(PDC2_Atilt*TMath::Pi()/180.)/cos(PDC2_Aparm*TMath::Pi()/180.) + (fY_Global-PDC2_Y0)*cos(PDC2_Atilt*TMath::Pi()/180.);
+     fX_Local	= fX_Local_sim;
+     fY_Local	= fY_Local_sim;
      
      	//control printouts
 	std::cout << "PDC2: glo_x: " << fX_Global << ", glo_y: "<< fY_Global << ", glo_z: "<< fZ_Global << std::endl;
+	std::cout << "PDC2: sloc_x: " << fX_Local_sim << ", sloc_y: "<< fY_Local_sim << std::endl;
 	std::cout << "PDC2: loc_x: " << fX_Local << ", loc_y: "<< fY_Local << ", loc_z: "<< fZ_Local << std::endl;
-	//std::cout << "PDC2: sloc_x: " << fX_Local_sim << ", sloc_y: "<< fY_Local_sim << std::endl;
      
+     ////Here, discard events where areas of dead wires were hit:
+     if ( (fX_Local+PDC_L_X/2>PDC2_X_DEAD_1_LO && fX_Local+PDC_L_X/2<=PDC2_X_DEAD_1_HI)
+     ) continue;
+
      Pdx2_p1 = fX_Local;	// not += !!!
      Pdy2_p1 = fY_Local;	// not += !!!
      DCH2Px->Fill(fPx);
      DCH2Py->Fill(fPy);
      DCH2Pz->Fill(fPz);
-     DCH2X->Fill(fX_Local);
-     DCH2Y->Fill(fY_Local);
+     DCH2X->Fill(fX_Local+PDC_L_X/2);
+     DCH2Y->Fill(fY_Local+PDC_L_Y/2);
 //     cout<<"Dch2 - second drift chamber"<<PID<<endl;
      pd2mul++;
     }
-    
-    
+
+
     if (mother<0)
     {
     TrackPx->Fill(fPx_track);
@@ -320,15 +357,16 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
     TrackPz->Fill(fPz_track);
     }
     
-    }
+    } // if primary proton
   
       
 
-   }
+   } // loop over DCH points
   
 
 
-AddHit(pd1mul,Pdx1_p1,Pdy1_p1,pd2mul,Pdx2_p1,Pdy2_p1);
+
+ AddHit(pd1mul,Pdx1_p1,Pdy1_p1,pd2mul,Pdx2_p1,Pdy2_p1);
 
 
 }
