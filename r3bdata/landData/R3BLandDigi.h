@@ -49,7 +49,7 @@ class R3BLandDigi : public TObject
   Double_t GetTdcL(){return fTdcL;}
   
   void SetTdc(Double_t time){fTdc = time;}
-  Double_t GetTdc(){return fTdc;}
+  Double_t GetTdc() const {return fTdc;}
 
   void SetQdcR(Double_t charge){fQdcR = charge;}
   Double_t GetQdcR(){return fQdcR;}
