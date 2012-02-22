@@ -34,7 +34,16 @@ using std::endl;
 		
 
 R3BLandDigitizer::R3BLandDigitizer() :
-  FairTask("R3B Land Digitization scheme ") { 
+  FairTask("R3B Land Digitization scheme ")
+{
+  fVerbose = 1;
+}
+
+
+R3BLandDigitizer::R3BLandDigitizer(Int_t verbose) :
+  FairTask("R3B Land Digitization scheme ", verbose)
+{
+  fVerbose = verbose;
 }
 
 
@@ -53,7 +62,7 @@ void R3BLandDigitizer::SetParContainers() {
 
   fLandDigiPar = (R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
 
-  if ( fLandDigiPar ) {
+  if ( fVerbose && fLandDigiPar ) {
       cout << "-I- R3BLandDigitizer::SetParContainers() "<< endl;
       cout << "-I- Container R3BLandDigiPar  loaded " << endl;
   }
@@ -73,7 +82,7 @@ InitStatus R3BLandDigitizer::Init() {
    
   // Register output array LandDigi
   fLandDigi = new TClonesArray("R3BLandDigi",1000);
-  ioman->Register("LandDigi", "Digital response in Land", fLandDigi, kFALSE);
+  ioman->Register("LandDigi", "Digital response in Land", fLandDigi, kTRUE);
 
   // Parameter retrieval
   // Only after Init one retrieve the Digitization Parameters!
@@ -657,6 +666,10 @@ void R3BLandDigitizer::Exec(Option_t* opt)
    hTotalLight->Fill(TotalLight,1.);      
    hTotalLightRel2->Fill(TotalLight/200.,1.);
    hFirstEnergy->Fill(QDC[1],1.);
+
+   if(fVerbose) {
+     cout << "-I- R3BLandDigitizer : produced " << fLandDigi->GetEntries() << " digis." << endl;
+   }
 }
 // -------------------------------------------------------------------------
 

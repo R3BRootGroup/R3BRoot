@@ -28,6 +28,10 @@ class R3BLandDigitizer : public FairTask
   R3BLandDigitizer();
 
 
+  /** Constructor **/  
+  R3BLandDigitizer(Int_t verbose);
+
+
   /** Destructor **/
   ~R3BLandDigitizer();
 
