@@ -346,6 +346,7 @@ void R3BLandDigitizer::Exec(Option_t* opt)
            cout<< "X Out "<<xOut<<endl;
            cout<< "Y Out "<<yOut<<endl;
            cout<< "Z Out "<<zOut<<endl;	   	   
+	   return;
          }
 	 
          gGeoManager->FindNode(x,y,z);
