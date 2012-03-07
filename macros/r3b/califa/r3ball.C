@@ -47,7 +47,7 @@ void r3ball(Int_t nEvents = 1,
   gSystem->Setenv("CONFIG_DIR",r3b_confdir.Data());
 
 // Output files
-  TString OutFile = "r3bsim.root";
+  TString OutFile = "muchos_iones.root";
   TString ParFile = "r3bpar.root";
 
 
@@ -89,6 +89,7 @@ void r3ball(Int_t nEvents = 1,
   gSystem->Load("libR3BmTof");
   gSystem->Load("libR3BTof");
   gSystem->Load("libR3BTra");
+  gSystem->Load("libR3BChimera");
   gSystem->Load("libELILuMon");
  
   // -----   Create simulation run   ----------------------------------------
@@ -236,9 +237,9 @@ void r3ball(Int_t nEvents = 1,
 	  // 4- CALIFA 7.17, only ENDCAP (in CsI[Tl])
 	  // 5- CALIFA 7.07+7.17, 
 	  // 6- CALIFA 7.09+7.17, (ongoing work)
-	  // 10- CALIFA 8.00, (ongoing work) 
+	  // 10- CALIFA 8.11, 
 	  // ...
-	  ((R3BCalo *)calo)->SelectGeometryVersion(5);
+	  ((R3BCalo *)calo)->SelectGeometryVersion(10);
 	  //Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
 	  ((R3BCalo *)calo)->SetNonUniformity(1.0);
       // Global position of the Module
@@ -396,6 +397,30 @@ void r3ball(Int_t nEvents = 1,
       run->AddModule(land);
   }
 
+  // Chimera
+  if (fDetList.FindObject("CHIMERA") ) {
+      R3BDetector* chim = new R3BChimera("Chimera", kTRUE);
+      chim->SetGeometryFileName("chimera.root");
+      // Global position of the Module
+      thetaX   =  0.0; // (deg)
+      thetaY   =  0.0; // (deg)
+      thetaZ   =  0.0; // (deg)
+      // Rotation in Ref. Frame.
+      thetaX =  0.0; // (deg)
+      thetaY =  0.0; // (deg)
+      thetaZ =  0.0; // (deg)
+      // Global translation in Lab
+      tx       =  0.0; // (cm)
+      ty       =  0.0; // (cm)
+      tz       =  0.0; // (cm)
+      chim->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
+      chim->SetTranslation(tx,ty,tz);
+      // User defined Energy CutOff
+      //Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
+      //((R3BChimera*) chim)->SetEnergyCutOff(fCutOffSci);
+      run->AddModule(chim);
+  }
+
   // Luminosity detector
   if (fDetList.FindObject("LUMON") ) {
       R3BDetector* lumon = new ELILuMon("LuMon", kTRUE);
@@ -460,39 +485,64 @@ void r3ball(Int_t nEvents = 1,
   // 1 - Create the Main API class for the Generator
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
+  if (fGenerator.CompareTo("ion") == 0  ) {
+	  // R3B Ion Generator
+          Int_t z = 30;  // Atomic number
+          Int_t a = 65; // Mass number
+          Int_t q = 0;   // Charge State 
+          Int_t m = 1;   // Multiplicity
+          Double_t px = 40./a;  // X-Momentum / per nucleon!!!!!!
+          Double_t py = 600./a;  // Y-Momentum / per nucleon!!!!!!
+          Double_t pz = 0.01/a;  // Z-Momentum / per nucleon!!!!!!
+	  R3BIonGenerator* ionGen = new R3BIonGenerator(z,a,q,m,px,py,pz);
+	  ionGen->SetSpotRadius(1,1,0);
+	  // add the ion generator
+	  primGen->AddGenerator(ionGen);
+  } 
+	
+  if (fGenerator.CompareTo("ascii") == 0  ) {
+	  // R3B Ascii Generator
+	  R3BAsciiGenerator* asciiGen = new R3BAsciiGenerator("muchos_iones.txt");
+	  // add the ascii generator
+	  primGen->AddGenerator(asciiGen);
+  } 
+	
 
   if (fGenerator.CompareTo("box") == 0  ) {
-  // 2- Define the BOX generator
-  Double_t pdgId=211; // pion beam
-  Double_t theta1= 0.;  // polar angle distribution
-  Double_t theta2= 7.;
-  Double_t momentum=.8; // 10 GeV/c
-  FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 50);
-  boxGen->SetThetaRange (   theta1,   theta2);
-  boxGen->SetPRange     (momentum,momentum*2.);
-  boxGen->SetPhiRange   (0.,360.);
-  boxGen->SetXYZ(0.0,0.0,-1.5);
-  // add the box generator
-  primGen->AddGenerator(boxGen);
+	  // 2- Define the BOX generator
+	  Double_t pdgId=211; // pion beam
+	  Double_t theta1= 0.;  // polar angle distribution
+	  Double_t theta2= 7.;
+	  Double_t momentum=.8; // 10 GeV/c
+	  FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 50);
+	  boxGen->SetThetaRange (   theta1,   theta2);
+	  boxGen->SetPRange     (momentum,momentum*2.);
+	  boxGen->SetPhiRange   (0.,360.);
+	  boxGen->SetXYZ(0.0,0.0,-1.5);
+	  // add the box generator
+	  primGen->AddGenerator(boxGen);
   } 
 	
   if (fGenerator.CompareTo("gammas") == 0  ) {
 	// 2- Define the CALIFA Test gamma generator
 	Double_t pdgId=22; // gamma emission
 	//Double_t pdgId=2212; // proton emission
-	Double_t theta1= 0.;  // polar angle distribution
+	Double_t theta1= 100.;  // polar angle distribution
 	Double_t theta2= 180.;	
-	Double_t momentum=0.002; // 0.010 GeV/c = 10 MeV/c 
-	//Double_t momentum=0.808065; // 0.808065 GeV/c (300MeV Kin Energy for protons) 
-	//Double_t momentum=0.31016124; // 0.31016124 GeV/c (50MeV Kin Energy for protons)
+	//Double_t theta2= 90.;	
+	//Double_t momentum=0.002; // 0.010 GeV/c = 10 MeV/c 
+	Double_t momentumI=0.019; // 0.010 GeV/c = 10 MeV/c 
+	Double_t momentumF=0.045; // 0.010 GeV/c = 10 MeV/c 
+	//Double_t momentumF=0.808065; // 0.808065 GeV/c (300MeV Kin Energy for protons) 
+	//Double_t momentumI=0.31016124; // 0.31016124 GeV/c (50MeV Kin Energy for protons)
 	//Double_t momentum=0.4442972; // 0.4442972 GeV/c (100MeV Kin Energy for protons)
 	//Double_t momentum=0.5509999; // 0.5509999 GeV/c (150MeV Kin Energy for protons)
-	//Double_t momentum=0.64405; // 0.64405 GeV/c (200MeV Kin Energy for protons) 
-	Int_t multiplicity = 1;
+	//Double_t momentumI=0.64405; // 0.64405 GeV/c (200MeV Kin Energy for protons) 
+	Int_t multiplicity = 12;
 	R3BCALIFATestGenerator* gammasGen = new R3BCALIFATestGenerator(pdgId, multiplicity);
 	gammasGen->SetThetaRange (theta1,   theta2);
 	gammasGen->SetCosTheta();
-	gammasGen->SetPRange(momentum,momentum);
+	gammasGen->SetPRange(momentumI,momentumF);
 	gammasGen->SetPhiRange(0.,360.);
 	//gammasGen->SetXYZ(0.0,0.0,-1.5);
 	//gammasGen->SetXYZ(0.0,0.0,0);
@@ -503,54 +553,53 @@ void r3ball(Int_t nEvents = 1,
   } 
 	
 
- if (fGenerator.CompareTo("r3b") == 0  ) {
-  R3BSpecificGenerator *pR3bGen = new R3BSpecificGenerator();
+  if (fGenerator.CompareTo("r3b") == 0  ) {
+	  R3BSpecificGenerator *pR3bGen = new R3BSpecificGenerator();
 
-  // R3bGen properties
-  pR3bGen->SetBeamInteractionFlag("off");
-  pR3bGen->SetBeamInteractionFlag("off");
-  pR3bGen->SetRndmFlag("off");
-  pR3bGen->SetRndmEneFlag("off");
-  pR3bGen->SetBoostFlag("off");
-  pR3bGen->SetReactionFlag("on");
-  pR3bGen->SetGammasFlag("off");
-  pR3bGen->SetDecaySchemeFlag("off");
-  pR3bGen->SetDissociationFlag("off");
-  pR3bGen->SetBackTrackingFlag("off");
-  pR3bGen->SetSimEmittanceFlag("off");
+	  // R3bGen properties
+	  pR3bGen->SetBeamInteractionFlag("off");
+	  pR3bGen->SetRndmFlag("off");
+	  pR3bGen->SetRndmEneFlag("off");
+	  pR3bGen->SetBoostFlag("off");
+	  pR3bGen->SetReactionFlag("on");
+	  pR3bGen->SetGammasFlag("off");
+	  pR3bGen->SetDecaySchemeFlag("off");
+	  pR3bGen->SetDissociationFlag("off");
+	  pR3bGen->SetBackTrackingFlag("off");
+	  pR3bGen->SetSimEmittanceFlag("off");
 
-  // R3bGen Parameters
-  pR3bGen->SetBeamEnergy(1.); // Beam Energy in GeV
-  pR3bGen->SetSigmaBeamEnergy(1.e-03); // Sigma(Ebeam) GeV
-  pR3bGen->SetParticleDefinition(2212); // Use Particle Pdg Code
-  pR3bGen->SetEnergyPrim(0.3); // Particle Energy in MeV
-  Int_t fMultiplicity = 50;
-  pR3bGen->SetNumberOfParticles(fMultiplicity); // Mult.
+	  // R3bGen Parameters
+	  pR3bGen->SetBeamEnergy(1.); // Beam Energy in GeV
+	  pR3bGen->SetSigmaBeamEnergy(1.e-03); // Sigma(Ebeam) GeV
+	  pR3bGen->SetParticleDefinition(2212); // Use Particle Pdg Code
+	  pR3bGen->SetEnergyPrim(0.3); // Particle Energy in MeV
+	  Int_t fMultiplicity = 50;
+	  pR3bGen->SetNumberOfParticles(fMultiplicity); // Mult.
 
-  // Reaction type
-  //        1: "Elas"
-  //        2: "iso"
-  //        3: "Trans"
-  pR3bGen->SetReactionType("Elas");
+	  // Reaction type
+	  //        1: "Elas"
+	  //        2: "iso"
+	  //        3: "Trans"
+	  pR3bGen->SetReactionType("Elas");
 
-  // Target  type
-  //        1: "LeadTarget"
-  //        2: "Parafin0Deg"
-  //        3: "Parafin45Deg"
-  //        4: "LiH"
+	  // Target  type
+	  //        1: "LeadTarget"
+	  //        2: "Parafin0Deg"
+	  //        3: "Parafin45Deg"
+	  //        4: "LiH"
 
-  pR3bGen->SetTargetType(Target.Data());
-  Double_t thickness = (0.11/2.)/10.;  // cm
-  pR3bGen->SetTargetHalfThicknessPara(thickness); // cm
-  pR3bGen->SetTargetThicknessLiH(3.5); // cm
-  pR3bGen->SetTargetRadius(1.); // cm
+	  pR3bGen->SetTargetType(Target.Data());
+	  Double_t thickness = (0.11/2.)/10.;  // cm
+	  pR3bGen->SetTargetHalfThicknessPara(thickness); // cm
+	  pR3bGen->SetTargetThicknessLiH(3.5); // cm
+	  pR3bGen->SetTargetRadius(1.); // cm
 
-  pR3bGen->SetSigmaXInEmittance(1.); //cm
-  pR3bGen->SetSigmaXPrimeInEmittance(0.0001); //cm
+	  pR3bGen->SetSigmaXInEmittance(1.); //cm
+	  pR3bGen->SetSigmaXPrimeInEmittance(0.0001); //cm
 
-  // Dump the User settings
-  pR3bGen->PrintParameters();  
-  primGen->AddGenerator(pR3bGen);
+	  // Dump the User settings
+	  pR3bGen->PrintParameters();  
+	  primGen->AddGenerator(pR3bGen);
   }
 
 
