@@ -30,10 +30,17 @@
 #include "R3BMCTrack.h"
 
 #define SQR(x) ((x)*(x))
-#define U_MEV_C2 931.494
-#define MASS_PROTON_MEV_C2 938.272046 //938.279
-#define MASS_17NE_MEV_C2   29796.65565 //Ar //15846.9
-#define MASS_15O_MEV_C2    28860.78 //Cl //13971.3
+//#define U_MEV_C2 931.494
+//#define MASS_PROTON_MEV_C2 938.272046 //938.279
+//#define MASS_17NE_MEV_C2   29796.65565 //Ar //15846.9
+//#define MASS_15O_MEV_C2    28860.78 //Cl //13971.3
+
+//Updated values by Felix: wikipedia and http://ie.lbl.gov/toi2003/MassSearch.asp
+#define U_MEV_C2 931.494061
+#define MASS_PROTON_MEV_C2 938.272032973
+#define MASS_17NE_MEV_C2   15846.7485478
+#define MASS_16F_MEV_C2    14909.9864966	//GS resonance 535keV above 15O+p
+#define MASS_15O_MEV_C2    13971.1785118
 		
 using std::cout;
 using std::endl;
@@ -204,7 +211,8 @@ void R3BTargetDigitizer::Exec(Option_t* opt) {
   
 
    //  sqrt(MeV^2/c^2 - MeV^2/c^2)=MeV/c
-   estar=sqrt(E2-p2)-MASS_17NE_MEV_C2; // *c2
+   //estar=sqrt(E2-p2)-MASS_17NE_MEV_C2; // *c2
+   estar=sqrt(E2-p2)-(MASS_15O_MEV_C2+MASS_PROTON_MEV_C2); // *c2
   
    
 //   cout<<"Estar In "<<Estar<<endl;
