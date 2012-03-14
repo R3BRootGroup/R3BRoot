@@ -66,6 +66,7 @@ void R3BMCTracks::Exec(Option_t* option)
       MinEnergyLimit=TMath::Max(0.0,MinEnergyLimit) ;
       MaxEnergyLimit=TMath::Max(PEnergy+10,MaxEnergyLimit) ;
       
+      fEventManager->SetMaxEnergy(MaxEnergyLimit+1);
 
       if(fVerbose>2)cout << "MinEnergyLimit " << MinEnergyLimit 
 			 << " MaxEnergyLimit " << MaxEnergyLimit << endl;
@@ -80,11 +81,20 @@ void R3BMCTracks::Exec(Option_t* option)
 	  || (PEnergy >fEventManager->GetMaxEnergy())) continue;
       
       ((R3BEventManager*) fEventManager)->AddParticlesToPdgDataBase(tr->GetPDG());	
+      if(fVerbose>3) cout << "Particle with PDG " << tr->GetPDG() << " added to DataBase " << endl;     
+      if(fVerbose>3) cout << "Particle  " << P << " and propagator " << fTrPr << endl;     
       
       Int_t Np=tr->GetNpoints(); 
       fTrList= GetTrGroup(P);
+      if(fVerbose>3) cout << "Track list: " << fTrList << " - " << fTrList->GetLimP() << " - " << fTrList->GetMaxP() << endl;
       TEveTrack *track= new TEveTrack(P, tr->GetPDG(), fTrPr);
-      track->SetLineColor(fEventManager->Color(tr->GetPDG()));
+      if(fVerbose>3) cout << "Track: " << track << " - " << track->GetPdg() << " - " << track->GetLabel() << endl;
+      if(tr->GetPDG()>5000000) {
+	      track->SetLineColor(12);
+      } else {
+	      track->SetLineColor(fEventManager->Color(tr->GetPDG()));
+      }
+      track->SetLineStyle(9);
 
       //Set Title / Tooltip
       char title[100];
@@ -95,12 +105,17 @@ void R3BMCTracks::Exec(Option_t* option)
       //Set the line width depending on energy
       if (((R3BEventManager*) fEventManager)->IsScaleByEnergy())
         {
-          Int_t lineWidth =(Int_t)(PEnergy/TMath::Min(fEventManager->GetMaxEnergy(),
-						      (Float_t)MaxEnergyLimit)*15.0);
-          if (lineWidth > 0)
+          Int_t lineWidth =(Int_t)(PEnergy/TMath::Min(fEventManager->GetMaxEnergy(),(Float_t)MaxEnergyLimit)*15.0);
+	  if(fVerbose>3) cout << "lineWidth: " << lineWidth << " for track " << track->GetPdg() << " - " << P->GetTitle() << endl;
+
+
+          if (lineWidth > 0) {
             track->SetLineWidth(lineWidth);
-          else
-            track->SetLineStyle(2);
+            if(P->GetMother(0)>-1) track->SetLineStyle(2);
+          } else {
+            track->SetLineStyle(1);
+            track->SetLineWidth(1);
+          }
         }
       
       for (Int_t n=0; n<Np; n++){

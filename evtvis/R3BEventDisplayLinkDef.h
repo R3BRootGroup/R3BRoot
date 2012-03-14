@@ -7,6 +7,7 @@
 #pragma link C++ class  R3BEventManager+;
 #pragma link C++ class  R3BEventManagerEditor+;
 #pragma link C++ class  R3BMCTracks+;
+#pragma link C++ class  R3BIonName+;
 
 #endif
 

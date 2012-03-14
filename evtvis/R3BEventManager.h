@@ -4,6 +4,8 @@
 
 #include "FairEventManager.h"
 
+class R3BIonName;
+
 class R3BEventManager : public FairEventManager
 {
  public:
@@ -16,6 +18,9 @@ class R3BEventManager : public FairEventManager
 
  protected:
   Bool_t fScaleByEnergy; //!
+
+  R3BIonName *fIonName;
+
     
  private:
   static R3BEventManager*    fgRinstance; //!

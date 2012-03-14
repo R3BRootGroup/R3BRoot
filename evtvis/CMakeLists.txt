@@ -28,6 +28,7 @@ set(R3BEVEDISP_SRCS
 R3BEventManager.cxx
 R3BEventManagerEditor.cxx
 R3BMCTracks.cxx
+R3BIonName.cxx
 )
 
 if(RULE_CHECKER_FOUND)
