@@ -4,6 +4,7 @@ r3bevtvis()
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
   gSystem->Load("libGeoBase");
+  gSystem->Load("libFairDB");
   gSystem->Load("libParBase");
   gSystem->Load("libBase");
   gSystem->Load("libMCStack");
@@ -47,7 +48,7 @@ r3bevtvis()
 
   fRun->SetInputFile("r3bsim.root");
   fRun->SetOutputFile("test.root");
-  fRun->LoadGeometry();
+  //fRun->LoadGeometry();
   
   R3BEventManager *fMan= new R3BEventManager();
   R3BMCTracks *Track =  new R3BMCTracks ("Monte-Carlo Tracks");

@@ -93,6 +93,7 @@ SET(LD_LIBRARY_PATH  ${R3BLIBDIR} ${LD_LIBRARY_PATH})
 # the project's entire directory structure.
 add_subdirectory (fairtools)
 add_subdirectory (base)
+add_subdirectory (dbase)
 add_subdirectory (geobase)
 add_subdirectory (parbase) 
 add_subdirectory (generators)
