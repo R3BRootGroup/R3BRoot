@@ -88,7 +88,7 @@ void plot_minv_astro()
 
   gStyle->SetPaperSize(16, 16);
   TCanvas *c1 = new TCanvas("c1", "", 0, 0, 450, 450);
-  TPostScript *ps1 = new TPostScript("plots/minv_astro.eps", -113);
+  TPostScript *ps1 = new TPostScript("minv_astro.eps", -113);
   ps1->Range(16, 16);
 
   gPad->SetLeftMargin(0.15);
