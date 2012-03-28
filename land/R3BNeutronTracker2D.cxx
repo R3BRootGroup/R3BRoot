@@ -1181,7 +1181,7 @@ void R3BNeutronTracker2D::UseBeam(Double_t beam_energy, Double_t beam_beta)
 {
   beamEnergy = beam_energy;
   beamBeta = beam_beta;
-  gBeamBeta = beamBeta;
+  gBeamBeta = beam_beta;
 }
 // -----------------------------------------------------------------------------
 
