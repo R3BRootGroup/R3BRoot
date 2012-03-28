@@ -1,47 +1,15 @@
-//  -------------------------------------------------------------------------
-//
-//   ----- General Macro for R3B simulation
-//
-//         Author: Denis Bertini <D.Bertini@gsi.de>
-//
-//         Last Update: 17/08/09
-//
-//         Comments:
-//               - 17/08/09 Adding R3BModule R3BDetector
-//                          for global positionning
-//               - 12/08/09 Adding R3B Special Physics List
-//               - 06/08/09 Adding R3B specific Event Generator
-//
-//
-//  -------------------------------------------------------------------------
-//
-//   Usage inside ROOT interpreter: 
-//        1) root -l
-//        2)[root] .L r3ball.C 
-//                         
-//        3)[root] r3ball( nevt,
-//                         fDetList,     // List of Detectors
-//                         TargetType,    // "LeadTarget" 
-//                         Visualization, // kFalse or kTRUE   
-//                         fMC ,        // "TGeant3" or "TGeant4"   
-//                         fGenerator   // Generator type
-//
-//  -------------------------------------------------------------------------
-
-
-
 void r3ball(Int_t nEvents = 1,
 	    TObjArray& fDetList,
 	    TString Target = "LeadTarget",
             Bool_t fVis=kFALSE,
             TString fMC="TGeant4",
-	    TString fGenerator="ascii",
+	    TString fGenerator="land",
 	    Bool_t fUserPList= kFALSE,
-            Bool_t fR3BMagnet= kTRUE
-	   )
+            Bool_t fR3BMagnet= kTRUE,
+	    Int_t beamEnergy = 600,
+	    Int_t nn = 1,
+	    Int_t erel = 500)
 {
-
-
   TString dir = getenv("VMCWORKDIR");
   TString r3bdir = dir + "/macros";
 
@@ -51,37 +19,36 @@ void r3ball(Int_t nEvents = 1,
   TString r3b_confdir = dir + "gconfig";
   gSystem->Setenv("CONFIG_DIR",r3b_confdir.Data());
 
-// Output files
-  TString OutFile = "r3bsim.root";
-  TString ParFile = "r3bpar.root";
 
+  // Output files
+  char str[100];
+  sprintf(str, "%1dAMeV.%1dn.%1dkeV", beamEnergy, nn, erel);
+  TString OutFile = "/home/kresan/neuland/r3bsim." + TString(str) + ".35m.root";
+  TString ParFile = "/home/kresan/neuland/r3bpar." + TString(str) + ".35m.root";
 
-  // In general, the following parts need not be touched
-  // ========================================================================
 
   // ----    Debug option   -------------------------------------------------
   gDebug = 0;
   // ------------------------------------------------------------------------
+
 
   // -----   Timer   --------------------------------------------------------
   TStopwatch timer;
   timer.Start();
   // ------------------------------------------------------------------------
 
+
   // ----  Load libraries   -------------------------------------------------
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
-
   gSystem->Load("libGenVector");
-
   gSystem->Load("libGeoBase");
+  gSystem->Load("libFairDB");
   gSystem->Load("libParBase");
   gSystem->Load("libBase");
   gSystem->Load("libMCStack");
   gSystem->Load("libField");
   gSystem->Load("libGen");
-
-  //----  Load R3B specific libraries ---------------------------------------
   gSystem->Load("libR3Bbase");
   gSystem->Load("libR3BGen");
   gSystem->Load("libR3BPassive");
@@ -94,12 +61,12 @@ void r3ball(Int_t nEvents = 1,
   gSystem->Load("libR3BmTof");
   gSystem->Load("libR3BTof");
   gSystem->Load("libR3BTra");
-  gSystem->Load("libR3BChimera");
   gSystem->Load("libELILuMon");
+
  
   // -----   Create simulation run   ----------------------------------------
   FairRunSim* run = new FairRunSim();
-  run->SetName(fMC.Data());              // Transport engine
+  run->SetName(fMC.Data());                    // Transport engine
   run->SetOutputFile(OutFile.Data());          // Output file
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
 
@@ -107,17 +74,19 @@ void r3ball(Int_t nEvents = 1,
   // Magnetic field map type
   Int_t fFieldMap = 0;
 
-  //  R3B Special Physics List in G4 case
-  if ( (fUserPList  == kTRUE ) &&
-       (fMC.CompareTo("TGeant4")   == 0)
-      ){
-       run->SetUserConfig("g4R3bConfig.C");
-       run->SetUserCuts("SetR3BCuts.C");
-   }
 
+  //  R3B Special Physics List in G4 case
+  if((fUserPList == kTRUE) &&
+     (fMC.CompareTo("TGeant4") == 0)) {
+    cout<<"Geant4******************************************"<<endl;
+    run->SetUserConfig("g4R3bConfig.C");
+    run->SetUserCuts("SetR3BCuts.C");
+  }
+  
 
   // -----   Create media   -------------------------------------------------
   run->SetMaterials("media_r3b.geo");       // Materials
+  // ------------------------------------------------------------------------
   
 
   // Global Transformations
@@ -131,7 +100,6 @@ void r3ball(Int_t nEvents = 1,
   //-- 2) Rotation in Ref. Frame of the Volume
   //-- Rotation is Using Local Ref. Frame axis angles
   Double_t thetaX,thetaY,thetaZ;
-
 
   //- Global Translation  Lab. frame.
   Double_t tx,ty,tz;
@@ -164,6 +132,7 @@ void r3ball(Int_t nEvents = 1,
       target->SetTranslation(tx,ty,tz);
       run->AddModule(target);
   }
+
 
   //R3B Magnet definition
   if (fDetList.FindObject("ALADIN") ) {
@@ -231,6 +200,7 @@ void r3ball(Int_t nEvents = 1,
       run->AddModule(cal);
   }
 
+
   if (fDetList.FindObject("CALIFA") ) {
       // CALIFA Calorimeter
       R3BDetector* calo = new R3BCalo("Califa", kTRUE);
@@ -251,6 +221,7 @@ void r3ball(Int_t nEvents = 1,
       calo->SetTranslation(tx,ty,tz);
       run->AddModule(calo);
   }
+
 
   // Tracker
   if (fDetList.FindObject("TRACKER")  ) {
@@ -275,6 +246,7 @@ void r3ball(Int_t nEvents = 1,
       ((R3BTra*) tra)->SetEnergyCutOff(fCutOffSi);
       run->AddModule(tra);
   }
+
   
   // DCH drift chambers
   if (fDetList.FindObject("DCH") ) {
@@ -298,6 +270,7 @@ void r3ball(Int_t nEvents = 1,
       run->AddModule(dch);
   }
 
+
   // Tof
   if (fDetList.FindObject("TOF") ) {
       R3BDetector* tof = new R3BTof("Tof", kTRUE);
@@ -320,6 +293,7 @@ void r3ball(Int_t nEvents = 1,
       ((R3BTof*) tof)->SetEnergyCutOff(fCutOffSci);
       run->AddModule(tof);
   }
+
 
   // mTof
   if (fDetList.FindObject("MTOF") ) {
@@ -345,6 +319,7 @@ void r3ball(Int_t nEvents = 1,
       run->AddModule(mTof);
   }
 
+
   // GFI detector
   if (fDetList.FindObject("GFI") ) {
       R3BDetector* gfi = new R3BGfi("Gfi", kTRUE);
@@ -368,11 +343,12 @@ void r3ball(Int_t nEvents = 1,
       run->AddModule(gfi);
   }
 
+
   // Land Detector
   if (fDetList.FindObject("LAND") ) {
       R3BDetector* land = new R3BLand("Land", kTRUE);
       // verbose level 2 ( step info activated )
-      land->SetVerboseLevel(1);
+      land->SetVerboseLevel(2);
       // Global position of the Module
       phi   =  0.0; // (deg)
       theta =  0.0; // (deg)
@@ -390,41 +366,49 @@ void r3ball(Int_t nEvents = 1,
       land->SetTranslation(tx,ty,tz);
       run->AddModule(land);
   }
-	// NeuLand Scintillator Detector
+  
+  // NeuLand Scintillator Detector
   if (fDetList.FindObject("SCINTNEULAND")) {
 
-      R3BDetector* land = new R3BLand("NeuLand", kTRUE);
-      // verbose level 2 ( step info activated )
-      land->SetVerboseLevel(2);
-			//Construct NeuLand
-			Double_t paddle_dimx=100.;   // half of the length [cm]
-			Double_t paddle_dimy=2.4;   // half of the width [cm]
-			Double_t paddle_dimz=2.4;   // half of the depth [cm]
-			Double_t detector_dimz=125; // total detector depth [cm]
-			Double_t air_gap=0.03;        // half of air gap between two scintillator bars [cm]
-			Double_t wrapping1=0.02;      // thickness of wrapping material Alu [cm]
-			Double_t wrapping2=0.05;      // thickness of wrapping material Tape [cm]
-			((R3BLand*) land)->UseNeuLand(paddle_dimx, paddle_dimy, paddle_dimz, detector_dimz, 
-			air_gap, wrapping1, wrapping2);
-
-      // Global position of the Module
-      phi   =  0.0; // (deg)
-      theta =  0.0; // (deg)
-      psi   =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx    =  0.0; // (cm)
-      ty    =  0.0; // (cm)
-      tz    =  1200.0; // (cm)
-      //land->SetRotAnglesEuler(phi,theta,psi);
-      land->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      land->SetTranslation(tx,ty,tz);
-
-      run->AddModule(land);
+    R3BDetector* land = new R3BLand("Land", kTRUE);
+    // verbose level 2 ( step info activated )
+    land->SetVerboseLevel(2);
+    //Construct NeuLand
+    Double_t paddle_dimx=125.;   // half of the length [cm]
+//     Double_t paddle_dimy=1.5;   // half of the width [cm]
+//     Double_t paddle_dimz=1.5;   // half of the depth [cm]
+    Double_t paddle_dimy=2.4;   // half of the width [cm]
+    Double_t paddle_dimz=2.4;   // half of the depth [cm]
+//     Double_t paddle_dimy=5.0;   // half of the width [cm]
+//     Double_t paddle_dimz=5.0;   // half of the depth [cm]
+    Double_t detector_dimz=150; // total detector depth [cm]
+//     Double_t detector_dimz=100;
+    Double_t air_gap=0.03;        // half of air gap between two scintillator bars [cm]
+    Double_t wrapping1=0.02;      // thickness of wrapping material Alu [cm]
+    Double_t wrapping2=0.05;      // thickness of wrapping material Tape [cm]
+    ((R3BLand*) land)->UseNeuLand(paddle_dimx, paddle_dimy, paddle_dimz, detector_dimz, 
+				  air_gap, wrapping1, wrapping2);
+    
+    // Global position of the Module
+    phi   =  0.0; // (deg)
+    theta =  0.0; // (deg)
+    psi   =  0.0; // (deg)
+    // Rotation in Ref. Frame.
+    thetaX =  0.0; // (deg)
+    thetaY =  0.0; // (deg)
+    thetaZ =  0.0; // (deg)
+    // Global translation in Lab
+    tx    =  0.0; // (cm)
+    ty    =  0.0; // (cm)
+    // tz    =  1550.0; // (cm)
+    tz    =  3650.0; // (cm)
+    //land->SetRotAnglesEuler(phi,theta,psi);
+    land->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
+    land->SetTranslation(tx,ty,tz);
+    
+    run->AddModule(land);
   }
+
 
   // Chimera
   if (fDetList.FindObject("CHIMERA") ) {
@@ -450,6 +434,7 @@ void r3ball(Int_t nEvents = 1,
       run->AddModule(chim);
   }
 
+
   // Luminosity detector
   if (fDetList.FindObject("LUMON") ) {
       R3BDetector* lumon = new ELILuMon("LuMon", kTRUE);
@@ -474,14 +459,11 @@ void r3ball(Int_t nEvents = 1,
       run->AddModule(lumon);
   }
 
-
   
   // -----   Create R3B  magnetic field ----------------------------------------
   Int_t typeOfMagneticField = 0;
   Double_t fieldScale = 1.;
   Bool_t fVerbose = kFALSE;
-
-
 
   //NB: <D.B>
   // If the Global Position of the Magnet is changed
@@ -492,7 +474,8 @@ void r3ball(Int_t nEvents = 1,
   
   if (fFieldMap == 0) {
     R3BAladinFieldMap* magField = new R3BAladinFieldMap("AladinMaps");
-    Double_t fMeasCurrent = 2000.;// I_current [A]
+//     Double_t fMeasCurrent = 2000.;// I_current [A]
+    Double_t fMeasCurrent = 2500.;// I_current [A]
     magField->SetCurrent(fMeasCurrent);
     magField->SetScale(fieldScale);
 
@@ -511,126 +494,131 @@ void r3ball(Int_t nEvents = 1,
     } else {
 	run->SetField(NULL);
     }
-  }  //! end of field map section
+  }//! end of field map section
 
 
   // -----   Create PrimaryGenerator   --------------------------------------
-
   // 1 - Create the Main API class for the Generator
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
   if (fGenerator.CompareTo("ascii") == 0  ) {
-  TString evtFile = "evt_gen.dat";
-  TString iFile = dir + "/input/" + evtFile;
-  R3BAsciiGenerator* gen = new R3BAsciiGenerator(iFile.Data());  
-  // add the ascii generator
-  primGen->AddGenerator(gen);
+    char str[100];
+    sprintf(str, "%1dSn_%1dn_%1dAMeV_%1dkeV.dat", (132-nn), nn, beamEnergy, erel);
+    TString evtFile;
+    evtFile = TString(str);
+    TString iFile = dir + "/input/" + evtFile;
+    R3BAsciiGenerator* gen = new R3BAsciiGenerator(iFile.Data());
+    // add the ascii generator
+    primGen->AddGenerator(gen);
   } 
 
   if (fGenerator.CompareTo("box") == 0  ) {
-  // 2- Define the BOX generator
-  Double_t pdgId=2212; // neutron
-  Double_t theta1= 0.1;  // polar angle distribution
-  Double_t theta2= 0.1;
-  Double_t momentum=1.692041; // 10 GeV/c
+    // 2- Define the BOX generator
+    Double_t pdgId=2212; // proton
+    Double_t theta1= 0.0;  // polar angle distribution
+    Double_t theta2= 180.0;
+    Double_t momentum=1.692041; // 10 GeV/c
 //  Double_t momentum=sqrt(2.*500.*938.27231)/1000.; // 10 GeV/c
 //  Double_t momentum=1215.649/1000.;  // 600 MeV 
-  FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 1);
-  boxGen->SetThetaRange (   theta1,   theta2);
-  boxGen->SetPRange     (momentum,momentum*1.);
-  boxGen->SetPhiRange   (0.,360.);
-  boxGen->SetXYZ(2.5,2.5,972.5);
-  // add the box generator
-  primGen->AddGenerator(boxGen);
-  
+    FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 1);
+    boxGen->SetThetaRange (   theta1,   theta2);
+    boxGen->SetPRange     (0.,momentum);
+    boxGen->SetPhiRange   (0.,360.);
+    boxGen->SetXYZ(0.,0.,1250.);
+    // add the box generator
+    primGen->AddGenerator(boxGen);
   } 
 
   if (fGenerator.CompareTo("land") == 0  ) {
-  // 2- Define the Land generator
-  //Double_t pdgId=211; // pion beam
-  //Double_t theta1= 0.;  // polar angle distribution
-  //Double_t theta2= 7.;
-  //Double_t momentum=.8; // 10 GeV/c
-  //boxGen->SetThetaRange (   theta1,   theta2);
-  //boxGen->SetPRange     (momentum,momentum*2.);
-  //boxGen->SetPhiRange   (0.,360.);
-  //boxGen->SetXYZ(0.0,0.0,-1.5);
-  
-  //  const char fname = output.root
-  TString evtFile = "evt_land.root";
-  TString iFile = dir + "/input/" + evtFile;
-  R3BLandGenerator* LandGen = new R3BLandGenerator(iFile.Data());
-  
-  // add the box generator
-  primGen->AddGenerator(LandGen);
+    // 2- Define the Land generator
+    //Double_t pdgId=211; // pion beam
+    //Double_t theta1= 0.;  // polar angle distribution
+    //Double_t theta2= 7.;
+    //Double_t momentum=.8; // 10 GeV/c
+    //boxGen->SetThetaRange (   theta1,   theta2);
+    //boxGen->SetPRange     (momentum,momentum*2.);
+    //boxGen->SetPhiRange   (0.,360.);
+    //boxGen->SetXYZ(0.0,0.0,-1.5);
+    
+    //  const char fname = output.root
+    R3BLandGenerator* LandGen = new R3BLandGenerator("output.root");
+    
+    // add the box generator
+    primGen->AddGenerator(LandGen);
   } 
 
   
- if (fGenerator.CompareTo("r3b") == 0  ) {
-  R3BSpecificGenerator *pR3bGen = new R3BSpecificGenerator();
+  if (fGenerator.CompareTo("r3b") == 0  ) {
+    R3BSpecificGenerator *pR3bGen = new R3BSpecificGenerator();
+    
+    // R3bGen properties
+    pR3bGen->SetBeamInteractionFlag("off");
+    pR3bGen->SetBeamInteractionFlag("off");
+    pR3bGen->SetRndmFlag("off");
+    pR3bGen->SetRndmEneFlag("off");
+    pR3bGen->SetBoostFlag("off");
+    pR3bGen->SetReactionFlag("on");
+    pR3bGen->SetGammasFlag("off");
+    pR3bGen->SetDecaySchemeFlag("off");
+    pR3bGen->SetDissociationFlag("off");
+    pR3bGen->SetBackTrackingFlag("off");
+    pR3bGen->SetSimEmittanceFlag("off");
+    
+    // R3bGen Parameters
+    pR3bGen->SetBeamEnergy(1.); // Beam Energy in GeV
+    pR3bGen->SetSigmaBeamEnergy(1.e-03); // Sigma(Ebeam) GeV
+    pR3bGen->SetParticleDefinition(2212); // Use Particle Pdg Code
+    pR3bGen->SetEnergyPrim(0.3); // Particle Energy in MeV
+    Int_t fMultiplicity = 50;
+    pR3bGen->SetNumberOfParticles(fMultiplicity); // Mult.
+    
+    // Reaction type
+    //        1: "Elas"
+    //        2: "iso"
+    //        3: "Trans"
+    pR3bGen->SetReactionType("Elas");
+    
+    // Target  type
+    //        1: "LeadTarget"
+    //        2: "Parafin0Deg"
+    //        3: "Parafin45Deg"
+    //        4: "LiH"
+    
+    pR3bGen->SetTargetType(Target.Data());
+    Double_t thickness = (0.11/2.)/10.;  // cm
+    pR3bGen->SetTargetHalfThicknessPara(thickness); // cm
+    pR3bGen->SetTargetThicknessLiH(3.5); // cm
+    pR3bGen->SetTargetRadius(1.); // cm
+    
+    pR3bGen->SetSigmaXInEmittance(1.); //cm
+    pR3bGen->SetSigmaXPrimeInEmittance(0.0001); //cm
 
-  // R3bGen properties
-  pR3bGen->SetBeamInteractionFlag("off");
-  pR3bGen->SetBeamInteractionFlag("off");
-  pR3bGen->SetRndmFlag("off");
-  pR3bGen->SetRndmEneFlag("off");
-  pR3bGen->SetBoostFlag("off");
-  pR3bGen->SetReactionFlag("on");
-  pR3bGen->SetGammasFlag("off");
-  pR3bGen->SetDecaySchemeFlag("off");
-  pR3bGen->SetDissociationFlag("off");
-  pR3bGen->SetBackTrackingFlag("off");
-  pR3bGen->SetSimEmittanceFlag("off");
-
-  // R3bGen Parameters
-  pR3bGen->SetBeamEnergy(1.); // Beam Energy in GeV
-  pR3bGen->SetSigmaBeamEnergy(1.e-03); // Sigma(Ebeam) GeV
-  pR3bGen->SetParticleDefinition(2212); // Use Particle Pdg Code
-  pR3bGen->SetEnergyPrim(0.3); // Particle Energy in MeV
-  Int_t fMultiplicity = 50;
-  pR3bGen->SetNumberOfParticles(fMultiplicity); // Mult.
-
-  // Reaction type
-  //        1: "Elas"
-  //        2: "iso"
-  //        3: "Trans"
-  pR3bGen->SetReactionType("Elas");
-
-  // Target  type
-  //        1: "LeadTarget"
-  //        2: "Parafin0Deg"
-  //        3: "Parafin45Deg"
-  //        4: "LiH"
-
-  pR3bGen->SetTargetType(Target.Data());
-  Double_t thickness = (0.11/2.)/10.;  // cm
-  pR3bGen->SetTargetHalfThicknessPara(thickness); // cm
-  pR3bGen->SetTargetThicknessLiH(3.5); // cm
-  pR3bGen->SetTargetRadius(1.); // cm
-
-  pR3bGen->SetSigmaXInEmittance(1.); //cm
-  pR3bGen->SetSigmaXPrimeInEmittance(0.0001); //cm
-
-  // Dump the User settings
-  pR3bGen->PrintParameters();  
-  primGen->AddGenerator(pR3bGen);
+    // Dump the User settings
+    pR3bGen->PrintParameters();  
+    primGen->AddGenerator(pR3bGen);
   }
 
+
   run->SetGenerator(primGen);
-  
+
+
   //-------Set visualisation flag to true------------------------------------
   if (fVis==kTRUE){
      run->SetStoreTraj(kTRUE);
   }else{
      run->SetStoreTraj(kFALSE);
-  }   
+  }
+  // ------------------------------------------------------------------------   
+
 
   // -----   Initialize simulation run   ------------------------------------
   run->Init();
 
+
   // ------  Increase nb of step for CALO
   Int_t nSteps = -15000;
   gMC->SetMaxNStep(nSteps);
+
 
   // -----   Runtime database   ---------------------------------------------
   Bool_t kParameterMerged = kTRUE;
@@ -639,9 +627,13 @@ void r3ball(Int_t nEvents = 1,
   rtdb->setOutput(parOut);
   rtdb->saveOutput();
   rtdb->print();
+
    
   // -----   Start run   ----------------------------------------------------
-  if (nEvents>0) run->Run(nEvents);
+  if(nEvents > 0) {
+    run->Run(nEvents);
+  }
+
   
   // -----   Finish   -------------------------------------------------------
   timer.Stop();
@@ -655,9 +647,9 @@ void r3ball(Int_t nEvents = 1,
        << "s" << endl << endl;
   // ------------------------------------------------------------------------
 
+
   cout << " Test passed" << endl;
   cout << " All ok " << endl;
-
 }
 
 
