@@ -52,18 +52,25 @@ void r3blandreco(Int_t beamE, Int_t nn, Int_t erel, Int_t d)
 
 
   // ---------------------------------------------------------------------------
-  Double_t Ekin = (Double_t)beamE * 132.;
-  Double_t E = Ekin + 131.917816*931.494028;
-  Double_t p = TMath::Sqrt(TMath::Power(E, 2) -
-			   TMath::Power(131.917816*931.494028, 2));
-  Double_t beta = p / (E + 1.00782503207*931.494028);
+  Double_t beamEnergy;
+  Double_t beamBeta;
+  if(200 == beamE) {
+    beamEnergy=200.;
+    beamBeta=0.5676881;
+  } else if(600 == beamE) {
+    beamEnergy=600.;
+    beamBeta=0.7937626;
+  } else if(1000 == beamE) {
+    beamEnergy=1000.;
+    beamBeta=0.8760237;
+  }
   // ---------------------------------------------------------------------------
-
-
-
+  
+  
+  
   // ----- Connect the Tracking Task -------------------------------------------
   R3BNeutronTracker2D* tracker  = new R3BNeutronTracker2D();
-  tracker->UseBeam(beamE, beta);
+  tracker->UseBeam(beamEnergy, beamBeta);
   tracker->ReadCalibrFile(calibrFile.Data());
   fRun->AddTask(tracker);
   // ---------------------------------------------------------------------------
