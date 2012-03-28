@@ -44,7 +44,12 @@ R3BLandData.cxx
 R3BLandDigiPar.cxx
 R3BConstantFraction.cxx
 R3BLandDigitizer_CFD.cxx
-R3BLandDigiAnalyser.cxx)
+R3BLandDigiAnalyser.cxx
+R3BNeuLandCluster.cxx
+R3BNeuLandClusterFinder.cxx
+R3BNeutronCalibr2D.cxx
+R3BPrimPart.cxx
+R3BNeutronTracker2D.cxx)
 
 # fill list of header files from list of source files
 # by exchanging the file extension

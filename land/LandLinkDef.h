@@ -19,5 +19,11 @@
 #pragma link C++ class R3BLandDigiAnalyser+;
 #pragma link C++ class R3BLandContFact;
 
+#pragma link C++ class R3BNeuLandCluster+;
+#pragma link C++ class R3BNeuLandClusterFinder+;
+#pragma link C++ class R3BNeutronCalibr2D+;
+#pragma link C++ class R3BNeutronTracker2D+;
+#pragma link C++ class R3BPrimPart+;
+
 #endif
 
