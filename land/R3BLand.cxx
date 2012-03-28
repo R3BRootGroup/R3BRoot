@@ -126,7 +126,6 @@ void R3BLand::Initialize()
   fBirkC2 =  9.6e-6/(dP * dP);
 
   useNeuLAND=false;
-
 }
 
 
@@ -444,7 +443,7 @@ void R3BLand::ConstructGeometry() {
     par[3]  = 0.000000; // tmaxfd
     par[4]  = 0.000000; // stemax
     par[5]  = 0.000000; // deemax
-    par[6]  = 0.000100; // epsil
+    par[6]  = 0.000000; // epsil
     par[7]  = 0.000000; // stmin
     pMedFe = new TGeoMedium("Iron", numed,pMatFe, par);
   }
@@ -462,9 +461,9 @@ void R3BLand::ConstructGeometry() {
     density = 1.032000;
     TGeoMixture*
     pMat37 = new TGeoMixture("BC408", nel,density);
-    a = 1.007940;  z = 1.000000;  w = 0.520000;  // H
+    a = 1.007940;  z = 1.000000;  w = 0.0764;  // H
     pMat37->DefineElement(0,a,z,w);
-    a = 12.010700;  z = 6.000000;  w = 0.480000;  // C
+    a = 12.010700;  z = 6.000000;  w = 0.916;  // C
     pMat37->DefineElement(1,a,z,w);
     pMat37->SetIndex(36);
     // Medium: BC408
@@ -476,7 +475,7 @@ void R3BLand::ConstructGeometry() {
     par[3]  = 0.000000; // tmaxfd
     par[4]  = 0.000000; // stemax
     par[5]  = 0.000000; // deemax
-    par[6]  = 0.000100; // epsil
+    par[6]  = 0.000000; // epsil
     par[7]  = 0.000000; // stmin
     pMed37 = new TGeoMedium("BC408", numed,pMat37,par);
   }
@@ -492,9 +491,9 @@ void R3BLand::ConstructGeometry() {
     density = 1.0;
     TGeoMixture*
     pMat38 = new TGeoMixture("CH2", nel,density);
-    a = 1.007940;  z = 1.000000;  w = 0.66;  // H
+    a = 1.007940;  z = 1.000000;  w = 0.857;  // H
     pMat38->DefineElement(0,a,z,w);
-    a = 12.010700;  z = 6.000000;  w = 0.34;  // C
+    a = 12.010700;  z = 6.000000;  w = 0.143;  // C
     pMat38->DefineElement(1,a,z,w);
     pMat38->SetIndex(38);
     // Medium: CH2
@@ -642,11 +641,11 @@ void R3BLand::ConstructLandGeometry(  TGeoVolume* vWorld,  TGeoMedium *Iron, TGe
   zz = 0.;
   aLand->AddNode(trap,3,new TGeoCombiTrans(xx,yy,zz,rot2));
 
-  AddSensitiveVolume(padle_h_box3); //Fe
-  AddSensitiveVolume(padle_h_box4); //Fe
+//  AddSensitiveVolume(padle_h_box3); //Fe
+//  AddSensitiveVolume(padle_h_box4); //Fe
   AddSensitiveVolume(padle_h_box5); //Scint.
 
-  fNbOfSensitiveVol+=3; //? FIXME
+  fNbOfSensitiveVol+=1; //? FIXME
 
   //------------------ Paddle assembly -------------------------------------
   // Iron end paddles
@@ -964,12 +963,15 @@ void R3BLand::StepHistory(){
   Int_t trackNo=gMC->GetStack()->GetCurrentTrackNumber();
   Int_t motherNo=gMC->GetStack()->GetCurrentParentTrackNumber();
   Double_t time=gMC->TrackTime();
+
 /*
   cout << "Prim: " << Nprim<<endl;
   cout << "TrackID: " << trackNo<<endl;
   cout << "MotherID: " << motherNo <<endl;
   cout << "time: " << time <<endl;
+  cout << "PiD: "<<gMC->TrackPid()<<endl;
 */  
+
   if(gMC->TrackPid()==2112 && motherNo<0){
   // we have a primary neutron
      TArrayI proc;  gMC->StepProcesses(proc); 
@@ -986,6 +988,16 @@ void R3BLand::StepHistory(){
         if(proc.At(i)==22 && trackNo<7){
 	   // elastic scattering
 //           cout<<"primary neutron interaction elastic"<<endl;
+           firstHitX[trackNo-1] = gMcTrackPos[0];
+           firstHitY[trackNo-1] = gMcTrackPos[1];
+           firstHitZ[trackNo-1] = gMcTrackPos[2];
+           firstT[trackNo-1] = time;
+  
+        }
+	
+        if(proc.At(i)==13 && trackNo<7){
+	   // elastic scattering
+//           cout<<"primary neutron interaction hadronic"<<endl;
            firstHitX[trackNo-1] = gMcTrackPos[0];
            firstHitY[trackNo-1] = gMcTrackPos[1];
            firstHitZ[trackNo-1] = gMcTrackPos[2];
