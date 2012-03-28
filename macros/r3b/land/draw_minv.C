@@ -17,13 +17,13 @@ void plot_minv_tn()
   h_minv_4n->GetXaxis()->SetRangeUser(0., 1.);
   //h_minv_4n->GetYaxis()->SetRangeUser(0., 1000.);
 
-  TF1 *f1 = new TF1("f1", "gaus", 0.1 - 2*0.038, 0.1 + 2*0.038);
+  TF1 *f1 = new TF1("f1", "gaus", 0.1 - 2*0.037, 0.1 + 2*0.037);
   f1->FixParameter(1, 0.1);
   h_minv_4n->Fit(f1, "NR+");
   cout << f1->GetParameter(1) << "  +-  " << f1->GetParError(1) << endl;
   cout << f1->GetParameter(2) << "  +-  " << f1->GetParError(2) << endl;
 
-  TF1 *f2 = new TF1("f2", "[0]*exp(-[1]*x)", 0.1 + 2*0.038, 1.);
+  TF1 *f2 = new TF1("f2", "[0]*exp(-[1]*x)", 0.1 + 2*0.037, 1.);
   f2->SetLineColor(4);
   h_minv_4n->Fit(f2, "NR+");
   cout << f2->GetParameter(0) << "  +-  " << f2->GetParError(0) << endl;
@@ -59,8 +59,8 @@ void plot_minv_tn()
   l3->Draw();
 
   cout << h_minv_4n->Integral() << endl;
-  cout << 100.*h_minv_4n->Integral(TMath::Nint((0.1 - 2*0.038)/0.01/2.)+1,
-				   TMath::Nint((0.1 + 2*0.038)/0.01/2.)+1) / 
+  cout << 100.*h_minv_4n->Integral(TMath::Nint((0.1 - 2*0.037 + 0.005)/0.01/2.)+1,
+				   TMath::Nint((0.1 + 2*0.037 + 0.005)/0.01/2.)+1) / 
     h_minv_4n->Integral() << endl;
 
   ps1->Close();
