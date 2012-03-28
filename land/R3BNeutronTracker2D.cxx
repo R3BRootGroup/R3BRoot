@@ -1211,7 +1211,7 @@ void R3BNeutronTracker2D::CreateHistograms()
   hErel4->GetXaxis()->SetTitle("Erel (MeV)");
   hErel4->GetYaxis()->SetTitle("Counts");
 
-  hMinv = new TH1F("Minv","Minv for reconstructed hits",4000,0.,40.);
+  hMinv = new TH1F("Minv","Minv for reconstructed hits",2000,-0.01,39.99);
   // hMinv = new TH1F("Minv","Minv for reconstructed hits",1000,0.,1000.);
   hMinv->GetXaxis()->SetTitle("Erel (MeV)");
   hMinv->GetYaxis()->SetTitle("Counts");
@@ -1226,7 +1226,7 @@ void R3BNeutronTracker2D::CreateHistograms()
   hMinv2->GetXaxis()->SetTitle("Erel (MeV)");
   hMinv2->GetYaxis()->SetTitle("Counts");
 
-  hMinv0 = new TH1F("Minv0","Minv for ideal hits",4000,0.,40.);
+  hMinv0 = new TH1F("Minv0","Minv for ideal hits",2000,-0.01,39.99);
   // hMinv0 = new TH1F("Minv0","Minv for ideal hits",1000,0.,1000.);
   hMinv0->GetXaxis()->SetTitle("Erel (MeV)");
   hMinv0->GetYaxis()->SetTitle("Counts");
