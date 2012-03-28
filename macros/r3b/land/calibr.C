@@ -85,7 +85,7 @@ void calibr_2D(Int_t beamE, Int_t erel, Int_t d)
   gStyle->SetPaperSize(32, 32);
   TCanvas *c1 = new TCanvas("c1", "", 10, 10, 900, 900);
   char strPsFile[1000];
-  sprintf(strPsFile, "plots/calibr_%1dAMeV_%1dkeV_%1dm.eps", beamE, erel, d);
+  sprintf(strPsFile, "calibr_%1dAMeV_%1dkeV_%1dm.eps", beamE, erel, d);
   TPostScript *ps1 = new TPostScript(strPsFile, -113);
   ps1->Range(32, 32);
   c1->Divide(2, 2);
