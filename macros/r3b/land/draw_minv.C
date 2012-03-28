@@ -13,9 +13,9 @@ void plot_minv_tn()
   TH1F *h_minv_4n = (TH1F*) file_4n->Get("Minv");
   Style(h_minv_4n, "E_{rel} (MeV)", "events");
   h_minv_4n->SetLineColor(4);
-  h_minv_4n->Rebin(2);
+  // h_minv_4n->Rebin(2);
   h_minv_4n->GetXaxis()->SetRangeUser(0., 1.);
-  //h_minv_4n->GetYaxis()->SetRangeUser(0., 1000.);
+  // h_minv_4n->GetYaxis()->SetRangeUser(0., 1000.);
 
   TF1 *f1 = new TF1("f1", "gaus", 0.1 - 2*0.037, 0.1 + 2*0.037);
   f1->FixParameter(1, 0.1);
@@ -59,8 +59,8 @@ void plot_minv_tn()
   l3->Draw();
 
   cout << h_minv_4n->Integral() << endl;
-  cout << 100.*h_minv_4n->Integral(TMath::Nint((0.1 - 2*0.037 + 0.005)/0.01/2.)+1,
-				   TMath::Nint((0.1 + 2*0.037 + 0.005)/0.01/2.)+1) / 
+  cout << 100.*h_minv_4n->Integral(TMath::Nint((0.1 - 2*0.037 + 0.01)/0.01)+1,
+				   TMath::Nint((0.1 + 2*0.037 + 0.01)/0.01)+1) / 
     h_minv_4n->Integral() << endl;
 
   ps1->Close();
