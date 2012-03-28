@@ -55,7 +55,7 @@ void preCalibr(Int_t beamE, Int_t nn, Int_t erel, Int_t d)
 
 
   // ----- Find clusters -------------------------------------------------------
-  R3BLandClusterFinder* landClusterFinder  = new R3BLandClusterFinder(0);
+  R3BNeuLandClusterFinder* landClusterFinder  = new R3BNeuLandClusterFinder(0);
   fRun->AddTask(landClusterFinder);
   // ---------------------------------------------------------------------------
 
