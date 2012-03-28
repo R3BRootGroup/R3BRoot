@@ -15,7 +15,7 @@ void plot_minv_tn()
   h_minv_4n->SetLineColor(4);
   h_minv_4n->Rebin(2);
   h_minv_4n->GetXaxis()->SetRangeUser(0., 1.);
-  h_minv_4n->GetYaxis()->SetRangeUser(0., 900.);
+  //h_minv_4n->GetYaxis()->SetRangeUser(0., 1000.);
 
   TF1 *f1 = new TF1("f1", "gaus", 0.1 - 2*0.038, 0.1 + 2*0.038);
   f1->FixParameter(1, 0.1);
