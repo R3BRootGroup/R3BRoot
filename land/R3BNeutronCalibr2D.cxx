@@ -46,7 +46,7 @@ InitStatus R3BNeutronCalibr2D::Init()
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) Fatal("Init", "No FairRootManager");
   fArrayDigi = (TClonesArray*) ioman->GetObject("LandDigi");
-  fArrayCluster = (TClonesArray*) ioman->GetObject("LandCluster");
+  fArrayCluster = (TClonesArray*) ioman->GetObject("NeuLandCluster");
      
   CreateHistograms();
 
