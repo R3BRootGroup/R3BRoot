@@ -59,8 +59,8 @@ void plot_minv_tn()
   l3->Draw();
 
   cout << h_minv_4n->Integral() << endl;
-  cout << 100.*h_minv_4n->Integral(TMath::Nint((0.1 - 2*0.037 + 0.01)/0.01)+1,
-				   TMath::Nint((0.1 + 2*0.037 + 0.01)/0.01)+1) / 
+  cout << 100.*h_minv_4n->Integral(TMath::Nint((0.1 - 2*0.037 + 0.01)/0.02)+1,
+				   TMath::Nint((0.1 + 2*0.037 + 0.01)/0.02)+1) / 
     h_minv_4n->Integral() << endl;
 
   ps1->Close();
