@@ -50,11 +50,15 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
         "/include/boost/exception/exception.hpp:"
         "/include/boost/smart_ptr/detail/sp_convertible.hpp:"
         "/include/boost/smart_ptr/shared_ptr.hpp:"  
+        "/include/boost"
 
+        # -- Root warnings when installed in installation dir
+        "/include/root/"
         # -- Root warnings which should not show up in the test setup
         "/include/G__ci.h:"
         "/include/TAttImage.h:"
-        "/include/TBuffer.h:"
+        "/include/TBuffer.h"
+        "/include/TChainElement.h"
         "/include/TCollectionProxyInfo.h"
         "/include/TCut.h:"
         "/include/TEveBoxSet.h:"
@@ -65,6 +69,7 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
         "/include/TFitterMinuit.h:"
         "/include/TGeoMatrix.h:"
         "/include/TGeoPainter.h:"
+        "/include/TGDMLParse.h"
         "/include/TList.h:"
         "/include/TMap.h:"
         "/include/TMatrixT.h:"
@@ -72,7 +77,7 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
         "/include/TMemberInspector.h:"
         "/include/TObjArray.h:"
         "/include/TRefArray.h:"
-        "/include/Math/GenVector/AxisAngle.h:"
+        "/include/TString.h"
         "/include/Minuit2/BasicFunctionGradient.h:"
         "/include/Minuit2/MnUserParameterState.h:"
         "/include/Minuit2/StackAllocator.h:"
@@ -95,24 +100,11 @@ set(CTEST_CUSTOM_WARNING_EXCEPTION
         "/geant3/TGeant3/TGeant3.h:"
         "/geant3/TGeant3/TGeant3TGeo.h:"
 
-        # ignore warnings from Fair base classes for the timebeeing
-	"FairAsciiGenerator.h"
-	"FairPrimaryGenerator.h"
-	"FairGeoMedium.h"
-	"FairDetParAsciiFileIo.h"
-	"FairParamList.h"
-	"FairDetParRootFileIo.h"
-	"FairIonGenerator.cxx"
-	"FairParIo.h"
-	"FairRtdbRun.h"
-	"FairBoxGenerator.cxx"
-	"FairDetParAsciiFileIo.cxx"
-	"FairIonGenerator.h"
-	"FairParRootFileIo.h"
-	"FairLink.cxx"
-	"FairParAsciiFileIo.h"
-	"FairShieldGenerator.h"
-	"FairShieldGenerator.cxx"	
+        # -- Errors which are filtered for the time being
+        # -- MbsAPI is only a copy from elsewhere so don't know what to do
+        # -- FairTSBufferFunctional.h has to be fixed by Tobias
+	"MbsAPI"
+	"FairTSBufferFunctional.h"
   )
 
 # -----------------------------------------------------------

@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 function print_example(){
 echo "##################################################################"
 echo "# To set the required parameters as source and the build         #"
@@ -9,23 +10,20 @@ echo "# during execution and which is defined on the command line.     #"
 echo "# Set all parameters according to your needs.                    #"
 echo "# LINUX_FLAVOUR should be set to the distribution you are using  #"
 echo "# eg Debian, SuSe etc.                                           #"
+echo "# An additional varibale NCPU can overwrite the default number   #"
+echo "# of parallel processes used to compile the project.             #"
+echo "# This can be usefull if one can use a distributed build system  #"
+echo "# like icecream.                                                 #"
 echo "# For example                                                    #"
 echo "#!/bin/bash                                                      #"
 echo "#export LINUX_FLAVOUR=Etch32                                     #"
 echo "#export FAIRSOFT_VERSION=mar08                                   #"
 echo "#export SIMPATH=<path_to_installation_of_external_packages>      #"
-echo "#export BUILDDIR=/tmp/fairroot/build_cbm_\${FAIRSOFT_VERSION}     #"
+echo "#export BUILDDIR=/tmp/fairroot/build_cbm_\${FAIRSOFT_VERSION}    #"
 echo "#export SOURCEDIR=/misc/uhlig/SVN/ctest/cbmroot                  #"
+echo "#export NCPU=100                                                 #"
 echo "##################################################################"
 }
-
-#if test  "x$SIMPATH" = "x" ; then
-#  echo ""                                                             
-#  echo "-- Error -- You don't set the needed variables in this shell script."
-#  echo "-- Error -- Please edit the script and do so."
-#  echo ""
-#  exit 1
-#fi
 
 if [ "$#" -lt "2" ]; then
   echo ""
@@ -83,11 +81,21 @@ export LABEL=$(echo $LABEL1 | sed -e 's#/#_#g')
 # and information about the host
 if [ "$arch" = "linux" ];
 then
-  export number_of_processors=$(cat /proc/cpuinfo | grep processor | wc -l)
+  if [ "$NCPU" != "" ];
+  then
+    export number_of_processors=$NCPU
+  else 
+    export number_of_processors=$(cat /proc/cpuinfo | grep processor | wc -l)
+  fi
   export SITE=$(hostname -f)
 elif [ "$arch" = "darwin" ];
 then
-  export number_of_processors=$(sysctl -n hw.ncpu)
+  if [ "$NCPU" != "" ];
+  then
+    export number_of_processors=$NCPU
+  else 
+    export number_of_processors=$(sysctl -n hw.ncpu)
+  fi
   export SITE=$(hostname -s)
 fi
 
