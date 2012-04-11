@@ -11,7 +11,7 @@ float events;
 int eres;
 char calVersion[10];
 //use 7.05 for DemoZero
-int fGeoVer=1;
+int fGeoVer=10;
 	if(fGeoVer == 0) sprintf(calVersion,"%s","5.0");       
 	if(fGeoVer == 1) sprintf(calVersion,"%s","7.05");       
 	if(fGeoVer == 2) sprintf(calVersion,"%s","7.07");       
@@ -19,7 +19,7 @@ int fGeoVer=1;
 	if(fGeoVer == 4) sprintf(calVersion,"%s","7.17");       
 	if(fGeoVer == 5) sprintf(calVersion,"%s","7.07+7.17");      
 	if(fGeoVer == 6) sprintf(calVersion,"%s","7.09+7.17");      
-	if(fGeoVer == 10) sprintf(calVersion,"%s","8.00");  
+	if(fGeoVer == 10) sprintf(calVersion,"%s","8.11");  
 
 energy = 4.4389;
 energymax = 5.5;

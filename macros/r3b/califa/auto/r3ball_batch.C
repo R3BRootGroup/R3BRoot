@@ -242,7 +242,7 @@ void r3ball_batch(Int_t nEvents = 1,
 	  // 4- CALIFA 7.17, only ENDCAP (in CsI[Tl])
 	  // 5- CALIFA 7.07+7.17, 
 	  // 6- CALIFA 7.09+7.17, (ongoing work)
-	  // 10- CALIFA 8.00, (ongoing work) 
+	  // 10- CALIFA 8.11, (ongoing work) 
 	  // ...
 	  ((R3BCalo *)calo)->SelectGeometryVersion(fGeoVer);
 	  //Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
