@@ -2,7 +2,7 @@
 //
 //   ----- General Macro for R3B CALIFA Analysis results
 //         Author: Hector Alvarez <hector.alvarez@usc.es>
-//         Last Update: 01/09/10
+//         Last Update: 12/04/2012
 //         Comments:
 //			Checks the primary, crystalHits and caloHits characteristics.
 //			User configurable for additional studies.
@@ -10,19 +10,15 @@
 //  -------------------------------------------------------------------------
 //
 //   Usage: 
-//      > root -l checkResults.C
+//      > root -l -b -q  'checkResults_batch.C(nEvents, fGeoVer, fThres, fExpRes, fMult, fEner, maxE, "califaAna.root", "r3bsim.root")'
 //                         
-//     BUT FIRST, select in the //SETTINGS section the simulation features 
-//	(the macro will plot and text information as a function of these settings)
 //  -------------------------------------------------------------------------
 
-void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold=0.000050, Int_t ExpRes=5, 
+void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold=0.050, Int_t ExpRes=5, 
 						Int_t multiplicity=1, Double_t Eproj=1.0, Double_t maxE=1.2, char* title0, char* title1) {
-	//char title0[250];
-	//char title1[250];
 	char calVersion[50];
 	
- TFile *newfile = new TFile("output.root","RECREATE");
+	TFile *newfile = new TFile("output.root","RECREATE");
 
 
 	//SETTINGS 
@@ -35,7 +31,7 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 	// 4- CALIFA 7.17, only ENDCAP (in CsI[Tl])
 	// 5- CALIFA 7.07+7.17, 
 	// 6- CALIFA 7.09+7.17, (ongoing work)
-	// 10- CALIFA 8.00, (ongoing work) 
+	// 10- CALIFA 8.11, only BARREL (ongoing work) 
 	// ...
 	if(fGeoVer == 0) sprintf(calVersion,"%s","5.0");       
 	if(fGeoVer == 1) sprintf(calVersion,"%s","7.05");       
@@ -44,32 +40,26 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 	if(fGeoVer == 4) sprintf(calVersion,"%s","7.17");       
 	if(fGeoVer == 5) sprintf(calVersion,"%s","7.07+7.17");      
 	if(fGeoVer == 6) sprintf(calVersion,"%s","7.09+7.17");      
-	if(fGeoVer == 10) sprintf(calVersion,"%s","8.00");      
+	if(fGeoVer == 10) sprintf(calVersion,"%s","8.11");      
 
-	//Double_t Eproj = 0.50;              //Gamma Energy in projectile frame in MeV 
-	//Int_t totalEvents = 100000;        //Events
-	//Int_t multiplicity = 1;           //Multiplicity (particles per event)
-	
-	//Double_t threshold=0.100;		  //Threshold in MeV
-	//Int_t ExpRes=5;			          //Exp. Resol in MeV
+	//Eproj = Gamma Energy in projectile frame in MeV 
+	//threshold in MeV
+	//ExpRes = Resolution in MeV
 
 	//FOR THE HISTOGRAMS AND PLOTS:
-	//Double_t maxE = 0.60;               //Maximum energy in MeV in the histos
+	//maxE = Maximum energy in MeV in the histos
 	
-	//sprintf(title0,"%s","/Users/hapol/r3broot/macros/r3b/califa/RESULTS_Apr11/2150/R/califaAna.root");  	
- 	//sprintf(title1,"%s","/Users/hapol/r3broot/macros/r3b/califa/RESULTS_Apr11/2150/r3bsim.root");  	
 	TFile *file0 = TFile::Open(title0);
 	TFile *file1 = TFile::Open(title1);
 	
-	//Double_t beta=0.82;
-	Double_t beta=0;
+	Double_t beta=0.81975;
 	//END OF THE SETTING AREA
 	
 	Bool_t BARREL= kFALSE;
 	Bool_t ENDCAP= kFALSE;
 	Double_t minThetaBarrel=0 , maxThetaBarrel=0,	minThetaEndCap=0 , maxThetaEndCap=0;
 
-	if(fGeoVer == 0){ //if(calVersion=="5.0"){
+	if(fGeoVer == 0){ 
 		cout << "Warning: Calorimeter version 5.0 is not supported in this macro! "<< endl;
 	}
 	if( !strcmp(calVersion,"7.05") ){
@@ -117,12 +107,11 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 		BARREL=kTRUE;		
 		ENDCAP=kTRUE;
 	}
-	else if(!strcmp(calVersion,"8.00")){
-		cout << "Using CALIFA version 8.00 "<< endl;
-		minThetaBarrel= 0.;  //Angular coverture of CALIFA 8.0
-		maxThetaBarrel= 0.; //Angular coverture of CALIFA 8.0
+	else if(!strcmp(calVersion,"8.11")){
+		cout << "Using CALIFA version 8.11 "<< endl;
+		minThetaBarrel= 43.16;   //Angular coverture of BARREL 8.11
+		maxThetaBarrel= 135.35;  //Angular coverture of BARREL 8.11
 		BARREL=kTRUE;
-		ENDCAP=kTRUE;
 	}
 	else cout << "Error: Calorimeter version not correctly defined! "<< endl;
 		
@@ -145,23 +134,12 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 	
 	//----  Load R3B specific libraries ---------------------------------------
 	gSystem->Load("libR3Bbase");
-	//gSystem->Load("libR3BGen");
 	gSystem->Load("libR3BPassive");
 	gSystem->Load("libR3BData");
 	gSystem->Load("libR3BCal");
 	gSystem->Load("libR3BCalo");
-	//gSystem->Load("libR3BDch");
-	//gSystem->Load("libR3BGfi");
-	//gSystem->Load("libR3BLand");
-	//gSystem->Load("libR3BmTof");
-	//gSystem->Load("libR3BTof");
-	//gSystem->Load("libR3BTra");
-	//gSystem->Load("libR3BChimera");
-	//gSystem->Load("libELILuMon");
-	
 	
 	gROOT->SetStyle("Default");
-	//gStyle->SetOptTitle(0);
 	gStyle->SetOptStat(0);
 	gStyle->SetOptFit(0);
 	
@@ -198,9 +176,7 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 	TH2F* h4_CC2 = new TH2F("h4_CC2","Phi residuals vs. polar angle",100,0,3.2,100,-0.25,0.25);
 
 	TH1F* h1_EF = new TH1F("h1_EF","Efficiency vs. polar angle",200,0,3.2);
-	//TH1F* h2_EF = new TH1F("h2_EF","Eventos vs. polar angle",1000,0,3.2);
 
-	
 	//BARREL
 	TH1F* h1_Cry_barrel = new TH1F("h1_Cry_barrel","Crystal ID",5850,0,5850);
 	TH1F* h1_Cry_count_barrel = new TH1F("h1_Cry_count_barrel","Crystal ID_count",2,0,3840);
@@ -221,8 +197,6 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 	TH1F* h2_CC_barrel = new TH1F("h2_CC_barrel","Reconstructed (Lorenzt corrected) Primary Energy (MeV)",2000,0,maxE); //Change this maximum energy
 	TH1F* h3_CC_barrel = new TH1F("h3_CC_barrel","Theta residuals if(caloHitsPerEvent==1)",400,-0.25,0.25);
 	TH1F* h4_CC_barrel = new TH1F("h4_CC_barrel","Phi residuals if(caloHitsPerEvent==1)",400,-0.25,0.25);
-	//TH1F* h1_EF_barrel = new TH1F("h1_EF_barrel","Efficiency vs. polar angle",200,0,3.2);
-
 	
 	//ENDCAP
 	TH1F* h1_Cry_endcap = new TH1F("h1_Cry_endcap","Crystal ID",5850,0,5850);
@@ -233,7 +207,6 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 	TH1F* h1_Cal_endcap = new TH1F("h1_Cal_endcap","Nb of Crystals in hit",20,0,20);
 	TH1F* h2_Cal_endcap = new TH1F("h2_Cal_endcap","Hit Energy (MeV)",200,0,3*maxE); //Change this maximum energy
 
-
 	TH1F* h3_Cal_endcap = new TH1F("h3_Cal_endcap","Hit Theta",200,0,3.2);
 	TH1F* h4_Cal_endcap = new TH1F("h4_Cal_endcap","Hit Phi",200,-3.2,3.2);
 	TH1F* h1_TMul_endcap = new TH1F("h1_TMul_endcap","Multiplicities",20,0,20);
@@ -242,12 +215,11 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 	TH1F* h2_CC_endcap = new TH1F("h2_CC_endcap","Reconstructed (Lorenzt corrected) Primary Energy (MeV)",2000,0,maxE); //Change this maximum energy
 	TH1F* h3_CC_endcap = new TH1F("h3_CC_endcap","Theta residuals if(caloHitsPerEvent==1)",400,-0.25,0.25);
 	TH1F* h4_CC_endcap = new TH1F("h4_CC_endcap","Phi residuals if(caloHitsPerEvent==1)",400,-0.25,0.25);
-	//TH1F* h1_EF_endcap = new TH1F("h1_EF_endcap","Efficiency vs. polar angle",200,0,3.2);
-
 	
 	//Additional user defined histos
 	TH2F* h1_User = new TH2F("h1_User","Double hits, ... where?",400,-2.5,2.5,400,-2.5,2.5);
 
+        //Getting trees from files
 	TTree* TCalo = (TTree*)file0->Get("cbmsim");
 	TTree* TCrystal = (TTree*)file1->Get("cbmsim");
 	
@@ -306,7 +278,7 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 		crystalHitsPerEvent = crystalHitCA->GetEntries(); 
 		caloHitsPerEvent = caloHitCA->GetEntries(); 
 		MCtracksPerEvent = MCTrackCA->GetEntries();
-		
+
 		if(crystalHitsPerEvent>0) {
 			crystalHit = new R3BCaloCrystalHit*[crystalHitsPerEvent];
 			for(Int_t j=0;j<crystalHitsPerEvent;j++){
@@ -411,12 +383,10 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 						if(BARREL && caloHit[h]->GetTheta()>minThetaBarrel*TMath::Pi()/180.){
 							h3_CC_barrel->Fill(momentum.Theta() - caloHit[h]->GetTheta());
 							h4_CC_barrel->Fill(momentum.Phi() - caloHit[h]->GetPhi());
-							//h1_EF_barrel->Fill(caloHit[h]->GetTheta());
 						}
 						if(ENDCAP && caloHit[h]->GetTheta()< maxThetaEndCap*TMath::Pi()/180.) {
 							h3_CC_endcap->Fill(momentum.Theta() - caloHit[h]->GetTheta());
 							h4_CC_endcap->Fill(momentum.Phi() - caloHit[h]->GetPhi());
-							//h1_EF_endcap->Fill(caloHit[h]->GetTheta());							
 						}
 					}
 					//else ... one could think in introduce some combinatorial here to see the 
@@ -453,6 +423,10 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 		if(caloHitsPerEvent) delete [] caloHit;
 		if(MCtracksPerEvent) delete [] track;
 	}
+
+
+	// - Canvas Section
+
 	TCanvas* c1 = new TCanvas("MCTrack","MCTrack",0,0,720,900);
 	c1->SetFillColor(0);
 	c1->SetFrameFillColor(0);
@@ -604,8 +578,8 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 	//getting the value of the fit parameters
 	TF1 *myfunc = h2_CC->GetFunction("gaus");
 
-	Double_t mean = myfunc->GetParameter(1); //value of 2st parameter (mean)
-	Double_t sigma = myfunc->GetParameter(2); //value of 2st parameter (sigma)
+	Double_t mean = myfunc->GetParameter(1); //value of 2nd parameter (mean)
+	Double_t sigma = myfunc->GetParameter(2); //value of 3rd parameter (sigma)
 	cout<< "TESTING mean: "<<mean <<",  sigma: "<< sigma<< endl;
 	h2_CC->Draw(); 
 	correlations_2->SetFrameBorderMode(0); correlations_2->SetLogy();
@@ -613,7 +587,7 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 	h3_CC->Fit("gaus","","",-0.03,0.03); 
 	//getting the value of the fit parameters
 	TF1 *myfuncPol = h3_CC->GetFunction("gaus");
-	Double_t sigmaPol = myfuncPol->GetParameter(2); //value of 2st parameter (mean)
+	Double_t sigmaPol = myfuncPol->GetParameter(2); //value of 2nd parameter (mean)
 	cout<< "TESTING sigmaPol: "<< sigmaPol<< endl;
 	h3_CC->Draw(); 
 	correlations_3->SetFrameBorderMode(0);
@@ -661,6 +635,8 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 	c5->cd(4);	User_4->SetFrameBorderMode(0); //h2_EF->Draw();
 	c5->cd();
 
+	Double_t mean_barrel  = 0.; 
+	Double_t sigma_barrel = 0.; 
 	if(BARREL) {
 		//CRYSTAL HIT CANVAS -- ONLY BARREL!!!
 		c2_barrel->cd();
@@ -726,8 +702,8 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 		h2_CC_barrel->Fit("gaus","","",Eproj-0.05*Eproj,Eproj+0.05*Eproj); 
 		//getting the value of the fit parameters
 		TF1 *myfunc_barrel = h2_CC_barrel->GetFunction("gaus");
-		Double_t mean_barrel = myfunc_barrel->GetParameter(1); //value of 2st parameter (mean)
-		Double_t sigma_barrel = myfunc_barrel->GetParameter(2); //value of 2st parameter (mean)
+		Double_t mean_barrel = myfunc_barrel->GetParameter(1); //value of 2nd parameter (mean)
+		Double_t sigma_barrel = myfunc_barrel->GetParameter(2); //value of 3rd parameter (mean)
 		cout<< "TESTING mean_barrel: "<<mean_barrel <<",  sigma_barrel: "<< sigma_barrel<< endl;
 		h2_CC_barrel->Draw(); 
 		correlations_barrel_2->SetFrameBorderMode(0); correlations_barrel_2->SetLogy();
@@ -750,6 +726,8 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 	}
 	
 	
+	Double_t mean_endcap  = 0.; 
+	Double_t sigma_endcap = 0.; 
 	if(ENDCAP) {
 		//CRYSTAL HIT CANVAS -- ONLY ENDCAP!!!
 		c2_endcap->cd();
@@ -839,21 +817,20 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 	}
 	
 	//IN CASE THE FIT IS NOT AUTOMATICALLY DONE PROPERLY...
-	//SOME PREVIOUS RESULT (plot first the energy corrected and check it)!
-	//if(0){
-		mean = 4.98171e+00;       //Mean of energy peak fit
-		sigma = 9.16487e-02;      //Sigma of energy peak fit
-		mean_barrel = 4.99329e+00;       //Mean of energy peak fit
-		sigma_barrel = 7.58946e-02;      //Sigma of energy peak fit
-		mean_endcap = 4.94582e+00;       //Mean of energy peak fit
-		sigma_endcap = 1.16033e-01;      //Sigma of energy peak fit
-		sigmaPol = 1.84747e-02;   //Sigma of polar angle fit
-	//}
+	if(mean<(Eproj-2)||mean>(Eproj+2))                mean = 4.98171e+00;          //Mean of energy peak fit
+	if(sigma<1e-05||sigma>1)                          sigma = 9.16487e-02;         //Sigma of energy peak fit
+	if(mean_barrel<(Eproj-2)||mean_barrel>(Eproj+2))  mean_barrel = 4.99329e+00;   //Mean of energy peak fit
+	if(sigma_barrel<1e-05||sigma_barrel>1)            sigma_barrel = 7.58946e-02;  //Sigma of energy peak fit
+	if(mean_endcap<(Eproj-2)||mean_endcap>(Eproj+2))  mean_endcap = 4.94582e+00;   //Mean of energy peak fit
+	if(sigma_endcap<1e-05||sigma_endcap>1)            sigma_endcap = 1.16033e-01;  //Sigma of energy peak fit
+	if(sigmaPol<1e-05||sigmaPol>1)                    sigmaPol = 1.84747e-02;      //Sigma of polar angle fit
 	
 	//DATA
 	//Previous calculations
-	Int_t particlesInBarrel = h3_T->Integral(minThetaBarrel,maxThetaBarrel);  //angular coverture of BARREL
-	Int_t particlesInEndCap = h3_T->Integral(minThetaEndCap,maxThetaEndCap);  //angular coverture of ENDCAP
+	if(BARREL) { Int_t particlesInBarrel = h3_T->Integral(minThetaBarrel,maxThetaBarrel);  //angular coverture of BARREL
+	} else { Int_t particlesInBarrel = 1; }
+	if(ENDCAP) { Int_t particlesInEndCap = h3_T->Integral(minThetaEndCap,maxThetaEndCap);  //angular coverture of ENDCAP
+        } else { Int_t particlesInEndCap = 1; }
 
 	Double_t resolution = (2.35*sigma*100)/mean;
 	Int_t binLeft2Sigma = h2_CC->FindBin(mean-2*sigma);
@@ -877,8 +854,8 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 	Int_t binRight3Sigma_endcap = h2_CC_endcap->FindBin(mean_endcap+3*sigma_endcap);
 	Int_t photopeakParticles3Sigma_endcap = h2_CC_endcap->Integral(binLeft3Sigma_endcap,binRight3Sigma_endcap);
 	
-	cout << endl << endl 
-		 << "CALIFA version: " << calVersion 
+	cout << endl
+	<< "CALIFA version: " << calVersion 
 	<< "      Particle energy: " << Eproj 
 	<< "      Events:  " << totalEvents  << endl;	
 	cout << "Multiplicity: " <<  multiplicity << " particles/event" << endl;
@@ -896,11 +873,11 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 		cout << "Particles in the Barrel = " << particlesInBarrel << " between angles " << minThetaBarrel << " and " << maxThetaBarrel << endl;
 		cout << "Mean number of crystals with signal in Barrel: " << h1_CryMul_barrel->GetMean() << endl;
 		cout << "Mean number of crystals with signal in Barrel per primary: " << (Double_t)h1_CryMul_barrel->Integral(2,50)/(Double_t)(totalEvents*multiplicity) << endl;
-		cout << "Mean number of crystals with signal in Barrel per primary in Barrel: " //<< (Double_t)h1_CryMul_barrel->GetEntries()/(Double_t)particlesInBarrel NO!
+		cout << "Mean number of crystals with signal in Barrel per primary in Barrel: "
 			<< (Double_t)h1_CryMul_barrel->GetMean()*totalEvents*multiplicity/(Double_t)particlesInBarrel << endl;
 		cout << "Mean number of calorimeter hits in Barrel: " << h1_CalMul_barrel->GetMean() << endl;
 		cout << "Mean number of calorimeter hits in Barrel per primary: " << (Double_t)h1_CalMul_barrel->Integral(2,50)/(Double_t)(totalEvents*multiplicity) << endl;
-		cout << "Mean number of calorimeter hits in Barrel per primary in Barrel: " //<< (Double_t)h1_CalMul_barrel->GetEntries()/(Double_t)particlesInBarrel NO!
+		cout << "Mean number of calorimeter hits in Barrel per primary in Barrel: "
 		<< (Double_t)h1_CalMul_barrel->GetMean()*totalEvents*multiplicity/(Double_t)particlesInBarrel << endl;
 		cout << "Particles in barrel / all particles: " << (Double_t)particlesInBarrel*100/(Double_t)(totalEvents*multiplicity) << "%" << endl<< endl;
 	}
@@ -908,11 +885,11 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 		cout << "Particles in the EndCap = " << particlesInEndCap << " between angles " << minThetaEndCap << " and " << maxThetaEndCap << endl;
 		cout << "Mean number of crystals with signal in EndCap: " << h1_CryMul_endcap->GetMean() << endl;
 		cout << "Mean number of crystals with signal in EndCap per primary: " << (Double_t)h1_CryMul_endcap->Integral(2,50)/((Double_t)(totalEvents*multiplicity)) << endl;
-		cout << "Mean number of crystals with signal in EndCap per primary in EndCap: " //<< (Double_t)h1_CryMul_endcap->GetEntries()/(Double_t)particlesInEndCap NO!
+		cout << "Mean number of crystals with signal in EndCap per primary in EndCap: "
 		<< (Double_t)h1_CryMul_endcap->GetMean()*totalEvents*multiplicity/(Double_t)particlesInEndCap << endl;
 		cout << "Mean number of calorimeter hits in EndCap: " << h1_CalMul_endcap->GetMean() << endl;
 		cout << "Mean number of calorimeter hits in EndCap per primary: " << (Double_t)h1_CalMul_endcap->Integral(2,50)/(Double_t)(totalEvents*multiplicity) << endl;
-		cout << "Mean number of calorimeter hits in EndCap per primary in EndCap: " //<< (Double_t)h1_CalMul_endcap->GetEntries()/(Double_t)particlesInEndCap NO!
+		cout << "Mean number of calorimeter hits in EndCap per primary in EndCap: "
 		<< (Double_t)h1_CalMul_endcap->GetMean()*(Double_t)totalEvents*multiplicity/(Double_t)particlesInEndCap << endl;
 		cout << "Particles in endcap / all particles: " << (Double_t)particlesInEndCap*100/(Double_t)(totalEvents*multiplicity) << "%" << endl<< endl;		
 	}
@@ -929,6 +906,7 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 	TCanvas *ctext = new TCanvas("ctext","Texto",0,0,600,800);
 	ctext->SetFrameFillColor(0);
    	ctext->SetFillColor(0);
+	ctext->cd();
 
  	char oT1[250];char oT2[250];char oT3[250];char oT4[250];char oT5[250];char oT6[250];char oT99[250];
 	char oT7[250];char oT8[250];char oT9[250];char oT10[250];char oT11[250];char oT12[250]; 
@@ -936,6 +914,7 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 	char oT20[250];char oT21[250];char oT22[250];char oT23[250];char oT24[250];char oT25[250];char oT26[250];
 	char oT27[250];	char oT28[250];	char oT29[250];	char oT30[250];	char oT31[250];	char oT32[250];
 	char oT33[250];	char oT34[250];	char oT35[250];	char oT36[250];	char oT37[250];	char oT38[250];
+	char oT39[250];	char oT40[250];	char oT41[250];	char oT42[250];	char oT43[250];	char oT44[250];
 	
   	sprintf(oT1,"%s%s%s%f%s%i","CALIFA version: ",calVersion,";  Particle energy: ",Eproj," MeV;  Events: ",totalEvents);  	
 	sprintf(oT2,"%s%i%s%f%s%i%s","Multiplicity: ",multiplicity,";   Threshold: ",threshold," MeV;    Exp. resolution: ", ExpRes,"%");
@@ -966,84 +945,83 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 	
 	sprintf(oT24,"%s","Photopeak efficiencies"); 
   	sprintf(oT25,"%s%i","Photopeak entries (+-2 sigmas, 95.44%): ",photopeakParticles2Sigma); 
-   	//sprintf(oT12,"%s%i","Photopeak entries (+-3 sigmas, 99.74%): ",photopeakParticles3Sigma); 
-   	sprintf(oT26,"%s%f","Photopeak entries/particles (%): ",(Double_t)photopeakParticles2Sigma*100/(Double_t)(totalEvents*multiplicity));
-	//sprintf(oT14,"%s%f","Photopeak entries/particles (%): ",(Double_t)photopeakParticles3Sigma*100/(Double_t)(totalEvents*multiplicity));
+   	sprintf(oT26,"%s%i","Photopeak entries (+-3 sigmas, 99.74%): ",photopeakParticles3Sigma); 
+   	sprintf(oT27,"%s%f","Photopeak entries/particles (%): ",(Double_t)photopeakParticles2Sigma*100/(Double_t)(totalEvents*multiplicity));
+	sprintf(oT28,"%s%f","Photopeak entries/particles (%): ",(Double_t)photopeakParticles3Sigma*100/(Double_t)(totalEvents*multiplicity));
 
-	if(BARREL)sprintf(oT27,"%s","Photopeak efficiencies (BARREL)"); 
-  	if(BARREL)sprintf(oT28,"%s%i","Photopeak entries (+-2 sigmas, 95.44%): ",photopeakParticles2Sigma_barrel); 
-   	//sprintf(oT12,"%s%i","Photopeak entries (+-3 sigmas, 99.74%): ",photopeakParticles3Sigma_barrel); 
-   	if(BARREL)sprintf(oT29,"%s%f","Photopeak entries/particles (%): ",(Double_t)photopeakParticles2Sigma_barrel*100/(Double_t)(totalEvents*multiplicity));
-	//sprintf(oT14,"%s%f","Photopeak entries/particles (%): ",(Double_t)photopeakParticles3Sigma_barrel*100/(Double_t)(totalEvents*multiplicity));
+	if(BARREL)sprintf(oT29,"%s","Photopeak efficiencies (BARREL)"); 
+  	if(BARREL)sprintf(oT30,"%s%i","Photopeak entries (+-2 sigmas, 95.44%): ",photopeakParticles2Sigma_barrel); 
+   	if(BARREL)sprintf(oT31,"%s%i","Photopeak entries (+-3 sigmas, 99.74%): ",photopeakParticles3Sigma_barrel); 
+   	if(BARREL)sprintf(oT32,"%s%f","Photopeak entries/particles (%): ",(Double_t)photopeakParticles2Sigma_barrel*100/(Double_t)(totalEvents*multiplicity));
+	if(BARREL)sprintf(oT33,"%s%f","Photopeak entries/particles (%): ",(Double_t)photopeakParticles3Sigma_barrel*100/(Double_t)(totalEvents*multiplicity));
 	
-	if(ENDCAP)sprintf(oT30,"%s","Photopeak efficiencies (ENDCAP)"); 
-  	if(ENDCAP)sprintf(oT31,"%s%i","Photopeak entries (+-2 sigmas 95.44%): ",photopeakParticles2Sigma_endcap); 
-   	//sprintf(oT12,"%s%i","Photopeak entries (+-3 sigmas, 99.74%): ",photopeakParticles3Sigma_endcap); 
-   	if(ENDCAP)sprintf(oT32,"%s%f","Photopeak entries/particles (%): ",(Double_t)photopeakParticles2Sigma_endcap*100/(Double_t)(totalEvents*multiplicity));
-	//sprintf(oT14,"%s%f","Photopeak entries/particles (%): ",(Double_t)photopeakParticles3Sigma_endcap*100/(Double_t)(totalEvents*multiplicity));
+	if(ENDCAP)sprintf(oT34,"%s","Photopeak efficiencies (ENDCAP)"); 
+  	if(ENDCAP)sprintf(oT35,"%s%i","Photopeak entries (+-2 sigmas 95.44%): ",photopeakParticles2Sigma_endcap); 
+   	if(ENDCAP)sprintf(oT36,"%s%i","Photopeak entries (+-3 sigmas, 99.74%): ",photopeakParticles3Sigma_endcap); 
+   	if(ENDCAP)sprintf(oT37,"%s%f","Photopeak entries/particles (%): ",(Double_t)photopeakParticles2Sigma_endcap*100/(Double_t)(totalEvents*multiplicity));
+	if(ENDCAP)sprintf(oT38,"%s%f","Photopeak entries/particles (%): ",(Double_t)photopeakParticles3Sigma_endcap*100/(Double_t)(totalEvents*multiplicity));
 	
-	sprintf(oT33,"%s","Photopeak and angle resolution"); 
-  	sprintf(oT34,"%s%f","FWHM (%): ",sigma*235./mean);
-	if(BARREL)sprintf(oT35,"%s%f","FWHM BARREL (%): ",sigma_barrel*235./mean_barrel);
-	if(ENDCAP)sprintf(oT36,"%s%f","FWHM ENDCAP (%): ",sigma_endcap*235./mean_endcap);
-	sprintf(oT37,"%s%f%s%f","Polar angle resolution (sigma in rads, degs): ",sigmaPol,", ",sigmaPol*180/3.141597 ); 
-	//sprintf(oT22,"%s","Hit finder sum over a window of 0.25rad (14.3deg) around each hit with large E."); 
-	sprintf(oT38,"%s","Hit finder sum over all calorimeter crystals."); 
+	sprintf(oT39,"%s%f","Photopeak resolution FWHM (%): ",sigma*235./mean); 
+	if(BARREL)sprintf(oT40,"%s%f","FWHM BARREL (%): ",sigma_barrel*235./mean_barrel);
+	if(ENDCAP)sprintf(oT41,"%s%f","FWHM ENDCAP (%): ",sigma_endcap*235./mean_endcap);
+	sprintf(oT42,"%s%f%s%f","Polar angle resolution (sigma in rads, degs): ",sigmaPol,", ",sigmaPol*180/3.141597 ); 
 
   	TLatex l;
   	l.SetTextSize(0.021);
-  	l.DrawLatex(0.08,0.95,oT1);
-  	l.DrawLatex(0.08,0.92,oT2);
-	
-  	l.DrawLatex(0.08,0.89,oT3);
-  	if(BARREL)l.DrawLatex(0.08,0.85,oT4);
-	if(ENDCAP)l.DrawLatex(0.08,0.82,oT5);
-	l.DrawLatex(0.08,0.79,oT6);
-	l.DrawLatex(0.08,0.76,oT7);
+  	l.DrawLatex(0.08,0.97,oT1);
+  	l.DrawLatex(0.08,0.95,oT2);
+  	l.DrawLatex(0.08,0.93,oT3);
 
-  	if(BARREL)l.DrawLatex(0.08,0.71,oT8);
-  	if(BARREL)l.DrawLatex(0.08,0.69,oT9);
-  	if(BARREL)l.DrawLatex(0.08,0.67,oT10);
-  	if(BARREL)l.DrawLatex(0.08,0.65,oT11);
-  	if(BARREL)l.DrawLatex(0.08,0.63,oT12);
-	if(BARREL)l.DrawLatex(0.08,0.61,oT13);
-	if(BARREL)l.DrawLatex(0.08,0.59,oT14);
-	if(BARREL)l.DrawLatex(0.08,0.57,oT15);
+  	if(BARREL)l.DrawLatex(0.08,0.90,oT4);
+	if(ENDCAP)l.DrawLatex(0.08,0.88,oT5);
+	l.DrawLatex(0.08,0.85,oT6);
+	l.DrawLatex(0.08,0.83,oT7);
 
-  	if(ENDCAP)l.DrawLatex(0.08,0.54,oT16);
-  	if(ENDCAP)l.DrawLatex(0.08,0.52,oT17);
-  	if(ENDCAP)l.DrawLatex(0.08,0.50,oT18);
-  	if(ENDCAP)l.DrawLatex(0.08,0.48,oT19);
-  	if(ENDCAP)l.DrawLatex(0.08,0.46,oT20);
-	if(ENDCAP)l.DrawLatex(0.08,0.44,oT21);
-	if(ENDCAP)l.DrawLatex(0.08,0.42,oT22);
-	if(ENDCAP)l.DrawLatex(0.08,0.40,oT23);
+  	if(BARREL)l.DrawLatex(0.08,0.80,oT8);
+  	if(BARREL)l.DrawLatex(0.08,0.78,oT9);
+  	if(BARREL)l.DrawLatex(0.08,0.76,oT10);
+  	if(BARREL)l.DrawLatex(0.08,0.74,oT11);
+  	if(BARREL)l.DrawLatex(0.08,0.72,oT12);
+	if(BARREL)l.DrawLatex(0.08,0.70,oT13);
+	if(BARREL)l.DrawLatex(0.08,0.68,oT14);
+	if(BARREL)l.DrawLatex(0.08,0.66,oT15);
+
+  	if(ENDCAP)l.DrawLatex(0.08,0.63,oT16);
+  	if(ENDCAP)l.DrawLatex(0.08,0.61,oT17);
+  	if(ENDCAP)l.DrawLatex(0.08,0.59,oT18);
+  	if(ENDCAP)l.DrawLatex(0.08,0.57,oT19);
+  	if(ENDCAP)l.DrawLatex(0.08,0.55,oT20);
+	if(ENDCAP)l.DrawLatex(0.08,0.53,oT21);
+	if(ENDCAP)l.DrawLatex(0.08,0.51,oT22);
+	if(ENDCAP)l.DrawLatex(0.08,0.49,oT23);
 	
-	l.DrawLatex(0.08,0.36,oT24);
-	l.DrawLatex(0.08,0.34,oT25);
-	l.DrawLatex(0.08,0.32,oT26);
+	l.DrawLatex(0.08,0.46,oT24);
+	l.DrawLatex(0.08,0.44,oT25);
+	l.DrawLatex(0.08,0.42,oT26);
+	l.DrawLatex(0.08,0.40,oT27);
+	l.DrawLatex(0.08,0.38,oT28);
 	
-	if(BARREL)l.DrawLatex(0.08,0.29,oT27);
-	if(BARREL)l.DrawLatex(0.08,0.27,oT28);
-	if(BARREL)l.DrawLatex(0.08,0.25,oT29);
+	if(BARREL)l.DrawLatex(0.08,0.35,oT29);
+	if(BARREL)l.DrawLatex(0.08,0.33,oT30);
+	if(BARREL)l.DrawLatex(0.08,0.31,oT31);
+	if(BARREL)l.DrawLatex(0.08,0.29,oT32);
+	if(BARREL)l.DrawLatex(0.08,0.27,oT33);
 	
-	if(ENDCAP)l.DrawLatex(0.08,0.22,oT30);
-	if(ENDCAP)l.DrawLatex(0.08,0.20,oT31);
-	if(ENDCAP)l.DrawLatex(0.08,0.18,oT32);
+	if(ENDCAP)l.DrawLatex(0.08,0.25,oT34);
+	if(ENDCAP)l.DrawLatex(0.08,0.23,oT35);
+	if(ENDCAP)l.DrawLatex(0.08,0.21,oT36);
+	if(ENDCAP)l.DrawLatex(0.08,0.19,oT37);
+	if(ENDCAP)l.DrawLatex(0.08,0.17,oT38);
 	
-	l.DrawLatex(0.08,0.15,oT33);
-	l.DrawLatex(0.08,0.13,oT34);
-	if(BARREL)l.DrawLatex(0.08,0.11,oT35);
-	if(ENDCAP)l.DrawLatex(0.08,0.09,oT36);
-	l.DrawLatex(0.08,0.07,oT37);
-	l.DrawLatex(0.08,0.05,oT38);
+	l.DrawLatex(0.08,0.14,oT39);
+	if(BARREL)l.DrawLatex(0.08,0.12,oT40);
+	if(ENDCAP)l.DrawLatex(0.08,0.10,oT41);
+	l.DrawLatex(0.08,0.08,oT42);
 	
 	l.SetTextSize(0.018);
 	l.DrawLatex(0.08,0.02,title0);
 	l.DrawLatex(0.08,0.01,title1);
 
-  	//ctext->Print("text.gif");
-  	//ctext->Print();
   	ctext->Draw();
   
 	ctext->Modified();
@@ -1063,62 +1041,67 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
   	c6->Print("output.ps)");
 
 
-//**
+	//**
 
-newfile->cd();
-h2_T->Write();
-h3_T->Write();
-h4_T->Write();
-h1_Cry->Write(); 
-h1_Cry_count->Write(); 
-h2_Cry->Write();
-h2_Crybaby->Write();
-h2_Crybabym1->Write();
-h2_Cal->Write();
-h2_Calbaby->Write();
-h2_Calbabym1->Write();
-h3_Cry->Write(); 
-h4_Cry->Write(); 
-h1_Cal->Write(); 
-h3_Cal->Write(); 
-h4_Cal->Write();
-h1_TMul->Write();
-h1_CryMul->Write();
-h1_CalMul->Write();
-h2_CC->Write(); 
-h3_CC->Write();
-h4_CC->Write();
-h1_CC2->Write(); 
-h2_CC2->Write(); 
-h3_CC2->Write(); 
-h4_CC2->Write();
-h1_EF->Write(); 
+	newfile->cd();
+	h2_T->Write();
+	h3_T->Write();
+	h4_T->Write();
+	h1_Cry->Write(); 
+	h1_Cry_count->Write(); 
+	h2_Cry->Write();
+	h2_Crybaby->Write();
+	h2_Crybabym1->Write();
+	h2_Cal->Write();
+	h2_Calbaby->Write();
+	h2_Calbabym1->Write();
+	h3_Cry->Write(); 
+	h4_Cry->Write(); 
+	h1_Cal->Write(); 
+	h3_Cal->Write(); 
+	h4_Cal->Write();
+	h1_TMul->Write();
+	h1_CryMul->Write();
+	h1_CalMul->Write();
+	h2_CC->Write(); 
+	h3_CC->Write();
+	h4_CC->Write();
+	h1_CC2->Write(); 
+	h2_CC2->Write(); 
+	h3_CC2->Write(); 
+	h4_CC2->Write();
+	h1_EF->Write(); 
 	//BARREL
-h1_Cry_barrel->Write();
-h1_Cry_count_barrel->Write(); 
-h2_Cry_barrel->Write();
-h2_Crybaby_barrel->Write();
-h3_Cry_barrel->Write();
-h4_Cry_barrel->Write(); 
-h1_Cal_barrel->Write(); 
-h2_Cal_barrel->Write();
-h2_Calbaby_barrel->Write(); 
-h3_Cal_barrel->Write();
-h4_Cal_barrel->Write();
-h1_TMul_barrel->Write(); 
-h1_CryMul_barrel->Write(); 
-h1_CalMul_barrel->Write();
-h2_CC_barrel->Write(); 
-h3_CC_barrel->Write();
-h4_CC_barrel->Write();
-newfile->Write();
-newfile->Close();
+	h1_Cry_barrel->Write();
+	h1_Cry_count_barrel->Write(); 
+	h2_Cry_barrel->Write();
+	h2_Crybaby_barrel->Write();
+	h3_Cry_barrel->Write();
+	h4_Cry_barrel->Write(); 
+	h1_Cal_barrel->Write(); 
+	h2_Cal_barrel->Write();
+	h2_Calbaby_barrel->Write(); 
+	h3_Cal_barrel->Write();
+	h4_Cal_barrel->Write();
+	h1_TMul_barrel->Write(); 
+	h1_CryMul_barrel->Write(); 
+	h1_CalMul_barrel->Write();
+	h2_CC_barrel->Write(); 
+	h3_CC_barrel->Write();
+	h4_CC_barrel->Write();
+	newfile->Write();
+	newfile->Close();
 
-  	/*ctext->Print("out_10MeV_version7_05_multiplicity1.pdf("); 
-	c1->Print("out_10MeV_version7_05_multiplicity1.pdf"); 	
-  	c2->Print("out_10MeV_version7_05_multiplicity1.pdf"); 
-  	c3->Print("out_10MeV_version7_05_multiplicity1.pdf");
-  	c4->Print("out_10MeV_version7_05_multiplicity1.pdf)");*/
+
+	//output file for quick check of resolutions
+	ofstream textout;
+	textout.open("check_resolutions.dat");
+	textout<<(Float_t)photopeakParticles2Sigma*100/(Float_t)(totalEvents*multiplicity)<<endl;
+	textout<<sigma*235./mean<<endl;
+	textout<<sigmaPol*180/3.141597<<endl;
+	textout.close();
+
+
 }
 		
 		

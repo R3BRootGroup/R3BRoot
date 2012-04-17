@@ -4,7 +4,7 @@
 //
 //         Author: Hector Alvarez <hector.alvarez@usc.es>
 //
-//         Last Update: 09/07/10
+//         Last Update: 12/04/2012
 //
 //         Comments:
 //
@@ -136,6 +136,9 @@ void r3ball_batch(Int_t nEvents = 1,
   //- Global Translation  Lab. frame.
   Double_t tx,ty,tz;
 
+  // - Polar angular limits
+  Double_t minTheta=35., maxTheta=55.;
+
 
   // -----   Create R3B geometry --------------------------------------------
   //R3B Cave definition
@@ -232,8 +235,8 @@ void r3ball_batch(Int_t nEvents = 1,
   }
 
   if (fDetList.FindObject("CALIFA") ) {
-      // CALIFA Calorimeter
-      R3BDetector* calo = new R3BCalo("Califa", kTRUE);
+	  // CALIFA Calorimeter
+	  R3BDetector* calo = new R3BCalo("Califa", kTRUE);
 	  //Selecting the geometry
 	  // 0- CALIFA 5.0, including BARREL and ENDCAP.
 	  // 1- CALIFA 7.05, only BARREL
@@ -247,22 +250,24 @@ void r3ball_batch(Int_t nEvents = 1,
 	  ((R3BCalo *)calo)->SelectGeometryVersion(fGeoVer);
 	  //Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
 	  ((R3BCalo *)calo)->SetNonUniformity(fNonUni);
-      // Global position of the Module
-      phi   =  0.0; // (deg)
-      theta =  0.0; // (deg)
-      psi   =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx    =  0.0; // (cm)
-      ty    =  0.0; // (cm)
-      tz    =  0.0; // (cm)
-      //calo->SetRotAnglesEuler(phi,theta,psi);
-      calo->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      calo->SetTranslation(tx,ty,tz);
-      run->AddModule(calo);
+	  // Global position of the Module
+	  phi   =  0.0; // (deg)
+	  theta =  0.0; // (deg)
+	  psi   =  0.0; // (deg)
+	  // Rotation in Ref. Frame.
+	  thetaX =  0.0; // (deg)
+	  thetaY =  0.0; // (deg)
+	  thetaZ =  0.0; // (deg)
+	  // Global translation in Lab
+	  tx    =  0.0; // (cm)
+	  ty    =  0.0; // (cm)
+	  tz    =  0.0; // (cm)
+	  //calo->SetRotAnglesEuler(phi,theta,psi);
+	  calo->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
+	  calo->SetTranslation(tx,ty,tz);
+	  run->AddModule(calo);
+	  // Full polar angle coverage
+	  if(fGeoVer==10) { minTheta=0.; maxTheta=180.; }
   }
 
   // Tracker
@@ -508,11 +513,10 @@ void r3ball_batch(Int_t nEvents = 1,
 	
   if (fGenerator.CompareTo("gammas") == 0  ) {
 	// 2- Define the CALIFA Test gamma generator
-	Double_t pdgId=22; // gamma emission
-	//Double_t pdgId=2212; // proton emission
-//bp	Double_t theta1= 30.;  // polar angle distribution
-//bp	Double_t theta2= 60.;	
-	Double_t momentum=fEnergyP; // 0.010 GeV/c = 10 MeV/c 
+	Double_t pdgId=22; // 22 for gamma emission, 2212 for proton emission 
+	Double_t theta1=minTheta;  // polar angle distribution: lower edge
+	Double_t theta2=maxTheta;  // polar angle distribution: upper edge	
+	Double_t momentum=fEnergyP; // GeV/c 
 	//Double_t momentum=0.808065; // 0.808065 GeV/c (300MeV Kin Energy for protons) 
 	//Double_t momentum=0.31016124; // 0.31016124 GeV/c (50MeV Kin Energy for protons)
 	//Double_t momentum=0.4442972; // 0.4442972 GeV/c (100MeV Kin Energy for protons)
@@ -520,17 +524,13 @@ void r3ball_batch(Int_t nEvents = 1,
 	//Double_t momentum=0.64405; // 0.64405 GeV/c (200MeV Kin Energy for protons) 
 	Int_t multiplicity = fMult;
 	R3BCALIFATestGenerator* gammasGen = new R3BCALIFATestGenerator(pdgId, multiplicity);
-//bp	gammasGen->SetThetaRange (theta1,   theta2);
-        gammasGen->SetThetaRange (35,55); //below 35 nada, above 55 nada
+	gammasGen->SetThetaRange(theta1,theta2);
 	gammasGen->SetCosTheta();
 	gammasGen->SetPRange(momentum,momentum);
-        gammasGen->SetPhiRange(60.,100); //below 50 nada, above 100 nada
+        gammasGen->SetPhiRange(0.,360.);
 
-	//gammasGen->SetXYZ(0.0,0.0,-1.5);
-	//gammasGen->SetXYZ(0.0,0.0,0);
 	gammasGen->SetBoxXYZ(-0.1,0.1,-0.1,0.1,-0.1,0.1);
-        gammasGen->SetLorentzBoost(0);
-	//gammasGen->SetLorentzBoost(0.8197505718204776); //beta=0.81975 for 700 A MeV
+	gammasGen->SetLorentzBoost(0.8197505718204776); //beta=0.81975 for 700 A MeV
 	// add the gamma generator
 	primGen->AddGenerator(gammasGen);
   } 

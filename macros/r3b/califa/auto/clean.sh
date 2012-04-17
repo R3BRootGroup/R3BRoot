@@ -1,3 +1,5 @@
+#!/bin/bash
+
 rm -rf RESULTS
 rm out_check.txt
 rm output.ps
