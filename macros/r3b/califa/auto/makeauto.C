@@ -61,9 +61,11 @@ void makeauto()
 		fole<<"ps2pdf output.ps"<<endl;
 		fole<<"mv output.pdf "<<calVersion<<"_"<<energy<<"_res"<<eres<<".pdf"<<endl;
 		fole<<"mv output.root "<<calVersion <<"_"<<energy<<"_res"<<eres<<"n"<<events<<".root"<<endl;
-		fole<<"rm output.ps";
+		fole<<"rm output.ps"<<endl;
 
 	}
+
+	fole<<". check_resolutions.sh";
 
 	fole.close();
 
