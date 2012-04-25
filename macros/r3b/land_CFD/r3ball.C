@@ -75,6 +75,7 @@ void r3ball(Int_t nEvents = 1,
   gSystem->Load("libGenVector");
 
   gSystem->Load("libGeoBase");
+  gSystem->Load("libFairDB");
   gSystem->Load("libParBase");
   gSystem->Load("libBase");
   gSystem->Load("libMCStack");
@@ -348,6 +349,7 @@ void r3ball(Int_t nEvents = 1,
       // Int_t version = 2;
       //R3BDetector* land = new R3BNeuLand("Land", kTRUE);
       R3BDetector* land = new R3BLand("Land", kTRUE);
+      land->SetVerboseLevel(2);
       //((R3BNeuLand*) land)->SetGeomVersion(version);
 
       // Global position of the Module
