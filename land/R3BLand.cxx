@@ -365,20 +365,20 @@ void R3BLand::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
 
 // -----  Private method AddHit  --------------------------------------------
 R3BLandPoint* R3BLand::AddHit(Int_t trackID, Int_t detID, Int_t box, Int_t id1, Int_t id2,
-          TVector3 posIn,
-          TVector3 posOut, TVector3 momIn,
-          TVector3 momOut, Double_t time,
-          Double_t length, Double_t eLoss, Double_t lightYield) {
+			      TVector3 posIn,
+			      TVector3 posOut, TVector3 momIn,
+			      TVector3 momOut, Double_t time,
+			      Double_t length, Double_t eLoss, Double_t lightYield)
+{
   TClonesArray& clref = *fLandCollection;
   Int_t size = clref.GetEntriesFast();
-  if (fVerboseLevel>1) 
-/*
-   cout << "-I- R3BLand: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
-   << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
-   << trackID << ", energy loss " << eLoss  << " GeV" << endl;
-*/
+  if (fVerboseLevel>1) {
+    cout << "-I- R3BLand: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
+	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
+	 << trackID << ", energy loss " << eLoss  << " GeV" << endl;
+  }
   return new(clref[size]) R3BLandPoint(trackID, detID, box, id1, id2,  posIn, posOut,
-            momIn, momOut, time, length, eLoss, lightYield);
+				       momIn, momOut, time, length, eLoss, lightYield);
 }
 
 R3BLandFirstHits* R3BLand::AddHit1(Double_t x0, Double_t y0, Double_t z0, Double_t t0,
