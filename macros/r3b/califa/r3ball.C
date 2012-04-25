@@ -4,7 +4,7 @@
 //
 //         Author: Hector Alvarez <hector.alvarez@usc.es>
 //
-//         Last Update: 09/07/10
+//         Last Update: 25/04/2012
 //
 //         Comments:
 //
@@ -47,7 +47,7 @@ void r3ball(Int_t nEvents = 1,
   gSystem->Setenv("CONFIG_DIR",r3b_confdir.Data());
 
 // Output files
-  TString OutFile = "muchos_iones.root";
+  TString OutFile = "r3bsim.root";
   TString ParFile = "r3bpar.root";
 
 
@@ -89,7 +89,7 @@ void r3ball(Int_t nEvents = 1,
   gSystem->Load("libR3BmTof");
   gSystem->Load("libR3BTof");
   gSystem->Load("libR3BTra");
-  gSystem->Load("libR3BChimera");
+  //gSystem->Load("libR3BChimera");
   gSystem->Load("libELILuMon");
  
   // -----   Create simulation run   ----------------------------------------

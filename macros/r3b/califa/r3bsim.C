@@ -4,7 +4,7 @@
 // Steering macros to main r3ball.C
 // Author: Hector Alvarez <hector.alvarez@usc.es>
 //
-// Last Update: 09/07/010
+// Last Update: 25/04/2012
 // Comments:
 //
 //
@@ -85,13 +85,13 @@ Int_t r3bsim(){
     TObjString det10("LAND");
 
     TObjArray fDetList;
-    fDetList.Add(&det0);
+    //fDetList.Add(&det0);
     //fDetList.Add(&det2);
     fDetList.Add(&det3);
     //fDetList.Add(&det5);
     //fDetList.Add(&det6);
     //fDetList.Add(&det7);
-    fDetList.Add(&det8);
+    //fDetList.Add(&det8);
     //fDetList.Add(&det9);
     //fDetList.Add(&det10);
 
@@ -100,7 +100,7 @@ Int_t r3bsim(){
    //- N# of Sim. Events   |    nEvents     (Int_t)
    //-------------------------------------------------
 
-   Int_t nEvents = 100000;
+   Int_t nEvents = 100;
 
    //-------------------------------------------------
    //- EventDisplay        |    fEventDisplay (Bool_t)
