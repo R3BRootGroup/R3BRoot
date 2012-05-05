@@ -19,6 +19,8 @@ void basiclibs()
   gSystem->Load("libNet");  
   gSystem->Load("libTree"); 
   gSystem->Load("libMinuit");
+  gSystem->Load("libProof");
+  gSystem->Load("libProofPlayer");
   gSystem->Load("libFairDB");
   gSystem->Load("libFairTools");
 }  
