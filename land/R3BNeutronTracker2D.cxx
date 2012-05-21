@@ -24,7 +24,7 @@
 #include "R3BLandFirstHits.h"
 #include "R3BMCTrack.h"		
 #include "R3BLandPoint.h"
-#include "R3BNeutronTrack.h"
+#include "R3BNeutHit.h"
 #include "R3BNeutronTracker2D.h"
 
 using std::cout;
@@ -95,8 +95,8 @@ InitStatus R3BNeutronTracker2D::Init()
   fArrayCluster = (TClonesArray*) ioman->GetObject("NeuLandCluster");
 
   // New structure created by the Neutron Tracker
-  fNeutronTracks = new TClonesArray("R3BNeutronTrack");
-  ioman->Register("LandNeTracks", "Neutron Tracks", fNeutronTracks, kTRUE);
+  fNeutHits = new TClonesArray("R3BNeutHit");
+  ioman->Register("LandNeutHits", "Neutron Hits", fNeutHits, kTRUE);
 
   npaddles = fLandDigiPar->GetMaxPaddle()+1;
   nplanes = fLandDigiPar->GetMaxPlane();
@@ -374,6 +374,10 @@ Int_t R3BNeutronTracker2D::AdvancedMethod()
       mapUsed[ic] = kTRUE;
       fNofHits[fNofTracks] += 1;
       fMapTracks[fNofTracks] = kTRUE;
+      new ((*fNeutHits)[fNofTracks]) R3BNeutHit(pos.X(),
+						pos.Y(),
+						pos.Z(),
+						cluster->GetStartT());
       nOutput += 1;
       fNofTracks += 1;
       break;
@@ -811,25 +815,21 @@ void R3BNeutronTracker2D::CalculateMassInv()
 
 
 
-  for (Int_t i = 0; i < fNofTracks; i++) {
+  R3BNeutHit *hit;
+  for (Int_t i = 0; i < fNeutHits->GetEntriesFast(); i++) {
     // add up momentum of neutrons
     // neutron: beta is calculated with position and time of first hit
+
+    hit = (R3BNeutHit*) fNeutHits->At(i);
       
-    R3BNeuLandCluster *c1 = fVectorCluster.at(fTracks[i][0]);
-    TVector3 pos;
-    c1->StartPosition(pos);
-    Double_t s = pos.Mag();
-    Double_t rr = pos.Perp();
-      
-    h_theta->Fill(TMath::RadToDeg()*TMath::ATan2(rr, pos.Z()));
-      
-    Double_t beta = s/c1->GetStartT()/c;
-    Double_t gamma = 1./sqrt(1.-beta*beta);
-    Double_t momentumT = beta*gamma*mNeutron;
-    Double_t momentumZ = momentumT*cos(TMath::ATan2(rr, pos.Z()));
-    Double_t momentumX = momentumZ*pos.X()/pos.Z();
-    Double_t momentumY = momentumZ*pos.Y()/pos.Z();
-    Double_t energy = gamma*1.0086649*amu; //total energy neutron
+    Double_t momentumT = hit->GetP();
+    Double_t momentumZ = momentumT*
+      cos(TMath::ATan2(TMath::Sqrt(hit->GetX()*hit->GetX() +
+				   hit->GetY()*hit->GetY()),
+		       hit->GetZ()));
+    Double_t momentumX = momentumZ*hit->GetX()/hit->GetZ();
+    Double_t momentumY = momentumZ*hit->GetY()/hit->GetZ();
+    Double_t energy = TMath::Sqrt(momentumT*momentumT + mNeutron*mNeutron);
 
     sum_energy += energy;
     sum_momentumX += momentumX;
@@ -845,7 +845,9 @@ void R3BNeutronTracker2D::CalculateMassInv()
     for(Int_t ip = 0; ip < fLandPoints->GetEntriesFast(); ip++) {
       point = (R3BLandPoint*) fLandPoints->At(ip);
       point->PositionIn(posPoint);
-      d = (pos-posPoint).Mag();
+      d = TMath::Sqrt(TMath::Power(hit->GetX() - posPoint.X(), 2) +
+		      TMath::Power(hit->GetY() - posPoint.Y(), 2) +
+		      TMath::Power(hit->GetZ() - posPoint.Z(), 2));
       if(d < dmin) {
     	dmin = d;
     	index = ip;
@@ -884,7 +886,9 @@ void R3BNeutronTracker2D::CalculateMassInv()
       
     dmin = 1e6;
     for(Int_t ifh = 0; ifh < 4; ifh++) {
-      d = (pos - fhv[ifh]).Mag();
+      d = TMath::Sqrt(TMath::Power(hit->GetX() - fhv[ifh].X(), 2) +
+		      TMath::Power(hit->GetY() - fhv[ifh].Y(), 2) +
+		      TMath::Power(hit->GetZ() - fhv[ifh].Z(), 2));
       if(d < dmin) {
     	dmin = d;
     	index = ifh;
@@ -895,9 +899,9 @@ void R3BNeutronTracker2D::CalculateMassInv()
     // hDeltaY->Fill((pos-fhv[1]).Y());
     // hDeltaZ->Fill((pos-fhv[1]).Z());
 
-    hDeltaX->Fill((pos-fhv[index]).X());
-    hDeltaY->Fill((pos-fhv[index]).Y());
-    hDeltaZ->Fill((pos-fhv[index]).Z());
+    hDeltaX->Fill(hit->GetX()-fhv[index].X());
+    hDeltaY->Fill(hit->GetY()-fhv[index].Y());
+    hDeltaZ->Fill(hit->GetZ()-fhv[index].Z());
   }// tracks
 
       	
@@ -1095,6 +1099,8 @@ void R3BNeutronTracker2D::Reset()
     }
     fNofHits[i] = 0;
   }
+
+  fNeutHits->Clear();
 }   
 // -----------------------------------------------------------------------------
 
@@ -1157,19 +1163,6 @@ void R3BNeutronTracker2D::Finish()
   h_ncl_etot_1->Write();
   h_ndigi_etot->Write();
   h_ncl1_etot->Write();
-}
-// -----------------------------------------------------------------------------
-
-
-
-
-// -----------------------------------------------------------------------------
-R3BNeutronTrack* R3BNeutronTracker2D::AddHit(TVector3 posIn,
-			TVector3 posOut, TVector3 momOut, Double_t time)
-{
-//   TClonesArray& clref = *fNeutronTracks;
-//   Int_t size = clref.GetEntriesFast();
-//   return new(clref[size]) R3BNeutronTrack(posIn, posOut, momOut, time);
 }
 // -----------------------------------------------------------------------------
 

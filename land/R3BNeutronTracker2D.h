@@ -18,7 +18,6 @@
 class TClonesArray;
 class TH1F;
 class TH2F;
-class R3BNeutronTrack;
 
 
 class R3BNeutronTracker2D : public FairTask
@@ -44,17 +43,14 @@ class R3BNeutronTracker2D : public FairTask
   void ReadCalibrFile(char *name);
 
  private:
-  R3BNeutronTrack* AddHit(TVector3 pos_in, TVector3 pos_out,
-                          TVector3 momOut, Double_t time);
   TClonesArray* fLandPoints;
   TClonesArray* fLandMCTrack; 
   TClonesArray* fLandDigi;
   TClonesArray* fLandFirstHits;
+  TClonesArray* fNeutHits;
 
   // Parameter class
   R3BLandDigiPar* fLandDigiPar;
-
-  TClonesArray* fNeutronTracks;
 
   // Add here control hist for tracker
   TH1F *hNeutmult;
