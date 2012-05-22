@@ -50,9 +50,7 @@ R3BNeuLandClusterFinder.cxx
 R3BNeutronCalibr2D.cxx
 R3BPrimPart.cxx
 R3BNeutronTracker2D.cxx
-R3BNeutHit.cxx
-R3BNeuLandTestbeam.cxx
-R3BNeuLandDigitizerTestbeam.cxx)
+R3BNeutHit.cxx)
 
 # fill list of header files from list of source files
 # by exchanging the file extension
