@@ -26,8 +26,5 @@
 #pragma link C++ class R3BPrimPart+;
 #pragma link C++ class R3BNeutHit+;
 
-#pragma link C++ class R3BNeuLandTestbeam+;
-#pragma link C++ class R3BNeuLandDigitizerTestbeam+;
-
 #endif
 
