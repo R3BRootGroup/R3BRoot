@@ -186,6 +186,7 @@ Int_t R3BAsciiGenerator::RegisterIons() {
   Double_t vx      = 0.;
   Double_t vy      = 0.;
   Double_t vz      = 0.;
+  Double_t iMass      = 0.;
 
   fIonMap.clear();
 
@@ -195,7 +196,7 @@ Int_t R3BAsciiGenerator::RegisterIons() {
     if ( fInputFile->eof() ) continue;
 
     for (Int_t iTrack=0; iTrack<nTracks; iTrack++) {
-      *fInputFile >> iPid >> iZ >> iA >> px >> py >> pz >> vx >> vy >> vz;
+      *fInputFile >> iPid >> iZ >> iA >> px >> py >> pz >> vx >> vy >> vz >> iMass;
 
       // Ion Case
       if ( iPid < 0 ) {
@@ -203,7 +204,8 @@ Int_t R3BAsciiGenerator::RegisterIons() {
 	sprintf(buffer, "Ion_%d_%d", iA, iZ);
 	TString ionName(buffer);
 	if ( fIonMap.find(ionName) == fIonMap.end() ) {
-	  FairIon* ion = new FairIon(ionName, iZ, iA, iZ);
+	  //FairIon* ion = new FairIon(ionName, iZ, iA, iZ);
+	  FairIon* ion = new FairIon(ionName, iZ, iA, iZ, 0., iMass);
 	  fIonMap[ionName] = ion;
 	  nIons++;
 	}  // new ion
