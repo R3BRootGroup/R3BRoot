@@ -88,6 +88,7 @@ Bool_t R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen) {
   Double_t vx      = 0.;
   Double_t vy      = 0.;
   Double_t vz      = 0.;
+  Double_t iMass      = 0.;
 
 
   // Read event header line from input file
@@ -106,7 +107,7 @@ Bool_t R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen) {
   // Loop over tracks in the current event
   for (Int_t itrack=0; itrack<nTracks; itrack++) {
 
-      *fInputFile >> iPid  >> iZ >> iA >> px >> py >> pz >> vx >> vy >> vz;
+      *fInputFile >> iPid  >> iZ >> iA >> px >> py >> pz >> vx >> vy >> vz >> iMass;
      /*
       cout << "-I- R3BAsciiGenerator: iPid: " << iPid <<
 	  ",   A = " << iA << " Z = " << iZ <<
