@@ -51,6 +51,10 @@ void R3BMagnet::ConstructGeometry(){
     Double_t radl    =        0.;
     Double_t absl    =        0.;
     Int_t numed      =        0 ;
+    Double_t dx,dy,dz;
+    Double_t fDx1, fDx2, fDy1, fDy2, fDz;
+    Double_t thx, phx, thy, phy, thz, phz;
+    
  // Specific Material definition
  // --  Material: Iron
    TGeoMedium * pMedFe=NULL;
@@ -78,6 +82,65 @@ void R3BMagnet::ConstructGeometry(){
     par[7]  = 0.000000; // stmin
     pMedFe = new TGeoMedium("Iron", numed,pMatFe, par);
    }
+   
+   
+   
+      // Material: HeliumGas
+   TGeoMedium * pMed4=NULL;
+   if (gGeoManager->GetMedium("HeliumGas") ){
+       pMed4=gGeoManager->GetMedium("HeliumGas");
+   }else{
+       w       =        0;
+       a       = 4.000000;
+       z       = 2.000000;
+       density = 0.000125;
+       
+       TGeoMaterial*
+	   pMat4 = new TGeoMaterial("HeliumGas", a,z,density);
+       pMat4->SetIndex(702);
+       numed   = 20;  // medium number
+       Double_t par[8];
+       par[0]  = 0.000000; // isvol
+       par[1]  = 0.000000; // ifield
+       par[2]  = 0.000000; // fieldm
+       par[3]  = 0.000000; // tmaxfd
+       par[4]  = 0.000000; // stemax
+       par[5]  = 0.000000; // deemax
+       par[6]  = 0.000100; // epsil
+       par[7]  = 0.000000; // stmin
+
+     pMed4 = new TGeoMedium("HeliumGas", numed,pMat4,par);
+   }   
+   
+   
+   // Material: Aluminum
+   TGeoMedium * pMed21=NULL;
+   if (gGeoManager->GetMedium("Aluminum") ){
+       pMed21=gGeoManager->GetMedium("Aluminum");
+   }else{
+     a       = 26.980000;
+     z       = 13.000000;
+     density = 2.700000;
+     radl    = 8.875105;
+     absl    = 388.793113;
+     TGeoMaterial*
+	 pMat21 = new TGeoMaterial("Aluminum", a,z,density,radl,absl);
+     pMat21->SetIndex(20);
+     // Medium: Aluminum
+     numed   = 20;  // medium number
+     Double_t par[8];
+     par[0]  = 0.000000; // isvol
+     par[1]  = 0.000000; // ifield
+     par[2]  = 0.000000; // fieldm
+     par[3]  = 0.000000; // tmaxfd
+     par[4]  = 0.000000; // stemax
+     par[5]  = 0.000000; // deemax
+     par[6]  = 0.000100; // epsil
+     par[7]  = 0.000000; // stmin
+     pMed21 = new TGeoMedium("Aluminum", numed,pMat21, par);
+   }
+   
+      
 
  // -- Mixture: Air
     TGeoMedium * pMed2=NULL;
@@ -105,19 +168,20 @@ void R3BMagnet::ConstructGeometry(){
      par[7]  = 0.000000; // stmin
      pMed2 = new TGeoMedium("Air", numed,pMat2, par );
    }
-
+      
+    
  // <D.Bertini@gsi.de>
  // version adapted from ALADIN magnet
  // parameters
 
-    Double_t Aladin_width = 156.0;//1.250*m;
+    Double_t Aladin_width = 156.0;//1.250*m; 
     Double_t Aladin_length = 176.0; //1.70*m; Field length is 1.4 m
-    Double_t Aladin_gap = 50.;    //cm
+    Double_t Aladin_gap = 50.;    //cm y-directory
     // Angle / beam axis check me ! (-7.3 deg , +7.2 deg ?)
     //Double_t Aladin_angle = +7.3; // degree
     Double_t Aladin_angle = -7.0; // degree
     Double_t DistanceToTarget = 350.0;  //cm
-    Double_t Yoke_thickness = 50.;     //cm
+    Double_t Yoke_thickness = 50.;     //cm thicknes of lead
 //    Double_t Correction = -119.94;   //cm
     Double_t Correction = -95.0;   //cm
 // Define distance  from target ??? FIXME
@@ -245,7 +309,174 @@ void R3BMagnet::ConstructGeometry(){
    pAWorld->AddNode(pVolFeYoke_down, 2, t2);
    pAWorld->AddNode(pVolFeYoke_left, 3, t3);
    pAWorld->AddNode(pVolFeYoke_right,4, t4);
+   
+   
+   
+//-----------------------------------------------------------   
 
+
+   // Aladin chamber part1
+   // Combi transformation: 
+   dx = 6.000000;
+   dy = 0.000000;
+   dz = 206.0;
+   TGeoRotation *gRot1 = new TGeoRotation();
+   gRot1->RotateX(0.);
+   gRot1->RotateY(-7.000000);
+   gRot1->RotateZ(0.);
+   TGeoCombiTrans *pMatrix58 = new TGeoCombiTrans("", dx,dy,dz,gRot1);
+   
+   // Aladin chamber part2
+   // Combi transformation: 
+   dx = -5.000000;
+   dy = 0.000000;
+   dz = 295.3;
+   TGeoRotation *gRot2 = new TGeoRotation();
+   gRot2->RotateX(0.);
+   gRot2->RotateY(-7.000000);
+   gRot2->RotateZ(0.);
+   TGeoCombiTrans *pMatrix59 = new TGeoCombiTrans("", dx,dy,dz,gRot2);
+   
+   // Aladin chamber part3
+   // Combi transformation: 
+   dx = -11.000000;
+   dy = 0.000000;
+   dz = 343.5;
+   TGeoRotation *gRot3 = new TGeoRotation();
+   gRot3->RotateX(0.);
+   gRot3->RotateY(-7.000000);
+   gRot3->RotateZ(0.);
+   TGeoCombiTrans *pMatrix60 = new TGeoCombiTrans("", dx,dy,dz,gRot3);
+   
+     
+   
+    // Helium-Aladin chamber part1
+   // Combi transformation: 
+   dx = 6.000000;
+   dy = 0.000000;
+   dz = 206.0;
+   TGeoRotation *gRot4 = new TGeoRotation();
+   gRot4->RotateX(0.);
+   gRot4->RotateY(-7.000000);
+   gRot4->RotateZ(0.);
+   TGeoCombiTrans *pMatrix61 = new TGeoCombiTrans("", dx,dy,dz,gRot4);
+   
+    // Helium-Aladin chamber part2
+   // Combi transformation: 
+   dx = -5.000000;
+   dy = 0.000000;
+   dz = 295.3;
+   TGeoRotation *gRot5 = new TGeoRotation();
+   gRot5->RotateX(0.);
+   gRot5->RotateY(-7.000000);
+   gRot5->RotateZ(0.);
+   TGeoCombiTrans *pMatrix62 = new TGeoCombiTrans("", dx,dy,dz,gRot5);
+   
+    // Helium-Aladin chamber part3
+   // Combi transformation: 
+   dx = -11.000000;
+   dy = 0.000000;
+   dz = 343.5;
+   TGeoRotation *gRot6 = new TGeoRotation();
+   gRot6->RotateX(0.);
+   gRot6->RotateY(-7.000000);
+   gRot6->RotateZ(0.);
+   TGeoCombiTrans *pMatrix63 = new TGeoCombiTrans("", dx,dy,dz,gRot6);   
+      
+
+
+   // Aladin chamber part1
+   Double_t xy[8][2];
+   xy[0][0] = 60.90;	xy[0][1] = -21.5;
+   xy[1][0] = 60.90;	xy[1][1] = 21.5;
+   xy[2][0] = -60.90;	xy[2][1] = 21.5;
+   xy[3][0] = -60.90;	xy[3][1] = -21.5;
+   xy[4][0] = 67.1;	xy[4][1] = -22.3;
+   xy[5][0] = 67.1;	xy[5][1] = 22.3;
+   xy[6][0] = -67.1;	xy[6][1] = 22.3;
+   xy[7][0] = -67.1;	xy[7][1] = -22.3;
+   TGeoShape *pAladinChamber1 = new TGeoArb8("AladinChamber1", 72.0, &xy[0][0]);
+   TGeoVolume* pAladinChamberLog1 = new TGeoVolume("AladinChamberLog1",pAladinChamber1, pMed21);  
+//   pAWorld->AddNode(pAladinChamberLog,1,pMatrix58);  
+
+ // Aladin chamber part2
+//   Double_t xy[8][2];
+   xy[0][0] = 67.1;	xy[0][1] = -22.3;
+   xy[1][0] = 67.1;	xy[1][1] = 22.3;
+   xy[2][0] = -67.1;	xy[2][1] = 22.3;
+   xy[3][0] = -67.1;	xy[3][1] = -22.3;
+   xy[4][0] = 69.1;	xy[4][1] = -23.4;
+   xy[5][0] = 69.1;	xy[5][1] = 23.4;
+   xy[6][0] = -69.1;	xy[6][1] = 23.4;
+   xy[7][0] = -69.1;	xy[7][1] = -23.4;
+   TGeoShape *pAladinChamber2 = new TGeoArb8("AladinChamber2", 17.8, &xy[0][0]);
+   TGeoVolume* pAladinChamberLog2 = new TGeoVolume("AladinChamberLog2",pAladinChamber2, pMed21);
+   
+ // Aladin chamber part3
+//   Double_t xy[8][2];
+   xy[0][0] = 69.1;	xy[0][1] = -23.4;
+   xy[1][0] = 69.1;	xy[1][1] = 23.4;
+   xy[2][0] = -69.1;	xy[2][1] = 23.4;
+   xy[3][0] = -69.1;	xy[3][1] = -23.4;
+   xy[4][0] = 79.05;	xy[4][1] = -30.5;
+   xy[5][0] = 79.05;	xy[5][1] = 30.5;
+   xy[6][0] = -79.05;	xy[6][1] = 30.5;
+   xy[7][0] = -79.05;	xy[7][1] = -30.5;
+   TGeoShape *pAladinChamber3 = new TGeoArb8("AladinChamber3", 30.95, &xy[0][0]);
+   TGeoVolume* pAladinChamberLog3 = new TGeoVolume("AladinChamberLog3",pAladinChamber3, pMed21);     
+   
+   
+   
+   // Helium-Aladin chamber part1
+   Double_t ab[8][2];
+   ab[0][0] = 60.40;	ab[0][1] = -21;
+   ab[1][0] = 60.40;	ab[1][1] = 21;
+   ab[2][0] = -60.40;	ab[2][1] = 21;
+   ab[3][0] = -60.40;	ab[3][1] = -21;
+   ab[4][0] = 66.6;	ab[4][1] = -21.8;
+   ab[5][0] = 66.6;	ab[5][1] = 21.8;
+   ab[6][0] = -66.6;	ab[6][1] = 21.8;
+   ab[7][0] = -66.6;	ab[7][1] = -21.8;
+   TGeoShape *pHeliumAladinChamber1 = new TGeoArb8("HeliumAladinChamber1", 72.0, &ab[0][0]);
+   TGeoVolume* pHeliumAladinChamberLog1 = new TGeoVolume("HeliumAladinChamberLog1",pHeliumAladinChamber1, pMed2);
+   
+   // Helium-Aladin chamber part2
+   ab[0][0] = 66.6;	ab[0][1] = -21.8;
+   ab[1][0] = 66.6;	ab[1][1] = 21.8;
+   ab[2][0] = -66.6;	ab[2][1] = 21.8;
+   ab[3][0] = -66.6;	ab[3][1] = -21.8;
+   ab[4][0] = 68.6;	ab[4][1] = -22.9;
+   ab[5][0] = 68.6;	ab[5][1] = 22.9;
+   ab[6][0] = -68.6;	ab[6][1] = 22.9;
+   ab[7][0] = -68.6;	ab[7][1] = -22.9;
+   TGeoShape *pHeliumAladinChamber2 = new TGeoArb8("HeliumAladinChamber2", 17.8, &ab[0][0]);
+   TGeoVolume* pHeliumAladinChamberLog2 = new TGeoVolume("HeliumAladinChamberLog2",pHeliumAladinChamber2, pMed2);
+   
+   // Helium-Aladin chamber part3
+   ab[0][0] = 68.6;	ab[0][1] = -22.9;
+   ab[1][0] = 68.6;	ab[1][1] = 22.9;
+   ab[2][0] = -68.6;	ab[2][1] = 22.9;
+   ab[3][0] = -68.6;	ab[3][1] = -22.9;
+   ab[4][0] = 78.55;	ab[4][1] = -30.0;
+   ab[5][0] = 78.55;	ab[5][1] = 30.0;
+   ab[6][0] = -78.55;	ab[6][1] = 30.0;
+   ab[7][0] = -78.55;	ab[7][1] = -30.0;
+   TGeoShape *pHeliumAladinChamber3 = new TGeoArb8("HeliumAladinChamber3", 30.95, &ab[0][0]);
+   TGeoVolume* pHeliumAladinChamberLog3 = new TGeoVolume("HeliumAladinChamberLog3",pHeliumAladinChamber3, pMed2);        
+   
+   
+   
+   
+   pAWorld->AddNode(pHeliumAladinChamberLog1,1,pMatrix61);
+   pAWorld->AddNode(pHeliumAladinChamberLog2,1,pMatrix62);
+   pAWorld->AddNode(pHeliumAladinChamberLog3,1,pMatrix63);
+   
+   pAWorld->AddNode(pAladinChamberLog1,1,pMatrix58);
+   pAWorld->AddNode(pAladinChamberLog2,1,pMatrix59);
+   pAWorld->AddNode(pAladinChamberLog3,1,pMatrix60);
+ 
+
+   
 }
 
 /*
