@@ -30,6 +30,7 @@ class R3BGfiPoint : public FairMCPoint
   /** Constructor with arguments
    *@param trackID  Index of MCTrack
    *@param detID    Detector ID
+   *@param plane    Module ID
    *@param posIn    Ccoordinates at entrance to active volume [cm]
    *@param posOut   Coordinates at exit of active volume [cm]
    *@param momIn    Momentum of track at entrance [GeV]
@@ -52,6 +53,7 @@ class R3BGfiPoint : public FairMCPoint
 
 
   /** Accessors **/
+  Int_t GetModule()   const { return fModule; }
   Double_t GetXIn()   const { return fX; }
   Double_t GetYIn()   const { return fY; }
   Double_t GetZIn()   const { return fZ; }
