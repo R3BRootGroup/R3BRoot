@@ -169,6 +169,68 @@ void R3BMagnet::ConstructGeometry(){
      pMed2 = new TGeoMedium("Air", numed,pMat2, par );
    }
       
+      
+    // -- Mixture: Steel
+    TGeoMedium * pMedSteel=NULL;
+   if (gGeoManager->GetMedium("Steel") ){
+       pMedSteel=gGeoManager->GetMedium("Steel");
+   }else{
+     Int_t nel     = 3;
+     density = 7.9;
+     TGeoMixture*
+	 pMatSteel = new TGeoMixture("Steel", nel,density);
+     a = 55.845000;   z = 26.000000;  w = 0.710000;  // Fe
+     pMatSteel->DefineElement(0,a,z,w);
+     a = 51.996100;   z = 24.000000;   w = 0.180000;  // Cr
+     pMatSteel->DefineElement(1,a,z,w);
+     a = 58.693400;   z = 28.000000;   w = 0.110000;  // Ni
+     pMatSteel->DefineElement(2,a,z,w);
+     pMatSteel->SetIndex(2);
+     numed   = 23;  // medium number
+     Double_t par[8];
+     par[0]  = 0.000000; // isvol
+     par[1]  = 0.000000; // ifield
+     par[2]  = 0.000000; // fieldm
+     par[3]  = 0.000000; // tmaxfd
+     par[4]  = 0.000000; // stemax
+     par[5]  = 0.000000; // deemax
+     par[6]  = 0.000100; // epsil
+     par[7]  = 0.000000; // stmin
+     pMedSteel = new TGeoMedium("Steel", numed,pMatSteel, par );
+   }
+   
+   
+   // -- Mixture: Mylar: C10H8O4
+    TGeoMedium * pMedMylar=NULL;
+   if (gGeoManager->GetMedium("Mylar") ){
+       pMedMylar=gGeoManager->GetMedium("Mylar");
+   }else{
+     Int_t nel     = 3;
+     density = 1.4;
+     TGeoMixture*
+	 pMatMylar = new TGeoMixture("Mylar", nel,density);
+     a = 12.010700;   z = 6.000000;  w = 0.454545;  // C from formula 10C is 45.4545%
+     pMatMylar->DefineElement(0,a,z,w);
+     a = 1.007940;   z = 1.000000;   w = 0.363636;  // H from formula 8H is 36.33636% 
+     pMatMylar->DefineElement(1,a,z,w);
+     a = 15.999400;   z = 8.000000;   w = 0.181819;  // O from formula 4O is 18.1818%
+     pMatMylar->DefineElement(2,a,z,w);
+     pMatMylar->SetIndex(17);
+     numed   = 31;  // medium number
+     Double_t par[8];
+     par[0]  = 0.000000; // isvol
+     par[1]  = 0.000000; // ifield
+     par[2]  = 0.000000; // fieldm
+     par[3]  = 0.000000; // tmaxfd
+     par[4]  = 0.000000; // stemax
+     par[5]  = 0.000000; // deemax
+     par[6]  = 0.000100; // epsil
+     par[7]  = 0.000000; // stmin
+     pMedMylar = new TGeoMedium("Mylar", numed,pMatMylar, par );
+   }
+         
+      
+      
     
  // <D.Bertini@gsi.de>
  // version adapted from ALADIN magnet
@@ -383,6 +445,31 @@ void R3BMagnet::ConstructGeometry(){
    gRot6->RotateZ(0.);
    TGeoCombiTrans *pMatrix63 = new TGeoCombiTrans("", dx,dy,dz,gRot6);   
       
+      
+      
+    // incoming window - Steel
+   // Combi transformation: 
+   dx = 15.000000;
+   dy = 0.000000;
+   dz = 134.5;
+   TGeoRotation *gRot7 = new TGeoRotation();
+   gRot7->RotateX(0.);
+   gRot7->RotateY(-7.000000);
+   gRot7->RotateZ(0.);
+   TGeoCombiTrans *pMatrix64 = new TGeoCombiTrans("", dx,dy,dz,gRot7); 
+
+    // outgoing window - Mylar
+   // Combi transformation: 
+   dx = -16.000000;
+   dy = 0.000000;
+   dz = 374.5;
+   TGeoRotation *gRot8 = new TGeoRotation();
+   gRot8->RotateX(0.);
+   gRot8->RotateY(-7.000000);
+   gRot8->RotateZ(0.);
+   TGeoCombiTrans *pMatrix65 = new TGeoCombiTrans("", dx,dy,dz,gRot8); 
+
+
 
 
    // Aladin chamber part1
@@ -465,6 +552,19 @@ void R3BMagnet::ConstructGeometry(){
    TGeoVolume* pHeliumAladinChamberLog3 = new TGeoVolume("HeliumAladinChamberLog3",pHeliumAladinChamber3, pMed2);        
    
    
+   // incoming window shape - Steel
+   dx = 61.000000;
+   dy = 26.000000;
+   dz = 0.006500;
+   TGeoShape *pinWINBox = new TGeoBBox("inWINBox", dx,dy,dz);
+   TGeoVolume *pinWINLog = new TGeoVolume("inWINLog",pinWINBox, pMedSteel);
+   
+   // outgoing window shape - Mylar
+   dx = 84.000000;
+   dy = 34.000000;
+   dz = 0.004950;
+   TGeoShape *poutWINBox = new TGeoBBox("outWINBox", dx,dy,dz);
+   TGeoVolume *poutWINLog = new TGeoVolume("outWINLog",poutWINBox, pMedMylar);
    
    
    pAWorld->AddNode(pHeliumAladinChamberLog1,1,pMatrix61);
@@ -475,7 +575,8 @@ void R3BMagnet::ConstructGeometry(){
    pAWorld->AddNode(pAladinChamberLog2,1,pMatrix59);
    pAWorld->AddNode(pAladinChamberLog3,1,pMatrix60);
  
-
+   pAWorld->AddNode(pinWINLog,1,pMatrix64);
+   pAWorld->AddNode(poutWINLog,1,pMatrix65);
    
 }
 
