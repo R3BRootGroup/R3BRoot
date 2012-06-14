@@ -52,6 +52,7 @@ void R3BMagnet::ConstructGeometry(){
     Double_t absl    =        0.;
     Int_t numed      =        0 ;
     Double_t dx,dy,dz;
+    Double_t pDx1,pDx2,pDx3,pDx4,pDy1,pDy2,pDz,pTheta,pPhi,pAlp1,pAlp2;
     Double_t fDx1, fDx2, fDy1, fDy2, fDz;
     Double_t thx, phx, thy, phy, thz, phz;
     
@@ -101,7 +102,7 @@ void R3BMagnet::ConstructGeometry(){
        numed   = 20;  // medium number
        Double_t par[8];
        par[0]  = 0.000000; // isvol
-       par[1]  = 0.000000; // ifield
+       par[1]  = 1.000000; // ifield
        par[2]  = 0.000000; // fieldm
        par[3]  = 0.000000; // tmaxfd
        par[4]  = 0.000000; // stemax
@@ -449,12 +450,12 @@ void R3BMagnet::ConstructGeometry(){
       
     // incoming window - Steel
    // Combi transformation: 
-   dx = 15.000000;
+   dx = 16.400000;
    dy = 0.000000;
-   dz = 134.5;
+   dz = 117.5;
    TGeoRotation *gRot7 = new TGeoRotation();
    gRot7->RotateX(0.);
-   gRot7->RotateY(-7.000000);
+   gRot7->RotateY(-0.500000);
    gRot7->RotateZ(0.);
    TGeoCombiTrans *pMatrix64 = new TGeoCombiTrans("", dx,dy,dz,gRot7); 
 
@@ -469,6 +470,18 @@ void R3BMagnet::ConstructGeometry(){
    gRot8->RotateZ(0.);
    TGeoCombiTrans *pMatrix65 = new TGeoCombiTrans("", dx,dy,dz,gRot8); 
 
+
+
+ // incoming helium chamber befor Aladin
+   // Combi transformation: 
+   dx = 15.500000;
+   dy = 0.000000;
+   dz = 126.1;
+   TGeoRotation *gRot9 = new TGeoRotation();
+   gRot9->RotateX(0.);
+   gRot9->RotateY(-93.700000);
+   gRot9->RotateZ(0.);
+   TGeoCombiTrans *pMatrix66 = new TGeoCombiTrans("", dx,dy,dz,gRot9);
 
 
 
@@ -525,7 +538,7 @@ void R3BMagnet::ConstructGeometry(){
    ab[6][0] = -66.6;	ab[6][1] = 21.8;
    ab[7][0] = -66.6;	ab[7][1] = -21.8;
    TGeoShape *pHeliumAladinChamber1 = new TGeoArb8("HeliumAladinChamber1", 72.0, &ab[0][0]);
-   TGeoVolume* pHeliumAladinChamberLog1 = new TGeoVolume("HeliumAladinChamberLog1",pHeliumAladinChamber1, pMed2);
+   TGeoVolume* pHeliumAladinChamberLog1 = new TGeoVolume("HeliumAladinChamberLog1",pHeliumAladinChamber1, pMed4);
    
    // Helium-Aladin chamber part2
    ab[0][0] = 66.6;	ab[0][1] = -21.8;
@@ -537,7 +550,7 @@ void R3BMagnet::ConstructGeometry(){
    ab[6][0] = -68.6;	ab[6][1] = 22.9;
    ab[7][0] = -68.6;	ab[7][1] = -22.9;
    TGeoShape *pHeliumAladinChamber2 = new TGeoArb8("HeliumAladinChamber2", 17.8, &ab[0][0]);
-   TGeoVolume* pHeliumAladinChamberLog2 = new TGeoVolume("HeliumAladinChamberLog2",pHeliumAladinChamber2, pMed2);
+   TGeoVolume* pHeliumAladinChamberLog2 = new TGeoVolume("HeliumAladinChamberLog2",pHeliumAladinChamber2, pMed4);
    
    // Helium-Aladin chamber part3
    ab[0][0] = 68.6;	ab[0][1] = -22.9;
@@ -549,7 +562,7 @@ void R3BMagnet::ConstructGeometry(){
    ab[6][0] = -78.55;	ab[6][1] = 30.0;
    ab[7][0] = -78.55;	ab[7][1] = -30.0;
    TGeoShape *pHeliumAladinChamber3 = new TGeoArb8("HeliumAladinChamber3", 30.95, &ab[0][0]);
-   TGeoVolume* pHeliumAladinChamberLog3 = new TGeoVolume("HeliumAladinChamberLog3",pHeliumAladinChamber3, pMed2);        
+   TGeoVolume* pHeliumAladinChamberLog3 = new TGeoVolume("HeliumAladinChamberLog3",pHeliumAladinChamber3, pMed4);        
    
    
    // incoming window shape - Steel
@@ -565,18 +578,37 @@ void R3BMagnet::ConstructGeometry(){
    dz = 0.004950;
    TGeoShape *poutWINBox = new TGeoBBox("outWINBox", dx,dy,dz);
    TGeoVolume *poutWINLog = new TGeoVolume("outWINLog",poutWINBox, pMedMylar);
-   
+
+
+   // incoming helium chamber befor Aladin
+   pDx1 = 11.685500;  //down
+   pDx2 = 11.685500;  //down
+   pDx3 = 4.863500;  //up
+   pDx4 = 4.863500;  //up
+   pDy1 = 19.900000;  //down
+   pDy2 = 19.900000;  //up
+   pDz  = 60.400000;
+   pTheta = 0.000000;
+   pPhi = 0.000000;
+   pAlp1 = 0.00000;
+   pAlp2 = 0.00000;
+   TGeoShape *pinHELBox = new TGeoTrap("inHELBox", pDz,pTheta,pPhi,pDy1,pDx1,pDx2,pAlp1,pDy2,pDx3,pDx4,pAlp2);
+   TGeoVolume *pinHELLog = new TGeoVolume("inHELLog",pinHELBox, pMed4);
+    
+       
    
    pAWorld->AddNode(pHeliumAladinChamberLog1,1,pMatrix61);
    pAWorld->AddNode(pHeliumAladinChamberLog2,1,pMatrix62);
    pAWorld->AddNode(pHeliumAladinChamberLog3,1,pMatrix63);
    
-   pAWorld->AddNode(pAladinChamberLog1,1,pMatrix58);
-   pAWorld->AddNode(pAladinChamberLog2,1,pMatrix59);
-   pAWorld->AddNode(pAladinChamberLog3,1,pMatrix60);
+//   pAWorld->AddNode(pAladinChamberLog1,1,pMatrix58);
+//   pAWorld->AddNode(pAladinChamberLog2,1,pMatrix59);
+//   pAWorld->AddNode(pAladinChamberLog3,1,pMatrix60);
  
    pAWorld->AddNode(pinWINLog,1,pMatrix64);
    pAWorld->AddNode(poutWINLog,1,pMatrix65);
+   
+   pAWorld->AddNode(pinHELLog,1,pMatrix66);
    
 }
 
