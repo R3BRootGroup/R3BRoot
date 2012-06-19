@@ -56,7 +56,7 @@ void R3BTarget::ConstructGeometry(){
  if (*fTargetName == "Para45")     return  ConstructGeometry3();
  if (*fTargetName == "LiH")        return  ConstructGeometry4();
  if (*fTargetName == "CTarget")    return  ConstructGeometry5();	//for s318 
- //if (*fTargetName == "CH2Target")    return  ConstructGeometry6(); 	//for s318
+ if (*fTargetName == "CH2Target")    return  ConstructGeometry6(); 	//for s318
 
 }
 
@@ -66,7 +66,8 @@ void R3BTarget::ConstructGeometry1(){
 
     cout << endl;
     cout << "-I- R3BTarget:: ConstructGeometry() "<< endl;
-    cout << "-I- R3BTarget Target type: Lead target (200mg/cm2) "<< endl;
+    //cout << "-I- R3BTarget Target type: Lead target (200mg/cm2) "<< endl;
+    cout << "-I- R3BTarget Target type: Lead target (199mg/cm2) "<< endl;
     cout << endl;
 
   // test of out-of-file geometry definition
@@ -110,7 +111,10 @@ void R3BTarget::ConstructGeometry1(){
    // Combi transformation: 
    dx = 0.000000;
    dy = 0.000000;
-   dz = 0.000000;
+   dz = 0.000000;       //-(0.15+half thickness)
+   //dx = -0.202437;	//s318: including offsets from exp tracker
+   //dy = -0.0776977;	//s318: including offsets from exp tracker
+   //dz = -0.15;		//s318: -(0.15cm)
    // Rotation: 
    thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
@@ -125,7 +129,8 @@ void R3BTarget::ConstructGeometry1(){
    //dz = 0.008810;
    dx = 1.500000;	//s318
    dy = 1.500000;	//s318
-   dz = 0.0176;		//s318
+   //dz = 0.0176;		//s318
+   dz = 0.008766520;		//s318: 199mg/cm2 = 0.17533040mm
    TGeoShape *pLeadTarget = new TGeoBBox("LeadTarget", dx,dy,dz);
  // Volume: leadTarget_log
    TGeoVolume* pleadTarget_log
@@ -627,7 +632,11 @@ void R3BTarget::ConstructGeometry5(){
    // Combi transformation: 
    dx = 0.000000;
    dy = 0.000000;
-   dz = 0.000000;
+   dz = 0.000000;	//-(0.15cm+half thickness)
+   //dx = -0.202437;	//s318: including offsets from exp tracker
+   //dy = -0.0776977;	//s318: including offsets from exp tracker
+   //dz = -0.15;		//s318: (0.15cm)
+   //dz = 0.00;		//justyna
    // Rotation: 
    thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
@@ -642,7 +651,8 @@ void R3BTarget::ConstructGeometry5(){
    //dz = 0.008810;
    dx = 1.500000;	//s318
    dy = 1.500000;	//s318
-   dz = 0.201;		//s318
+   //dz = 0.201;		//s318
+   dz = 0.1005;		//s318 half length?!?
    TGeoShape *pCarbonTarget = new TGeoBBox("CarbonTarget", dx,dy,dz);
  // Volume: CarbonTarget_log
    TGeoVolume* pCarbonTarget_log
@@ -705,7 +715,10 @@ void R3BTarget::ConstructGeometry6(){
    // Combi transformation: 
    dx = 0.000000;
    dy = 0.000000;
-   dz = 0.000000;
+   dz = 0.000000;       //-(0.15cm+half thickness)
+   //dx = -0.202437;	//s318: including offsets from exp tracker
+   //dy = -0.0776977;	//s318: including offsets from exp tracker
+   //dz = -0.15;		//s318: (0.15cm)
    // Rotation: 
    thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
@@ -720,7 +733,8 @@ void R3BTarget::ConstructGeometry6(){
    //dz = 0.008810;
    dx = 1.500000;	//s318
    dy = 1.500000;	//s318
-   dz = 0.231;		//s318
+   //dz = 0.231;		//s318
+   dz = 0.1155;		//s318
    TGeoShape *pCH2Target = new TGeoBBox("CH2Target", dx,dy,dz);
  // Volume: CH2Target_log
    TGeoVolume* pCH2Target_log
