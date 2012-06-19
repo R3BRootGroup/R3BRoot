@@ -37,6 +37,8 @@ R3BMagnet::R3BMagnet()
 R3BMagnet::R3BMagnet(const char * name, const char *Title)
   : R3BModule(name ,Title)
 {
+fGeometryVersion=1;
+fMedium=0;
 }
 
 void R3BMagnet::ConstructGeometry(){
