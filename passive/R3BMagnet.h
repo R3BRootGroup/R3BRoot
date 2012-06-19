@@ -16,13 +16,14 @@ private:
    Int_t fGeometryVersion; 
    Int_t fMedium;
 
+   void ConstructGeometry1();
+   void ConstructGeometry2();
+
 public:
     R3BMagnet(const char * name, const char *Title="R3B Magnet");
     R3BMagnet();
     virtual ~R3BMagnet();
     void ConstructGeometry();
-    void ConstructGeometry1();
-    void ConstructGeometry2();
     void SetGapMedium(Int_t medium){fMedium=medium;};
     void SelectGeometry(Int_t version){fGeometryVersion=version;};
     void ConstructASCIIGeometry();
