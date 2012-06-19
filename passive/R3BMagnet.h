@@ -19,6 +19,8 @@ public:
     R3BMagnet();
     virtual ~R3BMagnet();
     void ConstructGeometry();
+    void ConstructGeometry1();
+    void ConstructGeometry2();
     void ConstructASCIIGeometry();
     Bool_t CheckIfSensitive(std::string name);
     ClassDef(R3BMagnet,1) //R3BMagnet
