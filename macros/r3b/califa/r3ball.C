@@ -164,6 +164,15 @@ void r3ball(Int_t nEvents = 1,
   if (fDetList.FindObject("ALADIN") ) {
       fFieldMap = 0;
       R3BModule* mag = new R3BMagnet("AladinMagnet");
+      // Select geometry
+          // 1- Old geometry(default).
+          // 2- New geometry.
+          ((R3BMagnet *)mag)->SelectGeometry(1);
+      // Select gap medium
+          // 0- Air(default)
+          // 1- Vacuum
+          // 2- Helium
+          ((R3BMagnet *)mag)->SetGapMedium(2);
       // Global position of the Module
       phi   =  0.0; // (deg)
       theta =  0.0; // (deg)
