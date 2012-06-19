@@ -39,9 +39,18 @@ R3BMagnet::R3BMagnet(const char * name, const char *Title)
 {
 }
 
-
-
 void R3BMagnet::ConstructGeometry(){
+
+  if(fGeometryVersion==2){
+                          ConstructGeometry2();   
+                         }else{
+                               ConstructGeometry1();
+                              }
+
+}
+
+
+void R3BMagnet::ConstructGeometry1(){
 
     Double_t degrad = TMath::Pi()/180.;
     Double_t w       =        0.;
@@ -611,6 +620,15 @@ void R3BMagnet::ConstructGeometry(){
    pAWorld->AddNode(pinHELLog,1,pMatrix66);
    
 }
+
+
+void R3BMagnet::ConstructGeometry2(){
+
+
+
+
+}
+
 
 /*
 void R3BMagnet::ConstructGeometry(){
