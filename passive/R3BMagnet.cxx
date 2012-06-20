@@ -19,6 +19,7 @@
 #include "TGeoSphere.h"
 #include "TGeoArb8.h"
 #include "TGeoCone.h"
+#include "TGeoTube.h"
 #include "TGeoBoolNode.h"
 #include "TGeoCompositeShape.h"
 #include "TGeoManager.h"
@@ -626,10 +627,837 @@ void R3BMagnet::ConstructGeometry1(){
 
 void R3BMagnet::ConstructGeometry2(){
 
+    cout<<"-I- R3BMagnet::ConstructGeometry2()"  <<endl;
+
+
+    Double_t dx,dy,dz;
+    Double_t thx, phx, thy, phy, thz, phz;
+    Double_t h1, bl1, tl1, alpha1, h2, bl2, tl2, alpha2, ddz;
+    Double_t phi1, phi2,theta,phi,rmax,rmin;
+    Double_t degrad = TMath::Pi()/180.;
+    Double_t w       =        0.;
+    Double_t a       =        0.;
+    Double_t z       =        0.;
+    Double_t density =        0.;
+    Double_t radl    =        0.;
+    Double_t absl    =        0.;
+    Int_t numed      =        0 ;
+
+   // Specific Material definition
+   // --  Material: Iron
+   TGeoMedium * pMedFe=NULL;
+   if (gGeoManager->GetMedium("Iron") ){
+       cout << "-I- TGeoManager: Iron Medium already defined " << endl;
+       pMedFe=gGeoManager->GetMedium("Iron");
+   }else{
+    w       =        0.;
+    a       = 55.850000;
+    z       = 26.000000;
+    density = 7.870000;
+    TGeoMaterial*
+	pMatFe = new TGeoMaterial("Iron", a,z,density);
+    pMatFe->SetIndex(701);
+    numed   = 23;  // medium number
+    Double_t par[8];
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 0.000000; // tmaxfd
+    par[4]  = 0.000000; // stemax
+    par[5]  = 0.000000; // deemax
+    par[6]  = 0.000100; // epsil
+    par[7]  = 0.000000; // stmin
+    pMedFe = new TGeoMedium("Iron", numed,pMatFe, par);
+   }
+
+
+   // -- Material: Aluminium
+   TGeoMedium   * pMedAl=NULL;
+   TGeoMaterial * pMatAl=NULL;
+   if (gGeoManager->GetMedium("aluminium") ){
+       cout << "-I- TGeoManager: Aluminium Medium already defined " << endl;
+       pMedAl = gGeoManager->GetMedium("aluminium");
+   }else{
+    a       = 26.980000;
+    z       = 13.000000;
+    density = 2.7000000;
+    pMatAl = new TGeoMaterial("aluminium", a,z,density);
+    pMatAl->SetIndex(601);
+    numed   = 27;  // medium number
+    Double_t par[8];
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 0.000000; // tmaxfd
+    par[4]  = 0.000000; // stemax
+    par[5]  = 0.000000; // deemax
+    par[6]  = 0.000100; // epsil
+    par[7]  = 0.000000; // stmin
+    pMedAl  = new TGeoMedium("aluminium", numed,pMatAl, par);
+   }
+
+    // -- Mixture: Mylar
+    TGeoMedium * pMedMylar=NULL;
+    if (gGeoManager->GetMedium("mylar") ){
+           cout << "-I- TGeoManager: Mylar Medium already defined " << endl;
+	   pMedMylar=gGeoManager->GetMedium("mylar");
+	}else{ 
+		int nel     = 3;
+		density = 1.390000;
+		TGeoMixture*
+		pMylarMaterial = new TGeoMixture("Mylar", nel,density);
+		a = 12.010700;   z = 6.000000;   w = 0.363636;  // C
+		pMylarMaterial->DefineElement(0,a,z,w);
+		a = 1.007940;   z = 1.000000;   w = 0.454545;  // H
+		pMylarMaterial->DefineElement(1,a,z,w);
+		a = 15.999400;   z = 8.000000;   w = 0.181818;  // O
+		pMylarMaterial->DefineElement(2,a,z,w);
+		// Medium: Mylar
+		numed   = 805;  // medium number
+		pMylarMaterial->SetIndex(numed);
+		Double_t par[8];
+		par[0]  = 0.000000; // isvol
+		par[1]  = 0.000000; // ifield
+		par[2]  = 0.000000; // fieldm
+		par[3]  = 0.000000; // tmaxfd
+		par[4]  = 0.000000; // stemax
+		par[5]  = 0.000000; // deemax
+		par[6]  = 0.000100; // epsil
+		par[7]  = 0.000000; // stmin
+		pMedMylar = new TGeoMedium("Mylar", numed, pMylarMaterial, par);
+	}
+
+   // -- Mixture: Air
+   TGeoMedium * pMed2=NULL;
+   if (gGeoManager->GetMedium("Air") ){
+       cout << "-I- TGeoManager: Air Medium already defined " << endl;
+       pMed2=gGeoManager->GetMedium("Air");
+   }else{
+     Int_t nel     = 2;
+     density = 0.0012900;
+     TGeoMixture*
+     pMat2 = new TGeoMixture("Air", nel,density);
+     a = 14.006740;   z = 7.000000;  w = 0.700000;  // N
+     pMat2->DefineElement(0,a,z,w);
+     a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+     pMat2->DefineElement(1,a,z,w);
+     pMat2->SetIndex(700);
+     numed   = 1;  // medium number
+     Double_t par[8];
+     par[0]  = 0.000000; // isvol
+     par[1]  = 0.000000; // ifield
+     par[2]  = 0.000000; // fieldm
+     par[3]  = 0.000000; // tmaxfd
+     par[4]  = 0.000000; // stemax
+     par[5]  = 0.000000; // deemax
+     par[6]  = 0.000100; // epsil
+     par[7]  = 0.000000; // stmin
+     pMed2 = new TGeoMedium("Air", numed,pMat2, par );
+   }
+   
+  
+   // -- Material: HeliumGas
+   TGeoMedium * pMed4=NULL;
+   if (gGeoManager->GetMedium("HeliumGas") ){
+       cout << "-I- TGeoManager: Helium Gas Medium already defined " << endl;
+       pMed4=gGeoManager->GetMedium("HeliumGas");
+   }else{
+       w       =        0;
+       a       = 4.000000;
+       z       = 2.000000;
+       density = 0.000125;
+       TGeoMaterial*
+	   pMat4 = new TGeoMaterial("HeliumGas", a,z,density);
+       pMat4->SetIndex(702);
+       numed   = 20;  // medium number
+       Double_t par[8];
+       par[0]  = 0.000000; // isvol
+       par[1]  = 1.000000; // ifield
+       par[2]  = 0.000000; // fieldm
+       par[3]  = 0.000000; // tmaxfd
+       par[4]  = 0.000000; // stemax
+       par[5]  = 0.000000; // deemax
+       par[6]  = 0.000100; // epsil
+       par[7]  = 0.000000; // stmin
+
+     pMed4 = new TGeoMedium("HeliumGas", numed,pMat4,par);
+   }   
+
+   //-- Material: Vacuum
+   TGeoMedium * pMedVa=NULL;
+   if (gGeoManager->GetMedium("vacuum") ){
+       cout << "-I- TGeoManager: Vacuum Medium already defined " << endl;
+       pMedVa=gGeoManager->GetMedium("vacuum");
+   }else{
+    a       = 1.e-16;
+    z       = 1.e-16;
+    density = 1.e-16;
+    TGeoMaterial*
+    pMatVa = new TGeoMaterial("vacuum", a,z,density);
+    pMatVa->SetIndex(1212);
+    numed   =1212;  // medium number
+    Double_t par[8];
+       par[0]  = 0.000000; // isvol
+       par[1]  = 0.000000; // ifield
+       par[2]  = 0.000000; // fieldm
+       par[3]  = 0.000000; // tmaxfd
+       par[4]  = 0.000000; // stemax
+       par[5]  = 0.000000; // deemax
+       par[6]  = 0.000100; // epsil
+       par[7]  = 0.000000; // stmin
+       pMedVa = new TGeoMedium("vacuum", numed,pMatVa,par);
+   }
+
+   // -- Dimensions and distances --
+   Double_t Aladin_width = 156.0;    // cm
+   Double_t Aladin_length = 176.0;   // cm, Field length is 1.4 m
+   Double_t Aladin_gap = 50.;        // cm
+   Double_t Aladin_angle = -7.0;     // degree
+   Double_t DistanceToTarget = 350.0;// cm
+   Double_t Yoke_thickness = 50.;    // cm
+   Double_t Correction = -95.0;      // cm
+   Double_t DistanceFromtargetToAladinCenter
+	     = DistanceToTarget + Correction;
+
+   // Transformations
+   TGeoRotation *rot_aladin = new TGeoRotation("Aladinrot");
+   rot_aladin->RotateY(Aladin_angle);
+
+
+   // -- Select Gap medium --
+   cout<<"-I- R3BMagnet::SetGapMedium ";
+   TGeoMedium* GapMedium=NULL;
+
+   if(fMedium==2){ 
+                  GapMedium=pMed4;
+                  cout<< " Helium" <<endl;
+                  }else{
+                        if(fMedium==1){
+                                        GapMedium=pMedVa;
+                                        cout<< " Vacuum" <<endl;
+                                        }else{
+                                             GapMedium=pMed2;
+                                             cout<< " Air" <<endl;
+                                             }
+                       }  
+
+
+   // -- Geometry description --
+   TGeoVolume *pAWorld =  gGeoManager->GetTopVolume();
+
+   // Combi transformation: 
+   dx = 0.000000;
+   dy = 0.000000;
+   dz = DistanceToTarget+Correction;
+
+   TGeoCombiTrans* pMatrix = new TGeoCombiTrans("", dx,dy,dz,rot_aladin);
+
+   // Shape: pCWorld type: TGeoBBox
+   dx = Aladin_width+2.0*Yoke_thickness;
+   dy = Aladin_gap+2.0*Yoke_thickness;
+   dz = Aladin_length+64.0;
+   TGeoShape *pCWorld = new TGeoBBox("Aladin", dx/2.,dy/2.,dz/2.);
+   // Volume:
+   TGeoVolume* pWorld = new TGeoVolume("Aladin Box",pCWorld, GapMedium);
+   // Position Volume
+   TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix);
+   pAWorld->AddNodeOverlap(pWorld, 0, pGlobal);
+   
+
+   
+   // -- Aladin: Iron constrains of the magnet --
+
+   // Transformation: 
+   dx = 0.000000;
+   dy = 0.000000;
+   dz = 0.000000;
+   TGeoCombiTrans* pMatrix1 = new TGeoCombiTrans("", dx,dy,dz,0);
+
+   // Shape: TGeoBBox
+   dx = 156.0+144.0+100.0;
+   dy = 150.0+150.0;
+   dz = Aladin_length;
+   TGeoShape *iron = new TGeoBBox("iron", dx/2.,dy/2.,dz/2.);
+
+   // Shape: TGeoBBox
+   dx = Aladin_width;
+   dy = Aladin_gap;
+   dz = Aladin_length+2.0;
+   TGeoShape *iron2 = new TGeoBBox("iron2", dx/2.,dy/2.,dz/2.);
+
+   // Subtraction:
+   TGeoSubtraction* sub20 = new TGeoSubtraction(iron,iron2,pMatrix1,pMatrix1);
+   TGeoShape *sub20s = new TGeoCompositeShape("GE", sub20);
+
+   // Transformation: 
+   dx = 0.000000;
+   dy = 130.5000;
+   dz = 0.000000;
+   TGeoCombiTrans* pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,0);
+
+   // Shape: TGeoTrap
+   ddz    = 180.000;
+   theta  = 0.0;
+   phi    = 0.0;
+   h1     = 40.000;
+   bl1    = 60.000;
+   tl1    = 80.000;
+   alpha1 = 0.000000;
+   h2     = 40.000;
+   bl2    = 60.0000;
+   tl2    = 80.0000;
+   alpha2 = 0.000000;
+   TGeoShape *iron3 = new TGeoTrap("iron3", ddz/2.0,theta,phi,h1/2.0,bl1/2.0,tl1/2.0,alpha1,h2/2.0,bl2/2.0,tl2/2.0,alpha2);
+
+   // Subtraction:
+   TGeoSubtraction* sub21 = new TGeoSubtraction(sub20s,iron3,pMatrix1,pMatrix2);
+   TGeoShape *sub21s = new TGeoCompositeShape("GE", sub21);
+
+   // Transformation: 
+   dx = 200.0000;
+   dy = 122.0000;
+   dz = 0.000000;
+   TGeoCombiTrans* pMatrix3 = new TGeoCombiTrans("", dx,dy,dz,0);
+
+   // Shape: TGeoTrap
+   ddz    = 180.000;
+   theta  = 0.0;
+   phi    = 0.0;
+   h1     = 60.000;
+   bl1    = 1.000;
+   tl1    = 100.000;
+   alpha1 = 0.000000;
+   h2     = 60.000;
+   bl2    = 1.0000;
+   tl2    = 100.0000;
+   alpha2 = 0.000000;
+   TGeoShape *iron4 = new TGeoTrap("iron4", ddz/2.0,theta,phi,h1/2.0,bl1/2.0,tl1/2.0,alpha1,h2/2.0,bl2/2.0,tl2/2.0,alpha2);
+
+   // Subtraction:
+   TGeoSubtraction* sub22 = new TGeoSubtraction(sub21s,iron4,pMatrix1,pMatrix3);
+   TGeoShape *sub22s = new TGeoCompositeShape("GE", sub22);
+
+   // Transformation: 
+   dx = -200.0000;
+   dy = 122.0000;
+   dz = 0.000000;
+   TGeoCombiTrans* pMatrix4 = new TGeoCombiTrans("", dx,dy,dz,0);
+
+   // Shape: TGeoTrap
+   ddz    = 180.000;
+   theta  = 0.0;
+   phi    = 0.0;
+   h1     = 60.000;
+   bl1    = 1.000;
+   tl1    = 100.000;
+   alpha1 = 0.000000;
+   h2     = 60.000;
+   bl2    = 1.0000;
+   tl2    = 100.0000;
+   alpha2 = 0.000000;
+   TGeoShape *sub4 = new TGeoTrap("sub4", ddz/2.0,theta,phi,h1/2.0,bl1/2.0,tl1/2.0,alpha1,h2/2.0,bl2/2.0,tl2/2.0,alpha2);
+
+   // Subtraction:
+   TGeoSubtraction* sub23 = new TGeoSubtraction(sub22s,sub4,pMatrix1,pMatrix4);
+   TGeoShape *sub23s = new TGeoCompositeShape("GE", sub23);
+
+   // Volume:
+   TGeoVolume* magnet_log = new TGeoVolume("magnet_log",sub23s, pMedFe);
+   magnet_log->SetVisLeaves(kTRUE);
+   magnet_log->SetLineColor(4);
+
+   // Position Volume
+   TGeoCombiTrans* pGlobal1 = GetGlobalPosition(pMatrix1);
+   pWorld->AddNode(magnet_log, 0, pGlobal1);
+   
+   
+
+
+   // -- Aladin: Chamber --
+
+   // Combi transformation: 
+   dx = 120.8/2.0+2.4+1.0;
+   dy = 0.000000;
+   dz = -48.750000+17.45;
+   TGeoCombiTrans* pMatrix5 = new TGeoCombiTrans("", dx,dy,dz,0);
+ 
+   // Shape: TGeoTrap
+   ddz    = 178.900;
+   theta  = 2.74;
+   phi    = 0.0;
+   h1     = 42.000;
+   bl1    = 1.000;
+   tl1    = 1.000;
+   alpha1 = 0.000000;
+   h2     = 43.6000;
+   bl2    = 1.0000;
+   tl2    = 1.0000;
+   alpha2 = 0.000000;
+   dx = 2.0;
+   dy = 42.000;
+   dz = 144.00;
+   TGeoShape *cham1 = new TGeoTrap("cham1", ddz/2.0,theta,phi,h1/2.0,bl1/2.0,tl1/2.0,alpha1,h2/2.0,bl2/2.0,tl2/2.0,alpha2);
+   
+   // Volume:
+   TGeoVolume*
+   cham_log1 = new TGeoVolume("cham_log1",cham1, pMedFe);
+   cham_log1->SetVisLeaves(kTRUE);
+   cham_log1->SetLineColor(17);
+
+   // Position Volume
+   TGeoCombiTrans* pGlobal5 = GetGlobalPosition(pMatrix5);
+   pWorld->AddNode(cham_log1, 0, pGlobal5);
+
+   // Combi transformation: 
+   dx = -120.8/2.0-2.4-1.0;
+   dy = 0.000000;
+   dz = -48.750000+17.45;
+   TGeoCombiTrans* pMatrix6 = new TGeoCombiTrans("", dx,dy,dz,0);
+
+   // Shape: TGeoTrap
+   ddz     = 178.900;
+   theta  = -2.74;
+   phi    = 0.0;
+   h1     = 42.000;
+   bl1    = 1.000;
+   tl1    = 1.000;
+   alpha1 = 0.000000;
+   h2     = 43.6000;
+   bl2    = 1.0000;
+   tl2    = 1.0000;
+   alpha2 = 0.000000;
+   dx = 2.0;
+   dy = 42.000;
+   dz = 144.00;
+   TGeoShape *cham2 = new TGeoTrap("cham2", ddz/2.0,theta,phi,h1/2.0,bl1/2.0,tl1/2.0,alpha1,h2/2.0,bl2/2.0,tl2/2.0,alpha2);
+
+   // Volume:
+   TGeoVolume*
+   cham_log2 = new TGeoVolume("cham_log2",cham2, pMedFe);
+   cham_log2->SetVisLeaves(kTRUE);
+   cham_log2->SetLineColor(17);
+
+   // Position Volume
+   TGeoCombiTrans* pGlobal6 = GetGlobalPosition(pMatrix6);
+   pWorld->AddNode(cham_log2, 0, pGlobal6);
+
+   // Combi transformation: 
+   dx = 0.0;
+   dy = 22.00-1.0;
+   dz = -48.75000+34.9/2.;
+   TGeoCombiTrans* pMatrix7 = new TGeoCombiTrans("", dx,dy,dz,0);
+
+   // Shape: TGeoTrap
+   ddz    = 178.900;
+   theta  = 0.31;
+   phi    = 90.0;
+   h1     = 1.000;
+   bl1    = 118.000;
+   tl1    = 118.000;
+   alpha1 = 0.000000;
+   h2     = 1.000;
+   bl2    = 135.2000;
+   tl2    = 135.2000;
+   alpha2 = 0.000000;
+   TGeoShape *cham3 = new TGeoTrap("cham3", ddz/2.0,theta,phi,h1/2.0,bl1/2.0,tl1/2.0,alpha1,h2/2.0,bl2/2.0,tl2/2.0,alpha2);
+
+   // Volume:
+   TGeoVolume*
+   cham_log3 = new TGeoVolume("cham_log3",cham3, pMedFe);
+   cham_log3->SetVisLeaves(kTRUE);
+   cham_log3->SetLineColor(17);
+
+   // Position Volume
+   TGeoCombiTrans* pGlobal7 = GetGlobalPosition(pMatrix7);
+   pWorld->AddNode(cham_log3, 0,  pGlobal7);
+
+   // Combi transformation: 
+   dx = 0.0;
+   dy = -22.00+1.0;
+   dz = -48.75000+34.9/2.;
+   TGeoCombiTrans* pMatrix8 = new TGeoCombiTrans("", dx,dy,dz,0);
+
+   // Shape: TGeoTrap
+   ddz    = 178.900;
+   theta  = -0.31;
+   phi    = 90.0;
+   h1     = 1.000;
+   bl1    = 118.000;
+   tl1    = 118.000;
+   alpha1 = 0.000000;
+   h2     = 1.000;
+   bl2    = 135.2000;
+   tl2    = 135.2000;
+   alpha2 = 0.000000;
+   TGeoShape *cham4 = new TGeoTrap("cham4", ddz/2.0,theta,phi,h1/2.0,bl1/2.0,tl1/2.0,alpha1,h2/2.0,bl2/2.0,tl2/2.0,alpha2);
+
+   // Volume:
+   TGeoVolume*
+   cham_log4 = new TGeoVolume("cham_log4",cham4, pMedFe);
+   cham_log4->SetVisLeaves(kTRUE);
+   cham_log4->SetLineColor(17);
+
+   // Position Volume
+   TGeoCombiTrans* pGlobal8 = GetGlobalPosition(pMatrix8);
+   pWorld->AddNode(cham_log4, 0,  pGlobal8);
+
+   // Combi transformation: 
+   dx = 0.0;
+   dy = -22.00-2.1;
+   dz = 88.45;
+   TGeoCombiTrans* pMatrix9 = new TGeoCombiTrans("", dx,dy,dz,0);
+
+   // Shape: TGeoTrap
+   ddz    = 60.600;
+   theta  = -4.8;
+   phi    = 90.0;
+   h1     = 1.00;
+   bl1    = 137.200;
+   tl1    = 137.200;
+   alpha1 = 0.000000;
+   h2     = 1.00;
+   bl2    = 157.1000;
+   tl2    = 157.1000;
+   alpha2 = 0.000000;
+   TGeoShape *cham5 = new TGeoTrap("cham5", ddz/2.0,theta,phi,h1/2.0,bl1/2.0,tl1/2.0,alpha1,h2/2.0,bl2/2.0,tl2/2.0,alpha2);
+
+   // Volume:
+   TGeoVolume*
+   cham_log5 = new TGeoVolume("cham_log5",cham5, pMedFe);
+   cham_log5->SetVisLeaves(kTRUE);
+   cham_log5->SetLineColor(17);
+
+   // Position Volume
+   TGeoCombiTrans* pGlobal9 = GetGlobalPosition(pMatrix9);
+   pWorld->AddNode(cham_log5, 0,  pGlobal9);
+
+   // Combi transformation: 
+   dx = 0.0;
+   dy = 22.00+2.1;
+   dz = 88.45;
+   TGeoCombiTrans* pMatrix10 = new TGeoCombiTrans("", dx,dy,dz,0);
+
+   // Shape: TGeoTrap
+   ddz    = 60.600;
+   theta  = 4.8;
+   phi    = 90.0;
+   h1     = 1.00;
+   bl1    = 137.200;
+   tl1    = 137.200;
+   alpha1 = 0.000000;
+   h2     = 1.00;
+   bl2    = 157.1000;
+   tl2    = 157.1000;
+   alpha2 = 0.000000;
+   TGeoShape *cham6 = new TGeoTrap("cham6", ddz/2.0,theta,phi,h1/2.0,bl1/2.0,tl1/2.0,alpha1,h2/2.0,bl2/2.0,tl2/2.0,alpha2);
+
+   // Volume:
+   TGeoVolume*
+   cham_log6 = new TGeoVolume("cham_log6",cham6, pMedFe);
+   cham_log6->SetVisLeaves(kTRUE);
+   cham_log6->SetLineColor(17);
+
+   // Position Volume
+   TGeoCombiTrans* pGlobal10 = GetGlobalPosition(pMatrix10);
+   pWorld->AddNode(cham_log6, 0,  pGlobal10);
+
+   // Combi transformation: 
+   dx = 139.0/2.0+2.6+1.0;
+   dy = 0.000000;
+   dz = 71.0000+35.1/2.0;
+   TGeoCombiTrans* pMatrix11 = new TGeoCombiTrans("", dx,dy,dz,0);
+ 
+   // Shape: TGeoTrap
+   ddz    = 60.600;
+   theta  = 9.3;
+   phi    = 0.0;
+   h1     = 42.000;
+   bl1    = 1.000;
+   tl1    = 1.000;
+   alpha1 = 0.000000;
+   h2     = 52.4000;
+   bl2    = 1.0000;
+   tl2    = 1.0000;
+   alpha2 = 0.000000;
+   TGeoShape *cham7 = new TGeoTrap("cham7", ddz/2.0,theta,phi,h1/2.0,bl1/2.0,tl1/2.0,alpha1,h2/2.0,bl2/2.0,tl2/2.0,alpha2);
+
+   // Volume:
+   TGeoVolume*
+   cham_log7 = new TGeoVolume("cham_log7",cham7, pMedFe);
+   cham_log7->SetVisLeaves(kTRUE);
+   cham_log7->SetLineColor(17);
+
+   // Position Volume
+   TGeoCombiTrans* pGlobal11 = GetGlobalPosition(pMatrix11);
+   pWorld->AddNode(cham_log7, 0, pGlobal11);
+
+   // Combi transformation: 
+   dx = -139.0/2.0-2.6-1.0;
+   dy = 0.000000;
+   dz = 71.0000+35.1/2.0;
+   TGeoCombiTrans* pMatrix12 = new TGeoCombiTrans("", dx,dy,dz,0);
+ 
+   // Shape: TGeoTrap
+   ddz    = 60.600;
+   theta  = -9.3;
+   phi    = 0.0;
+   h1     = 42.000;
+   bl1    = 1.000;
+   tl1    = 1.000;
+   alpha1 = 0.000000;
+   h2     = 52.4000;
+   bl2    = 1.0000;
+   tl2    = 1.0000;
+   alpha2 = 0.000000;
+   TGeoShape *cham8 = new TGeoTrap("cham8", ddz/2.0,theta,phi,h1/2.0,bl1/2.0,tl1/2.0,alpha1,h2/2.0,bl2/2.0,tl2/2.0,alpha2);
+
+   // Volume:
+   TGeoVolume*
+   cham_log8 = new TGeoVolume("cham_log8",cham8, pMedFe);
+   cham_log8->SetVisLeaves(kTRUE);
+   cham_log8->SetLineColor(17);
+
+   // Position Volume
+   TGeoCombiTrans* pGlobal12 = GetGlobalPosition(pMatrix12);
+   pWorld->AddNode(cham_log8, 0, pGlobal12);
+
+   // Combi transformation: 
+   dx = 0.0;
+   dy = 0.00000;
+   dz = -122.75;
+   TGeoCombiTrans* pMatrix13 = new TGeoCombiTrans("", dx,dy,dz,0);
+
+   // Shape: TGeoBBox
+   dx = 128.8;
+   dy = 50.0;
+   dz = 4.00;
+   TGeoShape *cham9 = new TGeoBBox("cham9", dx/2.,dy/2.,dz/2.);
+
+    // Combi transformation: 
+   dx = 0.0;
+   dy = 0.00000;
+   dz = -122.75;
+   TGeoCombiTrans* pMatrix14 = new TGeoCombiTrans("", dx,dy,dz,0);
+
+   // Shape: TGeoBBox
+   dx = 116.8;
+   dy = 40.0;
+   dz = 8.00;
+   TGeoShape *cham10 = new TGeoBBox("cham10", dx/2.,dy/2.,dz/2.);
+
+    // Subtraction:
+   TGeoSubtraction* subcham11 = new TGeoSubtraction(cham9,cham10,pMatrix13,pMatrix14);
+   TGeoShape *cham11 = new TGeoCompositeShape("GE", subcham11);
+
+   // Volume:
+   TGeoVolume*
+   cham_log11 = new TGeoVolume("cham_log11",cham11, pMedFe);
+   cham_log11->SetVisLeaves(kTRUE);
+   cham_log11->SetLineColor(17);
+
+   // Position Volume
+   pWorld->AddNode(cham_log11, 0, 0);
+
+   
+   // Combi transformation: 
+   dx = 0.0;
+   dy = 0.00000;
+   dz = 119.75;
+   TGeoCombiTrans* pMatrix15 = new TGeoCombiTrans("", dx,dy,dz,0);
+
+   // Shape: TGeoBBox
+   dx = 197.1;
+   dy = 100.0;
+   dz = 2.00;
+   TGeoShape *cham12 = new TGeoBBox("cham12", dx/2.,dy/2.,dz/2.);
+
+    // Combi transformation: 
+   dx = 0.0;
+   dy = 0.00000;
+   dz = 119.75;
+   TGeoCombiTrans* pMatrix16 = new TGeoCombiTrans("", dx,dy,dz,0);
+
+   // Shape: TGeoBBox
+   dx = 155.1;
+   dy = 52.4;
+   dz = 4.00;
+   TGeoShape *cham13 = new TGeoBBox("cham13", dx/2.,dy/2.,dz/2.);
+
+   // Subtraction:
+   TGeoSubtraction* subcham14 = new TGeoSubtraction(cham12,cham13,pMatrix15,pMatrix16);
+   TGeoShape *cham14 = new TGeoCompositeShape("GE", subcham14);
+
+   // Volume:
+   TGeoVolume*
+   cham_log14 = new TGeoVolume("cham_log14",cham14, pMedFe);
+   cham_log14->SetVisLeaves(kTRUE);
+   cham_log14->SetLineColor(17);
+
+   // Position Volume
+   pWorld->AddNode(cham_log14, 0, 0);
+
+
+   // Combi transformation: 
+   dx = 0.0;
+   dy = 0.00000;
+   dz = -120.75;
+   TGeoCombiTrans* pMatrix17 = new TGeoCombiTrans("", dx,dy,dz,0);
+
+   // Shape: TGeoBBox
+   dx = 260.0;
+   dy = 150.0;
+   dz = 6.00;
+   TGeoShape *cham15 = new TGeoBBox("cham15", dx/2.,dy/2.,dz/2.);
+
+   // Combi transformation: 
+   dx = 0.0;
+   dy = 0.00000;
+   dz = -120.75;
+   TGeoCombiTrans* pMatrix18 = new TGeoCombiTrans("", dx,dy,dz,0);
+
+   // Shape: TGeoBBox
+   dx = 128.8;
+   dy = 50.0;
+   dz = 10.00;
+   TGeoShape *cham16 = new TGeoBBox("cham16", dx/2.,dy/2.,dz/2.);
+
+   // Subtraction:
+   TGeoSubtraction* subcham17 = new TGeoSubtraction(cham15,cham16,pMatrix17,pMatrix18);
+   TGeoShape *cham17 = new TGeoCompositeShape("GE", subcham17);
+
+   // Volume:
+   TGeoVolume*
+   cham_log17 = new TGeoVolume("cham_log17",cham17, pMedFe);
+   cham_log17->SetVisLeaves(kTRUE);
+   cham_log17->SetLineColor(5);
+
+   // Position Volume
+   pWorld->AddNode(cham_log17, 0, 0);
+
+
+    // Combi transformation: 
+   dx = 0.0;
+   dy = 0.00000;
+   dz = 116.75-1.0;
+   TGeoCombiTrans* pMatrix19 = new TGeoCombiTrans("", dx,dy,dz,0);
+
+   // Shape: TGeoBBox
+   dx = 260.0;
+   dy = 150.0;
+   dz = 6.00;
+   TGeoShape *cham18 = new TGeoBBox("cham18", dx/2.,dy/2.,dz/2.);
+
+   // Combi transformation: 
+   dx = 0.0;
+   dy = 0.00000;
+   dz = 116.75-1.0;
+   TGeoCombiTrans* pMatrix20 = new TGeoCombiTrans("", dx,dy,dz,0);
+
+   // Shape: TGeoBBox
+   dx = 180.0;
+   dy = 58.0;
+   dz = 10.00;
+   TGeoShape *cham19 = new TGeoBBox("cham19", dx/2.,dy/2.,dz/2.);
+
+   // Subtraction:
+   TGeoSubtraction* subcham20 = new TGeoSubtraction(cham18,cham19,pMatrix19,pMatrix20);
+   TGeoShape *cham20 = new TGeoCompositeShape("GE", subcham20);
+
+   // Volume:
+   TGeoVolume*
+   cham_log20 = new TGeoVolume("cham_log20",cham20, pMedFe);
+   cham_log20->SetVisLeaves(kTRUE);
+   cham_log20->SetLineColor(5);
+
+   // Position Volume
+   pWorld->AddNode(cham_log20, 0, 0);
 
 
 
-}
+
+   // -- Aladin: Windows --
+   //
+   // Iron      ->    4 cm
+   // Aluminium ->    2 cm
+   // Kapton    -> 0.05 mm
+ 
+   // Combi transformation: 
+   dx = -17.30000;
+   dy = 0.00000;
+   dz = -142.75;
+   TGeoRotation *rot_t1 = new TGeoRotation("rot1");
+   rot_t1->RotateY(7.0);
+   TGeoCombiTrans* pMatrix1w = new TGeoCombiTrans("", dx,dy,dz,rot_t1);
+
+   // Shape: TGeoTubeSeg
+   rmin = 12.50;
+   rmax = 67.00;
+   dz   = 4.00000;
+   phi1 = 0.000000;
+   phi2 = 360.0000;
+   TGeoShape *windows1 = new TGeoTubeSeg("windows1",rmin,rmax,dz/2.,phi1,phi2);
+
+   // Volume:
+   TGeoVolume*
+   Windows_log1 = new TGeoVolume("Windows_log1",windows1, pMedFe);
+   Windows_log1->SetVisLeaves(kTRUE);
+   Windows_log1->SetLineColor(15);
+
+   // Position Volume
+   TGeoCombiTrans* pGlobal1w = GetGlobalPosition(pMatrix1w);
+   pWorld->AddNode(Windows_log1, 0, pGlobal1w);
+
+   // Combi transformation: 
+   dx = -17.30000;
+   dy = 0.00000;
+   dz = -142.75-3.0;
+   TGeoCombiTrans* pMatrix2w = new TGeoCombiTrans("", dx,dy,dz,rot_t1);
+
+   // Shape: TGeoTubeSeg
+   rmin = 12.50;
+   rmax = 15.00;
+   dz   = 2.00000;
+   phi1 = 0.00000;
+   phi2 = 360.000;
+   TGeoShape *windows2 = new TGeoTubeSeg("windows2",rmin,rmax,dz/2.,phi1,phi2);
+
+   // Volume:
+   TGeoVolume*
+   Windows_log2 = new TGeoVolume("Windows_log2",windows2, pMedAl);
+   Windows_log2->SetVisLeaves(kTRUE);
+   Windows_log2->SetLineColor(19);
+
+   // Position Volume
+   TGeoCombiTrans* pGlobal2w = GetGlobalPosition(pMatrix2w);
+   pWorld->AddNode(Windows_log2, 0, pGlobal2w);
+
+   // Combi transformation: 
+   dx = -17.30000;
+   dy = 0.00000;
+   dz = -142.75-2.0;
+   TGeoCombiTrans* pMatrix3w = new TGeoCombiTrans("", dx,dy,dz,rot_t1);
+
+   // Shape: TGeoTubeSeg
+   rmin = 0.000;
+   rmax = 12.50;
+   dz   = 0.00500;
+   phi1 = 0.00000;
+   phi2 = 360.000;
+   TGeoShape *windows3 = new TGeoTubeSeg("windows3",rmin,rmax,dz/2.,phi1,phi2);
+
+   // Volume:
+   TGeoVolume*
+   Windows_log3 = new TGeoVolume("Windows_log3",windows3, pMedMylar);
+   Windows_log3->SetVisLeaves(kTRUE);
+   Windows_log3->SetLineColor(28);
+
+   // Position Volume
+   TGeoCombiTrans* pGlobal3w = GetGlobalPosition(pMatrix3w);
+   pWorld->AddNode(Windows_log3, 0, pGlobal3w);
+
+
+
+}// closed ConstructGeometry2()
 
 
 /*
