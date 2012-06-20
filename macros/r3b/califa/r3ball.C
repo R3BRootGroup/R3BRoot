@@ -164,11 +164,11 @@ void r3ball(Int_t nEvents = 1,
   if (fDetList.FindObject("ALADIN") ) {
       fFieldMap = 0;
       R3BModule* mag = new R3BMagnet("AladinMagnet");
-      // Select geometry
+      // Selecting the geometry
           // 1- Old geometry(default).
           // 2- New geometry.
           ((R3BMagnet *)mag)->SelectGeometry(1);
-      // Select gap medium
+      // Selecting the gap medium
           // 0- Air(default)
           // 1- Vacuum
           // 2- Helium
@@ -248,7 +248,7 @@ void r3ball(Int_t nEvents = 1,
 	  // 6- CALIFA 7.09+7.17, (ongoing work)
 	  // 10- CALIFA 8.11, 
 	  // ...
-	  ((R3BCalo *)calo)->SelectGeometryVersion(10);
+	  ((R3BCalo *)calo)->SelectGeometryVersion(5);
 	  //Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
 	  ((R3BCalo *)calo)->SetNonUniformity(1.0);
       // Global position of the Module
@@ -534,14 +534,14 @@ void r3ball(Int_t nEvents = 1,
 	
   if (fGenerator.CompareTo("gammas") == 0  ) {
 	// 2- Define the CALIFA Test gamma generator
-	Double_t pdgId=22; // gamma emission
-	//Double_t pdgId=2212; // proton emission
-	Double_t theta1= 100.;  // polar angle distribution
-	Double_t theta2= 180.;	
+	//Double_t pdgId=22; // gamma emission
+	Double_t pdgId=2212; // proton emission
+	Double_t theta1= 0.;  // polar angle distribution
+	Double_t theta2= 10.;	
 	//Double_t theta2= 90.;	
 	//Double_t momentum=0.002; // 0.010 GeV/c = 10 MeV/c 
-	Double_t momentumI=0.019; // 0.010 GeV/c = 10 MeV/c 
-	Double_t momentumF=0.045; // 0.010 GeV/c = 10 MeV/c 
+	Double_t momentumI=0.0019; // 0.010 GeV/c = 10 MeV/c 
+	Double_t momentumF=0.0045; // 0.010 GeV/c = 10 MeV/c 
 	//Double_t momentumF=0.808065; // 0.808065 GeV/c (300MeV Kin Energy for protons) 
 	//Double_t momentumI=0.31016124; // 0.31016124 GeV/c (50MeV Kin Energy for protons)
 	//Double_t momentum=0.4442972; // 0.4442972 GeV/c (100MeV Kin Energy for protons)
