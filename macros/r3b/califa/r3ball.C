@@ -534,14 +534,14 @@ void r3ball(Int_t nEvents = 1,
 	
   if (fGenerator.CompareTo("gammas") == 0  ) {
 	// 2- Define the CALIFA Test gamma generator
-	//Double_t pdgId=22; // gamma emission
-	Double_t pdgId=2212; // proton emission
-	Double_t theta1= 0.;  // polar angle distribution
-	Double_t theta2= 10.;	
+	Double_t pdgId=22; // gamma emission
+	//Double_t pdgId=2212; // proton emission
+	Double_t theta1= 100.;  // polar angle distribution
+	Double_t theta2= 180.;	
 	//Double_t theta2= 90.;	
 	//Double_t momentum=0.002; // 0.010 GeV/c = 10 MeV/c 
-	Double_t momentumI=0.0019; // 0.010 GeV/c = 10 MeV/c 
-	Double_t momentumF=0.0045; // 0.010 GeV/c = 10 MeV/c 
+	Double_t momentumI=0.019; // 0.010 GeV/c = 10 MeV/c 
+	Double_t momentumF=0.045; // 0.010 GeV/c = 10 MeV/c 
 	//Double_t momentumF=0.808065; // 0.808065 GeV/c (300MeV Kin Energy for protons) 
 	//Double_t momentumI=0.31016124; // 0.31016124 GeV/c (50MeV Kin Energy for protons)
 	//Double_t momentum=0.4442972; // 0.4442972 GeV/c (100MeV Kin Energy for protons)
