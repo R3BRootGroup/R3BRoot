@@ -217,9 +217,9 @@ void  R3BFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField){
 //      << " : " << localPoint.Z()
 //      << endl;
 
+// localPoint.Transform(*gRot);
+ localPoint = localPoint + (*gTrans); // First translation
  localPoint.Transform(*gRot);
- localPoint = localPoint + (*gTrans);
-
 
 
  // test area
