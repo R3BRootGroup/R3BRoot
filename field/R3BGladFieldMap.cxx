@@ -139,8 +139,9 @@ Double_t R3BGladFieldMap::GetBx(Double_t x, Double_t y, Double_t z) {
   // transform to local coordinates
   // local to global
   TVector3 localPoint(x,y,z);
-  localPoint.Transform(*gRot);
+  
   localPoint = localPoint + (*gTrans);
+  localPoint.Transform(*gRot);
 
   Int_t ix    = 0;
   Int_t iy    = 0;
@@ -179,8 +180,9 @@ Double_t R3BGladFieldMap::GetBy(Double_t x, Double_t y, Double_t z) {
   // transform to local coordinates
   // local to global
   TVector3 localPoint(x,y,z);
-  localPoint.Transform(*gRot);
+  
   localPoint = localPoint + (*gTrans);
+  localPoint.Transform(*gRot);
 
   Int_t ix    = 0;
   Int_t iy    = 0;
@@ -227,8 +229,9 @@ Double_t R3BGladFieldMap::GetBz(Double_t x, Double_t y, Double_t z) {
   // transform to local coordinates
   // local to global
   TVector3 localPoint(x,y,z);
-  localPoint.Transform(*gRot);
+  
   localPoint = localPoint + (*gTrans);
+  localPoint.Transform(*gRot);
 
 
 
