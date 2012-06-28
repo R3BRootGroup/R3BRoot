@@ -39,6 +39,9 @@ trackerData/R3BTraPoint.cxx
 trackerData/R3BTraHit.cxx
 trackerData/R3BSitrackerHit.cxx 
 trackerData/R3BTrackerHit.cxx
+startrackerData/R3BSTaRTraPoint.cxx 
+startrackerData/R3BSTaRTraHit.cxx 
+startrackerData/R3BSTaRTrackerHit.cxx
 landData/R3BLandPoint.cxx
 landData/R3BNeuLandPoint.cxx 
 landData/R3BLandDigi.cxx 

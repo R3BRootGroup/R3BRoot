@@ -27,6 +27,9 @@
 #pragma link C++ class R3BATofPoint+;
 #pragma link C++ class R3BVetoPoint+;
 #pragma link C++ class R3BChimeraPoint+;
+#pragma link C++ class R3BSTaRTraPoint+;
+#pragma link C++ class R3BSTaRTraHit+;
+#pragma link C++ class R3BSTaRTrackerHit+;
 #pragma link C++ class R3BTraPoint+;
 #pragma link C++ class R3BTraHit+;
 #pragma link C++ class R3BTrackerHit+;

@@ -79,6 +79,7 @@ void FairMCTrack::Print(Int_t trackId) const {
        << ") GeV" << endl;
   cout << "       Ref " << GetNPoints(kREF) << ", CAL " << GetNPoints(kCAL)
        << ", CALIFA " << GetNPoints(kCALIFA) << ", TRACKER " << GetNPoints(kTRA)
+       << ", STaRTrack " << GetNPoints(kSTaRTrack)
        << ", TOF " << GetNPoints(kTOF) << ", mTOF " << GetNPoints(kMTOF)
        << ", GFI " << GetNPoints(kGFI) << ", DCH " << GetNPoints(kDCH) 
        << ", LAND " << GetNPoints(kLAND)
@@ -117,6 +118,7 @@ Int_t FairMCTrack::GetNPoints(DetectorId detId) const {
   else if ( detId == kCAL  ) return ( (fNPoints & ( 7 <<  1) ) >>  1);
   else if ( detId == kCALIFA  ) return ( (fNPoints & (31 <<  4) ) >>  4);
   else if ( detId == kTRA ) return ( (fNPoints & ( 1 <<  9) ) >>  9);
+  else if ( detId == kSTaRTrack ) return ( (fNPoints & ( 1 <<  9) ) >>  9);  // to be checked (Marc)
   else if ( detId == kTOF ) return ( (fNPoints & (31 << 10) ) >> 10);
   else if ( detId == kMTOF  ) return ( (fNPoints & (31 << 15) ) >> 15);
   else if ( detId == kGFI  ) return ( (fNPoints & (15 << 20) ) >> 20);
@@ -158,6 +160,12 @@ void FairMCTrack::SetNPoints(Int_t iDet, Int_t nPoints) {
     if      ( nPoints < 0 ) nPoints = 0;
     else if ( nPoints > 1 ) nPoints = 1;
     fNPoints = ( fNPoints & ( ~ (  1 <<  9 ) ) )  |  ( nPoints <<  9 );
+  }
+
+  else if ( iDet == kSTaRTrack ) {
+    if      ( nPoints < 0 ) nPoints = 0;
+    else if ( nPoints > 1 ) nPoints = 1;
+    fNPoints = ( fNPoints & ( ~ (  1 <<  9 ) ) )  |  ( nPoints <<  9 );  // to be checked (Marc)
   }
 
   else if ( iDet == kTOF ) {
