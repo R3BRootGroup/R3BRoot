@@ -23,6 +23,7 @@
 #include "TGeoBBox.h"
 #include "TGeoPara.h"
 #include "TGeoTube.h"
+#include "TGeoCone.h"
 #include "TGeoBoolNode.h"
 
 #include <iostream>
@@ -464,11 +465,41 @@ void R3BTarget::ConstructGeometry4(){
    }
 
 
-      // TRANSFORMATION MATRICES
+// Specific Material definition
+ // --  Material: Gold
+   TGeoMedium * pMedAu=NULL;
+   if (gGeoManager->GetMedium("Gold") ){
+       pMedAu=gGeoManager->GetMedium("Gold");
+   }else{
+    w       =        0.;
+    a       = 196.9685;
+    z       = 79.000000;
+    density = 19.3000000;
+    //radl    = 6.9;  
+    //absl    = ?;
+    TGeoMaterial*
+      pMatAu = new TGeoMaterial("Gold", a,z,density) ; //,radl,absl);
+    pMatAu->SetIndex(702);
+    numed   = 103;  // medium number
+    Double_t par[8];
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 0.000000; // tmaxfd
+    par[4]  = 0.000000; // stemax
+    par[5]  = 0.000000; // deemax
+    par[6]  = 0.000100; // epsil
+    par[7]  = 0.000000; // stmin
+    pMedAu = new TGeoMedium("Gold", numed,pMatAu, par);
+   }
+
+
+
+     // TRANSFORMATION MATRICES
    // Combi transformation: 
    dx = 0.000000;
    dy = 0.000000;
-   dz = 0.000000;
+   dz = 3.025000;  // tanslation along z
    // Rotation: 
    thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
@@ -476,10 +507,17 @@ void R3BTarget::ConstructGeometry4(){
    TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
    pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
+   dz=dz*2.+5.5;
+   TGeoCombiTrans*
+   pMatrix2b = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
+   dz=dz +5.5 + 1.02500;
+   TGeoCombiTrans*
+   pMatrix2c = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
+
    // Combi transformation: 
    dx = 0.000000;
    dy = 0.000000;
-   dz = 1.765000;
+   dz = 0.000000; //1.765000;
    // Rotation: 
    thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
@@ -487,10 +525,11 @@ void R3BTarget::ConstructGeometry4(){
    TGeoRotation *pMatrix5 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
    pMatrix4 = new TGeoCombiTrans("", dx,dy,dz,pMatrix5);
+
    // Combi transformation: 
    dx = 0.000000;
    dy = 0.000000;
-   dz = 0.007500;
+   dz = 0.000000; //0.007500;
    // Rotation: 
    thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
@@ -498,10 +537,13 @@ void R3BTarget::ConstructGeometry4(){
    TGeoRotation *pMatrix7 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
    pMatrix6 = new TGeoCombiTrans("", dx,dy,dz,pMatrix7);
+
    // Combi transformation: 
    dx = 0.000000;
    dy = 0.000000;
-   dz = 0.007500;
+   //dz = 4.007500;  // 0.007500;
+   //dz = 4.012500;  // 0.007500;
+   dz = 3.012500;  // 0.007500;
    // Rotation: 
    thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
@@ -509,10 +551,13 @@ void R3BTarget::ConstructGeometry4(){
    TGeoRotation *pMatrix9 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
    pMatrix8 = new TGeoCombiTrans("", dx,dy,dz,pMatrix9);
+
    // Combi transformation: 
    dx = 0.000000;
    dy = 0.000000;
-   dz = 3.522500;
+   //dz = -4.007500;  // 3.522500;
+   //dz = -4.012500;  // 3.522500;
+   dz = -3.012500;  // 3.522500;
    // Rotation: 
    thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
@@ -521,65 +566,208 @@ void R3BTarget::ConstructGeometry4(){
    TGeoCombiTrans*
    pMatrix10 = new TGeoCombiTrans("", dx,dy,dz,pMatrix11);
 
+   // Combi transformation: 
+   dx = 0.000000;
+   dy = 0.000000;
+   //dz = 6.30000; // tube  
+   //dz = 7.0000;// cone   
+   dz = 8.4500;// cone  for final specs 
+  // Rotation: 
+   thx = 90.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 0.000000;    phz = 0.000000;
+   TGeoRotation *pMatrix13 = new TGeoRotation("", thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+   pMatrix12 = new TGeoCombiTrans("", dx,dy,dz,pMatrix13);
+
+
    TGeoVolume *top =  gGeoManager->GetTopVolume();
 
+     
 
    // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
+
    // Shape: TargetEnveloppe type: TGeoTubeSeg
-  Double_t rmin = 0.000000;
-   Double_t rmax = 1.015000;
-   dz   = 7.045000;
+   // TargetEnveloppe Tube 1
+   //
+   Double_t rmin = 0.000000;
+   Double_t rmax = 3.525000;  
+   //dz   = 4.0250; //7.045000;
+   dz   = 3.0250; /// = half length 
    phi1 = 0.000000;
    phi2 = 360.000000;
    TGeoShape *pTargetEnveloppe = new TGeoTubeSeg("TargetEnveloppe",rmin,rmax,dz,phi1,phi2);
-   // Volume: TargetEnveloppe
+   // Volume: TargetEnveloppe Tube
    TGeoVolume*
    pTargetEnveloppe_log = new TGeoVolume("TargetEnveloppe",pTargetEnveloppe, pMed2);
    pTargetEnveloppe_log->SetVisLeaves(kTRUE);
-
    // Position Mother Volume
    TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix2);
    top->AddNode(pTargetEnveloppe_log, 0, pGlobal);
 
+   /*
+   // Shape: TargetEnveloppe type: TGeoCone
+   // TargetEnveloppe Cone
+   //
+   Double_t rmin2 = 0.000000;
+   Double_t rmax2 = 1.500000;  
+   dz = 5.50; 
+   TGeoShape *pTargetEnveloppeCone = new TGeoCone("TargetEnveloppeCone",dz,rmin,rmax,rmin2,rmax2);
+   // Volume: TargetEnveloppe Cone
+   TGeoVolume*
+   pTargetEnveloppeCone_log = new TGeoVolume("TargetEnveloppeCone",pTargetEnveloppeCone, pMed2);
+   pTargetEnveloppeCone_log->SetVisLeaves(kTRUE);
+   // Position Mother Volume
+   top->AddNode(pTargetEnveloppeCone_log, 0, pMatrix2b);
 
-
+   // Shape: TargetEnveloppe type: TGeoTubeSeg
+   // TargetEnveloppe Tube 2
+   //
+   dz   = 1.0250; 
+   TGeoShape *pTargetEnveloppe2 = new TGeoTubeSeg("TargetEnveloppe2",rmin2,rmax2,dz,phi1,phi2);
+   // Volume: TargetEnveloppe Tube 2
+   TGeoVolume*
+   pTargetEnveloppe2_log = new TGeoVolume("TargetEnveloppe2",pTargetEnveloppe2, pMed2);
+   pTargetEnveloppe2_log->SetVisLeaves(kTRUE);
+   // Position Mother Volume
+   top->AddNode(pTargetEnveloppe2_log, 0, pMatrix2c);
+   */
+  
    // Shape: Target1 type: TGeoTubeSeg
-   rmin = 1.000000;
-   rmax = 1.015000;
-   dz   = 1.750000;
+   // Mylar Tube
+   rmin = 3.5;          //1.000000;
+   rmax = 3.5250;       //for Mylar
+   //rmax = 3.5100;       //for Gold
+   dz   = 3.;           //1.750000;
    phi1 = 0.000000;
    phi2 = 360.000000;
    TGeoShape *pTarget1 = new TGeoTubeSeg("Target1",rmin,rmax,dz,phi1,phi2);
    // Volume: Target1
    TGeoVolume*
-   pTarget1_log = new TGeoVolume("Target1",pTarget1, pMed15);
+     pTarget1_log = new TGeoVolume("Target1",pTarget1, pMed15);   // Mylar
    pTarget1_log->SetVisLeaves(kTRUE);
    pTargetEnveloppe_log->AddNode(pTarget1_log, 0, pMatrix4);
+
+   /*
+   // Shape: Target1 type: TGeoCone
+   // Mylar Cone
+   //
+   rmin2 = 1.475000;
+   dz=5.50;
+   TGeoShape *pTarget1Cone = new TGeoCone("Target1Cone",dz,rmin,rmax,rmin2,rmax2);
+   // Volume: Target1 Cone
+   TGeoVolume*
+   pTarget1Cone_log = new TGeoVolume("Target1Cone",pTarget1Cone, pMed2);
+   pTarget1Cone_log->SetVisLeaves(kTRUE);
+   // Position Mother Volume
+   pTargetEnveloppeCone_log->AddNode(pTarget1Cone_log, 0, pMatrix4);
+ 
+   // Shape: Target1 type: TGeoTube
+   // Mylar Tube 2
+   //
+   dz = 1.0250;
+     TGeoShape *pTarget1Tub2 = new TGeoTubeSeg("Target1Tub2",rmin2,rmax2,dz,phi1,phi2);
+   // Volume: Target1Tub2
+   TGeoVolume*
+     pTarget1Tub2_log = new TGeoVolume("Target1Tub2",pTarget1Tub2, pMed15);   // Mylar
+   pTarget1Tub2_log->SetVisLeaves(kTRUE);
+   pTargetEnveloppe2_log->AddNode(pTarget1Tub2_log, 0, pMatrix4);
+   */
+   
    // Shape: Target2 type: TGeoTubeSeg
+   // H2 Tube 1
+   //
    rmin = 0.000000;
-   rmax = 1.000000;
-   dz   = 1.750000;
+   rmax = 3.5;           //1.000000;
+   //dz   = 4.;            //1.750000;
+   dz   = 3.;            //1.750000;
    phi1 = 0.000000;
    phi2 = 360.000000;
    TGeoShape *pTarget2 = new TGeoTubeSeg("Target2",rmin,rmax,dz,phi1,phi2);
    // Volume: Target2
    TGeoVolume*
-   pTarget2_log = new TGeoVolume("Target2",pTarget2, pMed3);
+     pTarget2_log = new TGeoVolume("Target2",pTarget2, pMed3);   // H2
    pTarget2_log->SetVisLeaves(kTRUE);
    pTargetEnveloppe_log->AddNode(pTarget2_log, 0, pMatrix6);
+
+   /*
+   // Shape: Target2 type: TGeoCone
+   // H2 Cone
+   //
+   rmin2 = 0.;
+   rmax2 = 1.475000;
+   dz=5.50;
+   TGeoShape *pTarget2Cone = new TGeoCone("Target2Cone",dz,rmin,rmax,rmin2,rmax2);
+   // Volume: Target2 Cone
+   TGeoVolume*
+     pTarget2Cone_log = new TGeoVolume("Target2Cone",pTarget2Cone, pMed3);  // H2
+   pTarget2Cone_log->SetVisLeaves(kTRUE);
+   // Position Mother Volume
+   pTargetEnveloppeCone_log->AddNode(pTarget2Cone_log, 0, pMatrix4);
+ 
+   // Shape: Target2 type: TGeoTube
+   // H2 Tube 2
+   //
+   dz=1.0250;
+   TGeoShape *pTarget2Tub2 = new TGeoTubeSeg("Target2Tub2",rmin2,rmax2,dz,phi1,phi2);
+   // Volume: Target2Tub2
+   TGeoVolume*
+     pTarget2Tub2_log = new TGeoVolume("Target2Tub2",pTarget2Tub2, pMed3);   // H2
+   pTarget2Tub2_log->SetVisLeaves(kTRUE);
+   pTargetEnveloppe2_log->AddNode(pTarget2Tub2_log, 0, pMatrix6);
+   */
+
    // Shape: Target3 type: TGeoTubeSeg
    rmin = 0.000000;
-   rmax = 1.015000;
-   dz   = 0.007500;
+   rmax = 3.5250;    //for mylar;
+   //rmax = 3.5100;    //for Gold;
+   //rmax = 3.5150;    //1.015000;
+   dz   = 0.012500;  // =half thickness for Mylar
+   //dz   = 0.00500;  // =half thickness for Gold
+   //dz   = 0.00100;  // =half thickness for Carbon
+   //dz   = 0.007500; // -half thickness
    phi1 = 0.000000;
    phi2 = 360.000000;
    TGeoShape *pTarget3 = new TGeoTubeSeg("Target3",rmin,rmax,dz,phi1,phi2);
+
    // Volume: Target3
-   TGeoVolume*
-   pTarget3_log = new TGeoVolume("Target3",pTarget3, pMed15);
+   TGeoVolume* 
+     //pTarget3_log = new TGeoVolume("Target3",pTarget3, pMedCarb);    // Carb
+     //pTarget3_log = new TGeoVolume("Target3",pTarget3, pMedAu);    // Gold
+     pTarget3_log = new TGeoVolume("Target3",pTarget3, pMed15);    // Mylar
    pTarget3_log->SetVisLeaves(kTRUE);
    pTargetEnveloppe_log->AddNode(pTarget3_log, 0, pMatrix8);
    pTargetEnveloppe_log->AddNode(pTarget3_log, 1, pMatrix10);
+
+
+
+   // Shape: Target4 type: TGeoTubeSeg
+   //rmin = 0.000000; // Tube
+   //rmax = 3.5000;   // Tube
+   rmin = 6.637;   // Cone
+   rmax = 6.647;   // Cone   0.1mm
+   Double_t
+   //rmin2 = 1.2;     // Cone
+   rmin2 = 1.6;     // Cone
+   Double_t
+     //rmax2 = 1.7;    // Cone  1mm 
+   rmax2 = 1.61;    // Cone  0.1mm
+   //dz   = 0.00500;  // Tube =half length
+   //dz   = 9.500000;   // Cone =half length
+   dz   = 10.60000;   // Cone =half length for final specs
+   phi1 = 0.000000;
+   phi2 = 360.000000;
+   //TGeoShape *pTarget4 = new TGeoTubeSeg("Target4",rmin,rmax,dz,phi1,phi2);
+   TGeoShape *pTarget4 = new TGeoCone("Target4",dz,rmin,rmax,rmin2,rmax2);
+
+   // Volume: Target4
+   TGeoVolume*
+     pTarget4_log = new TGeoVolume("Target4",pTarget4, pMedAu);    // Gold
+     //pTarget4_log = new TGeoVolume("Target4",pTarget4, pMed15);    // Mylar
+   pTarget4_log->SetVisLeaves(kTRUE);
+   //top->AddNode(pTarget4_log, 0, pMatrix12);
+
+
 
 }
 

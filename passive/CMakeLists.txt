@@ -25,11 +25,13 @@ R3BGeoCave.cxx
 R3BGeoMagnet.cxx      
 R3BGeoPassivePar.cxx  
 R3BGeoPipe.cxx        
+R3BGeoVacVesselCool.cxx        
 R3BGeoTarget.cxx      
 R3BMagnet.cxx         
 R3BGladMagnet.cxx         
 R3BPassiveContFact.cxx
 R3BPipe.cxx           
+R3BVacVesselCool.cxx           
 R3BTarget.cxx 
 )
 
