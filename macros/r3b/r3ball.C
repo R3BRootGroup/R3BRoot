@@ -4,9 +4,10 @@
 //
 //         Author: Denis Bertini <D.Bertini@gsi.de>
 //
-//         Last Update: 17/08/09
+//         Last Update: 30/06/12 (marc Labiche)
 //
 //         Comments:
+//               - 30/06/12 Adding Vaccum Vessel and cooling for new Si tracker
 //               - 17/08/09 Adding R3BModule R3BDetector
 //                          for global positionning
 //               - 12/08/09 Adding R3B Special Physics List
@@ -166,6 +167,30 @@ void r3ball(Int_t nEvents = 1,
      target->SetTranslation(tx,ty,tz);
       run->AddModule(target);
   }
+
+  
+  //R3B SiTracker Cooling definition
+  if (fDetList.FindObject("VACVESSELCOOL") ) {
+    R3BModule* vesselcool= new R3BVacVesselCool(Target.Data());
+      // Global Lab. Rotation
+      phi    =  0.0; // (deg)
+      theta  =  0.0; // (deg)
+      psi    =  0.0; // (deg)
+      // Rotation in Ref. Frame.
+      thetaX =  0.0; // (deg)
+      thetaY =  0.0; // (deg)
+      thetaZ =  0.0; // (deg)
+      // Global translation in Lab
+      tx    =  0.0; // (cm)
+      ty    =  0.0; // (cm)
+      tz    =  0.0; // (cm)
+     //target->SetRotAnglesEuler(phi,theta,psi);
+     vesselcool->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
+     vesselcool->SetTranslation(tx,ty,tz);
+      run->AddModule(vesselcool);
+  }
+  
+
 
   //R3B Magnet definition
   if (fDetList.FindObject("ALADIN") ) {

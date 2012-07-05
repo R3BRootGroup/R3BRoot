@@ -4,8 +4,10 @@
 // Steering macros to main r3ball.C
 // Author: <D.Bertini@gsi.de>
 //
-// Last Update: 17/08/09
+// Last Update: 30/06/12 (marc labiche)
 // Comments:
+//         - 30/06/12 : Adding option to use the vaccum vessel and 
+//           cooling for new Si Tracker
 //         - 17/08/09 : Adding detector list
 //         - 13/08/09 : adding flag for User Physics List
 //
@@ -81,27 +83,30 @@ Int_t r3bsim(){
     TObjString det0("TARGET");
     TObjString det1("ALADIN");
     TObjString det2("GLAD");
-    TObjString det3("CALIFA");
+    //TObjString det3("CALIFA");
     TObjString det4("CRYSTALBALL");
     TObjString det5("TOF");
     TObjString det6("MTOF");
     TObjString det7("DCH");
     TObjString det8("TRACKER");
-    TObjString det9("STaRTrack");
+    //TObjString det9("STaRTrack");
     TObjString det10("GFI");
     TObjString det11("LAND");
+    //TObjString det12("VACVESSELCOOL");
 
     TObjArray fDetList;
     fDetList.Add(&det0);
     fDetList.Add(&det2);
+    //fDetList.Add(&det3);
     fDetList.Add(&det4);
     fDetList.Add(&det5);
     fDetList.Add(&det6);
     fDetList.Add(&det7);
     fDetList.Add(&det8);
-    fDetList.Add(&det9);
+    //fDetList.Add(&det9);
     fDetList.Add(&det10);
     fDetList.Add(&det11);
+    //fDetList.Add(&det12);
 
 
    //-------------------------------------------------
