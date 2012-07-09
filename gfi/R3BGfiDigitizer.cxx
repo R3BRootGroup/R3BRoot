@@ -143,14 +143,16 @@ void R3BGfiDigitizer::Exec(Option_t* opt) {
      
       if (fZ<600)  //no DetectorID for GFIs  this is GFI1
       {
-        gf1_01x=(-(((fX+71.97331) * 0.957822495) - ((fZ- 513.967775) * (-0.28736052))));//x position swop (with -) - requirement for tracker
+        gf1_01x=(-(((fX+72.164874) * 0.957822495) - ((fZ- 513.910302) * (-0.28736052))));//x position swop (with -) - requirement for tracker //justyna new
+        //gf1_01x=(-(((fX+71.97331) * 0.957822495) - ((fZ- 513.967775) * (-0.28736052))));//x position swop (with -) - requirement for tracker
 //        gf1_01x=(-(((fX+88.55368) * 0.957822495) - ((fZ- 515.015418) * (-0.28736052)))); //Christoph
 //	cout<<"GFI1 - fragment detector "<<PID<<endl;
         gf1mul++;
       }     
       if (fZ>600)  //GFI2
       {
-        gf2_01x=(-(((fX+145.270039) * 0.957822495) - ((fZ - 730.318956) * (-0.28736052))));//x position swop (with -) - requirement for tracker
+        gf2_01x=(-(((fX+145.212570) * 0.957822495) - ((fZ - 730.336197) * (-0.28736052))));//x position swop (with -) - requirement for tracker //justyna new
+        //gf2_01x=(-(((fX+145.270039) * 0.957822495) - ((fZ - 730.318956) * (-0.28736052))));//x position swop (with -) - requirement for tracker
 //        gf2_01x=(-(((fX+149.791168) * 0.957822495) - ((fZ - 744.623074) * (-0.28736052)))); //Christoph
 //	cout<<"GFI2 - fragment detector "<<PID<<endl;
 	gf2mul++;
