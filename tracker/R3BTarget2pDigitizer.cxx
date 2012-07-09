@@ -25,32 +25,34 @@
 #include <string>
 #include <iostream>
 
-
 #include "R3BTraPoint.h"
 #include "R3BMCTrack.h"
 
 #define SQR(x) ((x)*(x))
-#define U_MEV_C2 931.494
-#define MASS_PROTON_MEV_C2 938.279
-#define MASS_17NE_MEV_C2   15846.9
-#define MASS_15O_MEV_C2    13971.3
-//#define MASS_PROTON_MEV_C2 938.272046
-//#define MASS_17NE_MEV_C2   29796.65565  //Ar
-//#define MASS_15O_MEV_C2    27922.79434  //S
+//#define U_MEV_C2 931.494
+//#define MASS_PROTON_MEV_C2 938.279
+//#define MASS_17NE_MEV_C2   15846.9
+//#define MASS_15O_MEV_C2    13971.3
+////#define MASS_PROTON_MEV_C2 938.272046
+////#define MASS_17NE_MEV_C2   29796.65565  //Ar
+////#define MASS_15O_MEV_C2    27922.79434  //S
 
-		
+//Updated values by Felix: wikipedia and http://ie.lbl.gov/toi2003/MassSearch.asp
+#define U_MEV_C2 931.494061
+#define MASS_PROTON_MEV_C2 938.272032973
+#define MASS_17NE_MEV_C2   15846.7485478
+#define MASS_16F_MEV_C2    14909.9864966	//GS resonance 535keV above 15O+p
+#define MASS_15O_MEV_C2    13971.1785118
+
 using std::cout;
 using std::endl;
 		
-
 R3BTarget2pDigitizer::R3BTarget2pDigitizer() :
   FairTask("R3B Target2p Digitization scheme ") { 
 }
 
-
 R3BTarget2pDigitizer::~R3BTarget2pDigitizer() {
 }
-
 
 void R3BTarget2pDigitizer::SetParContainers() {
 
@@ -146,9 +148,16 @@ void R3BTarget2pDigitizer::Exec(Option_t* opt) {
      Double_t E2;
      Double_t estar;
      
+     //Todo: do those properly, maybe 15O+2p mass
+     Double_t in_beta=0.7579865;
+     Double_t Ne17mass=15851.85984; //MeV/c2
+     
+     Int_t ppmul;
 
 //******************** Target **************************//
 
+   ppmul=0;
+   
    for (Int_t l=0;l<nentries;l++){
 
 //if (l<4){
@@ -161,13 +170,13 @@ void R3BTarget2pDigitizer::Exec(Option_t* opt) {
      
      Double_t fX = aTrack->GetStartX();
      Double_t fY = aTrack->GetStartY();
+     Double_t fZ = aTrack->GetStartZ();
      Double_t fT = aTrack->GetStartT();
      
      Double_t Px = aTrack->GetPx();
      Double_t Py = aTrack->GetPy();
      Double_t Pz = aTrack->GetPz();
           
-   if (mother<0){
      
    if (mother<0 && PID==1000080150){
 //   if (mother<0 && PID==1000160300){   //Christoph 2p
@@ -181,38 +190,40 @@ void R3BTarget2pDigitizer::Exec(Option_t* opt) {
 //   cout<<"In "<<"Pf_tot "<<Pf_tot<<" f_beta "<<f_beta<<endl;
    }  
 
-   if (mother<0 && PID==2212 && l==1){
+   if (mother<0 && PID==2212) {
+
+   if (l==1){
    Pxp1=(Px*1000);
    Pyp1=(Py*1000);
    Pzp1=(Pz*1000);
-//   cout<<"In "<<"Pxp1 "<<Pxp1<<" Pyp1 "<<Pyp1<<" Pzp1 "<<Pzp1<<endl;
+   
    Pp1_tot=sqrt(SQR(Pxp1)+SQR(Pyp1)+SQR(Pzp1));
-//   p1_beta=0.7579865;
    p1_beta=sqrt((SQR(Pp1_tot))/((SQR(MASS_PROTON_MEV_C2))+(SQR(Pp1_tot))));
-//   cout<<"In "<<"Pp1_tot "<<Pp1_tot<<" p1_beta "<<p1_beta<<endl;
    }  
    
-   if (mother<0 && PID==2212 && l==2){
+   if (l==2){
    Pxp2=(Px*1000);
    Pyp2=(Py*1000);
    Pzp2=(Pz*1000);
-//   cout<<"In "<<"Pxp2 "<<Pxp2<<" Pyp2 "<<Pyp2<<" Pzp2 "<<Pzp2<<endl;
+   
    Pp2_tot=sqrt(SQR(Pxp2)+SQR(Pyp2)+SQR(Pzp2));
-//   p2_beta=0.7579865;
    p2_beta=sqrt((SQR(Pp2_tot))/((SQR(MASS_PROTON_MEV_C2))+(SQR(Pp2_tot))));
-//   cout<<"In "<<"Pp2_tot "<<Pp2_tot<<" p2_beta "<<p2_beta<<endl;
    }
-  
-   
-//   Double_t f_beta=0.7579865;
-//   Double_t p1_beta=0.7579865;
-//   Double_t p2_beta=0.7579865;            
-   
+   ppmul++;
    }
+   
      
    if(mother<0){  
-      x0=fX;
-      y0=fY;
+      //x0=fX;
+      //y0=fY;
+      
+      //x0=(((fX - 0.0)*1) - ((fZ - 0.0)*0.0));
+      //y0=(fY - 0.0);
+      
+      //Change to have lab coordinates instead (using the tracker offsets of the target):
+      x0=(((fX + 0.202437)*1) - ((fZ - 0.0)*0.0));
+      y0=(fY + 0.077698);
+      
       t0=fT;
    }       
   
@@ -235,14 +246,34 @@ void R3BTarget2pDigitizer::Exec(Option_t* opt) {
   
 
    //  sqrt(MeV^2/c^2 - MeV^2/c^2)=MeV/c
-   estar=sqrt(E2-p2)-MASS_17NE_MEV_C2; // *c2
+   //estar=sqrt(E2-p2)-MASS_17NE_MEV_C2; // *c2
+   estar=sqrt(E2-p2)-(MASS_15O_MEV_C2+2.0*MASS_PROTON_MEV_C2); // *c2
   
    
 //   cout<<"Estar In "<<Estar<<endl;
    
    ExEnIn_his->Fill(estar); 
  
-//   cout<<"Estar In "<<estar<<endl;  
+
+   Double_t Ne17_px=(Pxp1+Pxp2+Pxf);
+   Double_t Ne17_py=(Pyp1+Pyp2+Pyf);
+   Double_t Ne17_pz=(Pzp1+Pzp2+Pzf);
+   Double_t Ne17_p=sqrt(p2);
+
+   Double_t Indx=0;
+   Double_t Indy=0;
+   Double_t Indz=1;
+     
+   Double_t In_vector=(Ne17mass*in_beta)/sqrt(1-in_beta*in_beta);
+   Double_t In_px=Indx*In_vector;
+   Double_t In_py=Indy*In_vector;
+   Double_t In_pz=Indz*In_vector;
+     
+   Double_t cosalpha=((Ne17_px*In_px)+(Ne17_py*In_py)+(Ne17_pz*In_pz))/(Ne17_p*In_vector);     
+   Double_t alpha=acos(cosalpha);
+
+   
+   
 //******************** SSTs **************************//   
 
   ss03_smul=0;
@@ -263,17 +294,25 @@ void R3BTarget2pDigitizer::Exec(Option_t* opt) {
      Int_t PID = aTrack->GetPdgCode();
      Int_t mother = aTrack->GetMotherId();     
 
+     Double_t fZ_In = Tra_obj->GetZIn();
+     Double_t fZ_Out = Tra_obj->GetZOut(); 
+     Double_t fZ = ((fZ_In + fZ_Out)/2);  
+
     if(PID==1000080150 && mother<0){
 //    if(PID==1000160300 && mother<0){  //Christoph 2p
     
-      if (DetID==15)
-//      if (DetID==14)
+      //if (DetID==15)
+      //if (DetID==21)
+      //if (DetID==23)
+      if (fZ<12)
       {
         ss03_smul++;
 	ss03_kmul++;   
       }     
-      if (DetID==16)
-//      if (DetID==15)
+      //if (DetID==16)
+      //if (DetID==22)
+      //if (DetID==24)
+      if (fZ>12)
       {  
         ss06_smul++;
 	ss06_kmul++;   
@@ -283,27 +322,35 @@ void R3BTarget2pDigitizer::Exec(Option_t* opt) {
      
      if(PID==2212 && mother<0){
      
-      if (DetID==15 && l==0)
-//      if (DetID==14 && l==0)
+      //if (DetID==15 && l==0)
+      //if (DetID==21 && l==0)
+      //if (DetID==23 && l==0)
+      if (fZ<12 && l==0)
       { 
         ss03_smul++;
 	ss03_kmul++;   
       }
-      if (DetID==15 && l>1)
-//      if (DetID==14 && l>1)
+      //if (DetID==15 && l>1)
+      //if (DetID==21 && l>1)
+      //if (DetID==23 && l>1)
+      if (fZ<12 && l>0)
       { 
         ss03_smul++;
 	ss03_kmul++;   
       } 
            
-      if (DetID==16 && l==1)
-//      if (DetID==15 && l==0)
+      //if (DetID==16 && l==1)
+      //if (DetID==22 && l==1)
+      //if (DetID==24 && l==1)
+      if (fZ>12 && l==1)
       { 
         ss06_smul++;
 	ss06_kmul++;   
       }
-      if (DetID==16 && l>1)
-//      if (DetID==15 && l>0)
+      //if (DetID==16 && l>1)
+      //if (DetID==22 && l>1)
+      //if (DetID==24 && l>1)
+      if (fZ>12 && l>1)
       { 
         ss06_smul++;
 	ss06_kmul++;   
@@ -318,7 +365,9 @@ void R3BTarget2pDigitizer::Exec(Option_t* opt) {
 
 
 
-AddHit(ss03_smul,ss03_kmul,ss06_smul,ss06_kmul,x0,y0,t0,estar,Pxf,Pyf,Pzf,Pf_tot,f_beta,Pxp1,Pyp1,Pzp1,Pp1_tot,p1_beta,Pxp2,Pyp2,Pzp2,Pp2_tot,p2_beta);
+AddHit(ss03_smul,ss03_kmul,ss06_smul,ss06_kmul,x0,y0,t0,estar,Pxf,Pyf,Pzf,Pf_tot,f_beta,Pxp1,Pyp1,Pzp1,Pp1_tot,p1_beta,
+//Pxp2,Pyp2,Pzp2,Pp2_tot,p2_beta);
+Pxp2,Pyp2,Pzp2,Pp2_tot,p2_beta,alpha,ppmul);
 
 
 }
@@ -344,11 +393,13 @@ void R3BTarget2pDigitizer::Finish()
 R3BTarget2pDigi* R3BTarget2pDigitizer::AddHit(Double_t ss03_smul,Double_t ss03_kmul,Double_t ss06_smul,Double_t ss06_kmul,
 Double_t x0,Double_t y0,Double_t t0,Double_t estar,Double_t Pxf,Double_t Pyf,Double_t Pzf,Double_t Pf_tot,Double_t f_beta,
 Double_t Pxp1,Double_t Pyp1,Double_t Pzp1,Double_t Pp1_tot,Double_t p1_beta,Double_t Pxp2,Double_t Pyp2,Double_t Pzp2,
-Double_t Pp2_tot,Double_t p2_beta){   
+//Double_t Pp2_tot,Double_t p2_beta){   
+Double_t Pp2_tot,Double_t p2_beta,Double_t alpha,Int_t ppmul){   
   TClonesArray& clref = *fTarget2pDigi;
   Int_t size = clref.GetEntriesFast();
   return new(clref[size]) R3BTarget2pDigi(ss03_smul,ss03_kmul,ss06_smul,ss06_kmul,x0,y0,t0,estar,Pxf,Pyf,Pzf,Pf_tot,f_beta,
-  Pxp1,Pyp1,Pzp1,Pp1_tot,p1_beta,Pxp2,Pyp2,Pzp2,Pp2_tot,p2_beta);
+  //Pxp1,Pyp1,Pzp1,Pp1_tot,p1_beta,Pxp2,Pyp2,Pzp2,Pp2_tot,p2_beta);
+  Pxp1,Pyp1,Pzp1,Pp1_tot,p1_beta,Pxp2,Pyp2,Pzp2,Pp2_tot,p2_beta,alpha,ppmul);
  
 }
 
