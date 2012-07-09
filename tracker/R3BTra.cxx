@@ -517,32 +517,52 @@ void R3BTra::ConstructGeometry() {
 
    // SST03 position
    // Combi transformation: 
-   dx = 0.0;    //it should be move by 0.038230 but it doesn't work I'll move it in digitizer   
-   dy = 0.0;   //it should be move by -0.006402 but it doesn't work I'll move it in digitizer
+   dx = 0.03823;//0.0;    //it should be move by 0.038230  
+   dy = -0.006402;//0.0;   //it should be move by -0.006402 
    dz = 10.69; //Justyna
+   //dz = 10.66; //Felix
 //   dz = 10.69; //Christoph
    // Rotation: 
-   thx = 90.000000;    phx = 0.000000;
+/*   thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
    thz = 0.000000;    phz = 0.000000;
    TGeoRotation *pMatrix99 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
-   pMatrix98 = new TGeoCombiTrans("", dx,dy,dz,pMatrix99);
+   pMatrix98 = new TGeoCombiTrans("", dx,dy,dz,pMatrix99);*/
+   
+   TGeoRotation *gRot1 = new TGeoRotation();
+   gRot1->RotateX(0.);
+   gRot1->RotateY(0.);
+   gRot1->RotateZ(0.);
+
+   TGeoCombiTrans*
+   pMatrix98 = new TGeoCombiTrans("", dx,dy,dz,gRot1);
+   
+   
 
    
    // SSt06 position
    // Combi transformation: 
-   dx = 0.0;   //it should be move by -0.038495 but it doesn't work I'll move it in digitizer
-   dy = 0.0;     //it should be move by 0.00798 but it doesn't work I'll move it in digitizer
-   dz = 13.35; //Justyna
+   dx = -0.038495;//0.0;   //it should be move by -0.038495 
+   dy = 0.00798;//0.0;     //it should be move by 0.00798 
+   dz = 13.55;//13.35; //Justyna
+   //dz = 13.32;//13.35; //Felix
 //   dz = 13.35; //Christoph
    // Rotation: 
-   thx = 90.000000;    phx = 0.000000;
+/*   thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
    thz = 0.000000;    phz = 0.000000;
    TGeoRotation *pMatrix103 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
-   pMatrix102 = new TGeoCombiTrans("", dx,dy,dz,pMatrix103);
+   pMatrix102 = new TGeoCombiTrans("", dx,dy,dz,pMatrix103);*/
+
+   TGeoRotation *gRot2 = new TGeoRotation();
+   gRot2->RotateX(0.);
+   gRot2->RotateY(0.);
+   gRot2->RotateZ(0.);
+
+   TGeoCombiTrans*
+   pMatrix102 = new TGeoCombiTrans("", dx,dy,dz,gRot2);
 
 
 
