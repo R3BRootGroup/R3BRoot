@@ -40,7 +40,8 @@ class R3BTofDigitizer : public FairTask
 
 
   R3BTofDigi* AddHit(Int_t tfmul,Double_t tfwx_p1,Double_t tfwy_p1,Double_t tfwt_p1,Double_t tfwpath_p1,
-  Double_t tfwpx_p1,Double_t tfwpy_p1,Double_t tfwpz_p1);
+  //Double_t tfwpx_p1,Double_t tfwpy_p1,Double_t tfwpz_p1);
+  Double_t tfwpx_p1,Double_t tfwpy_p1,Double_t tfwpz_p1,Double_t tfwe_p1);
 
 
   protected: 

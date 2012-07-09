@@ -109,8 +109,8 @@ void R3BTofDigitizer::Exec(Option_t* opt) {
      Int_t nentriesTof = fTofPoints->GetEntries();
      Int_t TrackIdTof=0;
 
-     Double_t total_energy_tof=0.;
-     Double_t TOFeloss;
+     //Double_t total_energy_tof=0.;
+     //Double_t TOFeloss;
      
      Int_t tfmul;
      Double_t tfwx_p1;
@@ -120,8 +120,11 @@ void R3BTofDigitizer::Exec(Option_t* opt) {
      Double_t tfwpx_p1;
      Double_t tfwpy_p1;
      Double_t tfwpz_p1;
+     Double_t tfwe_p1;
    
 
+//********************* energy looping *********************//
+/*
    for (Int_t l=0;l<nentriesTof;l++){
 //cout<<"Point 1"<<endl;    
      R3BTofPoint *tof_obj = (R3BTofPoint*) fTofPoints->At(l);     
@@ -140,7 +143,7 @@ void R3BTofDigitizer::Exec(Option_t* opt) {
      
    
    }
-
+*/
 
 //******************** TFW ********************//
   tfmul=0;
@@ -151,6 +154,7 @@ void R3BTofDigitizer::Exec(Option_t* opt) {
   tfwpx_p1=0;
   tfwpy_p1=0;
   tfwpz_p1=0;
+  tfwe_p1=0;
   
    for (Int_t l=0;l<nentriesTof;l++){
 //cout<<"Point 2"<<endl;    
@@ -175,6 +179,7 @@ void R3BTofDigitizer::Exec(Option_t* opt) {
      Double_t PZ_out = tof_obj->GetPzOut();
      Double_t ftime = tof_obj->GetTime();
      Double_t flength = tof_obj->GetLength();
+     Double_t TOFeloss = tof_obj->GetEnergyLoss()*1000;
      
      Double_t fX = ((fX_in + fX_out)/2);
      Double_t fY = ((fY_in + fY_out)/2);
@@ -202,6 +207,7 @@ void R3BTofDigitizer::Exec(Option_t* opt) {
      tfwpx_p1=PX;
      tfwpy_p1=PY;
      tfwpz_p1=PZ;
+     tfwe_p1 += TOFeloss;
      
      TfwXhis->Fill(tfwx_p1);
      TfwYhis->Fill(tfwy_p1);
@@ -217,7 +223,8 @@ void R3BTofDigitizer::Exec(Option_t* opt) {
 
 
 
-AddHit(tfmul,tfwx_p1,tfwy_p1,tfwt_p1,tfwpath_p1,tfwpx_p1,tfwpy_p1,tfwpz_p1);
+//AddHit(tfmul,tfwx_p1,tfwy_p1,tfwt_p1,tfwpath_p1,tfwpx_p1,tfwpy_p1,tfwpz_p1);
+AddHit(tfmul,tfwx_p1,tfwy_p1,tfwt_p1,tfwpath_p1,tfwpx_p1,tfwpy_p1,tfwpz_p1,tfwe_p1);
 
 //     cout<<"addhit"<<nentriesTof<<" tfmul "<<tfmul<<" tfwx_p1 "<<tfwx_p1<<" tfwy_p1 "<<tfwy_p1<<endl;
 
@@ -247,10 +254,12 @@ void R3BTofDigitizer::Finish()
 }
 
 R3BTofDigi* R3BTofDigitizer::AddHit(Int_t tfmul,Double_t tfwx_p1,Double_t tfwy_p1,Double_t tfwt_p1,Double_t tfwpath_p1,
-Double_t tfwpx_p1,Double_t tfwpy_p1,Double_t tfwpz_p1){   
+//Double_t tfwpx_p1,Double_t tfwpy_p1,Double_t tfwpz_p1){   
+Double_t tfwpx_p1,Double_t tfwpy_p1,Double_t tfwpz_p1, Double_t tfwe_p1){   
   TClonesArray& clref = *fTofDigi;
   Int_t size = clref.GetEntriesFast();
-  return new(clref[size]) R3BTofDigi(tfmul,tfwx_p1,tfwy_p1,tfwt_p1,tfwpath_p1,tfwpx_p1,tfwpy_p1,tfwpz_p1);
+  //return new(clref[size]) R3BTofDigi(tfmul,tfwx_p1,tfwy_p1,tfwt_p1,tfwpath_p1,tfwpx_p1,tfwpy_p1,tfwpz_p1);
+  return new(clref[size]) R3BTofDigi(tfmul,tfwx_p1,tfwy_p1,tfwt_p1,tfwpath_p1,tfwpx_p1,tfwpy_p1,tfwpz_p1,tfwe_p1);
  
 }
 
