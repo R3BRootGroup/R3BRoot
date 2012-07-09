@@ -217,8 +217,8 @@ R3BmTofDigi* R3BmTofDigitizer::AddHit(Int_t ntmul,Double_t ntfx,Double_t ntfy,Do
 Double_t ntfpy,Double_t ntfpz, Double_t ntfe){   
   TClonesArray& clref = *fmTofDigi;
   Int_t size = clref.GetEntriesFast();
-  return new(clref[size]) R3BmTofDigi(ntmul,ntfx,ntfy,ntft,ntfpath,ntfpx,ntfpy,ntfpz);
-  // return new(clref[size]) R3BmTofDigi(ntmul,ntfx,ntfy,ntft,ntfpath,ntfpx,ntfpy,ntfpz,ntfe);
+  //return new(clref[size]) R3BmTofDigi(ntmul,ntfx,ntfy,ntft,ntfpath,ntfpx,ntfpy,ntfpz);
+  return new(clref[size]) R3BmTofDigi(ntmul,ntfx,ntfy,ntft,ntfpath,ntfpx,ntfpy,ntfpz,ntfe);
  
 }
 
