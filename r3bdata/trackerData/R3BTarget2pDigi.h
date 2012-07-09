@@ -27,7 +27,8 @@ class R3BTarget2pDigi : public TObject
   R3BTarget2pDigi(Double_t ss03_smul,Double_t ss03_kmul,Double_t ss06_smul,Double_t ss06_kmul,
   Double_t x0,Double_t y0,Double_t t0,Double_t estar,Double_t Pxf,Double_t Pyf,Double_t Pzf,Double_t Pf_tot,Double_t f_beta,
 Double_t Pxp1,Double_t Pyp1,Double_t Pzp1,Double_t Pp1_tot,Double_t p1_beta,Double_t Pxp2,Double_t Pyp2,Double_t Pzp2,
-Double_t Pp2_tot,Double_t p2_beta);
+//Double_t Pp2_tot,Double_t p2_beta);
+Double_t Pp2_tot,Double_t p2_beta,Double_t alpha,Int_t ppmul);
   
   /** Copy constructor **/
   R3BTarget2pDigi(const R3BTarget2pDigi& point) { *this = point; };
@@ -102,6 +103,11 @@ Double_t Pp2_tot,Double_t p2_beta);
   void Setp2_beta(Double_t vel){p2_Beta = vel;}
   Double_t Getp2_beta(){return p2_Beta;}
 
+  void Setalpha(Double_t ang){Alpha = ang;}
+  Double_t Getalpha(){return Alpha;}
+  
+  void Setppmul(Double_t mul){Ppmul = mul;}
+  Double_t Getppmul(){return Ppmul;}
 
     
 
@@ -137,6 +143,9 @@ Double_t Pp2_tot,Double_t p2_beta);
      Double32_t pp2_tot;
      Double32_t p2_Beta;
      
+     Double32_t Alpha;
+     
+     Double32_t Ppmul;
      
   
 
