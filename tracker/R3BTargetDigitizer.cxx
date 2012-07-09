@@ -44,16 +44,13 @@
 		
 using std::cout;
 using std::endl;
-		
 
 R3BTargetDigitizer::R3BTargetDigitizer() :
   FairTask("R3B Target Digitization scheme ") { 
 }
 
-
 R3BTargetDigitizer::~R3BTargetDigitizer() {
 }
-
 
 void R3BTargetDigitizer::SetParContainers() {
 
@@ -156,6 +153,7 @@ void R3BTargetDigitizer::Exec(Option_t* opt) {
      
      Double_t fX = aTrack->GetStartX();
      Double_t fY = aTrack->GetStartY();
+     Double_t fZ = aTrack->GetStartZ();
      Double_t fT = aTrack->GetStartT();
      
      Double_t Px = aTrack->GetPx();
@@ -164,7 +162,6 @@ void R3BTargetDigitizer::Exec(Option_t* opt) {
      
      
    if (mother<0 && PID==1000080150){
-//   if (mother<0 && PID==1000170310){  //Christoph
    Pxf=(Px*1000);
    Pyf=(Py*1000);
    Pzf=(Pz*1000);
@@ -189,8 +186,16 @@ void R3BTargetDigitizer::Exec(Option_t* opt) {
    
      
    if(mother<0){  
-      x0=fX;
-      y0=fY;
+      //x0=fX;
+      //y0=fY;
+      
+      //x0=(((fX - 0.0)*1) - ((fZ - 0.0)*0.0));
+      //y0=(fY - 0.0);
+
+      //Change to have lab coordinates instead (using the tracker offsets of the target):
+      x0=(((fX + 0.202437)*1) - ((fZ - 0.0)*0.0));
+      y0=(fY + 0.077698);
+      
       t0=fT;
    }            
 
@@ -238,16 +243,25 @@ void R3BTargetDigitizer::Exec(Option_t* opt) {
      R3BMCTrack *aTrack = (R3BMCTrack*) fTargetMCTrack->At(TrackIdTra);   
      Int_t PID = aTrack->GetPdgCode();
      Int_t mother = aTrack->GetMotherId();     
+     
+     Double_t fZ_In = Tra_obj->GetZIn();
+     Double_t fZ_Out = Tra_obj->GetZOut(); 
+     Double_t fZ = ((fZ_In + fZ_Out)/2);    
 
     if(PID==1000080150 && mother<0){
-//    if(PID==1000170310 && mother<0){ //Christoph
     
-      if (DetID==15)
+      //if (DetID==15)
+      //if (DetID==21)
+      //if (DetID==23)
+      if (fZ<12)
       {
         ss03_smul++;
 	ss03_kmul++;   
       }     
-      if (DetID==16)
+      //if (DetID==16)
+      //if (DetID==22)
+      //if (DetID==24)
+      if (fZ>12)
       {  
         ss06_smul++;
 	ss06_kmul++;   
@@ -257,12 +271,18 @@ void R3BTargetDigitizer::Exec(Option_t* opt) {
      
      if(PID==2212 && mother<0){
      
-      if (DetID==15)
+      //if (DetID==15)
+      //if (DetID==21)
+      //if (DetID==23)
+      if (fZ<12)
       { 
         ss03_smul++;
 	ss03_kmul++;   
       }     
-      if (DetID==16)
+      //if (DetID==16)
+      //if (DetID==22)
+      //if (DetID==24)
+      if (fZ>12)
       { 
         ss06_smul++;
 	ss06_kmul++;   
