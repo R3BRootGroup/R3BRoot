@@ -105,6 +105,7 @@ void R3BmTofDigitizer::Exec(Option_t* opt) {
   Double_t ntfpx;
   Double_t ntfpy;
   Double_t ntfpz;
+  Double_t ntfe;
 
 
 //******************** NTF ********************//
@@ -115,6 +116,7 @@ void R3BmTofDigitizer::Exec(Option_t* opt) {
   ntfpx=0;
   ntfpy=0;
   ntfpz=0;
+  ntfe=0;
   
    for (Int_t l=0;l<nentriesmTof;l++){
 //   cout<<"entries-mTof "<<l<<endl;
@@ -141,6 +143,7 @@ void R3BmTofDigitizer::Exec(Option_t* opt) {
      Double_t PZ_out = mtof_obj->GetPzOut();
      Double_t ftime = mtof_obj->GetTime();
      Double_t flength = mtof_obj->GetLength();
+     Double_t TOFeloss = mtof_obj->GetEnergyLoss()*1000;
      
      Double_t fX = ((fX_in + fX_out)/2);
      Double_t fY = ((fY_in + fY_out)/2);
@@ -163,15 +166,19 @@ void R3BmTofDigitizer::Exec(Option_t* opt) {
 //    if (PID==1000170310 && mother<0){  //Christoph  1p
 //      if (PID==1000160300 && mother<0){  //Christoph  2p
 
-     ntfx=(-(((fX + 154.815998) * 0.957822495) - ((fZ - 761.75516) * (-0.28736052))));//x position swop (with -) - requirement for tracker
+     ntfx=(-(((fX + 157.536214) * 0.957822495) - ((fZ - 760.139056) * (-0.28736052)))); //new x position to set tracker, justyna
+     //ntfx=(-(((fX + 157.536214) * 0.957822495) - ((fZ - 760.939056) * (-0.28736052))));//x position swop (with -) - requirement for tracker //justyna new
+     //ntfx=(-(((fX + 154.815998) * 0.957822495) - ((fZ - 761.75516) * (-0.28736052))));//x position swop (with -) - requirement for tracker
 //     ntfx=(-(((fX + 154.10721) * 0.957822495) - ((fZ - 761.967807) * (-0.28736052))));  //Christoph
-     ntfy=fY;
+     //ntfy=fY;
+     ntfy=fY+0.01;
 //     ntfy=(fY-0.92);  //Christoph
      ntft=ftime;
      ntfpath=flength;
      ntfpx=PX;
      ntfpy=PY;
      ntfpz=PZ;
+     ntfe += TOFeloss;
      
      
      NtfXhis->Fill(ntfx);
@@ -182,7 +189,7 @@ void R3BmTofDigitizer::Exec(Option_t* opt) {
      
    }
 
-AddHit(ntmul,ntfx,ntfy,ntft,ntfpath,ntfpx,ntfpy,ntfpz);
+AddHit(ntmul,ntfx,ntfy,ntft,ntfpath,ntfpx,ntfpy,ntfpz,ntfe);
 
 
 }
@@ -206,10 +213,12 @@ void R3BmTofDigitizer::Finish()
 }
 
 R3BmTofDigi* R3BmTofDigitizer::AddHit(Int_t ntmul,Double_t ntfx,Double_t ntfy,Double_t ntft,Double_t ntfpath,Double_t ntfpx,
-Double_t ntfpy,Double_t ntfpz){   
+//Double_t ntfpy,Double_t ntfpz){   
+Double_t ntfpy,Double_t ntfpz, Double_t ntfe){   
   TClonesArray& clref = *fmTofDigi;
   Int_t size = clref.GetEntriesFast();
-  return new(clref[size]) R3BmTofDigi(ntmul,ntfx,ntfy,ntft,ntfpath,ntfpx,ntfpy,ntfpz);
+  //return new(clref[size]) R3BmTofDigi(ntmul,ntfx,ntfy,ntft,ntfpath,ntfpx,ntfpy,ntfpz);
+  return new(clref[size]) R3BmTofDigi(ntmul,ntfx,ntfy,ntft,ntfpath,ntfpx,ntfpy,ntfpz,ntfe);
  
 }
 
