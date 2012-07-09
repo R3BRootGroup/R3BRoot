@@ -449,9 +449,12 @@ void R3BGfi::ConstructGeometry() {
    // TRANSFORMATION MATRICES
    // Combi transformation:
    //GFI1 position
-   dx = -71.973310; //Justyna
-   dy = 0.000000;   //Justyna
-   dz = 513.967775; //Justyna
+   //dx = -71.973310; //Justyna
+   //dy = 0.000000;   //Justyna
+   //dz = 513.967775; //Justyna
+   dx = -72.164874; //Justyna new
+   dy = -0.010000;   //Justyna new
+   dz = 513.910302; //Justyna new
    
 //   dx = -88.55368;  //Christoph
 //   dy = 0.92;   //Christoph
@@ -526,9 +529,12 @@ void R3BGfi::ConstructGeometry() {
    pMatrix14 = new TGeoCombiTrans("", dx,dy,dz,pMatrix15);
    // Combi transformation:
    //GFI2 position 
-   dx = -145.270039; //Justyna
-   dy = 0.000000;    //Justyna
-   dz = 730.318956;  //Justyna
+   //dx = -145.270039; //Justyna
+   //dy = 0.000000;    //Justyna
+   //dz = 730.318956;  //Justyna
+   dx = -145.212570; //Justyna new
+   dy = -0.010000;    //Justyna new
+   dz = 730.336197;  //Justyna new
    
 //   dx = -149.791168;  //Christoph
 //   dy = 0.920000;   //Christoph
