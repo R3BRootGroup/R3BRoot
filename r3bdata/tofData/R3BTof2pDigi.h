@@ -26,7 +26,9 @@ class R3BTof2pDigi : public TObject
   R3BTof2pDigi();
   R3BTof2pDigi(Int_t tfmul,Double_t tfwx_p1,Double_t tfwy_p1,Double_t tfwt_p1,
   Double_t tfwx_p2,Double_t tfwy_p2,Double_t tfwt_p2,Double_t tfwpath_p1,Double_t tfwpath_p2,
-  Double_t tfwpx_p1,Double_t tfwpy_p1,Double_t tfwpz_p1,Double_t tfwpx_p2,Double_t tfwpy_p2,Double_t tfwpz_p2);
+  //Double_t tfwpx_p1,Double_t tfwpy_p1,Double_t tfwpz_p1,Double_t tfwpx_p2,Double_t tfwpy_p2,Double_t tfwpz_p2);
+  Double_t tfwpx_p1,Double_t tfwpy_p1,Double_t tfwpz_p1,Double_t tfwpx_p2,Double_t tfwpy_p2,Double_t tfwpz_p2,
+  Double_t tfwe_p1,Double_t tfwe_p2);
   
   /** Copy constructor **/
   R3BTof2pDigi(const R3BTof2pDigi& point) { *this = point; };
@@ -62,6 +64,8 @@ class R3BTof2pDigi : public TObject
   void Settfwpz_p1(Int_t mom){Tfwpz_p1 = mom;}
   Double_t Gettfwpz_p1(){return Tfwpz_p1;}
   
+  void Settfwe_p1(Double_t en){Tfe_p1 = en;}
+  Double_t Gettfwe_p1(){return Tfe_p1;}
   
   
   void Settfwx_p2(Double_t pos){Tfx_p2 = pos;}
@@ -85,6 +89,8 @@ class R3BTof2pDigi : public TObject
   void Settfwpz_p2(Int_t mom){Tfwpz_p2 = mom;}
   Double_t Gettfwpz_p2(){return Tfwpz_p2;} 
 
+  void Settfwe_p2(Double_t en){Tfe_p2 = en;}
+  Double_t Gettfwe_p2(){return Tfe_p2;} 
 
  protected:
  
@@ -96,6 +102,7 @@ class R3BTof2pDigi : public TObject
    Double32_t Tfwpx_p1;
    Double32_t Tfwpy_p1;
    Double32_t Tfwpz_p1;
+   Double32_t Tfe_p1;
    
    Double32_t Tfx_p2;
    Double32_t Tfy_p2;
@@ -104,6 +111,7 @@ class R3BTof2pDigi : public TObject
    Double32_t Tfwpx_p2;
    Double32_t Tfwpy_p2;
    Double32_t Tfwpz_p2;
+   Double32_t Tfe_p2;
 
   ClassDef(R3BTof2pDigi,1)
 
