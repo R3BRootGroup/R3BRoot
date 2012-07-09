@@ -29,6 +29,9 @@
 #include "R3BTraPoint.h"
 #include "R3BMCTrack.h"
 		
+#define SST_HALF_WIDTH_CM  3.5200
+#define SST_HALF_HEIGHT_CM 1.9968
+
 using std::cout;
 using std::endl;
 		
@@ -159,8 +162,10 @@ void R3BTraDigitizer::Exec(Option_t* opt) {
      Int_t DetID = Tra_obj->GetDetectorID();
      Double_t fX_In = Tra_obj->GetXIn();
      Double_t fY_In = Tra_obj->GetYIn();
+     Double_t fZ_In = Tra_obj->GetZIn();
      Double_t fX_Out = Tra_obj->GetXOut();
      Double_t fY_Out = Tra_obj->GetYOut();
+     Double_t fZ_Out = Tra_obj->GetZOut();
      TrackIdTra = Tra_obj->GetTrackID();
      R3BMCTrack *aTrack = (R3BMCTrack*) fTraMCTrack->At(TrackIdTra);   
      Int_t PID = aTrack->GetPdgCode();
@@ -168,44 +173,50 @@ void R3BTraDigitizer::Exec(Option_t* opt) {
 
      Double_t fX = ((fX_In + fX_Out)/2);
      Double_t fY = ((fY_In + fY_Out)/2);     
+     Double_t fZ = ((fZ_In + fZ_Out)/2);   
 
 
     if(PID==1000080150 && mother<0){
-    //if(PID==1000170310 && mother<0){  //Christoph 1p
     
-      if (DetID==15)
+      //if (DetID==15)
+      //if (DetID==21)
+      //if (DetID==23)
+      if (fZ<12)      
       {
         ss03_se_f = 2000;
-//	ss03_spos_f = (-0.038230 + (3.5 + fX)); //detectors couldn't be shifted in simulation, they are shifted here 0.038230 
-	ss03_spos_f = (3.5 + fX);
-        //ss03_spos_f = (-0.039 + (3.5 + fX));  //Christoph
+	//ss03_spos_f = (-0.038230 + (3.5 + fX)); //detectors couldn't be shifted in simulation, they are shifted here 0.038230 
+	ss03_spos_f = (-0.038230 + (SST_HALF_WIDTH_CM + fX)); //detectors couldn't be shifted in simulation, they are shifted here 0.038230 
+	//ss03_spos_f = (3.5 + fX);
 	ss03_sbw_f = 2;
 	ss03_sarea_f = 0;
 	ss03_seta_f = 0;
 	  
 	ss03_ke_f = 2000;
-//	ss03_kpos_f = (3.9936-(-0.006402 + (2 + fY)));//detectors couldn't be shifted in simulation, they are shifted here -0.006402 
-	ss03_kpos_f = (2 + fY);
-	//ss03_kpos_f = ((-0.01035 + (2 + fY)));  //Christoph (no swop)!!!
+	//ss03_kpos_f = (3.9936-(0.006402 + (2 + fY)));//detectors couldn't be shifted in simulation, they are shifted here -0.006402 
+	ss03_kpos_f = (2.*SST_HALF_HEIGHT_CM-(0.006402 + (SST_HALF_HEIGHT_CM + fY)));//detectors couldn't be shifted in simulation, they are shifted here -0.006402 
+	//ss03_kpos_f = (2 + fY);
 	ss03_kbw_f = 2;  //kpos for 1 SST swop (with 3.9936-) - requirement for tracker
 	ss03_karea_f = 0;
 	ss03_keta_f = 0;
 //	cout<<"SST1 - fragment "<<PID<<endl;   
       }     
-      if (DetID==16)
+      //if (DetID==16)
+      //if (DetID==22)
+      //if (DetID==24)
+      if (fZ>12)      
       {
         ss06_se_f = 2000;
-//	ss06_spos_f = (0.038495 + (3.5 + fX));//detectors couldn't be shifted in simulation, they are shifted here -0.038495 
-	ss06_spos_f = (3.5 + fX);
-	//ss06_spos_f = (0.039 + (3.5 + fX));  //Christoph
+	//ss06_spos_f = (0.038495 + (3.5 + fX));//detectors couldn't be shifted in simulation, they are shifted here -0.038495 
+	ss06_spos_f = (0.038495 + (SST_HALF_WIDTH_CM + fX));//detectors couldn't be shifted in simulation, they are shifted here -0.038495 
+	//ss06_spos_f = (3.5 + fX);
 	ss06_sbw_f = 2;
 	ss06_sarea_f = 0;
 	ss06_seta_f = 0;
 	  
 	ss06_ke_f = 2000;
-//	ss06_kpos_f = (0.00798 + (2 + fY));//detectors couldn't be shifted in simulation, they are shifted here 0.00798
-	ss06_kpos_f = (2 + fY);
-	//ss06_kpos_f = (0.01035 + (2 + fY));  //Christoph
+	//ss06_kpos_f = (-0.00798 + (2 + fY));//detectors couldn't be shifted in simulation, they are shifted here 0.00798
+	ss06_kpos_f = (-0.00798 + (SST_HALF_HEIGHT_CM + fY));//detectors couldn't be shifted in simulation, they are shifted here 0.00798
+	//ss06_kpos_f = (2 + fY);
 	ss06_kbw_f = 2;
 	ss06_karea_f = 0;
 	ss06_keta_f = 0;	
@@ -216,40 +227,46 @@ void R3BTraDigitizer::Exec(Option_t* opt) {
      
      if(PID==2212 && mother<0){
      
-      if (DetID==15)
+      //if (DetID==15)
+      //if (DetID==21)
+      //if (DetID==23)
+      if (fZ<12)      
       {
         ss03_se_p1 = 50;
-//	ss03_spos_p1 = (-0.038230 + (3.5 + fX)); //detectors couldn't be shifted in simulation, they are shifted here 0.038230
-	ss03_spos_p1 = (3.5 + fX);
-	//ss03_spos_f = (-0.039 + (3.5 + fX));  //Christoph
+	//ss03_spos_p1 = (-0.038230 + (3.5 + fX)); //detectors couldn't be shifted in simulation, they are shifted here 0.038230
+	ss03_spos_p1 = (-0.038230 + (SST_HALF_WIDTH_CM + fX)); //detectors couldn't be shifted in simulation, they are shifted here 0.038230
+	//ss03_spos_p1 = (3.5 + fX);
 	ss03_sbw_p1 = 2;
 	ss03_sarea_p1 = 0;
 	ss03_seta_p1 = 0;
 	  
 	ss03_ke_p1 = 50;
-//	ss03_kpos_p1 = (3.9936-(-0.006402 + (2 + fY))); //detectors couldn't be shifted in simulation, they are shifted here -0.006402
-	ss03_kpos_p1 = (2 + fY);
-	//ss03_kpos_f = ((-0.01035 + (2 + fY)));  //Christoph (no swop)!!!
+	//ss03_kpos_p1 = (3.9936-(0.006402 + (2 + fY))); //detectors couldn't be shifted in simulation, they are shifted here -0.006402
+	ss03_kpos_p1 = (2.*SST_HALF_HEIGHT_CM-(0.006402 + (SST_HALF_HEIGHT_CM + fY))); //detectors couldn't be shifted in simulation, they are shifted here -0.006402
+	//ss03_kpos_p1 = (2 + fY);
 	ss03_kbw_p1 = 2;   //kpos for 1 SST swop (with 3.9936-) - requirement for tracker 
 	ss03_karea_p1 = 0;
 	ss03_keta_p1 = 0;
 //	cout<<"SST1 - proton "<<PID<<endl;
 //	cout<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID<<endl;
       }     
-      if (DetID==16)
+      //if (DetID==16)
+      //if (DetID==22)
+      //if (DetID==24)
+      if (fZ>12)      
       {
         ss06_se_p1 = 50;
-//	ss06_spos_p1 = (0.038495 + (3.5 + fX));//detectors couldn't be shifted in simulation, they are shifted here -0.038495
-	ss06_spos_p1 = (3.5 + fX);
-	//ss06_spos_f = (0.039 + (3.5 + fX));  //Christoph
+	//ss06_spos_p1 = (0.038495 + (3.5 + fX));//detectors couldn't be shifted in simulation, they are shifted here -0.038495
+	ss06_spos_p1 = (0.038495 + (SST_HALF_WIDTH_CM + fX));//detectors couldn't be shifted in simulation, they are shifted here -0.038495
+	//ss06_spos_p1 = (3.5 + fX);
 	ss06_sbw_p1 = 2;
 	ss06_sarea_p1 = 0;
 	ss06_seta_p1 = 0;
 	  
 	ss06_ke_p1 = 50;
-//	ss06_kpos_p1 = (0.00798 + (2 + fY));//detectors couldn't be shifted in simulation, they are shifted here 0.00798
-	ss06_kpos_p1 = (2 + fY);
-	//ss06_kpos_f = (0.01035 + (2 + fY));  //Christoph
+	//ss06_kpos_p1 = (-0.00798 + (2 + fY));//detectors couldn't be shifted in simulation, they are shifted here 0.00798
+	ss06_kpos_p1 = (-0.00798 + (SST_HALF_HEIGHT_CM + fY));//detectors couldn't be shifted in simulation, they are shifted here 0.00798
+	//ss06_kpos_p1 = (2 + fY);
 	ss06_kbw_p1 = 2;
 	ss06_karea_p1 = 0;
 	ss06_keta_p1 = 0;
