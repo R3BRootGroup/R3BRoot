@@ -416,9 +416,13 @@ void R3BmTof::ConstructGeometry() {
    // TRANSFORMATION MATRICES
    // Combi transformation:
    //NTF position 
-   dx = -154.815998;//Justyna
-   dy = 0.000000;  //Justyna
-   dz = 761.755160;//Justyna
+   //dx = -154.815998;//Justyna
+   //dy = 0.000000;  //Justyna
+   //dz = 761.755160;//Justyna
+   dx = -157.536214;//Justyna new
+   dy = -0.010000;  //Justyna new
+   //dz = 760.939056;//Justyna new
+   dz = 760.139056;//Justyna   
    
 //   dx = -154.10721;//Christoph
 //   dy = 0.92;  //Christoph
