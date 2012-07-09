@@ -50,16 +50,30 @@
 //Dead wire areas, determined from s318 DHIT data:
 #define PDC1_X_DEAD_1_LO	22.16	//cm, DHIT level, >
 #define PDC1_X_DEAD_1_HI	23.55	//cm, DHIT level, <=
-#define PDC1_Y_DEAD_1_LO	13.85	//cm, DHIT level, >
-#define PDC1_Y_DEAD_1_HI	15.24	//cm, DHIT level, <=
-#define PDC1_Y_DEAD_2_LO	54.73	//cm, DHIT level, >
-#define PDC1_Y_DEAD_2_HI	55.42	//cm, DHIT level, <=
-#define PDC1_Y_DEAD_3_LO	58.88	//cm, DHIT level, >
-#define PDC1_Y_DEAD_3_HI	60.97	//cm, DHIT level, <=
-#define PDC1_Y_DEAD_4_LO	64.41	//cm, DHIT level, >
-#define PDC1_Y_DEAD_4_HI	66.50	//cm, DHIT level, <=
+//#define PDC1_Y_DEAD_1_LO	13.85	//cm, DHIT level, >
+//#define PDC1_Y_DEAD_1_HI	15.24	//cm, DHIT level, <=
+//#define PDC1_Y_DEAD_2_LO	54.73	//cm, DHIT level, >
+//#define PDC1_Y_DEAD_2_HI	55.42	//cm, DHIT level, <=
+//#define PDC1_Y_DEAD_3_LO	58.88	//cm, DHIT level, >
+//#define PDC1_Y_DEAD_3_HI	60.97	//cm, DHIT level, <=
+//#define PDC1_Y_DEAD_4_LO	64.41	//cm, DHIT level, >
+//#define PDC1_Y_DEAD_4_HI	66.50	//cm, DHIT level, <=
+//update: HIT level values, translated to dhit
+#define PDC1_Y_DEAD_1_LO	14.3	//cm, DHIT level, >
+#define PDC1_Y_DEAD_1_HI	15.5	//cm, DHIT level, <=
+#define PDC1_Y_DEAD_2_LO	54.8	//cm, DHIT level, >
+#define PDC1_Y_DEAD_2_HI	56.2	//cm, DHIT level, <=
+#define PDC1_Y_DEAD_3_LO	56.5	//cm, DHIT level, >
+#define PDC1_Y_DEAD_3_HI	57.1	//cm, DHIT level, <=
+#define PDC1_Y_DEAD_4_LO	60.7	//cm, DHIT level, >
+#define PDC1_Y_DEAD_4_HI	62.7	//cm, DHIT level, <=
+#define PDC1_Y_DEAD_5_LO	66.2	//cm, DHIT level, >
+#define PDC1_Y_DEAD_5_HI	66.8	//cm, DHIT level, <=
+
 #define PDC2_X_DEAD_1_LO	13.84	//cm, DHIT level, >
 #define PDC2_X_DEAD_1_HI	15.26	//cm, DHIT level, <=
+
+
 
 //Size of active area
 //#define PDC_L_X		100.0	//length of active area
@@ -212,6 +226,7 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
      
 
    
+//********************** Energy loss ***************************//   
    
    for (Int_t l=0;l<nentriesDch;l++){
      
@@ -249,10 +264,8 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
 
      Double_t fX_Local_In = dch_obj->GetXLocalIn();
      Double_t fY_Local_In = dch_obj->GetYLocalIn();
-     //Double_t fZ_Local_In = dch_obj->GetZLocalIn();
      Double_t fX_Local_Out = dch_obj->GetXLocalOut();
      Double_t fY_Local_Out = dch_obj->GetYLocalOut();
-     //Double_t fZ_Local_Out = dch_obj->GetZLocalOut();
 
      Double_t fX_Global_In = dch_obj->GetXIn();
      Double_t fY_Global_In = dch_obj->GetYIn();
@@ -270,7 +283,6 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
      
      Double_t fX_Local_sim = ((fX_Local_In + fX_Local_Out)/2);
      Double_t fY_Local_sim = ((fY_Local_In + fY_Local_Out)/2);
-     //Double_t fZ_Local_sim = ((fZ_Local_In + fZ_Local_Out)/2);
 
      //Need modifications
      Double_t fX_Global = ((fX_Global_In + fX_Global_Out)/2);
@@ -283,7 +295,7 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
 
      Double_t fX_Local = 0.;	//initialisation, values will be PDC-specific
      Double_t fY_Local = 0.; 
-     Double_t fZ_Local = 0.;
+     Double_t fZ_Local = 0.; 
 
     if(PID==2212 && mother<0) {
       if (DetID==0) {
@@ -294,19 +306,23 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
      fX_Local	= fX_Local_sim;	//values identical to manual ones. both correct.
      fY_Local	= fY_Local_sim;
 	
-	//control printouts
-	std::cout << "PDC1: glo_x: " << fX_Global << ", glo_y: "<< fY_Global << ", glo_z: "<< fZ_Global << std::endl;
-	std::cout << "PDC1: sloc_x: " << fX_Local_sim << ", sloc_y: "<< fY_Local_sim << std::endl;
-	std::cout << "PDC1: loc_x: " << fX_Local << ", loc_y: "<< fY_Local << ", loc_z: "<< fZ_Local << std::endl;
+	////control printouts
+	//std::cout << "PDC1: glo_x: " << fX_Global << ", glo_y: "<< fY_Global << ", glo_z: "<< fZ_Global << std::endl;
+	//std::cout << "PDC1: sloc_x: " << fX_Local_sim << ", sloc_y: "<< fY_Local_sim << std::endl;
+	//std::cout << "PDC1: loc_x: " << fX_Local << ", loc_y: "<< fY_Local << ", loc_z: "<< fZ_Local << std::endl;
      
-     ////Here, discard events where areas of dead wires were hit:
-     if ( (fX_Local+PDC_L_X/2>PDC1_X_DEAD_1_LO && fX_Local+PDC_L_X/2<=PDC1_X_DEAD_1_HI)
+	
+     //Here, discard events where areas of dead wires were hit:
+     //if ( (fX_Local+PDC_L_X/2>PDC1_X_DEAD_1_LO && fX_Local+PDC_L_X/2<=PDC1_X_DEAD_1_HI)
+     if ( (-fX_Local+PDC_L_X/2>PDC1_X_DEAD_1_LO && -fX_Local+PDC_L_X/2<=PDC1_X_DEAD_1_HI)	//- for dhit-hit x-swap
       ||  (fY_Local+PDC_L_Y/2>PDC1_Y_DEAD_1_LO && fY_Local+PDC_L_Y/2<=PDC1_Y_DEAD_1_HI)
       ||  (fY_Local+PDC_L_Y/2>PDC1_Y_DEAD_2_LO && fY_Local+PDC_L_Y/2<=PDC1_Y_DEAD_2_HI)
       ||  (fY_Local+PDC_L_Y/2>PDC1_Y_DEAD_3_LO && fY_Local+PDC_L_Y/2<=PDC1_Y_DEAD_3_HI)
-      ||  (fY_Local+PDC_L_Y/2>PDC1_Y_DEAD_4_LO && fY_Local+PDC_L_Y/2<=PDC1_Y_DEAD_4_HI) ) {
-	    continue;
+      ||  (fY_Local+PDC_L_Y/2>PDC1_Y_DEAD_4_LO && fY_Local+PDC_L_Y/2<=PDC1_Y_DEAD_4_HI) 
+      ||  (fY_Local+PDC_L_Y/2>PDC1_Y_DEAD_5_LO && fY_Local+PDC_L_Y/2<=PDC1_Y_DEAD_5_HI)
+     ) { continue;
      }
+     
 
      Pdx1_p1 = fX_Local;	// not += !!!
      Pdy1_p1 = fY_Local;	// not += !!!
@@ -328,15 +344,18 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
      //fY_Local	= (fX_Global-PDC2_X0)*sin(PDC2_Atilt*TMath::Pi()/180.)/cos(PDC2_Aparm*TMath::Pi()/180.) + (fY_Global-PDC2_Y0)*cos(PDC2_Atilt*TMath::Pi()/180.);
      fX_Local	= fX_Local_sim;
      fY_Local	= fY_Local_sim;
+
+     ////control printouts
+     //std::cout << "PDC2: glo_x: " << fX_Global << ", glo_y: "<< fY_Global << ", glo_z: "<< fZ_Global << std::endl;
+     //std::cout << "PDC2: sloc_x: " << fX_Local_sim << ", sloc_y: "<< fY_Local_sim << std::endl;
+     //std::cout << "PDC2: loc_x: " << fX_Local << ", loc_y: "<< fY_Local << ", loc_z: "<< fZ_Local << std::endl;
      
-     	//control printouts
-	std::cout << "PDC2: glo_x: " << fX_Global << ", glo_y: "<< fY_Global << ", glo_z: "<< fZ_Global << std::endl;
-	std::cout << "PDC2: sloc_x: " << fX_Local_sim << ", sloc_y: "<< fY_Local_sim << std::endl;
-	std::cout << "PDC2: loc_x: " << fX_Local << ", loc_y: "<< fY_Local << ", loc_z: "<< fZ_Local << std::endl;
      
-     ////Here, discard events where areas of dead wires were hit:
-     if ( (fX_Local+PDC_L_X/2>PDC2_X_DEAD_1_LO && fX_Local+PDC_L_X/2<=PDC2_X_DEAD_1_HI)
+     //Here, discard events where areas of dead wires were hit:
+     //if ( (fX_Local+PDC_L_X/2>PDC2_X_DEAD_1_LO && fX_Local+PDC_L_X/2<=PDC2_X_DEAD_1_HI)
+     if ( (-fX_Local+PDC_L_X/2>PDC2_X_DEAD_1_LO && -fX_Local+PDC_L_X/2<=PDC2_X_DEAD_1_HI)	//- for dhit-hit x-swap
      ) continue;
+     
 
      Pdx2_p1 = fX_Local;	// not += !!!
      Pdy2_p1 = fY_Local;	// not += !!!
