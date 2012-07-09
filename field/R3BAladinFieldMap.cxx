@@ -586,9 +586,18 @@ void R3BAladinFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField)
   TVector3 BLab(Bi[0],Bi[1],Bi[2]);
   BLab.Transform(*gRot);
   // copy value @ end
-  bField[0] = -1.*BLab.X()*10.; // [kGauss]
+  //bField[0] = -1.*BLab.X()*10.; // [kGauss]
+  //bField[1] = -1.*BLab.Y()*10.; // [kGauss]
+  //bField[2] = -1.*BLab.Z()*10.; // [kGauss]
+  //swap field like in tracker, according to denis and justyna
+  //git/justyna version:
+  bField[2] = -1.*BLab.X()*10.; // [kGauss]
   bField[1] = -1.*BLab.Y()*10.; // [kGauss]
-  bField[2] = -1.*BLab.Z()*10.; // [kGauss]
+  bField[0] = +1.*BLab.Z()*10.; // [kGauss]
+  ////old/standard version(?):
+  //bField[2] = -1.*BLab.X()*10.; // [kGauss]
+  //bField[1] = -1.*BLab.Y()*10.; // [kGauss]
+  //bField[0] = -1.*BLab.Z()*10.; // [kGauss]
 
 //  cout << "-I- ALADIN --> X: " << p.X() << " Y: " << p.Y() << "Z:" << p.Z() << endl;
 //  cout << "-I- ALADIN --> Bx: " << bField[0] << " By: " << bField[1] << "Bz:" << bField[2] << endl;
