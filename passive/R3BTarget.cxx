@@ -58,6 +58,7 @@ void R3BTarget::ConstructGeometry(){
  if (*fTargetName == "LiH")        return  ConstructGeometry4();
  if (*fTargetName == "CTarget")    return  ConstructGeometry5();	//for s318 
  if (*fTargetName == "CH2Target")    return  ConstructGeometry6(); 	//for s318
+ if (*fTargetName == "ETTarget")    return  ConstructGeometry7(); 	//for s318, empty target
 
 }
 
@@ -933,6 +934,88 @@ void R3BTarget::ConstructGeometry6(){
 
    TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix);
    top->AddNode(pCH2Target_log, 0, pGlobal);
+
+}
+
+void R3BTarget::ConstructGeometry7(){//ETTarget
+
+    cout << endl;
+    cout << "-I- R3BTarget:: ConstructGeometry() "<< endl;
+    cout << "-I- R3BTarget Target type: Empty target (vacuum) "<< endl;
+    cout << endl;
+
+  // test of out-of-file geometry definition
+
+  Double_t dx, dy, dz;
+  Double_t thx, thy, thz;
+  Double_t phx, phy, phz;
+  Double_t a, z, density;
+  //Double_t par[20];
+  Int_t numed;
+
+  TGeoMaterial *pMat=NULL;
+  TGeoMedium   *pMed=NULL;
+
+  if (gGeoManager->GetMedium("Vacuum") ){
+       cout << "-I- TGeoManager: Vacuum Medium already defined " << endl;
+       pMed = gGeoManager->GetMedium("Vacuum");
+   }else{
+  // Material definition
+  // Material: Vacuum
+   a       = 1.e-16;
+   z       = 1.e-16;
+   density = 1.e-16;
+   pMat = new TGeoMaterial("Vacuum", a,z,density);
+   pMat->SetIndex(2);
+// Medium: Vacuum
+   numed   = 2;  // medium number
+   Double_t par[8];
+   par[0]  = 0.000000; // isvol
+   par[1]  = 0.000000; // ifield
+   par[2]  = 0.000000; // fieldm
+   par[3]  = 0.000000; // tmaxfd
+   par[4]  = 0.000000; // stemax
+   par[5]  = 0.000000; // deemax
+   par[6]  = 0.000100; // epsil
+   par[7]  = 0.000000; // stmin
+   pMed  = new TGeoMedium("Vacuum", numed,pMat, par);
+  }
+
+   // TRANSFORMATION MATRICES
+   // Combi transformation: 
+   dx = 0.000000;
+   dy = 0.000000;
+   dz = 0.000000;	//-(0.15cm+half thickness)
+   //dx = -0.202437;	//s318: including offsets from exp tracker
+   //dy = -0.0776977;	//s318: including offsets from exp tracker
+   //dz = -0.15;		//s318: (0.15cm)
+   //dz = 0.00;		//justyna
+   // Rotation: 
+   thx = 90.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 0.000000;     phz = 0.000000;
+   TGeoRotation *pRot = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans* pMatrix =
+                   new TGeoCombiTrans("", dx,dy,dz,pRot);
+
+ // Shape: VacuumTarget type: TGeoBBox
+   //dx = 1.600000;
+   //dy = 1.200000;
+   //dz = 0.008810;
+   dx = 1.500000;	//s318
+   dy = 1.500000;	//s318
+   //dz = 0.201;		//s318
+   dz = 0.1000;		//arbitrary thickness, 2mm for convenience
+   TGeoShape *pVacuumTarget = new TGeoBBox("VacuumTarget", dx,dy,dz);
+ // Volume: VacuumTarget_log
+   TGeoVolume* pVacuumTarget_log
+               = new TGeoVolume("VacuumTarget_log",pVacuumTarget, pMed);
+   pVacuumTarget_log->SetVisLeaves(kTRUE);
+
+   TGeoVolume *top =  gGeoManager->GetTopVolume();
+
+   TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix);
+   top->AddNode(pVacuumTarget_log, 0, pGlobal);
 
 }
 
