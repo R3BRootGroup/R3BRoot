@@ -368,7 +368,7 @@ void R3BMagnet::ConstructGeometry(){
 
 
 
-   pAWorld->AddNode(pVolFeYoke_up,   1, t1);
+//   pAWorld->AddNode(pVolFeYoke_up,   1, t1);
    pAWorld->AddNode(pVolFeYoke_down, 2, t2);
    pAWorld->AddNode(pVolFeYoke_left, 3, t3);
    pAWorld->AddNode(pVolFeYoke_right,4, t4);
@@ -463,7 +463,7 @@ void R3BMagnet::ConstructGeometry(){
    // Combi transformation: 
    dx = -16.000000;
    dy = 0.000000;
-   dz = 374.5;
+   dz = 375.0;
    TGeoRotation *gRot8 = new TGeoRotation();
    gRot8->RotateX(0.);
    gRot8->RotateY(-7.000000);
