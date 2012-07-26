@@ -1,15 +1,14 @@
 // -------------------------------------------------------------------------
-// -----                        R3BCal header file                     -----
+// -----                        R3BCalv1 header file                     -----
 // -----                  Created 26/03/09  by D.Bertini               -----
 // -----        new Version: 08/04/10 <wranne@student.chalmers.se>     -----
-// -----        new Version: 08/06/12 <pablo.cabanelas@usc.es>         -----
 // -------------------------------------------------------------------------
 
-/**  R3BCal.h
+/**  R3BCalv1.h
  **/
 
-#ifndef R3BCAL_H
-#define R3BCAL_H
+#ifndef R3BCALV1_H
+#define R3BCALV1_H
 
 #include "R3BDetector.h"
 #include "TGeoSphere.h"
@@ -18,12 +17,10 @@
 
 class TClonesArray;
 class R3BCalPoint;
-class R3BCalCrystalHit;
-class R3BCalCrystalHitSim;
 class FairVolume;
 class TGeoRotation;
 
-struct xb_wrapping
+struct xb_crystal_v1
 {
   int no;
   int type;
@@ -31,46 +28,38 @@ struct xb_wrapping
   bool active;
 };
 
-struct xb_wrapping_mod
+struct xb_crystal_mod
 {
   int no;
   int mod;
   double delta;
 };
 
-struct xb_crystal
-{
-  int no;
-  int type;
-  double theta, phi, psi;
-  bool active;
-};
 
-
-class R3BCal : public R3BDetector
+class R3BCalv1 : public R3BDetector
 {
 
  public:
 
   /** Default constructor **/
-  R3BCal();
+  R3BCalv1();
 
 
   /** Standard constructor.
    *@param name    detetcor name
    *@param active  sensitivity flag
    **/
-  R3BCal(const char* name, Bool_t active);
+  R3BCalv1(const char* name, Bool_t active);
 
 
   /** Destructor **/
-  virtual ~R3BCal();
+  virtual ~R3BCalv1();
 
 
   /** Virtual method ProcessHits
    **
    ** Defines the action to be taken when a step is inside the
-   ** active volume. Creates a R3BCalPoint and adds it to the
+   ** active volume. Creates a R3BCalv1Point and adds it to the
    ** collection.
    *@param vol  Pointer to the active volume
    **/
@@ -131,7 +120,7 @@ class R3BCal : public R3BDetector
         Int_t offset);
 
 
-  /** Virtual method Construct geometry
+  /** Virtaul method Construct geometry
    **
    ** Constructs the CAL CRYSTAL geometry
    **/
@@ -143,70 +132,30 @@ class R3BCal : public R3BDetector
   Double_t  GetEnergyCutOff ( ) {return fCutE;}
 
 
-  /** Public method DrawCrystals
-   **
-   ** Selects whether to draw crystals or wrappings in the R3BRoot evtviewer
-   **/
-  void DrawCrystals( Bool_t drawCrystals ) {kDrawCrystals = drawCrystals;}
-
-
-  /** Public method SelectCollectionOption
-   **
-   ** Selects the TObjectArray collection to be stored
-   ** Syntaxis:
-   **     fCollectionOption = 0  -- CrystalPoint only
-   **     fCollectionOption = 1  -- CrystalHit only
-   **     fCollectionOption = 2  -- Both
-   ** By default, only CrystalPoint collection is stored
-   **/
-  void SelectCollectionOption(Int_t option) {fCollectionOption = option;}
-
-  /** Public method SetNonUniformity
-  **
-  ** Defines the fNonUniformity parameter in % deviation from the central value 
-  *@param nonU  Double parameter setting the maximum non-uniformity allowed 
-  **/	
-  void SetNonUniformity(Double_t nonU);
-
-
   private:
 
     /** Track information to be stored until the track leaves the
   active volume. **/
-
     Int_t          fTrackID;           //!  track index
-    Int_t          fTrackPID;          //!  particle identification
     Int_t          fVolumeID;          //!  volume id
-    Int_t          fParentTrackID;     //!  parent track index
-    Int_t          fUniqueID;          //!  particle unique id (e.g. if Delta electron, fUniqueID=9)
-
     TLorentzVector fPosIn, fPosOut;    //!  position
     TLorentzVector fMomIn, fMomOut;    //!  momentum
-
     Double32_t     fTime;              //!  time
     Double32_t     fLength;            //!  length
     Double32_t     fELoss;             //!  energy loss
-    Double32_t     fCutE;              //!  energy cut 
-    Double32_t     fEinc;              //!  Total incident energy
-    Int_t          fNSteps;            //!  Number of steps in the active volume
+    Double32_t     fCutE;              //!  energy loss
 
     Int_t          fPosIndex;          //!
+    TClonesArray*  fCalCollection;     //!  The hit collection
     Bool_t         kGeoSaved;          //!
-    TList*         flGeoPar;           //!
-    Int_t          fGeoVersion;        //!
-    Bool_t         kDrawCrystals;      //! flag indicating whether draw either crystals or wrappings
-    Int_t          fCollectionOption;  //! object collection option
-    Double_t       fNonUniformity;     //! Adding some non-uniformity preliminary description
-
+    TList *flGeoPar;                   //!
+    Int_t fGeoVersion;                 //!
 
     Int_t fTypeA;                      //!
     Int_t fTypeB;                      //!
     Int_t fTypeC;                      //!
     Int_t fTypeD;                      //!
     
-    TClonesArray*  fCalCollection;               //!  The hit collection
-    TClonesArray*  fCalCrystalHitCollection;     //!  The CB crystal hit collection
-
     /** Private method AddHit
      **
      ** Adds a CalPoint to the HitCollection
@@ -216,24 +165,6 @@ class R3BCal : public R3BDetector
       TVector3 momOut, Double_t time, 
       Double_t length, Double_t eLoss);
 
-    /** Private method AddCrystalHit
-     **
-     ** Adds a CalCrystalhit to the HitCollection
-     **/
-    R3BCalCrystalHitSim* AddCrystalHit(Int_t type, Int_t copy,
-	Double_t energy, Double_t tof,
-	Int_t steps, Double_t einc,
-	Int_t trackid, Int_t volid, Int_t partrackid,
-	Int_t pdgid, Int_t uniqueid);
-	
-    /** Private method NUSmearing
-     **
-     ** Smears the energy according to some non-uniformity distribution	
-     ** Very simple preliminary scheme where the NU is introduced as a flat random
-     ** distribution with limits fNonUniformity (%) of the energy value.
-     **/
-    Double_t NUSmearing(Double_t inputEnergy);
-	
 
     /** Private method ResetParameters
      **
@@ -242,16 +173,16 @@ class R3BCal : public R3BDetector
     void ResetParameters();
 
     Int_t  GetCrystalType(Int_t volID);
-    void insertWrapping(xb_wrapping *wrapping, TGeoVolume **wrappingVolumes, TGeoVolume *worldVolume, double r);
-    TGeoShape* createVolume(double *arbCrystals, int voltype);
+    void insertCrystal(xb_crystal_v1 *crystal, TGeoVolume **crystalVolumes, TGeoVolume *worldVolume, double r);
+    TGeoShape* createCrystal(double *arbCrystals);
 
 
 
-    ClassDef(R3BCal,1);
+    ClassDef(R3BCalv1,1);
 
 };
 
-inline Int_t R3BCal::GetCrystalType(Int_t volID) {
+inline Int_t R3BCalv1::GetCrystalType(Int_t volID) {
 Int_t type=-1;
 
 if (volID==fTypeA) { type=1;return (type);}
@@ -263,15 +194,14 @@ return type;
 }
 
 
-inline void R3BCal::ResetParameters() {
-  fTrackID = fVolumeID = fParentTrackID = fTrackPID = fUniqueID = 0;
+inline void R3BCalv1::ResetParameters() {
+  fTrackID = fVolumeID = 0;
   fPosIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fPosOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fMomIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fMomOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
-  fTime = fLength = fELoss = fEinc = 0;
+  fTime = fLength = fELoss = 0;
   fPosIndex = 0;
-  fNSteps = 0;
 };
 
 

@@ -1,17 +1,14 @@
 // -------------------------------------------------------------------------
-// -----                  R3BCal source file                           -----
+// -----                  R3BCalv1 source file                           -----
 // -----            Created 26/03/09  by D.Bertini                     -----
 // -----        new Version: 20/07/09 <D.Bertini@gsi.de>               -----
 // -----        new Version: 08/04/10 <wranne@student.chalmers.se>     -----
 // -----        new Version: 25/11/10 <marc.labiche@stfc.ac.uk>        -----
-// -----        new Version: 08/06/12 <pablo.cabanelas@usc.es>         -----
 // -------------------------------------------------------------------------
-#include "R3BCal.h"
+#include "R3BCalv1.h"
 
 #include "R3BGeoCal.h"
 #include "R3BCalPoint.h"
-#include "R3BCalCrystalHit.h"
-#include "R3BCalCrystalHitSim.h"
 #include "R3BGeoCalPar.h"
 
 #include "FairGeoInterface.h"
@@ -60,75 +57,60 @@ using std::endl;
 #define XB_CRYSTAL(no,type,theta,phi,psi,n1,n2,n3,n4,n5,n6) { no, type, theta, phi, psi },
 #define XB_CRYSTAL_MOD(nr,mod,delta) { nr, mod, delta },
 
-#define XB_WRAPPING(no,type,theta,phi,psi,n1,n2,n3,n4,n5,n6) { no, type, theta, phi, psi },
-#define XB_WRAPPING_MOD(nr,mod,delta) { nr, mod, delta },
-
 
 // -----   Default constructor   -------------------------------------------
-R3BCal::R3BCal() : R3BDetector("R3BCal", kTRUE, kCAL) {
+R3BCalv1::R3BCalv1() : R3BDetector("R3BCalv1", kTRUE, kCAL) {
   ResetParameters();
   fCalCollection = new TClonesArray("R3BCalPoint");
-  fCalCrystalHitCollection = new TClonesArray("R3BCalCrystalHitSim");
   fPosIndex = 0;
   kGeoSaved = kFALSE;
-  kDrawCrystals = kFALSE;
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
   fGeoVersion = 1;
-  fCollectionOption = 0;
-  fNonUniformity = 0.;
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Standard constructor   ------------------------------------------
-R3BCal::R3BCal(const char* name, Bool_t active) 
+R3BCalv1::R3BCalv1(const char* name, Bool_t active) 
   : R3BDetector(name, active, kCAL) {
   ResetParameters();
   fCalCollection = new TClonesArray("R3BCalPoint");
-  fCalCrystalHitCollection = new TClonesArray("R3BCalCrystalHitSim");
   fPosIndex = 0;
   kGeoSaved = kFALSE;
-  kDrawCrystals = kFALSE;
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
   fGeoVersion = 1;
-  fCollectionOption = 0;
-  fNonUniformity = 0.;
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Destructor   ----------------------------------------------------
-R3BCal::~R3BCal() {
+R3BCalv1::~R3BCalv1() {
 
   if ( flGeoPar ) delete flGeoPar;
   if (fCalCollection) {
    fCalCollection->Delete();
    delete fCalCollection;
   }
-  if (fCalCrystalHitCollection) {
-   fCalCrystalHitCollection->Delete();
-   delete fCalCrystalHitCollection;
-  }
 }
 // -------------------------------------------------------------------------
 
-void R3BCal::Initialize()
+void R3BCalv1::Initialize()
 {
   FairDetector::Initialize();
 
   cout << endl;
-  cout << "-I- R3BCal initialisation" << endl;
-  cout << "-I- R3BCal: Vol. (McId)" << endl;
-  cout << "-I- R3BCal: Crystal A : " << gMC->VolId("crystalLogNAJA")<< endl;
-  cout << "-I- R3BCal: Crystal B : " << gMC->VolId("crystalLogNAJB")<< endl;
-  cout << "-I- R3BCal: Crystal C : " << gMC->VolId("crystalLogNAJC")<< endl;
-  cout << "-I- R3BCal: Crystal D : " << gMC->VolId("crystalLogNAJD")<< endl;
+  cout << "-I- R3BCalv1 initialisation" << endl;
+  cout << "-I- R3BCalv1: Vol. (McId)" << endl;
+  cout << "-I- R3BCalv1: Crystal A : " << gMC->VolId("crystalLogNAJA")<< endl;
+  cout << "-I- R3BCalv1: Crystal B : " << gMC->VolId("crystalLogNAJB")<< endl;
+  cout << "-I- R3BCalv1: Crystal C : " << gMC->VolId("crystalLogNAJC")<< endl;
+  cout << "-I- R3BCalv1: Crystal D : " << gMC->VolId("crystalLogNAJD")<< endl;
 
   // Crystals type ID
   // type  ID
@@ -144,16 +126,15 @@ void R3BCal::Initialize()
 
   TGeoVolume *vol = gGeoManager->GetVolume("CBLogWorld");
   vol->SetVisibility(kFALSE); 
-
 }
 
 
-void R3BCal::SetSpecialPhysicsCuts(){
+void R3BCalv1::SetSpecialPhysicsCuts(){
 
   cout << endl;
 
-  cout << "-I- R3BCal: Adding customized Physics cut ... " << endl;
-  cout << "-I- R3BCal: Yet not implemented !... " << endl;
+  cout << "-I- R3BCalv1: Adding customized Physics cut ... " << endl;
+  cout << "-I- R3BCalv1: Yet not implemented !... " << endl;
 
   cout << endl;
 
@@ -162,45 +143,30 @@ void R3BCal::SetSpecialPhysicsCuts(){
 
 
 // -----   Public method ProcessHits  --------------------------------------
-Bool_t R3BCal::ProcessHits(FairVolume* vol) {
-
+Bool_t R3BCalv1::ProcessHits(FairVolume* vol) {
   Int_t copyNo=0;
-
-  // Gets the right crystal type
   Int_t fVolID = gMC->CurrentVolID(copyNo);
   Int_t fCrystalType = GetCrystalType(fVolID);
 
-  // Gets the right crystal number from its mother wrapping
-  fVolID = gMC->CurrentVolOffID(1,copyNo);
-
   if ( gMC->IsTrackEntering() ) {
     fELoss = 0.;
-    fNSteps  = 0;
     fTime = gMC->TrackTime() * 1.0e09;    //[ns]
     fLength = gMC->TrackLength();
     gMC->TrackPosition(fPosIn);
     gMC->TrackMomentum(fMomIn);
-    fEinc   = gMC->Etot();
   }
 
   // Sum energy loss for all steps in the active volume
   fELoss += gMC->Edep();
-  fNSteps++;
 
   // Set additional parameters at exit of active volume. Create R3BCalPoint.
   if ( gMC->IsTrackExiting() ||
      gMC->IsTrackStop() ||
      gMC->IsTrackDisappeared() ) {
-
-    fTrackID        = gMC->GetStack()->GetCurrentTrackNumber();
-    fVolumeID       = vol->getMCid();
-    fParentTrackID  = gMC->GetStack()->GetCurrentParentTrackNumber();
-    fTrackPID       = gMC->TrackPid();
-    fUniqueID       = gMC->GetStack()->GetCurrentTrack()->GetUniqueID();
-
+    fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
+    fVolumeID = vol->getMCid();
     gMC->TrackPosition(fPosOut);
     gMC->TrackMomentum(fMomOut);
-
     if (fELoss == 0. ) return kFALSE;
 
     if (gMC->IsTrackExiting()) {
@@ -214,11 +180,14 @@ Bool_t R3BCal::ProcessHits(FairVolume* vol) {
       oldpos = gGeoManager->GetCurrentPoint();
       olddirection = gGeoManager->GetCurrentDirection();
 
+      //     cout << "1st direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] << endl;
+
       for (Int_t i=0; i<3; i++){
         newdirection[i] = -1*olddirection[i];
       }
 
       gGeoManager->SetCurrentDirection(newdirection);
+      //  TGeoNode *bla = gGeoManager->FindNextBoundary(2);
       safety = gGeoManager->GetSafeDistance();
 
 
@@ -240,44 +209,16 @@ Bool_t R3BCal::ProcessHits(FairVolume* vol) {
       fPosOut.SetZ(newpos[2]);
     }
 
-    if(fCollectionOption == 0 || fCollectionOption == 2) {
-      AddHit(fTrackID, fVolumeID, fCrystalType, copyNo ,
-        TVector3(fPosIn.X(), fPosIn.Y(), fPosIn.Z()),
-        TVector3(fPosOut.X(), fPosOut.Y(), fPosOut.Z()),
-        TVector3(fMomIn.Px(), fMomIn.Py(), fMomIn.Pz()),
-        TVector3(fMomOut.Px(), fMomOut.Py(), fMomOut.Pz()),
-        fTime, fLength, fELoss);
+    AddHit(fTrackID, fVolumeID, fCrystalType, copyNo ,
+      TVector3(fPosIn.X(), fPosIn.Y(), fPosIn.Z()),
+      TVector3(fPosOut.X(), fPosOut.Y(), fPosOut.Z()),
+      TVector3(fMomIn.Px(), fMomIn.Py(), fMomIn.Pz()),
+      TVector3(fMomOut.Px(), fMomOut.Py(), fMomOut.Pz()),
+      fTime, fLength, fELoss);
 
-      // Increment number of CalPoints for this track
-      FairStack* stack = (FairStack*) gMC->GetStack();
-      stack->AddPoint(kCAL);
-    }
-
-    //Adding a crystalHit support
-    if(fCollectionOption == 1 || fCollectionOption == 2) {
-      Int_t nCrystalHits = fCalCrystalHitCollection->GetEntriesFast();
-      Bool_t existHit = 0;
-
-      if (nCrystalHits==0) AddCrystalHit(fCrystalType, copyNo, NUSmearing(fELoss), fTime, fNSteps, fEinc,
-					fTrackID, fVolumeID, fParentTrackID, fTrackPID, fUniqueID);
-      else {
-        for (Int_t i=0; i<nCrystalHits; i++) {
-          if ( ((R3BCalCrystalHitSim *)(fCalCrystalHitCollection->At(i)))->GetCrystalNumber() == copyNo ) {
-            ((R3BCalCrystalHitSim *)(fCalCrystalHitCollection->At(i)))->AddMoreEnergy(NUSmearing(fELoss));
-            if ( ((R3BCalCrystalHitSim *)(fCalCrystalHitCollection->At(i)))->GetTime() > fTime ) {
-              ((R3BCalCrystalHitSim *)(fCalCrystalHitCollection->At(i)))->SetTime(fTime);
-            }
-            existHit=1; //to avoid the creation of a new CrystalHit
-            break;
-          }
-        }
-        if (!existHit) AddCrystalHit(fCrystalType, copyNo, NUSmearing(fELoss), fTime, fNSteps, fEinc,
-					fTrackID, fVolumeID, fParentTrackID, fTrackPID, fUniqueID);
-      }
-
-      existHit=0;
-    }
-
+    // Increment number of CalPoints for this track
+    FairStack* stack = (FairStack*) gMC->GetStack();
+    stack->AddPoint(kCAL);
 
     ResetParameters();
   }
@@ -285,7 +226,7 @@ Bool_t R3BCal::ProcessHits(FairVolume* vol) {
 }
 // ----------------------------------------------------------------------------
 /*
-void R3BCal::SaveGeoParams(){
+void R3BCalv1::SaveGeoParams(){
   cout << " -I Save STS geo params " << endl;
 
   TFolder *mf = (TFolder*) gDirectory->FindObjectAny("cbmroot");
@@ -301,7 +242,7 @@ void R3BCal::SaveGeoParams(){
 
 
 // -----   Public method EndOfEvent   -----------------------------------------
-void R3BCal::BeginEvent() {
+void R3BCalv1::BeginEvent() {
 
 //  if (! kGeoSaved ) {
 //    SaveGeoParams();
@@ -311,18 +252,10 @@ void R3BCal::BeginEvent() {
 
 }
 // -----   Public method EndOfEvent   -----------------------------------------
-void R3BCal::EndOfEvent() {
+void R3BCalv1::EndOfEvent() {
 
   if (fVerboseLevel) Print();
- 
-  if(fCollectionOption == 0) { 
-    fCalCollection->Clear();
-  } else if(fCollectionOption == 1) { 
-    fCalCrystalHitCollection->Clear();
-  } else if(fCollectionOption == 2) { 
-    fCalCollection->Clear();
-    fCalCrystalHitCollection->Clear();
-  }
+  fCalCollection->Clear();
 
   ResetParameters();
 }
@@ -331,61 +264,34 @@ void R3BCal::EndOfEvent() {
 
 
 // -----   Public method Register   -------------------------------------------
-void R3BCal::Register() {
-  if(fCollectionOption == 0) { 
-    FairRootManager::Instance()->Register("XBCrystalPoint", GetName(), fCalCollection, kTRUE);
-  } else if(fCollectionOption == 1) { 
-    FairRootManager::Instance()->Register("XBCrystalHitSim", GetName(), fCalCrystalHitCollection, kTRUE);
-  } else if(fCollectionOption == 2) { 
-    FairRootManager::Instance()->Register("XBCrystalPoint", GetName(), fCalCollection, kTRUE);
-    FairRootManager::Instance()->Register("XBCrystalHitSim", GetName(), fCalCrystalHitCollection, kTRUE);
-  }
+void R3BCalv1::Register() {
+  FairRootManager::Instance()->Register("CrystalPoint", GetName(), fCalCollection, kTRUE);
 }
 // ----------------------------------------------------------------------------
 
 
 
 // -----   Public method GetCollection   --------------------------------------
-TClonesArray* R3BCal::GetCollection(Int_t iColl) const {
-  if(fCollectionOption == 0) { 
-    if (iColl == 0) return fCalCollection;
-    else return NULL;
-  } else if(fCollectionOption == 1) { 
-    if (iColl == 0) return fCalCrystalHitCollection;
-    else return NULL;
-  } else if(fCollectionOption == 2) { 
-    if (iColl == 0) return fCalCollection;
-    if (iColl == 1) return fCalCrystalHitCollection;
-    else return NULL;
-  } else return NULL;
+TClonesArray* R3BCalv1::GetCollection(Int_t iColl) const {
+  if (iColl == 0) return fCalCollection;
+  else return NULL;
 }
 // ----------------------------------------------------------------------------
 
 
 
 // -----   Public method Print   ----------------------------------------------
-void R3BCal::Print() const {
-  if(fCollectionOption == 0) { 
-    Int_t nHits = fCalCollection->GetEntriesFast();
-    cout << "-I- R3BCal: " << nHits << " points registered in this event." << endl;
-  } else if(fCollectionOption == 1) { 
-    Int_t nHits = fCalCrystalHitCollection->GetEntriesFast();
-    cout << "-I- R3BCal: " << nHits << " hits registered in this event." << endl;
-  } else if(fCollectionOption == 2) { 
-    Int_t nHits = fCalCollection->GetEntriesFast();
-    cout << "-I- R3BCal: " << nHits << " points registered in this event." << endl;
-    nHits = fCalCrystalHitCollection->GetEntriesFast();
-    cout << "-I- R3BCal: " << nHits << " hits registered in this event." << endl;
-  }
+void R3BCalv1::Print() const {
+  Int_t nHits = fCalCollection->GetEntriesFast();
+  cout << "-I- R3BCalv1: " << nHits << " points registered in this event." << endl;
 }
 // ----------------------------------------------------------------------------
 
 
 
 // -----   Public method Reset   ----------------------------------------------
-void R3BCal::Reset() {
+void R3BCalv1::Reset() {
   fCalCollection->Clear();
-  fCalCrystalHitCollection->Clear();
   ResetParameters();
 }
 // ----------------------------------------------------------------------------
@@ -393,10 +299,10 @@ void R3BCal::Reset() {
 
 
 // -----   Public method CopyClones   -----------------------------------------
-void R3BCal::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
+void R3BCalv1::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
   Int_t nEntries = cl1->GetEntriesFast();
-  cout << "-I- R3BCal: " << nEntries << " entries to add." << endl;
+  cout << "-I- R3BCalv1: " << nEntries << " entries to add." << endl;
   TClonesArray& clref = *cl2;
   R3BCalPoint* oldpoint = NULL;
   for (Int_t i=0; i<nEntries; i++)
@@ -407,60 +313,30 @@ void R3BCal::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
     new (clref[fPosIndex]) R3BCalPoint(*oldpoint);
     fPosIndex++;
   }
-  cout << " -I- R3BCal: " << cl2->GetEntriesFast() << " merged entries." << endl;
+  cout << " -I- R3BCalv1: " << cl2->GetEntriesFast() << " merged entries." << endl;
 }
 
 // -----   Private method AddHit   --------------------------------------------
-R3BCalPoint* R3BCal::AddHit(Int_t trackID, Int_t detID, Int_t type, Int_t cp, TVector3 posIn,
+R3BCalPoint* R3BCalv1::AddHit(Int_t trackID, Int_t detID, Int_t type, Int_t cp, TVector3 posIn,
         TVector3 posOut, TVector3 momIn, 
         TVector3 momOut, Double_t time, 
         Double_t length, Double_t eLoss) {
   TClonesArray& clref = *fCalCollection;
   Int_t size = clref.GetEntriesFast();
   if (fVerboseLevel>1) 
-    cout << "-I- R3BCal: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
+    cout << "-I- R3BCalv1: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
      << ", " << posIn.Z() << ") cm, detector " << detID << ", track "
      << trackID << ", energy loss " << eLoss*1e06 << " keV" << endl;
   return new(clref[size]) R3BCalPoint(trackID, detID, type, cp , posIn, posOut,
             momIn, momOut, time, length, eLoss);
 }
 
-// -----   Private method AddCrystalHit   --------------------------------------------
-R3BCalCrystalHitSim* R3BCal::AddCrystalHit(Int_t type, Int_t copy,
-    Double_t energy, Double_t time, Int_t steps, Double_t einc,
-    Int_t trackid, Int_t volid, Int_t partrackid, Int_t pdgtype, Int_t uniqueid)
-{
-  TClonesArray& clref = *fCalCrystalHitCollection;
-  Int_t size = clref.GetEntriesFast();
-  if (fVerboseLevel>1)
-    cout << "-I- R3BCal: Adding Hit in detector type " << type << ", and number " << copy
-         << " entering with " << einc*1e06 << " keV, depositing " << energy*1e06 << " keV" << endl;
-    cout << " -I- trackid: " << trackid << " volume id: " << volid << " partrackid : " << partrackid << " type: " << pdgtype << " unique id: " << uniqueid << endl; 
-  return new(clref[size]) R3BCalCrystalHitSim(type, copy, energy, time, steps, einc, trackid, volid, partrackid, pdgtype, uniqueid);
-}
 
-// -----   Private method NUSmearing  --------------------------------------------
-Double_t R3BCal::NUSmearing(Double_t inputEnergy)
-{
-  // Very simple preliminary scheme where the NU is introduced as a flat random
-  // distribution with limits fNonUniformity (%) of the energy value.
-  //
-  return gRandom->Uniform(inputEnergy-inputEnergy*fNonUniformity/100,inputEnergy+inputEnergy*fNonUniformity/100);
-}
-
-// -----  Public method SetNonUniformity  ----------------------------------
-void R3BCal::SetNonUniformity(Double_t nonU)
-{
-  fNonUniformity = nonU;
-  cout << "-I- R3BCal::SetNonUniformity to " << fNonUniformity << " %." << endl;
-}
-
-
-void R3BCal::ConstructGeometry(){
+void R3BCalv1::ConstructGeometry(){
 
     cout
     << "##################################################################\n"
-    << "*     -I- R3BCal R3BCal::ConstructGeometry()                     *\n"
+    << "*     -I- R3BCalv1 R3BCalv1::ConstructGeometry()                     *\n"
     << "*        Darmstadt-Heidelberg Crystal Ball - CAVE C Setup        *\n"
     << "##################################################################\n";
 
@@ -471,37 +347,20 @@ void R3BCal::ConstructGeometry(){
   Double_t theta1, theta2, phi1, phi2, dphi;
   Double_t z, density, radl, absl, w;
   Int_t nel, numed;
-  double crystalPosRad =35;  //Radius of the center of the crystals [cm]
-  double wrappingPosRad=35;  //Radius of the center of the wrappings [cm]
+  double crystalPosRad=35;  //Radius of the center of the crystals [cm]
 
-// --- Aluminum Wrappings
+  // Definitions for the crystal types from "xb_crystal_loc.hh"
+  int XB_TYPE_A=0, XB_TYPE_B=1, XB_TYPE_C=2, XB_TYPE_D=3, DISABLE=0, MOVE_R=1;
 
-  // Definitions for the Al wrapping types from "xb_wrapping_loc.hh"
-  int XB_WTYPE_A=0, XB_WTYPE_B=1, XB_WTYPE_C=2, XB_WTYPE_D=3, WDISABLE=0, WMOVE_R=1;
-
-  // Get wrapping position information
-  xb_wrapping xb_wrappings[] =
+  // Get crystal position information
+  xb_crystal_v1 xb_crystals[] =
   {
-    #include "xb_wrapping_loc.hh"
+    #include "xb_crystal_loc.hh"
   };
 
-  int nrWrappings = sizeof( xb_wrappings ) / sizeof( xb_wrappings[0] );
-  for (int i = 0; i < nrWrappings; i++){
-    xb_wrappings[i].active = true;}
-
-  // Get corner information for the wrappings
-  double xb_wrapping_parts[][16] =
-  {
-    #include "xb_wrapping_part.hh"
-  };
-
-  // Get modification information for wrappings
-  xb_wrapping_mod xb_wrappings_mod[] =
-  {
-    #include "xb_wrapping_mod.hh"
-  };
-
-// --- NaI Crystals
+  int nrCrystals = sizeof( xb_crystals ) / sizeof( xb_crystals[0] );
+  for (int i = 0; i < nrCrystals; i++){
+    xb_crystals[i].active = true;}
 
   // Get corner information for the crystals
   double xb_crystal_parts[][16] =
@@ -509,10 +368,16 @@ void R3BCal::ConstructGeometry(){
     #include "xb_crystal_part.hh"
   };
 
+  // Get modification information
+  xb_crystal_mod xb_crystals_mod[] =
+  {
+    #include "xb_crystal_mod.hh"
+  };
+
 
 // --- Local Material definition
 
-  // Mixture: Air
+// Mixture: Air
   TGeoMedium * pMed2=NULL;
   if (gGeoManager->GetMedium("Air") )
     pMed2=gGeoManager->GetMedium("Air");
@@ -541,7 +406,7 @@ void R3BCal::ConstructGeometry(){
     pMed2 = new TGeoMedium("Air", numed,pMat2, par);
   }
 
-  // Mixture: NaI
+ // Mixture: NaI
   TGeoMedium * pMed10=NULL;
    if (gGeoManager->GetMedium("NaIn") ){
        pMed10=gGeoManager->GetMedium("NaIn");
@@ -567,8 +432,8 @@ void R3BCal::ConstructGeometry(){
     pMed10 = new TGeoMedium("NaIn", 2,pMat10, par);
   }
 
-/* ------- TGeoMedium not used any longer -------
-  // Mixture: CsI
+
+ // Mixture: CsI
   TGeoMedium * pMed9=NULL;
   if (gGeoManager->GetMedium("CsIn") )
     pMed9=gGeoManager->GetMedium("CsIn");
@@ -594,7 +459,6 @@ void R3BCal::ConstructGeometry(){
     par[7] = 0.000000; // stmin
     pMed9 = new TGeoMedium("CsIn", 2,pMat9, par);
   }
-------------------------------------------------- */
 
   // Material: Aluminum
   TGeoMedium * pMed21=NULL;
@@ -620,75 +484,32 @@ void R3BCal::ConstructGeometry(){
     pMed21 = new TGeoMedium("Aluminum",3, matAl, par);
   }
 
-
-// --- Create Volumes: Aluminum Wrappings
-
-  // Create volume: wrappingLogNAJA
-  TGeoShape *pWTRA = createVolume(xb_wrapping_parts[0],0);
-  pWTRA->SetTitle("WTRA1+WTRA2");
-  TGeoVolume* pwrappingLogNAJA = new TGeoVolume("wrappingLogNAJA",pWTRA, pMed21);
-  pwrappingLogNAJA->SetLineColor(34);
-  pwrappingLogNAJA->VisibleDaughters(kDrawCrystals);
-
-  // Create volume: wrappingLogNAJB
-  TGeoShape *pWTRB = createVolume(xb_wrapping_parts[1],0);
-  pWTRB->SetTitle("WTRB1+WTRB2");
-  TGeoVolume* pwrappingLogNAJB = new TGeoVolume("wrappingLogNAJB",pWTRB, pMed21);
-  pwrappingLogNAJB->SetLineColor(35);
-  pwrappingLogNAJB->VisibleDaughters(kDrawCrystals);
-
-  // Create volume: wrappingLogNAJC
-  TGeoShape *pWTRC = createVolume(xb_wrapping_parts[2],0);
-  pWTRC->SetTitle("WTRC1+WTRC2");
-  TGeoVolume* pwrappingLogNAJC = new TGeoVolume("wrappingLogNAJC",pWTRC, pMed21);
-  pwrappingLogNAJC->SetLineColor(36);
-  pwrappingLogNAJC->VisibleDaughters(kDrawCrystals);
-
-  // Create volume: wrappingLogNAJC
-  TGeoShape *pWTRD = createVolume(xb_wrapping_parts[3],0);
-  pWTRD->SetTitle("WTRD1+WTRD2");
-  TGeoVolume* pwrappingLogNAJD = new TGeoVolume("wrappingLogNAJD",pWTRD, pMed21);
-  pwrappingLogNAJD->SetLineColor(37);
-  pwrappingLogNAJD->VisibleDaughters(kDrawCrystals);
-
-  TGeoVolume* wrappingVolumes[]={pwrappingLogNAJA,
-                                pwrappingLogNAJB,
-                                pwrappingLogNAJC,
-                                pwrappingLogNAJD};
-
-// --- Create Volumes: NaI Volumes
-
   // Create volume: crystalLogNAJA
-  TGeoShape *pTRA = createVolume(xb_crystal_parts[0],1);
+  TGeoShape *pTRA = createCrystal(xb_crystal_parts[0]);
   pTRA->SetTitle("TRA1+TRA2");
   TGeoVolume* pcrystalLogNAJA = new TGeoVolume("crystalLogNAJA",pTRA, pMed10);
-  pcrystalLogNAJA->SetLineColor(41);
 
   // Create volume: crystalLogNAJB
-  TGeoShape *pTRB = createVolume(xb_crystal_parts[1],1);
+  TGeoShape *pTRB = createCrystal(xb_crystal_parts[1]);
   pTRB->SetTitle("TRB1+TRB2");
   TGeoVolume* pcrystalLogNAJB = new TGeoVolume("crystalLogNAJB",pTRB, pMed10);
-  pcrystalLogNAJB->SetLineColor(42);
 
   // Create volume: crystalLogNAJC
-  TGeoShape *pTRC = createVolume(xb_crystal_parts[2],1);
+  TGeoShape *pTRC = createCrystal(xb_crystal_parts[2]);
   pTRC->SetTitle("TRC1+TRC2");
   TGeoVolume* pcrystalLogNAJC = new TGeoVolume("crystalLogNAJC",pTRC, pMed10);
-  pcrystalLogNAJC->SetLineColor(43);
 
   // Create volume: crystalLogNAJC
-  TGeoShape *pTRD = createVolume(xb_crystal_parts[3],1);
+  TGeoShape *pTRD = createCrystal(xb_crystal_parts[3]);
   pTRD->SetTitle("TRD1+TRD2");
   TGeoVolume* pcrystalLogNAJD = new TGeoVolume("crystalLogNAJD",pTRD, pMed10);
-  pcrystalLogNAJD->SetLineColor(44);
 
   TGeoVolume* crystalVolumes[]={pcrystalLogNAJA,
                                 pcrystalLogNAJB,
                                 pcrystalLogNAJC,
                                 pcrystalLogNAJD};
 
-// ---- Geometry Definition
-
+  // ---- Geometry Definition
   // Get the top Volume
   TGeoVolume *top = gGeoManager->GetTopVolume();
 
@@ -746,7 +567,6 @@ void R3BCal::ConstructGeometry(){
   // Volume: CBChamberLog
   TGeoVolume* pCBChamberLog = new TGeoVolume("CBChamberLog",pCBReactionChamber, pMed21);
   pCBChamberLog->SetVisLeaves(kTRUE);
-  pCBChamberLog->SetLineColor(18);
   pCBLogWorld->AddNode(pCBChamberLog, 0, zeroRotTrans);
 
   // Shape: CBConicalTube type: TGeoConeSeg
@@ -761,37 +581,27 @@ void R3BCal::ConstructGeometry(){
   // Volume: CBConicalTubeLog
   TGeoVolume* pCBConicalTubeLog = new TGeoVolume("CBConicalTubeLog",pCBConicalTube, pMed21);
   pCBConicalTubeLog->SetVisLeaves(kTRUE);
-  pCBConicalTubeLog->SetLineColor(33);
   pCBLogWorld->AddNode(pCBConicalTubeLog, 0, pCombTrans1);
   pCBLogWorld->AddNode(pCBConicalTubeLog, 1, pCombTrans2);
   pCBLogWorld->AddNode(pCBConicalTubeLog, 2, pCombTrans3);
 
-// --- Add Wrappings to mother volume (CBWorld)
-
-  // Add modified wrappings to the crystal ball, defined in "xb_wrapping_mod.hh"
-  int nrModifiedWrappings = sizeof( xb_wrappings_mod ) / sizeof( xb_wrappings_mod[0] );
-  for (int i = 0; i < nrModifiedWrappings; i++)
+  // Add modified crystals to the crystal ball, defined in "xb_crystal_mod.hh"
+  int nrModifiedCrystals = sizeof( xb_crystals_mod ) / sizeof( xb_crystals_mod[0] );
+  for (int i = 0; i < nrModifiedCrystals; i++)
   {
-    xb_wrappings[xb_wrappings_mod[i].no - 1].active = false;
-    if (xb_wrappings_mod[i].mod == WMOVE_R)
-      insertWrapping(&xb_wrappings[xb_wrappings_mod[i].no - 1], wrappingVolumes, pCBLogWorld, wrappingPosRad + xb_wrappings_mod[i].delta);
+    xb_crystals[xb_crystals_mod[i].no - 1].active = false;
+    if (xb_crystals_mod[i].mod == MOVE_R)
+      insertCrystal(&xb_crystals[xb_crystals_mod[i].no - 1], crystalVolumes, pCBLogWorld, crystalPosRad + xb_crystals_mod[i].delta);
   }
 
-  // Add all enabled wrappings to the wrapping ball
-  for (int i=0; i < nrWrappings; i++){
-    if (xb_wrappings[i].active) 
-      insertWrapping(&xb_wrappings[i], wrappingVolumes, pCBLogWorld, wrappingPosRad);
+  // Add all enabled crystals to the crystal ball
+  for (int i=0; i < nrCrystals; i++){
+    if (xb_crystals[i].active) 
+      insertCrystal(&xb_crystals[i], crystalVolumes, pCBLogWorld, crystalPosRad);
   }
 
-// --- Add crystals as wrappings' daughters
-  pwrappingLogNAJA->AddNode(pcrystalLogNAJA, 0);
-  pwrappingLogNAJB->AddNode(pcrystalLogNAJB, 0);
-  pwrappingLogNAJC->AddNode(pcrystalLogNAJC, 0);
-  pwrappingLogNAJD->AddNode(pcrystalLogNAJD, 0);
-
-// --- End of Cal Crystal definition
-
-// --- Define Sensitive Modules
+  // End of Cal Crystal definition
+  // Define Sensitive Modules
   AddSensitiveVolume(pcrystalLogNAJA);
   AddSensitiveVolume(pcrystalLogNAJB);
   AddSensitiveVolume(pcrystalLogNAJC);
@@ -799,78 +609,62 @@ void R3BCal::ConstructGeometry(){
 
 }
 
-// -----   Private method insertWrapping   ----------------------------------
-// Add a wrapping in the right location using radious and information from "xb_wrapping_loc.hh"
-void R3BCal::insertWrapping(xb_wrapping *wrapping, TGeoVolume **wrappingVolumes, TGeoVolume *worldVolume, double r)
+// -----   Private method insertCrystal   ----------------------------------
+// Add a crystal in the right location using radious and information from "xb_crysta_loc.hh"
+void R3BCalv1::insertCrystal(xb_crystal_v1 *crystal, TGeoVolume **crystalVolumes, TGeoVolume *worldVolume, double r)
 {
   double conv=TMath::DegToRad();
-  double dx = r*sin(wrapping->theta*conv)*cos(wrapping->phi*conv);
-  double dy = r*sin(wrapping->theta*conv)*sin(wrapping->phi*conv);
-  double dz = r*cos(wrapping->theta*conv);
+  double dx = r*sin(crystal->theta*conv)*cos(crystal->phi*conv);
+  double dy = r*sin(crystal->theta*conv)*sin(crystal->phi*conv);
+  double dz = r*cos(crystal->theta*conv);
 
   TGeoTranslation *trans = new TGeoTranslation(dx,dy,dz);
   TGeoRotation *pRot = new TGeoRotation;
-  pRot->RotateZ(wrapping->psi);
-  pRot->RotateY(wrapping->theta);
-  pRot->RotateZ(wrapping->phi);
+  pRot->RotateZ(crystal->psi);
+  pRot->RotateY(crystal->theta);
+  pRot->RotateZ(crystal->phi);
 
   TGeoCombiTrans *combi = new TGeoCombiTrans(*trans,*pRot);
  
-  worldVolume->AddNode(wrappingVolumes[wrapping->type], wrapping->no, combi);
+  worldVolume->AddNode(crystalVolumes[crystal->type], crystal->no, combi);
 }
 
-
-// -----   Private method createVolume   ----------------------------------
-// Create TGeoShape from two TGeoArb8 for both crystals and wrappings
-//   using the information in "xb_crysta_part.hh" and "xb_wrapping_part.hh"
-TGeoShape* R3BCal::createVolume(double *arbVolumes, int voltype)
+// -----   Private method createCrystal   ----------------------------------
+// Create TGeoShape from two TGeoArb8 using the information in "xb_crysta_part_loc.hh"
+TGeoShape* R3BCalv1::createCrystal(double *arbCrystals)
 {
-
-  double innerR = -1.;
-  double dZ = -1.;
-
-  double thick = 0.06;   // Al wrapping thickness in cm (600microns)
-
-  if(voltype == 0) {          //wrappings
-    innerR=25.;  //[cm]
-    dZ=10.;      //[cm]
-  } else if(voltype == 1) {   //crystals
-    innerR=25.-thick;  //[cm]
-    dZ=10.-thick;      //[cm]
-  } else { cerr << " ******** Unknown volume type ******** " << endl; }
+  double innerR=25.;  //[cm]
+  double dZ=10.;      //[cm]
 
   // frameR is the radious of the frame which was the radious used during cornar definitions
   double frameR = 49.86932985;  // [cm]
   double scaleOuter=(innerR+(2*dZ))/frameR;
   double scaleInner=innerR/frameR;
 
-  double volume1[][2]={
-    arbVolumes[0]*scaleInner, arbVolumes[1]*scaleInner,
-    arbVolumes[2]*scaleInner, arbVolumes[3]*scaleInner,
-    arbVolumes[4]*scaleInner, arbVolumes[5]*scaleInner,
-    arbVolumes[6]*scaleInner, arbVolumes[7]*scaleInner,
-    arbVolumes[0]*scaleOuter, arbVolumes[1]*scaleOuter,
-    arbVolumes[2]*scaleOuter, arbVolumes[3]*scaleOuter,
-    arbVolumes[4]*scaleOuter, arbVolumes[5]*scaleOuter,
-    arbVolumes[6]*scaleOuter, arbVolumes[7]*scaleOuter};
+  double crystal1[][2]={
+    arbCrystals[0]*scaleInner, arbCrystals[1]*scaleInner,
+    arbCrystals[2]*scaleInner, arbCrystals[3]*scaleInner,
+    arbCrystals[4]*scaleInner, arbCrystals[5]*scaleInner,
+    arbCrystals[6]*scaleInner, arbCrystals[7]*scaleInner,
+    arbCrystals[0]*scaleOuter, arbCrystals[1]*scaleOuter,
+    arbCrystals[2]*scaleOuter, arbCrystals[3]*scaleOuter,
+    arbCrystals[4]*scaleOuter, arbCrystals[5]*scaleOuter,
+    arbCrystals[6]*scaleOuter, arbCrystals[7]*scaleOuter};
 
-  double volume2[][2]={
-    arbVolumes[8]*scaleInner, arbVolumes[9]*scaleInner,
-    arbVolumes[10]*scaleInner, arbVolumes[11]*scaleInner,
-    arbVolumes[12]*scaleInner, arbVolumes[13]*scaleInner,
-    arbVolumes[14]*scaleInner, arbVolumes[15]*scaleInner,
-    arbVolumes[8]*scaleOuter,  arbVolumes[9]*scaleOuter,
-    arbVolumes[10]*scaleOuter, arbVolumes[11]*scaleOuter,
-    arbVolumes[12]*scaleOuter, arbVolumes[13]*scaleOuter,
-    arbVolumes[14]*scaleOuter, arbVolumes[15]*scaleOuter};
+  double crystal2[][2]={
+    arbCrystals[8]*scaleInner, arbCrystals[9]*scaleInner,
+    arbCrystals[10]*scaleInner, arbCrystals[11]*scaleInner,
+    arbCrystals[12]*scaleInner, arbCrystals[13]*scaleInner,
+    arbCrystals[14]*scaleInner, arbCrystals[15]*scaleInner,
+    arbCrystals[8]*scaleOuter,  arbCrystals[9]*scaleOuter,
+    arbCrystals[10]*scaleOuter, arbCrystals[11]*scaleOuter,
+    arbCrystals[12]*scaleOuter, arbCrystals[13]*scaleOuter,
+    arbCrystals[14]*scaleOuter, arbCrystals[15]*scaleOuter};
 
-  TGeoArb8 *pTRA1 = new TGeoArb8("PARB1", dZ, *volume1);
-  TGeoArb8 *pTRA2 = new TGeoArb8("PARB2", dZ, *volume2);
+  TGeoArb8 *pTRA1 = new TGeoArb8("PARB1", dZ, *crystal1);
+  TGeoArb8 *pTRA2 = new TGeoArb8("PARB2", dZ, *crystal2);
   TGeoBoolNode *pBoolNode = new TGeoUnion(pTRA1, pTRA2, 0, 0);
-  TGeoShape *pTRA = new TGeoCompositeShape("", pBoolNode);
+   TGeoShape *pTRA = new TGeoCompositeShape("", pBoolNode);
   return pTRA;
 }
-
-
-
-ClassImp(R3BCal)
+ClassImp(R3BCalv1)
