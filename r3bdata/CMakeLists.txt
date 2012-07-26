@@ -23,6 +23,8 @@ set(R3BDATA_SRCS
 R3BMCStack.cxx
 R3BMCTrack.cxx
 calData/R3BCalPoint.cxx
+calData/R3BCalCrystalHit.cxx
+calData/R3BCalCrystalHitSim.cxx
 caloData/R3BCaloCrystalHit.cxx
 caloData/R3BCaloHit.cxx
 caloData/R3BCaloPoint.cxx 
