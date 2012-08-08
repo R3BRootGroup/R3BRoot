@@ -481,6 +481,35 @@ void R3BSTaRTra::ConstructGeometry() {
     pMed2 = new TGeoMedium("Air", numed,pMat2, par);
    }
 
+
+   // Mixture: Air
+   TGeoMedium * pVacuumMedium=NULL;
+   if (gGeoManager->GetMedium("Vacuum") ){
+       pVacuumMedium=gGeoManager->GetMedium("Vacuum");
+   }else{
+    nel     = 2;
+    density = 0.0000000000000001290;  // Air with low density
+    TGeoMixture*
+	pVacMat = new TGeoMixture("Vacuum", nel,density);
+    a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+    pVacMat->DefineElement(0,a,z,w);
+    a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+    pVacMat->DefineElement(1,a,z,w);
+    pVacMat->SetIndex(1);
+    // Medium: Vacuum
+    numed   = 10;  // medium number
+    Double_t par[8];
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 0.000000; // tmaxfd
+    par[4]  = 0.000000; // stemax
+    par[5]  = 0.000000; // deemax
+    par[6]  = 0.000100; // epsil
+    par[7]  = 0.000000; // stmin
+    pVacuumMedium = new TGeoMedium("Vacuum", numed,pVacMat, par);
+   }
+
  // Material: Silicon
    TGeoMedium * pMed22=NULL;
    if (gGeoManager->GetMedium("Silicon") ){
@@ -1492,11 +1521,29 @@ void R3BSTaRTra::ConstructGeometry() {
 
 
 
-   // Shape: World type: TGeoBBox
-   TGeoVolume* pWorld = gGeoManager->GetTopVolume();
-   pWorld->SetVisLeaves(kTRUE);
+   // WORLD
+   TGeoVolume* pAWorld = gGeoManager->GetTopVolume();
+   pAWorld->SetVisLeaves(kTRUE);
 
-    
+   // StarTrack world (mother volume
+   TGeoShape *pSTaRTrackWorld =new TGeoTubeSeg("STarTrack_Tube",
+					      0.,   // rmin
+					      26.4, // rmax (cf: Chamber in passive/R3BvacVesselcool.cxx 
+					      35.,  // dz
+					      0.,   // phi1
+					      360.);// phi2
+
+   TGeoVolume*
+   pWorld  = new TGeoVolume("STaRTrackWorld",pSTaRTrackWorld, pVacuumMedium);
+   TGeoCombiTrans *t0 = new TGeoCombiTrans();
+   TGeoCombiTrans *pGlobalc = GetGlobalPosition(t0);
+
+   // add the sphere as Mother Volume
+   pAWorld->AddNode(pWorld, 0, pGlobalc);
+
+
+
+   // STaRTracker
 
    // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
    // Shape: SiVacuumSphereWorld type: TGeoSphere
@@ -1559,7 +1606,7 @@ void R3BSTaRTra::ConstructGeometry() {
    TGeoVolume*
    pMontagePlatformLog = new TGeoVolume("MontagePlatformLog",pMontagePlatform, pMed25);
 
-
+   /*
 	// Shape: Chamber type: TGeoTubeSeg
 	rmin = 25.00000;
 	rmax = 25.200000;
@@ -1592,7 +1639,7 @@ void R3BSTaRTra::ConstructGeometry() {
 	// Volume: ChamberLog
 	TGeoVolume*
 	pChamberEnd2Log = new TGeoVolume("ChamberEnd2Log",pChamberEnd2, pMed3);
-
+   */
 
    // Shape: BeamPipe type: TGeoTubeSeg
    rmin = 1.800000;
@@ -1653,14 +1700,6 @@ void R3BSTaRTra::ConstructGeometry() {
 	//pGoldConelog = new TGeoVolume("GoldConelog",pGoldCone, pMed79);
 
 
-   // Shape: innerElectronicBox type: TGeoBBox
-   dx = 3.800000;
-   dy = 3.300000;
-   dz = 0.800000;
-   TGeoShape *pinnerElectronicBox = new TGeoBBox("innerElectronicBox", dx,dy,dz);
-   // Volume: innerElectronicsLog
-   TGeoVolume*
-   pinnerElectronicsLog = new TGeoVolume("innerElectronicsLog",pinnerElectronicBox, pMed2);
 
    //
    // Make elementary assembly of the whole structure.
@@ -1668,25 +1707,11 @@ void R3BSTaRTra::ConstructGeometry() {
 
    TGeoVolume *aTra = new TGeoVolumeAssembly("ATRA");
 
-
-   //aTra->AddNode(ptargetWheel2Log,1, pMatrix30);
- 
-   //aTra->AddNode(pinnerElectronicsLog ,1, pMatrix18);
-   //aTra->AddNode(pinnerElectronicsLog ,2, pMatrix20);
-   //aTra->AddNode(pinnerElectronicsLog ,3, pMatrix22);
-   //aTra->AddNode(pinnerElectronicsLog ,4, pMatrix24);
-   // aTra->AddNode(pinnerElectronicsLog ,5, pMatrix26);
-   // aTra->AddNode(pinnerElectronicsLog ,6, pMatrix32); 
-   
-   //aTra->AddNode(ptargetWheelLog ,1, pMatrix28); 
-   
-   //aTra->AddNode(pMontageRingLog ,1, pMatrix16);
-      
-   //aTra->AddNode(pBeamPipeLog,1,pMatrix58);
-
+   /*
 	aTra->AddNode(pChamberBarrelLog,1,pMatrix170);
 	aTra->AddNode(pChamberEnd1Log,1,pMatrix172);
 	aTra->AddNode(pChamberEnd2Log,1,pMatrix174);
+   */
 	//aTra->AddNode(pGoldConelog, 1, pMatrix176);
 
    
@@ -1767,6 +1792,7 @@ void R3BSTaRTra::ConstructGeometry() {
    
    //
    
+  
    TGeoRotation *rotg = new TGeoRotation();
    rotg->RotateX(0.);
    rotg->RotateY(0.);
@@ -1775,49 +1801,12 @@ void R3BSTaRTra::ConstructGeometry() {
    dy=ty=0.0;
    dz=tz=0.0;
    
-   TGeoCombiTrans *t0 = new TGeoCombiTrans(tx,ty,tz,rotg);
+   TGeoCombiTrans *t1 = new TGeoCombiTrans(tx,ty,tz,rotg);
 
-   pWorld->AddNode(aTra,1, GetGlobalPosition(t0));
-   
-
-}
-
-/*
-void R3BSTaRTra::ConstructGeometry() {
-  
-  FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
-  FairGeoInterface* geoFace = geoLoad->getGeoInterface();
-  R3BGeoSTaRTra*       stsGeo  = new R3BGeoSTaRTra();
-  stsGeo->setGeomFile(GetGeometryFileName());
-  geoFace->addGeoModule(stsGeo);
-
-  Bool_t rc = geoFace->readSet(stsGeo);
-  if (rc) stsGeo->create(geoLoad->getGeoBuilder());
-  TList* volList = stsGeo->getListOfVolumes();
-  // store geo parameter
-  FairRun *fRun = FairRun::Instance();
-  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
-  R3BGeoSTaRTraPar* par=(R3BGeoSTaRTraPar*)(rtdb->getContainer("R3BGeoSTaRTraPar"));
-  TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
-  TObjArray *fPassNodes = par->GetGeoPassiveNodes();
-
-  TListIter iter(volList);
-  FairGeoNode* node   = NULL;
-  FairGeoVolume *aVol=NULL;
-
-  while( (node = (FairGeoNode*)iter.Next()) ) {
-      aVol = dynamic_cast<FairGeoVolume*> ( node );
-       if ( node->isSensitive()  ) {
-           fSensNodes->AddLast( aVol );
-       }else{
-           fPassNodes->AddLast( aVol );
-       }
-  }
-  par->setChanged();
-  par->setInputVersion(fRun->GetRunId(),1);
-  ProcessNodes( volList );
+   pWorld->AddNode(aTra,0, t1);
 
 }
-*/
+
+
 
 ClassImp(R3BSTaRTra)
