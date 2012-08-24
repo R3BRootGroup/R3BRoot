@@ -26,7 +26,9 @@ calData/R3BCalPoint.cxx
 calData/R3BCalCrystalHit.cxx
 calData/R3BCalCrystalHitSim.cxx
 caloData/R3BCaloCrystalHit.cxx
+caloData/R3BCaloCrystalHitSim.cxx
 caloData/R3BCaloHit.cxx
+caloData/R3BCaloHitSim.cxx
 caloData/R3BCaloPoint.cxx 
 dchData/R3BDchPoint.cxx
 dchData/R3BDchFullPoint.cxx 

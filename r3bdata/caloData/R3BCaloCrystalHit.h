@@ -1,6 +1,7 @@
 // -------------------------------------------------------------------------
 // -----                  R3BCaloCrystalHit header file                -----
 // -----               Created 08/07/10  by H. Alvarez Pol             -----
+// -----	     Last modification 28/05/12 by P.Cabanelas         -----
 // -------------------------------------------------------------------------
 
 /**  R3BCaloCrystalHit.h
@@ -22,14 +23,11 @@ public:
   R3BCaloCrystalHit();
 
   /** Constructor with arguments
-   *@param fCrystalId		Crystal unique identifier
-   *@param fCrystalType		Crystal type
-   *@param fCrystalCopy     Crystal copy
-   *@param fEnergy		total energy deposited on the crystal [GeV]
-   *@param fTime      Time since event start [ns]
+   *@param fCrystalId   Crystal unique identifier
+   *@param fEnergy      Total energy deposited on the crystal [GeV]
+   *@param fTime        Time since event start [ns]
    **/
-	R3BCaloCrystalHit(Int_t type, Int_t copy, Int_t ident,
-					  Double_t energy, Double_t time);
+  R3BCaloCrystalHit(Int_t ident, Double_t energy, Double_t time);
 
   /** Copy constructor **/
   R3BCaloCrystalHit(const R3BCaloCrystalHit& hit) { *this = hit; };
@@ -38,18 +36,13 @@ public:
   virtual ~R3BCaloCrystalHit();
 
   /** Accessors **/
-  Double_t GetCrystalType()   const { return fCrystalType; }
-  Double_t GetCrystalCopy()   const { return fCrystalCopy; }
-  Double_t GetCrystalId()   const { return fCrystalId; }
-  Double_t GetEnergy()   const { return fEnergy; }
-  Double_t GetTime()  const { return fTime; }
+  Int_t    GetCrystalId()     const { return fCrystalId; }
+  Double_t GetEnergy()        const { return fEnergy; }
+  Double_t GetTime()          const { return fTime; }
 	
   /** Modifiers **/
-  void SetCrystalType(Int_t type){fCrystalType = type;}
-  void SetCrystalCopy(Int_t copy){fCrystalCopy = copy;}
-  void SetCrystalId(Int_t ident){fCrystalId = ident;}
+  void SetCrystalId(Int_t ident)            { fCrystalId = ident; }
   void SetEnergy(Double32_t energy){fEnergy = energy;}
-  void AddMoreEnergy(Double32_t moreEnergy){fEnergy += moreEnergy;}
   void SetTime(Double32_t time){fTime = time;}
 
   /** Output to screen **/
@@ -57,11 +50,9 @@ public:
 
 protected:
 
-  Double32_t fEnergy;  //total energy in the crystal
-  Double32_t fTime;    //time of the interaction
-  Int_t fCrystalType;  //crystal type
-  Int_t fCrystalCopy;  //crystal copy
-  Int_t fCrystalId;    //crystal unique identifier
+  Double32_t fEnergy;    //total energy in the crystal
+  Double32_t fTime;      //time of the interaction
+  Int_t fCrystalId;      //crystal unique identifier
 
   ClassDef(R3BCaloCrystalHit,1)
 

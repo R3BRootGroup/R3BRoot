@@ -1,13 +1,14 @@
 // -------------------------------------------------------------------------
 // -----                        R3BCalo source file                    -----
 // -----                  Created 26/03/09  by D.Bertini               -----
-// -----      Last modification 28/03/11 by H.Alvarez        -----
+// -----	     Last modification 28/05/12 by P.Cabanelas         -----
 // -------------------------------------------------------------------------
 #include "R3BCalo.h"
 
 #include "R3BGeoCalo.h"
 #include "R3BCaloPoint.h"
 #include "R3BCaloCrystalHit.h"
+#include "R3BCaloCrystalHitSim.h"
 #include "R3BGeoCaloPar.h"
 
 #include "FairGeoInterface.h"
@@ -25,11 +26,13 @@
 #include "TParticle.h"
 #include "TVirtualMC.h"
 #include "TObjArray.h"
+#include "TMCProcess.h"
 
 // includes for modeling
 #include "TGeoManager.h"
 #include "TParticle.h"
 #include "TVirtualMC.h"
+#include "TVirtualMCStack.h"
 #include "TGeoMatrix.h"
 #include "TGeoMaterial.h"
 #include "TGeoMedium.h"
@@ -54,7 +57,7 @@ R3BCalo::R3BCalo() : R3BDetector("R3BCalo", kTRUE, kCALIFA)
 {
   ResetParameters();
   fCaloCollection = new TClonesArray("R3BCaloPoint");
-  fCaloCrystalHitCollection = new TClonesArray("R3BCaloCrystalHit");
+  fCaloCrystalHitCollection = new TClonesArray("R3BCaloCrystalHitSim");
   fPosIndex = 0;
   kGeoSaved = kFALSE;
   flGeoPar = new TList();
@@ -73,7 +76,7 @@ R3BCalo::R3BCalo(const char* name, Bool_t active)
 {
   ResetParameters();
   fCaloCollection = new TClonesArray("R3BCaloPoint");
-  fCaloCrystalHitCollection = new TClonesArray("R3BCaloCrystalHit");
+  fCaloCrystalHitCollection = new TClonesArray("R3BCaloCrystalHitSim");
   fPosIndex = 0;
   kGeoSaved = kFALSE;
   flGeoPar = new TList();
@@ -311,7 +314,7 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
         crystalId = (crystalType-1)*128 + cpAlv * 4 + cpCry;
       }
       // Crystaltypes 17-19 are large crystals which fill type 6 alveoli, as opposed to the smaller crystals of which 4 fit in the other alveoli.
-  //    else if (GetAlveolusType(volIdAlv)>16&&GetAlveolusType(volIdAlv)<20) {
+  //    else if (GetAlveolusType(volIdAlv)>16&&GetAlveolusType(volIdAlv)<20) 
         else if (GetAlveolusType(volIdAlv)>16) {
         crystalType = GetAlveolusType(volIdAlv);
         crystalCopy = cpAlv + cpCry;
@@ -358,23 +361,32 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
 
   if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
+    fNSteps  = 0; // FIXME
     fTime   = gMC->TrackTime() * 1.0e09;
     fLength = gMC->TrackLength();
     gMC->TrackPosition(fPosIn);
     gMC->TrackMomentum(fMomIn);
+    fEinc   = gMC->Etot();
   }
 
   // Sum energy loss for all steps in the active volume
   fELoss += gMC->Edep();
+  fNSteps++;
 
   // Set additional parameters at exit of active volume. Create R3BCaloPoint.
   if ( gMC->IsTrackExiting()    ||
        gMC->IsTrackStop()       ||
        gMC->IsTrackDisappeared()   ) {
-    fTrackID  = gMC->GetStack()->GetCurrentTrackNumber();
-    fVolumeID = vol->getMCid();
+
+    fTrackID        = gMC->GetStack()->GetCurrentTrackNumber();
+    fParentTrackID  = gMC->GetStack()->GetCurrentParentTrackNumber();
+    fVolumeID       = vol->getMCid();
+    fTrackPID       = gMC->TrackPid();
+    fUniqueID       = gMC->GetStack()->GetCurrentTrack()->GetUniqueID();
+
     gMC->TrackPosition(fPosOut);
     gMC->TrackMomentum(fMomOut);
+
     if (fELoss == 0. ) return kFALSE;
 
     if (gMC->IsTrackExiting()) {
@@ -388,14 +400,12 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
       oldpos = gGeoManager->GetCurrentPoint();
       olddirection = gGeoManager->GetCurrentDirection();
 
-//cout << "1st direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] << endl;
 
       for (Int_t i=0; i<3; i++) {
         newdirection[i] = -1*olddirection[i];
       }
 
       gGeoManager->SetCurrentDirection(newdirection);
-//TGeoNode *bla = gGeoManager->FindNextBoundary(2);
       safety = gGeoManager->GetSafeDistance();
 
       gGeoManager->SetCurrentDirection(-newdirection[0],-newdirection[1],-newdirection[2]);
@@ -432,19 +442,21 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
     Int_t nCrystalHits = fCaloCrystalHitCollection->GetEntriesFast();
     Bool_t existHit = 0;
 
-    if (nCrystalHits==0) AddCrystalHit(crystalType , crystalCopy , crystalId, NUSmearing(fELoss), fTime);
+    if (nCrystalHits==0) AddCrystalHit(crystalType , crystalCopy , crystalId, NUSmearing(fELoss), fTime, fNSteps, fEinc,
+					fTrackID, fVolumeID, fParentTrackID, fTrackPID, fUniqueID);
     else {
       for (Int_t i=0; i<nCrystalHits; i++) {
-        if ( ((R3BCaloCrystalHit *)(fCaloCrystalHitCollection->At(i)))->GetCrystalId() == crystalId ) {
-          ((R3BCaloCrystalHit *)(fCaloCrystalHitCollection->At(i)))->AddMoreEnergy(NUSmearing(fELoss));
-          if ( ((R3BCaloCrystalHit *)(fCaloCrystalHitCollection->At(i)))->GetTime() > fTime ) {
-            ((R3BCaloCrystalHit *)(fCaloCrystalHitCollection->At(i)))->SetTime(fTime);
+        if ( ((R3BCaloCrystalHitSim *)(fCaloCrystalHitCollection->At(i)))->GetCrystalId() == crystalId ) {
+          ((R3BCaloCrystalHitSim *)(fCaloCrystalHitCollection->At(i)))->AddMoreEnergy(NUSmearing(fELoss));
+          if ( ((R3BCaloCrystalHitSim *)(fCaloCrystalHitCollection->At(i)))->GetTime() > fTime ) {
+            ((R3BCaloCrystalHitSim *)(fCaloCrystalHitCollection->At(i)))->SetTime(fTime);
           }
           existHit=1; //to avoid the creation of a new CrystalHit
           break;
         }
       }
-      if (!existHit) AddCrystalHit(crystalType , crystalCopy , crystalId, NUSmearing(fELoss), fTime);
+      if (!existHit) AddCrystalHit(crystalType , crystalCopy , crystalId, NUSmearing(fELoss), fTime, fNSteps, fEinc,
+					fTrackID, fVolumeID, fParentTrackID, fTrackPID, fUniqueID);
     }
 
     existHit=0;
@@ -550,7 +562,7 @@ void R3BCalo::EndOfEvent()
 void R3BCalo::Register()
 {
   //FairRootManager::Instance()->Register("CrystalPoint", GetName(), fCaloCollection, kTRUE);
-  FairRootManager::Instance()->Register("CrystalHit", GetName(), fCaloCrystalHitCollection, kTRUE);
+  FairRootManager::Instance()->Register("CrystalHitSim", GetName(), fCaloCrystalHitCollection, kTRUE);
 
 }
 // ----------------------------------------------------------------------------
@@ -576,7 +588,7 @@ void R3BCalo::Print() const
   cout << "-I- R3BCalo: " << nHits << " points registered in this event."
        << endl;
   Int_t nCrystalHits = fCaloCrystalHitCollection->GetEntriesFast();
-  cout << "-I- R3BCalo: " << nCrystalHits << " hits registered in this event."
+  cout << "-I- R3BCalo: " << nCrystalHits << " sim hits registered in this event."
        << endl;
 }
 // ----------------------------------------------------------------------------
@@ -628,15 +640,17 @@ R3BCaloPoint* R3BCalo::AddHit(Int_t trackID, Int_t detID, Int_t volid , Int_t co
 }
 
 // -----   Private method AddCrystalHit   --------------------------------------------
-R3BCaloCrystalHit* R3BCalo::AddCrystalHit(Int_t type, Int_t copy, Int_t ident,
-    Double_t energy, Double_t time)
+R3BCaloCrystalHitSim* R3BCalo::AddCrystalHit(Int_t type, Int_t copy, Int_t ident,
+    Double_t energy, Double_t time, Int_t steps, Double_t einc,
+    Int_t trackid, Int_t volid, Int_t partrackid, Int_t pdgtype, Int_t uniqueid)
 {
   TClonesArray& clref = *fCaloCrystalHitCollection;
   Int_t size = clref.GetEntriesFast();
   if (fVerboseLevel>1)
-    cout << "-I- R3BCalo: Adding Hit in detector type " << type << ", and copy " << copy
-         << " with unique identifier " << ident << ", depositing " << energy*1e06 << " keV" << endl;
-  return new(clref[size]) R3BCaloCrystalHit(type, copy, ident, energy, time);
+    cout << "-I- R3BCalo: Adding Sim Hit in detector type " << type << ", and copy " << copy
+         << " with unique identifier " << ident << " entering with " << einc*1e06 << " keV, depositing " << energy*1e06 << " keV" << endl;
+    cout << " -I- trackid: " << trackid << " volume id: " << volid << " partrackid : " << partrackid << " type: " << pdgtype << " unique id: " << uniqueid << endl; 
+  return new(clref[size]) R3BCaloCrystalHitSim(type, copy, ident, energy, time, steps, einc, trackid, volid, partrackid, pdgtype, uniqueid);
 }
 
 // -----   Private method NUSmearing  --------------------------------------------

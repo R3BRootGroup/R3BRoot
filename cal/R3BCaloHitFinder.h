@@ -3,6 +3,7 @@
 // -----                  Created 27/08/10  by H.Alvarez               -----
 // -----                Last modification 06/12/11 by H.Alvarez        -----
 // -----                                  15/09/11 by Enrico Fiori     -----
+// -----                                  05/07/12 by P. Cabanelas     -----
 // -------------------------------------------------------------------------
 
 /**  R3BCaloHitFinder.h
@@ -14,6 +15,7 @@
 
 #include "FairTask.h"
 #include "R3BCaloHit.h"
+#include "R3BCaloHitSim.h"
 
 class TClonesArray;
 
@@ -125,11 +127,13 @@ class R3BCaloHitFinder : public FairTask
     // Angular window (azimuthal)
     Double_t fDeltaAzimuthal;
     // Angular opening used for the clustering condition
-    Double_t fDeltaAngleClust ;
+    Double_t fDeltaAngleClust;
     // Clustering algorithm selector
-    Int_t fClusteringAlgorithmSelector ;
+    Int_t fClusteringAlgorithmSelector;
     // Clustering parameter 1
-    Double_t fParCluster1 ;
+    Double_t fParCluster1;
+    // Flag for simulation
+    Bool_t kSimulation;
 
     // Parameter class
     //R3BCaloHitFinderPar* fCaloHitFinderPar;
@@ -151,6 +155,12 @@ class R3BCaloHitFinder : public FairTask
     ** Adds a CaloHit to the HitCollection
     **/
     R3BCaloHit* AddHit(UInt_t Nbcrystals,Double_t ene,Double_t pAngle,Double_t aAngle);
+
+    /** Private method AddHitSim
+    **
+    ** Adds a CaloHitSim to the HitSimCollection
+    **/
+    R3BCaloHitSim* AddHitSim(UInt_t Nbcrystals,Double_t ene,Double_t pAngle,Double_t aAngle, Double_t einc);
 
 
     ClassDef(R3BCaloHitFinder,1);

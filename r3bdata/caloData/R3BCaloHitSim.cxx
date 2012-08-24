@@ -1,8 +1,8 @@
 // -------------------------------------------------------------------------
-// -----                      R3BCaloCrystalHit source file                  -----
+// -----                   R3BCaloHitSim source file                   -----
 // -------------------------------------------------------------------------
 
-#include "R3BCaloCrystalHit.h"
+#include "R3BCaloHitSim.h"
 
 #include <iostream>
 
@@ -12,21 +12,23 @@ using std::flush;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BCaloCrystalHit::R3BCaloCrystalHit() : FairMultiLinkedData() {
-  fCrystalId = -1;
-  fEnergy = fTime = -1; 
+R3BCaloHitSim::R3BCaloHitSim() : R3BCaloHit() {
+        fEinc = 0.;
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Standard constructor   ------------------------------------------
-R3BCaloCrystalHit::R3BCaloCrystalHit(Int_t ident, Double_t energy, Double_t time) 
-  : FairMultiLinkedData() {
-  
-  fCrystalId     = ident;
-  fEnergy        = energy;
-  fTime          = time;
+R3BCaloHitSim::R3BCaloHitSim(UInt_t Nb, Double_t ene,
+					   Double_t theta, Double_t phi, Double_t einc) 
+: R3BCaloHit() {
+	
+	fNbOfCrystalHits = Nb;
+	fEnergy = ene;
+	fTheta = theta;	
+	fPhi = phi;
+        fEinc = einc;
 
 }
 // -------------------------------------------------------------------------
@@ -34,16 +36,15 @@ R3BCaloCrystalHit::R3BCaloCrystalHit(Int_t ident, Double_t energy, Double_t time
 
 
 // -----   Destructor   ----------------------------------------------------
-R3BCaloCrystalHit::~R3BCaloCrystalHit() { }
+R3BCaloHitSim::~R3BCaloHitSim() { }
 // -------------------------------------------------------------------------
 
 
 
 
 // -----   Public method Print   -------------------------------------------
-void R3BCaloCrystalHit::Print(const Option_t* opt) const {
-  cout << "-I- R3BCaloCrystalHit: a calo crystalHit in crystal identifier " << fCrystalId << endl;
-  cout << "    Energy = " << fEnergy << " GeV" << endl;
-  cout << "    Time " << fTime << " ns  " << endl;
+void R3BCaloHitSim::Print(const Option_t* opt) const {
+	// --- cout << "-I- R3BCaloHit: a CALIFA Hit made of " << fNbOfCrystalHits 
+	cout << " Total incident Energy  " << fEinc << endl;
 }
 // -------------------------------------------------------------------------

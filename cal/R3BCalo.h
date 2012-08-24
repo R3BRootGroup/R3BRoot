@@ -1,7 +1,7 @@
 // -------------------------------------------------------------------------
 // -----                        R3BCalo header file                    -----
 // -----                  Created 26/03/09  by D.Bertini               -----
-// -----			Last modification 28/03/11 by H.Alvarez			   -----
+// -----	     Last modification 28/05/12 by P.Cabanelas         -----
 // -------------------------------------------------------------------------
 
 /**  R3BCalo.h
@@ -18,6 +18,7 @@
 class TClonesArray;
 class R3BCaloPoint;
 class R3BCaloCrystalHit;
+class R3BCaloCrystalHitSim;
 class FairVolume;
 class TGeoRotation;
 
@@ -164,7 +165,10 @@ class R3BCalo : public R3BDetector
     /** Track information to be stored until the track leaves the
 	active volume. **/
     Int_t          fTrackID;           //!  track index
+    Int_t          fTrackPID;          //!  particle identification
     Int_t          fVolumeID;          //!  volume id
+    Int_t          fParentTrackID;     //!  parent track index
+    Int_t          fUniqueID;          //!  particle unique id (e.g. if Delta electron, fUniqueID=9)
     TLorentzVector fPosIn, fPosOut;    //!  position
     TLorentzVector fMomIn, fMomOut;    //!  momentum
     Double32_t     fTime;              //!  time
@@ -172,21 +176,24 @@ class R3BCalo : public R3BDetector
     Double32_t     fELoss;             //!  energy loss
     Double32_t     fCutE;              //!  energy loss
     Int_t          fPosIndex;          //!
-    TClonesArray*  fCaloCollection;    //!  The hit collection
-    TClonesArray*  fCaloCrystalHitCollection;    //!  The hit collection
+    Int_t          fNSteps;            //!  Number of steps in the active volume
+    Double32_t     fEinc;              //!  Total incident energy
     Bool_t         kGeoSaved;          //!
-    TList *flGeoPar;				//!
+    TList*         flGeoPar;	       //!
+
+    TClonesArray*  fCaloCollection;              //!  The hit collection
+    TClonesArray*  fCaloCrystalHitCollection;    //!  The crystal hit collection
 
     Int_t fCrystalType[30];
     Int_t fAlveolusType[32];
-		Int_t fAlveolusECType[3];
+    Int_t fAlveolusECType[3];
 	
-	// Selecting the geometry of the CALIFA calorimeter
-	Int_t fGeometryVersion;
-	// Adding some non-uniformity preliminary description
-	Double_t  fNonUniformity;
+    // Selecting the geometry of the CALIFA calorimeter
+    Int_t fGeometryVersion;
+    // Adding some non-uniformity preliminary description
+    Double_t  fNonUniformity;
 	
-	/** Private method AddHit
+    /** Private method AddHit
      **
      ** Adds a CaloPoint to the HitCollection
      **/
@@ -197,20 +204,23 @@ class R3BCalo : public R3BDetector
 			Double_t length, Double_t eLoss);
 
 	
-	/** Private method AddCrystalHit
+    /** Private method AddCrystalHit
      **
-     ** Adds a CaloCrystalhit to the HitCollection
+     ** Adds a CaloCrystalHitSim to the HitCollection
      **/
-    R3BCaloCrystalHit* AddCrystalHit(Int_t type, Int_t copy, Int_t ident,
-									 Double_t energy, Double_t tof);
+    R3BCaloCrystalHitSim* AddCrystalHit(Int_t type, Int_t copy, Int_t ident,
+					Double_t energy, Double_t tof,
+					Int_t steps, Double_t einc,
+					Int_t trackid, Int_t volid, Int_t partrackid,
+					Int_t pdgid, Int_t uniqueid);
 	
 	
-	/** Private method NUSmearing
+    /** Private method NUSmearing
      **
      ** Smears the energy according to some non-uniformity distribution	
-	 ** Very simple preliminary scheme where the NU is introduced as a flat random
-	 ** distribution with limits fNonUniformity (%) of the energy value.
-	 **/
+     ** Very simple preliminary scheme where the NU is introduced as a flat random
+     ** distribution with limits fNonUniformity (%) of the energy value.
+     **/
     Double_t NUSmearing(Double_t inputEnergy);
 	
 	
@@ -220,11 +230,11 @@ class R3BCalo : public R3BDetector
      **/
     void ResetParameters();
 	
-   TGeoRotation* createMatrix( Double_t phi, Double_t theta, Double_t psi);
+    TGeoRotation* createMatrix( Double_t phi, Double_t theta, Double_t psi);
 
-   Int_t  GetCrystalType(Int_t volID);
-   Int_t  GetAlveolusType(Int_t volID);
-   Int_t  GetAlveolusECType(Int_t volID);
+    Int_t  GetCrystalType(Int_t volID);
+    Int_t  GetAlveolusType(Int_t volID);
+    Int_t  GetAlveolusECType(Int_t volID);
 
     ClassDef(R3BCalo,1);
 };
@@ -266,13 +276,14 @@ inline Int_t R3BCalo::GetAlveolusECType(Int_t volID) {
 }
 
 inline void R3BCalo::ResetParameters() {
-  fTrackID = fVolumeID = 0;
+  fTrackID = fVolumeID = fParentTrackID = fTrackPID = fUniqueID = 0;
   fPosIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fPosOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fMomIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fMomOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
-  fTime = fLength = fELoss = 0;
+  fTime = fLength = fELoss = fEinc = 0;
   fPosIndex = 0;
+  fNSteps = 0;
 };
 
 #endif 

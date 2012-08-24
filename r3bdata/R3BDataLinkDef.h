@@ -13,7 +13,9 @@
 #pragma link C++ class R3BCalCrystalHit+;
 #pragma link C++ class R3BCalCrystalHitSim+;
 #pragma link C++ class R3BCaloCrystalHit+;
+#pragma link C++ class R3BCaloCrystalHitSim+;
 #pragma link C++ class R3BCaloHit+;
+#pragma link C++ class R3BCaloHitSim+;
 #pragma link C++ class R3BCaloPoint+;
 #pragma link C++ class R3BDchPoint+;
 #pragma link C++ class R3BDchFullPoint+;
