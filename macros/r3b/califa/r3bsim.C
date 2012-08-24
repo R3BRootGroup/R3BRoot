@@ -85,7 +85,7 @@ Int_t r3bsim(){
     TObjString det10("LAND");
 
     TObjArray fDetList;
-    //fDetList.Add(&det0);
+    fDetList.Add(&det0);
     //fDetList.Add(&det2);
     fDetList.Add(&det3);
     //fDetList.Add(&det5);
@@ -101,6 +101,7 @@ Int_t r3bsim(){
    //-------------------------------------------------
 
    Int_t nEvents = 100;
+   //Int_t nEvents = 3;
 
    //-------------------------------------------------
    //- EventDisplay        |    fEventDisplay (Bool_t)

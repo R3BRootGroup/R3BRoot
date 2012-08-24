@@ -248,7 +248,7 @@ void r3ball(Int_t nEvents = 1,
 	  // 6- CALIFA 7.09+7.17, (ongoing work)
 	  // 10- CALIFA 8.11, 
 	  // ...
-	  ((R3BCalo *)calo)->SelectGeometryVersion(5);
+	  ((R3BCalo *)calo)->SelectGeometryVersion(10);
 	  //Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
 	  ((R3BCalo *)calo)->SetNonUniformity(1.0);
       // Global position of the Module
@@ -266,6 +266,7 @@ void r3ball(Int_t nEvents = 1,
       //calo->SetRotAnglesEuler(phi,theta,psi);
       calo->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       calo->SetTranslation(tx,ty,tz);
+      //calo->SetVerboseLevel(2);
       run->AddModule(calo);
   }
 
@@ -520,14 +521,16 @@ void r3ball(Int_t nEvents = 1,
   if (fGenerator.CompareTo("box") == 0  ) {
 	  // 2- Define the BOX generator
 	  Double_t pdgId=211; // pion beam
-	  Double_t theta1= 0.;  // polar angle distribution
-	  Double_t theta2= 7.;
+	  Double_t theta1= 30.;  // polar angle distribution
+	  //Double_t theta2= 7.;
+	  Double_t theta2= 160.;
 	  Double_t momentum=.8; // 10 GeV/c
-	  FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 50);
+	  FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 10);
 	  boxGen->SetThetaRange (   theta1,   theta2);
 	  boxGen->SetPRange     (momentum,momentum*2.);
 	  boxGen->SetPhiRange   (0.,360.);
-	  boxGen->SetXYZ(0.0,0.0,-1.5);
+	  //boxGen->SetXYZ(0.0,0.0,-1.5);
+	  boxGen->SetXYZ(0.0,0.0,0.0);
 	  // add the box generator
 	  primGen->AddGenerator(boxGen);
   } 
@@ -536,7 +539,7 @@ void r3ball(Int_t nEvents = 1,
 	// 2- Define the CALIFA Test gamma generator
 	Double_t pdgId=22; // gamma emission
 	//Double_t pdgId=2212; // proton emission
-	Double_t theta1= 100.;  // polar angle distribution
+	Double_t theta1= 90.;  // polar angle distribution
 	Double_t theta2= 180.;	
 	//Double_t theta2= 90.;	
 	//Double_t momentum=0.002; // 0.010 GeV/c = 10 MeV/c 
@@ -547,7 +550,7 @@ void r3ball(Int_t nEvents = 1,
 	//Double_t momentum=0.4442972; // 0.4442972 GeV/c (100MeV Kin Energy for protons)
 	//Double_t momentum=0.5509999; // 0.5509999 GeV/c (150MeV Kin Energy for protons)
 	//Double_t momentumI=0.64405; // 0.64405 GeV/c (200MeV Kin Energy for protons) 
-	Int_t multiplicity = 12;
+	Int_t multiplicity = 1;
 	R3BCALIFATestGenerator* gammasGen = new R3BCALIFATestGenerator(pdgId, multiplicity);
 	gammasGen->SetThetaRange (theta1,   theta2);
 	gammasGen->SetCosTheta();

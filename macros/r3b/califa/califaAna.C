@@ -95,7 +95,7 @@ void califaAna(Int_t nEvents = 1) {
 	// 6- CALIFA 7.09+7.17, (ongoing work)
 	// 10- CALIFA 8.00, (ongoing work) 
 	// ...
-	caloHF->SelectGeometryVersion(5);          
+	caloHF->SelectGeometryVersion(10);          
 	caloHF->SetDetectionThreshold(0.000050);//50 KeV
 	caloHF->SetExperimentalResolution(5.);  //5% at 1 MeV
 	caloHF->SetAngularWindow(3.2,3.2);      //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
