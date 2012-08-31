@@ -368,7 +368,7 @@ void R3BMagnet::ConstructGeometry(){
 
 
 
-//   pAWorld->AddNode(pVolFeYoke_up,   1, t1);
+   pAWorld->AddNode(pVolFeYoke_up,   1, t1);
    pAWorld->AddNode(pVolFeYoke_down, 2, t2);
    pAWorld->AddNode(pVolFeYoke_left, 3, t3);
    pAWorld->AddNode(pVolFeYoke_right,4, t4);
