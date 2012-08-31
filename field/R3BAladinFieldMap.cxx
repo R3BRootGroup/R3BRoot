@@ -584,7 +584,7 @@ void R3BAladinFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField)
   // And then transformed into world coordinates
   // rotate_field(B,Bi[0],Bi[1],Bi[2]);
   TVector3 BLab(Bi[0],Bi[1],Bi[2]);
-  BLab.Transform(*gRot);
+//   BLab.Transform(*gRot);
   // copy value @ end
   //bField[0] = -1.*BLab.X()*10.; // [kGauss]
   //bField[1] = -1.*BLab.Y()*10.; // [kGauss]
