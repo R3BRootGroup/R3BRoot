@@ -15,6 +15,7 @@ using std::flush;
 R3BChimeraPoint::R3BChimeraPoint() : FairMCPoint() {
   fX_out      = fY_out  = fZ_out  = 0.;
   fPx_out     = fPy_out = fPz_out = 0.;
+  fLightYield = fSlow = -1 ;
 }
 // -------------------------------------------------------------------------
 
@@ -23,7 +24,7 @@ R3BChimeraPoint::R3BChimeraPoint() : FairMCPoint() {
 // -----   Standard constructor   ------------------------------------------
 R3BChimeraPoint::R3BChimeraPoint(Int_t trackID, Int_t detID, TVector3 posIn, 
 			 TVector3 posOut, TVector3 momIn, TVector3 momOut,
-			 Double_t tof, Double_t length, Double_t eLoss) 
+			 Double_t tof, Double_t length, Double_t eLoss, Double_t lightYield, Double_t slow) 
   : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss) {
   fX_out  = posOut.X();
   fY_out  = posOut.Y();
@@ -31,6 +32,8 @@ R3BChimeraPoint::R3BChimeraPoint(Int_t trackID, Int_t detID, TVector3 posIn,
   fPx_out = momOut.Px();
   fPy_out = momOut.Py();
   fPz_out = momOut.Pz();
+  fLightYield = lightYield;
+  fSlow = slow;
 }
 // -------------------------------------------------------------------------
 

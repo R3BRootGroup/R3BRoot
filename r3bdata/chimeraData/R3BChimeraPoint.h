@@ -40,7 +40,7 @@ class R3BChimeraPoint : public FairMCPoint
    **/
   R3BChimeraPoint(Int_t trackID, Int_t detID, TVector3 posIn, 
 	      TVector3 posOut, TVector3 momIn, TVector3 momOut,
-	      Double_t tof, Double_t length, Double_t eLoss);
+	      Double_t tof, Double_t length, Double_t eLoss, Double_t lightYield, Double_t slow);
 
 
   /** Copy constructor **/
@@ -61,6 +61,8 @@ class R3BChimeraPoint : public FairMCPoint
   Double_t GetPxOut() const { return fPx_out; }
   Double_t GetPyOut() const { return fPy_out; }
   Double_t GetPzOut() const { return fPz_out; }
+  Double_t GetLightYield() const {return fLightYield;}
+  Double_t GetSlow() const {return fSlow;}
   void PositionIn(TVector3& pos)  { pos.SetXYZ(fX, fY, fZ); }
   void PositionOut(TVector3& pos) { pos.SetXYZ(fX_out,fY_out,fZ_out); }
   void MomentumOut(TVector3& mom) { mom.SetXYZ(fPx_out,fPy_out,fPz_out); }
@@ -89,6 +91,7 @@ class R3BChimeraPoint : public FairMCPoint
 
   Double32_t fX_out,  fY_out,  fZ_out;
   Double32_t fPx_out, fPy_out, fPz_out;
+  Double_t fLightYield, fSlow;
 
 
 
