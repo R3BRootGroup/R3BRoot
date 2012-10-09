@@ -161,8 +161,10 @@ Bool_t R3BTof::ProcessHits(FairVolume* vol) {
   // Simple Det PLane
     if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
-    fTime   = gMC->TrackTime() * 1.0e09;
-    fLength = gMC->TrackLength();
+    //fTime   = gMC->TrackTime() * 1.0e09;
+    //fLength = gMC->TrackLength();
+    fTime_in   = gMC->TrackTime() * 1.0e09;
+    fLength_in = gMC->TrackLength();
     gMC->TrackPosition(fPosIn);
     gMC->TrackMomentum(fMomIn);
 //    cout << "-I- evt: " << evt++ << " track entering " << endl;
@@ -180,6 +182,11 @@ Bool_t R3BTof::ProcessHits(FairVolume* vol) {
     gMC->TrackPosition(fPosOut);
     gMC->TrackMomentum(fMomOut);
     if (fELoss == 0. ) return kFALSE;
+    
+    fTime_out   = gMC->TrackTime() * 1.0e09;	//also in case particle is stopped in detector, or decays...
+    fLength_out = gMC->TrackLength();
+    fTime = (fTime_out+fTime_in)/2.;
+    fLength = (fLength_out+fLength_in)/2.;
     
     if (gMC->IsTrackExiting()) {
       const Double_t* oldpos;
