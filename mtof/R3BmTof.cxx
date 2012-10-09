@@ -160,8 +160,10 @@ Bool_t R3BmTof::ProcessHits(FairVolume* vol) {
    
     if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
-    fTime   = gMC->TrackTime() * 1.0e09;
-    fLength = gMC->TrackLength();
+    //fTime   = gMC->TrackTime() * 1.0e09;
+    //fLength = gMC->TrackLength();
+    fTime_in   = gMC->TrackTime() * 1.0e09;
+    fLength_in = gMC->TrackLength();
     gMC->TrackPosition(fPosIn);
     gMC->TrackMomentum(fMomIn);
   }
@@ -179,6 +181,11 @@ Bool_t R3BmTof::ProcessHits(FairVolume* vol) {
     gMC->TrackPosition(fPosOut);
     gMC->TrackMomentum(fMomOut);
     if (fELoss == 0. ) return kFALSE;
+    
+    fTime_out   = gMC->TrackTime() * 1.0e09;	//also in case particle is stopped in detector, or decays...
+    fLength_out = gMC->TrackLength();
+    fTime = (fTime_out+fTime_in)/2.;
+    fLength = (fLength_out+fLength_in)/2.;
     
     if (gMC->IsTrackExiting()) {
       const Double_t* oldpos;
@@ -419,14 +426,20 @@ void R3BmTof::ConstructGeometry() {
    //dx = -154.815998;//Justyna
    //dy = 0.000000;  //Justyna
    //dz = 761.755160;//Justyna
-   dx = -157.536214;//Justyna new
-   dy = -0.010000;  //Justyna new
-   //dz = 760.939056;//Justyna new
-   dz = 760.139056;//Justyna   
-   
-//   dx = -154.10721;//Christoph
-//   dy = 0.92;  //Christoph
-//   dz = 761.967807;//Christoph
+   //dx = -157.536214;//Justyna new
+   //dy = -0.010000;  //Justyna new
+   ////dz = 760.939056;//Justyna new
+   //dz = 760.139056;//Justyna   
+   //dx = -155.709;//dE tracker
+   //dy = 0.524;
+   ////dz = 761.487;
+   //dz = 760.687;	//try -0.8 like Justyna
+  
+   //LABPOS(FTF,-155.824045,0.523976,761.870346)
+   dx = -155.824045;//dE tracker, correction due to wrong angle
+   dy = 0.523976;
+   dz = 761.870346;
+
    // Rotation: 
    thx = -106.700000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
@@ -484,7 +497,8 @@ void R3BmTof::ConstructGeometry() {
    // Shape: mTOFBox type: TGeoBBox
    dx = 24.000000;
    dy = 24.000000;
-   dz = 0.250000;
+   //dz = 0.250000;	//wrong: should be 0.5->1cm total
+   dz = 0.500000;
    
 /*   dx = 94.450000;  //TFW size
    dy = 73.450000;
