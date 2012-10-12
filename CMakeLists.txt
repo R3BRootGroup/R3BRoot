@@ -63,6 +63,9 @@ else(NOT R3BROOT_MINIMAL)
   endif(NOT DEFINED ENV{ROOTSYS})
 endif(NOT R3BROOT_MINIMAL)
 
+# Check if the external packages are installed into a separate install
+# directory
+CHECK_EXTERNAL_PACKAGE_INSTALL_DIR()
 
 # searches for needed packages
 # REQUIRED means that cmake will stop if this packages are not found
