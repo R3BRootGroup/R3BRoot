@@ -615,6 +615,9 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
     // crystalType = crystals type (from 1 to 23)
     // crystalCopy = alveolus copy (from 1 to 32)
     // crystalId = 3000 + (alvelous copy-1)*23 + (crystal copy-1)  (from 3000 to 3736)
+    //Obs: In the case of phoswich endcap IEM-CSIC will use:
+     // crystalType = crystals type (from 1 to 30)
+    // crystalCopy = alveolus copy (from 1 to 60), though for the last 5 rings (10-15) from 1 to 30.
 
     crystalType = ((iD-3000)%23) + 1;  //For phoswich endcap of IEM-CSIC Madrid: crystalType = ((iD-3000)%30) + 1;
     crystalCopy = (iD-3000)/23 + 1;  //For phoswich endcap of IEM-CSIC Madrid:  crystalCopy = (iD-3000)/30 + 1;
