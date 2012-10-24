@@ -147,6 +147,15 @@ void R3BCalo::Initialize()
   //
   //     Volumes: Alveolus_EC_[1,3] made of CrystalWithWrapping_[1,23] made of Crystal_[1,23]
   //
+  // 4.1.CALIFA 7.17, only phoswich ENDCAP (CLF717_Geometry_PhoswichEndcap.geo)  We can add here the stand alone phoswich endcap of LaBr and LaCl scintillator crystals (version 1).
+  //
+  //	The first 10 rings are made of 60 alveoli of 60 crystals each ring (azimuthal plane). The other 5 rings are made of 30 alveoli of 30 crystals each ring. There are 15 alveoli along the polar angle
+  //   for a total of 10x60+5x30= 750 alveoli or 1500 crystals (750 phoswich crystals). There are 30 different crystal shapes:
+  //     @alveoliType=(2,2,2,2,2,2,2,2,2,2,2,2,2,2,2);
+  // 
+  //	Alveolus_EC_[1,10] made of CrystalWithWrapping_[1,60] made of Crystal_[1,60] and Alveolus_EC_[10,15] made of CrystalWithWrapping_[1,30] made of Crystal_[1,30]
+  //	
+  //
   // 5- CALIFA 7.07+7.17 
   //   See above the two components
   //
@@ -172,7 +181,7 @@ void R3BCalo::Initialize()
     cout << "-I- R3BCalo: Alveolus_ Nb   : " << i+1 << " connected to (McId) ---> " <<  gMC->VolId(buffer)<< endl;
     fAlveolusType[i] = gMC->VolId(buffer);
   }
-  for (Int_t i=0; i<3; i++ ) { //3 is the larger possible alveolus number (v7.17) in endcap
+  for (Int_t i=0; i<3; i++ ) { //3 is the larger possible alveolus number (v7.17) in endcap, in the case of the phoswich endcap CLF717_Geometry_PhoswichEndcap.geo, we change 3 by 15
     sprintf(buffer,"Alveolus_EC_%i",i+1);
     cout << "-I- R3BCalo: Alveolus_EC Nb   : " << i+1 << " connected to (McId) ---> " <<  gMC->VolId(buffer)<< endl;
     fAlveolusECType[i] = gMC->VolId(buffer);
@@ -277,13 +286,18 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
     // crystalType = crystals type (from 1 to 23)
     // crystalCopy = alveolus copy (from 1 to 32)
     // crystalId = 3000 + (alvelous copy-1)*23 + (crystal copy-1)  (from 3000 to 3736)
+    
+    //In the case of the phoswich endcap (CLF717_Geometry_PhoswichEndcap.geo): 
+    // crystalType = crystals type (from 1 to 30)
+    // crystalCopy = alveolus copy (from 1 to 60), though the last 5 rings have only 30
     if ( GetAlveolusECType(volIdAlv) !=-1 ) {
       sscanf(bufferName,"%*8c %d",&crysNum);
       crystalType = crysNum;
       //crystalType = cpCry+1;
       crystalCopy = cpAlv+1;
-      crystalId = 3000 + cpAlv*23 + (crystalType-1);
-      if (crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736)
+      crystalId = 3000 + cpAlv*23 + (crystalType-1);//In the case of phoswich endcap: crystalId = 3000 + cpAlv*30 + (crystalType-1);
+      if (crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736)//For phoswich endcap:if (crystalType>30 || crystalType<1 || crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>4800) 
+
         cout << "-E- R3BCalo: Wrong crystal number in geometryVersion 4. " << endl;
     } else cout << "-E- R3BCalo: Wrong alveolus volume in geometryVersion 4. " << endl;
   } else if (fGeometryVersion==5) {
@@ -3544,6 +3558,118 @@ void R3BCalo::ConstructUserDefinedGeometry()
     par[7]  = 0.000000; // stmin
     pAirMedium = new TGeoMedium("Air", numed,pAirMaterial, par);
   }
+  
+  
+//In the case of phoswich endcap, some additional materials are needed:
+
+/*
+// Mixture: LaCl
+  TGeoMedium * pLaClMedium=NULL;
+  if (gGeoManager->GetMedium("LaCl") ) {
+    pLaClMedium=gGeoManager->GetMedium("LaCl");
+    //if (gGeoManager->GetMedium("aluminium") ){
+    //  pCsIMedium=gGeoManager->GetMedium("aluminium");
+  } else {
+    nel     = 4;
+    density = 3.790000;
+    TGeoMixture*
+    pLaClMaterial = new TGeoMixture("LaCl", nel,density);  //Mtot=245.26
+    aMat = 138.91;   z = 57.000000;   w = 0.566;  // La
+    pLaClMaterial->DefineElement(0,aMat,z,w);
+    aMat = 35.453;   z = 17.00;   w = 0.144;  // Cl
+    pLaClMaterial->DefineElement(1,aMat,z,w);
+
+    aMat = 35.453;   z = 17.00;   w = 0.144;  // Cl
+    pLaClMaterial->DefineElement(2,aMat,z,w);
+
+    aMat = 35.453;   z = 17.00;   w = 0.144;  // Cl
+    pLaClMaterial->DefineElement(3,aMat,z,w);
+
+    numed = 805;
+    pLaClMaterial->SetIndex(numed);
+    Double_t par[8];
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 0.000000; // tmaxfd
+    par[4]  = 0.000000; // stemax
+    par[5]  = 0.000000; // deemax
+    par[6]  = 0.000100; // epsil
+    par[7]  = 0.000000; // stmin
+    pLaClMedium = new TGeoMedium("LaCl", numed,pLaClMaterial, par);
+  }
+
+// Mixture: LaBr
+  TGeoMedium * pLaBrMedium=NULL;
+  if (gGeoManager->GetMedium("LaBr") ) {
+    pLaBrMedium=gGeoManager->GetMedium("LaBr3");
+    //if (gGeoManager->GetMedium("aluminium") ){
+    //  pCsIMedium=gGeoManager->GetMedium("aluminium");
+  } else {
+    nel     = 4;
+    density = 5.290000;
+    TGeoMixture*
+    pLaBrMaterial = new TGeoMixture("LaBr", nel,density); //Mtot=378.61
+    aMat = 138.91;   z = 57.000000;   w = 0.366;  // La
+    pLaBrMaterial->DefineElement(0,aMat,z,w);
+    aMat = 79.909;   z = 35.00;   w = 0.211;  // Br
+    pLaBrMaterial->DefineElement(1,aMat,z,w);
+
+    aMat = 79.909;   z = 35.00;   w = 0.211;  // Br
+    pLaBrMaterial->DefineElement(2,aMat,z,w);
+
+    aMat = 79.909;   z = 35.00;   w = 0.211;  // Br
+    pLaBrMaterial->DefineElement(3,aMat,z,w);
+
+    numed = 804;
+    pLaBrMaterial->SetIndex(numed);
+    Double_t par[8];
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 0.000000; // tmaxfd
+    par[4]  = 0.000000; // stemax
+    par[5]  = 0.000000; // deemax
+    par[6]  = 0.000100; // epsil
+    par[7]  = 0.000000; // stmin
+    pLaBrMedium = new TGeoMedium("LaBr", numed,pLaBrMaterial, par);
+  }
+  
+  
+TGeoMedium * pWrappingMedium=NULL;
+  if (gGeoManager->GetMedium("tefflon") ) {
+    pWrappingMedium=gGeoManager->GetMedium("tefflon");
+  } else { // CARBON FIBER DEFINITION HERE!!! CHANGE IT TO WHATEVER IS USED!!
+    nel     = 2;
+    density = 2.2;
+    TGeoMixture*
+    pWrappingMaterial = new TGeoMixture("Wrapping", nel,density);
+
+    aMat = 12.010700;   z = 6.000000;   w = 0.333;  // C
+    pWrappingMaterial->DefineElement(0,aMat,z,w);
+    
+    aMat = 18.999400;   z = 9.000000;   w = 0.667;  // F
+    pWrappingMaterial->DefineElement(2,aMat,z,w);
+    // Medium: CarbonFibre
+    numed   = 803;  // medium number
+    pWrappingMaterial->SetIndex(numed);
+    Double_t par[8];
+    par[0]  = 0.000000; // isvol
+    par[1]  = 0.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 0.000000; // tmaxfd
+    par[4]  = 0.000000; // stemax
+    par[5]  = 0.000000; // deemax
+    par[6]  = 0.000100; // epsil
+    par[7]  = 0.000000; // stmin
+    pWrappingMedium = new TGeoMedium("Wrapping", numed,pWrappingMaterial,par);
+}
+*/
+
+
+
+
+
 
 
   //WORLD
@@ -3572,6 +3698,8 @@ void R3BCalo::ConstructUserDefinedGeometry()
   //finally the v7.05 code
 
 #include "perlScripts/CALIFA.geo"
+
+
 
 }
 
