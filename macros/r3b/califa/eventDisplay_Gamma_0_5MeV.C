@@ -36,21 +36,21 @@ eventDisplay_Gamma_0_5MeV()
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *fRun= new FairRunAna();
  
-  TFile* file = new TFile("r3bpar_Protons_50MeV.root");
+  TFile* file = new TFile("r3bpar_Gamma_0_5MeV.root");
   file->Get("FairBaseParSet"); 
 
  // -----   Runtime database   ---------------------------------------------
 
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
   FairParRootFileIo* parIn = new FairParRootFileIo();
-  parIn->open("r3bpar_Protons_50MeV.root");
+  parIn->open("r3bpar_Gamma_0_5MeV.root");
   rtdb->setFirstInput(parIn);
   rtdb->print();
 
 
  //-------
  
-  fRun->SetInputFile("r3bsim_Protons_50MeV.root");
+  fRun->SetInputFile("r3bsim_Gamma_0_5MeV.root");
 
   fRun->SetOutputFile("test.root");
   //fRun->LoadGeometry();
