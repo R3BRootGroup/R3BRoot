@@ -4,6 +4,7 @@
 // -----                Last modification 06/12/11 by H.Alvarez        -----
 // -----                                  15/09/11 by Enrico Fiori     -----
 // -----                                  05/07/12 by P. Cabanelas     -----
+// -----                                  24/12/12 by J. Sanchez del Rio-----    
 // -------------------------------------------------------------------------
 #include "R3BCaloHitFinder.h"
 #include "TMath.h"
