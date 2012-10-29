@@ -127,7 +127,11 @@ class R3BTra : public R3BDetector
     Int_t          fsector;            //!  volume id
     TLorentzVector fPosIn, fPosOut;    //!  position
     TLorentzVector fMomIn, fMomOut;    //!  momentum
+    Double32_t     fTime_in;              //!  time when entering active volume
+    Double32_t     fTime_out;              //!  time when exiting active volume
     Double32_t     fTime;              //!  time
+    Double32_t     fLength_in;            //!  length when entering active volume
+    Double32_t     fLength_out;            //!  length when exiting active volume
     Double32_t     fLength;            //!  length
     Double32_t     fELoss;             //!  energy loss
     Double32_t     fCutE;              //!  Sec. Energy Cut-Off
