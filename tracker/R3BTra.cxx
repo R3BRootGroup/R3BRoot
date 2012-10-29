@@ -183,8 +183,10 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
 
     if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
-    fTime   = gMC->TrackTime() * 1.0e09;
-    fLength = gMC->TrackLength();
+    //fTime   = gMC->TrackTime() * 1.0e09;
+    //fLength = gMC->TrackLength();
+    fTime_in   = gMC->TrackTime() * 1.0e09;
+    fLength_in = gMC->TrackLength();
     gMC->TrackPosition(fPosIn);
     gMC->TrackMomentum(fMomIn);
     //cout << "X,Y,X tracker=" << fPosIn(0) << " " << fPosIn(1) << " " << fPosIn(2) << endl;
@@ -205,6 +207,11 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
     gMC->TrackPosition(fPosOut);
     gMC->TrackMomentum(fMomOut);
     if (fELoss == 0. ) return kFALSE;
+    
+    fTime_out   = gMC->TrackTime() * 1.0e09;	//also in case particle is stopped in detector, or decays...
+    fLength_out = gMC->TrackLength();
+    fTime = (fTime_out+fTime_in)/2.;
+    fLength = (fLength_out+fLength_in)/2.;
     
     if (gMC->IsTrackExiting()) {
       const Double_t* oldpos;
@@ -517,11 +524,14 @@ void R3BTra::ConstructGeometry() {
 
    // SST03 position
    // Combi transformation: 
-   dx = 0.03823;//0.0;    //it should be move by 0.038230  
-   dy = -0.006402;//0.0;   //it should be move by -0.006402 
-   dz = 10.69; //Justyna
+   //dx = 0.03823;//0.0;    //it should be move by 0.038230  
+   //dy = -0.006402;//0.0;   //it should be move by -0.006402 
+   //dz = 10.69; //Justyna
    //dz = 10.66; //Felix
-//   dz = 10.69; //Christoph
+   //new dE tracker
+   dx = 0.042; 
+   dy = -0.0002; 
+   dz = 10.660;
    // Rotation: 
 /*   thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
@@ -543,11 +553,15 @@ void R3BTra::ConstructGeometry() {
    
    // SSt06 position
    // Combi transformation: 
-   dx = -0.038495;//0.0;   //it should be move by -0.038495 
-   dy = 0.00798;//0.0;     //it should be move by 0.00798 
-   dz = 13.55;//13.35; //Justyna
+   //dx = -0.038495;//0.0;   //it should be move by -0.038495 
+   //dy = 0.00798;//0.0;     //it should be move by 0.00798 
+   //dz = 13.55;//13.35; //Justyna
    //dz = 13.32;//13.35; //Felix
-//   dz = 13.35; //Christoph
+   //new dE tracker
+   dx = -0.042; 
+   //dy = -0.0168; 
+   dy = +0.0168;	//same logic as earlier: put lab positions, not offsets. 
+   dz = 13.320;
    // Rotation: 
 /*   thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
