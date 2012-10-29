@@ -163,8 +163,10 @@ Bool_t R3BGfi::ProcessHits(FairVolume* vol) {
 
    if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
-    fTime   = gMC->TrackTime() * 1.0e09;
-    fLength = gMC->TrackLength();
+    //fTime   = gMC->TrackTime() * 1.0e09;
+    //fLength = gMC->TrackLength();
+    fTime_in   = gMC->TrackTime() * 1.0e09;
+    fLength_in = gMC->TrackLength();
     gMC->TrackPosition(fPosIn);
     gMC->TrackMomentum(fMomIn);
   }
@@ -184,6 +186,11 @@ Bool_t R3BGfi::ProcessHits(FairVolume* vol) {
     gMC->TrackMomentum(fMomOut);
     if (fELoss == 0. ) return kFALSE;
     
+    fTime_out   = gMC->TrackTime() * 1.0e09;	//also in case particle is stopped in detector, or decays...
+    fLength_out = gMC->TrackLength();
+    fTime = (fTime_out+fTime_in)/2.;
+    fLength = (fLength_out+fLength_in)/2.;
+
     if (gMC->IsTrackExiting()) {
       const Double_t* oldpos;
       const Double_t* olddirection;
@@ -452,13 +459,18 @@ void R3BGfi::ConstructGeometry() {
    //dx = -71.973310; //Justyna
    //dy = 0.000000;   //Justyna
    //dz = 513.967775; //Justyna
-   dx = -72.164874; //Justyna new
-   dy = -0.010000;   //Justyna new
-   dz = 513.910302; //Justyna new
+   //dx = -72.164874; //Justyna new
+   //dy = -0.010000;   //Justyna new
+   //dz = 513.910302; //Justyna new
+   //dx = -73.381; //dE tracker
+   //dy = 0.070;
+   //dz = 513.421;
    
-//   dx = -88.55368;  //Christoph
-//   dy = 0.92;   //Christoph
-//   dz = 515.015418; //Christoph
+   //LABPOS(GFI1,-73.274339,0.069976,513.649524)
+   dx = -73.274339; //dE tracker, correction due to wrong angle
+   dy = 0.069976;
+   dz = 513.649524;
+   
 /*
    dx = 73.700000;
    dy = 0.000000;
@@ -532,13 +544,18 @@ void R3BGfi::ConstructGeometry() {
    //dx = -145.270039; //Justyna
    //dy = 0.000000;    //Justyna
    //dz = 730.318956;  //Justyna
-   dx = -145.212570; //Justyna new
-   dy = -0.010000;    //Justyna new
-   dz = 730.336197;  //Justyna new
+   //dx = -145.212570; //Justyna new
+   //dy = -0.010000;    //Justyna new
+   //dz = 730.336197;  //Justyna new
+   //dx = -147.486; //dE tracker
+   //dy = 0.070;
+   //dz = 729.798;
    
-//   dx = -149.791168;  //Christoph
-//   dy = 0.920000;   //Christoph
-//   dz = 744.623074; //Christoph
+   //LABPOS(GFI2,-147.135037,0.069976,729.680342)
+   dx = -147.135037; //dE tracker, correction due to wrong angle
+   dy = 0.069976;
+   dz = 729.680342;
+   
 /*
    dx = 141.800000;
    dy = 0.000000;
