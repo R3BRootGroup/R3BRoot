@@ -57,7 +57,7 @@ using std::ios;
 	Double_t Eproj = 50; 
 
 	//Double_t Eproj = 10.0;              //Gamma Energy in projectile frame i
-	Int_t totalEvents = 30000;        //Events
+	Int_t totalEvents = 3000;        //Events
 	Int_t multiplicity = 1;           //Multiplicity (particles per event)
 	
 	Double_t threshold=0.050;		  //Threshold in MeV
@@ -283,16 +283,23 @@ using std::ios;
 	
 	//Crystal Hits (input)
 	TClonesArray* crystalHitCA;  
-	R3BCaloCrystalHit** crystalHit;
-	crystalHitCA = new TClonesArray("R3BCaloCrystalHit",5);
-	TBranch *branchCrystalHit = TCrystal->GetBranch("CrystalHit");
+	//R3BCaloCrystalHit** crystalHit;
+	R3BCaloCrystalHitSim** crystalHit;
+
+	//crystalHitCA = new TClonesArray("R3BCaloCrystalHit",5);
+	crystalHitCA = new TClonesArray("R3BCaloCrystalHitSim",5);
+	//TBranch *branchCrystalHit = TCrystal->GetBranch("CrystalHit");
+	TBranch *branchCrystalHit = TCrystal->GetBranch("CrystalHitSim");
 	branchCrystalHit->SetAddress(&crystalHitCA);
 
 	//Calo Hits (output)
 	TClonesArray* caloHitCA;  
-	R3BCaloHit** caloHit;
-	caloHitCA = new TClonesArray("R3BCaloHit",5);
-	TBranch *branchCaloHit = TCalo->GetBranch("CaloHit");
+	//R3BCaloHit** caloHit;
+	R3BCaloHitSim** caloHit;
+	//caloHitCA = new TClonesArray("R3BCaloHit",5);
+	caloHitCA = new TClonesArray("R3BCaloHitSim",5);
+	//TBranch *branchCaloHit = TCalo->GetBranch("CaloHit");
+	TBranch *branchCaloHit = TCalo->GetBranch("CaloHitSim");
 	branchCaloHit->SetAddress(&caloHitCA);
 	
 	//MCTrack(input)
@@ -339,7 +346,7 @@ using std::ios;
 	Double_t resolutionCrystal = KPhoswich/(sqrt(inputEnergy));//no lo uso
 
 		//Protons
-		Double_t ResoloutionProts=0.02;
+		Double_t ResolutionProts=0.02;
 
 	
 	for(Int_t i=0;i<nevents;i++){
@@ -358,17 +365,23 @@ using std::ios;
 		MCtracksPerEvent = MCTrackCA->GetEntries();
 		
 		if(crystalHitsPerEvent>0) {
-			crystalHit = new R3BCaloCrystalHit*[crystalHitsPerEvent];
+			//crystalHit = new R3BCaloCrystalHit*[crystalHitsPerEvent];
+		crystalHit = new R3BCaloCrystalHitSim*[crystalHitsPerEvent];
 			for(Int_t j=0;j<crystalHitsPerEvent;j++){
-				crystalHit[j] = new R3BCaloCrystalHit;
-				crystalHit[j] = (R3BCaloCrystalHit*) crystalHitCA->At(j);      
+				//crystalHit[j] = new R3BCaloCrystalHit;
+				crystalHit[j] = new R3BCaloCrystalHitSim;
+				//crystalHit[j] = (R3BCaloCrystalHit*) crystalHitCA->At(j);      
+				crystalHit[j] = (R3BCaloCrystalHitSim*) crystalHitCA->At(j);      
 			}
 		}
 		if(caloHitsPerEvent>0) {
-			caloHit = new R3BCaloHit*[caloHitsPerEvent];
+			//caloHit = new R3BCaloHit*[caloHitsPerEvent];
+			caloHit = new R3BCaloHitSim*[caloHitsPerEvent];
 			for(Int_t j=0;j<caloHitsPerEvent;j++){
-				caloHit[j] = new R3BCaloHit;
-				caloHit[j] = (R3BCaloHit*) caloHitCA->At(j);      
+				//caloHit[j] = new R3BCaloHit;
+				caloHit[j] = new R3BCaloHitSim;
+				//caloHit[j] = (R3BCaloHit*) caloHitCA->At(j);      
+				caloHit[j] = (R3BCaloHitSim*) caloHitCA->At(j);
 			}
 		}		
 		if(MCtracksPerEvent>0) {
