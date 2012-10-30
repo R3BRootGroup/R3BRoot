@@ -57,7 +57,7 @@ using std::ios;
 	Double_t Eproj = 50; 
 
 	//Double_t Eproj = 10.0;              //Gamma Energy in projectile frame i
-	Int_t totalEvents = 30000;        //Events
+	Int_t totalEvents = 100;        //Events
 	Int_t multiplicity = 1;           //Multiplicity (particles per event)
 	
 	Double_t threshold=0.050;		  //Threshold in MeV
@@ -71,8 +71,8 @@ using std::ios;
 
 	//TString title0 = "califaAna.root";
 	//TString title1 =    "r3bsim.root";
-	sprintf(title0,"%s","/home/josesrs/fairsoft2/r3broot/macros/r3b/califa/califaAna_Protons_50MeV.root");  
- 	sprintf(title1,"%s","/home/josesrs/fairsoft2/r3broot/macros/r3b/califa/r3bsim_Protons_50MeV.root");  	
+	sprintf(title0,"%s","/home/josesrs/r3broot_sept2012/macros/r3b/califa/califaAna_Protons_50MeV.root");  
+ 	sprintf(title1,"%s","/home/josesrs/r3broot_sept2012/macros/r3b/califa/r3bsim_Protons_50MeV.root");  	
 	TFile *file0 = TFile::Open(title0);
 	TFile *file1 = TFile::Open(title1);
 	
@@ -641,7 +641,7 @@ using std::ios;
 	}//fin de evento i
 
 
-        TFile f_50MeV("/home/josesrs/fairsoft2/r3broot/macros/r3b/califa/hist_Endcap21_50MeV.root", "recreate");
+        TFile f_50MeV("/home/josesrs/r3broot_sept2012/macros/r3b/califa/hist_Endcap21_50MeV.root", "recreate");
 	f_50MeV->cd();
 	if(h3_T){h3_T->Write();}
 	if(h2_CC_endcap){h2_CC_endcap->Write();}
