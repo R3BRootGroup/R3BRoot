@@ -40,6 +40,9 @@ public:
   Double_t GetEnergy()        const { return fEnergy; }
   Double_t GetTime()          const { return fTime; }
 	
+  Int_t    GetCrystalType()   const { return 0; }   //Backwards compatibility: not crashing macros
+  Int_t    GetCrystalCopy()   const { return 0; }   //Backwards compatibility: not crashing macros
+
   /** Modifiers **/
   void SetCrystalId(Int_t ident)            { fCrystalId = ident; }
   void SetEnergy(Double32_t energy){fEnergy = energy;}
