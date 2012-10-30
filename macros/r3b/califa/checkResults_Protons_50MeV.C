@@ -57,7 +57,7 @@ using std::ios;
 	Double_t Eproj = 50; 
 
 	//Double_t Eproj = 10.0;              //Gamma Energy in projectile frame i
-	Int_t totalEvents = 100;        //Events
+	Int_t totalEvents = 30000;        //Events
 	Int_t multiplicity = 1;           //Multiplicity (particles per event)
 	
 	Double_t threshold=0.050;		  //Threshold in MeV
