@@ -52,7 +52,7 @@ using std::ios;
 	Double_t Eproj = 0.500;              //Gamma Energy in projectile frame in MeV 
 
 	//Double_t Eproj = 10.0;              //Gamma Energy in projectile frame i
-	Int_t totalEvents = 50000;        //Events
+	Int_t totalEvents = 5000;        //Events
 	Int_t multiplicity = 1;           //Multiplicity (particles per event)
 	
 	Double_t threshold=0.050;		  //Threshold in MeV
@@ -66,8 +66,8 @@ using std::ios;
 
 	//TString title0 = "califaAna.root";
 	//TString title1 =    "r3bsim.root";
-	sprintf(title0,"%s","/home/josesrs/fairsoft2/r3broot/macros/r3b/califa/califaAna0_5MeV.root");  
- 	sprintf(title1,"%s","/home/josesrs/fairsoft2/r3broot/macros/r3b/califa/r3bsim0_5MeV.root");  	
+	sprintf(title0,"%s","/home/josesrs/r3broot_sept2012/macros/r3b/califa/califaAna_Gamma_0_5MeV.root");  
+ 	sprintf(title1,"%s","/home/josesrs/r3broot_sept2012/macros/r3b/califa/r3bsim_Gamma_0_5MeV.root");  	
 	TFile *file0 = TFile::Open(title0);
 	TFile *file1 = TFile::Open(title1);
 	
@@ -280,20 +280,29 @@ using std::ios;
 
 	TTree* TCalo = (TTree*)file0->Get("cbmsim");
 	TTree* TCrystal = (TTree*)file1->Get("cbmsim");
-	
+		
+
 	//Crystal Hits (input)
 	TClonesArray* crystalHitCA;  
-	R3BCaloCrystalHit** crystalHit;
-	crystalHitCA = new TClonesArray("R3BCaloCrystalHit",5);
-	TBranch *branchCrystalHit = TCrystal->GetBranch("CrystalHit");
+	//R3BCaloCrystalHit** crystalHit;
+	R3BCaloCrystalHitSim** crystalHit;
+
+	//crystalHitCA = new TClonesArray("R3BCaloCrystalHit",5);
+	crystalHitCA = new TClonesArray("R3BCaloCrystalHitSim",5);
+	//TBranch *branchCrystalHit = TCrystal->GetBranch("CrystalHit");
+	TBranch *branchCrystalHit = TCrystal->GetBranch("CrystalHitSim");
 	branchCrystalHit->SetAddress(&crystalHitCA);
 
 	//Calo Hits (output)
 	TClonesArray* caloHitCA;  
-	R3BCaloHit** caloHit;
-	caloHitCA = new TClonesArray("R3BCaloHit",5);
-	TBranch *branchCaloHit = TCalo->GetBranch("CaloHit");
+	//R3BCaloHit** caloHit;
+	R3BCaloHitSim** caloHit;
+	//caloHitCA = new TClonesArray("R3BCaloHit",5);
+	caloHitCA = new TClonesArray("R3BCaloHitSim",5);
+	//TBranch *branchCaloHit = TCalo->GetBranch("CaloHit");
+	TBranch *branchCaloHit = TCalo->GetBranch("CaloHitSim");
 	branchCaloHit->SetAddress(&caloHitCA);
+
 	
 	//MCTrack(input)
 	TClonesArray* MCTrackCA;  
@@ -353,17 +362,27 @@ using std::ios;
 		MCtracksPerEvent = MCTrackCA->GetEntries();
 		
 		if(crystalHitsPerEvent>0) {
-			crystalHit = new R3BCaloCrystalHit*[crystalHitsPerEvent];
+			//crystalHit = new R3BCaloCrystalHit*[crystalHitsPerEvent];
+		crystalHit = new R3BCaloCrystalHitSim*[crystalHitsPerEvent];
+
 			for(Int_t j=0;j<crystalHitsPerEvent;j++){
-				crystalHit[j] = new R3BCaloCrystalHit;
-				crystalHit[j] = (R3BCaloCrystalHit*) crystalHitCA->At(j);      
+				//crystalHit[j] = new R3BCaloCrystalHit;
+				//crystalHit[j] = (R3BCaloCrystalHit*) crystalHitCA->At(j);    
+				crystalHit[j] = new R3BCaloCrystalHitSim;
+				crystalHit[j] = (R3BCaloCrystalHitSim*) crystalHitCA->At(j);    
+  
 			}
 		}
 		if(caloHitsPerEvent>0) {
-			caloHit = new R3BCaloHit*[caloHitsPerEvent];
+			//caloHit = new R3BCaloHit*[caloHitsPerEvent];
+
+			caloHit = new R3BCaloHitSim*[caloHitsPerEvent];
 			for(Int_t j=0;j<caloHitsPerEvent;j++){
-				caloHit[j] = new R3BCaloHit;
-				caloHit[j] = (R3BCaloHit*) caloHitCA->At(j);      
+				//caloHit[j] = new R3BCaloHit;
+				//caloHit[j] = (R3BCaloHit*) caloHitCA->At(j);      
+				caloHit[j] = new R3BCaloHitSim;
+				caloHit[j] = (R3BCaloHitSim*) caloHitCA->At(j);
+
 			}
 		}		
 		if(MCtracksPerEvent>0) {
@@ -555,7 +574,7 @@ using std::ios;
 
 
 
-        TFile f_0_5MeV("/home/josesrs/fairsoft2/r3broot/macros/r3b/califa/hist_Endcap21_0_5MeV.root", "recreate");
+        TFile f_0_5MeV("/home/josesrs/r3broot_sept2012/macros/r3b/califa/hist_Endcap21_0_5MeV.root", "recreate");
 	f_0_5MeV->cd();
 	if(h3_T){h3_T->Write();}
 	if(h2_CC_endcap){h2_CC_endcap->Write();}
@@ -567,7 +586,6 @@ using std::ios;
 	if(h5_Cal_ThetaPhi_endcap){h5_Cal_ThetaPhi_endcap->Write();}
 
 	
-;
 
 	TCanvas* c1 = new TCanvas("MCTrack","MCTrack",0,0,720,900);
 	c1->SetFillColor(0);
