@@ -6,30 +6,35 @@
 
 #Put the proper paths according to the user 
 
-export SIMPATH=/home/jose/fairsoft
-export ROOTSYS=/home/jose/fairsoft/tools/root
+export SIMPATH=/home/josesrs/fairsoft_sept2012_externalPackages
+#export ROOTSYS=/home/josesrs/fairsoft/tools/root
+export ROOTSYS=/home/josesrs/fairsoft_sept2012_externalPackages
 export PATH=$ROOTSYS/bin:$PATH
 
-export VMCWORKDIR=/home/jose/fairsoft/r3broot
+export VMCWORKDIR=/home/josesrs/r3broot_sept2012
 
+. $ROOTSYS/bin/thisroot.sh
 
-cd /home/jose/fairsoft/r3broot/build/
+cd /home/josesrs/r3broot_sept2012/build/
 
 cmake ../
 . ./config.sh
 make
 
-cd /home/jose/fairsoft/r3broot/macros/r3b/califa/
+cd /home/josesrs/r3broot_sept2012/macros/r3b/califa/
 
 #rm -rf *.dat *.out
 
 
 
-root -l r3bsim_Protons_50MeV.C -q
-#root -l eventDisplay_Protons_50MeV.C
+#root -l r3bsim.C
 
-#root -l califaAna_Protons_50MeV.C -q
-#root -l checkResults_Protons_50MeV.C -q
+root -l r3bsim_Protons_50MeV.C -q
+root -l eventDisplay_Protons_50MeV.C
+
+root -l califaAna_Protons_50MeV.C -q
+root -l checkResults_Protons_50MeV.C -q
+
 
 
 
