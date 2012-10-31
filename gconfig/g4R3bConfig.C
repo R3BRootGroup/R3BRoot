@@ -17,17 +17,43 @@ void Config()
    /// - geomRootToGeant4  - geometry defined via Root, G4 native navigation
    /// - geomGeant4        - geometry defined via Geant4, G4 native navigation
 
+   /// The second argument in the constructor selects physics list:
+   /// - emStandard         - standard em physics (default)
+   /// - emStandard+optical - standard em physics + optical physics
+   /// - XYZ                - selected hadron physics list ( XYZ = LHEP, QGSP, ...)
+   /// - XYZ+optical        - selected hadron physics list + optical physics
+
+
    // Create the Run Configuration
-   R3BRunConfiguration* runConfiguration
-     = new R3BRunConfiguration("geomRoot","stepLimiter+specialCuts+specialControls");
    //R3BRunConfiguration* runConfiguration
    //  = new R3BRunConfiguration("geomRootToGeant4", "stepLimiter+specialCuts+specialControls");
 
 /// Create the G4 VMC 
-   TGeant4* geant4 = new TGeant4("TGeant4", "The Geant4 Monte Carlo",
-				 runConfiguration);
-   cout << "-I- R3B Config(): Geant4 with R3B dedicated Physics list " << endl;
-   cout << "-I- R3B Config(): has been created..." << endl;
+   //TGeant4* geant4 = new TGeant4("TGeant4", "The Geant4 Monte Carlo",
+				// runConfiguration);
+   //cout << "-I- R3B Config(): Geant4 with R3B dedicated Physics list " << endl;
+   //cout << "-I- R3B Config(): has been created..." << endl;
+
+
+  // Create Geant4 VMC
+  //  
+  TGeant4 *geant4 = 0;
+  if ( ! gMC ) {
+    TG4RunConfiguration* runConfiguration 
+      = new TG4RunConfiguration("geomRoot", 
+                                "LHEP", 
+                                "specialCuts+stackPopper+stepLimiter+specialControls",
+                                 true);
+
+    geant4 = new TGeant4("TGeant4", "The Geant4 Monte Carlo", runConfiguration);
+    cout << "-I- R3B Config(): Geant4 with R3B dedicated Physics list " << endl;
+    cout << "-I- R3B Config(): has been created..." << endl;
+  } 
+  else {
+    cout << "Monte Carlo has been already created." << endl;
+  }  
+
+
 
 /// create the Specific stack
    R3BStack *stack = new R3BStack(1000); 
