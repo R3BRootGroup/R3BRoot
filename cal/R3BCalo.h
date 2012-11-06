@@ -187,7 +187,7 @@ class R3BCalo : public R3BDetector
 
     Int_t fCrystalType[30];
     Int_t fAlveolusType[32];
-    Int_t fAlveolusECType[3]; //For phoswich endcap (CLF717_Geometry_PhoswichEndcap.geo):Int_t fAlveolusECType[16];
+    Int_t fAlveolusECType[3]; /*For phoswich endcap (CLF717_Geometry_PhoswichEndcap.geo):Int_t fAlveolusECType[16]; To adapt ot to the barrel: Int_t fAlveolusECType[19];*/
 
 	
     // Selecting the geometry of the CALIFA calorimeter
@@ -268,7 +268,8 @@ inline Int_t R3BCalo::GetAlveolusType(Int_t volID) {
 inline Int_t R3BCalo::GetAlveolusECType(Int_t volID) {
 	Int_t type=-1;
 	
-	for (Int_t i=0;i<3;i++ ){ //For phoswich endcap IEM ((CLF717_Geometry_PhoswichEndcap.geo): (Int_t i=0;i<15;i++ )
+	for (Int_t i=0;i<3;i++ ){ /*For phoswich endcap IEM ((CLF717_Geometry_PhoswichEndcap.geo): (Int_t i=0;i<15;i++ ) or (Int_t i=0;i<15;i++ ) to adapt it perfectly to the
+	barrel*/
 		if (volID==fAlveolusECType[i]) {
 			type=i+1; //
 			return (type);
