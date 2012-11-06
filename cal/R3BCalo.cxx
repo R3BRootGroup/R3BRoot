@@ -154,10 +154,11 @@ void R3BCalo::Initialize()
   //     @alveoliType=(2,2,2,2,2,2,2,2,2,2,2,2,2,2,2);
   // 
   //	Alveolus_EC_[1,10] made of CrystalWithWrapping_[1,60] made of Crystal_[1,60] and Alveolus_EC_[10,15] made of CrystalWithWrapping_[1,30] made of Crystal_[1,30]
-  //	
   //
   // 5- CALIFA 7.07+7.17 
-  //   See above the two components
+  //   See above the two components (3 & 4)
+  //   If we want the phoswich endcap adapted to the barrel, we use: CLF717_Geometry_PhoswichEndcap_3.geo.
+  //   Alveolus_EC_[1,10] made of CrystalWithWrapping_[1,60] made of Crystal_[1,60] and Alveolus_EC_[10,18] made of CrystalWithWrapping_[1,30] made of Crystal_[1,30]
   //
   // 6- CALIFA 7.09+7.17
   //   See above the two components
@@ -181,7 +182,8 @@ void R3BCalo::Initialize()
     cout << "-I- R3BCalo: Alveolus_ Nb   : " << i+1 << " connected to (McId) ---> " <<  gMC->VolId(buffer)<< endl;
     fAlveolusType[i] = gMC->VolId(buffer);
   }
-  for (Int_t i=0; i<3; i++ ) { //3 is the larger possible alveolus number (v7.17) in endcap, in the case of the phoswich endcap CLF717_Geometry_PhoswichEndcap.geo, we change 3 by 15
+  for (Int_t i=0; i<3; i++ ) { /*3 is the larger possible alveolus number (v7.17) in endcap, in the case of the phoswich endcap CLF717_Geometry_PhoswichEndcap.geo, we change 3 by
+  15 or by 18 (CLF717_Geometry_PhoswichEndcap_3.geo) to adapt it yo the barrel 7.07*/
     sprintf(buffer,"Alveolus_EC_%i",i+1);
     cout << "-I- R3BCalo: Alveolus_EC Nb   : " << i+1 << " connected to (McId) ---> " <<  gMC->VolId(buffer)<< endl;
     fAlveolusECType[i] = gMC->VolId(buffer);
@@ -295,8 +297,9 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
       crystalType = crysNum;
       //crystalType = cpCry+1;
       crystalCopy = cpAlv+1;
-      crystalId = 3000 + cpAlv*23 + (crystalType-1);//In the case of phoswich endcap: crystalId = 3000 + cpAlv*30 + (crystalType-1);
-      if (crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736)//For phoswich endcap:if (crystalType>30 || crystalType<1 || crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>4800) 
+     crystalId = 3000 + cpAlv*23 + (crystalType-1);/*In the case of phoswich endcap: crystalId = 3000 + cpAlv*30 + (crystalType-1);*/
+      if (crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736)/*For phoswich endcap:if (crystalType>30 || crystalType<1 ||
+      crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>4800)*/
 
         cout << "-E- R3BCalo: Wrong crystal number in geometryVersion 4. " << endl;
     } else cout << "-E- R3BCalo: Wrong alveolus volume in geometryVersion 4. " << endl;
@@ -314,8 +317,13 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
       crystalType = crysNum;
       //crystalType = cpCry+1;
       crystalCopy = cpAlv+1;
-      crystalId = 3000 + cpAlv*23 + (crystalType-1);
-      if (crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736)
+      
+      
+      crystalId = 3000 + cpAlv*23 + (crystalType-1);//In the case of phoswich endcap:30 or 36 depending if we do not adapt it the barrel or yes: crystalId = 3000 + cpAlv*36 + (crystalType-1);
+      if (crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736)/*For phoswich endcap, 30 or 36 as before:if (crystalType>36 || crystalType<1 ||
+      crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>5160)*/ 
+
+ 
         cout << "-E- R3BCalo: Wrong crystal number in geometryVersion 5 (endcap). " << endl;
     }
   } else if (fGeometryVersion==6) {
@@ -3500,7 +3508,7 @@ void R3BCalo::ConstructUserDefinedGeometry()
     pCarbonFibreMedium = new TGeoMedium("CarbonFibre", numed,pCarbonFibreMaterial,par);
   }
 
-  // Mixture: Wrapping component
+/*  // Mixture: Wrapping component
   TGeoMedium * pWrappingMedium=NULL;
   if (gGeoManager->GetMedium("mylar") ) {
     pWrappingMedium=gGeoManager->GetMedium("mylar");
@@ -3529,7 +3537,7 @@ void R3BCalo::ConstructUserDefinedGeometry()
     par[7]  = 0.000000; // stmin
     pWrappingMedium = new TGeoMedium("Wrapping", numed,pWrappingMaterial,par);
   }
-
+*/
 
   // Mixture: Air
   TGeoMedium * pAirMedium=NULL;
@@ -3562,7 +3570,7 @@ void R3BCalo::ConstructUserDefinedGeometry()
   
 //In the case of phoswich endcap, some additional materials are needed:
 
-/*
+
 // Mixture: LaCl
   TGeoMedium * pLaClMedium=NULL;
   if (gGeoManager->GetMedium("LaCl") ) {
@@ -3664,7 +3672,7 @@ TGeoMedium * pWrappingMedium=NULL;
     par[7]  = 0.000000; // stmin
     pWrappingMedium = new TGeoMedium("Wrapping", numed,pWrappingMaterial,par);
 }
-*/
+
 
 
 
@@ -3698,6 +3706,18 @@ TGeoMedium * pWrappingMedium=NULL;
   //finally the v7.05 code
 
 #include "perlScripts/CALIFA.geo"
+
+//........
+
+//#include "perlScripts/CLF717_Geometry_PhoswichEndcap.geo"
+
+//#include "perlScripts/CLF717_Geometry_PhoswichEndcap_2.geo"
+
+
+//#include "perlScripts/CLF717_Geometry_PhoswichEndcap_3.geo" // If we want the IEM phoswich endcap adapted to the barrel C707. J.Sanchez del Rio Saez
+
+
+
 
 
 
