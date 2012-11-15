@@ -4,7 +4,7 @@
 //
 //         Author: Hector Alvarez <hector.alvarez@usc.es>
 //
-//         Last Update: 25/04/2012
+//         Last Update: 15/11/2012
 //
 //         Comments:
 //
@@ -16,11 +16,12 @@
 //        2)[root] .L r3ball.C 
 //                         
 //        3)[root] r3ball( nevt,
-//                         fDetList,     // List of Detectors
+//                         fDetList,      // List of Detectors
 //                         TargetType,    // "LeadTarget" 
 //                         Visualization, // kFalse or kTRUE   
-//                         fMC ,        // "TGeant3" or "TGeant4"   
-//                         fGenerator   // Generator type
+//                         fMC ,          // "TGeant3" or "TGeant4"   
+//                         fGenerator     // Generator type
+//                         fCaloHitFinder // Activate CaloHitFinder task
 //
 //  -------------------------------------------------------------------------
 
@@ -29,11 +30,12 @@
 void r3ball(Int_t nEvents = 1,
 	    TObjArray& fDetList,
 	    TString Target = "LeadTarget",
-		Bool_t fVis=kFALSE,
-		TString fMC="TGeant3",
+            Bool_t fVis=kFALSE,
+	    TString fMC="TGeant3",
 	    TString fGenerator="box",
 	    Bool_t fUserPList= kFALSE,
-		Bool_t fR3BMagnet= kTRUE )
+	    Bool_t fR3BMagnet = kTRUE,
+            Bool_t fCaloHitFinder = kFALSE )
 {
 
 
@@ -625,6 +627,16 @@ void r3ball(Int_t nEvents = 1,
      run->SetStoreTraj(kFALSE);
   }   
 
+  // ----- Initialize CaloHitFinder task ------------------------------------
+  if(fCaloHitFinder) {
+    R3BCaloHitFinder* caloHF = new R3BCaloHitFinder();
+    caloHF->SelectGeometryVersion(10);          
+    caloHF->SetDetectionThreshold(0.000050);//50 KeV
+    caloHF->SetExperimentalResolution(5.);  //5% at 1 MeV
+    caloHF->SetAngularWindow(3.2,3.2);      //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
+    run->AddTask(caloHF);
+  }
+	
   // -----   Initialize simulation run   ------------------------------------
   run->Init();
 

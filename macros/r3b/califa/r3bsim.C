@@ -101,7 +101,6 @@ Int_t r3bsim(){
    //-------------------------------------------------
 
    Int_t nEvents = 100;
-   //Int_t nEvents = 3;
 
    //-------------------------------------------------
    //- EventDisplay        |    fEventDisplay (Bool_t)
@@ -111,20 +110,22 @@ Int_t r3bsim(){
 
    Bool_t fEventDisplay=kTRUE;
 
-    // Magnet Field definition
-	//Bool_t fR3BMagnet = kTRUE;
-	Bool_t fR3BMagnet = kFALSE;
+   // Magnet Field definition
+   Bool_t fR3BMagnet = kFALSE;
 	
+   // Including CaloHitFinder task (kFALSE by default)
+   Bool_t fCaloHitFinder = kTRUE; 
 
    // Main Sim function call
    r3ball(  nEvents,
             fDetList,
             target2,
-		    fEventDisplay,
-	        fMC,
-	        fGene,
-	        fUserPList,
-            fR3BMagnet
+            fEventDisplay,
+	    fMC,
+	    fGene,
+	    fUserPList,
+            fR3BMagnet,
+            fCaloHitFinder
           );      
 
 }
