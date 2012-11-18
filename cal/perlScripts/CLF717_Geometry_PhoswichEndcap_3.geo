@@ -4465,7 +4465,7 @@ double thickness55=0.0025+ss5;
 double thickness6=0.0025+ss6;
 double thickness66=0.0025+ss6;
 
-TGeoVolume *Alveolus_EC_1 = gGeoManager->MakeTrap("Alveolus_EC_1", pWrappingMedium,5.000,0,0,0.719842,1.65716,1.597, 0,0.785282,1.80781,1.74218,0);
+TGeoVolume *Alveolus_EC_1 = gGeoManager->MakeTrap("Alveolus_EC_1", pWrappingMedium,5.000,0,0,0.719842+0.3,1.65716,1.597, 0,0.785282+0.3,1.80781,1.74218,0);
 //alveolusEC1
 theta=0;
 phi=0;
