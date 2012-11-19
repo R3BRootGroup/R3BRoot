@@ -120,7 +120,7 @@ using std::ios;
 	}
 	else if(!strcmp(calVersion,"7.07+7.17")){
 		cout << "Using CALIFA version 7.07+7.17 "<< endl;
-		//Obs: We could use as well CLF717_Geometry_PhoswichEndcap_5.geo for the version CLF811 and a pohoswich endcap (5%), but with 43.2 instead of 35)
+		//Obs: We could use as well CLF717_Geometry_PhoswichEndcap_4.geo for the version CLF811 and a pohoswich endcap (5%), but with 43.2 instead of 35)
 		
 		minThetaBarrel= 35;  //Angular coverture of BARREL 7.07.      CLF717_Geometry_PhoswichEndcap_3.geo
 		maxThetaBarrel= 135; //Angular coverture of BARREL 7.07
