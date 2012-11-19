@@ -629,8 +629,7 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
     //the array shows the alveoli number where each crystal of the EndCap belong
     
   
-   Int_t alveoliType[23]={1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3}; /*For phoswich endcap Madrid: Int_t
-   alveoliType[30]={1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13,14,14,15,15};*/
+   /*Int_t alveoliType[23]={1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3};*/ /*For LaBr- LaCl IEM phoswich endcap Madrid:(CLF717_Geometry_PhoswichEndcap_1,2.geo)*/ Int_t alveoliType[30]={1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13,14,14,15,15};
 
     Char_t nameVolume[200];
     sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_EC_%i_%i/CrystalWithWrapping_%i_1/Crystal_%i_1",
@@ -639,7 +638,7 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
     // The definition of the crystals is different in this particular EndCap design:
     // the origin for each crystal is the alveoli corner.
     //Obs: All these translations should be commented for the phoswich endcap Madrid (from this line:
-    if (crystalType==1) {
+    /*if (crystalType==1) {
       local[0]=-1.24654194026499; local[1]=0.648218850702041; local[2]=9.75;
     } else if (crystalType==2) {
       local[0]=-4.57345805973491; local[1]=0.64821885070204; local[2]=9.75;
@@ -759,17 +758,17 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
       local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
       currentNode->LocalToMaster(local, master);
     } else {
-      crystalType = ((iD-3000)%23) + 1;//For phoswich endcap of IEM-CSIC Madrid:crystalType = ((iD-3000)%36) + 1; or 36 if adapted to the barrel CLF 707*/
-      crystalCopy = (iD-3000)/23 + 1; //For phoswich endcap of IEM-CSIC Madrid: crystalCopy = (iD-3000)/36 + 1; or 36 if adapted to the barrel CLF 707*/
+      /*crystalType = ((iD-3000)%23) + 1;//For phoswich endcap of IEM-CSIC Madrid:*/crystalType = ((iD-3000)%30) + 1;
+      /*crystalCopy = (iD-3000)/23 + 1; //For phoswich endcap of IEM-CSIC Madrid:*/ crystalCopy = (iD-3000)/30 + 1; 
       
       //cout << " -------       crystalID="<< iD <<  "         crystalType="
       //  << crystalType <<  "        crystalCopy="<< crystalCopy <<endl;
 
       //here the alveoliType array meaning is opposite to the other BARREL cases...
       //the array shows the alveoli number where each crystal of the EndCap belong
-      Int_t alveoliType[23]={1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3}; /*For phoswich endcap Madrid: Int_talveoliType[30]={1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13,14,14,15,15}
-    or alveoliType[36]={1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13,14,14,15,15,16,16,17,17,18,18}; if we want it adapted to the barrel*/
-
+      /*Int_t alveoliType[23]={1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3}; For phoswich endcap Madrid:(CLF717_Geometry_PhoswichEndcap_3.geo)*/
+      Int_t alveoliType[30]={1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13,14,14,15,15};
+    
       Char_t nameVolume[200];
       sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_EC_%i_%i/CrystalWithWrapping_%i_1/Crystal_%i_1",
               alveoliType[crystalType-1], crystalCopy-1, crystalType, crystalType);
@@ -778,7 +777,7 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
       // the origin for each crystal is the alveoli corner
        //Obs: All these translations should be commented for the phoswich endcap Madrid (from this line:
        
-      if (crystalType==1) {
+     /* if (crystalType==1) {
         local[0]=-1.24654194026499; local[1]=0.648218850702041; local[2]=9.75;
       } else if (crystalType==2) {
         local[0]=-4.57345805973491; local[1]=0.64821885070204; local[2]=9.75;
@@ -936,21 +935,23 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
 
     else {
 
-      crystalType = ((iD-3000)%23) + 1;
-      crystalCopy = (iD-3000)/23 + 1;
+     /* crystalType = ((iD-3000)%23) + 1;For phoswich endcap of IEM-CSIC Madrid:(CLF717_Geometry_PhoswichEndcap_5.geo)*/  crystalType = ((iD-3000)%30) + 1;
+     /* crystalCopy = (iD-3000)/23 + 1;For phoswich endcap of IEM-CSIC Madrid:(CLF717_Geometry_PhoswichEndcap_5.geo)*/  crystalCopy = (iD-3000)/30 + 1;
       //cout << " -------       crystalID="<< iD <<  "         crystalType="
       //  << crystalType <<  "        crystalCopy="<< crystalCopy <<endl;
 
       //here the alveoliType array meaning is opposite to the other BARREL cases...
       //the array shows the alveoli number where each crystal of the EndCap belong
-      Int_t alveoliType[23]={1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3};
+     /* Int_t alveoliType[23]={1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3};For phoswich endcap of IEM-CSIC Madrid:(CLF717_Geometry_PhoswichEndcap_5.geo)*/Int_t alveoliType[30]={1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13,14,14,15,15};
       //Char_t nameVolume[200];
       sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_EC_%i_%i/CrystalWithWrapping_%i_1/Crystal_%i_1",
               alveoliType[crystalType-1], crystalCopy-1, crystalType, crystalType);
 
       // The definition of the crystals is different in this particular EndCap design:
       // the origin for each crystal is the alveoli corner
-      if (crystalType==1) {
+      //Obs: All these translations should be commented for the phoswich endcap Madrid (CLF717_Geometry_PhoswichEndcap_5.geo)(from this line:
+      
+      /*if (crystalType==1) {
         local[0]=-1.24654194026499; local[1]=0.648218850702041; local[2]=9.75;
       } else if (crystalType==2) {
         local[0]=-4.57345805973491; local[1]=0.64821885070204; local[2]=9.75;
@@ -996,7 +997,7 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
         local[0]=-2.35141794859767; local[1]=4.91875; local[2]=9.75;
       } else if (crystalType==23) {
         local[0]=-1.61999999999997; local[1]=7.22933631874703; local[2]=9.75;
-      }
+      }//to this line)  --Phoswich endcap of Madrid. Jose Sanchez del Rio.*/
 
       //cout << gGeoManager->GetPath()<<endl;
       gGeoManager->cd(nameVolume);
