@@ -24,7 +24,7 @@
 //----------------------------------------------------------------------------------------
 
 
-void r3ball_Protons_50MeV( Int_t nEvents = 30000,
+void r3ball_Protons_50MeV( Int_t nEvents = 100,
 	    TObjArray& fDetList,
 	    TString Target = "LeadTarget",
 		Bool_t fVis=kFALSE,
@@ -235,11 +235,12 @@ void r3ball_Protons_50MeV( Int_t nEvents = 30000,
 	  // 1- CALIFA 7.05, only BARREL
 	  // 2- CALIFA 7.07, only BARREL
 	  // 3- CALIFA 7.09, only BARREL (ongoing work)
-	  // 4- CALIFA 7.17, only ENDCAP (in CsI[Tl])  or phoswich endcap IEM-CSIC Madrid (LaBr - LaCl)(CLF717_Geometry_PhoswichEndcap.geo ) J. Sanchez del Rio (24-10-2012)
-	  // 5- CALIFA 7.07+7.17, 
-	  // 6- CALIFA 7.09+7.17, (ongoing work)
+	  // 4- CALIFA 7.17, only ENDCAP (in CsI[Tl])  or phoswich endcap IEM-CSIC Madrid (LaBr - LaCl)(CLF717_Geometry_PhoswichEndcap_1.geo & ""2.geo ) J. Sanchez del Rio (24-10-2012)
+	  // 5- CALIFA 7.07+7.17, Phoswich endcap IEM Madrid + Barrel CLF717 or CLF811  (CLF717_Geometry_PhoswichEndcap_3.geo & ""_4.geo) J. Sanchez del Rio (24-10-2012)
+	  // 6- CALIFA 7.09+7.17, (ongoing work)  (CLF717_Geometry_PhoswichEndcap_5.geo)
 	  // 10- CALIFA 8.00, (ongoing work) 
 	  // ...
+
 
 
 	 ((R3BCalo *)calo)->SelectGeometryVersion(4);
@@ -257,9 +258,9 @@ void r3ball_Protons_50MeV( Int_t nEvents = 30000,
       thetaY =  0.0; // (deg)
       thetaZ =  0.0; // (deg)
       // Global translation in Lab
-      tx    =  0.0; // (cm)
+      tx    =  300.0; // (cm)
       ty    =  0.0; // (cm)
-      tz    =  0.0; // (cm)
+      tz    =  300.0; // (cm)
       //calo->SetRotAnglesEuler(phi,theta,psi);
       calo->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       calo->SetTranslation(tx,ty,tz);
@@ -489,8 +490,11 @@ void r3ball_Protons_50MeV( Int_t nEvents = 30000,
 	Double_t pdgId=2212; // proton emission
 	//Double_t theta1= 0.;  // polar angle distribution
 	//Double_t theta2= 180.;	
-	Double_t theta1= 6.;  // polar angle distribution. Tira.
-	Double_t theta2= 35.;	
+	//Double_t theta1= 6.;  
+	//Double_t theta2= 35.;	
+	Double_t theta1= 6;  
+	Double_t theta2= 135.;	
+	
 	//Double_t momentum=0.01; // 0.010 GeV/c = 10 MeV/c 
 	//Double_t momentum=0.808065; // 0.808065 GeV/c (300MeV Kin Energy for protons) 
 	Double_t momentum=0.31016124; // 0.31016124 GeV/c (50MeV Kin Energy for protons)
@@ -502,7 +506,10 @@ void r3ball_Protons_50MeV( Int_t nEvents = 30000,
 	gammasGen->SetThetaRange (theta1,   theta2);
 	gammasGen->SetCosTheta();
 	gammasGen->SetPRange(momentum,momentum);
-	gammasGen->SetPhiRange(0.,360.);
+	//gammasGen->SetPhiRange(0.,360.);
+	
+	gammasGen->SetPhiRange(0.,12.);
+	
 	//gammasGen->SetPhiRange(260.,300.); //Tira
 	//gammasGen->SetXYZ(0.0,0.0,-1.5);
 	//gammasGen->SetXYZ(0.0,0.0,0);
