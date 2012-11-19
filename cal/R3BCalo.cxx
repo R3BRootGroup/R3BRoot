@@ -147,8 +147,8 @@ void R3BCalo::Initialize()
   //
   //     Volumes: Alveolus_EC_[1,3] made of CrystalWithWrapping_[1,23] made of Crystal_[1,23]
   //
-  // 4.1.CALIFA 7.17, only phoswich ENDCAP (CLF717_Geometry_PhoswichEndcap.geo)  We can add here the stand alone phoswich endcap of LaBr and LaCl scintillator crystals (version 1).
-  //
+  // 4.1.CALIFA 7.17, only phoswich ENDCAP (CLF717_Geometry_PhoswichEndcap_1,2.geo)  We can add here the stand alone phoswich endcap of LaBr and LaCl scintillator crystals.
+  //    The endcap that is adapted to the barrel CLF707 is CLF717_Geometry_PhoswichEndcap_1.geo and the one adapts to the barrel CLF811 is CLF717_Geometry_PhoswichEndcap_2.geo
   //	The first 10 rings are made of 60 alveoli of 60 crystals each ring (azimuthal plane). The other 5 rings are made of 30 alveoli of 30 crystals each ring. There are 15 alveoli along the polar angle
   //   for a total of 10x60+5x30= 750 alveoli or 1500 crystals (750 phoswich crystals). There are 30 different crystal shapes:
   //     @alveoliType=(2,2,2,2,2,2,2,2,2,2,2,2,2,2,2);
@@ -157,11 +157,11 @@ void R3BCalo::Initialize()
   //
   // 5- CALIFA 7.07+7.17 
   //   See above the two components (3 & 4)
-  //   If we want the phoswich endcap adapted to the barrel, we use: CLF717_Geometry_PhoswichEndcap_3.geo.
-  //   Alveolus_EC_[1,10] made of CrystalWithWrapping_[1,60] made of Crystal_[1,60] and Alveolus_EC_[10,18] made of CrystalWithWrapping_[1,30] made of Crystal_[1,30]
+  //   For phoswich LaBr-LaCl endcaps:If we want the phoswich endcap adapted to the barrel CLF707, we use: CLF717_Geometry_PhoswichEndcap_3.geo, and with the barrel CLF811, CLF717_Geometry_PhoswichEndcap_4.geo
+  //  
   //
   // 6- CALIFA 7.09+7.17
-  //   See above the two components
+  //   See above the two components. Use for LaBr-LaCl endcaps CLF717_Geometry_PhoswichEndcap_5.geo
   //
   // 10- CALIFA 8.11, only BARREL
 	//   The first 15 rings are made of 32 alveoli of 4 crystals each. The last ring are made of 32
@@ -182,8 +182,8 @@ void R3BCalo::Initialize()
     cout << "-I- R3BCalo: Alveolus_ Nb   : " << i+1 << " connected to (McId) ---> " <<  gMC->VolId(buffer)<< endl;
     fAlveolusType[i] = gMC->VolId(buffer);
   }
-  for (Int_t i=0; i<3; i++ ) { /*3 is the larger possible alveolus number (v7.17) in endcap, in the case of the phoswich endcap CLF717_Geometry_PhoswichEndcap.geo, we change 3 by
-  15 or by 18 (CLF717_Geometry_PhoswichEndcap_3.geo) to adapt it yo the barrel 7.07*/
+  for (Int_t i=0; i<15; i++ ) { /*3 is the larger possible alveolus number (v7.17) in endcap, in the case of the IEM LaBr-LaCl phoswich endcap CLF717_Geometry_PhoswichEndcap_*.geo, we change 3
+  by 15.*/
     sprintf(buffer,"Alveolus_EC_%i",i+1);
     cout << "-I- R3BCalo: Alveolus_EC Nb   : " << i+1 << " connected to (McId) ---> " <<  gMC->VolId(buffer)<< endl;
     fAlveolusECType[i] = gMC->VolId(buffer);
@@ -297,9 +297,9 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
       crystalType = crysNum;
       //crystalType = cpCry+1;
       crystalCopy = cpAlv+1;
-     crystalId = 3000 + cpAlv*23 + (crystalType-1);/*In the case of phoswich endcap: crystalId = 3000 + cpAlv*30 + (crystalType-1);*/
-      if (crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736)/*For phoswich endcap:if (crystalType>30 || crystalType<1 ||
-      crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>4800)*/
+     /*crystalId = 3000 + cpAlv*23 + (crystalType-1);/*In the case of IEM LaBr - LaCl phoswich endcap: */crystalId = 3000 + cpAlv*30 + (crystalType-1);
+      /*if (crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736)/*For IEM LaBr - LaCl phoswich endcap:*/if (crystalType>30 || crystalType<1 ||
+      crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>4800)
 
         cout << "-E- R3BCalo: Wrong crystal number in geometryVersion 4. " << endl;
     } else cout << "-E- R3BCalo: Wrong alveolus volume in geometryVersion 4. " << endl;
@@ -319,9 +319,9 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
       crystalCopy = cpAlv+1;
       
       
-      crystalId = 3000 + cpAlv*23 + (crystalType-1);//In the case of phoswich endcap:30 or 36 depending if we do not adapt it the barrel or yes: crystalId = 3000 + cpAlv*36 + (crystalType-1);
-      if (crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736)/*For phoswich endcap, 30 or 36 as before:if (crystalType>36 || crystalType<1 ||
-      crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>5160)*/ 
+      /*crystalId = 3000 + cpAlv*23 + (crystalType-1);//In the case of IEM LaBr - LaCl phoswich endcap: */crystalId = 3000 + cpAlv*30 + (crystalType-1);
+      /*if (crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736)/*For IEM LaBr - LaCl phoswich endcap:*/if (crystalType>30 || crystalType<1 ||
+      crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>5160)
 
  
         cout << "-E- R3BCalo: Wrong crystal number in geometryVersion 5 (endcap). " << endl;
@@ -351,8 +351,9 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
       crystalType = crysNum;
       //crystalType = cpCry+1;
       crystalCopy = cpAlv+1;
-      crystalId = 3000 + cpAlv*23 + (crystalType-1);
-      if (crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736)
+      /*crystalId = 3000 + cpAlv*23 + (crystalType-1);In the case of IEM LaBr - LaCl phoswich endcap: */crystalId = 3000 + cpAlv*30 + (crystalType-1);
+      /*if (crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736) For IEM LaBr - LaCl phoswich endcap:*/if (crystalType>30 || crystalType<1 ||
+      crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>4800)
         cout << "-E- R3BCalo: Wrong crystal number in geometryVersion 6 (endcap). " << endl;
     }
   } else if (fGeometryVersion==10) {
@@ -3705,20 +3706,22 @@ TGeoMedium * pWrappingMedium=NULL;
 
   //finally the v7.05 code
 
-#include "perlScripts/CALIFA.geo"
+//#include "perlScripts/CALIFA.geo"
 
 //........
 
-//#include "perlScripts/CLF717_Geometry_PhoswichEndcap.geo"
-
-//#include "perlScripts/CLF717_Geometry_PhoswichEndcap_2.geo"
+//#include "perlScripts/CLF717_Geometry_PhoswichEndcap.geo"  //If we want the stand-alone IEM phoswich endcap adapted to the barrel CLF707. J.Sanchez del Rio Saez
 
 
-//#include "perlScripts/CLF717_Geometry_PhoswichEndcap_3.geo" // If we want the IEM phoswich endcap adapted to the barrel C707. J.Sanchez del Rio Saez
+//#include "perlScripts/CLF717_Geometry_PhoswichEndcap_2.geo"/ If we want the stand-alone IEM phoswich endcap adapted the barrel CLF811. J.Sanchez del Rio Saez
 
 
+#include "perlScripts/CLF717_Geometry_PhoswichEndcap_3.geo" // If we want the IEM phoswich endcap with the barrel CLF707. J.Sanchez del Rio Saez
 
 
+//#include "perlScripts/CLF717_Geometry_PhoswichEndcap_4.geo" // If we want the IEM phoswich endcap with the barrel CLF811. J.Sanchez del Rio Saez
+
+//#include "perlScripts/CLF717_Geometry_PhoswichEndcap_5.geo" // If we want the IEM phoswich endcap with the barrel CLF709. J.Sanchez del Rio Saez
 
 
 }
