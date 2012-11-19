@@ -16,7 +16,7 @@
 
 //  -------------------------------------------------------------------------
 
-void califaAna_Gamma_0_5MeV(Int_t nEvents = 50000 , 
+void califaAna_Gamma_0_5MeV(Int_t nEvents = 10000 , 
 		TString file_r3bsim    = "r3bsim_Gamma_0_5MeV.root",
 		TString file_r3bpar    = "r3bpar_Gamma_0_5MeV.root",
 		TString file_califaAna = "califaAna_Gamma_0_5MeV.root"
@@ -100,17 +100,17 @@ void califaAna_Gamma_0_5MeV(Int_t nEvents = 50000 ,
 	// 0- CALIFA 5.0, including BARREL and ENDCAP.
 	// 1- CALIFA 7.05, only BARREL
 	// 2- CALIFA 7.07, only BARREL
-	// 3- CALIFA 7.09, only BARREL (ongoing work)
-	// 4- CALIFA 7.17, only ENDCAP (in CsI[Tl])
+	// 4- CALIFA 7.17, only ENDCAP (in CsI[Tl])  or phoswich endcap IEM-CSIC Madrid (LaBr - LaCl)(CLF717_Geometry_PhoswichEndcap_1.geo & ""2.geo ) J. Sanchez del Rio (24-10-2012)
+	// 5- CALIFA 7.07+7.17 or Phoswich endcap IEM Madrid + Barrel CLF717 or CLF811  (CLF717_Geometry_PhoswichEndcap_3.geo & ""_4.geo) J. Sanchez del Rio (24-10-2012) 
 	// 5- CALIFA 7.07+7.17, 
-	// 6- CALIFA 7.09+7.17, (ongoing work)
+	// 6- CALIFA 7.09+7.17, (ongoing work) Phoswich endcap IEM Madrid + Barrel CLF709  (CLF717_Geometry_PhoswichEndcap_5.geo) J.Sanchez del Rio (24-10-2012)
 	// 10- CALIFA 8.00, (ongoing work) 
 	// ...
 
 
 	//caloHF->SelectGeometryVersion(5);          
 
-	caloHF->SelectGeometryVersion(4);  
+	caloHF->SelectGeometryVersion(5);  
 	caloHF->SetDetectionThreshold(0.000050);//50 KeV
 	caloHF->SetExperimentalResolution(5.);  //5% at 1 MeV
 	caloHF->SetAngularWindow(3.2,3.2);      //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
