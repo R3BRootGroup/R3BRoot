@@ -26,7 +26,7 @@
 
 
 
-void r3ball_Gamma_0_5MeV( Int_t nEvents = 50000,
+void r3ball_Gamma_0_5MeV( Int_t nEvents = 10000,
 	    TObjArray& fDetList,
 	    TString Target = "LeadTarget",
 		Bool_t fVis=kFALSE,
@@ -237,15 +237,15 @@ void r3ball_Gamma_0_5MeV( Int_t nEvents = 50000,
 	  // 1- CALIFA 7.05, only BARREL
 	  // 2- CALIFA 7.07, only BARREL
 	  // 3- CALIFA 7.09, only BARREL (ongoing work)
-	  // 4- CALIFA 7.17, only ENDCAP (in CsI[Tl])
-	  // 5- CALIFA 7.07+7.17, 
-	  // 6- CALIFA 7.09+7.17, (ongoing work)
+	  // 4- CALIFA 7.17, only ENDCAP (in CsI[Tl])  or phoswich endcap IEM-CSIC Madrid (LaBr - LaCl)(CLF717_Geometry_PhoswichEndcap_1.geo & ""2.geo ) J. Sanchez del Rio (24-10-2012)
+	  // 5- CALIFA 7.07+7.17, Phoswich endcap IEM Madrid + Barrel CLF717 or CLF811  (CLF717_Geometry_PhoswichEndcap_3.geo & ""_4.geo) J. Sanchez del Rio (24-10-2012)
+	  // 6- CALIFA 7.09+7.17, (ongoing work)  (CLF717_Geometry_PhoswichEndcap_5.geo)
 	  // 10- CALIFA 8.00, (ongoing work) 
 	  // ...
 
 
-	 ((R3BCalo *)calo)->SelectGeometryVersion(4);
-	// ((R3BCalo *)calo)->SelectGeometryVersion(5);
+	 ((R3BCalo *)calo)->SelectGeometryVersion(5);
+	//((R3BCalo *)calo)->SelectGeometryVersion(4);
 
  	//((R3BCalo *)calo)->SelectGeometryVersion(6);
 	  //Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
@@ -489,8 +489,14 @@ void r3ball_Gamma_0_5MeV( Int_t nEvents = 50000,
 	// 2- Define the CALIFA Test gamma generator
 	Double_t pdgId=22; // gamma emission
 	//Double_t pdgId=2212; // proton emission
+	//Double_t theta1= 6.;  // polar angle distribution
+	//Double_t theta2= 35.;	
 	Double_t theta1= 6.;  // polar angle distribution
-	Double_t theta2= 35.;	
+	//Double_t theta2= 135.;	
+	Double_t theta2= 155.;
+	
+	
+	
 	//Double_t theta1= 6.;  // polar angle distribution. Tira.
 	//Double_t theta2= 40.;	
 	//Double_t momentum=0.01; // 0.010 GeV/c = 10 MeV/c 
@@ -509,9 +515,9 @@ void r3ball_Gamma_0_5MeV( Int_t nEvents = 50000,
 	//gammasGen->SetXYZ(0.0,0.0,-1.5);
 	//gammasGen->SetXYZ(0.0,0.0,0);
 	gammasGen->SetBoxXYZ(-0.1,0.1,-0.1,0.1,-0.1,0.1);
-	//gammasGen->SetLorentzBoost(0.8197505718204776); //beta=0.81975 for 700 A MeV
+	gammasGen->SetLorentzBoost(0.8197505718204776); //beta=0.81975 for 700 A MeV
 
-	gammasGen->SetLorentzBoost(0.0); //beta=0.81975 for 700 A MeV  LO PONGO YO
+	//gammasGen->SetLorentzBoost(0.0); //beta=0.81975 for 700 A MeV  LO PONGO YO
 
 
 	// add the gamma generator
