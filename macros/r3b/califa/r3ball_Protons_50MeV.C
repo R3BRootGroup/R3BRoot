@@ -24,7 +24,7 @@
 //----------------------------------------------------------------------------------------
 
 
-void r3ball_Protons_50MeV( Int_t nEvents = 1000,
+void r3ball_Protons_50MeV( Int_t nEvents = 10000,
 	    TObjArray& fDetList,
 	    TString Target = "LeadTarget",
 		Bool_t fVis=kFALSE,
@@ -506,9 +506,9 @@ void r3ball_Protons_50MeV( Int_t nEvents = 1000,
 	gammasGen->SetThetaRange (theta1,   theta2);
 	gammasGen->SetCosTheta();
 	gammasGen->SetPRange(momentum,momentum);
-	//gammasGen->SetPhiRange(0.,360.);
+	gammasGen->SetPhiRange(0.,360.);
 	
-	gammasGen->SetPhiRange(0.,12.);
+
 	
 	//gammasGen->SetPhiRange(260.,300.); //Tira
 	//gammasGen->SetXYZ(0.0,0.0,-1.5);
