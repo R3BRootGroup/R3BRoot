@@ -24,7 +24,7 @@
 //----------------------------------------------------------------------------------------
 
 
-void r3ball_Protons_50MeV( Int_t nEvents = 100,
+void r3ball_Protons_50MeV( Int_t nEvents = 1000,
 	    TObjArray& fDetList,
 	    TString Target = "LeadTarget",
 		Bool_t fVis=kFALSE,
@@ -243,7 +243,7 @@ void r3ball_Protons_50MeV( Int_t nEvents = 100,
 
 
 
-	 ((R3BCalo *)calo)->SelectGeometryVersion(4);
+	 ((R3BCalo *)calo)->SelectGeometryVersion(5);
 	// ((R3BCalo *)calo)->SelectGeometryVersion(5);
 
  	//((R3BCalo *)calo)->SelectGeometryVersion(6);
@@ -258,9 +258,9 @@ void r3ball_Protons_50MeV( Int_t nEvents = 100,
       thetaY =  0.0; // (deg)
       thetaZ =  0.0; // (deg)
       // Global translation in Lab
-      tx    =  300.0; // (cm)
+      tx    =  0.0; // (cm)
       ty    =  0.0; // (cm)
-      tz    =  300.0; // (cm)
+      tz    =  0.0; // (cm)
       //calo->SetRotAnglesEuler(phi,theta,psi);
       calo->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
       calo->SetTranslation(tx,ty,tz);
