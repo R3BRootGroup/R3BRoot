@@ -11,10 +11,13 @@ ${CMAKE_SOURCE_DIR}/field
 ${CMAKE_SOURCE_DIR}/trackbase 
 ${CMAKE_SOURCE_DIR}/mcstack
 ${CMAKE_SOURCE_DIR}/geane
+${CMAKE_SOURCE_DIR}/cal 
+${CMAKE_SOURCE_DIR}/r3bdata/caloData
 ${CMAKE_SOURCE_DIR}/eventdisplay
 ${CMAKE_SOURCE_DIR}/r3bdata
 ${CMAKE_SOURCE_DIR}/evtvis
 )
+
 
 include_directories( ${INCLUDE_DIRECTORIES})
 
@@ -27,6 +30,8 @@ link_directories( ${LINK_DIRECTORIES})
 set(R3BEVEDISP_SRCS
 R3BEventManager.cxx
 R3BEventManagerEditor.cxx
+R3BCaloEventDisplay.cxx
+R3BCaloHitEventDisplay.cxx
 R3BMCTracks.cxx
 R3BIonName.cxx
 )
