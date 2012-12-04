@@ -77,7 +77,9 @@ void FairMCTrack::Print(Int_t trackId) const {
   cout << "Track " << trackId << ", mother : " << fMotherId << ", Type "
        << fPdgCode << ", momentum (" << fPx << ", " << fPy << ", " << fPz
        << ") GeV" << endl;
-  cout << "       Ref " << GetNPoints(kREF) << ", CAL " << GetNPoints(kCAL)
+  cout << "  Ref " << GetNPoints(kREF) 
+       << ", CAL " << GetNPoints(kCAL)
+       << ", NTF " << GetNPoints(kNTF)
        << ", CALIFA " << GetNPoints(kCALIFA) << ", TRACKER " << GetNPoints(kTRA)
        << ", STaRTrack " << GetNPoints(kSTaRTrack)
        << ", TOF " << GetNPoints(kTOF) << ", mTOF " << GetNPoints(kMTOF)
@@ -117,6 +119,7 @@ Int_t FairMCTrack::GetNPoints(DetectorId detId) const {
   if      ( detId == kREF  ) return (  fNPoints &   1);
   else if ( detId == kCAL  ) return ( (fNPoints & ( 7 <<  1) ) >>  1);
   else if ( detId == kCALIFA  ) return ( (fNPoints & (31 <<  4) ) >>  4);
+  else if ( detId == kNTF ) return ( (fNPoints & ( 1 <<  8) ) >>  8);
   else if ( detId == kTRA ) return ( (fNPoints & ( 1 <<  9) ) >>  9);
   else if ( detId == kSTaRTrack ) return ( (fNPoints & ( 1 <<  9) ) >>  9);  // to be checked (Marc)
   else if ( detId == kTOF ) return ( (fNPoints & (31 << 10) ) >> 10);
@@ -154,6 +157,12 @@ void FairMCTrack::SetNPoints(Int_t iDet, Int_t nPoints) {
     if      ( nPoints <  0 ) nPoints =  0;
     else if ( nPoints > 31 ) nPoints = 31;
     fNPoints = ( fNPoints & ( ~ ( 31 <<  4 ) ) )  |  ( nPoints <<  4 );
+  }
+
+  else if ( iDet == kNTF ) {
+    if      ( nPoints < 0 ) nPoints = 0;
+    else if ( nPoints > 1 ) nPoints = 1;
+    fNPoints = ( fNPoints & ( ~ (  1 <<  8 ) ) )  |  ( nPoints <<  8 );
   }
 
   else if ( iDet == kTRA ) {

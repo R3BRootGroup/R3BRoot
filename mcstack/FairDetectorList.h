@@ -12,6 +12,7 @@
 enum DetectorId {kREF,
 		 kCAL,
 		 kCALIFA,
+                 kNTF,
 		 kTRA,
 		 kSTaRTrack,
 		 kTOF,
