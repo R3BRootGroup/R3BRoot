@@ -49,15 +49,15 @@ using std::ios;
 	//TFile *OutFile = TFile::Open( NameOutFile, "recreate" );
 	
 	//SETTINGS 
-	char calVersion[50] = "7.07+7.17";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.??)
+	char calVersion[50] = "7.09+7.17";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.??)
 
-	//char calVersion[50] = "7.09+7.17";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.??)
+	//char calVersion[50] = "7.07+7.17";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.??)
 	//Double_t Eproj = 0.500;              //Gamma Energy in projectile frame in MeV 
 	
-	Double_t Eproj = 50; 
+	Double_t Eproj = 0.5; 
 
 	//Double_t Eproj = 10.0;              //Gamma Energy in projectile frame i
-	Int_t totalEvents = 100;        //Events
+	Int_t totalEvents = 10000;        //Events
 	Int_t multiplicity = 1;           //Multiplicity (particles per event)
 	
 	Double_t threshold=0.050;		  //Threshold in MeV
@@ -66,19 +66,26 @@ using std::ios;
 	//FOR THE HISTOGRAMS AND PLOTS:
 	//Double_t maxE = 6;               //Maximum energy in MeV in the histos
 
-	Double_t maxE = 400;//30.0;               //Maximum energy in MeV in the histos
+	//Double_t maxE = 400;//30.0;               //Maximum energy in MeV in the histos
+
+	Double_t maxE =  Eproj*1000;
 
 
 	//TString title0 = "califaAna.root";
 	//TString title1 =    "r3bsim.root";
-	sprintf(title0,"%s","/home/jose/r3broot_sept2012/macros/r3b/califa/califaAna_Protons_50MeV.root");  
- 	sprintf(title1,"%s","/home/jose/r3broot_sept2012/macros/r3b/califa/r3bsim_Protons_50MeV.root");  	
+	sprintf(title0,"%s","/home/josesrs/r3broot_sept2012/macros/r3b/califa/califaAna_Protons_50MeV.root");  
+ 	sprintf(title1,"%s","/home/josesrs/r3broot_sept2012/macros/r3b/califa/r3bsim_Protons_50MeV.root");  	
+	//sprintf(title0,"%s","/home/josesrs/r3broot_sept2012/macros/r3b/califa/califaAna_Gamma_0_5MeV.root");  
+ 	//sprintf(title1,"%s","/home/josesrs/r3broot_sept2012/macros/r3b/califa/r3bsim_Gamma_0_5MeV.root"); 
+
 	TFile *file0 = TFile::Open(title0);
 	TFile *file1 = TFile::Open(title1);
 	
 	//Double_t beta=0.82;
 
-	Double_t beta=0.0;
+	Double_t beta=0.85;
+
+	//Double_t beta=0.0;
 
 	
 		//END OF THE SETTING AREA
@@ -104,7 +111,7 @@ using std::ios;
 	}
 	else if(!strcmp(calVersion,"7.09")){
 		cout << "Using CALIFA version 7.09 "<< endl;
-		minThetaBarrel= 32.4.;  //Angular coverture of BARREL 7.09
+		minThetaBarrel= 32.4;  //Angular coverture of BARREL 7.09
 		maxThetaBarrel= 155.; //Angular coverture of BARREL 7.09
 		BARREL=kTRUE;
 	}
@@ -142,13 +149,19 @@ using std::ios;
 
 		//outFileee<< "Using CALIFA version 7.09+7.17 ")<<endl;
 
-		minThetaBarrel= 32.10;  //Angular coverture of BARREL 7.09. (As well for CLF717_Geometry_PhoswichEndcap_5.geo)
+		//minThetaBarrel= 32.10;  //Angular coverture of BARREL 7.09. (As well for CLF717_Geometry_PhoswichEndcap_5.geo)
+		//maxThetaBarrel= 150.; //Angular coverture of BARREL 7.09
+
+		minThetaBarrel= /*42.61*/43;  //Angular coverture of BARREL 7.09, adapted to CLF717_Geometry_PhoswichEndcap_4_2.geo
 		maxThetaBarrel= 150.; //Angular coverture of BARREL 7.09
 
 		//minThetaEndCap= 9.59;  //Angular coverture of ENDCAP 7.17
 		//maxThetaEndCap= 32.10; //Angular coverture of ENDCAP 7.17
-		minThetaEndCap= 7;  //Angular coverture of ENDCAP 7.17
-		maxThetaEndCap= 32.10; //Angular coverture of ENDCAP 7.17    (As well for CLF717_Geometry_PhoswichEndcap_5.geo)
+		//minThetaEndCap= 7;  //Angular coverture of ENDCAP 7.17
+		//maxThetaEndCap= 32.10; //Angular coverture of ENDCAP 7.17    (As well for CLF717_Geometry_PhoswichEndcap_5.geo)
+
+		minThetaEndCap= 6;  //Angular coverture of ENDCAP 7.17
+		maxThetaEndCap= /*42.61*/43; //Angular coverture of ENDCAP 7.17    (As well for CLF717_Geometry_PhoswichEndcap_4_2.geo)
 
 		BARREL=kTRUE;		
 		ENDCAP=kTRUE;
@@ -207,7 +220,7 @@ using std::ios;
 	TH1F* h2_Cal = new TH1F("h2_Cal","Hit Energy (MeV)",200,0,3*maxE); //Change this maximum energy
 	TH1F* h3_Cal = new TH1F("h3_Cal","Hit Theta",200,0,3.2);
 
-	TH1F* h3_Cal = new TH1F("h3_Cal","Hit Theta",400,0,3.2);
+	//TH1F* h3_Cal = new TH1F("h3_Cal","Hit Theta",400,0,3.2);
 
 	TH1F* h4_Cal = new TH1F("h4_Cal","Hit Phi",200,-3.2,3.2);
 	TH1F* h1_TMul = new TH1F("h1_TMul","Multiplicities",20,0,20);
@@ -224,7 +237,23 @@ using std::ios;
 	TH1F* h1_EF = new TH1F("h1_EF","Efficiency vs. polar angle",200,0,3.2);
 	//TH1F* h2_EF = new TH1F("h2_EF","Eventos vs. polar angle",1000,0,3.2);
 
-
+//BARREL
+	TH1F* h1_Cry_barrel = new TH1F("h1_Cry_barrel","Crystal ID",5850,0,5850);
+	TH1F* h1_Cry_count_barrel = new TH1F("h1_Cry_count_barrel","Crystal ID_count",2,0,3840);
+	TH1F* h2_Cry_barrel = new TH1F("h2_Cry_barrel","Crystal Energy (MeV)",200,0,3*maxE); //Change this maximum energy
+	TH1F* h3_Cry_barrel = new TH1F("h3_Cry_barrel","Crystal Type",32,0,32);
+	TH1F* h4_Cry_barrel = new TH1F("h4_Cry_barrel","Crystal Copy",514,0,514);
+	TH1F* h1_Cal_barrel = new TH1F("h1_Cal_barrel","Nb of Crystals in hit",20,0,20);
+	TH1F* h2_Cal_barrel = new TH1F("h2_Cal_barrel","Hit Energy (MeV)",200,0,3*maxE); //Change this maximum energy
+	TH1F* h3_Cal_barrel = new TH1F("h3_Cal_barrel","Hit Theta",200,0,3.2);
+	TH1F* h4_Cal_barrel = new TH1F("h4_Cal_barrel","Hit Phi",200,-3.2,3.2);
+	TH1F* h1_TMul_barrel = new TH1F("h1_TMul_barrel","Multiplicities",20,0,20);
+	TH1F* h1_CryMul_barrel = new TH1F("h1_CryMul_barrel","Multiplicities",20,0,20);
+	TH1F* h1_CalMul_barrel = new TH1F("h1_CalMul_barrel","Multiplicities",20,0,20);
+	TH1F* h2_CC_barrel = new TH1F("h2_CC_barrel","Reconstructed (Lorenzt corrected) Primary Energy (MeV)",2000,0,maxE); //Change this maximum energy
+	TH1F* h3_CC_barrel = new TH1F("h3_CC_barrel","Theta residuals if(caloHitsPerEvent==1)",400,-0.25,0.25);
+	TH1F* h4_CC_barrel = new TH1F("h4_CC_barrel","Phi residuals if(caloHitsPerEvent==1)",400,-0.25,0.25);
+	//TH1F* h1_EF_barrel = new TH1F("h1_EF_barrel","Efficiency vs. polar angle",200,0,3.2);
 
 	
 	//ENDCAP
@@ -235,7 +264,7 @@ using std::ios;
 	TH1F* h4_Cry_endcap = new TH1F("h4_Cry_endcap","Crystal Copy",514,0,514);
 	TH1F* h1_Cal_endcap = new TH1F("h1_Cal_endcap","Nb of Crystals in hit",20,0,20);
 	TH1F* h2_Cal_endcap = new TH1F("h2_Cal_endcap","Hit Energy (MeV)",200,0,3*maxE); //Change this maximum energy
-	TH1F* h3_Cal_endcap = new TH1F("h3_Cal_endcap","Hit Theta",200,0,3.2);
+	//TH1F* h3_Cal_endcap = new TH1F("h3_Cal_endcap","Hit Theta",200,0,3.2);
 
 	TH1F* h3_Cal_endcap = new TH1F("h3_Cal_endcap","Hit Theta",400,0,3.2);
 
@@ -248,9 +277,9 @@ using std::ios;
 	TH1F* h4_CC_endcap = new TH1F("h4_CC_endcap","Phi residuals if(caloHitsPerEvent==1)",400,-0.25,0.25);
 
 
-	TH2F* h5_Cry_EnergyImparSumEnergyParSum_endcap = new TH2F("h5_Cry_EnergyImParSumEnergyParSum_endcap","Energy1Sum vs Energy2Sum",2000,0,maxE,2000,0,maxE);
+	//TH2F* h5_Cry_EnergyImparSumEnergyParSum_endcap = new TH2F("h5_Cry_EnergyImParSumEnergyParSum_endcap","Energy1Sum vs Energy2Sum",2000,0,maxE,2000,0,maxE);
 	
-	TH2F* h5_Cry_EnergyImparSumEnergySum_endcap = new TH2F("h5_Cry_EnergyImparSumEnergySum_endcap","EnergyTotSum vs Energy1Sum",2000,0,maxE,2000,0,maxE);
+	//TH2F* h5_Cry_EnergyImparSumEnergySum_endcap = new TH2F("h5_Cry_EnergyImparSumEnergySum_endcap","EnergyTotSum vs Energy1Sum",2000,0,maxE,2000,0,maxE);
 	
 	TH2F* h5_Cry_EnergyParSumEnergySum_endcap  = new TH2F("h5_Cry_EnergyParSumEnergySum_endcap ","EnergyTotSum vs Energy2Sum",2000,0,maxE,2000,0,maxE);
 	
@@ -259,16 +288,16 @@ using std::ios;
 
 
 
-	TH1F* h5_Cry_Events_endcap_2 = new TH1F("h5_Cry_Events_2","Crystal Energy (MeV)",200,0,3*maxE); //Change this maximum energy
+	//TH1F* h5_Cry_Events_endcap_2 = new TH1F("h5_Cry_Events_2","Crystal Energy (MeV)",200,0,3*maxE); //Change this maximum energy
 	
 
-	TH2F* h5_Cal_EnergyImparCalSumEnergyParCalSum_endcap = new TH2F("h5_Cal_EnergyImparCalSumEnergyParCalSum_endcap","EnergyParCalSum vs EnergyImpsrCalSum",2000,0,maxE,2000,0,maxE);
+	//TH2F* h5_Cal_EnergyImparCalSumEnergyParCalSum_endcap = new TH2F("h5_Cal_EnergyImparCalSumEnergyParCalSum_endcap","EnergyParCalSum vs EnergyImpsrCalSum",2000,0,maxE,2000,0,maxE);
 	
-	TH2F* h5_Cal_EnergyImparCalSumEnergyCalSum_endcap  = new TH2F("h5_Cal_EnergyImparCalSumEnergyCalSum_endcap ","EnergyImparCalSum vs EnergyCalSum",2000,0,maxE,2000,0,maxE);
+	//TH2F* h5_Cal_EnergyImparCalSumEnergyCalSum_endcap  = new TH2F("h5_Cal_EnergyImparCalSumEnergyCalSum_endcap ","EnergyImparCalSum vs EnergyCalSum",2000,0,maxE,2000,0,maxE);
 	
-	TH2F* h5_Cal_EnergyParCalSumEnergyCalSum_endcap  = new TH2F("h5_Cal_EnergyParCalSumEnergyCalSum_endcap","EnergyParCalSum vs EnergyCalSum",2000,0,maxE,2000,0,maxE);
+	//TH2F* h5_Cal_EnergyParCalSumEnergyCalSum_endcap  = new TH2F("h5_Cal_EnergyParCalSumEnergyCalSum_endcap","EnergyParCalSum vs EnergyCalSum",2000,0,maxE,2000,0,maxE);
 
-	TH1F* h5_Cal_Events_endcap_2 = new TH1F("h5_Cal_Events_endcap_2","energyTotalCalSum (MeV)",200,0,3*maxE); 
+	//TH1F* h5_Cal_Events_endcap_2 = new TH1F("h5_Cal_Events_endcap_2","energyTotalCalSum (MeV)",200,0,3*maxE); 
 
 
 
@@ -407,8 +436,24 @@ using std::ios;
 		
 		//loop in crystal Hits
 		for(Int_t h=0;h<crystalHitsPerEvent;h++)
-		{
 
+		{
+			h1_Cry->Fill(crystalHit[h]->GetCrystalId());
+			if(crystalHit[h]->GetEnergy()*1000>threshold)
+			h1_Cry_count->Fill(crystalHit[h]->GetCrystalId());
+			h2_Cry->Fill(crystalHit[h]->GetEnergy()*1000);
+			h3_Cry->Fill(crystalHit[h]->GetCrystalType());
+			h4_Cry->Fill(crystalHit[h]->GetCrystalCopy());
+
+			if(BARREL && crystalHit[h]->GetCrystalId()<3000){  //no estoy metiendo la resolucion al barrel
+				crystalHitsPerEvent_barrel++;
+				h1_Cry_barrel->Fill(crystalHit[h]->GetCrystalId());
+				if(crystalHit[h]->GetEnergy()*1000>threshold)
+					h1_Cry_count_barrel->Fill(crystalHit[h]->GetCrystalId());
+				h2_Cry_barrel->Fill(crystalHit[h]->GetEnergy()*1000);
+				h3_Cry_barrel->Fill(crystalHit[h]->GetCrystalType());
+				h4_Cry_barrel->Fill(crystalHit[h]->GetCrystalCopy());
+			}
 
 
 			
@@ -474,14 +519,14 @@ using std::ios;
 			} //acaba el endcap
 		}//acaba h
 
-		h5_Cry_EnergyImparSumEnergyParSum_endcap ->Fill(energyImparSum,energyParSum);
+		//h5_Cry_EnergyImparSumEnergyParSum_endcap ->Fill(energyImparSum,energyParSum);
 		
-		h5_Cry_EnergyImparSumEnergySum_endcap ->Fill(energyTotalSum,energyImparSum);
+		//h5_Cry_EnergyImparSumEnergySum_endcap ->Fill(energyTotalSum,energyImparSum);
 		
 		h5_Cry_EnergyParSumEnergySum_endcap ->Fill(energyTotalSum,energyParSum);
 		
 		
-		h5_Cry_Events_endcap_2->Fill(energyTotalSum);
+		//h5_Cry_Events_endcap_2->Fill(energyTotalSum);
 
 
 		
@@ -497,6 +542,15 @@ using std::ios;
 			h4_Cal->Fill(caloHit[h]->GetPhi());
 			h2_CC->Fill(GetCMEnergy(caloHit[h]->GetTheta(),caloHit[h]->GetEnergy()*1000,beta));
 			h2_CC2->Fill(caloHit[h]->GetTheta(),GetCMEnergy(caloHit[h]->GetTheta(),caloHit[h]->GetEnergy()*1000,beta));
+
+			if(BARREL && caloHit[h]->GetTheta()>minThetaBarrel*TMath::Pi()/180.) {
+				caloHitsPerEvent_barrel++;
+				h1_Cal_barrel->Fill(caloHit[h]->GetNbOfCrystalHits());	
+				h2_Cal_barrel->Fill(caloHit[h]->GetEnergy()*1000);	
+				h3_Cal_barrel->Fill(caloHit[h]->GetTheta());	
+				h4_Cal_barrel->Fill(caloHit[h]->GetPhi());
+				h2_CC_barrel->Fill(GetCMEnergy(caloHit[h]->GetTheta(),caloHit[h]->GetEnergy()*1000,beta));
+			}
 
 			int crystalId = crystalHit[h]->GetCrystalId();
 		
@@ -570,14 +624,14 @@ using std::ios;
 
 
 
-		h5_Cal_EnergyImparCalSumEnergyParCalSum_endcap ->Fill(energyImparCalSum,energyParCalSum);
+		//h5_Cal_EnergyImparCalSumEnergyParCalSum_endcap ->Fill(energyImparCalSum,energyParCalSum);
 
-		h5_Cal_EnergyImparCalSumEnergyCalSum_endcap ->Fill(energyTotalCalSum,energyImparCalSum);
+		//h5_Cal_EnergyImparCalSumEnergyCalSum_endcap ->Fill(energyTotalCalSum,energyImparCalSum);
 
-		h5_Cal_EnergyParCalSumEnergyCalSum_endcap ->Fill(energyTotalCalSum,energyParCalSum);
+		//h5_Cal_EnergyParCalSumEnergyCalSum_endcap ->Fill(energyTotalCalSum,energyParCalSum);
 		
 		
-		h5_Cal_Events_endcap_2->Fill(energyTotalCalSum);
+		//h5_Cal_Events_endcap_2->Fill(energyTotalCalSum);
 
 
 		
@@ -596,7 +650,7 @@ using std::ios;
 				h3_T->Fill(momentum.Theta());
 				h4_T->Fill(momentum.Phi());
 				primary++;
-
+				if(BARREL && momentum.Theta()>minThetaBarrel*TMath::Pi()/180.) primary_barrel++;
 				if(ENDCAP && momentum.Theta()<maxThetaEndCap*TMath::Pi()/180.) primary_endcap++;
 				if(primary==1)
 					{
@@ -611,6 +665,13 @@ using std::ios;
 							h1_EF->Fill(caloHit[h]->GetTheta());
 				
 							int crystalId = crystalHit[h]->GetCrystalId();
+
+							if(BARREL && caloHit[h]->GetTheta()>minThetaBarrel*TMath::Pi()/180.)
+							{
+								h3_CC_barrel->Fill(momentum.Theta() - caloHit[h]->GetTheta());
+								h4_CC_barrel->Fill(momentum.Phi() - caloHit[h]->GetPhi());
+								//h1_EF_barrel->Fill(caloHit[h]->GetTheta());
+							}
 							if(ENDCAP && caloHit[h]->GetTheta()< maxThetaEndCap*TMath::Pi()/180. /*&& crystalId%2 == 0*/) 
 							{
 								h3_CC_endcap->Fill(momentum.Theta() - caloHit[h]->GetTheta());
@@ -624,19 +685,22 @@ using std::ios;
 					}
 			}
 		}
-		
+
 		h1_CryMul->Fill(crystalHitsPerEvent);
 		h1_CalMul->Fill(caloHitsPerEvent);
+		if(BARREL) h1_CryMul_barrel->Fill(crystalHitsPerEvent_barrel);
+		if(BARREL) h1_CalMul_barrel->Fill(caloHitsPerEvent_barrel);
 		if(ENDCAP) h1_CryMul_endcap->Fill(crystalHitsPerEvent_endcap);
 		if(ENDCAP) h1_CalMul_endcap->Fill(caloHitsPerEvent_endcap);
 		
-		
-		
-
 		crystalHitsPerEvent_barrel=0;
 		caloHitsPerEvent_barrel=0;
 		crystalHitsPerEvent_endcap=0;
 		caloHitsPerEvent_endcap=0;
+
+		h1_TMul->Fill(primary);
+		if(BARREL) h1_TMul_barrel->Fill(primary_barrel);
+		if(ENDCAP) h1_TMul_endcap->Fill(primary_endcap);
 
 		primary=0;
 		primary_barrel=0;
@@ -655,34 +719,99 @@ using std::ios;
 	}//fin de evento i
 
 
-        TFile f_50MeV("/home/jose/r3broot_sept2012/macros/r3b/califa/hist_Endcap21_50MeV.root", "recreate");
+        TFile f_50MeV("/home/josesrs/r3broot_sept2012/macros/r3b/califa/hist_Endcap21_50MeV.root", "recreate");
 	f_50MeV->cd();
+
+	if(h1_T){h1_T->Write();}
+	if(h2_T){h2_T->Write();}
 	if(h3_T){h3_T->Write();}
-	if(h2_CC_endcap){h2_CC_endcap->Write();}
+	if(h4_T){h4_T->Write();}
+
+
+	if(h1_Cry){h1_Cry->Write();}
+	if(h1_Cry_count){h1_Cry_count->Write();}
+	if(h2_Cry){h2_Cry->Write();}
+	if(h3_Cry){h3_Cry->Write();}
+	if(h4_Cry){h4_Cry->Write();}
+
+	if(h1_Cal){h1_Cal->Write();}
+	if(h2_Cal){h2_Cal->Write();}
+	if(h3_Cal){h3_Cal->Write();}
+	if(h4_Cal){h4_Cal->Write();}
+
+	if(h1_TMul){h1_TMul->Write();}
+	if(h1_CryMul){h1_CryMul->Write();}
+	if(h1_CalMul){h1_CalMul->Write();}
+
+	if(h2_CC){h2_CC->Write();}
+	if(h3_CC){h3_CC->Write();}
+	if(h4_CC){h2_CC->Write();}
+
+	if(h2_CC2){h2_CC2->Write();}
+	if(h3_CC2){h3_CC2->Write();}
+	if(h4_CC2){h2_CC2->Write();}
+	if(h1_EF){h1_EF->Write();}
+//barrel
+
+	if(h1_Cry_barrel){h1_Cry_barrel->Write();}
+	if(h1_Cry_count_barrel){h1_Cry_count_barrel->Write();}
+	if(h2_Cry_barrel){h2_Cry_barrel->Write();}
+	if(h3_Cry_barrel){h3_Cry_barrel->Write();}
+	if(h4_Cry_barrel){h4_Cry_barrel->Write();}
+
+
+	if(h1_Cal_barrel){h1_Cal_barrel->Write();}
+	if(h2_Cal_barrel){h2_Cal_barrel->Write();}
+	if(h3_Cal_barrel){h3_Cal_barrel->Write();}
+	if(h4_Cal_barrel){h4_Cal_barrel->Write();}
+
+
+
+	if(h1_TMul_barrel){h1_TMul_barrel->Write();}
+	if(h1_CryMul_barrel){h1_CryMul_barrel->Write();}
+	if(h1_CalMul_barrel){h1_CalMul_barrel->Write();}
+	if(h2_CC_barrel){h2_CC_barrel->Write();}
+	if(h3_CC_barrel){h3_CC_barrel->Write();}
+	if(h4_CC_barrel){h4_CC_barrel->Write();}
+
+//endcap
+
+	if(h1_Cry_endcap){h1_Cry_endcap->Write();}
+	if(h1_Cry_count_endcap){h1_Cry_count_endcap->Write();}
+	if(h2_Cry_endcap){h2_Cry_endcap->Write();}
 	if(h3_Cry_endcap){h3_Cry_endcap->Write();}
-		
-	if(h2_Cry_endcap){h2_Cry_endcap->Write();}
+	if(h4_Cry_endcap){h4_Cry_endcap->Write();}
 
-	
+
+	if(h1_Cal_endcap){h1_Cal_endcap->Write();}
 	if(h2_Cal_endcap){h2_Cal_endcap->Write();}
-	
+	if(h3_Cal_endcap){h3_Cal_endcap->Write();}
+	if(h4_Cal_endcap){h4_Cal_endcap->Write();}
 
-	if(h2_Cry_endcap){h2_Cry_endcap->Write();}
 
-	if(h5_Cry_EnergyImparSumEnergyParSum_endcap){h5_Cry_EnergyImparSumEnergyParSum_endcap->Write();}
-	if(h5_Cry_EnergyImparSumEnergySum_endcap ){h5_Cry_EnergyImparSumEnergySum_endcap ->Write();}	
+
+	if(h1_TMul_endcap){h1_TMul_endcap->Write();}
+	if(h1_CryMul_endcap){h1_CryMul_endcap->Write();}
+	if(h1_CalMul_endcap){h1_CalMul_endcap->Write();}
+	if(h2_CC_endcap){h2_CC_endcap->Write();}
+	if(h3_CC_endcap){h3_CC_endcap->Write();}
+	if(h4_CC_endcap){h4_CC_endcap->Write();}
+
+
+	//if(h5_Cry_EnergyImparSumEnergyParSum_endcap){h5_Cry_EnergyImparSumEnergyParSum_endcap->Write();}
+	//if(h5_Cry_EnergyImparSumEnergySum_endcap ){h5_Cry_EnergyImparSumEnergySum_endcap ->Write();}	
 	if(h5_Cry_EnergyParSumEnergySum_endcap ){h5_Cry_EnergyParSumEnergySum_endcap ->Write();}
 	
-	if(h5_Cry_Events_endcap_2 ){h5_Cry_Events_endcap_2->Write();}
+	//if(h5_Cry_Events_endcap_2 ){h5_Cry_Events_endcap_2->Write();}
 
 	
 
-	if(h5_Cal_EnergyImparCalSumEnergyParCalSum_endcap){h5_Cal_EnergyImparCalSumEnergyParCalSum_endcap->Write();}
-	if(h5_Cal_EnergyImparCalSumEnergyCalSum_endcap){h5_Cal_EnergyImparCalSumEnergyCalSum_endcap->Write();}
-	if(h5_Cal_EnergyParCalSumEnergyCalSum_endcap){h5_Cal_EnergyParCalSumEnergyCalSum_endcap->Write();}
+	//if(h5_Cal_EnergyImparCalSumEnergyParCalSum_endcap){h5_Cal_EnergyImparCalSumEnergyParCalSum_endcap->Write();}
+	//if(h5_Cal_EnergyImparCalSumEnergyCalSum_endcap){h5_Cal_EnergyImparCalSumEnergyCalSum_endcap->Write();}
+	//if(h5_Cal_EnergyParCalSumEnergyCalSum_endcap){h5_Cal_EnergyParCalSumEnergyCalSum_endcap->Write();}
 
 
-	if(h5_Cal_Events_endcap_2){h5_Cal_Events_endcap_2->Write();}
+	//if(h5_Cal_Events_endcap_2){h5_Cal_Events_endcap_2->Write();}
 	
 	
 	
@@ -700,6 +829,9 @@ Double_t GetCMEnergy(Double_t theta, Double_t energy, Double_t beta=0.0){
 			
 	return energyCorrect;
 }
+
+
+
 		
 			
 
