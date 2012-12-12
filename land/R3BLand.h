@@ -13,6 +13,7 @@
 #include "R3BDetector.h"
 #include "TLorentzVector.h"
 #include "TGeoMedium.h"
+#include <string>
 #include <iostream>
 #include <map>
 #include "R3BLandFirstHits.h"
@@ -116,8 +117,11 @@ class R3BLand : public R3BDetector
    ** Constructs the STS geometry
    **/
   virtual void ConstructGeometry();
+  virtual void ConstructGeometryOld();
   virtual void Initialize();
   virtual void SetSpecialPhysicsCuts(){;}
+
+  virtual Bool_t CheckIfSensitive(std::string name);
 
   void UseNeuLand(Double_t _paddle_length, Double_t _paddle_width, Double_t _paddle_depth, 
   Double_t _neuLAND_depth, Double_t _paddle_gap, Double_t _wrapping1, Double_t _wrapping2);

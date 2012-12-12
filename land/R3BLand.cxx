@@ -407,8 +407,40 @@ Double_t neuLAND_depth, Double_t paddle_gap, Double_t paddle_wrapping1, Double_t
   
 }
 
+
+void R3BLand::ConstructGeometry()
+{
+  TString fileName = GetGeometryFileName();
+  if(fileName.EndsWith(".root")) {
+    fLogger->Info(MESSAGE_ORIGIN,
+		  "Constructing NEULAND geometry from ROOT file %s", 
+		  fileName.Data());
+    ConstructRootGeometry();
+  } else {
+    fLogger->Info(MESSAGE_ORIGIN,
+		  "Constructing hardcoded NEULAND geometry");
+    ConstructGeometryOld();
+  }
+}
+
+
+
+// -----   CheckIfSensitive   -------------------------------------------------
+Bool_t R3BLand::CheckIfSensitive(std::string name)
+{
+  TString volName = name;
+  if(volName.Contains("padle_h_box5")) {
+    return kTRUE;
+  }
+  return kFALSE;
+}
+// ----------------------------------------------------------------------------
+
+
+
+
 // -----  Public method ConstructGeometry  ----------------------------------
-void R3BLand::ConstructGeometry() {
+void R3BLand::ConstructGeometryOld() {
 
   // out-of-file geometry definition
   Double_t a;
