@@ -10,14 +10,15 @@ Int_t r3blandsim(Int_t beamEnergy, Int_t nn, Int_t erel)
   // Target type
   TString target="LiH";
 
+//   TObjString det1("LAND");
   TObjString det1("SCINTNEULAND");
 
   TObjArray fDetList;
   fDetList.Add(&det1);
 
-  Int_t nEvents = 10000;
+  Int_t nEvents = 10;
 
-  Bool_t fEventDisplay=kFALSE;
+  Bool_t fEventDisplay=kTRUE;
 
   // Magnet Field definition
   Bool_t fR3BMagnet = kTRUE;

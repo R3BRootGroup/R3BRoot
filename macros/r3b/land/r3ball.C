@@ -23,8 +23,8 @@ void r3ball(Int_t nEvents = 1,
   // Output files
   char str[100];
   sprintf(str, "%1dAMeV.%1dn.%1dkeV", beamEnergy, nn, erel);
-  TString OutFile = "/home/kresan/neuland/r3bsim." + TString(str) + ".35m.root";
-  TString ParFile = "/home/kresan/neuland/r3bpar." + TString(str) + ".35m.root";
+  TString OutFile = "/Users/kresan/neuland/r3bsim." + TString(str) + ".14m.root";
+  TString ParFile = "/Users/kresan/neuland/r3bpar." + TString(str) + ".14m.root";
 
 
   // ----    Debug option   -------------------------------------------------
@@ -345,67 +345,20 @@ void r3ball(Int_t nEvents = 1,
 
 
   // Land Detector
-  if (fDetList.FindObject("LAND") ) {
+  if(fDetList.FindObject("LAND")) {
       R3BDetector* land = new R3BLand("Land", kTRUE);
       // verbose level 2 ( step info activated )
-      land->SetVerboseLevel(2);
-      // Global position of the Module
-      phi   =  0.0; // (deg)
-      theta =  0.0; // (deg)
-      psi   =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx    =  0.0; // (cm)
-      ty    =  0.0; // (cm)
-      tz    =  1050.0; // (cm)
-      //land->SetRotAnglesEuler(phi,theta,psi);
-      land->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      land->SetTranslation(tx,ty,tz);
+      land->SetVerboseLevel(1);
+      land->SetGeometryFileName("land_v12a_10m.geo.root");
       run->AddModule(land);
   }
   
   // NeuLand Scintillator Detector
-  if (fDetList.FindObject("SCINTNEULAND")) {
-
+  if(fDetList.FindObject("SCINTNEULAND")) {
     R3BDetector* land = new R3BLand("Land", kTRUE);
     // verbose level 2 ( step info activated )
-    land->SetVerboseLevel(2);
-    //Construct NeuLand
-    Double_t paddle_dimx=125.;   // half of the length [cm]
-//     Double_t paddle_dimy=1.5;   // half of the width [cm]
-//     Double_t paddle_dimz=1.5;   // half of the depth [cm]
-    Double_t paddle_dimy=2.4;   // half of the width [cm]
-    Double_t paddle_dimz=2.4;   // half of the depth [cm]
-//     Double_t paddle_dimy=5.0;   // half of the width [cm]
-//     Double_t paddle_dimz=5.0;   // half of the depth [cm]
-    Double_t detector_dimz=150; // total detector depth [cm]
-//     Double_t detector_dimz=100;
-    Double_t air_gap=0.03;        // half of air gap between two scintillator bars [cm]
-    Double_t wrapping1=0.02;      // thickness of wrapping material Alu [cm]
-    Double_t wrapping2=0.05;      // thickness of wrapping material Tape [cm]
-    ((R3BLand*) land)->UseNeuLand(paddle_dimx, paddle_dimy, paddle_dimz, detector_dimz, 
-				  air_gap, wrapping1, wrapping2);
-    
-    // Global position of the Module
-    phi   =  0.0; // (deg)
-    theta =  0.0; // (deg)
-    psi   =  0.0; // (deg)
-    // Rotation in Ref. Frame.
-    thetaX =  0.0; // (deg)
-    thetaY =  0.0; // (deg)
-    thetaZ =  0.0; // (deg)
-    // Global translation in Lab
-    tx    =  0.0; // (cm)
-    ty    =  0.0; // (cm)
-    // tz    =  1550.0; // (cm)
-    tz    =  3650.0; // (cm)
-    //land->SetRotAnglesEuler(phi,theta,psi);
-    land->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-    land->SetTranslation(tx,ty,tz);
-    
+    land->SetVerboseLevel(1);
+    land->SetGeometryFileName("neuland_v12a_14m.geo.root");
     run->AddModule(land);
   }
 
