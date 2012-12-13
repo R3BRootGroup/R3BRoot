@@ -56,7 +56,6 @@ eventDisplay()
  fRun->SetInputFile("r3bsim.root");
 //  fRun->AddFriend("land_digi.root"); // 2nd file where LandHits or whatever are stored
   fRun->SetOutputFile("test.root");
-  fRun->LoadGeometry();
 
   R3BEventManager *fMan= new R3BEventManager();
   R3BMCTracks *Track =  new R3BMCTracks ("Monte-Carlo Tracks");

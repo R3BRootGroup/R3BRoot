@@ -253,10 +253,10 @@ void create_land_geo(const char* geoTag)
   // Add the whole assembly to the world
   tx = 0.0;
   ty = 0.0;
-  tz = 0.0; // cm
+  tz = fZ; // cm
   TGeoCombiTrans *t0 = new TGeoCombiTrans(tx,ty,tz,zeroRotation);
 
-  top->AddNode(cell,1, GetGlobalPosition(t0) );
+  top->AddNode(cell,1, /*GetGlobalPosition(t0)*/t0 );
 
 
 

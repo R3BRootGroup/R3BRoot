@@ -23,8 +23,10 @@ void r3ball(Int_t nEvents = 1,
   // Output files
   char str[100];
   sprintf(str, "%1dAMeV.%1dn.%1dkeV", beamEnergy, nn, erel);
-  TString OutFile = "/Users/kresan/neuland/r3bsim." + TString(str) + ".14m.root";
-  TString ParFile = "/Users/kresan/neuland/r3bpar." + TString(str) + ".14m.root";
+//   TString OutFile = "/Users/kresan/neuland/r3bsim." + TString(str) + ".14m.root";
+//   TString ParFile = "/Users/kresan/neuland/r3bpar." + TString(str) + ".14m.root";
+  TString OutFile = "r3bsim.root";
+  TString ParFile = "r3bpar.root";
 
 
   // ----    Debug option   -------------------------------------------------
@@ -138,6 +140,7 @@ void r3ball(Int_t nEvents = 1,
   if (fDetList.FindObject("ALADIN") ) {
       fFieldMap = 0;
       R3BModule* mag = new R3BMagnet("AladinMagnet");
+
       // Global position of the Module
       phi   =  0.0; // (deg)
       theta =  0.0; // (deg)
@@ -151,8 +154,10 @@ void r3ball(Int_t nEvents = 1,
       ty    =  0.0; // (cm)
       tz    =  0.0; // (cm)
       //mag->SetRotAnglesEuler(phi,theta,psi);
-      mag->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      mag->SetTranslation(tx,ty,tz);
+//       mag->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
+//       mag->SetTranslation(tx,ty,tz);
+
+      mag->SetGeometryFileName("aladin_v12a.geo.root");
       run->AddModule(mag);
   }
 
@@ -455,11 +460,12 @@ void r3ball(Int_t nEvents = 1,
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
   if (fGenerator.CompareTo("ascii") == 0  ) {
-    char str[100];
-    sprintf(str, "%1dSn_%1dn_%1dAMeV_%1dkeV.dat", (132-nn), nn, beamEnergy, erel);
-    TString evtFile;
-    evtFile = TString(str);
-    TString iFile = dir + "/input/" + evtFile;
+//     char str[100];
+//     sprintf(str, "%1dSn_%1dn_%1dAMeV_%1dkeV.dat", (132-nn), nn, beamEnergy, erel);
+//     TString evtFile;
+//     evtFile = TString(str);
+//     TString iFile = dir + "/input/" + evtFile;
+    TString iFile = "/Users/kresan/neuland/input/beam/beam.S406.200AMeV.dat";
     R3BAsciiGenerator* gen = new R3BAsciiGenerator(iFile.Data());
     // add the ascii generator
     primGen->AddGenerator(gen);
