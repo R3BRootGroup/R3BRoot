@@ -16,8 +16,9 @@
 //
 //	(the macro will plot and text information as a function of these settings)
 //
-// Comments:In this case the macro is prepared for protons in phoswich-endcap IEM-CSIC Madrid with resolutions of the crystals, CLF717_Geometry_PhoswichEndcap.geo (José Sánchez del Río Sáez ) 24/12/2012
-// Contact for the changes: josesrs@gmail.com && jose.sanchez@csic.es
+// Comments:In this case the macro is prepared for protons in phoswich-endcap IEM-CSIC Madrid with resolutions of the crystals, CLF717_Geometry_PhoswichEndcap_*.geo (José Sánchez del Río Sáez ) 24/12/2012
+// Make the corresponding changes of README for protons (in califaAna.C, r3bsim.C and r3ball.C) 
+//Contact for these changes: josesrs@gmail.com && jose.sanchez@csic.es)
 //  -------------------------------------------------------------------------
 //----------------------------------
 
@@ -49,12 +50,12 @@ using std::ios;
 	//TFile *OutFile = TFile::Open( NameOutFile, "recreate" );
 	
 	//SETTINGS 
-	char calVersion[50] = "7.09+7.17";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.??)
-
+	//char calVersion[50] = "7.09+7.17";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.??)
+	char calVersion[50] = "7.17"; 
 	//char calVersion[50] = "7.07+7.17";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.??)
 	//Double_t Eproj = 0.500;              //Gamma Energy in projectile frame in MeV 
 	
-	Double_t Eproj = 0.5; 
+	Double_t Eproj = 50; 
 
 	//Double_t Eproj = 10.0;              //Gamma Energy in projectile frame i
 	Int_t totalEvents = 10000;        //Events
@@ -68,24 +69,24 @@ using std::ios;
 
 	//Double_t maxE = 400;//30.0;               //Maximum energy in MeV in the histos
 
-	Double_t maxE =  Eproj*1000;
+	Double_t maxE =  Eproj*10;
 
 
 	//TString title0 = "califaAna.root";
 	//TString title1 =    "r3bsim.root";
-	sprintf(title0,"%s","/home/josesrs/r3broot_sept2012/macros/r3b/califa/califaAna_Protons_50MeV.root");  
- 	sprintf(title1,"%s","/home/josesrs/r3broot_sept2012/macros/r3b/califa/r3bsim_Protons_50MeV.root");  	
-	//sprintf(title0,"%s","/home/josesrs/r3broot_sept2012/macros/r3b/califa/califaAna_Gamma_0_5MeV.root");  
- 	//sprintf(title1,"%s","/home/josesrs/r3broot_sept2012/macros/r3b/califa/r3bsim_Gamma_0_5MeV.root"); 
+	sprintf(title0,"%s","/home/jose/r3broot_sept2012/macros/r3b/califa/califaAna_Protons_50MeV.root");  
+ 	sprintf(title1,"%s","/home/jose/r3broot_sept2012/macros/r3b/califa/r3bsim_Protons_50MeV.root");  	
+	//sprintf(title0,"%s","/home/jose/r3broot_sept2012/macros/r3b/califa/califaAna_Gamma_0_5MeV.root");  
+ 	//sprintf(title1,"%s","/home/jose/r3broot_sept2012/macros/r3b/califa/r3bsim_Gamma_0_5MeV.root"); 
 
 	TFile *file0 = TFile::Open(title0);
 	TFile *file1 = TFile::Open(title1);
 	
 	//Double_t beta=0.82;
 
-	Double_t beta=0.85;
+	//Double_t beta=0.85;
 
-	//Double_t beta=0.0;
+	Double_t beta=0.0;
 
 	
 		//END OF THE SETTING AREA
@@ -120,7 +121,7 @@ using std::ios;
 		//minThetaEndCap= 6;  //Angular coverture of ENDCAP 7.17 adapted to barrel CLF811:   CLF717_Geometry_PhoswichEndcap_2.geo
 		//maxThetaEndCap= 43; //Angular coverture of ENDCAP 7.17  adapted to barrel CLF811: CLF717_Geometry_PhoswichEndcap_2.geo
 
-		minThetaEndCap=7.00;  //Angular coverture of ENDCAP 7.17 adapted to barrel CLF717: CLF717_Geometry_PhoswichEndcap_1.geo
+		minThetaEndCap=6.00;  //Angular coverture of ENDCAP 7.17 adapted to barrel CLF717: CLF717_Geometry_PhoswichEndcap_1.geo
 		maxThetaEndCap= 35.0; //Angular coverture of ENDCAP 7.17 adapted to barrel CLF717: CLF717_Geometry_PhoswichEndcap_1.geo
 
 		ENDCAP=kTRUE;
@@ -281,7 +282,7 @@ using std::ios;
 	
 	//TH2F* h5_Cry_EnergyImparSumEnergySum_endcap = new TH2F("h5_Cry_EnergyImparSumEnergySum_endcap","EnergyTotSum vs Energy1Sum",2000,0,maxE,2000,0,maxE);
 	
-	TH2F* h5_Cry_EnergyParSumEnergySum_endcap  = new TH2F("h5_Cry_EnergyParSumEnergySum_endcap ","EnergyTotSum vs Energy2Sum",2000,0,maxE,2000,0,maxE);
+	TH2F* h5_Cry_EnergyParSumEnergySum_endcap  = new TH2F("h5_Cry_EnergyParSumEnergySum_endcap ","EnergyTotSum vs Energy2Sum",2000,0,maxE,2000,0,maxE); //Added for Phoswichendcap (CEPA), dEvsdEtot
 	
 	
 	//TH3F* h5_Cry_EnergyParSumEnergySumNprotons_endcap=new TH3F("h5_Cry_EnergyParSumEnergySum_endcapNprotons","EnergyTotSumvsEnergy2SumvsNprotons",2000,0,maxE,2000,0,maxE,300,0,3000);
@@ -373,11 +374,11 @@ using std::ios;
 	Double_t KLaCl=fCrystalResolutionLaCl*sqrt(inputEnergy);
 	Double_t KPhoswich=sqrt(KLaBr*KLaBr+KLaCl*KLaCl);
 
-	Double_t resolutionCrystal = KPhoswich/(sqrt(inputEnergy));//no lo uso
+	Double_t resolutionCrystal = KPhoswich/(sqrt(inputEnergy));//non ose by now
 
 		//Protons
 		Double_t ResolutionProts=0.02;
-
+		//Double_t ResolutionProts=0;
 	
 	for(Int_t i=0;i<nevents;i++){
 	    if(i%1000 == 0) printf("Event:%i\n",i);
@@ -387,7 +388,7 @@ using std::ios;
 		MCTrackCA->Clear();
 
 		TCrystal->GetEvent(i);
-		//outFile3<<"El evento en TCrystal es "<<TCrystal->GetEvent(i)<<endl;
+		//outFile3<<"The event in TCrystal es "<<TCrystal->GetEvent(i)<<endl;
 		TCalo->GetEvent(i);
 		
 		crystalHitsPerEvent = crystalHitCA->GetEntries(); 
@@ -422,13 +423,13 @@ using std::ios;
 			}
 		}
 		
-		double energyTotalSum=0;  //variables para sumar energ\EDas por evento i
-		double energyParSum=0;  //variables para sumar energ\EDas por evento i
+		double energyTotalSum=0;  //Inicitialization of sum energy vars. per event i 
+		double energyParSum=0;  
 		double energyImparSum=0;
 
 
-		double energyTotalCalSum=0;  //variables para sumar energ\EDas por evento i
-		double energyParCalSum=0;  //variables para sumar energ\EDas por evento i
+		double energyTotalCalSum=0;  
+		double energyParCalSum=0;  
 		double energyImparCalSum=0;
 
 
@@ -469,7 +470,7 @@ using std::ios;
 				}  
 			}//aqui acabamos el track*/
 			
-			//outFilePrueba<<"el Disparo i "<<i<<"  da al cristal  "<<crystalId<<endl;
+			//outFilePrueba<<"shot i "<<i<<" touches the crystal  "<<crystalId<<endl;
 			if(ENDCAP && crystalId>3000 /*&& crystalId%2 == 0*/)
 			{	
 
@@ -510,20 +511,20 @@ using std::ios;
 
 						
 					
-					}//aqui acaban cristales impares
+					}//finish with the odd crystals
 				
 					
 					
 					
-				} //aqui acaba el thershold
-			} //acaba el endcap
-		}//acaba h
+				} //finish with the threshold
+			} //finish with the endcap (b)
+		}//finish with h     (c)
 
 		//h5_Cry_EnergyImparSumEnergyParSum_endcap ->Fill(energyImparSum,energyParSum);
 		
 		//h5_Cry_EnergyImparSumEnergySum_endcap ->Fill(energyTotalSum,energyImparSum);
 		
-		h5_Cry_EnergyParSumEnergySum_endcap ->Fill(energyTotalSum,energyParSum);
+		h5_Cry_EnergyParSumEnergySum_endcap ->Fill(energyTotalSum,energyParSum);   //for this general case, this culd work between (c) and (d)
 		
 		
 		//h5_Cry_Events_endcap_2->Fill(energyTotalSum);
@@ -606,7 +607,7 @@ using std::ios;
 				
 
 					if (crystalId%2 == 1)
-					{	//empiezan cristales impares
+					{	//Odd crystals
 				
 				
 						double energyCalImpar=caloHit[h]->GetEnergy()*1000+randomIs;
@@ -719,7 +720,7 @@ using std::ios;
 	}//fin de evento i
 
 
-        TFile f_50MeV("/home/josesrs/r3broot_sept2012/macros/r3b/califa/hist_Endcap21_50MeV.root", "recreate");
+        TFile f_50MeV("/home/jose/r3broot_sept2012/macros/r3b/califa/hist_Endcap21_50MeV.root", "recreate");
 	f_50MeV->cd();
 
 	if(h1_T){h1_T->Write();}
@@ -800,7 +801,7 @@ using std::ios;
 
 	//if(h5_Cry_EnergyImparSumEnergyParSum_endcap){h5_Cry_EnergyImparSumEnergyParSum_endcap->Write();}
 	//if(h5_Cry_EnergyImparSumEnergySum_endcap ){h5_Cry_EnergyImparSumEnergySum_endcap ->Write();}	
-	if(h5_Cry_EnergyParSumEnergySum_endcap ){h5_Cry_EnergyParSumEnergySum_endcap ->Write();}
+	if(h5_Cry_EnergyParSumEnergySum_endcap ){h5_Cry_EnergyParSumEnergySum_endcap ->Write();}  //Specially important for phoswich endcap (CEPA)
 	
 	//if(h5_Cry_Events_endcap_2 ){h5_Cry_Events_endcap_2->Write();}
 
