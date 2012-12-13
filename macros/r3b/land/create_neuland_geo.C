@@ -29,7 +29,7 @@ Double_t fX = 0.;
 Double_t fY = 0.;
 Double_t fZ = 1550.;
 Bool_t fLocalTrans = kFALSE;
-Bool_t fLabTrans = kFALSE;
+Bool_t fLabTrans = kTRUE;
 
 
 
@@ -197,10 +197,10 @@ void create_neuland_geo(const char* geoTag)
 
   tx = 0.0;
   ty = 0.0;
-  tz = 0.0;
+  tz = fZ;
   TGeoCombiTrans *t0 = new TGeoCombiTrans(tx, ty, tz, zeroRotation);
 
-  top->AddNode(cell, 1, GetGlobalPosition(t0));
+  top->AddNode(cell, 1, /*GetGlobalPosition(t0)*/t0);
 
 
 
