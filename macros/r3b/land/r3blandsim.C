@@ -10,15 +10,17 @@ Int_t r3blandsim(Int_t beamEnergy, Int_t nn, Int_t erel)
   // Target type
   TString target="LiH";
 
-  TObjString det1("ALADIN");
-  TObjString det2("CRYSTALBALL");
-//   TObjString det3("LAND");
-  TObjString det3("SCINTNEULAND");
+  TObjString det1("TARGET");
+  TObjString det2("ALADIN");
+  TObjString det3("CRYSTALBALL");
+//   TObjString det4("LAND");
+  TObjString det4("SCINTNEULAND");
 
   TObjArray fDetList;
   fDetList.Add(&det1);
   fDetList.Add(&det2);
   fDetList.Add(&det3);
+  fDetList.Add(&det4);
 
   Int_t nEvents = 10;
 

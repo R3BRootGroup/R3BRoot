@@ -117,21 +117,7 @@ void r3ball(Int_t nEvents = 1,
   //R3B Target definition
   if (fDetList.FindObject("TARGET") ) {
       R3BModule* target= new R3BTarget(Target.Data());
-      // Global Lab. Rotation
-      phi    =  0.0; // (deg)
-      theta  =  0.0; // (deg)
-      psi    =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx    =  0.0; // (cm)
-      ty    =  0.0; // (cm)
-      tz    =  0.0; // (cm)
-      //target->SetRotAnglesEuler(phi,theta,psi);
-      target->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      target->SetTranslation(tx,ty,tz);
+      target->SetGeometryFileName(("target_" + Target + ".geo.root").Data());
       run->AddModule(target);
   }
 
