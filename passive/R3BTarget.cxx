@@ -50,16 +50,32 @@ fTargetName =  new TString(name);
 }
 
 
-void R3BTarget::ConstructGeometry(){
+void R3BTarget::ConstructGeometry()
+{
+  TString fileName = GetGeometryFileName();
+  if(fileName.EndsWith(".root")) {
+    fLogger->Info(MESSAGE_ORIGIN,
+		  "Constructing Target geometry from ROOT file %s", 
+		  fileName.Data());
+    ConstructRootGeometry();
+  } else {
+    fLogger->Info(MESSAGE_ORIGIN,
+		  "Constructing hardcoded Target geometry");
+    ConstructGeometryOld();
+  }
+}
 
- if (*fTargetName == "LeadTarget") return  ConstructGeometry1();	//for s318
- if (*fTargetName == "Para")       return  ConstructGeometry2();
- if (*fTargetName == "Para45")     return  ConstructGeometry3();
- if (*fTargetName == "LiH")        return  ConstructGeometry4();
- if (*fTargetName == "CTarget")    return  ConstructGeometry5();	//for s318 
- if (*fTargetName == "CH2Target")    return  ConstructGeometry6(); 	//for s318
- if (*fTargetName == "ETTarget")    return  ConstructGeometry7(); 	//for s318, empty target
 
+
+void R3BTarget::ConstructGeometryOld()
+{
+  if (*fTargetName == "LeadTarget") return  ConstructGeometry1();	//for s318
+  if (*fTargetName == "Para")       return  ConstructGeometry2();
+  if (*fTargetName == "Para45")     return  ConstructGeometry3();
+  if (*fTargetName == "LiH")        return  ConstructGeometry4();
+  if (*fTargetName == "CTarget")    return  ConstructGeometry5();	//for s318 
+  if (*fTargetName == "CH2Target")    return  ConstructGeometry6(); 	//for s318
+  if (*fTargetName == "ETTarget")    return  ConstructGeometry7(); 	//for s318, empty target
 }
 
 
