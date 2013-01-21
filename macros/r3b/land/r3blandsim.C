@@ -12,6 +12,7 @@ Int_t r3blandsim(Int_t beamEnergy, Int_t nn, Int_t erel)
 
   TObjString det1("TARGET");
   TObjString det2("ALADIN");
+//   TObjString det2("GLAD");
   TObjString det3("CRYSTALBALL");
 //   TObjString det4("LAND");
   TObjString det4("SCINTNEULAND");

@@ -134,21 +134,7 @@ void r3ball(Int_t nEvents = 1,
   if (fDetList.FindObject("GLAD") ) {
       fFieldMap = 1;
       R3BModule* mag = new R3BGladMagnet("GladMagnet");
-      // Global position of the Module
-      phi   =  0.0; // (deg)
-      theta =  0.0; // (deg)
-      psi   =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx    =  0.0; // (cm)
-      ty    =  0.0; // (cm)
-      tz    =  0.0; // (cm)
-      //mag->SetRotAnglesEuler(phi,theta,psi);
-      mag->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      mag->SetTranslation(tx,ty,tz);
+      mag->SetGeometryFileName("glad_v13a.geo.root");
       run->AddModule(mag);
   }
 
