@@ -43,8 +43,23 @@ R3BGladMagnet::R3BGladMagnet(const char * name, const char *Title)
 {
 }
 
-void R3BGladMagnet::ConstructGeometry(){
+void R3BGladMagnet::ConstructGeometry()
+{
+  TString fileName = GetGeometryFileName();
+  if(fileName.EndsWith(".root")) {
+    fLogger->Info(MESSAGE_ORIGIN,
+		  "Constructing GLAD geometry from ROOT file %s", 
+		  fileName.Data());
+    ConstructRootGeometry();
+  } else {
+    fLogger->Info(MESSAGE_ORIGIN,
+		  "Constructing hardcoded GLAD geometry");
+    ConstructGeometryOld();
+  }
+}
 
+void R3BGladMagnet::ConstructGeometryOld()
+{
     Double_t degrad = TMath::Pi()/180.;
     Double_t w       =        0.;
     Double_t a       =        0.;
@@ -5440,9 +5455,9 @@ void R3BGladMagnet::ConstructGToles(TGeoVolume * pWorld){
 
 
 
-Bool_t R3BGladMagnet::CheckIfSensitive(std::string name){
-	return kTRUE;
-}
+// Bool_t R3BGladMagnet::CheckIfSensitive(std::string name){
+// 	return kTRUE;
+// }
 
 
 
