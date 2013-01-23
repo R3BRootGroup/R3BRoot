@@ -3706,7 +3706,7 @@ TGeoMedium * pWrappingMedium=NULL;
 
   //finally the v7.05 code
 
-//#include "perlScripts/CALIFA.geo"
+#include "perlScripts/CALIFA.geo"
 
 //........
 
@@ -3716,7 +3716,7 @@ TGeoMedium * pWrappingMedium=NULL;
 //#include "perlScripts/CLF717_Geometry_PhoswichEndcap_2.geo"/ If we want the stand-alone IEM phoswich endcap adapted the barrel CLF811. J.Sanchez del Rio Saez
 
 
-#include "perlScripts/CLF717_Geometry_PhoswichEndcap_3.geo" // If we want the IEM phoswich endcap with the barrel CLF707. J.Sanchez del Rio Saez
+//#include "perlScripts/CLF717_Geometry_PhoswichEndcap_3.geo" // If we want the IEM phoswich endcap with the barrel CLF707. J.Sanchez del Rio Saez
 
 
 //#include "perlScripts/CLF717_Geometry_PhoswichEndcap_4.geo" // If we want the IEM phoswich endcap with the barrel CLF811. J.Sanchez del Rio Saez
