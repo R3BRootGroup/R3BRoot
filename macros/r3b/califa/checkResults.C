@@ -16,24 +16,24 @@
 //	(the macro will plot and text information as a function of these settings)
 //  -------------------------------------------------------------------------
 
-void checkResults() {
+void checkResultsP() {
 	char title0[250];
 	char title1[250];
 	
 	//SETTINGS 
-	char calVersion[50] = "7.07+7.17";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.??)
-	Double_t Eproj = 5.00;              //Gamma Energy in projectile frame in MeV 
-	Int_t totalEvents = 100000;        //Events
+	char calVersion[50] = "8.11";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.??)
+	Double_t Eproj = 35.00;              //Gamma Energy in projectile frame in MeV 
+	Int_t totalEvents = 100;        //Events
 	Int_t multiplicity = 1;           //Multiplicity (particles per event)
 	
 	Double_t threshold=0.050;		  //Threshold in MeV
 	Int_t ExpRes=5;			          //Exp. Resol in MeV
 
 	//FOR THE HISTOGRAMS AND PLOTS:
-	Double_t maxE = 6;               //Maximum energy in MeV in the histos
+	Double_t maxE = 100;               //Maximum energy in MeV in the histos
 
-	sprintf(title0,"%s","/Users/hapol/r3broot/macros/r3b/califa/RESULTS_Apr11/2105/E/califaAna.root");  	
- 	sprintf(title1,"%s","/Users/hapol/r3broot/macros/r3b/califa/RESULTS_Apr11/2105/r3bsim.root");  	
+	sprintf(title0,"%s","califaAna.root");  	
+ 	sprintf(title1,"%s","r3bsim.root");  	
 	TFile *file0 = TFile::Open(title0);
 	TFile *file1 = TFile::Open(title1);
 	
@@ -43,7 +43,8 @@ void checkResults() {
 	
 	Bool_t BARREL= kFALSE;
 	Bool_t ENDCAP= kFALSE;
-	Double_t minThetaBarrel=0 , maxThetaBarrel=0;	minThetaEndCap=0 , maxThetaEndCap=0;
+	Double_t minThetaBarrel=0. , maxThetaBarrel=0.;
+        Double_t minThetaEndCap=0. , maxThetaEndCap=0.;
 
 	if(calVersion=="5.0"){
 		cout << "Warning: Calorimeter version 5.0 is not supported in this macro! "<< endl;
@@ -90,12 +91,11 @@ void checkResults() {
 		BARREL=kTRUE;		
 		ENDCAP=kTRUE;
 	}
-	else if(!strcmp(calVersion,"8.00")){
+	else if(!strcmp(calVersion,"8.11")){
 		cout << "Using CALIFA version 8.00 "<< endl;
-		minThetaBarrel= 0.;  //Angular coverture of CALIFA 8.0
-		maxThetaBarrel= 0.; //Angular coverture of CALIFA 8.0
+		minThetaBarrel= 43.16;  //Angular coverture of BARREL 8.11
+		maxThetaBarrel= 135.35; //Angular coverture of BARREL 8.11
 		BARREL=kTRUE;
-		ENDCAP=kTRUE;
 	}
 	else cout << "Error: Calorimeter version not correctly defined! "<< endl;
 		
@@ -205,16 +205,16 @@ void checkResults() {
 	
 	//Crystal Hits (input)
 	TClonesArray* crystalHitCA;  
-	R3BCaloCrystalHit** crystalHit;
-	crystalHitCA = new TClonesArray("R3BCaloCrystalHit",5);
-	TBranch *branchCrystalHit = TCrystal->GetBranch("CrystalHit");
+	R3BCaloCrystalHitSim** crystalHit;
+	crystalHitCA = new TClonesArray("R3BCaloCrystalHitSim",5);
+	TBranch *branchCrystalHit = TCrystal->GetBranch("CrystalHitSim");
 	branchCrystalHit->SetAddress(&crystalHitCA);
 
 	//Calo Hits (output)
 	TClonesArray* caloHitCA;  
-	R3BCaloHit** caloHit;
-	caloHitCA = new TClonesArray("R3BCaloHit",5);
-	TBranch *branchCaloHit = TCalo->GetBranch("CaloHit");
+	R3BCaloHitSim** caloHit;
+	caloHitCA = new TClonesArray("R3BCaloHitSim",5);
+	TBranch *branchCaloHit = TCalo->GetBranch("CaloHitSim");
 	branchCaloHit->SetAddress(&caloHitCA);
 	
 	//MCTrack(input)
@@ -260,17 +260,17 @@ void checkResults() {
 		MCtracksPerEvent = MCTrackCA->GetEntries();
 		
 		if(crystalHitsPerEvent>0) {
-			crystalHit = new R3BCaloCrystalHit*[crystalHitsPerEvent];
+			crystalHit = new R3BCaloCrystalHitSim*[crystalHitsPerEvent];
 			for(Int_t j=0;j<crystalHitsPerEvent;j++){
-				crystalHit[j] = new R3BCaloCrystalHit;
-				crystalHit[j] = (R3BCaloCrystalHit*) crystalHitCA->At(j);      
+				crystalHit[j] = new R3BCaloCrystalHitSim;
+				crystalHit[j] = (R3BCaloCrystalHitSim*) crystalHitCA->At(j);      
 			}
 		}
 		if(caloHitsPerEvent>0) {
-			caloHit = new R3BCaloHit*[caloHitsPerEvent];
+			caloHit = new R3BCaloHitSim*[caloHitsPerEvent];
 			for(Int_t j=0;j<caloHitsPerEvent;j++){
-				caloHit[j] = new R3BCaloHit;
-				caloHit[j] = (R3BCaloHit*) caloHitCA->At(j);      
+				caloHit[j] = new R3BCaloHitSim;
+				caloHit[j] = (R3BCaloHitSim*) caloHitCA->At(j);      
 			}
 		}		
 		if(MCtracksPerEvent>0) {
@@ -545,7 +545,7 @@ void checkResults() {
 	Tl.SetTextSize(0.06);   Tl.SetTextColor(4);  Tl.DrawLatex(12, 1000, "Calorimeter");
 	
 	c4->cd(2);
-	h2_CC->Fit("gaus","","",Eproj-0.05*Eproj,Eproj+0.05*Eproj); 
+	h2_CC->Fit("gaus","","",Eproj-0.1*Eproj,Eproj+0.1*Eproj); 
 	//getting the value of the fit parameters
 	TF1 *myfunc = h2_CC->GetFunction("gaus");
 	Double_t mean = myfunc->GetParameter(1); //value of 2st parameter (mean)
@@ -806,20 +806,24 @@ void checkResults() {
 	Int_t binLeft3Sigma = h2_CC->FindBin(mean-3*sigma);
 	Int_t binRight3Sigma = h2_CC->FindBin(mean+3*sigma);
 	Int_t photopeakParticles3Sigma = h2_CC->Integral(binLeft3Sigma,binRight3Sigma);
-	Double_t resolution_barrel = (2.35*sigma_barrel*100)/mean_barrel;
-	Int_t binLeft2Sigma_barrel = h2_CC_barrel->FindBin(mean_barrel-2*sigma_barrel);
-	Int_t binRight2Sigma_barrel = h2_CC_barrel->FindBin(mean_barrel+2*sigma_barrel);
-	Int_t photopeakParticles2Sigma_barrel =h2_CC_barrel->Integral(binLeft2Sigma_barrel,binRight2Sigma_barrel);
-	Int_t binLeft3Sigma_barrel = h2_CC_barrel->FindBin(mean_barrel-3*sigma_barrel);
-	Int_t binRight3Sigma_barrel = h2_CC_barrel->FindBin(mean_barrel+3*sigma_barrel);
-	Int_t photopeakParticles3Sigma_barrel = h2_CC_barrel->Integral(binLeft3Sigma_barrel,binRight3Sigma_barrel);
-	Double_t resolution_endcap = (2.35*sigma_endcap*100)/mean_endcap;
-	Int_t binLeft2Sigma_endcap = h2_CC_endcap->FindBin(mean_endcap-2*sigma_endcap);
-	Int_t binRight2Sigma_endcap = h2_CC_endcap->FindBin(mean_endcap+2*sigma_endcap);
-	Int_t photopeakParticles2Sigma_endcap =h2_CC_endcap->Integral(binLeft2Sigma_endcap,binRight2Sigma_endcap);
-	Int_t binLeft3Sigma_endcap = h2_CC_endcap->FindBin(mean_endcap-3*sigma_endcap);
-	Int_t binRight3Sigma_endcap = h2_CC_endcap->FindBin(mean_endcap+3*sigma_endcap);
-	Int_t photopeakParticles3Sigma_endcap = h2_CC_endcap->Integral(binLeft3Sigma_endcap,binRight3Sigma_endcap);
+        if(BARREL) {
+		Double_t resolution_barrel = (2.35*sigma_barrel*100)/mean_barrel;
+		Int_t binLeft2Sigma_barrel = h2_CC_barrel->FindBin(mean_barrel-2*sigma_barrel);
+		Int_t binRight2Sigma_barrel = h2_CC_barrel->FindBin(mean_barrel+2*sigma_barrel);
+		Int_t photopeakParticles2Sigma_barrel =h2_CC_barrel->Integral(binLeft2Sigma_barrel,binRight2Sigma_barrel);
+		Int_t binLeft3Sigma_barrel = h2_CC_barrel->FindBin(mean_barrel-3*sigma_barrel);
+		Int_t binRight3Sigma_barrel = h2_CC_barrel->FindBin(mean_barrel+3*sigma_barrel);
+		Int_t photopeakParticles3Sigma_barrel = h2_CC_barrel->Integral(binLeft3Sigma_barrel,binRight3Sigma_barrel);
+        }
+        if(ENDCAP) {
+		Double_t resolution_endcap = (2.35*sigma_endcap*100)/mean_endcap;
+		Int_t binLeft2Sigma_endcap = h2_CC_endcap->FindBin(mean_endcap-2*sigma_endcap);
+		Int_t binRight2Sigma_endcap = h2_CC_endcap->FindBin(mean_endcap+2*sigma_endcap);
+		Int_t photopeakParticles2Sigma_endcap =h2_CC_endcap->Integral(binLeft2Sigma_endcap,binRight2Sigma_endcap);
+		Int_t binLeft3Sigma_endcap = h2_CC_endcap->FindBin(mean_endcap-3*sigma_endcap);
+		Int_t binRight3Sigma_endcap = h2_CC_endcap->FindBin(mean_endcap+3*sigma_endcap);
+		Int_t photopeakParticles3Sigma_endcap = h2_CC_endcap->Integral(binLeft3Sigma_endcap,binRight3Sigma_endcap);
+        }
 	
 	cout << endl << endl 
 		 << "CALIFA version: " << calVersion 
@@ -840,11 +844,11 @@ void checkResults() {
 		cout << "Particles in the Barrel = " << particlesInBarrel << " between angles " << minThetaBarrel << " and " << maxThetaBarrel << endl;
 		cout << "Mean number of crystals with signal in Barrel: " << h1_CryMul_barrel->GetMean() << endl;
 		cout << "Mean number of crystals with signal in Barrel per primary: " << (Double_t)h1_CryMul_barrel->Integral(2,50)/(Double_t)(totalEvents*multiplicity) << endl;
-		cout << "Mean number of crystals with signal in Barrel per primary in Barrel: " //<< (Double_t)h1_CryMul_barrel->GetEntries()/(Double_t)particlesInBarrel NO!
+		cout << "Mean number of crystals with signal in Barrel per primary in Barrel: "
 			<< (Double_t)h1_CryMul_barrel->GetMean()*totalEvents*multiplicity/(Double_t)particlesInBarrel << endl;
 		cout << "Mean number of calorimeter hits in Barrel: " << h1_CalMul_barrel->GetMean() << endl;
 		cout << "Mean number of calorimeter hits in Barrel per primary: " << (Double_t)h1_CalMul_barrel->Integral(2,50)/(Double_t)(totalEvents*multiplicity) << endl;
-		cout << "Mean number of calorimeter hits in Barrel per primary in Barrel: " //<< (Double_t)h1_CalMul_barrel->GetEntries()/(Double_t)particlesInBarrel NO!
+		cout << "Mean number of calorimeter hits in Barrel per primary in Barrel: "
 		<< (Double_t)h1_CalMul_barrel->GetMean()*totalEvents*multiplicity/(Double_t)particlesInBarrel << endl;
 		cout << "Particles in barrel / all particles: " << (Double_t)particlesInBarrel*100/(Double_t)(totalEvents*multiplicity) << "%" << endl<< endl;
 	}
@@ -852,11 +856,11 @@ void checkResults() {
 		cout << "Particles in the EndCap = " << particlesInEndCap << " between angles " << minThetaEndCap << " and " << maxThetaEndCap << endl;
 		cout << "Mean number of crystals with signal in EndCap: " << h1_CryMul_endcap->GetMean() << endl;
 		cout << "Mean number of crystals with signal in EndCap per primary: " << (Double_t)h1_CryMul_endcap->Integral(2,50)/((Double_t)(totalEvents*multiplicity)) << endl;
-		cout << "Mean number of crystals with signal in EndCap per primary in EndCap: " //<< (Double_t)h1_CryMul_endcap->GetEntries()/(Double_t)particlesInEndCap NO!
+		cout << "Mean number of crystals with signal in EndCap per primary in EndCap: " 
 		<< (Double_t)h1_CryMul_endcap->GetMean()*totalEvents*multiplicity/(Double_t)particlesInEndCap << endl;
 		cout << "Mean number of calorimeter hits in EndCap: " << h1_CalMul_endcap->GetMean() << endl;
 		cout << "Mean number of calorimeter hits in EndCap per primary: " << (Double_t)h1_CalMul_endcap->Integral(2,50)/(Double_t)(totalEvents*multiplicity) << endl;
-		cout << "Mean number of calorimeter hits in EndCap per primary in EndCap: " //<< (Double_t)h1_CalMul_endcap->GetEntries()/(Double_t)particlesInEndCap NO!
+		cout << "Mean number of calorimeter hits in EndCap per primary in EndCap: "
 		<< (Double_t)h1_CalMul_endcap->GetMean()*(Double_t)totalEvents*multiplicity/(Double_t)particlesInEndCap << endl;
 		cout << "Particles in endcap / all particles: " << (Double_t)particlesInEndCap*100/(Double_t)(totalEvents*multiplicity) << "%" << endl<< endl;		
 	}
@@ -994,24 +998,19 @@ void checkResults() {
 	ctext->cd();
 
  	//OUTPUT FILE
-  	ctext.Print("output.ps("); 
-	c1.Print("output.ps"); 	
-  	c2.Print("output.ps");
-	if(BARREL)c2_barrel.Print("output.ps");
-	if(ENDCAP)c2_endcap.Print("output.ps");
-  	c3.Print("output.ps");
-	if(BARREL)c3_barrel.Print("output.ps");
-	if(ENDCAP)c3_endcap.Print("output.ps");
-  	c4.Print("output.ps");
-	if(BARREL)c4_barrel.Print("output.ps");
-	if(ENDCAP)c4_endcap.Print("output.ps");
-  	c6.Print("output.ps)");
+  	ctext->Print("output.ps("); 
+	c1->Print("output.ps"); 	
+  	c2->Print("output.ps");
+	if(BARREL)c2_barrel->Print("output.ps");
+	if(ENDCAP)c2_endcap->Print("output.ps");
+  	c3->Print("output.ps");
+	if(BARREL)c3_barrel->Print("output.ps");
+	if(ENDCAP)c3_endcap->Print("output.ps");
+  	c4->Print("output.ps");
+	if(BARREL)c4_barrel->Print("output.ps");
+	if(ENDCAP)c4_endcap->Print("output.ps");
+  	c6->Print("output.ps)");
 
-  	/*ctext.Print("out_10MeV_version7_05_multiplicity1.pdf("); 
-	c1.Print("out_10MeV_version7_05_multiplicity1.pdf"); 	
-  	c2.Print("out_10MeV_version7_05_multiplicity1.pdf"); 
-  	c3.Print("out_10MeV_version7_05_multiplicity1.pdf");
-  	c4.Print("out_10MeV_version7_05_multiplicity1.pdf)");*/
 }
 		
 		
