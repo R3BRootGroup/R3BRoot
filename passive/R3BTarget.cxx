@@ -67,6 +67,13 @@ void R3BTarget::ConstructGeometry()
 
 
 
+Bool_t R3BTarget::CheckIfSensitive(std::string name)
+{
+  return kFALSE;
+}
+
+
+
 void R3BTarget::ConstructGeometryOld()
 {
   if (*fTargetName == "LeadTarget") return  ConstructGeometry1();	//for s318

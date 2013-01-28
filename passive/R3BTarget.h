@@ -1,7 +1,6 @@
 #ifndef R3BTarget_H
 #define R3BTarget_H
 
-#include "FairDetector.h"
 #include "R3BModule.h"
 #include <TString.h>
 
@@ -13,6 +12,7 @@ class R3BTarget : public R3BModule {
     virtual ~R3BTarget();
     virtual void ConstructGeometry();
     void ConstructGeometryOld();
+    virtual Bool_t CheckIfSensitive(std::string name);
 
  protected:
      TString *fTargetName; //!
