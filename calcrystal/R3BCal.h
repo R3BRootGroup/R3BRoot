@@ -11,6 +11,8 @@
 #ifndef R3BCAL_H
 #define R3BCAL_H
 
+#include <string>
+
 #include "R3BDetector.h"
 #include "TGeoSphere.h"
 
@@ -136,6 +138,9 @@ class R3BCal : public R3BDetector
    ** Constructs the CAL CRYSTAL geometry
    **/
   virtual void ConstructGeometry();
+  void ConstructGeometryOld();
+
+  virtual Bool_t CheckIfSensitive(std::string name);
 
   virtual void Initialize();
   virtual void SetSpecialPhysicsCuts();

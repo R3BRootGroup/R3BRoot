@@ -456,8 +456,38 @@ void R3BCal::SetNonUniformity(Double_t nonU)
 }
 
 
-void R3BCal::ConstructGeometry(){
 
+void R3BCal::ConstructGeometry()
+{
+  TString fileName = GetGeometryFileName();
+  if(fileName.EndsWith(".root")) {
+    fLogger->Info(MESSAGE_ORIGIN,
+		  "Constructing Crystal Ball geometry from ROOT file %s", 
+		  fileName.Data());
+    ConstructRootGeometry();
+  } else {
+    fLogger->Info(MESSAGE_ORIGIN,
+		  "Constructing hardcoded Crystal Ball geometry");
+    ConstructGeometryOld();
+  }
+}
+
+
+
+Bool_t R3BCal::CheckIfSensitive(std::string name)
+{
+  TString volName = name;
+  if(volName.Contains("crystalLogNAJ")) {
+    return kTRUE;
+  }
+  return kFALSE;
+}
+
+
+
+
+void R3BCal::ConstructGeometryOld()
+{
     cout
     << "##################################################################\n"
     << "*     -I- R3BCal R3BCal::ConstructGeometry()                     *\n"
