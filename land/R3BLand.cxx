@@ -100,22 +100,30 @@ void R3BLand::Initialize()
   FairDetector::Initialize();
 
   cout << "-I- R3BLand: initialisation " << endl;
-  cout << "-I- R3BLand: Paddle B3 (McId): " << gMC->VolId("padle_h_box3") << endl;
-  cout << "-I- R3BLand: Paddle B4 (McId): " << gMC->VolId("padle_h_box4") << endl;
-  cout << "-I- R3BLand: Paddle B5 (McId): " << gMC->VolId("padle_h_box5") << endl;
-
-  Int_t id1 = gMC->VolId("padle_h_box3");
-  Int_t id2 = gMC->VolId("padle_h_box4");
-  Int_t id3 = gMC->VolId("padle_h_box5");
+  
+  Int_t id1 = 0, id2 = 0, id3 = 0;
+  
+  TString fileName = GetGeometryFileName();
+  if(fileName.Contains("neuland")) {
+    cout << "-I- R3BLand: Paddle B5 (McId): " << gMC->VolId("padle_h_box5") << endl;
+    id3 = gMC->VolId("padle_h_box5");
+    fMapMcId[id3]=3;
+  } else {
+    cout << "-I- R3BLand: Paddle B3 (McId): " << gMC->VolId("padle_h_box3") << endl;
+    cout << "-I- R3BLand: Paddle B4 (McId): " << gMC->VolId("padle_h_box4") << endl;
+    cout << "-I- R3BLand: Paddle B5 (McId): " << gMC->VolId("padle_h_box5") << endl;
+    id1 = gMC->VolId("padle_h_box3");
+    id2 = gMC->VolId("padle_h_box4");
+    id3 = gMC->VolId("padle_h_box5");
+    fMapMcId[id1]=1;
+    fMapMcId[id2]=2;
+    fMapMcId[id3]=3;
+  }
 
   // Sensitive Volumes :: Unique  Id
   //  paddle_h_box3       1
   //  paddle_h_box4       2
   //  paddle_h_box5       3
-
-  fMapMcId[id1]=1;
-  fMapMcId[id2]=2;
-  fMapMcId[id3]=3;
 
   //<D.B> Check me
   // Initialise variables from Birk law
