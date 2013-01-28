@@ -912,7 +912,7 @@ void R3BMagnet::ConstructGeometry(){
 
 Bool_t R3BMagnet::CheckIfSensitive(std::string name){
 	// just to get rid of the warrning during run, not need this is a passive element! 
-	return kTRUE;
+	return kFALSE;
 }
 
 void R3BMagnet::ConstructASCIIGeometry(){
