@@ -21,8 +21,8 @@ void r3ball(Int_t nEvents = 1,
 
 
   // Output files
-  char str[100];
-  sprintf(str, "%1dAMeV.%1dn.%1dkeV", beamEnergy, nn, erel);
+//   char str[100];
+//   sprintf(str, "%1dAMeV.%1dn.%1dkeV", beamEnergy, nn, erel);
 //   TString OutFile = "/Users/kresan/neuland/r3bsim." + TString(str) + ".14m.root";
 //   TString ParFile = "/Users/kresan/neuland/r3bpar." + TString(str) + ".14m.root";
   TString OutFile = "r3bsim.root";
@@ -142,21 +142,7 @@ void r3ball(Int_t nEvents = 1,
   if (fDetList.FindObject("CRYSTALBALL") ) {
       //R3B Crystal Calorimeter
       R3BDetector* cal = new R3BCal("CrystalCal", kTRUE);
-      // Global position of the Module
-      phi   =  0.0; // (deg)
-      theta =  0.0; // (deg)
-      psi   =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx    =  0.0; // (cm)
-      ty    =  0.0; // (cm)
-      tz    =  0.0; // (cm)
-      //cal->SetRotAnglesEuler(phi,theta,psi);
-      cal->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      cal->SetTranslation(tx,ty,tz);
+      cal->SetGeometryFileName("cal_v13a.geo.root");
       run->AddModule(cal);
   }
 
@@ -420,7 +406,7 @@ void r3ball(Int_t nEvents = 1,
 //     TString evtFile;
 //     evtFile = TString(str);
 //     TString iFile = dir + "/input/" + evtFile;
-    TString iFile = "/Users/kresan/neuland/input/beam/beam.S406.200AMeV.dat";
+    TString iFile = "/Users/kresan/r3b/geo/r3broot/input/signal.1500AMeV.dat";
     R3BAsciiGenerator* gen = new R3BAsciiGenerator(iFile.Data());
     // add the ascii generator
     primGen->AddGenerator(gen);
