@@ -401,14 +401,8 @@ void r3ball(Int_t nEvents = 1,
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
   if (fGenerator.CompareTo("ascii") == 0  ) {
-//     char str[100];
-//     sprintf(str, "%1dSn_%1dn_%1dAMeV_%1dkeV.dat", (132-nn), nn, beamEnergy, erel);
-//     TString evtFile;
-//     evtFile = TString(str);
-//     TString iFile = dir + "/input/" + evtFile;
-    TString iFile = "/Users/kresan/r3b/geo/r3broot/input/signal.1500AMeV.dat";
+    TString iFile = dir + "/input/signal.1500AMeV.dat";
     R3BAsciiGenerator* gen = new R3BAsciiGenerator(iFile.Data());
-    // add the ascii generator
     primGen->AddGenerator(gen);
   } 
 
