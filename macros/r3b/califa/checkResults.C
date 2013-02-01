@@ -16,12 +16,12 @@
 //	(the macro will plot and text information as a function of these settings)
 //  -------------------------------------------------------------------------
 
-void checkResultsP() {
+void checkResults() {
 	char title0[250];
 	char title1[250];
 	
 	//SETTINGS 
-	char calVersion[50] = "8.11";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.??)
+	char calVersion[50] = "8.11";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.11)
 	Double_t Eproj = 35.00;              //Gamma Energy in projectile frame in MeV 
 	Int_t totalEvents = 100;        //Events
 	Int_t multiplicity = 1;           //Multiplicity (particles per event)
@@ -63,8 +63,8 @@ void checkResultsP() {
 	}
 	else if(!strcmp(calVersion,"7.09")){
 		cout << "Using CALIFA version 7.09 "<< endl;
-		minThetaBarrel= 0.;  //Angular coverture of BARREL 7.09
-		maxThetaBarrel= 0.; //Angular coverture of BARREL 7.09
+		minThetaBarrel= 32.;  //Angular coverture of BARREL 7.09
+		maxThetaBarrel= 135.; //Angular coverture of BARREL 7.09
 		BARREL=kTRUE;
 	}
 	else if(!strcmp(calVersion,"7.17")){
@@ -84,15 +84,15 @@ void checkResultsP() {
 	}
 	else if(!strcmp(calVersion,"7.09+7.17")){
 		cout << "Using CALIFA version 7.09+7.17 "<< endl;
-		minThetaBarrel= 0.;  //Angular coverture of BARREL 7.09
-		maxThetaBarrel= 0.; //Angular coverture of BARREL 7.09
+		minThetaBarrel= 32.;  //Angular coverture of BARREL 7.09
+		maxThetaBarrel= 135.; //Angular coverture of BARREL 7.09
 		minThetaEndCap= 9.59;  //Angular coverture of ENDCAP 7.17
 		maxThetaEndCap= 32.10; //Angular coverture of ENDCAP 7.17
 		BARREL=kTRUE;		
 		ENDCAP=kTRUE;
 	}
 	else if(!strcmp(calVersion,"8.11")){
-		cout << "Using CALIFA version 8.00 "<< endl;
+		cout << "Using CALIFA version 8.11 "<< endl;
 		minThetaBarrel= 43.16;  //Angular coverture of BARREL 8.11
 		maxThetaBarrel= 135.35; //Angular coverture of BARREL 8.11
 		BARREL=kTRUE;
@@ -600,7 +600,7 @@ void checkResultsP() {
 	gStyle->SetOptFit(0);
 	
 	c5->cd(1);	User_1->SetFrameBorderMode(0); h1_User->Draw();
-	c5->cd(2);	User_2->SetFrameBorderMode(0); h3_T->Draw();h1_EF->Draw("same");
+	c5->cd(2);	User_2->SetFrameBorderMode(0); h3_T->Draw();
 	c5->cd(3);	User_3->SetFrameBorderMode(0); h1_EF->Draw();
 	c5->cd(4);	User_4->SetFrameBorderMode(0); //h2_EF->Draw();
 	c5->cd();
