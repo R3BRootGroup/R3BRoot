@@ -223,25 +223,7 @@ void R3BNeutronTracker2D::Exec(Option_t* opt)
       fNPrimGamma += 1;
     } else{
       //fragment
-      Double_t M = aTrack1->GetMass();
-      Double_t A = M/0.938928;
-
-      if(A < 120.) {
-	Fatal("Exec", "Wrong fragment!");
-      }
-      
-      if(TMath::Abs(A-131.) < 0.01){
-	A = 130.917000;
-      }
-      if(TMath::Abs(A-130.) < 0.01){
-	A = 129.913967;
-      }
-      if(TMath::Abs(A-129.) < 0.01){
-	A = 128.91348;
-      }
-      if(TMath::Abs(A-128.) < 0.01){
-	A = 127.910537;
-      }
+      Double_t A = aTrack1->GetMass();
       PRIM_frag[fNofFrag] = new R3BPrimPart(aTrack1->GetPdgCode(),
 					    aTrack1->GetPx()*1000.,
 					    aTrack1->GetPy()*1000.,
@@ -314,7 +296,7 @@ void R3BNeutronTracker2D::Exec(Option_t* opt)
   
   // Calculate invariant mass of neutrons
   CalculateMassInv();
-  CalculateExce();
+//   CalculateExce();
   
   hMinv0->Fill(fMinvTrue);
   hExce0->Fill(fExceTrue);
@@ -1204,7 +1186,7 @@ void R3BNeutronTracker2D::CreateHistograms()
   hErel4->GetXaxis()->SetTitle("Erel (MeV)");
   hErel4->GetYaxis()->SetTitle("Counts");
 
-  hMinv = new TH1F("Minv","Minv for reconstructed hits",2000,-0.01,39.99);
+  hMinv = new TH1F("Minv","Minv for reconstructed hits",4000,-0.01,39.99);
   // hMinv = new TH1F("Minv","Minv for reconstructed hits",1000,0.,1000.);
   hMinv->GetXaxis()->SetTitle("Erel (MeV)");
   hMinv->GetYaxis()->SetTitle("Counts");
