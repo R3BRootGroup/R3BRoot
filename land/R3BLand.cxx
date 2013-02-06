@@ -424,6 +424,24 @@ void R3BLand::ConstructGeometry()
 		  "Constructing NEULAND geometry from ROOT file %s", 
 		  fileName.Data());
     ConstructRootGeometry();
+    TGeoBBox *box = (TGeoBBox*) gGeoManager->GetVolume(gMC->VolId("padle_h_box5"))->GetShape();
+    TGeoBBox *bbox = (TGeoBBox*) gGeoManager->GetVolume(gMC->VolId("ALAND"))->GetShape();
+    TGeoBBox *bbbox = (TGeoBBox*) gGeoManager->GetVolume("CELL")->GetShape();
+    Int_t maxPlane;
+    Int_t maxPaddle;
+    maxPlane = (Int_t) (bbbox->GetDZ() / bbox->GetDZ());
+    if(fileName.Contains("neuland")) {
+      maxPaddle = (Int_t) ( maxPlane * ((Int_t)(box->GetDX()/bbox->GetDY())) );
+    } else {
+      maxPaddle = (Int_t) ( maxPlane * ((Int_t)(box->GetDX()/box->GetDY())) );
+    }
+    FairRun *fRun = FairRun::Instance();
+    FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
+    R3BLandDigiPar* par=(R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
+    par->SetMaxPaddle(maxPaddle);
+    par->SetMaxPlane(maxPlane);
+    par->SetPaddleLength(box->GetDX());
+    par->setChanged();
   } else {
     fLogger->Info(MESSAGE_ORIGIN,
 		  "Constructing hardcoded NEULAND geometry");
