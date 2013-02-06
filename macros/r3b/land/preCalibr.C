@@ -1,7 +1,7 @@
 void preCalibr(Int_t beamE, Int_t nn, Int_t erel, Int_t d)
 {
   // ----- Files ---------------------------------------------------------------
-  char strDir[] = "/home/kresan/neuland";
+  char strDir[] = "/Users/kresan/neuland";
   char str[100];
   sprintf(str, "%1dAMeV.%1dn.%1dkeV.%1dm", beamE, nn, erel, d);
   TString inFile  = TString(strDir) + "/r3bsim." + TString(str) + ".root";

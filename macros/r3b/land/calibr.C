@@ -33,7 +33,7 @@ void calibr_2D(Int_t beamE, Int_t erel, Int_t d)
 
 
   // ----- Files -----------------------------------------------------
-  char strDir[] = "/home/kresan/neuland";
+  char strDir[] = "/Users/kresan/neuland";
   TString inFile[4];
   TFile *file[4];
   TH2F *h[4];

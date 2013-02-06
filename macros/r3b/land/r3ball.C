@@ -21,12 +21,14 @@ void r3ball(Int_t nEvents = 1,
 
 
   // Output files
-//   char str[100];
-//   sprintf(str, "%1dAMeV.%1dn.%1dkeV", beamEnergy, nn, erel);
-//   TString OutFile = "/Users/kresan/neuland/r3bsim." + TString(str) + ".14m.root";
-//   TString ParFile = "/Users/kresan/neuland/r3bpar." + TString(str) + ".14m.root";
-  TString OutFile = "r3bsim.root";
-  TString ParFile = "r3bpar.root";
+  char str[100];
+  if(100 == erel) {
+    sprintf(str, "%1dAMeV.%1dn.%1dkeV.35m", beamEnergy, nn, erel);
+  } else {
+    sprintf(str, "%1dAMeV.%1dn.%1dkeV.14m", beamEnergy, nn, erel);
+  }
+  TString OutFile = "/Users/kresan/neuland/r3bsim." + TString(str) + ".root";
+  TString ParFile = "/Users/kresan/neuland/r3bpar." + TString(str) + ".root";
 
 
   // ----    Debug option   -------------------------------------------------
@@ -304,7 +306,11 @@ void r3ball(Int_t nEvents = 1,
     R3BDetector* land = new R3BLand("Land", kTRUE);
     // verbose level 2 ( step info activated )
     land->SetVerboseLevel(1);
-    land->SetGeometryFileName("neuland_v12a_14m.geo.root");
+    if(100 == erel) {
+      land->SetGeometryFileName("neuland_v12a_35m.geo.root");
+    } else {
+      land->SetGeometryFileName("neuland_v12a_14m.geo.root");
+    }
     run->AddModule(land);
   }
 
@@ -373,6 +379,7 @@ void r3ball(Int_t nEvents = 1,
   
   if (fFieldMap == 0) {
     R3BAladinFieldMap* magField = new R3BAladinFieldMap("AladinMaps");
+//     R3BFieldMap* magField = new R3BFieldMap(0, kFALSE);
 //     Double_t fMeasCurrent = 2000.;// I_current [A]
     Double_t fMeasCurrent = 2500.;// I_current [A]
     magField->SetCurrent(fMeasCurrent);
@@ -401,7 +408,9 @@ void r3ball(Int_t nEvents = 1,
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
   if (fGenerator.CompareTo("ascii") == 0  ) {
-    TString iFile = dir + "/input/signal.1500AMeV.dat";
+    sprintf(str, "/input/%1dSn_%1dn_%1dAMeV_%1dkeV.dat",
+	    (132-nn), nn, beamEnergy, erel);
+    TString iFile = dir + TString(str);
     R3BAsciiGenerator* gen = new R3BAsciiGenerator(iFile.Data());
     primGen->AddGenerator(gen);
   } 
@@ -515,6 +524,10 @@ void r3ball(Int_t nEvents = 1,
 
 
   // -----   Runtime database   ---------------------------------------------
+  R3BFieldPar* fieldPar = (R3BFieldPar*) rtdb->getContainer("R3BFieldPar");
+  fieldPar->SetParameters(magField);
+  fieldPar->setChanged();
+  //fieldPar->setInputVersion(run->GetRunId(),1);
   Bool_t kParameterMerged = kTRUE;
   FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
   parOut->open(ParFile.Data());
