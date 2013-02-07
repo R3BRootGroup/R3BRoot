@@ -155,29 +155,41 @@ InitStatus R3BLandDigitizer::Init() {
      hElossLight->GetXaxis()->SetTitle("Energy (MeV)");
      hElossLight->GetYaxis()->SetTitle("Light (MeV)");
         
-  if(npaddles<202){
-     //LAND detector
-
-     hMult1 = new TH1F("Multiplicity1","Paddle multiplicity if two Pms have fired",20,-0.5,19.5);
-     hMult1->GetXaxis()->SetTitle("Multiplicity");
-     hMult1->GetYaxis()->SetTitle("Counts");
-
-     hMult2 = new TH1F("Multiplicity2","Paddle multiplicity if one PM has fired",20,-0.5,19.5);
-     hMult2->GetXaxis()->SetTitle("Multiplicity");
-     hMult2->GetYaxis()->SetTitle("Counts");
-  }
-  else if(npaddles>202){
-     //Neuland detector
-
-     hMult1 = new TH1F("Multiplicity1","Paddle multiplicity",100,0.,100.);
-     hMult1->GetXaxis()->SetTitle("Multiplicity");
-     hMult1->GetYaxis()->SetTitle("Counts");
-
-     hMult2 = new TH1F("Multiplicity2","Paddle multiplicity",100,0.,100.);
-     hMult2->GetXaxis()->SetTitle("Multiplicity");
-     hMult2->GetYaxis()->SetTitle("Counts");
-  }  
-  return kSUCCESS;
+     if(fLandDigiPar->GetGeometryFileName().Contains("proto")) {
+       //Neuland prototype
+       
+       hMult1 = new TH1F("Multiplicity1","Paddle multiplicity",100,0.,100.);
+       hMult1->GetXaxis()->SetTitle("Multiplicity");
+       hMult1->GetYaxis()->SetTitle("Counts");
+       
+       hMult2 = new TH1F("Multiplicity2","Paddle multiplicity",100,0.,100.);
+       hMult2->GetXaxis()->SetTitle("Multiplicity");
+       hMult2->GetYaxis()->SetTitle("Counts");
+     } else {
+       if(npaddles<202){
+	 //LAND detector
+	 
+	 hMult1 = new TH1F("Multiplicity1","Paddle multiplicity if two Pms have fired",20,-0.5,19.5);
+	 hMult1->GetXaxis()->SetTitle("Multiplicity");
+	 hMult1->GetYaxis()->SetTitle("Counts");
+	 
+	 hMult2 = new TH1F("Multiplicity2","Paddle multiplicity if one PM has fired",20,-0.5,19.5);
+	 hMult2->GetXaxis()->SetTitle("Multiplicity");
+	 hMult2->GetYaxis()->SetTitle("Counts");
+       }
+       else if(npaddles>202){
+	 //Neuland detector
+	 
+	 hMult1 = new TH1F("Multiplicity1","Paddle multiplicity",100,0.,100.);
+	 hMult1->GetXaxis()->SetTitle("Multiplicity");
+	 hMult1->GetYaxis()->SetTitle("Counts");
+	 
+	 hMult2 = new TH1F("Multiplicity2","Paddle multiplicity",100,0.,100.);
+	 hMult2->GetXaxis()->SetTitle("Multiplicity");
+	 hMult2->GetYaxis()->SetTitle("Counts");
+       }
+     }
+     return kSUCCESS;
 
 }
 
@@ -199,15 +211,19 @@ void R3BLandDigitizer::Exec(Option_t* opt)
 // time resolution of the scintillator in sigma
    eventNo=eventNo+1;
    Double_t timeRes;
-   if(npaddles<202){
-      //LAND detector
-      timeRes = 0.25;//ns
-   }
-   else if(npaddles>201){
-      //NeuLAND detector
+   if(fLandDigiPar->GetGeometryFileName().Contains("proto")) {
+     //NeuLAND prototype
      timeRes = 0.15;//ns  
+   } else {
+     if(npaddles<202){
+       //LAND detector
+       timeRes = 0.25;//ns
+     } else if(npaddles>201){
+       //NeuLAND detector
+       timeRes = 0.15;//ns  
+     }
    }
-
+   
 // light attenuation of plastic scintillator
 //   att = 0.005; // in [1/cm]
    att = 0.008; // in [1/cm]

@@ -430,14 +430,22 @@ void R3BLand::ConstructGeometry()
     Int_t maxPlane;
     Int_t maxPaddle;
     maxPlane = (Int_t) (bbbox->GetDZ() / bbox->GetDZ());
-    if(fileName.Contains("neuland")) {
+    if(fileName.Contains("neuland_proto")) {
+      maxPaddle = (Int_t) ( maxPlane * ((Int_t)(bbbox->GetDX()/bbox->GetDY())) );
+    } else if(fileName.Contains("neuland")) {
       maxPaddle = (Int_t) ( maxPlane * ((Int_t)(box->GetDX()/bbox->GetDY())) );
     } else {
       maxPaddle = (Int_t) ( maxPlane * ((Int_t)(box->GetDX()/box->GetDY())) );
     }
+//     cout << box->GetDX() << "   " << box->GetDY() << "   " << box->GetDZ() << endl;
+//     cout << bbox->GetDX() << "   " << bbox->GetDY() << "   " << bbox->GetDZ() << endl;
+//     cout << bbbox->GetDX() << "   " << bbbox->GetDY() << "   " << bbbox->GetDZ() << endl;
+//     cout << maxPlane << endl;
+//     cout << maxPaddle << endl;
     FairRun *fRun = FairRun::Instance();
     FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
     R3BLandDigiPar* par=(R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
+    par->SetGeometryFileName(GetGeometryFileName());
     par->SetMaxPaddle(maxPaddle);
     par->SetMaxPlane(maxPlane);
     par->SetPaddleLength(box->GetDX());
