@@ -299,9 +299,9 @@ void R3BLandDigitizer::Exec(Option_t* opt)
       R3BMCTrack *aTrack = (R3BMCTrack*) fLandMCTrack->At(TrackId);      
       Int_t PID = aTrack->GetPdgCode();
                 
-//      Double_t x = (xIn+xOut)/2.;
-//      Double_t y = (yIn+yOut)/2.;
-//      Double_t z = (zIn+zOut)/2.;
+//       Double_t x = (xIn+xOut)/2.;
+//       Double_t y = (yIn+yOut)/2.;
+//       Double_t z = (zIn+zOut)/2.;
 
       Double_t x = xIn;
       Double_t y = yIn;
@@ -370,7 +370,7 @@ void R3BLandDigitizer::Exec(Option_t* opt)
          gGeoManager->CdUp();
          TGeoNode* curNode1 = gGeoManager->GetCurrentNode();
    
-         //cout << "Node: "  << curNode1->GetName() << "  " << paddle <<  endl;
+//          cout << "Node: "  << curNode1->GetName() << "  " << paddle <<  endl;
 	 
          Double_t local_point[3];
          Double_t global_point[3];
@@ -379,8 +379,8 @@ void R3BLandDigitizer::Exec(Option_t* opt)
          local_point[2]=0.;
          gGeoManager->LocalToMaster(local_point, global_point);
 
-//         cout<<"test "<< global_point[0] << "  " << global_point[1] << 
-//               "  " << global_point[2] << endl;
+//          cout<<"test "<< global_point[0] << "  " << global_point[1] << 
+// 	   "  " << global_point[2] << endl;
       
          xpaddle[paddle] = global_point[0];
          ypaddle[paddle] = global_point[1];
@@ -392,31 +392,43 @@ void R3BLandDigitizer::Exec(Option_t* opt)
     
 //         cout<<"paddle "<<paddle<<"  "<<(int)(((paddle-1)/40.))/2.<<"  "<<(int)((int)(((paddle-1)/40.))/2.)<<endl;
 
-//	 if(paddle > (npaddles-1)/2) {
-         if((int)(((paddle-1)/paddle_per_plane))/2.==(int)((int)(((paddle-1)/paddle_per_plane))/2.)){
-	    // horizontal paddles
-	    PM_res[paddle][m].Ltime = time+(plength-x)/cMedia;
-            PM_res[paddle][m].LlightCFD = light*exp(-att*(plength-x));
-            PM_res[paddle][m].LlightQDC = light*exp(-att*(plength-x));
 
-	    PM_res[paddle][m].Rtime = time+(plength+x)/cMedia;
-            PM_res[paddle][m].RlightCFD = light*exp(-att*(plength+x));
-            PM_res[paddle][m].RlightQDC = light*exp(-att*(plength+x));
-//             cout<<"horizontal paddle "<< PM_res[paddle][m].LlightCFD<<
+	 if(fLandDigiPar->GetGeometryFileName().Contains("proto")) {
+	   // vertical paddles
+	   PM_res[paddle][m].Ltime = time+(plength-y)/cMedia;
+	   PM_res[paddle][m].LlightCFD = light*exp(-att*(plength-y));
+	   PM_res[paddle][m].LlightQDC = light*exp(-att*(plength-y));
+	   
+	   PM_res[paddle][m].Rtime = time+(plength+y)/cMedia;
+	   PM_res[paddle][m].RlightCFD = light*exp(-att*(plength+y));
+	   PM_res[paddle][m].RlightQDC = light*exp(-att*(plength+y));
+	 } else {
+	   if(paddle > (npaddles-1)/2) {
+	     if((int)(((paddle-1)/paddle_per_plane))/2.==(int)((int)(((paddle-1)/paddle_per_plane))/2.)) {
+	       // horizontal paddles
+	       PM_res[paddle][m].Ltime = time+(plength-x)/cMedia;
+	       PM_res[paddle][m].LlightCFD = light*exp(-att*(plength-x));
+	       PM_res[paddle][m].LlightQDC = light*exp(-att*(plength-x));
+	       
+	       PM_res[paddle][m].Rtime = time+(plength+x)/cMedia;
+	       PM_res[paddle][m].RlightCFD = light*exp(-att*(plength+x));
+	       PM_res[paddle][m].RlightQDC = light*exp(-att*(plength+x));
+// 	       cout<<"horizontal paddle "<< PM_res[paddle][m].LlightCFD<<
 //	     "  "<<PM_res[paddle][m].RlightCFD <<endl;
-         }
-	 else {
-	    // vertical paddles
-	    PM_res[paddle][m].Ltime = time+(plength-y)/cMedia;
-            PM_res[paddle][m].LlightCFD = light*exp(-att*(plength-y));
-            PM_res[paddle][m].LlightQDC = light*exp(-att*(plength-y));
-
-	    PM_res[paddle][m].Rtime = time+(plength+y)/cMedia;
-            PM_res[paddle][m].RlightCFD = light*exp(-att*(plength+y));
-            PM_res[paddle][m].RlightQDC = light*exp(-att*(plength+y));
+	     } else {
+	       // vertical paddles
+	       PM_res[paddle][m].Ltime = time+(plength-y)/cMedia;
+	       PM_res[paddle][m].LlightCFD = light*exp(-att*(plength-y));
+	       PM_res[paddle][m].LlightQDC = light*exp(-att*(plength-y));
+	       
+	       PM_res[paddle][m].Rtime = time+(plength+y)/cMedia;
+	       PM_res[paddle][m].RlightCFD = light*exp(-att*(plength+y));
+	       PM_res[paddle][m].RlightQDC = light*exp(-att*(plength+y));
 //             cout<<"vertical paddle"<< PM_res[paddle][m].LlightCFD<<
 //	     "  "<<PM_res[paddle][m].RlightCFD<<endl;
-         }
+	     }
+	   }
+	 }
 
       }//! eloss	 
            
@@ -598,22 +610,30 @@ void R3BLandDigitizer::Exec(Option_t* opt)
          QDC_temp[mult1] = sqrt(lightl*lightr)*exp((2.*plength)*att/2.);
 //	 cout << "QDC " <<  QDC_temp[mult1] << endl;	 
          TDC_temp[mult1] = (tofl + tofr) / 2. - plength/cMedia;
-	 
-//	 if(i > (npaddles-1)/2) {
-         if((int)(((i-1)/paddle_per_plane))/2.==(int)((int)(((i-1)/paddle_per_plane))/2.)){
-	    //horizontal paddles
-	    xpos_temp[mult1] = (tofr - tofl)/2.*cMedia;
-	    ypos_temp[mult1] = ypaddle[i];	    
-	    zpos_temp[mult1] = zpaddle[i];
+
+
+	 if(fLandDigiPar->GetGeometryFileName().Contains("proto")) {
+	   // vertical paddles
+	   xpos_temp[mult1] = xpaddle[i];
+	   ypos_temp[mult1] = (tofr - tofl)/2.*cMedia;	    
+	   zpos_temp[mult1] = zpaddle[i];
+	 } else {
+	   if(i > (npaddles-1)/2) {
+	     if((int)(((i-1)/paddle_per_plane))/2.==(int)((int)(((i-1)/paddle_per_plane))/2.)){
+	       //horizontal paddles
+	       xpos_temp[mult1] = (tofr - tofl)/2.*cMedia;
+	       ypos_temp[mult1] = ypaddle[i];	    
+	       zpos_temp[mult1] = zpaddle[i];
 //	    cout << "delta tof x " << (tofl - tofr) << endl; 
-         }
-	 else {
-	    // vertical paddles
-	    xpos_temp[mult1] = xpaddle[i];
-	    ypos_temp[mult1] = (tofr - tofl)/2.*cMedia;	    
-	    zpos_temp[mult1] = zpaddle[i];
+	     } else {
+	       // vertical paddles
+	       xpos_temp[mult1] = xpaddle[i];
+	       ypos_temp[mult1] = (tofr - tofl)/2.*cMedia;	    
+	       zpos_temp[mult1] = zpaddle[i];
 //	    cout << "delta tof y " << (tofl - tofr) << endl; 
-         }
+	     }
+	   }
+	 }
 	 
          // Here is an example how to fill the R3BLandDigi structure
          Double_t tdcL = tofl;
