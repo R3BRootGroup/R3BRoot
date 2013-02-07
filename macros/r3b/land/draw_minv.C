@@ -15,15 +15,15 @@ void plot_minv_tn()
   h_minv_4n->SetLineColor(4);
   // h_minv_4n->Rebin(2);
   h_minv_4n->GetXaxis()->SetRangeUser(0., 1.);
-  // h_minv_4n->GetYaxis()->SetRangeUser(0., 1000.);
+//   h_minv_4n->GetYaxis()->SetRangeUser(0., 440.);
 
-  TF1 *f1 = new TF1("f1", "gaus", 0.1 - 3*0.035, 0.1 + 2*0.035);
+  TF1 *f1 = new TF1("f1", "gaus", 0.1 - 2.5*0.035, 0.1 + 2.*0.035);
   f1->FixParameter(1, 0.1);
   h_minv_4n->Fit(f1, "NR+");
   cout << f1->GetParameter(1) << "  +-  " << f1->GetParError(1) << endl;
   cout << f1->GetParameter(2) << "  +-  " << f1->GetParError(2) << endl;
 
-  TF1 *f2 = new TF1("f2", "[0]*exp(-[1]*x)", 0.1 + 2*0.035, 1.);
+  TF1 *f2 = new TF1("f2", "[0]*exp(-[1]*x)", 0.1 + 2.*0.035, 1.);
   f2->SetLineColor(4);
   h_minv_4n->Fit(f2, "NR+");
   cout << f2->GetParameter(0) << "  +-  " << f2->GetParError(0) << endl;
