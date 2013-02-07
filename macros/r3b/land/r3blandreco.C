@@ -10,7 +10,7 @@ void r3blandreco(Int_t beamE, Int_t nn, Int_t erel, Int_t d)
   TString digiFile  = TString(strDir) + "/r3bcalibr." + TString(str) + ".root";
   TString parFile  = TString(strDir) + "/r3bpar." + TString(str) + ".root";
   TString calibrFile  = TString(strDir) + "/r3bcalibr." + TString(str2) + ".txt";
-  TString outFile  = TString(strDir) + "/r3breco." + TString(str) + ".old.root";
+  TString outFile  = TString(strDir) + "/r3breco." + TString(str) + ".root";
   // ---------------------------------------------------------------------------
 
 
