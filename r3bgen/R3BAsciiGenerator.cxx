@@ -124,7 +124,11 @@ Bool_t R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen) {
       // Ion case ( iPid = -1 )
       if ( iPid < 0 ) {
 	  char ionName[20];
-	  sprintf(ionName, "Ion_%d_%d", iA, iZ);
+	  if(1 == iZ && 2 == iA) {
+	    sprintf(ionName, "Deuteron");
+	  } else {
+	    sprintf(ionName, "Ion_%d_%d", iA, iZ);
+	  }
 	  TParticlePDG* part = fPDG->GetParticle(ionName);
 	  if ( ! part ) {
 	      cout << "-W- R3BAsciiGenerator::ReadEvent: Cannot find "
@@ -202,7 +206,7 @@ Int_t R3BAsciiGenerator::RegisterIons() {
       // Ion Case
       if ( iPid < 0 ) {
 	char buffer[20];
-	sprintf(buffer, "Ion_%d_%d", iA, iZ);
+ 	sprintf(buffer, "Ion_%d_%d", iA, iZ);
 	TString ionName(buffer);
 	if ( fIonMap.find(ionName) == fIonMap.end() ) {
 	  //FairIon* ion = new FairIon(ionName, iZ, iA, iZ);
