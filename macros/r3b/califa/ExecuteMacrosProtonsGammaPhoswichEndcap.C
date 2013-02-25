@@ -6,22 +6,22 @@
 
 #Put the proper paths according to the user 
 
-export SIMPATH=/home/josesrs/fairsoft_sept2012_externalPackages
-#export ROOTSYS=/home/josesrs/fairsoft/tools/root
-export ROOTSYS=/home/josesrs/fairsoft_sept2012_externalPackages
+export SIMPATH=/home/jose/fairsoft_sept2012_externalpackages
+#export ROOTSYS=/home/jose/fairsoft/tools/root
+export ROOTSYS=/home/jose/fairsoft_sept2012_externalpackages
 export PATH=$ROOTSYS/bin:$PATH
 
-export VMCWORKDIR=/home/josesrs/r3broot_sept2012
+export VMCWORKDIR=/home/jose/r3broot_sept_2013
 
 . $ROOTSYS/bin/thisroot.sh
 
-cd /home/josesrs/r3broot_sept2012/build/
+cd /home/jose/r3broot_sept_2013/build/
 
 cmake ../
 . ./config.sh
 make
 
-cd /home/josesrs/r3broot_sept2012/macros/r3b/califa/
+cd /home/jose/r3broot_sept_2013/macros/r3b/califa/
 
 #rm -rf *.dat *.out
 
@@ -29,11 +29,11 @@ cd /home/josesrs/r3broot_sept2012/macros/r3b/califa/
 
 #root -l r3bsim.C
 
-root -l r3bsim_Protons_50MeV.C -q
-root -l eventDisplay_Protons_50MeV.C
+#root -l r3bsim_Protons_50MeV.C -q
+#root -l eventDisplay_Protons_50MeV.C
 
-root -l califaAna_Protons_50MeV.C -q
-root -l checkResults_Protons_50MeV.C -q
+#root -l califaAna_Protons_50MeV.C -q
+#root -l checkResults_Protons_50MeV.C -q
 
 
 
@@ -48,11 +48,11 @@ root -l checkResults_Protons_50MeV.C -q
 
 #For gamma radiation:
 
-#root -l r3bsim_Gamma_0_5MeV.C -q
-#root -l eventDisplay_Gamma_50MeV.C
+root -l r3bsim_Gamma_0_5MeV.C -q
+root -l eventDisplay_Gamma_0_5MeV.C
 
-#root -l califaAna_Gamma_0_5MeV.C -q
-#root -l checkResults_Gamma_0_5MeV.C -q
+root -l califaAna_Gamma_0_5MeV.C -q
+root -l checkResults_Gamma_0_5MeV.C 
 
 
 
