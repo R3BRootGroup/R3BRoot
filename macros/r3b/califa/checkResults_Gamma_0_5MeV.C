@@ -46,17 +46,18 @@ using std::ios;
 
 	
 	//SETTINGS 
-	char calVersion[50] = "7.07+7.17";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.??)
+	//char calVersion[50] = "7.07+7.17";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.??)
+	char calVersion[50] = "8.00";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.??)
 
 	//char calVersion[50] = "7.09+7.17";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.??)
 	
 	//char calVersion[50] = "7.07+7.17";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.??)
 
 	
-	Double_t Eproj = 0.500;              //Gamma Energy in projectile frame in MeV 
+	//Double_t Eproj = 0.500;              //Gamma Energy in projectile frame in MeV 
 
-	//Double_t Eproj = 10.0;              //Gamma Energy in projectile frame i
-	Int_t totalEvents = 10000;        //Events
+	Double_t Eproj = 0.5;              //Gamma Energy in projectile frame i
+	Int_t totalEvents = 3000;        //Events
 	Int_t multiplicity = 1;           //Multiplicity (particles per event)
 	
 	Double_t threshold=0.050;		  //Threshold in MeV
@@ -70,15 +71,15 @@ using std::ios;
 
 	//TString title0 = "califaAna.root";
 	//TString title1 =    "r3bsim.root";
-	sprintf(title0,"%s","/home/jose/r3broot_sept2012/macros/r3b/califa/califaAna_Gamma_0_5MeV.root");  
- 	sprintf(title1,"%s","/home/jose/r3broot_sept2012/macros/r3b/califa/r3bsim_Gamma_0_5MeV.root");  	
+	sprintf(title0,"%s","/home/jose/r3broot_sept_2013/macros/r3b/califa/califaAna_Gamma_0_5MeV.root");  
+ 	sprintf(title1,"%s","/home/jose/r3broot_sept_2013/macros/r3b/califa/r3bsim_Gamma_0_5MeV.root");  	
 	TFile *file0 = TFile::Open(title0);
 	TFile *file1 = TFile::Open(title1);
 	
 
-	Double_t beta=0.819;
+	//Double_t beta=0.819;
 
-	//Double_t beta=0.0;
+	Double_t beta=0.0;
 
 	
 	//END OF THE SETTING AREA
@@ -154,10 +155,18 @@ using std::ios;
 		BARREL=kTRUE;		
 		ENDCAP=kTRUE;
 	}
-	else if(!strcmp(calVersion,"8.00")){
-		cout << "Using CALIFA version 8.00 "<< endl;
-		minThetaBarrel= 0.;  //Angular coverture of CALIFA 8.0
-		maxThetaBarrel= 0.; //Angular coverture of CALIFA 8.0
+
+		
+		
+		else if(!strcmp(calVersion,"8.00")){
+		cout << "Using CALIFA version 8.00 "<< endl;  //Use CLF811_Geometry.geo (only barrel) or CLF811_PhoswichEndcap_6.geo (Barrel + endcap)
+		minThetaBarrel= 43.;  //Angular coverture of CALIFA 8.0
+		maxThetaBarrel= 150.; //Angular coverture of CALIFA 8.0
+		
+		minThetaEndCap= 6;  //Angular coverture of ENDCAP 7.17
+		maxThetaEndCap= /*42.61*/43; //Angular coverture of ENDCAP 7.17    (As well for CLF717_Geometry_PhoswichEndcap_2.geo)
+
+		
 		BARREL=kTRUE;
 		ENDCAP=kTRUE;
 	}
@@ -580,17 +589,94 @@ using std::ios;
 
 
 
-        TFile f_0_5MeV("/home/jose/r3broot_sept2012/macros/r3b/califa/hist_Endcap21_0_5MeV.root", "recreate");
+        TFile f_0_5MeV("/home/jose/r3broot_sept_2013/macros/r3b/califa/hist_Endcap21_0_5MeV.root", "recreate");
 	f_0_5MeV->cd();
-	if(h3_T){h3_T->Write();}
+	/*if(h3_T){h3_T->Write();}
 	if(h2_CC_endcap){h2_CC_endcap->Write();}
 	if(h3_Cry_endcap){h3_Cry_endcap->Write();}
 	if(h2_Cal_endcap){h2_Cal_endcap->Write();}
 	if(h2_Cal){h2_Cal->Write();}
 	if(h5_Cal_RhoTheta_endcap){h5_Cal_RhoTheta_endcap->Write();}
 	if(h5_Cal_RhoPhi_endcap){h5_Cal_RhoPhi_endcap ->Write();}
-	if(h5_Cal_ThetaPhi_endcap){h5_Cal_ThetaPhi_endcap->Write();}
+	if(h5_Cal_ThetaPhi_endcap){h5_Cal_ThetaPhi_endcap->Write();}*/
+;
 
+	if(h1_T){h1_T->Write();}
+	if(h2_T){h2_T->Write();}
+	if(h3_T){h3_T->Write();}
+	if(h4_T){h4_T->Write();}
+
+
+	if(h1_Cry){h1_Cry->Write();}
+	if(h1_Cry_count){h1_Cry_count->Write();}
+	if(h2_Cry){h2_Cry->Write();}
+	if(h3_Cry){h3_Cry->Write();}
+	if(h4_Cry){h4_Cry->Write();}
+
+	if(h1_Cal){h1_Cal->Write();}
+	if(h2_Cal){h2_Cal->Write();}
+	if(h3_Cal){h3_Cal->Write();}
+	if(h4_Cal){h4_Cal->Write();}
+
+	if(h1_TMul){h1_TMul->Write();}
+	if(h1_CryMul){h1_CryMul->Write();}
+	if(h1_CalMul){h1_CalMul->Write();}
+
+	if(h2_CC){h2_CC->Write();}
+	if(h3_CC){h3_CC->Write();}
+	if(h4_CC){h2_CC->Write();}
+
+	if(h2_CC2){h2_CC2->Write();}
+	if(h3_CC2){h3_CC2->Write();}
+	if(h4_CC2){h2_CC2->Write();}
+	if(h1_EF){h1_EF->Write();}
+//barrel
+
+	if(h1_Cry_barrel){h1_Cry_barrel->Write();}
+	if(h1_Cry_count_barrel){h1_Cry_count_barrel->Write();}
+	if(h2_Cry_barrel){h2_Cry_barrel->Write();}
+	if(h3_Cry_barrel){h3_Cry_barrel->Write();}
+	if(h4_Cry_barrel){h4_Cry_barrel->Write();}
+
+
+	if(h1_Cal_barrel){h1_Cal_barrel->Write();}
+	if(h2_Cal_barrel){h2_Cal_barrel->Write();}
+	if(h3_Cal_barrel){h3_Cal_barrel->Write();}
+	if(h4_Cal_barrel){h4_Cal_barrel->Write();}
+
+
+
+	if(h1_TMul_barrel){h1_TMul_barrel->Write();}
+	if(h1_CryMul_barrel){h1_CryMul_barrel->Write();}
+	if(h1_CalMul_barrel){h1_CalMul_barrel->Write();}
+	if(h2_CC_barrel){h2_CC_barrel->Write();}
+	if(h3_CC_barrel){h3_CC_barrel->Write();}
+	if(h4_CC_barrel){h4_CC_barrel->Write();}
+
+//endcap
+
+	if(h1_Cry_endcap){h1_Cry_endcap->Write();}
+	if(h1_Cry_count_endcap){h1_Cry_count_endcap->Write();}
+	if(h2_Cry_endcap){h2_Cry_endcap->Write();}
+	if(h3_Cry_endcap){h3_Cry_endcap->Write();}
+	if(h4_Cry_endcap){h4_Cry_endcap->Write();}
+
+
+	if(h1_Cal_endcap){h1_Cal_endcap->Write();}
+	if(h2_Cal_endcap){h2_Cal_endcap->Write();}
+	if(h3_Cal_endcap){h3_Cal_endcap->Write();}
+	if(h4_Cal_endcap){h4_Cal_endcap->Write();}
+
+
+
+	if(h1_TMul_endcap){h1_TMul_endcap->Write();}
+	if(h1_CryMul_endcap){h1_CryMul_endcap->Write();}
+	if(h1_CalMul_endcap){h1_CalMul_endcap->Write();}
+	if(h2_CC_endcap){h2_CC_endcap->Write();}
+	if(h3_CC_endcap){h3_CC_endcap->Write();}
+	if(h4_CC_endcap){h4_CC_endcap->Write();}
+	
+	
 	
 
 	TCanvas* c1 = new TCanvas("MCTrack","MCTrack",0,0,720,900);

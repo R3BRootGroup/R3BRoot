@@ -26,7 +26,7 @@
 
 
 
-void r3ball_Gamma_0_5MeV( Int_t nEvents = 10000,
+void r3ball_Gamma_0_5MeV( Int_t nEvents = 3000,
 	    TObjArray& fDetList,
 	    TString Target = "LeadTarget",
 		Bool_t fVis=kFALSE,
@@ -244,7 +244,9 @@ void r3ball_Gamma_0_5MeV( Int_t nEvents = 10000,
 	  // ...
 
 
-	 ((R3BCalo *)calo)->SelectGeometryVersion(5);
+	((R3BCalo *)calo)->SelectGeometryVersion(10);
+
+	 //((R3BCalo *)calo)->SelectGeometryVersion(5);
 	//((R3BCalo *)calo)->SelectGeometryVersion(4);
 
  	//((R3BCalo *)calo)->SelectGeometryVersion(6);
@@ -499,7 +501,7 @@ void r3ball_Gamma_0_5MeV( Int_t nEvents = 10000,
 	
 	//Double_t theta1= 6.;  // polar angle distribution. Tira.
 	//Double_t theta2= 40.;	
-	//Double_t momentum=0.01; // 0.010 GeV/c = 10 MeV/c 
+	Double_t momentum=0.0005; // 0.010 GeV/c = 10 MeV/c 
 	//Double_t momentum=0.808065; // 0.808065 GeV/c (300MeV Kin Energy for protons) 
 	//Double_t momentum=0.31016124; // 0.31016124 GeV/c (50MeV Kin Energy for protons)
 	//Double_t momentum=0.4442972; // 0.4442972 GeV/c (100MeV Kin Energy for protons)
@@ -515,9 +517,9 @@ void r3ball_Gamma_0_5MeV( Int_t nEvents = 10000,
 	//gammasGen->SetXYZ(0.0,0.0,-1.5);
 	//gammasGen->SetXYZ(0.0,0.0,0);
 	gammasGen->SetBoxXYZ(-0.1,0.1,-0.1,0.1,-0.1,0.1);
-	gammasGen->SetLorentzBoost(0.8197505718204776); //beta=0.81975 for 700 A MeV
+	//gammasGen->SetLorentzBoost(0.8197505718204776); //beta=0.81975 for 700 A MeV
 
-	//gammasGen->SetLorentzBoost(0.0); //beta=0.81975 for 700 A MeV  LO PONGO YO
+	gammasGen->SetLorentzBoost(0.0); //beta=0.81975 for 700 A MeV  LO PONGO YO
 
 
 	// add the gamma generator

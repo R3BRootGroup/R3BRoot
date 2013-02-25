@@ -11,7 +11,7 @@
 //--------------------------------------------------------------------
 
 
-Int_t r3bsim_Gamma_0_5MeV(Double_t momentum=0.0005,  Int_t nEvents = 50000,  TString OutFile = "r3bsim_Gamma_0_5MeV.root", TString ParFile = "r3bpar_Gamma_0_5MeV.root" ){
+Int_t r3bsim_Gamma_0_5MeV(Double_t momentum=0.0005,  Int_t nEvents = 3000,  TString OutFile = "r3bsim_Gamma_0_5MeV.root", TString ParFile = "r3bpar_Gamma_0_5MeV.root" ){
 
    // Load the Main Simulation macro
    gROOT->LoadMacro("r3ball_Gamma_0_5MeV.C");

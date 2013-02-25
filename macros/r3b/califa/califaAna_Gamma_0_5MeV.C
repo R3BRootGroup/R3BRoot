@@ -16,7 +16,7 @@
 
 //  -------------------------------------------------------------------------
 
-void califaAna_Gamma_0_5MeV(Int_t nEvents = 10000 , 
+void califaAna_Gamma_0_5MeV(Int_t nEvents = 3000 , 
 		TString file_r3bsim    = "r3bsim_Gamma_0_5MeV.root",
 		TString file_r3bpar    = "r3bpar_Gamma_0_5MeV.root",
 		TString file_califaAna = "califaAna_Gamma_0_5MeV.root"
@@ -108,9 +108,9 @@ void califaAna_Gamma_0_5MeV(Int_t nEvents = 10000 ,
 	// ...
 
 
-	//caloHF->SelectGeometryVersion(5);          
+	caloHF->SelectGeometryVersion(10);          
 
-	caloHF->SelectGeometryVersion(5);  
+	//caloHF->SelectGeometryVersion(5);  
 	caloHF->SetDetectionThreshold(0.000050);//50 KeV
 	caloHF->SetExperimentalResolution(5.);  //5% at 1 MeV
 	caloHF->SetAngularWindow(3.2,3.2);      //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
