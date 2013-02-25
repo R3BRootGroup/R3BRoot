@@ -1026,6 +1026,9 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
 
     }
   } else if (fGeometryVersion==10) {
+  
+  
+  if (iD<3000){
     //The present scheme here done works with 8.11
     // crystalType = alveolus type (from 1 to 17)   [Basically the alveolus number]
     // crystalCopy = alveolus copy * 4 + crystals copy +1 (from 1 to 128)  [Not exactly azimuthal]
@@ -1138,7 +1141,43 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
     local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
     currentNode->LocalToMaster(local, master);
 		
-  } else cout << "-E- R3BCaloHitFinder: Geometry version not available in R3BCalo::ProcessHits(). " << endl;
+  }  
+
+//}
+else{//For IEM LaBr - LaCl phoswich endcap 
+
+Char_t nameVolume[200];
+ crystalType = ((iD-3000)%30) + 1;
+  crystalCopy = (iD-3000)/30 + 1;
+ Int_t alveoliType[30]={1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13,14,14,15,15};
+      //Char_t nameVolume[200];
+      sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_EC_%i_%i/CrystalWithWrapping_%i_1/Crystal_%i_1",
+              alveoliType[crystalType-1], crystalCopy-1, crystalType, crystalType);
+
+      gGeoManager->cd(nameVolume);
+      TGeoNode* currentNode = gGeoManager->GetCurrentNode();
+      currentNode->LocalToMaster(local, master);
+
+      sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_EC_%i_%i/CrystalWithWrapping_%i_1",
+              alveoliType[crystalType-1], crystalCopy-1, crystalType);
+
+      gGeoManager->cd(nameVolume);
+      currentNode = gGeoManager->GetCurrentNode();
+      local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
+      currentNode->LocalToMaster(local, master);
+
+      sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_EC_%i_%i",alveoliType[crystalType-1], crystalCopy-1);
+      gGeoManager->cd(nameVolume);
+      currentNode = gGeoManager->GetCurrentNode();
+      local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
+      currentNode->LocalToMaster(local, master);
+
+      sprintf(nameVolume, "/cave_1/CalifaWorld_0");
+      gGeoManager->cd(nameVolume);
+      currentNode = gGeoManager->GetCurrentNode();
+      local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
+      currentNode->LocalToMaster(local, master);
+      } }else cout << "-E- R3BCaloHitFinder: Geometry version not available in R3BCalo::ProcessHits(). " << endl;
 
 
   //cout << "-I- R3BCaloHitFinder::GetAngles: position of crystal center: "<<master[0] << ", "<<master[1] << ", "<<master[2] << endl;
@@ -1147,9 +1186,8 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
   *polar=masterV.Theta();
   *azimuthal=masterV.Phi();
   *rho=masterV.Mag();
-  //cout << "-I- R3BCaloHitFinder::GetAngles: theta: "<< *polar <<", phi: "<< *azimuthal << "for crystal iD " << iD <<endl;
-}
-
+}      
+      
 
 
 // -----   Private method ExpResSmearing  --------------------------------------------
