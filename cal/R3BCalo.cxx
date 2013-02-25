@@ -167,7 +167,7 @@ void R3BCalo::Initialize()
 	//   The first 15 rings are made of 32 alveoli of 4 crystals each. The last ring are made of 32
   //   alveoli of 1 crystal each. There are 16 alveoli along the polar angle for a total of 32x16=512
   //   alveoli and 32x15x4+32=1952 crystals. There are 11 (actually 5x2+1) different crystal shapes:
-	//
+	//It is adapted to the IEM-CSIC Madrid LaBr3-LaCl3 Phoswich Endcap (CLF717_Geometry_PhoswichEndcap_6.geo)
 
 
   //HAPOL TODO -> Check the VolId() datamember to assign dinamically different crystal logical
@@ -357,6 +357,9 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
         cout << "-E- R3BCalo: Wrong crystal number in geometryVersion 6 (endcap). " << endl;
     }
   } else if (fGeometryVersion==10) {
+  
+  
+  if (GetAlveolusType(volIdSupAlv)!=-1) {
     //The present scheme here done works with 8.11
     // crystalType = alveolus type (from 1 to 17)   [Basically the alveolus number]
     // crystalCopy = alveolus copy * 4 + crystals copy +1 (from 1 to 128)  [Not exactly azimuthal]
@@ -376,6 +379,23 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
 		}
 		if (crystalType>16 || crystalType<1 || crystalCopy>128 || crystalCopy<1 || crystalId>1952 || crystalId<1)
 			cout << "-E- R3BCalo: Wrong crystal number in geometryVersion 10. " << endl;
+			
+			
+	//} else{
+	
+	}else {  //For IEM LaBr - LaCl phoswich endcap 
+	sscanf(bufferName,"%*8c %d",&crysNum);
+      crystalType = crysNum;
+      //crystalType = cpCry+1;
+      crystalCopy = cpAlv+1;
+      /*crystalId = 3000 + cpAlv*23 + (crystalType-1);In the case of IEM LaBr - LaCl phoswich endcap: */crystalId = 3000 + cpAlv*30 + (crystalType-1);
+      /*if (crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736) For IEM LaBr - LaCl phoswich endcap:*/if (crystalType>30 || crystalType<1 ||
+      crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>4800)
+        cout << "-E- R3BCalo: Wrong crystal number in geometryVersion 10 (endcap). " << endl;
+    }		
+			
+			
+			
   } else cout << "-E- R3BCalo: Geometry version not available in R3BCalo::ProcessHits(). " << endl;
 	
   if (fVerboseLevel>1)
@@ -3706,7 +3726,7 @@ TGeoMedium * pWrappingMedium=NULL;
 
   //finally the v7.05 code
 
-#include "perlScripts/CALIFA.geo"
+//#include "perlScripts/CALIFA.geo"
 
 //........
 
@@ -3722,6 +3742,10 @@ TGeoMedium * pWrappingMedium=NULL;
 //#include "perlScripts/CLF717_Geometry_PhoswichEndcap_4.geo" // If we want the IEM phoswich endcap with the barrel CLF811. J.Sanchez del Rio Saez
 
 //#include "perlScripts/CLF717_Geometry_PhoswichEndcap_5.geo" // If we want the IEM phoswich endcap with the barrel CLF709. J.Sanchez del Rio Saez
+
+#include "perlScripts/CLF811_Geometry_PhoswichEndcap_6.geo"
+
+
 
 
 }
