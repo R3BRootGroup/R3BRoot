@@ -12,7 +12,7 @@
 
 
 
-Int_t r3bsim_Protons_50MeV(Double_t momentum=0.31016124,  Int_t nEvents =30000,  TString OutFile = "r3bsim_Protons_50MeV.root", TString ParFile = "r3bpar_Protons_50MeV.root" ){
+Int_t r3bsim_Protons_50MeV(Double_t momentum=0.31016124,  Int_t nEvents =1000,  TString OutFile = "r3bsim_Protons_50MeV.root", TString ParFile = "r3bpar_Protons_50MeV.root" ){
 
    // Load the Main Simulation macro
    gROOT->LoadMacro("r3ball_Protons_50MeV.C");

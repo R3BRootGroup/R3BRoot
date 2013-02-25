@@ -51,14 +51,16 @@ using std::ios;
 	
 	//SETTINGS 
 	//char calVersion[50] = "7.09+7.17";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.??)
-	char calVersion[50] = "7.17"; 
+	char calVersion[50] = "8.00";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.??)
+
+	//char calVersion[50] = "7.17"; 
 	//char calVersion[50] = "7.07+7.17";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.??)
 	//Double_t Eproj = 0.500;              //Gamma Energy in projectile frame in MeV 
 	
 	Double_t Eproj = 50; 
 
 	//Double_t Eproj = 10.0;              //Gamma Energy in projectile frame i
-	Int_t totalEvents = 10000;        //Events
+	Int_t totalEvents = 1000;        //Events
 	Int_t multiplicity = 1;           //Multiplicity (particles per event)
 	
 	Double_t threshold=0.050;		  //Threshold in MeV
@@ -74,8 +76,8 @@ using std::ios;
 
 	//TString title0 = "califaAna.root";
 	//TString title1 =    "r3bsim.root";
-	sprintf(title0,"%s","/home/jose/r3broot_sept2012/macros/r3b/califa/califaAna_Protons_50MeV.root");  
- 	sprintf(title1,"%s","/home/jose/r3broot_sept2012/macros/r3b/califa/r3bsim_Protons_50MeV.root");  	
+	sprintf(title0,"%s","/home/jose/r3broot_sept_2013/macros/r3b/califa/califaAna_Protons_50MeV.root");  
+ 	sprintf(title1,"%s","/home/jose/r3broot_sept_2013/macros/r3b/califa/r3bsim_Protons_50MeV.root");  	
 	//sprintf(title0,"%s","/home/jose/r3broot_sept2012/macros/r3b/califa/califaAna_Gamma_0_5MeV.root");  
  	//sprintf(title1,"%s","/home/jose/r3broot_sept2012/macros/r3b/califa/r3bsim_Gamma_0_5MeV.root"); 
 
@@ -168,9 +170,14 @@ using std::ios;
 		ENDCAP=kTRUE;
 	}
 	else if(!strcmp(calVersion,"8.00")){
-		cout << "Using CALIFA version 8.00 "<< endl;
-		minThetaBarrel= 0.;  //Angular coverture of CALIFA 8.0
-		maxThetaBarrel= 0.; //Angular coverture of CALIFA 8.0
+		cout << "Using CALIFA version 8.00 "<< endl;  //Use CLF811_Geometry.geo (only barrel) or CLF811_PhoswichEndcap_6.geo (Barrel + endcap)
+		minThetaBarrel= 43.;  //Angular coverture of CALIFA 8.0
+		maxThetaBarrel= 150.; //Angular coverture of CALIFA 8.0
+		
+		//minThetaEndCap= 6;  //Angular coverture of ENDCAP 7.17
+		//maxThetaEndCap= /*42.61*/43; //Angular coverture of ENDCAP 7.17    (As well for CLF717_Geometry_PhoswichEndcap_2.geo)
+
+		
 		BARREL=kTRUE;
 		ENDCAP=kTRUE;
 	}
@@ -720,7 +727,7 @@ using std::ios;
 	}//fin de evento i
 
 
-        TFile f_50MeV("/home/jose/r3broot_sept2012/macros/r3b/califa/hist_Endcap21_50MeV.root", "recreate");
+        TFile f_50MeV("/home/jose/r3broot_sept_2013/macros/r3b/califa/hist_Endcap21_50MeV.root", "recreate");
 	f_50MeV->cd();
 
 	if(h1_T){h1_T->Write();}

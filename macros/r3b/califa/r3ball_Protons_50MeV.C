@@ -24,7 +24,7 @@
 //----------------------------------------------------------------------------------------
 
 
-void r3ball_Protons_50MeV( Int_t nEvents = 10000,
+void r3ball_Protons_50MeV( Int_t nEvents = 1000,
 	    TObjArray& fDetList,
 	    TString Target = "LeadTarget",
 		Bool_t fVis=kFALSE,
@@ -238,12 +238,14 @@ void r3ball_Protons_50MeV( Int_t nEvents = 10000,
 	  // 4- CALIFA 7.17, only ENDCAP (in CsI[Tl])  or phoswich endcap IEM-CSIC Madrid (LaBr - LaCl)(CLF717_Geometry_PhoswichEndcap_1.geo & ""2.geo ) J. Sanchez del Rio (24-10-2012)
 	  // 5- CALIFA 7.07+7.17, Phoswich endcap IEM Madrid + Barrel CLF717 or CLF811  (CLF717_Geometry_PhoswichEndcap_3.geo & ""_4.geo) J. Sanchez del Rio (24-10-2012)
 	  // 6- CALIFA 7.09+7.17, (ongoing work)  (CLF717_Geometry_PhoswichEndcap_5.geo)
-	  // 10- CALIFA 8.00, (ongoing work) 
+	  // 10- CALIFA 8.00, (ongoing work) (Barrel (CLF811Califa.geo) or CLF811_Geometry_PhoswichEndcap_5.geo=CLF811Califa.geo+CLF717_Geometry_PhoswichEndcap_2.geo))
 	  // ...
 
 
 
-	 ((R3BCalo *)calo)->SelectGeometryVersion(5);
+	 //((R3BCalo *)calo)->SelectGeometryVersion(6);
+	 
+	 ((R3BCalo *)calo)->SelectGeometryVersion(10);
 	// ((R3BCalo *)calo)->SelectGeometryVersion(5);
 
  	//((R3BCalo *)calo)->SelectGeometryVersion(6);
