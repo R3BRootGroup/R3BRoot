@@ -314,11 +314,11 @@ void R3BStack::UpdateTrackIndex(TRefArray* detList) {
 		"Particle index not found in map");
 	}
 	if (fDebug) cout << "-D- R3BMCStack TrackID Set : " << (*fIndexIter).second << endl; 
-	if ( ((*fIndexIter).second ) < 0 ) {
-	   point->SetTrackID(iTrack);
-	}else{
+//	if ( ((*fIndexIter).second ) < 0 ) {
+//	   point->SetTrackID(iTrack);
+//	}else{
 	   point->SetTrackID((*fIndexIter).second);
-	}
+//	}
 
       }
 
@@ -440,7 +440,7 @@ void R3BStack::SelectTracks() {
     if(eKin < 0.0) eKin=0.0; // sometimes due to different PDG masses between ROOT and G4!!!!!!
     // --> Calculate number of points
     Int_t nPoints = 0;
-    for (Int_t iDet=kCAL; iDet<=kTRA; iDet++) {
+    for (Int_t iDet=kREF; iDet<=kVETO; iDet++) {
       pair<Int_t, Int_t> a(i, iDet);
       if ( fPointsMap.find(a) != fPointsMap.end() )
 	nPoints += fPointsMap[a];
