@@ -1,4 +1,4 @@
-Int_t r3blandsim(Int_t beamEnergy, Int_t nn, Int_t erel)
+Int_t r3blandsim()
 {
   // Load the Main Simulation macro
   gROOT->LoadMacro("r3ball.C");
@@ -14,18 +14,20 @@ Int_t r3blandsim(Int_t beamEnergy, Int_t nn, Int_t erel)
   TObjString det2("ALADIN");
 //   TObjString det2("GLAD");
   TObjString det3("CRYSTALBALL");
-//   TObjString det4("LAND");
-  TObjString det4("SCINTNEULAND");
+  TObjString det4("DCH");
+//   TObjString det5("LAND");
+  TObjString det5("SCINTNEULAND");
 
   TObjArray fDetList;
-//   fDetList.Add(&det1);
+  fDetList.Add(&det1);
   fDetList.Add(&det2);
-//   fDetList.Add(&det3);
+  fDetList.Add(&det3);
   fDetList.Add(&det4);
+  fDetList.Add(&det5);
 
-  Int_t nEvents = 10000;
+  Int_t nEvents = 10;
 
-  Bool_t fEventDisplay = kFALSE;
+  Bool_t fEventDisplay = kTRUE;
 
   // Magnet Field definition
   Bool_t fR3BMagnet = kTRUE;
@@ -38,9 +40,6 @@ Int_t r3blandsim(Int_t beamEnergy, Int_t nn, Int_t erel)
 	 fMC,
 	 fGene,
 	 fUserPList,
-	 fR3BMagnet,
-	 beamEnergy,
-	 nn,
-	 erel);  
+	 fR3BMagnet);
 }
 

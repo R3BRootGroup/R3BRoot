@@ -5,10 +5,7 @@ void r3ball(Int_t nEvents = 1,
             TString fMC="TGeant4",
 	    TString fGenerator="land",
 	    Bool_t fUserPList= kFALSE,
-            Bool_t fR3BMagnet= kTRUE,
-	    Int_t beamEnergy = 600,
-	    Int_t nn = 1,
-	    Int_t erel = 500)
+            Bool_t fR3BMagnet= kTRUE)
 {
   TString dir = getenv("VMCWORKDIR");
   TString r3bdir = dir + "/macros";
@@ -21,14 +18,8 @@ void r3ball(Int_t nEvents = 1,
 
 
   // Output files
-  char str[100];
-  if(100 == erel) {
-    sprintf(str, "%1dAMeV.%1dn.%1dkeV.35m", beamEnergy, nn, erel);
-  } else {
-    sprintf(str, "%1dAMeV.%1dn.%1dkeV.14m", beamEnergy, nn, erel);
-  }
-  TString OutFile = "/Users/kresan/neuland/r3bsim." + TString(str) + ".root";
-  TString ParFile = "/Users/kresan/neuland/r3bpar." + TString(str) + ".root";
+  TString OutFile = "r3bsim.root";
+  TString ParFile = "r3bpar.root";
 
 
   // ----    Debug option   -------------------------------------------------
@@ -199,22 +190,7 @@ void r3ball(Int_t nEvents = 1,
   // DCH drift chambers
   if (fDetList.FindObject("DCH") ) {
       R3BDetector* dch = new R3BDch("Dch", kTRUE);
-      ((R3BDch*) dch )->SetHeliumBag(kTRUE);
-      // Global position of the Module
-      phi   =  0.0; // (deg)
-      theta =  0.0; // (deg)
-      psi   =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx    =  0.0; // (cm)
-      ty    =  0.0; // (cm)
-      tz    =  0.0; // (cm)
-     //dch->SetRotAnglesEuler(phi,theta,psi);
-      dch->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      dch->SetTranslation(tx,ty,tz);
+      dch->SetGeometryFileName("dch_v13a.geo.root");
       run->AddModule(dch);
   }
 
@@ -295,7 +271,6 @@ void r3ball(Int_t nEvents = 1,
   // Land Detector
   if(fDetList.FindObject("LAND")) {
       R3BDetector* land = new R3BLand("Land", kTRUE);
-      // verbose level 2 ( step info activated )
       land->SetVerboseLevel(1);
       land->SetGeometryFileName("land_v12a_10m.geo.root");
       run->AddModule(land);
@@ -304,13 +279,8 @@ void r3ball(Int_t nEvents = 1,
   // NeuLand Scintillator Detector
   if(fDetList.FindObject("SCINTNEULAND")) {
     R3BDetector* land = new R3BLand("Land", kTRUE);
-    // verbose level 2 ( step info activated )
     land->SetVerboseLevel(1);
-    if(100 == erel) {
-      land->SetGeometryFileName("neuland_v12a_35m.geo.root");
-    } else {
-      land->SetGeometryFileName("neuland_v12a_14m.geo.root");
-    }
+    land->SetGeometryFileName("neuland_v12a_14m.geo.root");
     run->AddModule(land);
   }
 
@@ -408,9 +378,8 @@ void r3ball(Int_t nEvents = 1,
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
 
   if (fGenerator.CompareTo("ascii") == 0  ) {
-    sprintf(str, "/input/%1dSn_%1dn_%1dAMeV_%1dkeV.dat",
-	    (132-nn), nn, beamEnergy, erel);
-    TString iFile = dir + TString(str);
+    TString iFile = dir + TString("/input/signal.1500AMeV.dat");
+//     TString iFile = "/Users/kresan/neuland/input/felix/dp_2pn_1014.dat";
     R3BAsciiGenerator* gen = new R3BAsciiGenerator(iFile.Data());
     primGen->AddGenerator(gen);
   } 
