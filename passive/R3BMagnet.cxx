@@ -19,6 +19,7 @@
 #include "TGeoSphere.h"
 #include "TGeoArb8.h"
 #include "TGeoCone.h"
+#include "TGeoTube.h"
 #include "TGeoBoolNode.h"
 #include "TGeoCompositeShape.h"
 #include "TGeoManager.h"
@@ -41,26 +42,8 @@ R3BMagnet::R3BMagnet(const char * name, const char *Title)
 
 
 
-void R3BMagnet::ConstructGeometry()
-{
-  TString fileName = GetGeometryFileName();
-  if(fileName.EndsWith(".root")) {
-    fLogger->Info(MESSAGE_ORIGIN,
-		  "Constructing ALADIN geometry from ROOT file %s", 
-		  fileName.Data());
-    ConstructRootGeometry();
-  } else {
-    fLogger->Info(MESSAGE_ORIGIN,
-		  "Constructing hardcoded ALADIN geometry");
-    ConstructGeometryOld();
-  }
-}
+void R3BMagnet::ConstructGeometry(){
 
-
-
-
-void R3BMagnet::ConstructGeometryOld()
-{
     Double_t degrad = TMath::Pi()/180.;
     Double_t w       =        0.;
     Double_t a       =        0.;
@@ -257,12 +240,12 @@ void R3BMagnet::ConstructGeometryOld()
 
     Double_t Aladin_width = 156.0;//1.250*m; 
     Double_t Aladin_length = 176.0; //1.70*m; Field length is 1.4 m
-    Double_t Aladin_gap = 53.;    //cm y-directory
+    Double_t Aladin_gap = 52.;    //cm y-directory ->52 cm (Justyna) drawing. before: 53.
     // Angle / beam axis check me ! (-7.3 deg , +7.2 deg ?)
     //Double_t Aladin_angle = +7.3; // degree
     Double_t Aladin_angle = -7.0; // degree
     Double_t DistanceToTarget = 350.0;  //cm
-    Double_t Yoke_thickness = 53.;     //cm thicknes of lead
+    Double_t Yoke_thickness = 52.;     //cm thicknes of iron. Was: 53.
 //    Double_t Correction = -119.94;   //cm
     Double_t Correction = -95.0;   //cm
 // Define distance  from target ??? FIXME
@@ -612,9 +595,37 @@ void R3BMagnet::ConstructGeometryOld()
    pAlp2 = 0.00000;
    TGeoShape *pinHELBox = new TGeoTrap("inHELBox", pDz,pTheta,pPhi,pDy1,pDx1,pDx2,pAlp1,pDy2,pDx3,pDx4,pAlp2);
    TGeoVolume *pinHELLog = new TGeoVolume("inHELLog",pinHELBox, pMed4);
-    
-       
-   
+
+//   
+
+   /******************************************************/
+   /*************      Aladin Front Flange  ************************/
+   /*****************************************************/
+
+   //Material steel, thickness 4cm, inner diameter: 20cm, outer diameter: 133.4 cm. Distance from xb centre: 112.87 cm
+   //Combi transformation:
+   dx = 0.000000;
+   dy = 0.000000;
+   dz = 116.870000;	//cm
+   // Rotation:
+   //thx = 0.000000;    phx = 0.000000;
+   //thy = 0.000000;    phy = 0.000000;
+   //thz = 0.000000;    phz = 0.000000;
+   TGeoRotation *pMatrix15 = new TGeoRotation("ro0");
+   TGeoCombiTrans* pMatrix14 = new TGeoCombiTrans("", dx,dy,dz,pMatrix15);
+
+   double rmin = 10.000000;//radius, not diameter
+   double rmax = 66.700000;
+   dz   = 2.000000;//half thickness
+   double phi1 = 0.000000;
+   double phi2 = 360.000000;
+   TGeoShape *pAladinFrontFlange = new TGeoTubeSeg("AladinFrontFlange",rmin,rmax,dz,phi1,phi2);
+   TGeoVolume*  pAladinFrontFlangeLog = new TGeoVolume("AladinFrontFlangeLog",pAladinFrontFlange, pMedSteel);
+
+   pAWorld->AddNode(pAladinFrontFlangeLog,1,pMatrix14);
+
+
+
    pAWorld->AddNode(pHeliumAladinChamberLog1,1,pMatrix61);
    pAWorld->AddNode(pHeliumAladinChamberLog2,1,pMatrix62);
    pAWorld->AddNode(pHeliumAladinChamberLog3,1,pMatrix63);
@@ -912,7 +923,7 @@ void R3BMagnet::ConstructGeometry(){
 
 Bool_t R3BMagnet::CheckIfSensitive(std::string name){
 	// just to get rid of the warrning during run, not need this is a passive element! 
-	return kFALSE;
+	return kTRUE;
 }
 
 void R3BMagnet::ConstructASCIIGeometry(){
