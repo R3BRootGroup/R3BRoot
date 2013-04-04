@@ -42,7 +42,25 @@ R3BMagnet::R3BMagnet(const char * name, const char *Title)
 
 
 
-void R3BMagnet::ConstructGeometry(){
+void R3BMagnet::ConstructGeometry()
+{
+  TString fileName = GetGeometryFileName();
+  if(fileName.EndsWith(".root")) {
+    fLogger->Info(MESSAGE_ORIGIN,
+		  "Constructing ALADIN geometry from ROOT file %s", 
+		  fileName.Data());
+    ConstructRootGeometry();
+  } else {
+    fLogger->Info(MESSAGE_ORIGIN,
+		  "Constructing hardcoded ALADIN geometry");
+    ConstructGeometryOld();
+  }
+}
+
+
+
+void R3BMagnet::ConstructGeometryOld()
+{
 
     Double_t degrad = TMath::Pi()/180.;
     Double_t w       =        0.;
@@ -921,10 +939,13 @@ void R3BMagnet::ConstructGeometry(){
 
 */
 
-Bool_t R3BMagnet::CheckIfSensitive(std::string name){
+Bool_t R3BMagnet::CheckIfSensitive(std::string name)
+{
 	// just to get rid of the warrning during run, not need this is a passive element! 
-	return kTRUE;
+	return kFALSE;
 }
+
+
 
 void R3BMagnet::ConstructASCIIGeometry(){
 	FairGeoLoader *loader=FairGeoLoader::Instance();
