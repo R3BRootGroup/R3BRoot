@@ -678,9 +678,46 @@ R3BDchPoint* R3BDch::AddHit(Int_t trackId, Int_t mod, Int_t layer, Int_t cell, T
 				      time, length, eLoss);
 }
 // -----   Public method ConstructGeometry   ----------------------------------
-void R3BDch::ConstructGeometry() {
-  return ConstructGeometryJustyna();
+
+
+
+
+void R3BDch::ConstructGeometry()
+{
+  TString fileName = GetGeometryFileName();
+  if(fileName.EndsWith(".root")) {
+    fLogger->Info(MESSAGE_ORIGIN,
+		  "Constructing DCH geometry from ROOT file %s", 
+		  fileName.Data());
+    ConstructRootGeometry();
+  } else {
+    fLogger->Info(MESSAGE_ORIGIN,
+		  "Constructing hardcoded DCH geometry");
+    ConstructGeometryOld();
+  }
 }
+
+
+
+
+Bool_t R3BDch::CheckIfSensitive(std::string name)
+{
+  if(0 == TString(name).CompareTo("ActGASBoxLog")) {
+    return kTRUE;
+  }
+  return kFALSE;
+}
+
+
+
+
+void R3BDch::ConstructGeometryOld()
+{
+  ConstructGeometryJustyna();
+}
+
+
+
 
 void R3BDch::ConstructGeometryJustyna() {
  // out-of-file geometry definition
@@ -692,7 +729,7 @@ void R3BDch::ConstructGeometryJustyna() {
    Double_t z, density, radl, absl, w;
    Int_t nel, numed;
 
-   Int_t matIndex = gGeoManager->GetListOfMaterials()->GetEntries();
+   Int_t matIndex = gGeoManager->GetListOfMaterials()->GetEntries()+1000;  //!!! FIXME
    cout << " Matindex : " << matIndex<< endl;
 
    //-------------    Material definition
@@ -999,6 +1036,9 @@ void R3BDch::ConstructGeometryJustyna() {
 
   dch1->SetVisContainers(kTRUE);
 }
+
+
+
 /* tutaj
 void R3BDch::ConstructGeometry2() {
  // out-of-file geometry definition
