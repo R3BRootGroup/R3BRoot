@@ -366,7 +366,7 @@ void R3BTra::ConstructGeometry() {
 	// out-of-file geometry definition
 	Double_t dx,dy,dz;
 	Double_t par[20];
-	Double_t rmin, rmax;
+	Double_t rmin, rmax, rmin1, rmax1, rmin2, rmax2;
 	Double_t a;
 	Double_t thx, phx, thy, phy, thz, phz;
 	Double_t  phi1, phi2;
@@ -382,24 +382,24 @@ void R3BTra::ConstructGeometry() {
 	/********        Material definition         ********************************************/
 
 	// Mixture: Air
-	//TGeoMedium * pMedAir=NULL;
-	//if (gGeoManager->GetMedium("Air") ){
-	//	pMedAir=gGeoManager->GetMedium("Air");
-	//}else{
-	//	nel     = 2;
-	//	density = 0.001290;
-	//	TGeoMixture*
-	//		pMat2 = new TGeoMixture("Air", nel,density);
-	//	a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
-	//	pMat2->DefineElement(0,a,z,w);
-	//	a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
-	//	pMat2->DefineElement(1,a,z,w);
-	//	pMat2->SetIndex(1);
-	//	// Medium: Air
-	//	numed   = 1;  // medium number
-	//	for(int i = 0; i<8;i++){par[i] = 0.000000;} 
-	//	pMedAir = new TGeoMedium("Air", numed,pMat2, par);
-	//}
+	TGeoMedium * pMedAir=NULL;
+	if (gGeoManager->GetMedium("Air") ){
+		pMedAir=gGeoManager->GetMedium("Air");
+	}else{
+		nel     = 2;
+		density = 0.001290;
+		TGeoMixture*
+			pMat2 = new TGeoMixture("Air", nel,density);
+		a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
+		pMat2->DefineElement(0,a,z,w);
+		a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
+		pMat2->DefineElement(1,a,z,w);
+		pMat2->SetIndex(1);
+		// Medium: Air
+		numed   = 1;  // medium number
+		for(int i = 0; i<8;i++){par[i] = 0.000000;} 
+		pMedAir = new TGeoMedium("Air", numed,pMat2, par);
+	}
 
 	//--------------------------------------------------------------------
 
@@ -421,6 +421,16 @@ void R3BTra::ConstructGeometry() {
 		for(int i = 0; i<8;i++){par[i] = 0.000000;} 
 		pMedVac = new TGeoMedium("Vacuum", numed,pMat33, par);
 	}
+
+	//-------------------------------------------------------------------
+
+	// Fill Chamber: Vacuum or Air. Needed still: an external call interface for choosing which.
+	TGeoMedium * pMedFill=NULL;
+		//pMedFill = new TGeoMedium("Fill_Air", numed,pMat2, par);
+		//pMedFill = (TGeoMedium*) pMedAir->Clone();
+		//pMedFill->SetName("Fill_Air");
+		pMedFill = (TGeoMedium*) pMedVac->Clone();
+		pMedFill->SetName("Fill_Vacuum");
 
 	//-------------------------------------------------------------------
 
@@ -1192,6 +1202,94 @@ void R3BTra::ConstructGeometry() {
 	TGeoRotation *	    pMatrix13 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
 	TGeoCombiTrans*   pMatrix12 = new TGeoCombiTrans("", dx,dy,dz,pMatrix13);
 
+
+
+	/************ Medium inside reaction chamber, around tracker ****************/
+	TGeoShape *aTraMedium_ReactionChamber = new TGeoSphere("aTraMedium_ReactionChamber", 0., 24.250000);	//inner reaction chamber volume
+	TGeoVolume *aTraMedium_ReactionChamberLog = new TGeoVolume("aTraMedium_ReactionChamberLog", aTraMedium_ReactionChamber, pMedFill);	//pMedVac or pMedAir
+	
+	//three conical in out and bottom beam tubes. need additional short cylinders in order to match chamber with cones.
+	dz = 14.600000;
+	rmin1 = 0.0;
+	rmax1 = 2.730000;
+	rmin2 = 0.0;
+	rmax2 = 5.125000;
+	phi1 = 0.000000;
+	phi2 = 360.000000;
+	TGeoShape *aTraMedium_ConicalTube = new TGeoConeSeg("aTraMedium_ConicalTube", dz,rmin1,rmax1,rmin2,rmax2,phi1,phi2);
+	TGeoVolume* aTraMedium_ConicalTubeLog = new TGeoVolume("aTraMedium_ConicalTubeLog",aTraMedium_ConicalTube, pMedFill);
+	// Combi transformation: 
+	dx = 0.000000;
+	dy = 0.000000;
+	dz = 39.100000;
+	// Rotation: 
+	TGeoCombiTrans* pCombTrans1 = new TGeoCombiTrans("", dx,dy,dz, zeroRot);
+	// Combi transformation: 
+	dx = 0.000000;
+	dy = 0.000000;
+	dz = -39.100000;
+	// Rotation:
+	TGeoRotation *pRot1 = new TGeoRotation("", 0, 180, 0);
+	TGeoCombiTrans* pCombTrans2 = new TGeoCombiTrans("", dx,dy,dz, pRot1);
+	// Combi transformation:
+	dx = 0.000000; 
+	dy = -39.100000;
+	dz = 0.000000;
+	// Rotation: 
+	TGeoRotation *pRot2 = new TGeoRotation("", 0, 90, 0);
+	TGeoCombiTrans* pCombTrans3 = new TGeoCombiTrans("", dx,dy,dz, pRot2);
+	aTraMedium_ConicalTubeLog->SetVisLeaves(kTRUE);
+	aTraMedium_ConicalTubeLog->SetLineColor(33);
+	aTraMedium_ReactionChamberLog->AddNode(aTraMedium_ConicalTubeLog, 0, pCombTrans1);
+	aTraMedium_ReactionChamberLog->AddNode(aTraMedium_ConicalTubeLog, 1, pCombTrans2);
+	aTraMedium_ReactionChamberLog->AddNode(aTraMedium_ConicalTubeLog, 2, pCombTrans3);
+	
+	//need in and out bridging filling cylindrical volumes; also: bottom hole volume
+	//placement
+	dx = 0.000000;
+	dy = 0.000000;
+	dz = 24.500000;	//cm, at reaction chamber edge
+	TGeoCombiTrans* pCombTrans4 = new TGeoCombiTrans("", dx,dy,dz, zeroRot);
+	TGeoCombiTrans* pCombTrans5 = new TGeoCombiTrans("", dx,dy,-dz, zeroRot);
+	dx = 0.000000; 
+	dy = -24.500000;
+	dz = 0.000000;
+	TGeoCombiTrans* pCombTrans6 = new TGeoCombiTrans("", dx,dy,dz, pRot2);
+	//shape
+	rmin = 0.0;
+	rmax = 2.730000;
+	dz = 1.000000;	//2cm thickness (length)
+	phi1 = 0.0;
+	phi2 = 360.0;
+	TGeoShape *aTraMedium_BridgeChamberTube = new TGeoTubeSeg("aTraMedium_BridgeChamberTube",rmin,rmax,dz,phi1,phi2);
+	TGeoVolume*  aTraMedium_BridgeChamberTubeLog = new TGeoVolume("aTraMedium_BridgeChamberTubeLog",aTraMedium_BridgeChamberTube, pMedFill);
+	aTraMedium_BridgeChamberTubeLog->SetVisLeaves(kTRUE);
+	aTraMedium_BridgeChamberTubeLog->SetLineColor(33);
+	aTraMedium_ReactionChamberLog->AddNode(aTraMedium_BridgeChamberTubeLog, 0, pCombTrans4);
+	aTraMedium_ReactionChamberLog->AddNode(aTraMedium_BridgeChamberTubeLog, 1, pCombTrans5);
+	aTraMedium_ReactionChamberLog->AddNode(aTraMedium_BridgeChamberTubeLog, 2, pCombTrans6);
+
+	//linear beam tube going downstream until the Aladin entrance window
+	//placement
+	dx = 0.000000;
+	dy = 0.000000;
+	dz = 85.600000;	//cm
+	TGeoCombiTrans* pCombTrans7 = new TGeoCombiTrans("", dx,dy,dz, zeroRot);
+	//shape (approximation as a cone segment, matching radii at XB_out and Aladin_in)
+	rmin1 = 0.0;
+	rmax1 = 5.125000;
+	rmin2 = 0.0;
+	rmax2 = 10.000000;
+	dz = 31.900000;	//2cm thickness (length)
+	phi1 = 0.0;
+	phi2 = 360.0;
+	TGeoShape *aTraMedium_BeamLineDownstream = new TGeoConeSeg("aTraMedium_BeamLineDownstream", dz,rmin1,rmax1,rmin2,rmax2,phi1,phi2);
+	TGeoVolume* aTraMedium_BeamLineDownstreamLog = new TGeoVolume("aTraMedium_BeamLineDownstreamLog",aTraMedium_BeamLineDownstream, pMedFill);
+	aTraMedium_BeamLineDownstreamLog->SetVisLeaves(kTRUE);
+	aTraMedium_BeamLineDownstreamLog->SetLineColor(33);
+	aTraMedium_ReactionChamberLog->AddNode(aTraMedium_BeamLineDownstreamLog, 0, pCombTrans7);
+
+
 	/************ Assembling everything together ****************/
 	TGeoVolume *aTra = new TGeoVolumeAssembly("ATRA");
 
@@ -1262,8 +1360,12 @@ void R3BTra::ConstructGeometry() {
 	dy=ty=0.0;
 	dz=tz=0.0;
 
+	TGeoCombiTrans *t_zero = new TGeoCombiTrans("t_zero");
+	aTraMedium_ReactionChamberLog->AddNode(aTra,1, t_zero);
+	
 	TGeoCombiTrans *t0 = new TGeoCombiTrans(tx,ty,tz,rotg);
-	pWorld->AddNode(aTra,1, GetGlobalPosition(t0));
+	//pWorld->AddNode(aTra,1, GetGlobalPosition(t0));
+	pWorld->AddNode(aTraMedium_ReactionChamberLog,1, GetGlobalPosition(t0));
 
 }
 
