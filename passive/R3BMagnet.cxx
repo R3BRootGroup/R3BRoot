@@ -624,7 +624,7 @@ void R3BMagnet::ConstructGeometryOld()
    //Combi transformation:
    dx = 0.000000;
    dy = 0.000000;
-   dz = 116.870000;	//cm
+   dz = 114.870000;	//cm
    // Rotation:
    //thx = 0.000000;    phx = 0.000000;
    //thy = 0.000000;    phy = 0.000000;
