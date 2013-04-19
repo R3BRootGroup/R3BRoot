@@ -396,6 +396,7 @@ void R3BMagnet::ConstructGeometryOld()
    
 //-----------------------------------------------------------   
 
+   TGeoCombiTrans *pMatrix0 = new TGeoCombiTrans("");
 
    // Aladin chamber part1
    // Combi transformation: 
@@ -642,20 +643,79 @@ void R3BMagnet::ConstructGeometryOld()
 
    pAWorld->AddNode(pAladinFrontFlangeLog,1,pMatrix14);
 
+   /******************************************************/
+   /*************      Aladin shape corrections  ************************/
+   /*****************************************************/
+
+   // Combi transformation "up":
+   dx = 0.000000;
+   dy = 25.900000;
+   dz = 255.0;
+   TGeoRotation *gRot11 = new TGeoRotation();
+   gRot11->RotateX(180.);
+   gRot11->RotateY(-7.000000);
+   gRot11->RotateZ(0.);
+   TGeoCombiTrans *pMatrix67 = new TGeoCombiTrans("", dx,dy,dz,gRot11);
+
+   // shape "up":
+   Double_t cd[8][2];
+   cd[0][0] = 78.0;     cd[0][1] = 0.0;
+   cd[1][0] = 78.0;     cd[1][1] = 0.001;
+   cd[2][0] = -78.0;    cd[2][1] = 0.001;
+   cd[3][0] = -78.0;    cd[3][1] = 0.0;
+   cd[4][0] = 78.0;     cd[4][1] = 0.0;
+   cd[5][0] = 78.0;     cd[5][1] = 1.0;
+   cd[6][0] = -78.0;    cd[6][1] = 1.0;
+   cd[7][0] = -78.0;    cd[7][1] = 0.0;
+   TGeoShape *pAupBox = new TGeoArb8("AupBox", 88.0, &cd[0][0]);
+   TGeoVolume* pAupLog = new TGeoVolume("AupLog",pAupBox, pMedFe);
 
 
-   pAWorld->AddNode(pHeliumAladinChamberLog1,1,pMatrix61);
-   pAWorld->AddNode(pHeliumAladinChamberLog2,1,pMatrix62);
-   pAWorld->AddNode(pHeliumAladinChamberLog3,1,pMatrix63);
-   
-//   pAWorld->AddNode(pAladinChamberLog1,1,pMatrix58);
-//   pAWorld->AddNode(pAladinChamberLog2,1,pMatrix59);
-//   pAWorld->AddNode(pAladinChamberLog3,1,pMatrix60);
+   // Combi transformation "down":
+   dx = 0.000000;
+   dy = -25.900000;
+   dz = 255.0;
+   TGeoRotation *gRot12 = new TGeoRotation();
+   gRot12->RotateX(0.);
+   gRot12->RotateY(-7.000000);
+   gRot12->RotateZ(0.);
+   TGeoCombiTrans *pMatrix68 = new TGeoCombiTrans("", dx,dy,dz,gRot12);
+
+   // shape "down":
+   cd[0][0] = 78.0;     cd[0][1] = 0.0;
+   cd[1][0] = 78.0;     cd[1][1] = 1.0;
+   cd[2][0] = -78.0;    cd[2][1] = 1.0;
+   cd[3][0] = -78.0;    cd[3][1] = 0.0;
+   cd[4][0] = 78.0;     cd[4][1] = 0.0;
+   cd[5][0] = 78.0;     cd[5][1] = 0.001;
+   cd[6][0] = -78.0;    cd[6][1] = 0.001;
+   cd[7][0] = -78.0;    cd[7][1] = 0.0;
+   TGeoShape *pAdownBox = new TGeoArb8("AdownBox", 88.0, &cd[0][0]);
+   TGeoVolume* pAdownLog = new TGeoVolume("AdownLog",pAdownBox, pMedFe);
+
+
+
+//   pAWorld->AddNode(pHeliumAladinChamberLog1,1,pMatrix61);
+//   pAWorld->AddNode(pHeliumAladinChamberLog2,1,pMatrix62);
+//   pAWorld->AddNode(pHeliumAladinChamberLog3,1,pMatrix63);
+ 
+   pAladinChamberLog1->AddNode(pHeliumAladinChamberLog1,1,pMatrix0);
+   pAladinChamberLog2->AddNode(pHeliumAladinChamberLog2,1,pMatrix0);
+   pAladinChamberLog3->AddNode(pHeliumAladinChamberLog3,1,pMatrix0);
+
+   pAWorld->AddNode(pAladinChamberLog1,1,pMatrix58);
+   pAWorld->AddNode(pAladinChamberLog2,1,pMatrix59);
+   pAWorld->AddNode(pAladinChamberLog3,1,pMatrix60);
  
    pAWorld->AddNode(pinWINLog,1,pMatrix64);
    pAWorld->AddNode(poutWINLog,1,pMatrix65);
    
    pAWorld->AddNode(pinHELLog,1,pMatrix66);
+  
+   pAWorld->AddNode(pAupLog,1,pMatrix67);
+   pAWorld->AddNode(pAdownLog,1,pMatrix68);
+
+
    
 }
 
