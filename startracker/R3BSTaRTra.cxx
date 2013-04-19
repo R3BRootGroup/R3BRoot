@@ -74,7 +74,7 @@ R3BSTaRTra::R3BSTaRTra(const char* name, Bool_t active)
   kGeoSaved = kFALSE;
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
-  fVerboseLevel = 1;
+  fVerboseLevel = 2;
   fCutE=1.0e-06; // 1keV default
 }
 // -------------------------------------------------------------------------
@@ -190,13 +190,14 @@ Bool_t R3BSTaRTra::ProcessHits(FairVolume* vol) {
     fLength = gMC->TrackLength();
     gMC->TrackPosition(fPosIn);
     gMC->TrackMomentum(fMomIn);
-    //cout << "X,Y,X tracker=" << fPosIn(0) << " " << fPosIn(1) << " " << fPosIn(2) << endl;
-    //cout << "track length=" << fLength << endl;
+    cout << "X,Y,X tracker=" << fPosIn(0) << " " << fPosIn(1) << " " << fPosIn(2) << endl;
+    cout << "track length=" << fLength << endl;
+      cout << "Volume name=" <<  vol->getRealName()<< endl;
   }
 
   // Sum energy loss for all steps in the active volume
       fELoss += gMC->Edep();
-    //cout << "Tracker Eloss=" << fELoss << "  " << gMC->Edep() << endl;
+    cout << "Tracker Eloss=" << fELoss << "  " << gMC->Edep() << endl;
 
   // Set additional parameters at exit of active volume. Create R3BSTaRTraPoint.
   if ( gMC->IsTrackExiting()    ||
@@ -205,6 +206,10 @@ Bool_t R3BSTaRTra::ProcessHits(FairVolume* vol) {
     fTrackID  = gMC->GetStack()->GetCurrentTrackNumber();
     fVolumeID = vol->getMCid(); //getCopyNo(); //getMCid();
     fDetCopyID = vol->getCopyNo();  // added by Marc
+     cout << "VolumeID=" <<  vol->getMCid()<< endl;
+     cout << "DetCopyID=" <<  vol->getCopyNo()<< endl;
+      cout << "DetMotherID=" <<  vol->getMotherId()<< endl;
+      cout << "Volume name=" <<  vol->getRealName()<< endl;
     gMC->TrackPosition(fPosOut);
     gMC->TrackMomentum(fMomOut);
     if (fELoss == 0. ) return kFALSE;
@@ -290,7 +295,7 @@ void R3BSTaRTra::BeginEvent() {
     TGeoVolume * vol=gGeoManager->FindVolumeFast("STaRTraLog1");
   
     if(vol){
-       //    cout << "id tracker serial number : " << vol->GetNumber() << endl;
+           cout << "id tracker serial number : " << vol->GetNumber() << endl;
     }
   }
 
@@ -396,14 +401,21 @@ void R3BSTaRTra::ConstructGeometry() {
    Double_t tx,ty,tz;
    Int_t nel, numed;
 
+   Double_t Frame_Width=0.1; // =1mm
+   Double_t Frame_Length=Frame_Width;
+   Double_t Frame_Depth=0.1;  // = half of the frame Depth (ie frame full Depth=2mm)
+
+ 
+
    Double_t PI= 3.141592654;  
    Double_t NSide1= 6;             // Nb of detector in Layer 1 
    //Double_t WidthMax1= 7.945;   // Max width of detector (cm)
    Double_t WidthMax1= 8.1912;   // Max width of detector (cm) as final specs
    //Double_t WidthMin1= 2.25;    // Max width of detector (cm)
    Double_t WidthMin1= 1.971;    // Max width of detector (cm) as final specs
-   Double_t Thickness1= 0.005;  // Half thickness of detector (cm) as final specs
-   //Double_t Thickness1= 0.10;  // Half thickness of detector (cm)
+   Double_t Thickness1= 0.005;  // Half thickness of detector (cm) as final specs  -> total thickness: 100um
+   //Double_t Thickness1= 0.0005;  // Half thickness of detector (cm) as final specs  -> total thickness: 100um
+   //Double_t Thickness1= 0.015;  // Half thickness of detector (cm)   -> total thickness: 300um 
    Double_t Length1=21.794;      // length of detector (cm) as final specs
    //Double_t Length1=19.03;      // length of detector (cm
    //Double_t InclAng1=14.9;      // angle d'inclinaison with respect to z axis (deg)
@@ -454,9 +466,9 @@ void R3BSTaRTra::ConstructGeometry() {
 // Material definition
 
    // Mixture: Air
-   TGeoMedium * pMed2=NULL;
+   TGeoMedium * pAirMed=NULL;
    if (gGeoManager->GetMedium("Air") ){
-       pMed2=gGeoManager->GetMedium("Air");
+       pAirMed=gGeoManager->GetMedium("Air");
    }else{
     nel     = 2;
     density = 0.001290;  // Air
@@ -478,7 +490,7 @@ void R3BSTaRTra::ConstructGeometry() {
     par[5]  = 0.000000; // deemax
     par[6]  = 0.000100; // epsil
     par[7]  = 0.000000; // stmin
-    pMed2 = new TGeoMedium("Air", numed,pMat2, par);
+    pAirMed = new TGeoMedium("Air", numed,pMat2, par);
    }
 
 
@@ -511,9 +523,9 @@ void R3BSTaRTra::ConstructGeometry() {
    }
 
  // Material: Silicon
-   TGeoMedium * pMed22=NULL;
+   TGeoMedium * pSiMed=NULL;
    if (gGeoManager->GetMedium("Silicon") ){
-       pMed22=gGeoManager->GetMedium("Silicon");
+       pSiMed=gGeoManager->GetMedium("Silicon");
    }else{
      a       = 28.090000;
      z       = 14.000000;
@@ -536,14 +548,14 @@ void R3BSTaRTra::ConstructGeometry() {
      par[5]  = 0.000000; // deemax
      par[6]  = 0.000100; // epsil
      par[7]  = 0.000000; // stmin
-     pMed22 = new TGeoMedium("Silicon", numed,pMat22,par);
+     pSiMed = new TGeoMedium("Silicon", numed,pMat22,par);
    }
 
 
    // Material: Copper
-   TGeoMedium * pMed25=NULL;
+   TGeoMedium * pCopperMed=NULL;
    if (gGeoManager->GetMedium("Copper") ){
-       pMed25=gGeoManager->GetMedium("Copper");
+       pCopperMed=gGeoManager->GetMedium("Copper");
    }else{
      a       = 63.540000;
      z       = 29.000000;
@@ -564,13 +576,13 @@ void R3BSTaRTra::ConstructGeometry() {
      par[5]  = 0.000000; // deemax
      par[6]  = 0.000100; // epsil
      par[7]  = 0.000000; // stmin
-     pMed25 = new TGeoMedium("Copper", numed,pMat25, par);
+     pCopperMed = new TGeoMedium("Copper", numed,pMat25, par);
    }
 
 // Material: Aluminum
-   TGeoMedium * pMed21=NULL;
+   TGeoMedium * pAluMed=NULL;
    if (gGeoManager->GetMedium("Aluminum") ){
-       pMed21=gGeoManager->GetMedium("Aluminum");
+       pAluMed=gGeoManager->GetMedium("Aluminum");
    }else{
      a       = 26.980000;
      z       = 13.000000;
@@ -591,13 +603,15 @@ void R3BSTaRTra::ConstructGeometry() {
      par[5]  = 0.000000; // deemax
      par[6]  = 0.000100; // epsil
      par[7]  = 0.000000; // stmin
-     pMed21 = new TGeoMedium("Aluminum", numed,pMat21, par);
+     pAluMed = new TGeoMedium("Aluminum", numed,pMat21, par);
    }
 
+
+
 	// Mixture: CarbonFibre
-	TGeoMedium * pMed3=NULL;
+	TGeoMedium * pCarbonFibreMedium=NULL;
 	if (gGeoManager->GetMedium("CarbonFibre") ){
-		pMed3=gGeoManager->GetMedium("CarbonFibre");
+		pCarbonFibreMedium=gGeoManager->GetMedium("CarbonFibre");
 	}else{
 		nel     = 3;
 		density = 1.690000;
@@ -621,7 +635,7 @@ void R3BSTaRTra::ConstructGeometry() {
 		par[5]  = 0.000000; // deemax
 		par[6]  = 0.000100; // epsil
 		par[7]  = 0.000000; // stmin
-		pMed3 = new TGeoMedium("CarbonFibre", numed,pMat3,par);
+		pCarbonFibreMedium = new TGeoMedium("CarbonFibre", numed,pMat3,par);
 	}
 	
 	// Material: Gold
@@ -653,45 +667,72 @@ void R3BSTaRTra::ConstructGeometry() {
 	}
 
 
+
+
+
    // TRANSFORMATION MATRICES
    
    // Detectors
 
-   // First layer
+ 
+  //
+  // First layer
+  //
+     //########################
    
    // Combi transformation: 
    //dx = 0.000;
-   dx = (-((Length1/2)*sin(InclAng1*PI/180.)+ Rmin1))*sin((15.)*PI/180.);
    //dy = -((Length1/2  + (WidthHalf1/2)*tan(AngTrap1) )*sin(InclAng1*PI/180.)+ Rmin1); // considering  real barycentre position
    //dy = -((Length1/2)*sin(InclAng1*PI/180.)+ Rmin1);   // considering  intersection of 2 medianes
-   dy = (-((Length1/2)*sin(InclAng1*PI/180.)+ Rmin1))*cos((15.)*PI/180.);;   // considering  intersection of 2 medianes
-   dz = -Length1*cos(InclAng1*PI/180.)/2 + (Rmin1/tan(AngRangeMin1*PI/180.));
+
+   // +rotation of 15 degrees: 
+    dx = (-(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1))*sin((15.)*PI/180.);
+    dy = (-(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1))*cos((15.)*PI/180.);;   // considering  intersection of 2 medianes
+    dz = -(Length1)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.));
+
+
    // Rotation: 
+   //thx = 90.000000;        phx = 0.000000;   // 15 degrees rotation to span over 2 detectors of middle layers 
+   //thy = 90.+ InclAng1;    phy = 90.000000;
+   //thz = InclAng1;         phz = 90.000000;
    thx = 90.000000;        phx = 0.000000-15.;   // 15 degrees rotation to span over 2 detectors of middle layers 
    thy = 90.+ InclAng1;    phy = 90.000000-15.;
    thz = InclAng1;         phz = 90.000000-15.;
-   TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz); // geant3 angles
+    TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz); // geant3 angles
    //thx = -InclAng1; 
    //thy = 0.;   
    //thz = 0;    
    //TGeoRotation *pMatrix3 = new TGeoRotation("",thz,thx,thy); // Euler phi (rot/z), theta (rot/x), psi (rot/ new z) angles
    TGeoCombiTrans*
      pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);  // bottom inner detector
-   
+
+    dx = (-(( (Length1+Frame_Length)/2)*sin(InclAng1*PI/180.)+ Rmin1 + (Thickness1*2+Frame_Depth)))*sin((15.)*PI/180.);
+     dy = (-(( (Length1+Frame_Length)/2)*sin(InclAng1*PI/180.)+ Rmin1 + (Thickness1*2+Frame_Depth)))*cos((15.)*PI/180.);;   // considering  intersection of 2 medianes
+    dz = -(Length1+Frame_Length)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.));
+    TGeoCombiTrans*
+     pMatrix2b = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);  // bottom inner detector
+
+     //########################
 
    // Combi transformation:
    //dx =  dx -(WidthHalf1/2)*(1/(cos(AngTrap1)*cos(AngTrap1)))*(1 + cos((360./NSide1)*PI/180.)); // considering  real barycentre position;
-   //dx =  -(WidthHalf1/2)*(1 + cos((360./NSide1)*PI/180.));  // considering intersection of 2 medianes
+   // dx =  -(WidthHalf1/2)*(1 + cos((360./NSide1)*PI/180.));  // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf1/2)*(1/(cos(AngTrap1)*cos(AngTrap1)))*sin((360./NSide1)*PI/180.)*;      // considering  real barycentre position;
    //dy = dy +(WidthHalf1/2)*sin((360./NSide1)*PI/180.);      // considering  intersection of 2 medianes
-   dx=  (-((Length1/2)*sin(InclAng1*PI/180.)+ Rmin1))*sin((15.+360/NSide1)*PI/180.);  // rotation by 60+15 deg/ z axis
-   dy=  (-((Length1/2)*sin(InclAng1*PI/180.)+ Rmin1))*cos((15.+360/NSide1)*PI/180.);  // rotation by 60+15 deg/ z axis
+
+    // +rotation of 15 degrees: 
+    dx=  (-(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1))*sin((15.+360/NSide1)*PI/180.);  // rotation by 60+15 deg/ z axis
+    dy=  (-(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1))*cos((15.+360/NSide1)*PI/180.);  // rotation by 60+15 deg/ z axis
+    dz = -(Length1)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.));
 
    // Rotation: 
-   thx = 90.000000;        phx = 0.000000-(15.+360./NSide1);
-   thy = 90.+ InclAng1;    phy = 90.000000-(15.+360./NSide1);
-   thz = InclAng1;         phz = 90.000000-(15.+360./NSide1);
-   TGeoRotation *pMatrix5 = new TGeoRotation("",thx,phx,thy,phy,thz,phz); // geant3 angles
+   //thx = 90.000000;        phx = 0.000000-(360./NSide1);
+   //thy = 90.+ InclAng1;    phy = 90.000000-(360./NSide1);
+   //thz = InclAng1;         phz = 90.000000-(360./NSide1);
+     thx = 90.000000;        phx = 0.000000-(15.+360./NSide1);
+     thy = 90.+ InclAng1;    phy = 90.000000-(15.+360./NSide1);
+     thz = InclAng1;         phz = 90.000000-(15.+360./NSide1);
+    TGeoRotation *pMatrix5 = new TGeoRotation("",thx,phx,thy,phy,thz,phz); // geant3 angles
    //thx = -InclAng1; 
    //thy = 0.;   
    //thz = -360./NSide1;    
@@ -700,24 +741,45 @@ void R3BSTaRTra::ConstructGeometry() {
      pMatrix4 = new TGeoCombiTrans("", dx,dy,dz,pMatrix5);
    
 
+     dx=  (-(( (Length1+Frame_Length)/2)*sin(InclAng1*PI/180.)+ Rmin1 + (Thickness1*2+Frame_Depth)))*sin((15.+360/NSide1)*PI/180.);  // rotation by 60+15 deg/ z axis
+     dy=  (-(( (Length1+Frame_Length)/2)*sin(InclAng1*PI/180.)+ Rmin1 + (Thickness1*2+Frame_Depth)))*cos((15.+360/NSide1)*PI/180.);  // rotation by 60+15 deg/ z axis
+     //dz = -(Length1+Frame_Length)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.));
+     TGeoCombiTrans*
+     pMatrix4b = new TGeoCombiTrans("", dx,dy,dz,pMatrix5);
+
+     //########################
 
    // Combi transformation:
    //dx =  dx -(WidthHalf1/2)*(1/(cos(AngTrap1)*cos(AngTrap1)))*(cos((360./NSide1)*PI/180.)+cos(2*(360./NSide1)*PI/180.));   // considering  real barycentre position;
    //dx =  dx -(WidthHalf1/2)*(cos((360./NSide1)*PI/180.) + cos(2*(360./NSide1)*PI/180.)); // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf1/2)*(1/(cos(AngTrap1)*cos(AngTrap1)))*(sin((360./NSide1)*PI/180.)+sin(2*(360./NSide1)*PI/180.));  // considering  real barycentre position;   
    //dy =  dy +(WidthHalf1/2)*(sin((360./NSide1)*PI/180.) + sin(2*(360./NSide1)*PI/180.)); // considering  intersection of 2 medianes
-   dx= -((Length1/2)*sin(InclAng1*PI/180.)+ Rmin1)*sin((15.+2*(360/NSide1))*PI/180.);  // rotation by 120+15 deg / z axis
-   dy= -((Length1/2)*sin(InclAng1*PI/180.)+ Rmin1)*cos((15.+2*(360/NSide1))*PI/180.);  // rotation by 120+15 deg / z axis
+ 
+   // +rotation of 15 degrees: 
+   dx= -(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1)*sin((15.+2*(360/NSide1))*PI/180.);  // rotation by 120+15 deg / z axis
+   dy= -(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1)*cos((15.+2*(360/NSide1))*PI/180.);  // rotation by 120+15 deg / z axis
+   dz = -(Length1)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.));
+
 
    // Rotation: 
-   thx = 90.000000;        phx = 0.000000-(15.+2.*360./NSide1);
-   thy = 90.+ InclAng1;    phy = 90.000000-(15.+2.*360./NSide1);
-   thz = InclAng1;         phz = 90.000000-(15.+2.*360./NSide1);
+   //thx = 90.000000;        phx = 0.000000-(2.*360./NSide1);
+   //thy = 90.+ InclAng1;    phy = 90.000000-(2.*360./NSide1);
+   //thz = InclAng1;         phz = 90.000000-(2.*360./NSide1);
+     thx = 90.000000;        phx = 0.000000-(15.+2.*360./NSide1);
+     thy = 90.+ InclAng1;    phy = 90.000000-(15.+2.*360./NSide1);
+     thz = InclAng1;         phz = 90.000000-(15.+2.*360./NSide1);
    TGeoRotation *pMatrix7 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
      pMatrix6 = new TGeoCombiTrans("", dx,dy,dz,pMatrix7);
    
 
+	  dx= -(( (Length1+Frame_Length)/2)*sin(InclAng1*PI/180.)+ Rmin1 + (Thickness1*2+Frame_Depth))*sin((15.+2*(360/NSide1))*PI/180.);  // rotation by 120+15 deg / z axis
+	  dy= -(( (Length1+Frame_Length)/2)*sin(InclAng1*PI/180.)+ Rmin1 + (Thickness1*2+Frame_Depth))*cos((15.+2*(360/NSide1))*PI/180.);  // rotation by 120+15 deg / z axis
+	  //dz = -(Length1+Frame_Length)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.));
+   TGeoCombiTrans*
+     pMatrix6b = new TGeoCombiTrans("", dx,dy,dz,pMatrix7);
+
+     //########################
 
    // Combi transformation: 
    //dy = ((Length1/2  + (WidthHalf1/2)*tan(AngTrap1) )*sin(InclAng1*PI/180.)+ Rmin1); // considering  real barycentre position
@@ -725,36 +787,66 @@ void R3BSTaRTra::ConstructGeometry() {
    //dx =  dx -(WidthHalf1/2)*(cos(2*(360./NSide1)*PI/180.) + cos(3*(360./NSide1)*PI/180.));  // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf1/2)*(1/(cos(AngTrap1)*cos(AngTrap1)))*(sin(2*(360./NSide1)*PI/180.)+sin(3*(360./NSide1)*PI/180.));              // considering  real barycentre position;
    //dy =  dy +(WidthHalf1/2)*(sin(2*(360./NSide1)*PI/180.) + sin(3*(360./NSide1)*PI/180.));  // considering  intersection of 2 medianes
-   dx= -((Length1/2)*sin(InclAng1*PI/180.)+ Rmin1)*sin((15.+3*(360/NSide1))*PI/180.);     // rotation by 180+15 deg / z axis
-   dy= -((Length1/2)*sin(InclAng1*PI/180.)+ Rmin1)*cos((15.+3*(360/NSide1))*PI/180.);     // rotation by 180+15 deg / z axis
+
+   // +rotation of 15 degrees: 
+     dx= -(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1)*sin((15.+3*(360/NSide1))*PI/180.);     // rotation by 180+15 deg / z axis
+     dy= -(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1)*cos((15.+3*(360/NSide1))*PI/180.);     // rotation by 180+15 deg / z axis
+     dz = -(Length1)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.));
 
    // Rotation: 
+   //thx = 90.000000;        phx = 0.000000-(3.*360./NSide1);
+   //thy = 90.+ InclAng1;    phy = 90.000000-(3.*360./NSide1);
+   //thz = InclAng1;         phz = 90.000000-(3.*360./NSide1);
    thx = 90.000000;        phx = 0.000000-(15.+3.*360./NSide1);
    thy = 90.+ InclAng1;    phy = 90.000000-(15.+3.*360./NSide1);
    thz = InclAng1;         phz = 90.000000-(15.+3.*360./NSide1);
    TGeoRotation *pMatrix9 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
      pMatrix8 = new TGeoCombiTrans("", dx,dy,dz,pMatrix9);
+
+
+	  dx= -(( (Length1+Frame_Length)/2)*sin(InclAng1*PI/180.)+ Rmin1 +(Thickness1*2+ Frame_Depth))*sin((15.+3*(360/NSide1))*PI/180.);     // rotation by 180+15 deg / z axis
+	  dy= -(( (Length1+Frame_Length)/2)*sin(InclAng1*PI/180.)+ Rmin1 +(Thickness1*2+ Frame_Depth))*cos((15.+3*(360/NSide1))*PI/180.);     // rotation by 180+15 deg / z axis
+	  //dz = -(Length1+Frame_Length)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.));
+     TGeoCombiTrans*
+     pMatrix8b = new TGeoCombiTrans("", dx,dy,dz,pMatrix9);
+
    
 
+
+     //########################
 
    // Combi transformation: 
    //dx =  dx -(WidthHalf1/2)*(1/(cos(AngTrap1)*cos(AngTrap1)))*(cos(3*(360./NSide1)*PI/180.)+cos(4*(360./NSide1)*PI/180.));    // considering  real barycentre position;
    //dx =  dx -(WidthHalf1/2)*(cos(3*(360./NSide1)*PI/180.) + cos(4*(360./NSide1)*PI/180.));  // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf1/2)*(1/(cos(AngTrap1)*cos(AngTrap1)))*(sin(3*(360./NSide1)*PI/180.)+sin(4*(360./NSide1)*PI/180.));   // considering  real barycentre position;
    //dy =  dy +(WidthHalf1/2)*(sin(3*(360./NSide1)*PI/180.) + sin(4*(360./NSide1)*PI/180.));  // considering  intersection of 2 medianes
-   dx= -((Length1/2)*sin(InclAng1*PI/180.)+ Rmin1)*sin((15.+4*(360/NSide1))*PI/180.);    // rotation by 240+15 deg/ z axis
-   dy= -((Length1/2)*sin(InclAng1*PI/180.)+ Rmin1)*cos((15.+4*(360/NSide1))*PI/180.);    // rotation by 240+15 deg/ z axis
 
+   // +rotation of 15 degrees: 
+    dx= -(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1)*sin((15.+4*(360/NSide1))*PI/180.);    // rotation by 240+15 deg/ z axis
+    dy= -(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1)*cos((15.+4*(360/NSide1))*PI/180.);    // rotation by 240+15 deg/ z axis
+    dz = -(Length1)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.));
+ 
    // Rotation: 
+   //thx = 90.000000;        phx = 0.000000-(4.*360./NSide1);
+   //thy = 90.+ InclAng1;    phy = 90.000000-(4.*360./NSide1);
+   //thz = InclAng1;         phz = 90.000000-(4.*360./NSide1);
    thx = 90.000000;        phx = 0.000000-(15.+4.*360./NSide1);
    thy = 90.+ InclAng1;    phy = 90.000000-(15.+4.*360./NSide1);
    thz = InclAng1;         phz = 90.000000-(15.+4.*360./NSide1);
    TGeoRotation *pMatrix11 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
      pMatrix10 = new TGeoCombiTrans("", dx,dy,dz,pMatrix11);
-   
 
+   
+	  dx= -(( (Length1+Frame_Length)/2)*sin(InclAng1*PI/180.)+ Rmin1 + (Thickness1*2+Frame_Depth))*sin((15.+4*(360/NSide1))*PI/180.);    // rotation by 240+15 deg/ z axis
+	  dy= -(( (Length1+Frame_Length)/2)*sin(InclAng1*PI/180.)+ Rmin1 + (Thickness1*2+Frame_Depth))*cos((15.+4*(360/NSide1))*PI/180.);    // rotation by 240+15 deg/ z axis
+	  //dz = -(Length1+Frame_Length)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.));
+    TGeoCombiTrans*
+     pMatrix10b = new TGeoCombiTrans("", dx,dy,dz,pMatrix11);
+
+
+     //########################
 
    // Combi transformation: 
    //dx =  dx -(WidthHalf1/2)*(1/(cos(AngTrap1)*cos(AngTrap1)))*(cos(4*(360./NSide1)*PI/180.)+cos(5*(360./NSide1)*PI/180.));   // considering  real barycentre position;
@@ -762,173 +854,44 @@ void R3BSTaRTra::ConstructGeometry() {
    //dy =  dy + (WidthHalf1/2)*(1/(cos(AngTrap1)*cos(AngTrap1)))*(sin(4*(360./NSide1)*PI/180.)
    //                                                             +sin(5*(360./NSide1)*PI/180.));  // considering  real barycentre position;
    //dy =  dy +(WidthHalf1/2)*(sin(4*(360./NSide1)*PI/180.) + sin(5*(360./NSide1)*PI/180));      // considering  intersection of 2 medianes
-   dx= -((Length1/2)*sin(InclAng1*PI/180.)+ Rmin1)*sin((15.+5*(360/NSide1))*PI/180.);  // rotation by 300+15 deg/ z axis
-   dy= -((Length1/2)*sin(InclAng1*PI/180.)+ Rmin1)*cos((15.+5*(360/NSide1))*PI/180.);  // rotation by 300+15 deg/ z axis
 
+   // +rotation of 15 degrees: 
+   dx= -(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1)*sin((15.+5*(360/NSide1))*PI/180.);  // rotation by 300+15 deg/ z axis
+   dy= -(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1)*cos((15.+5*(360/NSide1))*PI/180.);  // rotation by 300+15 deg/ z axis
+   dz = -(Length1)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.));
+
+ 
    // Rotation: 
-   thx = 90.000000;        phx = 0.000000-(15.+5.*360./NSide1);
-   thy = 90.+ InclAng1;    phy = 90.000000-(15.+5.*360./NSide1);
-   thz = InclAng1;         phz = 90.000000-(15.+5.*360./NSide1);
-   TGeoRotation *pMatrix13 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+   //thx = 90.000000;        phx = 0.000000-(5.*360./NSide1);
+   //thy = 90.+ InclAng1;    phy = 90.000000-(5.*360./NSide1);
+   //thz = InclAng1;         phz = 90.000000-(5.*360./NSide1);
+     thx = 90.000000;        phx = 0.000000-(15.+5.*360./NSide1);
+     thy = 90.+ InclAng1;    phy = 90.000000-(15.+5.*360./NSide1);
+     thz = InclAng1;         phz = 90.000000-(15.+5.*360./NSide1);
+    TGeoRotation *pMatrix13 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
      pMatrix12 = new TGeoCombiTrans("", dx,dy,dz,pMatrix13);
    
 
-
-   // Combi transformation: 
-   dx =  dx -(WidthHalf1/2)*(1/(cos(AngTrap1)*cos(AngTrap1)))*(cos(5*(360./NSide1)*PI/180.)
-      					                       +cos(6*(360./NSide1)*PI/180.));   // considering  real barycentre position;
-   //dx =  dx -(WidthHalf1/2)*(cos(5*(360./NSide1)*PI/180.) + cos(6*(360./NSide1)*3.14159/180)); // considering intersection of 2 medianes
-   dy =  dy + (WidthHalf1/2)*(1/(cos(AngTrap1)*cos(AngTrap1)))*(sin(5*(360./NSide1)*PI/180.)
-        		                                       +sin(6*(360./NSide1)*PI/180.));   // considering  real barycentre position; 
-   //dy =  dy +(WidthHalf1/2)*(sin(5*(360./NSide1)*PI/180.) + sin(6*(360./NSide1)*PI/180));      // considering  intersection of 2 medianes
-   // Rotation: 
-   thx = 90.000000;        phx = 0.000000-(6.*360./NSide1);
-   thy = 90.+ InclAng1;    phy = 90.000000-(6.*360./NSide1);
-   thz = InclAng1;         phz = 90.000000-(6.*360./NSide1);
-   TGeoRotation *pMatrix15 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+	  dx= -(( (Length1+Frame_Length)/2)*sin(InclAng1*PI/180.)+ Rmin1 + (Thickness1*2+Frame_Depth))*sin((15.+5*(360/NSide1))*PI/180.);  // rotation by 300+15 deg/ z axis
+	  dy= -(( (Length1+Frame_Length)/2)*sin(InclAng1*PI/180.)+ Rmin1 + (Thickness1*2+Frame_Depth))*cos((15.+5*(360/NSide1))*PI/180.);  // rotation by 300+15 deg/ z axis
+	  //dz = -(Length1+Frame_Length)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.));
    TGeoCombiTrans*
-     pMatrix14 = new TGeoCombiTrans("", dx,dy,dz,pMatrix15);
-   
+     pMatrix12b = new TGeoCombiTrans("", dx,dy,dz,pMatrix13);
 
+     //########################
 
-   // Combi transformation: 
-   dx =  dx -(WidthHalf1/2)*(1/(cos(AngTrap1)*cos(AngTrap1)))*(cos(6*(360./NSide1)*PI/180.)
-   							       +cos(7*(360./NSide1)*PI/180.));   // considering  real barycentre position;
-   //dx =  dx -(WidthHalf1/2)*(cos(6*(360./NSide1)*PI/180. + cos(7*(360./NSide1)*3.14159/180));  // considering intersection of 2 medianes
-   dy =  dy + (WidthHalf1/2)*(1/(cos(AngTrap1)*cos(AngTrap1)))*(sin(6*(360./NSide1)*PI/180.)
-                                                              +sin(7*(360./NSide1)*PI/180.));    // considering  real barycentre position; 
-   //dy =  dy +(WidthHalf1/2)*(sin(6*(360./NSide1)*PI/180.) + sin(7*(360./NSide1)*PI/180));      // considering  intersection of 2 medianes
-   // Rotation: 
-   thx = 90.000000;        phx = 0.000000-(7*360./NSide1);
-   thy = 90.+ InclAng1;    phy = 90.000000-(7*360./NSide1);
-   thz = InclAng1;         phz = 90.000000-(7*360./NSide1);
-   TGeoRotation *pMatrix17 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-     pMatrix16 = new TGeoCombiTrans("", dx,dy,dz,pMatrix17);
-
-
-   
-   // Combi transformation: 
-   dx =  dx -(WidthHalf1/2)*(1/(cos(AngTrap1)*cos(AngTrap1)))*(cos(7*(360./NSide1)*PI/180.)
-   							     +cos(8*(360./NSide1)*PI/180.));    // considering  real barycentre position;
-   //dx =  dx -(WidthHalf1/2)*(cos(7*(360./NSide1)*PI/180. + cos(8*(360./NSide1)*3.14159/180)); // considering intersection of 2 medianes
-   dy =  dy + (WidthHalf1/2)*(1/(cos(AngTrap1)*cos(AngTrap1)))*(sin(7*(360./NSide1)*PI/180.)
-                                                             +sin(8*(360./NSide1)*PI/180.));   // considering  real barycentre position;  
-   //dy =  dy +(WidthHalf1/2)*(sin(7*(360./NSide1)*PI/180.) + sin(8*(360./NSide1)*PI/180));     // considering  intersection of 2 medianes
-   // Rotation: 
-   thx = 90.000000;        phx = 0.000000-(8*360./NSide1);
-   thy = 90.+ InclAng1;    phy = 90.000000-(8*360./NSide1);
-   thz = InclAng1;         phz = 90.000000-(8*360./NSide1);
-   TGeoRotation *pMatrix19 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-     pMatrix18 = new TGeoCombiTrans("", dx,dy,dz,pMatrix19);
-
-
-
-   // Combi transformation: 
-   dx =  dx -(WidthHalf1/2)*(1/(cos(AngTrap1)*cos(AngTrap1)))*(cos(8*(360./NSide1)*PI/180.)
-							     +cos(9*(360./NSide1)*PI/180.));    // considering  real barycentre position;
-   //dx =  dx -(WidthHalf1/2)*(cos(8*(360./NSide1)*PI/180. + cos(9*(360./NSide1)*3.14159/180)); // considering intersection of 2 medianes
-   dy =  dy + (WidthHalf1/2)*(1/(cos(AngTrap1)*cos(AngTrap1)))*(sin(8*(360./NSide1)*PI/180.)
-                                                              +sin(9*(360./NSide1)*PI/180.));   // considering  real barycentre position; 
-   //dy =  dy +(WidthHalf1/2)*(sin(8*(360./NSide1)*PI/180.) + sin(9*(360./NSide1)*PI/180));     // considering  intersection of 2 medianes
-   // Rotation: 
-   thx = 90.000000;        phx = 0.000000-(9*360./NSide1);
-   thy = 90.+ InclAng1;    phy = 90.000000-(9*360./NSide1);
-   thz = InclAng1;         phz = 90.000000-(9*360./NSide1);
-   TGeoRotation *pMatrix21 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-     pMatrix20 = new TGeoCombiTrans("", dx,dy,dz,pMatrix21);
-  
-
-
-
-
- 
-   // Combi transformation: 
-   dx = -4.830000;
-   dy = 0.00000; 
-   dz = 18.60000;
-   // Rotation: 
-   thx = 180.000000;    phx = 0.000000 ;
-   thy = 90.000000;    phy = 90.000000 ;
-   thz = 90.000000;    phz = 0.000000 ;
-   TGeoRotation *pMatrix23 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-     pMatrix22 = new TGeoCombiTrans("", dx,dy,dz,pMatrix23);
-   
-   // Combi transformation: 
-   dx = -3.42000;
-   dy = 3.42000; 
-   dz = 18.60000;
-   // Rotation: 
-   thx = 0.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 45.000000;
-   thz = 90.000000;    phz = 315.000000;
-   TGeoRotation *pMatrix25 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-     pMatrix24 = new TGeoCombiTrans("", dx,dy,dz,pMatrix25);
-   
-   // Combi transformation: 
-   dx = 0.000000;
-   dy = 4.8300; 
-   dz = 18.60000;
-   // Rotation: 
-   thx = 180.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 0.000000;
-   thz = 90.000000;    phz = 90.000000;
-   TGeoRotation *pMatrix27 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-     pMatrix26 = new TGeoCombiTrans("", dx,dy,dz,pMatrix27);
-   
-   // Combi transformation: 
-   dx = 3.42000;
-   dy = 3.42000; 
-   dz = 18.60000;
-   // Rotation: 
-   thx = 0.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 315.000000;
-   thz = 90.000000;    phz = 45.000000;
-   TGeoRotation *pMatrix29 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-     pMatrix28 = new TGeoCombiTrans("", dx,dy,dz,pMatrix29);
-   
-   // Combi transformation: 
-   dx = 4.83000;
-   dy = 0.00000; 
-   dz = 18.60000;
-   // Rotation: 
-   thx = 180.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = 90.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix31 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-     pMatrix30 = new TGeoCombiTrans("", dx,dy,dz,pMatrix31);
-   
-   // Combi transformation: 
-   dx = 3.42000;
-   dy = -3.42000; 
-   dz = 18.60000;
-   // Rotation: 
-   thx = 0.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 45.000000;
-   thz = 90.000000;    phz = 315.000000;
-   TGeoRotation *pMatrix33 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-     pMatrix32 = new TGeoCombiTrans("", dx,dy,dz,pMatrix33);
-
-
-
-
-
+   //
    // Second layer
+   //
+     //########################
 
    // Combi transformation: 
-   dx = 0.000;
    //dy = -((Length2/2  + (WidthHalf2/2)*tan(AngTrap2) )*sin(InclAng2*PI/180.)+ Rmin2); // considering  real barycentre position
-   dy = -((Length2/2)*sin(InclAng2*PI/180.)+ Rmin2);                               // considering  intersection of 2 medianes
+   dx = 0.000;
+   dy = -(( Length2/2)*sin(InclAng2*PI/180.)+ Rmin2 );                               // considering  intersection of 2 medianes
    dz = -Length2*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+
    // Rotation: 
    thx = 90.000000;        phx = 0.000000;
    thy = 90.+ InclAng2;    phy = 90.000000;
@@ -938,13 +901,23 @@ void R3BSTaRTra::ConstructGeometry() {
      pMatrix66 = new TGeoCombiTrans("", dx,dy,dz,pMatrix67);
    
 
+     dy = -(( (Length2+Frame_Length)/2)*sin(InclAng2*PI/180.)+ Rmin2 + (Thickness2*2+Frame_Depth));  // considering  intersection of 2 medianes and CBFrame
+     // dz = -(Length2+Frame_Length)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+   TGeoCombiTrans*
+     pMatrix66b = new TGeoCombiTrans("", dx,dy,dz,pMatrix67);
+
+     //########################
+
    // Combi transformation: 
    //dx =  dx -(WidthHalf2/2)*(1/(cos(AngTrap2)*cos(AngTrap2)))*(1 + cos((360./NSide2)*PI/180.)); // considering  real barycentre position;
    //dx =  -(WidthHalf2/2)*(1 + cos((360./NSide2)*PI/180));                                     // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf2/2)*(1/(cos(AngTrap2)*cos(AngTrap2)))*sin((360./NSide2)*PI/180.);      // considering  real barycentre position;
    //dy = dy +(WidthHalf2/2)*sin((360./NSide2)*PI/180);                                         // considering  intersection of 2 medianes
+
+   dy = -(( Length2/2)*sin(InclAng2*PI/180.)+ Rmin2 );                               // considering  intersection of 2 medianes
    dx=  dy*sin((360/NSide2)*PI/180.);  // rotation by 360/12=30 deg/ z axis
    dy=  dy*cos((360/NSide2)*PI/180.);  // rotation by 360/12=30 deg/ z axis
+   dz = -Length2*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
    // Rotation: 
    thx = 90.000000;        phx = 0.000000-360./NSide2;
    thy = 90.+ InclAng2;    phy = 90.000000-360./NSide2;
@@ -953,28 +926,51 @@ void R3BSTaRTra::ConstructGeometry() {
    TGeoCombiTrans*
      pMatrix68 = new TGeoCombiTrans("", dx,dy,dz,pMatrix69);
 
+   dy = -(( (Length2+Frame_Length)/2)*sin(InclAng2*PI/180.)+ Rmin2 + (Thickness2*2+Frame_Depth));  // considering  intersection of 2 medianes and CBFrame
+   dx=  dy*sin((360/NSide2)*PI/180.);  // rotation by 360/12=30 deg/ z axis
+   dy=  dy*cos((360/NSide2)*PI/180.);  // rotation by 360/12=30 deg/ z axis
+   //dz = -(Length2+Frame_Length)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+   TGeoCombiTrans*
+     pMatrix68b = new TGeoCombiTrans("", dx,dy,dz,pMatrix69);
+
+     //########################
+
+
    // Combi transformation: 
    //dx =  dx -(WidthHalf2/2)*(1/(cos(AngTrap2)*cos(AngTrap2)))*(cos((360./NSide2)*PI/180.)+cos(2*(360./NSide2)*PI/180.));     // considering  real barycentre position;
    //dx =  dx -(WidthHalf2/2)*(cos((360./NSide2)*PI/180.) + cos(2*(360./NSide2)*3.14159/180));   // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf2/2)*(1/(cos(AngTrap2)*cos(AngTrap2)))*(sin((360./NSide2)*PI/180.)+sin(2*(360./NSide2)*PI/180.));    // considering  real barycentre position;  
    //dy =  dy +(WidthHalf2/2)*(sin((360./NSide2)*PI/180.) + sin(2*(360./NSide2)*PI/180));        // considering  intersection of 2 medianes
-   dx=  -((Length2/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(2*(360/NSide2)*PI/180.);  // rotation by 60 deg/ z axis
-   dy=  -((Length2/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(2*(360/NSide2)*PI/180.);  // rotation by 60 deg/ z axis
-   // Rotation: 
+
+     dx=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(2*(360/NSide2)*PI/180.);  // rotation by 60 deg/ z axis
+     dy=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2 )*cos(2*(360/NSide2)*PI/180.);  // rotation by 60 deg/ z axis
+     dz = -Length2*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+  // Rotation: 
    thx = 90.000000;        phx = 0.000000-(2*360./NSide2);
    thy = 90.+ InclAng2;    phy = 90.000000-(2*360./NSide2);
    thz = InclAng2;         phz = 90.000000-(2*360./NSide2);
    TGeoRotation *pMatrix71 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
      pMatrix70 = new TGeoCombiTrans("", dx,dy,dz,pMatrix71);
+
+
+     dx=  -(( (Length2+ Frame_Length)/2)*sin(InclAng2*PI/180.)+ Rmin2 + (Thickness2*2+Frame_Depth))*sin(2*(360/NSide2)*PI/180.);  // rotation by 60 deg/ z axis
+     dy=  -(( (Length2+ Frame_Length)/2)*sin(InclAng2*PI/180.)+ Rmin2 + (Thickness2*2+Frame_Depth))*cos(2*(360/NSide2)*PI/180.);  // rotation by 60 deg/ z axis
+     dz= -(Length2+Frame_Length)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+     TGeoCombiTrans*
+     pMatrix70b = new TGeoCombiTrans("", dx,dy,dz,pMatrix71);
+
+     //########################
    
    // Combi transformation: 
    //dx =  dx -(WidthHalf2/2)*(1/(cos(AngTrap2)*cos(AngTrap2)))*(cos(2*(360./NSide2)*PI/180.)+cos(3*(360./NSide2)*PI/180.));     // considering  real barycentre position;
    //dx =  dx -(WidthHalf2/2)*(cos(2*(360./NSide2)*PI/180.) + cos(3*(360./NSide2)*3.14159/180)); // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf2/2)*(1/(cos(AngTrap2)*cos(AngTrap2)))*(sin(2*(360./NSide2)*PI/180.)+sin(3*(360./NSide2)*PI/180.));    // considering  real barycentre position; 
    //dy =  dy +(WidthHalf2/2)*(sin(2*(360./NSide2)*PI/180.) + sin(3*(360./NSide2)*PI/180));      // considering  intersection of 2 medianes
-   dx=  -((Length2/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(3*(360/NSide2)*PI/180.);  // rotation by 90 deg/ z axis
-   dy=  -((Length2/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(3*(360/NSide2)*PI/180.);  // rotation by 90 deg/ z axis
+   
+     dx=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(3*(360/NSide2)*PI/180.);  // rotation by 90 deg/ z axis
+     dy=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(3*(360/NSide2)*PI/180.);  // rotation by 90 deg/ z axis
+     dz = -Length2*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
    // Rotation: 
    thx = 90.000000;        phx = 0.000000-(3*360./NSide2);
    thy = 90.+ InclAng2;    phy = 90.000000-(3*360./NSide2);
@@ -982,45 +978,79 @@ void R3BSTaRTra::ConstructGeometry() {
    TGeoRotation *pMatrix73 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
      pMatrix72 = new TGeoCombiTrans("", dx,dy,dz,pMatrix73);
-   
+  
+     dx=  -(( (Length2+ Frame_Length)/2)*sin(InclAng2*PI/180.)+ Rmin2 + (Thickness2*2+Frame_Depth))*sin(3*(360/NSide2)*PI/180.);  // rotation by 90 deg/ z axis
+     dy=  -(( (Length2+ Frame_Length)/2)*sin(InclAng2*PI/180.)+ Rmin2 + (Thickness2*2+Frame_Depth))*cos(3*(360/NSide2)*PI/180.);  // rotation by 90 deg/ z axis
+     //dz= -(Length2+Frame_Length)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+   TGeoCombiTrans*
+     pMatrix72b = new TGeoCombiTrans("", dx,dy,dz,pMatrix73);
+
+     //########################
+
    // Combi transformation: 
    //dx =  dx -(WidthHalf2/2)*(1/(cos(AngTrap2)*cos(AngTrap2)))*(cos(3*(360./NSide2)*PI/180.)+cos(4*(360./NSide2)*PI/180.));      // considering  real barycentre position;
    //dx =  dx -(WidthHalf2/2)*(cos(3*(360./NSide2)*PI/180.) + cos(4*(360./NSide2)*3.14159/180));  // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf2/2)*(1/(cos(AngTrap2)*cos(AngTrap2)))*(sin(3*(360./NSide2)*PI/180.)+sin(4*(360./NSide2)*PI/180.));     // considering  real barycentre position;
    //dy =  dy +(WidthHalf2/2)*(sin(3*(360./NSide2)*PI/180.) + sin(4*(360./NSide2)*PI/180));       // considering  intersection of 2 medianes    
-   dx=  -((Length2/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(4*(360/NSide2)*PI/180.);  // rotation by 120 deg/ z axis
-   dy=  -((Length2/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(4*(360/NSide2)*PI/180.);  // rotation by 120 deg/ z axis
-   // Rotation: 
+
+   dx=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(4*(360/NSide2)*PI/180.);  // rotation by 120 deg/ z axis
+   dy=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(4*(360/NSide2)*PI/180.);  // rotation by 120 deg/ z axis
+   dz = -Length2*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+ 
+  // Rotation: 
    thx = 90.000000;        phx = 0.000000-(4*360./NSide2);
    thy = 90.+ InclAng2;    phy = 90.000000-(4*360./NSide2);
    thz = InclAng2;         phz = 90.000000-(4*360./NSide2);
    TGeoRotation *pMatrix75 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
      pMatrix74 = new TGeoCombiTrans("", dx,dy,dz,pMatrix75);
-   
+  
+   dx=  -(( (Length2+ Frame_Length)/2)*sin(InclAng2*PI/180.)+ Rmin2+ (Thickness2*2+Frame_Depth))*sin(4*(360/NSide2)*PI/180.);  // rotation by 120 deg/ z axis
+   dy=  -(( (Length2+ Frame_Length)/2)*sin(InclAng2*PI/180.)+ Rmin2+ (Thickness2*2+Frame_Depth))*cos(4*(360/NSide2)*PI/180.);  // rotation by 120 deg/ z axis
+   //dz= -(Length2+Frame_Length)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+   TGeoCombiTrans*
+     pMatrix74b = new TGeoCombiTrans("", dx,dy,dz,pMatrix75);
+
+     //########################
+
+
    // Combi transformation: 
    //dx =  dx -(WidthHalf2/2)*(1/(cos(AngTrap2)*cos(AngTrap2)))*(cos(4*(360./NSide2)*PI/180.)+cos(5*(360./NSide2)*PI/180.));      // considering  real barycentre position;
    //dx =  dx -(WidthHalf2/2)*(cos(4*(360./NSide2)*PI/180.) + cos(5*(360./NSide2)*3.14159/180));  // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf2/2)*(1/(cos(AngTrap2)*cos(AngTrap2)))*(sin(4*(360./NSide2)*PI/180.)+sin(5*(360./NSide2)*PI/180.));     // considering  real barycentre position;     
    //dy =  dy +(WidthHalf2/2)*(sin(4*(360./NSide2)*PI/180.) + sin(5*(360./NSide2)*PI/180));       // considering  intersection of 2 medianes    
-   dx=  -((Length2/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(5*(360/NSide2)*PI/180.);  // rotation by 150 deg/ z axis
-   dy=  -((Length2/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(5*(360/NSide2)*PI/180.);  // rotation by 150 deg/ z axis
-   // Rotation: 
+
+   dx=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(5*(360/NSide2)*PI/180.);  // rotation by 150 deg/ z axis
+   dy=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(5*(360/NSide2)*PI/180.);  // rotation by 150 deg/ z axis
+   dz = -Length2*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+ 
+  // Rotation: 
    thx = 90.000000;        phx = 0.000000-(5*360./NSide2);
    thy = 90.+ InclAng2;    phy = 90.000000-(5*360./NSide2);
    thz = InclAng2;         phz = 90.000000-(5*360./NSide2);
    TGeoRotation *pMatrix77 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
      pMatrix76 = new TGeoCombiTrans("", dx,dy,dz,pMatrix77);
+
+   dx=  -(( (Length2+ Frame_Length)/2)*sin(InclAng2*PI/180.)+ Rmin2+ (Thickness2*2+Frame_Depth))*sin(5*(360/NSide2)*PI/180.);  // rotation by 150 deg/ z axis
+   dy=  -(( (Length2+ Frame_Length)/2)*sin(InclAng2*PI/180.)+ Rmin2+ (Thickness2*2+Frame_Depth))*cos(5*(360/NSide2)*PI/180.);  // rotation by 150 deg/ z axis
+   //dz= -(Length2+Frame_Length)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.)); 
+   TGeoCombiTrans*
+     pMatrix76b = new TGeoCombiTrans("", dx,dy,dz,pMatrix77);
    
+     //########################
+
    // Combi transformation: 
    //dx =  dx -(WidthHalf2/2)*(1/(cos(AngTrap2)*cos(AngTrap2)))*(cos(5*(360./NSide2)*PI/180.)+cos(6*(360./NSide2)*PI/180.));      // considering  real barycentre position;
    //dx =  dx -(WidthHalf2/2)*(cos(5*(360./NSide2)*PI/180.) + cos(6*(360./NSide2)*3.14159/180));  // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf2/2)*(1/(cos(AngTrap2)*cos(AngTrap2)))*(sin(5*(360./NSide2)*PI/180.)+sin(6*(360./NSide2)*PI/180.));     // considering  real barycentre position;
    //dy =  dy +(WidthHalf2/2)*(sin(5*(360./NSide2)*PI/180.) + sin(6*(360./NSide2)*PI/180));       // considering  intersection of 2 medianes    
-   dx=  -((Length2/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(6*(360/NSide2)*PI/180.);  // rotation by 180 deg/ z axis
-   dy=  -((Length2/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(6*(360/NSide2)*PI/180.);  // rotation by 180 deg/ z axis
-   // Rotation: 
+
+     dx=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(6*(360/NSide2)*PI/180.);  // rotation by 180 deg/ z axis
+     dy=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(6*(360/NSide2)*PI/180.);  // rotation by 180 deg/ z axis
+     dz = -Length2*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+
+    // Rotation: 
    thx = 90.000000;        phx = 0.000000-(6*360./NSide2);
    thy = 90.+ InclAng2;    phy = 90.000000-(6*360./NSide2);
    thz = InclAng2;         phz = 90.000000-(6*360./NSide2);
@@ -1028,13 +1058,24 @@ void R3BSTaRTra::ConstructGeometry() {
    TGeoCombiTrans*
      pMatrix78 = new TGeoCombiTrans("", dx,dy,dz,pMatrix79);
    
+    dx=  -(( (Length2+ Frame_Length)/2)*sin(InclAng2*PI/180.)+ Rmin2 + (Thickness2*2+Frame_Depth))*sin(6*(360/NSide2)*PI/180.);  // rotation by 180 deg/ z axis
+    dy=  -(( (Length2+ Frame_Length)/2)*sin(InclAng2*PI/180.)+ Rmin2 + (Thickness2*2+Frame_Depth))*cos(6*(360/NSide2)*PI/180.);  // rotation by 180 deg/ z axis
+    //dz= -(Length2+Frame_Length)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.)); 
+    TGeoCombiTrans*
+     pMatrix78b = new TGeoCombiTrans("", dx,dy,dz,pMatrix79);
+
+     //########################
+
    // Combi transformation: 
    //dx =  dx -(WidthHalf2/2)*(1/(cos(AngTrap2)*cos(AngTrap2)))*(cos(6*(360./NSide2)*PI/180.)+cos(7*(360./NSide2)*PI/180.));     // considering  real barycentre position;
    //dx =  dx -(WidthHalf2/2)*(cos(6*(360./NSide2)*PI/180.) + cos(7*(360./NSide2)*3.14159/180)); // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf2/2)*(1/(cos(AngTrap2)*cos(AngTrap2)))*(sin(6*(360./NSide2)*PI/180.)+sin(7*(360./NSide2)*PI/180.));    // considering  real barycentre position; 
    //dy =  dy +(WidthHalf2/2)*(sin(6*(360./NSide2)*PI/180.) + sin(7*(360./NSide2)*PI/180));      // considering  intersection of 2 medianes    
-   dx=  -((Length2/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(7*(360/NSide2)*PI/180.);  // rotation by 210 deg/ z axis
-   dy=  -((Length2/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(7*(360/NSide2)*PI/180.);  // rotation by 210 deg/ z axis
+
+   dx=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(7*(360/NSide2)*PI/180.);  // rotation by 210 deg/ z axis
+   dy=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(7*(360/NSide2)*PI/180.);  // rotation by 210 deg/ z axis
+   dz = -Length2*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+
    // Rotation: 
    thx = 90.000000;        phx = 0.000000-(7*360./NSide2);
    thy = 90.+ InclAng2;    phy = 90.000000-(7*360./NSide2);
@@ -1043,13 +1084,24 @@ void R3BSTaRTra::ConstructGeometry() {
    TGeoCombiTrans*
      pMatrix80 = new TGeoCombiTrans("", dx,dy,dz,pMatrix81);
 
+   dx=  -(( (Length2+ Frame_Length)/2)*sin(InclAng2*PI/180.)+ Rmin2+ (Thickness2*2+Frame_Depth))*sin(7*(360/NSide2)*PI/180.);  // rotation by 210 deg/ z axis
+   dy=  -(( (Length2+ Frame_Length)/2)*sin(InclAng2*PI/180.)+ Rmin2+ (Thickness2*2+Frame_Depth))*cos(7*(360/NSide2)*PI/180.);  // rotation by 210 deg/ z axis
+   //dz= -(Length2+Frame_Length)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.)); 
+   TGeoCombiTrans*
+     pMatrix80b = new TGeoCombiTrans("", dx,dy,dz,pMatrix81);
+
+     //########################
+
+ 
    // Combi transformation: 
    //dx =  dx -(WidthHalf2/2)*(1/(cos(AngTrap2)*cos(AngTrap2)))*(cos(7*(360./NSide2)*PI/180.)+cos(8*(360./NSide2)*PI/180.));     // considering  real barycentre position;
    //dx =  dx -(WidthHalf2/2)*(cos(7*(360./NSide2)*PI/180.) + cos(8*(360./NSide2)*3.14159/180)); // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf2/2)*(1/(cos(AngTrap2)*cos(AngTrap2)))*(sin(7*(360./NSide2)*PI/180.)+sin(8*(360./NSide2)*PI/180.));    // considering  real barycentre position; 
    //dy =  dy +(WidthHalf2/2)*(sin(7*(360./NSide2)*PI/180.) + sin(8*(360./NSide2)*PI/180));      // considering  intersection of 2 medianes    
-   dx=  -((Length2/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(8*(360/NSide2)*PI/180.);  // rotation by 240 deg/ z axis
-   dy=  -((Length2/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(8*(360/NSide2)*PI/180.);  // rotation by 240 deg/ z axis
+
+   dx=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(8*(360/NSide2)*PI/180.);  // rotation by 240 deg/ z axis
+   dy=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(8*(360/NSide2)*PI/180.);  // rotation by 240 deg/ z axis
+   dz = -Length2*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
    // Rotation: 
    thx = 90.000000;        phx = 0.000000-(8*360./NSide2);
    thy = 90.+ InclAng2;    phy = 90.000000-(8*360./NSide2);
@@ -1057,14 +1109,27 @@ void R3BSTaRTra::ConstructGeometry() {
    TGeoRotation *pMatrix83 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
      pMatrix82 = new TGeoCombiTrans("", dx,dy,dz,pMatrix83);
-   
+ 
+
+   dx=  -(( (Length2+ Frame_Length)/2)*sin(InclAng2*PI/180.)+ Rmin2 + (Thickness2*2+Frame_Depth))*sin(8*(360/NSide2)*PI/180.);  // rotation by 240 deg/ z axis
+   dy=  -(( (Length2+ Frame_Length)/2)*sin(InclAng2*PI/180.)+ Rmin2 + (Thickness2*2+Frame_Depth))*cos(8*(360/NSide2)*PI/180.);  // rotation by 240 deg/ z axis
+   //dz= -(Length2+Frame_Length)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.)); 
+   TGeoCombiTrans*
+     pMatrix82b = new TGeoCombiTrans("", dx,dy,dz,pMatrix83);
+
+    //########################
+
+  
    // Combi transformation: 
    //dx =  dx -(WidthHalf2/2)*(1/(cos(AngTrap2)*cos(AngTrap2)))*(cos(8*(360./NSide2)*PI/180.)+cos(9*(360./NSide2)*PI/180.));      // considering  real barycentre position;
    //dx =  dx -(WidthHalf2/2)*(cos(8*(360./NSide2)*PI/180.) + cos(9*(360./NSide2)*3.14159/180));  // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf2/2)*(1/(cos(AngTrap2)*cos(AngTrap2)))*(sin(8*(360./NSide2)*PI/180.)+sin(9*(360./NSide2)*PI/180.));     // considering  real barycentre position;
    //dy =  dy +(WidthHalf2/2)*(sin(8*(360./NSide2)*PI/180.) + sin(9*(360./NSide2)*PI/180));       // considering  intersection of 2 medianes    
-   dx=  -((Length2/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(9*(360/NSide2)*PI/180.);  // rotation by 270 deg/ z axis
-   dy=  -((Length2/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(9*(360/NSide2)*PI/180.);  // rotation by 270 deg/ z axis
+
+   dx=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(9*(360/NSide2)*PI/180.);  // rotation by 270 deg/ z axis
+   dy=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(9*(360/NSide2)*PI/180.);  // rotation by 270 deg/ z axis
+   dz = -Length2*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+
    // Rotation: 
    thx = 90.000000;        phx = 0.000000-(9*360./NSide2);
    thy = 90.+ InclAng2;    phy = 90.000000-(9*360./NSide2);
@@ -1073,13 +1138,25 @@ void R3BSTaRTra::ConstructGeometry() {
    TGeoCombiTrans*
      pMatrix84 = new TGeoCombiTrans("", dx,dy,dz,pMatrix85);
 
+   dx=  -(( (Length2+ Frame_Length)/2)*sin(InclAng2*PI/180.)+ Rmin2+ (Thickness2*2+Frame_Depth) )*sin(9*(360/NSide2)*PI/180.);  // rotation by 270 deg/ z axis
+   dy=  -(( (Length2+ Frame_Length)/2)*sin(InclAng2*PI/180.)+ Rmin2+ (Thickness2*2+Frame_Depth))*cos(9*(360/NSide2)*PI/180.);  // rotation by 270 deg/ z axis
+   //dz= -(Length2+Frame_Length)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.)); 
+
+   TGeoCombiTrans*
+     pMatrix84b = new TGeoCombiTrans("", dx,dy,dz,pMatrix85);
+
+    //########################
+
    // Combi transformation: 
    //dx =  dx -(WidthHalf2/2)*(1/(cos(AngTrap2)*cos(AngTrap2)))*(cos(9*(360./NSide2)*PI/180.)+cos(10*(360./NSide2)*PI/180.));     // considering  real barycentre position;
-   //dx =  dx -(WidthHalf2/2)*(cos(9*(360./NSide2)*PI/180.) + cos(10*(360./NSide2)*3.14159/180)); // considering intersection of 2 medianes
+     // dx =  dx -(WidthHalf2/2)*(cos(9*(360./NSide2)*PI/180.) + cos(10*(360./NSide2)*3.14159/180)); // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf2/2)*(1/(cos(AngTrap2)*cos(AngTrap2)))*(sin(9*(360./NSide2)*PI/180.)+sin(10*(360./NSide2)*PI/180.));    // considering  real barycentre position; 
-    //dy =  dy +(WidthHalf2/2)*(sin(9*(360./NSide2)*PI/180.) + sin(10*(360./NSide2)*PI/180));     // considering  intersection of 2 medianes    
-   dx=  -((Length2/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(10*(360/NSide2)*PI/180.);  // rotation by 300 deg/ z axis
-   dy=  -((Length2/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(10*(360/NSide2)*PI/180.);  // rotation by 300 deg/ z axis
+     //dy =  dy +(WidthHalf2/2)*(sin(9*(360./NSide2)*PI/180.) + sin(10*(360./NSide2)*PI/180));     // considering  intersection of 2 medianes    
+
+   dx=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(10*(360/NSide2)*PI/180.);  // rotation by 300 deg/ z axis
+   dy=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(10*(360/NSide2)*PI/180.);  // rotation by 300 deg/ z axis
+   dz = -Length2*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+
   // Rotation: 
    thx = 90.000000;        phx = 0.000000-(10*360./NSide2);
    thy = 90.+ InclAng2;    phy = 90.000000-(10*360./NSide2);
@@ -1087,21 +1164,43 @@ void R3BSTaRTra::ConstructGeometry() {
    TGeoRotation *pMatrix87 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
      pMatrix86 = new TGeoCombiTrans("", dx,dy,dz,pMatrix87);
-   
+ 
+    dx=  -(( (Length2+ Frame_Length)/2)*sin(InclAng2*PI/180.)+ Rmin2+ (Thickness2*2+Frame_Depth))*sin(10*(360/NSide2)*PI/180.);  // rotation by 300 deg/ z axis
+    dy=  -(( (Length2+ Frame_Length)/2)*sin(InclAng2*PI/180.)+ Rmin2+ (Thickness2*2+Frame_Depth))*cos(10*(360/NSide2)*PI/180.);  // rotation by 300 deg/ z axis
+    //dz= -(Length2+Frame_Length)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.)); 
+    TGeoCombiTrans*
+     pMatrix86b = new TGeoCombiTrans("", dx,dy,dz,pMatrix87);
+
+    //########################
+
+  
    // Combi transformation: 
    //dx =  dx -(WidthHalf2/2)*(1/(cos(AngTrap2)*cos(AngTrap2)))*(cos(10*(360./NSide2)*PI/180.)+cos(11*(360./NSide2)*PI/180.));      // considering  real barycentre position;
    //dx =  dx -(WidthHalf2/2)*(cos(10*(360./NSide2)*PI/180.) + cos(11*(360./NSide2)*3.14159/180)); // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf2/2)*(1/(cos(AngTrap2)*cos(AngTrap2)))*(sin(10*(360./NSide2)*PI/180.)+sin(11*(360./NSide2)*PI/180.));     // considering  real barycentre position;
    //dy =  dy +(WidthHalf2/2)*(sin(10*(360./NSide2)*PI/180.) + sin(11*(360./NSide2)*PI/180));      // considering  intersection of 2 medianes    
-   dx=  -((Length2/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(11*(360/NSide2)*PI/180.);  // rotation by 330 deg/ z axis
-   dy=  -((Length2/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(11*(360/NSide2)*PI/180.);  // rotation by 330 deg/ z axis
-   // Rotation: 
+
+   dx=  -(((Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(11*(360/NSide2)*PI/180.);  // rotation by 330 deg/ z axis
+   dy=  -(((Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(11*(360/NSide2)*PI/180.);  // rotation by 330 deg/ z axis
+   dz = -Length2*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+
+  // Rotation: 
    thx = 90.000000;        phx = 0.000000-(11*360./NSide2);
    thy = 90.+ InclAng2;    phy = 90.000000-(11*360./NSide2);
    thz = InclAng2;         phz = 90.000000-(11*360./NSide2);
    TGeoRotation *pMatrix89 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
      pMatrix88 = new TGeoCombiTrans("", dx,dy,dz,pMatrix89);
+
+   dx=  -(((Length2+ Frame_Length)/2)*sin(InclAng2*PI/180.)+ Rmin2+ (Thickness2*2+Frame_Depth))*sin(11*(360/NSide2)*PI/180.);  // rotation by 330 deg/ z axis
+   dy=  -(((Length2+ Frame_Length)/2)*sin(InclAng2*PI/180.)+ Rmin2+ (Thickness2*2+Frame_Depth))*cos(11*(360/NSide2)*PI/180.);  // rotation by 330 deg/ z axis
+   //dz= -(Length2+Frame_Length)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.)); 
+
+   TGeoCombiTrans*
+     pMatrix88b = new TGeoCombiTrans("", dx,dy,dz,pMatrix89);
+
+    //########################
+
    
    // Combi transformation: 
    dx = 0.000000;
@@ -1154,14 +1253,21 @@ void R3BSTaRTra::ConstructGeometry() {
 
 
 
-
+  //
   // Third layer
+  //
+
+    //########################
 
    // Combi transformation: 
-   dx = 0.000;
    //dy = -((Length3/2  + (WidthHalf3/2)*tan(AngTrap3) )*sin(InclAng3*PI/180.)+ Rmin3); // considering  real barycentre position
-   dy = -((Length3/2)*sin(InclAng3*PI/180.)+ Rmin3);  // considering  intersection of 2 medianes
-   dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+   //dy = -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3);  // considering  intersection of 2 medianes
+   //dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+
+   dx = 0.000;
+   dy = -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3);  // considering  intersection of 2 medianes
+   dz = -(Length3)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+
    // Rotation: 
    thx = 90.000000;        phx = 0.000000;
    thy = 90.+ InclAng3;    phy = 90.000000;
@@ -1169,6 +1275,14 @@ void R3BSTaRTra::ConstructGeometry() {
    TGeoRotation *pMatrix35 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);   // geant3 angles
    TGeoCombiTrans*
      pMatrix34 = new TGeoCombiTrans("", dx,dy,dz,pMatrix35);
+
+	  dy = -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth));  // considering  intersection of 2 medianes
+	  //dz = -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+   TGeoCombiTrans*
+     pMatrix34b = new TGeoCombiTrans("", dx,dy,dz,pMatrix35);
+
+    //########################
+
    
    // Combi transformation: 
  
@@ -1176,8 +1290,11 @@ void R3BSTaRTra::ConstructGeometry() {
    //dx =  -(WidthHalf3/2)*(1 + cos((360./NSide3)*PI/180));                                     // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf3/2)*(1/(cos(AngTrap3)*cos(AngTrap3)))*sin((360./NSide3)*PI/180.);      // considering  real barycentre position;
    //dy = dy +(WidthHalf3/2)*sin((360./NSide3)*PI/180);                                         // considering  intersection of 2 medianes
+
+   dy = -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3);  // considering  intersection of 2 medianes
    dx=  dy*sin((360/NSide3)*PI/180.);  // rotation by 30 deg/ z axis
    dy=  dy*cos((360/NSide3)*PI/180.);  // rotation by 30 deg/ z axis
+   dz = -(Length3)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
    // Rotation: 
    thx = 90.000000;        phx = 0.000000-360./NSide3;
    thy = 90.+ InclAng3;    phy = 90.000000-360./NSide3;
@@ -1186,13 +1303,27 @@ void R3BSTaRTra::ConstructGeometry() {
    TGeoCombiTrans*
      pMatrix36 = new TGeoCombiTrans("", dx,dy,dz,pMatrix37);
 
+   dy = -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth));  // considering  intersection of 2 medianes
+   dx=  dy*sin((360/NSide3)*PI/180.);  // rotation by 30 deg/ z axis
+   dy=  dy*cos((360/NSide3)*PI/180.);  // rotation by 30 deg/ z axis
+   //dz = -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+   TGeoCombiTrans*
+     pMatrix36b = new TGeoCombiTrans("", dx,dy,dz,pMatrix37);
+
+    //########################
+
+
+
    // Combi transformation: 
    //dx =  dx -(WidthHalf3/2)*(1/(cos(AngTrap3)*cos(AngTrap3)))*(cos((360./NSide3)*PI/180.)+cos(2*(360./NSide3)*PI/180.));     // considering  real barycentre position;
    //dx =  dx -(WidthHalf3/2)*(cos((360./NSide3)*PI/180.) + cos(2*(360./NSide3)*3.14159/180));   // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf3/2)*(1/(cos(AngTrap3)*cos(AngTrap3)))*(sin((360./NSide3)*PI/180.)+sin(2*(360./NSide3)*PI/180.));    // considering  real barycentre position;  
    //dy =  dy +(WidthHalf3/2)*(sin((360./NSide3)*PI/180.) + sin(2*(360./NSide3)*PI/180));        // considering  intersection of 2 medianes
-   dx=  -((Length3/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(2*(360/NSide3)*PI/180.);  // rotation by 60 deg/ z axis
-   dy=  -((Length3/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(2*(360/NSide3)*PI/180.);  // rotation by 60 deg/ z axis
+
+   dx=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(2*(360/NSide3)*PI/180.);  // rotation by 60 deg/ z axis
+   dy=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(2*(360/NSide3)*PI/180.);  // rotation by 60 deg/ z axis
+   dz = -(Length3)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+
    // Rotation: 
    thx = 90.000000;        phx = 0.000000-(2*360./NSide3);
    thy = 90.+ InclAng3;    phy = 90.000000-(2*360./NSide3);
@@ -1200,14 +1331,26 @@ void R3BSTaRTra::ConstructGeometry() {
     TGeoRotation *pMatrix39 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
      pMatrix38 = new TGeoCombiTrans("", dx,dy,dz,pMatrix39);
+
+   dx=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*sin(2*(360/NSide3)*PI/180.);  // rotation by 60 deg/ z axis
+   dy=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*cos(2*(360/NSide3)*PI/180.);  // rotation by 60 deg/ z axis
+   //dz = -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+   TGeoCombiTrans*
+     pMatrix38b = new TGeoCombiTrans("", dx,dy,dz,pMatrix39);
+
+    //########################
+
    
    // Combi transformation: 
    //dx =  dx -(WidthHalf3/2)*(1/(cos(AngTrap3)*cos(AngTrap3)))*(cos(2*(360./NSide3)*PI/180.)+cos(3*(360./NSide3)*PI/180.));     // considering  real barycentre position;
    //dx =  dx -(WidthHalf3/2)*(cos(2*(360./NSide3)*PI/180.) + cos(3*(360./NSide3)*3.14159/180)); // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf3/2)*(1/(cos(AngTrap3)*cos(AngTrap3)))*(sin(2*(360./NSide3)*PI/180.)+sin(3*(360./NSide3)*PI/180.));    // considering  real barycentre position;  
    //dy =  dy +(WidthHalf3/2)*(sin(2*(360./NSide3)*PI/180.) + sin(3*(360./NSide3)*PI/180));      // considering  intersection of 2 medianes
-   dx=  -((Length3/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(3*(360/NSide3)*PI/180.);  // rotation by 90 deg/ z axis
-   dy=  -((Length3/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(3*(360/NSide3)*PI/180.);  // rotation by 90 deg/ z axis
+
+   dx=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(3*(360/NSide3)*PI/180.);  // rotation by 90 deg/ z axis
+   dy=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(3*(360/NSide3)*PI/180.);  // rotation by 90 deg/ z axis
+   dz = -(Length3)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+ 
    // Rotation: 
    thx = 90.000000;        phx = 0.000000-(3*360./NSide3);
    thy = 90.+ InclAng3;    phy = 90.000000-(3*360./NSide3);
@@ -1215,14 +1358,26 @@ void R3BSTaRTra::ConstructGeometry() {
    TGeoRotation *pMatrix41 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
      pMatrix40 = new TGeoCombiTrans("", dx,dy,dz,pMatrix41);
+
+   dx=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*sin(3*(360/NSide3)*PI/180.);  // rotation by 90 deg/ z axis
+   dy=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*cos(3*(360/NSide3)*PI/180.);  // rotation by 90 deg/ z axis
+   //dz = -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+   TGeoCombiTrans*
+     pMatrix40b = new TGeoCombiTrans("", dx,dy,dz,pMatrix41);
    
+
+    //########################
+
    // Combi transformation: 
    //dx =  dx -(WidthHalf3/2)*(1/(cos(AngTrap3)*cos(AngTrap3)))*(cos(3*(360./NSide3)*PI/180.)+cos(4*(360./NSide3)*PI/180.));     // considering  real barycentre position;
    //dx =  dx -(WidthHalf3/2)*(cos(3*(360./NSide3)*PI/180.) + cos(4*(360./NSide3)*3.14159/180)); // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf3/2)*(1/(cos(AngTrap3)*cos(AngTrap3)))*(sin(3*(360./NSide3)*PI/180.)+sin(4*(360./NSide3)*PI/180.));    // considering  real barycentre position;  
    //dy =  dy +(WidthHalf3/2)*(sin(3*(360./NSide3)*PI/180.) + sin(4*(360./NSide3)*PI/180));      // considering  intersection of 2 medianes
-   dx=  -((Length3/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(4*(360/NSide3)*PI/180.);  // rotation by 120 deg/ z axis
-   dy=  -((Length3/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(4*(360/NSide3)*PI/180.);  // rotation by 120 deg/ z axis
+
+   dx=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(4*(360/NSide3)*PI/180.);  // rotation by 120 deg/ z axis
+   dy=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(4*(360/NSide3)*PI/180.);  // rotation by 120 deg/ z axis
+   dz = -(Length3)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+
    // Rotation: 
    thx = 90.000000;        phx = 0.000000-(4*360./NSide3);
    thy = 90.+ InclAng3;    phy = 90.000000-(4*360./NSide3);
@@ -1231,13 +1386,24 @@ void R3BSTaRTra::ConstructGeometry() {
    TGeoCombiTrans*
      pMatrix42 = new TGeoCombiTrans("", dx,dy,dz,pMatrix43);
    
+   dx=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*sin(4*(360/NSide3)*PI/180.);  // rotation by 120 deg/ z axis
+   dy=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*cos(4*(360/NSide3)*PI/180.);  // rotation by 120 deg/ z axis
+   //dz = -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+   TGeoCombiTrans*
+     pMatrix42b = new TGeoCombiTrans("", dx,dy,dz,pMatrix43);
+
+    //########################
+
    // Combi transformation: 
    //dx =  dx -(WidthHalf3/2)*(1/(cos(AngTrap3)*cos(AngTrap3)))*(cos(4*(360./NSide3)*PI/180.)+cos(5*(360./NSide3)*PI/180.));     // considering  real barycentre position;
    //dx =  dx -(WidthHalf3/2)*(cos(4*(360./NSide3)*PI/180.) + cos(5*(360./NSide3)*3.14159/180)); // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf3/2)*(1/(cos(AngTrap3)*cos(AngTrap3)))*(sin(4*(360./NSide3)*PI/180.)+sin(5*(360./NSide3)*PI/180.));    // considering  real barycentre position;  
    //dy =  dy +(WidthHalf3/2)*(sin(4*(360./NSide3)*PI/180.) + sin(5*(360./NSide3)*PI/180));      // considering  intersection of 2 medianes
-   dx=  -((Length3/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(5*(360/NSide3)*PI/180.);  // rotation by 130 deg/ z axis
-   dy=  -((Length3/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(5*(360/NSide3)*PI/180.);  // rotation by 150 deg/ z axis
+
+   dx=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(5*(360/NSide3)*PI/180.);  // rotation by 130 deg/ z axis
+   dy=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(5*(360/NSide3)*PI/180.);  // rotation by 150 deg/ z axis
+   dz = -(Length3)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+
    // Rotation: 
    thx = 90.000000;        phx = 0.000000-(5*360./NSide3);
    thy = 90.+ InclAng3;    phy = 90.000000-(5*360./NSide3);
@@ -1245,14 +1411,26 @@ void R3BSTaRTra::ConstructGeometry() {
    TGeoRotation *pMatrix45 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
      pMatrix44 = new TGeoCombiTrans("", dx,dy,dz,pMatrix45);
+
+     dx=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*sin(5*(360/NSide3)*PI/180.);  // rotation by 130 deg/ z axis
+     dy=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*cos(5*(360/NSide3)*PI/180.);  // rotation by 150 deg/ z axis
+     //dz = -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+   TGeoCombiTrans*
+     pMatrix44b = new TGeoCombiTrans("", dx,dy,dz,pMatrix45);
+
+    //########################
+
    
    // Combi transformation: 
    //dx =  dx -(WidthHalf3/2)*(1/(cos(AngTrap3)*cos(AngTrap3)))*(cos(5*(360./NSide3)*PI/180.)+cos(6*(360./NSide3)*PI/180.));     // considering  real barycentre position;
    //dx =  dx -(WidthHalf3/2)*(cos(5*(360./NSide3)*PI/180.) + cos(6*(360./NSide3)*3.14159/180)); // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf3/2)*(1/(cos(AngTrap3)*cos(AngTrap3)))*(sin(5*(360./NSide3)*PI/180.)+sin(6*(360./NSide3)*PI/180.));    // considering  real barycentre position;  
    //dy =  dy +(WidthHalf3/2)*(sin(5*(360./NSide3)*PI/180.) + sin(6*(360./NSide3)*PI/180));      // considering  intersection of 2 medianes
-   dx=  -((Length3/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(6*(360/NSide3)*PI/180.);  // rotation by 180 deg/ z axis
-   dy=  -((Length3/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(6*(360/NSide3)*PI/180.);  // rotation by 180 deg/ z axis
+
+   dx=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(6*(360/NSide3)*PI/180.);  // rotation by 180 deg/ z axis
+   dy=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(6*(360/NSide3)*PI/180.);  // rotation by 180 deg/ z axis
+   dz = -(Length3)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+
    // Rotation: 
    thx = 90.000000;        phx = 0.000000-(6*360./NSide3);
    thy = 90.+ InclAng3;    phy = 90.000000-(6*360./NSide3);
@@ -1261,13 +1439,24 @@ void R3BSTaRTra::ConstructGeometry() {
    TGeoCombiTrans*
      pMatrix46 = new TGeoCombiTrans("", dx,dy,dz,pMatrix47);
    
+   dx=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*sin(6*(360/NSide3)*PI/180.);  // rotation by 180 deg/ z axis
+   dy=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*cos(6*(360/NSide3)*PI/180.);  // rotation by 180 deg/ z axis
+   //dz = -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+   TGeoCombiTrans*
+     pMatrix46b = new TGeoCombiTrans("", dx,dy,dz,pMatrix47);
+
+    //########################
+
    // Combi transformation: 
    //dx =  dx -(WidthHalf3/2)*(1/(cos(AngTrap3)*cos(AngTrap3)))*(cos(6*(360./NSide3)*PI/180.)+cos(7*(360./NSide3)*PI/180.));     // considering  real barycentre position;
    //dx =  dx -(WidthHalf3/2)*(cos(6*(360./NSide3)*PI/180.) + cos(7*(360./NSide3)*3.14159/180)); // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf3/2)*(1/(cos(AngTrap3)*cos(AngTrap3)))*(sin(6*(360./NSide3)*PI/180.)+sin(7*(360./NSide3)*PI/180.));    // considering  real barycentre position;  
    //dy =  dy +(WidthHalf3/2)*(sin(6*(360./NSide3)*PI/180.) + sin(7*(360./NSide3)*PI/180));      // considering  intersection of 2 medianes
-   dx=  -((Length3/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(7*(360/NSide3)*PI/180.);  // rotation by 210 deg/ z axis
-   dy=  -((Length3/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(7*(360/NSide3)*PI/180.);  // rotation by 210 deg/ z axis
+
+   dx=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(7*(360/NSide3)*PI/180.);  // rotation by 210 deg/ z axis
+   dy=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(7*(360/NSide3)*PI/180.);  // rotation by 210 deg/ z axis
+   dz = -(Length3)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+
    // Rotation: 
    thx = 90.000000;        phx = 0.000000-(7*360./NSide3);
    thy = 90.+ InclAng3;    phy = 90.000000-(7*360./NSide3);
@@ -1276,13 +1465,25 @@ void R3BSTaRTra::ConstructGeometry() {
    TGeoCombiTrans*
      pMatrix48 = new TGeoCombiTrans("", dx,dy,dz,pMatrix49);
 
+   dx=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*sin(7*(360/NSide3)*PI/180.);  // rotation by 210 deg/ z axis
+   dy=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*cos(7*(360/NSide3)*PI/180.);  // rotation by 210 deg/ z axis
+   //dz = -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+   TGeoCombiTrans*
+     pMatrix48b = new TGeoCombiTrans("", dx,dy,dz,pMatrix49);
+
+   //########################
+
+
    // Combi transformation: 
    //dx =  dx -(WidthHalf3/2)*(1/(cos(AngTrap3)*cos(AngTrap3)))*(cos(7*(360./NSide3)*PI/180.)+cos(8*(360./NSide3)*PI/180.));     // considering  real barycentre position;
    //dx =  dx -(WidthHalf3/2)*(cos(7*(360./NSide3)*PI/180.) + cos(8*(360./NSide3)*3.14159/180)); // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf3/2)*(1/(cos(AngTrap3)*cos(AngTrap3)))*(sin(7*(360./NSide3)*PI/180.)+sin(8*(360./NSide3)*PI/180.));    // considering  real barycentre position;  
    //dy =  dy +(WidthHalf3/2)*(sin(7*(360./NSide3)*PI/180.) + sin(8*(360./NSide3)*PI/180));      // considering  intersection of 2 medianes
-   dx=  -((Length3/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(8*(360/NSide3)*PI/180.);  // rotation by 240 deg/ z axis
-   dy=  -((Length3/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(8*(360/NSide3)*PI/180.);  // rotation by 240 deg/ z axis
+
+   dx=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(8*(360/NSide3)*PI/180.);  // rotation by 240 deg/ z axis
+   dy=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(8*(360/NSide3)*PI/180.);  // rotation by 240 deg/ z axis
+   dz = -(Length3)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+
    // Rotation: 
    thx = 90.000000;        phx = 0.000000-(8*360./NSide3);
    thy = 90.+ InclAng3;    phy = 90.000000-(8*360./NSide3);
@@ -1290,15 +1491,27 @@ void R3BSTaRTra::ConstructGeometry() {
    TGeoRotation *pMatrix51 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
      pMatrix50 = new TGeoCombiTrans("", dx,dy,dz,pMatrix51);
-   
+
+   dx=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*sin(8*(360/NSide3)*PI/180.);  // rotation by 240 deg/ z axis
+   dy=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*cos(8*(360/NSide3)*PI/180.);  // rotation by 240 deg/ z axis
+   //dz = -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+
+   TGeoCombiTrans*
+     pMatrix50b = new TGeoCombiTrans("", dx,dy,dz,pMatrix51);
+
+    //########################
+  
    // Combi transformation: 
    //dx =  dx -(WidthHalf3/2)*(1/(cos(AngTrap3)*cos(AngTrap3)))*(cos(8*(360./NSide3)*PI/180.)+cos(9*(360./NSide3)*PI/180.));     // considering  real barycentre position;
    //dx =  dx -(WidthHalf3/2)*(cos(8*(360./NSide3)*PI/180.) + cos(9*(360./NSide3)*3.14159/180)); // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf3/2)*(1/(cos(AngTrap3)*cos(AngTrap3)))*(sin(8*(360./NSide3)*PI/180.)+sin(9*(360./NSide3)*PI/180.));    // considering  real barycentre position;  
    //dy =  dy +(WidthHalf3/2)*(sin(8*(360./NSide3)*PI/180.) + sin(9*(360./NSide3)*PI/180));      // considering  intersection of 2 medianes
-   dx=  -((Length3/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(9*(360/NSide3)*PI/180.);  // rotation by 270 deg/ z axis
-   dy=  -((Length3/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(9*(360/NSide3)*PI/180.);  // rotation by 270 deg/ z axis
-   // Rotation: 
+
+   dx=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(9*(360/NSide3)*PI/180.);  // rotation by 270 deg/ z axis
+   dy=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(9*(360/NSide3)*PI/180.);  // rotation by 270 deg/ z axis
+   dz = -(Length3)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+
+    // Rotation: 
    thx = 90.000000;        phx = 0.000000-(9*360./NSide3);
    thy = 90.+ InclAng3;    phy = 90.000000-(9*360./NSide3);
    thz = InclAng3;         phz = 90.000000-(9*360./NSide3);
@@ -1306,13 +1519,25 @@ void R3BSTaRTra::ConstructGeometry() {
    TGeoCombiTrans*
      pMatrix52 = new TGeoCombiTrans("", dx,dy,dz,pMatrix53);
 
+   dx=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*sin(9*(360/NSide3)*PI/180.);  // rotation by 270 deg/ z axis
+   dy=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*cos(9*(360/NSide3)*PI/180.);  // rotation by 270 deg/ z axis
+   //dz = -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+   TGeoCombiTrans*
+     pMatrix52b = new TGeoCombiTrans("", dx,dy,dz,pMatrix53);
+
+
+   //########################
+
    // Combi transformation: 
    //dx =  dx -(WidthHalf3/2)*(1/(cos(AngTrap3)*cos(AngTrap3)))*(cos(9*(360./NSide3)*PI/180.)+cos(10*(360./NSide3)*PI/180.));     // considering  real barycentre position;
    //dx =  dx -(WidthHalf3/2)*(cos(9*(360./NSide3)*PI/180.) + cos(10*(360./NSide3)*3.14159/180)); // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf3/2)*(1/(cos(AngTrap3)*cos(AngTrap3)))*(sin(9*(360./NSide3)*PI/180.)+sin(10*(360./NSide3)*PI/180.));    // considering  real barycentre position;  
    //dy =  dy +(WidthHalf3/2)*(sin(9*(360./NSide3)*PI/180.) + sin(10*(360./NSide3)*PI/180));      // considering  intersection of 2 medianes
-   dx=  -((Length3/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(10*(360/NSide3)*PI/180.);  // rotation by 300 deg/ z axis
-   dy=  -((Length3/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(10*(360/NSide3)*PI/180.);  // rotation by 300 deg/ z axis
+
+   dx=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(10*(360/NSide3)*PI/180.);  // rotation by 300 deg/ z axis
+   dy=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(10*(360/NSide3)*PI/180.);  // rotation by 300 deg/ z axis
+   dz = -(Length3)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+
    // Rotation: 
    thx = 90.000000;        phx = 0.000000-(10*360./NSide3);
    thy = 90.+ InclAng3;    phy = 90.000000-(10*360./NSide3);
@@ -1320,14 +1545,25 @@ void R3BSTaRTra::ConstructGeometry() {
    TGeoRotation *pMatrix55 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
      pMatrix54 = new TGeoCombiTrans("", dx,dy,dz,pMatrix55);
-   
+
+   dx=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*sin(10*(360/NSide3)*PI/180.);  // rotation by 300 deg/ z axis
+   dy=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*cos(10*(360/NSide3)*PI/180.);  // rotation by 300 deg/ z axis
+   //dz = -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+   TGeoCombiTrans*
+     pMatrix54b = new TGeoCombiTrans("", dx,dy,dz,pMatrix55);
+ 
+  //########################
+  
    // Combi transformation: 
    //dx =  dx -(WidthHalf3/2)*(1/(cos(AngTrap3)*cos(AngTrap3)))*(cos(10*(360./NSide3)*PI/180.)+cos(11*(360./NSide3)*PI/180.));     // considering  real barycentre position;
    //dx =  dx -(WidthHalf3/2)*(cos(10*(360./NSide3)*PI/180.) + cos(11*(360./NSide3)*3.14159/180)); // considering intersection of 2 medianes
    //dy =  dy + (WidthHalf3/2)*(1/(cos(AngTrap3)*cos(AngTrap3)))*(sin(10*(360./NSide3)*PI/180.)+sin(11*(360./NSide3)*PI/180.));    // considering  real barycentre position;  
    //dy =  dy +(WidthHalf3/2)*(sin(10*(360./NSide3)*PI/180.) + sin(11*(360./NSide3)*PI/180));      // considering  intersection of 2 medianes
-   dx=  -((Length3/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(11*(360/NSide3)*PI/180.);  // rotation by 330 deg/ z axis
-   dy=  -((Length3/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(11*(360/NSide3)*PI/180.);  // rotation by 330 deg/ z axis
+
+   dx=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(11*(360/NSide3)*PI/180.);  // rotation by 330 deg/ z axis
+   dy=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(11*(360/NSide3)*PI/180.);  // rotation by 330 deg/ z axis
+   dz = -(Length3)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+
    // Rotation: 
    thx = 90.000000;        phx = 0.000000-(11*360./NSide3);
    thy = 90.+ InclAng3;    phy = 90.000000-(11*360./NSide3);
@@ -1335,7 +1571,16 @@ void R3BSTaRTra::ConstructGeometry() {
    TGeoRotation *pMatrix57 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
      pMatrix56 = new TGeoCombiTrans("", dx,dy,dz,pMatrix57);
-   
+
+   dx=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*sin(11*(360/NSide3)*PI/180.);  // rotation by 330 deg/ z axis
+   dy=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*cos(11*(360/NSide3)*PI/180.);  // rotation by 330 deg/ z axis
+   //dz = -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+
+  TGeoCombiTrans*
+     pMatrix56b = new TGeoCombiTrans("", dx,dy,dz,pMatrix57);
+
+   //########################
+  
    // Combi transformation: 
    dx = 0.000000;
    dy = 13.2800; 
@@ -1525,21 +1770,60 @@ void R3BSTaRTra::ConstructGeometry() {
    TGeoVolume* pAWorld = gGeoManager->GetTopVolume();
    pAWorld->SetVisLeaves(kTRUE);
 
-   // StarTrack world (mother volume
+
+     gGeoManager->SetVisLevel(6);
+
+   TGeoRotation *rotg = new TGeoRotation();
+   rotg->RotateX(0.);
+   rotg->RotateY(0.);
+   rotg->RotateZ(0.);
+   dx=tx=0.0;
+   dy=ty=0.0;
+   dz=tz=0.0;
+   
+   TGeoCombiTrans *t1 = new TGeoCombiTrans(tx,ty,tz,rotg);
+   
+     dx=tx=0;
+       //dy=ty=2*(Frame_Depth+Thickness1)/2 - Thickness1;  // Since Frame_Depth and Thickness1 are half thicknesses
+     dy=ty=Frame_Depth;  // Since Frame_Depth and Thickness1 are half thicknesses
+     dz=tz=0;
+   
+   TGeoCombiTrans *t2 = new TGeoCombiTrans(tx,ty,tz,rotg);
+
+     dx=tx=0;
+     dy=ty=-(Frame_Depth+Thickness1) + 0.00625;
+     dz=tz= Length1/2 -9.9869;
+   
+   TGeoCombiTrans *t3 = new TGeoCombiTrans(tx,ty,tz,rotg);
+   
+     dx=tx=0;
+     dy=ty=-(Thickness1*2);  // Since Thickness1 is half of the detector Thickness
+     dy=
+     dz=tz= Length1/2 -9.9869-1;
+   
+   TGeoCombiTrans *t4 = new TGeoCombiTrans(tx,ty,tz,rotg);
+
+   // StarTrack world (mother volume to have vacuum for Si tracker and air for CALIFA)  !! 
+  /*
    TGeoShape *pSTaRTrackWorld =new TGeoTubeSeg("STarTrack_Tube",
-					      0.,   // rmin
+					      4.,   // rmin // put it to 4 for delat e- and protons; TODO: modify geo to leave it to 0 all the time 
+					      //26.2,   // rmin // put it to 26.2 for gamma attenuation study; TODO: modify geo to leave it to 0 or 4 all the time 
 					      26.4, // rmax (cf: Chamber in passive/R3BvacVesselcool.cxx 
 					      35.,  // dz
 					      0.,   // phi1
 					      360.);// phi2
 
    TGeoVolume*
-   pWorld  = new TGeoVolume("STaRTrackWorld",pSTaRTrackWorld, pVacuumMedium);
+   pTraWorld  = new TGeoVolume("STaRTrackWorld",pSTaRTrackWorld, pVacuumMedium);
    TGeoCombiTrans *t0 = new TGeoCombiTrans();
    TGeoCombiTrans *pGlobalc = GetGlobalPosition(t0);
 
    // add the sphere as Mother Volume
-   pAWorld->AddNode(pWorld, 0, pGlobalc);
+   pAWorld->AddNode(pTraWorld, 0, pGlobalc);
+ */
+
+
+
 
 
 
@@ -1552,153 +1836,81 @@ void R3BSTaRTra::ConstructGeometry() {
    //dy = 2.000000;
    //dz = 0.005000;
    // Volume: STaRTraLog FOR FIRST LAYER
-   //TGeoVolume *STaRTraLog1 = gGeoManager->MakeBox("STaRTraLog1",pMed22,dx,dy,dz);
-   TGeoVolume *STaRTraLog1 = gGeoManager->MakeTrd1("STaRTraLog1",pMed22,WidthMax1/2.,WidthMin1/2.,Thickness1,Length1/2.);
+   //TGeoVolume *STaRTraLog1 = gGeoManager->MakeBox("STaRTraLog1",pSiMed,dx,dy,dz);
+
+   TGeoVolume *STaRTraLog1 = gGeoManager->MakeTrd1("STaRTraLog1",pSiMed,WidthMax1/2.,WidthMin1/2.,Thickness1,Length1/2.);
+
+    TGeoVolume *STaRTraVideLog1 = gGeoManager->MakeTrd1("STaRTraVideLog1",pVacuumMedium,WidthMax1/2.,WidthMin1/2.,Frame_Depth,Length1/2.);
+     TGeoVolume *STaRTraCBFrameLog1 = gGeoManager->MakeTrd1("STaRTraCBFrameLog1",pCarbonFibreMedium,(WidthMax1+Frame_Width)/2.,(WidthMin1+Frame_Width)/2.,Frame_Depth,(Length1+Frame_Length)/2.);
+       TGeoVolume *CBFrameSupportBDLog1 = gGeoManager->MakeTrd1("CBFrameSupportBDLog1",pCarbonFibreMedium, 4.90/2, 4.88/2, 0.05/2, 0.15/2);
+       TGeoVolume *CBFrameXSupportBDLog1 = gGeoManager->MakeTrd1("CBFrameXSupportBDLog1",pCarbonFibreMedium, 5.15/2, 5.13/2,  0.2/2, 0.1/2);  // extra support
+
+	     STaRTraVideLog1->AddNodeOverlap(CBFrameXSupportBDLog1,1,t4);
+	     STaRTraVideLog1->AddNodeOverlap(CBFrameSupportBDLog1,1,t3);
+	     //STaRTraVideLog1->AddNodeOverlap(STaRTraLog1,1,t2);
+	     STaRTraCBFrameLog1->AddNode(STaRTraVideLog1,1,t1);
+
+
+     dy=ty=-(Frame_Depth+Thickness2) + 0.00625;
+     dz=tz= Length2/2 -12.898471;
+     TGeoCombiTrans *t5 = new TGeoCombiTrans(tx,ty,tz,rotg);
+
+     dy=ty=-(Thickness2*2);  // Since Thickness1 is half of the detector Thickness
+     dz=tz= Length2/2 -12.898471 -1;
+     TGeoCombiTrans *t6 = new TGeoCombiTrans(tx,ty,tz,rotg);
+
+     dz=tz= Length3/2 - (12.898471+11.8071);
+     TGeoCombiTrans *t7 = new TGeoCombiTrans(tx,ty,tz,rotg);
+
+     dy=ty=-(Thickness3*2);  // Since Thickness1 is half of the detector Thickness
+     dz=tz= Length3/2 -(12.898471+11.8071)-1;
+     TGeoCombiTrans *t8 = new TGeoCombiTrans(tx,ty,tz,rotg);
 
    // Si Shape & volume: TraBox type: TGeoBBox
-   dx = 15.00000;
-   dy = 5.50000;
-   dz = 0.015000;
+   //dx = 15.00000;
+   //dy = 5.50000;
+   //dz = 0.015000;
    // Volume: STaRTraLog   FOR SECOND LAYER
-   //TGeoVolume *STaRTraLog2 = gGeoManager->MakeBox("STaRTraLog2",pMed22,dx,dy,dz);
-   TGeoVolume *STaRTraLog2 = gGeoManager->MakeTrd1("STaRTraLog2",pMed22,WidthMax3/2,WidthMin3/2,Thickness3,Length3/2);
+   //TGeoVolume *STaRTraLog2 = gGeoManager->MakeBox("STaRTraLog2",pSiMed,dx,dy,dz);
+   TGeoVolume *STaRTraLog2 = gGeoManager->MakeTrd1("STaRTraLog2",pSiMed,WidthMax3/2,WidthMin3/2,Thickness3,Length3/2);
+
+     TGeoVolume *STaRTraVideLog2 = gGeoManager->MakeTrd1("STaRTraVideLog2",pVacuumMedium,WidthMax3/2.,WidthMin3/2.,Frame_Depth,Length3/2.);
+     TGeoVolume *STaRTraCBFrameLog2 = gGeoManager->MakeTrd1("STaRTraCBFrameLog2",pCarbonFibreMedium,(WidthMax3+Frame_Width)/2.,(WidthMin3+Frame_Width)/2.,Frame_Depth,(Length3+Frame_Length)/2.);
+	 TGeoVolume *CBFrameSupportBDLog2 = gGeoManager->MakeTrd1("CBFrameSupportBDLog2",pCarbonFibreMedium, 4.90/2, 4.88/2 ,0.05/2, 0.15/2);
+	 TGeoVolume *CBFrameSupport2BDLog2 = gGeoManager->MakeTrd1("CBFrameSupport2BDLog2",pCarbonFibreMedium, 8.28/2, 8.26/2 ,0.05/2, 0.15/2);
+	 TGeoVolume *CBFrameXSupportBDLog2 = gGeoManager->MakeTrd1("CBFrameXSupportBDLog2",pCarbonFibreMedium, 5.15/2, 5.13/2, 0.2/2, 0.1/2);
+	 TGeoVolume *CBFrameXSupport2BDLog2 = gGeoManager->MakeTrd1("CBFrameXSupport2BDLog2",pCarbonFibreMedium, 8.52/2, 8.50/2, 0.2/2, 0.1/2);
+
+	   STaRTraVideLog2->AddNodeOverlap(CBFrameXSupportBDLog2,1,t6);
+	   STaRTraVideLog2->AddNodeOverlap(CBFrameXSupport2BDLog2,1,t8);
+	   STaRTraVideLog2->AddNodeOverlap(CBFrameSupportBDLog2,1,t5);
+	   STaRTraVideLog2->AddNodeOverlap(CBFrameSupport2BDLog2,1,t7);
+	   //STaRTraVideLog2->AddNodeOverlap(STaRTraLog2,1,t2);
+	   STaRTraCBFrameLog2->AddNode(STaRTraVideLog2,1,t1);
+
+
 
    // Si Shape & volume: TraBox type: TGeoBBox
-   dx = 15.00000;
-   dy = 4.500000;
-   dz = 0.015000;
+   //dx = 15.00000;
+   //dy = 4.500000;
+   //dz = 0.015000;
    // Volume: STaRTraLog FOR THIRD LAYER
-   //TGeoVolume *STaRTraLog3 = gGeoManager->MakeBox("STaRTraLog3",pMed22,dx,dy,dz);
-   TGeoVolume *STaRTraLog3 = gGeoManager->MakeTrd1("STaRTraLog3",pMed22,WidthMax2/2,WidthMin2/2,Thickness2,Length2/2);
+   //TGeoVolume *STaRTraLog3 = gGeoManager->MakeBox("STaRTraLog3",pSiMed,dx,dy,dz);
+   TGeoVolume *STaRTraLog3 = gGeoManager->MakeTrd1("STaRTraLog3",pSiMed,WidthMax2/2,WidthMin2/2,Thickness2,Length2/2);
 
-   // Si Shape & volume: TraBox type: TGeoBBox
-   dx = 13.500000;
-   dy = 7.1500000;
-   dz = 0.015000;
-   // Volume: STaRTraLog
-   TGeoVolume *STaRTraLog4 = gGeoManager->MakeBox("STaRTraLog4",pMed22,dx,dy,dz);
+     TGeoVolume *STaRTraVideLog3 = gGeoManager->MakeTrd1("STaRTraVideLog3",pVacuumMedium,WidthMax2/2.,WidthMin2/2.,Frame_Depth,Length2/2.);
+     TGeoVolume *STaRTraCBFrameLog3 = gGeoManager->MakeTrd1("STaRTraCBFrameLog3",pCarbonFibreMedium,(WidthMax2+Frame_Width)/2.,(WidthMin2+Frame_Width)/2.,Frame_Depth,(Length2+Frame_Length)/2.);
+	 TGeoVolume *CBFrameSupportBDLog3 = gGeoManager->MakeTrd1("CBFrameSupportBDLog3",pCarbonFibreMedium, 4.90/2, 4.88/2, 0.05/2, 0.15/2);
+	 TGeoVolume *CBFrameSupport2BDLog3 = gGeoManager->MakeTrd1("CBFrameSupport2BDLog3",pCarbonFibreMedium, 8.28/2, 8.26/2, 0.05/2, 0.15/2);
+	 TGeoVolume *CBFrameXSupportBDLog3 = gGeoManager->MakeTrd1("CBFrameXSupportBDLog3",pCarbonFibreMedium, 5.15/2, 5.13/2, 0.2/2, 0.1/2);
+	 TGeoVolume *CBFrameXSupport2BDLog3 = gGeoManager->MakeTrd1("CBFrameXSuppor2tBDLog3",pCarbonFibreMedium, 8.52/2, 8.50/2, 0.2/2, 0.1/2);
 
-   // Si Shape & volume: TraBox type: TGeoBBox
-   dx = 13.500000;
-   dy = 8.3500000;
-   dz = 0.015000;
-   // Volume: STaRTraLog
-   TGeoVolume *STaRTraLog5 = gGeoManager->MakeBox("STaRTraLog5",pMed22,dx,dy,dz);
-
-   // Shape: MontagePlatform type: TGeoTubeSeg
-   rmin = 5.0000;
-   rmax = 11.000000;
-   dz   = 0.0150000;
-   phi1 = 0.000000;
-   phi2 = 360.000000;
-   TGeoShape *Tra6 = new TGeoTubeSeg("Tra6",rmin,rmax,dz,phi1,phi2);
-   // Volume: MontagePlatformLog
-   TGeoVolume* STaRTraLog6 = new TGeoVolume("STaRTraLog6",Tra6, pMed22);
-   
-   // Shape: MontagePlatform type: TGeoTubeSeg
-   rmin = 2.750000;
-   rmax = 18.000000;
-   dz   = 0.150000;
-   phi1 = 0.000000;
-   phi2 = 360.000000;
-   TGeoShape *pMontagePlatform = new TGeoTubeSeg("MontagePlatform",rmin,rmax,dz,phi1,phi2);
-   // Volume: MontagePlatformLog
-   TGeoVolume*
-   pMontagePlatformLog = new TGeoVolume("MontagePlatformLog",pMontagePlatform, pMed25);
-
-   /*
-	// Shape: Chamber type: TGeoTubeSeg
-	rmin = 25.00000;
-	rmax = 25.200000;
-	dz   = 15.0000;
-	phi1 = 0.000000;
-	phi2 = 360.000000;
-	TGeoShape *pChamberBarrel = new TGeoTubeSeg("ChamberBarrel",rmin,rmax,dz,phi1,phi2);
-	// Volume: ChamberLog
-	TGeoVolume*
-	pChamberBarrelLog = new TGeoVolume("ChamberBarrelLog",pChamberBarrel, pMed3);
-	
-	// Shape: Chamber type: TGeoCone
-	Double_t rmax1 = 25.20000;
-	Double_t rmin1 = 25.40000;
-	Double_t rmax2 = 2.650000;
-	Double_t rmin2 = 2.450000;
-	dz = 20.0000;
-    TGeoShape *pChamberEnd1 = new TGeoCone("ChamberEnd1",dz,rmin1,rmax1,rmin2,rmax2);
-	// Volume: pGoldCone
-	TGeoVolume*
-	pChamberEnd1Log = new TGeoVolume("ChamberEnd1Log",pChamberEnd1, pMed3);
-	
-	// Shape: Chamber type: TGeoTubeSeg
-	rmin = 2.00000;
-	rmax = 25.200000;
-	dz   = 0.20000;
-	phi1 = 0.000000;
-	phi2 = 360.000000;
-	TGeoShape *pChamberEnd2 = new TGeoTubeSeg("ChamberEnd2",rmin,rmax,dz,phi1,phi2);
-	// Volume: ChamberLog
-	TGeoVolume*
-	pChamberEnd2Log = new TGeoVolume("ChamberEnd2Log",pChamberEnd2, pMed3);
-   */
-
-   // Shape: BeamPipe type: TGeoTubeSeg
-   rmin = 1.800000;
-   rmax = 2.000000;
-   dz   = 20.00000;
-   phi1 = 0.000000;
-   phi2 = 360.000000;
-   TGeoShape *pBeamPipe = new TGeoTubeSeg("BeamPipe",rmin,rmax,dz,phi1,phi2);
-   // Volume: BeamPipeLog
-   TGeoVolume*
-   pBeamPipeLog = new TGeoVolume("BeamPipeLog",pBeamPipe, pMed21);
-
-   // Shape: MontageRing type: TGeoTubeSeg
-   rmin = 12.000000;
-   rmax = 15.000000;
-   dz   = 0.250000;
-   phi1 = 0.000000;
-   phi2 = 360.000000;
-   TGeoShape *pMontageRing = new TGeoTubeSeg("MontageRing",rmin,rmax,dz,phi1,phi2);
-   // Volume: MontageRingLog
-   TGeoVolume*
-   pMontageRingLog = new TGeoVolume("MontageRingLog",pMontageRing, pMed25);
-
-
-   // Shape: targetWheel type: TGeoTubeSeg
-   rmin = 0.410000;
-   rmax = 5.300000;
-   dz   = 0.100000;
-   phi1 = 0.000000;
-   phi2 = 360.000000;
-   TGeoShape *ptargetWheel = new TGeoTubeSeg("targetWheel",rmin,rmax,dz,phi1,phi2);
-   // Volume: targetWheelLog
-   TGeoVolume*
-   ptargetWheelLog = new TGeoVolume("targetWheelLog",ptargetWheel, pMed21);
-
-
-   // Shape: targetWheel2 type: TGeoTubeSeg
-   rmin = 9.500000;
-   rmax = 10.000000;
-   dz   = 0.100000;
-   phi1 = 0.000000;
-   phi2 = 360.000000;
-   TGeoShape *ptargetWheel2 = new TGeoTubeSeg("targetWheel2",rmin,rmax,dz,phi1,phi2);
-   // Volume: targetWheel2Log
-   TGeoVolume*
-   ptargetWheel2Log = new TGeoVolume("targetWheel2Log",ptargetWheel2, pMed21);
-
-
-	// Shape: Target6 type: TGeoCone
-	//Double_t rmax1 = 6.270000;
-	//Double_t rmin1 = 6.260000;
-	//Double_t rmax2 = 1.930000;
-	//Double_t rmin2 = 1.920000;
-	//dz = 7.0000;
-	//TGeoShape *pGoldCone = new TGeoCone("GoldCone",dz,rmin1,rmax1,rmin2,rmax2);
-	// Volume: pGoldCone
-	//TGeoVolume*
-	//pGoldConelog = new TGeoVolume("GoldConelog",pGoldCone, pMed79);
-
+	   STaRTraVideLog3->AddNodeOverlap(CBFrameXSupportBDLog3,1,t6);
+	   STaRTraVideLog3->AddNodeOverlap(CBFrameXSupport2BDLog3,1,t8);
+	   STaRTraVideLog3->AddNodeOverlap(CBFrameSupportBDLog3,1,t5);
+	   STaRTraVideLog3->AddNodeOverlap(CBFrameSupport2BDLog3,1,t7);
+	   //STaRTraVideLog3->AddNodeOverlap(STaRTraLog3,1,t2);
+	   STaRTraCBFrameLog3->AddNode(STaRTraVideLog3,1,t1);
 
 
    //
@@ -1706,6 +1918,7 @@ void R3BSTaRTra::ConstructGeometry() {
    //
 
    TGeoVolume *aTra = new TGeoVolumeAssembly("ATRA");
+   TGeoVolume *aTraFrame = new TGeoVolumeAssembly("ATRAFRAME");
 
    /*
 	aTra->AddNode(pChamberBarrelLog,1,pMatrix170);
@@ -1725,26 +1938,27 @@ void R3BSTaRTra::ConstructGeometry() {
 
    // First layer
    
+   
+           
    aTra->AddNode(STaRTraLog1,1, pMatrix2);
    aTra->AddNode(STaRTraLog1,2, pMatrix4);
    aTra->AddNode(STaRTraLog1,3, pMatrix6); 
    aTra->AddNode(STaRTraLog1,4, pMatrix8); 
    aTra->AddNode(STaRTraLog1,5, pMatrix10); 
    aTra->AddNode(STaRTraLog1,6, pMatrix12); 
+     
+   aTraFrame->AddNode(STaRTraCBFrameLog1,1, pMatrix2b);
+   aTraFrame->AddNode(STaRTraCBFrameLog1,2, pMatrix4b);
+   aTraFrame->AddNode(STaRTraCBFrameLog1,3, pMatrix6b); 
+   aTraFrame->AddNode(STaRTraCBFrameLog1,4, pMatrix8b); 
+   aTraFrame->AddNode(STaRTraCBFrameLog1,5, pMatrix10b); 
+   aTraFrame->AddNode(STaRTraCBFrameLog1,6, pMatrix12b); 
+    
 
-   //aTra->AddNode(STaRTraLog1,7, pMatrix14); 
-   //aTra->AddNode(STaRTraLog1,8, pMatrix16); 
-   //aTra->AddNode(STaRTraLog1,9, pMatrix18);
-   //aTra->AddNode(STaRTraLog1,10, pMatrix20);
-    //aTra->AddNode(STaRTraLog1,11, pMatrix22); 
-    //aTra->AddNode(STaRTraLog1,12, pMatrix24); 
-    //aTra->AddNode(STaRTraLog1,13, pMatrix26); 
-    //aTra->AddNode(STaRTraLog1,14, pMatrix28); 
-    //aTra->AddNode(STaRTraLog1,15, pMatrix30); 
-    //aTra->AddNode(STaRTraLog1,16, pMatrix32);
+  // Second layer
 
-   // Second layer
-
+   
+          
    aTra->AddNode(STaRTraLog3,7, pMatrix66); 
    aTra->AddNode(STaRTraLog3,8, pMatrix68);
    aTra->AddNode(STaRTraLog3,9, pMatrix70); 
@@ -1757,14 +1971,27 @@ void R3BSTaRTra::ConstructGeometry() {
    aTra->AddNode(STaRTraLog3,16, pMatrix84);
    aTra->AddNode(STaRTraLog3,17, pMatrix86); 
    aTra->AddNode(STaRTraLog3,18, pMatrix88);
+    
+     
+   aTraFrame->AddNode(STaRTraCBFrameLog3,7, pMatrix66b); 
+   aTraFrame->AddNode(STaRTraCBFrameLog3,8, pMatrix68b);
+   aTraFrame->AddNode(STaRTraCBFrameLog3,9, pMatrix70b); 
+   aTraFrame->AddNode(STaRTraCBFrameLog3,10, pMatrix72b);
+   aTraFrame->AddNode(STaRTraCBFrameLog3,11, pMatrix74b); 
+   aTraFrame->AddNode(STaRTraCBFrameLog3,12, pMatrix76b);
+   aTraFrame->AddNode(STaRTraCBFrameLog3,13, pMatrix78b); 
+   aTraFrame->AddNode(STaRTraCBFrameLog3,14, pMatrix80b);
+   aTraFrame->AddNode(STaRTraCBFrameLog3,15, pMatrix82b); 
+   aTraFrame->AddNode(STaRTraCBFrameLog3,16, pMatrix84b);
+   aTraFrame->AddNode(STaRTraCBFrameLog3,17, pMatrix86b); 
+   aTraFrame->AddNode(STaRTraCBFrameLog3,18, pMatrix88b);
 
-    //aTra->AddNode(STaRTraLog3,45, pMatrix90); 
-    //aTra->AddNode(STaRTraLog3,46, pMatrix92);
-    //aTra->AddNode(STaRTraLog3,47, pMatrix94); 
-    //aTra->AddNode(STaRTraLog3,48, pMatrix96);
+     
+     
+ // Third layer 
 
-  // Third layer 
 
+     /*    
    aTra->AddNode(STaRTraLog2,19, pMatrix34); 
    aTra->AddNode(STaRTraLog2,20, pMatrix36);
    aTra->AddNode(STaRTraLog2,21, pMatrix38); 
@@ -1777,33 +2004,23 @@ void R3BSTaRTra::ConstructGeometry() {
    aTra->AddNode(STaRTraLog2,28, pMatrix52);
    aTra->AddNode(STaRTraLog2,29, pMatrix54); 
    aTra->AddNode(STaRTraLog2,30, pMatrix56);
-
-    //aTra->AddNode(STaRTraLog2,29, pMatrix58); 
-    //aTra->AddNode(STaRTraLog2,30, pMatrix60);
-    //aTra->AddNode(STaRTraLog2,31, pMatrix62); 
-    //aTra->AddNode(STaRTraLog2,32, pMatrix64);
-
-   // End Caps
-
-   //aTra->AddNode(STaRTraLog4,25, pMatrix98);
-   //aTra->AddNode(STaRTraLog4,26, pMatrix100);
-   //aTra->AddNode(STaRTraLog5,27, pMatrix102);
-   //aTra->AddNode(STaRTraLog5,28, pMatrix104);
-   
-   //
-   
-  
-   TGeoRotation *rotg = new TGeoRotation();
-   rotg->RotateX(0.);
-   rotg->RotateY(0.);
-   rotg->RotateZ(0.);
-   dx=tx=0.0;
-   dy=ty=0.0;
-   dz=tz=0.0;
-   
-   TGeoCombiTrans *t1 = new TGeoCombiTrans(tx,ty,tz,rotg);
-
-   pWorld->AddNode(aTra,0, t1);
+    
+   aTraFrame->AddNode(STaRTraCBFrameLog2,19, pMatrix34b); 
+   aTraFrame->AddNode(STaRTraCBFrameLog2,20, pMatrix36b);
+   aTraFrame->AddNode(STaRTraCBFrameLog2,21, pMatrix38b); 
+   aTraFrame->AddNode(STaRTraCBFrameLog2,22, pMatrix40b);
+   aTraFrame->AddNode(STaRTraCBFrameLog2,23, pMatrix42b); 
+   aTraFrame->AddNode(STaRTraCBFrameLog2,24, pMatrix44b);
+   aTraFrame->AddNode(STaRTraCBFrameLog2,25, pMatrix46b); 
+   aTraFrame->AddNode(STaRTraCBFrameLog2,26, pMatrix48b);
+   aTraFrame->AddNode(STaRTraCBFrameLog2,27, pMatrix50b); 
+   aTraFrame->AddNode(STaRTraCBFrameLog2,28, pMatrix52b);
+   aTraFrame->AddNode(STaRTraCBFrameLog2,29, pMatrix54b); 
+   aTraFrame->AddNode(STaRTraCBFrameLog2,30, pMatrix56b);
+     */
+   //pTraWorld->AddNode(aTra,0, t1);  // when use a mother volume for Tracker
+   pAWorld->AddNode(aTraFrame,0, t1);  // when use the world as mother volume of the tracker -> impli vacuum is made in all cave
+   pAWorld->AddNode(aTra,0, t1);  // when use the world as mother volume of the tracker -> impli vacuum is made in all cave
 
 }
 

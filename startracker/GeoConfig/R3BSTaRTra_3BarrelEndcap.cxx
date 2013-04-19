@@ -312,7 +312,7 @@ void R3BSTaRTra::EndOfEvent() {
 
 // -----   Public method Register   -------------------------------------------
 void R3BSTaRTra::Register() {
-  FairRootManager::Instance()->Register("TraPoint", GetName(), fTraCollection, kTRUE);
+  FairRootManager::Instance()->Register("STaRTraPoint", GetName(), fTraCollection, kTRUE);
 }
 // ----------------------------------------------------------------------------
 

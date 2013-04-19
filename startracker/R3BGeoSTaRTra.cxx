@@ -30,13 +30,13 @@ const char* R3BGeoSTaRTra::getModuleName(Int_t m) {
   	       << m << " not known!" << endl;
 	 return "";
 	 }
-  if ( m < 9 ) sprintf(modName,"calstation0%i",m+1);
-  else  sprintf(modName,"calstation%i",m+1);
+  if ( m < 9 ) sprintf(modName,"trackerstation0%i",m+1);
+  else  sprintf(modName,"trackerstation%i",m+1);
   return modName;
 }
 
 const char* R3BGeoSTaRTra::getEleName(Int_t m) {
   // Returns the element name of sts number m
-  sprintf(eleName,"cal%i",m+1);
+  sprintf(eleName,"tracker%i",m+1);
   return eleName;
 }
