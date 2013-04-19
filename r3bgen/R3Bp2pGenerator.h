@@ -16,6 +16,7 @@
 
 #include <fstream>
 
+
 class TDatabasePDG;
 class FairPrimaryGenerator;
 
@@ -52,7 +53,7 @@ class R3Bp2pGenerator : public FairGenerator
   ifstream* fInputFile;               //! Input file stream
   const Char_t * fFileName;           //! Input file Name
 
-	
+  ofstream* fOutputFile;	
 
   /** Private method CloseInput. Just for convenience. Closes the 
    ** input file properly. Called from destructor and from ReadEvent. **/
