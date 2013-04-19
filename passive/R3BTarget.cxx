@@ -241,6 +241,35 @@ void R3BTarget::ConstructGeometry2(){
      pMed16 = new TGeoMedium("CH2", numed,pMat16, par);
    }
 
+ // --  Material: Gold
+   TGeoMedium * pMedAu=NULL;
+   if (gGeoManager->GetMedium("Gold") ){
+       pMedAu=gGeoManager->GetMedium("Gold");
+   }else{
+    w       =        0.;
+    a       = 196.9685;
+    z       = 79.000000;
+    density = 19.3000000;
+    //radl    = 6.9;  
+    //absl    = ?;
+    TGeoMaterial*
+      pMatAu = new TGeoMaterial("Gold", a,z,density) ; //,radl,absl);
+    pMatAu->SetIndex(702);
+    numed   = 103;  // medium number
+    Double_t par[8];
+    par[0]  = 0.000000; // isvol
+    par[1]  = 1.000000; // ifield
+    par[2]  = 0.000000; // fieldm
+    par[3]  = 0.000000; // tmaxfd
+    par[4]  = 0.100000; // stemax
+    par[5]  = 0.000000; // deemax
+    par[6]  = 0.000100; // epsil
+    par[7]  = 0.000000; // stmin
+    pMedAu = new TGeoMedium("Gold", numed,pMatAu, par);
+   }
+
+
+
    // TRANSFORMATION MATRICES
    // Combi transformation: 
    dx = 0.000000;
@@ -254,12 +283,25 @@ void R3BTarget::ConstructGeometry2(){
    TGeoCombiTrans*
    pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
 
+  // Combi transformation: 
+   dx = 0.000000;
+   dy = 0.000000;
+    dz = 8.4500;// cone  for final specs 
+  // Rotation: 
+   thx = 90.000000;    phx = 0.000000;
+   thy = 90.000000;    phy = 90.000000;
+   thz = 0.000000;    phz = 0.000000;
+   TGeoRotation *pMatrix13 = new TGeoRotation("", thx,phx,thy,phy,thz,phz);
+   TGeoCombiTrans*
+   pMatrix12 = new TGeoCombiTrans("", dx,dy,dz,pMatrix13);
+
+
    TGeoVolume *top =  gGeoManager->GetTopVolume();
 
    // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
    // Shape: Parafin0deg type: TGeoTubeSeg
    Double_t rmin = 0.000000;
-   Double_t rmax = 1.000000;
+   Double_t rmax = 2.000000;
    dz   = 0.005500;
    phi1 = 0.000000;
    phi2 = 360.000000;
@@ -270,7 +312,26 @@ void R3BTarget::ConstructGeometry2(){
    pParafin0deg_log->SetVisLeaves(kTRUE);
 
    TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix2);
-   top->AddNode(pParafin0deg_log, 0, pGlobal);
+   //top->AddNode(pParafin0deg_log, 0, pGlobal);
+
+
+   // Shape type: TGeoTubeSeg  = for delta electron absorber foil
+   rmin = 6.637;   // Cone
+   rmax = 6.647;   // Cone   0.1mm
+   Double_t  rmin2 = 1.6;     // Cone
+   Double_t  rmax2 = 1.61;    // Cone  0.1mm
+   dz   = 10.60000;   // Cone =half length for final specs
+   phi1 = 0.000000;
+   phi2 = 360.000000;
+   TGeoShape *pTarget4 = new TGeoCone("Target4",dz,rmin,rmax,rmin2,rmax2);
+
+   // Volume: Target4  = for delta electron absorber foil
+   TGeoVolume*
+     pTarget4_log = new TGeoVolume("Target4",pTarget4, pMedAu);    // Gold
+   pTarget4_log->SetVisLeaves(kTRUE);
+   // uncomment to use absorber foil:
+   //top->AddNode(pTarget4_log, 0, pMatrix12);
+ 
 
 }
 
@@ -401,7 +462,34 @@ void R3BTarget::ConstructGeometry4(){
    Double_t z, density, radl, absl, w;
    Int_t nel, numed;
 
+   TGeoMaterial *pMat=NULL;
+   TGeoMedium   *pMed=NULL;
+
    // MATERIALS, MIXTURES AND TRACKING MEDIA
+  if (gGeoManager->GetMedium("Vacuum") ){
+       cout << "-I- TGeoManager: Vacuum Medium already defined " << endl;
+       pMed = gGeoManager->GetMedium("Vacuum");
+   }else{
+  // Material definition
+  // Material: Vacuum
+   a       = 1.e-16;
+   z       = 1.e-16;
+   density = 1.e-16;
+   pMat = new TGeoMaterial("Vacuum", a,z,density);
+   pMat->SetIndex(2);
+// Medium: Vacuum
+   numed   = 2;  // medium number
+   Double_t par[8];
+   par[0]  = 0.000000; // isvol
+   par[1]  = 0.000000; // ifield
+   par[2]  = 0.000000; // fieldm
+   par[3]  = 0.000000; // tmaxfd
+   par[4]  = 0.000000; // stemax
+   par[5]  = 0.000000; // deemax
+   par[6]  = 0.000100; // epsil
+   par[7]  = 0.000000; // stmin
+   pMed  = new TGeoMedium("Vacuum", numed,pMat, par);
+  }
 
    // Mixture: Air
    TGeoMedium * pMed2=NULL;
@@ -424,10 +512,10 @@ void R3BTarget::ConstructGeometry4(){
     par[1]  = 0.000000; // ifield
     par[2]  = 0.000000; // fieldm
     par[3]  = 0.000000; // tmaxfd
-    par[4]  = 0.000000; // stemax
+    par[4]  = 0.100000; // stemax
     par[5]  = 0.000000; // deemax
     par[6]  = 0.000100; // epsil
-    par[7]  = 0.000000; // stmin
+    par[7]  = 0.010000; // stmin
     pMed2 = new TGeoMedium("Air", numed,pMat2, par);
    }
 
@@ -451,10 +539,10 @@ void R3BTarget::ConstructGeometry4(){
     numed   = 14;  // medium number
     Double_t par[8];
     par[0]  = 0.000000; // isvol
-    par[1]  = 0.000000; // ifield
+    par[1]  = 1.000000; // ifield
     par[2]  = 0.000000; // fieldm
     par[3]  = 0.000000; // tmaxfd
-    par[4]  = 0.000000; // stemax
+    par[4]  = 0.100000; // stemax
     par[5]  = 0.000000; // deemax
     par[6]  = 0.000100; // epsil
     par[7]  = 0.000000; // stmin
@@ -478,18 +566,16 @@ void R3BTarget::ConstructGeometry4(){
       numed   = 2;  // medium number
       Double_t par[8];
       par[0]  = 0.000000; // isvol
-      par[1]  = 0.000000; // ifield
+      par[1]  = 1.000000; // ifield
       par[2]  = 0.000000; // fieldm
       par[3]  = 0.000000; // tmaxfd
-      par[4]  = 0.000000; // stemax
+      par[4]  = 0.100000; // stemax
       par[5]  = 0.000000; // deemax
       par[6]  = 0.000100; // epsil
       par[7]  = 0.000000; // stmin
       pMed3 = new TGeoMedium("H2", numed,pMat3,par);
    }
 
-
-// Specific Material definition
  // --  Material: Gold
    TGeoMedium * pMedAu=NULL;
    if (gGeoManager->GetMedium("Gold") ){
@@ -507,16 +593,15 @@ void R3BTarget::ConstructGeometry4(){
     numed   = 103;  // medium number
     Double_t par[8];
     par[0]  = 0.000000; // isvol
-    par[1]  = 0.000000; // ifield
+    par[1]  = 1.000000; // ifield
     par[2]  = 0.000000; // fieldm
     par[3]  = 0.000000; // tmaxfd
-    par[4]  = 0.000000; // stemax
+    par[4]  = 0.100000; // stemax
     par[5]  = 0.000000; // deemax
     par[6]  = 0.000100; // epsil
     par[7]  = 0.000000; // stmin
     pMedAu = new TGeoMedium("Gold", numed,pMatAu, par);
    }
-
 
 
      // TRANSFORMATION MATRICES
@@ -623,8 +708,9 @@ void R3BTarget::ConstructGeometry4(){
    TGeoShape *pTargetEnveloppe = new TGeoTubeSeg("TargetEnveloppe",rmin,rmax,dz,phi1,phi2);
    // Volume: TargetEnveloppe Tube
    TGeoVolume*
-   pTargetEnveloppe_log = new TGeoVolume("TargetEnveloppe",pTargetEnveloppe, pMed2);
+   pTargetEnveloppe_log = new TGeoVolume("TargetEnveloppe",pTargetEnveloppe, pMed);
    pTargetEnveloppe_log->SetVisLeaves(kTRUE);
+
    // Position Mother Volume
    TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix2);
    top->AddNode(pTargetEnveloppe_log, 0, pGlobal);
@@ -660,7 +746,8 @@ void R3BTarget::ConstructGeometry4(){
    // Shape: Target1 type: TGeoTubeSeg
    // Mylar Tube
    rmin = 3.5;          //1.000000;
-   rmax = 3.5250;       //for Mylar
+   rmax = 3.5200;       //for Mylar
+   //rmax = 3.5250;       //for Mylar
    //rmax = 3.5100;       //for Gold
    dz   = 3.;           //1.750000;
    phi1 = 0.000000;
@@ -711,9 +798,10 @@ void R3BTarget::ConstructGeometry4(){
    // Volume: Target2
    TGeoVolume*
      pTarget2_log = new TGeoVolume("Target2",pTarget2, pMed3);   // H2
-   pTarget2_log->SetVisLeaves(kTRUE);
-   pTargetEnveloppe_log->AddNode(pTarget2_log, 0, pMatrix6);
-
+     //pTarget2_log = new TGeoVolume("Target2",pTarget2, pMed2);   // Air
+     pTarget2_log->SetVisLeaves(kTRUE);
+     pTargetEnveloppe_log->AddNode(pTarget2_log, 0, pMatrix6);
+   
    /*
    // Shape: Target2 type: TGeoCone
    // H2 Cone
@@ -746,7 +834,8 @@ void R3BTarget::ConstructGeometry4(){
    rmax = 3.5250;    //for mylar;
    //rmax = 3.5100;    //for Gold;
    //rmax = 3.5150;    //1.015000;
-   dz   = 0.012500;  // =half thickness for Mylar
+   dz   = 0.010000;  // =half thickness for Mylar
+   //dz   = 0.012500;  // =half thickness for Mylar
    //dz   = 0.00500;  // =half thickness for Gold
    //dz   = 0.00100;  // =half thickness for Carbon
    //dz   = 0.007500; // -half thickness
@@ -784,15 +873,14 @@ void R3BTarget::ConstructGeometry4(){
    //TGeoShape *pTarget4 = new TGeoTubeSeg("Target4",rmin,rmax,dz,phi1,phi2);
    TGeoShape *pTarget4 = new TGeoCone("Target4",dz,rmin,rmax,rmin2,rmax2);
 
-   // Volume: Target4
+   // Volume: Target4  = delta electron absorber foil
    TGeoVolume*
      pTarget4_log = new TGeoVolume("Target4",pTarget4, pMedAu);    // Gold
      //pTarget4_log = new TGeoVolume("Target4",pTarget4, pMed15);    // Mylar
    pTarget4_log->SetVisLeaves(kTRUE);
+   // uncomment to use absorber foil:
    //top->AddNode(pTarget4_log, 0, pMatrix12);
-
-
-
+ 
 }
 
 void R3BTarget::ConstructGeometry5(){

@@ -30,6 +30,7 @@
 #include "TGeoTorus.h"
 #include "TGeoBoolNode.h"
 
+
 #include <iostream>
 #include <TMath.h>
 
@@ -57,7 +58,7 @@ fVacVesselCoolName =  new TString(name);
 
 void R3BVacVesselCool::ConstructGeometry(){
 
- if (*fVacVesselCoolName == "LiH") return  ConstructGeometry1();	
+  if (*fVacVesselCoolName == "LiH") return  ConstructGeometry1();  // ie: For Liquid Hydrogen target only (targt4)
 
 }
 
@@ -222,15 +223,17 @@ void R3BVacVesselCool::ConstructGeometry1(){
    thz = 0.000000;     phz = 0.000000;
    TGeoRotation *pRot5 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
 
-   dx = -.3500000*cos(-15*3.14159/180)-7.75*sin(-15*3.14159/180); // x position of ring for Inner Si     
-   dy = -0.35*sin(-15*3.14159/180)+7.75*cos(-15*3.14159/180); // y position of ring for Inner Si     
-   dz = -18.80000; // z position of ring for Inner Si     
+   dx = -.3500000*cos(-15*3.14159/180)-7.75*sin(-15*3.14159/180); //    
+   dy = -0.35*sin(-15*3.14159/180)+7.75*cos(-15*3.14159/180); //     
+   //dz = -13.80000-0.5; //      // for end plate shadowing CALIFA
+   dz = -18.80000-0.5; //      // for end plate at edge of CALIFA
+   //dz = -28.80000-0.5; //        // for end plate position just behind califa
    TGeoCombiTrans* pMatrix6 =
                    new TGeoCombiTrans("", dx,dy,dz,pRot5);
 
    dx = -.350000*cos(-15*3.14159/180)-7.75*sin(-15*3.14159/180)-0.5; // x position of ring for Inner Si     
    dy = -0.35*sin(-15*3.14159/180)+7.75*cos(-15*3.14159/180)+0.1; // y position of ring for Inner Si     
-   dz = -8.70000; // z position of ring for Inner Si     
+   dz = -8.70000; // z position of ring for Inner Si
    TGeoRotation *pRotXZ0 = new TGeoRotation("pRotXZ0");
    pRotXZ0->RotateX(90.);
    pRotXZ0->RotateZ(-15.);
@@ -238,9 +241,11 @@ void R3BVacVesselCool::ConstructGeometry1(){
    TGeoCombiTrans* pMatrix16 =
                    new TGeoCombiTrans("", dx,dy,dz,pRotXZ0);
 
-   dx = 0.3500000*cos(-15*3.14159/180)-7.75*sin(-15*3.14159/180); // x position of ring for Inner Si     
-   dy = 0.35*sin(-15*3.14159/180)+7.75*cos(-15*3.14159/180); // y position of ring for Inner Si     
-   dz = -18.8000000; // z position of ring for Inner Si     
+   dx = 0.3500000*cos(-15*3.14159/180)-7.75*sin(-15*3.14159/180); //   
+   dy = 0.35*sin(-15*3.14159/180)+7.75*cos(-15*3.14159/180); //     
+   //dz = -13.8000000-0.5;      // for end plate shadowing CALIFA
+   dz = -18.8000000-0.5;      // for end plate at edge of CALIFA
+   //dz = -28.8000000-0.5;       // for end plate position just behind califa
    TGeoCombiTrans* pMatrix7 =
                    new TGeoCombiTrans("", dx,dy,dz,pRot5);
 
@@ -259,7 +264,9 @@ void R3BVacVesselCool::ConstructGeometry1(){
    //////////////////////////////////////////////////////////////////////////
    dx = 24.50000; // x position of ring for Outer Si     
    dy = 2.21000; // y position of ring for Outer Si     
-   dz = -21.500000; // z position of ring for Outer Si     
+   //dz = -16.500000-0.5; //      // for end plate shadowing CALIFA 
+   dz = -21.500000-0.5; //      // for end plate at edge of CALIFA 
+   //dz = -31.500000-0.5; //       // for end plate position just behind califa
    TGeoCombiTrans* pMatrix12 =
                    new TGeoCombiTrans("", dx,dy,dz,pRot5);
    dy = 1.250000;
@@ -290,14 +297,18 @@ void R3BVacVesselCool::ConstructGeometry1(){
  
    dx = 24.50000; // x position of ring for Outer Si     
    dy = -2.21000; // y position of ring for Outer Si     
-   dz = -21.500000; // z position of ring for Outer Si     
+   //dz = -16.500000-0.5; // z position of ring for Outer Si      // for end plate edge shadowing CALIFA 
+   dz = -21.500000-0.5; // z position of ring for Outer Si     // for end plate at edge of CALIFA  
+   //dz = -31.500000-0.5; // z position of ring for Outer Si      // for end plate position just behind califa
    TGeoCombiTrans* pMatrix13 =
                    new TGeoCombiTrans("", dx,dy,dz,pRot5);
 
    ////////////////////////////////////////////////////////////////////
    dx = -24.50000; // x position of ring for Outer Si     
    dy = 2.21000; // y position of ring for Outer Si     
-   dz = -21.500000; // z position of ring for Outer Si     
+   //dz = -16.500000-0.5; // z position of ring for Outer Si    // for end plate edge shadowing CALIFA
+   dz = -21.500000-0.5; // z position of ring for Outer Si   // for end plate at edge of CALIFA  
+   //dz = -31.500000-0.5; // z position of ring for Outer Si     // for end plate position just behind califa
    TGeoCombiTrans* pMatrix14 =
                    new TGeoCombiTrans("", dx,dy,dz,pRot5);
    dy = 1.250000; 
@@ -317,7 +328,9 @@ void R3BVacVesselCool::ConstructGeometry1(){
 
    dx = -24.50000; // x position of ring for Outer Si     
    dy = -2.210000; // y position of ring for Outer Si     
-   dz = -21.500000; // z position of ring for Outer Si     
+   //dz = -16.500000-0.5; // z position of ring for Outer Si    // for end plate edge shadowing CALIFA 
+   dz = -21.500000-0.5; // z position of ring for Outer Si   // for end plate at edge of CALIFA 
+   //dz = -31.500000-0.5; // z position of ring for Outer Si     // for end plate position just behind califa
    TGeoCombiTrans* pMatrix15 =
                    new TGeoCombiTrans("", dx,dy,dz,pRot5);
    ////////////////////////////////////////////////////////////////////////
@@ -326,12 +339,14 @@ void R3BVacVesselCool::ConstructGeometry1(){
    //////////////////////////////////////////////////////////////////////////
    dx = 2.21000; // x position of ring for Middle Si     
    dy = 23.000000; // y position of ring for Middle Si     
-   dz = -22.50000; // z position of ring for Middle Si     
+   //dz = -17.50000-0.5; // z position of ring for Middle Si      // for end plate edge shadowing CALIFA
+   dz = -22.50000-0.5; // z position of ring for Middle Si     // for end plate at edge of CALIFA
+   //dz = -32.50000-0.5; // z position of ring for Middle Si      // for end plate position just behind califa
    TGeoCombiTrans* pMatrix8 =
                    new TGeoCombiTrans("", dx,dy,dz,pRot5);
    dx = 1.250000;
    dz= -14.;
-  TGeoRotation *pRotXY0 = new TGeoRotation("pRotXY0");
+   TGeoRotation *pRotXY0 = new TGeoRotation("pRotXY0");
    pRotXY0->RotateX(90.);
    pRotXY0->RotateY(90.);
    pRotXY0->RegisterYourself(); 
@@ -357,15 +372,19 @@ void R3BVacVesselCool::ConstructGeometry1(){
    
    dx = -2.21000; // x position of ring for Middle Si     
    dy = 23.000000; // y position of ring for Middle Si     
-   dz = -22.50000; // z position of ring for Middle Si     
+   //dz = -17.50000-0.5; // z position of ring for Middle Si       // for end plate edge shadowing CALIFA
+   dz = -22.50000-0.5; // z position of ring for Middle Si      // for end plate at edge of CALIFA
+   //dz = -32.50000-0.5; // z position of ring for Middle Si       // for end plate position just behind califa
    TGeoCombiTrans* pMatrix9 =
                    new TGeoCombiTrans("", dx,dy,dz,pRot5);
   
    //////////////////////////////////////////////////////////////////////////
    dx = 2.21000; // x position of ring for Middle Si     
    dy = -23.000000; // y position of ring for Middle Si     
-   dz = -22.500000; // z position of ring for Middle Si     
-   TGeoCombiTrans* pMatrix10 =
+   //dz = -17.500000-0.5; // z position of ring for Middle Si       // for end plate edge shadowing CALIFA
+   dz = -22.500000-0.5; // z position of ring for Middle Si      // for end plate at edge of CALIFA
+   //dz = -32.500000-0.5; // z position of ring for Middle Si     // for end plate position just behind califa
+  TGeoCombiTrans* pMatrix10 =
                    new TGeoCombiTrans("", dx,dy,dz,pRot5);
 
    dx = 1.250000; 
@@ -385,7 +404,9 @@ void R3BVacVesselCool::ConstructGeometry1(){
 
    dx = -2.21000; // x position of ring for Middle Si     
    dy = -23.000000; // y position of ring for Middle Si     
-   dz = -22.500000; // z position of ring for Middle Si     
+   //dz = -17.500000-0.5; // z position of ring for Middle Si       // for end plate edge shadowing CALIFA
+   dz = -22.500000-0.5; // z position of ring for Middle Si      // for end plate at edge of CALIFA
+   //dz = -32.500000-0.5; // z position of ring for Middle Si     // for end plate position just behind califa
    TGeoCombiTrans* pMatrix11 =
                    new TGeoCombiTrans("", dx,dy,dz,pRot5);
 
@@ -434,7 +455,9 @@ void R3BVacVesselCool::ConstructGeometry1(){
 	// Combi transformation: 
 	dx = 0.000000;
 	dy = 0.000000;
-	dz = -15.00000;
+	//dz = -10.00000;  // for end plate edge shadowing CALIFA
+	dz = -15.00000; // for end plate edge of CALIFA
+	//dz = -25.00000;    // for end plate position behind califa
 	// Rotation: 
 	thx = 90.000000;    phx = 0.000000;
 	thy = 90.000000;    phy = 90.000000;
@@ -449,18 +472,24 @@ void R3BVacVesselCool::ConstructGeometry1(){
 	pMatrix172 = new TGeoCombiTrans("", dx,dy,dz,pMatrix171);
 	
         // Combi transformation: 
-	dz = -30.000000;
+	//dz = -20.0000-0.75;    // for end plate edge shadowing CALIFA
+	dz = -30.0000-0.75; // for end plate edge of CALIFA
+	//dz = -50.0000-0.75;   // for end plate position behind califa
 	TGeoCombiTrans*
 	pMatrix174 = new TGeoCombiTrans("", dx,dy,dz,pMatrix171);
 
    // Beam Pipes:
 	
 	// Combi transformation: 
-	dz = -31.-5.00000;
+	//dz = -20.-1.5-5.00000; // for end plate shadowing CALIFA
+	dz = -30.-1.5-5.00000;  // for end plate edge of CALIFA
+	//dz = -50.-1.5-5.00000; // for end plate position behind califa
 	TGeoCombiTrans*
 	pMatrix176 = new TGeoCombiTrans("", dx,dy,dz,pMatrix171);
 	
-	dz = -29.+10.00;
+	//dz = -20.+5.50; // for end plate position behind califa
+	dz = -30.+10.50; // for end plate edge of CALIFA
+	//dz = -50.+20.50; // for end plate position behind califa
 	TGeoCombiTrans*
 	pMatrix178 = new TGeoCombiTrans("", dx,dy,dz,pMatrix171);
 
@@ -486,11 +515,19 @@ void R3BVacVesselCool::ConstructGeometry1(){
    Double_t parCoolRingIn[5] = { 7.75, 0.25, 0.35,
 				351.,  349.};
 
-   Double_t parCoolPipeIn[5] = { 0.25, 0.35, 10.1 };
+   //Double_t parCoolPipeIn[5] = { 0.25, 0.35, 5.6 };   // for end plate position shadowing califa
+   Double_t parCoolPipeIn[5] = { 0.25, 0.35, 10.6 }; // for end plate edge of CALIFA
+   //Double_t parCoolPipeIn[5] = { 0.25, 0.35, 20.6 };   // for end plate position just behind califa
    Double_t parCoolPipeCurveIn[5] = { 0.5, 0.25, 0.35,
 				      0, 90 };
-   Double_t parCoolPipeMid[5] = { 0.25, 0.35, 6.5 };
-   Double_t parCoolPipeOut[5] = { 0.25, 0.35, 7.5 };
+   //Double_t parCoolPipeMid[5] = { 0.25, 0.35, 2. };  // for end plate position shadowing califa
+   Double_t parCoolPipeMid[5] = { 0.25, 0.35, 7. }; // for end plate edge of CALIFA
+   //Double_t parCoolPipeMid[5] = { 0.25, 0.35, 17. };  // for end plate position just behind califa
+
+   //Double_t parCoolPipeOut[5] = { 0.25, 0.35, 3. };  // for end plate position shadowing califa
+   Double_t parCoolPipeOut[5] = { 0.25, 0.35, 8. }; // for end plate edge of CALIFA
+   //Double_t parCoolPipeOut[5] = { 0.25, 0.35, 18. };  // for end plate position just behind califa
+
    Double_t parCoolPipeCurveOut1[5] = { 1, 0.25, 0.35,
 				      180, 180 };
    Double_t parCoolPipeCurveOut2[5] = { 1, 0.25, 0.35,
@@ -531,12 +568,18 @@ void R3BVacVesselCool::ConstructGeometry1(){
 				   3.00000,  3.2000};
    //				   2.450000,  2.650000};
 
-   Double_t parChamberBarrel[3] = { 26.0, 26.2, 15.};
+   //Double_t parChamberBarrel[3] = { 26.0, 26.2, 10.}; // for end plate edge shadowing CALIFA
+   Double_t parChamberBarrel[3] = { 26.0, 26.2, 15.}; // for end plate edge of CALIFA
+   //Double_t parChamberBarrel[3] = { 26.0, 26.2, 25.};  // for end plate edge at then end of CALIFA
 
-   Double_t parChamberEndPlate[3] = { 5.50, 26.2, 1.};
+   //Double_t parChamberEndPlate[3] = { 5.50, 26.2, 1.}; // 2x1 cm Aluminium
+     Double_t parChamberEndPlate[3] = { 5.50, 26.2, 0.75}; // 2*0.75 cm of stainless steel
 
 
-   Double_t parPipeIn1[3] = { 5.50, 6.0, 10.};
+     //Double_t parPipeIn1[3] = { 5.50, 6.0, 5.5}; // for end plate edge shadowing CALIFA
+   Double_t parPipeIn1[3] = { 5.50, 6.0, 10.5}; // for end plate edge of CALIFA
+   //Double_t parPipeIn1[3] = { 5.50, 6.0, 20.5}; // for end plate at the end of CALIFA
+
    Double_t parPipeIn2[3] = { 5.50, 5.7, 2.5};
    Double_t parPipeOut[3] = { 5.50, 6.5, 5.};
    Double_t parPipeInSteelRing[3] = { 3., 5.50, 0.25};
@@ -636,7 +679,8 @@ void R3BVacVesselCool::ConstructGeometry1(){
    TGeoVolume* pChamberConeLog = new TGeoVolume("ChamberConeLog",pChamberCone, pMed2);
    pChamberConeLog->SetVisLeaves(kTRUE);
 
-   TGeoVolume* pChamberEndPlateLog = new TGeoVolume("ChamberEndPlateLog",pChamberEndPlate, pMed2);
+   TGeoVolume* pChamberEndPlateLog = new TGeoVolume("ChamberEndPlateLog",pChamberEndPlate, pMed3);  // Stainless Steel
+   //TGeoVolume* pChamberEndPlateLog = new TGeoVolume("ChamberEndPlateLog",pChamberEndPlate, pMed2);  // Alu
    pChamberEndPlateLog->SetVisLeaves(kTRUE);
 
    TGeoVolume* pPipeIn1Log = new TGeoVolume("PipeIn1Log", pPipeIn1, pMed2);
@@ -655,8 +699,13 @@ void R3BVacVesselCool::ConstructGeometry1(){
    pPipeInSteelPipeLog->SetVisLeaves(kTRUE);
 
    TGeoVolume *top =  gGeoManager->GetTopVolume();
+   TGeoCombiTrans* t0 = new TGeoCombiTrans();;
+   TGeoCombiTrans* pGlobal2 = GetGlobalPosition(t0);
+
    //TGeoCombiTrans* pGlobal1 = GetGlobalPosition(pMatrix1);
    //TGeoCombiTrans* pGlobal2 = GetGlobalPosition(pMatrix2);
+
+   
    top->AddNode(pCoolRingOut_log, 0, pMatrix1);  // top
    top->AddNode(pCoolRingOut_log, 1, pMatrix2); // bottom
    top->AddNode(pCoolRingMid_log, 0, pMatrix3);  // right
@@ -740,15 +789,16 @@ void R3BVacVesselCool::ConstructGeometry1(){
    top->AddNode(pLinkStruct_log, 4,pRot13);  // 270
    top->AddNode(pLinkStruct_log, 5,pRot14);  // 330 
 
-   top->AddNode(pChamberBarrelLog,0,pMatrix170);
-   top->AddNode(pChamberConeLog,0,pMatrix172);
-   top->AddNode(pChamberEndPlateLog,0,pMatrix174);
-
    top->AddNode(pPipeOutLog,0,pMatrix176);
    top->AddNode(pPipeIn1Log,0,pMatrix178);
    top->AddNode(pPipeIn2Log,0,pMatrix180);
    top->AddNode(pPipeInSteelRingLog,0,pMatrix182);
    top->AddNode(pPipeInSteelPipeLog,0,pMatrix184);
+   
+   top->AddNode(pChamberBarrelLog,0,pMatrix170);
+   top->AddNode(pChamberConeLog,0,pMatrix172);
+   top->AddNode(pChamberEndPlateLog,0,pMatrix174);
+
 
 }
 

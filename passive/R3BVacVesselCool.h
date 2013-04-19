@@ -8,6 +8,7 @@
 #include <TString.h>
 
 
+
 class R3BVacVesselCool : public R3BModule {
   public:
     R3BVacVesselCool(const char * name, const char *Title="R3B VacVesselCool");
@@ -18,6 +19,7 @@ class R3BVacVesselCool : public R3BModule {
  protected:
      TString *fVacVesselCoolName; //!
      void ConstructGeometry1();
+
 
     ClassDef(R3BVacVesselCool,1)
   

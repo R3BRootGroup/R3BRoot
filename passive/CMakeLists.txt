@@ -9,6 +9,7 @@ ${CMAKE_SOURCE_DIR}/geobase
 ${CMAKE_SOURCE_DIR}/base 
 ${CMAKE_SOURCE_DIR}/r3bbase  
 ${CMAKE_SOURCE_DIR}/parbase 
+${CMAKE_SOURCE_DIR}/field 
 ${CMAKE_SOURCE_DIR}/passive  )
 
 include_directories( ${INCLUDE_DIRECTORIES})
