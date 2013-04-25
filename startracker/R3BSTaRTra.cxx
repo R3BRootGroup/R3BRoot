@@ -401,9 +401,9 @@ void R3BSTaRTra::ConstructGeometry() {
    Double_t tx,ty,tz;
    Int_t nel, numed;
 
-   Double_t Frame_Width=0.1; // =1mm
+   Double_t Frame_Width=0.1; // =0.1/2=0.05cm on each side
    Double_t Frame_Length=Frame_Width;
-   Double_t Frame_Depth=0.1;  // = half of the frame Depth (ie frame full Depth=2mm)
+   Double_t Frame_Depth=0.1;  // = half of the frame Depth (ie frame full Depth=2.mm)
 
  
 
@@ -1840,16 +1840,68 @@ void R3BSTaRTra::ConstructGeometry() {
 
    TGeoVolume *STaRTraLog1 = gGeoManager->MakeTrd1("STaRTraLog1",pSiMed,WidthMax1/2.,WidthMin1/2.,Thickness1,Length1/2.);
 
+     Double_t Empty_widthMax, Empty_widthMin, Empty_Depth, Empty_Length;
+ 
+     Double_t alpha1=2.5; //alpha1= is an arbitrary fraction of the total length of the empty trapeze whih is totalLength=(Length1-2*Frame_Length)
+     Double_t alpha2= (Length1-2*Frame_Length)*alpha1/((Length1-2*Frame_Length)+0.15*alpha1); //   0.15cm is the width of the transversal support in the middle of the frame
+     Double_t alpha3= 20.;//alpha3= is an arbitrary fraction of the total length of the empty trapeze whih is totalLength=(Length1-2*Frame_Length)
+     Double_t alpha4= (alpha2*alpha3)/(alpha2+alpha3);
+     Double_t alpha5= alpha4/(alpha4-1);
+   
+     TGeoTranslation *t_CBFrame_0 = new TGeoTranslation("T0_in",0.,0.,0.);
+     t_CBFrame_0->RegisterYourself();
+     TGeoTranslation *t_EmptyFrame_1 = new TGeoTranslation("T1_in",0.,0., -(Length1+Frame_Length)/2 + Frame_Length + ((Length1-2*Frame_Length)/alpha1)/2);
+     t_EmptyFrame_1->RegisterYourself();
+     TGeoTranslation *t_EmptyFrame_2 = new TGeoTranslation("T2_in",0.,0., -(Length1+Frame_Length)/2 + Frame_Length + ((Length1-2*Frame_Length)/alpha1) + 0.15 + ((Length1-2*Frame_Length)/alpha3)/2.);
+     t_EmptyFrame_2->RegisterYourself();
+     TGeoTranslation *t_EmptyFrame_3 = new TGeoTranslation("T3_in",0.,0., -(Length1+Frame_Length)/2 + Frame_Length + ((Length1-2*Frame_Length)/alpha1) + 0.15 + ((Length1-2*Frame_Length)/alpha3) + 0.15 +((Length1-2*Frame_Length)/alpha5)/2.);
+     t_EmptyFrame_3->RegisterYourself();
+
+
+     TGeoTrd1 *CB1_Trd1 = new TGeoTrd1("A", (WidthMax1+Frame_Width)/2., (WidthMin1+Frame_Width)/2.,Frame_Depth,(Length1+Frame_Length)/2.); // exteranl CBframe
+
+     Empty_widthMax= (WidthMax1-Frame_Width)/2.;
+     Empty_widthMin= ((WidthMax1-Frame_Width) -(WidthMax1-WidthMin1)/alpha1 )/2.;
+     Empty_Depth= (Frame_Depth+Frame_Depth/10.);
+     Empty_Length= ((Length1-2*Frame_Length)/alpha1)/2.;
+     TGeoTrd1 *Empty1_Trd1 =new TGeoTrd1("B", Empty_widthMax, Empty_widthMin, Empty_Depth, Empty_Length);
+  
+     Empty_widthMax= ( (WidthMax1-Frame_Width)-(WidthMax1-WidthMin1)/alpha2 )/2.;
+     Empty_widthMin= ( Empty_widthMax*2 - (WidthMax1-WidthMin1)/alpha3 )/2.;
+     //Empty_widthMin= ( Empty_widthMax*2 - (Empty_widthMax*2/alpha3))/2.;
+     Empty_Length= ((Length1-2*Frame_Length)/alpha3)/2.;
+     TGeoTrd1 *Empty2_Trd1 =new TGeoTrd1("C", Empty_widthMax ,Empty_widthMin , Empty_Depth ,  Empty_Length);
+
+     
+     Empty_widthMax= ( (WidthMax1-Frame_Width)-(WidthMax1-WidthMin1)/alpha4 )/2.;
+     Empty_widthMin= (WidthMin1-Frame_Length)/2;
+     Empty_Length= ((Length1-2*Frame_Length) - (Length1-2*Frame_Length) /alpha4)/2.;
+     TGeoTrd1 *Empty3_Trd1 =new TGeoTrd1("D", Empty_widthMax ,Empty_widthMin , Empty_Depth , Empty_Length);
+    
+     TGeoCompositeShape *CBFrame;
+     CBFrame= new TGeoCompositeShape("CBFrame", "((A:T0_in-B:T1_in)-C:T2_in)-D:T3_in");
+
+     TGeoVolume *STaRTraCBFrameLog1 = new TGeoVolume("CBFRAME",CBFrame, pCarbonFibreMedium);
+
+     gGeoManager->AddVolume(STaRTraCBFrameLog1);
+
+     //TGeoVolume *STaRTraCBFrameLog1 = gGeoManager->MakeCBFrame("STaRTraCBFrameLog1",pCarbonFibreMedium);
+
+     /*
     TGeoVolume *STaRTraVideLog1 = gGeoManager->MakeTrd1("STaRTraVideLog1",pVacuumMedium,WidthMax1/2.,WidthMin1/2.,Frame_Depth,Length1/2.);
      TGeoVolume *STaRTraCBFrameLog1 = gGeoManager->MakeTrd1("STaRTraCBFrameLog1",pCarbonFibreMedium,(WidthMax1+Frame_Width)/2.,(WidthMin1+Frame_Width)/2.,Frame_Depth,(Length1+Frame_Length)/2.);
        TGeoVolume *CBFrameSupportBDLog1 = gGeoManager->MakeTrd1("CBFrameSupportBDLog1",pCarbonFibreMedium, 4.90/2, 4.88/2, 0.05/2, 0.15/2);
        TGeoVolume *CBFrameXSupportBDLog1 = gGeoManager->MakeTrd1("CBFrameXSupportBDLog1",pCarbonFibreMedium, 5.15/2, 5.13/2,  0.2/2, 0.1/2);  // extra support
 
+	   STaRTraCBFrameLog1->SetLineColor(kCyan);
+	   CBFrameSupportBDLog1->SetLineColor(kCyan);
+	   CBFrameXSupportBDLog1->SetLineColor(kCyan);
+
 	     STaRTraVideLog1->AddNodeOverlap(CBFrameXSupportBDLog1,1,t4);
 	     STaRTraVideLog1->AddNodeOverlap(CBFrameSupportBDLog1,1,t3);
 	     //STaRTraVideLog1->AddNodeOverlap(STaRTraLog1,1,t2);
 	     STaRTraCBFrameLog1->AddNode(STaRTraVideLog1,1,t1);
-
+     */
 
      dy=ty=-(Frame_Depth+Thickness2) + 0.00625;
      dz=tz= Length2/2 -12.898471;
@@ -1866,6 +1918,9 @@ void R3BSTaRTra::ConstructGeometry() {
      dz=tz= Length3/2 -(12.898471+11.8071)-1;
      TGeoCombiTrans *t8 = new TGeoCombiTrans(tx,ty,tz,rotg);
 
+
+
+
    // Si Shape & volume: TraBox type: TGeoBBox
    //dx = 15.00000;
    //dy = 5.50000;
@@ -1873,6 +1928,72 @@ void R3BSTaRTra::ConstructGeometry() {
    // Volume: STaRTraLog   FOR SECOND LAYER
    //TGeoVolume *STaRTraLog2 = gGeoManager->MakeBox("STaRTraLog2",pSiMed,dx,dy,dz);
    TGeoVolume *STaRTraLog2 = gGeoManager->MakeTrd1("STaRTraLog2",pSiMed,WidthMax3/2,WidthMin3/2,Thickness3,Length3/2);
+ 
+
+      alpha1=5.; //alpha1= is an arbitrary fraction of the total length of the empty trapeze whih is totalLength=(Length1-2*Frame_Length)
+      alpha2= (Length3-2*Frame_Length)*alpha1/((Length3-2*Frame_Length)+0.15*alpha1); //   0.15cm is the width of the transversal support in the middle of the frame
+      alpha3= 20.;//alpha3= is an arbitrary fraction of the total length of the empty trapeze whih is totalLength=(Length1-2*Frame_Length)
+      alpha4= 1/((alpha2+alpha3)/(alpha2*alpha3) +0.15/(Length3-2*Frame_Length));
+      alpha5= 3.;
+      Double_t alpha6= 1/( (alpha4+alpha5)/(alpha4*alpha5) +0.15/(Length3-2*Frame_Length));
+      Double_t alpha7= alpha3;
+      Double_t alpha8= (alpha6*alpha7)/(alpha6+alpha7);
+      Double_t alpha9= alpha8/(alpha8-1);
+ 
+
+     TGeoTranslation *t_CBFrame_out0 = new TGeoTranslation("T0_out",0.,0.,0.);
+     t_CBFrame_out0->RegisterYourself();
+     TGeoTranslation *t_EmptyFrame_out1 = new TGeoTranslation("T1_out",0.,0., -(Length3+Frame_Length)/2 + Frame_Length + ((Length3-2*Frame_Length)/alpha1)/2);
+     t_EmptyFrame_out1->RegisterYourself();
+     TGeoTranslation *t_EmptyFrame_out2 = new TGeoTranslation("T2_out",0.,0., -(Length3+Frame_Length)/2 + Frame_Length + ((Length3-2*Frame_Length)/alpha1) + 0.15 + ((Length3-2*Frame_Length)/alpha3)/2.);
+     t_EmptyFrame_out2->RegisterYourself();
+     TGeoTranslation *t_EmptyFrame_out3 = new TGeoTranslation("T3_out",0.,0., -(Length3+Frame_Length)/2 + Frame_Length + ((Length3-2*Frame_Length)/alpha1) + 0.15 + ((Length3-2*Frame_Length)/alpha3) + 0.15 +((Length3-2*Frame_Length)/alpha5)/2.);
+     t_EmptyFrame_out3->RegisterYourself();
+     TGeoTranslation *t_EmptyFrame_out4 = new TGeoTranslation("T4_out",0.,0., -(Length3+Frame_Length)/2 + Frame_Length + ((Length3-2*Frame_Length)/alpha1) + 0.15 + ((Length3-2*Frame_Length)/alpha3) + 0.15 +((Length3-2*Frame_Length)/alpha5) + 0.15 +((Length3-2*Frame_Length)/alpha7)/2) ;
+     t_EmptyFrame_out4->RegisterYourself();
+     TGeoTranslation *t_EmptyFrame_out5 = new TGeoTranslation("T5_out",0.,0., -(Length3+Frame_Length)/2 + Frame_Length + ((Length3-2*Frame_Length)/alpha1) + 0.15 + ((Length3-2*Frame_Length)/alpha3) + 0.15 +((Length3-2*Frame_Length)/alpha5) + 0.15 +((Length3-2*Frame_Length)/alpha7) +0.15 + ((Length3-2*Frame_Length)/alpha9)/2);
+     t_EmptyFrame_out5->RegisterYourself();
+
+
+     TGeoTrd1 *CB1out_Trd1 = new TGeoTrd1("Aout", (WidthMax3+Frame_Width)/2., (WidthMin3+Frame_Width)/2.,Frame_Depth,(Length3+Frame_Length)/2.); // exteranl CBframe
+
+     Empty_widthMax= (WidthMax3-Frame_Width)/2.;
+     Empty_widthMin= ((WidthMax3-Frame_Width) -(WidthMax3-WidthMin3)/alpha1 )/2.;
+     Empty_Depth= (Frame_Depth+Frame_Depth/10.);
+     Empty_Length= ((Length3-2*Frame_Length)/alpha1)/2.;
+     TGeoTrd1 *Empty1out_Trd1 =new TGeoTrd1("Bout", Empty_widthMax, Empty_widthMin, Empty_Depth, Empty_Length);
+  
+     Empty_widthMax= ( (WidthMax3-Frame_Width)-(WidthMax3-WidthMin3)/alpha2 )/2.;
+     Empty_widthMin= ( Empty_widthMax*2 - (WidthMax3-WidthMin3)/alpha3)/2.;
+     Empty_Length= ((Length3-2*Frame_Length)/alpha3)/2.;
+     TGeoTrd1 *Empty2out_Trd1 =new TGeoTrd1("Cout", Empty_widthMax ,Empty_widthMin , Empty_Depth ,  Empty_Length);
+
+     
+     Empty_widthMax= ( (WidthMax3-Frame_Width)-(WidthMax3-WidthMin3)/alpha4 )/2.;
+     Empty_widthMin=  ( Empty_widthMax*2 - (WidthMax3-WidthMin3)/alpha5)/2.;
+     Empty_Length= ((Length3-2*Frame_Length)/alpha5)/2.;
+     TGeoTrd1 *Empty3out_Trd1 =new TGeoTrd1("Dout", Empty_widthMax ,Empty_widthMin , Empty_Depth , Empty_Length);
+  
+     Empty_widthMax= ( (WidthMax3-Frame_Width)-(WidthMax3-WidthMin3)/alpha6 )/2.;
+     Empty_widthMin=  ( Empty_widthMax*2 - (WidthMax3-WidthMin3)/alpha7)/2.;
+     Empty_Length= ((Length3-2*Frame_Length)/alpha7)/2.;
+     TGeoTrd1 *Empty4out_Trd1 =new TGeoTrd1("Eout", Empty_widthMax ,Empty_widthMin , Empty_Depth , Empty_Length);
+  
+     Empty_widthMax= ( (WidthMax3-Frame_Width)-(WidthMax3-WidthMin3)/alpha8 )/2.;
+     Empty_widthMin= (WidthMin3-Frame_Length)/2;
+     Empty_Length= ((Length3-2*Frame_Length) - (Length3-2*Frame_Length) /alpha8)/2.;
+     TGeoTrd1 *Empty5out_Trd1 =new TGeoTrd1("Fout", Empty_widthMax ,Empty_widthMin , Empty_Depth , Empty_Length);
+
+  
+     TGeoCompositeShape *CBFrame_out;
+     CBFrame_out= new TGeoCompositeShape("CBFrame_out", "((((Aout:T0_out-Bout:T1_out)-Cout:T2_out)-Dout:T3_out)-Eout:T4_out)-Fout:T5_out");
+
+     TGeoVolume *STaRTraCBFrameLog2 = new TGeoVolume("CBFRAME_OUT",CBFrame_out, pCarbonFibreMedium);
+
+     gGeoManager->AddVolume(STaRTraCBFrameLog2);
+
+
+     /*
 
      TGeoVolume *STaRTraVideLog2 = gGeoManager->MakeTrd1("STaRTraVideLog2",pVacuumMedium,WidthMax3/2.,WidthMin3/2.,Frame_Depth,Length3/2.);
      TGeoVolume *STaRTraCBFrameLog2 = gGeoManager->MakeTrd1("STaRTraCBFrameLog2",pCarbonFibreMedium,(WidthMax3+Frame_Width)/2.,(WidthMin3+Frame_Width)/2.,Frame_Depth,(Length3+Frame_Length)/2.);
@@ -1881,13 +2002,21 @@ void R3BSTaRTra::ConstructGeometry() {
 	 TGeoVolume *CBFrameXSupportBDLog2 = gGeoManager->MakeTrd1("CBFrameXSupportBDLog2",pCarbonFibreMedium, 5.15/2, 5.13/2, 0.2/2, 0.1/2);
 	 TGeoVolume *CBFrameXSupport2BDLog2 = gGeoManager->MakeTrd1("CBFrameXSupport2BDLog2",pCarbonFibreMedium, 8.52/2, 8.50/2, 0.2/2, 0.1/2);
 
+
+	   STaRTraCBFrameLog2->SetLineColor(kCyan);
+	   CBFrameSupportBDLog2->SetLineColor(kCyan);
+	   CBFrameSupport2BDLog2->SetLineColor(kCyan);
+	   CBFrameXSupportBDLog2->SetLineColor(kCyan);
+	   CBFrameXSupport2BDLog2->SetLineColor(kCyan);
+
+
 	   STaRTraVideLog2->AddNodeOverlap(CBFrameXSupportBDLog2,1,t6);
 	   STaRTraVideLog2->AddNodeOverlap(CBFrameXSupport2BDLog2,1,t8);
 	   STaRTraVideLog2->AddNodeOverlap(CBFrameSupportBDLog2,1,t5);
 	   STaRTraVideLog2->AddNodeOverlap(CBFrameSupport2BDLog2,1,t7);
 	   //STaRTraVideLog2->AddNodeOverlap(STaRTraLog2,1,t2);
 	   STaRTraCBFrameLog2->AddNode(STaRTraVideLog2,1,t1);
-
+     */
 
 
    // Si Shape & volume: TraBox type: TGeoBBox
@@ -1898,6 +2027,71 @@ void R3BSTaRTra::ConstructGeometry() {
    //TGeoVolume *STaRTraLog3 = gGeoManager->MakeBox("STaRTraLog3",pSiMed,dx,dy,dz);
    TGeoVolume *STaRTraLog3 = gGeoManager->MakeTrd1("STaRTraLog3",pSiMed,WidthMax2/2,WidthMin2/2,Thickness2,Length2/2);
 
+     alpha1=5.; //alpha1= is an arbitrary fraction of the total length of the empty trapeze whih is totalLength=(Length1-2*Frame_Length)
+     alpha2= (Length2-2*Frame_Length)*alpha1/((Length2-2*Frame_Length)+0.15*alpha1); //   0.15cm is the width of the transversal support in the middle of the frame
+     alpha3= 20.;//alpha3= is an arbitrary fraction of the total length of the empty trapeze whih is totalLength=(Length1-2*Frame_Length)
+     alpha4= 1/((alpha2+alpha3)/(alpha2*alpha3) +0.15/(Length2-2*Frame_Length));
+     alpha5= 3.;
+     alpha6= 1/( (alpha4+alpha5)/(alpha4*alpha5) +0.15/(Length2-2*Frame_Length));
+     alpha7= alpha3;
+     alpha8= (alpha6*alpha7)/(alpha6+alpha7);
+     alpha9= alpha8/(alpha8-1);
+ 
+
+     TGeoTranslation *t_CBFrame_mid0 = new TGeoTranslation("T0_mid",0.,0.,0.);
+     t_CBFrame_mid0->RegisterYourself();
+     TGeoTranslation *t_EmptyFrame_mid1 = new TGeoTranslation("T1_mid",0.,0., -(Length2+Frame_Length)/2 + Frame_Length + ((Length2-2*Frame_Length)/alpha1)/2);
+     t_EmptyFrame_mid1->RegisterYourself();
+     TGeoTranslation *t_EmptyFrame_mid2 = new TGeoTranslation("T2_mid",0.,0., -(Length2+Frame_Length)/2 + Frame_Length + ((Length2-2*Frame_Length)/alpha1) + 0.15 + ((Length2-2*Frame_Length)/alpha3)/2.);
+     t_EmptyFrame_mid2->RegisterYourself();
+     TGeoTranslation *t_EmptyFrame_mid3 = new TGeoTranslation("T3_mid",0.,0., -(Length2+Frame_Length)/2 + Frame_Length + ((Length2-2*Frame_Length)/alpha1) + 0.15 + ((Length2-2*Frame_Length)/alpha3) + 0.15 +((Length2-2*Frame_Length)/alpha5)/2.);
+     t_EmptyFrame_mid3->RegisterYourself();
+     TGeoTranslation *t_EmptyFrame_mid4 = new TGeoTranslation("T4_mid",0.,0., -(Length2+Frame_Length)/2 + Frame_Length + ((Length2-2*Frame_Length)/alpha1) + 0.15 + ((Length2-2*Frame_Length)/alpha3) + 0.15 +((Length2-2*Frame_Length)/alpha5) + 0.15 +((Length2-2*Frame_Length)/alpha7)/2) ;
+     t_EmptyFrame_mid4->RegisterYourself();
+     TGeoTranslation *t_EmptyFrame_mid5 = new TGeoTranslation("T5_mid",0.,0., -(Length2+Frame_Length)/2 + Frame_Length + ((Length2-2*Frame_Length)/alpha1) + 0.15 + ((Length2-2*Frame_Length)/alpha3) + 0.15 +((Length2-2*Frame_Length)/alpha5) + 0.15 +((Length2-2*Frame_Length)/alpha7) +0.15 + ((Length2-2*Frame_Length)/alpha9)/2);
+     t_EmptyFrame_mid5->RegisterYourself();
+
+
+     TGeoTrd1 *CB1mid_Trd1 = new TGeoTrd1("Amid", (WidthMax2+Frame_Width)/2., (WidthMin2+Frame_Width)/2.,Frame_Depth,(Length2+Frame_Length)/2.); // exteranl CBframe
+
+     Empty_widthMax= (WidthMax2-Frame_Width)/2.;
+     Empty_widthMin= ((WidthMax2-Frame_Width) -(WidthMax2-WidthMin2)/alpha1 )/2.;
+     Empty_Depth= (Frame_Depth+Frame_Depth/10.);
+     Empty_Length= ((Length2-2*Frame_Length)/alpha1)/2.;
+     TGeoTrd1 *Empty1mid_Trd1 =new TGeoTrd1("Bmid", Empty_widthMax, Empty_widthMin, Empty_Depth, Empty_Length);
+  
+     Empty_widthMax= ( (WidthMax3-Frame_Width)-(WidthMax2-WidthMin2)/alpha2 )/2.;
+     Empty_widthMin= ( Empty_widthMax*2 - (WidthMax2-WidthMin2)/alpha3)/2.;
+     Empty_Length= ((Length2-2*Frame_Length)/alpha3)/2.;
+     TGeoTrd1 *Empty2mid_Trd1 =new TGeoTrd1("Cmid", Empty_widthMax ,Empty_widthMin , Empty_Depth ,  Empty_Length);
+
+     
+     Empty_widthMax= ( (WidthMax2-Frame_Width)-(WidthMax2-WidthMin2)/alpha4 )/2.;
+     Empty_widthMin=  ( Empty_widthMax*2 - (WidthMax2-WidthMin2)/alpha5)/2.;
+     Empty_Length= ((Length2-2*Frame_Length)/alpha5)/2.;
+     TGeoTrd1 *Empty3mid_Trd1 =new TGeoTrd1("Dmid", Empty_widthMax ,Empty_widthMin , Empty_Depth , Empty_Length);
+  
+     Empty_widthMax= ( (WidthMax2-Frame_Width)-(WidthMax2-WidthMin2)/alpha6 )/2.;
+     Empty_widthMin=  ( Empty_widthMax*2 - (WidthMax2-WidthMin2)/alpha7)/2.;
+     Empty_Length= ((Length2-2*Frame_Length)/alpha7)/2.;
+     TGeoTrd1 *Empty4mid_Trd1 =new TGeoTrd1("Emid", Empty_widthMax ,Empty_widthMin , Empty_Depth , Empty_Length);
+  
+     Empty_widthMax= ( (WidthMax2-Frame_Width)-(WidthMax2-WidthMin2)/alpha8 )/2.;
+     Empty_widthMin= (WidthMin2-Frame_Length)/2;
+     Empty_Length= ((Length2-2*Frame_Length) - (Length2-2*Frame_Length) /alpha8)/2.;
+     TGeoTrd1 *Empty5mid_Trd1 =new TGeoTrd1("Fmid", Empty_widthMax ,Empty_widthMin , Empty_Depth , Empty_Length);
+
+  
+     TGeoCompositeShape *CBFrame_mid;
+     CBFrame_mid= new TGeoCompositeShape("CBFrame_mid", "((((Amid:T0_mid-Bmid:T1_mid)-Cmid:T2_mid)-Dmid:T3_mid)-Emid:T4_mid)-Fmid:T5_mid");
+
+     TGeoVolume *STaRTraCBFrameLog3 = new TGeoVolume("CBFRAME_MID",CBFrame_out, pCarbonFibreMedium);
+
+     gGeoManager->AddVolume(STaRTraCBFrameLog3);
+
+
+     /*
+
      TGeoVolume *STaRTraVideLog3 = gGeoManager->MakeTrd1("STaRTraVideLog3",pVacuumMedium,WidthMax2/2.,WidthMin2/2.,Frame_Depth,Length2/2.);
      TGeoVolume *STaRTraCBFrameLog3 = gGeoManager->MakeTrd1("STaRTraCBFrameLog3",pCarbonFibreMedium,(WidthMax2+Frame_Width)/2.,(WidthMin2+Frame_Width)/2.,Frame_Depth,(Length2+Frame_Length)/2.);
 	 TGeoVolume *CBFrameSupportBDLog3 = gGeoManager->MakeTrd1("CBFrameSupportBDLog3",pCarbonFibreMedium, 4.90/2, 4.88/2, 0.05/2, 0.15/2);
@@ -1905,13 +2099,20 @@ void R3BSTaRTra::ConstructGeometry() {
 	 TGeoVolume *CBFrameXSupportBDLog3 = gGeoManager->MakeTrd1("CBFrameXSupportBDLog3",pCarbonFibreMedium, 5.15/2, 5.13/2, 0.2/2, 0.1/2);
 	 TGeoVolume *CBFrameXSupport2BDLog3 = gGeoManager->MakeTrd1("CBFrameXSuppor2tBDLog3",pCarbonFibreMedium, 8.52/2, 8.50/2, 0.2/2, 0.1/2);
 
+	   STaRTraVideLog3->SetLineColor(0);
+	   STaRTraCBFrameLog3->SetLineColor(41);
+	   CBFrameSupportBDLog3->SetLineColor(kCyan);
+	   CBFrameSupport2BDLog3->SetLineColor(kCyan);
+	   CBFrameXSupportBDLog3->SetLineColor(kCyan);
+	   CBFrameXSupport2BDLog3->SetLineColor(kCyan);
+
 	   STaRTraVideLog3->AddNodeOverlap(CBFrameXSupportBDLog3,1,t6);
 	   STaRTraVideLog3->AddNodeOverlap(CBFrameXSupport2BDLog3,1,t8);
 	   STaRTraVideLog3->AddNodeOverlap(CBFrameSupportBDLog3,1,t5);
 	   STaRTraVideLog3->AddNodeOverlap(CBFrameSupport2BDLog3,1,t7);
 	   //STaRTraVideLog3->AddNodeOverlap(STaRTraLog3,1,t2);
 	   STaRTraCBFrameLog3->AddNode(STaRTraVideLog3,1,t1);
-
+     */
 
    //
    // Make elementary assembly of the whole structure.
@@ -1939,6 +2140,8 @@ void R3BSTaRTra::ConstructGeometry() {
    // First layer
    
    
+   //STaRTraLog1->SetLineColor(kRed);
+   STaRTraLog1->SetLineColor(40);
            
    aTra->AddNode(STaRTraLog1,1, pMatrix2);
    aTra->AddNode(STaRTraLog1,2, pMatrix4);
@@ -1947,6 +2150,8 @@ void R3BSTaRTra::ConstructGeometry() {
    aTra->AddNode(STaRTraLog1,5, pMatrix10); 
    aTra->AddNode(STaRTraLog1,6, pMatrix12); 
      
+   STaRTraCBFrameLog1->SetLineColor(41);
+
    aTraFrame->AddNode(STaRTraCBFrameLog1,1, pMatrix2b);
    aTraFrame->AddNode(STaRTraCBFrameLog1,2, pMatrix4b);
    aTraFrame->AddNode(STaRTraCBFrameLog1,3, pMatrix6b); 
@@ -1958,6 +2163,8 @@ void R3BSTaRTra::ConstructGeometry() {
   // Second layer
 
    
+     //STaRTraLog3->SetLineColor(kWhite);
+     STaRTraLog3->SetLineColor(40);
           
    aTra->AddNode(STaRTraLog3,7, pMatrix66); 
    aTra->AddNode(STaRTraLog3,8, pMatrix68);
@@ -1972,6 +2179,7 @@ void R3BSTaRTra::ConstructGeometry() {
    aTra->AddNode(STaRTraLog3,17, pMatrix86); 
    aTra->AddNode(STaRTraLog3,18, pMatrix88);
     
+  STaRTraCBFrameLog3->SetLineColor(41);
      
    aTraFrame->AddNode(STaRTraCBFrameLog3,7, pMatrix66b); 
    aTraFrame->AddNode(STaRTraCBFrameLog3,8, pMatrix68b);
@@ -1991,7 +2199,9 @@ void R3BSTaRTra::ConstructGeometry() {
  // Third layer 
 
 
-     /*    
+     //STaRTraLog2->SetLineColor(kBlue);
+    STaRTraLog2->SetLineColor(40);
+        
    aTra->AddNode(STaRTraLog2,19, pMatrix34); 
    aTra->AddNode(STaRTraLog2,20, pMatrix36);
    aTra->AddNode(STaRTraLog2,21, pMatrix38); 
@@ -2004,6 +2214,8 @@ void R3BSTaRTra::ConstructGeometry() {
    aTra->AddNode(STaRTraLog2,28, pMatrix52);
    aTra->AddNode(STaRTraLog2,29, pMatrix54); 
    aTra->AddNode(STaRTraLog2,30, pMatrix56);
+
+  STaRTraCBFrameLog2->SetLineColor(41);
     
    aTraFrame->AddNode(STaRTraCBFrameLog2,19, pMatrix34b); 
    aTraFrame->AddNode(STaRTraCBFrameLog2,20, pMatrix36b);
@@ -2017,7 +2229,7 @@ void R3BSTaRTra::ConstructGeometry() {
    aTraFrame->AddNode(STaRTraCBFrameLog2,28, pMatrix52b);
    aTraFrame->AddNode(STaRTraCBFrameLog2,29, pMatrix54b); 
    aTraFrame->AddNode(STaRTraCBFrameLog2,30, pMatrix56b);
-     */
+     
    //pTraWorld->AddNode(aTra,0, t1);  // when use a mother volume for Tracker
    pAWorld->AddNode(aTraFrame,0, t1);  // when use the world as mother volume of the tracker -> impli vacuum is made in all cave
    pAWorld->AddNode(aTra,0, t1);  // when use the world as mother volume of the tracker -> impli vacuum is made in all cave
