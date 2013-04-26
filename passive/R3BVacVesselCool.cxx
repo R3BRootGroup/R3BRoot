@@ -706,27 +706,35 @@ void R3BVacVesselCool::ConstructGeometry1(){
    //TGeoCombiTrans* pGlobal2 = GetGlobalPosition(pMatrix2);
 
    
+   pCoolRingIn_log->SetLineColor(46);
+   pCoolRingMid_log->SetLineColor(46);
+   pCoolRingOut_log->SetLineColor(46);
    top->AddNode(pCoolRingOut_log, 0, pMatrix1);  // top
    top->AddNode(pCoolRingOut_log, 1, pMatrix2); // bottom
    top->AddNode(pCoolRingMid_log, 0, pMatrix3);  // right
    top->AddNode(pCoolRingMid_log, 1, pMatrix4);  // leftt
    top->AddNode(pCoolRingIn_log, 0, pMatrix5);
 
+   pCoolPipeIn_log->SetLineColor(46);
    top->AddNode(pCoolPipeIn_log, 0, pMatrix6);
    top->AddNode(pCoolPipeIn_log, 1, pMatrix7);
    top->AddNode(pCoolPipeCurveIn_log, 0, pMatrix16);
    top->AddNode(pCoolPipeCurveIn_log, 1, pMatrix17);
 
+   pCoolPipeMid_log->SetLineColor(46);
    top->AddNode(pCoolPipeMid_log, 0, pMatrix8);
    top->AddNode(pCoolPipeMid_log, 1, pMatrix9);
    top->AddNode(pCoolPipeMid_log, 2, pMatrix10);
    top->AddNode(pCoolPipeMid_log, 3, pMatrix11);
 
+   pCoolPipeOut_log->SetLineColor(46);
    top->AddNode(pCoolPipeOut_log, 0, pMatrix12);
    top->AddNode(pCoolPipeOut_log, 1, pMatrix13);
    top->AddNode(pCoolPipeOut_log, 2, pMatrix14);
    top->AddNode(pCoolPipeOut_log, 3, pMatrix15);
 
+   pCoolPipeCurveOut1_log->SetLineColor(46);
+   pCoolPipeCurveOut2_log->SetLineColor(46);
    top->AddNode(pCoolPipeCurveOut1_log, 0, pMatrix18);
    top->AddNode(pCoolPipeCurveOut1_log, 1, pMatrix19);
    top->AddNode(pCoolPipeCurveOut2_log, 0, pMatrix20);
@@ -739,16 +747,20 @@ void R3BVacVesselCool::ConstructGeometry1(){
    top->AddNode(pCoolPipeCurveOut1_log, 5, pMatrix27);
    top->AddNode(pCoolPipeCurveOut2_log, 4, pMatrix28);
    top->AddNode(pCoolPipeCurveOut2_log, 5, pMatrix29);
-
    top->AddNode(pCoolPipeCurveOut1_log, 6, pMatrix30);
    top->AddNode(pCoolPipeCurveOut1_log, 7, pMatrix31);
    top->AddNode(pCoolPipeCurveOut2_log, 6, pMatrix32);
    top->AddNode(pCoolPipeCurveOut2_log, 7, pMatrix33);
 
+   pCoolStructOut_log->SetLineColor(46);
    top->AddNode(pCoolStructOut_log, 0, pRot0);
+   pCoolStructMid_log->SetLineColor(46);
    top->AddNode(pCoolStructMid_log, 0, pRot0);
+   pCoolStructIn_log->SetLineColor(46);
    top->AddNode(pCoolStructIn_log, 0, pRot0);
 
+
+   pCoolAsicIn_log->SetLineColor(46);
    top->AddNode(pCoolAsicIn_log, 0, pRot0);
    top->AddNode(pCoolAsicIn_log, 1, pRot10);
    top->AddNode(pCoolAsicIn_log, 2, pRot11);
@@ -756,7 +768,8 @@ void R3BVacVesselCool::ConstructGeometry1(){
    top->AddNode(pCoolAsicIn_log, 4, pRot13);
    top->AddNode(pCoolAsicIn_log, 5, pRot14);
 
-   top->AddNode(pCoolAsicMid_log, 0, pRot0);
+   pCoolAsicMid_log->SetLineColor(46);
+    top->AddNode(pCoolAsicMid_log, 0, pRot0);
    top->AddNode(pCoolAsicMid_log, 1, pRot15);
    top->AddNode(pCoolAsicMid_log, 2, pRot10);
    top->AddNode(pCoolAsicMid_log, 3, pRot16);
@@ -769,6 +782,7 @@ void R3BVacVesselCool::ConstructGeometry1(){
    top->AddNode(pCoolAsicMid_log, 10, pRot14);
    top->AddNode(pCoolAsicMid_log, 11, pRot20);
 
+   pCoolAsicOut_log->SetLineColor(46);
    top->AddNode(pCoolAsicOut_log, 0, pRot0);
    top->AddNode(pCoolAsicOut_log, 1, pRot15);
    top->AddNode(pCoolAsicOut_log, 2, pRot10);
@@ -789,12 +803,19 @@ void R3BVacVesselCool::ConstructGeometry1(){
    top->AddNode(pLinkStruct_log, 4,pRot13);  // 270
    top->AddNode(pLinkStruct_log, 5,pRot14);  // 330 
 
+   pPipeOutLog->SetLineColor(34);
+   pPipeIn1Log->SetLineColor(34);
+   pPipeIn2Log->SetLineColor(34);
    top->AddNode(pPipeOutLog,0,pMatrix176);
    top->AddNode(pPipeIn1Log,0,pMatrix178);
    top->AddNode(pPipeIn2Log,0,pMatrix180);
+ 
    top->AddNode(pPipeInSteelRingLog,0,pMatrix182);
    top->AddNode(pPipeInSteelPipeLog,0,pMatrix184);
    
+   pChamberBarrelLog->SetLineColor(34);
+   pChamberConeLog->SetLineColor(34);
+   pChamberEndPlateLog->SetLineColor(34);
    top->AddNode(pChamberBarrelLog,0,pMatrix170);
    top->AddNode(pChamberConeLog,0,pMatrix172);
    top->AddNode(pChamberEndPlateLog,0,pMatrix174);

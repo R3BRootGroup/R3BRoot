@@ -312,7 +312,7 @@ void R3BTarget::ConstructGeometry2(){
    pParafin0deg_log->SetVisLeaves(kTRUE);
 
    TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix2);
-   top->AddNode(pParafin0deg_log, 0, pGlobal);
+   //top->AddNode(pParafin0deg_log, 0, pGlobal);
 
 
    // Shape type: TGeoTubeSeg  = for delta electron absorber foil
