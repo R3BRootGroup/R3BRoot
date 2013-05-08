@@ -67,6 +67,8 @@ endif(NOT R3BROOT_MINIMAL)
 # directory
 CHECK_EXTERNAL_PACKAGE_INSTALL_DIR()
 
+SetBasicVariables()
+
 # searches for needed packages
 # REQUIRED means that cmake will stop if this packages are not found
 # For example the framework can run without GEANT4, but ROOT is

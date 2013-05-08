@@ -5,13 +5,7 @@
 set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
 #put here all directories where header files are located
-${CMAKE_SOURCE_DIR}/fairtools
-${CMAKE_SOURCE_DIR}/base
-${CMAKE_SOURCE_DIR}/base/steer
-${CMAKE_SOURCE_DIR}/base/event
-${CMAKE_SOURCE_DIR}/base/field
-${CMAKE_SOURCE_DIR}/base/sim
-${CMAKE_SOURCE_DIR}/base/source
+${BASE_INCLUDE_DIRECTORIES}
 ${CMAKE_SOURCE_DIR}/r3bbase 
 ${CMAKE_SOURCE_DIR}/passive
 ${CMAKE_SOURCE_DIR}/mcstack 
@@ -26,8 +20,7 @@ ${CMAKE_SOURCE_DIR}/r3bdata/mtofData
 ${CMAKE_SOURCE_DIR}/r3bdata/tofData
 ${CMAKE_SOURCE_DIR}/r3bdata/landData
 ${CMAKE_SOURCE_DIR}/r3bdata/trackerData
-${CMAKE_SOURCE_DIR}/parbase
-${CMAKE_SOURCE_DIR}/geobase
+
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

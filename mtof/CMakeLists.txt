@@ -5,8 +5,7 @@
 set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
 #put here all directories where header files are located
-${R3BROOT_SOURCE_DIR}/fairtools
-${R3BROOT_SOURCE_DIR}/base
+${BASE_INCLUDE_DIRECTORIES}
 ${R3BROOT_SOURCE_DIR}/r3bbase 
 ${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/mcstack 
@@ -18,8 +17,8 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
-${R3BROOT_SOURCE_DIR}/r3bdata/trackerData ${R3BROOT_SOURCE_DIR}/base
-${R3BROOT_SOURCE_DIR}/parbase   ${R3BROOT_SOURCE_DIR}/geobase )
+${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
+)
 
 include_directories( ${INCLUDE_DIRECTORIES})
 
