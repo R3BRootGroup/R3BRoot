@@ -371,6 +371,7 @@ double R3BConstantFraction::FindZero(double A, double B, double C, double time, 
     return x_2;
   else
     Fatal("R3BConstantFraction::FindZero","No zero found"); 
+  return 0.;
 }
 
 //Compare function for heap

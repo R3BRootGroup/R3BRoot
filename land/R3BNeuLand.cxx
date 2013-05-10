@@ -327,7 +327,7 @@ R3BNeuLandPoint* R3BNeuLand::AddHit(Int_t eventID, Int_t trackID,
 // -----   Public method ConstructGeometry   ----------------------------------
 void R3BNeuLand::ConstructGeometry() {
 
-  if ((fVersion == 1 )) return ConstructGeometry1();
+  if (1 == fVersion) return ConstructGeometry1();
   
   cout << "-I- R3BNeuLand  ConstructGeometry() :unknown Geometry version  !!! " << endl;
 }

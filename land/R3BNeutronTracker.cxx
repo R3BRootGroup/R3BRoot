@@ -1112,7 +1112,7 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
       }
       for (Int_t i=0;i<Nclusters;i++){
          if(printing){
-            cout<< "Nach löschen !!!!!!"<<endl;
+            cout<< "Nach loeschen !!!!!!"<<endl;
             cout<< "cluster start: " << Cluster[i].xStart<<"  "<<Cluster[i].yStart<<"  "<<Cluster[i].zStart << endl;
             cout<< "cluster end  : " << Cluster[i].xEnd<<"  "<<Cluster[i].yEnd<<"  "<<Cluster[i].zEnd << endl;
             cout<< "cluster energy: " << Cluster[i].e << endl;

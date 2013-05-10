@@ -372,7 +372,7 @@ R3BNeuLandPoint* R3BNeuLandv1::AddHit(Int_t eventID, Int_t trackID,
 void R3BNeuLandv1::ConstructGeometry() {
 
   // New Design for RPC
-  if ((fVersion == 1 )) return ConstructGeometry1();
+  if (1 == fVersion) return ConstructGeometry1();
   
   cout << "-I- R3BNeuLandv1  ConstructGeometry() :unknown Geometry version  !!! " << endl;
 }
