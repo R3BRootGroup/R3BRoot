@@ -85,6 +85,11 @@ using std::endl;
 
 R3BDch2pDigitizer::R3BDch2pDigitizer() :
   FairTask("R3B Dch2p Digitization scheme ") { 
+  detectorResolution = 0;
+}
+R3BDch2pDigitizer::R3BDch2pDigitizer(int detres=0) :
+  FairTask("R3B Dch2p Digitization scheme ") { 
+  detectorResolution = detres;	//0=all off, 1= all on, ...
 }
 
 
@@ -233,7 +238,8 @@ void R3BDch2pDigitizer::Exec(Option_t* opt) {
      Double_t fY_Local = 0.; 
      Double_t fZ_Local = 0.; 
 
-    if(PID==2212 && mother<0){
+    //if(PID==2212 && mother<0){
+    if(PID==1000010010 && mother<0){
     
     if (DetID==0 && l==0)
     {
@@ -263,6 +269,16 @@ void R3BDch2pDigitizer::Exec(Option_t* opt) {
      Pdx1_p1 = fX_Local;
      Pdy1_p1 = fY_Local;
      
+     //resolutions:
+     //cout << "dch1x proton1 before: " << Pdx1_p1 << ", dch1y proton1 before: " << Pdy1_p1;
+     if (detectorResolution==1) {
+	     Pdx1_p1 = gRandom->Gaus(Pdx1_p1,0.0278);	//cm;
+	     Pdy1_p1 = gRandom->Gaus(Pdy1_p1,0.0215);	//cm;
+	     //Pdx1_p1 = gRandom->Gaus(Pdx1_p1,0.02);	//cm, Justynas default value; 
+	     //Pdy1_p1 = gRandom->Gaus(Pdy1_p1,0.02); 	//cm, Justynas default value;
+     }
+     //cout << ", dch1x proton1 after: " << Pdx1_p1 << ", dch1y proton1 after: " << Pdy1_p1 << endl;
+
 //     cout<<"DCH1 - first proton"<<endl;
      pd1mul++;
     }
@@ -284,7 +300,17 @@ void R3BDch2pDigitizer::Exec(Option_t* opt) {
 
      Pdx1_p2 = fX_Local;
      Pdy1_p2 = fY_Local;
-     
+ 
+     //resolutions:
+     //cout << "dch1x proton2 before: " << Pdx1_p2 << ", dch1y proton2 before: " << Pdy1_p2;
+     if (detectorResolution==1) {
+	     Pdx1_p2 = gRandom->Gaus(Pdx1_p2,0.0278);	//cm;
+	     Pdy1_p2 = gRandom->Gaus(Pdy1_p2,0.0215); 	//cm;
+	     //Pdx1_p2 = gRandom->Gaus(Pdx1_p2,0.02);	//cm, Justynas default value; 
+	     //Pdy1_p2 = gRandom->Gaus(Pdy1_p2,0.02); 	//cm, Justynas default value;
+     }
+     //cout << ", dch1x proton2 after: " << Pdx1_p2 << ", dch1y proton2 after: " << Pdy1_p2 << endl;
+    
 //     cout<<"DCH1 - second proton"<<endl;
      pd1mul++;
     }
@@ -306,7 +332,17 @@ void R3BDch2pDigitizer::Exec(Option_t* opt) {
      //if ( (fX_Local+PDC_L_X/2>PDC2_X_DEAD_1_LO && fX_Local+PDC_L_X/2<=PDC2_X_DEAD_1_HI)
      if ( (-fX_Local+PDC_L_X/2>PDC2_X_DEAD_1_LO && -fX_Local+PDC_L_X/2<=PDC2_X_DEAD_1_HI)
      ) continue;
-     
+ 
+     //resolutions:
+     //cout << "dch2x proton1 before: " << Pdx2_p1 << ", dch2y proton1 before: " << Pdy2_p1;
+     if (detectorResolution==1) {
+	     Pdx2_p1 = gRandom->Gaus(Pdx2_p1,0.0268);	//cm; 
+	     Pdy2_p1 = gRandom->Gaus(Pdy2_p1,0.0213);	//cm;
+	     //Pdx2_p1 = gRandom->Gaus(Pdx2_p1,0.02);	//cm, Justynas default value; 
+	     //Pdy2_p1 = gRandom->Gaus(Pdy2_p1,0.02); 	//cm, Justynas default value;
+     }
+     //cout << ", dch2x proton1 after: " << Pdx2_p1 << ", dch2y proton1 after: " << Pdy2_p1 << endl;
+    
      Pdx2_p1 = fX_Local;
      Pdy2_p1 = fY_Local;
      
@@ -322,7 +358,17 @@ void R3BDch2pDigitizer::Exec(Option_t* opt) {
      //if ( (fX_Local+PDC_L_X/2>PDC2_X_DEAD_1_LO && fX_Local+PDC_L_X/2<=PDC2_X_DEAD_1_HI)
      if ( (-fX_Local+PDC_L_X/2>PDC2_X_DEAD_1_LO && -fX_Local+PDC_L_X/2<=PDC2_X_DEAD_1_HI)
      ) continue;
-     
+ 
+     //resolutions:
+     //cout << "dch2x proton2 before: " << Pdx2_p2 << ", dch2y proton2 before: " << Pdy2_p2;
+     if (detectorResolution==1) {
+	     Pdx2_p2 = gRandom->Gaus(Pdx2_p2,0.0268);	//cm;
+	     Pdy2_p2 = gRandom->Gaus(Pdy2_p2,0.0213);	//cm;
+	     //Pdx2_p2 = gRandom->Gaus(Pdx2_p2,0.02);	//cm, Justynas default value; 
+	     //Pdy2_p2 = gRandom->Gaus(Pdy2_p2,0.02); 	//cm, Justynas default value;
+     }
+     //cout << ", dch2x proton2 after: " << Pdx2_p2 << ", dch2y proton2 after: " << Pdy2_p2 << endl;
+    
      Pdx2_p2 = fX_Local;
      Pdy2_p2 = fY_Local;
      

@@ -20,9 +20,14 @@ class R3BDch2pDigitizer : public FairTask
 
  public:
 
+  /** Detector resolution **/  
+  int detectorResolution;	//0=all off, 1= all on, ...
+  
   /** Default constructor **/  
   R3BDch2pDigitizer();
 
+  /** Detector resolution constructor **/  
+  R3BDch2pDigitizer(int detres);
 
   /** Destructor **/
   ~R3BDch2pDigitizer();

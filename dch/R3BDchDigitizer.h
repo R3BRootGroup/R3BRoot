@@ -20,13 +20,17 @@ class R3BDchDigitizer : public FairTask
 
  public:
 
+  /** Detector resolution **/  
+  int detectorResolution;	//0=all off, 1= all on, ...
+  
   /** Default constructor **/  
   R3BDchDigitizer();
-
+    
+  /** Detector resolution constructor **/  
+  R3BDchDigitizer(int detres);
 
   /** Destructor **/
   ~R3BDchDigitizer();
-
 
   /** Virtual method Init **/
   virtual InitStatus Init();

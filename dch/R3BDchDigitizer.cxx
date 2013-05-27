@@ -87,6 +87,11 @@ using std::endl;
 
 R3BDchDigitizer::R3BDchDigitizer() :
   FairTask("R3B Dch Digitization scheme ") { 
+  detectorResolution = 0;
+}
+R3BDchDigitizer::R3BDchDigitizer(int detres=0) :
+  FairTask("R3B Dch Digitization scheme ") { 
+  detectorResolution = detres;	//0=all off, 1= all on, ...
 }
 
 
@@ -208,6 +213,7 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
 //     if(eventNoDch/1000. == (int)eventNoDch/1000.) cout<<" "<<endl<<"Event #: "<<eventNoDch-1<<endl;
      
      Int_t nentriesDch = fDchPoints->GetEntries();
+	  cout<<nentriesDch<<endl;
      
      Int_t TrackId=0;
 
@@ -297,7 +303,8 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
      Double_t fY_Local = 0.; 
      Double_t fZ_Local = 0.; 
 
-    if(PID==2212 && mother<0) {
+    //if(PID==2212 && mother<0) {
+    if(PID==1000010010 && mother<0) {
       if (DetID==0) {
      //Check tilt direction, positive or negative angle?! Make it consistent with rotations in R3BDch.cxx !!!
      //using this manual calculation (based on the manual offsets above), a consistency with the s318 tracker is achieved. F. Wamers.    
@@ -333,6 +340,17 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
      DCH1Y->Fill(fY_Local+PDC_L_Y/2);
      TrackPxVSDCH1Px->Fill(fPx,fPx_track);
 //     cout<<"Dch1 - first drift chamber "<<PID<<endl;
+
+     //resolutions:
+     //cout << "dch1x before: " << Pdx1_p1 << ", dch1y before: " << Pdy1_p1;
+     if (detectorResolution==1) {
+	     Pdx1_p1 = gRandom->Gaus(Pdx1_p1,0.0278);	//cm; 
+	     Pdy1_p1 = gRandom->Gaus(Pdy1_p1,0.0215); 	//cm;
+	     //Pdx1_p1 = gRandom->Gaus(Pdx1_p1,0.02);	//cm, Justynas default value; 
+	     //Pdy1_p1 = gRandom->Gaus(Pdy1_p1,0.02); 	//cm, Justynas default value;
+     }
+     //cout << ", dch1x after: " << Pdx1_p1 << ", dch1y after: " << Pdy1_p1 << endl;
+
      pd1mul++;
     }
 
@@ -365,6 +383,17 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
      DCH2X->Fill(fX_Local+PDC_L_X/2);
      DCH2Y->Fill(fY_Local+PDC_L_Y/2);
 //     cout<<"Dch2 - second drift chamber"<<PID<<endl;
+
+     //resolutions:
+     //cout << "dch2x before: " << Pdx2_p1 << ", dch2y before: " << Pdy2_p1;
+     if (detectorResolution==1) {
+	     Pdx2_p1 = gRandom->Gaus(Pdx2_p1,0.0268);	//cm;
+	     Pdy2_p1 = gRandom->Gaus(Pdy2_p1,0.0213); 	//cm;
+	     //Pdx2_p1 = gRandom->Gaus(Pdx2_p1,0.02);	//cm, Justynas default value; 
+	     //Pdy2_p1 = gRandom->Gaus(Pdy2_p1,0.02); 	//cm, Justynas default value;
+     }
+     //cout << ", dch2x after: " << Pdx2_p1 << ", dch2y after: " << Pdy2_p1 << endl;
+
      pd2mul++;
     }
 

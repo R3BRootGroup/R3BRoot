@@ -161,7 +161,7 @@ void R3BDch::SetSpecialPhysicsCuts(){
      if ( pSi ) {
 	 // Setting processes for Gas mixture only
          // ELoss + deltas + reduced fluctuation
-	 gMC->Gstpar(pSi->GetId()  ,"LOSS",3);
+	 gMC->Gstpar(pSi->GetId()  ,"LOSS",2);
          // collision sampling on PAI Model ( thin layer )
 	 gMC->Gstpar(pSi->GetId()  ,"STRA",1.0);
          // Deltas on
@@ -679,9 +679,9 @@ R3BDchPoint* R3BDch::AddHit(Int_t trackId, Int_t mod, Int_t layer, Int_t cell, T
 }
 // -----   Public method ConstructGeometry   ----------------------------------
 
-
-
-
+//void R3BDch::ConstructGeometry() {
+//  return ConstructGeometryJustyna();
+//}
 void R3BDch::ConstructGeometry()
 {
   TString fileName = GetGeometryFileName();
@@ -716,9 +716,6 @@ void R3BDch::ConstructGeometryOld()
   ConstructGeometryJustyna();
 }
 
-
-
-
 void R3BDch::ConstructGeometryJustyna() {
  // out-of-file geometry definition
    Double_t dx,dy,dz;
@@ -729,7 +726,7 @@ void R3BDch::ConstructGeometryJustyna() {
    Double_t z, density, radl, absl, w;
    Int_t nel, numed;
 
-   Int_t matIndex = gGeoManager->GetListOfMaterials()->GetEntries()+1000;  //!!! FIXME
+   Int_t matIndex = gGeoManager->GetListOfMaterials()->GetEntries();
    cout << " Matindex : " << matIndex<< endl;
 
    //-------------    Material definition
@@ -1036,9 +1033,6 @@ void R3BDch::ConstructGeometryJustyna() {
 
   dch1->SetVisContainers(kTRUE);
 }
-
-
-
 /* tutaj
 void R3BDch::ConstructGeometry2() {
  // out-of-file geometry definition
