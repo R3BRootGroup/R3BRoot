@@ -29,7 +29,7 @@ ${ROOT_LIBRARY_DIR}
 
 link_directories( ${LINK_DIRECTORIES})
 
-set(R3BCAL_SRCS
+set(SRCS
 #Put here your sourcefiles
 ELILuMon.cxx  
 ELIGeoLuMon.cxx   
@@ -39,18 +39,13 @@ ELILuMonContFact.cxx
 
 # fill list of header files from list of source files
 # by exchanging the file extension
-CHANGE_FILE_EXTENSION(*.cxx *.h R3BCAL_HEADERS "${R3BCAL_SRCS}")
+CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
-set(R3BCAL_LINKDEF LuMonLinkDef.h)
-set(R3BCAL_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/ELILuMonDict.cxx)
+set(LINKDEF LuMonLinkDef.h)
+set(LIBRARY_NAME ELILuMon)
+set(DEPENDENCIES
+    R3Bbase R3BPassive MCStack R3BTof R3BData)
 
-ROOT_GENERATE_DICTIONARY("${R3BCAL_HEADERS}" "${R3BCAL_LINKDEF}" "${R3BCAL_DICTIONARY}" "${INCLUDE_DIRECTORIES}")
+GENERATE_LIBRARY()
 
-set(R3BCAL_SRCS ${R3BCAL_SRCS} ${R3BCAL_DICTIONARY})
 
-add_library(ELILuMon SHARED ${R3BCAL_SRCS})
-target_link_libraries(ELILuMon ${ROOT_LIBRARIES})
-set_target_properties(ELILuMon PROPERTIES  ${FAIRROOT_LIBRARY_PROPERTIES})
-
-################ install ###################
-install(TARGETS ELILuMon DESTINATION ${CMAKE_BINARY_DIR}/lib)

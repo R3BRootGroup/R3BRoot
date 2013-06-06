@@ -16,7 +16,7 @@ ${ROOT_LIBRARY_DIR}
  
 link_directories( ${LINK_DIRECTORIES})
 
-set(FIELD_SRCS
+set(SRCS
 R3BFieldConst.cxx     
 R3BFieldContFact.cxx    
 R3BFieldMap.cxx
@@ -26,25 +26,12 @@ R3BGladFieldMap.cxx
 R3BFieldInterp.cxx
 R3BAladinFieldMap.cxx  )
 
-if(RULE_CHECKER_FOUND)
-  CHECK_RULES("${FIELD_SRCS}" "${INCLUDE_DIRECTORIES}" FIELD_RULES)
-endif(RULE_CHECKER_FOUND)
-
 # fill list of header files from list of source files
 # by exchanging the file extension
-CHANGE_FILE_EXTENSION(*.cxx *.h FIELD_HEADERS "${FIELD_SRCS}")
+CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
-set(FIELD_LINKDEF FieldLinkDef.h)
-set(FIELD_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/FieldDict.cxx) 
+set(LINKDEF FieldLinkDef.h)
+set(LIBRARY_NAME Field)
 
-ROOT_GENERATE_DICTIONARY("${FIELD_HEADERS}" "${FIELD_LINKDEF}" "${FIELD_DICTIONARY}" "${INCLUDE_DIRECTORIES}")
+GENERATE_LIBRARY()
 
-
-set(FIELD_SRCS ${FIELD_SRCS} ${FIELD_DICTIONARY})
-
-add_library(Field SHARED ${FIELD_SRCS})
-target_link_libraries(Field ${ROOT_LIBRARIES})
-set_target_properties(Field PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
-
-################ install ###################
-install(TARGETS Field DESTINATION ${CMAKE_BINARY_DIR}/lib)

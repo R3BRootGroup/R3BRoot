@@ -28,7 +28,7 @@ ${ROOT_LIBRARY_DIR}
 
 link_directories( ${LINK_DIRECTORIES})
 
-set(R3BCALO_SRCS
+set(SRCS
 #Put here your sourcefiles
 R3BCalo.cxx
 R3BCaloHitFinder.cxx  
@@ -39,18 +39,12 @@ R3BCaloContFact.cxx
 
 # fill list of header files from list of source files
 # by exchanging the file extension
-CHANGE_FILE_EXTENSION(*.cxx *.h R3BCALO_HEADERS "${R3BCALO_SRCS}")
+CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
-set(R3BCALO_LINKDEF CaloLinkDef.h)
-set(R3BCALO_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/R3BCaloDict.cxx)
+set(LINKDEF CaloLinkDef.h)
+set(LIBRARY_NAME R3BCalo)
+set(DEPENDENCIES
+    R3Bbase R3BData R3BPassive MCStack R3BCal)
 
-ROOT_GENERATE_DICTIONARY("${R3BCALO_HEADERS}" "${R3BCALO_LINKDEF}" "${R3BCALO_DICTIONARY}" "${INCLUDE_DIRECTORIES}")
+GENERATE_LIBRARY()
 
-set(R3BCALO_SRCS ${R3BCALO_SRCS} ${R3BCALO_DICTIONARY})
-
-add_library(R3BCalo SHARED ${R3BCALO_SRCS})
-target_link_libraries(R3BCalo ${ROOT_LIBRARIES})
-set_target_properties(R3BCalo PROPERTIES  ${FAIRROOT_LIBRARY_PROPERTIES})
-
-################ install ###################
-install(TARGETS R3BCalo DESTINATION ${CMAKE_BINARY_DIR}/lib)

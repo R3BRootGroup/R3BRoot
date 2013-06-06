@@ -32,7 +32,7 @@ ${PLUTO_LIBRARY_DIR}
  
 link_directories( ${LINK_DIRECTORIES})
 
-set(GENERATORS_SRCS
+set(SRCS
 R3BPrimaryGenerator.cxx
 R3BSpecificGenerator.cxx
 R3BReadKinematics.cxx
@@ -51,27 +51,14 @@ R3BIonGenerator.cxx
 
 )
 
-if(RULE_CHECKER_FOUND)
-  CHECK_RULES("${GENERATORS_SRCS}" "${INCLUDE_DIRECTORIES}" GENERATORS_RULES)
-endif(RULE_CHECKER_FOUND)
-
 # fill list of header files from list of source files
 # by exchanging the file extension
-CHANGE_FILE_EXTENSION(*.cxx *.h GENERATORS_HEADERS "${GENERATORS_SRCS}")
+CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
-set(GENERATORS_LINKDEF R3BGenLinkDef.h)
-set(GENERATORS_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/R3BGenDict.cxx)
+set(LINKDEF R3BGenLinkDef.h)
+set(LIBRARY_NAME R3BGen)
+set(DEPENDENCIES
+    Field Gen)
 
+GENERATE_LIBRARY()
 
-ROOT_GENERATE_DICTIONARY("${GENERATORS_HEADERS}" "${GENERATORS_LINKDEF}" "${GENERATORS_DICTIONARY}" "${INCLUDE_DIRECTORIES}")
-
-
-set(GENERATORS_SRCS ${GENERATORS_SRCS}  ${GENERATORS_DICTIONARY})
-
-
-add_library(R3BGen SHARED ${GENERATORS_SRCS})
-#target_link_libraries(R3BGen ${ROOT_LIBRARIES} Pluto)
-set_target_properties(R3BGen PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
-
-################ install ###################
-install(TARGETS R3BGen DESTINATION ${CMAKE_BINARY_DIR}/lib)

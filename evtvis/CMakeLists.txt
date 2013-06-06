@@ -23,7 +23,7 @@ ${ROOT_LIBRARY_DIR}
  
 link_directories( ${LINK_DIRECTORIES})
 
-set(R3BEVEDISP_SRCS
+set(SRCS
 R3BEventManager.cxx
 R3BEventManagerEditor.cxx
 R3BCaloEventDisplay.cxx
@@ -32,24 +32,14 @@ R3BMCTracks.cxx
 R3BIonName.cxx
 )
 
-if(RULE_CHECKER_FOUND)
-  CHECK_RULES("${R3BEVEDISP_SRCS}" "${INCLUDE_DIRECTORIES}" R3BEVEDISP_RULES)
-endif(RULE_CHECKER_FOUND)
-
 # fill list of header files from list of source files
 # by exchanging the file extension
-CHANGE_FILE_EXTENSION(*.cxx *.h R3BEVEDISP_HEADERS "${R3BEVEDISP_SRCS}")
+CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
-set(R3BEVEDISP_LINKDEF R3BEventDisplayLinkDef.h)
-set(R3BEVEDISP_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/R3BEventDisplayDict.cxx) 
+set(LINKDEF R3BEventDisplayLinkDef.h)
+set(LIBRARY_NAME R3BEvtVis)
+set(DEPENDENCIES
+    Field MCStack R3BData R3BCalo Geane EventDisplay)
 
-ROOT_GENERATE_DICTIONARY("${R3BEVEDISP_HEADERS}" "${R3BEVEDISP_LINKDEF}" "${R3BEVEDISP_DICTIONARY}" "${INCLUDE_DIRECTORIES}")
+GENERATE_LIBRARY()
 
-
-set(R3BEVEDISP_SRCS ${R3BEVEDISP_SRCS} ${R3BEVEDISP_DICTIONARY})
-
-add_library(R3BEvtVis SHARED ${R3BEVEDISP_SRCS})
-target_link_libraries(R3BEvtVis ${ROOT_LIBRARIES})
-set_target_properties(R3BEvtVis PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES})
-################ install ###################
-install(TARGETS R3BEvtVis DESTINATION ${CMAKE_BINARY_DIR}/lib)

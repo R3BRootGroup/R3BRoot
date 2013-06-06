@@ -17,7 +17,7 @@ ${ROOT_LIBRARY_DIR}
  
 link_directories( ${LINK_DIRECTORIES})
 
-set(PASSIVE_SRCS
+set(SRCS
 R3BCave.cxx            
 R3BGeoCave.cxx        
 R3BGeoMagnet.cxx      
@@ -33,24 +33,13 @@ R3BVacVesselCool.cxx
 R3BTarget.cxx 
 )
 
-if(RULE_CHECKER_FOUND)
-  CHECK_RULES("${PASSIVE_SRCS}" "${INCLUDE_DIRECTORIES}" PASSIVE_RULES)
-endif(RULE_CHECKER_FOUND)
-
 # fill list of header files from list of source files
 # by exchanging the file extension
-CHANGE_FILE_EXTENSION(*.cxx *.h PASSIVE_HEADERS "${PASSIVE_SRCS}")
+CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
-set(PASSIVE_LINKDEF  PassiveLinkDef.h)
-set(PASSIVE_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/R3BPassiveDict.cxx) 
+Set(LINKDEF PassiveLinkDef.h)
+Set(LIBRARY_NAME R3BPassive) 
+Set(DEPENDENCIES
+    R3Bbase Field R3BPassive)
 
-ROOT_GENERATE_DICTIONARY("${PASSIVE_HEADERS}" "${PASSIVE_LINKDEF}" "${PASSIVE_DICTIONARY}" "${INCLUDE_DIRECTORIES}")
-
-SET(PASSIVE_SRCS ${PASSIVE_SRCS} ${PASSIVE_DICTIONARY})
-
-add_library(R3BPassive SHARED ${PASSIVE_SRCS})
-target_link_libraries(R3BPassive ${ROOT_LIBRARIES})
-set_target_properties(R3BPassive PROPERTIES
-${FAIRROOT_LIBRARY_PROPERTIES}) 
-################ install ################### 
-install(TARGETS R3BPassive DESTINATION ${CMAKE_BINARY_DIR}/lib)
+GENERATE_LIBRARY()

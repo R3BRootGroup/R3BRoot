@@ -20,27 +20,19 @@ ${ROOT_LIBRARY_DIR}
 
 link_directories( ${LINK_DIRECTORIES})
 
-set(R3B_SRCS
-#Put here your sourcefiles
+set(SRCS
 R3BModule.cxx 
 R3BDetector.cxx 
 )
 
 # fill list of header files from list of source files
 # by exchanging the file extension
-CHANGE_FILE_EXTENSION(*.cxx *.h R3B_HEADERS "${R3B_SRCS}")
+CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
-set(R3B_LINKDEF R3BLinkDef.h)
-set(R3B_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/R3BDict.cxx)
+Set(LINKDEF R3BLinkDef.h)
+Set(LIBRARY_NAME R3Bbase)
+Set(DEPENDENCIES
+    GeoBase ParBase Core Geom GenVector Physics Matrix MathCore FairTools)
 
-ROOT_GENERATE_DICTIONARY("${R3B_HEADERS}" "${R3B_LINKDEF}" "${R3B_DICTIONARY}" "${INCLUDE_DIRECTORIES}")
+GENERATE_LIBRARY()
 
-set(R3B_SRCS ${R3B_SRCS} ${R3B_DICTIONARY})
-
-add_library(R3Bbase SHARED ${R3B_SRCS}) 
-target_link_libraries(R3Bbase ${ROOT_LIBRARIES})
-set_target_properties(R3Bbase PROPERTIES 
-${FAIRROOT_LIBRARY_PROPERTIES})
-
-################ install ###################
-install(TARGETS R3Bbase DESTINATION ${CMAKE_BINARY_DIR}/lib)

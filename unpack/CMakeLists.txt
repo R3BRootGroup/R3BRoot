@@ -31,7 +31,7 @@ ${ROOT_LIBRARY_DIR}
 
 link_directories( ${LINK_DIRECTORIES})
 
-set(UNPACK_SRCS
+set(SRCS
 #Put here your sourcefiles
 TRootEvent.cxx
 land/R3BLandUnpack.cxx
@@ -42,18 +42,12 @@ land/TLANDEvent.cxx
 
 # fill list of header files from list of source files
 # by exchanging the file extension
-CHANGE_FILE_EXTENSION(*.cxx *.h UNPACK_HEADERS "${UNPACK_SRCS}")
+CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
-set(UNPACK_LINKDEF UnpackLinkDef.h)
-set(UNPACK_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/UnpackDict.cxx)
+set(LINKDEF UnpackLinkDef.h)
+set(LIBRARY_NAME Unpack)
+set(DEPENDENCIES
+    R3Bbase R3BPassive MCStack R3BData MbsAPI)
 
-ROOT_GENERATE_DICTIONARY("${UNPACK_HEADERS}" "${UNPACK_LINKDEF}" "${UNPACK_DICTIONARY}" "${INCLUDE_DIRECTORIES}")
+GENERATE_LIBRARY()
 
-set(UNPACK_SRCS ${UNPACK_SRCS} ${UNPACK_DICTIONARY})
-
-add_library(Unpack SHARED ${UNPACK_SRCS})
-target_link_libraries(Unpack ${ROOT_LIBRARIES})
-set_target_properties(Unpack PROPERTIES  ${FAIRROOT_LIBRARY_PROPERTIES})
-
-################ install ###################
-install(TARGETS Unpack DESTINATION ${CMAKE_BINARY_DIR}/lib)
