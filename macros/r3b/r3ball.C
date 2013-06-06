@@ -69,6 +69,8 @@ void r3ball(Int_t nEvents = 1,
   timer.Start();
   // ------------------------------------------------------------------------
 
+  // Explicit loading of libraries is obsolete
+/*
   // ----  Load libraries   -------------------------------------------------
   gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
   basiclibs();
@@ -99,7 +101,7 @@ void r3ball(Int_t nEvents = 1,
   gSystem->Load("libR3BSTaRTra");
   gSystem->Load("libR3BChimera");
   gSystem->Load("libELILuMon");
- 
+ */
   // -----   Create simulation run   ----------------------------------------
   FairRunSim* run = new FairRunSim();
   run->SetName(fMC.Data());              // Transport engine
