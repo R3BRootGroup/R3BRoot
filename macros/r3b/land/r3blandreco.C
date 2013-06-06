@@ -15,26 +15,6 @@ void r3blandreco(Int_t beamE, Int_t nn, Int_t erel, Int_t d)
 
 
 
-  // ----- Load libraries ------------------------------------------------------
-  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();
-  gSystem->Load("libGenVector");
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libFairDB");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libMCStack");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-  gSystem->Load("libR3Bbase");
-  gSystem->Load("libR3BGen");
-  gSystem->Load("libR3BPassive");
-  gSystem->Load("libR3BData");
-  gSystem->Load("libR3BLand");
-  // ---------------------------------------------------------------------------
-
-
-
   // ----- Timer ---------------------------------------------------------------
   TStopwatch timer;
   timer.Start();
