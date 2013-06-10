@@ -139,18 +139,18 @@ void R3BSTaRTra::SetSpecialPhysicsCuts(){
         cout << endl;
 
 	//Si
-	//gMC->Gstpar(pSi->GetId(),"CUTGAM",cutE);   /** gammas (GeV)*/
-   //gMC->Gstpar(pSi->GetId(),"CUTELE",cutE);   /** electrons (GeV)*/
-   //	gMC->Gstpar(pSi->GetId(),"CUTNEU",cutE);   /** neutral hadrons (GeV)*/
-   //	gMC->Gstpar(pSi->GetId(),"CUTHAD",cutE);   /** charged hadrons (GeV)*/
-   //	gMC->Gstpar(pSi->GetId(),"CUTMUO",cutE);   /** muons (GeV)*/
-   //	gMC->Gstpar(pSi->GetId(),"BCUTE" ,cutE);    /** electron bremsstrahlung (GeV)*/
-   //	gMC->Gstpar(pSi->GetId(),"BCUTM" ,cutE);    /** muon and hadron bremsstrahlung(GeV)*/
-   //	gMC->Gstpar(pSi->GetId(),"DCUTE" ,cutE);    /** delta-rays by electrons (GeV)*/
-   //	gMC->Gstpar(pSi->GetId(),"DCUTM" ,cutE);    /** delta-rays by muons (GeV)*/
-   //        gMC->Gstpar(pSi->GetId(),"PPCUTM",-1.);   /** direct pair production by muons (GeV)*/
+	//gMC->Gstpar(pSi->GetId(),"CUTGAM",cutE);   // gammas (GeV)
+   //gMC->Gstpar(pSi->GetId(),"CUTELE",cutE);   // electrons (GeV)
+   //	gMC->Gstpar(pSi->GetId(),"CUTNEU",cutE);   // neutral hadrons (GeV)
+   //	gMC->Gstpar(pSi->GetId(),"CUTHAD",cutE);   // charged hadrons (GeV)
+   //	gMC->Gstpar(pSi->GetId(),"CUTMUO",cutE);   // muons (GeV)
+   //	gMC->Gstpar(pSi->GetId(),"BCUTE" ,cutE);    // electron bremsstrahlung (GeV)
+   //	gMC->Gstpar(pSi->GetId(),"BCUTM" ,cutE);    // muon and hadron bremsstrahlung(GeV)
+   //	gMC->Gstpar(pSi->GetId(),"DCUTE" ,cutE);    // delta-rays by electrons (GeV)
+   //	gMC->Gstpar(pSi->GetId(),"DCUTM" ,cutE);    // delta-rays by muons (GeV)
+   //        gMC->Gstpar(pSi->GetId(),"PPCUTM",-1.);   // direct pair production by muons (GeV)
    //
-/* 
+ 
     }
    // <DB> trick to remove too much internal
    // tracking in the Aladin magnet yoke
