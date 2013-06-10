@@ -1,11 +1,12 @@
 //*-- AUTHOR : Denis Bertini
 //*-- Created : 21/06/2005
-
-using namespace std;
-#include "R3BGeoPassivePar.h"
-#include "FairParamList.h"
 #include <iostream>
 #include <iomanip>
+
+using namespace std;
+
+#include "R3BGeoPassivePar.h"
+#include "FairParamList.h"
 #include "TObjArray.h"
 
 ClassImp(R3BGeoPassivePar)

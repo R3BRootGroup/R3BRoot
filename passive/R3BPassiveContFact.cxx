@@ -9,12 +9,14 @@
 //
 /////////////////////////////////////////////////////////////
 
+#include <iostream>
+#include <iomanip>
+
 using namespace std;
+
 #include "R3BPassiveContFact.h"
 #include "FairRuntimeDb.h"
 #include "R3BGeoPassivePar.h"
-#include <iostream>
-#include <iomanip>
 
 ClassImp(R3BPassiveContFact)
 
