@@ -295,14 +295,19 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
     if ( GetAlveolusECType(volIdAlv) !=-1 ) {
       sscanf(bufferName,"%*8c %d",&crysNum);
       crystalType = crysNum;
-      //crystalType = cpCry+1;
+      // crystalType = cpCry+1;
       crystalCopy = cpAlv+1;
-     /*crystalId = 3000 + cpAlv*23 + (crystalType-1);/*In the case of IEM LaBr - LaCl phoswich endcap: */crystalId = 3000 + cpAlv*30 + (crystalType-1);
-      /*if (crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736)/*For IEM LaBr - LaCl phoswich endcap:*/if (crystalType>30 || crystalType<1 ||
-      crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>4800)
-
-        cout << "-E- R3BCalo: Wrong crystal number in geometryVersion 4. " << endl;
-    } else cout << "-E- R3BCalo: Wrong alveolus volume in geometryVersion 4. " << endl;
+      // crystalId = 3000 + cpAlv*23 + (crystalType-1);
+      // In the case of IEM LaBr - LaCl phoswich endcap: 
+      crystalId = 3000 + cpAlv*30 + (crystalType-1);
+      // if (crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736)
+      // For IEM LaBr - LaCl phoswich endcap:
+      if (crystalType>30 || crystalType<1 || crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>4800) {
+	cout << "-E- R3BCalo: Wrong crystal number in geometryVersion 4. " << endl;
+      }
+    } else {
+      cout << "-E- R3BCalo: Wrong alveolus volume in geometryVersion 4. " << endl;
+    }
   } else if (fGeometryVersion==5) {
     //The present scheme here done works nicely with 7.07+7.17
     //see the explanation for geometries 2 and 4
@@ -319,12 +324,14 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
       crystalCopy = cpAlv+1;
       
       
-      /*crystalId = 3000 + cpAlv*23 + (crystalType-1);//In the case of IEM LaBr - LaCl phoswich endcap: */crystalId = 3000 + cpAlv*30 + (crystalType-1);
-      /*if (crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736)/*For IEM LaBr - LaCl phoswich endcap:*/if (crystalType>30 || crystalType<1 ||
-      crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>5160)
-
- 
+      // crystalId = 3000 + cpAlv*23 + (crystalType-1);
+      // In the case of IEM LaBr - LaCl phoswich endcap: 
+      crystalId = 3000 + cpAlv*30 + (crystalType-1);
+      // if (crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736)
+      // For IEM LaBr - LaCl phoswich endcap:
+      if (crystalType>30 || crystalType<1 || crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>5160) {
         cout << "-E- R3BCalo: Wrong crystal number in geometryVersion 5 (endcap). " << endl;
+      }
     }
   } else if (fGeometryVersion==6) {
     //The present scheme here done works with 7.09+7.17
