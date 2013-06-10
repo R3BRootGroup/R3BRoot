@@ -611,16 +611,19 @@ void R3BAladinFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField)
 
 //-------------------------- Standard R3BROOT API ----------------------//
 Double_t R3BAladinFieldMap::GetBx(Double_t x, Double_t y, Double_t z) {
+  return 0.;
 }
 Double_t R3BAladinFieldMap::GetBy(Double_t x, Double_t y, Double_t z) {
+  return 0.;
 }
 
 Double_t R3BAladinFieldMap::GetBz(Double_t x, Double_t y, Double_t z) {
+  return 0.;
 }
 Bool_t R3BAladinFieldMap::IsInside(Double_t x, Double_t y, Double_t z,
 			     Int_t& ix, Int_t& iy, Int_t& iz,
 			     Double_t& dx, Double_t& dy, Double_t& dz) {
-
+  return kFALSE;
 }
 void R3BAladinFieldMap::WriteAsciiFile(const char* fileName) {
 
@@ -645,6 +648,7 @@ void R3BAladinFieldMap::ReadAsciiFile(const char* fileName) {
 }
 
 Double_t R3BAladinFieldMap::Interpolate(Double_t dx, Double_t dy, Double_t dz) {
+  return 0.;
 }
 
 ClassImp(R3BAladinFieldMap)
