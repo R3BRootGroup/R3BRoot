@@ -89,7 +89,7 @@ R3BDchDigitizer::R3BDchDigitizer() :
   FairTask("R3B Dch Digitization scheme ") { 
   detectorResolution = 0;
 }
-R3BDchDigitizer::R3BDchDigitizer(int detres=0) :
+R3BDchDigitizer::R3BDchDigitizer(int detres) :
   FairTask("R3B Dch Digitization scheme ") { 
   detectorResolution = detres;	//0=all off, 1= all on, ...
 }
