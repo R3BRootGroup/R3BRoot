@@ -353,7 +353,6 @@ void R3BmTof::ConstructGeometry() {
 
   // out-of-file geometry definition
    Double_t dx,dy,dz;
-   Double_t  par[20];
    Double_t a;
    Double_t thx, phx, thy, phy, thz, phz;
    Double_t z, density, w;
