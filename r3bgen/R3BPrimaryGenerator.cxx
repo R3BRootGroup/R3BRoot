@@ -71,7 +71,7 @@ void R3BPrimaryGenerator::AddTrack(Int_t pdgid, Double_t px, Double_t py,
 
     // ---> Get mass and calculate energy of particle
     if(e<0){
-	Double_t mass = pdgBase->GetParticle(pdgid)->Mass();
+	mass = pdgBase->GetParticle(pdgid)->Mass();
 
 	e = TMath::Sqrt( px*px + py*py + pz*pz + mass*mass );
     }// else, use the value of e given to the function
@@ -108,7 +108,7 @@ Bool_t R3BPrimaryGenerator::ExtendIon(Int_t pdgid){
     Double_t amu=0.931494028;
     Double_t massGeV;
 
-    char* pnames[3]={"H","He","Li"};
+    char* pnames[]={(char*)"H",(char*)"He",(char*)"Li"};
     Double_t mass=amu;
     Int_t isospin=2;
     Int_t isospin3=2;
@@ -217,7 +217,7 @@ Bool_t R3BPrimaryGenerator::ExtendIon(Int_t pdgid){
 	{
 	    cout<<"-W- R3BPrimaryGenerator PDG updating completed!"<<endl;
 	    extend++;
-	    TString WorkDir = gSystem->Getenv("VMCWORKDIR");
+	    WorkDir = gSystem->Getenv("VMCWORKDIR");
 	    TString wFilename  = WorkDir + "/input/chimera/ionlist.in";
 
 	    WriteTable(wFilename.Data());
@@ -253,7 +253,7 @@ void R3BPrimaryGenerator::ExtendIon2(Int_t pdgid){
     pname=Form("A%d_Z%d",A,Z);
     cout<<pname<<endl;
   
-    db->AddParticle(Form("%s_l",pname),("%s_l",pname),A*amu,1,0.0,Z*3,"Ion",pdgid+1);
+    db->AddParticle(Form("%s_l",pname),Form("%s_l",pname),A*amu,1,0.0,Z*3,"Ion",pdgid+1);
     gMC->DefineIon(Form("A%d_Z%d",A,Z),Z,A,Z,A*amu);
 
     

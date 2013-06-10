@@ -310,7 +310,7 @@ Bool_t R3BSpecificGenerator::ReadEvent(FairPrimaryGenerator* primGen)
       
       randnum = gRandom->Rndm();
       
-      for(Int_t i=0;i<181;i++) {
+      for(i=0;i<181;i++) {
         
 	if(randnum>=pReadKinematics->Icross_section[i] && 
 	   randnum<pReadKinematics->Icross_section[i+1]) {
@@ -543,7 +543,7 @@ Bool_t R3BSpecificGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 	  Double_t amu = 0.;
 	  fPDGType = 2212;
 	  pdgBase->GetParticle(fPDGType);
-	  TParticlePDG *particle = pdgBase->GetParticle(fPDGType);
+	  particle = pdgBase->GetParticle(fPDGType);
 	  if (! particle) Fatal("R3BSpecificGenerator","PDG code %d not defined.",fPDGType);
 	  amu = particle->Mass();  // Mass in GeV
 

@@ -179,9 +179,9 @@ Bool_t R3BAsciiIQMDGen::ReadEvent(FairPrimaryGenerator* primGen){
       px[i]=crp*pxx-srp*pyy;
       py[i]=srp*pxx+crp*pyy;
       pz[i]=pzz;
-      if(fscanf(fiqmd,"%lf %d %d",&mass[i], &imod[i],&mn[i])){;}
+      if(fscanf(fiqmd,"%lf %d %lf",&mass[i], &imod[i],&mn[i])){;}
       if(fscanf(fiqmd,"%d %d",&nclus[i],&iclus[i])){;}
-      if(fscanf(fiqmd,"%d %d %d %lf %lf",&itctl1,&itcl2,&itcl3,&rini,&pini)){;}
+      if(fscanf(fiqmd,"%lf %lf %lf %lf %lf",&itctl1[i],&itcl2[i],&itcl3[i],&rini[i],&pini[i])){;}
       //nothing more on this line
       if(fgets(c,518,fiqmd)){;}
       
@@ -296,7 +296,7 @@ Bool_t R3BAsciiIQMDGen::ReadEvent(FairPrimaryGenerator* primGen){
       if(nclus[i]==1)pdgID[iclus[i]-1]=idtotPDG[i];
       //check for pionic/delta clusters having one nucleon; 
       if(nn[iclus[i]-1]==1){
-	if(imod[i]<3)pdgID[iclus[i]-1]==idtotPDG[i];
+	if(imod[i]<3)pdgID[iclus[i]-1]=idtotPDG[i];
       }
       //check for pure pionic/delta clusters to discard
       if(nclus[i]>1&&nn[iclus[i]-1]==0)pdgID[iclus[i]-1]=0;
