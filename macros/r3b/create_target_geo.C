@@ -37,16 +37,6 @@ Bool_t fLabTrans = kFALSE;
 
 void create_terget_geo(const char* geoTag = "LiH")
 {
-  // -------------  Load the necessary FairRoot libraries   -------------------
-  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  // --------------------------------------------------------------------------
-
-
-
   // -------   Geometry file name (output)   ----------------------------------
   TString geoFileName = "target_";
   geoFileName = geoFileName + geoTag + ".geo.root";
