@@ -37,25 +37,6 @@ void califaAna_batch(Int_t nEvents=1, Int_t fGeoVer=1, Double_t fThres=0.000050,
 	timer.Start();
 	// ------------------------------------------------------------------------
 	
-	// ----  Load libraries   -------------------------------------------------
-	gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-	basiclibs();
-	
-	gSystem->Load("libGenVector");
-	
-	gSystem->Load("libGeoBase");
-	gSystem->Load("libParBase");
-	gSystem->Load("libBase");
-	gSystem->Load("libMCStack");
-	gSystem->Load("libField");
-	gSystem->Load("libGen");
-	
-	//----  Load R3B specific libraries ---------------------------------------
-	gSystem->Load("libR3Bbase");
-	gSystem->Load("libR3BPassive");
-	gSystem->Load("libR3BData");
-	gSystem->Load("libR3BCal");
-	gSystem->Load("libR3BCalo");
 	
 	// -----   Create analysis run   ----------------------------------------
 	FairRunAna* fRun = new FairRunAna();
