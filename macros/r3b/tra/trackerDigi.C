@@ -5,30 +5,6 @@ void trackerDigi(){
    TString parFile     = "r3bpar.root";
    TString outFile     = "tra_digi.root";
 
-  // ----  Load libraries   -------------------------------------------------
-  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();
-
-  gSystem->Load("libGenVector");
-
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-
-
-  gSystem->Load("libBase");
-  gSystem->Load("libMCStack");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-
-  //----  Load R3B specific libraries ---------------------------------------
-  gSystem->Load("libR3Bbase");
-  gSystem->Load("libR3BGen");
-  gSystem->Load("libR3BPassive");
-  gSystem->Load("libR3BData");
-  gSystem->Load("libR3BDch");
-
-
-
 
   // -----   Timer   --------------------------------------------------------
   TStopwatch timer;
