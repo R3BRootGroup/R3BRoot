@@ -3,7 +3,9 @@
 {
   // ---------------------------------------------------------------------------
   //FairRemoteSource* source  = new FairRemoteSource("lxi047");
-  FairLmdSource* source  = new FairLmdSource("/Users/kresan/r323_3607.lmd");
+  FairLmdSource* source  = new FairLmdSource();
+  source->AddFile("/Users/kresan/neuland/r258_2986.lmd");
+  source->AddFile("/Users/kresan/neuland/r323_3607.lmd");
 
   char *strCalDir = "/Users/kresan/r3b/geo/r3broot/calfiles/land/";
   Int_t type = 94;
@@ -27,7 +29,7 @@
 
   // ---------------------------------------------------------------------------
   run->Init();
-  run->Run(10000, 0);
+  run->Run(1000, 0);
   // ---------------------------------------------------------------------------
 }
 
