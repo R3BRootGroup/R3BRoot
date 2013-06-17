@@ -15,27 +15,29 @@ class TH2F;
 
 
 class R3BLandRawAna : public FairTask {
- public:
+public:
   R3BLandRawAna();
   virtual ~R3BLandRawAna();
-
+  
   virtual InitStatus Init();
-
+  
   virtual void Exec(Option_t *option);
-
+  
   virtual void FinishTask();
-
- private:
+  
+private:
+  Int_t fnEvents;
+  
   TClonesArray *fRawData;
-
+  
   TH1F *fh_padId;
   TH2F *fh_qdc_padId;
-
+  
   void CreateHistos();
-
+  
   void WriteHistos();
-
- public:
+  
+public:
   ClassDef(R3BLandRawAna, 0)
 };
 

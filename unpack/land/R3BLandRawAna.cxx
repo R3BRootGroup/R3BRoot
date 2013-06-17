@@ -21,6 +21,7 @@ using namespace std;
 
 R3BLandRawAna::R3BLandRawAna()
 {
+  fnEvents = 0;
 }
 
 
@@ -43,13 +44,15 @@ InitStatus R3BLandRawAna::Init()
 void R3BLandRawAna::Exec(Option_t *option)
 {
   Int_t nHits = fRawData->GetEntriesFast();
-  cout << "-I- R3BLandRawAna::Exec : multiplicity " << nHits << endl;
+  cout << "-I- R3BLandRawAna::Exec : event " << fnEvents << ", multiplicity " << nHits << endl;
   R3BLandRawHit *hit;
   for(Int_t i = 0; i < nHits; i++) {
     hit = (R3BLandRawHit*) fRawData->At(i);
     fh_padId->Fill(hit->GetPadId());
     fh_qdc_padId->Fill(hit->GetPadId(), hit->GetQdc1());
   }
+  
+  fnEvents += 1;
 }
 
 
