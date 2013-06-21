@@ -10,7 +10,6 @@ using namespace std;
 #include "TClonesArray.h"
 #include "TH1F.h"
 #include "TH2F.h"
-#include "TFolder.h"
 
 #include "FairRootManager.h"
 #include "FairRunOnline.h"
@@ -58,7 +57,6 @@ void R3BLandRawAna::Exec(Option_t *option)
 
 void R3BLandRawAna::FinishTask()
 {
-  WriteHistos();
 }
 
 
@@ -67,17 +65,13 @@ void R3BLandRawAna::CreateHistos()
   fh_padId = new TH1F("h_padId", "", 500, -0.5, 499.5);
 
   fh_qdc_padId = new TH2F("h_qdc_padId", "",
-			  500, -0.5, 499.5,
-			  400, 0., 4000.);
+			  50, 0., 500.,
+			  20, 0., 4000.);
 
   FairRunOnline *run = FairRunOnline::Instance();
 
-  TFolder *folder = new TFolder("LAND", "LAND");
-
-  folder->Add(fh_padId);
-  folder->Add(fh_qdc_padId);
-
-  run->AddObject(folder);
+  run->AddObject(fh_padId);
+  run->AddObject(fh_qdc_padId);
 }
 
 
