@@ -18,6 +18,7 @@
   // ---------------------------------------------------------------------------
   FairRunOnline *run = new FairRunOnline(source);
   run->SetOutputFile("land.root");
+  run->SetGenerateHtml(kTRUE);
   // ---------------------------------------------------------------------------
 
 
