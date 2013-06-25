@@ -7,13 +7,13 @@
 #include "R3BGeoLand.h"
 #include "R3BNeuLandPoint.h"
 #include "R3BGeoLandPar.h"
+#include "R3BMCStack.h"
 
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
 #include "FairGeoNode.h"
 #include "FairGeoRootBuilder.h"
 #include "FairRootManager.h"
-#include "FairStack.h"
 #include "FairRuntimeDb.h"
 #include "FairRun.h"
 #include "FairVolume.h"
@@ -260,7 +260,7 @@ Bool_t R3BNeuLandv1::ProcessHits(FairVolume* vol) {
 	     fTime, fLength, fELoss);
       
       // Increment number of NeuLandv1Points for this track
-      FairStack* stack = (FairStack*) gMC->GetStack();
+      R3BStack* stack = (R3BStack*) gMC->GetStack();
       stack->AddPoint(kLAND);
       
       ResetParameters();

@@ -10,13 +10,13 @@
 #include "R3BGeoCal.h"
 #include "R3BCalPoint.h"
 #include "R3BGeoCalPar.h"
+#include "R3BMCStack.h"
 
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
 #include "FairGeoNode.h"
 #include "FairGeoRootBuilder.h"
 #include "FairRootManager.h"
-#include "FairStack.h"
 #include "FairRuntimeDb.h"
 #include "FairRun.h"
 #include "FairVolume.h"
@@ -217,7 +217,7 @@ Bool_t R3BCalv1::ProcessHits(FairVolume* vol) {
       fTime, fLength, fELoss);
 
     // Increment number of CalPoints for this track
-    FairStack* stack = (FairStack*) gMC->GetStack();
+    R3BStack* stack = (R3BStack*) gMC->GetStack();
     stack->AddPoint(kCAL);
 
     ResetParameters();

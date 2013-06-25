@@ -7,13 +7,13 @@
 #include "R3BGeoTof.h"
 #include "R3BTofPoint.h"
 #include "R3BGeoTofPar.h"
+#include "R3BMCStack.h"
 
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
 #include "FairGeoNode.h"
 #include "FairGeoRootBuilder.h"
 #include "FairRootManager.h"
-#include "FairStack.h"
 #include "FairRuntimeDb.h"
 #include "FairRun.h"
 #include "FairVolume.h"
@@ -236,7 +236,7 @@ Bool_t R3BTof::ProcessHits(FairVolume* vol) {
 	   fTime, fLength, fELoss);
     
     // Increment number of TofPoints for this track
-    FairStack* stack = (FairStack*) gMC->GetStack();
+    R3BStack* stack = (R3BStack*) gMC->GetStack();
     stack->AddPoint(kTOF);
     
     ResetParameters();

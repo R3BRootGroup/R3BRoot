@@ -15,7 +15,6 @@
 #include "FairGeoNode.h"
 #include "FairGeoRootBuilder.h"
 #include "FairRootManager.h"
-//#include "FairStack.h"
 #include "FairRuntimeDb.h"
 #include "FairRun.h"
 #include "FairVolume.h"

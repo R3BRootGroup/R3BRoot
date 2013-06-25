@@ -1,31 +1,25 @@
+
 eventDisplay()
 {
-  // -----   Reconstruction run   -------------------------------------------
-  FairRunAna *fRun= new FairRunAna();
+  TString  InputFile = "r3bsim.root";
+  TString  ParFile = "r3bpar.root";
+	
+  FairRunAna *run = new FairRunAna();
+	
+  run->SetInputFile(InputFile.Data());
+  run->SetOutputFile("test.root");
+	
+  FairRuntimeDb* rtdb = run->GetRuntimeDb();
+  FairParRootFileIo* parInput1 = new FairParRootFileIo();
+  parInput1->open(ParFile.Data());
+  rtdb->setFirstInput(parInput1);
+	
+  FairEventManager *man= new FairEventManager();
+  FairMCTracks *Track =  new FairMCTracks("Monte-Carlo Tracks");
+  FairMCPointDraw *LandPoint = new FairMCPointDraw("LandPoint", kOrange, kFullSquare);
   
-  TFile* file = new TFile("r3bpar.root");
-  file->Get("FairBaseParSet"); 
-
-  // -----   Runtime database   ---------------------------------------------
-  FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
-  FairParRootFileIo* parIn = new FairParRootFileIo();
-  parIn->open("r3bpar.root");
-  rtdb->print();
-
-
-  //-------
-  fRun->SetInputFile("r3bsim.root");
-  fRun->SetOutputFile("test.root");
-
-
-  FairEventManager *fMan= new FairEventManager();
-  FairMCTracks *Track =  new FairMCTracks ("Monte-Carlo Tracks");
-  FairMCPointDraw *LandPoints =   new FairMCPointDraw ("LandPoint",kOrange,  kFullSquare);
-
-                                                               
-  fMan->AddTask(Track);
+  man->AddTask(Track);
+  man->AddTask(LandPoint);
   
-  fMan->AddTask(LandPoints);
-    
-  fMan->Init();
+	man->Init(1,4,10000);
 }

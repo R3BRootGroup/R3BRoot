@@ -77,6 +77,22 @@ class R3BLandDigitizer : public FairTask
   TH1F *hFirstEnergy;
   
   TH2F *hElossLight;
+
+  TH2F *hElossXL;
+  TH2F *hElossXR;
+
+  TH2F *hThresh;
+  TH1F *hTPaddle;
+  TH1F *hBetaPaddle;
+
+  TH1F *hQDCRatio;
+
+  TH2F *hElossTime;
+  TH2F *hElossPdg;
+
+  Double_t thresh[5000];
+  Double_t threshL[5000];
+  Double_t threshR[5000];
  
   Int_t eventNo;
   Int_t npaddles;
