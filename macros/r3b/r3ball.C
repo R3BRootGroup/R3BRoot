@@ -76,7 +76,7 @@ void r3ball(Int_t nEvents = 1,
   
   //  R3B Special Physics List in G4 case
   if ( (fUserPList  == kTRUE ) &&
-      (fMC.CompareTo("TGeant4")   == 0)) {
+       (fMC.CompareTo("TGeant4")   == 0)) {
     run->SetUserConfig("g4R3bConfig.C");
     run->SetUserCuts("SetR3BCuts.C");
   }
@@ -542,7 +542,7 @@ void r3ball(Int_t nEvents = 1,
   cout << "Output file is "    << OutFile << endl;
   cout << "Parameter file is " << ParFile << endl;
   cout << "Real time " << rtime << " s, CPU time " << ctime
-  << "s" << endl << endl;
+       << "s" << endl << endl;
   // ------------------------------------------------------------------------
   
   cout << " Test passed" << endl;

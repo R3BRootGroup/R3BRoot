@@ -1,31 +1,23 @@
 eventDisplay()
 {
-  // -----   Reconstruction run   -------------------------------------------
   FairRunAna *fRun= new FairRunAna();
   
-  TFile* file = new TFile("r3bpar.root");
-  file->Get("FairBaseParSet"); 
-
-  // -----   Runtime database   ---------------------------------------------
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
-  FairParRootFileIo* parIn = new FairParRootFileIo();
-  parIn->open("r3bpar.root");
+  FairParRootFileIo*  parIo1 = new FairParRootFileIo();
+  parIo1->open("r3bpar.root");
+  rtdb->setFirstInput(parIo1);
   rtdb->print();
-
-
-  //-------
+  
   fRun->SetInputFile("r3bsim.root");
   fRun->SetOutputFile("test.root");
-
-
+  
   FairEventManager *fMan= new FairEventManager();
   FairMCTracks *Track =  new FairMCTracks ("Monte-Carlo Tracks");
   FairMCPointDraw *LandPoints =   new FairMCPointDraw ("LandPoint",kOrange,  kFullSquare);
-
-                                                               
+  
   fMan->AddTask(Track);
   
   fMan->AddTask(LandPoints);
-    
+  
   fMan->Init();
 }
