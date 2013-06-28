@@ -24,6 +24,7 @@
 #include "TH2F.h"
 #include <string>
 #include <iostream>
+#include <fstream>
 
 
 #include "R3BLandPoint.h"
@@ -72,8 +73,8 @@ void R3BLandDigitizer::SetParContainers() {
 
 
 
-InitStatus R3BLandDigitizer::Init() {
-
+InitStatus R3BLandDigitizer::Init()
+{
   // Get input array 
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) Fatal("Init", "No FairRootManager");
@@ -123,11 +124,14 @@ InitStatus R3BLandDigitizer::Init() {
      hTotalEnergy->GetXaxis()->SetTitle("Energy (MeV)");
      hTotalEnergy->GetYaxis()->SetTitle("Counts");
 
-     hTotalEnergy1 = new TH1F("Total_Energy1","Total energy detected / Ebeam",55,-0.02,1.08);
+//      hTotalEnergy1 = new TH1F("Total_Energy1","Total energy detected / Ebeam",55,-0.02,1.08);
+     hTotalEnergy1 = new TH1F("Total_Energy1","Total energy detected / Ebeam",5000, 0., 5000.);
      hTotalEnergy1->GetXaxis()->SetTitle("Energy/Ebeam");
      hTotalEnergy1->GetYaxis()->SetTitle("Counts");
      
-     hTotalLightRel = new TH1F("Total_Light_rel","Relative Total light detected (energy equivalent)",1000,0.,1000.);
+//      hTotalLightRel = new TH1F("Total_Light_rel","Relative Total light detected (energy equivalent)",1000,0.,1000.);
+     hTotalLightRel = new TH1F("Total_Light_rel","Relative Total light detected (energy equivalent)",
+			       200, -1., 1.);
      hTotalLightRel->GetXaxis()->SetTitle("Energy/Ebeam");
      hTotalLightRel->GetYaxis()->SetTitle("Counts");
   
@@ -147,13 +151,28 @@ InitStatus R3BLandDigitizer::Init() {
      hPaddleEnergy->GetXaxis()->SetTitle("Energy (MeV)");
      hPaddleEnergy->GetYaxis()->SetTitle("Counts");
 
-     hFirstEnergy = new TH1F("FirstEnergy","First energy deposit in a paddle",500,0.,100.);
+     hFirstEnergy = new TH1F("FirstEnergy","First energy deposit in a paddle",200,0.,200.);
      hFirstEnergy->GetXaxis()->SetTitle("Energy (MeV)");
      hFirstEnergy->GetYaxis()->SetTitle("Counts");
 
      hElossLight = new TH2F("ElossLight","Light quenching for protons",200,0.,1000.,200,0.,1000.);
      hElossLight->GetXaxis()->SetTitle("Energy (MeV)");
      hElossLight->GetYaxis()->SetTitle("Light (MeV)");
+
+     hElossXL = new TH2F("hElossXL", "", 300, -150., 150., 100, 0., 100.);
+     hElossXR = new TH2F("hElossXR", "", 300, -150., 150., 100, 0., 100.);
+     
+     hThresh = new TH2F("hThresh", "", 150, 0., 150., 500, 0., 100.);
+
+     hTPaddle = new TH1F("hTPaddle", "", 150, 0., 150.);
+
+     hBetaPaddle = new TH1F("hBetaPaddle", "", 150, 0., 150.);
+
+     hQDCRatio = new TH1F("hQDCRatio", "", 100, -5., 5.);
+
+     hElossTime = new TH2F("hElossTime", "", 1000, 0., 1000., 1000, 0., 100.);
+
+     hElossPdg = new TH2F("hElossPdg", "", 30000, 0., 30000., 1000, 0., 100.);
         
      if(fLandDigiPar->GetGeometryFileName().Contains("proto")) {
        //Neuland prototype
@@ -228,26 +247,23 @@ void R3BLandDigitizer::Exec(Option_t* opt)
 //   att = 0.005; // in [1/cm]
    att = 0.008; // in [1/cm]
 // decay constant of BC408 scintillator
-//   Double_t lambda=0.693147/2.5; // in [1/ns] This lambda is actually a t1/2
-//   Double_t lambda=1./3.1; // in [1/ns]
+//    Double_t lambda=0.693147/2.5; // in [1/ns] This lambda is actually a t1/2
+//    Double_t lambda=1./3.1; // in [1/ns]
    Double_t lambda=1./2.1; // in [1/ns]
 
 // half of the length of a scintillator
    plength = fLandDigiPar->GetPaddleLength(); // in [cm]
 
 // length of time gate for QDC
-   Double_t tofRange = 400.;//in [ns]
+   Double_t tofRange = 400.;//in [ns] !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
    
 // energy calibration factor   
 //   calFactor=0.6; 
-   calFactor=0.4;   
-// Individual thresholds for PM's 
-   Double_t thresh[npaddles];
-   for (Int_t i=0;i<npaddles;i++){
-      Double_t ran=(gRandom->Rndm(0)-0.5)*0.15;   
-      // here one has the possibility to assign individual thresholds
-      thresh[i] = 0.16+ran; // [MeV] for geant4
-   }
+//    calFactor=0.4;
+//    calFactor = 0.85;
+   calFactor = 0.4;
+
+   Double_t Thresh = 0.16;
    
 //****************************************************   
    Int_t nentries = fLandPoints->GetEntries();
@@ -298,6 +314,9 @@ void R3BLandDigitizer::Exec(Option_t* opt)
       TrackId = land_obj->GetTrackID();
       R3BMCTrack *aTrack = (R3BMCTrack*) fLandMCTrack->At(TrackId);      
       Int_t PID = aTrack->GetPdgCode();
+
+      hElossTime->Fill(time, eloss);
+      hElossPdg->Fill(PID, eloss);
                 
 //       Double_t x = (xIn+xOut)/2.;
 //       Double_t y = (yIn+yOut)/2.;
@@ -332,19 +351,16 @@ void R3BLandDigitizer::Exec(Option_t* opt)
          cout<< "media "<<media<<endl;
 	 
       }
-      
-              
+
+
       if (eloss > 0. && media == 3) {
 	 
          // store Particle ID which caused the energy loss
          if(eloss > 1.) hParticle->Fill(PID,1.);
 
-
          PMmult[paddle] = PMmult[paddle] + 1;
 	 
          Int_t m = PMmult[paddle]; 
-//	 cout << "multi per paddle: "<<m<<endl;
-//           cout<< "light yield "<<light<<endl;
 	 
 	 if (m>1500) {
 	   cout<<"Too many hits in one paddle: "<< m<< " hits"<<endl;
@@ -403,30 +419,24 @@ void R3BLandDigitizer::Exec(Option_t* opt)
 	   PM_res[paddle][m].RlightCFD = light*exp(-att*(plength+y));
 	   PM_res[paddle][m].RlightQDC = light*exp(-att*(plength+y));
 	 } else {
-	   if(paddle > (npaddles-1)/2) {
-	     if((int)(((paddle-1)/paddle_per_plane))/2.==(int)((int)(((paddle-1)/paddle_per_plane))/2.)) {
-	       // horizontal paddles
-	       PM_res[paddle][m].Ltime = time+(plength-x)/cMedia;
-	       PM_res[paddle][m].LlightCFD = light*exp(-att*(plength-x));
-	       PM_res[paddle][m].LlightQDC = light*exp(-att*(plength-x));
-	       
-	       PM_res[paddle][m].Rtime = time+(plength+x)/cMedia;
-	       PM_res[paddle][m].RlightCFD = light*exp(-att*(plength+x));
-	       PM_res[paddle][m].RlightQDC = light*exp(-att*(plength+x));
-// 	       cout<<"horizontal paddle "<< PM_res[paddle][m].LlightCFD<<
-//	     "  "<<PM_res[paddle][m].RlightCFD <<endl;
-	     } else {
-	       // vertical paddles
-	       PM_res[paddle][m].Ltime = time+(plength-y)/cMedia;
-	       PM_res[paddle][m].LlightCFD = light*exp(-att*(plength-y));
-	       PM_res[paddle][m].LlightQDC = light*exp(-att*(plength-y));
-	       
-	       PM_res[paddle][m].Rtime = time+(plength+y)/cMedia;
-	       PM_res[paddle][m].RlightCFD = light*exp(-att*(plength+y));
-	       PM_res[paddle][m].RlightQDC = light*exp(-att*(plength+y));
-//             cout<<"vertical paddle"<< PM_res[paddle][m].LlightCFD<<
-//	     "  "<<PM_res[paddle][m].RlightCFD<<endl;
-	     }
+	   if((int)(((paddle-1)/paddle_per_plane))/2.==(int)((int)(((paddle-1)/paddle_per_plane))/2.)) {
+	     // horizontal paddles
+	     PM_res[paddle][m].Ltime = time+(plength-x)/cMedia;
+	     PM_res[paddle][m].LlightCFD = light*exp(-att*(plength-x));
+	     PM_res[paddle][m].LlightQDC = light*exp(-att*(plength-x));
+	     
+	     PM_res[paddle][m].Rtime = time+(plength+x)/cMedia;
+	     PM_res[paddle][m].RlightCFD = light*exp(-att*(plength+x));
+	     PM_res[paddle][m].RlightQDC = light*exp(-att*(plength+x));
+	   } else {
+	     // vertical paddles
+	     PM_res[paddle][m].Ltime = time+(plength-y)/cMedia;
+	     PM_res[paddle][m].LlightCFD = light*exp(-att*(plength-y));
+	     PM_res[paddle][m].LlightQDC = light*exp(-att*(plength-y));
+	     
+	     PM_res[paddle][m].Rtime = time+(plength+y)/cMedia;
+	     PM_res[paddle][m].RlightCFD = light*exp(-att*(plength+y));
+	     PM_res[paddle][m].RlightQDC = light*exp(-att*(plength+y));
 	   }
 	 }
 
@@ -436,105 +446,131 @@ void R3BLandDigitizer::Exec(Option_t* opt)
 
    hElossLight->Fill(TotalEnergy,TotalEnergyLee,1.);
    hTotalEnergy->Fill(TotalEnergy);  
-   hTotalEnergy1->Fill(TotalEnergy/calFactor/fBeamEnergy);  
+//    hTotalEnergy1->Fill(TotalEnergy/calFactor/fBeamEnergy);  
    hTotalLightRel->Fill(TotalEnergyLee);  
    hTotalLight1->Fill(TotalEnergyLee/calFactor/fBeamEnergy);  
    hTotalEnergyRel->Fill(TotalEnergy);  
 
-//    cout << "-I- R3BLandDigitizer : energy=" << TotalEnergy << ",  light=" << TotalEnergyLee << "." << endl;
    
    // Check for leading edge
-   Double_t triggerTime=1e10;
+   Double_t triggerTime=1e100;
    for(Int_t i = 0; i < npaddles; i++) {
-      for (Int_t j = 0; j < PMmult[i]; j++) {
+     
+     if(fLandDigiPar->GetGeometryFileName().Contains("proto")) {
+       if(0 == i || 9 == i || 140 == i || 149 == i) {
+	 continue;
+       }
+     }
 
-	PM_res[i][j+1].Lenergy=lambda*PM_res[i][j+1].LlightCFD;
-	PM_res[i][j+1].Lenergy=PM_res[i][j+1].Lenergy+PM_res[i][j].Lenergy* 
-	  exp(-lambda*(PM_res[i][j+1].Ltime-PM_res[i][j].Ltime));       
-
-	if(PM_res[i][j+1].Lenergy > thresh[i]) {
-	  if(PM_res[i][j+1].Ltime < triggerTime) {
-	    triggerTime = PM_res[i][j+1].Ltime;
-	  }// find minimum
-	}// if above threshold
-
-	PM_res[i][j+1].Renergy=lambda*PM_res[i][j+1].RlightCFD;
-	PM_res[i][j+1].Renergy=PM_res[i][j+1].Renergy+PM_res[i][j].Renergy* 
-	  exp(-lambda*(PM_res[i][j+1].Rtime-PM_res[i][j].Rtime));       
-
-	if(PM_res[i][j+1].Renergy > thresh[i]) {
-	  if(PM_res[i][j+1].Rtime < triggerTime) {
-	    triggerTime = PM_res[i][j+1].Rtime;
-	  }// find minimum
-	}// if above threshold
-
-      }// digis
-   }// paddles
-
-//    cout << "-I- R3BLandDigitizer : triggerTime=" << triggerTime << "." << endl;
-
-   Double_t temp[1500][3];
-      
-   for (Int_t i=0;i<npaddles;i++){
-      //cout<<"loop over paddles "<<i<<endl; 
-
-      // sort hits according to time; left PM
-      for (Int_t j=0;j<PMmult[i];j++){
-         temp[j][0]=PM_res[i][j+1].Ltime;
-         temp[j][1]=PM_res[i][j+1].LlightCFD;	 
-         temp[j][2]=PM_res[i][j+1].LlightQDC;	 
-      }
-      
-      for (Int_t j=0;j<PMmult[i];j++){
-         Double_t min = 100000;
-         Int_t index = 0;
-         for (Int_t k=0;k<PMmult[i];k++){
-            if(temp[k][0] < min){
-	       min = temp[k][0];
-	       index = k;
-	    }
-         }
-         PM_res[i][j+1].Ltime=temp[index][0];
-         PM_res[i][j+1].LlightCFD=temp[index][1];
-         PM_res[i][j+1].LlightQDC=temp[index][2];
-         temp[index][0] = 100000.;
-      }	
-   
-      // sort hits according to time; right PM
-      for (Int_t j=0;j<PMmult[i];j++){
-         temp[j][0]=PM_res[i][j+1].Rtime;
-         temp[j][1]=PM_res[i][j+1].RlightCFD;	 
-         temp[j][2]=PM_res[i][j+1].RlightQDC;	 
-      }
-      
-      for (Int_t j=0;j<PMmult[i];j++){
-         Double_t min = 100000;
-         Int_t index = 0;
-         for (Int_t k=0;k<PMmult[i];k++){
-            if(temp[k][0] < min){
-	       min = temp[k][0];
-	       index = k;
-	    }
-         }
-         PM_res[i][j+1].Rtime=temp[index][0];
-         PM_res[i][j+1].RlightCFD=temp[index][1];
-         PM_res[i][j+1].RlightQDC=temp[index][2];
-         temp[index][0] = 100000.;
-      }	
+     for (Int_t j = 0; j < PMmult[i]; j++) {
+       PM_res[i][j+1].Lenergy=lambda*PM_res[i][j+1].LlightCFD;
+       PM_res[i][j+1].Lenergy=PM_res[i][j+1].Lenergy+PM_res[i][j].Lenergy* 
+	 exp(-lambda*(PM_res[i][j+1].Ltime-PM_res[i][j].Ltime));       
        
-      Double_t tofl = 0.;
-      Double_t tofr = 0.;
-      Double_t lightr = 0.;
-      Double_t lightl = 0.;
-      Int_t multl = 0;
-      Int_t multr = 0;
-      PM_res[i][0].Lenergy=0.;
-      PM_res[i][0].Renergy=0.;
-      PM_res[i][0].Ltime=PM_res[i][1].Ltime;
-      PM_res[i][0].Rtime=PM_res[i][1].Rtime;
+       if(PM_res[i][j+1].Lenergy > Thresh) {
+	 if(PM_res[i][j+1].Ltime < triggerTime) {
+	   triggerTime = PM_res[i][j+1].Ltime;
+	 }// find minimum
+       }// if above threshold
+       
+       PM_res[i][j+1].Renergy=lambda*PM_res[i][j+1].RlightCFD;
+       PM_res[i][j+1].Renergy=PM_res[i][j+1].Renergy+PM_res[i][j].Renergy* 
+	 exp(-lambda*(PM_res[i][j+1].Rtime-PM_res[i][j].Rtime));       
+       
+       if(PM_res[i][j+1].Renergy > Thresh) {
+	 if(PM_res[i][j+1].Rtime < triggerTime) {
+	   triggerTime = PM_res[i][j+1].Rtime;
+	 }// find minimum
+       }// if above threshold
+       
+     }// digis
+   }// paddles
+   
+//    cout << "-I- R3BLandDigitizer : triggerTime=" << triggerTime << "." << endl;
+   
+   Double_t temp[1500][3];
+
+
+
+   Double_t TotalEnergy1 = 0.;
+
+   Double_t minimum1 = 1e10;
+   Int_t index1;
+   Double_t minimum2 = 1e10;
+   Int_t index2;
 
       
-      for (Int_t j=0;j<PMmult[i];j++){
+   for(Int_t i=0;i<npaddles;i++) {
+     //cout<<"loop over paddles "<<i<<endl; 
+     
+
+     if(fLandDigiPar->GetGeometryFileName().Contains("proto")) {
+       if(0 == i || 9 == i || 140 == i || 149 == i) {
+	 continue;
+       }
+     }
+     
+     if(! PMmult[i]) {
+       continue;
+     }
+     
+     // sort hits according to time; left PM
+     for (Int_t j=0;j<PMmult[i];j++){
+       temp[j][0]=PM_res[i][j+1].Ltime;
+       temp[j][1]=PM_res[i][j+1].LlightCFD;	 
+       temp[j][2]=PM_res[i][j+1].LlightQDC;	 
+     }
+     
+     for (Int_t j=0;j<PMmult[i];j++){
+       Double_t min = 100000;
+       Int_t index = 0;
+       for (Int_t k=0;k<PMmult[i];k++){
+	 if(temp[k][0] < min){
+	   min = temp[k][0];
+	   index = k;
+	 }
+       }
+       PM_res[i][j+1].Ltime=temp[index][0];
+       PM_res[i][j+1].LlightCFD=temp[index][1];
+       PM_res[i][j+1].LlightQDC=temp[index][2];
+       temp[index][0] = 100000.;
+     }	
+     
+     // sort hits according to time; right PM
+     for (Int_t j=0;j<PMmult[i];j++){
+       temp[j][0]=PM_res[i][j+1].Rtime;
+       temp[j][1]=PM_res[i][j+1].RlightCFD;	 
+       temp[j][2]=PM_res[i][j+1].RlightQDC;	 
+     }
+     
+     for (Int_t j=0;j<PMmult[i];j++){
+       Double_t min = 100000;
+       Int_t index = 0;
+       for (Int_t k=0;k<PMmult[i];k++){
+	 if(temp[k][0] < min){
+	   min = temp[k][0];
+	   index = k;
+	 }
+       }
+       PM_res[i][j+1].Rtime=temp[index][0];
+       PM_res[i][j+1].RlightCFD=temp[index][1];
+       PM_res[i][j+1].RlightQDC=temp[index][2];
+       temp[index][0] = 100000.;
+     }	
+     
+     Double_t tofl = 0.;
+     Double_t tofr = 0.;
+     Double_t lightr = 0.;
+     Double_t lightl = 0.;
+     Int_t multl = 0;
+     Int_t multr = 0;
+     PM_res[i][0].Lenergy=0.;
+     PM_res[i][0].Renergy=0.;
+     PM_res[i][0].Ltime=PM_res[i][1].Ltime;
+     PM_res[i][0].Rtime=PM_res[i][1].Rtime;
+     
+      
+     for(Int_t j = 0; j < PMmult[i]; j++) {
 /*
          cout<<"j: "<<j<<"  "<< PMmult[i] <<endl;
          cout<<"energy: "<<PM_res[i][j+1].Lenergy<<endl;
@@ -546,163 +582,190 @@ void R3BLandDigitizer::Exec(Option_t* opt)
 //	 exp(-lambda*(PM_res[i][j+1].Ltime-PM_res[i][j].Ltime))<<endl;
 //         cout<<"result: "<<PM_res[i][j+1].Lenergy<<endl;
 
-//         PM_res[i][j+1].Lenergy=PM_res[i][j+1].LlightCFD;
-
-
-         if(PM_res[i][j+1].Lenergy>thresh[i] && multl==0) {
-//             if (triggerTime==0.) triggerTime=PM_res[i][j+1].Ltime;
-	    // This is supposed to mimic a QDC and a TDC
-	    // check if light is larger than threshold and register time
-            // Take also time resolution of sigma=timeRes ps into account
-            Double_t num=gRandom->Gaus(0.,timeRes);
-	    tofl=PM_res[i][j+1].Ltime+num;
-	    multl=multl+1;
-	    lightl=0.;	   
-            for(Int_t k=1;k<=PMmult[i];k++){
-	    // add all times inside +- tofRange (ns) for QDC 
-	       if(TMath::Abs(PM_res[i][k].Ltime-triggerTime+tofRange/2.) < tofRange) {
-  	          lightl=lightl+PM_res[i][k].LlightQDC;
-	          if(i<68){
-                     // control histograms
-	             hPMl ->Fill(PM_res[i][k].Ltime,PM_res[i][k].LlightCFD);
-                  }
-	       }
-	    }
-	 
+       if(PM_res[i][j+1].Lenergy > Thresh && 0 == multl) {
+	 // This is supposed to mimic a QDC and a TDC
+	 // check if light is larger than threshold and register time
+	 // Take also time resolution of sigma=timeRes ps into account
+	 Double_t num=gRandom->Gaus(0.,timeRes);
+	 tofl=PM_res[i][j+1].Ltime+num;
+	 multl=multl+1;
+	 lightl=0.;	   
+	 for(Int_t k=1;k<=PMmult[i];k++) {
+	   // add all times inside +- tofRange (ns) for QDC 
+	   if(TMath::Abs(PM_res[i][k].Ltime-triggerTime+tofRange/2.) < tofRange) {
+	     lightl = lightl + PM_res[i][k].LlightQDC;
+	     hPMl->Fill(PM_res[i][k].Ltime, PM_res[i][k].LlightCFD);
+	   }
 	 }
-	 	 
-//         PM_res[i][j+1].Renergy=lambda*PM_res[i][j+1].RlightCFD;
+       }
+       
 
-         if(PM_res[i][j+1].Renergy>thresh[i] && multr==0) {
-//             if (triggerTime==0.) triggerTime=PM_res[i][j+1].Rtime;
-	    // This is supposed to mimic a QDC and a TDC
-	    // check if light is larger than threshold and register time
-            // Take also time resolution of sigma=timeRes ps into account
-            Double_t num=gRandom->Gaus(0.,timeRes);
-	    tofr=PM_res[i][j+1].Rtime+num;
-	    multr=multr+1;
-	    lightr=0.;	   
-            for(Int_t k=1;k<=PMmult[i];k++){
-	    // add all times inside +- tofRange (ns) for QDC 
-	       if(TMath::Abs(PM_res[i][k].Rtime-triggerTime+tofRange/2.) < tofRange) {
-  	          lightr=lightr+PM_res[i][k].RlightQDC;
-	          if(i<68){
-                     // control histograms
-	             hPMr ->Fill(PM_res[i][k].Rtime,PM_res[i][k].RlightCFD);
-                  }
-	       }
-	    }
-	 
+       if(PM_res[i][j+1].Renergy > Thresh && 0 == multr) {
+	 // This is supposed to mimic a QDC and a TDC
+	 // check if light is larger than threshold and register time
+	 // Take also time resolution of sigma=timeRes ps into account
+	 Double_t num=gRandom->Gaus(0.,timeRes);
+	 tofr=PM_res[i][j+1].Rtime+num;
+	 multr=multr+1;
+	 lightr=0.;	   
+	 for(Int_t k=1;k<=PMmult[i];k++){
+	   // add all times inside +- tofRange (ns) for QDC 
+	   if(TMath::Abs(PM_res[i][k].Rtime-triggerTime+tofRange/2.) < tofRange) {
+	     lightr = lightr + PM_res[i][k].RlightQDC;
+	     hPMr ->Fill(PM_res[i][k].Rtime,PM_res[i][k].RlightCFD);
+	   }
 	 }
-
-      }
-
-
-      // Multiplicity if only one PM has fired
-      if(multl>0 || multr>0) mult2=mult2+1;
-
-      if(multl>0 && multr>0){
-           
-	 //multiplicity if 2 PM's have fired
-	 mult1=mult1+1;
-//	 cout << "light l and r " <<  lightl<<"  "<<lightr << endl;	 
-
-         QDC_temp[mult1] = sqrt(lightl*lightr)*exp((2.*plength)*att/2.);
-//	 cout << "QDC " <<  QDC_temp[mult1] << endl;	 
-         TDC_temp[mult1] = (tofl + tofr) / 2. - plength/cMedia;
+	 
+       }
+       
+     }
 
 
-	 if(fLandDigiPar->GetGeometryFileName().Contains("proto")) {
+     // Multiplicity if only one PM has fired
+     if(multl > 0 || multr > 0) {
+       mult2 = mult2 + 1;
+     }
+     
+     
+     if(multl > 0 && multr > 0) {
+       
+       lightl *= exp((2.*plength)*att/2.);
+       lightr *= exp((2.*plength)*att/2.);
+
+       lightl = gRandom->Gaus(lightl, 0.02*lightl);
+       lightr = gRandom->Gaus(lightr, 0.02*lightr);
+
+//        Double_t k1 = 95.;
+//        Double_t k2 = 30.;
+       Double_t k1 = 1.;
+       Double_t k2 = 0.010;
+       Double_t k3 = 0.;
+       Double_t k4 = 0.012;
+       Double_t k5 = gRandom->Uniform(20., 45.);
+
+//        if(TMath::Sqrt(lightl*lightr) < k5) {
+// 	 lightl = lightl / (1. + k2*lightl);
+// 	 lightr = lightr / (1. + k2*lightr);
+//        } else {
+// 	 lightl = lightl / (1. + k4*lightl);
+// 	 lightr = lightr / (1. + k4*lightr);
+//        }
+
+//        lightl = gRandom->Landau(lightl, 0.008*lightl);
+//        lightr = gRandom->Landau(lightr, 0.008*lightr);
+
+//        if(lightl < threshL[i] || lightr < threshR[i]) {
+// 	 continue;
+//        }
+       
+       
+       //multiplicity if 2 PM's have fired
+       mult1=mult1+1;
+
+       QDC_temp[mult1] = sqrt(lightl*lightr);
+       TDC_temp[mult1] = (tofl + tofr) / 2. - plength/cMedia;
+
+
+       if(fLandDigiPar->GetGeometryFileName().Contains("proto")) {
+	 // vertical paddles
+	 xpos_temp[mult1] = xpaddle[i];
+	 ypos_temp[mult1] = (tofr - tofl)/2.*cMedia;	    
+	 zpos_temp[mult1] = zpaddle[i];
+       } else {
+	 if((int)(((i-1)/paddle_per_plane))/2.==(int)((int)(((i-1)/paddle_per_plane))/2.)){
+	   //horizontal paddles
+	   xpos_temp[mult1] = (tofr - tofl)/2.*cMedia;
+	   ypos_temp[mult1] = ypaddle[i];	    
+	   zpos_temp[mult1] = zpaddle[i];
+	   //	    cout << "delta tof x " << (tofl - tofr) << endl; 
+	 } else {
 	   // vertical paddles
 	   xpos_temp[mult1] = xpaddle[i];
 	   ypos_temp[mult1] = (tofr - tofl)/2.*cMedia;	    
 	   zpos_temp[mult1] = zpaddle[i];
-	 } else {
-	   if(i > (npaddles-1)/2) {
-	     if((int)(((i-1)/paddle_per_plane))/2.==(int)((int)(((i-1)/paddle_per_plane))/2.)){
-	       //horizontal paddles
-	       xpos_temp[mult1] = (tofr - tofl)/2.*cMedia;
-	       ypos_temp[mult1] = ypaddle[i];	    
-	       zpos_temp[mult1] = zpaddle[i];
-//	    cout << "delta tof x " << (tofl - tofr) << endl; 
-	     } else {
-	       // vertical paddles
-	       xpos_temp[mult1] = xpaddle[i];
-	       ypos_temp[mult1] = (tofr - tofl)/2.*cMedia;	    
-	       zpos_temp[mult1] = zpaddle[i];
-//	    cout << "delta tof y " << (tofl - tofr) << endl; 
-	     }
-	   }
+	   //	    cout << "delta tof y " << (tofl - tofr) << endl; 
 	 }
+       }
 	 
-         // Here is an example how to fill the R3BLandDigi structure
-         Double_t tdcL = tofl;
-         Double_t tdcR = tofr;
-         Double_t qdcL = lightl;
-         Double_t qdcR = lightr;
-         Int_t paddleNr = i+1;
-	 Double_t qdc=QDC_temp[mult1];
-	 Double_t tdc=TDC_temp[mult1];	 
-	 Double_t xx=xpos_temp[mult1];
-	 Double_t yy=ypos_temp[mult1];
-	 Double_t zz=zpos_temp[mult1];
-
-         // calling AddHit function will create a object
-         // R3BLandDigi in memory and will automatically
-         // add it to the array
-         // sothat :  1 call  to AddHit() 1 object in array
-         //           n calls to AddHit() n object in array
-
-         AddHit(paddleNr, tdcL, tdcR, tdc, qdcL, qdcR, qdc, xx, yy, zz);
+       // Here is an example how to fill the R3BLandDigi structure
+       Double_t tdcL = tofl;
+       Double_t tdcR = tofr;
+       Double_t qdcL = lightl;
+       Double_t qdcR = lightr;
+       Int_t paddleNr = i+1;
+       Double_t qdc=QDC_temp[mult1];
+       Double_t tdc=TDC_temp[mult1];	 
+       Double_t xx=xpos_temp[mult1];
+       Double_t yy=ypos_temp[mult1];
+       Double_t zz=zpos_temp[mult1];
 
 
-      }
+       if(tdc < minimum1) {
+	 minimum1 = tdc;
+	 index1 = i;
+       }
+       beta = TMath::Sqrt(xx*xx+yy*yy+zz*zz)/tdc/(c*1E-7);
+       if(beta < minimum2) {
+	 minimum2 = beta;
+	 index2 = i;
+       }
 
-
-      else {
-         // recover hits with partial information
-
-      }
+       
+       // calling AddHit function will create a object
+       // R3BLandDigi in memory and will automatically
+       // add it to the array
+       // sothat :  1 call  to AddHit() 1 object in array
+       //           n calls to AddHit() n object in array
+       
+       AddHit(paddleNr, tdcL, tdcR, tdc, qdcL, qdcR, qdc, xx, yy, zz);
+       hThresh->Fill(i, qdcL);
+       TotalEnergy1 += qdc;
+       hElossXL->Fill(yy, qdcL);
+       hElossXR->Fill(yy, qdcR);
+       hQDCRatio->Fill(TMath::Log(qdcL/qdcR));
+       hPaddleEnergy->Fill(qdc); 
+     }
    } // loop over paddles
 
-//   cout << "multiplicity " << mult1 << endl;
    
+   hTotalEnergy1->Fill(TotalEnergy1);
+   hTotalLightRel->Fill((TotalEnergy1-TotalEnergy)/TotalEnergy);
+
+
    // sort final hits for time again
    TotalLight=0.;
+   Int_t paddle[5000];
    for (Int_t i=1;i<mult1+1;i++){
-      Double_t min = 100000.;
-      Int_t index = 0;
-      for (Int_t j=1;j<mult1+1;j++){
-         if(TDC_temp[j] < min){
-	    min = TDC_temp[j];
-	    index = j;
-	 }
-      }
-      TDC[i] = TDC_temp[index];
-      TDC_temp[index] = 100000.;
-      QDC[i] = QDC_temp[index];
-      xpos[i] = xpos_temp[index];
-      ypos[i] = ypos_temp[index];
-      zpos[i] = zpos_temp[index];
-           
-      //cout<<"hit "<< i << " of " << mult1 << endl;
-      //cout<<"QDC "<< QDC[i] << " TDC " << TDC[i] << endl;
-      //cout<<"POS "<< xpos[i] << "  " << ypos[i]<< "  " << zpos[i] << endl;
-      hPaddleEnergy->Fill(QDC[i],1.);
-      
-      TotalLight=TotalLight+QDC[i];
-   }	  
+     Int_t index = 0;
+     Double_t min = 100000.;
+     for (Int_t j=1;j<mult1+1;j++){
+       if(TDC_temp[j] <= min){
+	 min = TDC_temp[j];
+	 index = j;
+       }
+     }
+     TDC[i] = TDC_temp[index];
+     TDC_temp[index] = 100000.;
+     QDC[i] = QDC_temp[index];
+     xpos[i] = xpos_temp[index];
+     ypos[i] = ypos_temp[index];
+     zpos[i] = zpos_temp[index];
+     paddle[i] = index;
+          
+     TotalLight=TotalLight+QDC[i];
+   }  
 
-//    cout << "-I- R3BLandDigitizer : totalLight=" << TotalLight << "." << endl;
    
-      // control histograms
+   // control histograms
    if(mult2>0){
-      hMult2 ->Fill(mult2,1.);
+     hMult2 ->Fill(mult2,1.);
    }      
-   hMult1 ->Fill(mult1,1.);
+   hMult1->Fill(mult1,1.);
    hTotalLight->Fill(TotalLight,1.);      
    hTotalLightRel2->Fill(TotalLight/200.,1.);
    hFirstEnergy->Fill(QDC[1],1.);
+   hTPaddle->Fill(index1);
+   hBetaPaddle->Fill(index2);
 
    if(fVerbose) {
      cout << "-I- R3BLandDigitizer : produced " << fLandDigi->GetEntries() << " digis." << endl;
@@ -741,6 +804,20 @@ void R3BLandDigitizer::Finish()
 
    hElossLight->Write();
 
+   hElossXL->Write();
+   hElossXR->Write();
+
+   hThresh->Write();
+
+   hTPaddle->Write();
+
+   hBetaPaddle->Write();
+
+   hQDCRatio->Write();
+
+   hElossTime->Write();
+
+   hElossPdg->Write();
 }
 
 R3BLandDigi* R3BLandDigitizer::AddHit(Int_t paddleNr, Double_t tdcL, Double_t tdcR,
