@@ -23,7 +23,7 @@ void Config()
   // Stack debug mode
   st->SetDebug(kFALSE);
 //  st->SetDebug(kTRUE);
-  st->SetMinPoints(1);
+  st->SetMinPoints(0);
   st->StoreSecondaries(kTRUE);
   
   geant3->SetStack( st ) ;

@@ -1,0 +1,62 @@
+1***************************************************************************************************
+ *                                                                                                 *
+ *    G E A N T  Version 3.2111      DATE/TIME 110706/1116          R U N      1                   *
+ *                                                                                                 *
+ *      Data structure   Date   Time    GVERSN    ZVERSN                                           *
+ *                                                                                                 *
+ *           INIT       110706  1116    3.2111     3.77                                            *
+ *           KINE       110706  1116    3.2111     3.77                                            *
+ *           HITS       110706  1116    3.2111     3.77                                            *
+ *           DIGI       110706  1116    3.2111     3.77                                            *
+ *                                                                                                 *
+ *                                                                                                 *
+ *              Standard TPAR for this run are                                                     *
+ *                                                                                                 *
+ *  CUTGAM=100.00 keV  CUTELE=100.00 keV  CUTNEU=100.00  eV  CUTHAD=100.00 keV  CUTMUO=100.00 keV  *
+ *  BCUTE =100.00 keV  BCUTM =100.00 keV  DCUTE = 10.00 TeV  DCUTM = 10.00 TeV  PPCUTM=  2.04 MeV  *
+ *  IPAIR=  1.  ICOMP=  1.  IPHOT=  1.  IPFIS=  0.  IDRAY=  0.  IANNI=  1.  IBREM=  1.  IHADR=  5. *
+ *  IMUNU=  1.  IDCAY=  1.  ILOSS=  2.  IMULS=  1.  IRAYL=  1.  ILABS=  1.  ISYNC=  0.  ISTRA=  1. *
+ *                                                                                                 *
+
+ ***** GPHYSI error, CUTS must be greater than 10 KeV *****
+
+ *                                                                                                 *
+ *     Special TPAR for TMED   3   Iron                                                            *
+ *  CUTGAM=100.00 keV  CUTELE=100.00 MeV  CUTNEU=100.00  eV  CUTHAD=100.00 keV  CUTMUO=100.00 keV  *
+ *  BCUTE =100.00 keV  BCUTM =100.00 keV  DCUTE = 10.00 TeV  DCUTM = 10.00 TeV  PPCUTM=  2.04 MeV  *
+ *  IPAIR=  1.  ICOMP=  1.  IPHOT=  1.  IPFIS=  0.  IDRAY=  0.  IANNI=  1.  IBREM=  1.  IHADR=  5. *
+ *  IMUNU=  1.  IDCAY=  1.  ILOSS=  2.  IMULS=  1.  IRAYL=  1.  ILABS=  1.  ISYNC=  0.  ISTRA=  1. *
+ *                                                                                                 *
+ *     Special TPAR for TMED   7   Silicon                                                         *
+ *  CUTGAM=  1.00 keV  CUTELE=  1.00 keV  CUTNEU=  1.00 keV  CUTHAD=  1.00 keV  CUTMUO=  1.00 keV  *
+ *  BCUTE =  1.00 keV  BCUTM =  1.00 keV  DCUTE =  1.00 keV  DCUTM =  1.00 keV  PPCUTM=  2.04 MeV  *
+ *  IPAIR=  1.  ICOMP=  1.  IPHOT=  1.  IPFIS=  0.  IDRAY=  1.  IANNI=  1.  IBREM=  1.  IHADR=  1. *
+ *  IMUNU=  1.  IDCAY=  1.  ILOSS=  3.  IMULS=  1.  IRAYL=  1.  ILABS=  1.  ISYNC=  0.  ISTRA=  1. *
+ *                                                                                                 *
+ *     Special TPAR for TMED  12   plasticForTOF                                                   *
+ *  CUTGAM= 10.00 keV  CUTELE= 10.00 keV  CUTNEU= 10.00 keV  CUTHAD= 10.00 keV  CUTMUO= 10.00 keV  *
+ *  BCUTE = 10.00 keV  BCUTM = 10.00 keV  DCUTE = 10.00 keV  DCUTM = 10.00 keV  PPCUTM=  2.04 MeV  *
+ *  IPAIR=  1.  ICOMP=  1.  IPHOT=  1.  IPFIS=  0.  IDRAY=  1.  IANNI=  1.  IBREM=  1.  IHADR=  1. *
+ *  IMUNU=  1.  IDCAY=  1.  ILOSS=  3.  IMULS=  1.  IRAYL=  1.  ILABS=  1.  ISYNC=  0.  ISTRA=  1. *
+ *                                                                                                 *
+ *     Special TPAR for TMED  13   plasticFormTOF                                                  *
+ *  CUTGAM= 10.00 keV  CUTELE= 10.00 keV  CUTNEU= 10.00 keV  CUTHAD= 10.00 keV  CUTMUO= 10.00 keV  *
+ *  BCUTE = 10.00 keV  BCUTM = 10.00 keV  DCUTE = 10.00 keV  DCUTM = 10.00 keV  PPCUTM=  2.04 MeV  *
+ *  IPAIR=  1.  ICOMP=  1.  IPHOT=  1.  IPFIS=  0.  IDRAY=  1.  IANNI=  1.  IBREM=  1.  IHADR=  1. *
+ *  IMUNU=  1.  IDCAY=  1.  ILOSS=  3.  IMULS=  1.  IRAYL=  1.  ILABS=  1.  ISYNC=  0.  ISTRA=  1. *
+ *                                                                                                 *
+ *     Special TPAR for TMED  14   Vacuum                                                          *
+ *  CUTGAM=100.00 keV  CUTELE=100.00 keV  CUTNEU=100.00  eV  CUTHAD=100.00 keV  CUTMUO=100.00 keV  *
+ *  BCUTE =100.00 keV  BCUTM =100.00 keV  DCUTE = 10.00 TeV  DCUTM = 10.00 TeV  PPCUTM=  2.04 MeV  *
+ *  IPAIR=  0.  ICOMP=  0.  IPHOT=  0.  IPFIS=  0.  IDRAY=  0.  IANNI=  0.  IBREM=  0.  IHADR=  0. *
+ *  IMUNU=  0.  IDCAY=  1.  ILOSS=  0.  IMULS=  0.  IRAYL=  0.  ILABS=  0.  ISYNC=  0.  ISTRA=  0. *
+ *                                                                                                 *
+ *     Special TPAR for TMED  15   plasticForGFI                                                   *
+ *  CUTGAM= 10.00 keV  CUTELE= 10.00 keV  CUTNEU= 10.00 keV  CUTHAD= 10.00 keV  CUTMUO= 10.00 keV  *
+ *  BCUTE = 10.00 keV  BCUTM = 10.00 keV  DCUTE = 10.00 keV  DCUTM = 10.00 keV  PPCUTM=  2.04 MeV  *
+ *  IPAIR=  1.  ICOMP=  1.  IPHOT=  1.  IPFIS=  0.  IDRAY=  1.  IANNI=  1.  IBREM=  1.  IHADR=  1. *
+ *  IMUNU=  1.  IDCAY=  1.  ILOSS=  3.  IMULS=  1.  IRAYL=  1.  ILABS=  1.  ISYNC=  0.  ISTRA=  1. *
+ *                                                                                                 *
+ ***************************************************************************************************
+
+

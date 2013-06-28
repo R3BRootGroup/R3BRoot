@@ -143,24 +143,10 @@ void r3ball(Int_t nEvents = 1,
 
   //R3B Magnet definition
   if (fDetList.FindObject("ALADIN") ) {
-      fFieldMap = 0;
-      R3BModule* mag = new R3BMagnet("AladinMagnet");
-      // Global position of the Module
-      phi   =  0.0; // (deg)
-      theta =  0.0; // (deg)
-      psi   =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx    =  0.0; // (cm)
-      ty    =  0.0; // (cm)
-      tz    =  0.0; // (cm)
-      //mag->SetRotAnglesEuler(phi,theta,psi);
-      mag->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      mag->SetTranslation(tx,ty,tz);
-      run->AddModule(mag);
+    fFieldMap = 0;
+    R3BModule* mag = new R3BMagnet("AladinMagnet");
+    mag->SetGeometryFileName("aladin_v13a.geo.root");
+    run->AddModule(mag);
   }
 
     //R3B Magnet definition
@@ -185,26 +171,11 @@ void r3ball(Int_t nEvents = 1,
       //run->AddModule(mag);
   }
 
-
   if (fDetList.FindObject("CRYSTALBALL") ) {
       //R3B Crystal Calorimeter
-      R3BDetector* cal = new R3BCal("CrystalCal", kTRUE);
-      // Global position of the Module
-      phi   =  0.0; // (deg)
-      theta =  0.0; // (deg)
-      psi   =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx    =  0.0; // (cm)
-      ty    =  0.0; // (cm)
-      tz    =  0.0; // (cm)
-      //cal->SetRotAnglesEuler(phi,theta,psi);
-      cal->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      cal->SetTranslation(tx,ty,tz);
-      run->AddModule(cal);
+      R3BDetector* xball = new R3BXBall("XBall", kTRUE);
+      xball->SetGeometryFileName("cal_v13a.geo.root");
+      run->AddModule(xball);
   }
 
   if (fDetList.FindObject("CALIFA") ) {
@@ -347,60 +318,20 @@ void r3ball(Int_t nEvents = 1,
 
   // Land Detector
   if (fDetList.FindObject("LAND") ) {
-      R3BDetector* land = new R3BLand("Land", kTRUE);
-      // verbose level 2 ( step info activated )
-      land->SetVerboseLevel(1);
-      // Global position of the Module
-      phi   =  0.0; // (deg)
-      theta =  0.0; // (deg)
-      psi   =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx    =  0.0; // (cm)
-      ty    =  0.0; // (cm)
-      tz    =  1050.0; // (cm)
-      //land->SetRotAnglesEuler(phi,theta,psi);
-      land->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      land->SetTranslation(tx,ty,tz);
-      //run->AddModule(land);
+    R3BDetector* land = new R3BLand("Land", kTRUE);
+    // verbose level 2 ( step info activated )
+    land->SetVerboseLevel(1);
+    land->SetGeometryFileName("land_v12a_10m.geo.root");
+//     run->AddModule(land);
   }
-	// NeuLand Scintillator Detector
+  
+  // NeuLand Scintillator Detector
   if (fDetList.FindObject("SCINTNEULAND")) {
-
-      R3BDetector* land = new R3BLand("Land", kTRUE);
-      // verbose level 2 ( step info activated )
-      land->SetVerboseLevel(2);
-			//Construct NeuLand
-			Double_t paddle_dimx=100.;   // half of the length [cm]
-			Double_t paddle_dimy=2.4;   // half of the width [cm]
-			Double_t paddle_dimz=2.4;   // half of the depth [cm]
-			Double_t detector_dimz=125; // total detector depth [cm]
-			Double_t air_gap=0.03;        // half of air gap between two scintillator bars [cm]
-			Double_t wrapping1=0.02;      // thickness of wrapping material Alu [cm]
-			Double_t wrapping2=0.05;      // thickness of wrapping material Tape [cm]
-			((R3BLand*) land)->UseNeuLand(paddle_dimx, paddle_dimy, paddle_dimz, detector_dimz, 
-			air_gap, wrapping1, wrapping2);
-
-      // Global position of the Module
-      phi   =  0.0; // (deg)
-      theta =  0.0; // (deg)
-      psi   =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx    =  0.0; // (cm)
-      ty    =  0.0; // (cm)
-      tz    =  3500.0; // (cm)
-      //land->SetRotAnglesEuler(phi,theta,psi);
-      land->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      land->SetTranslation(tx,ty,tz);
-
-      //run->AddModule(land);
+    R3BDetector* land = new R3BLand("Land", kTRUE);
+    // verbose level 2 ( step info activated )
+    land->SetVerboseLevel(1);
+    land->SetGeometryFileName("neuland_v12a_14m.geo.root");
+//     run->AddModule(land);
   }
 
   // Chimera

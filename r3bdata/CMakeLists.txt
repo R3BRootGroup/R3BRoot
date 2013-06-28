@@ -20,9 +20,9 @@ link_directories( ${LINK_DIRECTORIES})
 set(SRCS
 R3BMCStack.cxx
 R3BMCTrack.cxx
-calData/R3BCalPoint.cxx
-calData/R3BCalCrystalHit.cxx
-calData/R3BCalCrystalHitSim.cxx
+xballData/R3BXBallPoint.cxx
+xballData/R3BXBallCrystalHit.cxx
+xballData/R3BXBallCrystalHitSim.cxx
 caloData/R3BCaloCrystalHit.cxx
 caloData/R3BCaloCrystalHitSim.cxx
 caloData/R3BCaloHit.cxx

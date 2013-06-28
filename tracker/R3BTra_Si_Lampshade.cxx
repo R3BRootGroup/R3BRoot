@@ -7,13 +7,13 @@
 #include "R3BGeoTra.h"
 #include "R3BTraPoint.h"
 #include "R3BGeoTraPar.h"
-#include "R3BMCStack.h"
 
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
 #include "FairGeoNode.h"
 #include "FairGeoRootBuilder.h"
 #include "FairRootManager.h"
+#include "FairStack.h"
 #include "FairRuntimeDb.h"
 #include "FairRun.h"
 #include "FairVolume.h"
@@ -255,7 +255,7 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
 	   fTime, fLength, fELoss);
     
     // Increment number of TraPoints for this track
-    R3BStack* stack = (R3BStack*) gMC->GetStack();
+    FairStack* stack = (FairStack*) gMC->GetStack();
     stack->AddPoint(kTRA);
     
     ResetParameters();

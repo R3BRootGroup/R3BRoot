@@ -10,13 +10,13 @@
 #include "R3BCaloCrystalHit.h"
 #include "R3BCaloCrystalHitSim.h"
 #include "R3BGeoCaloPar.h"
-#include "R3BMCStack.h"
 
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
 #include "FairGeoNode.h"
 #include "FairGeoRootBuilder.h"
 #include "FairRootManager.h"
+#include "FairStack.h"
 #include "FairRuntimeDb.h"
 #include "FairRun.h"
 #include "FairVolume.h"
@@ -485,7 +485,7 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
            fTime, fLength, fELoss);
 
     // Increment number of CaloPoints for this track
-    R3BStack* stack = (R3BStack*) gMC->GetStack();
+    FairStack* stack = (FairStack*) gMC->GetStack();
     stack->AddPoint(kCALIFA);
 
     //Adding a crystalHit support
@@ -596,8 +596,6 @@ void R3BCalo::EndOfEvent()
       }
     }
     */
-  
-  cout << "End of event" << endl;
 
   if (fVerboseLevel) Print();
 
@@ -625,11 +623,8 @@ void R3BCalo::Register()
 TClonesArray* R3BCalo::GetCollection(Int_t iColl) const
 {
   //HAPOL TODO -- DO I NEED TO RETURN A fCaloCrystalHitColletion????
-  if(iColl == 0) {
-    return fCaloCollection;
-  } else if(iColl == 2) {
-    return fCaloCrystalHitCollection;
-  }
+  //if (iColl == 0) return fCaloCollection;
+  if (iColl == 0) return fCaloCrystalHitCollection;
   else return NULL;
 }
 // ----------------------------------------------------------------------------

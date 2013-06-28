@@ -7,13 +7,13 @@
 #include "R3BGeoSTaRTra.h"
 #include "R3BSTaRTraPoint.h"
 #include "R3BGeoSTaRTraPar.h"
-#include "R3BMCStack.h"
 
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
 #include "FairGeoNode.h"
 #include "FairGeoRootBuilder.h"
 #include "FairRootManager.h"
+#include "FairStack.h"
 #include "FairRuntimeDb.h"
 #include "FairRun.h"
 #include "FairVolume.h"
@@ -262,7 +262,7 @@ Bool_t R3BSTaRTra::ProcessHits(FairVolume* vol) {
 	   fTime, fLength, fELoss);
     
     // Increment number of STaRTraPoints for this track
-    R3BStack* stack = (R3BStack*) gMC->GetStack();
+    FairStack* stack = (FairStack*) gMC->GetStack();
     stack->AddPoint(kSTaRTrack);
     
     ResetParameters();
@@ -1035,8 +1035,7 @@ void R3BSTaRTra::ConstructGeometry() {
 
    dx=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*sin(5*(360/NSide3)*PI/180.);  // rotation by 150 deg/ z axis
    dy=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*cos(5*(360/NSide3)*PI/180.);  // rotation by 150 deg/ z axis
-   //dz= -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
- 
+   //dz= -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.)); 
    TGeoCombiTrans*
      pMatrix76b = new TGeoCombiTrans("", dx,dy,dz,pMatrix77);
    
@@ -1062,8 +1061,7 @@ void R3BSTaRTra::ConstructGeometry() {
    
     dx=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3 + (Thickness3*2+Frame_Depth))*sin(6*(360/NSide3)*PI/180.);  // rotation by 180 deg/ z axis
     dy=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3 + (Thickness3*2+Frame_Depth))*cos(6*(360/NSide3)*PI/180.);  // rotation by 180 deg/ z axis
-    //dz= -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
- 
+    //dz= -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.)); 
     TGeoCombiTrans*
      pMatrix78b = new TGeoCombiTrans("", dx,dy,dz,pMatrix79);
 
@@ -1089,8 +1087,7 @@ void R3BSTaRTra::ConstructGeometry() {
 
    dx=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*sin(7*(360/NSide3)*PI/180.);  // rotation by 210 deg/ z axis
    dy=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*cos(7*(360/NSide3)*PI/180.);  // rotation by 210 deg/ z axis
-   //dz= -(Length2+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
- 
+   //dz= -(Length2+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.)); 
    TGeoCombiTrans*
      pMatrix80b = new TGeoCombiTrans("", dx,dy,dz,pMatrix81);
 
@@ -1117,8 +1114,7 @@ void R3BSTaRTra::ConstructGeometry() {
 
    dx=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3 + (Thickness3*2+Frame_Depth))*sin(8*(360/NSide3)*PI/180.);  // rotation by 240 deg/ z axis
    dy=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3 + (Thickness3*2+Frame_Depth))*cos(8*(360/NSide3)*PI/180.);  // rotation by 240 deg/ z axis
-   //dz= -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
- 
+   //dz= -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.)); 
    TGeoCombiTrans*
      pMatrix82b = new TGeoCombiTrans("", dx,dy,dz,pMatrix83);
 
@@ -1145,8 +1141,7 @@ void R3BSTaRTra::ConstructGeometry() {
 
    dx=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth) )*sin(9*(360/NSide3)*PI/180.);  // rotation by 270 deg/ z axis
    dy=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*cos(9*(360/NSide3)*PI/180.);  // rotation by 270 deg/ z axis
-   //dz= -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
- 
+   //dz= -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.)); 
 
    TGeoCombiTrans*
      pMatrix84b = new TGeoCombiTrans("", dx,dy,dz,pMatrix85);
@@ -1173,8 +1168,7 @@ void R3BSTaRTra::ConstructGeometry() {
  
     dx=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*sin(10*(360/NSide3)*PI/180.);  // rotation by 300 deg/ z axis
     dy=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*cos(10*(360/NSide3)*PI/180.);  // rotation by 300 deg/ z axis
-    //dz= -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
- 
+    //dz= -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.)); 
     TGeoCombiTrans*
      pMatrix86b = new TGeoCombiTrans("", dx,dy,dz,pMatrix87);
 
@@ -1201,8 +1195,7 @@ void R3BSTaRTra::ConstructGeometry() {
 
    dx=  -(((Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*sin(11*(360/NSide3)*PI/180.);  // rotation by 330 deg/ z axis
    dy=  -(((Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3+ (Thickness3*2+Frame_Depth))*cos(11*(360/NSide3)*PI/180.);  // rotation by 330 deg/ z axis
-   //dz= -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
- 
+   //dz= -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.)); 
 
    TGeoCombiTrans*
      pMatrix88b = new TGeoCombiTrans("", dx,dy,dz,pMatrix89);
@@ -1790,13 +1783,10 @@ void R3BSTaRTra::ConstructGeometry() {
    dz=tz=0.0;
    
    TGeoCombiTrans *t1 = new TGeoCombiTrans(tx,ty,tz,rotg);
-
-   
+   
      dx=tx=0;
-       //dy=ty=2*(Frame_Depth+Thickness1)/2 - Thickness1;
-  // Since Frame_Depth and Thickness1 are half thicknesses
-     dy=ty=Frame_Depth;
-  // Since Frame_Depth and Thickness1 are half thicknesses
+       //dy=ty=2*(Frame_Depth+Thickness1)/2 - Thickness1;  // Since Frame_Depth and Thickness1 are half thicknesses
+     dy=ty=Frame_Depth;  // Since Frame_Depth and Thickness1 are half thicknesses
      dz=tz=0;
    
    TGeoCombiTrans *t2 = new TGeoCombiTrans(tx,ty,tz,rotg);
@@ -1806,11 +1796,9 @@ void R3BSTaRTra::ConstructGeometry() {
      dz=tz= Length1/2 -9.9869;
    
    TGeoCombiTrans *t3 = new TGeoCombiTrans(tx,ty,tz,rotg);
-
-   
+   
      dx=tx=0;
-     dy=ty=-(Thickness1*2);
-  // Since Thickness1 is half of the detector Thickness
+     dy=ty=-(Thickness1*2);  // Since Thickness1 is half of the detector Thickness
      dy=
      dz=tz= Length1/2 -9.9869-1;
    
@@ -1904,8 +1892,7 @@ void R3BSTaRTra::ConstructGeometry() {
     TGeoVolume *STaRTraVideLog1 = gGeoManager->MakeTrd1("STaRTraVideLog1",pVacuumMedium,WidthMax1/2.,WidthMin1/2.,Frame_Depth,Length1/2.);
      TGeoVolume *STaRTraCBFrameLog1 = gGeoManager->MakeTrd1("STaRTraCBFrameLog1",pCarbonFibreMedium,(WidthMax1+Frame_Width)/2.,(WidthMin1+Frame_Width)/2.,Frame_Depth,(Length1+Frame_Length)/2.);
        TGeoVolume *CBFrameSupportBDLog1 = gGeoManager->MakeTrd1("CBFrameSupportBDLog1",pCarbonFibreMedium, 4.90/2, 4.88/2, 0.05/2, 0.15/2);
-       TGeoVolume *CBFrameXSupportBDLog1 = gGeoManager->MakeTrd1("CBFrameXSupportBDLog1",pCarbonFibreMedium, 5.15/2, 5.13/2,  0.2/2, 0.1/2);
-  // extra support
+       TGeoVolume *CBFrameXSupportBDLog1 = gGeoManager->MakeTrd1("CBFrameXSupportBDLog1",pCarbonFibreMedium, 5.15/2, 5.13/2,  0.2/2, 0.1/2);  // extra support
 
 	   STaRTraCBFrameLog1->SetLineColor(kCyan);
 	   CBFrameSupportBDLog1->SetLineColor(kCyan);
@@ -1921,16 +1908,14 @@ void R3BSTaRTra::ConstructGeometry() {
      dz=tz= Length2/2 -12.898471;
      TGeoCombiTrans *t5 = new TGeoCombiTrans(tx,ty,tz,rotg);
 
-     dy=ty=-(Thickness2*2);
-  // Since Thickness1 is half of the detector Thickness
+     dy=ty=-(Thickness2*2);  // Since Thickness1 is half of the detector Thickness
      dz=tz= Length2/2 -12.898471 -1;
      TGeoCombiTrans *t6 = new TGeoCombiTrans(tx,ty,tz,rotg);
 
      dz=tz= Length3/2 - (12.898471+11.8071);
      TGeoCombiTrans *t7 = new TGeoCombiTrans(tx,ty,tz,rotg);
 
-     dy=ty=-(Thickness3*2);
-  // Since Thickness1 is half of the detector Thickness
+     dy=ty=-(Thickness3*2);  // Since Thickness1 is half of the detector Thickness
      dz=tz= Length3/2 -(12.898471+11.8071)-1;
      TGeoCombiTrans *t8 = new TGeoCombiTrans(tx,ty,tz,rotg);
 
@@ -1941,8 +1926,7 @@ void R3BSTaRTra::ConstructGeometry() {
    //dx = 15.00000;
    //dy = 5.50000;
    //dz = 0.015000;
-   // Volume: STaRTraLog   FOR OUTER LAYER
- 
+   // Volume: STaRTraLog   FOR OUTER LAYER 
    //TGeoVolume *STaRTraLog3 = gGeoManager->MakeBox("STaRTraLog3",pSiMed,dx,dy,dz);
    TGeoVolume *STaRTraLog3 = gGeoManager->MakeTrd1("STaRTraLog3",pSiMed,WidthMax3/2,WidthMin3/2,Thickness3,Length3/2);
  
@@ -2040,8 +2024,7 @@ void R3BSTaRTra::ConstructGeometry() {
    //dx = 15.00000;
    //dy = 4.500000;
    //dz = 0.015000;
-   // Volume: STaRTraLog FOR Intermediate LAYER
-   
+   // Volume: STaRTraLog FOR Intermediate LAYER   
    //TGeoVolume *STaRTraLog2 = gGeoManager->MakeBox("STaRTraLog2",pSiMed,dx,dy,dz);
    TGeoVolume *STaRTraLog2 = gGeoManager->MakeTrd1("STaRTraLog2",pSiMed,WidthMax2/2,WidthMin2/2,Thickness2,Length2/2);
 
