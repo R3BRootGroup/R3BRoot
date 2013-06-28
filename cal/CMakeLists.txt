@@ -9,7 +9,8 @@ ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/passive 
 ${R3BROOT_SOURCE_DIR}/mcstack 
 ${R3BROOT_SOURCE_DIR}/xball
-${R3BROOT_SOURCE_DIR}/cal 
+${R3BROOT_SOURCE_DIR}/cal
+${R3BROOT_SOURCE_DIR}/r3bdata 
 ${R3BROOT_SOURCE_DIR}/r3bdata/caloData
 ${R3BROOT_SOURCE_DIR}/r3bdata/dchData
 ${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
