@@ -8,13 +8,13 @@
 #include "R3BDchPoint.h"
 #include "R3BDchFullPoint.h"
 #include "R3BGeoDchPar.h"
+#include "R3BMCStack.h"
 
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
 #include "FairGeoNode.h"
 #include "FairGeoRootBuilder.h"
 #include "FairRootManager.h"
-#include "FairStack.h"
 #include "FairRuntimeDb.h"
 #include "FairRun.h"
 #include "FairVolume.h"
@@ -274,7 +274,7 @@ void R3BDch::RecordFullMcHit(){
 	 AddFullHit(trackId, mod, layer, cell, pos, lpos,  mom, lmom, time, length, eLoss) ;
 
       // Increment number of DCH Points for this track
-      FairStack* stack = (FairStack*) gMC->GetStack();
+      R3BStack* stack = (R3BStack*) gMC->GetStack();
       stack->AddPoint(kDCH);
 
       ResetParameters();
@@ -411,7 +411,7 @@ void R3BDch::RecordPartialMcHit(){
            fTime, fLength, fELoss);
 
       // Increment number of DCH Points for this track
-      FairStack* stack = (FairStack*) gMC->GetStack();
+      R3BStack* stack = (R3BStack*) gMC->GetStack();
       stack->AddPoint(kDCH);
 
       ResetParameters();
