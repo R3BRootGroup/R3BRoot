@@ -24,6 +24,7 @@ public:
     R3BMagnet();
     virtual ~R3BMagnet();
     void ConstructGeometry();
+    void ConstructGeometryOld();
     void SetGapMedium(Int_t medium){fMedium=medium;};
     void SelectGeometry(Int_t version){fGeometryVersion=version;};
     void ConstructASCIIGeometry();
