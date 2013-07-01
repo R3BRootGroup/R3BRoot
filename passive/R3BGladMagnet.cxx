@@ -5455,9 +5455,10 @@ void R3BGladMagnet::ConstructGToles(TGeoVolume * pWorld){
 
 
 
-// Bool_t R3BGladMagnet::CheckIfSensitive(std::string name){
-// 	return kTRUE;
-// }
+Bool_t R3BGladMagnet::CheckIfSensitive(std::string name)
+{
+ 	return kFALSE;
+}
 
 
 

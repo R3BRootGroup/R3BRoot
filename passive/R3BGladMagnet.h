@@ -29,7 +29,7 @@ public:
     void ConstructFondS(TGeoVolume* pWorld);
     void ConstructGToles(TGeoVolume* pWorld);
 
-    //Bool_t CheckIfSensitive(std::string name);
+    Bool_t CheckIfSensitive(std::string name);
     ClassDef(R3BGladMagnet,1) //R3BGladMagnet
 
 
