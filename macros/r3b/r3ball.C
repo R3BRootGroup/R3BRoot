@@ -40,7 +40,8 @@ void r3ball(Int_t nEvents = 1,
             Bool_t fUserPList = kFALSE,
             Bool_t fR3BMagnet = kTRUE,
             TString OutFile = "r3bsim.root",
-            TString ParFile = "r3bpar.root")
+            TString ParFile = "r3bpar.root",
+            TString InFile = "evt_gen.dat")
 {
   TString dir = getenv("VMCWORKDIR");
   TString r3bdir = dir + "/macros";
@@ -435,6 +436,11 @@ void r3ball(Int_t nEvents = 1,
     boxGen->SetXYZ(0.0,0.0,-1.5);
     // add the box generator
     primGen->AddGenerator(boxGen);
+  }
+  
+  if (fGenerator.CompareTo("ascii") == 0  ) {
+    R3BAsciiGenerator* gen = new R3BAsciiGenerator(InFile.Data());
+    primGen->AddGenerator(gen);
   }
   
   if (fGenerator.CompareTo("r3b") == 0  ) {
