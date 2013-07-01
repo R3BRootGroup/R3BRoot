@@ -1,21 +1,17 @@
-void preCalibr(Int_t beamE, Int_t nn, Int_t erel, Int_t d)
+
+void preCalibr()
 {
   // ----- Files ---------------------------------------------------------------
-  char strDir[] = "/Users/kresan/neuland";
-  char str[100];
-  sprintf(str, "%1dAMeV.%1dn.%1dkeV.%1dm", beamE, nn, erel, d);
-  TString inFile  = TString(strDir) + "/r3bsim." + TString(str) + ".root";
-  TString parFile  = TString(strDir) + "/r3bpar." + TString(str) + ".root";
-  TString outFile  = TString(strDir) + "/r3bcalibr." + TString(str) + ".root";
+  TString inFile = "r3bsim.root";
+  TString parFile = "r3bpar.root";
+  TString outFile = "r3bcalibr.root";
   // ---------------------------------------------------------------------------
-
 
 
   // ----- Timer ---------------------------------------------------------------
   TStopwatch timer;
   timer.Start();
   // ---------------------------------------------------------------------------
-
 
 
   // ----- Digitization --------------------------------------------------------
@@ -25,13 +21,11 @@ void preCalibr(Int_t beamE, Int_t nn, Int_t erel, Int_t d)
   // ---------------------------------------------------------------------------
 
 
-
   // ----- Connect the Digitization Task ---------------------------------------
   R3BLandDigitizer* landDigitizer  = new R3BLandDigitizer(0);
   landDigitizer->UseBeam(beamE);
   fRun->AddTask(landDigitizer);
   // ---------------------------------------------------------------------------
-
 
 
   // ----- Find clusters -------------------------------------------------------
@@ -40,13 +34,11 @@ void preCalibr(Int_t beamE, Int_t nn, Int_t erel, Int_t d)
   // ---------------------------------------------------------------------------
 
 
-
   // ----- Calibration of 2D cuts ----------------------------------------------
   R3BNeutronCalibr2D* calibr  = new R3BNeutronCalibr2D();
   calibr->UseBeam(beamE);
   fRun->AddTask(calibr);
   // ---------------------------------------------------------------------------
-
 
 
   // ----- Runtime DataBase info -----------------------------------------------
@@ -59,18 +51,15 @@ void preCalibr(Int_t beamE, Int_t nn, Int_t erel, Int_t d)
   // ---------------------------------------------------------------------------
 
 
-
   // ----- Number of events to process -----------------------------------------
   Int_t nEvents = 10000;
   // ---------------------------------------------------------------------------
-
 
   
   // ----- Intialise and run ---------------------------------------------------
   fRun->Init();
   fRun->Run(0, nEvents);
   // ---------------------------------------------------------------------------
-
 
 
   // ----- Finish --------------------------------------------------------------
