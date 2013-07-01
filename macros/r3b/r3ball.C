@@ -34,11 +34,13 @@
 void r3ball(Int_t nEvents = 1,
             TObjArray& fDetList,
             TString Target = "LeadTarget",
-            Bool_t fVis=kFALSE,
-            TString fMC="TGeant3",
-            TString fGenerator="box",
-            Bool_t fUserPList= kFALSE,
-            Bool_t fR3BMagnet= kTRUE)
+            Bool_t fVis = kFALSE,
+            TString fMC = "TGeant3",
+            TString fGenerator = "box",
+            Bool_t fUserPList = kFALSE,
+            Bool_t fR3BMagnet = kTRUE,
+            TString OutFile = "r3bsim.root",
+            TString ParFile = "r3bpar.root")
 {
   TString dir = getenv("VMCWORKDIR");
   TString r3bdir = dir + "/macros";
@@ -48,12 +50,6 @@ void r3ball(Int_t nEvents = 1,
   
   TString r3b_confdir = dir + "gconfig";
   gSystem->Setenv("CONFIG_DIR",r3b_confdir.Data());
-
-  
-  // Output files
-  TString OutFile = "r3bsim.root";
-  TString ParFile = "r3bpar.root";
-  
   
   // In general, the following parts need not be touched
   // ========================================================================
@@ -76,7 +72,7 @@ void r3ball(Int_t nEvents = 1,
   
   //  R3B Special Physics List in G4 case
   if ( (fUserPList  == kTRUE ) &&
-       (fMC.CompareTo("TGeant4")   == 0)) {
+      (fMC.CompareTo("TGeant4")   == 0)) {
     run->SetUserConfig("g4R3bConfig.C");
     run->SetUserCuts("SetR3BCuts.C");
   }
@@ -101,7 +97,6 @@ void r3ball(Int_t nEvents = 1,
   //-- 2) Rotation in Ref. Frame of the Volume
   //-- Rotation is Using Local Ref. Frame axis angles
   Double_t thetaX,thetaY,thetaZ;
-  
   
   //- Global Translation  Lab. frame.
   Double_t tx,ty,tz;
@@ -330,7 +325,7 @@ void r3ball(Int_t nEvents = 1,
     run->AddModule(land);
   }
   
-
+  
   // NeuLand Scintillator Detector
   if(fDetList.FindObject("SCINTNEULAND")) {
     R3BDetector* land = new R3BLand("Land", kTRUE);
@@ -338,7 +333,7 @@ void r3ball(Int_t nEvents = 1,
     land->SetGeometryFileName("neuland_v12a_14m.geo.root");
     run->AddModule(land);
   }
-
+  
   
   // Chimera
   if (fDetList.FindObject("CHIMERA") ) {
@@ -363,7 +358,7 @@ void r3ball(Int_t nEvents = 1,
     //((R3BChimera*) chim)->SetEnergyCutOff(fCutOffSci);
     run->AddModule(chim);
   }
-
+  
   
   // Luminosity detector
   if (fDetList.FindObject("LUMON") ) {
@@ -399,7 +394,6 @@ void r3ball(Int_t nEvents = 1,
   //NB: <D.B>
   // If the Global Position of the Magnet is changed
   // the Field Map has to be transformed accordingly
-  
   if (fFieldMap == 0) {
     R3BAladinFieldMap* magField = new R3BAladinFieldMap("AladinMaps");
     Double_t fMeasCurrent = 2500.;// I_current [A]
@@ -424,9 +418,7 @@ void r3ball(Int_t nEvents = 1,
   }  //! end of field map section
   
   
-  
   // -----   Create PrimaryGenerator   --------------------------------------
-
   // 1 - Create the Main API class for the Generator
   FairPrimaryGenerator* primGen = new FairPrimaryGenerator();
   
@@ -499,12 +491,8 @@ void r3ball(Int_t nEvents = 1,
   
   
   //-------Set visualisation flag to true------------------------------------
-  if (fVis==kTRUE){
-    run->SetStoreTraj(kTRUE);
-  }else{
-    run->SetStoreTraj(kFALSE);
-  }
-
+  run->SetStoreTraj(fVis);
+  
   
   // -----   Initialize simulation run   ------------------------------------
   run->Init();
@@ -531,7 +519,7 @@ void r3ball(Int_t nEvents = 1,
   if(nEvents > 0) {
     run->Run(nEvents);
   }
-
+  
   
   // -----   Finish   -------------------------------------------------------
   timer.Stop();
@@ -542,11 +530,10 @@ void r3ball(Int_t nEvents = 1,
   cout << "Output file is "    << OutFile << endl;
   cout << "Parameter file is " << ParFile << endl;
   cout << "Real time " << rtime << " s, CPU time " << ctime
-       << "s" << endl << endl;
+  << "s" << endl << endl;
   // ------------------------------------------------------------------------
+
   
   cout << " Test passed" << endl;
   cout << " All ok " << endl;
-  
 }
-
