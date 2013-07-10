@@ -121,21 +121,7 @@ void r3ball(Int_t nEvents = 1,
   //R3B SiTracker Cooling definition
   if (fDetList.FindObject("VACVESSELCOOL") ) {
     R3BModule* vesselcool= new R3BVacVesselCool(Target.Data());
-    // Global Lab. Rotation
-    phi    =  0.0; // (deg)
-    theta  =  0.0; // (deg)
-    psi    =  0.0; // (deg)
-    // Rotation in Ref. Frame.
-    thetaX =  0.0; // (deg)
-    thetaY =  0.0; // (deg)
-    thetaZ =  0.0; // (deg)
-    // Global translation in Lab
-    tx    =  0.0; // (cm)
-    ty    =  0.0; // (cm)
-    tz    =  0.0; // (cm)
-    //target->SetRotAnglesEuler(phi,theta,psi);
-    vesselcool->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-    vesselcool->SetTranslation(tx,ty,tz);
+    vesselcool->SetGeometryFileName("vacvessel_v13a.geo.root");
     run->AddModule(vesselcool);
   }
   

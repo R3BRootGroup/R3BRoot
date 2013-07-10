@@ -108,7 +108,7 @@ Int_t r3bsim()
   fDetList.Add(&det10);
   fDetList.Add(&det11);
   //fDetList.Add(&det12);
-  //fDetList.Add(&det13);
+  fDetList.Add(&det13);
   
   //-------------------------------------------------
   //- N# of Sim. Events   |    nEvents     (Int_t)
