@@ -61,7 +61,11 @@ trackerData/R3BTraDigi.cxx
 trackerData/R3BTra2pDigi.cxx
 trackerData/R3BTraFraDigi.cxx
 trackerData/R3BTargetDigi.cxx
-trackerData/R3BTarget2pDigi.cxx 
+trackerData/R3BTarget2pDigi.cxx
+mfiData/R3BMfiPoint.cxx
+mfiData/R3BMfiDigi.cxx 
+pspData/R3BPspPoint.cxx
+pspData/R3BPspDigi.cxx
 )
 
 

@@ -137,6 +137,8 @@ add_subdirectory (plists)
 add_subdirectory (lumon) 
 add_subdirectory (evtvis)
 add_subdirectory (unpack)
+add_subdirectory (mfi)
+add_subdirectory (psp)
 
 
 Option(BUILD_DOXYGEN "Build Doxygen" OFF)

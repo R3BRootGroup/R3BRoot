@@ -51,6 +51,10 @@
 #pragma link C++ class R3BLandHit+;
 #pragma link C++ class R3BPaddleCrystalHit+;
 #pragma link C++ class ELILuMonPoint+;
+#pragma link C++ class R3BMfiPoint+;
+#pragma link C++ class R3BMfiDigi+;
+#pragma link C++ class R3BPspPoint+;
+#pragma link C++ class R3BPspDigi+;
 
 #endif
 

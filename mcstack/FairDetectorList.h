@@ -20,6 +20,8 @@ enum DetectorId {kREF,
 		 kGFI,
 		 kDCH,
 		 kLAND,
+                 kMFI,
+                 kPSP,
                  kVETO,
 		 kTutDet};
 
