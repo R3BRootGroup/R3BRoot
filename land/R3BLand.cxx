@@ -444,7 +444,7 @@ void R3BLand::ConstructGeometry()
     par->SetPaddleLength(box->GetDX());
     par->setChanged();
   } else {
-    Fatal("ConstructGeometry", "Geometry file name is not set.");
+    fLogger->Fatal(MESSAGE_ORIGIN, "Geometry file name is not set");
   }
 }
 
