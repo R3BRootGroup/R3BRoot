@@ -8,6 +8,7 @@
 #include "FairMCPoint.h"
 #include "R3BMCTrack.h"
 #include "FairRootManager.h"
+#include "FairLogger.h"
 
 #include "caloData/R3BCaloCrystalHitSim.h"
 
@@ -152,16 +153,14 @@ TParticle* R3BStack::PopPrimaryForTracking(Int_t iPrim) {
   
   // Test for index
   if (iPrim < 0 || iPrim >= fNPrimaries) {
-    cout << "-E- R3BStack: Primary index out of range! " << iPrim << endl;
-    Fatal("R3BStack::PopPrimaryForTracking", "Index out of range");
+    LOG(FATAL) << "R3BStack: Primary index out of range! " << iPrim << FairLogger::endl;
   }
   
   // Return the iPrim-th TParticle from the fParticle array. This should be
   // a primary.
   TParticle* part = (TParticle*)fParticles->At(iPrim);
   if ( ! (part->GetMother(0) < 0) ) {
-    cout << "-E- R3BStack:: Not a primary track! " << iPrim << endl;
-    Fatal("R3BStack::PopPrimaryForTracking", "Not a primary track");
+    LOG(FATAL) << "R3BStack:: Not a primary track! " << iPrim << FairLogger::endl;
   }
   
   return part;
@@ -175,8 +174,7 @@ TParticle* R3BStack::PopPrimaryForTracking(Int_t iPrim) {
 TParticle* R3BStack::GetCurrentTrack() const {
   TParticle* currentPart = GetParticle(fCurrentTrack);
   if ( ! currentPart) {
-    cout << "-W- R3BStack: Current track not found in stack!" << endl;
-    Warning("R3BStack::GetCurrentTrack", "Track not found in stack");
+    LOG(WARNING) << "R3BStack: Current track not found in stack!" << FairLogger::endl;
   }
   return currentPart;
 }
@@ -199,7 +197,7 @@ void R3BStack::AddParticle(TParticle* oldPart) {
 // -----   Public method FillTrackArray   ----------------------------------
 void R3BStack::FillTrackArray() {
   
-  cout << "-I- R3BStack: Filling MCTrack array..." << endl;
+  LOG(INFO) << "R3BStack: Filling MCTrack array..." << FairLogger::endl;
   
   // --> Reset index map and number of output tracks
   fIndexMap.clear();
@@ -227,10 +225,8 @@ void R3BStack::FillTrackArray() {
     
     fStoreIter = fStoreMap.find(iPart);
     if (fStoreIter == fStoreMap.end() ) {
-      cout << "-E- R3BStack: Particle " << iPart
-      << " not found in storage map!" << endl;
-      Fatal("R3BStack::FillTrackArray",
-            "Particle not found in storage map.");
+      LOG(FATAL) << "R3BStack: Particle " << iPart
+      << " not found in storage map!" << FairLogger::endl;
     }
     Bool_t store = (*fStoreIter).second;
     
@@ -250,7 +246,7 @@ void R3BStack::FillTrackArray() {
       
       
     }else{
-      if (fDebug) cout << "-D- R3BMCStack IndexMap ---> -2 for iPart: " << iPart << endl;
+      LOG(DEBUG) << "R3BMCStack IndexMap ---> -2 for iPart: " << iPart << FairLogger::endl;
       fIndexMap[iPart] = -2;
     }
     
@@ -271,7 +267,7 @@ void R3BStack::FillTrackArray() {
 void R3BStack::UpdateTrackIndex(TRefArray* detList) {
   
   if ( fMinPoints == 0 ) return;
-  cout << "-I- R3BStack: Updating track indizes...";
+  LOG(INFO) << "R3BStack: Updating track indizes...";
   Int_t nColl = 0;
   
   // First update mother ID in MCTracks
@@ -280,10 +276,8 @@ void R3BStack::UpdateTrackIndex(TRefArray* detList) {
     Int_t iMotherOld = track->GetMotherId();
     fIndexIter = fIndexMap.find(iMotherOld);
     if (fIndexIter == fIndexMap.end()) {
-      cout << "-E- R3BStack: Particle index " << iMotherOld
-      << " not found in dex map! " << endl;
-      Fatal("R3BStack::UpdateTrackIndex",
-            "Particle index not found in map");
+      LOG(FATAL) << "R3BStack: Particle index " << iMotherOld
+      << " not found in dex map! " << FairLogger::endl;
     }
     track->SetMotherId( (*fIndexIter).second );
   }
@@ -306,16 +300,14 @@ void R3BStack::UpdateTrackIndex(TRefArray* detList) {
         FairMCPoint* point = (FairMCPoint*)hitArray->At(iPoint);
         Int_t iTrack = point->GetTrackID();
         
-        if (fDebug) cout << "-D- R3BMCStack TrackID Get : " << iTrack << endl;
+        LOG(DEBUG) << "R3BMCStack TrackID Get : " << iTrack << FairLogger::endl;
         
         fIndexIter = fIndexMap.find(iTrack);
         if (fIndexIter == fIndexMap.end()) {
-          cout << "-E- R3BStack: Particle index " << iTrack
-          << " not found in index map! " << endl;
-          Fatal("R3BStack::UpdateTrackIndex",
-                "Particle index not found in map");
+          LOG(FATAL) << "R3BStack: Particle index " << iTrack
+          << " not found in index map! " << FairLogger::endl;
         }
-        if (fDebug) cout << "-D- R3BMCStack TrackID Set : " << (*fIndexIter).second << endl;
+        LOG(DEBUG) << "R3BMCStack TrackID Set : " << (*fIndexIter).second << FairLogger::endl;
         //	if ( ((*fIndexIter).second ) < 0 ) {
         //	   point->SetTrackID(iTrack);
         //	}else{
@@ -335,16 +327,11 @@ void R3BStack::UpdateTrackIndex(TRefArray* detList) {
         R3BCaloCrystalHitSim* point = (R3BCaloCrystalHitSim*)hitArray->At(iPoint);
         Int_t iTrack = point->GetTrackId();
         
-        if (fDebug) cout << "-D- R3BMCStack TrackID Get : " << iTrack << endl;
-        
         fIndexIter = fIndexMap.find(iTrack);
         if (fIndexIter == fIndexMap.end()) {
-          cout << "-E- R3BStack: Particle index " << iTrack
-          << " not found in index map! " << endl;
-          Fatal("R3BStack::UpdateTrackIndex",
-                "Particle index not found in map");
+          LOG(FATAL) << "R3BStack: Particle index " << iTrack
+          << " not found in index map! " << FairLogger::endl;
         }
-        if (fDebug) cout << "-D- R3BMCStack TrackID Set : " << (*fIndexIter).second << endl;
         //	if ( ((*fIndexIter).second ) < 0 ) {
         //	   point->SetTrackID(iTrack);
         //	}else{
@@ -354,7 +341,7 @@ void R3BStack::UpdateTrackIndex(TRefArray* detList) {
     }
   }     // List of active detectors
 
-  cout << "...stack and " << nColl << " collections updated." << endl;
+  LOG(INFO) << "...stack and " << nColl << " collections updated" << FairLogger::endl;
   
 }
 // -------------------------------------------------------------------------
@@ -384,13 +371,14 @@ void R3BStack::Register() {
 
 
 // -----   Public method Print  --------------------------------------------
-void R3BStack::Print(Int_t iVerbose) const {
-  cout << "-I- R3BStack: Number of primaries        = "
-  << fNPrimaries << endl;
-  cout << "              Total number of particles  = "
-  << fNParticles << endl;
-  cout << "              Number of tracks in output = "
-  << fNTracks << endl;
+void R3BStack::Print(Int_t iVerbose) const
+{
+  LOG(INFO) << "R3BStack: Number of primaries = "
+  << fNPrimaries << FairLogger::endl;
+  LOG(INFO) << "          Total number of particles = "
+  << fNParticles << FairLogger::endl;
+  LOG(INFO) << "          Number of tracks in output = "
+  << fNTracks << FairLogger::endl;
   if (iVerbose) {
     for (Int_t iTrack=0; iTrack<fNTracks; iTrack++)
       ((R3BMCTrack*) fTracks->At(iTrack))->Print(iTrack);
@@ -435,11 +423,11 @@ Int_t R3BStack::GetCurrentParentTrackNumber() const {
 
 
 // -----   Public method GetParticle   -------------------------------------
-TParticle* R3BStack::GetParticle(Int_t trackID) const {
+TParticle* R3BStack::GetParticle(Int_t trackID) const
+{
   if (trackID < 0 || trackID >= fNParticles) {
-    cout << "-E- R3BStack: Particle index " << trackID
-    << " out of range." << endl;
-    Fatal("R3BStack::GetParticle", "Index out of range");
+    LOG(FATAL) << "-E- R3BStack: Particle index " << trackID
+    << " out of range" << FairLogger::endl;
   }
   return (TParticle*)fParticles->At(trackID);
 }

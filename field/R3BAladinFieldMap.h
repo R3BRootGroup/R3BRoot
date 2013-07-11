@@ -74,7 +74,10 @@ public:
   virtual void Init();
 
   virtual void InitField();
-
+  
+  
+  virtual void FillParContainer() {}
+  
 
   /** Main GetField function */
   virtual void GetFieldValue(const Double_t point[3], Double_t* bField);

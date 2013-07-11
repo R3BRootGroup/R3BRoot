@@ -93,18 +93,14 @@ void R3BGfi::Initialize()
 {
   FairDetector::Initialize();
 
-   cout << endl;
-   cout << "-I- R3BGfi: initialisation" << endl;
-   cout << "-I- R3BGfi: Sci. Vol. (McId) " << gMC->VolId("GFILog")<< endl;
-
+  LOG(INFO) << "R3BGfi: initialisation" << FairLogger::endl;
+  LOG(DEBUG) << "R3BGfi: Sci. Vol. (McId) " << gMC->VolId("GFILog") << FairLogger::endl;
 }
 
 
-void R3BGfi::SetSpecialPhysicsCuts(){
-
-   cout << endl;
-
-   cout << "-I- R3BGfi: Adding customized Physics cut ... " << endl;
+void R3BGfi::SetSpecialPhysicsCuts()
+{
+  LOG(INFO) << "R3BGfi: Adding customized Physics cut ... " << FairLogger::endl;
 
    if (gGeoManager) {
      TGeoMedium* pSi = gGeoManager->GetMedium("plasticForGFI");
@@ -220,10 +216,10 @@ Bool_t R3BGfi::ProcessHits(FairVolume* vol) {
       }
 
       if ( fPosIn.Z() < 30. && newpos[2] > 30.02 ) {
-	cerr << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] 
-	     << " with safety = " << safety << endl;
-	cerr << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << endl;
-	cerr << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << endl;
+        LOG(ERROR) << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2]
+        << " with safety = " << safety << FairLogger::endl;
+        LOG(ERROR) << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << FairLogger::endl;
+        LOG(ERROR) << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << FairLogger::endl;
       }
 
       fPosOut.SetX(newpos[0]);
@@ -288,10 +284,10 @@ TClonesArray* R3BGfi::GetCollection(Int_t iColl) const {
 
 
 // -----   Public method Print   ----------------------------------------------
-void R3BGfi::Print() const {
+void R3BGfi::Print() const
+{
   Int_t nHits = fGfiCollection->GetEntriesFast();
-  cout << "-I- R3BGfi: " << nHits << " points registered in this event." 
-       << endl;
+  LOG(INFO) << "R3BGfi: " << nHits << " points registered in this event" << FairLogger::endl;
 }
 // ----------------------------------------------------------------------------
 
@@ -307,35 +303,37 @@ void R3BGfi::Reset() {
 
 
 // -----   Public method CopyClones   -----------------------------------------
-void R3BGfi::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
+void R3BGfi::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
+{
   Int_t nEntries = cl1->GetEntriesFast();
-  cout << "-I- R3BGfi: " << nEntries << " entries to add." << endl;
+  LOG(INFO) << "R3BGfi: " << nEntries << " entries to add" << FairLogger::endl;
   TClonesArray& clref = *cl2;
   R3BGfiPoint* oldpoint = NULL;
-   for (Int_t i=0; i<nEntries; i++) {
-   oldpoint = (R3BGfiPoint*) cl1->At(i);
+  for (Int_t i=0; i<nEntries; i++) {
+    oldpoint = (R3BGfiPoint*) cl1->At(i);
     Int_t index = oldpoint->GetTrackID() + offset;
     oldpoint->SetTrackID(index);
     new (clref[fPosIndex]) R3BGfiPoint(*oldpoint);
     fPosIndex++;
   }
-   cout << " -I- R3BGfi: " << cl2->GetEntriesFast() << " merged entries."
-       << endl;
+  LOG(INFO) << "R3BGfi: " << cl2->GetEntriesFast() << " merged entries" << FairLogger::endl;
 }
+
 
 // -----   Private method AddHit   --------------------------------------------
 R3BGfiPoint* R3BGfi::AddHit(Int_t trackID, Int_t detID, Int_t plane , TVector3 posIn,
 			    TVector3 posOut, TVector3 momIn, 
 			    TVector3 momOut, Double_t time, 
-			    Double_t length, Double_t eLoss) {
+			    Double_t length, Double_t eLoss)
+{
   TClonesArray& clref = *fGfiCollection;
   Int_t size = clref.GetEntriesFast();
-  if (fVerboseLevel>1) 
-    cout << "-I- R3BGfi: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
-	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
-	 << trackID << ", energy loss " << eLoss*1e06 << " keV" << endl;
+  if (fVerboseLevel>1)
+    LOG(INFO) << "R3BGfi: Adding Point at (" << posIn.X() << ", " << posIn.Y()
+    << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
+    << trackID << ", energy loss " << eLoss*1e06 << " keV" << FairLogger::endl;
   return new(clref[size]) R3BGfiPoint(trackID, detID, plane, posIn, posOut,
-				      momIn, momOut, time, length, eLoss);
+                                      momIn, momOut, time, length, eLoss);
 }
 // -----   Public method ConstructGeometry   ----------------------------------
 void R3BGfi::ConstructGeometry() {

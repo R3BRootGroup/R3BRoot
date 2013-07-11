@@ -122,13 +122,12 @@ void R3BXBall::Initialize()
 {
   FairDetector::Initialize();
 
-  cout << endl;
-  cout << "-I- R3BXBall initialisation" << endl;
-  cout << "-I- R3BXBall: Vol. (McId)" << endl;
-  cout << "-I- R3BXBall: Crystal A : " << gMC->VolId("crystalLogNAJA")<< endl;
-  cout << "-I- R3BXBall: Crystal B : " << gMC->VolId("crystalLogNAJB")<< endl;
-  cout << "-I- R3BXBall: Crystal C : " << gMC->VolId("crystalLogNAJC")<< endl;
-  cout << "-I- R3BXBall: Crystal D : " << gMC->VolId("crystalLogNAJD")<< endl;
+  LOG(INFO) << "R3BXBall initialisation" << FairLogger::endl;
+  LOG(DEBUG) << "R3BXBall: Vol. (McId)" << FairLogger::endl;
+  LOG(DEBUG) << "R3BXBall: Crystal A : " << gMC->VolId("crystalLogNAJA")<< FairLogger::endl;
+  LOG(DEBUG) << "R3BXBall: Crystal B : " << gMC->VolId("crystalLogNAJB")<< FairLogger::endl;
+  LOG(DEBUG) << "R3BXBall: Crystal C : " << gMC->VolId("crystalLogNAJC")<< FairLogger::endl;
+  LOG(DEBUG) << "R3BXBall: Crystal D : " << gMC->VolId("crystalLogNAJD")<< FairLogger::endl;
 
   // Crystals type ID
   // type  ID
@@ -143,20 +142,12 @@ void R3BXBall::Initialize()
   fTypeD = gMC->VolId("crystalLogNAJD");
 
   TGeoVolume *vol = gGeoManager->GetVolume("CBLogWorld");
-  vol->SetVisibility(kFALSE); 
-
+  vol->SetVisibility(kFALSE);
 }
 
 
-void R3BXBall::SetSpecialPhysicsCuts(){
-
-  cout << endl;
-
-  cout << "-I- R3BXBall: Adding customized Physics cut ... " << endl;
-  cout << "-I- R3BXBall: Yet not implemented !... " << endl;
-
-  cout << endl;
-
+void R3BXBall::SetSpecialPhysicsCuts()
+{
 }
 
 
@@ -229,10 +220,10 @@ Bool_t R3BXBall::ProcessHits(FairVolume* vol) {
       }
 
       if ( fPosIn.Z() < 30. && newpos[2] > 30.02 ) {
-        cerr << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] 
-            << " with safety = " << safety << endl;
-        cerr << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << endl;
-        cerr << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << endl;
+        LOG(ERROR) << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2]
+        << " with safety = " << safety << FairLogger::endl;
+        LOG(ERROR) << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << FairLogger::endl;
+        LOG(ERROR) << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << FairLogger::endl;
       }
 
       fPosOut.SetX(newpos[0]);
@@ -367,15 +358,15 @@ TClonesArray* R3BXBall::GetCollection(Int_t iColl) const {
 void R3BXBall::Print() const {
   if(fCollectionOption == 0) { 
     Int_t nHits = fXBallCollection->GetEntriesFast();
-    cout << "-I- R3BXBall: " << nHits << " points registered in this event." << endl;
+    LOG(INFO) << "R3BXBall: " << nHits << " points registered in this event" << FairLogger::endl;
   } else if(fCollectionOption == 1) { 
     Int_t nHits = fXBallCrystalHitCollection->GetEntriesFast();
-    cout << "-I- R3BXBall: " << nHits << " hits registered in this event." << endl;
+    LOG(INFO) << "R3BXBall: " << nHits << " hits registered in this event" << FairLogger::endl;
   } else if(fCollectionOption == 2) { 
     Int_t nHits = fXBallCollection->GetEntriesFast();
-    cout << "-I- R3BXBall: " << nHits << " points registered in this event." << endl;
+    LOG(INFO) << "R3BXBall: " << nHits << " points registered in this event" << FairLogger::endl;
     nHits = fXBallCrystalHitCollection->GetEntriesFast();
-    cout << "-I- R3BXBall: " << nHits << " hits registered in this event." << endl;
+    LOG(INFO) << "R3BXBall: " << nHits << " hits registered in this event" << FairLogger::endl;
   }
 }
 // ----------------------------------------------------------------------------
@@ -396,7 +387,7 @@ void R3BXBall::Reset() {
 void R3BXBall::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
   Int_t nEntries = cl1->GetEntriesFast();
-  cout << "-I- R3BXBall: " << nEntries << " entries to add." << endl;
+  LOG(INFO) << "R3BXBall: " << nEntries << " entries to add" << FairLogger::endl;
   TClonesArray& clref = *cl2;
   R3BXBallPoint* oldpoint = NULL;
   for (Int_t i=0; i<nEntries; i++)
@@ -407,7 +398,7 @@ void R3BXBall::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
     new (clref[fPosIndex]) R3BXBallPoint(*oldpoint);
     fPosIndex++;
   }
-  cout << " -I- R3BXBall: " << cl2->GetEntriesFast() << " merged entries." << endl;
+  LOG(INFO) << "R3BXBall: " << cl2->GetEntriesFast() << " merged entries." << FairLogger::endl;
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -418,9 +409,9 @@ R3BXBallPoint* R3BXBall::AddHit(Int_t trackID, Int_t detID, Int_t type, Int_t cp
   TClonesArray& clref = *fXBallCollection;
   Int_t size = clref.GetEntriesFast();
   if (fVerboseLevel>1) 
-    cout << "-I- R3BXBall: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
-     << ", " << posIn.Z() << ") cm, detector " << detID << ", track "
-     << trackID << ", energy loss " << eLoss*1e06 << " keV" << endl;
+    LOG(INFO) << "R3BXBall: Adding Point at (" << posIn.X() << ", " << posIn.Y()
+    << ", " << posIn.Z() << ") cm, detector " << detID << ", track "
+    << trackID << ", energy loss " << eLoss*1e06 << " keV" << FairLogger::endl;
   return new(clref[size]) R3BXBallPoint(trackID, detID, type, cp , posIn, posOut,
             momIn, momOut, time, length, eLoss);
 }
@@ -433,9 +424,10 @@ R3BXBallCrystalHitSim* R3BXBall::AddCrystalHit(Int_t type, Int_t copy,
   TClonesArray& clref = *fXBallCrystalHitCollection;
   Int_t size = clref.GetEntriesFast();
   if (fVerboseLevel>1)
-    cout << "-I- R3BXBall: Adding Hit in detector type " << type << ", and number " << copy
-         << " entering with " << einc*1e06 << " keV, depositing " << energy*1e06 << " keV" << endl;
-    cout << " -I- trackid: " << trackid << " volume id: " << volid << " partrackid : " << partrackid << " type: " << pdgtype << " unique id: " << uniqueid << endl; 
+    LOG(INFO) << "R3BXBall: Adding Hit in detector type " << type << ", and number " << copy
+    << " entering with " << einc*1e06 << " keV, depositing " << energy*1e06 << " keV" << FairLogger::endl
+    << " trackid: " << trackid << " volume id: " << volid << " partrackid : " << partrackid << " type: " << pdgtype
+    << " unique id: " << uniqueid << FairLogger::endl;
   return new(clref[size]) R3BXBallCrystalHitSim(type, copy, energy, time, steps, einc, trackid, volid, partrackid, pdgtype, uniqueid);
 }
 
@@ -452,7 +444,7 @@ Double_t R3BXBall::NUSmearing(Double_t inputEnergy)
 void R3BXBall::SetNonUniformity(Double_t nonU)
 {
   fNonUniformity = nonU;
-  cout << "-I- R3BXBall::SetNonUniformity to " << fNonUniformity << " %." << endl;
+  LOG(INFO) << "R3BXBall::SetNonUniformity to " << fNonUniformity << " %" << FairLogger::endl;
 }
 
 
@@ -461,12 +453,10 @@ void R3BXBall::ConstructGeometry()
 {
   TString fileName = GetGeometryFileName();
   if(fileName.EndsWith(".root")) {
-    fLogger->Info(MESSAGE_ORIGIN,
-		  "Constructing Crystal Ball geometry from ROOT file %s", 
-		  fileName.Data());
+    LOG(INFO) << "Constructing Crystal Ball geometry from ROOT file " << fileName.Data() << FairLogger::endl;
     ConstructRootGeometry();
   } else {
-    fLogger->Fatal(MESSAGE_ORIGIN, "Geometry file is not specified");
+    LOG(FATAL) << "Geometry file is not specified" << FairLogger::endl;
   }
 }
 

@@ -102,19 +102,19 @@ void R3BLand::Initialize()
 {
   FairDetector::Initialize();
 
-  cout << "-I- R3BLand: initialisation " << endl;
+  LOG(INFO) << "R3BLand initialisation " << FairLogger::endl;
   
   Int_t id1 = 0, id2 = 0, id3 = 0;
   
   TString fileName = GetGeometryFileName();
   if(fileName.Contains("neuland")) {
-    cout << "-I- R3BLand: Paddle B5 (McId): " << gMC->VolId("padle_h_box5") << endl;
+    LOG(DEBUG) << "R3BLand: Paddle B5 (McId): " << gMC->VolId("padle_h_box5") << FairLogger::endl;
     id3 = gMC->VolId("padle_h_box5");
     fMapMcId[id3]=3;
   } else {
-    cout << "-I- R3BLand: Paddle B3 (McId): " << gMC->VolId("padle_h_box3") << endl;
-    cout << "-I- R3BLand: Paddle B4 (McId): " << gMC->VolId("padle_h_box4") << endl;
-    cout << "-I- R3BLand: Paddle B5 (McId): " << gMC->VolId("padle_h_box5") << endl;
+    LOG(DEBUG) << "R3BLand: Paddle B3 (McId): " << gMC->VolId("padle_h_box3") << FairLogger::endl;
+    LOG(DEBUG) << "R3BLand: Paddle B4 (McId): " << gMC->VolId("padle_h_box4") << FairLogger::endl;
+    LOG(DEBUG) << "R3BLand: Paddle B5 (McId): " << gMC->VolId("padle_h_box5") << FairLogger::endl;
     id1 = gMC->VolId("padle_h_box3");
     id2 = gMC->VolId("padle_h_box4");
     id3 = gMC->VolId("padle_h_box5");
@@ -339,11 +339,9 @@ TClonesArray* R3BLand::GetCollection(Int_t iColl) const
 void R3BLand::Print(Option_t *option) const
 {
   Int_t nHits = fLandCollection->GetEntriesFast();
-  cout << "-I- R3BLand: " << nHits << " points registered in this event." 
-     << endl;
+  LOG(INFO) << "R3BLand: " << nHits << " points registered in this event" << FairLogger::endl;
   nHits = fLandFirstHits->GetEntriesFast();
-  cout << "-I- R3BLandFirstHits: " << nHits << " points registered in this event." 
-     << endl;
+  LOG(INFO) << "R3BLandFirstHits: " << nHits << " points registered in this event" << FairLogger::endl;
 }
 // ----------------------------------------------------------------------------
 
@@ -352,7 +350,6 @@ void R3BLand::Print(Option_t *option) const
 // -----  Public method Reset  ----------------------------------------------
 void R3BLand::Reset()
 {
-  cout << "------------------------- Reset() called " << endl;
   fLandCollection->Clear();
   ResetParameters();
   fLandFirstHits->Clear();
@@ -366,7 +363,7 @@ void R3BLand::Reset()
 void R3BLand::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
   Int_t nEntries = cl1->GetEntriesFast();
-  cout << "-I- R3BLand: " << nEntries << " entries to add." << endl;
+  LOG(INFO) << "R3BLand: " << nEntries << " entries to add" << FairLogger::endl;
   TClonesArray& clref = *cl2;
   R3BLandPoint* oldpoint = NULL;
   for (Int_t i=0; i<nEntries; i++) {
@@ -376,7 +373,7 @@ void R3BLand::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
    new (clref[fPosIndex]) R3BLandPoint(*oldpoint);
    fPosIndex++;
   }
-  cout << " -I- R3BLand: " << cl2->GetEntriesFast() << " merged entries." << endl;
+  LOG(INFO) << "R3BLand: " << cl2->GetEntriesFast() << " merged entries" << FairLogger::endl;
 }
 
 
@@ -391,12 +388,12 @@ R3BLandPoint* R3BLand::AddHit(Int_t trackID, Int_t detID, Int_t box, Int_t id1, 
   TClonesArray& clref = *fLandCollection;
   Int_t size = clref.GetEntriesFast();
   if (fVerboseLevel>1) {
-    cout << "-I- R3BLand: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
-	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
-	 << trackID << ", energy loss " << eLoss  << " GeV" << endl;
+    LOG(INFO) << "R3BLand: Adding Point at (" << posIn.X() << ", " << posIn.Y()
+    << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
+    << trackID << ", energy loss " << eLoss  << " GeV" << FairLogger::endl;
   }
   return new(clref[size]) R3BLandPoint(trackID, detID, box, id1, id2,  posIn, posOut,
-				       momIn, momOut, time, length, eLoss, lightYield);
+                                       momIn, momOut, time, length, eLoss, lightYield);
 }
 
 
@@ -419,9 +416,7 @@ void R3BLand::ConstructGeometry()
 {
   TString fileName = GetGeometryFileName();
   if(fileName.EndsWith(".root")) {
-    fLogger->Info(MESSAGE_ORIGIN,
-		  "Constructing NEULAND geometry from ROOT file %s", 
-		  fileName.Data());
+    LOG(INFO) << "Constructing (Neu)LAND geometry from ROOT file " << fileName.Data() << FairLogger::endl;
     ConstructRootGeometry();
     TGeoBBox *box = (TGeoBBox*) gGeoManager->GetVolume(gMC->VolId("padle_h_box5"))->GetShape();
     TGeoBBox *bbox = (TGeoBBox*) gGeoManager->GetVolume(gMC->VolId("ALAND"))->GetShape();
@@ -444,7 +439,7 @@ void R3BLand::ConstructGeometry()
     par->SetPaddleLength(box->GetDX());
     par->setChanged();
   } else {
-    fLogger->Fatal(MESSAGE_ORIGIN, "Geometry file name is not set");
+    LOG(FATAL) << "Geometry file name is not set" << FairLogger::endl;
   }
 }
 
@@ -552,7 +547,7 @@ void R3BLand::StepHistory()
 //        printf("-I- Process involved --->   code: %i : name: %s\n", proc.At(i) , TMCProcessName[proc.At(i)]);
      
         if(proc.At(i)!=22 && proc.At(i)!=23 && proc.At(i)!=31 && proc.At(i)!=43 &&  proc.At(i)!=13){
-           cout<<"new primary neutron interaction: " << proc.At(i) <<"  "<< TMCProcessName[proc.At(i)] <<endl;
+           LOG(INFO) << "new primary neutron interaction: " << proc.At(i) <<"  "<< TMCProcessName[proc.At(i)] << FairLogger::endl;
 	
 	}
   
@@ -598,7 +593,6 @@ void R3BLand::StepHistory()
 
 void R3BLand::FinishRun()
 {
-  cout << "-I- finishing  run"<< endl;
 }
 
 

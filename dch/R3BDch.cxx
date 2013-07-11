@@ -101,105 +101,91 @@ R3BDch::~R3BDch() {
 
 void R3BDch::Initialize()
 {
-   if (fDynamicStepSize)
-   fDchCollection = new TClonesArray("R3BDchFullPoint");
-   else
-   fDchCollection = new TClonesArray("R3BDchPoint");
+  if (fDynamicStepSize)
+    fDchCollection = new TClonesArray("R3BDchFullPoint");
+  else
+    fDchCollection = new TClonesArray("R3BDchPoint");
 
 
-   FairDetector::Initialize();
+  FairDetector::Initialize();
 
-   cout << endl;
-   cout << "-I- R3BDch: initialisation" << endl;
-   //cout << "-I- R3BDch: Gas. Vol: (McId) " << gMC->VolId("GASBoxLog")<< endl;
-   cout << "-I- R3BDch: Gas. Vol: (McId) " << gMC->VolId("ActGASBoxLog")<< endl;
+  LOG(INFO) << "R3BDch: initialisation" << FairLogger::endl;
+  LOG(DEBUG) << "R3BDch: Gas. Vol: (McId) " << gMC->VolId("ActGASBoxLog") << FairLogger::endl;
 
-   // get the transformation matrixes for
-   // the sensitive nodes.
+  // get the transformation matrixes for
+  // the sensitive nodes.
   TGeoVolume *vol = gGeoManager->GetVolume("ALBoxLog");
   vol->SetVisibility(kTRUE);
   vol->SetVisContainers();
   gGeoManager->GetTopVolume()->SetVisContainers();
-
-
 }
 
-void R3BDch::FindNodePath(TObjArray * arr) {
- //TString sVol = "GASBoxLog";
- TString sVol = "ActGASBoxLog";
- TString topName = gGeoManager->GetTopNode()->GetName();
- TString path = "/" + topName;
 
+void R3BDch::FindNodePath(TObjArray * arr)
+{
+  TString sVol = "ActGASBoxLog";
+  TString topName = gGeoManager->GetTopNode()->GetName();
+  TString path = "/" + topName;
+  
   for (Int_t i=0;i<arr->GetEntries();i++ ){
-      TGeoNode *aNode = (TGeoNode*) arr->At(i);
-      TString nodName = aNode->GetName();
-      if ( nodName.Contains("DCH1") || nodName.Contains(sVol.Data())) {
-	  path+="/"+nodName;
-	  cout << " -I intermediate path: " << path << endl;
-      }
-      FindNodePath(aNode->GetNodes());
+    TGeoNode *aNode = (TGeoNode*) arr->At(i);
+    TString nodName = aNode->GetName();
+    if ( nodName.Contains("DCH1") || nodName.Contains(sVol.Data())) {
+      path+="/"+nodName;
+      LOG(INFO) << "intermediate path: " << path << FairLogger::endl;
+    }
+    FindNodePath(aNode->GetNodes());
   }
-
-  cout << "-I- found path " << path << endl;
-
+  
+  LOG(INFO) << "found path: " << path << FairLogger::endl;
 }
 
-void R3BDch::SetSpecialPhysicsCuts(){
 
-   cout << endl;
-   cout << "-I- R3Dch: Adding customized Physics cut: " << endl;
-   cout << "-I- R3Dch: not yet implemented ... " << endl;
-   cout << endl;
-
-
-   cout << endl;
-
-   cout << "-I- R3Dch: Adding customized Physics cut ... " << endl;
-
-   if (gGeoManager) {
-     TGeoMedium* pSi = gGeoManager->GetMedium("mixtureForDCH");
-     if ( pSi ) {
-	 // Setting processes for Gas mixture only
-         // ELoss + deltas + reduced fluctuation
-	 gMC->Gstpar(pSi->GetId()  ,"LOSS",2);
-         // collision sampling on PAI Model ( thin layer )
-	 gMC->Gstpar(pSi->GetId()  ,"STRA",1.0);
-         // Deltas on
-	 gMC->Gstpar(pSi->GetId()  ,"DRAY",1.0);
-         // Default processes
-         gMC->Gstpar(pSi->GetId()  ,"PAIR",1.0);
-	 gMC->Gstpar(pSi->GetId()  ,"COMP",1.0);
-	 gMC->Gstpar(pSi->GetId()  ,"PHOT",1.0);
-         gMC->Gstpar(pSi->GetId()  ,"ANNI",1.0);
-	 gMC->Gstpar(pSi->GetId()  ,"BREM",1.0);
-	 gMC->Gstpar(pSi->GetId()  ,"HADR",1.0);
-         gMC->Gstpar(pSi->GetId()  ,"DCAY",1.0);
-         gMC->Gstpar(pSi->GetId()  ,"MULS",1.0);
-	 gMC->Gstpar(pSi->GetId()  ,"RAYL",1.0);
-
-	 // Setting Energy-CutOff for Drift chamber Gas Only
-	Double_t cutE = fCutE; // GeV-> 1 keV
-
-	cout << "-I- R3Dch Gas Mixture Medium Id " << pSi->GetId()
+void R3BDch::SetSpecialPhysicsCuts()
+{
+  LOG(INFO) << "R3Dch: Adding customized Physics cut ... " << FairLogger::endl;
+  
+  if (gGeoManager) {
+    TGeoMedium* pSi = gGeoManager->GetMedium("mixtureForDCH");
+    if ( pSi ) {
+      // Setting processes for Gas mixture only
+      // ELoss + deltas + reduced fluctuation
+      gMC->Gstpar(pSi->GetId()  ,"LOSS",2);
+      // collision sampling on PAI Model ( thin layer )
+      gMC->Gstpar(pSi->GetId()  ,"STRA",1.0);
+      // Deltas on
+      gMC->Gstpar(pSi->GetId()  ,"DRAY",1.0);
+      // Default processes
+      gMC->Gstpar(pSi->GetId()  ,"PAIR",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"COMP",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"PHOT",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"ANNI",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"BREM",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"HADR",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"DCAY",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"MULS",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"RAYL",1.0);
+      
+      // Setting Energy-CutOff for Drift chamber Gas Only
+      Double_t cutE = fCutE; // GeV-> 1 keV
+      
+      cout << "-I- R3Dch Gas Mixture Medium Id " << pSi->GetId()
 	    << " Energy Cut-Off : " << cutE
 	    << endl;
-        cout << endl;
-        //Si
-	gMC->Gstpar(pSi->GetId(),"CUTGAM",cutE);   /** gammas (GeV)*/
-        gMC->Gstpar(pSi->GetId(),"CUTELE",cutE);   /** electrons (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"CUTNEU",cutE);   /** neutral hadrons (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"CUTHAD",cutE);   /** charged hadrons (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"CUTMUO",cutE);   /** muons (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"BCUTE",cutE);    /** electron bremsstrahlung (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"BCUTM",cutE);    /** muon and hadron bremsstrahlung(GeV)*/
-	gMC->Gstpar(pSi->GetId(),"DCUTE",cutE);    /** delta-rays by electrons (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"DCUTM",cutE);    /** delta-rays by muons (GeV)*/
-        gMC->Gstpar(pSi->GetId(),"PPCUTM",-1.);   /** direct pair production by muons (GeV)*/
-
-     }
-
- } //!gGeoManager
-
+      cout << endl;
+      //Si
+      gMC->Gstpar(pSi->GetId(),"CUTGAM",cutE);   /** gammas (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"CUTELE",cutE);   /** electrons (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"CUTNEU",cutE);   /** neutral hadrons (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"CUTHAD",cutE);   /** charged hadrons (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"CUTMUO",cutE);   /** muons (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"BCUTE",cutE);    /** electron bremsstrahlung (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"BCUTM",cutE);    /** muon and hadron bremsstrahlung(GeV)*/
+      gMC->Gstpar(pSi->GetId(),"DCUTE",cutE);    /** delta-rays by electrons (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"DCUTM",cutE);    /** delta-rays by muons (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"PPCUTM",-1.);   /** direct pair production by muons (GeV)*/
+    }
+  } //!gGeoManager
 }
 
 
@@ -365,10 +351,10 @@ void R3BDch::RecordPartialMcHit(){
 	  }
 
 	  if ( fPosIn.Z() < 30. && newpos[2] > 30.02 ) {
-	      cerr << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2]
-		  << " with safety = " << safety << endl;
-	      cerr << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << endl;
-	      cerr << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << endl;
+      LOG(ERROR) << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2]
+		  << " with safety = " << safety << FairLogger::endl;
+	    LOG(ERROR) << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << FairLogger::endl;
+	    LOG(ERROR) << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << FairLogger::endl;
 	  }
 
 	  fPosOut.SetX(newpos[0]);
@@ -421,48 +407,47 @@ void R3BDch::RecordPartialMcHit(){
 }
 
 
-void R3BDch::PrintInfo(){
-
+void R3BDch::PrintInfo()
+{
     // dump of Hit Information
-    cout << "X(cm)    " << "Y(cm)    " << "Z(cm)  " << "KinE(MeV)   " << "dE(MeV) " << "Step(cm) " << "TrackL(cm) "
-       << "Volume  " << "Process " << endl;
+    LOG(INFO) << "X(cm)    " << "Y(cm)    " << "Z(cm)  " << "KinE(MeV)   " << "dE(MeV) " << "Step(cm) " << "TrackL(cm) "
+    << "Volume  " << "Process " << FairLogger::endl;
 
     // Position
     Double_t x, y, z;
     gMC->TrackPosition(x, y, z);
-    cout << setw(8) << setprecision(3) << x << " "
-         << setw(8) << setprecision(3) << y << " "
-         << setw(8) << setprecision(3) << z << "  ";
+    LOG(INFO) << setw(8) << setprecision(3) << x << " "
+    << setw(8) << setprecision(3) << y << " "
+    << setw(8) << setprecision(3) << z << "  ";
 
     // Kinetic energy
     Double_t px, py, pz, etot;
     gMC->TrackMomentum(px, py, pz, etot);
     Double_t ekin = etot - gMC->TrackMass();
-    cout << setw(9) << setprecision(4) << ekin*1e03 << " ";
+    LOG(INFO) << setw(9) << setprecision(4) << ekin*1e03 << " ";
 
     // Energy deposit
-    cout << setw(9) << setprecision(4) << gMC->Edep()*1e03 << " ";
+    LOG(INFO) << setw(9) << setprecision(4) << gMC->Edep()*1e03 << " ";
     // Step length
-    cout << setw(8) << setprecision(3) << gMC->TrackStep() << " ";
+    LOG(INFO) << setw(8) << setprecision(3) << gMC->TrackStep() << " ";
 
     // Track length
-    cout << setw(8) << setprecision(3) << gMC->TrackLength() << "     ";
+    LOG(INFO) << setw(8) << setprecision(3) << gMC->TrackLength() << "     ";
 
     // Volume
     if (gMC->CurrentVolName() != 0)
-      cout << setw(4) << gMC->CurrentVolName() << "  ";
+      LOG(INFO) << setw(4) << gMC->CurrentVolName() << "  ";
     else
-      cout << setw(4) << "None"  << "  ";
+      LOG(INFO) << setw(4) << "None"  << "  ";
 
     // Process involved
     TArrayI processes;
     Int_t nofProcesses = gMC->StepProcesses(processes);
 
     for(int ip=0;ip<nofProcesses; ip++)
-      cout << TMCProcessName[processes[ip]]<<" / ";
+      LOG(INFO) << TMCProcessName[processes[ip]]<<" / ";
 
-    cout << endl;
-
+    LOG(INFO) << FairLogger::endl;
 }
 
 
@@ -606,10 +591,10 @@ TClonesArray* R3BDch::GetCollection(Int_t iColl) const {
 
 
 // -----   Public method Print   ----------------------------------------------
-void R3BDch::Print() const {
+void R3BDch::Print() const
+{
   Int_t nHits = fDchCollection->GetEntriesFast();
-  cout << "-I- R3BDch: " << nHits << " points registered in this event." 
-       << endl;
+  LOG(INFO) << "R3BDch: " << nHits << " points registered in this event" << FairLogger::endl;
 }
 // ----------------------------------------------------------------------------
 
@@ -625,35 +610,33 @@ void R3BDch::Reset() {
 
 
 // -----   Public method CopyClones   -----------------------------------------
-void R3BDch::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
+void R3BDch::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
+{
   Int_t nEntries = cl1->GetEntriesFast();
-  cout << "-I- R3BDch: " << nEntries << " entries to add." << endl;
+  LOG(INFO) << "R3BDch: " << nEntries << " entries to add" << FairLogger::endl;
   TClonesArray& clref = *cl2;
-
+  
   if (fDynamicStepSize) {
-      R3BDchFullPoint* oldpoint = NULL;
-      for (Int_t i=0; i<nEntries; i++) {
-	  oldpoint = (R3BDchFullPoint*) cl1->At(i);
-	  Int_t index = oldpoint->GetTrackID() + offset;
-	  oldpoint->SetTrackID(index);
-	  new (clref[fPosIndex]) R3BDchFullPoint(*oldpoint);
-	  fPosIndex++;
-      }
-
-  }else{
-
-      R3BDchPoint* oldpoint = NULL;
-      for (Int_t i=0; i<nEntries; i++) {
-	  oldpoint = (R3BDchPoint*) cl1->At(i);
-	  Int_t index = oldpoint->GetTrackID() + offset;
-	  oldpoint->SetTrackID(index);
-	  new (clref[fPosIndex]) R3BDchPoint(*oldpoint);
-	  fPosIndex++;
-      }
+    R3BDchFullPoint* oldpoint = NULL;
+    for (Int_t i=0; i<nEntries; i++) {
+      oldpoint = (R3BDchFullPoint*) cl1->At(i);
+      Int_t index = oldpoint->GetTrackID() + offset;
+      oldpoint->SetTrackID(index);
+      new (clref[fPosIndex]) R3BDchFullPoint(*oldpoint);
+      fPosIndex++;
+    }
+  } else {
+    R3BDchPoint* oldpoint = NULL;
+    for (Int_t i=0; i<nEntries; i++) {
+      oldpoint = (R3BDchPoint*) cl1->At(i);
+      Int_t index = oldpoint->GetTrackID() + offset;
+      oldpoint->SetTrackID(index);
+      new (clref[fPosIndex]) R3BDchPoint(*oldpoint);
+      fPosIndex++;
+    }
   }
-      cout << " -I- R3BDch: " << cl2->GetEntriesFast() << " merged entries."
-	  << endl;
-  }
+  LOG(INFO) << "R3BDch: " << cl2->GetEntriesFast() << " merged entries" << FairLogger::endl;
+}
 
 // -----   Private method AddHit   --------------------------------------------
 R3BDchFullPoint* R3BDch::AddFullHit(Int_t trackId, Int_t mod, Int_t layer, Int_t cell, TVector3 pos,
@@ -686,13 +669,10 @@ void R3BDch::ConstructGeometry()
 {
   TString fileName = GetGeometryFileName();
   if(fileName.EndsWith(".root")) {
-    fLogger->Info(MESSAGE_ORIGIN,
-		  "Constructing DCH geometry from ROOT file %s", 
-		  fileName.Data());
+    LOG(INFO) << "Constructing DCH geometry from ROOT file " << fileName.Data() << FairLogger::endl;
     ConstructRootGeometry();
   } else {
-    fLogger->Info(MESSAGE_ORIGIN,
-		  "Constructing hardcoded DCH geometry");
+    LOG(INFO) << "Constructing hardcoded DCH geometry" << FairLogger::endl;
     ConstructGeometryOld();
   }
 }

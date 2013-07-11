@@ -91,18 +91,14 @@ void R3BTra::Initialize()
 {
 	FairDetector::Initialize();
 
-	cout << endl;
-	cout << "-I- R3BTra: initialisation" << endl;
-	cout << "-I- R3BTra: Sens. Vol. (McId) " << gMC->VolId("TraLog")<< endl;
-
+	LOG(INFO) << "R3BTra: initialisation" << FairLogger::endl;
+	LOG(DEBUG) << "R3BTra: Sens. Vol. (McId) " << gMC->VolId("TraLog") << FairLogger::endl;
 }
 
 
-void R3BTra::SetSpecialPhysicsCuts(){
-
-	cout << endl;
-
-	cout << "-I- R3BTra: Adding customized Physics cut ... " << endl;
+void R3BTra::SetSpecialPhysicsCuts()
+{
+	LOG(INFO) << "R3BTra: Adding customized Physics cut ... " << FairLogger::endl;
 
 	if (gGeoManager) {
 
@@ -125,10 +121,9 @@ void R3BTra::SetSpecialPhysicsCuts(){
 			// Setting Energy-CutOff for Si Only
 			Double_t cutE = fCutE; // GeV-> 100 keV
 
-			cout << "-I- R3bTra Silicon Medium Id " << pSi->GetId()
-				<< " Energy Cut-Off : " << cutE
-				<< endl;
-			cout << endl;
+			LOG(INFO) << "R3BTra Silicon Medium Id " << pSi->GetId()
+			<< " Energy Cut-Off : " << cutE
+			<< FairLogger::endl;
 
 			//Si
 			gMC->Gstpar(pSi->GetId(),"CUTGAM",cutE);   /** gammas (GeV)*/
@@ -225,10 +220,10 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
 			}
 
 			if ( fPosIn.Z() < 30. && newpos[2] > 30.02 ) {
-				cerr << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] 
-					<< " with safety = " << safety << endl;
-				cerr << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << endl;
-				cerr << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << endl;
+				LOG(ERROR) << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2]
+				<< " with safety = " << safety << FairLogger::endl;
+				LOG(ERROR) << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << FairLogger::endl;
+				LOG(ERROR) << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << FairLogger::endl;
 			}
 
 			fPosOut.SetX(newpos[0]);
@@ -314,8 +309,7 @@ TClonesArray* R3BTra::GetCollection(Int_t iColl) const {
 // -----   Public method Print   ----------------------------------------------
 void R3BTra::Print() const {
 	Int_t nHits = fTraCollection->GetEntriesFast();
-	cout << "-I- R3BTra: " << nHits << " points registered in this event." 
-		<< endl;
+	LOG(INFO) << "R3BTra: " << nHits << " points registered in this event" << FairLogger::endl;
 }
 // ----------------------------------------------------------------------------
 
@@ -329,7 +323,7 @@ void R3BTra::Reset() {
 // -----   Public method CopyClones   -----------------------------------------
 void R3BTra::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
 	Int_t nEntries = cl1->GetEntriesFast();
-	cout << "-I- R3BTra: " << nEntries << " entries to add." << endl;
+	LOG(INFO) << "R3BTra: " << nEntries << " entries to add" << FairLogger::endl;
 	TClonesArray& clref = *cl2;
 	R3BTraPoint* oldpoint = NULL;
 	for (Int_t i=0; i<nEntries; i++) {
@@ -339,8 +333,7 @@ void R3BTra::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
 		new (clref[fPosIndex]) R3BTraPoint(*oldpoint);
 		fPosIndex++;
 	}
-	cout << " -I- R3BTra: " << cl2->GetEntriesFast() << " merged entries."
-		<< endl;
+	LOG(INFO) << "R3BTra: " << cl2->GetEntriesFast() << " merged entries"	<< FairLogger::endl;
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -352,9 +345,9 @@ R3BTraPoint* R3BTra::AddHit(Int_t trackID, Int_t detID, Int_t detCopyID,   // ad
 	TClonesArray& clref = *fTraCollection;
 	Int_t size = clref.GetEntriesFast();
 	if (fVerboseLevel>1) 
-		cout << "-I- R3BTra: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
-			<< ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
-			<< trackID << ", energy loss " << eLoss*1e06 << " keV" << endl;
+		LOG(INFO) << "R3BTra: Adding Point at (" << posIn.X() << ", " << posIn.Y()
+		<< ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
+		<< trackID << ", energy loss " << eLoss*1e06 << " keV" << FairLogger::endl;
 	return new(clref[size]) R3BTraPoint(trackID, detID, detCopyID, posIn, posOut,  // detCopyID added by Marc
 			momIn, momOut, time, length, eLoss);
 }

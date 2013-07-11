@@ -485,10 +485,13 @@ void r3ball(Int_t nEvents = 1,
   //-------Set visualisation flag to true------------------------------------
   run->SetStoreTraj(fVis);
   
+
+  FairLogger::GetLogger()->SetLogVerbosityLevel("LOW");
+
   
   // -----   Initialize simulation run   ------------------------------------
   run->Init();
-  
+
   
   // ------  Increase nb of step for CALO
   Int_t nSteps = -15000;

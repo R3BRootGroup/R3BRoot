@@ -87,68 +87,60 @@ R3BmTof::~R3BmTof() {
     delete fmTofCollection;
   }
 }
+
+
 // -------------------------------------------------------------------------
 void R3BmTof::Initialize()
 {
   FairDetector::Initialize();
-
-   cout << endl;
-   cout << "-I- R3BmTof: initialisation" << endl;
-   cout << "-I- R3BmTof: Sci. Vol. (McId) " << gMC->VolId("mTOFLog")<< endl;
-
+  
+  LOG(INFO) << "R3BmTof: initialisation" << FairLogger::endl;
+  LOG(DEBUG) << "R3BmTof: Sci. Vol. (McId) " << gMC->VolId("mTOFLog") << FairLogger::endl;
 }
 
 
-void R3BmTof::SetSpecialPhysicsCuts(){
-
-   cout << endl;
-
-   cout << "-I- R3BmTof: Adding customized Physics cut ... " << endl;
-
-   if (gGeoManager) {
-     TGeoMedium* pSi = gGeoManager->GetMedium("plasticFormTOF");
-     if ( pSi ) {
+void R3BmTof::SetSpecialPhysicsCuts()
+{
+  LOG(INFO) << "R3BmTof: Adding customized Physics cut ... " << FairLogger::endl;
+  
+  if (gGeoManager) {
+    TGeoMedium* pSi = gGeoManager->GetMedium("plasticFormTOF");
+    if ( pSi ) {
       // Setting processes for Si only
-         gMC->Gstpar(pSi->GetId()  ,"LOSS",3);
-         gMC->Gstpar(pSi->GetId()  ,"STRA",1.0);
-         gMC->Gstpar(pSi->GetId()  ,"PAIR",1.0);
-	 gMC->Gstpar(pSi->GetId()  ,"COMP",1.0);
-	 gMC->Gstpar(pSi->GetId()  ,"PHOT",1.0);
-         gMC->Gstpar(pSi->GetId()  ,"ANNI",1.0);
-	 gMC->Gstpar(pSi->GetId()  ,"BREM",1.0);
-	 gMC->Gstpar(pSi->GetId()  ,"HADR",1.0);
-         gMC->Gstpar(pSi->GetId()  ,"DRAY",1.0);
-         gMC->Gstpar(pSi->GetId()  ,"DCAY",1.0);
-         gMC->Gstpar(pSi->GetId()  ,"MULS",1.0);
-	 gMC->Gstpar(pSi->GetId()  ,"RAYL",1.0);
-
-	 // Setting Energy-CutOff for Si Only
-	Double_t cutE = fCutE; // GeV-> 1 keV
-
-	cout << "-I- R3bmTof Scintillator Medium Id " << pSi->GetId()
+      gMC->Gstpar(pSi->GetId()  ,"LOSS",3);
+      gMC->Gstpar(pSi->GetId()  ,"STRA",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"PAIR",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"COMP",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"PHOT",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"ANNI",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"BREM",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"HADR",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"DRAY",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"DCAY",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"MULS",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"RAYL",1.0);
+      
+      // Setting Energy-CutOff for Si Only
+      Double_t cutE = fCutE; // GeV-> 1 keV
+      
+      LOG(INFO) << "R3bmTof Scintillator Medium Id " << pSi->GetId()
 	    << " Energy Cut-Off : " << cutE
-	    << endl;
-        cout << endl;
-        //Si
-	gMC->Gstpar(pSi->GetId(),"CUTGAM",cutE);   /** gammas (GeV)*/
-        gMC->Gstpar(pSi->GetId(),"CUTELE",cutE);   /** electrons (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"CUTNEU",cutE);   /** neutral hadrons (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"CUTHAD",cutE);   /** charged hadrons (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"CUTMUO",cutE);   /** muons (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"BCUTE",cutE);    /** electron bremsstrahlung (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"BCUTM",cutE);    /** muon and hadron bremsstrahlung(GeV)*/
-	gMC->Gstpar(pSi->GetId(),"DCUTE",cutE);    /** delta-rays by electrons (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"DCUTM",cutE);    /** delta-rays by muons (GeV)*/
-        gMC->Gstpar(pSi->GetId(),"PPCUTM",-1.);   /** direct pair production by muons (GeV)*/
+	    << FairLogger::endl;
 
-     }
-
- } //!gGeoManager
-
-
+      //Si
+      gMC->Gstpar(pSi->GetId(),"CUTGAM",cutE);   /** gammas (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"CUTELE",cutE);   /** electrons (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"CUTNEU",cutE);   /** neutral hadrons (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"CUTHAD",cutE);   /** charged hadrons (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"CUTMUO",cutE);   /** muons (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"BCUTE",cutE);    /** electron bremsstrahlung (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"BCUTM",cutE);    /** muon and hadron bremsstrahlung(GeV)*/
+      gMC->Gstpar(pSi->GetId(),"DCUTE",cutE);    /** delta-rays by electrons (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"DCUTM",cutE);    /** delta-rays by muons (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"PPCUTM",-1.);   /** direct pair production by muons (GeV)*/
+    }
+  } //!gGeoManager
 }
-
-
 
 
 // -----   Public method ProcessHits  --------------------------------------
@@ -216,10 +208,10 @@ Bool_t R3BmTof::ProcessHits(FairVolume* vol) {
       }
 
       if ( fPosIn.Z() < 30. && newpos[2] > 30.02 ) {
-	cerr << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] 
-	     << " with safety = " << safety << endl;
-	cerr << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << endl;
-	cerr << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << endl;
+        LOG(ERROR) << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2]
+        << " with safety = " << safety << FairLogger::endl;
+        LOG(ERROR) << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << FairLogger::endl;
+        LOG(ERROR) << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << FairLogger::endl;
       }
 
       fPosOut.SetX(newpos[0]);
@@ -299,10 +291,10 @@ TClonesArray* R3BmTof::GetCollection(Int_t iColl) const {
 
 
 // -----   Public method Print   ----------------------------------------------
-void R3BmTof::Print() const {
+void R3BmTof::Print() const
+{
   Int_t nHits = fmTofCollection->GetEntriesFast();
-  cout << "-I- R3BmTof: " << nHits << " points registered in this event." 
-       << endl;
+  LOG(INFO) << "R3BmTof: " << nHits << " points registered in this event" << FairLogger::endl;
 }
 // ----------------------------------------------------------------------------
 
@@ -318,36 +310,40 @@ void R3BmTof::Reset() {
 
 
 // -----   Public method CopyClones   -----------------------------------------
-void R3BmTof::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
+void R3BmTof::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
+{
   Int_t nEntries = cl1->GetEntriesFast();
-  cout << "-I- R3BmTof: " << nEntries << " entries to add." << endl;
+  LOG(INFO) << "R3BmTof: " << nEntries << " entries to add" << FairLogger::endl;
   TClonesArray& clref = *cl2;
   R3BmTofPoint* oldpoint = NULL;
-   for (Int_t i=0; i<nEntries; i++) {
-   oldpoint = (R3BmTofPoint*) cl1->At(i);
+  for (Int_t i=0; i<nEntries; i++) {
+    oldpoint = (R3BmTofPoint*) cl1->At(i);
     Int_t index = oldpoint->GetTrackID() + offset;
     oldpoint->SetTrackID(index);
     new (clref[fPosIndex]) R3BmTofPoint(*oldpoint);
     fPosIndex++;
   }
-   cout << " -I- R3BmTof: " << cl2->GetEntriesFast() << " merged entries."
-       << endl;
+  LOG(INFO) << "R3BmTof: " << cl2->GetEntriesFast() << " merged entries" << FairLogger::endl;
 }
+
 
 // -----   Private method AddHit   --------------------------------------------
 R3BmTofPoint* R3BmTof::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
 			    TVector3 posOut, TVector3 momIn, 
 			    TVector3 momOut, Double_t time, 
-			    Double_t length, Double_t eLoss) {
+			    Double_t length, Double_t eLoss)
+{
   TClonesArray& clref = *fmTofCollection;
   Int_t size = clref.GetEntriesFast();
-  if (fVerboseLevel>1) 
-    cout << "-I- R3BmTof: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
-	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
-	 << trackID << ", energy loss " << eLoss*1e06 << " keV" << endl;
+  if (fVerboseLevel>1)
+    LOG(INFO) << "R3BmTof: Adding Point at (" << posIn.X() << ", " << posIn.Y()
+    << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
+    << trackID << ", energy loss " << eLoss*1e06 << " keV" << FairLogger::endl;
   return new(clref[size]) R3BmTofPoint(trackID, detID, posIn, posOut,
-				      momIn, momOut, time, length, eLoss);
+                                       momIn, momOut, time, length, eLoss);
 }
+
+
 // -----   Public method ConstructGeometry   ----------------------------------
 void R3BmTof::ConstructGeometry() {
 

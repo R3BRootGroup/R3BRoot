@@ -8,6 +8,7 @@
 
 #include "FairParSet.h"
 #include "FairRuntimeDb.h"
+#include "FairLogger.h"
 
 #include <iostream>
 
@@ -39,7 +40,7 @@ FairParSet* R3BFieldContFact::createContainer(FairContainer* container) {
 
 
   const char* name = container->GetName();
-  cout << "create R3BFieldPar container " << name << endl;
+  LOG(INFO) << "create R3BFieldPar container " << name << FairLogger::endl;
   FairParSet* set = NULL;
   if ( strcmp(name, "R3BFieldPar") == 0 ) 
     set = new R3BFieldPar( container->getConcatName().Data(),
