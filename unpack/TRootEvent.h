@@ -33,7 +33,7 @@ class TRootATOFhitEvent : public TNamed // ALADiN ToF-Wall event description at 
     int *adcb;  //[nhit]
     int *tdct;  //[nhit]
     int *tdcb;  //[nhit]
-    Bool_t Clear();
+    void Clear(Option_t* option="");
 
     //constructor 
     TRootATOFhitEvent() {
@@ -107,7 +107,7 @@ class TRootATOFtrackEvent : public TNamed // ALADiN ToF-Wall event description a
     int *adcbor;  //[ntrack]
     int *tdctor;  //[ntrack]
     int *tdcbor;  //[ntrack]
-    Bool_t Clear();
+    void Clear(Option_t* option="");
 
     //constructor 
     TRootATOFtrackEvent() {
@@ -253,7 +253,7 @@ class TRootATOFcalEvent : public TNamed // ALADiN ToF-Wall calibrated event desc
     int *imultihitoc; //[npart]
     float *multihitoc;  //[npart]
     int *cpoc; //[npart]
-    Bool_t Clear();
+    void Clear(Option_t* option="");
     //constructor 
     TRootATOFcalEvent() {
 	printf("TRootATOFcalEvent initialized - ALF\n");
@@ -355,7 +355,7 @@ class TRootATOFglobalEvent : public TNamed // ALADiN ToF-Wall calibrated global 
     int multHe;// multiplicity of Z=2
     int multIMF; // multiplicity of Z>2 
     float phirp; // azimuthal orientation of the reaction plane (corrected by a weighting function of particle phi's)
-    Bool_t Clear();
+    void Clear(Option_t* option="");
     //constructor 
     TRootATOFglobalEvent() {
 	printf("TRootATOFglobalEvent initialized - ALF\n");
@@ -381,7 +381,7 @@ class TRootCAMACEvent : public TNamed // start detector
     public: 
     int tdc1_sc,tdc2_sc,qdc1_sc,qdc2_sc; 
     float tstart_sc; // start time (ns) 
-    Bool_t Clear(); 
+    void Clear(Option_t* option="");
     //constructor   
     TRootCAMACEvent() {  
 	printf("TRootCAMACEvent initialized - ALF\n");  
@@ -411,7 +411,7 @@ class TRootINFOEvent : public TNamed
     int mbstsm; // 2nd word of the MBS time stamp 
     int mbstsh; // 3rd word of the MBS time stamp
     
-    Bool_t Clear(); 
+    void Clear(Option_t* option="");
     //constructor  
     TRootINFOEvent() {    
 	printf("TRootINFOEvent initialized - ALF\n");

@@ -98,10 +98,10 @@ void R3BTraFraDigitizer::Exec(Option_t* opt) {
 //     if(eventNoTra/1000. == (int)eventNoTra/1000.) cout<<"Event #: "<<eventNoTra-1<<endl;
      
      Int_t nentriesTra = fTraFraPoints->GetEntries();
-     Int_t nentries = fMCTrack->GetEntries();
+     //Int_t nentries = fMCTrack->GetEntries();
      
      Int_t TrackIdTra=0;
-     Int_t TrackId=0;
+     //Int_t TrackId=0;
      
 
      Double_t ss03_se_f;
@@ -139,7 +139,7 @@ void R3BTraFraDigitizer::Exec(Option_t* opt) {
      
      R3BTraPoint *TraFra_obj = (R3BTraPoint*) fTraFraPoints->At(l);
 
-     Int_t DetID = TraFra_obj->GetDetectorID();
+     //Int_t DetID = TraFra_obj->GetDetectorID();
      Double_t fX_In = TraFra_obj->GetXIn();
      Double_t fY_In = TraFra_obj->GetYIn();
      Double_t fZ_In = TraFra_obj->GetZIn();

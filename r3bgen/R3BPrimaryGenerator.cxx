@@ -20,11 +20,11 @@ void R3BPrimaryGenerator::AddTrack(Int_t pdgid, Double_t px, Double_t py,
 				   Double_t vz, Int_t parent,Bool_t wanttracking,Double_t e) {
   static Int_t iprim=0;
   Double_t mass; 
-  Int_t warn=0;
+  //Int_t warn=0;
   iprim++;
   cout<<" primary# "<<iprim<<endl;
-  Int_t Z,A,pdg1;
-  Bool_t flag;
+  //Int_t Z,A,pdg1;
+  //Bool_t flag;
 
     // ---> Add event vertex to track vertex
     vx += fVertex.X();
@@ -236,7 +236,7 @@ Bool_t R3BPrimaryGenerator::ExtendIon(Int_t pdgid){
 void R3BPrimaryGenerator::ExtendIon2(Int_t pdgid){
     Int_t pdg1,pdg2;
     Int_t Z,A;
-    Double_t lifetime;
+    //Double_t lifetime;
     char* pname;
     Double_t amu=0.931494028;
 

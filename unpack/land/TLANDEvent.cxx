@@ -221,7 +221,7 @@ int TLANDEvent::ProcessCurrentEventMBS(int *pl_se_dat, int l_evt_siz)  //this sh
   }   //while {....}
 
   //not convert l_tim to real l_tim (counter and 17th ch)
-  for(int l_loopaddrs=0; l_loopaddrs<30; l_loopaddrs++) {
+/*  for(int l_loopaddrs=0; l_loopaddrs<30; l_loopaddrs++) {
    for(int l_loopchs=0; l_loopchs<16;l_loopchs++) {
     int l_clocktime = l_17[l_loopaddrs][l_loopchs]*25;
       // cout << "Clock time gives " << l_clocktime << endl;
@@ -231,7 +231,7 @@ int TLANDEvent::ProcessCurrentEventMBS(int *pl_se_dat, int l_evt_siz)  //this sh
      double l_nstime=l_tim[l_loopaddrs][l_loopchs]*(0.01/25);
      //l_tim[l_loopaddrs][l_loopchs]=(l_nstime+l_clocktime);
     } 
-   }
+   }*/
 
   int ftotfired=l_mult;
 

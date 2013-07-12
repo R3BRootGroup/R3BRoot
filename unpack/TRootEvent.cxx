@@ -4,20 +4,18 @@
 #include <iostream>
 #include <stdio.h>
 using namespace std;
-Bool_t TRootATOFhitEvent::Clear()
+void TRootATOFhitEvent::Clear(Option_t* option)
 {
     this->nhit=0;
     this->ntdc=0;
     this->nadc=0;
     this->ndrop=0;
-    return kTRUE;
 }
-Bool_t TRootATOFtrackEvent::Clear()
+void TRootATOFtrackEvent::Clear(Option_t* option)
 {
     this->ntrack=0;
-    return kTRUE;
 }
-Bool_t TRootATOFcalEvent::Clear() // 09/2012
+void TRootATOFcalEvent::Clear(Option_t* option) // 09/2012
 {
     this->npart=0;
     this->nmultihit=-100;
@@ -29,9 +27,8 @@ Bool_t TRootATOFcalEvent::Clear() // 09/2012
     this->multHe=-100;
     this->multIMF=-100;
     this->phirp=-1000;
-    return kTRUE;
 }
-Bool_t TRootATOFglobalEvent::Clear() // 02/2013
+void TRootATOFglobalEvent::Clear(Option_t* option) // 02/2013
 {
     this->npart=0;
     this->nmultihit=-100;
@@ -43,9 +40,8 @@ Bool_t TRootATOFglobalEvent::Clear() // 02/2013
     this->multHe=-100;
     this->multIMF=-100;
     this->phirp=-1000;
-    return kTRUE;
 }
-Bool_t TRootINFOEvent::Clear() // 09/2012
+void TRootINFOEvent::Clear(Option_t* option) // 09/2012
 {
     this->trigpat=0; 
     this->run=0; 
@@ -57,16 +53,14 @@ Bool_t TRootINFOEvent::Clear() // 09/2012
     this->mbstsh=0;
     this->mbstsm=0;
     this->mbstss=0;
-    return kTRUE;
 }
-Bool_t TRootCAMACEvent::Clear() // 09/2012
+void TRootCAMACEvent::Clear(Option_t* option) // 09/2012
 {
     tdc1_sc=0; 
     tdc2_sc=0; 
     qdc1_sc=0; 
     qdc2_sc=0; 
     tstart_sc=0.; 
-    return kTRUE;
 }
 
 // Clear functions should be written here for the other detectors - ALF, 11/2012

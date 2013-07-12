@@ -211,7 +211,7 @@ void R3BDch::RecordFullMcHit(){
  // layer
 
     // DCH Geometry Hiearchy
-     Int_t medId = gMC->CurrentMedium();
+     //Int_t medId = gMC->CurrentMedium();
      Int_t copyNo    = -1;
      Int_t ModuleNr0 = -1;
      Int_t ModuleNr1 = -1;
@@ -275,7 +275,7 @@ void R3BDch::RecordFullMcHit(){
 void R3BDch::RecordPartialMcHit(){
 
     // DCH Geometry Hiearchy
-     Int_t medId = gMC->CurrentMedium();
+     //Int_t medId = gMC->CurrentMedium();
      Int_t copyNo    = -1;
      Int_t ModuleNr0 = -1;
      Int_t ModuleNr1 = -1;
@@ -591,7 +591,7 @@ TClonesArray* R3BDch::GetCollection(Int_t iColl) const {
 
 
 // -----   Public method Print   ----------------------------------------------
-void R3BDch::Print() const
+void R3BDch::Print(Option_t* option) const
 {
   Int_t nHits = fDchCollection->GetEntriesFast();
   LOG(INFO) << "R3BDch: " << nHits << " points registered in this event" << FairLogger::endl;
@@ -698,12 +698,12 @@ void R3BDch::ConstructGeometryOld()
 
 void R3BDch::ConstructGeometryJustyna() {
  // out-of-file geometry definition
-   Double_t dx,dy,dz;
-   Double_t theta, phi;
+  //Double_t dx,dy,dz;
+   Double_t /*theta,*/ phi;
    Double_t a;
-   Double_t thx, phx, thy, phy, thz, phz;
+   //Double_t thx, phx, thy, phy, thz, phz;
    Double_t alpha;
-   Double_t z, density, radl, absl, w;
+   Double_t z, density, /*radl, absl,*/ w;
    Int_t nel, numed;
 
    Int_t matIndex = gGeoManager->GetListOfMaterials()->GetEntries();

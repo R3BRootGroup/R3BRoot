@@ -21,7 +21,7 @@ class R3BLandDigiPar : public FairParGenericSet
 	void putParams(FairParamList* list);
 	Bool_t getParams(FairParamList* list);
 
-	void Print();
+	void Print(Option_t* option="") const;
 	/** Accessor functions **/
 	const Int_t GetMaxPaddle() { return  nMaxPaddle;}
 	const Int_t GetMaxPlane() { return  nMaxPlane;}

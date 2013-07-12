@@ -31,8 +31,6 @@ link_directories( ${LINK_DIRECTORIES})
 set(SRCS
 #Put here your sourcefiles
 R3BXBall.cxx  
-R3BXBallv0.cxx   
-R3BXBallv1.cxx   
 R3BGeoXBall.cxx    
 R3BGeoXBallPar.cxx    
 R3BXBallContFact.cxx 

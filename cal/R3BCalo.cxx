@@ -618,7 +618,7 @@ TClonesArray* R3BCalo::GetCollection(Int_t iColl) const
 
 
 // -----   Public method Print   ----------------------------------------------
-void R3BCalo::Print() const
+void R3BCalo::Print(Option_t* option) const
 {
   Int_t nHits = fCaloCollection->GetEntriesFast();
   LOG(INFO) << "R3BCalo: " << nHits << " points registered in this event" << FairLogger::endl;

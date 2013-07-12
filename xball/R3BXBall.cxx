@@ -53,15 +53,6 @@
 #include "Math/Rotation3D.h"
 #include "Math/Point3D.h"
 
-using std::cout;
-using std::cerr;
-using std::endl;
-
-#define XB_CRYSTAL(no,type,theta,phi,psi,n1,n2,n3,n4,n5,n6) { no, type, theta, phi, psi },
-#define XB_CRYSTAL_MOD(nr,mod,delta) { nr, mod, delta },
-
-#define XB_WRAPPING(no,type,theta,phi,psi,n1,n2,n3,n4,n5,n6) { no, type, theta, phi, psi },
-#define XB_WRAPPING_MOD(nr,mod,delta) { nr, mod, delta },
 
 
 // -----   Default constructor   -------------------------------------------
@@ -219,13 +210,6 @@ Bool_t R3BXBall::ProcessHits(FairVolume* vol) {
         newpos[i] = oldpos[i] - (3*safety*olddirection[i]);
       }
 
-      if ( fPosIn.Z() < 30. && newpos[2] > 30.02 ) {
-        LOG(ERROR) << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2]
-        << " with safety = " << safety << FairLogger::endl;
-        LOG(ERROR) << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << FairLogger::endl;
-        LOG(ERROR) << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << FairLogger::endl;
-      }
-
       fPosOut.SetX(newpos[0]);
       fPosOut.SetY(newpos[1]);
       fPosOut.SetZ(newpos[2]);
@@ -274,33 +258,22 @@ Bool_t R3BXBall::ProcessHits(FairVolume* vol) {
   }
   return kTRUE;
 }
+
+
 // ----------------------------------------------------------------------------
 /*
-void R3BXBall::SaveGeoParams(){
-  cout << " -I Save STS geo params " << endl;
-
-  TFolder *mf = (TFolder*) gDirectory->FindObjectAny("cbmroot");
-  cout << " mf: " << mf << endl;
-  TFolder *stsf = NULL;
-  if (mf ) stsf = (TFolder*) mf->FindObjectAny(GetName());
-  cout << " stsf: " << stsf << endl;
-  if (stsf) stsf->Add( flGeoPar0 ) ;
-  FairRootManager::Instance()->WriteFolder();
-  mf->Write("cbmroot",TObject::kWriteDelete);
+void R3BXBall::SaveGeoParams()
+{
 }
 */
 
 
 // -----   Public method EndOfEvent   -----------------------------------------
-void R3BXBall::BeginEvent() {
-
-//  if (! kGeoSaved ) {
-//    SaveGeoParams();
-//  cout << "-I STS geometry parameters saved " << endl;
-//  kGeoSaved = kTRUE;
-//  }
-
+void R3BXBall::BeginEvent()
+{
 }
+
+
 // -----   Public method EndOfEvent   -----------------------------------------
 void R3BXBall::EndOfEvent() {
 
@@ -355,7 +328,8 @@ TClonesArray* R3BXBall::GetCollection(Int_t iColl) const {
 
 
 // -----   Public method Print   ----------------------------------------------
-void R3BXBall::Print() const {
+void R3BXBall::Print(Option_t* option) const
+{
   if(fCollectionOption == 0) { 
     Int_t nHits = fXBallCollection->GetEntriesFast();
     LOG(INFO) << "R3BXBall: " << nHits << " points registered in this event" << FairLogger::endl;
@@ -456,7 +430,7 @@ void R3BXBall::ConstructGeometry()
     LOG(INFO) << "Constructing Crystal Ball geometry from ROOT file " << fileName.Data() << FairLogger::endl;
     ConstructRootGeometry();
   } else {
-    LOG(FATAL) << "Geometry file is not specified" << FairLogger::endl;
+    LOG(FATAL) << "Crystal Ball geometry file is not specified" << FairLogger::endl;
   }
 }
 

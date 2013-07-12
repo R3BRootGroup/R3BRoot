@@ -38,7 +38,7 @@ Bool_t R3BLandDigiPar::getParams(FairParamList* list)
 }
 
 
-void R3BLandDigiPar::Print()
+void R3BLandDigiPar::Print(Option_t* option) const
 {
     std::cout<<"-I- Land Digi Parameters:"<<std::endl;
     std::cout<<"   Max Paddle   = "<<nMaxPaddle<<std::endl;
