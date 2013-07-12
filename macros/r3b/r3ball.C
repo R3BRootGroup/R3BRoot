@@ -109,7 +109,6 @@ void r3ball(Int_t nEvents = 1,
   cave->SetGeometryFileName("r3b_cave.geo");
   run->AddModule(cave);
   
-  
   //R3B Target definition
   if (fDetList.FindObject("TARGET") ) {
     R3BModule* target= new R3BTarget(Target.Data());
@@ -117,14 +116,12 @@ void r3ball(Int_t nEvents = 1,
     run->AddModule(target);
   }
   
-  
   //R3B SiTracker Cooling definition
   if (fDetList.FindObject("VACVESSELCOOL") ) {
     R3BModule* vesselcool= new R3BVacVesselCool(Target.Data());
     vesselcool->SetGeometryFileName("vacvessel_v13a.geo.root");
     run->AddModule(vesselcool);
   }
-  
   
   //R3B Magnet definition
   if (fDetList.FindObject("ALADIN") ) {
@@ -142,7 +139,6 @@ void r3ball(Int_t nEvents = 1,
     run->AddModule(mag);
   }
   
-  
   if (fDetList.FindObject("CRYSTALBALL") ) {
     //R3B Crystal Calorimeter
     R3BDetector* xball = new R3BXBall("XBall", kTRUE);
@@ -150,25 +146,13 @@ void r3ball(Int_t nEvents = 1,
     run->AddModule(xball);
   }
   
-  
   if (fDetList.FindObject("CALIFA") ) {
     // CALIFA Calorimeter
     R3BDetector* calo = new R3BCalo("Califa", kTRUE);
-    // Global position of the Module
-    phi   =  0.0; // (deg)
-    theta =  0.0; // (deg)
-    psi   =  0.0; // (deg)
-    // Rotation in Ref. Frame.
-    thetaX =  0.0; // (deg)
-    thetaY =  0.0; // (deg)
-    thetaZ =  0.0; // (deg)
-    // Global translation in Lab
-    tx    =  0.0; // (cm)
-    ty    =  0.0; // (cm)
-    tz    =  0.0; // (cm)
-    //calo->SetRotAnglesEuler(phi,theta,psi);
-    calo->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-    calo->SetTranslation(tx,ty,tz);
+    ((R3BCalo *)calo)->SelectGeometryVersion(10);
+    //Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
+    ((R3BCalo *)calo)->SetNonUniformity(1.0);
+    calo->SetGeometryFileName("califa_v13_811.geo.root");
     run->AddModule(calo);
   }
   
@@ -370,7 +354,6 @@ void r3ball(Int_t nEvents = 1,
     //((ELILuMon*) lumon)->SetEnergyCutOff(fCutOffSci);
     run->AddModule(lumon);
   }
-  
   
   
   // -----   Create R3B  magnetic field ----------------------------------------

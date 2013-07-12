@@ -112,19 +112,8 @@ class R3BCalo : public R3BDetector
    **/
   virtual void ConstructGeometry();
 	
-	
-	/** Public method ConstructOldGeometry
-	 **
-	 ** Defines the CALIFA v5 geometry (from a R3BSim translation, never tested)
-	 **/
-  void ConstructOldGeometry();
 
-	
-	/** Public method ConstructUserDefinedGeometry
-	 **
-	 ** Defines a CALIFA geometry defined by the user from the perl scripts output
-	 **/
-  void ConstructUserDefinedGeometry();
+	virtual Bool_t CheckIfSensitive(std::string name);
 	
 	
 	/** Public method SelectGeometryVersion

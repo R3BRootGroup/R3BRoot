@@ -173,45 +173,13 @@ void r3ball_Protons_50MeV( Int_t nEvents = 1000,
   }
 
   if (fDetList.FindObject("CALIFA") ) {
-      // CALIFA Calorimeter
-      R3BDetector* calo = new R3BCalo("Califa", kTRUE);
-	  //Selecting the geometry
-	  // 0- CALIFA 5.0, including BARREL and ENDCAP.
-	  // 1- CALIFA 7.05, only BARREL
-	  // 2- CALIFA 7.07, only BARREL
-	  // 3- CALIFA 7.09, only BARREL (ongoing work)
-	  // 4- CALIFA 7.17, only ENDCAP (in CsI[Tl])  or phoswich endcap IEM-CSIC Madrid (LaBr - LaCl)(CLF717_Geometry_PhoswichEndcap_1.geo & ""2.geo ) J. Sanchez del Rio (24-10-2012)
-	  // 5- CALIFA 7.07+7.17, Phoswich endcap IEM Madrid + Barrel CLF717 or CLF811  (CLF717_Geometry_PhoswichEndcap_3.geo & ""_4.geo) J. Sanchez del Rio (24-10-2012)
-	  // 6- CALIFA 7.09+7.17, (ongoing work)  (CLF717_Geometry_PhoswichEndcap_5.geo)
-	  // 10- CALIFA 8.00, (ongoing work) (Barrel (CLF811Califa.geo) or CLF811_Geometry_PhoswichEndcap_5.geo=CLF811Califa.geo+CLF717_Geometry_PhoswichEndcap_2.geo))
-	  // ...
-
-
-
-	 //((R3BCalo *)calo)->SelectGeometryVersion(6);
-	 
-	 ((R3BCalo *)calo)->SelectGeometryVersion(10);
-	// ((R3BCalo *)calo)->SelectGeometryVersion(5);
-
- 	//((R3BCalo *)calo)->SelectGeometryVersion(6);
-	  //Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
-	  ((R3BCalo *)calo)->SetNonUniformity(1.0);
-      // Global position of the Module
-      phi   =  0.0; // (deg)
-      theta =  0.0; // (deg)
-      psi   =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx    =  0.0; // (cm)
-      ty    =  0.0; // (cm)
-      tz    =  0.0; // (cm)
-      //calo->SetRotAnglesEuler(phi,theta,psi);
-      calo->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      calo->SetTranslation(tx,ty,tz);
-      run->AddModule(calo);
+    // CALIFA Calorimeter
+    R3BDetector* calo = new R3BCalo("Califa", kTRUE);
+    ((R3BCalo *)calo)->SelectGeometryVersion(10);
+    //Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
+    ((R3BCalo *)calo)->SetNonUniformity(1.0);
+    calo->SetGeometryFileName("califa_v13_811.geo.root");
+    run->AddModule(calo);
   }
 
   // Tracker
