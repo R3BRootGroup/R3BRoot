@@ -30,6 +30,8 @@ SET( HEADERS ${HEADERS} FairDetectorList.h )
 
 set(LINKDEF  MCStackLinkDef.h)
 set(LIBRARY_NAME MCStack)
+set(DEPENDENCIES
+    Base FairTools)
 
 GENERATE_LIBRARY()
 

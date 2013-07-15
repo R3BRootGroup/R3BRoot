@@ -32,6 +32,8 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
 set(LINKDEF FieldLinkDef.h)
 set(LIBRARY_NAME Field)
+set(DEPENDENCIES
+    Base)
 
 GENERATE_LIBRARY()
 

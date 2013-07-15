@@ -76,6 +76,8 @@ SET(HEADERS ${HEADERS} R3BDetectorList.h )
 
 set(LINKDEF  R3BDataLinkDef.h)
 set(LIBRARY_NAME R3BData)
+set(DEPENDENCIES
+    Base FairTools)
 
 GENERATE_LIBRARY()
 
