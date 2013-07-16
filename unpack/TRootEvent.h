@@ -815,6 +815,7 @@ class TRootDefine
    flandevtstaout=new TRootLANDEventStaOutput();
   }
 //  TRootDefine() {ftr=0;frootW=0;fchievt=0;flandevt=0;fmballevt=0;}
+  virtual ~TRootDefine() {}
   void Open(const char *name);
   void Close();
   TTree *GetTree() {return ftr;}
