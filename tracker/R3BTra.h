@@ -48,6 +48,9 @@ class R3BTra : public R3BDetector
    *@param vol  Pointer to the active volume
    **/
   virtual Bool_t ProcessHits(FairVolume* vol = 0);
+  
+  
+  virtual Bool_t CheckIfSensitive(std::string name);
 
 
   /** Virtual method BeginEvent
@@ -83,7 +86,7 @@ class R3BTra : public R3BDetector
    **
    ** Screen output of hit collection.
    **/
-  virtual void Print() const;
+  virtual void Print(Option_t *option="") const;
 
 
   /** Virtual method Reset

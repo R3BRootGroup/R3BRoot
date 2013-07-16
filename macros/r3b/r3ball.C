@@ -156,28 +156,13 @@ void r3ball(Int_t nEvents = 1,
     run->AddModule(calo);
   }
   
-  
   // Tracker
   if (fDetList.FindObject("TRACKER")  ) {
     R3BDetector* tra = new R3BTra("Tracker", kTRUE);
-    // Global position of the Module
-    phi   =  0.0; // (deg)
-    theta =  0.0; // (deg)
-    psi   =  0.0; // (deg)
-    // Rotation in Ref. Frame.
-    thetaX =  0.0; // (deg)
-    thetaY =  0.0; // (deg)
-    thetaZ =  0.0; // (deg)
-    // Global translation in Lab
-    tx    =  0.0; // (cm)
-    ty    =  0.0; // (cm)
-    tz    =  0.0; // (cm)
-    //tra->SetRotAnglesEuler(phi,theta,psi);
-    tra->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-    tra->SetTranslation(tx,ty,tz);
     // User defined Energy CutOff
     Double_t fCutOffSi = 1.0e-06;  // Cut-Off -> 10KeV only in Si
     ((R3BTra*) tra)->SetEnergyCutOff(fCutOffSi);
+    tra->SetGeometryFileName("tra_v13vac.geo.root");
     run->AddModule(tra);
   }
   
