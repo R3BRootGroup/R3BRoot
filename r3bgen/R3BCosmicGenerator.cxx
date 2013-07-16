@@ -92,7 +92,7 @@ Double32_t R3BCosmicGenerator::E_Cosmic()
 //    ------------------------------------------------------------------
 
   Int_t N_PNT=14;
-  Int_t i_low, i_RN;
+  Int_t i_low = 0, i_RN;
   Int_t i,k;
 
   Double32_t SUM_INT;
@@ -118,7 +118,7 @@ Double32_t R3BCosmicGenerator::E_Cosmic()
     //    cout << " The energy threshold must be lower than 100 GeV " << endl;
     return 0;
     
-  skip1:  i_low=i_low;
+  skip1:  /*i_low=i_low*/;
 
     if(i_low==0){
       fE_Threshold=E_PNT[0];

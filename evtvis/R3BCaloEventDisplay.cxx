@@ -49,15 +49,15 @@ using std::endl;
 // -----   Default constructor   -------------------------------------------
 R3BCaloEventDisplay::R3BCaloEventDisplay() : FairTask("R3BCaloEventDisplay",0),
   fEventManager(NULL),
-  kSimulation(false),
   fDataHist(NULL),
   fCalo3d(NULL),
   fCalo2d(NULL),
-  slotLeftTop(NULL),slotRightTop(NULL),slotLeftBottom(NULL),slotRightBottom(NULL),
-  viewerLeftTop(NULL),viewerRightTop(NULL),viewerLeftBottom(NULL),viewerRightBottom(NULL),
-  sceneLeftTop(NULL),sceneRightTop(NULL),sceneLeftBottom(NULL),sceneRightBottom(NULL),
-  fLego(NULL),legoScene(NULL),legoViewer(NULL),legoSlot(NULL),
-  fProjManager1(NULL),fProjManager2(NULL) 
+  fLego(NULL),
+  slotLeftTop(NULL),slotLeftBottom(NULL),slotRightTop(NULL),slotRightBottom(NULL),
+  viewerLeftTop(NULL),sceneLeftTop(NULL),viewerRightTop(NULL),sceneRightTop(NULL),
+  viewerLeftBottom(NULL),sceneLeftBottom(NULL),viewerRightBottom(NULL),sceneRightBottom(NULL),
+  legoSlot(NULL),legoScene(NULL),legoViewer(NULL),
+  fProjManager1(NULL),fProjManager2(NULL),kSimulation(false)
 {
 }
 // -----------------------------------------------------------------------
@@ -65,15 +65,15 @@ R3BCaloEventDisplay::R3BCaloEventDisplay() : FairTask("R3BCaloEventDisplay",0),
 // -----   Standard constructor   -------------------------------------------
 R3BCaloEventDisplay::R3BCaloEventDisplay(const char* name, Int_t iVerbose) : FairTask(name, iVerbose),
   fEventManager(NULL),
-  kSimulation(false),
   fDataHist(NULL),
   fCalo3d(NULL),
   fCalo2d(NULL),
-  slotLeftTop(NULL),slotRightTop(NULL),slotLeftBottom(NULL),slotRightBottom(NULL),
-  viewerLeftTop(NULL),viewerRightTop(NULL),viewerLeftBottom(NULL),viewerRightBottom(NULL),
-  sceneLeftTop(NULL),sceneRightTop(NULL),sceneLeftBottom(NULL),sceneRightBottom(NULL),
-  fLego(NULL),legoScene(NULL),legoViewer(NULL),legoSlot(NULL),
-  fProjManager1(NULL),fProjManager2(NULL) 
+  fLego(NULL),
+  slotLeftTop(NULL),slotLeftBottom(NULL),slotRightTop(NULL),slotRightBottom(NULL),
+  viewerLeftTop(NULL),sceneLeftTop(NULL),viewerRightTop(NULL),sceneRightTop(NULL),
+  viewerLeftBottom(NULL),sceneLeftBottom(NULL),viewerRightBottom(NULL),sceneRightBottom(NULL),
+  legoSlot(NULL),legoScene(NULL),legoViewer(NULL),
+  fProjManager1(NULL),fProjManager2(NULL),kSimulation(false)
 {
 }
 // -----------------------------------------------------------------------
@@ -133,10 +133,10 @@ void R3BCaloEventDisplay::Exec(Option_t* opt)
     Int_t binx, biny;
     Double_t theta=0., phi=0., rho=0., eta=0.;
 
-    TAxis *ax = hcalo->GetXaxis();
-    TAxis *ay = hcalo->GetYaxis();
-    Int_t nx = ax->GetNbins();
-    Int_t ny = ay->GetNbins();
+//    TAxis *ax = hcalo->GetXaxis();
+//    TAxis *ay = hcalo->GetYaxis();
+//    Int_t nx = ax->GetNbins();
+//    Int_t ny = ay->GetNbins();
 
     // Loop in Crystal Hits
     for (Int_t i=0; i<crystalHits; i++) {
@@ -360,7 +360,7 @@ void R3BCaloEventDisplay::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuth
 	Int_t alveolusCopy      = 0;
 	Int_t crystalInAlveolus = 0;
 
-	TGeoVolume *pAWorld  =  gGeoManager->GetTopVolume();
+//	TGeoVolume *pAWorld  =  gGeoManager->GetTopVolume();
 
 	// crystalType = alveolus type (from 1 to 17)   [Basically the alveolus number]
 	// crystalCopy = alveolus copy * 4 + crystals copy +1 (from 1 to 128)  [Not exactly azimuthal]

@@ -43,32 +43,32 @@ using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 R3BCaloHitEventDisplay::R3BCaloHitEventDisplay() : FairTask("R3BCaloHitEventDisplay",0),
-  fEventManager(NULL),
-  kSimulation(false),
-  fDataHist(NULL),
-  fCalo3d(NULL),
-  fCalo2d(NULL),
-  slotLeftTop(NULL),slotRightTop(NULL),slotLeftBottom(NULL),slotRightBottom(NULL),
-  viewerLeftTop(NULL),viewerRightTop(NULL),viewerLeftBottom(NULL),viewerRightBottom(NULL),
-  sceneLeftTop(NULL),sceneRightTop(NULL),sceneLeftBottom(NULL),sceneRightBottom(NULL),
-  fLego(NULL),legoScene(NULL),legoViewer(NULL),legoSlot(NULL),
-  fProjManager1(NULL),fProjManager2(NULL) 
+fEventManager(NULL),
+fDataHist(NULL),
+fCalo3d(NULL),
+fCalo2d(NULL),
+fLego(NULL),
+slotLeftTop(NULL),slotLeftBottom(NULL),slotRightTop(NULL),slotRightBottom(NULL),
+viewerLeftTop(NULL),sceneLeftTop(NULL),viewerRightTop(NULL),sceneRightTop(NULL),
+viewerLeftBottom(NULL),sceneLeftBottom(NULL),viewerRightBottom(NULL),sceneRightBottom(NULL),
+legoSlot(NULL),legoScene(NULL),legoViewer(NULL),
+fProjManager1(NULL),fProjManager2(NULL),kSimulation(false)
 {
 }
 // -----------------------------------------------------------------------
 
 // -----   Standard constructor   -------------------------------------------
 R3BCaloHitEventDisplay::R3BCaloHitEventDisplay(const char* name, Int_t iVerbose) : FairTask(name, iVerbose),
-  fEventManager(NULL),
-  kSimulation(false),
-  fDataHist(NULL),
-  fCalo3d(NULL),
-  fCalo2d(NULL),
-  slotLeftTop(NULL),slotRightTop(NULL),slotLeftBottom(NULL),slotRightBottom(NULL),
-  viewerLeftTop(NULL),viewerRightTop(NULL),viewerLeftBottom(NULL),viewerRightBottom(NULL),
-  sceneLeftTop(NULL),sceneRightTop(NULL),sceneLeftBottom(NULL),sceneRightBottom(NULL),
-  fLego(NULL),legoScene(NULL),legoViewer(NULL),legoSlot(NULL),
-  fProjManager1(NULL),fProjManager2(NULL) 
+fEventManager(NULL),
+fDataHist(NULL),
+fCalo3d(NULL),
+fCalo2d(NULL),
+fLego(NULL),
+slotLeftTop(NULL),slotLeftBottom(NULL),slotRightTop(NULL),slotRightBottom(NULL),
+viewerLeftTop(NULL),sceneLeftTop(NULL),viewerRightTop(NULL),sceneRightTop(NULL),
+viewerLeftBottom(NULL),sceneLeftBottom(NULL),viewerRightBottom(NULL),sceneRightBottom(NULL),
+legoSlot(NULL),legoScene(NULL),legoViewer(NULL),
+fProjManager1(NULL),fProjManager2(NULL),kSimulation(false)
 {
 }
 // -----------------------------------------------------------------------
@@ -128,10 +128,10 @@ void R3BCaloHitEventDisplay::Exec(Option_t* opt)
     Int_t binx, biny;
     Double_t theta, phi, eta;
 
-    TAxis *ax = hcalohit->GetXaxis();
-    TAxis *ay = hcalohit->GetYaxis();
-    Int_t nx = ax->GetNbins();
-    Int_t ny = ay->GetNbins();
+//    TAxis *ax = hcalohit->GetXaxis();
+//    TAxis *ay = hcalohit->GetYaxis();
+//    Int_t nx = ax->GetNbins();
+//    Int_t ny = ay->GetNbins();
 
     // Loop in Calo Hits
     for (Int_t i=0; i<caloHits; i++) {

@@ -61,7 +61,7 @@ Bool_t R3BAsciiUrQMDGen::ReadEvent(FairPrimaryGenerator* primGen){
   
  
   //Event variables
-  Int_t nruns, nt; 
+  Int_t nt;//, nruns;
   Double_t dt, wtime;
   Double_t Ep, b;
   Int_t eventID, at,zt,ap,zp,newpart;
@@ -92,13 +92,13 @@ Bool_t R3BAsciiUrQMDGen::ReadEvent(FairPrimaryGenerator* primGen){
   Double_t x_c[500],y_c[500],z_c[500];
   Double_t px_c[500],py_c[500],pz_c[500];
   Int_t nn[500], nz[500],npi[500];
-  Int_t pdgID[500],g3ID[500];
+  Int_t pdgID[500];//,g3ID[500];
   Double_t pt_c,e_c,Y_c;
   Double_t Ylab_c, elab_c,et_c,pzlab_c;
   Double_t p4tot[4][500];
-  Int_t irtyp;
+//  Int_t irtyp;
   char* name_c[500];
-  Float_t mass_c[500],chrg_c[500],hlife_c[500];
+  Float_t mass_c[500];//,chrg_c[500],hlife_c[500];
   
 
   //cluster counters

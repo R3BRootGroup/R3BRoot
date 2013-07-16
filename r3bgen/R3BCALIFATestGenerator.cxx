@@ -21,8 +21,8 @@ fX1(0),fY1(0), fZ1(0),fX2(0),fY2(0),fZ2(0),
 fEtaRangeIsSet(0),fYRangeIsSet(0),fThetaRangeIsSet(0),
 fCosThetaIsSet(0),fPtRangeIsSet(0),fPRangeIsSet(0),
 fPointVtxIsSet(0),fBoxVtxIsSet(0),fDebug(0),
-fLorentzBoostIsSet(0),fNuclearDecayChainIsSet(0), 
-fGammasDefinedInNuclearDecay(0), fBetaOfEmittingFragment(0), fGammaFactor(1)
+fGammasDefinedInNuclearDecay(0), fBetaOfEmittingFragment(0),
+fGammaFactor(1), fLorentzBoostIsSet(0), fNuclearDecayChainIsSet(0)
 {
   // Default constructor
 }
@@ -36,8 +36,8 @@ fX1(0),fY1(0), fZ1(0),fX2(0),fY2(0),fZ2(0),
 fEtaRangeIsSet(0), fYRangeIsSet(0),fThetaRangeIsSet(0),
 fCosThetaIsSet(0), fPtRangeIsSet(0), fPRangeIsSet(0),
 fPointVtxIsSet(0),fBoxVtxIsSet(0),fDebug(0),
-fLorentzBoostIsSet(0),fNuclearDecayChainIsSet(0), 
-fGammasDefinedInNuclearDecay(0), fBetaOfEmittingFragment(0), fGammaFactor(1)
+fGammasDefinedInNuclearDecay(0), fBetaOfEmittingFragment(0),
+fGammaFactor(1), fLorentzBoostIsSet(0), fNuclearDecayChainIsSet(0)
 {
   // Constructor. Set default kinematics limits
   SetPhiRange  ();
