@@ -67,36 +67,8 @@ void eliall(Int_t nEvents = 1,
   TStopwatch timer;
   timer.Start();
   // ------------------------------------------------------------------------
-
-  // ----  Load libraries   -------------------------------------------------
-  gROOT->LoadMacro("$VMCWORKDIR/gconfig/basiclibs.C");
-  basiclibs();
-
-  gSystem->Load("libGenVector");
-
-  gSystem->Load("libGeoBase");
-  gSystem->Load("libParBase");
-  gSystem->Load("libBase");
-  gSystem->Load("libMCStack");
-  gSystem->Load("libField");
-  gSystem->Load("libGen");
-
-  //----  Load R3B specific libraries ---------------------------------------
-  gSystem->Load("libR3Bbase");
-  gSystem->Load("libR3BGen");
-  gSystem->Load("libR3BPassive");
-  gSystem->Load("libR3BData");
-  gSystem->Load("libR3BCal");
-  gSystem->Load("libR3BCalo");
-  gSystem->Load("libR3BDch");
-  gSystem->Load("libR3BGfi");
-  gSystem->Load("libR3BLand");
-  gSystem->Load("libR3BmTof");
-  gSystem->Load("libR3BTof");
-  gSystem->Load("libR3BTra");
-  gSystem->Load("libR3BChimera");
-  gSystem->Load("libELILuMon");
  
+  
   // -----   Create simulation run   ----------------------------------------
   FairRunSim* run = new FairRunSim();
   run->SetName(fMC.Data());              // Transport engine
@@ -171,31 +143,20 @@ void eliall(Int_t nEvents = 1,
   }
 
   if (fDetList.FindObject("CRYSTALBALL") ) {
-      //R3B Crystal Calorimeter
-      R3BDetector* xball = new R3BXBall("XBall", kTRUE);
-      xball->SetGeometryFileName("cal_v13a.geo.root");
-      run->AddModule(xball);
+    //R3B Crystal Calorimeter
+    R3BDetector* xball = new R3BXBall("XBall", kTRUE);
+    xball->SetGeometryFileName("cal_v13a.geo.root");
+    run->AddModule(xball);
   }
 
   if (fDetList.FindObject("CALIFA") ) {
-      // CALIFA Calorimeter
-      R3BDetector* calo = new R3BCalo("Califa", kTRUE);
-      // Global position of the Module
-      phi   =  0.0; // (deg)
-      theta =  0.0; // (deg)
-      psi   =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx    =  0.0; // (cm)
-      ty    =  0.0; // (cm)
-      tz    =  0.0; // (cm)
-      //calo->SetRotAnglesEuler(phi,theta,psi);
-      calo->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      calo->SetTranslation(tx,ty,tz);
-      run->AddModule(calo);
+    // CALIFA Calorimeter
+    R3BDetector* calo = new R3BCalo("Califa", kTRUE);
+    ((R3BCalo *)calo)->SelectGeometryVersion(10);
+    //Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
+    ((R3BCalo *)calo)->SetNonUniformity(1.0);
+    calo->SetGeometryFileName("califa_v13_811.geo.root");
+    run->AddModule(calo);
   }
 
   // Tracker
