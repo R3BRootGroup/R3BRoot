@@ -310,16 +310,20 @@ void FairStack::Register() {
 
 
 // -----   Public method Print  --------------------------------------------
-void FairStack::Print(Int_t iVerbose) const {
+void FairStack::Print(Option_t *option) const
+{
   LOG(INFO) << "FairStack: Number of primaries        = "
        << fNPrimaries << FairLogger::endl;
   LOG(INFO) << "              Total number of particles  = "
        << fNParticles << FairLogger::endl;
   LOG(INFO) << "              Number of tracks in output = "
        << fNTracks << FairLogger::endl;
-  if (iVerbose) {
-    for (Int_t iTrack=0; iTrack<fNTracks; iTrack++) 
-      ((FairMCTrack*) fTracks->At(iTrack))->Print(iTrack);
+  if (TString(option).Contains("track")) {
+    for (Int_t iTrack=0; iTrack<fNTracks; iTrack++) {
+      char str[100];
+      sprintf(str, "%d", iTrack);
+      ((FairMCTrack*) fTracks->At(iTrack))->Print((Option_t*)str);
+    }
   }
 }
 // -------------------------------------------------------------------------

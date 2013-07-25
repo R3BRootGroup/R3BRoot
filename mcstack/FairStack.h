@@ -160,7 +160,7 @@ class FairStack : public FairGenericStack
   /** Output to screen 
    **@param iVerbose: 0=events summary, 1=track info
    **/
-  virtual void Print(Int_t iVerbose=0) const;
+  virtual void Print(Option_t *option="") const;
 
 
   /** Modifiers  **/

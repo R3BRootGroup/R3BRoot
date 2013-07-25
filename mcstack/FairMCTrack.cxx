@@ -73,8 +73,9 @@ FairMCTrack::~FairMCTrack() { }
 
 
 // -----   Public method Print   -------------------------------------------
-void FairMCTrack::Print(Int_t trackId) const {
-  cout << "Track " << trackId << ", mother : " << fMotherId << ", Type "
+void FairMCTrack::Print(Option_t *option) const
+{
+  cout << "Track " << option << ", mother : " << fMotherId << ", Type "
        << fPdgCode << ", momentum (" << fPx << ", " << fPy << ", " << fPz
        << ") GeV" << endl;
   cout << "  Ref " << GetNPoints(kREF) 

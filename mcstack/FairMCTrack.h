@@ -62,7 +62,7 @@ class FairMCTrack : public TObject
 
 
   /**  Output to screen  **/
-  void Print(Int_t iTrack=0) const;
+  virtual void Print(Option_t *option="") const;
 
 
   /**  Accessors  **/
