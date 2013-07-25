@@ -87,7 +87,7 @@ class R3BNeuLand : public R3BDetector
    **
    ** Screen output of hit collection.
    **/
-  virtual void Print() const;
+  virtual void Print(Option_t *option="") const;
   
   
   /** Virtual method Reset

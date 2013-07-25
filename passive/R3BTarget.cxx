@@ -291,9 +291,9 @@ void R3BTarget::ConstructGeometry2(){
    thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
    thz = 0.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix13 = new TGeoRotation("", thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-   pMatrix12 = new TGeoCombiTrans("", dx,dy,dz,pMatrix13);
+//   TGeoRotation *pMatrix13 = new TGeoRotation("", thx,phx,thy,phy,thz,phz);
+//   TGeoCombiTrans*
+//   pMatrix12 = new TGeoCombiTrans("", dx,dy,dz,pMatrix13);
 
 
    TGeoVolume *top =  gGeoManager->GetTopVolume();
@@ -617,11 +617,11 @@ void R3BTarget::ConstructGeometry4(){
    TGeoCombiTrans*
    pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
    dz=dz*2.+5.5;
-   TGeoCombiTrans*
-   pMatrix2b = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
+//   TGeoCombiTrans*
+//   pMatrix2b = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
    dz=dz +5.5 + 1.02500;
-   TGeoCombiTrans*
-   pMatrix2c = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
+//   TGeoCombiTrans*
+//   pMatrix2c = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
 
    // Combi transformation: 
    dx = 0.000000;
@@ -685,9 +685,9 @@ void R3BTarget::ConstructGeometry4(){
    thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
    thz = 0.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix13 = new TGeoRotation("", thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-   pMatrix12 = new TGeoCombiTrans("", dx,dy,dz,pMatrix13);
+//   TGeoRotation *pMatrix13 = new TGeoRotation("", thx,phx,thy,phy,thz,phz);
+//   TGeoCombiTrans*
+//   pMatrix12 = new TGeoCombiTrans("", dx,dy,dz,pMatrix13);
 
 
    TGeoVolume *top =  gGeoManager->GetTopVolume();

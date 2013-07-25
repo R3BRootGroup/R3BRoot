@@ -485,7 +485,8 @@ void R3BFieldMap::SetPosition(Double_t x, Double_t y, Double_t z) {
 }
 // ------------------------------------------------------------------------
 // ---------   Screen output   --------------------------------------------
-void R3BFieldMap::Print() {
+void R3BFieldMap::Print(Option_t *option) const
+{
 }
 // ------------------------------------------------------------------------  
 // ---------    Reset parameters and data (private)  ----------------------

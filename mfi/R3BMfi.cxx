@@ -290,7 +290,8 @@ TClonesArray* R3BMfi::GetCollection(Int_t iColl) const {
 
 
 // -----   Public method Print   ----------------------------------------------
-void R3BMfi::Print() const {
+void R3BMfi::Print(Option_t *option) const
+{
   Int_t nHits = fMfiCollection->GetEntriesFast();
   cout << "-I- R3BMfi: " << nHits << " points registered in this event." 
        << endl;
@@ -346,7 +347,7 @@ void R3BMfi::ConstructGeometry() {
    Double_t dx,dy,dz;
    Double_t a;
    Double_t thx, phx, thy, phy, thz, phz;
-   Double_t z, density, radl, absl, w;
+  Double_t z, density, w;//, radl, absl;
    Int_t nel, numed;
 
 

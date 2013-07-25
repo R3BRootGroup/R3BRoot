@@ -237,7 +237,7 @@ Bool_t R3BNeuLand::ProcessHits(FairVolume* vol) {
 void R3BNeuLand::BeginEvent() {
   
   if (gGeoManager) {
-    TGeoVolume * vol = gGeoManager->FindVolumeFast("Gas2Log");
+    /*TGeoVolume * vol = */gGeoManager->FindVolumeFast("Gas2Log");
   }
   
   fIDMedGas = pMedGas->GetId();
@@ -272,8 +272,9 @@ TClonesArray* R3BNeuLand::GetCollection(Int_t iColl) const {
 
 
 // -----   Public method Print   ----------------------------------------------
-void R3BNeuLand::Print() const {
-  Int_t nHits = fLandCollection->GetEntriesFast();
+void R3BNeuLand::Print(Option_t *option) const
+{
+//  Int_t nHits = fLandCollection->GetEntriesFast();
 }
 // ----------------------------------------------------------------------------
 

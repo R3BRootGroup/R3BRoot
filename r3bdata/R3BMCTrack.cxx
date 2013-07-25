@@ -85,8 +85,8 @@ R3BMCTrack::~R3BMCTrack() { }
 
 
 // -----   Public method Print   -------------------------------------------
-void R3BMCTrack::Print(Int_t trackId) const {
-  cout << "Track " << trackId << ", mother : " << fMotherId << ", Type "
+void R3BMCTrack::Print(Option_t *option) const {
+  cout << "Track " << option << ", mother : " << fMotherId << ", Type "
        << fPdgCode << ", momentum (" << fPx << ", " << fPy << ", " << fPz
        << ") GeV" << endl;
   cout << "       Ref " << GetNPoints(kREF) << ", CAL " << GetNPoints(kCAL)

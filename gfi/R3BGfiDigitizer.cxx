@@ -117,7 +117,7 @@ void R3BGfiDigitizer::Exec(Option_t* opt) {
      
      R3BGfiPoint *Gfi_obj = (R3BGfiPoint*) fGfiPoints->At(l);
 
-     Int_t DetID = Gfi_obj->GetDetectorID();
+//     Int_t DetID = Gfi_obj->GetDetectorID();
      Double_t fX_In = Gfi_obj->GetXIn();
      Double_t fX_Out = Gfi_obj->GetXOut();
      Double_t fZ_In = Gfi_obj->GetZIn();

@@ -79,7 +79,7 @@ void R3BSTaRTraHitFinder::Exec(Option_t* opt) {
 	//Double_t AngRangeMin1=7.;    
 	Double_t AngRangeMin1=5.26;    
 	Double_t AngTrap1=atan((WidthMax1/2 -WidthMin1/2)/Length1);
-	Double_t WidthHalf1=WidthMax1 - (Length1/cos(AngTrap1))*sin(AngTrap1);
+//	Double_t WidthHalf1=WidthMax1 - (Length1/cos(AngTrap1))*sin(AngTrap1);
 	Double_t StepZ1= StripPitch1/sin(AngTrap1) ; // step along the z axis of the detector (in xz plan)
 	Double_t StepX1= StripPitch1/cos(AngTrap1) ; // step along the x axis of the detector (in xz plan)
 	Int_t    NbStrip1   = int(WidthMax1/StepX1); //

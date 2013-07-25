@@ -28,7 +28,7 @@ Bool_t R3BPspDigiPar::getParams(FairParamList* list)
 }
 
 
-void R3BPspDigiPar::Print()
+void R3BPspDigiPar::Print(Option_t *option) const
 {
     std::cout<<"-I- Psp Digi Parameters:"<<std::endl;
 //    std::cout<<"   Max Paddle   = "<<nMaxPaddle<<std::endl;

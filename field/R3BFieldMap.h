@@ -54,7 +54,7 @@ public:
   /** Accessor to global scaling factor  **/
   Double_t GetScale() const { return fScale; }
   /** Screen output **/
-  virtual void Print();
+  virtual void Print(Option_t *option="") const;
   /** Main GetField function */
   virtual void GetFieldValue(const Double_t point[3], Double_t* bField);
 

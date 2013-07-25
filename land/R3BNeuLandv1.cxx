@@ -122,7 +122,7 @@ Bool_t R3BNeuLandv1::ProcessHits(FairVolume* vol) {
   Int_t iMed = gMC->CurrentMedium();
   
   Int_t cp0;
-  Int_t volid = gMC->CurrentVolID(cp0);
+  /*Int_t volid = */gMC->CurrentVolID(cp0);
 
 
   if( gMC->TrackPid() == 11) {
@@ -134,8 +134,8 @@ Bool_t R3BNeuLandv1::ProcessHits(FairVolume* vol) {
   
   if (iMed == fIDMedGas) {
     Int_t trackpid_gas = gMC->TrackPid();
-    Double_t maxstep_gas = gMC->MaxStep();
-    Double_t trackstep_gas = gMC->TrackStep();
+//    Double_t maxstep_gas = gMC->MaxStep();
+//    Double_t trackstep_gas = gMC->TrackStep();
     //cout << " TrackPid in Gas " << trackpid_gas << endl;
     //cout << " MaxStep in Gas " << maxstep_gas << endl;
     //cout << " TrackStep in Gas " << trackstep_gas << endl;
@@ -274,7 +274,7 @@ Bool_t R3BNeuLandv1::ProcessHits(FairVolume* vol) {
 void R3BNeuLandv1::BeginEvent() {
   
   if (gGeoManager) {
-    TGeoVolume * vol = gGeoManager->FindVolumeFast("divVolGas");
+    /*TGeoVolume * vol = */gGeoManager->FindVolumeFast("divVolGas");
   }
   
   fIDMedGas = pMedGas->GetId();
@@ -319,9 +319,9 @@ TClonesArray* R3BNeuLandv1::GetCollection(Int_t iColl) const {
 
 
 // -----   Public method Print   ----------------------------------------------
-void R3BNeuLandv1::Print() const {
-  Int_t nHits = fLandv1Collection->GetEntriesFast();
-
+void R3BNeuLandv1::Print(Option_t *option) const
+{
+//  Int_t nHits = fLandv1Collection->GetEntriesFast();
 }
 
 // -----   Public method Reset   ----------------------------------------------
@@ -378,7 +378,7 @@ void R3BNeuLandv1::ConstructGeometry() {
 }
 
 void R3BNeuLandv1::ConstructGeometry1() {
-  Double_t dx,dy,dz;
+//  Double_t dx,dy,dz;
   Double_t a;
   Double_t z, density, w;
   Int_t nel, numed, aw;

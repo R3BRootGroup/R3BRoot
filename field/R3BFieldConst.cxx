@@ -134,7 +134,8 @@ Double_t R3BFieldConst::GetBz(Double_t x, Double_t y, Double_t z) {
 
 
 // -----   Screen output   -------------------------------------------------
-void R3BFieldConst::Print() {
+void R3BFieldConst::Print(Option_t *option) const
+{
   cout << "======================================================" << endl;
   cout << "----  " << fTitle << " : " << fName << endl;
   cout << "----" << endl;

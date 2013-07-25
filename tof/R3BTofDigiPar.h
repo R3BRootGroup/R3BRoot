@@ -18,7 +18,7 @@ class R3BTofDigiPar : public FairParGenericSet
 	void putParams(FairParamList* list);
 	Bool_t getParams(FairParamList* list);
 
-	void Print();
+	virtual void Print(Option_t *option="") const;
 	/** Accessor functions **/
 
   private:

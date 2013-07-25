@@ -35,8 +35,8 @@ R3BPipe::R3BPipe(const char * name, const char * title)
 void R3BPipe::ConstructGeometry(){
   
   
-  FairGeoLoader *loader=FairGeoLoader::Instance();
-  FairGeoInterface *GeoInterface =loader->getGeoInterface();
+//  FairGeoLoader *loader=FairGeoLoader::Instance();
+//  FairGeoInterface *GeoInterface =loader->getGeoInterface();
   
   
   Double_t parPipeLeft[9] = { 0., 360., 2,

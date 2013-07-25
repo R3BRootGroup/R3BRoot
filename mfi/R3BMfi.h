@@ -83,7 +83,7 @@ class R3BMfi : public R3BDetector
    **
    ** Screen output of hit collection.
    **/
-  virtual void Print() const;
+  virtual void Print(Option_t *option="") const;
 
 
   /** Virtual method Reset

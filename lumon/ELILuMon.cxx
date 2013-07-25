@@ -295,7 +295,8 @@ TClonesArray* ELILuMon::GetCollection(Int_t iColl) const {
 
 
 // -----   Public method Print   ----------------------------------------------
-void ELILuMon::Print() const {
+void ELILuMon::Print(Option_t *option) const
+{
   Int_t nHits = fLuMonCollection->GetEntriesFast();
   cout << "-I- ELILuMon: " << nHits << " points registered in this event." 
        << endl;
@@ -354,8 +355,8 @@ void ELILuMon::ConstructGeometry1() {
 
    //-  Some Material definition
    TGeoMaterial *material = 0;
-   TGeoMedium   *medium   = 0;
-   Float_t *buf = 0;
+//   TGeoMedium   *medium   = 0;
+//   Float_t *buf = 0;
    Float_t sumWeight;
    Int_t i;
    
@@ -398,15 +399,15 @@ void ELILuMon::ConstructGeometry1() {
    
    
    //- Media Definition
-   Int_t kMedLead=601, kMedScin=602, kMedFe=603, kMedPbWO=604;
-   TGeoMedium*
-   pMed1 = gGeoManager->Medium("Lead"        , kMedLead, kMatLead, 0, 0, 0., 10.0, 0.1, 0.1, 0.1, 0.1);
+   Int_t /*kMedLead=601, kMedScin=602, kMedFe=603,*/ kMedPbWO=604;
+//   TGeoMedium*
+//   pMed1 = gGeoManager->Medium("Lead"        , kMedLead, kMatLead, 0, 0, 0., 10.0, 0.1, 0.1, 0.1, 0.1);
    //pMed1->Print();
-   TGeoMedium*
-   pMed2 = gGeoManager->Medium("Scintillator", kMedScin, kMatPoly, 1, 0, 0., 10.0, 0.1, 0.1, 0.1, 0.1);
+//   TGeoMedium*
+//   pMed2 = gGeoManager->Medium("Scintillator", kMedScin, kMatPoly, 1, 0, 0., 10.0, 0.1, 0.1, 0.1, 0.1);
   // pMed2->Print();
-   TGeoMedium*
-   pMed3 = gGeoManager->Medium("Iron", kMedFe, kMatFe, 0, 0, 0., 10.0, 0.1, 0.1, 0.1, 0.1);
+//   TGeoMedium*
+//   pMed3 = gGeoManager->Medium("Iron", kMedFe, kMatFe, 0, 0, 0., 10.0, 0.1, 0.1, 0.1, 0.1);
   // pMed3->Print();
    TGeoMedium*
    pMed4 = gGeoManager->Medium("PbWO", kMedPbWO, kMatPbWO, 1, 0, 0., 10.0, 0.1, 0.1, 0.1, 0.1);

@@ -147,7 +147,7 @@ void R3BTof::SetSpecialPhysicsCuts()
 Bool_t R3BTof::ProcessHits(FairVolume* vol) {
 
    // debug
-    static Int_t evt;     
+//    static Int_t evt;     
 
   // Simple Det PLane
     if ( gMC->IsTrackEntering() ) {
@@ -293,7 +293,7 @@ TClonesArray* R3BTof::GetCollection(Int_t iColl) const {
 
 
 // -----   Public method Print   ----------------------------------------------
-void R3BTof::Print() const
+void R3BTof::Print(Option_t *option) const
 {
   Int_t nHits = fTofCollection->GetEntriesFast();
   LOG(INFO) << "R3BTof: " << nHits << " points registered in this event" << FairLogger::endl;
@@ -351,7 +351,7 @@ void R3BTof::ConstructGeometry() {
   // out-of-file geometry definition
    Double_t dx,dy,dz;
    Double_t a;
-   Double_t thx, phx, thy, phy, thz, phz;
+//   Double_t thx, phx, thy, phy, thz, phz;
    Double_t z, density, w;
    Int_t nel, numed;
 

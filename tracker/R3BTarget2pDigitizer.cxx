@@ -110,7 +110,7 @@ void R3BTarget2pDigitizer::Exec(Option_t* opt) {
      Int_t nentries = fMCTrack->GetEntries();
      
      Int_t TrackIdTra=0;
-     Int_t TrackId=0;
+//     Int_t TrackId=0;
 
 
      
@@ -287,7 +287,7 @@ void R3BTarget2pDigitizer::Exec(Option_t* opt) {
      
      R3BTraPoint *Tra_obj = (R3BTraPoint*) fTarget2pPoints->At(l);
 
-     Int_t DetID = Tra_obj->GetDetectorID();
+//     Int_t DetID = Tra_obj->GetDetectorID();
      
      TrackIdTra = Tra_obj->GetTrackID();
      R3BMCTrack *aTrack = (R3BMCTrack*) fTarget2pMCTrack->At(TrackIdTra);   

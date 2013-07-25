@@ -198,9 +198,9 @@ void R3BLandDigiAnalyser::Exec(Option_t* opt)
               diffHists[2]->Fill(hits[nValidHits].z-digi_obj->GetZ0()+landPlacementZ-(nPlanes/2*paddle_dimz +(nPlanes-1)/2*paddle_spacing));
               diffHists[3]->Fill(hits[nValidHits].t-digi_obj->GetT0());
 */              
-              double vel= TMath::Sqrt(hits[nValidHits].x * hits[nValidHits].x + 
-                                      hits[nValidHits].y * hits[nValidHits].y +
-                                      hits[nValidHits].z * hits[nValidHits].z +landPlacementZ)/hits[nValidHits].t;
+//              double vel= TMath::Sqrt(hits[nValidHits].x * hits[nValidHits].x + 
+//                                      hits[nValidHits].y * hits[nValidHits].y +
+//                                      hits[nValidHits].z * hits[nValidHits].z +landPlacementZ)/hits[nValidHits].t;
 
               
               digiHists[1]->Fill(qdcPaddle);
@@ -258,7 +258,7 @@ void R3BLandDigiAnalyser::Finish()
 
     TCanvas *diffPlots = new TCanvas("diffPlots");
     diffPlots->Divide(2,2);
-    for(int i; i < 4; i++)
+    for(int i=0; i < 4; i++)
     {
       diffPlots->cd(i+1);
       diffHists[i]->Draw();
@@ -335,7 +335,7 @@ std::string R3BLandDigiAnalyser::getPrimariesData()
   bool daughterFound;
 
   Double_t halfPaddleLength = paddle_dimx/(Double_t)2;
-  Double_t halfPaddlez = paddle_dimz/(Double_t)2+paddle_spacing;
+//  Double_t halfPaddlez = paddle_dimz/(Double_t)2+paddle_spacing;
   Double_t epsilon = 0.1;
 
   std::stringstream soutPrim, soutPrimTemp;

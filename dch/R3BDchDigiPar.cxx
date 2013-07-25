@@ -28,7 +28,7 @@ Bool_t R3BDchDigiPar::getParams(FairParamList* list)
 }
 
 
-void R3BDchDigiPar::Print()
+void R3BDchDigiPar::Print(Option_t *option) const
 {
     std::cout<<"-I- Dch Digi Parameters:"<<std::endl;
 //    std::cout<<"   Max Paddle   = "<<nMaxPaddle<<std::endl;

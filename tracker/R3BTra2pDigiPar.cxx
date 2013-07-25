@@ -28,7 +28,7 @@ Bool_t R3BTra2pDigiPar::getParams(FairParamList* list)
 }
 
 
-void R3BTra2pDigiPar::Print()
+void R3BTra2pDigiPar::Print(Option_t *option) const
 {
     std::cout<<"-I- Tra Digi Parameters:"<<std::endl;
 //    std::cout<<"   Max Paddle   = "<<nMaxPaddle<<std::endl;

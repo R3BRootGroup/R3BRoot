@@ -60,7 +60,7 @@ void R3BGladMagnet::ConstructGeometry()
 
 void R3BGladMagnet::ConstructGeometryOld()
 {
-    Double_t degrad = TMath::Pi()/180.;
+//    Double_t degrad = TMath::Pi()/180.;
     Double_t w       =        0.;
     Double_t a       =        0.;
     Double_t z       =        0.;
@@ -232,8 +232,8 @@ void R3BGladMagnet::ConstructSubPartEcrans(TGeoVolume* pWorld){
    Double_t thx,thy,thz,phx,phy,phz;
 
  // -- Mixture: Air
-   TGeoMedium *pMed2 = gGeoManager->GetMedium("Air");
-   TGeoMedium *pMedFe = gGeoManager->GetMedium("Iron");
+//   TGeoMedium *pMed2 = gGeoManager->GetMedium("Air");
+//   TGeoMedium *pMedFe = gGeoManager->GetMedium("Iron");
    TGeoMedium *pMedC =  gGeoManager->GetMedium("Copper");
 
 
@@ -2003,13 +2003,13 @@ void R3BGladMagnet::ConstructSubPartEcrans(TGeoVolume* pWorld){
 void R3BGladMagnet::ConstructDemiEcransTh(TGeoVolume* pWorld){
  // Demi Ecrans part
    Double_t dx,dy,dz;
-   Double_t dx1,dy1,dz1;
-   Double_t dx2,dy2,dz2;
-   Double_t rmin,rmax,phi1,phi2;
+  Double_t dx1,dy1;//,dz1;
+  Double_t dx2,dy2;//,dz2;
+//   Double_t rmin,rmax,phi1,phi2;
    Double_t thx,thy,thz,phx,phy,phz;
 
  // -- Mixture: Air
-   TGeoMedium *pMed2 = gGeoManager->GetMedium("Air");
+//   TGeoMedium *pMed2 = gGeoManager->GetMedium("Air");
    TGeoMedium *pMedFe = gGeoManager->GetMedium("Iron");
 
 
@@ -2296,14 +2296,14 @@ void R3BGladMagnet::ConstructEnceinteI(TGeoVolume* pWorld){
 
  // Enceinte part
    Double_t dx,dy,dz;
-   Double_t dx1,dy1,dz1;
-   Double_t dx2,dy2,dz2;
-   Double_t rmin,rmax,phi1,phi2;
+  Double_t dx1,dy1;//,dz1;
+  Double_t dx2,dy2;//,dz2;
+//   Double_t rmin,rmax,phi1,phi2;
    Double_t thx,thy,thz,phx,phy,phz;
 
  // -- Mixture: Air
-   TGeoMedium *pMed2 = gGeoManager->GetMedium("Air");
-   TGeoMedium *pMedFe = gGeoManager->GetMedium("Iron");
+//   TGeoMedium *pMed2 = gGeoManager->GetMedium("Air");
+//   TGeoMedium *pMedFe = gGeoManager->GetMedium("Iron");
    TGeoMedium *pMedAl = gGeoManager->GetMedium("Alu");
 
  // local transformation
@@ -2546,14 +2546,14 @@ void R3BGladMagnet::ConstructEnceinteE(TGeoVolume* pWorld){
 
  // Enceinte Extern part
    Double_t dx,dy,dz;
-   Double_t dx1,dy1,dz1;
-   Double_t dx2,dy2,dz2;
+//   Double_t dx1,dy1,dz1;
+//   Double_t dx2,dy2,dz2;
    Double_t rmin,rmax,phi1,phi2;
    Double_t thx,thy,thz,phx,phy,phz;
 
  // -- Mixture: Air
-   TGeoMedium *pMed2 = gGeoManager->GetMedium("Air");
-   TGeoMedium *pMedFe = gGeoManager->GetMedium("Iron");
+//   TGeoMedium *pMed2 = gGeoManager->GetMedium("Air");
+//   TGeoMedium *pMedFe = gGeoManager->GetMedium("Iron");
    TGeoMedium *pMedAl = gGeoManager->GetMedium("Alu");
 
    Double_t tr[3],rot[9];
@@ -3422,14 +3422,14 @@ void R3BGladMagnet::ConstructFonfE(TGeoVolume* pWorld){
 
  // Enceinte Extern part
    Double_t dx,dy,dz;
-   Double_t dx1,dy1,dz1;
-   Double_t dx2,dy2,dz2;
+//   Double_t dx1,dy1,dz1;
+//   Double_t dx2,dy2,dz2;
    Double_t rmin,rmax,phi1,phi2;
    Double_t thx,thy,thz,phx,phy,phz;
 
  // -- Mixture: Air
-   TGeoMedium *pMed2 = gGeoManager->GetMedium("Air");
-   TGeoMedium *pMedFe = gGeoManager->GetMedium("Iron");
+//   TGeoMedium *pMed2 = gGeoManager->GetMedium("Air");
+//   TGeoMedium *pMedFe = gGeoManager->GetMedium("Iron");
    TGeoMedium *pMedCu = gGeoManager->GetMedium("Copper");
    Double_t tr[3],rot[9];
 
@@ -4138,13 +4138,13 @@ void R3BGladMagnet::ConstructFondS(TGeoVolume * pWorld){
 
  // Enceinte Extern part
    Double_t dx,dy,dz;
-   Double_t dx1,dy1,dz1;
-   Double_t dx2,dy2,dz2;
+//   Double_t dx1,dy1,dz1;
+//   Double_t dx2,dy2,dz2;
    Double_t rmin,rmax,phi1,phi2;
    Double_t thx,thy,thz,phx,phy,phz;
 
  // -- Mixture: Air
-   TGeoMedium *pMed2 = gGeoManager->GetMedium("Air");
+//   TGeoMedium *pMed2 = gGeoManager->GetMedium("Air");
    TGeoMedium *pMedFe = gGeoManager->GetMedium("Iron");
 
    Double_t tr[3],rot[9];
@@ -4739,13 +4739,13 @@ void R3BGladMagnet::ConstructFondS(TGeoVolume * pWorld){
 void R3BGladMagnet::ConstructGToles(TGeoVolume * pWorld){
  // Enceinte Extern part
    Double_t dx,dy,dz;
-   Double_t dx1,dy1,dz1;
-   Double_t dx2,dy2,dz2;
+//   Double_t dx1,dy1,dz1;
+//   Double_t dx2,dy2,dz2;
    Double_t rmin,rmax,phi1,phi2;
    Double_t thx,thy,thz,phx,phy,phz;
 
  // -- Mixture: Air
-   TGeoMedium *pMed2 = gGeoManager->GetMedium("Air");
+//   TGeoMedium *pMed2 = gGeoManager->GetMedium("Air");
    TGeoMedium *pMedFe = gGeoManager->GetMedium("Iron");
 
    Double_t tr[3],rot[9];

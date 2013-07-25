@@ -199,36 +199,36 @@ void R3BDch2pDigitizer::Exec(Option_t* opt) {
      R3BDchPoint *dch2p_obj = (R3BDchPoint*) fDch2pPoints->At(l);
 
      Int_t DetID = dch2p_obj->GetDetectorID();
-     Double_t fPx = dch2p_obj->GetPx();
-     Double_t fPy = dch2p_obj->GetPy();
-     Double_t fPz = dch2p_obj->GetPz();
+//     Double_t fPx = dch2p_obj->GetPx();
+//     Double_t fPy = dch2p_obj->GetPy();
+//     Double_t fPz = dch2p_obj->GetPz();
  
      Double_t fX_Local_In = dch2p_obj->GetXLocalIn();
      Double_t fY_Local_In = dch2p_obj->GetYLocalIn();
      Double_t fX_Local_Out = dch2p_obj->GetXLocalOut();
      Double_t fY_Local_Out = dch2p_obj->GetYLocalOut();
 
-     Double_t fX_Global_In = dch2p_obj->GetXIn();
-     Double_t fY_Global_In = dch2p_obj->GetYIn();
-     Double_t fZ_Global_In = dch2p_obj->GetZIn();
-     Double_t fX_Global_Out = dch2p_obj->GetXOut();
-     Double_t fY_Global_Out = dch2p_obj->GetYOut();
-     Double_t fZ_Global_Out = dch2p_obj->GetZOut();
+//     Double_t fX_Global_In = dch2p_obj->GetXIn();
+//     Double_t fY_Global_In = dch2p_obj->GetYIn();
+//     Double_t fZ_Global_In = dch2p_obj->GetZIn();
+//     Double_t fX_Global_Out = dch2p_obj->GetXOut();
+//     Double_t fY_Global_Out = dch2p_obj->GetYOut();
+//     Double_t fZ_Global_Out = dch2p_obj->GetZOut();
      TrackId = dch2p_obj->GetTrackID();
      R3BMCTrack *aTrack = (R3BMCTrack*) fDch2pMCTrack->At(TrackId);   
      Int_t PID = aTrack->GetPdgCode();
      Int_t mother = aTrack->GetMotherId();
-     Double_t fPx_track = aTrack->GetPx();
-     Double_t fPy_track = aTrack->GetPy();
-     Double_t fPz_track = aTrack->GetPz();
+//     Double_t fPx_track = aTrack->GetPx();
+//     Double_t fPy_track = aTrack->GetPy();
+//     Double_t fPz_track = aTrack->GetPz();
      
      Double_t fX_Local_sim = ((fX_Local_In + fX_Local_Out)/2);
      Double_t fY_Local_sim = ((fY_Local_In + fY_Local_Out)/2);
 
      //Need modifications
-     Double_t fX_Global = ((fX_Global_In + fX_Global_Out)/2);
-     Double_t fY_Global = ((fY_Global_In + fY_Global_Out)/2);
-     Double_t fZ_Global = ((fZ_Global_In + fZ_Global_Out)/2);
+//     Double_t fX_Global = ((fX_Global_In + fX_Global_Out)/2);
+//     Double_t fY_Global = ((fY_Global_In + fY_Global_Out)/2);
+//     Double_t fZ_Global = ((fZ_Global_In + fZ_Global_Out)/2);
 
      //hardcoded detector centres wrt target, from Ralf's Tracker:
      //PDC1:    x0=-123.219446 y0=3.597104 z0=444.126271
@@ -236,7 +236,7 @@ void R3BDch2pDigitizer::Exec(Option_t* opt) {
 
      Double_t fX_Local = 0.;	//initialisation, values will be PDC-specific
      Double_t fY_Local = 0.; 
-     Double_t fZ_Local = 0.; 
+//     Double_t fZ_Local = 0.; 
 
     //if(PID==2212 && mother<0){
     if(PID==1000010010 && mother<0){

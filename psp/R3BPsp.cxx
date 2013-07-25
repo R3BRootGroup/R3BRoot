@@ -292,7 +292,8 @@ TClonesArray* R3BPsp::GetCollection(Int_t iColl) const {
 
 
 // -----   Public method Print   ----------------------------------------------
-void R3BPsp::Print() const {
+void R3BPsp::Print(Option_t *option) const
+{
   Int_t nHits = fPspCollection->GetEntriesFast();
   cout << "-I- R3BPsp: " << nHits << " points registered in this event." 
        << endl;

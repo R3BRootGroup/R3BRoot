@@ -291,7 +291,7 @@ TClonesArray* R3BmTof::GetCollection(Int_t iColl) const {
 
 
 // -----   Public method Print   ----------------------------------------------
-void R3BmTof::Print() const
+void R3BmTof::Print(Option_t *option) const
 {
   Int_t nHits = fmTofCollection->GetEntriesFast();
   LOG(INFO) << "R3BmTof: " << nHits << " points registered in this event" << FairLogger::endl;

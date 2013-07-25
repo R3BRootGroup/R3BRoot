@@ -650,7 +650,8 @@ void R3BAladinFieldMap::SetPosition(Double_t x, Double_t y, Double_t z) {
 }
 
 
-void R3BAladinFieldMap::Print() {
+void R3BAladinFieldMap::Print(Option_t *option) const
+{
 }
 
 

@@ -371,7 +371,7 @@ void R3BStack::Register() {
 
 
 // -----   Public method Print  --------------------------------------------
-void R3BStack::Print(Int_t iVerbose) const
+void R3BStack::Print(Option_t *option) const
 {
   LOG(INFO) << "R3BStack: Number of primaries = "
   << fNPrimaries << FairLogger::endl;
@@ -379,9 +379,12 @@ void R3BStack::Print(Int_t iVerbose) const
   << fNParticles << FairLogger::endl;
   LOG(INFO) << "          Number of tracks in output = "
   << fNTracks << FairLogger::endl;
-  if (iVerbose) {
-    for (Int_t iTrack=0; iTrack<fNTracks; iTrack++)
-      ((R3BMCTrack*) fTracks->At(iTrack))->Print(iTrack);
+  if(TString(option).Contains("track")) {
+    for (Int_t iTrack=0; iTrack<fNTracks; iTrack++) {
+      char str[100];
+      sprintf(str, "%d", iTrack);
+      ((R3BMCTrack*) fTracks->At(iTrack))->Print((Option_t*)str);
+    }
   }
 }
 // -------------------------------------------------------------------------

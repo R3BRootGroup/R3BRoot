@@ -115,7 +115,7 @@ void R3BPspDigitizer::Exec(Option_t* opt) {
      TrackIdPsp = psp_obj->GetTrackID();
      R3BMCTrack *aTrack = (R3BMCTrack*) fPspMCTrack->At(TrackIdPsp);   
      Int_t PID = aTrack->GetPdgCode();
-     Int_t mother = aTrack->GetMotherId();
+//     Int_t mother = aTrack->GetMotherId();
      
 
      Double_t fX_in = psp_obj->GetXIn();

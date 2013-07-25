@@ -95,9 +95,9 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
   Double_t yOut[NofEntr];
   Double_t zIn[NofEntr];
   Double_t zOut[NofEntr];
-  Double_t PxIn[NofEntr];
-  Double_t PyIn[NofEntr];
-  Double_t PzIn[NofEntr];
+//  Double_t PxIn[NofEntr];
+//  Double_t PyIn[NofEntr];
+//  Double_t PzIn[NofEntr];
   Double_t PxOut[NofEntr];
   Double_t PyOut[NofEntr];
   Double_t PzOut[NofEntr];
@@ -143,8 +143,8 @@ void R3BNeuLandDigitizer::Exec(Option_t* opt) {
       else ProtFlag[l] = 0;
 
       if(trackID[l] > 0) {
-	R3BMCTrack* aTrack1 = (R3BMCTrack*) fLandMCTrack->At(parentTrackID[l]);
-	parentPartID[l] = aTrack->GetPdgCode();
+//        R3BMCTrack* aTrack1 = (R3BMCTrack*) fLandMCTrack->At(parentTrackID[l]);
+        parentPartID[l] = aTrack->GetPdgCode();
       }
 
       Double_t energy = aTrack->GetEnergy();

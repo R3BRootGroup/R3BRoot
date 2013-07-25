@@ -180,7 +180,7 @@ void R3BLandDigitizer_CFD::Exec(Option_t* opt)
 			activePaddle->Right->pulse = &paddleHits[nentries+iEntry];
 			
 			Double_t landHitTime = land_obj->GetTime();
-			Double_t eloss = land_obj->GetEnergyLoss()*1000.; // [MeV]
+//			Double_t eloss = land_obj->GetEnergyLoss()*1000.; // [MeV]
 			Double_t lightyield = land_obj->GetLightYield()*1000.;
 
 			activePaddle->nrOfHits++;
@@ -253,13 +253,13 @@ void R3BLandDigitizer_CFD::Exec(Option_t* opt)
 				}
 
         //Exact data of the hit
-        double x0 = (paddles[iPaddles].Right->pulse->hitData->GetXIn()
-                     + paddles[iPaddles].Right->pulse->hitData->GetXOut())/2;
-        double y0 = (paddles[iPaddles].Right->pulse->hitData->GetYIn() 
-                     + paddles[iPaddles].Right->pulse->hitData->GetYOut())/2;
-        double z0 = (paddles[iPaddles].Right->pulse->hitData->GetZIn() 
-                     + paddles[iPaddles].Right->pulse->hitData->GetZOut())/2;
-        double t0 = paddles[iPaddles].Right->pulse->hitData->GetTime();
+//        double x0 = (paddles[iPaddles].Right->pulse->hitData->GetXIn()
+//                     + paddles[iPaddles].Right->pulse->hitData->GetXOut())/2;
+//        double y0 = (paddles[iPaddles].Right->pulse->hitData->GetYIn() 
+//                     + paddles[iPaddles].Right->pulse->hitData->GetYOut())/2;
+//        double z0 = (paddles[iPaddles].Right->pulse->hitData->GetZIn() 
+//                     + paddles[iPaddles].Right->pulse->hitData->GetZOut())/2;
+//        double t0 = paddles[iPaddles].Right->pulse->hitData->GetTime();
         
         //Save the data from the paddles
         AddHit( iPaddles, paddles[iPaddles].Right->tdc, paddles[iPaddles].Left->tdc, paddles[iPaddles].Right->qdc, paddles[iPaddles].Left->qdc);

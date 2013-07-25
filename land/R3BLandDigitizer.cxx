@@ -278,11 +278,11 @@ void R3BLandDigitizer::Exec(Option_t* opt)
    Int_t TrackId=0;
    Double_t xpos[npaddles],ypos[npaddles],zpos[npaddles];
    Double_t xpos_temp[npaddles],ypos_temp[npaddles],zpos_temp[npaddles];
-   Double_t beta,gamma,pnx,pny,pnz,pnzcm,p,betaNeut,betaFrag,gammaNeut,gammaFrag;
-   Double_t E_lab;
+   Double_t beta;//,gamma,pnx,pny,pnz,pnzcm,p,betaNeut,betaFrag,gammaNeut,gammaFrag;
+//   Double_t E_lab;
    Double_t xpaddle[npaddles],ypaddle[npaddles],zpaddle[npaddles];
-   Int_t PDG;
-   Double_t en,s,rr;
+//   Int_t PDG;
+//   Double_t en,s,rr;
 
    // reset    
    TotalEnergy=0.;
@@ -331,7 +331,7 @@ void R3BLandDigitizer::Exec(Option_t* opt)
         TotalEnergy+=eloss;     
         TotalEnergyLee+=light;
       }
-      Int_t mother = aTrack->GetMotherId();
+//      Int_t mother = aTrack->GetMotherId();
 
       if(1>2){
          cout<< "entry "<<l<<endl;
@@ -382,9 +382,9 @@ void R3BLandDigitizer::Exec(Option_t* opt)
          }
 	 
          gGeoManager->FindNode(x,y,z);
-         TGeoNode* curNode = gGeoManager->GetCurrentNode();
+//         TGeoNode* curNode = gGeoManager->GetCurrentNode();
          gGeoManager->CdUp();
-         TGeoNode* curNode1 = gGeoManager->GetCurrentNode();
+//         TGeoNode* curNode1 = gGeoManager->GetCurrentNode();
    
 //          cout << "Node: "  << curNode1->GetName() << "  " << paddle <<  endl;
 	 
@@ -637,11 +637,11 @@ void R3BLandDigitizer::Exec(Option_t* opt)
 
 //        Double_t k1 = 95.;
 //        Double_t k2 = 30.;
-       Double_t k1 = 1.;
-       Double_t k2 = 0.010;
-       Double_t k3 = 0.;
-       Double_t k4 = 0.012;
-       Double_t k5 = gRandom->Uniform(20., 45.);
+//       Double_t k1 = 1.;
+//       Double_t k2 = 0.010;
+//       Double_t k3 = 0.;
+//       Double_t k4 = 0.012;
+//       Double_t k5 = gRandom->Uniform(20., 45.);
 
 //        if(TMath::Sqrt(lightl*lightr) < k5) {
 // 	 lightl = lightl / (1. + k2*lightl);

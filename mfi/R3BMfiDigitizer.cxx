@@ -196,7 +196,7 @@ void R3BMfiDigitizer::Exec(Option_t* opt) {
      
      R3BMfiPoint *Mfi_obj = (R3BMfiPoint*) fMfiPoints->At(l);
 
-     Int_t DetID = Mfi_obj->GetDetectorID();
+//     Int_t DetID = Mfi_obj->GetDetectorID();
      Double_t fX_In = Mfi_obj->GetXIn();
      Double_t fX_Out = Mfi_obj->GetXOut();
      Double_t fZ_In = Mfi_obj->GetZIn();
@@ -204,7 +204,7 @@ void R3BMfiDigitizer::Exec(Option_t* opt) {
      TrackIdMfi = Mfi_obj->GetTrackID();
      R3BMCTrack *aTrack = (R3BMCTrack*) fMfiMCTrack->At(TrackIdMfi);   
      Int_t PID = aTrack->GetPdgCode();
-     Int_t mother = aTrack->GetMotherId();
+//     Int_t mother = aTrack->GetMotherId();
      
      Double_t fX = ((fX_In + fX_Out)/2);
      Double_t fZ = ((fZ_In + fZ_Out)/2);

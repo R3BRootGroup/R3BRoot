@@ -336,7 +336,8 @@ TClonesArray* R3BSTaRTra::GetCollection(Int_t iColl) const {
 
 
 // -----   Public method Print   ----------------------------------------------
-void R3BSTaRTra::Print() const {
+void R3BSTaRTra::Print(Option_t *option) const
+{
   Int_t nHits = fTraCollection->GetEntriesFast();
   cout << "-I- R3BSTaRTra: " << nHits << " points registered in this event." 
        << endl;
@@ -393,10 +394,10 @@ void R3BSTaRTra::ConstructGeometry() {
   // out-of-file geometry definition
    Double_t dx,dy,dz;
    // Double_t par[20];
-   Double_t rmin, rmax;
+//   Double_t rmin, rmax;
    Double_t a;
    Double_t thx, phx, thy, phy, thz, phz;
-   Double_t  phi1, phi2;
+//   Double_t  phi1, phi2;
    Double_t z, density, radl, absl, w;
    Double_t tx,ty,tz;
    Int_t nel, numed;
@@ -424,8 +425,8 @@ void R3BSTaRTra::ConstructGeometry() {
    Double_t Rmin1=1.75;           // beam clearance 2cm radius as final specs
    //Double_t AngRangeMin1=7;     // Min theta angle covered (deg)
    Double_t AngRangeMin1=5.26;     // Min theta angle covered (deg) as final specs
-   Double_t AngTrap1=atan((WidthMax1 /2 - WidthMin1 /2)/Length1); // (rad)
-   Double_t WidthHalf1= WidthMax1 - (Length1*tan(AngTrap1)); // width of detector at Length/2
+//   Double_t AngTrap1=atan((WidthMax1 /2 - WidthMin1 /2)/Length1); // (rad)
+//   Double_t WidthHalf1= WidthMax1 - (Length1*tan(AngTrap1)); // width of detector at Length/2
 
    Int_t NSide2= 12;            // Nb of detector in intermediate Layer 
    //Double_t WidthMax2= 10.4;    // Max width of detector (cm)
@@ -441,8 +442,8 @@ void R3BSTaRTra::ConstructGeometry() {
    Double_t Rmin2=2.22;        // beam clearance 3cm radius as final specs
    //Double_t AngRangeMin2=7.;    // Min theta angle covered (deg)
    Double_t AngRangeMin2=5.3;    // Min theta angle covered (deg) as final specs
-   Double_t AngTrap2=atan((WidthMax2 /2 - WidthMin2 /2)/Length2); // (rad)
-   Double_t WidthHalf2= WidthMax2 - (Length2*tan(AngTrap2)); // width of detector at Length/2
+//   Double_t AngTrap2=atan((WidthMax2 /2 - WidthMin2 /2)/Length2); // (rad)
+//   Double_t WidthHalf2= WidthMax2 - (Length2*tan(AngTrap2)); // width of detector at Length/2
 
    Int_t NSide3= 12;            // Nb of detector in outer Layer  
    //Double_t WidthMax3= 10.4;    // Max width of detector (cm)
@@ -458,8 +459,8 @@ void R3BSTaRTra::ConstructGeometry() {
    Double_t Rmin3=2.95;          // beam clearance 3cm radius as final specs
    //Double_t AngRangeMin3=7;     // Min theta angle covered (deg)
    Double_t AngRangeMin3=6.76;     // Min theta angle covered (deg) as final specs
-   Double_t AngTrap3=atan((WidthMax3 /2 - WidthMin3 /2)/Length2); // (rad)
-   Double_t WidthHalf3= WidthMax3 - (Length3*tan(AngTrap3)); // width of detector at Length/2
+//   Double_t AngTrap3=atan((WidthMax3 /2 - WidthMin3 /2)/Length2); // (rad)
+//   Double_t WidthHalf3= WidthMax3 - (Length3*tan(AngTrap3)); // width of detector at Length/2
 
 
 /****************************************************************************/
@@ -1218,10 +1219,10 @@ void R3BSTaRTra::ConstructGeometry() {
    thx = 180.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 0.000000;
    thz = 90.000000;    phz = 90.000000;
-   TGeoRotation *pMatrix91 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-     pMatrix90 = new TGeoCombiTrans("", dx,dy,dz,pMatrix91);
-   
+//   TGeoRotation *pMatrix91 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+//   TGeoCombiTrans*
+//     pMatrix90 = new TGeoCombiTrans("", dx,dy,dz,pMatrix91);
+  
    // Combi transformation: 
    dx = 7.67000;
    dy = 7.67000; 
@@ -1230,10 +1231,10 @@ void R3BSTaRTra::ConstructGeometry() {
    thx = 0.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 315.000000;
    thz = 90.000000;    phz = 45.000000;
-   TGeoRotation *pMatrix93 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-     pMatrix92 = new TGeoCombiTrans("", dx,dy,dz,pMatrix93);
-   
+//   TGeoRotation *pMatrix93 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+//   TGeoCombiTrans*
+//     pMatrix92 = new TGeoCombiTrans("", dx,dy,dz,pMatrix93);
+  
    // Combi transformation: 
    dx = 10.86000;
    dy = 0.00000; 
@@ -1242,10 +1243,10 @@ void R3BSTaRTra::ConstructGeometry() {
    thx = 180.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
    thz = 90.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix95 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-     pMatrix94 = new TGeoCombiTrans("", dx,dy,dz,pMatrix95);
-   
+//   TGeoRotation *pMatrix95 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+//   TGeoCombiTrans*
+//     pMatrix94 = new TGeoCombiTrans("", dx,dy,dz,pMatrix95);
+  
    // Combi transformation: 
    dx = 7.67000;
    dy = -7.67000; 
@@ -1254,9 +1255,9 @@ void R3BSTaRTra::ConstructGeometry() {
    thx = 0.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 45.000000;
    thz = 90.000000;    phz = 315.000000;
-   TGeoRotation *pMatrix97 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-     pMatrix96 = new TGeoCombiTrans("", dx,dy,dz,pMatrix97);
+//   TGeoRotation *pMatrix97 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+//   TGeoCombiTrans*
+//     pMatrix96 = new TGeoCombiTrans("", dx,dy,dz,pMatrix97);
 
 
 
@@ -1597,10 +1598,10 @@ void R3BSTaRTra::ConstructGeometry() {
    thx = 180.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 0.000000;
    thz = 90.000000;    phz = 90.000000;
-   TGeoRotation *pMatrix59 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-     pMatrix58 = new TGeoCombiTrans("", dx,dy,dz,pMatrix59);
-   
+//   TGeoRotation *pMatrix59 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+//   TGeoCombiTrans*
+//     pMatrix58 = new TGeoCombiTrans("", dx,dy,dz,pMatrix59);
+  
    // Combi transformation: 
    dx = 9.39000;
    dy = 9.39000; 
@@ -1609,10 +1610,10 @@ void R3BSTaRTra::ConstructGeometry() {
    thx = 0.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 315.000000;
    thz = 90.000000;    phz = 45.000000;
-   TGeoRotation *pMatrix61 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-     pMatrix60 = new TGeoCombiTrans("", dx,dy,dz,pMatrix61);
-   
+//   TGeoRotation *pMatrix61 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+//   TGeoCombiTrans*
+//     pMatrix60 = new TGeoCombiTrans("", dx,dy,dz,pMatrix61);
+  
    // Combi transformation: 
    dx = 13.28000;
    dy = 0.00000; 
@@ -1621,10 +1622,10 @@ void R3BSTaRTra::ConstructGeometry() {
    thx = 180.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
    thz = 90.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix63 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-     pMatrix62 = new TGeoCombiTrans("", dx,dy,dz,pMatrix63);
-   
+//   TGeoRotation *pMatrix63 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+//   TGeoCombiTrans*
+//     pMatrix62 = new TGeoCombiTrans("", dx,dy,dz,pMatrix63);
+  
    // Combi transformation: 
    dx = 9.39000;
    dy = -9.39000; 
@@ -1633,10 +1634,10 @@ void R3BSTaRTra::ConstructGeometry() {
    thx = 0.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 45.000000;
    thz = 90.000000;    phz = 315.000000;
-   TGeoRotation *pMatrix65 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-     pMatrix64 = new TGeoCombiTrans("", dx,dy,dz,pMatrix65);
-   
+//   TGeoRotation *pMatrix65 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+//   TGeoCombiTrans*
+//     pMatrix64 = new TGeoCombiTrans("", dx,dy,dz,pMatrix65);
+  
    // End caps
 
    // Combi transformation: 
@@ -1647,9 +1648,9 @@ void R3BSTaRTra::ConstructGeometry() {
    thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
    thz = 0.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix99 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-   pMatrix98 = new TGeoCombiTrans("", dx,dy,dz,pMatrix99);
+//   TGeoRotation *pMatrix99 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+//   TGeoCombiTrans*
+//   pMatrix98 = new TGeoCombiTrans("", dx,dy,dz,pMatrix99);
 
    // Combi transformation: 
    dx = 0.000000;
@@ -1659,9 +1660,9 @@ void R3BSTaRTra::ConstructGeometry() {
    thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
    thz = 0.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix101 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-   pMatrix100 = new TGeoCombiTrans("", dx,dy,dz,pMatrix101);
+//   TGeoRotation *pMatrix101 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+//   TGeoCombiTrans*
+//   pMatrix100 = new TGeoCombiTrans("", dx,dy,dz,pMatrix101);
 
    // Combi transformation: 
    dx = 0.000000;
@@ -1671,9 +1672,9 @@ void R3BSTaRTra::ConstructGeometry() {
    thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
    thz = 0.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix103 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-   pMatrix102 = new TGeoCombiTrans("", dx,dy,dz,pMatrix103);
+//   TGeoRotation *pMatrix103 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+//   TGeoCombiTrans*
+//   pMatrix102 = new TGeoCombiTrans("", dx,dy,dz,pMatrix103);
 
    // Combi transformation: 
    dx = 0.000000;
@@ -1683,9 +1684,9 @@ void R3BSTaRTra::ConstructGeometry() {
    thx = 90.000000;    phx = 0.000000;
    thy = 90.000000;    phy = 90.000000;
    thz = 0.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix105 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-     pMatrix104 = new TGeoCombiTrans("", dx,dy,dz,pMatrix105);
+//   TGeoRotation *pMatrix105 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+//   TGeoCombiTrans*
+//     pMatrix104 = new TGeoCombiTrans("", dx,dy,dz,pMatrix105);
 
 
    // Chamber
@@ -1698,9 +1699,9 @@ void R3BSTaRTra::ConstructGeometry() {
 	thx = 90.000000;    phx = 0.000000;
 	thy = 90.000000;    phy = 90.000000;
 	thz = 0.000000;    phz = 0.000000;
-	TGeoRotation *pMatrix171 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-	TGeoCombiTrans*
-	pMatrix170 = new TGeoCombiTrans("", dx,dy,dz,pMatrix171);
+//	TGeoRotation *pMatrix171 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+//	TGeoCombiTrans*
+//	pMatrix170 = new TGeoCombiTrans("", dx,dy,dz,pMatrix171);
 	
 	// Combi transformation: 
 	dx = 0.000000;
@@ -1710,9 +1711,9 @@ void R3BSTaRTra::ConstructGeometry() {
 	thx = 90.000000;    phx = 0.000000;
 	thy = 90.000000;    phy = 90.000000;
 	thz = 0.000000;    phz = 0.000000;
-	TGeoRotation *pMatrix173 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-	TGeoCombiTrans*
-	pMatrix172 = new TGeoCombiTrans("", dx,dy,dz,pMatrix173);
+//	TGeoRotation *pMatrix173 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+//	TGeoCombiTrans*
+//	pMatrix172 = new TGeoCombiTrans("", dx,dy,dz,pMatrix173);
 	
     // Combi transformation: 
 	dx = 0.000000;
@@ -1722,9 +1723,9 @@ void R3BSTaRTra::ConstructGeometry() {
 	thx = 90.000000;    phx = 0.000000;
 	thy = 90.000000;    phy = 90.000000;
 	thz = 0.000000;    phz = 0.000000;
-	TGeoRotation *pMatrix175 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-	TGeoCombiTrans*
-	pMatrix174 = new TGeoCombiTrans("", dx,dy,dz,pMatrix175);
+//	TGeoRotation *pMatrix175 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+//	TGeoCombiTrans*
+//	pMatrix174 = new TGeoCombiTrans("", dx,dy,dz,pMatrix175);
 	
    //Gold Cone
 	// Combi transformation: 
@@ -1735,9 +1736,9 @@ void R3BSTaRTra::ConstructGeometry() {
 	thx = 90.000000;    phx = 0.000000;
 	thy = 90.000000;    phy = 90.000000;
 	thz = 0.000000;    phz = 0.000000;
-	TGeoRotation *pMatrix177 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-	TGeoCombiTrans*
-	pMatrix176 = new TGeoCombiTrans("", dx,dy,dz,pMatrix177);
+//	TGeoRotation *pMatrix177 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+//	TGeoCombiTrans*
+//	pMatrix176 = new TGeoCombiTrans("", dx,dy,dz,pMatrix177);
 
    // Beam pipe
 
@@ -1799,13 +1800,13 @@ void R3BSTaRTra::ConstructGeometry() {
   // Since Frame_Depth and Thickness1 are half thicknesses
      dz=tz=0;
    
-   TGeoCombiTrans *t2 = new TGeoCombiTrans(tx,ty,tz,rotg);
+//   TGeoCombiTrans *t2 = new TGeoCombiTrans(tx,ty,tz,rotg);
 
      dx=tx=0;
      dy=ty=-(Frame_Depth+Thickness1) + 0.00625;
      dz=tz= Length1/2 -9.9869;
    
-   TGeoCombiTrans *t3 = new TGeoCombiTrans(tx,ty,tz,rotg);
+//   TGeoCombiTrans *t3 = new TGeoCombiTrans(tx,ty,tz,rotg);
 
    
      dx=tx=0;
@@ -1814,7 +1815,7 @@ void R3BSTaRTra::ConstructGeometry() {
      dy=
      dz=tz= Length1/2 -9.9869-1;
    
-   TGeoCombiTrans *t4 = new TGeoCombiTrans(tx,ty,tz,rotg);
+//   TGeoCombiTrans *t4 = new TGeoCombiTrans(tx,ty,tz,rotg);
 
    // StarTrack world (mother volume to have vacuum for Si tracker and air for CALIFA)  !! 
   /*
@@ -1871,26 +1872,26 @@ void R3BSTaRTra::ConstructGeometry() {
      t_EmptyFrame_3->RegisterYourself();
 
 
-     TGeoTrd1 *CB1_Trd1 = new TGeoTrd1("A", (WidthMax1+Frame_Width)/2., (WidthMin1+Frame_Width)/2.,Frame_Depth,(Length1+Frame_Length)/2.); // exteranl CBframe
+//     TGeoTrd1 *CB1_Trd1 = new TGeoTrd1("A", (WidthMax1+Frame_Width)/2., (WidthMin1+Frame_Width)/2.,Frame_Depth,(Length1+Frame_Length)/2.); // exteranl CBframe
 
      Empty_widthMax= (WidthMax1-Frame_Width)/2.;
      Empty_widthMin= ((WidthMax1-Frame_Width) -(WidthMax1-WidthMin1)/alpha1 )/2.;
      Empty_Depth= (Frame_Depth+Frame_Depth/10.);
      Empty_Length= ((Length1-2*Frame_Length)/alpha1)/2.;
-     TGeoTrd1 *Empty1_Trd1 =new TGeoTrd1("B", Empty_widthMax, Empty_widthMin, Empty_Depth, Empty_Length);
+//     TGeoTrd1 *Empty1_Trd1 =new TGeoTrd1("B", Empty_widthMax, Empty_widthMin, Empty_Depth, Empty_Length);
   
      Empty_widthMax= ( (WidthMax1-Frame_Width)-(WidthMax1-WidthMin1)/alpha2 )/2.;
      Empty_widthMin= ( Empty_widthMax*2 - (WidthMax1-WidthMin1)/alpha3 )/2.;
      //Empty_widthMin= ( Empty_widthMax*2 - (Empty_widthMax*2/alpha3))/2.;
      Empty_Length= ((Length1-2*Frame_Length)/alpha3)/2.;
-     TGeoTrd1 *Empty2_Trd1 =new TGeoTrd1("C", Empty_widthMax ,Empty_widthMin , Empty_Depth ,  Empty_Length);
+//     TGeoTrd1 *Empty2_Trd1 =new TGeoTrd1("C", Empty_widthMax ,Empty_widthMin , Empty_Depth ,  Empty_Length);
 
      
      Empty_widthMax= ( (WidthMax1-Frame_Width)-(WidthMax1-WidthMin1)/alpha4 )/2.;
      Empty_widthMin= (WidthMin1-Frame_Length)/2;
      Empty_Length= ((Length1-2*Frame_Length) - (Length1-2*Frame_Length) /alpha4)/2.;
-     TGeoTrd1 *Empty3_Trd1 =new TGeoTrd1("D", Empty_widthMax ,Empty_widthMin , Empty_Depth , Empty_Length);
-    
+//     TGeoTrd1 *Empty3_Trd1 =new TGeoTrd1("D", Empty_widthMax ,Empty_widthMin , Empty_Depth , Empty_Length);
+  
      TGeoCompositeShape *CBFrame;
      CBFrame= new TGeoCompositeShape("CBFrame", "((A:T0_in-B:T1_in)-C:T2_in)-D:T3_in");
 
@@ -1919,20 +1920,20 @@ void R3BSTaRTra::ConstructGeometry() {
 
      dy=ty=-(Frame_Depth+Thickness2) + 0.00625;
      dz=tz= Length2/2 -12.898471;
-     TGeoCombiTrans *t5 = new TGeoCombiTrans(tx,ty,tz,rotg);
+//     TGeoCombiTrans *t5 = new TGeoCombiTrans(tx,ty,tz,rotg);
 
      dy=ty=-(Thickness2*2);
   // Since Thickness1 is half of the detector Thickness
      dz=tz= Length2/2 -12.898471 -1;
-     TGeoCombiTrans *t6 = new TGeoCombiTrans(tx,ty,tz,rotg);
+//     TGeoCombiTrans *t6 = new TGeoCombiTrans(tx,ty,tz,rotg);
 
      dz=tz= Length3/2 - (12.898471+11.8071);
-     TGeoCombiTrans *t7 = new TGeoCombiTrans(tx,ty,tz,rotg);
+//     TGeoCombiTrans *t7 = new TGeoCombiTrans(tx,ty,tz,rotg);
 
      dy=ty=-(Thickness3*2);
   // Since Thickness1 is half of the detector Thickness
      dz=tz= Length3/2 -(12.898471+11.8071)-1;
-     TGeoCombiTrans *t8 = new TGeoCombiTrans(tx,ty,tz,rotg);
+//     TGeoCombiTrans *t8 = new TGeoCombiTrans(tx,ty,tz,rotg);
 
 
 
@@ -1972,34 +1973,34 @@ void R3BSTaRTra::ConstructGeometry() {
      t_EmptyFrame_out5->RegisterYourself();
 
 
-     TGeoTrd1 *CB1out_Trd1 = new TGeoTrd1("Aout", (WidthMax3+Frame_Width)/2., (WidthMin3+Frame_Width)/2.,Frame_Depth,(Length3+Frame_Length)/2.); // exteranl CBframe
+//     TGeoTrd1 *CB1out_Trd1 = new TGeoTrd1("Aout", (WidthMax3+Frame_Width)/2., (WidthMin3+Frame_Width)/2.,Frame_Depth,(Length3+Frame_Length)/2.); // exteranl CBframe
 
      Empty_widthMax= (WidthMax3-Frame_Width)/2.;
      Empty_widthMin= ((WidthMax3-Frame_Width) -(WidthMax3-WidthMin3)/alpha1 )/2.;
      Empty_Depth= (Frame_Depth+Frame_Depth/10.);
      Empty_Length= ((Length3-2*Frame_Length)/alpha1)/2.;
-     TGeoTrd1 *Empty1out_Trd1 =new TGeoTrd1("Bout", Empty_widthMax, Empty_widthMin, Empty_Depth, Empty_Length);
+//     TGeoTrd1 *Empty1out_Trd1 =new TGeoTrd1("Bout", Empty_widthMax, Empty_widthMin, Empty_Depth, Empty_Length);
   
      Empty_widthMax= ( (WidthMax3-Frame_Width)-(WidthMax3-WidthMin3)/alpha2 )/2.;
      Empty_widthMin= ( Empty_widthMax*2 - (WidthMax3-WidthMin3)/alpha3)/2.;
      Empty_Length= ((Length3-2*Frame_Length)/alpha3)/2.;
-     TGeoTrd1 *Empty2out_Trd1 =new TGeoTrd1("Cout", Empty_widthMax ,Empty_widthMin , Empty_Depth ,  Empty_Length);
+//     TGeoTrd1 *Empty2out_Trd1 =new TGeoTrd1("Cout", Empty_widthMax ,Empty_widthMin , Empty_Depth ,  Empty_Length);
 
      
      Empty_widthMax= ( (WidthMax3-Frame_Width)-(WidthMax3-WidthMin3)/alpha4 )/2.;
      Empty_widthMin=  ( Empty_widthMax*2 - (WidthMax3-WidthMin3)/alpha5)/2.;
      Empty_Length= ((Length3-2*Frame_Length)/alpha5)/2.;
-     TGeoTrd1 *Empty3out_Trd1 =new TGeoTrd1("Dout", Empty_widthMax ,Empty_widthMin , Empty_Depth , Empty_Length);
+//     TGeoTrd1 *Empty3out_Trd1 =new TGeoTrd1("Dout", Empty_widthMax ,Empty_widthMin , Empty_Depth , Empty_Length);
   
      Empty_widthMax= ( (WidthMax3-Frame_Width)-(WidthMax3-WidthMin3)/alpha6 )/2.;
      Empty_widthMin=  ( Empty_widthMax*2 - (WidthMax3-WidthMin3)/alpha7)/2.;
      Empty_Length= ((Length3-2*Frame_Length)/alpha7)/2.;
-     TGeoTrd1 *Empty4out_Trd1 =new TGeoTrd1("Eout", Empty_widthMax ,Empty_widthMin , Empty_Depth , Empty_Length);
+//     TGeoTrd1 *Empty4out_Trd1 =new TGeoTrd1("Eout", Empty_widthMax ,Empty_widthMin , Empty_Depth , Empty_Length);
   
      Empty_widthMax= ( (WidthMax3-Frame_Width)-(WidthMax3-WidthMin3)/alpha8 )/2.;
      Empty_widthMin= (WidthMin3-Frame_Length)/2;
      Empty_Length= ((Length3-2*Frame_Length) - (Length3-2*Frame_Length) /alpha8)/2.;
-     TGeoTrd1 *Empty5out_Trd1 =new TGeoTrd1("Fout", Empty_widthMax ,Empty_widthMin , Empty_Depth , Empty_Length);
+//     TGeoTrd1 *Empty5out_Trd1 =new TGeoTrd1("Fout", Empty_widthMax ,Empty_widthMin , Empty_Depth , Empty_Length);
 
   
      TGeoCompositeShape *CBFrame_out;
@@ -2070,34 +2071,34 @@ void R3BSTaRTra::ConstructGeometry() {
      t_EmptyFrame_mid5->RegisterYourself();
 
 
-     TGeoTrd1 *CB1mid_Trd1 = new TGeoTrd1("Amid", (WidthMax2+Frame_Width)/2., (WidthMin2+Frame_Width)/2.,Frame_Depth,(Length2+Frame_Length)/2.); // exteranl CBframe
+//     TGeoTrd1 *CB1mid_Trd1 = new TGeoTrd1("Amid", (WidthMax2+Frame_Width)/2., (WidthMin2+Frame_Width)/2.,Frame_Depth,(Length2+Frame_Length)/2.); // exteranl CBframe
 
      Empty_widthMax= (WidthMax2-Frame_Width)/2.;
      Empty_widthMin= ((WidthMax2-Frame_Width) -(WidthMax2-WidthMin2)/alpha1 )/2.;
      Empty_Depth= (Frame_Depth+Frame_Depth/10.);
      Empty_Length= ((Length2-2*Frame_Length)/alpha1)/2.;
-     TGeoTrd1 *Empty1mid_Trd1 =new TGeoTrd1("Bmid", Empty_widthMax, Empty_widthMin, Empty_Depth, Empty_Length);
+//     TGeoTrd1 *Empty1mid_Trd1 =new TGeoTrd1("Bmid", Empty_widthMax, Empty_widthMin, Empty_Depth, Empty_Length);
   
      Empty_widthMax= ( (WidthMax3-Frame_Width)-(WidthMax2-WidthMin2)/alpha2 )/2.;
      Empty_widthMin= ( Empty_widthMax*2 - (WidthMax2-WidthMin2)/alpha3)/2.;
      Empty_Length= ((Length2-2*Frame_Length)/alpha3)/2.;
-     TGeoTrd1 *Empty2mid_Trd1 =new TGeoTrd1("Cmid", Empty_widthMax ,Empty_widthMin , Empty_Depth ,  Empty_Length);
+//     TGeoTrd1 *Empty2mid_Trd1 =new TGeoTrd1("Cmid", Empty_widthMax ,Empty_widthMin , Empty_Depth ,  Empty_Length);
 
      
      Empty_widthMax= ( (WidthMax2-Frame_Width)-(WidthMax2-WidthMin2)/alpha4 )/2.;
      Empty_widthMin=  ( Empty_widthMax*2 - (WidthMax2-WidthMin2)/alpha5)/2.;
      Empty_Length= ((Length2-2*Frame_Length)/alpha5)/2.;
-     TGeoTrd1 *Empty3mid_Trd1 =new TGeoTrd1("Dmid", Empty_widthMax ,Empty_widthMin , Empty_Depth , Empty_Length);
+//     TGeoTrd1 *Empty3mid_Trd1 =new TGeoTrd1("Dmid", Empty_widthMax ,Empty_widthMin , Empty_Depth , Empty_Length);
   
      Empty_widthMax= ( (WidthMax2-Frame_Width)-(WidthMax2-WidthMin2)/alpha6 )/2.;
      Empty_widthMin=  ( Empty_widthMax*2 - (WidthMax2-WidthMin2)/alpha7)/2.;
      Empty_Length= ((Length2-2*Frame_Length)/alpha7)/2.;
-     TGeoTrd1 *Empty4mid_Trd1 =new TGeoTrd1("Emid", Empty_widthMax ,Empty_widthMin , Empty_Depth , Empty_Length);
+//     TGeoTrd1 *Empty4mid_Trd1 =new TGeoTrd1("Emid", Empty_widthMax ,Empty_widthMin , Empty_Depth , Empty_Length);
   
      Empty_widthMax= ( (WidthMax2-Frame_Width)-(WidthMax2-WidthMin2)/alpha8 )/2.;
      Empty_widthMin= (WidthMin2-Frame_Length)/2;
      Empty_Length= ((Length2-2*Frame_Length) - (Length2-2*Frame_Length) /alpha8)/2.;
-     TGeoTrd1 *Empty5mid_Trd1 =new TGeoTrd1("Fmid", Empty_widthMax ,Empty_widthMin , Empty_Depth , Empty_Length);
+//     TGeoTrd1 *Empty5mid_Trd1 =new TGeoTrd1("Fmid", Empty_widthMax ,Empty_widthMin , Empty_Depth , Empty_Length);
 
   
      TGeoCompositeShape *CBFrame_mid;

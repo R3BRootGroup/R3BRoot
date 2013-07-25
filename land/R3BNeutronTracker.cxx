@@ -264,7 +264,7 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
    Double_t momentumT[10],momentumX[10],momentumY[10],momentumZ[10],energy[10];
    Double_t beta[10], gamma[10],rr,s;  
    Double_t sum_momentumX,sum_momentumY,sum_momentumZ,sum_masses,sum_energy;
-   Double_t betaNeutron,E_lab,pnzcm;
+//   Double_t betaNeutron,E_lab,pnzcm;
    Double_t Egamma=0;
    Double_t gamma_px=0.;
    Double_t gamma_py=0.;
@@ -507,7 +507,7 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
    // time of first hit, position of first hit, and total energy 
    Double_t dio=10.6; //3 times half the diogonal of a paddle
    Double_t distance, posx, posy, posz, post, delt, delx, dely, delz;
-   Int_t hits=0;
+//   Int_t hits=0;
    Int_t Nclusters=0;
 //   cout<<"nentries: "<<nentries<<endl;
    hHits->Fill(nentries);
@@ -531,7 +531,7 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
          posz = temp[l][2];
          post = temp[l][3];        
 	 oldPaddle = (int)temp[l][5];
-	 Int_t neighbor=0;
+//	 Int_t neighbor=0;
 
          if(printing){
             cout<<"reference pos "<<posx<<"  "<<posy<<"  "<<posz<<endl;
@@ -631,10 +631,10 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
       Double_t z0=0.;
       Double_t t0=0.;
 
-      Double_t v1xmin,v1ymin,v1zmin,v1xmax,v1ymax,v1zmax;
-      Double_t v4xmin,v4ymin,v4zmin,v4xmax,v4ymax,v4zmax;
-      Double_t v3xmin,v3ymin,v3zmin,v3xmax,v3ymax,v3zmax;
-      Double_t v6xmin,v6ymin,v6zmin,v6xmax,v6ymax,v6zmax;
+//      Double_t v1xmin,v1ymin,v1zmin,v1xmax,v1ymax,v1zmax;
+     Double_t v4xmin,v4ymin,v4zmin;//,v4xmax,v4ymax,v4zmax;
+     Double_t v3xmin,v3ymin,v3zmin;//,v3xmax,v3ymax,v3zmax;
+//      Double_t v6xmin,v6ymin,v6zmin,v6xmax,v6ymax,v6zmax;
       Int_t elastic[100],origin[100];
       Int_t elasticCount=0;
 
@@ -830,16 +830,16 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
             Double_t p3min=beta3min*gamma3min*1.*amu;
             Double_t p3max=beta3max*gamma3max*1.*amu;
 	    if (p3>p1) p3=p1;
-	    Double_t En3=sqrt(p3*p3+amu*amu);
-	    Double_t En3min=sqrt(p3min*p3min+amu*amu);
-   	    Double_t En3max=sqrt(p3max*p3max+amu*amu);
-	    Double_t K3=En3-amu;
-	    Double_t K3min=En3min-amu;	    
-  	    Double_t K3max=En3max-amu;	    
+//	    Double_t En3=sqrt(p3*p3+amu*amu);
+//	    Double_t En3min=sqrt(p3min*p3min+amu*amu);
+//   	    Double_t En3max=sqrt(p3max*p3max+amu*amu);
+//	    Double_t K3=En3-amu;
+//	    Double_t K3min=En3min-amu;	    
+//  	    Double_t K3max=En3max-amu;	    
 	    
             Double_t Ma,Mb,Mc,Md,Ka,Thc,Ei,Pa,AA,BB,a,b,cc,Pc1,Pc2;
             Double_t Pd1,Thd1,Ec1,Ed1,Kc1,Kd1,Qsqr1;
-	    Double_t Pd2,Thd2,Ec2,Ed2,Kc2,Kd2,Qsqr2;
+//	    Double_t Pd2,Thd2,Ec2,Ed2,Kc2,Kd2,Qsqr2;
 	    Ma = 1.0087*amu;
 	    Mb = 1.0073*amu;
 	    Mc = Ma;
@@ -865,12 +865,12 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
 	    Kd1 = Ed1 - Mb;
 	    Qsqr1 = (- ( Ka - Kc1 ) * (Ka - Kc1 ) +  ( Pa * Pa + Pc1 * Pc1 - 2. * Pa * Pc1 * cos(Thc) ))/197.327/197.327;
             Double_t p3b=Pc1;
-	    Double_t K3b=Kc1;
-	    Double_t E3b=Ec1;	    
+//	    Double_t K3b=Kc1;
+//	    Double_t E3b=Ec1;	    
 	    Double_t theta4=Thd1;
             Double_t p4b=Pd1;
-	    Double_t K4b=Kd1;
-	    Double_t E4b=Ed1;
+//	    Double_t K4b=Kd1;
+//	    Double_t E4b=Ed1;
 
             Double_t p3bmin=p3b;
             Double_t p3bmax=p3b;
@@ -925,20 +925,20 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
 	    Ed1 = sqrt( p4bmin * p4bmin - -Mb * Mb );
 	    Kd1 = Ed1 - Mb;
 	    Qsqr1 = (- ( Ka - Kc1 ) * (Ka - Kc1 ) +  ( Pa * Pa + Pc1 * Pc1 - 2. * Pa * Pc1 * cos(Thc) ))/197.327/197.327;
-	    Double_t K3bmin=Kc1;
-	    Double_t E3bmin=Ec1;	    
+//	    Double_t K3bmin=Kc1;
+//	    Double_t E3bmin=Ec1;	    
 	    Double_t K4bmin=Kd1;
-	    Double_t E4bmin=Ed1;
+//	    Double_t E4bmin=Ed1;
 	    Ec1 = sqrt( p3bmax * p3bmax - -Ma * Ma );
 	    Kc1 = Ec1 - Ma;
 	    Ed1 = sqrt( p4bmax * p4bmax - -Mb * Mb );
 	    Kd1 = Ed1 - Mb;
 	    Qsqr1 = (- ( Ka - Kc1 ) * (Ka - Kc1 ) +  ( Pa * Pa + Pc1 * Pc1 - 2. * Pa * Pc1 * cos(Thc) ))/197.327/197.327;
 
-	    Double_t K3bmax=Kc1;
-	    Double_t E3bmax=Ec1;	    
+//	    Double_t K3bmax=Kc1;
+//	    Double_t E3bmax=Ec1;	    
 	    Double_t K4bmax=Kd1;
-	    Double_t E4bmax=Ed1;
+//	    Double_t E4bmax=Ed1;
 
 /*	
 	    cout<<"angle of proton calculated: "<<theta4*180./3.14<<"  "
@@ -1189,7 +1189,7 @@ void R3BNeutronTracker::Exec(Option_t* opt) {
       }
 
       for (Int_t i=1;i<Nclusters;i++){ 
-         Double_t betaMax=0.;
+//         Double_t betaMax=0.;
          Double_t betaMin=10.;
 	 Int_t index=1;
          for (Int_t k=1;k<Nclusters;k++){ 

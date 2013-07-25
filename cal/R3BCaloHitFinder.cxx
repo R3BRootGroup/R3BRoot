@@ -391,7 +391,7 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
   Int_t alveolusCopy =0;
   Int_t crystalInAlveolus=0;
 
-  TGeoVolume *pAWorld  =  gGeoManager->GetTopVolume();
+//  TGeoVolume *pAWorld  =  gGeoManager->GetTopVolume();
   if (fGeometryVersion==0) {
     //The present scheme here done works nicely with 5.0
     // crystalType = crystal type (from 1 to 30)

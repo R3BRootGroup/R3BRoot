@@ -28,7 +28,7 @@ Bool_t R3BMfiDigiPar::getParams(FairParamList* list)
 }
 
 
-void R3BMfiDigiPar::Print()
+void R3BMfiDigiPar::Print(Option_t *option) const
 {
     std::cout<<"-I- Mfi Digi Parameters:"<<std::endl;
 //    std::cout<<"   Max Paddle   = "<<nMaxPaddle<<std::endl;

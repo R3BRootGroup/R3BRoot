@@ -28,7 +28,7 @@ Bool_t R3BTarget2pDigiPar::getParams(FairParamList* list)
 }
 
 
-void R3BTarget2pDigiPar::Print()
+void R3BTarget2pDigiPar::Print(Option_t *option) const
 {
     std::cout<<"-I- Target2p Digi Parameters:"<<std::endl;
 //    std::cout<<"   Max Paddle   = "<<nMaxPaddle<<std::endl;

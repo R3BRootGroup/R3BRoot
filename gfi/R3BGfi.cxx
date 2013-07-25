@@ -280,7 +280,7 @@ TClonesArray* R3BGfi::GetCollection(Int_t iColl) const {
 
 
 // -----   Public method Print   ----------------------------------------------
-void R3BGfi::Print() const
+void R3BGfi::Print(Option_t *option) const
 {
   Int_t nHits = fGfiCollection->GetEntriesFast();
   LOG(INFO) << "R3BGfi: " << nHits << " points registered in this event" << FairLogger::endl;

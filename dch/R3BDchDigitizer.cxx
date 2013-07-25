@@ -273,12 +273,12 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
      Double_t fX_Local_Out = dch_obj->GetXLocalOut();
      Double_t fY_Local_Out = dch_obj->GetYLocalOut();
 
-     Double_t fX_Global_In = dch_obj->GetXIn();
-     Double_t fY_Global_In = dch_obj->GetYIn();
-     Double_t fZ_Global_In = dch_obj->GetZIn();
-     Double_t fX_Global_Out = dch_obj->GetXOut();
-     Double_t fY_Global_Out = dch_obj->GetYOut();
-     Double_t fZ_Global_Out = dch_obj->GetZOut();
+//     Double_t fX_Global_In = dch_obj->GetXIn();
+//     Double_t fY_Global_In = dch_obj->GetYIn();
+//     Double_t fZ_Global_In = dch_obj->GetZIn();
+//     Double_t fX_Global_Out = dch_obj->GetXOut();
+//     Double_t fY_Global_Out = dch_obj->GetYOut();
+//     Double_t fZ_Global_Out = dch_obj->GetZOut();
      TrackId = dch_obj->GetTrackID();
      R3BMCTrack *aTrack = (R3BMCTrack*) fDchMCTrack->At(TrackId);   
      Int_t PID = aTrack->GetPdgCode();
@@ -291,9 +291,9 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
      Double_t fY_Local_sim = ((fY_Local_In + fY_Local_Out)/2);
 
      //Need modifications
-     Double_t fX_Global = ((fX_Global_In + fX_Global_Out)/2);
-     Double_t fY_Global = ((fY_Global_In + fY_Global_Out)/2);
-     Double_t fZ_Global = ((fZ_Global_In + fZ_Global_Out)/2);
+//     Double_t fX_Global = ((fX_Global_In + fX_Global_Out)/2);
+//     Double_t fY_Global = ((fY_Global_In + fY_Global_Out)/2);
+//     Double_t fZ_Global = ((fZ_Global_In + fZ_Global_Out)/2);
 
      //hardcoded detector centres wrt target, from Ralf's Tracker:
      //PDC1:    x0=-123.219446 y0=3.597104 z0=444.126271
@@ -301,7 +301,7 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
 
      Double_t fX_Local = 0.;	//initialisation, values will be PDC-specific
      Double_t fY_Local = 0.; 
-     Double_t fZ_Local = 0.; 
+//     Double_t fZ_Local = 0.; 
 
     //if(PID==2212 && mother<0) {
     if(PID==1000010010 && mother<0) {

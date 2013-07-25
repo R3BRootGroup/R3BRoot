@@ -382,7 +382,9 @@ void R3BGladFieldMap::SetPosition(Double_t x, Double_t y, Double_t z) {
 
 
 // ---------   Screen output   --------------------------------------------
-void R3BGladFieldMap::Print() {  TString type = "Map";
+void R3BGladFieldMap::Print(Option_t *option) const
+{
+  TString type = "Map";
   if ( fType == 2 ) type = "Map sym2";
   if ( fType == 3 ) type = "Map sym3";
   cout << "======================================================" << endl;
@@ -403,12 +405,12 @@ void R3BGladFieldMap::Print() {  TString type = "Map";
   cout << "----  Field centre position: ( " << setw(6) << fPosX << ", "
        << setw(6) << fPosY << ", " << setw(6) << fPosZ << ") cm" << endl;
   cout << "----  Field scaling factor: " << fScale << endl;
-  Double_t bx = GetBx(0.,0.,0.);
-  Double_t by = GetBy(0.,0.,0.);
-  Double_t bz = GetBz(0.,0.,0.);
-  cout << "----" << endl;
-  cout << "----  Field at origin is ( " << setw(6) << bx << ", " << setw(6)
-       << by << ", " << setw(6) << bz << ") kG" << endl;
+//  Double_t bx = GetBx(0.,0.,0.);
+//  Double_t by = GetBy(0.,0.,0.);
+//  Double_t bz = GetBz(0.,0.,0.);
+//  cout << "----" << endl;
+//  cout << "----  Field at origin is ( " << setw(6) << bx << ", " << setw(6)
+//       << by << ", " << setw(6) << bz << ") kG" << endl;
  cout << "======================================================" << endl;
 }
 // ------------------------------------------------------------------------  
