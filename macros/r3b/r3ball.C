@@ -379,15 +379,15 @@ void r3ball(Int_t nEvents = 1,
   
   if (fGenerator.CompareTo("box") == 0  ) {
     // 2- Define the BOX generator
-    Double_t pdgId=211; // pion beam
-    Double_t theta1= 0.;  // polar angle distribution
-    Double_t theta2= 7.;
-    Double_t momentum=.8; // 10 GeV/c
+    Int_t pdgId = 211; // pion beam
+    Double32_t theta1 = 0.;  // polar angle distribution
+    Double32_t theta2 = 7.;
+    Double32_t momentum = 0.8; // 10 GeV/c
     FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 50);
-    boxGen->SetThetaRange (   theta1,   theta2);
-    boxGen->SetPRange     (momentum,momentum*2.);
-    boxGen->SetPhiRange   (0.,360.);
-    boxGen->SetXYZ(0.0,0.0,-1.5);
+    boxGen->SetThetaRange(theta1, theta2);
+    boxGen->SetPRange(momentum, momentum*2.);
+    boxGen->SetPhiRange(0, 360);
+    boxGen->SetXYZ(0.0, 0.0, -1.5);
     // add the box generator
     primGen->AddGenerator(boxGen);
   }
