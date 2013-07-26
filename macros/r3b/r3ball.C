@@ -393,7 +393,7 @@ void r3ball(Int_t nEvents = 1,
   }
   
   if (fGenerator.CompareTo("ascii") == 0  ) {
-    R3BAsciiGenerator* gen = new R3BAsciiGenerator(InFile.Data());
+    R3BAsciiGenerator* gen = new R3BAsciiGenerator((dir+"/input/"+InFile).Data());
     primGen->AddGenerator(gen);
   }
   
