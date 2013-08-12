@@ -17,14 +17,12 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "FairLogger.h"
 
 #include "TGeoManager.h"
 
 #include "R3BCaloCrystalHit.h"
 #include "R3BCaloCrystalHitSim.h"
-
-using std::cout;
-using std::endl;
 
 
 R3BCaloHitFinder::R3BCaloHitFinder() : FairTask("R3B CALIFA Hit Finder ")
@@ -61,14 +59,9 @@ void R3BCaloHitFinder::SetParContainers()
   if ( ! rtdb ) Fatal("R3BCaloHitFinder::SetParContainers", "No runtime database");
 
   fCaloHitFinderPar = (R3BCaloHitFinderPar*)(rtdb->getContainer("R3BCaloHitFinderPar"));
-
-  if ( fCaloHitFinderPar ) {
-    cout << "-I- R3BCaloHitFinder::SetParContainers() "<< endl;
-    cout << "-I- Container R3BCaloHitFinderPar  loaded " << endl;
-  }
    */
-
 }
+
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BCaloHitFinder::Init()
@@ -149,7 +142,6 @@ void R3BCaloHitFinder::Exec(Option_t* opt)
   crystalHits = fCrystalHitCA->GetEntries();
 
   if (crystalHits>0) {
-    //cout << "-I- R3BCaloHitFinder: Processing an event with " << crystalHits << " crystalHits." << endl;
     if(kSimulation) {
        crystalHitSim = new R3BCaloCrystalHitSim*[crystalHits];
        usedCrystalHits = new Int_t[crystalHits];
@@ -329,7 +321,6 @@ void R3BCaloHitFinder::Exec(Option_t* opt)
 void R3BCaloHitFinder::Reset()
 {
   // Clear the CA structure
-  // cout << " -I- R3BCaloHitFinder:Reset() called " << endl;
 
   if (fCaloHitCA) fCaloHitCA->Clear();
 }
@@ -340,33 +331,29 @@ void R3BCaloHitFinder::Reset()
 // ---- Public method Finish   --------------------------------------------------
 void R3BCaloHitFinder::Finish()
 {
-  // here event. write histos
-  //   cout << " -I- Digit Finish() called " << endl;
-  // Write control histograms
-
 }
 
 
 // -----  Public method SelectGeometryVersion  ----------------------------------
 void R3BCaloHitFinder::SelectGeometryVersion(Int_t version)
 {
-  fGeometryVersion=version;
+  fGeometryVersion = version;
 }
 
 
 // -----  Public method SetExperimentalResolution  ----------------------------------
 void R3BCaloHitFinder::SetExperimentalResolution(Double_t crystalRes)
 {
-  fCrystalResolution=crystalRes;
-  cout << "-I- R3BCaloHitFinder::SetExperimentalResolution to " << fCrystalResolution << "% @ 1 MeV." << endl;
+  fCrystalResolution = crystalRes;
+  LOG(INFO) << "R3BCaloHitFinder::SetExperimentalResolution to " << fCrystalResolution << "% @ 1 MeV." << FairLogger::endl;
 }
 
 
 // -----  Public method SetDetectionThreshold  ----------------------------------
 void R3BCaloHitFinder::SetDetectionThreshold(Double_t thresholdEne)
 {
-  fThreshold=thresholdEne;
-  cout << "-I- R3BCaloHitFinder::SetDetectionThreshold to " << fThreshold << " GeV." << endl;
+  fThreshold = thresholdEne;
+  LOG(INFO) << "R3BCaloHitFinder::SetDetectionThreshold to " << fThreshold << " GeV." << FairLogger::endl;
 }
 
 
@@ -448,7 +435,6 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
       sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iB_%i/Crystal_%iB_1",
               crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus, alveoliType[crystalType-1]);
 
-    //cout << gGeoManager->GetPath()<<endl;
     gGeoManager->cd(nameVolume);
     TGeoNode* currentNode = gGeoManager->GetCurrentNode();
     currentNode->LocalToMaster(local, master);
@@ -499,7 +485,6 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
       sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iB_%i/Crystal_%iB_1",
               crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus, alveoliType[crystalType-1]);
 
-    //cout << gGeoManager->GetPath()<<endl;
     gGeoManager->cd(nameVolume);
     TGeoNode* currentNode = gGeoManager->GetCurrentNode();
     currentNode->LocalToMaster(local, master);
@@ -546,7 +531,6 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
         sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iB_%i/Crystal_%iB_1",
                 crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus, alveoliType[crystalType-1]);
 
-      //cout << gGeoManager->GetPath()<<endl;
       gGeoManager->cd(nameVolume);
       TGeoNode* currentNode = gGeoManager->GetCurrentNode();
       currentNode->LocalToMaster(local, master);
@@ -586,7 +570,6 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
       sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iA_%i/Crystal_%iA_1",
               crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus, alveoliType[crystalType-1]);
 
-      //cout << gGeoManager->GetPath()<<endl;
       gGeoManager->cd(nameVolume);
       TGeoNode* currentNode = gGeoManager->GetCurrentNode();
       currentNode->LocalToMaster(local, master);
@@ -622,7 +605,6 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
 
     /*crystalType = ((iD-3000)%23) + 1;  //For phoswich endcap of IEM-CSIC Madrid: */crystalType = ((iD-3000)%30) + 1;
     /*crystalCopy = (iD-3000)/23 + 1;  //For phoswich endcap of IEM-CSIC Madrid: */ crystalCopy = (iD-3000)/30 + 1;
-    //cout << " -------       crystalID="<< iD <<  "         crystalType="
     //  << crystalType <<  "        crystalCopy="<< crystalCopy <<endl;
 
     //here the alveoliType array meaning is opposite to the other BARREL cases...
@@ -686,7 +668,6 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
       local[0]=-1.61999999999997; local[1]=7.22933631874703; local[2]=9.75;
     }  //to this line)  --Phoswich endcap of Madrid. Jose Sanchez del Rio.*/
 
-    //cout << gGeoManager->GetPath()<<endl;
     gGeoManager->cd(nameVolume);
     TGeoNode* currentNode = gGeoManager->GetCurrentNode();
     currentNode->LocalToMaster(local, master);
@@ -730,7 +711,6 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
         sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iB_%i/Crystal_%iB_1",
                 crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus, alveoliType[crystalType-1]);
 
-      //cout << gGeoManager->GetPath()<<endl;
       gGeoManager->cd(nameVolume);
       TGeoNode* currentNode = gGeoManager->GetCurrentNode();
       currentNode->LocalToMaster(local, master);
@@ -761,7 +741,6 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
       /*crystalType = ((iD-3000)%23) + 1;//For phoswich endcap of IEM-CSIC Madrid:*/crystalType = ((iD-3000)%30) + 1;
       /*crystalCopy = (iD-3000)/23 + 1; //For phoswich endcap of IEM-CSIC Madrid:*/ crystalCopy = (iD-3000)/30 + 1; 
       
-      //cout << " -------       crystalID="<< iD <<  "         crystalType="
       //  << crystalType <<  "        crystalCopy="<< crystalCopy <<endl;
 
       //here the alveoliType array meaning is opposite to the other BARREL cases...
@@ -825,7 +804,6 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
         local[0]=-1.61999999999997; local[1]=7.22933631874703; local[2]=9.75;
       }   //to this line)  --Phoswich endcap of Madrid. Jose Sanchez del Rio.*/
 
-      //cout << gGeoManager->GetPath()<<endl;
       gGeoManager->cd(nameVolume);
       TGeoNode* currentNode = gGeoManager->GetCurrentNode();
       currentNode->LocalToMaster(local, master);
@@ -869,8 +847,7 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
         sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iB_%i/Crystal_%iB_1",
                 crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus, alveoliType[crystalType-1]);
 
-      //cout << gGeoManager->GetPath()<<endl;
-      gGeoManager->cd(nameVolume);
+       gGeoManager->cd(nameVolume);
       TGeoNode* currentNode = gGeoManager->GetCurrentNode();
       currentNode->LocalToMaster(local, master);
       if (crystalInAlveolus<3)
@@ -908,7 +885,6 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
       sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_%i_%i/CrystalWithWrapping_%iA_%i/Crystal_%iA_1",
               crystalType, alveolusCopy-1, alveoliType[crystalType-1], crystalInAlveolus, alveoliType[crystalType-1]);
 
-      //cout << gGeoManager->GetPath()<<endl;
       gGeoManager->cd(nameVolume);
       TGeoNode* currentNode = gGeoManager->GetCurrentNode();
       currentNode->LocalToMaster(local, master);
@@ -937,8 +913,6 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
 
      /* crystalType = ((iD-3000)%23) + 1;For phoswich endcap of IEM-CSIC Madrid:(CLF717_Geometry_PhoswichEndcap_5.geo)*/  crystalType = ((iD-3000)%30) + 1;
      /* crystalCopy = (iD-3000)/23 + 1;For phoswich endcap of IEM-CSIC Madrid:(CLF717_Geometry_PhoswichEndcap_5.geo)*/  crystalCopy = (iD-3000)/30 + 1;
-      //cout << " -------       crystalID="<< iD <<  "         crystalType="
-      //  << crystalType <<  "        crystalCopy="<< crystalCopy <<endl;
 
       //here the alveoliType array meaning is opposite to the other BARREL cases...
       //the array shows the alveoli number where each crystal of the EndCap belong
@@ -999,7 +973,6 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
         local[0]=-1.61999999999997; local[1]=7.22933631874703; local[2]=9.75;
       }//to this line)  --Phoswich endcap of Madrid. Jose Sanchez del Rio.*/
 
-      //cout << gGeoManager->GetPath()<<endl;
       gGeoManager->cd(nameVolume);
       TGeoNode* currentNode = gGeoManager->GetCurrentNode();
       currentNode->LocalToMaster(local, master);
@@ -1044,8 +1017,6 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
 		if(iD<33) crystalInAlveolus =1;          //Alv type 1
 		else crystalInAlveolus = (iD-33)%4 + 1;         //Crystal number in alveolus (from 1 to 4)
 
-		//cout << " -------       crystalID="<< iD <<  "         crystalType="
-    //  << crystalType <<  "        crystalCopy="<< crystalCopy<<  "        alveolusCopy="<< alveolusCopy <<  "        crystalInAlveolus="<< crystalInAlveolus<<endl;
 
 		
     Int_t alveoliType[16]={1,2,2,2,2,3,3,4,4,4,5,5,5,6,6,6};
@@ -1110,7 +1081,6 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal,
 			}
 		}		
 
-		//cout << gGeoManager->GetPath()<<endl;
     gGeoManager->cd(nameVolume);
     TGeoNode* currentNode = gGeoManager->GetCurrentNode();
     currentNode->LocalToMaster(local, master);
@@ -1177,10 +1147,9 @@ Char_t nameVolume[200];
       currentNode = gGeoManager->GetCurrentNode();
       local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
       currentNode->LocalToMaster(local, master);
-      } }else cout << "-E- R3BCaloHitFinder: Geometry version not available in R3BCalo::ProcessHits(). " << endl;
+} }else LOG(ERROR) << "R3BCaloHitFinder: Geometry version not available in R3BCalo::ProcessHits(). " << FairLogger::endl;
 
 
-  //cout << "-I- R3BCaloHitFinder::GetAngles: position of crystal center: "<<master[0] << ", "<<master[1] << ", "<<master[2] << endl;
   TVector3 masterV(master[0],master[1],master[2]);
   //masterV.Print();
   *polar=masterV.Theta();
@@ -1206,7 +1175,6 @@ Double_t R3BCaloHitFinder::ExpResSmearing(Double_t inputEnergy)
   else {
     //Energy in MeV, that is the reason for the factor 1000...
     Double_t randomIs = gRandom->Gaus(0,inputEnergy*fCrystalResolution*1000/(235*sqrt(inputEnergy*1000)));
-    //cout << "randomIs " << randomIs  << " for and Energy of "<< rawEnergy  << endl;
     return inputEnergy + randomIs/1000;
   }
 }
@@ -1246,8 +1214,6 @@ R3BCaloHit* R3BCaloHitFinder::AddHit(UInt_t Nbcrystals,Double_t ene,Double_t pAn
   // It fills the R3BCaloHit array
   TClonesArray& clref = *fCaloHitCA;
   Int_t size = clref.GetEntriesFast();
-  //cout << "-I- R3BCaloHitFinder: Adding CaloHit from " << Nbcrystals
-  //  << " crystalHits, depositing " << ene*1e06 << " keV" << endl;
   return new(clref[size]) R3BCaloHit(Nbcrystals, ene, pAngle, aAngle);
 }
 
@@ -1257,8 +1223,6 @@ R3BCaloHitSim* R3BCaloHitFinder::AddHitSim(UInt_t Nbcrystals,Double_t ene,Double
   // It fills the R3BCaloHitSim array
   TClonesArray& clref = *fCaloHitCA;
   Int_t size = clref.GetEntriesFast();
-  //cout << "-I- R3BCaloHitFinder: Adding CaloHitSim from " << Nbcrystals
-  //  << " crystalHits, depositing " << ene*1e06 << " keV " << endl;
   return new(clref[size]) R3BCaloHitSim(Nbcrystals, ene, pAngle, aAngle, einc);
 }
 
