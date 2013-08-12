@@ -193,31 +193,15 @@ void r3ball(Int_t nEvents = 1,
     run->AddModule(tof);
   }
   
-  
   // mTof
   if (fDetList.FindObject("MTOF") ) {
     R3BDetector* mTof = new R3BmTof("mTof", kTRUE);
-    // Global position of the Module
-    phi   =  0.0; // (deg)
-    theta =  0.0; // (deg)
-    psi   =  0.0; // (deg)
-    // Rotation in Ref. Frame.
-    thetaX =  0.0; // (deg)
-    thetaY =  0.0; // (deg)
-    thetaZ =  0.0; // (deg)
-    // Global translation in Lab
-    tx    =  0.0; // (cm)
-    ty    =  0.0; // (cm)
-    tz    =  0.0; // (cm)
-    //mTof->SetRotAnglesEuler(phi,theta,psi);
-    mTof->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-    mTof->SetTranslation(tx,ty,tz);
+    mTof->SetGeometryFileName("mtof_v13a.geo.root");
     // User defined Energy CutOff
     Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
     ((R3BmTof*) mTof)->SetEnergyCutOff(fCutOffSci);
     run->AddModule(mTof);
   }
-  
   
   // GFI detector
   if (fDetList.FindObject("GFI") ) {
