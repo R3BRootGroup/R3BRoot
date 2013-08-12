@@ -236,26 +236,12 @@ void r3ball(Int_t nEvents = 1,
   // GFI detector
   if (fDetList.FindObject("GFI") ) {
     R3BDetector* gfi = new R3BGfi("Gfi", kTRUE);
-    // Global position of the Module
-    phi   =  0.0; // (deg)
-    theta =  0.0; // (deg)
-    psi   =  0.0; // (deg)
-    // Rotation in Ref. Frame.
-    thetaX =  0.0; // (deg)
-    thetaY =  0.0; // (deg)
-    thetaZ =  0.0; // (deg)
-    // Global translation in Lab
-    tx    =  0.0; // (cm)
-    ty    =  0.0; // (cm)
-    tz    =  0.0; // (cm)
-    gfi->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-    gfi->SetTranslation(tx,ty,tz);
+    gfi->SetGeometryFileName("gfi_v13a.geo.root");
     // User defined Energy CutOff
     Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
     ((R3BGfi*) gfi)->SetEnergyCutOff(fCutOffSci);
     run->AddModule(gfi);
   }
-  
   
   // Land Detector
   if (fDetList.FindObject("LAND") ) {
@@ -264,7 +250,6 @@ void r3ball(Int_t nEvents = 1,
     land->SetGeometryFileName("land_v12a_10m.geo.root");
     run->AddModule(land);
   }
-  
   
   // NeuLand Scintillator Detector
   if(fDetList.FindObject("SCINTNEULAND")) {
@@ -335,7 +320,7 @@ void r3ball(Int_t nEvents = 1,
   // the Field Map has to be transformed accordingly
   if (fFieldMap == 0) {
     R3BAladinFieldMap* magField = new R3BAladinFieldMap("AladinMaps");
-    Double_t fMeasCurrent = 2500.;// I_current [A]
+    Double_t fMeasCurrent = 1500.;// I_current [A]
     magField->SetCurrent(fMeasCurrent);
     magField->SetScale(fieldScale);
     

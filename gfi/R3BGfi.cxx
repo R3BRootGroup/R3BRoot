@@ -2,6 +2,8 @@
 // -----                        R3BGfi source file                     -----
 // -----                  Created 26/03/09  by D.Bertini               -----
 // -------------------------------------------------------------------------
+#include <stdlib.h>
+
 #include "R3BGfi.h"
 
 #include "R3BGeoGfi.h"
@@ -26,24 +28,6 @@
 
 // includes for modeling
 #include "TGeoManager.h"
-#include "TParticle.h"
-#include "TVirtualMC.h"
-#include "TGeoMatrix.h"
-#include "TGeoMaterial.h"
-#include "TGeoMedium.h"
-#include "TGeoBBox.h"
-#include "TGeoPara.h"
-#include "TGeoPgon.h"
-#include "TGeoSphere.h"
-#include "TGeoArb8.h"
-#include "TGeoCone.h"
-#include "TGeoBoolNode.h"
-#include "TGeoCompositeShape.h"
-#include <iostream>
-
-using std::cout;
-using std::cerr;
-using std::endl;
 
 
 
@@ -331,363 +315,32 @@ R3BGfiPoint* R3BGfi::AddHit(Int_t trackID, Int_t detID, Int_t plane , TVector3 p
   return new(clref[size]) R3BGfiPoint(trackID, detID, plane, posIn, posOut,
                                       momIn, momOut, time, length, eLoss);
 }
+
+
+
 // -----   Public method ConstructGeometry   ----------------------------------
-void R3BGfi::ConstructGeometry() {
-
-  // out-of-file geometry definition
-   Double_t dx,dy,dz;
-   Double_t a;
-   Double_t thx, phx, thy, phy, thz, phz;
-   Double_t z, density, radl, absl, w;
-   Int_t nel, numed;
-
-
-/****************************************************************************/
-// Material definition
-
- // Vacuum
-
-   TGeoMedium * pMed1=NULL;
-   if (gGeoManager->GetMedium("Vacuum") ){
-       pMed1=gGeoManager->GetMedium("Vacuum");
-   }else{
-       TGeoMaterial *matVacuum = new TGeoMaterial("Vacuum", 0,0,0);
-       Double_t par[8];
-       par[0]  = 0.000000; // isvol
-       par[1]  = 0.000000; // ifield
-       par[2]  = 0.000000; // fieldm
-       par[3]  = 0.000000; // tmaxfd
-       par[4]  = 0.000000; // stemax
-       par[5]  = 0.000000; // deemax
-       par[6]  = 0.000100; // epsil
-       par[7]  = 0.000000; // stmin
-       pMed1 = new TGeoMedium("Vacuum",1, matVacuum,par);
-   }
-
-   // Mixture: Air
-   TGeoMedium * pMed2=NULL;
-   if (gGeoManager->GetMedium("Air") ){
-       pMed2=gGeoManager->GetMedium("Air");
-   }else{
-       nel     = 2;
-       density = 0.001290;
-       TGeoMixture*
-	   pMat2 = new TGeoMixture("Air", nel,density);
-       a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
-       pMat2->DefineElement(0,a,z,w);
-       a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
-       pMat2->DefineElement(1,a,z,w);
-       pMat2->SetIndex(1);
-       // Medium: Air
-       numed   = 1;  // medium number
-       Double_t par[8];
-       par[0]  = 0.000000; // isvol
-       par[1]  = 0.000000; // ifield
-       par[2]  = 0.000000; // fieldm
-       par[3]  = 0.000000; // tmaxfd
-       par[4]  = 0.000000; // stemax
-       par[5]  = 0.000000; // deemax
-       par[6]  = 0.000100; // epsil
-       par[7]  = 0.000000; // stmin
-       pMed2 = new TGeoMedium("Air", numed,pMat2, par);
-   }
-
-   // Mixture: plasticForGFI
-   TGeoMedium * pMed35=NULL;
-   if (gGeoManager->GetMedium("plasticForGFI") ){
-       pMed35=gGeoManager->GetMedium("plasticForGFI");
-   }else{
-       nel     = 2;
-       density = 1.032000;
-       TGeoMixture*
-	   pMat35 = new TGeoMixture("plasticForGFI", nel,density);
-       a = 12.010700;   z = 6.000000;   w = 0.914708;  // C
-       pMat35->DefineElement(0,a,z,w);
-       a = 1.007940;   z = 1.000000;   w = 0.085292;  // H
-       pMat35->DefineElement(1,a,z,w);
-       pMat35->SetIndex(34);
-       // Medium: plasticForGFI
-       numed   = 34;  // medium number
-       Double_t par[8];
-       par[0]  = 0.000000; // isvol
-       par[1]  = 0.000000; // ifield
-       par[2]  = 0.000000; // fieldm
-       par[3]  = 0.000000; // tmaxfd
-       par[4]  = 0.000000; // stemax
-       par[5]  = 0.000000; // deemax
-       par[6]  = 0.000100; // epsil
-       par[7]  = 0.000000; // stmin
-       pMed35 = new TGeoMedium("plasticForGFI", numed,pMat35,par);
-   }
-
-
-   // Material: Aluminum
-   TGeoMedium * pMed21=NULL;
-   if (gGeoManager->GetMedium("Aluminum") ){
-       pMed21=gGeoManager->GetMedium("Aluminum");
-   }else{
-       a       = 26.980000;
-       z       = 13.000000;
-       density = 2.700000;
-       radl    = 8.875105;
-       absl    = 388.793113;
-
-       TGeoMaterial *matAl
-	   = new TGeoMaterial("Aluminum", a,z,density,radl,absl);
-
-       Double_t par[8];
-       par[0]  = 0.000000; // isvol
-       par[1]  = 0.000000; // ifield
-       par[2]  = 0.000000; // fieldm
-       par[3]  = 0.000000; // tmaxfd
-       par[4]  = 0.000000; // stemax
-       par[5]  = 0.000000; // deemax
-       par[6]  = 0.000100; // epsil
-       par[7]  = 0.000000; // stmin
-       pMed21 = new TGeoMedium("Aluminum",3, matAl,par);
-   }
-
-   // TRANSFORMATION MATRICES
-   // Combi transformation:
-   //GFI1 position
-   //dx = -71.973310; //Justyna
-   //dy = 0.000000;   //Justyna
-   //dz = 513.967775; //Justyna
-   //dx = -72.164874; //Justyna new
-   //dy = -0.010000;   //Justyna new
-   //dz = 513.910302; //Justyna new
-   //dx = -73.381; //dE tracker
-   //dy = 0.070;
-   //dz = 513.421;
-   
-   //LABPOS(GFI1,-73.274339,0.069976,513.649524)
-   dx = -73.274339; //dE tracker, correction due to wrong angle
-   dy = 0.069976;
-   dz = 513.649524;
-   
-/*
-   dx = 73.700000;
-   dy = 0.000000;
-   dz = 525.400000;
-*/
-   // Rotation: 
-   thx = -106.700000;    phx = 0.000000;
-//   thx = 106.700000;    phx = 0.000000;   
-   thy = 90.000000;    phy = 90.000000;
-   thz = -16.700000;    phz = 0.000000;
-   TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-   pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
-   // Combi transformation: 
-   dx = 0.000000;
-   dy = 0.000000;
-   dz = 0.000000;
-   // Rotation: 
-   thx = 90.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = 0.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix7 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-   pMatrix6 = new TGeoCombiTrans("", dx,dy,dz,pMatrix7);
-   // Combi transformation: 
-   dx = 0.000000;
-   dy = 27.000000;
-   dz = 0.000000;
-   // Rotation: 
-   thx = 90.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = 0.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix9 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-    TGeoCombiTrans*
-   pMatrix8 = new TGeoCombiTrans("", dx,dy,dz,pMatrix9);
-   // Combi transformation: 
-   dx = 0.000000;
-   dy = -27.000000;
-   dz = 0.000000;
-   // Rotation: 
-   thx = 90.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = 0.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix11 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-    TGeoCombiTrans*
-   pMatrix10 = new TGeoCombiTrans("", dx,dy,dz,pMatrix11);
-   // Combi transformation: 
-   dx = 27.000000;
-   dy = 0.000000;
-   dz = 0.000000;
-   // Rotation: 
-   thx = 90.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = 0.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix13 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-    TGeoCombiTrans*
-   pMatrix12 = new TGeoCombiTrans("", dx,dy,dz,pMatrix13);
-   // Combi transformation: 
-   dx = -27.000000;
-   dy = 0.000000;
-   dz = 0.000000;
-   // Rotation: 
-   thx = 90.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = 0.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix15 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-   pMatrix14 = new TGeoCombiTrans("", dx,dy,dz,pMatrix15);
-   // Combi transformation:
-   //GFI2 position 
-   //dx = -145.270039; //Justyna
-   //dy = 0.000000;    //Justyna
-   //dz = 730.318956;  //Justyna
-   //dx = -145.212570; //Justyna new
-   //dy = -0.010000;    //Justyna new
-   //dz = 730.336197;  //Justyna new
-   //dx = -147.486; //dE tracker
-   //dy = 0.070;
-   //dz = 729.798;
-   
-   //LABPOS(GFI2,-147.135037,0.069976,729.680342)
-   dx = -147.135037; //dE tracker, correction due to wrong angle
-   dy = 0.069976;
-   dz = 729.680342;
-   
-/*
-   dx = 141.800000;
-   dy = 0.000000;
-   dz = 727.300000;
-*/   
-   // Rotation: 
-   thx = -106.700000;    phx = 0.000000;
-//   thx = 106.700000;    phx = 0.000000;   
-   thy = 90.000000;    phy = 90.000000;
-   thz = -16.700000;    phz = 0.000000;
-   TGeoRotation *pMatrix5 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-   pMatrix4 = new TGeoCombiTrans("", dx,dy,dz,pMatrix5);
-
-
-   // World definition
-   TGeoVolume* pWorld = gGeoManager->GetTopVolume();
-   pWorld->SetVisLeaves(kTRUE);
-
- 
-
-
-   // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
-   // Shape: GFIBoxWorld type: TGeoBBox
-   dx = 28.24000;
-   dy = 29.00000;
-   dz = 0.050000;
-   TGeoShape *pGFIBoxWorld = new TGeoBBox("GFIBoxWorld", dx,dy,dz);
-   // Volume: GFILogWorld
-   TGeoVolume*
-   pGFILogWorld = new TGeoVolume("GFILogWorld",pGFIBoxWorld, pMed2);
-   pGFILogWorld->SetVisLeaves(kTRUE);
-
-   // Global positioning
-
-   TGeoCombiTrans *pGlobal1 = GetGlobalPosition(pMatrix2);
-   TGeoCombiTrans *pGlobal2 = GetGlobalPosition(pMatrix4);
-
-   pWorld->AddNode( pGFILogWorld, 0, pGlobal1 );
-   pWorld->AddNode( pGFILogWorld, 1, pGlobal2 );
-
-
-
-   // Shape: GFIBox type: TGeoBBox
-   dx = 25.000000;
-   dy = 25.000000;
-   dz = 0.050000;
-   TGeoShape *pGFIBox = new TGeoBBox("GFIBox", dx,dy,dz);
-   // Volume: GFILog
-   TGeoVolume*
-   pGFILog = new TGeoVolume("GFILog",pGFIBox, pMed35);
-   pGFILog->SetVisLeaves(kTRUE);
-   pGFILogWorld->AddNode(pGFILog, 0, pMatrix6);
-
-   // Shape: UpFrame type: TGeoBBox
-   dx = 29.000000;
-   dy = 2.000000;
-   dz = 0.050000;
-   TGeoShape *pUpFrame = new TGeoBBox("UpFrame", dx,dy,dz);
-   // Volume: logicUpFrame
-   TGeoVolume*
-   plogicUpFrame = new TGeoVolume("logicUpFrame",pUpFrame, pMed21);
-   plogicUpFrame->SetVisLeaves(kTRUE);
-   pGFILogWorld->AddNode(plogicUpFrame, 0, pMatrix8);
-   // Shape: DownFrame type: TGeoBBox
-   dx = 29.000000;
-   dy = 2.000000;
-   dz = 0.050000;
-   TGeoShape *pDownFrame = new TGeoBBox("DownFrame", dx,dy,dz);
-   // Volume: logicDownFrame
-   TGeoVolume*
-   plogicDownFrame = new TGeoVolume("logicDownFrame",pDownFrame, pMed21);
-   plogicDownFrame->SetVisLeaves(kTRUE);
-   pGFILogWorld->AddNode(plogicDownFrame, 0, pMatrix10);
-   // Shape: RightFrame type: TGeoBBox
-   dx = 2.000000;
-   dy = 25.000000;
-   dz = 0.050000;
-   TGeoShape *pRightFrame = new TGeoBBox("RightFrame", dx,dy,dz);
-   // Volume: logicRightFrame
-   TGeoVolume*
-   plogicRightFrame = new TGeoVolume("logicRightFrame",pRightFrame, pMed21);
-   plogicRightFrame->SetVisLeaves(kTRUE);
-   pGFILogWorld->AddNode(plogicRightFrame, 0, pMatrix12);
-   // Shape: LeftFrame type: TGeoBBox
-   dx = 2.000000;
-   dy = 25.000000;
-   dz = 0.050000;
-   TGeoShape *pLeftFrame = new TGeoBBox("LeftFrame", dx,dy,dz);
-   // Volume: logicLeftFrame
-   TGeoVolume*
-   plogicLeftFrame = new TGeoVolume("logicLeftFrame",pLeftFrame, pMed21);
-   plogicLeftFrame->SetVisLeaves(kTRUE);
-   pGFILogWorld->AddNode(plogicLeftFrame, 0, pMatrix14);
-
-  // Add the sensitive part
-   AddSensitiveVolume(pGFILog);
-   fNbOfSensitiveVol+=1;
-}
-
-
-
-/*
-void R3BGfi::ConstructGeometry() {
-  
-  FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
-  FairGeoInterface* geoFace = geoLoad->getGeoInterface();
-  R3BGeoGfi*       stsGeo  = new R3BGeoGfi();
-  stsGeo->setGeomFile(GetGeometryFileName());
-  geoFace->addGeoModule(stsGeo);
-
-  Bool_t rc = geoFace->readSet(stsGeo);
-  if (rc) stsGeo->create(geoLoad->getGeoBuilder());
-  TList* volList = stsGeo->getListOfVolumes();
-  // store geo parameter
-  FairRun *fRun = FairRun::Instance();
-  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
-  R3BGeoGfiPar* par=(R3BGeoGfiPar*)(rtdb->getContainer("R3BGeoGfiPar"));
-  TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
-  TObjArray *fPassNodes = par->GetGeoPassiveNodes();
-
-  TListIter iter(volList);
-  FairGeoNode* node   = NULL;
-  FairGeoVolume *aVol=NULL;
-
-  while( (node = (FairGeoNode*)iter.Next()) ) {
-      aVol = dynamic_cast<FairGeoVolume*> ( node );
-       if ( node->isSensitive()  ) {
-           fSensNodes->AddLast( aVol );
-       }else{
-           fPassNodes->AddLast( aVol );
-       }
+void R3BGfi::ConstructGeometry()
+{
+  TString fileName = GetGeometryFileName();
+  if(fileName.EndsWith(".root")) {
+    LOG(INFO) << "Constructing GFI geometry from ROOT file " << fileName.Data() << FairLogger::endl;
+    ConstructRootGeometry();
+  } else {
+    LOG(FATAL) << "GFI geometry file is not specified" << FairLogger::endl;
+    exit(1);
   }
-  par->setChanged();
-  par->setInputVersion(fRun->GetRunId(),1);
-  ProcessNodes( volList );
-
 }
-*/
+
+
+
+Bool_t R3BGfi::CheckIfSensitive(std::string name)
+{
+  if(TString(name).Contains("GFILog")) {
+    return kTRUE;
+  }
+  return kFALSE;
+}
+
+
 
 ClassImp(R3BGfi)
