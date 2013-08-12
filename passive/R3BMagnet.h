@@ -10,29 +10,17 @@
 #include "TGeoMatrix.h"
 
 class R3BMagnet : public R3BModule {
-
-private:
-   TGeoCombiTrans *gLobalPos; //!
-   Int_t fGeometryVersion; 
-   Int_t fMedium;
-
-   void ConstructGeometry1();
-   void ConstructGeometry2();
-
+  
 public:
-    R3BMagnet(const char * name, const char *Title="R3B Magnet");
-    R3BMagnet();
-    virtual ~R3BMagnet();
-    void ConstructGeometry();
-    void SetGapMedium(Int_t medium){fMedium=medium;};
-    void SelectGeometry(Int_t version){fGeometryVersion=version;};
-    void ConstructASCIIGeometry();
-    Bool_t CheckIfSensitive(std::string name);
-    ClassDef(R3BMagnet,2) //R3BMagnet
-
-
-
-
+  R3BMagnet(const char * name, const char *Title="R3B Magnet");
+  R3BMagnet();
+  virtual ~R3BMagnet();
+  
+  void ConstructGeometry();
+  
+  Bool_t CheckIfSensitive(std::string name);
+  
+  ClassDef(R3BMagnet,2) //R3BMagnet
 };
 
 #endif //R3BMAGNET_H
