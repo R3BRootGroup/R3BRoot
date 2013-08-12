@@ -6,6 +6,8 @@
 // -----        new Version: 25/11/10 <marc.labiche@stfc.ac.uk>        -----
 // -----        new Version: 08/06/12 <pablo.cabanelas@usc.es>         -----
 // -------------------------------------------------------------------------
+#include <stdlib.h>
+
 #include "R3BXBall.h"
 
 #include "R3BGeoXBall.h"
@@ -48,7 +50,6 @@
 #include "TGeoTube.h"
 #include "TGeoBoolNode.h"
 #include "TGeoCompositeShape.h"
-#include <iostream>
 // try the mathematical ROOT package
 #include "Math/Rotation3D.h"
 #include "Math/Point3D.h"
@@ -430,7 +431,8 @@ void R3BXBall::ConstructGeometry()
     LOG(INFO) << "Constructing Crystal Ball geometry from ROOT file " << fileName.Data() << FairLogger::endl;
     ConstructRootGeometry();
   } else {
-    LOG(FATAL) << "Crystal Ball geometry file is not specified" << FairLogger::endl;
+    LOG(FATAL) << "Crystal Ball geometry file name is not specified" << FairLogger::endl;
+    exit(1);
   }
 }
 
