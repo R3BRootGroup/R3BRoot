@@ -3,6 +3,9 @@
 // -----                  Created 26/03/09  by D.Bertini               -----
 // -----	     Last modification 28/05/12 by P.Cabanelas         -----
 // -------------------------------------------------------------------------
+#include <iostream>
+#include <stdlib.h>
+
 #include "R3BCalo.h"
 
 #include "R3BGeoCalo.h"
@@ -44,7 +47,6 @@
 #include "TGeoTube.h"
 #include "TGeoBoolNode.h"
 #include "TGeoCompositeShape.h"
-#include <iostream>
 
 using std::cout;
 using std::cerr;
@@ -721,7 +723,8 @@ void R3BCalo::ConstructGeometry()
     LOG(INFO) << "Constructing CALIFA geometry from ROOT file " << fileName.Data() << FairLogger::endl;
     ConstructRootGeometry();
   } else {
-    LOG(FATAL) << "CALIFA Geometry file is not specified" << FairLogger::endl;
+    LOG(FATAL) << "CALIFA geometry file name is not specified" << FairLogger::endl;
+    exit(1);
   }
 }
 
