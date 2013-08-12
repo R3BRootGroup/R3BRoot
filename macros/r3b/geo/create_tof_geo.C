@@ -91,67 +91,6 @@ void create_tof_geo(const char* geoTag)
   Int_t nel, numed;
   
   
-  /****************************************************************************/
-  // Material definition
-  
-  
-  // Mixture: Air
-  TGeoMedium * pMed2=NULL;
-  if (gGeoManager->GetMedium("Air") ){
-    pMed2=gGeoManager->GetMedium("Air");
-  }else{
-    nel     = 2;
-    density = 0.001290;
-    TGeoMixture*
-    pMat2 = new TGeoMixture("Air", nel,density);
-    a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
-    pMat2->DefineElement(0,a,z,w);
-    a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
-    pMat2->DefineElement(1,a,z,w);
-    pMat2->SetIndex(1);
-    // Medium: Air
-    numed   = 1;  // medium number
-    Double_t par[8];
-    par[0]  = 0.000000; // isvol
-    par[1]  = 0.000000; // ifield
-    par[2]  = 0.000000; // fieldm
-    par[3]  = 0.000000; // tmaxfd
-    par[4]  = 0.000000; // stemax
-    par[5]  = 0.000000; // deemax
-    par[6]  = 0.000100; // epsil
-    par[7]  = 0.000000; // stmin
-    pMed2 = new TGeoMedium("Air", numed,pMat2, par);
-  }
-  
-  
-  // Mixture: plasticForTOF
-  TGeoMedium * pMed34=NULL;
-  if (gGeoManager->GetMedium("plasticForTOF") ){
-    pMed34=gGeoManager->GetMedium("plasticForTOF");
-  }else{
-    nel     = 2;
-    density = 1.032000;
-    TGeoMixture*
-    pMat34 = new TGeoMixture("plasticForTOF", nel,density);
-    a = 12.010700;   z = 6.000000;   w = 0.914708;  // C
-    pMat34->DefineElement(0,a,z,w);
-    a = 1.007940;   z = 1.000000;   w = 0.085292;  // H
-    pMat34->DefineElement(1,a,z,w);
-    pMat34->SetIndex(33);
-    // Medium: plasticForTOF
-    numed   = 33;  // medium number
-    Double_t par[8];
-    par[0]  = 0.000000; // isvol
-    par[1]  = 0.000000; // ifield
-    par[2]  = 0.000000; // fieldm
-    par[3]  = 0.000000; // tmaxfd
-    par[4]  = 0.000000; // stemax
-    par[5]  = 0.000000; // deemax
-    par[6]  = 0.000100; // epsil
-    par[7]  = 0.000000; // stmin
-    pMed34 = new TGeoMedium("plasticForTOF", numed,pMat34,par);
-  }
-  
   
   // TRANSFORMATION MATRICES
   // Combi transformation:
