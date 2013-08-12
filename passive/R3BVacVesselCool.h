@@ -8,22 +8,21 @@
 #include <TString.h>
 
 
-
 class R3BVacVesselCool : public R3BModule {
 public:
   R3BVacVesselCool(const char * name, const char *Title="R3B VacVesselCool");
   R3BVacVesselCool();
   virtual ~R3BVacVesselCool();
+
   virtual void ConstructGeometry();
+  
   virtual Bool_t CheckIfSensitive(std::string name);
   
 protected:
   TString *fVacVesselCoolName; //!
   void ConstructGeometry1();
   
-  
   ClassDef(R3BVacVesselCool,1)
-  
 };
 
 #endif //R3BVacVesselCool_H

@@ -1,5 +1,6 @@
 //*-- AUTHOR : Marc Labiche
 //*-- Created : 28/06/2012
+#include <stdlib.h>
 
 #include "FairGeoLoader.h"
 #include "FairGeoInterface.h"
@@ -14,45 +15,27 @@
 #include "R3BGeoPassivePar.h"
 #include "R3BGeoVacVesselCool.h"
 
-// includes for modeling
-#include "TGeoManager.h"
-#include "TParticle.h"
-#include "TVirtualMC.h"
-#include "TGeoMatrix.h"
-#include "TGeoMaterial.h"
-#include "TGeoCompositeShape.h"
-#include "TGeoMedium.h"
-#include "TGeoBBox.h"
-#include "TGeoPara.h"
-#include "TGeoTube.h"
-#include "TGeoPgon.h"
-#include "TGeoCone.h"
-#include "TGeoTorus.h"
-#include "TGeoBoolNode.h"
-
-
-#include <iostream>
-#include <TMath.h>
-
 using namespace std;
+
 
 R3BVacVesselCool::~R3BVacVesselCool()
 {
-if (fVacVesselCoolName ) delete fVacVesselCoolName;
+  if(fVacVesselCoolName) {
+    delete fVacVesselCoolName;
+  }
 }
 
 
 R3BVacVesselCool::R3BVacVesselCool()
 {
-fVacVesselCoolName=NULL;
+  fVacVesselCoolName = NULL;
 }
+
 
 R3BVacVesselCool::R3BVacVesselCool(const char * name,  const char * title)
   : R3BModule(name ,title)
 {
-
-fVacVesselCoolName =  new TString(name);
-
+  fVacVesselCoolName = new TString(name);
 }
 
 
@@ -68,12 +51,11 @@ void R3BVacVesselCool::ConstructGeometry1()
 {
   TString fileName = GetGeometryFileName();
   if(fileName.EndsWith(".root")) {
-    fLogger->Info(MESSAGE_ORIGIN,
-                  "Constructing VACVESSEL geometry from ROOT file %s",
-                  fileName.Data());
+    LOG(INFO) << "Constructing VACVESSEL geometry from ROOT file " << fileName.Data() << FairLogger::endl;
     ConstructRootGeometry();
   } else {
-    fLogger->Fatal(MESSAGE_ORIGIN, "Geometry file name is not set");
+    LOG(FATAL) << "VACVESSEL geometry file name is not set" << FairLogger::endl;
+    exit(1);
   }
 }
 
@@ -85,6 +67,3 @@ Bool_t R3BVacVesselCool::CheckIfSensitive(std::string name)
 
 
 ClassImp(R3BVacVesselCool)
-
-
-
