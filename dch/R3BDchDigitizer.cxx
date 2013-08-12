@@ -3,6 +3,7 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "FairLogger.h"
 
 
 // includes for modeling
@@ -81,9 +82,6 @@
 #define PDC_L_X		99.07	//x length of active area
 #define PDC_L_Y		77.60	//y length of active area
 
-using std::cout;
-using std::endl;
-		
 
 R3BDchDigitizer::R3BDchDigitizer() :
   FairTask("R3B Dch Digitization scheme ") { 
@@ -111,8 +109,8 @@ void R3BDchDigitizer::SetParContainers() {
   fDchDigiPar = (R3BDchDigiPar*)(rtdb->getContainer("R3BDchDigiPar"));
 
   if ( fDchDigiPar ) {
-      cout << "-I- R3BDchDigitizer::SetParContainers() "<< endl;
-      cout << "-I- Container R3BDchDigiPar  loaded " << endl;
+    LOG(INFO) << "R3BDchDigitizer::SetParContainers() " << FairLogger::endl;
+    LOG(INFO) << "Container R3BDchDigiPar  loaded " << FairLogger::endl;
   }
 
 }
@@ -122,8 +120,7 @@ void R3BDchDigitizer::SetParContainers() {
 
 InitStatus R3BDchDigitizer::Init() {
 
-//  cout<<"Init "<<endl;
-  // Get input array 
+  // Get input array
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) Fatal("Init", "No FairRootManager");
   fDchPoints = (TClonesArray*) ioman->GetObject("DCHPoint");
@@ -210,10 +207,9 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
 
    Reset();
    eventNoDch+=1;
-//     if(eventNoDch/1000. == (int)eventNoDch/1000.) cout<<" "<<endl<<"Event #: "<<eventNoDch-1<<endl;
-     
+  
      Int_t nentriesDch = fDchPoints->GetEntries();
-	  cout<<nentriesDch<<endl;
+	  LOG(INFO) << nentriesDch << FairLogger::endl;
      
      Int_t TrackId=0;
 
@@ -259,7 +255,6 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
   
   
    for (Int_t l=0;l<nentriesDch;l++){
-//   cout<<"entries "<<l<<endl;
      
      R3BDchPoint *dch_obj = (R3BDchPoint*) fDchPoints->At(l);
 
@@ -313,11 +308,6 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
      fX_Local	= fX_Local_sim;	//values identical to manual ones. both correct.
      fY_Local	= fY_Local_sim;
 	
-	////control printouts
-	//std::cout << "PDC1: glo_x: " << fX_Global << ", glo_y: "<< fY_Global << ", glo_z: "<< fZ_Global << std::endl;
-	//std::cout << "PDC1: sloc_x: " << fX_Local_sim << ", sloc_y: "<< fY_Local_sim << std::endl;
-	//std::cout << "PDC1: loc_x: " << fX_Local << ", loc_y: "<< fY_Local << ", loc_z: "<< fZ_Local << std::endl;
-     
 	
      //Here, discard events where areas of dead wires were hit:
      //if ( (fX_Local+PDC_L_X/2>PDC1_X_DEAD_1_LO && fX_Local+PDC_L_X/2<=PDC1_X_DEAD_1_HI)
@@ -339,17 +329,14 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
      DCH1X->Fill(fX_Local+PDC_L_X/2);	//modified by additional addon
      DCH1Y->Fill(fY_Local+PDC_L_Y/2);
      TrackPxVSDCH1Px->Fill(fPx,fPx_track);
-//     cout<<"Dch1 - first drift chamber "<<PID<<endl;
 
      //resolutions:
-     //cout << "dch1x before: " << Pdx1_p1 << ", dch1y before: " << Pdy1_p1;
      if (detectorResolution==1) {
 	     Pdx1_p1 = gRandom->Gaus(Pdx1_p1,0.0278);	//cm; 
 	     Pdy1_p1 = gRandom->Gaus(Pdy1_p1,0.0215); 	//cm;
 	     //Pdx1_p1 = gRandom->Gaus(Pdx1_p1,0.02);	//cm, Justynas default value; 
 	     //Pdy1_p1 = gRandom->Gaus(Pdy1_p1,0.02); 	//cm, Justynas default value;
      }
-     //cout << ", dch1x after: " << Pdx1_p1 << ", dch1y after: " << Pdy1_p1 << endl;
 
      pd1mul++;
     }
@@ -363,11 +350,6 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
      fX_Local	= fX_Local_sim;
      fY_Local	= fY_Local_sim;
 
-     ////control printouts
-     //std::cout << "PDC2: glo_x: " << fX_Global << ", glo_y: "<< fY_Global << ", glo_z: "<< fZ_Global << std::endl;
-     //std::cout << "PDC2: sloc_x: " << fX_Local_sim << ", sloc_y: "<< fY_Local_sim << std::endl;
-     //std::cout << "PDC2: loc_x: " << fX_Local << ", loc_y: "<< fY_Local << ", loc_z: "<< fZ_Local << std::endl;
-     
      
      //Here, discard events where areas of dead wires were hit:
      //if ( (fX_Local+PDC_L_X/2>PDC2_X_DEAD_1_LO && fX_Local+PDC_L_X/2<=PDC2_X_DEAD_1_HI)
@@ -382,17 +364,14 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
      DCH2Pz->Fill(fPz);
      DCH2X->Fill(fX_Local+PDC_L_X/2);
      DCH2Y->Fill(fY_Local+PDC_L_Y/2);
-//     cout<<"Dch2 - second drift chamber"<<PID<<endl;
 
      //resolutions:
-     //cout << "dch2x before: " << Pdx2_p1 << ", dch2y before: " << Pdy2_p1;
      if (detectorResolution==1) {
 	     Pdx2_p1 = gRandom->Gaus(Pdx2_p1,0.0268);	//cm;
 	     Pdy2_p1 = gRandom->Gaus(Pdy2_p1,0.0213); 	//cm;
 	     //Pdx2_p1 = gRandom->Gaus(Pdx2_p1,0.02);	//cm, Justynas default value; 
 	     //Pdy2_p1 = gRandom->Gaus(Pdy2_p1,0.02); 	//cm, Justynas default value;
      }
-     //cout << ", dch2x after: " << Pdx2_p1 << ", dch2y after: " << Pdy2_p1 << endl;
 
      pd2mul++;
     }
@@ -421,13 +400,8 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
 // -------------------------------------------------------------------------
 
 void R3BDchDigitizer::Reset(){
-// Clear the structure
-//   cout << " -I- Digit Reset() called " << endl;
-
-   
  if (fDchDigi ) fDchDigi->Clear();
-
-}   
+}
 
 void R3BDchDigitizer::Finish()
 {
