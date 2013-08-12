@@ -183,24 +183,10 @@ void r3ball(Int_t nEvents = 1,
     run->AddModule(dch);
   }
   
-  
   // Tof
   if (fDetList.FindObject("TOF") ) {
     R3BDetector* tof = new R3BTof("Tof", kTRUE);
-    // Global position of the Module
-    thetaX   =  0.0; // (deg)
-    thetaY   =  0.0; // (deg)
-    thetaZ   =  0.0; // (deg)
-    // Rotation in Ref. Frame.
-    thetaX =  0.0; // (deg)
-    thetaY =  0.0; // (deg)
-    thetaZ =  0.0; // (deg)
-    // Global translation in Lab
-    tx       =  0.0; // (cm)
-    ty       =  0.0; // (cm)
-    tz       =  0.0; // (cm)
-    tof->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-    tof->SetTranslation(tx,ty,tz);
+    tof->SetGeometryFileName("tof_v13a.geo.root");
     // User defined Energy CutOff
     Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
     ((R3BTof*) tof)->SetEnergyCutOff(fCutOffSci);

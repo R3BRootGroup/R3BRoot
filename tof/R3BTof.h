@@ -109,6 +109,8 @@ class R3BTof : public R3BDetector
    ** Constructs the STS geometry
    **/
   virtual void ConstructGeometry();
+  
+  virtual Bool_t CheckIfSensitive(std::string name);
 
    virtual void Initialize();
    virtual void SetSpecialPhysicsCuts();
@@ -133,7 +135,7 @@ class R3BTof : public R3BDetector
     Double32_t     fLength_out;            //!  length when exiting active volume
     Double32_t     fLength;            //!  length average in detector
     Double32_t     fELoss;             //!  energy loss
-     Double32_t     fCutE;             //!  Sec. Energy Cut-Off
+    Double32_t     fCutE;             //!  Sec. Energy Cut-Off
 
     Int_t          fPosIndex;          //!
     TClonesArray*  fTofCollection;     //!  The hit collection

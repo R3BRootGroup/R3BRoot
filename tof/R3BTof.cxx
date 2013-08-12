@@ -2,6 +2,8 @@
 // -----                        R3BTof source file                     -----
 // -----                  Created 26/03/09  by D.Bertini               -----
 // -------------------------------------------------------------------------
+#include <stdlib.h>
+
 #include "R3BTof.h"
 
 #include "R3BGeoTof.h"
@@ -26,29 +28,12 @@
 
 // includes for modeling
 #include "TGeoManager.h"
-#include "TParticle.h"
-#include "TVirtualMC.h"
-#include "TGeoMatrix.h"
-#include "TGeoMaterial.h"
-#include "TGeoMedium.h"
-#include "TGeoBBox.h"
-#include "TGeoPara.h"
-#include "TGeoPgon.h"
-#include "TGeoSphere.h"
-#include "TGeoArb8.h"
-#include "TGeoCone.h"
-#include "TGeoBoolNode.h"
-#include "TGeoCompositeShape.h"
-#include <iostream>
-
-using std::cout;
-using std::cerr;
-using std::endl;
 
 
 
 // -----   Default constructor   -------------------------------------------
-R3BTof::R3BTof() : R3BDetector("R3BTof", kTRUE, kTOF) {
+R3BTof::R3BTof() : R3BDetector("R3BTof", kTRUE, kTOF)
+{
   ResetParameters();
   fTofCollection = new TClonesArray("R3BTofPoint");
   fPosIndex = 0;
@@ -64,7 +49,8 @@ R3BTof::R3BTof() : R3BDetector("R3BTof", kTRUE, kTOF) {
 
 // -----   Standard constructor   ------------------------------------------
 R3BTof::R3BTof(const char* name, Bool_t active) 
-  : R3BDetector(name, active, kTOF) {
+  : R3BDetector(name, active, kTOF)
+{
   ResetParameters();
   fTofCollection = new TClonesArray("R3BTofPoint");
   fPosIndex = 0;
@@ -79,8 +65,8 @@ R3BTof::R3BTof(const char* name, Bool_t active)
 
 
 // -----   Destructor   ----------------------------------------------------
-R3BTof::~R3BTof() {
-
+R3BTof::~R3BTof()
+{
   if ( flGeoPar ) delete flGeoPar;
   if (fTofCollection) {
     fTofCollection->Delete();
@@ -90,6 +76,7 @@ R3BTof::~R3BTof() {
 // -------------------------------------------------------------------------
 
 
+
 void R3BTof::Initialize()
 {
   FairDetector::Initialize();
@@ -97,6 +84,7 @@ void R3BTof::Initialize()
   LOG(INFO) << "R3BTof: initialisation" << FairLogger::endl;
   LOG(DEBUG) << "R3BTof: Sci. Vol. (McId) " << gMC->VolId("TOFLog") << FairLogger::endl;
 }
+
 
 
 void R3BTof::SetSpecialPhysicsCuts()
@@ -143,9 +131,10 @@ void R3BTof::SetSpecialPhysicsCuts()
 }
 
 
-// -----   Public method ProcessHits  --------------------------------------
-Bool_t R3BTof::ProcessHits(FairVolume* vol) {
 
+// -----   Public method ProcessHits  --------------------------------------
+Bool_t R3BTof::ProcessHits(FairVolume* vol)
+{
    // debug
 //    static Int_t evt;     
 
@@ -207,13 +196,6 @@ Bool_t R3BTof::ProcessHits(FairVolume* vol) {
 	newpos[i] = oldpos[i] - (3*safety*olddirection[i]);
       }
 
-      if ( fPosIn.Z() < 30. && newpos[2] > 30.02 ) {
-        LOG(ERROR) << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2]
-        << " with safety = " << safety << FairLogger::endl;
-        LOG(ERROR) << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << FairLogger::endl;
-        LOG(ERROR) << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << FairLogger::endl;
-      }
-
       fPosOut.SetX(newpos[0]);
       fPosOut.SetY(newpos[1]);
       fPosOut.SetZ(newpos[2]);
@@ -237,6 +219,7 @@ Bool_t R3BTof::ProcessHits(FairVolume* vol) {
 }
 
 
+
 // ----------------------------------------------------------------------------
 //void R3BTof::SaveGeoParams(){
 //
@@ -253,19 +236,22 @@ Bool_t R3BTof::ProcessHits(FairVolume* vol) {
 //}
 
 
-// -----   Public method EndOfEvent   -----------------------------------------
-void R3BTof::BeginEvent() {
 
+// -----   Public method EndOfEvent   -----------------------------------------
+void R3BTof::BeginEvent()
+{
 //  if (! kGeoSaved ) {
 //      SaveGeoParams();
 //  cout << "-I STS geometry parameters saved " << endl;
 //  kGeoSaved = kTRUE;
 //  }
-
 }
-// -----   Public method EndOfEvent   -----------------------------------------
-void R3BTof::EndOfEvent() {
 
+
+
+// -----   Public method EndOfEvent   -----------------------------------------
+void R3BTof::EndOfEvent()
+{
   if (fVerboseLevel) Print();
   fTofCollection->Clear();
 
@@ -276,7 +262,8 @@ void R3BTof::EndOfEvent() {
 
 
 // -----   Public method Register   -------------------------------------------
-void R3BTof::Register() {
+void R3BTof::Register()
+{
   FairRootManager::Instance()->Register("TOFPoint", GetName(), fTofCollection, kTRUE);
 }
 // ----------------------------------------------------------------------------
@@ -284,7 +271,8 @@ void R3BTof::Register() {
 
 
 // -----   Public method GetCollection   --------------------------------------
-TClonesArray* R3BTof::GetCollection(Int_t iColl) const {
+TClonesArray* R3BTof::GetCollection(Int_t iColl) const
+{
   if (iColl == 0) return fTofCollection;
   else return NULL;
 }
@@ -303,11 +291,13 @@ void R3BTof::Print(Option_t *option) const
 
 
 // -----   Public method Reset   ----------------------------------------------
-void R3BTof::Reset() {
+void R3BTof::Reset()
+{
   fTofCollection->Clear();
   ResetParameters();
 }
 // ----------------------------------------------------------------------------
+
 
 
 // -----   Public method CopyClones   -----------------------------------------
@@ -328,6 +318,7 @@ void R3BTof::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 }
 
 
+
 // -----   Private method AddHit   --------------------------------------------
 R3BTofPoint* R3BTof::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
 			    TVector3 posOut, TVector3 momIn, 
@@ -345,198 +336,30 @@ R3BTofPoint* R3BTof::AddHit(Int_t trackID, Int_t detID, TVector3 posIn,
 }
 
 
+
 // -----   Public method ConstructGeometry   ----------------------------------
-void R3BTof::ConstructGeometry() {
-
-  // out-of-file geometry definition
-   Double_t dx,dy,dz;
-   Double_t a;
-//   Double_t thx, phx, thy, phy, thz, phz;
-   Double_t z, density, w;
-   Int_t nel, numed;
-
-
-/****************************************************************************/
-// Material definition
-
-
-  // Mixture: Air
-  TGeoMedium * pMed2=NULL;
-   if (gGeoManager->GetMedium("Air") ){
-       pMed2=gGeoManager->GetMedium("Air");
-   }else{
-     nel     = 2;
-     density = 0.001290;
-     TGeoMixture*
-	 pMat2 = new TGeoMixture("Air", nel,density);
-     a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
-     pMat2->DefineElement(0,a,z,w);
-     a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
-     pMat2->DefineElement(1,a,z,w);
-     pMat2->SetIndex(1);
-     // Medium: Air
-     numed   = 1;  // medium number
-     Double_t par[8];
-     par[0]  = 0.000000; // isvol
-     par[1]  = 0.000000; // ifield
-     par[2]  = 0.000000; // fieldm
-     par[3]  = 0.000000; // tmaxfd
-     par[4]  = 0.000000; // stemax
-     par[5]  = 0.000000; // deemax
-     par[6]  = 0.000100; // epsil
-     par[7]  = 0.000000; // stmin
-     pMed2 = new TGeoMedium("Air", numed,pMat2, par);
-   }
-
-
-  // Mixture: plasticForTOF
-  TGeoMedium * pMed34=NULL;
-   if (gGeoManager->GetMedium("plasticForTOF") ){
-       pMed34=gGeoManager->GetMedium("plasticForTOF");
-   }else{
-     nel     = 2;
-     density = 1.032000;
-     TGeoMixture*
-	 pMat34 = new TGeoMixture("plasticForTOF", nel,density);
-     a = 12.010700;   z = 6.000000;   w = 0.914708;  // C
-     pMat34->DefineElement(0,a,z,w);
-     a = 1.007940;   z = 1.000000;   w = 0.085292;  // H
-     pMat34->DefineElement(1,a,z,w);
-     pMat34->SetIndex(33);
-     // Medium: plasticForTOF
-     numed   = 33;  // medium number
-     Double_t par[8];
-     par[0]  = 0.000000; // isvol
-     par[1]  = 0.000000; // ifield
-     par[2]  = 0.000000; // fieldm
-     par[3]  = 0.000000; // tmaxfd
-     par[4]  = 0.000000; // stemax
-     par[5]  = 0.000000; // deemax
-     par[6]  = 0.000100; // epsil
-     par[7]  = 0.000000; // stmin
-     pMed34 = new TGeoMedium("plasticForTOF", numed,pMat34,par);
-   }
-
-
-  // TRANSFORMATION MATRICES
-   // Combi transformation: 
-    dx = -417.359574; //Justyna
-    dy = 2.400000;    //Justyna
-    dz = 960.777114;  //Justyna 
-    
-//    dx = -421.33683; //Christoph
-//    dy = 2.12;    //Christoph
-//    dz = 958.387337;  //Christoph
-      
-/*    dx = -171.1;  //position directrly (15cm) after DCH2
-    dy = 2.400000;
-    dz = 548.95;*/
-   // dz = 0.;
-/*   // Rotation:
-   thx = -121.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = -31.000000;    phz = 0.000000;*/  //this
-
-//   TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);  //this
-   TGeoRotation *gRot = new TGeoRotation();
-   gRot->RotateX(0.);
-   gRot->RotateY(-31.000000);
-   gRot->RotateZ(0.);
-
-   TGeoCombiTrans*
-//   pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);  //this
-   pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,gRot);  //this
-
-
-
-
-
-
-
-/* PREVIOUS!!!
-  // TRANSFORMATION MATRICES
-   // Combi transformation: 
-    dx = 419.700000;
-    dy = 0.000000;
-    dz = 952.400000;
-   // dz = 0.;
-   // Rotation:
-   thx = 121.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = 31.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-   pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
-*/
-
-   //Top Volume
-   TGeoVolume* pWorld = gGeoManager->GetTopVolume();
-   pWorld->SetVisLeaves(kTRUE);
-
-
-
-   // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
-   // Shape: TOFBox type: TGeoBBox
-   dx = 94.450000;
-   dy = 73.450000;
-   dz = 0.500000;
-   TGeoShape *pTOFBox = new TGeoBBox("TOFBox", dx,dy,dz);
-   // Volume: TOFLog
-   TGeoVolume*
-   pTOFLog = new TGeoVolume("TOFLog",pTOFBox, pMed34);
-   pTOFLog->SetVisLeaves(kTRUE);
-
-   TGeoCombiTrans *pGlobal = GetGlobalPosition(pMatrix2);
-
-   if (pGlobal){
-       pWorld->AddNode(pTOFLog, 0, pGlobal);
-   }else{
-       pWorld->AddNode(pTOFLog, 0, pMatrix2);
-   }
-
-   AddSensitiveVolume(pTOFLog);
-   fNbOfSensitiveVol+=1;
-
-}
-
-
-
-/*
-void R3BTof::ConstructGeometry() {
-  
-  FairGeoLoader*    geoLoad = FairGeoLoader::Instance();
-  FairGeoInterface* geoFace = geoLoad->getGeoInterface();
-  R3BGeoTof*       stsGeo  = new R3BGeoTof();
-  stsGeo->setGeomFile(GetGeometryFileName());
-  geoFace->addGeoModule(stsGeo);
-
-  Bool_t rc = geoFace->readSet(stsGeo);
-  if (rc) stsGeo->create(geoLoad->getGeoBuilder());
-  TList* volList = stsGeo->getListOfVolumes();
-  // store geo parameter
-  FairRun *fRun = FairRun::Instance();
-  FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
-  R3BGeoTofPar* par=(R3BGeoTofPar*)(rtdb->getContainer("R3BGeoTofPar"));
-  TObjArray *fSensNodes = par->GetGeoSensitiveNodes();
-  TObjArray *fPassNodes = par->GetGeoPassiveNodes();
-
-  TListIter iter(volList);
-  FairGeoNode* node   = NULL;
-  FairGeoVolume *aVol=NULL;
-
-  while( (node = (FairGeoNode*)iter.Next()) ) {
-      aVol = dynamic_cast<FairGeoVolume*> ( node );
-       if ( node->isSensitive()  ) {
-           fSensNodes->AddLast( aVol );
-       }else{
-           fPassNodes->AddLast( aVol );
-       }
+void R3BTof::ConstructGeometry()
+{
+  TString fileName = GetGeometryFileName();
+  if(fileName.EndsWith(".root")) {
+    LOG(INFO) << "Constructing TOF geometry from ROOT file " << fileName.Data() << FairLogger::endl;
+    ConstructRootGeometry();
+  } else {
+    LOG(FATAL) << "TOF geometry file is not specified" << FairLogger::endl;
+    exit(1);
   }
-  par->setChanged();
-  par->setInputVersion(fRun->GetRunId(),1);
-  ProcessNodes( volList );
-
 }
-*/
+
+
+
+Bool_t R3BTof::CheckIfSensitive(std::string name)
+{
+  if(TString(name).Contains("TOFLog")) {
+    return kTRUE;
+  }
+  return kFALSE;
+}
+
+
 
 ClassImp(R3BTof)
