@@ -166,31 +166,15 @@ void r3ball(Int_t nEvents = 1,
     run->AddModule(tra);
   }
   
-  
   // STaRTrack
   if (fDetList.FindObject("STaRTrack")  ) {
     R3BDetector* tra = new R3BSTaRTra("STaRTrack", kTRUE);
-    // Global position of the Module
-    phi   =  0.0; // (deg)
-    theta =  0.0; // (deg)
-    psi   =  0.0; // (deg)
-    // Rotation in Ref. Frame.
-    thetaX =  0.0; // (deg)
-    thetaY =  0.0; // (deg)
-    thetaZ =  0.0; // (deg)
-    // Global translation in Lab
-    tx    =  0.0; // (cm)
-    ty    =  0.0; // (cm)
-    tz    =  0.0; // (cm)
-    //tra->SetRotAnglesEuler(phi,theta,psi);
-    tra->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-    tra->SetTranslation(tx,ty,tz);
+    tra->SetGeometryFileName("startra_v13a.geo.root");
     // User defined Energy CutOff
     Double_t fCutOffSi = 1.0e-06;  // Cut-Off -> 10KeV only in Si
     ((R3BSTaRTra*) tra)->SetEnergyCutOff(fCutOffSi);
     run->AddModule(tra);
   }
-  
   
   // DCH drift chambers
   if (fDetList.FindObject("DCH") ) {
