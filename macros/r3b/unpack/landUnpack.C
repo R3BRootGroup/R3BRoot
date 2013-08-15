@@ -6,16 +6,20 @@
   
   
   // Create source with unpackers ----------------------------------------------
-  //FairRemoteSource* source  = new FairRemoteSource("lxi047");
+//  FairRemoteSource* source  = new FairRemoteSource("lxi047");
   FairLmdSource* source  = new FairLmdSource();
   source->AddFile("/Users/kresan/neuland/r258_2986.lmd");
-  //source->AddFile("/Users/kresan/neuland/r323_3607.lmd");
+//  source->AddFile("/Users/kresan/neuland/r323_3607.lmd");
 
   char* strCalDir = "/Users/kresan/r3b/r3broot/calfiles/land/";
-  Int_t type = 94;
-  Int_t subType = 9400;
+  Short_t type = 94;
+  Short_t subType = 9400;
+  Short_t procId = 10;
+  Short_t subCrate = -1; // All sub-crates
+  Short_t control = 3;
 
-  source->AddUnpacker(new R3BLandUnpack(strCalDir, type, subType));
+  source->AddUnpacker(new R3BLandUnpack(strCalDir, type, subType,
+                                        procId, subCrate, control));
   // ---------------------------------------------------------------------------
 
 

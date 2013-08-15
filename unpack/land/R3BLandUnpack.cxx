@@ -18,8 +18,10 @@ using namespace std;
 
 
 R3BLandUnpack::R3BLandUnpack(char *strCalDir,
-			     Int_t type, Int_t subType)
-  : FairUnpack(type, subType)
+                             Short_t type, Short_t subType,
+                             Short_t procId,
+                             Short_t subCrate, Short_t control)
+: FairUnpack(type, subType, procId, subCrate, control)
 {
   fLand = new TLANDEvent(strCalDir);
   fLand->DoLANDMapping();
@@ -40,7 +42,7 @@ R3BLandUnpack::~R3BLandUnpack()
 Bool_t R3BLandUnpack::Init()
 {
   Register();
-
+  
   return kTRUE;
 }
 
@@ -51,8 +53,8 @@ Bool_t R3BLandUnpack::DoUnpack(Int_t *data, Int_t size)
   fLand->GetLANDRawData(fRootLand, kFALSE);
   for(Int_t i = 0; i < fRootLand->rawmulti; i++) {
     new ((*fRawData)[i]) R3BLandRawHit(fRootLand->padID[i],
- 				       fRootLand->qdc1[i],
- 				       fRootLand->qdc2[i]);
+                                       fRootLand->qdc1[i],
+                                       fRootLand->qdc2[i]);
   }
   
   return kTRUE;
@@ -76,5 +78,3 @@ void R3BLandUnpack::Reset()
 
 
 ClassImp(R3BLandUnpack)
-
-

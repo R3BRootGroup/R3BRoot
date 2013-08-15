@@ -16,24 +16,26 @@ class TClonesArray;
 
 
 class R3BLandUnpack : public FairUnpack {
- public:
+public:
   R3BLandUnpack(char *strCalDir,
-		Int_t type = 94, Int_t subType = 9400);
+                Short_t type = 94, Short_t subType = 9400,
+                Short_t procId = 0,
+                Short_t subCrate = 0, Short_t control = 0);
   virtual ~R3BLandUnpack();
-
+  
   virtual Bool_t Init();
   virtual Bool_t DoUnpack(Int_t *data, Int_t size);
   virtual void Reset();
-
- private:
+  
+private:
   TLANDEvent *fLand;
   TRootLANDEvent *fRootLand;
   TClonesArray *fRawData;
-
- protected:
+  
+protected:
   virtual void Register();
-
- public:
+  
+public:
   ClassDef(R3BLandUnpack, 0)
 };
 
