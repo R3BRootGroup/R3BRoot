@@ -139,6 +139,9 @@ Int_t R3BMCTrack::GetNPoints(DetectorId detId) const {
   else if ( detId == kDCH ) return ( (fNPoints & ( 1 << 24) ) >> 24);
   else if ( detId == kLAND  ) return ( (fNPoints & ( 1 << 25) ) >> 25);
   else if ( detId == kVETO  ) return ( (fNPoints & ( 1 <<26 ) ) >> 26);
+  else if ( detId == kMFI  ) return ( (fNPoints & ( 1 <<27 ) ) >> 27);
+  else if ( detId == kPSP  ) return ( (fNPoints & ( 1 <<28 ) ) >> 28);
+  else if ( detId == kLUMON  ) return ( (fNPoints & ( 1 <<29 ) ) >> 29);
   else {
     cout << "-E- R3BMCTrack::GetNPoints: Unknown detector ID "
 	 << detId << endl;
@@ -217,6 +220,24 @@ void R3BMCTrack::SetNPoints(Int_t iDet, Int_t nPoints) {
     else if ( nPoints > 1 ) nPoints = 1;
     fNPoints = ( fNPoints & ( ~ (  1 << 26 ) ) )  |  ( nPoints << 26 );
   }
+
+   else if ( iDet == kMFI ) {
+     if      ( nPoints < 0 ) nPoints = 0;
+     else if ( nPoints > 1 ) nPoints = 1;
+     fNPoints = ( fNPoints & ( ~ (  1 << 27 ) ) )  |  ( nPoints << 27 );
+   }
+  
+   else if ( iDet == kPSP ) {
+     if      ( nPoints < 0 ) nPoints = 0;
+     else if ( nPoints > 1 ) nPoints = 1;
+     fNPoints = ( fNPoints & ( ~ (  1 << 28 ) ) )  |  ( nPoints << 28 );
+   }
+  
+   else if ( iDet == kLUMON ) {
+     if      ( nPoints < 0 ) nPoints = 0;
+     else if ( nPoints > 1 ) nPoints = 1;
+     fNPoints = ( fNPoints & ( ~ (  1 << 29 ) ) )  |  ( nPoints << 29 );
+   }
 
   else cout << "-E- R3BMCTrack::SetNPoints: Unknown detector ID "
 	    << iDet << endl;

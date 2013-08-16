@@ -235,7 +235,7 @@ void R3BStack::FillTrackArray() {
       new( (*fTracks)[fNTracks]) R3BMCTrack(GetParticle(iPart),fMC);
       fIndexMap[iPart] = fNTracks;
       // --> Set the number of points in the detectors for this track
-      for (Int_t iDet=kCAL; iDet<=kTRA; iDet++) {
+      for (Int_t iDet=kREF; iDet<=kLUMON; iDet++) {
         pair<Int_t, Int_t> a(iPart, iDet);
         track->SetNPoints(iDet, fPointsMap[a]);
       }
@@ -460,7 +460,7 @@ void R3BStack::SelectTracks() {
     if(eKin < 0.0) eKin=0.0; // sometimes due to different PDG masses between ROOT and G4!!!!!!
     // --> Calculate number of points
     Int_t nPoints = 0;
-    for (Int_t iDet=kREF; iDet<=kVETO; iDet++) {
+    for (Int_t iDet=kREF; iDet<=kLUMON; iDet++) {
       pair<Int_t, Int_t> a(i, iDet);
       if ( fPointsMap.find(a) != fPointsMap.end() )
         nPoints += fPointsMap[a];
