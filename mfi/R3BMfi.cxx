@@ -2,6 +2,8 @@
 // -----                        R3BMfi source file                     -----
 // -----                  Created 26/03/09  by D.Bertini               -----
 // -------------------------------------------------------------------------
+#include <stdlib.h>
+
 #include "R3BMfi.h"
 
 #include "R3BGeoMfi.h"
@@ -336,253 +338,24 @@ R3BMfiPoint* R3BMfi::AddHit(Int_t trackID, Int_t detID, Int_t plane , TVector3 p
 // -----   Public method ConstructGeometry   ----------------------------------
 void R3BMfi::ConstructGeometry()
 {
-  // out-of-file geometry definition
-   Double_t dx,dy,dz;
-   Double_t a;
-   Double_t thx, phx, thy, phy, thz, phz;
-  Double_t z, density, w;//, radl, absl;
-   Int_t nel, numed;
-
-
-/****************************************************************************/
-// Material definition
-
- // Vacuum
-
-   TGeoMedium * pMed1=NULL;
-   if (gGeoManager->GetMedium("Vacuum") ){
-       pMed1=gGeoManager->GetMedium("Vacuum");
-   }else{
-       TGeoMaterial *matVacuum = new TGeoMaterial("Vacuum", 0,0,0);
-       Double_t par[8];
-       par[0]  = 0.000000; // isvol
-       par[1]  = 0.000000; // ifield
-       par[2]  = 0.000000; // fieldm
-       par[3]  = 0.000000; // tmaxfd
-       par[4]  = 0.000000; // stemax
-       par[5]  = 0.000000; // deemax
-       par[6]  = 0.000100; // epsil
-       par[7]  = 0.000000; // stmin
-       pMed1 = new TGeoMedium("Vacuum",1, matVacuum,par);
-   }
-
-   // Mixture: Air
-   TGeoMedium * pMed2=NULL;
-   if (gGeoManager->GetMedium("Air") ){
-       pMed2=gGeoManager->GetMedium("Air");
-   }else{
-       nel     = 2;
-       density = 0.001290;
-       TGeoMixture*
-	   pMat2 = new TGeoMixture("Air", nel,density);
-       a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
-       pMat2->DefineElement(0,a,z,w);
-       a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
-       pMat2->DefineElement(1,a,z,w);
-       pMat2->SetIndex(1);
-       // Medium: Air
-       numed   = 1;  // medium number
-       Double_t par[8];
-       par[0]  = 0.000000; // isvol
-       par[1]  = 0.000000; // ifield
-       par[2]  = 0.000000; // fieldm
-       par[3]  = 0.000000; // tmaxfd
-       par[4]  = 0.000000; // stemax
-       par[5]  = 0.000000; // deemax
-       par[6]  = 0.000100; // epsil
-       par[7]  = 0.000000; // stmin
-       pMed2 = new TGeoMedium("Air", numed,pMat2, par);
-   }
-
-   // Mixture: plasticForGFI
-   TGeoMedium * pMed35=NULL;
-   if (gGeoManager->GetMedium("plasticForGFI") ){
-       pMed35=gGeoManager->GetMedium("plasticForGFI");
-   }else{
-       nel     = 2;
-       density = 1.032000;
-       TGeoMixture*
-	   pMat35 = new TGeoMixture("plasticForGFI", nel,density);
-       a = 12.010700;   z = 6.000000;   w = 0.914708;  // C
-       pMat35->DefineElement(0,a,z,w);
-       a = 1.007940;   z = 1.000000;   w = 0.085292;  // H
-       pMat35->DefineElement(1,a,z,w);
-       pMat35->SetIndex(34);
-       // Medium: plasticForGFI
-       numed   = 34;  // medium number
-       Double_t par[8];
-       par[0]  = 0.000000; // isvol
-       par[1]  = 0.000000; // ifield
-       par[2]  = 0.000000; // fieldm
-       par[3]  = 0.000000; // tmaxfd
-       par[4]  = 0.000000; // stemax
-       par[5]  = 0.000000; // deemax
-       par[6]  = 0.000100; // epsil
-       par[7]  = 0.000000; // stmin
-       pMed35 = new TGeoMedium("plasticForGFI", numed,pMat35,par);
-   }
+  TString fileName = GetGeometryFileName();
+  if(fileName.EndsWith(".root")) {
+    LOG(INFO) << "Constructing MFI geometry from ROOT file " << fileName.Data() << FairLogger::endl;
+    ConstructRootGeometry();
+  } else {
+    LOG(FATAL) << "MFI geometry file is not specified" << FairLogger::endl;
+    exit(1);
+  }
+}
 
 
 
-
-   // TRANSFORMATION MATRICES
-   
-   //global position
-   
-   // Combi transformation:
-   
-   //from Ralf's tracker: without offsets
-   //LABPOS(MFI1,-63.82 , 0.00 , 520.25)
-   //ROTATE(MFI1,13.5);
-   dx = -63.82; //s412 pschrock
-   dy = 0.00;
-   dz = 520.25;
-   
-
-   // Rotation: 
-   
-   //pschrock: its easier to use 'Rotate' functions
-   TGeoRotation *gRot = new TGeoRotation();
-   gRot->RotateX(0.);
-   gRot->RotateY(-13.5000000); // s412
-   gRot->RotateZ(0.);
-   
-   
-   TGeoCombiTrans*
-//    pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
-   pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,gRot);
-   
-   
-   //translation and rotation of active volume
-   
-   // Combi transformation: 
-   dx = 0.000000;
-   dy = 0.000000;
-   dz = 0.000000;
-   // Rotation: 
-   thx = 90.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = 0.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix7 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-   pMatrix6 = new TGeoCombiTrans("", dx,dy,dz,pMatrix7);
-   
-   
-
-
-
-   
-   //create wrapping for mfi
-   //use plastic for the moment (like in ggland)
-   
-   //front
-   // Combi transformation: 
-   dx = 0.000000;
-   dy = 0.000000;
-   dz = -0.01300; //center of cladding
-   // Rotation: 
-   thx = 90.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = 0.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix9 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-    TGeoCombiTrans*
-   pMatrix8 = new TGeoCombiTrans("", dx,dy,dz,pMatrix9);
-   
-   //back
-   // Combi transformation: 
-   dx = 0.000000;
-   dy = 0.000000;
-   dz = 0.013000; //center of cladding
-   // Rotation: 
-   thx = 90.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = 0.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix11 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-    TGeoCombiTrans*
-   pMatrix10 = new TGeoCombiTrans("", dx,dy,dz,pMatrix11);
-   
-
-
-
-
-
-   // World definition
-   TGeoVolume* pWorld = gGeoManager->GetTopVolume();
-   pWorld->SetVisLeaves(kTRUE);
-
- 
-
-
-   // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
-   
-   //box for mfi volumes
-   
-   // Shape: GFIBoxWorld type: TGeoBBox
-   dx = 15.000;	//half width of box for mfi volumes
-   dy = 10.00000;
-   dz = 0.050000;
-   TGeoShape *pMFIBoxWorld = new TGeoBBox("MFIBoxWorld", dx,dy,dz);
-   // Volume: MFILogWorld
-   TGeoVolume*
-   pMFILogWorld = new TGeoVolume("MFILogWorld",pMFIBoxWorld, pMed1); //vacuum filled
-   pMFILogWorld->SetVisLeaves(kTRUE);
-   
-   
-   
-    // Shape: FrontCladding type: TGeoBBox
-   dx = 15.000000;
-   dy = 10.000000;
-   dz = 0.0015000; //half thickness of cladding
-   TGeoShape *pFrontCladding = new TGeoBBox("FrontClading", dx,dy,dz);
-   // Volume: logicUpFrame
-   TGeoVolume* plogicFrontClading = new TGeoVolume("logicFrontCladding",pFrontCladding, pMed35);
-   plogicFrontClading->SetVisLeaves(kTRUE);
-   pMFILogWorld->AddNode(plogicFrontClading, 0, pMatrix8);
-   
-   
-    // Shape: BackCladding type: TGeoBBox
-   dx = 15.000000;
-   dy = 10.000000;
-   dz = 0.0015000; //half thickness of cladding
-   TGeoShape *pBackCladding = new TGeoBBox("BackCladding", dx,dy,dz);
-   // Volume: logicUpFrame
-   TGeoVolume* plogicBackCladding = new TGeoVolume("logicBackCladding",pBackCladding, pMed35);
-   plogicBackCladding->SetVisLeaves(kTRUE);
-   pMFILogWorld->AddNode(plogicBackCladding, 0, pMatrix10);
-   
-   
-   
-   
-   
-
-
-   // Global positioning
-
-   TGeoCombiTrans *pGlobal1 = GetGlobalPosition(pMatrix2); //position and rotation is in pMatrix2
-//    TGeoCombiTrans *pGlobal2 = GetGlobalPosition(pMatrix4); //from Gfi2
-
-   pWorld->AddNode( pMFILogWorld, 0, pGlobal1 );
-
-
-   //active volume of mfi
-
-   // Shape: MFIBox type: TGeoBBox
-   dx = 15.000000; //half width of active volume
-   dy = 10.000000; //half width of active volume
-   dz = 0.01250000; //250 um full thickness of fibers
-   TGeoShape *pMFIBox = new TGeoBBox("MFIBox", dx,dy,dz);
-   // Volume: MFILog
-   TGeoVolume*
-   pMFILog = new TGeoVolume("MFILog",pMFIBox, pMed35);
-   pMFILog->SetVisLeaves(kTRUE);
-   pMFILogWorld->AddNode(pMFILog, 0, pMatrix6); //put here the active volume of mfi, pMatrix6 has no more moving parameters
-
-
-
-
-   // Add the sensitive part
-   AddSensitiveVolume(pMFILog);
-   fNbOfSensitiveVol+=1;
+Bool_t R3BMfi::CheckIfSensitive(std::string name)
+{
+  if(TString(name).Contains("MFILog")) {
+    return kTRUE;
+  }
+  return kFALSE;
 }
 
 

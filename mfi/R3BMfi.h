@@ -109,6 +109,7 @@ class R3BMfi : public R3BDetector
    ** Constructs the STS geometry
    **/
   virtual void ConstructGeometry();
+  virtual Bool_t CheckIfSensitive(std::string name);
   virtual void Initialize();
   virtual void SetSpecialPhysicsCuts();
   void SetEnergyCutOff( Double_t cutE ){fCutE = cutE;}

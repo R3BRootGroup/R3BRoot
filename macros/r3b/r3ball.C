@@ -232,7 +232,7 @@ void r3ball(Int_t nEvents = 1,
   // MFI Detector
   if(fDetList.FindObject("MFI")) {
     R3BDetector* mfi = new R3BMfi("Mfi", kTRUE);
-//    mfi->SetGeometryFileName("mfi_v13a.geo.root");
+    mfi->SetGeometryFileName("mfi_v13a.geo.root");
     run->AddModule(mfi);
   }
 
