@@ -93,6 +93,8 @@ Int_t r3bsim()
   TObjString det11("LAND");
   TObjString det12("SCINTNEULAND");
   TObjString det13("VACVESSELCOOL");
+  TObjString det14("MFI");
+  TObjString det15("PSP");
   
   TObjArray fDetList;
   fDetList.Add(&det0);
@@ -109,6 +111,8 @@ Int_t r3bsim()
   fDetList.Add(&det11);
   //fDetList.Add(&det12);
   fDetList.Add(&det13);
+  //fDetList.Add(&det14);
+  //fDetList.Add(&det15);
   
   //-------------------------------------------------
   //- N# of Sim. Events   |    nEvents     (Int_t)

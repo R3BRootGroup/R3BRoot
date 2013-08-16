@@ -155,7 +155,7 @@ void r3ball(Int_t nEvents = 1,
     calo->SetGeometryFileName("califa_v13_811.geo.root");
     run->AddModule(calo);
   }
-  
+
   // Tracker
   if (fDetList.FindObject("TRACKER")  ) {
     R3BDetector* tra = new R3BTra("Tracker", kTRUE);
@@ -229,6 +229,20 @@ void r3ball(Int_t nEvents = 1,
     run->AddModule(land);
   }
   
+  // MFI Detector
+  if(fDetList.FindObject("MFI")) {
+    R3BDetector* mfi = new R3BMfi("Mfi", kTRUE);
+//    mfi->SetGeometryFileName("mfi_v13a.geo.root");
+    run->AddModule(mfi);
+  }
+
+  // PSP Detector
+  if(fDetList.FindObject("PSP")) {
+    R3BDetector* psp = new R3BPsp("Psp", kTRUE);
+    //    psp->SetGeometryFileName("psp_v13a.geo.root");
+    run->AddModule(psp);
+  }
+  
   // Luminosity detector
   if (fDetList.FindObject("LUMON") ) {
     R3BDetector* lumon = new ELILuMon("LuMon", kTRUE);
@@ -247,7 +261,7 @@ void r3ball(Int_t nEvents = 1,
   // the Field Map has to be transformed accordingly
   if (fFieldMap == 0) {
     R3BAladinFieldMap* magField = new R3BAladinFieldMap("AladinMaps");
-    Double_t fMeasCurrent = 1500.;// I_current [A]
+    Double_t fMeasCurrent = 1000.;// I_current [A]
     magField->SetCurrent(fMeasCurrent);
     magField->SetScale(fieldScale);
     
@@ -278,12 +292,13 @@ void r3ball(Int_t nEvents = 1,
     Int_t pdgId = 211; // pion beam
     Double32_t theta1 = 0.;  // polar angle distribution
     Double32_t theta2 = 7.;
-    Double32_t momentum = 0.8; // 10 GeV/c
+    Double32_t momentum = 0.8;
     FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 50);
     boxGen->SetThetaRange(theta1, theta2);
     boxGen->SetPRange(momentum, momentum*2.);
     boxGen->SetPhiRange(0, 360);
     boxGen->SetXYZ(0.0, 0.0, -1.5);
+//    boxGen->SetXYZ(0.0, 0.0, -300.);
     // add the box generator
     primGen->AddGenerator(boxGen);
   }
