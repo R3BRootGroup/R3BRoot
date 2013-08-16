@@ -39,16 +39,12 @@
 #include "TGeoCone.h"
 #include "TGeoBoolNode.h"
 #include "TGeoCompositeShape.h"
-#include <iostream>
-
-using std::cout;
-using std::cerr;
-using std::endl;
 
 
 
 // -----   Default constructor   -------------------------------------------
-R3BMfi::R3BMfi() : R3BDetector("R3BMfi", kTRUE, kMFI) {
+R3BMfi::R3BMfi() : R3BDetector("R3BMfi", kTRUE, kMFI)
+{
 // R3BMfi::R3BMfi() : R3BDetector("R3BMfi", kTRUE, 1) {
   ResetParameters();
   fMfiCollection = new TClonesArray("R3BMfiPoint");
@@ -65,7 +61,8 @@ R3BMfi::R3BMfi() : R3BDetector("R3BMfi", kTRUE, kMFI) {
 
 // -----   Standard constructor   ------------------------------------------
 R3BMfi::R3BMfi(const char* name, Bool_t active) 
-  : R3BDetector(name, active, kMFI) {
+  : R3BDetector(name, active, kMFI)
+{
 //   : R3BDetector(name, active, 1) {
   ResetParameters();
   fMfiCollection = new TClonesArray("R3BMfiPoint");
@@ -91,70 +88,65 @@ R3BMfi::~R3BMfi() {
 }
 // -------------------------------------------------------------------------
 
+
+
 void R3BMfi::Initialize()
 {
   FairDetector::Initialize();
 
-   cout << endl;
-   cout << "-I- R3BMfi: initialisation" << endl;
-   cout << "-I- R3BMfi: Sci. Vol. (McId) " << gMC->VolId("MFILog")<< endl;
-
+  LOG(INFO) << "R3BMfi: initialisation" << FairLogger::endl;
+  LOG(DEBUG) << "R3BMfi: Sci. Vol. (McId) " << gMC->VolId("MFILog")<< FairLogger::endl;
 }
 
 
-void R3BMfi::SetSpecialPhysicsCuts(){
 
-   cout << endl;
+void R3BMfi::SetSpecialPhysicsCuts()
+{
+   LOG(INFO) << "R3BMfi: Adding customized Physics cut ... " << FairLogger::endl;
 
-   cout << "-I- R3BMfi: Adding customized Physics cut ... " << endl;
-
-   if (gGeoManager) {
-     TGeoMedium* pSi = gGeoManager->GetMedium("plasticForGFI");
-     if ( pSi ) {
+  if (gGeoManager) {
+    TGeoMedium* pSi = gGeoManager->GetMedium("plasticForGFI");
+    if ( pSi ) {
       // Setting processes for Si only
-         gMC->Gstpar(pSi->GetId()  ,"LOSS",3);
-         gMC->Gstpar(pSi->GetId()  ,"STRA",1.0);
-         gMC->Gstpar(pSi->GetId()  ,"PAIR",1.0);
-	 gMC->Gstpar(pSi->GetId()  ,"COMP",1.0);
-	 gMC->Gstpar(pSi->GetId()  ,"PHOT",1.0);
-         gMC->Gstpar(pSi->GetId()  ,"ANNI",1.0);
-	 gMC->Gstpar(pSi->GetId()  ,"BREM",1.0);
-	 gMC->Gstpar(pSi->GetId()  ,"HADR",1.0);
-         gMC->Gstpar(pSi->GetId()  ,"DRAY",1.0);
-         gMC->Gstpar(pSi->GetId()  ,"DCAY",1.0);
-         gMC->Gstpar(pSi->GetId()  ,"MULS",1.0);
-	 gMC->Gstpar(pSi->GetId()  ,"RAYL",1.0);
-
-	 // Setting Energy-CutOff for Si Only
-	Double_t cutE = fCutE; // GeV-> 1 keV
-
-	cout << "-I- R3bMfi Scintillator Medium Id " << pSi->GetId()
+      gMC->Gstpar(pSi->GetId()  ,"LOSS",3);
+      gMC->Gstpar(pSi->GetId()  ,"STRA",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"PAIR",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"COMP",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"PHOT",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"ANNI",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"BREM",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"HADR",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"DRAY",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"DCAY",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"MULS",1.0);
+      gMC->Gstpar(pSi->GetId()  ,"RAYL",1.0);
+      
+      // Setting Energy-CutOff for Si Only
+      Double_t cutE = fCutE; // GeV-> 1 keV
+      
+      LOG(INFO) << "R3bMfi Scintillator Medium Id " << pSi->GetId()
 	    << " Energy Cut-Off : " << cutE
-	     << " GeV " << endl;
-        cout << endl;
-        //Si
-	gMC->Gstpar(pSi->GetId(),"CUTGAM",cutE);   /** gammas (GeV)*/
-        gMC->Gstpar(pSi->GetId(),"CUTELE",cutE);   /** electrons (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"CUTNEU",cutE);   /** neutral hadrons (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"CUTHAD",cutE);   /** charged hadrons (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"CUTMUO",cutE);   /** muons (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"BCUTE",cutE);    /** electron bremsstrahlung (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"BCUTM",cutE);    /** muon and hadron bremsstrahlung(GeV)*/
-	gMC->Gstpar(pSi->GetId(),"DCUTE",cutE);    /** delta-rays by electrons (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"DCUTM",cutE);    /** delta-rays by muons (GeV)*/
-        gMC->Gstpar(pSi->GetId(),"PPCUTM",-1.);   /** direct pair production by muons (GeV)*/
-
-     }
-
- } //!gGeoManager
-
-
+      << " GeV " << FairLogger::endl;
+      //Si
+      gMC->Gstpar(pSi->GetId(),"CUTGAM",cutE);   /** gammas (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"CUTELE",cutE);   /** electrons (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"CUTNEU",cutE);   /** neutral hadrons (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"CUTHAD",cutE);   /** charged hadrons (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"CUTMUO",cutE);   /** muons (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"BCUTE",cutE);    /** electron bremsstrahlung (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"BCUTM",cutE);    /** muon and hadron bremsstrahlung(GeV)*/
+      gMC->Gstpar(pSi->GetId(),"DCUTE",cutE);    /** delta-rays by electrons (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"DCUTM",cutE);    /** delta-rays by muons (GeV)*/
+      gMC->Gstpar(pSi->GetId(),"PPCUTM",-1.);   /** direct pair production by muons (GeV)*/
+    }
+  } //!gGeoManager
 }
+
 
 
 // -----   Public method ProcessHits  --------------------------------------
-Bool_t R3BMfi::ProcessHits(FairVolume* vol) {
-
+Bool_t R3BMfi::ProcessHits(FairVolume* vol)
+{
    // 2 Simple Det PLane
    // get Info from DCH planes
     Int_t copyNo  = -1;
@@ -221,13 +213,6 @@ Bool_t R3BMfi::ProcessHits(FairVolume* vol) {
 	newpos[i] = oldpos[i] - (3*safety*olddirection[i]);
       }
 
-      if ( fPosIn.Z() < 30. && newpos[2] > 30.02 ) {
-	cerr << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] 
-	     << " with safety = " << safety << endl;
-	cerr << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << endl;
-	cerr << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << endl;
-      }
-
       fPosOut.SetX(newpos[0]);
       fPosOut.SetY(newpos[1]);
       fPosOut.SetZ(newpos[2]);
@@ -250,19 +235,18 @@ Bool_t R3BMfi::ProcessHits(FairVolume* vol) {
   return kTRUE;
 }
 
+
+
 // -----   Public method EndOfEvent   -----------------------------------------
-void R3BMfi::BeginEvent() {
-
-//  if (! kGeoSaved ) {
-//      SaveGeoParams();
-//  cout << "-I STS geometry parameters saved " << endl;
-//  kGeoSaved = kTRUE;
-//  }
-
+void R3BMfi::BeginEvent()
+{
 }
-// -----   Public method EndOfEvent   -----------------------------------------
-void R3BMfi::EndOfEvent() {
 
+
+
+// -----   Public method EndOfEvent   -----------------------------------------
+void R3BMfi::EndOfEvent()
+{
   if (fVerboseLevel) Print();
   fMfiCollection->Clear();
 
@@ -273,7 +257,8 @@ void R3BMfi::EndOfEvent() {
 
 
 // -----   Public method Register   -------------------------------------------
-void R3BMfi::Register() {
+void R3BMfi::Register()
+{
   FairRootManager::Instance()->Register("MFIPoint", GetName(), fMfiCollection, kTRUE);
 }
 // ----------------------------------------------------------------------------
@@ -281,7 +266,8 @@ void R3BMfi::Register() {
 
 
 // -----   Public method GetCollection   --------------------------------------
-TClonesArray* R3BMfi::GetCollection(Int_t iColl) const {
+TClonesArray* R3BMfi::GetCollection(Int_t iColl) const
+{
   if (iColl == 0) return fMfiCollection;
   else return NULL;
 }
@@ -293,15 +279,15 @@ TClonesArray* R3BMfi::GetCollection(Int_t iColl) const {
 void R3BMfi::Print(Option_t *option) const
 {
   Int_t nHits = fMfiCollection->GetEntriesFast();
-  cout << "-I- R3BMfi: " << nHits << " points registered in this event." 
-       << endl;
+  LOG(INFO) << "R3BMfi: " << nHits << " points registered in this event" << FairLogger::endl;
 }
 // ----------------------------------------------------------------------------
 
 
 
 // -----   Public method Reset   ----------------------------------------------
-void R3BMfi::Reset() {
+void R3BMfi::Reset()
+{
   fMfiCollection->Clear();
   ResetParameters();
 }
@@ -310,39 +296,46 @@ void R3BMfi::Reset() {
 
 
 // -----   Public method CopyClones   -----------------------------------------
-void R3BMfi::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
+void R3BMfi::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
+{
   Int_t nEntries = cl1->GetEntriesFast();
-  cout << "-I- R3BMfi: " << nEntries << " entries to add." << endl;
+  LOG(INFO) << "R3BMfi: " << nEntries << " entries to add" << FairLogger::endl;
   TClonesArray& clref = *cl2;
   R3BMfiPoint* oldpoint = NULL;
-   for (Int_t i=0; i<nEntries; i++) {
-   oldpoint = (R3BMfiPoint*) cl1->At(i);
+  for (Int_t i=0; i<nEntries; i++) {
+    oldpoint = (R3BMfiPoint*) cl1->At(i);
     Int_t index = oldpoint->GetTrackID() + offset;
     oldpoint->SetTrackID(index);
     new (clref[fPosIndex]) R3BMfiPoint(*oldpoint);
     fPosIndex++;
   }
-   cout << " -I- R3BMfi: " << cl2->GetEntriesFast() << " merged entries."
-       << endl;
+  LOG(INFO) << "R3BMfi: " << cl2->GetEntriesFast() << " merged entries" << FairLogger::endl;
 }
+
+
 
 // -----   Private method AddHit   --------------------------------------------
 R3BMfiPoint* R3BMfi::AddHit(Int_t trackID, Int_t detID, Int_t plane , TVector3 posIn,
 			    TVector3 posOut, TVector3 momIn, 
 			    TVector3 momOut, Double_t time, 
-			    Double_t length, Double_t eLoss) {
+			    Double_t length, Double_t eLoss)
+{
   TClonesArray& clref = *fMfiCollection;
   Int_t size = clref.GetEntriesFast();
-  if (fVerboseLevel>1) 
-    cout << "-I- R3BMfi: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
-	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
-	 << trackID << ", energy loss " << eLoss*1e06 << " keV" << endl;
+  if (fVerboseLevel > 1) {
+    LOG(INFO) << "R3BMfi: Adding Point at (" << posIn.X() << ", " << posIn.Y()
+    << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
+    << trackID << ", energy loss " << eLoss*1e06 << " keV" << FairLogger::endl;
+  }
   return new(clref[size]) R3BMfiPoint(trackID, detID, plane, posIn, posOut,
-				      momIn, momOut, time, length, eLoss);
+                                      momIn, momOut, time, length, eLoss);
 }
-// -----   Public method ConstructGeometry   ----------------------------------
-void R3BMfi::ConstructGeometry() {
 
+
+
+// -----   Public method ConstructGeometry   ----------------------------------
+void R3BMfi::ConstructGeometry()
+{
   // out-of-file geometry definition
    Double_t dx,dy,dz;
    Double_t a;
@@ -591,7 +584,6 @@ void R3BMfi::ConstructGeometry() {
    AddSensitiveVolume(pMFILog);
    fNbOfSensitiveVol+=1;
 }
-
 
 
 

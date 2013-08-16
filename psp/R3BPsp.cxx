@@ -39,16 +39,12 @@
 #include "TGeoCone.h"
 #include "TGeoBoolNode.h"
 #include "TGeoCompositeShape.h"
-#include <iostream>
-
-using std::cout;
-using std::cerr;
-using std::endl;
 
 
 
 // -----   Default constructor   -------------------------------------------
-R3BPsp::R3BPsp() : R3BDetector("R3BPsp", kTRUE, kPSP) {
+R3BPsp::R3BPsp() : R3BDetector("R3BPsp", kTRUE, kPSP)
+{
   ResetParameters();
   fPspCollection = new TClonesArray("R3BPspPoint");
   fPosIndex = 0;
@@ -64,7 +60,8 @@ R3BPsp::R3BPsp() : R3BDetector("R3BPsp", kTRUE, kPSP) {
 
 // -----   Standard constructor   ------------------------------------------
 R3BPsp::R3BPsp(const char* name, Bool_t active) 
-  : R3BDetector(name, active, kPSP) {
+  : R3BDetector(name, active, kPSP)
+{
   ResetParameters();
   fPspCollection = new TClonesArray("R3BPspPoint");
   fPosIndex = 0;
@@ -89,27 +86,26 @@ R3BPsp::~R3BPsp() {
 }
 // -------------------------------------------------------------------------
 
+
+
 void R3BPsp::Initialize()
 {
   FairDetector::Initialize();
-
-   cout << endl;
-   cout << "-I- R3BPsp: initialisation" << endl;
-   cout << "-I- R3BPsp: Vol. (McId) " << gMC->VolId("PSPLog")<< endl;
-
+  
+  LOG(INFO) << "R3BPsp: initialisation" << FairLogger::endl;
+  LOG(DEBUG) << "R3BPsp: Vol. (McId) " << gMC->VolId("PSP1Log") << FairLogger::endl;
 }
 
 
-void R3BPsp::SetSpecialPhysicsCuts(){
 
-   //pschrock 2013-06-07
-   //this lines are fron R3BTra.cxx
-   cout << endl;
-
-	cout << "-I- R3BTra: Adding customized Physics cut ... " << endl;
-
+void R3BPsp::SetSpecialPhysicsCuts()
+{
+  //pschrock 2013-06-07
+  //this lines are fron R3BTra.cxx
+	LOG(INFO) << "R3BPsp: Adding customized Physics cut ... " << FairLogger::endl;
+  
 	if (gGeoManager) {
-
+    
 		TGeoMedium* pSi = gGeoManager->GetMedium("Silicon");
 		if ( pSi ) {
 			// Setting processes for Si only
@@ -125,15 +121,14 @@ void R3BPsp::SetSpecialPhysicsCuts(){
 			gMC->Gstpar(pSi->GetId()  ,"DCAY",1.0);
 			gMC->Gstpar(pSi->GetId()  ,"MULS",1.0);
 			gMC->Gstpar(pSi->GetId()  ,"RAYL",1.0);
-
+      
 			// Setting Energy-CutOff for Si Only
 			Double_t cutE = fCutE; // GeV-> 100 keV
-
-			cout << "-I- R3bTra Silicon Medium Id " << pSi->GetId()
-				<< " Energy Cut-Off : " << cutE
-				<< endl;
-			cout << endl;
-
+      
+			LOG(INFO) << "R3BPsp Silicon Medium Id " << pSi->GetId()
+      << " Energy Cut-Off : " << cutE
+      << FairLogger::endl;
+      
 			//Si
 			gMC->Gstpar(pSi->GetId(),"CUTGAM",cutE);   /** gammas (GeV)*/
 			gMC->Gstpar(pSi->GetId(),"CUTELE",cutE);   /** electrons (GeV)*/
@@ -145,18 +140,15 @@ void R3BPsp::SetSpecialPhysicsCuts(){
 			gMC->Gstpar(pSi->GetId(),"DCUTE" ,cutE);    /** delta-rays by electrons (GeV)*/
 			gMC->Gstpar(pSi->GetId(),"DCUTM" ,cutE);    /** delta-rays by muons (GeV)*/
 			gMC->Gstpar(pSi->GetId(),"PPCUTM",-1.);   /** direct pair production by muons (GeV)*/
-
 		}
-
- } //!gGeoManager
-
-
+  } //!gGeoManager
 }
 
 
-// -----   Public method ProcessHits  --------------------------------------
-Bool_t R3BPsp::ProcessHits(FairVolume* vol) {
 
+// -----   Public method ProcessHits  --------------------------------------
+Bool_t R3BPsp::ProcessHits(FairVolume* vol)
+{
    // 2 Simple Det PLane
    // get Info from DCH planes
     Int_t copyNo  = -1;
@@ -223,13 +215,6 @@ Bool_t R3BPsp::ProcessHits(FairVolume* vol) {
 	newpos[i] = oldpos[i] - (3*safety*olddirection[i]);
       }
 
-      if ( fPosIn.Z() < 30. && newpos[2] > 30.02 ) {
-	cerr << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] 
-	     << " with safety = " << safety << endl;
-	cerr << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << endl;
-	cerr << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << endl;
-      }
-
       fPosOut.SetX(newpos[0]);
       fPosOut.SetY(newpos[1]);
       fPosOut.SetZ(newpos[2]);
@@ -252,19 +237,18 @@ Bool_t R3BPsp::ProcessHits(FairVolume* vol) {
   return kTRUE;
 }
 
+
+
 // -----   Public method EndOfEvent   -----------------------------------------
-void R3BPsp::BeginEvent() {
-
-//  if (! kGeoSaved ) {
-//      SaveGeoParams();
-//  cout << "-I STS geometry parameters saved " << endl;
-//  kGeoSaved = kTRUE;
-//  }
-
+void R3BPsp::BeginEvent()
+{
 }
-// -----   Public method EndOfEvent   -----------------------------------------
-void R3BPsp::EndOfEvent() {
 
+
+
+// -----   Public method EndOfEvent   -----------------------------------------
+void R3BPsp::EndOfEvent()
+{
   if (fVerboseLevel) Print();
   fPspCollection->Clear();
 
@@ -275,7 +259,8 @@ void R3BPsp::EndOfEvent() {
 
 
 // -----   Public method Register   -------------------------------------------
-void R3BPsp::Register() {
+void R3BPsp::Register()
+{
   FairRootManager::Instance()->Register("PSPPoint", GetName(), fPspCollection, kTRUE);
 }
 // ----------------------------------------------------------------------------
@@ -283,7 +268,8 @@ void R3BPsp::Register() {
 
 
 // -----   Public method GetCollection   --------------------------------------
-TClonesArray* R3BPsp::GetCollection(Int_t iColl) const {
+TClonesArray* R3BPsp::GetCollection(Int_t iColl) const
+{
   if (iColl == 0) return fPspCollection;
   else return NULL;
 }
@@ -295,15 +281,15 @@ TClonesArray* R3BPsp::GetCollection(Int_t iColl) const {
 void R3BPsp::Print(Option_t *option) const
 {
   Int_t nHits = fPspCollection->GetEntriesFast();
-  cout << "-I- R3BPsp: " << nHits << " points registered in this event." 
-       << endl;
+  LOG(INFO) << "R3BPsp: " << nHits << " points registered in this event" << FairLogger::endl;
 }
 // ----------------------------------------------------------------------------
 
 
 
 // -----   Public method Reset   ----------------------------------------------
-void R3BPsp::Reset() {
+void R3BPsp::Reset()
+{
   fPspCollection->Clear();
   ResetParameters();
 }
@@ -312,39 +298,46 @@ void R3BPsp::Reset() {
 
 
 // -----   Public method CopyClones   -----------------------------------------
-void R3BPsp::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
+void R3BPsp::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
+{
   Int_t nEntries = cl1->GetEntriesFast();
-  cout << "-I- R3BPsp: " << nEntries << " entries to add." << endl;
+  LOG(INFO) << "R3BPsp: " << nEntries << " entries to add" << FairLogger::endl;
   TClonesArray& clref = *cl2;
   R3BPspPoint* oldpoint = NULL;
-   for (Int_t i=0; i<nEntries; i++) {
-   oldpoint = (R3BPspPoint*) cl1->At(i);
+  for (Int_t i=0; i<nEntries; i++) {
+    oldpoint = (R3BPspPoint*) cl1->At(i);
     Int_t index = oldpoint->GetTrackID() + offset;
     oldpoint->SetTrackID(index);
     new (clref[fPosIndex]) R3BPspPoint(*oldpoint);
     fPosIndex++;
   }
-   cout << " -I- R3BPsp: " << cl2->GetEntriesFast() << " merged entries."
-       << endl;
+  LOG(INFO) << "R3BPsp: " << cl2->GetEntriesFast() << " merged entries" << FairLogger::endl;
 }
+
+
 
 // -----   Private method AddHit   --------------------------------------------
 R3BPspPoint* R3BPsp::AddHit(Int_t trackID, Int_t detID, Int_t plane , TVector3 posIn,
 			    TVector3 posOut, TVector3 momIn, 
 			    TVector3 momOut, Double_t time, 
-			    Double_t length, Double_t eLoss) {
+			    Double_t length, Double_t eLoss)
+{
   TClonesArray& clref = *fPspCollection;
   Int_t size = clref.GetEntriesFast();
-  if (fVerboseLevel>1) 
-    cout << "-I- R3BPsp: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
-	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
-	 << trackID << ", energy loss " << eLoss*1e06 << " keV" << endl;
+  if (fVerboseLevel>1) {
+    LOG(INFO) << "R3BPsp: Adding Point at (" << posIn.X() << ", " << posIn.Y()
+    << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
+    << trackID << ", energy loss " << eLoss*1e06 << " keV" << FairLogger::endl;
+  }
   return new(clref[size]) R3BPspPoint(trackID, detID, plane, posIn, posOut,
-				      momIn, momOut, time, length, eLoss);
+                                      momIn, momOut, time, length, eLoss);
 }
-// -----   Public method ConstructGeometry   ----------------------------------
-void R3BPsp::ConstructGeometry() {
 
+
+
+// -----   Public method ConstructGeometry   ----------------------------------
+void R3BPsp::ConstructGeometry()
+{
   // out-of-file geometry definition
    Double_t dx,dy,dz;
    Double_t a;
