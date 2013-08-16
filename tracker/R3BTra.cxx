@@ -2,6 +2,8 @@
 // -----                        R3BTra source file                     -----
 // -----                  Created 26/03/09  by D.Bertini               -----
 // -------------------------------------------------------------------------
+#include <stdlib.h>
+
 #include "R3BTra.h"
 
 #include "R3BGeoTra.h"
@@ -41,11 +43,7 @@
 #include "TGeoBoolNode.h"
 #include "TGeoCompositeShape.h"
 #include "TGeoShapeAssembly.h"
-#include <iostream>
 
-using std::cout;
-using std::cerr;
-using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 R3BTra::R3BTra() : R3BDetector("R3BTra", kTRUE, kTRA) {
@@ -362,6 +360,7 @@ void R3BTra::ConstructGeometry()
     ConstructRootGeometry();
   } else {
     LOG(FATAL) << "TRACKER Geometry file is not specified" << FairLogger::endl;
+    exit(1);
   }
 }
 
