@@ -2,6 +2,8 @@
 // -----                        R3BPsp source file                     -----
 // -----                  Created 26/03/09  by D.Bertini               -----
 // -------------------------------------------------------------------------
+#include <stdlib.h>
+
 #include "R3BPsp.h"
 
 #include "R3BGeoPsp.h"
@@ -198,8 +200,6 @@ Bool_t R3BPsp::ProcessHits(FairVolume* vol)
       oldpos = gGeoManager->GetCurrentPoint();
       olddirection = gGeoManager->GetCurrentDirection();
       
-//       cout << "1st direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] << endl;
-
       for (Int_t i=0; i<3; i++){
 	newdirection[i] = -1*olddirection[i];
       }
@@ -338,253 +338,26 @@ R3BPspPoint* R3BPsp::AddHit(Int_t trackID, Int_t detID, Int_t plane , TVector3 p
 // -----   Public method ConstructGeometry   ----------------------------------
 void R3BPsp::ConstructGeometry()
 {
-  // out-of-file geometry definition
-   Double_t dx,dy,dz;
-   Double_t a;
-   Double_t thx, phx, thy, phy, thz, phz;
-   Double_t z, density, radl, absl, w;
-   Int_t nel, numed;
+  TString fileName = GetGeometryFileName();
+  if(fileName.EndsWith(".root")) {
+    LOG(INFO) << "Constructing PSP geometry from ROOT file " << fileName.Data() << FairLogger::endl;
+    ConstructRootGeometry();
+  } else {
+    LOG(FATAL) << "PSP geometry file is not specified" << FairLogger::endl;
+    exit(1);
+  }
+}
 
 
-/****************************************************************************/
-// Material definition
 
- // Vacuum
-
-   TGeoMedium * pMed1=NULL;
-   if (gGeoManager->GetMedium("Vacuum") ){
-       pMed1=gGeoManager->GetMedium("Vacuum");
-   }else{
-       TGeoMaterial *matVacuum = new TGeoMaterial("Vacuum", 0,0,0);
-       Double_t par[8];
-       par[0]  = 0.000000; // isvol
-       par[1]  = 0.000000; // ifield
-       par[2]  = 0.000000; // fieldm
-       par[3]  = 0.000000; // tmaxfd
-       par[4]  = 0.000000; // stemax
-       par[5]  = 0.000000; // deemax
-       par[6]  = 0.000100; // epsil
-       par[7]  = 0.000000; // stmin
-       pMed1 = new TGeoMedium("Vacuum",1, matVacuum,par);
-   }
-
-   // Mixture: Air
-   TGeoMedium * pMed2=NULL;
-   if (gGeoManager->GetMedium("Air") ){
-       pMed2=gGeoManager->GetMedium("Air");
-   }else{
-       nel     = 2;
-       density = 0.001290;
-       TGeoMixture*
-	   pMat2 = new TGeoMixture("Air", nel,density);
-       a = 14.006740;   z = 7.000000;   w = 0.700000;  // N
-       pMat2->DefineElement(0,a,z,w);
-       a = 15.999400;   z = 8.000000;   w = 0.300000;  // O
-       pMat2->DefineElement(1,a,z,w);
-       pMat2->SetIndex(1);
-       // Medium: Air
-       numed   = 1;  // medium number
-       Double_t par[8];
-       par[0]  = 0.000000; // isvol
-       par[1]  = 0.000000; // ifield
-       par[2]  = 0.000000; // fieldm
-       par[3]  = 0.000000; // tmaxfd
-       par[4]  = 0.000000; // stemax
-       par[5]  = 0.000000; // deemax
-       par[6]  = 0.000100; // epsil
-       par[7]  = 0.000000; // stmin
-       pMed2 = new TGeoMedium("Air", numed,pMat2, par);
-   }
-
-   
-   
-   //pschrock 2013-06-07
-   //this lines are from R3BTra.cxx
-   
-   // Material: Silicon
-	TGeoMedium * pMedSi=NULL;
-	if (gGeoManager->GetMedium("Silicon") ){
-		pMedSi=gGeoManager->GetMedium("Silicon");
-	}else{
-		a       = 28.090000;
-		z       = 14.000000;
-		density = 2.330000;
-		radl    = 9.351106;
-		absl    = 456.628489;
-		TGeoMaterial*
-			pMat22 = new TGeoMaterial("Silicon", a,z,density,radl,absl);
-
-		pMat22->SetIndex(21);
-		// Medium: Silicon
-		numed   = 21;  // medium number
-		
-		Double_t par[8];
-		par[0]  = 0.000000; // isvol
-	    par[1]  = 0.000000; // ifield
-	    par[2]  = 0.000000; // fieldm
-	    par[3]  = 0.000000; // tmaxfd
-	    par[4]  = 0.000000; // stemax
-	    par[5]  = 0.000000; // deemax
-	    par[6]  = 0.000100; // epsil
-	    par[7]  = 0.000000; // stmin
-
-		pMedSi = new TGeoMedium("Silicon", numed,pMat22,par);
-	}
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   //psp1
-   dx = 0.0;  //pschrock s412
-   dy = 0.0;
-   dz = -221.0;
-   
-   TGeoRotation *gRot1 = new TGeoRotation();
-   gRot1->RotateX(0.);
-   gRot1->RotateY(0.); // s412
-   gRot1->RotateZ(0.);
-   
-   TGeoCombiTrans* pMatrix1 = new TGeoCombiTrans("", dx,dy,dz,gRot1);
-   
-   
-   
-   //psp2
-   dx = 0.0;  //pschrock s412
-   dy = 0.0;
-   dz = -89.0;
-   
-   TGeoRotation *gRot2 = new TGeoRotation();
-   gRot2->RotateX(0.);
-   gRot2->RotateY(0.); // s412
-   gRot2->RotateZ(0.);
-   
-   TGeoCombiTrans* pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,gRot2);
-   
-   
-   
-   
-   
-   
-   //psp3
-   dx = 0.00; //s412 pschrock
-   dy = 0.00;
-   dz = 94.1;
-   
-
-   TGeoRotation *gRot3 = new TGeoRotation();
-   gRot3->RotateX(0.);
-   gRot3->RotateY(0.); // s412
-   gRot3->RotateZ(0.);
-
-   TGeoCombiTrans* pMatrix3 = new TGeoCombiTrans("", dx,dy,dz,gRot3);
-   
-   
-   
-   
-   
-
-
-   // World definition
-   TGeoVolume* pWorld = gGeoManager->GetTopVolume();
-   pWorld->SetVisLeaves(kTRUE);
-
- 
-
-   // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
-   // Shape: PSPBoxWorld type: TGeoBBox
-   dx = 2.5000;
-   dy = 2.5000;
-   dz = 0.050000;
-   TGeoShape *pPSPBoxWorld = new TGeoBBox("PSPBoxWorld", dx,dy,dz);
-   // Volume: PSPLogWorld
-//    TGeoVolume* pPSPLogWorld = new TGeoVolume("PSPLogWorld",pPSPBoxWorld, pMed1); //vacuum filled
-   TGeoVolume* pPSP1LogWorld = new TGeoVolume("PSP1LogWorld",pPSPBoxWorld, pMed1); //vacuum filled
-   TGeoVolume* pPSP2LogWorld = new TGeoVolume("PSP1LogWorld",pPSPBoxWorld, pMed1); //vacuum filled
-   TGeoVolume* pPSP3LogWorld = new TGeoVolume("PSP1LogWorld",pPSPBoxWorld, pMed1); //vacuum filled
-//    pPSPLogWorld->SetVisLeaves(kTRUE);
-   pPSP1LogWorld->SetVisLeaves(kTRUE);
-   pPSP2LogWorld->SetVisLeaves(kTRUE);
-   pPSP3LogWorld->SetVisLeaves(kTRUE);
-
-   // Global positioning
-   TGeoCombiTrans *pGlobal1 = GetGlobalPosition(pMatrix1); //psp1
-   TGeoCombiTrans *pGlobal2 = GetGlobalPosition(pMatrix2); //psp2
-   TGeoCombiTrans *pGlobal3 = GetGlobalPosition(pMatrix3); //psp3
-
-   //put vacuum boxes for psp's
-//    pWorld->AddNode( pPSPLogWorld, 1, pGlobal1 ); //psp1
-//    pWorld->AddNode( pPSPLogWorld, 2, pGlobal2 ); //psp2
-//    pWorld->AddNode( pPSPLogWorld, 3, pGlobal3 ); //psp3
-   pWorld->AddNode( pPSP1LogWorld, 1, pGlobal1 ); //psp1
-   pWorld->AddNode( pPSP2LogWorld, 2, pGlobal2 ); //psp2
-   pWorld->AddNode( pPSP3LogWorld, 3, pGlobal3 ); //psp3
-
-   // Shape: PSPBox type: TGeoBBox
-   dx = 2.25000;
-   dy = 2.25000;
-   dz = 0.01005; //psp1 201 um, s412
-   TGeoShape *pPSP1Box = new TGeoBBox("PSP1Box", dx,dy,dz);
-   
-   dx = 2.25000;
-   dy = 2.25000;
-   dz = 0.0102; //psp2 204 um, s412
-   TGeoShape *pPSP2Box = new TGeoBBox("PSP2Box", dx,dy,dz);
-   
-   dx = 2.25000;
-   dy = 2.25000;
-   dz = 0.00520; //psp3 104 um, s412
-   TGeoShape *pPSP3Box = new TGeoBBox("PSP3Box", dx,dy,dz);
-   
-   
-   // Volume: PSPLog
-   //create active volumes of psp's with specific thicknesses
-   TGeoVolume* pPSP1Log = new TGeoVolume("PSP1Log",pPSP1Box, pMedSi);
-   TGeoVolume* pPSP2Log = new TGeoVolume("PSP2Log",pPSP2Box, pMedSi);
-   TGeoVolume* pPSP3Log = new TGeoVolume("PSP3Log",pPSP3Box, pMedSi);
-   pPSP1Log->SetVisLeaves(kTRUE);
-   pPSP2Log->SetVisLeaves(kTRUE);
-   pPSP3Log->SetVisLeaves(kTRUE);
-   
-   
-   
-   
-   
-   // Combi transformation: 
-   //"empty" matrix for placing active volumes inside vacuum box
-   dx = 0.000000;
-   dy = 0.000000;
-   dz = 0.000000;
-   // Rotation: 
-   thx = 90.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = 0.000000;    phz = 0.000000;
-   TGeoRotation *pMatrix7 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-   pMatrix6 = new TGeoCombiTrans("", dx,dy,dz,pMatrix7);
-   
-   
-   
-//    pPSPLogWorld->AddNode(pPSP1Log, 1, pMatrix6); 
-//    pPSPLogWorld->AddNode(pPSP2Log, 2, pMatrix6); 
-//    pPSPLogWorld->AddNode(pPSP3Log, 3, pMatrix6); 
-   pPSP1LogWorld->AddNode(pPSP1Log, 1, pMatrix6); 
-   pPSP2LogWorld->AddNode(pPSP2Log, 2, pMatrix6); 
-   pPSP3LogWorld->AddNode(pPSP3Log, 3, pMatrix6); 
-   
-   
-   
-   
-   // Add the sensitive part
-   AddSensitiveVolume(pPSP1Log);
-   AddSensitiveVolume(pPSP2Log);
-   AddSensitiveVolume(pPSP3Log);
-   fNbOfSensitiveVol+=1;
+Bool_t R3BPsp::CheckIfSensitive(std::string name)
+{
+  if(TString(name).Contains("PSP1Log") ||
+     TString(name).Contains("PSP2Log") ||
+     TString(name).Contains("PSP3Log")) {
+    return kTRUE;
+  }
+  return kFALSE;
 }
 
 

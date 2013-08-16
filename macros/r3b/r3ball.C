@@ -239,7 +239,7 @@ void r3ball(Int_t nEvents = 1,
   // PSP Detector
   if(fDetList.FindObject("PSP")) {
     R3BDetector* psp = new R3BPsp("Psp", kTRUE);
-    //    psp->SetGeometryFileName("psp_v13a.geo.root");
+    psp->SetGeometryFileName("psp_v13a.geo.root");
     run->AddModule(psp);
   }
   
