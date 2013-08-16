@@ -2,6 +2,9 @@
 // -----                        ELILuMon source file                     -----
 // -----                  Created 26/03/09  by D.Bertini               -----
 // -------------------------------------------------------------------------
+#include <iostream>
+#include <stdlib.h>
+
 #include "ELILuMon.h"
 
 #include "ELIGeoLuMon.h"
@@ -40,7 +43,6 @@
 #include "TGeoBoolNode.h"
 #include "TGeoCompositeShape.h"
 #include "TGeoShapeAssembly.h"
-#include <iostream>
 
 using std::cout;
 using std::cerr;
@@ -49,7 +51,7 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-ELILuMon::ELILuMon() : R3BDetector("ELILuMon", kTRUE, kTOF) {
+ELILuMon::ELILuMon() : R3BDetector("ELILuMon", kTRUE, kLUMON) {
   ResetParameters();
   fLuMonCollection = new TClonesArray("ELILuMonPoint");
   fPosIndex = 0;
@@ -65,7 +67,7 @@ ELILuMon::ELILuMon() : R3BDetector("ELILuMon", kTRUE, kTOF) {
 
 // -----   Standard constructor   ------------------------------------------
 ELILuMon::ELILuMon(const char* name, Bool_t active) 
-  : R3BDetector(name, active, kTOF) {
+  : R3BDetector(name, active, kLUMON) {
   ResetParameters();
   fLuMonCollection = new TClonesArray("ELILuMonPoint");
   fPosIndex = 0;
@@ -97,13 +99,13 @@ void ELILuMon::Initialize()
 
    cout << endl;
    cout << "-I- ELILuMon: initialisation" << endl;
-   cout << "-I- ELILuMon: Sci. Vol. (McId) " << gMC->VolId("LuMonLog")<< endl;
+   cout << "-I- ELILuMon: Sci. Vol. (McId) " << gMC->VolId("LUMONLog")<< endl;
 
 }
 
 
-void ELILuMon::SetSpecialPhysicsCuts(){
-
+void ELILuMon::SetSpecialPhysicsCuts()
+{
    cout << endl;
 
    cout << "-I- ELILuMon: Adding customized Physics cut ... " << endl;
@@ -154,8 +156,8 @@ void ELILuMon::SetSpecialPhysicsCuts(){
 
 
 // -----   Public method ProcessHits  --------------------------------------
-Bool_t ELILuMon::ProcessHits(FairVolume* vol) {
-
+Bool_t ELILuMon::ProcessHits(FairVolume* vol)
+{
    Int_t copyNo  = -1;
    gMC->CurrentVolID(copyNo);
 
@@ -211,13 +213,6 @@ Bool_t ELILuMon::ProcessHits(FairVolume* vol) {
 	newpos[i] = oldpos[i] - (3*safety*olddirection[i]);
       }
 
-      if ( fPosIn.Z() < 30. && newpos[2] > 30.02 ) {
-	cerr << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] 
-	     << " with safety = " << safety << endl;
-	cerr << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << endl;
-	cerr << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << endl;
-      }
-
       fPosOut.SetX(newpos[0]);
       fPosOut.SetY(newpos[1]);
       fPosOut.SetZ(newpos[2]);
@@ -232,7 +227,7 @@ Bool_t ELILuMon::ProcessHits(FairVolume* vol) {
     
     // Increment number of LuMonPoints for this track
     R3BStack* stack = (R3BStack*) gMC->GetStack();
-    stack->AddPoint(kTOF);
+    stack->AddPoint(kLUMON);
     
     ResetParameters();
   }
@@ -347,135 +342,28 @@ ELILuMonPoint* ELILuMon::AddHit(Int_t trackID, Int_t detID,  Int_t copy, TVector
 }
 // -----   Public method ConstructGeometry   ----------------------------------
 
-void ELILuMon::ConstructGeometry() {
-   ConstructGeometry1();
-}
 
-void ELILuMon::ConstructGeometry1() {
-
-   //-  Some Material definition
-   TGeoMaterial *material = 0;
-//   TGeoMedium   *medium   = 0;
-//   Float_t *buf = 0;
-   Float_t sumWeight;
-   Int_t i;
-   
-   // material Lead
-   Int_t kMatLead=601;
-   material = gGeoManager->Material("Pb", 207.2, 82., 11.35,kMatLead);
-   //material->Print();
-   
-   // mixtrure Scintillator (CH)
-   Int_t kMatPoly=602;
-   Float_t aP[2] = {12.011, 1.00794} ;
-   Float_t zP[2] = {6.0, 1.0} ;
-   Float_t wP[2] = {9.0, 8.0} ;
-   Float_t dP = 1.032 ;
-   Int_t   nP = 2;
-   sumWeight = 0;
-   for (i=0; i<nP; i++) sumWeight += aP[i]*wP[i];
-   for (i=0; i<nP; i++) wP[i] *= aP[i]/sumWeight;
-   material = gGeoManager->Mixture("Scintillator",aP,zP,dP,nP,wP,kMatPoly);
-  // material->Print();
-   
-   // Iron 
-   Int_t kMatFe=603;
-   material = gGeoManager->Material("Fe", 55.8, 26., 7.87, kMatFe);
-  // material->Print();
-   
-   
-   // Mixtrure Scintillator (PbWO)
-   Int_t kMatPbWO=604;
-   Float_t aPP[3] = {207.19, 183.85, 16.0} ;
-   Float_t zPP[3] = {82.0, 74.0, 8.0} ;
-   Float_t wPP[3] = {1.0, 1.0, 4.0} ;
-   Float_t dPP = 8.28 ;
-   Int_t   nPP = 3;
-   sumWeight = 0;
-   for (i=0; i<nPP; i++) sumWeight += aPP[i]*wPP[i];
-   for (i=0; i<nPP; i++) wPP[i] *= aPP[i]/sumWeight;
-   material = gGeoManager->Mixture("PbWO",aPP,zPP,dPP,nPP,wPP,kMatPbWO);
-  // material->Print();
-   
-   
-   //- Media Definition
-   Int_t /*kMedLead=601, kMedScin=602, kMedFe=603,*/ kMedPbWO=604;
-//   TGeoMedium*
-//   pMed1 = gGeoManager->Medium("Lead"        , kMedLead, kMatLead, 0, 0, 0., 10.0, 0.1, 0.1, 0.1, 0.1);
-   //pMed1->Print();
-//   TGeoMedium*
-//   pMed2 = gGeoManager->Medium("Scintillator", kMedScin, kMatPoly, 1, 0, 0., 10.0, 0.1, 0.1, 0.1, 0.1);
-  // pMed2->Print();
-//   TGeoMedium*
-//   pMed3 = gGeoManager->Medium("Iron", kMedFe, kMatFe, 0, 0, 0., 10.0, 0.1, 0.1, 0.1, 0.1);
-  // pMed3->Print();
-   TGeoMedium*
-   pMed4 = gGeoManager->Medium("PbWO", kMedPbWO, kMatPbWO, 1, 0, 0., 10.0, 0.1, 0.1, 0.1, 0.1);
-  // pMed4->Print();
-   
-   //- Volumes 
-
-   //Top Volume
-   TGeoVolume* pWorld = gGeoManager->GetTopVolume();
-   pWorld->SetVisLeaves(kTRUE);
-
-   // Rotation (Unity)
-   TGeoRotation *pRot = new TGeoRotation();
-
-   // Single Crystal size
-   Double_t bx = 2.1/2.;
-   Double_t by = 2.1/2.;
-   Double_t bz = 22.5/2.;
-
-   Double_t dx= 0.0;
-   Double_t dy= 0.0;
-   Double_t dz= 200 + bz; // distance target->Entrance of Crystal volume
-
-   TGeoVolume *cell = new TGeoVolumeAssembly("CELL");
-   pWorld->AddNode(cell,0,
-                   GetGlobalPosition(
-		   new TGeoCombiTrans("",dx,dy,dz,pRot)
-                   )
-		  );
-
-
-   TGeoShape *pLuMonBox = new TGeoBBox("LUMONBox", bx,by,bz);
-   // Volume: LuMon
-   TGeoVolume*
-   pLuMonLog = new TGeoVolume("LUMONLog",pLuMonBox, pMed4);
-   pLuMonLog->SetVisLeaves(kTRUE);
-
-
-   Double_t step = 2.1;  // step size of 2.1 cm
-
-   // Single Crystal Module Size
-   dx = -2.1;
-   dy = -2.1;
-
-   // Numbering for the copies
-   Int_t nb=0;
-
-   for (Int_t iCol = 0; iCol<3 ;iCol++){
-      for (Int_t iRow = 0; iRow<3; iRow++) {
-	  cell->AddNode( pLuMonLog,nb,
-			new TGeoCombiTrans("", dx+iCol*step,dy+iRow*step,0.0,pRot)
-		       );
-	  nb++;
-      }
-   }
-   
-
-   // Declare all modules as sensitive
-   AddSensitiveVolume(pLuMonLog);
-   fNbOfSensitiveVol+=1;
-
+void ELILuMon::ConstructGeometry()
+{
+  TString fileName = GetGeometryFileName();
+  if(fileName.EndsWith(".root")) {
+    LOG(INFO) << "Constructing LuMon geometry from ROOT file " << fileName.Data() << FairLogger::endl;
+    ConstructRootGeometry();
+  } else {
+    LOG(FATAL) << "LuMon Geometry file is not specified" << FairLogger::endl;
+    exit(1);
+  }
 }
 
 
-void ELILuMon::ConstructGeometry2() {
-// Dummy function
+Bool_t ELILuMon::CheckIfSensitive(std::string name)
+{
+  if(TString(name).Contains("LUMONLog")) {
+    cout << "!!!!!!!!!!!!! Works!" << endl;
+    return kTRUE;
+  }
+  return kFALSE;
 }
-
 
 
 ClassImp(ELILuMon)

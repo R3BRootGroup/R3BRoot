@@ -109,8 +109,7 @@ class ELILuMon : public R3BDetector
    ** Constructs the STS geometry
    **/
   virtual void ConstructGeometry();
-  void ConstructGeometry1();
-  void ConstructGeometry2();
+  virtual Bool_t CheckIfSensitive(std::string name);
 
    virtual void Initialize();
    virtual void SetSpecialPhysicsCuts();

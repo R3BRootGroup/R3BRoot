@@ -307,26 +307,9 @@ void eliall(Int_t nEvents = 1,
 
   // Luminosity detector
   if (fDetList.FindObject("LUMON") ) {
-      R3BDetector* lumon = new ELILuMon("LuMon", kTRUE);
-      //lumon->SetGeometryFileName("lumon.root");
-      // Global position of the Module
-      thetaX   =  0.0; // (deg)
-      thetaY   =  0.0; // (deg)
-      thetaZ   =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx       =  0.0; // (cm)
-      ty       =  0.0; // (cm)
-      tz       =  200.0; // (cm)
-      lumon->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      lumon->SetTranslation(tx,ty,tz);
-      // User defined Energy CutOff
-      //Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
-      //((ELILuMon*) lumon)->SetEnergyCutOff(fCutOffSci);
-      run->AddModule(lumon);
+    R3BDetector* lumon = new ELILuMon("LuMon", kTRUE);
+    lumon->SetGeometryFileName("lumon_v13a.geo.root");
+    run->AddModule(lumon);
   }
 
 

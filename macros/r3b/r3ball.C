@@ -229,53 +229,10 @@ void r3ball(Int_t nEvents = 1,
     run->AddModule(land);
   }
   
-  
-  // Chimera
-  if (fDetList.FindObject("CHIMERA") ) {
-    R3BDetector* chim = new R3BChimera("Chimera", kTRUE);
-    chim->SetGeometryFileName("chimera.root");
-    // Global position of the Module
-    thetaX   =  0.0; // (deg)
-    thetaY   =  0.0; // (deg)
-    thetaZ   =  0.0; // (deg)
-    // Rotation in Ref. Frame.
-    thetaX =  0.0; // (deg)
-    thetaY =  0.0; // (deg)
-    thetaZ =  0.0; // (deg)
-    // Global translation in Lab
-    tx       =  0.0; // (cm)
-    ty       =  0.0; // (cm)
-    tz       =  0.0; // (cm)
-    chim->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-    chim->SetTranslation(tx,ty,tz);
-    // User defined Energy CutOff
-    //Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
-    //((R3BChimera*) chim)->SetEnergyCutOff(fCutOffSci);
-    run->AddModule(chim);
-  }
-  
-  
   // Luminosity detector
   if (fDetList.FindObject("LUMON") ) {
     R3BDetector* lumon = new ELILuMon("LuMon", kTRUE);
-    //lumon->SetGeometryFileName("lumon.root");
-    // Global position of the Module
-    thetaX   =  0.0; // (deg)
-    thetaY   =  0.0; // (deg)
-    thetaZ   =  0.0; // (deg)
-    // Rotation in Ref. Frame.
-    thetaX =  0.0; // (deg)
-    thetaY =  0.0; // (deg)
-    thetaZ =  0.0; // (deg)
-    // Global translation in Lab
-    tx       =  0.0; // (cm)
-    ty       =  0.0; // (cm)
-    tz       =  200.0; // (cm)
-    lumon->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-    lumon->SetTranslation(tx,ty,tz);
-    // User defined Energy CutOff
-    //Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
-    //((ELILuMon*) lumon)->SetEnergyCutOff(fCutOffSci);
+    lumon->SetGeometryFileName("lumon_v13a.geo.root");
     run->AddModule(lumon);
   }
   
