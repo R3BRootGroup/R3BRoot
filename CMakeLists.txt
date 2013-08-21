@@ -6,7 +6,7 @@
 # and PANDAROOT.
 
 # Check if cmake has the required version
-CMAKE_MINIMUM_REQUIRED(VERSION 2.4.3 FATAL_ERROR)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.2 FATAL_ERROR)
 
 # Set name of our project to "R3BROOT". Has to be done
 # after check of cmake version                        
