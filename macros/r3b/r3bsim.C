@@ -14,13 +14,11 @@
 //
 //--------------------------------------------------------------------
 
-
 Int_t r3bsim()
 {
+  // Load the Main Simulation macro
   TString macro_r3ball = getenv("VMCWORKDIR");
   macro_r3ball += "/macros/r3b/r3ball.C";
-  
-  // Load the Main Simulation macro
   gROOT->LoadMacro(macro_r3ball.Data());
 
   // Output files
@@ -40,6 +38,7 @@ Int_t r3bsim()
   // Event Generator Type |   fGene       (TString)
   //-------------------------------------------------
   // Box generator:             "box"
+  // ASCII generator            "ascii"
   // R3B spec. generator:       "r3b"
   TString fGene = "box";
   
@@ -67,8 +66,8 @@ Int_t r3bsim()
   //-------------------------------------------------
   //-  Sensitiv            |    fDetName
   //-------------------------------------------------
-  //   Calorimeter:             CALIFA
-  //                            CRYSTALBALL
+  //   Calorimeter:             CRYSTALBALL
+  //                            CALIFA
   //
   //   Tof:                     TOF
   //                            MTOF
@@ -79,65 +78,36 @@ Int_t r3bsim()
   //                            GFI
   //
   //   Neutron:                 LAND
-  TObjString det0("TARGET");
-  TObjString det1("ALADIN");
-  TObjString det2("GLAD");
-  TObjString det3("CRYSTALBALL");
-  TObjString det4("CALIFA");
-  TObjString det5("TOF");
-  TObjString det6("MTOF");
-  TObjString det7("DCH");
-  TObjString det8("TRACKER");
-  TObjString det9("STaRTrack");
-  TObjString det10("GFI");
-  TObjString det11("LAND");
-  TObjString det12("SCINTNEULAND");
-  TObjString det13("VACVESSELCOOL");
-  TObjString det14("MFI");
-  TObjString det15("PSP");
-  
-  TObjArray fDetList;
-  fDetList.Add(&det0);
-  fDetList.Add(&det1);
-  //fDetList.Add(&det2);
-  fDetList.Add(&det3);
-  //fDetList.Add(&det4);
-  fDetList.Add(&det5);
-  fDetList.Add(&det6);
-  fDetList.Add(&det7);
-  fDetList.Add(&det8);
-  //fDetList.Add(&det9);
-  fDetList.Add(&det10);
-  fDetList.Add(&det11);
-  //fDetList.Add(&det12);
-  fDetList.Add(&det13);
-  //fDetList.Add(&det14);
-  //fDetList.Add(&det15);
-  
-  //-------------------------------------------------
-  //- N# of Sim. Events   |    nEvents     (Int_t)
-  //-------------------------------------------------
+  //                            SCINTNEULAND
+  TMap detGeo;
+  detGeo.Add(new TObjString("TARGET"),        new TObjString("target_"+target4+".geo.root"));
+  detGeo.Add(new TObjString("ALADIN"),        new TObjString("aladin_v13a.geo.root"));
+//  detGeo.Add(new TObjString("GLAD"),          new TObjString("glad_v13a.geo.root"));
+  detGeo.Add(new TObjString("CRYSTALBALL"),   new TObjString("cal_v13a.geo.root"));
+//  detGeo.Add(new TObjString("CALIFA"),        new TObjString("califa_v13_811.geo.root"));
+  detGeo.Add(new TObjString("TOF"),           new TObjString("tof_v13a.geo.root"));
+  detGeo.Add(new TObjString("MTOF"),          new TObjString("mtof_v13a.geo.root"));
+  detGeo.Add(new TObjString("DCH"),           new TObjString("dch_v13a.geo.root"));
+  detGeo.Add(new TObjString("TRACKER"),       new TObjString("tra_v13vac.geo.root"));
+//  detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startra_v13a.geo.root"));
+  detGeo.Add(new TObjString("GFI"),           new TObjString("gfi_v13a.geo.root"));
+  detGeo.Add(new TObjString("LAND"),          new TObjString("land_v12a_10m.geo.root"));
+//  detGeo.Add(new TObjString("SCINTNEULAND"),  new TObjString("neuland_v12a_14m.geo.root"));
+  detGeo.Add(new TObjString("VACVESSELCOOL"), new TObjString("vacvessel_v13a.geo.root"));
+//  detGeo.Add(new TObjString("MFI"),           new TObjString("mfi_v13a.geo.root"));
+//  detGeo.Add(new TObjString("PSP"),           new TObjString("psp_v13a.geo.root"));
+
+  // Number of events
   Int_t nEvents = 1;
   
-  //-------------------------------------------------
-  //- EventDisplay        |    fEventDisplay (Bool_t)
-  //-------------------------------------------------
-  //   connected:              kTRUE
-  //   not connected:          kFALSE
+  // Event display (store trajectories)
   Bool_t fEventDisplay = kTRUE;
   
   // Magnet Field definition
   Bool_t fR3BMagnet = kTRUE;
 
   // Main Sim function call
-  r3ball(nEvents,
-         fDetList,
-         target4,
-         fEventDisplay,
-         fMC,
-         fGene,
-         fUserPList,
-         fR3BMagnet,
-         OutFile,
-         ParFile);
+  r3ball(nEvents, detGeo, target4, fEventDisplay, fMC, fGene, fUserPList,
+         fR3BMagnet, 1500.,
+         OutFile, ParFile);
 }
