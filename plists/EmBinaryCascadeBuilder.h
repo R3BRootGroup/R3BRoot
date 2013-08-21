@@ -48,6 +48,7 @@ class EmBinaryCascadeBuilder : public G4VPhysicsConstructor
 {
 public:
   EmBinaryCascadeBuilder(const G4String& name = "binary");
+  EmBinaryCascadeBuilder(const EmBinaryCascadeBuilder &builder);
   virtual ~EmBinaryCascadeBuilder();
 
 public:

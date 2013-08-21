@@ -49,9 +49,8 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 G4StepLimiterBuilder::G4StepLimiterBuilder(const G4String& name)
-   :  G4VPhysicsConstructor(name)
+:  G4VPhysicsConstructor(name), stepMax()
 {
-  stepMax = new G4StepLimiterPerRegion();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

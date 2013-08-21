@@ -43,6 +43,12 @@ EmBinaryCascadeBuilder::EmBinaryCascadeBuilder(const G4String& name)
    :  G4VPhysicsConstructor(name)
 {}
 
+EmBinaryCascadeBuilder::EmBinaryCascadeBuilder(const EmBinaryCascadeBuilder& builder)
+:G4VPhysicsConstructor(builder.GetPhysicsName())
+{
+  theBC = builder.theBC;
+}
+
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 EmBinaryCascadeBuilder::~EmBinaryCascadeBuilder()
