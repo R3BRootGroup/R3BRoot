@@ -38,8 +38,8 @@ class R3BDetector : public FairDetector
   
  protected:
   TGeoRotation *fGlobalRot;
-  TGeoCombiTrans *fRefRot;
   TGeoTranslation *fGlobalTrans;
+  TGeoCombiTrans *fRefRot;
   
   Double_t fThetaX;
   Double_t fThetaY;
