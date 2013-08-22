@@ -113,14 +113,14 @@ void r3ball(Int_t nEvents = 1,
   //R3B Target definition
   if (fDetList.FindObject("TARGET") ) {
     R3BModule* target= new R3BTarget(Target.Data());
-    target->SetGeometryFileName(((TObjString*)fDetList.GetValue("TARGET"))->GetString()->Data());
+    target->SetGeometryFileName(((TObjString*)fDetList.GetValue("TARGET"))->GetString().Data());
     run->AddModule(target);
   }
   
   //R3B SiTracker Cooling definition
   if (fDetList.FindObject("VACVESSELCOOL") ) {
     R3BModule* vesselcool= new R3BVacVesselCool(Target.Data());
-    vesselcool->SetGeometryFileName(((TObjString*)fDetList.GetValue("VACVESSELCOOL"))->GetString()->Data());
+    vesselcool->SetGeometryFileName(((TObjString*)fDetList.GetValue("VACVESSELCOOL"))->GetString().Data());
     run->AddModule(vesselcool);
   }
   
@@ -128,7 +128,7 @@ void r3ball(Int_t nEvents = 1,
   if (fDetList.FindObject("ALADIN") ) {
     fFieldMap = 0;
     R3BModule* mag = new R3BMagnet("AladinMagnet");
-    mag->SetGeometryFileName(((TObjString*)fDetList.GetValue("ALADIN"))->GetString()->Data());
+    mag->SetGeometryFileName(((TObjString*)fDetList.GetValue("ALADIN"))->GetString().Data());
     run->AddModule(mag);
   }
   
@@ -136,14 +136,14 @@ void r3ball(Int_t nEvents = 1,
   if (fDetList.FindObject("GLAD") ) {
     fFieldMap = 1;
     R3BModule* mag = new R3BGladMagnet("GladMagnet");
-    mag->SetGeometryFileName(((TObjString*)fDetList.GetValue("GLAD"))->GetString()->Data());
+    mag->SetGeometryFileName(((TObjString*)fDetList.GetValue("GLAD"))->GetString().Data());
     run->AddModule(mag);
   }
   
   if (fDetList.FindObject("CRYSTALBALL") ) {
     //R3B Crystal Calorimeter
     R3BDetector* xball = new R3BXBall("XBall", kTRUE);
-    xball->SetGeometryFileName(((TObjString*)fDetList.GetValue("CRYSTALBALL"))->GetString()->Data());
+    xball->SetGeometryFileName(((TObjString*)fDetList.GetValue("CRYSTALBALL"))->GetString().Data());
     run->AddModule(xball);
   }
   
@@ -153,7 +153,7 @@ void r3ball(Int_t nEvents = 1,
     ((R3BCalo *)calo)->SelectGeometryVersion(10);
     //Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
     ((R3BCalo *)calo)->SetNonUniformity(1.0);
-    calo->SetGeometryFileName(((TObjString*)fDetList.GetValue("CALIFA"))->GetString()->Data());
+    calo->SetGeometryFileName(((TObjString*)fDetList.GetValue("CALIFA"))->GetString().Data());
     run->AddModule(calo);
   }
 
@@ -163,14 +163,14 @@ void r3ball(Int_t nEvents = 1,
     // User defined Energy CutOff
     Double_t fCutOffSi = 1.0e-06;  // Cut-Off -> 10KeV only in Si
     ((R3BTra*) tra)->SetEnergyCutOff(fCutOffSi);
-    tra->SetGeometryFileName(((TObjString*)fDetList.GetValue("TRACKER"))->GetString()->Data());
+    tra->SetGeometryFileName(((TObjString*)fDetList.GetValue("TRACKER"))->GetString().Data());
     run->AddModule(tra);
   }
   
   // STaRTrack
   if (fDetList.FindObject("STaRTrack")  ) {
     R3BDetector* tra = new R3BSTaRTra("STaRTrack", kTRUE);
-    tra->SetGeometryFileName(((TObjString*)fDetList.GetValue("STaRTrack"))->GetString()->Data());
+    tra->SetGeometryFileName(((TObjString*)fDetList.GetValue("STaRTrack"))->GetString().Data());
     // User defined Energy CutOff
     Double_t fCutOffSi = 1.0e-06;  // Cut-Off -> 10KeV only in Si
     ((R3BSTaRTra*) tra)->SetEnergyCutOff(fCutOffSi);
@@ -180,14 +180,14 @@ void r3ball(Int_t nEvents = 1,
   // DCH drift chambers
   if (fDetList.FindObject("DCH") ) {
     R3BDetector* dch = new R3BDch("Dch", kTRUE);
-    dch->SetGeometryFileName(((TObjString*)fDetList.GetValue("DCH"))->GetString()->Data());
+    dch->SetGeometryFileName(((TObjString*)fDetList.GetValue("DCH"))->GetString().Data());
     run->AddModule(dch);
   }
   
   // Tof
   if (fDetList.FindObject("TOF") ) {
     R3BDetector* tof = new R3BTof("Tof", kTRUE);
-    tof->SetGeometryFileName(((TObjString*)fDetList.GetValue("TOF"))->GetString()->Data());
+    tof->SetGeometryFileName(((TObjString*)fDetList.GetValue("TOF"))->GetString().Data());
     // User defined Energy CutOff
     Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
     ((R3BTof*) tof)->SetEnergyCutOff(fCutOffSci);
@@ -197,7 +197,7 @@ void r3ball(Int_t nEvents = 1,
   // mTof
   if (fDetList.FindObject("MTOF") ) {
     R3BDetector* mTof = new R3BmTof("mTof", kTRUE);
-    mTof->SetGeometryFileName(((TObjString*)fDetList.GetValue("MTOF"))->GetString()->Data());
+    mTof->SetGeometryFileName(((TObjString*)fDetList.GetValue("MTOF"))->GetString().Data());
     // User defined Energy CutOff
     Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
     ((R3BmTof*) mTof)->SetEnergyCutOff(fCutOffSci);
@@ -207,7 +207,7 @@ void r3ball(Int_t nEvents = 1,
   // GFI detector
   if (fDetList.FindObject("GFI") ) {
     R3BDetector* gfi = new R3BGfi("Gfi", kTRUE);
-    gfi->SetGeometryFileName(((TObjString*)fDetList.GetValue("GFI"))->GetString()->Data());
+    gfi->SetGeometryFileName(((TObjString*)fDetList.GetValue("GFI"))->GetString().Data());
     // User defined Energy CutOff
     Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
     ((R3BGfi*) gfi)->SetEnergyCutOff(fCutOffSci);
@@ -218,7 +218,7 @@ void r3ball(Int_t nEvents = 1,
   if (fDetList.FindObject("LAND") ) {
     R3BDetector* land = new R3BLand("Land", kTRUE);
     land->SetVerboseLevel(1);
-    land->SetGeometryFileName(((TObjString*)fDetList.GetValue("LAND"))->GetString()->Data());
+    land->SetGeometryFileName(((TObjString*)fDetList.GetValue("LAND"))->GetString().Data());
     run->AddModule(land);
   }
   
@@ -226,28 +226,28 @@ void r3ball(Int_t nEvents = 1,
   if(fDetList.FindObject("SCINTNEULAND")) {
     R3BDetector* land = new R3BLand("Land", kTRUE);
     land->SetVerboseLevel(1);
-    land->SetGeometryFileName(((TObjString*)fDetList.GetValue("SCINTNEULAND"))->GetString()->Data());
+    land->SetGeometryFileName(((TObjString*)fDetList.GetValue("SCINTNEULAND"))->GetString().Data());
     run->AddModule(land);
   }
   
   // MFI Detector
   if(fDetList.FindObject("MFI")) {
     R3BDetector* mfi = new R3BMfi("Mfi", kTRUE);
-    mfi->SetGeometryFileName(((TObjString*)fDetList.GetValue("MFI"))->GetString()->Data());
+    mfi->SetGeometryFileName(((TObjString*)fDetList.GetValue("MFI"))->GetString().Data());
     run->AddModule(mfi);
   }
 
   // PSP Detector
   if(fDetList.FindObject("PSP")) {
     R3BDetector* psp = new R3BPsp("Psp", kTRUE);
-    psp->SetGeometryFileName(((TObjString*)fDetList.GetValue("PSP"))->GetString()->Data());
+    psp->SetGeometryFileName(((TObjString*)fDetList.GetValue("PSP"))->GetString().Data());
     run->AddModule(psp);
   }
   
   // Luminosity detector
   if (fDetList.FindObject("LUMON") ) {
     R3BDetector* lumon = new ELILuMon("LuMon", kTRUE);
-    lumon->SetGeometryFileName(((TObjString*)fDetList.GetValue("LUMON"))->GetString()->Data());
+    lumon->SetGeometryFileName(((TObjString*)fDetList.GetValue("LUMON"))->GetString().Data());
     run->AddModule(lumon);
   }
   
