@@ -12,10 +12,12 @@ using std::flush;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BGfiPoint::R3BGfiPoint() : FairMCPoint() {
-  fX_out      = fY_out  = fZ_out  = 0.;
-  fPx_out     = fPy_out = fPz_out = 0.;
-  fModule     = -1;
+R3BGfiPoint::R3BGfiPoint()
+  : FairMCPoint(),
+    fX_out(0.), fY_out(0.), fZ_out(0.),
+    fPx_out(0.), fPy_out(0.), fPz_out(0.),
+    fModule(-1)
+{
 }
 // -------------------------------------------------------------------------
 
@@ -25,28 +27,38 @@ R3BGfiPoint::R3BGfiPoint() : FairMCPoint() {
 R3BGfiPoint::R3BGfiPoint(Int_t trackID, Int_t detID, Int_t plane, TVector3 posIn,
 			 TVector3 posOut, TVector3 momIn, TVector3 momOut,
 			 Double_t tof, Double_t length, Double_t eLoss) 
-  : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss) {
-  fX_out  = posOut.X();
-  fY_out  = posOut.Y();
-  fZ_out  = posOut.Z();
-  fPx_out = momOut.Px();
-  fPy_out = momOut.Py();
-  fPz_out = momOut.Pz();
-  fModule = plane;
+  : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss),
+    fX_out(posOut.X()), fY_out(posOut.Y()), fZ_out(posOut.Z()),
+    fPx_out(momOut.Px()), fPy_out(momOut.Py()), fPz_out(momOut.Pz()),
+    fModule(plane)
+{
 }
 // -------------------------------------------------------------------------
 
 
 
+R3BGfiPoint::R3BGfiPoint(const R3BGfiPoint& right) 
+  : FairMCPoint(right),
+    fX_out(right.fX_out), fY_out(right.fY_out), fZ_out(right.fZ_out),
+    fPx_out(right.fPx_out), fPy_out(right.fPy_out), fPz_out(right.fPz_out),
+    fModule(right.fModule)
+{
+}
+
+
+
 // -----   Destructor   ----------------------------------------------------
-R3BGfiPoint::~R3BGfiPoint() { }
+R3BGfiPoint::~R3BGfiPoint()
+{
+}
 // -------------------------------------------------------------------------
 
 
 
 
 // -----   Public method Print   -------------------------------------------
-void R3BGfiPoint::Print(const Option_t* opt) const {
+void R3BGfiPoint::Print(const Option_t* opt) const
+{
   cout << "-I- R3BGfiPoint: STS Point for track " << fTrackID 
        << " in detector " << fDetectorID << endl;
   cout << "    Position (" << fX << ", " << fY << ", " << fZ

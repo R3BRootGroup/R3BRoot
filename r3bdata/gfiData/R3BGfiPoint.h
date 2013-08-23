@@ -45,7 +45,7 @@ class R3BGfiPoint : public FairMCPoint
 
 
   /** Copy constructor **/
-  R3BGfiPoint(const R3BGfiPoint& point) { *this = point; };
+  R3BGfiPoint(const R3BGfiPoint&);
 
 
   /** Destructor **/

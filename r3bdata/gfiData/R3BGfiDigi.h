@@ -24,10 +24,11 @@ class R3BGfiDigi : public TObject
 
   /** Default constructor **/
   R3BGfiDigi();
-  R3BGfiDigi(Int_t gf1mul,Double_t gf1_01x,Int_t gf2mul,Double_t gf2_01x);
+  R3BGfiDigi(Int_t gf1mul, Double_t gf1_01x,
+	     Int_t gf2mul, Double_t gf2_01x);
   
   /** Copy constructor **/
-  R3BGfiDigi(const R3BGfiDigi& point) { *this = point; };
+  R3BGfiDigi(const R3BGfiDigi&);
 
   /** Destructor **/
   virtual ~R3BGfiDigi();
@@ -50,14 +51,12 @@ class R3BGfiDigi : public TObject
 
 
  protected:
- 
-     Int_t Gf1mul;
-     Double32_t Gf1_01x;
-     Int_t Gf2mul;
-     Double32_t Gf2_01x;
+  Int_t Gf1mul;
+  Double32_t Gf1_01x;
+  Int_t Gf2mul;
+  Double32_t Gf2_01x;
 
   ClassDef(R3BGfiDigi,1)
-
 };
 
 #endif
