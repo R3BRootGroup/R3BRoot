@@ -34,7 +34,6 @@ gfiData/R3BGfiPoint.cxx
 mtofData/R3BmTofPoint.cxx  
 tofData/R3BTofPoint.cxx
 vetoData/R3BVetoPoint.cxx
-atofData/R3BATofPoint.cxx
 lumonData/ELILuMonPoint.cxx 
 trackerData/R3BTraPoint.cxx 
 trackerData/R3BTraHit.cxx

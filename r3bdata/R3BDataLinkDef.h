@@ -28,7 +28,6 @@
 #pragma link C++ class R3BTofPoint+;
 #pragma link C++ class R3BTofDigi+;
 #pragma link C++ class R3BTof2pDigi+;
-#pragma link C++ class R3BATofPoint+;
 #pragma link C++ class R3BVetoPoint+;
 #pragma link C++ class R3BSTaRTraPoint+;
 #pragma link C++ class R3BSTaRTraHit+;
