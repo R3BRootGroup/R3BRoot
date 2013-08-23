@@ -36,7 +36,6 @@ tofData/R3BTofPoint.cxx
 vetoData/R3BVetoPoint.cxx
 atofData/R3BATofPoint.cxx
 lumonData/ELILuMonPoint.cxx 
-chimeraData/R3BChimeraPoint.cxx
 trackerData/R3BTraPoint.cxx 
 trackerData/R3BTraHit.cxx
 trackerData/R3BSitrackerHit.cxx 
