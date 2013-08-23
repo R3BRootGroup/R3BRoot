@@ -12,17 +12,16 @@ using std::flush;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BDchPoint::R3BDchPoint() : FairMCPoint() {
-
-  fX_out      = fY_out  = fZ_out  = -99999.;
-  fPx_out     = fPy_out = fPz_out = -99999.;
-
-  fLocalX_in      = fLocalY_in  = fLocalZ_in  = -99999.;
-  fLocalPx_in     = fLocalPy_in = fLocalPz_in = -99999.;
-  fLocalX_out      = fLocalY_out  = fLocalZ_out  = -99999.;
-  fLocalPx_out     = fLocalPy_out = fLocalPz_out = -99999.;
-
-  fModule     = fLayer  = fCell   = -99999;
+R3BDchPoint::R3BDchPoint()
+  : FairMCPoint(),
+    fX_out(-99999.), fY_out(-99999.), fZ_out(-99999.),
+    fPx_out(-99999.), fPy_out(-99999.), fPz_out(-99999.),
+    fLocalX_in(-99999.), fLocalY_in(-99999.), fLocalZ_in(-99999.),
+    fLocalPx_in(-99999.), fLocalPy_in(-99999.), fLocalPz_in(-99999.),
+    fLocalX_out(-99999.), fLocalY_out(-99999.), fLocalZ_out(-99999.),
+    fLocalPx_out(-99999.), fLocalPy_out(-99999.), fLocalPz_out(-99999.),
+    fModule(-99999), fLayer(-99999), fCell(-99999)
+{
 }
 // -------------------------------------------------------------------------
 
@@ -34,39 +33,37 @@ R3BDchPoint::R3BDchPoint(Int_t trackId, Int_t mod, Int_t layer, Int_t cell,TVect
 			 TVector3 lpos1, TVector3 lmom1,
 			 TVector3 lpos2, TVector3 lmom2,
 			 Double_t tof, Double_t length, Double_t eLoss) 
-: FairMCPoint(trackId, mod, posIn, momIn, tof, length, eLoss) {
-
-
-  fX_out  = posOut.X();
-  fY_out  = posOut.Y();
-  fZ_out  = posOut.Z();
-  fPx_out = momOut.Px();
-  fPy_out = momOut.Py();
-  fPz_out = momOut.Pz();
-
-  fLocalX_in  = lpos1.X();
-  fLocalY_in  = lpos1.Y();
-  fLocalZ_in  = lpos1.Z();
-  fLocalPx_in = lmom1.Px();
-  fLocalPy_in = lmom1.Py();
-  fLocalPz_in = lmom1.Pz();
-
-  fLocalX_out  = lpos2.X();
-  fLocalY_out  = lpos2.Y();
-  fLocalZ_out  = lpos2.Z();
-  fLocalPx_out = lmom2.Px();
-  fLocalPy_out = lmom2.Py();
-  fLocalPz_out = lmom2.Pz();
-
-  fModule  = mod;
-  fLayer  = layer;
-  fCell   = cell;
-
+  : FairMCPoint(trackId, mod, posIn, momIn, tof, length, eLoss),
+    fX_out(posOut.X()), fY_out(posOut.Y()), fZ_out(posOut.Z()),
+    fPx_out(momOut.Px()), fPy_out(momOut.Py()), fPz_out(momOut.Pz()),
+    fLocalX_in(lpos1.X()), fLocalY_in(lpos1.Y()), fLocalZ_in(lpos1.Z()),
+    fLocalPx_in(lmom1.Px()), fLocalPy_in(lmom1.Py()), fLocalPz_in(lmom1.Pz()),
+    fLocalX_out(lpos2.X()), fLocalY_out(lpos2.Y()), fLocalZ_out(lpos2.Z()),
+    fLocalPx_out(lmom2.Px()), fLocalPy_out(lmom2.Py()), fLocalPz_out(lmom2.Pz()),
+    fModule(mod), fLayer(layer), fCell(cell)
+{
 }
 
 
+
+R3BDchPoint::R3BDchPoint(const R3BDchPoint& right) 
+  : FairMCPoint(right),
+    fX_out(right.fX_out), fY_out(right.fY_out), fZ_out(right.fZ_out),
+    fPx_out(right.fPx_out), fPy_out(right.fPy_out), fPz_out(right.fPz_out),
+    fLocalX_in(right.fLocalX_in), fLocalY_in(right.fLocalY_in), fLocalZ_in(right.fLocalZ_in),
+    fLocalPx_in(right.fLocalPx_in), fLocalPy_in(right.fLocalPy_in), fLocalPz_in(right.fLocalPz_in),
+    fLocalX_out(right.fLocalX_out), fLocalY_out(right.fLocalY_out), fLocalZ_out(right.fLocalZ_out),
+    fLocalPx_out(right.fLocalPx_out), fLocalPy_out(right.fLocalPy_out), fLocalPz_out(right.fLocalPz_out),
+    fModule(right.fModule), fLayer(right.fLayer), fCell(right.fCell)
+{
+}
+
+
+
 // -----   Destructor   ----------------------------------------------------
-R3BDchPoint::~R3BDchPoint() { }
+R3BDchPoint::~R3BDchPoint()
+{
+}
 // -------------------------------------------------------------------------
 
 

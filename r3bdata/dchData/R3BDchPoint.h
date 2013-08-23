@@ -46,7 +46,9 @@ class R3BDchPoint : public FairMCPoint
 
 
   /** Copy constructor **/
-  R3BDchPoint(const R3BDchPoint& point) { *this = point; };
+  R3BDchPoint(const R3BDchPoint&);
+
+  R3BDchPoint& operator=(const R3BDchPoint&) { return *this; }
 
 
   /** Destructor **/

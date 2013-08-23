@@ -12,14 +12,12 @@ using std::flush;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BDchFullPoint::R3BDchFullPoint() : FairMCPoint() {
-  fX      = fY  = fZ  = 0.;
-  fPx     = fPy = fPz = 0.;
-  fLocalX      = fLocalY  = fLocalZ  = 0.;
-  fLocalPx     = fLocalPy = fLocalPz = 0.;
-  fModule      = -1;
-  fLayer       = -1;
-  fCell        = -1;
+R3BDchFullPoint::R3BDchFullPoint()
+  : FairMCPoint(),
+    fLocalX(0.), fLocalY(0.), fLocalZ(0.),
+    fLocalPx(0.), fLocalPy(0.), fLocalPz(0.),
+    fModule(-1), fLayer(-1), fCell(-1)
+{
 }
 // -------------------------------------------------------------------------
 
@@ -29,23 +27,30 @@ R3BDchFullPoint::R3BDchFullPoint() : FairMCPoint() {
 R3BDchFullPoint::R3BDchFullPoint(Int_t trackId, Int_t mod, Int_t layer, Int_t cell, TVector3 pos,
 			         TVector3 lpos, TVector3 mom, TVector3 lmom,
 			         Double_t tof, Double_t length, Double_t eLoss)
-  : FairMCPoint(trackId, mod, pos, mom, tof, length, eLoss) {
-  fLocalX  = lpos.X();
-  fLocalY  = lpos.Y();
-  fLocalZ  = lpos.Z();
-  fLocalPx = lmom.Px();
-  fLocalPy = lmom.Py();
-  fLocalPz = lmom.Pz();
-  fModule  = mod;
-  fLayer   = layer;
-  fCell    = cell;
+  : FairMCPoint(trackId, mod, pos, mom, tof, length, eLoss),
+    fLocalX(lpos.X()), fLocalY(lpos.Y()), fLocalZ(lpos.Z()),
+    fLocalPx(lmom.X()), fLocalPy(lmom.Y()), fLocalPz(lmom.Z()),
+    fModule(mod), fLayer(layer), fCell(cell)
+{
 }
 // -------------------------------------------------------------------------
 
 
 
+R3BDchFullPoint::R3BDchFullPoint(const R3BDchFullPoint& right)
+  : FairMCPoint(right),
+    fLocalX(right.fLocalX), fLocalY(right.fLocalY), fLocalZ(right.fLocalZ),
+    fLocalPx(right.fLocalPx), fLocalPy(right.fLocalPy), fLocalPz(right.fLocalPz),
+    fModule(right.fModule), fLayer(right.fLayer), fCell(right.fCell)
+{
+}
+
+
+
 // -----   Destructor   ----------------------------------------------------
-R3BDchFullPoint::~R3BDchFullPoint() { }
+R3BDchFullPoint::~R3BDchFullPoint()
+{
+}
 // -------------------------------------------------------------------------
 
 

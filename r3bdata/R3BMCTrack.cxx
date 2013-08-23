@@ -11,11 +11,12 @@ using std::endl;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BMCTrack::R3BMCTrack() {
-  fPdgCode  = fNPoints = 0;
-  fMotherId = -1;
-  fPx = fPy = fPz = 0.;
-  fStartX = fStartY  = fStartZ = fStartT = 0.;
+R3BMCTrack::R3BMCTrack()
+  : fPdgCode(0), fMotherId(-1),
+    fPx(0.), fPy(0.), fPz(0.),
+    fStartX(0.), fStartY(0.), fStartZ(0.), fStartT(0.),
+    fNPoints(0), fMass(0.)
+{
 }
 // -------------------------------------------------------------------------
 
@@ -24,55 +25,48 @@ R3BMCTrack::R3BMCTrack() {
 // -----   Standard constructor   ------------------------------------------
 R3BMCTrack::R3BMCTrack(Int_t pdgCode, Int_t motherId, Double_t px,
 		       Double_t py, Double_t pz, Double_t x, Double_t y,
-		       Double_t z, Double_t t, Int_t nPoints = 0) {
-  fPdgCode  = pdgCode;
-  fMotherId = motherId;
-  fPx = px;
-  fPy = py;
-  fPz = pz;
-  fStartX = x;
-  fStartY = y;
-  fStartZ = z;
-  fStartT = t;
-  if (nPoints >= 0) fNPoints = nPoints;
-  else              fNPoints = 0;
-  fMass = 0.0;
+		       Double_t z, Double_t t, Int_t nPoints = 0)
+  : fPdgCode(pdgCode), fMotherId(motherId),
+    fPx(px), fPy(py), fPz(pz),
+    fStartX(x), fStartY(y), fStartZ(z), fStartT(t),
+    fNPoints(0), fMass(0.)
+{
+  if(nPoints >= 0) {
+    fNPoints = nPoints;
+  } else {
+    fNPoints = 0;
+  }
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Copy constructor   ----------------------------------------------
-R3BMCTrack::R3BMCTrack(const R3BMCTrack& track) { 
-  *this = track;
+R3BMCTrack::R3BMCTrack(const R3BMCTrack& right)
+  : fPdgCode(right.fPdgCode), fMotherId(right.fMotherId),
+    fPx(right.fPx), fPy(right.fPy), fPz(right.fPz),
+    fStartX(right.fStartX), fStartY(right.fStartY), fStartZ(right.fStartZ), fStartT(right.fStartT),
+    fNPoints(right.fNPoints), fMass(right.fMass)
+{
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Constructor from TParticle   ------------------------------------
-R3BMCTrack::R3BMCTrack(TParticle* part, Int_t fMC) {
-
-  fPdgCode  = part->GetPdgCode();
-  fMotherId = part->GetMother(0);
-  fPx       = part->Px();
-  fPy       = part->Py();
-  fPz       = part->Pz();
-  fStartX   = part->Vx();
-  fStartY   = part->Vy();
-  fStartZ   = part->Vz();
- 
-  if (fMC == 0 ) {
+R3BMCTrack::R3BMCTrack(TParticle* part, Int_t fMC)
+  : fPdgCode(part->GetPdgCode()), fMotherId(part->GetMother(0)),
+    fPx(part->Px()), fPy(part->Py()), fPz(part->Pz()),
+    fStartX(part->Vx()), fStartY(part->Vy()), fStartZ(part->Vz()), fStartT(0.),
+    fNPoints(0), fMass(part->GetMass()) 
+{
+  if(fMC == 0) {
     //G3 
-      fStartT   = part->T()*1e09;
-   }else if (fMC == 1 ){
+    fStartT   = part->T()*1e09;
+  } else if(fMC == 1) {
     //G4 
     fStartT   = part->T();
   }
-
-  fNPoints  = 0;
-  fMass     = part->GetMass();
-
 }
 // -------------------------------------------------------------------------
 

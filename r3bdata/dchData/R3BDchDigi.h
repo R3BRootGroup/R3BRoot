@@ -28,7 +28,7 @@ class R3BDchDigi : public TObject
   R3BDchDigi(Int_t pd1mul,Double_t Pdx1_p1,Double_t Pdy1_p1,Int_t pd2mul,Double_t Pdx2_p1,Double_t Pdy2_p1);
   
   /** Copy constructor **/
-  R3BDchDigi(const R3BDchDigi& point) { *this = point; };
+  R3BDchDigi(const R3BDchDigi& point);
 
   /** Destructor **/
   virtual ~R3BDchDigi();
@@ -55,6 +55,7 @@ class R3BDchDigi : public TObject
   void SetPdy2_p1(Double_t pos){Pd2y_p1 = pos;}
   Double_t GetPdy2_p1(){return Pd2y_p1;}
 
+  R3BDchDigi& operator=(const R3BDchDigi&) { return *this; }
 
  protected:
  

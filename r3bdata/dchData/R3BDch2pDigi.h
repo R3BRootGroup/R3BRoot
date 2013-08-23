@@ -25,11 +25,15 @@ class R3BDch2pDigi : public TObject
 
   /** Default constructor **/
   R3BDch2pDigi();
-  R3BDch2pDigi(Int_t pd1mul,Double_t Pdx1_p1,Double_t Pdy1_p1,Double_t Pdx1_p2,Double_t Pdy1_p2,
-Int_t pd2mul,Double_t Pdx2_p1,Double_t Pdy2_p1,Double_t Pdx2_p2,Double_t Pdy2_p2);
+  R3BDch2pDigi(Int_t pd1mul,
+	       Double_t Pdx1_p1, Double_t Pdy1_p1,
+	       Double_t Pdx1_p2, Double_t Pdy1_p2,
+	       Int_t pd2mul,
+	       Double_t Pdx2_p1, Double_t Pdy2_p1,
+	       Double_t Pdx2_p2, Double_t Pdy2_p2);
   
   /** Copy constructor **/
-  R3BDch2pDigi(const R3BDch2pDigi& point) { *this = point; };
+  R3BDch2pDigi(const R3BDch2pDigi&);
 
   /** Destructor **/
   virtual ~R3BDch2pDigi();
@@ -70,6 +74,7 @@ Int_t pd2mul,Double_t Pdx2_p1,Double_t Pdy2_p1,Double_t Pdx2_p2,Double_t Pdy2_p2
   void SetPdy2_p2(Double_t pos){Pd2y_p2 = pos;}
   Double_t GetPdy2_p2(){return Pd2y_p2;}
   
+  R3BDch2pDigi& operator=(const R3BDch2pDigi&) { return *this; }
 
 
  protected:
@@ -86,7 +91,7 @@ Int_t pd2mul,Double_t Pdx2_p1,Double_t Pdy2_p1,Double_t Pdx2_p2,Double_t Pdy2_p2
    Double32_t Pd2x_p2;
    Double32_t Pd2y_p2;
 
-  ClassDef(R3BDch2pDigi,1)
+   ClassDef(R3BDch2pDigi,1)
 
 };
 

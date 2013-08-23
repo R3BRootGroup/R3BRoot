@@ -43,7 +43,7 @@ class R3BMCTrack : public TObject
 	     Double_t t, Int_t nPoints);
 
   /**  Copy constructor  **/
-  R3BMCTrack(const R3BMCTrack& track);
+  R3BMCTrack(const R3BMCTrack&);
 
 
   /**  Constructor from TParticle  **/
@@ -52,6 +52,9 @@ class R3BMCTrack : public TObject
 
   /**  Destructor  **/
   virtual ~R3BMCTrack();
+
+
+  R3BMCTrack& operator=(const R3BMCTrack&) { return *this; }
 
 
   /**  Output to screen  **/
