@@ -27,22 +27,21 @@ using std::pair;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BStack::R3BStack(Int_t size) {
-  fParticles = new TClonesArray("TParticle", size);
-  fTracks    = new TClonesArray("R3BMCTrack", size);
-  fCurrentTrack = -1;
-  fNPrimaries = fNParticles = fNTracks = 0;
-  fIndex = 0;
-  fStoreSecondaries = kTRUE;
-  fMinPoints        = 0;
-  fEnergyCut        = 0.;
-  fStoreMothers     = kTRUE;
-  fDebug            = kFALSE;
+R3BStack::R3BStack(Int_t size)
+  : fStack(),
+    fParticles(new TClonesArray("TParticle", size)),
+    fTracks(new TClonesArray("R3BMCTrack", size)),
+    fStoreMap(), fStoreIter(NULL), fIndexMap(), fIndexIter(NULL),
+    fPointsMap(), fCurrentTrack(-1), fNPrimaries(0), fNParticles(0),
+    fNTracks(0), fIndex(0), fMC(0), fStoreSecondaries(kTRUE),
+    fMinPoints(0), fEnergyCut(0.), fStoreMothers(kTRUE), fDebug(kFALSE)
+{
   TString MCName = gMC->GetName();
-  if (MCName.CompareTo("TGeant4") == 0 ){
-    fMC=1;
-  }else fMC=0;
-  
+  if(MCName.CompareTo("TGeant4") == 0) {
+    fMC = 1;
+  } else {
+    fMC = 0;
+  }
 }
 
 // -------------------------------------------------------------------------
@@ -61,6 +60,8 @@ R3BStack::~R3BStack() {
   }
 }
 // -------------------------------------------------------------------------
+
+
 
 // -----   Virtual public method PushTrack   -------------------------------
 void R3BStack::PushTrack(Int_t toBeDone, Int_t parentId, Int_t pdgCode,

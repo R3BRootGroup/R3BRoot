@@ -12,10 +12,11 @@ using std::flush;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BCaloCrystalHitSim::R3BCaloCrystalHitSim() : R3BCaloCrystalHit() {
-  fCrystalType = fCrystalCopy = fNSteps = -1;
-  fEinc = -1; 
-  fTrackID = fVolumeID = fParentTrackID = fTrackPID = fTrackUniqueID = -1;
+R3BCaloCrystalHitSim::R3BCaloCrystalHitSim()
+  : R3BCaloCrystalHit(),
+    fCrystalType(-1), fCrystalCopy(-1), fNSteps(-1), fEinc(-1.), fTrackID(-1),
+    fVolumeID(-1), fParentTrackID(-1), fTrackPID(-1), fTrackUniqueID(-1)
+{
 }
 // -------------------------------------------------------------------------
 
@@ -23,32 +24,35 @@ R3BCaloCrystalHitSim::R3BCaloCrystalHitSim() : R3BCaloCrystalHit() {
 
 // -----   Standard constructor   ------------------------------------------
 R3BCaloCrystalHitSim::R3BCaloCrystalHitSim(Int_t type, Int_t copy, Int_t ident,
-					Double_t energy, Double_t time,
-					Int_t steps, Double_t einc,
-					Int_t trackid, Int_t volid, Int_t partrackid,
-					Int_t pdgid, Int_t uniqueid) 
-  : R3BCaloCrystalHit() {
-  
-  fCrystalId     = ident;
-  fCrystalType   = type;
-  fCrystalCopy   = copy;
-  fEnergy        = energy;
-  fTime          = time;
-  fNSteps        = steps;
-  fEinc          = einc;
-  fTrackID       = trackid;
-  fVolumeID      = volid;
-  fParentTrackID = partrackid;
-  fTrackPID      = pdgid;
-  fTrackUniqueID      = uniqueid;
-
+					   Double_t energy, Double_t time,
+					   Int_t steps, Double_t einc,
+					   Int_t trackid, Int_t volid, Int_t partrackid,
+					   Int_t pdgid, Int_t uniqueid) 
+  : R3BCaloCrystalHit(ident, energy, time),
+    fCrystalType(type), fCrystalCopy(copy), fNSteps(steps), fEinc(einc),
+    fTrackID(trackid), fVolumeID(volid), fParentTrackID(partrackid),
+    fTrackPID(pdgid), fTrackUniqueID(uniqueid)
+{
 }
 // -------------------------------------------------------------------------
 
 
 
+R3BCaloCrystalHitSim::R3BCaloCrystalHitSim(const R3BCaloCrystalHitSim& right)
+  : R3BCaloCrystalHit(right),    
+    fCrystalType(right.fCrystalType), fCrystalCopy(right.fCrystalCopy),
+    fNSteps(right.fNSteps), fEinc(right.fEinc), fTrackID(right.fTrackID),
+    fVolumeID(right.fVolumeID), fParentTrackID(right.fParentTrackID),
+    fTrackPID(right.fTrackPID), fTrackUniqueID(right.fTrackUniqueID)
+{
+}
+
+
+
 // -----   Destructor   ----------------------------------------------------
-R3BCaloCrystalHitSim::~R3BCaloCrystalHitSim() { }
+R3BCaloCrystalHitSim::~R3BCaloCrystalHitSim()
+{
+}
 // -------------------------------------------------------------------------
 
 

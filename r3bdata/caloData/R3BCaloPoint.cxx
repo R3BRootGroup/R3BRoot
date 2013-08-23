@@ -12,10 +12,12 @@ using std::flush;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BCaloPoint::R3BCaloPoint() : FairMCPoint() {
-  fX_out      = fY_out  = fZ_out  = 0.;
-  fPx_out     = fPy_out = fPz_out = 0.;
-  fCrystalType = fCrystalCopy = fCrystalId = -1;
+R3BCaloPoint::R3BCaloPoint()
+  : FairMCPoint(),
+    fX_out(0.), fY_out(0.), fZ_out(0.),
+    fPx_out(0.), fPy_out(0.), fPz_out(0.),
+    fCrystalType(-1), fCrystalCopy(-1), fCrystalId(-1)
+{
 }
 // -------------------------------------------------------------------------
 
@@ -23,20 +25,26 @@ R3BCaloPoint::R3BCaloPoint() : FairMCPoint() {
 
 // -----   Standard constructor   ------------------------------------------
 R3BCaloPoint::R3BCaloPoint(Int_t trackID, Int_t detID, Int_t volid, Int_t copy, Int_t ident,
-			 TVector3 posIn, TVector3 posOut, TVector3 momIn, TVector3 momOut,
-			 Double_t tof, Double_t length, Double_t eLoss) 
-  : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss) {
-  fX_out  = posOut.X();
-  fY_out  = posOut.Y();
-  fZ_out  = posOut.Z();
-  fPx_out = momOut.Px();
-  fPy_out = momOut.Py();
-  fPz_out = momOut.Pz();
-  fCrystalType = volid;
-  fCrystalCopy = copy;
-  fCrystalId = ident;
+			   TVector3 posIn, TVector3 posOut, TVector3 momIn, TVector3 momOut,
+			   Double_t tof, Double_t length, Double_t eLoss) 
+  : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss),
+    fX_out(posOut.X()), fY_out(posOut.Y()), fZ_out(posOut.Z()),
+    fPx_out(momOut.Px()), fPy_out(momOut.Py()), fPz_out(momOut.Pz()),
+    fCrystalType(volid), fCrystalCopy(copy), fCrystalId(ident)
+{
 }
 // -------------------------------------------------------------------------
+
+
+
+R3BCaloPoint::R3BCaloPoint(const R3BCaloPoint& right)
+  : FairMCPoint(right),
+    fX_out(right.fX_out), fY_out(right.fY_out), fZ_out(right.fZ_out),
+    fPx_out(right.fPx_out), fPy_out(right.fPy_out), fPz_out(right.fPz_out),
+    fCrystalType(right.fCrystalType), fCrystalCopy(right.fCrystalCopy),
+    fCrystalId(right.fCrystalId)
+{
+}
 
 
 

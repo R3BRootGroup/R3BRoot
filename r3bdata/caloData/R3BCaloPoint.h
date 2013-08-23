@@ -39,12 +39,14 @@ class R3BCaloPoint : public FairMCPoint
    *@param eLoss    Energy deposit [GeV]
    **/
   R3BCaloPoint(Int_t trackID, Int_t detID, Int_t volId, Int_t copy , Int_t ident,
-	      TVector3 posIn,TVector3 posOut, TVector3 momIn, TVector3 momOut,
-	      Double_t tof, Double_t length, Double_t eLoss);
+	       TVector3 posIn,TVector3 posOut, TVector3 momIn, TVector3 momOut,
+	       Double_t tof, Double_t length, Double_t eLoss);
 
 
   /** Copy constructor **/
-  R3BCaloPoint(const R3BCaloPoint& point) { *this = point; };
+  R3BCaloPoint(const R3BCaloPoint&);
+
+  R3BCaloPoint& operator=(const R3BCaloPoint&) { return *this; }
 
 
   /** Destructor **/

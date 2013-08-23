@@ -43,7 +43,9 @@ public:
 			Int_t pdgid, Int_t uniqueid);
 
   /** Copy constructor **/
-  R3BCaloCrystalHitSim(const R3BCaloCrystalHitSim& hit) { *this = hit; };
+  R3BCaloCrystalHitSim(const R3BCaloCrystalHitSim&);
+
+  R3BCaloCrystalHitSim& operator=(const R3BCaloCrystalHitSim&) { return *this; }
 
   /** Destructor **/
   virtual ~R3BCaloCrystalHitSim();

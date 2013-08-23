@@ -12,8 +12,10 @@ using std::flush;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BCaloHitSim::R3BCaloHitSim() : R3BCaloHit() {
-        fEinc = 0.;
+R3BCaloHitSim::R3BCaloHitSim()
+  : R3BCaloHit(),
+    fEinc(0.)
+{
 }
 // -------------------------------------------------------------------------
 
@@ -21,17 +23,20 @@ R3BCaloHitSim::R3BCaloHitSim() : R3BCaloHit() {
 
 // -----   Standard constructor   ------------------------------------------
 R3BCaloHitSim::R3BCaloHitSim(UInt_t Nb, Double_t ene,
-					   Double_t theta, Double_t phi, Double_t einc) 
-: R3BCaloHit() {
-	
-	fNbOfCrystalHits = Nb;
-	fEnergy = ene;
-	fTheta = theta;	
-	fPhi = phi;
-        fEinc = einc;
-
+			     Double_t theta, Double_t phi, Double_t einc) 
+  : R3BCaloHit(Nb, ene, theta, phi),
+    fEinc(einc)
+{
 }
 // -------------------------------------------------------------------------
+
+
+
+R3BCaloHitSim::R3BCaloHitSim(const R3BCaloHitSim& right)
+  : R3BCaloHit(right),
+    fEinc(right.fEinc)
+{
+}
 
 
 

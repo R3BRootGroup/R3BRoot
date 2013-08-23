@@ -30,7 +30,9 @@ public:
   R3BCaloCrystalHit(Int_t ident, Double_t energy, Double_t time);
 
   /** Copy constructor **/
-  R3BCaloCrystalHit(const R3BCaloCrystalHit& hit) { *this = hit; };
+  R3BCaloCrystalHit(const R3BCaloCrystalHit&);
+
+  R3BCaloCrystalHit& operator=(const R3BCaloCrystalHit&) { return *this; }
 
   /** Destructor **/
   virtual ~R3BCaloCrystalHit();
@@ -52,7 +54,6 @@ public:
   virtual void Print(const Option_t* opt) const;
 
 protected:
-
   Double32_t fEnergy;    //total energy in the crystal
   Double32_t fTime;      //time of the interaction
   Int_t fCrystalId;      //crystal unique identifier

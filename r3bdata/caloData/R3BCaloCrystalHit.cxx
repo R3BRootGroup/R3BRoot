@@ -12,9 +12,12 @@ using std::flush;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BCaloCrystalHit::R3BCaloCrystalHit() : FairMultiLinkedData() {
-  fCrystalId = -1;
-  fEnergy = fTime = -1; 
+R3BCaloCrystalHit::R3BCaloCrystalHit()
+  : FairMultiLinkedData(),
+    fEnergy(-1.),
+    fTime(-1.),
+    fCrystalId(-1)
+{
 }
 // -------------------------------------------------------------------------
 
@@ -22,19 +25,30 @@ R3BCaloCrystalHit::R3BCaloCrystalHit() : FairMultiLinkedData() {
 
 // -----   Standard constructor   ------------------------------------------
 R3BCaloCrystalHit::R3BCaloCrystalHit(Int_t ident, Double_t energy, Double_t time) 
-  : FairMultiLinkedData() {
-  
-  fCrystalId     = ident;
-  fEnergy        = energy;
-  fTime          = time;
-
+  : FairMultiLinkedData(),
+    fEnergy(energy),
+    fTime(time),
+    fCrystalId(ident)
+{
 }
 // -------------------------------------------------------------------------
 
 
 
+R3BCaloCrystalHit::R3BCaloCrystalHit(const R3BCaloCrystalHit& right)
+  : FairMultiLinkedData(right),
+    fEnergy(right.fEnergy),
+    fTime(right.fTime),
+    fCrystalId(right.fCrystalId)
+{
+}
+
+
+
 // -----   Destructor   ----------------------------------------------------
-R3BCaloCrystalHit::~R3BCaloCrystalHit() { }
+R3BCaloCrystalHit::~R3BCaloCrystalHit()
+{
+}
 // -------------------------------------------------------------------------
 
 

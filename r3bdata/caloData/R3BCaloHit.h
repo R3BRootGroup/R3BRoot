@@ -38,7 +38,9 @@ public:
 	
 	
 	/** Copy constructor **/
-	R3BCaloHit(const R3BCaloHit& hit) { *this = hit; };
+	R3BCaloHit(const R3BCaloHit&);
+
+	R3BCaloHit& operator=(const R3BCaloHit&) { return *this; }
 	
 	
 	/** Destructor **/

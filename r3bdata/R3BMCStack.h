@@ -196,7 +196,10 @@ class R3BStack : public FairGenericStack
 
  private:
 
+  R3BStack(const R3BStack&);
+  R3BStack& operator=(const R3BStack&) { return *this; }
     
+
   /** STL stack (FILO) used to handle the TParticles for tracking **/
   std::stack<TParticle*>  fStack;           //!
 
