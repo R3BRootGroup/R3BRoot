@@ -129,18 +129,6 @@ void R3BXBallv0::Initialize()
 }
 
 
-void R3BXBallv0::SetSpecialPhysicsCuts(){
-
-   cout << endl;
-
-   cout << "-I- R3BXBallv0: Adding customized Physics cut ... " << endl;
-   cout << "-I- R3BXBallv0: Yet not implemented !... " << endl;
-
-   cout << endl;
-
-}
-
-
 
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BXBallv0::ProcessHits(FairVolume* vol) {

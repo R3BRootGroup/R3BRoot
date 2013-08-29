@@ -58,7 +58,6 @@ R3BSTaRTra::R3BSTaRTra() : R3BDetector("R3BSTaRTra", kTRUE, kTRA) {
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
-  fCutE=1.0e-06; // 1keV default
 }
 // -------------------------------------------------------------------------
 
@@ -74,7 +73,6 @@ R3BSTaRTra::R3BSTaRTra(const char* name, Bool_t active)
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
-  fCutE=1.0e-06; // 1keV default
 }
 // -------------------------------------------------------------------------
 
@@ -104,65 +102,6 @@ void R3BSTaRTra::Initialize()
 }
 
 
-void R3BSTaRTra::SetSpecialPhysicsCuts(){
-
-   cout << endl;
-
-   cout << "-I- R3BSTaRTra: Adding customized Physics cut ... " << endl;
-
-   if (gGeoManager) {
-
-     TGeoMedium* pSi = gGeoManager->GetMedium("Silicon");
-     if ( pSi ) {
-      // Setting processes for Si only
-         gMC->Gstpar(pSi->GetId()  ,"LOSS",3);
-         gMC->Gstpar(pSi->GetId()  ,"STRA",1.0);
-         gMC->Gstpar(pSi->GetId()  ,"PAIR",1.0);
-	 gMC->Gstpar(pSi->GetId()  ,"COMP",1.0);
-	 gMC->Gstpar(pSi->GetId()  ,"PHOT",1.0);
-         gMC->Gstpar(pSi->GetId()  ,"ANNI",1.0);
-	 gMC->Gstpar(pSi->GetId()  ,"BREM",1.0);
-	 gMC->Gstpar(pSi->GetId()  ,"HADR",1.0);
-         gMC->Gstpar(pSi->GetId()  ,"DRAY",1.0);
-         gMC->Gstpar(pSi->GetId()  ,"DCAY",1.0);
-         gMC->Gstpar(pSi->GetId()  ,"MULS",1.0);
-	 gMC->Gstpar(pSi->GetId()  ,"RAYL",1.0);
-
-	 // Setting Energy-CutOff for Si Only
-	Double_t cutE = fCutE; // GeV-> 1 keV
-
-	cout << "-I- R3bSTaRTra Silicon Medium Id " << pSi->GetId()
-	    << " Energy Cut-Off : " << cutE
-	    << endl;
-        cout << endl;
-
-	//Si
-	gMC->Gstpar(pSi->GetId(),"CUTGAM",cutE);   /** gammas (GeV)*/
-        gMC->Gstpar(pSi->GetId(),"CUTELE",cutE);   /** electrons (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"CUTNEU",cutE);   /** neutral hadrons (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"CUTHAD",cutE);   /** charged hadrons (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"CUTMUO",cutE);   /** muons (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"BCUTE" ,cutE);    /** electron bremsstrahlung (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"BCUTM" ,cutE);    /** muon and hadron bremsstrahlung(GeV)*/
-	gMC->Gstpar(pSi->GetId(),"DCUTE" ,cutE);    /** delta-rays by electrons (GeV)*/
-	gMC->Gstpar(pSi->GetId(),"DCUTM" ,cutE);    /** delta-rays by muons (GeV)*/
-        gMC->Gstpar(pSi->GetId(),"PPCUTM",-1.);   /** direct pair production by muons (GeV)*/
-
-     }
-   // <DB> trick to remove too much internal
-   // tracking in the Aladin magnet yoke
-   TGeoMedium* pFe = gGeoManager->GetMedium("Iron");
-
-     if ( pFe ) {
-     Double_t cutM= 1.e-01; // 100 MeV
-      gMC->Gstpar(pFe->GetId(),"CUTELE",cutM);
-      gMC->Gstpar(pFe->GetId()  ,"DRAY",0.0);
-     }
-
- } //!gGeoManager
-
-
-}
 
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BSTaRTra::ProcessHits(FairVolume* vol) {
