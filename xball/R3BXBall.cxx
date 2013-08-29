@@ -138,11 +138,6 @@ void R3BXBall::Initialize()
 }
 
 
-void R3BXBall::SetSpecialPhysicsCuts()
-{
-}
-
-
 
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BXBall::ProcessHits(FairVolume* vol) {

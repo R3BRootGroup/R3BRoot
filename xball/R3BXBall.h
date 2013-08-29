@@ -142,9 +142,7 @@ class R3BXBall : public R3BDetector
   virtual Bool_t CheckIfSensitive(std::string name);
 
   virtual void Initialize();
-  virtual void SetSpecialPhysicsCuts();
-  void SetEnergyCutOff( Double_t cutE ){fCutE = cutE;}
-  Double_t  GetEnergyCutOff ( ) {return fCutE;}
+  virtual void SetSpecialPhysicsCuts() {}
 
 
   /** Public method DrawCrystals
@@ -190,7 +188,6 @@ class R3BXBall : public R3BDetector
     Double32_t     fTime;              //!  time
     Double32_t     fLength;            //!  length
     Double32_t     fELoss;             //!  energy loss
-    Double32_t     fCutE;              //!  energy cut 
     Double32_t     fEinc;              //!  Total incident energy
     Int_t          fNSteps;            //!  Number of steps in the active volume
 

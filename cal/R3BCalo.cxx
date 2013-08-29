@@ -197,12 +197,6 @@ void R3BCalo::Initialize()
 }
 
 
-void R3BCalo::SetSpecialPhysicsCuts()
-{
-}
-
-
-
 
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BCalo::ProcessHits(FairVolume* vol)

@@ -54,7 +54,6 @@ R3BmTof::R3BmTof() : R3BDetector("R3BmTof", kTRUE, kMTOF)
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
-  fCutE=1.0e-03; // 1MeV default
 }
 // -------------------------------------------------------------------------
 
@@ -71,7 +70,6 @@ R3BmTof::R3BmTof(const char* name, Bool_t active)
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
-  fCutE=1.0e-03; // 1MeV default
 }
 // -------------------------------------------------------------------------
 
@@ -96,51 +94,6 @@ void R3BmTof::Initialize()
   
   LOG(INFO) << "R3BmTof: initialisation" << FairLogger::endl;
   LOG(DEBUG) << "R3BmTof: Sci. Vol. (McId) " << gMC->VolId("mTOFLog") << FairLogger::endl;
-}
-
-
-
-void R3BmTof::SetSpecialPhysicsCuts()
-{
-  LOG(INFO) << "R3BmTof: Adding customized Physics cut ... " << FairLogger::endl;
-  
-  if (gGeoManager) {
-    TGeoMedium* pSi = gGeoManager->GetMedium("plasticFormTOF");
-    if ( pSi ) {
-      // Setting processes for Si only
-      gMC->Gstpar(pSi->GetId()  ,"LOSS",3);
-      gMC->Gstpar(pSi->GetId()  ,"STRA",1.0);
-      gMC->Gstpar(pSi->GetId()  ,"PAIR",1.0);
-      gMC->Gstpar(pSi->GetId()  ,"COMP",1.0);
-      gMC->Gstpar(pSi->GetId()  ,"PHOT",1.0);
-      gMC->Gstpar(pSi->GetId()  ,"ANNI",1.0);
-      gMC->Gstpar(pSi->GetId()  ,"BREM",1.0);
-      gMC->Gstpar(pSi->GetId()  ,"HADR",1.0);
-      gMC->Gstpar(pSi->GetId()  ,"DRAY",1.0);
-      gMC->Gstpar(pSi->GetId()  ,"DCAY",1.0);
-      gMC->Gstpar(pSi->GetId()  ,"MULS",1.0);
-      gMC->Gstpar(pSi->GetId()  ,"RAYL",1.0);
-      
-      // Setting Energy-CutOff for Si Only
-      Double_t cutE = fCutE; // GeV-> 1 keV
-      
-      LOG(INFO) << "R3bmTof Scintillator Medium Id " << pSi->GetId()
-	    << " Energy Cut-Off : " << cutE
-	    << FairLogger::endl;
-
-      //Si
-      gMC->Gstpar(pSi->GetId(),"CUTGAM",cutE);   /** gammas (GeV)*/
-      gMC->Gstpar(pSi->GetId(),"CUTELE",cutE);   /** electrons (GeV)*/
-      gMC->Gstpar(pSi->GetId(),"CUTNEU",cutE);   /** neutral hadrons (GeV)*/
-      gMC->Gstpar(pSi->GetId(),"CUTHAD",cutE);   /** charged hadrons (GeV)*/
-      gMC->Gstpar(pSi->GetId(),"CUTMUO",cutE);   /** muons (GeV)*/
-      gMC->Gstpar(pSi->GetId(),"BCUTE",cutE);    /** electron bremsstrahlung (GeV)*/
-      gMC->Gstpar(pSi->GetId(),"BCUTM",cutE);    /** muon and hadron bremsstrahlung(GeV)*/
-      gMC->Gstpar(pSi->GetId(),"DCUTE",cutE);    /** delta-rays by electrons (GeV)*/
-      gMC->Gstpar(pSi->GetId(),"DCUTM",cutE);    /** delta-rays by muons (GeV)*/
-      gMC->Gstpar(pSi->GetId(),"PPCUTM",-1.);   /** direct pair production by muons (GeV)*/
-    }
-  } //!gGeoManager
 }
 
 

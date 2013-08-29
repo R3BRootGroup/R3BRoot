@@ -107,7 +107,7 @@ public:
   
   virtual void Initialize();
   
-  virtual void SetSpecialPhysicsCuts(){;}
+  virtual void SetSpecialPhysicsCuts() {}
   
   virtual Bool_t CheckIfSensitive(std::string name);
   

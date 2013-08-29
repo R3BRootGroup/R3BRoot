@@ -111,15 +111,12 @@ class ELILuMon : public R3BDetector
   virtual void ConstructGeometry();
   virtual Bool_t CheckIfSensitive(std::string name);
 
-   virtual void Initialize();
-   virtual void SetSpecialPhysicsCuts();
-   void SetEnergyCutOff( Double_t cutE ){fCutE = cutE;}
-   Double_t  GetEnergyCutOff ( ) {return fCutE;}
+  virtual void Initialize();
+  virtual void SetSpecialPhysicsCuts() {}
 
 //  void SaveGeoParams();
 
   private:
-
 
     /** Track information to be stored until the track leaves the
 	active volume. **/
@@ -130,7 +127,6 @@ class ELILuMon : public R3BDetector
     Double32_t     fTime;              //!  time
     Double32_t     fLength;            //!  length
     Double32_t     fELoss;             //!  energy loss
-     Double32_t     fCutE;              //!  Sec. Energy Cut-Off
 
     Int_t          fPosIndex;          //!
     TClonesArray*  fLuMonCollection;     //!  The hit collection

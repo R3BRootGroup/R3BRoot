@@ -143,9 +143,7 @@ class R3BCalo : public R3BDetector
 
 	
   virtual void Initialize();
-  virtual void SetSpecialPhysicsCuts();
-  void SetEnergyCutOff( Double_t cutE ){fCutE = cutE;}
-  Double_t  GetEnergyCutOff ( ) {return fCutE;}
+  virtual void SetSpecialPhysicsCuts() {}
 
 
 //  void SaveGeoParams();
@@ -164,7 +162,6 @@ class R3BCalo : public R3BDetector
     Double32_t     fTime;              //!  time
     Double32_t     fLength;            //!  length
     Double32_t     fELoss;             //!  energy loss
-    Double32_t     fCutE;              //!  energy loss
     Int_t          fPosIndex;          //!
     Int_t          fNSteps;            //!  Number of steps in the active volume
     Double32_t     fEinc;              //!  Total incident energy

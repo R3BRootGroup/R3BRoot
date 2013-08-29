@@ -160,9 +160,6 @@ void r3ball(Int_t nEvents = 1,
   // Tracker
   if (fDetList.FindObject("TRACKER")  ) {
     R3BDetector* tra = new R3BTra("Tracker", kTRUE);
-    // User defined Energy CutOff
-    Double_t fCutOffSi = 1.0e-06;  // Cut-Off -> 10KeV only in Si
-    ((R3BTra*) tra)->SetEnergyCutOff(fCutOffSi);
     tra->SetGeometryFileName(((TObjString*)fDetList.GetValue("TRACKER"))->GetString().Data());
     run->AddModule(tra);
   }
@@ -171,9 +168,6 @@ void r3ball(Int_t nEvents = 1,
   if (fDetList.FindObject("STaRTrack")  ) {
     R3BDetector* tra = new R3BSTaRTra("STaRTrack", kTRUE);
     tra->SetGeometryFileName(((TObjString*)fDetList.GetValue("STaRTrack"))->GetString().Data());
-    // User defined Energy CutOff
-    Double_t fCutOffSi = 1.0e-06;  // Cut-Off -> 10KeV only in Si
-    ((R3BSTaRTra*) tra)->SetEnergyCutOff(fCutOffSi);
     run->AddModule(tra);
   }
   
@@ -188,9 +182,6 @@ void r3ball(Int_t nEvents = 1,
   if (fDetList.FindObject("TOF") ) {
     R3BDetector* tof = new R3BTof("Tof", kTRUE);
     tof->SetGeometryFileName(((TObjString*)fDetList.GetValue("TOF"))->GetString().Data());
-    // User defined Energy CutOff
-    Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
-    ((R3BTof*) tof)->SetEnergyCutOff(fCutOffSci);
     run->AddModule(tof);
   }
   
@@ -198,9 +189,6 @@ void r3ball(Int_t nEvents = 1,
   if (fDetList.FindObject("MTOF") ) {
     R3BDetector* mTof = new R3BmTof("mTof", kTRUE);
     mTof->SetGeometryFileName(((TObjString*)fDetList.GetValue("MTOF"))->GetString().Data());
-    // User defined Energy CutOff
-    Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
-    ((R3BmTof*) mTof)->SetEnergyCutOff(fCutOffSci);
     run->AddModule(mTof);
   }
   
@@ -208,9 +196,6 @@ void r3ball(Int_t nEvents = 1,
   if (fDetList.FindObject("GFI") ) {
     R3BDetector* gfi = new R3BGfi("Gfi", kTRUE);
     gfi->SetGeometryFileName(((TObjString*)fDetList.GetValue("GFI"))->GetString().Data());
-    // User defined Energy CutOff
-    Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
-    ((R3BGfi*) gfi)->SetEnergyCutOff(fCutOffSci);
     run->AddModule(gfi);
   }
   

@@ -46,7 +46,8 @@
 
 
 // -----   Default constructor   -------------------------------------------
-R3BTra::R3BTra() : R3BDetector("R3BTra", kTRUE, kTRA) {
+R3BTra::R3BTra() : R3BDetector("R3BTra", kTRUE, kTRA)
+{
 	ResetParameters();
 	fTraCollection = new TClonesArray("R3BTraPoint");
 	fPosIndex = 0;
@@ -54,13 +55,15 @@ R3BTra::R3BTra() : R3BDetector("R3BTra", kTRUE, kTRA) {
 	flGeoPar = new TList();
 	flGeoPar->SetName( GetName());
 	fVerboseLevel = 1;
-	fCutE=1.0e-04; // 100keV default
 }
 // -------------------------------------------------------------------------
 
+
+
 // -----   Standard constructor   ------------------------------------------
 R3BTra::R3BTra(const char* name, Bool_t active) 
-	: R3BDetector(name, active, kTRA) {
+	: R3BDetector(name, active, kTRA)
+{
 		ResetParameters();
 		fTraCollection = new TClonesArray("R3BTraPoint");
 		fPosIndex = 0;
@@ -68,13 +71,14 @@ R3BTra::R3BTra(const char* name, Bool_t active)
 		flGeoPar = new TList();
 		flGeoPar->SetName( GetName());
 		fVerboseLevel = 1;
-		fCutE=1.0e-04; // 100keV default
 	}
 // -------------------------------------------------------------------------
 
-// -----   Destructor   ----------------------------------------------------
-R3BTra::~R3BTra() {
 
+
+// -----   Destructor   ----------------------------------------------------
+R3BTra::~R3BTra()
+{
 	if ( flGeoPar ) delete flGeoPar;
 	if (fTraCollection) {
 		fTraCollection->Delete();
@@ -83,8 +87,9 @@ R3BTra::~R3BTra() {
 }
 // -------------------------------------------------------------------------
 
-// ----   Initialize   -----------------------------------------------------
 
+
+// ----   Initialize   -----------------------------------------------------
 void R3BTra::Initialize()
 {
 	FairDetector::Initialize();
@@ -94,66 +99,10 @@ void R3BTra::Initialize()
 }
 
 
-void R3BTra::SetSpecialPhysicsCuts()
-{
-	LOG(INFO) << "R3BTra: Adding customized Physics cut ... " << FairLogger::endl;
-
-	if (gGeoManager) {
-
-		TGeoMedium* pSi = gGeoManager->GetMedium("Silicon");
-		if ( pSi ) {
-			// Setting processes for Si only
-			gMC->Gstpar(pSi->GetId()  ,"LOSS",1);
-			gMC->Gstpar(pSi->GetId()  ,"STRA",1.0);
-			gMC->Gstpar(pSi->GetId()  ,"PAIR",1.0);
-			gMC->Gstpar(pSi->GetId()  ,"COMP",1.0);
-			gMC->Gstpar(pSi->GetId()  ,"PHOT",1.0);
-			gMC->Gstpar(pSi->GetId()  ,"ANNI",1.0);
-			gMC->Gstpar(pSi->GetId()  ,"BREM",1.0);
-			gMC->Gstpar(pSi->GetId()  ,"HADR",1.0);
-			gMC->Gstpar(pSi->GetId()  ,"DRAY",1.0);
-			gMC->Gstpar(pSi->GetId()  ,"DCAY",1.0);
-			gMC->Gstpar(pSi->GetId()  ,"MULS",1.0);
-			gMC->Gstpar(pSi->GetId()  ,"RAYL",1.0);
-
-			// Setting Energy-CutOff for Si Only
-			Double_t cutE = fCutE; // GeV-> 100 keV
-
-			LOG(INFO) << "R3BTra Silicon Medium Id " << pSi->GetId()
-			<< " Energy Cut-Off : " << cutE
-			<< FairLogger::endl;
-
-			//Si
-			gMC->Gstpar(pSi->GetId(),"CUTGAM",cutE);   /** gammas (GeV)*/
-			gMC->Gstpar(pSi->GetId(),"CUTELE",cutE);   /** electrons (GeV)*/
-			gMC->Gstpar(pSi->GetId(),"CUTNEU",cutE);   /** neutral hadrons (GeV)*/
-			gMC->Gstpar(pSi->GetId(),"CUTHAD",cutE);   /** charged hadrons (GeV)*/
-			gMC->Gstpar(pSi->GetId(),"CUTMUO",cutE);   /** muons (GeV)*/
-			gMC->Gstpar(pSi->GetId(),"BCUTE" ,cutE);    /** electron bremsstrahlung (GeV)*/
-			gMC->Gstpar(pSi->GetId(),"BCUTM" ,cutE);    /** muon and hadron bremsstrahlung(GeV)*/
-			gMC->Gstpar(pSi->GetId(),"DCUTE" ,cutE);    /** delta-rays by electrons (GeV)*/
-			gMC->Gstpar(pSi->GetId(),"DCUTM" ,cutE);    /** delta-rays by muons (GeV)*/
-			gMC->Gstpar(pSi->GetId(),"PPCUTM",-1.);   /** direct pair production by muons (GeV)*/
-
-		}
-		// <DB> trick to remove too much internal
-		// tracking in the Aladin magnet yoke
-		TGeoMedium* pFe = gGeoManager->GetMedium("Iron");
-
-		if ( pFe ) {
-			Double_t cutM= 1.e-01; // 100 MeV
-			gMC->Gstpar(pFe->GetId(),"CUTELE",cutM);
-			gMC->Gstpar(pFe->GetId()  ,"DRAY",0.0);
-		}
-
-	} //!gGeoManager
-
-
-}
 
 // -----   Public method ProcessHits  --------------------------------------
-Bool_t R3BTra::ProcessHits(FairVolume* vol) {
-
+Bool_t R3BTra::ProcessHits(FairVolume* vol)
+{
 	//      cout << " -I process hit called for:" <<  vol->GetName() << endl;
 	// Set parameters at entrance of volume. Reset ELoss.
 
@@ -245,27 +194,12 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
 
 	return kTRUE;
 }
-// ----------------------------------------------------------------------------
-//void R3BTra::SaveGeoParams(){
-//
-//  cout << " -I Save STS geo params " << endl;
-//
-//  TFolder *mf = (TFolder*) gDirectory->FindObjectAny("cbmroot");
-//  cout << " mf: " << mf << endl;
-//  TFolder *stsf = NULL;
-//  if (mf ) stsf = (TFolder*) mf->FindObjectAny(GetName());
-//  cout << " stsf: " << stsf << endl;
-//  if (stsf) stsf->Add( flGeoPar0 ) ;
-//  FairRootManager::Instance()->WriteFolder();
-//  mf->Write("cbmroot",TObject::kWriteDelete);
-//}
+
 
 
 // -----   Public method EndOfEvent   -----------------------------------------
-void R3BTra::BeginEvent() {
-
-	//  cout << "-I- begin tracker event called ##########" << endl;
-
+void R3BTra::BeginEvent()
+{
 	if(gGeoManager){
 		TGeoVolume * vol=gGeoManager->FindVolumeFast("TraLog");
 
@@ -273,17 +207,13 @@ void R3BTra::BeginEvent() {
 			//    cout << "id tracker serial number : " << vol->GetNumber() << endl;
 		}
 	}
-
-	//  if (! kGeoSaved ) {
-	//      SaveGeoParams();
-	//  cout << "-I STS geometry parameters saved " << endl;
-	//  kGeoSaved = kTRUE;
-	//  }
-
 }
-// -----   Public method EndOfEvent   -----------------------------------------
-void R3BTra::EndOfEvent() {
 
+
+
+// -----   Public method EndOfEvent   -----------------------------------------
+void R3BTra::EndOfEvent()
+{
 	if (fVerboseLevel) Print();
 	fTraCollection->Clear();
 
@@ -291,35 +221,50 @@ void R3BTra::EndOfEvent() {
 }
 // ----------------------------------------------------------------------------
 
+
+
 // -----   Public method Register   -------------------------------------------
-void R3BTra::Register() {
+void R3BTra::Register()
+{
 	FairRootManager::Instance()->Register("TraPoint", GetName(), fTraCollection, kTRUE);
 }
 // ----------------------------------------------------------------------------
 
+
+
 // -----   Public method GetCollection   --------------------------------------
-TClonesArray* R3BTra::GetCollection(Int_t iColl) const {
+TClonesArray* R3BTra::GetCollection(Int_t iColl) const
+{
 	if (iColl == 0) return fTraCollection;
 	else return NULL;
 }
 // ----------------------------------------------------------------------------
 
+
+
 // -----   Public method Print   ----------------------------------------------
-void R3BTra::Print(Option_t *option) const {
+void R3BTra::Print(Option_t *option) const
+{
 	Int_t nHits = fTraCollection->GetEntriesFast();
 	LOG(INFO) << "R3BTra: " << nHits << " points registered in this event" << FairLogger::endl;
 }
 // ----------------------------------------------------------------------------
 
+
+
 // -----   Public method Reset   ----------------------------------------------
-void R3BTra::Reset() {
+void R3BTra::Reset()
+{
 	fTraCollection->Clear();
 	ResetParameters();
 }
 // ----------------------------------------------------------------------------
 
+
+
 // -----   Public method CopyClones   -----------------------------------------
-void R3BTra::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
+void R3BTra::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
+{
 	Int_t nEntries = cl1->GetEntriesFast();
 	LOG(INFO) << "R3BTra: " << nEntries << " entries to add" << FairLogger::endl;
 	TClonesArray& clref = *cl2;
@@ -334,12 +279,15 @@ void R3BTra::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
 	LOG(INFO) << "R3BTra: " << cl2->GetEntriesFast() << " merged entries"	<< FairLogger::endl;
 }
 
+
+
 // -----   Private method AddHit   --------------------------------------------
 R3BTraPoint* R3BTra::AddHit(Int_t trackID, Int_t detID, Int_t detCopyID,   // added by Marc 
 		TVector3 posIn,
 		TVector3 posOut, TVector3 momIn, 
 		TVector3 momOut, Double_t time, 
-		Double_t length, Double_t eLoss) {
+		Double_t length, Double_t eLoss)
+{
 	TClonesArray& clref = *fTraCollection;
 	Int_t size = clref.GetEntriesFast();
 	if (fVerboseLevel>1) 
@@ -351,6 +299,7 @@ R3BTraPoint* R3BTra::AddHit(Int_t trackID, Int_t detID, Int_t detCopyID,   // ad
 }
 
 
+
 // -----   Public method ConstructGeometry   ----------------------------------
 void R3BTra::ConstructGeometry()
 {
@@ -360,9 +309,10 @@ void R3BTra::ConstructGeometry()
     ConstructRootGeometry();
   } else {
     LOG(FATAL) << "TRACKER Geometry file is not specified" << FairLogger::endl;
-    exit(1);
+    exit(-1);
   }
 }
+
 
 
 Bool_t R3BTra::CheckIfSensitive(std::string name)
@@ -372,6 +322,7 @@ Bool_t R3BTra::CheckIfSensitive(std::string name)
   }
   return kFALSE;
 }
+
 
 
 ClassImp(R3BTra)

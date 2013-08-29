@@ -136,66 +136,22 @@ void R3BDch::FindNodePath(TObjArray * arr)
 }
 
 
-void R3BDch::SetSpecialPhysicsCuts()
-{
-  LOG(INFO) << "R3Dch: Adding customized Physics cut ... " << FairLogger::endl;
-  
-  if (gGeoManager) {
-    TGeoMedium* pSi = gGeoManager->GetMedium("mixtureForDCH");
-    if ( pSi ) {
-      // Setting processes for Gas mixture only
-      // ELoss + deltas + reduced fluctuation
-      gMC->Gstpar(pSi->GetId()  ,"LOSS",2);
-      // collision sampling on PAI Model ( thin layer )
-      gMC->Gstpar(pSi->GetId()  ,"STRA",1.0);
-      // Deltas on
-      gMC->Gstpar(pSi->GetId()  ,"DRAY",1.0);
-      // Default processes
-      gMC->Gstpar(pSi->GetId()  ,"PAIR",1.0);
-      gMC->Gstpar(pSi->GetId()  ,"COMP",1.0);
-      gMC->Gstpar(pSi->GetId()  ,"PHOT",1.0);
-      gMC->Gstpar(pSi->GetId()  ,"ANNI",1.0);
-      gMC->Gstpar(pSi->GetId()  ,"BREM",1.0);
-      gMC->Gstpar(pSi->GetId()  ,"HADR",1.0);
-      gMC->Gstpar(pSi->GetId()  ,"DCAY",1.0);
-      gMC->Gstpar(pSi->GetId()  ,"MULS",1.0);
-      gMC->Gstpar(pSi->GetId()  ,"RAYL",1.0);
-      
-      // Setting Energy-CutOff for Drift chamber Gas Only
-      Double_t cutE = fCutE; // GeV-> 1 keV
-      
-      LOG(INFO) << "R3Dch Gas Mixture Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << FairLogger::endl;
-      //Si
-      gMC->Gstpar(pSi->GetId(),"CUTGAM",cutE);   /** gammas (GeV)*/
-      gMC->Gstpar(pSi->GetId(),"CUTELE",cutE);   /** electrons (GeV)*/
-      gMC->Gstpar(pSi->GetId(),"CUTNEU",cutE);   /** neutral hadrons (GeV)*/
-      gMC->Gstpar(pSi->GetId(),"CUTHAD",cutE);   /** charged hadrons (GeV)*/
-      gMC->Gstpar(pSi->GetId(),"CUTMUO",cutE);   /** muons (GeV)*/
-      gMC->Gstpar(pSi->GetId(),"BCUTE",cutE);    /** electron bremsstrahlung (GeV)*/
-      gMC->Gstpar(pSi->GetId(),"BCUTM",cutE);    /** muon and hadron bremsstrahlung(GeV)*/
-      gMC->Gstpar(pSi->GetId(),"DCUTE",cutE);    /** delta-rays by electrons (GeV)*/
-      gMC->Gstpar(pSi->GetId(),"DCUTM",cutE);    /** delta-rays by muons (GeV)*/
-      gMC->Gstpar(pSi->GetId(),"PPCUTM",-1.);   /** direct pair production by muons (GeV)*/
-    }
-  } //!gGeoManager
-}
-
 
 // -----   Public method ProcessHits  --------------------------------------
-Bool_t R3BDch::ProcessHits(FairVolume* vol) {
-
-
-   if (fVerbose ) PrintInfo();
-
-   if (fDynamicStepSize) RecordFullMcHit();
-   else RecordPartialMcHit();
-
-   return kTRUE;
-
+Bool_t R3BDch::ProcessHits(FairVolume* vol)
+{
+  if (fVerbose ) PrintInfo();
+  
+  if (fDynamicStepSize) RecordFullMcHit();
+  else RecordPartialMcHit();
+  
+  return kTRUE;
 }
 
-void R3BDch::RecordFullMcHit(){
 
+
+void R3BDch::RecordFullMcHit()
+{
  // Record the full McHit history using
  // a dynamical update of the step size
  // at each Geant steps

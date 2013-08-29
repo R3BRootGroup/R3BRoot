@@ -41,7 +41,6 @@ R3BSTaRTra::R3BSTaRTra() : R3BDetector("R3BSTaRTra", kTRUE, kSTaRTrack)
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
-  fCutE=1.0e-06; // 1keV default
 }
 // -------------------------------------------------------------------------
 
@@ -57,7 +56,6 @@ R3BSTaRTra::R3BSTaRTra(const char* name, Bool_t active)
   flGeoPar = new TList();
   flGeoPar->SetName( GetName());
   fVerboseLevel = 1;
-  fCutE=1.0e-06; // 1keV default
 }
 // -------------------------------------------------------------------------
 
@@ -83,12 +81,6 @@ void R3BSTaRTra::Initialize()
   
   LOG(INFO) << "R3BSTaRTra: initialisation" << FairLogger::endl;
   LOG(DEBUG) << "R3BSTaRTra: Sens. Vol. (McId) " << gMC->VolId("STaRTraLog1") << FairLogger::endl;
-}
-
-
-
-void R3BSTaRTra::SetSpecialPhysicsCuts()
-{
 }
 
 
