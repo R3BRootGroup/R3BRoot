@@ -20,6 +20,7 @@
 #include "FairRuntimeDb.h"
 #include "FairRun.h"
 #include "FairVolume.h"
+#include "FairLogger.h"
 
 #include "TClonesArray.h"
 #include "TGeoMCGeometry.h"
@@ -45,14 +46,9 @@
 #include "TGeoTube.h"
 #include "TGeoBoolNode.h"
 #include "TGeoCompositeShape.h"
-#include <iostream>
 // try the mathematical ROOT package
 #include "Math/Rotation3D.h"
 #include "Math/Point3D.h"
-
-using std::cout;
-using std::cerr;
-using std::endl;
 
 #define XB_CRYSTAL(no,type,theta,phi,psi,n1,n2,n3,n4,n5,n6) { no, type, theta, phi, psi },
 #define XB_CRYSTAL_MOD(nr,mod,delta) { nr, mod, delta },
@@ -104,13 +100,12 @@ void R3BXBallv1::Initialize()
 {
   FairDetector::Initialize();
 
-  cout << endl;
-  cout << "-I- R3BXBallv1 initialisation" << endl;
-  cout << "-I- R3BXBallv1: Vol. (McId)" << endl;
-  cout << "-I- R3BXBallv1: Crystal A : " << gMC->VolId("crystalLogNAJA")<< endl;
-  cout << "-I- R3BXBallv1: Crystal B : " << gMC->VolId("crystalLogNAJB")<< endl;
-  cout << "-I- R3BXBallv1: Crystal C : " << gMC->VolId("crystalLogNAJC")<< endl;
-  cout << "-I- R3BXBallv1: Crystal D : " << gMC->VolId("crystalLogNAJD")<< endl;
+  LOG(INFO) << "R3BXBallv1 initialisation" << FairLogger::endl;
+  LOG(DEBUG) << "R3BXBallv1: Vol. (McId)" << FairLogger::endl;
+  LOG(DEBUG) << "R3BXBallv1: Crystal A : " << gMC->VolId("crystalLogNAJA")<< FairLogger::endl;
+  LOG(DEBUG) << "R3BXBallv1: Crystal B : " << gMC->VolId("crystalLogNAJB")<< FairLogger::endl;
+  LOG(DEBUG) << "R3BXBallv1: Crystal C : " << gMC->VolId("crystalLogNAJC")<< FairLogger::endl;
+  LOG(DEBUG) << "R3BXBallv1: Crystal D : " << gMC->VolId("crystalLogNAJD")<< FairLogger::endl;
 
   // Crystals type ID
   // type  ID
@@ -168,8 +163,6 @@ Bool_t R3BXBallv1::ProcessHits(FairVolume* vol) {
       oldpos = gGeoManager->GetCurrentPoint();
       olddirection = gGeoManager->GetCurrentDirection();
 
-      //     cout << "1st direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] << endl;
-
       for (Int_t i=0; i<3; i++){
         newdirection[i] = -1*olddirection[i];
       }
@@ -183,13 +176,6 @@ Bool_t R3BXBallv1::ProcessHits(FairVolume* vol) {
 
       for (Int_t i=0; i<3; i++){
         newpos[i] = oldpos[i] - (3*safety*olddirection[i]);
-      }
-
-      if ( fPosIn.Z() < 30. && newpos[2] > 30.02 ) {
-        cerr << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] 
-            << " with safety = " << safety << endl;
-        cerr << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << endl;
-        cerr << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << endl;
       }
 
       fPosOut.SetX(newpos[0]);
@@ -213,35 +199,19 @@ Bool_t R3BXBallv1::ProcessHits(FairVolume* vol) {
   return kTRUE;
 }
 // ----------------------------------------------------------------------------
-/*
-void R3BXBallv1::SaveGeoParams(){
-  cout << " -I Save STS geo params " << endl;
 
-  TFolder *mf = (TFolder*) gDirectory->FindObjectAny("cbmroot");
-  cout << " mf: " << mf << endl;
-  TFolder *stsf = NULL;
-  if (mf ) stsf = (TFolder*) mf->FindObjectAny(GetName());
-  cout << " stsf: " << stsf << endl;
-  if (stsf) stsf->Add( flGeoPar0 ) ;
-  FairRootManager::Instance()->WriteFolder();
-  mf->Write("cbmroot",TObject::kWriteDelete);
-}
-*/
 
 
 // -----   Public method EndOfEvent   -----------------------------------------
-void R3BXBallv1::BeginEvent() {
-
-//  if (! kGeoSaved ) {
-//    SaveGeoParams();
-//  cout << "-I STS geometry parameters saved " << endl;
-//  kGeoSaved = kTRUE;
-//  }
-
+void R3BXBallv1::BeginEvent()
+{
 }
-// -----   Public method EndOfEvent   -----------------------------------------
-void R3BXBallv1::EndOfEvent() {
 
+
+
+// -----   Public method EndOfEvent   -----------------------------------------
+void R3BXBallv1::EndOfEvent()
+{
   if (fVerboseLevel) Print();
   fXBallCollection->Clear();
 
@@ -252,7 +222,8 @@ void R3BXBallv1::EndOfEvent() {
 
 
 // -----   Public method Register   -------------------------------------------
-void R3BXBallv1::Register() {
+void R3BXBallv1::Register()
+{
   FairRootManager::Instance()->Register("CrystalPoint", GetName(), fXBallCollection, kTRUE);
 }
 // ----------------------------------------------------------------------------
@@ -269,9 +240,10 @@ TClonesArray* R3BXBallv1::GetCollection(Int_t iColl) const {
 
 
 // -----   Public method Print   ----------------------------------------------
-void R3BXBallv1::Print() const {
+void R3BXBallv1::Print() const
+{
   Int_t nHits = fXBallCollection->GetEntriesFast();
-  cout << "-I- R3BXBallv1: " << nHits << " points registered in this event." << endl;
+  LOG(INFO) << "R3BXBallv1: " << nHits << " points registered in this event" << FairLogger::endl;
 }
 // ----------------------------------------------------------------------------
 
@@ -290,7 +262,7 @@ void R3BXBallv1::Reset() {
 void R3BXBallv1::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
   Int_t nEntries = cl1->GetEntriesFast();
-  cout << "-I- R3BXBallv1: " << nEntries << " entries to add." << endl;
+  LOG(INFO) << "R3BXBallv1: " << nEntries << " entries to add" << FairLogger::endl;
   TClonesArray& clref = *cl2;
   R3BXBallPoint* oldpoint = NULL;
   for (Int_t i=0; i<nEntries; i++)
@@ -301,20 +273,23 @@ void R3BXBallv1::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
     new (clref[fPosIndex]) R3BXBallPoint(*oldpoint);
     fPosIndex++;
   }
-  cout << " -I- R3BXBallv1: " << cl2->GetEntriesFast() << " merged entries." << endl;
+  LOG(INFO) << "R3BXBallv1: " << cl2->GetEntriesFast() << " merged entries" << FairLogger::endl;
 }
+
+
 
 // -----   Private method AddHit   --------------------------------------------
 R3BXBallPoint* R3BXBallv1::AddHit(Int_t trackID, Int_t detID, Int_t type, Int_t cp, TVector3 posIn,
         TVector3 posOut, TVector3 momIn, 
         TVector3 momOut, Double_t time, 
-        Double_t length, Double_t eLoss) {
+        Double_t length, Double_t eLoss)
+{
   TClonesArray& clref = *fXBallCollection;
   Int_t size = clref.GetEntriesFast();
   if (fVerboseLevel>1) 
-    cout << "-I- R3BXBallv1: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
+    LOG(INFO) << "R3BXBallv1: Adding Point at (" << posIn.X() << ", " << posIn.Y()
      << ", " << posIn.Z() << ") cm, detector " << detID << ", track "
-     << trackID << ", energy loss " << eLoss*1e06 << " keV" << endl;
+     << trackID << ", energy loss " << eLoss*1e06 << " keV" << FairLogger::endl;
   return new(clref[size]) R3BXBallPoint(trackID, detID, type, cp , posIn, posOut,
             momIn, momOut, time, length, eLoss);
 }
@@ -322,11 +297,11 @@ R3BXBallPoint* R3BXBallv1::AddHit(Int_t trackID, Int_t detID, Int_t type, Int_t 
 
 void R3BXBallv1::ConstructGeometry(){
 
-    cout
-    << "##################################################################\n"
-    << "*     -I- R3BXBallv1 R3BXBallv1::ConstructGeometry()                     *\n"
-    << "*        Darmstadt-Heidelberg Crystal Ball - CAVE C Setup        *\n"
-    << "##################################################################\n";
+    LOG(INFO)
+    << "##################################################################" << FairLogger::endl
+    << "*     -I- R3BXBallv1 R3BXBallv1::ConstructGeometry()                     *" << FairLogger::endl
+    << "*        Darmstadt-Heidelberg Crystal Ball - CAVE C Setup        *" << FairLogger::endl
+    << "##################################################################" << FairLogger::endl;
 
   // out-of-file geometry definition
   Double_t dx,dy,dz;

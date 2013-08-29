@@ -9,40 +9,38 @@
 //
 /////////////////////////////////////////////////////////////
 
+#include "TClass.h"
+
+#include "FairRuntimeDb.h"
+#include "FairParRootFileIo.h"
+#include "FairParAsciiFileIo.h"
+#include "FairLogger.h"
 
 #include "R3BXBallContFact.h"
-
 //#include "R3BXBallParRootFileIo.h"
 //#include "R3BXBallParAsciiFileIo.h"
 #include "R3BGeoXBallPar.h"
 //#include "R3BXBallDigiPar.h"
 
-#include "FairRuntimeDb.h"
-//#include "CbmParTest.h"
-#include "FairParRootFileIo.h"
-#include "FairParAsciiFileIo.h"
 
-#include "TClass.h"
-
-#include <iostream>
-#include <iomanip>
-
-using std::cout;
-using std::endl;
-
-ClassImp(R3BXBallContFact)
 
 static R3BXBallContFact gR3BXBallContFact;
 
-R3BXBallContFact::R3BXBallContFact() {
+
+
+R3BXBallContFact::R3BXBallContFact()
+{
   // Constructor (called when the library is loaded)
-  fName="R3BXBallContFact";
-  fTitle="Factory for parameter containers in libR3BXBall";
+  fName = "R3BXBallContFact";
+  fTitle = "Factory for parameter containers in libR3BXBall";
   setAllContainers();
   FairRuntimeDb::instance()->addContFactory(this);
 }
 
-void R3BXBallContFact::setAllContainers() {
+
+
+void R3BXBallContFact::setAllContainers()
+{
   /** Creates the Container objects with all accepted contexts and adds them to
    *  the list of containers for the STS library.*/
    /*
@@ -61,13 +59,16 @@ void R3BXBallContFact::setAllContainers() {
     */
 }
 
-FairParSet* R3BXBallContFact::createContainer(FairContainer* c) {
+
+
+FairParSet* R3BXBallContFact::createContainer(FairContainer* c)
+{
   /** Calls the constructor of the corresponding parameter container.
    * For an actual context, which is not an empty string and not the default context
    * of this container, the name is concatinated with the context. */
   /*
   const char* name=c->GetName();
-  cout << " -I container name " << name << endl;
+  LOG(INFO) << "container name " << name << FairLogger::endl;
   FairParSet* p=0;
   if (strcmp(name,"R3BXBallDigiPar")==0) {
     p=new R3BXBallDigiPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
@@ -80,7 +81,10 @@ FairParSet* R3BXBallContFact::createContainer(FairContainer* c) {
   return NULL;
 }
 
-void  R3BXBallContFact::activateParIo(FairParIo* io) {
+
+
+void  R3BXBallContFact::activateParIo(FairParIo* io)
+{
   // activates the input/output class for the parameters
   // needed by the Sts
   /*
@@ -95,3 +99,6 @@ void  R3BXBallContFact::activateParIo(FairParIo* io) {
   */
 }
 
+
+
+ClassImp(R3BXBallContFact)
