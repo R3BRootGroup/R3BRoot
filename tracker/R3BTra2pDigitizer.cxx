@@ -3,6 +3,7 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "FairLogger.h"
 
 
 // includes for modeling
@@ -23,17 +24,12 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include <string>
-#include <iostream>
-
 
 #include "R3BTraPoint.h"
 #include "R3BMCTrack.h"
 		
 #define SST_HALF_WIDTH_CM  3.5200
 #define SST_HALF_HEIGHT_CM 1.9968
-
-using std::cout;
-using std::endl;
 		
 
 R3BTra2pDigitizer::R3BTra2pDigitizer() :
@@ -57,8 +53,8 @@ void R3BTra2pDigitizer::SetParContainers() {
   fTra2pDigiPar = (R3BTra2pDigiPar*)(rtdb->getContainer("R3BTra2pDigiPar"));
 
   if ( fTra2pDigiPar ) {
-      cout << "-I- R3BTra2pDigitizer::SetParContainers() "<< endl;
-      cout << "-I- Container R3BTra2pDigiPar  loaded " << endl;
+      LOG(INFO) << "-I- R3BTra2pDigitizer::SetParContainers() "<< FairLogger::endl;
+      LOG(INFO) << "-I- Container R3BTra2pDigiPar  loaded " << FairLogger::endl;
   }
 
 }
@@ -68,7 +64,7 @@ void R3BTra2pDigitizer::SetParContainers() {
 
 InitStatus R3BTra2pDigitizer::Init() {
 
-//  cout<<"Init "<<endl;
+//  LOG(INFO)<<"Init "<<FairLogger::endl;
   // Get input array 
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) Fatal("Init", "No FairRootManager");
@@ -95,7 +91,7 @@ void R3BTra2pDigitizer::Exec(Option_t* opt) {
 
    Reset();
    eventNoTra+=1;
-//     if(eventNoTra/1000. == (int)eventNoTra/1000.) cout<<"Event #: "<<eventNoTra-1<<endl;
+//     if(eventNoTra/1000. == (int)eventNoTra/1000.) LOG(INFO)<<"Event #: "<<eventNoTra-1<<FairLogger::endl;
      
      Int_t nentriesTra = fTra2pPoints->GetEntries();
 //     Int_t nentries = fMCTrack->GetEntries();
@@ -157,7 +153,7 @@ void R3BTra2pDigitizer::Exec(Option_t* opt) {
 
 
    for (Int_t l=0;l<nentriesTra;l++){
-//   cout<<"entries "<<l<<endl;
+//   LOG(INFO)<<"entries "<<l<<FairLogger::endl;
      
      R3BTraPoint *Tra2p_obj = (R3BTraPoint*) fTra2pPoints->At(l);
 
@@ -200,7 +196,7 @@ void R3BTra2pDigitizer::Exec(Option_t* opt) {
 	ss03_kbw_p1 = 2;   //kpos for 1 SST swop (with 3.9936-) - requirement for tracker
 	ss03_karea_p1 = 0;
 	ss03_keta_p1 = 0;
-//	cout<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID<<endl;
+//	LOG(INFO)<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID<<FairLogger::endl;
       }    
       
       //if (DetID==15 && l>1)
@@ -223,7 +219,7 @@ void R3BTra2pDigitizer::Exec(Option_t* opt) {
 	ss03_kbw_p2 = 2;  //kpos for 1 SST swop (with 3.9936-) - requirement for tracker
 	ss03_karea_p2 = 0;
 	ss03_keta_p2 = 0;
-//	cout<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID<<endl;
+//	LOG(INFO)<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID<<FairLogger::endl;
       }
             
       //if (DetID==16 && l==1)
@@ -246,7 +242,7 @@ void R3BTra2pDigitizer::Exec(Option_t* opt) {
 	ss06_kbw_p1 = 2;
 	ss06_karea_p1 = 0;
 	ss06_keta_p1 = 0;
-//	cout<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID<<endl;   
+//	LOG(INFO)<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID<<FairLogger::endl;   
       }
       
       //if (DetID==16 && l>1)
@@ -269,7 +265,7 @@ void R3BTra2pDigitizer::Exec(Option_t* opt) {
 	ss06_kbw_p2 = 2;
 	ss06_karea_p2 = 0;
 	ss06_keta_p2 = 0;
-//	cout<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID<<endl;   
+//	LOG(INFO)<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID<<FairLogger::endl;   
       }
       
     }     
@@ -291,7 +287,7 @@ ss06_spos_p2,ss06_sbw_p2,ss06_sarea_p2,ss06_seta_p2,ss06_ke_p2,ss06_kpos_p2,ss06
 
 void R3BTra2pDigitizer::Reset(){
 // Clear the structure
-//   cout << " -I- Digit Reset() called " << endl;
+//   LOG(INFO) << " -I- Digit Reset() called " << FairLogger::endl;
 
    
  if (fTra2pDigi ) fTra2pDigi->Clear();

@@ -21,20 +21,18 @@
 //#include "CbmParTest.h"
 #include "FairParRootFileIo.h"
 #include "FairParAsciiFileIo.h"
+#include "FairLogger.h"
 
 #include "TClass.h"
 
-#include <iostream>
-#include <iomanip>
 
-using std::cout;
-using std::endl;
-
-ClassImp(R3BTraContFact)
 
 static R3BTraContFact gR3BTraContFact;
 
-R3BTraContFact::R3BTraContFact() {
+
+
+R3BTraContFact::R3BTraContFact()
+{
   // Constructor (called when the library is loaded)
   fName="R3BTraContFact";
   fTitle="Factory for parameter containers in libR3BTra";
@@ -42,7 +40,10 @@ R3BTraContFact::R3BTraContFact() {
   FairRuntimeDb::instance()->addContFactory(this);
 }
 
-void R3BTraContFact::setAllContainers() {
+
+
+void R3BTraContFact::setAllContainers()
+{
   /** Creates the Container objects with all accepted contexts and adds them to
    *  the list of containers for the STS library.*/
    /*
@@ -61,13 +62,16 @@ void R3BTraContFact::setAllContainers() {
     */
 }
 
-FairParSet* R3BTraContFact::createContainer(FairContainer* c) {
+
+
+FairParSet* R3BTraContFact::createContainer(FairContainer* c)
+{
   /** Trals the constructor of the corresponding parameter container.
    * For an actual context, which is not an empty string and not the default context
    * of this container, the name is concatinated with the context. */
   /*
   const char* name=c->GetName();
-  cout << " -I container name " << name << endl;
+  LOG(INFO) << "container name " << name << FairLogger::endl;
   FairParSet* p=0;
   if (strcmp(name,"R3BTraDigiPar")==0) {
     p=new R3BTraDigiPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
@@ -80,7 +84,10 @@ FairParSet* R3BTraContFact::createContainer(FairContainer* c) {
   return NULL;
 }
 
-void  R3BTraContFact::activateParIo(FairParIo* io) {
+
+
+void  R3BTraContFact::activateParIo(FairParIo* io)
+{
   // activates the input/output class for the parameters
   // needed by the Sts
   /*
@@ -95,3 +102,6 @@ void  R3BTraContFact::activateParIo(FairParIo* io) {
   */
 }
 
+
+
+ClassImp(R3BTraContFact)

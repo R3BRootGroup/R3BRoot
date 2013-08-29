@@ -3,6 +3,7 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "FairLogger.h"
 
 
 // includes for modeling
@@ -23,8 +24,6 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include <string>
-#include <iostream>
-
 
 #include "R3BTraPoint.h"
 #include "R3BMCTrack.h"
@@ -32,9 +31,6 @@
 #define SST_HALF_WIDTH_CM  3.5200	//from Ralf's tracker
 #define SST_HALF_HEIGHT_CM 1.9968
 
-using std::cout;
-using std::endl;
-		
 
 R3BTraFraDigitizer::R3BTraFraDigitizer() :
   FairTask("R3B TraFra Digitization scheme ") { 
@@ -57,8 +53,8 @@ void R3BTraFraDigitizer::SetParContainers() {
   fTraFraDigiPar = (R3BTraFraDigiPar*)(rtdb->getContainer("R3BTraFraDigiPar"));
 
   if ( fTraFraDigiPar ) {
-      cout << "-I- R3BTraFraDigitizer::SetParContainers() "<< endl;
-      cout << "-I- Container R3BTraFraDigiPar  loaded " << endl;
+      LOG(INFO) << "-I- R3BTraFraDigitizer::SetParContainers() "<< FairLogger::endl;
+      LOG(INFO) << "-I- Container R3BTraFraDigiPar  loaded " << FairLogger::endl;
   }
 
 }
@@ -68,7 +64,7 @@ void R3BTraFraDigitizer::SetParContainers() {
 
 InitStatus R3BTraFraDigitizer::Init() {
 
-//  cout<<"Init "<<endl;
+//  LOG(INFO)<<"Init "<<FairLogger::endl;
   // Get input array 
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) Fatal("Init", "No FairRootManager");
@@ -95,7 +91,7 @@ void R3BTraFraDigitizer::Exec(Option_t* opt) {
 
    Reset();
    eventNoTra+=1;
-//     if(eventNoTra/1000. == (int)eventNoTra/1000.) cout<<"Event #: "<<eventNoTra-1<<endl;
+//     if(eventNoTra/1000. == (int)eventNoTra/1000.) LOG(INFO)<<"Event #: "<<eventNoTra-1<<FairLogger::endl;
      
      Int_t nentriesTra = fTraFraPoints->GetEntries();
      //Int_t nentries = fMCTrack->GetEntries();
@@ -135,7 +131,7 @@ void R3BTraFraDigitizer::Exec(Option_t* opt) {
 
 
    for (Int_t l=0;l<nentriesTra;l++){
-//   cout<<"entries "<<l<<endl;
+//   LOG(INFO)<<"entries "<<l<<FairLogger::endl;
      
      R3BTraPoint *TraFra_obj = (R3BTraPoint*) fTraFraPoints->At(l);
 
@@ -178,7 +174,7 @@ void R3BTraFraDigitizer::Exec(Option_t* opt) {
 	ss03_kbw_f = 2;   //kpos for 1 SST swop (with 3.9936-) - requirement for tracker
 	ss03_karea_f = 0;
 	ss03_keta_f = 0;
-//	cout<<"ss03_se_f "<<ss03_se_f<<endl;   
+//	LOG(INFO)<<"ss03_se_f "<<ss03_se_f<<FairLogger::endl;   
       }     
       //if (DetID==16)
       //if (DetID==22)
@@ -221,7 +217,7 @@ ss06_ke_f,ss06_kpos_f,ss06_kbw_f,ss06_karea_f,ss06_keta_f);
 
 void R3BTraFraDigitizer::Reset(){
 // Clear the structure
-//   cout << " -I- Digit Reset() called " << endl;
+//   LOG(INFO) << " -I- Digit Reset() called " << FairLogger::endl;
 
    
  if (fTraFraDigi ) fTraFraDigi->Clear();

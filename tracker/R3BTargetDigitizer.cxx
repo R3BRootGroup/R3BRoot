@@ -3,6 +3,7 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "FairLogger.h"
 
 
 // includes for modeling
@@ -23,7 +24,6 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include <string>
-#include <iostream>
 
 
 #include "R3BTraPoint.h"
@@ -42,8 +42,6 @@
 #define MASS_16F_MEV_C2    14909.9864966	//GS resonance 535keV above 15O+p
 #define MASS_15O_MEV_C2    13971.1785118
 		
-using std::cout;
-using std::endl;
 
 R3BTargetDigitizer::R3BTargetDigitizer() :
   FairTask("R3B Target Digitization scheme ") { 
@@ -64,8 +62,8 @@ void R3BTargetDigitizer::SetParContainers() {
   fTargetDigiPar = (R3BTargetDigiPar*)(rtdb->getContainer("R3BTargetDigiPar"));
 
   if ( fTargetDigiPar ) {
-      cout << "-I- R3BTargetDigitizer::SetParContainers() "<< endl;
-      cout << "-I- Container R3BTargetDigiPar  loaded " << endl;
+    LOG(INFO) << "R3BTargetDigitizer::SetParContainers() "<< FairLogger::endl;
+    LOG(INFO) << "Container R3BTargetDigiPar  loaded " << FairLogger::endl;
   }
 
 }
@@ -75,7 +73,7 @@ void R3BTargetDigitizer::SetParContainers() {
 
 InitStatus R3BTargetDigitizer::Init() {
 
-//  cout<<"Init "<<endl;
+//  LOG(INFO)<<"Init "<<FairLogger::endl;
   // Get input array 
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) Fatal("Init", "No FairRootManager");
@@ -102,7 +100,8 @@ void R3BTargetDigitizer::Exec(Option_t* opt) {
 
    Reset();
    eventNoTra+=1;
-     if(eventNoTra/1000. == (int)eventNoTra/1000.) cout<<"Event #: "<<eventNoTra-1<<endl;
+     if(eventNoTra/1000. == (int)eventNoTra/1000.)
+       LOG(INFO)<<"Event #: "<<eventNoTra-1<<FairLogger::endl;
      
      Int_t nentriesTra = fTargetPoints->GetEntries();
      Int_t nentries = fMCTrack->GetEntries();
@@ -144,7 +143,7 @@ void R3BTargetDigitizer::Exec(Option_t* opt) {
 //******************** Target **************************//
 
    for (Int_t l=0;l<nentries;l++){
-//   cout<<"entries "<<l<<endl;
+//   LOG(INFO)<<"entries "<<l<<FairLogger::endl;
      
      R3BMCTrack *aTrack = (R3BMCTrack*) fMCTrack->At(l);
      
@@ -165,11 +164,11 @@ void R3BTargetDigitizer::Exec(Option_t* opt) {
    Pxf=(Px*1000);
    Pyf=(Py*1000);
    Pzf=(Pz*1000);
-//   cout<<"In "<<"Pxf "<<Pxf<<" Pyf "<<Pyf<<" Pzf "<<Pzf<<endl;
+//   LOG(INFO)<<"In "<<"Pxf "<<Pxf<<" Pyf "<<Pyf<<" Pzf "<<Pzf<<FairLogger::endl;
    Pf_tot=sqrt(SQR(Pxf)+SQR(Pyf)+SQR(Pzf));
 //   f_beta=0.7579865;
    f_beta=sqrt((SQR(Pf_tot))/((SQR(MASS_15O_MEV_C2))+(SQR(Pf_tot))));
-//   cout<<"In "<<"Pf_tot "<<Pf_tot<<" f_beta "<<f_beta<<endl;
+//   LOG(INFO)<<"In "<<"Pf_tot "<<Pf_tot<<" f_beta "<<f_beta<<FairLogger::endl;
    }
    
    
@@ -177,11 +176,11 @@ void R3BTargetDigitizer::Exec(Option_t* opt) {
    Pxp1=(Px*1000);
    Pyp1=(Py*1000);
    Pzp1=(Pz*1000);
-//   cout<<"In "<<"Pxp1 "<<Pxp1<<" Pyp1 "<<Pyp1<<" Pzp1 "<<Pzp1<<endl;
+//   LOG(INFO)<<"In "<<"Pxp1 "<<Pxp1<<" Pyp1 "<<Pyp1<<" Pzp1 "<<Pzp1<<FairLogger::endl;
    Pp1_tot=sqrt(SQR(Pxp1)+SQR(Pyp1)+SQR(Pzp1));
 //   p1_beta=0.7579865;
    p1_beta=sqrt((SQR(Pp1_tot))/((SQR(MASS_PROTON_MEV_C2))+(SQR(Pp1_tot))));
-//   cout<<"In "<<"Pp1_tot "<<Pp1_tot<<" p1_beta "<<p1_beta<<endl;
+//   LOG(INFO)<<"In "<<"Pp1_tot "<<Pp1_tot<<" p1_beta "<<p1_beta<<FairLogger::endl;
    }    
    
      
@@ -207,12 +206,12 @@ void R3BTargetDigitizer::Exec(Option_t* opt) {
    Double_t py=SQR(Pyp1+Pyf);
    Double_t pz=SQR(Pzp1+Pzf);     
    p2=px+py+pz; // MeV^2/c^2
-//   cout<<"In "<<"px "<<px<<" py "<<py<<" pz "<<pz<<" sqrt_p2 "<<sqrt(p2)<<endl;
+//   LOG(INFO)<<"In "<<"px "<<px<<" py "<<py<<" pz "<<pz<<" sqrt_p2 "<<sqrt(p2)<<FairLogger::endl;
 
    Double_t E_f =1.0/sqrt(1-f_beta*f_beta)   * MASS_15O_MEV_C2; // *c   
    Double_t E_p1=1.0/sqrt(1-p1_beta*p1_beta) * MASS_PROTON_MEV_C2; // *c
    E2=(E_f+E_p1)*(E_f+E_p1); // MeV^2/c^2
-//   cout<<"In "<<"E_f "<<E_f<<" E_p1 "<<E_p1<<" sqrt_E2 "<<sqrt(E2)<<endl;
+//   LOG(INFO)<<"In "<<"E_f "<<E_f<<" E_p1 "<<E_p1<<" sqrt_E2 "<<sqrt(E2)<<FairLogger::endl;
   
 
    //  sqrt(MeV^2/c^2 - MeV^2/c^2)=MeV/c
@@ -220,7 +219,7 @@ void R3BTargetDigitizer::Exec(Option_t* opt) {
    estar=sqrt(E2-p2)-(MASS_15O_MEV_C2+MASS_PROTON_MEV_C2); // *c2
   
    
-//   cout<<"Estar In "<<Estar<<endl;
+//   LOG(INFO)<<"Estar In "<<Estar<<FairLogger::endl;
    
    ExEnIn_his->Fill(estar); 
   
@@ -233,7 +232,7 @@ void R3BTargetDigitizer::Exec(Option_t* opt) {
   
   
    for (Int_t l=0;l<nentriesTra;l++){
-//   cout<<"entries "<<l<<endl;
+//   LOG(INFO)<<"entries "<<l<<FairLogger::endl;
      
      R3BTraPoint *Tra_obj = (R3BTraPoint*) fTargetPoints->At(l);
 
@@ -303,7 +302,7 @@ AddHit(ss03_smul,ss03_kmul,ss06_smul,ss06_kmul,x0,y0,t0,estar,Pxf,Pyf,Pzf,Pf_tot
 
 void R3BTargetDigitizer::Reset(){
 // Clear the structure
-//   cout << " -I- Digit Reset() called " << endl;
+//   LOG(INFO) << " -I- Digit Reset() called " << FairLogger::endl;
 
    
  if (fTargetDigi ) fTargetDigi->Clear();

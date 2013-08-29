@@ -103,29 +103,16 @@ void R3BTra::Initialize()
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BTra::ProcessHits(FairVolume* vol)
 {
-	//      cout << " -I process hit called for:" <<  vol->GetName() << endl;
-	// Set parameters at entrance of volume. Reset ELoss.
-
-	//    if ( vol ) {
-	//        cout << " Name Id:copy "
-	//            << vol->getName() << " : " << vol->getMCid() << " : " << vol->getCopyNo() << endl;
-	//        Int_t copyNo=0;
-	//        cout << " Geant: " << gMC->CurrentVolID(copyNo) << ":" << copyNo << endl;
-	//    }
-
 	if ( gMC->IsTrackEntering() ) {
 		fELoss  = 0.;
 		fTime   = gMC->TrackTime() * 1.0e09;
 		fLength = gMC->TrackLength();
 		gMC->TrackPosition(fPosIn);
 		gMC->TrackMomentum(fMomIn);
-		//cout << "X,Y,X tracker=" << fPosIn(0) << " " << fPosIn(1) << " " << fPosIn(2) << endl;
-		//cout << "track length=" << fLength << endl;
 	}
 
 	// Sum energy loss for all steps in the active volume
 	fELoss += gMC->Edep();
-	//cout << "Tracker Eloss=" << fELoss << "  " << gMC->Edep() << endl;
 
 	// Set additional parameters at exit of active volume. Create R3BTraPoint.
 	if ( gMC->IsTrackExiting()    ||
@@ -149,8 +136,6 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol)
 			oldpos = gGeoManager->GetCurrentPoint();
 			olddirection = gGeoManager->GetCurrentDirection();
 
-			//       cout << "1st direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] << endl;
-
 			for (Int_t i=0; i<3; i++){
 				newdirection[i] = -1*olddirection[i];
 			}
@@ -164,13 +149,6 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol)
 
 			for (Int_t i=0; i<3; i++){
 				newpos[i] = oldpos[i] - (3*safety*olddirection[i]);
-			}
-
-			if ( fPosIn.Z() < 30. && newpos[2] > 30.02 ) {
-				LOG(ERROR) << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2]
-				<< " with safety = " << safety << FairLogger::endl;
-				LOG(ERROR) << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << FairLogger::endl;
-				LOG(ERROR) << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << FairLogger::endl;
 			}
 
 			fPosOut.SetX(newpos[0]);
@@ -200,13 +178,6 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol)
 // -----   Public method EndOfEvent   -----------------------------------------
 void R3BTra::BeginEvent()
 {
-	if(gGeoManager){
-		TGeoVolume * vol=gGeoManager->FindVolumeFast("TraLog");
-
-		if(vol){
-			//    cout << "id tracker serial number : " << vol->GetNumber() << endl;
-		}
-	}
 }
 
 

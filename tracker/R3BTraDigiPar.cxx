@@ -1,5 +1,5 @@
-#include <iostream>
 #include "R3BTraDigiPar.h"
+#include "FairLogger.h"
 #include "TMath.h"
 
 R3BTraDigiPar::R3BTraDigiPar(const char* name, const char* title, const char* context)
@@ -10,7 +10,7 @@ R3BTraDigiPar::R3BTraDigiPar(const char* name, const char* title, const char* co
 
 void R3BTraDigiPar::putParams(FairParamList* list)
 {
-  std::cout<<"-I- R3BTraDigiPar::putParams() called"<<std::endl;
+  LOG(INFO) << "R3BTraDigiPar::putParams() called" << FairLogger::endl;
   if(!list) return;
 //  list->add("max_paddle", (Int_t)nMaxPaddle);
 //  list->add("max_plane", (Int_t)nMaxPlane);
@@ -18,9 +18,9 @@ void R3BTraDigiPar::putParams(FairParamList* list)
 
 Bool_t R3BTraDigiPar::getParams(FairParamList* list)
 {
-  std::cout<<"-I- R3BTraDigiPar::getParams() called"<<std::endl;
+  LOG(INFO) << "R3BTraDigiPar::getParams() called" << FairLogger::endl;
   if (!list) return kFALSE;
-  std::cout<<"-I- R3BTraDigiPar::getParams() 1 ";
+  LOG(INFO) << "R3BTraDigiPar::getParams() 1 " << FairLogger::endl;
   
 //  if (!list->fill("max_paddle", &nMaxPaddle)) return kFALSE;
 //  if (!list->fill("max_plane", &nMaxPlane)) return kFALSE;
@@ -30,9 +30,9 @@ Bool_t R3BTraDigiPar::getParams(FairParamList* list)
 
 void R3BTraDigiPar::Print(Option_t *option) const
 {
-    std::cout<<"-I- Tra Digi Parameters:"<<std::endl;
-//    std::cout<<"   Max Paddle   = "<<nMaxPaddle<<std::endl;
-//    std::cout<<"   Max Plane   = "<<nMaxPlane<<std::endl;
+    LOG(INFO) << "Tra Digi Parameters:" << FairLogger::endl;
+//    LOG(INFO)<<"   Max Paddle   = "<<nMaxPaddle<<FairLogger::endl;
+//    LOG(INFO)<<"   Max Plane   = "<<nMaxPlane<<FairLogger::endl;
 }
 
 ClassImp(R3BTraDigiPar);

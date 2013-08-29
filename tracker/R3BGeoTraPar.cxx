@@ -7,9 +7,6 @@
 
 #include "TObjArray.h"
 
-#include <iostream>
-#include <iomanip>
-
 ClassImp(R3BGeoTraPar)
 
 R3BGeoTraPar::R3BGeoTraPar(const char* name,const char* title,const char* context)

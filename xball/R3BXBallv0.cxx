@@ -98,7 +98,7 @@ void R3BXBallv0::Initialize()
   FairDetector::Initialize();
   
   LOG(INFO) << "R3BXBallv0 initialisation" << FairLogger::endl;
-  LOG(DEBUG) << "R3BXBallv0: Vol. (McId)" << endl;
+  LOG(DEBUG) << "R3BXBallv0: Vol. (McId)" << FairLogger::endl;
   LOG(DEBUG) << "R3BXBallv0: Crystal A   : " << gMC->VolId("crystalLogNAJA")<< FairLogger::endl;
   LOG(DEBUG) << "R3BXBallv0: Crystal B   : " << gMC->VolId("crystalLogNAJB")<< FairLogger::endl;
   LOG(DEBUG) << "R3BXBallv0: Crystal C   : " << gMC->VolId("crystalLogNAJC")<< FairLogger::endl;

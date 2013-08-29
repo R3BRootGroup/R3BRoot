@@ -17,6 +17,7 @@
 #include "FairRuntimeDb.h"
 #include "FairRun.h"
 #include "FairVolume.h"
+#include "FairLogger.h"
 
 #include "TClonesArray.h"
 #include "TGeoMCGeometry.h"
@@ -42,11 +43,6 @@
 #include "TGeoBoolNode.h"
 #include "TGeoCompositeShape.h"
 #include "TGeoShapeAssembly.h"
-#include <iostream>
-
-using std::cout;
-using std::cerr;
-using std::endl;
 
 
 
@@ -96,9 +92,9 @@ void R3BTra::Initialize()
 {
   FairDetector::Initialize();
 
-   cout << endl;
-   cout << "-I- R3BTra: initialisation" << endl;
-   cout << "-I- R3BTra: Sens. Vol. (McId) " << gMC->VolId("TraLog")<< endl;
+   LOG(INFO) << FairLogger::endl;
+   LOG(INFO) << "-I- R3BTra: initialisation" << FairLogger::endl;
+   LOG(INFO) << "-I- R3BTra: Sens. Vol. (McId) " << gMC->VolId("TraLog")<< FairLogger::endl;
 
 }
 
@@ -107,14 +103,14 @@ void R3BTra::Initialize()
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BTra::ProcessHits(FairVolume* vol) {
 
-//      cout << " -I process hit called for:" <<  vol->GetName() << endl;
+//      LOG(INFO) << " -I process hit called for:" <<  vol->GetName() << FairLogger::endl;
 // Set parameters at entrance of volume. Reset ELoss.
 
 //    if ( vol ) {
-//        cout << " Name Id:copy "
-//            << vol->getName() << " : " << vol->getMCid() << " : " << vol->getCopyNo() << endl;
+//        LOG(INFO) << " Name Id:copy "
+//            << vol->getName() << " : " << vol->getMCid() << " : " << vol->getCopyNo() << FairLogger::endl;
 //        Int_t copyNo=0;
-//        cout << " Geant: " << gMC->CurrentVolID(copyNo) << ":" << copyNo << endl;
+//        LOG(INFO) << " Geant: " << gMC->CurrentVolID(copyNo) << ":" << copyNo << FairLogger::endl;
 //    }
 
 
@@ -127,13 +123,13 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
     fLength = gMC->TrackLength();
     gMC->TrackPosition(fPosIn);
     gMC->TrackMomentum(fMomIn);
-    //cout << "X,Y,X tracker=" << fPosIn(0) << " " << fPosIn(1) << " " << fPosIn(2) << endl;
-    //cout << "track length=" << fLength << endl;
+    //LOG(INFO) << "X,Y,X tracker=" << fPosIn(0) << " " << fPosIn(1) << " " << fPosIn(2) << FairLogger::endl;
+    //LOG(INFO) << "track length=" << fLength << FairLogger::endl;
   }
 
   // Sum energy loss for all steps in the active volume
       fELoss += gMC->Edep();
-    //cout << "Tracker Eloss=" << fELoss << "  " << gMC->Edep() << endl;
+    //LOG(INFO) << "Tracker Eloss=" << fELoss << "  " << gMC->Edep() << FairLogger::endl;
 
   // Set additional parameters at exit of active volume. Create R3BTraPoint.
   if ( gMC->IsTrackExiting()    ||
@@ -157,7 +153,7 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
       oldpos = gGeoManager->GetCurrentPoint();
       olddirection = gGeoManager->GetCurrentDirection();
       
-//       cout << "1st direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] << endl;
+//       LOG(INFO) << "1st direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] << FairLogger::endl;
 
       for (Int_t i=0; i<3; i++){
 	newdirection[i] = -1*olddirection[i];
@@ -176,9 +172,9 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
 
       if ( fPosIn.Z() < 30. && newpos[2] > 30.02 ) {
 	cerr << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] 
-	     << " with safety = " << safety << endl;
-	cerr << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << endl;
-	cerr << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << endl;
+	     << " with safety = " << safety << FairLogger::endl;
+	cerr << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << FairLogger::endl;
+	cerr << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << FairLogger::endl;
       }
 
       fPosOut.SetX(newpos[0]);
@@ -205,13 +201,13 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
 // ----------------------------------------------------------------------------
 //void R3BTra::SaveGeoParams(){
 //
-//  cout << " -I Save STS geo params " << endl;
+//  LOG(INFO) << " -I Save STS geo params " << FairLogger::endl;
 //
 //  TFolder *mf = (TFolder*) gDirectory->FindObjectAny("cbmroot");
-//  cout << " mf: " << mf << endl;
+//  LOG(INFO) << " mf: " << mf << FairLogger::endl;
 //  TFolder *stsf = NULL;
 //  if (mf ) stsf = (TFolder*) mf->FindObjectAny(GetName());
-//  cout << " stsf: " << stsf << endl;
+//  LOG(INFO) << " stsf: " << stsf << FairLogger::endl;
 //  if (stsf) stsf->Add( flGeoPar0 ) ;
  //  FairRootManager::Instance()->WriteFolder();
 //  mf->Write("cbmroot",TObject::kWriteDelete);
@@ -221,19 +217,19 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
 // -----   Public method EndOfEvent   -----------------------------------------
 void R3BTra::BeginEvent() {
 
-//  cout << "-I- begin tracker event called ##########" << endl;
+//  LOG(INFO) << "-I- begin tracker event called ##########" << FairLogger::endl;
 
   if(gGeoManager){
     TGeoVolume * vol=gGeoManager->FindVolumeFast("TraLog");
   
     if(vol){
-       //    cout << "id tracker serial number : " << vol->GetNumber() << endl;
+       //    LOG(INFO) << "id tracker serial number : " << vol->GetNumber() << FairLogger::endl;
     }
   }
 
 //  if (! kGeoSaved ) {
 //      SaveGeoParams();
-//  cout << "-I STS geometry parameters saved " << endl;
+//  LOG(INFO) << "-I STS geometry parameters saved " << FairLogger::endl;
 //  kGeoSaved = kTRUE;
 //  }
 
@@ -270,8 +266,8 @@ TClonesArray* R3BTra::GetCollection(Int_t iColl) const {
 // -----   Public method Print   ----------------------------------------------
 void R3BTra::Print() const {
   Int_t nHits = fTraCollection->GetEntriesFast();
-  cout << "-I- R3BTra: " << nHits << " points registered in this event." 
-       << endl;
+  LOG(INFO) << "-I- R3BTra: " << nHits << " points registered in this event." 
+       << FairLogger::endl;
 }
 // ----------------------------------------------------------------------------
 
@@ -289,7 +285,7 @@ void R3BTra::Reset() {
 // -----   Public method CopyClones   -----------------------------------------
 void R3BTra::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
   Int_t nEntries = cl1->GetEntriesFast();
-  cout << "-I- R3BTra: " << nEntries << " entries to add." << endl;
+  LOG(INFO) << "-I- R3BTra: " << nEntries << " entries to add." << FairLogger::endl;
   TClonesArray& clref = *cl2;
   R3BTraPoint* oldpoint = NULL;
    for (Int_t i=0; i<nEntries; i++) {
@@ -299,8 +295,8 @@ void R3BTra::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
     new (clref[fPosIndex]) R3BTraPoint(*oldpoint);
     fPosIndex++;
   }
-   cout << " -I- R3BTra: " << cl2->GetEntriesFast() << " merged entries."
-       << endl;
+   LOG(INFO) << " -I- R3BTra: " << cl2->GetEntriesFast() << " merged entries."
+       << FairLogger::endl;
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -311,9 +307,9 @@ R3BTraPoint* R3BTra::AddHit(Int_t trackID, Int_t detID, Int_t detCopyID, TVector
   TClonesArray& clref = *fTraCollection;
   Int_t size = clref.GetEntriesFast();
   if (fVerboseLevel>1) 
-    cout << "-I- R3BTra: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
+    LOG(INFO) << "-I- R3BTra: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
 	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
-	 << trackID << ", energy loss " << eLoss*1e06 << " keV" << endl;
+	 << trackID << ", energy loss " << eLoss*1e06 << " keV" << FairLogger::endl;
   return new(clref[size]) R3BTraPoint(trackID, detID, detCopyID, posIn, posOut,
 				      momIn, momOut, time, length, eLoss); // detCopy added by Marc
 }
@@ -516,7 +512,7 @@ void R3BTra::ConstructGeometry() {
 	// Material: Gold
 	TGeoMedium * pMed79=NULL;
 	if (gGeoManager->GetMedium("Gold") ){
-		cout << "-I- TGeoManager: Gold Medium already defined " << endl;
+		LOG(INFO) << "-I- TGeoManager: Gold Medium already defined " << FairLogger::endl;
 		pMed79 = gGeoManager->GetMedium("Gold");
 	}else{
 		// Material definition
