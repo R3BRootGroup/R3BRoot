@@ -4,7 +4,7 @@
 //
 //         Author: Hector Alvarez <hector.alvarez@usc.es>
 //
-//         Last Update: 15/11/2012
+//         Last Update: 09/09/2013
 //
 //         Comments:
 //
@@ -27,15 +27,19 @@
 
 
 
-void r3ball(Int_t nEvents = 1,
-	    TObjArray& fDetList,
+void r3ball(Int_t nEvents = 1,            
+	    TMap& fDetList,
 	    TString Target = "LeadTarget",
             Bool_t fVis=kFALSE,
 	    TString fMC="TGeant3",
 	    TString fGenerator="box",
 	    Bool_t fUserPList= kFALSE,
 	    Bool_t fR3BMagnet = kTRUE,
-            Bool_t fCaloHitFinder = kFALSE )
+            Bool_t fCaloHitFinder = kFALSE,
+	    Double_t fMeasCurrent = 2000.,
+            TString OutFile = "r3bsim.root",
+            TString ParFile = "r3bpar.root",
+            TString InFile = "evt_gen.dat")
 {
 
 
@@ -47,11 +51,6 @@ void r3ball(Int_t nEvents = 1,
 
   TString r3b_confdir = dir + "gconfig";
   gSystem->Setenv("CONFIG_DIR",r3b_confdir.Data());
-
-// Output files
-  TString OutFile = "r3bsim.root";
-  TString ParFile = "r3bpar.root";
-
 
   // In general, the following parts need not be touched
   // ========================================================================
@@ -115,245 +114,128 @@ void r3ball(Int_t nEvents = 1,
 
   //R3B Target definition
   if (fDetList.FindObject("TARGET") ) {
-      R3BModule* target= new R3BTarget(Target.Data());
-      // Global Lab. Rotation
-      phi    =  0.0; // (deg)
-      theta  =  0.0; // (deg)
-      psi    =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx    =  0.0; // (cm)
-      ty    =  0.0; // (cm)
-      tz    =  0.0; // (cm)
-     //target->SetRotAnglesEuler(phi,theta,psi);
-     target->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-     target->SetTranslation(tx,ty,tz);
-      run->AddModule(target);
+    R3BModule* target= new R3BTarget(Target.Data());
+    target->SetGeometryFileName(((TObjString*)fDetList.GetValue("TARGET"))->GetString().Data());
+    run->AddModule(target);
   }
 
+  //R3B SiTracker Cooling definition
+  if (fDetList.FindObject("VACVESSELCOOL") ) {
+    R3BModule* vesselcool= new R3BVacVesselCool(Target.Data());
+    vesselcool->SetGeometryFileName(((TObjString*)fDetList.GetValue("VACVESSELCOOL"))->GetString().Data());
+    run->AddModule(vesselcool);
+  }
   //R3B Magnet definition
   if (fDetList.FindObject("ALADIN") ) {
     fFieldMap = 0;
     R3BModule* mag = new R3BMagnet("AladinMagnet");
-    mag->SetGeometryFileName("aladin_v13a.geo.root");
+    mag->SetGeometryFileName(((TObjString*)fDetList.GetValue("ALADIN"))->GetString().Data());
     run->AddModule(mag);
   }
 
   //R3B Magnet definition
   if (fDetList.FindObject("GLAD") ) {
-      fFieldMap = 1;
-      R3BModule* mag = new R3BGladMagnet("GladMagnet");
-      // Global position of the Module
-      phi   =  0.0; // (deg)
-      theta =  0.0; // (deg)
-      psi   =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx    =  0.0; // (cm)
-      ty    =  0.0; // (cm)
-      tz    =  0.0; // (cm)
-      //mag->SetRotAnglesEuler(phi,theta,psi);
-      mag->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      mag->SetTranslation(tx,ty,tz);
-      run->AddModule(mag);
+    fFieldMap = 1;
+    R3BModule* mag = new R3BGladMagnet("GladMagnet");
+    mag->SetGeometryFileName(((TObjString*)fDetList.GetValue("GLAD"))->GetString().Data());
+    run->AddModule(mag);
   }
 
   if (fDetList.FindObject("CRYSTALBALL") ) {
     //R3B Crystal Calorimeter
     R3BDetector* xball = new R3BXBall("XBall", kTRUE);
-    xball->SetGeometryFileName("cal_v13a.geo.root");
+    xball->SetGeometryFileName(((TObjString*)fDetList.GetValue("CRYSTALBALL"))->GetString().Data());
     run->AddModule(xball);
   }
-
+  
   if (fDetList.FindObject("CALIFA") ) {
     // CALIFA Calorimeter
     R3BDetector* calo = new R3BCalo("Califa", kTRUE);
     ((R3BCalo *)calo)->SelectGeometryVersion(10);
     //Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
     ((R3BCalo *)calo)->SetNonUniformity(1.0);
-    calo->SetGeometryFileName("califa_v13_811.geo.root");
+    calo->SetGeometryFileName(((TObjString*)fDetList.GetValue("CALIFA"))->GetString().Data());
     run->AddModule(calo);
   }
-
+  
   // Tracker
   if (fDetList.FindObject("TRACKER")  ) {
-      R3BDetector* tra = new R3BTra("Tracker", kTRUE);
-      // Global position of the Module
-      phi   =  0.0; // (deg)
-      theta =  0.0; // (deg)
-      psi   =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx    =  0.0; // (cm)
-      ty    =  0.0; // (cm)
-      tz    =  0.0; // (cm)
-      //tra->SetRotAnglesEuler(phi,theta,psi);
-      tra->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      tra->SetTranslation(tx,ty,tz);
-      // User defined Energy CutOff
-      Double_t fCutOffSi = 1.0e-06;  // Cut-Off -> 10KeV only in Si
-      ((R3BTra*) tra)->SetEnergyCutOff(fCutOffSi);
-      run->AddModule(tra);
+    R3BDetector* tra = new R3BTra("Tracker", kTRUE);
+    tra->SetGeometryFileName(((TObjString*)fDetList.GetValue("TRACKER"))->GetString().Data());
+    run->AddModule(tra);
   }
   
+  // STaRTrack
+  if (fDetList.FindObject("STaRTrack")  ) {
+    R3BDetector* tra = new R3BSTaRTra("STaRTrack", kTRUE);
+    tra->SetGeometryFileName(((TObjString*)fDetList.GetValue("STaRTrack"))->GetString().Data());
+    run->AddModule(tra);
+  }
+
   // DCH drift chambers
   if (fDetList.FindObject("DCH") ) {
-      R3BDetector* dch = new R3BDch("Dch", kTRUE);
-      ((R3BDch*) dch )->SetHeliumBag(kTRUE);
-      // Global position of the Module
-      phi   =  0.0; // (deg)
-      theta =  0.0; // (deg)
-      psi   =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx    =  0.0; // (cm)
-      ty    =  0.0; // (cm)
-      tz    =  0.0; // (cm)
-     //dch->SetRotAnglesEuler(phi,theta,psi);
-      dch->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      dch->SetTranslation(tx,ty,tz);
-      run->AddModule(dch);
+    R3BDetector* dch = new R3BDch("Dch", kTRUE);
+    dch->SetGeometryFileName(((TObjString*)fDetList.GetValue("DCH"))->GetString().Data());
+    run->AddModule(dch);
   }
-
+  
   // Tof
   if (fDetList.FindObject("TOF") ) {
-      R3BDetector* tof = new R3BTof("Tof", kTRUE);
-      // Global position of the Module
-      thetaX   =  0.0; // (deg)
-      thetaY   =  0.0; // (deg)
-      thetaZ   =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx       =  0.0; // (cm)
-      ty       =  0.0; // (cm)
-      tz       =  0.0; // (cm)
-      tof->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      tof->SetTranslation(tx,ty,tz);
-      // User defined Energy CutOff
-      Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
-      ((R3BTof*) tof)->SetEnergyCutOff(fCutOffSci);
-      run->AddModule(tof);
+    R3BDetector* tof = new R3BTof("Tof", kTRUE);
+    tof->SetGeometryFileName(((TObjString*)fDetList.GetValue("TOF"))->GetString().Data());
+    run->AddModule(tof);
   }
-
+  
   // mTof
   if (fDetList.FindObject("MTOF") ) {
-      R3BDetector* mTof = new R3BmTof("mTof", kTRUE);
-      // Global position of the Module
-      phi   =  0.0; // (deg)
-      theta =  0.0; // (deg)
-      psi   =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx    =  0.0; // (cm)
-      ty    =  0.0; // (cm)
-      tz    =  0.0; // (cm)
-      //mTof->SetRotAnglesEuler(phi,theta,psi);
-      mTof->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      mTof->SetTranslation(tx,ty,tz);
-      // User defined Energy CutOff
-      Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
-      ((R3BmTof*) mTof)->SetEnergyCutOff(fCutOffSci);
-      run->AddModule(mTof);
+    R3BDetector* mTof = new R3BmTof("mTof", kTRUE);
+    mTof->SetGeometryFileName(((TObjString*)fDetList.GetValue("MTOF"))->GetString().Data());
+    run->AddModule(mTof);
   }
-
+  
   // GFI detector
   if (fDetList.FindObject("GFI") ) {
-      R3BDetector* gfi = new R3BGfi("Gfi", kTRUE);
-      // Global position of the Module
-      phi   =  0.0; // (deg)
-      theta =  0.0; // (deg)
-      psi   =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx    =  0.0; // (cm)
-      ty    =  0.0; // (cm)
-      tz    =  0.0; // (cm)
-      gfi->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      gfi->SetTranslation(tx,ty,tz);
-      // User defined Energy CutOff
-      Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
-      ((R3BGfi*) gfi)->SetEnergyCutOff(fCutOffSci);
-      run->AddModule(gfi);
+    R3BDetector* gfi = new R3BGfi("Gfi", kTRUE);
+    gfi->SetGeometryFileName(((TObjString*)fDetList.GetValue("GFI"))->GetString().Data());
+    run->AddModule(gfi);
   }
-
+  
   // Land Detector
   if (fDetList.FindObject("LAND") ) {
     R3BDetector* land = new R3BLand("Land", kTRUE);
     land->SetVerboseLevel(1);
-    land->SetGeometryFileName("land_v12a_10m.geo.root");
+    land->SetGeometryFileName(((TObjString*)fDetList.GetValue("LAND"))->GetString().Data());
     run->AddModule(land);
   }
-
-  // Chimera
-  if (fDetList.FindObject("CHIMERA") ) {
-      R3BDetector* chim = new R3BChimera("Chimera", kTRUE);
-      chim->SetGeometryFileName("chimera.root");
-      // Global position of the Module
-      thetaX   =  0.0; // (deg)
-      thetaY   =  0.0; // (deg)
-      thetaZ   =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx       =  0.0; // (cm)
-      ty       =  0.0; // (cm)
-      tz       =  0.0; // (cm)
-      chim->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      chim->SetTranslation(tx,ty,tz);
-      // User defined Energy CutOff
-      //Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
-      //((R3BChimera*) chim)->SetEnergyCutOff(fCutOffSci);
-      run->AddModule(chim);
+  
+  // NeuLand Scintillator Detector
+  if(fDetList.FindObject("SCINTNEULAND")) {
+    R3BDetector* land = new R3BLand("Land", kTRUE);
+    land->SetVerboseLevel(1);
+    land->SetGeometryFileName(((TObjString*)fDetList.GetValue("SCINTNEULAND"))->GetString().Data());
+    run->AddModule(land);
+  }
+  
+  // MFI Detector
+  if(fDetList.FindObject("MFI")) {
+    R3BDetector* mfi = new R3BMfi("Mfi", kTRUE);
+    mfi->SetGeometryFileName(((TObjString*)fDetList.GetValue("MFI"))->GetString().Data());
+    run->AddModule(mfi);
   }
 
+  // PSP Detector
+  if(fDetList.FindObject("PSP")) {
+    R3BDetector* psp = new R3BPsp("Psp", kTRUE);
+    psp->SetGeometryFileName(((TObjString*)fDetList.GetValue("PSP"))->GetString().Data());
+    run->AddModule(psp);
+  }
+  
   // Luminosity detector
   if (fDetList.FindObject("LUMON") ) {
-      R3BDetector* lumon = new ELILuMon("LuMon", kTRUE);
-      //lumon->SetGeometryFileName("lumon.root");
-      // Global position of the Module
-      thetaX   =  0.0; // (deg)
-      thetaY   =  0.0; // (deg)
-      thetaZ   =  0.0; // (deg)
-      // Rotation in Ref. Frame.
-      thetaX =  0.0; // (deg)
-      thetaY =  0.0; // (deg)
-      thetaZ =  0.0; // (deg)
-      // Global translation in Lab
-      tx       =  0.0; // (cm)
-      ty       =  0.0; // (cm)
-      tz       =  200.0; // (cm)
-      lumon->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      lumon->SetTranslation(tx,ty,tz);
-      // User defined Energy CutOff
-      //Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
-      //((ELILuMon*) lumon)->SetEnergyCutOff(fCutOffSci);
-      run->AddModule(lumon);
+    R3BDetector* lumon = new ELILuMon("LuMon", kTRUE);
+    lumon->SetGeometryFileName(((TObjString*)fDetList.GetValue("LUMON"))->GetString().Data());
+    run->AddModule(lumon);
   }
-
-
   
   // -----   Create R3B  magnetic field ----------------------------------------
   Int_t typeOfMagneticField = 0;
@@ -363,30 +245,27 @@ void r3ball(Int_t nEvents = 1,
   //NB: <D.B>
   // If the Global Position of the Magnet is changed
   // the Field Map has to be transformed accordingly
-
   if (fFieldMap == 0) {
-    R3BFieldMap* magField = new R3BFieldMap(typeOfMagneticField,fVerbose);
-    magField->SetPosition(0., 0., 0.);
+    R3BAladinFieldMap* magField = new R3BAladinFieldMap("AladinMaps");
+    magField->SetCurrent(fMeasCurrent);
     magField->SetScale(fieldScale);
-
+    
     if ( fR3BMagnet == kTRUE ) {
-	run->SetField(magField);
+      run->SetField(magField);
     } else {
-	run->SetField(NULL);
+      run->SetField(NULL);
     }
   } else if(fFieldMap == 1){
     R3BGladFieldMap* magField = new R3BGladFieldMap("R3BGladMap");
     magField->SetPosition(0., 0., +350-119.94);
     magField->SetScale(fieldScale);
-
+    
     if ( fR3BMagnet == kTRUE ) {
-	run->SetField(magField);
+      run->SetField(magField);
     } else {
-	run->SetField(NULL);
+      run->SetField(NULL);
     }
   }  //! end of field map section
-
-
 
   // -----   Create PrimaryGenerator   --------------------------------------
 
@@ -409,12 +288,10 @@ void r3ball(Int_t nEvents = 1,
   } 
 	
   if (fGenerator.CompareTo("ascii") == 0  ) {
-	  // R3B Ascii Generator
-	  R3BAsciiGenerator* asciiGen = new R3BAsciiGenerator("muchos_iones.txt");
-	  // add the ascii generator
-	  primGen->AddGenerator(asciiGen);
-  } 
-	
+    R3BAsciiGenerator* gen = new R3BAsciiGenerator((dir+"/input/"+InFile).Data());
+    primGen->AddGenerator(gen);
+  }
+  
 
   if (fGenerator.CompareTo("box") == 0  ) {
 	  // 2- Define the BOX generator
@@ -437,12 +314,12 @@ void r3ball(Int_t nEvents = 1,
 	// 2- Define the CALIFA Test gamma generator
 	Double_t pdgId=22; // gamma emission
 	//Double_t pdgId=2212; // proton emission
-	Double_t theta1= 90.;  // polar angle distribution
+	Double_t theta1= 0.;  // polar angle distribution
 	Double_t theta2= 180.;	
 	//Double_t theta2= 90.;	
 	//Double_t momentum=0.002; // 0.010 GeV/c = 10 MeV/c 
-	Double_t momentumI=0.019; // 0.010 GeV/c = 10 MeV/c 
-	Double_t momentumF=0.045; // 0.010 GeV/c = 10 MeV/c 
+	Double_t momentumI=0.002; // 0.010 GeV/c = 10 MeV/c 
+	Double_t momentumF=0.002; // 0.010 GeV/c = 10 MeV/c 
 	//Double_t momentumF=0.808065; // 0.808065 GeV/c (300MeV Kin Energy for protons) 
 	//Double_t momentumI=0.31016124; // 0.31016124 GeV/c (50MeV Kin Energy for protons)
 	//Double_t momentum=0.4442972; // 0.4442972 GeV/c (100MeV Kin Energy for protons)
@@ -517,12 +394,12 @@ void r3ball(Int_t nEvents = 1,
 
 
   //-------Set visualisation flag to true------------------------------------
-  if (fVis==kTRUE){
-     run->SetStoreTraj(kTRUE);
-  }else{
-     run->SetStoreTraj(kFALSE);
-  }   
+  run->SetStoreTraj(fVis);
+  
 
+  FairLogger::GetLogger()->SetLogVerbosityLevel("LOW");
+
+ 
   // ----- Initialize CaloHitFinder task ------------------------------------
   if(fCaloHitFinder) {
     R3BCaloHitFinder* caloHF = new R3BCaloHitFinder();
@@ -539,16 +416,21 @@ void r3ball(Int_t nEvents = 1,
   // ------  Increase nb of step for CALO
   Int_t nSteps = -15000;
   gMC->SetMaxNStep(nSteps);
-
+  
+  
   // -----   Runtime database   ---------------------------------------------
+  R3BFieldPar* fieldPar = (R3BFieldPar*) rtdb->getContainer("R3BFieldPar");
+  fieldPar->SetParameters(magField);
+  fieldPar->setChanged();
   Bool_t kParameterMerged = kTRUE;
   FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
   parOut->open(ParFile.Data());
   rtdb->setOutput(parOut);
   rtdb->saveOutput();
   rtdb->print();
-   
-  // -----   Start run   ----------------------------------------------------
+  
+
+// -----   Start run   ----------------------------------------------------
   if (nEvents>0) run->Run(nEvents);
   
   // -----   Finish   -------------------------------------------------------
