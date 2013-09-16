@@ -11,16 +11,16 @@ using std::endl;
 using std::flush;
 
 
+
 // -----   Default constructor   -------------------------------------------
-R3BNeuLandPoint::R3BNeuLandPoint() : FairMCPoint() {
-  fX_out      = fY_out  = fZ_out  = 0.;
-  fPx_out     = fPy_out = fPz_out = 0.;
-  fEventID = -1;
-  fMot0TrackID = -1 ;
-  fDetID = -1 ;
-  fCellID   = -1 ;
-  fSegID   = -1 ;
-  fMass = 0.0;
+R3BNeuLandPoint::R3BNeuLandPoint()
+  : FairMCPoint(),
+    fX_out(0.), fY_out(0.), fZ_out(0.),
+    fPx_out(0.), fPy_out(0.), fPz_out(0.),
+    fEventID(-1), fMot0TrackID(-1),
+    fDetID(-1), fCellID(-1), fSegID(-1),
+    fMass(0.)
+{
 }
 // -------------------------------------------------------------------------
 
@@ -34,37 +34,46 @@ R3BNeuLandPoint::R3BNeuLandPoint(Int_t eventID, Int_t trackID,
 				 TVector3 posIn,
 				 TVector3 posOut, TVector3 momIn, TVector3 momOut,
 				 Double_t tof, Double_t length, Double_t eLoss)
-  : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss) {
-  fX_out  = posOut.X();
-  fY_out  = posOut.Y();
-  fZ_out  = posOut.Z();
-  fPx_out = momOut.Px();
-  fPy_out = momOut.Py();
-  fPz_out = momOut.Pz();
-  fEventID = eventID;
-  fMot0TrackID = mot0trackID;
-  fDetID = detID;
-  fCellID = cellID;
-  fSegID = segID;
-  fMass = mass;
+  : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss),
+    fX_out(posOut.X()), fY_out(posOut.Y()), fZ_out(posOut.Z()),
+    fPx_out(momOut.X()), fPy_out(momOut.Y()), fPz_out(momOut.Z()),
+    fEventID(eventID), fMot0TrackID(mot0trackID),
+    fDetID(detID), fCellID(cellID), fSegID(segID),
+    fMass(mass)
+{
+}
+// -------------------------------------------------------------------------
+
+
+
+// -----   Copy constructor   ----------------------------------------------
+R3BNeuLandPoint::R3BNeuLandPoint(const R3BNeuLandPoint& right)
+  : FairMCPoint(right),
+    fX_out(right.fX_out), fY_out(right.fY_out), fZ_out(right.fZ_out),
+    fPx_out(right.fPx_out), fPy_out(right.fPy_out), fPz_out(right.fPz_out),
+    fEventID(right.fEventID), fMot0TrackID(right.fMot0TrackID),
+    fDetID(right.fDetID), fCellID(right.fCellID), fSegID(right.fSegID),
+    fMass(right.fMass)
+{
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Destructor   ----------------------------------------------------
-R3BNeuLandPoint::~R3BNeuLandPoint() { }
+R3BNeuLandPoint::~R3BNeuLandPoint()
+{
+}
 // -------------------------------------------------------------------------
 
 
 
-
 // -----   Public method Print   -------------------------------------------
-void R3BNeuLandPoint::Print(const Option_t* opt) const {
+void R3BNeuLandPoint::Print(const Option_t* opt) const
+{
   cout << "-I- R3BNeuLandPoint: LAND Point for track " << fTrackID
-	<< " in detector " << fDetID
+       << " in detector " << fDetID
        << " Cell: " << fCellID << endl;
-
   cout << "    Position (" << fX << ", " << fY << ", " << fZ
        << ") cm" << endl;
   cout << "    Momentum (" << fPx << ", " << fPy << ", " << fPz
@@ -77,7 +86,8 @@ void R3BNeuLandPoint::Print(const Option_t* opt) const {
 
 
 // -----   Point x coordinate from linear extrapolation   ------------------
-Double_t R3BNeuLandPoint::GetX(Double_t z) const {
+Double_t R3BNeuLandPoint::GetX(Double_t z) const
+{
   //  cout << fZ << " " << z << " " << fZ_out << endl;
   if ( (fZ_out-z)*(fZ-z) >= 0. ) return (fX_out+fX)/2.;
   Double_t dz = fZ_out - fZ;
@@ -88,7 +98,8 @@ Double_t R3BNeuLandPoint::GetX(Double_t z) const {
 
 
 // -----   Point y coordinate from linear extrapolation   ------------------
-Double_t R3BNeuLandPoint::GetY(Double_t z) const {
+Double_t R3BNeuLandPoint::GetY(Double_t z) const
+{
   if ( (fZ_out-z)*(fZ-z) >= 0. ) return (fY_out+fY)/2.;
   Double_t dz = fZ_out - fZ;
   //  if ( TMath::Abs(dz) < 1.e-3 ) return (fY_out+fY)/2.;
@@ -99,12 +110,14 @@ Double_t R3BNeuLandPoint::GetY(Double_t z) const {
 
 
 // -----   Public method IsUsable   ----------------------------------------
-Bool_t R3BNeuLandPoint::IsUsable() const {
+Bool_t R3BNeuLandPoint::IsUsable() const
+{
   Double_t dz = fZ_out - fZ;
   if ( TMath::Abs(dz) < 1.e-4 ) return kFALSE;
   return kTRUE;
 }
 // -------------------------------------------------------------------------
+
 
 
 ClassImp(R3BNeuLandPoint)

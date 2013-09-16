@@ -20,10 +20,12 @@ class R3BNeutronTrack :  public TObject
   R3BNeutronTrack(TVector3 posIn, TVector3 posOut, TVector3 momOut, Double_t tof);
 
   /** Copy constructor **/
-  R3BNeutronTrack(const R3BNeutronTrack& point) { *this = point; };
+  R3BNeutronTrack(const R3BNeutronTrack&);
 
   /** Destructor **/
   virtual ~R3BNeutronTrack();
+
+  R3BNeutronTrack& operator=(const R3BNeutronTrack&) { return *this; }
 
   /** Output to screen **/
   virtual void Print(const Option_t* opt) const;

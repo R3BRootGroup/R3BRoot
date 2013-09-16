@@ -45,11 +45,14 @@ class R3BLandPoint : public FairMCPoint
 
 
   /** Copy constructor **/
-  R3BLandPoint(const R3BLandPoint& point) { *this = point; };
+  R3BLandPoint(const R3BLandPoint&);
 
 
   /** Destructor **/
   virtual ~R3BLandPoint();
+
+
+  R3BLandPoint& operator=(const R3BLandPoint&) { return *this; }
 
 
   /** Accessors **/

@@ -20,9 +20,11 @@ class R3BPaddleCrystalHit : public FairHit
   /** Default constructor **/
   R3BPaddleCrystalHit();
   /** Copy constructor **/
-  R3BPaddleCrystalHit(const R3BPaddleCrystalHit& point) { *this = point; };
+  R3BPaddleCrystalHit(const R3BPaddleCrystalHit&);
   /** Destructor **/
   virtual ~R3BPaddleCrystalHit();
+
+  R3BPaddleCrystalHit& operator=(const R3BPaddleCrystalHit&) { return *this; }
 
   /** Output to screen **/
   virtual void Print(const Option_t* opt) const;

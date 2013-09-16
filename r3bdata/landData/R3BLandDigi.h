@@ -32,10 +32,12 @@ class R3BLandDigi : public TObject
 	               Double_t qdcR, Double_t qdcL);
    
   /** Copy constructor **/
-  R3BLandDigi(const R3BLandDigi& point) { *this = point; };
+  R3BLandDigi(const R3BLandDigi&);
 
   /** Destructor **/
   virtual ~R3BLandDigi();
+
+  R3BLandDigi& operator=(const R3BLandDigi&) { return *this; }
 
   /** Output to screen **/
   virtual void Print(const Option_t* opt) const;

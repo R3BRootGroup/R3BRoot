@@ -32,10 +32,12 @@ class R3BLandFirstHits : public TObject
                    Double_t x5, Double_t y5, Double_t z5, Double_t t5);
    
   /** Copy constructor **/
-  R3BLandFirstHits(const R3BLandFirstHits& point) { *this = point; };
+  R3BLandFirstHits(const R3BLandFirstHits&);
 
   /** Destructor **/
   virtual ~R3BLandFirstHits();
+
+  R3BLandFirstHits& operator=(const R3BLandFirstHits&) { return *this; }
 
   /** Output to screen **/
   virtual void Print(const Option_t* opt) const;

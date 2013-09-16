@@ -27,10 +27,12 @@ class R3BLandHit : public FairHit
   R3BLandHit();
 
   /** Copy constructor **/
-  R3BLandHit(const R3BLandHit& point) { *this = point; };
+  R3BLandHit(const R3BLandHit&);
 
   /** Destructor **/
   virtual ~R3BLandHit();
+
+  R3BLandHit& operator=(const R3BLandHit&) { return *this; }
 
   /** Output to screen **/
   virtual void Print(const Option_t* opt) const;
