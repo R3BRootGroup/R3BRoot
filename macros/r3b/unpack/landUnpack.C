@@ -9,7 +9,7 @@
 //  FairRemoteSource* source  = new FairRemoteSource("lxi047");
   FairLmdSource* source  = new FairLmdSource();
   source->AddFile("/Users/kresan/neuland/r258_2986.lmd");
-//  source->AddFile("/Users/kresan/neuland/r323_3607.lmd");
+  source->AddFile("/Users/kresan/neuland/r323_3607.lmd");
 
   char* strCalDir = "/Users/kresan/r3b/r3broot/calfiles/land/";
   Short_t type = 94;
@@ -65,7 +65,7 @@
   
   
   // Run -----------------------------------------------------------------------
-  run->Run(1000, 0);
+  run->Run(1000000, 0);
   // ---------------------------------------------------------------------------
 
 
