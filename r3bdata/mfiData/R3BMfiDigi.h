@@ -27,10 +27,12 @@ class R3BMfiDigi : public TObject
   R3BMfiDigi(Int_t mf1mul,Double_t mf1x, Int_t fiber);
   
   /** Copy constructor **/
-  R3BMfiDigi(const R3BMfiDigi& point) { *this = point; };
+  R3BMfiDigi(const R3BMfiDigi&);
 
   /** Destructor **/
   virtual ~R3BMfiDigi();
+
+  R3BMfiDigi& operator=(const R3BMfiDigi&) { return *this; }
 
   /** Output to screen **/
   virtual void Print(const Option_t* opt) const;

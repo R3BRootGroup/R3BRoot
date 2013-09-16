@@ -44,7 +44,10 @@ class ELILuMonPoint : public FairMCPoint
 
 
   /** Copy constructor **/
-  ELILuMonPoint(const ELILuMonPoint& point) { *this = point; };
+  ELILuMonPoint(const ELILuMonPoint&);
+
+
+  ELILuMonPoint& operator=(const ELILuMonPoint&) { return *this; }
 
 
   /** Destructor **/

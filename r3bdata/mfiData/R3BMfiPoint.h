@@ -45,11 +45,14 @@ class R3BMfiPoint : public FairMCPoint
 
 
   /** Copy constructor **/
-  R3BMfiPoint(const R3BMfiPoint& point) { *this = point; };
+  R3BMfiPoint(const R3BMfiPoint&);
 
 
   /** Destructor **/
   virtual ~R3BMfiPoint();
+
+
+  R3BMfiPoint& operator=(const R3BMfiPoint&) { return *this; }
 
 
   /** Accessors **/
