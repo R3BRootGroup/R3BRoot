@@ -89,7 +89,10 @@ private:
 
 public:
   R3BSpecificGenerator();
+  R3BSpecificGenerator(const R3BSpecificGenerator&);
   ~R3BSpecificGenerator();
+
+  R3BSpecificGenerator& operator=(const R3BSpecificGenerator&) { return *this; }
 
   /** Initializer **/
   virtual Bool_t Init();

@@ -1,29 +1,24 @@
 
 #include "R3BBeamInfo.h"
 
-ClassImp(R3BBeamInfo)
-  
-R3BBeamInfo::R3BBeamInfo() {
-  //
-  // Init values
-  //
-  theta = 0;        
-  phi =0;          
 
-  xPos = 0.;
-  yPos = 0.;
-  zPos = 0.;
+R3BBeamInfo::R3BBeamInfo()
+  : theta(0.), phi(0.),
+    xPos(0.), yPos(0.), zPos(0.)
+{
 }
 
 
-R3BBeamInfo::~R3BBeamInfo(){
+R3BBeamInfo::~R3BBeamInfo()
+{
   //
   // Destructor. Makes nothing
   //
 }
 
 
-void R3BBeamInfo::print(void){
+void R3BBeamInfo::print(void)
+{
   //
   // Prints info
   //
@@ -47,3 +42,6 @@ void R3BBeamInfo::SetAngles(Double_t angleTheta, Double_t anglePhi){
   theta = angleTheta;
   phi = anglePhi;
 }
+
+
+ClassImp(R3BBeamInfo)

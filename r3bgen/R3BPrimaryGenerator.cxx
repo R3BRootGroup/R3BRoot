@@ -129,7 +129,7 @@ Bool_t R3BPrimaryGenerator::ExtendIon(Int_t pdgid){
        TString fFilename  = WorkDir + "/input/chimera/plist.in";
 
        FILE* in=fopen(fFilename.Data(),"r");
-	fgets(c,200,in);
+       if(fgets(c,200,in)) {;}
 	//cout<<"line0: "<<c<<endl;
 
 	while((c[0]=getc(in))!=EOF){

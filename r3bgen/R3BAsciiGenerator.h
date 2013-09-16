@@ -35,6 +35,12 @@ class R3BAsciiGenerator : public FairGenerator
   R3BAsciiGenerator(const char* fileName);
 
 
+  R3BAsciiGenerator(const R3BAsciiGenerator&);
+
+
+  R3BAsciiGenerator& operator=(const R3BAsciiGenerator&) { return *this; }
+
+
   /** Destructor. **/
   virtual ~R3BAsciiGenerator();
 

@@ -6,26 +6,16 @@
 
 using namespace std;
 
-ClassImp(R3BBackTracking)
 
-
-R3BBackTracking::R3BBackTracking(){
+R3BBackTracking::R3BBackTracking()
+  : px1(0.), py1(0.), pz1(0.), pprim(0.),
+    x1(0.), y1(0.), z1(0.),
+    x0(0.), y0(0.), z0(0.), 
+    inputFile(NULL)
+{
   //
   // Constructor
   //
-
-  px1 = 0.; //unitary momentum components for particle 1
-  py1 = 0.;
-  pz1 = 0.;
-  pprim = 0.;//real momentum (obtained with the simulation)
-  x1 = 0.; //position in DCH2 (starting point)
-  y1=0.;
-  z1=0.;
-  x0=0.; //position measured in target
-  y0=0.;
-  z0=0.;
-
-    
   TString WorkDir = gSystem->Getenv("VMCWORKDIR");
   TString kine = WorkDir+"/input/kine/reconstructionSim.dat";
   inputFile = new ifstream(kine.Data());
@@ -33,15 +23,27 @@ R3BBackTracking::R3BBackTracking(){
   // cout << "Entrada en fichero"<< *inputFile.tellg() << endl;
   //while(!eof) *inputFile.peek();
   //cout << "Salida de fichero"<<*inputFile.tellg()<< endl; 
-  }
+}
+
+
+R3BBackTracking::R3BBackTracking(const R3BBackTracking& right)
+  : px1(right.px1), py1(right.py1), pz1(right.pz1), pprim(right.pprim),
+    x1(right.x1), y1(right.y1), z1(right.z1),
+    x0(right.x0), y0(right.y0), z0(right.z0), 
+    inputFile(right.inputFile)
+{
+}
+
  
-R3BBackTracking::~R3BBackTracking(){
+R3BBackTracking::~R3BBackTracking()
+{
   //
   // Destructor
   //
 
   delete inputFile;
 }
+
 
 void R3BBackTracking::ReadNewLine(){
   //
@@ -66,3 +68,6 @@ void R3BBackTracking::ReadNewLine(){
   //cout << "cuchufletas las justas!" << endl;
   
 }
+
+
+ClassImp(R3BBackTracking)

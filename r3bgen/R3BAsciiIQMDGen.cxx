@@ -20,14 +20,16 @@ using std::endl;
 
 // -----   Default constructor   ------------------------------------------
 R3BAsciiIQMDGen::R3BAsciiIQMDGen() 
-:fiqmd(0),
-fname("")
+  : fiqmd(NULL), fname("")
 {
 }
+
+
 //----------------------------------------------------------------------------
 // ----------  Standard constructor   ---------------------------------------------
-R3BAsciiIQMDGen::R3BAsciiIQMDGen(const char* filename){
-  fname=filename;
+R3BAsciiIQMDGen::R3BAsciiIQMDGen(const char* filename)
+  : fiqmd(NULL), fname(filename)
+{
   char c[518];
   fiqmd=fopen(fname,"r");
  
@@ -41,6 +43,13 @@ R3BAsciiIQMDGen::R3BAsciiIQMDGen(const char* filename){
   cout<<c<<endl;
   if(fgets(c,200,fiqmd)){;}
   cout<<c<<endl;
+}
+
+
+
+R3BAsciiIQMDGen::R3BAsciiIQMDGen(const R3BAsciiIQMDGen& right)
+  : fiqmd(right.fiqmd), fname(right.fname)
+{
 }
 
 

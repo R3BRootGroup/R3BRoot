@@ -30,20 +30,28 @@ Int_t R3BIonGenerator::fgNIon = 0;
 
 
 // -----   Default constructor   ------------------------------------------
-R3BIonGenerator::R3BIonGenerator() {
+R3BIonGenerator::R3BIonGenerator()
+  : fMult(0),          
+    fPx(0.), fPy(0.), fPz(0.),
+    fR(0.), fz(0.), fOffset(0.),
+    fVx(0.), fVy(0.), fVz(0.),
+    fIon(NULL),  fQ(0), fBeamSpotIsSet(kFALSE)
+{
 //  cout << "-W- R3BIonGenerator: "
 //      << " Please do not use the default constructor! " << endl;
 }
 // ------------------------------------------------------------------------
 
+
+
 R3BIonGenerator::R3BIonGenerator(const Char_t* ionName, Int_t mult,
 				 Double_t px, Double_t py, Double_t pz)
- :fMult(0),          
-  fPx(0), fPy(0), fPz(0),
-  fR(0), fz(0), fOffset(0),
-  fIon(0),  fQ(0), fBeamSpotIsSet(0)		
-
- {
+  : fMult(0),          
+    fPx(0.), fPy(0.), fPz(0.),
+    fR(0.), fz(0.), fOffset(0.),
+    fVx(0.), fVy(0.), fVz(0.),
+    fIon(NULL),  fQ(0), fBeamSpotIsSet(kFALSE)
+{
 
   FairRunSim *fRun=FairRunSim::Instance();
   TObjArray *UserIons=fRun->GetUserDefIons();
@@ -88,11 +96,11 @@ R3BIonGenerator::R3BIonGenerator(const Char_t* ionName, Int_t mult,
 // -----   Default constructor   ------------------------------------------
 R3BIonGenerator::R3BIonGenerator(Int_t z, Int_t a, Int_t q, Int_t mult,
 				 Double_t px, Double_t py, Double_t pz)
- :fMult(0),          
-  fPx(0), fPy(0), fPz(0),
-  fR(0), fz(0), fOffset(0),
-  fIon(0),  fQ(0), fBeamSpotIsSet(0)
-
+  : fMult(0),          
+    fPx(0.), fPy(0.), fPz(0.),
+    fR(0.), fz(0.), fOffset(0.),
+    fVx(0.), fVy(0.), fVz(0.),
+    fIon(NULL),  fQ(0), fBeamSpotIsSet(kFALSE)
  {
   fgNIon++;
   fMult = mult;
@@ -116,8 +124,19 @@ R3BIonGenerator::R3BIonGenerator(Int_t z, Int_t a, Int_t q, Int_t mult,
 
 
 
+R3BIonGenerator::R3BIonGenerator(const R3BIonGenerator& right)
+  : fMult(right.fMult),          
+    fPx(right.fPx), fPy(right.fPy), fPz(right.fPz),
+    fR(right.fR), fz(right.fz), fOffset(right.fOffset),
+    fVx(right.fVx), fVy(right.fVy), fVz(right.fVz),
+    fIon(right.fIon), fQ(right.fQ), fBeamSpotIsSet(right.fBeamSpotIsSet)
+{
+}
+
+
 // -----   Destructor   ---------------------------------------------------
-R3BIonGenerator::~R3BIonGenerator() {
+R3BIonGenerator::~R3BIonGenerator()
+{
  // if (fIon) delete fIon;
 }
 //_________________________________________________________________________

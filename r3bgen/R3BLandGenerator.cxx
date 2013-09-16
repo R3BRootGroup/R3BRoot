@@ -25,18 +25,36 @@ using std::cout;
 using std::endl;
 using std::map;
 
+
+
 // -----   Default constructor   ------------------------------------------
-R3BLandGenerator::R3BLandGenerator() {}
+R3BLandGenerator::R3BLandGenerator()
+  : fInputFile(NULL), tree(NULL),
+    lPDG(NULL), lM(NULL), lZ(NULL), lE(NULL), lp(NULL),
+    ltheta(NULL), lphi(NULL), lpx(NULL), lpy(NULL), lpz(NULL),
+    lx(NULL), ly(NULL), lz(NULL),
+    fFileName(""), fPDG(NULL),
+    PDGo(0.), Mo(0.), Zo(0.), Eo(0.), po(0.), thetao(0.), phio(0.),
+    xo(0.), yo(0.), zo(0.), pxo(0.), pyo(0.), pzo(0.),
+    vx(0.), vy(0.), vz(0.)
+{
+}
 // ------------------------------------------------------------------------
 
 
+
 // -----   Standard constructor   -----------------------------------------
-R3BLandGenerator::R3BLandGenerator(const char* fileName) {
-
-  fPDG=TDatabasePDG::Instance();
-  fFileName  = fileName;
+R3BLandGenerator::R3BLandGenerator(const char* fileName)
+  : fInputFile(NULL), tree(NULL),
+    lPDG(NULL), lM(NULL), lZ(NULL), lE(NULL), lp(NULL),
+    ltheta(NULL), lphi(NULL), lpx(NULL), lpy(NULL), lpz(NULL),
+    lx(NULL), ly(NULL), lz(NULL),
+    fFileName(fileName), fPDG(TDatabasePDG::Instance()),
+    PDGo(0.), Mo(0.), Zo(0.), Eo(0.), po(0.), thetao(0.), phio(0.),
+    xo(0.), yo(0.), zo(0.), pxo(0.), pyo(0.), pzo(0.),
+    vx(0.), vy(0.), vz(0.)
+{
   cout << "-I- R3BLandGenerator: Opening input file " << fileName << endl;
-
   // Open first the file to read all particles
   fInputFile = new TFile(fFileName,"READ");
 
@@ -59,11 +77,29 @@ R3BLandGenerator::R3BLandGenerator(const char* fileName) {
 }
 // ------------------------------------------------------------------------
 
+
+R3BLandGenerator::R3BLandGenerator(const R3BLandGenerator& right)
+  : fInputFile(right.fInputFile), tree(right.tree),
+    lPDG(right.lPDG), lM(right.lM), lZ(right.lZ), lE(right.lE), lp(right.lp),
+    ltheta(right.ltheta), lphi(right.lphi), lpx(right.lpx), lpy(right.lpy), lpz(right.lpz),
+    lx(right.lx), ly(right.ly), lz(right.lz),
+    fFileName(right.fFileName), fPDG(right.fPDG),
+    PDGo(right.PDGo), Mo(right.Mo), Zo(right.Zo), Eo(right.Eo),
+    po(right.po), thetao(right.thetao), phio(right.phio),
+    xo(right.xo), yo(right.yo), zo(right.zo), pxo(right.pxo), pyo(right.pyo), pzo(right.pzo),
+    vx(right.vx), vy(right.vy), vz(right.vz)
+{
+}
+
+
 // -----   Destructor   ---------------------------------------------------
-R3BLandGenerator::~R3BLandGenerator() {
+R3BLandGenerator::~R3BLandGenerator()
+{
   CloseInput();
 }
 // ------------------------------------------------------------------------
+
+
 
 // -----   Public method ReadEvent   --------------------------------------
 Bool_t R3BLandGenerator::ReadEvent(FairPrimaryGenerator* primGen) {

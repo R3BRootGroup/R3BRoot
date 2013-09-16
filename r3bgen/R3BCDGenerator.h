@@ -45,7 +45,10 @@ private:
 public:
   
   R3BCDGenerator();
+  R3BCDGenerator(const R3BCDGenerator&);
   ~R3BCDGenerator();
+
+  R3BCDGenerator& operator=(const R3BCDGenerator&) { return *this; }
   
   void ReadNewLine();
 

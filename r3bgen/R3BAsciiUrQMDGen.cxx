@@ -18,16 +18,19 @@
 using std::cout;
 using std::endl;
 
+
 // -----   Default constructor   ------------------------------------------
 R3BAsciiUrQMDGen::R3BAsciiUrQMDGen() 
-:furqmd	(0),
-fname("")
+  : furqmd(NULL), fname("")
 {
 }
 //----------------------------------------------------------------------------
+
+
 // ----------  Standard constructor   ---------------------------------------------
-R3BAsciiUrQMDGen::R3BAsciiUrQMDGen(const char* filename){
-  fname=filename;
+R3BAsciiUrQMDGen::R3BAsciiUrQMDGen(const char* filename)
+  : furqmd(NULL), fname(filename)
+{
   char c[518];
   furqmd	=fopen(fname,"r");
  
@@ -43,6 +46,11 @@ R3BAsciiUrQMDGen::R3BAsciiUrQMDGen(const char* filename){
   //cout<<c<<endl;
 }
 
+
+R3BAsciiUrQMDGen::R3BAsciiUrQMDGen(const R3BAsciiUrQMDGen& right)
+  : furqmd(right.furqmd), fname(right.fname)
+{
+}
 
 
 // -----   Destructor   ---------------------------------------------------

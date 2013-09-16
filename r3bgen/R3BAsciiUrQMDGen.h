@@ -47,6 +47,12 @@ class R3BAsciiUrQMDGen : public FairGenerator
   R3BAsciiUrQMDGen(const char* filename);
 
 
+  R3BAsciiUrQMDGen(const R3BAsciiUrQMDGen&);
+
+
+  R3BAsciiUrQMDGen& operator=(const R3BAsciiUrQMDGen&) { return *this; }
+
+
   /** Destructor. **/
   virtual ~R3BAsciiUrQMDGen();
 

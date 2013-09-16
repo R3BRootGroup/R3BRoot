@@ -55,6 +55,12 @@ class R3BIonGenerator : public FairGenerator
 		  Double_t py, Double_t pz);
 
 
+  R3BIonGenerator(const R3BIonGenerator&);
+
+
+  R3BIonGenerator& operator=(const R3BIonGenerator&) { return *this; }
+
+
   /** Destructor **/
   virtual ~R3BIonGenerator();
 

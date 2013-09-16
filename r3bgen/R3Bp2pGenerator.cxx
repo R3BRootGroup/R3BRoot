@@ -26,8 +26,7 @@ using std::endl;
 
 // -----   Default constructor   ------------------------------------------
 R3Bp2pGenerator::R3Bp2pGenerator() 
-:fInputFile(0),
-fFileName("")
+  : fInputFile(NULL), fFileName(""), fOutputFile(NULL)
 {
 }
 // ------------------------------------------------------------------------
@@ -35,22 +34,27 @@ fFileName("")
 
 
 // -----   Standard constructor   -----------------------------------------
-R3Bp2pGenerator::R3Bp2pGenerator(const char* fileName               ) 
-:fInputFile(0),
-fFileName( fileName)
+R3Bp2pGenerator::R3Bp2pGenerator(const char* fileName) 
+  : fInputFile(NULL), fFileName(fileName), fOutputFile(NULL)
 {
-  fFileName  = fileName;
   cout << "-I R3Bp2pGenerator: Opening input file " << fileName << endl;
   fInputFile = new ifstream(fFileName);
   if ( ! fInputFile->is_open() ) 
     Fatal("R3Bp2pGenerator","Cannot open input file.");
   fOutputFile = new ofstream("vertex.out");
 
-    
-  // fPDG=TDatabasePDG::Instance();
- 
+  // fPDG=TDatabasePDG::Instance(); 
 }
 // ------------------------------------------------------------------------
+
+
+
+R3Bp2pGenerator::R3Bp2pGenerator(const R3Bp2pGenerator& right)
+  : fInputFile(right.fInputFile),
+    fFileName(right.fFileName),
+    fOutputFile(right.fOutputFile)
+{
+}
 
 
 

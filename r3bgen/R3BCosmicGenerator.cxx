@@ -24,7 +24,7 @@ using std::endl;
 R3BCosmicGenerator::R3BCosmicGenerator() :
   fPDGType(0),fMult(0),fE_Threshold(0),fPDGMass(0),
   fPhiMin(0),fPhiMax(0),fThetaMin(0),fThetaMax(0),fX(0),fY(0),fZ(0),
-  fX1(0),fY1(0),fX2(0),fY2(0),
+  fX1(0),fY1(0),fZ1(0),fX2(0),fY2(0),fZ2(0),
   fThetaRangeIsSet(0),
   fCosThetaIsSet(0),
   fPointVtxIsSet(0),fBoxVtxIsSet(0),fDebug(0)
@@ -35,15 +35,14 @@ R3BCosmicGenerator::R3BCosmicGenerator() :
 // ------------------------------------------------------------------------
 R3BCosmicGenerator::R3BCosmicGenerator(Int_t pdgid, Int_t mult, Double32_t E_Threshold) :
   fPDGType(pdgid),fMult(mult),fE_Threshold(E_Threshold),fPDGMass(0),
-  fThetaMin(0),fThetaMax(0),fX(0),fY(0),fZ(0),
-  fX1(0),fY1(0),fX2(0),fY2(0),
+  fPhiMin(0),fPhiMax(0),fThetaMin(0),fThetaMax(0),fX(0),fY(0),fZ(0),
+  fX1(0),fY1(0),fZ1(0),fX2(0),fY2(0),fZ2(0),
   fThetaRangeIsSet(0),
   fCosThetaIsSet(0),
   fPointVtxIsSet(0),fBoxVtxIsSet(0),fDebug(0)
 {
-
   // Constructor. Set default kinematics limits
-  SetPhiRange  ();
+  SetPhiRange();
 }
 // ------------------------------------------------------------------------
 Bool_t R3BCosmicGenerator::Init()

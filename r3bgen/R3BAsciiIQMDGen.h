@@ -47,6 +47,12 @@ class R3BAsciiIQMDGen : public FairGenerator
   R3BAsciiIQMDGen(const char* filename);
 
 
+  R3BAsciiIQMDGen(const R3BAsciiIQMDGen&);
+
+
+  R3BAsciiIQMDGen& operator=(const R3BAsciiIQMDGen&) { return *this; }
+
+
   /** Destructor. **/
   virtual ~R3BAsciiIQMDGen();
 

@@ -18,18 +18,25 @@ using std::endl;
 using std::map;
 
 // -----   Default constructor   ------------------------------------------
-R3BAsciiGenerator::R3BAsciiGenerator() {}
+R3BAsciiGenerator::R3BAsciiGenerator()
+  : fInputFile(NULL), fFileName(""),
+    fPDG(NULL), fIonMap(), 
+    fX(0.), fY(0.), fZ(0.), fPointVtxIsSet(kFALSE),
+    fDX(0.), fDY(0.), fDZ(0.), fBoxVtxIsSet(kFALSE)
+{
+}
 // ------------------------------------------------------------------------
 
 
 
 // -----   Standard constructor   -----------------------------------------
-R3BAsciiGenerator::R3BAsciiGenerator(const char* fileName) {
-
-  fPDG=TDatabasePDG::Instance();
-  fFileName  = fileName;
+R3BAsciiGenerator::R3BAsciiGenerator(const char* fileName)
+  : fInputFile(NULL), fFileName(fileName),
+    fPDG(TDatabasePDG::Instance()), fIonMap(), 
+    fX(0.), fY(0.), fZ(0.), fPointVtxIsSet(kFALSE),
+    fDX(0.), fDY(0.), fDZ(0.), fBoxVtxIsSet(kFALSE)
+{
   cout << "-I- R3BAsciiGenerator: Opening input file " << fileName << endl;
-
   // Open first the file to register all new ions.
   fInputFile = new ifstream(fFileName);
   if ( ! fInputFile->is_open() ) 
@@ -43,19 +50,24 @@ R3BAsciiGenerator::R3BAsciiGenerator(const char* fileName) {
 
   // Re-Open the file for standard streaming ...
   fInputFile = new ifstream(fFileName);
-
-  fX=fY=fZ=0.0;
-  fPointVtxIsSet=kFALSE;
-  fDX=fDY=fDZ=0.0;
-  fBoxVtxIsSet=kFALSE;
- 
 }
 // ------------------------------------------------------------------------
 
 
+R3BAsciiGenerator::R3BAsciiGenerator(const R3BAsciiGenerator& right)
+  : fInputFile(right.fInputFile), fFileName(right.fFileName),
+    fPDG(right.fPDG), fIonMap(right.fIonMap), 
+    fX(right.fX), fY(right.fY), fZ(right.fZ),
+    fPointVtxIsSet(right.fPointVtxIsSet),
+    fDX(right.fDX), fDY(right.fDY), fDZ(right.fDZ),
+    fBoxVtxIsSet(right.fBoxVtxIsSet)
+{
+}
+
 
 // -----   Destructor   ---------------------------------------------------
-R3BAsciiGenerator::~R3BAsciiGenerator() {
+R3BAsciiGenerator::~R3BAsciiGenerator()
+{
   CloseInput();
 }
 // ------------------------------------------------------------------------

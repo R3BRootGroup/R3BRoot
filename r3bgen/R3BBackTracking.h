@@ -46,7 +46,10 @@ private:
 public:
   
   R3BBackTracking();
+  R3BBackTracking(const R3BBackTracking&);
   ~R3BBackTracking();
+
+  R3BBackTracking& operator=(const R3BBackTracking&) { return *this; }
   
   void ReadNewLine();
 

@@ -8,35 +8,34 @@
 #include "FairIon.h"
 #include "R3BBackTrackingStorageState.h"
 
+
+
 R3BSpecificGenerator::R3BSpecificGenerator()
-  :gammasFlag("off"),decaySchemeFlag("off"),reactionFlag("off"),reactionType("Elas"),
-   dissociationFlag("off"), backTrackingFlag("off"),beamInteractionFlag("off"),rndmFlag("off"),
-   rndmEneFlag("off"),boostFlag("off"),fPDGType(2212),
+  : pReadKinematics(NULL), pCDGenerator(NULL), pBackTrackingGenerator(NULL),
+    gammasFlag("off"),decaySchemeFlag("off"),reactionFlag("off"),reactionType("Elas"),
+    dissociationFlag("off"), backTrackingFlag("off"),
+    targetType("Parafin0Deg"),
+    targetHalfThicknessPara((0.11/2.)/10.), // cm
+    targetThicknessLiH(3.5),  // cm
+    targetRadius(1.),   // cm
+    beamInteractionFlag("off"),rndmFlag("off"),
+    rndmEneFlag("off"),boostFlag("off"),fPDGType(2212),
+    kinEnergyPrim(1e-03),          // GeV - kinetic energy of the primary
+    meanKinEnergyBeam(700.*1e-03), // GeV - kinetic energy mean of the beam (per nucleon)
+    sigmaKinEnergyBeam(1.e-03),    // GeV - kinetic energy sigma of the beam
     simEmittanceFlag("off"),sigmaXInEmittance(1.),sigmaXPrimeInEmittance(0.0001),
     fPDGMass(0.),fMult(1),fP(0.),fPdir(0.,0.,1.),fCharge(0),fPol(0.,0.,0.),
-    fPos(0.,0.,0.),fTime(0.) {
-
+    fPos(0.,0.,0.),fTime(0.),
+    particlePrim(""), isDumped(kFALSE)
+{
   //
   // Constructor: init values are filled
   //  
-
-  //Initial Values
-  kinEnergyPrim = 1e-03;      // GeV - kinetic energy of the primary
-  meanKinEnergyBeam = 700. * 1e-03;// GeV - kinetic energy mean of the beam (per nucleon)
-  sigmaKinEnergyBeam = 1.e-03 ; // GeV - kinetic energy sigma of the beam
-  
 //  Int_t n_particle = 1;
-
-  //init value for targets (final values come from ROOT Macros)
-   targetType = "Parafin0Deg";
-   targetHalfThicknessPara =(0.11/2.)/10.; // cm
-   targetThicknessLiH = 3.5;  // cm
-   targetRadius = 1.;   // cm
-
      
-   cout << endl;
-   cout << endl;    
-   cout << "-I- R3BSpecificGenerator::R3BSpecificGenerator() Ion Defs... " << endl;
+  cout << endl;
+  cout << endl;    
+  cout << "-I- R3BSpecificGenerator::R3BSpecificGenerator() Ion Defs... " << endl;
 
   // Define the ion for CD
   Char_t buffer[20];
@@ -54,14 +53,43 @@ R3BSpecificGenerator::R3BSpecificGenerator()
   run->AddNewIon(fIon);
   isDumped = kFALSE; 
   Init();
+}
 
- }
 
-R3BSpecificGenerator::~R3BSpecificGenerator() {
+
+R3BSpecificGenerator::R3BSpecificGenerator(const R3BSpecificGenerator& right)
+  : pReadKinematics(right.pReadKinematics),
+    pCDGenerator(right.pCDGenerator),
+    pBackTrackingGenerator(right.pBackTrackingGenerator),
+    gammasFlag(right.gammasFlag), decaySchemeFlag(right.decaySchemeFlag),
+    reactionFlag(right.reactionFlag), reactionType(right.reactionType),
+    dissociationFlag(right.dissociationFlag), backTrackingFlag(right.backTrackingFlag),
+    targetType(right.targetType), targetHalfThicknessPara(right.targetHalfThicknessPara),
+    targetThicknessLiH(right.targetThicknessLiH), targetRadius(right.targetRadius),
+    beamInteractionFlag(right.beamInteractionFlag), rndmFlag(right.rndmFlag),
+    rndmEneFlag(right.rndmEneFlag), boostFlag(right.boostFlag), fPDGType(right.fPDGType),
+    kinEnergyPrim(right.kinEnergyPrim),
+    meanKinEnergyBeam(right.meanKinEnergyBeam),
+    sigmaKinEnergyBeam(right.sigmaKinEnergyBeam),
+    simEmittanceFlag(right.simEmittanceFlag),
+    sigmaXInEmittance(right.sigmaXInEmittance),
+    sigmaXPrimeInEmittance(right.sigmaXPrimeInEmittance),
+    fPDGMass(right.fPDGMass), fMult(right.fMult), fP(right.fP), fPdir(right.fPdir),
+    fCharge(right.fCharge), fPol(right.fPol), fPos(right.fPos), fTime(right.fTime),
+    particlePrim(right.particlePrim), isDumped(right.isDumped)
+{
+}
+
+
+
+R3BSpecificGenerator::~R3BSpecificGenerator()
+{
   //
   // Simple destructor
   //
 }
+
+
 
 Bool_t R3BSpecificGenerator::Init()
 {

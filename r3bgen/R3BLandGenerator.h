@@ -45,6 +45,12 @@ class R3BLandGenerator : public FairGenerator
   R3BLandGenerator(const char* fileName);
 
 
+  R3BLandGenerator(const R3BLandGenerator&);
+
+
+  R3BLandGenerator& operator=(const R3BLandGenerator&) { return *this; }
+
+
   /** Destructor. **/
   virtual ~R3BLandGenerator();
 

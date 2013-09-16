@@ -37,6 +37,12 @@ class R3Bp2pGenerator : public FairGenerator
   R3Bp2pGenerator(const char* fileName);
 
 
+  R3Bp2pGenerator(const R3Bp2pGenerator&);
+
+
+  R3Bp2pGenerator& operator=(const R3Bp2pGenerator&) { return *this; }
+
+
   /** Destructor. **/
   virtual ~R3Bp2pGenerator();
 
