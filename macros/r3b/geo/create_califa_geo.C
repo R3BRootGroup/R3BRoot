@@ -113,11 +113,28 @@ void create_califa_geo(const char* geoTag)
   
   // Defintion of the Mother Volume
   Double_t length = 300.;
-  TGeoShape *pCBWorld = new TGeoBBox("Califa_box",
+  TGeoShape *pCBWorldOut = new TGeoBBox("Califa_boxOut",
                                      length/2.0,
                                      length/2.0,
                                      length/2.0);
-  
+
+
+  TGeoShape *pCBWorldIn1 = new TGeoTube("Califa_Centerpart1",  // hole to accommodate the tracker
+                                     0.,  // Rmin
+                                     26.4, // Rmax
+                                     190./2.0);  // half length
+  TGeoCombiTrans *t_part1 = new TGeoCombiTrans("t_part1",0.,0.,-55,fRefRot);
+  t_part1->RegisterYourself();
+
+  TGeoShape *pCBWorldIn2 = new TGeoTube("Califa_Centerpart2",  // hole to accommodate the pipe through the end-cap
+                                     0.,  // Rmin
+                                     5.,  // Rmax
+                                     110./2.0);  // half length
+  TGeoCombiTrans *t_part2 = new TGeoCombiTrans("t_part2",0.,0.,95,fRefRot);
+  t_part2->RegisterYourself();
+ 
+  TGeoCompositeShape *pCBWorld = new TGeoCompositeShape("Califa_box", " Califa_boxOut - (Califa_Centerpart1:t_part1  + Califa_Centerpart2:t_part2)");
+
   TGeoVolume* pWorld = new TGeoVolume("CalifaWorld",pCBWorld, pAirMedium);
   
   TGeoCombiTrans *t0 = new TGeoCombiTrans();

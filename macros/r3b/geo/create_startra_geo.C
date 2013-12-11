@@ -32,8 +32,6 @@ Bool_t fLocalTrans = kFALSE;
 Bool_t fLabTrans = kTRUE;
 
 
-
-
 void create_startra_geo(const char* geoTag)
 {
   // -------   Load media from media file   -----------------------------------
@@ -111,7 +109,48 @@ void create_startra_geo(const char* geoTag)
   gGeoMan->SetTopVolume(top);
   // --------------------------------------------------------------------------
 
+  // WORLD
+  //  TGeoVolume* pAWorld = gGeoManager->GetTopVolume();
+  TGeoVolume* pAWorld = top;
+   pAWorld->SetVisLeaves(kTRUE);
+  
+  gGeoManager->SetVisLevel(6);
 
+
+  Double_t WorldHalfLength=24.813;
+  Double_t ShiftToWorldEdge=20;
+
+  // StarTrack world (mother volume to have vacuum for Si tracker and air for CALIFA)  !!
+  
+   TGeoShape *pSTaRTrackWorld_A =new TGeoTube("STarTrack_Tube_A",
+					     0.,   // rmin // put it to 4 for delat e- and protons; TODO: modify geo to leave it to 0 all the time
+					    //1.,   // rmin // put it to 4 for delat e- and protons; TODO: modify geo to leave it to 0 all the time
+					     26.,   // rmax 
+					     WorldHalfLength  // half length
+					    );
+   // Remove target area 
+   TGeoShape *pSTaRTrackWorld_B =new TGeoTube("STarTrack_Tube_B",
+					     0.,   // rmin // put it to 4 for delat e- and protons; TODO: modify geo to leave it to 0 all the time
+					    //1.,  // rmin // put it to 4 for delat e- and protons; TODO: modify geo to leave it to 0 all the time
+					     3.5250,  // rmax 
+					     6     // half length
+					    );
+
+   TGeoCombiTrans *t_targ=new TGeoCombiTrans("t_targ", 0.,0.,5-WorldHalfLength,fRefRot);
+   t_targ->RegisterYourself();
+
+   TGeoCompositeShape *pSTaRTrackWorld = new TGeoCompositeShape("STarTrack_Tube","STarTrack_Tube_A - (STarTrack_Tube_B:t_targ)");
+
+   TGeoVolume*
+   pTraWorld  = new TGeoVolume("STaRTrackWorld",pSTaRTrackWorld, pVacuumMedium);
+   //TGeoCombiTrans *t0 = new TGeoCombiTrans();
+   TGeoCombiTrans *t0 = new TGeoCombiTrans("",0.,0.,ShiftToWorldEdge,fRefRot);
+   TGeoCombiTrans *pGlobalc = GetGlobalPosition(t0);
+   
+   // add the sphere as Mother Volume
+   pAWorld->AddNode(pTraWorld, 0, pGlobalc);
+ 
+   // All the other volumes:
 
   // out-of-file geometry definition
   Double_t dx,dy,dz;
@@ -127,8 +166,7 @@ void create_startra_geo(const char* geoTag)
   Double_t Frame_Width=0.1; // =0.1/2=0.05cm on each side
   Double_t Frame_Length=Frame_Width;
   Double_t Frame_Depth=0.1;  // = half of the frame Depth (ie frame full Depth=2.mm)
-  
-  
+    
   
   Double_t PI= 3.141592653589793;
   Double_t NSide1= 6;             // Nb of detector in inner Layer
@@ -204,7 +242,7 @@ void create_startra_geo(const char* geoTag)
   // +rotation of 15 degrees:
   dx = (-(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1))*sin((15.)*PI/180.);
   dy = (-(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1))*cos((15.)*PI/180.);;   // considering  intersection of 2 medianes
-  dz = -(Length1)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.));
+  dz = -(Length1)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.)) - ShiftToWorldEdge;
   
   
   // Rotation:
@@ -224,7 +262,7 @@ void create_startra_geo(const char* geoTag)
   
   dx = (-(( (Length1+Frame_Length)/2)*sin(InclAng1*PI/180.)+ Rmin1 + (Thickness1*2+Frame_Depth)))*sin((15.)*PI/180.);
   dy = (-(( (Length1+Frame_Length)/2)*sin(InclAng1*PI/180.)+ Rmin1 + (Thickness1*2+Frame_Depth)))*cos((15.)*PI/180.);;   // considering  intersection of 2 medianes
-  dz = -(Length1+Frame_Length)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.));
+  dz = -(Length1+Frame_Length)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.))- ShiftToWorldEdge;
   TGeoCombiTrans*
   pMatrix2b = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);  // bottom inner detector
   
@@ -239,7 +277,7 @@ void create_startra_geo(const char* geoTag)
   // +rotation of 15 degrees:
   dx=  (-(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1))*sin((15.+360/NSide1)*PI/180.);  // rotation by 60+15 deg/ z axis
   dy=  (-(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1))*cos((15.+360/NSide1)*PI/180.);  // rotation by 60+15 deg/ z axis
-  dz = -(Length1)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.));
+  dz = -(Length1)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.))- ShiftToWorldEdge;
   
   // Rotation:
   //thx = 90.000000;        phx = 0.000000-(360./NSide1);
@@ -274,7 +312,7 @@ void create_startra_geo(const char* geoTag)
   // +rotation of 15 degrees:
   dx= -(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1)*sin((15.+2*(360/NSide1))*PI/180.);  // rotation by 120+15 deg / z axis
   dy= -(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1)*cos((15.+2*(360/NSide1))*PI/180.);  // rotation by 120+15 deg / z axis
-  dz = -(Length1)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.));
+  dz = -(Length1)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.)) - ShiftToWorldEdge  ;
   
   
   // Rotation:
@@ -307,7 +345,7 @@ void create_startra_geo(const char* geoTag)
   // +rotation of 15 degrees:
   dx= -(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1)*sin((15.+3*(360/NSide1))*PI/180.);     // rotation by 180+15 deg / z axis
   dy= -(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1)*cos((15.+3*(360/NSide1))*PI/180.);     // rotation by 180+15 deg / z axis
-  dz = -(Length1)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.));
+  dz = -(Length1)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.))- ShiftToWorldEdge  ;
   
   // Rotation:
   //thx = 90.000000;        phx = 0.000000-(3.*360./NSide1);
@@ -341,7 +379,7 @@ void create_startra_geo(const char* geoTag)
   // +rotation of 15 degrees:
   dx= -(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1)*sin((15.+4*(360/NSide1))*PI/180.);    // rotation by 240+15 deg/ z axis
   dy= -(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1)*cos((15.+4*(360/NSide1))*PI/180.);    // rotation by 240+15 deg/ z axis
-  dz = -(Length1)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.));
+  dz = -(Length1)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.)) - ShiftToWorldEdge ;
   
   // Rotation:
   //thx = 90.000000;        phx = 0.000000-(4.*360./NSide1);
@@ -374,7 +412,7 @@ void create_startra_geo(const char* geoTag)
   // +rotation of 15 degrees:
   dx= -(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1)*sin((15.+5*(360/NSide1))*PI/180.);  // rotation by 300+15 deg/ z axis
   dy= -(( (Length1)/2)*sin(InclAng1*PI/180.)+ Rmin1)*cos((15.+5*(360/NSide1))*PI/180.);  // rotation by 300+15 deg/ z axis
-  dz = -(Length1)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.));
+  dz = -(Length1)*cos(InclAng1*PI/180.)/2 + ((Rmin1)/tan(AngRangeMin1*PI/180.)) - ShiftToWorldEdge ;
   
   
   // Rotation:
@@ -407,7 +445,7 @@ void create_startra_geo(const char* geoTag)
   //dy = -((Length3/2  + (WidthHalf3/2)*tan(AngTrap3) )*sin(InclAng3*PI/180.)+ Rmin3); // considering  real barycentre position
   dx = 0.000;
   dy = -(( Length3/2)*sin(InclAng3*PI/180.)+ Rmin3 );                               // considering  intersection of 2 medianes
-  dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+  dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.)) - ShiftToWorldEdge ;
   
   // Rotation:
   thx = 90.000000;        phx = 0.000000;
@@ -434,7 +472,7 @@ void create_startra_geo(const char* geoTag)
   dy = -(( Length3/2)*sin(InclAng3*PI/180.)+ Rmin3 );                               // considering  intersection of 2 medianes
   dx=  dy*sin((360/NSide3)*PI/180.);  // rotation by 360/12=30 deg/ z axis
   dy=  dy*cos((360/NSide3)*PI/180.);  // rotation by 360/12=30 deg/ z axis
-  dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+  dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.)) - ShiftToWorldEdge ;
   // Rotation:
   thx = 90.000000;        phx = 0.000000-360./NSide3;
   thy = 90.+ InclAng3;    phy = 90.000000-360./NSide3;
@@ -461,7 +499,7 @@ void create_startra_geo(const char* geoTag)
   
   dx=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(2*(360/NSide3)*PI/180.);  // rotation by 60 deg/ z axis
   dy=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3 )*cos(2*(360/NSide3)*PI/180.);  // rotation by 60 deg/ z axis
-  dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+  dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.)) - ShiftToWorldEdge ;
   // Rotation:
   thx = 90.000000;        phx = 0.000000-(2*360./NSide3);
   thy = 90.+ InclAng3;    phy = 90.000000-(2*360./NSide3);
@@ -473,7 +511,7 @@ void create_startra_geo(const char* geoTag)
   
   dx=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3 + (Thickness3*2+Frame_Depth))*sin(2*(360/NSide3)*PI/180.);  // rotation by 60 deg/ z axis
   dy=  -(( (Length3+ Frame_Length)/2)*sin(InclAng3*PI/180.)+ Rmin3 + (Thickness3*2+Frame_Depth))*cos(2*(360/NSide3)*PI/180.);  // rotation by 60 deg/ z axis
-  dz= -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+  dz= -(Length3+Frame_Length)*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.))- ShiftToWorldEdge;
   TGeoCombiTrans*
   pMatrix70b = new TGeoCombiTrans("", dx,dy,dz,pMatrix71);
   
@@ -487,7 +525,7 @@ void create_startra_geo(const char* geoTag)
   
   dx=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(3*(360/NSide3)*PI/180.);  // rotation by 90 deg/ z axis
   dy=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(3*(360/NSide3)*PI/180.);  // rotation by 90 deg/ z axis
-  dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+  dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.)) - ShiftToWorldEdge ;
   // Rotation:
   thx = 90.000000;        phx = 0.000000-(3*360./NSide3);
   thy = 90.+ InclAng3;    phy = 90.000000-(3*360./NSide3);
@@ -512,7 +550,7 @@ void create_startra_geo(const char* geoTag)
   
   dx=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(4*(360/NSide3)*PI/180.);  // rotation by 120 deg/ z axis
   dy=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(4*(360/NSide3)*PI/180.);  // rotation by 120 deg/ z axis
-  dz = -Length3*cos(InclAng2*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+  dz = -Length3*cos(InclAng2*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.)) - ShiftToWorldEdge ;
   
   // Rotation:
   thx = 90.000000;        phx = 0.000000-(4*360./NSide3);
@@ -539,7 +577,7 @@ void create_startra_geo(const char* geoTag)
   
   dx=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(5*(360/NSide3)*PI/180.);  // rotation by 150 deg/ z axis
   dy=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(5*(360/NSide3)*PI/180.);  // rotation by 150 deg/ z axis
-  dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+  dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.))- ShiftToWorldEdge  ;
   
   // Rotation:
   thx = 90.000000;        phx = 0.000000-(5*360./NSide3);
@@ -566,7 +604,7 @@ void create_startra_geo(const char* geoTag)
   
   dx=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(6*(360/NSide3)*PI/180.);  // rotation by 180 deg/ z axis
   dy=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(6*(360/NSide3)*PI/180.);  // rotation by 180 deg/ z axis
-  dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+  dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.)) - ShiftToWorldEdge ;
   
   // Rotation:
   thx = 90.000000;        phx = 0.000000-(6*360./NSide3);
@@ -593,7 +631,7 @@ void create_startra_geo(const char* geoTag)
   
   dx=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(7*(360/NSide3)*PI/180.);  // rotation by 210 deg/ z axis
   dy=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(7*(360/NSide3)*PI/180.);  // rotation by 210 deg/ z axis
-  dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+  dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.)) - ShiftToWorldEdge ;
   
   // Rotation:
   thx = 90.000000;        phx = 0.000000-(7*360./NSide3);
@@ -621,7 +659,7 @@ void create_startra_geo(const char* geoTag)
   
   dx=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(8*(360/NSide3)*PI/180.);  // rotation by 240 deg/ z axis
   dy=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(8*(360/NSide3)*PI/180.);  // rotation by 240 deg/ z axis
-  dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+  dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.)) - ShiftToWorldEdge ;
   // Rotation:
   thx = 90.000000;        phx = 0.000000-(8*360./NSide3);
   thy = 90.+ InclAng3;    phy = 90.000000-(8*360./NSide3);
@@ -649,7 +687,7 @@ void create_startra_geo(const char* geoTag)
   
   dx=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(9*(360/NSide3)*PI/180.);  // rotation by 270 deg/ z axis
   dy=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(9*(360/NSide3)*PI/180.);  // rotation by 270 deg/ z axis
-  dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+  dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.))  - ShiftToWorldEdge;
   
   // Rotation:
   thx = 90.000000;        phx = 0.000000-(9*360./NSide3);
@@ -677,7 +715,7 @@ void create_startra_geo(const char* geoTag)
   
   dx=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(10*(360/NSide3)*PI/180.);  // rotation by 300 deg/ z axis
   dy=  -(( (Length3)/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(10*(360/NSide3)*PI/180.);  // rotation by 300 deg/ z axis
-  dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+  dz = -Length3*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.)) - ShiftToWorldEdge ;
   
   // Rotation:
   thx = 90.000000;        phx = 0.000000-(10*360./NSide3);
@@ -705,7 +743,7 @@ void create_startra_geo(const char* geoTag)
   
   dx=  -(((Length2)/2)*sin(InclAng3*PI/180.)+ Rmin3)*sin(11*(360/NSide3)*PI/180.);  // rotation by 330 deg/ z axis
   dy=  -(((Length2)/2)*sin(InclAng3*PI/180.)+ Rmin3)*cos(11*(360/NSide3)*PI/180.);  // rotation by 330 deg/ z axis
-  dz = -Length2*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.));
+  dz = -Length2*cos(InclAng3*PI/180.)/2 + (Rmin3/tan(AngRangeMin3*PI/180.)) - ShiftToWorldEdge ;
   
   // Rotation:
   thx = 90.000000;        phx = 0.000000-(11*360./NSide3);
@@ -790,7 +828,7 @@ void create_startra_geo(const char* geoTag)
   
   dx = 0.000;
   dy = -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2);  // considering  intersection of 2 medianes
-  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.)) - ShiftToWorldEdge ;
   
   // Rotation:
   thx = 90.000000;        phx = 0.000000;
@@ -818,7 +856,7 @@ void create_startra_geo(const char* geoTag)
   dy = -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2);  // considering  intersection of 2 medianes
   dx=  dy*sin((360/NSide2)*PI/180.);  // rotation by 30 deg/ z axis
   dy=  dy*cos((360/NSide2)*PI/180.);  // rotation by 30 deg/ z axis
-  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.)) - ShiftToWorldEdge ;
   // Rotation:
   thx = 90.000000;        phx = 0.000000-360./NSide2;
   thy = 90.+ InclAng2;    phy = 90.000000-360./NSide2;
@@ -846,7 +884,7 @@ void create_startra_geo(const char* geoTag)
   
   dx=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(2*(360/NSide2)*PI/180.);  // rotation by 60 deg/ z axis
   dy=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(2*(360/NSide2)*PI/180.);  // rotation by 60 deg/ z axis
-  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.)) - ShiftToWorldEdge ;
   
   // Rotation:
   thx = 90.000000;        phx = 0.000000-(2*360./NSide2);
@@ -873,7 +911,7 @@ void create_startra_geo(const char* geoTag)
   
   dx=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(3*(360/NSide2)*PI/180.);  // rotation by 90 deg/ z axis
   dy=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(3*(360/NSide2)*PI/180.);  // rotation by 90 deg/ z axis
-  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.)) - ShiftToWorldEdge ;
   
   // Rotation:
   thx = 90.000000;        phx = 0.000000-(3*360./NSide2);
@@ -900,7 +938,7 @@ void create_startra_geo(const char* geoTag)
   
   dx=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(4*(360/NSide2)*PI/180.);  // rotation by 120 deg/ z axis
   dy=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(4*(360/NSide2)*PI/180.);  // rotation by 120 deg/ z axis
-  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.)) - ShiftToWorldEdge ;
   
   // Rotation:
   thx = 90.000000;        phx = 0.000000-(4*360./NSide2);
@@ -926,7 +964,7 @@ void create_startra_geo(const char* geoTag)
   
   dx=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(5*(360/NSide2)*PI/180.);  // rotation by 130 deg/ z axis
   dy=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(5*(360/NSide2)*PI/180.);  // rotation by 150 deg/ z axis
-  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.)) - ShiftToWorldEdge ;
   
   // Rotation:
   thx = 90.000000;        phx = 0.000000-(5*360./NSide2);
@@ -953,7 +991,7 @@ void create_startra_geo(const char* geoTag)
   
   dx=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(6*(360/NSide2)*PI/180.);  // rotation by 180 deg/ z axis
   dy=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(6*(360/NSide2)*PI/180.);  // rotation by 180 deg/ z axis
-  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.)) - ShiftToWorldEdge ;
   
   // Rotation:
   thx = 90.000000;        phx = 0.000000-(6*360./NSide2);
@@ -979,7 +1017,7 @@ void create_startra_geo(const char* geoTag)
   
   dx=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(7*(360/NSide2)*PI/180.);  // rotation by 210 deg/ z axis
   dy=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(7*(360/NSide2)*PI/180.);  // rotation by 210 deg/ z axis
-  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.)) - ShiftToWorldEdge ;
   
   // Rotation:
   thx = 90.000000;        phx = 0.000000-(7*360./NSide2);
@@ -1006,7 +1044,7 @@ void create_startra_geo(const char* geoTag)
   
   dx=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(8*(360/NSide2)*PI/180.);  // rotation by 240 deg/ z axis
   dy=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(8*(360/NSide2)*PI/180.);  // rotation by 240 deg/ z axis
-  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.)) - ShiftToWorldEdge ;
   
   // Rotation:
   thx = 90.000000;        phx = 0.000000-(8*360./NSide2);
@@ -1033,7 +1071,7 @@ void create_startra_geo(const char* geoTag)
   
   dx=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(9*(360/NSide2)*PI/180.);  // rotation by 270 deg/ z axis
   dy=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(9*(360/NSide2)*PI/180.);  // rotation by 270 deg/ z axis
-  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.))- ShiftToWorldEdge  ;
   
   // Rotation:
   thx = 90.000000;        phx = 0.000000-(9*360./NSide2);
@@ -1060,7 +1098,7 @@ void create_startra_geo(const char* geoTag)
   
   dx=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(10*(360/NSide2)*PI/180.);  // rotation by 300 deg/ z axis
   dy=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(10*(360/NSide2)*PI/180.);  // rotation by 300 deg/ z axis
-  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.)) - ShiftToWorldEdge;
   
   // Rotation:
   thx = 90.000000;        phx = 0.000000-(10*360./NSide2);
@@ -1086,7 +1124,7 @@ void create_startra_geo(const char* geoTag)
   
   dx=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*sin(11*(360/NSide2)*PI/180.);  // rotation by 330 deg/ z axis
   dy=  -(( (Length2)/2)*sin(InclAng2*PI/180.)+ Rmin2)*cos(11*(360/NSide2)*PI/180.);  // rotation by 330 deg/ z axis
-  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.));
+  dz = -(Length2)*cos(InclAng2*PI/180.)/2 + (Rmin2/tan(AngRangeMin2*PI/180.)) - ShiftToWorldEdge;
   
   // Rotation:
   thx = 90.000000;        phx = 0.000000-(11*360./NSide2);
@@ -1290,12 +1328,6 @@ void create_startra_geo(const char* geoTag)
   
   
   
-  // WORLD
-  TGeoVolume* pAWorld = gGeoManager->GetTopVolume();
-  pAWorld->SetVisLeaves(kTRUE);
-  
-  
-  gGeoManager->SetVisLevel(6);
   
   TGeoRotation *rotg = new TGeoRotation();
   rotg->RotateX(0.);
@@ -1332,30 +1364,8 @@ void create_startra_geo(const char* geoTag)
   
   //   TGeoCombiTrans *t4 = new TGeoCombiTrans(tx,ty,tz,rotg);
   
-  // StarTrack world (mother volume to have vacuum for Si tracker and air for CALIFA)  !!
   
-   TGeoShape *pSTaRTrackWorld =new TGeoTubeSeg("STarTrack_Tube",
-   1.,   // rmin // put it to 4 for delat e- and protons; TODO: modify geo to leave it to 0 all the time
-   //26.2,   // rmin // put it to 26.2 for gamma attenuation study; TODO: modify geo to leave it to 0 or 4 all the time
-   26.4, // rmax (cf: Chamber in passive/R3BvacVesselcool.cxx
-   35.,  // dz
-   0.,   // phi1
-   360.);// phi2
    
-   TGeoVolume*
-   pTraWorld  = new TGeoVolume("STaRTrackWorld",pSTaRTrackWorld, pVacuumMedium);
-   TGeoCombiTrans *t0 = new TGeoCombiTrans();
-   TGeoCombiTrans *pGlobalc = GetGlobalPosition(t0);
-   
-   // add the sphere as Mother Volume
-   pAWorld->AddNode(pTraWorld, 0, pGlobalc);
-   
-  
-  
-  
-  
-  
-  
   // STaRTracker
   
   // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY

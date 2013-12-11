@@ -87,7 +87,7 @@ void create_vacvessel_geo(const char* geoTag)
   gGeoMan = (TGeoManager*)gROOT->FindObject("FAIRGeom");
   gGeoMan->SetName("VACVESSELgeom");
   TGeoVolume* top = new TGeoVolumeAssembly("TOP");
-  gGeoMan->SetTopVolume(top);
+     gGeoMan->SetTopVolume(top);
   // --------------------------------------------------------------------------
 
 
@@ -379,7 +379,8 @@ void create_vacvessel_geo(const char* geoTag)
 	dx = 0.000000;
 	dy = 0.000000;
 	//dz = -10.00000;  // for end plate edge shadowing CALIFA
-	dz = -15.00000; // for end plate edge of CALIFA
+	//dz = -15.00000; // for end plate edge of CALIFA
+	dz = 5.00000; //
 	//dz = -25.00000;    // for end plate position behind califa
 	// Rotation:
 	thx = 90.000000;    phx = 0.000000;
@@ -396,10 +397,13 @@ void create_vacvessel_geo(const char* geoTag)
 	
   // Combi transformation:
 	//dz = -20.0000-0.75;    // for end plate edge shadowing CALIFA
-	dz = -30.0000-0.75; // for end plate edge of CALIFA
+	dz = -30.0000-0.75; // for end plate edge of CALIFA  (15 mm thick)
 	//dz = -50.0000-0.75;   // for end plate position behind califa
 	TGeoCombiTrans*
 	pMatrix174 = new TGeoCombiTrans("", dx,dy,dz,pMatrix171);
+	dz = 40.0000+0.1; // for end plate edge of CALIFA (2mm thick)
+	TGeoCombiTrans*
+	pMatrix175 = new TGeoCombiTrans("", dx,dy,dz,pMatrix171);
   
   // Beam Pipes:
 	
@@ -467,14 +471,20 @@ void create_vacvessel_geo(const char* geoTag)
     (-10.+ 0.5), 23.75, 23.75};
   
   Double_t parCoolAsicIn[10] = { .5, 59., 1, 2,
-    -8., 8, 8.2,
-    -2.2, 7, 7.2};
+    -8., 8, 8.4,
+    -2.2, 7, 7.4};
+  //    -8., 8, 8.2,
+  //    -2.2, 7, 7.2};
   Double_t parCoolAsicMid[10] = { .5, 29., 1, 2,
-    -11.5, 23., 23.2,
-    -4.8, 20., 20.2};
+    -11.5, 23., 23.4,
+    -4.8, 20., 20.4};
+  //    -11.5, 23., 23.2,
+  //   -4.8, 20., 20.2};
   Double_t parCoolAsicOut[10] = { .5, 29., 1, 2,
-    -9.5, 23.6, 23.8,
-    -3.9, 20.8, 21.};
+    -9.5, 23.6, 24.,
+    -3.9, 20.8, 21.2};
+  //   -9.5, 23.6, 23.8,
+  //   -3.9, 20.8, 21.};
   
   
   Double_t parLinkStruct[22] = { 358.5, 3., 1, 6,
@@ -485,18 +495,20 @@ void create_vacvessel_geo(const char* geoTag)
     (-6.75-3.5), 7.5, 12.75,
     (-6.75-3.5 + 0.05 + 1.5), 7.5, 9.5};
   
-  
-  Double_t parChamberCone[5] = { 20.,
-    26.20000, 26.40000,
-    3.00000,  3.2000};
-  //				   2.450000,  2.650000};
+  //For a Cone shape chamber  
+  //Double_t parChamberCone[5] = { 20.,
+  //  26.20000, 26.40000,
+  //  3.00000,  3.2000};
+
   
   //Double_t parChamberBarrel[3] = { 26.0, 26.2, 10.}; // for end plate edge shadowing CALIFA
-  Double_t parChamberBarrel[3] = { 26.0, 26.2, 15.}; // for end plate edge of CALIFA
+  //Double_t parChamberBarrel[3] = { 26.0, 26.2, 15.}; // for end plate edge of CALIFA
   //Double_t parChamberBarrel[3] = { 26.0, 26.2, 25.};  // for end plate edge at then end of CALIFA
+  Double_t parChamberBarrel[3] = { 26.0, 26.2, (15.+20.)}; // for a non cone shape chamber
   
   //Double_t parChamberEndPlate[3] = { 5.50, 26.2, 1.}; // 2x1 cm Aluminium
   Double_t parChamberEndPlate[3] = { 5.50, 26.2, 0.75}; // 2*0.75 cm of stainless steel
+  Double_t parChamberEndPlateFront[3] = { 5.50, 26.2, 0.1}; // 2*0.1 cm of aluminium
   
   
   //Double_t parPipeIn1[3] = { 5.50, 6.0, 5.5}; // for end plate edge shadowing CALIFA
@@ -530,8 +542,9 @@ void create_vacvessel_geo(const char* geoTag)
   
   // chamber
   TGeoTube *pChamberBarrel = new TGeoTube(parChamberBarrel);
-  TGeoCone *pChamberCone = new TGeoCone(parChamberCone);
+  //TGeoCone *pChamberCone = new TGeoCone(parChamberCone);
   TGeoTube *pChamberEndPlate = new TGeoTube(parChamberEndPlate);
+  TGeoTube *pChamberEndPlateFront = new TGeoTube(parChamberEndPlateFront);
   
   // beam pipe
   TGeoTube *pPipeIn1 = new TGeoTube(parPipeIn1);
@@ -599,13 +612,15 @@ void create_vacvessel_geo(const char* geoTag)
   TGeoVolume* pChamberBarrelLog = new TGeoVolume("ChamberBarrelLog",pChamberBarrel, pMed2);
   pChamberBarrelLog->SetVisLeaves(kTRUE);
   
-  TGeoVolume* pChamberConeLog = new TGeoVolume("ChamberConeLog",pChamberCone, pMed2);
-  pChamberConeLog->SetVisLeaves(kTRUE);
+  //TGeoVolume* pChamberConeLog = new TGeoVolume("ChamberConeLog",pChamberCone, pMed2);
+  //pChamberConeLog->SetVisLeaves(kTRUE);
   
   TGeoVolume* pChamberEndPlateLog = new TGeoVolume("ChamberEndPlateLog",pChamberEndPlate, pMed3);  // Stainless Steel
-  //TGeoVolume* pChamberEndPlateLog = new TGeoVolume("ChamberEndPlateLog",pChamberEndPlate, pMed2);  // Alu
   pChamberEndPlateLog->SetVisLeaves(kTRUE);
-  
+
+  TGeoVolume* pChamberEndPlateFrontLog = new TGeoVolume("ChamberEndPlateFrontLog",pChamberEndPlateFront, pMed2);  // Alu
+  pChamberEndPlateFrontLog->SetVisLeaves(kTRUE);
+ 
   TGeoVolume* pPipeIn1Log = new TGeoVolume("PipeIn1Log", pPipeIn1, pMed2);
   pPipeIn1Log->SetVisLeaves(kTRUE);
   
@@ -737,11 +752,13 @@ void create_vacvessel_geo(const char* geoTag)
   top1->AddNode(pPipeInSteelPipeLog,0,pMatrix184);
   
   pChamberBarrelLog->SetLineColor(34);
-  pChamberConeLog->SetLineColor(34);
+  //pChamberConeLog->SetLineColor(34);
   pChamberEndPlateLog->SetLineColor(34);
+  pChamberEndPlateFrontLog->SetLineColor(34);
   top1->AddNode(pChamberBarrelLog,0,pMatrix170);
-  top1->AddNode(pChamberConeLog,0,pMatrix172);
+  //top1->AddNode(pChamberConeLog,0,pMatrix172);   // for a cone shape chamber
   top1->AddNode(pChamberEndPlateLog,0,pMatrix174);
+  top1->AddNode(pChamberEndPlateFrontLog,0,pMatrix175); // for non cone shape chamber
   
   top->AddNode(top1, 0, t0);
   

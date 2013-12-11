@@ -35,7 +35,7 @@ Bool_t fLabTrans = kFALSE;
 
 
 
-void create_terget_geo(const char* geoTag = "LiH")
+void create_target_geo(const char* geoTag = "LiH")
 {
   // -------   Load media from media file   -----------------------------------
   FairGeoLoader*    geoLoad = new FairGeoLoader("TGeo","FairGeoLoader");
@@ -370,9 +370,7 @@ void ConstructGeometry4(TGeoMedium *pMed2, TGeoMedium *pMed15,
   Double_t rmin = 0.000000;
   Double_t rmax = 3.525000;  
   dz   = 3.0250;
-  phi1 = 0.000000;
-  phi2 = 360.000000;
-  TGeoShape *pTargetEnveloppe = new TGeoTubeSeg("TargetEnveloppe",rmin,rmax,dz,phi1,phi2);
+  TGeoShape *pTargetEnveloppe = new TGeoTube("TargetEnveloppe",rmin,rmax,dz);
   TGeoVolume *pTargetEnveloppe_log = new TGeoVolume("TargetEnveloppe",pTargetEnveloppe, pMed2);
   pTargetEnveloppe_log->SetVisLeaves(kTRUE);
   TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix2);
@@ -384,9 +382,7 @@ void ConstructGeometry4(TGeoMedium *pMed2, TGeoMedium *pMed15,
   rmin = 3.5;          //1.000000;
   rmax = 3.5250;       //for Mylar
   dz   = 3.;           //1.750000;
-  phi1 = 0.000000;
-  phi2 = 360.000000;
-  TGeoShape *pTarget1 = new TGeoTubeSeg("Target1",rmin,rmax,dz,phi1,phi2);
+  TGeoShape *pTarget1 = new TGeoTube("Target1",rmin,rmax,dz);
   TGeoVolume *pTarget1_log = new TGeoVolume("Target1",pTarget1, pMed15);   // Mylar
   pTarget1_log->SetVisLeaves(kTRUE);
   pTargetEnveloppe_log->AddNode(pTarget1_log, 0, pMatrix4);
@@ -397,9 +393,7 @@ void ConstructGeometry4(TGeoMedium *pMed2, TGeoMedium *pMed15,
   rmin = 0.000000;
   rmax = 3.5;           //1.000000;
   dz   = 3.;            //1.750000;
-  phi1 = 0.000000;
-  phi2 = 360.000000;
-  TGeoShape *pTarget2 = new TGeoTubeSeg("Target2",rmin,rmax,dz,phi1,phi2);
+  TGeoShape *pTarget2 = new TGeoTube("Target2",rmin,rmax,dz);
   TGeoVolume *pTarget2_log = new TGeoVolume("Target2",pTarget2, pMed3);   // H2
   pTarget2_log->SetVisLeaves(kTRUE);
   pTargetEnveloppe_log->AddNode(pTarget2_log, 0, pMatrix6);
@@ -409,9 +403,7 @@ void ConstructGeometry4(TGeoMedium *pMed2, TGeoMedium *pMed15,
   rmin = 0.000000;
   rmax = 3.5250;    //for mylar;
   dz   = 0.012500;  // =half thickness for Mylar
-  phi1 = 0.000000;
-  phi2 = 360.000000;
-  TGeoShape *pTarget3 = new TGeoTubeSeg("Target3",rmin,rmax,dz,phi1,phi2);
+  TGeoShape *pTarget3 = new TGeoTube("Target3",rmin,rmax,dz);
   TGeoVolume *pTarget3_log = new TGeoVolume("Target3",pTarget3, pMed15);    // Mylar
   pTarget3_log->SetVisLeaves(kTRUE);
   pTargetEnveloppe_log->AddNode(pTarget3_log, 0, pMatrix8);
