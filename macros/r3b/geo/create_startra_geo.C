@@ -136,7 +136,8 @@ void create_startra_geo(const char* geoTag)
 					     6     // half length
 					    );
 
-   TGeoCombiTrans *t_targ=new TGeoCombiTrans("t_targ", 0.,0.,5-WorldHalfLength,fRefRot);
+   //TGeoCombiTrans *t_targ=new TGeoCombiTrans("t_targ", 0.,0.,5-WorldHalfLength,fRefRot);
+   TGeoCombiTrans *t_targ=new TGeoCombiTrans("t_targ", 0.,0.,4.813-WorldHalfLength,fRefRot);
    t_targ->RegisterYourself();
 
    TGeoCompositeShape *pSTaRTrackWorld = new TGeoCompositeShape("STarTrack_Tube","STarTrack_Tube_A - (STarTrack_Tube_B:t_targ)");
