@@ -25,8 +25,10 @@ include(CheckCompiler)
 #Check the compiler and set the compile and link flags
 Check_Compiler()
 
-set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
-set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
+Set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
+Set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
+Set(INCLUDE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/include")
+Set(VMCWORKDIR ${CMAKE_SOURCE_DIR})
 
 Option(USE_PATH_INFO "Information from PATH and LD_LIBRARY_PATH are
 used."OFF)
@@ -89,20 +91,26 @@ else(R3BROOT_MINIMAL)
   find_package(Oracle)
 endif(R3BROOT_MINIMAL)
 
+# set a variable which should be used in all CMakeLists.txt
+# Defines all basic include directories from fairbase
+SetBasicVariables()
 
 # Set the library version in the main CMakeLists.txt
-SET(FAIRROOT_MAJOR_VERSION 0)
-SET(FAIRROOT_MINOR_VERSION 0)
-SET(FAIRROOT_PATCH_VERSION 0)
-SET(FAIRROOT_VERSION "${FAIRROOT_MAJOR_VERSION}.${FAIRROOT_MINOR_VERSION}.${FAIRROOT_PATCH_VERSION}")
+SET(R3BROOT_MAJOR_VERSION 0)
+SET(R3BROOT_MINOR_VERSION 0)
+SET(R3BROOT_PATCH_VERSION 0)
+SET(R3BROOT_VERSION "${FAIRROOT_MAJOR_VERSION}.${FAIRROOT_MINOR_VERSION}.${FAIRROOT_PATCH_VERSION}")
 SET(FAIRROOT_LIBRARY_PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES}
-    VERSION "${FAIRROOT_VERSION}"
-    SOVERSION "${FAIRROOT_MAJOR_VERSION}"
+    VERSION "${R3BROOT_VERSION}"
+    SOVERSION "${R3BROOT_MAJOR_VERSION}"
     SUFFIX ".so"
 )
 
 SET(R3BLIBDIR ${CMAKE_BINARY_DIR}/lib)  
 SET(LD_LIBRARY_PATH  ${R3BLIBDIR} ${LD_LIBRARY_PATH})
+
+
+Generate_Version_Info()
 
 # Recurse into the given subdirectories.  This does not actually
 # cause another cmake executable to run.  The same process will walk through
