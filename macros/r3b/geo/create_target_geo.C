@@ -297,16 +297,17 @@ void ConstructGeometry4(TGeoMedium *pMed2, TGeoMedium *pMed15,
   // Combi transformation: 
   dx = 0.000000;
   dy = 0.000000;
-  dz = 3.025000;  // tanslation along z
+  //dz = 3.025000;  // tanslation along z
+  dz=3.0; // this means the origine (0,0,0) starts at the edge of the Mylar entrance foil and the H2 liq.
   // Rotation: 
   thx = 90.000000;    phx = 0.000000;
   thy = 90.000000;    phy = 90.000000;
   thz = 0.000000;    phz = 0.000000;
   TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
   TGeoCombiTrans *pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
-  dz=dz*2.+5.5;
+  dz=dz*2.+ 5.5;
   TGeoCombiTrans *pMatrix2b = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
-  dz=dz +5.5 + 1.02500;
+  dz=dz + 5.5 + 1.02500;
   TGeoCombiTrans *pMatrix2c = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
 
   // Combi transformation: 
