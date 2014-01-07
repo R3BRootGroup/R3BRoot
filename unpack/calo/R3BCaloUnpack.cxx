@@ -74,7 +74,7 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size)
   
   
   UInt_t l_s = 0;
-  UInt_t *pl_data = (uint32_t*) data;
+  UInt_t *pl_data = (UInt_t*) data;
   
   
   LOG(DEBUG) << "Unpacking" << FairLogger::endl;
@@ -149,7 +149,7 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size)
     magic_affe = (pl_data[l_s++] >> 16) & 0xffff;
     event_id = pl_data[l_s++];
     timestamp = pl_data[l_s++];
-    timestamp |= (uint64_t)pl_data[l_s++] << 32;
+    timestamp |= (ULong_t)pl_data[l_s++] << 32;
     cfd_samples[0] = pl_data[l_s] & 0xff;
     cfd_samples[1] = pl_data[l_s++] >> 16;
     cfd_samples[2] = pl_data[l_s] & 0xff;
