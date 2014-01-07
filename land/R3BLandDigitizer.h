@@ -3,8 +3,6 @@
 
 
 #include "FairTask.h"
-#include <map>
-#include <string>
 #include "R3BLandDigiPar.h"
 #include "R3BLandDigi.h"
 
@@ -12,6 +10,9 @@ class TClonesArray;
 class TObjectArray;
 class TH1F;
 class TH2F;
+class TF1;
+class TRandom3;
+
 
 struct PM_RES
 {
@@ -19,78 +20,59 @@ struct PM_RES
 };
 
 
-class R3BLandDigitizer : public FairTask
-{
+class R3BLandDigitizer : public FairTask {
 
- public:
-
-  /** Default constructor **/  
+public:
+  /** Default constructor **/
   R3BLandDigitizer();
-
 
   /** Constructor **/  
   R3BLandDigitizer(Int_t verbose);
 
-
   /** Destructor **/
   ~R3BLandDigitizer();
 
-
   /** Virtual method Init **/
   virtual InitStatus Init();
-
 
   /** Virtual method Exec **/
   virtual void Exec(Option_t* opt);
 
   virtual void Finish();
+  
   virtual void Reset();
 
   inline void UseBeam(const Double_t& beamEnergy) {  fBeamEnergy = beamEnergy;  }
-
+  
+  inline void UseThresholds(const char *fileName, const Int_t nChannels)
+  { fThreshFileName = TString(fileName);  fNChannels = nChannels; }
 
   R3BLandDigi* AddHit(Int_t paddleNr, Double_t tdcL, Double_t tdcR, Double_t tdc,
-     Double_t qdcL, Double_t qdcR, Double_t qdc, Double_t xx,Double_t yy, Double_t zz );
+                      Double_t qdcL, Double_t qdcR, Double_t qdc,
+                      Double_t xx,Double_t yy, Double_t zz );
 
-  protected:
-  TClonesArray* fLandPoints;
-  TClonesArray* fLandMCTrack; 
-  TClonesArray* fLandDigi;
+  
+protected:
+  
+  TF1 *f1;
+  TRandom3 *fRnd;
+  
+  TString fThreshFileName;
+  Int_t fNChannels;
+  
+  TClonesArray *fLandPoints;
+  TClonesArray *fLandMCTrack;
+  TClonesArray *fLandDigi;
 
   // Parameter class
-  R3BLandDigiPar* fLandDigiPar;
+  R3BLandDigiPar *fLandDigiPar;
 
-  //- Control Hitograms
+  // Control Hitograms
   TH1F *hPMl;
   TH1F *hPMr;
-  TH1F *hTotalLight;
-  TH1F *hTotalLight1;
-  TH1F *hTotalEnergy;
-  TH1F *hTotalEnergy1;
-  TH1F *hTotalLightRel;
-  TH1F *hTotalEnergyRel;
-  TH1F *hTotalLightRel2;
   TH1F *hMult1;
   TH1F *hMult2;
-  TH1F *hParticle;
-  TH1F *hPaddleEnergy;
-  TH1F *hFirstEnergy;
-  
-  TH2F *hElossLight;
 
-  TH2F *hElossXL;
-  TH2F *hElossXR;
-
-  TH2F *hThresh;
-  TH1F *hTPaddle;
-  TH1F *hBetaPaddle;
-
-  TH1F *hQDCRatio;
-
-  TH2F *hElossTime;
-  TH2F *hElossPdg;
-
-  Double_t thresh[5000];
   Double_t threshL[5000];
   Double_t threshR[5000];
  
@@ -100,20 +82,18 @@ class R3BLandDigitizer : public FairTask
   Int_t paddle_per_plane;
   Double_t plength; // half length of paddle
   Double_t att; // light attenuation factor [1/cm]
-  Double_t mn; // mass of neutron in MeV/c**2
-  Double_t mnu; // mass of neutron in atomic mass units
-  Double_t amu; //atomic mass unit in MeV/c**2
   Double_t c;
   Double_t cMedia; // speed of light in material in cm/ns
-  Double_t calFactor; //calibration factor energy of LAND paddles
   Double_t fBeamEnergy;
   PM_RES **PM_res;
-  private:
+
+
+private:
+  
   virtual void SetParContainers();
 
  
-  ClassDef(R3BLandDigitizer,1);
-  
+  ClassDef(R3BLandDigitizer,1)
 };
 
 #endif

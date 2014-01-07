@@ -59,9 +59,9 @@ InitStatus R3BNeutronCalibr2D::Init()
 // -----------------------------------------------------------------------------
 void R3BNeutronCalibr2D::Exec(Option_t* opt)
 {
-  if(0 == (fEventNo%10)) {
-    cout << "-I- R3BNeutronCalibr2D : Event #: " << fEventNo << "." << endl;
-  }
+//  if(0 == (fEventNo%10)) {
+//    cout << "-I- R3BNeutronCalibr2D : Event #: " << fEventNo << "." << endl;
+//  }
   fEventNo += 1;
 
   // Loop over digis
