@@ -11,7 +11,7 @@ void r3blandsim(Int_t beam)
   // Files
   char str[100];
   sprintf(str, "%1dAMeV", beam);
-  TString InFile  = "../../../neuland/input/signal.p2p." + TString(str) + ".dat";
+  TString InFile  = "/Users/kresan/Dropbox/data/input/signal.p2p." + TString(str) + ".dat";
   TString OutFile = "/Users/kresan/neuland/r3bsim.s406." + TString(str) + ".root";
   TString ParFile = "/Users/kresan/neuland/r3bpar.s406." + TString(str) + ".root";
 
