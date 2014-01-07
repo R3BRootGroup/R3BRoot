@@ -10,6 +10,7 @@ ${CMAKE_SOURCE_DIR}/r3bbase
 ${CMAKE_SOURCE_DIR}/passive
 ${CMAKE_SOURCE_DIR}/mcstack 
 ${CMAKE_SOURCE_DIR}/unpack
+${CMAKE_SOURCE_DIR}/unpack/calo
 ${CMAKE_SOURCE_DIR}/unpack/land
 ${CMAKE_SOURCE_DIR}/MbsAPI
 ${CMAKE_SOURCE_DIR}/r3bdata/
@@ -33,6 +34,8 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
 #Put here your sourcefiles
+calo/R3BCaloUnpack.cxx
+calo/R3BCaloRawHit.cxx
 TRootEvent.cxx
 land/R3BLandUnpack.cxx
 land/R3BLandRawHit.cxx
