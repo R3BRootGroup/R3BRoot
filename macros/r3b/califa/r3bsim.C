@@ -83,8 +83,10 @@ Int_t r3bsim(){
   //	     new TObjString("glad_v13a.geo.root"));
   //detGeo.Add(new TObjString("CRYSTALBALL"),   
   //         new TObjString("cal_v13a.geo.root"));
+  //detGeo.Add(new TObjString("CALIFA"),        
+  //	     new TObjString("califa_v13_811.geo.root"));
   detGeo.Add(new TObjString("CALIFA"),        
-	     new TObjString("califa_v13_811.geo.root"));
+	     new TObjString("califa_10_v8.11.geo.root"));
   //detGeo.Add(new TObjString("TOF"),           
   //     new TObjString("tof_v13a.geo.root"));
   //detGeo.Add(new TObjString("MTOF"),          
