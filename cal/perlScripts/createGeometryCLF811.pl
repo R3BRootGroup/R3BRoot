@@ -23,6 +23,7 @@
 # SOME CONSTRUCTION PARAMETERS!
 # Thickness of the alveolar carbon fiber in cm 
 $alveolarThickness=0.03;
+$alveolarThicknessEpsilon=0.029; #to avoid extrusion of CrystalWithWrapping out of the AlveolusInner volume (added 19/12/2013)
 $wrappingThickness=0.03;
 #$wrappingThickness=0.5;
 # Length of the different crystals models, in cm (crystal1_A, crystal1_B, crystal2_A, ...)
@@ -118,16 +119,16 @@ for ($i = 0; $i<=$#Alv_x/8; $i++) {
 		#NOTE2: the transformation is X->X´, Y->Z´, Z->-Y´, so it is mandatory a change in the sign of $Cry_z
 		print OUTPUTFILE "\t vertices_Alv[",$j*2,"] = ", $Alv_x[$i*8+$j],"; vertices_Alv[",$j*2+1,"] = ", -$Alv_z[$i*8+$j], "; \n";
 		if($j==0 || $j==3 || $j==4 || $j==7) {		
-			print OUTPUTFILE "\t vertices_inner_Alv[",$j*2,"] = ", $Alv_x[$i*8+$j]+$alveolarThickness,";";
+			print OUTPUTFILE "\t vertices_inner_Alv[",$j*2,"] = ", $Alv_x[$i*8+$j]+$alveolarThickness-$alveolarThicknessEpsilon,";";
 		}
 		else{
-			print OUTPUTFILE "\t vertices_inner_Alv[",$j*2,"] = ", $Alv_x[$i*8+$j]-$alveolarThickness,";";
+			print OUTPUTFILE "\t vertices_inner_Alv[",$j*2,"] = ", $Alv_x[$i*8+$j]-$alveolarThickness+$alveolarThicknessEpsilon,";";
 		} 
 		if($j==0 || $j==1 || $j==4 || $j==5) {
-			print OUTPUTFILE "\t vertices_inner_Alv[",$j*2+1,"] = ", -$Alv_z[$i*8+$j]-$alveolarThickness,"; \n";
+			print OUTPUTFILE "\t vertices_inner_Alv[",$j*2+1,"] = ", -$Alv_z[$i*8+$j]-$alveolarThickness+$alveolarThicknessEpsilon,"; \n";
 		}
 		else{
-			print OUTPUTFILE "\t vertices_inner_Alv[",$j*2+1,"] = ", -$Alv_z[$i*8+$j]+$alveolarThickness,"; \n";
+			print OUTPUTFILE "\t vertices_inner_Alv[",$j*2+1,"] = ", -$Alv_z[$i*8+$j]+$alveolarThickness-$alveolarThicknessEpsilon,"; \n";
 		}
 	}
 	print OUTPUTFILE "\t TGeoVolume *Alveolus_",$alveolusNames[$i],"=gGeoManager->MakeArb8(\"Alveolus_",$alveolusNames[$i],"\", pCarbonFibreMedium,", $alveoliLength[$i]/2,", vertices_Alv); \n";
