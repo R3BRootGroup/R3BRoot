@@ -1,9 +1,7 @@
 // -------------------------------------------------------------------------
 // -----                   R3BCaloHitFinder source file                -----
 // -----                  Created 27/08/10  by H.Alvarez               -----
-// -----                Last modification 06/12/11 by H.Alvarez        -----
-// -----                                  15/09/11 by Enrico Fiori     -----
-// -----                                  05/07/12 by P. Cabanelas     -----
+// -----                Last modification 10/01/14 by H.Alvarez        ----
 // -------------------------------------------------------------------------
 
 /**  R3BCaloHitFinder.h
@@ -46,15 +44,7 @@ class R3BCaloHitFinder : public FairTask
      **
      ** Defines the geometry
      *@param version  Integer parameter used to select the geometry:
-     **     0- CALIFA 5.0, including BARREL and ENDCAP.
-     **     1- CALIFA 7.05, only BARREL
-     ** 2- CALIFA 7.07, only BARREL
-     ** 3- CALIFA 7.09, only BARREL 
-     ** 4- CALIFA 7.17, only ENDCAP (in CsI[Tl])
-     ** 5- CALIFA 7.07+7.17,
-     ** 6- CALIFA 7.09+7.17,
-     ** 10- CALIFA 8.11, only BARREL
-     ** ...
+     ** (see documentation /r3broot/cal/perlScripts/README))
      **/
     void SelectGeometryVersion(Int_t version);
 

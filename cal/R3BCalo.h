@@ -1,7 +1,7 @@
 // -------------------------------------------------------------------------
 // -----                        R3BCalo header file                    -----
 // -----                  Created 26/03/09  by D.Bertini               -----
-// -----	     Last modification 28/05/12 by P.Cabanelas         -----
+// -----	     Last modification 10/01/14 by H.Alvarez           -----
 // -------------------------------------------------------------------------
 
 /**  R3BCalo.h
@@ -113,34 +113,22 @@ class R3BCalo : public R3BDetector
   virtual void ConstructGeometry();
 	
 
-	virtual Bool_t CheckIfSensitive(std::string name);
-	
-	
-	/** Public method SelectGeometryVersion
-	 **
-	 ** Defines the geometry 
-	 *@param version  Integer parameter used to select the geometry: 
-	 **	0- CALIFA 5.0, including BARREL and ENDCAP.
-	 **	1- CALIFA 7.05, only BARREL
-	 ** 2- CALIFA 7.07, only BARREL
-	 ** 3- CALIFA 7.09, only BARREL 
-	 ** 4- CALIFA 7.17, only ENDCAP (in CsI[Tl])
-	 ++    4.1 Phoswich endcap (CLF717_Geometry_PhoswichEndcap_1,2.geo): 
-	 ** 5- CALIFA 7.07+7.17, (CLF717_Geometry_PhoswichEndcap_3.geo)
-	 ** 6- CALIFA 7.09+7.17, (CLF717_Geometry_PhoswichEndcap_5.geo)
-	 ** 10- CALIFA 8.11, only BARREL 
-	 ** ...CLF717_Geometry_PhoswichEndcap_4.geo for CLF811 + phoswich endcap, but not connected by now
-	 **/
+  virtual Bool_t CheckIfSensitive(std::string name);
+  
+  /** Select the version of the CALIFA geometry
+   **
+   *@param version Geometry version (see documentation /r3broot/cal/perlScripts/README)
+   **/	
   void SelectGeometryVersion(Int_t version);
-	
-	
-	/** Public method SetNonUniformity
-	 **
-	 ** Defines the fNonUniformity parameter in % deviation from the central value 
-	 *@param nonU  Double parameter setting the maximum non-uniformity allowed 
-	 **/	
+  
+  
+  /** Public method SetNonUniformity
+   **
+   ** Defines the fNonUniformity parameter in % deviation from the central value 
+   *@param nonU  Double parameter setting the maximum non-uniformity allowed 
+   **/	
   void SetNonUniformity( Double_t nonU );
-
+  
 	
   virtual void Initialize();
   virtual void SetSpecialPhysicsCuts() {}
@@ -170,11 +158,6 @@ class R3BCalo : public R3BDetector
 
     TClonesArray*  fCaloCollection;              //!  The hit collection
     TClonesArray*  fCaloCrystalHitCollection;    //!  The crystal hit collection
-
-    Int_t fCrystalType[30];
-    Int_t fAlveolusType[32];
-    Int_t fAlveolusECType[16]; /*Int_t fAlveolusECType[16] for LaBr LaCl phoswich endcap IEM (CLF717_Geometry_PhoswichEndcap_*.geo)*/
-
 	
     // Selecting the geometry of the CALIFA calorimeter
     Int_t fGeometryVersion;
@@ -220,48 +203,8 @@ class R3BCalo : public R3BDetector
 	
     TGeoRotation* createMatrix( Double_t phi, Double_t theta, Double_t psi);
 
-    Int_t  GetCrystalType(Int_t volID);
-    Int_t  GetAlveolusType(Int_t volID);
-    Int_t  GetAlveolusECType(Int_t volID);
-
     ClassDef(R3BCalo,1);
 };
-
-inline Int_t R3BCalo::GetCrystalType(Int_t volID) {
-Int_t type=-1;
-
-for (Int_t i=0;i<30;i++ ){
-    if (volID==fCrystalType[i]) {
-	type=i+1; //
-	return (type);
-    }
-}
-return type;
-}
-
-inline Int_t R3BCalo::GetAlveolusType(Int_t volID) {
-	Int_t type=-1;
-	
-	for (Int_t i=0;i<32;i++ ){
-		if (volID==fAlveolusType[i]) {
-			type=i+1; //
-			return (type);
-		}
-	}
-	return type;
-}
-
-inline Int_t R3BCalo::GetAlveolusECType(Int_t volID) {
-	Int_t type=-1;
-	
-	for (Int_t i=0;i<15;i++ ){ /*i=15 instead of i=3, For LaBr LaCl phoswich endcap IEM (CLF717_Geometry_PhoswichEndcap_*.geo)*/
-		if (volID==fAlveolusECType[i]) {
-			type=i+1; //
-			return (type);
-		}
-	}
-	return type;
-}
 
 inline void R3BCalo::ResetParameters() {
   fTrackID = fVolumeID = fParentTrackID = fTrackPID = fUniqueID = 0;

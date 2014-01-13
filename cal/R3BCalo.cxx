@@ -1,8 +1,101 @@
 // -------------------------------------------------------------------------
 // -----                        R3BCalo source file                    -----
 // -----                  Created 26/03/09  by D.Bertini               -----
-// -----	     Last modification 28/05/12 by P.Cabanelas         -----
+// -----	     Last modification 10/01/14 by H. Alvarez          -----
 // -------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////
+//HAPOL-10/01/2014 (hector.alvarez@usc.es)
+// Moving to the new geometry scheme where all TGeo structures loads from
+// a precreated root file.
+// Next geometries are possible:
+//
+// 0 - OLD CALIFA 5.0, including BARREL and ENDCAP:
+//   NOTE: THERE IS NO WARRANTY THAT THIS VERSION WORKS AT ALL IN R3BROOT
+//   Contains 30 different crystal types, repeated 64 times (64 copies)
+//
+// 1- CALIFA 7.05, only BARREL
+//   Each ring is made of 40 alveoli of 4 crystals each.  There are 24 
+//   alveoli along the polar angle for a total of 40x24=960 alveoli or 
+//   3840 crystals. There are 12 different crystal shapes:
+//     @alveoliType=(1,1,2,2,2,2,2,3,3,3,3,4,4,4,4,4,4,4,4,5,5,6,6,6);
+//     Volumes: Alveolus_[1,24] made of CrystalWithWrapping_[1,6][A,B] 
+//              made of Crystal_[1,6][A,B]
+//
+// 2- CALIFA 7.07, only BARREL
+//   Each ring is made of 32 alveoli of 4 crystals each. There are 20 
+//   alveoli along the polar angle for a total of 32x20=640 alveoli or 
+//   2560 crystals. There are 16 different crystal shapes:
+//     @alveoliType=(1,1,2,2,2,3,3,4,4,4,5,5,6,6,6,7,7,7,8,8);
+//     Volumes: Alveolus_[1,20] made of CrystalWithWrapping_[1,8][A,B] 
+//              made of Crystal_[1,8][A,B]
+//
+// 3- CALIFA 7.09, only BARREL (BP: benjamin.pietras@usc.es)
+//   The first 16 rings are made of 32 alveoli of 4 crystals each. The 
+//   last 3 rings are made of 32 alveoli of 1 crystal each. There are 
+//   19 alveoli along the polar angle for a total of 32x19=608 alveoli 
+//   or 2144 crystals. There are 11 different crystal shapes:
+//     @alveoliType[19]={1,1,2,2,3,3,3,3,3,3,4,4,4,5,5,5,6,6,6};
+//
+// 4- CALIFA 7.17, only ENDCAP (in CsI[Tl])
+//   Each ring is made of 32 alveoli of 8, 8 and 7 crystals each. There 
+//   are 3 alveoli along the polar angle for a total of 32x3=96 alveoli or 
+//   736 crystals. There are 23 different crystal shapes:
+//     @alveoliType=(8,8,7);
+//     Volumes: Alveolus_EC_[1,3] made of CrystalWithWrapping_[1,23] 
+//              made of Crystal_[1,23]
+//
+// 5- CALIFA 7.07+7.17 CsI
+//   See above the two components (2 & 4)
+//
+// 6- CALIFA 7.09+7.17 CsI
+//   See above the two components (3 & 4) 
+//   Use for LaBr-LaCl endcaps CLF717_Geometry_PhoswichEndcap_5.geo
+//
+// 7- CALIFA 717PHOSWICH, only phoswich ENDCAP (JSDR: josesrs@gmail.com) 
+//   (CLF717_Geometry_PhoswichEndcap_1,2.geo)  We can add here the stand 
+//   alone phoswich endcap of LaBr and LaCl scintillator crystals. The 
+//   endcap that is adapted to the barrel CLF707 is 
+//   CLF717_Geometry_PhoswichEndcap_1.geo and the one adapts to the barrel 
+//   CLF811 is CLF717_Geometry_PhoswichEndcap_2.geo
+//   The first 10 rings are made of 60 alveoli of 60 crystals each ring 
+//   (azimuthal plane). The other 5 rings are made of 30 alveoli of 30 
+//   crystals each ring. There are 15 alveoli along the polar angle for a 
+//   total of 10x60+5x30= 750 alveoli or 1500 crystals (750 phoswich 
+//   crystals). There are 30 different crystal shapes:
+//     @alveoliType=(2,2,2,2,2,2,2,2,2,2,2,2,2,2,2);
+//	 Volumes: Alveolus_EC_[1,10] made of CrystalWithWrapping_[1,60]
+//              made of Crystal_[1,60] and 
+//              Alveolus_EC_[10,15] made of CrystalWithWrapping_[1,30] 
+//              made of Crystal_[1,30]
+//
+// 8- CALIFA 7.07+7.17PHOSWICH 
+//   See above the two components (2 & 7)
+//   Phoswich LaBr-LaCl endcaps: If we want the phoswich endcap adapted 
+//   to the barrel CLF707, we use: CLF717_Geometry_PhoswichEndcap_3.geo, 
+//   and with the barrel CLF811, CLF717_Geometry_PhoswichEndcap_4.geo
+//
+// 9- CALIFA 7.09+7.17PHOSWICH
+//   See above the two components (3 & 7) 
+//   Use for LaBr-LaCl endcaps CLF717_Geometry_PhoswichEndcap_5.geo
+//
+// 10- CALIFA 8.11, only BARREL
+//   The first 15 rings are made of 32 alveoli of 4 crystals each. The 
+//   last ring are made of 32 alveoli of 1 crystal each. There are 16 
+//   alveoli along the polar angle for a total of 32x16=512 alveoli and 
+//   32x15x4+32=1952 crystals. There are 11 (actually 5x2+1) different 
+//   crystal shapes:
+//
+// 11- PHOSWICH ENDCAP ADAPTED TO CALIFA BARREL 8.11
+//   It is adapted to the IEM-CSIC Madrid LaBr3-LaCl3 Phoswich 
+//   Endcap (CLF717_Geometry_PhoswichEndcap_6.geo)
+// 
+// 12- CALIFA 8.11 +7.17 CsI
+//
+// 13- CALIFA 8.13d, only BARREL
+//
+// 14-  
+////////////////////////////////////////////////////////////////////////////
+
 #include <iostream>
 #include <stdlib.h>
 
@@ -113,87 +206,8 @@ void R3BCalo::Initialize()
   LOG(INFO) << "R3BCalo: initialisation" << FairLogger::endl;
   LOG(DEBUG) << "-I- R3BCalo: Vol (McId) def" << FairLogger::endl;
 
-  //Char_t buffer[126];
-
-  //Taken into different geometries during the initialization phase:
-  // 0 - OLD CALIFA 5.0, including BARREL and ENDCAP:
-  //   NOTE: THERE IS NO WARRANTY THAT THIS VERSION WORKS CORRECTLY IN R3BROOT
-  //   Contains 30 different crystal types, repeated 64 times (64 copies)
-  //
-  // 1- CALIFA 7.05, only BARREL
-  //   Each ring is made of 40 alveoli of 4 crystals each. There are 24 alveoli along the polar angle
-  //   for a total of 40x24=960 alveoli or 3840 crystals. There are 12 different crystal shapes:
-  //     @alveoliType=(1,1,2,2,2,2,2,3,3,3,3,4,4,4,4,4,4,4,4,5,5,6,6,6);
-  //
-  //     Volumes: Alveolus_[1,24] made of CrystalWithWrapping_[1,6][A,B] made of Crystal_[1,6][A,B]
-  //
-  // 2- CALIFA 7.07, only BARREL
-  //   Each ring is made of 32 alveoli of 4 crystals each. There are 20 alveoli along the polar angle
-  //   for a total of 32x20=640 alveoli or 2560 crystals. There are 16 different crystal shapes:
-  //     @alveoliType=(1,1,2,2,2,3,3,4,4,4,5,5,6,6,6,7,7,7,8,8);
-  //
-  //     Volumes: Alveolus_[1,20] made of CrystalWithWrapping_[1,8][A,B] made of Crystal_[1,8][A,B]
-  //
-  // 3- CALIFA 7.09, only BARREL (bp)
-  //   The first 16 rings are made of 32 alveoli of 4 crystals each. The last 3 rings are made of 32
-  //   alveoli of 1 crystal each. There are 19 alveoli along the polar angle for a total of 32x19=608
-  //   alveoli or 2144 crystals. There are 11 different crystal shapes:
-  //     @alveoliType[19]={1,1,2,2,3,3,3,3,3,3,4,4,4,5,5,5,6,6,6};
-  //
-  //
-  // 4- CALIFA 7.17, only ENDCAP (in CsI[Tl])
-  //   Each ring is made of 32 alveoli of 8, 8 and 7 crystals each. There are 3 alveoli along the polar angle
-  //   for a total of 32x3=96 alveoli or 736 crystals. There are 23 different crystal shapes:
-  //     @alveoliType=(8,8,7);
-  //
-  //     Volumes: Alveolus_EC_[1,3] made of CrystalWithWrapping_[1,23] made of Crystal_[1,23]
-  //
-  // 4.1.CALIFA 7.17, only phoswich ENDCAP (CLF717_Geometry_PhoswichEndcap_1,2.geo)  We can add here the stand alone phoswich endcap of LaBr and LaCl scintillator crystals.
-  //    The endcap that is adapted to the barrel CLF707 is CLF717_Geometry_PhoswichEndcap_1.geo and the one adapts to the barrel CLF811 is CLF717_Geometry_PhoswichEndcap_2.geo
-  //	The first 10 rings are made of 60 alveoli of 60 crystals each ring (azimuthal plane). The other 5 rings are made of 30 alveoli of 30 crystals each ring. There are 15 alveoli along the polar angle
-  //   for a total of 10x60+5x30= 750 alveoli or 1500 crystals (750 phoswich crystals). There are 30 different crystal shapes:
-  //     @alveoliType=(2,2,2,2,2,2,2,2,2,2,2,2,2,2,2);
-  // 
-  //	Alveolus_EC_[1,10] made of CrystalWithWrapping_[1,60] made of Crystal_[1,60] and Alveolus_EC_[10,15] made of CrystalWithWrapping_[1,30] made of Crystal_[1,30]
-  //
-  // 5- CALIFA 7.07+7.17 
-  //   See above the two components (3 & 4)
-  //   For phoswich LaBr-LaCl endcaps:If we want the phoswich endcap adapted to the barrel CLF707, we use: CLF717_Geometry_PhoswichEndcap_3.geo, and with the barrel CLF811, CLF717_Geometry_PhoswichEndcap_4.geo
-  //  
-  //
-  // 6- CALIFA 7.09+7.17
-  //   See above the two components. Use for LaBr-LaCl endcaps CLF717_Geometry_PhoswichEndcap_5.geo
-  //
-  // 10- CALIFA 8.11, only BARREL
-	//   The first 15 rings are made of 32 alveoli of 4 crystals each. The last ring are made of 32
-  //   alveoli of 1 crystal each. There are 16 alveoli along the polar angle for a total of 32x16=512
-  //   alveoli and 32x15x4+32=1952 crystals. There are 11 (actually 5x2+1) different crystal shapes:
-	//It is adapted to the IEM-CSIC Madrid LaBr3-LaCl3 Phoswich Endcap (CLF717_Geometry_PhoswichEndcap_6.geo)
-
-
-  //HAPOL TODO -> Check the VolId() datamember to assign dinamically different crystal logical
-  //  volumenes in different geometries. Setting now a fixed number, maybe not using all
-//  for (Int_t i=0; i<30; i++ ) {
-//    sprintf(buffer,"crystalLog%i",i+1);
-//    cout << "-I- R3BCalo: Crystal Nb   : " << i << " connected to (McId) ---> " <<  gMC->VolId(buffer)<< endl;
-//    fCrystalType[i] = gMC->VolId(buffer);
-//  }
-//  for (Int_t i=0; i<32; i++ ) {  //32 is the larger possible alveolus number (v7.05) in barrel
-//    sprintf(buffer,"Alveolus_%i",i+1);
-//    cout << "-I- R3BCalo: Alveolus_ Nb   : " << i+1 << " connected to (McId) ---> " <<  gMC->VolId(buffer)<< endl;
-//    fAlveolusType[i] = gMC->VolId(buffer);
-//  }
-//  for (Int_t i=0; i<15; i++ ) { /*3 is the larger possible alveolus number (v7.17) in endcap, in the case of the IEM LaBr-LaCl phoswich endcap CLF717_Geometry_PhoswichEndcap_*.geo, we change 3
-//  by 15.*/
-//    sprintf(buffer,"Alveolus_EC_%i",i+1);
-//    cout << "-I- R3BCalo: Alveolus_EC Nb   : " << i+1 << " connected to (McId) ---> " <<  gMC->VolId(buffer)<< endl;
-//    fAlveolusECType[i] = gMC->VolId(buffer);
-//  }
-
   TGeoVolume *vol = gGeoManager->GetVolume("CalifaWorld");
   vol->SetVisibility(kFALSE);
-
-
 }
 
 
@@ -203,15 +217,20 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
 {
 
   // Getting the Infos from Crystal Volumes
-  Int_t cp1 = -1; Int_t volId1 = -1; Int_t cpAlv = -1; Int_t cpSupAlv = -1; Int_t volIdAlv = -1; Int_t volIdSupAlv = -1; Int_t cpCry = -1; Int_t volIdCry = -1;
+  Int_t cp1 = -1; Int_t volId1 = -1; 
+  Int_t cpAlv = -1; Int_t cpSupAlv = -1; 
+  Int_t volIdAlv = -1; Int_t volIdSupAlv = -1; 
+  Int_t cpCry = -1; Int_t volIdCry = -1;
+
   // Crystals Ids
   int crysNum;
   const char* bufferName = gMC->CurrentVolName();
-  volId1 =  gMC->CurrentVolID(cp1);
-  volIdCry =  gMC->CurrentVolOffID(1,cpCry);
-  volIdAlv =  gMC->CurrentVolOffID(2,cpAlv);
-  volIdSupAlv =  gMC->CurrentVolOffID(3,cpSupAlv); //needed for versions 8.# and later
-
+  volId1 = gMC->CurrentVolID(cp1);
+  volIdCry = gMC->CurrentVolOffID(1,cpCry);
+  volIdAlv = gMC->CurrentVolOffID(2,cpAlv);
+  //next is needed for versions 8.# and later
+  volIdSupAlv = gMC->CurrentVolOffID(3,cpSupAlv);
+  //LOG(ERROR) << "TEST INITIAL. " <<  gMC->CurrentVolPath()<< FairLogger::endl;
   Int_t crystalType = 0;
   Int_t crystalCopy = 0;
   Int_t crystalId = 0;
@@ -219,183 +238,331 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
   if (fGeometryVersion==0) {
     //The present scheme here done works nicely with 5.0
     // crystalType = crystal type (from 1 to 30)
-    // crystalCopy = crystal copy (from 1 to 512 for crystal types from 1 to 6 (BARREL),
-    //                 from 1 to 64 for crystal types from 7 to 30 (ENDCAP))
-    // crystalId = (crystal type-1) *512 + crystal copy  (from 1 to 3072) for the BARREL
-    // crystalId = 3072 + (crystal type-7) *64 + crystal copy  (from 3073 to 4608) for the ENDCAP
-    //
-    crystalType = GetCrystalType(volId1);
-    //cout << " CHECKKKKKK ____ crystal Type "<< crystalType << endl;
-    crystalCopy = cp1 + 1;
-    //cout << " CHECKKKKKK ____ crystal Copy "<< crystalCopy << endl;
-    if (crystalType<7) {//del 1 al 6 hay 512 de cada tipo; del 7 al 30 solo hay 64 de cada tipo
-      crystalId = (crystalType-1)*512+crystalCopy;
-    } else if (crystalType<31) {
-      crystalId = 3072+(crystalType-7)*64+crystalCopy;
-    } else LOG(ERROR) << "R3BCalo: Impossible crystalType for geometry 5.0" << FairLogger::endl;
-    //cout << " CHECKKKKKK ____ crystal iD "<< crystalId << endl;
+    // crystalCopy = crystal copy (from 1 to 512 for crystal types from 1 to 6
+    //          (BARREL), from 1 to 64 for crystal types from 7 to 30 (ENDCAP))
+    // crystalId = (crystal type-1) *512 + crystal copy  (from 1 to 3072) 
+    //          for the BARREL
+    // crystalId = 3072 + (crystal type-7) *64 + crystal copy  (from 3073 to 
+    //          4608) for the ENDCAP
+    
+    // HAPOL-10/11/2013 (hector.alvarez@usc.es)
+    // Moving to a new way getting crystal identification: 
+    const char *crystalPrefix = "crystalLog";
+    const char *volumeName = gMC->VolName(volId1);
+    if (strncmp(crystalPrefix, volumeName,9) == 0) {
+      crystalType = atoi(volumeName+10);//converting to int the alveolus index
+      crystalCopy = cp1 + 1; 
+      if (crystalType>0 && crystalType<7) {
+	//from 1 to 6, there are 512 each type; from 7 to 30, only 64 each type
+	crystalId = (crystalType-1)*512+crystalCopy;
+      } else if (crystalType>6 && crystalType<31) {
+	crystalId = 3072+(crystalType-7)*64+crystalCopy;
+      } else 
+	LOG(ERROR) << "R3BCalo: Impossible crystalType for geometry 0 (v5.0)" 
+		   << FairLogger::endl;
+    }
+    else 
+      LOG(ERROR) << "R3BCalo: Energy collected in non-sensitive volume for geometry 0 (v5.0)" 
+		 << FairLogger::endl;
   } else if (fGeometryVersion==1)  {
     //The present scheme here done works nicely with 7.05
     // crystalType = alveolus type (from 1 to 24)   [Basically the alveolus number]
-    // crystalCopy = (alveolus copy - 1) * 4 + crystals copy (from 1 to 160)  [Not exactly azimuthal]
-    // crystalId = (alveolus type-1)*160 + (alvelous copy-1)*4 + (crystal copy)  (from 1 to 3840)
-    //        crystalID is asingle identifier per crystal!
-    crystalType = GetAlveolusType(volIdAlv);
-    crystalCopy = cpAlv * 4 + cpCry;
-    crystalId = (crystalType-1)*160 + cpAlv * 4 + cpCry;
-    if (crystalType>24 || crystalType<1 || crystalCopy>160 || crystalCopy<1 || crystalId>3840 || crystalId<1)
-      LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 1. " << FairLogger::endl;
+    // crystalCopy = (alveolus copy - 1) * 4 + crystals copy (from 1 to 160)  
+    //           [Not exactly azimuthal]
+    // crystalId = (alveolus type-1)*160 + (alvelous copy-1)*4 + (crystal copy)  
+    //           (from 1 to 3840) crystalID is a single identifier per crystal!
+    
+    // HAPOL-10/11/2013 (hector.alvarez@usc.es)
+    // Moving to a new way getting crystal identification:  
+    const char *alveolusPrefix = "Alveolus_";
+    const char *volumeName = gMC->VolName(volIdAlv);    
+    if (strncmp(alveolusPrefix, volumeName,8) == 0) {
+      crystalType = atoi(volumeName+9);//converting to int the alveolus index
+      crystalCopy = cpAlv * 4 + cpCry;
+      crystalId = (crystalType-1)*160 + cpAlv * 4 + cpCry;
+      if (crystalType>24 || crystalType<1 || crystalCopy>160 || 
+	  crystalCopy<1 || crystalId>3840 || crystalId<1)
+	LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 1 (v7.05). " 
+		   << FairLogger::endl;
+    } else LOG(ERROR) << "R3BCalo: Impossible crystalType for geometryVersion 1 (v7.05)" 
+		      << FairLogger::endl;
   } else if (fGeometryVersion==2)  {
     //The present scheme here done works nicely with 7.07
-    // crystalType = alveolus type (from 1 to 20)   [Basically the alveolus number]
-    // crystalCopy = (alveolus copy - 1) * 4 + crystals copy (from 1 to 128)  [Not exactly azimuthal]
-    // crystalId = (alveolus type-1)*128 + (alvelous copy-1)*4 + (crystal copy)  (from 1 to 2560)
-    crystalType = GetAlveolusType(volIdAlv);
-    crystalCopy = cpAlv * 4 + cpCry;
-    crystalId = (crystalType-1)*128 + cpAlv * 4 + cpCry;
-    if (crystalType>20 || crystalType<1 || crystalCopy>128 || crystalCopy<1 || crystalId>2560 || crystalId<1)
-      LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 2. " << FairLogger::endl;
-  } else if (fGeometryVersion==3) {
-    //The present scheme here done works with 7.09
-    if (GetAlveolusType(volIdAlv)<17) {
-      crystalType = GetAlveolusType(volIdAlv);
+    // crystalType = alveolus type (from 1 to 20)   [Alveolus number]
+    // crystalCopy = (alveolus copy - 1) * 4 + crystals copy (from 1 to 128)  
+    //            [Not exactly azimuthal]
+    // crystalId = (alveolus type-1)*128 + (alvelous copy-1)*4 + (crystal copy)  
+    //            (from 1 to 2560)
+    
+    // HAPOL-10/11/2013 (hector.alvarez@usc.es)
+    // Moving to a new way getting crystal identification:  
+    const char *alveolusPrefix = "Alveolus_";
+    const char *volumeName = gMC->VolName(volIdAlv);    
+    if (strncmp(alveolusPrefix, volumeName,8) == 0) {
+      crystalType = atoi(volumeName+9);//converting to int the alveolus index
       crystalCopy = cpAlv * 4 + cpCry;
       crystalId = (crystalType-1)*128 + cpAlv * 4 + cpCry;
+      if (crystalType>20 || crystalType<1 || crystalCopy>128 || 
+	  crystalCopy<1 || crystalId>2560 || crystalId<1)
+	LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 2 (v7.07)" 
+		   << FairLogger::endl;
     }
-    // Crystaltypes  17-19 are large crystals which fill type 6 alveoli, as opposed to the smaller       crystals of which 4 fit in the other alveoli.
-    else if (GetAlveolusType(volIdAlv)>16&&GetAlveolusType(volIdAlv)<20) {
-      crystalType = GetAlveolusType(volIdAlv);
-      crystalCopy = cpAlv + cpCry;
-      crystalId = 2048 + (crystalType-17)*32 + cpAlv + cpCry;
-    }
-    if (crystalType>19 || crystalType<1 || crystalCopy>128 || crystalCopy<1 || crystalId>2144 || crystalId<1)
-      LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 3. " << FairLogger::endl;
+    else LOG(ERROR) << "R3BCalo: Impossible crystalType for geometryVersion 2 (v7.07)" 
+		    << FairLogger::endl;  
+  } else if (fGeometryVersion==3) {
+    //The present scheme here done works with 7.09
+
+    // HAPOL-10/11/2013 (hector.alvarez@usc.es)
+    // Moving to a new way getting crystal identification:  
+    const char *alveolusPrefix = "Alveolus_";
+    const char *volumeName = gMC->VolName(volIdAlv);    
+    if (strncmp(alveolusPrefix, volumeName,8) == 0) {
+      crystalType = atoi(volumeName+9);//converting to int the alveolus index
+      if(crystalType>1 && crystalType<17) {
+	crystalCopy = cpAlv * 4 + cpCry;
+	crystalId = (crystalType-1)*128 + cpAlv * 4 + cpCry;
+      } else if (crystalType>16 && crystalType<20) {
+	// Crystaltypes 17-19 are large crystals which fill type 6 alveoli, as 
+	// opposed to the smaller crystals of which 4 fit in the other alveoli.
+	crystalCopy = cpAlv + cpCry;
+	crystalId = 2048 + (crystalType-17)*32 + cpAlv + cpCry;
+      }
+      if (crystalType>19 || crystalType<1 || crystalCopy>128 || 
+	  crystalCopy<1 || crystalId>2144 || crystalId<1)
+	LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 3 (v7.07). " 
+		   << FairLogger::endl;
+    } else  LOG(ERROR) << "R3BCalo: Impossible crystalType for geometryVersion 3 (v7.07)" 
+		       << FairLogger::endl;
   } else if (fGeometryVersion==4) {
     //The present scheme here done works nicely with 7.17
     // crystalType = crystals type (from 1 to 23)
     // crystalCopy = alveolus copy (from 1 to 32)
-    // crystalId = 3000 + (alvelous copy-1)*23 + (crystal copy-1)  (from 3000 to 3736)
-    
-    //In the case of the phoswich endcap (CLF717_Geometry_PhoswichEndcap.geo): 
-    // crystalType = crystals type (from 1 to 30)
-    // crystalCopy = alveolus copy (from 1 to 60), though the last 5 rings have only 30
-    if ( GetAlveolusECType(volIdAlv) !=-1 ) {
-      sscanf(bufferName,"%*8c %d",&crysNum);
-      crystalType = crysNum;
-      // crystalType = cpCry+1;
+    // crystalId = 3000 + (alvelous copy-1)*23 + (crystal copy-1)  
+    //          (from 3000 to 3736)
+
+    // HAPOL-10/11/2013 (hector.alvarez@usc.es)
+    // Moving to a new way getting crystal identification:  
+    const char *alveolusECPrefix = "Alveolus_EC_";
+    const char *volumeName = gMC->VolName(volIdAlv);    
+    if (strncmp(alveolusECPrefix, volumeName,11) == 0) {
+      crystalType = atoi(volumeName+12);//converting to int the alveolus index
       crystalCopy = cpAlv+1;
-      // crystalId = 3000 + cpAlv*23 + (crystalType-1);
-      // In the case of IEM LaBr - LaCl phoswich endcap: 
-      crystalId = 3000 + cpAlv*30 + (crystalType-1);
-      // if (crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736)
-      // For IEM LaBr - LaCl phoswich endcap:
-      if (crystalType>30 || crystalType<1 || crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>4800) {
-	LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 4. " << FairLogger::endl;
-      }
-    } else {
-      LOG(ERROR) << "R3BCalo: Wrong alveolus volume in geometryVersion 4. " << FairLogger::endl;
-    }
+      crystalId = 3000 + cpAlv*23 + (crystalType-1); 
+      if(crystalType>23 || crystalType<1 || crystalCopy>32 || 
+	 crystalCopy<1 || crystalId<3000 || crystalId>3736)  
+	LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 4 (v7.17). " 
+		   << FairLogger::endl;
+    } else  LOG(ERROR) << "R3BCalo: Impossible crystalType for geometryVersion 4 (v7.17)" 
+		       << FairLogger::endl;
   } else if (fGeometryVersion==5) {
     //The present scheme here done works nicely with 7.07+7.17
     //see the explanation for geometries 2 and 4
-    if (GetAlveolusType(volIdAlv)!=-1) {
-      crystalType = GetAlveolusType(volIdAlv);
+    
+    // HAPOL-10/11/2013 (hector.alvarez@usc.es)
+    // Moving to a new way getting crystal identification:  
+    const char *alveolusECPrefix = "Alveolus_EC_";
+    const char *alveolusPrefix = "Alveolus_";
+    const char *volumeName = gMC->VolName(volIdAlv);    
+    if (strncmp(alveolusECPrefix, volumeName,11) == 0) {
+      crystalType = atoi(volumeName+12);//converting to int the alveolus index
+      crystalCopy = cpAlv+1;
+      crystalId = 3000 + cpAlv*23 + (crystalType-1); 
+      if(crystalType>23 || crystalType<1 || crystalCopy>32 || 
+	 crystalCopy<1 || crystalId<3000 || crystalId>3736)  
+	LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 5 (v7.17). " 
+		   << FairLogger::endl;
+    }
+    else if (strncmp(alveolusPrefix, volumeName,8) == 0) {
+      crystalType = atoi(volumeName+9);//converting to int the alveolus index
       crystalCopy = cpAlv * 4 + cpCry;
       crystalId = (crystalType-1)*128 + cpAlv * 4 + cpCry;
-      if (crystalType>20 || crystalType<1 || crystalCopy>128 || crystalCopy<1 || crystalId>2560 || crystalId<1)
-        LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 5 (barrel). " << FairLogger::endl;
-    } else {
-      sscanf(bufferName,"%*8c %d",&crysNum);
-      crystalType = crysNum;
-      //crystalType = cpCry+1;
-      crystalCopy = cpAlv+1;
-      
-      
-      // crystalId = 3000 + cpAlv*23 + (crystalType-1);
-      // In the case of IEM LaBr - LaCl phoswich endcap: 
-      crystalId = 3000 + cpAlv*30 + (crystalType-1);
-      // if (crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736)
-      // For IEM LaBr - LaCl phoswich endcap:
-      if (crystalType>30 || crystalType<1 || crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>5160) {
-        LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 5 (endcap). " << FairLogger::endl;
-      }
+      if (crystalType>20 || crystalType<1 || crystalCopy>128 || 
+	  crystalCopy<1 || crystalId>2560 || crystalId<1)
+	LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 5 (v7.07)" 
+		   << FairLogger::endl;
     }
+    else LOG(ERROR) << "R3BCalo: Impossible crystalType for geometryVersion 5." 
+		    << FairLogger::endl; 
   } else if (fGeometryVersion==6) {
-    //The present scheme here done works with 7.09+7.17
+    //The present scheme here done works nicely with 7.09+7.17
     //see the explanation for geometries 3 and 4
-    if (GetAlveolusType(volIdAlv)!=-1) {
-      if (GetAlveolusType(volIdAlv)<17) {
-        crystalType = GetAlveolusType(volIdAlv);
-        crystalCopy = cpAlv * 4 + cpCry;
-        crystalId = (crystalType-1)*128 + cpAlv * 4 + cpCry;
-      }
-      // Crystaltypes 17-19 are large crystals which fill type 6 alveoli, as opposed to the smaller crystals of which 4 fit in the other alveoli.
-  //    else if (GetAlveolusType(volIdAlv)>16&&GetAlveolusType(volIdAlv)<20) 
-        else if (GetAlveolusType(volIdAlv)>16) {
-        crystalType = GetAlveolusType(volIdAlv);
-        crystalCopy = cpAlv + cpCry;
-    //    crystalId = 2048 + (crystalType-1)*32 + cpAlv + cpCry;
-        crystalId = 2048 + (crystalType-17)*32 + cpAlv + cpCry;
-      }
-
-      if (crystalType>19 || crystalType<1 || crystalCopy>128 || crystalCopy<1 || crystalId>2144 || crystalId<1)
-        LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 6 (Barrel). " << "\n" <<"crystalType = "<< crystalType << " crystalCopy = " << crystalCopy <<" crystalId = "<< crystalId << FairLogger::endl;
-    } else {
-      sscanf(bufferName,"%*8c %d",&crysNum);
-      crystalType = crysNum;
-      //crystalType = cpCry+1;
+ 
+    // HAPOL-10/11/2013 (hector.alvarez@usc.es)
+    // Moving to a new way getting crystal identification:  
+    const char *alveolusECPrefix = "Alveolus_EC_";
+    const char *alveolusPrefix = "Alveolus_";
+    const char *volumeName = gMC->VolName(volIdAlv);    
+    if (strncmp(alveolusECPrefix, volumeName,11) == 0) {
+      crystalType = atoi(volumeName+12);//converting to int the alveolus index
       crystalCopy = cpAlv+1;
-      /*crystalId = 3000 + cpAlv*23 + (crystalType-1);In the case of IEM LaBr - LaCl phoswich endcap: */crystalId = 3000 + cpAlv*30 + (crystalType-1);
-      /*if (crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736) For IEM LaBr - LaCl phoswich endcap:*/if (crystalType>30 || crystalType<1 ||
-      crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>4800)
-        LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 6 (endcap). " << FairLogger::endl;
-    }
+      crystalId = 3000 + cpAlv*23 + (crystalType-1); 
+      if(crystalType>23 || crystalType<1 || crystalCopy>32 || 
+	 crystalCopy<1 || crystalId<3000 || crystalId>3736)  
+	LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 6 (v7.17)." 
+		   << FairLogger::endl;
+    } else if (strncmp(alveolusPrefix, volumeName,8) == 0) {
+      crystalType = atoi(volumeName+9);//converting to int the alveolus index
+      if(crystalType>1 && crystalType<17) {
+	crystalCopy = cpAlv * 4 + cpCry;
+	crystalId = (crystalType-1)*128 + cpAlv * 4 + cpCry;
+      } else if (crystalType>16 && crystalType<20) {
+	// Crystaltypes 17-19 are large crystals which fill type 6 alveoli, as 
+	// opposed to the smaller crystals of which 4 fit in the other alveoli.
+	crystalCopy = cpAlv + cpCry;
+	crystalId = 2048 + (crystalType-17)*32 + cpAlv + cpCry;
+      }
+      if (crystalType>19 || crystalType<1 || crystalCopy>128 || 
+	  crystalCopy<1 || crystalId>2144 || crystalId<1)
+	LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 6 (v7.07). " 
+		   << FairLogger::endl;
+    } else  LOG(ERROR) << "R3BCalo: Impossible crystalType for geometryVersion 6." 
+		       << FairLogger::endl;
+  } else if (fGeometryVersion==7) { 
+    //RESERVED FOR CALIFA 717PHOSWICH, only phoswich ENDCAP 
+    //For IEM LaBr - LaCl phoswich endcap
+    const char *alveolusECPrefix = "Alveolus_EC_";
+    const char *volumeName = gMC->VolName(volIdAlv);    
+    if (strncmp(alveolusECPrefix, volumeName,11) == 0) {
+      crystalType = atoi(volumeName+12);//converting to int the alveolus index
+      crystalCopy = cpAlv+1;
+      crystalId = 3000 + cpAlv*30 + (crystalType-1);
+      if (crystalType>30 || crystalType<1 ||
+	  crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>4800)
+	LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 10 (endcap). " 
+		   << FairLogger::endl;
+    }else  LOG(ERROR) << "R3BCalo: Impossible crystalType for geometryVersion 7." 
+		      << FairLogger::endl;
+  } else if (fGeometryVersion==8) {
+    //RESERVED FOR CALIFA 7.07 BARREL + 717PHOSWICH 
+    
+    // HAPOL-10/11/2013 (hector.alvarez@usc.es)
+    // Moving to a new way getting crystal identification:  
+    const char *alveolusECPrefix = "Alveolus_EC_";
+    const char *alveolusPrefix = "Alveolus_";
+    const char *volumeName = gMC->VolName(volIdAlv);    
+    if (strncmp(alveolusECPrefix, volumeName,11) == 0) {
+      crystalType = atoi(volumeName+12);//converting to int the alveolus index
+      crystalCopy = cpAlv+1;
+      crystalId = 3000 + cpAlv*30 + (crystalType-1);
+      if (crystalType>30 || crystalType<1 ||
+	  crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>4800)
+	LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 10 (endcap). " 
+		   << FairLogger::endl;
+    } else if (strncmp(alveolusPrefix, volumeName,8) == 0) {
+      crystalType = atoi(volumeName+9);//converting to int the alveolus index
+      crystalCopy = cpAlv * 4 + cpCry;
+      crystalId = (crystalType-1)*128 + cpAlv * 4 + cpCry;
+      if (crystalType>20 || crystalType<1 || crystalCopy>128 || 
+	  crystalCopy<1 || crystalId>2560 || crystalId<1)
+	LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 5 (v7.07)" 
+		   << FairLogger::endl;
+    } else  
+      LOG(ERROR) << "R3BCalo: Impossible crystalType for geometryVersion 8." 
+		 << FairLogger::endl;
+  } else if (fGeometryVersion==9) {
+    //RESERVED FOR CALIFA 7.09 BARREL + 717PHOSWICH
+    const char *alveolusECPrefix = "Alveolus_EC_";
+    const char *alveolusPrefix = "Alveolus_";
+    const char *volumeName = gMC->VolName(volIdAlv);    
+    if (strncmp(alveolusECPrefix, volumeName,11) == 0) {
+      crystalType = atoi(volumeName+12);//converting to int the alveolus index
+      crystalCopy = cpAlv+1;
+      crystalId = 3000 + cpAlv*30 + (crystalType-1);
+      if (crystalType>30 || crystalType<1 ||
+	  crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>4800)
+	LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 9 (endcap). " 
+		   << FairLogger::endl;
+    } else if (strncmp(alveolusPrefix, volumeName,8) == 0) {
+      crystalType = atoi(volumeName+9);//converting to int the alveolus index
+      if(crystalType>1 && crystalType<17) {
+	crystalCopy = cpAlv * 4 + cpCry;
+	crystalId = (crystalType-1)*128 + cpAlv * 4 + cpCry;
+      } else if (crystalType>16 && crystalType<20) {
+	// Crystaltypes 17-19 are large crystals which fill type 6 alveoli, as 
+	// opposed to the smaller crystals of which 4 fit in the other alveoli.
+	crystalCopy = cpAlv + cpCry;
+	crystalId = 2048 + (crystalType-17)*32 + cpAlv + cpCry;
+      }
+      if (crystalType>19 || crystalType<1 || crystalCopy>128 || 
+	  crystalCopy<1 || crystalId>2144 || crystalId<1)
+	LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 9 (v7.07). " 
+		   << FairLogger::endl;
+    } else  
+      LOG(ERROR) << "R3BCalo: Impossible crystalType for geometryVersion 9." 
+		 << FairLogger::endl;
   } else if (fGeometryVersion==10) {
-  
-  
-    if (GetAlveolusType(volIdSupAlv)!=-1) {
-      //The present scheme here done works with 8.11
-      // crystalType = alveolus type (from 1 to 17)   [Basically the alveolus number]
-      // crystalCopy = alveolus copy * 4 + crystals copy +1 (from 1 to 128)  [Not exactly azimuthal]
-      // crystalId = 1 to 32 for the first 32 crystals (single crystal in each alveoli)
-      //             32 + (alveolus type-2)*128 + (alvelous copy)*4 + (crystal copy) + 1        (from 1 to 1952)
-      //
-      //cout << "volIdSupAlv" << volIdSupAlv <<" "<<GetAlveolusType(volIdSupAlv)<<endl;
-      if (GetAlveolusType(volIdSupAlv)==1) {
-        crystalType = GetAlveolusType(volIdSupAlv); //note that there one level more (alveolusInner)
-        crystalCopy = cpSupAlv+1;                   //only one crystal per alveoli in this ring, running from 1 to 32
-        crystalId = cpSupAlv+1;                     //only one crystal per alveoli in this ring, running from 1 to 32
+    //The present scheme here done works with 8.11:
+    // crystalType = alveolus type (from 1 to 17) [Alveolus number]
+    // crystalCopy = alveolus copy * 4 + crystals copy +1 (from 1 to 128) 
+    // crystalId = 1 to 32 for the first 32 crystals 
+    //                     (single crystal in each alveoli)
+    // or 32 + (alveolus type-2)*128 + (alvelous copy)*4 + (crystal copy) + 1        
+    //                     (in this way, crystalId runs from 1 to 1952)
+    //     
+    
+    // HAPOL-10/11/2013 (hector.alvarez@usc.es)
+    // Moving to a new way getting crystal identification:  
+    const char *alveolusPrefix = "Alveolus_";
+    const char *volumeName = gMC->VolName(volIdSupAlv);
+    if (strncmp(alveolusPrefix, volumeName,8) == 0) {
+      crystalType = atoi(volumeName+9);//converting to int the alveolus index
+      if (crystalType==1) {
+	//only one crystal per alveoli in this ring, running from 1 to 32
+        crystalCopy = cpSupAlv+1; 
+        crystalId = cpSupAlv+1;                    
+      } else if (crystalType>1 && crystalType<17) {
+	//running from 0*4+0+1=1 to 31*4+3+1=128
+        crystalCopy = cpSupAlv*4+cpCry+1;
+	//running from 32+0*128+0*4+0+1=1 to 32+14*128+31*4+3+1=1952
+        crystalId = 32+(crystalType-2)*128+cpSupAlv*4+cpCry+1; 
       }
-      else if (GetAlveolusType(volIdSupAlv)>1 && GetAlveolusType(volIdSupAlv)<17) {
-        crystalType = GetAlveolusType(volIdSupAlv);      //note that there one level more (alveolusInner)
-        crystalCopy = cpSupAlv*4+cpCry+1;  			         //running from 0*4+0+1=1 to 31*4+3+1=128
-        crystalId = 32+(crystalType-2)*128+cpSupAlv*4+cpCry+1; //running from 32+0*128+0*4+0+1=1 to 32+14*128+31*4+3+1=1952
-      }
-      if (crystalType>16 || crystalType<1 || crystalCopy>128 || crystalCopy<1 || crystalId>1952 || crystalId<1)
-        LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 10. " << crystalType
-        << "  " << crystalCopy << "  " << crystalId << FairLogger::endl;
-
-    //} else {
-	
-	} else {  //For IEM LaBr - LaCl phoswich endcap
-    sscanf(bufferName,"%*8c %d",&crysNum);
-      crystalType = crysNum;
-      //crystalType = cpCry+1;
+      if (crystalType>16 || crystalType<1 || crystalCopy>128 || 
+	  crystalCopy<1 || crystalId>1952 || crystalId<1) 
+        LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 10. " 
+		   << FairLogger::endl;
+    } else LOG(ERROR) << "R3BCalo: Impossible crystalType for geometryVersion 10." 
+		      << FairLogger::endl;
+  } else if (fGeometryVersion==11) {
+    //RESERVED FOR CALIFA 8.11 BARREL + PHOSWICH
+    
+    const char *alveolusECPrefix = "Alveolus_EC_";
+    const char *alveolusPrefix = "Alveolus_";
+    const char *volumeName = gMC->VolName(volIdAlv);    
+    if (strncmp(alveolusECPrefix, volumeName,11) == 0) {
+      crystalType = atoi(volumeName+12);//converting to int the alveolus index
       crystalCopy = cpAlv+1;
-      /*crystalId = 3000 + cpAlv*23 + (crystalType-1);In the case of IEM LaBr - LaCl phoswich endcap: */crystalId = 3000 + cpAlv*30 + (crystalType-1);
-      /*if (crystalType>23 || crystalType<1 || crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>3736) For IEM LaBr - LaCl phoswich endcap:*/if (crystalType>30 || crystalType<1 ||
-      crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>4800)
-        LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 10 (endcap). " << FairLogger::endl;
-    }		
-			
-			
-			
-  } else LOG(ERROR) << "R3BCalo: Geometry version not available in R3BCalo::ProcessHits(). " << FairLogger::endl;
-	
+      crystalId = 3000 + cpAlv*30 + (crystalType-1);
+      if (crystalType>30 || crystalType<1 ||
+	  crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>4800)
+	LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 9 (endcap). " 
+		   << FairLogger::endl;
+    } else if (strncmp(alveolusPrefix, volumeName,8) == 0) {
+      crystalType = atoi(volumeName+9);//converting to int the alveolus index
+      if (crystalType==1) {
+	//only one crystal per alveoli in this ring, running from 1 to 32
+        crystalCopy = cpSupAlv+1; 
+        crystalId = cpSupAlv+1;                    
+      } else if (crystalType>1 && crystalType<17) {
+	//running from 0*4+0+1=1 to 31*4+3+1=128
+        crystalCopy = cpSupAlv*4+cpCry+1;
+	//running from 32+0*128+0*4+0+1=1 to 32+14*128+31*4+3+1=1952
+        crystalId = 32+(crystalType-2)*128+cpSupAlv*4+cpCry+1; 
+      }
+      if (crystalType>16 || crystalType<1 || crystalCopy>128 || 
+	  crystalCopy<1 || crystalId>1952 || crystalId<1) 
+        LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 10. " 
+		   << FairLogger::endl;
+    } else LOG(ERROR) << "R3BCalo: Impossible crystalType for geometryVersion 10." 
+		      << FairLogger::endl;
+  } else LOG(ERROR) << "R3BCalo: Geometry version not available in R3BCalo::ProcessHits(). " 
+		    << FairLogger::endl;
+  
   if (fVerboseLevel>1)
-    LOG(INFO) << "R3BCalo: Processing Points in Alveolus Nb " << volIdAlv << ", copy Nb " << cpAlv
-         << ", crystal copy Nb " << cpCry << " and unique crystal identifier " << crystalId << FairLogger::endl;
-
+    LOG(INFO) << "R3BCalo: Processing Points in Alveolus Nb " 
+	      << volIdAlv << ", copy Nb " << cpAlv
+	      << ", crystal copy Nb " << cpCry << " and unique crystal identifier " 
+	      << crystalId << FairLogger::endl;
+  
   if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
     fNSteps  = 0; // FIXME
@@ -405,94 +572,104 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
     gMC->TrackMomentum(fMomIn);
     fEinc   = gMC->Etot();
   }
-
+  
   // Sum energy loss for all steps in the active volume
   fELoss += gMC->Edep();
   fNSteps++;
-
+  
   // Set additional parameters at exit of active volume. Create R3BCaloPoint.
   if ( gMC->IsTrackExiting()    ||
        gMC->IsTrackStop()       ||
        gMC->IsTrackDisappeared()   ) {
-
+    
     fTrackID        = gMC->GetStack()->GetCurrentTrackNumber();
     fParentTrackID  = gMC->GetStack()->GetCurrentParentTrackNumber();
     fVolumeID       = vol->getMCid();
     fTrackPID       = gMC->TrackPid();
     fUniqueID       = gMC->GetStack()->GetCurrentTrack()->GetUniqueID();
-
+    
     gMC->TrackPosition(fPosOut);
     gMC->TrackMomentum(fMomOut);
-
+    
     if (fELoss == 0. ) return kFALSE;
-
+    
     if (gMC->IsTrackExiting()) {
       const Double_t* oldpos;
       const Double_t* olddirection;
       Double_t newpos[3];
       Double_t newdirection[3];
       Double_t safety;
-
+      
       gGeoManager->FindNode(fPosOut.X(),fPosOut.Y(),fPosOut.Z());
       oldpos = gGeoManager->GetCurrentPoint();
       olddirection = gGeoManager->GetCurrentDirection();
-
-
+      
+      
       for (Int_t i=0; i<3; i++) {
         newdirection[i] = -1*olddirection[i];
       }
-
+      
       gGeoManager->SetCurrentDirection(newdirection);
       safety = gGeoManager->GetSafeDistance();
-
-      gGeoManager->SetCurrentDirection(-newdirection[0],-newdirection[1],-newdirection[2]);
-
+      
+      gGeoManager->SetCurrentDirection(-newdirection[0],
+				       -newdirection[1],
+				       -newdirection[2]);
+      
       for (Int_t i=0; i<3; i++) {
         newpos[i] = oldpos[i] - (3*safety*olddirection[i]);
       }
-
+      
       fPosOut.SetX(newpos[0]);
       fPosOut.SetY(newpos[1]);
       fPosOut.SetZ(newpos[2]);
     }
-
+    
     AddHit(fTrackID, fVolumeID, crystalType , crystalCopy , crystalId,
            TVector3(fPosIn.X(),   fPosIn.Y(),   fPosIn.Z()),
            TVector3(fPosOut.X(),  fPosOut.Y(),  fPosOut.Z()),
            TVector3(fMomIn.Px(),  fMomIn.Py(),  fMomIn.Pz()),
            TVector3(fMomOut.Px(), fMomOut.Py(), fMomOut.Pz()),
            fTime, fLength, fELoss);
-
+    
     // Increment number of CaloPoints for this track
     R3BStack* stack = (R3BStack*) gMC->GetStack();
     stack->AddPoint(kCALIFA);
-
+    
     //Adding a crystalHit support
     Int_t nCrystalHits = fCaloCrystalHitCollection->GetEntriesFast();
     Bool_t existHit = 0;
-
-    if (nCrystalHits==0) AddCrystalHit(crystalType , crystalCopy , crystalId, NUSmearing(fELoss), fTime, fNSteps, fEinc,
-					fTrackID, fVolumeID, fParentTrackID, fTrackPID, fUniqueID);
+    
+    if (nCrystalHits==0) AddCrystalHit(crystalType , crystalCopy , crystalId, 
+				       NUSmearing(fELoss), fTime, fNSteps, 
+				       fEinc, fTrackID, fVolumeID, 
+				       fParentTrackID, fTrackPID, fUniqueID);
     else {
       for (Int_t i=0; i<nCrystalHits; i++) {
-        if ( ((R3BCaloCrystalHitSim *)(fCaloCrystalHitCollection->At(i)))->GetCrystalId() == crystalId ) {
-          ((R3BCaloCrystalHitSim *)(fCaloCrystalHitCollection->At(i)))->AddMoreEnergy(NUSmearing(fELoss));
-          if ( ((R3BCaloCrystalHitSim *)(fCaloCrystalHitCollection->At(i)))->GetTime() > fTime ) {
-            ((R3BCaloCrystalHitSim *)(fCaloCrystalHitCollection->At(i)))->SetTime(fTime);
+        if ( ((R3BCaloCrystalHitSim *)(fCaloCrystalHitCollection->At(i)))
+	     ->GetCrystalId() == crystalId ) {
+          ((R3BCaloCrystalHitSim *)(fCaloCrystalHitCollection->At(i)))
+	    ->AddMoreEnergy(NUSmearing(fELoss));
+          if ( ((R3BCaloCrystalHitSim *)(fCaloCrystalHitCollection->At(i)))
+	       ->GetTime() > fTime ) {
+            ((R3BCaloCrystalHitSim *)(fCaloCrystalHitCollection->At(i)))
+	      ->SetTime(fTime);
           }
           existHit=1; //to avoid the creation of a new CrystalHit
           break;
         }
       }
-      if (!existHit) AddCrystalHit(crystalType , crystalCopy , crystalId, NUSmearing(fELoss), fTime, fNSteps, fEinc,
-					fTrackID, fVolumeID, fParentTrackID, fTrackPID, fUniqueID);
+      if (!existHit) AddCrystalHit(crystalType , crystalCopy , crystalId, 
+				   NUSmearing(fELoss), fTime, fNSteps, 
+				   fEinc, fTrackID, fVolumeID, 
+				   fParentTrackID, fTrackPID, fUniqueID);
     }
-
+    
     existHit=0;
-
+    
     ResetParameters();
   }
-
+  
   return kTRUE;
 }
 // ----------------------------------------------------------------------------
@@ -525,62 +702,11 @@ void R3BCalo::BeginEvent()
 // -----   Public method EndOfEvent   -----------------------------------------
 void R3BCalo::EndOfEvent()
 {
-
-  /*
-    Int_t nHits = fCaloCollection->GetEntriesFast();
-    if(nHits>0) {
-      //Int_t* detectorIdArray = new Int_t[nHits];
-      Int_t* takeHitFromPointArray = new Int_t[nHits];
-      Int_t* crystalTypesArray = new Int_t[nHits];
-      Int_t* crystalCopyArray = new Int_t[nHits];
-      Int_t* crystalIdArray = new Int_t[nHits];
-      Double_t* crystalEnergyArray = new Double_t[nHits];
-      Double_t* crystalTimeArray = new Double_t[nHits];
-      Double_t* accumulatedEnergyArray = new Double_t[nHits];
-
-      for(Int_t i=0;i<nHits;i++){
-      //detectorIdArray[i] = ((R3BCaloPoint *)(fCaloCollection->At(i)))->GetDetectorID();
-      crystalTypesArray[i] = ((R3BCaloPoint *)(fCaloCollection->At(i)))->GetCrystalType();
-      crystalCopyArray[i] = ((R3BCaloPoint *)(fCaloCollection->At(i)))->GetCrystalCopy();
-      crystalIdArray[i] = ((R3BCaloPoint *)(fCaloCollection->At(i)))->GetCrystalId();
-      crystalEnergyArray[i] = ((R3BCaloPoint *)(fCaloCollection->At(i)))->GetEnergyLoss();
-      crystalTimeArray[i] = ((R3BCaloPoint *)(fCaloCollection->At(i)))->GetTime();
-      accumulatedEnergyArray[i] = ((R3BCaloPoint *)(fCaloCollection->At(i)))->GetEnergyLoss();
-      takeHitFromPointArray[i] = 0;
-      }
-
-
-      if (fVerboseLevel>1)
-        for(Int_t i=0;i<nHits;i++){
-        cout << "  TEST Points " << crystalTypesArray[i] << "  "
-           << crystalCopyArray[i] << "  " << crystalEnergyArray[i]<< "  " << crystalTimeArray[i] << endl;
-        }
-
-      takeHitFromPointArray[0] = 1;
-
-      for (Int_t i=1;i<nHits;i++) {
-        for(Int_t j=0;j<i;j++){
-        if(crystalIdArray[i]==crystalIdArray[j]){
-        accumulatedEnergyArray[j] += crystalEnergyArray[i];
-        if(crystalTimeArray[i]<crystalTimeArray[j]) crystalTimeArray[j]=crystalTimeArray[i];
-        }
-        else takeHitFromPointArray[i] = 1;
-      }
-      }
-
-      for (Int_t i=1;i<nHits;i++) {
-      if(takeHitFromPointArray[i]==1)
-        AddCrystalHit(crystalTypesArray[i], crystalCopyArray[i], crystalIdArray[i],
-              accumulatedEnergyArray[i], crystalTimeArray[i]);
-      }
-    }
-    */
-  
   if (fVerboseLevel) Print();
-
+  
   fCaloCollection->Clear();
   fCaloCrystalHitCollection->Clear();
-
+  
   ResetParameters();
 }
 // ----------------------------------------------------------------------------
@@ -590,9 +716,11 @@ void R3BCalo::EndOfEvent()
 // -----   Public method Register   -------------------------------------------
 void R3BCalo::Register()
 {
-  //FairRootManager::Instance()->Register("CrystalPoint", GetName(), fCaloCollection, kTRUE);
-  FairRootManager::Instance()->Register("CrystalHitSim", GetName(), fCaloCrystalHitCollection, kTRUE);
-
+  //FairRootManager::Instance()->Register("CrystalPoint", GetName(), 
+  //                                      fCaloCollection, kTRUE);
+  FairRootManager::Instance()->Register("CrystalHitSim", GetName(), 
+					fCaloCrystalHitCollection, kTRUE);
+  
 }
 // ----------------------------------------------------------------------------
 
@@ -617,9 +745,11 @@ TClonesArray* R3BCalo::GetCollection(Int_t iColl) const
 void R3BCalo::Print(Option_t* option) const
 {
   Int_t nHits = fCaloCollection->GetEntriesFast();
-  LOG(INFO) << "R3BCalo: " << nHits << " points registered in this event" << FairLogger::endl;
+  LOG(INFO) << "R3BCalo: " << nHits << " points registered in this event" 
+	    << FairLogger::endl;
   Int_t nCrystalHits = fCaloCrystalHitCollection->GetEntriesFast();
-  LOG(INFO) << "R3BCalo: " << nCrystalHits << " sim hits registered in this event." << FairLogger::endl;
+  LOG(INFO) << "R3BCalo: " << nCrystalHits << " sim hits registered in this event." 
+	    << FairLogger::endl;
 }
 // ----------------------------------------------------------------------------
 
@@ -650,37 +780,50 @@ void R3BCalo::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
     new (clref[fPosIndex]) R3BCaloPoint(*oldpoint);
     fPosIndex++;
   }
-  LOG(INFO) << "R3BCalo: " << cl2->GetEntriesFast() << " merged entries" << FairLogger::endl;
+  LOG(INFO) << "R3BCalo: " << cl2->GetEntriesFast() << " merged entries" 
+	    << FairLogger::endl;
 }
 
 // -----   Private method AddHit   --------------------------------------------
-R3BCaloPoint* R3BCalo::AddHit(Int_t trackID, Int_t detID, Int_t volid , Int_t copy, Int_t ident,
-                              TVector3 posIn, TVector3 posOut, TVector3 momIn, TVector3 momOut,
+R3BCaloPoint* R3BCalo::AddHit(Int_t trackID, Int_t detID, Int_t volid , 
+			      Int_t copy, Int_t ident, TVector3 posIn, 
+			      TVector3 posOut, TVector3 momIn, TVector3 momOut,
                               Double_t time, Double_t length, Double_t eLoss)
 {
   TClonesArray& clref = *fCaloCollection;
   Int_t size = clref.GetEntriesFast();
   if (fVerboseLevel>1)
     LOG(INFO) << "R3BCalo: Adding Point at (" << posIn.X() << ", " << posIn.Y()
-         << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
-         << trackID << ", energy loss " << eLoss*1e06 << " keV" << FairLogger::endl;
-  return new(clref[size]) R3BCaloPoint(trackID, detID, volid, copy , ident, posIn, posOut,
-                                       momIn, momOut, time, length, eLoss);
+	      << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
+	      << trackID << ", energy loss " << eLoss*1e06 << " keV" 
+	      << FairLogger::endl;
+  return new(clref[size]) R3BCaloPoint(trackID, detID, volid, copy , ident, 
+				       posIn, posOut, momIn, momOut, time, 
+				       length, eLoss);
 }
 
 // -----   Private method AddCrystalHit   --------------------------------------------
 R3BCaloCrystalHitSim* R3BCalo::AddCrystalHit(Int_t type, Int_t copy, Int_t ident,
-    Double_t energy, Double_t time, Int_t steps, Double_t einc,
-    Int_t trackid, Int_t volid, Int_t partrackid, Int_t pdgtype, Int_t uniqueid)
+					     Double_t energy, Double_t time, 
+					     Int_t steps, Double_t einc,
+					     Int_t trackid, Int_t volid, 
+					     Int_t partrackid, Int_t pdgtype, 
+					     Int_t uniqueid)
 {
   TClonesArray& clref = *fCaloCrystalHitCollection;
   Int_t size = clref.GetEntriesFast();
   if (fVerboseLevel>1) {
-    LOG(INFO) << "-I- R3BCalo: Adding Sim Hit in detector type " << type << ", and copy " << copy
-         << " with unique identifier " << ident << " entering with " << einc*1e06 << " keV, depositing " << energy*1e06 << " keV" << FairLogger::endl;
-    LOG(INFO) << " -I- trackid: " << trackid << " volume id: " << volid << " partrackid : " << partrackid << " type: " << pdgtype << " unique id: " << uniqueid << FairLogger::endl;
+    LOG(INFO) << "-I- R3BCalo: Adding Sim Hit in detector type " << type 
+	      << ", and copy " << copy << " with unique identifier " << ident 
+	      << " entering with " << einc*1e06 << " keV, depositing " << energy*1e06 
+	      << " keV" << FairLogger::endl;
+    LOG(INFO) << " -I- trackid: " << trackid << " volume id: " << volid 
+	      << " partrackid : " << partrackid << " type: " << pdgtype 
+	      << " unique id: " << uniqueid << FairLogger::endl;
   }
-  return new(clref[size]) R3BCaloCrystalHitSim(type, copy, ident, energy, time, steps, einc, trackid, volid, partrackid, pdgtype, uniqueid);
+  return new(clref[size]) R3BCaloCrystalHitSim(type, copy, ident, energy, time, 
+					       steps, einc, trackid, volid, 
+					       partrackid, pdgtype, uniqueid);
 }
 
 // -----   Private method NUSmearing  --------------------------------------------
@@ -689,7 +832,8 @@ Double_t R3BCalo::NUSmearing(Double_t inputEnergy)
   // Very simple preliminary scheme where the NU is introduced as a flat random
   // distribution with limits fNonUniformity (%) of the energy value.
   //
-  return gRandom->Uniform(inputEnergy-inputEnergy*fNonUniformity/100,inputEnergy+inputEnergy*fNonUniformity/100);
+  return gRandom->Uniform(inputEnergy-inputEnergy*fNonUniformity/100,
+			  inputEnergy+inputEnergy*fNonUniformity/100);
 }
 
 
@@ -705,7 +849,8 @@ void R3BCalo::SelectGeometryVersion(Int_t version)
 void R3BCalo::SetNonUniformity(Double_t nonU)
 {
   fNonUniformity = nonU;
-  LOG(INFO) << "R3BCalo::SetNonUniformity to " << fNonUniformity << " %" << FairLogger::endl;
+  LOG(INFO) << "R3BCalo::SetNonUniformity to " << fNonUniformity << " %" 
+	    << FairLogger::endl;
 }
 
 
@@ -714,7 +859,8 @@ void R3BCalo::ConstructGeometry()
 {
   TString fileName = GetGeometryFileName();
   if(fileName.EndsWith(".root")) {
-    LOG(INFO) << "Constructing CALIFA geometry from ROOT file " << fileName.Data() << FairLogger::endl;
+    LOG(INFO) << "Constructing CALIFA geometry from ROOT file " << fileName.Data() 
+	      << FairLogger::endl;
     ConstructRootGeometry();
   } else {
     LOG(FATAL) << "CALIFA geometry file name is not specified" << FairLogger::endl;
