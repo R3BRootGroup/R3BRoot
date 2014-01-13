@@ -22,19 +22,19 @@ void checkResults() {
 	
 	//SETTINGS 
 	char calVersion[50] = "8.11";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.11)
-	Double_t Eproj = 35.00;              //Gamma Energy in projectile frame in MeV 
-	Int_t totalEvents = 100;        //Events
+	Double_t Eproj = 2.00;              //Gamma Energy in projectile frame in MeV 
+	Int_t totalEvents = 1000;        //Events
 	Int_t multiplicity = 1;           //Multiplicity (particles per event)
 	
 	Double_t threshold=0.050;		  //Threshold in MeV
 	Int_t ExpRes=5;			          //Exp. Resol in MeV
 
 	//FOR THE HISTOGRAMS AND PLOTS:
-	Double_t maxE = 100;               //Maximum energy in MeV in the histos
+	Double_t maxE = 5;               //Maximum energy in MeV in the histos
 
-	sprintf(title0,"%s","califaAna.root");  	
+	//sprintf(title0,"%s","califaAna.root");  	
  	sprintf(title1,"%s","r3bsim.root");  	
-	TFile *file0 = TFile::Open(title0);
+	//TFile *file0 = TFile::Open(title0);
 	TFile *file1 = TFile::Open(title1);
 	
 	Double_t beta=0.82;
@@ -180,7 +180,7 @@ void checkResults() {
 	//Additional user defined histos
 	TH2F* h1_User = new TH2F("h1_User","Double hits, ... where?",400,-2.5,2.5,400,-2.5,2.5);
 
-	TTree* TCalo = (TTree*)file0->Get("cbmsim");
+	//TTree* TCalo = (TTree*)file0->Get("cbmsim");
 	TTree* TCrystal = (TTree*)file1->Get("cbmsim");
 	
 	//Crystal Hits (input)
@@ -194,7 +194,7 @@ void checkResults() {
 	TClonesArray* caloHitCA;  
 	R3BCaloHitSim** caloHit;
 	caloHitCA = new TClonesArray("R3BCaloHitSim",5);
-	TBranch *branchCaloHit = TCalo->GetBranch("CaloHitSim");
+	TBranch *branchCaloHit = TCrystal->GetBranch("CaloHitSim");
 	branchCaloHit->SetAddress(&caloHitCA);
 	
 	//MCTrack(input)
@@ -233,7 +233,7 @@ void checkResults() {
 		MCTrackCA->Clear();
 
 		TCrystal->GetEvent(i);
-		TCalo->GetEvent(i);
+		//TCalo->GetEvent(i);
 		
 		crystalHitsPerEvent = crystalHitCA->GetEntries(); 
 		caloHitsPerEvent = caloHitCA->GetEntries(); 
