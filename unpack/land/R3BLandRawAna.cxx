@@ -43,7 +43,7 @@ InitStatus R3BLandRawAna::Init()
 void R3BLandRawAna::Exec(Option_t *option)
 {
   Int_t nHits = fRawData->GetEntriesFast();
-  cout << "-I- R3BLandRawAna::Exec : event " << fnEvents << ", multiplicity " << nHits << endl;
+  //cout << "-I- R3BLandRawAna::Exec : event " << fnEvents << ", multiplicity " << nHits << endl;
   R3BLandRawHit *hit;
   for(Int_t i = 0; i < nHits; i++) {
     hit = (R3BLandRawHit*) fRawData->At(i);
