@@ -13,7 +13,6 @@ class TClonesArray;
 class TH1F;
 class TH2F;
 
-
 class R3BLandRawAna : public FairTask {
 public:
   R3BLandRawAna();
@@ -24,20 +23,21 @@ public:
   virtual void Exec(Option_t *option);
   
   virtual void FinishTask();
-  
+   
 private:
   Int_t fnEvents;
   
   TClonesArray *fRawData;
   
-  TH1F *fh_padId;
-  TH2F *fh_qdc_padId;
+  TH1F *thmul;
+  TH1F *thch;
   
   void CreateHistos();
   
   void WriteHistos();
   
 public:
+  
   ClassDef(R3BLandRawAna, 0)
 };
 
