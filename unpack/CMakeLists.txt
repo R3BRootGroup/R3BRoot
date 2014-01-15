@@ -36,11 +36,8 @@ set(SRCS
 #Put here your sourcefiles
 calo/R3BCaloUnpack.cxx
 calo/R3BCaloRawHit.cxx
-TRootEvent.cxx
-land/R3BLandUnpack.cxx
-land/R3BLandRawHit.cxx
 land/R3BLandRawAna.cxx
-land/TLANDEvent.cxx
+land/R3BLandRawHit.cxx
 )
 
 # fill list of header files from list of source files
