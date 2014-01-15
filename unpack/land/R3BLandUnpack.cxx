@@ -107,7 +107,7 @@ Bool_t R3BLandUnpack::DoUnpack(Int_t *data, Int_t size)
     fNHits++;
     }  
  
-  LOG(INFO) << "R3BLandUnpack: Number of hits per event in LAND: " << fNHits << FairLogger::endl;
+  LOG(DEBUG) << "R3BLandUnpack: Number of hits per event in LAND: " << fNHits << FairLogger::endl;
   return kTRUE;
 }
  
