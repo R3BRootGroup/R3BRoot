@@ -38,6 +38,7 @@ calo/R3BCaloUnpack.cxx
 calo/R3BCaloRawHit.cxx
 land/R3BLandRawAna.cxx
 land/R3BLandRawHit.cxx
+land/R3BLandUnpack.cxx
 )
 
 # fill list of header files from list of source files
