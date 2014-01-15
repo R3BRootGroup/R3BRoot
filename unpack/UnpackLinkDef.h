@@ -9,6 +9,7 @@
 
 #pragma link C++ class R3BLandRawAna+;
 #pragma link C++ class R3BLandRawHit+;
+#pragma link C++ class R3BLandUnpack+;
 
 #endif
 
