@@ -13,6 +13,7 @@ using namespace std;
 
 #include "FairRootManager.h"
 #include "FairRunOnline.h"
+#include "FairLogger.h"
 
 #include "R3BLandRawHit.h"
 #include "R3BLandRawAna.h"
@@ -33,7 +34,6 @@ InitStatus R3BLandRawAna::Init()
 {
   FairRootManager *fMan = FairRootManager::Instance();
   fRawData = (TClonesArray*) fMan->GetObject("LandRawHit");
-
   CreateHistos();
 
   return kSUCCESS;
@@ -47,10 +47,9 @@ void R3BLandRawAna::Exec(Option_t *option)
   R3BLandRawHit *hit;
   for(Int_t i = 0; i < nHits; i++) {
     hit = (R3BLandRawHit*) fRawData->At(i);
-    fh_padId->Fill(hit->GetPadId());
-    fh_qdc_padId->Fill(hit->GetPadId(), hit->GetQdc1());
+    thch ->Fill(hit->GetQdcData());
   }
-  
+  thmul->Fill(nHits);
   fnEvents += 1;
 }
 
@@ -62,23 +61,19 @@ void R3BLandRawAna::FinishTask()
 
 void R3BLandRawAna::CreateHistos()
 {
-  fh_padId = new TH1F("h_padId", "", 500, -0.5, 499.5);
-
-  fh_qdc_padId = new TH2F("h_qdc_padId", "",
-			  50, 0., 500.,
-			  20, 0., 4000.);
-
+  thmul = new TH1F("Multiplicity", "", 500, 0, 500);
+  thch = new TH1F("Charge", "", 700, 0., 7000.);
   FairRunOnline *run = FairRunOnline::Instance();
-
-  run->AddObject(fh_padId);
-  run->AddObject(fh_qdc_padId);
+  run->AddObject(thmul);
+  run->AddObject(thch);
 }
 
 
 void R3BLandRawAna::WriteHistos()
 {
-  fh_padId->Write();
-  fh_qdc_padId->Write();
+  thmul->Write();
+  thch->Write();
+  LOG(INFO) << "R3BLandRawAna --- Histograms writed to the Root File ..." << FairLogger::endl; 
 }
 
 
