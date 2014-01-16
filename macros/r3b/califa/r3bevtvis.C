@@ -9,6 +9,7 @@ r3bevtvis()
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
   FairParRootFileIo* parIn = new FairParRootFileIo();
   parIn->open("r3bpar.root");
+  rtdb->setFirstInput(parIn);
   rtdb->print();
   
   fRun->SetInputFile("r3bsim.root");
