@@ -1,4 +1,4 @@
-# The name of our project is "FairBase".  CMakeLists files in this project can
+# The name of our project is “R3BBROOT”.  CMakeLists files in this project can
 # refer to the root source directory of the project as ${R3BROOT_SOURCE_DIR} or
 # as ${CMAKE_SOURCE_DIR} and to the root binary directory of the project as 
 # ${R3BROOT_BINARY_DIR} or ${CMAKE_BINARY_DIR}.
@@ -12,9 +12,50 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.1 FATAL_ERROR)
 # after check of cmake version                        
 project(R3BROOT)
 
+# Check if the FairRoot is still in source, since Jan 2014 FairRoot 
+# should be installed separately 
+
+FIND_PATH(FAIRBASE NAMES FairRun.h  PATHS
+  ${CMAKE_SOURCE_DIR}/base/steer
+  NO_DEFAULT_PATH
+)
+
+If (FAIRBASE)
+  Message(STATUS "Found FAIRBASE")
+  SET(FAIRBASE ${FAIRBASE})
+Else (FAIRBASE)
+  Message(STATUS "NOT Found FAIRBASE")
+  IF(NOT DEFINED ENV{FAIRROOTPATH})
+     MESSAGE(FATAL_ERROR "You did not define the environment variable FAIRROOTPATH which is needed to find FairRoot. Please set this variable and execute cmake again.")
+  ENDIF(NOT DEFINED ENV{FAIRROOTPATH})
+  SET(FAIRROOTPATH $ENV{FAIRROOTPATH})
+
+EndIf (FAIRBASE)
+
+
 # where to look first for cmake modules, before ${CMAKE_ROOT}/Modules/ 
 # is checked
+
+
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
+set(CMAKE_MODULE_PATH "${FAIRROOTPATH}/share/fairbase/cmake/modules"  ${CMAKE_MODULE_PATH})
+
+# Check if the compiler support specific C++11 features
+# Up to now this is only a check since the code does not use
+# any of the features of the new standard
+
+IF(FAIRROOTPATH)
+  Set(CheckSrcDir "${FAIRROOTPATH}/share/fairbase/cmake/checks")
+ELSE(FAIRROOTPATH)
+  Set(CheckSrcDir "${CMAKE_SOURCE_DIR}/cmake/checks")
+ENDIF(FAIRROOTPATH)
+
+if(FAIRROOTPATH)
+  find_package(FairRoot)
+endif(FAIRROOTPATH)
+
+include(CheckCXX11Features)
+
 
 # Load some basic macros which are needed later on
 include(FairMacros)
@@ -88,7 +129,6 @@ else(R3BROOT_MINIMAL)
   find_package(GEANT4VMC REQUIRED)
   find_package(CLHEP REQUIRED)
   find_package(RuleChecker)
-  find_package(Oracle)
 endif(R3BROOT_MINIMAL)
 
 # set a variable which should be used in all CMakeLists.txt
@@ -115,6 +155,8 @@ Generate_Version_Info()
 # Recurse into the given subdirectories.  This does not actually
 # cause another cmake executable to run.  The same process will walk through
 # the project's entire directory structure.
+
+IF(NOT FAIRROOT_FOUND)
 add_subdirectory (fairtools)
 add_subdirectory (base)
 add_subdirectory (dbase)
@@ -124,6 +166,8 @@ add_subdirectory (generators)
 add_subdirectory (geane)
 add_subdirectory (trackbase)
 add_subdirectory (MbsAPI)
+ENDIF (NOT FAIRROOT_FOUND)
+
 add_subdirectory (r3bbase)  
 add_subdirectory (passive) 
 add_subdirectory (mcstack) 
@@ -139,7 +183,6 @@ add_subdirectory (startracker)
 add_subdirectory (r3bdata) 
 add_subdirectory (field) 
 add_subdirectory (macros)  
-add_subdirectory (eventdisplay)  
 add_subdirectory (r3bgen) 
 add_subdirectory (plists)
 add_subdirectory (lumon) 
@@ -149,15 +192,28 @@ add_subdirectory (mfi)
 add_subdirectory (psp)
 
 
+Execute_Process(COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-opengl
+                OUTPUT_VARIABLE EveIsBuild
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+               )
+
+If(${EveIsBuild} STREQUAL yes)
+  Message("Build the eventdisplay.")
+IF(NOT FAIRROOT_FOUND)
+  add_subdirectory (eventdisplay)
+ENDIF(NOT FAIRROOT_FOUND)
+Else(${EveIsBuild} STREQUAL yes)
+  Message("The eventdisplay is not build, there is no OpenGL support.")
+EndIf(${EveIsBuild} STREQUAL yes)
+
+
+
 Option(BUILD_DOXYGEN "Build Doxygen" OFF)
 if(BUILD_DOXYGEN)
   MESSAGE(STATUS "*** Building the Doxygen documentaion ***")
   ADD_SUBDIRECTORY(doxygen)
 endif(BUILD_DOXYGEN)
 
-if(ORACLE_FOUND)  
-  add_subdirectory (ora)
-endif(ORACLE_FOUND)  
 
 if(RULE_CHECKER_FOUND)
 
