@@ -527,14 +527,15 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
     
     const char *alveolusECPrefix = "Alveolus_EC_";
     const char *alveolusPrefix = "Alveolus_";
-    const char *volumeName = gMC->VolName(volIdAlv);    
-    if (strncmp(alveolusECPrefix, volumeName,11) == 0) {
-      crystalType = atoi(volumeName+12);//converting to int the alveolus index
+    const char *volumeNameEC = gMC->VolName(volIdAlv);    
+    const char *volumeName   = gMC->VolName(volIdSupAlv);
+    if (strncmp(alveolusECPrefix, volumeNameEC,11) == 0) {
+      crystalType = atoi(volumeNameEC+12);//converting to int the alveolus index
       crystalCopy = cpAlv+1;
       crystalId = 3000 + cpAlv*30 + (crystalType-1);
       if (crystalType>30 || crystalType<1 ||
 	  crystalCopy>60 || crystalCopy<1 || crystalId<3000 || crystalId>4800)
-	LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 9 (endcap). " 
+	LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 11 (endcap). " 
 		   << FairLogger::endl;
     } else if (strncmp(alveolusPrefix, volumeName,8) == 0) {
       crystalType = atoi(volumeName+9);//converting to int the alveolus index
@@ -550,9 +551,9 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
       }
       if (crystalType>16 || crystalType<1 || crystalCopy>128 || 
 	  crystalCopy<1 || crystalId>1952 || crystalId<1) 
-        LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 10. " 
+        LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 11. " 
 		   << FairLogger::endl;
-    } else LOG(ERROR) << "R3BCalo: Impossible crystalType for geometryVersion 10." 
+    } else LOG(ERROR) << "R3BCalo: Impossible crystalType for geometryVersion 11." 
 		      << FairLogger::endl;
   } else LOG(ERROR) << "R3BCalo: Geometry version not available in R3BCalo::ProcessHits(). " 
 		    << FairLogger::endl;
@@ -640,7 +641,7 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
     Int_t nCrystalHits = fCaloCrystalHitCollection->GetEntriesFast();
     Bool_t existHit = 0;
     
-    if (nCrystalHits==0) AddCrystalHit(crystalType , crystalCopy , crystalId, 
+    if (nCrystalHits==0) AddCrystalHit(fGeometryVersion , crystalType , crystalCopy , crystalId, 
 				       NUSmearing(fELoss), fTime, fNSteps, 
 				       fEinc, fTrackID, fVolumeID, 
 				       fParentTrackID, fTrackPID, fUniqueID);
@@ -659,7 +660,7 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
           break;
         }
       }
-      if (!existHit) AddCrystalHit(crystalType , crystalCopy , crystalId, 
+      if (!existHit) AddCrystalHit(fGeometryVersion , crystalType , crystalCopy , crystalId, 
 				   NUSmearing(fELoss), fTime, fNSteps, 
 				   fEinc, fTrackID, fVolumeID, 
 				   fParentTrackID, fTrackPID, fUniqueID);
@@ -803,7 +804,7 @@ R3BCaloPoint* R3BCalo::AddHit(Int_t trackID, Int_t detID, Int_t volid ,
 }
 
 // -----   Private method AddCrystalHit   --------------------------------------------
-R3BCaloCrystalHitSim* R3BCalo::AddCrystalHit(Int_t type, Int_t copy, Int_t ident,
+R3BCaloCrystalHitSim* R3BCalo::AddCrystalHit(Int_t geover, Int_t type, Int_t copy, Int_t ident,
 					     Double_t energy, Double_t time, 
 					     Int_t steps, Double_t einc,
 					     Int_t trackid, Int_t volid, 
@@ -821,7 +822,7 @@ R3BCaloCrystalHitSim* R3BCalo::AddCrystalHit(Int_t type, Int_t copy, Int_t ident
 	      << " partrackid : " << partrackid << " type: " << pdgtype 
 	      << " unique id: " << uniqueid << FairLogger::endl;
   }
-  return new(clref[size]) R3BCaloCrystalHitSim(type, copy, ident, energy, time, 
+  return new(clref[size]) R3BCaloCrystalHitSim(geover, type, copy, ident, energy, time, 
 					       steps, einc, trackid, volid, 
 					       partrackid, pdgtype, uniqueid);
 }
