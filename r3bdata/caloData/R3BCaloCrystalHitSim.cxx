@@ -23,12 +23,12 @@ R3BCaloCrystalHitSim::R3BCaloCrystalHitSim()
 
 
 // -----   Standard constructor   ------------------------------------------
-R3BCaloCrystalHitSim::R3BCaloCrystalHitSim(Int_t type, Int_t copy, Int_t ident,
+R3BCaloCrystalHitSim::R3BCaloCrystalHitSim(Int_t geover, Int_t type, Int_t copy, Int_t ident,
 					   Double_t energy, Double_t time,
 					   Int_t steps, Double_t einc,
 					   Int_t trackid, Int_t volid, Int_t partrackid,
 					   Int_t pdgid, Int_t uniqueid) 
-  : R3BCaloCrystalHit(ident, energy, time),
+  : R3BCaloCrystalHit(geover, ident, energy, time),
     fCrystalType(type), fCrystalCopy(copy), fNSteps(steps), fEinc(einc),
     fTrackID(trackid), fVolumeID(volid), fParentTrackID(partrackid),
     fTrackPID(pdgid), fTrackUniqueID(uniqueid)
@@ -62,6 +62,7 @@ R3BCaloCrystalHitSim::~R3BCaloCrystalHitSim()
 void R3BCaloCrystalHitSim::Print(const Option_t* opt) const {
   cout << "-I- R3BCaloCrystalHitSim: a sim calo crystalHit in crystal type " << fCrystalType 
        << " and copy  " << fCrystalCopy << ". Uniqued crystal identifier: " << fCrystalId << endl;
+  cout << "    GeoVersion = " << fGeoVersion << endl;
   cout << "    Energy = " << fEnergy << " GeV" << endl;
   cout << "    Time " << fTime << " ns  " << endl;
   cout << "    Steps " << fNSteps << endl;

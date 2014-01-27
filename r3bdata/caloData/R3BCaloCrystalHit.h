@@ -23,11 +23,12 @@ public:
   R3BCaloCrystalHit();
 
   /** Constructor with arguments
+   *@param fGeoVersion     CALIFA geometry version
    *@param fCrystalId   Crystal unique identifier
    *@param fEnergy      Total energy deposited on the crystal [GeV]
    *@param fTime        Time since event start [ns]
    **/
-  R3BCaloCrystalHit(Int_t ident, Double_t energy, Double_t time);
+  R3BCaloCrystalHit(Int_t geover, Int_t ident, Double_t energy, Double_t time);
 
   /** Copy constructor **/
   R3BCaloCrystalHit(const R3BCaloCrystalHit&);
@@ -38,6 +39,7 @@ public:
   virtual ~R3BCaloCrystalHit();
 
   /** Accessors **/
+  Int_t    GetGeoVersion()    const { return fGeoVersion; }
   Int_t    GetCrystalId()     const { return fCrystalId; }
   Double_t GetEnergy()        const { return fEnergy; }
   Double_t GetTime()          const { return fTime; }
@@ -46,6 +48,7 @@ public:
   Int_t    GetCrystalCopy()   const { return 0; }   //Backwards compatibility: not crashing macros
 
   /** Modifiers **/
+  void SetGeoVersion(Int_t geover)          { fGeoVersion  = geover; }
   void SetCrystalId(Int_t ident)            { fCrystalId = ident; }
   void SetEnergy(Double32_t energy){fEnergy = energy;}
   void SetTime(Double32_t time){fTime = time;}
@@ -54,6 +57,7 @@ public:
   virtual void Print(const Option_t* opt) const;
 
 protected:
+  Int_t fGeoVersion;     //CALIFA geometry version
   Double32_t fEnergy;    //total energy in the crystal
   Double32_t fTime;      //time of the interaction
   Int_t fCrystalId;      //crystal unique identifier

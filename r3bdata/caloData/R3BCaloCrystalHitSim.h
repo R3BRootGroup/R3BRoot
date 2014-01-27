@@ -23,11 +23,8 @@ public:
   R3BCaloCrystalHitSim();
 
   /** Constructor with arguments
-   // ---- *@param fCrystalId      Crystal unique identifier
    *@param fCrystalType    Crystal type
    *@param fCrystalCopy    Crystal copy
-   // ---- *@param fEnergy	   total energy deposited on the crystal [GeV]
-   // ---- *@param fTime           Time since event start [ns]
    *@param fNSteps         Steps inside an active volume
    *@param fEinc           total energy entering the crystal [GeV]
    *@param fTrackID        Track index
@@ -36,7 +33,7 @@ public:
    *@param fTrackPID       Particle identification
    *@param fTrackUniqueID  Particle unique id (e.g. if Delta electron, fTrackUniqueID=9)
    **/
-  R3BCaloCrystalHitSim(Int_t type, Int_t copy, Int_t ident,
+  R3BCaloCrystalHitSim(Int_t geover, Int_t type, Int_t copy, Int_t ident,
 			Double_t energy, Double_t time,
 			Int_t steps, Double_t einc,
 			Int_t trackid, Int_t volid, Int_t partrackid,
@@ -53,9 +50,6 @@ public:
   /** Accessors **/
   Int_t    GetCrystalType()   const { return fCrystalType; }
   Int_t    GetCrystalCopy()   const { return fCrystalCopy; }
-  // ---- Int_t    GetCrystalId()     const { return fCrystalId; }
-  // ---- Double_t GetEnergy()        const { return fEnergy; }
-  // ---- Double_t GetTime()          const { return fTime; }
   Int_t    GetNSteps()        const { return fNSteps; }
   Double_t GetEinc()          const { return fEinc; }
   Int_t    GetTrackId()       const { return fTrackID; }
@@ -67,10 +61,7 @@ public:
   /** Modifiers **/
   void SetCrystalType(Int_t type)           { fCrystalType = type; }
   void SetCrystalCopy(Int_t copy)           { fCrystalCopy = copy; }
-  // ---- void SetCrystalId(Int_t ident)            { fCrystalId = ident; }
-  // ---- void SetEnergy(Double32_t energy)         { fEnergy = energy; }
   void AddMoreEnergy(Double32_t moreEnergy) { fEnergy += moreEnergy; }
-  // ---- void SetTime(Double32_t time)             { fTime = time; }
   void SetNSteps(Int_t steps)               { fNSteps = steps; }
   void SetEinc(Double32_t einc)             { fEinc = einc; }
   void SetTrackId(Int_t trackid)            { fTrackID = trackid; }
@@ -84,11 +75,8 @@ public:
 
 protected:
 
-  // ---- Double32_t fEnergy;    //total energy in the crystal
-  // ---- Double32_t fTime;      //time of the interaction
   Int_t fCrystalType;    //crystal type
   Int_t fCrystalCopy;    //crystal copy
-  // ---- Int_t fCrystalId;      //crystal unique identifier
   Int_t fNSteps;         //steps inside an active volume
   Double32_t fEinc;      //total energy entering the crystal
   Int_t fTrackID;        //track index
