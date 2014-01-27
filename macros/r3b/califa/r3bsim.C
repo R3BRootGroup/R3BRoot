@@ -84,9 +84,9 @@ Int_t r3bsim(){
   //detGeo.Add(new TObjString("CRYSTALBALL"),   
   //         new TObjString("cal_v13a.geo.root"));
   //detGeo.Add(new TObjString("CALIFA"),        
-  //	     new TObjString("califa_v13_811.geo.root"));
+  //	     new TObjString("califa_v13_811.geo.root"));  //Barrel + Madrid Endcap
   detGeo.Add(new TObjString("CALIFA"),        
-	     new TObjString("califa_10_v8.11.geo.root"));
+	     new TObjString("califa_10_v8.11.geo.root"));  //Barrel only
   //detGeo.Add(new TObjString("TOF"),           
   //     new TObjString("tof_v13a.geo.root"));
   //detGeo.Add(new TObjString("MTOF"),          
@@ -128,7 +128,7 @@ Int_t r3bsim(){
    Bool_t fR3BMagnet = kFALSE;
 	
    // Including CaloHitFinder task (kFALSE by default)
-   Bool_t fCaloHitFinder = kTRUE; 
+   Bool_t fCaloHitFinder = kFALSE; 
 
    Double_t fMeasCurrent = 1500.;
 
