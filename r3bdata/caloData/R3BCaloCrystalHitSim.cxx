@@ -24,11 +24,11 @@ R3BCaloCrystalHitSim::R3BCaloCrystalHitSim()
 
 // -----   Standard constructor   ------------------------------------------
 R3BCaloCrystalHitSim::R3BCaloCrystalHitSim(Int_t geover, Int_t type, Int_t copy, Int_t ident,
-					   Double_t energy, Double_t time,
+					   Double_t energy, Double_t Nf, Double_t Ns, Double_t time,
 					   Int_t steps, Double_t einc,
 					   Int_t trackid, Int_t volid, Int_t partrackid,
 					   Int_t pdgid, Int_t uniqueid) 
-  : R3BCaloCrystalHit(geover, ident, energy, time),
+  : R3BCaloCrystalHit(geover, ident, energy, Nf, Ns, time),
     fCrystalType(type), fCrystalCopy(copy), fNSteps(steps), fEinc(einc),
     fTrackID(trackid), fVolumeID(volid), fParentTrackID(partrackid),
     fTrackPID(pdgid), fTrackUniqueID(uniqueid)

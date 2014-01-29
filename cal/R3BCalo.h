@@ -12,7 +12,7 @@
 #define R3BCALO_H
 
 #include "R3BDetector.h"
-
+#include "TF1.h"
 #include "TLorentzVector.h"
 
 class TClonesArray;
@@ -150,6 +150,8 @@ class R3BCalo : public R3BDetector
     Double32_t     fTime;              //!  time
     Double32_t     fLength;            //!  length
     Double32_t     fELoss;             //!  energy loss
+    Double32_t     fNf;                //!  fast CsI(Tl) amplitude
+    Double32_t     fNs;                //!  slow CsI(Tl) amplitude
     Int_t          fPosIndex;          //!
     Int_t          fNSteps;            //!  Number of steps in the active volume
     Double32_t     fEinc;              //!  Total incident energy
@@ -158,6 +160,12 @@ class R3BCalo : public R3BDetector
 
     TClonesArray*  fCaloCollection;              //!  The hit collection
     TClonesArray*  fCaloCrystalHitCollection;    //!  The crystal hit collection
+
+    //! Defining functions for energy to light output calculation
+    TF1 *tf_p_dNs;
+    TF1 *tf_p_dNf;
+    TF1 *tf_g_dNs;
+    TF1 *tf_g_dNf;
 	
     // Selecting the geometry of the CALIFA calorimeter
     Int_t fGeometryVersion;
@@ -169,10 +177,11 @@ class R3BCalo : public R3BDetector
      ** Adds a CaloPoint to the HitCollection
      **/
     R3BCaloPoint* AddHit(Int_t trackID, Int_t detID, Int_t volid, Int_t copy, Int_t ident,
-			TVector3 posIn,
-			TVector3 pos_out, TVector3 momIn, 
-			TVector3 momOut, Double_t time, 
-			Double_t length, Double_t eLoss);
+			 TVector3 posIn,
+			 TVector3 pos_out, TVector3 momIn, 
+			 TVector3 momOut, Double_t time, 
+			 Double_t length, Double_t eLoss,
+			 Double_t Nf, Double_t Ns);
 
 	
     /** Private method AddCrystalHit
@@ -180,7 +189,7 @@ class R3BCalo : public R3BDetector
      ** Adds a CaloCrystalHitSim to the HitCollection
      **/
     R3BCaloCrystalHitSim* AddCrystalHit(Int_t geover, Int_t type, Int_t copy, Int_t ident,
-					Double_t energy, Double_t tof,
+					Double_t energy, Double_t Nf, Double_t Ns, Double_t tof,
 					Int_t steps, Double_t einc,
 					Int_t trackid, Int_t volid, Int_t partrackid,
 					Int_t pdgid, Int_t uniqueid);
@@ -212,7 +221,7 @@ inline void R3BCalo::ResetParameters() {
   fPosOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fMomIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
   fMomOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
-  fTime = fLength = fELoss = fEinc = 0;
+  fTime = fLength = fELoss = fNf = fNs = fEinc = 0;
   fPosIndex = 0;
   fNSteps = 0;
 };

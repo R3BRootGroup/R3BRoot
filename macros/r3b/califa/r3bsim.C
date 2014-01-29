@@ -18,6 +18,12 @@ Int_t r3bsim(){
   macro_r3ball += "/macros/r3b/califa/r3ball.C";
   gROOT->LoadMacro(macro_r3ball.Data());
   
+  // Input files
+  TString EventFile = "p2p_O18_no_exc_state_without_gammas_of_course.dat";
+  //TString EventFile = "p2p_O18_first_exc_state_with_gammas.dat";
+  //TString EventFile = "p2p_O18_second_exc_state_with_gammas.dat";
+  //TString EventFile = "p2p_O18_third_exc_state_with_gammas.dat";
+
   // Output files
   TString OutFile = "r3bsim.root";
   TString ParFile = "r3bpar.root";
@@ -37,7 +43,7 @@ Int_t r3bsim(){
   // Box generator:             "box"
   // CALIFA generator:          "gammas"
   // R3B spec. generator:       "r3b"
-  TString fGene="gammas";
+  TString fGene="ascii";
   
   //-------------------------------------------------
   // Secondaries  generation (G4 only)
@@ -76,17 +82,17 @@ Int_t r3bsim(){
   //   Neutron:                 LAND
   TMap detGeo;
   detGeo.Add(new TObjString("TARGET"),
-	     new TObjString("target_"+target4+".geo.root"));
+  	     new TObjString("target_"+target4+".geo.root"));
   //detGeo.Add(new TObjString("ALADIN"),        
   //     new TObjString("aladin_v13a.geo.root"));
   //detGeo.Add(new TObjString("GLAD"),          
   //	     new TObjString("glad_v13a.geo.root"));
   //detGeo.Add(new TObjString("CRYSTALBALL"),   
   //         new TObjString("cal_v13a.geo.root"));
-  //detGeo.Add(new TObjString("CALIFA"),        
-  //	     new TObjString("califa_v13_811.geo.root"));  //Barrel + Madrid Endcap
   detGeo.Add(new TObjString("CALIFA"),        
 	     new TObjString("califa_10_v8.11.geo.root"));  //Barrel only
+  //new TObjString("califa_v13_811.geo.root"));
+             //new TObjString("califa_v5_707717.geo.root"));
   //detGeo.Add(new TObjString("TOF"),           
   //     new TObjString("tof_v13a.geo.root"));
   //detGeo.Add(new TObjString("MTOF"),          
@@ -115,7 +121,7 @@ Int_t r3bsim(){
    //- N# of Sim. Events   |    nEvents     (Int_t)
    //-------------------------------------------------
 
-   Int_t nEvents = 10;
+   Int_t nEvents = 2000;
 
    //-------------------------------------------------
    //- EventDisplay        |    fEventDisplay (Bool_t)
@@ -128,13 +134,17 @@ Int_t r3bsim(){
    Bool_t fR3BMagnet = kFALSE;
 	
    // Including CaloHitFinder task (kFALSE by default)
+<<<<<<< .mine
+   Bool_t fCaloHitFinder = kTRUE;  //kTRUE; 
+=======
    Bool_t fCaloHitFinder = kFALSE; 
+>>>>>>> .r23610
 
    Double_t fMeasCurrent = 1500.;
 
    // Main Sim function call
-   r3ball(nEvents,detGeo,target2,fEventDisplay,fMC,fGene,fUserPList,
-	  fR3BMagnet,fCaloHitFinder,fMeasCurrent,OutFile,ParFile);      
+   r3ball(nEvents, detGeo, target2, fEventDisplay, fMC, fGene, fUserPList,
+	  fR3BMagnet, fCaloHitFinder, fMeasCurrent, OutFile, ParFile, EventFile);      
 
 }
 

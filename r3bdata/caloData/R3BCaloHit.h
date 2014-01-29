@@ -33,8 +33,8 @@ public:
 	 *@param fTheta					Reconstructed theta
 	 *@param fPhi					Reconstructed phi
 	 **/
-	R3BCaloHit(UInt_t Nb, Double_t ene,
-			   Double_t theta, Double_t phi);
+	R3BCaloHit(UInt_t Nb, Double_t ene, Double_t Nf, Double_t Ns,
+		   Double_t theta, Double_t phi);
 	
 	
 	/** Copy constructor **/
@@ -49,12 +49,16 @@ public:
 	/** Accessors **/
 	UInt_t GetNbOfCrystalHits()   const { return fNbOfCrystalHits; }
 	Double_t GetEnergy()   const { return fEnergy; }
+	Double_t GetNf()   const { return fNf; }
+	Double_t GetNs()   const { return fNs; }
 	Double_t GetTheta()   const { return fTheta; }
 	Double_t GetPhi()   const { return fPhi; }
 
 	/** Modifiers **/
 	void SetNbOfCrystalHits(UInt_t number){fNbOfCrystalHits = number;}
 	void SetEnergy(Double_t ene){fEnergy = ene;}
+	void SetNf(Double_t Nf){fNf = Nf;}
+	void SetNs(Double_t Ns){fNs = Ns;}
 	void SetTheta(Double_t theta){fTheta = theta;}
 	void SetPhi(Double_t phi){fPhi = phi;}
 
@@ -68,6 +72,8 @@ protected:
 	//Basic Hit information
 	UInt_t fNbOfCrystalHits; //number of crystals contribuying to the R3BCaloHit
 	Double_t fEnergy;        //total energy deposited 
+	Double_t fNf;            //total Nf deposited
+	Double_t fNs;            //total Ns deposited
 	Double_t fTheta;         //reconstructed theta
 	Double_t fPhi;           //reconstructed phi
 		

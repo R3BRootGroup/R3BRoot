@@ -144,13 +144,13 @@ class R3BCaloHitFinder : public FairTask
     **
     ** Adds a CaloHit to the HitCollection
     **/
-    R3BCaloHit* AddHit(UInt_t Nbcrystals,Double_t ene,Double_t pAngle,Double_t aAngle);
+    R3BCaloHit* AddHit(UInt_t Nbcrystals,Double_t ene, Double_t Nf, Double_t Ns, Double_t pAngle,Double_t aAngle);
 
     /** Private method AddHitSim
     **
     ** Adds a CaloHitSim to the HitSimCollection
     **/
-    R3BCaloHitSim* AddHitSim(UInt_t Nbcrystals,Double_t ene,Double_t pAngle,Double_t aAngle, Double_t einc);
+    R3BCaloHitSim* AddHitSim(UInt_t Nbcrystals,Double_t ene, Double_t Nf, Double_t Ns,Double_t pAngle,Double_t aAngle, Double_t einc);
 
 
     ClassDef(R3BCaloHitFinder,1);

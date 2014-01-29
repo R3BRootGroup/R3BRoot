@@ -21,9 +21,9 @@ void checkResults() {
 	char title1[250];
 	
 	//SETTINGS 
-	char calVersion[50] = "8.11";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.11)
+	char calVersion[50] = "8.11+iPhos1.01";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.11)
 	Double_t Eproj = 2.00;              //Gamma Energy in projectile frame in MeV 
-	Int_t totalEvents = 1000;        //Events
+	Int_t totalEvents = 2000;        //Events
 	Int_t multiplicity = 1;           //Multiplicity (particles per event)
 	
 	Double_t threshold=0.050;		  //Threshold in MeV
@@ -96,6 +96,15 @@ void checkResults() {
 		minThetaBarrel= 43.16;  //Angular coverture of BARREL 8.11
 		maxThetaBarrel= 135.35; //Angular coverture of BARREL 8.11
 		BARREL=kTRUE;
+	}	
+	else if(!strcmp(calVersion,"8.11+iPhos1.01")){
+		cout << "Using CALIFA version 8.11 + iPhos 1.01 "<< endl;
+		minThetaBarrel= 32.;  //Angular coverture of BARREL 7.09
+		maxThetaBarrel= 135.; //Angular coverture of BARREL 7.09
+		minThetaEndCap= 9.59;  //Angular coverture of ENDCAP 7.17
+		maxThetaEndCap= 32.10; //Angular coverture of ENDCAP 7.17
+		BARREL=kTRUE;		
+		ENDCAP=kTRUE;
 	}
 	else cout << "Error: Calorimeter version not correctly defined! "<< endl;
 		

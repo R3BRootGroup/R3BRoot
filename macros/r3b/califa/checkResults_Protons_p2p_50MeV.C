@@ -33,16 +33,16 @@ void checkResults_Protons_p2p_50MeV() {
 
 
 // C,C++ Libraries
-#include <string>
-#include <stdio.h>
-#include <stdlib.h>
-#include <iostream>
-#include <fstream> 
-#include <sstream>
-#include <math.h>
-#include <cstdlib>
-#include <ctime>
-#include <iomanip>
+// #include <string>
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <iostream>
+// #include <fstream> 
+// #include <sstream>
+// #include <math.h>
+// #include <cstdlib>
+// #include <ctime>
+// #include <iomanip>
 
 
 using std::cout;
@@ -84,8 +84,8 @@ using std::ios;
 
 	//TString title0 = "califaAna.root";
 	//TString title1 =    "r3bsim.root";
-	sprintf(title0,"%s","/home/jose/r3broot_sept2012/macros/r3b/califa/califaAna_Protons_50MeV.root");  
- 	sprintf(title1,"%s","/home/jose/r3broot_sept2012/macros/r3b/califa/r3bsim_Protons_50MeV.root");  	
+	sprintf(title0,"%s","./califaAna.root");  
+ 	sprintf(title1,"%s","./r3bsim.root");  	
 	//sprintf(title0,"%s","/home/jose/r3broot_sept2012/macros/r3b/califa/califaAna_Gamma_0_5MeV.root");  
  	//sprintf(title1,"%s","/home/jose/r3broot_sept2012/macros/r3b/califa/r3bsim_Gamma_0_5MeV.root"); 
 
@@ -103,7 +103,8 @@ using std::ios;
 	
 	Bool_t BARREL= kFALSE;
 	Bool_t ENDCAP= kFALSE;
-	Double_t minThetaBarrel=0 , maxThetaBarrel=0;	minThetaEndCap=0 , maxThetaEndCap=0;
+	Double_t minThetaBarrel=0 , maxThetaBarrel=0;
+	Double_t minThetaEndCap=0 , maxThetaEndCap=0;
 
 	if(calVersion=="5.0"){
 		cout << "Warning: Calorimeter version 5.0 is not supported in this macro! "<< endl;

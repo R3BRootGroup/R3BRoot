@@ -126,6 +126,8 @@ void R3BCaloHitFinder::Exec(Option_t* opt)
   //ALGORITHMS FOR HIT FINDING
 
   Double_t energy=0.;       // caloHits energy
+  Double_t Nf=0.;           // caloHits Nf
+  Double_t Ns=0.;           // caloHits Ns
   Double_t polarAngle=0.;     // caloHits reconstructed polar angle
   Double_t azimuthalAngle=0.;   // caloHits reconstructed azimuthal angle
   Double_t rhoAngle=0.;   // caloHits reconstructed rho
@@ -211,10 +213,14 @@ void R3BCaloHitFinder::Exec(Option_t* opt)
     // Second, energy and angles come from the crystal with the higher energy
     if(kSimulation) {
       energy = ExpResSmearing(crystalHitSim[crystalWithHigherEnergy]->GetEnergy());
+      Nf = crystalHitSim[crystalWithHigherEnergy]->GetNf();
+      Ns = crystalHitSim[crystalWithHigherEnergy]->GetNs();
       GetAngles(crystalHitSim[crystalWithHigherEnergy]->GetCrystalId(),
 		&polarAngle,&azimuthalAngle,&rhoAngle);
     } else {
       energy = ExpResSmearing(crystalHit[crystalWithHigherEnergy]->GetEnergy());
+      Nf = crystalHit[crystalWithHigherEnergy]->GetNf();
+      Ns = crystalHit[crystalWithHigherEnergy]->GetNs();
       GetAngles(crystalHit[crystalWithHigherEnergy]->GetCrystalId(),
 		&polarAngle,&azimuthalAngle,&rhoAngle);
     }
@@ -243,7 +249,6 @@ void R3BCaloHitFinder::Exec(Option_t* opt)
         TVector3 testAngle(1);       //EF
         testAngle.SetTheta(testPolar);
         testAngle.SetPhi(testAzimuthal);
-
         // Check if the angle between the two vectors is less than the reference angle.
         switch (fClusteringAlgorithmSelector) {
         case 1: {  //square window
@@ -262,10 +267,14 @@ void R3BCaloHitFinder::Exec(Option_t* opt)
               TMath::Abs(angle1 - angle2) < fDeltaAzimuthal ) {
             if(kSimulation) {
               energy += ExpResSmearing(crystalHitSim[i]->GetEnergy());
+	      Nf += crystalHitSim[i]->GetNf();
+	      Ns += crystalHitSim[i]->GetNs();
               eInc += crystalHitSim[i]->GetEinc();
               usedCrystalHits[i] = 1; unusedCrystals--; crystalsInHit++;
             } else {
               energy += ExpResSmearing(crystalHit[i]->GetEnergy());
+	      Nf += crystalHitSim[i]->GetNf();
+	      Ns += crystalHitSim[i]->GetNs();
               usedCrystalHits[i] = 1; unusedCrystals--; crystalsInHit++;
             }
           }
@@ -283,9 +292,14 @@ void R3BCaloHitFinder::Exec(Option_t* opt)
 	       fDeltaAngleClust )  {
             if(kSimulation) {
               energy += ExpResSmearing(crystalHitSim[i]->GetEnergy());
+	      Nf += crystalHitSim[i]->GetNf();
+	      Ns += crystalHitSim[i]->GetNs();
+	      LOG(INFO) << "Nf: " << Nf << FairLogger::endl;
               eInc += crystalHitSim[i]->GetEinc();
             } else {
               energy += ExpResSmearing(crystalHit[i]->GetEnergy());
+	      Nf += crystalHitSim[i]->GetNf();
+	      Ns += crystalHitSim[i]->GetNs();
             }
             usedCrystalHits[i] = 1; unusedCrystals--; crystalsInHit++;
           }
@@ -300,6 +314,8 @@ void R3BCaloHitFinder::Exec(Option_t* opt)
             if ( ((refAngle.Angle(testAngle))*((testRho+rhoAngle)/(35.*2.))) < 
 		 fDeltaAngleClustScaled )  {
               energy += ExpResSmearing(crystalHitSim[i]->GetEnergy());
+	      Nf += crystalHitSim[i]->GetNf();
+	      Ns += crystalHitSim[i]->GetNs();
               eInc += crystalHitSim[i]->GetEinc(); 
               usedCrystalHits[i] = 1; unusedCrystals--; crystalsInHit++;
             }
@@ -309,6 +325,8 @@ void R3BCaloHitFinder::Exec(Option_t* opt)
             if ( ((refAngle.Angle(testAngle))*((testRho+rhoAngle)/(35.*2.))) < 
 		 fDeltaAngleClustScaled )  {
               energy += ExpResSmearing(crystalHit[i]->GetEnergy());
+	      Nf += crystalHitSim[i]->GetNf();
+	      Ns += crystalHitSim[i]->GetNs();
               usedCrystalHits[i] = 1; unusedCrystals--; crystalsInHit++;
             }
           }
@@ -325,9 +343,9 @@ void R3BCaloHitFinder::Exec(Option_t* opt)
     
     
     if(kSimulation) {
-      AddHitSim(crystalsInHit, energy, polarAngle, azimuthalAngle, eInc);
+      AddHitSim(crystalsInHit, energy, Nf, Ns, polarAngle, azimuthalAngle, eInc);
     } else {
-      AddHit(crystalsInHit, energy, polarAngle, azimuthalAngle);
+      AddHit(crystalsInHit, energy, Nf, Ns, polarAngle, azimuthalAngle);
     }
     
     crystalsInHit = 0; //reset for next CaloHit
@@ -1635,7 +1653,168 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar,
       currentNode->LocalToMaster(local, master);
     } 
     
-  }else LOG(ERROR) << "R3BCaloHitFinder: Geometry version not available in R3BCalo::ProcessHits(). " << FairLogger::endl;
+  } else if (fGeometryVersion==15) {
+    //The present scheme here done works with 8.11
+    // crystalType = alveolus type (from 1 to 17) [Alveolus number]
+    // crystalCopy = alveolus copy * 4 + crystals copy +1 (from 1 to 128)
+    // crystalId = 1 to 32 for the first 32 crystals 
+    //                     (single crystal in each alveoli)
+    // or 32 + (alveolus type-2)*128 + (alvelous copy)*4 + (crystal copy) + 1
+    //                     (from 1 to 1952)
+    //
+    Char_t nameVolume[200];
+    if (iD<3000) {
+      if(iD<33) crystalType = 1;  //Alv type 1
+      else crystalType = (Int_t)((iD-33)/128) + 2;  //Alv type (2 to 16)
+      if(iD<33) crystalCopy = iD;     //for Alv type 1 
+      else crystalCopy = ((iD-33)%128) + 1;         //CrystalCopy (1 to 128)
+      if(iD<33) alveolusCopy = iD;    //Alv type 1 
+      else alveolusCopy =(Int_t)(((iD-33)%128)/4) +1; //Alveolus copy (1 to 32)
+      if(iD<33) crystalInAlveolus =1;          //Alv type 1
+      else crystalInAlveolus = (iD-33)%4 + 1;//Crystal number in alveolus (1 to 4)
+    
+      Int_t alveoliType[16]={1,2,2,2,2,3,3,4,4,4,5,5,5,6,6,6};
+    
+      sprintf(nameVolume, 
+	      "/cave_1/CalifaWorld_0/Alveolus_%i_%i/AlveolusInner_%i_1/CrystalWithWrapping_%i_%i_%i/Crystal_%i_%i_1",
+	      crystalType, alveolusCopy-1, 
+	      crystalType, alveoliType[crystalType-1], 
+	      crystalInAlveolus, crystalInAlveolus-1, 
+	      alveoliType[crystalType-1], crystalInAlveolus);
+    
+      // The definition of the crystals is different in this particular EndCap design:
+      // the origin for each crystal is the alveoli corner
+      if (crystalType==1) {
+	local[0]=27.108/8; local[1]=-28.0483/8; local[2]=0;
+      } else if (crystalType==2 || crystalType==3 || 
+		 crystalType==4 || crystalType==5) {
+	if(crystalInAlveolus==1){
+	  local[0]=37.4639/8; local[1]=-8.57573/8; local[2]=0;
+	} else if(crystalInAlveolus==2) {
+	  local[0]=37.4639/8; local[1]=-31.1043/8; local[2]=0;
+	} else if(crystalInAlveolus==3) {
+	  local[0]=9.52012/8; local[1]=-8.57573/8; local[2]=0;
+	} else if(crystalInAlveolus==4){
+	  local[0]=9.52012/8; local[1]=-31.1043/8; local[2]=0;
+	}
+      } else if (crystalType==6 || crystalType==7) {
+	if(crystalInAlveolus==1){
+	  local[0]=38.3282/8; local[1]=-5.49819/8; local[2]=0;
+	} else if(crystalInAlveolus==2) {
+	  local[0]=38.3282/8; local[1]=-23.0538/8; local[2]=0;
+	} else if(crystalInAlveolus==3) {
+	  local[0]=8.66384/8; local[1]=-5.49819/8; local[2]=0;
+	} else if(crystalInAlveolus==4){
+	  local[0]=8.66384/8; local[1]=-23.0538/8; local[2]=0;
+	}
+      } else if (crystalType==8 || crystalType==9 || crystalType==10) {
+	if(crystalInAlveolus==1){
+	  local[0]=38.3683/8; local[1]=-4.71618/8; local[2]=0;
+	} else if(crystalInAlveolus==2) {
+	  local[0]=38.3683/8; local[1]=-19.8438/8; local[2]=0;
+	} else if(crystalInAlveolus==3) {
+	  local[0]=8.43569/8; local[1]=-4.71618/8; local[2]=0;
+	} else if(crystalInAlveolus==4){
+	  local[0]=8.43569/8; local[1]=-19.8438/8; local[2]=0;
+	}
+      } else if (crystalType==11 || crystalType==12 || crystalType==13) {
+	if(crystalInAlveolus==1){
+	  local[0]=38.3495/8; local[1]=-4.70373/8; local[2]=0;
+	} else if(crystalInAlveolus==2) {
+	  local[0]=38.3495/8; local[1]=-19.8403/8; local[2]=0;
+	} else if(crystalInAlveolus==3) {
+	  local[0]=8.66654/8; local[1]=-4.70373/8; local[2]=0;
+	} else if(crystalInAlveolus==4){
+	  local[0]=8.66654/8; local[1]=-19.8403/8; local[2]=0;
+	}
+      } else if (crystalType==14 || crystalType==15 || crystalType==16) {
+	if(crystalInAlveolus==1){
+	  local[0]=37.9075/8; local[1]=-4.66458/8; local[2]=0;
+	} else if(crystalInAlveolus==2) {
+	  local[0]=37.9075/8; local[1]=-19.8474/8; local[2]=0;
+	} else if(crystalInAlveolus==3) {
+	  local[0]=9.07247/8; local[1]=-19.8474/8; local[2]=0;
+	} else if(crystalInAlveolus==4){
+	  local[0]=9.07247/8; local[1]=-4.66458/8; local[2]=0;
+	}
+      }		
+
+      gGeoManager->CdTop();
+
+      if(gGeoManager->CheckPath(nameVolume)) gGeoManager->cd(nameVolume);
+      else { 
+	LOG(ERROR) << "R3BCaloHitFinder: Invalid crystal path: " << nameVolume
+		   << FairLogger::endl;
+	return; 
+      }
+      TGeoNode* currentNode = gGeoManager->GetCurrentNode();
+      currentNode->LocalToMaster(local, master);
+    
+      sprintf(nameVolume, 
+	      "/cave_1/CalifaWorld_0/Alveolus_%i_%i/AlveolusInner_%i_1/CrystalWithWrapping_%i_%i_%i",
+	      crystalType, alveolusCopy-1, 
+	      crystalType, alveoliType[crystalType-1], 
+	      crystalInAlveolus, crystalInAlveolus-1);
+      gGeoManager->cd(nameVolume);
+      currentNode = gGeoManager->GetCurrentNode();
+      local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
+      currentNode->LocalToMaster(local, master);
+    
+      sprintf(nameVolume, 
+	      "/cave_1/CalifaWorld_0/Alveolus_%i_%i/AlveolusInner_%i_1",
+	      crystalType, alveolusCopy-1, crystalType);
+      gGeoManager->cd(nameVolume);
+      currentNode = gGeoManager->GetCurrentNode();
+      local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
+      currentNode->LocalToMaster(local, master);
+    
+      sprintf(nameVolume, 
+	      "/cave_1/CalifaWorld_0/Alveolus_%i_%i",
+	      crystalType, alveolusCopy-1);
+      gGeoManager->cd(nameVolume);
+      currentNode = gGeoManager->GetCurrentNode();
+      local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
+      currentNode->LocalToMaster(local, master);
+    
+      sprintf(nameVolume, "/cave_1/CalifaWorld_0");
+      gGeoManager->cd(nameVolume);
+      currentNode = gGeoManager->GetCurrentNode();
+      local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
+      currentNode->LocalToMaster(local, master);
+    } else{
+      //For TUM iPhos endcap 
+      crystalType = ((iD-3000)%15) + 1;
+      crystalCopy = (iD-3000)/15 + 1;
+      Int_t alveoliType[15]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+      //Char_t nameVolume[200];
+      sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_EC_%i_%i/CrystalWithWrapping_%i_1/Crystal_%i_1",
+              alveoliType[crystalType-1], crystalCopy-1, crystalType, crystalType);
+
+      gGeoManager->cd(nameVolume);
+      TGeoNode* currentNode = gGeoManager->GetCurrentNode();
+      currentNode->LocalToMaster(local, master);
+
+      sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_EC_%i_%i/CrystalWithWrapping_%i_1",
+              alveoliType[crystalType-1], crystalCopy-1, crystalType);
+
+      gGeoManager->cd(nameVolume);
+      currentNode = gGeoManager->GetCurrentNode();
+      local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
+      currentNode->LocalToMaster(local, master);
+
+      sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_EC_%i_%i",alveoliType[crystalType-1], crystalCopy-1);
+      gGeoManager->cd(nameVolume);
+      currentNode = gGeoManager->GetCurrentNode();
+      local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
+      currentNode->LocalToMaster(local, master);
+
+      sprintf(nameVolume, "/cave_1/CalifaWorld_0");
+      gGeoManager->cd(nameVolume);
+      currentNode = gGeoManager->GetCurrentNode();
+      local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
+      currentNode->LocalToMaster(local, master);   
+    }
+  } else LOG(ERROR) << "R3BCaloHitFinder: Geometry version not available in R3BCalo::ProcessHits(). " << FairLogger::endl;
   
   
   TVector3 masterV(master[0],master[1],master[2]);
@@ -1697,21 +1876,21 @@ void R3BCaloHitFinder::SetAngularWindow(Double_t deltaPolar, Double_t deltaAzimu
 
 
 // -----   Private method AddHit  --------------------------------------------
-R3BCaloHit* R3BCaloHitFinder::AddHit(UInt_t Nbcrystals,Double_t ene,Double_t pAngle,Double_t aAngle)
+R3BCaloHit* R3BCaloHitFinder::AddHit(UInt_t Nbcrystals,Double_t ene,Double_t Nf,Double_t Ns,Double_t pAngle,Double_t aAngle)
 {
   // It fills the R3BCaloHit array
   TClonesArray& clref = *fCaloHitCA;
   Int_t size = clref.GetEntriesFast();
-  return new(clref[size]) R3BCaloHit(Nbcrystals, ene, pAngle, aAngle);
+  return new(clref[size]) R3BCaloHit(Nbcrystals, ene, Nf, Ns, pAngle, aAngle);
 }
 
 // -----   Private method AddHitSim  --------------------------------------------
-R3BCaloHitSim* R3BCaloHitFinder::AddHitSim(UInt_t Nbcrystals,Double_t ene,Double_t pAngle,Double_t aAngle, Double_t einc)
+R3BCaloHitSim* R3BCaloHitFinder::AddHitSim(UInt_t Nbcrystals,Double_t ene,Double_t Nf,Double_t Ns,Double_t pAngle,Double_t aAngle, Double_t einc)
 {
   // It fills the R3BCaloHitSim array
   TClonesArray& clref = *fCaloHitCA;
   Int_t size = clref.GetEntriesFast();
-  return new(clref[size]) R3BCaloHitSim(Nbcrystals, ene, pAngle, aAngle, einc);
+  return new(clref[size]) R3BCaloHitSim(Nbcrystals, ene, Nf, Ns, pAngle, aAngle, einc);
 }
 
 /*

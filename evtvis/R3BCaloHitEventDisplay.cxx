@@ -113,7 +113,6 @@ InitStatus R3BCaloHitEventDisplay::ReInit()
 // -----   Public method Exec   --------------------------------------------
 void R3BCaloHitEventDisplay::Exec(Option_t* opt)
 {
-
   if (IsActive()) {
 
     Reset();
@@ -218,7 +217,6 @@ void R3BCaloHitEventDisplay::Exec(Option_t* opt)
     legoViewer->GetGLViewer()->SetEventHandler
        (new TEveLegoEventHandler((TGWindow*)legoViewer->GetGLViewer()->GetGLWidget(), legoViewer->GetGLViewer(), fLego));
     fLego->SetGridColor(5);
-
     gEve->FullRedraw3D(kFALSE);
 
   }

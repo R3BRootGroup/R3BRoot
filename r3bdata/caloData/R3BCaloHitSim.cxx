@@ -22,9 +22,9 @@ R3BCaloHitSim::R3BCaloHitSim()
 
 
 // -----   Standard constructor   ------------------------------------------
-R3BCaloHitSim::R3BCaloHitSim(UInt_t Nb, Double_t ene,
+R3BCaloHitSim::R3BCaloHitSim(UInt_t Nb, Double_t ene, Double_t Nf, Double_t Ns,
 			     Double_t theta, Double_t phi, Double_t einc) 
-  : R3BCaloHit(Nb, ene, theta, phi),
+  : R3BCaloHit(Nb, ene, Nf, Ns, theta, phi),
     fEinc(einc)
 {
 }

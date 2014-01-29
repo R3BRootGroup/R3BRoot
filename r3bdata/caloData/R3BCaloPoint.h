@@ -37,10 +37,12 @@ class R3BCaloPoint : public FairMCPoint
    *@param tof      Time since event start [ns]
    *@param length   Track length since creation [cm]
    *@param eLoss    Energy deposit [GeV]
+   *@param Nf       Fast component of CsI(Tl) light [a.u.]
+   *@param Ns       Slow component of CsI(Tl) light [a.u.]
    **/
   R3BCaloPoint(Int_t trackID, Int_t detID, Int_t volId, Int_t copy , Int_t ident,
 	       TVector3 posIn,TVector3 posOut, TVector3 momIn, TVector3 momOut,
-	       Double_t tof, Double_t length, Double_t eLoss);
+	       Double_t tof, Double_t length, Double_t eLoss, Double_t Nf, Double_t Ns);
 
 
   /** Copy constructor **/
@@ -96,6 +98,7 @@ class R3BCaloPoint : public FairMCPoint
   Int_t fCrystalType;
   Int_t fCrystalCopy;
   Int_t fCrystalId;
+  Double32_t fNf, fNs;
 
   ClassDef(R3BCaloPoint,1)
 
