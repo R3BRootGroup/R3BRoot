@@ -42,14 +42,17 @@ InitStatus R3BLandRawAna::Init()
 
 void R3BLandRawAna::Exec(Option_t *option)
 {
-  Int_t nHits = fRawData->GetEntriesFast();
+  Int_t nHits = fRawData->GetEntries();
   //cout << "-I- R3BLandRawAna::Exec : event " << fnEvents << ", multiplicity " << nHits << endl;
   R3BLandRawHit *hit;
   for(Int_t i = 0; i < nHits; i++) {
     hit = (R3BLandRawHit*) fRawData->At(i);
-    thch ->Fill(hit->GetQdcData());
+    thch->Fill(hit->GetQdcData());
   }
   thmul->Fill(nHits);
+  if(0 == (fnEvents%100)) {
+    cout << fnEvents << "  " << nHits << endl;
+  }
   fnEvents += 1;
 }
 
@@ -61,8 +64,8 @@ void R3BLandRawAna::FinishTask()
 
 void R3BLandRawAna::CreateHistos()
 {
-  thmul = new TH1F("Multiplicity", "", 500, 0, 500);
-  thch = new TH1F("Charge", "", 700, 0., 7000.);
+  thmul = new TH1F("Multiplicity", "", 400, -0.5, 399.5);
+  thch = new TH1F("Charge", "", 1500, 0., 1500.);
   FairRunOnline *run = FairRunOnline::Instance();
   run->AddObject(thmul);
   run->AddObject(thch);

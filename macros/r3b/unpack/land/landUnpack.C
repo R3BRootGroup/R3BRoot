@@ -3,14 +3,13 @@
 {
   TStopwatch timer;
   timer.Start();
-// nev=-1 for all events
   Int_t nev=-1;
   // Create source with unpackers ----------------------------------------------
 //  FairRemoteSource* source  = new FairRemoteSource("lxi047");
   FairLmdSource* source  = new FairLmdSource();
 // adding the LMD file
   source->AddFile("r258_2986.lmd");
-//  source->AddFile("/Users/kresan/neuland/r323_3607.lmd");
+//  source->AddFile("r323_3607.lmd");
 
   Short_t type = 94;
   Short_t subType = 9400;
@@ -66,7 +65,7 @@
   
   // Run -----------------------------------------------------------------------
   // test with 100 events
-  run->Run(100, 0);
+  run->Run(nev, 0);
   // ---------------------------------------------------------------------------
 
 
