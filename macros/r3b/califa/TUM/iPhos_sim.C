@@ -15,7 +15,7 @@ Int_t iPhos_sim(){
   
   // Load the Main Simulation macro
   TString macro_r3ball = getenv("VMCWORKDIR");
-  macro_r3ball += "/macros/r3b/califa/r3ball.C";
+  macro_r3ball += "/macros/r3b/califa/TUM/r3ball.C";
   gROOT->LoadMacro(macro_r3ball.Data());
   
   // Input files
@@ -130,7 +130,7 @@ Int_t iPhos_sim(){
    //-------------------------------------------------
    //   connected:              kTRUE
    //   not connected:          kFALSE
-   Bool_t fEventDisplay=kFALSE;
+   Bool_t fEventDisplay=kTRUE;
 
    // Magnet Field definition
    Bool_t fR3BMagnet = kFALSE;

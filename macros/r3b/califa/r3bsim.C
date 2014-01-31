@@ -19,8 +19,8 @@ Int_t r3bsim(){
   gROOT->LoadMacro(macro_r3ball.Data());
   
   // Input files
-  TString EventFile = "p2p_O18_no_exc_state_without_gammas_of_course.dat";
-  //TString EventFile = "p2p_O18_first_exc_state_with_gammas.dat";
+  //TString EventFile = "p2p_O18_no_exc_state_without_gammas_of_course.dat";
+  TString EventFile = "p2p_O18_first_exc_state_with_gammas_no_doppler.dat";
   //TString EventFile = "p2p_O18_second_exc_state_with_gammas.dat";
   //TString EventFile = "p2p_O18_third_exc_state_with_gammas.dat";
 
@@ -121,7 +121,7 @@ Int_t r3bsim(){
    //- N# of Sim. Events   |    nEvents     (Int_t)
    //-------------------------------------------------
 
-   Int_t nEvents = 2000;
+   Int_t nEvents = 50;
 
    //-------------------------------------------------
    //- EventDisplay        |    fEventDisplay (Bool_t)
@@ -134,11 +134,8 @@ Int_t r3bsim(){
    Bool_t fR3BMagnet = kFALSE;
 	
    // Including CaloHitFinder task (kFALSE by default)
-<<<<<<< .mine
+
    Bool_t fCaloHitFinder = kTRUE;  //kTRUE; 
-=======
-   Bool_t fCaloHitFinder = kFALSE; 
->>>>>>> .r23610
 
    Double_t fMeasCurrent = 1500.;
 
