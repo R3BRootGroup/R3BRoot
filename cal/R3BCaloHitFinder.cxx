@@ -1784,7 +1784,7 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar,
     } else{
       //For TUM iPhos endcap 
       crystalType = ((iD-3000)%15) + 1;
-      crystalCopy = (iD-3000)/15 + 1;
+      crystalCopy = (iD-3000 - crystalType + 1)/15 + 1;
       Int_t alveoliType[15]={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
       //Char_t nameVolume[200];
       sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_EC_%i_%i/CrystalWithWrapping_%i_1/Crystal_%i_1",

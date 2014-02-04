@@ -403,9 +403,10 @@ void r3ball(Int_t nEvents = 1,
   // ----- Initialize CaloHitFinder task ------------------------------------
   if(fCaloHitFinder) {
     R3BCaloHitFinder* caloHF = new R3BCaloHitFinder();
+    caloHF->SetClusteringAlgorithm(1,0);
     caloHF->SetDetectionThreshold(0.000050);//50 KeV
-    caloHF->SetExperimentalResolution(5.);  //5% at 1 MeV
-    caloHF->SetAngularWindow(3.2,3.2);      //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
+    caloHF->SetExperimentalResolution(0.);  //5% at 1 MeV
+    caloHF->SetAngularWindow(0.25,0.25);      //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
     run->AddTask(caloHF);
   }
 	

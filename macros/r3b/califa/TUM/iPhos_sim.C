@@ -21,13 +21,13 @@ Int_t iPhos_sim(){
   // Input files
   //TString EventFile = "p2p_O18_no_exc_state_without_gammas_of_course.dat";
   //TString EventFile = "p2p_O18_first_exc_state_with_gammas.dat";
-  TString EventFile = "p2p_O18_first_exc_state_with_gammas_no_doppler.dat";
+  //TString EventFile = "p2p_O18_first_exc_state_with_gammas_no_doppler.dat";
   //TString EventFile = "p2p_O18_second_exc_state_with_gammas.dat";
   //TString EventFile = "p2p_O18_third_exc_state_with_gammas.dat";
-  //TString EventFile = "evt_gen.dat";
+  TString EventFile = "proton_events.dat";
 
   // Output files
-  TString OutFile = "r3bsim.root";
+  TString OutFile = "proton_events.root";
   TString ParFile = "r3bpar.root";
   
   //-------------------------------------------------
@@ -93,7 +93,7 @@ Int_t iPhos_sim(){
   //detGeo.Add(new TObjString("CRYSTALBALL"),   
   //         new TObjString("cal_v13a.geo.root"));
   detGeo.Add(new TObjString("CALIFA"),        
-	     new TObjString("califa_15_v8.11_iPhos1.01.geo.root"));
+	     new TObjString("califa_15_v8.11_iPhos1.02.geo.root"));
 	     //new TObjString("califa_10_v8.11.geo.root"));
   //detGeo.Add(new TObjString("TOF"),           
   //     new TObjString("tof_v13a.geo.root"));
@@ -123,7 +123,7 @@ Int_t iPhos_sim(){
    //- N# of Sim. Events   |    nEvents     (Int_t)
    //-------------------------------------------------
 
-   Int_t nEvents = 100;
+   Int_t nEvents = 1000;
 
    //-------------------------------------------------
    //- EventDisplay        |    fEventDisplay (Bool_t)
@@ -145,4 +145,3 @@ Int_t iPhos_sim(){
 	  fR3BMagnet, fCaloHitFinder, fMeasCurrent, OutFile, ParFile, EventFile);      
 
 }
-
