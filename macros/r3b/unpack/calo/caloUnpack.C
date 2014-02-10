@@ -28,8 +28,8 @@
 
   // Create online run ---------------------------------------------------------
   FairRunOnline* run = new FairRunOnline(source);
-  run->SetOutputFile("rawData.root");
-  run->SetGenerateHtml(kFALSE);
+  run->SetOutputFile("calo_raw_data.root");
+  run->SetGenerateHtml(kTRUE);
   // ---------------------------------------------------------------------------
   
   
@@ -41,6 +41,10 @@
   run->SetField(magField);
   // ---------------------------------------------------------------------------
   
+  // Add analysis task ---------------------------------------------------------
+  R3BCaloRawAna* ana = new R3BCaloRawAna();
+  run->AddTask(ana);
+  // ---------------------------------------------------------------------------
   
   // Initialize ----------------------------------------------------------------
   run->Init();
