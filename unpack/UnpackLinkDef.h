@@ -4,8 +4,9 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class R3BCaloUnpack+;
+#pragma link C++ class R3BCaloRawAna+;
 #pragma link C++ class R3BCaloRawHit+;
+#pragma link C++ class R3BCaloUnpack+;
 
 #pragma link C++ class R3BLandRawAna+;
 #pragma link C++ class R3BLandRawHit+;
