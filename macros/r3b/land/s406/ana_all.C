@@ -38,7 +38,7 @@ void plot_paddle()
   
   cout << binsize << " MeV" << endl;
   
-  Style(h1[4], "Energy per paddle (MeV)", "probability #times N_{max}");
+  Style(h1[4], "Energy per paddle (MeV)", "probability #times N_{mean}");
   h1[4]->SetLineColor(6);
 //  h1[4]->Scale(2.2);
   
@@ -70,12 +70,10 @@ void plot_paddle()
 
   
   
-  gStyle->SetPaperSize(32, 16);
-  TCanvas *c1 = new TCanvas("c1", "", 10, 10, 900, 450);
-  c1->Divide(2, 1);
+  gStyle->SetPaperSize(16, 16);
+  TCanvas *c1 = new TCanvas("c1", "", 10, 10, 450, 450);
   TPostScript *ps1 = new TPostScript("plots/all_paddle.eps", -113);
-  ps1->Range(32, 16);
-  c1->cd(1);
+  ps1->Range(16, 16);
   gPad->SetLeftMargin(0.15);
   gPad->SetRightMargin(0.05);
   gPad->SetTickx();
@@ -95,7 +93,14 @@ void plot_paddle()
   for(Int_t i = 0; i < 4; i++) {
     hien[i]->Draw("pe1same");
   }
-  c1->cd(2);
+  ps1->Close();
+
+  
+  
+  gStyle->SetPaperSize(16, 16);
+  TCanvas *c2 = new TCanvas("c2", "", 10, 10, 450, 450);
+  TPostScript *ps2 = new TPostScript("plots/all_paddle_log.eps", -113);
+  ps2->Range(16, 16);
   gPad->SetLeftMargin(0.15);
   gPad->SetRightMargin(0.05);
   gPad->SetTickx();
@@ -111,8 +116,8 @@ void plot_paddle()
   for(Int_t i = 0; i < 4; i++) {
     hien[i]->Draw("pe1same");
   }
-  c1->cd(0);
-  ps1->Close();
+  ps2->Close();
+
   
   TFile *ofile = new TFile("s406.sim.all.root", "RECREATE");
   for(Int_t i = 0; i < 5; i++) {
@@ -184,12 +189,10 @@ void plot_mult()
   
   
   
-  gStyle->SetPaperSize(32, 16);
-  TCanvas *c1 = new TCanvas("c1", "", 10, 10, 900, 450);
-  c1->Divide(2, 1);
+  gStyle->SetPaperSize(16, 16);
+  TCanvas *c1 = new TCanvas("c1", "", 10, 10, 450, 450);
   TPostScript *ps1 = new TPostScript("plots/all_mult.eps", -113);
-  ps1->Range(32, 16);
-  c1->cd(1);
+  ps1->Range(16, 16);
   gPad->SetLeftMargin(0.15);
   gPad->SetRightMargin(0.05);
   gPad->SetTickx();
@@ -209,7 +212,13 @@ void plot_mult()
   for(Int_t i = 0; i < 4; i++) {
     hien[i]->Draw("pe1same");
   }
-  c1->cd(2);
+  ps1->Close();
+
+  
+  gStyle->SetPaperSize(16, 16);
+  TCanvas *c2 = new TCanvas("c2", "", 10, 10, 450, 450);
+  TPostScript *ps2 = new TPostScript("plots/all_mult_log.eps", -113);
+  ps2->Range(16, 16);
   gPad->SetLeftMargin(0.15);
   gPad->SetRightMargin(0.05);
   gPad->SetTickx();
@@ -225,8 +234,7 @@ void plot_mult()
   for(Int_t i = 0; i < 4; i++) {
     hien[i]->Draw("pe1same");
   }
-  c1->cd(0);
-  ps1->Close();
+  ps2->Close();
   
 //  TFile *ofile = new TFile("s406.sim.all.root", "RECREATE");
 //  for(Int_t i = 0; i < 5; i++) {
@@ -311,12 +319,10 @@ void plot_etot()
   
   
   
-  gStyle->SetPaperSize(32, 16);
-  TCanvas *c1 = new TCanvas("c1", "", 10, 10, 900, 450);
-  c1->Divide(2, 1);
-  TPostScript *ps1 = new TPostScript("plots/all_etot.eps", -113);
-  ps1->Range(32, 16);
-  c1->cd(1);
+  gStyle->SetPaperSize(16, 16);
+  TCanvas *c1 = new TCanvas("c1", "", 10, 10, 450, 450);
+  TPostScript *ps1 = new TPostScript("plots/all_etot_log.eps", -113);
+  ps1->Range(16, 16);
   gPad->SetLeftMargin(0.15);
   gPad->SetRightMargin(0.05);
   gPad->SetTickx();
@@ -324,20 +330,16 @@ void plot_etot()
   gPad->SetLogy();
   h1[4]->GetXaxis()->SetRangeUser(0., 700.);
   h1[4]->DrawClone();
-  TLegend *leg1 = new TLegend(0.486, 0.432, 0.912, 0.872);
-  Style(leg1);
-  leg1->AddEntry(h1[4], en[4], "l");
-  for(Int_t i = 3; i >= 0; i--) {
-    if(3 != i) {
-      h1[i]->DrawClone("same");
-      leg1->AddEntry(h1[i], en[i], "l");
-    }
-  }
-//  leg1->Draw();
   for(Int_t i = 0; i < 4; i++) {
     hien[i]->Draw("pe1same");
   }
-  c1->cd(2);
+  ps1->Close();
+
+  
+  gStyle->SetPaperSize(16, 16);
+  TCanvas *c2 = new TCanvas("c2", "", 10, 10, 450, 450);
+  TPostScript *ps2 = new TPostScript("plots/all_etot.eps", -113);
+  ps2->Range(16, 16);
   gPad->SetLeftMargin(0.15);
   gPad->SetRightMargin(0.05);
   gPad->SetTickx();
@@ -353,8 +355,17 @@ void plot_etot()
   for(Int_t i = 0; i < 4; i++) {
     hien[i]->Draw("pe1same");
   }
-  c1->cd(0);
-  ps1->Close();
+  TLegend *leg1 = new TLegend(0.486, 0.432, 0.912, 0.872);
+  Style(leg1);
+  leg1->AddEntry(h1[4], en[4], "l");
+  for(Int_t i = 3; i >= 0; i--) {
+    if(3 != i) {
+      h1[i]->DrawClone("same");
+      leg1->AddEntry(h1[i], en[i], "l");
+    }
+  }
+  leg1->Draw();
+  ps2->Close();
   
   TFile *ofile = new TFile("s406.sim.all.root", "RECREATE");
   for(Int_t i = 0; i < 5; i++) {
