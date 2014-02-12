@@ -103,7 +103,7 @@ class R3BCaloEventDisplay : public FairTask
     void MakeSlots();
     void MakeViewerScene();
 
-    void GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal, Double_t* rho);
+    void GetAngles(Int_t geoVersion, Int_t iD, Double_t* polar, Double_t* azimuthal, Double_t* rho);
 
 
     ClassDef(R3BCaloEventDisplay,1);

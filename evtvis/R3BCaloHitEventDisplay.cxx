@@ -121,7 +121,7 @@ void R3BCaloHitEventDisplay::Exec(Option_t* opt)
     R3BCaloHit*    caloHit;
     R3BCaloHitSim* caloHitSim;
 
-    Int_t caloHits;        // Nb of CaloHits in current event
+    Int_t caloHits=0;        // Nb of CaloHits in current event
     caloHits = fCaloHitCA->GetEntriesFast();
 
     Int_t binx, biny;
