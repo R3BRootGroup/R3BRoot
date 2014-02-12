@@ -52,7 +52,7 @@ r3bevtvis()
   R3BCaloHitEventDisplay *CaloHitEvtVis = new R3BCaloHitEventDisplay("R3BCaloHitEventDisplay");
   
   fMan->AddTask(CaloEvtVis);
-  fMan->AddTask(CaloHitEvtVis);
+  fMan->AddTask(CaloHitEvtVis);  //Make sure that you have CaloHit branch in the file
   fMan->AddTask(Track);
   fMan->Init();
 }
