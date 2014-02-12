@@ -12,6 +12,7 @@ ${CMAKE_SOURCE_DIR}/mcstack
 ${CMAKE_SOURCE_DIR}/unpack
 ${CMAKE_SOURCE_DIR}/unpack/calo
 ${CMAKE_SOURCE_DIR}/unpack/land
+${CMAKE_SOURCE_DIR}/unpack/calo
 ${CMAKE_SOURCE_DIR}/MbsAPI
 ${CMAKE_SOURCE_DIR}/r3bdata/
 ${CMAKE_SOURCE_DIR}/r3bdata/calData
@@ -35,11 +36,12 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
 #Put here your sourcefiles
-calo/R3BCaloUnpack.cxx
-calo/R3BCaloRawHit.cxx
 land/R3BLandRawAna.cxx
 land/R3BLandRawHit.cxx
 land/R3BLandUnpack.cxx
+calo/R3BCaloRawAna.cxx
+calo/R3BCaloRawHit.cxx
+calo/R3BCaloUnpack.cxx
 )
 
 # fill list of header files from list of source files
@@ -52,4 +54,3 @@ set(DEPENDENCIES
     R3Bbase R3BPassive MCStack R3BData MbsAPI)
 
 GENERATE_LIBRARY()
-
