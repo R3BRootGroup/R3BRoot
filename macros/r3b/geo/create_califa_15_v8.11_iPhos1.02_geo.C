@@ -4117,7 +4117,7 @@ double thickness5=0.005+ss5;
 double thickness55=0.005+ss5;
 double thickness6=0.005+ss6;
 double thickness66=0.005+ss6;
-TGeoVolume *Alveolus_EC_1 = gGeoManager->MakeTrap("Alveolus_EC_1", pCarbonFibreMedium,5.000,0,0,0.780249,1.57268,1.51485, 0,1.04807,2.1125,2.03482,0);
+TGeoVolume *Alveolus_EC_1 = gGeoManager->MakeTrap("Alveolus_EC_1", pCarbonFibreMedium,l1,0,0,0.780249,1.57268,1.51485, 0,1.04807,2.1125,2.03482,0);
 //alveolusEC1
 theta=0;
 phi=0;
@@ -4129,7 +4129,7 @@ phi = 0;
 TGeoVolume *Crystal_1 = gGeoManager->MakeTrap("Crystal_1", pCsIMedium,l1-thicknessW0-thicknessC00,
 theta, phi,0.770249,1.56268,1.50485,0,1.03807,2.1025,2.02482, 0);
 Crystal_1->SetLineColor(EC_color);
-TGeoVolume *Alveolus_EC_2 = gGeoManager->MakeTrap("Alveolus_EC_2", pCarbonFibreMedium,5.000,0,0,0.772202,1.50668,1.44765, 0,1.04807,2.1125,2.03482,0);
+TGeoVolume *Alveolus_EC_2 = gGeoManager->MakeTrap("Alveolus_EC_2", pCarbonFibreMedium,l1,0,0,0.772202,1.50668,1.44765, 0,1.04807,2.1125,2.03482,0);
 //alveolusEC2
 theta=0;
 phi=0;
@@ -4141,7 +4141,7 @@ phi = 0;
 TGeoVolume *Crystal_2 = gGeoManager->MakeTrap("Crystal_2", pCsIMedium,l1-thicknessW0-thicknessC00,
 theta, phi,0.762202,1.49668,1.43765,0,1.02726,2.01385,1.93455, 0);
 Crystal_2->SetLineColor(EC_color);
-TGeoVolume *Alveolus_EC_3 = gGeoManager->MakeTrap("Alveolus_EC_3", pCarbonFibreMedium,5.000,0,0,0.766431,1.44468,1.38422, 0,1.04807,2.1125,2.03482,0);
+TGeoVolume *Alveolus_EC_3 = gGeoManager->MakeTrap("Alveolus_EC_3", pCarbonFibreMedium,l1,0,0,0.766431,1.44468,1.38422, 0,1.04807,2.1125,2.03482,0);
 //alveolusEC3
 theta=0;
 phi=0;
@@ -4153,7 +4153,7 @@ phi = 0;
 TGeoVolume *Crystal_3 = gGeoManager->MakeTrap("Crystal_3", pCsIMedium,l1-thicknessW0-thicknessC00,
 theta, phi,0.756431,1.43468,1.37422,0,1.01951,1.93057,1.84935, 0);
 Crystal_3->SetLineColor(EC_color);
-TGeoVolume *Alveolus_EC_4 = gGeoManager->MakeTrap("Alveolus_EC_4", pCarbonFibreMedium,5.000,0,0,0.76316,1.3812,1.31922, 0,1.04807,2.1125,2.03482,0);
+TGeoVolume *Alveolus_EC_4 = gGeoManager->MakeTrap("Alveolus_EC_4", pCarbonFibreMedium,l1,0,0,0.76316,1.3812,1.31922, 0,1.04807,2.1125,2.03482,0);
 //alveolusEC4
 theta=0;
 phi=0;
@@ -4165,7 +4165,7 @@ phi = 0;
 TGeoVolume *Crystal_4 = gGeoManager->MakeTrap("Crystal_4", pCsIMedium,l1-thicknessW0-thicknessC00,
 theta, phi,0.75316,1.3712,1.30922,0,1.01511,1.8453,1.76204, 0);
 Crystal_4->SetLineColor(EC_color);
-TGeoVolume *Alveolus_EC_5 = gGeoManager->MakeTrap("Alveolus_EC_5", pCarbonFibreMedium,5.000,0,0,0.762732,1.31609,1.25245, 0,1.04807,2.1125,2.03482,0);
+TGeoVolume *Alveolus_EC_5 = gGeoManager->MakeTrap("Alveolus_EC_5", pCarbonFibreMedium,l1,0,0,0.762732,1.31609,1.25245, 0,1.04807,2.1125,2.03482,0);
 //alveolusEC5
 theta=0;
 phi=0;
@@ -4177,7 +4177,7 @@ phi = 0;
 TGeoVolume *Crystal_5 = gGeoManager->MakeTrap("Crystal_5", pCsIMedium,l1-thicknessW0-thicknessC00,
 theta, phi,0.752732,1.30609,1.24245,0,1.01454,1.75783,1.67236, 0);
 Crystal_5->SetLineColor(EC_color);
-TGeoVolume *Alveolus_EC_6 = gGeoManager->MakeTrap("Alveolus_EC_6", pCarbonFibreMedium,5.000,0,0,0.765624,1.24308,1.17794, 0,1.04807,2.1125,2.03482,0);
+TGeoVolume *Alveolus_EC_6 = gGeoManager->MakeTrap("Alveolus_EC_6", pCarbonFibreMedium,l1,0,0,0.765624,1.24308,1.17794, 0,1.04807,2.1125,2.03482,0);
 //alveolusEC6
 theta=0;
 phi=0;
@@ -4189,7 +4189,7 @@ phi = 0;
 TGeoVolume *Crystal_6 = gGeoManager->MakeTrap("Crystal_6", pCsIMedium,l1-thicknessW0-thicknessC00,
 theta, phi,0.755624,1.23308,1.16794,0,1.01842,1.65977,1.57227, 0);
 Crystal_6->SetLineColor(EC_color);
-TGeoVolume *Alveolus_EC_7 = gGeoManager->MakeTrap("Alveolus_EC_7", pCarbonFibreMedium,5.000,0,0,0.7725,1.17517,1.10792, 0,1.04807,2.1125,2.03482,0);
+TGeoVolume *Alveolus_EC_7 = gGeoManager->MakeTrap("Alveolus_EC_7", pCarbonFibreMedium,l1,0,0,0.7725,1.17517,1.10792, 0,1.04807,2.1125,2.03482,0);
 //alveolusEC7
 theta=0;
 phi=0;
@@ -4201,7 +4201,7 @@ phi = 0;
 TGeoVolume *Crystal_7 = gGeoManager->MakeTrap("Crystal_7", pCsIMedium,l1-thicknessW0-thicknessC00,
 theta, phi,0.7625,1.16517,1.09792,0,1.02766,1.56855,1.47822, 0);
 Crystal_7->SetLineColor(EC_color);
-TGeoVolume *Alveolus_EC_8 = gGeoManager->MakeTrap("Alveolus_EC_8", pCarbonFibreMedium,5.000,0,0,0.784458,1.10101,1.03148, 0,1.04807,2.1125,2.03482,0);
+TGeoVolume *Alveolus_EC_8 = gGeoManager->MakeTrap("Alveolus_EC_8", pCarbonFibreMedium,l1,0,0,0.784458,1.10101,1.03148, 0,1.04807,2.1125,2.03482,0);
 //alveolusEC8
 theta=0;
 phi=0;
@@ -4213,7 +4213,7 @@ phi = 0;
 TGeoVolume *Crystal_8 = gGeoManager->MakeTrap("Crystal_8", pCsIMedium,l1-thicknessW0-thicknessC00,
 theta, phi,0.774458,1.09101,1.02148,0,1.04372,1.46893,1.37554, 0);
 Crystal_8->SetLineColor(EC_color);
-TGeoVolume *Alveolus_EC_9 = gGeoManager->MakeTrap("Alveolus_EC_9", pCarbonFibreMedium,5.000,0,0,0.802983,1.02506,0.952706, 0,1.04807,2.1125,2.03482,0);
+TGeoVolume *Alveolus_EC_9 = gGeoManager->MakeTrap("Alveolus_EC_9", pCarbonFibreMedium,l1,0,0,0.802983,1.02506,0.952706, 0,1.04807,2.1125,2.03482,0);
 //alveolusEC9
 theta=0;
 phi=0;
@@ -4225,7 +4225,7 @@ phi = 0;
 TGeoVolume *Crystal_9 = gGeoManager->MakeTrap("Crystal_9", pCsIMedium,l1-thicknessW0-thicknessC00,
 theta, phi,0.792983,1.01506,0.942706,0,1.06861,1.36691,1.26972, 0);
 Crystal_9->SetLineColor(EC_color);
-TGeoVolume *Alveolus_EC_10 = gGeoManager->MakeTrap("Alveolus_EC_10", pCarbonFibreMedium,5.000,0,0,0.830622,0.944943,0.869091, 0,1.04807,2.1125,2.03482,0);
+TGeoVolume *Alveolus_EC_10 = gGeoManager->MakeTrap("Alveolus_EC_10", pCarbonFibreMedium,l1,0,0,0.830622,0.944943,0.869091, 0,1.04807,2.1125,2.03482,0);
 //alveolusEC10
 theta=0;
 phi=0;
@@ -4237,7 +4237,7 @@ phi = 0;
 TGeoVolume *Crystal_10 = gGeoManager->MakeTrap("Crystal_10", pCsIMedium,l1-thicknessW0-thicknessC00,
 theta, phi,0.820622,0.934943,0.859091,0,1.10573,1.25929,1.15741, 0);
 Crystal_10->SetLineColor(EC_color);
-TGeoVolume *Alveolus_EC_11 = gGeoManager->MakeTrap("Alveolus_EC_11", pCarbonFibreMedium,5.000,0,0,0.871823,1.71512,1.55471, 0,1.04807,2.1125,2.03482,0);
+TGeoVolume *Alveolus_EC_11 = gGeoManager->MakeTrap("Alveolus_EC_11", pCarbonFibreMedium,l1,0,0,0.871823,1.71512,1.55471, 0,1.04807,2.1125,2.03482,0);
 //alveolusEC11
 theta=0;
 phi=0;
@@ -4249,7 +4249,7 @@ phi = 0;
 TGeoVolume *Crystal_11 = gGeoManager->MakeTrap("Crystal_11", pCsIMedium,l1-thicknessW0-thicknessC00,
 theta, phi,0.861823,1.70512,1.54471,0,1.16108,2.29384,2.07836, 0);
 Crystal_11->SetLineColor(EC_color);
-TGeoVolume *Alveolus_EC_12 = gGeoManager->MakeTrap("Alveolus_EC_12", pCarbonFibreMedium,5.000,0,0,0.934837,1.52749,1.35509, 0,1.04807,2.1125,2.03482,0);
+TGeoVolume *Alveolus_EC_12 = gGeoManager->MakeTrap("Alveolus_EC_12", pCarbonFibreMedium,l1,0,0,0.934837,1.52749,1.35509, 0,1.04807,2.1125,2.03482,0);
 //alveolusEC12
 theta=0;
 phi=0;
@@ -4261,7 +4261,7 @@ phi = 0;
 TGeoVolume *Crystal_12 = gGeoManager->MakeTrap("Crystal_12", pCsIMedium,l1-thicknessW0-thicknessC00,
 theta, phi,0.924837,1.51749,1.34509,0,1.24572,2.04179,1.81022, 0);
 Crystal_12->SetLineColor(EC_color);
-TGeoVolume *Alveolus_EC_13 = gGeoManager->MakeTrap("Alveolus_EC_13", pCarbonFibreMedium,5.000,0,0,1.03904,1.33948,1.14626, 0,1.04807,2.1125,2.03482,0);
+TGeoVolume *Alveolus_EC_13 = gGeoManager->MakeTrap("Alveolus_EC_13", pCarbonFibreMedium,l1,0,0,1.03904,1.33948,1.14626, 0,1.04807,2.1125,2.03482,0);
 //alveolusEC13
 theta=0;
 phi=0;
@@ -4273,7 +4273,7 @@ phi = 0;
 TGeoVolume *Crystal_13 = gGeoManager->MakeTrap("Crystal_13", pCsIMedium,l1-thicknessW0-thicknessC00,
 theta, phi,1.02904,1.32948,1.13626,0,1.38569,1.78926,1.52972, 0);
 Crystal_13->SetLineColor(EC_color);
-TGeoVolume *Alveolus_EC_14 = gGeoManager->MakeTrap("Alveolus_EC_14", pCarbonFibreMedium,5.000,0,0,1.24089,1.09058,0.866847, 0,1.04807,2.1125,2.03482,0);
+TGeoVolume *Alveolus_EC_14 = gGeoManager->MakeTrap("Alveolus_EC_14", pCarbonFibreMedium,l1,0,0,1.24089,1.09058,0.866847, 0,1.04807,2.1125,2.03482,0);
 //alveolusEC14
 theta=0;
 phi=0;
@@ -4285,7 +4285,7 @@ phi = 0;
 TGeoVolume *Crystal_14 = gGeoManager->MakeTrap("Crystal_14", pCsIMedium,l1-thicknessW0-thicknessC00,
 theta, phi,1.23089,1.08058,0.856847,0,1.65682,1.45492,1.15439, 0);
 Crystal_14->SetLineColor(EC_color);
-TGeoVolume *Alveolus_EC_15 = gGeoManager->MakeTrap("Alveolus_EC_15", pCarbonFibreMedium,5.000,0,0,2.03391,0.773075,0.441011, 0,1.04807,2.1125,2.03482,0);
+TGeoVolume *Alveolus_EC_15 = gGeoManager->MakeTrap("Alveolus_EC_15", pCarbonFibreMedium,l1,0,0,2.03391,0.773075,0.441011, 0,1.04807,2.1125,2.03482,0);
 //alveolusEC15
 theta=0;
 phi=0;
