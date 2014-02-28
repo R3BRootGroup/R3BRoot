@@ -33,7 +33,7 @@ public:
 	 *@param fPhi				Reconstructed phi
 	 *@param fEinc				Total incident energy
 	 **/
-	R3BCaloHitSim(UInt_t Nb, Double_t ene, Double_t Nf, Double_t Ns,
+	R3BCaloHitSim(UInt_t Nb, Double_t ene, Double_t nf, Double_t ns,
 			   Double_t theta, Double_t phi, Double_t einc);
 	
 	

@@ -33,7 +33,7 @@ public:
 	 *@param fTheta					Reconstructed theta
 	 *@param fPhi					Reconstructed phi
 	 **/
-	R3BCaloHit(UInt_t Nb, Double_t ene, Double_t Nf, Double_t Ns,
+	R3BCaloHit(UInt_t Nb, Double_t ene, Double_t nf, Double_t ns,
 		   Double_t theta, Double_t phi);
 	
 	
@@ -57,8 +57,8 @@ public:
 	/** Modifiers **/
 	void SetNbOfCrystalHits(UInt_t number){fNbOfCrystalHits = number;}
 	void SetEnergy(Double_t ene){fEnergy = ene;}
-	void SetNf(Double_t Nf){fNf = Nf;}
-	void SetNs(Double_t Ns){fNs = Ns;}
+	void SetNf(Double_t nf){fNf = nf;}
+	void SetNs(Double_t ns){fNs = ns;}
 	void SetTheta(Double_t theta){fTheta = theta;}
 	void SetPhi(Double_t phi){fPhi = phi;}
 

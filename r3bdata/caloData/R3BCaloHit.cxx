@@ -23,10 +23,10 @@ R3BCaloHit::R3BCaloHit()
 
 
 // -----   Standard constructor   ------------------------------------------
-R3BCaloHit::R3BCaloHit(UInt_t Nb, Double_t ene, Double_t Nf, Double_t Ns,
+R3BCaloHit::R3BCaloHit(UInt_t Nb, Double_t ene, Double_t nf, Double_t ns,
 		       Double_t theta, Double_t phi) 
   : FairMultiLinkedData(),
-    fNbOfCrystalHits(Nb), fEnergy(ene), fNf(Nf), fNs(Ns),
+    fNbOfCrystalHits(Nb), fEnergy(ene), fNf(nf), fNs(ns),
     fTheta(theta), fPhi(phi)
 {
 }
