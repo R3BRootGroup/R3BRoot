@@ -10,17 +10,24 @@
 
 
 R3BCaloRawHit::R3BCaloRawHit()
-: fCrystalId(0),
-fEnergy(0),
-fTime(0)
+  : fCrystalId(0),
+    fEnergy(0),
+    fNf(0),
+    fNs(0),
+    fTime(0),
+    fError(0)
 {
 }
 
 
-R3BCaloRawHit::R3BCaloRawHit(UShort_t crystalId, UShort_t energy, ULong_t time)
-: fCrystalId(crystalId),
-fEnergy(energy),
-fTime(time)
+R3BCaloRawHit::R3BCaloRawHit(UShort_t crystalId, UShort_t energy,
+			     UShort_t nf, UShort_t ns, ULong_t time, Char_t error)
+  : fCrystalId(crystalId),
+    fEnergy(energy),
+    fNf(nf),
+    fNs(ns),
+    fTime(time),
+    fError(error)
 {
 }
 

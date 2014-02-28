@@ -82,7 +82,7 @@ void R3BCaloRawAna::WriteHistos()
   thc->Write();
   the->Write();
   tht->Write();
-  LOG(INFO) << "R3BCaloRawAna --- Histograms writed to the Root File ..." << FairLogger::endl; 
+  LOG(INFO) << "R3BCaloRawAna --- Histograms written to Root File ..." << FairLogger::endl; 
 }
 
 

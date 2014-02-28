@@ -92,9 +92,11 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size)
     
     UShort_t header_size;
     UShort_t trigger;
+    UShort_t pc_id = 0;     //Should be implemented for use of two CALIFA halfths
+    UShort_t sfp_id = 0;    //for use of all for sfps
     UShort_t module_id;
     UShort_t submemory_id;
-    UInt_t data_size;
+    UInt_t   data_size;
     header_size = pl_data[l_s] & 0xff;
     trigger = (pl_data[l_s] >> 8) & 0xff;
     module_id = (pl_data[l_s] >> 16) & 0xff;
@@ -136,6 +138,7 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size)
     UShort_t cfd_samples[4];
     UShort_t loverflow;
     UShort_t hoverflow;
+    UInt_t   overflow;
     UShort_t self_triggered;
     UShort_t num_pileup;
     UShort_t num_discarded;
@@ -145,6 +148,7 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size)
     UShort_t magic_babe;
     Short_t n_f;
     UShort_t n_s;
+    UChar_t error = 0;
     evsize = pl_data[l_s] & 0xffff;
     magic_affe = (pl_data[l_s++] >> 16) & 0xffff;
     event_id = pl_data[l_s++];
@@ -154,8 +158,7 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size)
     cfd_samples[1] = pl_data[l_s++] >> 16;
     cfd_samples[2] = pl_data[l_s] & 0xff;
     cfd_samples[3] = pl_data[l_s++] >> 16;
-    loverflow = pl_data[l_s] & 0xffff;
-    hoverflow = (pl_data[l_s] >> 16) & 0xff;
+    overflow = pl_data[l_s] & 0xffffff;
     self_triggered = (pl_data[l_s++] >> 24) & 0xff;
     num_pileup = pl_data[l_s] & 0xffff;
     num_discarded = (pl_data[l_s++] >> 16) & 0xffff;
@@ -164,8 +167,26 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size)
     magic_babe = (pl_data[l_s++] >> 16) & 0xffff;
     n_f = pl_data[l_s] & 0xffff;
     n_s = (pl_data[l_s++] >> 16) & 0xffff;
-    
-    
+
+    //Set error bits
+    // Timing not valid
+    if (overflow & 0x601)  //11000000001
+      error |= 1;
+    // Energy not valid
+    if (overflow & 0x63e)  //11000111110
+      error |= 1<<1;
+    // PID not valid
+    if (overflow & 0x78E)  //11110001110
+      error |= 1<<2;
+    if (num_pileup)
+      error |= 1<<3;
+ 
+    //Generate crystalID
+    UShort_t crystal_id = pc_id * (max_submemory_id*max_module_id*max_sfp_id)
+      + sfp_id * (max_submemory_id*max_module_id)
+      + module_id * max_submemory_id
+      + submemory_id;
+
     LOG(DEBUG) << " --------- event " << FairLogger::endl
     << "        event_id " << event_id << FairLogger::endl
     << "          energy " << energy << FairLogger::endl
@@ -173,13 +194,15 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size)
     << "=================================" << FairLogger::endl;
     
     
-    new ((*fRawData)[fNHits]) R3BCaloRawHit(module_id*1500+submemory_id, energy, timestamp);
+    new ((*fRawData)[fNHits]) R3BCaloRawHit(crystal_id, 
+					    energy, n_f, n_s, timestamp,
+					    error);
     fNHits++;
   }
   
   
   LOG(DEBUG) << "End of memory" << FairLogger::endl;
-  LOG(INFO) << "R3BCaloUnpack: Number of CALIFA raw hits: " << fNHits << FairLogger::endl;
+  LOG(DEBUG) << "R3BCaloUnpack: Number of CALIFA raw hits: " << fNHits << FairLogger::endl;
   
   
   return kTRUE;
