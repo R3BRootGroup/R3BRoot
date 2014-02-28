@@ -19,15 +19,11 @@ Int_t iPhos_sim(){
   gROOT->LoadMacro(macro_r3ball.Data());
   
   // Input files
-  //TString EventFile = "p2p_O18_no_exc_state_without_gammas_of_course.dat";
-  //TString EventFile = "p2p_O18_first_exc_state_with_gammas.dat";
-  //TString EventFile = "p2p_O18_first_exc_state_with_gammas_no_doppler.dat";
-  //TString EventFile = "p2p_O18_second_exc_state_with_gammas.dat";
-  //TString EventFile = "p2p_O18_third_exc_state_with_gammas.dat";
-  TString EventFile = "proton_events.dat";
+
+  TString EventFile = "p2p_O18_first_exc_state_with_gammas_no_doppler.dat";
 
   // Output files
-  TString OutFile = "proton_events.root";
+  TString OutFile = "iPhos_sim.root";
   TString ParFile = "r3bpar.root";
   
   //-------------------------------------------------
@@ -93,8 +89,8 @@ Int_t iPhos_sim(){
   //detGeo.Add(new TObjString("CRYSTALBALL"),   
   //         new TObjString("cal_v13a.geo.root"));
   detGeo.Add(new TObjString("CALIFA"),        
-	     new TObjString("califa_15_v8.11_iPhos1.02.geo.root"));
-	     //new TObjString("califa_10_v8.11.geo.root"));
+	     new TObjString("califa_15_v8.11_iPhos1.03.geo.root"));
+  //new TObjString("califa_10_v8.11.geo.root"));
   //detGeo.Add(new TObjString("TOF"),           
   //     new TObjString("tof_v13a.geo.root"));
   //detGeo.Add(new TObjString("MTOF"),          
@@ -130,7 +126,7 @@ Int_t iPhos_sim(){
    //-------------------------------------------------
    //   connected:              kTRUE
    //   not connected:          kFALSE
-   Bool_t fEventDisplay=kTRUE;
+   Bool_t fEventDisplay=kFALSE;
 
    // Magnet Field definition
    Bool_t fR3BMagnet = kFALSE;
