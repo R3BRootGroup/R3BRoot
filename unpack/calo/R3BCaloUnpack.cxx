@@ -80,7 +80,11 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size)
   LOG(DEBUG) << "Unpacking" << FairLogger::endl;
   
   
+  
   while(l_s < size) {
+
+    // Loops over CALIFA halves and SFPs have to be implemented! 
+
     // Remove 0xadd... words
     while((data[l_s] & 0xfff00000) == 0xadd00000) {
       l_s++;
@@ -92,7 +96,7 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size)
     
     UShort_t header_size;
     UShort_t trigger;
-    UShort_t pc_id = 0;     //Should be implemented for use of two CALIFA halfths
+    UShort_t pc_id = 0;     //Should be implemented for use of two CALIFA halves
     UShort_t sfp_id = 0;    //for use of all for sfps
     UShort_t module_id;
     UShort_t submemory_id;
