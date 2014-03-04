@@ -18,7 +18,8 @@ static const UInt_t gosip_header_size = 16;
 static const UInt_t gosip_sub_header_size = 8;
 static const Int_t  event_t_size = 44;
 static const Int_t  trace_head_t_size = 8;
-static const UInt_t max_submemory_id = 16;
+
+static const UInt_t max_submemory_id = 20;
 static const UInt_t max_module_id = 256;
 static const UInt_t max_sfp_id = 4;
 static const UInt_t max_pc_id = 2;

@@ -6,9 +6,6 @@
 // -----                                                                   -----
 // -----------------------------------------------------------------------------
 
-#include <iostream>
-using namespace std;
-
 #include "TClonesArray.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -45,7 +42,6 @@ InitStatus R3BCaloRawAna::Init()
 void R3BCaloRawAna::Exec(Option_t *option)
 {
   Int_t nHits = fRawData->GetEntries();
-  //cout << "-I- R3BCaloRawAna::Exec : event " << fnEvents << ", multiplicity " << nHits << endl;
   R3BCaloRawHit *hit;
   for(Int_t i = 0; i < nHits; i++) {
     hit = (R3BCaloRawHit*) fRawData->At(i);
@@ -54,7 +50,7 @@ void R3BCaloRawAna::Exec(Option_t *option)
     tht->Fill(hit->GetTime());
   }
   if(0 == (fnEvents%100)) {
-    cout << fnEvents << "  " << nHits << endl;
+    LOG(INFO) << fnEvents << " events, multiplicity:  " << nHits << FairLogger::endl;
   }
   fnEvents += 1;
 }

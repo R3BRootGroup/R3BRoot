@@ -1,8 +1,9 @@
 // -----------------------------------------------------------------------------
 // -----                                                                   -----
-// -----                           R3BCaloUnpack                            -----
-// -----                           Version 0.1                             -----
-// -----                    Created 11.10.2013 by Y.Gonzalez               -----
+// -----                           R3BCaloUnpack                           -----
+// -----                           Version 1.0                             -----
+// -----                    Created  11/10/2013 by Y.Gonzalez              -----
+// -----                    Modified 03/03/2014 by M. Bendel               -----
 // -----                                                                   -----
 // -----------------------------------------------------------------------------
 
@@ -13,14 +14,11 @@
 #include "FairRootManager.h"
 #include "FairLogger.h"
 
+#include <iomanip>
+
 //Califa headers
 #include "R3BCaloRawHit.h"
 #include "R3BCaloUnpack.h"
-
-#define NUMCHANNELS 1500
-#define NUMMODULES 1500
-
-
 
 //R3BCaloUnpack: Constructor
 R3BCaloUnpack::R3BCaloUnpack(char *strCalDir,
@@ -65,74 +63,69 @@ void R3BCaloUnpack::Register()
 }
 
 
-
 //DoUnpack: Public method
 Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size)
 {
   //	trace_head_t *califa_trace = new trace_head_t;
   //	UShort_t *trace_data;
   
-  
   UInt_t l_s = 0;
   UInt_t *pl_data = (UInt_t*) data;
-  
-  
+
   LOG(DEBUG) << "Unpacking" << FairLogger::endl;
-  
-  
-  
+
   while(l_s < size) {
 
-    // Loops over CALIFA halves and SFPs have to be implemented! 
+    // Loops over CALIFA halves have to be implemented!
 
     // Remove 0xadd... words
     while((data[l_s] & 0xfff00000) == 0xadd00000) {
       l_s++;
     }
     
-    
     LOG(DEBUG) << "At GOSIP memory" << FairLogger::endl;
-    
     
     UShort_t header_size;
     UShort_t trigger;
     UShort_t pc_id = 0;     //Should be implemented for use of two CALIFA halves
-    UShort_t sfp_id = 0;    //for use of all for sfps
+    UShort_t sfp_id = 0;
     UShort_t module_id;
     UShort_t submemory_id;
     UInt_t   data_size;
+
     header_size = pl_data[l_s] & 0xff;
     trigger = (pl_data[l_s] >> 8) & 0xff;
     module_id = (pl_data[l_s] >> 16) & 0xff;
     submemory_id = (pl_data[l_s++] >> 24) & 0xff;
     data_size = pl_data[l_s++];
     
-    
-    LOG(DEBUG) << "========== gosip " << FairLogger::endl
+    LOG(DEBUG) << "========== gosip sub " << FairLogger::endl
     << "     header_size " << header_size << FairLogger::endl
     << "         trigger " << trigger << FairLogger::endl
     << "       module_id " << module_id << FairLogger::endl
     << "    submemory_id " << submemory_id << FairLogger::endl
     << "       data_size " << data_size << FairLogger::endl;
-    
+
     
     if(header_size != 0x34) {
       break;
     }
     
-    
     // Data reduction: size == 0 -> no more events
-    if(data_size == 0)
-      break;
-    
-    
-    // GSI special channel -> skip
-    if(submemory_id == 0xff)
-    {
-      l_s += data_size / 4;
+    if(data_size == 0) {
       continue;
     }
     
+    // special channel
+    if(submemory_id == 0xff)
+    {
+      //!! Prepared for use with different SFPs    !!
+      //!! not available in current data structure !!
+      // l_s++;
+      // sfp_id = (pl_data[l_s++] >> 24) & 0xff;
+      l_s += data_size / 4;
+      continue;
+    }
     
     // Real CALIFA data channel
     UShort_t evsize;
@@ -172,7 +165,9 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size)
     n_f = pl_data[l_s] & 0xffff;
     n_s = (pl_data[l_s++] >> 16) & 0xffff;
 
-    //Set error bits
+    // Set error bits
+    // Error flags: [Pileup][PID][Energy][Timing]
+
     // Timing not valid
     if (overflow & 0x601)  //11000000001
       error |= 1;
@@ -185,7 +180,7 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size)
     if (num_pileup)
       error |= 1<<3;
  
-    //Generate crystalID
+    // Generate crystalID
     UShort_t crystal_id = pc_id * (max_submemory_id*max_module_id*max_sfp_id)
       + sfp_id * (max_submemory_id*max_module_id)
       + module_id * max_submemory_id
@@ -196,7 +191,6 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size)
     << "          energy " << energy << FairLogger::endl
     << "       timestamp " << timestamp << FairLogger::endl
     << "=================================" << FairLogger::endl;
-    
     
     new ((*fRawData)[fNHits]) R3BCaloRawHit(crystal_id, 
 					    energy, n_f, n_s, timestamp,

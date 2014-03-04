@@ -24,7 +24,7 @@ public:
    *@param time        Time since event start [ns]
    **/
   R3BCaloRawHit(UShort_t crystalId, UShort_t energy,
-		UShort_t nf, UShort_t ns, ULong_t time, Char_t error);
+		UShort_t nf, UShort_t ns, ULong_t time, UChar_t error);
   
   //Destructor
   ~R3BCaloRawHit() { }
@@ -35,14 +35,14 @@ public:
   inline const UShort_t& GetNf()        const { return fNf;        }
   inline const UShort_t& GetNs()        const { return fNs;        }
   inline const ULong_t&  GetTime()      const { return fTime;      }
-  inline const Char_t&   GetError()     const { return fError;      }	
+  inline const UChar_t&  GetError()     const { return fError;      }	
 protected:
   UShort_t fCrystalId; //crystal unique identifier
   UShort_t fEnergy;    //total energy in the crystal
   UShort_t fNf;        //total fast amplitude in the crystal
   UShort_t fNs;        //total slow amplitude in the crystal
   ULong_t  fTime;      //time of the interaction
-  Char_t   fError;     //bit coded error flag
+  UChar_t  fError;     //bit coded error flag
   
 public:
   ClassDef(R3BCaloRawHit,1)
