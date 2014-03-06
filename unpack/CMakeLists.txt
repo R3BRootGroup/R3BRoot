@@ -38,6 +38,8 @@ set(SRCS
 #Put here your sourcefiles
 land/R3BLandRawAna.cxx
 land/R3BLandRawHit.cxx
+land/R3BLandMapping.cxx
+land/R3BLandHitTmp.cxx
 land/R3BLandUnpack.cxx
 calo/R3BCaloRawAna.cxx
 calo/R3BCaloRawHit.cxx
