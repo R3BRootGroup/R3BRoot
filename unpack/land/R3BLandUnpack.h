@@ -4,6 +4,7 @@
 // -----                           Version 0.1                                       -----
 // -----         Adapted by M.I. Cherciu @ 01.2014 after Y.Gonzalez code             -----
 // -----                                                                             -----
+// -----        * modification @ 03.2014: added TClonesArray for R3BLandHit          -----
 // ---------------------------------------------------------------------------------------
 
 #ifndef R3BLANDUNPACK_H
@@ -41,7 +42,6 @@ class R3BLandUnpack : public FairUnpack {
  private:
   TClonesArray *fRawData;
   Int_t         fNHits;
-   
   
  public:
   //Class definition
