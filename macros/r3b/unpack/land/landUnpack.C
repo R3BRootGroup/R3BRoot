@@ -3,7 +3,7 @@
 {
   TStopwatch timer;
   timer.Start();
-  Int_t nev=-1;
+  Int_t nev=100000;
   // Create source with unpackers ----------------------------------------------
 //  FairRemoteSource* source  = new FairRemoteSource("lxi047");
   FairLmdSource* source  = new FairLmdSource();
@@ -42,6 +42,11 @@
   R3BLandRawAna* ana = new R3BLandRawAna();
   run->AddTask(ana);
   // ---------------------------------------------------------------------------
+
+
+  R3BLandMapping *map = new R3BLandMapping();
+  map->SetFileName("cfg_neuland_s406.hh");
+  run->AddTask(map);
 
 
   // Initialize ----------------------------------------------------------------
