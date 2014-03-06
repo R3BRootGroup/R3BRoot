@@ -22,7 +22,6 @@ ${CMAKE_SOURCE_DIR}/r3bdata/mtofData
 ${CMAKE_SOURCE_DIR}/r3bdata/tofData
 ${CMAKE_SOURCE_DIR}/r3bdata/landData
 ${CMAKE_SOURCE_DIR}/r3bdata/trackerData
-
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
