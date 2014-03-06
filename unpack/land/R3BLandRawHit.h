@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------------------
 // -----                                                                             -----
-// -----                           R3BLandUnpack                                     -----
+// -----                           R3BLandRawHit                                     -----
 // -----                           Version 0.1                                       -----
 // -----         Adapted by M.I. Cherciu @ 01.2014 after Y.Gonzalez code             -----
 // -----                                                                             -----
@@ -24,27 +24,30 @@ public:
    *@param Tac_data   tac data
    *@param Qdc_data   qdc data
    **/
-  R3BLandRawHit(UShort_t Tac_addr, UShort_t Tac_ch, UShort_t Cal, UShort_t Cntrl_data, UShort_t Tac_data, UShort_t Qdc_data);
+  R3BLandRawHit(UShort_t Sam, UShort_t Gtb, UShort_t Tac_addr, UShort_t Tac_ch,
+                UShort_t Cal, UShort_t Cntrl_data, UShort_t Tac_data, UShort_t Qdc_data);
+  R3BLandRawHit(UShort_t Tac_addr, UShort_t Tac_ch, UShort_t Cal,
+                UShort_t Cntrl_data, UShort_t Tac_data, UShort_t Qdc_data);
   
   //Destructor
-  ~R3BLandRawHit() { }
+  virtual ~R3BLandRawHit() { }
   
-  //Getters
-//  inline const UShort_t& GetTacAddr()    const { return ftaddr;  }
-//  inline const UShort_t& GetTacCh()      const { return ftch;    }
-//  inline const ULong_t&  GetCal()        const { return fcal;    }
-//  inline const ULong_t&  GetCntrlData()  const { return fcntdata;}
-//  inline const ULong_t&  GetTacData()    const { return ftdata;  }
+  inline const UShort_t&  GetTacCh()    const { return ftch;  }
+  inline const UShort_t&  GetTacAddr()    const { return ftaddr;  }
+  inline const UShort_t&  GetQdcData()    const { return fqdata;  }
+  inline const UShort_t&  GetTacData()    const { return ftdata;  }
+  inline const UShort_t&  GetSam()    const { return fsam;  }
+  inline const UShort_t&  GetGtb()    const { return fgtb;  }
 
+private:
   UShort_t ftaddr;    //... tac mod address
   UShort_t ftch;      //... tac channel no
   UShort_t fcal;      //... calibration bit
   UShort_t fcntdata;  //... cntrl data
   UShort_t ftdata;    //... tac data
   UShort_t fqdata;
-
-  inline const UShort_t&  GetQdcData()    const { return fqdata;  }
-  
+  UShort_t fsam;
+  UShort_t fgtb;
   
 public:
   ClassDef(R3BLandRawHit,1)
