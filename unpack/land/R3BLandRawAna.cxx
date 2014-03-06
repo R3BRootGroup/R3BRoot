@@ -1,7 +1,8 @@
 // -----------------------------------------------------------------------------
 // -----                                                                   -----
 // -----                            R3BLandRawAna                          -----
-// -----                    Created 23.04.2013 by D.Kresan                 -----
+// -----                    Created @ 01.2014 by Madalin Cherciu           -----
+// -----                                                                   -----
 // -----------------------------------------------------------------------------
 
 #include <iostream>
@@ -64,7 +65,7 @@ void R3BLandRawAna::FinishTask()
 
 void R3BLandRawAna::CreateHistos()
 {
-  thmul = new TH1F("Multiplicity", "", 400, -0.5, 399.5);
+  thmul = new TH1F("Multiplicity", "", 1000, -0.5, 999.5);
   thch = new TH1F("Charge", "", 1500, 0., 1500.);
   FairRunOnline *run = FairRunOnline::Instance();
   run->AddObject(thmul);
