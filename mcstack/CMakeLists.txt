@@ -13,8 +13,6 @@ include_directories( ${INCLUDE_DIRECTORIES})
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
 ${FAIRROOT_LIBRARY_DIR}
-${CMAKE_SOURCE_DIR}/base
-${CMAKE_SOURCE_DIR}/parbase
 )
  
 link_directories( ${LINK_DIRECTORIES})
