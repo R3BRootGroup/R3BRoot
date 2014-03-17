@@ -1,6 +1,6 @@
 
 #ifndef R3BEVENTMANAGER_H
-#define R3BEVENTMANGER_H
+#define R3BEVENTMANAGER_H
 
 #include "FairEventManager.h"
 
