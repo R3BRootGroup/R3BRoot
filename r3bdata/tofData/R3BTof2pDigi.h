@@ -9,7 +9,7 @@
 
 
 #ifndef R3BTOF2PDIGI_H
-#define R3BTOF2PDDIGI_H
+#define R3BTOF2PDIGI_H
 
 
 #include "TObject.h"

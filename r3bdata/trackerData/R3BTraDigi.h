@@ -9,7 +9,7 @@
 
 
 #ifndef R3BTRADIGI_H
-#define R3BTRADDIGI_H
+#define R3BTRADIGI_H
 
 
 #include "TObject.h"

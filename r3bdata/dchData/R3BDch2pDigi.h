@@ -9,7 +9,7 @@
 
 
 #ifndef R3BDCH2PDIGI_H
-#define R3BDCH2PDDIGI_H
+#define R3BDCH2PDIGI_H
 
 
 

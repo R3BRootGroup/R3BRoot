@@ -9,7 +9,7 @@
 
 
 #ifndef R3BGFIDIGI_H
-#define R3BGFIDDIGI_H
+#define R3BGFIDIGI_H
 
 
 #include "TObject.h"

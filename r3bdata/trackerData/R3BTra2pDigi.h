@@ -9,7 +9,7 @@
 
 
 #ifndef R3BTRA2PDIGI_H
-#define R3BTRADDIGI_H
+#define R3BTRA2PDIGI_H
 
 #include "TObject.h"
 #include "TVector3.h"

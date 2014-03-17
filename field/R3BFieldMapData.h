@@ -16,7 +16,7 @@
 
 
 #ifndef R3BMAGFIELDMAPDATA_H
-#define R3BMAGFIELDMAPDATA
+#define R3BMAGFIELDMAPDATA_H
 
 
 #include "TNamed.h"
