@@ -164,7 +164,7 @@ class R3BStack : public FairGenericStack
   /** Output to screen 
    **@param iVerbose: 0=events summary, 1=track info
    **/
-  virtual void Print(Option_t *option="") const;
+  virtual void Print(Int_t iVerbose) const;
 
 
   /** Modifiers  **/
