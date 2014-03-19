@@ -102,7 +102,7 @@ Bool_t R3BLandUnpack::DoUnpack(Int_t *data, Int_t size)
       qdc_data = (p1[i1+1] & 0x00000fff);
       l_i += 2;
       
-      if(0 == cal) {
+      if(2 == cal) {
         LOG(DEBUG) << "TAC ADDR IS " << tac_addr << FairLogger::endl;
         LOG(DEBUG) << "TAC CH IS " << tac_ch << FairLogger::endl;
         LOG(DEBUG) << "TAC Data IS " << tac_data << FairLogger::endl;
