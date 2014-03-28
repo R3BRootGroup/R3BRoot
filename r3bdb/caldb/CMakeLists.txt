@@ -37,14 +37,14 @@ R3BCaloGeometryPar.h
 R3BGeomAnalyzer.h
 R3BCaloUnits.h
 R3BCaloPhysConsts.h
-${CMAKE_SOURCE_DIR}/dbase/dbInterface/FairDbReader.h
-${CMAKE_SOURCE_DIR}/dbase/dbInterface/FairDbWriter.h
+${FAIRROOTPATH}/include/FairDbReader.h
+${FAIRROOTPATH}/include/FairDbWriter.h
 )
 
 
 set(LINKDEF R3BCaloGeoLinkDef.h)
 Set(LIBRARY_NAME R3BCaloDB)
-Set(DEPENDENCIES Base)
+#Set(DEPENDENCIES Base)
 
 GENERATE_LIBRARY()
 
