@@ -1,7 +1,5 @@
 Int_t  calgeo_prime()
 {
-  // Load the Geo Library
-  gSystem->Load("libR3BCaloGeo");
 
   // Generate a unique RunID
   FairRunIdGenerator runID;
