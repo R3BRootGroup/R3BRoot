@@ -110,6 +110,34 @@ endif(NOT R3BROOT_MINIMAL)
 # directory
 CHECK_EXTERNAL_PACKAGE_INSTALL_DIR()
 
+
+If(FAIRSOFT_EXTERN)
+  set(BOOST_ROOT ${SIMPATH})
+  set(GSL_DIR ${SIMPATH})
+Else(FAIRSOFT_EXTERN)
+  set(BOOST_ROOT ${SIMPATH}/basics/boost)
+  set(GSL_DIR ${SIMPATH}/basics/gsl)
+EndIf(FAIRSOFT_EXTERN)
+
+IF(FAIRROOT_FOUND)
+  Set(Boost_NO_SYSTEM_PATHS TRUE)
+  Set(Boost_NO_BOOST_CMAKE TRUE)
+  Message("-- Looking for Boost ...")
+  # If an older version of boost is found both of the variables below are
+  # cached and in a second cmake run, a good boost version is found even
+  # if the version is to old.
+  # To overcome this problem both variables are cleared before checking
+  # for boost.
+  Unset(Boost_INCLUDE_DIR CACHE)
+  Unset(Boost_LIBRARY_DIRS CACHE)
+  find_package(Boost 1.41 COMPONENTS thread system timer)
+  If (Boost_FOUND)
+    Set(Boost_Avail 1)
+  Else (Boost_FOUND)
+    Set(Boost_Avail 0)
+  EndIf (Boost_FOUND)
+ENDIF(FAIRROOT_FOUND)
+
 SetBasicVariables()
 
 # searches for needed packages
