@@ -1,0 +1,37 @@
+# Create a library called "R3BLandDB" 
+
+set(INCLUDE_DIRECTORIES
+${BASE_INCLUDE_DIRECTORIES}
+${CMAKE_SOURCE_DIR}/r3bdb/landdb
+)
+
+include_directories( ${INCLUDE_DIRECTORIES})
+
+set(LINK_DIRECTORIES
+${ROOT_LIBRARY_DIR}
+)
+ 
+link_directories( ${LINK_DIRECTORIES})
+
+set(SRCS
+R3BLandContFact.cxx
+R3BLandCalPar.cxx
+R3BLandTCalPar.cxx
+)
+
+set(HEADERS
+R3BLandContFact.h
+R3BLandCalPar.h
+R3BLandTCalPar.h
+${FAIRROOTPATH}/include/FairDbReader.h
+${FAIRROOTPATH}/include/FairDbWriter.h
+)
+
+
+set(LINKDEF R3BLandLinkDef.h)
+Set(LIBRARY_NAME R3BLandDB)
+
+GENERATE_LIBRARY()
+
+
+
