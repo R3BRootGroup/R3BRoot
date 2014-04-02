@@ -1,21 +1,28 @@
 
-
 {
   TStopwatch timer;
   timer.Start();
-  Int_t nev=100000;
-  // Create source with unpackers ----------------------------------------------
-//  FairRemoteSource* source  = new FairRemoteSource("lxi047");
-  FairLmdSource* source  = new FairLmdSource();
-// adding the LMD file
-  source->AddFile("r258_2986.lmd");
-//  source->AddFile("r323_3607.lmd");
 
+
+  const Int_t nev = 1000;
+  const char *node = "lxi047";
+  const char *landMappingName = "cfg_neuland_s438.hh";
+  const Int_t nBarsPerPlane = 50;
+  const char *outputFileName = "rawData.s438.root";
+  const char *parFileName = "params.s438.root";
+  const Long64_t maxSize = 1 * 1024 * 1024 * 1024; // GBytes
+
+
+  // Create source with unpackers ----------------------------------------------
+  FairRemoteSource* source  = new FairRemoteSource(node);
+
+  // MBS parameters ---------------------------------------
   Short_t type = 94;
   Short_t subType = 9400;
   Short_t procId = 10;
-  Short_t subCrate = -1; // All sub-crates
+  Short_t subCrate = 1;
   Short_t control = 3;
+  // ------------------------------------------------------
 
   source->AddUnpacker(new R3BLandUnpack("", type, subType,
                                         procId, subCrate, control));
@@ -24,7 +31,7 @@
 
   // Create online run ---------------------------------------------------------
   FairRunOnline* run = new FairRunOnline(source);
-  run->SetOutputFile("land_raw_data.root");
+  run->SetOutputFile(outputFileName);
   run->SetGenerateHtml(kFALSE);
   // ---------------------------------------------------------------------------
   
@@ -44,13 +51,18 @@
   // ---------------------------------------------------------------------------
 
 
+  // Channel mapping -----------------------------------------------------------
   R3BLandMapping *map = new R3BLandMapping();
-  map->SetFileName("cfg_neuland_s406.hh");
+  map->SetFileName(landMappingName);
+  map->SetNofBarsPerPlane(nBarsPerPlane);
   run->AddTask(map);
+  // ---------------------------------------------------------------------------
 
 
   // Initialize ----------------------------------------------------------------
   run->Init();
+  ((TTree*)gFile->Get("cbmsim"))->SetMaxTreeSize(maxSize);
+  FairLogger::GetLogger()->SetLogScreenLevel("INFO");
   // ---------------------------------------------------------------------------
   
   
@@ -61,7 +73,7 @@
   fieldPar->setChanged();
   Bool_t kParameterMerged = kTRUE;
   FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
-  parOut->open("r3bpar.root");
+  parOut->open(parFileName);
   rtdb->setOutput(parOut);
   rtdb->saveOutput();
   rtdb->print();
@@ -69,7 +81,6 @@
   
   
   // Run -----------------------------------------------------------------------
-  // test with 100 events
   run->Run(nev, 0);
   // ---------------------------------------------------------------------------
 
@@ -79,9 +90,8 @@
   Double_t ctime = timer.CpuTime();
   cout << endl << endl;
   cout << "Macro finished succesfully." << endl;
-//  cout << "Output file is "    << OutFile << endl;
-//  cout << "Parameter file is " << ParFile << endl;
+  cout << "Output file is "    << outputFileName << endl;
+  cout << "Parameter file is " << parFileName << endl;
   cout << "Real time " << rtime << " s, CPU time " << ctime<< "s" << endl << endl;
 }
-
 
