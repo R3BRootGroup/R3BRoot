@@ -33,11 +33,12 @@ public:
   virtual ~R3BLandRawHit() { }
   
   inline const UShort_t&  GetTacCh()    const { return ftch;  }
-  inline const UShort_t&  GetTacAddr()    const { return ftaddr;  }
-  inline const UShort_t&  GetQdcData()    const { return fqdata;  }
-  inline const UShort_t&  GetTacData()    const { return ftdata;  }
-  inline const UShort_t&  GetSam()    const { return fsam;  }
-  inline const UShort_t&  GetGtb()    const { return fgtb;  }
+  inline const UShort_t&  GetTacAddr()  const { return ftaddr;  }
+  inline const UShort_t&  GetQdcData()  const { return fqdata;  }
+  inline const UShort_t&  GetTacData()  const { return ftdata;  }
+  inline const UShort_t&  GetSam()      const { return fsam;  }
+  inline const UShort_t&  GetGtb()      const { return fgtb;  }
+  inline const UShort_t&  GetCntl()     const { return fcntdata; }
 
 private:
   UShort_t ftaddr;    //... tac mod address

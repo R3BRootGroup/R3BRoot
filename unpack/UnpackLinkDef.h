@@ -11,7 +11,7 @@
 #pragma link C++ class R3BLandRawAna+;
 #pragma link C++ class R3BLandRawHit+;
 #pragma link C++ class R3BLandMapping+;
-#pragma link C++ class R3BLandHitTmp+;
+#pragma link C++ class R3BLandRawHitMapped+;
 #pragma link C++ class R3BLandUnpack+;
 
 #endif

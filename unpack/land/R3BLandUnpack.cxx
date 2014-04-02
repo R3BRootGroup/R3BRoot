@@ -70,17 +70,24 @@ void R3BLandUnpack::Register()
 //DoUnpack: Public method
 Bool_t R3BLandUnpack::DoUnpack(Int_t *data, Int_t size)
 {
-  LOG(DEBUG) << "Unpacking" << FairLogger::endl;
+  LOG(DEBUG) << "Unpacking...  size = " << size << FairLogger::endl;
   
   UInt_t l_i = 0;
-  
+
+  Int_t n17 = 0;
+
   while(l_i < size) {
+    
+    n17 = 0;
     
     UInt_t *p1 = (UInt_t*) (data + l_i);
     UShort_t l_sam_id = (p1[0] & 0xf0000000) >> 28;   //identifies the sam
     UShort_t l_gtb_id = (p1[0] & 0x0f000000) >> 24;   //0 or 1, identifies which of the 2 cables of the sam
+    UShort_t l_lec    = (p1[0] & 0x00f00000) >> 20;
     UShort_t l_da_siz = (p1[0] & 0x000001ff);
-    LOG(DEBUG) << "sam was " << l_sam_id << ",  gtb was " << l_gtb_id << ",  size " << l_da_siz << FairLogger::endl;
+    
+    LOG(DEBUG) << "sam was " << l_sam_id << ",  gtb was " << l_gtb_id
+    << ",  lec " << l_lec << ",  size " << l_da_siz << FairLogger::endl;
     
     l_i += 1;
     
@@ -93,7 +100,6 @@ Bool_t R3BLandUnpack::DoUnpack(Int_t *data, Int_t size)
       UShort_t cntrl_data;
       UShort_t tac_data;
       UShort_t qdc_data;
-//      UShort_t bar_id;
       tac_addr = (p1[i1] & 0xf8000000) >> 27;
       tac_ch = (p1[i1] & 0x07c00000) >> 22;
       cal = (p1[i1] & 0x003C0000) >> 18;
@@ -102,15 +108,23 @@ Bool_t R3BLandUnpack::DoUnpack(Int_t *data, Int_t size)
       qdc_data = (p1[i1+1] & 0x00000fff);
       l_i += 2;
       
-      if(2 == cal) {
-        LOG(DEBUG) << "TAC ADDR IS " << tac_addr << FairLogger::endl;
-        LOG(DEBUG) << "TAC CH IS " << tac_ch << FairLogger::endl;
-        LOG(DEBUG) << "TAC Data IS " << tac_data << FairLogger::endl;
-        LOG(DEBUG) << "QDC Data IS " << qdc_data << FairLogger::endl;
+      if(16 == tac_ch && 0 == cal) {
+        n17 += 1;
+        LOG(DEBUG) << "TAC ADDR IS " << tac_addr << ",  TAC CH IS " << tac_ch
+        << ",  TAC Data IS " << tac_data << ",  QDC Data IS " << qdc_data
+        << FairLogger::endl;
+        new ((*fRawData)[fNHits]) R3BLandRawHit(l_sam_id, l_gtb_id, tac_addr, tac_ch, cal, cntrl_data, tac_data, qdc_data);
+        fNHits++;
+      } else if(1 == cal) {
+        LOG(DEBUG) << "TAC ADDR IS " << tac_addr << ",  TAC CH IS " << tac_ch
+        << ",  TAC Data IS " << tac_data << ",  QDC Data IS " << qdc_data
+        << FairLogger::endl;
         new ((*fRawData)[fNHits]) R3BLandRawHit(l_sam_id, l_gtb_id, tac_addr, tac_ch, cal, cntrl_data, tac_data, qdc_data);
         fNHits++;
       }
     }
+    
+    LOG(DEBUG) << "!!!!! n17 " << n17 << FairLogger::endl;
   }
   
   LOG(DEBUG) << "R3BLandUnpack: Number of hits per event in LAND: " << fNHits << FairLogger::endl;

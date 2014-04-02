@@ -24,8 +24,9 @@ R3BLandMapping::R3BLandMapping()
   nEntry = 0;
   fnEvents = 0;
   nMappedElements= 0;
+  fNofBarsPerPlane = 0;
   fIsMappingDefined = kFALSE;
-  fLandHit = new TClonesArray("R3BLandHitTmp");
+  fLandHit = new TClonesArray("R3BLandRawHitMapped");
 }
 
 
@@ -78,14 +79,6 @@ Bool_t R3BLandMapping::DoMapping()
                not_used_1, &i_plane,&i_bar,&i_side, not_used_2,
                &i_sam, &i_gtb, &i_tac_addr, &i_tac_ch, stmp);
         
-        if('S' == stmp[0]) {
-          sscanf(stringFromFile.c_str(),
-                 "%s NNP%d_%d_%d, %31c SAM%d_GTB%d_TAC%d, %d, SAM%d_GTB%d_TAC%d, %d",
-                 not_used_1, &i_plane,&i_bar,&i_side, not_used_2,
-                 &tmp, &tmp, &tmp, &tmp,
-                 &i_sam, &i_gtb, &i_tac_addr, &i_tac_ch);
-        }
-
         LOG(INFO) << " PLANE = "<<i_plane<<";  BAR = "<<i_bar<<"; SIDE = "<<i_side<<";"
         << " SAM = "<<i_sam<<";  GTB = "<<i_gtb
         <<";  TAC ADDR = "<<i_tac_addr<<"; TAC CH = "<<i_tac_ch << "; "
@@ -99,9 +92,36 @@ Bool_t R3BLandMapping::DoMapping()
         v2map.insert(v2map.begin()+nMappedElements,i_tac_ch-1);
         v3map.insert(v3map.begin()+nMappedElements,i_sam);
         v4map.insert(v4map.begin()+nMappedElements,i_gtb);
-        v5map.insert(v5map.begin()+nMappedElements,(i_plane-1)*10+(i_bar-1));
+        LOG(INFO) << i_plane << FairLogger::endl;
+        v5map.insert(v5map.begin()+nMappedElements,(i_plane-1)*fNofBarsPerPlane+i_bar);
         v6map.insert(v6map.begin()+nMappedElements,i_side);
         nMappedElements++;
+
+        // Read 17-th channel
+        if('S' == stmp[0]) {
+          sscanf(stringFromFile.c_str(),
+                 "%s NNP%d_%d_%d, %31c SAM%d_GTB%d_TAC%d, %d, SAM%d_GTB%d_TAC%d, %d",
+                 not_used_1, &i_plane,&i_bar,&i_side, not_used_2,
+                 &tmp, &tmp, &tmp, &tmp,
+                 &i_sam, &i_gtb, &i_tac_addr, &i_tac_ch);
+
+          LOG(INFO) << " PLANE = "<<i_plane<<";  BAR = "<<i_bar<<"; SIDE = "<<i_side<<";"
+          << " SAM = "<<i_sam<<";  GTB = "<<i_gtb
+          <<";  TAC ADDR = "<<i_tac_addr<<"; TAC CH = "<<i_tac_ch << "; "
+          << stmp <<FairLogger::endl;
+          
+          if(16 == i_plane) {
+            continue;
+          }
+          
+          v1map.insert(v1map.begin()+nMappedElements,i_tac_addr);
+          v2map.insert(v2map.begin()+nMappedElements,i_tac_ch-1);
+          v3map.insert(v3map.begin()+nMappedElements,i_sam);
+          v4map.insert(v4map.begin()+nMappedElements,i_gtb);
+          v5map.insert(v5map.begin()+nMappedElements,-1);
+          v6map.insert(v6map.begin()+nMappedElements,-1);
+          nMappedElements++;
+        }
       }
 		}
     infile.close();
@@ -129,16 +149,15 @@ void R3BLandMapping::Exec(Option_t *option)
     sam = hit->GetSam();
     gtb = hit->GetGtb();
     tach = hit->GetTacCh();
-    if(16 == tach) { // 17-th channel - currently skip
-      continue;
-    }
+    cntl = hit->GetCntl();
     for (Int_t j = 0; j<v1map.size();j++) {
-	    if(v1map[j] == tacaddr && v2map[j] == tach && v3map[j] == sam && v4map[j] == gtb ) {
-        if(2 == v6map[j]) { // Currently store only one side
-          break;
-        }
+	    if(v1map[j] == tacaddr && v2map[j] == tach && v3map[j] == sam && v4map[j] == gtb) {
 	      LOG(DEBUG)<<" [I] < > TACADDR = "<<v1map[j]<<" < > TACCH = "<<v2map[j]<<" Bar Id ="<<v5map[j]<<FairLogger::endl;
-	      new ((*fLandHit)[nEntry]) R3BLandHitTmp (v5map[j], ttime, charge);
+        if(16 == tach) { // 17-th channel
+          new ((*fLandHit)[nEntry]) R3BLandRawHitMapped(kTRUE, v5map[j], v6map[j], ttime, charge, cntl);
+        } else { // physics channel
+          new ((*fLandHit)[nEntry]) R3BLandRawHitMapped(kFALSE, v5map[j], v6map[j], ttime, charge, cntl);
+        }
 	      nEntry++;
       }
     }

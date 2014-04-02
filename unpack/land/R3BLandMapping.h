@@ -62,12 +62,14 @@ public:
   
   void SetFileName (const char* A_FileName) {fname = A_FileName;}
   const char* GetFileName () {return fname;}
+  inline void SetNofBarsPerPlane(Int_t nBars) { fNofBarsPerPlane = nBars; }
   void SetBarID(int bid){i_bar = bid;}
   int GetBarId(){return i_bar;}
   
   ifstream infile;
   const char* fname;
   FILE * landmap;
+
 public:
 	Int_t nEntry;
 	Int_t nHits;
@@ -84,6 +86,7 @@ public:
 	int i_side;
 	UShort_t ttime;
 	UShort_t charge;
+  UShort_t cntl;
 	char not_used_1[10];
 	char not_used_2[31];
 	vector<Int_t> v1map;
@@ -95,6 +98,7 @@ public:
   
 private:
   Int_t fnEvents;
+  Int_t fNofBarsPerPlane;
   TClonesArray *fRawData;
 	TClonesArray *fLandHit;
   
