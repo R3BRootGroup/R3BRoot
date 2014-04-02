@@ -10,5 +10,9 @@
 #pragma link C++ class R3BCalo+;
 #pragma link C++ class R3BCaloContFact;
 
+#pragma link C++ class R3BCaloUnpack+;
+#pragma link C++ class R3BCaloRawAna+;
+#pragma link C++ class R3BCaloRawHit+;
+
 #endif
 

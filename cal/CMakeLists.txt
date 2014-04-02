@@ -10,6 +10,7 @@ ${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/mcstack 
 ${R3BROOT_SOURCE_DIR}/xball
 ${R3BROOT_SOURCE_DIR}/cal
+${R3BROOT_SOURCE_DIR}/cal/unpack
 ${R3BROOT_SOURCE_DIR}/r3bdata 
 ${R3BROOT_SOURCE_DIR}/r3bdata/caloData
 ${R3BROOT_SOURCE_DIR}/r3bdata/dchData
@@ -36,7 +37,10 @@ R3BCalo.cxx
 R3BCaloHitFinder.cxx  
 R3BGeoCalo.cxx   
 R3BGeoCaloPar.cxx   
-R3BCaloContFact.cxx   
+R3BCaloContFact.cxx
+unpack/R3BCaloRawHit.cxx
+unpack/R3BCaloUnpack.cxx
+unpack/R3BCaloRawAna.cxx
 )
 
 # fill list of header files from list of source files

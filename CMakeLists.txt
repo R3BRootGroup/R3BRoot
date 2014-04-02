@@ -215,7 +215,6 @@ add_subdirectory (r3bgen)
 add_subdirectory (plists)
 add_subdirectory (lumon) 
 add_subdirectory (evtvis)
-add_subdirectory (unpack)
 add_subdirectory (mfi)
 add_subdirectory (psp)
 
