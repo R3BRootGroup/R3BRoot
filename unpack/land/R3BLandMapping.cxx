@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------
 #include "R3BLandMapping.h"
 #include "R3BLandRawHit.h"
-#include "R3BLandHitTmp.h"
+#include "R3BLandRawHitMapped.h"
 //----------------------------------------------------------------------
 
 
