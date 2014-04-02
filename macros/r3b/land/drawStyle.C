@@ -98,7 +98,7 @@ TPstyle()
 
   gStyle->SetFrameFillColor(10);
   gStyle->SetFrameBorderSize(1);
-  gStyle->SetFrameBorderMode(-1);
+  //gStyle->SetFrameBorderMode(-1);
   gStyle->SetFrameLineWidth(1.2);
   gStyle->SetFrameLineColor(1);
 
