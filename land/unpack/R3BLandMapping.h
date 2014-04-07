@@ -86,7 +86,7 @@ public:
 	int i_side;
 	UShort_t ttime;
 	UShort_t charge;
-  UShort_t cntl;
+  UShort_t clock;
 	char not_used_1[10];
 	char not_used_2[31];
 	vector<Int_t> v1map;

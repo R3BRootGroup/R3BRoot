@@ -92,7 +92,6 @@ Bool_t R3BLandMapping::DoMapping()
         v2map.insert(v2map.begin()+nMappedElements,i_tac_ch-1);
         v3map.insert(v3map.begin()+nMappedElements,i_sam);
         v4map.insert(v4map.begin()+nMappedElements,i_gtb);
-        LOG(INFO) << i_plane << FairLogger::endl;
         v5map.insert(v5map.begin()+nMappedElements,(i_plane-1)*fNofBarsPerPlane+i_bar);
         v6map.insert(v6map.begin()+nMappedElements,i_side);
         nMappedElements++;
@@ -149,14 +148,14 @@ void R3BLandMapping::Exec(Option_t *option)
     sam = hit->GetSam();
     gtb = hit->GetGtb();
     tach = hit->GetTacCh();
-    cntl = hit->GetCntl();
+    clock = hit->GetClock();
     for (Int_t j = 0; j<v1map.size();j++) {
 	    if(v1map[j] == tacaddr && v2map[j] == tach && v3map[j] == sam && v4map[j] == gtb) {
 	      LOG(DEBUG)<<" [I] < > TACADDR = "<<v1map[j]<<" < > TACCH = "<<v2map[j]<<" Bar Id ="<<v5map[j]<<FairLogger::endl;
         if(16 == tach) { // 17-th channel
-          new ((*fLandHit)[nEntry]) R3BLandRawHitMapped(kTRUE, v5map[j], v6map[j], ttime, charge, cntl);
+          new ((*fLandHit)[nEntry]) R3BLandRawHitMapped(kTRUE, v5map[j], v6map[j], ttime, charge, clock);
         } else { // physics channel
-          new ((*fLandHit)[nEntry]) R3BLandRawHitMapped(kFALSE, v5map[j], v6map[j], ttime, charge, cntl);
+          new ((*fLandHit)[nEntry]) R3BLandRawHitMapped(kFALSE, v5map[j], v6map[j], ttime, charge, clock);
         }
 	      nEntry++;
       }

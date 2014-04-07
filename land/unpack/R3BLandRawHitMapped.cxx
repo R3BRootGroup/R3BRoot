@@ -17,20 +17,20 @@ R3BLandRawHitMapped::R3BLandRawHitMapped()
   fSide = 0;
   fTime = 0;
   fCharge = 0;
-  fCntl = 0;
+  fClock = 0;
 }
 
 
 
 R3BLandRawHitMapped::R3BLandRawHitMapped(Bool_t is17, Int_t barId, Int_t side,
-                                         Int_t time, Int_t charge, Int_t cntl)
+                                         Int_t time, Int_t charge, Int_t clock)
 {
   fIs17 = is17;
   fBarId = barId;
   fSide = side;
   fTime = time;
   fCharge = charge;
-  fCntl = cntl;
+  fClock = clock;
 }
 
 

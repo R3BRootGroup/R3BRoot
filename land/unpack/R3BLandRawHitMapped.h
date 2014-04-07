@@ -23,7 +23,7 @@ public:
    *@param time    tac data
    *@param charge  qdc data
    **/
-  R3BLandRawHitMapped(Bool_t is17, Int_t barId, Int_t side, Int_t time, Int_t charge, Int_t cntl);
+  R3BLandRawHitMapped(Bool_t is17, Int_t barId, Int_t side, Int_t time, Int_t charge, Int_t clock);
   
   //Destructor
   virtual ~R3BLandRawHitMapped() { }
@@ -34,7 +34,7 @@ public:
   inline const Int_t&  GetSide()    const { return fSide;   }
   inline const Int_t&  GetTime()    const { return fTime;   }
   inline const Int_t&  GetCharge()  const { return fCharge; }
-  inline const Int_t&  GetCntl()    const { return fCntl;   }
+  inline const Int_t&  GetClock()   const { return fClock;  }
 
 private:
   Bool_t fIs17;     //... true if CH 17
@@ -42,7 +42,7 @@ private:
   Int_t  fSide;     //... PMT
   Int_t  fTime;     //... TAC
   Int_t  fCharge;   //... QDC
-  Int_t  fCntl;     //... clock count
+  Int_t  fClock;    //... clock count
   
 public:
   ClassDef(R3BLandRawHitMapped,1)
