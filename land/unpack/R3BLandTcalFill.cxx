@@ -79,7 +79,7 @@ InitStatus R3BLandTcalFill::Init()
 
 void R3BLandTcalFill::Exec(Option_t* option)
 {
-    Int_t nHits = fHits->GetEntriesFast();
+    Int_t nHits = fHits->GetEntries();
     R3BLandRawHitMapped* hit;
     Int_t iBar;
     Int_t iSide;
@@ -95,6 +95,7 @@ void R3BLandTcalFill::Exec(Option_t* option)
         }
 
         // Check bar ID
+        iBar = hit->GetBarId();
         if ((iBar - 1) >= (fNofPMTs / 2))
         {
             LOG(ERROR) << "R3BLandTcalFill::Exec() : wrong bar ID: " << iBar << FairLogger::endl;
@@ -109,7 +110,6 @@ void R3BLandTcalFill::Exec(Option_t* option)
         else
         {
             // PMT signal
-            iBar = hit->GetBarId();
             iSide = hit->GetSide();
             channel = fNofPMTs / 2 * (iSide - 1) + iBar - 1;
         }
