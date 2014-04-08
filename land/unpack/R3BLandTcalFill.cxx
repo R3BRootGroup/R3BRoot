@@ -12,6 +12,8 @@
 #include "TClonesArray.h"
 #include "TH1F.h"
 
+#include <stdlib.h>
+
 R3BLandTcalFill::R3BLandTcalFill()
     : fUpdateRate(1000000)
     , fMinStats(100000)
