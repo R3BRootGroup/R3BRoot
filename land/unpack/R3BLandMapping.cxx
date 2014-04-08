@@ -202,7 +202,7 @@ void R3BLandMapping::Exec(Option_t* option)
                 { // physics channel
                     is17 = kFALSE;
                 }
-                new ((*fLandHit)[nEntry]) R3BLandRawHitMapped(is17, v5map[j], v6map[j], clock, tacData, qdcData);
+                new ((*fLandHit)[nEntry]) R3BLandRawHitMapped(is17, tacaddr, v5map[j], v6map[j], clock, tacData, qdcData);
                 nEntry++;
             }
         }

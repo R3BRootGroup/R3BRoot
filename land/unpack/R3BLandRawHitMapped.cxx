@@ -10,6 +10,7 @@
 
 R3BLandRawHitMapped::R3BLandRawHitMapped()
     : fIs17(kFALSE)
+    , fTacAddr(0)
     , fBarId(0)
     , fSide(0)
     , fClock(0)
@@ -18,8 +19,9 @@ R3BLandRawHitMapped::R3BLandRawHitMapped()
 {
 }
 
-R3BLandRawHitMapped::R3BLandRawHitMapped(Bool_t is17, Int_t barId, Int_t side, Int_t clock, Int_t tacData, Int_t qdcData)
+R3BLandRawHitMapped::R3BLandRawHitMapped(Bool_t is17, Int_t tacAddr, Int_t barId, Int_t side, Int_t clock, Int_t tacData, Int_t qdcData)
     : fIs17(is17)
+    , fTacAddr(tacAddr)
     , fBarId(barId)
     , fSide(side)
     , fClock(clock)
