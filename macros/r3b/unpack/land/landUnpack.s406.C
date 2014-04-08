@@ -7,6 +7,9 @@
   const Int_t nev = -1;
   const char *landMappingName = "cfg_neuland_s406.hh";
   const Int_t nBarsPerPlane = 10;
+  const Int_t updateRate = 1500000;
+  const Int_t minStats = 1000;
+  const Int_t nModules = 300;
   const char *outputFileName = "rawData.s406.root";
   const char *parFileName = "params.s406.root";
   const Long64_t maxSize = 1 * 1024 * 1024 * 1024; // GBytes
@@ -15,8 +18,11 @@
   // Create source with unpackers ----------------------------------------------
   FairLmdSource* source  = new FairLmdSource();
   // adding the LMD file
-  source->AddFile("/Users/kresan/lmd/r258_2986.lmd");
-//  source->AddFile("/Users/kresan/lmd/r323_3607.lmd");
+  source->AddFile("/Users/kresan/lmd/s406/r258_2983.lmd");
+  source->AddFile("/Users/kresan/lmd/s406/r258_2984.lmd");
+  source->AddFile("/Users/kresan/lmd/s406/r258_2985.lmd");
+  source->AddFile("/Users/kresan/lmd/s406/r258_2986.lmd");
+  source->AddFile("/Users/kresan/lmd/s406/r258_2987.lmd");
 
   // MBS parameters ---------------------------------------
   Short_t type = 94;
@@ -58,6 +64,15 @@
   map->SetFileName(landMappingName);
   map->SetNofBarsPerPlane(nBarsPerPlane);
   run->AddTask(map);
+  // ---------------------------------------------------------------------------
+
+
+  // TCAL ----------------------------------------------------------------------
+  R3BLandTcalFill *tcalFill = new R3BLandTcalFill("TcalFill");
+  tcalFill->SetUpdateRate(updateRate);
+  tcalFill->SetMinStats(minStats);
+  tcalFill->SetNofModules(nModules, 20);
+  run->AddTask(tcalFill);
   // ---------------------------------------------------------------------------
 
 
