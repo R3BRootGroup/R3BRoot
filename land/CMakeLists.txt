@@ -55,7 +55,8 @@ unpack/R3BLandRawAna.cxx
 unpack/R3BLandRawHit.cxx
 unpack/R3BLandMapping.cxx
 unpack/R3BLandRawHitMapped.cxx
-unpack/R3BLandUnpack.cxx)
+unpack/R3BLandUnpack.cxx
+unpack/R3BLandTcalFill.cxx)
 
 # fill list of header files from list of source files
 # by exchanging the file extension
