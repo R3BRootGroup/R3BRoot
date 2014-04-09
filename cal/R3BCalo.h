@@ -162,10 +162,10 @@ class R3BCalo : public R3BDetector
     TClonesArray*  fCaloCrystalHitCollection;    //!  The crystal hit collection
 
     //! Defining functions for energy to light output calculation
-    TF1 *tf_p_dNs;
-    TF1 *tf_p_dNf;
-    TF1 *tf_g_dNs;
-    TF1 *tf_g_dNf;
+    TF1 *tf_p_dNs;    //!
+    TF1 *tf_p_dNf;    //!
+    TF1 *tf_g_dNs;    //!
+    TF1 *tf_g_dNf;    //!
 	
     // Selecting the geometry of the CALIFA calorimeter
     Int_t fGeometryVersion;
