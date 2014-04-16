@@ -6,13 +6,23 @@
 #include "R3BLandTcalFill.h"
 #include "R3BLandRawHitMapped.h"
 
+#include "R3BLandCalPar.h"
+#include "R3BLandTCalPar.h"
+
 #include "FairRootManager.h"
+#include "FairRuntimeDb.h"
+#include "FairRunIdGenerator.h"
+#include "FairRtdbRun.h"
 #include "FairLogger.h"
 
 #include "TClonesArray.h"
 #include "TH1F.h"
 
+
+#include <iostream>
 #include <stdlib.h>
+
+using namespace std;
 
 R3BLandTcalFill::R3BLandTcalFill()
     : fUpdateRate(1000000)
@@ -22,7 +32,9 @@ R3BLandTcalFill::R3BLandTcalFill()
     , fhData(NULL)
     , fhTime(NULL)
     , fNEvents(0)
-{
+    , fStoreDB(kFALSE)
+    , fCal_Par(NULL)
+{    
 }
 
 R3BLandTcalFill::R3BLandTcalFill(const char* name, Int_t iVerbose)
@@ -34,6 +46,8 @@ R3BLandTcalFill::R3BLandTcalFill(const char* name, Int_t iVerbose)
     , fhData(NULL)
     , fhTime(NULL)
     , fNEvents(0)
+    , fStoreDB(kFALSE)
+    , fCal_Par(NULL)
 {
 }
 
@@ -57,6 +71,9 @@ R3BLandTcalFill::~R3BLandTcalFill()
         delete fhTime;
         fhTime = NULL;
     }
+
+	if (fCal_Par) delete fCal_Par;  
+
 }
 
 InitStatus R3BLandTcalFill::Init()
@@ -70,6 +87,10 @@ InitStatus R3BLandTcalFill::Init()
     if (!fHits)
     {
         return kFATAL;
+    }
+    if (fStoreDB) { 
+
+	  fCal_Par = (R3BLandCalPar*) FairRuntimeDb::instance()->getContainer("LandCalPar");
     }
 
     CreateContainers();
@@ -143,6 +164,13 @@ void R3BLandTcalFill::FinishEvent()
                 fhData[im]->Reset();
             }
         }
+
+		Int_t runId = FairRuntimeDb::instance()->getCurrentRun()->getRunId();
+        if (fStoreDB && fCal_Par) {
+	        fCal_Par->Print();
+            fCal_Par->store(runId);
+        }  
+
     }
 }
 
@@ -197,6 +225,15 @@ void R3BLandTcalFill::CalculateParams(Int_t iModule)
     Int_t ibin = iMin;
     Int_t group;
     Double_t prev_time = 0.;
+
+   
+    R3BLandTCalPar *pTCal=NULL;  
+    if (fStoreDB) { 
+              pTCal = new R3BLandTCalPar();
+              pTCal->SetBarId(iModule); 
+    }  
+    
+    Int_t incr=0; 
     while (ibin <= iMax)
     {
         // Iteratively compute parameter
@@ -204,12 +241,25 @@ void R3BLandTcalFill::CalculateParams(Int_t iModule)
         // Fill time calibration parameter
         for (Int_t i1 = ibin; i1 < (ibin + group); i1++)
         {
-            fhTime[iModule]->SetBinContent(i1 + 1, prev_time);
+            fhTime[iModule]->SetBinContent(i1 + 1, prev_time);        
         }
+
+        cout << " Module: " << iModule << " bin range: " << ibin << " : " << ibin+group << " dbin: " << group  
+             << " time set: " << prev_time << endl;
+
+        if(pTCal){  
+		  pTCal->SetBinLowAt(ibin,incr); 
+		  pTCal->SetBinUpAt(ibin+group,incr); 
+		  pTCal->SetTimeAt(prev_time,incr); 
+		}
+
         // Next range of channels
         ibin += group;
         nch += 1;
+        incr++;  
     }
+        
+    if (fStoreDB) fCal_Par->AddTCalPar( pTCal );   
 
     LOG(INFO) << "R3BLandTcalFill::CalculateParams() : Number of parameters: " << nch << FairLogger::endl;
 }
@@ -246,6 +296,7 @@ void R3BLandTcalFill::WriteContainer(Int_t iModule)
 {
     fhData[iModule]->Write();
     fhTime[iModule]->Write();
+
     LOG(INFO) << "R3BLandTcalFill : TCAL container " << iModule << " is saved" << FairLogger::endl;
 }
 

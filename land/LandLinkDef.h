@@ -33,6 +33,7 @@
 #pragma link C++ class R3BLandRawHitMapped+;
 #pragma link C++ class R3BLandUnpack+;
 #pragma link C++ class R3BLandTcalFill+;
+#pragma link C++ class R3BLandParamRead+;
 
 #endif
 

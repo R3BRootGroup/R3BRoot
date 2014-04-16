@@ -8,6 +8,7 @@
 
 #include "FairTask.h"
 
+class R3BLandCalPar;
 class TClonesArray;
 class TH1F;
 
@@ -26,6 +27,11 @@ class R3BLandTcalFill : public FairTask
     virtual void FinishEvent();
 
     virtual void FinishTask();
+
+    inline void SetStoreDB(Bool_t st ) 
+	{
+	  fStoreDB=st;
+    }
 
     inline void SetUpdateRate(Int_t rate)
     {
@@ -56,7 +62,10 @@ class R3BLandTcalFill : public FairTask
     TH1F** fhTime;
     
     Int_t fNEvents;
+    Bool_t fStoreDB;
+    R3BLandCalPar* fCal_Par;
     TClonesArray* fHits;
+
 
     void CreateContainers();
 
