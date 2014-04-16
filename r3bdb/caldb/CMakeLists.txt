@@ -9,6 +9,7 @@ include_directories( ${INCLUDE_DIRECTORIES})
 
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
+${FAIRROOT_LIBRARY_DIR}
 )
  
 link_directories( ${LINK_DIRECTORIES})
@@ -44,7 +45,6 @@ ${FAIRROOTPATH}/include/FairDbWriter.h
 
 set(LINKDEF R3BCaloGeoLinkDef.h)
 Set(LIBRARY_NAME R3BCaloDB)
-#Set(DEPENDENCIES Base)
 
 GENERATE_LIBRARY()
 
