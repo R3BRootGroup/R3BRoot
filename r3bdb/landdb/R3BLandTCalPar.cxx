@@ -260,7 +260,7 @@ void R3BLandTCalPar::store(UInt_t rid)
 
 void R3BLandTCalPar::Print()
 {
-  std::cout<<"   R3BLandTCalPar  TRAP Parameters: "<<std::endl;
+  std::cout<<"   R3BLandTCalPar: Time Calibration Parameters: "<<std::endl;
   std::cout<<"   fCompId: "<<  fCompId <<  std::endl;
   std::cout<<"   fBarId: "<<  fBarId <<  std::endl;
   std::cout<<"   fSide: "<<  fSide <<  std::endl;

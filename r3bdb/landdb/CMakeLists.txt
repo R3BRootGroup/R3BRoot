@@ -15,17 +15,17 @@ ${FAIRROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
-R3BLandContFact.cxx
+R3BDBLandContFact.cxx
 R3BLandCalPar.cxx
 R3BLandTCalPar.cxx
-#R3BDBRunInfo.cxx
+R3BDBRunInfo.cxx
 )
 
 set(HEADERS
-R3BLandContFact.h
+R3BDBLandContFact.h
 R3BLandCalPar.h
 R3BLandTCalPar.h
-#R3BDBRunInfo.h
+R3BDBRunInfo.h
 ${FAIRROOTPATH}/include/FairDbReader.h
 ${FAIRROOTPATH}/include/FairDbWriter.h
 )

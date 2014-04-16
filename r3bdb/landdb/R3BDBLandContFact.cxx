@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////
 //
-//  R3BLandContFact
+//  R3BDBLandContFact
 //
 //  Factory for the parameter containers
 //
 /////////////////////////////////////////////////////////////
-#include "R3BLandContFact.h"
+#include "R3BDBLandContFact.h"
 
 #include "R3BLandCalPar.h"               // for R3BLandGeometryPar
 #include "FairParSet.h"                 // for FairParSet
@@ -20,20 +20,20 @@
 
 using namespace std;
 
-ClassImp(R3BLandContFact);
+ClassImp(R3BDBLandContFact);
 
-static R3BLandContFact gR3BLandContFact;
+static R3BDBLandContFact gR3BDBLandContFact;
 
-R3BLandContFact::R3BLandContFact()
+R3BDBLandContFact::R3BDBLandContFact()
 {
   // Constructor (called when the library is loaded)
-  fName="R3BLandContFact";
+  fName="R3BDBLandContFact";
   fTitle="Tutorial factory for parameter containers";
   setAllContainers();
   FairRuntimeDb::instance()->addContFactory(this);
 }
 
-void R3BLandContFact::setAllContainers()
+void R3BDBLandContFact::setAllContainers()
 {
   /** Creates the Container objects with all accepted contexts and adds them to
    *  the list of containers.*/
@@ -44,14 +44,14 @@ void R3BLandContFact::setAllContainers()
   containers->Add(p1);
 }
 
-FairParSet* R3BLandContFact::createContainer(FairContainer* c)
+FairParSet* R3BDBLandContFact::createContainer(FairContainer* c)
 {
   /** Calls the constructor of the corresponding parameter container.
    * For an actual context, which is not an empty string and not the default context
    * of this container, the name is concatinated with the context. */
 
   const char* name=c->GetName();
-  cout << "-I-R3BLandContFact::createContainer " << name << endl;
+  cout << "-I-R3BDBLandContFact::createContainer " << name << endl;
   FairParSet* p=NULL;
 
   if (strcmp(name,"LandCalPar")==0) {
