@@ -48,7 +48,7 @@ Bool_t R3BLandUnpack::Init()
 void R3BLandUnpack::Register()
 {
     //  LOG(DEBUG) << "Registering" << FairLogger::endl;
-    LOG(INFO) << "Registering ..." << FairLogger::endl;
+    LOG(INFO) << "R3BLandUnpack : Registering..." << FairLogger::endl;
     FairRootManager* fMan = FairRootManager::Instance();
     if (!fMan)
     {
@@ -60,7 +60,7 @@ void R3BLandUnpack::Register()
 // DoUnpack: Public method
 Bool_t R3BLandUnpack::DoUnpack(Int_t* data, Int_t size)
 {
-    LOG(DEBUG) << "Unpacking...  size = " << size << FairLogger::endl;
+    LOG(INFO) << "R3BLandUnpack : Unpacking... size = " << size << FairLogger::endl;
 
     UInt_t l_i = 0;
 
@@ -77,7 +77,7 @@ Bool_t R3BLandUnpack::DoUnpack(Int_t* data, Int_t size)
         UShort_t l_lec = (p1[0] & 0x00f00000) >> 20;
         UShort_t l_da_siz = (p1[0] & 0x000001ff);
 
-        LOG(DEBUG) << "sam was " << l_sam_id << ",  gtb was " << l_gtb_id << ",  lec " << l_lec << ",  size " << l_da_siz << FairLogger::endl;
+        LOG(INFO) << "R3BLandUnpack : SAM:" << l_sam_id << ",  GTB:" << l_gtb_id << ",  lec:" << l_lec << ",  size:" << l_da_siz << FairLogger::endl;
 
         l_i += 1;
 
@@ -99,34 +99,27 @@ Bool_t R3BLandUnpack::DoUnpack(Int_t* data, Int_t size)
             qdc_data = (p1[i1 + 1] & 0x00000fff);
             l_i += 2;
 
-            if (16 == tac_ch && 0 == cal)
+            if (16 == tac_ch)
             {
                 n17 += 1;
-                LOG(DEBUG) << "TAC ADDR IS " << tac_addr << ",  TAC CH IS " << tac_ch << ",  TAC Data IS " << tac_data << ",  QDC Data IS " << qdc_data
-                           << FairLogger::endl;
-                new ((*fRawData)[fNHits]) R3BLandRawHit(l_sam_id, l_gtb_id, tac_addr, tac_ch, cal, clock, tac_data, qdc_data);
-                fNHits++;
             }
-            else if (1 == cal)
-            {
-                LOG(DEBUG) << "TAC ADDR IS " << tac_addr << ",  TAC CH IS " << tac_ch << ",  TAC Data IS " << tac_data << ",  QDC Data IS " << qdc_data
-                           << FairLogger::endl;
-                new ((*fRawData)[fNHits]) R3BLandRawHit(l_sam_id, l_gtb_id, tac_addr, tac_ch, cal, clock, tac_data, qdc_data);
-                fNHits++;
-            }
+            LOG(DEBUG) << "R3BLandUnpack : TAC ADDR IS " << tac_addr << ",  TAC CH IS " << tac_ch << ",  TAC Data IS " << tac_data << ",  QDC Data IS " << qdc_data
+            << FairLogger::endl;
+            new ((*fRawData)[fNHits]) R3BLandRawHit(l_sam_id, l_gtb_id, tac_addr, tac_ch, cal, clock, tac_data, qdc_data);
+            fNHits++;
         }
 
-        LOG(DEBUG) << "!!!!! n17 " << n17 << FairLogger::endl;
+        LOG(DEBUG) << "R3BLandUnpack : n17=" << n17 << FairLogger::endl;
     }
 
-    LOG(DEBUG) << "R3BLandUnpack: Number of hits per event in LAND: " << fNHits << FairLogger::endl;
+    LOG(INFO) << "R3BLandUnpack : Number of hits in LAND: " << fNHits << FairLogger::endl;
     return kTRUE;
 }
 
 // Reset: Public method
 void R3BLandUnpack::Reset()
 {
-    LOG(DEBUG) << "Clearing Data Structure" << FairLogger::endl;
+    LOG(DEBUG) << "R3BLandUnpack : Clearing Data Structure" << FairLogger::endl;
     fRawData->Clear();
     fNHits = 0;
 }
