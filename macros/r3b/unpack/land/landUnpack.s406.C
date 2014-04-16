@@ -3,11 +3,11 @@
   TStopwatch timer;
   timer.Start();
 
-
+ 
   const Int_t nev = -1;
   const char *landMappingName = "cfg_neuland_s406.hh";
   const Int_t nBarsPerPlane = 10;
-  const Int_t updateRate = 1500000;
+  const Int_t updateRate = 150000;
   const Int_t minStats = 1000;
   const Int_t nModules = 300;
   const char *outputFileName = "rawData.s406.root";
@@ -18,11 +18,11 @@
   // Create source with unpackers ----------------------------------------------
   FairLmdSource* source  = new FairLmdSource();
   // adding the LMD file
-  source->AddFile("/Users/kresan/lmd/s406/r258_2983.lmd");
-  source->AddFile("/Users/kresan/lmd/s406/r258_2984.lmd");
-  source->AddFile("/Users/kresan/lmd/s406/r258_2985.lmd");
-  source->AddFile("/Users/kresan/lmd/s406/r258_2986.lmd");
-  source->AddFile("/Users/kresan/lmd/s406/r258_2987.lmd");
+  source->AddFile("/Volumes/Data2/land/s406/lmd/r258_2983.lmd");
+  source->AddFile("/Volumes/Data2/land/s406/lmd/r258_2984.lmd");
+  source->AddFile("/Volumes/Data2/land/s406/lmd/r258_2985.lmd");
+  source->AddFile("/Volumes/Data2/land/s406/lmd/r258_2986.lmd");
+  source->AddFile("/Volumes/Data2/land/s406/lmd/r258_2987.lmd");
 
   // MBS parameters ---------------------------------------
   Short_t type = 94;
@@ -39,8 +39,16 @@
 
   // Create online run ---------------------------------------------------------
   FairRunOnline* run = new FairRunOnline(source);
+  FairRunIdGenerator runID;
+  UInt_t runId =  runID.generateId();
+  Double_t s= (Double_t) runId;
+  ValTimeStamp t1(s);
+     
+  cout << " RUNID GENERE " << runId << " date:" << t1.AsString("s") <<  endl;
+  run->SetRunId(runId); 
   run->SetOutputFile(outputFileName);
   run->SetGenerateHtml(kFALSE);
+  
   // ---------------------------------------------------------------------------
   
   
@@ -72,15 +80,12 @@
   tcalFill->SetUpdateRate(updateRate);
   tcalFill->SetMinStats(minStats);
   tcalFill->SetNofModules(nModules, 20);
+  tcalFill->SetStoreDB(kTRUE); 
   run->AddTask(tcalFill);
   // ---------------------------------------------------------------------------
 
 
-  // Initialize ----------------------------------------------------------------
-  run->Init();
-  ((TTree*)gFile->Get("cbmsim"))->SetMaxTreeSize(maxSize);
-  FairLogger::GetLogger()->SetLogScreenLevel("INFO");
-  // ---------------------------------------------------------------------------
+ 
   
   
   // Runtime data base ---------------------------------------------------------
@@ -88,18 +93,37 @@
   R3BFieldPar* fieldPar = (R3BFieldPar*) rtdb->getContainer("R3BFieldPar");
   fieldPar->SetParameters(magField);
   fieldPar->setChanged();
-  Bool_t kParameterMerged = kTRUE;
-  FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
-  parOut->open(parFileName);
-  rtdb->setOutput(parOut);
-  rtdb->saveOutput();
-  rtdb->print();
+
+  // Set the SQL based IO as first input
+  FairParTSQLIo* input_db = new FairParTSQLIo();  
+  input_db->SetShutdown(kTRUE);
+  input_db->open();  
+  rtdb->setFirstInput(input_db);
+  rtdb->setOutput(input_db);
+  
+
+   Bool_t kParameterMerged = kTRUE;
+   FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
+   parOut->open(parFileName);
+   rtdb->setSecondInput(parOut);
+   rtdb->saveOutput();
+   rtdb->print(); 
   // ---------------------------------------------------------------------------
   
-  
+ 
+ // Initialize ----------------------------------------------------------------
+  run->Init();
+  ((TTree*)gFile->Get("cbmsim"))->SetMaxTreeSize(maxSize);
+  FairLogger::GetLogger()->SetLogScreenLevel("INFO");
+  // ---------------------------------------------------------------------------
+
+ 
   // Run -----------------------------------------------------------------------
-  run->Run(nev, 0);
+  //run->Run(nev, 0);
+  run->Run(150000, 0);
   // ---------------------------------------------------------------------------
+
+
 
 
   timer.Stop();
