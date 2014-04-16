@@ -48,6 +48,10 @@ class R3BLandRawHit : public TObject
     {
         return fTacAddr;
     }
+    inline const UShort_t& GetCal() const
+    {
+        return fCal;
+    }
     inline const UShort_t& GetClock() const
     {
         return fClock;
