@@ -54,7 +54,7 @@ FairParSet* R3BLandContFact::createContainer(FairContainer* c)
   cout << "-I-R3BLandContFact::createContainer " << name << endl;
   FairParSet* p=NULL;
 
-  if (strcmp(name,"LandGeometryPar")==0) {
+  if (strcmp(name,"LandCalPar")==0) {
     p=new R3BLandCalPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
     // Set Arguments needed for SQL versioning managment
     p->SetVersion(0);

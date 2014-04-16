@@ -34,14 +34,17 @@ R3BLandTCalPar::R3BLandTCalPar(const char* name, const char* title, const char* 
 	fBarId(0),
     fSide(0)
 {
-  // Reset all parameters
-  clear();
+
   // Set the default Db Entry to the first slot
   fDbEntry=0;
   //  Writer Meta-Class for SQL IO
   fParam_Writer=NULL;
   //  Reader Meta-Class for SQL IO
   fParam_Reader=NULL;
+
+  // Reset all parameters
+  clear();
+
   // ConnectionPool
   fMultConn=FairDbTableInterfaceStore::Instance().fConnectionPool;
 
@@ -71,7 +74,8 @@ void R3BLandTCalPar::putParams(FairParamList* list)
   list->add("comp_id",  fCompId);
   list->add("bar_id", fBarId);
   list->add("side", fSide);
-  list->add("channels", fChannel, NCHMAX);
+  list->add("bin_low", fBinLow, NCHMAX);
+  list->add("bin_up", fBinUp, NCHMAX);
   list->add("time", fTime, NCHMAX);
   
 }
@@ -82,7 +86,8 @@ Bool_t R3BLandTCalPar::getParams(FairParamList* list)
   if (!list->fill("comp_id", &fCompId)) { return kFALSE; }
   if (!list->fill("bar_id", &fBarId)) { return kFALSE; }
   if (!list->fill("side", &fSide)) { return kFALSE; }
-  if (!list->fill("channels", fChannel, NCHMAX)) { return kFALSE; }
+  if (!list->fill("bin_low", fBinLow, NCHMAX)) { return kFALSE; }
+  if (!list->fill("bin_up", fBinUp, NCHMAX)) { return kFALSE; }
   if (!list->fill("time", fTime, NCHMAX)) { return kFALSE; }
  
   return kTRUE;
@@ -92,7 +97,7 @@ void R3BLandTCalPar::clear()
 {
   fCompId=fBarId=fSide=0;
   // <DB> Not so much overhead here.
-  for(Int_t i=0; i<NCHMAX; i++) { fChannel[i]=0;fTime[i]=0.;}
+  for(Int_t i=0; i<NCHMAX; i++) { fBinLow[i]=fBinUp[i]=0;fTime[i]=0.;}
  
   if (fParam_Writer) { fParam_Writer->Reset(); }
   if (fParam_Reader) { fParam_Reader->Reset(); }
@@ -111,7 +116,8 @@ string R3BLandTCalPar::GetTableDefinition(const char* Name)
   sql += "  COMP_ID               INT,";
   sql += "  BAR_ID                INT,";
   sql += "  SIDE_ID               INT,";
-  sql += "  CHANNEL               TEXT,";
+  sql += "  BIN_LOW               TEXT,";
+  sql += "  BIN_UP                TEXT,";
   sql += "  TIME                  TEXT,";
   sql += "  primary key(SEQNO,ROW_ID))";
   return sql;
@@ -124,22 +130,26 @@ void R3BLandTCalPar::Fill(FairDbResultPool& res_in,
 {
   // Clear all structures
   clear();
-  FairDbStreamer b_c(fChannel, NCHMAX);
+  FairDbStreamer b_l(fBinLow, NCHMAX);
+  FairDbStreamer b_u(fBinUp, NCHMAX);
   FairDbStreamer b_t(fTime, NCHMAX);
 
-  res_in >> fCompId  >> fBarId   >> fSide  >> b_c >> b_t;
+  res_in >> fCompId  >> fBarId   >> fSide  >> b_l >> b_u >> b_t;
 
-  b_c.Fill(fChannel);
+  b_l.Fill(fBinLow);
+  b_u.Fill(fBinUp);
   b_t.Fill(fTime);
+
 }
 
 void R3BLandTCalPar::Store(FairDbOutTableBuffer& res_out,
                          const FairDbValRecord* valrec) const
 {
-  FairDbStreamer b_c(fChannel,NCHMAX);
+  FairDbStreamer b_l(fBinLow, NCHMAX);
+  FairDbStreamer b_u(fBinUp, NCHMAX);
   FairDbStreamer b_t(fTime,NCHMAX);
 
-  res_out << fCompId  << fBarId   << fSide << b_c << b_t;
+  res_out << fCompId  << fBarId   << fSide << b_l << b_u << b_t;
 
 }
 
@@ -169,7 +179,8 @@ void R3BLandTCalPar::fill(UInt_t rid)
     fSide  =  cgd->GetSide();
 
     for(Int_t j=0;j<NCHMAX;j++){
-	  SetChannelAt(GetChannelAt(j),j);
+	  SetBinLowAt(GetBinLowAt(j),j);
+	  SetBinUpAt(GetBinUpAt(j),j);
 	  SetTimeAt(GetTimeAt(j),j);
     }
   }
@@ -254,7 +265,8 @@ void R3BLandTCalPar::Print()
   std::cout<<"   fBarId: "<<  fBarId <<  std::endl;
   std::cout<<"   fSide: "<<  fSide <<  std::endl;
  for (Int_t i=0;i<NCHMAX;i++) {
-   std::cout<<"   Channel: " <<  fChannel[i]  << " Time:" << fTime[i] <<  std::endl;
+   if ( (fBinLow[i] != 0) && (fBinUp[i] != 0) &&  (fTime[i] != 0) )
+   std::cout<<"   BinLow: " <<  fBinLow[i]  <<  " BinUp "  << fBinUp[i] << " Time:" << fTime[i] <<  std::endl;
    }
 }
 
@@ -268,11 +280,15 @@ Bool_t R3BLandTCalPar::Compare(const R3BLandTCalPar& that ) const {
  
   Bool_t test_d=kTRUE;
   for(Int_t i=0; i<NCHMAX;i++){
-    Int_t  a =  GetChannelAt(i);
-    Int_t  b =  that.GetChannelAt(i);
+
+    Int_t  a =  GetBinLowAt(i);
+    Int_t  b =  that.GetBinLowAt(i);
+    Int_t  c =  GetBinUpAt(i);
+    Int_t  d =  that.GetBinUpAt(i);
+
     Double_t  t1 =  GetTimeAt(i);
     Double_t  t2 =  that.GetTimeAt(i);
-	if ( ( a != b )  || (t1 != t2 ) ){
+	if ( ( a != b ) || ( c != d )  || (t1 != t2 ) ){
 	  test_d = kFALSE;
       break;
     }      
@@ -331,6 +347,10 @@ FairDbWriter<R3BLandTCalPar>* R3BLandTCalPar::ActivateWriter(Int_t rid)
 	fParam_Writer = GetParamWriter();
 		
 	fParam_Writer->Activate(GetValInterval(rid),GetComboNo(), GetVersion(),GetDbEntry(),"Land Time Calib Pars");
+
+    //ValTimeStamp tStart(rid);  
+    //ValInterval valI(Detector::kLand, DataType::kData, tStart, ValTimeStamp::GetEOT(), "Validation interval");       
+	//fParam_Writer->Activate(valI,GetComboNo(), GetVersion(),GetDbEntry(),"Land Time Calib Pars");
 
 	return fParam_Writer;
 	

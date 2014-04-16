@@ -38,10 +38,10 @@ using TObject::Compare;
     void   Print();
 
 	// Lists handling  
-    void   AddTChannel(R3BLandTCalPar* tch,Int_t side){fTChannels[side]->Add(tch);}  
-    TObjArray* GetListOfTChannel(Int_t side) {return fTChannels[side];}
-    Int_t GetNumTChannels(Int_t side) {return fTChannels[side]->GetEntries();} 
-    R3BLandTCalPar* GetTChannelAt(Int_t idx, Int_t side){return (R3BLandTCalPar*) fTChannels[side]->At(idx);} 
+    void   AddTCalPar(R3BLandTCalPar* tch){fTCalParams->Add(tch);}  
+    TObjArray* GetListOfTCalPar(Int_t side) {return fTCalParams;}
+    Int_t GetNumTCalPar() {return fTCalParams->GetEntries();} 
+    R3BLandTCalPar* GetTCalParAt(Int_t idx){return (R3BLandTCalPar*) fTCalParams->At(idx);} 
 
 
     // Global IO using run_id
@@ -49,7 +49,7 @@ using TObject::Compare;
     virtual void store(UInt_t rid);
 
   private:
-    TObjArray* fTChannels[2];
+    TObjArray* fTCalParams;
 
     ClassDef(R3BLandCalPar,1); // R3BLandCalPar Parameter Container example
 };

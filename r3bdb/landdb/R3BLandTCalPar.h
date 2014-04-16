@@ -36,10 +36,10 @@ class R3BLandTCalPar : public FairParGenericSet
 using TObject::Compare;
 
   public :
-    R3BLandTCalPar (const char* name="R3BLandTCalPar",
-                  const char* title="Califa Geometry Parameter",
-                  const char* context="TestDefaultContext",
-                  Bool_t own=kTRUE);
+  R3BLandTCalPar (const char* name="R3BLandTCalPar",
+				 const char* title="Land Calibrated Time Parameter",
+				 const char* context="TestDefaultContext",
+				 Bool_t own=kTRUE);
     virtual ~R3BLandTCalPar(void);
     void clear(void);
     void   putParams(FairParamList* list);
@@ -53,12 +53,14 @@ using TObject::Compare;
     Int_t GetBarId() const {return fBarId;}
     Int_t GetSide() const {return fSide;}
     Double_t GetTimeAt(Int_t i) const {return fTime[i];}
-    Int_t    GetChannelAt(Int_t i) const {return fChannel[i];}
- 
+    Int_t    GetBinLowAt(Int_t i) const {return fBinLow[i];}
+    Int_t    GetBinUpAt(Int_t i) const {return fBinUp[i];}
+
     void SetCompId(Int_t x)  {SetComboNo(x); fCompId=x;}
     void SetBarId(Int_t i) {fBarId=i;}
     void SetSide(Int_t i) {fSide=i;}
-    void SetChannelAt(Int_t ch,Int_t i) {fChannel[i]=ch;}
+    void SetBinLowAt(Int_t ch,Int_t i) {fBinLow[i]=ch;}
+	void SetBinUpAt(Int_t ch,Int_t i) {fBinUp[i]=ch;}
     void SetTimeAt(Double_t t,Int_t i) {fTime[i]= t;}
 
     UInt_t GetIndex(UInt_t /*def*/) const { return fBarId; }
@@ -85,7 +87,7 @@ using TObject::Compare;
     virtual ValCondition GetContext(UInt_t rid) {
       return ValCondition(Detector::kLand,
                           DataType::kData,
-                          ValTimeStamp(rid));
+                          ValTimeStamp((Double_t) rid));
     }
 
     // SQL-IO Meta-Class Getters
@@ -98,8 +100,9 @@ using TObject::Compare;
     Int_t fCompId;
     Int_t fBarId; 
     Int_t fSide; 
-    Int_t fChannel[NCHMAX];//
-    Double_t fTime[NCHMAX];//
+    Int_t fBinLow[NCHMAX];// lower channel
+    Int_t fBinUp[NCHMAX];// upper channel
+    Double_t fTime[NCHMAX];// Cal. Time
 
     // Database Pool Index
     Int_t fDbEntry; //!

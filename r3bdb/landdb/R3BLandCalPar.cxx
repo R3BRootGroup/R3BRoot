@@ -25,13 +25,13 @@ ClassImp(R3BLandCalPar);
 R3BLandCalPar::R3BLandCalPar(const char* name, const char* title, const char* context, Bool_t own)
   : FairParGenericSet(name,title,context, own)
 {
-  for (Int_t i=0;i<2;i++ ) fTChannels[i] = new TObjArray(500);
+  fTCalParams = new TObjArray(500);
 }
 
 
 R3BLandCalPar::~R3BLandCalPar()
 {
-  for (Int_t i=0;i<2;i++ ) if(fTChannels[i]) delete fTChannels[i];
+  if(fTCalParams) {delete fTCalParams; fTCalParams=NULL;}
 }
 
 
@@ -39,15 +39,13 @@ void R3BLandCalPar::putParams(FairParamList* list)
 {
   std::cout<<"-I- R3BLandCalPar::putParams() called"<<std::endl;
   if(!list) { return; }
-  list->addObject("LandTChannelsR", fTChannels[0]);
-  list->addObject("LandTChannelsL", fTChannels[1]);
+  list->addObject("LandTCalParams", fTCalParams);
 }
 
 Bool_t R3BLandCalPar::getParams(FairParamList* list)
 {
   if(!list) { return kFALSE;}
-  if (!list->fillObject("LandTChannelsR", fTChannels[0])) {return kFALSE;}
-  if (!list->fillObject("LandTChannelsL", fTChannels[1])) {return kFALSE;}
+  if (!list->fillObject("LandTCalParams", fTCalParams)) {return kFALSE;}
   return kTRUE;
 }
 
@@ -61,58 +59,48 @@ void R3BLandCalPar::fill(UInt_t rid){
   // Fill the lists with correspondin TimeStamps (runID) 
   cout << "-I- R3BLandCalPar::fill() called with RID# " << rid << endl; 
 
-
   R3BLandTCalPar tpar;
 
   FairDbReader<R3BLandTCalPar>* r_tpar = tpar.GetParamReader();  
   
   // Define a Global Context
   ValTimeStamp ts(rid);
-  ValCondition context(Detector::kLand,DataType::kData,ts);
+  time_t shift = ts.GetSec() + 60;
+  ValTimeStamp    end(shift,0);
+  cout << " DATE of RETRIEVAL " << end.AsString("s") << endl;
+  ValCondition context(Detector::kLand,DataType::kData,end);
 
   // Activate reading for this Context
   r_tpar->Activate(context, GetVersion());
 
 
   Int_t numTCh = r_tpar->GetNumRows(); 
+  cout << "-I- R3BlandCalPar numOfRow " << numTCh << endl;
   for (int i = 0; i < numTCh; ++i) {
-    R3BLandTCalPar* tcal_par = (R3BLandTCalPar*) r_tpar->GetRowByIndex(i);
+    R3BLandTCalPar* tcal_par = (R3BLandTCalPar*) r_tpar->GetRow(i);
     if (!tcal_par) { continue; }
-
-    if (tcal_par->GetSide() == 0)
-	  fTChannels[0]->Add(tcal_par);
     else 
-	  fTChannels[1]->Add(tcal_par);
-
+	  fTCalParams->Add(tcal_par);    
   }
-
+  cout << "-I- R3BlandCalPar filled with  " << fTCalParams->GetEntries()  << " Cal Objects " << endl;
 }
 
 
 void R3BLandCalPar::store(UInt_t rid){
   //<DB> store the lists
-  Int_t n0 = fTChannels[0]->GetEntries();
-  Int_t n1 = fTChannels[1]->GetEntries();
+  Int_t nParams = fTCalParams->GetEntries();
 
-  cout << "-I- R3BLandCalPar::store() called with RID# " << rid << " n0: " << n0 << " n1: " << n1 << endl; 
-
-  if ( n0 != n1 ) {
-	cout << "-E- R3BLandCalPar::store() channels entries inconsistent " << endl; 
-   exit(1);
-  } 
-  
+  cout << "-I- R3BLandCalPar::store() called with RID# " << rid << " nParams: " << nParams << endl; 
 
   // Crystal nodes stored row-wized
   R3BLandTCalPar iPar;
   FairDbWriter<R3BLandTCalPar>* cW = iPar.ActivateWriter(rid); 
 
   if (cW) {
-	// Crystals node
-	for(Int_t i=0;i<n0;i++){
-	  R3BLandTCalPar* t_par0 = (R3BLandTCalPar*) fTChannels[0]->At(i);
-	  R3BLandTCalPar* t_par1 = (R3BLandTCalPar*) fTChannels[1]->At(i);
-	  if (t_par0) *cW << *t_par0; 
-	  if (t_par1) *cW << *t_par1; 
+	// TCal Objects
+	for(Int_t i=0;i<nParams;i++){
+	  R3BLandTCalPar* t_par = (R3BLandTCalPar*) fTCalParams->At(i);
+	  if (t_par) *cW << *t_par; 
 	}
 	// Reset the Writer
 	if(!cW->Close()){
@@ -128,23 +116,14 @@ void R3BLandCalPar::store(UInt_t rid){
 
 void R3BLandCalPar::Print(){
 
-  std::cout<<" -----------  Land Channel Time Calib. Parameters -------------  "<<std::endl;
+  std::cout<<" -----------  Land Time Calib. Parameters -------------  "<<std::endl;
 
-  std::cout<<" Side R:  "<< fTChannels[0]->GetEntries() << std::endl;
-  for(Int_t i=0;i<fTChannels[0]->GetEntries(); i++){
-	R3BLandTCalPar* t_par = (R3BLandTCalPar*) fTChannels[0]->At(i);  
+  std::cout<<" Number of TCal Parameters "<< fTCalParams->GetEntries() << std::endl;
+  for(Int_t i=0;i<fTCalParams->GetEntries(); i++){
+	R3BLandTCalPar* t_par = (R3BLandTCalPar*) fTCalParams->At(i);  
     cout << "----------------------------------------------------------------------" << endl;
 	if (t_par) t_par->Print();
   }
-
-  std::cout<<" Side L:  "<< fTChannels[1]->GetEntries() << std::endl;
-  for(Int_t i=0;i<fTChannels[1]->GetEntries(); i++){
-	R3BLandTCalPar* t_par = (R3BLandTCalPar*) fTChannels[1]->At(i);  
-    cout << "----------------------------------------------------------------------" << endl;
-	if (t_par) t_par->Print();
-  }
-  
-  
   
 }
 
