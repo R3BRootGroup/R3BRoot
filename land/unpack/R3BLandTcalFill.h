@@ -28,21 +28,21 @@ class R3BLandTcalFill : public FairTask
 
     virtual void FinishTask();
 
-    inline void SetStoreDB(Bool_t st ) 
-	{
-	  fStoreDB=st;
+    inline void SetStoreDB(Bool_t st)
+    {
+        fStoreDB = st;
     }
 
     inline void SetUpdateRate(Int_t rate)
     {
         fUpdateRate = rate;
     }
-    
+
     inline void SetMinStats(Int_t minStats)
     {
         fMinStats = minStats;
     }
-    
+
     inline void SetNofModules(Int_t nPMTs, Int_t n17)
     {
         fNofPMTs = nPMTs;
@@ -52,26 +52,25 @@ class R3BLandTcalFill : public FairTask
   private:
     Int_t fUpdateRate;
     Int_t fMinStats;
-    
+
     Int_t fNofPMTs;
     Int_t fNof17;
-    
+
     Int_t iMin;
     Int_t iMax;
     TH1F** fhData;
     TH1F** fhTime;
-    
+
     Int_t fNEvents;
     Bool_t fStoreDB;
     R3BLandCalPar* fCal_Par;
     TClonesArray* fHits;
 
-
     void CreateContainers();
 
     void CalculateParams(Int_t iModule);
-    
-    Int_t CalculateBin(Int_t iModule, Double_t &prev_time, Int_t ibin1, Int_t ngroup);
+
+    Int_t CalculateBin(Int_t iModule, Double_t& prev_time, Int_t ibin1, Int_t ngroup);
 
     void WriteContainer(Int_t iModule);
 

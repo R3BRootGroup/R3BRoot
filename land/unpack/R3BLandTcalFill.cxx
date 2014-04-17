@@ -18,7 +18,6 @@
 #include "TClonesArray.h"
 #include "TH1F.h"
 
-
 #include <iostream>
 #include <stdlib.h>
 
@@ -34,7 +33,7 @@ R3BLandTcalFill::R3BLandTcalFill()
     , fNEvents(0)
     , fStoreDB(kFALSE)
     , fCal_Par(NULL)
-{    
+{
 }
 
 R3BLandTcalFill::R3BLandTcalFill(const char* name, Int_t iVerbose)
@@ -72,8 +71,8 @@ R3BLandTcalFill::~R3BLandTcalFill()
         fhTime = NULL;
     }
 
-	if (fCal_Par) delete fCal_Par;  
-
+    if (fCal_Par)
+        delete fCal_Par;
 }
 
 InitStatus R3BLandTcalFill::Init()
@@ -88,9 +87,10 @@ InitStatus R3BLandTcalFill::Init()
     {
         return kFATAL;
     }
-    if (fStoreDB) { 
+    if (fStoreDB)
+    {
 
-	  fCal_Par = (R3BLandCalPar*) FairRuntimeDb::instance()->getContainer("LandCalPar");
+        fCal_Par = (R3BLandCalPar*)FairRuntimeDb::instance()->getContainer("LandCalPar");
     }
 
     CreateContainers();
@@ -152,7 +152,11 @@ void R3BLandTcalFill::Exec(Option_t* option)
 
 void R3BLandTcalFill::FinishEvent()
 {
-    if (0 == (fNEvents % fUpdateRate))
+}
+
+void R3BLandTcalFill::FinishTask()
+{
+//    if (0 == (fNEvents % fUpdateRate))
     {
         // Re-calculate calibration parameters
         for (Int_t im = 0; im < (fNofPMTs + fNof17); im++)
@@ -164,18 +168,14 @@ void R3BLandTcalFill::FinishEvent()
                 fhData[im]->Reset();
             }
         }
-
-		Int_t runId = FairRuntimeDb::instance()->getCurrentRun()->getRunId();
-        if (fStoreDB && fCal_Par) {
-	        fCal_Par->Print();
+        
+        Int_t runId = FairRuntimeDb::instance()->getCurrentRun()->getRunId();
+        if (fStoreDB && fCal_Par)
+        {
+            fCal_Par->Print();
             fCal_Par->store(runId);
-        }  
-
+        }
     }
-}
-
-void R3BLandTcalFill::FinishTask()
-{
 }
 
 void R3BLandTcalFill::CreateContainers()
@@ -190,9 +190,9 @@ void R3BLandTcalFill::CreateContainers()
     for (Int_t i = 0; i < (fNofPMTs + fNof17); i++)
     {
         sprintf(str, "hTcalData_%d", i);
-        fhData[i] = new TH1F(str, "", 4096, 0., 4095.);
+        fhData[i] = new TH1F(str, "", 4096, 0., 4096.);
         sprintf(str, "hTime_%d", i);
-        fhTime[i] = new TH1F(str, "", 4096, 0., 4095.);
+        fhTime[i] = new TH1F(str, "", 4096, 0., 4096.);
     }
 }
 
@@ -211,7 +211,7 @@ void R3BLandTcalFill::CalculateParams(Int_t iModule)
     {
         if (fhData[iModule]->GetBinContent(j + 1) > 0)
         {
-            iMax = j;
+            iMax = j + 1;
             break;
         }
     }
@@ -226,14 +226,14 @@ void R3BLandTcalFill::CalculateParams(Int_t iModule)
     Int_t group;
     Double_t prev_time = 0.;
 
-   
-    R3BLandTCalPar *pTCal=NULL;  
-    if (fStoreDB) { 
-              pTCal = new R3BLandTCalPar();
-              pTCal->SetBarId(iModule); 
-    }  
-    
-    Int_t incr=0; 
+    R3BLandTCalPar* pTCal = NULL;
+    if (fStoreDB)
+    {
+        pTCal = new R3BLandTCalPar();
+        pTCal->SetBarId(iModule);
+    }
+
+    Int_t incr = 0;
     while (ibin <= iMax)
     {
         // Iteratively compute parameter
@@ -241,25 +241,26 @@ void R3BLandTcalFill::CalculateParams(Int_t iModule)
         // Fill time calibration parameter
         for (Int_t i1 = ibin; i1 < (ibin + group); i1++)
         {
-            fhTime[iModule]->SetBinContent(i1 + 1, prev_time);        
+            fhTime[iModule]->SetBinContent(i1 + 1, prev_time);
         }
 
-        cout << " Module: " << iModule << " bin range: " << ibin << " : " << ibin+group << " dbin: " << group  
-             << " time set: " << prev_time << endl;
+        cout << " Module: " << iModule << " bin range: " << ibin << " : " << ibin + group << " dbin: " << group << " time set: " << prev_time << endl;
 
-        if(pTCal){  
-		  pTCal->SetBinLowAt(ibin,incr); 
-		  pTCal->SetBinUpAt(ibin+group,incr); 
-		  pTCal->SetTimeAt(prev_time,incr); 
-		}
+        if (pTCal)
+        {
+            pTCal->SetBinLowAt(ibin, incr);
+            pTCal->SetBinUpAt(ibin + group - 1, incr);
+            pTCal->SetTimeAt(prev_time, incr);
+        }
 
         // Next range of channels
         ibin += group;
         nch += 1;
-        incr++;  
+        incr++;
     }
-        
-    if (fStoreDB) fCal_Par->AddTCalPar( pTCal );   
+
+    if (fStoreDB)
+        fCal_Par->AddTCalPar(pTCal);
 
     LOG(INFO) << "R3BLandTcalFill::CalculateParams() : Number of parameters: " << nch << FairLogger::endl;
 }
@@ -268,11 +269,19 @@ Int_t R3BLandTcalFill::CalculateBin(Int_t iModule, Double_t& prev_time, Int_t ib
 {
     if ((ibin + ngroup) > iMax)
     {
+        Double_t total = fhData[iModule]->Integral(1, 4096);
+        Double_t itot = fhData[iModule]->Integral(1, (ibin+1) + ngroup);
+        if (itot > 0. && total > 0.)
+        {
+            Double_t time = 25. * itot / total; // time of channel in [ns]
+            LOG(DEBUG) << "R3BLandTcalFill::CalculateBin() : bin=" << ibin << "  time=" << time << "  ngroup=" << ngroup << FairLogger::endl;
+            prev_time = time;
+        }
         return ngroup;
     }
-    Double_t total = fhData[iModule]->Integral();
-    Double_t itot = fhData[iModule]->Integral(1, ibin + ngroup);
-    if (itot > 0)
+    Double_t total = fhData[iModule]->Integral(1, 4096);
+    Double_t itot = fhData[iModule]->Integral(1, (ibin+1) + ngroup);
+    if (itot > 0. && total > 0.)
     {
         Double_t time = 25. * itot / total; // time of channel in [ns]
         Double_t diff = time - prev_time;   // time difference to previous range
