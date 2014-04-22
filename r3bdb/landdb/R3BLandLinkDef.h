@@ -6,11 +6,8 @@
 
 #pragma link C++ class FairDbReader<R3BLandTCalPar>+;
 #pragma link C++ class FairDbWriter<R3BLandTCalPar>+;
-#pragma link C++ class FairDbReader<R3BDBRunInfo>+;
-#pragma link C++ class FairDbWriter<R3BDBRunInfo>+;
 #pragma link C++ class  R3BLandTCalPar+;
 #pragma link C++ class  R3BLandCalPar+;
-#pragma link C++ class  R3BDBRunInfo+;
 #pragma link C++ class  R3BDBLandContFact+;
 
 #endif

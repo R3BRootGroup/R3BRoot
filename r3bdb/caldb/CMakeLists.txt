@@ -2,6 +2,7 @@
 
 set(INCLUDE_DIRECTORIES
 ${BASE_INCLUDE_DIRECTORIES}
+${CMAKE_SOURCE_DIR}/r3bdb/commondb
 ${CMAKE_SOURCE_DIR}/r3bdb/caldb
 )
 
@@ -23,8 +24,6 @@ R3BCaloCrystalGeoPar.cxx
 R3BCaloCrystalPar.cxx
 R3BCaloGeometryPar.cxx
 R3BGeomAnalyzer.cxx
-R3BCaloUnits.cxx
-R3BCaloPhysConsts.cxx
 )
 
 set(HEADERS
@@ -36,8 +35,6 @@ R3BCaloCrystalGeoPar.h
 R3BCaloCrystalPar.h
 R3BCaloGeometryPar.h
 R3BGeomAnalyzer.h
-R3BCaloUnits.h
-R3BCaloPhysConsts.h
 ${FAIRROOTPATH}/include/FairDbReader.h
 ${FAIRROOTPATH}/include/FairDbWriter.h
 )
