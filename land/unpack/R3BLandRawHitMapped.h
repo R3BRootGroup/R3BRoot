@@ -23,7 +23,7 @@ class R3BLandRawHitMapped : public TObject
      *@param time    tac data
      *@param charge  qdc data
      **/
-    R3BLandRawHitMapped(Bool_t is17, Int_t tacAddr, Int_t barId, Int_t side, Int_t clock, Int_t tacData, Int_t qdcData);
+    R3BLandRawHitMapped(Bool_t is17, Int_t cal, Int_t tacAddr, Int_t barId, Int_t side, Int_t clock, Int_t tacData, Int_t qdcData);
 
     // Destructor
     virtual ~R3BLandRawHitMapped()
@@ -38,6 +38,10 @@ class R3BLandRawHitMapped : public TObject
     inline const Int_t& GetTacAddr() const
     {
         return fTacAddr;
+    }
+    inline const Int_t& GetCal() const
+    {
+        return fCal;
     }
     inline const Int_t& GetBarId() const
     {
@@ -62,6 +66,7 @@ class R3BLandRawHitMapped : public TObject
 
   private:
     Bool_t fIs17;   //... true if CH 17
+    Int_t fCal;     //... triggers
     Int_t fTacAddr; //... TAC address
     Int_t fBarId;   //... detector ID
     Int_t fSide;    //... PMT
