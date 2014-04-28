@@ -60,7 +60,7 @@ void R3BLandUnpack::Register()
 // DoUnpack: Public method
 Bool_t R3BLandUnpack::DoUnpack(Int_t* data, Int_t size)
 {
-    LOG(INFO) << "R3BLandUnpack : Unpacking... size = " << size << FairLogger::endl;
+    LOG(DEBUG) << "R3BLandUnpack : Unpacking... size = " << size << FairLogger::endl;
 
     UInt_t l_i = 0;
 
@@ -68,7 +68,6 @@ Bool_t R3BLandUnpack::DoUnpack(Int_t* data, Int_t size)
 
     while (l_i < size)
     {
-
         n17 = 0;
 
         UInt_t* p1 = (UInt_t*)(data + l_i);
@@ -77,7 +76,7 @@ Bool_t R3BLandUnpack::DoUnpack(Int_t* data, Int_t size)
         UShort_t l_lec = (p1[0] & 0x00f00000) >> 20;
         UShort_t l_da_siz = (p1[0] & 0x000001ff);
 
-        LOG(INFO) << "R3BLandUnpack : SAM:" << l_sam_id << ",  GTB:" << l_gtb_id << ",  lec:" << l_lec << ",  size:" << l_da_siz << FairLogger::endl;
+        LOG(DEBUG) << "R3BLandUnpack : SAM:" << l_sam_id << ",  GTB:" << l_gtb_id << ",  lec:" << l_lec << ",  size:" << l_da_siz << FairLogger::endl;
 
         l_i += 1;
 
