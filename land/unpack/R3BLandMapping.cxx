@@ -178,6 +178,7 @@ void R3BLandMapping::Exec(Option_t* option)
     Int_t sam;
     Int_t gtb;
     Int_t clock;
+    Int_t cal;
     Bool_t is17;
     for (Int_t i = 0; i < nHits; i++)
     {
@@ -189,6 +190,7 @@ void R3BLandMapping::Exec(Option_t* option)
         gtb = hit->GetGtb();
         tach = hit->GetTacCh();
         clock = hit->GetClock();
+        cal = hit->GetCal();
         for (Int_t j = 0; j < v1map.size(); j++)
         {
             if (v1map[j] == tacaddr && v2map[j] == tach && v3map[j] == sam && v4map[j] == gtb)
@@ -202,14 +204,14 @@ void R3BLandMapping::Exec(Option_t* option)
                 { // physics channel
                     is17 = kFALSE;
                 }
-                new ((*fLandHit)[nEntry]) R3BLandRawHitMapped(is17, tacaddr, v5map[j], v6map[j], clock, tacData, qdcData);
+                new ((*fLandHit)[nEntry]) R3BLandRawHitMapped(is17, cal, tacaddr, v5map[j], v6map[j], clock, tacData, qdcData);
                 nEntry++;
             }
         }
     }
     if (nEntry > 0)
     {
-        LOG(INFO) << "Event: " << fnEvents << ",  multiplicity: " << nEntry << FairLogger::endl;
+        LOG(DEBUG) << "Event: " << fnEvents << ",  multiplicity: " << nEntry << FairLogger::endl;
     }
     fnEvents += 1;
 }
