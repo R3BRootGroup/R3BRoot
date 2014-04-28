@@ -66,10 +66,13 @@ void R3BLandRawAna::Exec(Option_t* option)
             fh_land_raw_gtb->Fill(hit->GetGtb());
             fh_land_raw_tacaddr->Fill(hit->GetTacAddr());
             fh_land_raw_tacch->Fill(hit->GetTacCh());
-            fh_land_raw_cal->Fill(hit->GetCal());
+            if(0 != hit->GetCal())
+            {
+                fh_land_raw_cal->Fill(hit->GetCal());
+            }
             fh_land_raw_clock->Fill(hit->GetClock());
             fh_land_raw_tac->Fill(hit->GetTacData());
-            if(16 != hit->GetTacCh())
+            if(16 != hit->GetTacCh() && 1 == hit->GetCal() && hit->GetQdcData() > 0.)
             {
                 fh_land_raw_qdc->Fill(hit->GetQdcData());
             }
@@ -84,8 +87,11 @@ void R3BLandRawAna::Exec(Option_t* option)
         {
             hitmapped = (R3BLandRawHitMapped*)fLandRawHitMapped->At(i);
             fh_land_mapped_is17->Fill(hitmapped->Is17());
-            fh_land_mapped_barid->Fill(hitmapped->GetBarId());
-            fh_land_mapped_side->Fill(hitmapped->GetSide());
+            if(1 == hitmapped->GetCal() && hitmapped->GetQdcData() > 0.)
+            {
+                fh_land_mapped_barid->Fill(hitmapped->GetBarId());
+                fh_land_mapped_side->Fill(hitmapped->GetSide());
+            }
         }
     }
 
@@ -103,6 +109,10 @@ void R3BLandRawAna::Exec(Option_t* option)
     }
 
     fnEvents += 1;
+    if(0 == (fnEvents%1))
+    {
+        LOG(INFO) << "\033[0;31mR3BLandRawAna : " << fnEvents << " events collected\033[0;30m" << FairLogger::endl;
+    }
 }
 
 void R3BLandRawAna::FinishTask()
