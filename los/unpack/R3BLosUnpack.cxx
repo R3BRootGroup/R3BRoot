@@ -61,7 +61,7 @@ Bool_t R3BLosUnpack::DoUnpack(Int_t* data, Int_t size)
         return kFALSE;
     }
     
-    LOG(INFO) << "R3BLosUnpack : Unpacking... size = " << size << FairLogger::endl;
+    LOG(DEBUG) << "R3BLosUnpack : Unpacking... size = " << size << FairLogger::endl;
 
 //    LOG(INFO) << "!!!!!!! " << std::hex;
 //    for (Int_t i = 0; i < size; i++)
@@ -81,7 +81,7 @@ Bool_t R3BLosUnpack::DoUnpack(Int_t* data, Int_t size)
     UInt_t l_i = 0;
     
     UInt_t nr_cha = 0x1ff & (p1[l_i] >> 9);
-    LOG(INFO) << "R3BLosUnpack : Number of channels to read: " << nr_cha << FairLogger::endl;
+    LOG(DEBUG) << "R3BLosUnpack : Number of channels to read: " << nr_cha << FairLogger::endl;
 
     if(nr_cha)
     {
