@@ -13,12 +13,12 @@ Analysis:
 		The tracks are reconstructed in one step with: 
 		root -l 
 		.L analysLampShadeSpec1Tree.C
-		analysEvents(1,"r3bsim.root","outputFileName.root") -> this create the output file called startrackerAnaDigit.root with position (x,y,z) of pixel hit and reconstructed theta and phi angles, AND INVARIANT MASS 
+		analysEvents(1,"r3bsim.root","outputFileName.root") -> this create the output file called outputFileName.root with position (x,y,z) of pixel hit and reconstructed theta and phi angles, AND INVARIANT MASS 
 
 
 		or in 2 steps, making use of the R3BSTaRTraHitFinder class via:
 		root -l StarTrackAna.C  -> this create the output file called startrackerAna.root with position (x,y,z) of pixel hit and reconstructed theta and phi angles.
-		root -l checkResults.C  -> reads the "startrackerAnaDigit.root" and reconstruct invariant mass. !!TODO!!
+		.L checkResults.C  -> reads the "startrackerAna.root" and reconstruct invariant mass. !!TODO!!
 
 
 
@@ -30,6 +30,13 @@ Analysis:
 		root -l StarTrackAnaDigit.C   -> reads the r3bsim.root output file and creates a new output tree called "startrackerAnaDigit.root" 
 		     			      	 with RAW information similar to the DAQ output
 
-		root -l RecResults.C        -> reads the "startrackerAnaDigit.root" and reconstruct tracks and other physical observables from the detector Id, strip ID, energy loss and time 
+		.L RecResults.C  
+		RecResult("outputFileName.root")      -> reads the "startrackerAnaDigit.root" and reconstruct tracks and other physical observables from the detector Id, strip ID, energy loss and time 
+
+		or .L RecResultsGene.C
+		RecResultGene("outputFileName.root")  -> reads the "startrackerAnaDigit.root" and reconstruct tracks and other physical observables from the detector Id, strip ID, energy loss and time 
+
+		or .L RecResultsClust.C
+		RecResultClust("outputFileName.root")  -> reads the "startrackerAnaDigit.root" and reconstruct tracks and other physical observables from the detector Id, strip ID, energy loss and time 
 	     	 
 	
