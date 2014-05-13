@@ -1870,7 +1870,7 @@ void analysEvents(Int_t analType=1, char* input, char* output) {
 
 ////////////////////////////////////////////////
 //
-// For elastic case
+// For elastic case assuming the particle is stop in the calorimeter 
 //
 
 // Add energies together if in same track
@@ -1885,7 +1885,7 @@ if(TrackMult==1){
   if(Energy>0.00004) // 40 keV threshold
     {
       E_detected->Fill(Energy);
-      CsIE = E_particle[0]-Energy;
+      CsIE = E_particle[0]-Energy; // We assume the particle is stopped in the calorimeter
   
       if(CsIE > 0.) CsIER = gRandom->Gaus(CsIE,(CsIE*0.01)); // 1%
       //if(CsIE > 0.) CsIER = CsIE; // 0%

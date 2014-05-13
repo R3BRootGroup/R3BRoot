@@ -1,0 +1,35 @@
+
+
+Simulation:
+
+	Edit and adjust the file "r3bsim.C" for your specific setup and event generator, then run:
+
+	root -l r3bsim.C
+
+Analysis:
+
+	For pure simulations:
+
+		The tracks are reconstructed in one step with: 
+		root -l 
+		.L analysLampShadeSpec1Tree.C
+		analysEvents(1,"r3bsim.root","outputFileName.root") -> this create the output file called startrackerAnaDigit.root with position (x,y,z) of pixel hit and reconstructed theta and phi angles, AND INVARIANT MASS 
+
+
+		or in 2 steps, making use of the R3BSTaRTraHitFinder class via:
+		root -l StarTrackAna.C  -> this create the output file called startrackerAna.root with position (x,y,z) of pixel hit and reconstructed theta and phi angles.
+		root -l checkResults.C  -> reads the "startrackerAnaDigit.root" and reconstruct invariant mass. !!TODO!!
+
+
+
+
+	For simulated raw data:
+	     
+		The tracks are reconstructed in 2 steps with: 
+
+		root -l StarTrackAnaDigit.C   -> reads the r3bsim.root output file and creates a new output tree called "startrackerAnaDigit.root" 
+		     			      	 with RAW information similar to the DAQ output
+
+		root -l RecResults.C        -> reads the "startrackerAnaDigit.root" and reconstruct tracks and other physical observables from the detector Id, strip ID, energy loss and time 
+	     	 
+	
