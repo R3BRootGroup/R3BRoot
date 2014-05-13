@@ -35,8 +35,9 @@ Analysis:
 
 		or .L RecResultsGene.C
 		RecResultGene("outputFileName.root")  -> reads the "startrackerAnaDigit.root" and reconstruct tracks and other physical observables from the detector Id, strip ID, energy loss and time 
-
+						      as above but more general (looking at all hits in each layers)
 		or .L RecResultsClust.C
-		RecResultClust("outputFileName.root")  -> reads the "startrackerAnaDigit.root" and reconstruct tracks and other physical observables from the detector Id, strip ID, energy loss and time 
+		RecResultClust("outputFileName.root")  -> reads the "startrackerAnaDigit.root" and reconstruct tracks and other physical observables from the detector Id, strip ID, energy loss and time
+	                                                  as above but with also a search and identification of strip cluster (RECOMMANDED !!!!)	 
 	     	 
 	
