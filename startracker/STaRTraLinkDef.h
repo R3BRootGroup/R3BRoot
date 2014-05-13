@@ -8,6 +8,7 @@
 #pragma link C++ class R3BGeoSTaRTraPar+;
 #pragma link C++ class R3BSTaRTra+;
 #pragma link C++ class R3BSTaRTraHitFinder+;
+#pragma link C++ class R3BSTaRTraDigit+;
 #pragma link C++ class R3BSTaRTraContFact+;
 
 #endif

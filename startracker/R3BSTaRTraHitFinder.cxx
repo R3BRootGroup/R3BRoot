@@ -72,7 +72,7 @@ void R3BSTaRTraHitFinder::Exec(Option_t* opt) {
 	Double_t WidthMax1  = 8.1912 ; // cm
 	//Double_t WidthMin1  = 2.25 ; // cm
 	Double_t WidthMin1  = 1.971 ; // cm
-	Double_t StripPitch1= 0.005 ; // = 50 um
+	Double_t StripPitch1= 0.00515 ; // = 51.5 um
 	//Double_t InclAng1=14.9;
 	Double_t InclAng1=14.3;
 	Double_t Rmin1=1.75;    // cm
@@ -104,7 +104,7 @@ void R3BSTaRTraHitFinder::Exec(Option_t* opt) {
 	Double_t WidthMax2  = 10.80295 ; // cm
 	//Double_t WidthMin2  = 1.3 ; // cm
 	Double_t WidthMin2  = 1.1406 ; // cm
-	Double_t StripPitch2= 0.005 ; // = 50 um
+	Double_t StripPitch2= 0.00515 ; // = 51.5 um
 	Double_t InclAng2=32.155; // deg    
 	Double_t Rmin2=2.22;    // cm
 	Double_t AngRangeMin2=5.3;// deg    
@@ -127,7 +127,7 @@ void R3BSTaRTraHitFinder::Exec(Option_t* opt) {
 	//Double_t WidthMin3  = 1.3 ; // cm
 	Double_t WidthMin3  = 1.1406 ; // cm
 	//Double_t StripPitch3= 0.005 ; // = 50 um
-	Double_t StripPitch3= 0.00385 + 0.0012 + 0.0001 + 0.00007; // = 50.5 um
+	Double_t StripPitch3= 0.00385 + 0.0012 + 0.0001 + 0.00007; // = 51.5 um
         Double_t InclAng3=32.155; // deg    
         Double_t Rmin3=2.95;    // cm
         Double_t AngRangeMin3=6.76; // deg   
@@ -695,8 +695,8 @@ void R3BSTaRTraHitFinder::Exec(Option_t* opt) {
 
       {
 	{1,            0,             0,            0},  // Matrice 1 row 0
-	{0,  0.831954122,   0.554844427, -12.17121099},  // Matrice 1 row 1
-	{0, -0.554844427,   0.831954122,  19.02022645},  // Matrice 1 row 2
+	{0,  0.846611425,   0.532211512, -12.2056808},  // Matrice 1 row 1
+	{0, -0.532211513,   0.846611425,  19.02022645},  // Matrice 1 row 2
 	{0,            0,             0,            1}   // Matrice 1 row 3
       },
 
@@ -1627,7 +1627,9 @@ Double_t R3BSTaRTraHitFinder::GetThetaScatZero(Double_t X, Double_t Y, Double_t 
 	
 	Double_t Theta;
 	
-	Theta=atan(sqrt(pow(X,2)+pow(Y,2))/Z);
+	//Theta=atan(sqrt(pow(X,2)+pow(Y,2))/Z); // Nick
+	Theta=atan2(sqrt(pow(X,2)+pow(Y,2)),Z);
+	if(Theta<0)Theta=Theta+TMath::Pi(); // added by Marc
 	
 	return Theta;
 }
@@ -1639,11 +1641,16 @@ Double_t R3BSTaRTraHitFinder::GetPhiScatZero(Double_t X, Double_t Y, Double_t Z)
 	
 	Double_t Phi;
 	
+	/* Marc:*/
+	Phi=atan2(Y,X);
+	if(Phi<0)Phi=Phi+2*TMath::Pi();
+
+	/*Nick:
 	if(X>0 && Y>0)Phi=atan(Y/X);
 	if(X<0 && Y>=0)Phi=TMath::Pi()+atan(Y/X);
 	if(X<0 && Y<0)Phi=-TMath::Pi()+atan(Y/X);
 	if(X>0 && Y<=0)Phi=atan(Y/X);
-	
+	*/
 	
 	
 	return Phi;

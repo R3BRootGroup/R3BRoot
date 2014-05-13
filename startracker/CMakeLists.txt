@@ -17,8 +17,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/dchData
 ${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
-${R3BROOT_SOURCE_DIR}/r3bdata/landData
-${R3BROOT_SOURCE_DIR}/r3bdata/trackerData 
+${R3BROOT_SOURCE_DIR}/r3bdata/landData 
 ${R3BROOT_SOURCE_DIR}/r3bdata/startrackerData)
 
 
@@ -38,6 +37,7 @@ R3BGeoSTaRTra.cxx
 R3BGeoSTaRTraPar.cxx   
 R3BSTaRTraContFact.cxx  
 R3BSTaRTraHitFinder.cxx 
+R3BSTaRTraDigit.cxx 
 )
 
 # fill list of header files from list of source files
