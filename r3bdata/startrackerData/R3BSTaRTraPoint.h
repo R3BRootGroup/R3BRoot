@@ -55,6 +55,7 @@ class R3BSTaRTraPoint : public FairMCPoint
 
   /** Accessors **/
   Int_t GetDetCopyID()   const { return fDetCopyID; } // added by Marc
+  Double_t GetTOF()   const { return fTime; }         // added by Marc
   Double_t GetXIn()   const { return fX; }
   Double_t GetYIn()   const { return fY; }
   Double_t GetZIn()   const { return fZ; }

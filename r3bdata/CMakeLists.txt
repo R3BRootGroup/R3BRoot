@@ -12,6 +12,7 @@ include_directories( ${INCLUDE_DIRECTORIES})
 
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
+${CMAKE_SOURCE_DIR}/base
 ${FAIRROOT_LIBRARY_DIR}
 )
  
@@ -42,6 +43,7 @@ trackerData/R3BTrackerHit.cxx
 startrackerData/R3BSTaRTraPoint.cxx 
 startrackerData/R3BSTaRTraHit.cxx 
 startrackerData/R3BSTaRTrackerHit.cxx
+startrackerData/R3BSTaRTrackerDigitHit.cxx
 landData/R3BLandPoint.cxx
 landData/R3BNeuLandPoint.cxx 
 landData/R3BLandDigi.cxx 
