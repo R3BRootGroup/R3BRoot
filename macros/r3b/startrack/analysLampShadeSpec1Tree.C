@@ -305,7 +305,7 @@ void analysEvents(Int_t analType=1, char* input, char* output) {
   //Double_t WidthMin1  = 2.25 ; // cm
   Double_t WidthMin1  = 1.971 ; // cmIbrahim@ipno.in2p3.fr
   //Double_t StripPitch1= 0.0050 ; // = 50 um
-  Double_t StripPitch1= 0.00385 + 0.0012 + 0.0001 + 0.000127; // = 51.5 um
+  Double_t StripPitch1= 0.00385 + 0.0012 + 0.0001 + 0.000127 + 2e-6; // = 52.77 um  = strip pitch (38.5um) + interstrip (~14 um -to be checked)
   //Double_t InclAng1=14.9;
   Double_t InclAng1=14.3; // deg
   Double_t Rmin1=1.75;    // cm
@@ -932,10 +932,16 @@ void analysEvents(Int_t analType=1, char* input, char* output) {
 // Read the tree event by event:
    
   for(Int_t i=0;i<nevents;i++){
-  //for(Int_t i=0;i<1.;i++){
+  //for(Int_t i=0;i<3.;i++){
   //for(Int_t i=0;i<920;i++){  // for 132Sn comparison G494 vs G495
  
     if(i%100 == 0) printf("Event:%d\n",i);
+
+    //cout << " ############################### " << endl;
+    //cout << " New Event " << endl;
+    //cout << "Event #" << i << endl;
+
+
  
     //if one input tree:     
     nb += T->GetEvent(i);
@@ -1263,6 +1269,7 @@ void analysEvents(Int_t analType=1, char* input, char* output) {
 		                       +             M_INV_Inner[DetCopyID[j]-1][2][3];
 			   
 			   //cout <<  X_track[j] << " " <<   Y_track[j] << " " <<  Z_track[j] << " " << endl;
+
 			   
 		    // fill histograms
 		  XtrackDet->Fill(X_track_det[j]);

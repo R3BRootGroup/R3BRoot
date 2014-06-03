@@ -42,8 +42,8 @@ Int_t r3bsim(){
    // Box generator:             "box"
    // R3B spec. generator:       "r3b"
 
-   TString fGene="box";
-   //TString fGene="gammas";  
+   //TString fGene="box";
+   TString fGene="gammas";  
    // TString fGene="ion_gun";
    //TString fGene="ascii";
    //TString fGene="p2p";
@@ -63,7 +63,10 @@ Int_t r3bsim(){
    TString target2="Para";
    TString target3="Para45";
    TString target4="LiH";
-
+   TString target5="CTarget";   // C for s318
+   TString target6="CH2Target"; // CH2 for s318
+   TString target7="ETTarget";  // empty target for s318
+ 
    //-------------------------------------------------
    //- Geometrical Setup Definition
    //-  Non Sensitiv        |    fDetName (String)
@@ -89,11 +92,13 @@ Int_t r3bsim(){
 
   TMap detGeo;
 
-  detGeo.Add(new TObjString("TARGET"),        new TObjString("target_"+target4+".geo.root"));
+  //detGeo.Add(new TObjString("TARGET"),        new TObjString("target_"+target4+".geo.root"));
+  detGeo.Add(new TObjString("TARGET"),        new TObjString("target_"+target2+".geo.root"));
 //  detGeo.Add(new TObjString("ALADIN"),        new TObjString("aladin_v13a.geo.root"));
 //  detGeo.Add(new TObjString("GLAD"),          new TObjString("glad_v13a.geo.root"));
 //  detGeo.Add(new TObjString("CRYSTALBALL"),   new TObjString("cal_v13a.geo.root"));
-  //detGeo.Add(new TObjString("CALIFA"),        new TObjString("califa_v14a.geo.root"));
+//    detGeo.Add(new TObjString("CALIFA"),        new TObjString("califa_Marc.geo.root"));
+//  detGeo.Add(new TObjString("CALIFA"),        new TObjString("califa_v14a.geo.root"));
 //  detGeo.Add(new TObjString("TOF"),           new TObjString("tof_v13a.geo.root"));
 //  detGeo.Add(new TObjString("MTOF"),          new TObjString("mtof_v13a.geo.root"));
 //  detGeo.Add(new TObjString("DCH"),           new TObjString("dch_v13a.geo.root"));
@@ -102,7 +107,7 @@ Int_t r3bsim(){
 //  detGeo.Add(new TObjString("GFI"),           new TObjString("gfi_v13a.geo.root"));
 //  detGeo.Add(new TObjString("LAND"),          new TObjString("land_v12a_10m.geo.root"));
 //  detGeo.Add(new TObjString("SCINTNEULAND"),  new TObjString("neuland_v12a_14m.geo.root"));
-  detGeo.Add(new TObjString("VACVESSELCOOL"), new TObjString("vacvessel_v14a.geo.root"));
+//  detGeo.Add(new TObjString("VACVESSELCOOL"), new TObjString("vacvessel_v14a.geo.root"));
   //  detGeo.Add(new TObjString("VACVESSELCOOL"), new TObjString("vacvessel_v13a.geo.root"));
 ///  detGeo.Add(new TObjString("MFI"),           new TObjString("mfi_v13a.geo.root"));
 //  detGeo.Add(new TObjString("PSP"),           new TObjString("psp_v13a.geo.root"));
@@ -147,7 +152,7 @@ Int_t r3bsim(){
    //-------------------------------------------------
 
   //Int_t nEvents = 10;
-    Int_t nEvents = 1000;
+  Int_t nEvents = 10000;
        //Int_t nEvents = 20000;
 
    //-------------------------------------------------
@@ -166,7 +171,7 @@ Int_t r3bsim(){
    // Main Sim function call
    r3ball(  nEvents,
             detGeo,
-	    target4, //           target2,
+	    target2, //           target4,
 	    fEventDisplay,
 	    fMC,
 	    fGene,

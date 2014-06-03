@@ -10,13 +10,15 @@
 //  -------------------------------------------------------------------------
 //
 //   Usage: 
-//      > root -l RecResultsClust.C
-//                         
-//     BUT FIRST, select in the //SETTINGS section the simulation features 
-//	(the macro will plot and text information as a function of these settings)
+//      > .L RecResultsClust.C
+//      > RecResultsClust(mode,"outputName.root")
+//
+//     mode=0 for pp or pp' reaction channels
+//     mode=1 for p2p reaction channel        
+//                 
 //  -------------------------------------------------------------------------
 
-void RecResultsClust(char* output) {
+void RecResultsClust(Int_t mode, char* output) {
 
 
   gROOT->Reset();
@@ -35,6 +37,7 @@ void RecResultsClust(char* output) {
 
 
 
+	//sprintf(title0,"%s","startrackerAnaDigit_Notrgt_PencilBeam.root");  	
 	sprintf(title0,"%s","startrackerAnaDigit.root");  	
  	//sprintf(title1,"%s","r3bsim.root");  
 	TFile *file0 = TFile::Open(title0);
@@ -88,6 +91,10 @@ void RecResultsClust(char* output) {
 	TH1F *EnergyDeltaE = new TH1F("EnergyDeltaE","Energy distribution of delta electrons",200,0.,2.);  // 0 to 2 MeV
 	TH1F *ELossMiddl = new TH1F("ELossMiddl","Energy loss in middle detector",100,0.,1.);
 	TH1F *ELossOuter = new TH1F("ELossOuter","Energy loss in outer detector",100,0.,1.);
+
+
+	TH1F *TargRadius = new TH1F("TargRadius","Position(radius) distribution in target",200,0.,4.);
+	TH2F *XTargYTarg = new TH2F("XTargYTarg","Image reconstructed of target+beam overlap",200,-4.,4., 200,-4.,4.);
 	
 	//For p2p case:
 	TH1F *AngTheta1 = new TH1F("AngTheta1","G ",180,0.,180.);
@@ -296,14 +303,11 @@ void RecResultsClust(char* output) {
 	//
 	
 	// Inner layer
-	//Double_t Length1  = 19.03 ; // cm
 	Double_t Length1  = 21.794 ; // cm
-	//Double_t WidthMax1  = 7.945 ; // cm
 	Double_t WidthMax1  = 8.1912 ; // cm
-	//Double_t WidthMin1  = 2.25 ; // cm
 	Double_t WidthMin1  = 1.971 ; // cmIbrahim@ipno.in2p3.fr
 	//Double_t StripPitch1= 0.0050 ; // = 50 um
-	Double_t StripPitch1= 0.00385 + 0.0012 + 0.0001 + 0.000127; // = 51.5 um
+	Double_t StripPitch1= 0.00385 + 0.0012 + 0.0001 + 0.000127+ 2e-6; // = strip pitch 0.00385 + interstrip = 52.8 um
 	//Double_t InclAng1=14.9;
 	Double_t InclAng1=14.3; // deg
 	Double_t Rmin1=1.75;    // cm
@@ -330,7 +334,7 @@ void RecResultsClust(char* output) {
 	//Double_t WidthMin2  = 1.3 ; // cm
 	Double_t WidthMin2  = 1.1406 ; // cm
 	//Double_t StripPitch2= 0.005 ; // = 50 um
-	Double_t StripPitch2= 0.00385 + 0.0012 + 0.0001 + 0.00007; // = 51.5 um    
+	Double_t StripPitch2= 0.00385 + 0.0012 + 0.0001 + 0.00007; // =52.2 um    
 	Double_t InclAng2=32.155; // deg    
 	Double_t Rmin2=2.22;    // cm
 	Double_t AngRangeMin2=5.3;// deg    
@@ -352,7 +356,7 @@ void RecResultsClust(char* output) {
 	//Double_t WidthMin3  = 1.3 ; // cm
 	Double_t WidthMin3  = 1.1406 ; // cm
 	//Double_t StripPitch3= 0.005 ; // = 50 um
-	Double_t StripPitch3= 0.00385 + 0.0012 + 0.0001 + 0.00007; // = 50.5 um
+	Double_t StripPitch3= 0.00385 + 0.0012 + 0.0001 + 0.00007; // =52.2 um
 	Double_t InclAng3=32.155; // deg    
 	Double_t Rmin3=2.95;    // cm
 	Double_t AngRangeMin3=6.76; // deg   
@@ -853,7 +857,17 @@ void RecResultsClust(char* output) {
 	Int_t nb = 0;
 
 
-	for(Int_t i=0;i<nevents;i++){
+	Int_t CountGoodTrk = 0;
+	Int_t CountTrk = 0;
+	if(mode==1)
+	  {
+	    Int_t CountGoodTrk2 = 0;
+	    Double_t CountTrk2 = 0;
+	  }
+
+       	for(Int_t i=0;i<nevents;i++){
+       	//for(Int_t i=0;i<20;i++){
+
 	    if(i%100 == 0) printf("Event:%i\n",i);
 
 	    //if one input tree:     
@@ -987,12 +1001,18 @@ void RecResultsClust(char* output) {
 		Stripbck[j]=branchStripbck->GetValue(j,0,true);
 		//cout << "Stripbck= " << Stripbck[j] << endl;
 
+
 		ELoss[j]=branchDigitELoss->GetValue(j,0,true); // in GeV      // *1000.;   // *1000 to change from GeV to MeV
 		//cout << "ELoss=" << ELoss[j] << endl;	 
 		
 		DetCopyID[j]=branchDigitDetID->GetValue(j,0,true);
 		//cout << "DetCopyID=" << DetCopyID[j] << endl;
-		
+
+		if(DetCopyID[j]<7)
+		  {
+			   if(Stripfrt[j]>NbStrip1)cout << "StripA_Id=" <<  Stripfrt[j] <<  ">NbStrip1 in event #"<< i << endl;
+			   if(Stripbck[j]>NbStrip1)cout << "StripB_Id= "<<  Stripbck[j] << ">NbStrip1 in event #"<< i << endl;
+		  }
 	      }
 
 
@@ -1122,8 +1142,8 @@ void RecResultsClust(char* output) {
 		                       + Z_intersect*M_INV_Inner[DetCopyID[j]-1][2][2]
 		                       +             M_INV_Inner[DetCopyID[j]-1][2][3];
 
-			    if(Stripfrt[j]>NbStrip1)cout << "StripA_Id>NbStrip1 in event #"<< i << endl;
-			    if(Stripbck[j]>NbStrip1)cout << "StripB_Id>NbStrip1 in event #"<< i << endl;
+			   if(Stripfrt[j]>NbStrip1)cout << "StripA_Id=" <<  Stripfrt[j] <<  ">NbStrip1 in event #"<< i << endl;
+			   if(Stripbck[j]>NbStrip1)cout << "StripB_Id= "<<  Stripbck[j] << ">NbStrip1 in event #"<< i << endl;
 		   
 			   // then calculate polar and Azimuth angle in lab frame, assuming interaction position is (x=0,y=0,z=0):
 			   
@@ -1332,290 +1352,528 @@ void RecResultsClust(char* output) {
 	    TrackMult_Inner40->Fill(TrkMult_Inner40);
 	    TrackMult_Middl40->Fill(TrkMult_Middl40);
 	    TrackMult_Outer40->Fill(TrkMult_Outer40);
-	    
+
+
 	    
 	    ///////////////////////////////////////////////////////////////////////////
 	    //
-	    // Reconstruction for p2p reaction:
+	    // Track Reconstruction for (pp), (pp'), (pd), (pd') ... reaction chsnnels:
 	    //
 
-
-	    //
-	    //if( TrackMult==6 )   // = 3 Si layers and 2 particles going through
-	    if( TrackMult>=4 )   // Minimum requirement to have 2 protons going through at least 2 layers
+	    if(mode==0)
 	      {
 		
-		Int_t x=0;   // index for inner layer  = equivalenet to TrkMult_Inner40
-		Int_t y=0;   // index for intermediate layer = equivalenet to TrkMult_Middl40
-		Int_t z=0;   // index for outer layer = equivalenet to TrkMult_Outer40
-		
-		///////////////////////////////////////
-		/* For basic tracking:
-		Double_t theta1, theta2, phi1, phi2;
-		Double_t Ep1, Ep2;
-		*/
-		/* For general tracking:*/ 
-		Int_t trk=0;
-		theta=new Double_t[TrackMult_Middl40];  // using TrackMult_Middl40 here since we look for tracking between inner and intermediate layer.		
-		phi=new Double_t[TrackMult_Middl40];    // using TrackMult_Middl40 here since we look for tracking between inner and intermediate layer.		
-		Ep=new Double_t[TrackMult_Middl40];     // using TrackMult_Middl40 here since we look for tracking between inner and intermediate layer.		
-		part_a=new Double_t[TrackMult_Inner40];
-		part_b=new Double_t[TrackMult_Middl40];
-		part_c=new Double_t[TrackMult_Outer40];
-		////////////////////////////////////////
-
-		for(Int_t k=0; k<TrackMult; k++){
-		  
-		  if( DetCopyID[k]<7 && (ELoss[k]*1000)>0.04 )                           // inner layer
-		    {
-		      Xa[x]=X_track[k];
-		      Ya[x]=Y_track[k];
-		      Za[x]=Z_track[k];
-		      Phia[x]=GetPhiTrk(Xa[x],Ya[x]); 
-		      Epa[x]=ELoss[k]; 
-		      x++;  // equivalenet to TrckMult_Inner40
-		    }
-		  
-		  if( ( DetCopyID[k]>6 && DetCopyID[k]<19 )  && (ELoss[k]*1000)>0.04 )  // middle layer
-		    {
-		      Xb[y]=X_track[k];
-		      Yb[y]=Y_track[k];
-		      Zb[y]=Z_track[k];
-		      Phib[y]=GetPhiTrk(Xb[y],Yb[y]);
-		      Epb[y]=ELoss[k];
-		      y++;
-		    }
-		  
-		  if( ( DetCopyID[k]>18 && DetCopyID[k]<31 )  && (ELoss[k]*1000)>0.04 )  // outer later
-		    {
-		      Xc[z]=X_track[k];
-		      Yc[z]=Y_track[k];
-		      Zc[z]=Z_track[k];
-		      Phic[z]=GetPhiTrk(Xc[z],Yc[z]);
-		      Epc[z]=ELoss[k];
-		      z++;
-		    }
-		  
-		} // end of k=TrackMult loop 
-		
-
-		if(x!=TrkMult_Inner40) cout << "Attention x and TrckMult_inner40 should be identical !!! : x= "<< x << " TrkMult_inner40= " << TrkMult_Inner40 << endl;
-		if(y!=TrkMult_Middl40) cout << "Attention x and TrckMult_inner40 should be identical !!! : x= "<< x << " TrkMult_inner40= " << TrkMult_Middl40 << endl;
-		if(z!=TrkMult_Outer40) cout << "Attention x and TrckMult_inner40 should be identical !!! : x= "<< x << " TrkMult_inner40= " << TrkMult_Outer40 << endl;
-
-		// Now We are only interested in event with Multiplicity>=4 and the inner and intermediate layer are hit:		
-		//if(x==2 && y==2)  // At least inner and intermediate layer are hit (= better case than inner and outer layers because of straggling in intermediate layer 
-		if(x>=2 && y>=2)  // At least inner and intermediate layer are hit (= better case than inner and outer layers because of straggling in intermediate layer 
+		if( TrackMult>=2 )   // Minimum requirement to have 1 charged particle  going through at least 2 layers
 		  {
-		    
-		    //cout << "TrackMult = " << TrackMult << endl; 
-		    //cout << "Phia[0] = " << Phia[0]*180/pi << endl; 
-		    //cout << "Phib[0] = " << Phib[0]*180/pi << endl; 
-		    //cout << "Phia[1] = " << Phia[1]*180/pi << endl; 
-		    //cout << "Phib[1] = " << Phib[1]*180/pi << endl; 
-		    //cout << "Phia[0]-Phib[0] = " << (Phia[0]-Phib[0])*180/pi << endl; 
-		    //cout << "Phia[0]-Phib[1] = " << (Phia[0]-Phib[1])*180/pi << endl; 
-		    //cout << "fabs = " << fabs((Phia[0]-Phib[0])/( Phia[0]-Phib[1])) << endl; 
 
-		    //////////////////////////////////////////////
-		    /* For basic tracking only:
-		    theta2=0.;
-		    theta1=0.;
-		    phi1=0.;
-		    phi2=0.;
-		    Ep1=0.;
-		    Ep2=0.;
+		    Int_t InLay=0;   // index for inner layer  = equivalenet to TrkMult_Inner40
+		    Int_t InterLay=0;   // index for intermediate layer = equivalenet to TrkMult_Middl40
+		    Int_t OutLay=0;   // index for outer layer = equivalenet to TrkMult_Outer40
 		    
-		    // 
-		    // Basic tracking for 2 tracked particles:
-		    //
-		       
-		    if( fabs((Phia[0]-Phib[0]))<0.1 && fabs((Phia[1]-Phib[1]))<0.1)  // 0.1 radian Window of the azimuthal angle to accept that it is likely to be the same particle
+		    Double_t r=0;  // reconstructed radius of target+beam
+		    Double_t Xtarg=0;  // reconstructed X of target+beam
+		    Double_t Ytarg=0;  // reconstructed Y of target+beam
+		    Int_t trk=0;
+		    theta=new Double_t[TrackMult_Middl40];  // using TrackMult_Middl40 here since we look for tracking between inner and intermediate layer.		
+		    phi=new Double_t[TrackMult_Middl40];    // using TrackMult_Middl40 here since we look for tracking between inner and intermediate layer.		
+		    Ep=new Double_t[TrackMult_Middl40];     // using TrackMult_Middl40 here since we look for tracking between inner and intermediate layer.		
+		    part_a=new Double_t[TrackMult_Inner40];
+		    part_b=new Double_t[TrackMult_Middl40];
+		    part_c=new Double_t[TrackMult_Outer40];
+
+		    for(Int_t k=0; k<TrackMult; k++){
+		      
+		      if( DetCopyID[k]<7 && (ELoss[k]*1000)>0.04 )                           // inner layer
+			{
+			  Xa[InLay]=X_track[k];
+			  Ya[InLay]=Y_track[k];
+			  Za[InLay]=Z_track[k];
+			  Phia[InLay]=GetPhiTrk(Xa[InLay],Ya[InLay]); 
+			  Epa[InLay]=ELoss[k]; 
+			  InLay++;  // equivalenet to TrckMult_Inner40
+			}
+		      
+		      if( ( DetCopyID[k]>6 && DetCopyID[k]<19 )  && (ELoss[k]*1000)>0.04 )  // middle layer
+			{
+			  Xb[InterLay]=X_track[k];
+			  Yb[InterLay]=Y_track[k];
+			  Zb[InterLay]=Z_track[k];
+			  Phib[InterLay]=GetPhiTrk(Xb[InterLay],Yb[InterLay]);
+			  Epb[InterLay]=ELoss[k];
+			  InterLay++;
+			}
+		      
+		      if( ( DetCopyID[k]>18 && DetCopyID[k]<31 )  && (ELoss[k]*1000)>0.04 )  // outer later
+			{
+			  Xc[OutLay]=X_track[k];
+			  Yc[OutLay]=Y_track[k];
+			  Zc[OutLay]=Z_track[k];
+			  Phic[OutLay]=GetPhiTrk(Xc[OutLay],Yc[OutLay]);
+			  Epc[OutLay]=ELoss[k];
+			  OutLay++;
+			}
+		  
+		    } // end of k=TrackMult loop 
+
+		    if(InLay!=TrkMult_Inner40) cout << "Attention x and TrckMult_inner40 should be identical !!! InLay: = "<< InLay << " TrkMult_inner40= " << TrkMult_Inner40 << endl;
+		    if(InterLay!=TrkMult_Middl40) cout << "Attention x and TrckMult_inner40 should be identical !!! InterLa: = "<< InterLay << " TrkMult_Middl40= " << TrkMult_Middl40 << endl;
+		    if(OutLay!=TrkMult_Outer40) cout << "Attention x and TrckMult_inner40 should be identical !!! : OutLay= "<< OutLay << " TrkMult_outer40= " << TrkMult_Outer40 << endl;
+		    
+		    // Now We are only interested in event with Multiplicity>=2 and the inner and intermediate layer are hit:		
+		    if(InLay>=1 && InterLay>=1)  // At least inner and intermediate layer are hit (= better case than inner and outer layers because of straggling in intermediate layer 
 		      {
-			phi1= GetPhiTrk(Xb[0]-Xa[0], Yb[0]-Ya[0]);                   // one calculates the azimuthal angle form the position in inner and intermediate layer
-			theta1= GetThetaTrk(Xb[0]-Xa[0], Yb[0]-Ya[0], Zb[0]-Za[0]);  // one calculates the polar angle form the position in inner and intermediate layer
-			Ep1=Epa[0]+Epb[0]+Epc[0];
+			
+			//cout << "TrackMult = " << TrackMult << endl; 
+			//cout << "Phia[0] = " << Phia[0]*180/pi << endl; 
+			//cout << "Phib[0] = " << Phib[0]*180/pi << endl; 
+			//cout << "Phia[1] = " << Phia[1]*180/pi << endl; 
+			//cout << "Phib[1] = " << Phib[1]*180/pi << endl; 
+			//cout << "Phia[0]-Phib[0] = " << (Phia[0]-Phib[0])*180/pi << endl; 
+			//cout << "Phia[0]-Phib[1] = " << (Phia[0]-Phib[1])*180/pi << endl; 
+			//cout << "fabs = " << fabs((Phia[0]-Phib[0])/( Phia[0]-Phib[1])) << endl; 
+			
+			
+			/* For general tracking  between inner and intermediate layer:*/ 
+			for (Int_t tk=0; tk<TrkMult_Middl40; tk++){theta[tk]=phi[tk]=Ep[tk]=part_b[tk]=0;}		     
+			for (Int_t tk=0; tk<TrkMult_Inner40; tk++){part_a[tk]=0;}
+			for (Int_t tk=0; tk<TrkMult_Outer40; tk++){part_c[tk]=0;}
+			
+			
+			// General tracking
+			//
+			// Case for particle going through at least 2 layers 
+			//
+			
+			//cout << "InLay:" << InLay << " InterLay:" << InterLay << " OutLay:" << OutLay << endl;
+			
+			for (Int_t ia=0;ia<InLay;ia++) // looking at all hits in Inner layer
+			  {
+			    for (Int_t ib=0;ib<InterLay;ib++) // looking at all hits in Intermediate layer
+			      {
 
-			phi2= GetPhiTrk(Xb[1]-Xa[1], Yb[1]-Ya[1]);
-			theta2= GetThetaTrk(Xb[1]-Xa[1], Yb[1]-Ya[1], Zb[1]-Za[1]);
-			Ep2=Epa[1]+Epb[1]+Epc[1];
+				//cout << "fabs((Phia[ia]-Phib[ib]):" << fabs((Phia[ia]-Phib[ib]))  << endl;
+				PhiDiff_ab->Fill(fabs((Phia[ia]-Phib[ib])));
+
+			        CountTrk++; // Count all tracks identified between inner and outer layer
+				
+				// let's first compare phi in inner and intermediate layers. (0.2rad has been determined from PhiDiff_bc)
+				if( fabs((Phia[ia]-Phib[ib]))<0.2 ) // 0.2 rad ~ 11.5deg = considered this as same track
+				  {				
+
+				    // ToDo Check the track goes through the Target+Beam overlap
+				    //r=DistToBeam(Xa[ia],Ya[ia],Za[ia],Xb[ib],Yb[ib],Zb[ib],1.5);
+				    DistToBeam(Xa[ia],Ya[ia],Za[ia],Xb[ib],Yb[ib],Zb[ib],1.5, &r, &Xtarg, &Ytarg);
+				    //cout << "r=" << r << endl;
+				    //cout << "Xtarg=" << Xtarg << " Ytarg=" << Ytarg << endl;
+
+
+				// Now let's check the track comes from the target:
+      				    if(IsFromTarget(Xa[ia],Ya[ia],Za[ia],Xb[ib],Yb[ib],Zb[ib],1.5, 0.001)) // Assuming beam spot radius = 1.5 cm, target thickness 10um
+				      {
+					part_a[trk]=ia; 
+					part_b[trk]=ib;
+					trk++; // this is track #trk
+
+					if(trk==1)CountGoodTrk++; // increment number of good track identified
+					                           
+
+					//cout << "ia:" << ia << " ib:"<< ib << endl;
+					
+					for (Int_t ic=0; ic<OutLay; ic++) // looking at all hits in  Outer layer
+					  {
+					    PhiDiff_bc->Fill(fabs((Phib[ib]-Phic[ic])));
+					    // let's compare phi in intermediate and outer layers. (0.05rad has been determined from PhiDiff_bc)
+					    if( fabs((Phib[ib]-Phic[ic]))<0.05 ) // = considered as same track (here we could maybe put more conditions to be more restrictive)
+					      {
+						part_b[trk]=ib;
+						part_c[trk]=ic;
+						//     cout << "ia:" << ia << " ib:"<< ib << " ic:" << ic << endl;
+					      }
+					    
+					  }
+
+					
+					XTargYTarg->Fill(Xtarg,Ytarg);
+					TargRadius->Fill(r);					
+
+
+				      } // end of IsFromTarget
+				  }  // end of Phi condition
+				
+			      }
+			  }
+			
+						
+			//loop other the tracks when the number of track is higher than 1: 
+			
+			//cout << "trk=" << trk << endl;
+			//cout << " "<< endl;
+			Tracks->Fill(trk);
 
 			
-			//filling histograms
-			Theta1Theta2->Fill(theta1*180/pi,theta2*180/pi);
-			Phi1Phi2->Fill(phi1*180/pi,phi2*180/pi);
-			AngTheta1->Fill(theta1*180/pi);
-			AngTheta2->Fill(theta2*180/pi);
-			Phi1Phi2->Fill(phi1*180/pi,phi2*180/pi);
-			AngPhi1->Fill(phi1*180/pi);
-			AngPhi2->Fill(phi2*180/pi);
-			dEp1->Fill(Ep1*1000.);
-			dEp2->Fill(Ep2*1000.);
+			if(trk)
+			  {
+			    for (Int_t t=0;t<trk;t++) // 
+			      {
+				
+				phi[t]= GetPhiTrk( Xb[ part_b[t] ]- Xa[ part_a[t] ], Yb[ part_b[t] ]-Ya[ part_a[t] ] );   // one calculates the azimuthal angle form the position in inner and intermediate layer
+				theta[t]= GetThetaTrk( Xb[ part_b[t] ]- Xa[ part_a[t] ], Yb[ part_b[t] ]-Ya[ part_a[t]  ], Zb[ part_b[t] ]-Za[ part_a[t] ] );  // one calculates the polar angle form the position in inner and intermediate layer
+				
+				Ep[t]= Epa[ part_a[t] ]+ Epb[ part_b[t] ]+ Epc[part_c[t] ];  // energy loss in the three layer
+				
+			      }
+			    
+			    
+			    
+			    if(trk>1)  // ie there is more than 1 tracks detected 
+			      {
+				for (Int_t t=0;t<trk;t++) // 
+				  {
+				    //cout << "fabs(phi[t]-phi[t+1])=" << fabs(phi[t]-phi[t+1]) << " " << phi[t] << " " <<  phi[t+1] << endl;
+				    if( fabs(phi[t]-phi[t+1])>(pi-1) && fabs(phi[t]-phi[t+1])<(pi+1) )
+				      {
+					//filling histograms
+					Theta1Theta2->Fill(theta[t]*180/pi,theta[t+1]*180/pi);
+					Phi1Phi2->Fill(phi[t]*180/pi,phi[t+1]*180/pi);
+					AngTheta1->Fill(theta[t]*180/pi);
+					AngTheta2->Fill(theta[t+1]*180/pi);
+					Phi1Phi2->Fill(phi[t]*180/pi,phi[t+1]*180/pi);
+					AngPhi1->Fill(phi[t]*180/pi);
+					AngPhi2->Fill(phi[t+1]*180/pi);
+					dEp1->Fill(Ep[t]*1000.);
+					dEp2->Fill(Ep[t+1]*1000.);
+				      }
+				    
+				    
+				  }
+				
+			      }
+			    
+			  }
+			/////////////////// End of general tracking
+			
+		    
 		      }
-			 
 
-		    //cout << "theta1 = " << theta1*180/pi << endl; 
-		    //cout << "phi1 = " << phi1*180/pi << endl; 
-		    //cout << "theta2 = " << theta2*180/pi << endl; 
-		    //cout << "phi2 = " << phi2*180/pi << endl; 
 
+		  }  // end of TrackMult>=2
+	      }// endo fo mode 0
+
+	    
+	    ///////////////////////////////////////////////////////////////////////////
+	    //
+	    // Track Reconstruction for p2p reaction:
+	    //
+
+	    if(mode==1)
+	      {
+		//
+		//if( TrackMult==6 )   // = 3 Si layers and 2 particles going through
+		if( TrackMult>=4 )   // Minimum requirement to have 2 protons going through at least 2 layers
+		  {
+		
+		    Int_t InLay=0;   // index for inner layer  = equivalenet to TrkMult_Inner40
+		    Int_t InterLay=0;   // index for intermediate layer = equivalenet to TrkMult_Middl40
+		    Int_t OutLay=0;   // index for outer layer = equivalenet to TrkMult_Outer40
+		    
+		    Double_t r=0;  // reconstructed radius of target+beam
+		    Double_t Xtarg=0;  // reconstructed X of target+beam
+		    Double_t Ytarg=0;  // reconstructed Y of target+beam
+
+		    ///////////////////////////////////////
+		    /* For basic tracking:
+		       Double_t theta1, theta2, phi1, phi2;
+		       Double_t Ep1, Ep2;
 		    */
+		    /* For general tracking:*/ 
+		    Int_t trk=0;
+		    theta=new Double_t[TrackMult_Middl40];  // using TrackMult_Middl40 here since we look for tracking between inner and intermediate layer.		
+		    phi=new Double_t[TrackMult_Middl40];    // using TrackMult_Middl40 here since we look for tracking between inner and intermediate layer.		
+		    Ep=new Double_t[TrackMult_Middl40];     // using TrackMult_Middl40 here since we look for tracking between inner and intermediate layer.		
+		    part_a=new Double_t[TrackMult_Inner40];
+		    part_b=new Double_t[TrackMult_Middl40];
+		    part_c=new Double_t[TrackMult_Outer40];
+		    ////////////////////////////////////////
 		    
-		    /* For general tracking  between inner and intermediate layer:*/ 
-		    for (Int_t tk=0; tk<TrkMult_Middl40; tk++){theta[tk]=phi[tk]=Ep[tk]=part_b[tk]=0;}		     
-		    for (Int_t tk=0; tk<TrkMult_Inner40; tk++){part_a[tk]=0;}
-		    for (Int_t tk=0; tk<TrkMult_Outer40; tk++){part_c[tk]=0;}
+		    for(Int_t k=0; k<TrackMult; k++){
 		      
-
-		    // General tracking
-		    //
-		    // Case for particle going through 3 layers (Todo: add case when the paricle goes through only 2 layers) 
-		    //
-		    
-		    //cout << "x:" << x << " y:" << y << " z:" << z << endl;
-
-		    for (Int_t ia=0;ia<x;ia++) // looking at all hits in Inner layer
+		      if( DetCopyID[k]<7 && (ELoss[k]*1000)>0.04 )                           // inner layer
 			{
-		         for (Int_t ib=0;ib<y;ib++) // looking at all hits in Intermediate layer
-			   {
-
-			     //cout << "fabs((Phia[ia]-Phib[ib]):" << fabs((Phia[ia]-Phib[ib]))  << endl;
-			     PhiDiff_ab->Fill(fabs((Phia[ia]-Phib[ib])));
-
-				 // let's compare phi in inner and intermediate layers. (0.2rad has been determined from PhiDiff_bc)
-				 if( fabs((Phia[ia]-Phib[ib]))<0.2 ) // = considered as same track (here we could maybe put more conditions to be more restrictive)
-				   {
-				     part_a[trk]=ia; 
-				     part_b[trk]=ib;
-				     trk++; // this is track #trk
-      				     //cout << "ia:" << ia << " ib:"<< ib << endl;
-
-				     for (Int_t ic=0; ic<z; ic++) // looking at all hits in Intermediate  Outer layer
-				       {
-					 PhiDiff_bc->Fill(fabs((Phib[ib]-Phic[ic])));
-				         // let's compare phi in intermediate and outer layers. (0.05rad has been determined from PhiDiff_bc)
-					 if( fabs((Phib[ib]-Phic[ic]))<0.05 ) // = considered as same track (here we could maybe put more conditions to be more restrictive)
-					   {
-					     part_b[trk]=ib;
-					     part_c[trk]=ic;
-					     //     cout << "ia:" << ia << " ib:"<< ib << " ic:" << ic << endl;
-					   }
-
-				       }
-				   }
-			     
-			     
-			   }
+			  Xa[InLay]=X_track[k];
+			  Ya[InLay]=Y_track[k];
+			  Za[InLay]=Z_track[k];
+			  Phia[InLay]=GetPhiTrk(Xa[InLay],Ya[InLay]); 
+			  Epa[InLay]=ELoss[k]; 
+			  InLay++;  // equivalenet to TrckMult_Inner40
 			}
-		    
-
-		    /* below is another method but less efficient in finding 2 tracks:
-		      for (Int_t ia=0;ia<x;ia++) // looking at all hits in Inner layer
+		      
+		      if( ( DetCopyID[k]>6 && DetCopyID[k]<19 )  && (ELoss[k]*1000)>0.04 )  // middle layer
 			{
-		         for (Int_t ib=0;ib<y;ib++) // looking at all hits in Intermediate layer
-			   {
-
-			     
-			     if(z>0) // 
-			       {
-				 for (Int_t ic=0;ic<z;ic++) // looking at all hits in Intermediate  Outer layer
-				   {
-
-				     if( fabs((Phib[ib]-Phic[ic]))<0.05 ) // = considered as same track (here we could maybe put more conditions to be more restrictive)
-				       {
-					 
-					 part_b[trk]=ib;
-					 part_c[trk]=ic;
-
-					 if( fabs((Phia[ia]-Phib[ib]))<0.2 ) // = consider as same track (here we could put more conditions to be more restrictive)
-					   {
-					     //this could be the same particle going through the 2 layers (same track)
-					     part_a[trk]=ia; 
-					     trk++; // look for the next track
-       					     cout << "ia:" << ia << " ib:"<< ib << " ic:" << ic << endl;
-					   }
-				       }
-				   }
-			       }else  // Only the 2 first layers are considered for the tracking
-			       {
-			     
-				 if( fabs((Phia[ia]-Phib[ib]))<0.2 ) // = considered as same track (here we could put more conditions to be more restrictive)
-				   {
-				     //this could be the same particle going through the 2 layers (same track)
-				     part_a[trk]=ia; 
-				     part_b[trk]=ib;
-				     trk++; // look for the next track
-      				     cout << "ia:" << ia << " ib:"<< ib << endl;
-
-				   }
-			     }
-			   }
-			} */
-
-		      //loop other the tracks when the number of track is higher than 1: 
-
-		    //cout << "trk=" << trk << endl;
-		    //cout << " "<< endl;
-		    Tracks->Fill(trk);
-
-			 if(trk)
-			   {
-			     for (Int_t t=0;t<trk;t++) // 
-			       {
-			  
-				 phi[t]= GetPhiTrk( Xb[ part_b[t] ]- Xa[ part_a[t] ], Yb[ part_b[t] ]-Ya[ part_a[t] ] );   // one calculates the azimuthal angle form the position in inner and intermediate layer
-				 theta[t]= GetThetaTrk( Xb[ part_b[t] ]- Xa[ part_a[t] ], Yb[ part_b[t] ]-Ya[ part_a[t]  ], Zb[ part_b[t] ]-Za[ part_a[t] ] );  // one calculates the polar angle form the position in inner and intermediate layer
-
-				 Ep[t]= Epa[ part_a[t] ]+ Epb[ part_b[t] ]+ Epc[part_c[t] ];  // energy loss in the three layer
-				 
-			       }
-
-
-			     if(trk==2)  // ie there is 2 tracks only 
-			       {
-
-				 //filling histograms
-				 Theta1Theta2->Fill(theta[0]*180/pi,theta[1]*180/pi);
-				 Phi1Phi2->Fill(phi[0]*180/pi,phi[1]*180/pi);
-				 AngTheta1->Fill(theta[0]*180/pi);
-				 AngTheta2->Fill(theta[1]*180/pi);
-				 Phi1Phi2->Fill(phi[0]*180/pi,phi[1]*180/pi);
-				 AngPhi1->Fill(phi[0]*180/pi);
-				 AngPhi2->Fill(phi[1]*180/pi);
-				 dEp1->Fill(Ep[0]*1000.);
-				 dEp2->Fill(Ep[1]*1000.);
-				 
-			       }
-
-			     if(trk>2)  // ie there is more than 2 tracks detected 
-			       {
-				 for (Int_t t=0;t<trk;t++) // 
-				   {
-				     //cout << "fabs(phi[t]-phi[t+1])=" << fabs(phi[t]-phi[t+1]) << " " << phi[t] << " " <<  phi[t+1] << endl;
-				     if( fabs(phi[t]-phi[t+1])>(pi-1) && fabs(phi[t]-phi[t+1])<(pi+1) )
-				       {
-					 //filling histograms
-					 Theta1Theta2->Fill(theta[t]*180/pi,theta[t+1]*180/pi);
-					 Phi1Phi2->Fill(phi[t]*180/pi,phi[t+1]*180/pi);
-					 AngTheta1->Fill(theta[t]*180/pi);
-					 AngTheta2->Fill(theta[t+1]*180/pi);
-					 Phi1Phi2->Fill(phi[t]*180/pi,phi[t+1]*180/pi);
-					 AngPhi1->Fill(phi[t]*180/pi);
-					 AngPhi2->Fill(phi[t+1]*180/pi);
-					 dEp1->Fill(Ep[t]*1000.);
-					 dEp2->Fill(Ep[t+1]*1000.);
-				       }
-
-
-				   }
-
-			       }
-
-			   }
-			 /////////////////// End of general tracking
-
+			  Xb[InterLay]=X_track[k];
+			  Yb[InterLay]=Y_track[k];
+			  Zb[InterLay]=Z_track[k];
+			  Phib[InterLay]=GetPhiTrk(Xb[InterLay],Yb[InterLay]);
+			  Epb[InterLay]=ELoss[k];
+			  InterLay++;
+			}
+		      
+		      if( ( DetCopyID[k]>18 && DetCopyID[k]<31 )  && (ELoss[k]*1000)>0.04 )  // outer later
+			{
+			  Xc[OutLay]=X_track[k];
+			  Yc[OutLay]=Y_track[k];
+			  Zc[OutLay]=Z_track[k];
+			  Phic[OutLay]=GetPhiTrk(Xc[OutLay],Yc[OutLay]);
+			  Epc[OutLay]=ELoss[k];
+			  OutLay++;
+			}
+		      
+		    } // end of k=TrackMult loop 
 		    
-		  }
+		    
+		    if(InLay!=TrkMult_Inner40) cout << "Attention x and TrckMult_inner40 should be identical !!! InLay: = "<< InLay << " TrkMult_inner40= " << TrkMult_Inner40 << endl;
+		    if(InterLay!=TrkMult_Middl40) cout << "Attention x and TrckMult_inner40 should be identical !!! InterLa: = "<< InterLay << " TrkMult_Middl40= " << TrkMult_Middl40 << endl;
+		    if(OutLay!=TrkMult_Outer40) cout << "Attention x and TrckMult_inner40 should be identical !!! : OutLay= "<< OutLay << " TrkMult_outer40= " << TrkMult_Outer40 << endl;
+		    
+		    // Now We are only interested in event with Multiplicity>=4 and the inner and intermediate layer are hit:		
+		    //if(InterLay==2 && InterLay==2)  // At least inner and intermediate layer are hit (= better case than inner and outer layers because of straggling in intermediate layer 
+		    if(InLay>=2 && InterLay>=2)  // At least inner and intermediate layer are hit (= better case than inner and outer layers because of straggling in intermediate layer 
+		      {
+			
+			//cout << "TrackMult = " << TrackMult << endl; 
+			//cout << "Phia[0] = " << Phia[0]*180/pi << endl; 
+			//cout << "Phib[0] = " << Phib[0]*180/pi << endl; 
+			//cout << "Phia[1] = " << Phia[1]*180/pi << endl; 
+			//cout << "Phib[1] = " << Phib[1]*180/pi << endl; 
+			//cout << "Phia[0]-Phib[0] = " << (Phia[0]-Phib[0])*180/pi << endl; 
+			//cout << "Phia[0]-Phib[1] = " << (Phia[0]-Phib[1])*180/pi << endl; 
+			//cout << "fabs = " << fabs((Phia[0]-Phib[0])/( Phia[0]-Phib[1])) << endl; 
+			
+			//////////////////////////////////////////////
+			/* For basic tracking only:
+			   theta2=0.;
+			   theta1=0.;
+			   phi1=0.;
+			   phi2=0.;
+			   Ep1=0.;
+			   Ep2=0.;
+			   
+			   // 
+			   // Basic tracking for 2 tracked particles:
+			   //
+			   
+			   if( fabs((Phia[0]-Phib[0]))<0.1 && fabs((Phia[1]-Phib[1]))<0.1)  // 0.1 radian Window of the azimuthal angle to accept that it is likely to be the same particle
+			   {
+			   phi1= GetPhiTrk(Xb[0]-Xa[0], Yb[0]-Ya[0]);                   // one calculates the azimuthal angle form the position in inner and intermediate layer
+			   theta1= GetThetaTrk(Xb[0]-Xa[0], Yb[0]-Ya[0], Zb[0]-Za[0]);  // one calculates the polar angle form the position in inner and intermediate layer
+			   Ep1=Epa[0]+Epb[0]+Epc[0];
+			   
+			   phi2= GetPhiTrk(Xb[1]-Xa[1], Yb[1]-Ya[1]);
+			   theta2= GetThetaTrk(Xb[1]-Xa[1], Yb[1]-Ya[1], Zb[1]-Za[1]);
+			   Ep2=Epa[1]+Epb[1]+Epc[1];
+			   
+			   
+			   //filling histograms
+			   Theta1Theta2->Fill(theta1*180/pi,theta2*180/pi);
+			   Phi1Phi2->Fill(phi1*180/pi,phi2*180/pi);
+			   AngTheta1->Fill(theta1*180/pi);
+			   AngTheta2->Fill(theta2*180/pi);
+			   Phi1Phi2->Fill(phi1*180/pi,phi2*180/pi);
+			   AngPhi1->Fill(phi1*180/pi);
+			   AngPhi2->Fill(phi2*180/pi);
+			   dEp1->Fill(Ep1*1000.);
+			   dEp2->Fill(Ep2*1000.);
+			   }
+			   
+			   
+			   //cout << "theta1 = " << theta1*180/pi << endl; 
+			   //cout << "phi1 = " << phi1*180/pi << endl; 
+			   //cout << "theta2 = " << theta2*180/pi << endl; 
+			   //cout << "phi2 = " << phi2*180/pi << endl; 
+			   
+			   */
+			
+			/* For general tracking  between inner and intermediate layer:*/ 
+			for (Int_t tk=0; tk<TrkMult_Middl40; tk++){theta[tk]=phi[tk]=Ep[tk]=part_b[tk]=0;}		     
+			for (Int_t tk=0; tk<TrkMult_Inner40; tk++){part_a[tk]=0;}
+			for (Int_t tk=0; tk<TrkMult_Outer40; tk++){part_c[tk]=0;}
+			
+			
+			// General tracking
+			//
+			// Case for particle going through 3 layers (Todo: add case when the paricle goes through only 2 layers) 
+			//
+			
+			//cout << "InLay:" << InLay << " InterLay:" << InterLay << " OutLay:" << OutLay << endl;
+			
+			for (Int_t ia=0;ia<InLay;ia++) // looking at all hits in Inner layer
+			  {
+			    for (Int_t ib=0;ib<InterLay;ib++) // looking at all hits in Intermediate layer
+			      {
+
+				PhiDiff_ab->Fill(fabs((Phia[ia]-Phib[ib])));
+				
+			        CountTrk++; // Count all tracks identified between inner and outer layer
+			        CountTrk2=CountTrk2+0.5; // Count all tracks identified between inner and outer layer (there should be at least 2 tracks
+				
+				// let's first compare phi in inner and intermediate layers. (0.2rad has been determined from PhiDiff_bc)				// ToDo Check the track goes thorug the Target+Beam overlap
+				if( fabs((Phia[ia]-Phib[ib]))<0.2 ) // = considered as same track (here we could maybe put more conditions to be more restrictive)
+				  {
+				    part_a[trk]=ia; 
+				    part_b[trk]=ib;
+				    trk++; // this is track #trk
+				    //cout << "ia:" << ia << " ib:"<< ib << endl;
+
+
+				    // Reconstruct the target image (radius, X, Y)
+				    DistToBeam(Xa[ia],Ya[ia],Za[ia],Xb[ib],Yb[ib],Zb[ib],1.5, &r, &Xtarg, &Ytarg);
+				    //cout << "r=" << r << endl;
+				    //cout << "Xtarg=" << Xtarg << " Ytarg=" << Ytarg << endl;
+
+				    // Now let's check the track really comes from the target:
+      				    if(IsFromTarget(Xa[ia],Ya[ia],Za[ia],Xb[ib],Yb[ib],Zb[ib],1.5, 0.001)) // Assuming beam spot radius = 1.5 cm, target thickness 10um
+				      {
+					part_a[trk]=ia; 
+					part_b[trk]=ib;
+					trk++; // this is track #trk
+
+					if(trk==1)CountGoodTrk++; // increment number of good track identified
+					if(trk==2)CountGoodTrk2++; // increment number of good 2 tracks identified
+					                           
+
+					//cout << "ia:" << ia << " ib:"<< ib << endl;
+					
+					for (Int_t ic=0; ic<OutLay; ic++) // looking at all hits in  Outer layer
+					  {
+					    PhiDiff_bc->Fill(fabs((Phib[ib]-Phic[ic])));
+					    // let's compare phi in intermediate and outer layers. (0.05rad has been determined from PhiDiff_bc)
+					    if( fabs((Phib[ib]-Phic[ic]))<0.05 ) // = considered as same track (here we could maybe put more conditions to be more restrictive)
+					      {
+						part_b[trk]=ib;
+						part_c[trk]=ic;
+						//     cout << "ia:" << ia << " ib:"<< ib << " ic:" << ic << endl;
+					      }
+					    
+					  }
+
+					
+					XTargYTarg->Fill(Xtarg,Ytarg);
+					TargRadius->Fill(r);					
+
+				      } // end of IsFromTarget
+			    
+				  } // end of Phi condition
+
+			      }
+			  }
+			
+			
+			/* below is another method but less efficient in finding 2 tracks:
+			   for (Int_t ia=0;ia<InLay;ia++) // looking at all hits in Inner layer
+			   {
+			   for (Int_t ib=0;ib<InterLay;ib++) // looking at all hits in Intermediate layer
+			   {
+			   
+			   
+			   if(OutLay>0) // 
+			   {
+			   for (Int_t ic=0;ic<OutLay;ic++) // looking at all hits in Intermediate  Outer layer
+			   {
+			   
+			   if( fabs((Phib[ib]-Phic[ic]))<0.05 ) // = considered as same track (here we could maybe put more conditions to be more restrictive)
+			   {
+			   
+			   part_b[trk]=ib;
+			   part_c[trk]=ic;
+			   
+			   if( fabs((Phia[ia]-Phib[ib]))<0.2 ) // = consider as same track (here we could put more conditions to be more restrictive)
+			   {
+			   //this could be the same particle going through the 2 layers (same track)
+			   part_a[trk]=ia; 
+			   trk++; // look for the next track
+			   cout << "ia:" << ia << " ib:"<< ib << " ic:" << ic << endl;
+			   }
+			   }
+			   }
+			   }else  // Only the 2 first layers are considered for the tracking
+			   {
+			   
+			   if( fabs((Phia[ia]-Phib[ib]))<0.2 ) // = considered as same track (here we could put more conditions to be more restrictive)
+			   {
+			   //this could be the same particle going through the 2 layers (same track)
+			   part_a[trk]=ia; 
+			   part_b[trk]=ib;
+			   trk++; // look for the next track
+			   cout << "ia:" << ia << " ib:"<< ib << endl;
+			   
+			   }
+			   }
+			   }
+			   } */
+			
+			//loop other the tracks when the number of track is higher than 1: 
+			
+			//cout << "trk=" << trk << endl;
+			//cout << " "<< endl;
+			Tracks->Fill(trk);
+			
+			if(trk)
+			  {
+			    for (Int_t t=0;t<trk;t++) // 
+			      {
+				
+				phi[t]= GetPhiTrk( Xb[ part_b[t] ]- Xa[ part_a[t] ], Yb[ part_b[t] ]-Ya[ part_a[t] ] );   // one calculates the azimuthal angle form the position in inner and intermediate layer
+				theta[t]= GetThetaTrk( Xb[ part_b[t] ]- Xa[ part_a[t] ], Yb[ part_b[t] ]-Ya[ part_a[t]  ], Zb[ part_b[t] ]-Za[ part_a[t] ] );  // one calculates the polar angle form the position in inner and intermediate layer
+				
+				Ep[t]= Epa[ part_a[t] ]+ Epb[ part_b[t] ]+ Epc[part_c[t] ];  // energy loss in the three layer
+				
+			      }
+			    
+			    
+			    if(trk==2)  // ie there is 2 tracks only 
+			      {
+				
+				//filling histograms
+				Theta1Theta2->Fill(theta[0]*180/pi,theta[1]*180/pi);
+				Phi1Phi2->Fill(phi[0]*180/pi,phi[1]*180/pi);
+				AngTheta1->Fill(theta[0]*180/pi);
+				AngTheta2->Fill(theta[1]*180/pi);
+				Phi1Phi2->Fill(phi[0]*180/pi,phi[1]*180/pi);
+				AngPhi1->Fill(phi[0]*180/pi);
+				AngPhi2->Fill(phi[1]*180/pi);
+				dEp1->Fill(Ep[0]*1000.);
+				dEp2->Fill(Ep[1]*1000.);
+				
+			      }
+			    
+			    if(trk>2)  // ie there is more than 2 tracks detected 
+			      {
+				for (Int_t t=0;t<trk;t++) // 
+				  {
+				    //cout << "fabs(phi[t]-phi[t+1])=" << fabs(phi[t]-phi[t+1]) << " " << phi[t] << " " <<  phi[t+1] << endl;
+				    if( fabs(phi[t]-phi[t+1])>(pi-1) && fabs(phi[t]-phi[t+1])<(pi+1) )
+				      {
+					//filling histograms
+					Theta1Theta2->Fill(theta[t]*180/pi,theta[t+1]*180/pi);
+					Phi1Phi2->Fill(phi[t]*180/pi,phi[t+1]*180/pi);
+					AngTheta1->Fill(theta[t]*180/pi);
+					AngTheta2->Fill(theta[t+1]*180/pi);
+					Phi1Phi2->Fill(phi[t]*180/pi,phi[t+1]*180/pi);
+					AngPhi1->Fill(phi[t]*180/pi);
+					AngPhi2->Fill(phi[t+1]*180/pi);
+					dEp1->Fill(Ep[t]*1000.);
+					dEp2->Fill(Ep[t+1]*1000.);
+				      }
+				    
+				    
+				  }
+				
+			      }
+			    
+			  }
+			/////////////////// End of general tracking
+			
+		    
+		      }
 
 		
 
@@ -1624,8 +1882,10 @@ void RecResultsClust(char* output) {
 		// Inv_Mass= GetERec(Ep1, Ep2, theta1, phi1, theta2, phi2, Ebeam);
 		// InvMass=->Fill(Inv_Mass);
 
-	      }   // end of Multiplicity >= 4
-	    
+		  }   // end of Multiplicity >= 4 and end of p2p reconstruction.
+
+
+	      }// end of p2p track analysis
 
 
 	delete[]  Mother_part;
@@ -1691,6 +1951,21 @@ void RecResultsClust(char* output) {
  
   } // end of event loop
 
+
+	if(mode==0)
+	  {
+	    cout << "Tracking Efficiency (tracks identified as coming from target / total number of tracks) : " << CountGoodTrk*100./CountTrk  << "%" << endl;
+	    cout << "Tracking Global Efficiency (tracks identified as coming from target / total number of events): " << CountGoodTrk*100./nevents << "%" << endl;
+	  }else if(mode==1)
+	  {
+	    cout << "Tracking Efficiency (tracks identified as coming from target / total number of tracks) : " << CountGoodTrk*100./CountTrk  << "%" << endl;
+	    cout << " Pair of Tracks identified as coming from the target : " << CountGoodTrk2 << " Events with at least 2 tracks " << CountTrk2  << endl;
+	    cout << "Tracking Efficiency for 2 tracks (nb of pair of tracks identified as coming from target / total number of pair of track) : " << CountGoodTrk2*100./int(CountTrk2)  << "%" << endl;
+	    cout << "Tracking Global Efficiency (pair of tracks identified as coming from target / total number of events): " << CountGoodTrk2*100./nevents << "%" << endl;
+
+	  }
+
+
   // save histogram in output file
 
   Xtrack->Write();
@@ -1735,6 +2010,9 @@ void RecResultsClust(char* output) {
   ThetaELoss->Write();
 
   ThetaELoss1Cryst->Write();
+
+  TargRadius->Write();
+  XTargYTarg->Write();
 
   Tracks->Write();
   PhiDiff_ab->Write();
@@ -1992,65 +2270,135 @@ Float_t GetThetaCM(Float_t th3l){
 
 }
 
-Float_t GetXVertex(Float_t X1, Float_t X2, Float_t X3, Float_t X4, Float_t Y1, Float_t Y2, Float_t Y3, Float_t Y4){
-
-  Float_t X = 0.;
-  Float_t A1 = Y2 - Y1;
-  Float_t A2 = Y4 - Y3;
-  Float_t B1 = X1 - X2;
-  Float_t B2 = X3 - X4;
-  Float_t C1 = A1*X1 + B1*Y1;
-  Float_t C2 = A2*X3 + B2*Y3;
-
-  Float_t det = A1*B2 - A2*B1;
-	
-  if(det != 0) X = (B2*C1 - B1*C2)/det;
-
-  return X;
-
-}
 
 
-Float_t GetYVertex(Float_t X1, Float_t X2, Float_t X3, Float_t X4, Float_t Y1, Float_t Y2, Float_t Y3, Float_t Y4){
+void DistToBeam( Float_t Xa,  Float_t Ya, Float_t Za ,  Float_t Xb,  Float_t Yb, Float_t Zb, Float_t Beam_spot, Double_t* radius, Double_t* Xtarget, Double_t* Ytarget) 
+{
+  Double_t a,b,c;
+  Double_t Xtrk0,Ytrk0;
+  Double_t t0;
+  //Double_t r;
 
-  Float_t Y = 0.;
-  Float_t A1 = Y2 - Y1;
-  Float_t A2 = Y4 - Y3;
-  Float_t B1 = X1 - X2;
-  Float_t B2 = X3 - X4;
-  Float_t C1 = A1*X1 + B1*Y1;
-  Float_t C2 = A2*X3 + B2*Y3;
+  //Colinear vector
+  a=(Xb-Xa);
+  b=(Yb-Ya);
+  c=(Zb-Za);
 
-  Float_t det = A1*B2 - A2*B1;
-	
-  if(det != 0) Y = (A1*C2 - A2*C1)/det;
+  // For thin solid target, one calculates the distance r between z axis and the intersection point between the track and the plan (x,y) at Ztrk=0 (target position)
+  // according to the straight line parametric equation:
+  //  Xtrk= at+Xa
+  //  Ytrk= bt+Ya
+  //  Ztrk= ct+Za =0 -> t0=Za/c
+  //
+  // and compare it the the beam spot: 
 
-  return Y;
+  t0=-Za/c;
+  Xtrk0=a*t0+Xa;
+  Ytrk0=b*t0+Ya;
+  
+  //r=sqrt(pow(Xtrk0,2)+pow(Ytrk0,2));
+  *radius=sqrt(pow(Xtrk0,2)+pow(Ytrk0,2));
+  *Xtarget= Xtrk0;
+  *Ytarget= Ytrk0;
 
-}
+  //cout << "r=" << r << endl;
+  //cout << "radius=" << *radius << endl;
+  //cout << "Xtarget=" << *Xtarget << " Ytarget=" << *Ytarget << endl;
 
-
-Float_t GetZVertex(Float_t X1, Float_t X2, Float_t X3, Float_t X4, Float_t Z1, Float_t Z2, Float_t Z3, Float_t Z4){
-
-  Float_t Z = 0.;
-  Float_t A1 = Z2 - Z1;
-  Float_t A2 = Z4 - Z3;
-  Float_t B1 = X1 - X2;
-  Float_t B2 = X3 - X4;
-  Float_t C1 = A1*X1 + B1*Z1;
-  Float_t C2 = A2*X3 + B2*Z3;
-
-  Float_t det = A1*B2 - A2*B1;
-	
-  if(det != 0) Z = (A1*C2 - A2*C1)/det;
-
-  return Z;  
+   return 0;
+ 
 
 }
-
-
-
-
 
  
+Bool_t IsFromTarget( Float_t Xa,  Float_t Ya, Float_t Za ,  Float_t Xb,  Float_t Yb, Float_t Zb, Float_t Beam_spot_radius, Float_t target_thick) 
+{
+  Double_t a,b,c;
+  Double_t Xtrk0,Ytrk0;
+  Double_t Xtrkmin,Ytrkmin;
+  Double_t Xtrkmax,Ytrkmax;
+  Double_t t0,tmin,tmax, r;
+
+  //Colinear vector
+  a=(Xb-Xa);
+  b=(Yb-Ya);
+  c=(Zb-Za);
+
+  // For thin solid target, one calculates the distance r between z axis and the intersection point between the track and the plan (x,y) at Ztrk=0 (target position)
+  // according to the straight line parametric equation:
+  //  Xtrk= at+Xa
+  //  Ytrk= bt+Ya
+  //  Ztrk= ct+Za =0 -> t=Za/c
+  //
+  // and compare it the the beam spot: 
+
+  // First let's consider Ztrk=0
+  t0=-Za/c; // At Ztrk=0
+  Xtrk0=a*t0+Xa;
+  Ytrk0=b*t0+Ya;
+
+  // Now let's take into accoun the target thickness
+  if(c>0)
+    {
+      tmin=(-target_thick/2 -Za)/c;
+      tmax=(target_thick/2 -Za)/c;
+    }else
+    {
+      tmax=(-target_thick/2 -Za)/c;
+      tmin=(target_thick/2 -Za)/c;
+    }
+
+  if(a>0)
+    {
+      Xtrkmin=a*tmin+Xa;
+      Xtrkmax=a*tmax+Xa;
+    }else
+    {
+      Xtrkmin=a*tmax+Xa;
+      Xtrkmax=a*tmin+Xa;
+      
+    }
+
+  if(b>0)
+    {
+      Ytrkmin=b*tmin+Ya;
+      Ytrkmax=b*tmax+Ya;
+    }else
+    {
+      Ytrkmax=b*tmin+Ya;
+      Ytrkmin=b*tmax+Ya;
+    }
+  
+    r=sqrt(pow(Xtrk0,2)+pow(Ytrk0,2));
+
+
+
+    //if(  r<=Beam_spot ||
+    //	 (Xtrk0>=Xtrkmin && Xtrk0<=Xtrkmax)  ||
+    //	 (Ytrk0>=Ytrkmin && Ytrk0<=Ytrkmax) ) 
+     
+    //if(  r<=Beam_spot_radius || 
+    //	 ( (Xtrkmin>=-Beam_spot_radius && Xtrkmin<Beam_spot_radius) && (Xtrkmax>-Beam_spot_radius && Xtrkmax<=Beam_spot_radius) ) ||
+    //   ( (Ytrkmin>=-Beam_spot_radius && Ytrkmin<Beam_spot_radius) && (Ytrkmax>-Beam_spot_radius && Ytrkmax<=Beam_spot_radius) ) )
+
+    if(  r<=Beam_spot_radius || 
+	 ( Xtrk0>=-Beam_spot_radius && Xtrk0<=Beam_spot_radius) ||        // At least one of the coordinates (X or Y) at Z=0 
+         ( Ytrk0>=-Beam_spot_radius && Ytrk0<=Beam_spot_radius)    )      // valids the beam_spot_radius condition to take into account the fact that pixels of the detector are not point-like.
+    {
+      /*
+      cout << "t0=" << t0 << " tmin=" << tmin  << " tmax=" << tmax  << endl;
+      cout << "Xtrk0=" << Xtrk0 << " Xtrkmin=" << Xtrkmin  << " Xtrkmax=" << Xtrkmax  << endl;
+      cout << "Trrk0=" << Ytrk0 << " Ytrkmin=" << Ytrkmin  << " Ytrkmax=" << Ytrkmax  << endl;
+      cout << "Xa=" << Xa << " Xb=" << Xb <<  " a=" << a << endl;
+      cout << "Ya=" << Ya << " Yb=" << Yb <<  " b=" << b << endl;
+      cout << "Za=" << Za << " Zb=" << Zb <<  " c=" << c << endl;
+      */
+      return kTRUE;
+
+    }else
+    {
+      return kFALSE;
+    }
+    
+}
 			
