@@ -83,7 +83,8 @@ void R3BSTaRTraDigit::Exec(Option_t* opt) {
 	Double_t WidthMax1  = 8.1912 ; // cm
 	//Double_t WidthMin1  = 2.25 ; // cm
 	Double_t WidthMin1  = 1.971 ; // cm
-	Double_t StripPitch1= 0.00515 ; // = 51.5 um
+	//Double_t StripPitch1= 0.00515 ; // = 51.5 um
+	Double_t StripPitch1= 0.00385 + 0.0012 + 0.0001 + 0.000127+ 2e-6 ; // 
 	//Double_t InclAng1=14.9;
 	Double_t InclAng1=14.3;
 	Double_t Rmin1=1.75;    // cm
@@ -115,7 +116,8 @@ void R3BSTaRTraDigit::Exec(Option_t* opt) {
 	Double_t WidthMax2  = 10.80295 ; // cm
 	//Double_t WidthMin2  = 1.3 ; // cm
 	Double_t WidthMin2  = 1.1406 ; // cm
-	Double_t StripPitch2= 0.00515 ; // = 51.5 um
+	//Double_t StripPitch2= 0.00515 ; // = 51.5 um
+	Double_t StripPitch2= 0.00385 + 0.0012 + 0.0001 + 0.00007; // 
 	Double_t InclAng2=32.155; // deg    
 	Double_t Rmin2=2.22;    // cm
 	Double_t AngRangeMin2=5.3;// deg    

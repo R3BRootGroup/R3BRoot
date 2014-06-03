@@ -11,4 +11,8 @@
 #pragma link C++ class R3BSTaRTraDigit+;
 #pragma link C++ class R3BSTaRTraContFact+;
 
+//#pragma link C++ class R3BStarTrackUnpack+;
+//#pragma link C++ class R3BStarTrackRawAna+;
+//#pragma link C++ class R3BStarTrackRawHit+;
+
 #endif

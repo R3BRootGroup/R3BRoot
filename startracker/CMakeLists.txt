@@ -10,6 +10,7 @@ ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/mcstack 
 ${R3BROOT_SOURCE_DIR}/startracker
+#${R3BROOT_SOURCE_DIR}/startracker/unpack
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/calData
 ${R3BROOT_SOURCE_DIR}/r3bdata/caloData
@@ -37,7 +38,10 @@ R3BGeoSTaRTra.cxx
 R3BGeoSTaRTraPar.cxx   
 R3BSTaRTraContFact.cxx  
 R3BSTaRTraHitFinder.cxx 
-R3BSTaRTraDigit.cxx 
+R3BSTaRTraDigit.cxx
+#unpack/R3BStarTrackRawHit.cxx
+#unpack/R3BStarTrackUnpack.cxx
+#unpack/R3BStarTrackRawAna.cxx
 )
 
 # fill list of header files from list of source files
