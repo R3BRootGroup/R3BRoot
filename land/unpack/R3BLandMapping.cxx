@@ -99,7 +99,7 @@ Bool_t R3BLandMapping::DoMapping()
                        &i_tac_addr,
                        &i_tac_ch,
                        stmp);
-
+                
                 LOG(INFO) << " PLANE = " << i_plane << ";  BAR = " << i_bar << "; SIDE = " << i_side << ";"
                           << " SAM = " << i_sam << ";  GTB = " << i_gtb << ";  TAC ADDR = " << i_tac_addr << "; TAC CH = " << i_tac_ch << "; " << stmp
                           << FairLogger::endl;
@@ -116,7 +116,7 @@ Bool_t R3BLandMapping::DoMapping()
                 v5map.insert(v5map.begin() + nMappedElements, (i_plane - 1) * fNofBarsPerPlane + i_bar);
                 v6map.insert(v6map.begin() + nMappedElements, i_side);
                 nMappedElements++;
-
+                
                 // Read 17-th channel
                 if ('S' == stmp[0])
                 {
@@ -135,16 +135,16 @@ Bool_t R3BLandMapping::DoMapping()
                            &i_gtb,
                            &i_tac_addr,
                            &i_tac_ch);
-
+                    
                     LOG(INFO) << " PLANE = " << i_plane << ";  BAR = " << i_bar << "; SIDE = " << i_side << ";"
-                              << " SAM = " << i_sam << ";  GTB = " << i_gtb << ";  TAC ADDR = " << i_tac_addr << "; TAC CH = " << i_tac_ch << "; " << stmp
-                              << FairLogger::endl;
-
+                    << " SAM = " << i_sam << ";  GTB = " << i_gtb << ";  TAC ADDR = " << i_tac_addr << "; TAC CH = " << i_tac_ch << "; " << stmp
+                    << FairLogger::endl;
+                    
                     if (16 == i_plane)
                     {
                         continue;
                     }
-
+                    
                     v1map.insert(v1map.begin() + nMappedElements, i_tac_addr);
                     v2map.insert(v2map.begin() + nMappedElements, i_tac_ch - 1);
                     v3map.insert(v3map.begin() + nMappedElements, i_sam);
@@ -195,7 +195,7 @@ void R3BLandMapping::Exec(Option_t* option)
         {
             if (v1map[j] == tacaddr && v2map[j] == tach && v3map[j] == sam && v4map[j] == gtb)
             {
-                LOG(DEBUG) << " [I] < > TACADDR = " << v1map[j] << " < > TACCH = " << v2map[j] << " Bar Id =" << v5map[j] << FairLogger::endl;
+                LOG(DEBUG) << " [I] < > TACADDR = " << v1map[j] << " < > TACCH = " << v2map[j] << " Bar Id =" << v5map[j] << " Side = " << v6map[j] << FairLogger::endl;
                 if (16 == tach)
                 { // 17-th channel
                     is17 = kTRUE;
@@ -204,14 +204,14 @@ void R3BLandMapping::Exec(Option_t* option)
                 { // physics channel
                     is17 = kFALSE;
                 }
-                new ((*fLandHit)[nEntry]) R3BLandRawHitMapped(is17, cal, tacaddr, v5map[j], v6map[j], clock, tacData, qdcData);
+                new ((*fLandHit)[nEntry]) R3BLandRawHitMapped(sam, gtb, tacaddr, cal, clock, tacData, qdcData, v5map[j], v6map[j], is17);
                 nEntry++;
             }
         }
     }
-    if (nEntry > 0)
+    if (nEntry > 0 && 0 == (fnEvents%1000))
     {
-        LOG(DEBUG) << "Event: " << fnEvents << ",  multiplicity: " << nEntry << FairLogger::endl;
+        LOG(INFO) << "Event: " << fnEvents << ",  multiplicity: " << nEntry << FairLogger::endl;
     }
     fnEvents += 1;
 }

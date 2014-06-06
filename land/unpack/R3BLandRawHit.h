@@ -65,7 +65,7 @@ class R3BLandRawHit : public TObject
         return fQdcData;
     }
 
-  private:
+  protected:
     UShort_t fSam;
     UShort_t fGtb;
     UShort_t fTacAddr; //... TAC module address
