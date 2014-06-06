@@ -4,3 +4,5 @@
 add_subdirectory (commondb)
 add_subdirectory (caldb)
 add_subdirectory (landdb)
+add_subdirectory (losdb)
+
