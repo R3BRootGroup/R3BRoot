@@ -101,6 +101,11 @@ InitStatus R3BLandTcalFill::Init()
 void R3BLandTcalFill::Exec(Option_t* option)
 {
     Int_t nHits = fHits->GetEntries();
+    if(nHits > (fNofPMTs/2))
+    {
+        return;
+    }
+    
     R3BLandRawHitMapped* hit;
     Int_t iBar;
     Int_t iSide;
@@ -111,6 +116,11 @@ void R3BLandTcalFill::Exec(Option_t* option)
     {
         hit = (R3BLandRawHitMapped*)fHits->At(i);
         if (!hit)
+        {
+            continue;
+        }
+        
+        if(hit->GetCal() != 1 && hit->GetCal() != 2)
         {
             continue;
         }
@@ -126,7 +136,7 @@ void R3BLandTcalFill::Exec(Option_t* option)
         if (hit->Is17())
         {
             // 17-th channel
-            channel = fNofPMTs + hit->GetTacAddr();
+            channel = fNofPMTs + hit->GetGtb()*20 + hit->GetTacAddr();
         }
         else
         {
@@ -139,7 +149,6 @@ void R3BLandTcalFill::Exec(Option_t* option)
         if (channel < 0 || channel >= (fNofPMTs + fNof17))
         {
             FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Illegal detector ID...");
-            exit(-1);
         }
 
         // Fill TAC histogram
@@ -201,15 +210,15 @@ void R3BLandTcalFill::CalculateParams(Int_t iModule)
     // Define range of channels
     for (Int_t i = 0; i < 4096; i++)
     {
-        if (fhData[iModule]->GetBinContent(i + 1) > 0)
+        if (fhData[iModule]->GetBinContent(i + 1) > 1 && i > 1000)
         {
             iMin = i;
             break;
         }
     }
-    for (Int_t j = 4095; j >= 0; j--)
+    for (Int_t j = 4096; j >= 0; j--)
     {
-        if (fhData[iModule]->GetBinContent(j + 1) > 0)
+        if (fhData[iModule]->GetBinContent(j + 1) > 1)
         {
             iMax = j + 1;
             break;
@@ -273,7 +282,7 @@ Int_t R3BLandTcalFill::CalculateBin(Int_t iModule, Double_t& prev_time, Int_t ib
         Double_t itot = fhData[iModule]->Integral(1, (ibin+1) + ngroup);
         if (itot > 0. && total > 0.)
         {
-            Double_t time = 25. * itot / total; // time of channel in [ns]
+            Double_t time = 24.99819 * itot / total; // time of channel in [ns]
             LOG(DEBUG) << "R3BLandTcalFill::CalculateBin() : bin=" << ibin << "  time=" << time << "  ngroup=" << ngroup << FairLogger::endl;
             prev_time = time;
         }
@@ -283,7 +292,7 @@ Int_t R3BLandTcalFill::CalculateBin(Int_t iModule, Double_t& prev_time, Int_t ib
     Double_t itot = fhData[iModule]->Integral(1, (ibin+1) + ngroup);
     if (itot > 0. && total > 0.)
     {
-        Double_t time = 25. * itot / total; // time of channel in [ns]
+        Double_t time = 24.99819 * itot / total; // time of channel in [ns]
         Double_t diff = time - prev_time;   // time difference to previous range
         if (diff * 1e3 < 70.)               // check if below resolution
         {
