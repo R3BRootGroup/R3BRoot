@@ -98,7 +98,7 @@ Bool_t R3BLosUnpack::DoUnpack(Int_t* data, Int_t size)
             UInt_t raw_ch = (p1[l_i] & 0x7e000000) >> 25;  // raw channel 0...63
             UInt_t t_leading = (p1[l_i] & 0x7ff);          // tdc time
             UInt_t c_leading = (p1[l_i] & 0xfff800) >> 11; // clock
-//            LOG(INFO) << "######### ch:" << raw_ch << ", tdc:" << t_leading << ", clock:" << c_leading << FairLogger::endl;
+            LOG(DEBUG) << "######### ch:" << raw_ch << ", tdc:" << t_leading << ", clock:" << c_leading << FairLogger::endl;
             new ((*fRawData)[fNHits]) R3BLosRawHit(raw_ch, t_leading, c_leading);
             fNHits += 1;
             if(0 == nr_cha)
@@ -110,7 +110,7 @@ Bool_t R3BLosUnpack::DoUnpack(Int_t* data, Int_t size)
         }
     }
 
-    LOG(INFO) << "R3BLosUnpack : Number of hits in LOS: " << fNHits << FairLogger::endl;
+    LOG(DEBUG) << "R3BLosUnpack : Number of hits in LOS: " << fNHits << FairLogger::endl;
     return kTRUE;
 }
 
