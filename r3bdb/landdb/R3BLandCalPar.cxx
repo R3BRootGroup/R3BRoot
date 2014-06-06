@@ -76,7 +76,7 @@ void R3BLandCalPar::fill(UInt_t rid){
 
   Int_t numTCh = r_tpar->GetNumRows(); 
   cout << "-I- R3BlandCalPar numOfRow " << numTCh << endl;
-  for (int i = 0; i < numTCh; ++i) {
+  for (int i = 0; i <= numTCh; ++i) {
     R3BLandTCalPar* tcal_par = (R3BLandTCalPar*) r_tpar->GetRow(i);
     if (!tcal_par) { continue; }
     else 
