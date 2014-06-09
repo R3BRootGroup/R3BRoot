@@ -39,6 +39,7 @@ R3BGeoSTaRTraPar.cxx
 R3BSTaRTraContFact.cxx  
 R3BSTaRTraHitFinder.cxx 
 R3BSTaRTraDigit.cxx
+R3BSTaRTrackerEvent.cxx
 #unpack/R3BStarTrackRawHit.cxx
 #unpack/R3BStarTrackUnpack.cxx
 #unpack/R3BStarTrackRawAna.cxx
