@@ -118,7 +118,7 @@ private:
   Int_t          fTrackID;           //!  track index
   Int_t          fVolumeID;          //!  volume id
   Int_t          fCopyNo;            //!  copy no
-  Int_t          fPaddleTyp;               //!  box number
+  Int_t          fPaddleTyp;         //!  box number
   TLorentzVector fPosIn, fPosOut;    //!  position
   TLorentzVector fMomIn, fMomOut;    //!  momentum
   Double32_t     fTime;              //!  time
@@ -136,10 +136,10 @@ private:
   Int_t          fMotherID;          //!  Mother ID
   Int_t          fNprim;             //!  Number of primaries
   
-  Double_t firstHitX[6];             // position and time of first our hits
-  Double_t firstHitY[6];
-  Double_t firstHitZ[6];
-  Double_t firstT[6];
+  Double_t firstHitX[6];             //! position and time of first our hits
+  Double_t firstHitY[6];             //!
+  Double_t firstHitZ[6];             //!
+  Double_t firstT[6];                //!
   
   /** Private method AddHit
    **
@@ -165,7 +165,7 @@ private:
   void ResetParameters();
   
   /** Map of MCis with fixed VolID */
-  map <Int_t,Int_t> fMapMcId;
+  map <Int_t,Int_t> fMapMcId;    //!
   
   void StepHistory();
   
