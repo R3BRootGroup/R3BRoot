@@ -24,6 +24,8 @@ link_directories( ${LINK_DIRECTORIES})
 set(SRCS
 R3BModule.cxx 
 R3BDetector.cxx 
+R3BEventHeader.cxx
+R3BEventHeaderUnpack.cxx
 )
 
 # fill list of header files from list of source files

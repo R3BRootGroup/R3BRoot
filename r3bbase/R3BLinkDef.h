@@ -6,5 +6,7 @@
 
 #pragma link C++ class R3BModule+;
 #pragma link C++ class R3BDetector+;
+#pragma link C++ class R3BEventHeader+;
+#pragma link C++ class R3BEventHeaderUnpack+;
 
 #endif
