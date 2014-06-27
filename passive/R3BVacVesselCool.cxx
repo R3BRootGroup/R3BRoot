@@ -41,6 +41,7 @@ R3BVacVesselCool::R3BVacVesselCool(const char * name,  const char * title)
 
 void R3BVacVesselCool::ConstructGeometry()
 {
+  //  if (*fVacVesselCoolName == "LiH" || *fVacVesselCoolName == "Para") {
   if (*fVacVesselCoolName == "LiH") {
     return  ConstructGeometry1();  // ie: For Liquid Hydrogen target only (targt4)
   }
