@@ -4,8 +4,6 @@
 #include "TMath.h"
 
 
-
-
 // Create Matrix Unity
 TGeoRotation *fGlobalRot = new TGeoRotation();
 
@@ -16,8 +14,6 @@ TGeoRotation *fRefRot = NULL;
 
 TGeoManager* gGeoMan = NULL;
 TGeoVolume* gTop;
-
-
 
 
 Double_t fThetaX = 0.;
@@ -31,7 +27,6 @@ Double_t fY = 0.;
 Double_t fZ = 0.;
 Bool_t fLocalTrans = kFALSE;
 Bool_t fLabTrans = kFALSE;
-
 
 
 
@@ -121,8 +116,9 @@ void create_target_geo(const char* geoTag = "LiH")
 
 
   if (geoTag == "LeadTarget") ConstructGeometry1(lead);  	//for s318
-  if (geoTag == "Para")       ConstructGeometry2(pMed38);
-  if (geoTag == "Para45")     ConstructGeometry3(pMed38);
+  //if (geoTag == "Para")       ConstructGeometry2(pMed2,pMed2); // equivalent to no target
+  if (geoTag == "Para")       ConstructGeometry2(pMed38,pMed2);
+  if (geoTag == "Para45")     ConstructGeometry3(pMed38,pMed2);
   if (geoTag == "LiH")        ConstructGeometry4(pMed2, pMed15, pMed3, pMedAu);
   if (geoTag == "CTarget")    ConstructGeometry5(pMedCarbon);	//for s318 
   if (geoTag == "CH2Target")  ConstructGeometry6(pMed38); 	//for s318
@@ -146,10 +142,11 @@ void create_target_geo(const char* geoTag = "LiH")
 
 
 
+//void ConstructGeometry1(TGeoMedium *lead,  TGeoMedium *pMed2)
 void ConstructGeometry1(TGeoMedium *lead)
 {
   cout << endl;
-  cout << "-I- R3BTarget:: ConstructGeometry() "<< endl;
+  cout << "create_target_geo.C-I- R3BTarget:: ConstructGeometry() "<< endl;
   cout << "-I- R3BTarget Target type: Lead target (199mg/cm2) "<< endl;
   cout << endl;
 
@@ -169,6 +166,19 @@ void ConstructGeometry1(TGeoMedium *lead)
   TGeoCombiTrans* pMatrix =
     new TGeoCombiTrans("", dx,dy,dz,pRot);
 
+  /*
+  // Shape: TargetEnveloppe type: TGeoBBox
+  // TargetEnveloppe Tube 1
+  dx   = 1.6000;
+  dy   = 1.6000;
+  dz   = 0.009000;
+  TGeoShape *pTargetEnveloppe = new TGeoBBox("TargetEnveloppe",dx,dy,dz);
+  TGeoVolume *pTargetEnveloppe_log = new TGeoVolume("TargetEnveloppe",pTargetEnveloppe, pMed2);
+  pTargetEnveloppe_log->SetVisLeaves(kTRUE);
+  TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix);
+  gTop->AddNode(pTargetEnveloppe_log, 0, pGlobal);
+  */
+
 
   // Shape: LeadTarget type: TGeoBBox
   dx = 1.500000;	//s318
@@ -180,6 +190,7 @@ void ConstructGeometry1(TGeoMedium *lead)
   pleadTarget_log->SetVisLeaves(kTRUE);
 
 
+  //pTargetEnveloppe_log->AddNode(pleadTarget_log, 0, pGlobal);
   TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix);
   gTop->AddNode(pleadTarget_log, 0, pGlobal);
 }
@@ -188,7 +199,8 @@ void ConstructGeometry1(TGeoMedium *lead)
 
 
 
-void ConstructGeometry2(TGeoMedium *pMed38)
+//void ConstructGeometry2(TGeoMedium *pMed38)
+void ConstructGeometry2(TGeoMedium *pMed38, TGeoMedium *pMed2)
 {
   cout << endl;
   cout << "-I- R3BTarget:: ConstructGeometry() "<< endl;
@@ -213,8 +225,21 @@ void ConstructGeometry2(TGeoMedium *pMed38)
   TGeoCombiTrans *pMatrix2 = new TGeoCombiTrans("", dx, dy, dz, pMatrix3);
 
   
+  // Shape: TargetEnveloppe type: TGeoTubeSeg
+  // TargetEnveloppe Tube 1
   Double_t rmin = 0.000000;
-  Double_t rmax = 1.000000;
+  Double_t rmax = 1.005000;  
+  dz   = 0.006000;
+  TGeoShape *pTargetEnveloppe = new TGeoTube("TargetEnveloppe",rmin,rmax,dz);
+  TGeoVolume *pTargetEnveloppe_log = new TGeoVolume("TargetEnveloppe",pTargetEnveloppe, pMed2);
+  pTargetEnveloppe_log->SetVisLeaves(kTRUE);
+  TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix2);
+  gTop->AddNode(pTargetEnveloppe_log, 0, pGlobal);
+ 
+
+
+  rmin = 0.000000;
+  rmax = 1.000000;
   dz   = 0.005500;
   phi1 = 0.000000;
   phi2 = 360.000000;
@@ -226,15 +251,17 @@ void ConstructGeometry2(TGeoMedium *pMed38)
   pParafin0deg_log->SetVisLeaves(kTRUE);
 
   
-  TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix2);
-  gTop->AddNode(pParafin0deg_log, 0, pGlobal);
+  //TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix2);
+  //gTop->AddNode(pParafin0deg_log, 0, pGlobal);
+  pTargetEnveloppe_log->AddNode(pParafin0deg_log, 0, pGlobal);
 }
 
 
 
 
 
-void ConstructGeometry3(TGeoMedium *pMed38)
+//void ConstructGeometry3(TGeoMedium *pMed38)
+void ConstructGeometry3(TGeoMedium *pMed38, TGeoMedium *pMed2)
 {
   cout << endl;
   cout << "-I- R3BTarget:: ConstructGeometry() "<< endl;
@@ -260,6 +287,21 @@ void ConstructGeometry3(TGeoMedium *pMed38)
   TGeoCombiTrans *pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
   
 
+  // Shape: TargetEnveloppe type: TGeoTubeSeg
+  // TargetEnveloppe Tube 1
+  dx    = 1.500000;
+  dy    = 1.100000;
+  dz    = 0.00600;
+  alpha = 0.000000;
+  theta = 45.000000;
+  phi   = -180.000000;
+   TGeoShape *pTargetEnveloppe = new TGeoPara("TargetEnveloppe",dx,dy,dz,alpha,theta,phi);
+  TGeoVolume *pTargetEnveloppe_log = new TGeoVolume("TargetEnveloppe",pTargetEnveloppe, pMed2);
+  pTargetEnveloppe_log->SetVisLeaves(kTRUE);
+  TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix2);
+  gTop->AddNode(pTargetEnveloppe_log, 0, pGlobal);
+
+
   // Shape: Para45deg type: TGeoPara
   dx    = 1.450000;
   dy    = 1.000000;
@@ -272,8 +314,9 @@ void ConstructGeometry3(TGeoMedium *pMed38)
   pPara45deg_log->SetVisLeaves(kTRUE);
 
   
-  TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix2);
-  gTop->AddNode(pPara45deg_log, 0, pGlobal);
+  //TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix2);
+  //gTop->AddNode(pPara45deg_log, 0, pGlobal);
+  pTargetEnveloppe_log->AddNode(pPara45deg_log, 0);
 }
 
 
