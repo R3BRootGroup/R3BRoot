@@ -202,7 +202,7 @@ public:
 
 
   inline TVector3 GetParticleMomentumDirection()
-     { return fP; }
+  { return TVector3(fP,0,0); }
 
   inline Int_t GetParticleCharge()
      { return fCharge; }
@@ -214,7 +214,7 @@ public:
      { return fPos; }
 
   inline TVector3 GetParticleTime()
-     { return fTime; }
+  { return TVector3(fTime,0,0); }
 
   inline Int_t GetNumberOfParticles()
      { return fMult; }

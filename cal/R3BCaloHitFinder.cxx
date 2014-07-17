@@ -231,7 +231,7 @@ void R3BCaloHitFinder::Exec(Option_t* opt)
     // energy crystal and the others. This is done by using the TVector3 classes and
     // not with different DeltaAngle on theta and phi, to get a proper solid angle
     // and not a "square" one.                    Enrico Fiori
-    TVector3 refAngle(1);     // EF
+    TVector3 refAngle(1,0,0);     // EF
     refAngle.SetTheta(polarAngle);
     refAngle.SetPhi(azimuthalAngle);
     for (Int_t i=0; i<crystalHits; i++) {
@@ -246,7 +246,7 @@ void R3BCaloHitFinder::Exec(Option_t* opt)
 
         //if(kSimulation) eInc += crystalHitSim[i]->GetEinc();
 
-        TVector3 testAngle(1);       //EF
+        TVector3 testAngle(1,0,0);       //EF
         testAngle.SetTheta(testPolar);
         testAngle.SetPhi(testAzimuthal);
         // Check if the angle between the two vectors is less than the reference angle.
