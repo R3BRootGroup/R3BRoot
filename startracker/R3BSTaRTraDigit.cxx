@@ -109,6 +109,13 @@ void R3BSTaRTraDigit::Exec(Option_t* opt) {
 	Int_t StripB_Id=0;
 	Double_t SlopA,SlopB,OffsetA,OffsetB;
 	
+
+	Int_t ChipA=-1;
+	Int_t StripFront=-1;
+	Int_t ChipB=-1;
+	Int_t StripBack=-1;
+
+
 	// Middle layer
 	//Double_t Length2  = 30.06 ; // cm
 	Double_t Length2  = 33.83875 ; // cm
@@ -539,6 +546,10 @@ void R3BSTaRTraDigit::Exec(Option_t* opt) {
 
 				}
 				
+				ChipA=int((StripA_Id-1)/128);
+				StripFront=(StripA_Id-1) - (ChipA*128);
+				ChipB=int((StripB_Id-1)/128);
+				StripBack=(StripB_Id-1) - (ChipB*128);			
 				
 				
 			}   // end of Det=7 ( inner layer)
@@ -646,6 +657,12 @@ void R3BSTaRTraDigit::Exec(Option_t* opt) {
 					}
 				  */
 				}
+
+
+				ChipA=int((StripA_Id-1)/128);
+				StripFront=(StripA_Id-1) - (ChipA*128);
+				ChipB=int((StripB_Id-1)/128);
+				StripBack=(StripB_Id-1) - (ChipB*128);			
 				
 				
 			} 
@@ -708,6 +725,7 @@ void R3BSTaRTraDigit::Exec(Option_t* opt) {
 				    }
 
 				}
+
 				
 				// find 2nd strip hit:
 				// step 1 : projection parallel to the 2nd longitudinal side of the detector (ie: offset at z=0 of this straight line in plane xz)
@@ -737,14 +755,23 @@ void R3BSTaRTraDigit::Exec(Option_t* opt) {
 				    }
 
 				}
-				
+
+
+				ChipA=int((StripA_Id-1)/128);
+				StripFront=(StripA_Id-1) - (ChipA*128);
+				ChipB=int((StripB_Id-1)/128);
+				StripBack=(StripB_Id-1) - (ChipB*128);			
 				
 			}
             
 				
 
-			if(Energy >= fThreshold) AddHit(Energy, Detector, StripA_Id, StripB_Id, Time);
-
+			//if(Energy >= fThreshold) AddHit(Energy, Detector, StripA_Id, StripB_Id, Time);
+			if(Energy >= fThreshold)
+			  {
+			    AddHit(Detector, ChipA, 0, StripFront, Energy, Time);
+			    AddHit(Detector, ChipB, 1, StripBack, Energy, Time);
+			  }
 				
 			}
 		}
@@ -805,10 +832,12 @@ Double_t R3BSTaRTraDigit::ExpResSmearing(Double_t inputEnergy) {
 
 
 // -----   Private method AddHit  --------------------------------------------
-	R3BSTaRTrackerDigitHit* R3BSTaRTraDigit::AddHit(Double_t ene,Int_t det,Int_t Stripfrt, Int_t Stripbck, Double_t time){   
+//      R3BSTaRTrackerDigitHit* R3BSTaRTraDigit::AddHit(Double_t ene,Int_t det,Int_t Stripfrt, Int_t Stripbck, Double_t time){   
+        R3BSTaRTrackerDigitHit* R3BSTaRTraDigit::AddHit(Int_t det,Int_t chip, Int_t side, Int_t strip, Double_t ene, Double_t time){   
 	TClonesArray& clref = *fSTaRTraHitCA;
 	Int_t size = clref.GetEntriesFast();
-	return new(clref[size]) R3BSTaRTrackerDigitHit(ene, det, Stripfrt, Stripbck, time);  
+//	return new(clref[size]) R3BSTaRTrackerDigitHit(ene, det, Stripfrt, Stripbck, time);  
+	return new(clref[size]) R3BSTaRTrackerDigitHit(det, chip, side, strip, ene, time);  
 }
 
 ClassImp(R3BSTaRTraDigit)

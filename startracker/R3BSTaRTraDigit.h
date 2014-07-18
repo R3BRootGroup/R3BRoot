@@ -75,7 +75,8 @@ private:
     Double_t ExpResSmearing(Double_t inputEnergy);
 
 	/** Private method Addhit **/
-	R3BSTaRTrackerDigitHit* AddHit(Double_t ene,Int_t det,Int_t Stripfrt,Int_t Stripbck,Double_t time);
+	//R3BSTaRTrackerDigitHit* AddHit(Double_t ene,Int_t det,Int_t Stripfrt,Int_t Stripbck,Double_t time);
+        R3BSTaRTrackerDigitHit* AddHit( Int_t det, Int_t chip, Int_t Side, Int_t Strip, Double_t energy, Double_t time);
 	
 	
 	ClassDef(R3BSTaRTraDigit,1);
