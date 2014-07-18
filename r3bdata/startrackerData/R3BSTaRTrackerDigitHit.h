@@ -23,7 +23,8 @@ public:
 	R3BSTaRTrackerDigitHit();
 
 	
-	R3BSTaRTrackerDigitHit(Double_t ene, Int_t det, Int_t Stripfrt, Int_t Stripbck, Double_t time);
+	//R3BSTaRTrackerDigitHit(Double_t ene, Int_t det, Int_t Stripfrt, Int_t Stripbck, Double_t time);
+	R3BSTaRTrackerDigitHit(Int_t det, Int_t chip, Int_t side, Int_t strip, Double_t ene, Double_t time);
 	
 	
 	/** Copy constructor **/
@@ -38,16 +39,24 @@ public:
 	Double_t GetEnergy()   const { return fEnergy; }
 	Double_t GetTime()   const { return fTime; }
 	Int_t GetDetector()   const { return fDetector; }
+	Int_t GetChip()   const { return fChip; }
+	Int_t GetSide()   const { return fSide; }
+	Int_t GetStrip()   const { return fStrip; }
+	/*
 	Double_t GetStripfrt()   const { return fStripfrt; } 
 	Double_t GetStripbck()   const { return fStripbck; } 
-	 
+	*/	 
 	/** Modifiers **/
 	//void SetNbOfTrackerHits(Int_t number){fNbOfTrackerHits = number;}
 	void SetEnergy(Double_t ene){fEnergy = ene;}
 	void SetDetector(Int_t det){fDetector = det;}
+	void SetChip(Int_t chip){fChip = chip;}
+	void SetSide(Int_t side){fSide = side;}
+	void SetStrip(Int_t strip){fStrip = strip;}
+	/*
 	void SetStripfrt(Int_t Stripfrt){fStripfrt = Stripfrt;}
 	void SetStripbck(Int_t Stripbck){fStripbck = Stripbck;}
-       
+	*/
 
 
 	/** Output to screen **/
@@ -61,9 +70,13 @@ protected:
 	Double_t fEnergy;        //total energy deposited 
 	Double_t fTime;        // global time when hit occur 
 	Int_t fDetector; //Detector hit by event
+	Int_t fChip;  //ASIC chip hit by event
+	Int_t fSide;  //Front or back of Det hit by event
+	Int_t fStrip; //Front or back of Det hit by event
+	/*
 	Double_t fStripfrt; // front strip hit in detector fdetector	
 	Double_t fStripbck; // back strip hit in detector fdetector	
-
+	*/
 	ClassDef(R3BSTaRTrackerDigitHit,1)
 	
 };
