@@ -156,7 +156,6 @@ void R3BCaloHitFinder::Exec(Option_t* opt)
          crystalHitSim[i] = (R3BCaloCrystalHitSim*) fCrystalHitCA->At(i);
          usedCrystalHits[i] = 0;
        }
-       fGeometryVersion=crystalHitSim[0]->GetGeoVersion();
     } else {
        crystalHit = new R3BCaloCrystalHit*[crystalHits];
        usedCrystalHits = new Int_t[crystalHits];
@@ -165,7 +164,6 @@ void R3BCaloHitFinder::Exec(Option_t* opt)
          crystalHit[i] = (R3BCaloCrystalHit*) fCrystalHitCA->At(i);
          usedCrystalHits[i] = 0;
        }
-       fGeometryVersion=crystalHit[0]->GetGeoVersion();
     }
   }
 

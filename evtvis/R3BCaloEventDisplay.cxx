@@ -48,6 +48,7 @@ using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 R3BCaloEventDisplay::R3BCaloEventDisplay() : FairTask("R3BCaloEventDisplay",0),
+  fGeometryVersion(10),
   fEventManager(NULL),
   fDataHist(NULL),
   fCalo3d(NULL),
@@ -64,6 +65,7 @@ R3BCaloEventDisplay::R3BCaloEventDisplay() : FairTask("R3BCaloEventDisplay",0),
 
 // -----   Standard constructor   -------------------------------------------
 R3BCaloEventDisplay::R3BCaloEventDisplay(const char* name, Int_t iVerbose) : FairTask(name, iVerbose),
+  fGeometryVersion(10),
   fEventManager(NULL),
   fDataHist(NULL),
   fCalo3d(NULL),
@@ -115,6 +117,13 @@ InitStatus R3BCaloEventDisplay::ReInit()
 }
 
 
+// -----  Public method SelectGeometryVersion  ----------------------------------
+void R3BCaloEventDisplay::SelectGeometryVersion(Int_t version)
+{
+  fGeometryVersion = version;
+}
+
+
 // -----   Public method Exec   --------------------------------------------
 void R3BCaloEventDisplay::Exec(Option_t* opt)
 {
@@ -130,7 +139,6 @@ void R3BCaloEventDisplay::Exec(Option_t* opt)
     Int_t crystalHits;        // Nb of CrystalHits in current event
     crystalHits = fCrystalHitCA->GetEntriesFast();
 
-    Int_t geoVersion = 0;
     Int_t binx, biny;
     Double_t theta=0., phi=0., rho=0., eta=0.;
 
@@ -144,12 +152,10 @@ void R3BCaloEventDisplay::Exec(Option_t* opt)
 
       if(kSimulation) {
         crystalHitSim = (R3BCaloCrystalHitSim *) fCrystalHitCA->At(i);
-        geoVersion = crystalHitSim->GetGeoVersion();
-        GetAngles(geoVersion,crystalHitSim->GetCrystalId(),&theta,&phi,&rho);
+        GetAngles(fGeometryVersion,crystalHitSim->GetCrystalId(),&theta,&phi,&rho);
       } else {
         crystalHit  = (R3BCaloCrystalHit *) fCrystalHitCA->At(i);
-        geoVersion = crystalHit->GetGeoVersion();
-        GetAngles(geoVersion,crystalHit->GetCrystalId(),&theta,&phi,&rho);
+        GetAngles(fGeometryVersion,crystalHit->GetCrystalId(),&theta,&phi,&rho);
       }
 
       eta = -TMath::Log(TMath::Tan(theta*0.5f));

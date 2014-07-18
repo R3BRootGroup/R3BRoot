@@ -751,7 +751,7 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
     Int_t nCrystalHits = fCaloCrystalHitCollection->GetEntriesFast();
     Bool_t existHit = 0;
     
-    if (nCrystalHits==0) AddCrystalHit(fGeometryVersion , crystalType , crystalCopy , crystalId, 
+    if (nCrystalHits==0) AddCrystalHit(crystalType , crystalCopy , crystalId, 
 				       NUSmearing(fELoss), fNf, fNs, fTime, fNSteps, 
 				       fEinc, fTrackID, fVolumeID, 
 				       fParentTrackID, fTrackPID, fUniqueID);
@@ -770,7 +770,7 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
           break;
         }
       }
-      if (!existHit) AddCrystalHit(fGeometryVersion , crystalType , crystalCopy , crystalId, 
+      if (!existHit) AddCrystalHit(crystalType , crystalCopy , crystalId, 
 				   NUSmearing(fELoss), fNf, fNs, fTime, fNSteps, 
 				   fEinc, fTrackID, fVolumeID, 
 				   fParentTrackID, fTrackPID, fUniqueID);
@@ -914,7 +914,7 @@ R3BCaloPoint* R3BCalo::AddHit(Int_t trackID, Int_t detID, Int_t volid ,
 }
 
 // -----   Private method AddCrystalHit   --------------------------------------------
-R3BCaloCrystalHitSim* R3BCalo::AddCrystalHit(Int_t geover, Int_t type, Int_t copy, Int_t ident,
+R3BCaloCrystalHitSim* R3BCalo::AddCrystalHit(Int_t type, Int_t copy, Int_t ident,
 					     Double_t energy, Double_t Nf, Double_t Ns, Double_t time, 
 					     Int_t steps, Double_t einc,
 					     Int_t trackid, Int_t volid, 
@@ -932,7 +932,7 @@ R3BCaloCrystalHitSim* R3BCalo::AddCrystalHit(Int_t geover, Int_t type, Int_t cop
 	      << " partrackid : " << partrackid << " type: " << pdgtype 
 	      << " unique id: " << uniqueid << FairLogger::endl;
   }
-  return new(clref[size]) R3BCaloCrystalHitSim(geover, type, copy, ident, energy, Nf, Ns, time, 
+  return new(clref[size]) R3BCaloCrystalHitSim(type, copy, ident, energy, Nf, Ns, time, 
 					       steps, einc, trackid, volid, 
 					       partrackid, pdgtype, uniqueid);
 }

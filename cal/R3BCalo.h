@@ -188,7 +188,7 @@ class R3BCalo : public R3BDetector
      **
      ** Adds a CaloCrystalHitSim to the HitCollection
      **/
-    R3BCaloCrystalHitSim* AddCrystalHit(Int_t geover, Int_t type, Int_t copy, Int_t ident,
+    R3BCaloCrystalHitSim* AddCrystalHit(Int_t type, Int_t copy, Int_t ident,
 					Double_t energy, Double_t Nf, Double_t Ns, Double_t tof,
 					Int_t steps, Double_t einc,
 					Int_t trackid, Int_t volid, Int_t partrackid,

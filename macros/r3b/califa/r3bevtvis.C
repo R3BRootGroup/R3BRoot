@@ -17,6 +17,9 @@ r3bevtvis()
   R3BCaloEventDisplay *CaloEvtVis = new R3BCaloEventDisplay("R3BCaloEventDisplay");
   R3BCaloHitEventDisplay *CaloHitEvtVis = new R3BCaloHitEventDisplay("R3BCaloHitEventDisplay");
 
+  //Select the Geometry Version
+  CaloEvtVis->SelectGeometryVersion(10);
+
   fMan->AddTask(CaloEvtVis);
   fMan->AddTask(CaloHitEvtVis);  //Make sure that you have CaloHit branch in the file
 

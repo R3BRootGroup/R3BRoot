@@ -48,6 +48,13 @@ class R3BCaloEventDisplay : public FairTask
     /** Virtual method Finish **/
     virtual void Finish();
 
+    /** Public method SelectGeometryVersion
+     **
+     ** Defines the geometry
+     *@param version  Integer parameter used to select the geometry:
+     ** (see documentation /r3broot/cal/perlScripts/README))
+     **/
+    void SelectGeometryVersion(Int_t version);
 
 
     /** Accessors **/
@@ -62,6 +69,9 @@ class R3BCaloEventDisplay : public FairTask
     FairEventManager* fEventManager;
     FairRootManager*  fManager;
 
+    // Selecting the geometry of the CALIFA calorimeter
+    Int_t fGeometryVersion;
+    
     TEveCaloDataHist* fDataHist;
     TEveCalo3D*       fCalo3d;
     TEveCalo2D*       fCalo2d;

@@ -1,7 +1,7 @@
 // -------------------------------------------------------------------------
 // -----                  R3BCaloCrystalHit header file                -----
 // -----               Created 08/07/10  by H. Alvarez Pol             -----
-// -----	     Last modification 28/05/12 by P.Cabanelas         -----
+// -----	     Last modification 18/07/14 by H. Alvarez         -----
 // -------------------------------------------------------------------------
 
 /**  R3BCaloCrystalHit.h
@@ -23,12 +23,11 @@ public:
   R3BCaloCrystalHit();
 
   /** Constructor with arguments
-   *@param fGeoVersion     CALIFA geometry version
    *@param fCrystalId   Crystal unique identifier
    *@param fEnergy      Total energy deposited on the crystal [GeV]
    *@param fTime        Time since event start [ns]
    **/
-  R3BCaloCrystalHit(Int_t geover, Int_t ident, Double_t energy, Double_t Nf, Double_t Ns, Double_t time);
+  R3BCaloCrystalHit(Int_t ident, Double_t energy, Double_t Nf, Double_t Ns, Double_t time);
 
   /** Copy constructor **/
   R3BCaloCrystalHit(const R3BCaloCrystalHit&);
@@ -39,7 +38,6 @@ public:
   virtual ~R3BCaloCrystalHit();
 
   /** Accessors **/
-  Int_t    GetGeoVersion()    const { return fGeoVersion; }
   Int_t    GetCrystalId()     const { return fCrystalId; }
   Double_t GetEnergy()        const { return fEnergy; }
   Double_t GetNf()            const { return fNf; }
@@ -50,7 +48,6 @@ public:
   Int_t    GetCrystalCopy()   const { return 0; }   //Backwards compatibility: not crashing macros
 
   /** Modifiers **/
-  void SetGeoVersion(Int_t geover)          { fGeoVersion  = geover; }
   void SetCrystalId(Int_t ident)            { fCrystalId = ident; }
   void SetEnergy(Double32_t energy){fEnergy = energy;}
   void SetNf(Double32_t Nf){fNf = Nf;}
@@ -61,7 +58,6 @@ public:
   virtual void Print(const Option_t* opt) const;
 
 protected:
-  Int_t fGeoVersion;     //CALIFA geometry version
   Double32_t fEnergy;    //total energy in the crystal
   Double32_t fNf;        //total Nf in the crystal
   Double32_t fNs;        //total Nf in the crystal

@@ -33,7 +33,7 @@ public:
    *@param fTrackPID       Particle identification
    *@param fTrackUniqueID  Particle unique id (e.g. if Delta electron, fTrackUniqueID=9)
    **/
-  R3BCaloCrystalHitSim(Int_t geover, Int_t type, Int_t copy, Int_t ident,
+  R3BCaloCrystalHitSim(Int_t type, Int_t copy, Int_t ident,
 		       Double_t energy, Double_t Nf, Double_t Ns, Double_t time,
 			Int_t steps, Double_t einc,
 			Int_t trackid, Int_t volid, Int_t partrackid,
