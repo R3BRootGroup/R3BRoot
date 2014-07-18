@@ -164,8 +164,11 @@ void RecResultsGene(char* output) {
                      
 	TBranchElement *branchDigitELoss = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fEnergy");
 	TBranchElement *branchDigitDetID = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fDetector");  // = DetcopyId here
-	TBranchElement *branchStripfrt = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fStripfrt");
-	TBranchElement *branchStripbck = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fStripbck");
+	TBranchElement *branchChip = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fChip");
+	TBranchElement *branchSide = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fSide");
+	TBranchElement *branchStrip = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fStrip");
+	//TBranchElement *branchStripfrt = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fStripfrt");
+	//TBranchElement *branchStripbck = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fStripbck");
 	TBranchElement *branchDigitTime = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fTime");
 
 	//for califa
@@ -189,6 +192,7 @@ void RecResultsGene(char* output) {
 	
 	// For Si tracker:
 	Int_t TrackMult=0;
+	Int_t TotalTrackMult=0;
 	Int_t TrkMult_Inner=0;
 	Int_t TrkMult_Middl=0;
 	Int_t TrkMult_Outer=0;
@@ -199,6 +203,11 @@ void RecResultsGene(char* output) {
 	
 	Int_t *DetID;      // Detector ID (=7 for inner layer, =8 for middle layer, =9 for outer layer)
 	Int_t *DetCopyID;  // Detector Copy ID
+	Int_t *DetCopyID_init;  // Detector Copy ID
+
+	Int_t *Chip;  // front strip ID
+	Int_t *Side;  // front strip ID
+	Int_t *Strip;  // front strip ID
 
 	Int_t *Stripfrt;  // front strip ID
 	Int_t *Stripbck;  // back Strip ID
@@ -232,10 +241,12 @@ void RecResultsGene(char* output) {
 	Double_t *Cryst_Nb;
 	
 	Double_t *ELoss;
+	Double_t *ELoss_init;
 	Double_t *ELossCryst;
 	Double_t *EDepos;
 	Double_t *EDepos1Cryst;
 	
+	Double_t *TimeStp_init;
 
 	Double_t *Xa;  // inner layer
 	Double_t *Ya;
@@ -893,20 +904,26 @@ void RecResultsGene(char* output) {
 	    // Si Tracker:
 	    //
 	    //TrackMult=branchTrackX->GetNdata();
-	    TrackMult=branchStripfrt->GetNdata();
+	    //TrackMult=branchStripfrt->GetNdata();
+	    TotalTrackMult= branchDigitELoss->GetNdata();  // (Multiplicity= 1 means 1 front OR 1 back strip hit)
 
-	    //cout <<" "<< endl;
+	    Chip=new Int_t[TotalTrackMult];     // Strip front id
+	    Side=new Int_t[TotalTrackMult];     // Strip front id
+	    Strip=new Int_t[TotalTrackMult];     // Strip front id
+	    ELoss_init=new Double_t[TotalTrackMult];
+	    DetCopyID_init=new Int_t[TotalTrackMult];    // Detector Copy ID
+	    TimeStp_init=new Double_t[TotalTrackMult];
+
+	    TrackMult=int(TotalTrackMult/2);	    //cout <<" "<< endl;
 	    //cout << "Multiplicity in Tracker=" << TrackMult << endl;
 
 	    DetID=new Int_t[TrackMult];        // Detector ID (=7 inner layer, =8 middle layer, =9 outer layer)
 	    DetCopyID=new Int_t[TrackMult];    // Detector Copy ID
-	    DetCopyIDClust=new Int_t[TrackMult];    // Detector Copy ID of cluster of strips
+
 
 	    Stripfrt=new Int_t[TrackMult];     // Strip front id
 	    Stripbck=new Int_t[TrackMult];     // Strip bck id
 
-	    StripfrtClust=new Int_t[TrackMult];     // main Strip front id of cluster of strips
-	    StripbckClust=new Int_t[TrackMult];     // main Strip bck id of cluster of strips
 
 	    X_track=new Double_t[TrackMult];   // Position X in Lab frame
 	    Y_track=new Double_t[TrackMult];   // Position Y in Lab frame
@@ -925,7 +942,6 @@ void RecResultsGene(char* output) {
 	    Track=new Int_t[TrackMult];
 
 	    ELoss=new Double_t[TrackMult];
-	    ELossCluster=new Double_t[TrackMult];  // sum of energy loss in cluster of strips
 	    // ELossCryst=new Double_t[XballMult]; // uncomment if XBall used
 	    EDepos=new Double_t[TrackMult];
 	    EDepos1Cryst=new Double_t[TrackMult];
@@ -958,36 +974,99 @@ void RecResultsGene(char* output) {
 
 	    }
 
+	    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	    //
-	    // loop over Tracker  Multiplicity:
+	    // 1st loop over TOTAL Tracker  Multiplicity = hit multiplicity (reading the tree)
 	    //
+
+	    //cout << "#### Reading the Tree  ####" <<  endl;
+
+
+	    for(Int_t j=0; j<TotalTrackMult; j++)
+	      {
+		//cout <<"j="<< j <<  endl;
+		Chip[j]= branchChip->GetValue(j,0,true);
+		//cout << "Chip=" << Chip[j] << endl;	 
+		Side[j]= branchSide->GetValue(j,0,true);
+		//cout << "Side=" << Side[j] << endl;	 
+		Strip[j]= branchStrip->GetValue(j,0,true);
+		//cout << "Strip=" << Strip[j] << endl;	 
+
+		ELoss_init[j]=branchDigitELoss->GetValue(j,0,true); // in GeV      // *1000.;   // *1000 to change from GeV to MeV
+		//cout << "ELoss_init=" << ELoss_init[j] << endl;	 
+		
+		DetCopyID_init[j]=branchDigitDetID->GetValue(j,0,true);
+		//cout << "DetCopyID_init=" << DetCopyID_init[j] << endl;
+
+		//One assumes that the time sorting is done
+		//TimeStp_init[j]=branchDigitTime->GetValue(j,0,true); // in GeV      // *1000.;   // *1000 to change from GeV to MeV
+
+
+		if(Side[j]==0)
+		  {
+		  if(j==0)
+		    {
+		      Stripfrt[j]= Chip[j]*128 + (Strip[j]+1);
+		      //cout << "Side= " <<  Side[j] << " j=" << j << endl;
+		      //cout << "Stripfrt= " <<  Stripfrt[j] << " j=" << j << endl;
+		      ELoss[j]=ELoss_init[j];   // One only keeps the energy loss measured in front strip
+		      DetCopyID[j]=DetCopyID_init[j]; // One only keeps the Detector ID from the hit in front strip
+		    }else
+		    {
+		      Stripfrt[int(j/2)]= Chip[j]*128 + (Strip[j]+1);
+		      //cout << "Side= " <<  Side[j] << " j=" << j << endl;
+		      //cout << "Stripfrt= " <<  Stripfrt[int(j/2)] << " int(j/2)=" << int(j/2) << endl;
+		      ELoss[int(j/2)]=ELoss_init[j];   // One only keeps the energy loss measured in front strip
+		      DetCopyID[int(j/2)]=DetCopyID_init[j]; // One only keeps the Detector ID from the hit in front strip
+		    }
+		}
+
+		if(Side[j]==1)    // This assume the first strip hit is the front strip : True in simulation but not guarranty in real data
+		  {
+
+		    if(j%2 !=0 )
+		      {
+			Stripbck[int((j-Side[j])/2)]= Chip[j]*128 + (Strip[j]+1);
+			//cout << "Chip= " << Chip[j] << " j=" << j << endl;
+			//cout << "Strip= " << Strip[j] << " j=" << j << endl;
+			//cout << "Stripbck= " << Stripbck[int( (j-Side[j])/2)] << " int( (j-Side[j])/2 ) =" << int((j-Side[j])/2)  << endl;
+		      }else
+		      {
+			if(j==0)
+			  {
+			    Stripbck[j]= Chip[j]*128 + (Strip[j]+1);
+			  }else
+			  {
+			    Stripbck[j-Side[j]]= Chip[j]*128 + (Strip[j]+1);
+			  }
+
+			//cout << "Chip= " << Chip[j] << " j=" << j << endl;
+			//cout << "Strip= " << Strip[j] << " j=" << j << endl;
+			//cout << "Stripbck= " << Stripbck[int( (j-Side[j])/2)] << " int( (j-Side[j])/2 ) =" << int((j-Side[j])/2)  << endl;
+		      }
+
+		  }
+	      }
+
+
+
+
+	    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	    //
+	    // 2nd loop over reduced Tracker  Multiplicity (TrackMult)
+	    //
+     	    //
 
 	    //cout << "Reading the Tree" <<  endl;
 
 	    for(Int_t j=0; j<TrackMult; j++)
-	      {
-
-		//cout <<"j="<< j <<  endl;
-
-		Stripfrt[j]= branchStripfrt->GetValue(j,0,true);
-		//cout << "Stripfrt= " <<  branchStripfrt->GetValue(j,0, true) << endl;
-      
-		Stripbck[j]=branchStripbck->GetValue(j,0,true);
-		//cout << "Stripbck= " << Stripbck[j] << endl;
-
-		ELoss[j]=branchDigitELoss->GetValue(j,0,true); // in GeV      // *1000.;   // *1000 to change from GeV to MeV
-		//cout << "ELoss=" << ELoss[j] << endl;	 
-		
-		DetCopyID[j]=branchDigitDetID->GetValue(j,0,true);
-		//cout << "DetCopyID=" << DetCopyID[j] << endl;
-		
-	 
+	      {	 
 
 
-	    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	    //
-	    // Reconstruction of the positions in Si detectors, in the laboratory frame, from both the detector id and strip id information:
-	    //
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//
+		// Reconstruction of the positions in Si detectors, in the laboratory frame, from both the detector id and strip id information:
+		//
 
 
 
@@ -1567,6 +1646,13 @@ void RecResultsGene(char* output) {
 	delete[]  DetID;
 	delete[]  DetCopyID;
 	delete[]  EDepos;
+
+	delete[]  Chip;
+	delete[]  Side;
+	delete[]  Strip;
+	delete[]  DetCopyID_init;
+	delete[]  ELoss_init;
+	delete[]  TimeStp_init;
 
 	delete[]  X_Xball;
 	delete[]  Y_Xball;
