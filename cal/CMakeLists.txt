@@ -41,6 +41,8 @@ R3BCaloContFact.cxx
 unpack/R3BCaloRawHit.cxx
 unpack/R3BCaloUnpack.cxx
 unpack/R3BCaloRawAna.cxx
+unpack/R3BCaloCalib.cxx
+unpack/R3BCaloCrystalAna.cxx
 )
 
 # fill list of header files from list of source files
