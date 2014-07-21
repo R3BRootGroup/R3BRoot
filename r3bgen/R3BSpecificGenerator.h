@@ -213,8 +213,8 @@ public:
   inline TVector3 GetParticlePosition()
      { return fPos; }
 
-  inline TVector3 GetParticleTime()
-  { return TVector3(fTime,0,0); }
+  inline Double_t GetParticleTime()
+  { return fTime; }
 
   inline Int_t GetNumberOfParticles()
      { return fMult; }
