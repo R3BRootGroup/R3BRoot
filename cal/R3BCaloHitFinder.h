@@ -14,6 +14,7 @@
 #include "FairTask.h"
 #include "R3BCaloHit.h"
 #include "R3BCaloHitSim.h"
+#include "R3BCaloHitFinderPar.h"
 
 class TClonesArray;
 
@@ -126,7 +127,7 @@ class R3BCaloHitFinder : public FairTask
     Bool_t kSimulation;
 
     // Parameter class
-    //R3BCaloHitFinderPar* fCaloHitFinderPar;
+    R3BCaloHitFinderPar* fCaloHitFinderPar;
 
   private:
 

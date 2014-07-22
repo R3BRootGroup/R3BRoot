@@ -40,30 +40,35 @@ R3BCaloHitFinder::R3BCaloHitFinder() : FairTask("R3B CALIFA Hit Finder ")
   fClusteringAlgorithmSelector=1;
   fParCluster1=0;
   kSimulation = false;
+  fCaloHitFinderPar=0;
+  fCrystalHitCA=0;
+  fCaloHitCA=0;
 }
 
 
 R3BCaloHitFinder::~R3BCaloHitFinder()
 {
+  LOG(INFO) << "R3BCaloHitFinder: Delete instance" << FairLogger::endl;
+  delete fCrystalHitCA;
+  delete fCaloHitCA;
 }
 
 
 
 void R3BCaloHitFinder::SetParContainers()
 {
-  //
-  //NO CONTAINER FOR HIT FINDER DEFINED YET.... FOLLOW THE NEXT PROCEDURE!!!!!!
-  //
-  /*
   // Get run and runtime database
   FairRunAna* run = FairRunAna::Instance();
-  if ( ! run ) Fatal("R3BCaloHitFinder::SetParContainers", "No analysis run");
+  if (!run) Fatal("R3BCaloHitFinder::SetParContainers", "No analysis run");
 
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
-  if ( ! rtdb ) Fatal("R3BCaloHitFinder::SetParContainers", "No runtime database");
+  if (!rtdb) Fatal("R3BCaloHitFinder::SetParContainers", "No runtime database");
 
   fCaloHitFinderPar = (R3BCaloHitFinderPar*)(rtdb->getContainer("R3BCaloHitFinderPar"));
-   */
+  if ( fVerbose && fCaloHitFinderPar ) {
+    LOG(INFO) << "R3BCaloHitFinder::SetParContainers() "<< FairLogger::endl;
+    LOG(INFO) << "Container R3BCaloHitFinderPar loaded " << FairLogger::endl;
+  }  
 }
 
 

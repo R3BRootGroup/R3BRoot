@@ -11,6 +11,7 @@
 #include "FairTask.h"
 #include "R3BCaloCrystalHit.h"
 #include "R3BCaloRawHit.h"
+#include "R3BCaloCalibPar.h"
 
 class TClonesArray;
 
@@ -57,6 +58,7 @@ protected:
   TClonesArray *fRawHitCA;
   TClonesArray *fCrystalHitCA;
 
+  R3BCaloCalibPar* fCaloCalibPar;
     
  public:
   //Class definition

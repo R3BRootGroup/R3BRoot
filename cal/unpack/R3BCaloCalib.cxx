@@ -10,6 +10,8 @@
 
 //Fair headers
 #include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDB.h"
 #include "FairLogger.h"
 
 #include <iomanip>
@@ -19,9 +21,11 @@
 #include "R3BCaloCalib.h"
 
 //R3BCaloCalib: Constructor
-R3BCaloCalib::R3BCaloCalib() : FairTask("R3B CALIFA Calibrator")
+R3BCaloCalib::R3BCaloCalib() : FairTask("R3B CALIFA Calibrator"),
+			       fRawHitCA(0),
+			       fCrystalHitCA(new TClonesArray("R3BCaloCrystalHit")), 
+			       fCaloCalibPar(0)
 {
-
 }
 
 
@@ -30,6 +34,8 @@ R3BCaloCalib::R3BCaloCalib() : FairTask("R3B CALIFA Calibrator")
 R3BCaloCalib::~R3BCaloCalib()
 {
   LOG(INFO) << "R3BCaloCalib: Delete instance" << FairLogger::endl;
+  delete fRawHitCA;
+  delete fCrystalHitCA;
 }
 
 
@@ -44,6 +50,19 @@ InitStatus R3BCaloCalib::Init()
 
 void R3BCaloCalib::SetParContainers()
 {
+  // Get run and runtime database
+  FairRunAna* run = FairRunAna::Instance();
+  if (!run) Fatal("R3BCaloCalib::SetParContainers", "No analysis run");
+  
+  FairRuntimeDb* rtdb = run->GetRuntimeDb();
+  if (!rtdb) Fatal("R3BCaloCalib::SetParContainers", "No runtime database");
+  
+  fCaloCalibPar = (R3BCaloCalibPar*)(rtdb->getContainer("R3BCaloCalibPar"));
+  
+  if ( fVerbose && fCaloCalibPar ) {
+    LOG(INFO) << "R3BCaloCalib::SetParContainers() "<< FairLogger::endl;
+    LOG(INFO) << "Container R3BCaloCalibPar loaded " << FairLogger::endl;
+  }  
 }
 
 

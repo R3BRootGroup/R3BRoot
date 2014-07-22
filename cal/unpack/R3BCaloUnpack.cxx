@@ -12,6 +12,8 @@
 
 //Fair headers
 #include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDB.h"
 #include "FairLogger.h"
 
 #include <iomanip>
@@ -25,9 +27,9 @@ R3BCaloUnpack::R3BCaloUnpack(char *strCalDir,
                              Short_t type, Short_t subType,
                              Short_t procId,
                              Short_t subCrate, Short_t control)
-: FairUnpack(type, subType, procId, subCrate, control),
-fRawData(new TClonesArray("R3BCaloRawHit")),
-fNHits(0)
+  : FairUnpack(type, subType, procId, subCrate, control),
+    fRawData(new TClonesArray("R3BCaloRawHit")),
+    fNHits(0),fCaloUnpackPar(0)
 {
 }
 
@@ -49,6 +51,23 @@ Bool_t R3BCaloUnpack::Init()
   return kTRUE;
 }
 
+
+void R3BCaloUnpack::SetParContainers()
+{
+  // Get run and runtime database
+  FairRunAna* run = FairRunAna::Instance();
+  if (!run) Fatal("R3BCaloUnpack::SetParContainers", "No analysis run");
+  
+  FairRuntimeDb* rtdb = run->GetRuntimeDb();
+  if (!rtdb) Fatal("R3BCaloUnpack::SetParContainers", "No runtime database");
+  
+  fCaloUnpackPar = (R3BCaloUnpackPar*)(rtdb->getContainer("R3BCaloUnpackPar"));
+  
+  if ( fCaloUnpackPar ) {
+    LOG(INFO) << "R3BCaloUnpack::SetParContainers() "<< FairLogger::endl;
+    LOG(INFO) << "Container R3BCaloUnpackPar loaded " << FairLogger::endl;
+  }  
+}
 
 
 //Register: Protected method

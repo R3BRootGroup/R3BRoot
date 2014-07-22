@@ -11,6 +11,8 @@
 
 #include "FairUnpack.h"
 
+#include "R3BCaloUnpackPar.h"
+
 class TClonesArray;
 
 
@@ -38,6 +40,9 @@ class R3BCaloUnpack : public FairUnpack {
   
   //Fair specific
   virtual Bool_t Init();
+  /** Virtual method SetParContainers **/
+  virtual void SetParContainers();
+
   virtual Bool_t DoUnpack(Int_t* data, Int_t size);
   virtual void Reset();
     
@@ -47,6 +52,8 @@ class R3BCaloUnpack : public FairUnpack {
  private:
   TClonesArray *fRawData;
   Int_t         fNHits;
+
+  R3BCaloUnpackPar* fCaloUnpackPar;
 
  public:
   //Class definition
