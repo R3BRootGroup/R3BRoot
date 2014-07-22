@@ -35,14 +35,17 @@ set(SRCS
 #Put here your sourcefiles
 R3BCalo.cxx
 R3BCaloHitFinder.cxx  
+R3BCaloHitFinderPar.cxx  
 R3BGeoCalo.cxx   
 R3BGeoCaloPar.cxx   
 R3BCaloContFact.cxx
 unpack/R3BCaloRawHit.cxx
 unpack/R3BCaloUnpack.cxx
+unpack/R3BCaloUnpackPar.cxx
 unpack/R3BCaloRawAna.cxx
 unpack/R3BCaloCalib.cxx
 unpack/R3BCaloCrystalAna.cxx
+unpack/R3BCaloCalibPar.cxx
 )
 
 # fill list of header files from list of source files
