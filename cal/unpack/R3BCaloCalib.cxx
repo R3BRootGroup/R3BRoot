@@ -42,6 +42,10 @@ InitStatus R3BCaloCalib::Init()
 }
 
 
+void R3BCaloCalib::SetParContainers()
+{
+}
+
 
 //Register: Protected method
 void R3BCaloCalib::Register()
@@ -61,7 +65,7 @@ void R3BCaloCalib::Register()
 // -----   Public method ReInit   --------------------------------------------
 InitStatus R3BCaloCalib::ReInit()
 {
-
+  SetParContainers();
   return kSUCCESS;
 }
 
@@ -101,6 +105,10 @@ void R3BCaloCalib::Exec(Option_t* opt)
   return;
 }
 
+
+void R3BCaloCalib::Finish()
+{
+}
 
 
 //Reset: Public method
