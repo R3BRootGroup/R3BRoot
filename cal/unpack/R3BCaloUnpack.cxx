@@ -13,7 +13,7 @@
 //Fair headers
 #include "FairRootManager.h"
 #include "FairRunAna.h"
-#include "FairRuntimeDB.h"
+#include "FairRuntimeDb.h"
 #include "FairLogger.h"
 
 #include <iomanip>
