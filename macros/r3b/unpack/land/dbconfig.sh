@@ -1,6 +1,6 @@
 # add for MySql libs
 # MAc OSx
-#export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/usr/local/mysql/lib
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/usr/local/mysql/lib
 # Linux
 #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/mysql/lib
 
@@ -16,8 +16,8 @@ if [ $1 = "local_mysql" ]
 then
 # Local MySQL server
 export FAIRDB_TSQL_URL="mysql://localhost/r3b"
-export FAIRDB_TSQL_USER="kresan"
-export FAIRDB_TSQL_PSWD="Ea6Ta7"
+export FAIRDB_TSQL_USER="scott"
+export FAIRDB_TSQL_PSWD="tiger"
 fi
 
 if [ $1 = "local_pgsql" ]
