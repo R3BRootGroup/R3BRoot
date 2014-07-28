@@ -1,25 +1,25 @@
-#include "drawStyle.C"
+#include "../drawStyle.C"
 
 
 
-const Float_t kappa = 0.08;
-const Float_t misId[] = {0.05, 0.07, 0.12, 0.01};
-
+Float_t kappa = 0.04;
+const Float_t misId[] = {0.4, 0.3, 0.2, 0.025};
 
 
 // -----------------------------------------------------------------------------
-void calibr_2D(Int_t beamE, Int_t erel, Int_t d)
+void calibr_2D(Int_t beamE = 600,Int_t erel = 500, Int_t d = 14)
 {
   TPstyle();
 
 
   // ----- Files -----------------------------------------------------
-  char strDir[] = "/Users/kresan/neuland";
+  char strDir[] = ".";
   TString inFile[4];
   TFile *file[4];
   TH2F *h[4];
+  
   for(Int_t i = 0; i < 4; i++) {
-    char str[100];
+    char str[1000];
     sprintf(str, "%1dAMeV.%1dn.%1dkeV.%1dm", beamE, i+1, erel, d);
     inFile[i] = TString(strDir) + "/r3bcalibr." + TString(str) + ".root";
     file[i] = new TFile(inFile[i]);
@@ -28,26 +28,89 @@ void calibr_2D(Int_t beamE, Int_t erel, Int_t d)
   }
   // -----------------------------------------------------------------
 
+  Int_t dy;
+  Int_t dx;
+  Int_t sum;
+  Int_t times = 0;
+  Int_t TotalSum;
+  Int_t trashholdx = 10;
+  Int_t trashholdy = 100;
+  Int_t maxX = h[0]->GetXaxis()->GetLast();
+  Int_t maxY = h[0]->GetYaxis()->GetLast();
+  Bool_t r;
+  
+  
+  for(Int_t i = 0; i < maxX; i++){
+    for(Int_t j = 0; j < maxY; j++){      
+      TotalSum += h[0]->GetBinContent(i,j);
+    }
+  }
+  
+  do{
+    times++;
+    r = false;
+    dx = 0;
+    dy = 0;
+    
+    
+    for(Int_t i = 0; i < maxX; i++){
+      sum = 0;
+      for(Int_t j = 0; j < maxY; j++){      
+	sum += h[0]->GetBinContent(i + 1,j + 1);
+      }
+      if(sum > trashholdx){
+	dx++;
+      }
+    }
 
+    for(Int_t i = 0; i < maxY; i++){
+      sum = 0;
+      for(Int_t j = 0; j < maxX; j++){      
+	sum += h[0]->GetBinContent(j + 1,i + 1);
+      }
+      if(sum > trashholdy){
+	dy++;
+      }
+    }
+    
+    if(trashholdx != (int) (TotalSum * 0.4f  / dx)){
+      trashholdx = TotalSum * 0.4f  / dx;
+      r = true;
+    }
+    if(trashholdy != (int) (TotalSum * 0.4f  / dy)){
+      trashholdy = TotalSum * 0.4f  / dy;
+      r = true;
+    }   
+  } while(r && times <100);
+  
+  kappa = h[0]->GetYaxis()->GetBinUpEdge(dy + 1)/h[0]->GetXaxis()->GetBinUpEdge(dx + 1);
+  cout << "kappa = " << kappa << " in " << times << " loops" << endl;
+  
   // -----------------------------------------------------------------
   Float_t cuts[5];
-  cuts[0] = 30.*((Float_t)beamE)/600.;
+  cuts[0] = 10.*((Float_t)beamE)/600.;
 
   for(Int_t i = 1; i < 5; i++) {
-    cuts[i] = cuts[i-1] + 100.;
+    cuts[i] = cuts[i-1] + 1.;
     Float_t int0 = h[i-1]->GetEntries();
     Float_t int1 = Integral_2D(h[i-1], cuts[i-1], cuts[i]);
     Float_t int2 = Integral_2D(h[i-1], cuts[i], 1500.);
     Float_t eff1 = int1 / int0;
     Float_t eff2 = int2 / int0;
     while(eff2 > misId[i-1]) {
-      cuts[i] += 1.;
+      if(eff2 >= (2.*misId[i-1])) {
+	cuts[i] += 20.;
+      } else if(eff2 >= (1.2*misId[i-1])) {
+	cuts[i] += 10.;
+      } else {
+	cuts[i] += 1.;
+      }
       int1 = Integral_2D(h[i-1], cuts[i-1], cuts[i]);
       int2 = Integral_2D(h[i-1], cuts[i], 1500.);
       eff1 = int1 / int0;
       eff2 = int2 / int0;
-      cout << "loop : " << i << "   " << int1 << " : " << eff1 << "  " << eff2 << endl;
-      if(eff2 <= misId[i-1] && eff1 > 0.4) {
+      cout << "loop : " << i << "   " << cuts[i] << " : " << eff1 << "  " << eff2 << endl;
+      if(eff2 <= misId[i-1]){// && eff1 > 0.4) {
 	break;
       }
     }
@@ -121,8 +184,8 @@ Float_t Integral_2D(TH2F *h1, Float_t cut1, Float_t cut2)
   Float_t e;
   for(Int_t ic = 0; ic < 150; ic++) {
     c = (Float_t)(ic+0.5);
-    for(Int_t ie = 0; ie < 150; ie++) {
-      e = (Float_t)(ie+0.5)*10.;
+    for(Int_t ie = 0; ie < 1000; ie++) {
+      e = (Float_t)(ie+0.5)*1.;
       if(c >= ( (0.-kappa*cut1)/(cut1-0.)*(e-0.)+kappa*cut1 )) {
 	if(c < ( (0.-kappa*cut2)/(cut2-0.)*(e-0.)+kappa*cut2 )) {
 	  integral += h1->GetBinContent(ie+1, ic+1);

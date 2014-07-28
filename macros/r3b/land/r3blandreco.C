@@ -1,16 +1,16 @@
 void r3blandreco(Int_t beamE, Int_t nn, Int_t erel, Int_t d)
 {
   // ----- Files ---------------------------------------------------------------
-  char strDir[] = "/Users/kresan/neuland";
+  char strDir[] = ".";
   char str[100];
   char str2[100];
-  sprintf(str, "%1dAMeV.%1dn.%1dkeV.%1dm", beamE, nn, erel, d);
+  sprintf(str, "%1dAMeV.%1dn.%1dkeV.%1dm.root", beamE,nn, erel, d);
   sprintf(str2, "%1dAMeV.%1dkeV.%1dm", beamE, erel, d);
-  TString inFile  = TString(strDir) + "/r3bsim." + TString(str) + ".root";
-  TString digiFile  = TString(strDir) + "/r3bcalibr." + TString(str) + ".root";
-  TString parFile  = TString(strDir) + "/r3bpar." + TString(str) + ".root";
+  TString inFile  = TString(strDir) + "/r3bsim." + TString(str);
+  TString digiFile  = TString(strDir) + "/r3bcalibr." + TString(str);
+  TString parFile  = TString(strDir) + "/r3bpar." + TString(str);
   TString calibrFile  = TString(strDir) + "/r3bcalibr." + TString(str2) + ".txt";
-  TString outFile  = TString(strDir) + "/r3breco." + TString(str) + ".root";
+  TString outFile  = TString(strDir) + "/r3breco." + TString(str);
   // ---------------------------------------------------------------------------
 
 
@@ -28,7 +28,6 @@ void r3blandreco(Int_t beamE, Int_t nn, Int_t erel, Int_t d)
   fRun->AddFriend(digiFile);
   fRun->SetOutputFile(outFile);
   // ---------------------------------------------------------------------------
-
 
 
   // ---------------------------------------------------------------------------

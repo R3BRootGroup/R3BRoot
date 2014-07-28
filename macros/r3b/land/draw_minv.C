@@ -1,4 +1,4 @@
-#include "drawStyle.C"
+#include "../drawStyle.C"
 
 
 
@@ -9,13 +9,18 @@ void plot_minv_tn()
   TPstyle();
 
 
-  TFile *file_4n = new TFile("/Users/kresan/neuland/r3breco.600AMeV.4n.100keV.35m.root");
+  TFile *file_4n = new TFile("r3breco.600AMeV.4n.100keV.35m.root");
   TH1F *h_minv_4n = (TH1F*) file_4n->Get("Minv");
   Style(h_minv_4n, "E_{rel} (MeV)", "events");
   h_minv_4n->SetLineColor(4);
   // h_minv_4n->Rebin(2);
   h_minv_4n->GetXaxis()->SetRangeUser(0., 1.);
-//   h_minv_4n->GetYaxis()->SetRangeUser(0., 440.);
+  h_minv_4n->GetYaxis()->SetRangeUser(0., 500.);
+
+//   TFile *file_4n_o = new TFile("r3breco.600AMeV.4n.100keV.35m.old.root");
+//   TH1F *h_minv_4n_o = (TH1F*) file_4n_o->Get("Minv");
+//   h_minv_4n_o->SetLineStyle(2);
+//   h_minv_4n_o->SetLineColor(4);
 
   TF1 *f1 = new TF1("f1", "gaus", 0.1 - 2.5*0.035, 0.1 + 2.*0.035);
   f1->FixParameter(1, 0.1);
@@ -23,14 +28,14 @@ void plot_minv_tn()
   cout << f1->GetParameter(1) << "  +-  " << f1->GetParError(1) << endl;
   cout << f1->GetParameter(2) << "  +-  " << f1->GetParError(2) << endl;
 
-  TF1 *f2 = new TF1("f2", "[0]*exp(-[1]*x)", 0.1 + 2.*0.035, 1.);
+  TF1 *f2 = new TF1("f2", "[0]*exp(-[1]*x)", 0.1 + 2.*0.035, 2.);
   f2->SetLineColor(4);
   h_minv_4n->Fit(f2, "NR+");
   cout << f2->GetParameter(0) << "  +-  " << f2->GetParError(0) << endl;
 
   gStyle->SetPaperSize(16, 16);
   TCanvas *c1 = new TCanvas("c1", "", 0, 0, 450, 450);
-  TPostScript *ps1 = new TPostScript("minv_tetra-neutron.eps", -113);
+  TPostScript *ps1 = new TPostScript("minv_tetra-neutron_new_temp.eps", -113);
   ps1->Range(16, 16);
 
   gPad->SetLeftMargin(0.15);
@@ -38,6 +43,7 @@ void plot_minv_tn()
   gPad->SetTickx();
   gPad->SetTicky();
   h_minv_4n->Draw();
+//   h_minv_4n_o->Draw("same");
   f1->Draw("same");
   f2->Draw("same");
 
@@ -75,7 +81,7 @@ void plot_minv_tn_compare()
   TPstyle();
 
 
-  TFile *file_4n = new TFile("/Users/kresan/neuland/r3breco.600AMeV.4n.100keV.35m.root");
+  TFile *file_4n = new TFile("/Users/kresan/neuland/r3breco.600AMeV.4n.100keV.35m.new.root");
   TH1F *h_minv_4n = (TH1F*) file_4n->Get("Minv");
   Style(h_minv_4n, "E_{rel} (MeV)", "events");
   h_minv_4n->SetLineColor(4);
@@ -100,7 +106,7 @@ void plot_minv_tn_compare()
 
   gStyle->SetPaperSize(16, 16);
   TCanvas *c1 = new TCanvas("c1", "", 0, 0, 450, 450);
-  TPostScript *ps1 = new TPostScript("minv_tetra-neutron_compare.eps", -113);
+  TPostScript *ps1 = new TPostScript("minv_tetra-neutron_compare_new.eps", -113);
   ps1->Range(16, 16);
 
   gPad->SetLeftMargin(0.15);
@@ -146,7 +152,7 @@ void plot_minv_astro()
   TPstyle();
 
 
-  TFile *file_1n = new TFile("/Users/kresan/neuland/r3breco.600AMeV.1n.100keV.35m.root");
+  TFile *file_1n = new TFile("r3breco.600AMeV.1n.100keV.35m.root");
   TH1F *h_minv_1n = (TH1F*) file_1n->Get("Minv");
   Style(h_minv_1n, "E_{rel} (MeV)", "events");
   h_minv_1n->SetLineColor(1);
@@ -159,7 +165,7 @@ void plot_minv_astro()
 
   gStyle->SetPaperSize(16, 16);
   TCanvas *c1 = new TCanvas("c1", "", 0, 0, 450, 450);
-  TPostScript *ps1 = new TPostScript("minv_astro.eps", -113);
+  TPostScript *ps1 = new TPostScript("minv_astro_new.eps", -113);
   ps1->Range(16, 16);
 
   gPad->SetLeftMargin(0.15);
