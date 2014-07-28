@@ -11,6 +11,7 @@ ${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/mcstack 
 ${R3BROOT_SOURCE_DIR}/los
 ${R3BROOT_SOURCE_DIR}/los/unpack
+${R3BROOT_SOURCE_DIR}/r3bdb/losdb
 ${R3BROOT_SOURCE_DIR}/r3bdata/
 ${R3BROOT_SOURCE_DIR}/r3bdata/calData
 ${R3BROOT_SOURCE_DIR}/r3bdata/dchData
@@ -18,7 +19,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
-${R3BROOT_SOURCE_DIR}/r3bdata/trackerData  )
+${R3BROOT_SOURCE_DIR}/r3bdata/trackerData)
 
 include_directories( ${INCLUDE_DIRECTORIES})
 
@@ -31,7 +32,11 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
 unpack/R3BLosUnpack.cxx
-unpack/R3BLosRawHit.cxx)
+unpack/R3BLosRawHit.cxx
+unpack/R3BLosTcalFill.cxx
+unpack/R3BLosTcal.cxx
+unpack/R3BLosHit.cxx
+)
 
 # fill list of header files from list of source files
 # by exchanging the file extension
@@ -40,7 +45,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF LosLinkDef.h)
 Set(LIBRARY_NAME R3BLos)
 Set(DEPENDENCIES
-    R3Bbase R3BData R3BPassive MCStack)
+    R3Bbase R3BData R3BPassive R3BLosDB MCStack)
 
 GENERATE_LIBRARY()
 
