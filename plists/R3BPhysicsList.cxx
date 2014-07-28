@@ -26,10 +26,15 @@
 #include "G4PenelopeQEDBuilder.h"
 #include "G4StepLimiterBuilder.h"
 #include "R3BDecaysBuilder.h"
-#include "EmHadronElasticBuilder.h"
-#include "EmBinaryCascadeBuilder.h"
-#include "EmIonBinaryCascadeBuilder.h"
-#include "EmGammaNucleusBuilder.h"
+
+
+//#include "EmHadronElasticBuilder.h"
+//#include "EmBinaryCascadeBuilder.h"
+//#include "EmIonBinaryCascadeBuilder.h"
+//#include "EmGammaNucleusBuilder.h"
+#include "G4HadronElasticPhysics.hh"
+#include "G4IonBinaryCascadePhysics.hh"
+#include "G4EmExtraPhysics.hh"
 
 
 // std G4 headers
@@ -54,7 +59,7 @@ R3BPhysicsList::R3BPhysicsList():  G4VModularPhysicsList(){
   gnucIsRegisted = false;
   verbose = 0;
   G4LossTableManager::Instance()->SetVerbose(0);
-  defaultCutValue = 1.*mm;
+  defaultCutValue = 1.*CLHEP::mm;
   cutForGamma     = defaultCutValue;
   cutForElectron  = defaultCutValue;
   cutForPositron  = defaultCutValue;
@@ -100,8 +105,8 @@ void R3BPhysicsList::ConstructProcess() {
   
   // Define energy interval for loss processes
   G4EmProcessOptions emOptions;
-  emOptions.SetMinEnergy(0.1*keV);
-  emOptions.SetMaxEnergy(100.*GeV);
+  emOptions.SetMinEnergy(0.1*CLHEP::keV);
+  emOptions.SetMaxEnergy(100.*CLHEP::GeV);
   emOptions.SetDEDXBinning(90);
   emOptions.SetLambdaBinning(90);
   //emOptions.SetBuildPreciseRange(false);
@@ -164,22 +169,22 @@ void R3BPhysicsList::AddPhysicsList(const G4String& name){
     G4cout << "R3BPhysicsList::AddPhysicsList <" << name << ">" << G4endl;
 
   } else if (name == "elastic" && !helIsRegisted) {
-    RegisterPhysics(new EmHadronElasticBuilder());
+    RegisterPhysics(new G4HadronElasticPhysics());
     helIsRegisted = true;
     G4cout << "R3BPhysicsList::AddPhysicsList <" << name << ">" << G4endl;
     
-  } else if (name == "binary" && !bicIsRegisted) {
-    RegisterPhysics(new EmBinaryCascadeBuilder());
-    bicIsRegisted = true;
-    G4cout << "R3BPhysicsList::AddPhysicsList <" << name << ">" << G4endl;
-    
+//  } else if (name == "binary" && !bicIsRegisted) {
+//    RegisterPhysics(new EmBinaryCascadeBuilder());
+//    bicIsRegisted = true;
+//    G4cout << "R3BPhysicsList::AddPhysicsList <" << name << ">" << G4endl;
+//    
   } else if (name == "binary_ion" && !ionIsRegisted) {
-    RegisterPhysics(new EmIonBinaryCascadeBuilder());
+    RegisterPhysics(new G4IonBinaryCascadePhysics());
     ionIsRegisted = true;
     G4cout << "R3BPhysicsList::AddPhysicsList <" << name << ">" << G4endl;
 
   } else if (name == "gamma_nuc" && !gnucIsRegisted) {
-    RegisterPhysics(new EmGammaNucleusBuilder());
+    RegisterPhysics(new G4EmExtraPhysics());
     gnucIsRegisted = true;
     G4cout << "R3BPhysicsList::AddPhysicsList <" << name << ">" << G4endl;
     

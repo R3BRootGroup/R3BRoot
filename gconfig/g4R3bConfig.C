@@ -41,7 +41,7 @@ void Config()
   if ( ! gMC ) {
     TG4RunConfiguration* runConfiguration 
       = new TG4RunConfiguration("geomRoot", 
-                                "LHEP", 
+                                "QGSP_BERT", 
                                 "specialCuts+stackPopper+stepLimiter+specialControls",
                                  true);
 

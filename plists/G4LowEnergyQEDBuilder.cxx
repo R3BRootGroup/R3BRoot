@@ -180,19 +180,19 @@ void G4LowEnergyQEDBuilder::ConstructProcess()
   G4ParticleDefinition* particle = G4Gamma::Gamma();
 
   G4PhotoElectricEffect* thePhotoElectricEffect = new G4PhotoElectricEffect();
-  thePhotoElectricEffect->SetModel(new G4LivermorePhotoElectricModel());
+  thePhotoElectricEffect->SetEmModel(new G4LivermorePhotoElectricModel());
   ph->RegisterProcess(thePhotoElectricEffect, particle);
 
   G4ComptonScattering* theComptonScattering = new G4ComptonScattering();
-  theComptonScattering->SetModel(new G4LivermoreComptonModel());
+  theComptonScattering->SetEmModel(new G4LivermoreComptonModel());
   ph->RegisterProcess(theComptonScattering, particle);
 
   G4GammaConversion* theGammaConversion = new G4GammaConversion();
-  theGammaConversion->SetModel(new G4LivermoreGammaConversionModel());
+  theGammaConversion->SetEmModel(new G4LivermoreGammaConversionModel());
   ph->RegisterProcess(theGammaConversion, particle);
 
   G4RayleighScattering* theRayleigh = new G4RayleighScattering();
-  theRayleigh->SetModel(new G4LivermoreRayleighModel());
+  theRayleigh->SetEmModel(new G4LivermoreRayleighModel());
   ph->RegisterProcess(theRayleigh, particle);
     
   // Add standard EM Processes for e-
@@ -219,7 +219,7 @@ void G4LowEnergyQEDBuilder::ConstructProcess()
 
   //Annihilation
   G4eplusAnnihilation* eAnni = new G4eplusAnnihilation();
-  eAnni->SetModel(new G4PenelopeAnnihilationModel());
+  eAnni->SetEmModel(new G4PenelopeAnnihilationModel());
   ph->RegisterProcess(eAnni, particle);
 
 #endif

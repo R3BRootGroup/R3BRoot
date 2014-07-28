@@ -82,12 +82,12 @@ void G4EmHadronBuilder::ConstructParticle()
 void G4EmHadronBuilder::ConstructProcess()
 {
   // Add standard EM Processes
-  theParticleIterator->reset();
+  aParticleIterator->reset();
 
-  while( (*theParticleIterator)() ){
-    G4ParticleDefinition* particle = theParticleIterator->value();
+  while( (*aParticleIterator)() ){
+    G4ParticleDefinition* particle = aParticleIterator->value();
 
-    if(particle->GetPDGMass() > 110.*MeV) {
+    if(particle->GetPDGMass() > 110.*CLHEP::MeV) {
       G4ProcessManager* pmanager = particle->GetProcessManager();
       G4String particleName = particle->GetParticleName();
 

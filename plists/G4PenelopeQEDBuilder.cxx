@@ -176,19 +176,19 @@ void G4PenelopeQEDBuilder::ConstructProcess()
   G4ParticleDefinition* particle = G4Gamma::Gamma();
 
   G4PhotoElectricEffect* thePhotoElectricEffect = new G4PhotoElectricEffect();
-  thePhotoElectricEffect->SetModel(new G4PenelopePhotoElectricModel());
+  thePhotoElectricEffect->SetEmModel(new G4PenelopePhotoElectricModel());
   ph->RegisterProcess(thePhotoElectricEffect, particle);
 
   G4ComptonScattering* theComptonScattering = new G4ComptonScattering();
-  theComptonScattering->SetModel(new G4PenelopeComptonModel());
+  theComptonScattering->SetEmModel(new G4PenelopeComptonModel());
   ph->RegisterProcess(theComptonScattering, particle);
 
   G4GammaConversion* theGammaConversion = new G4GammaConversion();
-  theGammaConversion->SetModel(new G4PenelopeGammaConversionModel());
+  theGammaConversion->SetEmModel(new G4PenelopeGammaConversionModel());
   ph->RegisterProcess(theGammaConversion, particle);
 
   G4RayleighScattering* theRayleigh = new G4RayleighScattering();
-  theRayleigh->SetModel(new G4PenelopeRayleighModel());
+  theRayleigh->SetEmModel(new G4PenelopeRayleighModel());
   ph->RegisterProcess(theRayleigh, particle);
     
 
@@ -222,7 +222,7 @@ void G4PenelopeQEDBuilder::ConstructProcess()
 
   //Annihilation
   G4eplusAnnihilation* eAnni = new G4eplusAnnihilation();
-  eAnni->SetModel(new G4PenelopeAnnihilationModel());
+  eAnni->SetEmModel(new G4PenelopeAnnihilationModel());
   ph->RegisterProcess(eAnni, particle);
 
 #endif

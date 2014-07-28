@@ -26,7 +26,7 @@
 #include "EmHadronElasticBuilder.h"
 #include "G4ParticleDefinition.hh"
 #include "G4ProcessManager.hh"
-#include "G4LElastic.hh"   
+#include "G4LElastic.hh"
 #include "G4HadronElasticProcess.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -51,11 +51,11 @@ void EmHadronElasticBuilder::ConstructProcess()
   theElasticProcess = new G4HadronElasticProcess();
   theElasticProcess->RegisterMe( new G4LElastic() );
 
-  theParticleIterator->reset();
-  while( (*theParticleIterator)() ){
-    G4ParticleDefinition* particle = theParticleIterator->value();
+  aParticleIterator->reset();
+  while( (*aParticleIterator)() ){
+    G4ParticleDefinition* particle = aParticleIterator->value();
     G4ProcessManager* pManager = particle->GetProcessManager();
-    if (particle->GetPDGMass() > 110.*MeV && 
+    if (particle->GetPDGMass() > 110.*CLHEP::MeV && 
         theElasticProcess->IsApplicable(*particle) &&
         !particle->IsShortLived()) { 
       pManager->AddDiscreteProcess(theElasticProcess);

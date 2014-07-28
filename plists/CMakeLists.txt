@@ -38,10 +38,10 @@ G4PenelopeQEDBuilder.cxx
 G4StepLimiterBuilder.cxx
 G4StepLimiterMessenger.cxx
 G4StepLimiterPerRegion.cxx
-EmBinaryCascadeBuilder.cxx
-EmGammaNucleusBuilder.cxx
-EmHadronElasticBuilder.cxx
-EmIonBinaryCascadeBuilder.cxx
+#EmBinaryCascadeBuilder.cxx
+#EmGammaNucleusBuilder.cxx
+#EmHadronElasticBuilder.cxx
+#EmIonBinaryCascadeBuilder.cxx
 R3BDecaysBuilder.cxx
 R3BParticlesBuilder.cxx
 R3BPhysicsList.cxx
