@@ -30,6 +30,7 @@ typedef enum EDetector {
   kMtof             = 0x12,
   kTof              = 0x14,
   kTracker          = 0x16,
+  kLos              = 0x18
 } Detector_t;
  
  static Int_t       FullMask(){
