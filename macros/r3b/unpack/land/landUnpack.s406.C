@@ -8,7 +8,7 @@
   const char *landMappingName = "cfg_neuland_s406.hh";
   const Int_t nBarsPerPlane = 10;
   const Int_t updateRate = 150000;
-  const Int_t minStats = 1000;
+  const Int_t minStats = 10000;
   const Int_t nModules = 300;
   const char *outputFileName = "rawData.s406.root";
   const char *parFileName = "params.s406.root";
@@ -18,11 +18,11 @@
   // Create source with unpackers ----------------------------------------------
   FairLmdSource* source  = new FairLmdSource();
   // adding the LMD file
-  source->AddFile("/Volumes/Data2/land/s406/lmd/r258_2983.lmd");
-  source->AddFile("/Volumes/Data2/land/s406/lmd/r258_2984.lmd");
-  source->AddFile("/Volumes/Data2/land/s406/lmd/r258_2985.lmd");
-  source->AddFile("/Volumes/Data2/land/s406/lmd/r258_2986.lmd");
-  source->AddFile("/Volumes/Data2/land/s406/lmd/r258_2987.lmd");
+  source->AddFile("/Users/kresan/lmd/s406/r258_2983.lmd");
+  source->AddFile("/Users/kresan/lmd/s406/r258_2984.lmd");
+  source->AddFile("/Users/kresan/lmd/s406/r258_2985.lmd");
+  source->AddFile("/Users/kresan/lmd/s406/r258_2986.lmd");
+  source->AddFile("/Users/kresan/lmd/s406/r258_2987.lmd");
 
   // MBS parameters ---------------------------------------
   Short_t type = 94;
@@ -39,16 +39,8 @@
 
   // Create online run ---------------------------------------------------------
   FairRunOnline* run = new FairRunOnline(source);
-  FairRunIdGenerator runID;
-  UInt_t runId =  runID.generateId();
-  Double_t s= (Double_t) runId;
-  ValTimeStamp t1(s);
-     
-  cout << " RUNID GENERE " << runId << " date:" << t1.AsString("s") <<  endl;
-  run->SetRunId(runId); 
   run->SetOutputFile(outputFileName);
-  run->SetGenerateHtml(kFALSE);
-  
+  run->SetGenerateHtml(kFALSE, "", 10000);
   // ---------------------------------------------------------------------------
   
   
@@ -119,8 +111,7 @@
 
  
   // Run -----------------------------------------------------------------------
-  //run->Run(nev, 0);
-  run->Run(150000, 0);
+  run->Run(nev, 0);
   // ---------------------------------------------------------------------------
 
 
