@@ -11,6 +11,7 @@ ${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/mcstack 
 ${R3BROOT_SOURCE_DIR}/gfi
 ${R3BROOT_SOURCE_DIR}/mfi
+${R3BROOT_SOURCE_DIR}/mfi/unpack
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/calData
 ${R3BROOT_SOURCE_DIR}/r3bdata/dchData
@@ -38,6 +39,8 @@ R3BGeoMfi.cxx
 R3BMfiDigiPar.cxx
 R3BMfiDigitizer.cxx
 R3BKeepEventProbabilityMfi.cxx
+unpack/R3BMfiRawHit.cxx
+unpack/R3BMfiUnpack.cxx
 )
 
 # fill list of header files from list of source files
