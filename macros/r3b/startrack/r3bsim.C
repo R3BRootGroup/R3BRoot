@@ -98,12 +98,13 @@ Int_t r3bsim(){
 //  detGeo.Add(new TObjString("GLAD"),          new TObjString("glad_v13a.geo.root"));
 //  detGeo.Add(new TObjString("CRYSTALBALL"),   new TObjString("cal_v13a.geo.root"));
 //    detGeo.Add(new TObjString("CALIFA"),        new TObjString("califa_Marc.geo.root"));
-  detGeo.Add(new TObjString("CALIFA"),        new TObjString("califa_v14a.geo.root"));
+//  detGeo.Add(new TObjString("CALIFA"),        new TObjString("califa_v14a.geo.root"));
 //  detGeo.Add(new TObjString("TOF"),           new TObjString("tof_v13a.geo.root"));
 //  detGeo.Add(new TObjString("MTOF"),          new TObjString("mtof_v13a.geo.root"));
 //  detGeo.Add(new TObjString("DCH"),           new TObjString("dch_v13a.geo.root"));
 //  detGeo.Add(new TObjString("TRACKER"),       new TObjString("tra_v13vac.geo.root"));
-  detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startra_v14a.geo.root"));
+//  detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startra_v14a.geo.root"));
+  detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startra_v15a.geo.root"));
 //  detGeo.Add(new TObjString("GFI"),           new TObjString("gfi_v13a.geo.root"));
 //  detGeo.Add(new TObjString("LAND"),          new TObjString("land_v12a_10m.geo.root"));
 //  detGeo.Add(new TObjString("SCINTNEULAND"),  new TObjString("neuland_v12a_14m.geo.root"));
@@ -113,39 +114,7 @@ Int_t r3bsim(){
 //  detGeo.Add(new TObjString("PSP"),           new TObjString("psp_v13a.geo.root"));
 
 
-/*
-    TObjString det0("TARGET");
-    //TObjString det1("ALADIN");
-    //TObjString det2("GLAD");
-    TObjString det3("CALIFA");
-    //TObjString det4("CRYSTALBALL");
-    //TObjString det5("TOF");
-    //TObjString det6("MTOF");
-    //TObjString det7("DCH");
-	//TObjString det8("TRACKER");
-	TObjString det9("STaRTrack");
-        //TObjString det10("GFI");
-        //TObjString det11("LAND");
-	//TObjString det12("CHAMBER"); // vacuum chamber for Si tracker
-	//TObjString det13("VACVESSELCOOL"); // vacuum chamber for Si STaRTrack
 
-
-    TObjArray fDetList;
-    fDetList.Add(&det0);  // target
-    //fDetList.Add(&det1);  // ALADIN
-    //fDetList.Add(&det2); // GLAD
-    fDetList.Add(&det3);  // Calorimeter CALIFA
-    //fDetList.Add(&det4);  // Calorimeter XBall
-    //fDetList.Add(&det5);
-    //fDetList.Add(&det6);
-    //fDetList.Add(&det7);
-       //fDetList.Add(&det8);  // Tracker
-       fDetList.Add(&det9);  // StarTrack
-       //fDetList.Add(&det10);
-       //fDetList.Add(&det11);
-       //fDetList.Add(&det12);  // chamber !!!! when chamber is on delta e- rate increases -> To check !!! 
-       //fDetList.Add(&det13);  // 
-       */
 
    //-------------------------------------------------
    //- N# of Sim. Events   |    nEvents     (Int_t)
