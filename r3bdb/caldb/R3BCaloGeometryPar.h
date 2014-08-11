@@ -9,10 +9,10 @@
 #include <iostream>                     // for operator<<, basic_ostream, etc
 #include <string>                       // for string
 
-#include "R3BCaloAlveolusGeoPar.h";
-#include "R3BCaloCrystalGeoPar.h";
-#include "R3BCaloAlveolusPar.h";
-#include "R3BCaloCrystalPar.h";
+#include "R3BCaloAlveolusGeoPar.h"
+#include "R3BCaloCrystalGeoPar.h"
+#include "R3BCaloAlveolusPar.h"
+#include "R3BCaloCrystalPar.h"
 
 using namespace std;
 
