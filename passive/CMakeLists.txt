@@ -41,6 +41,6 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF PassiveLinkDef.h)
 Set(LIBRARY_NAME R3BPassive) 
 Set(DEPENDENCIES
-    R3Bbase Field R3BPassive)
+    R3Bbase Field)
 
 GENERATE_LIBRARY()

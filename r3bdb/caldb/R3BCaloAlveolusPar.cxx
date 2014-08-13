@@ -343,4 +343,6 @@ FairDbWriter<R3BCaloAlveolusPar>* R3BCaloAlveolusPar::ActivateWriter(Int_t rid)
 	return fParam_Writer;
 	
   }
+
+  return NULL;
 }

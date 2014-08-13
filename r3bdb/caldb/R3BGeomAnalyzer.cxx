@@ -66,6 +66,7 @@ Bool_t R3BGeomAnalyzer::Import(TFile *geoFile) {
   // Close the Geometry
   fGeom->CloseGeometry();
 
+  return kTRUE;
 }
 
 Bool_t R3BGeomAnalyzer::RecReadMedia(Bool_t keepGoing){

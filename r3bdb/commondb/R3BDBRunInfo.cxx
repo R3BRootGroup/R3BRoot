@@ -297,6 +297,8 @@ FairDbWriter<R3BDBRunInfo>* R3BDBRunInfo::ActivateWriter(Int_t rid)
 	return fParam_Writer;
 	
   }
+
+  return NULL;
 }
 
 Int_t R3BDBRunInfo::CalcUniqueSeqNo(Int_t run)

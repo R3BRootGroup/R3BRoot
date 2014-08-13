@@ -426,6 +426,8 @@ FairDbWriter<R3BDBLmdFileInfo>* R3BDBLmdFileInfo::ActivateWriter(Int_t rid)
 	return fParam_Writer;
 	
   }
+
+  return NULL;
 }
 
 Int_t R3BDBLmdFileInfo::CalcUniqueSeqNo(Int_t fileId)

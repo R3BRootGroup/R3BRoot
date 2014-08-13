@@ -355,4 +355,6 @@ FairDbWriter<R3BLandTCalPar>* R3BLandTCalPar::ActivateWriter(Int_t rid)
 	return fParam_Writer;
 	
   }
+
+  return NULL;
 }

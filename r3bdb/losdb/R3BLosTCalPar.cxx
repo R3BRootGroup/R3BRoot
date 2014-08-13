@@ -348,4 +348,6 @@ FairDbWriter<R3BLosTCalPar>* R3BLosTCalPar::ActivateWriter(Int_t rid)
 	return fParam_Writer;
 	
   }
+
+  return NULL;
 }

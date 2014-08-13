@@ -343,4 +343,6 @@ FairDbWriter<R3BCaloCrystalPar>* R3BCaloCrystalPar::ActivateWriter(Int_t rid)
 	return fParam_Writer;
 	
   }
+
+  return NULL;
 }
