@@ -16,8 +16,9 @@ R3BPrimaryGenerator::~R3BPrimaryGenerator() {
 }
 
 void R3BPrimaryGenerator::AddTrack(Int_t pdgid, Double_t px, Double_t py,
-				   Double_t pz, Double_t vx, Double_t vy,
-				   Double_t vz, Int_t parent,Bool_t wanttracking,Double_t e) {
+                                   Double_t pz, Double_t vx, Double_t vy,
+                                   Double_t vz, Int_t parent, Bool_t wanttracking,
+                                   Double_t e, Double_t tof, Double_t weight) {
   static Int_t iprim=0;
   Double_t mass; 
   //Int_t warn=0;
@@ -80,12 +81,12 @@ void R3BPrimaryGenerator::AddTrack(Int_t pdgid, Double_t px, Double_t py,
     Int_t    doTracking =  0;   // Go to tracking
     if(fdoTracking && wanttracking) doTracking = 1 ;
     Int_t    dummyparent     = -1;   // Primary particle (now the value is -1 by default)
-    Double_t tof        =  0.;  // Time of flight
+    tof        =  0.;           // Time of flight
     Double_t polx       =  0.;  // Polarisation
     Double_t poly       =  0.;
     Double_t polz       =  0.;
     Int_t    ntr        =  0;   // Track number; to be filled by the stack
-    Double_t weight     =  1.;  // Weight
+    weight     =  1.;           // Weight
     Int_t    status     =  0;   // Generation status
 
     if( parent!=-1) parent+=fMCIndexOffset;// correct for tracks which are in list before generator is called

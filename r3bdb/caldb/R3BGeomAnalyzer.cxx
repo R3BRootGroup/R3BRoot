@@ -172,7 +172,7 @@ Bool_t R3BGeomAnalyzer::RecReadNodes(Bool_t keepGoing){
       Double_t wrap_thickness = TMath::Abs(moth_shape->GetDZ()-dZ);
 
 	  Int_t crystal_typeId = GetCrystalTypeId(shape);
-      const Char_t* crystal_name = ((TGeoShape*) fV_Crystals[crystal_typeId])->GetName();     
+      //const Char_t* crystal_name = ((TGeoShape*) fV_Crystals[crystal_typeId])->GetName();
 	  //cout << " -I- Crystal type Id # " << crystal_typeId 
       //                                  <<  " crystal name# " <<  crystal_name 
 	  //	                                <<  " wrapping# " <<  wrap_thickness << endl; 
@@ -262,7 +262,7 @@ Bool_t R3BGeomAnalyzer::CompareShape(TGeoArb8* a , TGeoArb8* b){
 	return kFALSE;
   } else {
     Double_t l_diff[8]={0.,0.,0.,0.,0.,0.,0.,0.};   
-    Double_t h_diff[8]={0.,0.,0.,0.,0.,0.,0.,0.};   
+    //Double_t h_diff[8]={0.,0.,0.,0.,0.,0.,0.,0.};
 	
 	for(Int_t i=0;i<8;i++) {
       l_diff[i] = TMath::Abs(a_vtx[i] - b_vtx[i]);

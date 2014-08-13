@@ -14,7 +14,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
-const int kMaxLen = 2048;        
+//const int kMaxLen = 2048;
 
 // ------   Constructor   --------------------------------------------------
 R3BFieldPar::R3BFieldPar(const char* name, const char* title,

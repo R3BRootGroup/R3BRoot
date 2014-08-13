@@ -48,8 +48,8 @@ using std::endl;
 
 // -----   Default constructor   -------------------------------------------
 R3BCaloEventDisplay::R3BCaloEventDisplay() : FairTask("R3BCaloEventDisplay",0),
-  fGeometryVersion(10),
   fEventManager(NULL),
+  fGeometryVersion(10),
   fDataHist(NULL),
   fCalo3d(NULL),
   fCalo2d(NULL),
@@ -65,8 +65,8 @@ R3BCaloEventDisplay::R3BCaloEventDisplay() : FairTask("R3BCaloEventDisplay",0),
 
 // -----   Standard constructor   -------------------------------------------
 R3BCaloEventDisplay::R3BCaloEventDisplay(const char* name, Int_t iVerbose) : FairTask(name, iVerbose),
-  fGeometryVersion(10),
   fEventManager(NULL),
+  fGeometryVersion(10),
   fDataHist(NULL),
   fCalo3d(NULL),
   fCalo2d(NULL),
