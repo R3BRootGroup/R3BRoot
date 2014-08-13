@@ -72,7 +72,7 @@ Set(INCLUDE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/include")
 Set(VMCWORKDIR ${CMAKE_SOURCE_DIR})
 
 Option(USE_PATH_INFO "Information from PATH and LD_LIBRARY_PATH are
-used."OFF)
+used." OFF)
 If(USE_PATH_INFO)
   Set(PATH $ENV{PATH})
   If (APPLE)
