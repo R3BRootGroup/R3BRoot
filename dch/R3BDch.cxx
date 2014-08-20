@@ -310,8 +310,8 @@ void R3BDch::RecordPartialMcHit()
         fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
         gMC->TrackPosition(fPosOut);
         gMC->TrackMomentum(fMomOut);
-        if (fELoss == 0.)
-            return;
+//        if (fELoss == 0.)
+//            return;
 
         fTime_out = gMC->TrackTime() * 1.0e09; // also in case particle is stopped in detector, or decays...
         fLength_out = gMC->TrackLength();

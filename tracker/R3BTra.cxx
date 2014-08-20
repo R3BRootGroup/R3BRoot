@@ -171,8 +171,8 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol)
         fDetCopyID = vol->getCopyNo(); // added by Marc
         gMC->TrackPosition(fPosOut);
         gMC->TrackMomentum(fMomOut);
-        if (fELoss == 0.)
-            return kFALSE;
+//        if (fELoss == 0.)
+//            return kFALSE;
 
         if (gMC->IsTrackExiting())
         {
