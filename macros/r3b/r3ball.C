@@ -161,6 +161,7 @@ void r3ball(Int_t nEvents = 1,
   if (fDetList.FindObject("TRACKER")  ) {
     R3BDetector* tra = new R3BTra("Tracker", kTRUE);
     tra->SetGeometryFileName(((TObjString*)fDetList.GetValue("TRACKER"))->GetString().Data());
+    tra->SetEnergyCut(1e-4);
     run->AddModule(tra);
   }
   

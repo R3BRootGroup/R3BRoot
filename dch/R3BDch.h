@@ -6,7 +6,6 @@
 /**  R3BDch.h
  **/
 
-
 #ifndef R3BDCH_H
 #define R3BDCH_H
 
@@ -21,159 +20,164 @@ class R3BDchFullPoint;
 class R3BDchPoint;
 class FairVolume;
 
-
-
 class R3BDch : public R3BDetector
 {
 
- public:
+  public:
+    /** Default constructor **/
+    R3BDch();
 
-  /** Default constructor **/
-  R3BDch();
+    /** Standard constructor.
+     *@param name    detetcor name
+     *@param active  sensitivity flag
+     **/
+    R3BDch(const char* name, Bool_t active);
 
+    /** Destructor **/
+    virtual ~R3BDch();
 
-  /** Standard constructor.
-   *@param name    detetcor name
-   *@param active  sensitivity flag
-   **/
-  R3BDch(const char* name, Bool_t active);
+    /** Virtual method ProcessHits
+     **
+     ** Defines the action to be taken when a step is inside the
+     ** active volume. Creates a R3BDchPoint and adds it to the
+     ** collection.
+     *@param vol  Pointer to the active volume
+     **/
+    virtual Bool_t ProcessHits(FairVolume* vol = 0);
 
+    /** Virtual method BeginEvent
+     **
+     ** If verbosity level is set, print hit collection at the
+     ** end of the event and resets it afterwards.
+     **/
 
-  /** Destructor **/
-  virtual ~R3BDch();
+    virtual void BeginEvent();
 
+    /** Virtual method EndOfEvent
+     **
+     ** If verbosity level is set, print hit collection at the
+     ** end of the event and resets it afterwards.
+     **/
 
-  /** Virtual method ProcessHits
-   **
-   ** Defines the action to be taken when a step is inside the
-   ** active volume. Creates a R3BDchPoint and adds it to the
-   ** collection.
-   *@param vol  Pointer to the active volume
-   **/
-  virtual Bool_t ProcessHits(FairVolume* vol = 0);
+    virtual void EndOfEvent();
 
+    /** Virtual method Register
+     **
+     ** Registers the hit collection in the ROOT manager.
+     **/
+    virtual void Register();
 
-  /** Virtual method BeginEvent
-   **
-   ** If verbosity level is set, print hit collection at the
-   ** end of the event and resets it afterwards.
-   **/
+    /** Accessor to the hit collection **/
+    virtual TClonesArray* GetCollection(Int_t iColl) const;
 
-  virtual void BeginEvent();
+    /** Virtual method Print
+     **
+     ** Screen output of hit collection.
+     **/
+    virtual void Print(Option_t* option = "") const;
 
-  /** Virtual method EndOfEvent
-   **
-   ** If verbosity level is set, print hit collection at the
-   ** end of the event and resets it afterwards.
-   **/
+    /** Virtual method Reset
+     **
+     ** Clears the hit collection
+     **/
+    virtual void Reset();
 
-  virtual void EndOfEvent();
+    /** Virtual method CopyClones
+     **
+     ** Copies the hit collection with a given track index offset
+     *@param cl1     Origin
+     *@param cl2     Target
+     *@param offset  Index offset
+     **/
+    virtual void CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset);
 
+    /** Virtaul method Construct geometry
+     **
+     ** Constructs the STS geometry
+     **/
+    virtual void ConstructGeometry();
 
+    virtual Bool_t CheckIfSensitive(std::string name);
 
-  /** Virtual method Register
-   **
-   ** Registers the hit collection in the ROOT manager.
-   **/
-  virtual void Register();
+    virtual void Initialize();
+    virtual void SetSpecialPhysicsCuts();
+    void SetHeliumBag(Bool_t bag)
+    {
+        kHelium = bag;
+    }
+    void SetDynamicStepSize(Bool_t step)
+    {
+        fDynamicStepSize = step;
+    }
 
+    // renormalization of MC step size
+    Double_t BetheBloch(Double_t bg);
+    void SetStepToNextCollision();
+    void SetVerbosity(Bool_t verb)
+    {
+        fVerbose = verb;
+    }
 
-  /** Accessor to the hit collection **/
-  virtual TClonesArray* GetCollection(Int_t iColl) const;
+    void PrintInfo();
+    void RecordFullMcHit();
+    void RecordPartialMcHit();
+    void FindNodePath(TObjArray* arr);
 
-
-  /** Virtual method Print
-   **
-   ** Screen output of hit collection.
-   **/
-  virtual void Print(Option_t* option="") const;
-
-
-  /** Virtual method Reset
-   **
-   ** Clears the hit collection
-   **/
-  virtual void Reset();
-
-
-  /** Virtual method CopyClones
-   **
-   ** Copies the hit collection with a given track index offset
-   *@param cl1     Origin
-   *@param cl2     Target
-   *@param offset  Index offset
-   **/
-  virtual void CopyClones(TClonesArray* cl1, TClonesArray* cl2,
-			  Int_t offset);
-
-
-  /** Virtaul method Construct geometry
-   **
-   ** Constructs the STS geometry
-   **/
-  virtual void ConstructGeometry();
-   
-
-  virtual Bool_t CheckIfSensitive(std::string name);
-
-
-  virtual void Initialize();
-  virtual void SetSpecialPhysicsCuts() {}
-  void SetHeliumBag( Bool_t bag ) {kHelium = bag;}
-  void SetDynamicStepSize(Bool_t step) {fDynamicStepSize=step;}
-
-
-  // renormalization of MC step size
-  Double_t BetheBloch(Double_t bg);
-  void SetStepToNextCollision();
-  void SetVerbosity(Bool_t verb ) { fVerbose=verb;}
-
-  void PrintInfo();
-  void RecordFullMcHit();
-  void RecordPartialMcHit();
-  void FindNodePath(TObjArray* arr);
-
-private:
-
+  private:
     /** Track information to be stored until the track leaves the
-	active volume. **/
-    Int_t          fTrackID;           //!  track index
-    Int_t          fVolumeID;          //!  volume id
-    TLorentzVector fPosIn, fPosOut;    //!  position
-    TLorentzVector fMomIn, fMomOut;    //!  momentum
-    Double32_t     fTime_in;              //!  time when entering active volume
-    Double32_t     fTime_out;              //!  time when exiting active volume
-    Double32_t     fTime;              //!  time
-    Double32_t     fLength_in;            //!  length when entering active volume
-    Double32_t     fLength_out;            //!  length when exiting active volume
-    Double32_t     fLength;            //!  length
-    Double32_t     fELoss;             //!  energy loss
-    Int_t          fPosIndex;          //!
-    TClonesArray*  fDchCollection;     //!  The hit collection
-    Bool_t         kGeoSaved;          //!
-    Bool_t         kHelium;            //!  Helium bag part
-    TList         *flGeoPar;           //!
-    Bool_t         fVerbose;           //!
-    Bool_t         fDynamicStepSize;   //!
+    active volume. **/
+    Int_t fTrackID;                 //!  track index
+    Int_t fVolumeID;                //!  volume id
+    TLorentzVector fPosIn, fPosOut; //!  position
+    TLorentzVector fMomIn, fMomOut; //!  momentum
+    Double32_t fTime_in;            //!  time when entering active volume
+    Double32_t fTime_out;           //!  time when exiting active volume
+    Double32_t fTime;               //!  time
+    Double32_t fLength_in;          //!  length when entering active volume
+    Double32_t fLength_out;         //!  length when exiting active volume
+    Double32_t fLength;             //!  length
+    Double32_t fELoss;              //!  energy loss
+    Int_t fPosIndex;                //!
+    TClonesArray* fDchCollection;   //!  The hit collection
+    Bool_t kGeoSaved;               //!
+    Bool_t kHelium;                 //!  Helium bag part
+    TList* flGeoPar;                //!
+    Bool_t fVerbose;                //!
+    Bool_t fDynamicStepSize;        //!
     // Sensitive Ref Node
-    TGeoMatrix* refMatrix;                 //! Trans reference Node
+    TGeoMatrix* refMatrix; //! Trans reference Node
 
     /** Private method AddHit
      **
      ** Adds a DchPoint to the HitCollection
      **/
-    R3BDchFullPoint* AddFullHit(Int_t trackId, Int_t mod, Int_t layer, Int_t cell, TVector3 pos,
-			        TVector3 lpos, TVector3 mom,
-			        TVector3 lmom, Double_t time,
-			        Double_t length, Double_t eLoss);
+    R3BDchFullPoint* AddFullHit(Int_t trackId,
+                                Int_t mod,
+                                Int_t layer,
+                                Int_t cell,
+                                TVector3 pos,
+                                TVector3 lpos,
+                                TVector3 mom,
+                                TVector3 lmom,
+                                Double_t time,
+                                Double_t length,
+                                Double_t eLoss);
 
-    R3BDchPoint* AddHit(Int_t trackId, Int_t mod, Int_t layer, Int_t cell, TVector3 posIn,
-			    TVector3 pos_out, TVector3 momIn,
-			    TVector3 momOut,
-			    TVector3 lpos1, TVector3 lmom1,
-                            TVector3 lpos2, TVector3 lmom2,
-			    Double_t time, Double_t length, Double_t eLoss);
-
+    R3BDchPoint* AddHit(Int_t trackId,
+                        Int_t mod,
+                        Int_t layer,
+                        Int_t cell,
+                        TVector3 posIn,
+                        TVector3 pos_out,
+                        TVector3 momIn,
+                        TVector3 momOut,
+                        TVector3 lpos1,
+                        TVector3 lmom1,
+                        TVector3 lpos2,
+                        TVector3 lmom2,
+                        Double_t time,
+                        Double_t length,
+                        Double_t eLoss);
 
     /** Private method ResetParameters
      **
@@ -181,21 +185,18 @@ private:
      **/
     void ResetParameters();
 
-
-    ClassDef(R3BDch,1);
-
+    ClassDef(R3BDch, 1);
 };
 
-
-inline void R3BDch::ResetParameters() {
-  fTrackID = fVolumeID = 0;
-  fPosIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
-  fPosOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
-  fMomIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
-  fMomOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
-  fTime = fLength = fELoss = 0;
-  fPosIndex = 0;
+inline void R3BDch::ResetParameters()
+{
+    fTrackID = fVolumeID = 0;
+    fPosIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
+    fPosOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
+    fMomIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
+    fMomOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
+    fTime = fLength = fELoss = 0;
+    fPosIndex = 0;
 };
 
-
-#endif 
+#endif
