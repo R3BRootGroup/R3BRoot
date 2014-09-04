@@ -13,6 +13,8 @@
 #include "FairTask.h"
 #include "R3BSTaRTrackerDigitHit.h"
 
+#include "R3BSTaRTraDigiPar.h"
+
 class TClonesArray;
 
 class R3BSTaRTraDigit : public FairTask
@@ -68,6 +70,8 @@ protected:
 	// Experimental resolution @ 1 MeV  
 	Double_t fTrackerResolution;
 
+        // Parameter class
+        R3BSTaRTraDigiPar* fSTaRTraDigiPar;
 	
 private:
 	
@@ -78,6 +82,8 @@ private:
 	//R3BSTaRTrackerDigitHit* AddHit(Double_t ene,Int_t det,Int_t Stripfrt,Int_t Stripbck,Double_t time);
         R3BSTaRTrackerDigitHit* AddHit( Int_t det, Int_t chip, Int_t Side, Int_t Strip, Double_t energy, Double_t time);
 	
+
+        virtual void SetParContainers();
 	
 	ClassDef(R3BSTaRTraDigit,1);
 	

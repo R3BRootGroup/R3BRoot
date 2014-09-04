@@ -23,6 +23,7 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "FairLogger.h"
 
 #include "TGeoManager.h"
 
@@ -41,6 +42,26 @@ R3BSTaRTraDigit::R3BSTaRTraDigit() : FairTask("R3B STaRTracker Hit Raw Sim data 
 
 R3BSTaRTraDigit::~R3BSTaRTraDigit() {
 }
+
+
+void R3BSTaRTraDigit::SetParContainers() {
+
+  // Get run and runtime database
+  FairRunAna* run = FairRunAna::Instance();
+  if ( ! run ) Fatal("SetParContainers", "No analysis run");
+
+  FairRuntimeDb* rtdb = run->GetRuntimeDb();
+  if ( ! rtdb ) Fatal("SetParContainers", "No runtime database");
+
+  fSTaRTraDigiPar = (R3BSTaRTraDigiPar*)(rtdb->getContainer("R3BSTaRTraDigiPar"));
+
+  if ( fSTaRTraDigiPar ) {
+      LOG(INFO) << "-I- R3BSTaRTraDigit::SetParContainers() "<< FairLogger::endl;
+      LOG(INFO) << "-I- Container R3BSTaRTraDigiPar  loaded " << FairLogger::endl;
+  }
+
+}
+
 
 
 // -----   Public method Init   --------------------------------------------

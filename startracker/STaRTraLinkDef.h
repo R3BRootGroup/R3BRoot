@@ -9,6 +9,7 @@
 #pragma link C++ class R3BSTaRTra+;
 #pragma link C++ class R3BSTaRTraHitFinder+;
 #pragma link C++ class R3BSTaRTraDigit+;
+#pragma link C++ class R3BSTaRTraDigiPar+;
 #pragma link C++ class R3BSTaRTraContFact+;
 
 #pragma link C++ class R3BSTaRTrackerEvent+;
