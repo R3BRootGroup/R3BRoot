@@ -85,17 +85,17 @@ void R3BCaloGeometryPar::fill(UInt_t rid){
   cout << "-I- R3BCaloGeometryPar::fill() called with RID# " << rid << endl; 
 
   R3BCaloMediaPar mpar;
-  R3BCaloCrystalGeoPar cgpar;
+  R3BCaloDetectionUnitSimGeoPar cgpar;
   R3BCaloAlveolusGeoPar agpar;
-  R3BCaloCrystalPar cpar;
+  R3BCaloDetectionUnitSimPar cpar;
   R3BCaloAlveolusPar apar;
-
+ 
   FairDbReader<R3BCaloMediaPar>* r_mpar = mpar.GetParamReader();  
-  FairDbReader<R3BCaloCrystalGeoPar>* r_cgpar = cgpar.GetParamReader();  
-  FairDbReader<R3BCaloCrystalPar>* r_cpar = cpar.GetParamReader();  
+  FairDbReader<R3BCaloDetectionUnitSimGeoPar>* r_cgpar = cgpar.GetParamReader();  
+  FairDbReader<R3BCaloDetectionUnitSimPar>* r_cpar = cpar.GetParamReader();  
   FairDbReader<R3BCaloAlveolusGeoPar>* r_agpar = agpar.GetParamReader();  
   FairDbReader<R3BCaloAlveolusPar>* r_apar = apar.GetParamReader();  
-  
+
   // Define a Global Context
   ValTimeStamp ts(rid);
   ValCondition context(Detector::kCal,DataType::kData,ts);
@@ -107,7 +107,6 @@ void R3BCaloGeometryPar::fill(UInt_t rid){
   r_agpar->Activate(context, GetVersion());  
   r_apar->Activate(context, GetVersion());  
 
-
   Int_t numMedia = r_mpar->GetNumRows(); 
   for (int i = 0; i < numMedia; ++i) {
     R3BCaloMediaPar* media_par = (R3BCaloMediaPar*) r_mpar->GetRowByIndex(i);
@@ -117,7 +116,7 @@ void R3BCaloGeometryPar::fill(UInt_t rid){
 
   Int_t numCrystalGeom = r_cgpar->GetNumRows(); 
   for (int i = 0; i < numCrystalGeom; ++i) {
-    R3BCaloCrystalGeoPar* cgeo_par = (R3BCaloCrystalGeoPar*) r_cgpar->GetRowByIndex(i+1);
+    R3BCaloDetectionUnitSimGeoPar* cgeo_par = (R3BCaloDetectionUnitSimGeoPar*) r_cgpar->GetRowByIndex(i+1);
     if (!cgeo_par) { continue; }
     fGeomCrystals->Add(cgeo_par);
   }
@@ -133,7 +132,7 @@ void R3BCaloGeometryPar::fill(UInt_t rid){
 
   Int_t numCrystals = r_cpar->GetNumRows(); 
   for (int i = 0; i < numCrystals; ++i) {
-    R3BCaloCrystalPar* c_par = (R3BCaloCrystalPar*) r_cpar->GetRowByIndex(i);
+    R3BCaloDetectionUnitSimPar* c_par = (R3BCaloDetectionUnitSimPar*) r_cpar->GetRowByIndex(i);
     if (!c_par) { continue; }
     fNodeCrystals->Add(c_par);
   }
@@ -144,7 +143,6 @@ void R3BCaloGeometryPar::fill(UInt_t rid){
     if (!a_par) { continue; }
     fNodeAlveoli->Add(a_par);
   }
-
 
 }
 
@@ -187,7 +185,7 @@ void R3BCaloGeometryPar::store(UInt_t rid){
 
   // Crystal Geometries
   for(Int_t i=0;i<fGeomCrystals->GetEntries();i++){
-	R3BCaloCrystalGeoPar* cgeo_par = (R3BCaloCrystalGeoPar*) fGeomCrystals->At(i);
+	R3BCaloDetectionUnitSimGeoPar* cgeo_par = (R3BCaloDetectionUnitSimGeoPar*) fGeomCrystals->At(i);
     if (cgeo_par) cgeo_par->store(rid); 
   }
 
@@ -199,13 +197,13 @@ void R3BCaloGeometryPar::store(UInt_t rid){
 
 
   // Crystal nodes stored row-wized
-  R3BCaloCrystalPar iPar;
-  FairDbWriter<R3BCaloCrystalPar>* cW = iPar.ActivateWriter(rid); 
+  R3BCaloDetectionUnitSimPar iPar;
+  FairDbWriter<R3BCaloDetectionUnitSimPar>* cW = iPar.ActivateWriter(rid); 
 
   if (cW) {
 	// Crystals node
 	for(Int_t i=0;i<fNodeCrystals->GetEntries();i++){
-	  R3BCaloCrystalPar* c_par = (R3BCaloCrystalPar*) fNodeCrystals->At(i);
+	  R3BCaloDetectionUnitSimPar* c_par = (R3BCaloDetectionUnitSimPar*) fNodeCrystals->At(i);
 	  if (c_par) *cW << *c_par; 
 	}
 	// Reset the Writer
@@ -214,7 +212,7 @@ void R3BCaloGeometryPar::store(UInt_t rid){
 	}
   }//! (cWriter)
   else {
-	cout << " -W- R3BCaloGeometryPar:: Writer for R3BCaloCrystalPar not created "<< endl;  
+	cout << " -W- R3BCaloGeometryPar:: Writer for R3BCaloDetectionUnitSimPar not created "<< endl;  
   }
 
 
@@ -237,7 +235,6 @@ void R3BCaloGeometryPar::store(UInt_t rid){
 	cout << " -W- R3BCaloGeometryPar:: Writer for R3BCaloAlveolusPar not created "<< endl;  
   }
 
-
 }
 
 void R3BCaloGeometryPar::Print(){
@@ -253,7 +250,7 @@ void R3BCaloGeometryPar::Print(){
   
   std::cout<<" Califa Crystal Geometry : "<< fGeomCrystals->GetEntries() << std::endl;
   for(Int_t i=0;i<fGeomCrystals->GetEntries(); i++){
-	R3BCaloCrystalGeoPar* cgeo_par = (R3BCaloCrystalGeoPar*) fGeomCrystals->At(i);  
+	R3BCaloDetectionUnitSimGeoPar* cgeo_par = (R3BCaloDetectionUnitSimGeoPar*) fGeomCrystals->At(i);  
     cout << "----------------------------------------------------------------------" << endl;
 	if (cgeo_par) cgeo_par->Print();
   }
@@ -269,7 +266,7 @@ void R3BCaloGeometryPar::Print(){
   
   std::cout<<" Califa Crystals Node : "<< fNodeCrystals->GetEntries() << std::endl;
   for(Int_t i=0;i<fNodeCrystals->GetEntries(); i++){
-	R3BCaloCrystalPar* c_par = (R3BCaloCrystalPar*) fNodeCrystals->At(i);  
+	R3BCaloDetectionUnitSimPar* c_par = (R3BCaloDetectionUnitSimPar*) fNodeCrystals->At(i);  
     cout << "----------------------------------------------------------------------" << endl;
 	if (c_par) c_par->Print();
   }

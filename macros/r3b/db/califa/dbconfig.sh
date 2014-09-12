@@ -1,9 +1,7 @@
 # add for MySql libs
 # MAc OSx
-export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/usr/local/mysql/lib
+# export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/usr/local/mysql/lib
 # Linux
-#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/mysql/lib
-
 
 # Log File 
 # -- If the string is NULL the default file "fairdbinfo.log"
@@ -23,9 +21,12 @@ fi
 if [ $1 = "local_pgsql" ]
 then
 # Local PgSQL server
-export FAIRDB_TSQL_URL="pgsql://localhost:5432/R3B"
-export FAIRDB_TSQL_USER="postgres"
-export FAIRDB_TSQL_PSWD="pasglop1"
+export PATH=$PATH:$HOME/Work/postgresql/bin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/Work/postgresql/lib
+export PGSQL=$HOME/Work/postgresql
+export FAIRDB_TSQL_URL="pgsql://localhost:5432/r3b"
+export FAIRDB_TSQL_USER="ygonroz"
+export FAIRDB_TSQL_PSWD="44849937USC"
 fi
 
 

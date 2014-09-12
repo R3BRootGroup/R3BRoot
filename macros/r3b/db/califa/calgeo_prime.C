@@ -12,7 +12,7 @@ Int_t  calgeo_prime()
 
   // Set the SQL based IO as second input
   FairParTSQLIo* input_db = new FairParTSQLIo();  
-  //  input_db->SetVerbosity(1);
+  input_db->SetVerbosity(1);
 
   // Set Global SeqNo ( Replication Global Index Base )
   //inp2->SetGlobalSeqNoIn();

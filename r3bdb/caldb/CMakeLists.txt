@@ -1,4 +1,6 @@
-# Create a library called "R3BCaloDB" 
+# Create a library called "R3BCaloDB" which includes the source files given in
+# the array .
+# The extension is already found.  Any number of sources could be listed here.
 
 set(INCLUDE_DIRECTORIES
 ${BASE_INCLUDE_DIRECTORIES}
@@ -16,29 +18,31 @@ ${FAIRROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
+#Put here your sourcefiles
 R3BCaloContFact.cxx
 R3BCaloMediaPar.cxx
-R3BCaloAlveolusGeoPar.cxx
-R3BCaloAlveolusPar.cxx
-R3BCaloCrystalGeoPar.cxx
-R3BCaloCrystalPar.cxx
 R3BCaloGeometryPar.cxx
 R3BGeomAnalyzer.cxx
+R3BCaloAddonBoardPar.cxx
+R3BCaloAlveolusGeoPar.cxx
+R3BCaloAlveolusPar.cxx
+R3BCaloAmplifierPar.cxx
+R3BCaloAPDPar.cxx
+R3BCaloAPDLabPar.cxx
+R3BCaloCalPar.cxx
+R3BCaloCrystalPar.cxx
+R3BCaloCrystalLabPar.cxx
+R3BCaloDetectionUnitPar.cxx
+R3BCaloDetectionUnitSimPar.cxx
+R3BCaloDetectionUnitSimGeoPar.cxx
+R3BCaloDetectorPar.cxx
+R3BCaloDUCalPar.cxx
+R3BCaloFEBEXPar.cxx
+R3BCaloPreamplifierPar.cxx
 )
 
-set(HEADERS
-R3BCaloContFact.h
-R3BCaloMediaPar.h
-R3BCaloAlveolusGeoPar.h
-R3BCaloAlveolusPar.h
-R3BCaloCrystalGeoPar.h
-R3BCaloCrystalPar.h
-R3BCaloGeometryPar.h
-R3BGeomAnalyzer.h
-${FAIRROOTPATH}/include/FairDbReader.h
-${FAIRROOTPATH}/include/FairDbWriter.h
-)
-
+CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
+SET(HEADERS ${HEADERS} ${FAIRROOTPATH}/include/FairDbReader.h ${FAIRROOTPATH}/include/FairDbWriter.h)
 
 set(LINKDEF R3BCaloGeoLinkDef.h)
 Set(LIBRARY_NAME R3BCaloDB)

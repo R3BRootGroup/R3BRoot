@@ -42,23 +42,27 @@ using TObject::Compare;
 
     void Print();
     /** Accessor functions **/
-    Int_t GetComboNo()                const {return fCompId;}
-    Int_t GetCompId()                 const {return fCompId;}
-    Int_t GetCrystalNodeId()          const {return fCrystalNodeId;} 
-    Int_t GetCrystalTypeId()          const {return fCrystalTypeId;}
-    Double_t GetWrapThickness()       const {return fWrapThickness;}
-    const Double_t*   GetCenter()           const {return &fCenter[0];}
-    const Double_t*   GetRotEuler()         const {return &fRotEuler[0];}
+    Int_t GetId()          		const {return fId;} 
+    Int_t GetIdAmcrys()          	const {return fIdAmcrys;}
+    string GetEnergySource()          	const {return fEnergySource;}
+    Double_t GetAbsoluteLO()          	const {return fAbsoluteLO;}
+    Double_t GetLO()          		const {return fLO;}
+    Double_t GetEnergyResolution()      const {return fEnergyResolution;}
+    string GetOrigin()     		const {return fOrigin;}
+    string GetLocation()     		const {return fLocation;}
+    string GetObservation()     	const {return fObservation;}
 
-    void SetCompId(Int_t x)  {SetComboNo(x); fCompId=x;}
-    void SetCrystalNodeId(Int_t x) {fCrystalNodeId  = x;}
-    void SetCrystalTypeId(Int_t x) {fCrystalTypeId  = x;}
-    void SetCenter(Double_t x, Double_t y, Double_t z) {fCenter[0]=x;fCenter[1]=y;fCenter[2]=z;}
-    void SetRotEuler(Double_t x, Double_t y, Double_t z) {fRotEuler[0]=x;fRotEuler[1]=y;fRotEuler[2]=z;}
-	void SetWrapThickness(Double_t x) {fWrapThickness  = x;}   
+    void SetId(Int_t x) 			{fId  = x;}
+    void SetIdAmcrys(Int_t x) 			{fIdAmcrys  = x;}
+    void SetEnergySource(string x) 		{fEnergySource  = x;}
+    void SetAbsoluteLO(Double_t x) 		{fAbsoluteLO  = x;}
+    void SetLO(Double_t x) 			{fLO  = x;}
+    void SetEnergyResolution(Double_t x) 	{fEnergyResolution  = x;}
+    void SetOrigin(string x) 			{fOrigin  = x;}
+    void SetLocation(string x) 			{fLocation  = x;}
+    void SetObservation(string x) 		{fObservation  = x;}
 
-
-    UInt_t GetIndex(UInt_t /*def*/) const { return fCrystalNodeId;}
+    //UInt_t GetIndex(UInt_t /*def*///) const { return fCrystalNodeId;}
 
     Bool_t Compare(const R3BCaloCrystalPar& that ) const; 
 
@@ -78,6 +82,7 @@ using TObject::Compare;
     // Global IO using run_id
     virtual void fill(UInt_t rid);
     virtual void store(UInt_t rid);
+    virtual void update(Int_t seqno);
 
     // Validity frame definition
     virtual ValCondition GetContext(UInt_t rid) {
@@ -89,17 +94,20 @@ using TObject::Compare;
     // SQL-IO Meta-Class Getters
     FairDbReader<R3BCaloCrystalPar>* GetParamReader();
     FairDbWriter<R3BCaloCrystalPar>* GetParamWriter();
-	FairDbWriter<R3BCaloCrystalPar>* ActivateWriter(Int_t rid);
+    FairDbWriter<R3BCaloCrystalPar>* ActivateWriter(Int_t rid);
 
   private:
     // Data Parameters
-    Int_t fCompId;
-    Int_t fCrystalNodeId;
-    Int_t fCrystalTypeId;
-    Double_t fWrapThickness;    
-    Double_t fCenter[3];
-    Double_t fRotEuler[3];
-
+    Int_t fId;
+    Int_t fIdAmcrys;
+    string fEnergySource;
+    Double_t fAbsoluteLO;
+    Double_t fLO;
+    Double_t fEnergyResolution;
+    string fOrigin;
+    string fLocation;
+    string fObservation;
+    
     // Database Pool Index
     Int_t fDbEntry; //!
     // Parameter Container SQL Writer Meta-Class

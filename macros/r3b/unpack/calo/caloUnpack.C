@@ -12,7 +12,7 @@
   // Create source with unpackers ----------------------------------------------
 //  FairRemoteSource* source  = new FairRemoteSource("lxi047");
   FairLmdSource* source  = new FairLmdSource();
-  source->AddFile("/Users/kresan/Dropbox/data/califa1428.lmd");
+  source->AddFile("Co60_2014-06-20-2300_350V0214.lmd");
 
 //  char* strCalDir = "/home/work/example/";
   Short_t type = 10;

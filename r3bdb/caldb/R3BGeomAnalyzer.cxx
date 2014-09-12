@@ -178,7 +178,7 @@ Bool_t R3BGeomAnalyzer::RecReadNodes(Bool_t keepGoing){
 	  //	                                <<  " wrapping# " <<  wrap_thickness << endl; 
 	   
       // Create and convert parameters
-      R3BCaloCrystalPar* par = new  R3BCaloCrystalPar();
+      R3BCaloDetectionUnitSimPar* par = new  R3BCaloDetectionUnitSimPar();
       // No compID for now
       par->SetCompId(0);
       par->SetCrystalNodeId(fN_Crystals);
@@ -344,7 +344,7 @@ void R3BGeomAnalyzer::FillGeometryPar(R3BCaloGeometryPar* par){
 	if (a_sh){ 
       cid++; 
 	  //a_sh->Print();
-      R3BCaloCrystalGeoPar* sh_par = new R3BCaloCrystalGeoPar();
+      R3BCaloDetectionUnitSimGeoPar* sh_par = new R3BCaloDetectionUnitSimGeoPar();
       sh_par->SetShape( (TGeoArb8*) a_sh);
       sh_par->SetCompId(cid);
       sh_par->SetCrystalType(cid);   
@@ -366,8 +366,8 @@ void R3BGeomAnalyzer::FillGeometryPar(R3BCaloGeometryPar* par){
   }
 
   //Loop over Crystal Nodes
-  for(vector<R3BCaloCrystalPar*>::const_iterator it = fCrystals.begin();it != fCrystals.end(); it++){
-    R3BCaloCrystalPar* c_par = (*it); 
+  for(vector<R3BCaloDetectionUnitSimPar*>::const_iterator it = fCrystals.begin();it != fCrystals.end(); it++){
+    R3BCaloDetectionUnitSimPar* c_par = (*it); 
 	if (c_par){ 
       par->AddCrystals(c_par); 
 	} 
@@ -380,8 +380,6 @@ void R3BGeomAnalyzer::FillGeometryPar(R3BCaloGeometryPar* par){
       par->AddAlveoli(c_par); 
 	} 
   }
-
-
 
   par->setChanged();
 }

@@ -220,7 +220,6 @@ add_subdirectory (evtvis)
 add_subdirectory (mfi)
 add_subdirectory (psp)
 
-
 Execute_Process(COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-opengl
                 OUTPUT_VARIABLE EveIsBuild
                 OUTPUT_STRIP_TRAILING_WHITESPACE

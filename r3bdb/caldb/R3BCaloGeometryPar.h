@@ -10,9 +10,9 @@
 #include <string>                       // for string
 
 #include "R3BCaloAlveolusGeoPar.h"
-#include "R3BCaloCrystalGeoPar.h"
+#include "R3BCaloDetectionUnitSimGeoPar.h"
 #include "R3BCaloAlveolusPar.h"
-#include "R3BCaloCrystalPar.h"
+#include "R3BCaloDetectionUnitSimPar.h"
 
 using namespace std;
 
@@ -42,10 +42,10 @@ using TObject::Compare;
 
 	// Lists handling  
     void   AddMaterial(TGeoMaterial *mat){fMateria->Add(mat);}  
-    void   AddCrystalShapes(R3BCaloCrystalGeoPar* sh){fGeomCrystals->Add(sh);}  
-	void   AddAlveoliShapes(R3BCaloAlveolusGeoPar* sh){fGeomAlveoli->Add(sh);}
-    void   AddCrystals(R3BCaloCrystalPar* sh){fNodeCrystals->Add(sh);}  
-	void   AddAlveoli(R3BCaloAlveolusPar* sh){fNodeAlveoli->Add(sh);}  
+    void   AddCrystalShapes(R3BCaloDetectionUnitSimGeoPar* sh){fGeomCrystals->Add(sh);}  
+    void   AddAlveoliShapes(R3BCaloAlveolusGeoPar* sh){fGeomAlveoli->Add(sh);}
+    void   AddCrystals(R3BCaloDetectionUnitSimPar* sh){fNodeCrystals->Add(sh);}  
+    void   AddAlveoli(R3BCaloAlveolusPar* sh){fNodeAlveoli->Add(sh);}  
 
     TObjArray* GetListOfMateria() {return fMateria;}
     Int_t GetNumMedia() {return fMateria->GetEntries();} 
@@ -55,8 +55,7 @@ using TObject::Compare;
     Int_t GetNumCrystalNodes() {return fNodeCrystals->GetEntries();}
     Int_t GetNumAlveolusGeom() {return fGeomAlveoli->GetEntries();} 
     Int_t GetNumAlveolusNodes() {return fNodeAlveoli->GetEntries();}
-
-
+   
     // Global IO using run_id
     virtual void fill(UInt_t rid);
     virtual void store(UInt_t rid);
@@ -67,7 +66,7 @@ using TObject::Compare;
     TObjArray* fGeomAlveoli;
     TObjArray* fNodeCrystals;
     TObjArray* fNodeAlveoli;
-
+ 
     ClassDef(R3BCaloGeometryPar,1); // R3BCaloGeometryPar Parameter Container example
 };
 

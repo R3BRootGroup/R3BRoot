@@ -11,7 +11,7 @@
 #include "TFile.h"
 
 #include "R3BCaloGeometryPar.h"
-#include "R3BCaloCrystalPar.h"
+#include "R3BCaloDetectionUnitSimPar.h"
 #include "R3BCaloAlveolusPar.h"
 
 using namespace std;
@@ -66,7 +66,7 @@ class R3BGeomAnalyzer : public TObject
   vector<TGeoShape*> fV_Crystals;
   vector<TGeoShape*> fV_Alveoli;
   map<string, TGeoMaterial*> fMapMedia;
-  vector<R3BCaloCrystalPar*> fCrystals;
+  vector<R3BCaloDetectionUnitSimPar*> fCrystals;
   vector<R3BCaloAlveolusPar*> fAlveoli;
   
  
