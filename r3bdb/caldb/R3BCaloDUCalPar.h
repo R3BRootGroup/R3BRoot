@@ -54,10 +54,10 @@ using TObject::Compare;
     Double_t GetProtonParZero() 	const {return fProtonParZero;}
     Double_t GetProtonParOne() 		const {return fProtonParOne;}
     Double_t GetConversionFactor() 	const {return fConversionFactor;}
-    Double_t GetExtraOne() 		const {return fExtraOne;}
+    /*Double_t GetExtraOne() 		const {return fExtraOne;}
     Double_t GetExtraTwo() 		const {return fExtraTwo;}
     Double_t GetExtraThree() 		const {return fExtraThree;}
-    Double_t GetExtraFour() 		const {return fExtraFour;}
+    Double_t GetExtraFour() 		const {return fExtraFour;}*/
 
     void SetCompId(Int_t x)  			{SetComboNo(x); fCompId=x;}
     void SetDetectionUnit(Int_t i) 		{fDetectionUnit=i;}
@@ -66,10 +66,10 @@ using TObject::Compare;
     void SetProtonParZero(Double_t i) 		{fProtonParZero=i;}
     void SetProtonParOne(Double_t i) 		{fProtonParOne=i;}
     void SetConversionFactor(Double_t i) 	{fConversionFactor=i;}
-    void SetExtraOne(Double_t i) 		{fExtraOne=i;}
+    /*void SetExtraOne(Double_t i) 		{fExtraOne=i;}
     void SetExtraTwo(Double_t i) 		{fExtraTwo=i;}
     void SetExtraThree(Double_t i) 		{fExtraThree=i;}
-    void SetExtraFour(Double_t i) 		{fExtraFour=i;}
+    void SetExtraFour(Double_t i) 		{fExtraFour=i;}*/
     
     UInt_t GetIndex(UInt_t /*def*/) const { return fDetectionUnit; }
 
@@ -112,10 +112,10 @@ using TObject::Compare;
     Double_t fProtonParZero;
     Double_t fProtonParOne;
     Double_t fConversionFactor;
-    Double_t fExtraOne;
+    /*Double_t fExtraOne;
     Double_t fExtraTwo;
     Double_t fExtraThree;
-    Double_t fExtraFour;
+    Double_t fExtraFour;*/
 
     // Database Pool Index
     Int_t fDbEntry; //!

@@ -36,11 +36,11 @@ R3BCaloDUCalPar::R3BCaloDUCalPar(const char* name, const char* title, const char
 	fGammaParOne(0.),
 	fProtonParZero(0.),
 	fProtonParOne(0.),
-	fConversionFactor(0.),
-	fExtraOne(0.),
+	fConversionFactor(0.)
+	/*fExtraOne(0.),
 	fExtraTwo(0.),
 	fExtraThree(0.),
-	fExtraFour(0.)
+	fExtraFour(0.)*/
 {
 
   // Set the default Db Entry to the first slot
@@ -86,10 +86,10 @@ void R3BCaloDUCalPar::putParams(FairParamList* list)
   list->add("proton_parzero", fProtonParZero);
   list->add("proton_parone", fProtonParOne);
   list->add("conversion_factor", fConversionFactor);
-  list->add("extra_one", fExtraOne);
+  /*list->add("extra_one", fExtraOne);
   list->add("extra_two", fExtraTwo);
   list->add("extra_three", fExtraThree);
-  list->add("extra_four", fExtraFour);
+  list->add("extra_four", fExtraFour);*/
   
 }
 
@@ -103,10 +103,10 @@ Bool_t R3BCaloDUCalPar::getParams(FairParamList* list)
   if (!list->fill("proton_parzero", &fProtonParZero)) { return kFALSE; }
   if (!list->fill("proton_parone", &fProtonParOne)) { return kFALSE; }
   if (!list->fill("conversion_factor", &fConversionFactor)) { return kFALSE; }
-  if (!list->fill("extra_one", &fExtraOne)) { return kFALSE; }
+  /*if (!list->fill("extra_one", &fExtraOne)) { return kFALSE; }
   if (!list->fill("extra_two", &fExtraTwo)) { return kFALSE; }
   if (!list->fill("extra_three", &fExtraThree)) { return kFALSE; }
-  if (!list->fill("extra_four", &fExtraFour)) { return kFALSE; }
+  if (!list->fill("extra_four", &fExtraFour)) { return kFALSE; }*/
 
   return kTRUE;
 }
@@ -114,7 +114,7 @@ Bool_t R3BCaloDUCalPar::getParams(FairParamList* list)
 void R3BCaloDUCalPar::clear()
 {
   fCompId=fDetectionUnit=0;
-  fGammaParZero=fGammaParOne=fProtonParZero=fProtonParOne=fConversionFactor=fExtraOne=fExtraTwo=fExtraThree=fExtraFour=0.;
+  fGammaParZero=fGammaParOne=fProtonParZero=fProtonParOne=fConversionFactor=/*fExtraOne=fExtraTwo=fExtraThree=fExtraFour=*/0.;
 
   if (fParam_Writer) { fParam_Writer->Reset(); }
   if (fParam_Reader) { fParam_Reader->Reset(); }
@@ -137,10 +137,10 @@ string R3BCaloDUCalPar::GetTableDefinition(const char* Name)
   sql += "  PROTON_PARZERO        DOUBLE,";
   sql += "  PROTON_PARONE         DOUBLE,";
   sql += "  CONVERSION_FACTOR     DOUBLE,";
-  sql += "  EXTRA_ONE		  DOUBLE,";
+  /*sql += "  EXTRA_ONE		  DOUBLE,";
   sql += "  EXTRA_TWO		  DOUBLE,";
   sql += "  EXTRA_THREE		  DOUBLE,";
-  sql += "  EXTRA_FOUR		  DOUBLE,";
+  sql += "  EXTRA_FOUR		  DOUBLE,";*/
   sql += "  primary key(SEQNO,ROW_ID))";
   return sql;
 }
@@ -154,7 +154,7 @@ void R3BCaloDUCalPar::Fill(FairDbResultPool& res_in,
   clear();
   
   res_in >> fCompId  >> fDetectionUnit >> fGammaParZero  >> fGammaParOne >> fProtonParZero >> fProtonParOne 
-  >> fConversionFactor >> fExtraOne >> fExtraTwo >> fExtraThree >> fExtraFour;
+  >> fConversionFactor /*>> fExtraOne >> fExtraTwo >> fExtraThree >> fExtraFour*/;
 
 }
 
@@ -163,7 +163,7 @@ void R3BCaloDUCalPar::Store(FairDbOutTableBuffer& res_out,
 {
   
   res_out << fCompId  << fDetectionUnit << fGammaParZero  << fGammaParOne << fProtonParZero << fProtonParOne 
-  << fConversionFactor << fExtraOne << fExtraTwo << fExtraThree << fExtraFour;
+  << fConversionFactor /*<< fExtraOne << fExtraTwo << fExtraThree << fExtraFour*/;
 
 }
 
@@ -195,10 +195,10 @@ void R3BCaloDUCalPar::fill(UInt_t rid)
     fProtonParZero  =  cgd->GetProtonParZero();
     fProtonParOne  =  cgd->GetProtonParOne();
     fConversionFactor  =  cgd->GetConversionFactor();
-    fExtraOne  =  cgd->GetExtraOne();
+    /*fExtraOne  =  cgd->GetExtraOne();
     fExtraTwo  =  cgd->GetExtraTwo();
     fExtraThree  =  cgd->GetExtraThree();
-    fExtraFour  =  cgd->GetExtraFour();
+    fExtraFour  =  cgd->GetExtraFour();*/
   }
 
 }
@@ -282,10 +282,10 @@ void R3BCaloDUCalPar::Print()
   std::cout<<"   fGammaParZero: "<<  fGammaParZero <<  "   fGammaParOne: "<<  fGammaParOne <<  std::endl;
   std::cout<<"   fProtonParZero: "<<  fProtonParZero <<  "   fProtonParOne: "<<  fProtonParOne <<  std::endl;
   std::cout<<"   fConversionFactor: "<<  fConversionFactor <<  std::endl;
-  std::cout<<"   fExtraOne: "<<  fExtraOne <<  std::endl;
+  /*std::cout<<"   fExtraOne: "<<  fExtraOne <<  std::endl;
   std::cout<<"   fExtraTwo: "<<  fExtraTwo <<  std::endl;
   std::cout<<"   fExtraThree: "<<  fExtraThree <<  std::endl;
-  std::cout<<"   fExtraFour: "<<  fExtraFour <<  std::endl;
+  std::cout<<"   fExtraFour: "<<  fExtraFour <<  std::endl;*/
 }
 
 
@@ -297,11 +297,11 @@ Bool_t R3BCaloDUCalPar::Compare(const R3BCaloDUCalPar& that ) const {
 		       &&  (fGammaParOne   == that.fGammaParOne)
 		       &&  (fProtonParZero   == that.fProtonParZero)
 		       &&  (fProtonParOne   == that.fProtonParOne)
-		       &&  (fConversionFactor   == that.fConversionFactor)
-		       &&  (fExtraOne   == that.fExtraOne)
+		       &&  (fConversionFactor   == that.fConversionFactor);
+		       /*&&  (fExtraOne   == that.fExtraOne)
 		       &&  (fExtraTwo   == that.fExtraTwo)
 		       &&  (fExtraThree   == that.fExtraThree)
-		       &&  (fExtraFour   == that.fExtraFour);
+		       &&  (fExtraFour   == that.fExtraFour);*/
   
   return (test_h); 
 }
