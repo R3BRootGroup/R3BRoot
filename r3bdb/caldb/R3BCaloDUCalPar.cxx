@@ -32,7 +32,6 @@ R3BCaloDUCalPar::R3BCaloDUCalPar(const char* name, const char* title, const char
   : FairParGenericSet(name,title,context, own),
 	fCompId(0),
 	fDetectionUnit(0),
-	fDetector(""),
 	fGammaParZero(0.),
 	fGammaParOne(0.),
 	fProtonParZero(0.),
@@ -82,7 +81,6 @@ void R3BCaloDUCalPar::putParams(FairParamList* list)
   if(!list) { return; }
   list->add("comp_id",  fCompId);
   list->add("detection_unit", fDetectionUnit);
-  list->add("detector", (Text_t*)fDetector.c_str());
   list->add("gamma_parzero", fGammaParZero);
   list->add("gamma_parone", fGammaParOne);
   list->add("proton_parzero", fProtonParZero);
@@ -100,9 +98,6 @@ Bool_t R3BCaloDUCalPar::getParams(FairParamList* list)
   if (!list) { return kFALSE; }
   if (!list->fill("comp_id", &fCompId)) { return kFALSE; }
   if (!list->fill("detection_unit", &fDetectionUnit)) { return kFALSE; }
-  Text_t detectoraux[80];
-  if (!list->fill("detector", detectoraux, 80)) { return kFALSE; }
-  fDetector = detectoraux;
   if (!list->fill("gamma_parzero", &fGammaParZero)) { return kFALSE; }
   if (!list->fill("gamma_parone", &fGammaParOne)) { return kFALSE; }
   if (!list->fill("proton_parzero", &fProtonParZero)) { return kFALSE; }
@@ -120,7 +115,6 @@ void R3BCaloDUCalPar::clear()
 {
   fCompId=fDetectionUnit=0;
   fGammaParZero=fGammaParOne=fProtonParZero=fProtonParOne=fConversionFactor=fExtraOne=fExtraTwo=fExtraThree=fExtraFour=0.;
-  fDetector="";
 
   if (fParam_Writer) { fParam_Writer->Reset(); }
   if (fParam_Reader) { fParam_Reader->Reset(); }
@@ -137,8 +131,7 @@ string R3BCaloDUCalPar::GetTableDefinition(const char* Name)
   sql += "( SEQNO                 INT NOT NULL,";
   sql += "  ROW_ID                INT NOT NULL,";
   sql += "  COMP_ID               INT,";
-  sql += "  DETECTION_UNIT        INT NOT NULL,";
-  sql += "  DETECTOR        	  TEXT,";
+  sql += "  DETECTION_UNIT        INT,";
   sql += "  GAMMA_PARZERO         DOUBLE,";
   sql += "  GAMMA_PARONE          DOUBLE,";
   sql += "  PROTON_PARZERO        DOUBLE,";
@@ -160,7 +153,7 @@ void R3BCaloDUCalPar::Fill(FairDbResultPool& res_in,
   // Clear all structures
   clear();
   
-  res_in >> fCompId  >> fDetectionUnit >> fDetector  >> fGammaParZero  >> fGammaParOne >> fProtonParZero >> fProtonParOne 
+  res_in >> fCompId  >> fDetectionUnit >> fGammaParZero  >> fGammaParOne >> fProtonParZero >> fProtonParOne 
   >> fConversionFactor >> fExtraOne >> fExtraTwo >> fExtraThree >> fExtraFour;
 
 }
@@ -169,7 +162,7 @@ void R3BCaloDUCalPar::Store(FairDbOutTableBuffer& res_out,
                          const FairDbValRecord* valrec) const
 {
   
-  res_out << fCompId  << fDetectionUnit << fDetector  << fGammaParZero  << fGammaParOne << fProtonParZero << fProtonParOne 
+  res_out << fCompId  << fDetectionUnit << fGammaParZero  << fGammaParOne << fProtonParZero << fProtonParOne 
   << fConversionFactor << fExtraOne << fExtraTwo << fExtraThree << fExtraFour;
 
 }
@@ -197,7 +190,6 @@ void R3BCaloDUCalPar::fill(UInt_t rid)
     if (!cgd) { continue; }
     fCompId = cgd->GetCompId();
     fDetectionUnit =  cgd->GetDetectionUnit();
-    fDetector =  cgd->GetDetector();
     fGammaParZero  =  cgd->GetGammaParZero();
     fGammaParOne  =  cgd->GetGammaParOne();
     fProtonParZero  =  cgd->GetProtonParZero();
@@ -287,7 +279,6 @@ void R3BCaloDUCalPar::Print()
   std::cout<<"   R3BCaloDUCalPar: Detection Unit Calibration Parameters: "<<std::endl;
   std::cout<<"   fCompId: "<<  fCompId <<  std::endl;
   std::cout<<"   fDetectionUnit: "<<  fDetectionUnit <<  std::endl;
-  std::cout<<"   fDetector: "<<  fDetector <<  std::endl;
   std::cout<<"   fGammaParZero: "<<  fGammaParZero <<  "   fGammaParOne: "<<  fGammaParOne <<  std::endl;
   std::cout<<"   fProtonParZero: "<<  fProtonParZero <<  "   fProtonParOne: "<<  fProtonParOne <<  std::endl;
   std::cout<<"   fConversionFactor: "<<  fConversionFactor <<  std::endl;
@@ -302,7 +293,6 @@ Bool_t R3BCaloDUCalPar::Compare(const R3BCaloDUCalPar& that ) const {
   //  
   Bool_t test_h =  (fCompId   == that.fCompId)
  	               &&  (fDetectionUnit   == that.fDetectionUnit)
- 	               &&  (fDetector   == that.fDetector)
 		       &&  (fGammaParZero   == that.fGammaParZero)
 		       &&  (fGammaParOne   == that.fGammaParOne)
 		       &&  (fProtonParZero   == that.fProtonParZero)

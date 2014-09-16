@@ -49,7 +49,6 @@ using TObject::Compare;
     Int_t GetComboNo()       		const {return fCompId;}
     Int_t GetCompId()   		const {return fCompId;}
     Int_t GetDetectionUnit() 		const {return fDetectionUnit;}
-    string GetDetector()		const {return fDetector;}
     Double_t GetGammaParZero() 		const {return fGammaParZero;}
     Double_t GetGammaParOne() 		const {return fGammaParOne;}
     Double_t GetProtonParZero() 	const {return fProtonParZero;}
@@ -62,7 +61,6 @@ using TObject::Compare;
 
     void SetCompId(Int_t x)  			{SetComboNo(x); fCompId=x;}
     void SetDetectionUnit(Int_t i) 		{fDetectionUnit=i;}
-    void SetDetector(string i) 			{fDetector=i;}
     void SetGammaParZero(Double_t i) 		{fGammaParZero=i;}
     void SetGammaParOne(Double_t i) 		{fGammaParOne=i;}
     void SetProtonParZero(Double_t i) 		{fProtonParZero=i;}
@@ -109,7 +107,6 @@ using TObject::Compare;
     // Data Parameters
     Int_t fCompId;
     Int_t fDetectionUnit; 
-    string fDetector;
     Double_t fGammaParZero;
     Double_t fGammaParOne;
     Double_t fProtonParZero;

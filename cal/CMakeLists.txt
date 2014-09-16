@@ -19,6 +19,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
+${R3BROOT_SOURCE_DIR}/r3bdb/caldb
 ${BASE_INCLUDE_DIRECTORIES}   
 )
 
@@ -43,10 +44,8 @@ unpack/R3BCaloRawHit.cxx
 unpack/R3BCaloUnpack.cxx
 unpack/R3BCaloUnpackPar.cxx
 unpack/R3BCaloRawAna.cxx
-unpack/R3BCaloCalib.cxx
+unpack/R3BCaloCal.cxx
 unpack/R3BCaloCrystalAna.cxx
-unpack/R3BCaloCalibPar.cxx
-unpack/R3BCaloCalibParFinder.cxx
 )
 
 # fill list of header files from list of source files

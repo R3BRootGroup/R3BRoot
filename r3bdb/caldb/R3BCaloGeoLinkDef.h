@@ -28,8 +28,8 @@
 #pragma link C++ class FairDbWriter<R3BCaloDetectionUnitSimGeoPar>+;
 #pragma link C++ class FairDbReader<R3BCaloDetectorPar>+;
 #pragma link C++ class FairDbWriter<R3BCaloDetectorPar>+;
-//#pragma link C++ class FairDbReader<R3BCaloDUCalPar>+;
-//#pragma link C++ class FairDbWriter<R3BCaloDUCalPar>+;
+#pragma link C++ class FairDbReader<R3BCaloDUCalPar>+;
+#pragma link C++ class FairDbWriter<R3BCaloDUCalPar>+;
 #pragma link C++ class FairDbReader<R3BCaloFEBEXPar>+;
 #pragma link C++ class FairDbWriter<R3BCaloFEBEXPar>+;
 #pragma link C++ class FairDbReader<R3BCaloMediaPar>+;
@@ -42,7 +42,7 @@
 #pragma link C++ class  R3BCaloAmplifierPar+;
 #pragma link C++ class  R3BCaloAPDPar+;
 #pragma link C++ class  R3BCaloAPDLabPar+;
-//#pragma link C++ class  R3BCaloCalPar+;
+#pragma link C++ class  R3BCaloCalPar+;
 #pragma link C++ class  R3BCaloContFact+;
 #pragma link C++ class  R3BCaloCrystalPar+;
 #pragma link C++ class  R3BCaloCrystalLabPar+;
@@ -50,7 +50,7 @@
 #pragma link C++ class  R3BCaloDetectionUnitSimPar+;
 #pragma link C++ class  R3BCaloDetectionUnitSimGeoPar+;
 #pragma link C++ class  R3BCaloDetectorPar+;
-//#pragma link C++ class  R3BCaloDUCalPar+;
+#pragma link C++ class  R3BCaloDUCalPar+;
 #pragma link C++ class  R3BCaloFEBEXPar+;
 #pragma link C++ class  R3BCaloGeometryPar+;
 #pragma link C++ class  R3BCaloMediaPar+;
