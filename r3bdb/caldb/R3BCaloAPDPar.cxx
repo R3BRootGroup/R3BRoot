@@ -329,10 +329,10 @@ FairDbWriter<R3BCaloAPDPar>* R3BCaloAPDPar::ActivateWriter(Int_t rid)
 	fParam_Writer = GetParamWriter();
 		
 	fParam_Writer->Activate(GetValInterval(rid),GetComboNo(), GetVersion(),GetDbEntry(),"Califa APD Node Pars");
-
-	return fParam_Writer;
 	
   }
+
+  return fParam_Writer;
 }
 
 void R3BCaloAPDPar::update(Int_t seqno)

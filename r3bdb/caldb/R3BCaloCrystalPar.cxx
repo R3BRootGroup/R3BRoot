@@ -336,12 +336,10 @@ FairDbWriter<R3BCaloCrystalPar>* R3BCaloCrystalPar::ActivateWriter(Int_t rid)
 	fParam_Writer = GetParamWriter();
 		
 	fParam_Writer->Activate(GetValInterval(rid),GetComboNo(), GetVersion(),GetDbEntry(),"Califa Crystal Node Pars");
-
-	return fParam_Writer;
 	
   }
 
-  return NULL;
+  return fParam_Writer;
 }
 
 void R3BCaloCrystalPar::update(Int_t seqno)

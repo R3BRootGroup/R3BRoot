@@ -309,10 +309,10 @@ FairDbWriter<R3BCaloFEBEXPar>* R3BCaloFEBEXPar::ActivateWriter(Int_t rid)
 	fParam_Writer = GetParamWriter();
 		
 	fParam_Writer->Activate(GetValInterval(rid),GetComboNo(), GetVersion(),GetDbEntry(),"Califa FEBEX Node Pars");
-
-	return fParam_Writer;
 	
   }
+  
+  return fParam_Writer;
 }
 
 void R3BCaloFEBEXPar::update(Int_t seqno)

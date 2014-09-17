@@ -541,8 +541,8 @@ FairDbWriter<R3BCaloCrystalLabPar>* R3BCaloCrystalLabPar::ActivateWriter(Int_t r
 	fParam_Writer = GetParamWriter();
 		
 	fParam_Writer->Activate(GetValInterval(rid),GetComboNo(), GetVersion(),GetDbEntry(),"Califa APD Node Meas");
-
-	return fParam_Writer;
 	
   }
+
+  return fParam_Writer;
 }

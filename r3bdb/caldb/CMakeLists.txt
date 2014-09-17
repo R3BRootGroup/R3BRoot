@@ -6,6 +6,8 @@ set(INCLUDE_DIRECTORIES
 ${BASE_INCLUDE_DIRECTORIES}
 ${CMAKE_SOURCE_DIR}/r3bdb/commondb
 ${CMAKE_SOURCE_DIR}/r3bdb/caldb
+${CMAKE_SOURCE_DIR}/r3bdb/r3bdata/calodata
+${CMAKE_SOURCE_DIR}/r3bdb/cal
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -30,6 +32,7 @@ R3BCaloAmplifierPar.cxx
 R3BCaloAPDPar.cxx
 R3BCaloAPDLabPar.cxx
 R3BCaloCalPar.cxx
+R3BCaloCalParFinder.cxx
 R3BCaloCrystalPar.cxx
 R3BCaloCrystalLabPar.cxx
 R3BCaloDetectionUnitPar.cxx

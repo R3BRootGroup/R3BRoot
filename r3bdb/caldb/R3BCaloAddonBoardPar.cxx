@@ -291,10 +291,10 @@ FairDbWriter<R3BCaloAddonBoardPar>* R3BCaloAddonBoardPar::ActivateWriter(Int_t r
 	fParam_Writer = GetParamWriter();
 		
 	fParam_Writer->Activate(GetValInterval(rid),GetComboNo(), GetVersion(),GetDbEntry(),"Califa AddonBoard Node Pars");
-
-	return fParam_Writer;
 	
   }
+
+  return fParam_Writer;
 }
 
 void R3BCaloAddonBoardPar::update(Int_t seqno)

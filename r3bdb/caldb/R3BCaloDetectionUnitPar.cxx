@@ -326,10 +326,10 @@ FairDbWriter<R3BCaloDetectionUnitPar>* R3BCaloDetectionUnitPar::ActivateWriter(I
 	fParam_Writer = GetParamWriter();
 		
 	fParam_Writer->Activate(GetValInterval(rid),GetComboNo(), GetVersion(),GetDbEntry(),"Califa DetectionUnit Node Pars");
-
-	return fParam_Writer;
 	
   }
+  
+  return fParam_Writer;
 }
 
 void R3BCaloDetectionUnitPar::update(Int_t seqno)

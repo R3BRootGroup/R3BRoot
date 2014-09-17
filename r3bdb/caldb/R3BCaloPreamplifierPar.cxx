@@ -318,10 +318,10 @@ FairDbWriter<R3BCaloPreamplifierPar>* R3BCaloPreamplifierPar::ActivateWriter(Int
 	fParam_Writer = GetParamWriter();
 		
 	fParam_Writer->Activate(GetValInterval(rid),GetComboNo(), GetVersion(),GetDbEntry(),"Califa Preamplifier Node Pars");
-
-	return fParam_Writer;
 	
   }
+
+  return fParam_Writer;
 }
 
 void R3BCaloPreamplifierPar::update(Int_t seqno)
