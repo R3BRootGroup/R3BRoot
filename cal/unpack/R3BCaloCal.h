@@ -26,7 +26,7 @@ class R3BCaloCal : public FairTask {
   virtual ~R3BCaloCal();
   
   /** Virtual method Exec **/
-  virtual void Exec(char c);
+  virtual void Exec(/*char c*/);
     
   /** Virtual method Reset **/
   virtual void Reset();
@@ -50,7 +50,7 @@ protected:
  private:
   //private functions making most of the calibration work
   Int_t MapCrystalID(R3BCaloRawHit* chit);
-  Double32_t CalibrateEnergy(R3BCaloRawHit* chit,char c);
+  Double32_t CalibrateEnergy(R3BCaloRawHit* chit/*,char c*/);
   Double32_t CalibrateFastComponent(R3BCaloRawHit* chit);
   Double32_t CalibrateSlowComponent(R3BCaloRawHit* chit);
   Double32_t CalibrateTime(R3BCaloRawHit* chit);

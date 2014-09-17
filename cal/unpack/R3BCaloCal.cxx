@@ -89,7 +89,7 @@ InitStatus R3BCaloCal::ReInit()
 }
 
 //DoCalib: Public method
-void R3BCaloCal::Exec(char c)
+void R3BCaloCal::Exec(/*char c*/)
 {
   
   LOG(DEBUG) << "Calibring CALIFA Raw Data Calo" << FairLogger::endl;
@@ -111,7 +111,7 @@ void R3BCaloCal::Exec(char c)
       rawHit[i] = (R3BCaloRawHit*) fCrystalHitCA->At(i);
       
       crystal_id = MapCrystalID(rawHit[i]);
-      energy = CalibrateEnergy(rawHit[i],c);
+      energy = CalibrateEnergy(rawHit[i]/*,c*/);
       n_f = CalibrateFastComponent(rawHit[i]);
       n_s = CalibrateSlowComponent(rawHit[i]);
       time = CalibrateTime(rawHit[i]);
@@ -145,19 +145,20 @@ Int_t R3BCaloCal::MapCrystalID(R3BCaloRawHit* chit)
   return fCaloCalPar->GetDUCalParAt(chit->GetCrystalId())->GetDetectionUnit();
 }
 
-Double32_t R3BCaloCal::CalibrateEnergy(R3BCaloRawHit* chit, char c)
+Double32_t R3BCaloCal::CalibrateEnergy(R3BCaloRawHit* chit/*, char c*/)
 {
   LOG(DEBUG) << "Calibrating Energies in R3BCaloCal" << FairLogger::endl;
   //Implement here the energy calibration based on the parameters
   TRandom *r0 = new TRandom();
   rando = r0->Rndm(chit->GetCrystalId());
-  if (c=='g') {
+  /*if (c=='g') {
   	return fCaloCalPar->GetDUCalParAt(chit->GetCrystalId())->GetGammaParZero()+(chit->GetEnergy()+(rando-0.5))*fCaloCalPar->GetDUCalParAt(chit->GetCrystalId())->GetGammaParOne();
   } else if (c=='p') {
 	return fCaloCalPar->GetDUCalParAt(chit->GetCrystalId())->GetProtonParZero()+(chit->GetEnergy()+(rando-0.5))*fCaloCalPar->GetDUCalParAt(chit->GetCrystalId())->GetProtonParOne();
   } else {
   	return 0.;
-  }
+  }*/
+  return fCaloCalPar->GetDUCalParAt(chit->GetCrystalId())->GetParZero()+((chit->GetEnergy()+(rando-0.5))*fCaloCalPar->GetDUCalParAt(chit->GetCrystalId())->GetParOne())/fCaloCalPar->GetDUCalParAt(chit->GetCrystalId())->GetConversionFactor();
 }
 
 Double32_t R3BCaloCal::CalibrateFastComponent(R3BCaloRawHit* chit)

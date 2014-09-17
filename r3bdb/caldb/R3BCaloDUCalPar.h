@@ -49,10 +49,12 @@ using TObject::Compare;
     Int_t GetComboNo()       		const {return fCompId;}
     Int_t GetCompId()   		const {return fCompId;}
     Int_t GetDetectionUnit() 		const {return fDetectionUnit;}
-    Double_t GetGammaParZero() 		const {return fGammaParZero;}
+    Double_t GetParZero() 		const {return fParZero;}
+    Double_t GetParOne() 		const {return fParOne;}
+    /*Double_t GetGammaParZero() 		const {return fGammaParZero;}
     Double_t GetGammaParOne() 		const {return fGammaParOne;}
     Double_t GetProtonParZero() 	const {return fProtonParZero;}
-    Double_t GetProtonParOne() 		const {return fProtonParOne;}
+    Double_t GetProtonParOne() 		const {return fProtonParOne;}*/
     Double_t GetConversionFactor() 	const {return fConversionFactor;}
     /*Double_t GetExtraOne() 		const {return fExtraOne;}
     Double_t GetExtraTwo() 		const {return fExtraTwo;}
@@ -61,10 +63,12 @@ using TObject::Compare;
 
     void SetCompId(Int_t x)  			{SetComboNo(x); fCompId=x;}
     void SetDetectionUnit(Int_t i) 		{fDetectionUnit=i;}
-    void SetGammaParZero(Double_t i) 		{fGammaParZero=i;}
+    void SetParZero(Double_t i) 		{fParZero=i;}
+    void SetParOne(Double_t i) 			{fParOne=i;}
+    /*void SetGammaParZero(Double_t i) 		{fGammaParZero=i;}
     void SetGammaParOne(Double_t i) 		{fGammaParOne=i;}
     void SetProtonParZero(Double_t i) 		{fProtonParZero=i;}
-    void SetProtonParOne(Double_t i) 		{fProtonParOne=i;}
+    void SetProtonParOne(Double_t i) 		{fProtonParOne=i;}*/
     void SetConversionFactor(Double_t i) 	{fConversionFactor=i;}
     /*void SetExtraOne(Double_t i) 		{fExtraOne=i;}
     void SetExtraTwo(Double_t i) 		{fExtraTwo=i;}
@@ -107,10 +111,12 @@ using TObject::Compare;
     // Data Parameters
     Int_t fCompId;
     Int_t fDetectionUnit; 
-    Double_t fGammaParZero;
+    Double_t fParZero;
+    Double_t fParOne;
+    /*Double_t fGammaParZero;
     Double_t fGammaParOne;
     Double_t fProtonParZero;
-    Double_t fProtonParOne;
+    Double_t fProtonParOne;*/
     Double_t fConversionFactor;
     /*Double_t fExtraOne;
     Double_t fExtraTwo;
