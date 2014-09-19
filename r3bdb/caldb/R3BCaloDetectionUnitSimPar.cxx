@@ -339,8 +339,8 @@ FairDbWriter<R3BCaloDetectionUnitSimPar>* R3BCaloDetectionUnitSimPar::ActivateWr
 	fParam_Writer = GetParamWriter();
 		
 	fParam_Writer->Activate(GetValInterval(rid),GetComboNo(), GetVersion(),GetDbEntry(),"Califa Crystal Node Pars");
-
-	return fParam_Writer;
 	
   }
+
+  return fParam_Writer;
 }
