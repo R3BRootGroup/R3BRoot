@@ -32,7 +32,7 @@ R3BCaloAmplifierPar.cxx
 R3BCaloAPDPar.cxx
 R3BCaloAPDLabPar.cxx
 R3BCaloCalPar.cxx
-R3BCaloCalParFinder.cxx
+#R3BCaloCalParFinder.cxx
 R3BCaloCrystalPar.cxx
 R3BCaloCrystalLabPar.cxx
 R3BCaloDetectionUnitPar.cxx

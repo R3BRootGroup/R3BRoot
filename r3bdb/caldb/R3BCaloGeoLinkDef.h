@@ -43,7 +43,7 @@
 #pragma link C++ class  R3BCaloAPDPar+;
 #pragma link C++ class  R3BCaloAPDLabPar+;
 #pragma link C++ class  R3BCaloCalPar+;
-#pragma link C++ class  R3BCaloCalParFinder+;
+//#pragma link C++ class  R3BCaloCalParFinder+;
 #pragma link C++ class  R3BCaloContFact+;
 #pragma link C++ class  R3BCaloCrystalPar+;
 #pragma link C++ class  R3BCaloCrystalLabPar+;
