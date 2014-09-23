@@ -83,12 +83,12 @@ void R3BCaloUnpack::Register()
 
 
 //DoUnpack: Public method
-Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size, Int_t l_s)
+Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size)
 {
   //	trace_head_t *califa_trace = new trace_head_t;
   //	UShort_t *trace_data;
   
-  // UInt_t l_s = 0;
+  UInt_t l_s = 5;
   UInt_t *pl_data = (UInt_t*) data;
 
   LOG(DEBUG) << "Unpacking" << FairLogger::endl;

@@ -43,7 +43,7 @@ class R3BCaloUnpack : public FairUnpack {
   /** Virtual method SetParContainers **/
   virtual void SetParContainers();
 
-  virtual Bool_t DoUnpack(Int_t* data, Int_t size, Int_t l_s = 5);
+  virtual Bool_t DoUnpack(Int_t* data, Int_t size);
   virtual void Reset();
     
  protected:
