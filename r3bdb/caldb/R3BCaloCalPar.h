@@ -36,6 +36,7 @@ using TObject::Compare;
     void   putParams(FairParamList* list);
     Bool_t getParams(FairParamList* list);
     void   Print();
+    void ReadFile(string file);
 
 	// Lists handling  
     void   AddDUCalPar(R3BCaloDUCalPar* tch){fDUCalParams->Add(tch);}  

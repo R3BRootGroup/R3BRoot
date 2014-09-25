@@ -11,6 +11,7 @@
 #include "Riosfwd.h"                    // for ostream
 #include "TString.h"                    // for TString
 
+#include <sstream>
 #include <stdlib.h>                     // for exit
 #include <memory>                       // for auto_ptr, etc
 #include <vector>                       // for vector, vector<>::iterator
@@ -49,11 +50,35 @@ Bool_t R3BCaloCalPar::getParams(FairParamList* list)
   return kTRUE;
 }
 
+void R3BCaloCalPar::ReadFile(string file) {
+  vector<string> data;
+  string datasegments, line;
+
+  ifstream infile(file.c_str());
+  while (getline(infile,line)) {
+   stringstream dataline;
+   dataline<<line;
+   while (getline(dataline,datasegments,'\t')) {
+    if(datasegments=="null")
+     data.push_back("");
+    else
+     data.push_back(datasegments);
+   }
+   dataline.clear();
+   R3BCaloDUCalPar dupar;
+   dupar.SetDetectionUnit(atoi(data[0].c_str()));
+   dupar.SetGammaCal_offset(atof(data[1].c_str()));
+   dupar.SetGammaCal_gain(atof(data[2].c_str()));
+   dupar.SetToTCal_offset(atof(data[3].c_str()));
+   dupar.SetToTCal_gain(atof(data[4].c_str()));
+   dupar.SetConversionFactor(atof(data[5].c_str()));
+   fDUCalParams->Add(&dupar);
+  }
+}
+
 void R3BCaloCalPar::clear()
 {
 }
-
-
 
 void R3BCaloCalPar::fill(UInt_t rid){
   // Fill the lists with correspondin TimeStamps (runID) 
@@ -126,6 +151,7 @@ void R3BCaloCalPar::Print(){
   }
   
 }
+
 
 
 
