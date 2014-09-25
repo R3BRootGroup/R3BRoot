@@ -32,8 +32,10 @@ R3BCaloDUCalPar::R3BCaloDUCalPar(const char* name, const char* title, const char
   : FairParGenericSet(name,title,context, own),
 	fCompId(0),
 	fDetectionUnit(0),
-        fParZero(0.),
-	fParOne(0.), 
+        fGammaCal_offset(0.),
+	fGammaCal_gain(0.), 
+        fToTCal_offset(0.),
+	fToTCal_gain(0.), 
 	/*fGammaParZero(0.),
 	fGammaParOne(0.),
 	fProtonParZero(0.),
@@ -83,8 +85,10 @@ void R3BCaloDUCalPar::putParams(FairParamList* list)
   if(!list) { return; }
   list->add("comp_id",  fCompId);
   list->add("detection_unit", fDetectionUnit);
-  list->add("parzero", fParZero);
-  list->add("parone", fParOne);
+  list->add("gammacal_offset", fGammaCal_offset);
+  list->add("gammacal_gain", fGammaCal_gain);
+  list->add("totcal_offset", fToTCal_offset);
+  list->add("totcal_gain", fToTCal_gain);
   /*list->add("gamma_parzero", fGammaParZero);
   list->add("gamma_parone", fGammaParOne);
   list->add("proton_parzero", fProtonParZero);
@@ -102,8 +106,10 @@ Bool_t R3BCaloDUCalPar::getParams(FairParamList* list)
   if (!list) { return kFALSE; }
   if (!list->fill("comp_id", &fCompId)) { return kFALSE; }
   if (!list->fill("detection_unit", &fDetectionUnit)) { return kFALSE; }
-  if (!list->fill("parzero", &fParZero)) { return kFALSE; }
-  if (!list->fill("parone", &fParOne)) { return kFALSE; }
+  if (!list->fill("gammacal_offset", &fGammaCal_offset)) { return kFALSE; }
+  if (!list->fill("gammacal_gain", &fGammaCal_gain)) { return kFALSE; }
+  if (!list->fill("totcal_offset", &fToTCal_offset)) { return kFALSE; }
+  if (!list->fill("totcal_gain", &fToTCal_gain)) { return kFALSE; }
   /*if (!list->fill("gamma_parzero", &fGammaParZero)) { return kFALSE; }
   if (!list->fill("gamma_parone", &fGammaParOne)) { return kFALSE; }
   if (!list->fill("proton_parzero", &fProtonParZero)) { return kFALSE; }
@@ -120,7 +126,8 @@ Bool_t R3BCaloDUCalPar::getParams(FairParamList* list)
 void R3BCaloDUCalPar::clear()
 {
   fCompId=fDetectionUnit=0;
-  /*fGammaParZero=fGammaParOne=fProtonParZero=fProtonParOne*/fParZero=fParOne=fConversionFactor=/*fExtraOne=fExtraTwo=fExtraThree=fExtraFour=*/0.;
+  /*fGammaParZero=fGammaParOne=fProtonParZero=fProtonParOne*/fGammaCal_offset=fGammaCal_gain=fToTCal_offset=fToTCal_gain=
+  fConversionFactor=/*fExtraOne=fExtraTwo=fExtraThree=fExtraFour=*/0.;
 
   if (fParam_Writer) { fParam_Writer->Reset(); }
   if (fParam_Reader) { fParam_Reader->Reset(); }
@@ -138,9 +145,11 @@ string R3BCaloDUCalPar::GetTableDefinition(const char* Name)
   sql += "  ROW_ID                INT NOT NULL,";
   sql += "  COMP_ID               INT,";
   sql += "  DETECTION_UNIT        INT,";
-  sql += "  PARZERO         DOUBLE,";
-  sql += "  PARONE          DOUBLE,";
-  /*sql += "  GAMMA_PARZERO         DOUBLE,";
+  sql += "  GAMMACAL_OFFSET       DOUBLE,";
+  sql += "  GAMMACAL_GAIN         DOUBLE,";
+  sql += "  TOTCAL_OFFSET         DOUBLE,";
+  sql += "  TOTCAL_GAIN           DOUBLE,";
+  /*sql += "  GAMMA_PARZERO       DOUBLE,";
   sql += "  GAMMA_PARONE          DOUBLE,";
   sql += "  PROTON_PARZERO        DOUBLE,";
   sql += "  PROTON_PARONE         DOUBLE,";*/
@@ -161,8 +170,9 @@ void R3BCaloDUCalPar::Fill(FairDbResultPool& res_in,
   // Clear all structures
   clear();
   
-  res_in >> fCompId  >> fDetectionUnit >> fParZero >> fParOne /* >> fGammaParZero  >> fGammaParOne >> fProtonParZero >> fProtonParOne 
-  */ >> fConversionFactor /*>> fExtraOne >> fExtraTwo >> fExtraThree >> fExtraFour*/;
+  res_in >> fCompId  >> fDetectionUnit >> fGammaCal_offset >> fGammaCal_gain >> fToTCal_offset >> fToTCal_gain
+  /* >> fGammaParZero  >> fGammaParOne >> fProtonParZero >> fProtonParOne */ >> fConversionFactor 
+  /*>> fExtraOne >> fExtraTwo >> fExtraThree >> fExtraFour*/;
 
 }
 
@@ -170,8 +180,8 @@ void R3BCaloDUCalPar::Store(FairDbOutTableBuffer& res_out,
                          const FairDbValRecord* valrec) const
 {
   
-  res_out << fCompId  << fDetectionUnit << fParZero << fParOne /*<< fGammaParZero  << fGammaParOne << fProtonParZero << fProtonParOne 
-  */ << fConversionFactor /*<< fExtraOne << fExtraTwo << fExtraThree << fExtraFour*/;
+  res_out << fCompId  << fDetectionUnit << fGammaCal_offset << fGammaCal_gain << fToTCal_offset << fToTCal_gain  
+  /*<< fGammaParZero  << fGammaParOne << fProtonParZero << fProtonParOne */ << fConversionFactor /*<< fExtraOne << fExtraTwo << fExtraThree << fExtraFour*/;
 
 }
 
@@ -198,8 +208,10 @@ void R3BCaloDUCalPar::fill(UInt_t rid)
     if (!cgd) { continue; }
     fCompId = cgd->GetCompId();
     fDetectionUnit =  cgd->GetDetectionUnit();
-    fParZero  =  cgd->GetParZero();
-    fParOne  =  cgd->GetParOne();
+    fGammaCal_offset  =  cgd->GetGammaCal_offset();
+    fGammaCal_gain  =  cgd->GetGammaCal_gain();
+    fToTCal_offset  =  cgd->GetToTCal_offset();
+    fToTCal_gain  =  cgd->GetToTCal_gain();
     /*fGammaParZero  =  cgd->GetGammaParZero();
     fGammaParOne  =  cgd->GetGammaParOne();
     fProtonParZero  =  cgd->GetProtonParZero();
@@ -289,7 +301,8 @@ void R3BCaloDUCalPar::Print()
   std::cout<<"   R3BCaloDUCalPar: Detection Unit Calibration Parameters: "<<std::endl;
   std::cout<<"   fCompId: "<<  fCompId <<  std::endl;
   std::cout<<"   fDetectionUnit: "<<  fDetectionUnit <<  std::endl;
-  std::cout<<"   fParZero: "<<  fParZero <<  "   fParOne: "<<  fParOne <<  std::endl;
+  std::cout<<"   fGammaCal_offset: "<<  fGammaCal_offset <<  "   fGammaCal_gain: "<<  fGammaCal_gain <<  std::endl;
+  std::cout<<"   fToTCal_offset: "<<  fToTCal_offset <<  "   fToTCal_gain: "<<  fToTCal_gain <<  std::endl;
   /*std::cout<<"   fGammaParZero: "<<  fGammaParZero <<  "   fGammaParOne: "<<  fGammaParOne <<  std::endl;
   std::cout<<"   fProtonParZero: "<<  fProtonParZero <<  "   fProtonParOne: "<<  fProtonParOne <<  std::endl;*/
   std::cout<<"   fConversionFactor: "<<  fConversionFactor <<  std::endl;
@@ -304,8 +317,10 @@ Bool_t R3BCaloDUCalPar::Compare(const R3BCaloDUCalPar& that ) const {
   //  
   Bool_t test_h =  (fCompId   == that.fCompId)
  	               &&  (fDetectionUnit   == that.fDetectionUnit)
-	               &&  (fParZero   == that.fParZero)
-		       &&  (fParOne   == that.fParOne)
+	               &&  (fGammaCal_offset   == that.fGammaCal_offset)
+		       &&  (fGammaCal_gain   == that.fGammaCal_gain)
+  		       &&  (fToTCal_offset   == that.fToTCal_offset)
+		       &&  (fToTCal_gain   == that.fToTCal_gain)
 		       /*&&  (fGammaParZero   == that.fGammaParZero)
 		       &&  (fGammaParOne   == that.fGammaParOne)
 		       &&  (fProtonParZero   == that.fProtonParZero)

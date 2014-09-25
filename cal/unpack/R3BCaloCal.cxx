@@ -158,7 +158,7 @@ Double32_t R3BCaloCal::CalibrateEnergy(R3BCaloRawHit* chit/*, char c*/)
   } else {
   	return 0.;
   }*/
-  return fCaloCalPar->GetDUCalParAt(chit->GetCrystalId())->GetParZero()+((chit->GetEnergy()+(rando-0.5))*fCaloCalPar->GetDUCalParAt(chit->GetCrystalId())->GetParOne())/fCaloCalPar->GetDUCalParAt(chit->GetCrystalId())->GetConversionFactor();
+  return fCaloCalPar->GetDUCalParAt(chit->GetCrystalId())->GetGammaCal_offset()+((chit->GetEnergy()+(rando-0.5))*fCaloCalPar->GetDUCalParAt(chit->GetCrystalId())->GetGammaCal_gain())/fCaloCalPar->GetDUCalParAt(chit->GetCrystalId())->GetConversionFactor();
 }
 
 Double32_t R3BCaloCal::CalibrateFastComponent(R3BCaloRawHit* chit)

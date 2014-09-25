@@ -49,8 +49,10 @@ using TObject::Compare;
     Int_t GetComboNo()       		const {return fCompId;}
     Int_t GetCompId()   		const {return fCompId;}
     Int_t GetDetectionUnit() 		const {return fDetectionUnit;}
-    Double_t GetParZero() 		const {return fParZero;}
-    Double_t GetParOne() 		const {return fParOne;}
+    Double_t GetGammaCal_offset() 	const {return fGammaCal_offset;}
+    Double_t GetGammaCal_gain() 	const {return fGammaCal_gain;}
+    Double_t GetToTCal_offset() 	const {return fToTCal_offset;}
+    Double_t GetToTCal_gain() 		const {return fToTCal_gain;}
     /*Double_t GetGammaParZero() 		const {return fGammaParZero;}
     Double_t GetGammaParOne() 		const {return fGammaParOne;}
     Double_t GetProtonParZero() 	const {return fProtonParZero;}
@@ -63,8 +65,10 @@ using TObject::Compare;
 
     void SetCompId(Int_t x)  			{SetComboNo(x); fCompId=x;}
     void SetDetectionUnit(Int_t i) 		{fDetectionUnit=i;}
-    void SetParZero(Double_t i) 		{fParZero=i;}
-    void SetParOne(Double_t i) 			{fParOne=i;}
+    void SetGammaCal_offset(Double_t i) 	{fGammaCal_offset=i;}
+    void SetGammaCal_gain(Double_t i) 		{fGammaCal_gain=i;}
+    void SetToTCal_offset(Double_t i) 		{fToTCal_offset=i;}
+    void SetToTCal_gain(Double_t i) 		{fToTCal_gain=i;}
     /*void SetGammaParZero(Double_t i) 		{fGammaParZero=i;}
     void SetGammaParOne(Double_t i) 		{fGammaParOne=i;}
     void SetProtonParZero(Double_t i) 		{fProtonParZero=i;}
@@ -111,8 +115,10 @@ using TObject::Compare;
     // Data Parameters
     Int_t fCompId;
     Int_t fDetectionUnit; 
-    Double_t fParZero;
-    Double_t fParOne;
+    Double_t fGammaCal_offset;
+    Double_t fGammaCal_gain;
+    Double_t fToTCal_offset;
+    Double_t fToTCal_gain;
     /*Double_t fGammaParZero;
     Double_t fGammaParOne;
     Double_t fProtonParZero;
