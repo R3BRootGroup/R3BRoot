@@ -8,6 +8,8 @@
 #include "R3BCaloContFact.h"
 
 #include "R3BCaloGeometryPar.h"               // for R3BCaloGeometryPar
+#include "R3BCaloCalPar.h"               // for R3BCaloCalPar
+#include "R3BCaloDUCalPar.h"               // for R3BCaloDUCalPar
 #include "FairParSet.h"                 // for FairParSet
 #include "FairRuntimeDb.h"              // for FairRuntimeDb
 
@@ -56,6 +58,18 @@ FairParSet* R3BCaloContFact::createContainer(FairContainer* c)
 
   if (strcmp(name,"CaloGeometryPar")==0) {
     p=new R3BCaloGeometryPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
+    // Set Arguments needed for SQL versioning managment
+    p->SetVersion(0);
+    p->SetDbEntry(0);
+    p->SetLogTitle(name);
+  } else if (strcmp(name,"CaloCalPar")==0) {
+    p=new R3BCaloCalPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
+    // Set Arguments needed for SQL versioning managment
+    p->SetVersion(0);
+    p->SetDbEntry(0);
+    p->SetLogTitle(name);
+  } else if (strcmp(name,"CaloDUCalPar")==0) {
+    p=new R3BCaloDUCalPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
     // Set Arguments needed for SQL versioning managment
     p->SetVersion(0);
     p->SetDbEntry(0);

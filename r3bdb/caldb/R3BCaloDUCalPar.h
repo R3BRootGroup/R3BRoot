@@ -34,7 +34,7 @@ class R3BCaloDUCalPar : public FairParGenericSet
 using TObject::Compare;
 
   public :
-  R3BCaloDUCalPar (const char* name="R3BCaloDUCalPar",
+  R3BCaloDUCalPar (const char* name="CaloDUCalPar",
 				 const char* title="Califa Calibrated Detection Unit Parameter",
 				 const char* context="TestDefaultContext",
 				 Bool_t own=kTRUE);
