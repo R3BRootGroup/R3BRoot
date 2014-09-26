@@ -107,8 +107,8 @@ void r3ball(Int_t nEvents = 1,
   // -----   Create R3B geometry --------------------------------------------
   //R3B Cave definition
   FairModule* cave= new R3BCave("CAVE");
-  cave->SetGeometryFileName("r3b_cave.geo");
-  //cave->SetGeometryFileName("tracker_cave.geo");
+  //cave->SetGeometryFileName("r3b_cave.geo");
+  cave->SetGeometryFileName("tracker_cave.geo");
   run->AddModule(cave);
   
   //R3B Target definition
@@ -296,20 +296,20 @@ void r3ball(Int_t nEvents = 1,
 	// 2- Define the CALIFA Test gamma generator
 	//Double_t pdgId=22; // gamma emission
 	Double_t pdgId=2212; // proton emission
-	Double_t theta1= 7.;  // polar angle distribution
-	Double_t theta2= 130.;	
-	//Double_t theta1= 0.;  // polar angle distribution
-	//Double_t theta2= 179.;	
+	//Double_t theta1= 7.;  // polar angle distribution
+	//Double_t theta2= 130.;	
+	Double_t theta1= 60.;  // polar angle distribution
+	Double_t theta2= 60.;	
 	//Double_t theta1= 7.;  // polar angle distribution	
 	//Double_t theta2= 100.;	
 	//Double_t theta2= 90.;	
 	//Double_t momentum=0.001; // 0.001 GeV/c = 1 MeV/c 
-	Double_t momentum=0.8; // 0.001 GeV/c = 1 MeV/c 
+	Double_t momentum=0.55; // 0.55 GeV/c proton <=> 149 MeV kinetic energy proton
 	//Double_t momentum=0.002; // 0.010 GeV/c = 10 MeV/c 
 	//Double_t momentumI=0.5; // 0.0001 GeV/c = 0.1 MeV/c 
-	//Double_t momentumF=0.5; // 0.0001 GeV/c = 0.1 MeV/c 
-	//Double_t momentumI=0.8; // 0.8 GeV/c = 800 MeV/c 
-	//Double_t momentumF=0.8; // 0.01 GeV/c = 10 MeV/c 
+	//Double_t momentumF=0.5; // 
+	//Double_t momentumI=0.8; // 0.8 GeV/c
+	//Double_t momentumF=0.8; //  
 	//Double_t momentumI=0.808065; // 0.808065 GeV/c (300MeV Kin Energy for protons) 
 	//Double_t momentumF=0.808065; // 0.808065 GeV/c (300MeV Kin Energy for protons) 
 	//Double_t momentumI=0.31016124; // 0.31016124 GeV/c (50MeV Kin Energy for protons)
@@ -326,11 +326,19 @@ void r3ball(Int_t nEvents = 1,
 	//gammasGen->SetPRange(momentumI,momentumF);
 	gammasGen->SetPhiRange(0.,360.);
 	//gammasGen->SetXYZ(0.0,0.0,-1.5);
+
 	//gammasGen->SetXYZ(0.0,0.0,0.0);
 	//
+	//gammasGen->SetBoxXYZ(Xmin,Ymin,Zmin,Xmax,Ymax,Zmax)
+
 	//gammasGen->SetBoxXYZ(-0.1,0.1,-0.1,0.1,-0.1,0.1);
-	//gammasGen->SetBoxXYZ(-1.5,1.5,-1.5,1.5,0.,6.);  // LiqH target
-	gammasGen->SetBoxXYZ(-1.5,1.5,-1.5,1.5,-0.0005,0.0005);  // 10um target thick
+	//gammasGen->SetBoxXYZ(-1.5,-1.5,0,1.5,1.5,6.);  // LiqH target
+
+	//gammasGen->SetBoxXYZ(-1.,1.,-1.,1.,-0.0005,0.0005);  // 10um CH2 target thick
+	//gammasGen->SetBoxXYZ(-1.,-1.,-0.29,1.,1.,0.29);  // 5.8 mm CH2 target thick
+	gammasGen->SetBoxXYZ(-1.,-1.,0.,1.,1.,0.);  // infinitively thin CH2 target thick + 2cm beam spot
+
+	//gammasGen->SetBoxXYZ(-1.,-1.,-0.29,1.,1.,0.29);  // 5.8 mm CH2 target thick
 	//gammasGen->SetLorentzBoost(0.8197505718204776); //beta=0.81975 for 700 A MeV
 	//gammasGen->SetLorentzBoost(0.5);
 	// add the gamma generator
