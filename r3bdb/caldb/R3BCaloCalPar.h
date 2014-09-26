@@ -1,5 +1,5 @@
-#ifndef R3BCALOCALPAR_H
-#define R3BCALOCALPAR_H
+#ifndef R3BCALOCALPAR1_H
+#define R3BCALOCALPAR1_H
 
 #include "FairParGenericSet.h"          // for FairParGenericSet
 
@@ -23,10 +23,8 @@ class FairParamList;
 class R3BCaloCalPar : public FairParGenericSet
 {
 
-using TObject::Compare;
-
   public :
-    R3BCaloCalPar (const char* name="CaloCalPar",
+    R3BCaloCalPar (const char* name="R3BCaloCalPar",
                   const char* title="Califa Calibration Parameter",
                   const char* context="TestDefaultContext",
                   Bool_t own=kTRUE);
@@ -45,9 +43,29 @@ using TObject::Compare;
     R3BCaloDUCalPar* GetDUCalParAt(Int_t idx){return (R3BCaloDUCalPar*) fDUCalParams->At(idx);} 
 
 
+   // Add-ons: SQL descriptors for the parameter class
+    virtual std::string GetTableDefinition(const char* Name = 0){std::string rr=""; return rr;}
+
+    virtual FairDbObjTableMap* CreateObjTableMap() const {
+      return new R3BCaloCalPar();
+    }
+
+    // Atomic IO (intrinsic)
+    virtual void Fill(FairDbResultPool& res_in,
+                      const FairDbValRecord* valrec){;}
+    virtual void Store(FairDbOutTableBuffer& res_out,
+                       const FairDbValRecord* valrec) const {;}
+
     // Global IO using run_id
     virtual void fill(UInt_t rid);
     virtual void store(UInt_t rid);
+
+    virtual ValCondition GetContext(UInt_t rid) {
+      return ValCondition(Detector::kCal,
+                          DataType::kData,
+                          ValTimeStamp(rid));
+    }
+
 
   private:
     TObjArray* fDUCalParams;
@@ -55,5 +73,5 @@ using TObject::Compare;
     ClassDef(R3BCaloCalPar,1); // R3BCaloCalPar Parameter Container example
 };
 
-#endif /* !R3BCALOCALPARPAR_H*/
+#endif /* !R3BCALOCALPAR_H*/
 

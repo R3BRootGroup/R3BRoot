@@ -58,7 +58,7 @@ R3BCaloDUCalPar::R3BCaloDUCalPar(const char* name, const char* title, const char
   clear();
 
   // ConnectionPool
-  fMultConn=FairDbTableInterfaceStore::Instance().fConnectionPool;
+  //fMultConn=FairDbTableInterfaceStore::Instance().fConnectionPool;
 
 }
 

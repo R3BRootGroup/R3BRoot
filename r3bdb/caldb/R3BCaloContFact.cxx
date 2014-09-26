@@ -44,6 +44,11 @@ void R3BCaloContFact::setAllContainers()
                                         "TestDefaultContext");
   p1->addContext("TestNonDefaultContext");
   containers->Add(p1);
+
+  FairContainer* p2 = new FairContainer("CaloCalPar", "Califa Calib Parameters",
+                                        "TestDefaultContext");
+  p2->addContext("TestDefaultContext");
+  containers->Add(p2);
 }
 
 FairParSet* R3BCaloContFact::createContainer(FairContainer* c)
