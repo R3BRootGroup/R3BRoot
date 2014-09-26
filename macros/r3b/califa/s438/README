@@ -19,13 +19,15 @@ extractParams.C	Macro for extracting calibration parameters fron the output
 
 califaUnpack.C	Unpack macro 
 	
-fitPars_140922.txt	Fit result for calibration run 140922
+fitPars_140922.txt	Fit result for calibration run 140922 (files 1639 to 1650)
 
-calPars_140922.txt	Calibration parameters for calibration run 140922
+calPars_140922.txt	Calibration parameters for calibration run 140922 (only 
+			files 1639 to 1650)
 
 crystalInfo_140922.txt	Crystal information (parameters, resolution) for 
-			calibration run 140922
+			calibration run 140922 (only files 1639 to 1650)
 
-plot.C		Macro ready for plotting interesting features of 
+plot.C		Macro ready for plotting raw hits and crystal hits data and 
+		correlations
 
 data		Temporal storage of data files (outputs) for calibration
