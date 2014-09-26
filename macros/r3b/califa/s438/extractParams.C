@@ -1,13 +1,32 @@
-{
+//  -------------------------------------------------------------------------
+//
+//   -----  Macro for R3B CALIFA parameters conversion
+//         Author: Hector Alvarez <hector.alvarez@usc.es>
+//         Last Update: 26/09/14
+//         Comments:
+//  -------------------------------------------------------------------------
+//
+//   Usage: 
+//      > root -l 
+//      ROOT> .L extractParams.C
+//      ROOT> extractParams(inputFile,outputFile1,outputFile2,energy1,energy2)
+//                             
+//     where inputFile is the file name of the output of calibrate.C 
+//           outputFile1 is the file name for the parameters
+//           outputFile2 is the file name for additional info output
+//           energy1 is the energy of secondfirst peak used in calibrate.C
+//           energy2 is the energy of second peak used in calibrate.C
+//         
+//  -------------------------------------------------------------------------
+extractParams(TString inputFile, TString outputFile1, TString outputFile2,
+	      Double_t energy1, Double_t energy2){
   ifstream input;
-  input.open("fitPars.txt");
   ofstream output;
-  output.open("calPars.txt");
   ofstream output_2;
-  output_2.open("crystalInfo.txt");
   
-  Double_t energy1 = 511.;
-  Double_t energy2 = 1274.53;
+  input.open(inputFile);  //input fit parameters (output of calibrate.C)
+  output.open(outputFile1); //output calibration parameters
+  output_2.open(outputFile2); //output info (cal pars + resol FWHM)
   
   Double_t gain=0;
   Double_t offset=0;

@@ -1,6 +1,6 @@
 //  -------------------------------------------------------------------------
 //
-//   ----- General Macro for R3B CALIFA Fast Calibration
+//   ----- General Macro for R3B CALIFA Fast Calibration for two energy peaks
 //         Author: Hector Alvarez <hector.alvarez@usc.es>
 //         Last Update: 25/09/14
 //         Comments:
@@ -48,12 +48,12 @@ void calibrate(TString inputFile, Int_t mode=0,
   TH1F** hEnergy = new TH1F*[160];
   for(Int_t i=0;i<160;i++) {
     sprintf(histitle,"%s%i","hEnergy",i);  	
-    hEnergy[i] = new TH1F(histitle,histitle,1000,0,5000);
+    hEnergy[i] = new TH1F(histitle,histitle,peak2Right-peak1Left+200,peak1Left-100,peak2Right+100);
   }
   TH1F** hImprovedEnergy = new TH1F*[160];
   for(Int_t i=0;i<160;i++) {
     sprintf(histitle,"%s%i","hImprovedEnergy",i);  	
-    hImprovedEnergy[i] = new TH1F(histitle,histitle,1000,0,5000);
+    hImprovedEnergy[i] = new TH1F(histitle,histitle,peak2Right-peak1Left+200,peak1Left-100,peak2Right+100);
   }
   
   TTree* caloTree = (TTree*)file1->Get("cbmsim");
@@ -122,15 +122,15 @@ void calibrate(TString inputFile, Int_t mode=0,
 	   i!=56 && i!=57 && i!=58 && i!=59 && i!=76 && i!=77 && i!=78 && i!=79 && 
 	   i!=96 && i!=97 && i!=98 && i!=99 && i!=116 && i!=117 && i!=118 && i!=119 && 
 	   i!=136 && i!=137 && i!=138 && i!=139 && i!=156 && i!=157 && i!=158 && i!=159 ) {
-	myfit_1[i]->SetParameter(0, 1.5e+05);
-	myfit_1[i]->SetParameter(1, 1.0e+03);
+	myfit_1[i]->SetParameter(0, 1.0e+03);
+	myfit_1[i]->SetParameter(1, (peak1Left+peak1Right)/2);
 	myfit_1[i]->SetParameter(2, 50);
-	myfit_1[i]->SetParameter(3, 400);
+	myfit_1[i]->SetParameter(3, 0);
 	
-	myfit_2[i]->SetParameter(0, 5.0e+04);
-	myfit_2[i]->SetParameter(1, 2.7e+03);
-	myfit_2[i]->SetParameter(2, 64);
-	myfit_2[i]->SetParameter(3, 900);
+	myfit_2[i]->SetParameter(0, 1.0e+02);
+	myfit_2[i]->SetParameter(1, (peak2Left+peak2Right)/2);
+	myfit_2[i]->SetParameter(2, 50);
+	myfit_2[i]->SetParameter(3, 0);
 	sprintf(f1title,"%s%i","myfit_1_",i);  
 	hEnergy[i]->Fit(f1title,"R");  
 	fitParFile << myfit_1[i]->GetParameter(0) << " " 
