@@ -124,8 +124,8 @@ void R3BCaloCal::Exec(Option_t* option)
       
       time = rawHit->GetTime();
       
-      tot_energy = fCaloCalPar->GetDUCalParAt(rawHit->GetCrystalId())->GetTotCal_offset() + 
-      	( (rawhit->GetTot()+(rando-0.5) ) * fCaloCalPar->GetDUCalParAt(rawHit->GetCrystalId())->GetGammaCal_gain()); 
+      tot_energy = fCaloCalPar->GetDUCalParAt(rawHit->GetCrystalId())->GetToTCal_offset() + 
+      	( (rawHit->GetTot()+(rando-0.5) ) * fCaloCalPar->GetDUCalParAt(rawHit->GetCrystalId())->GetToTCal_gain()); 
       
       //TODO: Add tot_energy in CaloCrystalHit
       new ((*fCrystalHitCA)[i]) R3BCaloCrystalHit(crystal_id, energy, n_f, n_s, time);
