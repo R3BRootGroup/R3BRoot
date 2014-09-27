@@ -26,7 +26,7 @@ class R3BCaloCal : public FairTask {
   virtual ~R3BCaloCal();
   
   /** Virtual method Exec **/
-  virtual void Exec(/*char c*/);
+  virtual void Exec(Option_t* option);
     
   /** Virtual method Reset **/
   virtual void Reset();
@@ -59,7 +59,6 @@ protected:
   TClonesArray *fRawHitCA;
   TClonesArray *fCrystalHitCA;
   R3BCaloCalPar* fCaloCalPar;
-  float rando;
     
  public:
   //Class definition

@@ -3,7 +3,7 @@
 // -----                          R3BCaloRawHit                            -----
 // -----                           Version 0.1                             -----
 // -----                    Created 15.10.2013 by Y.Gonzalez               -----
-// -----                                                                   -----
+// -----                    Modified 24/10/2013 by A.Perea                 -----
 // -----------------------------------------------------------------------------
 
 #include "R3BCaloRawHit.h"
@@ -20,14 +20,20 @@ R3BCaloRawHit::R3BCaloRawHit()
 }
 
 
+//------------------------------
+/**
+ * 
+ * 
+ */
 R3BCaloRawHit::R3BCaloRawHit(UShort_t crystalId, UShort_t energy,
-			     UShort_t nf, UShort_t ns, ULong_t time, UChar_t error)
+			     UShort_t nf, UShort_t ns, ULong_t time, UChar_t error, UShort_t tot)
   : fCrystalId(crystalId),
     fEnergy(energy),
     fNf(nf),
     fNs(ns),
     fTime(time),
-    fError(error)
+    fError(error),
+    fTot(tot) 
 {
 }
 

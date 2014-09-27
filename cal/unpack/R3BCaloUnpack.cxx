@@ -4,6 +4,7 @@
 // -----                           Version 1.0                             -----
 // -----                    Created  11/10/2013 by Y.Gonzalez              -----
 // -----                    Modified 03/03/2014 by M. Bendel               -----
+// -----                    Modified 23/09/2014 by A.Perea                 -----                
 // -----                                                                   -----
 // -----------------------------------------------------------------------------
 
@@ -22,7 +23,12 @@
 #include "R3BCaloRawHit.h"
 #include "R3BCaloUnpack.h"
 
-//R3BCaloUnpack: Constructor
+
+
+//------------------------
+/**
+ * Constructor
+ */
 R3BCaloUnpack::R3BCaloUnpack(char *strCalDir,
                              Short_t type, Short_t subType,
                              Short_t procId,
@@ -35,7 +41,12 @@ R3BCaloUnpack::R3BCaloUnpack(char *strCalDir,
 
 
 
-//Virtual R3BCaloUnpack: Public method
+
+
+//-------------------------
+/**
+ * Destructor
+ */
 R3BCaloUnpack::~R3BCaloUnpack()
 {
   LOG(INFO) << "R3BCaloUnpack: Delete instance" << FairLogger::endl;
@@ -44,16 +55,24 @@ R3BCaloUnpack::~R3BCaloUnpack()
 
 
 
-//Init: Public method
-Bool_t R3BCaloUnpack::Init()
-{
+
+//--------------------------
+/**
+ *  
+ */
+Bool_t R3BCaloUnpack::Init() {
   Register();
   return kTRUE;
 }
 
 
-void R3BCaloUnpack::SetParContainers()
-{
+
+//--------------------------
+/**
+ * 
+ */
+void R3BCaloUnpack::SetParContainers() {
+  
   // Get run and runtime database
   FairRunAna* run = FairRunAna::Instance();
   if (!run) Fatal("R3BCaloUnpack::SetParContainers", "No analysis run");
@@ -70,9 +89,11 @@ void R3BCaloUnpack::SetParContainers()
 }
 
 
-//Register: Protected method
-void R3BCaloUnpack::Register()
-{
+//----------------------------
+/*
+ * 
+ */
+void R3BCaloUnpack::Register() {
   LOG(DEBUG) << "Registering" << FairLogger::endl;
   FairRootManager *fMan = FairRootManager::Instance();
   if(! fMan) {
@@ -82,62 +103,91 @@ void R3BCaloUnpack::Register()
 }
 
 
-//DoUnpack: Public method
-Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size)
-{
+
+//------------------------------
+/*  R3BCalounpack
+ * 
+ * Called by the unpacker, returns
+ * 
+ */
+Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
   //	trace_head_t *califa_trace = new trace_head_t;
   //	UShort_t *trace_data;
   
-  UInt_t l_s = 5;
   UInt_t *pl_data = (UInt_t*) data;
-
+  UInt_t l_s = 0; // skip over timerabit header
+  
+  //----- Whiterabbit timestamp ------
+  // The structure of the time-stamp is as follows
+  // 0x03E1 XXXX
+  // 0x04E1 YYYY
+  // 0x05E1 ZZZZ
+  // 0x06E1 TTTT
+  // Where the whiteRabbit time-stamp is a 64bit-long integer = 0xTTTTZZZZYYYYXXXX
+    
+  ULong64_t rabbit0, rabbit1, rabbit2, rabbit3, rabbit4;
+  ULong64_t check0, check1, check2, check3;
+ 
+  l_s++; // skip first module id (should be 0x0300)
+  check0 = ( data[l_s] >> 16 ) & 0xffff;  rabbit1 =  data[l_s++] & 0xffff;
+  check1 = ( data[l_s] >> 16 ) & 0xffff;  rabbit2 =  data[l_s++] & 0xffff;
+  check1 = ( data[l_s] >> 16 ) & 0xffff;  rabbit3 =  data[l_s++] & 0xffff;
+  check1 = ( data[l_s] >> 16 ) & 0xffff;  rabbit4 =  data[l_s++] & 0xffff;
+  
+  ULong64_t rabbitStamp = (rabbit4 << 48) | (rabbit3 << 32) | ( rabbit2 << 16 ) | rabbit1; 
+  //   LOG(INFO) << "whiteRabbit:" << rabbitStamp << FairLogger::endl;
+  
+  //---------- hit data ---------
+  
+  // hitdata consists in several hits 
+  // there are two possible formats (old and new), a magic number defines version is being used. 
+  // In the new format, each hit can be followed by optional extra data for time-over-threshold or trace
+  
   LOG(DEBUG) << "Unpacking" << FairLogger::endl;
 
   while(l_s < size) {
 
-    // Loops over CALIFA halves have to be implemented!
-
-    // Remove 0xadd... words
-    while((data[l_s] & 0xfff00000) == 0xadd00000) {
-      l_s++;
-    }
+    // @TODO Loops over CALIFA halves to be implemented
     
-    LOG(DEBUG) << "At GOSIP memory" << FairLogger::endl;
+    //----------- parse header -----------
+    
+    // Remove 0xadd... words. some padding?
+    while((data[l_s] & 0xfff00000) == 0xadd00000) { l_s++;  }
     
     UShort_t header_size;
     UShort_t trigger;
     UShort_t pc_id = 0;     //Should be implemented for use of two CALIFA halves
     UShort_t sfp_id = 0;
-    UShort_t module_id;
-    UShort_t submemory_id;
+    UShort_t card;
+    UShort_t channel;
     UInt_t   data_size;
 
     header_size = pl_data[l_s] & 0xff;
     trigger = (pl_data[l_s] >> 8) & 0xff;
-    module_id = (pl_data[l_s] >> 16) & 0xff;
-    submemory_id = (pl_data[l_s++] >> 24) & 0xff;
+    card = (pl_data[l_s] >> 16) & 0xff;
+    channel = (pl_data[l_s++] >> 24) & 0xff;
     data_size = pl_data[l_s++];
     
-    LOG(DEBUG) << "========== gosip sub " << FairLogger::endl
-    << "     header_size " << header_size << FairLogger::endl
-    << "         trigger " << trigger << FairLogger::endl
-    << "       module_id " << module_id << FairLogger::endl
-    << "    submemory_id " << submemory_id << FairLogger::endl
-    << "       data_size " << data_size << FairLogger::endl;
+    
+//     LOG(DEBUG) << "========== gosip sub " << FairLogger::endl
+//     << "     header_size " << header_size << FairLogger::endl
+//     << "         trigger " << trigger << FairLogger::endl
+//     << "       card " << card << FairLogger::endl
+//     << "    channel " << channel << FairLogger::endl
+//     << "       data_size " << data_size << FairLogger::endl;
 
     
     if(header_size != 0x34) {
+      LOG(WARNING) << "Wrong header size" << FairLogger::endl;
       break;
     }
     
     // Data reduction: size == 0 -> no more events
-    if(data_size == 0) {
-      continue;
-    }
+    if(data_size == 0) continue;
+  
     
-    // special channel
-    if(submemory_id == 0xff)
-    {
+    // ignore special channel with metadata, if present
+    if(channel == 0xff) {
       //!! Prepared for use with different SFPs    !!
       //!! not available in current data structure !!
       // l_s++;
@@ -145,13 +195,16 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size)
       l_s += data_size / 4;
       continue;
     }
-    
-    // Real CALIFA data channel
+ 
+ 
+  
+    //----------- parse data -----------
+             
     UShort_t evsize;
-    UShort_t magic_affe;
+    UShort_t magic;
     UInt_t event_id;
-    ULong_t timestamp;
-    UShort_t cfd_samples[4];
+    ULong_t febexTimestamp;    // timestamp from the febex. Not used
+    UShort_t cfd_samples[4]; 
     UShort_t loverflow;
     UShort_t hoverflow;
     UInt_t   overflow;
@@ -165,76 +218,132 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size)
     Short_t n_f;
     UShort_t n_s;
     UChar_t error = 0;
-    evsize = pl_data[l_s] & 0xffff;
-    magic_affe = (pl_data[l_s++] >> 16) & 0xffff;
-    event_id = pl_data[l_s++];
-    timestamp = pl_data[l_s++];
-    timestamp |= (ULong_t)pl_data[l_s++] << 32;
-    cfd_samples[0] = pl_data[l_s] & 0xff;
-    cfd_samples[1] = pl_data[l_s++] >> 16;
-    cfd_samples[2] = pl_data[l_s] & 0xff;
-    cfd_samples[3] = pl_data[l_s++] >> 16;
-    overflow = pl_data[l_s] & 0xffffff;
-    self_triggered = (pl_data[l_s++] >> 24) & 0xff;
-    num_pileup = pl_data[l_s] & 0xffff;
-    num_discarded = (pl_data[l_s++] >> 16) & 0xffff;
-    energy = pl_data[l_s++] & 0xffff;
-    qpid_size = pl_data[l_s] & 0xffff;
-    magic_babe = (pl_data[l_s++] >> 16) & 0xffff;
-    n_f = pl_data[l_s] & 0xffff;
-    n_s = (pl_data[l_s++] >> 16) & 0xffff;
-
-    // Set error bits
-    // Error flags: [Pileup][PID][Energy][Timing]
-
-    // Timing not valid
-    if (overflow & 0x601)  //11000000001
-      error |= 1;
-    // Energy not valid
-    if (overflow & 0x63e)  //11000111110
-      error |= 1<<1;
-    // PID not valid
-    if (overflow & 0x78E)  //11110001110
-      error |= 1<<2;
-    if (num_pileup)
-      error |= 1<<3;
+    UShort_t tot;
+    UShort_t tot_samples[4];
  
-    // Generate crystalID
-    UShort_t crystal_id = pc_id * (max_submemory_id*max_module_id*max_sfp_id)
-      + sfp_id * (max_submemory_id*max_module_id)
-      + module_id * max_submemory_id
-      + submemory_id;
-
-    LOG(DEBUG) << " --------- event " << FairLogger::endl
-    << "        event_id " << event_id << FairLogger::endl
-    << "          energy " << energy << FairLogger::endl
-    << "       timestamp " << timestamp << FairLogger::endl
-    << "=================================" << FairLogger::endl;
     
-    new ((*fRawData)[fNHits]) R3BCaloRawHit(crystal_id, 
-					    energy, n_f, n_s, timestamp,
-					    error);
+    evsize = pl_data[l_s] & 0xffff;
+    magic = (pl_data[l_s++] >> 16) & 0xffff;
+   
+    
+    switch(magic) {
+    
+      // uint64_t = ULong_t
+      //--------------------        
+      //     evsize = pl_data[l_s] & 0xffff;
+      //     magic_affe = (pl_data[l_s++] >> 16) & 0xffff;
+      //     event_id = pl_data[l_s++];
+      //     timestamp = pl_data[l_s++];
+      //     timestamp |= (ULong_t)pl_data[l_s++] << 32;
+      //     cfd_samples[0] = pl_data[l_s] & 0xff;
+      //     cfd_samples[1] = pl_data[l_s++] >> 16;
+      //     cfd_samples[2] = pl_data[l_s] & 0xff;
+      //     cfd_samples[3] = pl_data[l_s++] >> 16;
+      //     overflow = pl_data[l_s] & 0xffffff;
+      //     self_triggered = (pl_data[l_s++] >> 24) & 0xff;
+      //     num_pileup = pl_data[l_s] & 0xffff;
+      //     num_discarded = (pl_data[l_s++] >> 16) & 0xffff;
+      //     energy = pl_data[l_s++] & 0xffff;
+      //     qpid_size = pl_data[l_s] & 0xffff;
+      //     magic_babe = (pl_data[l_s++] >> 16) & 0xffff;
+      //     n_f = pl_data[l_s] & 0xffff;
+      //     n_s = (pl_data[l_s++] >> 16) & 0xffff;
+      //------------------------
+      
+      
+      case 0xAFFE: // old version of lmd
+        event_id = pl_data[l_s++];
+        febexTimestamp = pl_data[l_s++];   // not used. see whiterabbit timestamp above
+        febexTimestamp |= (ULong_t) pl_data[l_s++] << 32;
+        cfd_samples[0] = pl_data[l_s] & 0xffff;
+        cfd_samples[1] = pl_data[l_s++] >> 16;
+        cfd_samples[2] = pl_data[l_s] & 0xffff;
+        cfd_samples[3] = pl_data[l_s++] >> 16;
+        overflow = pl_data[l_s] & 0xffffff;
+        self_triggered = (pl_data[l_s++] >> 24) & 0xff;
+        num_pileup = pl_data[l_s] & 0xffff;
+        num_discarded = (pl_data[l_s++] >> 16) & 0xffff;
+        energy = pl_data[l_s++] & 0xffff;
+        //energy = (int32_t)((uint16_t)(pl_data[l_s++] & 0xffff));     // in Max's unpacker
+        l_s++;
+        n_f = pl_data[l_s] & 0xffff;
+        n_s = (pl_data[l_s++] >> 16) & 0xffff;
+        //n_f = (int32_t)((uint16_t)(pl_data[l_s] & 0xffff));           // in Max's unpacker
+        //n_s = (int32_t)((uint16_t)((pl_data[l_s++] >> 16) & 0xffff)); // in Max's unpacker
+        break;
+        
+      case 0x115A:  // new event version
+        event_id = pl_data[l_s++];
+        febexTimestamp = pl_data[l_s++];
+        febexTimestamp |= (ULong_t)pl_data[l_s++] << 32; // not used. see whiterabbit timestamp above
+        cfd_samples[0] = pl_data[l_s] & 0xff;
+        cfd_samples[1] = pl_data[l_s++] >> 16;
+        cfd_samples[2] = pl_data[l_s] & 0xff;
+        cfd_samples[3] = pl_data[l_s++] >> 16;
+        overflow = pl_data[l_s] & 0xffffff;
+        self_triggered = (pl_data[l_s++] >> 24) & 0xff;
+        num_pileup = pl_data[l_s] & 0xffff;
+        num_discarded = (pl_data[l_s++] >> 16) & 0xffff;
+        energy = pl_data[l_s++] & 0xffff;
+        //
+        n_f = pl_data[l_s] & 0xffff;
+        n_s = (pl_data[l_s++] >> 16) & 0xffff;
+        
+        // checks if optional time-over-threshold payload present (recognized by 0xBEEF as first word) 
+        if( (evsize > kEvent115a_t_size) && ((pl_data[l_s] >> 16) & 0xffff) == 0xBEEF)  {
+          tot = pl_data[l_s++] & 0xffff;
+          tot_samples[0] = pl_data[l_s] & 0xffff;
+          tot_samples[1] = (pl_data[l_s++] >> 16) & 0xffff;
+          tot_samples[2] = pl_data[l_s] & 0xffff;
+          tot_samples[3] = (pl_data[l_s++] >> 16) & 0xffff;
+          //parsed_size += tot_size;
+        }
+
+        break;
+                                    
+      default:
+        LOG(WARNING) << "Invalid event magic number:" << magic << FairLogger::endl; 
+        break;
+            
+      } // case
+    
+
+
+    // Set error flags
+    // Error flag structure: [Pileup][PID][Energy][Timing]
+
+    if (overflow & 0x601)  error |= 1; //11000000001 Timing not valid
+    if (overflow & 0x63e)   error |= 1<<1; //11000111110  Energy not valid
+    if (overflow & 0x78E)    error |= 1<<2; //11110001110  PID not valid
+    if (num_pileup)   error |= 1<<3;
+    
+
+     // Generates crystalID out of  pc, crate, board, channel
+     UShort_t crystal_id = pc_id * (max_channel*max_card*max_sfp_id)
+                        + sfp_id * (max_channel*max_card)
+                        + card * max_channel
+                        + channel;
+
+    new ((*fRawData)[fNHits]) R3BCaloRawHit(crystal_id, energy, n_f, n_s, rabbitStamp, error, tot);
     fNHits++;
-  }
   
-  
-  LOG(DEBUG) << "End of memory" << FairLogger::endl;
-  LOG(DEBUG) << "R3BCaloUnpack: Number of CALIFA raw hits: " << fNHits << FairLogger::endl;
-  
-  
+  } // while
+ 
   return kTRUE;
-}
+
+} // DoUnpack
 
 
-
-//Reset: Public method
-void R3BCaloUnpack::Reset()
-{
+//--------------------
+/**
+ * 
+ * 
+ */
+void R3BCaloUnpack::Reset() {
   LOG(DEBUG) << "Clearing Data Structure" << FairLogger::endl;
   fRawData->Clear();
   fNHits = 0;
 }
 
-
-
+//---------------------
 ClassImp(R3BCaloUnpack)

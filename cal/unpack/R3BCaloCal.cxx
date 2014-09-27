@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // -----                                                                   -----
-// -----                           R3BCaloCal                            -----
+// -----                           R3BCaloCal                              -----
 // -----                 Created 18/07/2014 by H. Alvarez Pol              -----
 // -----                                                                   -----
 // -----------------------------------------------------------------------------
@@ -23,7 +23,7 @@
 //R3BCaloCal: Constructor
 R3BCaloCal::R3BCaloCal() : FairTask("R3B CALIFA Calibrator"),
 			       fRawHitCA(0),
-			       fCrystalHitCA(new TClonesArray("CaloCrystalHit")), 
+			       fCrystalHitCA(new TClonesArray("R3BCaloCrystalHit")), 
 			       fCaloCalPar(0)
 {
 }
@@ -76,8 +76,10 @@ void R3BCaloCal::Register()
     return;
   }
   fRawHitCA = (TClonesArray*) fMan->GetObject("CaloRawHit");
-
-  fMan->Register("CrystalHit","Calibrated data from Califa",fCrystalHitCA,kTRUE);
+  if(NULL == fRawHitCA) {
+    FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch CaloRawHit not found");
+    }
+  fMan->Register("CaloCrystalHit","CaloCalibrated",fCrystalHitCA,kTRUE);
 }
 
 
@@ -89,33 +91,43 @@ InitStatus R3BCaloCal::ReInit()
 }
 
 //DoCalib: Public method
-void R3BCaloCal::Exec(/*char c*/)
+void R3BCaloCal::Exec(Option_t* option)
 {
   
-  LOG(DEBUG) << "Calibring CALIFA Raw Data Calo" << FairLogger::endl;
+  LOG(DEBUG) << "Calibrating CALIFA Raw Data Calo" << FairLogger::endl;
   
-  R3BCaloRawHit**    rawHit;
+  TRandom *r0 = new TRandom();
+  Float_t rando = r0->Rndm();
+
+  R3BCaloRawHit*  rawHit;
   Int_t crystal_id=0;  
   Double32_t energy=0;  
   Double32_t n_f=0;  
   Double32_t n_s=0;  
-  Double32_t time=0;  
-
-
+  Double32_t time=0;    
+  Double32_t tot_energy=0;    
+  
   Int_t rawHits;        // Nb of RawHits in current event
   rawHits = fRawHitCA->GetEntries();
   if (rawHits>0) {
-    rawHit = new R3BCaloRawHit*[rawHits];
     for (Int_t i=0; i<rawHits; i++) {
-      rawHit[i] = new R3BCaloRawHit;
-      rawHit[i] = (R3BCaloRawHit*) fCrystalHitCA->At(i);
+      rawHit= (R3BCaloRawHit*) fRawHitCA->At(i);
       
-      crystal_id = MapCrystalID(rawHit[i]);
-      energy = CalibrateEnergy(rawHit[i]/*,c*/);
-      n_f = CalibrateFastComponent(rawHit[i]);
-      n_s = CalibrateSlowComponent(rawHit[i]);
-      time = CalibrateTime(rawHit[i]);
+      crystal_id = rawHit->GetCrystalId();
       
+      energy = fCaloCalPar->GetDUCalParAt(rawHit->GetCrystalId())->GetGammaCal_offset() + 
+	( (rawHit->GetEnergy()+(rando-0.5) ) * fCaloCalPar->GetDUCalParAt(rawHit->GetCrystalId())->GetGammaCal_gain());
+      
+      n_f = rawHit->GetNf(); 
+      
+      n_s = rawHit->GetNs(); 
+      
+      time = rawHit->GetTime();
+      
+      tot_energy = fCaloCalPar->GetDUCalParAt(rawHit->GetCrystalId())->GetTotCal_offset() + 
+      	( (rawhit->GetTot()+(rando-0.5) ) * fCaloCalPar->GetDUCalParAt(rawHit->GetCrystalId())->GetGammaCal_gain()); 
+      
+      //TODO: Add tot_energy in CaloCrystalHit
       new ((*fCrystalHitCA)[i]) R3BCaloCrystalHit(crystal_id, energy, n_f, n_s, time);
       
     }  
@@ -136,50 +148,6 @@ void R3BCaloCal::Reset()
   LOG(DEBUG) << "Clearing CrystalHit Data Structure" << FairLogger::endl;
   if(fCrystalHitCA)fCrystalHitCA->Clear();
 }
-
-
-Int_t R3BCaloCal::MapCrystalID(R3BCaloRawHit* chit)
-{
-  LOG(DEBUG) << "Mapping Crystal ID in R3BCaloCal" << FairLogger::endl;
-  //Implement here the mapping from the unpacker to physical crystal numbers
-  return fCaloCalPar->GetDUCalParAt(chit->GetCrystalId())->GetDetectionUnit();
-}
-
-Double32_t R3BCaloCal::CalibrateEnergy(R3BCaloRawHit* chit/*, char c*/)
-{
-  LOG(DEBUG) << "Calibrating Energies in R3BCaloCal" << FairLogger::endl;
-  //Implement here the energy calibration based on the parameters
-  TRandom *r0 = new TRandom();
-  rando = r0->Rndm(chit->GetCrystalId());
-  /*if (c=='g') {
-  	return fCaloCalPar->GetDUCalParAt(chit->GetCrystalId())->GetGammaParZero()+(chit->GetEnergy()+(rando-0.5))*fCaloCalPar->GetDUCalParAt(chit->GetCrystalId())->GetGammaParOne();
-  } else if (c=='p') {
-	return fCaloCalPar->GetDUCalParAt(chit->GetCrystalId())->GetProtonParZero()+(chit->GetEnergy()+(rando-0.5))*fCaloCalPar->GetDUCalParAt(chit->GetCrystalId())->GetProtonParOne();
-  } else {
-  	return 0.;
-  }*/
-  return fCaloCalPar->GetDUCalParAt(chit->GetCrystalId())->GetGammaCal_offset()+((chit->GetEnergy()+(rando-0.5))*fCaloCalPar->GetDUCalParAt(chit->GetCrystalId())->GetGammaCal_gain())/fCaloCalPar->GetDUCalParAt(chit->GetCrystalId())->GetConversionFactor();
-}
-
-Double32_t R3BCaloCal::CalibrateFastComponent(R3BCaloRawHit* chit)
-{
-  LOG(DEBUG) << "Calibrating Fast Component in R3BCaloCal" << FairLogger::endl;
-  return chit->GetNf();
-}
-
-Double32_t R3BCaloCal::CalibrateSlowComponent(R3BCaloRawHit* chit)
-{
-  LOG(DEBUG) << "Calibrating Slow Component in R3BCaloCal" << FairLogger::endl;
-
-  return chit->GetNs();
-}
-
-Double32_t R3BCaloCal::CalibrateTime(R3BCaloRawHit* chit)
-{
-  LOG(DEBUG) << "Calibrating Time in R3BCaloCal" << FairLogger::endl;
-  return chit->GetTime();
-}
-
 
 
 ClassImp(R3BCaloCal)
