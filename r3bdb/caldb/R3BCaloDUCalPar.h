@@ -53,32 +53,18 @@ using TObject::Compare;
     Double_t GetGammaCal_gain() 	const {return fGammaCal_gain;}
     Double_t GetToTCal_offset() 	const {return fToTCal_offset;}
     Double_t GetToTCal_gain() 		const {return fToTCal_gain;}
-    /*Double_t GetGammaParZero() 		const {return fGammaParZero;}
-    Double_t GetGammaParOne() 		const {return fGammaParOne;}
-    Double_t GetProtonParZero() 	const {return fProtonParZero;}
-    Double_t GetProtonParOne() 		const {return fProtonParOne;}*/
     Double_t GetConversionFactor() 	const {return fConversionFactor;}
-    /*Double_t GetExtraOne() 		const {return fExtraOne;}
-    Double_t GetExtraTwo() 		const {return fExtraTwo;}
-    Double_t GetExtraThree() 		const {return fExtraThree;}
-    Double_t GetExtraFour() 		const {return fExtraFour;}*/
-
+    Double_t GetQuenchingFactor() 	const {return fQuenchingFactor;}
+    
     void SetCompId(Int_t x)  			{SetComboNo(x); fCompId=x;}
     void SetDetectionUnit(Int_t i) 		{fDetectionUnit=i;}
     void SetGammaCal_offset(Double_t i) 	{fGammaCal_offset=i;}
     void SetGammaCal_gain(Double_t i) 		{fGammaCal_gain=i;}
     void SetToTCal_offset(Double_t i) 		{fToTCal_offset=i;}
     void SetToTCal_gain(Double_t i) 		{fToTCal_gain=i;}
-    /*void SetGammaParZero(Double_t i) 		{fGammaParZero=i;}
-    void SetGammaParOne(Double_t i) 		{fGammaParOne=i;}
-    void SetProtonParZero(Double_t i) 		{fProtonParZero=i;}
-    void SetProtonParOne(Double_t i) 		{fProtonParOne=i;}*/
     void SetConversionFactor(Double_t i) 	{fConversionFactor=i;}
-    /*void SetExtraOne(Double_t i) 		{fExtraOne=i;}
-    void SetExtraTwo(Double_t i) 		{fExtraTwo=i;}
-    void SetExtraThree(Double_t i) 		{fExtraThree=i;}
-    void SetExtraFour(Double_t i) 		{fExtraFour=i;}*/
-    
+    void SetQuenchingFactor(Double_t i) 	{fQuenchingFactor=i;}
+   
     UInt_t GetIndex(UInt_t /*def*/) const { return fDetectionUnit; }
 
     Bool_t Compare(const R3BCaloDUCalPar& that ) const; 
@@ -119,15 +105,8 @@ using TObject::Compare;
     Double_t fGammaCal_gain;
     Double_t fToTCal_offset;
     Double_t fToTCal_gain;
-    /*Double_t fGammaParZero;
-    Double_t fGammaParOne;
-    Double_t fProtonParZero;
-    Double_t fProtonParOne;*/
     Double_t fConversionFactor;
-    /*Double_t fExtraOne;
-    Double_t fExtraTwo;
-    Double_t fExtraThree;
-    Double_t fExtraFour;*/
+    Double_t fQuenchingFactor;
 
     // Database Pool Index
     Int_t fDbEntry; //!

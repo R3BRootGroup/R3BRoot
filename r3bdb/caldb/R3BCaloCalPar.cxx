@@ -47,14 +47,15 @@ void R3BCaloCalPar::putParams(FairParamList* list)
   for (Int_t i=0;i<fDUCalParams->GetEntries();i++){
     stringstream ss;
     ss << i;
-	TString du_id(ss.str());
-    TArrayD values(5);
+    TString du_id(ss.str());
+    TArrayD values(6);
     R3BCaloDUCalPar* dupar = (R3BCaloDUCalPar*) fDUCalParams->At(i);
     values[0] = dupar->GetGammaCal_offset(); 
     values[1] = dupar->GetGammaCal_gain(); 
     values[2] = dupar->GetToTCal_offset();
     values[3] = dupar->GetToTCal_gain();
     values[4] = dupar->GetConversionFactor();
+    values[5] = dupar->GetQuenchingFactor();
 
     list->add(du_id.Data(), values); 
         
@@ -67,57 +68,59 @@ Bool_t R3BCaloCalPar::getParams(FairParamList* list)
   if(!list) { return kFALSE;}
   Int_t ndus;
   if (!list->fill("NrOfDUnits", &ndus)) {return kFALSE;}
-
+  
   cout << " NrOFUNits " << ndus << endl;
- 
-  TArrayD* values = new TArrayD(5);
- 
+  
+  TArrayD* values = new TArrayD(6);
+  
   for(Int_t i=0;i<ndus;i++){
     stringstream ss;
     ss << i;
-	TString du_id(ss.str());
+    TString du_id(ss.str());
     if ( !list->fill(du_id.Data(), values) ) return kFALSE;
-     
-	R3BCaloDUCalPar* dupar = new R3BCaloDUCalPar();
-	dupar->SetDetectionUnit(i);
-	dupar->SetGammaCal_offset(values->At(0));
-	dupar->SetGammaCal_gain(values->At(1));
-	dupar->SetToTCal_offset(values->At(2));
-	dupar->SetToTCal_gain(values->At(3));
-	dupar->SetConversionFactor(values->At(4));
-	fDUCalParams->Add( dupar );
+    
+    R3BCaloDUCalPar* dupar = new R3BCaloDUCalPar();
+    dupar->SetDetectionUnit(i);
+    dupar->SetGammaCal_offset(values->At(0));
+    dupar->SetGammaCal_gain(values->At(1));
+    dupar->SetToTCal_offset(values->At(2));
+    dupar->SetToTCal_gain(values->At(3));
+    dupar->SetConversionFactor(values->At(4));
+    dupar->SetQuenchingFactor(values->At(5));
+    fDUCalParams->Add( dupar );
     cout << " Entries in Array " <<  fDUCalParams->GetEntries()  << endl;
-    for(Int_t j=0;j<5;j++) cout << " idx: " << j << "values# " << values->At(j) << endl;
+    for(Int_t j=0;j<6;j++) cout << " idx: " << j << "values# " << values->At(j) << endl;
   }
   
   if (values) delete values;
-
+  
   return kTRUE;
 }
 
 void R3BCaloCalPar::ReadFile(string file) {
   vector<string> data;
   string datasegments, line;
-
+  
   ifstream infile(file.c_str());
   while (getline(infile,line)) {
-   stringstream dataline;
-   dataline<<line;
-   while (getline(dataline,datasegments,'\t')) {
-    if(datasegments=="null")
-     data.push_back("");
-    else
-     data.push_back(datasegments);
-   }
-   dataline.clear();
-   R3BCaloDUCalPar dupar;
-   dupar.SetDetectionUnit(atoi(data[0].c_str()));
-   dupar.SetGammaCal_offset(atof(data[1].c_str()));
-   dupar.SetGammaCal_gain(atof(data[2].c_str()));
-   dupar.SetToTCal_offset(atof(data[3].c_str()));
-   dupar.SetToTCal_gain(atof(data[4].c_str()));
-   dupar.SetConversionFactor(atof(data[5].c_str()));
-   fDUCalParams->Add(&dupar);
+    stringstream dataline;
+    dataline<<line;
+    while (getline(dataline,datasegments,'\t')) {
+      if(datasegments=="null")
+	data.push_back("");
+      else
+	data.push_back(datasegments);
+    }
+    dataline.clear();
+    R3BCaloDUCalPar dupar;
+    dupar.SetDetectionUnit(atoi(data[0].c_str()));
+    dupar.SetGammaCal_offset(atof(data[1].c_str()));
+    dupar.SetGammaCal_gain(atof(data[2].c_str()));
+    dupar.SetToTCal_offset(atof(data[3].c_str()));
+    dupar.SetToTCal_gain(atof(data[4].c_str()));
+    dupar.SetConversionFactor(atof(data[5].c_str()));
+    dupar.SetQuenchingFactor(atof(data[6].c_str()));
+    fDUCalParams->Add(&dupar);
   }
 }
 
