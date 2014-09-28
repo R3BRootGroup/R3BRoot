@@ -4,7 +4,7 @@
 // -----                           Version 1.0                             -----
 // -----                    Created  11/10/2013 by Y.Gonzalez              -----
 // -----                    Modified 03/03/2014 by M. Bendel               -----
-// -----                    Modified 23/09/2014 by A.Perea                 -----                
+// -----                    Modified 28/09/2014 by A.Perea                 -----                
 // -----                                                                   -----
 // -----------------------------------------------------------------------------
 
@@ -111,11 +111,10 @@ void R3BCaloUnpack::Register() {
  * 
  */
 Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
-  //	trace_head_t *califa_trace = new trace_head_t;
-  //	UShort_t *trace_data;
   
   UInt_t *pl_data = (UInt_t*) data;
   UInt_t l_s = 0; // skip over timerabit header
+  UInt_t start;      // used to decect optional payloads
   
   //----- Whiterabbit timestamp ------
   // The structure of the time-stamp is as follows
@@ -135,8 +134,9 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
   check1 = ( data[l_s] >> 16 ) & 0xffff;  rabbit4 =  data[l_s++] & 0xffff;
   
   ULong64_t rabbitStamp = (rabbit4 << 48) | (rabbit3 << 32) | ( rabbit2 << 16 ) | rabbit1; 
-  //   LOG(INFO) << "whiteRabbit:" << rabbitStamp << FairLogger::endl;
-  
+ /* LOG(DEBUG) << "-------- EVENT ----------" << FairLogger::endl;
+  LOG(DEBUG) << "whiteRabbit:" << rabbitStamp << FairLogger::endl;
+ */ 
   //---------- hit data ---------
   
   // hitdata consists in several hits 
@@ -169,16 +169,16 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
     data_size = pl_data[l_s++];
     
     
-//     LOG(DEBUG) << "========== gosip sub " << FairLogger::endl
-//     << "     header_size " << header_size << FairLogger::endl
-//     << "         trigger " << trigger << FairLogger::endl
-//     << "       card " << card << FairLogger::endl
-//     << "    channel " << channel << FairLogger::endl
-//     << "       data_size " << data_size << FairLogger::endl;
+//     LOG(INFO) << "========== gosip sub " << FairLogger::endl
+//      << "     header_size " << header_size << FairLogger::endl
+//      << "         trigger " << trigger << FairLogger::endl
+//      << "            card " << card << FairLogger::endl
+//      << "         channel " << channel << FairLogger::endl
+//      << "       data_size " << data_size << FairLogger::endl;
 
     
     if(header_size != 0x34) {
-      LOG(WARNING) << "Wrong header size" << FairLogger::endl;
+      LOG(WARNING) << "Wrong header size ( is " << header_size << ")" << FairLogger::endl;
       break;
     }
     
@@ -201,7 +201,7 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
     //----------- parse data -----------
              
     UShort_t evsize;
-    UShort_t magic;
+    UShort_t magic;            // magic number to tell appart data format versions
     UInt_t event_id;
     ULong_t febexTimestamp;    // timestamp from the febex. Not used
     UShort_t cfd_samples[4]; 
@@ -221,37 +221,14 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
     UShort_t tot;
     UShort_t tot_samples[4];
  
-    
-    evsize = pl_data[l_s] & 0xffff;
+    start = l_s;                               // used to calc readed data vs evsize
+    evsize = pl_data[l_s] & 0xffff;            // first word of the data 
     magic = (pl_data[l_s++] >> 16) & 0xffff;
    
     
-    switch(magic) {
-    
-      // uint64_t = ULong_t
-      //--------------------        
-      //     evsize = pl_data[l_s] & 0xffff;
-      //     magic_affe = (pl_data[l_s++] >> 16) & 0xffff;
-      //     event_id = pl_data[l_s++];
-      //     timestamp = pl_data[l_s++];
-      //     timestamp |= (ULong_t)pl_data[l_s++] << 32;
-      //     cfd_samples[0] = pl_data[l_s] & 0xff;
-      //     cfd_samples[1] = pl_data[l_s++] >> 16;
-      //     cfd_samples[2] = pl_data[l_s] & 0xff;
-      //     cfd_samples[3] = pl_data[l_s++] >> 16;
-      //     overflow = pl_data[l_s] & 0xffffff;
-      //     self_triggered = (pl_data[l_s++] >> 24) & 0xff;
-      //     num_pileup = pl_data[l_s] & 0xffff;
-      //     num_discarded = (pl_data[l_s++] >> 16) & 0xffff;
-      //     energy = pl_data[l_s++] & 0xffff;
-      //     qpid_size = pl_data[l_s] & 0xffff;
-      //     magic_babe = (pl_data[l_s++] >> 16) & 0xffff;
-      //     n_f = pl_data[l_s] & 0xffff;
-      //     n_s = (pl_data[l_s++] >> 16) & 0xffff;
-      //------------------------
+    switch(magic) {      
       
-      
-      case 0xAFFE: // old version of lmd
+      case 0xAFFE: // old version of lmd. 1 (evsize & magic) + 10 words, 44 bytes
         event_id = pl_data[l_s++];
         febexTimestamp = pl_data[l_s++];   // not used. see whiterabbit timestamp above
         febexTimestamp |= (ULong_t) pl_data[l_s++] << 32;
@@ -272,7 +249,7 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
         //n_s = (int32_t)((uint16_t)((pl_data[l_s++] >> 16) & 0xffff)); // in Max's unpacker
         break;
         
-      case 0x115A:  // new event version
+      case 0x115A:  // new event version: 1 (evsize & magic) + 9 words = 40 bytes
         event_id = pl_data[l_s++];
         febexTimestamp = pl_data[l_s++];
         febexTimestamp |= (ULong_t)pl_data[l_s++] << 32; // not used. see whiterabbit timestamp above
@@ -285,20 +262,37 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
         num_pileup = pl_data[l_s] & 0xffff;
         num_discarded = (pl_data[l_s++] >> 16) & 0xffff;
         energy = pl_data[l_s++] & 0xffff;
-        //
+        // field not included in new version
         n_f = pl_data[l_s] & 0xffff;
         n_s = (pl_data[l_s++] >> 16) & 0xffff;
         
         // checks if optional time-over-threshold payload present (recognized by 0xBEEF as first word) 
-        if( (evsize > kEvent115a_t_size) && ((pl_data[l_s] >> 16) & 0xffff) == 0xBEEF)  {
+        if ( (evsize > 4 * (l_s - start))   && ( ((pl_data[l_s] >> 16) & 0xffff) == 0xBEEF) ) {
+          LOG(DEBUG) << "TOT payload present" << FairLogger::endl;
           tot = pl_data[l_s++] & 0xffff;
           tot_samples[0] = pl_data[l_s] & 0xffff;
           tot_samples[1] = (pl_data[l_s++] >> 16) & 0xffff;
           tot_samples[2] = pl_data[l_s] & 0xffff;
-          tot_samples[3] = (pl_data[l_s++] >> 16) & 0xffff;
-          //parsed_size += tot_size;
+          tot_samples[3] = (pl_data[l_s++] >> 16) & 0xffff; 
         }
+          
+//         if( (evsize > kEvent115a_t_size) && ((pl_data[l_s] >> 16) & 0xffff) == 0xBEEF)  { // 4 words
+//           LOG(INFO) << "TOT payload present" << FairLogger::endl;
+//           tot = pl_data[l_s++] & 0xffff;
+//           tot_samples[0] = pl_data[l_s] & 0xffff;
+//           tot_samples[1] = (pl_data[l_s++] >> 16) & 0xffff;
+//           tot_samples[2] = pl_data[l_s] & 0xffff;
+//           tot_samples[3] = (pl_data[l_s++] >> 16) & 0xffff;
+//         }
 
+        // checks if traces are present --------------
+        //LOG(INFO) << evsize << " " << l_s - start << FairLogger::endl;
+        
+        if (evsize > 4 * (l_s - start) ) {  // there is still traces in the 
+          //LOG(DEBUG) << "TRACE payload present" << FairLogger::endl;
+          l_s = start + (evsize / 4); // skip the traces
+        }
+        
         break;
                                     
       default:
