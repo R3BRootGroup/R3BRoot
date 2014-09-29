@@ -25,8 +25,7 @@ R3BCaloRawHit::R3BCaloRawHit()
  * 
  * 
  */
-R3BCaloRawHit::R3BCaloRawHit(UShort_t crystalId, UShort_t energy,
-			     UShort_t nf, UShort_t ns, ULong_t time, UChar_t error, UShort_t tot)
+R3BCaloRawHit::R3BCaloRawHit(UShort_t crystalId, Int_t energy, Int_t nf, Int_t ns, ULong_t time, UChar_t error, UShort_t tot)
   : fCrystalId(crystalId),
     fEnergy(energy),
     fNf(nf),

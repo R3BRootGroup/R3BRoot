@@ -160,7 +160,7 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
     UShort_t sfp_id = 0;
     UShort_t card;
     UShort_t channel;
-    UInt_t   data_size;
+    UInt_t   data_size; 
 
     header_size = pl_data[l_s] & 0xff;
     trigger = (pl_data[l_s] >> 8) & 0xff;
@@ -195,15 +195,13 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
       l_s += data_size / 4;
       continue;
     }
- 
- 
   
     //----------- parse data -----------
              
     UShort_t evsize;
-    UShort_t magic;            // magic number to tell appart data format versions
+    UShort_t magic;                 // magic number to tell appart data format versions
     UInt_t event_id;
-    ULong_t febexTimestamp;    // timestamp from the febex. Not used
+    ULong_t febexTimestamp;         // timestamp from the febex. Not used
     UShort_t cfd_samples[4]; 
     UShort_t loverflow;
     UShort_t hoverflow;
@@ -211,12 +209,12 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
     UShort_t self_triggered;
     UShort_t num_pileup;
     UShort_t num_discarded;
-    UShort_t energy;
+    Int_t energy;                   // 32 bits, to accomodate old version 16-bits unsigned and new-version 16-bit signed
     //    UShort_t reserved;
     UShort_t qpid_size;
     UShort_t magic_babe;
-    Short_t n_f;
-    UShort_t n_s;
+    Int_t n_f;                      // again, set to 32 bits to accept both version's 
+    Int_t n_s;
     UChar_t error = 0;
     UShort_t tot;
     UShort_t tot_samples[4];
@@ -240,13 +238,11 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
         self_triggered = (pl_data[l_s++] >> 24) & 0xff;
         num_pileup = pl_data[l_s] & 0xffff;
         num_discarded = (pl_data[l_s++] >> 16) & 0xffff;
-        energy = pl_data[l_s++] & 0xffff;
-        //energy = (int32_t)((uint16_t)(pl_data[l_s++] & 0xffff));     // in Max's unpacker
+        //energy = pl_data[l_s++] & 0xffff;
+        energy = (Int_t)((UShort_t)(pl_data[l_s++] & 0xffff));     // in Max's unpacker
         l_s++;
-        n_f = pl_data[l_s] & 0xffff;
-        n_s = (pl_data[l_s++] >> 16) & 0xffff;
-        //n_f = (int32_t)((uint16_t)(pl_data[l_s] & 0xffff));           // in Max's unpacker
-        //n_s = (int32_t)((uint16_t)((pl_data[l_s++] >> 16) & 0xffff)); // in Max's unpacker
+        n_f = (Int_t) ((UShort_t) (pl_data[l_s] & 0xffff));
+        n_s = (Int_t) ((UShort_t) ((pl_data[l_s++] >> 16) & 0xffff));
         break;
         
       case 0x115A:  // new event version: 1 (evsize & magic) + 9 words = 40 bytes
@@ -276,15 +272,6 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
           tot_samples[3] = (pl_data[l_s++] >> 16) & 0xffff; 
         }
           
-//         if( (evsize > kEvent115a_t_size) && ((pl_data[l_s] >> 16) & 0xffff) == 0xBEEF)  { // 4 words
-//           LOG(INFO) << "TOT payload present" << FairLogger::endl;
-//           tot = pl_data[l_s++] & 0xffff;
-//           tot_samples[0] = pl_data[l_s] & 0xffff;
-//           tot_samples[1] = (pl_data[l_s++] >> 16) & 0xffff;
-//           tot_samples[2] = pl_data[l_s] & 0xffff;
-//           tot_samples[3] = (pl_data[l_s++] >> 16) & 0xffff;
-//         }
-
         // checks if traces are present --------------
         //LOG(INFO) << evsize << " " << l_s - start << FairLogger::endl;
         
@@ -296,8 +283,9 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
         break;
                                     
       default:
-        LOG(WARNING) << "Invalid event magic number:" << magic << FairLogger::endl; 
+        LOG(WARNING) << "Invalid event magic number:" << magic << "Discarding event..." << FairLogger::endl; 
         break;
+        l_s = start + (evsize / 4); // skip the traces
             
       } // case
     
@@ -307,11 +295,10 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
     // Error flag structure: [Pileup][PID][Energy][Timing]
 
     if (overflow & 0x601)  error |= 1; //11000000001 Timing not valid
-    if (overflow & 0x63e)   error |= 1<<1; //11000111110  Energy not valid
-    if (overflow & 0x78E)    error |= 1<<2; //11110001110  PID not valid
-    if (num_pileup)   error |= 1<<3;
+    if (overflow & 0x63e)  error |= 1<<1; //11000111110  Energy not valid
+    if (overflow & 0x78E)  error |= 1<<2; //11110001110  PID not valid
+    if (num_pileup)        error |= 1<<3;
     
-
      // Generates crystalID out of  pc, crate, board, channel
      UShort_t crystal_id = pc_id * (max_channel*max_card*max_sfp_id)
                         + sfp_id * (max_channel*max_card)

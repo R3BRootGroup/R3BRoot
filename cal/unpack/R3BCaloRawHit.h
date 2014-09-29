@@ -25,26 +25,25 @@ public:
    *@param time        Time since event start [ns]
    *@param tot         Time over threshold
    **/
-  R3BCaloRawHit(UShort_t crystalId, UShort_t energy,
-		UShort_t nf, UShort_t ns, ULong_t time, UChar_t error, UShort_t tot);
+  R3BCaloRawHit(UShort_t crystalId, Int_t energy, Int_t nf, Int_t ns, ULong_t time, UChar_t error, UShort_t tot);
   
   //Destructor
   ~R3BCaloRawHit() { }
   
   //Getters
   inline const UShort_t& GetCrystalId() const { return fCrystalId; }
-  inline const UShort_t& GetEnergy()    const { return fEnergy;    }
-  inline const UShort_t& GetNf()        const { return fNf;        }
-  inline const UShort_t& GetNs()        const { return fNs;        }
+  inline const Int_t&    GetEnergy()    const { return fEnergy;    }
+  inline const Int_t&    GetNf()        const { return fNf;        }
+  inline const Int_t&    GetNs()        const { return fNs;        }
   inline const ULong_t&  GetTime()      const { return fTime;      }
   inline const UChar_t&  GetError()     const { return fError;     }	
   inline const UShort_t& GetTot()       const { return fTot;       }  
   
 protected:
   UShort_t fCrystalId; // crystal unique identifier
-  UShort_t fEnergy;    // total energy in the crystal
-  UShort_t fNf;        // total fast amplitude in the crystal
-  UShort_t fNs;        // total slow amplitude in the crystal
+  Int_t    fEnergy;    // total energy in the crystal
+  Int_t    fNf;        // total fast amplitude in the crystal
+  Int_t    fNs;        // total slow amplitude in the crystal
   ULong_t  fTime;      // time-stamp (common to all the hits in the event)
   UChar_t  fError;     // bit coded error flag
   UShort_t fTot;       // time-over-treshold
