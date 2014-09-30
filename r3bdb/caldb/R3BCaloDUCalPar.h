@@ -26,8 +26,6 @@ class FairDbObjTableMap;
 class FairDbValRecord;
 class FairParamList;
 
-
-
 class R3BCaloDUCalPar : public FairParGenericSet
 {
 
@@ -53,7 +51,8 @@ using TObject::Compare;
     Double_t GetGammaCal_gain() 	const {return fGammaCal_gain;}
     Double_t GetToTCal_offset() 	const {return fToTCal_offset;}
     Double_t GetToTCal_gain() 		const {return fToTCal_gain;}
-    Double_t GetConversionFactor() 	const {return fConversionFactor;}
+    Double_t GetRangeCal_offset() 	const {return fRangeCal_offset;}
+    Double_t GetRangeCal_gain() 	const {return fRangeCal_gain;}
     Double_t GetQuenchingFactor() 	const {return fQuenchingFactor;}
     
     void SetCompId(Int_t x)  			{SetComboNo(x); fCompId=x;}
@@ -62,9 +61,10 @@ using TObject::Compare;
     void SetGammaCal_gain(Double_t i) 		{fGammaCal_gain=i;}
     void SetToTCal_offset(Double_t i) 		{fToTCal_offset=i;}
     void SetToTCal_gain(Double_t i) 		{fToTCal_gain=i;}
-    void SetConversionFactor(Double_t i) 	{fConversionFactor=i;}
+    void SetRangeCal_offset(Double_t i) 	{fRangeCal_offset=i;}
+    void SetRangeCal_gain(Double_t i) 	        {fRangeCal_gain=i;}
     void SetQuenchingFactor(Double_t i) 	{fQuenchingFactor=i;}
-   
+    
     UInt_t GetIndex(UInt_t /*def*/) const { return fDetectionUnit; }
 
     Bool_t Compare(const R3BCaloDUCalPar& that ) const; 
@@ -101,12 +101,13 @@ using TObject::Compare;
     // Data Parameters
     Int_t fCompId;
     Int_t fDetectionUnit; 
-    Double_t fGammaCal_offset;
-    Double_t fGammaCal_gain;
-    Double_t fToTCal_offset;
-    Double_t fToTCal_gain;
-    Double_t fConversionFactor;
-    Double_t fQuenchingFactor;
+    Double_t fGammaCal_offset; //offset in linear gamma calibration
+    Double_t fGammaCal_gain;   //gain in linear gamma calibration
+    Double_t fToTCal_offset;   //offset in the non-linear ToT calibration
+    Double_t fToTCal_gain;     //gain in the non-linear ToT calibration
+    Double_t fRangeCal_offset; //offset in the linear 30 to 300 MeV range calibration
+    Double_t fRangeCal_gain;   //gain in the linear 30 to 300 MeV range calibration
+    Double_t fQuenchingFactor; //quenching factor for protons (tentative) calculated from proton and pulser measurements
 
     // Database Pool Index
     Int_t fDbEntry; //!

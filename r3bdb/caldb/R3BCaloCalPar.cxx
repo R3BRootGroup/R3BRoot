@@ -48,14 +48,15 @@ void R3BCaloCalPar::putParams(FairParamList* list)
     stringstream ss;
     ss << i;
     TString du_id(ss.str());
-    TArrayD values(6);
+    TArrayD values(7);
     R3BCaloDUCalPar* dupar = (R3BCaloDUCalPar*) fDUCalParams->At(i);
     values[0] = dupar->GetGammaCal_offset(); 
     values[1] = dupar->GetGammaCal_gain(); 
     values[2] = dupar->GetToTCal_offset();
     values[3] = dupar->GetToTCal_gain();
-    values[4] = dupar->GetConversionFactor();
-    values[5] = dupar->GetQuenchingFactor();
+    values[4] = dupar->GetRangeCal_offset();
+    values[5] = dupar->GetRangeCal_gain();
+    values[6] = dupar->GetQuenchingFactor();
 
     list->add(du_id.Data(), values); 
         
@@ -71,7 +72,7 @@ Bool_t R3BCaloCalPar::getParams(FairParamList* list)
   
   cout << " NrOFUNits " << ndus << endl;
   
-  TArrayD* values = new TArrayD(6);
+  TArrayD* values = new TArrayD(7);
   
   for(Int_t i=0;i<ndus;i++){
     stringstream ss;
@@ -85,11 +86,12 @@ Bool_t R3BCaloCalPar::getParams(FairParamList* list)
     dupar->SetGammaCal_gain(values->At(1));
     dupar->SetToTCal_offset(values->At(2));
     dupar->SetToTCal_gain(values->At(3));
-    dupar->SetConversionFactor(values->At(4));
-    dupar->SetQuenchingFactor(values->At(5));
+    dupar->SetRangeCal_offset(values->At(4));
+    dupar->SetRangeCal_gain(values->At(5));
+    dupar->SetQuenchingFactor(values->At(6));
     fDUCalParams->Add( dupar );
     cout << " Entries in Array " <<  fDUCalParams->GetEntries()  << endl;
-    for(Int_t j=0;j<6;j++) cout << " idx: " << j << "values# " << values->At(j) << endl;
+    for(Int_t j=0;j<7;j++) cout << " idx: " << j << "values# " << values->At(j) << endl;
   }
   
   if (values) delete values;
@@ -118,8 +120,9 @@ void R3BCaloCalPar::ReadFile(string file) {
     dupar.SetGammaCal_gain(atof(data[2].c_str()));
     dupar.SetToTCal_offset(atof(data[3].c_str()));
     dupar.SetToTCal_gain(atof(data[4].c_str()));
-    dupar.SetConversionFactor(atof(data[5].c_str()));
-    dupar.SetQuenchingFactor(atof(data[6].c_str()));
+    dupar.SetRangeCal_offset(atof(data[5].c_str()));
+    dupar.SetRangeCal_gain(atof(data[6].c_str()));
+    dupar.SetQuenchingFactor(atof(data[7].c_str()));
     fDUCalParams->Add(&dupar);
   }
 }

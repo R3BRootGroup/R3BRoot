@@ -36,7 +36,8 @@ R3BCaloDUCalPar::R3BCaloDUCalPar(const char* name, const char* title, const char
     fGammaCal_gain(0.), 
     fToTCal_offset(0.),
     fToTCal_gain(0.), 
-    fConversionFactor(0.),
+    fRangeCal_offset(0.),
+    fRangeCal_gain(0.),
     fQuenchingFactor(0.)
 {
   
@@ -82,7 +83,8 @@ void R3BCaloDUCalPar::putParams(FairParamList* list)
   list->add("gammacal_gain", fGammaCal_gain);
   list->add("totcal_offset", fToTCal_offset);
   list->add("totcal_gain", fToTCal_gain);
-  list->add("conversion_factor", fConversionFactor);
+  list->add("rangecal_offset", fRangeCal_offset);
+  list->add("rangecal_gain", fRangeCal_gain);
   list->add("quenching_factor", fQuenchingFactor);
 
 }
@@ -96,7 +98,8 @@ Bool_t R3BCaloDUCalPar::getParams(FairParamList* list)
   if (!list->fill("gammacal_gain", &fGammaCal_gain)) { return kFALSE; }
   if (!list->fill("totcal_offset", &fToTCal_offset)) { return kFALSE; }
   if (!list->fill("totcal_gain", &fToTCal_gain)) { return kFALSE; }
-  if (!list->fill("conversion_factor", &fConversionFactor)) { return kFALSE; }
+  if (!list->fill("rangecal_offset", &fRangeCal_offset)) { return kFALSE; }
+  if (!list->fill("rangecal_gain", &fRangeCal_gain)) { return kFALSE; }
   if (!list->fill("quenching_factor", &fQuenchingFactor)) { return kFALSE; }
 
   return kTRUE;
@@ -105,7 +108,7 @@ Bool_t R3BCaloDUCalPar::getParams(FairParamList* list)
 void R3BCaloDUCalPar::clear()
 {
   fCompId=fDetectionUnit=0;
-  fGammaCal_offset=fGammaCal_gain=fToTCal_offset=fToTCal_gain=fConversionFactor=fQuenchingFactor=0.;
+  fGammaCal_offset=fGammaCal_gain=fToTCal_offset=fToTCal_gain=fRangeCal_offset=fRangeCal_gain=fQuenchingFactor=0.;
 
   if (fParam_Writer) { fParam_Writer->Reset(); }
   if (fParam_Reader) { fParam_Reader->Reset(); }
@@ -127,7 +130,8 @@ string R3BCaloDUCalPar::GetTableDefinition(const char* Name)
   sql += "  GAMMACAL_GAIN         DOUBLE,";
   sql += "  TOTCAL_OFFSET         DOUBLE,";
   sql += "  TOTCAL_GAIN           DOUBLE,";
-  sql += "  CONVERSION_FACTOR     DOUBLE,";
+  sql += "  RANGECAL_OFFSET       DOUBLE,";
+  sql += "  RANGECAL_GAIN         DOUBLE,";
   sql += "  QUENCHING_FACTOR      DOUBLE,";
   sql += "  primary key(SEQNO,ROW_ID))";
   return sql;
@@ -142,7 +146,7 @@ void R3BCaloDUCalPar::Fill(FairDbResultPool& res_in,
   clear();
   
   res_in >> fCompId  >> fDetectionUnit >> fGammaCal_offset >> fGammaCal_gain 
-	 >> fToTCal_offset >> fToTCal_gain >> fConversionFactor >> fQuenchingFactor ;
+	 >> fToTCal_offset >> fToTCal_gain >> fRangeCal_offset >> fRangeCal_gain >> fQuenchingFactor ;
 
 }
 
@@ -151,7 +155,7 @@ void R3BCaloDUCalPar::Store(FairDbOutTableBuffer& res_out,
 {
   
   res_out << fCompId  << fDetectionUnit << fGammaCal_offset << fGammaCal_gain 
-	  << fToTCal_offset << fToTCal_gain << fConversionFactor << fQuenchingFactor ;
+	  << fToTCal_offset << fToTCal_gain << fRangeCal_offset << fRangeCal_gain << fQuenchingFactor ;
 
 }
 
@@ -182,7 +186,8 @@ void R3BCaloDUCalPar::fill(UInt_t rid)
     fGammaCal_gain  =  cgd->GetGammaCal_gain();
     fToTCal_offset  =  cgd->GetToTCal_offset();
     fToTCal_gain  =  cgd->GetToTCal_gain();
-    fConversionFactor  =  cgd->GetConversionFactor();
+    fRangeCal_offset  =  cgd->GetRangeCal_offset();
+    fRangeCal_gain  =  cgd->GetRangeCal_gain();
     fQuenchingFactor  =  cgd->GetQuenchingFactor();
   }
 
@@ -266,7 +271,7 @@ void R3BCaloDUCalPar::Print()
   std::cout<<"   fDetectionUnit: "<<  fDetectionUnit <<  std::endl;
   std::cout<<"   fGammaCal_offset: "<<  fGammaCal_offset <<  "   fGammaCal_gain: "<<  fGammaCal_gain <<  std::endl;
   std::cout<<"   fToTCal_offset: "<<  fToTCal_offset <<  "   fToTCal_gain: "<<  fToTCal_gain <<  std::endl;
-  std::cout<<"   fConversionFactor: "<<  fConversionFactor <<  std::endl;
+  std::cout<<"   fRangeCal_offset: "<<  fRangeCal_offset <<  "   fRangeCal_gain: "<<  fRangeCal_gain <<  std::endl;
   std::cout<<"   fQuenchingFactor: "<<  fQuenchingFactor <<  std::endl;
  
 }
@@ -279,8 +284,9 @@ Bool_t R3BCaloDUCalPar::Compare(const R3BCaloDUCalPar& that ) const {
 	               &&  (fGammaCal_offset   == that.fGammaCal_offset)
 		       &&  (fGammaCal_gain   == that.fGammaCal_gain)
   		       &&  (fToTCal_offset   == that.fToTCal_offset)
-		       &&  (fToTCal_gain   == that.fToTCal_gain)
-		       &&  (fConversionFactor   == that.fConversionFactor)
+		       &&  (fToTCal_gain   == that.fToTCal_gain)      
+                       &&  (fRangeCal_offset   == that.fRangeCal_offset)
+		       &&  (fRangeCal_gain   == that.fRangeCal_gain)
 		       &&  (fQuenchingFactor   == that.fQuenchingFactor);
   
   return (test_h); 
