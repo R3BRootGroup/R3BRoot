@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-// -----                      R3BCaloCrystalHit source file                  -----
+// -----                  R3BCaloCrystalHit source file                -----
 // -------------------------------------------------------------------------
 
 #include "R3BCaloCrystalHit.h"
@@ -15,6 +15,7 @@ using std::flush;
 R3BCaloCrystalHit::R3BCaloCrystalHit()
   : FairMultiLinkedData(),
     fEnergy(-1.),
+    fToT_Energy(-1.),
     fNf(-1.),
     fNs(-1.),
     fTime(-1.),
@@ -26,9 +27,10 @@ R3BCaloCrystalHit::R3BCaloCrystalHit()
 
 
 // -----   Standard constructor   ------------------------------------------
-R3BCaloCrystalHit::R3BCaloCrystalHit(Int_t ident, Double_t energy, Double_t Nf, Double_t Ns, Double_t time) 
+R3BCaloCrystalHit::R3BCaloCrystalHit(Int_t ident, Double_t energy, Double_t Nf, Double_t Ns, Double_t time, Double_t tot_energy) 
   : FairMultiLinkedData(),
     fEnergy(energy),
+    fToT_Energy(tot_energy),
     fNf(Nf),
     fNs(Ns),
     fTime(time),
@@ -42,6 +44,7 @@ R3BCaloCrystalHit::R3BCaloCrystalHit(Int_t ident, Double_t energy, Double_t Nf, 
 R3BCaloCrystalHit::R3BCaloCrystalHit(const R3BCaloCrystalHit& right)
   : FairMultiLinkedData(right),
     fEnergy(right.fEnergy),
+    fToT_Energy(right.fToT_Energy),
     fNf(right.fNf),
     fNs(right.fNs),
     fTime(right.fTime),
@@ -63,8 +66,9 @@ R3BCaloCrystalHit::~R3BCaloCrystalHit()
 // -----   Public method Print   -------------------------------------------
 void R3BCaloCrystalHit::Print(const Option_t* opt) const {
   cout << "-I- R3BCaloCrystalHit: a calo crystalHit in crystal identifier " << fCrystalId << endl;
-  cout << "    Energy = " << fEnergy << " GeV" << endl;
-  cout << "    Nf = " << fNf << " GeV; fNs =" << fNs << " GeV" << endl;
+  cout << "    Energy = " << fEnergy << " (GeV in sim)" << endl;
+  cout << "    ToT_Energy = " << fToT_Energy << " (GeV in sim)" << endl;
+  cout << "    Nf = " << fNf << " (GeV in sim); fNs =" << fNs << " (GeV in sim)" << endl;
   cout << "    Time =" << fTime << " ns  " << endl;
 }
 // -------------------------------------------------------------------------
