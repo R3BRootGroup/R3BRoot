@@ -7,6 +7,7 @@
 
 //ROOT headers
 #include "TClonesArray.h"
+#include "TMath.h"
 
 //Fair headers
 #include "FairRootManager.h"
@@ -26,6 +27,8 @@ R3BCaloCal::R3BCaloCal() : FairTask("R3B CALIFA Calibrator"),
 			       fCrystalHitCA(new TClonesArray("R3BCaloCrystalHit")), 
 			       fCaloCalPar(0)
 {
+  //counter1=0;
+  //counter2=0;
 }
 
 
@@ -36,6 +39,7 @@ R3BCaloCal::~R3BCaloCal()
   LOG(INFO) << "R3BCaloCal: Delete instance" << FairLogger::endl;
   delete fRawHitCA;
   delete fCrystalHitCA;
+  delete ran;
 }
 
 
@@ -44,6 +48,7 @@ R3BCaloCal::~R3BCaloCal()
 InitStatus R3BCaloCal::Init()
 {
   Register();
+  ran = new TRandom(0);
   return kSUCCESS;
 }
 
@@ -96,39 +101,46 @@ void R3BCaloCal::Exec(Option_t* option)
   
   LOG(DEBUG) << "Calibrating CALIFA Raw Data Calo" << FairLogger::endl;
   
-  TRandom *r0 = new TRandom();
-  Float_t rando = r0->Rndm();
+  Float_t rando = ran->Rndm()-0.5;
+  
+  if(fCrystalHitCA)fCrystalHitCA->Delete();
 
   R3BCaloRawHit*  rawHit;
+  Int_t rawHit_id=0;  
   Int_t crystal_id=0;  
   Double32_t energy=0;  
   Double32_t n_f=0;  
   Double32_t n_s=0;  
   Double32_t time=0;    
   Double32_t tot_energy=0;    
-  
+  Double32_t tempResult=0;    
+  Double_t tau = 850.0; //electronics constant, taken a fixed value for the moment!
+
   Int_t rawHits;        // Nb of RawHits in current event
   rawHits = fRawHitCA->GetEntries();
   if (rawHits>0) {
     for (Int_t i=0; i<rawHits; i++) {
       rawHit= (R3BCaloRawHit*) fRawHitCA->At(i);
       
-      crystal_id = rawHit->GetCrystalId();
-      
-      energy = fCaloCalPar->GetDUCalParAt(rawHit->GetCrystalId())->GetGammaCal_offset() + 
-	( (rawHit->GetEnergy()+(rando-0.5) ) * fCaloCalPar->GetDUCalParAt(rawHit->GetCrystalId())->GetGammaCal_gain());
-      
+      rawHit_id= rawHit->GetCrystalId();
+      crystal_id = rawHit_id;
+      energy = fCaloCalPar->GetDUCalParAt(rawHit_id)->GetGammaCal_offset() + 
+      	( (rawHit->GetEnergy()+rando ) * fCaloCalPar->GetDUCalParAt(rawHit_id)->GetGammaCal_gain());
       n_f = rawHit->GetNf(); 
-      
       n_s = rawHit->GetNs(); 
-      
       time = rawHit->GetTime();
       
-      tot_energy = fCaloCalPar->GetDUCalParAt(rawHit->GetCrystalId())->GetToTCal_offset() + 
-      	( (rawHit->GetTot()+(rando-0.5) ) * fCaloCalPar->GetDUCalParAt(rawHit->GetCrystalId())->GetToTCal_gain()); 
+      //tot converted from tot-channels to 300MeV range channels
+      tempResult = fCaloCalPar->GetDUCalParAt(rawHit_id)->GetToTCal_offset() + 
+	( TMath::Exp((rawHit->GetTot()+rando)/tau) * fCaloCalPar->GetDUCalParAt(rawHit_id)->GetToTCal_gain()); 
+      //tot converted from 300MeV range channels to 30MeV range channels
+      tempResult = fCaloCalPar->GetDUCalParAt(rawHit_id)->GetRangeCal_offset() + 
+	( tempResult* fCaloCalPar->GetDUCalParAt(rawHit_id)->GetRangeCal_gain()); 
+      //tot converted from 30MeV range channels to energy (keV)
+      tot_energy = fCaloCalPar->GetDUCalParAt(rawHit_id)->GetGammaCal_offset() + 
+      	( tempResult * fCaloCalPar->GetDUCalParAt(rawHit_id)->GetGammaCal_gain());
       
-      //TODO: Add tot_energy in CaloCrystalHit
-      new ((*fCrystalHitCA)[i]) R3BCaloCrystalHit(crystal_id, energy, n_f, n_s, time);
+      new ((*fCrystalHitCA)[i]) R3BCaloCrystalHit(crystal_id, energy, n_f, n_s, time, tot_energy);
       
     }  
   }

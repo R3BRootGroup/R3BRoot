@@ -48,17 +48,16 @@ protected:
   virtual void Register();
  
  private:
-  //private functions making most of the calibration work
-  Int_t MapCrystalID(R3BCaloRawHit* chit);
-  Double32_t CalibrateEnergy(R3BCaloRawHit* chit/*,char c*/);
-  Double32_t CalibrateFastComponent(R3BCaloRawHit* chit);
-  Double32_t CalibrateSlowComponent(R3BCaloRawHit* chit);
-  Double32_t CalibrateTime(R3BCaloRawHit* chit);
-
     
   TClonesArray *fRawHitCA;
   TClonesArray *fCrystalHitCA;
   R3BCaloCalPar* fCaloCalPar;
+
+  TRandom* ran;
+
+  //Int_t counter1;
+  //Int_t counter2;
+
     
  public:
   //Class definition
