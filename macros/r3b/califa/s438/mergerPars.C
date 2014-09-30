@@ -8,8 +8,8 @@
 //
 //   Usage: 
 //      > root -l 
-//      ROOT> .L extractParams.C
-//      ROOT> extractParams(inputFile1,inputFile2,inputFile3,outputFile)
+//      ROOT> .L mergerParams.C
+//      ROOT> mergerParams(inputFile1,inputFile2,inputFile3,outputFile)
 //                             
 //     where inputFile1 is the file name of the output of the calibrate.C macro
 //           inputFile2 is the file name of the output of the calToT_part2.C macro

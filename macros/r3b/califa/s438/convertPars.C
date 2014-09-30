@@ -43,7 +43,7 @@ Int_t  convert(TString inputfilename,TString outputfilename)
 
   // Dump the Parameters
   cout << endl;
-  cout << "-I- Reading Parameter data from Ascii File: \n" << filename.Data() << endl;
+  cout << "-I- Reading Parameter data from Ascii File: \n" << inputfilename.Data() << endl;
   cout << endl;
 
   par->Print();
