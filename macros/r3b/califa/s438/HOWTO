@@ -223,13 +223,16 @@ Adding the parameters to r3broot: (example from the outcome of the previous poin
 
        or, it can be used to create a parameters root file using the macro
        r3broot/macros/r3b/califa/s438/convertPars.C
+       $ root -l
+       root [0] .L convertPars.C
+       root [1] convert("califa_allPars.par","califa_allPars.root") 
+
        In this case, the root file should enter in the calibration macro as:
         FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
   	FairParRootFileIo* parRootIn = new FairParRootFileIo();
   	parRootIn->open(parRootFile);
   	rtdb->setFirstInput("name_of_the_file.root");
  	rtdb->print();
-
 
 
 
