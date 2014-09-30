@@ -45,13 +45,13 @@ void calibrate(TString inputFile, Int_t mode=0,
   
   //HISTOGRAMS DEFINITION
   char histitle[100];
-  TH1F** hEnergy = new TH1F*[160];
-  for(Int_t i=0;i<160;i++) {
+  TH1F** hEnergy = new TH1F*[128];
+  for(Int_t i=0;i<128;i++) {
     sprintf(histitle,"%s%i","hEnergy",i);  	
     hEnergy[i] = new TH1F(histitle,histitle,peak2Right-peak1Left+200,peak1Left-100,peak2Right+100);
   }
-  TH1F** hImprovedEnergy = new TH1F*[160];
-  for(Int_t i=0;i<160;i++) {
+  TH1F** hImprovedEnergy = new TH1F*[128];
+  for(Int_t i=0;i<128;i++) {
     sprintf(histitle,"%s%i","hImprovedEnergy",i);  	
     hImprovedEnergy[i] = new TH1F(histitle,histitle,peak2Right-peak1Left+200,peak1Left-100,peak2Right+100);
   }
@@ -94,16 +94,16 @@ void calibrate(TString inputFile, Int_t mode=0,
   
   //HISTOGRAMS DEFINITION
   char f1title[100];
-  TF1** myfit_1 = new TF1*[160];
-  for(Int_t i=0;i<160;i++) {
+  TF1** myfit_1 = new TF1*[128];
+  for(Int_t i=0;i<128;i++) {
     sprintf(f1title,"%s%i","myfit_1_",i);  	
     myfit_1[i] = new TF1(f1title,"[0] / sqrt(2.0 * TMath::Pi()) / [2] * exp(-(x-[1])*(x-[1])/2./[2]/[2]) + [3]",peak1Left,peak1Right);
     myfit_1[i]->SetLineColor(2);
     myfit_1[i]->SetLineWidth(1);
   }
   
-  TF1** myfit_2 = new TF1*[160];
-  for(Int_t i=0;i<160;i++) {
+  TF1** myfit_2 = new TF1*[128];
+  for(Int_t i=0;i<128;i++) {
     sprintf(f1title,"%s%i","myfit_2_",i);  	
     myfit_2[i] = new TF1(f1title,"[0] / sqrt(2.0 * TMath::Pi()) / [2] * exp(-(x-[1])*(x-[1])/2./[2]/[2]) + [3]", peak2Left, peak2Right);
     myfit_2[i]->SetLineColor(3);
@@ -116,12 +116,7 @@ void calibrate(TString inputFile, Int_t mode=0,
   //c1->Divide(4,4);
   
   if(mode==0){    
-    for(Int_t i=0;i<160;i++) {
-      //CHANGE THIS CRAZY if as soon as the new unpacker delivers crystal numbers without gaps
-      if ( i!=16 && i!=17 && i!=18 && i!=19 && i!=36 && i!=37 && i!=38 && i!=39 && 
-	   i!=56 && i!=57 && i!=58 && i!=59 && i!=76 && i!=77 && i!=78 && i!=79 && 
-	   i!=96 && i!=97 && i!=98 && i!=99 && i!=116 && i!=117 && i!=118 && i!=119 && 
-	   i!=136 && i!=137 && i!=138 && i!=139 && i!=156 && i!=157 && i!=158 && i!=159 ) {
+    for(Int_t i=0;i<128;i++) {
 	myfit_1[i]->SetParameter(0, 1.0e+03);
 	myfit_1[i]->SetParameter(1, (peak1Left+peak1Right)/2);
 	myfit_1[i]->SetParameter(2, 50);
@@ -166,15 +161,10 @@ void calibrate(TString inputFile, Int_t mode=0,
   Int_t canvas_i=0;
   TCanvas* dummy;
   
-  TF1** myfit_3 = new TF1*[160];
-  TF1** myfit_4 = new TF1*[160];
+  TF1** myfit_3 = new TF1*[128];
+  TF1** myfit_4 = new TF1*[128];
   
-  for(Int_t i=0;i<160;i++) { 
-    //CHANGE THIS CRAZY if as soon as the new unpacker delivers crystal numbers without gaps    
-    if ( i!=16 && i!=17 && i!=18 && i!=19 && i!=36 && i!=37 && i!=38 && i!=39 && 
-	 i!=56 && i!=57 && i!=58 && i!=59 && i!=76 && i!=77 && i!=78 && i!=79 && 
-	 i!=96 && i!=97 && i!=98 && i!=99 && i!=116 && i!=117 && i!=118 && i!=119 && 
-	 i!=136 && i!=137 && i!=138 && i!=139 && i!=156 && i!=157 && i!=158 && i!=159 ) {
+  for(Int_t i=0;i<128;i++) { 
       sprintf(f1title,"%s%i","myfit_3_",i); 
       fitParFile_a >> par1; cout << par1<< endl; 
       fitParFile_a >> par2; cout << par2<< endl; 
@@ -202,13 +192,13 @@ void calibrate(TString inputFile, Int_t mode=0,
       myfit_4[i]->SetLineWidth(1);
       
       if(i<16) canv[0]->cd(i+1);
-      else if(i>19 && i<36) canv[1]->cd(i-19);
-      else if(i>39 &&i<56) canv[2]->cd(i-39);
-      else if(i>59 &&i<76) canv[3]->cd(i-59);
-      else if(i>79 &&i<96) canv[4]->cd(i-79);
-      else if(i>99 &&i<116) canv[5]->cd(i-99);
-      else if(i>119 &&i<136)  canv[6]->cd(i-119);
-      else if(i>139 &&i<156)  canv[7]->cd(i-139);
+      else if(i>15 &&i<32) canv[1]->cd(i-15);
+      else if(i>31 &&i<48) canv[2]->cd(i-31);
+      else if(i>47 &&i<64) canv[3]->cd(i-47);
+      else if(i>63 &&i<80) canv[4]->cd(i-63);
+      else if(i>79 &&i<96) canv[5]->cd(i-79);
+      else if(i>95 &&i<112)  canv[6]->cd(i-95);
+      else if(i>111 &&i<128)  canv[7]->cd(i-111);
       
       sprintf(f1title,"%s%i","myfit_3_",i);  
       hImprovedEnergy[i]->Fit(f1title,"R");  
