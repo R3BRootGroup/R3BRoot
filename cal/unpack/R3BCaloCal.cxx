@@ -114,7 +114,7 @@ void R3BCaloCal::Exec(Option_t* option)
   Double32_t time=0;    
   Double32_t tot_energy=0;    
   Double32_t tempResult=0;    
-  Double_t tau = 850.0; //electronics constant, taken a fixed value for the moment!
+  Double_t tau = 878.625358; //electronics constant, taken a fixed value for the moment!
 
   Int_t rawHits;        // Nb of RawHits in current event
   rawHits = fRawHitCA->GetEntries();
