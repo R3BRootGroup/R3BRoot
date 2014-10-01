@@ -1,19 +1,22 @@
 //  -------------------------------------------------------------------------
 //
-//   ----- General Macro for R3B CALIFA Raw Data Display
+//   ----- General Macro for R3B CALIFA Data Display
 //         Author: Hector Alvarez <hector.alvarez@usc.es>
-//         Last Update: 25/09/14
+//         Last Update: 26/09/14
 //         Comments:
+//         THAT IS A TEMPLATE FOR OTHER DISPLAY/ANALYSIS MACRO. COPY AND USE.
+//         CAN DISPLAY RAWHITs OR CRYSTALHITs 
 //	
 //  -------------------------------------------------------------------------
 //
 //   Usage: 
-//      > root -l plotRaw.C
-//                         
-//     BUT FIRST, select in the //SETTINGS section the simulation features 
-//	(the macro will plot and text information as a function of these settings)
+//      > root -l 
+//      ROOT> .L plot.C
+//      ROOT> plot("inputFile")
+//     
+//     where inputFile is the input file :) 
+//     Define histograms and fill them in the loop!
 //  -------------------------------------------------------------------------
-
 void plot(TString inputFile) {
 
   gROOT->SetStyle("Default");
@@ -24,8 +27,13 @@ void plot(TString inputFile) {
   TFile *file1 = TFile::Open(inputFile);
   
   //HISTOGRAMS DEFINITION
-  TH1F* hEnergy = new TH1F("hEnergy","Energy",1000,0,10000);
- 
+  TH1F* hEnergy = new TH1F("hEnergy","Energy",1000,0,2000);
+  TH2F* hEnergyvsID = new TH2F("hEnergyvsID","EnergyvsID",500,0,2500,128,0,127);
+  TH2F* hTimevsID = new TH2F("hTimevsID","TimevsID",500,1450000000000,1460000000000,128,0,127);
+  TH2F* hEnergyvsTime = new TH2F("hEnergyvsTime","EnergyvsTime",500,0,2500,500,1450000000000,1650000000000);
+
+
+
   TTree* caloTree = (TTree*)file1->Get("cbmsim");
  
   //Raw Hits (input)
@@ -59,14 +67,14 @@ void plot(TString inputFile) {
     if(rawHitsPerEvent>0) {
       rawHit = new R3BCaloRawHit*[rawHitsPerEvent];
       for(Int_t j=0;j<rawHitsPerEvent;j++){
-	rawHit[j] = new R3BCaloRawHit;
+	//rawHit[j] = new R3BCaloRawHit;
 	rawHit[j] = (R3BCaloRawHit*) rawHitCA->At(j);      
       }
     }
     if(crystalHitsPerEvent>0) {
       crystalHit = new R3BCaloCrystalHit*[crystalHitsPerEvent];
       for(Int_t j=0;j<crystalHitsPerEvent;j++){
-	crystalHit[j] = new R3BCaloCrystalHit;
+	//crystalHit[j] = new R3BCaloCrystalHit;
 	crystalHit[j] = (R3BCaloCrystalHit*) crystalHitCA->At(j);      
       }
     }
@@ -75,6 +83,9 @@ void plot(TString inputFile) {
     if(rawHitsPerEvent>0) {
       for(Int_t h=0;h<rawHitsPerEvent;h++){
 	hEnergy->Fill(rawHit[h]->GetEnergy());
+	hEnergyvsID->Fill(rawHit[h]->GetEnergy(),rawHit[h]->GetCrystalId());
+	hTimevsID->Fill(rawHit[h]->GetTime(),rawHit[h]->GetCrystalId());
+	hEnergyvsTime->Fill(rawHit[h]->GetEnergy(),rawHit[h]->GetTime());
       }
     }    
     if(crystalHitsPerEvent>0) {
@@ -89,13 +100,18 @@ void plot(TString inputFile) {
     
   }
   
-  TCanvas* c1 = new TCanvas("Info","Info",0,0,720,900);
+  TCanvas* c1 = new TCanvas("Info","Info",0,0,780,1200);
 	c1->SetFillColor(0);
 	c1->SetFrameFillColor(0);
-
+	c1->Divide(2,2);
 	//MC TRACK CANVAS
-	c1->cd();
+	c1->cd(1);
 	hEnergy->Draw();
-
+	c1->cd(2);
+	hEnergyvsID->Draw("COLZ");
+	c1->cd(3);
+	hEnergyvsTime->Draw("COLZ");
+	c1->cd(4);
+	hTimevsID->Draw("COLZ");
 }
 	   
