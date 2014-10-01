@@ -304,9 +304,12 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
                         + sfp_id * (max_channel*max_card)
                         + card * max_channel
                         + channel;
-
-    new ((*fRawData)[fNHits]) R3BCaloRawHit(crystal_id, energy, n_f, n_s, rabbitStamp, error, tot);
-    fNHits++;
+     //01-10-2014 Temporaty hack
+     //to handle 128 crystals only!!!!
+     if (crystal_id>-1 && crystal_id<128){
+       new ((*fRawData)[fNHits]) R3BCaloRawHit(crystal_id, energy, n_f, n_s, rabbitStamp, error, tot);
+       fNHits++;
+     }
   
   } // while
  
