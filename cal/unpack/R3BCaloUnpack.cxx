@@ -257,10 +257,10 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
         self_triggered = (pl_data[l_s++] >> 24) & 0xff;
         num_pileup = pl_data[l_s] & 0xffff;
         num_discarded = (pl_data[l_s++] >> 16) & 0xffff;
-        energy = (Short_t) pl_data[l_s++] & 0xffff;
+        energy = (Short_t) ( pl_data[l_s++] & 0xffff );
         // field    not included in new version
-        n_f = (Short_t) pl_data[l_s] & 0xffff;
-        n_s = (Short_t) (pl_data[l_s++] >> 16) & 0xffff;
+        n_f = (Short_t) ( pl_data[l_s] & 0xffff );
+        n_s = (Short_t) ( (pl_data[l_s++] >> 16) & 0xffff );
         
         // checks if optional time-over-threshold payload present (recognized by 0xBEEF as first word) 
         if ( (evsize > 4 * (l_s - start))   && ( ((pl_data[l_s] >> 16) & 0xffff) == 0xBEEF) ) {
