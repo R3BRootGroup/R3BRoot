@@ -19,7 +19,7 @@ void plot(TString inputFile) {
 
   // CONFIGURATION
   ifstream input1;
-  input1.open("rough_angles_az.txt"); 
+  input1.open("./angles/petals_angels_angles.txt"); 
   Double_t polar[128]; Double_t azimuthal[128]; Int_t number=0;
   for(Int_t i=0;i<128;i++) input1 >> number >> polar[i] >> azimuthal[i]; 
   //
