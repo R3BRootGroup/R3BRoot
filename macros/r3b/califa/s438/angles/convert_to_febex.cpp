@@ -24,7 +24,7 @@ int main()
 	string str[128], strx[128];
 	int i,j,a[128],b[128],ax[128],bx[128],x;
 	int febex[16]={6,5,4,3,2,1,0,7,8,15,14,13,12,11,10,9};
-	int invert[16]={5,4,7,6,1,0,3,2,13,12,15,14,9,8,11,10};
+	int invert[16]={5,4,7,6,1,0,3,2,13,12,15,11,9,8,11,10};//hmm
 	float c[128],d[128],cx[128],dx[128],div[128];
     char passit[20];
     const char *name;
@@ -74,8 +74,8 @@ int main()
 	   ax[i]=a[x];
     	   bx[i]=b[x];
     		   cx[i]=c[x];
-    			   dx[i]=d[x];   // non-inverted
-    			  	//  dx[i]=div[x]; // inverted
+    			    //dx[i]=d[x]+180;   // non-inverted
+    			  	  dx[i]=div[x]+180; // inverted
     			  	         strx[i]=str[x];
 	}
 	

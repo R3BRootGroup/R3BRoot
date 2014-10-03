@@ -61,6 +61,9 @@ Calibration:(example with run 140925, as before)
 
 	   the output  with R3BCaloCrystalHits will be in na22__calTest.root 
 
+	It is recommended to use a symbolic link
+	$ ln -s /path/to/your/data data
+
 	   Initial calibration parameters are available in 		   
 	   r3broot/macros/r3b/califa/s438/califa_cal_par.root (with runid=0)
 	  			
