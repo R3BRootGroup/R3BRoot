@@ -13,7 +13,7 @@
 //        > root -l 
 //        ROOT> .L califaUnpack.C
 //        ROOT>  run("inputFile", firstFileNumber, lastFileNumber, nevents) 
-//                         
+//        ????ROOT>  run("inputFile", firstFileNumber, lastFileNumber) in HOWTO without the nevents 
 //   where 
 //    inputFile is the input lmd file without the .lmd extension and the file number
 //    firstFileNumber is the file number of the first lmd file
@@ -41,12 +41,18 @@ void run(TString inputFile, Int_t firstFileNumber, Int_t lastFileNumber, Int_t n
         source->AddFile(strName);
     }
     
-    // CALIFA MBS parameters -------------------------------
-    Short_t type = 10;
-    Short_t subType = 1;
-    Short_t procId = 1;
-    Short_t subCrate = -1;
-    Short_t control = 9;
+    // CALIFA MBS parameters ------------parameters -------------------
+   Short_t type = 100; // CALIFA in included in the general daz
+   Short_t subType = 10000;
+   Short_t procId = 2;
+   Short_t subCrate = 2;
+   Short_t control = 9;
+
+    // Short_t type = 10; // CALIFA at the beginning of the experiment 
+    // Short_t subType = 1;
+    // Short_t procId = 1;
+    // Short_t subCrate = -1;
+    // Short_t control = 9;
     source->AddUnpacker(new R3BCaloUnpack("", type, subType, procId, subCrate, control));
     // ------------------------------------------------------
 
