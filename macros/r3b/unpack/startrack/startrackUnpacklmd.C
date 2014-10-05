@@ -10,8 +10,8 @@
 
 
   // Run over all events  (or blocks)
-  //Int_t nev = -1;
-  Int_t nev =2;
+  Int_t nev = -1;
+  //Int_t nev =2;
  
   const char *outputFileName = "startrack_raw_data.root";
   const Long64_t maxSize = 1 * 1024 * 1024 * 1024; // GBytes
@@ -24,17 +24,21 @@
 
   //source->AddFile("/home/mala/Echanges/R3B_Simulation/r3b_dataread_Marcello/Mixed-alpha-source/2014-03-06-Eth-b0.bin");
   //source->AddFile("/home/mala/Echanges/R3B_data/highThreshold/R2_0");
-  //source->AddFile("/MIDAS/R3B/sitracker.lmd");
-  //source->AddFile("../land/run108-0325.lmd");
-  source->AddFile("/net/nnlxs1/data19/mala/MyE_drive\ docs/R3B-UK/mbs/sitracker001.lmd");
+
+  // lmd file
+  //source->AddFile("/net/nnlxs1/data19/mala/MyE_drive\ docs/R3B-UK/mbs/sitracker001.lmd");  // !! with Type =10, SubType=1
+
+  source->AddFile("/MIDAS/R3B/GSITest2014/lmd/run222_0818.lmd");  // !! Si+all other detector with Type =104, SubType=10400
+  //source->AddFile("/MIDAS/R3B/GSITest2014/lmd/run007_0018.lmd");  // !! Si + internal pulse  with Type =104, SubType=10400
+  //source->AddFile("/MIDAS/R3B/GSITest2014/lmd/run006_0016.lmd");  // !! Si only with Type =104, SubType=10400
 
  
 //  char* strCalDir = "/home/work/example/";
 
 // TODO: set proper values to the variable below when the binary file is from GSI MBS DAQ is used.
 // To be checked:
-  Short_t type = 10;
-  Short_t subType = 1;
+  Short_t type = 104;
+  Short_t subType = 10400;
   Short_t procId = 1; 
   //Short_t subCrate = -1; // All sub-crates
   Short_t subCrate = 0; // All sub-crates
