@@ -33,8 +33,12 @@ mergerPars(TString inputFile1, TString inputFile2,
   Int_t crystal[128];
   Double_t gammaCal_offset[128];
   Double_t gammaCal_gain[128];  
-  Double_t totCal_offset[128];
-  Double_t totCal_gain[128];
+  // Double_t totCal_offset[128]; // fit not linear, not used
+  // Double_t totCal_gain[128];   // fit not linear, not used
+  // E = par0 * exp( TOT / par1 )  + par2
+  Double_t totCal_par0[128];
+  Double_t totCal_par1[128];
+  Double_t totCal_par2[128];
   Double_t rangeCal_offset[128];
   Double_t rangeCal_gain[128];
 
@@ -45,10 +49,10 @@ mergerPars(TString inputFile1, TString inputFile2,
     input1 >> crystal[i] >> gammaCal_offset[i] >> gammaCal_gain[i]; 
     cout << crystal[i] << " " << gammaCal_offset[i] << " " << gammaCal_gain[i] << endl; 
   } 
-  for(Int_t i=0;i<3;i++) input2 >> dummy; 
+  for(Int_t i=0;i<2;i++) input2 >> dummy; 
   for(Int_t i=0;i<128;i++)  {
-    input2 >> crystal[i] >> totCal_offset[i] >> totCal_gain[i]; 
-    cout << crystal[i] << " " << totCal_offset[i] << " " << totCal_gain[i] << endl; 
+    input2 >> crystal[i] >> totCal_par0[i] >> totCal_par1[i] >> totCal_par2[i]; 
+    cout << crystal[i] << " " << totCal_par0[i] << " " << totCal_par1[i] << " " << totCal_par2[i] << endl; 
   }
   for(Int_t i=0;i<3;i++) input3 >> dummy; 
   for(Int_t i=0;i<128;i++)  {
@@ -70,9 +74,9 @@ mergerPars(TString inputFile1, TString inputFile2,
   //PARS VALUES
   char out8[100] = ":   Double_t  \\";
   for(Int_t i=0;i<128;i++)  {
-    output << crystal[i] << out8 << endl;
+    output <<crystal[i] << out8 << endl;
     output << " " << gammaCal_offset[i] << " " << gammaCal_gain[i]
-	   << " " << totCal_offset[i] << " " << totCal_gain[i]
+	   << " " << totCal_par0[i] << " " << totCal_par1[i] << " " << totCal_par2[i] 
 	   << " " << rangeCal_offset[i] << " " << rangeCal_gain[i] 
 	   << " " << QuenchingFactor  << endl; 
   }
