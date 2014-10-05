@@ -10,7 +10,7 @@
 //   Usage: 
 //      > root -l 
 //      ROOT> .L convertPars.C
-//      ROOT> convert(inputFile, outputFile)
+//      ROOT> convert(inputFile, outputFile) // with ""!
 //                             
 //     where inputFile is the file name of the ascii parameter file (input)
 //           outputFile is the file name of the root parameter file (output)
