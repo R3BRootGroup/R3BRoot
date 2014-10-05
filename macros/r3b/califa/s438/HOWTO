@@ -61,19 +61,20 @@ Calibration:(example with run 140925, as before)
 
 	   the output  with R3BCaloCrystalHits will be in na22__calTest.root 
 
-	It is recommended to use a symbolic link
-	$ ln -s /path/to/your/data data
+ It is recommended to use a symbolic link to outside of the r3broot dir
+ $ ln -s /path/to/your/data data
 
 	   Initial calibration parameters are available in 		   
 	   r3broot/macros/r3b/califa/s438/califa_cal_par.root (with runid=0)
 	  			
-
 Calibration parameters:
 	There are the following calibration parameters:
 	Double_t fGammaCal_offset;   offset in linear gamma calibration
     	Double_t fGammaCal_gain;     gain in linear gamma calibration
-    	Double_t fToTCal_offset;     offset in the non-linear ToT calibration
-    	Double_t fToTCal_gain;       gain in the non-linear ToT calibration
+    	Double_t ftotCal_par0
+       	Double_t ftotCal_par1 
+        Double_t ftotCal_par2; 		
+    	ToT energy cal parameters for fit E=par0*exp(TOT/par1)+par2
     	Double_t fRangeCal_offset;   offset in the linear 30 to 300 MeV range calibration
     	Double_t fRangeCal_gain;     gain in the linear 30 to 300 MeV range calibration
     	Double_t fQuenchingFactor;   quenching factor for protons (tentative) calculated 
@@ -171,7 +172,7 @@ Getting Range calibration parameters: (example with run 140926)
 	PLEASE, check all the points in the final fits. A bad fit is easy to localize
 	and solve, but a single point out of place will destroy the calibration for this channel!
 
-
+ // needs new E=par0*exp(TOT/par1)+par2 function.. NOT DONE
 
 Getting ToT calibration parameters: (example with run 140927)
 
@@ -213,8 +214,7 @@ Adding the parameters to r3broot: (example from the outcome of the previous poin
        ascii file parameters file for R3BRoot:
        $ root -l
        root [0] .L mergerPars.C
-       root [1] mergerPars("calPars_140925.txt","gainPars_ToT_140927.txt",
-       "gainPars_pulser_140926.txt","califa_allPars.par")
+       root [1] mergerPars("calPars_140925.txt","ToT_Pars_140929.txt","gainPars_pulser_140926.txt","califa_allPars.par")
        
        The output can be directly used in a calibration macro with the code:
          // -----   Runtime database   ---------------------------------------------
