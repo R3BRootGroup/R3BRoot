@@ -20,7 +20,7 @@
 //    lastFileNumber is the file number of the last lmd file
 //    nevents is the number of events to read, -1 - untill CTRL+C
 //  -------------------------------------------------------------------------
-void run(TString inputFile, Int_t firstFileNumber, Int_t lastFileNumber, Int_t nevents=-1)
+void califaUnpack_batch(TString inputFile, Int_t firstFileNumber, Int_t lastFileNumber, Int_t nevents=-1)
 {
     TStopwatch timer;
     timer.Start();
@@ -42,17 +42,18 @@ void run(TString inputFile, Int_t firstFileNumber, Int_t lastFileNumber, Int_t n
     }
     
     // CALIFA MBS parameters ------------parameters -------------------
+/*
    Short_t type = 100; // CALIFA in included in the general day
    Short_t subType = 10000;
    Short_t procId = 2;
    Short_t subCrate = 2;
    Short_t control = 9;
-
-    // Short_t type = 10; // CALIFA at the beginning of the experiment 
-    // Short_t subType = 1;
-    // Short_t procId = 1;
-    // Short_t subCrate = -1;
-    // Short_t control = 9;
+*/
+    Short_t type = 10; // CALIFA at the beginning of the experiment 
+    Short_t subType = 1;
+    Short_t procId = 1;
+    Short_t subCrate = -1;
+    Short_t control = 9;
     source->AddUnpacker(new R3BCaloUnpack("", type, subType, procId, subCrate, control));
     // ------------------------------------------------------
 

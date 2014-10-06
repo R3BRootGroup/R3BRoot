@@ -41,6 +41,11 @@ Unpacking: (example with 10 files of run 140925, from 0100 to 0110, 22Na calib. 
 
 	   Then, a new file r3broot/macros/r3b/califa/s438/data/na22__raw.root
 	   contains the R3BCaloRawHit (rawHits for short)
+	   
+	   [An alternative is califaUnpack_batch.C, where you simply do
+	   root -l -b 'califaUnpack.C("1000mv_30mev_",362,364)';
+	   which allows you to run a list of events in a bash script]
+
 
 
 
