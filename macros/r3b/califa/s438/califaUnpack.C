@@ -25,8 +25,8 @@ void run(TString inputFile, Int_t firstFileNumber, Int_t lastFileNumber, Int_t n
     TStopwatch timer;
     timer.Start();
     
-    TString inDir = "/home/genp/Desktop/GSI14/data/";   // directory with lmd files
-    TString outDir = "/home/genp/Desktop/GSI14/data/";  // output directory
+    TString inDir = "./data/totcal/";   // directory with lmd files
+    TString outDir = "./data/totcal/";  // output directory
 
     TString inputFileName = inDir + inputFile + ".lmd";                       // name of input file
     TString outputFileName = outDir + inputFile + "_raw.root";                // name of output file
@@ -42,7 +42,7 @@ void run(TString inputFile, Int_t firstFileNumber, Int_t lastFileNumber, Int_t n
     }
     
     // CALIFA MBS parameters ------------parameters -------------------
-   Short_t type = 100; // CALIFA in included in the general daz
+   Short_t type = 100; // CALIFA in included in the general daq
    Short_t subType = 10000;
    Short_t procId = 2;
    Short_t subCrate = 2;

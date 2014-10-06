@@ -3,6 +3,7 @@
 //  -----  Macro for R3B CALIFA parameters merging
 //         Author: Hector Alvarez <hector.alvarez@usc.es>
 //         Last Update: 26/09/14
+//         Last Update: 5/10/14    - modified to include 3 params for ToT, changed r3bdb/caldb files also.     
 //         Comments:
 //  -------------------------------------------------------------------------
 //
@@ -41,7 +42,6 @@ mergerPars(TString inputFile1, TString inputFile2,
   Double_t totCal_par2[128];
   Double_t rangeCal_offset[128];
   Double_t rangeCal_gain[128];
-
   Double_t QuenchingFactor=0.9;
   
   for(Int_t i=0;i<3;i++) input1 >> dummy; 

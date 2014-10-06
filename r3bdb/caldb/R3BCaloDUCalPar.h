@@ -49,8 +49,9 @@ using TObject::Compare;
     Int_t GetDetectionUnit() 		const {return fDetectionUnit;}
     Double_t GetGammaCal_offset() 	const {return fGammaCal_offset;}
     Double_t GetGammaCal_gain() 	const {return fGammaCal_gain;}
-    Double_t GetToTCal_offset() 	const {return fToTCal_offset;}
-    Double_t GetToTCal_gain() 		const {return fToTCal_gain;}
+    Double_t GetToTCal_par0() 		const {return fToTCal_par0;}
+    Double_t GetToTCal_par1() 		const {return fToTCal_par1;}
+    Double_t GetToTCal_par2() 		const {return fToTCal_par2;}
     Double_t GetRangeCal_offset() 	const {return fRangeCal_offset;}
     Double_t GetRangeCal_gain() 	const {return fRangeCal_gain;}
     Double_t GetQuenchingFactor() 	const {return fQuenchingFactor;}
@@ -59,8 +60,9 @@ using TObject::Compare;
     void SetDetectionUnit(Int_t i) 		{fDetectionUnit=i;}
     void SetGammaCal_offset(Double_t i) 	{fGammaCal_offset=i;}
     void SetGammaCal_gain(Double_t i) 		{fGammaCal_gain=i;}
-    void SetToTCal_offset(Double_t i) 		{fToTCal_offset=i;}
-    void SetToTCal_gain(Double_t i) 		{fToTCal_gain=i;}
+    void SetToTCal_par0(Double_t i) 		{fToTCal_par0=i;}
+    void SetToTCal_par1(Double_t i) 		{fToTCal_par1=i;}
+    void SetToTCal_par2(Double_t i) 		{fToTCal_par2=i;}
     void SetRangeCal_offset(Double_t i) 	{fRangeCal_offset=i;}
     void SetRangeCal_gain(Double_t i) 	        {fRangeCal_gain=i;}
     void SetQuenchingFactor(Double_t i) 	{fQuenchingFactor=i;}
@@ -103,8 +105,9 @@ using TObject::Compare;
     Int_t fDetectionUnit; 
     Double_t fGammaCal_offset; //offset in linear gamma calibration
     Double_t fGammaCal_gain;   //gain in linear gamma calibration
-    Double_t fToTCal_offset;   //offset in the non-linear ToT calibration
-    Double_t fToTCal_gain;     //gain in the non-linear ToT calibration
+    Double_t fToTCal_par0;  //E=par0*exp(TOT/par1)+par2
+    Double_t fToTCal_par1;  
+    Double_t fToTCal_par2;  
     Double_t fRangeCal_offset; //offset in the linear 30 to 300 MeV range calibration
     Double_t fRangeCal_gain;   //gain in the linear 30 to 300 MeV range calibration
     Double_t fQuenchingFactor; //quenching factor for protons (tentative) calculated from proton and pulser measurements

@@ -58,6 +58,8 @@ Calibration:(example with run 140925, as before)
 	   root [1] califaCal("./data1/140925/na22__raw.root","./data1/140925/na22__calTest.root",
 	                      "../../db/califa/califa_cal_par.root")
 				(all in the same line!)
+				
+				(califa_allPars.root in the s438 file)
 
 	   the output  with R3BCaloCrystalHits will be in na22__calTest.root 
 
@@ -172,9 +174,7 @@ Getting Range calibration parameters: (example with run 140926)
 	PLEASE, check all the points in the final fits. A bad fit is easy to localize
 	and solve, but a single point out of place will destroy the calibration for this channel!
 
- // needs new E=par0*exp(TOT/par1)+par2 function.. NOT DONE
-
-Getting ToT calibration parameters: (example with run 140927)
+Getting ToT calibration parameters: (example with run 140927) // needs new E=par0*exp(TOT/par1)+par2 function.. NOT DONE
 
 	Use the macros r3broot/macros/r3b/califa/s438/calToT_part1.C and
 	r3broot/macros/r3b/califa/s438/calToT_part2.C			
@@ -214,7 +214,7 @@ Adding the parameters to r3broot: (example from the outcome of the previous poin
        ascii file parameters file for R3BRoot:
        $ root -l
        root [0] .L mergerPars.C
-       root [1] mergerPars("calPars_140925.txt","ToT_Pars_140929.txt","gainPars_pulser_140926.txt","califa_allPars.par")
+       root [1] mergerPars("calPars_140925.txt","ToT_Pars_140929.txt","gainPars_pulser_140926.txt","califa_allPars.")
        
        The output can be directly used in a calibration macro with the code:
          // -----   Runtime database   ---------------------------------------------

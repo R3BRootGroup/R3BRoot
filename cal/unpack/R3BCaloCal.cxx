@@ -131,8 +131,12 @@ void R3BCaloCal::Exec(Option_t* option)
       time = rawHit->GetTime();
       
       //tot converted from tot-channels to 300MeV range channels
-      tempResult = fCaloCalPar->GetDUCalParAt(rawHit_id)->GetToTCal_offset() + 
-	( TMath::Exp((rawHit->GetTot()+rando)/tau) * fCaloCalPar->GetDUCalParAt(rawHit_id)->GetToTCal_gain()); 
+      
+//      tempResult = fCaloCalPar->GetDUCalParAt(rawHit_id)->GetToTCal_offset() + 	( TMath::Exp((rawHit->GetTot()+rando)/tau) * fCaloCalPar->GetDUCalParAt(rawHit_id)->GetToTCal_gain()); 
+	  tempResult = fCaloCalPar->GetDUCalParAt(rawHit_id)->GetToTCal_par0()*(TMath::Exp((rawHit->GetTot()+rando)/fCaloCalPar->GetDUCalParAt(rawHit_id)->GetToTCal_par1()))+fCaloCalPar->GetDUCalParAt(rawHit_id)->GetToTCal_par2();
+		
+	  // E=par0*exp(TOT/par1)+par2, par1 is not constant..
+	
       //tot converted from 300MeV range channels to 30MeV range channels
       tempResult = fCaloCalPar->GetDUCalParAt(rawHit_id)->GetRangeCal_offset() + 
 	( tempResult* fCaloCalPar->GetDUCalParAt(rawHit_id)->GetRangeCal_gain()); 
