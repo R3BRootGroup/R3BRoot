@@ -43,7 +43,7 @@ Unpacking: (example with 10 files of run 140925, from 0100 to 0110, 22Na calib. 
 	   contains the R3BCaloRawHit (rawHits for short)
 	   
 	   [An alternative is califaUnpack_batch.C, where you simply do
-	   root -l -b 'califaUnpack.C("1000mv_30mev_",362,364)';
+	   root -l -b -q 'califaUnpack_batch.C("1000mv_30mev_",362,364)';
 	   which allows you to run a list of events in a bash script]
 
 
