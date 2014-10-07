@@ -18,8 +18,8 @@ void califaUnpack_batch(TString inputFile, Int_t firstFileNumber, Int_t lastFile
     TStopwatch timer;
     timer.Start();
     
-    TString inDir = '';   // directory with lmd files
-    TString outDir = '';  // output directory
+    TString inDir = "";   // directory with lmd files
+    TString outDir = "";  // output directory
 
     TString inputFileName = inDir + inputFile + ".lmd";                       // name of input file
     TString outputFileName = outDir + inputFile + "_raw.root";                // name of output file

@@ -16,6 +16,8 @@
 //           outputFile is the file name of the root parameter file (output)
 //       
 //  -------------------------------------------------------------------------
+#include <unistd.h>
+
 Int_t  convert(TString inputfilename,TString outputfilename)
 {
   // Create a Runtime Database singleton.
@@ -53,9 +55,9 @@ Int_t  convert(TString inputfilename,TString outputfilename)
   par->setChanged();
   Bool_t kParameterMerged = kTRUE;
   FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
+  unlink(outputfilename);
   parOut->open(outputfilename.Data());
   db->setOutput(parOut);
-  db->saveOutput();
   db->print();
   // ------------------------------------------------------------------------
 

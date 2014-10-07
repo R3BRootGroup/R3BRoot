@@ -22,9 +22,9 @@
 //    nevents is the number of events to calibrate (0 if all)
 // 
 //    Batch is also an option, e.g.
-//    root -l -b -q 'califaCal.C("./data/totcal/900mv_30mev__raw.root","./data/totcal/900mv_30mev_cal.root","califa_allPars.root")';
+//    root -l -b -q -x 'califaCal.C("./data/totcal/900mv_30mev__raw.root","./data/totcal/900mv_30mev_cal.root","califa_allPars.root")';
 //
- -------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 
 void califaCal(TString inputFile, TString outputFile, 
 	       TString parRootFile, Int_t nEvents = 0) {
