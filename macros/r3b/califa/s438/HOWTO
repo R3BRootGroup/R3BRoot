@@ -219,7 +219,7 @@ Adding the parameters to r3broot: (example from the outcome of the previous poin
        ascii file parameters file for R3BRoot:
        $ root -l
        root [0] .L mergerPars.C
-       root [1] mergerPars("calPars_140925.txt","ToT_Pars_140929.txt","gainPars_pulser_140926.txt","califa_allPars.root")
+       root [1] mergerPars("calPars_140925.txt","ToT_Pars_140929.txt","gainPars_pulser_140926.txt","califa_allPars.par")
        
        The output can be directly used in a calibration macro with the code:
          // -----   Runtime database   ---------------------------------------------
