@@ -9,16 +9,9 @@
 //
 //  -------------------------------------------------------------------------
 //
-//   Usage: 
-//        > root -l 
-//        ROOT> .L califaUnpack.C
-//        ROOT>  run("inputFile", firstFileNumber, lastFileNumber, nevents) 
-//        ????ROOT>  run("inputFile", firstFileNumber, lastFileNumber) in HOWTO without the nevents 
-//   where 
-//    inputFile is the input lmd file without the .lmd extension and the file number
-//    firstFileNumber is the file number of the first lmd file
-//    lastFileNumber is the file number of the last lmd file
-//    nevents is the number of events to read, -1 - untill CTRL+C
+//   Usage: e.g.
+//
+// root -l -b -q 'califaUnpack_batch.C("1000mv_30mev_",362,364)';
 //  -------------------------------------------------------------------------
 void califaUnpack_batch(TString inputFile, Int_t firstFileNumber, Int_t lastFileNumber, Int_t nevents=-1)
 {
