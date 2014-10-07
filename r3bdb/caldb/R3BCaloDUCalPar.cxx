@@ -33,9 +33,7 @@ R3BCaloDUCalPar::R3BCaloDUCalPar(const char* name, const char* title, const char
     fCompId(0),
     fDetectionUnit(0),
     fGammaCal_offset(0.),
-    fGammaCal_gain(0.),
-    //fToTCal_offset(0.),
-    //fToTCal_gain(0.),  
+    fGammaCal_gain(0.), 
     fToTCal_par0(0.),
     fToTCal_par1(0.),
     fToTCal_par2(0.),
@@ -84,8 +82,6 @@ void R3BCaloDUCalPar::putParams(FairParamList* list)
   list->add("detection_unit", fDetectionUnit);
   list->add("gammacal_offset", fGammaCal_offset);
   list->add("gammacal_gain", fGammaCal_gain);
-  //list->add("totcal_offset", fToTCal_offset);
-  //list->add("totcal_gain", fToTCal_gain);
   list->add("totcal_par0", fToTCal_par0);
   list->add("totcal_par1", fToTCal_par1);
   list->add("totcal_par2", fToTCal_par2);
@@ -102,8 +98,6 @@ Bool_t R3BCaloDUCalPar::getParams(FairParamList* list)
   if (!list->fill("detection_unit", &fDetectionUnit)) { return kFALSE; }
   if (!list->fill("gammacal_offset", &fGammaCal_offset)) { return kFALSE; }
   if (!list->fill("gammacal_gain", &fGammaCal_gain)) { return kFALSE; }
-//  if (!list->fill("totcal_offset", &fToTCal_offset)) { return kFALSE; }
-//  if (!list->fill("totcal_gain", &fToTCal_gain)) { return kFALSE; }
   if (!list->fill("totcal_par0", &fToTCal_par0)) { return kFALSE; }
   if (!list->fill("totcal_par1", &fToTCal_par1)) { return kFALSE; }
   if (!list->fill("totcal_par2", &fToTCal_par2)) { return kFALSE; }
@@ -117,7 +111,6 @@ Bool_t R3BCaloDUCalPar::getParams(FairParamList* list)
 void R3BCaloDUCalPar::clear()
 {
   fCompId=fDetectionUnit=0;
-  //fGammaCal_offset=fGammaCal_gain=fToTCal_offset=fToTCal_gain=fRangeCal_offset=fRangeCal_gain=fQuenchingFactor=0.;
   fGammaCal_offset=fGammaCal_gain=fToTCal_par0=fToTCal_par1=fToTCal_par2=fRangeCal_offset=fRangeCal_gain=fQuenchingFactor=0.;
   if (fParam_Writer) { fParam_Writer->Reset(); }
   if (fParam_Reader) { fParam_Reader->Reset(); }
@@ -137,8 +130,6 @@ string R3BCaloDUCalPar::GetTableDefinition(const char* Name)
   sql += "  DETECTION_UNIT        INT,";
   sql += "  GAMMACAL_OFFSET       DOUBLE,";
   sql += "  GAMMACAL_GAIN         DOUBLE,";
- // sql += "  TOTCAL_OFFSET         DOUBLE,";
- // sql += "  TOTCAL_GAIN           DOUBLE,";
   sql += "  TOTCAL_PAR0           DOUBLE,";
   sql += "  TOTCAL_PAR1           DOUBLE,";
   sql += "  TOTCAL_PAR2           DOUBLE,";
@@ -196,8 +187,6 @@ void R3BCaloDUCalPar::fill(UInt_t rid)
     fDetectionUnit =  cgd->GetDetectionUnit();
     fGammaCal_offset  =  cgd->GetGammaCal_offset();
     fGammaCal_gain  =  cgd->GetGammaCal_gain();
- //   fToTCal_offset  =  cgd->GetToTCal_offset();
- //   fToTCal_gain  =  cgd->GetToTCal_gain();
     fToTCal_par0  =  cgd->GetToTCal_par0();
     fToTCal_par1  =  cgd->GetToTCal_par1();
     fToTCal_par2  =  cgd->GetToTCal_par2();
@@ -297,9 +286,7 @@ Bool_t R3BCaloDUCalPar::Compare(const R3BCaloDUCalPar& that ) const {
   Bool_t test_h =  (fCompId   == that.fCompId)
  	               &&  (fDetectionUnit   == that.fDetectionUnit)
 	               &&  (fGammaCal_offset   == that.fGammaCal_offset)
-		           &&  (fGammaCal_gain   == that.fGammaCal_gain)
-  		           //&&  (fToTCal_offset   == that.fToTCal_offset)
-		           //&&  (fToTCal_gain   == that.fToTCal_gain)   
+		           &&  (fGammaCal_gain   == that.fGammaCal_gain)  
 		           &&  (fToTCal_par0   == that.fToTCal_par0)   
 		           &&  (fToTCal_par1   == that.fToTCal_par1)   
    		           &&  (fToTCal_par2   == that.fToTCal_par2)   
