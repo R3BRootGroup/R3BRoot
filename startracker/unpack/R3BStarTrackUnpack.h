@@ -14,19 +14,16 @@
 class TClonesArray;
 
 
-//static const UInt_t gosip_header_size = 16;
-//static const UInt_t gosip_sub_header_size = 8;
-//static const Int_t  event_t_size = 44;
-//static const Int_t  trace_head_t_size = 8;
-
-
 class R3BStarTrackUnpack : public FairUnpack {
  public:
   //Constructor
   R3BStarTrackUnpack(char *strCalDir,
-                Short_t type = 10, Short_t subType = 1,
+                Short_t type = 104, Short_t subType = 10400,
                 Short_t procId = 1,
                 Short_t subCrate = 0, Short_t control = 37);
+
+  // Type, SubTypde, procId, subcrate, control are parameters that are unique to the Silicon Tracker.
+
   
   //Destructor
   virtual ~R3BStarTrackUnpack();
@@ -34,7 +31,7 @@ class R3BStarTrackUnpack : public FairUnpack {
   //Fair specific
   virtual Bool_t Init();
   virtual Bool_t DoUnpack(Int_t* data, Int_t size);
-  virtual Bool_t DoUnpack2(Int_t* data_wd0, Int_t* data_wd1, Int_t size);
+  //virtual Bool_t DoUnpack2(Int_t* data_wd0, Int_t* data_wd1, Int_t size);
   virtual void Reset();
     
  protected:

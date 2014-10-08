@@ -57,13 +57,21 @@ void R3BStarTrackRawAna::Exec(Option_t *option)
     tha->Fill(hit->GetAsicId());
     thst->Fill(hit->GetStripId());
     the->Fill(hit->GetADCdata());
-    tht->Fill(hit->GetTime());
+
+    thts->Fill(hit->GetTime()*1e-6);
+    //cout << "WR lb=" << hit->GetWRlb() << endl;
+    //cout << "Time lb=" << hit->GetTimelb() << endl;
+    //cout << "XXXXX" << endl;
+    thtslbdiff->Fill((hit->GetWRlb() - hit->GetTimelb())*1e-6); // in msec
+    thtsExt->Fill(hit->GetTimeExt()*1e-6);
+    thtsExtlbdiff->Fill((hit->GetTimeExtlb() - hit->GetTimelb())*1e-6);  // in msec
+
     thif->Fill(hit->GetInfoField());
     thic->Fill(hit->GetInfoCode());
    }
 
   if(0 == (fnEvents%100)) {
-    cout << fnEvents << "  " << nHits << endl;
+    cout << "nEvents:" << fnEvents << "  nHits= " << nHits << endl;
   }
   fnEvents += 1;
 }
@@ -82,8 +90,11 @@ void R3BStarTrackRawAna::CreateHistos()
   thsd = new TH1F("Side", "", 9, -0.5, 8.5);
   tha = new TH1F("Asic ID", "", 17, -0.5, 16.5);
   thst = new TH1F("Strip ID", "", 131, -0.5, 130.5);
-  the = new TH1F("Energy", "", 50, 0., 500.);
-  tht = new TH1F("Time", "", 1000, 0., 450000000.);
+  the = new TH1F("Energy", "", 500, 0., 5000.);
+  thts = new TH1F("Silicon Time stamp", "", 1000, 0., 1000.);
+  thtslbdiff = new TH1F(" WR time - Si time  ", "", 550, -50, 500.);
+  thtsExt = new TH1F("Master time Trigger", "", 1000, 0., 10.);
+  thtsExtlbdiff = new TH1F("Ext Mster Time - Si time  ", "", 2000, 0, 20.);
   thif = new TH1F("InfoField", "", 21, 0., 20.);
   thic = new TH1F("InfoCode", "", 21, 0., 20.);
   FairRunOnline *run = FairRunOnline::Instance();
@@ -94,7 +105,10 @@ void R3BStarTrackRawAna::CreateHistos()
   run->AddObject(tha);
   run->AddObject(thst);
   run->AddObject(the);
-  run->AddObject(tht);
+  run->AddObject(thts);
+  run->AddObject(thtslbdiff);
+  run->AddObject(thtsExt);
+  run->AddObject(thtsExtlbdiff);
   run->AddObject(thif);
   run->AddObject(thic);
 }
@@ -109,7 +123,10 @@ void R3BStarTrackRawAna::WriteHistos()
   tha->Write();
   thst->Write();
   the->Write();
-  tht->Write();
+  thts->Write();
+  thtslbdiff->Write();
+  thtsExt->Write();
+  thtsExtlbdiff->Write();
   thif->Write();
   thic->Write();
   LOG(INFO) << "R3BStarTrackRawAna --- Histograms writed to the Root File ..." << FairLogger::endl; 
