@@ -52,7 +52,14 @@ InitStatus R3BCaloCal::Init()
   return kSUCCESS;
 }
 
-
+int bicycle() {
+  static int pos=0;
+  char cursor[4]={'/','-','\\','|'};
+  printf("(%c)  (%c)  (%c)  (%c)  (%c)  (%c)  (%c)  \r                     ",cursor[pos],cursor[pos],cursor[pos],cursor[pos],cursor[pos],cursor[pos],cursor[pos]);
+  fflush(stdout);
+  pos = (pos+1)%4;
+			  }
+				 
 void R3BCaloCal::SetParContainers()
 {
   // Get run and runtime database
@@ -115,13 +122,19 @@ void R3BCaloCal::Exec(Option_t* option)
   Double32_t tot_energy=0;    
   Double32_t tempResult=0;    
   Double_t tau = 878.625358; //electronics constant, taken a fixed value for the moment! // Not any more.. BP
-
+   
   Int_t rawHits;        // Nb of RawHits in current event
   rawHits = fRawHitCA->GetEntries();
+  
   if (rawHits>0) {
     for (Int_t i=0; i<rawHits; i++) {
-      rawHit= (R3BCaloRawHit*) fRawHitCA->At(i);
-      
+   
+  
+      if(i==60){
+         bicycle();
+         	   }
+        
+      rawHit= (R3BCaloRawHit*) fRawHitCA->At(i);      
       rawHit_id= rawHit->GetCrystalId();
       crystal_id = rawHit_id;
       energy = fCaloCalPar->GetDUCalParAt(rawHit_id)->GetGammaCal_offset() + 
