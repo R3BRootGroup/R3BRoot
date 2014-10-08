@@ -28,10 +28,12 @@
   // lmd file
   //source->AddFile("/net/nnlxs1/data19/mala/MyE_drive\ docs/R3B-UK/mbs/sitracker001.lmd");  // !! with Type =10, SubType=1
 
-  source->AddFile("/MIDAS/R3B/GSITest2014/lmd/run222_0818.lmd");  // !! Si+all other detector with Type =104, SubType=10400
+  //source->AddFile("/MIDAS/R3B/GSITest2014/lmd/run222_0818.lmd");  // !! Si+all other detector with Type =104, SubType=10400
   //source->AddFile("/MIDAS/R3B/GSITest2014/lmd/run007_0018.lmd");  // !! Si + internal pulse  with Type =104, SubType=10400
   //source->AddFile("/MIDAS/R3B/GSITest2014/lmd/run006_0016.lmd");  // !! Si only with Type =104, SubType=10400
-
+  //source->AddFile("/MIDAS/R3B/GSITest2014/lmd/sit272_2186.lmd");  // !! Si only empty target with Type =104, SubType=10400
+  source->AddFile("/MIDAS/R3B/GSITest2014/lmd/run280_3364.lmd");  // !! Si only with Type =104, SubType=10400
+  //source->AddFile("/MIDAS/R3B/GSITest2014/lmd/sitracker_stripped.lmd");  // !! Si only with Type =104, SubType=10400
  
 //  char* strCalDir = "/home/work/example/";
 
