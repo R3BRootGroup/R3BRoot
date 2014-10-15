@@ -57,6 +57,13 @@ class R3BCaloHitFinder : public FairTask
      **/
     void SetExperimentalResolution(Double_t crystalRes);
 
+    /** Public method SetComponentResolution
+     **
+     ** Defines the experimental resolution of the CsI(Tl) components.
+     *@param componentRes  Double parameter used to set the experimental resolution in MeV
+     **/
+    void SetComponentResolution(Double_t componentRes);
+
     /** Public method SetDetectionThreshold
      **
      ** Defines the minimum energy requested in a crystal to be considered in a calorimeter Hit
@@ -113,6 +120,8 @@ class R3BCaloHitFinder : public FairTask
     Double_t fThreshold;
     // Experimental resolution @ 1 MeV
     Double_t fCrystalResolution;
+    // Experimental resolution for Nf and Ns
+    Double_t fComponentResolution;
     // Angular window (polar)
     Double_t fDeltaPolar;
     // Angular window (azimuthal)
@@ -141,7 +150,14 @@ class R3BCaloHitFinder : public FairTask
     Double_t ExpResSmearing(Double_t inputEnergy);
 
 
-    /** Private method AddHit
+     /** Private method CompSmearing
+    **
+    ** Smears the CsI(Tl) components Ns and Nf
+    **/
+    Double_t CompSmearing(Double_t inputEnergy);
+
+
+   /** Private method AddHit
     **
     ** Adds a CaloHit to the HitCollection
     **/

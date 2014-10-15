@@ -639,6 +639,47 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
     } else LOG(ERROR) << "R3BCalo: Impossible crystalType for geometryVersion 15." 
 	     //<< "volIdAlv: " << volIdAlv << ", volIdSupAlv: " << volIdSupAlv << ", volumeName: " << volumeName
 		      << FairLogger::endl;
+  } else if (fGeometryVersion==16) {
+    //RESERVED FOR CALIFA 8.11 BARREL + CC 0.2
+    
+    const char *alveolusECPrefix = "Alveolus_EC_";
+    const char *alveolusPrefix = "Alveolus_";
+    const char *volumeName = gMC->VolName(volIdSupAlv);
+    const char *volumeNameCrystal;
+
+    // Workaround to fix the hierarchy difference between Barrel and Endcap
+    if (strncmp("CalifaWorld", volumeName,10) == 0) {
+      volumeName = gMC->VolName(volIdAlv);
+      volumeNameCrystal = gMC->VolName(volId1);
+    }
+
+    if (strncmp(alveolusECPrefix, volumeName,11) == 0) {
+      crystalType = atoi(volumeNameCrystal+8);     //converting to int the crystal index
+      crystalCopy = cpAlv+1;
+      crystalId = 3000 + cpAlv*24 + (crystalType-1);
+      if (crystalType>24 || crystalType<1 ||
+	  crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>4800)
+	LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 16 (CC). " 
+		   << FairLogger::endl;
+    //if BARREL
+    } else if (strncmp(alveolusPrefix, volumeName,8) == 0) {
+      crystalType = atoi(volumeName+9);//converting to int the alveolus index
+      if (crystalType==1) {
+	//only one crystal per alveoli in this ring, running from 1 to 32
+        crystalCopy = cpSupAlv+1; 
+        crystalId = cpSupAlv+1;                    
+      } else if (crystalType>1 && crystalType<17) {
+	//running from 0*4+0+1=1 to 31*4+3+1=128
+        crystalCopy = cpSupAlv*4+cpCry+1;
+	//running from 32+0*128+0*4+0+1=1 to 32+14*128+31*4+3+1=1952
+        crystalId = 32+(crystalType-2)*128+cpSupAlv*4+cpCry+1; 
+      }
+      if (crystalType>16 || crystalType<1 || crystalCopy>128 || 
+	  crystalCopy<1 || crystalId>1952 || crystalId<1) 
+        LOG(ERROR) << "R3BCalo: Wrong crystal number in geometryVersion 16 (BARREL)." 
+		   << FairLogger::endl;
+    } else LOG(ERROR) << "R3BCalo: Impossible crystalType for geometryVersion 16." 
+		      << FairLogger::endl;
   } else LOG(ERROR) << "R3BCalo: Geometry version not available in R3BCalo::ProcessHits(). " 
 		    << FairLogger::endl;
   
