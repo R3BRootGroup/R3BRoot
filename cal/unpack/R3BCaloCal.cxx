@@ -52,7 +52,7 @@ InitStatus R3BCaloCal::Init()
   return kSUCCESS;
 }
 
-int bicycle() {
+void bicycle() {
   static int pos=0;
   char cursor[4]={'/','-','\\','|'};
   printf("(%c)  (%c)  (%c)  (%c)  (%c)  (%c)  (%c)  \r                     ",cursor[pos],cursor[pos],cursor[pos],cursor[pos],cursor[pos],cursor[pos],cursor[pos]);
@@ -130,7 +130,7 @@ void R3BCaloCal::Exec(Option_t* option)
     for (Int_t i=0; i<rawHits; i++) {
    
   
-      if(i==60){
+      if(i==600){
          bicycle();
          	   }
         
