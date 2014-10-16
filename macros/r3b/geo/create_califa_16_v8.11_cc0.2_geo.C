@@ -207,7 +207,8 @@ void create_califa_geo(const char* geoTag)
   Double_t thick_alv = 0.025;       //cm
 
   //Thickness of wrapping;
-  Double_t thick_wrap = 0.0065;     //cm
+  Double_t thick_wrap_iPhos = 0.0065;     //cm
+  Double_t thick_wrap_phoswich = 0.0130;     //cm
 
   //Thickness of Al housing for phoswich
   Double_t thick_al_housing = 0.05; //cm
@@ -241,7 +242,7 @@ void create_califa_geo(const char* geoTag)
       num_phi = 16;
 
     Double_t dphi = 360. / (Double_t)num_phi;
-    Double_t phi = dphi/2; //5.625;
+    Double_t phi = dphi / 2 + 5.625;
 
     //Define crystal length dependent on ring
     if(i < 4)
@@ -273,12 +274,13 @@ void create_califa_geo(const char* geoTag)
     } else {
       Double_t thick_alv_theta = 0.;
     }
-
+    Double_t thick_wrap = thick_wrap_iPhos;
     Double_t thick_alv_phi = thick_alv;
     //Aluminum housing 0.1cm
-    if(i < 4)
+    if(i < 4) {
       thick_alv_phi = thick_al_housing;
-
+      thick_wrap = thick_wrap_phoswich;
+    }
 
     //Define vectors from origin to edges of the alveoli
     TVector3 A, B, C, D, A2, B2, C2, D2;
