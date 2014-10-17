@@ -22,7 +22,6 @@ Int_t iPhos_sim(){
   TString EventFile = "gamma_events.dat";
 
   // Output files
-  //TString OutFile = "2p_5000evts_new_endcap_tracker.root";
   TString OutFile = "testsim.root";
   TString ParFile = "testpar.root";
   
@@ -42,7 +41,7 @@ Int_t iPhos_sim(){
   // CALIFA generator:          "gammas"
   // R3B spec. generator:       "r3b"
   // Events from file:          "ascii"
-  TString fGene="ascii";
+  TString fGene="gammas";
   
   //-------------------------------------------------
   // Secondaries  generation (G4 only)
@@ -121,14 +120,14 @@ Int_t iPhos_sim(){
    //- N# of Sim. Events   |    nEvents     (Int_t)
    //-------------------------------------------------
 
-   Int_t nEvents = 2000;
+   Int_t nEvents = 1000;
 
    //-------------------------------------------------
    //- EventDisplay        |    fEventDisplay (Bool_t)
    //-------------------------------------------------
    //   connected:              kTRUE
    //   not connected:          kFALSE
-   Bool_t fEventDisplay=kFALSE;
+   Bool_t fEventDisplay=kTRUE;
 
    // Magnet Field definition
    Bool_t fR3BMagnet = kFALSE;

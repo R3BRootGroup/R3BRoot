@@ -33,17 +33,17 @@ r3bevtvis()
 
   // -----   Reconstruction run   -------------------------------------------
   FairRunAna *fRun= new FairRunAna();
-  TFile* file = new TFile("r3bpar.root");
+  TFile* file = new TFile("testpar.root");
   file->Get("FairBaseParSet"); 
   
   // -----   Runtime database   ---------------------------------------------
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
   FairParRootFileIo* parIn = new FairParRootFileIo();
-  parIn->open("r3bpar.root");
+  parIn->open("testpar.root");
   rtdb->setFirstInput(parIn);
   rtdb->print();
   
-  fRun->SetInputFile("r3bsim.root");
+  fRun->SetInputFile("testsim.root");
   fRun->SetOutputFile("test.root");
   
   R3BEventManager *fMan= new R3BEventManager();

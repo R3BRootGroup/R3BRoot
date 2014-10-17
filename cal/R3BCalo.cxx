@@ -272,6 +272,8 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
   Int_t crystalType = 0;
   Int_t crystalCopy = 0;
   Int_t crystalId = 0;
+  Int_t fEndcapIdentifier = 0;
+  Int_t fPhoswichIdentifier = 0;
 
   if (fGeometryVersion==0) {
     //The present scheme here done works nicely with 5.0
@@ -639,23 +641,43 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
     } else LOG(ERROR) << "R3BCalo: Impossible crystalType for geometryVersion 15." 
 	     //<< "volIdAlv: " << volIdAlv << ", volIdSupAlv: " << volIdSupAlv << ", volumeName: " << volumeName
 		      << FairLogger::endl;
+
+
+
   } else if (fGeometryVersion==16) {
     //RESERVED FOR CALIFA 8.11 BARREL + CC 0.2
     
-    const char *alveolusECPrefix = "Alveolus_EC_";
-    const char *alveolusPrefix = "Alveolus_";
+    const char *alveolusECPrefix = "Alveolus_EC";
+    const char *alveolusPrefix = "Alveolus";
     const char *volumeName = gMC->VolName(volIdSupAlv);
-    const char *volumeNameCrystal;
+    const char *volumeNameCrystal ="";
 
     // Workaround to fix the hierarchy difference between Barrel and Endcap
     if (strncmp("CalifaWorld", volumeName,10) == 0) {
       volumeName = gMC->VolName(volIdAlv);
       volumeNameCrystal = gMC->VolName(volId1);
     }
-
-    if (strncmp(alveolusECPrefix, volumeName,11) == 0) {
+    if (strncmp(alveolusECPrefix, volumeName, 11) == 0) {
       crystalType = atoi(volumeNameCrystal+8);     //converting to int the crystal index
       crystalCopy = cpAlv+1;
+
+      if(crystalType < 9) {
+	//CC Phoswich crystals are combined in one crystal
+	//Energies are contained in Nf -> LaBr and Ns -> LaCl
+	
+	//fEndcapIdentifier = 0 -> iPhos
+	//fEndcapIdentifier = 1 -> Phoswich
+	fEndcapIdentifier = 1;
+
+	if(crystalType%2 == 0) {
+	  //fPhoswichIdentifier = 2 -> LaCl
+	  fPhoswichIdentifier = 2;
+	  crystalType -= 1;
+	} else {
+	  //fPhoswichIdentifier = 1 -> LaBr
+	  fPhoswichIdentifier = 1;
+	}
+      }
       crystalId = 3000 + cpAlv*24 + (crystalType-1);
       if (crystalType>24 || crystalType<1 ||
 	  crystalCopy>32 || crystalCopy<1 || crystalId<3000 || crystalId>4800)
@@ -663,6 +685,7 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
 		   << FairLogger::endl;
     //if BARREL
     } else if (strncmp(alveolusPrefix, volumeName,8) == 0) {
+
       crystalType = atoi(volumeName+9);//converting to int the alveolus index
       if (crystalType==1) {
 	//only one crystal per alveoli in this ring, running from 1 to 32
@@ -691,8 +714,8 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
   
   if ( gMC->IsTrackEntering() ) {
     fELoss  = 0.;
-    fNf = 0;
-    fNs = 0;
+    fNf = 0.;
+    fNs = 0.;
     fNSteps  = 0; // FIXME
     fTime   = gMC->TrackTime() * 1.0e09;
     fLength = gMC->TrackLength();
@@ -707,27 +730,35 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
   TString ptype = gMC->GetStack()->GetCurrentTrack()->GetName();
 
 
-
-  //if(fNs == 0.) {
-  //LOG(INFO) << "fNs == 0: fNSteps = " << fNSteps << FairLogger::endl;
-  //}
-  //LOG(INFO) << "ptype: " << ptype << FairLogger::endl;
-
-
-  if(ptype == "proton") {
-    fNs += tf_p_dNs->Integral(post_E, post_E + dE);
-    fNf += tf_p_dNf->Integral(post_E, post_E + dE);
-  } else if (ptype == "e-" || ptype == "e+" || ptype == "gamma") {
-    fNs += tf_g_dNs->Integral(post_E, post_E + dE);
-    fNf += tf_g_dNf->Integral(post_E, post_E + dE);
+  if(fEndcapIdentifier == 1) {
+    //CC Phoswich
+    if(fPhoswichIdentifier == 1) {
+      //LaBr
+      fNf += dE;
+    } else if(fPhoswichIdentifier == 2) {
+      //LaCl
+      fNs += dE;
+    } else {
+    LOG(ERROR) << "R3BCalo: fPhoswichIdentifier not valid in R3BCalo::ProcessHits(). " 
+		    << FairLogger::endl;
+  }
+    
+  } else if (fEndcapIdentifier == 0)  {
+    if(ptype == "proton") {
+      fNs += tf_p_dNs->Integral(post_E, post_E + dE);
+      fNf += tf_p_dNf->Integral(post_E, post_E + dE);
+    } else if (ptype == "e-" || ptype == "e+" || ptype == "gamma") {
+      fNs += tf_g_dNs->Integral(post_E, post_E + dE);
+      fNf += tf_g_dNf->Integral(post_E, post_E + dE);
+    } else {
+      //to be continued
+    }
   } else {
-    //to be continued
+    LOG(ERROR) << "R3BCalo: fEndcapIdentifier not valid in R3BCalo::ProcessHits(). " 
+		    << FairLogger::endl;
   }
   fELoss += dE / 1000.;       //back to GeV
   fNSteps++;
-
-  //LOG(INFO) << "ptype: " << ptype << ", pre_E: " << post_E + dE << ", post_E: " << post_E << ", dE: " << dE << ", fELoss (MeV): " << fELoss*1000. << ", fNf: " << fNf  << ", fNs: " << fNs << ", fNSteps: " << fNSteps << FairLogger::endl;
-
 
   // Set additional parameters at exit of active volume. Create R3BCaloPoint.
   if ( gMC->IsTrackExiting()    ||
@@ -802,6 +833,10 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
 	     ->GetCrystalId() == crystalId ) {
           ((R3BCaloCrystalHitSim *)(fCaloCrystalHitCollection->At(i)))
 	    ->AddMoreEnergy(NUSmearing(fELoss));
+	  ((R3BCaloCrystalHitSim *)(fCaloCrystalHitCollection->At(i)))
+	    ->AddMoreNf(fNf);
+	  ((R3BCaloCrystalHitSim *)(fCaloCrystalHitCollection->At(i)))
+	    ->AddMoreNs(fNs);
           if ( ((R3BCaloCrystalHitSim *)(fCaloCrystalHitCollection->At(i)))
 	       ->GetTime() > fTime ) {
             ((R3BCaloCrystalHitSim *)(fCaloCrystalHitCollection->At(i)))

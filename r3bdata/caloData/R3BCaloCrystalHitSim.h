@@ -62,6 +62,8 @@ public:
   void SetCrystalType(Int_t type)           { fCrystalType = type; }
   void SetCrystalCopy(Int_t copy)           { fCrystalCopy = copy; }
   void AddMoreEnergy(Double32_t moreEnergy) { fEnergy += moreEnergy; }
+  void AddMoreNf(Double32_t moreNf)         { fNf += moreNf; }
+  void AddMoreNs(Double32_t moreNs)         { fNs += moreNs; }
   void SetNSteps(Int_t steps)               { fNSteps = steps; }
   void SetEinc(Double32_t einc)             { fEinc = einc; }
   void SetTrackId(Int_t trackid)            { fTrackID = trackid; }

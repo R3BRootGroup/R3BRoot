@@ -64,6 +64,13 @@ class R3BCaloHitFinder : public FairTask
      **/
     void SetComponentResolution(Double_t componentRes);
 
+    /** Public method SetPhoswichResolution
+     **
+     ** Defines the experimental resolution of the LaBr and LaCl crystals.
+     *@param LaBr  Double parameter used to set the experimental resolution in % for LaBr
+     *@param Lacl  Double parameter used to set the experimental resolution in % for LaCl
+     **/
+    void SetPhoswichResolution(Double_t LaBr, Double_t LaCl);
     /** Public method SetDetectionThreshold
      **
      ** Defines the minimum energy requested in a crystal to be considered in a calorimeter Hit
@@ -122,6 +129,10 @@ class R3BCaloHitFinder : public FairTask
     Double_t fCrystalResolution;
     // Experimental resolution for Nf and Ns
     Double_t fComponentResolution;
+    // Experimental resolution for LaBr
+    Double_t fLaBrResolution;
+    // Experimental resolution for LaCl
+    Double_t fLaClResolution;
     // Angular window (polar)
     Double_t fDeltaPolar;
     // Angular window (azimuthal)
@@ -154,8 +165,20 @@ class R3BCaloHitFinder : public FairTask
     **
     ** Smears the CsI(Tl) components Ns and Nf
     **/
-    Double_t CompSmearing(Double_t inputEnergy);
+    Double_t CompSmearing(Double_t inputComponent);
 
+    /** Private method CompSmearing
+    **
+    ** Smears the LaBr and LaCl
+    **/
+    Double_t PhoswichSmearing(Double_t inputEnergy, bool isLaBr);
+
+
+    /** Private method isPhoswich
+    **
+    ** Smears the CsI(Tl) components Ns and Nf
+    **/
+    bool isPhoswich(Int_t crystalid);
 
    /** Private method AddHit
     **

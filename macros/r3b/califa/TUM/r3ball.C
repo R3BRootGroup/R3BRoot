@@ -313,14 +313,14 @@ void r3ball(Int_t nEvents = 1,
 	
   if (fGenerator.CompareTo("gammas") == 0  ) {
 	// 2- Define the CALIFA Test gamma generator
-	//Double_t pdgId=22; // gamma emission
-	Double_t pdgId=2212; // proton emission
-	Double_t theta1= 43.2;  // polar angle distribution
-	Double_t theta2= 45.5.;	
+	Double_t pdgId=22; // gamma emission
+	//Double_t pdgId=2212; // proton emission
+	Double_t theta1= 7.;  // polar angle distribution
+	Double_t theta2= 45.;	
 	//Double_t theta2= 90.;	
 	//Double_t momentum=0.002; // 0.010 GeV/c = 10 MeV/c 
-	Double_t momentumI=0.4; // 0.010 GeV/c = 10 MeV/c 
-	Double_t momentumF=0.4; // 0.010 GeV/c = 10 MeV/c 
+	Double_t momentumI=0.002; // 0.010 GeV/c = 10 MeV/c 
+	Double_t momentumF=0.002; // 0.010 GeV/c = 10 MeV/c 
 	//Double_t momentumF=0.808065; // 0.808065 GeV/c (300MeV Kin Energy for protons) 
 	//Double_t momentumI=0.31016124; // 0.31016124 GeV/c (50MeV Kin Energy for protons)
 	//Double_t momentum=0.4442972; // 0.4442972 GeV/c (100MeV Kin Energy for protons)
@@ -331,11 +331,11 @@ void r3ball(Int_t nEvents = 1,
 	gammasGen->SetThetaRange (theta1,   theta2);
 	gammasGen->SetCosTheta();
 	gammasGen->SetPRange(momentumI,momentumF);
-	gammasGen->SetPhiRange(1.,2.);
+	gammasGen->SetPhiRange(-180.,180.);
 	//gammasGen->SetXYZ(0.0,0.0,-1.5);
 	//gammasGen->SetXYZ(0.0,0.0,0);
 	gammasGen->SetBoxXYZ(-0.1,0.1,-0.1,0.1,-0.1,0.1);
-	gammasGen->SetLorentzBoost(0.8197505718204776); //beta=0.81975 for 700 A MeV
+	//gammasGen->SetLorentzBoost(0.8197505718204776); //beta=0.81975 for 700 A MeV
 	// add the gamma generator
 	primGen->AddGenerator(gammasGen);
   } 
@@ -408,8 +408,9 @@ void r3ball(Int_t nEvents = 1,
     caloHF->SetDetectionThreshold(0.000050);//50 KeV
     caloHF->SetExperimentalResolution(6.);  //percent @ 1 MeV
     caloHF->SetComponentResolution(.25);    //sigma = 0.5 MeV
+    caloHF->SetPhoswichResolution(3.,5.);   //percent @ 1 MeV for LaBr and LaCl 
     caloHF->SelectGeometryVersion(16);
-    caloHF->SetAngularWindow(3.2,3.2);      //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
+    caloHF->SetAngularWindow(0.2,0.2);      //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
     run->AddTask(caloHF);
   }
 
