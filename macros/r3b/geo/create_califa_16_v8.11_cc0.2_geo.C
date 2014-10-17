@@ -211,7 +211,7 @@ void create_califa_geo(const char* geoTag)
   Double_t thick_wrap_phoswich = 0.0130;     //cm
 
   //Thickness of Al housing for phoswich
-  Double_t thick_al_housing = 0.05; //cm
+  Double_t thick_al_housing = 0.04; //cm
 
   //how many phoswich rings?
   unsigned int num_phoswich = 4;
@@ -220,7 +220,7 @@ void create_califa_geo(const char* geoTag)
   unsigned int cut = 8;
 
   //Endcap shift in beam (z) direction
-  Double_t shift_z = 3.;            //cm
+  Double_t shift_z = 2.6;            //cm
 
   /*** END of settings ***/
 
@@ -288,7 +288,7 @@ void create_califa_geo(const char* geoTag)
     //Gap between different num_phi
     Double_t gap = 0.;
     if(i == 1)
-      gap = 0.19;
+      gap = 0.1;
 
     A.SetMagThetaPhi(inner_radius - thick_alv / 4. - thick_wrap / 2., (theta[i])*TMath::Pi()/180., 0);
     B.SetMagThetaPhi(inner_radius - thick_alv / 4. - thick_wrap / 2., (theta[i])*TMath::Pi()/180., dphi*TMath::Pi()/180.);
