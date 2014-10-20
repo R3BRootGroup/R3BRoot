@@ -1,8 +1,9 @@
 //  -------------------------------------------------------------------------
 //
 //   ----- General Macro for R3B CALIFA Analysis
-//         Author: Hector Alvarez <hector.alvarez@usc.es>
-//         Last Update: 01/09/10
+//         Author: Hector Alvarez <hector.alvarez@usc.es>,
+//                 Michael Bendel <michael.bendel@tum.de>
+//         Last Update: 20/10/14
 //         Comments:
 //			Runs the CALIFA Hit Finder. Outputs a root file with 
 //			a collection (TClonesArray) of R3BCaloHits
@@ -17,22 +18,21 @@
 
 void califaAna(Int_t nEvents = 1) {
 	
-	/*TString dir = getenv("VMCWORKDIR");
-	
-	TString r3b_geomdir = dir + "/geometry";
-	gSystem->Setenv("GEOMPATH",r3b_geomdir.Data());
-	
-	TString r3b_confdir = dir + "gconfig";
-	gSystem->Setenv("CONFIG_DIR",r3b_confdir.Data());
-	*/
-	
 	// Input and output files
-	//TString InFile = "r3bsim.root";
-	//TString OutFile = "califaAna.root";
+ 
+        // Input file: simulation
+	TString InFile = "r3bsim.root";
+
+	// Input file: parameters
+	TString parFile = "r3bpar.root";
+
+	// Output file
+	TString OutFile = "califaAna.root";
+
 	
 	// In general, the following parts need not be touched
 	// ========================================================================
-	
+
 	// ----    Debug option   -------------------------------------------------
 	gDebug = 0;
 	// ------------------------------------------------------------------------
@@ -42,29 +42,23 @@ void califaAna(Int_t nEvents = 1) {
 	timer.Start();
 	// ------------------------------------------------------------------------
 	
-	
+
 	
 	// -----   Create analysis run   ----------------------------------------
 	FairRunAna* fRun = new FairRunAna();
-	
-	
-	 TFile* file = new TFile("r3bpar.root");
-	file->Get("FairBaseParSet"); 
-	
+	fRun->SetInputFile(InFile.Data());
+	fRun->SetOutputFile(OutFile.Data());
+
 	// -----   Runtime database   ---------------------------------------------
-	/*
 	FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
-	FairParRootFileIo* parIn = new FairParRootFileIo();
-	parIn->open("r3bpar.root");
+	FairParRootFileIo* parIn = new FairParRootFileIo(kTRUE);
+	parIn->open(parFile.Data());
+	rtdb->setFirstInput(parIn);
 	rtdb->print();
-	*/
+
+
+
 	// -----  Analysis routines for CALIFA	
-	
-	fRun->SetInputFile("r3bsim.root");
-	fRun->SetOutputFile("califaAna.root");
-	
-	//fRun->LoadGeometry(); //Needed for what??
-	
 	R3BCaloHitFinder* caloHF = new R3BCaloHitFinder();
 	//Selecting the geometry version
 	// 0- CALIFA 5.0, including BARREL and ENDCAP.
@@ -76,17 +70,21 @@ void califaAna(Int_t nEvents = 1) {
 	// 6- CALIFA 7.09+7.17, (ongoing work)
 	// 10- CALIFA 8.00, (ongoing work) 
 	// ...
-	caloHF->SelectGeometryVersion(15);          
-	caloHF->SetDetectionThreshold(0.000050);//50 KeV
-	caloHF->SetExperimentalResolution(5.);  //5% at 1 MeV
-	caloHF->SetAngularWindow(3.2,3.2);      //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
+	// 16- CALIFA 8.11 + cc0.2 (ongoing work)
+	caloHF->SelectGeometryVersion(16);   
+	caloHF->SetClusteringAlgorithm(1,0);
+	caloHF->SetDetectionThreshold(0.000050);  //50 KeV
+	caloHF->SetExperimentalResolution(6.);    //6% at 1 MeV
+	caloHF->SetComponentResolution(.25);      //sigma = 0.25 MeV
+	caloHF->SetPhoswichResolution(3.,5.);     //percent @ 1 MeV for LaBr and LaCl 
+	caloHF->SetAngularWindow(3.2,3.2);        //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
 
 	fRun->AddTask(caloHF);
 	
 	// Number of events to process
 	Int_t nEvents = 100000;
 
-	fRun->Init();                     
+	fRun->Init();  
 	fRun->Run(0, nEvents);
 	
 	// -----   Finish   -------------------------------------------------------
