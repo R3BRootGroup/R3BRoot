@@ -18,8 +18,8 @@ void califaUnpack_batch(TString inputFile, Int_t firstFileNumber, Int_t lastFile
     TStopwatch timer;
     timer.Start();
     
-    TString inDir = "";   // directory with lmd files
-    TString outDir = "";  // output directory
+    TString inDir = "./data/run336/";   // directory with lmd files
+    TString outDir = "./data/run336/";  // output directory
 
     TString inputFileName = inDir + inputFile + ".lmd";                       // name of input file
     TString outputFileName = outDir + inputFile + "_raw.root";                // name of output file
@@ -35,18 +35,19 @@ void califaUnpack_batch(TString inputFile, Int_t firstFileNumber, Int_t lastFile
     }
     
     // CALIFA MBS parameters ------------parameters -------------------
-/*
+
    Short_t type = 100; // CALIFA in included in the general day
    Short_t subType = 10000;
    Short_t procId = 2;
    Short_t subCrate = 2;
    Short_t control = 9;
-*/
+    /*
     Short_t type = 10; // CALIFA at the beginning of the experiment 
     Short_t subType = 1;
     Short_t procId = 1;
     Short_t subCrate = -1;
     Short_t control = 9;
+    */
     source->AddUnpacker(new R3BCaloUnpack("", type, subType, procId, subCrate, control));
     // ------------------------------------------------------
 

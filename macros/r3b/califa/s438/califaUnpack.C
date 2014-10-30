@@ -25,8 +25,8 @@ void run(TString inputFile, Int_t firstFileNumber, Int_t lastFileNumber, Int_t n
     TStopwatch timer;
     timer.Start();
     
-    TString inDir = "./data/totcal/";   // directory with lmd files
-    TString outDir = "./data/totcal/";  // output directory
+    TString inDir = "./data/run296/";   // directory with lmd files
+    TString outDir = "./data/run296/";  // output directory
 
     TString inputFileName = inDir + inputFile + ".lmd";                       // name of input file
     TString outputFileName = outDir + inputFile + "_raw.root";                // name of output file

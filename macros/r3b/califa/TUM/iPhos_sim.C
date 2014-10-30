@@ -19,7 +19,7 @@ Int_t iPhos_sim(){
   gROOT->LoadMacro(macro_r3ball.Data());
   
   // Input files
-  TString EventFile = "gamma_events.dat";
+  TString EventFile = "doesn't matter";
 
   // Output files
   TString OutFile = "testsim.root";
@@ -41,7 +41,9 @@ Int_t iPhos_sim(){
   // CALIFA generator:          "gammas"
   // R3B spec. generator:       "r3b"
   // Events from file:          "ascii"
-  TString fGene="gammas";
+  // p2p events from file:      "p2p"
+  
+  TString fGene="ascii";
   
   //-------------------------------------------------
   // Secondaries  generation (G4 only)

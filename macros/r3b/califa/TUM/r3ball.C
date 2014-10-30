@@ -313,10 +313,10 @@ void r3ball(Int_t nEvents = 1,
 	
   if (fGenerator.CompareTo("gammas") == 0  ) {
 	// 2- Define the CALIFA Test gamma generator
-	Double_t pdgId=22; // gamma emission
-	//Double_t pdgId=2212; // proton emission
-	Double_t theta1= 7.;  // polar angle distribution
-	Double_t theta2= 45.;	
+	//Double_t pdgId=22; // gamma emission
+	Double_t pdgId=2212; // proton emission
+	Double_t theta1= 10.;  // polar angle distribution
+	Double_t theta2= 40.;	
 	//Double_t theta2= 90.;	
 	//Double_t momentum=0.002; // 0.010 GeV/c = 10 MeV/c 
 	Double_t momentumI=0.002; // 0.010 GeV/c = 10 MeV/c 
@@ -390,7 +390,11 @@ void r3ball(Int_t nEvents = 1,
 	  primGen->AddGenerator(pR3bGen);
   }
 
-
+  if (fGenerator.CompareTo("p2p") == 0  ) {
+    R3Bp2pGenerator* gen = new R3Bp2pGenerator("/home/username/r3broot/input/p2p/build/quasi.out");
+    primGen->AddGenerator(gen);
+  }
+  
   run->SetGenerator(primGen);
 
 

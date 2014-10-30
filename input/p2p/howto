@@ -1,0 +1,32 @@
+In info/info.hh change the energy, beta, events, etc, as you please.
+mkdir build
+cd build
+cmake ../
+make
+./qfs
+
+The output is quasi.root and quasi.out (a text file). 
+
+Uses Valerii Panin's code, in turn based on the QFS fortran code by Leonid Chulkov.
+
+You can use the quasi.out as an input for the R3Bp2pGenerator.
+
+To use, for example
+
+cd r3broot/macros/r3b/califa/TUM
+
+In iPhos_sim.C
+
+  TString fGene="p2p";
+
+In r3ball.C
+
+  if (fGenerator.CompareTo("p2p") == 0  ) {
+    R3Bp2pGenerator* gen = new R3Bp2pGenerator("$VMCWORKDIR/input/p2p/build/quasi.out");
+    primGen->AddGenerator(gen);
+  }
+  
+  root -l iPhos_sim.C
+  
+  
+
