@@ -143,12 +143,12 @@ Bool_t R3BDBLmdFileInfo::getParams(FairParamList* list)
 
   Double_t starttime;
   if (!list->fill("start_time", &starttime)) { return kFALSE; }
-  timespec_t start_t ={starttime,0};
-  fStartTime = ValTimeStamp(start_t); 
+  timespec_t start_t ={(time_t)starttime,0};
+  fStartTime = ValTimeStamp(start_t);
 
   Double_t endtime;
   if (!list->fill("end_time", &endtime)) { return kFALSE; }
-  timespec_t end_t ={endtime,0};
+  timespec_t end_t ={(time_t)endtime,0};
   fEndTime = ValTimeStamp(end_t); 
 
   if (!list->fill("time_offset", &fOffsetTime)) { return kFALSE; }

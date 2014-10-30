@@ -87,7 +87,7 @@ Bool_t R3BDBRunInfo::getParams(FairParamList* list)
   if (!list->fill("run_id", &fRunId)) { return kFALSE; }
   Double_t epoch_sec;
   if (!list->fill("run_time", &epoch_sec)) { return kFALSE; }
-  timespec_t value ={epoch_sec,0};
+  timespec_t value ={(time_t)epoch_sec,0};
   fRunTime = ValTimeStamp(value); 
 
   return kTRUE;
