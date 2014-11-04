@@ -47,9 +47,9 @@ void run()
 	r1.SetSeed(0);
 
 	//Output text file for R3BROOT event generator
-	ofstream outfile;
+	ofstream outfile,outfile_ascii;
 	outfile.open("quasi.out");
-
+	outfile_ascii.open("quasi_ascii.out");
 	char tooutfile[300];
 
 	int events = 0;//generated event counter
@@ -161,11 +161,17 @@ void run()
 
 	//	outfile << PBx/1000 << "\t" << PBy/1000 << "\t" << PBz_lab/1000 << "\t" <<P1x/1000 << "\t"<< P1y/1000 << "\t" << P1z/1000 << "\t"<< P2x/1000 << "\t" << P2y/1000 <<  "\t" << P2z/1000 << "\n"; // Panin's new format
 	
-	    sprintf(tooutfile,"\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\n", P2x, P2y, P2z, P1x, P1y, P1z, PBx, PBy, PBz_lab, MA-Mi-MB, E1, theta_1, phi_1, E2, theta_2, phi_2, EB, theta_B, phi_B, Mandelstam_S, Mandelstam_T);   
-	    
-	    // I am most unsure of MA-Mi-MB.. (BP)
+	//
 
-		outfile << tooutfile; // An attempt to recreate Chulkov's old format for the R3Bp2pgen input.
+         Double_t P3F = sqrt(PA*PA + P1L.Mag2() - 2*PA*P1L.Z());
+         Double_t A   = MA*MA - 2*EA*sqrt(Mi*Mi + P1L.Mag2()) + 2*PA*P1L.Z();
+         Double_t B   = A + 2*Mi*Mi;
+         Double_t QUATER = B + sqrt(B*B + 4*Mi*Mi*P3F*P3F - A*A);
+         Double_t ARAMISS = sqrt(QUATER) - MA;
+
+	    sprintf(tooutfile,"\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\n", P2x, P2y, P2z, P1x, P1y, P1z, PBx, PBy, PBz_lab, MA-Ma-MB, E1, theta_1, phi_1, E2, theta_2, phi_2, EB, theta_B, phi_B, ARAMISS, Mandelstam_T); 
+
+		outfile << tooutfile; // Emulate Chulkov's old format for the R3Bp2pgen input.
 
 		tree->Fill();
         events++;
