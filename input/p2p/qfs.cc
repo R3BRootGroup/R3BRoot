@@ -33,6 +33,8 @@ void run()
 	const double gA = 1/sqrt(1-bA*bA);	      	     // Gamma of the beam
 	const double S_first = (EA+Mi)*(EA+Mi) - PA*PA;      // Invariant mass (A+i) (Mandelstam S)
 
+	double target_depth;
+
 	cout << "\n****** Beam parameters ********" << endl;
 	cout << "Total momentum:\t" << PA << " MeV" << endl;
 	cout << "Total energy:\t"   << EA << " MeV" << endl;
@@ -159,27 +161,33 @@ void run()
 	
 		if(events%10000==0) cout<< events <<" of "<<MAX_STORY<<" ("<<(float)events/MAX_STORY*100<<"%)"<<endl;	
 
-	//	outfile << PBx/1000 << "\t" << PBy/1000 << "\t" << PBz_lab/1000 << "\t" <<P1x/1000 << "\t"<< P1y/1000 << "\t" << P1z/1000 << "\t"<< P2x/1000 << "\t" << P2y/1000 <<  "\t" << P2z/1000 << "\n"; // Panin's new format
-	
-	//
+	// the new R3BAsciiGenerator wants this as an input:
+	// eventId >> nTracks >> pBeam >> b;
+	// iPid  >> iZ >> iA >> px >> py >> pz >> vx >> vy >> vz >> iMass;
 
-         Double_t P3F = sqrt(PA*PA + P1L.Mag2() - 2*PA*P1L.Z());
-         Double_t A   = MA*MA - 2*EA*sqrt(Mi*Mi + P1L.Mag2()) + 2*PA*P1L.Z();
-         Double_t B   = A + 2*Mi*Mi;
-         Double_t QUATER = B + sqrt(B*B + 4*Mi*Mi*P3F*P3F - A*A);
-         Double_t ARAMISS = sqrt(QUATER) - MA;
+        target_depth= (double) r1.Uniform(-2.5,2.5); // 5cm thick target
 
-	    sprintf(tooutfile,"\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\n", P2x, P2y, P2z, P1x, P1y, P1z, PBx, PBy, PBz_lab, MA-Ma-MB, E1, theta_1, phi_1, E2, theta_2, phi_2, EB, theta_B, phi_B, ARAMISS, Mandelstam_T); 
+	sprintf(tooutfile,"%d\t2\t%0.5E\t0\n2212\t1\t1\t%0.5E\t%0.5E\t%0.5E\t0\t0\t%0.5E\t0\n2212\t1\t1\t%0.5E\t%0.5E\t%0.5E\t0\t0\t%0.5E\t0\n",events,PA/1000,P2x/1000,P2y/1000,P2z/1000,target_depth,P1x/1000,P1y/1000,P1z/1000,target_depth);
 
-		outfile << tooutfile; // Emulate Chulkov's old format for the R3Bp2pgen input.
+	outfile_ascii << tooutfile; // create an input for the R3BAsciiGenerator
 
-		tree->Fill();
+        Double_t P3F = sqrt(PA*PA + P1L.Mag2() - 2*PA*P1L.Z());
+        Double_t A   = MA*MA - 2*EA*sqrt(Mi*Mi + P1L.Mag2()) + 2*PA*P1L.Z();
+        Double_t B   = A + 2*Mi*Mi;
+        Double_t QUATER = B + sqrt(B*B + 4*Mi*Mi*P3F*P3F - A*A);
+        Double_t ARAMISS = sqrt(QUATER) - MA;
+
+	sprintf(tooutfile,"\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\n", P2x, P2y, P2z, P1x, P1y, P1z, PBx, PBy, PBz_lab, MA-Ma-MB, E1, theta_1, phi_1, E2, theta_2, phi_2, EB, theta_B, phi_B, ARAMISS, Mandelstam_T); 
+
+	outfile << tooutfile; // Emulate Chulkov's old format for the R3Bp2pgen input
+
+	tree->Fill();
         events++;
 
 		}
 	
 	outfile.close();
-
+	outfile_ascii.close();
 	//tree->Print();
 	tree->AutoSave();
 	file.Close();
