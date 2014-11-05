@@ -122,8 +122,8 @@ Int_t r3bsim(){
    //- N# of Sim. Events   |    nEvents     (Int_t)
    //-------------------------------------------------
 
-  //Int_t nEvents = 10;
-  Int_t nEvents = 10000;
+  Int_t nEvents = 10;
+  //Int_t nEvents = 100000;
        //Int_t nEvents = 20000;
 
    //-------------------------------------------------

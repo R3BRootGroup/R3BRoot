@@ -296,10 +296,12 @@ void r3ball(Int_t nEvents = 1,
 	// 2- Define the CALIFA Test gamma generator
 	//Double_t pdgId=22; // gamma emission
 	Double_t pdgId=2212; // proton emission
-	//Double_t theta1= 7.;  // polar angle distribution
-	//Double_t theta2= 130.;	
-	Double_t theta1= 60.;  // polar angle distribution
-	Double_t theta2= 60.;	
+	Double_t theta1= 5.;  // polar angle distribution
+	Double_t theta2= 105.;	
+	//Double_t theta1= 5.3;  // polar angle distribution
+	//Double_t theta2= 5.39;	
+	//Double_t theta1= 100.;  // polar angle distribution
+	//Double_t theta2= 105.;	
 	//Double_t theta1= 7.;  // polar angle distribution	
 	//Double_t theta2= 100.;	
 	//Double_t theta2= 90.;	
@@ -324,10 +326,12 @@ void r3ball(Int_t nEvents = 1,
 	gammasGen->SetCosTheta();
 	gammasGen->SetPRange(momentum,momentum);
 	//gammasGen->SetPRange(momentumI,momentumF);
-	gammasGen->SetPhiRange(0.,360.);
+	//gammasGen->SetPhiRange(0.,360.);
+	gammasGen->SetPhiRange(269.,301.);
+	//gammasGen->SetPhiRange(269.,275.);
 	//gammasGen->SetXYZ(0.0,0.0,-1.5);
 
-	//gammasGen->SetXYZ(0.0,0.0,0.0);
+	gammasGen->SetXYZ(0.0,0.0,0.0);
 	//
 	//gammasGen->SetBoxXYZ(Xmin,Ymin,Zmin,Xmax,Ymax,Zmax)
 
@@ -336,7 +340,8 @@ void r3ball(Int_t nEvents = 1,
 
 	//gammasGen->SetBoxXYZ(-1.,1.,-1.,1.,-0.0005,0.0005);  // 10um CH2 target thick
 	//gammasGen->SetBoxXYZ(-1.,-1.,-0.29,1.,1.,0.29);  // 5.8 mm CH2 target thick
-	gammasGen->SetBoxXYZ(-1.,-1.,0.,1.,1.,0.);  // infinitively thin CH2 target thick + 2cm beam spot
+
+	//gammasGen->SetBoxXYZ(-0.1,-0.1,0.,0.1,0.1,0.);  // infinitively thin CH2 target thick + 2mm beam spot
 
 	//gammasGen->SetBoxXYZ(-1.,-1.,-0.29,1.,1.,0.29);  // 5.8 mm CH2 target thick
 	//gammasGen->SetLorentzBoost(0.8197505718204776); //beta=0.81975 for 700 A MeV

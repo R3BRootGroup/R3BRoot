@@ -105,6 +105,7 @@ void RecResults(char* output) {
 	TH1F *EnergyDeltaE = new TH1F("EnergyDeltaE","Energy distribution of delta electrons",200,0.,2.);  // 0 to 2 MeV
 	TH1F *ELossMiddl = new TH1F("ELossMiddl","Energy loss in middle detector",100,0.,1.);
 	TH1F *ELossOuter = new TH1F("ELossOuter","Energy loss in outer detector",100,0.,1.);
+	TH2F *StripNStripP = new TH2F("Strip-n_Strip-p","G ",2100,0.,2100., 2100,0.,2100.);
 	
 	//For p2p case:
 	TH1F *AngTheta1 = new TH1F("AngTheta1","G ",180,0.,180.);
@@ -344,10 +345,13 @@ void RecResults(char* output) {
 	Double_t Length2  = 33.83875 ; // cm
 	//Double_t WidthMax2  = 10.4 ; // cm
 	Double_t WidthMax2  = 10.80295 ; // cm
+	//WidthMax2  =  WidthMax2-2*Guard2; // cm
 	//Double_t WidthMin2  = 1.3 ; // cm
-	Double_t WidthMin2  = 1.1406 ; // cm
+	Double_t WidthMin2  = 1.1406 ; // cm ; full physical width
+	//WidthMin2=WidthMin2-2*Guard2; // Active Area min witdh
 	//Double_t StripPitch2= 0.005 ; // = 50 um
 	Double_t StripPitch2= 0.00385 + 0.0012 + 0.0001 + 0.00007; // = 51.5 um    
+	//Double_t StripPitch2= 0.00385 + 0.0012; // = 50.5 um    
 	Double_t InclAng2=32.155; // deg    
 	Double_t Rmin2=2.22;    // cm
 	Double_t AngRangeMin2=5.3;// deg    
@@ -355,6 +359,8 @@ void RecResults(char* output) {
 	Double_t StepZ2= StripPitch2/sin(AngTrap2) ; // step along the z axis of the detector (in xz plan)
 	Double_t StepX2= StripPitch2/cos(AngTrap2) ; // step along the x axis of the detector (in xz plan)
 	Int_t    NbStrip2   = int(WidthMax2/StepX2); //
+	cout << "AngTrap2= " << AngTrap2 << endl;
+	cout << "StepX2= " << StepX2 << endl;
 	cout << "NbStrip2= " << NbStrip2 << endl;
 	Double_t Xlab2, Ylab2, Zlab2;  // see trunk/tracker/R3BTra.cxx
 	Xlab2=0;
@@ -1243,6 +1249,8 @@ void RecResults(char* output) {
 			Theta->Fill(Theta_track[j]);
 			Phi->Fill(Phi_track[j]);
 			ELossMiddl->Fill(ELoss[j]*1000);
+
+			StripNStripP->Fill(Stripfrt[j], Stripbck[j]);
 			
 			if(ELoss[j]>0.00004) TrkMult_Middl40++;
 			
@@ -1672,6 +1680,8 @@ void RecResults(char* output) {
   StripB_Middl40->Write();
   StripA_Outer40->Write();
   StripB_Outer40->Write();
+
+  StripNStripP->Write();
 
   Theta->Write();
   Phi->Write();
