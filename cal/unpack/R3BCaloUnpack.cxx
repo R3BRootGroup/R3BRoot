@@ -205,9 +205,9 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
     UShort_t cfd_samples[4]; 
     UShort_t loverflow;
     UShort_t hoverflow;
-    UInt_t   overflow;
+    UInt_t   overflow = 0;
     UShort_t self_triggered;
-    UShort_t num_pileup;
+    UShort_t num_pileup = 0;
     UShort_t num_discarded;
     Int_t energy;                   // 32 bits, to accomodate old version 16-bits unsigned and new-version 16-bit signed
     //    UShort_t reserved;

@@ -15,9 +15,9 @@ using std::flush;
 R3BCaloCrystalHit::R3BCaloCrystalHit()
   : FairMultiLinkedData(),
     fEnergy(-1.),
-    fToT_Energy(-1.),
     fNf(-1.),
     fNs(-1.),
+    fToT_Energy(-1.),
     fTime(-1.),
     fCrystalId(-1)
 {
@@ -30,9 +30,9 @@ R3BCaloCrystalHit::R3BCaloCrystalHit()
 R3BCaloCrystalHit::R3BCaloCrystalHit(Int_t ident, Double_t energy, Double_t Nf, Double_t Ns, Double_t time, Double_t tot_energy) 
   : FairMultiLinkedData(),
     fEnergy(energy),
-    fToT_Energy(tot_energy),
     fNf(Nf),
     fNs(Ns),
+    fToT_Energy(tot_energy),
     fTime(time),
     fCrystalId(ident)
 {
@@ -44,9 +44,9 @@ R3BCaloCrystalHit::R3BCaloCrystalHit(Int_t ident, Double_t energy, Double_t Nf, 
 R3BCaloCrystalHit::R3BCaloCrystalHit(const R3BCaloCrystalHit& right)
   : FairMultiLinkedData(right),
     fEnergy(right.fEnergy),
-    fToT_Energy(right.fToT_Energy),
     fNf(right.fNf),
     fNs(right.fNs),
+    fToT_Energy(right.fToT_Energy),
     fTime(right.fTime),
     fCrystalId(right.fCrystalId)
 {
