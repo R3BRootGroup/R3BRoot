@@ -1,5 +1,6 @@
 #include "R3BLosTCalPar.h"
 
+#include "db_detector_def.h"
 #include "FairDbLogFormat.h"
 #include "FairDbLogService.h"
 #include "FairDbOutTableBuffer.h"         // for FairDbOutRowStream
