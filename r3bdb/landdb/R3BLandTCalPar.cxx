@@ -161,7 +161,7 @@ void R3BLandTCalPar::fill(UInt_t rid)
 
   // Define a Context
   ValTimeStamp ts(rid);
-  ValCondition context(Detector::kLand,DataType::kData,ts);
+  ValCondition context(FairDbDetector::EDetector::kLand,DataType::kData,ts);
 
   // Activate reading for this Context
   fParam_Reader->Activate(context, GetVersion());

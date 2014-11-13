@@ -137,7 +137,7 @@ void R3BDBRunInfo::fill(UInt_t rid)
 
   // Define a Context
   ValTimeStamp ts(rid);
-  ValCondition context(Detector::kLand,DataType::kData,ts);
+    ValCondition context(FairDbDetector::EDetector::kLand,DataType::kData,ts);
 
   // Activate reading for this Context
   fParam_Reader->Activate(context, GetVersion());
@@ -404,7 +404,7 @@ Bool_t R3BDBRunInfo::Commit()
   sqlcolv << ", TIMEEND ";
   sqlvalv << ",'" << tsEnd.AsString("s") << "'";
   sqlcolv << ", DETID ";
-  sqlvalv << "," << Detector::kLand;
+    sqlvalv << "," << FairDbDetector::EDetector::kLand;
   sqlcolv << ", DATAID ";
   sqlvalv << "," << DataType::kData;
   sqlcolv << ", VERSION ";
@@ -438,11 +438,11 @@ Bool_t R3BDBRunInfo::Commit()
   
   char tmpbuf[1024];
   sprintf(tmpbuf,"Insert R3B RUN for Detector: %c%8.8d ",
-          Detector::AsString(Detector::kUnknown)[0],fRunId);
+          FairDbDetector::AsString(FairDbDetector::EDetector::kUnknown)[0],fRunId);
 
   DBLOG("FairDb",FairDbLog::kInfo)
     << tmpbuf
-    << " rm/in " 
+    << " rm/in "
     << nrm << "," << nrmv << "/"
     << ninsert << "," << ninsertv 
     << endl;

@@ -230,7 +230,7 @@ void R3BCaloAPDLabPar::fill(UInt_t rid)
 
   // Define a Context
   ValTimeStamp ts(rid);
-  ValCondition context(Detector::kCal,DataType::kData,ts);
+  ValCondition context(FairDbDetector::EDetector::kCal,DataType::kData,ts);
 
   // Activate reading for this Context
   fParam_Reader->Activate(context, GetVersion());

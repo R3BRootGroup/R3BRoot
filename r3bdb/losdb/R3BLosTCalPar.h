@@ -83,7 +83,7 @@ using TObject::Compare;
 
     // Validity frame definition
     virtual ValCondition GetContext(UInt_t rid) {
-      return ValCondition(Detector::kLos,
+        return ValCondition(FairDbDetector::EDetector::kLos,
                           DataType::kData,
                           ValTimeStamp((Double_t) rid));
     }

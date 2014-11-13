@@ -68,7 +68,7 @@ void R3BLosCalPar::fill(UInt_t rid){
   time_t shift = ts.GetSec() + 60;
   ValTimeStamp    end(shift,0);
   cout << " DATE of RETRIEVAL " << end.AsString("s") << endl;
-  ValCondition context(Detector::kLos,DataType::kData,end);
+  ValCondition context(FairDbDetector::EDetector::kLos,DataType::kData,end);
 
   // Activate reading for this Context
   r_tpar->Activate(context, GetVersion());

@@ -251,7 +251,7 @@ void R3BDBLmdFileInfo::fill(UInt_t rid)
 
   // Define a Context
   ValTimeStamp ts(rid);
-  ValCondition context(Detector::kLand,DataType::kData,ts);
+  ValCondition context(FairDbDetector::EDetector::kLand,DataType::kData,ts);
 
   // Activate reading for this Context
   fParam_Reader->Activate(context, GetVersion());
@@ -572,7 +572,7 @@ Bool_t R3BDBLmdFileInfo::Commit()
   sqlcolv << ", TIMEEND ";
   sqlvalv << ",'" << tsEnd.AsString("s") << "'";
   sqlcolv << ", DETID ";
-  sqlvalv << "," << Detector::kLand;
+  sqlvalv << "," << FairDbDetector::EDetector::kLand;
   sqlcolv << ", DATAID ";
   sqlvalv << "," << DataType::kData;
   sqlcolv << ", VERSION ";
@@ -606,7 +606,7 @@ Bool_t R3BDBLmdFileInfo::Commit()
   
   char tmpbuf[1024];
   sprintf(tmpbuf,"Insert R3B FILE for Detector: %c%8.8d ",
-          Detector::AsString(Detector::kLand)[0],fFileId);
+          FairDbDetector::AsString(FairDbDetector::EDetector::kLand)[0],fFileId);
 
   DBLOG("FairDb",FairDbLog::kInfo)
     << tmpbuf

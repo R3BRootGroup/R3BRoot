@@ -157,7 +157,7 @@ void R3BLosTCalPar::fill(UInt_t rid)
 
   // Define a Context
   ValTimeStamp ts(rid);
-  ValCondition context(Detector::kLos,DataType::kData,ts);
+  ValCondition context(FairDbDetector::EDetector::kLos,DataType::kData,ts);
 
   // Activate reading for this Context
   fParam_Reader->Activate(context, GetVersion());
