@@ -1,7 +1,6 @@
 #include "R3BLandCalPar.h"
 
 
-#include "db_detector_def.h"
 #include "FairDbLogFormat.h"
 #include "FairDbLogService.h"
 #include "FairDbOutTableBuffer.h"         // for FairDbOutRowStream
@@ -69,7 +68,7 @@ void R3BLandCalPar::fill(UInt_t rid){
   time_t shift = ts.GetSec() + 60;
   ValTimeStamp    end(shift,0);
   cout << " DATE of RETRIEVAL " << end.AsString("s") << endl;
-  ValCondition context(FairDbDetector::EDetector::kLand,DataType::kData,end);
+  ValCondition context(FairDbDetector::kLand,DataType::kData,end);
 
   // Activate reading for this Context
   r_tpar->Activate(context, GetVersion());

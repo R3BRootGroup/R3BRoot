@@ -1,6 +1,5 @@
 #include "R3BLandTCalPar.h"
 
-#include "db_detector_def.h"
 #include "FairDbLogFormat.h"
 #include "FairDbLogService.h"
 #include "FairDbOutTableBuffer.h"         // for FairDbOutRowStream
@@ -162,7 +161,7 @@ void R3BLandTCalPar::fill(UInt_t rid)
 
   // Define a Context
   ValTimeStamp ts(rid);
-  ValCondition context(FairDbDetector::EDetector::kLand,DataType::kData,ts);
+  ValCondition context(FairDbDetector::kLand,DataType::kData,ts);
 
   // Activate reading for this Context
   fParam_Reader->Activate(context, GetVersion());
