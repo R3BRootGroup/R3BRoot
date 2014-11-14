@@ -107,7 +107,7 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
     UInt_t WRlb = UInt_t(( ((wr2[0] & 0x00000fff) << 16) + (wr1[0] & 0x0000ffff) )); // 28 bits: 0-27
     // + wr3[0] << 32 + wr2[0] << 16 + wr1[0];
 
-    long long WR = WRhb1 << 48 + WRhb2 << 28 + WRlb;
+    long long WR = WRhb1 << (48 + WRhb2) << (28 + WRlb);
     
     // initialisation of ts_hb1 and 2 as this is not done in the Si Tracker DAQ unless word 10 appear with 4&5 or 7&8 info codes.
 
@@ -225,7 +225,7 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 		  if(info_code == 4 || info_code == 7) ts_hb2=info_field; 
 		  if(info_code == 5 || info_code == 8) ts_hb1=info_field;
 		  //if(ts_hb1 && ts_hb2)
-		    ts=ts_hb1 << 48 + ts_hb2 << 28 + ts_lb;
+		    ts=ts_hb1 << (48 + ts_hb2) << (28 + ts_lb);
 		  
 
 		  if(info_code == 14) tsExt_hb2=info_field; // high bit (47:28) time from the external Master
@@ -233,7 +233,7 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 		  if(info_code == 14 || info_code == 15){
 		    tsExt_lb = (pl_data[(l_s+1)] & 0x0FFFFFFF); // low bit timestamp from master trigger  (To be checked)
 		    //if(tsExt_hb1 && tsExt_hb2) 
-		      tsExt=tsExt_hb1 << 48 + tsExt_hb2 << 28 + tsExt_lb;  // full timestamp from Master trigger
+		      tsExt=tsExt_hb1 << (48 + tsExt_hb2) << (28 + tsExt_lb);  // full timestamp from Master trigger
 		  }
 
 		  ts_hb= (ts_hb1 << 20) + ts_hb2;
@@ -325,7 +325,7 @@ Bool_t R3BStarTrackUnpack::DoUnpack2(Int_t *data_word0, Int_t *data_word1, Int_t
 	
 	
 	// Check the trailer: reject or keep the block.
-	///*if( (*data_word0 & 0xFFFFFFFF) == 0xFFFFFFFF ||
+	//if( (*data_word0 & 0xFFFFFFFF) == 0xFFFFFFFF ||
 	//  (*data_word1 & 0xFFFFFFFF) == 0xFFFFFFFF) {
 	//  // this marks the point after which there is no more good data in the block_main
 	//  // log_file << "End of block " << itr_1 << std::endl; 
