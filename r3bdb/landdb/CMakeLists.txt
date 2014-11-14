@@ -32,6 +32,7 @@ ${FAIRROOTPATH}/include/FairDbWriter.h
 
 set(LINKDEF R3BLandLinkDef.h)
 Set(LIBRARY_NAME R3BLandDB)
+Set(DEPENDENCIES Base)
 
 
 GENERATE_LIBRARY()
