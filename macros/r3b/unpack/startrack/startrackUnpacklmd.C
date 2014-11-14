@@ -32,7 +32,8 @@
   //source->AddFile("/MIDAS/R3B/GSITest2014/lmd/run007_0018.lmd");  // !! Si + internal pulse  with Type =104, SubType=10400
   //source->AddFile("/MIDAS/R3B/GSITest2014/lmd/run006_0016.lmd");  // !! Si only with Type =104, SubType=10400
   //source->AddFile("/MIDAS/R3B/GSITest2014/lmd/sit272_2186.lmd");  // !! Si only empty target with Type =104, SubType=10400
-  source->AddFile("/MIDAS/R3B/GSITest2014/lmd/run280_3364.lmd");  // !! Si only with Type =104, SubType=10400
+  source->AddFile("/MIDAS/R3B/GSITest2014/lmd/run280_3364.lmd");  // !! Si only with Type =104, SubType=10400  - C target
+  //source->AddFile("/scratch/xry76555/R3B-data/GSIdata/run290_3777.lmd");  // !! Si only with Type =104, SubType=10400  - CH2 target
   //source->AddFile("/MIDAS/R3B/GSITest2014/lmd/sitracker_stripped.lmd");  // !! Si only with Type =104, SubType=10400
  
 //  char* strCalDir = "/home/work/example/";
