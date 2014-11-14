@@ -32,6 +32,7 @@ ${FAIRROOTPATH}/include/FairDbWriter.h
 
 set(LINKDEF R3BLosLinkDef.h)
 Set(LIBRARY_NAME R3BLosDB)
+Set(DEPENDENCIES Base)
 
 
 GENERATE_LIBRARY()
