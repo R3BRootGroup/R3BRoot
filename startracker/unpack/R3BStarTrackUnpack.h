@@ -40,6 +40,7 @@ class R3BStarTrackUnpack : public FairUnpack {
  private:
   TClonesArray *fRawData;
   Int_t         fNHits;
+  Int_t         nblock;
 
 
     // The information is split into 2 words of 32 bits (4 byte).
@@ -51,6 +52,36 @@ class R3BStarTrackUnpack : public FairUnpack {
     UInt_t word_0B; 
     UInt_t word_1B;
  
+
+   UInt_t wordtype;  // 
+    UInt_t info_field;
+    UInt_t info_code;
+    
+    //UInt_t ts_vhb;
+    ULong_t ts_vhb;  // to be used if Time stamp is reconstructed in the unpacker (otherwise UInt_t is sufficient)
+    //UInt_t ts_hb;
+    ULong_t ts_hb;   // to be used if Time stamp is reconstructed in the unpacker (otherwise UInt_t is sufficient)
+    UInt_t ts_lb;
+    UInt_t ts_lb_part1;
+    UInt_t ts_lb_part2;
+    UInt_t ts_lb_part2_inv;
+    UInt_t ts_lb_part3;
+    //long long ts=0;
+    
+    // Time information from an external input (ie: other than Si tracker)
+    UInt_t tsExt_vhb; // 63:48 in Si (16 bits)
+    UInt_t tsExt_hb; // 47:28 in Si (20 bits) 
+    UInt_t tsExt_lb; // 27:0 in Si (28 bits)	   
+    //long long tsExt=0;	   
+    
+    UInt_t hitbit; // real values are: 0 or 1
+    UInt_t module_id;  // module id, real values are  1 to 30
+    UInt_t side; // real values are  0 or 1 
+    UInt_t asic_id;    // Chip id, real values are 0 to 15
+    UInt_t strip_id;   // strip id, real values are 0 to 127
+    UInt_t adcData;  // adc value for energy loss in Si
+    
+
 
  public:
   //Class definition

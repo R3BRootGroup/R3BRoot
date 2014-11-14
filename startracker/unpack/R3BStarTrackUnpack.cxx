@@ -6,7 +6,6 @@
 // -----                                                                   -----
 // -----------------------------------------------------------------------------
 
-
 //ROOT headers
 #include "TClonesArray.h"
 #include "TH1F.h"
@@ -84,6 +83,8 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
   LOG(INFO) << "R3BSTaRTrackUnpack : Unpacking... size = "  << size << FairLogger::endl;
 
   UInt_t l_s = 0;
+  Int_t nInfo4 = 0;
+  Int_t nInfo5 = 0;
  
   UInt_t* pl_data = (UInt_t*)(data + l_s); // let's find 0x00000200 
   
@@ -102,12 +103,12 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
     //  WRlb:  Wr low bits time stamp in header
     //  WR:    WR time stamp in header
     //WRhb = UInt_t( ((wr4[0] & 0x00000fff) << 16) + ((wr3[0] & 0x0000ffff) << 4) + ((wr2[0] & 0x0000f000) >> 12) ); // bits: 28-59
-    UInt_t WRhb1 = UInt_t((wr4[0] & 0x0000ffff)); // bits: 48-63
-    UInt_t WRhb2 = UInt_t( ((wr3[0] & 0x0000ffff) << 4) + ((wr2[0] & 0x0000f000) >> 12) ); // 20 bits: 28-47
+    UInt_t WRvhb = UInt_t((wr4[0] & 0x0000ffff)); // bits: 48-63
+    UInt_t WRhb = UInt_t( ((wr3[0] & 0x0000ffff) << 4) + ((wr2[0] & 0x0000f000) >> 12) ); // 20 bits: 28-47
     UInt_t WRlb = UInt_t(( ((wr2[0] & 0x00000fff) << 16) + (wr1[0] & 0x0000ffff) )); // 28 bits: 0-27
     // + wr3[0] << 32 + wr2[0] << 16 + wr1[0];
 
-    long long WR = WRhb1 << (48 + WRhb2) << (28 + WRlb);
+    //long long WR = (WRhb1 << 48) + (WRhb2 << 28) + WRlb;
     
     // initialisation of ts_hb1 and 2 as this is not done in the Si Tracker DAQ unless word 10 appear with 4&5 or 7&8 info codes.
 
@@ -135,6 +136,33 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 	//LOG(INFO) << "R3BSTaRTrackUnpack :   size:" << l_da_siz << FairLogger::endl;	
     //}
 
+    /*
+    UInt_t wordtype;  // 
+    UInt_t info_field;
+    UInt_t info_code;
+    
+    UInt_t ts_vhb=0;
+    UInt_t ts_hb=0;
+    UInt_t ts_lb=0;
+    UInt_t ts_lb_part1=0;
+    UInt_t ts_lb_part2=0;
+    UInt_t ts_lb_part2_inv=0;
+    UInt_t ts_lb_part3=0;
+    //long long ts=0;
+    
+    // Time information from an external input (ie: other than Si tracker)
+    UInt_t tsExt_vhb=0; // 63:48 in Si (16 bits)
+    UInt_t tsExt_hb=0; // 47:28 in Si (20 bits) 
+    UInt_t tsExt_lb=0; // 27:0 in Si (28 bits)	   
+    //long long tsExt=0;	   
+    
+    UInt_t hitbit=0; // real values are: 0 or 1
+    UInt_t module_id=0;  // module id, real values are  1 to 30
+    UInt_t side=0; // real values are  0 or 1 
+    UInt_t asic_id=0;    // Chip id, real values are 0 to 15
+    UInt_t strip_id=0;   // strip id, real values are 0 to 127
+    UInt_t adcData=0;  // adc value for energy loss in Si
+    */
 
     if( pl_data[0]==0x00000200)
       {
@@ -143,37 +171,62 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 	  	  
 	  //pl_data = (UInt_t*)(data + l_s);
 	  
-	  UInt_t wordtype;  // 
-	  UInt_t info_field;
-	  UInt_t info_code;
-	  
-	  UInt_t ts_hb1;
-	  UInt_t ts_hb2;
-	  UInt_t ts_hb;
-	  UInt_t ts_lb;
-	  long long ts;
-	  
-	  // Time information from an external input (ie: other than Si tracker)
-	  UInt_t tsExt_hb1; // 63:48 in Si (16 bits)
-	  UInt_t tsExt_hb2; // 47:28 in Si (20 bits)
-	  UInt_t tsExt_hb ; // in Si
-	  UInt_t tsExt_lb; // 27:0 in Si (28 bits)	   
-	  long long tsExt; //	   
-	  
-	  UInt_t hitbit;
-	  UInt_t module_id;  // module id
-	  UInt_t side;
-	  UInt_t asic_id;    // Chip id
-	  UInt_t strip_id;   // strip id 
-	  UInt_t adcData;  // adc value for energy loss in Si
-	  
-	  for (Int_t i1 = 0; i1 < 2; i1++)   // 2 words to read.
-	    { 
+	  //for (Int_t i1 = 0; i1 < 2; i1++)   
+	  //{ 
 
-	      if( ( ( (pl_data[l_s] >> 30) & 0x3) == 0x3) && ( ((pl_data[l_s] & 0xFFFFFFFF) != 0xFFFFFFFF)))  
+	      if( ( ( (pl_data[l_s] >> 30) & 0x3) == 0x2) && ( ((pl_data[l_s] & 0xFFFFFFFF) != 0xFFFFFFFF)))  
 		{ 
 		  
-		  //LOG(INFO) << " pl_data: " <<  ((pl_data[l_s] >> 30) & 0x3)  << FairLogger::endl;
+
+		  wordtype = (pl_data[l_s] >> 30) & 0x3; // bit 31:30
+		  
+		  //info_code = (pl_data[l_s] >> 20) & 0x0000000F; //bits 20:23
+		  
+		  info_code = (pl_data[l_s] & 0x00F00000) >> 20; //bits 20:23
+		  
+		  info_field =  (pl_data[l_s]) & 0x000FFFFF; //20 bits: 0-19;
+		  
+		  //tsExt_lb = (pl_data[(l_s+1)] & 0x0FFFFFFF); // low bit timestamp from master trigger  (To be checked)
+		  
+		  if(info_code == 4 || info_code == 7) ts_hb=info_field; 
+		  if(info_code == 5 || info_code == 8) ts_vhb=info_field;
+		  //if(info_code == 7) ts_hb=info_field; 
+		  //if(info_code == 8) ts_vhb=info_field;
+	      
+		  //ts= (ts_hb1 << 48) + (ts_hb2 << 28) + ts_lb;
+
+		  if(info_code == 14) tsExt_hb=info_field; // high bit (47:28) time from the external Master
+		  if(info_code == 15) tsExt_vhb=info_field; // high bit (63:48)time from the external Master
+		  if(info_code == 14 || info_code == 15)
+		    {
+		      tsExt_lb = (pl_data[(l_s+1)] & 0x0FFFFFFF); // low bit timestamp from master trigger  (To be checked)
+		    }
+
+		  //tsExt= (tsExt_hb1 << 48) + (tsExt_hb2 << 28) + tsExt_lb;  // full timestamp from Master trigger
+
+		  //if(info_code==4)nInfo4++;
+		  //if(info_code==5)nInfo5++;
+
+		  l_s +=2;
+
+		  //new ((*fRawData)[fNHits]) R3BStarTrackRawHit(WR,WRlb, wordtype, hitbit, module_id, side, asic_id, strip_id, adcData, ts, ts_lb, tsExt, tsExt_lb,info_field, info_code);
+		  //fNHits++;
+		  new ((*fRawData)[fNHits]) R3BStarTrackRawHit(WRvhb,WRhb,WRlb, wordtype, hitbit, module_id, side, asic_id, strip_id, adcData, ts_vhb, ts_hb, ts_lb, tsExt_vhb, tsExt_hb, tsExt_lb,info_field, info_code);
+		  fNHits++;
+
+		  //
+		  // reseting in order to check that the same number of time info_code=4 (7,14) and info code = 5 (8,15)
+		  // 
+		  info_code=0;
+		  info_field=0;
+		  tsExt_lb=tsExt_hb=tsExt_vhb=0;
+		  ts_hb=0;
+		  ts_vhb=0;
+
+		}else if(((pl_data[l_s] >> 30) & 0x3) == 0x3 && ( (pl_data[l_s] & 0xFFFFFFFF) != 0xFFFFFFFF ))
+		{
+
+		  //LOG(INFO) << " pl_data[l_s]: " <<  ((pl_data[l_s] >> 30) & 0x3)  << FairLogger::endl;
 		  
 		  //LOG(INFO) << "R3BSTaRTrackUnpack :   wordB :" <<  (pl_data[l_s] & 0xC0000000) << FairLogger::endl;
 		  
@@ -189,71 +242,81 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 		  
 		  UInt_t ADCchanIdent=  (pl_data[l_s] >> 12) & 0x0001FFFF; //17 bits after a shift of 12 bit
 		  
-		  module_id = (ADCchanIdent >> 12) & 0x0000001F;
+		  module_id = ((ADCchanIdent >> 12) & 0x0000001F) + 0x1  ;  // not adding 0x1 t from 1 to 30
 		  
-		  side = (ADCchanIdent >> 11) & 0x00000001;
+		  side = ((ADCchanIdent >> 11) & 0x00000001) +  0x1; // adding 0x1 to have real values from 1 to 2
+ 
+		  // Do the following test only for the S438 test run (GSI Oct. 2014), please put in comments otherwise
+		  if(side==0x1){  
+		    adcData= ((~(adcData)) & 0x00000FFF) ;  // we invert all adcData bit and take the last 12 bits only
+		  }
+
 		  
-		  asic_id = (ADCchanIdent >> 7) & 0x0000000F;
+		  asic_id = ((ADCchanIdent >> 7) & 0x0000000F) +  0x1; // adding 0x1 to have real values from 1 to 16
 		  
-		  strip_id = ADCchanIdent & 0x0000007F;
+		  strip_id = (ADCchanIdent & 0x0000007F) +  0x1; // adding 0x1 to have real values from 1 to 128
 		  
-		  ts_lb= pl_data[l_s+1] & 0x0FFFFFFF;  // low bit time stamp in Silicon
+
+		  
+		  // if S438 data (Oct 2014 data): 
+		  //cout << "ts_init=" << pl_data[l_s+1] << endl;
+ 		  ts_lb_part1 = pl_data[l_s+1] & 0x00000003; //take the 2 first less significant  bits;
+		  //cout << "ts_lb_part1=" << ts_lb_part1 << endl;
+		  ts_lb_part2= (pl_data[l_s+1] >> 2) & 0x00000FFF; // take the 12 bits after a shift of 2 bits
+		  //cout << "ts_lb_part2=" << ts_lb_part2 << endl;
+		  ts_lb_part2_inv=  (~(ts_lb_part2)) & 0x00000FFF; // invert and take only the first 12 inverted bits;
+		  //cout << "ts_lb_part2_inv=" << ts_lb_part2_inv << endl;
+		  ts_lb_part3 = pl_data[l_s+1] & 0x0FFFC000; //from bit 14 to 27;
+		  //cout << "ts_lb_part3=" << ts_lb_part3 << endl;
+		  ts_lb= (((ts_lb_part3 >> 2) + ts_lb_part2_inv) << 2)  + ts_lb_part1 ;
+		  //cout << "ts_lb end=" << ts_lb << endl;
+		  
+		  // if not S438 data (ie after Oct 2014):
+		  //ts_lb= pl_data[l_s+1] & 0x0FFFFFFF;  // low bit time stamp in Silicon
+
+	          //LOG(INFO) << "R3BSTaRTrackUnpack :   pl_data[ls+1]:" << pl_data[l_s+1] << FairLogger::endl;
 		  
 		  l_s +=2;	  
 		  
 		  //LOG(DEBUG) << "R3BStartrackerUnpack : Strip_ID IS " << strip_id << ",  Chip ID IS " << asic_id << " , Ladder ID IS " << module_id << " , ADC Data IS " << adcData << FairLogger::endl;
 		  //new ((*fRawData)[fNHits]) R3BStarTrackRawHit(module_id, side, asic_id, strip_id, adcData, lclock);
 		  
-		  //new ((*fRawData)[fNHits]) R3BStarTrackRawHit(wordtype, hitbit, module_id, side, asic_id, strip_id, adcData, lclock);
 		  //new ((*fRawData)[fNHits]) R3BStarTrackRawHit(wordtype, hitbit, module_id, side, asic_id, strip_id, adcData, ts2);
 		  //new ((*fRawData)[fNHits]) R3BStarTrackRawHit(WRhb2,WRlb, wordtype, hitbit, module_id, side, asic_id, strip_id, adcData, ts_hb, ts_lb,tsExt_hb , tsExt_lb,info_field, info_code);
-		  new ((*fRawData)[fNHits]) R3BStarTrackRawHit(WR,WRlb, wordtype, hitbit, module_id, side, asic_id, strip_id, adcData, ts, ts_lb, tsExt, tsExt_lb,info_field, info_code);
+		  //new ((*fRawData)[fNHits]) R3BStarTrackRawHit(WR,WRlb, wordtype, hitbit, module_id, side, asic_id, strip_id, adcData, ts, ts_lb, tsExt, tsExt_lb,info_field, info_code);
+		  //fNHits++;
+
+		  new ((*fRawData)[fNHits]) R3BStarTrackRawHit(WRvhb,WRhb,WRlb, wordtype, hitbit, module_id, side, asic_id, strip_id, adcData, ts_vhb, ts_hb, ts_lb, tsExt_vhb, tsExt_hb, tsExt_lb,info_field, info_code);
 		  fNHits++;
-		  
-		}else if(((pl_data[l_s] >> 30) & 0x3) == 0x2 && ( (pl_data[l_s] & 0xFFFFFFFF) != 0xFFFFFFFF ))
-		{
-		  wordtype = (pl_data[l_s] >> 30) & 0x3; // bit 31:30
-		  
-		  //info_code = (pl_data[l_s] >> 20) & 0x0000000F; //bits 20:23
-		  
-		  info_code = (pl_data[l_s] & 0x00F00000) >> 20; //bits 20:23
-		  
-		  info_field =  (pl_data[l_s]) & 0x000FFFFF; //20 bits: 0-19;
-		  
-		  tsExt_lb = (pl_data[(l_s+1)] & 0x0FFFFFFF); // low bit timestamp from master trigger  (To be checked)
-		  
-		  if(info_code == 4 || info_code == 7) ts_hb2=info_field; 
-		  if(info_code == 5 || info_code == 8) ts_hb1=info_field;
-		  //if(ts_hb1 && ts_hb2)
-		    ts=ts_hb1 << (48 + ts_hb2) << (28 + ts_lb);
-		  
 
-		  if(info_code == 14) tsExt_hb2=info_field; // high bit (47:28) time from the external Master
-		  if(info_code == 15) tsExt_hb1=info_field; // high bit (63:48)time from the external Master
-		  if(info_code == 14 || info_code == 15){
-		    tsExt_lb = (pl_data[(l_s+1)] & 0x0FFFFFFF); // low bit timestamp from master trigger  (To be checked)
-		    //if(tsExt_hb1 && tsExt_hb2) 
-		      tsExt=tsExt_hb1 << (48 + tsExt_hb2) << (28 + tsExt_lb);  // full timestamp from Master trigger
-		  }
+		  // Resetting:
+       		  adcData=0;
+      		  ts_lb=0;
 
-		  ts_hb= (ts_hb1 << 20) + ts_hb2;
-		  //tsExt_hb=tsExt_hb2;
-		  //tsExt=tsExt_hb1 << 48 + tsExt_hb2 << 28;
 
-		  l_s +=2;
 		} else
 		{
-		  LOG(INFO) << " Warning:  Word not recognised) :";
-		  l_s++;	  
+		  LOG(INFO) << " Warning:  Word not recognised !!!  :" << FairLogger::endl;
+		  
+		    LOG(INFO) << " pl_data[l_s-2]: " <<  ((pl_data[l_s-2] ) & 0xFFFFFFFF)  << FairLogger::endl;
+		  LOG(INFO) << " pl_data[l_s-1]: " <<  ((pl_data[l_s-1] ) & 0xFFFFFFFF)  << FairLogger::endl;
+		  LOG(INFO) << " pl_data[l_s]: " <<  ((pl_data[l_s] ) & 0xFFFFFFFF)  << FairLogger::endl;
+		  LOG(INFO) << " pl_data[l_s+1]: " <<  ((pl_data[l_s+1] ) & 0xFFFFFFFF)  << FairLogger::endl;
+		  LOG(INFO) << " pl_data[l_s+2]: " <<  ((pl_data[l_s+2] ) & 0xFFFFFFFF)  << FairLogger::endl;
+		  LOG(INFO) << " pl_data[l_s+3]: " <<  ((pl_data[l_s+3] ) & 0xFFFFFFFF)  << FairLogger::endl;
+		  LOG(INFO) << " pl_data[l_s+14]: " <<  ((pl_data[l_s+14] ) & 0xFFFFFFFF)  << FairLogger::endl;
+		  LOG(INFO) << " pl_data[l_s+15]: " <<  ((pl_data[l_s+15] ) & 0xFFFFFFFF)  << FairLogger::endl;
+		  
+		  l_s++;  // move to next word	  
 		}
 	      
-	     	      
 	      
-	      
-	      
-	    }	   
+	      //}	   
 	  
-	  
+
+
+	      //cout << "NHits= "<< fNHits  << endl;	  
+	      //cout << "nInfor4= "<< nInfo4  << " nInfo5= "<< nInfo5 << endl;	  
 	}	
 	
       }

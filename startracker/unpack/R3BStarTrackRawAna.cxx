@@ -58,12 +58,12 @@ void R3BStarTrackRawAna::Exec(Option_t *option)
     thst->Fill(hit->GetStripId());
     the->Fill(hit->GetADCdata());
 
-    thts->Fill(hit->GetTime()*1e-6);
+    thts->Fill(hit->GetTimelb()*1e-6);
     //cout << "WR lb=" << hit->GetWRlb() << endl;
     //cout << "Time lb=" << hit->GetTimelb() << endl;
     //cout << "XXXXX" << endl;
     thtslbdiff->Fill((hit->GetWRlb() - hit->GetTimelb())*1e-6); // in msec
-    thtsExt->Fill(hit->GetTimeExt()*1e-6);
+    thtsExt->Fill(hit->GetTimeExtlb()*1e-6);
     thtsExtlbdiff->Fill((hit->GetTimeExtlb() - hit->GetTimelb())*1e-6);  // in msec
 
     thif->Fill(hit->GetInfoField());
