@@ -1,6 +1,7 @@
 # Create a library called "R3BLandDB" 
 
 set(INCLUDE_DIRECTORIES
+${ROOT_INCLUDE_DIR}
 ${BASE_INCLUDE_DIRECTORIES}
 ${CMAKE_SOURCE_DIR}/r3bdb/commondb
 ${CMAKE_SOURCE_DIR}/r3bdb/losdb
