@@ -98,7 +98,7 @@ void R3BCaloGeometryPar::fill(UInt_t rid){
 
   // Define a Global Context
   ValTimeStamp ts(rid);
-  ValCondition context(FairDbDetector::EDetector::kCal,DataType::kData,ts);
+  ValCondition context(FairDbDetector::kCal,DataType::kData,ts);
 
   // Activate reading for this Context
   r_mpar->Activate(context, GetVersion());

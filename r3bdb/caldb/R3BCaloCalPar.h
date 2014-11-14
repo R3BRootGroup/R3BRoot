@@ -61,7 +61,7 @@ class R3BCaloCalPar : public FairParGenericSet
     virtual void store(UInt_t rid);
 
     virtual ValCondition GetContext(UInt_t rid) {
-      return ValCondition(FairDbDetector::EDetector::kCal,
+      return ValCondition(FairDbDetector::kCal,
                           DataType::kData,
                           ValTimeStamp(rid));
     }
