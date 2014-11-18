@@ -1,11 +1,19 @@
-void r3blandreco(Int_t beamE, Int_t nn, Int_t erel, Int_t d)
+void r3blandreco(Int_t nNeutrons, Int_t beamE, Int_t Erel)
 {
+  Int_t d;
+  if(Erel == 100){
+    d = 35;
+  }
+  else{
+    d = 14;
+  }
+  
   // ----- Files ---------------------------------------------------------------
   char strDir[] = ".";
   char str[100];
   char str2[100];
-  sprintf(str, "%1dAMeV.%1dn.%1dkeV.%1dm.root", beamE,nn, erel, d);
-  sprintf(str2, "%1dAMeV.%1dkeV.%1dm", beamE, erel, d);
+  sprintf(str, "%1dAMeV.%1dn.%1dkeV.%1dm.root", beamE,nNeutrons, Erel, d);
+  sprintf(str2, "%1dAMeV.%1dkeV.%1dm", beamE, Erel, d);
   TString inFile  = TString(strDir) + "/r3bsim." + TString(str);
   TString digiFile  = TString(strDir) + "/r3bcalibr." + TString(str);
   TString parFile  = TString(strDir) + "/r3bpar." + TString(str);

@@ -1,17 +1,18 @@
-void preCalibr(Int_t beamE,Int_t nEvents=10000,  Int_t nn, Int_t erel)
+void preCalibr(Int_t nNeutrons, Int_t nEvents = 10000, Int_t beamE, Int_t Erel)
 {
-  // ----- Files ---------------------------------------------------------------
-  char strDir[] = ".";
-  
   Int_t d;
-  if(100 == erel) {
+  if(Erel == 100) {
     d = 35; 
   } else {
     d = 14;
   }
+ 
+  // ----- Files ---------------------------------------------------------------
+  char strDir[] = ".";
   
+
   char str[100];
-  sprintf(str, "%1dAMeV.%1dn.%1dkeV.%1dm.root", beamE,nn, erel, d);
+  sprintf(str, "%1dAMeV.%1dn.%1dkeV.%1dm.root", beamE,nNeutrons, Erel, d);
   TString inFile  = TString(strDir) + "/r3bsim." + TString(str);
   TString parFile  = TString(strDir) + "/r3bpar." + TString(str);
   TString outFile  = TString(strDir) + "/r3bcalibr." + TString(str);
