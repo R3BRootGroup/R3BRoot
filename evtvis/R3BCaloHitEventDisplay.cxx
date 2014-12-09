@@ -2,6 +2,7 @@
 // -----           R3BCaloHitEventDisplay source file             -----
 // --------------------------------------------------------------------
 
+
 #include "R3BCaloHitEventDisplay.h"
 
 #include "TClonesArray.h"
