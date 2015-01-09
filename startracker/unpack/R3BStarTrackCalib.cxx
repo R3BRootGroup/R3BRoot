@@ -186,7 +186,8 @@ Double32_t R3BStarTrackCalib::CalibrateTime(R3BStarTrackRawHit* chit)
   LOG(DEBUG) << "Calibrating Time in R3BStarTraCalib" << FairLogger::endl;
 
   //Implement here the time calibration based on the parameters
-  return chit->GetTimelb();
+  return chit->GetTime();
+  //return chit->GetTimelb();
 }
 
 

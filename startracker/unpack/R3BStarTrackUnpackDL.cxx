@@ -160,13 +160,20 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 
 		  UInt_t ADCchanIdent=  (pl_data[l_s] >> 12) & 0x0001FFFF; //17 bits after a shift of 12 bit
 
-		  module_id = (ADCchanIdent >> 12) & 0x0000001F;
+		  module_id = ((ADCchanIdent >> 12) & 0x0000001F) + 0x1;
 
-		  side = (ADCchanIdent >> 11) & 0x00000001;
+		  side = ((ADCchanIdent >> 11) & 0x00000001) + 0x1;
 
-		  asic_id = (ADCchanIdent >> 7) & 0x0000000F;
+		  asic_id = ((ADCchanIdent >> 7) & 0x0000000F) + 0x1;
 
-		  strip_id = ADCchanIdent & 0x0000007F;
+		  strip_id = (ADCchanIdent & 0x0000007F) + 0x1;
+
+		  // Do the following test only for the S438 test run (GSI Oct. 2014), please put in comments otherwise
+		  if(side==0x1){  
+		    adcData= ((~(adcData)) & 0x00000FFF) ;  // we invert all adcData bit and take the last 12 bits only
+		  }
+
+
 
 	     }else if(((pl_data[l_s] >> 30) & 0x3) == 0x2 && ( (pl_data[l_s] & 0xFFFFFFFF) != 0xFFFFFFFF ))
 	     {
@@ -241,14 +248,14 @@ Bool_t R3BStarTrackUnpack::DoUnpack2(Int_t *data_word0, Int_t *data_word1, Int_t
 
   wordtype = (*data_word0 >> 30) & 0x3; // bit 31:30
 
-  if(wordtype==2) LOG(INFO) << "Words type 2(10) or 3(11)=" << wordtype << FairLogger::endl;
+  //if(wordtype==2) LOG(INFO) << "Words type 2(10) or 3(11)=" << wordtype << FairLogger::endl;
 
   // Check if word_0 begins with:
   // - 10 then is type A word. 
   // - 11 then is type B word.
 
-  //while(l_s < size) {
-  //  l_s++;
+  while(l_s < size) {
+    l_s++;
 
       // A (10):
       if ( (*data_word0 & 0xC0000000)==0x80000000 && ( ((*data_word0 & 0xFFFFFFFF) != 0xFFFFFFFF) && ((*data_word1 & 0xFFFFFFFF) != 0xFFFFFFFF)) ){
@@ -257,8 +264,8 @@ Bool_t R3BStarTrackUnpack::DoUnpack2(Int_t *data_word0, Int_t *data_word1, Int_t
 	word_0A=*pl_data_word0;
 	word_1A=*pl_data_word1;
 	
-	while(l_s < size) {
-	l_s++;
+	//while(l_s < size) {
+	//l_s++;
 	
 	
 	// Check the trailer: reject or keep the block.
@@ -274,14 +281,24 @@ Bool_t R3BStarTrackUnpack::DoUnpack2(Int_t *data_word0, Int_t *data_word1, Int_t
 	
 	info_field = word_0A & 0x000FFFFF; //bits 0:19
 	info_code = (word_0A >> 20) & 0x0000000F; //bits 20:23
-	module_id = (word_0A >> 24) & 0x0000003F; //bits 24:29   
+	module_id = ((word_0A >> 24) & 0x0000003F) + 0x1; //bits 24:29   
 	
 	// Extract time stamp.
 	timestamp =  (unsigned long) (word_1A & 0x0FFFFFFF);
 	
 	// LOG(INFO) << "Info_field " << info_field <<  FairLogger::endl; 
 	
-	}  // end of while(l_s<size)
+	//}  // end of while(l_s<size)
+
+	new ((*fRawData)[fNHits]) R3BStarTrackRawHit(wordtype, hitbit, module_id, side, asic_id, channel_id, energy, timestamp, info_field, info_code);
+	fNHits++;
+	//
+	// reseting in order to check that the same number of time info_code=4 (7,14) and info code = 5 (8,15)
+	// 
+	info_code=0;
+	info_field=0;
+	timestamp=0;
+	//module_id=0;
 
       } //end of A word case
 
@@ -293,8 +310,8 @@ Bool_t R3BStarTrackUnpack::DoUnpack2(Int_t *data_word0, Int_t *data_word1, Int_t
 	word_1B=*pl_data_word1;
 	
  
-	while(l_s < size) {
-	l_s++;
+	//while(l_s < size) {
+	//l_s++;
       
 	// Check the trailer: reject or keep the block.
 	/*
@@ -325,31 +342,41 @@ Bool_t R3BStarTrackUnpack::DoUnpack2(Int_t *data_word0, Int_t *data_word1, Int_t
 	
 	// Extract channel id.
 	// From word_2: 7 bits (12-18). 
-	channel_id = (word_0B & 0x0007F000) >> 12;
+	channel_id = ((word_0B & 0x0007F000) >> 12) + 0x1;
 	
 	// Extract ASIC id.
 	// From word_2: 4bits (19-22).
-	asic_id = (word_0B & 0x00780000) >> 19;
+	asic_id = ((word_0B & 0x00780000) >> 19) + 0x1;
 	
 	// Extract Side.
 	// From word_2: 1 bit (23).
-	side = (word_0B & 0x00800000) >> 23;
+	side = ((word_0B & 0x00800000) >> 23) +0x1;
 	
 	// Extract module id.
 	// From word_2 bits 23-28.
 	//module_id = (word_0B & 0x1F800000) >> 23;
 	// From word_2: 5 bits (24-28).
-	module_id = (word_0B & 0x1F000000) >> 24;
+	module_id = ((word_0B & 0x1F000000) >> 24) + 0x1;
 	
 	// Extract hit bit .
 	// From word_2: bit 29.
 	hitbit = (word_0B & 0x20000000) >> 29;
 	
-	} // end of while(l_s<size) for B
+	          //Do the following test only for the S438 test run (GSI Oct. 2014), please put in comments otherwise
+		  if(side==0x2){  
+		    energy= ((~(energy)) & 0x00000FFF) ;  // we invert all adcData bit and take the last 12 bits only
+		  }
 
- 
+	new ((*fRawData)[fNHits]) R3BStarTrackRawHit(wordtype, hitbit, module_id, side, asic_id, channel_id, energy, timestamp, info_field, info_code);
+	fNHits++;
+
+	// } // end of while(l_s<size) for B
+
+
       } // end of B word case
    
+
+  
 	    //LOG(INFO) << " --------- event " << FairLogger::endl
     LOG(DEBUG) << " --------- event " << FairLogger::endl
     << "        hitbit " << hitbit << FairLogger::endl
@@ -363,10 +390,10 @@ Bool_t R3BStarTrackUnpack::DoUnpack2(Int_t *data_word0, Int_t *data_word1, Int_t
     
     //new ((*fRawData)[fNHits]) R3BStarTrackRawHit(channel_id, asic_id, module_id, energy, timestamp);
     //new ((*fRawData)[fNHits]) R3BStarTrackRawHit(wordtype, hitbit, module_id, side, asic_id, channel_id, energy, timestamp);
-    new ((*fRawData)[fNHits]) R3BStarTrackRawHit(wordtype, hitbit, module_id, side, asic_id, channel_id, energy, timestamp, info_field, info_code);
-    fNHits++;
+    //new ((*fRawData)[fNHits]) R3BStarTrackRawHit(wordtype, hitbit, module_id, side, asic_id, channel_id, energy, timestamp, info_field, info_code);
+    //fNHits++;
  
-  
+  } // end of while(l_s<size)
   
   LOG(DEBUG) << "End of memory" << FairLogger::endl;
   LOG(DEBUG) << "R3BStarTrackUnpack: Number of Si Tracker raw hits: " << fNHits << FairLogger::endl;
