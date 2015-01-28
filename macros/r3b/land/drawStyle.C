@@ -1,6 +1,14 @@
 // drawStyle.C
 // Set the drawing style of different objects
 
+#include "TH2.h"
+#include "TH1.h"
+#include "TProfile.h"
+#include "TPaveText.h"
+#include "TPaveLabel.h"
+#include "TLegend.h"
+#include "TSystem.h"
+#include "TStyle.h"
 
 void Style(TH2* h, const char *xTitle, const char *yTitle)
 {
@@ -83,7 +91,7 @@ void Style(TLegend *p)
 
 
 
-TPstyle()
+void TPstyle()
 {
   //////////////////////////////////////////////////////////////////////
   //
