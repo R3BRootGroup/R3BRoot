@@ -247,7 +247,7 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 		  side = ((ADCchanIdent >> 11) & 0x00000001) +  0x1; // adding 0x1 to have real values from 1 to 2
  
 		  // Do the following test only for the S438 test run (GSI Oct. 2014), please put in comments otherwise
-		  if(side==0x2){  
+		  if(side==0x1){  
 		    adcData= ((~(adcData)) & 0x00000FFF) ;  // we invert all adcData bit and take the last 12 bits only
 		  }
 

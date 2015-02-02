@@ -14,19 +14,16 @@
 class TClonesArray;
 
 
-//static const UInt_t gosip_header_size = 16;
-//static const UInt_t gosip_sub_header_size = 8;
-//static const Int_t  event_t_size = 44;
-//static const Int_t  trace_head_t_size = 8;
-
-
 class R3BStarTrackUnpack : public FairUnpack {
  public:
   //Constructor
   R3BStarTrackUnpack(char *strCalDir,
-                Short_t type = 0, Short_t subType = 0,
-                Short_t procId = 0,
-                Short_t subCrate = -1, Short_t control = 0);
+                Short_t type = 104, Short_t subType = 10400,
+                Short_t procId = 1,
+                Short_t subCrate = 0, Short_t control = 37);
+
+  // Type, SubTypde, procId, subcrate, control are parameters that are unique to the Silicon Tracker.
+
   
   //Destructor
   virtual ~R3BStarTrackUnpack();
@@ -34,7 +31,7 @@ class R3BStarTrackUnpack : public FairUnpack {
   //Fair specific
   virtual Bool_t Init();
   virtual Bool_t DoUnpack(Int_t* data, Int_t size);
-  virtual Bool_t DoUnpack2(Int_t* data_wd0, Int_t* data_wd1, Int_t size);
+  //virtual Bool_t DoUnpack2(Int_t* data_wd0, Int_t* data_wd1, Int_t size);
   virtual void Reset();
     
  protected:
@@ -43,6 +40,7 @@ class R3BStarTrackUnpack : public FairUnpack {
  private:
   TClonesArray *fRawData;
   Int_t         fNHits;
+  Int_t         nblock;
 
 
     // The information is split into 2 words of 32 bits (4 byte).
@@ -54,6 +52,36 @@ class R3BStarTrackUnpack : public FairUnpack {
     UInt_t word_0B; 
     UInt_t word_1B;
  
+
+   UInt_t wordtype;  // 
+    UInt_t info_field;
+    UInt_t info_code;
+    
+    //UInt_t ts_vhb;
+    ULong_t ts_vhb;  // to be used if Time stamp is reconstructed in the unpacker (otherwise UInt_t is sufficient)
+    //UInt_t ts_hb;
+    ULong_t ts_hb;   // to be used if Time stamp is reconstructed in the unpacker (otherwise UInt_t is sufficient)
+    UInt_t ts_lb;
+    UInt_t ts_lb_part1;
+    UInt_t ts_lb_part2;
+    UInt_t ts_lb_part2_inv;
+    UInt_t ts_lb_part3;
+    //long long ts=0;
+    
+    // Time information from an external input (ie: other than Si tracker)
+    UInt_t tsExt_vhb; // 63:48 in Si (16 bits)
+    UInt_t tsExt_hb; // 47:28 in Si (20 bits) 
+    UInt_t tsExt_lb; // 27:0 in Si (28 bits)	   
+    //long long tsExt=0;	   
+    
+    UInt_t hitbit; // real values are: 0 or 1
+    UInt_t module_id;  // module id, real values are  1 to 30
+    UInt_t side; // real values are  0 or 1 
+    UInt_t asic_id;    // Chip id, real values are 0 to 15
+    UInt_t strip_id;   // strip id, real values are 0 to 127
+    UInt_t adcData;  // adc value for energy loss in Si
+    
+
 
  public:
   //Class definition

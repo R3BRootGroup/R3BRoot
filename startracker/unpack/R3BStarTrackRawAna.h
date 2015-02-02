@@ -39,9 +39,9 @@ private:
   TH1F *thst;
   TH1F *the;
   TH1F *thts;
-  //TH1F *thtslbdiff;
-  //TH1F *thtsExt;
-  //TH1F *thtsExtlbdiff;
+  TH1F *thtslbdiff;
+  TH1F *thtsExt;
+  TH1F *thtsExtlbdiff;
   TH1F *thif;
   TH1F *thic;
   
