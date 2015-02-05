@@ -36,6 +36,8 @@ double fun1(double *x, double *par)
 // ----------------------------------------------------------------------------
 R3BLandDigitizer::R3BLandDigitizer()
 : FairTask("R3B Land Digitization scheme"),
+f1(new TF1("f1", fun1, 0., 1000., 2)),
+fRnd(new TRandom3()),
 fThreshFileName(""),
 fNChannels(0)
 {
@@ -149,8 +151,8 @@ InitStatus R3BLandDigitizer::Init()
     tf->close();
   } else {
     for(Int_t i = 0; i < 5000; i++) {
-      threshL[i] = 1.;
-      threshR[i] = 1.;
+      threshL[i] = 0.;
+      threshR[i] = 0.;
     }
   }
   
