@@ -51,8 +51,6 @@ Bool_t R3BLandMapping::DoMapping()
     std::string stringFromFile;
     char l_char[9];
     std::string m_string;
-    char stmp[4];
-    Int_t tmp;
     Int_t i_sam;
     Int_t i_gtb;
     Int_t i_tac_addr;
@@ -60,10 +58,9 @@ Bool_t R3BLandMapping::DoMapping()
     Int_t i_plane;
     Int_t i_bar;
     Int_t i_side;
-    char not_used_1[10];
-    char not_used_2[31];
     ifstream infile;
-
+    Int_t n17 = 0;
+    
     if (fname != NULL)
     {
         LOG(INFO) << "Opened File Name is =" << GetFileName() << FairLogger::endl;
@@ -87,76 +84,48 @@ Bool_t R3BLandMapping::DoMapping()
 
             if (m_string == "SIG_BEAM")
             {
-                sscanf(stringFromFile.c_str(),
-                       "%s NNP%d_%d_%d, %31c SAM%d_GTB%d_TAC%d, %d, %4s",
-                       not_used_1,
-                       &i_plane,
-                       &i_bar,
-                       &i_side,
-                       not_used_2,
-                       &i_sam,
-                       &i_gtb,
-                       &i_tac_addr,
-                       &i_tac_ch,
-                       stmp);
+                TString str = TString(stringFromFile.c_str());
+                
+                Int_t pos = str.Index("NNP");
+                char *sub_str = & ( ((char*)str.Data())[pos] );
+                sub_str[10] = '\0';
+                sscanf(sub_str, "NNP%d_%d_%d", &i_plane, &i_bar, &i_side);
+                
+                pos = str.Index("SAM");
+                sub_str = & ( ((char*)str.Data())[pos] );
+                sub_str[20] = '\0';
+                sscanf(sub_str, "SAM%d_GTB%d_TAC%d , %d", &i_sam, &i_gtb, &i_tac_addr, &i_tac_ch);
                 
                 LOG(INFO) << " PLANE = " << i_plane << ";  BAR = " << i_bar << "; SIDE = " << i_side << ";"
-                          << " SAM = " << i_sam << ";  GTB = " << i_gtb << ";  TAC ADDR = " << i_tac_addr << "; TAC CH = " << i_tac_ch << "; " << stmp
+                          << " SAM = " << i_sam << ";  GTB = " << i_gtb << ";  TAC ADDR = " << i_tac_addr << "; TAC CH = " << i_tac_ch << "; "
                           << FairLogger::endl;
 
-                if (16 == i_plane)
-                {
-                    continue;
-                }
-
-                v1map.insert(v1map.begin() + nMappedElements, i_tac_addr);
-                v2map.insert(v2map.begin() + nMappedElements, i_tac_ch - 1);
-                v3map.insert(v3map.begin() + nMappedElements, i_sam);
-                v4map.insert(v4map.begin() + nMappedElements, i_gtb);
-                v5map.insert(v5map.begin() + nMappedElements, (i_plane - 1) * fNofBarsPerPlane + i_bar);
-                v6map.insert(v6map.begin() + nMappedElements, i_side);
+                Int_t index = 1000000*i_sam + 10000*i_gtb + 100*i_tac_addr + (i_tac_ch-1);
+                v1map[index] = (i_plane - 1) * fNofBarsPerPlane + i_bar;
+                v2map[index] = i_side;
                 nMappedElements++;
                 
-                // Read 17-th channel
-                if ('S' == stmp[0])
+                if (-1 == str.Index("NONE"))
                 {
-                    sscanf(stringFromFile.c_str(),
-                           "%s NNP%d_%d_%d, %31c SAM%d_GTB%d_TAC%d, %d, SAM%d_GTB%d_TAC%d, %d",
-                           not_used_1,
-                           &i_plane,
-                           &i_bar,
-                           &i_side,
-                           not_used_2,
-                           &tmp,
-                           &tmp,
-                           &tmp,
-                           &tmp,
-                           &i_sam,
-                           &i_gtb,
-                           &i_tac_addr,
-                           &i_tac_ch);
+                    n17 += 1;
+                    pos = str.Index("SAM", pos+1);
+                    sub_str = & ( ((char*)str.Data())[pos] );
+                    sub_str[20] = '\0';
+                    sscanf(sub_str, "SAM%d_GTB%d_TAC%d , %d", &i_sam, &i_gtb, &i_tac_addr, &i_tac_ch);
                     
                     LOG(INFO) << " PLANE = " << i_plane << ";  BAR = " << i_bar << "; SIDE = " << i_side << ";"
-                    << " SAM = " << i_sam << ";  GTB = " << i_gtb << ";  TAC ADDR = " << i_tac_addr << "; TAC CH = " << i_tac_ch << "; " << stmp
+                    << " SAM = " << i_sam << ";  GTB = " << i_gtb << ";  TAC ADDR = " << i_tac_addr << "; TAC CH = " << i_tac_ch << "; "
                     << FairLogger::endl;
                     
-                    if (16 == i_plane)
-                    {
-                        continue;
-                    }
-                    
-                    v1map.insert(v1map.begin() + nMappedElements, i_tac_addr);
-                    v2map.insert(v2map.begin() + nMappedElements, i_tac_ch - 1);
-                    v3map.insert(v3map.begin() + nMappedElements, i_sam);
-                    v4map.insert(v4map.begin() + nMappedElements, i_gtb);
-                    v5map.insert(v5map.begin() + nMappedElements, -1);
-                    v6map.insert(v6map.begin() + nMappedElements, -1);
-                    nMappedElements++;
+                    index = 1000000*i_sam + 10000*i_gtb + 100*i_tac_addr + (i_tac_ch-1);
+                    v1map[index] = -1;
+                    v2map[index] = -1;
                 }
             }
         }
         infile.close();
         LOG(INFO) << "Total Mapped Elements = " << nMappedElements << FairLogger::endl;
+        LOG(INFO) << "n17 = " << n17 << FairLogger::endl;
     }
     else
     {
@@ -168,45 +137,61 @@ Bool_t R3BLandMapping::DoMapping()
 
 void R3BLandMapping::Exec(Option_t* option)
 {
+    fLandHit->Clear();
+    nEntry = 0;
     // -------- Paddle identification ----------------------
     Int_t nHits = fRawData->GetEntries();
     R3BLandRawHit* hit;
-    Int_t tacData;
-    Int_t qdcData;
-    Int_t tacaddr;
-    Int_t tach;
+    
     Int_t sam;
     Int_t gtb;
-    Int_t clock;
+    Int_t tacaddr;
+    Int_t tach;
     Int_t cal;
+    Int_t clock;
+    Int_t tacData;
+    Int_t qdcData;
+    
     Bool_t is17;
+    Int_t barId;
+    Int_t side;
     for (Int_t i = 0; i < nHits; i++)
     {
         hit = (R3BLandRawHit*)fRawData->At(i);
-        tacData = hit->GetTacData();
-        qdcData = hit->GetQdcData();
-        tacaddr = hit->GetTacAddr();
         sam = hit->GetSam();
         gtb = hit->GetGtb();
+        tacaddr = hit->GetTacAddr();
         tach = hit->GetTacCh();
-        clock = hit->GetClock();
         cal = hit->GetCal();
-        for (Int_t j = 0; j < v1map.size(); j++)
+        clock = hit->GetClock();
+        tacData = hit->GetTacData();
+        qdcData = hit->GetQdcData();
+        Int_t index = 1000000*sam + 10000*gtb + 100*tacaddr + tach;
+        if(16 == tach)
         {
-            if (v1map[j] == tacaddr && v2map[j] == tach && v3map[j] == sam && v4map[j] == gtb)
+            is17 = kTRUE;
+        }
+        else
+        {
+            is17 = kFALSE;
+        }
+        barId = -2;
+        side = -2;
+        if(v1map.find(index) != v1map.end() && v2map.find(index) != v2map.end())
+        {
+            barId = v1map[index];
+            side = v2map[index];
+        }
+        
+        if(barId != -2 && side != -2)
+        {
+            if((barId == -1 && side == -1) && !is17)
             {
-                LOG(DEBUG) << " [I] < > TACADDR = " << v1map[j] << " < > TACCH = " << v2map[j] << " Bar Id =" << v5map[j] << " Side = " << v6map[j] << FairLogger::endl;
-                if (16 == tach)
-                { // 17-th channel
-                    is17 = kTRUE;
-                }
-                else
-                { // physics channel
-                    is17 = kFALSE;
-                }
-                new ((*fLandHit)[nEntry]) R3BLandRawHitMapped(sam, gtb, tacaddr, cal, clock, tacData, qdcData, v5map[j], v6map[j], is17);
-                nEntry++;
+                LOG(INFO) << tach << "  " << is17 << "  " << barId << "  " << side << FairLogger::endl;
+                FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Illegal barId");
             }
+            new ((*fLandHit)[nEntry]) R3BLandRawHitMapped(sam, gtb, tacaddr, cal, clock, tacData, qdcData, barId, side, is17);
+            nEntry++;
         }
     }
     if (nEntry > 0 && 0 == (fnEvents%1000))

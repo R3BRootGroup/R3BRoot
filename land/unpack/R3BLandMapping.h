@@ -9,7 +9,7 @@
 #ifndef R3BLAND_MAPPING_H
 #define R3BLAND_MAPPING_H
 
-#include <vector>
+#include <map>
 
 #include "FairTask.h"
 
@@ -51,12 +51,8 @@ class R3BLandMapping : public FairTask
     TClonesArray* fRawData;
     TClonesArray* fLandHit;
     Int_t nEntry;
-    std::vector<Int_t> v1map;
-    std::vector<Int_t> v2map;
-    std::vector<Int_t> v3map;
-    std::vector<Int_t> v4map;
-    std::vector<Int_t> v5map;
-    std::vector<Int_t> v6map;
+    std::map<Int_t, Int_t> v1map;
+    std::map<Int_t, Int_t> v2map;
     Bool_t DoMapping();
 
   public:
