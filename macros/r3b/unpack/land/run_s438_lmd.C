@@ -7,7 +7,7 @@ void run(TString runNumber)
     const Int_t nev = -1;                               // number of events to read, -1 - untill CTRL+C
     TString inDir = "/Volumes/Data/kresan/s438/lmd/";   // directory with lmd files
     TString outDir = "/Volumes/Data/kresan/s438/data/"; // output directory
-    TString histDir = "/Users/kresan/webdocs/";         // web-server directory
+    TString histDir = "/Users/kresan/Sites/";           // web-server directory
 
     TString outputFileName = outDir + runNumber + "_raw.root";                 // name of output file
     TString histFileName = histDir + "hist_s438_" + runNumber + "_raw.root";   // name of file with control histograms
@@ -48,6 +48,9 @@ void run(TString runNumber)
         cout << strName << endl;
         source->AddFile(strName);
     }
+
+    R3BEventHeaderUnpack *event_unpack = new R3BEventHeaderUnpack();
+    source->AddUnpacker(event_unpack);
 
     // NeuLAND MBS parameters -------------------------------
     Short_t type = 94;
@@ -93,6 +96,7 @@ void run(TString runNumber)
     R3BLandTcalFill* tcalFill = new R3BLandTcalFill("TcalFill");
     tcalFill->SetUpdateRate(updateRate);
     tcalFill->SetMinStats(minStats);
+    tcalFill->SetTrigger(2);
     tcalFill->SetNofModules(nModules, 40);
     tcalFill->SetStoreDB(kTRUE);
     run->AddTask(tcalFill);
@@ -121,24 +125,16 @@ void run(TString runNumber)
     R3BFieldPar* fieldPar = (R3BFieldPar*)rtdb->getContainer("R3BFieldPar");
     fieldPar->SetParameters(magField);
     fieldPar->setChanged();
-
-    // Set the SQL based IO as first input
-    FairParTSQLIo* input_db = new FairParTSQLIo();
-    input_db->SetShutdown(kTRUE);
-    input_db->open();
-    rtdb->setFirstInput(input_db);
-    rtdb->setOutput(input_db);
-
     Bool_t kParameterMerged = kTRUE;
     FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
     parOut->open(parFileName);
-    rtdb->setSecondInput(parOut);
-    rtdb->saveOutput();
+    rtdb->setOutput(parOut);
     rtdb->print();
     // ---------------------------------------------------------------------------
 
     // Run -----------------------------------------------------------------------
     run->Run(nev, 0);
+    rtdb->saveOutput();
     // ---------------------------------------------------------------------------
 
     timer.Stop();

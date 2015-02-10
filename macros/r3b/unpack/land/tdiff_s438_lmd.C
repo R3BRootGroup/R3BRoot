@@ -24,13 +24,6 @@ void run(TString runNumber)
     parIo1->open(parFileName);
     rtdb->setFirstInput(parIo1);
     rtdb->setOutput(parIo1);
-
-    // Set the SQL IO as second input
-    FairParTSQLIo* inp = new FairParTSQLIo();
-    inp->SetVerbosity(1);
-    inp->open();
-    rtdb->setFirstInput(inp);
-
     rtdb->saveOutput();
     // ---------------------------------------------------------------------------
 
