@@ -11,6 +11,7 @@
 class R3BLandCalPar;
 class TClonesArray;
 class TH1F;
+class R3BEventHeader;
 
 class R3BLandTcalFill : public FairTask
 {
@@ -42,6 +43,11 @@ class R3BLandTcalFill : public FairTask
     {
         fMinStats = minStats;
     }
+    
+    inline void SetTrigger(Int_t trigger)
+    {
+        fTrigger = trigger;
+    }
 
     inline void SetNofModules(Int_t nPMTs, Int_t n17)
     {
@@ -52,6 +58,7 @@ class R3BLandTcalFill : public FairTask
   private:
     Int_t fUpdateRate;
     Int_t fMinStats;
+    Int_t fTrigger;
 
     Int_t fNofPMTs;
     Int_t fNof17;
@@ -59,12 +66,14 @@ class R3BLandTcalFill : public FairTask
     Int_t iMin;
     Int_t iMax;
     TH1F** fhData;
+    TH1F** fhData100;
     TH1F** fhTime;
 
     Int_t fNEvents;
     Bool_t fStoreDB;
     R3BLandCalPar* fCal_Par;
     TClonesArray* fHits;
+    R3BEventHeader* header;
 
     void CreateContainers();
 

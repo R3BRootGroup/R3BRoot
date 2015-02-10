@@ -5,6 +5,7 @@
 
 #include "R3BLandTcalFill.h"
 #include "R3BLandRawHitMapped.h"
+#include "R3BEventHeader.h"
 
 #include "R3BLandCalPar.h"
 #include "R3BLandTCalPar.h"
@@ -26,6 +27,7 @@ using namespace std;
 R3BLandTcalFill::R3BLandTcalFill()
     : fUpdateRate(1000000)
     , fMinStats(100000)
+    , fTrigger(0)
     , fNofPMTs(0)
     , fNof17(0)
     , fhData(NULL)
@@ -40,6 +42,7 @@ R3BLandTcalFill::R3BLandTcalFill(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fUpdateRate(1000000)
     , fMinStats(100000)
+    , fTrigger(0)
     , fNofPMTs(0)
     , fNof17(0)
     , fhData(NULL)
@@ -54,7 +57,7 @@ R3BLandTcalFill::~R3BLandTcalFill()
 {
     if (fhData)
     {
-        for (Int_t i = 0; i < (fNofPMTs + fNof17); i++)
+        for (Int_t i = 0; i < (2*fNofPMTs); i++)
         {
             delete fhData[i];
         }
@@ -63,7 +66,7 @@ R3BLandTcalFill::~R3BLandTcalFill()
     }
     if (fhTime)
     {
-        for (Int_t i = 0; i < (fNofPMTs + fNof17); i++)
+        for (Int_t i = 0; i < (2*fNofPMTs); i++)
         {
             delete fhTime[i];
         }
@@ -82,6 +85,11 @@ InitStatus R3BLandTcalFill::Init()
     {
         return kFATAL;
     }
+    header = (R3BEventHeader*) rm->GetObject("R3BEventHeader");
+    if(! header)
+    {
+        return kFATAL;
+    }
     fHits = (TClonesArray*)rm->GetObject("LandRawHitMapped");
     if (!fHits)
     {
@@ -89,8 +97,8 @@ InitStatus R3BLandTcalFill::Init()
     }
     if (fStoreDB)
     {
-
         fCal_Par = (R3BLandCalPar*)FairRuntimeDb::instance()->getContainer("LandCalPar");
+        fCal_Par->setChanged();
     }
 
     CreateContainers();
@@ -100,6 +108,11 @@ InitStatus R3BLandTcalFill::Init()
 
 void R3BLandTcalFill::Exec(Option_t* option)
 {
+    if(header->GetTrigger() != fTrigger)
+    {
+        return;
+    }
+    
     Int_t nHits = fHits->GetEntries();
     if(nHits > (fNofPMTs/2))
     {
@@ -120,11 +133,6 @@ void R3BLandTcalFill::Exec(Option_t* option)
             continue;
         }
         
-        if(hit->GetCal() != 1 && hit->GetCal() != 2)
-        {
-            continue;
-        }
-
         // Check bar ID
         iBar = hit->GetBarId();
         if ((iBar - 1) >= (fNofPMTs / 2))
@@ -142,12 +150,13 @@ void R3BLandTcalFill::Exec(Option_t* option)
         {
             // PMT signal
             iSide = hit->GetSide();
-            channel = fNofPMTs / 2 * (iSide - 1) + iBar - 1;
+            channel = (Double_t)fNofPMTs / 2 * (iSide - 1) + iBar - 1;
         }
 
         // Check validity of module
-        if (channel < 0 || channel >= (fNofPMTs + fNof17))
+        if (channel < 0 || channel >= (2*fNofPMTs))
         {
+            LOG(INFO) << "Bar:" << iBar << "  Side:" << iSide << "  " << channel << "   " << (2*fNofPMTs + fNof17) << "   " << hit->GetGtb() << FairLogger::endl;
             FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Illegal detector ID...");
         }
 
@@ -168,7 +177,8 @@ void R3BLandTcalFill::FinishTask()
 //    if (0 == (fNEvents % fUpdateRate))
     {
         // Re-calculate calibration parameters
-        for (Int_t im = 0; im < (fNofPMTs + fNof17); im++)
+//        for (Int_t im = 0; im < (fNofPMTs + fNof17); im++)
+        for (Int_t im = 0; im < (2*fNofPMTs); im++)
         {
             if (fhData[im]->GetEntries() >= fMinStats)
             {
@@ -178,11 +188,12 @@ void R3BLandTcalFill::FinishTask()
             }
         }
         
-        Int_t runId = FairRuntimeDb::instance()->getCurrentRun()->getRunId();
+//        Int_t runId = FairRuntimeDb::instance()->getCurrentRun()->getRunId();
         if (fStoreDB && fCal_Par)
         {
-            fCal_Par->Print();
-            fCal_Par->store(runId);
+            fCal_Par->setChanged();
+//            fCal_Par->Print();
+//            fCal_Par->store(runId);
         }
     }
 }
@@ -193,10 +204,14 @@ void R3BLandTcalFill::CreateContainers()
     {
         return;
     }
-    fhData = new TH1F* [fNofPMTs + fNof17];
-    fhTime = new TH1F* [fNofPMTs + fNof17];
+//    fhData = new TH1F* [fNofPMTs + fNof17];
+//    fhTime = new TH1F* [fNofPMTs + fNof17];
+    fhData = new TH1F* [2*fNofPMTs];
+    fhData100 = new TH1F* [2*fNofPMTs];
+    fhTime = new TH1F* [2*fNofPMTs];
     char str[20];
-    for (Int_t i = 0; i < (fNofPMTs + fNof17); i++)
+//    for (Int_t i = 0; i < (fNofPMTs + fNof17); i++)
+    for (Int_t i = 0; i < (2*fNofPMTs); i++)
     {
         sprintf(str, "hTcalData_%d", i);
         fhData[i] = new TH1F(str, "", 4096, 0., 4096.);
@@ -208,27 +223,38 @@ void R3BLandTcalFill::CreateContainers()
 void R3BLandTcalFill::CalculateParams(Int_t iModule)
 {
     // Define range of channels
-    for (Int_t i = 0; i < 4096; i++)
+    fhData100[iModule] = (TH1F*)fhData[iModule]->Clone();
+    fhData100[iModule]->Rebin(8);
+    for (Int_t i = 0; i < 512; i++)
     {
-        if (fhData[iModule]->GetBinContent(i + 1) > 1 && i > 1000)
+        if (fhData100[iModule]->GetBinContent(i + 1) > 0.1*fhData100[iModule]->GetMaximum())
         {
-            iMin = i;
+            iMin = i - 1;
             break;
         }
     }
-    for (Int_t j = 4096; j >= 0; j--)
+    for (Int_t j = 511; j > 0; j--)
     {
-        if (fhData[iModule]->GetBinContent(j + 1) > 1)
+        if (fhData100[iModule]->GetBinContent(j + 1) > 0.1*fhData100[iModule]->GetMaximum())
         {
-            iMax = j + 1;
-            break;
+            if(fhData100[iModule]->GetBinContent(j) > 0.1*fhData100[iModule]->GetMaximum())
+            {
+                iMax = j + 1;
+                break;
+            }
         }
     }
     if (iMax <= iMin)
     {
         return;
     }
-    LOG(DEBUG) << "R3BLandTcalFill::CalculateParams() : Range of channels: " << iMin << " - " << iMax << FairLogger::endl;
+    iMin = Int_t(((Double_t)iMin-0.5)*8);
+    iMax = Int_t(((Double_t)iMax+0.5)*8);
+    if(iMin < 0 || iMax > 4095)
+    {
+        return;
+    }
+    LOG(INFO) << "R3BLandTcalFill::CalculateParams() : Range of channels: " << iMin << " - " << iMax << FairLogger::endl;
 
     Int_t nch = 0;
     Int_t ibin = iMin;
@@ -253,7 +279,7 @@ void R3BLandTcalFill::CalculateParams(Int_t iModule)
             fhTime[iModule]->SetBinContent(i1 + 1, prev_time);
         }
 
-        cout << " Module: " << iModule << " bin range: " << ibin << " : " << ibin + group << " dbin: " << group << " time set: " << prev_time << endl;
+        LOG(DEBUG) << " Module: " << iModule << " bin range: " << ibin << " : " << ibin + group << " dbin: " << group << " time set: " << prev_time << FairLogger::endl;
 
         if (pTCal)
         {
@@ -315,7 +341,7 @@ void R3BLandTcalFill::WriteContainer(Int_t iModule)
     fhData[iModule]->Write();
     fhTime[iModule]->Write();
 
-    LOG(INFO) << "R3BLandTcalFill : TCAL container " << iModule << " is saved" << FairLogger::endl;
+    LOG(INFO) << "R3BLandTcalFill : TCAL container " << iModule << " is saved" << FairLogger::endl << FairLogger::endl;
 }
 
 ClassImp(R3BLandTcalFill)
