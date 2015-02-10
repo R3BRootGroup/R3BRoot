@@ -15,6 +15,7 @@ class TH1F;
 class TH2F;
 class R3BLandCalPar;
 class R3BLandTCalPar;
+class R3BEventHeader;
 
 class R3BLandTcal : public FairTask
 {
@@ -43,6 +44,7 @@ class R3BLandTcal : public FairTask
   private:
     Int_t fNEvents;
     std::map<Int_t, R3BLandTCalPar*> fMapPar;
+    R3BEventHeader* header;
     TClonesArray* fRawHit;
     TClonesArray* fPmt;
     Int_t fNPmt;

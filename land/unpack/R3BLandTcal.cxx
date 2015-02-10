@@ -13,6 +13,7 @@
 #include "R3BLandRawHitMapped.h"
 #include "R3BLandPmt.h"
 #include "R3BLandCalPar.h"
+#include "R3BEventHeader.h"
 
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
@@ -72,6 +73,7 @@ InitStatus R3BLandTcal::Init()
     {
         par = fTcalPar->GetTCalParAt(i);
         fMapPar[par->GetBarId()] = par;
+        par->Print();
     }
 
     FairRootManager* mgr = FairRootManager::Instance();
@@ -80,7 +82,13 @@ InitStatus R3BLandTcal::Init()
         FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
     }
     
-    fRawHit = (TClonesArray*) mgr->GetObject("LandRawHitMapped_New");
+    header = (R3BEventHeader*) mgr->GetObject("R3BEventHeader");
+    if(NULL == header)
+    {
+        FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch R3BEventHeader not found");
+    }
+    
+    fRawHit = (TClonesArray*) mgr->GetObject("LandRawHitMapped");
     if(NULL == fRawHit)
     {
         FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch LandRawHitMapped not found");
@@ -110,6 +118,11 @@ InitStatus R3BLandTcal::ReInit()
 
 void R3BLandTcal::Exec(Option_t* option)
 {
+    if(header->GetTrigger() != 2)
+    {
+        return;
+    }
+    
     Int_t nHits = fRawHit->GetEntriesFast();
     if(nHits > (fNofPMTs/2))
     {
@@ -133,21 +146,6 @@ void R3BLandTcal::Exec(Option_t* option)
         if(NULL == hit)
         {
             continue;
-        }
-        
-        if(fIsBeam)
-        {
-            if(hit->GetCal() != 1)
-            {
-                continue;
-            }
-        }
-        else
-        {
-            if(hit->GetCal() != 1 && hit->GetCal() != 2)
-            {
-                continue;
-            }
         }
         
         iBar = hit->GetBarId();
@@ -188,7 +186,7 @@ void R3BLandTcal::Exec(Option_t* option)
         gtb = hit->GetGtb();
         tacAddr = hit->GetTacAddr();
         index = hit->GetSam()*(MAX_TACQUILA_MODULE+1)*(MAX_TACQUILA_GTB+1) + gtb*(MAX_TACQUILA_MODULE+1) + tacAddr;
-        if(fMap17Seen[index])
+        if(fMap17Seen.find(index) != fMap17Seen.end())
         {
             LOG(ERROR) << "R3BLandTcal::Exec : multiple stop signal for: GTB=" << gtb << ", TacAddr=" << tacAddr << FairLogger::endl;
             continue;
@@ -205,21 +203,6 @@ void R3BLandTcal::Exec(Option_t* option)
         if(NULL == hit)
         {
             continue;
-        }
-    
-        if(fIsBeam)
-        {
-            if(hit->GetCal() != 1)
-            {
-                continue;
-            }
-        }
-        else
-        {
-            if(hit->GetCal() != 1 && hit->GetCal() != 2)
-            {
-                continue;
-            }
         }
         
         iBar = hit->GetBarId();
@@ -268,7 +251,7 @@ void R3BLandTcal::Exec(Option_t* option)
         gtb = hit->GetGtb();
         tacAddr = hit->GetTacAddr();
         index = hit->GetSam()*(MAX_TACQUILA_MODULE+1)*(MAX_TACQUILA_GTB+1) + gtb*(MAX_TACQUILA_MODULE+1) + tacAddr;
-        if(!fMap17Seen[index])
+        if(fMap17Seen.find(index) == fMap17Seen.end())
         {
             LOG(ERROR) << "R3BLandTcal::Exec : NO stop signal for: GTB=" << gtb << ", TacAddr=" << tacAddr << FairLogger::endl;
             continue;
