@@ -4,6 +4,7 @@
 #include "R3BFieldPar.h"
 #include "R3BFieldMap.h"
 #include "R3BFieldConst.h"
+#include "R3BAladinFieldMap.h"
 
 #include "FairParamList.h"
 
@@ -72,6 +73,7 @@ void R3BFieldPar::putParams(FairParamList* list) {
     list->add("Field y position", fPosY);
     list->add("Field z position", fPosZ);
     list->add("Field scaling factor", fScale);
+      list->add("Current", fCurrent);
 
   }
 
@@ -107,6 +109,7 @@ Bool_t R3BFieldPar::getParams(FairParamList* list) {
     if ( ! list->fill("Field y position", &fPosY) )  return kFALSE;
     if ( ! list->fill("Field z position", &fPosZ) )  return kFALSE;
     if ( ! list->fill("Field scaling factor", &fScale) ) return kFALSE;
+      if ( ! list->fill("Current", &fCurrent) ) return kFALSE;
 
   }
 
@@ -144,16 +147,21 @@ void R3BFieldPar::SetParameters(FairField* field) {
 
   else if ( fType >=1 && fType <= kMaxFieldMapType ) {              // field map
 // to be implemented for the  case of R3B
-//    R3BFieldMap* fieldMap = (R3BFieldMap*) field;
-//    fBx = fBy = fBz = 0.;
-//    fXmin = fXmax = fYmin = fYmax = fZmin = fZmax = 0.;
-//
-//    fMapName = field->GetName();
-//    fPosX   = fieldMap->GetPositionX();
-//    fPosY   = fieldMap->GetPositionY();
-//    fPosZ   = fieldMap->GetPositionZ();
-//    fScale  = fieldMap->GetScale();
+    R3BFieldMap* fieldMap = (R3BFieldMap*) field;
+    fBx = fBy = fBz = 0.;
+    fXmin = fXmax = fYmin = fYmax = fZmin = fZmax = 0.;
 
+    fMapName = field->GetName();
+    //fPosX   = fieldMap->GetPositionX();
+    //fPosY   = fieldMap->GetPositionY();
+    //fPosZ   = fieldMap->GetPositionZ();
+    fScale  = fieldMap->GetScale();
+      
+      if(1 == fType)
+      {
+          R3BAladinFieldMap* aladinFieldMap = (R3BAladinFieldMap*) field;
+          fCurrent = aladinFieldMap->GetCurrent();
+      }
   }
 
   else {

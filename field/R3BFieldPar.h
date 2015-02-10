@@ -68,6 +68,7 @@ class R3BFieldPar : public FairParGenericSet
   Double_t GetPositionY() const { return fPosY; }
   Double_t GetPositionZ() const { return fPosZ; }
   Double_t GetScale()     const { return fScale; }
+    Double_t GetCurrent()   const { return fCurrent; }
 
 
  private:
@@ -99,6 +100,9 @@ class R3BFieldPar : public FairParGenericSet
 
   /** Scaling factor for field map **/
   Double_t fScale;
+    
+
+    Double_t fCurrent;
 
 
   ClassDef(R3BFieldPar,1);

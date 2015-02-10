@@ -51,14 +51,24 @@ map_fields_ALADiN R3BAladinFieldMap::gMapIField;
 coords_ALADiN    R3BAladinFieldMap::gCoords[2];
 Bool_t           R3BAladinFieldMap::gInitialized = kFALSE;
 
-R3BAladinFieldMap::R3BAladinFieldMap() {
-  
+R3BAladinFieldMap::R3BAladinFieldMap()
+{
+    fType = 1;
 }
 
 R3BAladinFieldMap::R3BAladinFieldMap(const char* mapName, const char* fileType)
-: FairField(mapName) {
-  
+: FairField(mapName)
+{
+    fType = 1;  
 }
+
+R3BAladinFieldMap::R3BAladinFieldMap(R3BFieldPar* fieldPar)
+{
+    fType = 1;
+    fCurrent = fieldPar->GetCurrent();
+    fScale = fieldPar->GetScale();
+}
+
 // ------------   Destructor   --------------------------------------------
 R3BAladinFieldMap::~R3BAladinFieldMap() {
   if ( fBx ) delete fBx;

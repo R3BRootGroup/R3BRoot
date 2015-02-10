@@ -6,6 +6,7 @@
 #include "TRotation.h"
 #include "TVector3.h"
 #include "R3BFieldInterp.h"
+#include "R3BFieldPar.h"
 #include <map>
 
 
@@ -59,7 +60,7 @@ public:
 
 
   /** Constructor from R3BAladinFieldPar **/
- // R3BAladinFieldMap(R3BAladinFieldPar* fieldPar);
+  R3BAladinFieldMap(R3BFieldPar* fieldPar);
 
 
   /** Constructor from R3BAladinFieldMapCreator **/
