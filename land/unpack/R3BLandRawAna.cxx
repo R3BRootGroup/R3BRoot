@@ -47,7 +47,7 @@ InitStatus R3BLandRawAna::Init()
     FairRootManager* fMan = FairRootManager::Instance();
     fLandRawHit = (TClonesArray*)fMan->GetObject("LandRawHit");
     fLandRawHitMapped = (TClonesArray*)fMan->GetObject("LandRawHitMapped");
-    fLosRawHit = (TClonesArray*)fMan->GetObject("LosRawHit");
+    //fLosRawHit = (TClonesArray*)fMan->GetObject("LosRawHit");
     CreateHistos();
 
     return kSUCCESS;
@@ -88,6 +88,9 @@ void R3BLandRawAna::Exec(Option_t* option)
             {
                 fh_land_mapped_barid->Fill(hitmapped->GetBarId());
                 fh_land_mapped_side->Fill(hitmapped->GetSide());
+                fh_land_mapped_clock->Fill(hitmapped->GetClock());
+                fh_land_mapped_tac->Fill(hitmapped->GetTacData());
+                fh_land_mapped_qdc->Fill(hitmapped->GetQdcData());
             }
         }
     }
@@ -128,8 +131,11 @@ void R3BLandRawAna::CreateHistos()
     fh_land_raw_qdc = new TH1F("h_land_raw_qdc", "QDC data", 100, 0., 1000.);
 
     fh_land_mapped_is17 = new TH1F("h_land_mapped_is17", "Is 17", 4, -0.5, 3.5);
-    fh_land_mapped_barid = new TH1F("h_land_mapped_barid", "Bar ID", 300, -0.5, 299.5);
+    fh_land_mapped_barid = new TH1F("h_land_mapped_barid", "Bar ID", 500, -0.5, 499.5);
     fh_land_mapped_side = new TH1F("h_land_mapped_side", "Side", 5, -0.5, 4.5);
+    fh_land_mapped_clock = new TH1F("h_land_mapped_clock", "Clock count", 70, -0.5, 69.5);
+    fh_land_mapped_tac = new TH1F("h_land_mapped_tac", "TAC data", 500, 0., 5000.);
+    fh_land_mapped_qdc = new TH1F("h_land_mapped_qdc", "QDC data", 100, 0., 1000.);
 
     fh_los_raw_ch = new TH1F("h_los_raw_ch", "Channel", 20, -0.5, 19.5);
     fh_los_raw_tdc = new TH1F("h_los_raw_tdc", "TDC data", 200, 0., 2000.);
@@ -149,6 +155,9 @@ void R3BLandRawAna::CreateHistos()
     run->AddObject(fh_land_mapped_is17);
     run->AddObject(fh_land_mapped_barid);
     run->AddObject(fh_land_mapped_side);
+    run->AddObject(fh_land_mapped_clock);
+    run->AddObject(fh_land_mapped_tac);
+    run->AddObject(fh_land_mapped_qdc);
 
     run->AddObject(fh_los_raw_ch);
     run->AddObject(fh_los_raw_tdc);

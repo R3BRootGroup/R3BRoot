@@ -46,6 +46,9 @@ class R3BLandRawAna : public FairTask
     TH1F* fh_land_mapped_is17;
     TH1F* fh_land_mapped_barid;
     TH1F* fh_land_mapped_side;
+    TH1F* fh_land_mapped_clock;
+    TH1F* fh_land_mapped_tac;
+    TH1F* fh_land_mapped_qdc;
 
     TH1F* fh_los_raw_ch;
     TH1F* fh_los_raw_tdc;
