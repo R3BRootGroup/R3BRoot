@@ -57,9 +57,9 @@ FairParSet* R3BDBLandContFact::createContainer(FairContainer* c)
   if (strcmp(name,"LandCalPar")==0) {
     p=new R3BLandCalPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
     // Set Arguments needed for SQL versioning managment
-    p->SetVersion(0);
-    p->SetDbEntry(0);
-    p->SetLogTitle(name);
+    //p->SetVersion(0);
+    //p->SetDbEntry(0);
+    //p->SetLogTitle(name);
   }
 
   return p;

@@ -2,10 +2,6 @@
 #define R3BLANDTCALPAR_H
 
 #include "FairParGenericSet.h"          // for FairParGenericSet
-#include "DataType.h"                    // for EDataType::kData
-#include "ValCondition.h"                 // for ValCondition
-#include "ValTimeStamp.h"               // for ValTimeStamp
-#include "db_detector_def.h"            // for Detector, etc
 
 #include "Rtypes.h"                     // for Double_t, Int_t, UInt_t, etc
 
@@ -15,17 +11,11 @@
 #include "TObjArray.h"                  // Store for vertices 
 #include "TVector3.h"                   // Vertex
 #include "TGeoArb8.h"                   // Trap
-#include "FairDbWriter.h"
-#include "FairDbReader.h"
 
 #define NCHMAX 500
 
 using namespace std;
 
-class FairDbOutTableBuffer;
-class FairDbResultPool;
-class FairDbObjTableMap;
-class FairDbValRecord;
 class FairParamList;
 
 
@@ -33,8 +23,8 @@ class FairParamList;
 class R3BLandTCalPar : public FairParGenericSet
 {
 
-using TObject::Compare;
-
+    using TObject::Compare;
+    
   public :
   R3BLandTCalPar (const char* name="R3BLandTCalPar",
 				 const char* title="Land Calibrated Time Parameter",
@@ -67,34 +57,6 @@ using TObject::Compare;
 
     Bool_t Compare(const R3BLandTCalPar& that ) const; 
 
-    // Add-ons: SQL descriptors for the parameter class
-    virtual std::string GetTableDefinition(const char* Name = 0);
-
-    virtual FairDbObjTableMap* CreateObjTableMap() const {
-      return new R3BLandTCalPar();
-    }
-
-    // Atomic IO (intrinsic)
-    virtual void Fill(FairDbResultPool& res_in,
-                      const FairDbValRecord* valrec);
-    virtual void Store(FairDbOutTableBuffer& res_out,
-                       const FairDbValRecord* valrec) const;
-    // Global IO using run_id
-    virtual void fill(UInt_t rid);
-    virtual void store(UInt_t rid);
-
-    // Validity frame definition
-    virtual ValCondition GetContext(UInt_t rid) {
-        return ValCondition(FairDbDetector::kLand,
-                          DataType::kData,
-                          ValTimeStamp((Double_t) rid));
-    }
-
-    // SQL-IO Meta-Class Getters
-    FairDbReader<R3BLandTCalPar>* GetParamReader();
-    FairDbWriter<R3BLandTCalPar>* GetParamWriter();
-	FairDbWriter<R3BLandTCalPar>* ActivateWriter(Int_t rid);
-
   private:
     // Data Parameters
     Int_t fCompId;
@@ -104,36 +66,8 @@ using TObject::Compare;
     Int_t fBinUp[NCHMAX];// upper channel
     Double_t fTime[NCHMAX];// Cal. Time
 
-    // Database Pool Index
-    Int_t fDbEntry; //!
-    // Parameter Container SQL Writer Meta-Class
-    FairDbWriter<R3BLandTCalPar>* fParam_Writer; //!
-    // Parameter Container SQL Writer Meta-Class
-    FairDbReader<R3BLandTCalPar>* fParam_Reader; //!
-    // Connection Pool
-    FairDbConnectionPool* fMultConn;  //!
-
     ClassDef(R3BLandTCalPar,1); // R3BLandTCalPar Parameter Container example
 };
 
-
-
-inline  FairDbReader<R3BLandTCalPar>* R3BLandTCalPar::GetParamReader()
-{
-  if (fParam_Reader) { return fParam_Reader; }
-  else {
-    fParam_Reader = new  FairDbReader<R3BLandTCalPar>();
-    return fParam_Reader;
-  }
-}
-
-inline FairDbWriter<R3BLandTCalPar>* R3BLandTCalPar::GetParamWriter()
-{
-  if (fParam_Writer) { return fParam_Writer; }
-  else {
-    fParam_Writer = new  FairDbWriter<R3BLandTCalPar>();
-    return fParam_Writer;
-  }
-}
 
 #endif /* !R3BLANDTCALPAR_H*/

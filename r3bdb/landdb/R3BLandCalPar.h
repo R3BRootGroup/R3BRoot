@@ -13,10 +13,6 @@
 
 using namespace std;
 
-class FairDbOutTableBuffer;
-class FairDbResultPool;
-class FairDbObjTableMap;
-class FairDbValRecord;
 class FairParamList;
 
 
@@ -42,11 +38,6 @@ using TObject::Compare;
     TObjArray* GetListOfTCalPar(Int_t side) {return fTCalParams;}
     Int_t GetNumTCalPar() {return fTCalParams->GetEntries();} 
     R3BLandTCalPar* GetTCalParAt(Int_t idx){return (R3BLandTCalPar*) fTCalParams->At(idx);} 
-
-
-    // Global IO using run_id
-    virtual void fill(UInt_t rid);
-    virtual void store(UInt_t rid);
 
   private:
     TObjArray* fTCalParams;

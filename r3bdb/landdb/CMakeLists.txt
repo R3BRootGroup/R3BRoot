@@ -25,14 +25,14 @@ set(HEADERS
 R3BDBLandContFact.h
 R3BLandCalPar.h
 R3BLandTCalPar.h
-${FAIRROOTPATH}/include/FairDbReader.h
-${FAIRROOTPATH}/include/FairDbWriter.h
+#${FAIRROOTPATH}/include/FairDbReader.h
+#${FAIRROOTPATH}/include/FairDbWriter.h
 )
 
 
 set(LINKDEF R3BLandLinkDef.h)
 Set(LIBRARY_NAME R3BLandDB)
-Set(DEPENDENCIES Base)
+Set(DEPENDENCIES Base ParBase)
 
 
 GENERATE_LIBRARY()
