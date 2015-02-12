@@ -121,7 +121,7 @@ void R3BLandTdiffFill::FinishTask()
     Double_t xmax = 270.; // cm
     Double_t veff;
     Int_t l = 0;
-    for (Int_t ibar = 0; ibar < 100; ibar++)
+    for (Int_t ibar = 0; ibar < fNofBars; ibar++)
     {
         if (fh_tdiff[ibar]->GetEntries() > 1000)
         {
