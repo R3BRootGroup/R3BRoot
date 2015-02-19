@@ -125,11 +125,11 @@ void R3BLandTdiffFill::FinishTask()
     {
         if (fh_tdiff[ibar]->GetEntries() > 1000)
         {
-            for (Int_t i = 0; i < 1000; i++)
+            for (Int_t i = 0; i < 2000; i++)
             {
                 if ((fh_tdiff[ibar]->GetBinContent(i + 1 + 1) - fh_tdiff[ibar]->GetBinContent(i + 1)) > 0.1*fh_tdiff[ibar]->GetMaximum())
                 {
-                    for (Int_t j = 999; j >= (i+1); j--)
+                    for (Int_t j = (i+500); j >= (i+1); j--)
                     {
                         if ((fh_tdiff[ibar]->GetBinContent(j + 1) - fh_tdiff[ibar]->GetBinContent(j + 1 + 1)) > 0.1*fh_tdiff[ibar]->GetMaximum())
                         {
@@ -139,8 +139,8 @@ void R3BLandTdiffFill::FinishTask()
                     }
                     if (l > 50)
                     {
-                        tmin = (i + 1) * 0.2 - 100.;
-                        tmax = (i + l - 1) * 0.2 - 100.;
+                        tmin = (i + 1) * 0.2 - 200.;
+                        tmax = (i + l - 1) * 0.2 - 200.;
                         break;
                     }
                 }
@@ -175,7 +175,7 @@ void R3BLandTdiffFill::CreateHistos()
     for (Int_t i = 0; i < fNofBars; i++)
     {
         sprintf(str, "h_tdiff_%d", (i + 1));
-        fh_tdiff[i] = new TH1F(str, "(Time2 - Time1)/2", 1000, -100., 100.);
+        fh_tdiff[i] = new TH1F(str, "(Time2 - Time1)/2", 2000, -200., 200.);
     }
 
     fh_tdiff_res = new TH1F("h_tdiff_res", "Tdiff", fNofBars, 0.5, fNofBars + 0.5);
