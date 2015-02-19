@@ -20,7 +20,8 @@ R3BLandTCalPar::R3BLandTCalPar(const char* name, const char* title, const char* 
   : FairParGenericSet(name,title,context, own),
 	fCompId(0),
 	fBarId(0),
-    fSide(0)
+    fSide(0),
+    fNofChannels(0)
 {
   // Reset all parameters
   clear();
@@ -39,6 +40,7 @@ void R3BLandTCalPar::putParams(FairParamList* list)
   list->add("comp_id",  fCompId);
   list->add("bar_id", fBarId);
   list->add("side", fSide);
+  list->add("nofchannels", fNofChannels);
   list->add("bin_low", fBinLow, NCHMAX);
   list->add("bin_up", fBinUp, NCHMAX);
   list->add("time", fTime, NCHMAX);
@@ -51,6 +53,7 @@ Bool_t R3BLandTCalPar::getParams(FairParamList* list)
   if (!list->fill("comp_id", &fCompId)) { return kFALSE; }
   if (!list->fill("bar_id", &fBarId)) { return kFALSE; }
   if (!list->fill("side", &fSide)) { return kFALSE; }
+  if (!list->fill("nofchannels", &fNofChannels)) { return kFALSE; }
   if (!list->fill("bin_low", fBinLow, NCHMAX)) { return kFALSE; }
   if (!list->fill("bin_up", fBinUp, NCHMAX)) { return kFALSE; }
   if (!list->fill("time", fTime, NCHMAX)) { return kFALSE; }
@@ -60,7 +63,7 @@ Bool_t R3BLandTCalPar::getParams(FairParamList* list)
 
 void R3BLandTCalPar::clear()
 {
-  fCompId=fBarId=fSide=0;
+  fCompId=fBarId=fSide=fNofChannels=0;
   // <DB> Not so much overhead here.
   for(Int_t i=0; i<NCHMAX; i++) { fBinLow[i]=fBinUp[i]=0;fTime[i]=0.;}
 }
@@ -73,7 +76,8 @@ void R3BLandTCalPar::Print()
   std::cout<<"   fCompId: "<<  fCompId <<  std::endl;
   std::cout<<"   fBarId: "<<  fBarId <<  std::endl;
   std::cout<<"   fSide: "<<  fSide <<  std::endl;
- for (Int_t i=0;i<NCHMAX;i++) {
+  std::cout<<"   fNofChannels: "<<  fNofChannels <<  std::endl;
+ for (Int_t i=0;i<fNofChannels;i++) {
    if ( (fBinLow[i] != 0) && (fBinUp[i] != 0) &&  (fTime[i] != 0) )
    std::cout<<"   BinLow: " <<  fBinLow[i]  <<  " BinUp "  << fBinUp[i] << " Time:" << fTime[i] <<  std::endl;
    }
@@ -84,11 +88,12 @@ Bool_t R3BLandTCalPar::Compare(const R3BLandTCalPar& that ) const {
   //  
   Bool_t test_h =  (fCompId   == that.fCompId)
  	               &&  (fBarId   == that.fBarId)
- 	               &&  (fSide   == that.fSide);
+ 	               &&  (fSide   == that.fSide)
+                   &&  (fNofChannels == that.fNofChannels);
   
  
   Bool_t test_d=kTRUE;
-  for(Int_t i=0; i<NCHMAX;i++){
+  for(Int_t i=0; i<fNofChannels;i++){
 
     Int_t  a =  GetBinLowAt(i);
     Int_t  b =  that.GetBinLowAt(i);

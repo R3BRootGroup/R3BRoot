@@ -42,6 +42,7 @@ class R3BLandTCalPar : public FairParGenericSet
     Int_t GetCompId()   const {return fCompId;}
     Int_t GetBarId() const {return fBarId;}
     Int_t GetSide() const {return fSide;}
+    Int_t GetNofChannels() const { return fNofChannels; }
     Double_t GetTimeAt(Int_t i) const {return fTime[i];}
     Int_t    GetBinLowAt(Int_t i) const {return fBinLow[i];}
     Int_t    GetBinUpAt(Int_t i) const {return fBinUp[i];}
@@ -49,6 +50,7 @@ class R3BLandTCalPar : public FairParGenericSet
     void SetCompId(Int_t x)  {SetComboNo(x); fCompId=x;}
     void SetBarId(Int_t i) {fBarId=i;}
     void SetSide(Int_t i) {fSide=i;}
+    void IncrementNofChannels() { fNofChannels += 1; }
     void SetBinLowAt(Int_t ch,Int_t i) {fBinLow[i]=ch;}
 	void SetBinUpAt(Int_t ch,Int_t i) {fBinUp[i]=ch;}
     void SetTimeAt(Double_t t,Int_t i) {fTime[i]= t;}
@@ -61,7 +63,8 @@ class R3BLandTCalPar : public FairParGenericSet
     // Data Parameters
     Int_t fCompId;
     Int_t fBarId; 
-    Int_t fSide; 
+    Int_t fSide;
+    Int_t fNofChannels;
     Int_t fBinLow[NCHMAX];// lower channel
     Int_t fBinUp[NCHMAX];// upper channel
     Double_t fTime[NCHMAX];// Cal. Time
