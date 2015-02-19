@@ -27,6 +27,8 @@ class R3BLandTdiff : public FairTask
     virtual void FinishEvent();
     
     inline void SetTdiffParName(char* name) { fParName = name; }
+    
+    inline void SetFirstPlaneHorisontal() { fFirstPlaneHorisontal = kTRUE; }
 
   private:
     TClonesArray* fLandPmt;
@@ -35,6 +37,7 @@ class R3BLandTdiff : public FairTask
     
     char* fParName;
     std::ifstream* fInFile;
+    Bool_t fFirstPlaneHorisontal;
     
     std::map<Int_t, Bool_t> fMapIsSet;
     std::map<Int_t, Double_t> fMapTdiff;

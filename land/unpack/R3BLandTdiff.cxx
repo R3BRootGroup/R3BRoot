@@ -31,6 +31,7 @@ R3BLandTdiff::R3BLandTdiff()
     : fLandPmt(NULL)
     , fLandDigi(new TClonesArray("R3BLandDigi"))
     , fNDigi(0)
+    , fFirstPlaneHorisontal(kFALSE)
 {
 }
 
@@ -39,6 +40,7 @@ R3BLandTdiff::R3BLandTdiff(const char* name, Int_t iVerbose)
     , fLandPmt(NULL)
     , fLandDigi(new TClonesArray("R3BLandDigi"))
     , fNDigi(0)
+    , fFirstPlaneHorisontal(kFALSE)
 {
 }
 
@@ -84,6 +86,11 @@ void R3BLandTdiff::Exec(Option_t* option)
     Double_t tdcL, tdcR, tdc;
     Double_t qdcL, qdcR, qdc;
     Double_t x, y, z;
+    Int_t id = 0;
+    if(fFirstPlaneHorisontal)
+    {
+        id = 1;
+    }
     for (Int_t i1 = 0; i1 < nLandPmt; i1++)
     {
         pmt1 = (R3BLandPmt*)fLandPmt->At(i1);
@@ -123,7 +130,7 @@ void R3BLandTdiff::Exec(Option_t* option)
             tdc = (tdcL + tdcR) / 2.;
             qdc = TMath::Sqrt(qdcL * qdcR);
             plane = (Int_t)((barId-1)/50) + 1;
-            if(0 == plane % 2)
+            if(id == plane % 2)
             {
                 x = veff * (tdcL - tdcR);
                 y = (barId - 0.5 - (plane-1)*50) * 5. - 125.;
@@ -159,22 +166,23 @@ void R3BLandTdiff::ReadParameters()
         fMapIsSet[barId] = kTRUE;
         fMapTdiff[barId] = tdiff;
         fMapVeff[barId] = veff;
+        fMapTsync[barId] = 0.;
     }
     fInFile->close();
     
-    ifstream ifile("neuland_sync_159.txt");
-    char str1[20], str2[20], str3[20], str4[20];
-    ifile >> str1 >> str2 >> str3 >> str4;
-    Double_t tsync;
-    while(!ifile.eof())
-    {
-        ifile >> barId >> tdiff >> tsync >> veff;
-        if(barId > 0 && barId <= 100)
-        {
-            fMapTsync[barId] = tsync;
-        }
-    }
-    ifile.close();
+//    ifstream ifile("neuland_sync_159.txt");
+//    char str1[20], str2[20], str3[20], str4[20];
+//    ifile >> str1 >> str2 >> str3 >> str4;
+//    Double_t tsync;
+//    while(!ifile.eof())
+//    {
+//        ifile >> barId >> tdiff >> tsync >> veff;
+//        if(barId > 0 && barId <= 100)
+//        {
+//            fMapTsync[barId] = tsync;
+//        }
+//    }
+//    ifile.close();
 }
 
 ClassImp(R3BLandTdiff)
