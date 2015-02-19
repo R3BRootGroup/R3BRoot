@@ -35,6 +35,7 @@ void run(TString runNumber)
 
     // Analysis ------------------------------------------------------------------
     R3BLandAna* landAna = new R3BLandAna("LandAna", 1);
+    landAna->SetNofBars(100);
     run->AddTask(landAna);
     // ---------------------------------------------------------------------------
     
