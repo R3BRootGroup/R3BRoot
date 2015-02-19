@@ -32,6 +32,7 @@ R3BLandTcal::R3BLandTcal()
     , fPmt(new TClonesArray("R3BLandPmt"))
     , fNPmt(0)
     , fTcalPar(NULL)
+    , fTrigger(1)
     , fIsBeam(kFALSE)
     , fMap17Seen()
     , fMapStopTime()
@@ -47,6 +48,7 @@ R3BLandTcal::R3BLandTcal(const char* name, Int_t iVerbose)
     , fPmt(new TClonesArray("R3BLandPmt"))
     , fNPmt(0)
     , fTcalPar(NULL)
+    , fTrigger(1)
     , fIsBeam(kFALSE)
     , fMap17Seen()
     , fMapStopTime()
@@ -118,7 +120,7 @@ InitStatus R3BLandTcal::ReInit()
 
 void R3BLandTcal::Exec(Option_t* option)
 {
-    if(header->GetTrigger() != 2)
+    if(header->GetTrigger() != fTrigger)
     {
         return;
     }
@@ -130,15 +132,18 @@ void R3BLandTcal::Exec(Option_t* option)
     }
     
     R3BLandRawHitMapped* hit;
+    R3BLandRawHitMapped* hit2;
     Int_t iBar;
     Int_t iSide;
     Int_t channel;
     Int_t tdc;
     R3BLandTCalPar *par;
     Double_t time;
+    Double_t time2;
     Int_t gtb;
     Int_t tacAddr;
     Int_t index;
+    Int_t index2;
     
     for(Int_t ihit = 0; ihit < nHits; ihit++)
     {
@@ -147,9 +152,6 @@ void R3BLandTcal::Exec(Option_t* option)
         {
             continue;
         }
-        
-        iBar = hit->GetBarId();
-        iSide = hit->GetSide();
         if (hit->Is17())
         {
             // 17-th channel
@@ -186,15 +188,84 @@ void R3BLandTcal::Exec(Option_t* option)
         gtb = hit->GetGtb();
         tacAddr = hit->GetTacAddr();
         index = hit->GetSam()*(MAX_TACQUILA_MODULE+1)*(MAX_TACQUILA_GTB+1) + gtb*(MAX_TACQUILA_MODULE+1) + tacAddr;
-        if(fMap17Seen.find(index) != fMap17Seen.end())
+        if(fMap17Seen.find(index) != fMap17Seen.end() && fMap17Seen[index])
         {
-            LOG(ERROR) << "R3BLandTcal::Exec : multiple stop signal for: GTB=" << gtb << ", TacAddr=" << tacAddr << FairLogger::endl;
-            continue;
+            LOG(WARNING) << "R3BLandTcal::Exec : multiple stop signal for: GTB=" << gtb << ", TacAddr=" << tacAddr << FairLogger::endl;
+//            continue;
         }
         fMap17Seen[index] = kTRUE;
         fMapStopTime[index] = time;
         fMapStopClock[index] = hit->GetClock();
+        
+        for(Int_t khit = 0; khit < ihit; khit++)
+        {
+            hit2 = (R3BLandRawHitMapped*) fRawHit->At(khit);
+            if(NULL == hit2)
+            {
+                continue;
+            }
+            
+            iBar = hit2->GetBarId();
+            iSide = hit2->GetSide();
+            if (hit2->Is17())
+            {
+                // 17-th channel
+                continue;
+            }
+            else
+            {
+                // PMT signal
+                channel = fNofPMTs / 2 * (iSide - 1) + iBar - 1;
+            }
+            
+            gtb = hit2->GetGtb();
+            tacAddr = hit2->GetTacAddr();
+            index2 = hit2->GetSam()*(MAX_TACQUILA_MODULE+1)*(MAX_TACQUILA_GTB+1) + gtb*(MAX_TACQUILA_MODULE+1) + tacAddr;
+            if(index != index2)
+            {
+                continue;
+            }
+            
+            // Convert TDC to [ns]
+            if(channel < 0 || channel >= (fNofPMTs+fNof17))
+            {
+                LOG(ERROR) << "R3BLandTcal::Exec : wrong hardware channel: " << channel << FairLogger::endl;
+                continue;
+            }
+            if(! FindChannel(channel, &par))
+            {
+                LOG(WARNING) << "R3BLandTcal::Exec : Tcal par not found, channel: " << channel << FairLogger::endl;
+                continue;
+            }
+            
+            tdc = hit2->GetTacData();
+            time2 = Interpolate(tdc, par);
+            if(time2 < -1000.)
+            {
+                continue;
+            }
+            if(time2 < 0. || time2 > 24.99819)
+            {
+                LOG(ERROR) << "R3BLandTcal::Exec : error in time calibration: ch=" << channel << ", tdc=" << tdc << ", time=" << time2 << FairLogger::endl;
+                continue;
+            }
+            
+            if(fMap17Seen.find(index2) == fMap17Seen.end())
+            {
+                LOG(ERROR) << "R3BLandTcal::Exec : NO stop signal for: GTB=" << gtb << ", TacAddr=" << tacAddr << FairLogger::endl;
+                continue;
+            }
+            time2 = time2 - fMapStopTime[index2] + hit2->GetClock()*24.99819;
+            new ((*fPmt)[fNPmt]) R3BLandPmt(iBar, iSide, time2, hit2->GetQdcData());
+            fNPmt += 1;
+        }
+        
+        fMap17Seen.clear();
+        fMapStopTime.clear();
+        fMapStopClock.clear();
     }
+}
+/*
 
     Double_t time2;
     for(Int_t ihit = 0; ihit < nHits; ihit++)
@@ -227,7 +298,7 @@ void R3BLandTcal::Exec(Option_t* option)
         
         if(! FindChannel(channel, &par))
         {
-            LOG(WARNING) << "R3BLandTcal::Exec : Tcal par not found, channel: " << channel << FairLogger::endl;
+            LOG(DEBUG) << "R3BLandTcal::Exec : Tcal par not found, channel: " << channel << FairLogger::endl;
             continue;
         }
         
@@ -261,6 +332,7 @@ void R3BLandTcal::Exec(Option_t* option)
         fNPmt += 1;
     }
 }
+ */
 
 void R3BLandTcal::FinishEvent()
 {
@@ -318,9 +390,13 @@ Double_t R3BLandTcal::Interpolate(Int_t tdc, R3BLandTCalPar* par)
         slope = (Double_t)(par->GetTimeAt(p+1) - par->GetTimeAt(p)) / (b2 - b1);
         time = (Double_t)(tdc - par->GetBinLowAt(p)) * slope;
     }
+    else if(p >= par->GetNofChannels())
+    {
+        return -10000.;
+    }
     else if(par->GetTimeAt(p) > 24.99)
     {
-        time = 24.99819;
+        return 24.99819;
     }
     else
     {

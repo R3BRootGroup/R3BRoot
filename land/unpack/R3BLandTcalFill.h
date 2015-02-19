@@ -11,6 +11,7 @@
 class R3BLandCalPar;
 class TClonesArray;
 class TH1F;
+class TF1;
 class R3BEventHeader;
 
 class R3BLandTcalFill : public FairTask
@@ -68,6 +69,7 @@ class R3BLandTcalFill : public FairTask
     TH1F** fhData;
     TH1F** fhData100;
     TH1F** fhTime;
+    TF1* f1;
 
     Int_t fNEvents;
     Bool_t fStoreDB;

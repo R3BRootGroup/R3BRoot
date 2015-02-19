@@ -18,6 +18,7 @@
 
 #include "TClonesArray.h"
 #include "TH1F.h"
+#include "TF1.h"
 
 #include <iostream>
 #include <stdlib.h>
@@ -27,11 +28,12 @@ using namespace std;
 R3BLandTcalFill::R3BLandTcalFill()
     : fUpdateRate(1000000)
     , fMinStats(100000)
-    , fTrigger(0)
+    , fTrigger(1)
     , fNofPMTs(0)
     , fNof17(0)
     , fhData(NULL)
     , fhTime(NULL)
+    , f1(new TF1("f1", "[0]", 1500., 2500.))
     , fNEvents(0)
     , fStoreDB(kFALSE)
     , fCal_Par(NULL)
@@ -42,11 +44,12 @@ R3BLandTcalFill::R3BLandTcalFill(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fUpdateRate(1000000)
     , fMinStats(100000)
-    , fTrigger(0)
+    , fTrigger(1)
     , fNofPMTs(0)
     , fNof17(0)
     , fhData(NULL)
     , fhTime(NULL)
+    , f1(new TF1("f1", "[0]", 1500., 2500.))
     , fNEvents(0)
     , fStoreDB(kFALSE)
     , fCal_Par(NULL)
@@ -225,27 +228,26 @@ void R3BLandTcalFill::CalculateParams(Int_t iModule)
     // Define range of channels
     fhData100[iModule] = (TH1F*)fhData[iModule]->Clone();
     fhData100[iModule]->Rebin(8);
-    for (Int_t i = 0; i < 512; i++)
+    fhData100[iModule]->Fit(f1, "QNR");
+    for (Int_t i = 256; i >= 0; i--)
     {
-        if (fhData100[iModule]->GetBinContent(i + 1) > 0.1*fhData100[iModule]->GetMaximum())
+        if (fhData100[iModule]->GetBinContent(i + 1) < 0.1*f1->GetParameter(0))
         {
             iMin = i - 1;
             break;
         }
     }
-    for (Int_t j = 511; j > 0; j--)
+    for (Int_t j = 256; j < 512; j++)
     {
-        if (fhData100[iModule]->GetBinContent(j + 1) > 0.1*fhData100[iModule]->GetMaximum())
+        if (fhData100[iModule]->GetBinContent(j + 1) < 0.1*f1->GetParameter(0))
         {
-            if(fhData100[iModule]->GetBinContent(j) > 0.1*fhData100[iModule]->GetMaximum())
-            {
-                iMax = j + 1;
-                break;
-            }
+            iMax = j + 1;
+            break;
         }
     }
     if (iMax <= iMin)
     {
+        LOG(ERROR) << "Error in definition of TCAL range" << FairLogger::endl;
         return;
     }
     iMin = Int_t(((Double_t)iMin-0.5)*8);
@@ -286,6 +288,7 @@ void R3BLandTcalFill::CalculateParams(Int_t iModule)
             pTCal->SetBinLowAt(ibin, incr);
             pTCal->SetBinUpAt(ibin + group - 1, incr);
             pTCal->SetTimeAt(prev_time, incr);
+            pTCal->IncrementNofChannels();
         }
 
         // Next range of channels

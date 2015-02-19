@@ -31,10 +31,16 @@ class R3BLandTcal : public FairTask
     virtual void FinishEvent();
     virtual void FinishTask();
     
+    inline void SetTrigger(Int_t trigger)
+    {
+        fTrigger = trigger;
+    }
+    
     inline void SetBeam(Bool_t isBeam = kTRUE)
     {
         fIsBeam = isBeam;
     }
+    
     inline void SetNofModules(Int_t nPMTs, Int_t n17)
     {
         fNofPMTs = nPMTs;
@@ -49,6 +55,7 @@ class R3BLandTcal : public FairTask
     TClonesArray* fPmt;
     Int_t fNPmt;
     R3BLandCalPar* fTcalPar;
+    Int_t fTrigger;
     Bool_t fIsBeam;
     Int_t fNofPMTs;
     Int_t fNof17;
