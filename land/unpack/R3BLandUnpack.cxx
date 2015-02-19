@@ -54,7 +54,7 @@ void R3BLandUnpack::Register()
     {
         return;
     }
-    fMan->Register("LandRawHit", "Land", fRawData, kTRUE);
+    fMan->Register("LandRawHit", "Land", fRawData, kFALSE);
 }
 
 // DoUnpack: Public method
