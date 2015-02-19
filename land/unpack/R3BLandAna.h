@@ -24,8 +24,15 @@ class R3BLandAna : public FairTask
     virtual void Exec(Option_t* option);
 
     virtual void FinishTask();
+    
+    inline void SetNofBars(Int_t nofBars) { fNofBars = nofBars; }
+    
+    inline void SetFirstPlaneHorisontal() { fFirstPlaneHorisontal = kTRUE; }
 
   private:
+    Int_t fNofBars;
+    Bool_t fFirstPlaneHorisontal;
+    
     Int_t fnEvents;
 
     TClonesArray* fLandDigi;

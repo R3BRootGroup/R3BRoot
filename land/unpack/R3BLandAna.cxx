@@ -16,7 +16,9 @@
 #include "R3BLandAna.h"
 
 R3BLandAna::R3BLandAna()
-    : fnEvents(0)
+    : fNofBars(100)
+    , fFirstPlaneHorisontal(kFALSE)
+    , fnEvents(0)
     , fLandDigi(NULL)
     , fLosHit(NULL)
 {
@@ -24,6 +26,8 @@ R3BLandAna::R3BLandAna()
 
 R3BLandAna::R3BLandAna(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
+    , fNofBars(100)
+    , fFirstPlaneHorisontal(kFALSE)
     , fnEvents(0)
     , fLandDigi(NULL)
     , fLosHit(NULL)
@@ -126,7 +130,7 @@ void R3BLandAna::Exec(Option_t* option)
             {
                 fh_land_yx1->Fill(x, y);
             }
-            else
+            else if(barId < 101)
             {
                 fh_land_yx2->Fill(x, y);
             }
@@ -177,7 +181,7 @@ void R3BLandAna::FinishTask()
 void R3BLandAna::CreateHistos()
 {
     fh_land_barid = new TH1F("h_land_barid", "Bar ID", 100, 0.5, 100.5);
-    fh_land_qdcbarid = new TH2F("h_land_qdcbarid", "QDC vs Bar ID", 100, 0.5, 100.5, 2000, 0., 2000.);
+    fh_land_qdcbarid = new TH2F("h_land_qdcbarid", "QDC vs Bar ID", fNofBars, 0.5, (Double_t)fNofBars + 0.5, 2000, 0., 2000.);
     fh_land_timebarid = new TH2F("h_land_timebarid", "Time vs Bar ID", 100, 0.5, 100.5, 4000, 0., 2000.);
     fh_land_tofbarid = new TH2F("h_land_tofbarid", "ToF vs Bar ID", 100, 0.5, 100.5, 1000, 0., 100.);
     fh_land_tof = new TH1F("h_land_tof", "ToF", 1000, -500., 500.);
@@ -187,8 +191,16 @@ void R3BLandAna::CreateHistos()
     fh_land_ltime = new TH2F("h_land_ltime", "Length vs Bar ID", 4000, 0., 2000., 1000, 700., 900.);
 
     fh_land_yx = new TH2F("h_land_yx", "Y vs X", 340, -170., 170., 340, -170., 170.);
-    fh_land_yx1 = new TH2F("h_land_yx1", "Y vs X", 68, -170., 170., 340, -170., 170.);
-    fh_land_yx2 = new TH2F("h_land_yx2", "Y vs X", 340, -170., 170., 68, -170., 170.);
+    if(fFirstPlaneHorisontal)
+    {
+        fh_land_yx1 = new TH2F("h_land_yx1", "Y vs X", 340, -170., 170., 68, -170., 170.);
+        fh_land_yx2 = new TH2F("h_land_yx2", "Y vs X", 68, -170., 170., 340, -170., 170.);
+    }
+    else
+    {
+        fh_land_yx1 = new TH2F("h_land_yx1", "Y vs X", 68, -170., 170., 340, -170., 170.);
+        fh_land_yx2 = new TH2F("h_land_yx2", "Y vs X", 340, -170., 170., 68, -170., 170.);
+    }
 
     fh_land_beta = new TH1F("h_land_beta", "Velocity", 500, 0., 50.);
     fh_land_qdc = new TH1F("h_land_qdc", "QDC", 2000, 0., 2000.);
