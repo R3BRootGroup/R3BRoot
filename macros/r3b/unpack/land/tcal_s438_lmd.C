@@ -30,6 +30,7 @@ void run(TString runNumber)
     // Time calibration ----------------------------------------------------------
     R3BLandTcal* landTcal = new R3BLandTcal("LandTcal", 1);
     landTcal->SetNofModules(nModules, 40);
+    landTcal->SetTrigger(2);
     run->AddTask(landTcal);
     // ---------------------------------------------------------------------------
 
