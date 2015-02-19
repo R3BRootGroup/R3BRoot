@@ -137,8 +137,6 @@ Bool_t R3BLandMapping::DoMapping()
 
 void R3BLandMapping::Exec(Option_t* option)
 {
-    fLandHit->Clear();
-    nEntry = 0;
     // -------- Paddle identification ----------------------
     Int_t nHits = fRawData->GetEntries();
     R3BLandRawHit* hit;
