@@ -20,6 +20,7 @@
 #include "R3BLandPoint.h"
 #include "R3BLandDigitizer.h"
 
+const Double_t R3BLandDigitizer::DEFAULT_SATURATION_COEFFICIENT = 0.012;
 
 
 double fun1(double *x, double *par)
@@ -32,14 +33,26 @@ double fun1(double *x, double *par)
 }
 
 
+inline Double_t R3BLandDigitizer::BuildTOFRangeFromBeamEnergy(const Double_t &e) // [ns]
+{
+  if(e > 1100) {
+    return 15.;
+  }
+  if(e < 350) {
+    return 13.;
+  }
+  return 11. + (e / 498. - 1.) * 0.9;
+}
+
 
 // ----------------------------------------------------------------------------
 R3BLandDigitizer::R3BLandDigitizer()
-: FairTask("R3B Land Digitization scheme"),
-f1(new TF1("f1", fun1, 0., 1000., 2)),
-fRnd(new TRandom3()),
-fThreshFileName(""),
-fNChannels(0)
+  : FairTask("R3B Land Digitization scheme"),
+    f1(new TF1("f1", fun1, 0., 1000., 2)),
+    fRnd(new TRandom3()),
+    fThreshFileName(""),
+    fNChannels(0),
+    fSaturationCoefficient(R3BLandDigitizer::DEFAULT_SATURATION_COEFFICIENT)
 {
 }
 // ----------------------------------------------------------------------------
@@ -48,11 +61,12 @@ fNChannels(0)
 
 // ----------------------------------------------------------------------------
 R3BLandDigitizer::R3BLandDigitizer(Int_t verbose)
-: FairTask("R3B Land Digitization scheme ", verbose),
-f1(new TF1("f1", fun1, 0., 1000., 2)),
-fRnd(new TRandom3()),
-fThreshFileName(""),
-fNChannels(0)
+  : FairTask("R3B Land Digitization scheme ", verbose),
+    f1(new TF1("f1", fun1, 0., 1000., 2)),
+    fRnd(new TRandom3()),
+    fThreshFileName(""),
+    fNChannels(0),
+    fSaturationCoefficient(R3BLandDigitizer::DEFAULT_SATURATION_COEFFICIENT)
 {
 }
 // ----------------------------------------------------------------------------
@@ -73,12 +87,12 @@ void R3BLandDigitizer::SetParContainers()
   // Get run and runtime database
   FairRunAna* run = FairRunAna::Instance();
   if ( ! run ) Fatal("SetParContainers", "No analysis run");
-  
+
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
   if ( ! rtdb ) Fatal("SetParContainers", "No runtime database");
-  
+
   fLandDigiPar = (R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
-  
+
   if ( fVerbose && fLandDigiPar ) {
     LOG(INFO) << "R3BLandDigitizer::SetParContainers() "<< FairLogger::endl;
     LOG(INFO) << "Container R3BLandDigiPar loaded " << FairLogger::endl;
@@ -95,11 +109,11 @@ InitStatus R3BLandDigitizer::Init()
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) Fatal("Init", "No FairRootManager");
   fLandPoints = (TClonesArray*) ioman->GetObject("LandPoint");
-  
+
   // Register output array LandDigi
   fLandDigi = new TClonesArray("R3BLandDigi",1000);
   ioman->Register("LandDigi", "Digital response in Land", fLandDigi, kTRUE);
-  
+
   // Parameter retrieval
   // Only after Init one retrieve the Digitization Parameters!
   npaddles = fLandDigiPar->GetMaxPaddle()+1;
@@ -112,12 +126,12 @@ InitStatus R3BLandDigitizer::Init()
   cMedia = 14.; // speed of light in material in [cm/ns]
 //  cMedia = c / 1.58 * 1e9; // speed of light in material in [cm/ns]
   eventNo = 0;
-  
+
   PM_res=new PM_RES*[npaddles];
   for (int i=0;i<npaddles;i++){
     PM_res[i]=new PM_RES[1500];
   }
-  
+
   // Initialise control histograms
   hPMl = new TH1F("PM_left", "Arrival times of left PM", 1000, 0., 1000.);
   hPMr = new TH1F("PM_right", "Arrival times of right PM", 1000, 0., 1000.);
@@ -132,7 +146,7 @@ InitStatus R3BLandDigitizer::Init()
   }
   hMult1 = new TH1F("Multiplicity1", "Paddle multiplicity", nbins, 0., nmax);
   hMult2 = new TH1F("Multiplicity2", "Paddle multiplicity", nbins, 0., nmax);
-  
+
   if(fNChannels > 0 && fThreshFileName.Length() > 0) {
     std::ifstream *tf = new std::ifstream(fThreshFileName.Data());
     for(Int_t i = 0; i < fNChannels; i++) {
@@ -151,11 +165,17 @@ InitStatus R3BLandDigitizer::Init()
     tf->close();
   } else {
     for(Int_t i = 0; i < 5000; i++) {
-      threshL[i] = 0.;
-      threshR[i] = 0.;
+      threshL[i] = 0.01;
+      threshR[i] = 0.01;
     }
   }
-  
+
+  // If integration time has not been set otherwise, set it from beam energy - mimicks previous behavior
+  if (fTOFRange < 0.01) {
+    fTOFRange = BuildTOFRangeFromBeamEnergy(fBeamEnergy);
+  }
+  hRLTimeToTrig = new TH1F("hRLTimeToTrig", "R/Ltime-triggerTime", 200, -100, 100);
+
   return kSUCCESS;
 }
 // -------------------------------------------------------------------------
@@ -167,7 +187,7 @@ void R3BLandDigitizer::Exec(Option_t* opt)
 {
   // Reset entries in output arrays
   Reset();
-  
+
   eventNo += 1;
 
   Double_t timeRes = 0.15; // ns
@@ -180,29 +200,19 @@ void R3BLandDigitizer::Exec(Option_t* opt)
   if(fLandDigiPar->GetGeometryFileName().Contains("jap")) {
     timeRes = 0.010;
   }
-  
+
   // light attenuation of plastic scintillator
   att = 0.008; // [1/cm]
   //att = 0.0047619047619; // [1/cm]
   // decay constant of BC408 scintillator
   Double_t lambda=1./2.1; // [1/ns]
-  
+
   // half of the length of a scintillator
   plength = fLandDigiPar->GetPaddleLength(); // [cm]
-  
-  // length of time gate for QDC
-  Double_t tofRange;
-  if(fBeamEnergy > 1100) {
-    tofRange = 15; // [ns]
-  } else if(fBeamEnergy < 350) {
-    tofRange = 13.;
-  } else {
-    tofRange = 11.+(fBeamEnergy/498.-1.)*0.9; // [ns]
-  }
-//  Double_t tofRange = 40.; // [ns]
+
   Double_t Thresh = 0.16;
 
-  
+
   Int_t nentries = fLandPoints->GetEntries();
   Int_t PMmult[npaddles];
   Double_t QDC_temp[npaddles], TDC_temp[npaddles];
@@ -210,20 +220,20 @@ void R3BLandDigitizer::Exec(Option_t* opt)
   Int_t mult2 = 0;
   Double_t xpos_temp[npaddles], ypos_temp[npaddles], zpos_temp[npaddles];
   Double_t xpaddle[npaddles], ypaddle[npaddles], zpaddle[npaddles];
-  
+
   // reset
   for (Int_t j=0; j < npaddles; j++) {
     PMmult[j] = 0;
     memset(PM_res[j],0,1500*sizeof(PM_RES));
   }
-  
-  
+
+
   Double_t edep = 0.;
-  
-  
+
+
   for (Int_t l=0; l < nentries; l++) {
     R3BLandPoint *land_obj = (R3BLandPoint*) fLandPoints->At(l);
-    
+
     Int_t paddle = int(land_obj->GetSector())-1; //note that paddle starts at 1
     Int_t scint = int(land_obj->GetPaddleNb());
     Double_t eloss = land_obj->GetEnergyLoss()*1000.;
@@ -233,15 +243,15 @@ void R3BLandDigitizer::Exec(Option_t* opt)
     Double_t z = land_obj->GetZIn();
     Double_t time = land_obj->GetTime();
     Int_t media = int(land_obj->GetPaddleType());
-    
-    
+
+
     if (eloss > 0. && media == 3) {
       PMmult[paddle] = PMmult[paddle] + 1;
-      
+
       edep += eloss;
-      
+
       Int_t m = PMmult[paddle];
-      
+
       if (m>1500) {
         LOG(ERROR) << "R3BLandDigitizer: Too many hits in one paddle: "<< m << " hits" << FairLogger::endl
         << "entry " << l << " after sorting" << FairLogger::endl
@@ -256,7 +266,7 @@ void R3BLandDigitizer::Exec(Option_t* opt)
         << "Z In " << z << FairLogger::endl;
         return;
       }
-      
+
       gGeoManager->FindNode(x,y,z);
       gGeoManager->CdUp();
       Double_t local_point[] = {0., 0., 0.};
@@ -265,13 +275,13 @@ void R3BLandDigitizer::Exec(Option_t* opt)
       xpaddle[paddle] = global_point[0];
       ypaddle[paddle] = global_point[1];
       zpaddle[paddle] = global_point[2];
-      
+
       if(fLandDigiPar->GetGeometryFileName().Contains("proto")) {
         // vertical paddles
         PM_res[paddle][m].Ltime = time+(plength-y)/cMedia;
         PM_res[paddle][m].LlightCFD = light*exp(-att*(plength-y));
         PM_res[paddle][m].LlightQDC = light*exp(-att*(plength-y));
-        
+
         PM_res[paddle][m].Rtime = time+(plength+y)/cMedia;
         PM_res[paddle][m].RlightCFD = light*exp(-att*(plength+y));
         PM_res[paddle][m].RlightQDC = light*exp(-att*(plength+y));
@@ -281,7 +291,7 @@ void R3BLandDigitizer::Exec(Option_t* opt)
           PM_res[paddle][m].Ltime = time+(plength-x)/cMedia;
           PM_res[paddle][m].LlightCFD = light*exp(-att*(plength-x));
           PM_res[paddle][m].LlightQDC = light*exp(-att*(plength-x));
-          
+
           PM_res[paddle][m].Rtime = time+(plength+x)/cMedia;
           PM_res[paddle][m].RlightCFD = light*exp(-att*(plength+x));
           PM_res[paddle][m].RlightQDC = light*exp(-att*(plength+x));
@@ -290,7 +300,7 @@ void R3BLandDigitizer::Exec(Option_t* opt)
           PM_res[paddle][m].Ltime = time+(plength-y)/cMedia;
           PM_res[paddle][m].LlightCFD = light*exp(-att*(plength-y));
           PM_res[paddle][m].LlightQDC = light*exp(-att*(plength-y));
-          
+
           PM_res[paddle][m].Rtime = time+(plength+y)/cMedia;
           PM_res[paddle][m].RlightCFD = light*exp(-att*(plength+y));
           PM_res[paddle][m].RlightQDC = light*exp(-att*(plength+y));
@@ -298,22 +308,22 @@ void R3BLandDigitizer::Exec(Option_t* opt)
       }
     }//! eloss
   }//! MC hits
-  
-  
-  
-  
+
+
+
+
   Double_t temp[1500][3];
-  
+
 /*  for (Int_t i=0;i<npaddles;i++){
     //cout<<"loop over paddles "<<i<<endl;
-    
+
     // sort hits according to time; left PM
     for (Int_t j=0;j<PMmult[i];j++){
       temp[j][0]=PM_res[i][j+1].Ltime;
       temp[j][1]=PM_res[i][j+1].LlightCFD;
       temp[j][2]=PM_res[i][j+1].LlightQDC;
     }
-    
+
     for (Int_t j=0;j<PMmult[i];j++){
       Double_t min = 100000;
       Int_t index = 0;
@@ -328,14 +338,14 @@ void R3BLandDigitizer::Exec(Option_t* opt)
       PM_res[i][j+1].LlightQDC=temp[index][2];
       temp[index][0] = 100000.;
     }
-    
+
     // sort hits according to time; right PM
     for (Int_t j=0;j<PMmult[i];j++){
       temp[j][0]=PM_res[i][j+1].Rtime;
       temp[j][1]=PM_res[i][j+1].RlightCFD;
       temp[j][2]=PM_res[i][j+1].RlightQDC;
     }
-    
+
     for (Int_t j=0;j<PMmult[i];j++){
       Double_t min = 100000;
       Int_t index = 0;
@@ -352,8 +362,8 @@ void R3BLandDigitizer::Exec(Option_t* opt)
     }
   }
   */
-  
-  
+
+
   // Check for leading edge
   Double_t triggerTime=1e100;
 //  Double_t triggerTime=40.;
@@ -363,22 +373,22 @@ void R3BLandDigitizer::Exec(Option_t* opt)
         continue;
       }
     }
-    
+
     for (Int_t j = 0; j < PMmult[i]; j++) {
       PM_res[i][j+1].Lenergy=lambda*PM_res[i][j+1].LlightCFD;
       PM_res[i][j+1].Lenergy=PM_res[i][j+1].Lenergy+PM_res[i][j].Lenergy*
       exp(-lambda*(PM_res[i][j+1].Ltime-PM_res[i][j].Ltime));
-      
+
       if(PM_res[i][j+1].Lenergy > Thresh) {
         if(PM_res[i][j+1].Ltime < triggerTime) {
           triggerTime = PM_res[i][j+1].Ltime;
         }// find minimum
       }// if above threshold
-      
+
       PM_res[i][j+1].Renergy=lambda*PM_res[i][j+1].RlightCFD;
       PM_res[i][j+1].Renergy=PM_res[i][j+1].Renergy+PM_res[i][j].Renergy*
       exp(-lambda*(PM_res[i][j+1].Rtime-PM_res[i][j].Rtime));
-      
+
       if(PM_res[i][j+1].Renergy > Thresh) {
         if(PM_res[i][j+1].Rtime < triggerTime) {
           triggerTime = PM_res[i][j+1].Rtime;
@@ -386,8 +396,8 @@ void R3BLandDigitizer::Exec(Option_t* opt)
       }// if above threshold
     }// digis
   }// paddles
-  
-  
+
+
 //  Double_t temp[1500][3];
   for(Int_t i=0;i<npaddles;i++) {
     if(fLandDigiPar->GetGeometryFileName().Contains("proto")) {
@@ -395,18 +405,18 @@ void R3BLandDigitizer::Exec(Option_t* opt)
         continue;
       }
     }
-    
+
     if(! PMmult[i]) {
       continue;
     }
-    
+
     // sort hits according to time; left PM
     for (Int_t j=0;j<PMmult[i];j++){
       temp[j][0]=PM_res[i][j+1].Ltime;
       temp[j][1]=PM_res[i][j+1].LlightCFD;
       temp[j][2]=PM_res[i][j+1].LlightQDC;
     }
-    
+
     for (Int_t j=0;j<PMmult[i];j++){
       Double_t min = 100000;
       Int_t index = 0;
@@ -421,14 +431,14 @@ void R3BLandDigitizer::Exec(Option_t* opt)
       PM_res[i][j+1].LlightQDC=temp[index][2];
       temp[index][0] = 100000.;
     }
-    
+
     // sort hits according to time; right PM
     for (Int_t j=0;j<PMmult[i];j++){
       temp[j][0]=PM_res[i][j+1].Rtime;
       temp[j][1]=PM_res[i][j+1].RlightCFD;
       temp[j][2]=PM_res[i][j+1].RlightQDC;
     }
-    
+
     for (Int_t j=0;j<PMmult[i];j++){
       Double_t min = 100000;
       Int_t index = 0;
@@ -443,7 +453,7 @@ void R3BLandDigitizer::Exec(Option_t* opt)
       PM_res[i][j+1].RlightQDC=temp[index][2];
       temp[index][0] = 100000.;
     }
-    
+
     Double_t tofl = 0.;
     Double_t tofr = 0.;
     Double_t lightr = 0.;
@@ -454,7 +464,7 @@ void R3BLandDigitizer::Exec(Option_t* opt)
     PM_res[i][0].Renergy=0.;
     PM_res[i][0].Ltime=PM_res[i][1].Ltime;
     PM_res[i][0].Rtime=PM_res[i][1].Rtime;
-    
+
     for(Int_t j = 0; j < PMmult[i]; j++) {
       if(PM_res[i][j+1].Lenergy > Thresh && 0 == multl) {
         // This is supposed to mimic a QDC and a TDC
@@ -466,14 +476,15 @@ void R3BLandDigitizer::Exec(Option_t* opt)
         lightl=0.;
         for(Int_t k=1;k<=PMmult[i];k++) {
           // add all times inside +- tofRange (ns) for QDC
-          if(TMath::Abs(PM_res[i][k].Ltime-triggerTime+tofRange/2.) < tofRange) {
+          hRLTimeToTrig->Fill(PM_res[i][k].Ltime-triggerTime);
+          if(TMath::Abs(PM_res[i][k].Ltime-triggerTime+fTOFRange/2.) < fTOFRange) {
 //          if(TMath::Abs(PM_res[i][k].Ltime-triggerTime) < 4.3) {
             lightl = lightl + PM_res[i][k].LlightQDC;
             hPMl->Fill(PM_res[i][k].Ltime, PM_res[i][k].LlightCFD);
           }
         }
       }
-      
+
       if(PM_res[i][j+1].Renergy > Thresh && 0 == multr) {
         // This is supposed to mimic a QDC and a TDC
         // check if light is larger than threshold and register time
@@ -484,7 +495,8 @@ void R3BLandDigitizer::Exec(Option_t* opt)
         lightr=0.;
         for(Int_t k=1;k<=PMmult[i];k++){
           // add all times inside +- tofRange (ns) for QDC
-          if(TMath::Abs(PM_res[i][k].Rtime-triggerTime+tofRange/2.) < tofRange) {
+          hRLTimeToTrig->Fill(PM_res[i][k].Rtime-triggerTime);
+          if(TMath::Abs(PM_res[i][k].Rtime-triggerTime+fTOFRange/2.) < fTOFRange) {
 //          if(TMath::Abs(PM_res[i][k].Rtime-triggerTime) < 4.3) {
             lightr = lightr + PM_res[i][k].RlightQDC;
             hPMr ->Fill(PM_res[i][k].Rtime,PM_res[i][k].RlightCFD);
@@ -492,26 +504,26 @@ void R3BLandDigitizer::Exec(Option_t* opt)
         }
       }
     }
-    
-    
+
+
     // Multiplicity if only one PM has fired
     if(multl > 0 || multr > 0) {
       mult2 = mult2 + 1;
     }
-    
-    
+
+
     if(multl > 0 && multr > 0) {
-      
+
       lightl *= TMath::Exp((2.*(plength))*att/2.);
       lightr *= TMath::Exp((2.*(plength))*att/2.);
 
-      Double_t k = 0.012;
-      lightl = lightl / (1. + k*lightl);
-      lightr = lightr / (1. + k*lightr);
+      // PMT Saturation
+      lightl = lightl / (1. + fSaturationCoefficient*lightl);
+      lightr = lightr / (1. + fSaturationCoefficient*lightr);
 
       lightl = fRnd->Gaus(lightl, 0.05*lightl);
       lightr = fRnd->Gaus(lightr, 0.05*lightr);
-      
+
 //      if(fBeamEnergy > 1000.) {
 //        lightl = fRnd->Gaus(lightl, 0.03*lightl);
 //        lightr = fRnd->Gaus(lightr, 0.03*lightr);
@@ -549,15 +561,15 @@ void R3BLandDigitizer::Exec(Option_t* opt)
       if(lightl < threshL[i] || lightr < threshR[i]) {
         continue;
       }
-      
-      
+
+
       //multiplicity if 2 PM's have fired
       mult1=mult1+1;
-      
+
       QDC_temp[mult1] = TMath::Sqrt(lightl*lightr);
       TDC_temp[mult1] = (tofl + tofr) / 2. - plength/cMedia;
-      
-      
+
+
       if(fLandDigiPar->GetGeometryFileName().Contains("proto")) {
         // vertical paddles
         xpos_temp[mult1] = xpaddle[i];
@@ -578,7 +590,7 @@ void R3BLandDigitizer::Exec(Option_t* opt)
           //	    cout << "delta tof y " << (tofl - tofr) << endl;
         }
       }
-      
+
       // Here is an example how to fill the R3BLandDigi structure
       Double_t tdcL = tofl;
       Double_t tdcR = tofr;
@@ -590,19 +602,19 @@ void R3BLandDigitizer::Exec(Option_t* opt)
       Double_t xx=xpos_temp[mult1];
       Double_t yy=ypos_temp[mult1];
       Double_t zz=zpos_temp[mult1];
-      
+
       AddHit(paddleNr, tdcL, tdcR, tdc, qdcL, qdcR, qdc, xx, yy, zz);
     }
   } // loop over paddles
-  
-  
+
+
   // control histograms
   if(mult2>0){
     hMult2 ->Fill(mult2,1.);
   }
   hMult1->Fill(mult1,1.);
 
-  
+
   if(fVerbose) {
     LOG(INFO) << "R3BLandDigitizer: produced "
     << fLandDigi->GetEntries() << " digis" << FairLogger::endl;
@@ -630,6 +642,7 @@ void R3BLandDigitizer::Finish()
   hPMr->Write();
   hMult1->Write();
   hMult2->Write();
+  hRLTimeToTrig->Write();
 }
 // ----------------------------------------------------------------------------
 
@@ -637,7 +650,7 @@ void R3BLandDigitizer::Finish()
 
 // ----------------------------------------------------------------------------
 R3BLandDigi* R3BLandDigitizer::AddHit(Int_t paddleNr, Double_t tdcL, Double_t tdcR,
-                                      Double_t tdc, Double_t qdcL, Double_t qdcR, Double_t qdc, 
+                                      Double_t tdc, Double_t qdcL, Double_t qdcR, Double_t qdc,
                                       Double_t xx, Double_t yy, Double_t zz)
 {
   R3BLandDigi *digi = new((*fLandDigi)[fLandDigi->GetEntriesFast()]) R3BLandDigi(paddleNr,

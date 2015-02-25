@@ -26,7 +26,7 @@ public:
   /** Default constructor **/
   R3BLandDigitizer();
 
-  /** Constructor **/  
+  /** Constructor **/
   R3BLandDigitizer(Int_t verbose);
 
   /** Destructor **/
@@ -39,11 +39,21 @@ public:
   virtual void Exec(Option_t* opt);
 
   virtual void Finish();
-  
+
   virtual void Reset();
 
-  inline void UseBeam(const Double_t& beamEnergy) {  fBeamEnergy = beamEnergy;  }
-  
+  // Allow change of the PMT Saturation at runtime. R3BLandDigitizer is initialized with the default value
+  inline void SetSaturationCoefficient(const Double_t& saturationCoefficient) {  fSaturationCoefficient = saturationCoefficient;  }
+  inline Double_t GetSaturationCoefficient() const  {  return fSaturationCoefficient;  }
+
+  // Allow change of length of time gate for QDC ("Integration time") at runtime
+  inline void SetTOFRange(const Double_t& TOFRange) {  fTOFRange = TOFRange;  }
+  inline Double_t GetTOFRange() const  {  return fTOFRange;  }
+  Double_t BuildTOFRangeFromBeamEnergy(const Double_t &e);
+  // Compatibility to not break existing code
+  inline void UseBeam(const Double_t& beamEnergy) { fBeamEnergy = beamEnergy; }
+
+
   inline void UseThresholds(const char *fileName, const Int_t nChannels)
   { fThreshFileName = TString(fileName);  fNChannels = nChannels; }
 
@@ -51,15 +61,15 @@ public:
                       Double_t qdcL, Double_t qdcR, Double_t qdc,
                       Double_t xx,Double_t yy, Double_t zz );
 
-  
+
 protected:
-  
+
   TF1 *f1;
   TRandom3 *fRnd;
-  
+
   TString fThreshFileName;
   Int_t fNChannels;
-  
+
   TClonesArray *fLandPoints;
   TClonesArray *fLandMCTrack;
   TClonesArray *fLandDigi;
@@ -72,10 +82,11 @@ protected:
   TH1F *hPMr;
   TH1F *hMult1;
   TH1F *hMult2;
+  TH1F *hRLTimeToTrig;
 
   Double_t threshL[5000];
   Double_t threshR[5000];
- 
+
   Int_t eventNo;
   Int_t npaddles;
   Int_t nplanes;
@@ -87,12 +98,16 @@ protected:
   Double_t fBeamEnergy;
   PM_RES **PM_res;
 
+  static const Double_t DEFAULT_SATURATION_COEFFICIENT;
+  Double_t fSaturationCoefficient;
+  
+  Double_t fTOFRange;
 
 private:
-  
+
   virtual void SetParContainers();
 
- 
+
   ClassDef(R3BLandDigitizer,1)
 };
 
