@@ -39,6 +39,7 @@ EndIf (FAIRBASE)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
 set(CMAKE_MODULE_PATH "${FAIRROOTPATH}/share/fairbase/cmake/modules"  ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH "${FAIRROOTPATH}/share/fairbase/cmake/modules_old"  ${CMAKE_MODULE_PATH})
 
 # Check if the compiler support specific C++11 features
 # Up to now this is only a check since the code does not use
@@ -120,26 +121,38 @@ Else(FAIRSOFT_EXTERN)
   set(GSL_DIR ${SIMPATH}/basics/gsl)
 EndIf(FAIRSOFT_EXTERN)
 
-IF(FAIRROOT_FOUND)
-  Set(Boost_NO_SYSTEM_PATHS TRUE)
-  Set(Boost_NO_BOOST_CMAKE TRUE)
-  Message("-- Looking for Boost ...")
-  # If an older version of boost is found both of the variables below are
-  # cached and in a second cmake run, a good boost version is found even
-  # if the version is to old.
-  # To overcome this problem both variables are cleared before checking
-  # for boost.
-  Unset(Boost_INCLUDE_DIR CACHE)
-  Unset(Boost_LIBRARY_DIRS CACHE)
-  find_package(Boost 1.41 COMPONENTS thread system timer)
-  If (Boost_FOUND)
-    Set(Boost_Avail 1)
-  Else (Boost_FOUND)
-    Set(Boost_Avail 0)
-  EndIf (Boost_FOUND)
-ENDIF(FAIRROOT_FOUND)
+
+Set(Boost_NO_SYSTEM_PATHS TRUE)
+Set(Boost_NO_BOOST_CMAKE TRUE)
+Message("-- Looking for Boost ...")
+# If an older version of boost is found both of the variables below are
+# cached and in a second cmake run, a good boost version is found even
+# if the version is to old.
+# To overcome this problem both variables are cleared before checking
+# for boost.
+Unset(Boost_INCLUDE_DIR CACHE)
+Unset(Boost_LIBRARY_DIRS CACHE)
+find_package(Boost 1.41 COMPONENTS thread system timer program_options)
+If (Boost_FOUND)
+  Set(Boost_Avail 1)
+Else (Boost_FOUND)
+  Set(Boost_Avail 0)
+EndIf (Boost_FOUND)
+
 
 SetBasicVariables()
+
+
+# Check if FairRoot was compiled with FairDB option
+find_library(FAIRDB_FOUND FairDB ${FAIRROOTPATH}/lib NO_DEFAULT_PATH)
+if(FAIRDB_FOUND)
+  Message("Found FairDB ...")
+  Add_Definitions(-DWITH_FAIRDB)
+  Set(DEFINITIONS "${DEFINITIONS} -DWITH_FAIRDB")
+else(FAIRDB_FOUND)
+  Message("Building without dbase ...")
+endif(FAIRDB_FOUND)
+
 
 # searches for needed packages
 # REQUIRED means that cmake will stop if this packages are not found
@@ -151,7 +164,7 @@ if(R3BROOT_MINIMAL)
 else(R3BROOT_MINIMAL)
   find_package(ROOT 5.32.00 REQUIRED)
   find_package(PLUTO REQUIRED)
-  find_package(GENERATORS REQUIRED)
+#  find_package(GENERATORS REQUIRED)
   find_package(GEANT3 REQUIRED)
   find_package(GEANT4 REQUIRED)
   find_package(GEANT4DATA)
