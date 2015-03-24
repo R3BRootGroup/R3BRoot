@@ -3,7 +3,7 @@
 # The extension is already found.  Any number of sources could be listed here.
 
 set(INCLUDE_DIRECTORIES
-${ROOT_INCLUDE_DIR} 
+${SYSTEM_INCLUDE_DIRECTORIES} 
 #put here all directories where header files are located
 ${BASE_INCLUDE_DIRECTORIES}
 ${R3BROOT_SOURCE_DIR}/r3bbase 
@@ -14,7 +14,7 @@ ${R3BROOT_SOURCE_DIR}/land/unpack
 ${R3BROOT_SOURCE_DIR}/los
 ${R3BROOT_SOURCE_DIR}/los/unpack
 ${R3BROOT_SOURCE_DIR}/r3bdata/
-${R3BROOT_SOURCE_DIR}/r3bdata/calData
+${R3BROOT_SOURCE_DIR}/r3bdata/caloData
 ${R3BROOT_SOURCE_DIR}/r3bdata/dchData
 ${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
@@ -56,7 +56,7 @@ R3BPrimPart.cxx
 R3BNeutronTracker2D.cxx
 R3BNeutHit.cxx
 unpack/R3BLandRawAna.cxx
-unpack/R3BLandRawHit.cxx
+unpack/R3BLandRawAnaS438b.cxx
 unpack/R3BLandMapping.cxx
 unpack/R3BLandRawHitMapped.cxx
 unpack/R3BLandUnpack.cxx
