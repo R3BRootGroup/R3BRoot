@@ -47,7 +47,7 @@ class R3BLandTCalPar : public FairParGenericSet
     Int_t    GetBinLowAt(Int_t i) const {return fBinLow[i];}
     Int_t    GetBinUpAt(Int_t i) const {return fBinUp[i];}
 
-    void SetCompId(Int_t x)  {SetComboNo(x); fCompId=x;}
+    void SetCompId(Int_t x)  {/*SetComboNo(x);*/ fCompId=x;}
     void SetBarId(Int_t i) {fBarId=i;}
     void SetSide(Int_t i) {fSide=i;}
     void IncrementNofChannels() { fNofChannels += 1; }
