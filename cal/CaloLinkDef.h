@@ -14,8 +14,9 @@
 #pragma link C++ class R3BCaloUnpack+;
 #pragma link C++ class R3BCaloUnpackPar+;
 #pragma link C++ class R3BCaloRawAna+;
-#pragma link C++ class R3BCaloRawHit+;
+#ifdef WITH_FAIRDB
 #pragma link C++ class R3BCaloCal+;
+#endif
 #pragma link C++ class R3BCaloCrystalAna+;
 
 

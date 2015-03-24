@@ -3,7 +3,7 @@
 # The extension is already found.  Any number of sources could be listed here.
 
 set(INCLUDE_DIRECTORIES
-${ROOT_INCLUDE_DIR} 
+${SYSTEM_INCLUDE_DIRECTORIES} 
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase 
 ${R3BROOT_SOURCE_DIR}/passive 
@@ -40,13 +40,17 @@ R3BCaloHitFinderPar.cxx
 R3BGeoCalo.cxx   
 R3BGeoCaloPar.cxx   
 R3BCaloContFact.cxx
-unpack/R3BCaloRawHit.cxx
 unpack/R3BCaloUnpack.cxx
 unpack/R3BCaloUnpackPar.cxx
 unpack/R3BCaloRawAna.cxx
-unpack/R3BCaloCal.cxx
 unpack/R3BCaloCrystalAna.cxx
 )
+
+if(FAIRDB_FOUND)
+set(SRCS
+${SRCS}
+unpack/R3BCaloCal.cxx)
+endif(FAIRDB_FOUND)
 
 # fill list of header files from list of source files
 # by exchanging the file extension
@@ -56,6 +60,11 @@ set(LINKDEF CaloLinkDef.h)
 set(LIBRARY_NAME R3BCalo)
 set(DEPENDENCIES
     R3Bbase R3BData R3BPassive MCStack R3BXBall)
+
+if(FAIRDB_FOUND)
+set(DEPENDENCIES
+    ${DEPENDENCIES} FairDB)
+endif(FAIRDB_FOUND)
 
 GENERATE_LIBRARY()
 
