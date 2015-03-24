@@ -3,6 +3,7 @@
 
 
 #include "FairField.h"
+#include "R3BFieldPar.h"
 #include "TRotation.h"
 #include "TVector3.h"
 
@@ -26,7 +27,7 @@ public:
 
 
   /** Constructor from R3BGladFieldPar **/
- // R3BGladFieldMap(R3BGladFieldPar* fieldPar);
+  R3BGladFieldMap(R3BFieldPar* fieldPar);
 
 
   /** Constructor from R3BGladFieldMapCreator **/

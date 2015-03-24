@@ -129,6 +129,10 @@ void R3BFieldPar::SetParameters(FairField* field) {
   }
 
   fType = field->GetType();
+    if(TString(field->GetName()).Contains("Glad"))
+    {
+        fType = 2;
+    }
  
   if ( fType == 0 ) {                                 // constant field
     R3BFieldConst* fieldConst = (R3BFieldConst*) field;

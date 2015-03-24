@@ -59,8 +59,8 @@ R3BGladFieldMap::R3BGladFieldMap(const char* mapName, const char* fileType)
 
 
 // ------------   Constructor from R3BGladFieldPar   --------------------------
-/*
-R3BGladFieldMap::R3BGladFieldMap(R3BGladFieldPar* fieldPar) {
+
+R3BGladFieldMap::R3BGladFieldMap(R3BFieldPar* fieldPar) {
   fType = 1;
   fPosX  = fPosY  = fPosZ  = 0.;
   fXmin  = fYmin  = fZmin  = 0.;
@@ -82,12 +82,13 @@ R3BGladFieldMap::R3BGladFieldMap(R3BGladFieldPar* fieldPar) {
     fPosY  = fieldPar->GetPositionY();
     fPosZ  = fieldPar->GetPositionZ();
     fScale = fieldPar->GetScale();
-    TString dir = getenv("VMCWORKDIR");
-    fFileName = dir + "/input/" + fName + ".root";
-    fType = fieldPar->GetType();
+      TString dir = getenv("VMCWORKDIR");
+      fFileName = dir + "/field/magField/R3B/" + fName;
+      fFileName += ".dat";
+    //fType = fieldPar->GetType();
   }
 }
-*/
+
 
 
 
