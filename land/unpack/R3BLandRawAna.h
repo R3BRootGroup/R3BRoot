@@ -10,6 +10,7 @@
 
 #include "FairTask.h"
 
+class R3BEventHeader;
 class TClonesArray;
 class TH1F;
 class TH2F;
@@ -30,10 +31,13 @@ class R3BLandRawAna : public FairTask
   private:
     Int_t fnEvents;
 
+    R3BEventHeader *fHeader;
     TClonesArray* fLandRawHit;
     TClonesArray* fLandRawHitMapped;
     TClonesArray* fLosRawHit;
 
+    TH1F* fh_trigger;
+    
     TH1F* fh_land_raw_sam;
     TH1F* fh_land_raw_gtb;
     TH1F* fh_land_raw_tacaddr;

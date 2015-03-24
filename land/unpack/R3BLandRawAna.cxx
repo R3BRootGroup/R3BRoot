@@ -16,6 +16,7 @@ using namespace std;
 #include "FairRunOnline.h"
 #include "FairLogger.h"
 
+#include "R3BEventHeader.h"
 #include "R3BLandRawHit.h"
 #include "R3BLandRawHitMapped.h"
 #include "R3BLosRawHit.h"
@@ -23,6 +24,7 @@ using namespace std;
 
 R3BLandRawAna::R3BLandRawAna()
     : fnEvents(0)
+    , fHeader(NULL)
     , fLandRawHit(NULL)
     , fLandRawHitMapped(NULL)
     , fLosRawHit(NULL)
@@ -32,6 +34,7 @@ R3BLandRawAna::R3BLandRawAna()
 R3BLandRawAna::R3BLandRawAna(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fnEvents(0)
+    , fHeader(NULL)
     , fLandRawHit(NULL)
     , fLandRawHitMapped(NULL)
     , fLosRawHit(NULL)
@@ -45,6 +48,7 @@ R3BLandRawAna::~R3BLandRawAna()
 InitStatus R3BLandRawAna::Init()
 {
     FairRootManager* fMan = FairRootManager::Instance();
+    fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
     fLandRawHit = (TClonesArray*)fMan->GetObject("LandRawHit");
     fLandRawHitMapped = (TClonesArray*)fMan->GetObject("LandRawHitMapped");
     //fLosRawHit = (TClonesArray*)fMan->GetObject("LosRawHit");
@@ -55,6 +59,11 @@ InitStatus R3BLandRawAna::Init()
 
 void R3BLandRawAna::Exec(Option_t* option)
 {
+    if(fHeader)
+    {
+        fh_trigger->Fill(fHeader->GetTrigger());
+    }
+
     if (fLandRawHit)
     {
         Int_t nLandRawHits = fLandRawHit->GetEntries();
@@ -121,6 +130,8 @@ void R3BLandRawAna::FinishTask()
 
 void R3BLandRawAna::CreateHistos()
 {
+    fh_trigger = new TH1F("h_trigger", "Trigger", 10, -0.5, 9.5);
+    
     fh_land_raw_sam = new TH1F("h_land_raw_sam", "SAM", 20, -0.5, 19.5);
     fh_land_raw_gtb = new TH1F("h_land_raw_gtb", "GTB", 10, -0.5, 9.5);
     fh_land_raw_tacaddr = new TH1F("h_land_raw_tacaddr", "TAC module", 30, -0.5, 29.5);
@@ -142,7 +153,9 @@ void R3BLandRawAna::CreateHistos()
     fh_los_raw_clock = new TH1F("h_los_raw_clock", "Clock count", 1000, 0., 10000.);
 
     FairRunOnline* run = FairRunOnline::Instance();
-
+    
+    run->AddObject(fh_trigger);
+    
     run->AddObject(fh_land_raw_sam);
     run->AddObject(fh_land_raw_gtb);
     run->AddObject(fh_land_raw_tacaddr);
