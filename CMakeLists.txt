@@ -212,7 +212,6 @@ ENDIF (NOT FAIRROOT_FOUND)
 
 add_subdirectory (r3bbase)  
 add_subdirectory (passive) 
-add_subdirectory (mcstack) 
 add_subdirectory (cal)
 add_subdirectory (xball)
 add_subdirectory (dch) 

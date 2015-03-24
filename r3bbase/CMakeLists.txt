@@ -9,8 +9,6 @@ ${BASE_INCLUDE_DIRECTORIES}
 ${R3BROOT_SOURCE_DIR}/r3bbase 
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/caloData
-#${R3BROOT_SOURCE_DIR}/passive
-#${R3BROOT_SOURCE_DIR}/mcstack 
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

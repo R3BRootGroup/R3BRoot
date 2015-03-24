@@ -7,7 +7,6 @@ ${ROOT_INCLUDE_DIR}
 #put here all directories where header files are located
 ${BASE_INCLUDE_DIRECTORIES}
 ${R3BROOT_SOURCE_DIR}/passive
-${R3BROOT_SOURCE_DIR}/mcstack
 ${R3BROOT_SOURCE_DIR}/tof
 ${R3BROOT_SOURCE_DIR}/plists
 ${GEANT4_INCLUDE_DIR}
