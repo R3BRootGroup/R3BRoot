@@ -6,8 +6,10 @@
  
 #pragma link C++ class R3BLosUnpack+;
 #pragma link C++ class R3BLosRawHit+;
+#ifdef WITH_FAIRDB
 #pragma link C++ class R3BLosTcalFill+;
 #pragma link C++ class R3BLosTcal+;
+#endif
 #pragma link C++ class R3BLosHit+;
 
 #endif

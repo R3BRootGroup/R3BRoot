@@ -33,10 +33,16 @@ link_directories( ${LINK_DIRECTORIES})
 set(SRCS
 unpack/R3BLosUnpack.cxx
 unpack/R3BLosRawHit.cxx
-unpack/R3BLosTcalFill.cxx
-unpack/R3BLosTcal.cxx
 unpack/R3BLosHit.cxx
 )
+
+if(FAIRDB_FOUND)
+set(SRCS
+${SRCS}
+unpack/R3BLosTcalFill.cxx
+unpack/R3BLosTcal.cxx
+)
+endif(FAIRDB_FOUND)
 
 # fill list of header files from list of source files
 # by exchanging the file extension
@@ -45,7 +51,12 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF LosLinkDef.h)
 Set(LIBRARY_NAME R3BLos)
 Set(DEPENDENCIES
-    R3Bbase R3BData R3BPassive R3BLosDB MCStack)
+    R3Bbase R3BData R3BPassive MCStack)
+
+if(FAIRDB_FOUND)
+Set(DEPENDENCIES
+    ${DEPENDENCIES} R3BLosDB)
+endif(FAIRDB_FOUND)
 
 GENERATE_LIBRARY()
 
