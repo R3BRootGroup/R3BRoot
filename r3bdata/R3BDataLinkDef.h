@@ -14,6 +14,7 @@
 #pragma link C++ class R3BXBallCrystalHitSim+;
 #pragma link C++ class R3BCaloCrystalHit+;
 #pragma link C++ class R3BCaloCrystalHitSim+;
+#pragma link C++ class R3BCaloRawHit+;
 #pragma link C++ class R3BCaloHit+;
 #pragma link C++ class R3BCaloHitSim+;
 #pragma link C++ class R3BCaloPoint+;
@@ -45,6 +46,7 @@
 #pragma link C++ class R3BLandPoint+;
 #pragma link C++ class R3BNeuLandPoint+;
 #pragma link C++ class R3BNeutronTrack+;
+#pragma link C++ class R3BLandRawHit+;
 #pragma link C++ class R3BLandDigi+;
 #pragma link C++ class R3BLandFirstHits+;
 #pragma link C++ class R3BLandHit+;

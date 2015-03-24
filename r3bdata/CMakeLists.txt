@@ -3,7 +3,7 @@
 # The extension is already found.  Any number of sources could be listed here.
 
 set(INCLUDE_DIRECTORIES
-${ROOT_INCLUDE_DIR} 
+${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
 ${CMAKE_SOURCE_DIR}/r3bdata  
 )
@@ -25,6 +25,7 @@ xballData/R3BXBallCrystalHit.cxx
 xballData/R3BXBallCrystalHitSim.cxx
 caloData/R3BCaloCrystalHit.cxx
 caloData/R3BCaloCrystalHitSim.cxx
+caloData/R3BCaloRawHit.cxx
 caloData/R3BCaloHit.cxx
 caloData/R3BCaloHitSim.cxx
 caloData/R3BCaloPoint.cxx 
@@ -45,6 +46,7 @@ startrackerData/R3BSTaRTrackerHit.cxx
 startrackerData/R3BSTaRTrackerDigitHit.cxx
 landData/R3BLandPoint.cxx
 landData/R3BNeuLandPoint.cxx 
+landData/R3BLandRawHit.cxx
 landData/R3BLandDigi.cxx 
 landData/R3BLandFirstHits.cxx 
 landData/R3BLandHit.cxx 
