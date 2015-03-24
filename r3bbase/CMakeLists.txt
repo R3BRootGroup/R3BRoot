@@ -5,10 +5,10 @@
 set(INCLUDE_DIRECTORIES
 ${ROOT_INCLUDE_DIR} 
 ${BASE_INCLUDE_DIRECTORIES}
-${R3BROOT_SOURCE_DIR}/fairtools
-${R3BROOT_SOURCE_DIR}/MbsAPI
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase 
+${R3BROOT_SOURCE_DIR}/r3bdata/landData
+${R3BROOT_SOURCE_DIR}/r3bdata/caloData
 #${R3BROOT_SOURCE_DIR}/passive
 #${R3BROOT_SOURCE_DIR}/mcstack 
 )
@@ -27,6 +27,8 @@ R3BModule.cxx
 R3BDetector.cxx 
 R3BEventHeader.cxx
 R3BEventHeaderUnpack.cxx
+R3BTimeStampUnpack.cxx
+R3BLmdSource.cxx
 )
 
 # fill list of header files from list of source files
@@ -34,9 +36,11 @@ R3BEventHeaderUnpack.cxx
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
 Set(LINKDEF R3BLinkDef.h)
-Set(LIBRARY_NAME R3Bbase)
+
 Set(DEPENDENCIES
-    GeoBase ParBase Core Geom GenVector Physics Matrix MathCore FairTools)
+    GeoBase ParBase MbsAPI Base FairTools R3BData Core Geom GenVector Physics Matrix MathCore)
+
+Set(LIBRARY_NAME R3Bbase)
 
 GENERATE_LIBRARY()
 
