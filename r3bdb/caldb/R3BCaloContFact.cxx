@@ -59,7 +59,7 @@ FairParSet* R3BCaloContFact::createContainer(FairContainer* c)
 
   const char* name=c->GetName();
   cout << "-I-R3BCaloContFact::createContainer " << name << endl;
-  FairParSet* p=NULL;
+  FairDbObjTableMap* p=NULL;
 
   if (strcmp(name,"CaloGeometryPar")==0) {
     p=new R3BCaloGeometryPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());

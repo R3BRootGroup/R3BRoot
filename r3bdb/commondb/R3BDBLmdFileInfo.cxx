@@ -38,7 +38,7 @@ const std::string R3BDBLmdFileInfo::kNoRunType  = "<<NoRunType>>";
 
 
 R3BDBLmdFileInfo::R3BDBLmdFileInfo(const char* name, const char* title, const char* context, Bool_t own)
-  : FairParGenericSet(name,title,context, own)
+  : FairDbObjTableMap(name,title,context, own)
      ,fCompId(0)
      ,fFileId(0)
      ,fRunNr(0)

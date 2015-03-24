@@ -29,7 +29,7 @@ template class  FairDbWriter<R3BCaloAPDPar>;
 
 
 R3BCaloAPDPar::R3BCaloAPDPar(const char* name, const char* title, const char* context, Bool_t own)
-  : FairParGenericSet(name,title,context, own),
+  : FairDbObjTableMap(name,title,context, own),
     fId(0),
     fIdHamamatsu(0),
     fVrHamamatsu(0),   

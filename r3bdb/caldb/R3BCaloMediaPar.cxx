@@ -29,7 +29,7 @@ template class  FairDbWriter<R3BCaloMediaPar>;
 
 
 R3BCaloMediaPar::R3BCaloMediaPar(const char* name, const char* title, const char* context, Bool_t own)
-  : FairParGenericSet(name,title,context, own),
+  : FairDbObjTableMap(name,title,context, own),
     fName(""), 
     fDensity(0.),
     fRadLen(0.),

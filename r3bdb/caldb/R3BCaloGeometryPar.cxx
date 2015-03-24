@@ -25,7 +25,7 @@ ClassImp(R3BCaloGeometryPar);
 
 
 R3BCaloGeometryPar::R3BCaloGeometryPar(const char* name, const char* title, const char* context, Bool_t own)
-  : FairParGenericSet(name,title,context, own),
+  : FairDbObjTableMap(name,title,context, own),
 	fMateria(new TObjArray()),
 	fGeomCrystals(new TObjArray()),
 	fGeomAlveoli(new TObjArray()),

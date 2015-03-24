@@ -29,7 +29,7 @@ class FairParamList;
 
 
 
-class R3BDBLmdFileInfo : public FairParGenericSet
+class R3BDBLmdFileInfo : public FairDbObjTableMap
 {
 
 using TObject::Compare;

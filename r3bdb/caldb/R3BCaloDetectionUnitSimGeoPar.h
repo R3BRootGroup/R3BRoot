@@ -29,7 +29,7 @@ class FairDbValRecord;
 class FairParamList;
 
 
-class R3BCaloDetectionUnitSimGeoPar : public FairParGenericSet
+class R3BCaloDetectionUnitSimGeoPar : public FairDbObjTableMap
 {
 
 using TObject::Compare;

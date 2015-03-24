@@ -20,7 +20,7 @@ class FairDbValRecord;
 class FairParamList;
 
 
-class R3BCaloCalPar : public FairParGenericSet
+class R3BCaloCalPar : public FairDbObjTableMap
 {
 
   public :

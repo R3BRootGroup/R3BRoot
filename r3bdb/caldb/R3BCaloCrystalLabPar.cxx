@@ -29,7 +29,7 @@ template class  FairDbWriter<R3BCaloCrystalLabPar>;
 
 
 R3BCaloCrystalLabPar::R3BCaloCrystalLabPar(const char* name, const char* title, const char* context, Bool_t own)
-  : FairParGenericSet(name,title,context, own),
+  : FairDbObjTableMap(name,title,context, own),
     fIdCrystal(0),
     fResolution(0.),
     fChannelCo1(0.),

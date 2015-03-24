@@ -32,7 +32,7 @@ template class  FairDbWriter<R3BDBRunInfo>;
 
 
 R3BDBRunInfo::R3BDBRunInfo(const char* name, const char* title, const char* context, Bool_t own)
-  : FairParGenericSet(name,title,context, own),
+  : FairDbObjTableMap(name,title,context, own),
 	fCompId(0),
 	fRunId(0),
     fRunTime(0)

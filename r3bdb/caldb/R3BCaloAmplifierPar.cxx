@@ -29,7 +29,7 @@ template class  FairDbWriter<R3BCaloAmplifierPar>;
 
 
 R3BCaloAmplifierPar::R3BCaloAmplifierPar(const char* name, const char* title, const char* context, Bool_t own)
-  : FairParGenericSet(name,title,context, own),
+  : FairDbObjTableMap(name,title,context, own),
     fId(""),
     fSerialNumber(""),
     fOrigin(""),

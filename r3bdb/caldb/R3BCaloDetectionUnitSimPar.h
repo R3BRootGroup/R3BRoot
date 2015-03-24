@@ -25,7 +25,7 @@ class FairDbValRecord;
 class FairParamList;
 
 
-class R3BCaloDetectionUnitSimPar : public FairParGenericSet
+class R3BCaloDetectionUnitSimPar : public FairDbObjTableMap
 {
 
 using TObject::Compare;

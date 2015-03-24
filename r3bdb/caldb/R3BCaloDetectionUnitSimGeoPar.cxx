@@ -29,7 +29,7 @@ template class  FairDbWriter<R3BCaloDetectionUnitSimGeoPar>;
 
 
 R3BCaloDetectionUnitSimGeoPar::R3BCaloDetectionUnitSimGeoPar(const char* name, const char* title, const char* context, Bool_t own)
-  : FairParGenericSet(name,title,context, own),
+  : FairDbObjTableMap(name,title,context, own),
 	fCompId(0),
 	fCrystalTypeId(0),
     fDZ(0.0),

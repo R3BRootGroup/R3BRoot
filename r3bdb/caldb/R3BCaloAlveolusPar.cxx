@@ -29,7 +29,7 @@ template class  FairDbWriter<R3BCaloAlveolusPar>;
 
 
 R3BCaloAlveolusPar::R3BCaloAlveolusPar(const char* name, const char* title, const char* context, Bool_t own)
-  : FairParGenericSet(name,title,context, own),
+  : FairDbObjTableMap(name,title,context, own),
     fCompId(0),
     fAlveolusNodeId(0),
     fAlveolusTypeId(0),
