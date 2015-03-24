@@ -18,17 +18,28 @@ class R3BEventHeader : public FairEventHeader
     {
         fTrigger = trigger;
     }
+    
+    inline void SetTimeStamp(const ULong_t& timeStamp)
+    {
+        fTimeStamp = timeStamp;
+    }
 
     inline const Int_t& GetTrigger() const
     {
         return fTrigger;
     }
+    
+    inline const ULong_t& GetTimeStamp() const
+    {
+        return fTimeStamp;
+    }
 
   private:
     Int_t fTrigger;
+    ULong_t fTimeStamp;
 
   public:
-    ClassDef(R3BEventHeader, 1)
+    ClassDef(R3BEventHeader, 2)
 };
 
 #endif
