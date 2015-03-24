@@ -29,7 +29,7 @@ template class  FairDbWriter<R3BLosTCalPar>;
 
 
 R3BLosTCalPar::R3BLosTCalPar(const char* name, const char* title, const char* context, Bool_t own)
-  : FairParGenericSet(name,title,context, own),
+  : FairDbObjTableMap(name,title,context, own),
 	fCompId(0),
 	fChannel(0)
 {

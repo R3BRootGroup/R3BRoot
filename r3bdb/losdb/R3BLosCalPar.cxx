@@ -71,7 +71,7 @@ void R3BLosCalPar::fill(UInt_t rid){
   ValCondition context(FairDbDetector::kLos,DataType::kData,end);
 
   // Activate reading for this Context
-  r_tpar->Activate(context, GetVersion());
+//  r_tpar->Activate(context, GetVersion());
 
 
   Int_t numTCh = r_tpar->GetNumRows(); 

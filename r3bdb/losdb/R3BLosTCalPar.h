@@ -30,7 +30,7 @@ class FairParamList;
 
 
 
-class R3BLosTCalPar : public FairParGenericSet
+class R3BLosTCalPar : public FairDbObjTableMap
 {
 
 using TObject::Compare;
@@ -48,7 +48,7 @@ using TObject::Compare;
     void Print();
 
     /** Accessor functions **/
-    Int_t GetComboNo()       const {return fCompId;}
+    Int_t GetAggregateNo()       const {return fCompId;}
     Int_t GetCompId()   const {return fCompId;}
     Int_t GetChannel() const {return fChannel;}
     Double_t GetTimeAt(Int_t i) const {return fTime[i];}
@@ -68,9 +68,9 @@ using TObject::Compare;
     // Add-ons: SQL descriptors for the parameter class
     virtual std::string GetTableDefinition(const char* Name = 0);
 
-    virtual FairDbObjTableMap* CreateObjTableMap() const {
+    /*virtual FairDbObjTableMap* CreateObjTableMap() const {
       return new R3BLosTCalPar();
-    }
+    }*/
 
     // Atomic IO (intrinsic)
     virtual void Fill(FairDbResultPool& res_in,
