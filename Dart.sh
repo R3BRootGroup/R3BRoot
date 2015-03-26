@@ -39,11 +39,11 @@ if [ "$#" -lt "2" ]; then
 fi
 
 # test if a ctest model is either Experimantal or Nightly
-if [ "$1" == "Experimental" -o "$1" == "Nightly" -o "$1" == "Continuous" ]; then
+if [ "$1" == "Experimental" -o "$1" == "Nightly" -o "$1" == "Continuous" -o "$1" == "Profile" ]; then
   echo ""
 else
   echo "-- Error -- This ctest model is not supported."
-  echo "-- Error -- Possible arguments are Nightly, Experimental or Continuous."
+  echo "-- Error -- Possible arguments are Nightly, Experimental, Continuous or Profile."
   exit 1
 fi 
 
@@ -88,6 +88,9 @@ then
     export number_of_processors=$(cat /proc/cpuinfo | grep processor | wc -l)
   fi
   export SITE=$(hostname -f)
+  if [ -z $SITE ]; then
+    export SITE=$(uname -n)
+  fi
 elif [ "$arch" = "darwin" ];
 then
   if [ "$NCPU" != "" ];
