@@ -26,8 +26,8 @@ fTimelb(0),
 fTimeExtvhb(0),
 fTimeExthb(0),
 fTimeExtlb(0),
-fInfoCode(0),
-fInfoField(0)
+fInfoField(0),
+fInfoCode(0)
 {
 }
 
@@ -49,8 +49,8 @@ fTimelb(timelb),
 fTimeExtvhb(timeExtvhb),
 fTimeExthb(timeExthb),
 fTimeExtlb(timeExtlb),
-fInfoCode(infocode),
-fInfoField(infofield)
+fInfoField(infofield),
+fInfoCode(infocode)
 {
 }
 

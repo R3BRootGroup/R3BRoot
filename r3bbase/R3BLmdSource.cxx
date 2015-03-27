@@ -157,7 +157,7 @@ Bool_t R3BLmdSource::OpenNextFile(TString fileName)
 
 
   // Decode File Header
-  Bool_t result = Unpack((Int_t*)fxInfoHeader, sizeof(s_filhe), -4, -4, -4, -4, -4);
+  /*Bool_t result = */Unpack((Int_t*)fxInfoHeader, sizeof(s_filhe), -4, -4, -4, -4, -4);
 
   cout << "-I- R3BLmdSource::OpenNextFile : file "
        << fileName << " opened." << endl;

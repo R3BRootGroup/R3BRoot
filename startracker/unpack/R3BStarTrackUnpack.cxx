@@ -83,8 +83,8 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
   LOG(INFO) << "R3BSTaRTrackUnpack : Unpacking... size = "  << size << FairLogger::endl;
 
   UInt_t l_s = 0;
-  Int_t nInfo4 = 0;
-  Int_t nInfo5 = 0;
+  //Int_t nInfo4 = 0;
+  //Int_t nInfo5 = 0;
  
   UInt_t* pl_data = (UInt_t*)(data + l_s); // let's find 0x00000200 
   
