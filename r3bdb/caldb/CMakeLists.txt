@@ -2,16 +2,20 @@
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 
-set(INCLUDE_DIRECTORIES
-${ROOT_INCLUDE_DIR}
+Set(SYSTEM_INCLUDE_DIRECTORIES 
+${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
-${CMAKE_SOURCE_DIR}/r3bdb/commondb
-${CMAKE_SOURCE_DIR}/r3bdb/caldb
-${CMAKE_SOURCE_DIR}/r3bdb/r3bdata/calodata
-${CMAKE_SOURCE_DIR}/r3bdb/cal
+)
+
+set(INCLUDE_DIRECTORIES
+${R3BROOT_SOURCE_DIR}/r3bdb/commondb
+${R3BROOT_SOURCE_DIR}/r3bdb/caldb
+${R3BROOT_SOURCE_DIR}/r3bdb/r3bdata/calodata
+${R3BROOT_SOURCE_DIR}/r3bdb/cal
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
+include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}

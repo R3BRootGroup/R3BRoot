@@ -2,14 +2,18 @@
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 
-set(INCLUDE_DIRECTORIES
-${ROOT_INCLUDE_DIR} 
+Set(SYSTEM_INCLUDE_DIRECTORIES 
+${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
-${CMAKE_SOURCE_DIR}/r3bbase  
-${CMAKE_SOURCE_DIR}/field 
-${CMAKE_SOURCE_DIR}/passive  )
+)
+
+set(INCLUDE_DIRECTORIES
+${R3BROOT_SOURCE_DIR}/r3bbase  
+${R3BROOT_SOURCE_DIR}/field 
+${R3BROOT_SOURCE_DIR}/passive  )
 
 include_directories( ${INCLUDE_DIRECTORIES})
+include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
