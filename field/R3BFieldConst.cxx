@@ -15,30 +15,40 @@ using std::setw;
 
 
 // -----   Default constructor   -------------------------------------------
-R3BFieldConst::R3BFieldConst() {
-  fXmin = fXmax = fYmin = fYmax = fZmin = fZmax = fBx = fBy = fBz = 0.;
-  fType = 0;
+R3BFieldConst::R3BFieldConst()
+: fXmin(0.)
+, fXmax(0.)
+, fYmin(0.)
+, fYmax(0.)
+, fZmin(0.)
+, fZmax(0.)
+, fBx(0.)
+, fBy(0.)
+, fBz(0.)
+{
+    fType = 0;
 }
 // -------------------------------------------------------------------------
 
 
 
 // -----   Standard constructor   ------------------------------------------
-R3BFieldConst::R3BFieldConst(const char* name, Double_t xMin, 
-			     Double_t xMax, Double_t yMin, 
-			     Double_t yMax, Double_t zMin,
-			     Double_t zMax, Double_t bX, 
-			     Double_t bY, Double_t bZ) 
-  : FairField(name) {
-  fXmin = xMin;
-  fXmax = xMax;
-  fYmin = yMin;
-  fYmax = yMax;
-  fZmin = zMin;
-  fZmax = zMax;
-  fBx   = bX;
-  fBy   = bY;
-  fBz   = bZ;
+R3BFieldConst::R3BFieldConst(const char* name, Double_t xMin,
+                             Double_t xMax, Double_t yMin,
+                             Double_t yMax, Double_t zMin,
+                             Double_t zMax, Double_t bX,
+                             Double_t bY, Double_t bZ) 
+: FairField(name)
+, fXmin(xMin)
+, fXmax(xMax)
+, fYmin(yMin)
+, fYmax(yMax)
+, fZmin(zMin)
+, fZmax(zMax)
+, fBx(bX)
+, fBy(bY)
+, fBz(bZ)
+{
   fType = 0;
 }
 // -------------------------------------------------------------------------
@@ -46,24 +56,36 @@ R3BFieldConst::R3BFieldConst(const char* name, Double_t xMin,
 
 
 // --------   Constructor from R3BFieldPar   -------------------------------
-R3BFieldConst::R3BFieldConst(R3BFieldPar* fieldPar) {
-  if ( ! fieldPar ) {
-    cerr << "-W- R3BFieldConst::R3BFieldConst: empty parameter container!"
-	 << endl;
-  fXmin = fXmax = fYmin = fYmax = fZmin = fZmax = fBx = fBy = fBz = 0.;
-  }
-  else {
-    fXmin = fieldPar->GetXmin();
-    fXmax = fieldPar->GetXmax();
-    fYmin = fieldPar->GetYmin();
-    fYmax = fieldPar->GetYmax();
-    fZmin = fieldPar->GetZmin();
-    fZmax = fieldPar->GetZmax();
-    fBx   = fieldPar->GetBx();
-    fBy   = fieldPar->GetBy();
-    fBz   = fieldPar->GetBz();
-    fType = fieldPar->GetType();
-  }
+R3BFieldConst::R3BFieldConst(R3BFieldPar* fieldPar)
+: fXmin(0.)
+, fXmax(0.)
+, fYmin(0.)
+, fYmax(0.)
+, fZmin(0.)
+, fZmax(0.)
+, fBx(0.)
+, fBy(0.)
+, fBz(0.)
+{
+    if ( ! fieldPar )
+    {
+        cerr << "-W- R3BFieldConst::R3BFieldConst: empty parameter container!"
+        << endl;
+        fType = 0;
+    }
+    else
+    {
+        fXmin = fieldPar->GetXmin();
+        fXmax = fieldPar->GetXmax();
+        fYmin = fieldPar->GetYmin();
+        fYmax = fieldPar->GetYmax();
+        fZmin = fieldPar->GetZmin();
+        fZmax = fieldPar->GetZmax();
+        fBx   = fieldPar->GetBx();
+        fBy   = fieldPar->GetBy();
+        fBz   = fieldPar->GetBz();
+        fType = fieldPar->GetType();
+    }
 }
 // -------------------------------------------------------------------------
 
@@ -134,7 +156,7 @@ Double_t R3BFieldConst::GetBz(Double_t x, Double_t y, Double_t z) {
 
 
 // -----   Screen output   -------------------------------------------------
-void R3BFieldConst::Print(Option_t *option) const
+void R3BFieldConst::Print(Option_t*) const
 {
   cout << "======================================================" << endl;
   cout << "----  " << fTitle << " : " << fName << endl;
