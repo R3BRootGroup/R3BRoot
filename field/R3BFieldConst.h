@@ -20,6 +20,11 @@
 
 class R3BFieldPar;
 
+/**
+ * \brief R3BFieldConst class.
+ *
+ * A constant (homogeneous) magnetic field.
+ */
 
 class R3BFieldConst : public FairField
 {
