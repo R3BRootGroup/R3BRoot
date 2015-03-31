@@ -35,11 +35,13 @@ using TObject::Compare;
 
 	// Lists handling  
     void   AddTCalPar(R3BLandTCalPar* tch){fTCalParams->Add(tch);}  
-    TObjArray* GetListOfTCalPar(Int_t side) {return fTCalParams;}
+    TObjArray* GetListOfTCalPar(Int_t) {return fTCalParams;}
     Int_t GetNumTCalPar() {return fTCalParams->GetEntries();} 
     R3BLandTCalPar* GetTCalParAt(Int_t idx){return (R3BLandTCalPar*) fTCalParams->At(idx);} 
 
   private:
+    R3BLandCalPar(const R3BLandCalPar&);
+    
     TObjArray* fTCalParams;
 
     ClassDef(R3BLandCalPar,1); // R3BLandCalPar Parameter Container example

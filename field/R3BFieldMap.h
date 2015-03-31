@@ -60,6 +60,8 @@ public:
 
   void SetVerbose(Bool_t verbosity){ fVerbose = verbosity;}
 
+private:
+    R3BFieldMap(const R3BFieldMap&);
 
 
  protected:

@@ -15,16 +15,22 @@ class R3BFieldInterp
 {
 public:
   R3BFieldInterp()
+    : _m1(0)
+    , _m2(0)
+    , _n(0)
+    , _data(NULL)
   {
     for (int i = 0; i < 3; i++)
       _np[i] = 0;
-    _data = NULL;
   }
 
   ~R3BFieldInterp()
   {
     free(_data);
   }
+    
+private:
+    R3BFieldInterp(const R3BFieldInterp&);
 
 public:
   void interpolate(const R3BFieldInterp &s1,double w1,

@@ -18,9 +18,9 @@ ClassImp(R3BLandCalPar);
 
 
 R3BLandCalPar::R3BLandCalPar(const char* name, const char* title, const char* context, Bool_t own)
-  : FairParGenericSet(name,title,context, own)
+: FairParGenericSet(name,title,context, own)
+, fTCalParams(new TObjArray(500))
 {
-  fTCalParams = new TObjArray(500);
 }
 
 

@@ -46,6 +46,8 @@ public:
   void SetNewValue(G4UIcommand*, G4String);
 
 private:
+  G4StepLimiterMessenger(const G4StepLimiterMessenger&);
+    
   G4StepLimiterPerRegion* stepLimiter;
   G4UIcmdWithADoubleAndUnit* stepMaxCmd;
 };

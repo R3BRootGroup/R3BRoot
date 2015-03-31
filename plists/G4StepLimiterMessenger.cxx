@@ -35,9 +35,9 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 G4StepLimiterMessenger::G4StepLimiterMessenger(G4StepLimiterPerRegion* stepM)
-:stepLimiter(stepM)
+: stepLimiter(stepM)
+, stepMaxCmd(new G4UIcmdWithADoubleAndUnit("/R3B/phys/stepMax",this))
 {
-  stepMaxCmd = new G4UIcmdWithADoubleAndUnit("/R3B/phys/stepMax",this);
   stepMaxCmd->SetGuidance("Set max allowed step length for the default region");
   stepMaxCmd->SetParameterName("mxStep",false);
   stepMaxCmd->SetRange("mxStep>0.");

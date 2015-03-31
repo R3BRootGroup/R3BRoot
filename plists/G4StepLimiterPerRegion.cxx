@@ -33,10 +33,10 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 G4StepLimiterPerRegion::G4StepLimiterPerRegion(const G4String& processName)
- : G4VDiscreteProcess(processName),
-   MaxChargedStep(DBL_MAX)
+: G4VDiscreteProcess(processName)
+, MaxChargedStep(DBL_MAX)
+, pMess(new G4StepLimiterMessenger(this))
 {
-  pMess = new G4StepLimiterMessenger(this);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
