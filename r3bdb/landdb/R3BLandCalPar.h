@@ -40,6 +40,7 @@ using TObject::Compare;
     R3BLandTCalPar* GetTCalParAt(Int_t idx){return (R3BLandTCalPar*) fTCalParams->At(idx);} 
 
   private:
+    const R3BLandCalPar& operator=(const R3BLandCalPar&);
     R3BLandCalPar(const R3BLandCalPar&);
     
     TObjArray* fTCalParams;

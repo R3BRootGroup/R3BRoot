@@ -30,6 +30,7 @@ public:
   }
     
 private:
+    const R3BFieldInterp& operator=(const R3BFieldInterp&);
     R3BFieldInterp(const R3BFieldInterp&);
 
 public:

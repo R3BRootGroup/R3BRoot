@@ -61,6 +61,7 @@ public:
   void SetVerbose(Bool_t verbosity){ fVerbose = verbosity;}
 
 private:
+    const R3BFieldMap& operator=(const R3BFieldMap&);
     R3BFieldMap(const R3BFieldMap&);
 
 
