@@ -135,7 +135,7 @@ Int_t r3bsim(){
 	
    // Including CaloHitFinder task (kFALSE by default)
 
-   Bool_t fCaloHitFinder = kTRUE;  //kTRUE; 
+   Bool_t fCaloHitFinder = kFALSE;  //kTRUE; 
 
    Double_t fMeasCurrent = 1500.;
 

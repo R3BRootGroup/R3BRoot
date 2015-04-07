@@ -60,6 +60,8 @@ void califaAna(Int_t nEvents = 1) {
 
 	// -----  Analysis routines for CALIFA	
 	R3BCaloHitFinder* caloHF = new R3BCaloHitFinder();
+        TMap fDetList = new TMap();
+        caloHF->SetGeometryFileName(((TObjString*)&fDetList.GetValue("CALIFA"))->GetString().Data());
 	//Selecting the geometry version
 	// 0- CALIFA 5.0, including BARREL and ENDCAP.
 	// 1- CALIFA 7.05, only BARREL

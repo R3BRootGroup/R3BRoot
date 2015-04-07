@@ -1,7 +1,7 @@
 if [ "$#" -ne 1 ] ; then
  echo "ERROR!! At least one arguments should be provided (type of db)" 1>&2
 else
- source ~/Work/r3broot/macros/r3b/db/califa/dbconfig.sh local_pgsql > /dev/null
+ source ~/Work/r3broot/macros/r3b/db/califa/dbconfigmio.sh local_pgsql > /dev/null
  if [ "$?" -eq "0" ]; then
   if [ "$1" == "local_pgsql" ]; then
    psql -d r3b -c "DROP TABLE USERS" > /dev/null 2>&1

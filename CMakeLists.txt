@@ -222,6 +222,11 @@ add_subdirectory (trackbase)
 add_subdirectory (MbsAPI)
 ENDIF (NOT FAIRROOT_FOUND)
 
+IF(MODULE)
+add_subdirectory (${MODULE}) 
+ENDIF (MODULE)
+
+IF(NOT MODULE)
 add_subdirectory (r3bbase)  
 add_subdirectory (passive) 
 add_subdirectory (cal)
@@ -244,6 +249,7 @@ add_subdirectory (lumon)
 add_subdirectory (evtvis)
 add_subdirectory (mfi)
 add_subdirectory (psp)
+ENDIF (NOT MODULE)
 
 Execute_Process(COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-opengl
                 OUTPUT_VARIABLE EveIsBuild
