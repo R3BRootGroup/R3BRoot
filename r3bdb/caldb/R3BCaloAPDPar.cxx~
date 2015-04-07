@@ -1,4 +1,4 @@
-#include "R3BCaloCrystalPar.h"
+#include "R3BCaloAPDPar.h"
 
 #include "FairDbLogFormat.h"
 #include "FairDbLogService.h"
@@ -17,25 +17,24 @@
 
 using namespace std;
 
-ClassImp(R3BCaloCrystalPar);
+ClassImp(R3BCaloAPDPar);
 
 #include "FairDbReader.tpl"
-template class  FairDbReader<R3BCaloCrystalPar>;
+template class  FairDbReader<R3BCaloAPDPar>;
 
 #include "FairDbWriter.tpl"
-template class  FairDbWriter<R3BCaloCrystalPar>;
+template class  FairDbWriter<R3BCaloAPDPar>;
 
 
 
 
-R3BCaloCrystalPar::R3BCaloCrystalPar(const char* name, const char* title, const char* context, Bool_t own)
-  : FairDbObjTableMap(name,title,context, own),
+R3BCaloAPDPar::R3BCaloAPDPar(const char* name, const char* title, const char* context, Bool_t own)
+  : FairParGenericSet(name,title,context, own),
     fId(0),
-    fIdAmcrys(NULL),
-    fEnergySource(""),
-    fAbsoluteLO(0.),
-    fLO(0.),
-    fEnergyResolution(0.),
+    fIdHamamatsu(NULL),
+    fVrHamamatsu(0.),   
+    fVBreakdownHamamatsu(0),    
+    fDarkCurrentHamamatsu(0),
     fOrigin(""),
     fLocation(""),
     fObservation(""),
@@ -48,7 +47,7 @@ R3BCaloCrystalPar::R3BCaloCrystalPar(const char* name, const char* title, const 
 }
 
 
-R3BCaloCrystalPar::~R3BCaloCrystalPar()
+R3BCaloAPDPar::~R3BCaloAPDPar()
 {
   if (fParam_Writer) {
     delete fParam_Writer;
@@ -63,72 +62,67 @@ R3BCaloCrystalPar::~R3BCaloCrystalPar()
 }
 
 
-void R3BCaloCrystalPar::putParams(FairParamList* list)
+void R3BCaloAPDPar::putParams(FairParamList* list)
 {
-  std::cout<<"-I- R3BCaloCrystalPar::putParams() called"<<std::endl;
+  std::cout<<"-I- R3BCaloAPDPar::putParams() called"<<std::endl;
   if(!list) { return; }
-  list->add("CrystalPar_Id", fId);
-  list->add("CrystalPar_IdAmcrys", fIdAmcrys);
-  list->add("CrystalPar_EnergySource", (Text_t*)fEnergySource.c_str());
-  list->add("CrystalPar_AbsoluteLO", fAbsoluteLO);
-  list->add("CrystalPar_LO", fLO);
-  list->add("CrystalPar_EnergyResolution", fEnergyResolution);
-  list->add("CrystalPar_Origin", (Text_t*)fOrigin.c_str());
-  list->add("CrystalPar_Location", (Text_t*)fLocation.c_str());
-  list->add("CrystalPar_Observation", (Text_t*)fObservation.c_str());
+  list->add("APDPar_Id", fId);
+  list->add("APDPar_IdHamamatsu", (Text_t*)fIdHamamatsu.c_str());
+  list->add("APDPar_VrHamamatsu", fVrHamamatsu);
+  list->add("APDPar_VBreakdownHamamatsu", fVBreakdownHamamatsu);
+  list->add("APDPar_DarkCurrentHamamatsu", fDarkCurrentHamamatsu);
+  list->add("APDPar_Origin", (Text_t*)fOrigin.c_str());
+  list->add("APDPar_Location", (Text_t*)fLocation.c_str());
+  list->add("APDPar_Observation", (Text_t*)fObservation.c_str());
 }
 
-Bool_t R3BCaloCrystalPar::getParams(FairParamList* list)
+Bool_t R3BCaloAPDPar::getParams(FairParamList* list)
 {
   if (!list) { return kFALSE; }
-  if (!list->fill("CrystalPar_Id", &fId)) { return kFALSE; }
-  Text_t idamcrysaux[80];
-  if (!list->fill("CrystalPar_IdAmcrys", idamcrysaux, 80)) { return kFALSE; }
-  fIdAmcrys = idamcrysaux;
-  Text_t energysourceaux[80];
-  if (!list->fill("CrystalPar_EnergySource", energysourceaux, 80)) { return kFALSE; }
-  fEnergySource = energysourceaux;
-  if (!list->fill("CrystalPar_AbsoluteLO", &fAbsoluteLO)) { return kFALSE; }
-  if (!list->fill("CrystalPar_LO", &fLO)) { return kFALSE; }
-  if (!list->fill("CrystalPar_EnergyResolution", &fEnergyResolution)) { return kFALSE; }
+  if (!list->fill("APDPar_Id", &fId)) { return kFALSE; }
+  Text_t idhamamatsuaux[80];
+  if (!list->fill("APDPar_IdHamamatsu", idhamamatsuauxm 80)) { return kFALSE; }
+  fIdHamamatsu = idhamamatsuaux;
+  if (!list->fill("APDPar_VrHamamatsu", &fVrHamamatsu)) { return kFALSE; }
+  if (!list->fill("APDPar_VBreakdownHamamatsu", &fVBreakdownHamamatsu)) { return kFALSE; }
+  if (!list->fill("APDPar_DarkCurrentHamamatsu", &fDarkCurrentHamamatsu)) { return kFALSE; }
   Text_t originaux[80];
-  if (!list->fill("CrystalPar_Origin", originaux, 80)) { return kFALSE; }
+  if (!list->fill("APDPar_Origin", originaux, 80)) { return kFALSE; }
   fOrigin = originaux;
   Text_t locationaux[80];
-  if (!list->fill("CrystalPar_Location", locationaux, 80)) { return kFALSE; }
+  if (!list->fill("APDPar_Location", locationaux, 80)) { return kFALSE; }
   fLocation = locationaux;
   Text_t observationaux[80];
-  if (!list->fill("CrystalPar_Observation", observationaux, 80)) { return kFALSE; }
+  if (!list->fill("APDPar_Observation", observationaux, 80)) { return kFALSE; }
   fObservation = observationaux;
 
   return kTRUE;
 }
 
-void R3BCaloCrystalPar::clear()
+void R3BCaloAPDPar::clear()
 {
-  fId=0;
-  fAbsoluteLO=fAbsoluteLO=fEnergyResolution=0.;
-  fIdAmcrys=fEnergySource=fOrigin=fLocation=fObservation="";
+  fId=fIdHamamatsu=fVrHamamatsu=fVBreakdownHamamatsu=0;
+  fDarkCurrentHamamatsu=0.;
+  fOrigin=fLocation=fObservation="";
 
   if (fParam_Writer) { fParam_Writer->Reset(); }
   if (fParam_Reader) { fParam_Reader->Reset(); }
 }
 
 
-string R3BCaloCrystalPar::GetTableDefinition(const char* Name)
+string R3BCaloAPDPar::GetTableDefinition(const char* Name)
 {
 
   string sql("create table ");
   if ( Name ) { sql += Name; }
-  else { sql += "R3BCALOCRYSTALPAR"; }
+  else { sql += "R3BCALOAPDPAR"; }
   sql += "( SEQNO            		INT NOT NULL,";
   sql += "  ROW_ID           		INT NOT NULL,";
   sql += "  ID               		INT NOT NULL,";
-  sql += "  ID_AMCRYS     		TEXT NOT NULL,";
-  sql += "  ENERGYSOURCE		TEXT,";
-  sql += "  ABSOLUTELO			DOUBLE,";
-  sql += "  LO				DOUBLE,";
-  sql += "  ENERGYRESOLUTION		DOUBLE,";
+  sql += "  ID_HAMAMATSU     		INT NOT NULL,";
+  sql += "  VR_HAMAMATSU      		DOUBLE,";
+  sql += "  VBREAKDOWN_HAMAMATSU     	INT,";
+  sql += "  DARKCURRENT_HAMAMATSU     	INT,";
   sql += "  ORIGIN			TEXT,";
   sql += "  LOCATION			TEXT,";
   sql += "  OBSERVATION			TEXT,";
@@ -138,25 +132,27 @@ string R3BCaloCrystalPar::GetTableDefinition(const char* Name)
 
 
 
-void R3BCaloCrystalPar::Fill(FairDbResultPool& res_in,
+void R3BCaloAPDPar::Fill(FairDbResultPool& res_in,
                         const FairDbValRecord* valrec)
 {
   clear();
 
-  res_in >> fId  >> fIdAmcrys >> fEnergySource >> fAbsoluteLO >> fLO >> fEnergyResolution >> fOrigin >> fLocation >> fObservation;
+  res_in >> fId  >> fIdHamamatsu >> fVrHamamatsu >> fVBreakdownHamamatsu >> fDarkCurrentHamamatsu >> fOrigin >> 
+  fLocation >> fObservation;
 
 }
 
-void R3BCaloCrystalPar::Store(FairDbOutTableBuffer& res_out,
+void R3BCaloAPDPar::Store(FairDbOutTableBuffer& res_out,
                          const FairDbValRecord* valrec) const
 {
 
-  res_out << fId  << fIdAmcrys << fEnergySource << fAbsoluteLO << fLO << fEnergyResolution << fOrigin <<  fLocation << fObservation;
+  res_out << fId  << fIdHamamatsu  << fVrHamamatsu << fVBreakdownHamamatsu << fDarkCurrentHamamatsu << fOrigin << 
+  fLocation << fObservation;
 
 }
 
 
-void R3BCaloCrystalPar::fill(UInt_t rid)
+void R3BCaloAPDPar::fill(UInt_t rid)
 {
   // Get Reader Meta Class
   fParam_Reader=GetParamReader();
@@ -174,14 +170,13 @@ void R3BCaloCrystalPar::fill(UInt_t rid)
   if ( numRows > 1 ) { numRows = 1; }
 
   for (int i = 0; i < numRows; ++i) {
-    R3BCaloCrystalPar* cgd = (R3BCaloCrystalPar*) fParam_Reader->GetRow(i);
+    R3BCaloAPDPar* cgd = (R3BCaloAPDPar*) fParam_Reader->GetRow(i);
     if (!cgd) { continue; }
     fId =  cgd->GetId();
-    fIdAmcrys =  cgd->GetIdAmcrys();
-    fEnergySource =  cgd->GetEnergySource();
-    fAbsoluteLO =  cgd->GetAbsoluteLO();
-    fLO =  cgd->GetLO();
-    fEnergyResolution =  cgd->GetEnergyResolution();
+    fIdHamamatsu =  cgd->GetIdHamamatsu();
+    fVrHamamatsu =  cgd->GetVrHamamatsu();
+    fVBreakdownHamamatsu =  cgd->GetVBreakdownHamamatsu();
+    fDarkCurrentHamamatsu =  cgd->GetDarkCurrentHamamatsu();
     fOrigin =  cgd->GetOrigin();
     fLocation =  cgd->GetLocation();
     fObservation =  cgd->GetObservation();
@@ -190,7 +185,7 @@ void R3BCaloCrystalPar::fill(UInt_t rid)
 }
 
 
-void R3BCaloCrystalPar::store(UInt_t rid)
+void R3BCaloAPDPar::store(UInt_t rid)
 {
 
   // Boolean IO test variable
@@ -199,7 +194,7 @@ void R3BCaloCrystalPar::store(UInt_t rid)
   // Create a unique statement on choosen DB entry
   auto_ptr<FairDbStatement> stmtDbn(fMultConn->CreateStatement(GetDbEntry()));
   if ( ! stmtDbn.get() ) {
-    cout << "-E-  R3BCaloCrystalPar::Store()  Cannot create statement for Database_id: " << GetDbEntry()
+    cout << "-E-  R3BCaloAPDPar::Store()  Cannot create statement for Database_id: " << GetDbEntry()
          << "\n    Please check the FAIRDB_TSQL_* environment.  Quitting ... " << endl;
     exit(1);
   }
@@ -210,9 +205,9 @@ void R3BCaloCrystalPar::store(UInt_t rid)
   TString atr(GetName());
   atr.ToUpper();
 
-  if (! fMultConn->GetConnection(GetDbEntry())->TableExists("R3BCALOCRYSTALPAR") ) {
-    sql_cmds.push_back(FairDb::GetValDefinition("R3BCALOCRYSTALPAR").Data());
-    sql_cmds.push_back(R3BCaloCrystalPar::GetTableDefinition());
+  if (! fMultConn->GetConnection(GetDbEntry())->TableExists("R3BCALOAPDPAR") ) {
+    sql_cmds.push_back(FairDb::GetValDefinition("R3BCALOAPDPAR").Data());
+    sql_cmds.push_back(R3BCaloAPDPar::GetTableDefinition());
   }
 
   // Packed SQL commands executed internally via SQL processor
@@ -222,7 +217,7 @@ void R3BCaloCrystalPar::store(UInt_t rid)
     stmtDbn->Commit(sql_cmd.c_str());
     if ( stmtDbn->PrintExceptions() ) {
       fail = true;
-      cout << "-E- R3BCaloCrystalPar::Store() ******* Error Executing SQL commands ***********  " << endl;
+      cout << "-E- R3BCaloAPDPar::Store() ******* Error Executing SQL commands ***********  " << endl;
     }
 
   }
@@ -247,7 +242,7 @@ void R3BCaloCrystalPar::store(UInt_t rid)
   //                      DbEntry          ,            Int_t                   set via cont. factory
   //                      LogTitle         ,            std::string             set via cont. factory
 
-  fParam_Writer->Activate(GetValInterval(rid),GetComboNo(), GetVersion(),GetDbEntry(),"Califa Crystal Node Pars");
+  fParam_Writer->Activate(GetValInterval(rid),GetComboNo(), GetVersion(),GetDbEntry(),"Califa APD Node Pars");
 
   // Object to Table mapping
   *fParam_Writer<< (*this);
@@ -255,42 +250,40 @@ void R3BCaloCrystalPar::store(UInt_t rid)
   // Check for eventual IO problems
   if ( !fParam_Writer->Close() ) {
     fail = true;
-    cout << "-E- R3BCaloCrystalPar::Store() ******** Cannot do IO on class: " << GetName() <<  endl;
+    cout << "-E- R3BCaloAPDPar::Store() ******** Cannot do IO on class: " << GetName() <<  endl;
   }
 
 }
 
-void R3BCaloCrystalPar::Print()
+void R3BCaloAPDPar::Print()
 {
 
-  cout<<  " Crystal Id: " << fId << " Crystal Id Amcrys: "<< fIdAmcrys <<  endl;
-  cout << " Crystal Energy Source : " << fEnergySource << endl;
-  cout << " Crystal AbsoluteLO : " << fAbsoluteLO << endl;
-  cout << " Crystal LO : " << fLO << endl;
-  cout << " Crystal EnergyResolution : " << fEnergyResolution << endl;
-  cout << " Crystal Origin : " << fOrigin << endl;
-  cout << " Crystal Location : " << fLocation << endl;
-  cout << " Crystal Observation : " << fObservation << endl;
+  cout<<  " APD Id: " << fId << " APD Id Hamamatsu: "<< fIdHamamatsu <<  endl;
+  cout << " APD Vr Hamamatsu: " << fVrHamamatsu << endl;
+  cout << " APD V Breadkown Hamamatsu : " << fVBreakdownHamamatsu << endl;
+  cout << " APD Dark Current Hamamatsu : " << fDarkCurrentHamamatsu << endl;
+  cout << " APD Origin : " << fOrigin << endl;
+  cout << " APD Location : " << fLocation << endl;
+  cout << " APD Observation : " << fObservation << endl;
 }
 
 
-Bool_t R3BCaloCrystalPar::Compare(const R3BCaloCrystalPar& that ) const {
+Bool_t R3BCaloAPDPar::Compare(const R3BCaloAPDPar& that ) const {
   //  
   Bool_t test_h =      (fId          == that.fId)
- 	               &&  (fIdAmcrys   == that.fIdAmcrys)
- 	               &&  (fEnergySource   == that.fEnergySource)
- 	               &&  (fAbsoluteLO   == that.fAbsoluteLO)
- 	               &&  (fLO   == that.fLO)
- 	               &&  (fEnergyResolution   == that.fEnergyResolution)
+ 	               &&  (fIdHamamatsu   == that.fIdHamamatsu)
+ 	               &&  (fVrHamamatsu   == that.fVrHamamatsu)
+ 	               &&  (fVBreakdownHamamatsu   == that.fVBreakdownHamamatsu)
+		       &&  (fDarkCurrentHamamatsu   == that.fDarkCurrentHamamatsu)
  	               &&  (fOrigin   == that.fOrigin)
-		       &&  (fLocation   == that.fLocation)
+                       &&  (fLocation   == that.fLocation)
 		       &&  (fObservation   == that.fObservation);
   
  return (test_h); 
 }
 
 
-FairDbWriter<R3BCaloCrystalPar>* R3BCaloCrystalPar::ActivateWriter(Int_t rid)
+FairDbWriter<R3BCaloAPDPar>* R3BCaloAPDPar::ActivateWriter(Int_t rid)
 {
   // delete if already existing
   if (fParam_Writer) { delete fParam_Writer; fParam_Writer=NULL; }
@@ -302,7 +295,7 @@ FairDbWriter<R3BCaloCrystalPar>* R3BCaloCrystalPar::ActivateWriter(Int_t rid)
 	// Create a unique statement on choosen DB entry
 	auto_ptr<FairDbStatement> stmtDbn(fMultConn->CreateStatement(GetDbEntry()));
 	if ( ! stmtDbn.get() ) {
-	  cout << "-E-  R3BCaloCrystalPar::Store()  Cannot create statement for Database_id: " << GetDbEntry()
+	  cout << "-E-  R3BCaloAPDPar::Store()  Cannot create statement for Database_id: " << GetDbEntry()
 		   << "\n    Please check the FAIRDB_TSQL_* environment.  Quitting ... " << endl;
 	  exit(1);
 	}
@@ -313,9 +306,9 @@ FairDbWriter<R3BCaloCrystalPar>* R3BCaloCrystalPar::ActivateWriter(Int_t rid)
 	TString atr(GetName());
 	atr.ToUpper();
 	
-	if (! fMultConn->GetConnection(GetDbEntry())->TableExists("R3BCALOCRYSTALPAR") ) {
-	  sql_cmds.push_back(FairDb::GetValDefinition("R3BCALOCRYSTALPAR").Data());
-	  sql_cmds.push_back(R3BCaloCrystalPar::GetTableDefinition());
+	if (! fMultConn->GetConnection(GetDbEntry())->TableExists("R3BCALOAPDPAR") ) {
+	  sql_cmds.push_back(FairDb::GetValDefinition("R3BCALOAPDPAR").Data());
+	  sql_cmds.push_back(R3BCaloAPDPar::GetTableDefinition());
 	}
 	
 	// Packed SQL commands executed internally via SQL processor
@@ -325,7 +318,7 @@ FairDbWriter<R3BCaloCrystalPar>* R3BCaloCrystalPar::ActivateWriter(Int_t rid)
 	  stmtDbn->Commit(sql_cmd.c_str());
 	  if ( stmtDbn->PrintExceptions() ) {
 		fail = true;
-		cout << "-E- R3BCaloCrystalPar::Store() ******* Error Executing SQL commands ***********  " << endl;
+		cout << "-E- R3BCaloAPDPar::Store() ******* Error Executing SQL commands ***********  " << endl;
 	  }
 	  
 	}
@@ -337,14 +330,14 @@ FairDbWriter<R3BCaloCrystalPar>* R3BCaloCrystalPar::ActivateWriter(Int_t rid)
 	// Writer Meta-Class Instance
 	fParam_Writer = GetParamWriter();
 		
-	fParam_Writer->Activate(GetValInterval(rid),GetComboNo(), GetVersion(),GetDbEntry(),"Califa Crystal Node Pars");
+	fParam_Writer->Activate(GetValInterval(rid),GetComboNo(), GetVersion(),GetDbEntry(),"Califa APD Node Pars");
 	
   }
 
   return fParam_Writer;
 }
 
-void R3BCaloCrystalPar::update(Int_t seqno)
+void R3BCaloAPDPar::update(Int_t seqno)
 {
 
   // Boolean IO test variable
@@ -353,18 +346,18 @@ void R3BCaloCrystalPar::update(Int_t seqno)
   // Create a unique statement on choosen DB entry
   auto_ptr<FairDbStatement> stmtDbn(fMultConn->CreateStatement(GetDbEntry()));
   if ( ! stmtDbn.get() ) {
-    cout << "-E-  R3BCaloCrystalPar::Update()  Cannot create statement for Database_id: " << GetDbEntry()
+    cout << "-E-  R3BCaloAPDPar::Update()  Cannot create statement for Database_id: " << GetDbEntry()
          << "\n    Please check the FAIRDB_TSQL_* environment.  Quitting ... " << endl;
     exit(1);
   }
 
   FairDbString command;
-  command << "UPDATE R3BCALOCRYSTALPARVAL SET TIMEEND = NOW() WHERE SEQNO = " << seqno <<  ";\0";
+  command << "UPDATE R3BCALOAPDPARVAL SET TIMEEND = NOW() WHERE SEQNO = " << seqno <<  ";\0";
 
   stmtDbn->Commit(command.c_str());
   if ( stmtDbn->PrintExceptions() ) {
    fail = true;
-   cout << "-E- R3BCaloCrystalPar::Update() ******* Error Executing SQL commands ***********  " << endl;
+   cout << "-E- R3BCaloAPDPar::Update() ******* Error Executing SQL commands ***********  " << endl;
   }
 
 }

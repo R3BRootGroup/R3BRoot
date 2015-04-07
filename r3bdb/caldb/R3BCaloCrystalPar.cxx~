@@ -29,7 +29,7 @@ template class  FairDbWriter<R3BCaloCrystalPar>;
 
 
 R3BCaloCrystalPar::R3BCaloCrystalPar(const char* name, const char* title, const char* context, Bool_t own)
-  : FairDbObjTableMap(name,title,context, own),
+  : FairParGenericSet(name,title,context, own),
     fId(0),
     fIdAmcrys(NULL),
     fEnergySource(""),
@@ -82,9 +82,7 @@ Bool_t R3BCaloCrystalPar::getParams(FairParamList* list)
 {
   if (!list) { return kFALSE; }
   if (!list->fill("CrystalPar_Id", &fId)) { return kFALSE; }
-  Text_t idamcrysaux[80];
-  if (!list->fill("CrystalPar_IdAmcrys", idamcrysaux, 80)) { return kFALSE; }
-  fIdAmcrys = idamcrysaux;
+  if (!list->fill("CrystalPar_IdAmcrys", &fIdAmcrys)) { return kFALSE; }
   Text_t energysourceaux[80];
   if (!list->fill("CrystalPar_EnergySource", energysourceaux, 80)) { return kFALSE; }
   fEnergySource = energysourceaux;
@@ -106,9 +104,9 @@ Bool_t R3BCaloCrystalPar::getParams(FairParamList* list)
 
 void R3BCaloCrystalPar::clear()
 {
-  fId=0;
+  fId=fIdAmcrys=0;
   fAbsoluteLO=fAbsoluteLO=fEnergyResolution=0.;
-  fIdAmcrys=fEnergySource=fOrigin=fLocation=fObservation="";
+  fEnergySource=fOrigin=fLocation=fObservation="";
 
   if (fParam_Writer) { fParam_Writer->Reset(); }
   if (fParam_Reader) { fParam_Reader->Reset(); }
@@ -124,7 +122,7 @@ string R3BCaloCrystalPar::GetTableDefinition(const char* Name)
   sql += "( SEQNO            		INT NOT NULL,";
   sql += "  ROW_ID           		INT NOT NULL,";
   sql += "  ID               		INT NOT NULL,";
-  sql += "  ID_AMCRYS     		TEXT NOT NULL,";
+  sql += "  ID_AMCRYS     		INT NOT NULL,";
   sql += "  ENERGYSOURCE		TEXT,";
   sql += "  ABSOLUTELO			DOUBLE,";
   sql += "  LO				DOUBLE,";

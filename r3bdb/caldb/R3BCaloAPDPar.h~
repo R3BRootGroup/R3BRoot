@@ -25,7 +25,7 @@ class FairDbValRecord;
 class FairParamList;
 
 
-class R3BCaloAPDPar : public FairDbObjTableMap
+class R3BCaloAPDPar : public FairParGenericSet
 {
 
 using TObject::Compare;
@@ -43,7 +43,7 @@ using TObject::Compare;
     void Print();
     /** Accessor functions **/
     Int_t GetId()          		const {return fId;} 
-    string GetIdHamamatsu()          	const {return fIdHamamatsu;}
+    Int_t GetIdHamamatsu()          	const {return fIdHamamatsu;}
     Double_t GetVrHamamatsu()          	const {return fVrHamamatsu;}
     Int_t GetVBreakdownHamamatsu()      const {return fVBreakdownHamamatsu;}
     Int_t GetDarkCurrentHamamatsu()  	const {return fDarkCurrentHamamatsu;}
@@ -52,7 +52,7 @@ using TObject::Compare;
     string GetObservation()     	const {return fObservation;}
 
     void SetId(Int_t x) 			{fId  = x;}
-    string SetIdHamamatsu(string x) 		{fIdHamamatsu  = x;}
+    void SetIdHamamatsu(Int_t x) 		{fIdHamamatsu  = x;}
     void SetVrHamamatsu(Double_t x) 		{fVrHamamatsu  = x;}
     void SetVBreakdownHamamatsu(Int_t x) 	{fVBreakdownHamamatsu  = x;}
     void SetDarkCurrentHamamatsu(Int_t x) 	{fDarkCurrentHamamatsu=x;}
@@ -97,7 +97,7 @@ using TObject::Compare;
   private:
     // Data Parameters
     Int_t fId;
-    string fIdHamamatsu;
+    Int_t fIdHamamatsu;
     Double_t fVrHamamatsu;
     Int_t fVBreakdownHamamatsu;
     Int_t fDarkCurrentHamamatsu;

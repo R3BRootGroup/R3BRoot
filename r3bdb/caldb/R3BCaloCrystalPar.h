@@ -43,7 +43,7 @@ using TObject::Compare;
     void Print();
     /** Accessor functions **/
     Int_t GetId()          		const {return fId;} 
-    Int_t GetIdAmcrys()          	const {return fIdAmcrys;}
+    string GetIdAmcrys()          	const {return fIdAmcrys;}
     string GetEnergySource()          	const {return fEnergySource;}
     Double_t GetAbsoluteLO()          	const {return fAbsoluteLO;}
     Double_t GetLO()          		const {return fLO;}
@@ -53,7 +53,7 @@ using TObject::Compare;
     string GetObservation()     	const {return fObservation;}
 
     void SetId(Int_t x) 			{fId  = x;}
-    void SetIdAmcrys(Int_t x) 			{fIdAmcrys  = x;}
+    void SetIdAmcrys(string x) 			{fIdAmcrys  = x;}
     void SetEnergySource(string x) 		{fEnergySource  = x;}
     void SetAbsoluteLO(Double_t x) 		{fAbsoluteLO  = x;}
     void SetLO(Double_t x) 			{fLO  = x;}
@@ -99,7 +99,7 @@ using TObject::Compare;
   private:
     // Data Parameters
     Int_t fId;
-    Int_t fIdAmcrys;
+    string fIdAmcrys;
     string fEnergySource;
     Double_t fAbsoluteLO;
     Double_t fLO;

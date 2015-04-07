@@ -31,10 +31,10 @@ template class  FairDbWriter<R3BCaloAPDPar>;
 R3BCaloAPDPar::R3BCaloAPDPar(const char* name, const char* title, const char* context, Bool_t own)
   : FairDbObjTableMap(name,title,context, own),
     fId(0),
-    fIdHamamatsu(0),
-    fVrHamamatsu(0),   
+    fIdHamamatsu(NULL),
+    fVrHamamatsu(0.),   
     fVBreakdownHamamatsu(0),    
-    fDarkCurrentHamamatsu(0.),
+    fDarkCurrentHamamatsu(0),
     fOrigin(""),
     fLocation(""),
     fObservation(""),
@@ -67,7 +67,7 @@ void R3BCaloAPDPar::putParams(FairParamList* list)
   std::cout<<"-I- R3BCaloAPDPar::putParams() called"<<std::endl;
   if(!list) { return; }
   list->add("APDPar_Id", fId);
-  list->add("APDPar_IdHamamatsu", fIdHamamatsu);
+  list->add("APDPar_IdHamamatsu", (Text_t*)fIdHamamatsu.c_str());
   list->add("APDPar_VrHamamatsu", fVrHamamatsu);
   list->add("APDPar_VBreakdownHamamatsu", fVBreakdownHamamatsu);
   list->add("APDPar_DarkCurrentHamamatsu", fDarkCurrentHamamatsu);
@@ -80,7 +80,9 @@ Bool_t R3BCaloAPDPar::getParams(FairParamList* list)
 {
   if (!list) { return kFALSE; }
   if (!list->fill("APDPar_Id", &fId)) { return kFALSE; }
-  if (!list->fill("APDPar_IdHamamatsu", &fIdHamamatsu)) { return kFALSE; }
+  Text_t idhamamatsuaux[80];
+  if (!list->fill("APDPar_IdHamamatsu", idhamamatsuauxm 80)) { return kFALSE; }
+  fIdHamamatsu = idhamamatsuaux;
   if (!list->fill("APDPar_VrHamamatsu", &fVrHamamatsu)) { return kFALSE; }
   if (!list->fill("APDPar_VBreakdownHamamatsu", &fVBreakdownHamamatsu)) { return kFALSE; }
   if (!list->fill("APDPar_DarkCurrentHamamatsu", &fDarkCurrentHamamatsu)) { return kFALSE; }
@@ -99,9 +101,9 @@ Bool_t R3BCaloAPDPar::getParams(FairParamList* list)
 
 void R3BCaloAPDPar::clear()
 {
-  fId=fIdHamamatsu=fVrHamamatsu=fVBreakdownHamamatsu=0;
+  fId=fVrHamamatsu=fVBreakdownHamamatsu=0;
   fDarkCurrentHamamatsu=0.;
-  fOrigin=fLocation=fObservation="";
+  fIdHamamatsu=fOrigin=fLocation=fObservation="";
 
   if (fParam_Writer) { fParam_Writer->Reset(); }
   if (fParam_Reader) { fParam_Reader->Reset(); }
@@ -117,10 +119,10 @@ string R3BCaloAPDPar::GetTableDefinition(const char* Name)
   sql += "( SEQNO            		INT NOT NULL,";
   sql += "  ROW_ID           		INT NOT NULL,";
   sql += "  ID               		INT NOT NULL,";
-  sql += "  ID_HAMAMATSU     		INT NOT NULL,";
-  sql += "  VR_HAMAMATSU      		INT,";
+  sql += "  ID_HAMAMATSU     		TEXT NOT NULL,";
+  sql += "  VR_HAMAMATSU      		DOUBLE,";
   sql += "  VBREAKDOWN_HAMAMATSU     	INT,";
-  sql += "  DARKCURRENT_HAMAMATSU     	DOUBLE,";
+  sql += "  DARKCURRENT_HAMAMATSU     	INT,";
   sql += "  ORIGIN			TEXT,";
   sql += "  LOCATION			TEXT,";
   sql += "  OBSERVATION			TEXT,";
