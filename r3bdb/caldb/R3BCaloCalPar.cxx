@@ -58,6 +58,7 @@ void R3BCaloCalPar::putParams(FairParamList* list)
     values[5] = dupar->GetRangeCal_offset();
     values[6] = dupar->GetRangeCal_gain();
     values[7] = dupar->GetQuenchingFactor();
+    values[8] = dupar->GetPidGain();
 
     list->add(du_id.Data(), values); 
         
@@ -91,6 +92,7 @@ Bool_t R3BCaloCalPar::getParams(FairParamList* list)
     dupar->SetRangeCal_offset(values->At(5));
     dupar->SetRangeCal_gain(values->At(6));
     dupar->SetQuenchingFactor(values->At(7));
+    dupar->SetPidGain(values->At(8));
     fDUCalParams->Add( dupar );
     cout << " Entries in Array " <<  fDUCalParams->GetEntries()  << endl;
     for(Int_t j=0;j<8;j++) cout << " idx: " << j << "values# " << values->At(j) << endl;
@@ -126,6 +128,7 @@ void R3BCaloCalPar::ReadFile(string file) {
     dupar.SetRangeCal_offset(atof(data[6].c_str()));
     dupar.SetRangeCal_gain(atof(data[7].c_str()));
     dupar.SetQuenchingFactor(atof(data[8].c_str()));
+    dupar.SetPidGain(atof(data[9].c_str()));
     fDUCalParams->Add(&dupar);
   }
 }

@@ -39,7 +39,8 @@ R3BCaloDUCalPar::R3BCaloDUCalPar(const char* name, const char* title, const char
     fToTCal_par2(0.),
     fRangeCal_offset(0.),
     fRangeCal_gain(0.),
-    fQuenchingFactor(0.)
+    fQuenchingFactor(0.),
+    fPidGain(0.)
 {
   
   // Set the default Db Entry to the first slot
@@ -88,6 +89,7 @@ void R3BCaloDUCalPar::putParams(FairParamList* list)
   list->add("rangecal_offset", fRangeCal_offset);
   list->add("rangecal_gain", fRangeCal_gain);
   list->add("quenching_factor", fQuenchingFactor);
+  list->add("pid_gain", fPidGain);
 
 }
 
@@ -104,6 +106,7 @@ Bool_t R3BCaloDUCalPar::getParams(FairParamList* list)
   if (!list->fill("rangecal_offset", &fRangeCal_offset)) { return kFALSE; }
   if (!list->fill("rangecal_gain", &fRangeCal_gain)) { return kFALSE; }
   if (!list->fill("quenching_factor", &fQuenchingFactor)) { return kFALSE; }
+  if (!list->fill("pid_gain", &fPidGain)) { return kFALSE; }
 
   return kTRUE;
 }
@@ -111,7 +114,9 @@ Bool_t R3BCaloDUCalPar::getParams(FairParamList* list)
 void R3BCaloDUCalPar::clear()
 {
   fCompId=fDetectionUnit=0;
-  fGammaCal_offset=fGammaCal_gain=fToTCal_par0=fToTCal_par1=fToTCal_par2=fRangeCal_offset=fRangeCal_gain=fQuenchingFactor=0.;
+  fGammaCal_offset = fGammaCal_gain = fToTCal_par0 = fToTCal_par1
+     = fToTCal_par2 = fRangeCal_offset = fRangeCal_gain
+     = fQuenchingFactor = fPidGain = 0.;
   if (fParam_Writer) { fParam_Writer->Reset(); }
   if (fParam_Reader) { fParam_Reader->Reset(); }
 
@@ -149,7 +154,8 @@ void R3BCaloDUCalPar::Fill(FairDbResultPool& res_in,
   clear();
   
   res_in >> fCompId  >> fDetectionUnit >> fGammaCal_offset >> fGammaCal_gain 
-	 >> fToTCal_par0 >> fToTCal_par1 >> fToTCal_par2 >> fRangeCal_offset >> fRangeCal_gain >> fQuenchingFactor ;
+	 >> fToTCal_par0 >> fToTCal_par1 >> fToTCal_par2 >> fRangeCal_offset
+         >> fRangeCal_gain >> fQuenchingFactor >> fPidGain;
 
 }
 
@@ -158,7 +164,8 @@ void R3BCaloDUCalPar::Store(FairDbOutTableBuffer& res_out,
 {
   
   res_out << fCompId  << fDetectionUnit << fGammaCal_offset << fGammaCal_gain 
-	  << fToTCal_par0 << fToTCal_par1 << fToTCal_par2 << fRangeCal_offset << fRangeCal_gain << fQuenchingFactor ;
+	  << fToTCal_par0 << fToTCal_par1 << fToTCal_par2 << fRangeCal_offset
+          << fRangeCal_gain << fQuenchingFactor << fPidGain;
 
 }
 
@@ -193,6 +200,7 @@ void R3BCaloDUCalPar::fill(UInt_t rid)
     fRangeCal_offset  =  cgd->GetRangeCal_offset();
     fRangeCal_gain  =  cgd->GetRangeCal_gain();
     fQuenchingFactor  =  cgd->GetQuenchingFactor();
+    fPidGain = cgd->GetPidGain();
   }
 
 }
@@ -277,6 +285,7 @@ void R3BCaloDUCalPar::Print()
   std::cout<<"   fToTCal_par0: "<<  fToTCal_par0 <<"   fToTCal_par1: "<<  fToTCal_par1 <<"   fToTCal_par2: "<<  fToTCal_par2 <<  std::endl;
   std::cout<<"   fRangeCal_offset: "<<  fRangeCal_offset <<  "   fRangeCal_gain: "<<  fRangeCal_gain <<  std::endl;
   std::cout<<"   fQuenchingFactor: "<<  fQuenchingFactor <<  std::endl;
+  std::cout<<"   fPidGain: "<<  fPidGain <<  std::endl;
  
 }
 
@@ -292,7 +301,8 @@ Bool_t R3BCaloDUCalPar::Compare(const R3BCaloDUCalPar& that ) const {
    		           &&  (fToTCal_par2   == that.fToTCal_par2)   
                    &&  (fRangeCal_offset   == that.fRangeCal_offset)
 		           &&  (fRangeCal_gain   == that.fRangeCal_gain)
-		           &&  (fQuenchingFactor   == that.fQuenchingFactor);
+		           &&  (fQuenchingFactor   == that.fQuenchingFactor)
+                           && (fPidGain == that.fPidGain);
   
   return (test_h); 
 }

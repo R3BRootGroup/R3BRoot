@@ -15,19 +15,22 @@
 //     where inputFile1 is the file name of the output of the calibrate.C macro
 //           inputFile2 is the file name of the output of the calToT_part2.C macro
 //           inputFile3 is the file name of the output of the calPulse_part2.C macro
+//           inputFilePid is the file name of the PID calibration
 //           outputFile is the file name with all the params and the right format
 //         
 //  -------------------------------------------------------------------------
 mergerPars(TString inputFile1, TString inputFile2, 
-	      TString inputFile3, TString outputFile){
+	      TString inputFile3, TString inputFilePid, TString outputFile){
   ifstream input1;
   ifstream input2;
   ifstream input3;
+  ifstream inputPid;
   ofstream output;
   
   input1.open(inputFile1);  //input fit parameters (output of calibrate.C, GammaCal pars)
   input2.open(inputFile2);  //input fit parameters (output of calToT_part2.C, ToTCal pars)
   input3.open(inputFile3);  //input fit parameters (output of calPulse_part2.C, RangeCal pars)
+  inputPid.open(inputFilePid);
   output.open(outputFile); //output calibration parameters
 
   TString dummy;
@@ -43,6 +46,7 @@ mergerPars(TString inputFile1, TString inputFile2,
   Double_t rangeCal_offset[128];
   Double_t rangeCal_gain[128];
   Double_t QuenchingFactor=0.9;
+  Double_t pidCal_gain[128];
   
   for(Int_t i=0;i<3;i++) input1 >> dummy; 
   for(Int_t i=0;i<128;i++)  {
@@ -59,17 +63,20 @@ mergerPars(TString inputFile1, TString inputFile2,
     input3 >> crystal[i] >> rangeCal_offset[i] >> rangeCal_gain[i]; 
     cout << crystal[i] << " " << rangeCal_offset[i] << " " << rangeCal_gain[i] << endl; 
   }
+  for(Int_t i=0;i<3;i++) inputPid >> dummy; 
+  for(Int_t i=0;i<128;i++)  {
+    inputPid >> crystal[i] >> pidCal_gain[i] >> dummy; 
+    cout << crystal[i] << " " << pidCal_gain[i] << endl; 
+  }
 
   //PARS ASCII FILE HEADER
-  char out1[100] = "##############################################################################";
-  char out2[100] = "# Class:   R3BCaloCalPar";
-  char out3[100] = "# Context: TestDefaultContext";
-  char out4[100] = "##############################################################################";
-  char out5[100] = "[CaloCalPar]";
-  char out6[100] = "//----------------------------------------------------------------------------";
-  char out7[100] = "NrOfDUnits:  Int_t  128";
-  output << out1 << endl; output << out2 << endl; output << out3 << endl; output << out4 << endl;
-  output << out5 << endl; output << out6 << endl; output << out7 << endl;
+  output << "##############################################################################\n";
+  output << "# Class:   R3BCaloCalPar\n";
+  output << "# Context: TestDefaultContext\n";
+  output << "##############################################################################\n";
+  output << "[CaloCalPar]\n";
+  output << "//----------------------------------------------------------------------------\n";
+  output << "NrOfDUnits:  Int_t  128\n";
 
   //PARS VALUES
   char out8[100] = ":   Double_t  \\";
@@ -78,7 +85,8 @@ mergerPars(TString inputFile1, TString inputFile2,
     output << " " << gammaCal_offset[i] << " " << gammaCal_gain[i]
 	   << " " << totCal_par0[i] << " " << totCal_par1[i] << " " << totCal_par2[i] 
 	   << " " << rangeCal_offset[i] << " " << rangeCal_gain[i] 
-	   << " " << QuenchingFactor  << endl; 
+	   << " " << QuenchingFactor
+           << " " << pidCal_gain[i] << endl;
   }
 
 }

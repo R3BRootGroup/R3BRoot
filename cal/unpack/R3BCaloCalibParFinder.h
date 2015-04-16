@@ -7,9 +7,6 @@
 #define R3BCALOCALIBPARFINDER_H
 
 #include "FairTask.h"
-#include "R3BCaloHit.h"
-#include "R3BCaloHitSim.h"
-#include "R3BCaloCalibPar.h"
 
 class TClonesArray;
 
@@ -23,7 +20,9 @@ public:
     
     /** Destructor **/
     ~R3BCaloCalibParFinder();
-    
+   
+    void SetOutputFile(const char *outFile);
+
     /** Virtual method Exec **/
     virtual void Exec(Option_t* opt);
     
@@ -31,7 +30,7 @@ public:
     virtual void Reset();
     
 protected:
-    
+
     /** Virtual method Init **/
     virtual InitStatus Init();
     
@@ -49,10 +48,15 @@ protected:
     
     TClonesArray* fCaloRawHitCA;
     
-    // Parameter class
-    R3BCaloCalibPar* fCaloCalibPar;
+    // (Nf + Ns) / Energy ratio
+    Double_t *fRatioPidEnergy;
+    UInt_t *fNumEvents;
+    UInt_t fNumChannels;
     
-    
+    UInt_t nEvents;
+
+    char *fOutputFile;
+
     ClassDef(R3BCaloCalibParFinder,1);
 };
 

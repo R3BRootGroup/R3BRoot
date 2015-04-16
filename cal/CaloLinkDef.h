@@ -18,6 +18,7 @@
 #pragma link C++ class R3BCaloCal+;
 #endif
 #pragma link C++ class R3BCaloCrystalAna+;
+#pragma link C++ class R3BCaloCalibParFinder+;
 
 
 #endif

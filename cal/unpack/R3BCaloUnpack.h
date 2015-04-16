@@ -63,6 +63,8 @@ class R3BCaloUnpack : public FairUnpack {
 
     R3BCaloUnpackPar* fCaloUnpackPar;
 
+    ULong64_t nEvents;
+
    public:
     //Class definition
     ClassDef(R3BCaloUnpack, 0)

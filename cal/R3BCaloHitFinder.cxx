@@ -43,6 +43,7 @@ R3BCaloHitFinder::R3BCaloHitFinder() : FairTask("R3B CALIFA Hit Finder ")
   fCaloHitFinderPar=0;
   fCrystalHitCA=0;
   fCaloHitCA=0;
+  nEvents=0;
 }
 
 
@@ -79,10 +80,10 @@ InitStatus R3BCaloHitFinder::Init()
 
   FairRootManager* ioManager = FairRootManager::Instance();
   if ( !ioManager ) Fatal("Init", "No FairRootManager");
-  if( !ioManager->GetObject("CrystalHitSim") ) {
-     fCrystalHitCA = (TClonesArray*) ioManager->GetObject("CrystalHit");
+  if( !ioManager->GetObject("CaloCrystalHitSim") ) {
+     fCrystalHitCA = (TClonesArray*) ioManager->GetObject("CaloCrystalHit");
   } else {
-     fCrystalHitCA = (TClonesArray*) ioManager->GetObject("CrystalHitSim");
+     fCrystalHitCA = (TClonesArray*) ioManager->GetObject("CaloCrystalHitSim");
      kSimulation = true;
   }
 
@@ -125,12 +126,16 @@ InitStatus R3BCaloHitFinder::ReInit()
 void R3BCaloHitFinder::Exec(Option_t* opt)
 {
 
+  if(++nEvents % 10000 == 0)
+	LOG(INFO) << nEvents << FairLogger::endl;
+
   // Reset entries in output arrays, local arrays
   Reset();
 
 
   //ALGORITHMS FOR HIT FINDING
 
+  ULong64_t hitTime=0;
   Double_t energy=0.;       // caloHits energy
   Double_t Nf=0.;           // caloHits Nf
   Double_t Ns=0.;           // caloHits Ns
@@ -140,37 +145,33 @@ void R3BCaloHitFinder::Exec(Option_t* opt)
   Double_t angle1,angle2;
   Double_t eInc=0.;       // total incident energy (only for simulation)
 
-  Int_t* usedCrystalHits=0; //array to control the CrystalHits
+  bool* usedCrystalHits=NULL; //array to control the CrystalHits
   Int_t crystalsInHit=0;  //used crystals in each CaloHit
   Double_t testPolar=0 ;
   Double_t testAzimuthal=0 ;
   Double_t testRho =0 ;
+  bool takeCrystalInCluster;
 
-  // Besides if conditions, both objects must be defined
-  R3BCaloCrystalHit**    crystalHit;
-  R3BCaloCrystalHitSim** crystalHitSim;
+  R3BCaloCrystalHit**    crystalHit = NULL;
 
   Int_t crystalHits;        // Nb of CrystalHits in current event
   crystalHits = fCrystalHitCA->GetEntries();
 
-  if (crystalHits>0) {
-    if(kSimulation) {
-       crystalHitSim = new R3BCaloCrystalHitSim*[crystalHits];
-       usedCrystalHits = new Int_t[crystalHits];
-       for (Int_t i=0; i<crystalHits; i++) {
-         crystalHitSim[i] = new R3BCaloCrystalHitSim;
-         crystalHitSim[i] = (R3BCaloCrystalHitSim*) fCrystalHitCA->At(i);
-         usedCrystalHits[i] = 0;
-       }
-    } else {
-       crystalHit = new R3BCaloCrystalHit*[crystalHits];
-       usedCrystalHits = new Int_t[crystalHits];
-       for (Int_t i=0; i<crystalHits; i++) {
-         crystalHit[i] = new R3BCaloCrystalHit;
-         crystalHit[i] = (R3BCaloCrystalHit*) fCrystalHitCA->At(i);
-         usedCrystalHits[i] = 0;
-       }
+  if (crystalHits == 0)
+     return;
+
+  crystalHit = new R3BCaloCrystalHit*[crystalHits];
+  usedCrystalHits = new bool[crystalHits];
+  for (Int_t i=0; i<crystalHits; i++) {
+    crystalHit[i] = (R3BCaloCrystalHit*) fCrystalHitCA->At(i);
+    if(kSimulation)
+    {
+       // Apply resolution smearing for simulation
+       crystalHit[i]->SetEnergy(ExpResSmearing(crystalHit[i]->GetEnergy()));
+       crystalHit[i]->SetNf(CompSmearing(crystalHit[i]->GetNf()));
+       crystalHit[i]->SetNs(CompSmearing(crystalHit[i]->GetNs()));
     }
+    usedCrystalHits[i] = 0;
   }
 
   //For the moment a simple analysis... more to come
@@ -178,67 +179,33 @@ void R3BCaloHitFinder::Exec(Option_t* opt)
   Int_t unusedCrystals = crystalHits;
 
   //removing those crystals with energy below the threshold
-  if(kSimulation) {
-    for (Int_t i=0; i<crystalHits; i++) {
-      if (crystalHitSim[i]->GetEnergy()<fThreshold) {
-        usedCrystalHits[i] = 1;
-        unusedCrystals--;
-      }
-    }
-  } else {
     for (Int_t i=0; i<crystalHits; i++) {
       if (crystalHit[i]->GetEnergy()<fThreshold) {
         usedCrystalHits[i] = 1;
         unusedCrystals--;
       }
     }
-  }
 
+//  int n_clusters = 0;
 
   while (unusedCrystals>0) {
     // First, finding the crystal with higher energy from the unused crystalHits
-    if(kSimulation) {
-      for (Int_t i=1; i<crystalHits; i++) {
-        if (!usedCrystalHits[i] && crystalHitSim[i]->GetEnergy() > 
-	    crystalHitSim[crystalWithHigherEnergy]->GetEnergy())
-          crystalWithHigherEnergy = i;
-      }
-    } else {
       for (Int_t i=1; i<crystalHits; i++) {
         if (!usedCrystalHits[i] && crystalHit[i]->GetEnergy() > 
 	    crystalHit[crystalWithHigherEnergy]->GetEnergy())
           crystalWithHigherEnergy = i;
       }
-    }
 
     usedCrystalHits[crystalWithHigherEnergy] = 1; 
     unusedCrystals--; crystalsInHit++;
 
     // Second, energy and angles come from the crystal with the higher energy
-    if(kSimulation) {
-      energy = ExpResSmearing(crystalHitSim[crystalWithHigherEnergy]->GetEnergy());
-      if(isPhoswich(crystalHitSim[crystalWithHigherEnergy]->GetCrystalId())) {
-	Nf = PhoswichSmearing(crystalHitSim[crystalWithHigherEnergy]->GetNf(), 1);
-	Ns = PhoswichSmearing(crystalHitSim[crystalWithHigherEnergy]->GetNs(), 0);
-      } else {
-	Nf = CompSmearing(crystalHitSim[crystalWithHigherEnergy]->GetNf());
-	Ns = CompSmearing(crystalHitSim[crystalWithHigherEnergy]->GetNs());
-      }
-      GetAngles(crystalHitSim[crystalWithHigherEnergy]->GetCrystalId(),
-		&polarAngle,&azimuthalAngle,&rhoAngle);
-    } else {
-      energy = ExpResSmearing(crystalHit[crystalWithHigherEnergy]->GetEnergy());
-      if(isPhoswich(crystalHit[crystalWithHigherEnergy]->GetCrystalId())) {
-	Nf = PhoswichSmearing(crystalHit[crystalWithHigherEnergy]->GetNf(), 1);
-	Ns = PhoswichSmearing(crystalHit[crystalWithHigherEnergy]->GetNs(), 0);
-      } else {
-	Nf = CompSmearing(crystalHit[crystalWithHigherEnergy]->GetNf());
-	Ns = CompSmearing(crystalHit[crystalWithHigherEnergy]->GetNs());
-      }
+      hitTime = crystalHit[crystalWithHigherEnergy]->GetTime();
+      energy = crystalHit[crystalWithHigherEnergy]->GetEnergy();
+      Nf = crystalHit[crystalWithHigherEnergy]->GetNf();
+      Ns = crystalHit[crystalWithHigherEnergy]->GetNs();
       GetAngles(crystalHit[crystalWithHigherEnergy]->GetCrystalId(),
 		&polarAngle,&azimuthalAngle,&rhoAngle);
-    }
-
 
     // Third, finding closest hits and adding their energy
     // Clusterization: you want to put a condition on the angle between the highest
@@ -250,15 +217,12 @@ void R3BCaloHitFinder::Exec(Option_t* opt)
     refAngle.SetPhi(azimuthalAngle);
     for (Int_t i=0; i<crystalHits; i++) {
       if (!usedCrystalHits[i] ) {
-        if(kSimulation) {
-          GetAngles(crystalHitSim[i]->GetCrystalId(), &testPolar, 
-		    &testAzimuthal, &testRho);
-        } else {
           GetAngles(crystalHit[i]->GetCrystalId(), &testPolar, 
 		    &testAzimuthal, &testRho);
-        }
 
         //if(kSimulation) eInc += crystalHitSim[i]->GetEinc();
+
+        takeCrystalInCluster = false;
 
         TVector3 testAngle(1,0,0);       //EF
         testAngle.SetTheta(testPolar);
@@ -278,29 +242,8 @@ void R3BCaloHitFinder::Exec(Option_t* opt)
             angle1 = azimuthalAngle; angle2 = testAzimuthal;
           }
           if (TMath::Abs(polarAngle - testPolar) < fDeltaPolar &&
-              TMath::Abs(angle1 - angle2) < fDeltaAzimuthal ) {
-            if(kSimulation) {
-              energy += ExpResSmearing(crystalHitSim[i]->GetEnergy());
-	      if(isPhoswich(crystalHitSim[i]->GetCrystalId())) {
-		Nf += PhoswichSmearing(crystalHitSim[i]->GetNf(), 1);
-		Ns += PhoswichSmearing(crystalHitSim[i]->GetNs(), 0);
-	      } else {
-		Nf += CompSmearing(crystalHitSim[i]->GetNf());
-		Ns += CompSmearing(crystalHitSim[i]->GetNs());
-	      }
-              eInc += crystalHitSim[i]->GetEinc();
-              usedCrystalHits[i] = 1; unusedCrystals--; crystalsInHit++;
-            } else {
-              energy += ExpResSmearing(crystalHit[i]->GetEnergy());
-	      if(isPhoswich(crystalHit[i]->GetCrystalId())) {
-		Nf += PhoswichSmearing(crystalHit[i]->GetNf(), 1);
-		Ns += PhoswichSmearing(crystalHit[i]->GetNs(), 0);
-	      } else {
-		Nf += CompSmearing(crystalHit[i]->GetNf());
-		Ns += CompSmearing(crystalHit[i]->GetNs());
-	      }
-              usedCrystalHits[i] = 1; unusedCrystals--; crystalsInHit++;
-            }
+              TMath::Abs(angle1 - angle2) < fDeltaAzimuthal ){
+                 takeCrystalInCluster = true;
           }
           break;
         }
@@ -314,66 +257,19 @@ void R3BCaloHitFinder::Exec(Option_t* opt)
 	  // the CsI, no matter the position of the crystal they hit.
           if ( ((refAngle.Angle(testAngle))*((testRho+rhoAngle)/(35.*2.))) < 
 	       fDeltaAngleClust )  {
-            if(kSimulation) {
-              energy += ExpResSmearing(crystalHitSim[i]->GetEnergy());
-	      if(isPhoswich(crystalHitSim[i]->GetCrystalId())) {
-		Nf += PhoswichSmearing(crystalHitSim[i]->GetNf(), 1);
-		Ns += PhoswichSmearing(crystalHitSim[i]->GetNs(), 0);
-	      } else {
-		Nf += CompSmearing(crystalHitSim[i]->GetNf());
-		Ns += CompSmearing(crystalHitSim[i]->GetNs());
-	      }
-	      LOG(INFO) << "Nf: " << Nf << FairLogger::endl;
-              eInc += crystalHitSim[i]->GetEinc();
-            } else {
-              energy += ExpResSmearing(crystalHit[i]->GetEnergy());
-	      if(isPhoswich(crystalHit[i]->GetCrystalId())) {
-		Nf += PhoswichSmearing(crystalHit[i]->GetNf(), 1);
-		Ns += PhoswichSmearing(crystalHit[i]->GetNs(), 0);
-	      } else {
-		Nf += CompSmearing(crystalHit[i]->GetNf());
-		Ns += CompSmearing(crystalHit[i]->GetNs());
-	      }
-            }
-            usedCrystalHits[i] = 1; unusedCrystals--; crystalsInHit++;
+                  takeCrystalInCluster = true;
           }
           break ;
         case 3: {  //round window scaled with energy
           // The same as before but the angular window is scaled 
 	  // according to the energy of the hit in the higher energy 
 	  // crystal. It needs a parameter that should be calibrated.
-          if(kSimulation) {
-            Double_t fDeltaAngleClustScaled = fDeltaAngleClust * 
-	      (crystalHitSim[crystalWithHigherEnergy]->GetEnergy()*fParCluster1);
-            if ( ((refAngle.Angle(testAngle))*((testRho+rhoAngle)/(35.*2.))) < 
-		 fDeltaAngleClustScaled )  {
-              energy += ExpResSmearing(crystalHitSim[i]->GetEnergy());
-	      if(isPhoswich(crystalHitSim[i]->GetCrystalId())) {
-		Nf += PhoswichSmearing(crystalHitSim[i]->GetNf(), 1);
-		Ns += PhoswichSmearing(crystalHitSim[i]->GetNs(), 0);
-	      } else {
-		Nf += CompSmearing(crystalHitSim[i]->GetNf());
-		Ns += CompSmearing(crystalHitSim[i]->GetNs());
-	      }
-              eInc += crystalHitSim[i]->GetEinc(); 
-              usedCrystalHits[i] = 1; unusedCrystals--; crystalsInHit++;
-            }
-          } else {
             Double_t fDeltaAngleClustScaled = fDeltaAngleClust * 
 	      (crystalHit[crystalWithHigherEnergy]->GetEnergy()*fParCluster1);
             if ( ((refAngle.Angle(testAngle))*((testRho+rhoAngle)/(35.*2.))) < 
 		 fDeltaAngleClustScaled )  {
-              energy += ExpResSmearing(crystalHit[i]->GetEnergy());
-	      if(isPhoswich(crystalHit[i]->GetCrystalId())) {
-		Nf += PhoswichSmearing(crystalHit[i]->GetNf(), 1);
-		Ns += PhoswichSmearing(crystalHit[i]->GetNs(), 0);
-	      } else {
-		Nf += CompSmearing(crystalHit[i]->GetNf());
-		Ns += CompSmearing(crystalHit[i]->GetNs());
-	      }
-              usedCrystalHits[i] = 1; unusedCrystals--; crystalsInHit++;
+                  takeCrystalInCluster = true;
             }
-          }
           break;
         }
         case 4: // round window scaled with the energy of the _two_ hits 
@@ -382,6 +278,17 @@ void R3BCaloHitFinder::Exec(Option_t* opt)
 	  //two hits is function of the energy of both hits
           break;
         }
+
+        if(takeCrystalInCluster)
+        {
+              energy += crystalHit[i]->GetEnergy();
+  	      Nf += crystalHit[i]->GetNf();
+	      Ns += crystalHit[i]->GetNs();
+              usedCrystalHits[i] = 1; unusedCrystals--; crystalsInHit++;
+              
+              if(kSimulation)
+                  eInc += dynamic_cast<R3BCaloCrystalHitSim*>(crystalHit[i])->GetEinc();
+        }
       }
     }
     
@@ -389,7 +296,8 @@ void R3BCaloHitFinder::Exec(Option_t* opt)
     if(kSimulation) {
       AddHitSim(crystalsInHit, energy, Nf, Ns, polarAngle, azimuthalAngle, eInc);
     } else {
-      AddHit(crystalsInHit, energy, Nf, Ns, polarAngle, azimuthalAngle);
+      AddHit(crystalsInHit, energy, Nf, Ns, polarAngle, azimuthalAngle, hitTime);
+//      n_clusters++;
     }
     
     crystalsInHit = 0; //reset for next CaloHit
@@ -403,6 +311,13 @@ void R3BCaloHitFinder::Exec(Option_t* opt)
       }
     }
   }
+
+//  std::cout << "# " << n_clusters << "\n--------\n";
+
+  if(crystalHit)
+     delete[] crystalHit;
+  if(usedCrystalHits)
+     delete[] usedCrystalHits;
 }
 
 
@@ -2040,6 +1955,19 @@ void R3BCaloHitFinder::GetAngles(Int_t iD, Double_t* polar,
       local[0]=master[0]; local[1]=master[1]; local[2]=master[2];
       currentNode->LocalToMaster(local, master);   
     }
+  } else if(fGeometryVersion == 0x438b) {
+	// s438b demonstrator design (Very quick and super dirty), extracted from Angels angles
+	static double s438bDemoThetaPhi[256] = {59.600000, 236.800000, 61.900000, 230.800000, 61.900000, 236.900000, 59.600000, 243.200000, 59.600000, 249.400000, 61.900000, 243.100000, 61.900000, 249.200000, 59.600000, 230.600000, 57.300000, 249.600000, 54.900000, 230.200000, 54.900000, 236.700000, 57.300000, 230.400000, 57.300000, 236.800000, 54.900000, 236.700000, 54.900000, 249.800000, 57.300000, 243.200000, 50.300000, 236.600000, 52.600000, 230.200000, 52.600000, 236.700000, 50.300000, 243.400000, 50.300000, 250.100000, 52.600000, 243.300000, 52.600000, 249.800000, 50.300000, 229.900000, 48.000000, 250.100000, 45.700000, 229.700000, 45.700000, 236.500000, 48.000000, 229.900000, 48.000000, 236.600000, 45.700000, 236.500000, 45.700000, 250.300000, 48.000000, 243.400000, 41.000000, 236.300000, 43.400000, 229.600000, 43.400000, 236.500000, 41.000000, 243.700000, 41.000000, 250.800000, 43.400000, 243.500000, 43.400000, 250.400000, 41.000000, 229.200000, 38.700000, 250.800000, 36.400000, 228.700000, 36.400000, 236.200000, 38.700000, 229.200000, 38.700000, 236.400000, 36.400000, 236.200000, 36.400000, 251.300000, 38.700000, 243.600000, 31.800000, 235.900000, 34.100000, 228.600000, 34.100000, 236.200000, 31.800000, 244.100000, 31.800000, 252.100000, 34.100000, 243.800000, 34.100000, 251.400000, 31.800000, 227.900000, 29.500000, 252.100000, 27.200000, 227.000000, 27.200000, 235.600000, 29.500000, 227.900000, 29.500000, 235.900000, 27.200000, 235.600000, 27.200000, 253.000000, 29.500000, 244.100000, 59.600000, 56.800000, 61.900000, 50.800000, 61.900000, 56.900000, 59.600000, 63.200000, 59.600000, 69.400000, 61.900000, 63.100000, 61.900000, 69.200000, 59.600000, 50.600000, 57.300000, 69.600000, 54.900000, 50.200000, 54.900000, 56.700000, 57.300000, 50.400000, 57.300000, 56.800000, 54.900000, 56.700000, 54.900000, 69.800000, 57.300000, 63.200000, 50.300000, 56.600000, 52.600000, 50.200000, 52.600000, 56.700000, 50.300000, 63.400000, 50.300000, 70.100000, 52.600000, 63.300000, 52.600000, 69.800000, 50.300000, 49.900000, 48.000000, 70.100000, 45.700000, 49.700000, 45.700000, 56.500000, 48.000000, 49.900000, 48.000000, 56.600000, 45.700000, 56.500000, 45.700000, 70.300000, 48.000000, 63.400000, 41.000000, 56.300000, 43.400000, 49.600000, 43.400000, 56.500000, 41.000000, 63.700000, 41.000000, 70.800000, 43.400000, 63.500000, 43.400000, 70.400000, 41.000000, 49.200000, 38.700000, 70.800000, 36.400000, 48.700000, 36.400000, 56.200000, 38.700000, 49.200000, 38.700000, 56.400000, 36.400000, 56.200000, 36.400000, 71.300000, 38.700000, 63.600000, 31.800000, 55.900000, 34.100000, 48.600000, 34.100000, 56.200000, 31.800000, 64.100000, 31.800000, 72.100000, 34.100000, 63.800000, 34.100000, 71.400000, 31.800000, 47.900000, 29.500000, 72.100000, 27.200000, 47.000000, 27.200000, 55.600000, 29.500000, 47.900000, 29.500000, 55.900000, 27.200000, 55.600000, 27.200000, 73.000000, 29.500000, 64.100000};
+
+	if(iD >= 0 && iD < 128)
+	{
+		*polar = TMath::Pi() * s438bDemoThetaPhi[2*iD] / 180.0;
+		*azimuthal = TMath::Pi() * s438bDemoThetaPhi[2*iD+1] / 180.0;
+		*rho = 1;	// Reasonable?
+		return;
+	}
+	else
+		LOG(ERROR) << "R3BCaloHitFinder (Geometry 0x438b): Invalid crystal Id: " << iD << FairLogger::endl;
   } else LOG(ERROR) << "R3BCaloHitFinder: Geometry version not available in R3BCalo::ProcessHits(). " << FairLogger::endl;
   
   
@@ -2145,12 +2073,13 @@ void R3BCaloHitFinder::SetAngularWindow(Double_t deltaPolar, Double_t deltaAzimu
 
 
 // -----   Private method AddHit  --------------------------------------------
-R3BCaloHit* R3BCaloHitFinder::AddHit(UInt_t Nbcrystals,Double_t ene,Double_t Nf,Double_t Ns,Double_t pAngle,Double_t aAngle)
+R3BCaloHit* R3BCaloHitFinder::AddHit(UInt_t Nbcrystals,Double_t ene,Double_t Nf,Double_t Ns,Double_t pAngle,Double_t aAngle, ULong64_t time)
 {
+//std::cout << "Ncrystals = " << Nbcrystals << endl;
   // It fills the R3BCaloHit array
   TClonesArray& clref = *fCaloHitCA;
   Int_t size = clref.GetEntriesFast();
-  return new(clref[size]) R3BCaloHit(Nbcrystals, ene, Nf, Ns, pAngle, aAngle);
+  return new(clref[size]) R3BCaloHit(Nbcrystals, ene, Nf, Ns, pAngle, aAngle, time);
 }
 
 // -----   Private method AddHitSim  --------------------------------------------

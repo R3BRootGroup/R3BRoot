@@ -28,7 +28,7 @@ public:
    *@param fToT_Energy  Total energy deposited on the crystal from ToT ([GeV] in sim)
    *@param fTime        Time since event start [ns]
    **/
-  R3BCaloCrystalHit(Int_t ident, Double_t energy, Double_t Nf, Double_t Ns, Double_t time, Double_t tot_energy=0);
+  R3BCaloCrystalHit(Int_t ident, Double_t energy, Double_t Nf, Double_t Ns, ULong64_t time, Double_t tot_energy=0);
 
   /** Copy constructor **/
   R3BCaloCrystalHit(const R3BCaloCrystalHit&);
@@ -44,7 +44,7 @@ public:
   Double_t GetToT_Energy()    const { return fToT_Energy; }
   Double_t GetNf()            const { return fNf; }
   Double_t GetNs()            const { return fNs; }
-  Double_t GetTime()          const { return fTime; }
+  ULong64_t GetTime()          const { return fTime; }
 	
   Int_t    GetCrystalType()   const { return 0; }   //Backwards compatibility: not crashing macros
   Int_t    GetCrystalCopy()   const { return 0; }   //Backwards compatibility: not crashing macros
@@ -55,7 +55,7 @@ public:
   void SetToT_Energy(Double32_t energy){fToT_Energy = energy;}
   void SetNf(Double32_t Nf){fNf = Nf;}
   void SetNs(Double32_t Ns){fNs = Ns;}
-  void SetTime(Double32_t time){fTime = time;}
+  void SetTime(ULong64_t time){fTime = time;}
 
   /** Output to screen **/
   virtual void Print(const Option_t* opt) const;
@@ -65,10 +65,10 @@ protected:
   Double32_t fNf;        //total Nf in the crystal
   Double32_t fNs;        //total Nf in the crystal
   Double32_t fToT_Energy;//total energy in the crystal from ToT
-  Double32_t fTime;      //time of the interaction
+  ULong64_t fTime;      //time of the interaction
   Int_t fCrystalId;      //crystal unique identifier
 
-  ClassDef(R3BCaloCrystalHit,1)
+  ClassDef(R3BCaloCrystalHit,2)
 
 };
 

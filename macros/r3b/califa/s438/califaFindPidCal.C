@@ -1,33 +1,6 @@
-//  -------------------------------------------------------------------------
-//
-//   ----- General Macro for R3B CALIFA Analysis
-//         Author: Hector Alvarez <hector.alvarez@usc.es>
-//         Last Update: 30/09/14
-//         Comments:
-//	       	Runs the CALIFA calibration. Outputs a root file with 
-//     		a collection (TClonesArray) of R3BCaloCrystalHits
-//
-//  -------------------------------------------------------------------------
-//
-//   Usage: 
-//        > root -l califaCal.C
-//        ROOT> .L califaCal.C
-//        ROOT>  califaCal(inputFile,outputFile,parRootFile,nevents)
-//                         
-//   where
-//    inputFile is the input root file with the R3BCalorRawHits 
-//    outputFile is the output root file where the R3BCaloCrystalHits will 
-//               be created
-//    parRootFile is the parameters ROOT file 
-//    nevents is the number of events to calibrate (0 if all)
-// 
-//    Batch is also an option, e.g.
-//    root -l -b -q -x 'califaCal.C("./data/totcal/900mv_30mev__raw.root","./data/totcal/900mv_30mev_cal.root","califa_allPars.root")';
-//
-//-------------------------------------------------------------------------
-
-void califaCal(TString inputFile, TString outputFile, 
-	       TString parRootFile, bool highRange = false, Int_t nEvents = 0) {
+// Find average ratio (Nf + Ns) / Energy for each crystal
+void califaFindPidCal(TString inputFile, TString outputFile, 
+	       TString parRootFile, Int_t nEvents = 0) {
   // -----   Timer   --------------------------------------------------------
   TStopwatch timer;
   timer.Start();
@@ -37,7 +10,7 @@ void califaCal(TString inputFile, TString outputFile,
   FairRunAna* fRun = new FairRunAna();
   fRun->SetInputFile(inputFile);
   fRun->SetOutputFile(outputFile);
-
+  
   FairRootManager::Instance()->SetCompressData(true);
 
   // -----   Runtime database   ---------------------------------------------
@@ -79,9 +52,8 @@ void califaCal(TString inputFile, TString outputFile,
   */
 
   //Crystal calibration
-  R3BCaloCal* cal = new R3BCaloCal();
-  cal->UseHighRange(highRange);
-  cal->SetCalibratePID(true);
+  R3BCaloCalibParFinder* cal = new R3BCaloCalibParFinder();
+  cal->SetOutputFile("pidPars.txt");
   fRun->AddTask(cal);
   
 

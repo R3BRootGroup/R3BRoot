@@ -55,6 +55,7 @@ using TObject::Compare;
     Double_t GetRangeCal_offset() 	const {return fRangeCal_offset;}
     Double_t GetRangeCal_gain() 	const {return fRangeCal_gain;}
     Double_t GetQuenchingFactor() 	const {return fQuenchingFactor;}
+    Double_t GetPidGain()               const {return fPidGain;}
     
     void SetCompId(Int_t x)  			{SetComboNo(x); fCompId=x;}
     void SetDetectionUnit(Int_t i) 		{fDetectionUnit=i;}
@@ -66,6 +67,7 @@ using TObject::Compare;
     void SetRangeCal_offset(Double_t i) 	{fRangeCal_offset=i;}
     void SetRangeCal_gain(Double_t i) 	        {fRangeCal_gain=i;}
     void SetQuenchingFactor(Double_t i) 	{fQuenchingFactor=i;}
+    void SetPidGain(Double_t g)                 {fPidGain=g;}
     
     UInt_t GetIndex(UInt_t /*def*/) const { return fDetectionUnit; }
 
@@ -111,6 +113,7 @@ using TObject::Compare;
     Double_t fRangeCal_offset; //offset in the linear 30 to 300 MeV range calibration
     Double_t fRangeCal_gain;   //gain in the linear 30 to 300 MeV range calibration
     Double_t fQuenchingFactor; //quenching factor for protons (tentative) calculated from proton and pulser measurements
+    Double_t fPidGain;
 
     // Database Pool Index
     Int_t fDbEntry; //!
@@ -121,7 +124,7 @@ using TObject::Compare;
     // Connection Pool
     FairDbConnectionPool* fMultConn;  //!
 
-    ClassDef(R3BCaloDUCalPar,1); // R3BCaloDUCalPar Parameter Container example
+    ClassDef(R3BCaloDUCalPar,2); // R3BCaloDUCalPar Parameter Container example
 };
 
 

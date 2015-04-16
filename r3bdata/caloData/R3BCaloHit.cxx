@@ -15,7 +15,7 @@ using std::flush;
 // -----   Default constructor   -------------------------------------------
 R3BCaloHit::R3BCaloHit()
   : FairMultiLinkedData(),
-    fNbOfCrystalHits(0), fEnergy(-1.), fTheta(-1.), fPhi(-1.)
+    fNbOfCrystalHits(0), fEnergy(-1.), fTheta(-1.), fPhi(-1.), fTime(0)
 {
 }
 // -------------------------------------------------------------------------
@@ -24,10 +24,10 @@ R3BCaloHit::R3BCaloHit()
 
 // -----   Standard constructor   ------------------------------------------
 R3BCaloHit::R3BCaloHit(UInt_t Nb, Double_t ene, Double_t nf, Double_t ns,
-		       Double_t theta, Double_t phi) 
+		       Double_t theta, Double_t phi, ULong64_t time) 
   : FairMultiLinkedData(),
     fNbOfCrystalHits(Nb), fEnergy(ene), fNf(nf), fNs(ns),
-    fTheta(theta), fPhi(phi)
+    fTheta(theta), fPhi(phi), fTime(time)
 {
 }
 // -------------------------------------------------------------------------
@@ -38,7 +38,7 @@ R3BCaloHit::R3BCaloHit(const R3BCaloHit& right)
   : FairMultiLinkedData(right),
     fNbOfCrystalHits(right.fNbOfCrystalHits),
     fEnergy(right.fEnergy), fNf(right.fNf), fNs(right.fNs),
-    fTheta(right.fTheta), fPhi(right.fPhi)
+    fTheta(right.fTheta), fPhi(right.fPhi), fTime(right.fTime)
 {
 }
 

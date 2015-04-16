@@ -31,6 +31,9 @@ class R3BCaloCal : public FairTask {
   /** Virtual method Reset **/
   virtual void Reset();
 
+  void UseHighRange(bool highRange);
+  void SetCalibratePID(bool cal);
+
 protected:
   //Fair specific
   /** Virtual method Init **/
@@ -55,10 +58,16 @@ protected:
 
   TRandom* ran;
 
+// Use high range calibration (instead of gamma calibraton)
+  bool calHighRange;
+// Calibrate PID
+  bool calPID;
+
   //Int_t counter1;
   //Int_t counter2;
 
-    
+  UInt_t nEvents;
+
  public:
   //Class definition
   ClassDef(R3BCaloCal, 0)

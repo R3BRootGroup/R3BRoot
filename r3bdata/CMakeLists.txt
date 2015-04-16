@@ -33,6 +33,7 @@ caloData/R3BCaloRawHit.cxx
 caloData/R3BCaloHit.cxx
 caloData/R3BCaloHitSim.cxx
 caloData/R3BCaloPoint.cxx 
+caloData/R3BCaloRawHit.cxx
 dchData/R3BDchPoint.cxx
 dchData/R3BDchFullPoint.cxx 
 gfiData/R3BGfiPoint.cxx 

@@ -63,7 +63,7 @@ protected:
         Double_t fEinc;      // total incident energy
 		
 	
-	ClassDef(R3BCaloHitSim,1)
+	ClassDef(R3BCaloHitSim,2)
 	
 };
 

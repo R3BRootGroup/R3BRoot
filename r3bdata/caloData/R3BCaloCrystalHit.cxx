@@ -18,7 +18,7 @@ R3BCaloCrystalHit::R3BCaloCrystalHit()
     fNf(-1.),
     fNs(-1.),
     fToT_Energy(-1.),
-    fTime(-1.),
+    fTime(0),
     fCrystalId(-1)
 {
 }
@@ -27,7 +27,7 @@ R3BCaloCrystalHit::R3BCaloCrystalHit()
 
 
 // -----   Standard constructor   ------------------------------------------
-R3BCaloCrystalHit::R3BCaloCrystalHit(Int_t ident, Double_t energy, Double_t Nf, Double_t Ns, Double_t time, Double_t tot_energy) 
+R3BCaloCrystalHit::R3BCaloCrystalHit(Int_t ident, Double_t energy, Double_t Nf, Double_t Ns, ULong64_t time, Double_t tot_energy) 
   : FairMultiLinkedData(),
     fEnergy(energy),
     fNf(Nf),

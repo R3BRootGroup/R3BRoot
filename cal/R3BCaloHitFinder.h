@@ -151,6 +151,8 @@ class R3BCaloHitFinder : public FairTask
 
   private:
 
+    UInt_t nEvents;
+
     /** Private method ExpResSmearing
     **
     ** Smears the energy according to some Experimental Resolution distribution
@@ -184,7 +186,7 @@ class R3BCaloHitFinder : public FairTask
     **
     ** Adds a CaloHit to the HitCollection
     **/
-    R3BCaloHit* AddHit(UInt_t Nbcrystals,Double_t ene, Double_t Nf, Double_t Ns, Double_t pAngle,Double_t aAngle);
+    R3BCaloHit* AddHit(UInt_t Nbcrystals,Double_t ene, Double_t Nf, Double_t Ns, Double_t pAngle,Double_t aAngle, ULong64_t time);
 
     /** Private method AddHitSim
     **

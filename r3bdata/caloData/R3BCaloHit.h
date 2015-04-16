@@ -34,7 +34,7 @@ public:
 	 *@param fPhi					Reconstructed phi
 	 **/
 	R3BCaloHit(UInt_t Nb, Double_t ene, Double_t nf, Double_t ns,
-		   Double_t theta, Double_t phi);
+		   Double_t theta, Double_t phi, ULong64_t time);
 	
 	
 	/** Copy constructor **/
@@ -53,6 +53,7 @@ public:
 	Double_t GetNs()   const { return fNs; }
 	Double_t GetTheta()   const { return fTheta; }
 	Double_t GetPhi()   const { return fPhi; }
+        ULong64_t GetTime() const { return fTime; }
 
 	/** Modifiers **/
 	void SetNbOfCrystalHits(UInt_t number){fNbOfCrystalHits = number;}
@@ -61,7 +62,7 @@ public:
 	void SetNs(Double_t ns){fNs = ns;}
 	void SetTheta(Double_t theta){fTheta = theta;}
 	void SetPhi(Double_t phi){fPhi = phi;}
-
+        void SetTime(ULong64_t time){fTime = time;}
 
 	/** Output to screen **/
 	virtual void Print(const Option_t* opt) const;
@@ -76,9 +77,9 @@ protected:
 	Double_t fNs;            //total Ns deposited
 	Double_t fTheta;         //reconstructed theta
 	Double_t fPhi;           //reconstructed phi
-		
+        ULong64_t fTime;         //WR time stamp
 	
-	ClassDef(R3BCaloHit,1)
+	ClassDef(R3BCaloHit,2)
 	
 };
 

@@ -10,6 +10,7 @@
 #pragma link C++ class R3BMCTrack+;
 
 #pragma link C++ class R3BXBallPoint+;
+#pragma link C++ class R3BCaloRawHit+;
 #pragma link C++ class R3BXBallCrystalHit+;
 #pragma link C++ class R3BXBallCrystalHitSim+;
 #pragma link C++ class R3BCaloCrystalHit+;

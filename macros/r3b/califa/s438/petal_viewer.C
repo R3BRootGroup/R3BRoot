@@ -18,8 +18,6 @@ void petal_viewer(TString inputFile) {
   
   //HISTOGRAMS DEFINITION
 
-  char hname1[128];
-  char title1[128];
   TH1F *E_p1[128];
   
   int cry;
@@ -30,9 +28,8 @@ void petal_viewer(TString inputFile) {
 
   for(Int_t i=0;i<128;i++){
     //petal 1
-    sprintf(hname1,"E_p1_cr%d",i);	  
-    sprintf(title1,"Crystal %d",i);	  
-    E_p1[i]= new TH1F(hname1,hname1,330,0,3300);  E_p1[i]->SetTitle(title1);  E_p1[i]->GetXaxis()->SetTitle("a.u.");
+    E_p1[i]= new TH1F(Form("E_p1_cr%d", i),Form("Crystal %d", i),500,0,300000);
+    E_p1[i]->GetXaxis()->SetTitle("keV");
   }
 
   TTree* caloTree = (TTree*)file1->Get("cbmsim");
@@ -40,8 +37,8 @@ void petal_viewer(TString inputFile) {
   //Raw Hits (input)
   TClonesArray* rawHitCA;  
   R3BCaloRawHit** rawHit;
-  rawHitCA = new TClonesArray("R3BCaloRawHit",5);
-  TBranch *branchRawHit = caloTree->GetBranch("CaloRawHit");
+  rawHitCA = new TClonesArray("R3BCaloCrystalHit",5);
+  TBranch *branchRawHit = caloTree->GetBranch("CaloCrystalHit");
   branchRawHit->SetAddress(&rawHitCA);
   
   Long64_t nevents = caloTree->GetEntries();
@@ -56,20 +53,13 @@ void petal_viewer(TString inputFile) {
     caloTree->GetEvent(i);
     rawHitsPerEvent = rawHitCA->GetEntries(); 
     //cout<<"mul "<<rawHitsPerEvent<<endl;
-  
-    if(rawHitsPerEvent>0) {
-      rawHit = new R3BCaloRawHit*[rawHitsPerEvent];
-      for(Int_t j=0;j<rawHitsPerEvent;j++){
-	rawHit[j] = new R3BCaloRawHit;
-	rawHit[j] = (R3BCaloRawHit*) rawHitCA->At(j);      
-      }
-    }
     
     //    cout<<"Mul "<<rawHitsPerEvent<<endl;
     //loop in RAW Hits
     if(rawHitsPerEvent>0) {
       for(Int_t h=0;h<rawHitsPerEvent;h++){
-	E_p1[rawHit[h]->GetCrystalId()]->Fill(rawHit[h]->GetEnergy());
+	R3BCaloCrystalHit *hit = (R3BCaloCrystalHit*)rawHitCA->At(h);
+	E_p1[hit->GetCrystalId()]->Fill(hit->GetEnergy());
 	//	cout<<"E "<<rawHit[h]->GetEnergy()<<endl;
       }
     }    

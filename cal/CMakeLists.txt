@@ -47,6 +47,7 @@ unpack/R3BCaloUnpack.cxx
 unpack/R3BCaloUnpackPar.cxx
 unpack/R3BCaloRawAna.cxx
 unpack/R3BCaloCrystalAna.cxx
+unpack/R3BCaloCalibParFinder.cxx
 )
 
 if(FAIRDB_FOUND)

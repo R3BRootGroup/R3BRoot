@@ -35,8 +35,9 @@ R3BCaloUnpack::R3BCaloUnpack(char *strCalDir,
                              Short_t subCrate, Short_t control)
   : FairUnpack(type, subType, procId, subCrate, control),
     fRawData(new TClonesArray("R3BCaloRawHit")),
-    fNHits(0),fCaloUnpackPar(0)
+    fNHits(0),fCaloUnpackPar(0), nEvents(NULL)
 {
+   LOG(DEBUG2) << "R3BCaloUnpack::ctor()" << FairLogger::endl;
 }
 
 
@@ -49,7 +50,7 @@ R3BCaloUnpack::R3BCaloUnpack(char *strCalDir,
  */
 R3BCaloUnpack::~R3BCaloUnpack()
 {
-  LOG(INFO) << "R3BCaloUnpack: Delete instance" << FairLogger::endl;
+  LOG(DEBUG2) << "R3BCaloUnpack: Delete instance" << FairLogger::endl;
   delete fRawData;
 }
 
@@ -111,7 +112,9 @@ void R3BCaloUnpack::Register() {
  * 
  */
 Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
-  
+
+  LOG(DEBUG2) << "R3BCaloUnpack::DoUnpack()" << FairLogger::endl;
+
   UInt_t *pl_data = (UInt_t*) data;
   UInt_t l_s = 0; // skip over timerabit header
   UInt_t start;      // used to decect optional payloads
@@ -284,8 +287,8 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
                                     
       default:
         LOG(WARNING) << "Invalid event magic number:" << magic << "Discarding event..." << FairLogger::endl; 
-        break;
         l_s = start + (evsize / 4); // skip the traces
+        break;
             
       } // case
     
@@ -309,10 +312,18 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
      if (crystal_id<128){
        new ((*fRawData)[fNHits]) R3BCaloRawHit(crystal_id, energy, n_f, n_s, rabbitStamp, error, tot);
        fNHits++;
+
+       LOG(DEBUG2) << "R3BCaloUnpack::DoUnpack(): New Hit: Crystal Id: " << crystal_id << ", fNHits: " << fNHits << FairLogger::endl;
      }
   
   } // while
- 
+
+  if(fNHits && ++nEvents % 1000 == 0)
+  {
+     LOG(INFO) << "nEvents: " << nEvents << " (Last multiplicity: " << fNHits << ")" << FairLogger::endl;
+//     LOG(INFO) << "  Last WR Timestamp: 0x" << rabbitStamp << FairLogger::endl;
+  }
+
   return kTRUE;
 
 } // DoUnpack
@@ -324,7 +335,7 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
  * 
  */
 void R3BCaloUnpack::Reset() {
-  LOG(DEBUG) << "Clearing Data Structure" << FairLogger::endl;
+  LOG(DEBUG2) << "Clearing Data Structure" << FairLogger::endl;
   fRawData->Clear();
   fNHits = 0;
 }
