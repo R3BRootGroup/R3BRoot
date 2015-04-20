@@ -68,7 +68,10 @@ void R3BCaloCrystalPar::putParams(FairParamList* list)
   std::cout<<"-I- R3BCaloCrystalPar::putParams() called"<<std::endl;
   if(!list) { return; }
   list->add("CrystalPar_Id", fId);
-  list->add("CrystalPar_IdAmcrys", fIdAmcrys);
+  // Note (Max W.): I made it compile, but I highly doupt that using
+  // string::c_str() as memory location for the parameters will
+  // work as expected...
+  list->add("CrystalPar_IdAmcrys", (Text_t*)fIdAmcrys.c_str());
   list->add("CrystalPar_EnergySource", (Text_t*)fEnergySource.c_str());
   list->add("CrystalPar_AbsoluteLO", fAbsoluteLO);
   list->add("CrystalPar_LO", fLO);

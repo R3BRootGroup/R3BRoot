@@ -81,7 +81,7 @@ Bool_t R3BCaloAPDPar::getParams(FairParamList* list)
   if (!list) { return kFALSE; }
   if (!list->fill("APDPar_Id", &fId)) { return kFALSE; }
   Text_t idhamamatsuaux[80];
-  if (!list->fill("APDPar_IdHamamatsu", idhamamatsuauxm 80)) { return kFALSE; }
+  if (!list->fill("APDPar_IdHamamatsu", idhamamatsuaux, 80)) { return kFALSE; }
   fIdHamamatsu = idhamamatsuaux;
   if (!list->fill("APDPar_VrHamamatsu", &fVrHamamatsu)) { return kFALSE; }
   if (!list->fill("APDPar_VBreakdownHamamatsu", &fVBreakdownHamamatsu)) { return kFALSE; }

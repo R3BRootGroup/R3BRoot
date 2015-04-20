@@ -11,6 +11,8 @@
 #ifndef R3BCALO_H
 #define R3BCALO_H
 
+#include <map>
+
 #include "R3BDetector.h"
 #include "TF1.h"
 #include "TLorentzVector.h"
@@ -27,6 +29,19 @@ class R3BCalo : public R3BDetector
 {
 
  public:
+
+  struct sCrystalInfo
+  {
+    Int_t   crystalType;
+    Int_t   crystalCopy;
+    Int_t   crystalId;
+    Int_t   fEndcapIdentifier;
+    Int_t   fPhoswichIdentifier;
+
+    Int_t   volIdAlv;
+    Int_t   cpAlv;
+    Int_t   cpCry;
+  };
 
   /** Default constructor **/
   R3BCalo();
@@ -138,6 +153,12 @@ class R3BCalo : public R3BDetector
 
   private:
 
+  // Mapping of volume ID to crystal information
+  std::map<Int_t, sCrystalInfo> fCrystalMap;
+
+  // Current active crystal
+  sCrystalInfo    *fCrystal;
+
     /** Track information to be stored until the track leaves the
 	active volume. **/
     Int_t          fTrackID;           //!  track index
@@ -212,7 +233,9 @@ class R3BCalo : public R3BDetector
 	
     TGeoRotation* createMatrix( Double_t phi, Double_t theta, Double_t psi);
 
-    ClassDef(R3BCalo,2);
+    Bool_t GetCrystalInfo(FairVolume *vol, sCrystalInfo &info);
+
+    ClassDef(R3BCalo,3);
 };
 
 inline void R3BCalo::ResetParameters() {

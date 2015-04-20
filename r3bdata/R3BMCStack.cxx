@@ -198,7 +198,7 @@ void R3BStack::AddParticle(TParticle* oldPart) {
 // -----   Public method FillTrackArray   ----------------------------------
 void R3BStack::FillTrackArray() {
   
-  LOG(INFO) << "R3BStack: Filling MCTrack array..." << FairLogger::endl;
+  LOG(DEBUG) << "R3BStack: Filling MCTrack array..." << FairLogger::endl;
   
   // --> Reset index map and number of output tracks
   fIndexMap.clear();
@@ -268,7 +268,7 @@ void R3BStack::FillTrackArray() {
 void R3BStack::UpdateTrackIndex(TRefArray* detList) {
   
   if ( fMinPoints == 0 ) return;
-  LOG(INFO) << "R3BStack: Updating track indizes...";
+  LOG(DEBUG) << "R3BStack: Updating track indizes...";
   Int_t nColl = 0;
   
   // First update mother ID in MCTracks
@@ -342,7 +342,7 @@ void R3BStack::UpdateTrackIndex(TRefArray* detList) {
     }
   }     // List of active detectors
 
-  LOG(INFO) << "...stack and " << nColl << " collections updated" << FairLogger::endl;
+  LOG(DEBUG) << "...stack and " << nColl << " collections updated" << FairLogger::endl;
   
 }
 // -------------------------------------------------------------------------
