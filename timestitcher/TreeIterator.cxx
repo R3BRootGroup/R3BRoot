@@ -6,7 +6,7 @@ using namespace std;
 
 namespace R3BCalifaTimestitcher
 {
-   TreeIterator::TreeIterator(vector<TreeWrapper*> &trees) : trees(trees)
+   TreeIterator::TreeIterator(vector<TreeWrapper*> &_trees) : trees(_trees)
    {
    }
 

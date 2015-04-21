@@ -7,7 +7,7 @@ using namespace std;
 namespace R3BCalifaTimestitcher
 {
 
-   TreeWrapper::TreeWrapper(TTree *tree, uint32_t id) : tree(tree), idx(0), id(id)
+   TreeWrapper::TreeWrapper(TTree *_tree, uint32_t _id) : tree(_tree), idx(0), id(_id)
    {
       this->nEntries = tree->GetEntries();
    }

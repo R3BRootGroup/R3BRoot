@@ -8,7 +8,7 @@ using namespace std;
 
 namespace R3BCalifaTimestitcher
 {
-   Land02TreeWrapper::Land02TreeWrapper(TTree *t, branchptrmap_t &branchmap, uint32_t id) : TreeWrapper(t, id)
+   Land02TreeWrapper::Land02TreeWrapper(TTree *t, branchptrmap_t &branchmap, uint32_t _id) : TreeWrapper(t, _id)
    {
       if(branchmap.count("Wr_time_l") == 0)
          throw runtime_error("Land02TreeWrapper: Could not find branch Wr_time_l!");

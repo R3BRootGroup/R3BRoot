@@ -16,7 +16,7 @@ using namespace std;
 
 namespace R3BCalifaTimestitcher
 {
-   R3BTreeWrapper::R3BTreeWrapper(TTree *tree, branchptrmap_t &branchmap, uint32_t id) : TreeWrapper(tree, id)
+   R3BTreeWrapper::R3BTreeWrapper(TTree *_tree, branchptrmap_t &branchmap, uint32_t _id) : TreeWrapper(_tree, _id)
    {
       // Try...
       // ...R3BCaloRawHit
