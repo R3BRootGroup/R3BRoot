@@ -89,13 +89,13 @@ void run(TString runNumber)
     tcalFill->SetTrigger(2);
     tcalFill->SetNofModules(nModules, 50);
     tcalFill->SetStoreDB(kTRUE);
-    //run->AddTask(tcalFill);
+    run->AddTask(tcalFill);
 
-    R3BLosTcalFill* losTcalFill = new R3BLosTcalFill("LosTcalFill");
-    losTcalFill->SetUpdateRate(updateRate);
-    losTcalFill->SetMinStats(minStats);
-    losTcalFill->SetNofModules(20);
-    losTcalFill->SetStoreDB(kTRUE);
+    //R3BLosTcalFill* losTcalFill = new R3BLosTcalFill("LosTcalFill");
+    //losTcalFill->SetUpdateRate(updateRate);
+    //losTcalFill->SetMinStats(minStats);
+    //losTcalFill->SetNofModules(20);
+    //losTcalFill->SetStoreDB(kTRUE);
     //run->AddTask(losTcalFill);
     // ---------------------------------------------------------------------------
 
