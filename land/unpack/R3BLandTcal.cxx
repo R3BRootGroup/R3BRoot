@@ -32,7 +32,7 @@ R3BLandTcal::R3BLandTcal()
     , fPmt(new TClonesArray("R3BLandPmt"))
     , fNPmt(0)
     , fTcalPar(NULL)
-    , fTrigger(1)
+    , fTrigger(-1)
     , fIsBeam(kFALSE)
     , fMap17Seen()
     , fMapStopTime()
@@ -48,7 +48,7 @@ R3BLandTcal::R3BLandTcal(const char* name, Int_t iVerbose)
     , fPmt(new TClonesArray("R3BLandPmt"))
     , fNPmt(0)
     , fTcalPar(NULL)
-    , fTrigger(1)
+    , fTrigger(-1)
     , fIsBeam(kFALSE)
     , fMap17Seen()
     , fMapStopTime()
@@ -120,9 +120,12 @@ InitStatus R3BLandTcal::ReInit()
 
 void R3BLandTcal::Exec(Option_t* option)
 {
-    if(header->GetTrigger() != fTrigger)
+    if(fTrigger >= 0)
     {
-        return;
+        if(header->GetTrigger() != fTrigger)
+        {
+            return;
+        }
     }
     
     Int_t nHits = fRawHit->GetEntriesFast();

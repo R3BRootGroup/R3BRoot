@@ -28,7 +28,7 @@ using namespace std;
 R3BLandTcalFill::R3BLandTcalFill()
     : fUpdateRate(1000000)
     , fMinStats(100000)
-    , fTrigger(1)
+    , fTrigger(-1)
     , fNofPMTs(0)
     , fNof17(0)
     , fhData(NULL)
@@ -44,7 +44,7 @@ R3BLandTcalFill::R3BLandTcalFill(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fUpdateRate(1000000)
     , fMinStats(100000)
-    , fTrigger(1)
+    , fTrigger(-1)
     , fNofPMTs(0)
     , fNof17(0)
     , fhData(NULL)
@@ -111,9 +111,12 @@ InitStatus R3BLandTcalFill::Init()
 
 void R3BLandTcalFill::Exec(Option_t* option)
 {
-    if(header->GetTrigger() != fTrigger)
+    if(fTrigger >= 0)
     {
-        return;
+        if(header->GetTrigger() != fTrigger)
+        {
+            return;
+        }
     }
     
     Int_t nHits = fHits->GetEntries();
