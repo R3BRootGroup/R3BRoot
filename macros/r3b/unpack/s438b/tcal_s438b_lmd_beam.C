@@ -5,6 +5,7 @@ void run(TString runNumber)
     timer.Start();
 
     const Int_t nModules = 800;
+    const Int_t trigger = 1;              // 1 - onspill, 2 - offspill. -1 - all
 
     TString dirIn1 = "/Volumes/Data/kresan/s438b/data/";
     TString dirOut = "/Volumes/Data/kresan/s438b/tcal/";
@@ -29,7 +30,7 @@ void run(TString runNumber)
 
     // Time calibration ----------------------------------------------------------
     R3BLandTcal* landTcal = new R3BLandTcal("LandTcal", 1);
-    landTcal->SetTrigger(1);
+    landTcal->SetTrigger(trigger);
     landTcal->SetNofModules(nModules, 50);
     run->AddTask(landTcal);
     // ---------------------------------------------------------------------------

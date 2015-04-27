@@ -5,6 +5,7 @@ void run(TString runNumber)
     timer.Start();
 
     const Int_t nev = -1;                                // number of events to read, -1 - untill CTRL+C
+    const Int_t trigger = 1;                             // 1 - onspill, 2 - offspill. -1 - all
     TString inDir = "/Volumes/Data/kresan/s438b/lmd/";   // directory with lmd files
     TString outDir = "/Volumes/Data/kresan/s438b/data/"; // output directory
     TString histDir = "/Users/kresan/Sites/";            // web-server directory
@@ -86,7 +87,7 @@ void run(TString runNumber)
     R3BLandTcalFill* tcalFill = new R3BLandTcalFill("TcalFill");
     tcalFill->SetUpdateRate(updateRate);
     tcalFill->SetMinStats(minStats);
-    tcalFill->SetTrigger(2);
+    tcalFill->SetTrigger(trigger);
     tcalFill->SetNofModules(nModules, 50);
     tcalFill->SetStoreDB(kTRUE);
     run->AddTask(tcalFill);
