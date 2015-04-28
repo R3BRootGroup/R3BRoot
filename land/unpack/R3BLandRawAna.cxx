@@ -120,7 +120,7 @@ void R3BLandRawAna::Exec(Option_t* option)
     fnEvents += 1;
     if(0 == (fnEvents%1000))
     {
-        LOG(INFO) << "\033[0;31mR3BLandRawAna : " << fnEvents << " events collected\033[0;30m" << FairLogger::endl;
+        LOG(INFO) << "R3BLandRawAna : " << fnEvents << " events collected" << FairLogger::endl;
     }
 }
 
