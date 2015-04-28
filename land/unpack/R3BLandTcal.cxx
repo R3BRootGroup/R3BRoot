@@ -411,6 +411,10 @@ Double_t R3BLandTcal::Interpolate(Int_t tdc, R3BLandTCalPar* par)
         }
         slope = (Double_t)(par->GetTimeAt(p) - par->GetTimeAt(p-1)) / (b2 - b1);
         time = (Double_t)(tdc - par->GetBinLowAt(p)) * slope + par->GetTimeAt(p-1);
+        if(time > par->GetTimeAt(p))
+        {
+            return par->GetTimeAt(p);
+        }
     }
     return time;
 }
