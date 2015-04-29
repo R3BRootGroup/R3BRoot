@@ -255,20 +255,22 @@ void R3BCalo::Initialize()
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BCalo::ProcessHits(FairVolume* vol)
 {
-
   // While tracking a single particle within a crystal (volume)
   // we can rely on the latest crystal information for each step
   if(gMC->IsTrackEntering() || fCrystal == NULL)
   {
     // Try to get crystal information from hash table
-    std::map<Int_t, sCrystalInfo>::iterator it = fCrystalMap.find(vol->getVolumeId());
+    // TODO: Still a performance benefit to use hash table?
+    gGeoManager->cd(gMC->CurrentVolPath());
+    Int_t nodeId = gGeoManager->GetNodeId();
+    std::map<Int_t, sCrystalInfo>::iterator it = fCrystalMap.find(nodeId);
     if(it == fCrystalMap.end())
     {
       // Not found in map => Create crystal information for crystal
       sCrystalInfo tmpInfo;
       memset(&tmpInfo, 0, sizeof(sCrystalInfo));
-      if(GetCrystalInfo(vol, tmpInfo))
-        fCrystal = &(fCrystalMap[vol->getVolumeId()] = tmpInfo);
+      if(GetCrystalInfo(tmpInfo))
+        fCrystal = &(fCrystalMap[nodeId] = tmpInfo);
       else
         fCrystal = NULL;
     }
@@ -465,7 +467,7 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
 //}
 
 
-Bool_t R3BCalo::GetCrystalInfo(FairVolume *vol, sCrystalInfo &info)
+Bool_t R3BCalo::GetCrystalInfo(sCrystalInfo &info)
 {
 
   // Getting the Infos from Crystal Volumes
@@ -970,7 +972,7 @@ Bool_t R3BCalo::GetCrystalInfo(FairVolume *vol, sCrystalInfo &info)
 
 
 
-  } else if (fGeometryVersion==16) {
+  } else if (fGeometryVersion==16 || fGeometryVersion==17 || fGeometryVersion==0x438b) {
     //RESERVED FOR CALIFA 8.11 BARREL + CC 0.2
     
     const char *alveolusECPrefix = "Alveolus_EC";
@@ -1083,7 +1085,7 @@ void R3BCalo::Register()
 {
   //FairRootManager::Instance()->Register("CrystalPoint", GetName(), 
   //                                      fCaloCollection, kTRUE);
-  FairRootManager::Instance()->Register("CrystalHitSim", GetName(), 
+  FairRootManager::Instance()->Register("CaloCrystalHitSim", GetName(), 
 					fCaloCrystalHitCollection, kTRUE);
   
 }

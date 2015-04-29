@@ -78,15 +78,16 @@ void califaCal(TString inputFile, TString outputFile,
   else cout << "NO DU!!!!" << endl << endl;
   */
 
+  FairLogger::GetLogger()->SetLogScreenLevel("INFO");
   //Crystal calibration
   R3BCaloCal* cal = new R3BCaloCal();
   cal->UseHighRange(highRange);
   cal->SetCalibratePID(true);
   fRun->AddTask(cal);
-  
+
+  fRun->AddTask(new R3BCaloMap("s438b_califa.map"));
 
   fRun->Init();       
-  FairLogger::GetLogger()->SetLogScreenLevel("INFO");
              
   fRun->Run(0,nEvents);
   

@@ -15,7 +15,7 @@ void CaloHitAna::DrawPID()
 {
    if (fChain == 0) return;
 
-   TH2D *hpid = new TH2D("qpid", "QPID", 250, 0, 4E5, 250, 0, 4E5);
+   TH2D *hpid = new TH2D("qpid", "QPID", 250, 0, .5, 250, 0, .5);
 
    Long64_t nentries = fChain->GetEntriesFast();
 

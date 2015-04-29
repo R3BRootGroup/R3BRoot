@@ -233,7 +233,7 @@ class R3BCalo : public R3BDetector
 	
     TGeoRotation* createMatrix( Double_t phi, Double_t theta, Double_t psi);
 
-    Bool_t GetCrystalInfo(FairVolume *vol, sCrystalInfo &info);
+    Bool_t GetCrystalInfo(sCrystalInfo &info);
 
     ClassDef(R3BCalo,3);
 };

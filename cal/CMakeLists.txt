@@ -38,6 +38,7 @@ link_directories( ${LINK_DIRECTORIES})
 set(SRCS
 #Put here your sourcefiles
 R3BCalo.cxx
+R3BCaloGeometry.cxx
 R3BCaloHitFinder.cxx  
 R3BCaloHitFinderPar.cxx  
 R3BGeoCalo.cxx   
@@ -48,6 +49,7 @@ unpack/R3BCaloUnpackPar.cxx
 unpack/R3BCaloRawAna.cxx
 unpack/R3BCaloCrystalAna.cxx
 unpack/R3BCaloCalibParFinder.cxx
+unpack/R3BCaloMap.cxx
 )
 
 if(FAIRDB_FOUND)

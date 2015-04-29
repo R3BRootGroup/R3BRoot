@@ -5,6 +5,7 @@
 #pragma link off all functions;
  
 #pragma link C++ class R3BGeoCalo+;
+#pragma link C++ class R3BCaloGeometry+;
 #pragma link C++ class R3BCaloHitFinder+;
 #pragma link C++ class R3BCaloHitFinderPar+;
 #pragma link C++ class R3BGeoCaloPar;
@@ -19,6 +20,7 @@
 #endif
 #pragma link C++ class R3BCaloCrystalAna+;
 #pragma link C++ class R3BCaloCalibParFinder+;
+#pragma link C++ class R3BCaloMap+;
 
 
 #endif

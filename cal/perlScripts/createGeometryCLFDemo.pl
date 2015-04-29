@@ -39,7 +39,7 @@ $wrappingThickness=0.03;
 $INPUTFILE1 = 'CLF811_OnlyAlveoli-points-ordered-filtered.dat';
 $INPUTFILE2 = 'CLF811_BARREL_Vertex_Alveoli_all.dat';
 $INPUTFILE3 = 'CLF811_BARREL_Vertex_Crystal_all.dat';
-$OUTPUTFILE = 'CLF811_Geometry.geo';
+$OUTPUTFILE = 'CLF811_Geometry_Demo.geo';
 open(INPUTFILE1);   #Open the alveoli positions and main axis directions file
 open(INPUTFILE2);   #Open the vertex of the alveoli file
 open(INPUTFILE3);   #Open the vertex of all crystals file
@@ -256,7 +256,10 @@ print OUTPUTFILE "\n //Positioning in space of alveoli \n";
 print OUTPUTFILE "\t Double_t phiEuler=0; Double_t thetaEuler=0; Double_t psiEuler=0; \n";
 print OUTPUTFILE "\t Double_t rotAngle=0;\n";
 #
-for ($h = 0; $h<=$#Alv_x/8; $h++) {
+#print OUTPUTFILE "\t TGeoCombiTrans matDemo(0, -2.83, 11.91, new TGeoRotation(\"rotDemo\", 0, 4.12, 0));\n";
+#print OUTPUTFILE "\t TGeoCombiTrans matDemo(0, 0, 0, new TGeoRotation(\"rotDemo\", 0, 0, 0));\n";
+print OUTPUTFILE "\t TGeoCombiTrans matDemo(0, 3.4691, 0.321849, new TGeoRotation(\"rotDemo\", 0, 19.8387, 0));\n";
+for ($h = 8; $h<=$#Alv_x/8; $h++) {
 	############################################################################################################
 	# CORRECT!!!!!
 	# About the euler angles from the CAD transformation:
@@ -307,22 +310,31 @@ for ($h = 0; $h<=$#Alv_x/8; $h++) {
 	}
 	#print OUTPUTFILE "\t cout << \"rotAlv_",$h+1," \" << phiEuler << \" \" << thetaEuler << \" \" << psiEuler << endl; \n";
 	print OUTPUTFILE "\t TGeoRotation *rotAlv_",$h+1," = new TGeoRotation(\"rotAlv",$h+1,"\",phiEuler,thetaEuler,psiEuler); \n";
-	for($rot=0; $rot<32; $rot++) {		
-		if($rot==0) { 			
+        print OUTPUTFILE "\t TGeoCombiTrans *transAlvBase = new TGeoCombiTrans();\n";
+        print OUTPUTFILE "\t TGeoRotation *rotPlace_",$h+1," = new TGeoRotation();\n";
+	for($rot=0; $rot<32; $rot++) {
+          if($rot == 12 || $rot == 13 || $rot == 28 || $rot == 29){
+		if($rot % 2 == 0) { 			
+	                print OUTPUTFILE "\t *rotAlv_",$h+1," = TGeoRotation(\"rotAlv",$h+1,"\",phiEuler,thetaEuler,psiEuler); \n";
 			#print OUTPUTFILE "\t TGeoCombiTrans* transAlv_",$h+1,"_",$rot," = new TGeoCombiTrans(",$x[$h],",",$y[$h],",",$z[$h],",rotAlv_",$h+1,"); \n";
 			print OUTPUTFILE "\t TGeoCombiTrans* transAlv_",$h+1,"_",$rot," = new TGeoCombiTrans(",$x[$h],",",$y[$h]+($alveoliLength[$h]/2-10.0)*$zz[$h],",",$z[$h]-($alveoliLength[$h]/2-10.0)*$zy[$h],",rotAlv_",$h+1,"); \n";
 			# the shift in the alveoli center to one of the faces should be included: transDef makes the required transformation!
-			print OUTPUTFILE "\t *transAlv_",$h+1,"_",$rot," =  (*transAlv_",$h+1,"_",$rot,") * (*transDef) ; \n";
+			print OUTPUTFILE "\t *transAlvBase =  (*transAlv_",$h+1,"_",$rot,") * (*transDef) ; \n";
+                        print OUTPUTFILE "\t rotPlace_",$h+1,"->SetAngles(",-11.25*$rot,", 0., 0.);\n";
+			print OUTPUTFILE "\t *transAlv_",$h+1,"_",$rot," =  (*rotPlace_",$h+1,") * matDemo * (*transAlvBase); \n";
+			print OUTPUTFILE "\t rotAlv_",$h+1,"->SetAngles(-11.25, 0., 0.);     \n";
 		}
 		else {
 			# the shift in the alveoli center plus the rotation 
-			print OUTPUTFILE "\t rotAngle = TMath::Pi()*11.25*",$rot,"/180.;  \n"; 
-			print OUTPUTFILE "\t rotAlv_",$h+1,"->RotateZ(-11.25);     \n";
+#			print OUTPUTFILE "\t rotAngle = TMath::Pi()*11.25*",$rot,"/180.;  \n"; 
 			#print OUTPUTFILE "\t TGeoCombiTrans* transAlv_",$h+1,"_",$rot," = new TGeoCombiTrans(",$x[$h],"*cos(rotAngle)+",$y[$h],"*sin(rotAngle),",-$x[$h],"*sin(rotAngle)+",$y[$h],"*cos(rotAngle),",$z[$h],",rotAlv_",$h+1,"); \n";
-			print OUTPUTFILE "\t TGeoCombiTrans* transAlv_",$h+1,"_",$rot," = new TGeoCombiTrans(",$x[$h],"*cos(rotAngle)+",($y[$h]+($alveoliLength[$h]/2-10.0)*$zz[$h]),"*sin(rotAngle),",-$x[$h],"*sin(rotAngle)+",$y[$h]+($alveoliLength[$h]/2-10.0)*$zz[$h],"*cos(rotAngle),",$z[$h]-($alveoliLength[$h]/2-10.0)*$zy[$h],",rotAlv_",$h+1,"); \n";
-			print OUTPUTFILE "\t *transAlv_",$h+1,"_",$rot," =  (*transAlv_",$h+1,"_",$rot,") * (*transDef); \n";
+# 			print OUTPUTFILE "\t TGeoCombiTrans* transAlv_",$h+1,"_",$rot," = new TGeoCombiTrans(",$x[$h],"*cos(rotAngle)+",($y[$h]+($alveoliLength[$h]/2-10.0)*$zz[$h]),"*sin(rotAngle),",-$x[$h],"*sin(rotAngle)+",$y[$h]+($alveoliLength[$h]/2-10.0)*$zz[$h],"*cos(rotAngle),",$z[$h]-($alveoliLength[$h]/2-10.0)*$zy[$h],",rotAlv_",$h+1,"); \n";
+#			print OUTPUTFILE "\t *transAlv_",$h+1,"_",$rot," =  (*transAlv_",$h+1,"_",$rot,") * (*transDef); \n";
+                        print OUTPUTFILE "\t TGeoCombiTrans* transAlv_",$h+1,"_",$rot," = new TGeoCombiTrans();\n";
+                        print OUTPUTFILE "\t *transAlv_",$h+1,"_",$rot," = (*rotPlace_",$h+1,") * matDemo * (*rotAlv_",$h+1,") * (*transAlvBase);\n";
 		}
 		print OUTPUTFILE "\t pWorld->AddNode(Alveolus_",@alveolusNames[$h],",",$rot,",transAlv_",$h+1,"_",$rot,"); \n\n";
+              }
 	}
 }		
 #print OUTPUTFILE "\t pWorld->AddNode(Alveolus_",1,",",999,",new TGeoCombiTrans(0,0,0,rotUni)); \n";
