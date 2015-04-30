@@ -35,7 +35,7 @@ R3BCaloUnpack::R3BCaloUnpack(char *strCalDir,
                              Short_t subCrate, Short_t control)
   : FairUnpack(type, subType, procId, subCrate, control),
     fRawData(new TClonesArray("R3BCaloRawHit")),
-    fNHits(0),fCaloUnpackPar(0), nEvents(NULL)
+    fNHits(0),fCaloUnpackPar(0), nEvents(0)
 {
    LOG(DEBUG2) << "R3BCaloUnpack::ctor()" << FairLogger::endl;
 }

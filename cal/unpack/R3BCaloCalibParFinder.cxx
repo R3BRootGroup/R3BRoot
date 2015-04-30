@@ -193,7 +193,7 @@ void R3BCaloCalibParFinder::Finish()
       
       cout << "Channel " << i << ": " << fRatioPidEnergy[i] << " (" << fNumEvents[i] << ")" << endl;
       if(fout)
-         fprintf(fout, "%ld %lf %ld\n", i, fRatioPidEnergy[i], fNumEvents[i]);
+         fprintf(fout, "%d %lf %u\n", i, fRatioPidEnergy[i], fNumEvents[i]);
    }
 }
 
