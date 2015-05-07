@@ -20,7 +20,7 @@ int fbxPetalCrystalIdBase[64] =
   1828, 1830, 1831, 1829, 1832, 1826, 1827, 1825  // row 16
 };
 
-int ptlAlveoliCopyBase[2] = {12, 28};
+int ptlAlveoliCopyBase[2] = {2, 0};
 
 void GenChannelMapping(const char *fname = "s438b_califa.map")
 {

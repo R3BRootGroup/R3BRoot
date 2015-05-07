@@ -36,7 +36,8 @@ int fbxCrystalPhiOrder[16] =
   9, 11, 7, 1
 };
 
-int ptlAlveoliCopyBase[2] = {12, 28};
+//int ptlAlveoliCopyBase[2] = {12, 28};
+int ptlAlveoliCopyBase[2] = {0, 2};
 
 int febexChannelToCrystalId(int _channel)
 {
@@ -51,7 +52,6 @@ TGeoRotation rotPetal;
 double theta_exp[128], theta_sim, dtmp;
 
 R3BCaloGeometry *geo_sim;
-R3BCaloGeometry *geo_exp;
 
 using namespace std;
 
@@ -126,7 +126,8 @@ double GetCrystalChiSqu(int iD, double angleNominal)
   for(int f = 0; f < 3; f++)
   {
     x = 0; y = 0;
-    if(f < 3)
+// Center of front face, center, back face
+    if(f < 2)
     {
       for(int i = 0; i < 4; i++)
       {
@@ -153,7 +154,7 @@ double GetCrystalChiSqu(int iD, double angleNominal)
 
 double thetaNominal[2] = {28., 28. + 35.};
 //int crystalsEdge[8] = {1827, 1826, 1831, 1830, 931, 929, 935, 933};
-int crystalsEdge[2] = {1826, 929};
+int crystalsEdge[] = {1826, 1827, 1825, 1828, 929, 931, 930, 932};
 
 void CalcChiSqu2(int &npar, double *gin, double &f, double *par, int iflag)
 {
@@ -178,11 +179,11 @@ void CalcChiSqu2(int &npar, double *gin, double &f, double *par, int iflag)
 
   for(int dir = 0; dir < 2; dir++)
   {
-      f += GetCrystalChiSqu(crystalsEdge[dir], thetaNominal[dir]);
-//    for(int c = 0; c < 4; c++)
-//    {
-//      f += GetCrystalChiSqu(crystalsEdge[c + 4*dir], thetaNominal[dir]);
-//    }
+//      f += GetCrystalChiSqu(crystalsEdge[dir], thetaNominal[dir]);
+    for(int c = 0; c < 4; c++)
+    {
+      f += GetCrystalChiSqu(crystalsEdge[c + 4*dir], thetaNominal[dir]);
+    }
   }
 }
 
@@ -218,8 +219,7 @@ void CalcChiSqu(int &npar, double *gin, double &f, double *par, int iflag)
 // Note: Execute with Alveoli copies 0, 1 to get transformation matrix
 void Fit()
 {
-  geo_sim = R3BCaloGeometry::Instance(17);
-  geo_exp = R3BCaloGeometry::Instance(0x438b);
+  geo_sim = R3BCaloGeometry::Instance(0x438b);
 
   for(int i = 0; i < 64; i++)
   {
@@ -240,10 +240,9 @@ void Fit()
     nodes[i] = (TGeoNodeMatrix*)gGeoManager->GetCurrentNode();
     matrixOrg[i] = nodes[i]->GetMatrix()->MakeClone();
 
-    geo_exp->GetAngles(i, &theta_exp[i], &dtmp, &dtmp);
     geo_sim->GetAngles(febexChannelToCrystalId(i), &theta_sim, &dtmp, &dtmp);
 
-    cout << i << ": " << 180.0 * theta_sim / TMath::Pi() << " (" << 180.0 * theta_exp[i] / TMath::Pi() << ")" << endl;
+    cout << i << ": " << 180.0 * theta_sim / TMath::Pi() << endl; //" (" << 180.0 * theta_exp[i] / TMath::Pi() << ")" << endl;
   }
 
   cout << "-------------------------------------------------" << endl;
@@ -275,7 +274,7 @@ void Fit()
   {
     geo_sim->GetAngles(febexChannelToCrystalId(i), &theta_sim, &dtmp, &dtmp);
 
-    cout << i << ": " << 180.0 * theta_sim / TMath::Pi() << " (" << 180.0 * theta_exp[i] / TMath::Pi() << ")" << endl;
+    cout << i << ": " << 180.0 * theta_sim / TMath::Pi() << endl; //" (" << 180.0 * theta_exp[i] / TMath::Pi() << ")" << endl;
   }
 }
 

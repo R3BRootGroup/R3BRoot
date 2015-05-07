@@ -567,7 +567,7 @@ void create_califa_geo(const char* geoTag)
 
 #if Barrel
 
- //Generated 4/28/2015 11:33:53 from macro createGeometryCLF811.pl by Hector Alvarez Pol (hector.alvarez.es) 
+ //Generated 4/30/2015 15:36:20 from macro createGeometryCLF811.pl by Hector Alvarez Pol (hector.alvarez.es) 
 
 
  //Alveolus
@@ -1416,7 +1416,7 @@ void create_califa_geo(const char* geoTag)
  //Positioning in space of alveoli 
 	 Double_t phiEuler=0; Double_t thetaEuler=0; Double_t psiEuler=0; 
 	 Double_t rotAngle=0;
-	 TGeoCombiTrans matDemo(0, 3.4691, 0.321849, new TGeoRotation("rotDemo", 0, 19.8387, 0));
+	 TGeoCombiTrans matDemo(0, 1.92093, -1.75703, new TGeoRotation("rotDemo", 0, 20.3304, 0));
 	 phiEuler = 180; 
 	 thetaEuler = 180.*TMath::ATan2(-0.1275567287250409800,0.9918312764563167500)/TMath::Pi(); 
 	 psiEuler = -180; 
@@ -1425,28 +1425,28 @@ void create_califa_geo(const char* geoTag)
 	 TGeoCombiTrans *transAlvBase = new TGeoCombiTrans();
 	 TGeoRotation *rotPlace_9 = new TGeoRotation();
 	 *rotAlv_9 = TGeoRotation("rotAlv9",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans* transAlv_9_12 = new TGeoCombiTrans(-2.98999999999993,30.3953961794098,4.44438599416416,rotAlv_9); 
-	 *transAlvBase =  (*transAlv_9_12) * (*transDef) ; 
-	 rotPlace_9->SetAngles(-135, 0., 0.);
-	 *transAlv_9_12 =  (*rotPlace_9) * matDemo * (*transAlvBase); 
+	 TGeoCombiTrans* transAlv_9_0 = new TGeoCombiTrans(-2.98999999999993,30.3953961794098,4.44438599416416,rotAlv_9); 
+	 *transAlvBase =  (*transAlv_9_0) * (*transDef) ; 
+	 rotPlace_9->SetAngles(-120, 0., 0.);
+	 *transAlv_9_0 =  (*rotPlace_9) * matDemo * (*transAlvBase); 
 	 rotAlv_9->SetAngles(-11.25, 0., 0.);     
-	 pWorld->AddNode(Alveolus_9,12,transAlv_9_12); 
+	 pWorld->AddNode(Alveolus_9,0,transAlv_9_0); 
 
-	 TGeoCombiTrans* transAlv_9_13 = new TGeoCombiTrans();
-	 *transAlv_9_13 = (*rotPlace_9) * matDemo * (*rotAlv_9) * (*transAlvBase);
-	 pWorld->AddNode(Alveolus_9,13,transAlv_9_13); 
+	 TGeoCombiTrans* transAlv_9_1 = new TGeoCombiTrans();
+	 *transAlv_9_1 = (*rotPlace_9) * matDemo * (*rotAlv_9) * (*transAlvBase);
+	 pWorld->AddNode(Alveolus_9,1,transAlv_9_1); 
 
 	 *rotAlv_9 = TGeoRotation("rotAlv9",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans* transAlv_9_28 = new TGeoCombiTrans(-2.98999999999993,30.3953961794098,4.44438599416416,rotAlv_9); 
-	 *transAlvBase =  (*transAlv_9_28) * (*transDef) ; 
-	 rotPlace_9->SetAngles(-315, 0., 0.);
-	 *transAlv_9_28 =  (*rotPlace_9) * matDemo * (*transAlvBase); 
+	 TGeoCombiTrans* transAlv_9_2 = new TGeoCombiTrans(-2.98999999999993,30.3953961794098,4.44438599416416,rotAlv_9); 
+	 *transAlvBase =  (*transAlv_9_2) * (*transDef) ; 
+	 rotPlace_9->SetAngles(-300, 0., 0.);
+	 *transAlv_9_2 =  (*rotPlace_9) * matDemo * (*transAlvBase); 
 	 rotAlv_9->SetAngles(-11.25, 0., 0.);     
-	 pWorld->AddNode(Alveolus_9,28,transAlv_9_28); 
+	 pWorld->AddNode(Alveolus_9,2,transAlv_9_2); 
 
-	 TGeoCombiTrans* transAlv_9_29 = new TGeoCombiTrans();
-	 *transAlv_9_29 = (*rotPlace_9) * matDemo * (*rotAlv_9) * (*transAlvBase);
-	 pWorld->AddNode(Alveolus_9,29,transAlv_9_29); 
+	 TGeoCombiTrans* transAlv_9_3 = new TGeoCombiTrans();
+	 *transAlv_9_3 = (*rotPlace_9) * matDemo * (*rotAlv_9) * (*transAlvBase);
+	 pWorld->AddNode(Alveolus_9,3,transAlv_9_3); 
 
 	 phiEuler = 180; 
 	 thetaEuler = 180.*TMath::ATan2(-0.2131210329617397300,0.9770258058563863200)/TMath::Pi(); 
@@ -1456,28 +1456,28 @@ void create_califa_geo(const char* geoTag)
 	 TGeoCombiTrans *transAlvBase = new TGeoCombiTrans();
 	 TGeoRotation *rotPlace_10 = new TGeoRotation();
 	 *rotAlv_10 = TGeoRotation("rotAlv10",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans* transAlv_10_12 = new TGeoCombiTrans(-3.01649999999993,30.6605329493663,7.63929090825073,rotAlv_10); 
-	 *transAlvBase =  (*transAlv_10_12) * (*transDef) ; 
-	 rotPlace_10->SetAngles(-135, 0., 0.);
-	 *transAlv_10_12 =  (*rotPlace_10) * matDemo * (*transAlvBase); 
+	 TGeoCombiTrans* transAlv_10_0 = new TGeoCombiTrans(-3.01649999999993,30.6605329493663,7.63929090825073,rotAlv_10); 
+	 *transAlvBase =  (*transAlv_10_0) * (*transDef) ; 
+	 rotPlace_10->SetAngles(-120, 0., 0.);
+	 *transAlv_10_0 =  (*rotPlace_10) * matDemo * (*transAlvBase); 
 	 rotAlv_10->SetAngles(-11.25, 0., 0.);     
-	 pWorld->AddNode(Alveolus_10,12,transAlv_10_12); 
+	 pWorld->AddNode(Alveolus_10,0,transAlv_10_0); 
 
-	 TGeoCombiTrans* transAlv_10_13 = new TGeoCombiTrans();
-	 *transAlv_10_13 = (*rotPlace_10) * matDemo * (*rotAlv_10) * (*transAlvBase);
-	 pWorld->AddNode(Alveolus_10,13,transAlv_10_13); 
+	 TGeoCombiTrans* transAlv_10_1 = new TGeoCombiTrans();
+	 *transAlv_10_1 = (*rotPlace_10) * matDemo * (*rotAlv_10) * (*transAlvBase);
+	 pWorld->AddNode(Alveolus_10,1,transAlv_10_1); 
 
 	 *rotAlv_10 = TGeoRotation("rotAlv10",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans* transAlv_10_28 = new TGeoCombiTrans(-3.01649999999993,30.6605329493663,7.63929090825073,rotAlv_10); 
-	 *transAlvBase =  (*transAlv_10_28) * (*transDef) ; 
-	 rotPlace_10->SetAngles(-315, 0., 0.);
-	 *transAlv_10_28 =  (*rotPlace_10) * matDemo * (*transAlvBase); 
+	 TGeoCombiTrans* transAlv_10_2 = new TGeoCombiTrans(-3.01649999999993,30.6605329493663,7.63929090825073,rotAlv_10); 
+	 *transAlvBase =  (*transAlv_10_2) * (*transDef) ; 
+	 rotPlace_10->SetAngles(-300, 0., 0.);
+	 *transAlv_10_2 =  (*rotPlace_10) * matDemo * (*transAlvBase); 
 	 rotAlv_10->SetAngles(-11.25, 0., 0.);     
-	 pWorld->AddNode(Alveolus_10,28,transAlv_10_28); 
+	 pWorld->AddNode(Alveolus_10,2,transAlv_10_2); 
 
-	 TGeoCombiTrans* transAlv_10_29 = new TGeoCombiTrans();
-	 *transAlv_10_29 = (*rotPlace_10) * matDemo * (*rotAlv_10) * (*transAlvBase);
-	 pWorld->AddNode(Alveolus_10,29,transAlv_10_29); 
+	 TGeoCombiTrans* transAlv_10_3 = new TGeoCombiTrans();
+	 *transAlv_10_3 = (*rotPlace_10) * matDemo * (*rotAlv_10) * (*transAlvBase);
+	 pWorld->AddNode(Alveolus_10,3,transAlv_10_3); 
 
 	 phiEuler = 180; 
 	 thetaEuler = 180.*TMath::ATan2(-0.2971184379757390000,0.9548406326790127600)/TMath::Pi(); 
@@ -1487,28 +1487,28 @@ void create_califa_geo(const char* geoTag)
 	 TGeoCombiTrans *transAlvBase = new TGeoCombiTrans();
 	 TGeoRotation *rotPlace_11 = new TGeoRotation();
 	 *rotAlv_11 = TGeoRotation("rotAlv11",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans* transAlv_11_12 = new TGeoCombiTrans(-3.04199999999993,30.9206806111464,10.9180918399028,rotAlv_11); 
-	 *transAlvBase =  (*transAlv_11_12) * (*transDef) ; 
-	 rotPlace_11->SetAngles(-135, 0., 0.);
-	 *transAlv_11_12 =  (*rotPlace_11) * matDemo * (*transAlvBase); 
+	 TGeoCombiTrans* transAlv_11_0 = new TGeoCombiTrans(-3.04199999999993,30.9206806111464,10.9180918399028,rotAlv_11); 
+	 *transAlvBase =  (*transAlv_11_0) * (*transDef) ; 
+	 rotPlace_11->SetAngles(-120, 0., 0.);
+	 *transAlv_11_0 =  (*rotPlace_11) * matDemo * (*transAlvBase); 
 	 rotAlv_11->SetAngles(-11.25, 0., 0.);     
-	 pWorld->AddNode(Alveolus_11,12,transAlv_11_12); 
+	 pWorld->AddNode(Alveolus_11,0,transAlv_11_0); 
 
-	 TGeoCombiTrans* transAlv_11_13 = new TGeoCombiTrans();
-	 *transAlv_11_13 = (*rotPlace_11) * matDemo * (*rotAlv_11) * (*transAlvBase);
-	 pWorld->AddNode(Alveolus_11,13,transAlv_11_13); 
+	 TGeoCombiTrans* transAlv_11_1 = new TGeoCombiTrans();
+	 *transAlv_11_1 = (*rotPlace_11) * matDemo * (*rotAlv_11) * (*transAlvBase);
+	 pWorld->AddNode(Alveolus_11,1,transAlv_11_1); 
 
 	 *rotAlv_11 = TGeoRotation("rotAlv11",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans* transAlv_11_28 = new TGeoCombiTrans(-3.04199999999993,30.9206806111464,10.9180918399028,rotAlv_11); 
-	 *transAlvBase =  (*transAlv_11_28) * (*transDef) ; 
-	 rotPlace_11->SetAngles(-315, 0., 0.);
-	 *transAlv_11_28 =  (*rotPlace_11) * matDemo * (*transAlvBase); 
+	 TGeoCombiTrans* transAlv_11_2 = new TGeoCombiTrans(-3.04199999999993,30.9206806111464,10.9180918399028,rotAlv_11); 
+	 *transAlvBase =  (*transAlv_11_2) * (*transDef) ; 
+	 rotPlace_11->SetAngles(-300, 0., 0.);
+	 *transAlv_11_2 =  (*rotPlace_11) * matDemo * (*transAlvBase); 
 	 rotAlv_11->SetAngles(-11.25, 0., 0.);     
-	 pWorld->AddNode(Alveolus_11,28,transAlv_11_28); 
+	 pWorld->AddNode(Alveolus_11,2,transAlv_11_2); 
 
-	 TGeoCombiTrans* transAlv_11_29 = new TGeoCombiTrans();
-	 *transAlv_11_29 = (*rotPlace_11) * matDemo * (*rotAlv_11) * (*transAlvBase);
-	 pWorld->AddNode(Alveolus_11,29,transAlv_11_29); 
+	 TGeoCombiTrans* transAlv_11_3 = new TGeoCombiTrans();
+	 *transAlv_11_3 = (*rotPlace_11) * matDemo * (*rotAlv_11) * (*transAlvBase);
+	 pWorld->AddNode(Alveolus_11,3,transAlv_11_3); 
 
 	 phiEuler = 180; 
 	 thetaEuler = 180.*TMath::ATan2(-0.3788871076768108300,0.9254428991765514300)/TMath::Pi(); 
@@ -1518,28 +1518,28 @@ void create_califa_geo(const char* geoTag)
 	 TGeoCombiTrans *transAlvBase = new TGeoCombiTrans();
 	 TGeoRotation *rotPlace_12 = new TGeoRotation();
 	 *rotAlv_12 = TGeoRotation("rotAlv12",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans* transAlv_12_12 = new TGeoCombiTrans(-3.06749999999993,31.1737346881315,14.3082258908461,rotAlv_12); 
-	 *transAlvBase =  (*transAlv_12_12) * (*transDef) ; 
-	 rotPlace_12->SetAngles(-135, 0., 0.);
-	 *transAlv_12_12 =  (*rotPlace_12) * matDemo * (*transAlvBase); 
+	 TGeoCombiTrans* transAlv_12_0 = new TGeoCombiTrans(-3.06749999999993,31.1737346881315,14.3082258908461,rotAlv_12); 
+	 *transAlvBase =  (*transAlv_12_0) * (*transDef) ; 
+	 rotPlace_12->SetAngles(-120, 0., 0.);
+	 *transAlv_12_0 =  (*rotPlace_12) * matDemo * (*transAlvBase); 
 	 rotAlv_12->SetAngles(-11.25, 0., 0.);     
-	 pWorld->AddNode(Alveolus_12,12,transAlv_12_12); 
+	 pWorld->AddNode(Alveolus_12,0,transAlv_12_0); 
 
-	 TGeoCombiTrans* transAlv_12_13 = new TGeoCombiTrans();
-	 *transAlv_12_13 = (*rotPlace_12) * matDemo * (*rotAlv_12) * (*transAlvBase);
-	 pWorld->AddNode(Alveolus_12,13,transAlv_12_13); 
+	 TGeoCombiTrans* transAlv_12_1 = new TGeoCombiTrans();
+	 *transAlv_12_1 = (*rotPlace_12) * matDemo * (*rotAlv_12) * (*transAlvBase);
+	 pWorld->AddNode(Alveolus_12,1,transAlv_12_1); 
 
 	 *rotAlv_12 = TGeoRotation("rotAlv12",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans* transAlv_12_28 = new TGeoCombiTrans(-3.06749999999993,31.1737346881315,14.3082258908461,rotAlv_12); 
-	 *transAlvBase =  (*transAlv_12_28) * (*transDef) ; 
-	 rotPlace_12->SetAngles(-315, 0., 0.);
-	 *transAlv_12_28 =  (*rotPlace_12) * matDemo * (*transAlvBase); 
+	 TGeoCombiTrans* transAlv_12_2 = new TGeoCombiTrans(-3.06749999999993,31.1737346881315,14.3082258908461,rotAlv_12); 
+	 *transAlvBase =  (*transAlv_12_2) * (*transDef) ; 
+	 rotPlace_12->SetAngles(-300, 0., 0.);
+	 *transAlv_12_2 =  (*rotPlace_12) * matDemo * (*transAlvBase); 
 	 rotAlv_12->SetAngles(-11.25, 0., 0.);     
-	 pWorld->AddNode(Alveolus_12,28,transAlv_12_28); 
+	 pWorld->AddNode(Alveolus_12,2,transAlv_12_2); 
 
-	 TGeoCombiTrans* transAlv_12_29 = new TGeoCombiTrans();
-	 *transAlv_12_29 = (*rotPlace_12) * matDemo * (*rotAlv_12) * (*transAlvBase);
-	 pWorld->AddNode(Alveolus_12,29,transAlv_12_29); 
+	 TGeoCombiTrans* transAlv_12_3 = new TGeoCombiTrans();
+	 *transAlv_12_3 = (*rotPlace_12) * matDemo * (*rotAlv_12) * (*transAlvBase);
+	 pWorld->AddNode(Alveolus_12,3,transAlv_12_3); 
 
 	 phiEuler = 180; 
 	 thetaEuler = 180.*TMath::ATan2(-0.4578676224535794800,0.8890203823921623000)/TMath::Pi(); 
@@ -1549,28 +1549,28 @@ void create_califa_geo(const char* geoTag)
 	 TGeoCombiTrans *transAlvBase = new TGeoCombiTrans();
 	 TGeoRotation *rotPlace_13 = new TGeoRotation();
 	 *rotAlv_13 = TGeoRotation("rotAlv13",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans* transAlv_13_12 = new TGeoCombiTrans(-3.09099999999993,31.417956426523,17.8408437262792,rotAlv_13); 
-	 *transAlvBase =  (*transAlv_13_12) * (*transDef) ; 
-	 rotPlace_13->SetAngles(-135, 0., 0.);
-	 *transAlv_13_12 =  (*rotPlace_13) * matDemo * (*transAlvBase); 
+	 TGeoCombiTrans* transAlv_13_0 = new TGeoCombiTrans(-3.09099999999993,31.417956426523,17.8408437262792,rotAlv_13); 
+	 *transAlvBase =  (*transAlv_13_0) * (*transDef) ; 
+	 rotPlace_13->SetAngles(-120, 0., 0.);
+	 *transAlv_13_0 =  (*rotPlace_13) * matDemo * (*transAlvBase); 
 	 rotAlv_13->SetAngles(-11.25, 0., 0.);     
-	 pWorld->AddNode(Alveolus_13,12,transAlv_13_12); 
+	 pWorld->AddNode(Alveolus_13,0,transAlv_13_0); 
 
-	 TGeoCombiTrans* transAlv_13_13 = new TGeoCombiTrans();
-	 *transAlv_13_13 = (*rotPlace_13) * matDemo * (*rotAlv_13) * (*transAlvBase);
-	 pWorld->AddNode(Alveolus_13,13,transAlv_13_13); 
+	 TGeoCombiTrans* transAlv_13_1 = new TGeoCombiTrans();
+	 *transAlv_13_1 = (*rotPlace_13) * matDemo * (*rotAlv_13) * (*transAlvBase);
+	 pWorld->AddNode(Alveolus_13,1,transAlv_13_1); 
 
 	 *rotAlv_13 = TGeoRotation("rotAlv13",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans* transAlv_13_28 = new TGeoCombiTrans(-3.09099999999993,31.417956426523,17.8408437262792,rotAlv_13); 
-	 *transAlvBase =  (*transAlv_13_28) * (*transDef) ; 
-	 rotPlace_13->SetAngles(-315, 0., 0.);
-	 *transAlv_13_28 =  (*rotPlace_13) * matDemo * (*transAlvBase); 
+	 TGeoCombiTrans* transAlv_13_2 = new TGeoCombiTrans(-3.09099999999993,31.417956426523,17.8408437262792,rotAlv_13); 
+	 *transAlvBase =  (*transAlv_13_2) * (*transDef) ; 
+	 rotPlace_13->SetAngles(-300, 0., 0.);
+	 *transAlv_13_2 =  (*rotPlace_13) * matDemo * (*transAlvBase); 
 	 rotAlv_13->SetAngles(-11.25, 0., 0.);     
-	 pWorld->AddNode(Alveolus_13,28,transAlv_13_28); 
+	 pWorld->AddNode(Alveolus_13,2,transAlv_13_2); 
 
-	 TGeoCombiTrans* transAlv_13_29 = new TGeoCombiTrans();
-	 *transAlv_13_29 = (*rotPlace_13) * matDemo * (*rotAlv_13) * (*transAlvBase);
-	 pWorld->AddNode(Alveolus_13,29,transAlv_13_29); 
+	 TGeoCombiTrans* transAlv_13_3 = new TGeoCombiTrans();
+	 *transAlv_13_3 = (*rotPlace_13) * matDemo * (*rotAlv_13) * (*transAlvBase);
+	 pWorld->AddNode(Alveolus_13,3,transAlv_13_3); 
 
 	 phiEuler = 180; 
 	 thetaEuler = 180.*TMath::ATan2(-0.5334425026911959700,0.8458363295121305000)/TMath::Pi(); 
@@ -1580,28 +1580,28 @@ void create_califa_geo(const char* geoTag)
 	 TGeoCombiTrans *transAlvBase = new TGeoCombiTrans();
 	 TGeoRotation *rotPlace_14 = new TGeoRotation();
 	 *rotAlv_14 = TGeoRotation("rotAlv14",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans* transAlv_14_12 = new TGeoCombiTrans(-3.11449999999993,33.343093197755,22.6194116972268,rotAlv_14); 
-	 *transAlvBase =  (*transAlv_14_12) * (*transDef) ; 
-	 rotPlace_14->SetAngles(-135, 0., 0.);
-	 *transAlv_14_12 =  (*rotPlace_14) * matDemo * (*transAlvBase); 
+	 TGeoCombiTrans* transAlv_14_0 = new TGeoCombiTrans(-3.11449999999993,33.343093197755,22.6194116972268,rotAlv_14); 
+	 *transAlvBase =  (*transAlv_14_0) * (*transDef) ; 
+	 rotPlace_14->SetAngles(-120, 0., 0.);
+	 *transAlv_14_0 =  (*rotPlace_14) * matDemo * (*transAlvBase); 
 	 rotAlv_14->SetAngles(-11.25, 0., 0.);     
-	 pWorld->AddNode(Alveolus_14,12,transAlv_14_12); 
+	 pWorld->AddNode(Alveolus_14,0,transAlv_14_0); 
 
-	 TGeoCombiTrans* transAlv_14_13 = new TGeoCombiTrans();
-	 *transAlv_14_13 = (*rotPlace_14) * matDemo * (*rotAlv_14) * (*transAlvBase);
-	 pWorld->AddNode(Alveolus_14,13,transAlv_14_13); 
+	 TGeoCombiTrans* transAlv_14_1 = new TGeoCombiTrans();
+	 *transAlv_14_1 = (*rotPlace_14) * matDemo * (*rotAlv_14) * (*transAlvBase);
+	 pWorld->AddNode(Alveolus_14,1,transAlv_14_1); 
 
 	 *rotAlv_14 = TGeoRotation("rotAlv14",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans* transAlv_14_28 = new TGeoCombiTrans(-3.11449999999993,33.343093197755,22.6194116972268,rotAlv_14); 
-	 *transAlvBase =  (*transAlv_14_28) * (*transDef) ; 
-	 rotPlace_14->SetAngles(-315, 0., 0.);
-	 *transAlv_14_28 =  (*rotPlace_14) * matDemo * (*transAlvBase); 
+	 TGeoCombiTrans* transAlv_14_2 = new TGeoCombiTrans(-3.11449999999993,33.343093197755,22.6194116972268,rotAlv_14); 
+	 *transAlvBase =  (*transAlv_14_2) * (*transDef) ; 
+	 rotPlace_14->SetAngles(-300, 0., 0.);
+	 *transAlv_14_2 =  (*rotPlace_14) * matDemo * (*transAlvBase); 
 	 rotAlv_14->SetAngles(-11.25, 0., 0.);     
-	 pWorld->AddNode(Alveolus_14,28,transAlv_14_28); 
+	 pWorld->AddNode(Alveolus_14,2,transAlv_14_2); 
 
-	 TGeoCombiTrans* transAlv_14_29 = new TGeoCombiTrans();
-	 *transAlv_14_29 = (*rotPlace_14) * matDemo * (*rotAlv_14) * (*transAlvBase);
-	 pWorld->AddNode(Alveolus_14,29,transAlv_14_29); 
+	 TGeoCombiTrans* transAlv_14_3 = new TGeoCombiTrans();
+	 *transAlv_14_3 = (*rotPlace_14) * matDemo * (*rotAlv_14) * (*transAlvBase);
+	 pWorld->AddNode(Alveolus_14,3,transAlv_14_3); 
 
 	 phiEuler = 180; 
 	 thetaEuler = 180.*TMath::ATan2(-0.6050038521676790500,0.7962225435531633500)/TMath::Pi(); 
@@ -1611,28 +1611,28 @@ void create_califa_geo(const char* geoTag)
 	 TGeoCombiTrans *transAlvBase = new TGeoCombiTrans();
 	 TGeoRotation *rotPlace_15 = new TGeoRotation();
 	 *rotAlv_15 = TGeoRotation("rotAlv15",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans* transAlv_15_12 = new TGeoCombiTrans(-3.13549999999993,33.4646558050777,26.6976862352101,rotAlv_15); 
-	 *transAlvBase =  (*transAlv_15_12) * (*transDef) ; 
-	 rotPlace_15->SetAngles(-135, 0., 0.);
-	 *transAlv_15_12 =  (*rotPlace_15) * matDemo * (*transAlvBase); 
+	 TGeoCombiTrans* transAlv_15_0 = new TGeoCombiTrans(-3.13549999999993,33.4646558050777,26.6976862352101,rotAlv_15); 
+	 *transAlvBase =  (*transAlv_15_0) * (*transDef) ; 
+	 rotPlace_15->SetAngles(-120, 0., 0.);
+	 *transAlv_15_0 =  (*rotPlace_15) * matDemo * (*transAlvBase); 
 	 rotAlv_15->SetAngles(-11.25, 0., 0.);     
-	 pWorld->AddNode(Alveolus_15,12,transAlv_15_12); 
+	 pWorld->AddNode(Alveolus_15,0,transAlv_15_0); 
 
-	 TGeoCombiTrans* transAlv_15_13 = new TGeoCombiTrans();
-	 *transAlv_15_13 = (*rotPlace_15) * matDemo * (*rotAlv_15) * (*transAlvBase);
-	 pWorld->AddNode(Alveolus_15,13,transAlv_15_13); 
+	 TGeoCombiTrans* transAlv_15_1 = new TGeoCombiTrans();
+	 *transAlv_15_1 = (*rotPlace_15) * matDemo * (*rotAlv_15) * (*transAlvBase);
+	 pWorld->AddNode(Alveolus_15,1,transAlv_15_1); 
 
 	 *rotAlv_15 = TGeoRotation("rotAlv15",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans* transAlv_15_28 = new TGeoCombiTrans(-3.13549999999993,33.4646558050777,26.6976862352101,rotAlv_15); 
-	 *transAlvBase =  (*transAlv_15_28) * (*transDef) ; 
-	 rotPlace_15->SetAngles(-315, 0., 0.);
-	 *transAlv_15_28 =  (*rotPlace_15) * matDemo * (*transAlvBase); 
+	 TGeoCombiTrans* transAlv_15_2 = new TGeoCombiTrans(-3.13549999999993,33.4646558050777,26.6976862352101,rotAlv_15); 
+	 *transAlvBase =  (*transAlv_15_2) * (*transDef) ; 
+	 rotPlace_15->SetAngles(-300, 0., 0.);
+	 *transAlv_15_2 =  (*rotPlace_15) * matDemo * (*transAlvBase); 
 	 rotAlv_15->SetAngles(-11.25, 0., 0.);     
-	 pWorld->AddNode(Alveolus_15,28,transAlv_15_28); 
+	 pWorld->AddNode(Alveolus_15,2,transAlv_15_2); 
 
-	 TGeoCombiTrans* transAlv_15_29 = new TGeoCombiTrans();
-	 *transAlv_15_29 = (*rotPlace_15) * matDemo * (*rotAlv_15) * (*transAlvBase);
-	 pWorld->AddNode(Alveolus_15,29,transAlv_15_29); 
+	 TGeoCombiTrans* transAlv_15_3 = new TGeoCombiTrans();
+	 *transAlv_15_3 = (*rotPlace_15) * matDemo * (*rotAlv_15) * (*transAlvBase);
+	 pWorld->AddNode(Alveolus_15,3,transAlv_15_3); 
 
 	 phiEuler = 180; 
 	 thetaEuler = 180.*TMath::ATan2(-0.6720370049050432600,0.7405175649761855900)/TMath::Pi(); 
@@ -1642,28 +1642,28 @@ void create_califa_geo(const char* geoTag)
 	 TGeoCombiTrans *transAlvBase = new TGeoCombiTrans();
 	 TGeoRotation *rotPlace_16 = new TGeoRotation();
 	 *rotAlv_16 = TGeoRotation("rotAlv16",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans* transAlv_16_12 = new TGeoCombiTrans(-3.15649999999993,33.559817680364,31.0463924828861,rotAlv_16); 
-	 *transAlvBase =  (*transAlv_16_12) * (*transDef) ; 
-	 rotPlace_16->SetAngles(-135, 0., 0.);
-	 *transAlv_16_12 =  (*rotPlace_16) * matDemo * (*transAlvBase); 
+	 TGeoCombiTrans* transAlv_16_0 = new TGeoCombiTrans(-3.15649999999993,33.559817680364,31.0463924828861,rotAlv_16); 
+	 *transAlvBase =  (*transAlv_16_0) * (*transDef) ; 
+	 rotPlace_16->SetAngles(-120, 0., 0.);
+	 *transAlv_16_0 =  (*rotPlace_16) * matDemo * (*transAlvBase); 
 	 rotAlv_16->SetAngles(-11.25, 0., 0.);     
-	 pWorld->AddNode(Alveolus_16,12,transAlv_16_12); 
+	 pWorld->AddNode(Alveolus_16,0,transAlv_16_0); 
 
-	 TGeoCombiTrans* transAlv_16_13 = new TGeoCombiTrans();
-	 *transAlv_16_13 = (*rotPlace_16) * matDemo * (*rotAlv_16) * (*transAlvBase);
-	 pWorld->AddNode(Alveolus_16,13,transAlv_16_13); 
+	 TGeoCombiTrans* transAlv_16_1 = new TGeoCombiTrans();
+	 *transAlv_16_1 = (*rotPlace_16) * matDemo * (*rotAlv_16) * (*transAlvBase);
+	 pWorld->AddNode(Alveolus_16,1,transAlv_16_1); 
 
 	 *rotAlv_16 = TGeoRotation("rotAlv16",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans* transAlv_16_28 = new TGeoCombiTrans(-3.15649999999993,33.559817680364,31.0463924828861,rotAlv_16); 
-	 *transAlvBase =  (*transAlv_16_28) * (*transDef) ; 
-	 rotPlace_16->SetAngles(-315, 0., 0.);
-	 *transAlv_16_28 =  (*rotPlace_16) * matDemo * (*transAlvBase); 
+	 TGeoCombiTrans* transAlv_16_2 = new TGeoCombiTrans(-3.15649999999993,33.559817680364,31.0463924828861,rotAlv_16); 
+	 *transAlvBase =  (*transAlv_16_2) * (*transDef) ; 
+	 rotPlace_16->SetAngles(-300, 0., 0.);
+	 *transAlv_16_2 =  (*rotPlace_16) * matDemo * (*transAlvBase); 
 	 rotAlv_16->SetAngles(-11.25, 0., 0.);     
-	 pWorld->AddNode(Alveolus_16,28,transAlv_16_28); 
+	 pWorld->AddNode(Alveolus_16,2,transAlv_16_2); 
 
-	 TGeoCombiTrans* transAlv_16_29 = new TGeoCombiTrans();
-	 *transAlv_16_29 = (*rotPlace_16) * matDemo * (*rotAlv_16) * (*transAlvBase);
-	 pWorld->AddNode(Alveolus_16,29,transAlv_16_29); 
+	 TGeoCombiTrans* transAlv_16_3 = new TGeoCombiTrans();
+	 *transAlv_16_3 = (*rotPlace_16) * matDemo * (*rotAlv_16) * (*transAlvBase);
+	 pWorld->AddNode(Alveolus_16,3,transAlv_16_3); 
 
 
 #endif
