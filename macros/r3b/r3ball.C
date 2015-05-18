@@ -192,6 +192,13 @@ void r3ball(Int_t nEvents = 1,
     mTof->SetGeometryFileName(((TObjString*)fDetList.GetValue("MTOF"))->GetString().Data());
     run->AddModule(mTof);
   }
+
+  // dTof
+  if (fDetList.FindObject("DTOF") ) {
+    R3BDetector* dTof = new R3BdTof("dTof", kTRUE);
+    dTof->SetGeometryFileName(((TObjString*)fDetList.GetValue("DTOF"))->GetString().Data());
+    run->AddModule(dTof);
+  }
   
   // GFI detector
   if (fDetList.FindObject("GFI") ) {

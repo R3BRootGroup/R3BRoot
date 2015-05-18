@@ -88,6 +88,7 @@ Int_t r3bsim()
 //  detGeo.Add(new TObjString("CALIFA"),        new TObjString("califa_v13_811.geo.root"));
   detGeo.Add(new TObjString("TOF"),           new TObjString("tof_v13a.geo.root"));
   detGeo.Add(new TObjString("MTOF"),          new TObjString("mtof_v13a.geo.root"));
+//  detGeo.Add(new TObjString("DTOF"),          new TObjString("dtof_v15a.geo.root"));
   detGeo.Add(new TObjString("DCH"),           new TObjString("dch_v13a.geo.root"));
   detGeo.Add(new TObjString("TRACKER"),       new TObjString("tra_v13vac.geo.root"));
 //  detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startra_v14a.geo.root"));

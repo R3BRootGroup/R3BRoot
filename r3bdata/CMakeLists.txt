@@ -38,6 +38,7 @@ dchData/R3BDchPoint.cxx
 dchData/R3BDchFullPoint.cxx 
 gfiData/R3BGfiPoint.cxx 
 mtofData/R3BmTofPoint.cxx  
+dtofData/R3BdTofPoint.cxx
 tofData/R3BTofPoint.cxx
 vetoData/R3BVetoPoint.cxx
 lumonData/ELILuMonPoint.cxx 
