@@ -70,7 +70,7 @@ Bool_t R3BLosUnpack::DoUnpack(Int_t* data, Int_t size)
 //    }
 //    LOG(INFO) << std::dec << FairLogger::endl;
 
-    UInt_t* p1 = (UInt_t*)(data + 1);
+    UInt_t* p1 = (UInt_t*)(data + 3);   // !!!!! for s438b
 
     if ((p1[0] & 0xff000000) != 0xab000000)
     {
