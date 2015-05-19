@@ -6,7 +6,6 @@ ${BASE_INCLUDE_DIRECTORIES}
 )
 
 set(INCLUDE_DIRECTORIES
-${R3BROOT_SOURCE_DIR}/r3bdb/commondb
 ${R3BROOT_SOURCE_DIR}/r3bdb/losdb
 )
 
@@ -30,14 +29,12 @@ set(HEADERS
 R3BDBLosContFact.h
 R3BLosCalPar.h
 R3BLosTCalPar.h
-${FAIRROOTPATH}/include/FairDbReader.h
-${FAIRROOTPATH}/include/FairDbWriter.h
 )
 
 
 set(LINKDEF R3BLosLinkDef.h)
 Set(LIBRARY_NAME R3BLosDB)
-Set(DEPENDENCIES Base)
+Set(DEPENDENCIES Base ParBase)
 
 
 GENERATE_LIBRARY()

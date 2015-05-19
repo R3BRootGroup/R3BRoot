@@ -49,6 +49,13 @@ InitStatus R3BLosTcal::Init()
 {
     LOG(INFO) << "R3BLosTcal::Init : read " << fTcalPar->GetNumTCalPar() << " calibration channels" << FairLogger::endl;
     //fTcalPar->Print();
+    R3BLosTCalPar* par;
+    for(Int_t i = 0; i < fTcalPar->GetNumTCalPar(); i++)
+    {
+        par = fTcalPar->GetTCalParAt(i);
+        fMapPar[par->GetBarId()] = par;
+        par->Print();
+    }
 
     FairRootManager* mgr = FairRootManager::Instance();
     if(NULL == mgr)
@@ -207,7 +214,7 @@ Double_t R3BLosTcal::Interpolate(Int_t tdc, R3BLosTCalPar* par)
     Int_t p = -1;
     Int_t b1, b2;
     Double_t slope;
-    for(Int_t i = 0; i < 2000; i++)
+    for(Int_t i = 0; i < NCHMAX; i++)
     {
         if(tdc >= par->GetBinLowAt(i) && tdc <= par->GetBinUpAt(i))
         {
@@ -217,35 +224,53 @@ Double_t R3BLosTcal::Interpolate(Int_t tdc, R3BLosTCalPar* par)
     }
     if(-1 == p)
     {
-        return 0.;
+        return -10000.;
     }
     else if(0 == p)
     {
-        time = 0.;
+        b1 = (Double_t)(par->GetBinLowAt(p) + par->GetBinUpAt(p)) / 2.;
+        b2 = (Double_t)(par->GetBinLowAt(p+1) + par->GetBinUpAt(p+1)) / 2.;
+        if(b2 < b1)
+        {
+            FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "%d %d", b2, b1);
+        }
+        slope = (Double_t)(par->GetTimeAt(p+1) - par->GetTimeAt(p)) / (b2 - b1);
+        time = (Double_t)(tdc - par->GetBinLowAt(p)) * slope;
     }
-    else if(par->GetTimeAt(p) > 4.99)
+    else if(p >= par->GetNofChannels())
     {
-        time = 5.;
+        return -10000.;
+    }
+    else if(par->GetTimeAt(p) > 5.)
+    {
+        return 5.;
     }
     else
     {
         b1 = (Double_t)(par->GetBinLowAt(p-1) + par->GetBinUpAt(p-1)) / 2.;
         b2 = (Double_t)(par->GetBinLowAt(p) + par->GetBinUpAt(p)) / 2.;
+        if(b2 < b1)
+        {
+            FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "%d %d", b2, b1);
+        }
         slope = (Double_t)(par->GetTimeAt(p) - par->GetTimeAt(p-1)) / (b2 - b1);
         time = (Double_t)(tdc - par->GetBinLowAt(p)) * slope + par->GetTimeAt(p-1);
+        if(time >= par->GetTimeAt(p))
+        {
+            return par->GetTimeAt(p);
+        }
     }
     return time;
 }
 
 Bool_t R3BLosTcal::FindChannel(Int_t channel, R3BLosTCalPar** par)
 {
-    for(Int_t i = 0; i < fTcalPar->GetNumTCalPar(); i++) {
-        (*par) = fTcalPar->GetTCalParAt(i);
-        if(channel == (*par)->GetChannel()) {
-            return kTRUE;
-        }
+    (*par) = fMapPar[channel];
+    if(NULL == (*par))
+    {
+        return kFALSE;
     }
-    return kFALSE;
+    return kTRUE;
 }
 
 ClassImp(R3BLosTcal)

@@ -3,9 +3,9 @@
 # the project's entire directory structure.
 
 add_subdirectory (landdb)
+add_subdirectory (losdb)
 if(FAIRDB_FOUND)
 add_subdirectory (commondb)
 add_subdirectory (caldb)
-add_subdirectory (losdb)
 endif(FAIRDB_FOUND)
 

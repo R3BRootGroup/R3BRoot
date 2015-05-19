@@ -6,6 +6,8 @@
 #ifndef R3BLOSTCAL
 #define R3BLOSTCAL
 
+#include <map>
+
 #include "FairTask.h"
 
 class TClonesArray;
@@ -35,6 +37,7 @@ class R3BLosTcal : public FairTask
     TClonesArray* fRawHit;
     TClonesArray* fHit;
     Int_t fNHit;
+    std::map<Int_t, R3BLosTCalPar*> fMapPar;
     R3BLosCalPar* fTcalPar;
     Int_t fNofModules;
     

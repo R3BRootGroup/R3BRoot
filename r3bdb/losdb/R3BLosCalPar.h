@@ -13,10 +13,6 @@
 
 using namespace std;
 
-class FairDbOutTableBuffer;
-class FairDbResultPool;
-class FairDbObjTableMap;
-class FairDbValRecord;
 class FairParamList;
 
 
@@ -27,7 +23,7 @@ using TObject::Compare;
 
   public :
     R3BLosCalPar (const char* name="R3BLosCalPar",
-                  const char* title="LOS Time Calibration Parameter",
+                  const char* title="Los Time Calibration Parameter",
                   const char* context="TestDefaultContext",
                   Bool_t own=kTRUE);
     virtual ~R3BLosCalPar(void);
@@ -39,16 +35,14 @@ using TObject::Compare;
 
 	// Lists handling  
     void   AddTCalPar(R3BLosTCalPar* tch){fTCalParams->Add(tch);}
-    TObjArray* GetListOfTCalPar(Int_t side) {return fTCalParams;}
+    TObjArray* GetListOfTCalPar(Int_t) {return fTCalParams;}
     Int_t GetNumTCalPar() {return fTCalParams->GetEntries();} 
     R3BLosTCalPar* GetTCalParAt(Int_t idx){return (R3BLosTCalPar*) fTCalParams->At(idx);}
 
-
-    // Global IO using run_id
-    virtual void fill(UInt_t rid);
-    virtual void store(UInt_t rid);
-
   private:
+    const R3BLosCalPar& operator=(const R3BLosCalPar&);
+    R3BLosCalPar(const R3BLosCalPar&);
+    
     TObjArray* fTCalParams;
 
     ClassDef(R3BLosCalPar,1); // R3BLosCalPar Parameter Container example

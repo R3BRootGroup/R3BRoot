@@ -11,6 +11,7 @@
 class R3BLosCalPar;
 class TClonesArray;
 class TH1F;
+class TF1;
 
 class R3BLosTcalFill : public FairTask
 {
@@ -57,7 +58,9 @@ class R3BLosTcalFill : public FairTask
     Int_t iMin;
     Int_t iMax;
     TH1F** fhData;
+    TH1F** fhData100;
     TH1F** fhTime;
+    TF1* f1;
 
     Int_t fNEvents;
     Bool_t fStoreDB;

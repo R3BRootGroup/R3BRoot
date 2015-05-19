@@ -38,7 +38,7 @@ void R3BDBLosContFact::setAllContainers()
   /** Creates the Container objects with all accepted contexts and adds them to
    *  the list of containers.*/
 
-  FairContainer* p1 = new FairContainer("LosCalPar", "LOS Calibration Parameters",
+  FairContainer* p1 = new FairContainer("LosCalPar", "los Calibration Parameters",
                                         "TestDefaultContext");
   p1->addContext("TestNonDefaultContext");
   containers->Add(p1);

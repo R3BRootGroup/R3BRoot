@@ -13,6 +13,7 @@ class R3BDBLosContFact : public FairContFact
     R3BDBLosContFact();
     ~R3BDBLosContFact() {}
     FairParSet* createContainer(FairContainer* c);
+
   private:
     void setAllContainers();
 
