@@ -25,18 +25,16 @@ void run(TString inputFile, Int_t firstFileNumber, Int_t lastFileNumber, Int_t n
     TStopwatch timer;
     timer.Start();
     
-    TString inDir = "./data/run296/";   // directory with lmd files
-    TString outDir = "./data/run296/";  // output directory
+    TString inDir = "lmd/";   // directory with lmd file
+    TString outDir = "";  // output directory
 
     TString inputFileName = inDir + inputFile + ".lmd";                       // name of input file
     TString outputFileName = outDir + inputFile + "_raw.root";                // name of output file
-    TString parFileName = outDir + "params_" + inputFile + "_raw.root";       // name of parameter file
 
     FairLmdSource* source = new FairLmdSource();
     char strName[1000];
     for(Int_t i = firstFileNumber; i < lastFileNumber+1; i++) {
-        sprintf(strName, "%s%s%4d.lmd", inDir.Data(), inputFile.Data(), i);
-        for(Int_t j = 0; j < 1000; j++) if(' ' == strName[j]) strName[j] = '0';
+        sprintf(strName, "%s%s_%04d.lmd", inDir.Data(), inputFile.Data(), i);
         cout << strName << endl;
         source->AddFile(strName);
     }
@@ -62,18 +60,20 @@ void run(TString inputFile, Int_t firstFileNumber, Int_t lastFileNumber, Int_t n
     run->SetOutputFile(outputFileName.Data());
     // ---------------------------------------------------------------------------
 
+    FairRootManager::Instance()->SetCompressData(true);
+
     // Histograms ----------------------------------------------------------------
-    R3BCaloRawAna* rawAna = new R3BCaloRawAna();
-    run->AddTask(rawAna);
+//    R3BCaloRawAna* rawAna = new R3BCaloRawAna();
+//    run->AddTask(rawAna);
     // ---------------------------------------------------------------------------
 
     // Initialize ----------------------------------------------------------------
     run->Init();
-    FairLogger::GetLogger()->SetLogScreenLevel("INFO");
+//    FairLogger::GetLogger()->SetLogScreenLevel("INFO");
     // ---------------------------------------------------------------------------
 
     // Run -----------------------------------------------------------------------
-    run->Run(nevents, 0);
+    run->Run(0, nEvents);
     // ---------------------------------------------------------------------------
 
     timer.Stop();
@@ -82,7 +82,6 @@ void run(TString inputFile, Int_t firstFileNumber, Int_t lastFileNumber, Int_t n
     cout << endl << endl;
     cout << "Macro finished succesfully." << endl;
     cout << "Output file is " << outputFileName << endl;
-    cout << "Parameter file is " << parFileName << endl;
     cout << "Real time " << rtime << " s, CPU time " << ctime << "s" << endl << endl;
 }
 

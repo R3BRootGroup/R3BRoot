@@ -307,3 +307,28 @@ const char * R3BCaloGeometry::GetCrystalVolumePath(int iD)
   return nameVolume.Data();
 }
 
+double R3BCaloGeometry::GetDistanceThroughCrystals(TVector3 &startVertex, TVector3 &direction)
+{
+  TGeoNode *n;
+
+  gGeoManager->InitTrack(startVertex.X(), startVertex.Y(), startVertex.Z(),
+      direction.X()/direction.Mag(), direction.Y()/direction.Mag(), direction.Z()/direction.Mag());
+
+  double distance = 0;
+  bool inCrystal = false;
+  TString nodeName;
+
+  while((n = gGeoManager->FindNextBoundaryAndStep()))
+  {
+    nodeName = n->GetName();
+
+    if(inCrystal)
+      distance += gGeoManager->GetStep();
+
+    inCrystal = nodeName.BeginsWith("Crystal_");
+  }
+
+  return distance;
+}
+
+ClassImp(R3BCaloGeometry);

@@ -8,6 +8,8 @@
 
 #include "FairParamList.h"              // for FairParamList
 
+#include "FairLogger.h"
+
 #include "Riosfwd.h"                    // for ostream
 #include "TString.h"                    // for TString
 #include "TArrayD.h"                    // for TString
@@ -68,13 +70,21 @@ void R3BCaloCalPar::putParams(FairParamList* list)
 
 Bool_t R3BCaloCalPar::getParams(FairParamList* list)
 {
-  if(!list) { return kFALSE;}
+  if(!list)
+  {
+    LOG(WARNING) << "R3BCaloCalPar::getParams(): list is NULL" << FairLogger::endl;
+    return kFALSE;
+  }
   Int_t ndus;
-  if (!list->fill("NrOfDUnits", &ndus)) {return kFALSE;}
+  if (!list->fill("NrOfDUnits", &ndus))
+  {
+    LOG(WARNING) << "R3BCaloCalPar::getParams(): Could not read NrOfDUnits from parameter list" << FairLogger::endl;
+    return kFALSE;
+  }
   
-  cout << " NrOFUNits " << ndus << endl;
+  LOG(DEBUG) << "R3BCaloCalPar::getParams(): NrOFUNits " << ndus << FairLogger::endl;
   
-  TArrayD* values = new TArrayD(8);
+  TArrayD* values = new TArrayD(9);
   
   for(Int_t i=0;i<ndus;i++){
     stringstream ss;

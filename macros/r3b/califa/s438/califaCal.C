@@ -33,6 +33,7 @@ void califaCal(TString inputFile, TString outputFile,
   timer.Start();
   // ------------------------------------------------------------------------
   
+  FairLogger::GetLogger()->SetLogScreenLevel("INFO");
   // -----   Create analysis run   ----------------------------------------
   FairRunAna* fRun = new FairRunAna();
   fRun->SetInputFile(inputFile);
@@ -62,9 +63,9 @@ void califaCal(TString inputFile, TString outputFile,
     //}
   //rtdb->setOutput(parIn);
   //rtdb->saveOutput();
-  rtdb->print();
-  
-  /*TList *lPars = rtdb->getListOfContainers();
+ 
+  /*
+  TList *lPars = rtdb->getListOfContainers();
   for (Int_t i=0;i<lPars->GetEntries();i++) {
     FairParSet* apar = (FairParSet*) lPars->At(i);
     apar->Print();
@@ -78,7 +79,6 @@ void califaCal(TString inputFile, TString outputFile,
   else cout << "NO DU!!!!" << endl << endl;
   */
 
-  FairLogger::GetLogger()->SetLogScreenLevel("INFO");
   //Crystal calibration
   R3BCaloCal* cal = new R3BCaloCal();
   cal->UseHighRange(highRange);
@@ -88,8 +88,13 @@ void califaCal(TString inputFile, TString outputFile,
   fRun->AddTask(new R3BCaloMap("s438b_califa.map"));
 
   fRun->Init();       
-             
-  fRun->Run(0,nEvents);
+
+  // Set default input version = 1 for CaloCalPar
+  int runid = fRun->GetRuntimeDb()->getCurrentRun()->getRunId();
+  fRun->GetRuntimeDb()->setInputVersion(runid, "CaloCalPar", 1, 1);
+  fRun->Reinit(runid);
+
+  fRun->Run(0, nEvents);
   
   // -----   Finish   -------------------------------------------------------
   timer.Stop();

@@ -1,6 +1,10 @@
 #ifndef R3BCALOGEOMETRY_H
 #define R3BCALOGEOMETRY_H
 
+#include <TObject.h>
+
+class TVector3;
+
 class R3BCaloGeometry : public TObject
 {
 protected:
@@ -14,9 +18,11 @@ public:
 
   const char *GetCrystalVolumePath(int iD);
 
+  double GetDistanceThroughCrystals(TVector3 &startVertex, TVector3 &direction);
+
   static R3BCaloGeometry *Instance(int version);
 
-  ClassDef(R3BCaloGeometry, 2);
+  ClassDef(R3BCaloGeometry, 3);
 };
 
 #endif
