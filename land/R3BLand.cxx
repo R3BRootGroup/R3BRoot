@@ -145,7 +145,9 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol)
   // <DB>  Before filling MC info for current track
 	//       print step info if verbose > 1
   //    cout<<"Test verbose: "<<fVerboseLevel<<endl;
-  if (fVerboseLevel>1) StepHistory();
+  //if (fVerboseLevel>1) StepHistory();
+  
+  StepHistory(); // FIXME: StepHistory also responsible for filling LandFirstHits 
 
   // --- get Geometry hiearchical Information
   Int_t cp1=-1;
