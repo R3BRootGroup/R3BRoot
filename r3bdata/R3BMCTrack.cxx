@@ -232,7 +232,7 @@ void R3BMCTrack::SetNPoints(Int_t iDet, Int_t nPoints) {
      else if ( nPoints > 1 ) nPoints = 1;
      fNPoints = ( fNPoints & ( ~ (  1 << 29 ) ) )  |  ( nPoints << 29 );
    }
-
+   else if ( iDet == kDTOF ){/*FIXME*/}
   else cout << "-E- R3BMCTrack::SetNPoints: Unknown detector ID "
 	    << iDet << endl;
 
