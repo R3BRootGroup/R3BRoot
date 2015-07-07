@@ -552,36 +552,36 @@ void R3BLand::StepHistory()
            LOG(INFO) << "new primary neutron interaction: " << proc.At(i) <<"  "<< TMCProcessName[proc.At(i)] << FairLogger::endl;
 	
 	}
-  
+         
 // make histogram with first interaction
   
-        if(proc.At(i)==22 && trackNo<7){
+        if(proc.At(i)==22 && trackNo<6){
 	   // elastic scattering
 //           cout<<"primary neutron interaction elastic"<<endl;
-           firstHitX[trackNo-1] = gMcTrackPos[0];
-           firstHitY[trackNo-1] = gMcTrackPos[1];
-           firstHitZ[trackNo-1] = gMcTrackPos[2];
-           firstT[trackNo-1] = time;
+           firstHitX[trackNo] = gMcTrackPos[0];
+           firstHitY[trackNo] = gMcTrackPos[1];
+           firstHitZ[trackNo] = gMcTrackPos[2];
+           firstT[trackNo] = time;
   
         }
 	
-        if(proc.At(i)==13 && trackNo<7){
+        if(proc.At(i)==13 && trackNo<6){
 	   // elastic scattering
 //           cout<<"primary neutron interaction hadronic"<<endl;
-           firstHitX[trackNo-1] = gMcTrackPos[0];
-           firstHitY[trackNo-1] = gMcTrackPos[1];
-           firstHitZ[trackNo-1] = gMcTrackPos[2];
-           firstT[trackNo-1] = time;
+           firstHitX[trackNo] = gMcTrackPos[0];
+           firstHitY[trackNo] = gMcTrackPos[1];
+           firstHitZ[trackNo] = gMcTrackPos[2];
+           firstT[trackNo] = time;
   
         }
 
-        if(proc.At(i)==23 && trackNo<7){
+        if(proc.At(i)==23 && trackNo<6){
 	   // elastic scattering
 //           cout<<"primary neutron interaction inelastic"<<endl;
-           firstHitX[trackNo-1] = gMcTrackPos[0];
-           firstHitY[trackNo-1] = gMcTrackPos[1];
-           firstHitZ[trackNo-1] = gMcTrackPos[2];
-           firstT[trackNo-1] = time;
+           firstHitX[trackNo] = gMcTrackPos[0];
+           firstHitY[trackNo] = gMcTrackPos[1];
+           firstHitZ[trackNo] = gMcTrackPos[2];
+           firstT[trackNo] = time;
   
         }
      }  
