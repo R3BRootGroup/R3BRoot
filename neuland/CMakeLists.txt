@@ -2,6 +2,7 @@ set(LIBRARY_NAME R3BNeuland)
 set(LINKDEF NeulandLinkDef.h)
 
 set(SRCS
+	R3BNeulandMCMon.cxx
 	R3BNeulandDigiMon.cxx
 )
 change_file_extension(*.cxx *.h HEADERS "${SRCS}")
@@ -19,6 +20,7 @@ include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 
 set(INCLUDE_DIRECTORIES
 	${R3BROOT_SOURCE_DIR}/neuland/
+	${R3BROOT_SOURCE_DIR}/r3bdata/
 	${R3BROOT_SOURCE_DIR}/r3bdata/landData
 )
 include_directories(${INCLUDE_DIRECTORIES})

@@ -5,5 +5,6 @@
 #pragma link off all functions;
 
 #pragma link C++ class R3BNeulandDigiMon;
+#pragma link C++ class R3BNeulandMCMon;
 
 #endif
