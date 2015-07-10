@@ -4,6 +4,7 @@ set(LINKDEF NeulandLinkDef.h)
 set(SRCS
 	R3BNeulandMCMon.cxx
 	R3BNeulandDigiMon.cxx
+	R3BNeulandVisualizer.cxx
 )
 change_file_extension(*.cxx *.h HEADERS "${SRCS}")
 

@@ -29,6 +29,16 @@ InitStatus R3BNeulandMCMon::Init()
   h_motherIDs_ = new TH1D("h_motherIDs", "MotherIDs", 6001, -1, 6000);
   h_primary_daughter_IDs_ = new TH1D("h_primary_daughter_IDs", "IDs of tracks with a primary mother", 6001, -1, 6000);
 
+  // XYZ -> ZXY (side view)
+  h3_ = new TH3D("hMCTracks", "hMCTracks", 60, 1400, 1700, 50, -125, 125, 50, -125, 125);
+  h3_->SetTitle("NeuLAND MCTracks");
+  h3_->GetXaxis()->SetTitle("Z");
+  h3_->GetYaxis()->SetTitle("X");
+  h3_->GetZaxis()->SetTitle("Y");
+
+  frm->Register("NeulandMCMon", "MC Tracks in NeuLAND", h3_, kTRUE);
+
+
   return kSUCCESS;
 }
 
@@ -103,6 +113,20 @@ void R3BNeulandMCMon::Exec(Option_t* option)
     hm_E_tot_PDG_[kv.first]->Fill( kv.second );
   }
 
+
+
+  // For 3D Vis
+  h3_->Reset("ICES");
+  for (unsigned int i = 0; i < num_tracks; i++) {
+    mc_track = (R3BMCTrack*)mc_tracks_->At(i);
+    if (mc_track->GetMotherId() != -1) {
+      if (mc_track->GetNPoints(kLAND) > 0) {
+        h3_->Fill( mc_track->GetStartZ(), mc_track->GetStartX(), mc_track->GetStartY(), GetKineticEnergy(mc_track) );
+      } else {
+        h3_->Fill( mc_track->GetStartZ(), mc_track->GetStartX(), mc_track->GetStartY(), -1.*GetKineticEnergy(mc_track) );
+      }
+    }
+  }
 }
 
 

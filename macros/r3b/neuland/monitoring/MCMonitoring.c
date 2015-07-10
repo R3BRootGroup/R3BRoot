@@ -1,4 +1,5 @@
-inline void ConnectParFileToRuntimeDb(const TString par_file, FairRuntimeDb* rtdb){
+inline void ConnectParFileToRuntimeDb(const TString par_file, FairRuntimeDb* rtdb)
+{
   FairParRootFileIo* io = new FairParRootFileIo();
   io->open(par_file);
   rtdb->setFirstInput(io);

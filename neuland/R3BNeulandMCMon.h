@@ -23,6 +23,7 @@
 #include <map>
 
 class TH1D;
+class TH3D;
 
 class R3BNeulandMCMon : public FairTask
 {
@@ -44,7 +45,7 @@ private:
   TH1D* h_primary_daughter_IDs_;
   std::map<int, TH1D*> hm_E_PDG_;
   std::map<int, TH1D*> hm_E_tot_PDG_;
-
+  TH3D* h3_;
 
   // TODO: Thats not the business of this class, should be in R3BMCTrack
   // Note: Reference to the pointer to R3BMCTrack so it can be changed within the function
