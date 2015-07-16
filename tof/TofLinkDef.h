@@ -12,6 +12,7 @@
 #pragma link C++ class R3BTofDigitizer+;
 #pragma link C++ class R3BTof2pDigiPar+;
 #pragma link C++ class R3BTof2pDigitizer+;
+#pragma link C++ class R3BTofUnpack+;
 
 #endif
 

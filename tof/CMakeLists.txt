@@ -41,6 +41,7 @@ R3BTofDigiPar.cxx
 R3BTofDigitizer.cxx
 R3BTof2pDigiPar.cxx
 R3BTof2pDigitizer.cxx  
+R3BTofUnpack.cxx
 )
 
 # fill list of header files from list of source files
