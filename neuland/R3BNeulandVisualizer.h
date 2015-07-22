@@ -8,36 +8,35 @@
 
 //#include <vector>
 
-class R3BNeulandVisualizer
-{
+class R3BNeulandVisualizer {
 public:
-  R3BNeulandVisualizer(const TString &input_file, const TString &what);
-  //R3BNeulandVisualizer(const std::vector<TString> files);
-  ~R3BNeulandVisualizer();
+   R3BNeulandVisualizer(const TString &input_file, const TString &what);
+   //R3BNeulandVisualizer(const std::vector<TString> files);
+   ~R3BNeulandVisualizer();
 
-  inline void ShowEvent(const UInt_t i)
-  {
-    i_ = i;
-    Visualize();
-  }
+   inline void ShowEvent(const UInt_t i)
+   {
+      fIndex = i;
+      Visualize();
+   }
 
-  inline void ShowNext()
-  {
-    i_++;
-    Visualize();
-  }
+   inline void ShowNext()
+   {
+      fIndex++;
+      Visualize();
+   }
 
 protected:
-  void Visualize();
+   void Visualize();
 
 private:
-  TFile* f_;
-  TTree* t_;
-  TH3D* h3_;
-  TCanvas* canvas_;
-  UInt_t i_;
+   TFile *fFile;
+   TTree *fTree;
+   TH3D *fh3;
+   TCanvas *fCanvas;
+   UInt_t fIndex;
 
-  ClassDef(R3BNeulandVisualizer, 0);
+   ClassDef(R3BNeulandVisualizer, 0);
 };
 
 #endif //R3BNEULANDVISUALIZER_H

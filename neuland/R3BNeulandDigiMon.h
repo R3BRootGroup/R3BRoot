@@ -16,21 +16,20 @@
 class TClonesArray;
 class TH3D;
 
-class R3BNeulandDigiMon : public FairTask
-{
+class R3BNeulandDigiMon : public FairTask {
 public:
-  R3BNeulandDigiMon();
-  ~R3BNeulandDigiMon();
+   R3BNeulandDigiMon();
+   ~R3BNeulandDigiMon();
 
-  InitStatus Init();
-  void Exec(Option_t *option);
-  void Finish();
+   InitStatus Init();
+   void Exec(Option_t *option);
+   void Finish();
 
 private:
-  TClonesArray* fArrayDigi;
-  TH3D* h3;
+   TClonesArray *fDigis;
+   TH3D *fh3;
 
-  ClassDef(R3BNeulandDigiMon, 0);
+   ClassDef(R3BNeulandDigiMon, 0);
 };
 
 

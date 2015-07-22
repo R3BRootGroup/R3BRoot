@@ -20,33 +20,33 @@ R3BNeulandDigiMon::~R3BNeulandDigiMon()
 
 InitStatus R3BNeulandDigiMon::Init()
 {
-  FairRootManager* frm = FairRootManager::Instance();
+   FairRootManager *rm = FairRootManager::Instance();
 
-  fArrayDigi = (TClonesArray*) frm->GetObject("LandDigi");
+   fDigis = (TClonesArray *) rm->GetObject("LandDigi");
 
-  // XYZ -> ZXY (side view)
-  h3 = new TH3D("hDigis", "hDigis", 60, 1400, 1700, 50, -125, 125, 50, -125, 125);
-  h3->SetTitle("NeuLAND Digis");
-  h3->GetXaxis()->SetTitle("Z");
-  h3->GetYaxis()->SetTitle("X");
-  h3->GetZaxis()->SetTitle("Y");
+   // XYZ -> ZXY (side view)
+   fh3 = new TH3D("hDigis", "hDigis", 60, 1400, 1700, 50, -125, 125, 50, -125, 125);
+   fh3->SetTitle("NeuLAND Digis");
+   fh3->GetXaxis()->SetTitle("Z");
+   fh3->GetYaxis()->SetTitle("X");
+   fh3->GetZaxis()->SetTitle("Y");
 
-  frm->Register("NeulandDigiMon", "Digis in NeuLAND", h3, kTRUE);
+   rm->Register("NeulandDigiMon", "Digis in NeuLAND", fh3, kTRUE);
 
-  return kSUCCESS;
+   return kSUCCESS;
 }
 
 
-void R3BNeulandDigiMon::Exec(Option_t* option)
+void R3BNeulandDigiMon::Exec(Option_t *option)
 {
-  h3->Reset("ICES");
-  R3BLandDigi* digi;
-  const unsigned int nDigis = fArrayDigi->GetEntries();
-  for (unsigned int i = 0; i < nDigis; i++) {
-    digi = (R3BLandDigi*) fArrayDigi->At(i);
-    // XYZ -> ZXY (side view)
-    h3->Fill( digi->GetZZ(), digi->GetXX(), digi->GetYY(), digi->GetQdc() );
-  }
+   fh3->Reset("ICES");
+   R3BLandDigi *digi;
+   const unsigned int nDigis = fDigis->GetEntries();
+   for (unsigned int i = 0; i < nDigis; i++) {
+      digi = (R3BLandDigi *) fDigis->At(i);
+      // XYZ -> ZXY (side view)
+      fh3->Fill(digi->GetZZ(), digi->GetXX(), digi->GetYY(), digi->GetQdc());
+   }
 }
 
 
