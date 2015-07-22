@@ -21,11 +21,13 @@ InitStatus R3BNeulandMCMon::Init()
 {
    FairRootManager *rm = FairRootManager::Instance();
    fMCTracks = (TClonesArray *)rm->GetObject("MCTrack");
+   fLandPoints = (TClonesArray *)rm->GetObject("LandPoint");
 
-   fhPDG = new TH1D("h_PDG", "Number of particles by PDG code created by primary neutron interaction", 8000, -4000, 4000);
+   fhPDG = new TH1D("h_PDG", "Number of particles by PDG code created by primary neutron interaction resulting in a LandPoint", 8000, -4000, 4000);
    fhEPrimaryNeutrons = new TH1D("h_E_primary_neutrons", "Energy of primary Neutrons", 1000, 0, 1000);
-   fhEtot = new TH1D("h_E_tot", "Total energy of non-neutron tracks in kLAND created by primary neutron interaction(s)", 1000, 0, 6000);
-   fhESecondaryNeutrons = new TH1D("h_E_secondary_neutrons", "Energy of neutron tracks created by primary neutron interaction", 1000, 0, 6000);
+   fhEtotPrim = new TH1D("h_E_tot_prim", "Total Light Yield of non-neutron LandPoints created by primary neutron interaction(s)", 6000, 0, 6000);
+   fhEtot = new TH1D("h_E_tot", "Total Light Yield of non-neutron LandPoints", 6000, 0, 6000);
+   fhESecondaryNeutrons = new TH1D("h_E_secondary_neutrons", "Energy of neutron tracks created by primary neutron interaction", 6000, 0, 6000);
    fhMotherIDs = new TH1D("h_motherIDs", "MotherIDs", 6001, -1, 6000);
    fhPrimaryDaughterIDs = new TH1D("h_primary_daughter_IDs", "IDs of tracks with a primary mother", 6001, -1, 6000);
 
@@ -45,88 +47,117 @@ InitStatus R3BNeulandMCMon::Init()
 
 void R3BNeulandMCMon::Exec(Option_t *option)
 {
-   const UInt_t nTracks = fMCTracks->GetEntries();
-   R3BMCTrack *mcTrack;
 
-   std::map<Int_t, Double_t> EtotPDG;
-   Double_t Etot = 0.;
+   /* raw MC Track based analysis */
+   {
+      const UInt_t nTracks = fMCTracks->GetEntries();
+      R3BMCTrack *mcTrack;
 
-   for (UInt_t i = 0; i < nTracks; i++) {
-      mcTrack = (R3BMCTrack *)fMCTracks->At(i);
+      for (UInt_t i = 0; i < nTracks; i++) {
+         mcTrack = (R3BMCTrack *)fMCTracks->At(i);
 
-      // Distribution of MC Track mother id's
-      fhMotherIDs->Fill(mcTrack->GetMotherId());
-
-
-      // Energy of Inital Neutrons
-      if (IsPrimaryNeutron(mcTrack)) {
-         fhEPrimaryNeutrons->Fill(GetKineticEnergy(mcTrack));
-      }
+         // Distribution of MC Track mother id's
+         fhMotherIDs->Fill(mcTrack->GetMotherId());
 
 
-      //Select tracks with a primary neutron mother
-      if (IsMotherPrimaryNeutron(mcTrack)) {
-         // Remaining energy of neutrpns after first interaction
-         if (mcTrack->GetPdgCode() == 2112) {
-            fhESecondaryNeutrons->Fill(GetKineticEnergy(mcTrack));
+         // Energy of Inital Neutrons
+         if (IsPrimaryNeutron(mcTrack)) {
+            fhEPrimaryNeutrons->Fill(GetKineticEnergy(mcTrack));
          }
 
+         // Remaining energy of neutrpns after first interaction
+         if (IsMotherPrimaryNeutron(mcTrack) && mcTrack->GetPdgCode() == 2112) {
+            fhESecondaryNeutrons->Fill(GetKineticEnergy(mcTrack));
+         }
+      }
+   }
 
-         if (mcTrack->GetNPoints(kLAND) > 0) {
+
+   {
+      std::map<Int_t, Double_t> EtotPDG;
+      Double_t Etot = 0.;
+      Double_t EtotPrim = 0.;
+
+      const UInt_t nLandPoints = fLandPoints->GetEntries();
+      R3BLandPoint *landPoint;
+      R3BMCTrack *mcTrack;
+
+      for (UInt_t iLP = 0; iLP < nLandPoints; iLP++) {
+         landPoint = (R3BLandPoint *)fLandPoints->At(iLP);
+         mcTrack = (R3BMCTrack *)fMCTracks->At(landPoint->GetTrackID());
+
+         Etot += landPoint->GetLightYield() * 1000.;
+
+         //Select tracks with a primary neutron mother
+         if (IsMotherPrimaryNeutron(mcTrack)) {
+
             // Total energy of non-neutron secondary particles where mother is a primary neutron
             if (mcTrack->GetPdgCode() != 2112) {
-               Etot += (GetKineticEnergy(mcTrack));
+               EtotPrim += landPoint->GetLightYield() * 1000.;
             }
-
 
             // Distribution of secondary particles
             fhPDG->Fill(mcTrack->GetPdgCode());
-            fhPrimaryDaughterIDs->Fill(i);
+            fhPrimaryDaughterIDs->Fill(landPoint->GetTrackID());
 
 
             // Buld Histograms for each particle PDG if it donst exist
             if (!fhmEPdg[mcTrack->GetPdgCode()]) {
-               TString name = TString("Energy of PID ") + TString::Itoa(mcTrack->GetPdgCode(), 10) + TString(" with a primary neutron mother");
-               fhmEPdg[mcTrack->GetPdgCode()] = new TH1D("h_E_PDG_" + TString::Itoa(mcTrack->GetPdgCode(), 10), name, 1000, 0, 1000);
+               TString name = TString("Light Yield of PID ") + TString::Itoa(mcTrack->GetPdgCode(), 10) + TString(" with a primary neutron mother");
+               fhmEPdg[mcTrack->GetPdgCode()] = new TH1D("h_E_PDG_" + TString::Itoa(mcTrack->GetPdgCode(), 10), name, 3000, 0, 3000);
             }
             // Get Energy py particle where the mother is a primary neutron
-            fhmEPdg[mcTrack->GetPdgCode()]->Fill(GetKineticEnergy(mcTrack));
+            fhmEPdg[mcTrack->GetPdgCode()]->Fill(landPoint->GetLightYield() * 1000.); //landPoint->GetEnergyLoss()*1000.);
+         } // end primary neutron mother
 
-
-            // Sum energy per particle type per event
-            if (!EtotPDG[mcTrack->GetPdgCode()]) {
-               EtotPDG[mcTrack->GetPdgCode()] = 0.;
-            }
-            EtotPDG[mcTrack->GetPdgCode()] += GetKineticEnergy(mcTrack);
+         // Sum energy per particle type per event
+         if (!EtotPDG[mcTrack->GetPdgCode()]) {
+            EtotPDG[mcTrack->GetPdgCode()] = 0.;
          }
+         EtotPDG[mcTrack->GetPdgCode()] += landPoint->GetLightYield() * 1000.; //landPoint->GetEnergyLoss()*1000.;
       }
-   }
 
-   fhEtot->Fill(Etot);
-
-
-   for (const auto &kv : EtotPDG) {
-      if (!fhmEtotPdg[kv.first]) {
-         TString name = TString("Sum Energy of PID ") + TString::Itoa(kv.first, 10) + TString(" with a primary neutron mother");
-         fhmEtotPdg[kv.first] = new TH1D("fhEtotPDG_" + TString::Itoa(kv.first, 10), name, 1000, 0, 1000);
-      }
-      fhmEtotPdg[kv.first]->Fill(kv.second);
-   }
+      fhEtot->Fill(Etot);
+      fhEtotPrim->Fill(EtotPrim);
 
 
+      for (const auto &kv : EtotPDG) {
+         if (!fhmEtotPdg[kv.first]) {
+            TString name = TString("Sum Light Yield of PID ") + TString::Itoa(kv.first, 10);
+            fhmEtotPdg[kv.first] = new TH1D("fhEtotPDG_" + TString::Itoa(kv.first, 10), name, 3000, 0, 3000);
+         }
+         fhmEtotPdg[kv.first]->Fill(kv.second);
 
-   // For 3D Vis
-   fh3->Reset("ICES");
-   for (UInt_t i = 0; i < nTracks; i++) {
-      mcTrack = (R3BMCTrack *)fMCTracks->At(i);
-      if (mcTrack->GetMotherId() != -1) {
-         if (mcTrack->GetNPoints(kLAND) > 0) {
-            fh3->Fill(mcTrack->GetStartZ(), mcTrack->GetStartX(), mcTrack->GetStartY(), GetKineticEnergy(mcTrack));
+         if (!fhmEtotPdgRel[kv.first]) {
+            TString name = TString("Percent Light Yield of PID ") + TString::Itoa(kv.first, 10) + TString(" to total Light Yield.");
+            fhmEtotPdgRel[kv.first] = new TH1D("fhEtotPDGRel_" + TString::Itoa(kv.first, 10), name, 110, 0, 110);
+         }
+         if (Etot == 0) {
+            fhmEtotPdgRel[kv.first]->Fill(0);
          } else {
-            fh3->Fill(mcTrack->GetStartZ(), mcTrack->GetStartX(), mcTrack->GetStartY(), -1.*GetKineticEnergy(mcTrack));
+            fhmEtotPdgRel[kv.first]->Fill(kv.second/Etot*100.);
          }
       }
    }
+
+
+   {
+      // For 3D Vis
+      const UInt_t nTracks = fMCTracks->GetEntries();
+      R3BMCTrack *mcTrack;
+      fh3->Reset("ICES");
+      for (UInt_t i = 0; i < nTracks; i++) {
+         mcTrack = (R3BMCTrack *)fMCTracks->At(i);
+         if (mcTrack->GetMotherId() != -1) {
+            if (mcTrack->GetNPoints(kLAND) > 0) {
+               fh3->Fill(mcTrack->GetStartZ(), mcTrack->GetStartX(), mcTrack->GetStartY(), GetKineticEnergy(mcTrack));
+            } else {
+               fh3->Fill(mcTrack->GetStartZ(), mcTrack->GetStartX(), mcTrack->GetStartY(), -1.*GetKineticEnergy(mcTrack));
+            }
+         }
+      }
+   }
+
 }
 
 
@@ -135,6 +166,7 @@ void R3BNeulandMCMon::Finish()
    fhPDG->Write();
    fhEPrimaryNeutrons->Write();
    fhEtot->Write();
+   fhEtotPrim->Write();
    fhESecondaryNeutrons->Write();
    fhMotherIDs->Write();
    fhPrimaryDaughterIDs->Write();
@@ -143,6 +175,9 @@ void R3BNeulandMCMon::Finish()
       kv.second->Write();
    }
    for (const auto &kv : fhmEtotPdg) {
+      kv.second->Write();
+   }
+   for (const auto &kv : fhmEtotPdgRel) {
       kv.second->Write();
    }
 }

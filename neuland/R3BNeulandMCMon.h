@@ -19,6 +19,7 @@
 
 #include "FairTask.h"
 #include "R3BMCTrack.h"
+#include "R3BLandPoint.h"
 #include "TClonesArray.h"
 #include <map>
 
@@ -36,14 +37,17 @@ public:
 
 private:
    TClonesArray *fMCTracks;
+   TClonesArray *fLandPoints;
    TH1D *fhPDG;
    TH1D *fhEPrimaryNeutrons;
    TH1D *fhEtot;
+   TH1D *fhEtotPrim;
    TH1D *fhESecondaryNeutrons;
    TH1D *fhMotherIDs;
    TH1D *fhPrimaryDaughterIDs;
    std::map<Int_t, TH1D *> fhmEPdg;
    std::map<Int_t, TH1D *> fhmEtotPdg;
+   std::map<Int_t, TH1D *> fhmEtotPdgRel;
    TH3D *fh3;
 
    // TODO: Thats not the business of this class, should be in R3BMCTrack
