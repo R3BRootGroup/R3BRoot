@@ -3,10 +3,9 @@
 # sources could be listed here.
 
 Set(SYSTEM_INCLUDE_DIRECTORIES 
-${ROOT_INCLUDE_DIR}
+${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
 ${GEANT4_INCLUDE_DIR}
-${CLHEP_INCLUDE_DIR}
 ${GEANT4VMC_INCLUDE_DIR}
 )
 
@@ -23,16 +22,18 @@ include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
 ${FAIRROOT_LIBRARY_DIR}
+${GEANT4_LIBRARY_DIR}
+${GEANT4VMC_LIBRARY_DIR}
 ) 
 
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2")
-set(CMAKE_CXX_FLAGS_RELEASE        "-O2")
-set(CMAKE_CXX_FLAGS_DEBUG          "-g -O2 -fno-reorder-blocks -fno-schedule-insns -fno-inline")
-set(CMAKE_CXX_FLAGS_DEBUG          "-g")
+#set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2")
+#set(CMAKE_CXX_FLAGS_RELEASE        "-O2")
+#set(CMAKE_CXX_FLAGS_DEBUG          "-g -O2 -fno-reorder-blocks -fno-schedule-insns -fno-inline")
+#set(CMAKE_CXX_FLAGS_DEBUG          "-g")
 
 link_directories( ${LINK_DIRECTORIES})
 
-set(R3BPLIST_SRCS
+set(SRCS
 G4EmHadronBuilder.cxx
 G4EmMuonBuilder.cxx
 G4EmQEDBuilder.cxx
@@ -54,27 +55,12 @@ R3BRunConfiguration.cxx
 
 # fill list of header files from list of source files
 # by exchanging the file extension
-CHANGE_FILE_EXTENSION(*.cxx *.h R3BPLIST_HEADERS "${R3BPLIST_SRCS}")
+CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
-set(R3BPLIST_DICT_HEADERS R3BRunConfiguration.h)
+Set(DEPENDENCIES
+    VMC G4physicslists G4vis_management geant4vmc)
 
-set(R3BPLIST_LINKDEF PlistLinkDef.h)
+Set(LIBRARY_NAME R3BPlist)
 
-set(R3BPLIST_DICTIONARY ${CMAKE_CURRENT_BINARY_DIR}/R3BPlistDict.cxx)
-
-Set(INCLUDE
-${SYSTEM_INCLUDE_DIRECTORIES}
-${INCLUDE_DIRECTORIES}
-)
-ROOT_GENERATE_DICTIONARY("${R3BPLIST_DICT_HEADERS}" "${R3BPLIST_LINKDEF}" "${R3BPLIST_DICTIONARY}" "${INCLUDE}")
-
-set(R3BPLIST_SRCS ${R3BPLIST_SRCS} ${R3BPLIST_DICTIONARY})
-
-add_library(R3BPlist SHARED ${R3BPLIST_SRCS})
-target_link_libraries(R3BPlist ${ROOT_LIBRARIES})
-set_target_properties(R3BPlist PROPERTIES 
-${FAIRROOT_LIBRARY_PROPERTIES})
-
-################ install ###################
-install(TARGETS R3BPlist DESTINATION ${CMAKE_BINARY_DIR}/lib)
+GENERATE_LIBRARY()
 
