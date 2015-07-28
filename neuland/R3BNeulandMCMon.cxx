@@ -121,7 +121,10 @@ void R3BNeulandMCMon::Exec(Option_t *option)
       fhEtotPrim->Fill(EtotPrim);
 
 
-      for (const auto &kv : EtotPDG) {
+//      for (const auto &kv : EtotPDG) {
+      for (std::map<Int_t,Double_t>::iterator i = EtotPDG.begin(); i != EtotPDG.end(); i++) {
+         const std::map<Int_t,Double_t>::value_type &kv = *i;
+
          if (!fhmEtotPdg[kv.first]) {
             TString name = TString("Sum Light Yield of PID ") + TString::Itoa(kv.first, 10);
             fhmEtotPdg[kv.first] = new TH1D("fhEtotPDG_" + TString::Itoa(kv.first, 10), name, 3000, 0, 3000);
@@ -171,14 +174,20 @@ void R3BNeulandMCMon::Finish()
    fhMotherIDs->Write();
    fhPrimaryDaughterIDs->Write();
 
-   for (const auto &kv : fhmEPdg) {
-      kv.second->Write();
+//   for (const auto &kv : fhmEPdg) {
+//      kv.second->Write();
+   for(std::map<Int_t, TH1D*>::iterator kv = fhmEPdg.begin(); kv != fhmEPdg.end(); kv++) {
+     kv->second->Write();
    }
-   for (const auto &kv : fhmEtotPdg) {
-      kv.second->Write();
+//   for (const auto &kv : fhmEtotPdg) {
+//      kv.second->Write();
+   for(std::map<Int_t, TH1D*>::iterator kv = fhmEtotPdg.begin(); kv != fhmEtotPdg.end(); kv++) {
+     kv->second->Write();
    }
-   for (const auto &kv : fhmEtotPdgRel) {
-      kv.second->Write();
+//   for (const auto &kv : fhmEtotPdgRel) {
+//      kv.second->Write();
+   for(std::map<Int_t, TH1D*>::iterator kv = fhmEtotPdgRel.begin(); kv != fhmEtotPdgRel.end(); kv++) {
+     kv->second->Write();
    }
 }
 
