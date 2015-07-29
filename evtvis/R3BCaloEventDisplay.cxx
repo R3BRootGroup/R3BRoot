@@ -90,10 +90,10 @@ InitStatus R3BCaloEventDisplay::Init()
 
   FairRootManager* ioManager = FairRootManager::Instance();
   if ( !ioManager ) Fatal("Init", "No FairRootManager");
-  if( !ioManager->GetObject("CrystalHitSim") ) {
-     fCrystalHitCA = (TClonesArray*) ioManager->GetObject("CrystalHit");
+  if( !ioManager->GetObject("CaloCrystalHitSim") ) {
+     fCrystalHitCA = (TClonesArray*) ioManager->GetObject("CaloCrystalHit");
   } else {
-     fCrystalHitCA = (TClonesArray*) ioManager->GetObject("CrystalHitSim");
+     fCrystalHitCA = (TClonesArray*) ioManager->GetObject("CaloCrystalHitSim");
      kSimulation = true;
   }
 
