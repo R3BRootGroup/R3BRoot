@@ -186,7 +186,6 @@ void R3BCaloEventDisplay::Exec(Option_t* opt)
 
     }
 
-
     // ------- Data Histogram --------------------------------
     fDataHist = new TEveCaloDataHist();
     fDataHist->AddHistogram(hcalo);
