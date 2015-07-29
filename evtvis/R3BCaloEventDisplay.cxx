@@ -111,9 +111,7 @@ InitStatus R3BCaloEventDisplay::Init()
 // -----   Public method ReInit   --------------------------------------------
 InitStatus R3BCaloEventDisplay::ReInit()
 {
-
   return kSUCCESS;
-
 }
 
 
