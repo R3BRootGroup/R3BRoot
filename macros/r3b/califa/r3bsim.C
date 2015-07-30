@@ -43,7 +43,7 @@ Int_t r3bsim(){
   // Box generator:             "box"
   // CALIFA generator:          "gammas"
   // R3B spec. generator:       "r3b"
-  TString fGene="ascii";
+  TString fGene="box";
   
   //-------------------------------------------------
   // Secondaries  generation (G4 only)
@@ -121,7 +121,7 @@ Int_t r3bsim(){
    //- N# of Sim. Events   |    nEvents     (Int_t)
    //-------------------------------------------------
 
-   Int_t nEvents = 50;
+   Int_t nEvents = 5;
 
    //-------------------------------------------------
    //- EventDisplay        |    fEventDisplay (Bool_t)
@@ -135,7 +135,7 @@ Int_t r3bsim(){
 	
    // Including CaloHitFinder task (kFALSE by default)
 
-   Bool_t fCaloHitFinder = kFALSE;  //kTRUE; 
+   Bool_t fCaloHitFinder = kTRUE;  //kTRUE; 
 
    Double_t fMeasCurrent = 1500.;
 
