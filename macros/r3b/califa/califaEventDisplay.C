@@ -1,4 +1,4 @@
-eventDisplay()
+califaEventDisplay()
 {
   FairRunAna *fRun= new FairRunAna();
   
