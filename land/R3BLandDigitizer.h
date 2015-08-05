@@ -1,5 +1,5 @@
 #ifndef R3BLANDDIGITIZER_H
-#define R3BLANDDIGITISER_H 1
+#define R3BLANDDIGITIZER_H 1
 
 
 #include "FairTask.h"
