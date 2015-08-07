@@ -37,7 +37,7 @@ InitStatus R3BNeulandDigiMon::Init()
 }
 
 
-void R3BNeulandDigiMon::Exec(Option_t *option)
+void R3BNeulandDigiMon::Exec(Option_t *)
 {
    fh3->Reset("ICES");
    R3BLandDigi *digi;
@@ -54,4 +54,4 @@ void R3BNeulandDigiMon::Finish()
 {}
 
 
-ClassImp(R3BNeulandDigiMon);
+ClassImp(R3BNeulandDigiMon)

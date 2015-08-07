@@ -52,7 +52,7 @@ private:
 
    // TODO: Thats not the business of this class, should be in R3BMCTrack
    // Note: Reference to the pointer to R3BMCTrack so it can be changed within the function
-   inline Bool_t GetMotherTrack(const UInt_t i, R3BMCTrack *&motherTrack)
+   inline Bool_t GetMotherTrack(const Int_t i, R3BMCTrack *&motherTrack)
    {
       if (i < fMCTracks->GetEntries() && i >= 0) {
          motherTrack = (R3BMCTrack *)fMCTracks->At(i);
@@ -84,7 +84,7 @@ private:
    }
 
 
-   ClassDef(R3BNeulandMCMon, 0);
+   ClassDef(R3BNeulandMCMon, 0)
 };
 
 

@@ -45,7 +45,7 @@ InitStatus R3BNeulandMCMon::Init()
 }
 
 
-void R3BNeulandMCMon::Exec(Option_t *option)
+void R3BNeulandMCMon::Exec(Option_t *)
 {
 
    /* raw MC Track based analysis */
@@ -192,4 +192,4 @@ void R3BNeulandMCMon::Finish()
 }
 
 
-ClassImp(R3BNeulandMCMon);
+ClassImp(R3BNeulandMCMon)

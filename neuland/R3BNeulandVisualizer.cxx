@@ -8,7 +8,7 @@
 #include <iostream>
 
 /* This function is required to suppress boxes for empty bins - make them transparent.*/
-static Double_t gEmptyBinSupressor(const Double_t *x, const Double_t *_)
+static Double_t gEmptyBinSupressor(const Double_t *x, const Double_t *)
 {
    if (x) {
       return *x > 0 ? 1. : 0.;
@@ -78,4 +78,4 @@ void R3BNeulandVisualizer::Visualize()
    fCanvas->Flush();
 }
 
-ClassImp(R3BNeulandVisualizer);
+ClassImp(R3BNeulandVisualizer)
