@@ -1,0 +1,11 @@
+# Remove trailing slash from a path passed as argument
+Macro(Remove_Trailing_Slash _variable)
+  String(FIND ${_variable} "/" _pos_last_slash REVERSE)
+  STRING(LENGTH ${_variable} _length)
+  Math(EXPR _last_pos ${_pos_last_slash}+1)
+  If(${_last_pos} EQUAL ${_length})  
+    String(SUBSTRING ${_variable} 0 ${_pos_last_slash} _ret_val)
+  Else()
+    Set(_ret_val ${_variable})
+  EndIf()
+EndMacro()

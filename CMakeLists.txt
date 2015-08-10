@@ -72,9 +72,36 @@ include(CheckCXX11Features)
 
 # Load some basic macros which are needed later on
 include(FairMacros)
+include(R3BMacros)
 include(WriteConfigFile)
 include(Dart)
 include(CheckCompiler)
+
+
+# R3BRoot uses from 10.08.15 C++11, so we need an compiler which supports C++11
+# Check if the used compiler support C++11. If not stop with an error message
+# Check also if FairSoft and FairRoot have been compiled with C++11 support 
+If(NOT _HAS_CXX11_FLAG)
+  Message(FATAL_ERROR "The used C++ compiler (${CMAKE_CXX_COMPILER}) does not support C++11. R3BRoot can only be compiled with compilers supporting C++11. Please install such an compiler.")
+EndIf()
+
+Execute_process(COMMAND $ENV{SIMPATH}/bin/fairsoft-config --cxxflags OUTPUT_VARIABLE _res_fairsoft_config OUTPUT_STRIP_TRAILING_WHITESPACE)
+String(FIND ${_res_fairsoft_config} "-std=c++11" POS_C++11)
+If(${POS_C++11} EQUAL -1)
+  Message(FATAL_ERROR "FairSoft wasn't compiled with c++11 support. Please recompile FairSoft with a compiler which supports c++11.")
+EndIf()
+
+Execute_process(COMMAND $ENV{FAIRROOTPATH}/bin/fairroot-config --fairsoft_path OUTPUT_VARIABLE _simpath OUTPUT_STRIP_TRAILING_WHITESPACE)
+Remove_Trailing_Slash($ENV{SIMPATH})
+Set(_simpath ${_ret_val})
+Remove_Trailing_Slash(${_simpath})
+Set(_fairroot_config ${_ret_val})
+String(COMPARE EQUAL ${_simpath} ${_fairroot_config}  _same_fairsoft)
+If(NOT _same_fairsoft)
+    Message(STATUS "FairSoft version used for FairRoot compilation: ${_fairroot_config}")
+    Message(STATUS "FairSoft version now (defined by SIMPATH): ${_simpath}")
+    Message(FATAL_ERROR "Both versions must be the same.")
+EndIf()
 
 
 #Check the compiler and set the compile and link flags
