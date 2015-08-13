@@ -7,5 +7,7 @@
 #pragma link C++ class R3BNeulandDigiMon;
 #pragma link C++ class R3BNeulandMCMon;
 #pragma link C++ class R3BNeulandVisualizer;
+#pragma link C++ class R3BNeulandDigitizer+;
+#pragma link C++ class Neuland::DigitizingEngine+;
 
 #endif
