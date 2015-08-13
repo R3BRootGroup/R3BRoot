@@ -12,7 +12,7 @@ class R3BNeulandVisualizer {
 public:
    R3BNeulandVisualizer(const TString &input_file, const TString &what);
    //R3BNeulandVisualizer(const std::vector<TString> files);
-   ~R3BNeulandVisualizer();
+   virtual ~R3BNeulandVisualizer();
 
    inline void ShowEvent(const UInt_t i)
    {
