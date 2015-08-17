@@ -2,14 +2,14 @@
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 
-Set(SYSTEM_INCLUDE_DIRECTORIES 
+Set(SYSTEM_INCLUDE_DIRECTORIES
 ${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
 )
 
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
-${R3BROOT_SOURCE_DIR}/r3bbase 
+${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/land
 ${R3BROOT_SOURCE_DIR}/land/unpack
@@ -22,7 +22,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
-${R3BROOT_SOURCE_DIR}/r3bdata/trackerData  
+${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
 ${R3BROOT_SOURCE_DIR}/r3bdb/landdb
 )
 
@@ -32,22 +32,21 @@ include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
 ${FAIRROOT_LIBRARY_DIR}
-) 
+)
 
 link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
-R3BLand.cxx  
-R3BNeuLand.cxx   
-R3BNeuLandv1.cxx   
-R3BGeoLand.cxx    
-R3BGeoLandPar.cxx   
-R3BLandContFact.cxx 
-R3BLandDigitizer.cxx 
+R3BLand.cxx
+R3BNeuLand.cxx
+R3BNeuLandv1.cxx
+R3BGeoLand.cxx
+R3BGeoLandPar.cxx
+R3BLandContFact.cxx
+R3BLandDigitizer.cxx
 R3BLandDigitizerQA.cxx
 R3BNeutronTracker.cxx
-R3BNeuLandDigitizer.cxx 
-R3BLandData.cxx 
+R3BLandData.cxx
 R3BLandDigiPar.cxx
 R3BConstantFraction.cxx
 R3BLandDigitizer_CFD.cxx
