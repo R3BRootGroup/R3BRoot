@@ -144,7 +144,7 @@ void R3BNeulandDigitizer::Exec(Option_t *)
             try {
                 fDigitizingEngine->DepositLight(paddle_id, time, light, dist);
             } catch (std::exception &e) {
-                Fatal("Exec", e.what());
+                Fatal("Exec", "%s", e.what());
             }
 
         } //! eloss

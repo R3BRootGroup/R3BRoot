@@ -15,7 +15,7 @@ set(DEPENDENCIES
 )
 
 # TODO: -Wno-ignored-qualifiers for R3BLandDigiPar
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wno-ignored-qualifiers")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -Wno-ignored-qualifiers -Wformat-security")
 
 set(SYSTEM_INCLUDE_DIRECTORIES
 	${SYSTEM_INCLUDE_DIRECTORIES}
