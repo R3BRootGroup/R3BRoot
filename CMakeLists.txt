@@ -280,6 +280,7 @@ add_subdirectory (mfi)
 add_subdirectory (psp)
 add_subdirectory (timestitcher)
 add_subdirectory (compilehelper)
+add_subdirectory (tcal)
 ENDIF (NOT MODULE)
 
 Execute_Process(COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-opengl
