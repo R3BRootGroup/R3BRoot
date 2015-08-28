@@ -59,7 +59,7 @@ void R3BTCalPar::printParams()
         LOG(INFO) << "----------------------------------------------------------------------" << FairLogger::endl;
         if (t_par)
         {
-            t_par->Print();
+            t_par->printParams();
         }
     }
 }

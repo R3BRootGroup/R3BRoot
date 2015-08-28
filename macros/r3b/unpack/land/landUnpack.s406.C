@@ -72,7 +72,6 @@
   tcalFill->SetUpdateRate(updateRate);
   tcalFill->SetMinStats(minStats);
   tcalFill->SetNofModules(nModules, 20);
-  tcalFill->SetStoreDB(kTRUE); 
   run->AddTask(tcalFill);
   // ---------------------------------------------------------------------------
 

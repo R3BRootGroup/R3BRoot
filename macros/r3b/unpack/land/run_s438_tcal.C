@@ -70,14 +70,12 @@ void run(TString runNumber)
     tcalFill->SetUpdateRate(updateRate);
     tcalFill->SetMinStats(minStats);
     tcalFill->SetNofModules(nModules, 20);
-    tcalFill->SetStoreDB(kTRUE);
     run->AddTask(tcalFill);
 
     R3BLosTcalFill* losTcalFill = new R3BLosTcalFill("LosTcalFill");
     losTcalFill->SetUpdateRate(updateRate);
     losTcalFill->SetMinStats(minStats);
     losTcalFill->SetNofModules(20);
-    losTcalFill->SetStoreDB(kTRUE);
     run->AddTask(losTcalFill);
     // ---------------------------------------------------------------------------
 

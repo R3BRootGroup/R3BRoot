@@ -33,7 +33,8 @@ void R3BTCalModulePar::putParams(FairParamList* list)
     list->add("nofchannels", fNofChannels);
     list->add("bin_low", fBinLow, NCHMAX);
     list->add("bin_up", fBinUp, NCHMAX);
-    list->add("time", fTime, NCHMAX);
+    list->add("slope", fSlope, NCHMAX);
+    list->add("offset", fOffset, NCHMAX);
 }
 
 Bool_t R3BTCalModulePar::getParams(FairParamList* list)
@@ -62,7 +63,11 @@ Bool_t R3BTCalModulePar::getParams(FairParamList* list)
     {
         return kFALSE;
     }
-    if (!list->fill("time", fTime, NCHMAX))
+    if (!list->fill("slope", fSlope, NCHMAX))
+    {
+        return kFALSE;
+    }
+    if (!list->fill("offset", fOffset, NCHMAX))
     {
         return kFALSE;
     }
@@ -77,7 +82,8 @@ void R3BTCalModulePar::clear()
     for (Int_t i = 0; i < NCHMAX; i++)
     {
         fBinLow[i] = fBinUp[i] = 0;
-        fTime[i] = 0.;
+        fSlope[i] = 0.;
+        fOffset[i] = 0.;
     }
 }
 
@@ -89,34 +95,34 @@ void R3BTCalModulePar::printParams()
     LOG(INFO) << "   fNofChannels: " << fNofChannels << FairLogger::endl;
     for (Int_t i = 0; i < fNofChannels; i++)
     {
-        if ((fBinLow[i] != 0) && (fBinUp[i] != 0) && (fTime[i] != 0))
-            LOG(INFO) << "   BinLow: " << fBinLow[i] << " BinUp " << fBinUp[i] << " Time:" << fTime[i]
-                      << FairLogger::endl;
+        if ((fBinLow[i] != 0) && (fBinUp[i] != 0) && (fSlope[i] != 0))
+            LOG(INFO) << "   BinLow: " << fBinLow[i] << " BinUp " << fBinUp[i] << " Slope:" << fSlope[i]
+                      << " Offset:" << fOffset[i] << FairLogger::endl;
     }
 }
 
-Bool_t R3BTCalModulePar::Compare(const R3BTCalModulePar& that) const
+Double_t R3BTCalModulePar::GetTimeTacquila(Int_t tdc)
 {
-    //
-    Bool_t test_h = (fModuleId == that.fModuleId) && (fSide == that.fSide) && (fNofChannels == that.fNofChannels);
-
-    Bool_t test_d = kTRUE;
     for (Int_t i = 0; i < fNofChannels; i++)
     {
-
-        Int_t a = GetBinLowAt(i);
-        Int_t b = that.GetBinLowAt(i);
-        Int_t c = GetBinUpAt(i);
-        Int_t d = that.GetBinUpAt(i);
-
-        Double_t t1 = GetTimeAt(i);
-        Double_t t2 = that.GetTimeAt(i);
-        if ((a != b) || (c != d) || (t1 != t2))
+        if (tdc >= fBinLow[i] && tdc <= fBinUp[i])
         {
-            test_d = kFALSE;
-            break;
+            Double_t time = fOffset[i] + fSlope[i] * (Double_t)(tdc - fBinLow[i]);
+            return time;
         }
     }
+    return -10000.;
+}
 
-    return (test_h && test_d);
+Double_t R3BTCalModulePar::GetTimeVFTX(Int_t tdc)
+{
+    for (Int_t i = 0; i < fNofChannels; i++)
+    {
+        if (tdc == fBinLow[i])
+        {
+            Double_t time = fOffset[i];
+            return time;
+        }
+    }
+    return -10000.;
 }

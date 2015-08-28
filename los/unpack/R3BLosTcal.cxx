@@ -5,10 +5,11 @@
 
 #include "R3BLosTcal.h"
 
+#include "R3BTCalEngine.h"
 #include "R3BLosRawHit.h"
 #include "R3BLosHit.h"
-#include "R3BLosCalPar.h"
-#include "R3BLosTCalPar.h"
+#include "R3BTCalPar.h"
+#include "R3BTCalModulePar.h"
 
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
@@ -23,6 +24,7 @@ R3BLosTcal::R3BLosTcal()
     , fHit(new TClonesArray("R3BLosHit"))
     , fNHit(0)
     , fTcalPar(NULL)
+    , fClockFreq(1./VFTX_CLOCK_MHZ*1000.)
 {
 }
 
@@ -32,6 +34,7 @@ R3BLosTcal::R3BLosTcal(const char* name, Int_t iVerbose)
     , fHit(new TClonesArray("R3BLosHit"))
     , fNHit(0)
     , fTcalPar(NULL)
+    , fClockFreq(1./VFTX_CLOCK_MHZ*1000.)
 {
 }
 
@@ -47,14 +50,14 @@ R3BLosTcal::~R3BLosTcal()
 
 InitStatus R3BLosTcal::Init()
 {
-    LOG(INFO) << "R3BLosTcal::Init : read " << fTcalPar->GetNumTCalPar() << " calibration channels" << FairLogger::endl;
-    //fTcalPar->Print();
-    R3BLosTCalPar* par;
-    for(Int_t i = 0; i < fTcalPar->GetNumTCalPar(); i++)
+    LOG(INFO) << "R3BLosTcal::Init : read " << fTcalPar->GetNumModulePar() << " calibration channels" << FairLogger::endl;
+    //fTcalPar->printParams();
+    R3BTCalModulePar* par;
+    for(Int_t i = 0; i < fTcalPar->GetNumModulePar(); i++)
     {
-        par = fTcalPar->GetTCalParAt(i);
-        fMapPar[par->GetBarId()] = par;
-        par->Print();
+        par = fTcalPar->GetModuleParAt(i);
+        fMapPar[par->GetModuleId()] = par;
+        par->printParams();
     }
 
     FairRootManager* mgr = FairRootManager::Instance();
@@ -78,7 +81,7 @@ void R3BLosTcal::SetParContainers()
 {
     FairRunAna* ana = FairRunAna::Instance();
     FairRuntimeDb* rtdb = ana->GetRuntimeDb();
-    fTcalPar = (R3BLosCalPar*)(rtdb->getContainer("LosCalPar"));
+    fTcalPar = (R3BTCalPar*)(rtdb->getContainer("LosTCalPar"));
 }
 
 InitStatus R3BLosTcal::ReInit()
@@ -93,7 +96,7 @@ void R3BLosTcal::Exec(Option_t* option)
     R3BLosRawHit* rawHit;
     Int_t channel;
     Int_t tdc;
-    R3BLosTCalPar *par;
+    R3BTCalModulePar *par;
     Double_t time;
     Double_t time2;
     
@@ -133,8 +136,8 @@ void R3BLosTcal::Exec(Option_t* option)
         }
         
         tdc = rawHit->GetTdc();
-        time = Interpolate(tdc, par);
-        if(time < 0. || time > 5.)
+        time = par->GetTimeVFTX(tdc);
+        if(time < 0. || time > fClockFreq)
         {
             LOG(ERROR) << "R3BLosTcal::Exec : error in time calibration: ch=" << channel << ", tdc=" << tdc << ", time=" << time << FairLogger::endl;
             continue;
@@ -178,13 +181,13 @@ void R3BLosTcal::Exec(Option_t* option)
         }
         
         tdc = rawHit->GetTdc();
-        time = Interpolate(tdc, par);
-        if(time < 0. || time > 5.)
+        time = par->GetTimeVFTX(tdc);
+        if(time < 0. || time > fClockFreq)
         {
             LOG(ERROR) << "R3BLosTcal::Exec : error in time calibration: ch=" << channel << ", tdc=" << tdc << ", time=" << time << FairLogger::endl;
             continue;
         }
-        time2 = (rawHit->GetClock() - stopClock)*5. - (time - stopTime);
+        time2 = (rawHit->GetClock() - stopClock)*fClockFreq - (time - stopTime);
         new ((*fHit)[fNHit]) R3BLosHit(channel, time2);
         fNHit += 1;
     }
@@ -208,62 +211,7 @@ void R3BLosTcal::FinishTask()
 {
 }
 
-Double_t R3BLosTcal::Interpolate(Int_t tdc, R3BLosTCalPar* par)
-{
-    Double_t time;
-    Int_t p = -1;
-    Int_t b1, b2;
-    Double_t slope;
-    for(Int_t i = 0; i < NCHMAX; i++)
-    {
-        if(tdc >= par->GetBinLowAt(i) && tdc <= par->GetBinUpAt(i))
-        {
-            p = i;
-            break;
-        }
-    }
-    if(-1 == p)
-    {
-        return -10000.;
-    }
-    else if(0 == p)
-    {
-        b1 = (Double_t)(par->GetBinLowAt(p) + par->GetBinUpAt(p)) / 2.;
-        b2 = (Double_t)(par->GetBinLowAt(p+1) + par->GetBinUpAt(p+1)) / 2.;
-        if(b2 < b1)
-        {
-            FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "%d %d", b2, b1);
-        }
-        slope = (Double_t)(par->GetTimeAt(p+1) - par->GetTimeAt(p)) / (b2 - b1);
-        time = (Double_t)(tdc - par->GetBinLowAt(p)) * slope;
-    }
-    else if(p >= par->GetNofChannels())
-    {
-        return -10000.;
-    }
-    else if(par->GetTimeAt(p) > 5.)
-    {
-        return 5.;
-    }
-    else
-    {
-        b1 = (Double_t)(par->GetBinLowAt(p-1) + par->GetBinUpAt(p-1)) / 2.;
-        b2 = (Double_t)(par->GetBinLowAt(p) + par->GetBinUpAt(p)) / 2.;
-        if(b2 < b1)
-        {
-            FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "%d %d", b2, b1);
-        }
-        slope = (Double_t)(par->GetTimeAt(p) - par->GetTimeAt(p-1)) / (b2 - b1);
-        time = (Double_t)(tdc - par->GetBinLowAt(p)) * slope + par->GetTimeAt(p-1);
-        if(time >= par->GetTimeAt(p))
-        {
-            return par->GetTimeAt(p);
-        }
-    }
-    return time;
-}
-
-Bool_t R3BLosTcal::FindChannel(Int_t channel, R3BLosTCalPar** par)
+Bool_t R3BLosTcal::FindChannel(Int_t channel, R3BTCalModulePar** par)
 {
     (*par) = fMapPar[channel];
     if(NULL == (*par))

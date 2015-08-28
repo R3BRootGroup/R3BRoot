@@ -2,7 +2,7 @@
 #include <string>
 
 #include "TH1F.h"
-#include "TF1.h"
+#include "TMath.h"
 
 #include "FairLogger.h"
 
@@ -13,12 +13,8 @@ R3BTCalEngine::R3BTCalEngine(R3BTCalPar* param, Int_t nModules, Int_t minStats)
     : fMinStats(minStats)
     , fNModules(nModules)
     , fhData(new TH1F*[nModules])
-    , fhData100(new TH1F*[nModules])
     , fhTime(new TH1F*[nModules])
-    , f1(new TF1("f1", "[0]", 1500., 2500.))
     , fCal_Par(param)
-    , iMin(0)
-    , iMax(0)
     , fClockFreq(0.)
 {
     char strName[255];
@@ -35,19 +31,17 @@ R3BTCalEngine::~R3BTCalEngine()
 {
     for (Int_t i = 0; i < fNModules; i++)
     {
-        if(fhData[i])
+        if (fhData[i])
         {
             delete fhData[i];
         }
-        if(fhTime[i])
+        if (fhTime[i])
         {
             delete fhTime[i];
         }
     }
     delete fhData;
     delete fhTime;
-    delete fhData100;
-    delete f1;
 }
 
 void R3BTCalEngine::Fill(Int_t iModule, Int_t tdc)
@@ -61,135 +55,314 @@ void R3BTCalEngine::Fill(Int_t iModule, Int_t tdc)
 void R3BTCalEngine::CalculateParamTacquila()
 {
     fClockFreq = 1. / TACQUILA_CLOCK_MHZ * 1000.;
-    
+
     for (Int_t iModule = 0; iModule < fNModules; iModule++)
     {
-        if(fhData[iModule]->GetEntries() < fMinStats)
+        if (fhData[iModule]->GetEntries() < fMinStats)
         {
             continue;
         }
-            
+
         // Define range of channels
-        fhData100[iModule] = (TH1F*)fhData[iModule]->Clone();
-        fhData100[iModule]->Rebin(8);
-        fhData100[iModule]->Fit(f1, "QNR");
-        for (Int_t i = 256; i >= 0; i--)
-        {
-            if (fhData100[iModule]->GetBinContent(i + 1) < 0.1 * f1->GetParameter(0))
-            {
-                iMin = i - 1;
-                break;
-            }
-        }
-        for (Int_t j = 256; j < 512; j++)
-        {
-            if (fhData100[iModule]->GetBinContent(j + 1) < 0.1 * f1->GetParameter(0))
-            {
-                iMax = j + 1;
-                break;
-            }
-        }
-        if (iMax <= iMin)
-        {
-            LOG(ERROR) << "Error in definition of TCAL range" << FairLogger::endl;
-            return;
-        }
-        iMin = Int_t(((Double_t)iMin - 0.5) * 8);
-        iMax = Int_t(((Double_t)iMax + 0.5) * 8);
+        Int_t ic, iMin, iMax;
+        FindRange(fhData[iModule], ic, iMin, iMax);
         if (iMin < 0 || iMax > 4095)
         {
             return;
         }
         LOG(INFO) << "R3BTCalEngine::CalculateParamTacquila() : Range of channels: " << iMin << " - " << iMax
                   << FairLogger::endl;
+        
+        Double_t total = fhData[iModule]->Integral(iMin, iMax);
+        for(Int_t i = iMin; i <= iMax; i++)
+        {
+            fhTime[iModule]->SetBinContent(i, fhData[iModule]->Integral(iMin, i) / total * fClockFreq);
+        }
 
-        Int_t nch = 0;
-        Int_t ibin = iMin;
-        Int_t group;
-        Double_t prev_time = 0.;
+        Int_t nparam = 0;
 
         R3BTCalModulePar* pTCal = NULL;
         pTCal = new R3BTCalModulePar();
         pTCal->SetModuleId(iModule);
 
-        Int_t incr = 0;
-        while (ibin <= iMax)
+        Int_t il = ic - 10 + 1;
+        Int_t ih = ic;
+        while (il > iMin)
         {
-            // Iteratively compute parameter
-            group = CalculateBinTacquila(iModule, prev_time, ibin, 1);
-            // Fill time calibration parameter
-            for (Int_t i1 = ibin; i1 < (ibin + group); i1++)
+            Double_t slope = 0, offset = 0;
+            LinearDown(fhData[iModule], iMin, iMax, il, ih, slope, offset);
+
+            pTCal->SetBinLowAt(il, nparam);
+            pTCal->SetBinUpAt(ih, nparam);
+            pTCal->SetSlopeAt(slope, nparam);
+            pTCal->SetOffsetAt(offset, nparam);
+            pTCal->IncrementNofChannels();
+
+            nparam += 1;
+
+            ih = il;
+            il = ih - 10 + 1;
+        }
+
+        if (ih > iMin)
+        {
+            Double_t slope = 0, offset = 0;
+            Double_t tot = fhData[iModule]->Integral(iMin, iMax);
+            Double_t t1 = 0.;
+            Double_t t2 = fhData[iModule]->Integral(iMin, ih) / tot * fClockFreq;
+            slope = (t2 - t1) / (Double_t)(ih - iMin);
+            offset = t1;
+
+            pTCal->SetBinLowAt(iMin, nparam);
+            pTCal->SetBinUpAt(ih, nparam);
+            pTCal->SetSlopeAt(slope, nparam);
+            pTCal->SetOffsetAt(offset, nparam);
+            pTCal->IncrementNofChannels();
+
+            nparam += 1;
+        }
+
+        il = ic;
+        ih = ic + 10 - 1;
+        while (ih <= iMax)
+        {
+            Double_t slope = 0, offset = 0;
+            LinearUp(fhData[iModule], iMin, iMax, il, ih, slope, offset);
+
+            pTCal->SetBinLowAt(il, nparam);
+            pTCal->SetBinUpAt(ih, nparam);
+            pTCal->SetSlopeAt(slope, nparam);
+            pTCal->SetOffsetAt(offset, nparam);
+            pTCal->IncrementNofChannels();
+
+            nparam += 1;
+
+            il = ih;
+            if ((iMax - ih) < 100)
             {
-                fhTime[iModule]->SetBinContent(i1 + 1, prev_time);
+                ih = il + 5 - 1;
             }
-
-            LOG(DEBUG) << " Module: " << iModule << " bin range: " << ibin << " : " << ibin + group
-                       << " dbin: " << group << " time set: " << prev_time << FairLogger::endl;
-
-            if (pTCal)
+            else
             {
-                pTCal->SetBinLowAt(ibin, incr);
-                pTCal->SetBinUpAt(ibin + group - 1, incr);
-                pTCal->SetTimeAt(prev_time, incr);
-                pTCal->IncrementNofChannels();
+                ih = il + 10 - 1;
             }
+        }
 
-            // Next range of channels
-            ibin += group;
-            nch += 1;
-            incr++;
+        if (il < iMax)
+        {
+            Double_t slope = 0, offset = 0;
+            Double_t tot = fhData[iModule]->Integral(iMin, iMax);
+            Double_t t1 = fhData[iModule]->Integral(iMin, il) / tot * fClockFreq;
+            Double_t t2 = fClockFreq;
+            slope = (t2 - t1) / (Double_t)(iMax - il);
+            offset = t1;
+
+            pTCal->SetBinLowAt(il, nparam);
+            pTCal->SetBinUpAt(iMax, nparam);
+            pTCal->SetSlopeAt(slope, nparam);
+            pTCal->SetOffsetAt(offset, nparam);
+            pTCal->IncrementNofChannels();
+
+            nparam += 1;
         }
 
         fCal_Par->AddModulePar(pTCal);
 
-        LOG(INFO) << "R3BTCalEngine::CalculateParamTacquila() : Number of parameters: " << nch << FairLogger::endl;
-        
+        LOG(INFO) << "R3BTCalEngine::CalculateParamTacquila() : Number of parameters: " << nparam << FairLogger::endl;
+
         fhData[iModule]->Write();
         fhTime[iModule]->Write();
-        
-        LOG(INFO) << "R3BTCalEngine::CalculateParamTacquila() : Module: " << iModule << " is calibrated." << FairLogger::endl << FairLogger::endl;
-       
+
+        LOG(INFO) << "R3BTCalEngine::CalculateParamTacquila() : Module: " << iModule << " is calibrated."
+                  << FairLogger::endl
+                  << FairLogger::endl;
     }
-    
+
     fCal_Par->setChanged();
 }
 
-Int_t R3BTCalEngine::CalculateBinTacquila(Int_t iModule, Double_t& prev_time, Int_t ibin, Int_t ngroup)
+void R3BTCalEngine::CalculateParamVFTX()
 {
-    if ((ibin + ngroup) > iMax)
+    fClockFreq = 1. / VFTX_CLOCK_MHZ * 1000.;
+    
+    for (Int_t iModule = 0; iModule < fNModules; iModule++)
     {
-        Double_t total = fhData[iModule]->Integral(1, 4096);
-        Double_t itot = fhData[iModule]->Integral(1, (ibin + 1) + ngroup);
-        if (itot > 0. && total > 0.)
+        if (fhData[iModule]->GetEntries() < fMinStats)
         {
-            Double_t time = fClockFreq * itot / total; // time of channel in [ns]
-            LOG(DEBUG) << "R3BTCalEngine::CalculateBin() : bin=" << ibin << "  time=" << time << "  ngroup=" << ngroup
-                       << FairLogger::endl;
-            prev_time = time;
+            continue;
         }
-        return ngroup;
+        
+        // Define range of channels
+        Int_t ic, iMin, iMax;
+        FindRange(fhData[iModule], ic, iMin, iMax);
+        if (iMin < 0 || iMax > 4095)
+        {
+            return;
+        }
+        LOG(INFO) << "R3BTCalEngine::CalculateParamVFTX() : Range of channels: " << iMin << " - " << iMax
+        << FairLogger::endl;
+        
+        Double_t total = fhData[iModule]->Integral(iMin, iMax);
+        for(Int_t i = iMin; i <= iMax; i++)
+        {
+            fhTime[iModule]->SetBinContent(i, fhData[iModule]->Integral(iMin, i) / total * fClockFreq);
+        }
+        
+        Int_t nparam = 0;
+        
+        R3BTCalModulePar* pTCal = NULL;
+        pTCal = new R3BTCalModulePar();
+        pTCal->SetModuleId(iModule);
+        
+        for(Int_t ibin = iMin; ibin <= iMax; ibin++)
+        {
+            Double_t time = fhData[iModule]->Integral(iMin, ibin) / total;
+            if(time > 1.)
+            {
+                FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Integration error.");
+            }
+            time *= fClockFreq;
+            
+            pTCal->SetBinLowAt(ibin, nparam);
+            pTCal->SetOffsetAt(time, nparam);
+            pTCal->IncrementNofChannels();
+            nparam += 1;
+        }
+        
+        fCal_Par->AddModulePar(pTCal);
+        
+        LOG(INFO) << "R3BTCalEngine::CalculateParamVFTX() : Number of parameters: " << nparam << FairLogger::endl;
+
+        fhData[iModule]->Write();
+        fhTime[iModule]->Write();
+        
+        LOG(INFO) << "R3BTCalEngine::CalculateParamVFTX() : Module: " << iModule << " is calibrated."
+        << FairLogger::endl
+        << FairLogger::endl;
     }
-    Double_t total = fhData[iModule]->Integral(1, 4096);
-    Double_t itot = fhData[iModule]->Integral(1, (ibin + 1) + ngroup);
-    if (itot > 0. && total > 0.)
+
+    fCal_Par->setChanged();
+}
+
+void R3BTCalEngine::FindRange(TH1F* h1, Int_t& ic, Int_t& iMin, Int_t& iMax)
+{
+    Double_t mean = h1->GetMean();
+    ic = (Int_t)(mean + 0.5);
+    Double_t top = h1->Integral(ic - 4, ic + 5) / 10.;
+
+    for (Int_t i = ic; i >= 1; i--)
     {
-        Double_t time = fClockFreq * itot / total; // time of channel in [ns]
-        Double_t diff = time - prev_time;        // time difference to previous range
-        if (diff * 1e3 < 70.)                    // check if below resolution
+        if (h1->GetBinContent(i) < 0.1 * top)
         {
-            // Next iteration
-            return CalculateBinTacquila(iModule, prev_time, ibin, ngroup + 1);
-        }
-        else
-        {
-            // Finalize
-            LOG(DEBUG) << "R3BTCalEngine::CalculateBin() : bin=" << ibin << "  time=" << time << "  ngroup=" << ngroup
-                       << FairLogger::endl;
-            prev_time = time;
-            return ngroup;
+            if (h1->Integral(i - 9, i) / 10. < 0.1 * top)
+            {
+                iMin = i - 1;
+                break;
+            }
         }
     }
-    return ngroup;
+
+    for (Int_t i = ic + 1; i <= 4096; i++)
+    {
+        if (h1->GetBinContent(i) < 0.1 * top)
+        {
+            if (h1->Integral(i, i + 9) / 10. < 0.1 * top)
+            {
+                //iMax = i - 1;
+                iMax = i;
+                break;
+            }
+        }
+    }
+}
+
+void R3BTCalEngine::LinearUp(TH1F* h1, Int_t iMin, Int_t iMax, Int_t& il, Int_t& ih, Double_t& slope, Double_t& offset)
+{
+    Double_t tot = h1->Integral(iMin, iMax);
+    Double_t t1 = h1->Integral(iMin, il) / tot; // * fClockFreq;
+    Double_t t2 = h1->Integral(iMin, ih) / tot; // * fClockFreq;
+    if (t1 > 1. || t2 > 1.)
+    {
+        Fatal("LinearUp", "Integration error");
+    }
+    t1 *= fClockFreq;
+    t2 *= fClockFreq;
+    slope = (t2 - t1) / (Double_t)(ih - il);
+    offset = t1;
+
+    Double_t prec = 3. / TMath::Sqrt(h1->GetEntries());
+
+    Double_t slope1;
+
+    Int_t iter = 1;
+    while (ih <= iMax)
+    {
+        Int_t ih_next = ih + iter;
+        if (ih_next > iMax)
+        {
+            break;
+        }
+        Double_t t21 = h1->Integral(iMin, ih_next) / tot * fClockFreq;
+        slope1 = (t21 - t1) / (Double_t)(ih_next - il);
+
+        Double_t dev = TMath::Abs(slope1 - slope) / TMath::Abs(slope);
+
+        ih = ih_next;
+        iter += 1;
+
+        slope = slope1;
+        if (dev > prec)
+        {
+            break;
+        }
+    }
+}
+
+void R3BTCalEngine::LinearDown(TH1F* h1,
+                               Int_t iMin,
+                               Int_t iMax,
+                               Int_t& il,
+                               Int_t& ih,
+                               Double_t& slope,
+                               Double_t& offset)
+{
+    Double_t tot = h1->Integral(iMin, iMax);
+    Double_t t1 = h1->Integral(iMin, il) / tot * fClockFreq;
+    Double_t t2 = h1->Integral(iMin, ih) / tot * fClockFreq;
+    slope = (t2 - t1) / (Double_t)(ih - il);
+    offset = t1;
+
+    Double_t prec = 3. / TMath::Sqrt(h1->GetEntries());
+
+    Double_t slope1;
+    Double_t offset1;
+
+    Int_t iter = 1;
+    while (il >= iMin)
+    {
+        Int_t il_next = il - iter, ih_next = ih;
+        if (il_next < iMin)
+        {
+            break;
+        }
+        Double_t t11 = h1->Integral(iMin, il_next) / tot * fClockFreq;
+        Double_t t21 = h1->Integral(iMin, ih_next) / tot * fClockFreq;
+        slope1 = (t21 - t11) / (Double_t)(ih_next - il_next);
+        offset1 = t11;
+
+        Double_t dev = TMath::Abs(slope1 - slope) / TMath::Abs(slope);
+
+        il = il_next;
+        ih = ih_next;
+        iter += 1;
+
+        slope = slope1;
+        offset = offset1;
+        if (dev > prec)
+        {
+            break;
+        }
+    }
 }
 
 ClassImp(R3BTCalEngine)

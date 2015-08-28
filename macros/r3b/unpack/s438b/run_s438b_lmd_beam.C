@@ -6,8 +6,8 @@ void run(TString runNumber)
 
     const Int_t nev = -1;                                // number of events to read, -1 - untill CTRL+C
     const Int_t trigger = 1;                             // 1 - onspill, 2 - offspill. -1 - all
-    TString inDir = "/Volumes/Data/kresan/s438b/lmd/";   // directory with lmd files
-    TString outDir = "/Volumes/Data/kresan/s438b/data/"; // output directory
+    TString inDir = "/Users/kresan/data/s438b/lmd/";     // directory with lmd files
+    TString outDir = "/Users/kresan/data/s438b/data/";   // output directory
     TString histDir = "/Users/kresan/Sites/";            // web-server directory
 
     TString outputFileName = outDir + runNumber + "_raw_land.root";                  // name of output file
@@ -17,28 +17,14 @@ void run(TString runNumber)
     //const Long64_t maxSize = 1 * 1024 * 1024 * 1024;                               // 1 GByte       // file split size
 
     const char *landMappingName = "cfg_neuland_s438b.hh";   // mapping file
-    const Int_t nBarsPerPlane = 50;
+    const Int_t nBarsPerPlane = 50;                         // number of scintillator bars per plane
     const Int_t updateRate = 150000;
-    const Int_t minStats = 5000;
-    const Int_t nModules = 800;
+    const Int_t minStats = 10000;                           // minimum number of entries for TCAL calibration
+    const Int_t nModules = 800;                             // number of photomultipliers (for TCAL calibration)
 
     // Create source with unpackers ----------------------------------------------
-    Int_t iFile = 0;
-    Int_t kFile = 0;
-    if(runNumber.Contains("run336"))
-    {
-        iFile = 5395;
-        kFile = 5405;
-    }
     FairLmdSource* source = new FairLmdSource();
-    char strName[1000];
-    for(Int_t i = iFile; i < kFile; i++)
-    {
-        sprintf(strName, "%s%s_%4d.lmd", inDir.Data(), runNumber.Data(), i);
-        for(Int_t j = 0; j < 1000; j++) if(' ' == strName[j]) strName[j] = '0';
-        cout << strName << endl;
-        source->AddFile(strName);
-    }
+    source->AddPath(inDir, runNumber+"*");
 
     R3BEventHeaderUnpack *event_unpack = new R3BEventHeaderUnpack();
     source->AddUnpacker(event_unpack);
@@ -55,10 +41,10 @@ void run(TString runNumber)
     // LOS MBS parameters -----------------------------------
     type = 88;
     subType = 8800;
-    procId = 10;
-    subCrate = 7;
-    control = 5;
-    //source->AddUnpacker(new R3BLosUnpack("", type, subType, procId, subCrate, control));
+    procId = 12;
+    subCrate = 1;
+    control = 9;
+    source->AddUnpacker(new R3BLosUnpack("", type, subType, procId, subCrate, control));
     // ------------------------------------------------------
     // ---------------------------------------------------------------------------
 
@@ -89,15 +75,13 @@ void run(TString runNumber)
     tcalFill->SetMinStats(minStats);
     tcalFill->SetTrigger(trigger);
     tcalFill->SetNofModules(nModules, 50);
-    tcalFill->SetStoreDB(kTRUE);
     run->AddTask(tcalFill);
 
-    //R3BLosTcalFill* losTcalFill = new R3BLosTcalFill("LosTcalFill");
-    //losTcalFill->SetUpdateRate(updateRate);
-    //losTcalFill->SetMinStats(minStats);
-    //losTcalFill->SetNofModules(20);
-    //losTcalFill->SetStoreDB(kTRUE);
-    //run->AddTask(losTcalFill);
+    R3BLosTcalFill* losTcalFill = new R3BLosTcalFill("LosTcalFill");
+    losTcalFill->SetUpdateRate(updateRate);
+    losTcalFill->SetMinStats(minStats);
+    losTcalFill->SetNofModules(20);
+    run->AddTask(losTcalFill);
     // ---------------------------------------------------------------------------
 
     // Add analysis task ---------------------------------------------------------
