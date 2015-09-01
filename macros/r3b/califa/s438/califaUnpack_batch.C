@@ -13,7 +13,7 @@
 //
 // root -l -b -q 'califaUnpack_batch.C("1000mv_30mev_",362,364)';
 //  -------------------------------------------------------------------------
-void califaUnpack_batch(TString inputFile, Int_t firstFileNumber, Int_t lastFileNumber, Int_t nevents=-1)
+void califaUnpack_batch(TString inputFile="", Int_t firstFileNumber=-999, Int_t lastFileNumber=-999, Int_t nevents=-1)
 {
     TStopwatch timer;
     timer.Start();

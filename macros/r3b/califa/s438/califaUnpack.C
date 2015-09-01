@@ -20,7 +20,7 @@
 //    lastFileNumber is the file number of the last lmd file
 //    nevents is the number of events to read, -1 - untill CTRL+C
 //  -------------------------------------------------------------------------
-void run(TString inputFile, Int_t firstFileNumber, Int_t lastFileNumber, Int_t nevents=-1)
+void run(TString inputFile="", Int_t firstFileNumber=-999, Int_t lastFileNumber=-999, Int_t nevents=-1)
 {
     TStopwatch timer;
     timer.Start();

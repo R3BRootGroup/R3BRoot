@@ -314,4 +314,4 @@ void Plot()
   htheta[1]->Draw("colz");
 }
 
-// TODO: TMinuit to minimize Chi**2 between Angels angles and sim angles with transformation matrix T
+// TODO: TMinuit to minimize Chi**2 between Angles angles and sim angles with transformation matrix T

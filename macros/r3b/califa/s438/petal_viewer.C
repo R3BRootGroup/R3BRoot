@@ -7,7 +7,7 @@
 //     where inputFile is RAW level file!!!!
 //     
 //  -------------------------------------------------------------------------
-void petal_viewer(TString inputFile) {
+void petal_viewer(TString inputFile="") {
 
   gROOT->SetStyle("Default");
   //gStyle->SetOptTitle(0);
@@ -20,7 +20,7 @@ void petal_viewer(TString inputFile) {
 
   TH1F *E_p1[128];
   
-  int cry;
+  int cry=0;
   int fb[16]={6,5,4,3,2,1,0,7,8,15,14,13,12,11,10,9};
   //int pa[16]={15,13,7,5,14,12,6,4,11,9,3,1,10,8,2,0};
   // int pa[16]={0,2,8,10,1,3,9,11,4,6,12,14,5,7,13,15};

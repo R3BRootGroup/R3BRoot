@@ -16,6 +16,8 @@
 
 #include <map>
 
+using std::ofstream;
+
 R3BLandTdiffFill::R3BLandTdiffFill()
     : fnEvents(0)
     , fNofBars(0)

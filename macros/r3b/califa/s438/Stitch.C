@@ -1,9 +1,11 @@
 #include <unistd.h>
 
-void Stitch(const char *tree1_fNamePattern, int tree1_first, int tree1_last, const char *tree2_fName, const char *merged_treePattern, const char *merged_chainName = NULL)
+#include "../../../../build/lib/libtimestitcher.so"
+
+void Stitch(const char *tree1_fNamePattern=NULL, int tree1_first=0, int tree1_last=0, const char *tree2_fName=NULL, const char *merged_treePattern=NULL, const char *merged_chainName = NULL)
 {
    // Uhm... I should try to find a more elegent way some time...
-   gSystem->Load("../../../../build/lib/libtimestitcher.so");
+   //gSystem->Load("../../../../build/lib/libtimestitcher.so");
    gSystem->CompileMacro("../../../../timestitcher/Timestitch.C", "k,O");
 
    char *cwd = getcwd(NULL, 0);

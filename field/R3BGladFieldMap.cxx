@@ -14,6 +14,8 @@
 using std::cout;
 using std::cerr;
 using std::endl;
+using std::ofstream;
+using std::ifstream;
 using std::right;
 using std::flush;
 using std::setw;

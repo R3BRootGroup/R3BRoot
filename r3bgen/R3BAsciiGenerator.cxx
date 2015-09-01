@@ -13,9 +13,12 @@
 
 #include <iostream>
 
+using namespace std;
+
 using std::cout;
 using std::endl;
 using std::map;
+using std::ifstream;
 
 // -----   Default constructor   ------------------------------------------
 R3BAsciiGenerator::R3BAsciiGenerator()

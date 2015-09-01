@@ -17,7 +17,7 @@
 //     where inputFile is the input file :) 
 //     Define histograms and fill them in the loop!
 //  -------------------------------------------------------------------------
-void plot(TString inputFile) {
+void plot(TString inputFile="") {
 
   gROOT->SetStyle("Default");
   //gStyle->SetOptTitle(0);

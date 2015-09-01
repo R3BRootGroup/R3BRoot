@@ -41,14 +41,16 @@ void califaAna_batch(Int_t nEvents=1, Int_t fGeoVer=1, Double_t fThres=0.000050,
 	// -----   Create analysis run   ----------------------------------------
 	FairRunAna* fRun = new FairRunAna();
 	
-	
-	 TFile* file = new TFile("r3bpar.root");
-	file->Get("FairBaseParSet"); 
-	
-	// -----  Analysis routines for CALIFA	
-	
+        FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
+        FairParRootFileIo*  parIo1 = new FairParRootFileIo();
+        parIo1->open("r3bpar.root");
+        rtdb->setFirstInput(parIo1);
+        rtdb->print();
+
 	fRun->SetInputFile("r3bsim.root");
 	fRun->SetOutputFile("califaAna.root");
+	
+	// -----  Analysis routines for CALIFA	
 	
 	R3BCaloHitFinder* caloHF = new R3BCaloHitFinder();
 	//Selecting the geometry version
@@ -62,6 +64,7 @@ void califaAna_batch(Int_t nEvents=1, Int_t fGeoVer=1, Double_t fThres=0.000050,
 	// 10- CALIFA 8.11, only BARREL (ongoing work) 
 	// ...
 	caloHF->SelectGeometryVersion(fGeoVer);          
+	//caloHF->SelectGeometryVersion(10);          
 	caloHF->SetDetectionThreshold(fThres);             //50 KeV  [fThres in GeV]
 	caloHF->SetExperimentalResolution(fExpRes);        //5% at 1 MeV
 	caloHF->SetAngularWindow(fDelPolar,fDelAzimuthal); //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]

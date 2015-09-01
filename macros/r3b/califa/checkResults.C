@@ -2,7 +2,7 @@
 //
 //   ----- General Macro for R3B CALIFA Analysis results
 //         Author: Hector Alvarez <hector.alvarez@usc.es>
-//         Last Update: 01/09/10
+//         Last Update: 08/09/15 <pablo.cabanelas@usc.es>
 //         Comments:
 //			Checks the primary, crystalHits and caloHits characteristics.
 //			User configurable for additional studies.
@@ -16,25 +16,38 @@
 //	(the macro will plot and text information as a function of these settings)
 //  -------------------------------------------------------------------------
 
+		
+Double_t GetCMEnergy(Double_t theta, Double_t energy, Double_t beta=0.82){
+	//
+	// Calculating the CM energy from the lab energy and the polar angle
+	//
+	Double_t gamma = 1/sqrt(1-beta*beta);
+	//Lorenzt boost correction
+	//E' = gamma E + beta gamma P|| = gamma E + beta gamma P cos(theta) 
+	//In photons E=P
+	Double_t energyCorrect = gamma*energy - beta*gamma*energy*cos(theta);
+			
+	return energyCorrect;
+}
+
+
 void checkResults() {
-	char title0[250];
+
 	char title1[250];
 	
 	//SETTINGS 
-	char calVersion[50] = "8.11+iPhos1.01";       //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.11)
-	Double_t Eproj = 2.00;              //Gamma Energy in projectile frame in MeV 
-	Int_t totalEvents = 2000;        //Events
-	Int_t multiplicity = 1;           //Multiplicity (particles per event)
+	char calVersion[50] = "v13_811";          //Calorimeter version (5.0, 7.05, 7.07, 7.09, 7.17, 7.07+7.17,7.09+7.17, 8.11)
+	Double_t Eproj = 2.00;                    //Gamma Energy in projectile frame in MeV 
+	Int_t totalEvents = 2000;                 //Events
+	Int_t multiplicity = 1;                   //Multiplicity (particles per event)
 	
 	Double_t threshold=0.050;		  //Threshold in MeV
 	Int_t ExpRes=5;			          //Exp. Resol in MeV
 
 	//FOR THE HISTOGRAMS AND PLOTS:
-	Double_t maxE = 5;               //Maximum energy in MeV in the histos
+	Double_t maxE = 5;                        //Maximum energy in MeV in the histos
 
-	//sprintf(title0,"%s","califaAna.root");  	
- 	sprintf(title1,"%s","r3bsim.root");  	
-	//TFile *file0 = TFile::Open(title0);
+ 	sprintf(title1,"%s","sim_out.root");  	
 	TFile *file1 = TFile::Open(title1);
 	
 	Double_t beta=0.82;
@@ -46,10 +59,10 @@ void checkResults() {
 	Double_t minThetaBarrel=0. , maxThetaBarrel=0.;
         Double_t minThetaEndCap=0. , maxThetaEndCap=0.;
 
-	if(calVersion=="5.0"){
+	if(!strcmp(calVersion,"5.0")){
 		cout << "Warning: Calorimeter version 5.0 is not supported in this macro! "<< endl;
 	}
-	if( !strcmp(calVersion,"7.05") ){
+	if(!strcmp(calVersion,"7.05")){
 		cout << "Using CALIFA version 7.05 "<< endl;
 		minThetaBarrel= 32.9;    //Angular coverture of BARREL 7.05
 		maxThetaBarrel= 134.7;   //Angular coverture of BARREL 7.05
@@ -106,6 +119,15 @@ void checkResults() {
 		BARREL=kTRUE;		
 		ENDCAP=kTRUE;
 	}
+	else if(!strcmp(calVersion,"v13_811")){
+		cout << "Using CALIFA version v13_8.11 "<< endl;
+		minThetaBarrel= 43.16;   //Angular coverture of BARREL 8.11
+		maxThetaBarrel= 135.35;  //Angular coverture of BARREL 8.11
+		minThetaEndCap= 9.59;    //Angular coverture of ENDCAP
+		maxThetaEndCap= 32.10;   //Angular coverture of ENDCAP
+		BARREL=kTRUE;
+		ENDCAP=kTRUE;
+	}
 	else cout << "Error: Calorimeter version not correctly defined! "<< endl;
 		
 	// ----    Debug option   -------------------------------------------------
@@ -114,7 +136,6 @@ void checkResults() {
 		
 	
 	gROOT->SetStyle("Default");
-	//gStyle->SetOptTitle(0);
 	gStyle->SetOptStat(0);
 	gStyle->SetOptFit(0);
 	
@@ -136,16 +157,15 @@ void checkResults() {
 	TH1F* h1_TMul = new TH1F("h1_TMul","Multiplicities",20,0,20);
 	TH1F* h1_CryMul = new TH1F("h1_CryMul","Multiplicities",20,0,20);
 	TH1F* h1_CalMul = new TH1F("h1_CalMul","Multiplicities",20,0,20);
-	TH1F* h2_CC = new TH1F("h2_CC","Reconstructed (Lorenzt corrected) Primary Energy (MeV)",2000,0,maxE); //Change this maximum energy
+	TH1F* h2_CC = new TH1F("h2_CC","Reconstructed (Lorenzt corrected) Primary Energy (MeV)",2000,0,3*maxE); //Change this maximum energy
 	TH1F* h3_CC = new TH1F("h3_CC","Theta residuals if(caloHitsPerEvent==1)",400,-0.25,0.25);
 	TH1F* h4_CC = new TH1F("h4_CC","Phi residuals if(caloHitsPerEvent==1)",400,-0.25,0.25);
 	TH2F* h1_CC2 = new TH2F("h1_CC2","Multiplicity vs. polar angle",200,0,3.2,36,0,12);
-	TH2F* h2_CC2 = new TH2F("h2_CC2","Energy reconstructed vs. polar angle",50,0,3.2,400,0,maxE); //Change this maximum energy
+	TH2F* h2_CC2 = new TH2F("h2_CC2","Energy reconstructed vs. polar angle",50,0,3.2,400,0,3*maxE); //Change this maximum energy
 	TH2F* h3_CC2 = new TH2F("h3_CC2","Theta residuals vs. polar angle",100,0,3.2,100,-0.25,0.25);
 	TH2F* h4_CC2 = new TH2F("h4_CC2","Phi residuals vs. polar angle",100,0,3.2,100,-0.25,0.25);
 
 	TH1F* h1_EF = new TH1F("h1_EF","Efficiency vs. polar angle",200,0,3.2);
-	//TH1F* h2_EF = new TH1F("h2_EF","Eventos vs. polar angle",1000,0,3.2);
 
 	
 	//BARREL
@@ -164,7 +184,6 @@ void checkResults() {
 	TH1F* h2_CC_barrel = new TH1F("h2_CC_barrel","Reconstructed (Lorenzt corrected) Primary Energy (MeV)",2000,0,maxE); //Change this maximum energy
 	TH1F* h3_CC_barrel = new TH1F("h3_CC_barrel","Theta residuals if(caloHitsPerEvent==1)",400,-0.25,0.25);
 	TH1F* h4_CC_barrel = new TH1F("h4_CC_barrel","Phi residuals if(caloHitsPerEvent==1)",400,-0.25,0.25);
-	//TH1F* h1_EF_barrel = new TH1F("h1_EF_barrel","Efficiency vs. polar angle",200,0,3.2);
 
 	
 	//ENDCAP
@@ -183,20 +202,18 @@ void checkResults() {
 	TH1F* h2_CC_endcap = new TH1F("h2_CC_endcap","Reconstructed (Lorenzt corrected) Primary Energy (MeV)",2000,0,maxE); //Change this maximum energy
 	TH1F* h3_CC_endcap = new TH1F("h3_CC_endcap","Theta residuals if(caloHitsPerEvent==1)",400,-0.25,0.25);
 	TH1F* h4_CC_endcap = new TH1F("h4_CC_endcap","Phi residuals if(caloHitsPerEvent==1)",400,-0.25,0.25);
-	//TH1F* h1_EF_endcap = new TH1F("h1_EF_endcap","Efficiency vs. polar angle",200,0,3.2);
 
 	
 	//Additional user defined histos
 	TH2F* h1_User = new TH2F("h1_User","Double hits, ... where?",400,-2.5,2.5,400,-2.5,2.5);
 
-	//TTree* TCalo = (TTree*)file0->Get("cbmsim");
 	TTree* TCrystal = (TTree*)file1->Get("cbmsim");
 	
 	//Crystal Hits (input)
 	TClonesArray* crystalHitCA;  
 	R3BCaloCrystalHitSim** crystalHit;
 	crystalHitCA = new TClonesArray("R3BCaloCrystalHitSim",5);
-	TBranch *branchCrystalHit = TCrystal->GetBranch("CrystalHitSim");
+	TBranch *branchCrystalHit = TCrystal->GetBranch("CaloCrystalHitSim");
 	branchCrystalHit->SetAddress(&crystalHitCA);
 
 	//Calo Hits (output)
@@ -235,6 +252,7 @@ void checkResults() {
 	Int_t tirame=0;
 	
 	for(Int_t i=0;i<nevents;i++){
+
 	    if(i%1000 == 0) printf("Event:%i\n",i);
 				
 		crystalHitCA->Clear();
@@ -242,7 +260,6 @@ void checkResults() {
 		MCTrackCA->Clear();
 
 		TCrystal->GetEvent(i);
-		//TCalo->GetEvent(i);
 		
 		crystalHitsPerEvent = crystalHitCA->GetEntries(); 
 		caloHitsPerEvent = caloHitCA->GetEntries(); 
@@ -346,12 +363,10 @@ void checkResults() {
 						if(BARREL && caloHit[h]->GetTheta()>minThetaBarrel*TMath::Pi()/180.){
 							h3_CC_barrel->Fill(momentum.Theta() - caloHit[h]->GetTheta());
 							h4_CC_barrel->Fill(momentum.Phi() - caloHit[h]->GetPhi());
-							//h1_EF_barrel->Fill(caloHit[h]->GetTheta());
 						}
 						if(ENDCAP && caloHit[h]->GetTheta()< maxThetaEndCap*TMath::Pi()/180.) {
 							h3_CC_endcap->Fill(momentum.Theta() - caloHit[h]->GetTheta());
 							h4_CC_endcap->Fill(momentum.Phi() - caloHit[h]->GetPhi());
-							//h1_EF_endcap->Fill(caloHit[h]->GetTheta());							
 						}
 					}
 					//else ... one could think in introduce some combinatorial here to see the 
@@ -359,6 +374,7 @@ void checkResults() {
 				}
 			}
 		}
+
 		h1_CryMul->Fill(crystalHitsPerEvent);
 		h1_CalMul->Fill(caloHitsPerEvent);
 		if(BARREL) h1_CryMul_barrel->Fill(crystalHitsPerEvent_barrel);
@@ -384,10 +400,12 @@ void checkResults() {
 			h1_User->Fill(caloHit[1]->GetTheta()-caloHit[0]->GetTheta(),
 						  caloHit[1]->GetPhi()-caloHit[0]->GetPhi());
 		}
-		if(crystalHitsPerEvent) delete [] crystalHit;
-		if(caloHitsPerEvent) delete [] caloHit;
-		if(MCtracksPerEvent) delete [] track;
+
+		if(crystalHitsPerEvent) delete[] crystalHit;
+		if(caloHitsPerEvent)    delete[] caloHit;
+		if(MCtracksPerEvent)    delete[] track;
 	}
+
 	TCanvas* c1 = new TCanvas("MCTrack","MCTrack",0,0,720,900);
 	c1->SetFillColor(0);
 	c1->SetFrameFillColor(0);
@@ -447,9 +465,9 @@ void checkResults() {
 	//MC TRACK CANVAS
 	c1->cd();
 	c1->Divide(2,2);
-	c1->cd(1);	h1_T->Draw();   MCTrack_1->SetFrameBorderMode(0);
-	c1->cd(2);	h2_T->Draw();	MCTrack_2->SetFrameBorderMode(0);
-	c1->cd(3);	h3_T->Draw();	MCTrack_3->SetFrameBorderMode(0);
+	c1->cd(1);	h1_T->Draw();
+	c1->cd(2);	h2_T->Draw();
+	c1->cd(3);	h3_T->Draw();
 	TLine* line1 = new TLine(0,0,0,0);
 	line1->SetLineStyle(2);
 	line1->Draw();
@@ -461,7 +479,7 @@ void checkResults() {
 		line1->DrawLine(minThetaEndCap*TMath::Pi()/180.,0.,minThetaEndCap*TMath::Pi()/180.,10000);
 		line1->DrawLine(maxThetaEndCap*TMath::Pi()/180.,0.,maxThetaEndCap*TMath::Pi()/180.,10000);
 	}
-	c1->cd(4);	h4_T->Draw();	MCTrack_4->SetFrameBorderMode(0);
+	c1->cd(4);	h4_T->Draw();
 	c1->cd();
 	c1_2 = new TPad("c1_2", "c1_2",0.,0.,0.9,0.03);	
 	c1_2->Draw();
@@ -474,10 +492,10 @@ void checkResults() {
 	//CRYSTAL HIT CANVAS
 	c2->cd();
 	c2->Divide(2,2);
-	c2->cd(1); h1_Cry->Draw();	crystalHit_1->SetFrameBorderMode(0);
-	c2->cd(2); h2_Cry->Draw();	crystalHit_2->SetFrameBorderMode(0);	crystalHit_2->SetLogy();
-	c2->cd(3); h3_Cry->Draw();	crystalHit_3->SetFrameBorderMode(0);
-	c2->cd(4); h4_Cry->Draw();	crystalHit_4->SetFrameBorderMode(0);
+	c2->cd(1); h1_Cry->Draw();
+	c2->cd(2); h2_Cry->Draw(); c2->cd(2)->SetLogy();
+	c2->cd(3); h3_Cry->Draw();
+	c2->cd(4); h4_Cry->Draw();
 	c2->cd();
 	TPad* c2_2 = new TPad("c2_2", "c2_2",0.,0.,0.9,0.03);	
 	c2_2->Draw();
@@ -491,9 +509,9 @@ void checkResults() {
 	//CALORIMETER HIT CANVAS	
 	c3->cd();
 	c3->Divide(2,2);
-	c3->cd(1); h1_Cal->Draw();	caloHit_1->SetFrameBorderMode(0);
-	c3->cd(2); h2_Cal->Draw();	caloHit_2->SetFrameBorderMode(0);	caloHit_2->SetLogy();
-	c3->cd(3); h3_Cal->Draw();	caloHit_3->SetFrameBorderMode(0);
+	c3->cd(1); h1_Cal->Draw();
+	c3->cd(2); h2_Cal->Draw(); c3->cd(2)->SetLogy();
+	c3->cd(3); h3_Cal->Draw();
 	
 	TLine* line2 = new TLine(0,0,0,0);
 	line2->SetLineStyle(2);
@@ -507,7 +525,7 @@ void checkResults() {
 		line2->DrawLine(maxThetaEndCap*TMath::Pi()/180.,0.,maxThetaEndCap*TMath::Pi()/180.,10000);
 	}
 	
-	c3->cd(4); h4_Cal->Draw();	caloHit_4->SetFrameBorderMode(0);
+	c3->cd(4); h4_Cal->Draw();
 	c3->cd();
 	TPad* c3_2 = new TPad("c3_2", "c3_2",0.,0.,0.9,0.03);	
 	c3_2->Draw();
@@ -526,34 +544,36 @@ void checkResults() {
 	c4->cd(1);   
 	h1_TMul->GetYaxis()->SetRangeUser(1, 2*totalEvents*multiplicity);
 	h1_TMul->Draw(); h1_CalMul->Draw("SAME"); h1_CryMul->Draw("SAME");    
-	correlations_1->SetFrameBorderMode(0);	correlations_1->SetLogy();
+	c4->cd(1)->SetLogy();
 
 	TLatex Tl;
 	Tl.SetTextSize(0.06);	Tl.DrawLatex(12, 10000, "Primary");
 	Tl.SetTextSize(0.06);   Tl.SetTextColor(2);  Tl.DrawLatex(12, 3500, "Crystal");
 	Tl.SetTextSize(0.06);   Tl.SetTextColor(4);  Tl.DrawLatex(12, 1000, "Calorimeter");
 	
+	Double_t mean = 0., sigma = 0., sigmaPol = 0.;
+	Double_t mean_barrel = 0., sigma_barrel = 0.;
+	Double_t mean_endcap = 0., sigma_endcap = 0.;
+
 	c4->cd(2);
 	h2_CC->Fit("gaus","","",Eproj-0.1*Eproj,Eproj+0.1*Eproj); 
 	//getting the value of the fit parameters
 	TF1 *myfunc = h2_CC->GetFunction("gaus");
-	Double_t mean = myfunc->GetParameter(1); //value of 2st parameter (mean)
-	Double_t sigma = myfunc->GetParameter(2); //value of 2st parameter (sigma)
+	if(myfunc!=NULL) mean = myfunc->GetParameter(1); //value of 2st parameter (mean)
+	if(myfunc!=NULL) sigma = myfunc->GetParameter(2); //value of 2st parameter (sigma)
 	cout<< "TESTING mean: "<<mean <<",  sigma: "<< sigma<< endl;
 	h2_CC->Draw(); 
-	correlations_2->SetFrameBorderMode(0); correlations_2->SetLogy();
+	c4->cd(2)->SetLogy();
 	c4->cd(3); gStyle->SetOptStat(1); gStyle->SetOptFit(1); 
 	h3_CC->Fit("gaus","","",-0.03,0.03); 
 	//getting the value of the fit parameters
 	TF1 *myfuncPol = h3_CC->GetFunction("gaus");
-	Double_t sigmaPol = myfuncPol->GetParameter(2); //value of 2st parameter (mean)
+	if(myfuncPol!=NULL) sigmaPol = myfuncPol->GetParameter(2); //value of 2st parameter (mean)
 	cout<< "TESTING sigmaPol: "<< sigmaPol<< endl;
 	h3_CC->Draw(); 
-	correlations_3->SetFrameBorderMode(0);
 	c4->cd(4); gStyle->SetOptStat(1); gStyle->SetOptFit(1); 
 	h4_CC->Fit("gaus","","",-0.06,0.06); 
 	h4_CC->Draw(); 
-	correlations_4->SetFrameBorderMode(0); 
 	c4->cd();
 	TPad* c4_2 = new TPad("c4_2", "c4_2",0.,0.,0.9,0.03);
 	c4_2->Draw();
@@ -569,10 +589,10 @@ void checkResults() {
 	c6->Divide(2,2);
 	gStyle->SetOptStat(0);
 	gStyle->SetOptFit(0);
-	c6->cd(1);	correlations2_1->SetFrameBorderMode(0);	h1_CC2->Draw("ZCOL");
-	c6->cd(2);	correlations2_2->SetFrameBorderMode(0);	h2_CC2->Draw("ZCOL"); correlations2_2->SetLogz();
-	c6->cd(3);	correlations2_3->SetFrameBorderMode(0); h3_CC2->Draw("ZCOL"); correlations2_3->SetLogz();
-	c6->cd(4);	correlations2_4->SetFrameBorderMode(0); h4_CC2->Draw("ZCOL"); correlations2_4->SetLogz();
+	c6->cd(1);	h1_CC2->Draw("ZCOL");
+	c6->cd(2);	h2_CC2->Draw("ZCOL"); c6->cd(2)->SetLogz();
+	c6->cd(3);	h3_CC2->Draw("ZCOL"); c6->cd(3)->SetLogz();
+	c6->cd(4);	h4_CC2->Draw("ZCOL"); c6->cd(4)->SetLogz();
 	c6->cd();
 	TPad* c6_2 = new TPad("c6_2", "c6_2",0.,0.,0.9,0.03);	
 	c6_2->Draw();
@@ -588,20 +608,19 @@ void checkResults() {
 	gStyle->SetOptStat(0);
 	gStyle->SetOptFit(0);
 	
-	c5->cd(1);	User_1->SetFrameBorderMode(0); h1_User->Draw();
-	c5->cd(2);	User_2->SetFrameBorderMode(0); h3_T->Draw();
-	c5->cd(3);	User_3->SetFrameBorderMode(0); h1_EF->Draw();
-	c5->cd(4);	User_4->SetFrameBorderMode(0); //h2_EF->Draw();
+	c5->cd(1); h1_User->Draw();
+	c5->cd(2); h3_T->Draw();
+	c5->cd(3); h1_EF->Draw();
 	c5->cd();
 
 	if(BARREL) {
 		//CRYSTAL HIT CANVAS -- ONLY BARREL!!!
 		c2_barrel->cd();
 		c2_barrel->Divide(2,2);
-		c2_barrel->cd(1); h1_Cry_barrel->Draw();	crystalHit_barrel_1->SetFrameBorderMode(0);
-		c2_barrel->cd(2); h2_Cry_barrel->Draw();	crystalHit_barrel_2->SetFrameBorderMode(0);	crystalHit_barrel_2->SetLogy();
-		c2_barrel->cd(3); h3_Cry_barrel->Draw();	crystalHit_barrel_3->SetFrameBorderMode(0);
-		c2_barrel->cd(4); h4_Cry_barrel->Draw();	crystalHit_barrel_4->SetFrameBorderMode(0);
+		c2_barrel->cd(1); h1_Cry_barrel->Draw();
+		c2_barrel->cd(2); h2_Cry_barrel->Draw(); c2_barrel->cd(2)->SetLogy();
+		c2_barrel->cd(3); h3_Cry_barrel->Draw();
+		c2_barrel->cd(4); h4_Cry_barrel->Draw();
 		c2_barrel->cd();
 		TPad* c2_2_barrel = new TPad("c2_2_barrel", "c2_2_barrel",0.,0.,0.9,0.03);	
 		c2_2_barrel->Draw();
@@ -615,9 +634,9 @@ void checkResults() {
 		//CALORIMETER HIT CANVAS -- ONLY BARREL!!!	
 		c3_barrel->cd();
 		c3_barrel->Divide(2,2);
-		c3_barrel->cd(1); h1_Cal_barrel->Draw();	caloHit_barrel_1->SetFrameBorderMode(0);
-		c3_barrel->cd(2); h2_Cal_barrel->Draw();	caloHit_barrel_2->SetFrameBorderMode(0);	caloHit_barrel_2->SetLogy();
-		c3_barrel->cd(3); h3_Cal_barrel->Draw();	caloHit_barrel_3->SetFrameBorderMode(0);
+		c3_barrel->cd(1); h1_Cal_barrel->Draw();
+		c3_barrel->cd(2); h2_Cal_barrel->Draw(); c3_barrel->cd(2)->SetLogy();
+		c3_barrel->cd(3); h3_Cal_barrel->Draw();
 	
 		TLine* line2_barrel = new TLine(0,0,0,0);
 		line2_barrel->SetLineStyle(2);
@@ -629,7 +648,7 @@ void checkResults() {
 			line2_barrel->DrawLine(maxThetaEndCap*TMath::Pi()/180.,0.,maxThetaEndCap*TMath::Pi()/180.,10000);
 		}
 	
-		c3_barrel->cd(4); h4_Cal_barrel->Draw();	caloHit_barrel_4->SetFrameBorderMode(0);
+		c3_barrel->cd(4); h4_Cal_barrel->Draw();
 		c3_barrel->cd();
 		TPad* c3_2_barrel = new TPad("c3_2_barrel", "c3_2_barrel",0.,0.,0.9,0.03);	
 		c3_2_barrel->Draw();
@@ -648,30 +667,28 @@ void checkResults() {
 		c4_barrel->cd(1);   
 		h1_TMul_barrel->GetYaxis()->SetRangeUser(1, 2*totalEvents*multiplicity);
 		h1_TMul_barrel->Draw(); h1_CalMul_barrel->Draw("SAME"); h1_CryMul_barrel->Draw("SAME");    
-		correlations_barrel_1->SetFrameBorderMode(0);	correlations_barrel_1->SetLogy();
+		c4_barrel->cd(1)->SetLogy();
 	
 		TLatex Tl_barrel;
 		Tl_barrel.SetTextSize(0.06);	Tl_barrel.DrawLatex(12, 10000, "Primary");
-		Tl_barrel.SetTextSize(0.06);   Tl_barrel.SetTextColor(2);  Tl_barrel.DrawLatex(12, 3500, "Crystal");
-		Tl_barrel.SetTextSize(0.06);   Tl_barrel.SetTextColor(4);  Tl_barrel.DrawLatex(12, 1000, "Calorimeter");
+		Tl_barrel.SetTextSize(0.06);    Tl_barrel.SetTextColor(2);  Tl_barrel.DrawLatex(12, 3500, "Crystal");
+		Tl_barrel.SetTextSize(0.06);    Tl_barrel.SetTextColor(4);  Tl_barrel.DrawLatex(12, 1000, "Calorimeter");
 	
 		c4_barrel->cd(2);
 		h2_CC_barrel->Fit("gaus","","",Eproj-0.05*Eproj,Eproj+0.05*Eproj); 
 		//getting the value of the fit parameters
 		TF1 *myfunc_barrel = h2_CC_barrel->GetFunction("gaus");
-		Double_t mean_barrel = myfunc_barrel->GetParameter(1); //value of 2st parameter (mean)
-		Double_t sigma_barrel = myfunc_barrel->GetParameter(2); //value of 2st parameter (mean)
+		if(myfunc_barrel!=NULL) mean_barrel = myfunc_barrel->GetParameter(1); //value of 2st parameter (mean)
+		if(myfunc_barrel!=NULL) sigma_barrel = myfunc_barrel->GetParameter(2); //value of 2st parameter (mean)
 		cout<< "TESTING mean_barrel: "<<mean_barrel <<",  sigma_barrel: "<< sigma_barrel<< endl;
 		h2_CC_barrel->Draw(); 
-		correlations_barrel_2->SetFrameBorderMode(0); correlations_barrel_2->SetLogy();
+		c4_barrel->cd(2)->SetLogy();
 		c4_barrel->cd(3); gStyle->SetOptStat(1); gStyle->SetOptFit(1); 
 		h3_CC_barrel->Fit("gaus","","",-0.03,0.03); 
 		h3_CC_barrel->Draw(); 
-		correlations_barrel_3->SetFrameBorderMode(0);
 		c4_barrel->cd(4); gStyle->SetOptStat(1); gStyle->SetOptFit(1); 
 		h4_CC_barrel->Fit("gaus","","",-0.06,0.06); 
 		h4_CC_barrel->Draw(); 
-		correlations_barrel_4->SetFrameBorderMode(0); 
 		c4_barrel->cd();
 		TPad* c4_2_barrel = new TPad("c4_2_barrel", "c4_2_barrel",0.,0.,0.9,0.03);	
 		c4_2_barrel->Draw();
@@ -687,10 +704,10 @@ void checkResults() {
 		//CRYSTAL HIT CANVAS -- ONLY ENDCAP!!!
 		c2_endcap->cd();
 		c2_endcap->Divide(2,2);
-		c2_endcap->cd(1); h1_Cry_endcap->Draw();	crystalHit_endcap_1->SetFrameBorderMode(0);
-		c2_endcap->cd(2); h2_Cry_endcap->Draw();	crystalHit_endcap_2->SetFrameBorderMode(0);	crystalHit_endcap_2->SetLogy();
-		c2_endcap->cd(3); h3_Cry_endcap->Draw();	crystalHit_endcap_3->SetFrameBorderMode(0);
-		c2_endcap->cd(4); h4_Cry_endcap->Draw();	crystalHit_endcap_4->SetFrameBorderMode(0);
+		c2_endcap->cd(1); h1_Cry_endcap->Draw();
+		c2_endcap->cd(2); h2_Cry_endcap->Draw(); c2_endcap->cd(2)->SetLogy();
+		c2_endcap->cd(3); h3_Cry_endcap->Draw();
+		c2_endcap->cd(4); h4_Cry_endcap->Draw();
 		c2_endcap->cd();
 		TPad* c2_2_endcap = new TPad("c2_2_endcap", "c2_2_endcap",0.,0.,0.9,0.03);	
 		c2_2_endcap->Draw();
@@ -704,9 +721,9 @@ void checkResults() {
 		//CALORIMETER HIT CANVAS -- ONLY ENDCAP!!!	
 		c3_endcap->cd();
 		c3_endcap->Divide(2,2);
-		c3_endcap->cd(1); h1_Cal_endcap->Draw();	caloHit_endcap_3->SetFrameBorderMode(0);
-		c3_endcap->cd(2); h2_Cal_endcap->Draw();	caloHit_endcap_3->SetFrameBorderMode(0);	caloHit_endcap_2->SetLogy();
-		c3_endcap->cd(3); h3_Cal_endcap->Draw();	caloHit_endcap_3->SetFrameBorderMode(0);
+		c3_endcap->cd(1); h1_Cal_endcap->Draw();
+		c3_endcap->cd(2); h2_Cal_endcap->Draw(); c3_endcap->cd(2)->SetLogy();
+		c3_endcap->cd(3); h3_Cal_endcap->Draw();
 		
 		TLine* line2_endcap = new TLine(0,0,0,0);
 		line2_endcap->SetLineStyle(2);
@@ -718,7 +735,7 @@ void checkResults() {
 			line2->DrawLine(maxThetaBarrel*TMath::Pi()/180.,0.,maxThetaBarrel*TMath::Pi()/180.,10000);
 		}
 		
-		c3_endcap->cd(4); h4_Cal_endcap->Draw();	caloHit_endcap_4->SetFrameBorderMode(0);
+		c3_endcap->cd(4); h4_Cal_endcap->Draw();
 		c3_endcap->cd();
 		TPad* c3_2_endcap = new TPad("c3_2_endcap", "c3_2_endcap",0.,0.,0.9,0.03);	
 		c3_2_endcap->Draw();
@@ -737,30 +754,28 @@ void checkResults() {
 		c4_endcap->cd(1);   
 		h1_TMul_endcap->GetYaxis()->SetRangeUser(1, 2*totalEvents*multiplicity);
 		h1_TMul_endcap->Draw(); h1_CalMul_endcap->Draw("SAME"); h1_CryMul_endcap->Draw("SAME");    
-		correlations_endcap_1->SetFrameBorderMode(0);	correlations_endcap_1->SetLogy();
+		c4_endcap->cd(1)->SetLogy();
 		
 		TLatex Tl_endcap;
 		Tl_endcap.SetTextSize(0.06);	Tl_endcap.DrawLatex(12, 10000, "Primary");
-		Tl_endcap.SetTextSize(0.06);   Tl_endcap.SetTextColor(2);  Tl_endcap.DrawLatex(12, 3500, "Crystal");
-		Tl_endcap.SetTextSize(0.06);   Tl_endcap.SetTextColor(4);  Tl_endcap.DrawLatex(12, 1000, "Calorimeter");
+		Tl_endcap.SetTextSize(0.06);    Tl_endcap.SetTextColor(2);  Tl_endcap.DrawLatex(12, 3500, "Crystal");
+		Tl_endcap.SetTextSize(0.06);    Tl_endcap.SetTextColor(4);  Tl_endcap.DrawLatex(12, 1000, "Calorimeter");
 		
 		c4_endcap->cd(2);
 		h2_CC_endcap->Fit("gaus","","",Eproj-0.05*Eproj,Eproj+0.05*Eproj); 
 		//getting the value of the fit parameters
 		TF1 *myfunc_endcap = h2_CC_endcap->GetFunction("gaus");
-		Double_t mean_endcap = myfunc_endcap->GetParameter(1); //value of 2st parameter (mean)
-		Double_t sigma_endcap = myfunc_endcap->GetParameter(2); //value of 2st parameter (mean)
+		if(myfunc_endcap!=NULL) mean_endcap = myfunc_endcap->GetParameter(1); //value of 2st parameter (mean)
+		if(myfunc_endcap!=NULL) sigma_endcap = myfunc_endcap->GetParameter(2); //value of 2st parameter (mean)
 		cout<< "TESTING mean_endcap: "<<mean_endcap <<",  sigma_endcap: "<< sigma_endcap<< endl;
 		h2_CC_endcap->Draw(); 
-		correlations_endcap_2->SetFrameBorderMode(0); correlations_endcap_2->SetLogy();
+		c4_endcap->cd(2)->SetLogy();
 		c4_endcap->cd(3); gStyle->SetOptStat(1); gStyle->SetOptFit(1); 
 		h3_CC_endcap->Fit("gaus","","",-0.03,0.03); 
 		h3_CC_endcap->Draw(); 
-		correlations_endcap_3->SetFrameBorderMode(0);
 		c4_endcap->cd(4); gStyle->SetOptStat(1); gStyle->SetOptFit(1); 
 		h4_CC_endcap->Fit("gaus","","",-0.06,0.06); 
 		h4_CC_endcap->Draw(); 
-		correlations_endcap_4->SetFrameBorderMode(0); 
 		c4_endcap->cd();
 		TPad* c4_2_endcap = new TPad("c4_2_endcap", "c4_2_endcap",0.,0.,0.9,0.03);	
 		c4_2_endcap->Draw();
@@ -774,48 +789,49 @@ void checkResults() {
 	//IN CASE THE FIt IS NOT AUTOMATICALLY DONE PROPERLY...
 	//SOME PREVIOUS RESULT (plot first the energy corrected and check it)!
 	if(0){
-		mean = 4.98171e+00;       //Mean of energy peak fit
-		sigma = 9.16487e-02;      //Sigma of energy peak fit
-		mean_barrel = 4.99329e+00;       //Mean of energy peak fit
-		sigma_barrel = 7.58946e-02;      //Sigma of energy peak fit
-		mean_endcap = 4.94582e+00;       //Mean of energy peak fit
-		sigma_endcap = 1.16033e-01;      //Sigma of energy peak fit
-		sigmaPol = 1.84747e-02;   //Sigma of polar angle fit
+		mean = 4.98171e+00;          //Mean of energy peak fit
+		sigma = 9.16487e-02;         //Sigma of energy peak fit
+		mean_barrel = 4.99329e+00;   //Mean of energy peak fit
+		sigma_barrel = 7.58946e-02;  //Sigma of energy peak fit
+		mean_endcap = 4.94582e+00;   //Mean of energy peak fit
+		sigma_endcap = 1.16033e-01;  //Sigma of energy peak fit
+		sigmaPol = 1.84747e-02;      //Sigma of polar angle fit
 	}
 	
 	//DATA
 	//Previous calculations
-	Int_t particlesInBarrel = h3_T->Integral(minThetaBarrel,maxThetaBarrel);  //angular coverture of BARREL
-	Int_t particlesInEndCap = h3_T->Integral(minThetaEndCap,maxThetaEndCap);  //angular coverture of ENDCAP
+	Double_t particlesInBarrel = h3_T->Integral(minThetaBarrel,maxThetaBarrel);  //angular coverture of BARREL
+	Double_t particlesInEndCap = h3_T->Integral(minThetaEndCap,maxThetaEndCap);  //angular coverture of ENDCAP
 
 	Double_t resolution = (2.35*sigma*100)/mean;
 	Int_t binLeft2Sigma = h2_CC->FindBin(mean-2*sigma);
 	Int_t binRight2Sigma = h2_CC->FindBin(mean+2*sigma);
-	Int_t photopeakParticles2Sigma =h2_CC->Integral(binLeft2Sigma,binRight2Sigma);
+	Double_t photopeakParticles2Sigma = h2_CC->Integral(binLeft2Sigma,binRight2Sigma);
 	Int_t binLeft3Sigma = h2_CC->FindBin(mean-3*sigma);
 	Int_t binRight3Sigma = h2_CC->FindBin(mean+3*sigma);
-	Int_t photopeakParticles3Sigma = h2_CC->Integral(binLeft3Sigma,binRight3Sigma);
+	Double_t photopeakParticles3Sigma = h2_CC->Integral(binLeft3Sigma,binRight3Sigma);
+	Double_t photopeakParticles2Sigma_barrel = 0., photopeakParticles2Sigma_endcap = 0.;
+	Double_t photopeakParticles3Sigma_barrel = 0., photopeakParticles3Sigma_endcap = 0.;
         if(BARREL) {
 		Double_t resolution_barrel = (2.35*sigma_barrel*100)/mean_barrel;
 		Int_t binLeft2Sigma_barrel = h2_CC_barrel->FindBin(mean_barrel-2*sigma_barrel);
 		Int_t binRight2Sigma_barrel = h2_CC_barrel->FindBin(mean_barrel+2*sigma_barrel);
-		Int_t photopeakParticles2Sigma_barrel =h2_CC_barrel->Integral(binLeft2Sigma_barrel,binRight2Sigma_barrel);
+		photopeakParticles2Sigma_barrel = h2_CC_barrel->Integral(binLeft2Sigma_barrel,binRight2Sigma_barrel);
 		Int_t binLeft3Sigma_barrel = h2_CC_barrel->FindBin(mean_barrel-3*sigma_barrel);
 		Int_t binRight3Sigma_barrel = h2_CC_barrel->FindBin(mean_barrel+3*sigma_barrel);
-		Int_t photopeakParticles3Sigma_barrel = h2_CC_barrel->Integral(binLeft3Sigma_barrel,binRight3Sigma_barrel);
+		photopeakParticles3Sigma_barrel = h2_CC_barrel->Integral(binLeft3Sigma_barrel,binRight3Sigma_barrel);
         }
         if(ENDCAP) {
 		Double_t resolution_endcap = (2.35*sigma_endcap*100)/mean_endcap;
 		Int_t binLeft2Sigma_endcap = h2_CC_endcap->FindBin(mean_endcap-2*sigma_endcap);
 		Int_t binRight2Sigma_endcap = h2_CC_endcap->FindBin(mean_endcap+2*sigma_endcap);
-		Int_t photopeakParticles2Sigma_endcap =h2_CC_endcap->Integral(binLeft2Sigma_endcap,binRight2Sigma_endcap);
+		photopeakParticles2Sigma_endcap = h2_CC_endcap->Integral(binLeft2Sigma_endcap,binRight2Sigma_endcap);
 		Int_t binLeft3Sigma_endcap = h2_CC_endcap->FindBin(mean_endcap-3*sigma_endcap);
 		Int_t binRight3Sigma_endcap = h2_CC_endcap->FindBin(mean_endcap+3*sigma_endcap);
-		Int_t photopeakParticles3Sigma_endcap = h2_CC_endcap->Integral(binLeft3Sigma_endcap,binRight3Sigma_endcap);
+		photopeakParticles3Sigma_endcap = h2_CC_endcap->Integral(binLeft3Sigma_endcap,binRight3Sigma_endcap);
         }
 	
-	cout << endl << endl 
-		 << "CALIFA version: " << calVersion 
+	cout << endl << endl << "CALIFA version: " << calVersion 
 	<< "      Particle energy: " << Eproj 
 	<< "      Events:  " << totalEvents  << endl;	
 	cout << "Multiplicity: " <<  multiplicity << " particles/event" << endl;
@@ -832,11 +848,11 @@ void checkResults() {
 	if(BARREL) {
 		cout << "Particles in the Barrel = " << particlesInBarrel << " between angles " << minThetaBarrel << " and " << maxThetaBarrel << endl;
 		cout << "Mean number of crystals with signal in Barrel: " << h1_CryMul_barrel->GetMean() << endl;
-		cout << "Mean number of crystals with signal in Barrel per primary: " << (Double_t)h1_CryMul_barrel->Integral(2,50)/(Double_t)(totalEvents*multiplicity) << endl;
+		cout << "Mean number of crystals with signal in Barrel per primary: " << h1_CryMul_barrel->Integral(2,50)/(Double_t)(totalEvents*multiplicity) << endl;
 		cout << "Mean number of crystals with signal in Barrel per primary in Barrel: "
 			<< (Double_t)h1_CryMul_barrel->GetMean()*totalEvents*multiplicity/(Double_t)particlesInBarrel << endl;
 		cout << "Mean number of calorimeter hits in Barrel: " << h1_CalMul_barrel->GetMean() << endl;
-		cout << "Mean number of calorimeter hits in Barrel per primary: " << (Double_t)h1_CalMul_barrel->Integral(2,50)/(Double_t)(totalEvents*multiplicity) << endl;
+		cout << "Mean number of calorimeter hits in Barrel per primary: " << h1_CalMul_barrel->Integral(2,50)/(Double_t)(totalEvents*multiplicity) << endl;
 		cout << "Mean number of calorimeter hits in Barrel per primary in Barrel: "
 		<< (Double_t)h1_CalMul_barrel->GetMean()*totalEvents*multiplicity/(Double_t)particlesInBarrel << endl;
 		cout << "Particles in barrel / all particles: " << (Double_t)particlesInBarrel*100/(Double_t)(totalEvents*multiplicity) << "%" << endl<< endl;
@@ -844,11 +860,11 @@ void checkResults() {
 	if(ENDCAP){
 		cout << "Particles in the EndCap = " << particlesInEndCap << " between angles " << minThetaEndCap << " and " << maxThetaEndCap << endl;
 		cout << "Mean number of crystals with signal in EndCap: " << h1_CryMul_endcap->GetMean() << endl;
-		cout << "Mean number of crystals with signal in EndCap per primary: " << (Double_t)h1_CryMul_endcap->Integral(2,50)/((Double_t)(totalEvents*multiplicity)) << endl;
+		cout << "Mean number of crystals with signal in EndCap per primary: " << h1_CryMul_endcap->Integral(2,50)/((Double_t)(totalEvents*multiplicity)) << endl;
 		cout << "Mean number of crystals with signal in EndCap per primary in EndCap: " 
 		<< (Double_t)h1_CryMul_endcap->GetMean()*totalEvents*multiplicity/(Double_t)particlesInEndCap << endl;
 		cout << "Mean number of calorimeter hits in EndCap: " << h1_CalMul_endcap->GetMean() << endl;
-		cout << "Mean number of calorimeter hits in EndCap per primary: " << (Double_t)h1_CalMul_endcap->Integral(2,50)/(Double_t)(totalEvents*multiplicity) << endl;
+		cout << "Mean number of calorimeter hits in EndCap per primary: " << h1_CalMul_endcap->Integral(2,50)/(Double_t)(totalEvents*multiplicity) << endl;
 		cout << "Mean number of calorimeter hits in EndCap per primary in EndCap: "
 		<< (Double_t)h1_CalMul_endcap->GetMean()*(Double_t)totalEvents*multiplicity/(Double_t)particlesInEndCap << endl;
 		cout << "Particles in endcap / all particles: " << (Double_t)particlesInEndCap*100/(Double_t)(totalEvents*multiplicity) << "%" << endl<< endl;		
@@ -877,12 +893,12 @@ void checkResults() {
   	sprintf(oT1,"%s%s%s%f%s%i","CALIFA version: ",calVersion,";  Particle energy: ",Eproj," MeV;  Events: ",totalEvents);  	
 	sprintf(oT2,"%s%i%s%f%s%i%s","Multiplicity: ",multiplicity,";   Threshold: ",threshold," MeV;    Exp. resolution: ", ExpRes,"%");
   	sprintf(oT3,"%s%i%s","Particles emitted: totalEvents * multiplicity = ",totalEvents *  multiplicity," total particles ");
-	sprintf(oT4,"%s%i%s%i","Total crystals with signal: ",h1_Cry->GetEntries(), "  above threshold: ",h1_Cry_count->GetEntries()); 
-	sprintf(oT5,"%s%i","Total calorimeter hits: ",h1_Cal->GetEntries()); 
+	sprintf(oT4,"%s%f%s%f","Total crystals with signal: ",h1_Cry->GetEntries(), "  above threshold: ",h1_Cry_count->GetEntries()); 
+	sprintf(oT5,"%s%f","Total calorimeter hits: ",h1_Cal->GetEntries()); 
   	sprintf(oT6,"%s%f","Mean number of crystals with signal per event: ",h1_CryMul->GetMean());
 	sprintf(oT7,"%s%f","Mean number of calorimeter hits per event: ",h1_CalMul->GetMean());
 	
-	if(BARREL)sprintf(oT8,"%s%i%s%f%s%f","Particles in the Barrel: ",particlesInBarrel," between angles ",minThetaBarrel," and ",maxThetaBarrel);
+	if(BARREL)sprintf(oT8,"%s%f%s%f%s%f","Particles in the Barrel: ",particlesInBarrel," between angles ",minThetaBarrel," and ",maxThetaBarrel);
 	if(BARREL)sprintf(oT9,"%s%f","Mean number of crystals with signal in Barrel: ",h1_CryMul_barrel->GetMean());
   	if(BARREL)sprintf(oT10,"%s%f","Mean number of crystals with signal in Barrel per primary: ",(Double_t)h1_CryMul_barrel->Integral(2,50)/(Double_t)(totalEvents*multiplicity));
   	if(BARREL)sprintf(oT11,"%s%f","Mean number of crystals with signal in Barrel per primary in Barrel: ",(Double_t)h1_CryMul_barrel->GetMean()*totalEvents*multiplicity/(Double_t)particlesInBarrel);
@@ -891,7 +907,7 @@ void checkResults() {
   	if(BARREL)sprintf(oT14,"%s%f","Mean number of calorimeter hits in Barrel per primary in Barrel: ",(Double_t)h1_CalMul_barrel->GetMean()*totalEvents*multiplicity/(Double_t)particlesInBarrel);
 	if(BARREL)sprintf(oT15,"%s%f","Particles in barrel / all particles (%): ",(Double_t)particlesInBarrel*100/(Double_t)(totalEvents*multiplicity));
 
-	if(ENDCAP)sprintf(oT16,"%s%i%s%f%s%f","Particles in the Endcap: ",particlesInEndCap," between angles ",minThetaEndCap," and ",maxThetaEndCap);
+	if(ENDCAP)sprintf(oT16,"%s%f%s%f%s%f","Particles in the Endcap: ",particlesInEndCap," between angles ",minThetaEndCap," and ",maxThetaEndCap);
 	if(ENDCAP)sprintf(oT17,"%s%f","Mean number of crystals with signal in Endcap: ",h1_CryMul_endcap->GetMean());
   	if(ENDCAP)sprintf(oT18,"%s%f","Mean number of crystals with signal in Endcap per primary: ",(Double_t)h1_CryMul_endcap->Integral(2,50)/(Double_t)(totalEvents*multiplicity));
   	if(ENDCAP)sprintf(oT19,"%s%f","Mean number of crystals with signal in Endcap per primary in Endcap: ",(Double_t)h1_CryMul_endcap->GetMean()*totalEvents*multiplicity/(Double_t)particlesInEndCap);
@@ -902,29 +918,22 @@ void checkResults() {
 	
 	
 	sprintf(oT24,"%s","Photopeak efficiencies"); 
-  	sprintf(oT25,"%s%i","Photopeak entries (+-2 sigmas, 95.44%): ",photopeakParticles2Sigma); 
-   	//sprintf(oT12,"%s%i","Photopeak entries (+-3 sigmas, 99.74%): ",photopeakParticles3Sigma); 
+  	sprintf(oT25,"%s%f","Photopeak entries (+-2 sigmas, 95.44%): ",photopeakParticles2Sigma); 
    	sprintf(oT26,"%s%f","Photopeak entries/particles (%): ",(Double_t)photopeakParticles2Sigma*100/(Double_t)(totalEvents*multiplicity));
-	//sprintf(oT14,"%s%f","Photopeak entries/particles (%): ",(Double_t)photopeakParticles3Sigma*100/(Double_t)(totalEvents*multiplicity));
 
 	if(BARREL)sprintf(oT27,"%s","Photopeak efficiencies (BARREL)"); 
-  	if(BARREL)sprintf(oT28,"%s%i","Photopeak entries (+-2 sigmas, 95.44%): ",photopeakParticles2Sigma_barrel); 
-   	//sprintf(oT12,"%s%i","Photopeak entries (+-3 sigmas, 99.74%): ",photopeakParticles3Sigma_barrel); 
-   	if(BARREL)sprintf(oT29,"%s%f","Photopeak entries/particles (%): ",(Double_t)photopeakParticles2Sigma_barrel*100/(Double_t)(totalEvents*multiplicity));
-	//sprintf(oT14,"%s%f","Photopeak entries/particles (%): ",(Double_t)photopeakParticles3Sigma_barrel*100/(Double_t)(totalEvents*multiplicity));
+  	if(BARREL)sprintf(oT28,"%s%f","Photopeak entries (+-2 sigmas, 95.44%): ",photopeakParticles2Sigma_barrel); 
+   	if(BARREL)sprintf(oT29,"%s%f","Photopeak entries/particles (%): ",photopeakParticles2Sigma_barrel*100/(Double_t)(totalEvents*multiplicity));
 	
 	if(ENDCAP)sprintf(oT30,"%s","Photopeak efficiencies (ENDCAP)"); 
-  	if(ENDCAP)sprintf(oT31,"%s%i","Photopeak entries (+-2 sigmas 95.44%): ",photopeakParticles2Sigma_endcap); 
-   	//sprintf(oT12,"%s%i","Photopeak entries (+-3 sigmas, 99.74%): ",photopeakParticles3Sigma_endcap); 
+  	if(ENDCAP)sprintf(oT31,"%s%f","Photopeak entries (+-2 sigmas 95.44%): ",photopeakParticles2Sigma_endcap); 
    	if(ENDCAP)sprintf(oT32,"%s%f","Photopeak entries/particles (%): ",(Double_t)photopeakParticles2Sigma_endcap*100/(Double_t)(totalEvents*multiplicity));
-	//sprintf(oT14,"%s%f","Photopeak entries/particles (%): ",(Double_t)photopeakParticles3Sigma_endcap*100/(Double_t)(totalEvents*multiplicity));
 	
 	sprintf(oT33,"%s","Photopeak and angle resolution"); 
   	sprintf(oT34,"%s%f","FWHM (%): ",sigma*235./mean);
 	if(BARREL)sprintf(oT35,"%s%f","FWHM BARREL (%): ",sigma_barrel*235./mean_barrel);
 	if(ENDCAP)sprintf(oT36,"%s%f","FWHM ENDCAP (%): ",sigma_endcap*235./mean_endcap);
 	sprintf(oT37,"%s%f%s%f","Polar angle resolution (sigma in rads, degs): ",sigmaPol,", ",sigmaPol*180/3.141597 ); 
-	//sprintf(oT22,"%s","Hit finder sum over a window of 0.25rad (14.3deg) around each hit with large E."); 
 	sprintf(oT38,"%s","Hit finder sum over all calorimeter crystals."); 
 
   	TLatex l;
@@ -976,11 +985,8 @@ void checkResults() {
 	l.DrawLatex(0.08,0.05,oT38);
 	
 	l.SetTextSize(0.018);
-	l.DrawLatex(0.08,0.02,title0);
 	l.DrawLatex(0.08,0.01,title1);
 
-  	//ctext->Print("text.gif");
-  	//ctext->Print();
   	ctext->Draw();
   
 	ctext->Modified();
@@ -1001,19 +1007,3 @@ void checkResults() {
   	c6->Print("output.ps)");
 
 }
-		
-		
-Double_t GetCMEnergy(Double_t theta, Double_t energy, Double_t beta=0.82){
-	//
-	// Calculating the CM energy from the lab energy and the polar angle
-	//
-	Double_t gamma = 1/sqrt(1-beta*beta);
-	//Lorenzt boost correction
-	//E' = gamma E + beta gamma P|| = gamma E + beta gamma P cos(theta) 
-	//In photons E=P
-	Double_t energyCorrect = gamma*energy - beta*gamma*energy*cos(theta);
-			
-	return energyCorrect;
-}
-		
-			

@@ -16,11 +16,10 @@
 
 #include <fstream>
 
+using namespace std;
 
 class TDatabasePDG;
 class FairPrimaryGenerator;
-
-
 
 class R3Bp2pGenerator : public FairGenerator  
 {

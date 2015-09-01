@@ -8,7 +8,7 @@
 #include <TCutG.h>
 
 #include <iostream>
-
+#include <fstream>
 using namespace std;
 
 void CaloHitAna::DrawPID(bool cut)

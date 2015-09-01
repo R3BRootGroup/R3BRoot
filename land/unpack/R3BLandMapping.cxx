@@ -19,6 +19,8 @@
 #include "R3BLandRawHit.h"
 #include "R3BLandRawHitMapped.h"
 
+using std::ifstream;
+
 R3BLandMapping::R3BLandMapping()
     : nMappedElements(0)
     , fnEvents(0)

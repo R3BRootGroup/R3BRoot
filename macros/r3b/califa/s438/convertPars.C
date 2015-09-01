@@ -18,7 +18,7 @@
 //  -------------------------------------------------------------------------
 #include <unistd.h>
 
-Int_t  convertPars(TString inputfilename,TString outputfilename)
+Int_t  convertPars(TString inputfilename="",TString outputfilename="")
 {
   // Create a Runtime Database singleton.
   FairRuntimeDb* db = FairRuntimeDb::instance();

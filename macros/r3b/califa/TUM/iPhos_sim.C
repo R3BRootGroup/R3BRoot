@@ -10,13 +10,9 @@
 //
 //--------------------------------------------------------------------
 
+#include "r3ball.C"
 
-Int_t iPhos_sim(){
-  
-  // Load the Main Simulation macro
-  TString macro_r3ball = getenv("VMCWORKDIR");
-  macro_r3ball += "/macros/r3b/califa/TUM/r3ball.C";
-  gROOT->LoadMacro(macro_r3ball.Data());
+void iPhos_sim(){
   
   // Input files
   TString EventFile = "doesn't matter";
