@@ -31,7 +31,7 @@ void run(TString runNumber)
     Short_t procId = 10;
     Short_t subCrate = 1;
     Short_t control = 3;
-    source->AddUnpacker(new R3BLandUnpack("", type, subType, procId, subCrate, control));
+    source->AddUnpacker(new R3BLandUnpack(type, subType, procId, subCrate, control));
     // ------------------------------------------------------
 
     // LOS MBS parameters -----------------------------------

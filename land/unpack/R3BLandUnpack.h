@@ -19,7 +19,7 @@ class R3BLandUnpack : public FairUnpack
 {
   public:
     // Constructor
-    R3BLandUnpack(char* strCalDir, Short_t type = 94, Short_t subType = 9400, Short_t procId = 10, Short_t subCrate = 1, Short_t control = 3);
+    R3BLandUnpack(Short_t type = 94, Short_t subType = 9400, Short_t procId = 10, Short_t subCrate = 1, Short_t control = 3);
 
     // Destructor
     virtual ~R3BLandUnpack();

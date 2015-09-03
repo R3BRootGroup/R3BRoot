@@ -23,7 +23,7 @@
 #include "R3BLandHit.h"
 
 // R3BLandUnpack: Constructor
-R3BLandUnpack::R3BLandUnpack(char* strCalDir, Short_t type, Short_t subType, Short_t procId, Short_t subCrate, Short_t control)
+R3BLandUnpack::R3BLandUnpack(Short_t type, Short_t subType, Short_t procId, Short_t subCrate, Short_t control)
     : FairUnpack(type, subType, procId, subCrate, control)
     , fRawData(new TClonesArray("R3BLandRawHit"))
     , fNHits(0)

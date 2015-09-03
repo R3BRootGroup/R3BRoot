@@ -32,7 +32,7 @@
   Short_t control = 3;
   // ------------------------------------------------------
 
-  source->AddUnpacker(new R3BLandUnpack("", type, subType,
+  source->AddUnpacker(new R3BLandUnpack(type, subType,
                                         procId, subCrate, control));
   // ---------------------------------------------------------------------------
 
