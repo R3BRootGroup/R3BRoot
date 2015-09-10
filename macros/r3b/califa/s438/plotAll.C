@@ -15,7 +15,12 @@
 //     
 //     where inputFile is the input file :) 
 //  -------------------------------------------------------------------------
-void plot(TString inputFile) {
+
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+void plot(TString inputFile="") {
 
   // CONFIGURATION
   ifstream input1;
@@ -35,7 +40,7 @@ void plot(TString inputFile) {
   Bool_t plotMultiplicities=kTRUE; Bool_t plotEnergyvsAngle=kTRUE; Bool_t plotProtonCorr=kTRUE; Bool_t plotAddBack=kTRUE;
 
   //HISTOGRAMS DEFINITION FOR CRYSTALHITS
-  TH1F* hMult; TH1F* hMult2; TH2F* hEnergyvsId; TH2F* hToT_EnergyvsId;
+  TH1F* hMult=NULL; TH1F* hMult2=NULL; TH2F* hEnergyvsId=NULL; TH2F* hToT_EnergyvsId=NULL;
   if(plotMultiplicities) {
     hMult = new TH1F("hMult","Total CrystalHits vs crystalId",128,0,127);
     hMult2 = new TH1F("hMult2","Number of CrystalHit with max. E of the event vs crystalId",128,0,127);
@@ -49,7 +54,7 @@ void plot(TString inputFile) {
     hP1ToT_EnergyvsPolar = new TH2F("hP1ToT_EnergyvsPolar","PETAL1: ToT_Energy vs polar",50,22,68,3000,-1000,299000);
     hP2ToT_EnergyvsPolar = new TH2F("hP2ToT_EnergyvsPolar","PETAL2: ToT_Energy vs polar",50,22,68,3000,-1000,299000);
   }
-  TH2F* hToT_EnergyCorr; TH2F* hAngleCorr; TH2F* hToT_EnergyCorrLarge; TH2F* hAngleCorrLarge;
+  TH2F* hToT_EnergyCorr=NULL; TH2F* hAngleCorr=NULL; TH2F* hToT_EnergyCorrLarge=NULL; TH2F* hAngleCorrLarge=NULL;
   if(plotProtonCorr) {
     hToT_EnergyCorr = new TH2F("hToT_EnergyCorr","ToT_Energy Petal1 vs ToT_Energy Petal2 (FULL COMBINATORIAL)",3000,-100,29900,3000,-100,29900);
     hEnergyCorr = new TH2F("hEnergyCorr","Energy Petal1 vs Energy Petal2 (FULL COMBINATORIAL)",3000,-100,29900,3000,-100,29900);
@@ -58,7 +63,7 @@ void plot(TString inputFile) {
     hEnergyCorrLarge = new TH2F("hEnergyCorrLarge","Energy Petal1 vs Energy Petal2 (ONLY LARGEST ENERGY HIT)",3000,-100,29900,3000,-100,29900);
     hAngleCorrLarge = new TH2F("hAngleCorrLarge","Polar Petal1 vs polar Petal2 (ONLY LARGEST ENERGY HIT)",50,22,68,50,22,68);
   }  
-  TH2F* hP1ABEnergy; TH2F* hP2ABEnergy; TH2F* hP1ABToT_Energy; TH2F* hP2ABToT_Energy;
+  TH2F* hP1ABEnergy=NULL; TH2F* hP2ABEnergy=NULL; TH2F* hP1ABToT_Energy=NULL; TH2F* hP2ABToT_Energy=NULL;
   if(plotAddBack) {
     hP1ABEnergy= new TH2F("hP1ABEnergy","AddBack Energy in Petal1: second largest Energy vs largest Energy",3000,-100,29900,3000,-100,29900);
     hP2ABEnergy = new TH2F("hP2ABEnergy","AddBack Energy in Petal2: second largest Energy vs largest Energy",3000,-100,29900,3000,-100,29900);
@@ -75,9 +80,9 @@ void plot(TString inputFile) {
   TBranch *branchCrystalHit = caloTree->GetBranch("CaloCrystalHit");
   if(branchCrystalHit) branchCrystalHit->SetAddress(&crystalHitCA);
   
-  Int_t* crystalId; 
-  Double_t* energies;
-  Double_t* ToT_energies;
+  Int_t* crystalId=NULL; 
+  Double_t* energies=NULL;
+  Double_t* ToT_energies=NULL;
   Double_t maxEnergyP1=0; Double_t maxEnergyP2=0; Double_t maxToT_EnergyP1=0; Double_t maxToT_EnergyP2=0; 
   Int_t winnerEnergyP1=0; Int_t winnerEnergyP2=0; Int_t winnerToT_EnergyP1=0; Int_t winnerToT_EnergyP2=0;
   Int_t secondEnergyP1=0; Int_t secondEnergyP2=0; Int_t secondToT_EnergyP1=0; Int_t secondToT_EnergyP2=0;
@@ -169,7 +174,7 @@ void plot(TString inputFile) {
     if(crystalHitsPerEvent) delete [] crystalHit;
   }
 
-  TCanvas* cMult;  TCanvas* cEnerg; TCanvas* cEneCorr; TCanvas* cAB;
+  TCanvas* cMult=NULL;  TCanvas* cEnerg=NULL; TCanvas* cEneCorr=NULL; TCanvas* cAB=NULL;
   if(plotMultiplicities) {
     cMult= new TCanvas("cMult","Info on multiplicities and energies per crystalID",0,0,800,800);
     cMult->SetFillColor(0);    cMult->SetFrameFillColor(0);    cMult->Divide(2,2);

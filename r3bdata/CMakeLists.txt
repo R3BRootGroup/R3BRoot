@@ -9,6 +9,20 @@ ${BASE_INCLUDE_DIRECTORIES}
 
 set(INCLUDE_DIRECTORIES
 ${R3BROOT_SOURCE_DIR}/r3bdata  
+${R3BROOT_SOURCE_DIR}/r3bdata/xballData  
+${R3BROOT_SOURCE_DIR}/r3bdata/caloData  
+${R3BROOT_SOURCE_DIR}/r3bdata/dhcData  
+${R3BROOT_SOURCE_DIR}/r3bdata/gfiData  
+${R3BROOT_SOURCE_DIR}/r3bdata/mtofData  
+${R3BROOT_SOURCE_DIR}/r3bdata/dtofData  
+${R3BROOT_SOURCE_DIR}/r3bdata/tofData  
+${R3BROOT_SOURCE_DIR}/r3bdata/vetoData  
+${R3BROOT_SOURCE_DIR}/r3bdata/lumonData  
+${R3BROOT_SOURCE_DIR}/r3bdata/trackerData  
+${R3BROOT_SOURCE_DIR}/r3bdata/starttrackerData  
+${R3BROOT_SOURCE_DIR}/r3bdata/landData  
+${R3BROOT_SOURCE_DIR}/r3bdata/mfiData  
+${R3BROOT_SOURCE_DIR}/r3bdata/pspData  
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

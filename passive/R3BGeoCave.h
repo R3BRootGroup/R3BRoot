@@ -5,6 +5,9 @@
 #include "TString.h"
 #include "FairGeoMedia.h"
 #include <fstream>
+
+using namespace std;
+
 class  R3BGeoCave : public FairGeoSet {
 protected:
   TString name;

@@ -3,6 +3,10 @@
 #include "TString.h"
 #include "TRandom.h"
 
+using std::cout;
+using std::endl;
+using std::cerr;
+
 R3BPrimaryGenerator::R3BPrimaryGenerator() : FairPrimaryGenerator()
 {
 }

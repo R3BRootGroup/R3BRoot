@@ -23,6 +23,8 @@
 
 using std::cout;
 using std::endl;
+using std::ifstream;
+using std::ofstream;
 
 // -----   Default constructor   ------------------------------------------
 R3Bp2pGenerator::R3Bp2pGenerator() 

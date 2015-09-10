@@ -4,6 +4,11 @@
  * for s438b experiment
  ****************************************/
 
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
 int fbxPetalCrystalIdBase[64] =
 {
   // Febex 0

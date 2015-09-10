@@ -32,7 +32,7 @@
 
 
 void r3ball(Int_t nEvents = 1,
-            TMap& fDetList,
+            TMap* fDetList = NULL,
             TString Target = "LeadTarget",
             Bool_t fVis = kFALSE,
             TString fMC = "TGeant3",
@@ -111,136 +111,136 @@ void r3ball(Int_t nEvents = 1,
   run->AddModule(cave);
   
   //R3B Target definition
-  if (fDetList.FindObject("TARGET") ) {
+  if (fDetList->FindObject("TARGET") ) {
     R3BModule* target= new R3BTarget(Target.Data());
-    target->SetGeometryFileName(((TObjString*)fDetList.GetValue("TARGET"))->GetString().Data());
+    target->SetGeometryFileName(((TObjString*)fDetList->GetValue("TARGET"))->GetString().Data());
     run->AddModule(target);
   }
   
   //R3B SiTracker Cooling definition
-  if (fDetList.FindObject("VACVESSELCOOL") ) {
+  if (fDetList->FindObject("VACVESSELCOOL") ) {
     R3BModule* vesselcool= new R3BVacVesselCool(Target.Data());
-    vesselcool->SetGeometryFileName(((TObjString*)fDetList.GetValue("VACVESSELCOOL"))->GetString().Data());
+    vesselcool->SetGeometryFileName(((TObjString*)fDetList->GetValue("VACVESSELCOOL"))->GetString().Data());
     run->AddModule(vesselcool);
   }
   
   //R3B Magnet definition
-  if (fDetList.FindObject("ALADIN") ) {
+  if (fDetList->FindObject("ALADIN") ) {
     fFieldMap = 0;
     R3BModule* mag = new R3BMagnet("AladinMagnet");
-    mag->SetGeometryFileName(((TObjString*)fDetList.GetValue("ALADIN"))->GetString().Data());
+    mag->SetGeometryFileName(((TObjString*)fDetList->GetValue("ALADIN"))->GetString().Data());
     run->AddModule(mag);
   }
   
   //R3B Magnet definition
-  if (fDetList.FindObject("GLAD") ) {
+  if (fDetList->FindObject("GLAD") ) {
     fFieldMap = 1;
     R3BModule* mag = new R3BGladMagnet("GladMagnet");
-    mag->SetGeometryFileName(((TObjString*)fDetList.GetValue("GLAD"))->GetString().Data());
+    mag->SetGeometryFileName(((TObjString*)fDetList->GetValue("GLAD"))->GetString().Data());
     run->AddModule(mag);
   }
   
-  if (fDetList.FindObject("CRYSTALBALL") ) {
+  if (fDetList->FindObject("CRYSTALBALL") ) {
     //R3B Crystal Calorimeter
     R3BDetector* xball = new R3BXBall("XBall", kTRUE);
-    xball->SetGeometryFileName(((TObjString*)fDetList.GetValue("CRYSTALBALL"))->GetString().Data());
+    xball->SetGeometryFileName(((TObjString*)fDetList->GetValue("CRYSTALBALL"))->GetString().Data());
     run->AddModule(xball);
   }
   
-  if (fDetList.FindObject("CALIFA") ) {
+  if (fDetList->FindObject("CALIFA") ) {
     // CALIFA Calorimeter
     R3BDetector* calo = new R3BCalo("Califa", kTRUE);
     ((R3BCalo *)calo)->SelectGeometryVersion(10);
     //Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
     ((R3BCalo *)calo)->SetNonUniformity(1.0);
-    calo->SetGeometryFileName(((TObjString*)fDetList.GetValue("CALIFA"))->GetString().Data());
+    calo->SetGeometryFileName(((TObjString*)fDetList->GetValue("CALIFA"))->GetString().Data());
     run->AddModule(calo);
   }
 
   // Tracker
-  if (fDetList.FindObject("TRACKER")  ) {
+  if (fDetList->FindObject("TRACKER")  ) {
     R3BDetector* tra = new R3BTra("Tracker", kTRUE);
-    tra->SetGeometryFileName(((TObjString*)fDetList.GetValue("TRACKER"))->GetString().Data());
+    tra->SetGeometryFileName(((TObjString*)fDetList->GetValue("TRACKER"))->GetString().Data());
     tra->SetEnergyCut(1e-4);
     run->AddModule(tra);
   }
   
   // STaRTrack
-  if (fDetList.FindObject("STaRTrack")  ) {
+  if (fDetList->FindObject("STaRTrack")  ) {
     R3BDetector* tra = new R3BSTaRTra("STaRTrack", kTRUE);
-    tra->SetGeometryFileName(((TObjString*)fDetList.GetValue("STaRTrack"))->GetString().Data());
+    tra->SetGeometryFileName(((TObjString*)fDetList->GetValue("STaRTrack"))->GetString().Data());
     run->AddModule(tra);
   }
   
   // DCH drift chambers
-  if (fDetList.FindObject("DCH") ) {
+  if (fDetList->FindObject("DCH") ) {
     R3BDetector* dch = new R3BDch("Dch", kTRUE);
-    dch->SetGeometryFileName(((TObjString*)fDetList.GetValue("DCH"))->GetString().Data());
+    dch->SetGeometryFileName(((TObjString*)fDetList->GetValue("DCH"))->GetString().Data());
     run->AddModule(dch);
   }
   
   // Tof
-  if (fDetList.FindObject("TOF") ) {
+  if (fDetList->FindObject("TOF") ) {
     R3BDetector* tof = new R3BTof("Tof", kTRUE);
-    tof->SetGeometryFileName(((TObjString*)fDetList.GetValue("TOF"))->GetString().Data());
+    tof->SetGeometryFileName(((TObjString*)fDetList->GetValue("TOF"))->GetString().Data());
     run->AddModule(tof);
   }
   
   // mTof
-  if (fDetList.FindObject("MTOF") ) {
+  if (fDetList->FindObject("MTOF") ) {
     R3BDetector* mTof = new R3BmTof("mTof", kTRUE);
-    mTof->SetGeometryFileName(((TObjString*)fDetList.GetValue("MTOF"))->GetString().Data());
+    mTof->SetGeometryFileName(((TObjString*)fDetList->GetValue("MTOF"))->GetString().Data());
     run->AddModule(mTof);
   }
 
   // dTof
-  if (fDetList.FindObject("DTOF") ) {
+  if (fDetList->FindObject("DTOF") ) {
     R3BDetector* dTof = new R3BdTof("dTof", kTRUE);
-    dTof->SetGeometryFileName(((TObjString*)fDetList.GetValue("DTOF"))->GetString().Data());
+    dTof->SetGeometryFileName(((TObjString*)fDetList->GetValue("DTOF"))->GetString().Data());
     run->AddModule(dTof);
   }
   
   // GFI detector
-  if (fDetList.FindObject("GFI") ) {
+  if (fDetList->FindObject("GFI") ) {
     R3BDetector* gfi = new R3BGfi("Gfi", kTRUE);
-    gfi->SetGeometryFileName(((TObjString*)fDetList.GetValue("GFI"))->GetString().Data());
+    gfi->SetGeometryFileName(((TObjString*)fDetList->GetValue("GFI"))->GetString().Data());
     run->AddModule(gfi);
   }
   
   // Land Detector
-  if (fDetList.FindObject("LAND") ) {
+  if (fDetList->FindObject("LAND") ) {
     R3BDetector* land = new R3BLand("Land", kTRUE);
     land->SetVerboseLevel(1);
-    land->SetGeometryFileName(((TObjString*)fDetList.GetValue("LAND"))->GetString().Data());
+    land->SetGeometryFileName(((TObjString*)fDetList->GetValue("LAND"))->GetString().Data());
     run->AddModule(land);
   }
   
   // NeuLand Scintillator Detector
-  if(fDetList.FindObject("SCINTNEULAND")) {
+  if(fDetList->FindObject("SCINTNEULAND")) {
     R3BDetector* land = new R3BLand("Land", kTRUE);
     land->SetVerboseLevel(1);
-    land->SetGeometryFileName(((TObjString*)fDetList.GetValue("SCINTNEULAND"))->GetString().Data());
+    land->SetGeometryFileName(((TObjString*)fDetList->GetValue("SCINTNEULAND"))->GetString().Data());
     run->AddModule(land);
   }
   
   // MFI Detector
-  if(fDetList.FindObject("MFI")) {
+  if(fDetList->FindObject("MFI")) {
     R3BDetector* mfi = new R3BMfi("Mfi", kTRUE);
-    mfi->SetGeometryFileName(((TObjString*)fDetList.GetValue("MFI"))->GetString().Data());
+    mfi->SetGeometryFileName(((TObjString*)fDetList->GetValue("MFI"))->GetString().Data());
     run->AddModule(mfi);
   }
 
   // PSP Detector
-  if(fDetList.FindObject("PSP")) {
+  if(fDetList->FindObject("PSP")) {
     R3BDetector* psp = new R3BPsp("Psp", kTRUE);
-    psp->SetGeometryFileName(((TObjString*)fDetList.GetValue("PSP"))->GetString().Data());
+    psp->SetGeometryFileName(((TObjString*)fDetList->GetValue("PSP"))->GetString().Data());
     run->AddModule(psp);
   }
   
   // Luminosity detector
-  if (fDetList.FindObject("LUMON") ) {
+  if (fDetList->FindObject("LUMON") ) {
     R3BDetector* lumon = new ELILuMon("LuMon", kTRUE);
-    lumon->SetGeometryFileName(((TObjString*)fDetList.GetValue("LUMON"))->GetString().Data());
+    lumon->SetGeometryFileName(((TObjString*)fDetList->GetValue("LUMON"))->GetString().Data());
     run->AddModule(lumon);
   }
   
@@ -253,10 +253,11 @@ void r3ball(Int_t nEvents = 1,
   //NB: <D.B>
   // If the Global Position of the Magnet is changed
   // the Field Map has to be transformed accordingly
+  FairField *magField = NULL;
   if (fFieldMap == 0) {
-    R3BAladinFieldMap* magField = new R3BAladinFieldMap("AladinMaps");
-    magField->SetCurrent(fMeasCurrent);
-    magField->SetScale(fieldScale);
+    magField = new R3BAladinFieldMap("AladinMaps");
+    ((R3BAladinFieldMap*)magField)->SetCurrent(fMeasCurrent);
+    ((R3BAladinFieldMap*)magField)->SetScale(fieldScale);
     
     if ( fR3BMagnet == kTRUE ) {
       run->SetField(magField);
@@ -264,9 +265,9 @@ void r3ball(Int_t nEvents = 1,
       run->SetField(NULL);
     }
   } else if(fFieldMap == 1){
-    R3BGladFieldMap* magField = new R3BGladFieldMap("R3BGladMap");
-    magField->SetPosition(0., 0., +350-119.94);
-    magField->SetScale(fieldScale);
+    magField = new R3BGladFieldMap("R3BGladMap");
+    ((R3BGladFieldMap*)magField)->SetPosition(0., 0., +350-119.94);
+    ((R3BGladFieldMap*)magField)->SetScale(fieldScale);
     
     if ( fR3BMagnet == kTRUE ) {
       run->SetField(magField);
@@ -372,8 +373,11 @@ void r3ball(Int_t nEvents = 1,
   
   // -----   Runtime database   ---------------------------------------------
   R3BFieldPar* fieldPar = (R3BFieldPar*) rtdb->getContainer("R3BFieldPar");
-  fieldPar->SetParameters(magField);
-  fieldPar->setChanged();
+  if(NULL != magField)
+  {
+      fieldPar->SetParameters(magField);
+      fieldPar->setChanged();
+  }
   Bool_t kParameterMerged = kTRUE;
   FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
   parOut->open(ParFile.Data());

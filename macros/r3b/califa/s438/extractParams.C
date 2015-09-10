@@ -18,8 +18,13 @@
 //           energy2 is the energy of second peak used in calibrate.C
 //         
 //  -------------------------------------------------------------------------
-extractParams(TString inputFile, TString outputFile1, TString outputFile2,
-	      Double_t energy1, Double_t energy2){
+
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+void extractParams(TString inputFile="" , TString outputFile1="", TString outputFile2="",
+	      Double_t energy1=0., Double_t energy2=0.){
   ifstream input;
   ofstream output;
   ofstream output_2;

@@ -13,6 +13,8 @@
 #include "R3BLandDigi.h"
 #include "R3BLandTdiff.h"
 
+using std::ifstream;
+
 Double_t wlk(Double_t x)
 {
     Double_t y=0;

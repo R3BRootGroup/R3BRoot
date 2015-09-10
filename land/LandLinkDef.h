@@ -38,6 +38,7 @@
 #pragma link C++ class R3BLandTdiffFill+;
 #pragma link C++ class R3BLandTdiff+;
 #pragma link C++ class R3BLandAna+;
+#pragma link C++ class R3BLandTcalTest+;
 
 #endif
 

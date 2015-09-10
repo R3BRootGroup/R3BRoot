@@ -26,8 +26,14 @@
 #include "TSpectrum.h"
 #include "TVirtualFitter.h"
 
-Int_t npeaks = 10;
-void cal(TString inputFile_30,TString inputFile_300, Int_t np=4) {
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+const Int_t npeaks = 10;
+
+void cal(TString inputFile_30="",TString inputFile_300="", Int_t np=4) {
   
   gROOT->SetStyle("Default");
   //gStyle->SetOptTitle(0);

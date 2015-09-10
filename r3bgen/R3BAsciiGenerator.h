@@ -16,6 +16,10 @@
 #include <fstream>
 #include <map>
 
+using namespace std;
+
+using std::ifstream;
+
 class TDatabasePDG;
 class FairPrimaryGenerator;
 class FairIon;

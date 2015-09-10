@@ -58,7 +58,7 @@ void run(TString runNumber)
     Short_t procId = 10;
     Short_t subCrate = 1;
     Short_t control = 3;
-    source->AddUnpacker(new R3BLandUnpack("", type, subType, procId, subCrate, control));
+    source->AddUnpacker(new R3BLandUnpack(type, subType, procId, subCrate, control));
     // ------------------------------------------------------
 
     // LOS MBS parameters -----------------------------------
@@ -98,14 +98,12 @@ void run(TString runNumber)
     tcalFill->SetMinStats(minStats);
     tcalFill->SetTrigger(2);
     tcalFill->SetNofModules(nModules, 40);
-    tcalFill->SetStoreDB(kTRUE);
     run->AddTask(tcalFill);
 
     R3BLosTcalFill* losTcalFill = new R3BLosTcalFill("LosTcalFill");
     losTcalFill->SetUpdateRate(updateRate);
     losTcalFill->SetMinStats(minStats);
     losTcalFill->SetNofModules(20);
-    losTcalFill->SetStoreDB(kTRUE);
     //run->AddTask(losTcalFill);
     // ---------------------------------------------------------------------------
 

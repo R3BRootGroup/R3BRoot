@@ -1,14 +1,14 @@
-califaEventDisplay()
+void califaEventDisplay()
 {
   FairRunAna *fRun= new FairRunAna();
   
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
   FairParRootFileIo*  parIo1 = new FairParRootFileIo();
-  parIo1->open("r3bpar.root");
+  parIo1->open("sim_par.root");
   rtdb->setFirstInput(parIo1);
   rtdb->print();
   
-  fRun->SetInputFile("r3bsim.root");
+  fRun->SetInputFile("sim_out.root");
   fRun->SetOutputFile("test.root");
   
   R3BEventManager *fMan= new R3BEventManager();

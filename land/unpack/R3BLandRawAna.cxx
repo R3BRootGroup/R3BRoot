@@ -51,7 +51,7 @@ InitStatus R3BLandRawAna::Init()
     fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
     fLandRawHit = (TClonesArray*)fMan->GetObject("LandRawHit");
     fLandRawHitMapped = (TClonesArray*)fMan->GetObject("LandRawHitMapped");
-    //fLosRawHit = (TClonesArray*)fMan->GetObject("LosRawHit");
+    fLosRawHit = (TClonesArray*)fMan->GetObject("LosRawHit");
     CreateHistos();
 
     return kSUCCESS;

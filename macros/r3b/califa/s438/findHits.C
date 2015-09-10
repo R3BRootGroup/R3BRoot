@@ -1,4 +1,4 @@
-void findHits(TString inputFile, TString outputFile, Int_t nEvents = 0)
+void findHits(TString inputFile="", TString outputFile="", Int_t nEvents = 0)
 {
   // -----   Timer   --------------------------------------------------------
   TStopwatch timer;

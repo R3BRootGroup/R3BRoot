@@ -14,13 +14,10 @@
 //
 //--------------------------------------------------------------------
 
-Int_t r3bsim()
-{
-  // Load the Main Simulation macro
-  TString macro_r3ball = getenv("VMCWORKDIR");
-  macro_r3ball += "/macros/r3b/r3ball.C";
-  gROOT->LoadMacro(macro_r3ball.Data());
+#include "r3ball.C"
 
+void r3bsim()
+{
   // Output files
   TString OutFile = "r3bsim.root";
   TString ParFile = "r3bpar.root";
@@ -111,7 +108,7 @@ Int_t r3bsim()
   Bool_t fR3BMagnet = kTRUE;
 
   // Main Sim function call
-  r3ball(nEvents, detGeo, target4, fEventDisplay, fMC, fGene, fUserPList,
+  r3ball(nEvents, &detGeo, target4, fEventDisplay, fMC, fGene, fUserPList,
          fR3BMagnet, 1500.,
          OutFile, ParFile);
 }

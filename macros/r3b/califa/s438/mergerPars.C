@@ -19,8 +19,13 @@
 //           outputFile is the file name with all the params and the right format
 //         
 //  -------------------------------------------------------------------------
-mergerPars(TString inputFile1, TString inputFile2, 
-	      TString inputFile3, TString inputFilePid, TString outputFile){
+
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+void mergerPars(TString inputFile1="", TString inputFile2="", 
+	      TString inputFile3="", TString inputFilePid="", TString outputFile=""){
   ifstream input1;
   ifstream input2;
   ifstream input3;

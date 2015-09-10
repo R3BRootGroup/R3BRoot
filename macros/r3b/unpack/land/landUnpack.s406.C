@@ -32,7 +32,7 @@
   Short_t control = 3;
   // ------------------------------------------------------
 
-  source->AddUnpacker(new R3BLandUnpack("", type, subType,
+  source->AddUnpacker(new R3BLandUnpack(type, subType,
                                         procId, subCrate, control));
   // ---------------------------------------------------------------------------
 
@@ -72,7 +72,6 @@
   tcalFill->SetUpdateRate(updateRate);
   tcalFill->SetMinStats(minStats);
   tcalFill->SetNofModules(nModules, 20);
-  tcalFill->SetStoreDB(kTRUE); 
   run->AddTask(tcalFill);
   // ---------------------------------------------------------------------------
 

@@ -26,8 +26,8 @@
 //
 //-------------------------------------------------------------------------
 
-void califaCal(TString inputFile, TString outputFile, 
-	       TString parRootFile, bool highRange = false, Int_t nEvents = 0) {
+void califaCal(TString inputFile="", TString outputFile="", 
+	       TString parRootFile="", bool highRange = false, Int_t nEvents = 0) {
   // -----   Timer   --------------------------------------------------------
   TStopwatch timer;
   timer.Start();

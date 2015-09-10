@@ -27,7 +27,11 @@
 //  will be overwritten. Store your results (for instance under fitPars_RUN.txt)
 //  -------------------------------------------------------------------------
 
-void calibrate(TString inputFile, Int_t mode=0, 
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+void calibrate(TString inputFile="", Int_t mode=0, 
 	       Double_t peak1Left=900, Double_t peak1Right=1300,
 	       Double_t peak2Left=2500, Double_t peak2Right=3000) {
   
@@ -144,7 +148,7 @@ void calibrate(TString inputFile, Int_t mode=0,
     fitParFile.close();
   }
   
-  Double_t par1, par2, par3, par4;
+  Double_t par1=-999., par2=-999., par3=-999., par4=-999.;
   //CANVAS DEFINITION
   char canvastitle[100];
   TCanvas** canv = new TCanvas*[8];

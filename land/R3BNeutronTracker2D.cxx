@@ -29,6 +29,7 @@
 
 using std::cout;
 using std::endl;
+using std::ifstream;
 
 ClassImp(R3BNeutronTracker2D)
 

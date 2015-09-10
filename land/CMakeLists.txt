@@ -24,6 +24,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
 ${R3BROOT_SOURCE_DIR}/r3bdb/landdb
+${R3BROOT_SOURCE_DIR}/tcal
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -69,6 +70,7 @@ unpack/R3BLandTcal.cxx
 unpack/R3BLandTdiffFill.cxx
 unpack/R3BLandTdiff.cxx
 unpack/R3BLandAna.cxx
+unpack/R3BLandTcalTest.cxx
 )
 
 # fill list of header files from list of source files
@@ -78,7 +80,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF LandLinkDef.h)
 Set(LIBRARY_NAME R3BLand)
 Set(DEPENDENCIES
-    R3Bbase R3BData R3BPassive MCStack R3BLandDB)
+    R3Bbase R3BData R3BPassive MCStack R3BTCal)
 
 GENERATE_LIBRARY()
 

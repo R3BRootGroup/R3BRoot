@@ -1,4 +1,4 @@
-eventDisplay()
+void eventDisplay()
 {
   FairRunAna *fRun= new FairRunAna();
   
