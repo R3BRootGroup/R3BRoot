@@ -42,7 +42,7 @@
   procId = 10;
   subCrate = 7;
   control = 5;
-  source->AddUnpacker(new R3BLosUnpack("", type, subType,
+  source->AddUnpacker(new R3BLosUnpack(type, subType,
                                        procId, subCrate, control));
   // ------------------------------------------------------
   // ---------------------------------------------------------------------------

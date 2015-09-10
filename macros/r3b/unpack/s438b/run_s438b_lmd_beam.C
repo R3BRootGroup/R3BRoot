@@ -44,7 +44,7 @@ void run(TString runNumber)
     procId = 12;
     subCrate = 1;
     control = 9;
-    source->AddUnpacker(new R3BLosUnpack("", type, subType, procId, subCrate, control));
+    source->AddUnpacker(new R3BLosUnpack(type, subType, procId, subCrate, control));
     // ------------------------------------------------------
     // ---------------------------------------------------------------------------
 
