@@ -178,6 +178,9 @@ void R3BLandRawAna::CreateHistos()
     run->AddObject(fh_los_raw_ch);
     run->AddObject(fh_los_raw_tdc);
     run->AddObject(fh_los_raw_clock);
+
+
+    run->RegisterHttpCommand("/Reset_h_land_mapped_barid", "/h_land_mapped_barid/->Reset()");
 }
 
 void R3BLandRawAna::WriteHistos()

@@ -52,6 +52,7 @@ void run(TString runNumber)
     FairRunOnline* run = new FairRunOnline(source);
     run->SetOutputFile(outputFileName.Data());
     run->SetGenerateHtml(kTRUE, histFileName.Data(), refresh);
+    run->ActivateHttpServer();
     // ---------------------------------------------------------------------------
 
     // Create ALADIN field map ---------------------------------------------------
