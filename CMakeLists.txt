@@ -248,6 +248,11 @@ Else(${IS_XCODE})
   SET(LD_LIBRARY_PATH  ${R3BLIBDIR} ${LD_LIBRARY_PATH})
 Endif(${IS_XCODE})
 
+find_package(ucesb)
+if(ucesb_FOUND)
+set(WITH_UCESB true)
+set(LD_LIBRARY_PATH ${ucesb_LIBRARY_DIR} ${LD_LIBRARY_PATH})
+endif(ucesb_FOUND)
 
 Generate_Version_Info()
 
@@ -273,6 +278,9 @@ ENDIF (MODULE)
 
 IF(NOT MODULE)
 add_subdirectory (r3bbase)  
+if (WITH_UCESB)
+  add_subdirectory (r3bsource)
+endif (WITH_UCESB)
 add_subdirectory (passive) 
 add_subdirectory (cal)
 add_subdirectory (xball)
