@@ -47,7 +47,7 @@ ${FAIRROOTPATH}/include/FairDbWriter.h
 set(LINKDEF R3BDBLinkDef.h)
 set(LIBRARY_NAME R3BDB)
 set(DEPENDENCIES
-    R3Bbase  R3BData R3BPassive R3BLandDB MCStack)
+    R3Bbase R3BData R3BPassive)
 
 GENERATE_LIBRARY()
 
