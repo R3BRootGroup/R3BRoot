@@ -16,7 +16,7 @@
 #include "FairLogger.h"
 
 
-inline bool IsHorizonzalPaddle(const Int_t paddle, const Int_t paddle_per_plane)
+inline bool IsHorizontalPaddle(const Int_t paddle, const Int_t paddle_per_plane)
 {
     // TODO: Wait, what?
     return (int)(((paddle - 1) / paddle_per_plane)) / 2. == (int)((int)(((paddle - 1) / paddle_per_plane)) / 2.);
@@ -24,7 +24,7 @@ inline bool IsHorizonzalPaddle(const Int_t paddle, const Int_t paddle_per_plane)
 
 
 R3BNeulandDigitizer::R3BNeulandDigitizer()
-    : FairTask("R3B Land Digitization scheme", 0),
+    : FairTask("R3B NeuLAND Digitizer", 0),
       fLandDigi(new TClonesArray("R3BLandDigi")),
       fDigitizingEngine(new Neuland::DigitizingEngine())
 {
@@ -52,7 +52,6 @@ void R3BNeulandDigitizer::SetParContainers()
     if (!fLandDigiPar) {
         Fatal("SetParContainers", "No R3BLandDigiPar");
     }
-
 
     if (fVerbose && fLandDigiPar) {
         LOG(INFO) << "R3BNeulandDigitizer::SetParContainers() " << FairLogger::endl;
@@ -112,16 +111,12 @@ void R3BNeulandDigitizer::Exec(Option_t *)
         const Int_t paddle_id = int(landPoint->GetSector()) - 1; //note that paddle starts at 1
 
         Double_t light = landPoint->GetLightYield() * 1000.;
-        Double_t x = landPoint->GetXIn();
-        Double_t y = landPoint->GetYIn();
-        Double_t z = landPoint->GetZIn();
-        Double_t time = landPoint->GetTime();
         Int_t media = int(landPoint->GetPaddleType());
 
         if (landPoint->GetEnergyLoss() > 0. && media == 3) {
 
             // TODO: What is this?
-            gGeoManager->FindNode(x, y, z);
+            gGeoManager->FindNode(landPoint->GetXIn(), landPoint->GetYIn(), landPoint->GetZIn());
             gGeoManager->CdUp();
             Double_t local_point[] = {0., 0., 0.};
             Double_t global_point[3];
@@ -132,17 +127,17 @@ void R3BNeulandDigitizer::Exec(Option_t *)
 
             Double_t dist;
             if (fLandDigiPar->GetGeometryFileName().Contains("proto")) {
-                dist = y; // only vertical paddles
+                dist = landPoint->GetYIn(); // only vertical paddles
             } else {
-                if (IsHorizonzalPaddle(paddle_id, paddle_per_plane)) {
-                    dist = x;
+                if (IsHorizontalPaddle(paddle_id, paddle_per_plane)) {
+                    dist = landPoint->GetXIn();
                 } else {
-                    dist = y;
+                    dist = landPoint->GetYIn();
                 }
             }
 
             try {
-                fDigitizingEngine->DepositLight(paddle_id, time, light, dist);
+                fDigitizingEngine->DepositLight(paddle_id, landPoint->GetTime(), light, dist);
             } catch (std::exception &e) {
                 Fatal("Exec", "%s", e.what());
             }
@@ -191,12 +186,7 @@ void R3BNeulandDigitizer::Exec(Option_t *)
         const Int_t paddleNr = kv.first;
         const auto &paddle = kv.second;
 
-        if (paddle.leftPMT.HasFired() && paddle.leftPMT.HasFired()) {
-
-            // FIXME: Second Threshold check?
-            /* if (lightl < threshLR || lightr < threshLR) {
-                continue;
-            }*/
+        if (paddle.HasFired()) {
 
             // Get position and other information and fill digis.
             Double_t xx, yy, zz;
@@ -207,7 +197,7 @@ void R3BNeulandDigitizer::Exec(Option_t *)
                 yy = paddle.GetPosition();
                 zz = zpaddle[paddleNr];
             } else {
-                if (IsHorizonzalPaddle(paddleNr, paddle_per_plane)) {
+                if (IsHorizontalPaddle(paddleNr, paddle_per_plane)) {
                     //horizontal paddles
                     xx = paddle.GetPosition();
                     yy = ypaddle[paddleNr];
@@ -228,7 +218,10 @@ void R3BNeulandDigitizer::Exec(Option_t *)
             Double_t qdc = paddle.GetPaddleEnergy();
             Double_t tdc = paddle.GetPaddleTime();
 
-            AddHit(paddleNr, tdcL, tdcR, tdc, qdcL, qdcR, qdc, xx, yy, zz);
+            new((*fLandDigi)[fLandDigi->GetEntriesFast()]) R3BLandDigi(paddleNr,
+                    tdcL, tdcR, tdc,
+                    qdcL, qdcR, qdc,
+                    xx, yy, zz);
         }
     } // loop over paddles
 
@@ -256,21 +249,6 @@ void R3BNeulandDigitizer::Finish()
     hMultTwo->Write();
     hRLTimeToTrig->Write();
 }
-
-
-R3BLandDigi *R3BNeulandDigitizer::AddHit(Int_t paddleNr, Double_t tdcL, Double_t tdcR,
-        Double_t tdc, Double_t qdcL, Double_t qdcR, Double_t qdc,
-        Double_t xx, Double_t yy, Double_t zz)
-{
-    R3BLandDigi *digi = new((*fLandDigi)[fLandDigi->GetEntriesFast()]) R3BLandDigi(paddleNr,
-            tdcL, tdcR, tdc,
-            qdcL, qdcR, qdc,
-            xx, yy, zz);
-    return digi;
-}
-
-
-
 
 
 ClassImp(R3BNeulandDigitizer)

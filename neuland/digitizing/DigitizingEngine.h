@@ -3,11 +3,40 @@
 
 /* Neuland Digitizing Engine
  * @author: Jan Mayer
- * 
- * All scintilator bars ('Paddles') in the NeuLAND detector are equipped with two photomultipliers (leftPMT, rightPMT).
- * Each light emission created by deposition of energy is transported to the PMT and arrives at a specific time and
- * with a specific amplitude ('PMTHit'). Based on this PMTHits, the PMT response (Fired, TDC, QDC, Energy) is calculated based on a plethora of 
- * "variable" values (e.g. threshold) and material "constants" (e.g. speed of light).
+ *
+ * The Neuland Digitizing Engine (DE) handles the detector physics and data acquisition
+ * part of the conversion from raw deposited energy (that has already been converted to
+ * light), to experiment-like detector hits.
+ *
+ * Note: This class does not depend on any R3BRoot code. The in- and output, that is the
+ * the actual conversion from `LandPoints` to `LandDigis`, is handled by tasks, e.g. by
+ * the R3BNeulandDigitizer.
+ *
+ *
+ * All scintillator bars in the NeuLAND detector are equipped a photomultiplier (PMT) on
+ * the left and right side (leftPMT, rightPMT), forming a Paddle. The DE handles these
+ * paddles independently by id, without knowledge about physical position or orientation.
+ *
+ * DigitizingEngine
+ *  └ map<id,paddle> paddles
+ *
+ * Paddle
+ *  ├ PMT leftPMT
+ *  └ PMT rightPMT
+ *
+ *
+ * Each light emission created by deposition of energy is transported to the PMT and arrives
+ * at a specific time and with a specific amplitude (PMTHit). Based on these PMTHits, the
+ * PMT response (HasFired, TDC, QDC, Energy) is calculated based on a plethora of "variable"
+ * values (e.g. threshold) and material "constants" (e.g. speed of light), see cxx file.
+ *
+ * PMT
+ *  └ vector<PMTHit> hits;
+ *
+ * PMTHit
+ *  ├ time
+ *  └ light
+ *
  */
 
 #include <vector>
@@ -56,9 +85,9 @@ public:
 
     class PMT {
     private:
-    	std::vector<PMTHit> hits;
+        std::vector<PMTHit> hits;
         // NOTE: Some expensive calculations and random distributions are cached
-        // so they do not need to be recomputed evertime a Getter is called
+        // so they do not need to be recomputed every time a Getter is called
         mutable Validated<std::vector<PMTHit>::const_iterator> cachedFirstHitOverThresh;
         mutable Validated<Double_t> cachedQDC;
         mutable Validated<Double_t> cachedTDC;
@@ -68,7 +97,8 @@ public:
         void AddHit(const Double_t &mcTime, const Double_t &mcLight, const Double_t &dist)
         {
             hits.push_back(PMTHit(mcTime, mcLight, dist));
-            // NOTE: Sorting after every hit may not be efficient, but this way FindThresholdExeeding hit can be made const
+            // NOTE: Sorting after every hit may not be efficient, but this way
+            // FindThresholdExeeding hit can be made const
             std::sort(hits.begin(), hits.end());
             cachedFirstHitOverThresh.invalidate();
         }
@@ -77,9 +107,10 @@ public:
         Double_t GetQDC() const;
         Double_t GetTDC() const;
         Double_t GetEnergy() const;
-		const std::vector<PMTHit> & GetHits() const {
-			return hits;
-		}
+        const std::vector<PMTHit> &GetHits() const
+        {
+            return hits;
+        }
 
     private:
         std::vector<PMTHit>::const_iterator FindThresholdExceedingHit() const;
@@ -106,6 +137,12 @@ public:
         {
             return (rightPMT.GetTDC() - leftPMT.GetTDC()) / 2.*fcMedium;
         }
+
+        bool HasFired() const
+        {
+            return (leftPMT.HasFired() && rightPMT.HasFired());
+        }
+
 
     };
 

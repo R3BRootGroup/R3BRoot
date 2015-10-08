@@ -37,5 +37,5 @@ void R3BNeulandSim(
   gROOT->LoadMacro(TString(getenv("VMCWORKDIR")) + TString("/macros/r3b/r3ball.C"));
 
   // Main Sim function call
-  r3ball(num_events, geometry, target, enable_event_display, mc_engine, generator_engine, enable_user_physics_list, enable_R3B_magnet, measured_current, out_file, par_file, input_file);
+  r3ball(num_events, &geometry, target, enable_event_display, mc_engine, generator_engine, enable_user_physics_list, enable_R3B_magnet, measured_current, out_file, par_file, input_file);
 }

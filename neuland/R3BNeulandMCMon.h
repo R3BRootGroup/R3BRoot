@@ -28,63 +28,66 @@ class TH3D;
 
 class R3BNeulandMCMon : public FairTask {
 public:
-   R3BNeulandMCMon();
-   ~R3BNeulandMCMon();
+    R3BNeulandMCMon(const Option_t *option = "");
+    ~R3BNeulandMCMon();
 
-   InitStatus Init();
-   void Exec(Option_t *option);
-   void Finish();
+    InitStatus Init();
+    void Exec(Option_t *option);
+    void Finish();
 
 private:
-   TClonesArray *fMCTracks;
-   TClonesArray *fLandPoints;
-   TH1D *fhPDG;
-   TH1D *fhEPrimaryNeutrons;
-   TH1D *fhEtot;
-   TH1D *fhEtotPrim;
-   TH1D *fhESecondaryNeutrons;
-   TH1D *fhMotherIDs;
-   TH1D *fhPrimaryDaughterIDs;
-   std::map<Int_t, TH1D *> fhmEPdg;
-   std::map<Int_t, TH1D *> fhmEtotPdg;
-   std::map<Int_t, TH1D *> fhmEtotPdgRel;
-   TH3D *fh3;
+    Bool_t fIs3DTrackEnabled;
 
-   // TODO: Thats not the business of this class, should be in R3BMCTrack
-   // Note: Reference to the pointer to R3BMCTrack so it can be changed within the function
-   inline Bool_t GetMotherTrack(const Int_t i, R3BMCTrack *&motherTrack)
-   {
-      if (i < fMCTracks->GetEntries() && i >= 0) {
-         motherTrack = (R3BMCTrack *)fMCTracks->At(i);
-         return true;
-      }
-      return false;
-   }
+    TClonesArray *fMCTracks;
+    TClonesArray *fLandPoints;
+    TH1D *fhPDG;
+    TH1D *fhEPrimarys;
+    TH1D *fhEPrimaryNeutrons;
+    TH1D *fhEtot;
+    TH1D *fhEtotPrim;
+    TH1D *fhESecondaryNeutrons;
+    TH1D *fhMotherIDs;
+    TH1D *fhPrimaryDaughterIDs;
+    std::map<Int_t, TH1D *> fhmEPdg;
+    std::map<Int_t, TH1D *> fhmEtotPdg;
+    std::map<Int_t, TH1D *> fhmEtotPdgRel;
+    TH3D *fh3;
 
-   inline Bool_t IsPrimaryNeutron(const R3BMCTrack *mcTrack)
-   {
-      if (mcTrack->GetPdgCode() == 2112 && mcTrack->GetMotherId() == -1) {
-         return true;
-      }
-      return false;
-   }
+    // TODO: Thats not the business of this class, should be in R3BMCTrack
+    // Note: Reference to the pointer to R3BMCTrack so it can be changed within the function
+    inline Bool_t GetMotherTrack(const Int_t i, R3BMCTrack *&motherTrack)
+    {
+        if (i < fMCTracks->GetEntries() && i >= 0) {
+            motherTrack = (R3BMCTrack *)fMCTracks->At(i);
+            return true;
+        }
+        return false;
+    }
 
-   inline Bool_t IsMotherPrimaryNeutron(const R3BMCTrack *mcTrack)
-   {
-      R3BMCTrack *motherTrack;
-      if (GetMotherTrack(mcTrack->GetMotherId(), motherTrack) && IsPrimaryNeutron(motherTrack)) {
-         return true;
-      }
-      return false;
-   }
+    inline Bool_t IsPrimaryNeutron(const R3BMCTrack *mcTrack)
+    {
+        if (mcTrack->GetPdgCode() == 2112 && mcTrack->GetMotherId() == -1) {
+            return true;
+        }
+        return false;
+    }
 
-   inline Double_t GetKineticEnergy(const R3BMCTrack *mcTrack)
-   {
-      return (mcTrack->GetEnergy() - mcTrack->GetMass()) * 1000.;
-   }
+    inline Bool_t IsMotherPrimaryNeutron(const R3BMCTrack *mcTrack)
+    {
+        R3BMCTrack *motherTrack;
+        if (GetMotherTrack(mcTrack->GetMotherId(), motherTrack) && IsPrimaryNeutron(motherTrack)) {
+            return true;
+        }
+        return false;
+    }
+
+    inline Double_t GetKineticEnergy(const R3BMCTrack *mcTrack)
+    {
+        return (mcTrack->GetEnergy() - mcTrack->GetMass()) * 1000.;
+    }
 
 
-   ClassDef(R3BNeulandMCMon, 0)
+    ClassDef(R3BNeulandMCMon, 0)
 };
 
 

@@ -24,11 +24,6 @@ public:
     virtual void Finish();
     virtual void Reset();
 
-    R3BLandDigi *AddHit(Int_t paddleNr, Double_t tdcL, Double_t tdcR, Double_t tdc,
-                        Double_t qdcL, Double_t qdcR, Double_t qdc,
-                        Double_t xx, Double_t yy, Double_t zz);
-
-
 protected:
     TClonesArray *fLandPoints;
     TClonesArray *fLandDigi;
