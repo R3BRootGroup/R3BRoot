@@ -16,11 +16,13 @@ echo "# This can be usefull if one can use a distributed build system  #"
 echo "# like icecream.                                                 #"
 echo "# For example                                                    #"
 echo "#!/bin/bash                                                      #"
-echo "#export LINUX_FLAVOUR=Etch32                                     #"
-echo "#export FAIRSOFT_VERSION=mar08                                   #"
-echo "#export SIMPATH=<path_to_installation_of_external_packages>      #"
-echo "#export BUILDDIR=/tmp/fairroot/build_cbm_\${FAIRSOFT_VERSION}    #"
-echo "#export SOURCEDIR=/misc/uhlig/SVN/ctest/cbmroot                  #"
+echo "export LINUX_FLAVOUR=<your linux flavour>                        #"
+echo "export FAIRSOFT_VERSION=<version of FairSoft>                    #"
+echo "export FAIRROOT_VERSION=<version of FairRoot>                    #"
+echo "export SIMPATH=<path to your FairSoft version>                   #"
+echo "export GIT_BRANCH=< master or dev>                               #"
+echo "export BUILDDIR=<dir where the build files go>                   #"
+echo "export SOURCEDIR=<location of the R3BRoot sources>               #"
 echo "#export NCPU=100                                                 #"
 echo "##################################################################"
 }
@@ -29,7 +31,8 @@ if [ "$#" -lt "2" ]; then
   echo ""
   echo "-- Error -- Please start script with two parameters"
   echo "-- Error -- The first parameter is the ctest model."
-  echo "-- Error -- Possible arguments are Nightly and Experimental ."
+  echo "-- Error -- Possible arguments are Nightly, Experimental, "
+  echo "-- Error -- Continuous or Profile."
   echo "-- Error -- The second parameter is the file containg the"
   echo "-- Error -- Information about the setup at the client" 
   echo "-- Error -- installation (see example below)."
@@ -38,7 +41,7 @@ if [ "$#" -lt "2" ]; then
   exit 1
 fi
 
-# test if a ctest model is either Experimantal or Nightly
+# test if a valid ctest model is defined
 if [ "$1" == "Experimental" -o "$1" == "Nightly" -o "$1" == "Continuous" -o "$1" == "Profile" ]; then
   echo ""
 else
@@ -74,7 +77,7 @@ else
   GCC_VERSION=$($CXX -dumpversion)
 fi
 
-export LABEL1=${LINUX_FLAVOUR}-$SYSTEM-$COMPILER$GCC_VERSION-fairsoft_$FAIRSOFT_VERSION-fairroot_$FAIRROOT_VERSION
+export LABEL1=${LINUX_FLAVOUR}-$SYSTEM-$COMPILER$GCC_VERSION-r3broot_$GIT_BRANCH-fairroot_$FAIRROOT_VERSION-fairsoft_$FAIRSOFT_VERSION
 export LABEL=$(echo $LABEL1 | sed -e 's#/#_#g')
 
 # get the number of processors
@@ -90,7 +93,7 @@ then
   export SITE=$(hostname -f)
   if [ -z $SITE ]; then
     export SITE=$(uname -n)
-  fi
+  fi  
 elif [ "$arch" = "darwin" ];
 then
   if [ "$NCPU" != "" ];
