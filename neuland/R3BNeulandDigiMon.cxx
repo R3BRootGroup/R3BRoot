@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <numeric>
 
 #include "TClonesArray.h"
 #include "TH1D.h"
