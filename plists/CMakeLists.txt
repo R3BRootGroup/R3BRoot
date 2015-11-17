@@ -38,8 +38,6 @@ G4EmHadronBuilder.cxx
 G4EmMuonBuilder.cxx
 G4EmQEDBuilder.cxx
 G4LowEnergyQEDBuilder.cxx
-G4PenelopeQEDBuilder.cxx
-G4StepLimiterBuilder.cxx
 G4StepLimiterMessenger.cxx
 G4StepLimiterPerRegion.cxx
 #EmBinaryCascadeBuilder.cxx
@@ -56,6 +54,8 @@ R3BRunConfiguration.cxx
 # fill list of header files from list of source files
 # by exchanging the file extension
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
+
+Set(LINKDEF PlistLinkDef.h)
 
 Set(DEPENDENCIES
     VMC G4physicslists G4vis_management geant4vmc)
