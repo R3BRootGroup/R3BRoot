@@ -12,7 +12,6 @@
 #pragma link C++ class R3BLandDigitizer+;
 #pragma link C++ class R3BLandDigitizerQA+;
 #pragma link C++ class R3BLandDigiPar+;
-#pragma link C++ class R3BLandData+;
 #pragma link C++ class R3BNeutronTracker+;
 #pragma link C++ class R3BConstantFraction+;
 #pragma link C++ class R3BLandDigitizer_CFD+;
