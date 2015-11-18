@@ -11,7 +11,6 @@ TGeoRotation *fGlobalRot = new TGeoRotation();
 
 // Create a null translation
 TGeoTranslation *fGlobalTrans = new TGeoTranslation();
-fGlobalTrans->SetTranslation(0.0,0.0,0.0);
 TGeoRotation *fRefRot = NULL;
 
 TGeoManager* gGeoMan = NULL;
@@ -32,11 +31,23 @@ Double_t fZ = 0.;
 Bool_t fLocalTrans = kFALSE;
 Bool_t fLabTrans = kFALSE;
 
+void ConstructGeometry1(TGeoMedium *lead, TGeoMedium *pMed);
+void ConstructGeometry2(TGeoMedium *pMed38);
+void ConstructGeometry3(TGeoMedium *pMed38);
+void ConstructGeometry4(TGeoMedium *pMed2, TGeoMedium *pMed15,
+                        TGeoMedium *pMed3, TGeoMedium *pMedAu);
+void ConstructGeometry5(TGeoMedium *pMedCarbon, TGeoMedium *pMed);
+void ConstructGeometry6(TGeoMedium *pMed16, TGeoMedium *pMed);
+void ConstructGeometry7(TGeoMedium *pMed);
+
+TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef);
 
 
 
 void create_target_geo(const char* geoTag = "LiH")
 {
+  fGlobalTrans->SetTranslation(0.0,0.0,0.0);
+
   // -------   Load media from media file   -----------------------------------
   FairGeoLoader*    geoLoad = new FairGeoLoader("TGeo","FairGeoLoader");
   FairGeoInterface* geoFace = geoLoad->getGeoInterface();
@@ -51,7 +62,7 @@ void create_target_geo(const char* geoTag = "LiH")
 
   // -------   Geometry file name (output)   ----------------------------------
   TString geoFileName = geoPath + "/geometry/target_";
-  geoFileName = geoFileName + geoTag + ".geo.root";
+  geoFileName = geoFileName + geoTag + "_s318.geo.root";
   // --------------------------------------------------------------------------
 
 
@@ -120,13 +131,13 @@ void create_target_geo(const char* geoTag = "LiH")
 
 
 
-  if (geoTag == "LeadTarget") ConstructGeometry1(lead, pMed);  	//for s318
-  if (geoTag == "Para")       ConstructGeometry2(pMed38, pMed2);
-  if (geoTag == "Para45")     ConstructGeometry3(pMed38, pMed2);
-  if (geoTag == "LiH")        ConstructGeometry4(pMed2, pMed15, pMed3, pMedAu);
-  if (geoTag == "CTarget")    ConstructGeometry5(pMedCarbon, pMed);	//for s318 
-  if (geoTag == "CH2Target")  ConstructGeometry6(pMed38, pMed); 	//for s318
-  if (geoTag == "ETTarget")   ConstructGeometry7(pMed); 	//for s318, empty target
+  if (0 == strncmp(geoTag, "LeadTarget", 10)) ConstructGeometry1(lead, pMed);  	//for s318
+  if (0 == strncmp(geoTag, "Para", 4))       ConstructGeometry2(pMed38);
+  if (0 == strncmp(geoTag, "Para45", 6))     ConstructGeometry3(pMed38);
+  if (0 == strncmp(geoTag, "LiH", 3))        ConstructGeometry4(pMed2, pMed15, pMed3, pMedAu);
+  if (0 == strncmp(geoTag, "CTarget", 7))    ConstructGeometry5(pMedCarbon, pMed);	//for s318
+  if (0 == strncmp(geoTag, "CH2Target", 9))  ConstructGeometry6(pMed38, pMed); 	//for s318
+  if (0 == strncmp(geoTag, "ETTarget", 8))   ConstructGeometry7(pMed); 	//for s318, empty target
 
 
 
@@ -238,9 +249,11 @@ void ConstructGeometry2(TGeoMedium *pMed38)
     new TGeoVolume("Parafin0deg", pParafin0deg, pMed38);
   pParafin0deg_log->SetVisLeaves(kTRUE);
 
+  TGeoVolumeAssembly *keep = new TGeoVolumeAssembly("Target");
+  keep->AddNode(pParafin0deg_log, 0, pMatrix2);
   
   TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix2);
-  gTop->AddNode(pParafin0deg_log, 0, pGlobal);
+  gTop->AddNode(keep, 0, pGlobal);
 }
 
 
@@ -284,9 +297,11 @@ void ConstructGeometry3(TGeoMedium *pMed38)
   TGeoVolume *pPara45deg_log = new TGeoVolume("Para45deg",pPara45deg, pMed38);
   pPara45deg_log->SetVisLeaves(kTRUE);
 
+  TGeoVolumeAssembly *keep = new TGeoVolumeAssembly("Target");
+  keep->AddNode(pPara45deg_log, 0, pMatrix2);
   
   TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix2);
-  gTop->AddNode(pPara45deg_log, 0, pGlobal);
+  gTop->AddNode(keep, 0, pGlobal);
 }
 
 
@@ -579,9 +594,11 @@ void ConstructGeometry7(TGeoMedium *pMed)
   TGeoVolume *pVacuumTarget_log = new TGeoVolume("VacuumTarget_log",pVacuumTarget, pMed);
   pVacuumTarget_log->SetVisLeaves(kTRUE);
 
+  TGeoVolumeAssembly *keep = new TGeoVolumeAssembly("Target");
+  keep->AddNode(pVacuumTarget_log, 0, pMatrix);
 
   TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix);
-  gTop->AddNode(pVacuumTarget_log, 0, pGlobal);
+  gTop->AddNode(keep, 0, pGlobal);
 }
 
 
@@ -601,7 +618,7 @@ TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef)
     Double_t yAxis[3] = { 0. , 1. , 0. };
     Double_t zAxis[3] = { 0. , 0. , 1. };
     // Reference Rotation
-    fRefRot = fRef;
+    fRefRot = fRef->GetRotation();
     
     if (fRefRot) {
       Double_t mX[3] = {0.,0.,0.};
@@ -658,7 +675,7 @@ TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef)
       TGeoCombiTrans c3;
       c3.SetRotation(pTmp->GetRotation());
       TGeoCombiTrans c4;
-      c4.SetRotation(fRefRot->GetRotation());
+      c4.SetRotation(fRefRot);
       
       TGeoCombiTrans ccc = c3 * c4;
       
