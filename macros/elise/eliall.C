@@ -30,14 +30,14 @@
 
 
 
-void eliall(Int_t nEvents = 1,
+void eliall(Int_t nEvents,
 	    TObjArray& fDetList,
-	    TString Target = "LeadTarget",
-            Bool_t fVis=kFALSE,
-            TString fMC="TGeant3",
-	    TString fGenerator="box",
-	    Bool_t fUserPList= kFALSE,
-            Bool_t fR3BMagnet= kTRUE
+	    TString Target,
+            Bool_t fVis,
+            TString fMC,
+	    TString fGenerator,
+	    Bool_t fUserPList,
+            Bool_t fR3BMagnet
 	   )
 {
 
@@ -179,7 +179,7 @@ void eliall(Int_t nEvents = 1,
       tra->SetTranslation(tx,ty,tz);
       // User defined Energy CutOff
       Double_t fCutOffSi = 1.0e-06;  // Cut-Off -> 10KeV only in Si
-      ((R3BTra*) tra)->SetEnergyCutOff(fCutOffSi);
+      //((R3BTra*) tra)->SetEnergyCutOff(fCutOffSi);
       run->AddModule(tra);
   }
   
@@ -223,7 +223,7 @@ void eliall(Int_t nEvents = 1,
       tof->SetTranslation(tx,ty,tz);
       // User defined Energy CutOff
       Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
-      ((R3BTof*) tof)->SetEnergyCutOff(fCutOffSci);
+      //((R3BTof*) tof)->SetEnergyCutOff(fCutOffSci);
       run->AddModule(tof);
   }
 
@@ -247,7 +247,7 @@ void eliall(Int_t nEvents = 1,
       mTof->SetTranslation(tx,ty,tz);
       // User defined Energy CutOff
       Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
-      ((R3BmTof*) mTof)->SetEnergyCutOff(fCutOffSci);
+      //((R3BmTof*) mTof)->SetEnergyCutOff(fCutOffSci);
       run->AddModule(mTof);
   }
 
@@ -270,7 +270,7 @@ void eliall(Int_t nEvents = 1,
       gfi->SetTranslation(tx,ty,tz);
       // User defined Energy CutOff
       Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
-      ((R3BGfi*) gfi)->SetEnergyCutOff(fCutOffSci);
+      //((R3BGfi*) gfi)->SetEnergyCutOff(fCutOffSci);
       run->AddModule(gfi);
   }
 
@@ -282,7 +282,7 @@ void eliall(Int_t nEvents = 1,
   }
 
   // Chimera
-  if (fDetList.FindObject("CHIMERA") ) {
+/*  if (fDetList.FindObject("CHIMERA") ) {
       R3BDetector* chim = new R3BChimera("Chimera", kTRUE);
       chim->SetGeometryFileName("chimera.root");
       // Global position of the Module
@@ -303,7 +303,7 @@ void eliall(Int_t nEvents = 1,
       //Double_t fCutOffSci = 1.0e-05;  // Cut-Off -> 10.KeV only in Sci.
       //((R3BChimera*) chim)->SetEnergyCutOff(fCutOffSci);
       run->AddModule(chim);
-  }
+  }*/
 
   // Luminosity detector
   if (fDetList.FindObject("LUMON") ) {

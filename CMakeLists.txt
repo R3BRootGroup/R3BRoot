@@ -209,7 +209,7 @@ else(R3BROOT_MINIMAL)
   find_package(GEANT4DATA)
   find_package(GEANT4VMC REQUIRED)
   find_package(CLHEP REQUIRED)
-  find_package(RuleChecker)
+#  find_package(RuleChecker)
 endif(R3BROOT_MINIMAL)
 
 # set a variable which should be used in all CMakeLists.txt

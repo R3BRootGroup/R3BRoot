@@ -12,13 +12,9 @@
 //
 //--------------------------------------------------------------------
 
+#include "eliall.C"
 
-Int_t elsim(){
-
-   // Load the Main Simulation macro
-   TString macro_eliall= getenv("VMCWORKDIR");
-   macro_eliall+="/macros/elise/eliall.C";
-   gROOT->LoadMacro(macro_eliall.Data());
+void elsim(){
 
    //-------------------------------------------------
    // Monte Carlo type     |    fMC        (TString)
