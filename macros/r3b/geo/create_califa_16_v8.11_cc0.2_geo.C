@@ -5,17 +5,14 @@
 
 #define Barrel 1
 
-
 // Create Matrix Unity
 TGeoRotation *fGlobalRot = new TGeoRotation();
 
 // Create a null translation
 TGeoTranslation *fGlobalTrans = new TGeoTranslation();
-fGlobalTrans->SetTranslation(0.0,0.0,0.0);
 TGeoRotation *fRefRot = NULL;
 
-TGeoManager*   gGeoMan           = NULL;
-
+TGeoManager*  gGeoMan = NULL;
 
 Double_t fThetaX = 0.;
 Double_t fThetaY = 0.;
@@ -29,11 +26,12 @@ Double_t fZ = 0.;
 Bool_t fLocalTrans = kFALSE;
 Bool_t fLabTrans = kFALSE;
 
-
-
+TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef);
 
 void create_califa_geo(const char* geoTag)
 {
+
+  fGlobalTrans->SetTranslation(0.0,0.0,0.0);
 
   // -------   Load media from media file   -----------------------------------
   FairGeoLoader*    geoLoad = new FairGeoLoader("TGeo","FairGeoLoader");
@@ -130,7 +128,7 @@ void create_califa_geo(const char* geoTag)
   TGeoCombiTrans *t_part1 = new TGeoCombiTrans("t_part1",0.,0.,-50,fRefRot);
   t_part1->RegisterYourself();
 
-  TGeoShape *pCBCone = new TGeoCone("Califa_Cone",20.,0.,26.4.,0.,3.2);
+  TGeoShape *pCBCone = new TGeoCone("Califa_Cone",20.,0.,26.4,0.,3.2);
   TGeoCombiTrans *t_cone = new TGeoCombiTrans("t_cone",0.,0.,20,fRefRot);
   t_cone->RegisterYourself();
   
@@ -269,10 +267,11 @@ void create_califa_geo(const char* geoTag)
 
     //Define thick_alv dependent on ring
     //(between ring i and i - 1)
+    Double_t thick_alv_theta = 0.; 
     if(i == 4 || i == 8 || i == 10 || i == 12) {
-      Double_t thick_alv_theta = thick_alv;
+      thick_alv_theta = thick_alv;
     } else {
-      Double_t thick_alv_theta = 0.;
+      thick_alv_theta = 0.;
     }
     Double_t thick_wrap = thick_wrap_iPhos;
     Double_t thick_alv_phi = thick_alv;
@@ -1202,7 +1201,6 @@ void create_califa_geo(const char* geoTag)
 	 Crystal_6_4->SetLineColor(col_barrel_crystal); 
 
  //Some common geometrical operations 
-	 TGeoRotation *rotUni = new TGeoRotation();          //unitary rotation  
 	 TGeoTranslation* noTrans=new TGeoTranslation("noTrans",0.,0.,0.); 
 	 TGeoRotation *rotSymmetric = new TGeoRotation(); //Symmetric crystal 
 	 rotSymmetric->RotateZ(180); 
@@ -4507,8 +4505,6 @@ void create_califa_geo(const char* geoTag)
 }
 
 
-
-
 TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef)
 {
   if (fLocalTrans == kTRUE ) {
@@ -4524,7 +4520,7 @@ TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef)
     Double_t yAxis[3] = { 0. , 1. , 0. };
     Double_t zAxis[3] = { 0. , 0. , 1. };
     // Reference Rotation
-    fRefRot = fRef;
+    fRefRot = fRef->GetRotation();
     
     if (fRefRot) {
       Double_t mX[3] = {0.,0.,0.};
@@ -4581,7 +4577,7 @@ TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef)
       TGeoCombiTrans c3;
       c3.SetRotation(pTmp->GetRotation());
       TGeoCombiTrans c4;
-      c4.SetRotation(fRefRot->GetRotation());
+      c4.SetRotation(fRefRot);
       
       TGeoCombiTrans ccc = c3 * c4;
       

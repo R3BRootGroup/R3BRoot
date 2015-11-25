@@ -3,21 +3,14 @@
 #include "TGeoManager.h"
 #include "TMath.h"
 
-
-
-
 // Create Matrix Unity
 TGeoRotation *fGlobalRot = new TGeoRotation();
 
 // Create a null translation
 TGeoTranslation *fGlobalTrans = new TGeoTranslation();
-fGlobalTrans->SetTranslation(0.0,0.0,0.0);
 TGeoRotation *fRefRot = NULL;
 
-TGeoManager*   gGeoMan           = NULL;
-
-
-
+TGeoManager*  gGeoMan = NULL;
 
 Double_t fThetaX = 0.;
 Double_t fThetaY = 0.;
@@ -32,10 +25,21 @@ Bool_t fLocalTrans = kFALSE;
 Bool_t fLabTrans = kFALSE;
 
 
+TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef);
 
+void ConstructSubPartEcrans(TGeoVolume* pWorld);
+void ConstructDemiEcransTh(TGeoVolume* pWorld);
+void ConstructEnceinteI(TGeoVolume* pWorld);
+void ConstructEnceinteE(TGeoVolume* pWorld);
+void ConstructFonfE(TGeoVolume* pWorld);
+void ConstructFondS(TGeoVolume* pWorld);
+void ConstructGToles(TGeoVolume* pWorld);
 
 void create_glad_geo(const char* geoTag)
 {
+
+  fGlobalTrans->SetTranslation(0.0,0.0,0.0);
+
   // Global positioning definition
   Double_t Glad_angle =    0.0;   //[deg]
   Double_t Glad_length = 200.0;   //[cm]
@@ -4066,7 +4070,7 @@ void ConstructFonfE(TGeoVolume* pWorld)
 
 
 
-void ConstructFondS(TGeoVolume * pWorld)
+void ConstructFondS(TGeoVolume* pWorld)
 {
  // Enceinte Extern part
    Double_t dx,dy,dz;
@@ -4670,7 +4674,7 @@ void ConstructFondS(TGeoVolume * pWorld)
 
 
 
-void ConstructGToles(TGeoVolume * pWorld)
+void ConstructGToles(TGeoVolume* pWorld)
 {
  // Enceinte Extern part
    Double_t dx,dy,dz;
@@ -5387,7 +5391,6 @@ void ConstructGToles(TGeoVolume * pWorld)
 
 
 
-
 TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef)
 {
   if (fLocalTrans == kTRUE ) {
@@ -5403,7 +5406,7 @@ TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef)
     Double_t yAxis[3] = { 0. , 1. , 0. };
     Double_t zAxis[3] = { 0. , 0. , 1. };
     // Reference Rotation
-    fRefRot = fRef;
+    fRefRot = fRef->GetRotation();
     
     if (fRefRot) {
       Double_t mX[3] = {0.,0.,0.};
@@ -5460,7 +5463,7 @@ TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef)
       TGeoCombiTrans c3;
       c3.SetRotation(pTmp->GetRotation());
       TGeoCombiTrans c4;
-      c4.SetRotation(fRefRot->GetRotation());
+      c4.SetRotation(fRefRot);
       
       TGeoCombiTrans ccc = c3 * c4;
       

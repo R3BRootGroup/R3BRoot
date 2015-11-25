@@ -3,21 +3,14 @@
 #include "TGeoManager.h"
 #include "TMath.h"
 
-
-
-
 // Create Matrix Unity
 TGeoRotation *fGlobalRot = new TGeoRotation();
 
 // Create a null translation
 TGeoTranslation *fGlobalTrans = new TGeoTranslation();
-fGlobalTrans->SetTranslation(0.0,0.0,0.0);
 TGeoRotation *fRefRot = NULL;
 
-TGeoManager*   gGeoMan           = NULL;
-
-
-
+TGeoManager*  gGeoMan = NULL;
 
 Double_t fThetaX = 0.;
 Double_t fThetaY = 0.;
@@ -32,10 +25,14 @@ Bool_t fLocalTrans = kFALSE;
 Bool_t fLabTrans = kTRUE;
 
 
+TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef);
 
 
 void create_tof_geo(const char* geoTag)
 {
+
+  fGlobalTrans->SetTranslation(0.0,0.0,0.0);
+
   // -------   Load media from media file   -----------------------------------
   FairGeoLoader*    geoLoad = new FairGeoLoader("TGeo","FairGeoLoader");
   FairGeoInterface* geoFace = geoLoad->getGeoInterface();
@@ -191,7 +188,6 @@ void create_tof_geo(const char* geoTag)
 
 
 
-
 TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef)
 {
   if (fLocalTrans == kTRUE ) {
@@ -207,7 +203,7 @@ TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef)
     Double_t yAxis[3] = { 0. , 1. , 0. };
     Double_t zAxis[3] = { 0. , 0. , 1. };
     // Reference Rotation
-    fRefRot = fRef;
+    fRefRot = fRef->GetRotation();
     
     if (fRefRot) {
       Double_t mX[3] = {0.,0.,0.};
@@ -264,7 +260,7 @@ TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef)
       TGeoCombiTrans c3;
       c3.SetRotation(pTmp->GetRotation());
       TGeoCombiTrans c4;
-      c4.SetRotation(fRefRot->GetRotation());
+      c4.SetRotation(fRefRot);
       
       TGeoCombiTrans ccc = c3 * c4;
       

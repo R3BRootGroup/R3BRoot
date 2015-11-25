@@ -5,17 +5,14 @@
 
 #define Barrel 1
 
-
 // Create Matrix Unity
 TGeoRotation *fGlobalRot = new TGeoRotation();
 
 // Create a null translation
 TGeoTranslation *fGlobalTrans = new TGeoTranslation();
-fGlobalTrans->SetTranslation(0.0,0.0,0.0);
 TGeoRotation *fRefRot = NULL;
 
-TGeoManager*   gGeoMan           = NULL;
-
+TGeoManager*  gGeoMan = NULL;
 
 Double_t fThetaX = 0.;
 Double_t fThetaY = 0.;
@@ -29,11 +26,12 @@ Double_t fZ = 0.;
 Bool_t fLocalTrans = kFALSE;
 Bool_t fLabTrans = kFALSE;
 
-
-
+TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef);
 
 void create_califa_geo(const char* geoTag)
 {
+
+  fGlobalTrans->SetTranslation(0.0,0.0,0.0);
 
   // -------   Load media from media file   -----------------------------------
   FairGeoLoader*    geoLoad = new FairGeoLoader("TGeo","FairGeoLoader");
@@ -130,7 +128,7 @@ void create_califa_geo(const char* geoTag)
   TGeoCombiTrans *t_part1 = new TGeoCombiTrans("t_part1",0.,0.,-50,fRefRot);
   t_part1->RegisterYourself();
 
-  TGeoShape *pCBCone = new TGeoCone("Califa_Cone",20.,0.,26.4.,0.,3.2);
+  TGeoShape *pCBCone = new TGeoCone("Califa_Cone",20.,0.,26.4,0.,3.2);
   TGeoCombiTrans *t_cone = new TGeoCombiTrans("t_cone",0.,0.,20,fRefRot);
   t_cone->RegisterYourself();
   
@@ -1453,7 +1451,6 @@ void create_califa_geo(const char* geoTag)
 	 psiEuler = -180; 
 
 	 TGeoRotation *rotAlv_10 = new TGeoRotation("rotAlv10",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans *transAlvBase = new TGeoCombiTrans();
 	 TGeoRotation *rotPlace_10 = new TGeoRotation();
 	 *rotAlv_10 = TGeoRotation("rotAlv10",phiEuler,thetaEuler,psiEuler); 
 	 TGeoCombiTrans* transAlv_10_0 = new TGeoCombiTrans(-3.01649999999993,30.6605329493663,7.63929090825073,rotAlv_10); 
@@ -1484,7 +1481,6 @@ void create_califa_geo(const char* geoTag)
 	 psiEuler = -180; 
 
 	 TGeoRotation *rotAlv_11 = new TGeoRotation("rotAlv11",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans *transAlvBase = new TGeoCombiTrans();
 	 TGeoRotation *rotPlace_11 = new TGeoRotation();
 	 *rotAlv_11 = TGeoRotation("rotAlv11",phiEuler,thetaEuler,psiEuler); 
 	 TGeoCombiTrans* transAlv_11_0 = new TGeoCombiTrans(-3.04199999999993,30.9206806111464,10.9180918399028,rotAlv_11); 
@@ -1515,7 +1511,6 @@ void create_califa_geo(const char* geoTag)
 	 psiEuler = -180; 
 
 	 TGeoRotation *rotAlv_12 = new TGeoRotation("rotAlv12",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans *transAlvBase = new TGeoCombiTrans();
 	 TGeoRotation *rotPlace_12 = new TGeoRotation();
 	 *rotAlv_12 = TGeoRotation("rotAlv12",phiEuler,thetaEuler,psiEuler); 
 	 TGeoCombiTrans* transAlv_12_0 = new TGeoCombiTrans(-3.06749999999993,31.1737346881315,14.3082258908461,rotAlv_12); 
@@ -1546,7 +1541,6 @@ void create_califa_geo(const char* geoTag)
 	 psiEuler = -180; 
 
 	 TGeoRotation *rotAlv_13 = new TGeoRotation("rotAlv13",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans *transAlvBase = new TGeoCombiTrans();
 	 TGeoRotation *rotPlace_13 = new TGeoRotation();
 	 *rotAlv_13 = TGeoRotation("rotAlv13",phiEuler,thetaEuler,psiEuler); 
 	 TGeoCombiTrans* transAlv_13_0 = new TGeoCombiTrans(-3.09099999999993,31.417956426523,17.8408437262792,rotAlv_13); 
@@ -1577,7 +1571,6 @@ void create_califa_geo(const char* geoTag)
 	 psiEuler = -180; 
 
 	 TGeoRotation *rotAlv_14 = new TGeoRotation("rotAlv14",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans *transAlvBase = new TGeoCombiTrans();
 	 TGeoRotation *rotPlace_14 = new TGeoRotation();
 	 *rotAlv_14 = TGeoRotation("rotAlv14",phiEuler,thetaEuler,psiEuler); 
 	 TGeoCombiTrans* transAlv_14_0 = new TGeoCombiTrans(-3.11449999999993,33.343093197755,22.6194116972268,rotAlv_14); 
@@ -1608,7 +1601,6 @@ void create_califa_geo(const char* geoTag)
 	 psiEuler = -180; 
 
 	 TGeoRotation *rotAlv_15 = new TGeoRotation("rotAlv15",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans *transAlvBase = new TGeoCombiTrans();
 	 TGeoRotation *rotPlace_15 = new TGeoRotation();
 	 *rotAlv_15 = TGeoRotation("rotAlv15",phiEuler,thetaEuler,psiEuler); 
 	 TGeoCombiTrans* transAlv_15_0 = new TGeoCombiTrans(-3.13549999999993,33.4646558050777,26.6976862352101,rotAlv_15); 
@@ -1639,7 +1631,6 @@ void create_califa_geo(const char* geoTag)
 	 psiEuler = -180; 
 
 	 TGeoRotation *rotAlv_16 = new TGeoRotation("rotAlv16",phiEuler,thetaEuler,psiEuler); 
-	 TGeoCombiTrans *transAlvBase = new TGeoCombiTrans();
 	 TGeoRotation *rotPlace_16 = new TGeoRotation();
 	 *rotAlv_16 = TGeoRotation("rotAlv16",phiEuler,thetaEuler,psiEuler); 
 	 TGeoCombiTrans* transAlv_16_0 = new TGeoCombiTrans(-3.15649999999993,33.559817680364,31.0463924828861,rotAlv_16); 
@@ -1699,7 +1690,7 @@ TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef)
     Double_t yAxis[3] = { 0. , 1. , 0. };
     Double_t zAxis[3] = { 0. , 0. , 1. };
     // Reference Rotation
-    fRefRot = fRef;
+    fRefRot = fRef->GetRotation();
     
     if (fRefRot) {
       Double_t mX[3] = {0.,0.,0.};
@@ -1756,7 +1747,7 @@ TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef)
       TGeoCombiTrans c3;
       c3.SetRotation(pTmp->GetRotation());
       TGeoCombiTrans c4;
-      c4.SetRotation(fRefRot->GetRotation());
+      c4.SetRotation(fRefRot);
       
       TGeoCombiTrans ccc = c3 * c4;
       
