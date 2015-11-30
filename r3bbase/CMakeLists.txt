@@ -11,6 +11,7 @@ set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase 
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
+${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 ${R3BROOT_SOURCE_DIR}/r3bdata/caloData
 )
 

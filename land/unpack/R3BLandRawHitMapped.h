@@ -9,9 +9,9 @@
 #ifndef R3BLANDHITMAPPED_H
 #define R3BLANDHITMAPPED_H
 
-#include "R3BLandRawHit.h"
+#include "R3BNeulandRawItem.h"
 
-class R3BLandRawHitMapped : public R3BLandRawHit
+class R3BLandRawHitMapped : public R3BNeulandRawItem
 {
   public:
     // Default Constructor

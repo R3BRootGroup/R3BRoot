@@ -48,7 +48,6 @@
 #pragma link C++ class R3BLandPoint+;
 #pragma link C++ class R3BNeuLandPoint+;
 #pragma link C++ class R3BNeutronTrack+;
-#pragma link C++ class R3BLandRawHit+;
 #pragma link C++ class R3BLandDigi+;
 #pragma link C++ class R3BLandFirstHits+;
 #pragma link C++ class R3BLandHit+;
@@ -58,6 +57,7 @@
 #pragma link C++ class R3BMfiDigi+;
 #pragma link C++ class R3BPspPoint+;
 #pragma link C++ class R3BPspDigi+;
+#pragma link C++ class R3BNeulandRawItem+;
 
 #endif
 

@@ -22,6 +22,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
+${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
 ${R3BROOT_SOURCE_DIR}/r3bdb/landdb
 ${R3BROOT_SOURCE_DIR}/tcal

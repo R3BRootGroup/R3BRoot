@@ -16,7 +16,7 @@
 #include "FairLogger.h"
 
 #include "R3BLandMapping.h"
-#include "R3BLandRawHit.h"
+#include "R3BNeulandRawItem.h"
 #include "R3BLandRawHitMapped.h"
 
 using std::ifstream;
@@ -141,7 +141,7 @@ void R3BLandMapping::Exec(Option_t* option)
 {
     // -------- Paddle identification ----------------------
     Int_t nHits = fRawData->GetEntries();
-    R3BLandRawHit* hit;
+    R3BNeulandRawItem* hit;
     
     Int_t sam;
     Int_t gtb;
@@ -157,7 +157,7 @@ void R3BLandMapping::Exec(Option_t* option)
     Int_t side;
     for (Int_t i = 0; i < nHits; i++)
     {
-        hit = (R3BLandRawHit*)fRawData->At(i);
+        hit = (R3BNeulandRawItem*)fRawData->At(i);
         sam = hit->GetSam();
         gtb = hit->GetGtb();
         tacaddr = hit->GetTacAddr();

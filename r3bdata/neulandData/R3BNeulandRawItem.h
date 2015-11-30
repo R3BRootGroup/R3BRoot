@@ -1,21 +1,14 @@
-// ---------------------------------------------------------------------------------------
-// -----                                                                             -----
-// -----                           R3BLandRawHit                                     -----
-// -----                           Version 0.1                                       -----
-// -----         Adapted by M.I. Cherciu @ 01.2014 after Y.Gonzalez code             -----
-// -----                                                                             -----
-// ---------------------------------------------------------------------------------------
 
-#ifndef R3BLANDRAWHIT_H
-#define R3BLANDRAWHIT_H
+#ifndef R3BNEULANDRAWITEM_H
+#define R3BNEULANDRAWITEM_H
 
 #include "TObject.h"
 
-class R3BLandRawHit : public TObject
+class R3BNeulandRawItem : public TObject
 {
   public:
     // Default Constructor
-    R3BLandRawHit();
+    R3BNeulandRawItem();
 
     /** Standard Constructor
      *@param Tac_addr   tac mod address
@@ -25,12 +18,19 @@ class R3BLandRawHit : public TObject
      *@param Tac_data   tac data
      *@param Qdc_data   qdc data
      **/
-    R3BLandRawHit(UShort_t sam, UShort_t gtb, UShort_t tacAddr, UShort_t tacCh, UShort_t cal, UShort_t clock, UShort_t tacData, UShort_t qdcData);
-    
-    R3BLandRawHit(const R3BLandRawHit&);
+    R3BNeulandRawItem(UShort_t sam,
+                      UShort_t gtb,
+                      UShort_t tacAddr,
+                      UShort_t tacCh,
+                      UShort_t cal,
+                      UShort_t clock,
+                      UShort_t tacData,
+                      UShort_t qdcData);
+
+    R3BNeulandRawItem(const R3BNeulandRawItem&);
 
     // Destructor
-    virtual ~R3BLandRawHit()
+    virtual ~R3BNeulandRawItem()
     {
     }
 
@@ -78,7 +78,7 @@ class R3BLandRawHit : public TObject
     UShort_t fQdcData; //... QDC data
 
   public:
-    ClassDef(R3BLandRawHit, 1)
+    ClassDef(R3BNeulandRawItem, 1)
 };
 
 #endif
