@@ -10,6 +10,7 @@ ${BASE_INCLUDE_DIRECTORIES}
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bsource
+${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 )
 
 
@@ -39,6 +40,7 @@ if(WITH_UCESB)
 		R3BReader.cxx
 		R3BUnpackReader.cxx
 		R3BNeulandTamexReader.cxx
+        R3BNeulandTacquilaReader.cxx
 	)
 message("-- Looking for ucesb... - found ucesb")
 endif(WITH_UCESB)
