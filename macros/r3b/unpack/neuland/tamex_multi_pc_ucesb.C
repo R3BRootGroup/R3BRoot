@@ -34,7 +34,7 @@ void tamex_multi_pc_ucesb()
 	R3BUcesbSource* source = new R3BUcesbSource(filename, ntuple_options,
 	    ucesb_path, &ucesb_struct, sizeof(ucesb_struct));
 	source->AddReader(new R3BUnpackReader(&ucesb_struct));
-	/*source->AddReader(new R3BNeulandTamexReader(&ucesb_struct));*/
+	source->AddReader(new R3BNeulandTamexReader(&ucesb_struct));
 
 	/* ------------------------------------------------------ */
 
