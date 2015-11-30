@@ -33,7 +33,7 @@ find_path(ucesb_INCLUDE_DIR NAMES ext_data_clnt.hh ext_h101.h
   DOC   "Path to ucesb include header files."
 )
 
-find_path(ucesb_LIBRARY_DIR NAMES "lib${ucesb_LIBRARY_SHARED}"
+find_path(ucesb_LIBRARY_DIR NAMES "lib${ucesb_LIBRARY_SHARED}.so"
   PATHS $ENV{UCESB_DIR}
   	$ENV{UCESB_DIR}/hbook
   NO_DEFAULT_PATH
