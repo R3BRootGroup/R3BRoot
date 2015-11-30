@@ -61,7 +61,6 @@ R3BNeutHit.cxx
 unpack/R3BLandRawAna.cxx
 unpack/R3BLandRawAnaS438b.cxx
 unpack/R3BLandMapping.cxx
-unpack/R3BLandRawHitMapped.cxx
 unpack/R3BLandUnpack.cxx
 unpack/R3BLandTcalFill.cxx
 unpack/R3BLandParamRead.cxx

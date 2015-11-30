@@ -88,6 +88,7 @@ mfiData/R3BMfiDigi.cxx
 pspData/R3BPspPoint.cxx
 pspData/R3BPspDigi.cxx
 neulandData/R3BNeulandRawItem.cxx
+neulandData/R3BNeulandMappedItem.cxx
 )
 
 

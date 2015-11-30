@@ -4,7 +4,7 @@
 // ----------------------------------------------------------------
 
 #include "R3BLandTcalFill.h"
-#include "R3BLandRawHitMapped.h"
+#include "R3BNeulandMappedItem.h"
 #include "R3BEventHeader.h"
 #include "R3BTCalPar.h"
 #include "R3BTCalEngine.h"
@@ -101,7 +101,7 @@ void R3BLandTcalFill::Exec(Option_t* option)
         return;
     }
 
-    R3BLandRawHitMapped* hit;
+    R3BNeulandMappedItem* hit;
     Int_t iBar;
     Int_t iSide;
     Int_t channel;
@@ -109,7 +109,7 @@ void R3BLandTcalFill::Exec(Option_t* option)
     // Loop over mapped hits
     for (Int_t i = 0; i < nHits; i++)
     {
-        hit = (R3BLandRawHitMapped*)fHits->At(i);
+        hit = (R3BNeulandMappedItem*)fHits->At(i);
         if (!hit)
         {
             continue;

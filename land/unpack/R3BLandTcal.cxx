@@ -11,7 +11,7 @@
 #include "R3BLandTcal.h"
 
 #include "R3BTCalEngine.h"
-#include "R3BLandRawHitMapped.h"
+#include "R3BNeulandMappedItem.h"
 #include "R3BLandPmt.h"
 #include "R3BTCalPar.h"
 #include "R3BEventHeader.h"
@@ -130,8 +130,8 @@ void R3BLandTcal::Exec(Option_t* option)
         return;
     }
 
-    R3BLandRawHitMapped* hit;
-    R3BLandRawHitMapped* hit2;
+    R3BNeulandMappedItem* hit;
+    R3BNeulandMappedItem* hit2;
     Int_t iBar;
     Int_t iSide;
     Int_t channel;
@@ -146,7 +146,7 @@ void R3BLandTcal::Exec(Option_t* option)
 
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        hit = (R3BLandRawHitMapped*)fRawHit->At(ihit);
+        hit = (R3BNeulandMappedItem*)fRawHit->At(ihit);
         if (NULL == hit)
         {
             continue;
@@ -201,7 +201,7 @@ void R3BLandTcal::Exec(Option_t* option)
 
         for (Int_t khit = 0; khit < ihit; khit++)
         {
-            hit2 = (R3BLandRawHitMapped*)fRawHit->At(khit);
+            hit2 = (R3BNeulandMappedItem*)fRawHit->At(khit);
             if (NULL == hit2)
             {
                 continue;

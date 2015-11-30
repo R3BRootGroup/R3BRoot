@@ -18,7 +18,7 @@ using namespace std;
 
 #include "R3BEventHeader.h"
 #include "R3BNeulandRawItem.h"
-#include "R3BLandRawHitMapped.h"
+#include "R3BNeulandMappedItem.h"
 #include "R3BLosRawHit.h"
 #include "R3BLandRawAna.h"
 
@@ -88,10 +88,10 @@ void R3BLandRawAna::Exec(Option_t* option)
     if (fLandRawHitMapped)
     {
         Int_t nLandRawHitsMapped = fLandRawHitMapped->GetEntries();
-        R3BLandRawHitMapped* hitmapped;
+        R3BNeulandMappedItem* hitmapped;
         for (Int_t i = 0; i < nLandRawHitsMapped; i++)
         {
-            hitmapped = (R3BLandRawHitMapped*)fLandRawHitMapped->At(i);
+            hitmapped = (R3BNeulandMappedItem*)fLandRawHitMapped->At(i);
             fh_land_mapped_is17->Fill(hitmapped->Is17());
             if(! hitmapped->Is17())
             {

@@ -17,7 +17,7 @@
 
 #include "R3BLandMapping.h"
 #include "R3BNeulandRawItem.h"
-#include "R3BLandRawHitMapped.h"
+#include "R3BNeulandMappedItem.h"
 
 using std::ifstream;
 
@@ -25,7 +25,7 @@ R3BLandMapping::R3BLandMapping()
     : nMappedElements(0)
     , fnEvents(0)
     , fNofBarsPerPlane(0)
-    , fLandHit(new TClonesArray("R3BLandRawHitMapped"))
+    , fLandHit(new TClonesArray("R3BNeulandMappedItem"))
     , nEntry(0)
 {
 }
@@ -190,7 +190,7 @@ void R3BLandMapping::Exec(Option_t* option)
                 LOG(INFO) << tach << "  " << is17 << "  " << barId << "  " << side << FairLogger::endl;
                 FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Illegal barId");
             }
-            new ((*fLandHit)[nEntry]) R3BLandRawHitMapped(sam, gtb, tacaddr, cal, clock, tacData, qdcData, barId, side, is17);
+            new ((*fLandHit)[nEntry]) R3BNeulandMappedItem(sam, gtb, tacaddr, cal, clock, tacData, qdcData, barId, side, is17);
             nEntry++;
         }
     }
