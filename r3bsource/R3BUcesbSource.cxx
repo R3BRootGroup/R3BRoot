@@ -39,6 +39,10 @@ Bool_t R3BUcesbSource::Init()
 	command << fUcesbPath << " " << fFileName << " "
 		<< "--ntuple=" << fNtupleOptions << ",STRUCT,-";
 
+	if (fLastEventNo != -1) {
+		command << " --max-events=" << fLastEventNo;
+	}
+
 	std::cout << "Calling ucesb with command: " << command.str()
 		<< std::endl;
 

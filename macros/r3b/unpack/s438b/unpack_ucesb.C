@@ -32,6 +32,7 @@ void unpack_ucesb()
 	EXT_STR_h101 ucesb_struct;
 	R3BUcesbSource* source = new R3BUcesbSource(filename, ntuple_options,
 	    ucesb_path, &ucesb_struct, sizeof(ucesb_struct));
+	source->SetMaxEvents(nev);
 	source->AddReader(new R3BUnpackReader(&ucesb_struct));
 	/*source->AddReader(new R3BNeulandTamexReader(&ucesb_struct));*/
 
@@ -74,7 +75,7 @@ void unpack_ucesb()
 	/* ------------------------------------------------------ */
 
 	/* Run -------------------------------------------------- */
-	run->Run(nev, 0);
+	run->Run((nev < 0) ? nev : 0, (nev < 0) ? 0 : nev);
 	/*rtdb->saveOutput();*/
 	/* ------------------------------------------------------ */
 

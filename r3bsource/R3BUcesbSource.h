@@ -44,6 +44,8 @@ public:
 	void	Reset();
 	/* The reader interface */
 	void	AddReader(R3BReader *a_reader) { fReaders->Add(a_reader); }
+	/* Limit the number of events */
+	void	SetMaxEvents(int a_max) { fLastEventNo = a_max; }
 	/* Get readers */
 	const TObjArray* GetReaders() const { return fReaders; }
 
