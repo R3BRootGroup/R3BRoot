@@ -1,4 +1,6 @@
-Int_t r3blandsim(Int_t nNeutrons, Int_t nEvents=10000,Int_t beamE, Int_t Erel)
+#include "../r3ball.C"
+
+void r3blandsim(Int_t nNeutrons = 1, Int_t nEvents = 1000, Int_t beamE = 600, Int_t Erel = 500)
 {
   Int_t d;
   if(Erel == 100){
@@ -7,11 +9,6 @@ Int_t r3blandsim(Int_t nNeutrons, Int_t nEvents=10000,Int_t beamE, Int_t Erel)
   else{
     d = 14;
   }
-  
-  // Load the Main Simulation macro
-  TString macro_r3ball = getenv("VMCWORKDIR");
-  macro_r3ball += "/macros/r3b/r3ball.C";
-  gROOT->LoadMacro(macro_r3ball.Data());
   
   char str[100];
   
@@ -55,6 +52,6 @@ Int_t r3blandsim(Int_t nNeutrons, Int_t nEvents=10000,Int_t beamE, Int_t Erel)
   Bool_t fR3BMagnet = kTRUE;
 
   // Main Sim function call
-  r3ball(nEvents,detGeo,target,fEventDisplay,fMC,fGene,fUserPList,fR3BMagnet,2500.,OutFile,ParFile,EventDataFile);  
+  r3ball(nEvents,&detGeo,target,fEventDisplay,fMC,fGene,fUserPList,fR3BMagnet,2500.,OutFile,ParFile,EventDataFile);  
 }
 
