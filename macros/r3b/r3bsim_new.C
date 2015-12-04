@@ -16,7 +16,7 @@
 
 #include "r3ball.C"
 
-void r3bsim()
+void r3bsim_new()
 {
   // Output files
   TString OutFile = "r3bsim_new.root";
