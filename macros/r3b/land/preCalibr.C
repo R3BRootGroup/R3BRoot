@@ -40,6 +40,10 @@ void preCalibr(Int_t nNeutrons = 4, Int_t nEvents = 100, Int_t beamE = 600, Int_
   landDigitizer->UseBeam(beamE);
   landDigitizer->SetTOFRange(400.);
   fRun->AddTask(landDigitizer);
+
+  R3BLandDigitizerQA* landDigitizerQA = new R3BLandDigitizerQA();
+  landDigitizerQA->SetBeamEnergy(beamE);
+  fRun->AddTask(landDigitizerQA);
   // ---------------------------------------------------------------------------
 
 
