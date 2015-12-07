@@ -9,4 +9,5 @@ SET_TESTS_PROPERTIES(r3bsim_new PROPERTIES TIMEOUT "100")
 SET_TESTS_PROPERTIES(r3bsim_new PROPERTIES PASS_REGULAR_EXPRESSION "TestPassed;All ok")
 
 add_subdirectory(califa)
+add_subdirectory(land)
 

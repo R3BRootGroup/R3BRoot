@@ -1,6 +1,6 @@
 #include "../r3ball.C"
 
-void r3blandsim(Int_t nNeutrons = 1, Int_t nEvents = 1000, Int_t beamE = 600, Int_t Erel = 500)
+void r3blandsim(Int_t nNeutrons = 4, Int_t nEvents = 100, Int_t beamE = 600, Int_t Erel = 500)
 {
   Int_t d;
   if(Erel == 100){

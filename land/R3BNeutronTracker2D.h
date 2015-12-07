@@ -42,6 +42,8 @@ class R3BNeutronTracker2D : public FairTask
   
   void ReadCalibrFile(char *name);
 
+  inline Int_t GetNTracks4() { return h_ntracks->GetBinContent(5); }
+
  private:
   TClonesArray* fLandPoints;
   TClonesArray* fLandMCTrack; 
