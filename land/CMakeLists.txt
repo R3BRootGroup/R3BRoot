@@ -40,8 +40,6 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
 R3BLand.cxx
-R3BNeuLand.cxx
-R3BNeuLandv1.cxx
 R3BGeoLand.cxx
 R3BGeoLandPar.cxx
 R3BLandContFact.cxx
@@ -49,9 +47,6 @@ R3BLandDigitizer.cxx
 R3BLandDigitizerQA.cxx
 R3BNeutronTracker.cxx
 R3BLandDigiPar.cxx
-R3BConstantFraction.cxx
-R3BLandDigitizer_CFD.cxx
-R3BLandDigiAnalyser.cxx
 R3BNeuLandCluster.cxx
 R3BNeuLandClusterFinder.cxx
 R3BNeutronCalibr2D.cxx
@@ -79,7 +74,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF LandLinkDef.h)
 Set(LIBRARY_NAME R3BLand)
 Set(DEPENDENCIES
-    R3Bbase R3BData R3BPassive MCStack R3BTCal)
+    R3Bbase R3BData R3BPassive R3BTCal)
 
 GENERATE_LIBRARY()
 
