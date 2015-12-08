@@ -66,7 +66,6 @@ startrackerData/R3BSTaRTraHit.cxx
 startrackerData/R3BSTaRTrackerHit.cxx
 startrackerData/R3BSTaRTrackerDigitHit.cxx
 landData/R3BLandPoint.cxx
-landData/R3BNeuLandPoint.cxx 
 landData/R3BLandDigi.cxx 
 landData/R3BLandFirstHits.cxx 
 landData/R3BLandHit.cxx 
