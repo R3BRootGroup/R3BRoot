@@ -28,8 +28,11 @@ class R3BLandRawAna : public FairTask
 
     virtual void FinishTask();
 
+    inline Int_t GetNItemsTotal() { return fNItemsTotal; }
+
   private:
     Int_t fnEvents;
+    Int_t fNItemsTotal;
 
     R3BEventHeader *fHeader;
     TClonesArray* fLandRawHit;

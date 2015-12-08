@@ -24,6 +24,7 @@ using namespace std;
 
 R3BLandRawAna::R3BLandRawAna()
     : fnEvents(0)
+    , fNItemsTotal(0)
     , fHeader(NULL)
     , fLandRawHit(NULL)
     , fLandRawHitMapped(NULL)
@@ -34,6 +35,7 @@ R3BLandRawAna::R3BLandRawAna()
 R3BLandRawAna::R3BLandRawAna(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fnEvents(0)
+    , fNItemsTotal(0)
     , fHeader(NULL)
     , fLandRawHit(NULL)
     , fLandRawHitMapped(NULL)
@@ -88,6 +90,7 @@ void R3BLandRawAna::Exec(Option_t* option)
     if (fLandRawHitMapped)
     {
         Int_t nLandRawHitsMapped = fLandRawHitMapped->GetEntries();
+        fNItemsTotal += nLandRawHitsMapped;
         R3BNeulandMappedItem* hitmapped;
         for (Int_t i = 0; i < nLandRawHitsMapped; i++)
         {
