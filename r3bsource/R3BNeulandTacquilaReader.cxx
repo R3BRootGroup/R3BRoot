@@ -63,9 +63,12 @@ Bool_t R3BNeulandTacquilaReader::Read()
             {
                 // Signal channel
                 UInt_t tdc1 = data->NNP[i]._[j]._[k].E;
+                UInt_t clock1 = data->NNP[i]._[j]._[k].C;
+                UInt_t qdc = data->NNP[i]._[j]._[k].Q;
 
                 // Stop signal (17-th channel)
                 UInt_t tdc2 = data->NNP[i]._[j]._[k].T;
+                UInt_t clock2 = data->NNP[i]._[j]._[k].S;
 
                 // Calculate global bar index
                 barId = i * 50 + j + 1;
@@ -74,12 +77,12 @@ Bool_t R3BNeulandTacquilaReader::Read()
                 if (tdc1)
                 {
                     new ((*fArray)[fArray->GetEntriesFast()])
-                        R3BNeulandMappedItem(0, 0, 0, 0, 0, 4096 - tdc1, 0, barId, k + 1, kFALSE);
+                        R3BNeulandMappedItem(0, 0, 0, 0, 63 - clock1, 4095 - tdc1, qdc, barId, k + 1, kFALSE);
                 }
                 if (tdc2)
                 {
                     new ((*fArray)[fArray->GetEntriesFast()])
-                        R3BNeulandMappedItem(0, 0, 0, 0, 0, 4096 - tdc2, 0, 0, 0, kTRUE);
+                        R3BNeulandMappedItem(0, 0, 0, 0, 63 - clock2, 4095 - tdc2, 0, 0, 0, kTRUE);
                 }
             }
         }
