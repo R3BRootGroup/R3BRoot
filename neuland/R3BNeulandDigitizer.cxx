@@ -41,16 +41,19 @@ void R3BNeulandDigitizer::SetParContainers()
     FairRunAna *run = FairRunAna::Instance();
     if (!run) {
         Fatal("SetParContainers", "No analysis run");
+        return;
     }
 
     FairRuntimeDb *rtdb = run->GetRuntimeDb();
     if (!rtdb) {
         Fatal("SetParContainers", "No runtime database");
+        return;
     }
 
-    fLandDigiPar = (R3BLandDigiPar *)(rtdb->getContainer("R3BLandDigiPar"));
+    fLandDigiPar = (R3BLandDigiPar *)rtdb->getContainer("R3BLandDigiPar");
     if (!fLandDigiPar) {
         Fatal("SetParContainers", "No R3BLandDigiPar");
+        return;
     }
 
     if (fVerbose && fLandDigiPar) {
@@ -65,9 +68,14 @@ InitStatus R3BNeulandDigitizer::Init()
     FairRootManager *ioman = FairRootManager::Instance();
     if (!ioman) {
         Fatal("Init", "No FairRootManager");
+        return kFATAL;
     }
 
-    fLandPoints = (TClonesArray *) ioman->GetObject("LandPoint");
+    fLandPoints = (TClonesArray *) ioman->GetObject("NeulandPoints");
+    if (fLandPoints == nullptr) {
+        LOG(FATAL) << "R3BNeulandDigitizer: No NeulandPoints!" << FairLogger::endl;
+        return kFATAL;
+    }
 
     ioman->Register("LandDigi", "Digital response in Land", fLandDigi, kTRUE);
 
@@ -82,6 +90,7 @@ InitStatus R3BNeulandDigitizer::Init()
 
     // half of the length of a scintillator
     fPlength = fLandDigiPar->GetPaddleLength(); // [cm]
+    LOG(INFO) << "R3BNeulandDigitizer: paddle length: " << fPlength << FairLogger::endl;
     fDigitizingEngine->SetPaddleHalfLength(fPlength);
 
     // Initialise control histograms
@@ -100,7 +109,6 @@ void R3BNeulandDigitizer::Exec(Option_t *)
     Reset();
 
     Double_t xpaddle[npaddles], ypaddle[npaddles], zpaddle[npaddles];
-
 
     /* Look at each Land Point, if it deposited energy in the szintillator,
      * store it with reference to the bar */
@@ -251,4 +259,4 @@ void R3BNeulandDigitizer::Finish()
 }
 
 
-ClassImp(R3BNeulandDigitizer)
+ClassImp(R3BNeulandDigitizer);

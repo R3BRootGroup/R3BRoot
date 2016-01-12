@@ -33,5 +33,5 @@ void r3blandsim(
   gROOT->LoadMacro(macro_r3ball.Data());
 
   // Main Sim function call
-  r3ball( n_events, geometry, target, fEventDisplay, fMC, fGene, fUserPList, fR3BMagnet, fMeasCurrent, out_file, par_file, input_file);
+  r3ball( n_events, &geometry, target, fEventDisplay, fMC, fGene, fUserPList, fR3BMagnet, fMeasCurrent, out_file, par_file, input_file);
 }

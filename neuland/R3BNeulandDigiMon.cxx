@@ -40,6 +40,10 @@ InitStatus R3BNeulandDigiMon::Init()
     FairRootManager *rm = FairRootManager::Instance();
 
     fDigis = (TClonesArray *) rm->GetObject("LandDigi");
+    if (fDigis == nullptr) {
+        LOG(FATAL) << "R3BNeulandDigiMon: No LandDigi!" << FairLogger::endl;
+        return kFATAL;
+    }
 
     if (fIs3DTrackEnabled) {
         // XYZ -> ZXY (side view)

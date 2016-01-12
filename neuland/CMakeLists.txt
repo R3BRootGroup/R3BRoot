@@ -2,6 +2,7 @@ set(LIBRARY_NAME R3BNeuland)
 set(LINKDEF NeulandLinkDef.h)
 
 set(SRCS
+	R3BNeuland.cxx
 	R3BNeulandMCMon.cxx
 	R3BNeulandDigiMon.cxx
 	R3BNeulandVisualizer.cxx
@@ -11,7 +12,7 @@ set(SRCS
 change_file_extension(*.cxx *.h HEADERS "${SRCS}")
 
 set(DEPENDENCIES
-  R3Bbase
+  R3Bbase R3BLand
 )
 
 # TODO: -Wno-ignored-qualifiers for R3BLandDigiPar
@@ -27,6 +28,7 @@ set(INCLUDE_DIRECTORIES
 	${R3BROOT_SOURCE_DIR}/land/
 	${R3BROOT_SOURCE_DIR}/neuland/
 	${R3BROOT_SOURCE_DIR}/neuland/digitizing
+	${R3BROOT_SOURCE_DIR}/r3bbase/
 	${R3BROOT_SOURCE_DIR}/r3bdata/
 	${R3BROOT_SOURCE_DIR}/r3bdata/landData
 )

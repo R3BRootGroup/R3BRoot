@@ -1,3 +1,6 @@
+#ifndef R3BNEULANDDIGIMON_H
+#define R3BNEULANDDIGIMON_H 1
+
 /** Neuland Digi Monitor
  * @author Jan Mayer
  * @since  10.06.2015
@@ -7,9 +10,6 @@
  *  Output: Soon: Vairous diagrams.
  *          Currently: A 3D scatterplot for each event.
  */
-
-#ifndef R3BNEULANDDIGIMON_H
-#define R3BNEULANDDIGIMON_H 1
 
 #include "FairTask.h"
 
