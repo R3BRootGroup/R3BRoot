@@ -7,6 +7,7 @@ ${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
 ${GEANT4_INCLUDE_DIR}
 ${GEANT4VMC_INCLUDE_DIR}
+${CLHEP_INCLUDE_DIR}
 )
 
 set(INCLUDE_DIRECTORIES
@@ -51,11 +52,30 @@ R3BPhysicsListMessenger.cxx
 R3BRunConfiguration.cxx  
 )
 
+Set(R3BPLIST_LINKDEF PlistLinkDef.h)
+
+set(R3BPLIST_DICT_HEADERS R3BRunConfiguration.h)
+set(R3BPLIST_DICTIONARY G__R3BPlistDict.cxx)
+
+Set(INCLUDE
+${SYSTEM_INCLUDE_DIRECTORIES}
+${INCLUDE_DIRECTORIES}
+)
+
+if(ROOT_FOUND_VERSION LESS 59999)
+  ROOT_GENERATE_DICTIONARY("${R3BPLIST_DICT_HEADERS}" "${R3BPLIST_LINKDEF}" "${R3BPLIST_DICTIONARY}" "${INCLUDE}")
+
+  Set(SRCS
+      ${SRCS}
+      ${R3BPLIST_DICTIONARY}
+  )
+else(ROOT_FOUND_VERSION LESS 59999)
+  Set(LINKDEF PlistLinkDef.h)
+endif(ROOT_FOUND_VERSION LESS 59999)
+
 # fill list of header files from list of source files
 # by exchanging the file extension
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
-
-Set(LINKDEF PlistLinkDef.h)
 
 Set(DEPENDENCIES
     VMC G4physicslists G4vis_management geant4vmc)
