@@ -20,8 +20,8 @@
 #   hadronic: elastic, binary, binary_ion, gamma_nuc, 
 #
 #/R3B/phys/addPhysics standard
-#/R3B/phys/addPhysics lowenergy
-/R3B/phys/addPhysics penelope
+/R3B/phys/addPhysics lowenergy
+#/R3B/phys/addPhysics penelope
 /R3B/phys/addPhysics decay
 /R3B/phys/addPhysics elastic
 #/R3B/phys/addPhysics binary
@@ -49,7 +49,7 @@
 #/control/manual   
 #/control/createHTML  
 
-/run/particle/dumpCutValues
+#/run/particle/dumpCutValues
 
 # Limit max number of Cerenkov photons per step
 # (Needed as Cerenkov process does not limit step itself)

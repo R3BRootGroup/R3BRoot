@@ -1,4 +1,4 @@
-void r3blandreco(Int_t nNeutrons, Int_t beamE, Int_t Erel)
+void r3blandreco(Int_t nNeutrons = 4, Int_t nEvents = 100, Int_t beamE = 600, Int_t Erel = 500)
 {
   Int_t d;
   if(Erel == 100){
@@ -58,7 +58,7 @@ void r3blandreco(Int_t nNeutrons, Int_t beamE, Int_t Erel)
   // ----- Connect the Tracking Task -------------------------------------------
   R3BNeutronTracker2D* tracker  = new R3BNeutronTracker2D();
   tracker->UseBeam(beamEnergy, beamBeta);
-  tracker->ReadCalibrFile(calibrFile.Data());
+  tracker->ReadCalibrFile((char*)calibrFile.Data());
   fRun->AddTask(tracker);
   // ---------------------------------------------------------------------------
 
@@ -75,12 +75,6 @@ void r3blandreco(Int_t nNeutrons, Int_t beamE, Int_t Erel)
 
 
 
-  // ----- Number of events to process -----------------------------------------
-  Int_t nEvents = 10000;
-  // ---------------------------------------------------------------------------
-
-
-  
   // ----- Intialise and run ---------------------------------------------------
   fRun->Init();
   fRun->Run(0, nEvents);
@@ -98,5 +92,10 @@ void r3blandreco(Int_t nNeutrons, Int_t beamE, Int_t Erel)
   cout << "Parameter file writen " << parFile << endl;
   cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
   cout << endl;
+  if(tracker->GetNTracks4() > (0.5*nEvents))
+  {
+    cout << " Reconstruction successful" << endl;
+    cout << " All ok " << endl;
+  }
   // ---------------------------------------------------------------------------
 }

@@ -102,7 +102,7 @@ void R3BPsp::SetSpecialPhysicsCuts()
         if (pSi)
         {
             // Setting processes for Si only
-            gMC->Gstpar(pSi->GetId(), "LOSS", 2);
+            gMC->Gstpar(pSi->GetId(), "LOSS", 3);
             gMC->Gstpar(pSi->GetId(), "STRA", 1.0);
             gMC->Gstpar(pSi->GetId(), "PAIR", 1.0);
             gMC->Gstpar(pSi->GetId(), "COMP", 1.0);

@@ -23,6 +23,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/starttrackerData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData  
 ${R3BROOT_SOURCE_DIR}/r3bdata/mfiData  
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData  
+${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -65,8 +66,6 @@ startrackerData/R3BSTaRTraHit.cxx
 startrackerData/R3BSTaRTrackerHit.cxx
 startrackerData/R3BSTaRTrackerDigitHit.cxx
 landData/R3BLandPoint.cxx
-landData/R3BNeuLandPoint.cxx 
-landData/R3BLandRawHit.cxx
 landData/R3BLandDigi.cxx 
 landData/R3BLandFirstHits.cxx 
 landData/R3BLandHit.cxx 
@@ -87,6 +86,8 @@ mfiData/R3BMfiPoint.cxx
 mfiData/R3BMfiDigi.cxx 
 pspData/R3BPspPoint.cxx
 pspData/R3BPspDigi.cxx
+neulandData/R3BNeulandRawItem.cxx
+neulandData/R3BNeulandMappedItem.cxx
 )
 
 

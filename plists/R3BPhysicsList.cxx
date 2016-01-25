@@ -23,8 +23,8 @@
 #include "G4EmMuonBuilder.h"
 #include "G4EmHadronBuilder.h"
 #include "G4LowEnergyQEDBuilder.h"
-#include "G4PenelopeQEDBuilder.h"
-#include "G4StepLimiterBuilder.h"
+#include "G4EmPenelopePhysics.hh"
+#include "G4StepLimiterPhysics.hh"
 #include "R3BDecaysBuilder.h"
 
 
@@ -68,7 +68,7 @@ R3BPhysicsList::R3BPhysicsList():  G4VModularPhysicsList(){
   
   // Add Physics builders
   RegisterPhysics(new R3BParticlesBuilder());
-  steplimiter = new G4StepLimiterBuilder();
+  steplimiter = new G4StepLimiterPhysics();
 }
 
 
@@ -156,7 +156,7 @@ void R3BPhysicsList::AddPhysicsList(const G4String& name){
     G4cout << "R3BPhysicsList::AddPhysicsList <" << name << ">" << G4endl;
 
   } else if (name == "penelope" && !emBuilderIsRegisted) {
-    RegisterPhysics(new G4PenelopeQEDBuilder());
+    RegisterPhysics(new G4EmPenelopePhysics());
     RegisterPhysics(steplimiter);
     RegisterPhysics(new G4EmMuonBuilder());
     RegisterPhysics(new G4EmHadronBuilder());

@@ -17,13 +17,14 @@ using namespace std;
 #include "FairLogger.h"
 
 #include "R3BEventHeader.h"
-#include "R3BLandRawHit.h"
-#include "R3BLandRawHitMapped.h"
+#include "R3BNeulandRawItem.h"
+#include "R3BNeulandMappedItem.h"
 #include "R3BLosRawHit.h"
 #include "R3BLandRawAna.h"
 
 R3BLandRawAna::R3BLandRawAna()
     : fnEvents(0)
+    , fNItemsTotal(0)
     , fHeader(NULL)
     , fLandRawHit(NULL)
     , fLandRawHitMapped(NULL)
@@ -34,6 +35,7 @@ R3BLandRawAna::R3BLandRawAna()
 R3BLandRawAna::R3BLandRawAna(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fnEvents(0)
+    , fNItemsTotal(0)
     , fHeader(NULL)
     , fLandRawHit(NULL)
     , fLandRawHitMapped(NULL)
@@ -67,10 +69,10 @@ void R3BLandRawAna::Exec(Option_t* option)
     if (fLandRawHit)
     {
         Int_t nLandRawHits = fLandRawHit->GetEntries();
-        R3BLandRawHit* hit;
+        R3BNeulandRawItem* hit;
         for (Int_t i = 0; i < nLandRawHits; i++)
         {
-            hit = (R3BLandRawHit*)fLandRawHit->At(i);
+            hit = (R3BNeulandRawItem*)fLandRawHit->At(i);
             fh_land_raw_sam->Fill(hit->GetSam());
             fh_land_raw_gtb->Fill(hit->GetGtb());
             fh_land_raw_tacaddr->Fill(hit->GetTacAddr());
@@ -88,10 +90,11 @@ void R3BLandRawAna::Exec(Option_t* option)
     if (fLandRawHitMapped)
     {
         Int_t nLandRawHitsMapped = fLandRawHitMapped->GetEntries();
-        R3BLandRawHitMapped* hitmapped;
+        fNItemsTotal += nLandRawHitsMapped;
+        R3BNeulandMappedItem* hitmapped;
         for (Int_t i = 0; i < nLandRawHitsMapped; i++)
         {
-            hitmapped = (R3BLandRawHitMapped*)fLandRawHitMapped->At(i);
+            hitmapped = (R3BNeulandMappedItem*)fLandRawHitMapped->At(i);
             fh_land_mapped_is17->Fill(hitmapped->Is17());
             if(! hitmapped->Is17())
             {
