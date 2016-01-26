@@ -5,7 +5,7 @@ void run_sample_data()
     timer.Start();
 
     const Int_t nev = -1;                                // number of events to read, -1 - untill CTRL+C
-    const Int_t trigger = 1;                             // 1 - onspill, 2 - offspill. -1 - all
+    const Int_t trigger = -1;                            // 1 - onspill, 2 - offspill. -1 - all
 
     TString outputFileName = "output_raw_land.root";     // name of output file
     const Int_t refresh = 100000;                        // refresh rate for saving control histograms
