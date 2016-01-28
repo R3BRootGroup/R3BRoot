@@ -29,9 +29,14 @@
 #pragma link C++ class R3BLandPmt+;
 #pragma link C++ class R3BLandTcal+;
 #pragma link C++ class R3BLandTdiffFill+;
-#pragma link C++ class R3BLandTdiff+;
 #pragma link C++ class R3BLandAna+;
 #pragma link C++ class R3BLandTcalTest+;
+#pragma link C++ class R3BLandTSync+;
+#pragma link C++ class R3BLandCosmic1+;
+#pragma link C++ class R3BLandTSyncContFact+;
+#pragma link C++ class R3BLandTSyncPar+;
+#pragma link C++ class R3BLandTSyncModulePar+;
+
 
 #endif
 

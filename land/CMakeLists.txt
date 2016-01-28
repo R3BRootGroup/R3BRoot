@@ -62,9 +62,15 @@ unpack/R3BLandParamRead.cxx
 unpack/R3BLandPmt.cxx
 unpack/R3BLandTcal.cxx
 unpack/R3BLandTdiffFill.cxx
-unpack/R3BLandTdiff.cxx
 unpack/R3BLandAna.cxx
 unpack/R3BLandTcalTest.cxx
+unpack/R3BLandTSync.cxx
+unpack/R3BLandCosmic1.cxx
+unpack/R3BLandCosmic1LSQR.cxx
+unpack/R3BLandCosmic1Util.cxx
+unpack/R3BLandTSyncContFact.cxx
+unpack/R3BLandTSyncPar.cxx
+unpack/R3BLandTSyncModulePar.cxx
 )
 
 # fill list of header files from list of source files

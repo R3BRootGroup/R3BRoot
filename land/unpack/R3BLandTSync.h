@@ -1,10 +1,10 @@
 // -----------------------------------------------------------------------------
-// -----                              R3BLandTdiff                         -----
+// -----                              R3BLandTSync                         -----
 // -----                     Created 07-05-2014 by D.Kresan                -----
 // -----------------------------------------------------------------------------
 
-#ifndef R3BLANDTDIFF_H
-#define R3BLANDTDIFF_H
+#ifndef R3BLANDTSYNC_H
+#define R3BLANDTSYNC_H
 
 #include <fstream>
 #include <map>
@@ -12,42 +12,46 @@
 #include "FairTask.h"
 
 class TClonesArray;
+class R3BLandTSyncPar;
 
-class R3BLandTdiff : public FairTask
+class R3BLandTSync : public FairTask
 {
   public:
-    R3BLandTdiff();
-    R3BLandTdiff(const char* name, Int_t iVerbose);
-    virtual ~R3BLandTdiff();
+    R3BLandTSync();
+    R3BLandTSync(const char* name, Int_t iVerbose);
+    virtual ~R3BLandTSync();
 
     virtual InitStatus Init();
-
+    
+    virtual void SetParContainers();
+    
+    virtual InitStatus ReInit();
+    
     virtual void Exec(Option_t* option);
 
     virtual void FinishEvent();
     
-    inline void SetTdiffParName(char* name) { fParName = name; }
-    
     inline void SetFirstPlaneHorisontal() { fFirstPlaneHorisontal = kTRUE; }
 
   private:
+    void SetParameter();
+    
     TClonesArray* fLandPmt;
     TClonesArray* fLandDigi;
+    R3BLandTSyncPar* fTSyncPar;
     Int_t fNDigi;
     
-    char* fParName;
     std::ifstream* fInFile;
     Bool_t fFirstPlaneHorisontal;
     
     std::map<Int_t, Bool_t> fMapIsSet;
-    std::map<Int_t, Double_t> fMapTdiff;
     std::map<Int_t, Double_t> fMapVeff;
-    std::map<Int_t, Double_t> fMapTsync;
+    std::map<Int_t, Double_t> fMapTSync;
     
     void ReadParameters();
 
   public:
-    ClassDef(R3BLandTdiff, 0)
+    ClassDef(R3BLandTSync, 0)
 };
 
 #endif
