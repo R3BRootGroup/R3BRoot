@@ -33,35 +33,38 @@ public:
     R3BNeuland(const char *name, Bool_t active);
 
     /** Default Destructor */
-    virtual ~R3BNeuland() = default;
+    //virtual ~R3BNeuland() = default;
+    virtual ~R3BNeuland() {};
 
-    virtual void Initialize() override;
+    virtual void Initialize(); // override;
 
-    virtual Bool_t ProcessHits(FairVolume * = nullptr) override;
+    virtual Bool_t ProcessHits(FairVolume * = nullptr); // override;
 
-    virtual void EndOfEvent() override;
+    virtual void EndOfEvent(); // override;
 
-    virtual void Register() override;
+    virtual void Register(); // override;
 
-    virtual TClonesArray *GetCollection(Int_t iColl) const override;
+    virtual TClonesArray *GetCollection(Int_t iColl) const; // override;
 
-    virtual void Print(Option_t * = "") const override;
+    virtual void Print(Option_t * = "") const; // override;
 
-    virtual void Reset() override;
+    virtual void Reset(); // override;
 
-    virtual void ConstructGeometry() override;
+    virtual void ConstructGeometry(); // override;
 
-    virtual void PostTrack() override;
+    virtual void PostTrack(); // override;
 
-    virtual Bool_t CheckIfSensitive(std::string name) override;
+    virtual Bool_t CheckIfSensitive(std::string name); // override;
 
     /** May not be copy constructed */
-    R3BNeuland(const R3BNeuland &) = delete;
-    R3BNeuland &operator=(const R3BNeuland &) = delete;
+    //R3BNeuland(const R3BNeuland &) = delete;
+    //R3BNeuland &operator=(const R3BNeuland &) = delete;
 
 private:
-    std::unique_ptr<TClonesArray> fNeulandPoints;
-    std::unique_ptr<TClonesArray> fNeulandPrimaryNeutronInteractionPoints;
+    //std::unique_ptr<TClonesArray> fNeulandPoints;
+    TClonesArray* fNeulandPoints;
+    //std::unique_ptr<TClonesArray> fNeulandPrimaryNeutronInteractionPoints;
+    TClonesArray* fNeulandPrimaryNeutronInteractionPoints;
 
     /** Track information to be stored until the track leaves the active volume. */
     // TODO: Just fill an existing R3BLandPoint in the TClonesArray or
@@ -84,7 +87,8 @@ private:
      * ClassDefOverride to avoid inconsistent-missing-override warnings
      * ClassVersionID = 0, this class should not be read/written (no IO necessary)
      */
-    ClassDefOverride(R3BNeuland, 0);
+    //ClassDefOverride(R3BNeuland, 0);
+    ClassDef(R3BNeuland, 0);
 };
 
 #endif //R3BNEULAND_H

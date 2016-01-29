@@ -182,7 +182,8 @@ void R3BNeuland::EndOfEvent()
 TClonesArray *R3BNeuland::GetCollection(Int_t iColl) const
 {
     if (iColl == 0) {
-        return fNeulandPoints.get();
+        //return fNeulandPoints.get();
+        return fNeulandPoints;
     }
     return nullptr;
 }
@@ -190,8 +191,10 @@ TClonesArray *R3BNeuland::GetCollection(Int_t iColl) const
 
 void R3BNeuland::Register()
 {
-    FairRootManager::Instance()->Register("NeulandPoints", GetName(), fNeulandPoints.get(), kTRUE);
-    FairRootManager::Instance()->Register("NeulandPrimaryNeutronInteractionPoints", GetName(), fNeulandPrimaryNeutronInteractionPoints.get(), kTRUE);
+    //FairRootManager::Instance()->Register("NeulandPoints", GetName(), fNeulandPoints.get(), kTRUE);
+    FairRootManager::Instance()->Register("NeulandPoints", GetName(), fNeulandPoints, kTRUE);
+    //FairRootManager::Instance()->Register("NeulandPrimaryNeutronInteractionPoints", GetName(), fNeulandPrimaryNeutronInteractionPoints.get(), kTRUE);
+    FairRootManager::Instance()->Register("NeulandPrimaryNeutronInteractionPoints", GetName(), fNeulandPrimaryNeutronInteractionPoints, kTRUE);
 }
 
 

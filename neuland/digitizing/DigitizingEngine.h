@@ -149,8 +149,8 @@ public:
 public:
     std::map<Int_t, Paddle> paddles;
 
-    DigitizingEngine() = default;
-    ~DigitizingEngine() = default;
+    DigitizingEngine(){};// = default;
+    ~DigitizingEngine(){};// = default;
 
 
     void SetPaddleHalfLength(const Double_t &v)
