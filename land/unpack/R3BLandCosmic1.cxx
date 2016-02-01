@@ -123,7 +123,6 @@ namespace __gnu_cxx {
 # include <cmath>
 # define ISNAN(x)      std::isnan(x)
 # define ISFINITE(x)   std::isfinite(x)
-# include "util_c99.h"
 #else
 # define ISNAN(x)     isnan(x)
 # define ISFINITE(x)  isfinite(x)
