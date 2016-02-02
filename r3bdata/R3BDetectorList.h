@@ -3,19 +3,58 @@
 // -----                 Created 11/02/09  by D.Bertini                -----
 // -------------------------------------------------------------------------
 
-
-/** Unique identifier for all Panda detector systems **/
+/** Unique identifier for all R3B detector systems **/
 
 #ifndef R3BDETECTORLIST_H
 #define R3BDETECTORLIST_H 1
 
-enum DetectorId {kREF,kDCH,kCAL,kLAND,kGFI,kMTOF,kDTOF,kTOF,kTRA,kCALIFA,kMFI,kPSP,kVETO,kSTaRTrack,kLUMON,kNEULAND};
-    
-/** Unique identifier for all Panda Point and Hit types **/
+enum DetectorId
+{
+    kREF,
+    kDCH,
+    kCAL,
+    kLAND,
+    kGFI,
+    kMTOF,
+    kDTOF,
+    kTOF,
+    kTRA,
+    kCALIFA,
+    kMFI,
+    kPSP,
+    kVETO,
+    kSTaRTrack,
+    kLUMON,
+    kNEULAND,
+    kLAST
+};
 
-enum fDetectorType {kUnknown,kDchPoint,kCalPoint,kLandPoint,kGfiPoint,kmTofPoint,kdTofPoint,kTofPoint,kTraPoint,kCalifaPoint,kMfiPoint,kPspPoint,kVetoPoint,kSTarTraPoint,kLuMonPoint,kNeulandPoint};
+/** Unique identifier for all R3B Point and Hit types **/
 
+enum fDetectorType
+{
+    kUnknown,
+    kDchPoint,
+    kCalPoint,
+    kLandPoint,
+    kGfiPoint,
+    kmTofPoint,
+    kdTofPoint,
+    kTofPoint,
+    kTraPoint,
+    kCalifaPoint,
+    kMfiPoint,
+    kPspPoint,
+    kVetoPoint,
+    kSTarTraPoint,
+    kLuMonPoint,
+    kNeulandPoint
+};
 
-enum SensorSide { kTOP, kBOTTOM };
+enum SensorSide
+{
+    kTOP,
+    kBOTTOM
+};
 
 #endif
