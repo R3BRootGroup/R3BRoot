@@ -1305,7 +1305,7 @@ void R3BLandCosmic1::FinishTask() {
    memset (ppp, 0, sizeof (ppp));
 
    for (int i = 0; i < fPlanes * fPaddles * 2; i++) {
-      pair_value pv[fPlanes * fPaddles * 2];
+      pair_value *pv = new pair_value[fPlanes * fPaddles * 2];
 
       print_pl_pdl_pm (i);
 
@@ -1352,6 +1352,8 @@ void R3BLandCosmic1::FinishTask() {
          LOG (DEBUG) << " **(mis-match)**";
          ppp[i / 2]._flag |= (int) (PPP_MISMATCH_PM1 << (i & 1));
       }
+
+      delete pv;
 
       LOG (DEBUG) << FairLogger::endl;
    }
@@ -1515,7 +1517,7 @@ void R3BLandCosmic1::FinishTask() {
    LOG (INFO) << "******PADDLE matching******" << FairLogger::endl;
 
    for (int i = 0; i < fPlanes * fPaddles; i++) {
-      pair_value pv[fPlanes * fPaddles];
+      pair_value *pv = new pair_value[fPlanes * fPaddles];
 
       if (!_pairs_pdl._corr[i][i]) {
          FairLogger::GetLogger()->Debug (MESSAGE_ORIGIN, "%d: DEAD", i);
@@ -1634,6 +1636,8 @@ void R3BLandCosmic1::FinishTask() {
             break;
          }
       }
+
+      delete pv;
 
       LOG (DEBUG) << FairLogger::endl;
    }
