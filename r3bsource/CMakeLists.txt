@@ -11,6 +11,8 @@ set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bsource
 ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
+${R3BROOT_SOURCE_DIR}/r3bdata/pspData
+${R3BROOT_SOURCE_DIR}/r3bdata/losData
 )
 
 
@@ -39,6 +41,8 @@ if(WITH_UCESB)
 		R3BUcesbSource.cxx
 		R3BReader.cxx
 		R3BUnpackReader.cxx
+		R3BPspReader.cxx
+		R3BLosReader.cxx
 		R3BNeulandTamexReader.cxx
         R3BNeulandTacquilaReader.cxx
 	)

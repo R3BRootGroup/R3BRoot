@@ -21,6 +21,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/lumonData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData  
 ${R3BROOT_SOURCE_DIR}/r3bdata/starttrackerData  
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData  
+${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mfiData  
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData  
 ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
@@ -88,6 +89,9 @@ pspData/R3BPspPoint.cxx
 pspData/R3BPspDigi.cxx
 neulandData/R3BNeulandRawItem.cxx
 neulandData/R3BNeulandMappedItem.cxx
+pspData/R3BPspxMappedItem.cxx
+pspData/R3BPspxCalItem.cxx
+losData/R3BLosMappedItem.cxx
 )
 
 

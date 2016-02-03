@@ -58,6 +58,9 @@
 #pragma link C++ class R3BPspDigi+;
 #pragma link C++ class R3BNeulandRawItem+;
 #pragma link C++ class R3BNeulandMappedItem+;
+#pragma link C++ class R3BPspxMappedItem+;
+#pragma link C++ class R3BPspxCalItem+;
+#pragma link C++ class R3BLosMappedItem+;
 
 #endif
 

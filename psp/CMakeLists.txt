@@ -39,6 +39,7 @@ R3BGeoPsp.cxx
 # R3BPspContFact.cxx
 R3BPspDigiPar.cxx
 R3BPspDigitizer.cxx   
+R3BPspxCal.cxx
 )
 
 # fill list of header files from list of source files

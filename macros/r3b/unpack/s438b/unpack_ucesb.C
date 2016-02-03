@@ -11,7 +11,8 @@
  * */
 
 extern "C" {
-#include "/home/bloeher/git/R3BRoot/r3bsource/ext_h101_full.h"
+//#include "/home/bloeher/git/R3BRoot/r3bsource/ext_h101_full.h"
+#include "/u/rplag/R3BRoot/r3bsource/ext_h101.h"
 }
 
 void unpack_ucesb()
@@ -19,12 +20,12 @@ void unpack_ucesb()
 	TStopwatch timer;
 	timer.Start();
 
-	const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
+	const Int_t nev = 1000; /* number of events to read, -1 - until CTRL+C */
 
 	/* Create source using ucesb for input ------------------ */
 
-	TString filename = "/data/r3b/r3broot_dev/lmd/run301_4334.lmd";
-	TString outputFileName = "/data/r3b/r3broot_dev/root/unpack_ucesb.root";
+	TString filename = "/SAT/hera/land/s438b/stitched/s438b/lmd/run301_4307.lmd.gz";
+	TString outputFileName = "/tmp/unpack_ucesb_ralf.root";
 	TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
 	TString ucesb_dir = getenv("UCESB_DIR");
 	TString ucesb_path = ucesb_dir + "/../upexps/s438b/s438b";
@@ -40,7 +41,7 @@ void unpack_ucesb()
 
 	/* Create online run ------------------------------------ */
 	FairRunOnline* run = new FairRunOnline(source);
-	run->SetOutputFile("/tmp/output.root");
+	run->SetOutputFile("/tmp/output_ralf.root");
 
 	/* ------------------------------------------------------ */
 
