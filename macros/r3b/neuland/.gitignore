@@ -1,3 +1,9 @@
 # Output directories
 **/output*/
 
+# Output files
+*.png
+*.pdf
+*.eps
+*.log
+

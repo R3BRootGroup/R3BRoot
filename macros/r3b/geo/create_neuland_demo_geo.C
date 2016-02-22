@@ -1,6 +1,6 @@
 #include "./helper_neuland_geometry.C"
 
-void create_neuland_demo_geo(const Int_t nPlanes = 8, const Double_t distance = 1100., const char *geoTag = "demo_11m")
+void create_neuland_demo_geo(const Int_t nPlanes = 8, const Double_t distance = 1100., const TString geoTag = "demo_11m")
 {
     new FairGeoLoader("TGeo", "FairGeoLoader");
     gGeoManager->SetName("NEULANDgeom");
@@ -40,8 +40,11 @@ void create_neuland_demo_geo(const Int_t nPlanes = 8, const Double_t distance = 
 
     cout << "Done. " << nindex << " Paddles in " << nPlane << " Planes" << endl;
 
-    //gGeoManager->GetMasterVolume()->Draw("ogl");
-    //gGeoManager->GetVolume("volNeuland")->Draw("ogl");
-    //TGLViewer *v = (TGLViewer *)gPad->GetViewer3D();
-    //v->SetStyle(TGLRnrCtx::kOutline);
+    gStyle->SetCanvasPreferGL(kTRUE);
+    gGeoManager->GetVolume("volNeuland")->Draw("ogl");
+    TGLViewer *v = (TGLViewer *)gPad->GetViewer3D();
+    v->CurrentCamera().RotateRad(0, 0.1);
+    v->SetStyle(TGLRnrCtx::kOutline);
+    v->RequestDraw();
+    v->SavePicture("neuland_" + geoTag + ".png");
 }

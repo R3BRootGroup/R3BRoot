@@ -1,9 +1,11 @@
+#include "../../r3ball.C"
+
 void r3blandsim(
   const Int_t n_neutrons,
   const Int_t n_events,
-  const string neuland_geo_file,
-  const string input_file,
-  const string basename
+  const TString neuland_geo_file,
+  const TString input_file,
+  const TString basename
 ){
 
   // Output files
@@ -11,6 +13,7 @@ void r3blandsim(
   const TString par_file = "r3bpar." + basename + ".root";
 
   // Constant configuration
+  const Int_t    nEvents = 10000;
   const TString  target = "LiH";
   const TString  fMC   = "TGeant3";
   const TString  fGene = "ascii";
@@ -28,10 +31,6 @@ void r3blandsim(
   geometry.Add(new TObjString("SCINTNEULAND"),  new TObjString(TString(neuland_geo_file)));
 
 
-  // Load the Main Simulation macro
-  const TString macro_r3ball = TString(getenv("VMCWORKDIR")) + TString("/macros/r3b/r3ball.C");
-  gROOT->LoadMacro(macro_r3ball.Data());
-
   // Main Sim function call
-  r3ball( n_events, &geometry, target, fEventDisplay, fMC, fGene, fUserPList, fR3BMagnet, fMeasCurrent, out_file, par_file, input_file);
+  r3ball(nEvents, &geometry, target, fEventDisplay, fMC, fGene, fUserPList, fR3BMagnet, fMeasCurrent, out_file, par_file, input_file);
 }

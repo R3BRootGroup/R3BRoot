@@ -73,6 +73,9 @@ InitStatus R3BNeulandDigitizer::Init()
 
     fLandPoints = (TClonesArray *) ioman->GetObject("NeulandPoints");
     if (fLandPoints == nullptr) {
+        fLandPoints = (TClonesArray *) ioman->GetObject("LandPoint");
+    }
+    if (fLandPoints == nullptr) {
         LOG(FATAL) << "R3BNeulandDigitizer: No NeulandPoints!" << FairLogger::endl;
         return kFATAL;
     }
@@ -84,8 +87,8 @@ InitStatus R3BNeulandDigitizer::Init()
     // Only after Init one retrieve the Digitization Parameters!
     npaddles = fLandDigiPar->GetMaxPaddle() + 1;
     nplanes = fLandDigiPar->GetMaxPlane();
-    paddle_per_plane = (npaddles - 1) / nplanes;
     LOG(INFO) << "R3BNeulandDigitizer: # paddles: " << npaddles - 1 << ", # planes: " << nplanes << FairLogger::endl;
+    paddle_per_plane = (npaddles - 1) / nplanes;
     LOG(INFO) << "R3BNeulandDigitizer: paddles per plane: " << paddle_per_plane << FairLogger::endl;
 
     // half of the length of a scintillator
