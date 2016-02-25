@@ -5,22 +5,19 @@ void run(TString runNumber)
     timer.Start();
 
     const Int_t nev = -1;                                // number of events to read, -1 - untill CTRL+C
-    const Int_t trigger = 1;                             // 1 - onspill, 2 - offspill. -1 - all
+    const Int_t trigger = 2;                             // 1 - onspill, 2 - offspill. -1 - all
     TString inDir = "/Users/kresan/data/s438b/lmd/";     // directory with lmd files
     TString outDir = "/Users/kresan/data/s438b/data/";   // output directory
     TString histDir = "/Users/kresan/Sites/";            // web-server directory
 
-    TString outputFileName = outDir + runNumber + "_raw_land.root";                  // name of output file
-    TString histFileName = histDir + "hist_s438b_" + runNumber + "_raw_land.root";   // name of file with control histograms
-    const Int_t refresh = 100000;                                                    // refresh rate for saving control histograms
-    TString parFileName = outDir + "params_" + runNumber + "_raw_land.root";         // name of parameter file
-    //const Long64_t maxSize = 1 * 1024 * 1024 * 1024;                               // 1 GByte       // file split size
+    TString outputFileName = outDir + runNumber + "_raw.root";                  // name of output file
+    TString histFileName = histDir + "hist_s438b_" + runNumber + "_raw.root";   // name of file with control histograms
+    const Int_t refresh = 100000;                                               // refresh rate for saving control histograms
+    TString parFileName = outDir + "params_" + runNumber + "_raw.root";         // name of parameter file
+    //const Long64_t maxSize = 1 * 1024 * 1024 * 1024;                          // 1 GByte       // file split size
 
     const char *landMappingName = "cfg_neuland_s438b.hh";   // mapping file
     const Int_t nBarsPerPlane = 50;                         // number of scintillator bars per plane
-    const Int_t updateRate = 150000;
-    const Int_t minStats = 10000;                           // minimum number of entries for TCAL calibration
-    const Int_t nModules = 800;                             // number of photomultipliers (for TCAL calibration)
 
     // Create source with unpackers ----------------------------------------------
     FairLmdSource* source = new FairLmdSource();
@@ -38,21 +35,10 @@ void run(TString runNumber)
     source->AddUnpacker(new R3BLandUnpack(type, subType, procId, subCrate, control));
     // ------------------------------------------------------
 
-    // LOS MBS parameters -----------------------------------
-    type = 88;
-    subType = 8800;
-    procId = 12;
-    subCrate = 1;
-    control = 9;
-    source->AddUnpacker(new R3BLosUnpack(type, subType, procId, subCrate, control));
-    // ------------------------------------------------------
-    // ---------------------------------------------------------------------------
-
     // Create online run ---------------------------------------------------------
     FairRunOnline* run = new FairRunOnline(source);
     run->SetOutputFile(outputFileName.Data());
     run->SetGenerateHtml(kTRUE, histFileName.Data(), refresh);
-    run->ActivateHttpServer();
     // ---------------------------------------------------------------------------
 
     // Create ALADIN field map ---------------------------------------------------
@@ -68,26 +54,6 @@ void run(TString runNumber)
     map->SetFileName(landMappingName);
     map->SetNofBarsPerPlane(nBarsPerPlane);
     run->AddTask(map);
-    // ---------------------------------------------------------------------------
-
-    // TCAL ----------------------------------------------------------------------
-    R3BLandTcalFill* tcalFill = new R3BLandTcalFill("TcalFill");
-    tcalFill->SetUpdateRate(updateRate);
-    tcalFill->SetMinStats(minStats);
-    tcalFill->SetTrigger(trigger);
-    tcalFill->SetNofModules(nModules);
-    run->AddTask(tcalFill);
-
-    R3BLosTcalFill* losTcalFill = new R3BLosTcalFill("LosTcalFill");
-    losTcalFill->SetUpdateRate(updateRate);
-    losTcalFill->SetMinStats(minStats);
-    losTcalFill->SetNofModules(20);
-    run->AddTask(losTcalFill);
-    // ---------------------------------------------------------------------------
-
-    // Add analysis task ---------------------------------------------------------
-    R3BLandRawAna* ana = new R3BLandRawAna("LandRawAna", 1);
-    run->AddTask(ana);
     // ---------------------------------------------------------------------------
 
     // Initialize ----------------------------------------------------------------

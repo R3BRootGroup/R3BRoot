@@ -1,5 +1,5 @@
 
-void run(TString runNumber)
+void run(TString runNumber, TString refRun)
 {
     TStopwatch timer;
     timer.Start();
@@ -11,6 +11,7 @@ void run(TString runNumber)
     TString dirOut = "/Users/kresan/data/s438b/tcal/";
     TString inputFileName1 = dirIn1 + runNumber + "_raw.root";              // name of input file
     TString parFileName    = dirIn1 + "params_" + runNumber + "_raw.root";  // name of parameter file
+    TString parFileName2   = dirIn1 + "params_" + refRun + "_raw.root";     // name of parameter file
     TString outputFileName = dirOut + runNumber + "_tcal.root";             // name of output file
 
     // Create analysis run -------------------------------------------------------
@@ -24,14 +25,16 @@ void run(TString runNumber)
     FairParRootFileIo* parIo1 = new FairParRootFileIo();
     parIo1->open(parFileName);
     rtdb->setFirstInput(parIo1);
-    rtdb->setOutput(parIo1);
-    rtdb->saveOutput();
+    FairParRootFileIo* parIo2 = new FairParRootFileIo();
+    parIo2->open(parFileName2);
+    rtdb->setFirstInput(parIo2);
     // ---------------------------------------------------------------------------
 
     // Time calibration ----------------------------------------------------------
     R3BLandTcal* landTcal = new R3BLandTcal("LandTcal", 1);
     landTcal->SetTrigger(trigger);
     landTcal->SetNofModules(nModules);
+    landTcal->SetPulserMode(kTRUE);
     run->AddTask(landTcal);
     // ---------------------------------------------------------------------------
 

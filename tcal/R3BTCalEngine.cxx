@@ -248,30 +248,22 @@ void R3BTCalEngine::FindRange(TH1F* h1, Int_t& ic, Int_t& iMin, Int_t& iMax)
 {
     Double_t mean = h1->GetMean();
     ic = (Int_t)(mean + 0.5);
-    Double_t top = h1->Integral(ic - 4, ic + 5) / 10.;
 
-    for (Int_t i = ic; i >= 1; i--)
+    for (Int_t i = 1; i <= 4096; i++)
     {
-        if (h1->GetBinContent(i) < 0.1 * top)
+        if (h1->GetBinContent(i) > 0)
         {
-            if (h1->Integral(i - 9, i) / 10. < 0.1 * top)
-            {
-                iMin = i - 1;
-                break;
-            }
+            iMin = i - 1;
+            break;
         }
     }
 
-    for (Int_t i = ic + 1; i <= 4096; i++)
+    for (Int_t i = 4096; i >= 1; i--)
     {
-        if (h1->GetBinContent(i) < 0.1 * top)
+        if (h1->GetBinContent(i) > 0)
         {
-            if (h1->Integral(i, i + 9) / 10. < 0.1 * top)
-            {
-                //iMax = i - 1;
-                iMax = i;
-                break;
-            }
+            iMax = i + 1;
+            break;
         }
     }
 }

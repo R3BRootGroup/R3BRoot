@@ -106,12 +106,10 @@ class R3BLandTcalFill : public FairTask
     /**
      * Method for setting number of modules in NeuLAND setup.
      * @param nPMTs a number of photomultipliers.
-     * @param n17 a number of channels with stop signal (17-th channel).
      */
-    inline void SetNofModules(Int_t nPMTs, Int_t n17)
+    inline void SetNofModules(Int_t nPMTs)
     {
         fNofPMTs = nPMTs;
-        fNof17 = n17;
     }
 
   private:
@@ -120,7 +118,6 @@ class R3BLandTcalFill : public FairTask
     Int_t fTrigger;    /**< Trigger value. */
 
     Int_t fNofPMTs; /**< Number of NeuLAND modules. */
-    Int_t fNof17;   /**< Number of channels with stop signal. */
 
     Int_t fNEvents;         /**< Event counter. */
     R3BTCalPar* fCal_Par;   /**< Parameter container. */

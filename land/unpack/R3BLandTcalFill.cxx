@@ -29,7 +29,6 @@ R3BLandTcalFill::R3BLandTcalFill()
     , fMinStats(100000)
     , fTrigger(-1)
     , fNofPMTs(0)
-    , fNof17(0)
     , fNEvents(0)
     , fCal_Par(NULL)
 {
@@ -41,7 +40,6 @@ R3BLandTcalFill::R3BLandTcalFill(const char* name, Int_t iVerbose)
     , fMinStats(100000)
     , fTrigger(-1)
     , fNofPMTs(0)
-    , fNof17(0)
     , fNEvents(0)
     , fCal_Par(NULL)
 {
@@ -80,7 +78,7 @@ InitStatus R3BLandTcalFill::Init()
     fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LandTCalPar");
     fCal_Par->setChanged();
 
-    fEngine = new R3BTCalEngine(fCal_Par, fNofPMTs + fNof17, fMinStats);
+    fEngine = new R3BTCalEngine(fCal_Par, 2*fNofPMTs, fMinStats);
 
     return kSUCCESS;
 }
@@ -117,6 +115,7 @@ void R3BLandTcalFill::Exec(Option_t* option)
 
         // Check bar ID
         iBar = hit->GetBarId();
+        iSide = hit->GetSide();
         if ((iBar - 1) >= (fNofPMTs / 2))
         {
             LOG(ERROR) << "R3BLandTcalFill::Exec() : wrong bar ID: " << iBar << FairLogger::endl;
@@ -126,20 +125,18 @@ void R3BLandTcalFill::Exec(Option_t* option)
         if (hit->Is17())
         {
             // 17-th channel
-            channel = fNofPMTs + hit->GetGtb() * 20 + hit->GetTacAddr();
+            channel = fNofPMTs + hit->GetSam() * (MAX_TACQUILA_MODULE + 1) * (MAX_TACQUILA_GTB + 1) + hit->GetGtb() * (MAX_TACQUILA_MODULE + 1) + hit->GetTacAddr();
         }
         else
         {
             // PMT signal
-            iSide = hit->GetSide();
             channel = (Double_t)fNofPMTs / 2 * (iSide - 1) + iBar - 1;
         }
 
         // Check validity of module
         if (channel < 0 || channel >= (2 * fNofPMTs))
         {
-            LOG(INFO) << "Bar:" << iBar << "  Side:" << iSide << "  " << channel << "   " << (2 * fNofPMTs + fNof17)
-                      << "   " << hit->GetGtb() << FairLogger::endl;
+            LOG(INFO) << "Bar:" << iBar << "  Side:" << iSide << "  " << channel << FairLogger::endl;
             FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Illegal detector ID...");
         }
 

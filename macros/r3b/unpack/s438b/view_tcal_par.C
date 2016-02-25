@@ -8,11 +8,12 @@ void view_module_neuland(TString runNumber, Int_t iBar, Int_t iSide)
     
     const Int_t fNofPMTs = 800;
     
-    TString fileName = inDir + "params_" + runNumber + "_raw_land.root";
+    TString fileName = inDir + "params_" + runNumber + "_raw.root";
     TFile *parFile = new TFile(fileName);
     R3BTCalPar *par = (R3BTCalPar*) parFile->Get("LandTCalPar");
+    cout << par->GetNumModulePar() << endl;
     
-    fileName = inDir + runNumber + "_raw_land.root";
+    fileName = inDir + runNumber + "_raw.root";
     TFile *file = new TFile(fileName);
     char str[100];
     Int_t index = (Double_t)fNofPMTs / 2. * (iSide - 1) + iBar - 1;

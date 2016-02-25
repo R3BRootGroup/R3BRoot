@@ -11,6 +11,7 @@
 #include "FairTask.h"
 
 class TClonesArray;
+class TH1F;
 class R3BTCalModulePar;
 class R3BTCalPar;
 class R3BEventHeader;
@@ -100,16 +101,24 @@ class R3BLandTcal : public FairTask
     /**
      * Method for setting the number of NeuLAND modules.
      * @param nPMTs a number of photomultipliers.
-     * @param n17 a number of channels with stop signal (17-th channel).
      */
-    inline void SetNofModules(Int_t nPMTs, Int_t n17)
+    inline void SetNofModules(Int_t nPMTs)
     {
         fNofPMTs = nPMTs;
-        fNof17 = n17;
+    }
+
+    /**
+     * Method to set running mode for pulser data analysis.
+     * @param mode a boolean flag - if TRUE events with all PMT's fired will be taken.
+     */
+    inline void SetPulserMode(Bool_t mode = kTRUE)
+    {
+        fPulserMode = mode;
     }
 
   private:
     Int_t fNEvents;                             /**< Event counter. */
+    Bool_t fPulserMode;                         /**< Running with pulser data. */
     std::map<Int_t, R3BTCalModulePar*> fMapPar; /**< Map for matching mdoule ID with parameter container. */
     R3BEventHeader* header;                     /**< Event header. */
     TClonesArray* fRawHit;                      /**< Array with raw items - input data. */
@@ -118,11 +127,12 @@ class R3BLandTcal : public FairTask
     R3BTCalPar* fTcalPar;                       /**< TCAL parameter container. */
     Int_t fTrigger;                             /**< Trigger value. */
     Int_t fNofPMTs;                             /**< Number of photomultipliers. */
-    Int_t fNof17;                               /**< Number of channels with stop signal. */
     std::map<Int_t, Bool_t> fMap17Seen;         /**< Map with flag of observed stop signal. */
     std::map<Int_t, Double_t> fMapStopTime;     /**< Map with value of stop time. */
     std::map<Int_t, Int_t> fMapStopClock;       /**< Map with value of stop clock. */
     Double_t fClockFreq;                        /**< Clock cycle in [ns]. */
+    TH1F* fh_pulser_5_2;                        /**< Resolution of one PMT. */
+    TH1F* fh_pulser_105_2;                      /**< Resolution of one PMT. */
 
     /**
      * Method for retrieving parameter container for specific module ID.

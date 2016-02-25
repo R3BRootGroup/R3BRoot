@@ -68,7 +68,7 @@ void run_sample_data()
     tcalFill->SetUpdateRate(updateRate);
     tcalFill->SetMinStats(minStats);
     tcalFill->SetTrigger(trigger);
-    tcalFill->SetNofModules(nModules, 50);
+    tcalFill->SetNofModules(nModules);
     run->AddTask(tcalFill);
 
     R3BLosTcalFill* losTcalFill = new R3BLosTcalFill("LosTcalFill");
