@@ -4,8 +4,8 @@ void run(TString runNumber)
     TStopwatch timer;
     timer.Start();
 
-    TString dirIn1 = "/media/vadim/Externe/GSI/data/";
-    TString dirOut = "/media/vadim/Externe/GSI/data/";
+    TString dirIn1 = "/Volumes/Data/kresan/s438b/data/";
+    TString dirOut = "/Volumes/Data/kresan/s438b/data/";
     TString inputFileName1 = dirIn1 + runNumber + "_tcal.root";              // name of input file
     TString parFileName    = dirIn1 + "params_" + runNumber + "_raw.root";  // name of parameter file
     TString outputFileName = dirOut + runNumber + "_cosmic1.root";             // name of output file
@@ -27,7 +27,6 @@ void run(TString runNumber)
 
     // Cosmic1----------------------------------------------------------------------
     R3BLandCosmic1* cosmic1 = new R3BLandCosmic1("cosmic1");
-    cosmic1->WritePlot(kTRUE);
     cosmic1->SetMaxPaddleDistFromLine(1);
     cosmic1->SetPlanes(8);
     run->AddTask(cosmic1);
@@ -39,7 +38,7 @@ void run(TString runNumber)
     // ---------------------------------------------------------------------------
 
     // Run -----------------------------------------------------------------------
-    run->Run(10000);
+    run->Run();
     rtdb->saveOutput();
     // ---------------------------------------------------------------------------
 

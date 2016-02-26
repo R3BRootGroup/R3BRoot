@@ -67,7 +67,7 @@ InitStatus R3BLandTSync::Init() {
    }
 
    fMan->Register ("LandDigi", "Land", fLandDigi, kTRUE);
-   
+      
    SetParameter();
    return kSUCCESS;
 }
@@ -76,6 +76,8 @@ void R3BLandTSync::SetParContainers() {
    FairRuntimeDb* rtdb = FairRunAna::Instance()->GetRuntimeDb();
    fTSyncPar = (R3BLandTSyncPar*) rtdb->getContainer ("LandTSyncPar");
 }
+
+
 
 void R3BLandTSync::SetParameter(){
    std::map<Int_t, Bool_t> tempMapIsSet;
@@ -89,6 +91,8 @@ void R3BLandTSync::SetParameter(){
       tempMapVeff[id] = fModulePar->GetEffectiveSpeed();
       tempMapTSync[id] = fModulePar->GetTimeOffset();
    }
+     
+   LOG(INFO) << "Number of Parameter: " << fTSyncPar->GetNumModulePar() << FairLogger::endl;
    
    fMapIsSet = tempMapIsSet;
    fMapVeff = tempMapVeff;
@@ -113,6 +117,7 @@ void R3BLandTSync::Exec (Option_t* option) {
    Double_t qdcL, qdcR, qdc;
    Double_t x, y, z;
    Int_t id = 0;
+     
    if (fFirstPlaneHorisontal) {
       id = 1;
    }
@@ -140,12 +145,13 @@ void R3BLandTSync::Exec (Option_t* option) {
 
          qdcL = pmt1->GetQdc();
          qdcR = pmt2->GetQdc();
+	 		 
          veff = fMapVeff[(barId-1)*2];
          tdcL = pmt1->GetTime() + fMapTSync[pmt1->GetBarId() * 2 - 2] + wlk (qdcL);
          tdcR = pmt2->GetTime() + fMapTSync[pmt2->GetBarId() * 2 - 1] + wlk (qdcR);
          tdc = (tdcL + tdcR) / 2.;
          qdc = TMath::Sqrt (qdcL * qdcR);
-         plane = (Int_t) ( (barId - 1) / 50) + 1;
+         plane = ((barId - 1) / 50) + 1;
          if (id == plane % 2) {
             x = veff * (tdcR - tdcL);
             y = (barId - 0.5 - (plane - 1) * 50) * 5. - 125.;
@@ -154,7 +160,7 @@ void R3BLandTSync::Exec (Option_t* option) {
             x = (barId - 0.5 - (plane - 1) * 50) * 5. - 125.;
             y = veff * (tdcR - tdcL);
          }
-         z = (plane - 0.5) * 5.;// + 870.;
+         z = (plane - 0.5) * 5. + fDistanceToTarget;
 	 
 	 new ( (*fLandDigi) [fNDigi]) R3BLandDigi (barId, tdcL, tdcR, tdc, qdcL, qdcR, qdc, x, y, z);
 	 fNDigi += 1;	 

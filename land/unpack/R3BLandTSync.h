@@ -32,6 +32,9 @@ class R3BLandTSync : public FairTask
     virtual void FinishEvent();
     
     inline void SetFirstPlaneHorisontal() { fFirstPlaneHorisontal = kTRUE; }
+        
+    //Distance to target in cm
+    inline void SetDistanceToTarget(Double_t d) { fDistanceToTarget = d; }
 
   private:
     void SetParameter();
@@ -43,6 +46,7 @@ class R3BLandTSync : public FairTask
     
     std::ifstream* fInFile;
     Bool_t fFirstPlaneHorisontal;
+    Double_t fDistanceToTarget;
     
     std::map<Int_t, Bool_t> fMapIsSet;
     std::map<Int_t, Double_t> fMapVeff;

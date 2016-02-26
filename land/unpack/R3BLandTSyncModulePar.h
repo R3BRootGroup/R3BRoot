@@ -63,11 +63,20 @@ public:
     Double_t GetTimeOffset() const {
         return fTimeOffset;
     }
+    Double_t GetTimeOffsetError() const {
+	return fTimeOffsetError;
+    }  
     Double_t GetEnergieGain() const {
         return fEnergieGain;
     }
+    Double_t GetEnergieGainError() const{
+	return fEnergieGainError;
+    }
     Double_t GetEffectiveSpeed() const {
 	return fEffectiveSpeed;
+    }
+    Double_t GetEffectiveSpeedError() const {
+	return fEffectiveSpeedError;
     }
     void SetModuleId ( Int_t i ) {
         fModuleId = i;
@@ -78,19 +87,31 @@ public:
     void SetTimeOffset ( Double_t i ) {
         fTimeOffset = i;
     }
+    void SetTimeOffsetError(Double_t i){
+	fTimeOffsetError = i;
+    }
     void SetEnergieGain ( Double_t i ) {
         fEnergieGain = i;
     }
+    void SetEnergieGainError( Double_t i){
+	fEnergieGainError =i;
+    }
     void SetEffectiveSpeed ( Double_t i ){
 	fEffectiveSpeed = i;
+    }
+    void SetEffectiveSpeedError( Double_t i){
+	fEffectiveSpeedError = i;
     }
 
 private:
     Int_t fModuleId;          /**< Index of a detector module. */
     Int_t fSide;              /**< Side of a module: for NeuLAND - L/R PMT. */
     Double_t fTimeOffset;
+    Double_t fTimeOffsetError;
     Double_t fEnergieGain;
+    Double_t fEnergieGainError;
     Double_t fEffectiveSpeed;
+    Double_t fEffectiveSpeedError;
     ClassDef ( R3BLandTSyncModulePar, 1 );
 };
 

@@ -9,7 +9,15 @@
 #include "FairTask.h"
 #include "R3BLandCosmic1Util.h"
 
-#include "stdint.h"
+#ifdef __APPLE__ 
+#include <_types/_uint8_t.h>
+#include <_types/_uint16_t.h>
+#include <_types/_uint32_t.h>
+#include <_types/_uint64_t.h>
+#else
+#include <stdint.h>
+#endif
+
 #include "stdlib.h"
 #include <set>
 
@@ -20,12 +28,12 @@ class TGraph;
 class TF1;
 
 typedef std::set<uint32_t> ident_no_set;
-typedef std::pair<float,int> pair_value;
+typedef std::pair<Float_t,Int_t> pair_value;
 
 struct nc_diff
 {
-  float _pos_track;
-  float _pos_diff;
+  Float_t _pos_track;
+  Float_t _pos_diff;
 
   uint32_t  _ident_no;
 
@@ -34,8 +42,8 @@ struct nc_diff
 struct n_calib_diff
 {
 public:
-  bool analyse_history(ident_no_set& bad_fit_idents);
-  bool calc_params(ident_no_set& bad_fit_idents,double v[2]);
+  Bool_t analyse_history(ident_no_set& bad_fit_idents);
+  Bool_t calc_params(ident_no_set& bad_fit_idents,Double_t y0[2], Double_t dydx[2]);
 
 public:
   std::vector<nc_diff> _data;
@@ -44,9 +52,9 @@ public:
 
 struct nc_mean
 {
-  float _mean_diff;
+  Float_t _mean_diff;
 
-  float _mean_corr;
+  Float_t _mean_corr;
 
   uint32_t  _ident_no;
 };
@@ -56,32 +64,11 @@ struct n_calib_mean
 {
 
 public:
-  bool analyse_history(ident_no_set& bad_fit_idents);
-  bool calc_params(ident_no_set& bad_fit_idents,val_err_inv& mean);
+  Bool_t analyse_history(ident_no_set& bad_fit_idents);
+  Bool_t calc_params(ident_no_set& bad_fit_idents,val_err_inv& mean);
 
 public:
   std::vector<nc_mean> _data;
-};
-
-struct pdl_pm_pair
-{
-  float _rate[2];
-  Int_t _favourite[2];
-
-  Int_t _others[2][5];
-
-  Int_t _flag;
-};
-
-class pair_correlation
-{
-public:
-  pair_correlation(){
-    _total = 0;
-  }
-public:
-  std::vector<std::vector<Int_t> > _corr;
-  Int_t _total;
 };
 
 struct bar{
@@ -114,10 +101,6 @@ class R3BLandCosmic1 : public FairTask
 
     virtual void FinishTask();
 
-    void WritePlot(Bool_t b){
-      writePlot = b;
-    }
-
     void SetMaxPaddleDistFromLine(Double_t d){
 	MAX_PADDLE_DIST_FROM_LINE = d;
     }
@@ -128,7 +111,6 @@ class R3BLandCosmic1 : public FairTask
 
   private:
 
-    Bool_t writePlot = kFALSE;
     Double_t MAX_PADDLE_DIST_FROM_LINE = 1.0;
     Int_t fPlanes = 60;
     Int_t fPaddles = 50;
@@ -136,14 +118,15 @@ class R3BLandCosmic1 : public FairTask
     TClonesArray* fLandPmt;
     R3BLandTSyncPar* fTSyncPar;
 
-    TCanvas* canvas;
     std::vector<std::vector<bar*> > bars;
     TGraph* x_plot;
     TGraph* y_plot;
     TF1* x_fit;
     TF1* y_fit;
-    Int_t nData;
-      
+    
+    Int_t nData = 0;
+    Int_t fEventNumber = 0;
+    
     std::vector<std::vector<n_calib_diff> > _collect_diff;
     std::vector<std::vector<n_calib_mean> > _collect_mean_within;
     std::vector<std::vector<std::vector<n_calib_mean> > > _collect_mean_cross;
@@ -154,11 +137,6 @@ class R3BLandCosmic1 : public FairTask
     uint32_t _used_ident_no;
 
     ident_no_set _bad_fit_idents;
-
-    std::vector<std::vector<std::vector<std::vector<uint32_t> > > > _stats;
-
-    pair_correlation _pairs_pm;
-    pair_correlation _pairs_pdl;
 
   public:
     ClassDef(R3BLandCosmic1, 0)
