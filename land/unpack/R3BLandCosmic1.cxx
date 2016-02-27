@@ -16,6 +16,7 @@
 #include "TClonesArray.h"
 #include "FairRuntimeDb.h"
 #include "math.h"
+#include <algorithm>
 
 #ifndef _isfinite // Workaround for gcc (stdc99 etc bla, bla...)
 
