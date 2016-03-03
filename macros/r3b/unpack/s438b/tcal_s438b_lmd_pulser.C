@@ -35,6 +35,7 @@ void run(TString runNumber, TString refRun)
     landTcal->SetTrigger(trigger);
     landTcal->SetNofModules(nModules);
     landTcal->SetPulserMode(kTRUE);
+    landTcal->EnableWalk(kTRUE);
     run->AddTask(landTcal);
     // ---------------------------------------------------------------------------
 

@@ -116,9 +116,19 @@ class R3BLandTcal : public FairTask
         fPulserMode = mode;
     }
 
+    /**
+     * Method to enable / disable walk corrections.
+     * @param walk a boolean flag - if TRUE, walk corrections will be applied.
+     */
+    inline void EnableWalk(Bool_t walk = kTRUE)
+    {
+        fWalkEnabled = walk;
+    }
+
   private:
     Int_t fNEvents;                             /**< Event counter. */
     Bool_t fPulserMode;                         /**< Running with pulser data. */
+    Bool_t fWalkEnabled;                        /**< Enable / Disable walk correction. */
     std::map<Int_t, R3BTCalModulePar*> fMapPar; /**< Map for matching mdoule ID with parameter container. */
     R3BEventHeader* header;                     /**< Event header. */
     TClonesArray* fRawHit;                      /**< Array with raw items - input data. */

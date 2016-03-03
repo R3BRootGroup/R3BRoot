@@ -24,19 +24,6 @@
 
 using std::ifstream;
 
-Double_t wlk (Double_t x) {
-   Double_t y = 0;
-
-   Double_t par1 = 1500.; // +-0.2238
-   Double_t par2 = 0.00075; //+-2.355e-05
-   y = par1 * TMath::Power (x, par2) - (par1 * TMath::Power (400., par2)); // Michael's
-
-   //y=2.29083*log(x)-0.0870157*log(x)*log(x)-4.57824;  // mine
-
-   return y;
-   //return 0.;
-}
-
 R3BLandTSync::R3BLandTSync()
    : fLandPmt (NULL)
    , fLandDigi (new TClonesArray ("R3BLandDigi"))
@@ -147,8 +134,8 @@ void R3BLandTSync::Exec (Option_t* option) {
          qdcR = pmt2->GetQdc();
 	 		 
          veff = fMapVeff[(barId-1)*2];
-         tdcL = pmt1->GetTime() + fMapTSync[pmt1->GetBarId() * 2 - 2] + wlk (qdcL);
-         tdcR = pmt2->GetTime() + fMapTSync[pmt2->GetBarId() * 2 - 1] + wlk (qdcR);
+         tdcL = pmt1->GetTime() + fMapTSync[pmt1->GetBarId() * 2 - 2];
+         tdcR = pmt2->GetTime() + fMapTSync[pmt2->GetBarId() * 2 - 1];
          tdc = (tdcL + tdcR) / 2.;
          qdc = TMath::Sqrt (qdcL * qdcR);
          plane = ((barId - 1) / 50) + 1;

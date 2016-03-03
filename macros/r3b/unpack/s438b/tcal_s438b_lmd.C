@@ -32,6 +32,7 @@ void run(TString runNumber)
     R3BLandTcal* landTcal = new R3BLandTcal("LandTcal", 1);
     landTcal->SetTrigger(trigger);
     landTcal->SetNofModules(nModules);
+    landTcal->EnableWalk(kTRUE);
     run->AddTask(landTcal);
     // ---------------------------------------------------------------------------
 

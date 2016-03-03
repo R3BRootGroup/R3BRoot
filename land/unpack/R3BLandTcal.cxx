@@ -17,12 +17,28 @@
 #include "FairLogger.h"
 
 #include "TClonesArray.h"
+#include "TMath.h"
 #include "TH1F.h"
+
+Double_t wlk(Double_t x)
+{
+    Double_t y = 0;
+
+    Double_t par1 = 1500.;                                                // +-0.2238
+    Double_t par2 = 0.00075;                                              //+-2.355e-05
+    y = par1 * TMath::Power(x, par2) - (par1 * TMath::Power(400., par2)); // Michael's
+
+    // y=2.29083*log(x)-0.0870157*log(x)*log(x)-4.57824;  // mine
+
+    return y;
+    // return 0.;
+}
 
 R3BLandTcal::R3BLandTcal()
     : FairTask("LandTcal", 1)
     , fNEvents(0)
     , fPulserMode(kFALSE)
+    , fWalkEnabled(kTRUE)
     , fMapPar()
     , fRawHit(NULL)
     , fPmt(new TClonesArray("R3BLandPmt"))
@@ -40,6 +56,7 @@ R3BLandTcal::R3BLandTcal(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fNEvents(0)
     , fPulserMode(kFALSE)
+    , fWalkEnabled(kTRUE)
     , fMapPar()
     , fRawHit(NULL)
     , fPmt(new TClonesArray("R3BLandPmt"))
@@ -260,6 +277,10 @@ void R3BLandTcal::Exec(Option_t* option)
             continue;
         }
         time2 = time2 - fMapStopTime[index2] + hit2->GetClock() * fClockFreq;
+        if (fWalkEnabled)
+        {
+            time2 += wlk(hit2->GetQdcData());
+        }
         new ((*fPmt)[fNPmt]) R3BLandPmt(iBar, iSide, time2, hit2->GetQdcData());
         fNPmt += 1;
     }
