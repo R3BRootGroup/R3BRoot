@@ -32,11 +32,15 @@ class R3BNeutronTracker2D : public FairTask
   /** Virtual method Init **/
   virtual InitStatus Init();
 
+  virtual void SetParContainers();
+    
   /** Virtual method Exec **/
   virtual void Exec(Option_t* opt);
 
   virtual void Finish();
   virtual void Reset();
+    
+    inline void Disable2DEventCut(Int_t nNeutrons) { fNNeutrons = nNeutrons; f2DCutEnabled = kFALSE; }
 
   void UseBeam(Double_t beam_energy, Double_t beam_beta);
   
@@ -110,6 +114,8 @@ class R3BNeutronTracker2D : public FairTask
   Int_t nplanes;
   Int_t printing;
 
+    Bool_t f2DCutEnabled;
+    Int_t fNNeutrons;
   Double_t beamEnergy;
   Double_t beamBeta;
   Double_t plength; // half length of paddle
@@ -155,8 +161,6 @@ class R3BNeutronTracker2D : public FairTask
 
   Double_t temp[3000][14];
   Int_t nentries;
-
-  virtual void SetParContainers();
 
   void CreateHistograms();
   Int_t AdvancedMethod();

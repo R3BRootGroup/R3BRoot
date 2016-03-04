@@ -39,18 +39,15 @@ Double_t c = 29.9792458;
 Double_t gBeamBeta;
 bool AuxSortClustersBeta(R3BNeuLandCluster*, R3BNeuLandCluster*);
 
-
-
 // -----------------------------------------------------------------------------
-R3BNeutronTracker2D::R3BNeutronTracker2D() :
-  FairTask("R3B NeuLAND Neutron Tracker")
-{ 
-  dio=10.6; //3 times half the diogonal of a paddle
+R3BNeutronTracker2D::R3BNeutronTracker2D()
+    : FairTask("R3B NeuLAND Neutron Tracker")
+    , f2DCutEnabled(kTRUE)
+    , fNNeutrons(0)
+{
+    dio = 10.6; // 3 times half the diogonal of a paddle
 }
 // -----------------------------------------------------------------------------
-
-
-
 
 // -----------------------------------------------------------------------------
 R3BNeutronTracker2D::~R3BNeutronTracker2D()
@@ -268,22 +265,37 @@ void R3BNeutronTracker2D::Exec(Option_t* opt)
   h_ncl_etot->Fill(fEtot, fNofClusters);
   h_ndigi_etot->Fill(fEtot, nentries);
 
-
-
-  if(fNofClusters >= ( (0.-fKappa*fCuts[4])/(fCuts[4]-0.)*(fEtot-0.)+fKappa*fCuts[4] )) {
-    nNeut = 5;
-  } else if(fNofClusters >= ( (0.-fKappa*fCuts[3])/(fCuts[3]-0.)*(fEtot-0.)+fKappa*fCuts[3] )) {
-    nNeut = 4;
-  } else if(fNofClusters >= ( (0.-fKappa*fCuts[2])/(fCuts[2]-0.)*(fEtot-0.)+fKappa*fCuts[2] )) {
-    nNeut = 3;
-  } else if(fNofClusters >= ( (0.-fKappa*fCuts[1])/(fCuts[1]-0.)*(fEtot-0.)+fKappa*fCuts[1] )) {
-    nNeut = 2;
-  } else if(fNofClusters >= ( (0.-fKappa*fCuts[0])/(fCuts[0]-0.)*(fEtot-0.)+fKappa*fCuts[0] )) {
-    nNeut = 1;
-  } else {
-    nNeut = 0;
+  if (f2DCutEnabled)
+  {
+      if (fNofClusters >= ((0. - fKappa * fCuts[4]) / (fCuts[4] - 0.) * (fEtot - 0.) + fKappa * fCuts[4]))
+      {
+          nNeut = 5;
+      }
+      else if (fNofClusters >= ((0. - fKappa * fCuts[3]) / (fCuts[3] - 0.) * (fEtot - 0.) + fKappa * fCuts[3]))
+      {
+          nNeut = 4;
+      }
+      else if (fNofClusters >= ((0. - fKappa * fCuts[2]) / (fCuts[2] - 0.) * (fEtot - 0.) + fKappa * fCuts[2]))
+      {
+          nNeut = 3;
+      }
+      else if (fNofClusters >= ((0. - fKappa * fCuts[1]) / (fCuts[1] - 0.) * (fEtot - 0.) + fKappa * fCuts[1]))
+      {
+          nNeut = 2;
+      }
+      else if (fNofClusters >= ((0. - fKappa * fCuts[0]) / (fCuts[0] - 0.) * (fEtot - 0.) + fKappa * fCuts[0]))
+      {
+          nNeut = 1;
+      }
+      else
+      {
+          nNeut = 0;
+      }
   }
-
+  else
+  {
+      nNeut = fNNeutrons;
+  }
 
   h_ntracks->Fill(nNeut);
     

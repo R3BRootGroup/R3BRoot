@@ -58,7 +58,16 @@ void r3blandreco(Int_t nNeutrons = 4, Int_t nEvents = 100, Int_t beamE = 600, In
   // ----- Connect the Tracking Task -------------------------------------------
   R3BNeutronTracker2D* tracker  = new R3BNeutronTracker2D();
   tracker->UseBeam(beamEnergy, beamBeta);
+
+  // Use only one of the following options:
+
+  // Option 1 - use 2D cuts from file, produced out of set of 4 event classes.
   tracker->ReadCalibrFile((char*)calibrFile.Data());
+
+  // Option 2 - disable cuts for determination of number of neutrons.
+  // Manually set number of incident neutrons (for test purpose).
+  //tracker->Disable2DEventCut(4);
+
   fRun->AddTask(tracker);
   // ---------------------------------------------------------------------------
 
