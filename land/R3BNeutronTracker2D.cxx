@@ -302,7 +302,9 @@ void R3BNeutronTracker2D::Exec(Option_t* opt)
 
   if(nNeut > 0) {
     // Find neutrons
+    nAboveThresh=0;
     AdvancedMethod();
+    //if(nAboveThresh > 3) cout<<"Neutrons above threshold: "<<nAboveThresh<<"  event: "<<eventNo<< "  Neutrons: " <<nNeut<<endl;
     hClusters1->Fill(fNofClusters1);
     h_ncl1_etot->Fill(fEtot, fNofClusters1);
   }
@@ -317,6 +319,15 @@ void R3BNeutronTracker2D::Exec(Option_t* opt)
     hMinv->Fill(fMinv);
     hExce->Fill(fExce);
   }
+/*
+  if(fMinv>0.45 && fMinv<0.55 && nNeut != 0 && fNofTracks == fNPrimNeut){ 
+	  cout<<" Good event: "<<eventNo<< "  Neutrons: " <<nNeut<<endl;
+      h_nofclusters->Fill(fNofClusters);
+      h_etot->Fill(fEtot);
+      h_ncl_etot->Fill(fEtot, fNofClusters);
+      h_ndigi_etot->Fill(fEtot, nentries);
+  }
+*/
 }
 // ----------------------------------------------------------------------------- 
 
@@ -363,7 +374,30 @@ Int_t R3BNeutronTracker2D::AdvancedMethod()
       if(TMath::Abs(beta-beamBeta) > (0.05*600./beamEnergy) && ic > 0) {
   	continue;
       }
+      
 
+/*
+      // Check if cluster has more energy than half the neutron energy
+      if(cluster->GetE() > 150. ) {
+		  nAboveThresh++;
+	   //cout<<"Cluster energy: "<<	cluster->GetE() <<"  event: "<<eventNo<<endl;   	
+      }
+*/
+/*
+      // Check cluster size
+      if(cluster->GetSize() < 8. ) {
+		//  nAboveThresh++;
+	   //cout<<"Cluster energy: "<<	cluster->GetE() <<"  event: "<<eventNo<<endl;   	
+	 continue;
+      }
+*/ 
+/*     
+      if(cluster->GetSize()*cluster->GetE()>2000. ) {
+//		  cout<<"Cluster energy: "<<	cluster->GetE()*cluster->GetSize() <<"  event: "<<eventNo<<endl;
+		  nAboveThresh++;
+      }
+*/
+     
       // Create neutron track
       fTracks[fNofTracks][0] = ic;
       mapUsed[ic] = kTRUE;
@@ -1153,8 +1187,8 @@ void R3BNeutronTracker2D::Finish()
   h_theta->Write();
 
   h_nofclusters->Write();
-  // h_etot->Write();
-  // h_ncl_etot->Write();
+  h_etot->Write();
+  h_ncl_etot->Write();
   h_ncl_etot_1->Write();
   h_ndigi_etot->Write();
   h_ncl1_etot->Write();

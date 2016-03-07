@@ -8,11 +8,14 @@ set(SRCS
 	R3BNeulandVisualizer.cxx
 	R3BNeulandDigitizer.cxx
 	digitizing/DigitizingEngine.cxx
+	unpack/R3BNeulandTcalFill.cxx
+	unpack/R3BNeulandTcal.cxx
+	unpack/R3BNeulandPmt.cxx 
 )
 change_file_extension(*.cxx *.h HEADERS "${SRCS}")
 
 set(DEPENDENCIES
-  R3Bbase R3BLand
+  R3Bbase R3BLand R3BTCal R3BData
 )
 
 # TODO: -Wno-ignored-qualifiers for R3BLandDigiPar
@@ -25,12 +28,16 @@ set(SYSTEM_INCLUDE_DIRECTORIES
 include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 
 set(INCLUDE_DIRECTORIES
-	${R3BROOT_SOURCE_DIR}/land/
-	${R3BROOT_SOURCE_DIR}/neuland/
+	${R3BROOT_SOURCE_DIR}/land
+	${R3BROOT_SOURCE_DIR}/neuland
+	${R3BROOT_SOURCE_DIR}/neuland/unpack
 	${R3BROOT_SOURCE_DIR}/neuland/digitizing
 	${R3BROOT_SOURCE_DIR}/r3bbase/
 	${R3BROOT_SOURCE_DIR}/r3bdata/
 	${R3BROOT_SOURCE_DIR}/r3bdata/landData
+	${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
+	${R3BROOT_SOURCE_DIR}/r3bbase
+	${R3BROOT_SOURCE_DIR}/tcal
 )
 include_directories(${INCLUDE_DIRECTORIES})
 

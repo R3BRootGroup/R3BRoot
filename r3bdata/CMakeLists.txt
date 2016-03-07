@@ -92,6 +92,7 @@ neulandData/R3BNeulandMappedItem.cxx
 pspData/R3BPspxMappedItem.cxx
 pspData/R3BPspxCalItem.cxx
 losData/R3BLosMappedItem.cxx
+neulandData/R3BNeulandTamexMappedItem.cxx
 )
 
 

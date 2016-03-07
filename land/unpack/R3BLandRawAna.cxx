@@ -19,6 +19,7 @@ using namespace std;
 #include "R3BEventHeader.h"
 #include "R3BNeulandRawItem.h"
 #include "R3BNeulandMappedItem.h"
+#include "R3BNeulandTamexMappedItem.h"
 #include "R3BLosRawHit.h"
 #include "R3BLandRawAna.h"
 
@@ -54,6 +55,7 @@ InitStatus R3BLandRawAna::Init()
     fLandRawHit = (TClonesArray*)fMan->GetObject("LandRawHit");
     fLandRawHitMapped = (TClonesArray*)fMan->GetObject("LandRawHitMapped");
     fLosRawHit = (TClonesArray*)fMan->GetObject("LosRawHit");
+    fNeulandTamexHitMapped = (TClonesArray*)fMan->GetObject("NeulandTamexMappedItem");
     CreateHistos();
 
     return kSUCCESS;
@@ -107,6 +109,29 @@ void R3BLandRawAna::Exec(Option_t* option)
         }
     }
 
+    if (fNeulandTamexHitMapped)
+    {
+        Int_t nNeulandTamexHitsMapped = fNeulandTamexHitMapped->GetEntries();
+//        fNItemsTotal += nLandRawHitsMapped;
+        R3BNeulandTamexMappedItem* hitmapped;
+        for (Int_t i = 0; i < nNeulandTamexHitsMapped; i++)
+        {
+            hitmapped = (R3BNeulandTamexMappedItem*)fNeulandTamexHitMapped->At(i);
+            fh_neuland_mapped_is17->Fill(hitmapped->Is17());
+            if(! hitmapped->Is17())
+            {
+                fh_neuland_mapped_planeid->Fill(hitmapped->GetPlaneId());
+                fh_neuland_mapped_barid->Fill(hitmapped->GetBarId());
+                fh_neuland_mapped_side->Fill(hitmapped->GetSide());
+                fh_neuland_mapped_cle->Fill(hitmapped->GetCoarseTimeLE());
+                fh_neuland_mapped_cte->Fill(hitmapped->GetCoarseTimeTE());
+                fh_neuland_mapped_fle->Fill(hitmapped->GetFineTimeLE());
+                fh_neuland_mapped_fte->Fill(hitmapped->GetFineTimeTE());
+//        cout<<"in ana: "<<hitmapped->GetPlaneId()<<"  "<<hitmapped->GetBarId()<<endl;
+           }
+        }
+    }
+
     if (fLosRawHit)
     {
         Int_t nLosRawHits = fLosRawHit->GetEntries();
@@ -129,6 +154,8 @@ void R3BLandRawAna::Exec(Option_t* option)
 
 void R3BLandRawAna::FinishTask()
 {
+    WriteHistos();
+	
 }
 
 void R3BLandRawAna::CreateHistos()
@@ -150,6 +177,15 @@ void R3BLandRawAna::CreateHistos()
     fh_land_mapped_clock = new TH1F("h_land_mapped_clock", "Clock count", 70, -0.5, 69.5);
     fh_land_mapped_tac = new TH1F("h_land_mapped_tac", "TAC data", 500, 0., 5000.);
     fh_land_mapped_qdc = new TH1F("h_land_mapped_qdc", "QDC data", 100, 0., 1000.);
+
+    fh_neuland_mapped_is17 = new TH1F("h_neuland_mapped_is17", "Is 17", 4, -0.5, 3.5);
+    fh_neuland_mapped_planeid = new TH1F("h_neuland_mapped_planeid", "Plane ID", 30, -0.5, 29.5);
+    fh_neuland_mapped_barid = new TH1F("h_neuland_mapped_barid", "Bar ID", 50, -0.5, 49.5);
+    fh_neuland_mapped_side = new TH1F("h_neuland_mapped_side", "Side", 5, -0.5, 4.5);
+    fh_neuland_mapped_cle = new TH1F("h_neuland_mapped_cle", "Coarse time LE", 8200, 0., 8200.);
+    fh_neuland_mapped_cte = new TH1F("h_neuland_mapped_cte", "Coarse time TE", 8200, 0., 8200.);
+    fh_neuland_mapped_fle = new TH1F("h_neuland_mapped_fle", "Fine time LE", 600, 0., 600.);
+    fh_neuland_mapped_fte = new TH1F("h_neuland_mapped_fte", "Fine time TE", 600, 0., 600.);
 
     fh_los_raw_ch = new TH1F("h_los_raw_ch", "Channel", 20, -0.5, 19.5);
     fh_los_raw_tdc = new TH1F("h_los_raw_tdc", "TDC data", 200, 0., 2000.);
@@ -175,6 +211,15 @@ void R3BLandRawAna::CreateHistos()
     run->AddObject(fh_land_mapped_tac);
     run->AddObject(fh_land_mapped_qdc);
 
+    run->AddObject(fh_neuland_mapped_is17);
+    run->AddObject(fh_neuland_mapped_planeid);
+    run->AddObject(fh_neuland_mapped_barid);
+    run->AddObject(fh_neuland_mapped_side);
+    run->AddObject(fh_neuland_mapped_cle);
+    run->AddObject(fh_neuland_mapped_cte);
+    run->AddObject(fh_neuland_mapped_fle);
+    run->AddObject(fh_neuland_mapped_fte);
+  
     run->AddObject(fh_los_raw_ch);
     run->AddObject(fh_los_raw_tdc);
     run->AddObject(fh_los_raw_clock);
@@ -185,6 +230,14 @@ void R3BLandRawAna::CreateHistos()
 
 void R3BLandRawAna::WriteHistos()
 {
+    fh_neuland_mapped_is17->Write();
+    fh_neuland_mapped_planeid->Write();
+    fh_neuland_mapped_barid->Write();
+    fh_neuland_mapped_side->Write();
+    fh_neuland_mapped_cle->Write();
+    fh_neuland_mapped_cte->Write();
+    fh_neuland_mapped_fle->Write();
+    fh_neuland_mapped_fte->Write();
 }
 
 ClassImp(R3BLandRawAna)

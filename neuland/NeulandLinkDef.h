@@ -10,5 +10,8 @@
 #pragma link C++ class R3BNeulandVisualizer;
 #pragma link C++ class R3BNeulandDigitizer+;
 #pragma link C++ class Neuland::DigitizingEngine+;
+#pragma link C++ class R3BNeulandTcalFill+;
+#pragma link C++ class R3BNeulandTcal+;
+#pragma link C++ class R3BNeulandPmt+; 
 
 #endif

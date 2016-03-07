@@ -26,6 +26,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
 ${R3BROOT_SOURCE_DIR}/r3bdb/landdb
 ${R3BROOT_SOURCE_DIR}/tcal
+${R3BROOT_SOURCE_DIR}/neuland/unpack
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

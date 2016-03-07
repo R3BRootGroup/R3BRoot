@@ -158,7 +158,7 @@ class R3BNeutronTracker2D : public FairTask
   Int_t fNofFrag;
 
   Int_t nPrim;
-
+  Int_t nAboveThresh;
   Double_t temp[3000][14];
   Int_t nentries;
 

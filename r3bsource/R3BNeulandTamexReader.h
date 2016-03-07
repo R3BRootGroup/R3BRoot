@@ -2,9 +2,10 @@
 #define R3BNEULANDTAMEXREADER_H
 
 #include "R3BReader.h"
+class TClonesArray;
+class FairLogger;
 
 typedef struct EXT_STR_h101_t EXT_STR_h101;
-class FairLogger;
 
 class R3BNeulandTamexReader : public R3BReader
 {
@@ -23,6 +24,7 @@ class R3BNeulandTamexReader : public R3BReader
 		EXT_STR_h101* fData;
 		/* FairLogger */
 		FairLogger*	fLogger;
+        TClonesArray* fArray; /**< Output array. */
 
 	public:
 		ClassDef(R3BNeulandTamexReader, 0);

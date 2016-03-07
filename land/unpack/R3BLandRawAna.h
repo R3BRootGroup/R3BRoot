@@ -37,6 +37,7 @@ class R3BLandRawAna : public FairTask
     R3BEventHeader *fHeader;
     TClonesArray* fLandRawHit;
     TClonesArray* fLandRawHitMapped;
+    TClonesArray* fNeulandTamexHitMapped;
     TClonesArray* fLosRawHit;
 
     TH1F* fh_trigger;
@@ -56,6 +57,15 @@ class R3BLandRawAna : public FairTask
     TH1F* fh_land_mapped_clock;
     TH1F* fh_land_mapped_tac;
     TH1F* fh_land_mapped_qdc;
+    
+    TH1F* fh_neuland_mapped_is17;
+    TH1F* fh_neuland_mapped_planeid;
+    TH1F* fh_neuland_mapped_barid;
+    TH1F* fh_neuland_mapped_side;
+    TH1F* fh_neuland_mapped_cle;
+    TH1F* fh_neuland_mapped_cte;
+    TH1F* fh_neuland_mapped_fle;
+    TH1F* fh_neuland_mapped_fte;
 
     TH1F* fh_los_raw_ch;
     TH1F* fh_los_raw_tdc;

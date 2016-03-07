@@ -24,11 +24,14 @@ class R3BLandTcalTest : public FairTask
     Int_t fnEvents;
 
     TClonesArray* fLandPmt;
+    TClonesArray* fNeulandPmt;
     TClonesArray* fLosHit;
 
     TH2F* fh_los_corr;
     TH1F* fh_tof;
     TH2F* fh_qdctof;
+    TH1F* fh_tdiff;
+    
 
     TH2F* fh_qdctof_2;
 
