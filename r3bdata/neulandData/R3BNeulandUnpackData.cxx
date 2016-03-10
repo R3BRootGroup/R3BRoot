@@ -1,7 +1,7 @@
 
-#include "R3BNeulandRawItem.h"
+#include "R3BNeulandUnpackData.h"
 
-R3BNeulandRawItem::R3BNeulandRawItem()
+R3BNeulandUnpackData::R3BNeulandUnpackData()
     : fSam(0)
     , fGtb(0)
     , fTacAddr(0)
@@ -13,7 +13,7 @@ R3BNeulandRawItem::R3BNeulandRawItem()
 {
 }
 
-R3BNeulandRawItem::R3BNeulandRawItem(UShort_t sam,
+R3BNeulandUnpackData::R3BNeulandUnpackData(UShort_t sam,
                                      UShort_t gtb,
                                      UShort_t tacAddr,
                                      UShort_t tacCh,
@@ -32,7 +32,7 @@ R3BNeulandRawItem::R3BNeulandRawItem(UShort_t sam,
 {
 }
 
-R3BNeulandRawItem::R3BNeulandRawItem(const R3BNeulandRawItem& right)
+R3BNeulandUnpackData::R3BNeulandUnpackData(const R3BNeulandUnpackData& right)
     : fSam(right.fSam)
     , fGtb(right.fGtb)
     , fTacAddr(right.fTacAddr)
@@ -44,4 +44,4 @@ R3BNeulandRawItem::R3BNeulandRawItem(const R3BNeulandRawItem& right)
 {
 }
 
-ClassImp(R3BNeulandRawItem)
+ClassImp(R3BNeulandUnpackData)

@@ -1,5 +1,5 @@
-#ifndef R3BLANDTCALTEST_H
-#define R3BLANDTCALTEST_H
+#ifndef R3BNEULANDCALTEST_H
+#define R3BNEULANDCALTEST_H
 
 #include "FairTask.h"
 
@@ -7,12 +7,12 @@ class TClonesArray;
 class TH1F;
 class TH2F;
 
-class R3BLandTcalTest : public FairTask
+class R3BNeulandCalTest : public FairTask
 {
   public:
-    R3BLandTcalTest();
-    R3BLandTcalTest(const char* name, Int_t iVerbose);
-    virtual ~R3BLandTcalTest();
+    R3BNeulandCalTest();
+    R3BNeulandCalTest(const char* name, Int_t iVerbose);
+    virtual ~R3BNeulandCalTest();
 
     virtual InitStatus Init();
 
@@ -40,7 +40,7 @@ class R3BLandTcalTest : public FairTask
     void WriteHistos();
 
   public:
-    ClassDef(R3BLandTcalTest, 1)
+    ClassDef(R3BNeulandCalTest, 1)
 };
 
 #endif

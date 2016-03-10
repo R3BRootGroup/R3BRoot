@@ -1,10 +1,10 @@
 // ------------------------------------------------------------
-// -----                    R3BLandTcal                   -----
+// -----               R3BNeulandMapped2Cal               -----
 // -----          Created 22-04-2014 by D.Kresan          -----
 // ------------------------------------------------------------
 
-#ifndef R3BLANDTCAL
-#define R3BLANDTCAL
+#ifndef R3BNEULANDMAPPED2CAL_H
+#define R3BNEULANDMAPPED2CAL_H
 
 #include <map>
 
@@ -21,11 +21,11 @@ class R3BEventHeader;
  * This class reads NeuLAND raw items with TDC values and
  * produces time items with time in [ns]. It requires TCAL
  * calibration parameters, which are produced in a separate
- * analysis run containing R3BLandTcalFill task.
+ * analysis run containing R3BNeulandMapped2CalPar task.
  * @author D. Kresan
  * @since September 7, 2015
  */
-class R3BLandTcal : public FairTask
+class R3BNeulandMapped2Cal : public FairTask
 {
 
   public:
@@ -33,7 +33,7 @@ class R3BLandTcal : public FairTask
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BLandTcal();
+    R3BNeulandMapped2Cal();
 
     /**
      * Standard constructor.
@@ -41,13 +41,13 @@ class R3BLandTcal : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BLandTcal(const char* name, Int_t iVerbose = 1);
+    R3BNeulandMapped2Cal(const char* name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BLandTcal();
+    virtual ~R3BNeulandMapped2Cal();
 
     /**
      * Method for task initialization.
@@ -153,7 +153,7 @@ class R3BLandTcal : public FairTask
     Bool_t FindChannel(Int_t channel, R3BTCalModulePar** par);
 
   public:
-    ClassDef(R3BLandTcal, 1)
+    ClassDef(R3BNeulandMapped2Cal, 1)
 };
 
 #endif

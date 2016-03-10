@@ -1,5 +1,5 @@
-#ifndef R3BLANDTSYNCMODULEPAR_H
-#define R3BLANDTSYNCMODULEPAR_H
+#ifndef R3BNEULANDHITMODULEPAR_H
+#define R3BNEULANDHITMODULEPAR_H
 
 #include "FairParGenericSet.h"
 
@@ -8,7 +8,7 @@
 class FairParamList;
 
 
-class R3BLandTSyncModulePar : public FairParGenericSet
+class R3BNeulandHitModulePar : public FairParGenericSet
 {
 public:
     /**
@@ -18,8 +18,8 @@ public:
      * @param context context/purpose for parameters and conditions.
      * @param own class ownership, if flag is kTRUE FairDB has the par.
      */
-    R3BLandTSyncModulePar ( const char* name = "TSyncModulePar",
-                           const char* title = "Time synchronization of a module",
+    R3BNeulandHitModulePar ( const char* name = "R3BNeulandHitModulePar",
+                           const char* title = "Calibration of a NeuLAND module",
                            const char* context = "TestDefaultContext",
                            Bool_t own = kTRUE );
 
@@ -27,7 +27,7 @@ public:
      * Destructor.
      * Frees the memory allocated by the object.
      */
-    virtual ~R3BLandTSyncModulePar ( void );
+    virtual ~R3BNeulandHitModulePar ( void );
 
     /**
      * A method to reset the parameter values. Sets all parameters to 0.
@@ -112,7 +112,7 @@ private:
     Double_t fEnergieGainError;
     Double_t fEffectiveSpeed;
     Double_t fEffectiveSpeedError;
-    ClassDef ( R3BLandTSyncModulePar, 1 );
+    ClassDef ( R3BNeulandHitModulePar, 1 );
 };
 
-#endif /* !R3BLANDTSYNCMODULEPAR_H*/
+#endif /* !R3BNEULANDHITMODULEPAR_H*/

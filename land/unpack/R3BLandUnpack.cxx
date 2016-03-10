@@ -18,14 +18,14 @@
 #include "FairLogger.h"
 
 // Land headers
-#include "R3BNeulandRawItem.h"
+#include "R3BNeulandUnpackData.h"
 #include "R3BLandUnpack.h"
 #include "R3BLandHit.h"
 
 // R3BLandUnpack: Constructor
 R3BLandUnpack::R3BLandUnpack(Short_t type, Short_t subType, Short_t procId, Short_t subCrate, Short_t control)
     : FairUnpack(type, subType, procId, subCrate, control)
-    , fRawData(new TClonesArray("R3BNeulandRawItem"))
+    , fRawData(new TClonesArray("R3BNeulandUnpackData"))
     , fNHits(0)
 {
 }
@@ -104,7 +104,7 @@ Bool_t R3BLandUnpack::DoUnpack(Int_t* data, Int_t size)
             }
             LOG(DEBUG) << "R3BLandUnpack : TAC ADDR IS " << tac_addr << ",  TAC CH IS " << tac_ch << ",  TAC Data IS " << tac_data << ",  QDC Data IS " << qdc_data
             << FairLogger::endl;
-            new ((*fRawData)[fNHits]) R3BNeulandRawItem(l_sam_id, l_gtb_id, tac_addr, tac_ch, cal, clock, tac_data, qdc_data);
+            new ((*fRawData)[fNHits]) R3BNeulandUnpackData(l_sam_id, l_gtb_id, tac_addr, tac_ch, cal, clock, tac_data, qdc_data);
             fNHits++;
         }
 

@@ -17,8 +17,8 @@ using namespace std;
 #include "FairLogger.h"
 
 #include "R3BEventHeader.h"
-#include "R3BNeulandRawItem.h"
-#include "R3BNeulandMappedItem.h"
+#include "R3BNeulandUnpackData.h"
+#include "R3BNeulandMappedData.h"
 #include "R3BNeulandTamexMappedItem.h"
 #include "R3BLosRawHit.h"
 #include "R3BLandRawAna.h"
@@ -71,10 +71,10 @@ void R3BLandRawAna::Exec(Option_t* option)
     if (fLandRawHit)
     {
         Int_t nLandRawHits = fLandRawHit->GetEntries();
-        R3BNeulandRawItem* hit;
+        R3BNeulandUnpackData* hit;
         for (Int_t i = 0; i < nLandRawHits; i++)
         {
-            hit = (R3BNeulandRawItem*)fLandRawHit->At(i);
+            hit = (R3BNeulandUnpackData*)fLandRawHit->At(i);
             fh_land_raw_sam->Fill(hit->GetSam());
             fh_land_raw_gtb->Fill(hit->GetGtb());
             fh_land_raw_tacaddr->Fill(hit->GetTacAddr());
@@ -93,10 +93,10 @@ void R3BLandRawAna::Exec(Option_t* option)
     {
         Int_t nLandRawHitsMapped = fLandRawHitMapped->GetEntries();
         fNItemsTotal += nLandRawHitsMapped;
-        R3BNeulandMappedItem* hitmapped;
+        R3BNeulandMappedData* hitmapped;
         for (Int_t i = 0; i < nLandRawHitsMapped; i++)
         {
-            hitmapped = (R3BNeulandMappedItem*)fLandRawHitMapped->At(i);
+            hitmapped = (R3BNeulandMappedData*)fLandRawHitMapped->At(i);
             fh_land_mapped_is17->Fill(hitmapped->Is17());
             if(! hitmapped->Is17())
             {

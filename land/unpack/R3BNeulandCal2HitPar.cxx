@@ -1,17 +1,17 @@
 // ---------------------------------------------------------------------------------------
-// -----                              R3BLandCosmic1                                 -----
+// -----                           R3BNeulandCal2HitPar                              -----
 // -----         Copied from Land02/detector/land/n_gen_det_cosmic1 on 11-2015       -----
 // ---------------------------------------------------------------------------------------
 
-#include "R3BLandCosmic1.h"
-#include "R3BLandPmt.h"
+#include "R3BNeulandCal2HitPar.h"
+#include "R3BNeulandCalData.h"
 #include "FairLogger.h"
 #include "TAxis.h"
 #include "TGraph.h"
 #include "TPolyLine3D.h"
 #include "TH2D.h"
-#include "R3BLandTSyncModulePar.h"
-#include "R3BLandTSyncPar.h"
+#include "R3BNeulandHitModulePar.h"
+#include "R3BNeulandHitPar.h"
 #include "TF1.h"
 #include "TClonesArray.h"
 #include "FairRuntimeDb.h"
@@ -374,24 +374,24 @@ bool n_calib_diff::analyse_history(ident_no_set& bad_fit_idents) {
    return true;
 }
 
-R3BLandCosmic1::R3BLandCosmic1()
-   : FairTask("R3BLandCosmic1_Task")
-   , fTSyncPar(NULL)
+R3BNeulandCal2HitPar::R3BNeulandCal2HitPar()
+   : FairTask("R3BNeulandCal2HitPar")
+   , fPar(NULL)
    , fLandPmt(NULL) {
 }
 
-R3BLandCosmic1::R3BLandCosmic1(const char* name, Int_t iVerbose)
+R3BNeulandCal2HitPar::R3BNeulandCal2HitPar(const char* name, Int_t iVerbose)
    : FairTask(name, iVerbose)
-   , fTSyncPar(NULL)
+   , fPar(NULL)
    , fLandPmt(NULL) {
 }
 
-R3BLandCosmic1::~R3BLandCosmic1() {
-   if (fTSyncPar)
-      delete fTSyncPar;
+R3BNeulandCal2HitPar::~R3BNeulandCal2HitPar() {
+   if (fPar)
+      delete fPar;
 }
 
-InitStatus R3BLandCosmic1::Init() {
+InitStatus R3BNeulandCal2HitPar::Init() {
 
    FairRootManager* fMan = FairRootManager::Instance();
 
@@ -400,10 +400,10 @@ InitStatus R3BLandCosmic1::Init() {
       return kFATAL;
    }
 
-   fLandPmt = (TClonesArray*) fMan->GetObject("LandPmt");
+   fLandPmt = (TClonesArray*) fMan->GetObject("NeulandCalData");
 
    if (NULL == fLandPmt) {
-      FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch LandPmt not found");
+      FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch NeulandCalData not found");
       return kFATAL;
    }
 
@@ -418,7 +418,7 @@ InitStatus R3BLandCosmic1::Init() {
    _collect_mean_cross_e.resize(fPlanes - 1, vector<vector<n_calib_mean>> (fPaddles, vector<n_calib_mean> (fPaddles)));
    bars.resize(fPlanes, vector<bar*> (0));
 
-   fTSyncPar = (R3BLandTSyncPar*) FairRuntimeDb::instance()->getContainer("LandTSyncPar");
+   fPar = (R3BNeulandHitPar*) FairRuntimeDb::instance()->getContainer("NeulandHitPar");
 
    x_plot = new  TGraph();
    y_plot = new  TGraph();
@@ -432,9 +432,9 @@ bool sortBars(bar* b1, bar* b2) {
    return (b1->fPdl < b2->fPdl);
 }
 
-void R3BLandCosmic1::Exec(Option_t* option) {
+void R3BNeulandCal2HitPar::Exec(Option_t* option) {
    if (++fEventNumber % 10000 == 0)
-      FairLogger::GetLogger()->Info(MESSAGE_ORIGIN, "[R3BLandCosmic1] Event: %8d,    accepted Events: %8d", fEventNumber, nData);
+      FairLogger::GetLogger()->Info(MESSAGE_ORIGIN, "[R3BNeulandCal2HitPar] Event: %8d,    accepted Events: %8d", fEventNumber, nData);
 
    Int_t nItems = fLandPmt->GetEntriesFast();
 
@@ -452,7 +452,7 @@ void R3BLandCosmic1::Exec(Option_t* option) {
 
 
    for (Int_t i = 0; i < nItems; i++) {
-      R3BLandPmt* pmt = (R3BLandPmt*) fLandPmt->At(i);
+      R3BNeulandCalData* pmt = (R3BNeulandCalData*) fLandPmt->At(i);
       Int_t pl = (pmt->GetBarId() - 1) / fPaddles;
       Int_t pdl = (pmt->GetBarId() - 1) % fPaddles;
       Int_t side = pmt->GetSide() - 1;
@@ -1062,7 +1062,7 @@ void R3BLandCosmic1::Exec(Option_t* option) {
    }
 }
 
-void R3BLandCosmic1::FinishEvent() {
+void R3BNeulandCal2HitPar::FinishEvent() {
    for (Int_t i = 0; i < fPlanes; i++) {
       for (Int_t j = 0; j < bars[i].size(); j++)
          delete bars[i][j];
@@ -1070,7 +1070,7 @@ void R3BLandCosmic1::FinishEvent() {
    }
 }
 
-void R3BLandCosmic1::FinishTask() {
+void R3BNeulandCal2HitPar::FinishTask() {
    LOG(INFO) << nData << " Events registered." << FairLogger::endl;
 
    LOG(INFO) << "**************TIMES**************" << FairLogger::endl;
@@ -1335,7 +1335,7 @@ void R3BLandCosmic1::FinishTask() {
    for (Int_t pl = 0; pl < fPlanes; pl++) {
       for (Int_t pdl = 0; pdl < fPaddles; pdl++) {
          for (Int_t pm = 0; pm < 2; pm++) {
-            R3BLandTSyncModulePar* syncmodpar = new R3BLandTSyncModulePar();
+            R3BNeulandHitModulePar* syncmodpar = new R3BNeulandHitModulePar();
             syncmodpar->SetModuleId(pl * fPaddles + pdl + 1);
             syncmodpar->SetSide(pm + 1);
             syncmodpar->SetTimeOffset((1 - 2 * pm) *tdiff[pl][pdl][0] - tsync[pl][pdl][0]);
@@ -1349,7 +1349,7 @@ void R3BLandCosmic1::FinishTask() {
                                           syncmodpar->GetTimeOffsetError(), syncmodpar->GetEnergieGain(),
                                           syncmodpar->GetEnergieGainError());
             if (!ISNAN(syncmodpar->GetTimeOffset()))
-               fTSyncPar->AddModulePar(syncmodpar);
+               fPar->AddModulePar(syncmodpar);
          }
          if (!ISNAN(tdiff[pl][pdl][0]))
             h_tdiff->SetBinContent(pl * fPaddles + pdl + 1, 2*tdiff[pl][pdl][0]);
@@ -1365,8 +1365,8 @@ void R3BLandCosmic1::FinishTask() {
    h_veff->Write();
    delete h_tdiff, h_tsync, h_veff;
 
-   fTSyncPar->setChanged();
-   LOG(INFO) << fTSyncPar->GetNumModulePar() << " PMTs calibrated!" << FairLogger::endl;
+   fPar->setChanged();
+   LOG(INFO) << fPar->GetNumModulePar() << " PMTs calibrated!" << FairLogger::endl;
 }
 
-ClassImp(R3BLandCosmic1)
+ClassImp(R3BNeulandCal2HitPar)

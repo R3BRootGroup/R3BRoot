@@ -4,9 +4,9 @@ void run(TString runNumber)
     TStopwatch timer;
     timer.Start();
 
-    TString dirIn1 = "/media/vadim/Externe/GSI/data/";
-    TString dirIn2 = "/media/vadim/Externe/GSI/data/";
-    TString dirOut = "/media/vadim/Externe/GSI/data/";
+    TString dirIn1 = "/Users/kresan/data/s438b/data/";
+    TString dirIn2 = "/Users/kresan/data/s438b/data/";
+    TString dirOut = "/Users/kresan/data/s438b/data/";
     TString inputFileName1 = dirIn2 + runNumber + "_tcal.root";             // name of input file
     TString parFileName    = dirIn1 + "params_" + runNumber + "_raw.root";  // name of parameter file
     TString outputFileName = dirOut + runNumber + "_digi.root";            // name of output file
@@ -24,10 +24,10 @@ void run(TString runNumber)
     rtdb->setFirstInput(parIo1);
     // ---------------------------------------------------------------------------
 
-    // Tdiff calibration ---------------------------------------------------------
-    R3BLandTSync* landTSync= new R3BLandTSync("LandTSync", 1);
-    //landTSync->SetFirstPlaneHorisontal();
-    run->AddTask(landTSync);
+    // cal2hit ---------------------------------------------------------
+    R3BNeulandCal2Hit* neulandCal2Hit= new R3BNeulandCal2Hit("NeulandCal2Hit", 1);
+    //neulandCal2Hit->SetFirstPlaneHorisontal();
+    run->AddTask(neulandCal2Hit);
     // ---------------------------------------------------------------------------
 
     // Analysis ------------------------------------------------------------------

@@ -1,14 +1,14 @@
 
-#ifndef R3BNEULANDRAWITEM_H
-#define R3BNEULANDRAWITEM_H
+#ifndef R3BNEULANDUNPACKDATA_H
+#define R3BNEULANDUNPACKDATA_H
 
 #include "TObject.h"
 
-class R3BNeulandRawItem : public TObject
+class R3BNeulandUnpackData : public TObject
 {
   public:
     // Default Constructor
-    R3BNeulandRawItem();
+    R3BNeulandUnpackData();
 
     /** Standard Constructor
      *@param Tac_addr   tac mod address
@@ -18,7 +18,7 @@ class R3BNeulandRawItem : public TObject
      *@param Tac_data   tac data
      *@param Qdc_data   qdc data
      **/
-    R3BNeulandRawItem(UShort_t sam,
+    R3BNeulandUnpackData(UShort_t sam,
                       UShort_t gtb,
                       UShort_t tacAddr,
                       UShort_t tacCh,
@@ -27,10 +27,10 @@ class R3BNeulandRawItem : public TObject
                       UShort_t tacData,
                       UShort_t qdcData);
 
-    R3BNeulandRawItem(const R3BNeulandRawItem&);
+    R3BNeulandUnpackData(const R3BNeulandUnpackData&);
 
     // Destructor
-    virtual ~R3BNeulandRawItem()
+    virtual ~R3BNeulandUnpackData()
     {
     }
 
@@ -78,7 +78,7 @@ class R3BNeulandRawItem : public TObject
     UShort_t fQdcData; //... QDC data
 
   public:
-    ClassDef(R3BNeulandRawItem, 1)
+    ClassDef(R3BNeulandUnpackData, 1)
 };
 
 #endif

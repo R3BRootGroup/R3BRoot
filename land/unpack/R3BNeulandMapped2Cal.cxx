@@ -1,13 +1,13 @@
 // ------------------------------------------------------------
-// -----                    R3BLandTcal                   -----
+// -----               R3BNeulandMapped2Cal               -----
 // -----          Created 22-04-2014 by D.Kresan          -----
 // ------------------------------------------------------------
 
-#include "R3BLandTcal.h"
+#include "R3BNeulandMapped2Cal.h"
 
 #include "R3BTCalEngine.h"
-#include "R3BNeulandMappedItem.h"
-#include "R3BLandPmt.h"
+#include "R3BNeulandMappedData.h"
+#include "R3BNeulandCalData.h"
 #include "R3BTCalPar.h"
 #include "R3BEventHeader.h"
 
@@ -34,14 +34,14 @@ Double_t wlk(Double_t x)
     // return 0.;
 }
 
-R3BLandTcal::R3BLandTcal()
-    : FairTask("LandTcal", 1)
+R3BNeulandMapped2Cal::R3BNeulandMapped2Cal()
+    : FairTask("NeulandMapped2Cal", 1)
     , fNEvents(0)
     , fPulserMode(kFALSE)
     , fWalkEnabled(kTRUE)
     , fMapPar()
     , fRawHit(NULL)
-    , fPmt(new TClonesArray("R3BLandPmt"))
+    , fPmt(new TClonesArray("NeulandCalData"))
     , fNPmt(0)
     , fTcalPar(NULL)
     , fTrigger(-1)
@@ -52,14 +52,14 @@ R3BLandTcal::R3BLandTcal()
 {
 }
 
-R3BLandTcal::R3BLandTcal(const char* name, Int_t iVerbose)
+R3BNeulandMapped2Cal::R3BNeulandMapped2Cal(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fNEvents(0)
     , fPulserMode(kFALSE)
     , fWalkEnabled(kTRUE)
     , fMapPar()
     , fRawHit(NULL)
-    , fPmt(new TClonesArray("R3BLandPmt"))
+    , fPmt(new TClonesArray("NeulandCalData"))
     , fNPmt(0)
     , fTcalPar(NULL)
     , fTrigger(-1)
@@ -70,7 +70,7 @@ R3BLandTcal::R3BLandTcal(const char* name, Int_t iVerbose)
 {
 }
 
-R3BLandTcal::~R3BLandTcal()
+R3BNeulandMapped2Cal::~R3BNeulandMapped2Cal()
 {
     if (fPmt)
     {
@@ -80,9 +80,9 @@ R3BLandTcal::~R3BLandTcal()
     }
 }
 
-InitStatus R3BLandTcal::Init()
+InitStatus R3BNeulandMapped2Cal::Init()
 {
-    LOG(INFO) << "R3BLandTcal::Init : read " << fTcalPar->GetNumModulePar() << " calibrated modules"
+    LOG(INFO) << "R3BNeulandMapped2Cal::Init : read " << fTcalPar->GetNumModulePar() << " calibrated modules"
               << FairLogger::endl;
     // fTcalPar->printParams();
     R3BTCalModulePar* par;
@@ -111,7 +111,7 @@ InitStatus R3BLandTcal::Init()
         FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch LandRawHitMapped not found");
     }
 
-    mgr->Register("LandPmt", "Land", fPmt, kTRUE);
+    mgr->Register("NeulandCalData", "Land", fPmt, kTRUE);
 
     fh_pulser_5_2 = new TH1F("h_pulser_5_2", "Single PMT resolution Bar 5 vs 2", 40000, -200., 200.);
     fh_pulser_105_2 = new TH1F("h_pulser_105_2", "Single PMT resolution Bar 105 vs 2", 40000, -200., 200.);
@@ -119,20 +119,20 @@ InitStatus R3BLandTcal::Init()
     return kSUCCESS;
 }
 
-void R3BLandTcal::SetParContainers()
+void R3BNeulandMapped2Cal::SetParContainers()
 {
     FairRunAna* ana = FairRunAna::Instance();
     FairRuntimeDb* rtdb = ana->GetRuntimeDb();
     fTcalPar = (R3BTCalPar*)(rtdb->getContainer("LandTCalPar"));
 }
 
-InitStatus R3BLandTcal::ReInit()
+InitStatus R3BNeulandMapped2Cal::ReInit()
 {
     SetParContainers();
     return kSUCCESS;
 }
 
-void R3BLandTcal::Exec(Option_t* option)
+void R3BNeulandMapped2Cal::Exec(Option_t* option)
 {
     if (fTrigger >= 0)
     {
@@ -158,8 +158,8 @@ void R3BLandTcal::Exec(Option_t* option)
         }
     }
 
-    R3BNeulandMappedItem* hit;
-    R3BNeulandMappedItem* hit2;
+    R3BNeulandMappedData* hit;
+    R3BNeulandMappedData* hit2;
     Int_t iBar;
     Int_t iSide;
     Int_t channel;
@@ -174,7 +174,7 @@ void R3BLandTcal::Exec(Option_t* option)
 
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        hit = (R3BNeulandMappedItem*)fRawHit->At(ihit);
+        hit = (R3BNeulandMappedData*)fRawHit->At(ihit);
         if (NULL == hit)
         {
             continue;
@@ -191,12 +191,12 @@ void R3BLandTcal::Exec(Option_t* option)
         // Convert TDC to [ns]
         if (channel < 0 || channel >= (2*fNofPMTs))
         {
-            LOG(ERROR) << "R3BLandTcal::Exec : wrong hardware channel: " << channel << FairLogger::endl;
+            LOG(ERROR) << "R3BNeulandMapped2Cal::Exec : wrong hardware channel: " << channel << FairLogger::endl;
             continue;
         }
         if (!FindChannel(channel, &par))
         {
-            LOG(WARNING) << "R3BLandTcal::Exec : Tcal par not found, channel: " << channel << FairLogger::endl;
+            LOG(WARNING) << "R3BNeulandMapped2Cal::Exec : Tcal par not found, channel: " << channel << FairLogger::endl;
             continue;
         }
 
@@ -204,7 +204,7 @@ void R3BLandTcal::Exec(Option_t* option)
         time = par->GetTimeTacquila(tdc);
         if (time < 0. || time > fClockFreq)
         {
-            LOG(ERROR) << "R3BLandTcal::Exec : error in time calibration: ch=" << channel << ", tdc=" << tdc
+            LOG(ERROR) << "R3BNeulandMapped2Cal::Exec : error in time calibration: ch=" << channel << ", tdc=" << tdc
                        << ", time=" << time << FairLogger::endl;
             continue;
         }
@@ -214,7 +214,7 @@ void R3BLandTcal::Exec(Option_t* option)
         index = hit->GetSam() * (MAX_TACQUILA_MODULE + 1) * (MAX_TACQUILA_GTB + 1) + gtb * (MAX_TACQUILA_MODULE + 1) + tacAddr;
         if (fMap17Seen.find(index) != fMap17Seen.end() && fMap17Seen[index])
         {
-            LOG(WARNING) << "R3BLandTcal::Exec : multiple stop signal for: GTB=" << gtb << ", TacAddr=" << tacAddr
+            LOG(WARNING) << "R3BNeulandMapped2Cal::Exec : multiple stop signal for: GTB=" << gtb << ", TacAddr=" << tacAddr
                          << FairLogger::endl;
             //            continue;
         }
@@ -225,7 +225,7 @@ void R3BLandTcal::Exec(Option_t* option)
 
     for (Int_t khit = 0; khit < nHits; khit++)
     {
-        hit2 = (R3BNeulandMappedItem*)fRawHit->At(khit);
+        hit2 = (R3BNeulandMappedData*)fRawHit->At(khit);
         if (NULL == hit2)
         {
             continue;
@@ -247,12 +247,12 @@ void R3BLandTcal::Exec(Option_t* option)
         // Convert TDC to [ns]
         if (channel < 0 || channel >= (2*fNofPMTs))
         {
-            LOG(ERROR) << "R3BLandTcal::Exec : wrong hardware channel: " << channel << FairLogger::endl;
+            LOG(ERROR) << "R3BNeulandMapped2Cal::Exec : wrong hardware channel: " << channel << FairLogger::endl;
             continue;
         }
         if (!FindChannel(channel, &par))
         {
-            LOG(DEBUG) << "R3BLandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide
+            LOG(DEBUG) << "R3BNeulandMapped2Cal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide
             << FairLogger::endl;
             continue;
         }
@@ -261,7 +261,7 @@ void R3BLandTcal::Exec(Option_t* option)
         time2 = par->GetTimeTacquila(tdc);
         if (time2 < 0. || time2 > fClockFreq)
         {
-            LOG(ERROR) << "R3BLandTcal::Exec : error in time calibration: ch=" << channel << ", tdc=" << tdc
+            LOG(ERROR) << "R3BNeulandMapped2Cal::Exec : error in time calibration: ch=" << channel << ", tdc=" << tdc
             << ", time=" << time2 << FairLogger::endl;
             continue;
         }
@@ -272,7 +272,7 @@ void R3BLandTcal::Exec(Option_t* option)
 
         if (fMap17Seen.find(index2) == fMap17Seen.end())
         {
-            LOG(ERROR) << "R3BLandTcal::Exec : NO stop signal for: GTB=" << gtb << ", TacAddr=" << tacAddr
+            LOG(ERROR) << "R3BNeulandMapped2Cal::Exec : NO stop signal for: GTB=" << gtb << ", TacAddr=" << tacAddr
             << FairLogger::endl;
             continue;
         }
@@ -281,17 +281,17 @@ void R3BLandTcal::Exec(Option_t* option)
         {
             time2 += wlk(hit2->GetQdcData());
         }
-        new ((*fPmt)[fNPmt]) R3BLandPmt(iBar, iSide, time2, hit2->GetQdcData());
+        new ((*fPmt)[fNPmt]) R3BNeulandCalData(iBar, iSide, time2, hit2->GetQdcData());
         fNPmt += 1;
     }
 
     if (fPulserMode)
     {
-        R3BLandPmt* pmt1;
+        R3BNeulandCalData* pmt1;
         Double_t time1;
         for (Int_t i = 0; i < fNPmt; i++)
         {
-            pmt1 = (R3BLandPmt*)fPmt->At(i);
+            pmt1 = (R3BNeulandCalData*)fPmt->At(i);
             if (pmt1->GetBarId() == 2 && pmt1->GetSide() == 1)
             {
                 time1 = pmt1->GetTime();
@@ -300,7 +300,7 @@ void R3BLandTcal::Exec(Option_t* option)
         }
         for (Int_t i = 0; i < fNPmt; i++)
         {
-            pmt1 = (R3BLandPmt*)fPmt->At(i);
+            pmt1 = (R3BNeulandCalData*)fPmt->At(i);
             if (pmt1->GetBarId() == 5 && pmt1->GetSide() == 1)
             {
                 fh_pulser_5_2->Fill(pmt1->GetTime() - time1);
@@ -313,11 +313,11 @@ void R3BLandTcal::Exec(Option_t* option)
     }
 }
 
-void R3BLandTcal::FinishEvent()
+void R3BNeulandMapped2Cal::FinishEvent()
 {
     if (fVerbose && 0 == (fNEvents % 1000))
     {
-        LOG(INFO) << "R3BLandTcal::Exec : event=" << fNEvents << " nPMTs=" << fNPmt << FairLogger::endl;
+        LOG(INFO) << "R3BNeulandMapped2Cal::Exec : event=" << fNEvents << " nPMTs=" << fNPmt << FairLogger::endl;
     }
 
     if (fPmt)
@@ -332,13 +332,13 @@ void R3BLandTcal::FinishEvent()
     fNEvents += 1;
 }
 
-void R3BLandTcal::FinishTask()
+void R3BNeulandMapped2Cal::FinishTask()
 {
     fh_pulser_5_2->Write();
     fh_pulser_105_2->Write();
 }
 
-Bool_t R3BLandTcal::FindChannel(Int_t channel, R3BTCalModulePar** par)
+Bool_t R3BNeulandMapped2Cal::FindChannel(Int_t channel, R3BTCalModulePar** par)
 {
     (*par) = fMapPar[channel];
     if (NULL == (*par))
@@ -348,4 +348,4 @@ Bool_t R3BLandTcal::FindChannel(Int_t channel, R3BTCalModulePar** par)
     return kTRUE;
 }
 
-ClassImp(R3BLandTcal)
+ClassImp(R3BNeulandMapped2Cal)

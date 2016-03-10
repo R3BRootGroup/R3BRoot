@@ -1,5 +1,5 @@
-#ifndef R3BLANDTSYNCCONTFACT_H
-#define R3BLANDTSYNCCONTFACT_H
+#ifndef R3BNEULANDPARFACT_H
+#define R3BNEULANDPARFACT_H
 
 #include "FairContFact.h"
 
@@ -7,18 +7,18 @@
 
 class FairParSet;
 
-class R3BLandTSyncContFact : public FairContFact
+class R3BNeulandParFact : public FairContFact
 {
   public:
     /**
      * Default constructor.
      */
-    R3BLandTSyncContFact();
+    R3BNeulandParFact();
     
     /**
      * Destructor.
      */
-    ~R3BLandTSyncContFact()
+    ~R3BNeulandParFact()
     {
     }
     
@@ -37,7 +37,7 @@ class R3BLandTSyncContFact : public FairContFact
      */
     void setAllContainers();
 
-    ClassDef(R3BLandTSyncContFact, 0);
+    ClassDef(R3BNeulandParFact, 0);
 };
 
-#endif /* !R3BLANDTSYNCCONTFACT_H */
+#endif /* !R3BNEULANDPARFACT_H */

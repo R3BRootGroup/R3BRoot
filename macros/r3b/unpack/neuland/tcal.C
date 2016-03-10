@@ -41,7 +41,7 @@ void run(TString runNumber)
  */
     // ---------------------------------------------------------------------------
 
-    R3BLandTcalTest *testTcal = new R3BLandTcalTest("TestTcal", 1);
+    R3BNeulandCalTest *testTcal = new R3BNeulandCalTest("TestTcal", 1);
     run->AddTask(testTcal);
 
     // Initialize ----------------------------------------------------------------

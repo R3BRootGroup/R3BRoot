@@ -61,7 +61,7 @@ void run(TString runNumber)
     // ---------------------------------------------------------------------------
 
     // TCAL ----------------------------------------------------------------------
-    R3BLandTcalFill* tcalFill = new R3BLandTcalFill("TcalFill");
+    R3BNeulandMapped2CalPar* tcalFill = new R3BNeulandMapped2CalPar("TcalFill");
     tcalFill->SetUpdateRate(updateRate);
     tcalFill->SetMinStats(minStats);
     tcalFill->SetTrigger(trigger);

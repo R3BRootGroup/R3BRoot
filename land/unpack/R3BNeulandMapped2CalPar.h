@@ -1,10 +1,10 @@
 // ----------------------------------------------------------------
-// -----                     R3BLandTcalFill                  -----
+// -----                 R3BNeulandMapped2CalPar              -----
 // -----             Created 04-04-2014 by D.Kresan           -----
 // ----------------------------------------------------------------
 
-#ifndef R3BLANDTCALFILL_H
-#define R3BLANDTCALFILL_H
+#ifndef R3BNEULANDMAPPED2CALPAR_H
+#define R3BNEULANDMAPPED2CALPAR_H
 
 #include "FairTask.h"
 
@@ -21,7 +21,7 @@ class R3BTCalEngine;
  * @author D. Kresan
  * @since September 7, 2015
  */
-class R3BLandTcalFill : public FairTask
+class R3BNeulandMapped2CalPar : public FairTask
 {
 
   public:
@@ -29,7 +29,7 @@ class R3BLandTcalFill : public FairTask
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BLandTcalFill();
+    R3BNeulandMapped2CalPar();
 
     /**
      * Standard constructor.
@@ -37,13 +37,13 @@ class R3BLandTcalFill : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BLandTcalFill(const char* name, Int_t iVerbose = 1);
+    R3BNeulandMapped2CalPar(const char* name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BLandTcalFill();
+    virtual ~R3BNeulandMapped2CalPar();
 
     /**
      * Method for task initialization.
@@ -127,7 +127,7 @@ class R3BLandTcalFill : public FairTask
     R3BTCalEngine* fEngine; /**< Instance of the TCAL engine. */
 
   public:
-    ClassDef(R3BLandTcalFill, 1)
+    ClassDef(R3BNeulandMapped2CalPar, 1)
 };
 
 #endif

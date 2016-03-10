@@ -1,10 +1,10 @@
 // ----------------------------------------------------------------
-// -----                     R3BLandTcalFill                  -----
+// -----                 R3BNeulandMapped2CalPar              -----
 // -----             Created 04-04-2014 by D.Kresan           -----
 // ----------------------------------------------------------------
 
-#include "R3BLandTcalFill.h"
-#include "R3BNeulandMappedItem.h"
+#include "R3BNeulandMapped2CalPar.h"
+#include "R3BNeulandMappedData.h"
 #include "R3BEventHeader.h"
 #include "R3BTCalPar.h"
 #include "R3BTCalEngine.h"
@@ -24,7 +24,7 @@
 
 using namespace std;
 
-R3BLandTcalFill::R3BLandTcalFill()
+R3BNeulandMapped2CalPar::R3BNeulandMapped2CalPar()
     : fUpdateRate(1000000)
     , fMinStats(100000)
     , fTrigger(-1)
@@ -34,7 +34,7 @@ R3BLandTcalFill::R3BLandTcalFill()
 {
 }
 
-R3BLandTcalFill::R3BLandTcalFill(const char* name, Int_t iVerbose)
+R3BNeulandMapped2CalPar::R3BNeulandMapped2CalPar(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fUpdateRate(1000000)
     , fMinStats(100000)
@@ -45,7 +45,7 @@ R3BLandTcalFill::R3BLandTcalFill(const char* name, Int_t iVerbose)
 {
 }
 
-R3BLandTcalFill::~R3BLandTcalFill()
+R3BNeulandMapped2CalPar::~R3BNeulandMapped2CalPar()
 {
     if (fCal_Par)
     {
@@ -57,7 +57,7 @@ R3BLandTcalFill::~R3BLandTcalFill()
     }
 }
 
-InitStatus R3BLandTcalFill::Init()
+InitStatus R3BNeulandMapped2CalPar::Init()
 {
     FairRootManager* rm = FairRootManager::Instance();
     if (!rm)
@@ -83,7 +83,7 @@ InitStatus R3BLandTcalFill::Init()
     return kSUCCESS;
 }
 
-void R3BLandTcalFill::Exec(Option_t* option)
+void R3BNeulandMapped2CalPar::Exec(Option_t* option)
 {
     if (fTrigger >= 0)
     {
@@ -99,7 +99,7 @@ void R3BLandTcalFill::Exec(Option_t* option)
         return;
     }
 
-    R3BNeulandMappedItem* hit;
+    R3BNeulandMappedData* hit;
     Int_t iBar;
     Int_t iSide;
     Int_t channel;
@@ -107,7 +107,7 @@ void R3BLandTcalFill::Exec(Option_t* option)
     // Loop over mapped hits
     for (Int_t i = 0; i < nHits; i++)
     {
-        hit = (R3BNeulandMappedItem*)fHits->At(i);
+        hit = (R3BNeulandMappedData*)fHits->At(i);
         if (!hit)
         {
             continue;
@@ -118,7 +118,7 @@ void R3BLandTcalFill::Exec(Option_t* option)
         iSide = hit->GetSide();
         if ((iBar - 1) >= (fNofPMTs / 2))
         {
-            LOG(ERROR) << "R3BLandTcalFill::Exec() : wrong bar ID: " << iBar << FairLogger::endl;
+            LOG(ERROR) << "R3BNeulandMapped2CalPar::Exec() : wrong bar ID: " << iBar << FairLogger::endl;
             continue;
         }
 
@@ -148,13 +148,13 @@ void R3BLandTcalFill::Exec(Option_t* option)
     fNEvents += 1;
 }
 
-void R3BLandTcalFill::FinishEvent()
+void R3BNeulandMapped2CalPar::FinishEvent()
 {
 }
 
-void R3BLandTcalFill::FinishTask()
+void R3BNeulandMapped2CalPar::FinishTask()
 {
     fEngine->CalculateParamTacquila();
 }
 
-ClassImp(R3BLandTcalFill)
+ClassImp(R3BNeulandMapped2CalPar)

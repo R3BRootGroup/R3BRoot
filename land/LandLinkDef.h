@@ -24,18 +24,16 @@
 #pragma link C++ class R3BLandRawAnaS438b+;
 #pragma link C++ class R3BLandMapping+;
 #pragma link C++ class R3BLandUnpack+;
-#pragma link C++ class R3BLandTcalFill+;
+#pragma link C++ class R3BNeulandMapped2CalPar+;
 #pragma link C++ class R3BLandParamRead+;
-#pragma link C++ class R3BLandPmt+;
-#pragma link C++ class R3BLandTcal+;
-#pragma link C++ class R3BLandTdiffFill+;
+#pragma link C++ class R3BNeulandMapped2Cal+;
 #pragma link C++ class R3BLandAna+;
-#pragma link C++ class R3BLandTcalTest+;
-#pragma link C++ class R3BLandTSync+;
-#pragma link C++ class R3BLandCosmic1+;
-#pragma link C++ class R3BLandTSyncContFact+;
-#pragma link C++ class R3BLandTSyncPar+;
-#pragma link C++ class R3BLandTSyncModulePar+;
+#pragma link C++ class R3BNeulandCalTest+;
+#pragma link C++ class R3BNeulandCal2Hit+;
+#pragma link C++ class R3BNeulandCal2HitPar+;
+#pragma link C++ class R3BNeulandParFact+;
+#pragma link C++ class R3BNeulandHitPar+;
+#pragma link C++ class R3BNeulandHitModulePar+;
 
 
 #endif

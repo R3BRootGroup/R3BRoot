@@ -1,19 +1,19 @@
 // -----------------------------------------------------------------------
-// -----                          R3BLandPmt                         -----
-// -----                Created 22-04-2014 by D.Kresan               -----
+// -----                    R3BNeulandCalData                        -----
+// -----              Created 22-04-2014 by D.Kresan                 -----
 // -----------------------------------------------------------------------
 
-#ifndef R3BLANDPMT
-#define R3BLANDPMT
+#ifndef R3BNEULANDCALDATA_H
+#define R3BNEULANDCALDATA_H
 
 #include "TObject.h"
 
-class R3BLandPmt : public TObject
+class R3BNeulandCalData : public TObject
 {
   public:
-    R3BLandPmt();
-    R3BLandPmt(Int_t barId, Int_t side, Double_t time, Int_t qdc);
-    virtual ~R3BLandPmt();
+    R3BNeulandCalData();
+    R3BNeulandCalData(Int_t barId, Int_t side, Double_t time, Int_t qdc);
+    virtual ~R3BNeulandCalData();
 
     inline const Int_t& GetBarId() const
     {
@@ -39,7 +39,7 @@ class R3BLandPmt : public TObject
     Int_t fQdc;
 
   public:
-    ClassDef(R3BLandPmt, 1)
+    ClassDef(R3BNeulandCalData, 1)
 };
 
 #endif

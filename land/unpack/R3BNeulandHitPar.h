@@ -1,5 +1,5 @@
-#ifndef R3BLANDTSYNCPAR_H
-#define R3BLANDTSYNCPAR_H
+#ifndef R3BNEULANDHITPAR_H
+#define R3BNEULANDHITPAR_H
 
 #define NMODULEMAX 6000
 
@@ -7,13 +7,13 @@
 
 #include "TObjArray.h"
 
-#include "R3BLandTSyncModulePar.h"
+#include "R3BNeulandHitModulePar.h"
 
 using namespace std;
 
 class FairParamList;
 
-class R3BLandTSyncPar : public FairParGenericSet
+class R3BNeulandHitPar : public FairParGenericSet
 {
 
   public:
@@ -24,14 +24,14 @@ class R3BLandTSyncPar : public FairParGenericSet
      * @param context context/purpose for parameters and conditions.
      * @param own class ownership, if flag is kTRUE FairDB has the par.
      */
-    R3BLandTSyncPar(const char* name = "LandTSyncPar",
-               const char* title = "Time Synchronization",
+    R3BNeulandHitPar(const char* name = "R3BNeulandHitPar",
+               const char* title = "Calibration",
                const char* context = "TestDefaultContext",
                Bool_t own = kTRUE);
     /**
      * Destructor. Cleares the memory used by the object.
      */
-    virtual ~R3BLandTSyncPar(void);
+    virtual ~R3BNeulandHitPar(void);
 
     /**
      * Method to reset the values of parameters.
@@ -62,18 +62,18 @@ class R3BLandTSyncPar : public FairParGenericSet
      * Extends the array.
      * @param tch a parameter container for a detector module.
      */
-    void AddModulePar(R3BLandTSyncModulePar* tch)
+    void AddModulePar(R3BNeulandHitModulePar* tch)
     {
-        fTSyncParams->Add(tch);
+        fParams->Add(tch);
     }
 
     /**
      * Method to retrieve the arrray with module containers.
-     * @return an array with parameter containers of type R3BTSyncModulePar.
+     * @return an array with parameter containers of type R3BNeulandHitModulePar.
      */
     TObjArray* GetListOfModulePar()
     {
-        return fTSyncParams;
+        return fParams;
     }
 
     /**
@@ -82,7 +82,7 @@ class R3BLandTSyncPar : public FairParGenericSet
      */
     Int_t GetNumModulePar()
     {
-        return fTSyncParams->GetEntriesFast();
+        return fParams->GetEntriesFast();
     }
 
     /**
@@ -90,16 +90,16 @@ class R3BLandTSyncPar : public FairParGenericSet
      * @param idx an index of a module.
      * @return parameter container of this module.
      */
-    R3BLandTSyncModulePar* GetModuleParAt(Int_t idx)
+    R3BNeulandHitModulePar* GetModuleParAt(Int_t idx)
     {
-        return (R3BLandTSyncModulePar*)fTSyncParams->At(idx);
+        return (R3BNeulandHitModulePar*)fParams->At(idx);
     }
 
   private:
 
-    TObjArray* fTSyncParams; /**< an array with parameter containers of all modules */
+    TObjArray* fParams; /**< an array with parameter containers of all modules */
 
-    ClassDef(R3BLandTSyncPar, 1);
+    ClassDef(R3BNeulandHitPar, 1);
 };
 
-#endif /* !R3BLANDTSYNCPAR_H*/
+#endif /* !R3BNEULANDHITPAR_H*/

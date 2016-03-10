@@ -1,10 +1,10 @@
 // -----------------------------------------------------------------------------
-// -----                              R3BLandTSync                         -----
-// -----                     Created 07-05-2014 by D.Kresan                -----
+// -----                         R3BNeulandCal2Hit                         -----
+// -----                   Created 07-05-2014 by D.Kresan                  -----
 // -----------------------------------------------------------------------------
 
-#ifndef R3BLANDTSYNC_H
-#define R3BLANDTSYNC_H
+#ifndef R3BNEULANDCAL2HIT_H
+#define R3BNEULANDCAL2HIT_H
 
 #include <fstream>
 #include <map>
@@ -12,14 +12,14 @@
 #include "FairTask.h"
 
 class TClonesArray;
-class R3BLandTSyncPar;
+class R3BNeulandHitPar;
 
-class R3BLandTSync : public FairTask
+class R3BNeulandCal2Hit : public FairTask
 {
   public:
-    R3BLandTSync();
-    R3BLandTSync(const char* name, Int_t iVerbose);
-    virtual ~R3BLandTSync();
+    R3BNeulandCal2Hit();
+    R3BNeulandCal2Hit(const char* name, Int_t iVerbose);
+    virtual ~R3BNeulandCal2Hit();
 
     virtual InitStatus Init();
     
@@ -41,7 +41,7 @@ class R3BLandTSync : public FairTask
     
     TClonesArray* fLandPmt;
     TClonesArray* fLandDigi;
-    R3BLandTSyncPar* fTSyncPar;
+    R3BNeulandHitPar* fPar;
     Int_t fNDigi;
     
     std::ifstream* fInFile;
@@ -55,7 +55,7 @@ class R3BLandTSync : public FairTask
     void ReadParameters();
 
   public:
-    ClassDef(R3BLandTSync, 0)
+    ClassDef(R3BNeulandCal2Hit, 0)
 };
 
 #endif

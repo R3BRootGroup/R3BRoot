@@ -1,14 +1,14 @@
 
-#include "R3BNeulandMappedItem.h"
+#include "R3BNeulandMappedData.h"
 
-R3BNeulandMappedItem::R3BNeulandMappedItem()
+R3BNeulandMappedData::R3BNeulandMappedData()
     : fBarId(0)
     , fSide(0)
     , fIs17(kFALSE)
 {
 }
 
-R3BNeulandMappedItem::R3BNeulandMappedItem(Int_t sam,
+R3BNeulandMappedData::R3BNeulandMappedData(Int_t sam,
                                            Int_t gtb,
                                            Int_t tacAddr,
                                            Int_t cal,
@@ -18,11 +18,11 @@ R3BNeulandMappedItem::R3BNeulandMappedItem(Int_t sam,
                                            Int_t barId,
                                            Int_t side,
                                            Bool_t is17)
-    : R3BNeulandRawItem(sam, gtb, tacAddr, 0, cal, clock, tacData, qdcData)
+    : R3BNeulandUnpackData(sam, gtb, tacAddr, 0, cal, clock, tacData, qdcData)
     , fBarId(barId)
     , fSide(side)
     , fIs17(is17)
 {
 }
 
-ClassImp(R3BNeulandMappedItem)
+ClassImp(R3BNeulandMappedData)

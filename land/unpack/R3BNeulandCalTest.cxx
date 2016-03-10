@@ -6,10 +6,10 @@
 #include "FairRootManager.h"
 #include "FairLogger.h"
 
-#include "R3BLandPmt.h"
+#include "R3BNeulandCalData.h"
 #include "R3BNeulandPmt.h"
 #include "R3BLosHit.h"
-#include "R3BLandTcalTest.h"
+#include "R3BNeulandCalTest.h"
 
 Double_t walk(Double_t x)
 {
@@ -25,7 +25,7 @@ Double_t walk(Double_t x)
     //return 0.;
 }
 
-R3BLandTcalTest::R3BLandTcalTest()
+R3BNeulandCalTest::R3BNeulandCalTest()
     : fnEvents(0)
     , fLandPmt(NULL)
     , fNeulandPmt(NULL)
@@ -33,7 +33,7 @@ R3BLandTcalTest::R3BLandTcalTest()
 {
 }
 
-R3BLandTcalTest::R3BLandTcalTest(const char* name, Int_t iVerbose)
+R3BNeulandCalTest::R3BNeulandCalTest(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fnEvents(0)
     , fLandPmt(NULL)
@@ -42,18 +42,18 @@ R3BLandTcalTest::R3BLandTcalTest(const char* name, Int_t iVerbose)
 {
 }
 
-R3BLandTcalTest::~R3BLandTcalTest()
+R3BNeulandCalTest::~R3BNeulandCalTest()
 {
 }
 
-InitStatus R3BLandTcalTest::Init()
+InitStatus R3BNeulandCalTest::Init()
 {
     FairRootManager* fMan = FairRootManager::Instance();
     if (!fMan)
     {
         FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
     }
-    fLandPmt = (TClonesArray*)fMan->GetObject("LandPmt");
+    fLandPmt = (TClonesArray*)fMan->GetObject("NeulandCalData");
     fNeulandPmt = (TClonesArray*)fMan->GetObject("NeulandPmt");
     fLosHit = (TClonesArray*)fMan->GetObject("LosHit");
     CreateHistos();
@@ -61,7 +61,7 @@ InitStatus R3BLandTcalTest::Init()
     return kSUCCESS;
 }
 
-void R3BLandTcalTest::Exec(Option_t* option)
+void R3BNeulandCalTest::Exec(Option_t* option)
 {
     Bool_t startSeen = kTRUE;
     Double_t startTime = 0.;
@@ -108,13 +108,13 @@ void R3BLandTcalTest::Exec(Option_t* option)
     if (fLandPmt)
     {
         Int_t nLandPmt = fLandPmt->GetEntriesFast();
-        R3BLandPmt* pmt1;
-        R3BLandPmt* pmt2;
+        R3BNeulandCalData* pmt1;
+        R3BNeulandCalData* pmt2;
         Int_t barId;
         Double_t time1, time2;
         for (Int_t i1 = 0; i1 < nLandPmt; i1++)
         {
-            pmt1 = (R3BLandPmt*)fLandPmt->At(i1);
+            pmt1 = (R3BNeulandCalData*)fLandPmt->At(i1);
             barId = pmt1->GetBarId();
             time1 = pmt1->GetTime();
             time1 += walk(pmt1->GetQdc());
@@ -125,7 +125,7 @@ void R3BLandTcalTest::Exec(Option_t* option)
                 {
                     continue;
                 }
-                pmt2 = (R3BLandPmt*)fLandPmt->At(i2);
+                pmt2 = (R3BNeulandCalData*)fLandPmt->At(i2);
                 if (barId != pmt2->GetBarId())
                 {
                     continue;
@@ -196,12 +196,12 @@ void R3BLandTcalTest::Exec(Option_t* option)
     fnEvents += 1;
 }
 
-void R3BLandTcalTest::FinishTask()
+void R3BNeulandCalTest::FinishTask()
 {
     WriteHistos();
 }
 
-void R3BLandTcalTest::CreateHistos()
+void R3BNeulandCalTest::CreateHistos()
 {
     fh_los_corr = new TH2F("h_los_corr", "LOS vs NeuLAND", 1000, 100, 400., 1000, -1360., -1310.);
     fh_tof = new TH1F("h_tof", "ToF", 1000, 1500., 1700.);
@@ -210,7 +210,7 @@ void R3BLandTcalTest::CreateHistos()
     fh_tdiff = new TH1F("h_tdiff", "Tdiff", 10000, -50, 50.);
 }
 
-void R3BLandTcalTest::WriteHistos()
+void R3BNeulandCalTest::WriteHistos()
 {
     fh_los_corr->Write();
     fh_tof->Write();
@@ -219,4 +219,4 @@ void R3BLandTcalTest::WriteHistos()
     fh_tdiff->Write();
 }
 
-ClassImp(R3BLandTcalTest)
+ClassImp(R3BNeulandCalTest)

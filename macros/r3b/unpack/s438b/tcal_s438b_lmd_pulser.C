@@ -31,7 +31,7 @@ void run(TString runNumber, TString refRun)
     // ---------------------------------------------------------------------------
 
     // Time calibration ----------------------------------------------------------
-    R3BLandTcal* landTcal = new R3BLandTcal("LandTcal", 1);
+    R3BNeulandMapped2Cal* landTcal = new R3BNeulandMapped2Cal("LandTcal", 1);
     landTcal->SetTrigger(trigger);
     landTcal->SetNofModules(nModules);
     landTcal->SetPulserMode(kTRUE);

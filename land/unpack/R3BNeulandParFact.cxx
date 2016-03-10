@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////
 //
-//  R3BTSyncContFact
+//  R3BNeulandParFact
 //
 //  Factory for the parameter containers
 //
 /////////////////////////////////////////////////////////////
-#include "R3BLandTSyncContFact.h"
+#include "R3BNeulandParFact.h"
 
-#include "R3BLandTSyncPar.h"    // for R3BLandGeometryPar
+#include "R3BNeulandHitPar.h"    // for R3BLandGeometryPar
 #include "FairParSet.h"    // for FairParSet
 #include "FairRuntimeDb.h" // for FairRuntimeDb
 #include "FairLogger.h"
@@ -20,42 +20,42 @@
 
 using namespace std;
 
-static R3BLandTSyncContFact gR3BTSyncContFact;
+static R3BNeulandParFact gR3BNeulandParFact;
 
-R3BLandTSyncContFact::R3BLandTSyncContFact()
+R3BNeulandParFact::R3BNeulandParFact()
 {
     // Constructor (called when the library is loaded)
-    fName = "R3BLandTSyncContFact";
+    fName = "R3BNeulandParFact";
     fTitle = "Tutorial factory for parameter containers"; //TODO
     setAllContainers();
     FairRuntimeDb::instance()->addContFactory(this);
 }
 
-void R3BLandTSyncContFact::setAllContainers()
+void R3BNeulandParFact::setAllContainers()
 {
     /** Creates the Container objects with all accepted contexts and adds them to
      *  the list of containers.*/
 
-    FairContainer* p1 = new FairContainer("LandTSyncPar", "NeuLAND TSync Parameters", "TestDefaultContext"); //TODO
+    FairContainer* p1 = new FairContainer("NeulandPar", "NeuLAND Modul Parameters", "TestDefaultContext"); //TODO
     p1->addContext("TestNonDefaultContext");
     containers->Add(p1);
 }
 
-FairParSet* R3BLandTSyncContFact::createContainer(FairContainer* c)
+FairParSet* R3BNeulandParFact::createContainer(FairContainer* c)
 {
     /** Calls the constructor of the corresponding parameter container.
      * For an actual context, which is not an empty string and not the default context
      * of this container, the name is concatinated with the context. */
 
     const char* name = c->GetName();
-    LOG(INFO) << "R3BLandTSyncContFact::createContainer : " << name << FairLogger::endl;
+    LOG(INFO) << "R3BNeulandParFact::createContainer : " << name << FairLogger::endl;
     FairParSet* p = NULL;
 
-    if (strcmp(name, "LandTSyncPar") == 0) //TODO
+    if (strcmp(name, "NeulandPar") == 0) //TODO
     {
-        p = new R3BLandTSyncPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+        p = new R3BNeulandHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
     return p;
 }
 
-ClassImp(R3BLandTSyncContFact);
+ClassImp(R3BNeulandParFact);

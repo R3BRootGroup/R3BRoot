@@ -6,7 +6,7 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 
-#include "R3BNeulandMappedItem.h"
+#include "R3BNeulandMappedData.h"
 
 #include "ext_data_struct_info.hh"
 
@@ -21,7 +21,7 @@ R3BNeulandTacquilaReader::R3BNeulandTacquilaReader(EXT_STR_h101* data)
     , fNEvent(0)
     , fData(data)
     , fLogger(FairLogger::GetLogger())
-    , fArray(new TClonesArray("R3BNeulandMappedItem"))
+    , fArray(new TClonesArray("R3BNeulandMappedData"))
 {
 }
 
@@ -43,7 +43,7 @@ Bool_t R3BNeulandTacquilaReader::Init(ext_data_struct_info* a_struct_info)
     }
 
     // Register output array in tree
-    FairRootManager::Instance()->Register("NeulandMappedItem", "Land", fArray, kTRUE);
+    FairRootManager::Instance()->Register("NeulandMappedData", "Land", fArray, kTRUE);
 
     return kTRUE;
 }
@@ -77,12 +77,12 @@ Bool_t R3BNeulandTacquilaReader::Read()
                 if (tdc1)
                 {
                     new ((*fArray)[fArray->GetEntriesFast()])
-                        R3BNeulandMappedItem(0, 0, 0, 0, 63 - clock1, 4095 - tdc1, qdc, barId, k + 1, kFALSE);
+                        R3BNeulandMappedData(0, 0, 0, 0, 63 - clock1, 4095 - tdc1, qdc, barId, k + 1, kFALSE);
                 }
                 if (tdc2)
                 {
                     new ((*fArray)[fArray->GetEntriesFast()])
-                        R3BNeulandMappedItem(0, 0, 0, 0, 63 - clock2, 4095 - tdc2, 0, 0, 0, kTRUE);
+                        R3BNeulandMappedData(0, 0, 0, 0, 63 - clock2, 4095 - tdc2, 0, 0, 0, kTRUE);
                 }
             }
         }

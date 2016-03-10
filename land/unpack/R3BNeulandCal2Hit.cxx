@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
-// -----                              R3BLandTSync                         -----
-// -----                     Created 07-05-2014 by D.Kresan                -----
+// -----                          R3BNeulandCal2Hit                        -----
+// -----                   Created 07-05-2014 by D.Kresan                  -----
 // -----------------------------------------------------------------------------
 
 #include "TClonesArray.h"
@@ -11,10 +11,10 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 
-#include "R3BLandPmt.h"
+#include "R3BNeulandCalData.h"
 #include "R3BLandDigi.h"
-#include "R3BLandTSync.h"
-#include "R3BLandTSyncPar.h"
+#include "R3BNeulandCal2Hit.h"
+#include "R3BNeulandHitPar.h"
 #include "R3BTCalPar.h"
 
 #include "TH1F.h"
@@ -24,14 +24,14 @@
 
 using std::ifstream;
 
-R3BLandTSync::R3BLandTSync()
+R3BNeulandCal2Hit::R3BNeulandCal2Hit()
    : fLandPmt (NULL)
    , fLandDigi (new TClonesArray ("R3BLandDigi"))
    , fNDigi (0)
    , fFirstPlaneHorisontal (kFALSE) {
 }
 
-R3BLandTSync::R3BLandTSync (const char* name, Int_t iVerbose)
+R3BNeulandCal2Hit::R3BNeulandCal2Hit (const char* name, Int_t iVerbose)
    : FairTask (name, iVerbose)
    , fLandPmt (NULL)
    , fLandDigi (new TClonesArray ("R3BLandDigi"))
@@ -39,18 +39,18 @@ R3BLandTSync::R3BLandTSync (const char* name, Int_t iVerbose)
    , fFirstPlaneHorisontal (kFALSE) {
 }
 
-R3BLandTSync::~R3BLandTSync() {
+R3BNeulandCal2Hit::~R3BNeulandCal2Hit() {
 }
 
-InitStatus R3BLandTSync::Init() {
+InitStatus R3BNeulandCal2Hit::Init() {
    FairRootManager* fMan = FairRootManager::Instance();
    if (!fMan) {
       FairLogger::GetLogger()->Fatal (MESSAGE_ORIGIN, "FairRootManager not found");
    }
 
-   fLandPmt = (TClonesArray*) fMan->GetObject ("LandPmt");
+   fLandPmt = (TClonesArray*) fMan->GetObject ("NeulandCalData");
    if (!fLandPmt) {
-      FairLogger::GetLogger()->Fatal (MESSAGE_ORIGIN, "LandPmt not found");
+      FairLogger::GetLogger()->Fatal (MESSAGE_ORIGIN, "NeulandCalData not found");
    }
 
    fMan->Register ("LandDigi", "Land", fLandDigi, kTRUE);
@@ -59,44 +59,44 @@ InitStatus R3BLandTSync::Init() {
    return kSUCCESS;
 }
 
-void R3BLandTSync::SetParContainers() {
+void R3BNeulandCal2Hit::SetParContainers() {
    FairRuntimeDb* rtdb = FairRunAna::Instance()->GetRuntimeDb();
-   fTSyncPar = (R3BLandTSyncPar*) rtdb->getContainer ("LandTSyncPar");
+   fPar = (R3BNeulandHitPar*) rtdb->getContainer ("NeulandHitPar");
 }
 
 
 
-void R3BLandTSync::SetParameter(){
+void R3BNeulandCal2Hit::SetParameter(){
    std::map<Int_t, Bool_t> tempMapIsSet;
    std::map<Int_t, Double_t> tempMapVeff;
    std::map<Int_t, Double_t> tempMapTSync;
    
-   for (Int_t i = 0; i < fTSyncPar->GetNumModulePar(); i++) {
-      R3BLandTSyncModulePar* fModulePar = fTSyncPar->GetModuleParAt(i);
+   for (Int_t i = 0; i < fPar->GetNumModulePar(); i++) {
+      R3BNeulandHitModulePar* fModulePar = fPar->GetModuleParAt(i);
       Int_t id = fModulePar->GetModuleId()*2 + fModulePar->GetSide() - 3;
       tempMapIsSet[id] = kTRUE;
       tempMapVeff[id] = fModulePar->GetEffectiveSpeed();
       tempMapTSync[id] = fModulePar->GetTimeOffset();
    }
      
-   LOG(INFO) << "Number of Parameter: " << fTSyncPar->GetNumModulePar() << FairLogger::endl;
+   LOG(INFO) << "Number of Parameter: " << fPar->GetNumModulePar() << FairLogger::endl;
    
    fMapIsSet = tempMapIsSet;
    fMapVeff = tempMapVeff;
    fMapTSync = tempMapTSync;
 }
 
-InitStatus R3BLandTSync::ReInit() {
+InitStatus R3BNeulandCal2Hit::ReInit() {
    SetParContainers();
    SetParameter();
    return kSUCCESS;
 }
 
-void R3BLandTSync::Exec (Option_t* option) {
+void R3BNeulandCal2Hit::Exec (Option_t* option) {
    Int_t nLandPmt = fLandPmt->GetEntriesFast();
   
-   R3BLandPmt* pmt1;
-   R3BLandPmt* pmt2;
+   R3BNeulandCalData* pmt1;
+   R3BNeulandCalData* pmt2;
    Int_t barId;
    Int_t plane;
    Double_t veff;
@@ -109,7 +109,7 @@ void R3BLandTSync::Exec (Option_t* option) {
       id = 1;
    }
    for (Int_t i1 = 0; i1 < nLandPmt; i1++) {
-      pmt1 = (R3BLandPmt*) fLandPmt->At (i1);
+      pmt1 = (R3BNeulandCalData*) fLandPmt->At (i1);
       if (1 != pmt1->GetSide()) {
          continue;
       }
@@ -122,7 +122,7 @@ void R3BLandTSync::Exec (Option_t* option) {
          if (i1 == i2) {
             continue;
          }
-         pmt2 = (R3BLandPmt*) fLandPmt->At (i2);
+         pmt2 = (R3BNeulandCalData*) fLandPmt->At (i2);
          if (2 != pmt2->GetSide()) {
             continue;
          }
@@ -155,9 +155,9 @@ void R3BLandTSync::Exec (Option_t* option) {
    }
 }
 
-void R3BLandTSync::FinishEvent() {
+void R3BNeulandCal2Hit::FinishEvent() {
    fLandDigi->Clear();
    fNDigi = 0;
 }
 
-ClassImp (R3BLandTSync)
+ClassImp (R3BNeulandCal2Hit)

@@ -2,17 +2,17 @@
 #ifndef R3BNEULANDMAPPEDITEM_H
 #define R3BNEULANDMAPPEDITEM_H
 
-#include "R3BNeulandRawItem.h"
+#include "R3BNeulandUnpackData.h"
 
-class R3BNeulandMappedItem : public R3BNeulandRawItem
+class R3BNeulandMappedData : public R3BNeulandUnpackData
 {
   public:
     // Default Constructor
-    R3BNeulandMappedItem();
+    R3BNeulandMappedData();
 
     /** Standard Constructor
      **/
-    R3BNeulandMappedItem(Int_t sam,
+    R3BNeulandMappedData(Int_t sam,
                          Int_t gtb,
                          Int_t tacAddr,
                          Int_t cal,
@@ -24,7 +24,7 @@ class R3BNeulandMappedItem : public R3BNeulandRawItem
                          Bool_t is17);
 
     // Destructor
-    virtual ~R3BNeulandMappedItem()
+    virtual ~R3BNeulandMappedData()
     {
     }
 
@@ -48,7 +48,7 @@ class R3BNeulandMappedItem : public R3BNeulandRawItem
     Bool_t fIs17; //... true if CH 17
 
   public:
-    ClassDef(R3BNeulandMappedItem, 2)
+    ClassDef(R3BNeulandMappedData, 2)
 };
 
 #endif

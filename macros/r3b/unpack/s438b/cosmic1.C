@@ -26,7 +26,7 @@ void run(TString runNumber)
     // ---------------------------------------------------------------------------
 
     // Cosmic1----------------------------------------------------------------------
-    R3BLandCosmic1* cosmic1 = new R3BLandCosmic1("cosmic1");
+    R3BNeulandCal2HitPar* cosmic1 = new R3BNeulandCal2HitPar("cosmic1");
     cosmic1->SetMaxPaddleDistFromLine(1);
     cosmic1->SetPlanes(8);
     run->AddTask(cosmic1);

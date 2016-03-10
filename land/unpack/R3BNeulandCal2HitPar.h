@@ -1,10 +1,10 @@
 // ---------------------------------------------------------------------------------------
-// -----                              R3BLandCosmic1                                 -----
+// -----                           R3BNeulandCal2HitPar                              -----
 // -----         Copied from Land02/detector/land/n_gen_det_cosmic1 on 11-2015       -----
 // ---------------------------------------------------------------------------------------
 
-#ifndef R3BLANDCOSMIC1_H
-#define R3BLANDCOSMIC1_H
+#ifndef R3BNEULANDCAL2HITPAR_H
+#define R3BNEULANDCAL2HITPAR_H
 
 #include "FairTask.h"
 #include "R3BLandCosmic1Util.h"
@@ -21,7 +21,7 @@
 #include "stdlib.h"
 #include <set>
 
-class R3BLandTSyncPar;
+class R3BNeulandHitPar;
 class TClonesArray;
 class TCanvas;
 class TGraph;
@@ -85,13 +85,13 @@ struct bar{
   }
 };
 
-class R3BLandCosmic1 : public FairTask
+class R3BNeulandCal2HitPar : public FairTask
 {
 
   public:
-    R3BLandCosmic1();
-    R3BLandCosmic1(const char* name, Int_t iVerbose = 1);
-    virtual ~R3BLandCosmic1();
+    R3BNeulandCal2HitPar();
+    R3BNeulandCal2HitPar(const char* name, Int_t iVerbose = 1);
+    virtual ~R3BNeulandCal2HitPar();
 
     virtual InitStatus Init();
 
@@ -116,7 +116,7 @@ class R3BLandCosmic1 : public FairTask
     Int_t fPaddles = 50;
     
     TClonesArray* fLandPmt;
-    R3BLandTSyncPar* fTSyncPar;
+    R3BNeulandHitPar* fPar;
 
     std::vector<std::vector<bar*> > bars;
     TGraph* x_plot;
@@ -139,7 +139,7 @@ class R3BLandCosmic1 : public FairTask
     ident_no_set _bad_fit_idents;
 
   public:
-    ClassDef(R3BLandCosmic1, 0)
+    ClassDef(R3BNeulandCal2HitPar, 0)
 };
 
 #endif

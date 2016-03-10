@@ -1,11 +1,11 @@
-#include "R3BLandTSyncModulePar.h"
+#include "R3BNeulandHitModulePar.h"
 
 #include "FairParamList.h" // for FairParamList
 #include "FairLogger.h"
 
 using namespace std;
 
-R3BLandTSyncModulePar::R3BLandTSyncModulePar (const char* name, const char* title, const char* context, Bool_t own)
+R3BNeulandHitModulePar::R3BNeulandHitModulePar (const char* name, const char* title, const char* context, Bool_t own)
    : FairParGenericSet (name, title, context, own)
    , fModuleId (0)
    , fSide (0) {
@@ -13,11 +13,11 @@ R3BLandTSyncModulePar::R3BLandTSyncModulePar (const char* name, const char* titl
    clear();
 }
 
-R3BLandTSyncModulePar::~R3BLandTSyncModulePar() {
+R3BNeulandHitModulePar::~R3BNeulandHitModulePar() {
 }
 
-void R3BLandTSyncModulePar::putParams (FairParamList* list) {
-   LOG (INFO) << "R3BLandTSyncModulePar::putParams() called" << FairLogger::endl;
+void R3BNeulandHitModulePar::putParams (FairParamList* list) {
+   LOG (INFO) << "R3BNeulandHitModulePar::putParams() called" << FairLogger::endl;
    if (!list) {
       return;
    }
@@ -31,7 +31,7 @@ void R3BLandTSyncModulePar::putParams (FairParamList* list) {
    list->add ("effectivespeed_error", fEffectiveSpeedError);
 }
 
-Bool_t R3BLandTSyncModulePar::getParams (FairParamList* list) {
+Bool_t R3BNeulandHitModulePar::getParams (FairParamList* list) {
    if (!list) {
       return kFALSE;
    }
@@ -63,11 +63,11 @@ Bool_t R3BLandTSyncModulePar::getParams (FairParamList* list) {
    return kTRUE;
 }
 
-void R3BLandTSyncModulePar::clear() {
+void R3BNeulandHitModulePar::clear() {
 }
 
-void R3BLandTSyncModulePar::printParams() {
-   LOG (INFO) << "   R3BLandTSyncModulePar: Time Calibration Parameters: " << FairLogger::endl;
+void R3BNeulandHitModulePar::printParams() {
+   LOG (INFO) << "   R3BNeulandHitModulePar: Calibration Parameters: " << FairLogger::endl;
    LOG (INFO) << "   fBarId: " << fModuleId << FairLogger::endl;
    LOG (INFO) << "   fSide: " << fSide << FairLogger::endl;
    FairLogger::GetLogger()->Info (MESSAGE_ORIGIN, "   fTimeOffset: %4.2f  ±   %4.2f", fTimeOffset, fTimeOffsetError);
@@ -75,4 +75,4 @@ void R3BLandTSyncModulePar::printParams() {
    FairLogger::GetLogger()->Info (MESSAGE_ORIGIN, "   fEnergieGain: %4.2f  ±   %4.2f", fEnergieGain, fEnergieGainError);
 }
 
-ClassImp (R3BLandTSyncModulePar);
+ClassImp (R3BNeulandHitModulePar);
