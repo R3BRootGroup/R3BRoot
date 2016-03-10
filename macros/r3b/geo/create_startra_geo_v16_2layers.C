@@ -3,6 +3,9 @@
 #include "TGeoManager.h"
 #include "TMath.h"
 
+
+
+
 // Create Matrix Unity
 TGeoRotation *fGlobalRot = new TGeoRotation();
 
@@ -29,7 +32,7 @@ Bool_t fLocalTrans = kFALSE;
 Bool_t fLabTrans = kTRUE;
 
 
-void create_startra_geo_v15(const char* geoTag)
+void create_startra_geo_v16_2layers(const char* geoTag)
 {
   // -------   Load media from media file   -----------------------------------
   FairGeoLoader*    geoLoad = new FairGeoLoader("TGeo","FairGeoLoader");
@@ -114,7 +117,8 @@ void create_startra_geo_v15(const char* geoTag)
   gGeoManager->SetVisLevel(6);
 
 
-  Double_t WorldHalfLength=24.813;
+  //Double_t WorldHalfLength=24.813;
+  Double_t WorldHalfLength=25.;
   Double_t ShiftToWorldEdge=20;
 
   // StarTrack world (mother volume to have vacuum for Si tracker and air for CALIFA)  !!
@@ -174,7 +178,7 @@ void create_startra_geo_v15(const char* geoTag)
   Double_t WidthMin1= 1.971;    // Max width of detector (cm) as final specs
   Double_t Thickness1= 0.005;  // Half thickness of detector (cm) as final specs  -> total thickness: 100um
   //Double_t Thickness1= 0.015;  // Half thickness of detector (cm)   -> total thickness: 300um
-  Double_t Length1=21.794;      // length of detector (cm) as final specs
+  Double_t Length1=21.794+0.015;      // length of detector (cm) as final specs ( +150um to count for the gap between sensor)
   //Double_t Length1=19.03;      // length of detector (cm
   //Double_t InclAng1=14.9;      // angle d'inclinaison with respect to z axis (deg)
   Double_t InclAng1=14.3;      // angle d'inclinaison with respect to z axis (deg)  As final specs
@@ -192,13 +196,13 @@ void create_startra_geo_v15(const char* geoTag)
   Double_t WidthMin2= 1.1406;     // Max width of detector (cm)  as final specs
   Double_t Thickness2= 0.015;  // half thickness of detector (cm)
   //Double_t Length2=30.6;       // length of detector (cm
-  Double_t Length2=33.83875;       // length of detector (cm) as final specs
+  Double_t Length2=33.83875 + 2*0.015;       // length of detector (cm) as final specs  ( + 2*150um to count for the gap between sensor)
   //Double_t InclAng2=33.7;      // angle d'inclinaison with respect to z axis (deg) as final specs to be checked
   Double_t InclAng2=32.155;      // angle d'inclinaison with respect to z axis (deg) as final specs to be checked
   //Double_t Rmin2=2.5;        // beam clearance 3cm radius
-  Double_t Rmin2=2.22;        // beam clearance 3cm radius as final specs
+  Double_t Rmin2=2.30657; // 2.22;        // beam clearance 3cm radius as final specs
   //Double_t AngRangeMin2=7.;    // Min theta angle covered (deg)
-  Double_t AngRangeMin2=5.3;    // Min theta angle covered (deg) as final specs
+  Double_t AngRangeMin2=5.537946491; // 5.306;    // Min theta angle covered (deg) as final specs
   //   Double_t AngTrap2=atan((WidthMax2 /2 - WidthMin2 /2)/Length2); // (rad)
   //   Double_t WidthHalf2= WidthMax2 - (Length2*tan(AngTrap2)); // width of detector at Length/2
   
@@ -209,13 +213,13 @@ void create_startra_geo_v15(const char* geoTag)
   Double_t WidthMin3= 1.1406;     // Max width of detector (cm) as final specs
   Double_t Thickness3= 0.015;  // half thickness of detector (cm)
   //Double_t Length3=30.6;       // length of detector (cm
-  Double_t Length3=33.83875;       // length of detector (cm) as final specs
+  Double_t Length3=33.83875 + 2*0.015;       // length of detector (cm) as final specs  ( + 2*150um to count for the gap between sensor)
   //Double_t InclAng3=33.7;      // angle d'inclinaison with respect to z axis (deg) as final specs to be checked !!
   Double_t InclAng3=32.155;      // angle d'inclinaison with respect to z axis (deg) as final specs to be checked !!
   //Double_t Rmin3=2.685;          // beam clearance 3cm radius
-  Double_t Rmin3=2.95;          // beam clearance 3cm radius as final specs
+  Double_t Rmin3=3.03196; // 2.95;          // beam clearance 3cm radius as final specs
   //Double_t AngRangeMin3=7;     // Min theta angle covered (deg)
-  Double_t AngRangeMin3=6.76;     // Min theta angle covered (deg) as final specs
+  Double_t AngRangeMin3=6.98815; // 6.7657;     // Min theta angle covered (deg) as final specs
   //   Double_t AngTrap3=atan((WidthMax3 /2 - WidthMin3 /2)/Length2); // (rad)
   //   Double_t WidthHalf3= WidthMax3 - (Length3*tan(AngTrap3)); // width of detector at Length/2
   
@@ -1768,6 +1772,7 @@ void create_startra_geo_v15(const char* geoTag)
   //STaRTraLog3->SetLineColor(kWhite);
   STaRTraLog3->SetLineColor(40);
   
+  /*
   aTra->AddNode(STaRTraLog3,19, pMatrix66);
   aTra->AddNode(STaRTraLog3,20, pMatrix68);
   aTra->AddNode(STaRTraLog3,21, pMatrix70);
@@ -1795,7 +1800,7 @@ void create_startra_geo_v15(const char* geoTag)
   aTraFrame->AddNode(STaRTraCBFrameLog3,28, pMatrix84b);
   aTraFrame->AddNode(STaRTraCBFrameLog3,29, pMatrix86b);
   aTraFrame->AddNode(STaRTraCBFrameLog3,30, pMatrix88b);
- 
+  */
   
   pTraWorld->AddNode(aTra, 0, t1);  // when use a mother volume for Tracker
   pTraWorld->AddNode(aTraFrame, 0, t1);  // when use a mother volume for Tracker

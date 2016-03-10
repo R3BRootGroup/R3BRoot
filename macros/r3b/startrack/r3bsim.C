@@ -12,7 +12,6 @@
 //
 //--------------------------------------------------------------------
 
-
 Int_t r3bsim(){
 
    // Load the Main Simulation macro
@@ -43,11 +42,14 @@ Int_t r3bsim(){
    // R3B spec. generator:       "r3b"
 
    //TString fGene="box";
-   TString fGene="gammas";  
+   TString fGene="gammas"; // particle source  
    // TString fGene="ion_gun";
-   //TString fGene="ascii";
    //TString fGene="p2p";
-      //TString fGene="cosmic";
+   //TString fGene="cosmic";
+   //TString fGene="ascii";
+
+   TString InFile = "../../../R3B-Input/Input/KINR_12C_a_a_4.8GeV.event";  // only used when ascii evt generator
+
 
    //-------------------------------------------------
    // Secondaries  generation (G4 only)
@@ -92,21 +94,30 @@ Int_t r3bsim(){
 
   TMap detGeo;
 
-  //detGeo.Add(new TObjString("TARGET"),        new TObjString("target_"+target4+".geo.root"));
-  //detGeo.Add(new TObjString("TARGET"),        new TObjString("target_"+target2+".geo.S438.root"));
-  detGeo.Add(new TObjString("TARGET"),        new TObjString("target_"+target2+"Empty.geo.S438.root"));
+  // Target:
+  detGeo.Add(new TObjString("TARGET"),        new TObjString("target_"+target4+".geo.root"));
+  //detGeo.Add(new TObjString("TARGET"),        new TObjString("target_"+target2+".geo.root"));  // ~10mg/cm2 (thin) 
+  //detGeo.Add(new TObjString("TARGET"),        new TObjString("target_"+target2+".geo.S438.root")); // =0.5g/cm2 (thick)
+  //detGeo.Add(new TObjString("TARGET"),        new TObjString("target_"+target2+"Empty.geo.S438.root"));
+
+  // Setup
 //  detGeo.Add(new TObjString("ALADIN"),        new TObjString("aladin_v13a.geo.root"));
 //  detGeo.Add(new TObjString("GLAD"),          new TObjString("glad_v13a.geo.root"));
 //  detGeo.Add(new TObjString("CRYSTALBALL"),   new TObjString("cal_v13a.geo.root"));
-//    detGeo.Add(new TObjString("CALIFA"),        new TObjString("califa_Marc.geo.root"));
-//  detGeo.Add(new TObjString("CALIFA"),        new TObjString("califa_v14a.geo.root"));
+  //detGeo.Add(new TObjString("CALIFA"),        new TObjString("califa_Marc.geo.root"));
+  detGeo.Add(new TObjString("CALIFA"),        new TObjString("califa_v14a.geo.root"));
 //  detGeo.Add(new TObjString("TOF"),           new TObjString("tof_v13a.geo.root"));
 //  detGeo.Add(new TObjString("MTOF"),          new TObjString("mtof_v13a.geo.root"));
 //  detGeo.Add(new TObjString("DCH"),           new TObjString("dch_v13a.geo.root"));
 //  detGeo.Add(new TObjString("TRACKER"),       new TObjString("tra_v13vac.geo.root"));
 //  detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startra_v14a.geo.root"));
-//  detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startra_v15a.geo.root"));
-  detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startra_S438.geo.root"));
+  //detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startra_v15.geo.root"));   // for p2p
+  //detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startra_v15300.geo.root")); // for p2p
+  //detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startra_v16.geo.root"));  
+  //detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startra_v16-300.geo.root"));
+  //detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startra_v16_2layers.geo.root")); // for elastic
+  detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startra_v16-300_2layers.geo.root")); // for elastic
+//  detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startra_S438.geo.root"));
 //  detGeo.Add(new TObjString("GFI"),           new TObjString("gfi_v13a.geo.root"));
 //  detGeo.Add(new TObjString("LAND"),          new TObjString("land_v12a_10m.geo.root"));
 //  detGeo.Add(new TObjString("SCINTNEULAND"),  new TObjString("neuland_v12a_14m.geo.root"));
@@ -122,8 +133,8 @@ Int_t r3bsim(){
    //- N# of Sim. Events   |    nEvents     (Int_t)
    //-------------------------------------------------
 
-  Int_t nEvents = 10;
-  //Int_t nEvents = 100000;
+    //Int_t nEvents = 100;
+  Int_t nEvents = 1000;
        //Int_t nEvents = 20000;
 
    //-------------------------------------------------
@@ -142,7 +153,7 @@ Int_t r3bsim(){
    // Main Sim function call
    r3ball(  nEvents,
             detGeo,
-	    target2, //           target4,
+	    target4, //           target2,
 	    fEventDisplay,
 	    fMC,
 	    fGene,
@@ -150,7 +161,8 @@ Int_t r3bsim(){
             fR3BMagnet,
        	    1500.,
 	    OutFile,
-	    ParFile
+	    ParFile,
+	    InFile   // for ascii evt generator
           );      
 
 }
