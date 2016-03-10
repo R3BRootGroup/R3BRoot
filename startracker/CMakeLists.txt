@@ -49,6 +49,7 @@ unpack/R3BStarTrackUnpack.cxx
 unpack/R3BStarTrackUnpackPar.cxx
 unpack/R3BStarTrackRawAna.cxx
 #unpack/R3BStarTrackSortRawAna.cxx
+unpack/R3BStarTrackOrderTS.cxx
 unpack/R3BStarTrackStripAna.cxx
 unpack/R3BStarTrackCalib.cxx
 unpack/R3BStarTrackCalibPar.cxx
