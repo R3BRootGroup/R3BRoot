@@ -26,13 +26,14 @@ fTimelb(0),
 fTimeExtvhb(0),
 fTimeExthb(0),
 fTimeExtlb(0),
+fTime47lb(0),
 fInfoField(0),
 fInfoCode(0)
 {
 }
 
 //R3BStarTrackRawHit::R3BStarTrackRawHit(UInt_t wrvhb, UInt_t wrhb, UInt_t wrlb, UInt_t wordtype, UInt_t hitbit, UInt_t moduleId, UInt_t side, UInt_t asicId, UInt_t stripId, UInt_t adc_data, UInt_t timevhb, UInt_t timehb, UInt_t timelb, UInt_t timeExtvhb, UInt_t timeExthb, UInt_t timeExtlb, UInt_t infofield, UInt_t infocode)
-R3BStarTrackRawHit::R3BStarTrackRawHit(UInt_t wrvhb, UInt_t wrhb, UInt_t wrlb, UInt_t wordtype, UInt_t hitbit, UInt_t moduleId, UInt_t side, UInt_t asicId, UInt_t stripId, UInt_t adc_data, ULong_t timevhb, ULong_t timehb, UInt_t timelb, UInt_t timeExtvhb, UInt_t timeExthb, UInt_t timeExtlb, UInt_t infofield, UInt_t infocode)
+R3BStarTrackRawHit::R3BStarTrackRawHit(UInt_t wrvhb, UInt_t wrhb, UInt_t wrlb, UInt_t wordtype, UInt_t hitbit, UInt_t moduleId, UInt_t side, UInt_t asicId, UInt_t stripId, UInt_t adc_data, ULong_t timevhb, ULong_t timehb, UInt_t timelb, UInt_t timeExtvhb, UInt_t timeExthb, UInt_t timeExtlb, UInt_t timecode47lb, UInt_t infofield, UInt_t infocode)
   : fWRvhb(wrvhb),
 fWRhb(wrhb),
 fWRlb(wrlb),
@@ -49,6 +50,7 @@ fTimelb(timelb),
 fTimeExtvhb(timeExtvhb),
 fTimeExthb(timeExthb),
 fTimeExtlb(timeExtlb),
+fTime47lb(timecode47lb),
 fInfoField(infofield),
 fInfoCode(infocode)
 {
