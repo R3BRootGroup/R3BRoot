@@ -3,7 +3,6 @@
 //
 //
 
-
 {
   TStopwatch timer;
   timer.Start();

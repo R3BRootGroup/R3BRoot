@@ -164,7 +164,7 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
     UInt_t adcData=0;  // adc value for energy loss in Si
     */
 
-    if( pl_data[0]==0x00000200)
+    if( pl_data[0]==0x00000200)   // identifiant du Silicon tracker
       {
 
 	while(l_s < size) { 
@@ -174,12 +174,25 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 	  //for (Int_t i1 = 0; i1 < 2; i1++)   
 	  //{ 
 
-	      if( ( ( (pl_data[l_s] >> 30) & 0x3) == 0x2) && ( ((pl_data[l_s] & 0xFFFFFFFF) != 0xFFFFFFFF)))  
+	  //
+	  // reseting in order to check that the same number of time info_code=4 (7,14) and info code =5 (8,15)
+	  // 
+	  info_code=0;
+	  info_field=0;
+	  tsExt_lb=tsExt_hb=tsExt_vhb=0;
+	  ts_hb=0;
+	  ts_vhb=0;
+       	  adcData=0;
+      	  ts_lb=0;
+
+
+	  if( ( ( (pl_data[l_s] >> 30) & 0x3) == 0x2) && ( ((pl_data[l_s] & 0xFFFFFFFF) != 0xFFFFFFFF)))  // word type 2
 		{ 
 		  
 
 		  wordtype = (pl_data[l_s] >> 30) & 0x3; // bit 31:30
-		  
+		  //cout << "wordtype=" << wordtype << endl;
+
 		  //info_code = (pl_data[l_s] >> 20) & 0x0000000F; //bits 20:23
 		  
 		  info_code = (pl_data[l_s] & 0x00F00000) >> 20; //bits 20:23
@@ -215,22 +228,20 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 		  fNHits++;
 
 		  //
-		  // reseting in order to check that the same number of time info_code=4 (7,14) and info code = 5 (8,15)
+		  // reseting in order to check that the same number of time info_code=4 (7,14) and info code =5 (8,15)
 		  // 
-		  info_code=0;
-		  info_field=0;
-		  tsExt_lb=tsExt_hb=tsExt_vhb=0;
-		  ts_hb=0;
-		  ts_vhb=0;
+		  //tsExt_lb=tsExt_hb=tsExt_vhb=0;
+		  //ts_hb=0;
+		  //ts_vhb=0;
 
-		}else if(((pl_data[l_s] >> 30) & 0x3) == 0x3 && ( (pl_data[l_s] & 0xFFFFFFFF) != 0xFFFFFFFF ))
+		}else if(((pl_data[l_s] >> 30) & 0x3) == 0x3 && ( (pl_data[l_s] & 0xFFFFFFFF) != 0xFFFFFFFF ))  // word of type 3
 		{
 
 		  //LOG(INFO) << " pl_data[l_s]: " <<  ((pl_data[l_s] >> 30) & 0x3)  << FairLogger::endl;
 		  
 		  //LOG(INFO) << "R3BSTaRTrackUnpack :   wordB :" <<  (pl_data[l_s] & 0xC0000000) << FairLogger::endl;
 		  
-		  // wordtype=11;
+		  // wordtype=11 <=> 3 ;
 		  wordtype = (pl_data[l_s] >> 30) & 0x3; // bit 31:30
 		  if(wordtype!=3) cout << wordtype << endl;
 		  
@@ -290,8 +301,9 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 		  fNHits++;
 
 		  // Resetting:
-       		  adcData=0;
-      		  ts_lb=0;
+       		  //adcData=0;
+      		  //ts_lb=0;
+
 
 
 		} else
