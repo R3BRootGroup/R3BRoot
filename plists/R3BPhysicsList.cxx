@@ -36,6 +36,8 @@
 #include "G4IonBinaryCascadePhysics.hh"
 #include "G4EmExtraPhysics.hh"
 
+#include "G4IonINCLXXPhysics.hh"
+#include "G4HadronPhysicsQGSP_BERT.hh"
 
 // std G4 headers
 #include "G4UnitsTable.hh"
@@ -187,7 +189,16 @@ void R3BPhysicsList::AddPhysicsList(const G4String& name){
     RegisterPhysics(new G4EmExtraPhysics());
     gnucIsRegisted = true;
     G4cout << "R3BPhysicsList::AddPhysicsList <" << name << ">" << G4endl;
+
+  } else if (name == "qgsp_bert") {
+    RegisterPhysics(new G4HadronPhysicsQGSP_BERT());
+    G4cout << "R3BPhysicsList::AddPhysicsList <" << name << ">" << G4endl;
     
+  } else if (name == "ion_inclxx" && !ionIsRegisted) {
+    RegisterPhysics(new G4IonINCLXXPhysics());
+    ionIsRegisted = true;
+    G4cout << "R3BPhysicsList::AddPhysicsList <" << name << ">" << G4endl;
+
   } else {
     G4cout << "R3BPhysicsList::AddPhysicsList <" << name << ">" 
            << " fail - module is already regitered or is unknown " << G4endl;
