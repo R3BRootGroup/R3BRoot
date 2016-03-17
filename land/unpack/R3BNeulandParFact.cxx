@@ -36,7 +36,7 @@ void R3BNeulandParFact::setAllContainers()
     /** Creates the Container objects with all accepted contexts and adds them to
      *  the list of containers.*/
 
-    FairContainer* p1 = new FairContainer("NeulandPar", "NeuLAND Modul Parameters", "TestDefaultContext"); //TODO
+    FairContainer* p1 = new FairContainer("NeulandHitPar", "NeuLAND Modul Parameters", "TestDefaultContext"); //TODO
     p1->addContext("TestNonDefaultContext");
     containers->Add(p1);
 }
@@ -51,7 +51,7 @@ FairParSet* R3BNeulandParFact::createContainer(FairContainer* c)
     LOG(INFO) << "R3BNeulandParFact::createContainer : " << name << FairLogger::endl;
     FairParSet* p = NULL;
 
-    if (strcmp(name, "NeulandPar") == 0) //TODO
+    if (strcmp(name, "NeulandHitPar") == 0) //TODO
     {
         p = new R3BNeulandHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }

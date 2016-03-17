@@ -18,7 +18,7 @@ public:
      * @param context context/purpose for parameters and conditions.
      * @param own class ownership, if flag is kTRUE FairDB has the par.
      */
-    R3BNeulandHitModulePar ( const char* name = "R3BNeulandHitModulePar",
+    R3BNeulandHitModulePar ( const char* name = "NeulandHitModulePar",
                            const char* title = "Calibration of a NeuLAND module",
                            const char* context = "TestDefaultContext",
                            Bool_t own = kTRUE );

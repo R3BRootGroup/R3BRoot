@@ -24,7 +24,7 @@ class R3BNeulandHitPar : public FairParGenericSet
      * @param context context/purpose for parameters and conditions.
      * @param own class ownership, if flag is kTRUE FairDB has the par.
      */
-    R3BNeulandHitPar(const char* name = "R3BNeulandHitPar",
+    R3BNeulandHitPar(const char* name = "NeulandHitPar",
                const char* title = "Calibration",
                const char* context = "TestDefaultContext",
                Bool_t own = kTRUE);
