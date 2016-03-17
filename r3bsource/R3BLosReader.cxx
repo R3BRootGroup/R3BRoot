@@ -3,19 +3,22 @@
 #include "TClonesArray.h"
 #include "FairRootManager.h"
 #include "R3BLosReader.h"
-#include "R3BLosMappedItem.h"
+#include "R3BLosMappedData.h"
 
 extern "C" {
 #include "ext_data_client.h"
 #include "ext_h101_los.h"
-#include "ext_h101.h"
+#include EXP_SPECIFIC_H101_FILE
 }
+
+#define NUM_LOS_DETECTORS 2
+#define NUM_LOS_CHANNELS  5
 
 R3BLosReader::R3BLosReader(EXT_STR_h101* data)
 	: R3BReader("R3BLosReader")
 	, fData(data)
 	, fLogger(FairLogger::GetLogger())
-    , fArray(new TClonesArray("R3BLosMappedItem"))
+    , fArray(new TClonesArray("R3BLosMappedData"))
 {
 }
 
@@ -36,7 +39,7 @@ Bool_t R3BLosReader::Init(ext_data_struct_info *a_struct_info)
 	}
 
     // Register output array in tree
-    FairRootManager::Instance()->Register("R3BLosMappedItem", "Land", fArray, kTRUE);
+    FairRootManager::Instance()->Register("LosMapped", "Land", fArray, kTRUE);
 
 	return kTRUE;
 }
@@ -47,25 +50,46 @@ Bool_t R3BLosReader::Read()
     EXT_STR_h101_onion* data = (EXT_STR_h101_onion*)fData;
 
 /*
+
   struct {
-    struct {
-      uint32_t TF;
-      uint32_t TC;
-    } _[4];
+    uint32_t TFM;
+    uint32_t TFMI[5 / * TFM * /];
+    uint32_t TFME[5 / * TFM * /];
+    uint32_t TF;
+    uint32_t TFv[50 / * TF * /];
+    uint32_t TCM;
+    uint32_t TCMI[5 / * TCM * /];
+    uint32_t TCME[5 / * TCM * /];
+    uint32_t TC;
+    uint32_t TCv[50 / * TC * /];
   } LOS[2];
+ 
 */
 
-	for (int d=0;d<2;d++)
-		for (int c=0;c<4;c++)
+	// loop over all detectors
+	for (int d=0;d<NUM_LOS_DETECTORS;d++)
+	{		
+		uint32_t numChannels = data->LOS[d].TFM; // not necessarly number of hits! (b/c multi hit)
+		
+		// loop over channels
+		uint32_t curChannelStart=0;     // index in v for first item of current channel
+		for (int i=0;i<numChannels;i++) 
 		{
-			if (data->LOS[d]._[c].TF==0) continue; // no time converted
+			uint32_t channel=data->LOS[d].TFMI[i]; // or 1..65
+			uint32_t nextChannelStart=data->LOS[d].TFME[i];  // index in v for first item of next channel
 			
-			new ((*fArray)[fArray->GetEntriesFast()])
-				R3BLosMappedItem(d,						// detector
-								 c,						// channel
-								 data->LOS[d]._[c].TC,  // coarse time
-								 data->LOS[d]._[c].TF); // fine time
-		}	
+			for (int j=curChannelStart;j<nextChannelStart;j++)
+				new ((*fArray)[fArray->GetEntriesFast()])
+					R3BLosMappedData(
+						d+1,
+						channel,
+						data->LOS[d].TCv[j],
+						data->LOS[d].TFv[j]
+						); // det,channel,energy
+			
+			curChannelStart=nextChannelStart;
+		}
+	}
 
     return kTRUE;
 }

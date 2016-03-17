@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // -----                                                                   -----
-// -----                           R3BPspxCal                              -----
+// -----                           R3BPspxMapped2Cal                              -----
 // -----                    Created  21-01-2016 by R. Plag                 -----
 // -----                                                                   -----
 // -----------------------------------------------------------------------------
@@ -15,12 +15,12 @@
 class TClonesArray;
 class R3BEventHeader;
 
-class R3BPspxCal : public FairTask
+class R3BPspxMapped2Cal : public FairTask
 {
   public:
-    R3BPspxCal();
-    R3BPspxCal(const char* name, Int_t iVerbose);
-    virtual ~R3BPspxCal();
+    R3BPspxMapped2Cal();
+    R3BPspxMapped2Cal(const char* name, Int_t iVerbose);
+    virtual ~R3BPspxMapped2Cal();
 
     virtual InitStatus Init();
 
@@ -39,7 +39,7 @@ class R3BPspxCal : public FairTask
     // void WriteHistos();
 
   public:
-    ClassDef(R3BPspxCal, 2)
+    ClassDef(R3BPspxMapped2Cal, 2)
 };
 
 #endif

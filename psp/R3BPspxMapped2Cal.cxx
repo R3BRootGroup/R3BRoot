@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // -----                                                                   -----
-// -----                           R3BPspxCal                              -----
+// -----                           R3BPspxMapped2Cal                              -----
 // -----                    Created  21-01-2016 by R. Plag                 -----
 // -----                                                                   -----
 // -----------------------------------------------------------------------------
@@ -18,45 +18,45 @@ using namespace std;
 #include "FairLogger.h"
 
 #include "R3BEventHeader.h"
-#include "R3BPspxMappedItem.h"
-#include "R3BPspxCalItem.h"
-#include "R3BPspxCal.h"
+#include "R3BPspxMappedData.h"
+#include "R3BPspxCalData.h"
+#include "R3BPspxMapped2Cal.h"
 
-R3BPspxCal::R3BPspxCal()
+R3BPspxMapped2Cal::R3BPspxMapped2Cal()
     : fMappedItems(NULL)
-    , fCalItems(new TClonesArray("R3BPspxCalItem"))
+    , fCalItems(new TClonesArray("R3BPspxCalData"))
 {
 }
 
-R3BPspxCal::R3BPspxCal(const char* name, Int_t iVerbose)
+R3BPspxMapped2Cal::R3BPspxMapped2Cal(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fMappedItems(NULL)
-    , fCalItems(new TClonesArray("R3BPspxCalItem"))
+    , fCalItems(new TClonesArray("R3BPspxCalData"))
 {
 }
 
-R3BPspxCal::~R3BPspxCal()
+R3BPspxMapped2Cal::~R3BPspxMapped2Cal()
 {
 }
 
-InitStatus R3BPspxCal::Init()
+InitStatus R3BPspxMapped2Cal::Init()
 {
     FairRootManager* fMan = FairRootManager::Instance();
     fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
-    fMappedItems = (TClonesArray*)fMan->GetObject("R3BPspxMappedItem"); // = branch name in TTree
+    fMappedItems = (TClonesArray*)fMan->GetObject("PspxMapped"); // = branch name in TTree
     if (!fMappedItems)
     {
 		printf("Couldnt get handle on PSPX mapped items\n");
 		return kFATAL;
 	}
-    //fCalItems = (TClonesArray*)fMan->GetObject("R3BPspxCalItem");
+    //fCalItems = (TClonesArray*)fMan->GetObject("R3BPspxMapped2CalItem");
     fCalibration = NULL; // care about that later
-    FairRootManager::Instance()->Register("PspxCalItem", "Land", fCalItems, kTRUE);
+    FairRootManager::Instance()->Register("PspxCal", "Land", fCalItems, kTRUE);
 
     return kSUCCESS;
 }
 
-void R3BPspxCal::Exec(Option_t* option)
+void R3BPspxMapped2Cal::Exec(Option_t* option)
 {
     if (!fMappedItems) 
     {
@@ -67,25 +67,25 @@ void R3BPspxCal::Exec(Option_t* option)
 	Int_t nMapped = fMappedItems->GetEntries();
 	for (Int_t i = 0; i < nMapped; i++)
 	{
-		R3BPspxMappedItem* mItem = (R3BPspxMappedItem*)fMappedItems->At(i);
+		R3BPspxMappedData* mItem = (R3BPspxMappedData*)fMappedItems->At(i);
 
 		// calibrate and add to fCalItems
 		// [...]
 		Float_t e=mItem->GetEnergy();
 		
 		new ((*fCalItems)[fCalItems->GetEntriesFast()])
-			R3BPspxCalItem(mItem->GetDetector(), mItem->GetChannel(), e); // det,channel,energy
+			R3BPspxCalData(mItem->GetDetector(), mItem->GetChannel(), e); // det,channel,energy
 
 	}
 
     
 }
 
-void R3BPspxCal::FinishTask()
+void R3BPspxMapped2Cal::FinishTask()
 {
 }
 
 
-//void R3BPspxCal::WriteHistos() {}
+//void R3BPspxMapped2Cal::WriteHistos() {}
 
-ClassImp(R3BPspxCal)
+ClassImp(R3BPspxMapped2Cal)

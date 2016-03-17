@@ -1,21 +1,22 @@
 #include "FairLogger.h"
 
-#include "TClonesArray.h"
-#include "FairRootManager.h"
-#include "R3BPspReader.h"
-#include "R3BPspxMappedItem.h"
-
 extern "C" {
 #include "ext_data_client.h"
 #include "ext_h101_psp.h"
 #include "ext_h101.h"
 }
 
+#include "TClonesArray.h"
+#include "FairRootManager.h"
+#include "R3BPspReader.h"
+#include "R3BPspxMappedData.h"
+
+
 R3BPspReader::R3BPspReader(EXT_STR_h101* data)
 	: R3BReader("R3BPspReader")
 	, fData(data)
 	, fLogger(FairLogger::GetLogger())
-    , fArray(new TClonesArray("R3BPspxMappedItem"))
+    , fArray(new TClonesArray("R3BPspxMappedData"))
 {
 }
 
@@ -36,7 +37,7 @@ Bool_t R3BPspReader::Init(ext_data_struct_info *a_struct_info)
 	}
 
     // Register output array in tree
-    FairRootManager::Instance()->Register("R3BPspxMappedItem", "Land", fArray, kTRUE);
+    FairRootManager::Instance()->Register("PspxMapped", "Land", fArray, kTRUE);
 
 	return kTRUE;
 }
@@ -106,7 +107,7 @@ Bool_t R3BPspReader::Read()
 			// For the PSPs, however, we take the first hit only:
 
 			new ((*fArray)[fArray->GetEntriesFast()])
-				R3BPspxMappedItem(d,channel,data->PSPX[d].v[curChannelStart]); // det,channel,energy
+				R3BPspxMappedData(d,channel,data->PSPX[d].v[curChannelStart]); // det,channel,energy
 			
 			curChannelStart=nextChannelStart;
 		}

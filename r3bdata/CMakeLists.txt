@@ -93,11 +93,13 @@ pspData/R3BPspDigi.cxx
 neulandData/R3BNeulandUnpackData.cxx
 neulandData/R3BNeulandMappedData.cxx
 neulandData/R3BNeulandCalData.cxx
-pspData/R3BPspxMappedItem.cxx
-pspData/R3BPspxCalItem.cxx
-losData/R3BLosMappedItem.cxx
+pspData/R3BPspxMappedData.cxx
+pspData/R3BPspxCalData.cxx
+losData/R3BLosMappedData.cxx
 neulandData/R3BNeulandTamexMappedItem.cxx
 actarData/R3BActarPoint.cxx
+losData/R3BLosCalData.cxx
+losData/R3BLosHitData.cxx
 )
 
 
