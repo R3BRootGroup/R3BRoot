@@ -2,21 +2,20 @@
 #include "../../land/drawStyle.C"
 
 
-void view_module_neuland(TString runNumber, Int_t iBar, Int_t iSide)
+void view_module_neuland(TString runNumber, Int_t iPlane, Int_t iBar, Int_t iSide)
 {
-    TString inDir = "/Users/kresan/data/s438b/data/";
+    TString inDir = "/u/mheil/data/neuland_tamex/par/";
     
-    const Int_t fNofPMTs = 800;
+    const Int_t fNofBars = 50;
     
-    TString fileName = inDir + "params_" + runNumber + "_raw.root";
+    TString fileName = inDir + "params_online_mapped_neuland.root";
     TFile *parFile = new TFile(fileName);
     R3BTCalPar *par = (R3BTCalPar*) parFile->Get("LandTCalPar");
-    cout << par->GetNumModulePar() << endl;
     
-    fileName = inDir + runNumber + "_raw.root";
+    fileName = "/u/mheil/data/neuland_tamex/tcal/online_mapped_neuland.root";
     TFile *file = new TFile(fileName);
     char str[100];
-    Int_t index = (Double_t)fNofPMTs / 2. * (iSide - 1) + iBar - 1;
+    Int_t index = iPlane * fNofBars*4 + (iBar-1)*4 + (iSide)*2;
     sprintf(str, "LandTCalPar_tcaldata_%d", index);
     TH1F *hdata = (TH1F*) file->Get(str);
     sprintf(str, "LandTCalPar_time_%d", index);

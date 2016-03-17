@@ -54,7 +54,8 @@ void tamex_multi_pc_ucesb_mh(TString runNumber)
 	FairRunOnline* run = new FairRunOnline(source);
 	run->SetOutputFile(outputFileName);
 	run->SetRunId(5050);
-    run->SetGenerateHtml(kTRUE, "test_page.root", refresh);
+    //run->SetGenerateHtml(kTRUE, "test_page.root", refresh);
+    run->ActivateHttpServer();
 	/* ------------------------------------------------------ */
 
 	/* Create ALADIN field map ------------------------------ */

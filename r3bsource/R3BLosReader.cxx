@@ -11,8 +11,8 @@ extern "C" {
 #include EXP_SPECIFIC_H101_FILE
 }
 
-#define NUM_LOS_DETECTORS 2
-#define NUM_LOS_CHANNELS  5
+#define NUM_LOS_DETECTORS 1
+#define NUM_LOS_CHANNELS  4
 
 R3BLosReader::R3BLosReader(EXT_STR_h101* data)
 	: R3BReader("R3BLosReader")
@@ -40,6 +40,12 @@ Bool_t R3BLosReader::Init(ext_data_struct_info *a_struct_info)
 
     // Register output array in tree
     FairRootManager::Instance()->Register("LosMapped", "Land", fArray, kTRUE);
+
+	// clear struct_writer's output struct. Seems ucesb doesn't do that
+	// for channels that are unknown to the current ucesb config.
+	EXT_STR_h101_onion* data = (EXT_STR_h101_onion*)fData;
+	for (int d=0;d<NUM_LOS_DETECTORS;d++)
+	    data->LOS[d].TFM=0;
 
 	return kTRUE;
 }
@@ -77,7 +83,6 @@ Bool_t R3BLosReader::Read()
 		{
 			uint32_t channel=data->LOS[d].TFMI[i]; // or 1..65
 			uint32_t nextChannelStart=data->LOS[d].TFME[i];  // index in v for first item of next channel
-			
 			for (int j=curChannelStart;j<nextChannelStart;j++)
 				new ((*fArray)[fArray->GetEntriesFast()])
 					R3BLosMappedData(
@@ -90,7 +95,6 @@ Bool_t R3BLosReader::Read()
 			curChannelStart=nextChannelStart;
 		}
 	}
-
     return kTRUE;
 }
 

@@ -95,6 +95,8 @@ void R3BLosCal2Hit::Exec(Option_t* option)
        new ((*fHitItems)[fNofHitItems]) R3BLosHitData(calItem->GetDetector(), t_hit , t_diff2MT);
        fNofHitItems += 1;
     }
+    
+    
 }
 
 void R3BLosCal2Hit::FinishEvent()

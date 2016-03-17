@@ -9,6 +9,7 @@
 #pragma link C++ class R3BUnpackReader+;
 #pragma link C++ class R3BPspReader+;
 #pragma link C++ class R3BLosReader+;
+#pragma link C++ class R3BTofdReader+;
 #pragma link C++ class R3BNeulandTamexReader+;
 #pragma link C++ class R3BNeulandTacquilaReader+;
 

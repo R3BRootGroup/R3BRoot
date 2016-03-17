@@ -19,8 +19,8 @@ using namespace std;
 #include "R3BEventHeader.h"
 #include "R3BNeulandUnpackData.h"
 #include "R3BNeulandMappedData.h"
-#include "R3BNeulandTamexMappedItem.h"
-#include "R3BLosRawHit.h"
+#include "R3BPaddleTamexMappedItem.h"
+#include "R3BLosMappedItem.h"
 #include "R3BLandRawAna.h"
 
 R3BLandRawAna::R3BLandRawAna()
@@ -116,7 +116,7 @@ void R3BLandRawAna::Exec(Option_t* option)
         R3BNeulandTamexMappedItem* hitmapped;
         for (Int_t i = 0; i < nNeulandTamexHitsMapped; i++)
         {
-            hitmapped = (R3BNeulandTamexMappedItem*)fNeulandTamexHitMapped->At(i);
+            hitmapped = (R3BPaddleTamexMappedItem*)fNeulandTamexHitMapped->At(i);
             fh_neuland_mapped_is17->Fill(hitmapped->Is17());
             if(! hitmapped->Is17())
             {

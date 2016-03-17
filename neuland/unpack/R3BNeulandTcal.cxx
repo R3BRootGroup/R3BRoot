@@ -8,7 +8,7 @@
 #include "R3BNeulandTcal.h"
 
 #include "R3BTCalEngine.h"
-#include "R3BNeulandTamexMappedItem.h"
+#include "R3BPaddleTamexMappedData.h"
 #include "R3BNeulandPmt.h"
 #include "R3BTCalPar.h"
 #include "R3BEventHeader.h"
@@ -78,10 +78,10 @@ InitStatus R3BNeulandTcal::Init()
         FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch R3BEventHeader not found");
     }
 */
-    fMappedHit = (TClonesArray*)mgr->GetObject("NeulandTamexMappedItem");
+    fMappedHit = (TClonesArray*)mgr->GetObject("NeulandTamexMappedData");
     if (NULL == fMappedHit)
     {
-        FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch R3BNeulandTamexMappedItem not found");
+        FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch R3BNeulandTamexMappedData not found");
     }
 
     mgr->Register("NeulandPmt", "Land", fPmt, kTRUE);
@@ -120,7 +120,7 @@ void R3BNeulandTcal::Exec(Option_t*)
         return;
     }
 */
-    R3BNeulandTamexMappedItem* hit;
+    R3BPaddleTamexMappedData* hit;
     Int_t iPlane;
     Int_t iBar;
     Int_t iSide;
@@ -132,7 +132,7 @@ void R3BNeulandTcal::Exec(Option_t*)
 
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-       hit = (R3BNeulandTamexMappedItem*)fMappedHit->At(ihit);
+       hit = (R3BPaddleTamexMappedData*)fMappedHit->At(ihit);
        if (NULL == hit)
        {
           continue;

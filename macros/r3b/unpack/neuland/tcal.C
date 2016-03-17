@@ -41,7 +41,11 @@ void run(TString runNumber)
  */
     // ---------------------------------------------------------------------------
 
+<<<<<<< HEAD
     R3BNeulandCalTest *testTcal = new R3BNeulandCalTest("TestTcal", 1);
+=======
+    R3BLandTcalTest *testTcal = new R3BLandTcalTest("TestTcal", 1);
+>>>>>>> Added: Tamex reader. Geometry and macro for s2018.
     run->AddTask(testTcal);
 
     // Initialize ----------------------------------------------------------------

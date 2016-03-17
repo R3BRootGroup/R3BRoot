@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------
-// -----            R3BLosMapped2CalPar (7ps VFTX)            -----
-// -----           Created Feb 4th 2016 by R.Plag             -----
+// -----            R3BTofdMapped2TCalPar (7ps VFTX)            -----
+// -----           Created Apr 2016 by R.Plag             -----
 // ----------------------------------------------------------------
 
 /* Some notes:
@@ -21,8 +21,8 @@
  * 
  */
 
-#include "R3BLosMapped2CalPar.h"
-#include "R3BLosMappedData.h"
+#include "R3BTofdMapped2TCalPar.h"
+#include "R3BPaddleTamexMappedData.h"
 #include "R3BEventHeader.h"
 #include "R3BTCalPar.h"
 #include "R3BTCalEngine.h"
@@ -42,31 +42,31 @@
 
 using namespace std;
 
-R3BLosMapped2CalPar::R3BLosMapped2CalPar()
-    : FairTask("R3BLosMapped2CalPar", 1)
+R3BTofdMapped2TCalPar::R3BTofdMapped2TCalPar()
+    : FairTask("R3BTofdMapped2TCalPar", 1)
     , fUpdateRate(1000000)
     , fMinStats(100000)
     , fTrigger(-1)
-    , fNofDetectors(0)
-    , fNofChannels(0)
+    , fNofPlanes(0)
+    , fPaddlesPerPlane(0)
     , fNEvents(0)
     , fCal_Par(NULL)
 {
 }
 
-R3BLosMapped2CalPar::R3BLosMapped2CalPar(const char* name, Int_t iVerbose)
+R3BTofdMapped2TCalPar::R3BTofdMapped2TCalPar(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fUpdateRate(1000000)
     , fMinStats(100000)
     , fTrigger(-1)
-    , fNofDetectors(0)
-    , fNofChannels(0)
+    , fNofPlanes(0)
+    , fPaddlesPerPlane(0)
     , fNEvents(0)
     , fCal_Par(NULL)
 {
 }
 
-R3BLosMapped2CalPar::~R3BLosMapped2CalPar()
+R3BTofdMapped2TCalPar::~R3BTofdMapped2TCalPar()
 {
 	if (fCal_Par)
 	{
@@ -78,8 +78,8 @@ R3BLosMapped2CalPar::~R3BLosMapped2CalPar()
     }
 }
 
-InitStatus R3BLosMapped2CalPar::Init()
-{
+InitStatus R3BTofdMapped2TCalPar::Init()
+{	
     FairRootManager* rm = FairRootManager::Instance();
     if (!rm)
     {
@@ -89,28 +89,36 @@ InitStatus R3BLosMapped2CalPar::Init()
     header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
 	// may be = NULL!
 	
-    fMapped = (TClonesArray*)rm->GetObject("LosMapped");
+    fMapped = (TClonesArray*)rm->GetObject("TofdMapped");
     if (!fMapped)
     {
         return kFATAL;
     }
 
-    fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LosTCalPar");
+	// container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
+	// to be set as dependency in CMakelists.txt (in this case in the tof directory)
+    fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofdTCalPar");
+	if (!fCal_Par)
+	{
+		LOG(ERROR) << "R3BTofdMapped2TCalPar::Init() Couldn't get handle on TofdTCalPar. " << FairLogger::endl;
+        return kFATAL;
+		
+	}
+	
     fCal_Par->setChanged();
 
     if (!fNofModules)
     {
-		LOG(ERROR) << "R3BLosMapped2CalPar::Init() Number of modules not set. " << FairLogger::endl;
+		LOG(ERROR) << "R3BTofdMapped2TCalPar::Init() Number of modules not set. " << FairLogger::endl;
         return kFATAL;
     }
     
     fEngine = new R3BTCalEngine(fCal_Par, fMinStats);
-//    fEngine = new R3BTCalEngine(fCal_Par, fNofModules, fMinStats);
 
     return kSUCCESS;
 }
 
-void R3BLosMapped2CalPar::Exec(Option_t* option)
+void R3BTofdMapped2TCalPar::Exec(Option_t* option)
 {
 	// test for requested trigger (if possible)
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger)) 
@@ -122,55 +130,47 @@ void R3BLosMapped2CalPar::Exec(Option_t* option)
     for (Int_t i = 0; i < nHits; i++)
     {
 		
-        R3BLosMappedData* hit = (R3BLosMappedData*)fMapped->At(i);
+        R3BPaddleTamexMappedData* hit = (R3BPaddleTamexMappedData*)fMapped->At(i);
         if (!hit) continue; // should not happen
 
+        Int_t iPlane = hit->GetPlaneId(); // 1..n
+        Int_t iBar   = hit->GetBarId();   // 1..n
+        Int_t iSide  = hit->GetSide();    // 1 or 2	                
         
-        // channel numbers are supposed to be 1-based (1..n)
-        UChar_t iDetector = hit->GetDetector()-1; // now 0..n-1
-        UChar_t iChannel  = hit->GetChannel()-1;  // now 0..n-1
-                
-        
-        if (iDetector>=fNofDetectors) // this also errors for iDetector==0
+        if (iPlane>=fNofPlanes) // this also errors for iDetector==0
         {
-            LOG(ERROR) << "R3BLosMapped2CalPar::Exec() : more detectors than expected! Det: " << (iDetector+1) << " allowed are 1.." << fNofDetectors << FairLogger::endl;
+            LOG(ERROR) << "R3BTofdMapped2TCalPar::Exec() : more detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes << FairLogger::endl;
             continue;
         }
-        if (iChannel>=fNofChannels) // same here
+        if (iBar>=fPaddlesPerPlane) // same here
         {
-            LOG(ERROR) << "R3BLosMapped2CalPar::Exec() : more bars than expected! Det: " << (iDetector+1) << " allowed are 1.." << fNofChannels << FairLogger::endl;
+            LOG(ERROR) << "R3BTofdMapped2TCalPar::Exec() : more bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane << FairLogger::endl;
             continue;
         }
 
 
-		// remember: only one edge per channel
-		UInt_t iModule = iDetector * fNofChannels + iChannel; // 0..n-1
-		
-        // Check validity of module
-        if (iModule >= fNofModules)
-        {
-            LOG(ERROR) << "Detector: " << iDetector << "  Ch: " << iChannel << " => Module: " << iModule << " out of range."  << FairLogger::endl;
-            FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Illegal detector ID...");
-        }
+		for (Int_t edge=0;edge<2;edge++)
+		{
+	
+	        // Fill TAC histogram
+	        //fEngine->Fill(iModule, hit->GetFineTime(edge));
+	        fEngine->Fill(iPlane, iBar, (iSide-1)*2 + edge+1, hit->GetFineTime(edge));
 
-        // Fill TAC histogram
-        //fEngine->Fill(iModule, hit->GetTimeFine());
-        // *** new ***
-        fEngine->Fill(iDetector+1, iChannel + 1, 1, hit->GetTimeFine());
+	    }
     }
 
     // Increment events
     fNEvents += 1;
 }
 
-void R3BLosMapped2CalPar::FinishEvent()
+void R3BTofdMapped2TCalPar::FinishEvent()
 {
 }
 
-void R3BLosMapped2CalPar::FinishTask()
+void R3BTofdMapped2TCalPar::FinishTask()
 {
     fEngine->CalculateParamVFTX();
     fCal_Par->printParams();
 }
 
-ClassImp(R3BLosMapped2CalPar)
+ClassImp(R3BTofdMapped2TCalPar)

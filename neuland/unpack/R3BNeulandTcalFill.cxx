@@ -4,7 +4,7 @@
 // ----------------------------------------------------------------
 
 #include "R3BNeulandTcalFill.h"
-#include "R3BNeulandTamexMappedItem.h"
+#include "R3BPaddleTamexMappedData.h"
 #include "R3BEventHeader.h"
 #include "R3BTCalPar.h"
 #include "R3BTCalEngine.h"
@@ -74,7 +74,7 @@ InitStatus R3BNeulandTcalFill::Init()
     {
         return kFATAL;
     }*/
-    fHits = (TClonesArray*)rm->GetObject("NeulandTamexMappedItem");
+    fHits = (TClonesArray*)rm->GetObject("NeulandTamexMappedData");
     if (!fHits)
     {
         return kFATAL;
@@ -108,7 +108,7 @@ void R3BNeulandTcalFill::Exec(Option_t*)
     }
 */
 
-    R3BNeulandTamexMappedItem* hit;
+    R3BPaddleTamexMappedData* hit;
     Int_t iPlane;
     Int_t iBar;
     Int_t iSide;
@@ -117,7 +117,7 @@ void R3BNeulandTcalFill::Exec(Option_t*)
     // Loop over mapped hits
     for (Int_t i = 0; i < nHits; i++)
     {
-        hit = (R3BNeulandTamexMappedItem*)fHits->At(i);
+        hit = (R3BPaddleTamexMappedData*)fHits->At(i);
         if (!hit)
         {
             continue;

@@ -96,10 +96,11 @@ neulandData/R3BNeulandCalData.cxx
 pspData/R3BPspxMappedData.cxx
 pspData/R3BPspxCalData.cxx
 losData/R3BLosMappedData.cxx
-neulandData/R3BNeulandTamexMappedItem.cxx
 actarData/R3BActarPoint.cxx
 losData/R3BLosCalData.cxx
 losData/R3BLosHitData.cxx
+neulandData/R3BPaddleTamexMappedData.cxx
+tofData/R3BPaddleCalData.cxx
 )
 
 

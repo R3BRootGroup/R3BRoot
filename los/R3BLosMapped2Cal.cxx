@@ -24,9 +24,12 @@
 #include "R3BEventHeader.h"
 
 #include "FairRunAna.h"
+#include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
 #include "FairRootManager.h"
 #include "FairLogger.h"
+#include "TH1F.h"
+#include "TH2F.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -84,20 +87,6 @@ InitStatus R3BLosMapped2Cal::Init()
 
     LOG(INFO) << "R3BLosMapped2Cal::Init : read " << fNofModules << " modules" << FairLogger::endl;
     
-	// create the map for fast access in exec()
-	/*
-    for (Int_t i = 0; i < fNofTcalPars; i++)
-    {
-        R3BTCalModulePar* par = fTcalPar->GetModuleParAt(i);
-        if (!par) 
-        {
-			LOG(INFO) << "No LOS Tcal pars for module " << i << FairLogger::endl;
-			continue;
-		}
-        fMapPar[par->GetModuleId()] = par;
-    }
-*/
-
 	// try to get a handle on the EventHeader. EventHeader may not be 
 	// present though and hence may be null. Take care when using.
     FairRootManager* mgr = FairRootManager::Instance();
@@ -114,7 +103,7 @@ InitStatus R3BLosMapped2Cal::Init()
 
 	// request storage of Cal data in output tree
     mgr->Register("LosCal", "Land", fCalItems, kTRUE);
-
+    
     return kSUCCESS;
 }
 
@@ -127,7 +116,7 @@ void R3BLosMapped2Cal::SetParContainers()
 		LOG(ERROR) << "Could not get access to LosTCalPar-Container." << FairLogger::endl;
 		fNofTcalPars=0;
 		return;
-	}
+    }
 }
 
 InitStatus R3BLosMapped2Cal::ReInit()
@@ -250,7 +239,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
            iCha << FairLogger::endl;
 	   }       
     }
-
+    
 }
 
 void R3BLosMapped2Cal::FinishEvent()

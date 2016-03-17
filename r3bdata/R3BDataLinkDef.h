@@ -56,15 +56,22 @@
 #pragma link C++ class R3BMfiDigi+;
 #pragma link C++ class R3BPspPoint+;
 #pragma link C++ class R3BPspDigi+;
-#pragma link C++ class R3BNeulandUnpackData+;
-#pragma link C++ class R3BNeulandMappedData+;
-#pragma link C++ class R3BNeulandCalData+;
-#pragma link C++ class R3BPspxMappedData+;
 #pragma link C++ class R3BPspxCalData+;
+#pragma link C++ class R3BNeulandRawItem+;
+#pragma link C++ class R3BNeulandMappedData+;
+#pragma link C++ class R3BPspxMappedData+;
+#pragma link C++ class R3BPspxCalItem+;
+#pragma link C++ class R3BLosMappedItem+;
 #pragma link C++ class R3BLosMappedData+;
-#pragma link C++ class R3BNeulandTamexMappedItem+;
-#pragma link C++ class R3BActarPoint+;
+#pragma link C++ class R3BLosCalItem+;
 #pragma link C++ class R3BLosCalData+;
+#pragma link C++ class R3BLosHitItem+;
 #pragma link C++ class R3BLosHitData+;
+#pragma link C++ class R3BNeulandTamexMappedItem+;
+#pragma link C++ class R3BPaddleTamexMappedData+;
+#pragma link C++ class R3BPaddleCalData+;
+#pragma link C++ class R3BNeulandUnpackData+;
+#pragma link C++ class R3BNeulandCalData+;
+#pragma link C++ class R3BActarPoint+;
 #endif
 

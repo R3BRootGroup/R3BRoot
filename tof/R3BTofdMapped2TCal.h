@@ -1,22 +1,20 @@
 // ------------------------------------------------------------
-// -----                  R3BLosMapped2Cal                -----
-// -----            Created 4-02-2016 by R.Plag           -----
+// -----                R3BTofdMapped2TCal                -----
+// -----            Created Apr 2016 by R.Plag            -----
 // ----- Convert mapped data to time calibrated data      -----
 // ------------------------------------------------------------
 
 
 
-#ifndef R3BLOSMAPPED2CAL
-#define R3BLOSMAPPED2CAL
+#ifndef R3BLOSMAPPED2TCAL
+#define R3BLOSMAPPED2TCAL
 
 #include <map>
 
 #include "FairTask.h"
-#include "R3BLosCalData.h"
+#include "R3BPaddleCalData.h"
 
 class TClonesArray;
-class TH1F;
-class TH2F;
 class R3BTCalModulePar;
 class R3BTCalPar;
 class R3BEventHeader;
@@ -26,9 +24,9 @@ class R3BEventHeader;
  * This class reads NeuLAND mapped items with TDC values and
  * produces time items with time in [ns]. It requires TCAL
  * calibration parameters, which are produced in a separate
- * analysis run containing R3BLosMapped2CalFill task.
+ * analysis run containing R3BTofdMapped2TCalFill task.
  */
-class R3BLosMapped2Cal : public FairTask
+class R3BTofdMapped2TCal : public FairTask
 {
 
   public:
@@ -36,7 +34,7 @@ class R3BLosMapped2Cal : public FairTask
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BLosMapped2Cal();
+    R3BTofdMapped2TCal();
 
     /**
      * Standard constructor.
@@ -44,13 +42,13 @@ class R3BLosMapped2Cal : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BLosMapped2Cal(const char* name, Int_t iVerbose = 1);
+    R3BTofdMapped2TCal(const char* name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BLosMapped2Cal();
+    virtual ~R3BTofdMapped2TCal();
 
     /**
      * Method for task initialization.
@@ -106,17 +104,20 @@ class R3BLosMapped2Cal : public FairTask
      * @param nPMTs a number of photomultipliers.
      * @param n17 a number of channels with stop signal (17-th channel).
      */
-    inline void SetNofModules(Int_t nDets, Int_t nChs)
+    inline void SetNofModules(Int_t planes, Int_t ppp)
     {
-        fNofDetectors = nDets;
-        fNofChannels = nChs;
-        fNofModules  = nChs * nDets;
+        fNofPlanes   = planes;
+        fPaddlesPerPlane  = ppp;
+        fNofEdges  = ppp * planes * 4; // two PMs per paddle, two edges per PM
+        
+        if (fCalItemMap) delete [] fCalItemMap;
+        fCalItemMap = new R3BPaddleCalData*[ fNofEdges/4 ];
     }
 
   private:
-    //std::map<Int_t, R3BTCalModulePar*> fMapPar; /**< Map for matching mdoule ID with parameter container. */
     TClonesArray* fMappedItems;                 /**< Array with mapped items - input data. */
     TClonesArray* fCalItems;                    /**< Array with cal items - output data. */
+    R3BPaddleCalData** fCalItemMap;              /**< used internally to reconstruct data. */
     Int_t fNofCalItems;                         /**< Number of produced time items per event. */
 
     R3BTCalPar* fTcalPar;                       /**< TCAL parameter container. */
@@ -126,13 +127,14 @@ class R3BLosMapped2Cal : public FairTask
     R3BEventHeader* header;                     /**< Event header. */
     Int_t fTrigger;                             /**< Trigger value. */
 
-    UInt_t fNofDetectors;  /**< Number of detectors. */
-    UInt_t fNofChannels;   /**< Number of channels per detector. */    
-	UInt_t fNofModules;    /**< Total number of channels. */
-    Double_t fClockFreq;   /**< Clock cycle in [ns]. */
+    UInt_t fNofPlanes;  
+    UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */    
+	UInt_t fNofEdges;      /**< Total number of edges. */
+    Double_t fClockFreq;     /**< Clock cycle in [ns]. */
+
 
   public:
-    ClassDef(R3BLosMapped2Cal, 1)
+    ClassDef(R3BTofdMapped2TCal, 1)
 };
 
 #endif
