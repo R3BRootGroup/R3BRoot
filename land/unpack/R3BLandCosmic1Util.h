@@ -3,6 +3,7 @@
 
 #include "assert.h"
 #include "R3BLandCosmic1LSQR.h"
+#include "Rtypes.h"
 #include "vector"
 #include <string.h>
 
@@ -79,8 +80,8 @@ public:
 
 struct sspllq_pair_sync
 {
-  uint32_t   _ind1;
-  uint32_t   _ind2;
+  UInt_t   _ind1;
+  UInt_t   _ind2;
 
   double _coeff1;
   double _coeff2;
@@ -173,12 +174,12 @@ public:
 
   std::vector<val_err_inv>       _solution;
 
-  uint32_t _active_vars;
+  UInt_t _active_vars;
 
 public:
   void add_sync_pair(int ind1,double coeff1,int ind2,double coeff2,double rhs);
 
-  bool solve(uint32_t max_vars,bool add_eqn_for_each_set = false);
+  bool solve(UInt_t max_vars,bool add_eqn_for_each_set = false);
 
 public:
   virtual void mult_forw(dvec * vx, dvec * vy);
@@ -192,7 +193,7 @@ class sparse_sync_pair_llq_mean_zero
 
 
 public:
-  bool solve(uint32_t max_vars);
+  bool solve(UInt_t max_vars);
 
 
 
@@ -225,7 +226,7 @@ public:
  *                     is noise and what is good.)
  */
 
-bool analyse_spread(const float* data,uint32_t n,float& min_accept,float& max_accept,
+bool analyse_spread(const float* data,UInt_t n,float& min_accept,float& max_accept,
 		    float accept_diff,float unreasonable_diff);
 
 #endif

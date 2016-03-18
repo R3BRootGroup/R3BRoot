@@ -1,6 +1,6 @@
 #include "R3BLandCosmic1Util.h"
 
-#define uint uint32_t
+#define uint UInt_t
 
 void sparse_linear_least_squares_mult(long mode, dvec * x, dvec * y, void * data)
 {
@@ -601,7 +601,7 @@ void sparse_sync_pair_llq_mean_zero::mult_backw(dvec * vx, dvec * vy)
     x[i] += *y;
 }
 
-bool analyse_spread(const float* data,uint32_t n,float& min_accept,float& max_accept,
+bool analyse_spread(const float* data,UInt_t n,float& min_accept,float& max_accept,
 		    float accept_diff,float unreasonable_diff)
 {
   assert (data);
