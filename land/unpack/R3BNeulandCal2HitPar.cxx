@@ -141,14 +141,14 @@ namespace __gnu_cxx {
 # define NEED_CREATE_NAN 1
 #endif
 
-#define PPP_MISMATCH_PM1    uint64_t(0x0001)
-#define PPP_MISMATCH_PM2    uint64_t(0x0002)
+#define PPP_MISMATCH_PM1    ULong_t(0x0001)
+#define PPP_MISMATCH_PM2    ULong_t(0x0002)
 #define PPP_MASK_MISMATCH   (PPP_MISMATCH_PM1 | PPP_MISMATCH_PM2)
-#define PPP_DEAD_PM1        uint64_t(0x0004)
-#define PPP_DEAD_PM2        uint64_t(0x0008)
+#define PPP_DEAD_PM1        ULong_t(0x0004)
+#define PPP_DEAD_PM2        ULong_t(0x0008)
 #define PPP_MASK_DEAD       (PPP_DEAD_PM1 | PPP_DEAD_PM2)
-#define PPP_FIND_EXPECT1    uint64_t(0x0010)
-#define PPP_FIND_EXPECT2    uint64_t(0x0020)
+#define PPP_FIND_EXPECT1    ULong_t(0x0010)
+#define PPP_FIND_EXPECT2    ULong_t(0x0020)
 #define PPP_MASK_EXPECT     (PPP_FIND_EXPECT1 | PPP_FIND_EXPECT2)
 #define ADD_EXPECT(exp_i) if (!(ppp[(exp_i)/2]._flag & (PPP_DEAD_PM1 << ((exp_i) & 1)))) { expect[nexpect++] =  (exp_i); }
 
@@ -194,7 +194,7 @@ using namespace std;
 bool n_calib_mean::calc_params(ident_no_set& bad_fit_idents, val_err_inv& mean) {
    Double_t sum = 0, sum_x = 0, sum_x2 = 0;
 
-   for (uint32_t k = 0; k < _data.size(); k++)
+   for (UInt_t k = 0; k < _data.size(); k++)
       if (bad_fit_idents.find(_data[k]._ident_no) == bad_fit_idents.end()) {
          sum_x += _data[k]._mean_diff - _data[k]._mean_corr;
          sum_x2 += (_data[k]._mean_diff - _data[k]._mean_corr) * (_data[k]._mean_diff - _data[k]._mean_corr);
@@ -208,17 +208,17 @@ bool n_calib_mean::calc_params(ident_no_set& bad_fit_idents, val_err_inv& mean) 
 }
 
 bool n_calib_mean::analyse_history(ident_no_set& bad_fit_idents) {
-   uint32_t n = (uint32_t) _data.size();
+   UInt_t n = (UInt_t) _data.size();
    Float_t od[n];
 
-   for (uint32_t k = 0; k < n; k++) {
+   for (UInt_t k = 0; k < n; k++) {
       od[k] = _data[k]._mean_diff - _data[k]._mean_corr;
    }
 
    Float_t min_accept = NAN, max_accept = NAN;
 
    if (analyse_spread(od, n, min_accept, max_accept, 0.15f, 3.0f)) {
-      for (uint32_t k = 0; k < n; k++)
+      for (UInt_t k = 0; k < n; k++)
          if (od[k] < min_accept ||
                od[k] > max_accept) {
             bad_fit_idents.insert(_data[k]._ident_no);
@@ -232,7 +232,7 @@ bool n_calib_diff::calc_params(ident_no_set& bad_fit_idents, Double_t y0[2], Dou
    TGraph* plot = new TGraph();
    Int_t n = 0;
 
-   for (uint32_t k = 0; k < _data.size(); k++)
+   for (UInt_t k = 0; k < _data.size(); k++)
       if (bad_fit_idents.find(_data[k]._ident_no) == bad_fit_idents.end()) {
          plot->SetPoint(n++, _data[k]._pos_track, _data[k]._pos_diff);
       }
@@ -270,12 +270,12 @@ bool n_calib_diff::analyse_history(ident_no_set& bad_fit_idents) {
          return false;
       }
 
-      uint32_t n = (uint32_t) _data.size();
+      UInt_t n = (UInt_t) _data.size();
       /* resort the data according to position. */
 
       nc_diff d[n];
 
-      for (uint32_t k = 0; k < _data.size(); k++) {
+      for (UInt_t k = 0; k < _data.size(); k++) {
          d[k] = _data[k];
       }
 
@@ -294,7 +294,7 @@ bool n_calib_diff::analyse_history(ident_no_set& bad_fit_idents) {
             sect     * data_per_sect + (sect * extra_data) / sections;
          size_t kmax =
             (sect + 1) * data_per_sect + ((sect + 1) * extra_data) / sections;
-         uint32_t nk = (uint32_t)(kmax - kmin);
+         UInt_t nk = (UInt_t)(kmax - kmin);
 
          for (size_t k = kmin; k < kmax; k++) {
             od[k - kmin] = d[k]._pos_diff;
@@ -338,7 +338,7 @@ bool n_calib_diff::analyse_history(ident_no_set& bad_fit_idents) {
             sect     * data_per_sect + (sect * extra_data) / sections;
          size_t kmax =
             (sect + 1) * data_per_sect + ((sect + 1) * extra_data) / sections;
-         uint32_t nk = (uint32_t)(kmax - kmin);
+         UInt_t nk = (UInt_t)(kmax - kmin);
 
          for (size_t k = kmin; k < kmax; k++) {
             od[k - kmin] =
@@ -443,8 +443,8 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
       return;
    }
 
-   uint64_t hit_mask_t[fPlanes][2];
-   uint64_t hit_mask_e[fPlanes][2];
+   ULong_t hit_mask_t[fPlanes][2];
+   ULong_t hit_mask_e[fPlanes][2];
 
    memset(hit_mask_t, 0, sizeof(hit_mask_t));
    memset(hit_mask_e, 0, sizeof(hit_mask_e));
@@ -477,8 +477,8 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
          bars[pl].push_back(b);
       }
 
-      hit_mask_t[pl][side] |= uint64_t (1) << pdl;
-      hit_mask_e[pl][side] |= uint64_t (1) << pdl;
+      hit_mask_t[pl][side] |= ULong_t (1) << pdl;
+      hit_mask_e[pl][side] |= ULong_t (1) << pdl;
    }
 
    for (Int_t i = 0; i < fPlanes; i++) {
@@ -561,7 +561,7 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
      We can possible this way also operate on neutron data, since it
      will in most cases anyhow not fit the tracking... */
 
-   uint64_t hit_mask_use[fPlanes];
+   ULong_t hit_mask_use[fPlanes];
 
    for (Int_t pl = 0; pl < fPlanes; pl++) {
       hit_mask_use[pl] = (hit_mask_t[pl][0] | hit_mask_t[pl][1]);
@@ -608,7 +608,7 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
 
       for (Int_t pl = 0; pl < fPlanes; pl++) {
          for (Int_t pdl = 0; pdl < fPaddles; pdl++) {
-            if ((hit_mask_use[pl] >> pdl) & uint64_t (1)) {
+            if ((hit_mask_use[pl] >> pdl) & ULong_t (1)) {
                if (pl % 2 == FIRST_VERT_PLANE) {
                   x_plot->SetPoint(n_x++, pl, pdl);
                }
@@ -685,24 +685,24 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
       Int_t bad_y = 0;
 
       for (Int_t pl = FIRST_VERT_PLANE; pl < fPlanes; pl += 2) {
-         uint64_t hm = hit_mask_use[pl];
+         ULong_t hm = hit_mask_use[pl];
 
          for (Int_t pdl = 0; hm; pdl++, hm >>= 1)
             if (hm & 0x01) {
                if (fabs(dxdz * pl - pdl + x0) > max_dist_scaled_x) {
-                  hit_mask_use[pl] &= ~(uint64_t (1) << pdl);
+                  hit_mask_use[pl] &= ~(ULong_t (1) << pdl);
                   bad_x++;
                }
             }
       }
 
       for (Int_t pl = FIRST_HORZ_PLANE; pl < fPlanes; pl += 2) {
-         uint64_t hm = hit_mask_use[pl];
+         ULong_t hm = hit_mask_use[pl];
 
          for (Int_t pdl = 0; hm; pdl++, hm >>= 1)
             if (hm & 0x01) {
                if (fabs(dydz * pl - pdl + y0) > max_dist_scaled_y) {
-                  hit_mask_use[pl] &= ~(uint64_t (1) << pdl);
+                  hit_mask_use[pl] &= ~(ULong_t (1) << pdl);
                   bad_y++;
                }
             }
@@ -740,17 +740,17 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
       /* And now add our information. */
 
       for (Int_t pl = 0; pl < fPlanes; pl++) {
-         uint64_t hm_t, hm_e;
+         ULong_t hm_t, hm_e;
 
          hm_t = hit_mask_t[pl][0] & hit_mask_t[pl][1] & hit_mask_use[pl];
          hm_e = hit_mask_e[pl][0] & hit_mask_e[pl][1] & hit_mask_t[pl][0] & hit_mask_t[pl][1] & hit_mask_use[pl];
 
          if (hm_t)
-            for (uint32_t i = 0; i < bars[pl].size(); i++) {
+            for (UInt_t i = 0; i < bars[pl].size(); i++) {
                bar* b = bars[pl][i];
                Int_t pdl = b->fPdl;
 
-               if (!(hm_t & (uint64_t (1) << pdl))) {
+               if (!(hm_t & (ULong_t (1) << pdl))) {
                   continue;
                }
 
@@ -773,7 +773,7 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
                // And now the energies.  For now we only use energies where the
                // times were also sane
 
-               if (!(hm_e & (uint64_t (1) << pdl))) {
+               if (!(hm_e & (ULong_t (1) << pdl))) {
                   continue;
                }
 
@@ -808,14 +808,14 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
       for (Int_t pl = 0; pl < fPlanes; pl++) {
          // Paddles in the same plane
 
-         uint64_t hm_t;
-         uint64_t hm_e;
+         ULong_t hm_t;
+         ULong_t hm_e;
 
          hm_t = hit_mask_t[pl][0] & hit_mask_t[pl][1] & hit_mask_use[pl];
          hm_e = hit_mask_e[pl][0] & hit_mask_e[pl][1] & hit_mask_t[pl][0] & hit_mask_t[pl][1] & hit_mask_use[pl];
 
          if (hm_t)
-            for (uint32_t i = 0; i < bars[pl].size() - 1; i++) {
+            for (UInt_t i = 0; i < bars[pl].size() - 1; i++) {
                bar* b1 = bars[pl][i];
                bar* b2 = bars[pl][i + 1];
 
@@ -826,7 +826,7 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
                   continue;   // not neighbours
                }
 
-               if ((hm_t & ((uint64_t) 0x03 << pdl)) != ((uint64_t) 0x03 << pdl)) {
+               if ((hm_t & ((ULong_t) 0x03 << pdl)) != ((ULong_t) 0x03 << pdl)) {
                   continue;   // both hits not accepted for the muon
                }
 
@@ -909,7 +909,7 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
 
                // And now deal with energies
 
-               if ((hm_e & ((uint64_t) 0x03 << pdl)) != ((uint64_t) 0x03 << pdl)) {
+               if ((hm_e & ((ULong_t) 0x03 << pdl)) != ((ULong_t) 0x03 << pdl)) {
                   continue;   // both hits not accepted for the muon
                }
 
@@ -935,8 +935,8 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
       for (Int_t pl = 0; pl < fPlanes - 1; pl++) {
          // Hits in paddles from neighbouring fPlanes
 
-         uint64_t hm1_t, hm2_t;
-         uint64_t hm1_e, hm2_e;
+         ULong_t hm1_t, hm2_t;
+         ULong_t hm1_e, hm2_e;
 
          hm1_t = hit_mask_t[pl  ][0] & hit_mask_t[pl  ][1] & hit_mask_use[pl  ];
          hm2_t = hit_mask_t[pl + 1][0] & hit_mask_t[pl + 1][1] & hit_mask_use[pl + 1];
@@ -945,21 +945,21 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
          hm2_e = hit_mask_e[pl + 1][0] & hit_mask_e[pl + 1][1] & hit_mask_t[pl + 1][0] & hit_mask_t[pl + 1][1] & hit_mask_use[pl + 1];
 
          if (hm1_t && hm2_t)
-            for (uint32_t i1 = 0; i1 < bars[pl].size(); i1++) {
+            for (UInt_t i1 = 0; i1 < bars[pl].size(); i1++) {
                bar* b1 = bars[pl][i1];
 
                Int_t pdl1 = b1->fPdl;
 
-               if (!(hm1_t & (uint64_t (1) << pdl1))) {
+               if (!(hm1_t & (ULong_t (1) << pdl1))) {
                   continue;
                }
 
-               for (uint32_t i2 = 0; i2 < bars[pl + 1].size(); i2++) {
+               for (UInt_t i2 = 0; i2 < bars[pl + 1].size(); i2++) {
                   bar* b2 = bars[pl + 1][i2];
 
                   Int_t pdl2 = b2->fPdl;
 
-                  if (!(hm2_t & (uint64_t (1) << pdl2))) {
+                  if (!(hm2_t & (ULong_t (1) << pdl2))) {
                      continue;
                   }
 
@@ -997,8 +997,8 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
 
                   // And now the energies
 
-                  if (!(hm1_e & (uint64_t (1) << pdl1)) ||
-                        !(hm2_e & (uint64_t (1) << pdl2))) {
+                  if (!(hm1_e & (ULong_t (1) << pdl1)) ||
+                        !(hm2_e & (ULong_t (1) << pdl2))) {
                      continue;
                   }
 

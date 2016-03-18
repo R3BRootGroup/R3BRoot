@@ -9,16 +9,7 @@
 #include "FairTask.h"
 #include "R3BLandCosmic1Util.h"
 
-#ifdef __APPLE__ 
-#include <_types/_uint8_t.h>
-#include <_types/_uint16_t.h>
-#include <_types/_uint32_t.h>
-#include <_types/_uint64_t.h>
-#else
-#include <stdint.h>
-#endif
-
-#include "stdlib.h"
+//#include "stdlib.h"
 #include <set>
 
 class R3BNeulandHitPar;
@@ -27,7 +18,7 @@ class TCanvas;
 class TGraph;
 class TF1;
 
-typedef std::set<uint32_t> ident_no_set;
+typedef std::set<UInt_t> ident_no_set;
 typedef std::pair<Float_t,Int_t> pair_value;
 
 struct nc_diff
@@ -35,7 +26,7 @@ struct nc_diff
   Float_t _pos_track;
   Float_t _pos_diff;
 
-  uint32_t  _ident_no;
+  UInt_t  _ident_no;
 
 };
 
@@ -56,7 +47,7 @@ struct nc_mean
 
   Float_t _mean_corr;
 
-  uint32_t  _ident_no;
+  UInt_t  _ident_no;
 };
 
 
@@ -134,7 +125,7 @@ class R3BNeulandCal2HitPar : public FairTask
     std::vector<std::vector<n_calib_mean> > _collect_mean_within_e;
     std::vector<std::vector<std::vector<n_calib_mean> > > _collect_mean_cross_e;
 
-    uint32_t _used_ident_no;
+    UInt_t _used_ident_no;
 
     ident_no_set _bad_fit_idents;
 
