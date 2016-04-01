@@ -88,7 +88,7 @@ InitStatus R3BNeulandTcalFill::Init()
     return kSUCCESS;
 }
 
-void R3BNeulandTcalFill::Exec(Option_t* option)
+void R3BNeulandTcalFill::Exec(Option_t*)
 {
  /*   if (fTrigger >= 0)
     {

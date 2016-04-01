@@ -94,10 +94,10 @@ void R3BAladinFieldMap::Init() {
   af_mag[1][0].SetXYZ( 123.259, -.210,  10.411);
   af_mag[1][1].SetXYZ(-123.022, -.210,   0.092);
   
-  memcpy(gCoords[0].fBox_pt,af_box[0],sizeof(af_box[0]));
-  memcpy(gCoords[1].fBox_pt,af_box[1],sizeof(af_box[0]));
-  memcpy(gCoords[0].fMag_pt,af_mag[0],sizeof(af_mag[0]));
-  memcpy(gCoords[1].fMag_pt,af_mag[1],sizeof(af_mag[0]));
+  memcpy((void*)gCoords[0].fBox_pt,(void*)af_box[0],sizeof(af_box[0]));
+  memcpy((void*)gCoords[1].fBox_pt,(void*)af_box[1],sizeof(af_box[0]));
+  memcpy((void*)gCoords[0].fMag_pt,(void*)af_mag[0],sizeof(af_mag[0]));
+  memcpy((void*)gCoords[1].fMag_pt,(void*)af_mag[1],sizeof(af_mag[0]));
   
   char str[100];
   for (Int_t i = 0; i < 2; i++)

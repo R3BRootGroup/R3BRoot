@@ -144,7 +144,7 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
 		fLogger->Info(MESSAGE_ORIGIN, "  Raw data:");
 		for (w = 0; w < raw_words; w += 8)
 		{
-			printf ("    RAW%4zx:", w);
+			printf ("    RAW%4x:", w);
 			for (j = 0; j < 8 && w+j < raw_words; j++)
 				printf (" %08x", u[w+j]);
 			printf ("\n");

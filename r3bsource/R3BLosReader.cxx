@@ -66,6 +66,8 @@ Bool_t R3BLosReader::Read()
 								 data->LOS[d]._[c].TC,  // coarse time
 								 data->LOS[d]._[c].TF); // fine time
 		}	
+
+    return kTRUE;
 }
 
 void R3BLosReader::Reset()

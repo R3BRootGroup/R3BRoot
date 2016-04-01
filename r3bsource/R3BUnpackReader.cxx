@@ -44,6 +44,8 @@ Bool_t R3BUnpackReader::Read()
 		fData->TRIGGER);
 
 	fNEvent = fData->EVENTNO;
+
+    return kTRUE;
 }
 
 void R3BUnpackReader::Reset()

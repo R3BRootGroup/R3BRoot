@@ -111,6 +111,8 @@ Bool_t R3BPspReader::Read()
 			curChannelStart=nextChannelStart;
 		}
 	}
+
+    return kTRUE;
 }
 
 void R3BPspReader::Reset()

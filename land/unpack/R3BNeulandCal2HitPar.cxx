@@ -1363,7 +1363,6 @@ void R3BNeulandCal2HitPar::FinishTask() {
    h_tdiff->Write();
    h_tsync->Write();
    h_veff->Write();
-   delete h_tdiff, h_tsync, h_veff;
 
    fPar->setChanged();
    LOG(INFO) << fPar->GetNumModulePar() << " PMTs calibrated!" << FairLogger::endl;

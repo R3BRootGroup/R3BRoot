@@ -111,7 +111,7 @@ InitStatus R3BNeulandTcal::ReInit()
     return kSUCCESS;
 }
 
-void R3BNeulandTcal::Exec(Option_t* option)
+void R3BNeulandTcal::Exec(Option_t*)
 {
 	/*
     if (fTrigger >= 0)
@@ -138,7 +138,6 @@ void R3BNeulandTcal::Exec(Option_t* option)
     R3BTCalModulePar* par;
     Double_t timeLE;
     Double_t timeTE;
-    Int_t index;
 
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {

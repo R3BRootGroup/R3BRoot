@@ -40,8 +40,8 @@ R3BTCalEngine::~R3BTCalEngine()
             delete fhTime[i];
         }
     }
-    delete fhData;
-    delete fhTime;
+    delete [] fhData;
+    delete [] fhTime;
 }
 
 void R3BTCalEngine::Fill(Int_t iModule, Int_t tdc)
