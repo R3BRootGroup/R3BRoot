@@ -138,13 +138,13 @@ void R3BNeulandTcalFill::Exec(Option_t*)
             continue;
         }
 
-        if (hit->Is17())
-        {
+//        if (hit->Is17())
+//        {
             // 17-th channel
 //MH            channel = fNofPMTs + hit->GetGtb() * 20 + hit->GetTacAddr();
-        }
-        else
-        {
+//        }
+//        else
+//        {
             // PMT signal
             iSide = hit->GetSide();
 //            channel = (Double_t)fNofPMTs * (iSide - 1) + iBar - 1;
@@ -152,7 +152,7 @@ void R3BNeulandTcalFill::Exec(Option_t*)
             
 //            LOG(INFO) << "Plane: " << iPlane << " Bar: " << iBar << " Side: " << iSide << " Cal channel: " << channel << "   "  << FairLogger::endl;
              
-        }
+//        }
 
         // Check validity of module
         if (channel < 0 || channel >= (fNofPlanes*fNofBars*4))
