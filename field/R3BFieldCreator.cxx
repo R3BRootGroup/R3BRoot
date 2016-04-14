@@ -49,7 +49,7 @@ FairField* R3BFieldCreator::createFairField()
 	// Initialise field
 	if ( fMagneticField ) {
 		fMagneticField->Init();
-		fMagneticField->Print();
+		fMagneticField->Print("");
 	}
   }
   return fMagneticField;
