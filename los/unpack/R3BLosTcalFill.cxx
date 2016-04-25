@@ -66,7 +66,7 @@ InitStatus R3BLosTcalFill::Init()
     fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LosTCalPar");
     fCal_Par->setChanged();
 
-    fEngine = new R3BTCalEngine(fCal_Par, fNofCh, fMinStats);
+    fEngine = new R3BTCalEngine(fCal_Par, fMinStats);
 
     return kSUCCESS;
 }
@@ -105,7 +105,7 @@ void R3BLosTcalFill::Exec(Option_t* option)
         }
 
         // Fill TAC histogram
-        fEngine->Fill(channel, hit->GetTdc());
+        fEngine->Fill(1, channel + 1, 1, hit->GetTdc());
     }
 
     // Increment events

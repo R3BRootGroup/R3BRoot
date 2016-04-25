@@ -4,9 +4,10 @@ void run(TString runNumber)
     TStopwatch timer;
     timer.Start();
 
-    TString dirIn1 = "/Volumes/Data/kresan/s438b/data/";
-    TString dirOut = "/Volumes/Data/kresan/s438b/data/";
-    TString inputFileName1 = dirIn1 + runNumber + "_tcal.root";              // name of input file
+    TString dirIn1 = "/Users/kresan/data/s438b/data/";
+    TString dirIn2 = "/Users/kresan/data/s438b/tcal/";
+    TString dirOut = "/Users/kresan/data/s438b/cosmic1/";
+    TString inputFileName1 = dirIn2 + runNumber + "_tcal.root";              // name of input file
     TString parFileName    = dirIn1 + "params_" + runNumber + "_raw.root";  // name of parameter file
     TString outputFileName = dirOut + runNumber + "_cosmic1.root";             // name of output file
 
@@ -27,7 +28,7 @@ void run(TString runNumber)
 
     // Cosmic1----------------------------------------------------------------------
     R3BNeulandCal2HitPar* cosmic1 = new R3BNeulandCal2HitPar("cosmic1");
-    cosmic1->SetMaxPaddleDistFromLine(1);
+    cosmic1->SetMaxPaddleDistFromLine(0.5);
     cosmic1->SetPlanes(8);
     run->AddTask(cosmic1);
     // ---------------------------------------------------------------------------

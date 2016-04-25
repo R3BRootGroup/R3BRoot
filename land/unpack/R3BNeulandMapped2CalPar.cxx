@@ -78,7 +78,7 @@ InitStatus R3BNeulandMapped2CalPar::Init()
     fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LandTCalPar");
     fCal_Par->setChanged();
 
-    fEngine = new R3BTCalEngine(fCal_Par, 2*fNofPMTs, fMinStats);
+    fEngine = new R3BTCalEngine(fCal_Par, fMinStats);
 
     return kSUCCESS;
 }
@@ -100,9 +100,9 @@ void R3BNeulandMapped2CalPar::Exec(Option_t* option)
     }
 
     R3BNeulandMappedData* hit;
-    Int_t iBar;
+    Int_t iPlane;
+    Int_t iPaddle;
     Int_t iSide;
-    Int_t channel;
 
     // Loop over mapped hits
     for (Int_t i = 0; i < nHits; i++)
@@ -114,34 +114,12 @@ void R3BNeulandMapped2CalPar::Exec(Option_t* option)
         }
 
         // Check bar ID
-        iBar = hit->GetBarId();
+        iPlane = hit->GetPlane();
+        iPaddle = hit->GetPaddle();
         iSide = hit->GetSide();
-        if ((iBar - 1) >= (fNofPMTs / 2))
-        {
-            LOG(ERROR) << "R3BNeulandMapped2CalPar::Exec() : wrong bar ID: " << iBar << FairLogger::endl;
-            continue;
-        }
-
-        if (hit->Is17())
-        {
-            // 17-th channel
-            channel = fNofPMTs + hit->GetSam() * (MAX_TACQUILA_MODULE + 1) * (MAX_TACQUILA_GTB + 1) + hit->GetGtb() * (MAX_TACQUILA_MODULE + 1) + hit->GetTacAddr();
-        }
-        else
-        {
-            // PMT signal
-            channel = (Double_t)fNofPMTs / 2 * (iSide - 1) + iBar - 1;
-        }
-
-        // Check validity of module
-        if (channel < 0 || channel >= (2 * fNofPMTs))
-        {
-            LOG(INFO) << "Bar:" << iBar << "  Side:" << iSide << "  " << channel << FairLogger::endl;
-            FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Illegal detector ID...");
-        }
 
         // Fill TAC histogram
-        fEngine->Fill(channel, hit->GetTacData());
+        fEngine->Fill(iPlane, iPaddle, iSide, hit->GetTacData());
     }
 
     // Increment events

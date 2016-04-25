@@ -39,7 +39,6 @@ R3BNeulandMapped2Cal::R3BNeulandMapped2Cal()
     , fNEvents(0)
     , fPulserMode(kFALSE)
     , fWalkEnabled(kTRUE)
-    , fMapPar()
     , fRawHit(NULL)
     , fPmt(new TClonesArray("R3BNeulandCalData"))
     , fNPmt(0)
@@ -57,7 +56,6 @@ R3BNeulandMapped2Cal::R3BNeulandMapped2Cal(const char* name, Int_t iVerbose)
     , fNEvents(0)
     , fPulserMode(kFALSE)
     , fWalkEnabled(kTRUE)
-    , fMapPar()
     , fRawHit(NULL)
     , fPmt(new TClonesArray("R3BNeulandCalData"))
     , fNPmt(0)
@@ -85,13 +83,6 @@ InitStatus R3BNeulandMapped2Cal::Init()
     LOG(INFO) << "R3BNeulandMapped2Cal::Init : read " << fTcalPar->GetNumModulePar() << " calibrated modules"
               << FairLogger::endl;
     // fTcalPar->printParams();
-    R3BTCalModulePar* par;
-    for (Int_t i = 0; i < fTcalPar->GetNumModulePar(); i++)
-    {
-        par = fTcalPar->GetModuleParAt(i);
-        fMapPar[par->GetModuleId()] = par;
-        par->printParams();
-    }
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
@@ -160,7 +151,8 @@ void R3BNeulandMapped2Cal::Exec(Option_t* option)
 
     R3BNeulandMappedData* hit;
     R3BNeulandMappedData* hit2;
-    Int_t iBar;
+    Int_t iPlane;
+    Int_t iPaddle;
     Int_t iSide;
     Int_t channel;
     Int_t tdc;
@@ -179,24 +171,16 @@ void R3BNeulandMapped2Cal::Exec(Option_t* option)
         {
             continue;
         }
-        if (hit->Is17())
-        {
-            // 17-th channel
-            channel = fNofPMTs + hit->GetSam() * (MAX_TACQUILA_MODULE + 1) * (MAX_TACQUILA_GTB + 1) + hit->GetGtb() * (MAX_TACQUILA_MODULE + 1) + hit->GetTacAddr();
-        }
-        else
+        if(! hit->Is17())
         {
             continue;
         }
-        // Convert TDC to [ns]
-        if (channel < 0 || channel >= (2*fNofPMTs))
+        iPlane = hit->GetPlane();
+        iPaddle = hit->GetPaddle();
+        iSide = hit->GetSide();
+        if (!(par = fTcalPar->GetModuleParAt(iPlane, iPaddle, iSide)))
         {
-            LOG(ERROR) << "R3BNeulandMapped2Cal::Exec : wrong hardware channel: " << channel << FairLogger::endl;
-            continue;
-        }
-        if (!FindChannel(channel, &par))
-        {
-            LOG(WARNING) << "R3BNeulandMapped2Cal::Exec : Tcal par not found, channel: " << channel << FairLogger::endl;
+            LOG(WARNING) << "R3BNeulandMapped2Cal::Exec : Tcal par not found, channel: " << iPlane << " / " << iPaddle << " / " << iSide << FairLogger::endl;
             continue;
         }
 
@@ -204,7 +188,7 @@ void R3BNeulandMapped2Cal::Exec(Option_t* option)
         time = par->GetTimeTacquila(tdc);
         if (time < 0. || time > fClockFreq)
         {
-            LOG(ERROR) << "R3BNeulandMapped2Cal::Exec : error in time calibration: ch=" << channel << ", tdc=" << tdc
+            LOG(ERROR) << "R3BNeulandMapped2Cal::Exec : error in time calibration: ch=" << iPlane << " / " << iPaddle << " / " << iSide << ", tdc=" << tdc
                        << ", time=" << time << FairLogger::endl;
             continue;
         }
@@ -231,28 +215,18 @@ void R3BNeulandMapped2Cal::Exec(Option_t* option)
             continue;
         }
 
-        iBar = hit2->GetBarId();
+        iPlane = hit2->GetPlane();
+        iPaddle = hit2->GetPaddle();
         iSide = hit2->GetSide();
         if (hit2->Is17())
         {
             // 17-th channel
             continue;
         }
-        else
-        {
-            // PMT signal
-            channel = fNofPMTs / 2 * (iSide - 1) + iBar - 1;
-        }
 
-        // Convert TDC to [ns]
-        if (channel < 0 || channel >= (2*fNofPMTs))
+        if (!(par = fTcalPar->GetModuleParAt(iPlane, iPaddle, iSide)))
         {
-            LOG(ERROR) << "R3BNeulandMapped2Cal::Exec : wrong hardware channel: " << channel << FairLogger::endl;
-            continue;
-        }
-        if (!FindChannel(channel, &par))
-        {
-            LOG(DEBUG) << "R3BNeulandMapped2Cal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide
+            LOG(DEBUG) << "R3BNeulandMapped2Cal::Exec : Tcal par not found, channel: " << iPlane << " / " << iPaddle << " / " << iSide
             << FairLogger::endl;
             continue;
         }
@@ -281,7 +255,7 @@ void R3BNeulandMapped2Cal::Exec(Option_t* option)
         {
             time2 += wlk(hit2->GetQdcData());
         }
-        new ((*fPmt)[fNPmt]) R3BNeulandCalData(iBar, iSide, time2, hit2->GetQdcData());
+        new ((*fPmt)[fNPmt]) R3BNeulandCalData((iPlane-1)*50 + iPaddle, iSide, time2, hit2->GetQdcData());
         fNPmt += 1;
     }
 
@@ -336,16 +310,6 @@ void R3BNeulandMapped2Cal::FinishTask()
 {
     fh_pulser_5_2->Write();
     fh_pulser_105_2->Write();
-}
-
-Bool_t R3BNeulandMapped2Cal::FindChannel(Int_t channel, R3BTCalModulePar** par)
-{
-    (*par) = fMapPar[channel];
-    if (NULL == (*par))
-    {
-        return kFALSE;
-    }
-    return kTRUE;
 }
 
 ClassImp(R3BNeulandMapped2Cal)

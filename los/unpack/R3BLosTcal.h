@@ -6,8 +6,6 @@
 #ifndef R3BLOSTCAL
 #define R3BLOSTCAL
 
-#include <map>
-
 #include "FairTask.h"
 
 class TClonesArray;
@@ -95,18 +93,9 @@ class R3BLosTcal : public FairTask
     TClonesArray* fRawHit;                      /**< Array of raw items - input data. */
     TClonesArray* fHit;                         /**< Array of time items - output data. */
     Int_t fNHit;                                /**< Number of produced time items per event. */
-    std::map<Int_t, R3BTCalModulePar*> fMapPar; /**< Map for matching of detector module with parameter container. */
     R3BTCalPar* fTcalPar;                       /**< Parameter container for the whole detector. */
     Int_t fNofModules;                          /**< Number of modules. */
     Double_t fClockFreq;                        /**< Clock cycle in [ns]. */
-
-    /**
-     * Method for retrieving parameter container for specific module ID.
-     * @param channel a detector module ID.
-     * @param par an output parameter container for this module.
-     * @return kTRUE if parameter container for this module exists, else kFALSE.
-     */
-    Bool_t FindChannel(Int_t channel, R3BTCalModulePar** par);
 
   public:
     ClassDef(R3BLosTcal, 1)

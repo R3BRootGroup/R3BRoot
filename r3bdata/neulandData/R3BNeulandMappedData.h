@@ -19,7 +19,8 @@ class R3BNeulandMappedData : public R3BNeulandUnpackData
                          Int_t clock,
                          Int_t tacData,
                          Int_t qdcData,
-                         Int_t barId,
+                         Int_t plane,
+                         Int_t paddle,
                          Int_t side,
                          Bool_t is17);
 
@@ -29,9 +30,13 @@ class R3BNeulandMappedData : public R3BNeulandUnpackData
     }
 
     // Getters
-    inline const Int_t& GetBarId() const
+    inline const Int_t& GetPlane() const
     {
-        return fBarId;
+        return fPlane;
+    }
+    inline const Int_t& GetPaddle() const
+    {
+        return fPaddle;
     }
     inline const Int_t& GetSide() const
     {
@@ -43,9 +48,10 @@ class R3BNeulandMappedData : public R3BNeulandUnpackData
     }
 
   private:
-    Int_t fBarId; //... detector ID
-    Int_t fSide;  //... PMT
-    Bool_t fIs17; //... true if CH 17
+    Int_t fPlane;  //... plane ID
+    Int_t fPaddle; //... paddle ID
+    Int_t fSide;   //... PMT
+    Bool_t fIs17;  //... true if CH 17
 
   public:
     ClassDef(R3BNeulandMappedData, 2)

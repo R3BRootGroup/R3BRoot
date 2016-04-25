@@ -6,8 +6,6 @@
 #ifndef R3BNEULANDTCAL
 #define R3BNEULANDTCAL
 
-#include <map>
-
 #include "FairTask.h"
 
 class TClonesArray;
@@ -109,7 +107,6 @@ class R3BNeulandTcal : public FairTask
 
   private:
     Int_t fNEvents;                             /**< Event counter. */
-    std::map<Int_t, R3BTCalModulePar*> fMapPar; /**< Map for matching mdoule ID with parameter container. */
     R3BEventHeader* header;                     /**< Event header. */
     TClonesArray* fMappedHit;                      /**< Array with raw items - input data. */
     TClonesArray* fPmt;                         /**< Array with time items - output data. */
@@ -123,14 +120,6 @@ class R3BNeulandTcal : public FairTask
 //    std::map<Int_t, Double_t> fMapStopTime;     /**< Map with value of stop time. */
 //    std::map<Int_t, Int_t> fMapStopClock;       /**< Map with value of stop clock. */
     Double_t fClockFreq;                        /**< Clock cycle in [ns]. */
-
-    /**
-     * Method for retrieving parameter container for specific module ID.
-     * @param channel a detector module ID.
-     * @param par an output parameter container for this module.
-     * @return kTRUE if parameter container for this module exists, else kFALSE.
-     */
-    Bool_t FindChannel(Int_t channel, R3BTCalModulePar** par);
 
   public:
     ClassDef(R3BNeulandTcal, 1)

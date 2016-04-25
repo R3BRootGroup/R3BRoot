@@ -6,8 +6,6 @@
 #ifndef R3BNEULANDMAPPED2CAL_H
 #define R3BNEULANDMAPPED2CAL_H
 
-#include <map>
-
 #include "FairTask.h"
 
 class TClonesArray;
@@ -129,7 +127,6 @@ class R3BNeulandMapped2Cal : public FairTask
     Int_t fNEvents;                             /**< Event counter. */
     Bool_t fPulserMode;                         /**< Running with pulser data. */
     Bool_t fWalkEnabled;                        /**< Enable / Disable walk correction. */
-    std::map<Int_t, R3BTCalModulePar*> fMapPar; /**< Map for matching mdoule ID with parameter container. */
     R3BEventHeader* header;                     /**< Event header. */
     TClonesArray* fRawHit;                      /**< Array with raw items - input data. */
     TClonesArray* fPmt;                         /**< Array with time items - output data. */
@@ -143,14 +140,6 @@ class R3BNeulandMapped2Cal : public FairTask
     Double_t fClockFreq;                        /**< Clock cycle in [ns]. */
     TH1F* fh_pulser_5_2;                        /**< Resolution of one PMT. */
     TH1F* fh_pulser_105_2;                      /**< Resolution of one PMT. */
-
-    /**
-     * Method for retrieving parameter container for specific module ID.
-     * @param channel a detector module ID.
-     * @param par an output parameter container for this module.
-     * @return kTRUE if parameter container for this module exists, else kFALSE.
-     */
-    Bool_t FindChannel(Int_t channel, R3BTCalModulePar** par);
 
   public:
     ClassDef(R3BNeulandMapped2Cal, 1)

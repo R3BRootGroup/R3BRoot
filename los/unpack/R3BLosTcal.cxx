@@ -52,13 +52,6 @@ InitStatus R3BLosTcal::Init()
 {
     LOG(INFO) << "R3BLosTcal::Init : read " << fTcalPar->GetNumModulePar() << " calibration channels" << FairLogger::endl;
     //fTcalPar->printParams();
-    R3BTCalModulePar* par;
-    for(Int_t i = 0; i < fTcalPar->GetNumModulePar(); i++)
-    {
-        par = fTcalPar->GetModuleParAt(i);
-        fMapPar[par->GetModuleId()] = par;
-        par->printParams();
-    }
 
     FairRootManager* mgr = FairRootManager::Instance();
     if(NULL == mgr)
@@ -129,7 +122,7 @@ void R3BLosTcal::Exec(Option_t* option)
             LOG(ERROR) << "R3BLosTcal::Exec : wrong hardware channel: " << channel << FairLogger::endl;
             continue;
         }
-        if(! FindChannel(channel, &par))
+        if(! (par = fTcalPar->GetModuleParAt(1, channel+1, 1)))
         {
             LOG(WARNING) << "R3BLosTcal::Exec : Tcal par not found, channel: " << channel << FairLogger::endl;
             continue;
@@ -174,7 +167,7 @@ void R3BLosTcal::Exec(Option_t* option)
             LOG(ERROR) << "R3BLosTcal::Exec : wrong hardware channel: " << channel << FairLogger::endl;
             continue;
         }
-        if(! FindChannel(channel, &par))
+        if(! (par = fTcalPar->GetModuleParAt(1, channel+1, 1)))
         {
             LOG(WARNING) << "R3BLosTcal::Exec : Tcal par not found, channel: " << channel << FairLogger::endl;
             continue;
@@ -209,16 +202,6 @@ void R3BLosTcal::FinishEvent()
 
 void R3BLosTcal::FinishTask()
 {
-}
-
-Bool_t R3BLosTcal::FindChannel(Int_t channel, R3BTCalModulePar** par)
-{
-    (*par) = fMapPar[channel];
-    if(NULL == (*par))
-    {
-        return kFALSE;
-    }
-    return kTRUE;
 }
 
 ClassImp(R3BLosTcal)

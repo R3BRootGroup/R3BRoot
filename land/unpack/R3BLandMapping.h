@@ -53,6 +53,7 @@ class R3BLandMapping : public FairTask
     Int_t nEntry;
     std::map<Int_t, Int_t> v1map;
     std::map<Int_t, Int_t> v2map;
+    std::map<Int_t, Int_t> v3map;
     Bool_t DoMapping();
 
   public:

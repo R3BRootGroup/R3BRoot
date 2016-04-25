@@ -83,7 +83,7 @@ InitStatus R3BNeulandTcalFill::Init()
     fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LandTCalPar");
     fCal_Par->setChanged();
 
-    fEngine = new R3BTCalEngine(fCal_Par, fNofPlanes*fNofBars*4 + fNof17, fMinStats);
+    fEngine = new R3BTCalEngine(fCal_Par, fMinStats);
 
     return kSUCCESS;
 }
@@ -112,7 +112,6 @@ void R3BNeulandTcalFill::Exec(Option_t*)
     Int_t iPlane;
     Int_t iBar;
     Int_t iSide;
-    Int_t channel;
     
 
     // Loop over mapped hits
@@ -147,23 +146,14 @@ void R3BNeulandTcalFill::Exec(Option_t*)
 //        {
             // PMT signal
             iSide = hit->GetSide();
-//            channel = (Double_t)fNofPMTs * (iSide - 1) + iBar - 1;
-            channel = iPlane * fNofBars*4 + (iBar-1)*4 + (iSide)*2;
-            
+        
 //            LOG(INFO) << "Plane: " << iPlane << " Bar: " << iBar << " Side: " << iSide << " Cal channel: " << channel << "   "  << FairLogger::endl;
              
 //        }
 
-        // Check validity of module
-        if (channel < 0 || channel >= (fNofPlanes*fNofBars*4))
-        {
-            LOG(INFO) << "Plane: " << iPlane << "  Bar:" << iBar << "  Side:" << iSide << "  " << channel << "   "  << FairLogger::endl;
-            FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Illegal detector ID...");
-        }
-
         // Fill TAC histogram
-        fEngine->Fill(channel, hit->GetFineTimeLE());
-        fEngine->Fill(channel+1, hit->GetFineTimeTE());
+        fEngine->Fill(iPlane, iBar, iSide, hit->GetFineTimeLE());
+        fEngine->Fill(iPlane, iBar, iSide + 2, hit->GetFineTimeTE());
     }
 
     // Increment events

@@ -23,7 +23,6 @@
 R3BNeulandTcal::R3BNeulandTcal()
     : FairTask("LandTcal", 1)
     , fNEvents(0)
-    , fMapPar()
     , fMappedHit(NULL)
     , fPmt(new TClonesArray("R3BNeulandPmt"))
     , fNPmt(0)
@@ -39,7 +38,6 @@ R3BNeulandTcal::R3BNeulandTcal()
 R3BNeulandTcal::R3BNeulandTcal(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fNEvents(0)
-    , fMapPar()
     , fMappedHit(NULL)
     , fPmt(new TClonesArray("R3BNeulandPmt"))
     , fNPmt(0)
@@ -67,13 +65,6 @@ InitStatus R3BNeulandTcal::Init()
     LOG(INFO) << "R3BNeulandTcal::Init : read " << fTcalPar->GetNumModulePar() << " calibrated modules"
               << FairLogger::endl;
     // fTcalPar->printParams();
-    R3BTCalModulePar* par;
-    for (Int_t i = 0; i < fTcalPar->GetNumModulePar(); i++)
-    {
-        par = fTcalPar->GetModuleParAt(i);
-        fMapPar[par->GetModuleId()] = par;
-        par->printParams();
-    }
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
@@ -154,20 +145,9 @@ void R3BNeulandTcal::Exec(Option_t*)
            // 17-th channel
            continue;
        }
-       else
-       {
-           // PMT signal
-           channel = iPlane * fNofBars*4 + (iBar-1)*4 + (iSide)*2;
-       }
-       
 
        // Convert TDC to [ns]
-       if (channel < 0 || channel >= (fNofPlanes*fNofBars*4))
-       {
-           LOG(ERROR) << "R3BNeulandTcal::Exec : wrong hardware channel: " << channel << FairLogger::endl;
-           continue;
-       }
-       if (!FindChannel(channel, &par))
+       if (! (par = fTcalPar->GetModuleParAt(iPlane, iBar, iSide)))
        {
            LOG(DEBUG) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide
                       << FairLogger::endl;
@@ -178,8 +158,7 @@ void R3BNeulandTcal::Exec(Option_t*)
        tdc = hit->GetFineTimeLE();
        timeLE = par->GetTimeVFTX(tdc);
 
-       channel+=1;
-       if (!FindChannel(channel, &par))
+       if (! (par = fTcalPar->GetModuleParAt(iPlane, iBar, iSide + 2)))
        {
            LOG(DEBUG) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide
                       << FairLogger::endl;
@@ -232,16 +211,6 @@ void R3BNeulandTcal::FinishEvent()
 
 void R3BNeulandTcal::FinishTask()
 {
-}
-
-Bool_t R3BNeulandTcal::FindChannel(Int_t channel, R3BTCalModulePar** par)
-{
-    (*par) = fMapPar[channel];
-    if (NULL == (*par))
-    {
-        return kFALSE;
-    }
-    return kTRUE;
 }
 
 ClassImp(R3BNeulandTcal)

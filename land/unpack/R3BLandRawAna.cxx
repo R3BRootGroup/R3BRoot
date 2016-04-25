@@ -100,7 +100,7 @@ void R3BLandRawAna::Exec(Option_t* option)
             fh_land_mapped_is17->Fill(hitmapped->Is17());
             if(! hitmapped->Is17())
             {
-                fh_land_mapped_barid->Fill(hitmapped->GetBarId());
+                fh_land_mapped_barid->Fill((hitmapped->GetPlane()-1)*50 + hitmapped->GetPaddle());
                 fh_land_mapped_side->Fill(hitmapped->GetSide());
                 fh_land_mapped_clock->Fill(hitmapped->GetClock());
                 fh_land_mapped_tac->Fill(hitmapped->GetTacData());
