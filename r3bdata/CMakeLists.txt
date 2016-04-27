@@ -27,6 +27,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mfiData  
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData  
 ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
+${R3BROOT_SOURCE_DIR}/r3bdata/actarData
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -96,6 +97,7 @@ pspData/R3BPspxMappedItem.cxx
 pspData/R3BPspxCalItem.cxx
 losData/R3BLosMappedItem.cxx
 neulandData/R3BNeulandTamexMappedItem.cxx
+actarData/R3BActarPoint.cxx
 )
 
 

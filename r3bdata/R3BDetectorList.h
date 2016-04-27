@@ -26,6 +26,7 @@ enum DetectorId
     kSTaRTrack,
     kLUMON,
     kNEULAND,
+    kACTAR,
     kLAST
 };
 

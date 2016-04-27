@@ -181,6 +181,8 @@ Int_t R3BMCTrack::GetNPoints(DetectorId detId) const
         return ((fNPoints & 0x30000000) >> 28);
     else if (detId == kNEULAND)
         return ((fNPoints & 0xC0000000) >> 30);
+    else if (detId == kACTAR)
+        return ((fNPoints & 0x300000000) >> 32);
     else
     {
         cout << "-E- R3BMCTrack::GetNPoints: Unknown detector ID " << detId << endl;
@@ -190,12 +192,13 @@ Int_t R3BMCTrack::GetNPoints(DetectorId detId) const
 // -------------------------------------------------------------------------
 
 // -----   Public method SetNPoints   --------------------------------------
-void R3BMCTrack::SetNPoints(Int_t iDet, Int_t nPoints)
+void R3BMCTrack::SetNPoints(Int_t iDet, Int_t nP)
 {
-    if (nPoints < 0)
-        nPoints = 0;
-    else if (nPoints > 3)
+    ULong_t nPoints = nP;
+    if (nPoints > 3)
+    {
         nPoints = 3;
+    }
 
     if (iDet == kREF)
     {
@@ -260,6 +263,10 @@ void R3BMCTrack::SetNPoints(Int_t iDet, Int_t nPoints)
     else if (iDet == kNEULAND)
     {
         fNPoints = (fNPoints & (~0xC0000000)) | (nPoints << 30);
+    }
+    else if (iDet == kACTAR)
+    {
+        fNPoints = (fNPoints & (~0x300000000)) | (nPoints << 32);
     }
     else
     {
