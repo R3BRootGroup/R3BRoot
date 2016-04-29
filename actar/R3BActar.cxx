@@ -4,11 +4,11 @@
 // -------------------------------------------------------------------------
 #include <stdlib.h>
 
+#include "GarfieldPhysics.h"
+
 #include "R3BActar.h"
 
 #include "R3BActarPoint.h"
-//#include "R3BGeoPsp.h"
-// #include "R3BGeoPspPar.h"
 #include "R3BMCStack.h"
 
 #include "FairGeoInterface.h"
@@ -21,24 +21,7 @@
 #include "FairVolume.h"
 
 #include "TClonesArray.h"
-#include "TGeoMCGeometry.h"
 #include "TObjArray.h"
-#include "TParticle.h"
-#include "TVirtualMC.h"
-
-// includes for modeling
-#include "TGeoArb8.h"
-#include "TGeoBBox.h"
-#include "TGeoBoolNode.h"
-#include "TGeoCompositeShape.h"
-#include "TGeoCone.h"
-#include "TGeoManager.h"
-#include "TGeoMaterial.h"
-#include "TGeoMatrix.h"
-#include "TGeoMedium.h"
-#include "TGeoPara.h"
-#include "TGeoPgon.h"
-#include "TGeoSphere.h"
 #include "TParticle.h"
 #include "TVirtualMC.h"
 
@@ -94,7 +77,9 @@ void R3BActar::Initialize()
 
 void R3BActar::SetSpecialPhysicsCuts()
 {
-    LOG(INFO) << "R3BActar: Adding customized Physics cut ... " << FairLogger::endl;
+    //LOG(INFO) << "R3BActar: Adding customized Physics cut ... " << FairLogger::endl;
+
+    return;
 
     if (gGeoManager)
     {
@@ -238,11 +223,26 @@ void R3BActar::BeginEvent()
 // -----   Public method EndOfEvent   -----------------------------------------
 void R3BActar::EndOfEvent()
 {
+    /// Update the collected hit information from Garfield interface
+    GarfieldPhysics* garfieldPhysics = GarfieldPhysics::GetInstance();
+
+    // get energy deposit from Garfield, convert it in GeV
+    Double_t edep = garfieldPhysics->GetEnergyDeposit_MeV() * 1e-03;
+    Double_t avalancheSize = garfieldPhysics->GetAvalancheSize();
+    Double_t gain = garfieldPhysics->GetGain();
+
+    LOG(INFO) << "Garfield output:" << FairLogger::endl;
+    LOG(INFO) << "  energy deposit: " << edep << FairLogger::endl;
+    LOG(INFO) << "  avalanche size: " << avalancheSize << FairLogger::endl;
+    LOG(INFO) << "            gain: " << gain << FairLogger::endl;
+
     if (fVerboseLevel)
         Print();
     fPspCollection->Clear();
 
     ResetParameters();
+
+    garfieldPhysics->Clear();
 }
 // ----------------------------------------------------------------------------
 

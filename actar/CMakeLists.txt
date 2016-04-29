@@ -5,6 +5,9 @@
 Set(SYSTEM_INCLUDE_DIRECTORIES 
 ${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
+${GARFIELD_INCLUDE_DIR}
+${GEANT4_INCLUDE_DIR}
+${GEANT4VMC_INCLUDE_DIR}
 )
 
 set(INCLUDE_DIRECTORIES
@@ -21,6 +24,8 @@ include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
 ${FAIRROOT_LIBRARY_DIR}
+${GARFIELD_LIBRARY_DIR}
+${GEANT4_LIBRARY_DIR}
 ) 
 
 link_directories( ${LINK_DIRECTORIES})
@@ -28,6 +33,11 @@ link_directories( ${LINK_DIRECTORIES})
 set(SRCS
 #Put here your sourcefiles
 R3BActar.cxx  
+GarfieldPhysics.cxx
+FastSimulation.cxx
+GarfieldG4FastSimulationModel.cxx
+GarfieldMessenger.cxx
+RunConfiguration.cxx
 )
 
 # fill list of header files from list of source files
@@ -37,7 +47,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF ActarLinkDef.h)
 Set(LIBRARY_NAME R3BActar)
 Set(DEPENDENCIES
-    R3Bbase R3BData)
+    R3Bbase R3BData Garfield G4global G4interfaces geant4vmc)
 
 GENERATE_LIBRARY()
 

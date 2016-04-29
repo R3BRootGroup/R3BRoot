@@ -75,7 +75,7 @@ void r3ball(Int_t nEvents = 1,
   //  R3B Special Physics List in G4 case
   if ( (fUserPList  == kTRUE ) &&
       (fMC.CompareTo("TGeant4")   == 0)) {
-    run->SetUserConfig("g4R3bConfig.C");
+    run->SetUserConfig("g4GarfieldConfig.C");
     run->SetUserCuts("SetR3BCuts.C");
   }
   
@@ -297,15 +297,15 @@ void r3ball(Int_t nEvents = 1,
   
   if (fGenerator.CompareTo("box") == 0  ) {
     // 2- Define the BOX generator
-    Int_t pdgId = 211; // pion beam
+    Int_t pdgId = 11; // electron beam
     Double32_t theta1 = 0.;  // polar angle distribution
     Double32_t theta2 = 7.;
-    Double32_t momentum = 0.8;
-    FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 50);
+    Double32_t momentum = 1e-6;//0.8;
+    FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 1);
     boxGen->SetThetaRange(theta1, theta2);
     boxGen->SetPRange(momentum, momentum*2.);
     boxGen->SetPhiRange(0, 360);
-    boxGen->SetXYZ(0.0, 0.0, -1.5);
+    boxGen->SetXYZ(0.5, 0.5, 0.0);
 //    boxGen->SetXYZ(0.0, 0.0, -300.);
     // add the box generator
     primGen->AddGenerator(boxGen);
@@ -379,6 +379,8 @@ void r3ball(Int_t nEvents = 1,
   // -----   Initialize simulation run   ------------------------------------
   run->Init();
 
+  // Customise Geant4 setting after initialization:
+  ((TGeant4*)gMC)->ProcessGeantMacro("g4config2.in");
   
   // ------  Increase nb of step for CALO
   Int_t nSteps = -15000;

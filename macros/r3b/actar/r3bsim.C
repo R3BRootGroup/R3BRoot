@@ -77,11 +77,10 @@ void r3bsim()
   //   Neutron:                 LAND
   //                            SCINTNEULAND
   TMap detGeo;
-  detGeo.Add(new TObjString("GLAD"),          new TObjString("glad_v13a.geo.root"));
-  detGeo.Add(new TObjString("ACTAR"),         new TObjString("actar_v0.geo.root"));
+  detGeo.Add(new TObjString("ACTAR"),         new TObjString("actar_arco2.geo.root"));
 
   // Number of events
-  Int_t nEvents = 1;
+  Int_t nEvents = 10;
   
   // Event display (store trajectories)
   Bool_t fEventDisplay = kTRUE;

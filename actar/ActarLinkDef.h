@@ -5,6 +5,8 @@
 #pragma link off all functions;
  
 #pragma link C++ class R3BActar+;
+#pragma link C++ class GarfieldPhysics+;
+#pragma link C++ class VMC::Garfield::RunConfiguration+;
 
 #endif
 

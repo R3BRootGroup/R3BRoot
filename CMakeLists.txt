@@ -254,6 +254,8 @@ set(WITH_UCESB true)
 set(LD_LIBRARY_PATH ${ucesb_LIBRARY_DIR} ${LD_LIBRARY_PATH})
 endif(ucesb_FOUND)
 
+find_package(Garfield)
+
 Generate_Version_Info()
 
 # Recurse into the given subdirectories.  This does not actually
@@ -307,7 +309,10 @@ add_subdirectory (psp)
 add_subdirectory (timestitcher)
 add_subdirectory (compilehelper)
 add_subdirectory (tcal)
-add_subdirectory (actar)
+  IF(GARFIELD_FOUND)
+    add_subdirectory (actar)
+    Set(LD_LIBRARY_PATH ${GARFIELD_LIBRARY_DIR} ${LD_LIBRARY_PATH})
+  ENDIF(GARFIELD_FOUND)
 ENDIF (NOT MODULE)
 
 Execute_Process(COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-opengl
