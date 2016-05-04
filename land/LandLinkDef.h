@@ -20,15 +20,15 @@
 #pragma link C++ class R3BPrimPart+;
 #pragma link C++ class R3BNeutHit+;
 
-#pragma link C++ class R3BLandRawAna+;
-#pragma link C++ class R3BLandRawAnaS438b+;
-#pragma link C++ class R3BLandMapping+;
-#pragma link C++ class R3BLandUnpack+;
+//#pragma link C++ class R3BLandRawAna+;
+//#pragma link C++ class R3BLandRawAnaS438b+;
+//#pragma link C++ class R3BLandMapping+;
+//#pragma link C++ class R3BLandUnpack+;
 #pragma link C++ class R3BNeulandMapped2CalPar+;
 #pragma link C++ class R3BLandParamRead+;
 #pragma link C++ class R3BNeulandMapped2Cal+;
-#pragma link C++ class R3BLandAna+;
-#pragma link C++ class R3BNeulandCalTest+;
+//#pragma link C++ class R3BLandAna+;
+//#pragma link C++ class R3BNeulandCalTest+;
 #pragma link C++ class R3BNeulandCal2Hit+;
 #pragma link C++ class R3BNeulandCal2HitPar+;
 #pragma link C++ class R3BNeulandParFact+;
