@@ -92,7 +92,7 @@ R3BTCalModulePar* R3BTCalPar::GetModuleParAt(Int_t plane, Int_t paddle, Int_t si
                            << tpaddle << " / " << tside << FairLogger::endl;
                 continue;
             }
-            index = (tplane - 1) * N_PLANE_MAX * N_PADDLE_MAX + (tpaddle - 1) * N_PADDLE_MAX + tside - 1;
+            index = (tplane - 1) * N_PADDLE_MAX * N_SIDE_MAX + (tpaddle - 1) * N_SIDE_MAX + tside - 1;
             if (fIndexMap.find(index) != fIndexMap.end())
             {
                 LOG(ERROR) << "R3BTCalPar::GetModuleParAt : parameter found more than once. " << tplane << " / "
@@ -110,12 +110,13 @@ R3BTCalModulePar* R3BTCalPar::GetModuleParAt(Int_t plane, Int_t paddle, Int_t si
                    << " / " << side << FairLogger::endl;
         return NULL;
     }
-    Int_t index = (plane - 1) * N_PLANE_MAX * N_PADDLE_MAX + (paddle - 1) * N_PADDLE_MAX + side - 1;
-    ;
+    Int_t index = (plane - 1) * N_PADDLE_MAX * N_SIDE_MAX + (paddle - 1) * N_SIDE_MAX + side - 1;
+
     if (fIndexMap.find(index) == fIndexMap.end())
     {
         LOG(WARNING) << "R3BTCalPar::GetModuleParAt : parameter not found for: " << plane << " / " << paddle << " / "
                      << side << FairLogger::endl;
+        return NULL;
     }
     Int_t arind = fIndexMap[index];
     R3BTCalModulePar* par = (R3BTCalModulePar*)fTCalParams->At(arind);
