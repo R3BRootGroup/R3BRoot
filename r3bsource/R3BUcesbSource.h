@@ -31,11 +31,16 @@ public:
 	R3BUcesbSource(const TString &, const TString &, const TString &,
 	    EXT_STR_h101 *, size_t);
 	~R3BUcesbSource();
+    
+    Source_Type GetSourceType() { return kONLINE; }
 
 	/* Init() will fork a ucesb instance to deliver the unpacked data for
 	 * R3Broot. It makes use of the ext_data_ interface of ucesb.
 	 * */
 	Bool_t	Init();
+    Bool_t  InitUnpackers();
+    void    SetParUnpackers();
+    Bool_t  ReInitUnpackers();
 	/* A wrapper for ext_data_fetch_event() */
 	Int_t	ReadEvent(UInt_t);
 	/* Close the ext_data_ interface */

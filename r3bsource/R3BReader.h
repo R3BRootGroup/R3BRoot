@@ -21,6 +21,8 @@ class R3BReader : public TObject
 
 		/* Setup structure information */
 		virtual Bool_t Init(ext_data_struct_info *) = 0;
+        virtual void SetParContainers() {}
+        virtual Bool_t ReInit() { return kTRUE; }
 		/* Read data from full event structure */
 		virtual Bool_t Read() = 0;
 		/* Reset */

@@ -14,7 +14,7 @@ extern "C" {
 #include "/Users/kresan/R3BRoot/github/R3BRoot/r3bsource/ext_h101_full.h"
 }
 
-void unpack_ucesb()
+void unpack_ucesb_tacquila()
 {
     TStopwatch timer;
     timer.Start();
@@ -40,6 +40,7 @@ void unpack_ucesb()
     /* Create online run ------------------------------------ */
     FairRunOnline* run = new FairRunOnline(source);
     run->SetOutputFile("output.root");
+    run->SetRunId(269);
     /* ------------------------------------------------------ */
 
     /* Create ALADIN field map ------------------------------ */
@@ -51,8 +52,8 @@ void unpack_ucesb()
     /* ------------------------------------------------------ */
 
     /* Add analysis task ------------------------------------ */
-    R3BLandRawAna* ana = new R3BLandRawAna("LandRawAna", 1);
-    run->AddTask(ana);
+    //R3BLandRawAna* ana = new R3BLandRawAna("LandRawAna", 1);
+    //run->AddTask(ana);
     /* ------------------------------------------------------ */
 
     /* Initialize ------------------------------------------- */
@@ -61,20 +62,20 @@ void unpack_ucesb()
     /* ------------------------------------------------------ */
 
     /* Runtime data base ------------------------------------ */
-    /*FairRuntimeDb* rtdb = run->GetRuntimeDb();
+    FairRuntimeDb* rtdb = run->GetRuntimeDb();
     R3BFieldPar* fieldPar = (R3BFieldPar*)rtdb->getContainer("R3BFieldPar");
     fieldPar->SetParameters(magField);
     fieldPar->setChanged();
     Bool_t kParameterMerged = kTRUE;
     FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
-    parOut->open(parFileName);
+    parOut->open("params.root");
     rtdb->setOutput(parOut);
-    rtdb->print();*/
+    rtdb->print();
     /* ------------------------------------------------------ */
 
     /* Run -------------------------------------------------- */
     run->Run((nev < 0) ? nev : 0, (nev < 0) ? 0 : nev);
-    /*rtdb->saveOutput();*/
+    rtdb->saveOutput();
     /* ------------------------------------------------------ */
 
     timer.Stop();

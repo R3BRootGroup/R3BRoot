@@ -65,26 +65,51 @@ Bool_t R3BUcesbSource::Init()
 		return kFALSE;
 	}
 
-	/* Initialize all readers */
-	for (int i = 0; i < fReaders->GetEntriesFast(); ++i) {
-		if (!((R3BReader *)fReaders->At(i))->Init(&fStructInfo)) {
-			fLogger->Fatal(MESSAGE_ORIGIN, "ucesb: %s",
-			    fClient.last_error());
-			return kFALSE;
-		}
-	}
-
-	/* Setup client */
-	status = fClient.setup(NULL, 0, &fStructInfo, fEventSize);
-	if (status != 0) {
-		perror("ext_data_clnt::setup()");
-		fLogger->Error(MESSAGE_ORIGIN, "ext_data_clnt::setup() failed");
-		fLogger->Fatal(MESSAGE_ORIGIN, "ucesb: %s",
-		    fClient.last_error());
-		return kFALSE;
-	}
-
 	return kTRUE;
+}
+
+Bool_t R3BUcesbSource::InitUnpackers()
+{
+    /* Initialize all readers */
+    for (int i = 0; i < fReaders->GetEntriesFast(); ++i) {
+        if (!((R3BReader *)fReaders->At(i))->Init(&fStructInfo)) {
+            fLogger->Fatal(MESSAGE_ORIGIN, "ucesb: %s",
+                           fClient.last_error());
+            return kFALSE;
+        }
+    }
+
+    /* Setup client */
+    Bool_t status = fClient.setup(NULL, 0, &fStructInfo, fEventSize);
+    if (status != 0) {
+        perror("ext_data_clnt::setup()");
+        fLogger->Error(MESSAGE_ORIGIN, "ext_data_clnt::setup() failed");
+        fLogger->Fatal(MESSAGE_ORIGIN, "ucesb: %s",
+                       fClient.last_error());
+        return kFALSE;
+    }
+    
+    return kTRUE;
+}
+
+void R3BUcesbSource::SetParUnpackers()
+{
+    for (int i = 0; i < fReaders->GetEntriesFast(); ++i) {
+        ((R3BReader *)fReaders->At(i))->SetParContainers();
+    }
+}
+
+Bool_t R3BUcesbSource::ReInitUnpackers()
+{
+    /* Initialize all readers */
+    for (int i = 0; i < fReaders->GetEntriesFast(); ++i) {
+        if (!((R3BReader *)fReaders->At(i))->ReInit()) {
+            fLogger->Fatal(MESSAGE_ORIGIN, "ReInit of a reader failed.");
+            return kFALSE;
+        }
+    }
+
+    return kTRUE;
 }
 
 Int_t R3BUcesbSource::ReadEvent(UInt_t i)
