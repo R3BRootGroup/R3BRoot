@@ -10,6 +10,7 @@ ${BASE_INCLUDE_DIRECTORIES}
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bsource
+${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
@@ -30,7 +31,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF R3BLinkDef.h)
 
 set(DEPENDENCIES
-    GeoBase ParBase MbsAPI Base FairTools R3BData Core Geom GenVector Physics Matrix MathCore)
+    GeoBase ParBase MbsAPI Base FairTools R3Bbase R3BData Core Geom GenVector Physics Matrix MathCore)
 
 
 # Include ucesb, if it was found

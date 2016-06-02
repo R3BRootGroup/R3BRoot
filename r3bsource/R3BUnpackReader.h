@@ -5,6 +5,7 @@
 
 typedef struct EXT_STR_h101_t EXT_STR_h101;
 class FairLogger;
+class R3BEventHeader;
 
 class R3BUnpackReader : public R3BReader
 {
@@ -18,11 +19,13 @@ class R3BUnpackReader : public R3BReader
 
 	private:
 		/* An event counter */
-		unsigned int fNEvent;
+		UInt_t fNEvent;
 		/* Reader specific data structure from ucesb */
 		EXT_STR_h101* fData;
 		/* FairLogger */
 		FairLogger*	fLogger;
+
+		R3BEventHeader* fHeader;
 
 	public:
 		ClassDef(R3BUnpackReader, 0);

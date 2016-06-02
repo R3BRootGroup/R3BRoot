@@ -1,4 +1,6 @@
 #include "FairLogger.h"
+#include "FairRootManager.h"
+#include "R3BEventHeader.h"
 #include "R3BUnpackReader.h"
 
 extern "C" {
@@ -12,11 +14,17 @@ R3BUnpackReader::R3BUnpackReader(EXT_STR_h101* data)
 	, fNEvent(0)
 	, fData(data)
 	, fLogger(FairLogger::GetLogger())
+	, fHeader(new R3BEventHeader())
 {
 }
 
 R3BUnpackReader::~R3BUnpackReader()
-{}
+{
+	if (fHeader)
+	{
+		delete fHeader;
+	}
+}
 
 Bool_t R3BUnpackReader::Init(ext_data_struct_info *a_struct_info)
 {
@@ -31,19 +39,29 @@ Bool_t R3BUnpackReader::Init(ext_data_struct_info *a_struct_info)
 		return kFALSE;
 	}
 
+	FairRootManager* mgr = FairRootManager::Instance();
+	mgr->Register("R3BEventHeader", "EventHeader", fHeader, kTRUE);
+
 	return kTRUE;
 }
 
 Bool_t R3BUnpackReader::Read()
 {
 	/* Display data */
-	fLogger->Info(MESSAGE_ORIGIN, "  Event data:");
-	fLogger->Info(MESSAGE_ORIGIN, "  %10d (d%10d): %2d\n",
-		fData->EVENTNO,
-		fData->EVENTNO - fNEvent,
-		fData->TRIGGER);
+//	fLogger->Info(MESSAGE_ORIGIN, "  Event data:");
+//	fLogger->Info(MESSAGE_ORIGIN, "  %10d (d%10d): %2d\n",
+//		fData->EVENTNO,
+//		fData->EVENTNO - fNEvent,
+//		fData->TRIGGER);
 
 	fNEvent = fData->EVENTNO;
+
+	if (0 == (fNEvent % 1000))
+	{
+		LOG(DEBUG1) << "R3BUnpackReader : event : " << fNEvent << ", trigger : " << fData->TRIGGER << FairLogger::endl;
+	}
+
+	fHeader->SetTrigger(fData->TRIGGER);
 
     return kTRUE;
 }
