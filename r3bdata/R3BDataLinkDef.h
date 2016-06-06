@@ -56,6 +56,7 @@
 #pragma link C++ class R3BMfiDigi+;
 #pragma link C++ class R3BPspPoint+;
 #pragma link C++ class R3BPspDigi+;
+
 #pragma link C++ class R3BPspxCalData+;
 #pragma link C++ class R3BNeulandMappedData+;
 #pragma link C++ class R3BPspxMappedData+;
@@ -67,5 +68,10 @@
 #pragma link C++ class R3BNeulandUnpackData+;
 #pragma link C++ class R3BNeulandCalData+;
 #pragma link C++ class R3BActarPoint+;
+#pragma link C++ class R3BFi4MappedItem+;
+#pragma link C++ class R3BFi4CalItem+;
+#pragma link C++ class R3BFi4HitItem+;
+
+
 #endif
 

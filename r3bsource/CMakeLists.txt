@@ -13,6 +13,7 @@ ${R3BROOT_SOURCE_DIR}/r3bsource
 ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
+${R3BROOT_SOURCE_DIR}/r3bdata/fi4Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 )
@@ -44,6 +45,7 @@ if(WITH_UCESB)
 		R3BReader.cxx
 		R3BUnpackReader.cxx
 		R3BPspReader.cxx
+		R3BFiberReader.cxx
 		R3BLosReader.cxx
 		R3BTofdReader.cxx
 		R3BNeulandTamexReader.cxx

@@ -12,7 +12,7 @@
 
 extern "C" {
 //#include "/home/bloeher/git/R3BRoot/r3bsource/ext_h101_full.h"
-#include "/u/rplag/R3BRoot/r3bsource/ext_h101.h"
+#include "/u/jtscheus/r3broot/R3BRoot/r3bsource/ext_h101.h"
 }
 
 void unpack_ucesb()
@@ -20,12 +20,12 @@ void unpack_ucesb()
 	TStopwatch timer;
 	timer.Start();
 
-	const Int_t nev = 1000; /* number of events to read, -1 - until CTRL+C */
+	const Int_t nev = 2000; /* number of events to read, -1 - until CTRL+C */
 
 	/* Create source using ucesb for input ------------------ */
 
-	TString filename = "/SAT/hera/land/s438b/stitched/s438b/lmd/run301_4307.lmd.gz";
-	TString outputFileName = "/tmp/unpack_ucesb_ralf.root";
+	TString filename = "/u/jtscheus/r3broot/data_s438b/run222_0811.lmd.gz";
+	TString outputFileName = "jo_test_fiber.root";
 	TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
 	TString ucesb_dir = getenv("UCESB_DIR");
 	TString ucesb_path = ucesb_dir + "/../upexps/s438b/s438b";
@@ -34,14 +34,15 @@ void unpack_ucesb()
 	R3BUcesbSource* source = new R3BUcesbSource(filename, ntuple_options,
 	    ucesb_path, &ucesb_struct, sizeof(ucesb_struct));
 	source->SetMaxEvents(nev);
-	source->AddReader(new R3BUnpackReader(&ucesb_struct));
+	//source->AddReader(new R3BUnpackReader(&ucesb_struct));
+	source->AddReader(new R3BFiberReader(&ucesb_struct));
 	/*source->AddReader(new R3BNeulandTamexReader(&ucesb_struct));*/
 
 	/* ------------------------------------------------------ */
 
 	/* Create online run ------------------------------------ */
 	FairRunOnline* run = new FairRunOnline(source);
-	run->SetOutputFile("/tmp/output_ralf.root");
+	run->SetOutputFile(outputFileName);
 
 	/* ------------------------------------------------------ */
 
@@ -56,11 +57,17 @@ void unpack_ucesb()
 	/* Add analysis task ------------------------------------ */
 	R3BLandRawAna* ana = new R3BLandRawAna("LandRawAna", 1);
 	run->AddTask(ana);
+	R3BFi4Mapped2Cal* Fi4Mapped2Cal = new R3BFi4Mapped2Cal("Fi4Mapped2Cal",1);
+	run->AddTask(Fi4Mapped2Cal);
+	R3BFi4Cal2Hit* Fi4Cal2Hit = new R3BFi4Cal2Hit("Fi4Cal2Hit",1);
+	Fi4Cal2Hit->SetGeometry("");
+	Fi4Cal2Hit->SetFiberWidth("");
+	run->AddTask(Fi4Cal2Hit);
 	/* ------------------------------------------------------ */
 
 	/* Initialize ------------------------------------------- */
 	run->Init();
-	FairLogger::GetLogger()->SetLogScreenLevel("INFO");
+	FairLogger::GetLogger()->SetLogScreenLevel("WARNING");
 	/* ------------------------------------------------------ */
 
 	/* Runtime data base ------------------------------------ */

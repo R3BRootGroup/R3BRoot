@@ -25,6 +25,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/starttrackerData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData  
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mfiData  
+${R3BROOT_SOURCE_DIR}/r3bdata/fi4Data  
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData  
 ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 ${R3BROOT_SOURCE_DIR}/r3bdata/actarData
@@ -90,6 +91,7 @@ mfiData/R3BMfiPoint.cxx
 mfiData/R3BMfiDigi.cxx 
 pspData/R3BPspPoint.cxx
 pspData/R3BPspDigi.cxx
+
 neulandData/R3BNeulandUnpackData.cxx
 neulandData/R3BNeulandMappedData.cxx
 neulandData/R3BNeulandCalData.cxx
@@ -101,6 +103,10 @@ losData/R3BLosCalData.cxx
 losData/R3BLosHitData.cxx
 neulandData/R3BPaddleTamexMappedData.cxx
 tofData/R3BPaddleCalData.cxx
+fi4Data/R3BFi4MappedItem.cxx
+fi4Data/R3BFi4CalItem.cxx
+fi4Data/R3BFi4HitItem.cxx
+
 )
 
 
