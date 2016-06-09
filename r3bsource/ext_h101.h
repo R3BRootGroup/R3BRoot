@@ -32,176 +32,2466 @@ typedef struct EXT_STR_h101_t
   uint32_t TRIGGER /* [0,15] */;
   uint32_t EVENTNO /* [-1,-1] */;
   /* RAW */
-  uint32_t LOS1TFM /* [1,4] */;
-  uint32_t LOS1TFMI[4 EXT_STRUCT_CTRL(LOS1TFM)] /* [1,4] */;
-  uint32_t LOS1TFME[4 EXT_STRUCT_CTRL(LOS1TFM)] /* [1,40] */;
-  uint32_t LOS1TF /* [0,40] */;
-  uint32_t LOS1TFv[40 EXT_STRUCT_CTRL(LOS1TF)] /* [0,65535] */;
-  uint32_t LOS1TCM /* [1,4] */;
-  uint32_t LOS1TCMI[4 EXT_STRUCT_CTRL(LOS1TCM)] /* [1,4] */;
-  uint32_t LOS1TCME[4 EXT_STRUCT_CTRL(LOS1TCM)] /* [1,40] */;
-  uint32_t LOS1TC /* [0,40] */;
-  uint32_t LOS1TCv[40 EXT_STRUCT_CTRL(LOS1TC)] /* [0,65535] */;
-  uint32_t TOFD_P1T1TFLM /* [1,6] */;
-  uint32_t TOFD_P1T1TFLMI[6 EXT_STRUCT_CTRL(TOFD_P1T1TFLM)] /* [1,6] */;
-  uint32_t TOFD_P1T1TFLME[6 EXT_STRUCT_CTRL(TOFD_P1T1TFLM)] /* [1,60] */;
-  uint32_t TOFD_P1T1TFL /* [0,60] */;
-  uint32_t TOFD_P1T1TFLv[60 EXT_STRUCT_CTRL(TOFD_P1T1TFL)] /* [0,65535] */;
-  uint32_t TOFD_P1T1TFTM /* [1,6] */;
-  uint32_t TOFD_P1T1TFTMI[6 EXT_STRUCT_CTRL(TOFD_P1T1TFTM)] /* [1,6] */;
-  uint32_t TOFD_P1T1TFTME[6 EXT_STRUCT_CTRL(TOFD_P1T1TFTM)] /* [1,60] */;
-  uint32_t TOFD_P1T1TFT /* [0,60] */;
-  uint32_t TOFD_P1T1TFTv[60 EXT_STRUCT_CTRL(TOFD_P1T1TFT)] /* [0,65535] */;
-  uint32_t TOFD_P1T1TCLM /* [1,6] */;
-  uint32_t TOFD_P1T1TCLMI[6 EXT_STRUCT_CTRL(TOFD_P1T1TCLM)] /* [1,6] */;
-  uint32_t TOFD_P1T1TCLME[6 EXT_STRUCT_CTRL(TOFD_P1T1TCLM)] /* [1,60] */;
-  uint32_t TOFD_P1T1TCL /* [0,60] */;
-  uint32_t TOFD_P1T1TCLv[60 EXT_STRUCT_CTRL(TOFD_P1T1TCL)] /* [0,65535] */;
-  uint32_t TOFD_P1T1TCTM /* [1,6] */;
-  uint32_t TOFD_P1T1TCTMI[6 EXT_STRUCT_CTRL(TOFD_P1T1TCTM)] /* [1,6] */;
-  uint32_t TOFD_P1T1TCTME[6 EXT_STRUCT_CTRL(TOFD_P1T1TCTM)] /* [1,60] */;
-  uint32_t TOFD_P1T1TCT /* [0,60] */;
-  uint32_t TOFD_P1T1TCTv[60 EXT_STRUCT_CTRL(TOFD_P1T1TCT)] /* [0,65535] */;
-  uint32_t TOFD_P1T2TFLM /* [1,6] */;
-  uint32_t TOFD_P1T2TFLMI[6 EXT_STRUCT_CTRL(TOFD_P1T2TFLM)] /* [1,6] */;
-  uint32_t TOFD_P1T2TFLME[6 EXT_STRUCT_CTRL(TOFD_P1T2TFLM)] /* [1,60] */;
-  uint32_t TOFD_P1T2TFL /* [0,60] */;
-  uint32_t TOFD_P1T2TFLv[60 EXT_STRUCT_CTRL(TOFD_P1T2TFL)] /* [0,65535] */;
-  uint32_t TOFD_P1T2TFTM /* [1,6] */;
-  uint32_t TOFD_P1T2TFTMI[6 EXT_STRUCT_CTRL(TOFD_P1T2TFTM)] /* [1,6] */;
-  uint32_t TOFD_P1T2TFTME[6 EXT_STRUCT_CTRL(TOFD_P1T2TFTM)] /* [1,60] */;
-  uint32_t TOFD_P1T2TFT /* [0,60] */;
-  uint32_t TOFD_P1T2TFTv[60 EXT_STRUCT_CTRL(TOFD_P1T2TFT)] /* [0,65535] */;
-  uint32_t TOFD_P1T2TCLM /* [1,6] */;
-  uint32_t TOFD_P1T2TCLMI[6 EXT_STRUCT_CTRL(TOFD_P1T2TCLM)] /* [1,6] */;
-  uint32_t TOFD_P1T2TCLME[6 EXT_STRUCT_CTRL(TOFD_P1T2TCLM)] /* [1,60] */;
-  uint32_t TOFD_P1T2TCL /* [0,60] */;
-  uint32_t TOFD_P1T2TCLv[60 EXT_STRUCT_CTRL(TOFD_P1T2TCL)] /* [0,65535] */;
-  uint32_t TOFD_P1T2TCTM /* [1,6] */;
-  uint32_t TOFD_P1T2TCTMI[6 EXT_STRUCT_CTRL(TOFD_P1T2TCTM)] /* [1,6] */;
-  uint32_t TOFD_P1T2TCTME[6 EXT_STRUCT_CTRL(TOFD_P1T2TCTM)] /* [1,60] */;
-  uint32_t TOFD_P1T2TCT /* [0,60] */;
-  uint32_t TOFD_P1T2TCTv[60 EXT_STRUCT_CTRL(TOFD_P1T2TCT)] /* [0,65535] */;
-  uint32_t TOFD_P2T1TFLM /* [1,6] */;
-  uint32_t TOFD_P2T1TFLMI[6 EXT_STRUCT_CTRL(TOFD_P2T1TFLM)] /* [1,6] */;
-  uint32_t TOFD_P2T1TFLME[6 EXT_STRUCT_CTRL(TOFD_P2T1TFLM)] /* [1,60] */;
-  uint32_t TOFD_P2T1TFL /* [0,60] */;
-  uint32_t TOFD_P2T1TFLv[60 EXT_STRUCT_CTRL(TOFD_P2T1TFL)] /* [0,65535] */;
-  uint32_t TOFD_P2T1TFTM /* [1,6] */;
-  uint32_t TOFD_P2T1TFTMI[6 EXT_STRUCT_CTRL(TOFD_P2T1TFTM)] /* [1,6] */;
-  uint32_t TOFD_P2T1TFTME[6 EXT_STRUCT_CTRL(TOFD_P2T1TFTM)] /* [1,60] */;
-  uint32_t TOFD_P2T1TFT /* [0,60] */;
-  uint32_t TOFD_P2T1TFTv[60 EXT_STRUCT_CTRL(TOFD_P2T1TFT)] /* [0,65535] */;
-  uint32_t TOFD_P2T1TCLM /* [1,6] */;
-  uint32_t TOFD_P2T1TCLMI[6 EXT_STRUCT_CTRL(TOFD_P2T1TCLM)] /* [1,6] */;
-  uint32_t TOFD_P2T1TCLME[6 EXT_STRUCT_CTRL(TOFD_P2T1TCLM)] /* [1,60] */;
-  uint32_t TOFD_P2T1TCL /* [0,60] */;
-  uint32_t TOFD_P2T1TCLv[60 EXT_STRUCT_CTRL(TOFD_P2T1TCL)] /* [0,65535] */;
-  uint32_t TOFD_P2T1TCTM /* [1,6] */;
-  uint32_t TOFD_P2T1TCTMI[6 EXT_STRUCT_CTRL(TOFD_P2T1TCTM)] /* [1,6] */;
-  uint32_t TOFD_P2T1TCTME[6 EXT_STRUCT_CTRL(TOFD_P2T1TCTM)] /* [1,60] */;
-  uint32_t TOFD_P2T1TCT /* [0,60] */;
-  uint32_t TOFD_P2T1TCTv[60 EXT_STRUCT_CTRL(TOFD_P2T1TCT)] /* [0,65535] */;
-  uint32_t TOFD_P2T2TFLM /* [1,6] */;
-  uint32_t TOFD_P2T2TFLMI[6 EXT_STRUCT_CTRL(TOFD_P2T2TFLM)] /* [1,6] */;
-  uint32_t TOFD_P2T2TFLME[6 EXT_STRUCT_CTRL(TOFD_P2T2TFLM)] /* [1,60] */;
-  uint32_t TOFD_P2T2TFL /* [0,60] */;
-  uint32_t TOFD_P2T2TFLv[60 EXT_STRUCT_CTRL(TOFD_P2T2TFL)] /* [0,65535] */;
-  uint32_t TOFD_P2T2TFTM /* [1,6] */;
-  uint32_t TOFD_P2T2TFTMI[6 EXT_STRUCT_CTRL(TOFD_P2T2TFTM)] /* [1,6] */;
-  uint32_t TOFD_P2T2TFTME[6 EXT_STRUCT_CTRL(TOFD_P2T2TFTM)] /* [1,60] */;
-  uint32_t TOFD_P2T2TFT /* [0,60] */;
-  uint32_t TOFD_P2T2TFTv[60 EXT_STRUCT_CTRL(TOFD_P2T2TFT)] /* [0,65535] */;
-  uint32_t TOFD_P2T2TCLM /* [1,6] */;
-  uint32_t TOFD_P2T2TCLMI[6 EXT_STRUCT_CTRL(TOFD_P2T2TCLM)] /* [1,6] */;
-  uint32_t TOFD_P2T2TCLME[6 EXT_STRUCT_CTRL(TOFD_P2T2TCLM)] /* [1,60] */;
-  uint32_t TOFD_P2T2TCL /* [0,60] */;
-  uint32_t TOFD_P2T2TCLv[60 EXT_STRUCT_CTRL(TOFD_P2T2TCL)] /* [0,65535] */;
-  uint32_t TOFD_P2T2TCTM /* [1,6] */;
-  uint32_t TOFD_P2T2TCTMI[6 EXT_STRUCT_CTRL(TOFD_P2T2TCTM)] /* [1,6] */;
-  uint32_t TOFD_P2T2TCTME[6 EXT_STRUCT_CTRL(TOFD_P2T2TCTM)] /* [1,60] */;
-  uint32_t TOFD_P2T2TCT /* [0,60] */;
-  uint32_t TOFD_P2T2TCTv[60 EXT_STRUCT_CTRL(TOFD_P2T2TCT)] /* [0,65535] */;
-  uint32_t TOFD_P3T1TFLM /* [1,6] */;
-  uint32_t TOFD_P3T1TFLMI[6 EXT_STRUCT_CTRL(TOFD_P3T1TFLM)] /* [1,6] */;
-  uint32_t TOFD_P3T1TFLME[6 EXT_STRUCT_CTRL(TOFD_P3T1TFLM)] /* [1,60] */;
-  uint32_t TOFD_P3T1TFL /* [0,60] */;
-  uint32_t TOFD_P3T1TFLv[60 EXT_STRUCT_CTRL(TOFD_P3T1TFL)] /* [0,65535] */;
-  uint32_t TOFD_P3T1TFTM /* [1,6] */;
-  uint32_t TOFD_P3T1TFTMI[6 EXT_STRUCT_CTRL(TOFD_P3T1TFTM)] /* [1,6] */;
-  uint32_t TOFD_P3T1TFTME[6 EXT_STRUCT_CTRL(TOFD_P3T1TFTM)] /* [1,60] */;
-  uint32_t TOFD_P3T1TFT /* [0,60] */;
-  uint32_t TOFD_P3T1TFTv[60 EXT_STRUCT_CTRL(TOFD_P3T1TFT)] /* [0,65535] */;
-  uint32_t TOFD_P3T1TCLM /* [1,6] */;
-  uint32_t TOFD_P3T1TCLMI[6 EXT_STRUCT_CTRL(TOFD_P3T1TCLM)] /* [1,6] */;
-  uint32_t TOFD_P3T1TCLME[6 EXT_STRUCT_CTRL(TOFD_P3T1TCLM)] /* [1,60] */;
-  uint32_t TOFD_P3T1TCL /* [0,60] */;
-  uint32_t TOFD_P3T1TCLv[60 EXT_STRUCT_CTRL(TOFD_P3T1TCL)] /* [0,65535] */;
-  uint32_t TOFD_P3T1TCTM /* [1,6] */;
-  uint32_t TOFD_P3T1TCTMI[6 EXT_STRUCT_CTRL(TOFD_P3T1TCTM)] /* [1,6] */;
-  uint32_t TOFD_P3T1TCTME[6 EXT_STRUCT_CTRL(TOFD_P3T1TCTM)] /* [1,60] */;
-  uint32_t TOFD_P3T1TCT /* [0,60] */;
-  uint32_t TOFD_P3T1TCTv[60 EXT_STRUCT_CTRL(TOFD_P3T1TCT)] /* [0,65535] */;
-  uint32_t TOFD_P3T2TFLM /* [1,6] */;
-  uint32_t TOFD_P3T2TFLMI[6 EXT_STRUCT_CTRL(TOFD_P3T2TFLM)] /* [1,6] */;
-  uint32_t TOFD_P3T2TFLME[6 EXT_STRUCT_CTRL(TOFD_P3T2TFLM)] /* [1,60] */;
-  uint32_t TOFD_P3T2TFL /* [0,60] */;
-  uint32_t TOFD_P3T2TFLv[60 EXT_STRUCT_CTRL(TOFD_P3T2TFL)] /* [0,65535] */;
-  uint32_t TOFD_P3T2TFTM /* [1,6] */;
-  uint32_t TOFD_P3T2TFTMI[6 EXT_STRUCT_CTRL(TOFD_P3T2TFTM)] /* [1,6] */;
-  uint32_t TOFD_P3T2TFTME[6 EXT_STRUCT_CTRL(TOFD_P3T2TFTM)] /* [1,60] */;
-  uint32_t TOFD_P3T2TFT /* [0,60] */;
-  uint32_t TOFD_P3T2TFTv[60 EXT_STRUCT_CTRL(TOFD_P3T2TFT)] /* [0,65535] */;
-  uint32_t TOFD_P3T2TCLM /* [1,6] */;
-  uint32_t TOFD_P3T2TCLMI[6 EXT_STRUCT_CTRL(TOFD_P3T2TCLM)] /* [1,6] */;
-  uint32_t TOFD_P3T2TCLME[6 EXT_STRUCT_CTRL(TOFD_P3T2TCLM)] /* [1,60] */;
-  uint32_t TOFD_P3T2TCL /* [0,60] */;
-  uint32_t TOFD_P3T2TCLv[60 EXT_STRUCT_CTRL(TOFD_P3T2TCL)] /* [0,65535] */;
-  uint32_t TOFD_P3T2TCTM /* [1,6] */;
-  uint32_t TOFD_P3T2TCTMI[6 EXT_STRUCT_CTRL(TOFD_P3T2TCTM)] /* [1,6] */;
-  uint32_t TOFD_P3T2TCTME[6 EXT_STRUCT_CTRL(TOFD_P3T2TCTM)] /* [1,60] */;
-  uint32_t TOFD_P3T2TCT /* [0,60] */;
-  uint32_t TOFD_P3T2TCTv[60 EXT_STRUCT_CTRL(TOFD_P3T2TCT)] /* [0,65535] */;
-  uint32_t TOFD_P4T1TFLM /* [1,6] */;
-  uint32_t TOFD_P4T1TFLMI[6 EXT_STRUCT_CTRL(TOFD_P4T1TFLM)] /* [1,6] */;
-  uint32_t TOFD_P4T1TFLME[6 EXT_STRUCT_CTRL(TOFD_P4T1TFLM)] /* [1,60] */;
-  uint32_t TOFD_P4T1TFL /* [0,60] */;
-  uint32_t TOFD_P4T1TFLv[60 EXT_STRUCT_CTRL(TOFD_P4T1TFL)] /* [0,65535] */;
-  uint32_t TOFD_P4T1TFTM /* [1,6] */;
-  uint32_t TOFD_P4T1TFTMI[6 EXT_STRUCT_CTRL(TOFD_P4T1TFTM)] /* [1,6] */;
-  uint32_t TOFD_P4T1TFTME[6 EXT_STRUCT_CTRL(TOFD_P4T1TFTM)] /* [1,60] */;
-  uint32_t TOFD_P4T1TFT /* [0,60] */;
-  uint32_t TOFD_P4T1TFTv[60 EXT_STRUCT_CTRL(TOFD_P4T1TFT)] /* [0,65535] */;
-  uint32_t TOFD_P4T1TCLM /* [1,6] */;
-  uint32_t TOFD_P4T1TCLMI[6 EXT_STRUCT_CTRL(TOFD_P4T1TCLM)] /* [1,6] */;
-  uint32_t TOFD_P4T1TCLME[6 EXT_STRUCT_CTRL(TOFD_P4T1TCLM)] /* [1,60] */;
-  uint32_t TOFD_P4T1TCL /* [0,60] */;
-  uint32_t TOFD_P4T1TCLv[60 EXT_STRUCT_CTRL(TOFD_P4T1TCL)] /* [0,65535] */;
-  uint32_t TOFD_P4T1TCTM /* [1,6] */;
-  uint32_t TOFD_P4T1TCTMI[6 EXT_STRUCT_CTRL(TOFD_P4T1TCTM)] /* [1,6] */;
-  uint32_t TOFD_P4T1TCTME[6 EXT_STRUCT_CTRL(TOFD_P4T1TCTM)] /* [1,60] */;
-  uint32_t TOFD_P4T1TCT /* [0,60] */;
-  uint32_t TOFD_P4T1TCTv[60 EXT_STRUCT_CTRL(TOFD_P4T1TCT)] /* [0,65535] */;
-  uint32_t TOFD_P4T2TFLM /* [1,6] */;
-  uint32_t TOFD_P4T2TFLMI[6 EXT_STRUCT_CTRL(TOFD_P4T2TFLM)] /* [1,6] */;
-  uint32_t TOFD_P4T2TFLME[6 EXT_STRUCT_CTRL(TOFD_P4T2TFLM)] /* [1,60] */;
-  uint32_t TOFD_P4T2TFL /* [0,60] */;
-  uint32_t TOFD_P4T2TFLv[60 EXT_STRUCT_CTRL(TOFD_P4T2TFL)] /* [0,65535] */;
-  uint32_t TOFD_P4T2TFTM /* [1,6] */;
-  uint32_t TOFD_P4T2TFTMI[6 EXT_STRUCT_CTRL(TOFD_P4T2TFTM)] /* [1,6] */;
-  uint32_t TOFD_P4T2TFTME[6 EXT_STRUCT_CTRL(TOFD_P4T2TFTM)] /* [1,60] */;
-  uint32_t TOFD_P4T2TFT /* [0,60] */;
-  uint32_t TOFD_P4T2TFTv[60 EXT_STRUCT_CTRL(TOFD_P4T2TFT)] /* [0,65535] */;
-  uint32_t TOFD_P4T2TCLM /* [1,6] */;
-  uint32_t TOFD_P4T2TCLMI[6 EXT_STRUCT_CTRL(TOFD_P4T2TCLM)] /* [1,6] */;
-  uint32_t TOFD_P4T2TCLME[6 EXT_STRUCT_CTRL(TOFD_P4T2TCLM)] /* [1,60] */;
-  uint32_t TOFD_P4T2TCL /* [0,60] */;
-  uint32_t TOFD_P4T2TCLv[60 EXT_STRUCT_CTRL(TOFD_P4T2TCL)] /* [0,65535] */;
-  uint32_t TOFD_P4T2TCTM /* [1,6] */;
-  uint32_t TOFD_P4T2TCTMI[6 EXT_STRUCT_CTRL(TOFD_P4T2TCTM)] /* [1,6] */;
-  uint32_t TOFD_P4T2TCTME[6 EXT_STRUCT_CTRL(TOFD_P4T2TCTM)] /* [1,60] */;
-  uint32_t TOFD_P4T2TCT /* [0,60] */;
-  uint32_t TOFD_P4T2TCTv[60 EXT_STRUCT_CTRL(TOFD_P4T2TCT)] /* [0,65535] */;
+  uint32_t LOS1_1TF /* [-1,-1] */;
+  uint32_t LOS1_1TC /* [-1,-1] */;
+  uint32_t LOS1_2TF /* [-1,-1] */;
+  uint32_t LOS1_2TC /* [-1,-1] */;
+  uint32_t LOS1_3TF /* [-1,-1] */;
+  uint32_t LOS1_3TC /* [-1,-1] */;
+  uint32_t LOS1_4TF /* [-1,-1] */;
+  uint32_t LOS1_4TC /* [-1,-1] */;
+  uint32_t LOS1_5TF /* [-1,-1] */;
+  uint32_t LOS1_5TC /* [-1,-1] */;
+  uint32_t LOS2_1TF /* [-1,-1] */;
+  uint32_t LOS2_1TC /* [-1,-1] */;
+  uint32_t LOS2_2TF /* [-1,-1] */;
+  uint32_t LOS2_2TC /* [-1,-1] */;
+  uint32_t LOS2_3TF /* [-1,-1] */;
+  uint32_t LOS2_3TC /* [-1,-1] */;
+  uint32_t LOS2_4TF /* [-1,-1] */;
+  uint32_t LOS2_4TC /* [-1,-1] */;
+  uint32_t LOS2_5TF /* [-1,-1] */;
+  uint32_t LOS2_5TC /* [-1,-1] */;
+  uint32_t ROLU1_1T /* [-1,-1] */;
+  uint32_t ROLU1_2T /* [-1,-1] */;
+  uint32_t ROLU1_3T /* [-1,-1] */;
+  uint32_t ROLU1_4T /* [-1,-1] */;
+  uint32_t ROLU2_1T /* [-1,-1] */;
+  uint32_t ROLU2_2T /* [-1,-1] */;
+  uint32_t ROLU2_3T /* [-1,-1] */;
+  uint32_t ROLU2_4T /* [-1,-1] */;
+  uint32_t TOF1 /* [0,16777215] */;
+  uint32_t TOF2 /* [0,16777215] */;
+  uint32_t TOF3 /* [0,16777215] */;
+  uint32_t TOF4 /* [0,16777215] */;
+  uint32_t TOF5 /* [0,16777215] */;
+  uint32_t TOF6 /* [0,16777215] */;
+  uint32_t TOF7 /* [0,16777215] */;
+  uint32_t TOF8 /* [0,16777215] */;
+  uint32_t TOF9 /* [0,16777215] */;
+  uint32_t TOF10 /* [0,16777215] */;
+  uint32_t TOF11 /* [0,16777215] */;
+  uint32_t TOF12 /* [0,16777215] */;
+  uint32_t TOF13 /* [0,16777215] */;
+  uint32_t TOF14 /* [0,16777215] */;
+  uint32_t TOF15 /* [0,16777215] */;
+  uint32_t TOF16 /* [0,16777215] */;
+  uint32_t TOF17 /* [0,16777215] */;
+  uint32_t TOF18 /* [0,16777215] */;
+  uint32_t TOF19 /* [0,16777215] */;
+  uint32_t TOF20 /* [0,16777215] */;
+  uint32_t TOF21 /* [0,16777215] */;
+  uint32_t TOF22 /* [0,16777215] */;
+  uint32_t TOF23 /* [0,16777215] */;
+  uint32_t TOF24 /* [0,16777215] */;
+  uint32_t TOF25 /* [0,16777215] */;
+  uint32_t TOF26 /* [0,16777215] */;
+  uint32_t TOF27 /* [0,16777215] */;
+  uint32_t TOF28 /* [0,16777215] */;
+  uint32_t TOF29 /* [0,16777215] */;
+  uint32_t TOF30 /* [0,16777215] */;
+  uint32_t TOF31 /* [0,16777215] */;
+  uint32_t TOF32 /* [0,16777215] */;
+  uint32_t NNP1_1_1TAC /* [0,65535] */;
+  uint32_t NNP1_1_1CLK /* [0,65535] */;
+  uint32_t NNP1_1_1ADC /* [0,65535] */;
+  uint32_t NNP1_1_2TAC /* [0,65535] */;
+  uint32_t NNP1_1_2CLK /* [0,65535] */;
+  uint32_t NNP1_1_2ADC /* [0,65535] */;
+  uint32_t NNP1_2_1TAC /* [0,65535] */;
+  uint32_t NNP1_2_1CLK /* [0,65535] */;
+  uint32_t NNP1_2_1ADC /* [0,65535] */;
+  uint32_t NNP1_2_2TAC /* [0,65535] */;
+  uint32_t NNP1_2_2CLK /* [0,65535] */;
+  uint32_t NNP1_2_2ADC /* [0,65535] */;
+  uint32_t NNP1_3_1TAC /* [0,65535] */;
+  uint32_t NNP1_3_1CLK /* [0,65535] */;
+  uint32_t NNP1_3_1ADC /* [0,65535] */;
+  uint32_t NNP1_3_2TAC /* [0,65535] */;
+  uint32_t NNP1_3_2CLK /* [0,65535] */;
+  uint32_t NNP1_3_2ADC /* [0,65535] */;
+  uint32_t NNP1_4_1TAC /* [0,65535] */;
+  uint32_t NNP1_4_1CLK /* [0,65535] */;
+  uint32_t NNP1_4_1ADC /* [0,65535] */;
+  uint32_t NNP1_4_2TAC /* [0,65535] */;
+  uint32_t NNP1_4_2CLK /* [0,65535] */;
+  uint32_t NNP1_4_2ADC /* [0,65535] */;
+  uint32_t NNP1_5_1TAC /* [0,65535] */;
+  uint32_t NNP1_5_1CLK /* [0,65535] */;
+  uint32_t NNP1_5_1ADC /* [0,65535] */;
+  uint32_t NNP1_5_2TAC /* [0,65535] */;
+  uint32_t NNP1_5_2CLK /* [0,65535] */;
+  uint32_t NNP1_5_2ADC /* [0,65535] */;
+  uint32_t NNP1_6_1TAC /* [0,65535] */;
+  uint32_t NNP1_6_1CLK /* [0,65535] */;
+  uint32_t NNP1_6_1ADC /* [0,65535] */;
+  uint32_t NNP1_6_2TAC /* [0,65535] */;
+  uint32_t NNP1_6_2CLK /* [0,65535] */;
+  uint32_t NNP1_6_2ADC /* [0,65535] */;
+  uint32_t NNP1_7_1TAC /* [0,65535] */;
+  uint32_t NNP1_7_1CLK /* [0,65535] */;
+  uint32_t NNP1_7_1ADC /* [0,65535] */;
+  uint32_t NNP1_7_2TAC /* [0,65535] */;
+  uint32_t NNP1_7_2CLK /* [0,65535] */;
+  uint32_t NNP1_7_2ADC /* [0,65535] */;
+  uint32_t NNP1_8_1TAC /* [0,65535] */;
+  uint32_t NNP1_8_1CLK /* [0,65535] */;
+  uint32_t NNP1_8_1ADC /* [0,65535] */;
+  uint32_t NNP1_8_2TAC /* [0,65535] */;
+  uint32_t NNP1_8_2CLK /* [0,65535] */;
+  uint32_t NNP1_8_2ADC /* [0,65535] */;
+  uint32_t NNP1_9_1TAC /* [0,65535] */;
+  uint32_t NNP1_9_1CLK /* [0,65535] */;
+  uint32_t NNP1_9_1ADC /* [0,65535] */;
+  uint32_t NNP1_9_2TAC /* [0,65535] */;
+  uint32_t NNP1_9_2CLK /* [0,65535] */;
+  uint32_t NNP1_9_2ADC /* [0,65535] */;
+  uint32_t NNP1_10_1TAC /* [0,65535] */;
+  uint32_t NNP1_10_1CLK /* [0,65535] */;
+  uint32_t NNP1_10_1ADC /* [0,65535] */;
+  uint32_t NNP1_10_2TAC /* [0,65535] */;
+  uint32_t NNP1_10_2CLK /* [0,65535] */;
+  uint32_t NNP1_10_2ADC /* [0,65535] */;
+  uint32_t NNP1_11_1TAC /* [0,65535] */;
+  uint32_t NNP1_11_1CLK /* [0,65535] */;
+  uint32_t NNP1_11_1ADC /* [0,65535] */;
+  uint32_t NNP1_11_2TAC /* [0,65535] */;
+  uint32_t NNP1_11_2CLK /* [0,65535] */;
+  uint32_t NNP1_11_2ADC /* [0,65535] */;
+  uint32_t NNP1_12_1TAC /* [0,65535] */;
+  uint32_t NNP1_12_1CLK /* [0,65535] */;
+  uint32_t NNP1_12_1ADC /* [0,65535] */;
+  uint32_t NNP1_12_2TAC /* [0,65535] */;
+  uint32_t NNP1_12_2CLK /* [0,65535] */;
+  uint32_t NNP1_12_2ADC /* [0,65535] */;
+  uint32_t NNP1_13_1TAC /* [0,65535] */;
+  uint32_t NNP1_13_1CLK /* [0,65535] */;
+  uint32_t NNP1_13_1ADC /* [0,65535] */;
+  uint32_t NNP1_13_2TAC /* [0,65535] */;
+  uint32_t NNP1_13_2CLK /* [0,65535] */;
+  uint32_t NNP1_13_2ADC /* [0,65535] */;
+  uint32_t NNP1_14_1TAC /* [0,65535] */;
+  uint32_t NNP1_14_1CLK /* [0,65535] */;
+  uint32_t NNP1_14_1ADC /* [0,65535] */;
+  uint32_t NNP1_14_2TAC /* [0,65535] */;
+  uint32_t NNP1_14_2CLK /* [0,65535] */;
+  uint32_t NNP1_14_2ADC /* [0,65535] */;
+  uint32_t NNP1_15_1TAC /* [0,65535] */;
+  uint32_t NNP1_15_1CLK /* [0,65535] */;
+  uint32_t NNP1_15_1ADC /* [0,65535] */;
+  uint32_t NNP1_15_2TAC /* [0,65535] */;
+  uint32_t NNP1_15_2CLK /* [0,65535] */;
+  uint32_t NNP1_15_2ADC /* [0,65535] */;
+  uint32_t NNP1_16_1TAC /* [0,65535] */;
+  uint32_t NNP1_16_1CLK /* [0,65535] */;
+  uint32_t NNP1_16_1ADC /* [0,65535] */;
+  uint32_t NNP1_16_2TAC /* [0,65535] */;
+  uint32_t NNP1_16_2CLK /* [0,65535] */;
+  uint32_t NNP1_16_2ADC /* [0,65535] */;
+  uint32_t NNP1_17_1TAC /* [0,65535] */;
+  uint32_t NNP1_17_1CLK /* [0,65535] */;
+  uint32_t NNP1_17_1ADC /* [0,65535] */;
+  uint32_t NNP1_17_2TAC /* [0,65535] */;
+  uint32_t NNP1_17_2CLK /* [0,65535] */;
+  uint32_t NNP1_17_2ADC /* [0,65535] */;
+  uint32_t NNP1_18_1TAC /* [0,65535] */;
+  uint32_t NNP1_18_1CLK /* [0,65535] */;
+  uint32_t NNP1_18_1ADC /* [0,65535] */;
+  uint32_t NNP1_18_2TAC /* [0,65535] */;
+  uint32_t NNP1_18_2CLK /* [0,65535] */;
+  uint32_t NNP1_18_2ADC /* [0,65535] */;
+  uint32_t NNP1_19_1TAC /* [0,65535] */;
+  uint32_t NNP1_19_1CLK /* [0,65535] */;
+  uint32_t NNP1_19_1ADC /* [0,65535] */;
+  uint32_t NNP1_19_2TAC /* [0,65535] */;
+  uint32_t NNP1_19_2CLK /* [0,65535] */;
+  uint32_t NNP1_19_2ADC /* [0,65535] */;
+  uint32_t NNP1_20_1TAC /* [0,65535] */;
+  uint32_t NNP1_20_1CLK /* [0,65535] */;
+  uint32_t NNP1_20_1ADC /* [0,65535] */;
+  uint32_t NNP1_20_2TAC /* [0,65535] */;
+  uint32_t NNP1_20_2CLK /* [0,65535] */;
+  uint32_t NNP1_20_2ADC /* [0,65535] */;
+  uint32_t NNP1_21_1TAC /* [0,65535] */;
+  uint32_t NNP1_21_1CLK /* [0,65535] */;
+  uint32_t NNP1_21_1ADC /* [0,65535] */;
+  uint32_t NNP1_21_2TAC /* [0,65535] */;
+  uint32_t NNP1_21_2CLK /* [0,65535] */;
+  uint32_t NNP1_21_2ADC /* [0,65535] */;
+  uint32_t NNP1_22_1TAC /* [0,65535] */;
+  uint32_t NNP1_22_1CLK /* [0,65535] */;
+  uint32_t NNP1_22_1ADC /* [0,65535] */;
+  uint32_t NNP1_22_2TAC /* [0,65535] */;
+  uint32_t NNP1_22_2CLK /* [0,65535] */;
+  uint32_t NNP1_22_2ADC /* [0,65535] */;
+  uint32_t NNP1_23_1TAC /* [0,65535] */;
+  uint32_t NNP1_23_1CLK /* [0,65535] */;
+  uint32_t NNP1_23_1ADC /* [0,65535] */;
+  uint32_t NNP1_23_2TAC /* [0,65535] */;
+  uint32_t NNP1_23_2CLK /* [0,65535] */;
+  uint32_t NNP1_23_2ADC /* [0,65535] */;
+  uint32_t NNP1_24_1TAC /* [0,65535] */;
+  uint32_t NNP1_24_1CLK /* [0,65535] */;
+  uint32_t NNP1_24_1ADC /* [0,65535] */;
+  uint32_t NNP1_24_2TAC /* [0,65535] */;
+  uint32_t NNP1_24_2CLK /* [0,65535] */;
+  uint32_t NNP1_24_2ADC /* [0,65535] */;
+  uint32_t NNP1_25_1TAC /* [0,65535] */;
+  uint32_t NNP1_25_1CLK /* [0,65535] */;
+  uint32_t NNP1_25_1ADC /* [0,65535] */;
+  uint32_t NNP1_25_2TAC /* [0,65535] */;
+  uint32_t NNP1_25_2CLK /* [0,65535] */;
+  uint32_t NNP1_25_2ADC /* [0,65535] */;
+  uint32_t NNP1_26_1TAC /* [0,65535] */;
+  uint32_t NNP1_26_1CLK /* [0,65535] */;
+  uint32_t NNP1_26_1ADC /* [0,65535] */;
+  uint32_t NNP1_26_2TAC /* [0,65535] */;
+  uint32_t NNP1_26_2CLK /* [0,65535] */;
+  uint32_t NNP1_26_2ADC /* [0,65535] */;
+  uint32_t NNP1_27_1TAC /* [0,65535] */;
+  uint32_t NNP1_27_1CLK /* [0,65535] */;
+  uint32_t NNP1_27_1ADC /* [0,65535] */;
+  uint32_t NNP1_27_2TAC /* [0,65535] */;
+  uint32_t NNP1_27_2CLK /* [0,65535] */;
+  uint32_t NNP1_27_2ADC /* [0,65535] */;
+  uint32_t NNP1_28_1TAC /* [0,65535] */;
+  uint32_t NNP1_28_1CLK /* [0,65535] */;
+  uint32_t NNP1_28_1ADC /* [0,65535] */;
+  uint32_t NNP1_28_2TAC /* [0,65535] */;
+  uint32_t NNP1_28_2CLK /* [0,65535] */;
+  uint32_t NNP1_28_2ADC /* [0,65535] */;
+  uint32_t NNP1_29_1TAC /* [0,65535] */;
+  uint32_t NNP1_29_1CLK /* [0,65535] */;
+  uint32_t NNP1_29_1ADC /* [0,65535] */;
+  uint32_t NNP1_29_2TAC /* [0,65535] */;
+  uint32_t NNP1_29_2CLK /* [0,65535] */;
+  uint32_t NNP1_29_2ADC /* [0,65535] */;
+  uint32_t NNP1_30_1TAC /* [0,65535] */;
+  uint32_t NNP1_30_1CLK /* [0,65535] */;
+  uint32_t NNP1_30_1ADC /* [0,65535] */;
+  uint32_t NNP1_30_2TAC /* [0,65535] */;
+  uint32_t NNP1_30_2CLK /* [0,65535] */;
+  uint32_t NNP1_30_2ADC /* [0,65535] */;
+  uint32_t NNP1_31_1TAC /* [0,65535] */;
+  uint32_t NNP1_31_1CLK /* [0,65535] */;
+  uint32_t NNP1_31_1ADC /* [0,65535] */;
+  uint32_t NNP1_31_2TAC /* [0,65535] */;
+  uint32_t NNP1_31_2CLK /* [0,65535] */;
+  uint32_t NNP1_31_2ADC /* [0,65535] */;
+  uint32_t NNP1_32_1TAC /* [0,65535] */;
+  uint32_t NNP1_32_1CLK /* [0,65535] */;
+  uint32_t NNP1_32_1ADC /* [0,65535] */;
+  uint32_t NNP1_32_2TAC /* [0,65535] */;
+  uint32_t NNP1_32_2CLK /* [0,65535] */;
+  uint32_t NNP1_32_2ADC /* [0,65535] */;
+  uint32_t NNP1_33_1TAC /* [0,65535] */;
+  uint32_t NNP1_33_1CLK /* [0,65535] */;
+  uint32_t NNP1_33_1ADC /* [0,65535] */;
+  uint32_t NNP1_33_2TAC /* [0,65535] */;
+  uint32_t NNP1_33_2CLK /* [0,65535] */;
+  uint32_t NNP1_33_2ADC /* [0,65535] */;
+  uint32_t NNP1_34_1TAC /* [0,65535] */;
+  uint32_t NNP1_34_1CLK /* [0,65535] */;
+  uint32_t NNP1_34_1ADC /* [0,65535] */;
+  uint32_t NNP1_34_2TAC /* [0,65535] */;
+  uint32_t NNP1_34_2CLK /* [0,65535] */;
+  uint32_t NNP1_34_2ADC /* [0,65535] */;
+  uint32_t NNP1_35_1TAC /* [0,65535] */;
+  uint32_t NNP1_35_1CLK /* [0,65535] */;
+  uint32_t NNP1_35_1ADC /* [0,65535] */;
+  uint32_t NNP1_35_2TAC /* [0,65535] */;
+  uint32_t NNP1_35_2CLK /* [0,65535] */;
+  uint32_t NNP1_35_2ADC /* [0,65535] */;
+  uint32_t NNP1_36_1TAC /* [0,65535] */;
+  uint32_t NNP1_36_1CLK /* [0,65535] */;
+  uint32_t NNP1_36_1ADC /* [0,65535] */;
+  uint32_t NNP1_36_2TAC /* [0,65535] */;
+  uint32_t NNP1_36_2CLK /* [0,65535] */;
+  uint32_t NNP1_36_2ADC /* [0,65535] */;
+  uint32_t NNP1_37_1TAC /* [0,65535] */;
+  uint32_t NNP1_37_1CLK /* [0,65535] */;
+  uint32_t NNP1_37_1ADC /* [0,65535] */;
+  uint32_t NNP1_37_2TAC /* [0,65535] */;
+  uint32_t NNP1_37_2CLK /* [0,65535] */;
+  uint32_t NNP1_37_2ADC /* [0,65535] */;
+  uint32_t NNP1_38_1TAC /* [0,65535] */;
+  uint32_t NNP1_38_1CLK /* [0,65535] */;
+  uint32_t NNP1_38_1ADC /* [0,65535] */;
+  uint32_t NNP1_38_2TAC /* [0,65535] */;
+  uint32_t NNP1_38_2CLK /* [0,65535] */;
+  uint32_t NNP1_38_2ADC /* [0,65535] */;
+  uint32_t NNP1_39_1TAC /* [0,65535] */;
+  uint32_t NNP1_39_1CLK /* [0,65535] */;
+  uint32_t NNP1_39_1ADC /* [0,65535] */;
+  uint32_t NNP1_39_2TAC /* [0,65535] */;
+  uint32_t NNP1_39_2CLK /* [0,65535] */;
+  uint32_t NNP1_39_2ADC /* [0,65535] */;
+  uint32_t NNP1_40_1TAC /* [0,65535] */;
+  uint32_t NNP1_40_1CLK /* [0,65535] */;
+  uint32_t NNP1_40_1ADC /* [0,65535] */;
+  uint32_t NNP1_40_2TAC /* [0,65535] */;
+  uint32_t NNP1_40_2CLK /* [0,65535] */;
+  uint32_t NNP1_40_2ADC /* [0,65535] */;
+  uint32_t NNP1_41_1TAC /* [0,65535] */;
+  uint32_t NNP1_41_1CLK /* [0,65535] */;
+  uint32_t NNP1_41_1ADC /* [0,65535] */;
+  uint32_t NNP1_41_2TAC /* [0,65535] */;
+  uint32_t NNP1_41_2CLK /* [0,65535] */;
+  uint32_t NNP1_41_2ADC /* [0,65535] */;
+  uint32_t NNP1_42_1TAC /* [0,65535] */;
+  uint32_t NNP1_42_1CLK /* [0,65535] */;
+  uint32_t NNP1_42_1ADC /* [0,65535] */;
+  uint32_t NNP1_42_2TAC /* [0,65535] */;
+  uint32_t NNP1_42_2CLK /* [0,65535] */;
+  uint32_t NNP1_42_2ADC /* [0,65535] */;
+  uint32_t NNP1_43_1TAC /* [0,65535] */;
+  uint32_t NNP1_43_1CLK /* [0,65535] */;
+  uint32_t NNP1_43_1ADC /* [0,65535] */;
+  uint32_t NNP1_43_2TAC /* [0,65535] */;
+  uint32_t NNP1_43_2CLK /* [0,65535] */;
+  uint32_t NNP1_43_2ADC /* [0,65535] */;
+  uint32_t NNP1_44_1TAC /* [0,65535] */;
+  uint32_t NNP1_44_1CLK /* [0,65535] */;
+  uint32_t NNP1_44_1ADC /* [0,65535] */;
+  uint32_t NNP1_44_2TAC /* [0,65535] */;
+  uint32_t NNP1_44_2CLK /* [0,65535] */;
+  uint32_t NNP1_44_2ADC /* [0,65535] */;
+  uint32_t NNP1_45_1TAC /* [0,65535] */;
+  uint32_t NNP1_45_1CLK /* [0,65535] */;
+  uint32_t NNP1_45_1ADC /* [0,65535] */;
+  uint32_t NNP1_45_2TAC /* [0,65535] */;
+  uint32_t NNP1_45_2CLK /* [0,65535] */;
+  uint32_t NNP1_45_2ADC /* [0,65535] */;
+  uint32_t NNP1_46_1TAC /* [0,65535] */;
+  uint32_t NNP1_46_1CLK /* [0,65535] */;
+  uint32_t NNP1_46_1ADC /* [0,65535] */;
+  uint32_t NNP1_46_2TAC /* [0,65535] */;
+  uint32_t NNP1_46_2CLK /* [0,65535] */;
+  uint32_t NNP1_46_2ADC /* [0,65535] */;
+  uint32_t NNP1_47_1TAC /* [0,65535] */;
+  uint32_t NNP1_47_1CLK /* [0,65535] */;
+  uint32_t NNP1_47_1ADC /* [0,65535] */;
+  uint32_t NNP1_47_2TAC /* [0,65535] */;
+  uint32_t NNP1_47_2CLK /* [0,65535] */;
+  uint32_t NNP1_47_2ADC /* [0,65535] */;
+  uint32_t NNP1_48_1TAC /* [0,65535] */;
+  uint32_t NNP1_48_1CLK /* [0,65535] */;
+  uint32_t NNP1_48_1ADC /* [0,65535] */;
+  uint32_t NNP1_48_2TAC /* [0,65535] */;
+  uint32_t NNP1_48_2CLK /* [0,65535] */;
+  uint32_t NNP1_48_2ADC /* [0,65535] */;
+  uint32_t NNP1_49_1TAC /* [0,65535] */;
+  uint32_t NNP1_49_1CLK /* [0,65535] */;
+  uint32_t NNP1_49_1ADC /* [0,65535] */;
+  uint32_t NNP1_49_2TAC /* [0,65535] */;
+  uint32_t NNP1_49_2CLK /* [0,65535] */;
+  uint32_t NNP1_49_2ADC /* [0,65535] */;
+  uint32_t NNP1_50_1TAC /* [0,65535] */;
+  uint32_t NNP1_50_1CLK /* [0,65535] */;
+  uint32_t NNP1_50_1ADC /* [0,65535] */;
+  uint32_t NNP1_50_2TAC /* [0,65535] */;
+  uint32_t NNP1_50_2CLK /* [0,65535] */;
+  uint32_t NNP1_50_2ADC /* [0,65535] */;
+  uint32_t NNP2_1_1TAC /* [0,65535] */;
+  uint32_t NNP2_1_1CLK /* [0,65535] */;
+  uint32_t NNP2_1_1ADC /* [0,65535] */;
+  uint32_t NNP2_1_2TAC /* [0,65535] */;
+  uint32_t NNP2_1_2CLK /* [0,65535] */;
+  uint32_t NNP2_1_2ADC /* [0,65535] */;
+  uint32_t NNP2_2_1TAC /* [0,65535] */;
+  uint32_t NNP2_2_1CLK /* [0,65535] */;
+  uint32_t NNP2_2_1ADC /* [0,65535] */;
+  uint32_t NNP2_2_2TAC /* [0,65535] */;
+  uint32_t NNP2_2_2CLK /* [0,65535] */;
+  uint32_t NNP2_2_2ADC /* [0,65535] */;
+  uint32_t NNP2_3_1TAC /* [0,65535] */;
+  uint32_t NNP2_3_1CLK /* [0,65535] */;
+  uint32_t NNP2_3_1ADC /* [0,65535] */;
+  uint32_t NNP2_3_2TAC /* [0,65535] */;
+  uint32_t NNP2_3_2CLK /* [0,65535] */;
+  uint32_t NNP2_3_2ADC /* [0,65535] */;
+  uint32_t NNP2_4_1TAC /* [0,65535] */;
+  uint32_t NNP2_4_1CLK /* [0,65535] */;
+  uint32_t NNP2_4_1ADC /* [0,65535] */;
+  uint32_t NNP2_4_2TAC /* [0,65535] */;
+  uint32_t NNP2_4_2CLK /* [0,65535] */;
+  uint32_t NNP2_4_2ADC /* [0,65535] */;
+  uint32_t NNP2_5_1TAC /* [0,65535] */;
+  uint32_t NNP2_5_1CLK /* [0,65535] */;
+  uint32_t NNP2_5_1ADC /* [0,65535] */;
+  uint32_t NNP2_5_2TAC /* [0,65535] */;
+  uint32_t NNP2_5_2CLK /* [0,65535] */;
+  uint32_t NNP2_5_2ADC /* [0,65535] */;
+  uint32_t NNP2_6_1TAC /* [0,65535] */;
+  uint32_t NNP2_6_1CLK /* [0,65535] */;
+  uint32_t NNP2_6_1ADC /* [0,65535] */;
+  uint32_t NNP2_6_2TAC /* [0,65535] */;
+  uint32_t NNP2_6_2CLK /* [0,65535] */;
+  uint32_t NNP2_6_2ADC /* [0,65535] */;
+  uint32_t NNP2_7_1TAC /* [0,65535] */;
+  uint32_t NNP2_7_1CLK /* [0,65535] */;
+  uint32_t NNP2_7_1ADC /* [0,65535] */;
+  uint32_t NNP2_7_2TAC /* [0,65535] */;
+  uint32_t NNP2_7_2CLK /* [0,65535] */;
+  uint32_t NNP2_7_2ADC /* [0,65535] */;
+  uint32_t NNP2_8_1TAC /* [0,65535] */;
+  uint32_t NNP2_8_1CLK /* [0,65535] */;
+  uint32_t NNP2_8_1ADC /* [0,65535] */;
+  uint32_t NNP2_8_2TAC /* [0,65535] */;
+  uint32_t NNP2_8_2CLK /* [0,65535] */;
+  uint32_t NNP2_8_2ADC /* [0,65535] */;
+  uint32_t NNP2_9_1TAC /* [0,65535] */;
+  uint32_t NNP2_9_1CLK /* [0,65535] */;
+  uint32_t NNP2_9_1ADC /* [0,65535] */;
+  uint32_t NNP2_9_2TAC /* [0,65535] */;
+  uint32_t NNP2_9_2CLK /* [0,65535] */;
+  uint32_t NNP2_9_2ADC /* [0,65535] */;
+  uint32_t NNP2_10_1TAC /* [0,65535] */;
+  uint32_t NNP2_10_1CLK /* [0,65535] */;
+  uint32_t NNP2_10_1ADC /* [0,65535] */;
+  uint32_t NNP2_10_2TAC /* [0,65535] */;
+  uint32_t NNP2_10_2CLK /* [0,65535] */;
+  uint32_t NNP2_10_2ADC /* [0,65535] */;
+  uint32_t NNP2_11_1TAC /* [0,65535] */;
+  uint32_t NNP2_11_1CLK /* [0,65535] */;
+  uint32_t NNP2_11_1ADC /* [0,65535] */;
+  uint32_t NNP2_11_2TAC /* [0,65535] */;
+  uint32_t NNP2_11_2CLK /* [0,65535] */;
+  uint32_t NNP2_11_2ADC /* [0,65535] */;
+  uint32_t NNP2_12_1TAC /* [0,65535] */;
+  uint32_t NNP2_12_1CLK /* [0,65535] */;
+  uint32_t NNP2_12_1ADC /* [0,65535] */;
+  uint32_t NNP2_12_2TAC /* [0,65535] */;
+  uint32_t NNP2_12_2CLK /* [0,65535] */;
+  uint32_t NNP2_12_2ADC /* [0,65535] */;
+  uint32_t NNP2_13_1TAC /* [0,65535] */;
+  uint32_t NNP2_13_1CLK /* [0,65535] */;
+  uint32_t NNP2_13_1ADC /* [0,65535] */;
+  uint32_t NNP2_13_2TAC /* [0,65535] */;
+  uint32_t NNP2_13_2CLK /* [0,65535] */;
+  uint32_t NNP2_13_2ADC /* [0,65535] */;
+  uint32_t NNP2_14_1TAC /* [0,65535] */;
+  uint32_t NNP2_14_1CLK /* [0,65535] */;
+  uint32_t NNP2_14_1ADC /* [0,65535] */;
+  uint32_t NNP2_14_2TAC /* [0,65535] */;
+  uint32_t NNP2_14_2CLK /* [0,65535] */;
+  uint32_t NNP2_14_2ADC /* [0,65535] */;
+  uint32_t NNP2_15_1TAC /* [0,65535] */;
+  uint32_t NNP2_15_1CLK /* [0,65535] */;
+  uint32_t NNP2_15_1ADC /* [0,65535] */;
+  uint32_t NNP2_15_2TAC /* [0,65535] */;
+  uint32_t NNP2_15_2CLK /* [0,65535] */;
+  uint32_t NNP2_15_2ADC /* [0,65535] */;
+  uint32_t NNP2_16_1TAC /* [0,65535] */;
+  uint32_t NNP2_16_1CLK /* [0,65535] */;
+  uint32_t NNP2_16_1ADC /* [0,65535] */;
+  uint32_t NNP2_16_2TAC /* [0,65535] */;
+  uint32_t NNP2_16_2CLK /* [0,65535] */;
+  uint32_t NNP2_16_2ADC /* [0,65535] */;
+  uint32_t NNP2_17_1TAC /* [0,65535] */;
+  uint32_t NNP2_17_1CLK /* [0,65535] */;
+  uint32_t NNP2_17_1ADC /* [0,65535] */;
+  uint32_t NNP2_17_2TAC /* [0,65535] */;
+  uint32_t NNP2_17_2CLK /* [0,65535] */;
+  uint32_t NNP2_17_2ADC /* [0,65535] */;
+  uint32_t NNP2_18_1TAC /* [0,65535] */;
+  uint32_t NNP2_18_1CLK /* [0,65535] */;
+  uint32_t NNP2_18_1ADC /* [0,65535] */;
+  uint32_t NNP2_18_2TAC /* [0,65535] */;
+  uint32_t NNP2_18_2CLK /* [0,65535] */;
+  uint32_t NNP2_18_2ADC /* [0,65535] */;
+  uint32_t NNP2_19_1TAC /* [0,65535] */;
+  uint32_t NNP2_19_1CLK /* [0,65535] */;
+  uint32_t NNP2_19_1ADC /* [0,65535] */;
+  uint32_t NNP2_19_2TAC /* [0,65535] */;
+  uint32_t NNP2_19_2CLK /* [0,65535] */;
+  uint32_t NNP2_19_2ADC /* [0,65535] */;
+  uint32_t NNP2_20_1TAC /* [0,65535] */;
+  uint32_t NNP2_20_1CLK /* [0,65535] */;
+  uint32_t NNP2_20_1ADC /* [0,65535] */;
+  uint32_t NNP2_20_2TAC /* [0,65535] */;
+  uint32_t NNP2_20_2CLK /* [0,65535] */;
+  uint32_t NNP2_20_2ADC /* [0,65535] */;
+  uint32_t NNP2_21_1TAC /* [0,65535] */;
+  uint32_t NNP2_21_1CLK /* [0,65535] */;
+  uint32_t NNP2_21_1ADC /* [0,65535] */;
+  uint32_t NNP2_21_2TAC /* [0,65535] */;
+  uint32_t NNP2_21_2CLK /* [0,65535] */;
+  uint32_t NNP2_21_2ADC /* [0,65535] */;
+  uint32_t NNP2_22_1TAC /* [0,65535] */;
+  uint32_t NNP2_22_1CLK /* [0,65535] */;
+  uint32_t NNP2_22_1ADC /* [0,65535] */;
+  uint32_t NNP2_22_2TAC /* [0,65535] */;
+  uint32_t NNP2_22_2CLK /* [0,65535] */;
+  uint32_t NNP2_22_2ADC /* [0,65535] */;
+  uint32_t NNP2_23_1TAC /* [0,65535] */;
+  uint32_t NNP2_23_1CLK /* [0,65535] */;
+  uint32_t NNP2_23_1ADC /* [0,65535] */;
+  uint32_t NNP2_23_2TAC /* [0,65535] */;
+  uint32_t NNP2_23_2CLK /* [0,65535] */;
+  uint32_t NNP2_23_2ADC /* [0,65535] */;
+  uint32_t NNP2_24_1TAC /* [0,65535] */;
+  uint32_t NNP2_24_1CLK /* [0,65535] */;
+  uint32_t NNP2_24_1ADC /* [0,65535] */;
+  uint32_t NNP2_24_2TAC /* [0,65535] */;
+  uint32_t NNP2_24_2CLK /* [0,65535] */;
+  uint32_t NNP2_24_2ADC /* [0,65535] */;
+  uint32_t NNP2_25_1TAC /* [0,65535] */;
+  uint32_t NNP2_25_1CLK /* [0,65535] */;
+  uint32_t NNP2_25_1ADC /* [0,65535] */;
+  uint32_t NNP2_25_2TAC /* [0,65535] */;
+  uint32_t NNP2_25_2CLK /* [0,65535] */;
+  uint32_t NNP2_25_2ADC /* [0,65535] */;
+  uint32_t NNP2_26_1TAC /* [0,65535] */;
+  uint32_t NNP2_26_1CLK /* [0,65535] */;
+  uint32_t NNP2_26_1ADC /* [0,65535] */;
+  uint32_t NNP2_26_2TAC /* [0,65535] */;
+  uint32_t NNP2_26_2CLK /* [0,65535] */;
+  uint32_t NNP2_26_2ADC /* [0,65535] */;
+  uint32_t NNP2_27_1TAC /* [0,65535] */;
+  uint32_t NNP2_27_1CLK /* [0,65535] */;
+  uint32_t NNP2_27_1ADC /* [0,65535] */;
+  uint32_t NNP2_27_2TAC /* [0,65535] */;
+  uint32_t NNP2_27_2CLK /* [0,65535] */;
+  uint32_t NNP2_27_2ADC /* [0,65535] */;
+  uint32_t NNP2_28_1TAC /* [0,65535] */;
+  uint32_t NNP2_28_1CLK /* [0,65535] */;
+  uint32_t NNP2_28_1ADC /* [0,65535] */;
+  uint32_t NNP2_28_2TAC /* [0,65535] */;
+  uint32_t NNP2_28_2CLK /* [0,65535] */;
+  uint32_t NNP2_28_2ADC /* [0,65535] */;
+  uint32_t NNP2_29_1TAC /* [0,65535] */;
+  uint32_t NNP2_29_1CLK /* [0,65535] */;
+  uint32_t NNP2_29_1ADC /* [0,65535] */;
+  uint32_t NNP2_29_2TAC /* [0,65535] */;
+  uint32_t NNP2_29_2CLK /* [0,65535] */;
+  uint32_t NNP2_29_2ADC /* [0,65535] */;
+  uint32_t NNP2_30_1TAC /* [0,65535] */;
+  uint32_t NNP2_30_1CLK /* [0,65535] */;
+  uint32_t NNP2_30_1ADC /* [0,65535] */;
+  uint32_t NNP2_30_2TAC /* [0,65535] */;
+  uint32_t NNP2_30_2CLK /* [0,65535] */;
+  uint32_t NNP2_30_2ADC /* [0,65535] */;
+  uint32_t NNP2_31_1TAC /* [0,65535] */;
+  uint32_t NNP2_31_1CLK /* [0,65535] */;
+  uint32_t NNP2_31_1ADC /* [0,65535] */;
+  uint32_t NNP2_31_2TAC /* [0,65535] */;
+  uint32_t NNP2_31_2CLK /* [0,65535] */;
+  uint32_t NNP2_31_2ADC /* [0,65535] */;
+  uint32_t NNP2_32_1TAC /* [0,65535] */;
+  uint32_t NNP2_32_1CLK /* [0,65535] */;
+  uint32_t NNP2_32_1ADC /* [0,65535] */;
+  uint32_t NNP2_32_2TAC /* [0,65535] */;
+  uint32_t NNP2_32_2CLK /* [0,65535] */;
+  uint32_t NNP2_32_2ADC /* [0,65535] */;
+  uint32_t NNP2_33_1TAC /* [0,65535] */;
+  uint32_t NNP2_33_1CLK /* [0,65535] */;
+  uint32_t NNP2_33_1ADC /* [0,65535] */;
+  uint32_t NNP2_33_2TAC /* [0,65535] */;
+  uint32_t NNP2_33_2CLK /* [0,65535] */;
+  uint32_t NNP2_33_2ADC /* [0,65535] */;
+  uint32_t NNP2_34_1TAC /* [0,65535] */;
+  uint32_t NNP2_34_1CLK /* [0,65535] */;
+  uint32_t NNP2_34_1ADC /* [0,65535] */;
+  uint32_t NNP2_34_2TAC /* [0,65535] */;
+  uint32_t NNP2_34_2CLK /* [0,65535] */;
+  uint32_t NNP2_34_2ADC /* [0,65535] */;
+  uint32_t NNP2_35_1TAC /* [0,65535] */;
+  uint32_t NNP2_35_1CLK /* [0,65535] */;
+  uint32_t NNP2_35_1ADC /* [0,65535] */;
+  uint32_t NNP2_35_2TAC /* [0,65535] */;
+  uint32_t NNP2_35_2CLK /* [0,65535] */;
+  uint32_t NNP2_35_2ADC /* [0,65535] */;
+  uint32_t NNP2_36_1TAC /* [0,65535] */;
+  uint32_t NNP2_36_1CLK /* [0,65535] */;
+  uint32_t NNP2_36_1ADC /* [0,65535] */;
+  uint32_t NNP2_36_2TAC /* [0,65535] */;
+  uint32_t NNP2_36_2CLK /* [0,65535] */;
+  uint32_t NNP2_36_2ADC /* [0,65535] */;
+  uint32_t NNP2_37_1TAC /* [0,65535] */;
+  uint32_t NNP2_37_1CLK /* [0,65535] */;
+  uint32_t NNP2_37_1ADC /* [0,65535] */;
+  uint32_t NNP2_37_2TAC /* [0,65535] */;
+  uint32_t NNP2_37_2CLK /* [0,65535] */;
+  uint32_t NNP2_37_2ADC /* [0,65535] */;
+  uint32_t NNP2_38_1TAC /* [0,65535] */;
+  uint32_t NNP2_38_1CLK /* [0,65535] */;
+  uint32_t NNP2_38_1ADC /* [0,65535] */;
+  uint32_t NNP2_38_2TAC /* [0,65535] */;
+  uint32_t NNP2_38_2CLK /* [0,65535] */;
+  uint32_t NNP2_38_2ADC /* [0,65535] */;
+  uint32_t NNP2_39_1TAC /* [0,65535] */;
+  uint32_t NNP2_39_1CLK /* [0,65535] */;
+  uint32_t NNP2_39_1ADC /* [0,65535] */;
+  uint32_t NNP2_39_2TAC /* [0,65535] */;
+  uint32_t NNP2_39_2CLK /* [0,65535] */;
+  uint32_t NNP2_39_2ADC /* [0,65535] */;
+  uint32_t NNP2_40_1TAC /* [0,65535] */;
+  uint32_t NNP2_40_1CLK /* [0,65535] */;
+  uint32_t NNP2_40_1ADC /* [0,65535] */;
+  uint32_t NNP2_40_2TAC /* [0,65535] */;
+  uint32_t NNP2_40_2CLK /* [0,65535] */;
+  uint32_t NNP2_40_2ADC /* [0,65535] */;
+  uint32_t NNP2_41_1TAC /* [0,65535] */;
+  uint32_t NNP2_41_1CLK /* [0,65535] */;
+  uint32_t NNP2_41_1ADC /* [0,65535] */;
+  uint32_t NNP2_41_2TAC /* [0,65535] */;
+  uint32_t NNP2_41_2CLK /* [0,65535] */;
+  uint32_t NNP2_41_2ADC /* [0,65535] */;
+  uint32_t NNP2_42_1TAC /* [0,65535] */;
+  uint32_t NNP2_42_1CLK /* [0,65535] */;
+  uint32_t NNP2_42_1ADC /* [0,65535] */;
+  uint32_t NNP2_42_2TAC /* [0,65535] */;
+  uint32_t NNP2_42_2CLK /* [0,65535] */;
+  uint32_t NNP2_42_2ADC /* [0,65535] */;
+  uint32_t NNP2_43_1TAC /* [0,65535] */;
+  uint32_t NNP2_43_1CLK /* [0,65535] */;
+  uint32_t NNP2_43_1ADC /* [0,65535] */;
+  uint32_t NNP2_43_2TAC /* [0,65535] */;
+  uint32_t NNP2_43_2CLK /* [0,65535] */;
+  uint32_t NNP2_43_2ADC /* [0,65535] */;
+  uint32_t NNP2_44_1TAC /* [0,65535] */;
+  uint32_t NNP2_44_1CLK /* [0,65535] */;
+  uint32_t NNP2_44_1ADC /* [0,65535] */;
+  uint32_t NNP2_44_2TAC /* [0,65535] */;
+  uint32_t NNP2_44_2CLK /* [0,65535] */;
+  uint32_t NNP2_44_2ADC /* [0,65535] */;
+  uint32_t NNP2_45_1TAC /* [0,65535] */;
+  uint32_t NNP2_45_1CLK /* [0,65535] */;
+  uint32_t NNP2_45_1ADC /* [0,65535] */;
+  uint32_t NNP2_45_2TAC /* [0,65535] */;
+  uint32_t NNP2_45_2CLK /* [0,65535] */;
+  uint32_t NNP2_45_2ADC /* [0,65535] */;
+  uint32_t NNP2_46_1TAC /* [0,65535] */;
+  uint32_t NNP2_46_1CLK /* [0,65535] */;
+  uint32_t NNP2_46_1ADC /* [0,65535] */;
+  uint32_t NNP2_46_2TAC /* [0,65535] */;
+  uint32_t NNP2_46_2CLK /* [0,65535] */;
+  uint32_t NNP2_46_2ADC /* [0,65535] */;
+  uint32_t NNP2_47_1TAC /* [0,65535] */;
+  uint32_t NNP2_47_1CLK /* [0,65535] */;
+  uint32_t NNP2_47_1ADC /* [0,65535] */;
+  uint32_t NNP2_47_2TAC /* [0,65535] */;
+  uint32_t NNP2_47_2CLK /* [0,65535] */;
+  uint32_t NNP2_47_2ADC /* [0,65535] */;
+  uint32_t NNP2_48_1TAC /* [0,65535] */;
+  uint32_t NNP2_48_1CLK /* [0,65535] */;
+  uint32_t NNP2_48_1ADC /* [0,65535] */;
+  uint32_t NNP2_48_2TAC /* [0,65535] */;
+  uint32_t NNP2_48_2CLK /* [0,65535] */;
+  uint32_t NNP2_48_2ADC /* [0,65535] */;
+  uint32_t NNP2_49_1TAC /* [0,65535] */;
+  uint32_t NNP2_49_1CLK /* [0,65535] */;
+  uint32_t NNP2_49_1ADC /* [0,65535] */;
+  uint32_t NNP2_49_2TAC /* [0,65535] */;
+  uint32_t NNP2_49_2CLK /* [0,65535] */;
+  uint32_t NNP2_49_2ADC /* [0,65535] */;
+  uint32_t NNP2_50_1TAC /* [0,65535] */;
+  uint32_t NNP2_50_1CLK /* [0,65535] */;
+  uint32_t NNP2_50_1ADC /* [0,65535] */;
+  uint32_t NNP2_50_2TAC /* [0,65535] */;
+  uint32_t NNP2_50_2CLK /* [0,65535] */;
+  uint32_t NNP2_50_2ADC /* [0,65535] */;
+  uint32_t NNP3_1_1TAC /* [0,65535] */;
+  uint32_t NNP3_1_1CLK /* [0,65535] */;
+  uint32_t NNP3_1_1ADC /* [0,65535] */;
+  uint32_t NNP3_1_2TAC /* [0,65535] */;
+  uint32_t NNP3_1_2CLK /* [0,65535] */;
+  uint32_t NNP3_1_2ADC /* [0,65535] */;
+  uint32_t NNP3_2_1TAC /* [0,65535] */;
+  uint32_t NNP3_2_1CLK /* [0,65535] */;
+  uint32_t NNP3_2_1ADC /* [0,65535] */;
+  uint32_t NNP3_2_2TAC /* [0,65535] */;
+  uint32_t NNP3_2_2CLK /* [0,65535] */;
+  uint32_t NNP3_2_2ADC /* [0,65535] */;
+  uint32_t NNP3_3_1TAC /* [0,65535] */;
+  uint32_t NNP3_3_1CLK /* [0,65535] */;
+  uint32_t NNP3_3_1ADC /* [0,65535] */;
+  uint32_t NNP3_3_2TAC /* [0,65535] */;
+  uint32_t NNP3_3_2CLK /* [0,65535] */;
+  uint32_t NNP3_3_2ADC /* [0,65535] */;
+  uint32_t NNP3_4_1TAC /* [0,65535] */;
+  uint32_t NNP3_4_1CLK /* [0,65535] */;
+  uint32_t NNP3_4_1ADC /* [0,65535] */;
+  uint32_t NNP3_4_2TAC /* [0,65535] */;
+  uint32_t NNP3_4_2CLK /* [0,65535] */;
+  uint32_t NNP3_4_2ADC /* [0,65535] */;
+  uint32_t NNP3_5_1TAC /* [0,65535] */;
+  uint32_t NNP3_5_1CLK /* [0,65535] */;
+  uint32_t NNP3_5_1ADC /* [0,65535] */;
+  uint32_t NNP3_5_2TAC /* [0,65535] */;
+  uint32_t NNP3_5_2CLK /* [0,65535] */;
+  uint32_t NNP3_5_2ADC /* [0,65535] */;
+  uint32_t NNP3_6_1TAC /* [0,65535] */;
+  uint32_t NNP3_6_1CLK /* [0,65535] */;
+  uint32_t NNP3_6_1ADC /* [0,65535] */;
+  uint32_t NNP3_6_2TAC /* [0,65535] */;
+  uint32_t NNP3_6_2CLK /* [0,65535] */;
+  uint32_t NNP3_6_2ADC /* [0,65535] */;
+  uint32_t NNP3_7_1TAC /* [0,65535] */;
+  uint32_t NNP3_7_1CLK /* [0,65535] */;
+  uint32_t NNP3_7_1ADC /* [0,65535] */;
+  uint32_t NNP3_7_2TAC /* [0,65535] */;
+  uint32_t NNP3_7_2CLK /* [0,65535] */;
+  uint32_t NNP3_7_2ADC /* [0,65535] */;
+  uint32_t NNP3_8_1TAC /* [0,65535] */;
+  uint32_t NNP3_8_1CLK /* [0,65535] */;
+  uint32_t NNP3_8_1ADC /* [0,65535] */;
+  uint32_t NNP3_8_2TAC /* [0,65535] */;
+  uint32_t NNP3_8_2CLK /* [0,65535] */;
+  uint32_t NNP3_8_2ADC /* [0,65535] */;
+  uint32_t NNP3_9_1TAC /* [0,65535] */;
+  uint32_t NNP3_9_1CLK /* [0,65535] */;
+  uint32_t NNP3_9_1ADC /* [0,65535] */;
+  uint32_t NNP3_9_2TAC /* [0,65535] */;
+  uint32_t NNP3_9_2CLK /* [0,65535] */;
+  uint32_t NNP3_9_2ADC /* [0,65535] */;
+  uint32_t NNP3_10_1TAC /* [0,65535] */;
+  uint32_t NNP3_10_1CLK /* [0,65535] */;
+  uint32_t NNP3_10_1ADC /* [0,65535] */;
+  uint32_t NNP3_10_2TAC /* [0,65535] */;
+  uint32_t NNP3_10_2CLK /* [0,65535] */;
+  uint32_t NNP3_10_2ADC /* [0,65535] */;
+  uint32_t NNP3_11_1TAC /* [0,65535] */;
+  uint32_t NNP3_11_1CLK /* [0,65535] */;
+  uint32_t NNP3_11_1ADC /* [0,65535] */;
+  uint32_t NNP3_11_2TAC /* [0,65535] */;
+  uint32_t NNP3_11_2CLK /* [0,65535] */;
+  uint32_t NNP3_11_2ADC /* [0,65535] */;
+  uint32_t NNP3_12_1TAC /* [0,65535] */;
+  uint32_t NNP3_12_1CLK /* [0,65535] */;
+  uint32_t NNP3_12_1ADC /* [0,65535] */;
+  uint32_t NNP3_12_2TAC /* [0,65535] */;
+  uint32_t NNP3_12_2CLK /* [0,65535] */;
+  uint32_t NNP3_12_2ADC /* [0,65535] */;
+  uint32_t NNP3_13_1TAC /* [0,65535] */;
+  uint32_t NNP3_13_1CLK /* [0,65535] */;
+  uint32_t NNP3_13_1ADC /* [0,65535] */;
+  uint32_t NNP3_13_2TAC /* [0,65535] */;
+  uint32_t NNP3_13_2CLK /* [0,65535] */;
+  uint32_t NNP3_13_2ADC /* [0,65535] */;
+  uint32_t NNP3_14_1TAC /* [0,65535] */;
+  uint32_t NNP3_14_1CLK /* [0,65535] */;
+  uint32_t NNP3_14_1ADC /* [0,65535] */;
+  uint32_t NNP3_14_2TAC /* [0,65535] */;
+  uint32_t NNP3_14_2CLK /* [0,65535] */;
+  uint32_t NNP3_14_2ADC /* [0,65535] */;
+  uint32_t NNP3_15_1TAC /* [0,65535] */;
+  uint32_t NNP3_15_1CLK /* [0,65535] */;
+  uint32_t NNP3_15_1ADC /* [0,65535] */;
+  uint32_t NNP3_15_2TAC /* [0,65535] */;
+  uint32_t NNP3_15_2CLK /* [0,65535] */;
+  uint32_t NNP3_15_2ADC /* [0,65535] */;
+  uint32_t NNP3_16_1TAC /* [0,65535] */;
+  uint32_t NNP3_16_1CLK /* [0,65535] */;
+  uint32_t NNP3_16_1ADC /* [0,65535] */;
+  uint32_t NNP3_16_2TAC /* [0,65535] */;
+  uint32_t NNP3_16_2CLK /* [0,65535] */;
+  uint32_t NNP3_16_2ADC /* [0,65535] */;
+  uint32_t NNP3_17_1TAC /* [0,65535] */;
+  uint32_t NNP3_17_1CLK /* [0,65535] */;
+  uint32_t NNP3_17_1ADC /* [0,65535] */;
+  uint32_t NNP3_17_2TAC /* [0,65535] */;
+  uint32_t NNP3_17_2CLK /* [0,65535] */;
+  uint32_t NNP3_17_2ADC /* [0,65535] */;
+  uint32_t NNP3_18_1TAC /* [0,65535] */;
+  uint32_t NNP3_18_1CLK /* [0,65535] */;
+  uint32_t NNP3_18_1ADC /* [0,65535] */;
+  uint32_t NNP3_18_2TAC /* [0,65535] */;
+  uint32_t NNP3_18_2CLK /* [0,65535] */;
+  uint32_t NNP3_18_2ADC /* [0,65535] */;
+  uint32_t NNP3_19_1TAC /* [0,65535] */;
+  uint32_t NNP3_19_1CLK /* [0,65535] */;
+  uint32_t NNP3_19_1ADC /* [0,65535] */;
+  uint32_t NNP3_19_2TAC /* [0,65535] */;
+  uint32_t NNP3_19_2CLK /* [0,65535] */;
+  uint32_t NNP3_19_2ADC /* [0,65535] */;
+  uint32_t NNP3_20_1TAC /* [0,65535] */;
+  uint32_t NNP3_20_1CLK /* [0,65535] */;
+  uint32_t NNP3_20_1ADC /* [0,65535] */;
+  uint32_t NNP3_20_2TAC /* [0,65535] */;
+  uint32_t NNP3_20_2CLK /* [0,65535] */;
+  uint32_t NNP3_20_2ADC /* [0,65535] */;
+  uint32_t NNP3_21_1TAC /* [0,65535] */;
+  uint32_t NNP3_21_1CLK /* [0,65535] */;
+  uint32_t NNP3_21_1ADC /* [0,65535] */;
+  uint32_t NNP3_21_2TAC /* [0,65535] */;
+  uint32_t NNP3_21_2CLK /* [0,65535] */;
+  uint32_t NNP3_21_2ADC /* [0,65535] */;
+  uint32_t NNP3_22_1TAC /* [0,65535] */;
+  uint32_t NNP3_22_1CLK /* [0,65535] */;
+  uint32_t NNP3_22_1ADC /* [0,65535] */;
+  uint32_t NNP3_22_2TAC /* [0,65535] */;
+  uint32_t NNP3_22_2CLK /* [0,65535] */;
+  uint32_t NNP3_22_2ADC /* [0,65535] */;
+  uint32_t NNP3_23_1TAC /* [0,65535] */;
+  uint32_t NNP3_23_1CLK /* [0,65535] */;
+  uint32_t NNP3_23_1ADC /* [0,65535] */;
+  uint32_t NNP3_23_2TAC /* [0,65535] */;
+  uint32_t NNP3_23_2CLK /* [0,65535] */;
+  uint32_t NNP3_23_2ADC /* [0,65535] */;
+  uint32_t NNP3_24_1TAC /* [0,65535] */;
+  uint32_t NNP3_24_1CLK /* [0,65535] */;
+  uint32_t NNP3_24_1ADC /* [0,65535] */;
+  uint32_t NNP3_24_2TAC /* [0,65535] */;
+  uint32_t NNP3_24_2CLK /* [0,65535] */;
+  uint32_t NNP3_24_2ADC /* [0,65535] */;
+  uint32_t NNP3_25_1TAC /* [0,65535] */;
+  uint32_t NNP3_25_1CLK /* [0,65535] */;
+  uint32_t NNP3_25_1ADC /* [0,65535] */;
+  uint32_t NNP3_25_2TAC /* [0,65535] */;
+  uint32_t NNP3_25_2CLK /* [0,65535] */;
+  uint32_t NNP3_25_2ADC /* [0,65535] */;
+  uint32_t NNP3_26_1TAC /* [0,65535] */;
+  uint32_t NNP3_26_1CLK /* [0,65535] */;
+  uint32_t NNP3_26_1ADC /* [0,65535] */;
+  uint32_t NNP3_26_2TAC /* [0,65535] */;
+  uint32_t NNP3_26_2CLK /* [0,65535] */;
+  uint32_t NNP3_26_2ADC /* [0,65535] */;
+  uint32_t NNP3_27_1TAC /* [0,65535] */;
+  uint32_t NNP3_27_1CLK /* [0,65535] */;
+  uint32_t NNP3_27_1ADC /* [0,65535] */;
+  uint32_t NNP3_27_2TAC /* [0,65535] */;
+  uint32_t NNP3_27_2CLK /* [0,65535] */;
+  uint32_t NNP3_27_2ADC /* [0,65535] */;
+  uint32_t NNP3_28_1TAC /* [0,65535] */;
+  uint32_t NNP3_28_1CLK /* [0,65535] */;
+  uint32_t NNP3_28_1ADC /* [0,65535] */;
+  uint32_t NNP3_28_2TAC /* [0,65535] */;
+  uint32_t NNP3_28_2CLK /* [0,65535] */;
+  uint32_t NNP3_28_2ADC /* [0,65535] */;
+  uint32_t NNP3_29_1TAC /* [0,65535] */;
+  uint32_t NNP3_29_1CLK /* [0,65535] */;
+  uint32_t NNP3_29_1ADC /* [0,65535] */;
+  uint32_t NNP3_29_2TAC /* [0,65535] */;
+  uint32_t NNP3_29_2CLK /* [0,65535] */;
+  uint32_t NNP3_29_2ADC /* [0,65535] */;
+  uint32_t NNP3_30_1TAC /* [0,65535] */;
+  uint32_t NNP3_30_1CLK /* [0,65535] */;
+  uint32_t NNP3_30_1ADC /* [0,65535] */;
+  uint32_t NNP3_30_2TAC /* [0,65535] */;
+  uint32_t NNP3_30_2CLK /* [0,65535] */;
+  uint32_t NNP3_30_2ADC /* [0,65535] */;
+  uint32_t NNP3_31_1TAC /* [0,65535] */;
+  uint32_t NNP3_31_1CLK /* [0,65535] */;
+  uint32_t NNP3_31_1ADC /* [0,65535] */;
+  uint32_t NNP3_31_2TAC /* [0,65535] */;
+  uint32_t NNP3_31_2CLK /* [0,65535] */;
+  uint32_t NNP3_31_2ADC /* [0,65535] */;
+  uint32_t NNP3_32_1TAC /* [0,65535] */;
+  uint32_t NNP3_32_1CLK /* [0,65535] */;
+  uint32_t NNP3_32_1ADC /* [0,65535] */;
+  uint32_t NNP3_32_2TAC /* [0,65535] */;
+  uint32_t NNP3_32_2CLK /* [0,65535] */;
+  uint32_t NNP3_32_2ADC /* [0,65535] */;
+  uint32_t NNP3_33_1TAC /* [0,65535] */;
+  uint32_t NNP3_33_1CLK /* [0,65535] */;
+  uint32_t NNP3_33_1ADC /* [0,65535] */;
+  uint32_t NNP3_33_2TAC /* [0,65535] */;
+  uint32_t NNP3_33_2CLK /* [0,65535] */;
+  uint32_t NNP3_33_2ADC /* [0,65535] */;
+  uint32_t NNP3_34_1TAC /* [0,65535] */;
+  uint32_t NNP3_34_1CLK /* [0,65535] */;
+  uint32_t NNP3_34_1ADC /* [0,65535] */;
+  uint32_t NNP3_34_2TAC /* [0,65535] */;
+  uint32_t NNP3_34_2CLK /* [0,65535] */;
+  uint32_t NNP3_34_2ADC /* [0,65535] */;
+  uint32_t NNP3_35_1TAC /* [0,65535] */;
+  uint32_t NNP3_35_1CLK /* [0,65535] */;
+  uint32_t NNP3_35_1ADC /* [0,65535] */;
+  uint32_t NNP3_35_2TAC /* [0,65535] */;
+  uint32_t NNP3_35_2CLK /* [0,65535] */;
+  uint32_t NNP3_35_2ADC /* [0,65535] */;
+  uint32_t NNP3_36_1TAC /* [0,65535] */;
+  uint32_t NNP3_36_1CLK /* [0,65535] */;
+  uint32_t NNP3_36_1ADC /* [0,65535] */;
+  uint32_t NNP3_36_2TAC /* [0,65535] */;
+  uint32_t NNP3_36_2CLK /* [0,65535] */;
+  uint32_t NNP3_36_2ADC /* [0,65535] */;
+  uint32_t NNP3_37_1TAC /* [0,65535] */;
+  uint32_t NNP3_37_1CLK /* [0,65535] */;
+  uint32_t NNP3_37_1ADC /* [0,65535] */;
+  uint32_t NNP3_37_2TAC /* [0,65535] */;
+  uint32_t NNP3_37_2CLK /* [0,65535] */;
+  uint32_t NNP3_37_2ADC /* [0,65535] */;
+  uint32_t NNP3_38_1TAC /* [0,65535] */;
+  uint32_t NNP3_38_1CLK /* [0,65535] */;
+  uint32_t NNP3_38_1ADC /* [0,65535] */;
+  uint32_t NNP3_38_2TAC /* [0,65535] */;
+  uint32_t NNP3_38_2CLK /* [0,65535] */;
+  uint32_t NNP3_38_2ADC /* [0,65535] */;
+  uint32_t NNP3_39_1TAC /* [0,65535] */;
+  uint32_t NNP3_39_1CLK /* [0,65535] */;
+  uint32_t NNP3_39_1ADC /* [0,65535] */;
+  uint32_t NNP3_39_2TAC /* [0,65535] */;
+  uint32_t NNP3_39_2CLK /* [0,65535] */;
+  uint32_t NNP3_39_2ADC /* [0,65535] */;
+  uint32_t NNP3_40_1TAC /* [0,65535] */;
+  uint32_t NNP3_40_1CLK /* [0,65535] */;
+  uint32_t NNP3_40_1ADC /* [0,65535] */;
+  uint32_t NNP3_40_2TAC /* [0,65535] */;
+  uint32_t NNP3_40_2CLK /* [0,65535] */;
+  uint32_t NNP3_40_2ADC /* [0,65535] */;
+  uint32_t NNP3_41_1TAC /* [0,65535] */;
+  uint32_t NNP3_41_1CLK /* [0,65535] */;
+  uint32_t NNP3_41_1ADC /* [0,65535] */;
+  uint32_t NNP3_41_2TAC /* [0,65535] */;
+  uint32_t NNP3_41_2CLK /* [0,65535] */;
+  uint32_t NNP3_41_2ADC /* [0,65535] */;
+  uint32_t NNP3_42_1TAC /* [0,65535] */;
+  uint32_t NNP3_42_1CLK /* [0,65535] */;
+  uint32_t NNP3_42_1ADC /* [0,65535] */;
+  uint32_t NNP3_42_2TAC /* [0,65535] */;
+  uint32_t NNP3_42_2CLK /* [0,65535] */;
+  uint32_t NNP3_42_2ADC /* [0,65535] */;
+  uint32_t NNP3_43_1TAC /* [0,65535] */;
+  uint32_t NNP3_43_1CLK /* [0,65535] */;
+  uint32_t NNP3_43_1ADC /* [0,65535] */;
+  uint32_t NNP3_43_2TAC /* [0,65535] */;
+  uint32_t NNP3_43_2CLK /* [0,65535] */;
+  uint32_t NNP3_43_2ADC /* [0,65535] */;
+  uint32_t NNP3_44_1TAC /* [0,65535] */;
+  uint32_t NNP3_44_1CLK /* [0,65535] */;
+  uint32_t NNP3_44_1ADC /* [0,65535] */;
+  uint32_t NNP3_44_2TAC /* [0,65535] */;
+  uint32_t NNP3_44_2CLK /* [0,65535] */;
+  uint32_t NNP3_44_2ADC /* [0,65535] */;
+  uint32_t NNP3_45_1TAC /* [0,65535] */;
+  uint32_t NNP3_45_1CLK /* [0,65535] */;
+  uint32_t NNP3_45_1ADC /* [0,65535] */;
+  uint32_t NNP3_45_2TAC /* [0,65535] */;
+  uint32_t NNP3_45_2CLK /* [0,65535] */;
+  uint32_t NNP3_45_2ADC /* [0,65535] */;
+  uint32_t NNP3_46_1TAC /* [0,65535] */;
+  uint32_t NNP3_46_1CLK /* [0,65535] */;
+  uint32_t NNP3_46_1ADC /* [0,65535] */;
+  uint32_t NNP3_46_2TAC /* [0,65535] */;
+  uint32_t NNP3_46_2CLK /* [0,65535] */;
+  uint32_t NNP3_46_2ADC /* [0,65535] */;
+  uint32_t NNP3_47_1TAC /* [0,65535] */;
+  uint32_t NNP3_47_1CLK /* [0,65535] */;
+  uint32_t NNP3_47_1ADC /* [0,65535] */;
+  uint32_t NNP3_47_2TAC /* [0,65535] */;
+  uint32_t NNP3_47_2CLK /* [0,65535] */;
+  uint32_t NNP3_47_2ADC /* [0,65535] */;
+  uint32_t NNP3_48_1TAC /* [0,65535] */;
+  uint32_t NNP3_48_1CLK /* [0,65535] */;
+  uint32_t NNP3_48_1ADC /* [0,65535] */;
+  uint32_t NNP3_48_2TAC /* [0,65535] */;
+  uint32_t NNP3_48_2CLK /* [0,65535] */;
+  uint32_t NNP3_48_2ADC /* [0,65535] */;
+  uint32_t NNP3_49_1TAC /* [0,65535] */;
+  uint32_t NNP3_49_1CLK /* [0,65535] */;
+  uint32_t NNP3_49_1ADC /* [0,65535] */;
+  uint32_t NNP3_49_2TAC /* [0,65535] */;
+  uint32_t NNP3_49_2CLK /* [0,65535] */;
+  uint32_t NNP3_49_2ADC /* [0,65535] */;
+  uint32_t NNP3_50_1TAC /* [0,65535] */;
+  uint32_t NNP3_50_1CLK /* [0,65535] */;
+  uint32_t NNP3_50_1ADC /* [0,65535] */;
+  uint32_t NNP3_50_2TAC /* [0,65535] */;
+  uint32_t NNP3_50_2CLK /* [0,65535] */;
+  uint32_t NNP3_50_2ADC /* [0,65535] */;
+  uint32_t NNP4_1_1TAC /* [0,65535] */;
+  uint32_t NNP4_1_1CLK /* [0,65535] */;
+  uint32_t NNP4_1_1ADC /* [0,65535] */;
+  uint32_t NNP4_1_2TAC /* [0,65535] */;
+  uint32_t NNP4_1_2CLK /* [0,65535] */;
+  uint32_t NNP4_1_2ADC /* [0,65535] */;
+  uint32_t NNP4_2_1TAC /* [0,65535] */;
+  uint32_t NNP4_2_1CLK /* [0,65535] */;
+  uint32_t NNP4_2_1ADC /* [0,65535] */;
+  uint32_t NNP4_2_2TAC /* [0,65535] */;
+  uint32_t NNP4_2_2CLK /* [0,65535] */;
+  uint32_t NNP4_2_2ADC /* [0,65535] */;
+  uint32_t NNP4_3_1TAC /* [0,65535] */;
+  uint32_t NNP4_3_1CLK /* [0,65535] */;
+  uint32_t NNP4_3_1ADC /* [0,65535] */;
+  uint32_t NNP4_3_2TAC /* [0,65535] */;
+  uint32_t NNP4_3_2CLK /* [0,65535] */;
+  uint32_t NNP4_3_2ADC /* [0,65535] */;
+  uint32_t NNP4_4_1TAC /* [0,65535] */;
+  uint32_t NNP4_4_1CLK /* [0,65535] */;
+  uint32_t NNP4_4_1ADC /* [0,65535] */;
+  uint32_t NNP4_4_2TAC /* [0,65535] */;
+  uint32_t NNP4_4_2CLK /* [0,65535] */;
+  uint32_t NNP4_4_2ADC /* [0,65535] */;
+  uint32_t NNP4_5_1TAC /* [0,65535] */;
+  uint32_t NNP4_5_1CLK /* [0,65535] */;
+  uint32_t NNP4_5_1ADC /* [0,65535] */;
+  uint32_t NNP4_5_2TAC /* [0,65535] */;
+  uint32_t NNP4_5_2CLK /* [0,65535] */;
+  uint32_t NNP4_5_2ADC /* [0,65535] */;
+  uint32_t NNP4_6_1TAC /* [0,65535] */;
+  uint32_t NNP4_6_1CLK /* [0,65535] */;
+  uint32_t NNP4_6_1ADC /* [0,65535] */;
+  uint32_t NNP4_6_2TAC /* [0,65535] */;
+  uint32_t NNP4_6_2CLK /* [0,65535] */;
+  uint32_t NNP4_6_2ADC /* [0,65535] */;
+  uint32_t NNP4_7_1TAC /* [0,65535] */;
+  uint32_t NNP4_7_1CLK /* [0,65535] */;
+  uint32_t NNP4_7_1ADC /* [0,65535] */;
+  uint32_t NNP4_7_2TAC /* [0,65535] */;
+  uint32_t NNP4_7_2CLK /* [0,65535] */;
+  uint32_t NNP4_7_2ADC /* [0,65535] */;
+  uint32_t NNP4_8_1TAC /* [0,65535] */;
+  uint32_t NNP4_8_1CLK /* [0,65535] */;
+  uint32_t NNP4_8_1ADC /* [0,65535] */;
+  uint32_t NNP4_8_2TAC /* [0,65535] */;
+  uint32_t NNP4_8_2CLK /* [0,65535] */;
+  uint32_t NNP4_8_2ADC /* [0,65535] */;
+  uint32_t NNP4_9_1TAC /* [0,65535] */;
+  uint32_t NNP4_9_1CLK /* [0,65535] */;
+  uint32_t NNP4_9_1ADC /* [0,65535] */;
+  uint32_t NNP4_9_2TAC /* [0,65535] */;
+  uint32_t NNP4_9_2CLK /* [0,65535] */;
+  uint32_t NNP4_9_2ADC /* [0,65535] */;
+  uint32_t NNP4_10_1TAC /* [0,65535] */;
+  uint32_t NNP4_10_1CLK /* [0,65535] */;
+  uint32_t NNP4_10_1ADC /* [0,65535] */;
+  uint32_t NNP4_10_2TAC /* [0,65535] */;
+  uint32_t NNP4_10_2CLK /* [0,65535] */;
+  uint32_t NNP4_10_2ADC /* [0,65535] */;
+  uint32_t NNP4_11_1TAC /* [0,65535] */;
+  uint32_t NNP4_11_1CLK /* [0,65535] */;
+  uint32_t NNP4_11_1ADC /* [0,65535] */;
+  uint32_t NNP4_11_2TAC /* [0,65535] */;
+  uint32_t NNP4_11_2CLK /* [0,65535] */;
+  uint32_t NNP4_11_2ADC /* [0,65535] */;
+  uint32_t NNP4_12_1TAC /* [0,65535] */;
+  uint32_t NNP4_12_1CLK /* [0,65535] */;
+  uint32_t NNP4_12_1ADC /* [0,65535] */;
+  uint32_t NNP4_12_2TAC /* [0,65535] */;
+  uint32_t NNP4_12_2CLK /* [0,65535] */;
+  uint32_t NNP4_12_2ADC /* [0,65535] */;
+  uint32_t NNP4_13_1TAC /* [0,65535] */;
+  uint32_t NNP4_13_1CLK /* [0,65535] */;
+  uint32_t NNP4_13_1ADC /* [0,65535] */;
+  uint32_t NNP4_13_2TAC /* [0,65535] */;
+  uint32_t NNP4_13_2CLK /* [0,65535] */;
+  uint32_t NNP4_13_2ADC /* [0,65535] */;
+  uint32_t NNP4_14_1TAC /* [0,65535] */;
+  uint32_t NNP4_14_1CLK /* [0,65535] */;
+  uint32_t NNP4_14_1ADC /* [0,65535] */;
+  uint32_t NNP4_14_2TAC /* [0,65535] */;
+  uint32_t NNP4_14_2CLK /* [0,65535] */;
+  uint32_t NNP4_14_2ADC /* [0,65535] */;
+  uint32_t NNP4_15_1TAC /* [0,65535] */;
+  uint32_t NNP4_15_1CLK /* [0,65535] */;
+  uint32_t NNP4_15_1ADC /* [0,65535] */;
+  uint32_t NNP4_15_2TAC /* [0,65535] */;
+  uint32_t NNP4_15_2CLK /* [0,65535] */;
+  uint32_t NNP4_15_2ADC /* [0,65535] */;
+  uint32_t NNP4_16_1TAC /* [0,65535] */;
+  uint32_t NNP4_16_1CLK /* [0,65535] */;
+  uint32_t NNP4_16_1ADC /* [0,65535] */;
+  uint32_t NNP4_16_2TAC /* [0,65535] */;
+  uint32_t NNP4_16_2CLK /* [0,65535] */;
+  uint32_t NNP4_16_2ADC /* [0,65535] */;
+  uint32_t NNP4_17_1TAC /* [0,65535] */;
+  uint32_t NNP4_17_1CLK /* [0,65535] */;
+  uint32_t NNP4_17_1ADC /* [0,65535] */;
+  uint32_t NNP4_17_2TAC /* [0,65535] */;
+  uint32_t NNP4_17_2CLK /* [0,65535] */;
+  uint32_t NNP4_17_2ADC /* [0,65535] */;
+  uint32_t NNP4_18_1TAC /* [0,65535] */;
+  uint32_t NNP4_18_1CLK /* [0,65535] */;
+  uint32_t NNP4_18_1ADC /* [0,65535] */;
+  uint32_t NNP4_18_2TAC /* [0,65535] */;
+  uint32_t NNP4_18_2CLK /* [0,65535] */;
+  uint32_t NNP4_18_2ADC /* [0,65535] */;
+  uint32_t NNP4_19_1TAC /* [0,65535] */;
+  uint32_t NNP4_19_1CLK /* [0,65535] */;
+  uint32_t NNP4_19_1ADC /* [0,65535] */;
+  uint32_t NNP4_19_2TAC /* [0,65535] */;
+  uint32_t NNP4_19_2CLK /* [0,65535] */;
+  uint32_t NNP4_19_2ADC /* [0,65535] */;
+  uint32_t NNP4_20_1TAC /* [0,65535] */;
+  uint32_t NNP4_20_1CLK /* [0,65535] */;
+  uint32_t NNP4_20_1ADC /* [0,65535] */;
+  uint32_t NNP4_20_2TAC /* [0,65535] */;
+  uint32_t NNP4_20_2CLK /* [0,65535] */;
+  uint32_t NNP4_20_2ADC /* [0,65535] */;
+  uint32_t NNP4_21_1TAC /* [0,65535] */;
+  uint32_t NNP4_21_1CLK /* [0,65535] */;
+  uint32_t NNP4_21_1ADC /* [0,65535] */;
+  uint32_t NNP4_21_2TAC /* [0,65535] */;
+  uint32_t NNP4_21_2CLK /* [0,65535] */;
+  uint32_t NNP4_21_2ADC /* [0,65535] */;
+  uint32_t NNP4_22_1TAC /* [0,65535] */;
+  uint32_t NNP4_22_1CLK /* [0,65535] */;
+  uint32_t NNP4_22_1ADC /* [0,65535] */;
+  uint32_t NNP4_22_2TAC /* [0,65535] */;
+  uint32_t NNP4_22_2CLK /* [0,65535] */;
+  uint32_t NNP4_22_2ADC /* [0,65535] */;
+  uint32_t NNP4_23_1TAC /* [0,65535] */;
+  uint32_t NNP4_23_1CLK /* [0,65535] */;
+  uint32_t NNP4_23_1ADC /* [0,65535] */;
+  uint32_t NNP4_23_2TAC /* [0,65535] */;
+  uint32_t NNP4_23_2CLK /* [0,65535] */;
+  uint32_t NNP4_23_2ADC /* [0,65535] */;
+  uint32_t NNP4_24_1TAC /* [0,65535] */;
+  uint32_t NNP4_24_1CLK /* [0,65535] */;
+  uint32_t NNP4_24_1ADC /* [0,65535] */;
+  uint32_t NNP4_24_2TAC /* [0,65535] */;
+  uint32_t NNP4_24_2CLK /* [0,65535] */;
+  uint32_t NNP4_24_2ADC /* [0,65535] */;
+  uint32_t NNP4_25_1TAC /* [0,65535] */;
+  uint32_t NNP4_25_1CLK /* [0,65535] */;
+  uint32_t NNP4_25_1ADC /* [0,65535] */;
+  uint32_t NNP4_25_2TAC /* [0,65535] */;
+  uint32_t NNP4_25_2CLK /* [0,65535] */;
+  uint32_t NNP4_25_2ADC /* [0,65535] */;
+  uint32_t NNP4_26_1TAC /* [0,65535] */;
+  uint32_t NNP4_26_1CLK /* [0,65535] */;
+  uint32_t NNP4_26_1ADC /* [0,65535] */;
+  uint32_t NNP4_26_2TAC /* [0,65535] */;
+  uint32_t NNP4_26_2CLK /* [0,65535] */;
+  uint32_t NNP4_26_2ADC /* [0,65535] */;
+  uint32_t NNP4_27_1TAC /* [0,65535] */;
+  uint32_t NNP4_27_1CLK /* [0,65535] */;
+  uint32_t NNP4_27_1ADC /* [0,65535] */;
+  uint32_t NNP4_27_2TAC /* [0,65535] */;
+  uint32_t NNP4_27_2CLK /* [0,65535] */;
+  uint32_t NNP4_27_2ADC /* [0,65535] */;
+  uint32_t NNP4_28_1TAC /* [0,65535] */;
+  uint32_t NNP4_28_1CLK /* [0,65535] */;
+  uint32_t NNP4_28_1ADC /* [0,65535] */;
+  uint32_t NNP4_28_2TAC /* [0,65535] */;
+  uint32_t NNP4_28_2CLK /* [0,65535] */;
+  uint32_t NNP4_28_2ADC /* [0,65535] */;
+  uint32_t NNP4_29_1TAC /* [0,65535] */;
+  uint32_t NNP4_29_1CLK /* [0,65535] */;
+  uint32_t NNP4_29_1ADC /* [0,65535] */;
+  uint32_t NNP4_29_2TAC /* [0,65535] */;
+  uint32_t NNP4_29_2CLK /* [0,65535] */;
+  uint32_t NNP4_29_2ADC /* [0,65535] */;
+  uint32_t NNP4_30_1TAC /* [0,65535] */;
+  uint32_t NNP4_30_1CLK /* [0,65535] */;
+  uint32_t NNP4_30_1ADC /* [0,65535] */;
+  uint32_t NNP4_30_2TAC /* [0,65535] */;
+  uint32_t NNP4_30_2CLK /* [0,65535] */;
+  uint32_t NNP4_30_2ADC /* [0,65535] */;
+  uint32_t NNP4_31_1TAC /* [0,65535] */;
+  uint32_t NNP4_31_1CLK /* [0,65535] */;
+  uint32_t NNP4_31_1ADC /* [0,65535] */;
+  uint32_t NNP4_31_2TAC /* [0,65535] */;
+  uint32_t NNP4_31_2CLK /* [0,65535] */;
+  uint32_t NNP4_31_2ADC /* [0,65535] */;
+  uint32_t NNP4_32_1TAC /* [0,65535] */;
+  uint32_t NNP4_32_1CLK /* [0,65535] */;
+  uint32_t NNP4_32_1ADC /* [0,65535] */;
+  uint32_t NNP4_32_2TAC /* [0,65535] */;
+  uint32_t NNP4_32_2CLK /* [0,65535] */;
+  uint32_t NNP4_32_2ADC /* [0,65535] */;
+  uint32_t NNP4_33_1TAC /* [0,65535] */;
+  uint32_t NNP4_33_1CLK /* [0,65535] */;
+  uint32_t NNP4_33_1ADC /* [0,65535] */;
+  uint32_t NNP4_33_2TAC /* [0,65535] */;
+  uint32_t NNP4_33_2CLK /* [0,65535] */;
+  uint32_t NNP4_33_2ADC /* [0,65535] */;
+  uint32_t NNP4_34_1TAC /* [0,65535] */;
+  uint32_t NNP4_34_1CLK /* [0,65535] */;
+  uint32_t NNP4_34_1ADC /* [0,65535] */;
+  uint32_t NNP4_34_2TAC /* [0,65535] */;
+  uint32_t NNP4_34_2CLK /* [0,65535] */;
+  uint32_t NNP4_34_2ADC /* [0,65535] */;
+  uint32_t NNP4_35_1TAC /* [0,65535] */;
+  uint32_t NNP4_35_1CLK /* [0,65535] */;
+  uint32_t NNP4_35_1ADC /* [0,65535] */;
+  uint32_t NNP4_35_2TAC /* [0,65535] */;
+  uint32_t NNP4_35_2CLK /* [0,65535] */;
+  uint32_t NNP4_35_2ADC /* [0,65535] */;
+  uint32_t NNP4_36_1TAC /* [0,65535] */;
+  uint32_t NNP4_36_1CLK /* [0,65535] */;
+  uint32_t NNP4_36_1ADC /* [0,65535] */;
+  uint32_t NNP4_36_2TAC /* [0,65535] */;
+  uint32_t NNP4_36_2CLK /* [0,65535] */;
+  uint32_t NNP4_36_2ADC /* [0,65535] */;
+  uint32_t NNP4_37_1TAC /* [0,65535] */;
+  uint32_t NNP4_37_1CLK /* [0,65535] */;
+  uint32_t NNP4_37_1ADC /* [0,65535] */;
+  uint32_t NNP4_37_2TAC /* [0,65535] */;
+  uint32_t NNP4_37_2CLK /* [0,65535] */;
+  uint32_t NNP4_37_2ADC /* [0,65535] */;
+  uint32_t NNP4_38_1TAC /* [0,65535] */;
+  uint32_t NNP4_38_1CLK /* [0,65535] */;
+  uint32_t NNP4_38_1ADC /* [0,65535] */;
+  uint32_t NNP4_38_2TAC /* [0,65535] */;
+  uint32_t NNP4_38_2CLK /* [0,65535] */;
+  uint32_t NNP4_38_2ADC /* [0,65535] */;
+  uint32_t NNP4_39_1TAC /* [0,65535] */;
+  uint32_t NNP4_39_1CLK /* [0,65535] */;
+  uint32_t NNP4_39_1ADC /* [0,65535] */;
+  uint32_t NNP4_39_2TAC /* [0,65535] */;
+  uint32_t NNP4_39_2CLK /* [0,65535] */;
+  uint32_t NNP4_39_2ADC /* [0,65535] */;
+  uint32_t NNP4_40_1TAC /* [0,65535] */;
+  uint32_t NNP4_40_1CLK /* [0,65535] */;
+  uint32_t NNP4_40_1ADC /* [0,65535] */;
+  uint32_t NNP4_40_2TAC /* [0,65535] */;
+  uint32_t NNP4_40_2CLK /* [0,65535] */;
+  uint32_t NNP4_40_2ADC /* [0,65535] */;
+  uint32_t NNP4_41_1TAC /* [0,65535] */;
+  uint32_t NNP4_41_1CLK /* [0,65535] */;
+  uint32_t NNP4_41_1ADC /* [0,65535] */;
+  uint32_t NNP4_41_2TAC /* [0,65535] */;
+  uint32_t NNP4_41_2CLK /* [0,65535] */;
+  uint32_t NNP4_41_2ADC /* [0,65535] */;
+  uint32_t NNP4_42_1TAC /* [0,65535] */;
+  uint32_t NNP4_42_1CLK /* [0,65535] */;
+  uint32_t NNP4_42_1ADC /* [0,65535] */;
+  uint32_t NNP4_42_2TAC /* [0,65535] */;
+  uint32_t NNP4_42_2CLK /* [0,65535] */;
+  uint32_t NNP4_42_2ADC /* [0,65535] */;
+  uint32_t NNP4_43_1TAC /* [0,65535] */;
+  uint32_t NNP4_43_1CLK /* [0,65535] */;
+  uint32_t NNP4_43_1ADC /* [0,65535] */;
+  uint32_t NNP4_43_2TAC /* [0,65535] */;
+  uint32_t NNP4_43_2CLK /* [0,65535] */;
+  uint32_t NNP4_43_2ADC /* [0,65535] */;
+  uint32_t NNP4_44_1TAC /* [0,65535] */;
+  uint32_t NNP4_44_1CLK /* [0,65535] */;
+  uint32_t NNP4_44_1ADC /* [0,65535] */;
+  uint32_t NNP4_44_2TAC /* [0,65535] */;
+  uint32_t NNP4_44_2CLK /* [0,65535] */;
+  uint32_t NNP4_44_2ADC /* [0,65535] */;
+  uint32_t NNP4_45_1TAC /* [0,65535] */;
+  uint32_t NNP4_45_1CLK /* [0,65535] */;
+  uint32_t NNP4_45_1ADC /* [0,65535] */;
+  uint32_t NNP4_45_2TAC /* [0,65535] */;
+  uint32_t NNP4_45_2CLK /* [0,65535] */;
+  uint32_t NNP4_45_2ADC /* [0,65535] */;
+  uint32_t NNP4_46_1TAC /* [0,65535] */;
+  uint32_t NNP4_46_1CLK /* [0,65535] */;
+  uint32_t NNP4_46_1ADC /* [0,65535] */;
+  uint32_t NNP4_46_2TAC /* [0,65535] */;
+  uint32_t NNP4_46_2CLK /* [0,65535] */;
+  uint32_t NNP4_46_2ADC /* [0,65535] */;
+  uint32_t NNP4_47_1TAC /* [0,65535] */;
+  uint32_t NNP4_47_1CLK /* [0,65535] */;
+  uint32_t NNP4_47_1ADC /* [0,65535] */;
+  uint32_t NNP4_47_2TAC /* [0,65535] */;
+  uint32_t NNP4_47_2CLK /* [0,65535] */;
+  uint32_t NNP4_47_2ADC /* [0,65535] */;
+  uint32_t NNP4_48_1TAC /* [0,65535] */;
+  uint32_t NNP4_48_1CLK /* [0,65535] */;
+  uint32_t NNP4_48_1ADC /* [0,65535] */;
+  uint32_t NNP4_48_2TAC /* [0,65535] */;
+  uint32_t NNP4_48_2CLK /* [0,65535] */;
+  uint32_t NNP4_48_2ADC /* [0,65535] */;
+  uint32_t NNP4_49_1TAC /* [0,65535] */;
+  uint32_t NNP4_49_1CLK /* [0,65535] */;
+  uint32_t NNP4_49_1ADC /* [0,65535] */;
+  uint32_t NNP4_49_2TAC /* [0,65535] */;
+  uint32_t NNP4_49_2CLK /* [0,65535] */;
+  uint32_t NNP4_49_2ADC /* [0,65535] */;
+  uint32_t NNP4_50_1TAC /* [0,65535] */;
+  uint32_t NNP4_50_1CLK /* [0,65535] */;
+  uint32_t NNP4_50_1ADC /* [0,65535] */;
+  uint32_t NNP4_50_2TAC /* [0,65535] */;
+  uint32_t NNP4_50_2CLK /* [0,65535] */;
+  uint32_t NNP4_50_2ADC /* [0,65535] */;
+  uint32_t NNP5_1_1TAC /* [0,65535] */;
+  uint32_t NNP5_1_1CLK /* [0,65535] */;
+  uint32_t NNP5_1_1ADC /* [0,65535] */;
+  uint32_t NNP5_1_2TAC /* [0,65535] */;
+  uint32_t NNP5_1_2CLK /* [0,65535] */;
+  uint32_t NNP5_1_2ADC /* [0,65535] */;
+  uint32_t NNP5_2_1TAC /* [0,65535] */;
+  uint32_t NNP5_2_1CLK /* [0,65535] */;
+  uint32_t NNP5_2_1ADC /* [0,65535] */;
+  uint32_t NNP5_2_2TAC /* [0,65535] */;
+  uint32_t NNP5_2_2CLK /* [0,65535] */;
+  uint32_t NNP5_2_2ADC /* [0,65535] */;
+  uint32_t NNP5_3_1TAC /* [0,65535] */;
+  uint32_t NNP5_3_1CLK /* [0,65535] */;
+  uint32_t NNP5_3_1ADC /* [0,65535] */;
+  uint32_t NNP5_3_2TAC /* [0,65535] */;
+  uint32_t NNP5_3_2CLK /* [0,65535] */;
+  uint32_t NNP5_3_2ADC /* [0,65535] */;
+  uint32_t NNP5_4_1TAC /* [0,65535] */;
+  uint32_t NNP5_4_1CLK /* [0,65535] */;
+  uint32_t NNP5_4_1ADC /* [0,65535] */;
+  uint32_t NNP5_4_2TAC /* [0,65535] */;
+  uint32_t NNP5_4_2CLK /* [0,65535] */;
+  uint32_t NNP5_4_2ADC /* [0,65535] */;
+  uint32_t NNP5_5_1TAC /* [0,65535] */;
+  uint32_t NNP5_5_1CLK /* [0,65535] */;
+  uint32_t NNP5_5_1ADC /* [0,65535] */;
+  uint32_t NNP5_5_2TAC /* [0,65535] */;
+  uint32_t NNP5_5_2CLK /* [0,65535] */;
+  uint32_t NNP5_5_2ADC /* [0,65535] */;
+  uint32_t NNP5_6_1TAC /* [0,65535] */;
+  uint32_t NNP5_6_1CLK /* [0,65535] */;
+  uint32_t NNP5_6_1ADC /* [0,65535] */;
+  uint32_t NNP5_6_2TAC /* [0,65535] */;
+  uint32_t NNP5_6_2CLK /* [0,65535] */;
+  uint32_t NNP5_6_2ADC /* [0,65535] */;
+  uint32_t NNP5_7_1TAC /* [0,65535] */;
+  uint32_t NNP5_7_1CLK /* [0,65535] */;
+  uint32_t NNP5_7_1ADC /* [0,65535] */;
+  uint32_t NNP5_7_2TAC /* [0,65535] */;
+  uint32_t NNP5_7_2CLK /* [0,65535] */;
+  uint32_t NNP5_7_2ADC /* [0,65535] */;
+  uint32_t NNP5_8_1TAC /* [0,65535] */;
+  uint32_t NNP5_8_1CLK /* [0,65535] */;
+  uint32_t NNP5_8_1ADC /* [0,65535] */;
+  uint32_t NNP5_8_2TAC /* [0,65535] */;
+  uint32_t NNP5_8_2CLK /* [0,65535] */;
+  uint32_t NNP5_8_2ADC /* [0,65535] */;
+  uint32_t NNP5_9_1TAC /* [0,65535] */;
+  uint32_t NNP5_9_1CLK /* [0,65535] */;
+  uint32_t NNP5_9_1ADC /* [0,65535] */;
+  uint32_t NNP5_9_2TAC /* [0,65535] */;
+  uint32_t NNP5_9_2CLK /* [0,65535] */;
+  uint32_t NNP5_9_2ADC /* [0,65535] */;
+  uint32_t NNP5_10_1TAC /* [0,65535] */;
+  uint32_t NNP5_10_1CLK /* [0,65535] */;
+  uint32_t NNP5_10_1ADC /* [0,65535] */;
+  uint32_t NNP5_10_2TAC /* [0,65535] */;
+  uint32_t NNP5_10_2CLK /* [0,65535] */;
+  uint32_t NNP5_10_2ADC /* [0,65535] */;
+  uint32_t NNP5_11_1TAC /* [0,65535] */;
+  uint32_t NNP5_11_1CLK /* [0,65535] */;
+  uint32_t NNP5_11_1ADC /* [0,65535] */;
+  uint32_t NNP5_11_2TAC /* [0,65535] */;
+  uint32_t NNP5_11_2CLK /* [0,65535] */;
+  uint32_t NNP5_11_2ADC /* [0,65535] */;
+  uint32_t NNP5_12_1TAC /* [0,65535] */;
+  uint32_t NNP5_12_1CLK /* [0,65535] */;
+  uint32_t NNP5_12_1ADC /* [0,65535] */;
+  uint32_t NNP5_12_2TAC /* [0,65535] */;
+  uint32_t NNP5_12_2CLK /* [0,65535] */;
+  uint32_t NNP5_12_2ADC /* [0,65535] */;
+  uint32_t NNP5_13_1TAC /* [0,65535] */;
+  uint32_t NNP5_13_1CLK /* [0,65535] */;
+  uint32_t NNP5_13_1ADC /* [0,65535] */;
+  uint32_t NNP5_13_2TAC /* [0,65535] */;
+  uint32_t NNP5_13_2CLK /* [0,65535] */;
+  uint32_t NNP5_13_2ADC /* [0,65535] */;
+  uint32_t NNP5_14_1TAC /* [0,65535] */;
+  uint32_t NNP5_14_1CLK /* [0,65535] */;
+  uint32_t NNP5_14_1ADC /* [0,65535] */;
+  uint32_t NNP5_14_2TAC /* [0,65535] */;
+  uint32_t NNP5_14_2CLK /* [0,65535] */;
+  uint32_t NNP5_14_2ADC /* [0,65535] */;
+  uint32_t NNP5_15_1TAC /* [0,65535] */;
+  uint32_t NNP5_15_1CLK /* [0,65535] */;
+  uint32_t NNP5_15_1ADC /* [0,65535] */;
+  uint32_t NNP5_15_2TAC /* [0,65535] */;
+  uint32_t NNP5_15_2CLK /* [0,65535] */;
+  uint32_t NNP5_15_2ADC /* [0,65535] */;
+  uint32_t NNP5_16_1TAC /* [0,65535] */;
+  uint32_t NNP5_16_1CLK /* [0,65535] */;
+  uint32_t NNP5_16_1ADC /* [0,65535] */;
+  uint32_t NNP5_16_2TAC /* [0,65535] */;
+  uint32_t NNP5_16_2CLK /* [0,65535] */;
+  uint32_t NNP5_16_2ADC /* [0,65535] */;
+  uint32_t NNP5_17_1TAC /* [0,65535] */;
+  uint32_t NNP5_17_1CLK /* [0,65535] */;
+  uint32_t NNP5_17_1ADC /* [0,65535] */;
+  uint32_t NNP5_17_2TAC /* [0,65535] */;
+  uint32_t NNP5_17_2CLK /* [0,65535] */;
+  uint32_t NNP5_17_2ADC /* [0,65535] */;
+  uint32_t NNP5_18_1TAC /* [0,65535] */;
+  uint32_t NNP5_18_1CLK /* [0,65535] */;
+  uint32_t NNP5_18_1ADC /* [0,65535] */;
+  uint32_t NNP5_18_2TAC /* [0,65535] */;
+  uint32_t NNP5_18_2CLK /* [0,65535] */;
+  uint32_t NNP5_18_2ADC /* [0,65535] */;
+  uint32_t NNP5_19_1TAC /* [0,65535] */;
+  uint32_t NNP5_19_1CLK /* [0,65535] */;
+  uint32_t NNP5_19_1ADC /* [0,65535] */;
+  uint32_t NNP5_19_2TAC /* [0,65535] */;
+  uint32_t NNP5_19_2CLK /* [0,65535] */;
+  uint32_t NNP5_19_2ADC /* [0,65535] */;
+  uint32_t NNP5_20_1TAC /* [0,65535] */;
+  uint32_t NNP5_20_1CLK /* [0,65535] */;
+  uint32_t NNP5_20_1ADC /* [0,65535] */;
+  uint32_t NNP5_20_2TAC /* [0,65535] */;
+  uint32_t NNP5_20_2CLK /* [0,65535] */;
+  uint32_t NNP5_20_2ADC /* [0,65535] */;
+  uint32_t NNP5_21_1TAC /* [0,65535] */;
+  uint32_t NNP5_21_1CLK /* [0,65535] */;
+  uint32_t NNP5_21_1ADC /* [0,65535] */;
+  uint32_t NNP5_21_2TAC /* [0,65535] */;
+  uint32_t NNP5_21_2CLK /* [0,65535] */;
+  uint32_t NNP5_21_2ADC /* [0,65535] */;
+  uint32_t NNP5_22_1TAC /* [0,65535] */;
+  uint32_t NNP5_22_1CLK /* [0,65535] */;
+  uint32_t NNP5_22_1ADC /* [0,65535] */;
+  uint32_t NNP5_22_2TAC /* [0,65535] */;
+  uint32_t NNP5_22_2CLK /* [0,65535] */;
+  uint32_t NNP5_22_2ADC /* [0,65535] */;
+  uint32_t NNP5_23_1TAC /* [0,65535] */;
+  uint32_t NNP5_23_1CLK /* [0,65535] */;
+  uint32_t NNP5_23_1ADC /* [0,65535] */;
+  uint32_t NNP5_23_2TAC /* [0,65535] */;
+  uint32_t NNP5_23_2CLK /* [0,65535] */;
+  uint32_t NNP5_23_2ADC /* [0,65535] */;
+  uint32_t NNP5_24_1TAC /* [0,65535] */;
+  uint32_t NNP5_24_1CLK /* [0,65535] */;
+  uint32_t NNP5_24_1ADC /* [0,65535] */;
+  uint32_t NNP5_24_2TAC /* [0,65535] */;
+  uint32_t NNP5_24_2CLK /* [0,65535] */;
+  uint32_t NNP5_24_2ADC /* [0,65535] */;
+  uint32_t NNP5_25_1TAC /* [0,65535] */;
+  uint32_t NNP5_25_1CLK /* [0,65535] */;
+  uint32_t NNP5_25_1ADC /* [0,65535] */;
+  uint32_t NNP5_25_2TAC /* [0,65535] */;
+  uint32_t NNP5_25_2CLK /* [0,65535] */;
+  uint32_t NNP5_25_2ADC /* [0,65535] */;
+  uint32_t NNP5_26_1TAC /* [0,65535] */;
+  uint32_t NNP5_26_1CLK /* [0,65535] */;
+  uint32_t NNP5_26_1ADC /* [0,65535] */;
+  uint32_t NNP5_26_2TAC /* [0,65535] */;
+  uint32_t NNP5_26_2CLK /* [0,65535] */;
+  uint32_t NNP5_26_2ADC /* [0,65535] */;
+  uint32_t NNP5_27_1TAC /* [0,65535] */;
+  uint32_t NNP5_27_1CLK /* [0,65535] */;
+  uint32_t NNP5_27_1ADC /* [0,65535] */;
+  uint32_t NNP5_27_2TAC /* [0,65535] */;
+  uint32_t NNP5_27_2CLK /* [0,65535] */;
+  uint32_t NNP5_27_2ADC /* [0,65535] */;
+  uint32_t NNP5_28_1TAC /* [0,65535] */;
+  uint32_t NNP5_28_1CLK /* [0,65535] */;
+  uint32_t NNP5_28_1ADC /* [0,65535] */;
+  uint32_t NNP5_28_2TAC /* [0,65535] */;
+  uint32_t NNP5_28_2CLK /* [0,65535] */;
+  uint32_t NNP5_28_2ADC /* [0,65535] */;
+  uint32_t NNP5_29_1TAC /* [0,65535] */;
+  uint32_t NNP5_29_1CLK /* [0,65535] */;
+  uint32_t NNP5_29_1ADC /* [0,65535] */;
+  uint32_t NNP5_29_2TAC /* [0,65535] */;
+  uint32_t NNP5_29_2CLK /* [0,65535] */;
+  uint32_t NNP5_29_2ADC /* [0,65535] */;
+  uint32_t NNP5_30_1TAC /* [0,65535] */;
+  uint32_t NNP5_30_1CLK /* [0,65535] */;
+  uint32_t NNP5_30_1ADC /* [0,65535] */;
+  uint32_t NNP5_30_2TAC /* [0,65535] */;
+  uint32_t NNP5_30_2CLK /* [0,65535] */;
+  uint32_t NNP5_30_2ADC /* [0,65535] */;
+  uint32_t NNP5_31_1TAC /* [0,65535] */;
+  uint32_t NNP5_31_1CLK /* [0,65535] */;
+  uint32_t NNP5_31_1ADC /* [0,65535] */;
+  uint32_t NNP5_31_2TAC /* [0,65535] */;
+  uint32_t NNP5_31_2CLK /* [0,65535] */;
+  uint32_t NNP5_31_2ADC /* [0,65535] */;
+  uint32_t NNP5_32_1TAC /* [0,65535] */;
+  uint32_t NNP5_32_1CLK /* [0,65535] */;
+  uint32_t NNP5_32_1ADC /* [0,65535] */;
+  uint32_t NNP5_32_2TAC /* [0,65535] */;
+  uint32_t NNP5_32_2CLK /* [0,65535] */;
+  uint32_t NNP5_32_2ADC /* [0,65535] */;
+  uint32_t NNP5_33_1TAC /* [0,65535] */;
+  uint32_t NNP5_33_1CLK /* [0,65535] */;
+  uint32_t NNP5_33_1ADC /* [0,65535] */;
+  uint32_t NNP5_33_2TAC /* [0,65535] */;
+  uint32_t NNP5_33_2CLK /* [0,65535] */;
+  uint32_t NNP5_33_2ADC /* [0,65535] */;
+  uint32_t NNP5_34_1TAC /* [0,65535] */;
+  uint32_t NNP5_34_1CLK /* [0,65535] */;
+  uint32_t NNP5_34_1ADC /* [0,65535] */;
+  uint32_t NNP5_34_2TAC /* [0,65535] */;
+  uint32_t NNP5_34_2CLK /* [0,65535] */;
+  uint32_t NNP5_34_2ADC /* [0,65535] */;
+  uint32_t NNP5_35_1TAC /* [0,65535] */;
+  uint32_t NNP5_35_1CLK /* [0,65535] */;
+  uint32_t NNP5_35_1ADC /* [0,65535] */;
+  uint32_t NNP5_35_2TAC /* [0,65535] */;
+  uint32_t NNP5_35_2CLK /* [0,65535] */;
+  uint32_t NNP5_35_2ADC /* [0,65535] */;
+  uint32_t NNP5_36_1TAC /* [0,65535] */;
+  uint32_t NNP5_36_1CLK /* [0,65535] */;
+  uint32_t NNP5_36_1ADC /* [0,65535] */;
+  uint32_t NNP5_36_2TAC /* [0,65535] */;
+  uint32_t NNP5_36_2CLK /* [0,65535] */;
+  uint32_t NNP5_36_2ADC /* [0,65535] */;
+  uint32_t NNP5_37_1TAC /* [0,65535] */;
+  uint32_t NNP5_37_1CLK /* [0,65535] */;
+  uint32_t NNP5_37_1ADC /* [0,65535] */;
+  uint32_t NNP5_37_2TAC /* [0,65535] */;
+  uint32_t NNP5_37_2CLK /* [0,65535] */;
+  uint32_t NNP5_37_2ADC /* [0,65535] */;
+  uint32_t NNP5_38_1TAC /* [0,65535] */;
+  uint32_t NNP5_38_1CLK /* [0,65535] */;
+  uint32_t NNP5_38_1ADC /* [0,65535] */;
+  uint32_t NNP5_38_2TAC /* [0,65535] */;
+  uint32_t NNP5_38_2CLK /* [0,65535] */;
+  uint32_t NNP5_38_2ADC /* [0,65535] */;
+  uint32_t NNP5_39_1TAC /* [0,65535] */;
+  uint32_t NNP5_39_1CLK /* [0,65535] */;
+  uint32_t NNP5_39_1ADC /* [0,65535] */;
+  uint32_t NNP5_39_2TAC /* [0,65535] */;
+  uint32_t NNP5_39_2CLK /* [0,65535] */;
+  uint32_t NNP5_39_2ADC /* [0,65535] */;
+  uint32_t NNP5_40_1TAC /* [0,65535] */;
+  uint32_t NNP5_40_1CLK /* [0,65535] */;
+  uint32_t NNP5_40_1ADC /* [0,65535] */;
+  uint32_t NNP5_40_2TAC /* [0,65535] */;
+  uint32_t NNP5_40_2CLK /* [0,65535] */;
+  uint32_t NNP5_40_2ADC /* [0,65535] */;
+  uint32_t NNP5_41_1TAC /* [0,65535] */;
+  uint32_t NNP5_41_1CLK /* [0,65535] */;
+  uint32_t NNP5_41_1ADC /* [0,65535] */;
+  uint32_t NNP5_41_2TAC /* [0,65535] */;
+  uint32_t NNP5_41_2CLK /* [0,65535] */;
+  uint32_t NNP5_41_2ADC /* [0,65535] */;
+  uint32_t NNP5_42_1TAC /* [0,65535] */;
+  uint32_t NNP5_42_1CLK /* [0,65535] */;
+  uint32_t NNP5_42_1ADC /* [0,65535] */;
+  uint32_t NNP5_42_2TAC /* [0,65535] */;
+  uint32_t NNP5_42_2CLK /* [0,65535] */;
+  uint32_t NNP5_42_2ADC /* [0,65535] */;
+  uint32_t NNP5_43_1TAC /* [0,65535] */;
+  uint32_t NNP5_43_1CLK /* [0,65535] */;
+  uint32_t NNP5_43_1ADC /* [0,65535] */;
+  uint32_t NNP5_43_2TAC /* [0,65535] */;
+  uint32_t NNP5_43_2CLK /* [0,65535] */;
+  uint32_t NNP5_43_2ADC /* [0,65535] */;
+  uint32_t NNP5_44_1TAC /* [0,65535] */;
+  uint32_t NNP5_44_1CLK /* [0,65535] */;
+  uint32_t NNP5_44_1ADC /* [0,65535] */;
+  uint32_t NNP5_44_2TAC /* [0,65535] */;
+  uint32_t NNP5_44_2CLK /* [0,65535] */;
+  uint32_t NNP5_44_2ADC /* [0,65535] */;
+  uint32_t NNP5_45_1TAC /* [0,65535] */;
+  uint32_t NNP5_45_1CLK /* [0,65535] */;
+  uint32_t NNP5_45_1ADC /* [0,65535] */;
+  uint32_t NNP5_45_2TAC /* [0,65535] */;
+  uint32_t NNP5_45_2CLK /* [0,65535] */;
+  uint32_t NNP5_45_2ADC /* [0,65535] */;
+  uint32_t NNP5_46_1TAC /* [0,65535] */;
+  uint32_t NNP5_46_1CLK /* [0,65535] */;
+  uint32_t NNP5_46_1ADC /* [0,65535] */;
+  uint32_t NNP5_46_2TAC /* [0,65535] */;
+  uint32_t NNP5_46_2CLK /* [0,65535] */;
+  uint32_t NNP5_46_2ADC /* [0,65535] */;
+  uint32_t NNP5_47_1TAC /* [0,65535] */;
+  uint32_t NNP5_47_1CLK /* [0,65535] */;
+  uint32_t NNP5_47_1ADC /* [0,65535] */;
+  uint32_t NNP5_47_2TAC /* [0,65535] */;
+  uint32_t NNP5_47_2CLK /* [0,65535] */;
+  uint32_t NNP5_47_2ADC /* [0,65535] */;
+  uint32_t NNP5_48_1TAC /* [0,65535] */;
+  uint32_t NNP5_48_1CLK /* [0,65535] */;
+  uint32_t NNP5_48_1ADC /* [0,65535] */;
+  uint32_t NNP5_48_2TAC /* [0,65535] */;
+  uint32_t NNP5_48_2CLK /* [0,65535] */;
+  uint32_t NNP5_48_2ADC /* [0,65535] */;
+  uint32_t NNP5_49_1TAC /* [0,65535] */;
+  uint32_t NNP5_49_1CLK /* [0,65535] */;
+  uint32_t NNP5_49_1ADC /* [0,65535] */;
+  uint32_t NNP5_49_2TAC /* [0,65535] */;
+  uint32_t NNP5_49_2CLK /* [0,65535] */;
+  uint32_t NNP5_49_2ADC /* [0,65535] */;
+  uint32_t NNP5_50_1TAC /* [0,65535] */;
+  uint32_t NNP5_50_1CLK /* [0,65535] */;
+  uint32_t NNP5_50_1ADC /* [0,65535] */;
+  uint32_t NNP5_50_2TAC /* [0,65535] */;
+  uint32_t NNP5_50_2CLK /* [0,65535] */;
+  uint32_t NNP5_50_2ADC /* [0,65535] */;
+  uint32_t NNP6_1_1TAC /* [0,65535] */;
+  uint32_t NNP6_1_1CLK /* [0,65535] */;
+  uint32_t NNP6_1_1ADC /* [0,65535] */;
+  uint32_t NNP6_1_2TAC /* [0,65535] */;
+  uint32_t NNP6_1_2CLK /* [0,65535] */;
+  uint32_t NNP6_1_2ADC /* [0,65535] */;
+  uint32_t NNP6_2_1TAC /* [0,65535] */;
+  uint32_t NNP6_2_1CLK /* [0,65535] */;
+  uint32_t NNP6_2_1ADC /* [0,65535] */;
+  uint32_t NNP6_2_2TAC /* [0,65535] */;
+  uint32_t NNP6_2_2CLK /* [0,65535] */;
+  uint32_t NNP6_2_2ADC /* [0,65535] */;
+  uint32_t NNP6_3_1TAC /* [0,65535] */;
+  uint32_t NNP6_3_1CLK /* [0,65535] */;
+  uint32_t NNP6_3_1ADC /* [0,65535] */;
+  uint32_t NNP6_3_2TAC /* [0,65535] */;
+  uint32_t NNP6_3_2CLK /* [0,65535] */;
+  uint32_t NNP6_3_2ADC /* [0,65535] */;
+  uint32_t NNP6_4_1TAC /* [0,65535] */;
+  uint32_t NNP6_4_1CLK /* [0,65535] */;
+  uint32_t NNP6_4_1ADC /* [0,65535] */;
+  uint32_t NNP6_4_2TAC /* [0,65535] */;
+  uint32_t NNP6_4_2CLK /* [0,65535] */;
+  uint32_t NNP6_4_2ADC /* [0,65535] */;
+  uint32_t NNP6_5_1TAC /* [0,65535] */;
+  uint32_t NNP6_5_1CLK /* [0,65535] */;
+  uint32_t NNP6_5_1ADC /* [0,65535] */;
+  uint32_t NNP6_5_2TAC /* [0,65535] */;
+  uint32_t NNP6_5_2CLK /* [0,65535] */;
+  uint32_t NNP6_5_2ADC /* [0,65535] */;
+  uint32_t NNP6_6_1TAC /* [0,65535] */;
+  uint32_t NNP6_6_1CLK /* [0,65535] */;
+  uint32_t NNP6_6_1ADC /* [0,65535] */;
+  uint32_t NNP6_6_2TAC /* [0,65535] */;
+  uint32_t NNP6_6_2CLK /* [0,65535] */;
+  uint32_t NNP6_6_2ADC /* [0,65535] */;
+  uint32_t NNP6_7_1TAC /* [0,65535] */;
+  uint32_t NNP6_7_1CLK /* [0,65535] */;
+  uint32_t NNP6_7_1ADC /* [0,65535] */;
+  uint32_t NNP6_7_2TAC /* [0,65535] */;
+  uint32_t NNP6_7_2CLK /* [0,65535] */;
+  uint32_t NNP6_7_2ADC /* [0,65535] */;
+  uint32_t NNP6_8_1TAC /* [0,65535] */;
+  uint32_t NNP6_8_1CLK /* [0,65535] */;
+  uint32_t NNP6_8_1ADC /* [0,65535] */;
+  uint32_t NNP6_8_2TAC /* [0,65535] */;
+  uint32_t NNP6_8_2CLK /* [0,65535] */;
+  uint32_t NNP6_8_2ADC /* [0,65535] */;
+  uint32_t NNP6_9_1TAC /* [0,65535] */;
+  uint32_t NNP6_9_1CLK /* [0,65535] */;
+  uint32_t NNP6_9_1ADC /* [0,65535] */;
+  uint32_t NNP6_9_2TAC /* [0,65535] */;
+  uint32_t NNP6_9_2CLK /* [0,65535] */;
+  uint32_t NNP6_9_2ADC /* [0,65535] */;
+  uint32_t NNP6_10_1TAC /* [0,65535] */;
+  uint32_t NNP6_10_1CLK /* [0,65535] */;
+  uint32_t NNP6_10_1ADC /* [0,65535] */;
+  uint32_t NNP6_10_2TAC /* [0,65535] */;
+  uint32_t NNP6_10_2CLK /* [0,65535] */;
+  uint32_t NNP6_10_2ADC /* [0,65535] */;
+  uint32_t NNP6_11_1TAC /* [0,65535] */;
+  uint32_t NNP6_11_1CLK /* [0,65535] */;
+  uint32_t NNP6_11_1ADC /* [0,65535] */;
+  uint32_t NNP6_11_2TAC /* [0,65535] */;
+  uint32_t NNP6_11_2CLK /* [0,65535] */;
+  uint32_t NNP6_11_2ADC /* [0,65535] */;
+  uint32_t NNP6_12_1TAC /* [0,65535] */;
+  uint32_t NNP6_12_1CLK /* [0,65535] */;
+  uint32_t NNP6_12_1ADC /* [0,65535] */;
+  uint32_t NNP6_12_2TAC /* [0,65535] */;
+  uint32_t NNP6_12_2CLK /* [0,65535] */;
+  uint32_t NNP6_12_2ADC /* [0,65535] */;
+  uint32_t NNP6_13_1TAC /* [0,65535] */;
+  uint32_t NNP6_13_1CLK /* [0,65535] */;
+  uint32_t NNP6_13_1ADC /* [0,65535] */;
+  uint32_t NNP6_13_2TAC /* [0,65535] */;
+  uint32_t NNP6_13_2CLK /* [0,65535] */;
+  uint32_t NNP6_13_2ADC /* [0,65535] */;
+  uint32_t NNP6_14_1TAC /* [0,65535] */;
+  uint32_t NNP6_14_1CLK /* [0,65535] */;
+  uint32_t NNP6_14_1ADC /* [0,65535] */;
+  uint32_t NNP6_14_2TAC /* [0,65535] */;
+  uint32_t NNP6_14_2CLK /* [0,65535] */;
+  uint32_t NNP6_14_2ADC /* [0,65535] */;
+  uint32_t NNP6_15_1TAC /* [0,65535] */;
+  uint32_t NNP6_15_1CLK /* [0,65535] */;
+  uint32_t NNP6_15_1ADC /* [0,65535] */;
+  uint32_t NNP6_15_2TAC /* [0,65535] */;
+  uint32_t NNP6_15_2CLK /* [0,65535] */;
+  uint32_t NNP6_15_2ADC /* [0,65535] */;
+  uint32_t NNP6_16_1TAC /* [0,65535] */;
+  uint32_t NNP6_16_1CLK /* [0,65535] */;
+  uint32_t NNP6_16_1ADC /* [0,65535] */;
+  uint32_t NNP6_16_2TAC /* [0,65535] */;
+  uint32_t NNP6_16_2CLK /* [0,65535] */;
+  uint32_t NNP6_16_2ADC /* [0,65535] */;
+  uint32_t NNP6_17_1TAC /* [0,65535] */;
+  uint32_t NNP6_17_1CLK /* [0,65535] */;
+  uint32_t NNP6_17_1ADC /* [0,65535] */;
+  uint32_t NNP6_17_2TAC /* [0,65535] */;
+  uint32_t NNP6_17_2CLK /* [0,65535] */;
+  uint32_t NNP6_17_2ADC /* [0,65535] */;
+  uint32_t NNP6_18_1TAC /* [0,65535] */;
+  uint32_t NNP6_18_1CLK /* [0,65535] */;
+  uint32_t NNP6_18_1ADC /* [0,65535] */;
+  uint32_t NNP6_18_2TAC /* [0,65535] */;
+  uint32_t NNP6_18_2CLK /* [0,65535] */;
+  uint32_t NNP6_18_2ADC /* [0,65535] */;
+  uint32_t NNP6_19_1TAC /* [0,65535] */;
+  uint32_t NNP6_19_1CLK /* [0,65535] */;
+  uint32_t NNP6_19_1ADC /* [0,65535] */;
+  uint32_t NNP6_19_2TAC /* [0,65535] */;
+  uint32_t NNP6_19_2CLK /* [0,65535] */;
+  uint32_t NNP6_19_2ADC /* [0,65535] */;
+  uint32_t NNP6_20_1TAC /* [0,65535] */;
+  uint32_t NNP6_20_1CLK /* [0,65535] */;
+  uint32_t NNP6_20_1ADC /* [0,65535] */;
+  uint32_t NNP6_20_2TAC /* [0,65535] */;
+  uint32_t NNP6_20_2CLK /* [0,65535] */;
+  uint32_t NNP6_20_2ADC /* [0,65535] */;
+  uint32_t NNP6_21_1TAC /* [0,65535] */;
+  uint32_t NNP6_21_1CLK /* [0,65535] */;
+  uint32_t NNP6_21_1ADC /* [0,65535] */;
+  uint32_t NNP6_21_2TAC /* [0,65535] */;
+  uint32_t NNP6_21_2CLK /* [0,65535] */;
+  uint32_t NNP6_21_2ADC /* [0,65535] */;
+  uint32_t NNP6_22_1TAC /* [0,65535] */;
+  uint32_t NNP6_22_1CLK /* [0,65535] */;
+  uint32_t NNP6_22_1ADC /* [0,65535] */;
+  uint32_t NNP6_22_2TAC /* [0,65535] */;
+  uint32_t NNP6_22_2CLK /* [0,65535] */;
+  uint32_t NNP6_22_2ADC /* [0,65535] */;
+  uint32_t NNP6_23_1TAC /* [0,65535] */;
+  uint32_t NNP6_23_1CLK /* [0,65535] */;
+  uint32_t NNP6_23_1ADC /* [0,65535] */;
+  uint32_t NNP6_23_2TAC /* [0,65535] */;
+  uint32_t NNP6_23_2CLK /* [0,65535] */;
+  uint32_t NNP6_23_2ADC /* [0,65535] */;
+  uint32_t NNP6_24_1TAC /* [0,65535] */;
+  uint32_t NNP6_24_1CLK /* [0,65535] */;
+  uint32_t NNP6_24_1ADC /* [0,65535] */;
+  uint32_t NNP6_24_2TAC /* [0,65535] */;
+  uint32_t NNP6_24_2CLK /* [0,65535] */;
+  uint32_t NNP6_24_2ADC /* [0,65535] */;
+  uint32_t NNP6_25_1TAC /* [0,65535] */;
+  uint32_t NNP6_25_1CLK /* [0,65535] */;
+  uint32_t NNP6_25_1ADC /* [0,65535] */;
+  uint32_t NNP6_25_2TAC /* [0,65535] */;
+  uint32_t NNP6_25_2CLK /* [0,65535] */;
+  uint32_t NNP6_25_2ADC /* [0,65535] */;
+  uint32_t NNP6_26_1TAC /* [0,65535] */;
+  uint32_t NNP6_26_1CLK /* [0,65535] */;
+  uint32_t NNP6_26_1ADC /* [0,65535] */;
+  uint32_t NNP6_26_2TAC /* [0,65535] */;
+  uint32_t NNP6_26_2CLK /* [0,65535] */;
+  uint32_t NNP6_26_2ADC /* [0,65535] */;
+  uint32_t NNP6_27_1TAC /* [0,65535] */;
+  uint32_t NNP6_27_1CLK /* [0,65535] */;
+  uint32_t NNP6_27_1ADC /* [0,65535] */;
+  uint32_t NNP6_27_2TAC /* [0,65535] */;
+  uint32_t NNP6_27_2CLK /* [0,65535] */;
+  uint32_t NNP6_27_2ADC /* [0,65535] */;
+  uint32_t NNP6_28_1TAC /* [0,65535] */;
+  uint32_t NNP6_28_1CLK /* [0,65535] */;
+  uint32_t NNP6_28_1ADC /* [0,65535] */;
+  uint32_t NNP6_28_2TAC /* [0,65535] */;
+  uint32_t NNP6_28_2CLK /* [0,65535] */;
+  uint32_t NNP6_28_2ADC /* [0,65535] */;
+  uint32_t NNP6_29_1TAC /* [0,65535] */;
+  uint32_t NNP6_29_1CLK /* [0,65535] */;
+  uint32_t NNP6_29_1ADC /* [0,65535] */;
+  uint32_t NNP6_29_2TAC /* [0,65535] */;
+  uint32_t NNP6_29_2CLK /* [0,65535] */;
+  uint32_t NNP6_29_2ADC /* [0,65535] */;
+  uint32_t NNP6_30_1TAC /* [0,65535] */;
+  uint32_t NNP6_30_1CLK /* [0,65535] */;
+  uint32_t NNP6_30_1ADC /* [0,65535] */;
+  uint32_t NNP6_30_2TAC /* [0,65535] */;
+  uint32_t NNP6_30_2CLK /* [0,65535] */;
+  uint32_t NNP6_30_2ADC /* [0,65535] */;
+  uint32_t NNP6_31_1TAC /* [0,65535] */;
+  uint32_t NNP6_31_1CLK /* [0,65535] */;
+  uint32_t NNP6_31_1ADC /* [0,65535] */;
+  uint32_t NNP6_31_2TAC /* [0,65535] */;
+  uint32_t NNP6_31_2CLK /* [0,65535] */;
+  uint32_t NNP6_31_2ADC /* [0,65535] */;
+  uint32_t NNP6_32_1TAC /* [0,65535] */;
+  uint32_t NNP6_32_1CLK /* [0,65535] */;
+  uint32_t NNP6_32_1ADC /* [0,65535] */;
+  uint32_t NNP6_32_2TAC /* [0,65535] */;
+  uint32_t NNP6_32_2CLK /* [0,65535] */;
+  uint32_t NNP6_32_2ADC /* [0,65535] */;
+  uint32_t NNP6_33_1TAC /* [0,65535] */;
+  uint32_t NNP6_33_1CLK /* [0,65535] */;
+  uint32_t NNP6_33_1ADC /* [0,65535] */;
+  uint32_t NNP6_33_2TAC /* [0,65535] */;
+  uint32_t NNP6_33_2CLK /* [0,65535] */;
+  uint32_t NNP6_33_2ADC /* [0,65535] */;
+  uint32_t NNP6_34_1TAC /* [0,65535] */;
+  uint32_t NNP6_34_1CLK /* [0,65535] */;
+  uint32_t NNP6_34_1ADC /* [0,65535] */;
+  uint32_t NNP6_34_2TAC /* [0,65535] */;
+  uint32_t NNP6_34_2CLK /* [0,65535] */;
+  uint32_t NNP6_34_2ADC /* [0,65535] */;
+  uint32_t NNP6_35_1TAC /* [0,65535] */;
+  uint32_t NNP6_35_1CLK /* [0,65535] */;
+  uint32_t NNP6_35_1ADC /* [0,65535] */;
+  uint32_t NNP6_35_2TAC /* [0,65535] */;
+  uint32_t NNP6_35_2CLK /* [0,65535] */;
+  uint32_t NNP6_35_2ADC /* [0,65535] */;
+  uint32_t NNP6_36_1TAC /* [0,65535] */;
+  uint32_t NNP6_36_1CLK /* [0,65535] */;
+  uint32_t NNP6_36_1ADC /* [0,65535] */;
+  uint32_t NNP6_36_2TAC /* [0,65535] */;
+  uint32_t NNP6_36_2CLK /* [0,65535] */;
+  uint32_t NNP6_36_2ADC /* [0,65535] */;
+  uint32_t NNP6_37_1TAC /* [0,65535] */;
+  uint32_t NNP6_37_1CLK /* [0,65535] */;
+  uint32_t NNP6_37_1ADC /* [0,65535] */;
+  uint32_t NNP6_37_2TAC /* [0,65535] */;
+  uint32_t NNP6_37_2CLK /* [0,65535] */;
+  uint32_t NNP6_37_2ADC /* [0,65535] */;
+  uint32_t NNP6_38_1TAC /* [0,65535] */;
+  uint32_t NNP6_38_1CLK /* [0,65535] */;
+  uint32_t NNP6_38_1ADC /* [0,65535] */;
+  uint32_t NNP6_38_2TAC /* [0,65535] */;
+  uint32_t NNP6_38_2CLK /* [0,65535] */;
+  uint32_t NNP6_38_2ADC /* [0,65535] */;
+  uint32_t NNP6_39_1TAC /* [0,65535] */;
+  uint32_t NNP6_39_1CLK /* [0,65535] */;
+  uint32_t NNP6_39_1ADC /* [0,65535] */;
+  uint32_t NNP6_39_2TAC /* [0,65535] */;
+  uint32_t NNP6_39_2CLK /* [0,65535] */;
+  uint32_t NNP6_39_2ADC /* [0,65535] */;
+  uint32_t NNP6_40_1TAC /* [0,65535] */;
+  uint32_t NNP6_40_1CLK /* [0,65535] */;
+  uint32_t NNP6_40_1ADC /* [0,65535] */;
+  uint32_t NNP6_40_2TAC /* [0,65535] */;
+  uint32_t NNP6_40_2CLK /* [0,65535] */;
+  uint32_t NNP6_40_2ADC /* [0,65535] */;
+  uint32_t NNP6_41_1TAC /* [0,65535] */;
+  uint32_t NNP6_41_1CLK /* [0,65535] */;
+  uint32_t NNP6_41_1ADC /* [0,65535] */;
+  uint32_t NNP6_41_2TAC /* [0,65535] */;
+  uint32_t NNP6_41_2CLK /* [0,65535] */;
+  uint32_t NNP6_41_2ADC /* [0,65535] */;
+  uint32_t NNP6_42_1TAC /* [0,65535] */;
+  uint32_t NNP6_42_1CLK /* [0,65535] */;
+  uint32_t NNP6_42_1ADC /* [0,65535] */;
+  uint32_t NNP6_42_2TAC /* [0,65535] */;
+  uint32_t NNP6_42_2CLK /* [0,65535] */;
+  uint32_t NNP6_42_2ADC /* [0,65535] */;
+  uint32_t NNP6_43_1TAC /* [0,65535] */;
+  uint32_t NNP6_43_1CLK /* [0,65535] */;
+  uint32_t NNP6_43_1ADC /* [0,65535] */;
+  uint32_t NNP6_43_2TAC /* [0,65535] */;
+  uint32_t NNP6_43_2CLK /* [0,65535] */;
+  uint32_t NNP6_43_2ADC /* [0,65535] */;
+  uint32_t NNP6_44_1TAC /* [0,65535] */;
+  uint32_t NNP6_44_1CLK /* [0,65535] */;
+  uint32_t NNP6_44_1ADC /* [0,65535] */;
+  uint32_t NNP6_44_2TAC /* [0,65535] */;
+  uint32_t NNP6_44_2CLK /* [0,65535] */;
+  uint32_t NNP6_44_2ADC /* [0,65535] */;
+  uint32_t NNP6_45_1TAC /* [0,65535] */;
+  uint32_t NNP6_45_1CLK /* [0,65535] */;
+  uint32_t NNP6_45_1ADC /* [0,65535] */;
+  uint32_t NNP6_45_2TAC /* [0,65535] */;
+  uint32_t NNP6_45_2CLK /* [0,65535] */;
+  uint32_t NNP6_45_2ADC /* [0,65535] */;
+  uint32_t NNP6_46_1TAC /* [0,65535] */;
+  uint32_t NNP6_46_1CLK /* [0,65535] */;
+  uint32_t NNP6_46_1ADC /* [0,65535] */;
+  uint32_t NNP6_46_2TAC /* [0,65535] */;
+  uint32_t NNP6_46_2CLK /* [0,65535] */;
+  uint32_t NNP6_46_2ADC /* [0,65535] */;
+  uint32_t NNP6_47_1TAC /* [0,65535] */;
+  uint32_t NNP6_47_1CLK /* [0,65535] */;
+  uint32_t NNP6_47_1ADC /* [0,65535] */;
+  uint32_t NNP6_47_2TAC /* [0,65535] */;
+  uint32_t NNP6_47_2CLK /* [0,65535] */;
+  uint32_t NNP6_47_2ADC /* [0,65535] */;
+  uint32_t NNP6_48_1TAC /* [0,65535] */;
+  uint32_t NNP6_48_1CLK /* [0,65535] */;
+  uint32_t NNP6_48_1ADC /* [0,65535] */;
+  uint32_t NNP6_48_2TAC /* [0,65535] */;
+  uint32_t NNP6_48_2CLK /* [0,65535] */;
+  uint32_t NNP6_48_2ADC /* [0,65535] */;
+  uint32_t NNP6_49_1TAC /* [0,65535] */;
+  uint32_t NNP6_49_1CLK /* [0,65535] */;
+  uint32_t NNP6_49_1ADC /* [0,65535] */;
+  uint32_t NNP6_49_2TAC /* [0,65535] */;
+  uint32_t NNP6_49_2CLK /* [0,65535] */;
+  uint32_t NNP6_49_2ADC /* [0,65535] */;
+  uint32_t NNP6_50_1TAC /* [0,65535] */;
+  uint32_t NNP6_50_1CLK /* [0,65535] */;
+  uint32_t NNP6_50_1ADC /* [0,65535] */;
+  uint32_t NNP6_50_2TAC /* [0,65535] */;
+  uint32_t NNP6_50_2CLK /* [0,65535] */;
+  uint32_t NNP6_50_2ADC /* [0,65535] */;
+  uint32_t NNP7_1_1TAC /* [0,65535] */;
+  uint32_t NNP7_1_1CLK /* [0,65535] */;
+  uint32_t NNP7_1_1ADC /* [0,65535] */;
+  uint32_t NNP7_1_2TAC /* [0,65535] */;
+  uint32_t NNP7_1_2CLK /* [0,65535] */;
+  uint32_t NNP7_1_2ADC /* [0,65535] */;
+  uint32_t NNP7_2_1TAC /* [0,65535] */;
+  uint32_t NNP7_2_1CLK /* [0,65535] */;
+  uint32_t NNP7_2_1ADC /* [0,65535] */;
+  uint32_t NNP7_2_2TAC /* [0,65535] */;
+  uint32_t NNP7_2_2CLK /* [0,65535] */;
+  uint32_t NNP7_2_2ADC /* [0,65535] */;
+  uint32_t NNP7_3_1TAC /* [0,65535] */;
+  uint32_t NNP7_3_1CLK /* [0,65535] */;
+  uint32_t NNP7_3_1ADC /* [0,65535] */;
+  uint32_t NNP7_3_2TAC /* [0,65535] */;
+  uint32_t NNP7_3_2CLK /* [0,65535] */;
+  uint32_t NNP7_3_2ADC /* [0,65535] */;
+  uint32_t NNP7_4_1TAC /* [0,65535] */;
+  uint32_t NNP7_4_1CLK /* [0,65535] */;
+  uint32_t NNP7_4_1ADC /* [0,65535] */;
+  uint32_t NNP7_4_2TAC /* [0,65535] */;
+  uint32_t NNP7_4_2CLK /* [0,65535] */;
+  uint32_t NNP7_4_2ADC /* [0,65535] */;
+  uint32_t NNP7_5_1TAC /* [0,65535] */;
+  uint32_t NNP7_5_1CLK /* [0,65535] */;
+  uint32_t NNP7_5_1ADC /* [0,65535] */;
+  uint32_t NNP7_5_2TAC /* [0,65535] */;
+  uint32_t NNP7_5_2CLK /* [0,65535] */;
+  uint32_t NNP7_5_2ADC /* [0,65535] */;
+  uint32_t NNP7_6_1TAC /* [0,65535] */;
+  uint32_t NNP7_6_1CLK /* [0,65535] */;
+  uint32_t NNP7_6_1ADC /* [0,65535] */;
+  uint32_t NNP7_6_2TAC /* [0,65535] */;
+  uint32_t NNP7_6_2CLK /* [0,65535] */;
+  uint32_t NNP7_6_2ADC /* [0,65535] */;
+  uint32_t NNP7_7_1TAC /* [0,65535] */;
+  uint32_t NNP7_7_1CLK /* [0,65535] */;
+  uint32_t NNP7_7_1ADC /* [0,65535] */;
+  uint32_t NNP7_7_2TAC /* [0,65535] */;
+  uint32_t NNP7_7_2CLK /* [0,65535] */;
+  uint32_t NNP7_7_2ADC /* [0,65535] */;
+  uint32_t NNP7_8_1TAC /* [0,65535] */;
+  uint32_t NNP7_8_1CLK /* [0,65535] */;
+  uint32_t NNP7_8_1ADC /* [0,65535] */;
+  uint32_t NNP7_8_2TAC /* [0,65535] */;
+  uint32_t NNP7_8_2CLK /* [0,65535] */;
+  uint32_t NNP7_8_2ADC /* [0,65535] */;
+  uint32_t NNP7_9_1TAC /* [0,65535] */;
+  uint32_t NNP7_9_1CLK /* [0,65535] */;
+  uint32_t NNP7_9_1ADC /* [0,65535] */;
+  uint32_t NNP7_9_2TAC /* [0,65535] */;
+  uint32_t NNP7_9_2CLK /* [0,65535] */;
+  uint32_t NNP7_9_2ADC /* [0,65535] */;
+  uint32_t NNP7_10_1TAC /* [0,65535] */;
+  uint32_t NNP7_10_1CLK /* [0,65535] */;
+  uint32_t NNP7_10_1ADC /* [0,65535] */;
+  uint32_t NNP7_10_2TAC /* [0,65535] */;
+  uint32_t NNP7_10_2CLK /* [0,65535] */;
+  uint32_t NNP7_10_2ADC /* [0,65535] */;
+  uint32_t NNP7_11_1TAC /* [0,65535] */;
+  uint32_t NNP7_11_1CLK /* [0,65535] */;
+  uint32_t NNP7_11_1ADC /* [0,65535] */;
+  uint32_t NNP7_11_2TAC /* [0,65535] */;
+  uint32_t NNP7_11_2CLK /* [0,65535] */;
+  uint32_t NNP7_11_2ADC /* [0,65535] */;
+  uint32_t NNP7_12_1TAC /* [0,65535] */;
+  uint32_t NNP7_12_1CLK /* [0,65535] */;
+  uint32_t NNP7_12_1ADC /* [0,65535] */;
+  uint32_t NNP7_12_2TAC /* [0,65535] */;
+  uint32_t NNP7_12_2CLK /* [0,65535] */;
+  uint32_t NNP7_12_2ADC /* [0,65535] */;
+  uint32_t NNP7_13_1TAC /* [0,65535] */;
+  uint32_t NNP7_13_1CLK /* [0,65535] */;
+  uint32_t NNP7_13_1ADC /* [0,65535] */;
+  uint32_t NNP7_13_2TAC /* [0,65535] */;
+  uint32_t NNP7_13_2CLK /* [0,65535] */;
+  uint32_t NNP7_13_2ADC /* [0,65535] */;
+  uint32_t NNP7_14_1TAC /* [0,65535] */;
+  uint32_t NNP7_14_1CLK /* [0,65535] */;
+  uint32_t NNP7_14_1ADC /* [0,65535] */;
+  uint32_t NNP7_14_2TAC /* [0,65535] */;
+  uint32_t NNP7_14_2CLK /* [0,65535] */;
+  uint32_t NNP7_14_2ADC /* [0,65535] */;
+  uint32_t NNP7_15_1TAC /* [0,65535] */;
+  uint32_t NNP7_15_1CLK /* [0,65535] */;
+  uint32_t NNP7_15_1ADC /* [0,65535] */;
+  uint32_t NNP7_15_2TAC /* [0,65535] */;
+  uint32_t NNP7_15_2CLK /* [0,65535] */;
+  uint32_t NNP7_15_2ADC /* [0,65535] */;
+  uint32_t NNP7_16_1TAC /* [0,65535] */;
+  uint32_t NNP7_16_1CLK /* [0,65535] */;
+  uint32_t NNP7_16_1ADC /* [0,65535] */;
+  uint32_t NNP7_16_2TAC /* [0,65535] */;
+  uint32_t NNP7_16_2CLK /* [0,65535] */;
+  uint32_t NNP7_16_2ADC /* [0,65535] */;
+  uint32_t NNP7_17_1TAC /* [0,65535] */;
+  uint32_t NNP7_17_1CLK /* [0,65535] */;
+  uint32_t NNP7_17_1ADC /* [0,65535] */;
+  uint32_t NNP7_17_2TAC /* [0,65535] */;
+  uint32_t NNP7_17_2CLK /* [0,65535] */;
+  uint32_t NNP7_17_2ADC /* [0,65535] */;
+  uint32_t NNP7_18_1TAC /* [0,65535] */;
+  uint32_t NNP7_18_1CLK /* [0,65535] */;
+  uint32_t NNP7_18_1ADC /* [0,65535] */;
+  uint32_t NNP7_18_2TAC /* [0,65535] */;
+  uint32_t NNP7_18_2CLK /* [0,65535] */;
+  uint32_t NNP7_18_2ADC /* [0,65535] */;
+  uint32_t NNP7_19_1TAC /* [0,65535] */;
+  uint32_t NNP7_19_1CLK /* [0,65535] */;
+  uint32_t NNP7_19_1ADC /* [0,65535] */;
+  uint32_t NNP7_19_2TAC /* [0,65535] */;
+  uint32_t NNP7_19_2CLK /* [0,65535] */;
+  uint32_t NNP7_19_2ADC /* [0,65535] */;
+  uint32_t NNP7_20_1TAC /* [0,65535] */;
+  uint32_t NNP7_20_1CLK /* [0,65535] */;
+  uint32_t NNP7_20_1ADC /* [0,65535] */;
+  uint32_t NNP7_20_2TAC /* [0,65535] */;
+  uint32_t NNP7_20_2CLK /* [0,65535] */;
+  uint32_t NNP7_20_2ADC /* [0,65535] */;
+  uint32_t NNP7_21_1TAC /* [0,65535] */;
+  uint32_t NNP7_21_1CLK /* [0,65535] */;
+  uint32_t NNP7_21_1ADC /* [0,65535] */;
+  uint32_t NNP7_21_2TAC /* [0,65535] */;
+  uint32_t NNP7_21_2CLK /* [0,65535] */;
+  uint32_t NNP7_21_2ADC /* [0,65535] */;
+  uint32_t NNP7_22_1TAC /* [0,65535] */;
+  uint32_t NNP7_22_1CLK /* [0,65535] */;
+  uint32_t NNP7_22_1ADC /* [0,65535] */;
+  uint32_t NNP7_22_2TAC /* [0,65535] */;
+  uint32_t NNP7_22_2CLK /* [0,65535] */;
+  uint32_t NNP7_22_2ADC /* [0,65535] */;
+  uint32_t NNP7_23_1TAC /* [0,65535] */;
+  uint32_t NNP7_23_1CLK /* [0,65535] */;
+  uint32_t NNP7_23_1ADC /* [0,65535] */;
+  uint32_t NNP7_23_2TAC /* [0,65535] */;
+  uint32_t NNP7_23_2CLK /* [0,65535] */;
+  uint32_t NNP7_23_2ADC /* [0,65535] */;
+  uint32_t NNP7_24_1TAC /* [0,65535] */;
+  uint32_t NNP7_24_1CLK /* [0,65535] */;
+  uint32_t NNP7_24_1ADC /* [0,65535] */;
+  uint32_t NNP7_24_2TAC /* [0,65535] */;
+  uint32_t NNP7_24_2CLK /* [0,65535] */;
+  uint32_t NNP7_24_2ADC /* [0,65535] */;
+  uint32_t NNP7_25_1TAC /* [0,65535] */;
+  uint32_t NNP7_25_1CLK /* [0,65535] */;
+  uint32_t NNP7_25_1ADC /* [0,65535] */;
+  uint32_t NNP7_25_2TAC /* [0,65535] */;
+  uint32_t NNP7_25_2CLK /* [0,65535] */;
+  uint32_t NNP7_25_2ADC /* [0,65535] */;
+  uint32_t NNP7_26_1TAC /* [0,65535] */;
+  uint32_t NNP7_26_1CLK /* [0,65535] */;
+  uint32_t NNP7_26_1ADC /* [0,65535] */;
+  uint32_t NNP7_26_2TAC /* [0,65535] */;
+  uint32_t NNP7_26_2CLK /* [0,65535] */;
+  uint32_t NNP7_26_2ADC /* [0,65535] */;
+  uint32_t NNP7_27_1TAC /* [0,65535] */;
+  uint32_t NNP7_27_1CLK /* [0,65535] */;
+  uint32_t NNP7_27_1ADC /* [0,65535] */;
+  uint32_t NNP7_27_2TAC /* [0,65535] */;
+  uint32_t NNP7_27_2CLK /* [0,65535] */;
+  uint32_t NNP7_27_2ADC /* [0,65535] */;
+  uint32_t NNP7_28_1TAC /* [0,65535] */;
+  uint32_t NNP7_28_1CLK /* [0,65535] */;
+  uint32_t NNP7_28_1ADC /* [0,65535] */;
+  uint32_t NNP7_28_2TAC /* [0,65535] */;
+  uint32_t NNP7_28_2CLK /* [0,65535] */;
+  uint32_t NNP7_28_2ADC /* [0,65535] */;
+  uint32_t NNP7_29_1TAC /* [0,65535] */;
+  uint32_t NNP7_29_1CLK /* [0,65535] */;
+  uint32_t NNP7_29_1ADC /* [0,65535] */;
+  uint32_t NNP7_29_2TAC /* [0,65535] */;
+  uint32_t NNP7_29_2CLK /* [0,65535] */;
+  uint32_t NNP7_29_2ADC /* [0,65535] */;
+  uint32_t NNP7_30_1TAC /* [0,65535] */;
+  uint32_t NNP7_30_1CLK /* [0,65535] */;
+  uint32_t NNP7_30_1ADC /* [0,65535] */;
+  uint32_t NNP7_30_2TAC /* [0,65535] */;
+  uint32_t NNP7_30_2CLK /* [0,65535] */;
+  uint32_t NNP7_30_2ADC /* [0,65535] */;
+  uint32_t NNP7_31_1TAC /* [0,65535] */;
+  uint32_t NNP7_31_1CLK /* [0,65535] */;
+  uint32_t NNP7_31_1ADC /* [0,65535] */;
+  uint32_t NNP7_31_2TAC /* [0,65535] */;
+  uint32_t NNP7_31_2CLK /* [0,65535] */;
+  uint32_t NNP7_31_2ADC /* [0,65535] */;
+  uint32_t NNP7_32_1TAC /* [0,65535] */;
+  uint32_t NNP7_32_1CLK /* [0,65535] */;
+  uint32_t NNP7_32_1ADC /* [0,65535] */;
+  uint32_t NNP7_32_2TAC /* [0,65535] */;
+  uint32_t NNP7_32_2CLK /* [0,65535] */;
+  uint32_t NNP7_32_2ADC /* [0,65535] */;
+  uint32_t NNP7_33_1TAC /* [0,65535] */;
+  uint32_t NNP7_33_1CLK /* [0,65535] */;
+  uint32_t NNP7_33_1ADC /* [0,65535] */;
+  uint32_t NNP7_33_2TAC /* [0,65535] */;
+  uint32_t NNP7_33_2CLK /* [0,65535] */;
+  uint32_t NNP7_33_2ADC /* [0,65535] */;
+  uint32_t NNP7_34_1TAC /* [0,65535] */;
+  uint32_t NNP7_34_1CLK /* [0,65535] */;
+  uint32_t NNP7_34_1ADC /* [0,65535] */;
+  uint32_t NNP7_34_2TAC /* [0,65535] */;
+  uint32_t NNP7_34_2CLK /* [0,65535] */;
+  uint32_t NNP7_34_2ADC /* [0,65535] */;
+  uint32_t NNP7_35_1TAC /* [0,65535] */;
+  uint32_t NNP7_35_1CLK /* [0,65535] */;
+  uint32_t NNP7_35_1ADC /* [0,65535] */;
+  uint32_t NNP7_35_2TAC /* [0,65535] */;
+  uint32_t NNP7_35_2CLK /* [0,65535] */;
+  uint32_t NNP7_35_2ADC /* [0,65535] */;
+  uint32_t NNP7_36_1TAC /* [0,65535] */;
+  uint32_t NNP7_36_1CLK /* [0,65535] */;
+  uint32_t NNP7_36_1ADC /* [0,65535] */;
+  uint32_t NNP7_36_2TAC /* [0,65535] */;
+  uint32_t NNP7_36_2CLK /* [0,65535] */;
+  uint32_t NNP7_36_2ADC /* [0,65535] */;
+  uint32_t NNP7_37_1TAC /* [0,65535] */;
+  uint32_t NNP7_37_1CLK /* [0,65535] */;
+  uint32_t NNP7_37_1ADC /* [0,65535] */;
+  uint32_t NNP7_37_2TAC /* [0,65535] */;
+  uint32_t NNP7_37_2CLK /* [0,65535] */;
+  uint32_t NNP7_37_2ADC /* [0,65535] */;
+  uint32_t NNP7_38_1TAC /* [0,65535] */;
+  uint32_t NNP7_38_1CLK /* [0,65535] */;
+  uint32_t NNP7_38_1ADC /* [0,65535] */;
+  uint32_t NNP7_38_2TAC /* [0,65535] */;
+  uint32_t NNP7_38_2CLK /* [0,65535] */;
+  uint32_t NNP7_38_2ADC /* [0,65535] */;
+  uint32_t NNP7_39_1TAC /* [0,65535] */;
+  uint32_t NNP7_39_1CLK /* [0,65535] */;
+  uint32_t NNP7_39_1ADC /* [0,65535] */;
+  uint32_t NNP7_39_2TAC /* [0,65535] */;
+  uint32_t NNP7_39_2CLK /* [0,65535] */;
+  uint32_t NNP7_39_2ADC /* [0,65535] */;
+  uint32_t NNP7_40_1TAC /* [0,65535] */;
+  uint32_t NNP7_40_1CLK /* [0,65535] */;
+  uint32_t NNP7_40_1ADC /* [0,65535] */;
+  uint32_t NNP7_40_2TAC /* [0,65535] */;
+  uint32_t NNP7_40_2CLK /* [0,65535] */;
+  uint32_t NNP7_40_2ADC /* [0,65535] */;
+  uint32_t NNP7_41_1TAC /* [0,65535] */;
+  uint32_t NNP7_41_1CLK /* [0,65535] */;
+  uint32_t NNP7_41_1ADC /* [0,65535] */;
+  uint32_t NNP7_41_2TAC /* [0,65535] */;
+  uint32_t NNP7_41_2CLK /* [0,65535] */;
+  uint32_t NNP7_41_2ADC /* [0,65535] */;
+  uint32_t NNP7_42_1TAC /* [0,65535] */;
+  uint32_t NNP7_42_1CLK /* [0,65535] */;
+  uint32_t NNP7_42_1ADC /* [0,65535] */;
+  uint32_t NNP7_42_2TAC /* [0,65535] */;
+  uint32_t NNP7_42_2CLK /* [0,65535] */;
+  uint32_t NNP7_42_2ADC /* [0,65535] */;
+  uint32_t NNP7_43_1TAC /* [0,65535] */;
+  uint32_t NNP7_43_1CLK /* [0,65535] */;
+  uint32_t NNP7_43_1ADC /* [0,65535] */;
+  uint32_t NNP7_43_2TAC /* [0,65535] */;
+  uint32_t NNP7_43_2CLK /* [0,65535] */;
+  uint32_t NNP7_43_2ADC /* [0,65535] */;
+  uint32_t NNP7_44_1TAC /* [0,65535] */;
+  uint32_t NNP7_44_1CLK /* [0,65535] */;
+  uint32_t NNP7_44_1ADC /* [0,65535] */;
+  uint32_t NNP7_44_2TAC /* [0,65535] */;
+  uint32_t NNP7_44_2CLK /* [0,65535] */;
+  uint32_t NNP7_44_2ADC /* [0,65535] */;
+  uint32_t NNP7_45_1TAC /* [0,65535] */;
+  uint32_t NNP7_45_1CLK /* [0,65535] */;
+  uint32_t NNP7_45_1ADC /* [0,65535] */;
+  uint32_t NNP7_45_2TAC /* [0,65535] */;
+  uint32_t NNP7_45_2CLK /* [0,65535] */;
+  uint32_t NNP7_45_2ADC /* [0,65535] */;
+  uint32_t NNP7_46_1TAC /* [0,65535] */;
+  uint32_t NNP7_46_1CLK /* [0,65535] */;
+  uint32_t NNP7_46_1ADC /* [0,65535] */;
+  uint32_t NNP7_46_2TAC /* [0,65535] */;
+  uint32_t NNP7_46_2CLK /* [0,65535] */;
+  uint32_t NNP7_46_2ADC /* [0,65535] */;
+  uint32_t NNP7_47_1TAC /* [0,65535] */;
+  uint32_t NNP7_47_1CLK /* [0,65535] */;
+  uint32_t NNP7_47_1ADC /* [0,65535] */;
+  uint32_t NNP7_47_2TAC /* [0,65535] */;
+  uint32_t NNP7_47_2CLK /* [0,65535] */;
+  uint32_t NNP7_47_2ADC /* [0,65535] */;
+  uint32_t NNP7_48_1TAC /* [0,65535] */;
+  uint32_t NNP7_48_1CLK /* [0,65535] */;
+  uint32_t NNP7_48_1ADC /* [0,65535] */;
+  uint32_t NNP7_48_2TAC /* [0,65535] */;
+  uint32_t NNP7_48_2CLK /* [0,65535] */;
+  uint32_t NNP7_48_2ADC /* [0,65535] */;
+  uint32_t NNP7_49_1TAC /* [0,65535] */;
+  uint32_t NNP7_49_1CLK /* [0,65535] */;
+  uint32_t NNP7_49_1ADC /* [0,65535] */;
+  uint32_t NNP7_49_2TAC /* [0,65535] */;
+  uint32_t NNP7_49_2CLK /* [0,65535] */;
+  uint32_t NNP7_49_2ADC /* [0,65535] */;
+  uint32_t NNP7_50_1TAC /* [0,65535] */;
+  uint32_t NNP7_50_1CLK /* [0,65535] */;
+  uint32_t NNP7_50_1ADC /* [0,65535] */;
+  uint32_t NNP7_50_2TAC /* [0,65535] */;
+  uint32_t NNP7_50_2CLK /* [0,65535] */;
+  uint32_t NNP7_50_2ADC /* [0,65535] */;
+  uint32_t NNP8_1_1TAC /* [0,65535] */;
+  uint32_t NNP8_1_1CLK /* [0,65535] */;
+  uint32_t NNP8_1_1ADC /* [0,65535] */;
+  uint32_t NNP8_1_2TAC /* [0,65535] */;
+  uint32_t NNP8_1_2CLK /* [0,65535] */;
+  uint32_t NNP8_1_2ADC /* [0,65535] */;
+  uint32_t NNP8_2_1TAC /* [0,65535] */;
+  uint32_t NNP8_2_1CLK /* [0,65535] */;
+  uint32_t NNP8_2_1ADC /* [0,65535] */;
+  uint32_t NNP8_2_2TAC /* [0,65535] */;
+  uint32_t NNP8_2_2CLK /* [0,65535] */;
+  uint32_t NNP8_2_2ADC /* [0,65535] */;
+  uint32_t NNP8_3_1TAC /* [0,65535] */;
+  uint32_t NNP8_3_1CLK /* [0,65535] */;
+  uint32_t NNP8_3_1ADC /* [0,65535] */;
+  uint32_t NNP8_3_2TAC /* [0,65535] */;
+  uint32_t NNP8_3_2CLK /* [0,65535] */;
+  uint32_t NNP8_3_2ADC /* [0,65535] */;
+  uint32_t NNP8_4_1TAC /* [0,65535] */;
+  uint32_t NNP8_4_1CLK /* [0,65535] */;
+  uint32_t NNP8_4_1ADC /* [0,65535] */;
+  uint32_t NNP8_4_2TAC /* [0,65535] */;
+  uint32_t NNP8_4_2CLK /* [0,65535] */;
+  uint32_t NNP8_4_2ADC /* [0,65535] */;
+  uint32_t NNP8_5_1TAC /* [0,65535] */;
+  uint32_t NNP8_5_1CLK /* [0,65535] */;
+  uint32_t NNP8_5_1ADC /* [0,65535] */;
+  uint32_t NNP8_5_2TAC /* [0,65535] */;
+  uint32_t NNP8_5_2CLK /* [0,65535] */;
+  uint32_t NNP8_5_2ADC /* [0,65535] */;
+  uint32_t NNP8_6_1TAC /* [0,65535] */;
+  uint32_t NNP8_6_1CLK /* [0,65535] */;
+  uint32_t NNP8_6_1ADC /* [0,65535] */;
+  uint32_t NNP8_6_2TAC /* [0,65535] */;
+  uint32_t NNP8_6_2CLK /* [0,65535] */;
+  uint32_t NNP8_6_2ADC /* [0,65535] */;
+  uint32_t NNP8_7_1TAC /* [0,65535] */;
+  uint32_t NNP8_7_1CLK /* [0,65535] */;
+  uint32_t NNP8_7_1ADC /* [0,65535] */;
+  uint32_t NNP8_7_2TAC /* [0,65535] */;
+  uint32_t NNP8_7_2CLK /* [0,65535] */;
+  uint32_t NNP8_7_2ADC /* [0,65535] */;
+  uint32_t NNP8_8_1TAC /* [0,65535] */;
+  uint32_t NNP8_8_1CLK /* [0,65535] */;
+  uint32_t NNP8_8_1ADC /* [0,65535] */;
+  uint32_t NNP8_8_2TAC /* [0,65535] */;
+  uint32_t NNP8_8_2CLK /* [0,65535] */;
+  uint32_t NNP8_8_2ADC /* [0,65535] */;
+  uint32_t NNP8_9_1TAC /* [0,65535] */;
+  uint32_t NNP8_9_1CLK /* [0,65535] */;
+  uint32_t NNP8_9_1ADC /* [0,65535] */;
+  uint32_t NNP8_9_2TAC /* [0,65535] */;
+  uint32_t NNP8_9_2CLK /* [0,65535] */;
+  uint32_t NNP8_9_2ADC /* [0,65535] */;
+  uint32_t NNP8_10_1TAC /* [0,65535] */;
+  uint32_t NNP8_10_1CLK /* [0,65535] */;
+  uint32_t NNP8_10_1ADC /* [0,65535] */;
+  uint32_t NNP8_10_2TAC /* [0,65535] */;
+  uint32_t NNP8_10_2CLK /* [0,65535] */;
+  uint32_t NNP8_10_2ADC /* [0,65535] */;
+  uint32_t NNP8_11_1TAC /* [0,65535] */;
+  uint32_t NNP8_11_1CLK /* [0,65535] */;
+  uint32_t NNP8_11_1ADC /* [0,65535] */;
+  uint32_t NNP8_11_2TAC /* [0,65535] */;
+  uint32_t NNP8_11_2CLK /* [0,65535] */;
+  uint32_t NNP8_11_2ADC /* [0,65535] */;
+  uint32_t NNP8_12_1TAC /* [0,65535] */;
+  uint32_t NNP8_12_1CLK /* [0,65535] */;
+  uint32_t NNP8_12_1ADC /* [0,65535] */;
+  uint32_t NNP8_12_2TAC /* [0,65535] */;
+  uint32_t NNP8_12_2CLK /* [0,65535] */;
+  uint32_t NNP8_12_2ADC /* [0,65535] */;
+  uint32_t NNP8_13_1TAC /* [0,65535] */;
+  uint32_t NNP8_13_1CLK /* [0,65535] */;
+  uint32_t NNP8_13_1ADC /* [0,65535] */;
+  uint32_t NNP8_13_2TAC /* [0,65535] */;
+  uint32_t NNP8_13_2CLK /* [0,65535] */;
+  uint32_t NNP8_13_2ADC /* [0,65535] */;
+  uint32_t NNP8_14_1TAC /* [0,65535] */;
+  uint32_t NNP8_14_1CLK /* [0,65535] */;
+  uint32_t NNP8_14_1ADC /* [0,65535] */;
+  uint32_t NNP8_14_2TAC /* [0,65535] */;
+  uint32_t NNP8_14_2CLK /* [0,65535] */;
+  uint32_t NNP8_14_2ADC /* [0,65535] */;
+  uint32_t NNP8_15_1TAC /* [0,65535] */;
+  uint32_t NNP8_15_1CLK /* [0,65535] */;
+  uint32_t NNP8_15_1ADC /* [0,65535] */;
+  uint32_t NNP8_15_2TAC /* [0,65535] */;
+  uint32_t NNP8_15_2CLK /* [0,65535] */;
+  uint32_t NNP8_15_2ADC /* [0,65535] */;
+  uint32_t NNP8_16_1TAC /* [0,65535] */;
+  uint32_t NNP8_16_1CLK /* [0,65535] */;
+  uint32_t NNP8_16_1ADC /* [0,65535] */;
+  uint32_t NNP8_16_2TAC /* [0,65535] */;
+  uint32_t NNP8_16_2CLK /* [0,65535] */;
+  uint32_t NNP8_16_2ADC /* [0,65535] */;
+  uint32_t NNP8_17_1TAC /* [0,65535] */;
+  uint32_t NNP8_17_1CLK /* [0,65535] */;
+  uint32_t NNP8_17_1ADC /* [0,65535] */;
+  uint32_t NNP8_17_2TAC /* [0,65535] */;
+  uint32_t NNP8_17_2CLK /* [0,65535] */;
+  uint32_t NNP8_17_2ADC /* [0,65535] */;
+  uint32_t NNP8_18_1TAC /* [0,65535] */;
+  uint32_t NNP8_18_1CLK /* [0,65535] */;
+  uint32_t NNP8_18_1ADC /* [0,65535] */;
+  uint32_t NNP8_18_2TAC /* [0,65535] */;
+  uint32_t NNP8_18_2CLK /* [0,65535] */;
+  uint32_t NNP8_18_2ADC /* [0,65535] */;
+  uint32_t NNP8_19_1TAC /* [0,65535] */;
+  uint32_t NNP8_19_1CLK /* [0,65535] */;
+  uint32_t NNP8_19_1ADC /* [0,65535] */;
+  uint32_t NNP8_19_2TAC /* [0,65535] */;
+  uint32_t NNP8_19_2CLK /* [0,65535] */;
+  uint32_t NNP8_19_2ADC /* [0,65535] */;
+  uint32_t NNP8_20_1TAC /* [0,65535] */;
+  uint32_t NNP8_20_1CLK /* [0,65535] */;
+  uint32_t NNP8_20_1ADC /* [0,65535] */;
+  uint32_t NNP8_20_2TAC /* [0,65535] */;
+  uint32_t NNP8_20_2CLK /* [0,65535] */;
+  uint32_t NNP8_20_2ADC /* [0,65535] */;
+  uint32_t NNP8_21_1TAC /* [0,65535] */;
+  uint32_t NNP8_21_1CLK /* [0,65535] */;
+  uint32_t NNP8_21_1ADC /* [0,65535] */;
+  uint32_t NNP8_21_2TAC /* [0,65535] */;
+  uint32_t NNP8_21_2CLK /* [0,65535] */;
+  uint32_t NNP8_21_2ADC /* [0,65535] */;
+  uint32_t NNP8_22_1TAC /* [0,65535] */;
+  uint32_t NNP8_22_1CLK /* [0,65535] */;
+  uint32_t NNP8_22_1ADC /* [0,65535] */;
+  uint32_t NNP8_22_2TAC /* [0,65535] */;
+  uint32_t NNP8_22_2CLK /* [0,65535] */;
+  uint32_t NNP8_22_2ADC /* [0,65535] */;
+  uint32_t NNP8_23_1TAC /* [0,65535] */;
+  uint32_t NNP8_23_1CLK /* [0,65535] */;
+  uint32_t NNP8_23_1ADC /* [0,65535] */;
+  uint32_t NNP8_23_2TAC /* [0,65535] */;
+  uint32_t NNP8_23_2CLK /* [0,65535] */;
+  uint32_t NNP8_23_2ADC /* [0,65535] */;
+  uint32_t NNP8_24_1TAC /* [0,65535] */;
+  uint32_t NNP8_24_1CLK /* [0,65535] */;
+  uint32_t NNP8_24_1ADC /* [0,65535] */;
+  uint32_t NNP8_24_2TAC /* [0,65535] */;
+  uint32_t NNP8_24_2CLK /* [0,65535] */;
+  uint32_t NNP8_24_2ADC /* [0,65535] */;
+  uint32_t NNP8_25_1TAC /* [0,65535] */;
+  uint32_t NNP8_25_1CLK /* [0,65535] */;
+  uint32_t NNP8_25_1ADC /* [0,65535] */;
+  uint32_t NNP8_25_2TAC /* [0,65535] */;
+  uint32_t NNP8_25_2CLK /* [0,65535] */;
+  uint32_t NNP8_25_2ADC /* [0,65535] */;
+  uint32_t NNP8_26_1TAC /* [0,65535] */;
+  uint32_t NNP8_26_1CLK /* [0,65535] */;
+  uint32_t NNP8_26_1ADC /* [0,65535] */;
+  uint32_t NNP8_26_2TAC /* [0,65535] */;
+  uint32_t NNP8_26_2CLK /* [0,65535] */;
+  uint32_t NNP8_26_2ADC /* [0,65535] */;
+  uint32_t NNP8_27_1TAC /* [0,65535] */;
+  uint32_t NNP8_27_1CLK /* [0,65535] */;
+  uint32_t NNP8_27_1ADC /* [0,65535] */;
+  uint32_t NNP8_27_2TAC /* [0,65535] */;
+  uint32_t NNP8_27_2CLK /* [0,65535] */;
+  uint32_t NNP8_27_2ADC /* [0,65535] */;
+  uint32_t NNP8_28_1TAC /* [0,65535] */;
+  uint32_t NNP8_28_1CLK /* [0,65535] */;
+  uint32_t NNP8_28_1ADC /* [0,65535] */;
+  uint32_t NNP8_28_2TAC /* [0,65535] */;
+  uint32_t NNP8_28_2CLK /* [0,65535] */;
+  uint32_t NNP8_28_2ADC /* [0,65535] */;
+  uint32_t NNP8_29_1TAC /* [0,65535] */;
+  uint32_t NNP8_29_1CLK /* [0,65535] */;
+  uint32_t NNP8_29_1ADC /* [0,65535] */;
+  uint32_t NNP8_29_2TAC /* [0,65535] */;
+  uint32_t NNP8_29_2CLK /* [0,65535] */;
+  uint32_t NNP8_29_2ADC /* [0,65535] */;
+  uint32_t NNP8_30_1TAC /* [0,65535] */;
+  uint32_t NNP8_30_1CLK /* [0,65535] */;
+  uint32_t NNP8_30_1ADC /* [0,65535] */;
+  uint32_t NNP8_30_2TAC /* [0,65535] */;
+  uint32_t NNP8_30_2CLK /* [0,65535] */;
+  uint32_t NNP8_30_2ADC /* [0,65535] */;
+  uint32_t NNP8_31_1TAC /* [0,65535] */;
+  uint32_t NNP8_31_1CLK /* [0,65535] */;
+  uint32_t NNP8_31_1ADC /* [0,65535] */;
+  uint32_t NNP8_31_2TAC /* [0,65535] */;
+  uint32_t NNP8_31_2CLK /* [0,65535] */;
+  uint32_t NNP8_31_2ADC /* [0,65535] */;
+  uint32_t NNP8_32_1TAC /* [0,65535] */;
+  uint32_t NNP8_32_1CLK /* [0,65535] */;
+  uint32_t NNP8_32_1ADC /* [0,65535] */;
+  uint32_t NNP8_32_2TAC /* [0,65535] */;
+  uint32_t NNP8_32_2CLK /* [0,65535] */;
+  uint32_t NNP8_32_2ADC /* [0,65535] */;
+  uint32_t NNP8_33_1TAC /* [0,65535] */;
+  uint32_t NNP8_33_1CLK /* [0,65535] */;
+  uint32_t NNP8_33_1ADC /* [0,65535] */;
+  uint32_t NNP8_33_2TAC /* [0,65535] */;
+  uint32_t NNP8_33_2CLK /* [0,65535] */;
+  uint32_t NNP8_33_2ADC /* [0,65535] */;
+  uint32_t NNP8_34_1TAC /* [0,65535] */;
+  uint32_t NNP8_34_1CLK /* [0,65535] */;
+  uint32_t NNP8_34_1ADC /* [0,65535] */;
+  uint32_t NNP8_34_2TAC /* [0,65535] */;
+  uint32_t NNP8_34_2CLK /* [0,65535] */;
+  uint32_t NNP8_34_2ADC /* [0,65535] */;
+  uint32_t NNP8_35_1TAC /* [0,65535] */;
+  uint32_t NNP8_35_1CLK /* [0,65535] */;
+  uint32_t NNP8_35_1ADC /* [0,65535] */;
+  uint32_t NNP8_35_2TAC /* [0,65535] */;
+  uint32_t NNP8_35_2CLK /* [0,65535] */;
+  uint32_t NNP8_35_2ADC /* [0,65535] */;
+  uint32_t NNP8_36_1TAC /* [0,65535] */;
+  uint32_t NNP8_36_1CLK /* [0,65535] */;
+  uint32_t NNP8_36_1ADC /* [0,65535] */;
+  uint32_t NNP8_36_2TAC /* [0,65535] */;
+  uint32_t NNP8_36_2CLK /* [0,65535] */;
+  uint32_t NNP8_36_2ADC /* [0,65535] */;
+  uint32_t NNP8_37_1TAC /* [0,65535] */;
+  uint32_t NNP8_37_1CLK /* [0,65535] */;
+  uint32_t NNP8_37_1ADC /* [0,65535] */;
+  uint32_t NNP8_37_2TAC /* [0,65535] */;
+  uint32_t NNP8_37_2CLK /* [0,65535] */;
+  uint32_t NNP8_37_2ADC /* [0,65535] */;
+  uint32_t NNP8_38_1TAC /* [0,65535] */;
+  uint32_t NNP8_38_1CLK /* [0,65535] */;
+  uint32_t NNP8_38_1ADC /* [0,65535] */;
+  uint32_t NNP8_38_2TAC /* [0,65535] */;
+  uint32_t NNP8_38_2CLK /* [0,65535] */;
+  uint32_t NNP8_38_2ADC /* [0,65535] */;
+  uint32_t NNP8_39_1TAC /* [0,65535] */;
+  uint32_t NNP8_39_1CLK /* [0,65535] */;
+  uint32_t NNP8_39_1ADC /* [0,65535] */;
+  uint32_t NNP8_39_2TAC /* [0,65535] */;
+  uint32_t NNP8_39_2CLK /* [0,65535] */;
+  uint32_t NNP8_39_2ADC /* [0,65535] */;
+  uint32_t NNP8_40_1TAC /* [0,65535] */;
+  uint32_t NNP8_40_1CLK /* [0,65535] */;
+  uint32_t NNP8_40_1ADC /* [0,65535] */;
+  uint32_t NNP8_40_2TAC /* [0,65535] */;
+  uint32_t NNP8_40_2CLK /* [0,65535] */;
+  uint32_t NNP8_40_2ADC /* [0,65535] */;
+  uint32_t NNP8_41_1TAC /* [0,65535] */;
+  uint32_t NNP8_41_1CLK /* [0,65535] */;
+  uint32_t NNP8_41_1ADC /* [0,65535] */;
+  uint32_t NNP8_41_2TAC /* [0,65535] */;
+  uint32_t NNP8_41_2CLK /* [0,65535] */;
+  uint32_t NNP8_41_2ADC /* [0,65535] */;
+  uint32_t NNP8_42_1TAC /* [0,65535] */;
+  uint32_t NNP8_42_1CLK /* [0,65535] */;
+  uint32_t NNP8_42_1ADC /* [0,65535] */;
+  uint32_t NNP8_42_2TAC /* [0,65535] */;
+  uint32_t NNP8_42_2CLK /* [0,65535] */;
+  uint32_t NNP8_42_2ADC /* [0,65535] */;
+  uint32_t NNP8_43_1TAC /* [0,65535] */;
+  uint32_t NNP8_43_1CLK /* [0,65535] */;
+  uint32_t NNP8_43_1ADC /* [0,65535] */;
+  uint32_t NNP8_43_2TAC /* [0,65535] */;
+  uint32_t NNP8_43_2CLK /* [0,65535] */;
+  uint32_t NNP8_43_2ADC /* [0,65535] */;
+  uint32_t NNP8_44_1TAC /* [0,65535] */;
+  uint32_t NNP8_44_1CLK /* [0,65535] */;
+  uint32_t NNP8_44_1ADC /* [0,65535] */;
+  uint32_t NNP8_44_2TAC /* [0,65535] */;
+  uint32_t NNP8_44_2CLK /* [0,65535] */;
+  uint32_t NNP8_44_2ADC /* [0,65535] */;
+  uint32_t NNP8_45_1TAC /* [0,65535] */;
+  uint32_t NNP8_45_1CLK /* [0,65535] */;
+  uint32_t NNP8_45_1ADC /* [0,65535] */;
+  uint32_t NNP8_45_2TAC /* [0,65535] */;
+  uint32_t NNP8_45_2CLK /* [0,65535] */;
+  uint32_t NNP8_45_2ADC /* [0,65535] */;
+  uint32_t NNP8_46_1TAC /* [0,65535] */;
+  uint32_t NNP8_46_1CLK /* [0,65535] */;
+  uint32_t NNP8_46_1ADC /* [0,65535] */;
+  uint32_t NNP8_46_2TAC /* [0,65535] */;
+  uint32_t NNP8_46_2CLK /* [0,65535] */;
+  uint32_t NNP8_46_2ADC /* [0,65535] */;
+  uint32_t NNP8_47_1TAC /* [0,65535] */;
+  uint32_t NNP8_47_1CLK /* [0,65535] */;
+  uint32_t NNP8_47_1ADC /* [0,65535] */;
+  uint32_t NNP8_47_2TAC /* [0,65535] */;
+  uint32_t NNP8_47_2CLK /* [0,65535] */;
+  uint32_t NNP8_47_2ADC /* [0,65535] */;
+  uint32_t NNP8_48_1TAC /* [0,65535] */;
+  uint32_t NNP8_48_1CLK /* [0,65535] */;
+  uint32_t NNP8_48_1ADC /* [0,65535] */;
+  uint32_t NNP8_48_2TAC /* [0,65535] */;
+  uint32_t NNP8_48_2CLK /* [0,65535] */;
+  uint32_t NNP8_48_2ADC /* [0,65535] */;
+  uint32_t NNP8_49_1TAC /* [0,65535] */;
+  uint32_t NNP8_49_1CLK /* [0,65535] */;
+  uint32_t NNP8_49_1ADC /* [0,65535] */;
+  uint32_t NNP8_49_2TAC /* [0,65535] */;
+  uint32_t NNP8_49_2CLK /* [0,65535] */;
+  uint32_t NNP8_49_2ADC /* [0,65535] */;
+  uint32_t NNP8_50_1TAC /* [0,65535] */;
+  uint32_t NNP8_50_1CLK /* [0,65535] */;
+  uint32_t NNP8_50_1ADC /* [0,65535] */;
+  uint32_t NNP8_50_2TAC /* [0,65535] */;
+  uint32_t NNP8_50_2CLK /* [0,65535] */;
+  uint32_t NNP8_50_2ADC /* [0,65535] */;
   uint32_t PSPX1M /* [1,65] */;
   uint32_t PSPX1MI[65 EXT_STRUCT_CTRL(PSPX1M)] /* [1,65] */;
   uint32_t PSPX1ME[65 EXT_STRUCT_CTRL(PSPX1M)] /* [1,650] */;
@@ -270,7 +2560,7 @@ typedef struct EXT_STR_h101_t
   uint32_t fiberfour5tM /* [1,16] */;
   uint32_t fiberfour5tMI[16 EXT_STRUCT_CTRL(fiberfour5tM)] /* [1,16] */;
   uint32_t fiberfour5tME[16 EXT_STRUCT_CTRL(fiberfour5tM)] /* [1,160] */;
-  uint32_t fiberfour\5t /* [0,160] */;
+  uint32_t fiberfour5t /* [0,160] */;
   uint32_t fiberfour5tv[160 EXT_STRUCT_CTRL(fiberfour5t)] /* [0,65535] */;
   uint32_t fiberfour5EM /* [1,16] */;
   uint32_t fiberfour5EMI[16 EXT_STRUCT_CTRL(fiberfour5EM)] /* [1,16] */;
@@ -333,41 +2623,24 @@ typedef struct EXT_STR_h101_onion_t
   uint32_t EVENTNO;
   /* RAW */
   struct {
-    uint32_t TFM;
-    uint32_t TFMI[4 /* TFM */];
-    uint32_t TFME[4 /* TFM */];
-    uint32_t TF;
-    uint32_t TFv[40 /* TF */];
-    uint32_t TCM;
-    uint32_t TCMI[4 /* TCM */];
-    uint32_t TCME[4 /* TCM */];
-    uint32_t TC;
-    uint32_t TCv[40 /* TC */];
-  } LOS[1];
+    struct {
+      uint32_t TF;
+      uint32_t TC;
+    } _[5];
+  } LOS[2];
+  struct {
+    uint32_t _T[4];
+  } ROLU[2];
+  uint32_t TOF[32];
   struct {
     struct {
-      uint32_t TFLM;
-      uint32_t TFLMI[6 /* TFLM */];
-      uint32_t TFLME[6 /* TFLM */];
-      uint32_t TFL;
-      uint32_t TFLv[60 /* TFL */];
-      uint32_t TFTM;
-      uint32_t TFTMI[6 /* TFTM */];
-      uint32_t TFTME[6 /* TFTM */];
-      uint32_t TFT;
-      uint32_t TFTv[60 /* TFT */];
-      uint32_t TCLM;
-      uint32_t TCLMI[6 /* TCLM */];
-      uint32_t TCLME[6 /* TCLM */];
-      uint32_t TCL;
-      uint32_t TCLv[60 /* TCL */];
-      uint32_t TCTM;
-      uint32_t TCTMI[6 /* TCTM */];
-      uint32_t TCTME[6 /* TCTM */];
-      uint32_t TCT;
-      uint32_t TCTv[60 /* TCT */];
-    } T[2];
-  } TOFD_P[4];
+      struct {
+        uint32_t TAC;
+        uint32_t CLK;
+        uint32_t ADC;
+      } _[2];
+    } _[50];
+  } NNP[8];
   struct {
     uint32_t M;
     uint32_t MI[65 /* M */];
@@ -402,516 +2675,7386 @@ typedef struct EXT_STR_h101_onion_t
                      EVENTNO,                         UINT32,\
                     "EVENTNO"); \
   /* RAW */ \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     LOS1_1TF,                        UINT32,\
+                    "LOS1_1TF"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     LOS1_1TC,                        UINT32,\
+                    "LOS1_1TC"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     LOS1_2TF,                        UINT32,\
+                    "LOS1_2TF"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     LOS1_2TC,                        UINT32,\
+                    "LOS1_2TC"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     LOS1_3TF,                        UINT32,\
+                    "LOS1_3TF"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     LOS1_3TC,                        UINT32,\
+                    "LOS1_3TC"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     LOS1_4TF,                        UINT32,\
+                    "LOS1_4TF"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     LOS1_4TC,                        UINT32,\
+                    "LOS1_4TC"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     LOS1_5TF,                        UINT32,\
+                    "LOS1_5TF"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     LOS1_5TC,                        UINT32,\
+                    "LOS1_5TC"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     LOS2_1TF,                        UINT32,\
+                    "LOS2_1TF"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     LOS2_1TC,                        UINT32,\
+                    "LOS2_1TC"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     LOS2_2TF,                        UINT32,\
+                    "LOS2_2TF"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     LOS2_2TC,                        UINT32,\
+                    "LOS2_2TC"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     LOS2_3TF,                        UINT32,\
+                    "LOS2_3TF"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     LOS2_3TC,                        UINT32,\
+                    "LOS2_3TC"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     LOS2_4TF,                        UINT32,\
+                    "LOS2_4TF"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     LOS2_4TC,                        UINT32,\
+                    "LOS2_4TC"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     LOS2_5TF,                        UINT32,\
+                    "LOS2_5TF"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     LOS2_5TC,                        UINT32,\
+                    "LOS2_5TC"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     ROLU1_1T,                        UINT32,\
+                    "ROLU1_1T"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     ROLU1_2T,                        UINT32,\
+                    "ROLU1_2T"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     ROLU1_3T,                        UINT32,\
+                    "ROLU1_3T"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     ROLU1_4T,                        UINT32,\
+                    "ROLU1_4T"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     ROLU2_1T,                        UINT32,\
+                    "ROLU2_1T"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     ROLU2_2T,                        UINT32,\
+                    "ROLU2_2T"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     ROLU2_3T,                        UINT32,\
+                    "ROLU2_3T"); \
+  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+                     ROLU2_4T,                        UINT32,\
+                    "ROLU2_4T"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF1,                            UINT32,\
+                    "TOF1",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF2,                            UINT32,\
+                    "TOF2",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF3,                            UINT32,\
+                    "TOF3",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF4,                            UINT32,\
+                    "TOF4",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF5,                            UINT32,\
+                    "TOF5",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF6,                            UINT32,\
+                    "TOF6",16777215); \
   EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     LOS1TFM,                         UINT32,\
-                    "LOS1TFM",4); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     LOS1TFMI,                        UINT32,\
-                    "LOS1TFMI",                        "LOS1TFM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     LOS1TFME,                        UINT32,\
-                    "LOS1TFME",                        "LOS1TFM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     LOS1TF,                          UINT32,\
-                    "LOS1TF",40); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     LOS1TFv,                         UINT32,\
-                    "LOS1TFv",                         "LOS1TF"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     LOS1TCM,                         UINT32,\
-                    "LOS1TCM",4); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     LOS1TCMI,                        UINT32,\
-                    "LOS1TCMI",                        "LOS1TCM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     LOS1TCME,                        UINT32,\
-                    "LOS1TCME",                        "LOS1TCM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     LOS1TC,                          UINT32,\
-                    "LOS1TC",40); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     LOS1TCv,                         UINT32,\
-                    "LOS1TCv",                         "LOS1TC"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P1T1TFLM,                   UINT32,\
-                    "TOFD_P1T1TFLM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T1TFLMI,                  UINT32,\
-                    "TOFD_P1T1TFLMI",                  "TOFD_P1T1TFLM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T1TFLME,                  UINT32,\
-                    "TOFD_P1T1TFLME",                  "TOFD_P1T1TFLM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P1T1TFL,                    UINT32,\
-                    "TOFD_P1T1TFL",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T1TFLv,                   UINT32,\
-                    "TOFD_P1T1TFLv",                   "TOFD_P1T1TFL"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P1T1TFTM,                   UINT32,\
-                    "TOFD_P1T1TFTM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T1TFTMI,                  UINT32,\
-                    "TOFD_P1T1TFTMI",                  "TOFD_P1T1TFTM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T1TFTME,                  UINT32,\
-                    "TOFD_P1T1TFTME",                  "TOFD_P1T1TFTM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P1T1TFT,                    UINT32,\
-                    "TOFD_P1T1TFT",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T1TFTv,                   UINT32,\
-                    "TOFD_P1T1TFTv",                   "TOFD_P1T1TFT"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P1T1TCLM,                   UINT32,\
-                    "TOFD_P1T1TCLM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T1TCLMI,                  UINT32,\
-                    "TOFD_P1T1TCLMI",                  "TOFD_P1T1TCLM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T1TCLME,                  UINT32,\
-                    "TOFD_P1T1TCLME",                  "TOFD_P1T1TCLM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P1T1TCL,                    UINT32,\
-                    "TOFD_P1T1TCL",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T1TCLv,                   UINT32,\
-                    "TOFD_P1T1TCLv",                   "TOFD_P1T1TCL"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P1T1TCTM,                   UINT32,\
-                    "TOFD_P1T1TCTM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T1TCTMI,                  UINT32,\
-                    "TOFD_P1T1TCTMI",                  "TOFD_P1T1TCTM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T1TCTME,                  UINT32,\
-                    "TOFD_P1T1TCTME",                  "TOFD_P1T1TCTM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P1T1TCT,                    UINT32,\
-                    "TOFD_P1T1TCT",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T1TCTv,                   UINT32,\
-                    "TOFD_P1T1TCTv",                   "TOFD_P1T1TCT"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P1T2TFLM,                   UINT32,\
-                    "TOFD_P1T2TFLM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T2TFLMI,                  UINT32,\
-                    "TOFD_P1T2TFLMI",                  "TOFD_P1T2TFLM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T2TFLME,                  UINT32,\
-                    "TOFD_P1T2TFLME",                  "TOFD_P1T2TFLM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P1T2TFL,                    UINT32,\
-                    "TOFD_P1T2TFL",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T2TFLv,                   UINT32,\
-                    "TOFD_P1T2TFLv",                   "TOFD_P1T2TFL"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P1T2TFTM,                   UINT32,\
-                    "TOFD_P1T2TFTM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T2TFTMI,                  UINT32,\
-                    "TOFD_P1T2TFTMI",                  "TOFD_P1T2TFTM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T2TFTME,                  UINT32,\
-                    "TOFD_P1T2TFTME",                  "TOFD_P1T2TFTM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P1T2TFT,                    UINT32,\
-                    "TOFD_P1T2TFT",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T2TFTv,                   UINT32,\
-                    "TOFD_P1T2TFTv",                   "TOFD_P1T2TFT"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P1T2TCLM,                   UINT32,\
-                    "TOFD_P1T2TCLM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T2TCLMI,                  UINT32,\
-                    "TOFD_P1T2TCLMI",                  "TOFD_P1T2TCLM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T2TCLME,                  UINT32,\
-                    "TOFD_P1T2TCLME",                  "TOFD_P1T2TCLM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P1T2TCL,                    UINT32,\
-                    "TOFD_P1T2TCL",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T2TCLv,                   UINT32,\
-                    "TOFD_P1T2TCLv",                   "TOFD_P1T2TCL"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P1T2TCTM,                   UINT32,\
-                    "TOFD_P1T2TCTM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T2TCTMI,                  UINT32,\
-                    "TOFD_P1T2TCTMI",                  "TOFD_P1T2TCTM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T2TCTME,                  UINT32,\
-                    "TOFD_P1T2TCTME",                  "TOFD_P1T2TCTM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P1T2TCT,                    UINT32,\
-                    "TOFD_P1T2TCT",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P1T2TCTv,                   UINT32,\
-                    "TOFD_P1T2TCTv",                   "TOFD_P1T2TCT"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P2T1TFLM,                   UINT32,\
-                    "TOFD_P2T1TFLM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T1TFLMI,                  UINT32,\
-                    "TOFD_P2T1TFLMI",                  "TOFD_P2T1TFLM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T1TFLME,                  UINT32,\
-                    "TOFD_P2T1TFLME",                  "TOFD_P2T1TFLM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P2T1TFL,                    UINT32,\
-                    "TOFD_P2T1TFL",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T1TFLv,                   UINT32,\
-                    "TOFD_P2T1TFLv",                   "TOFD_P2T1TFL"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P2T1TFTM,                   UINT32,\
-                    "TOFD_P2T1TFTM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T1TFTMI,                  UINT32,\
-                    "TOFD_P2T1TFTMI",                  "TOFD_P2T1TFTM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T1TFTME,                  UINT32,\
-                    "TOFD_P2T1TFTME",                  "TOFD_P2T1TFTM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P2T1TFT,                    UINT32,\
-                    "TOFD_P2T1TFT",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T1TFTv,                   UINT32,\
-                    "TOFD_P2T1TFTv",                   "TOFD_P2T1TFT"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P2T1TCLM,                   UINT32,\
-                    "TOFD_P2T1TCLM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T1TCLMI,                  UINT32,\
-                    "TOFD_P2T1TCLMI",                  "TOFD_P2T1TCLM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T1TCLME,                  UINT32,\
-                    "TOFD_P2T1TCLME",                  "TOFD_P2T1TCLM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P2T1TCL,                    UINT32,\
-                    "TOFD_P2T1TCL",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T1TCLv,                   UINT32,\
-                    "TOFD_P2T1TCLv",                   "TOFD_P2T1TCL"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P2T1TCTM,                   UINT32,\
-                    "TOFD_P2T1TCTM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T1TCTMI,                  UINT32,\
-                    "TOFD_P2T1TCTMI",                  "TOFD_P2T1TCTM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T1TCTME,                  UINT32,\
-                    "TOFD_P2T1TCTME",                  "TOFD_P2T1TCTM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P2T1TCT,                    UINT32,\
-                    "TOFD_P2T1TCT",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T1TCTv,                   UINT32,\
-                    "TOFD_P2T1TCTv",                   "TOFD_P2T1TCT"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P2T2TFLM,                   UINT32,\
-                    "TOFD_P2T2TFLM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T2TFLMI,                  UINT32,\
-                    "TOFD_P2T2TFLMI",                  "TOFD_P2T2TFLM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T2TFLME,                  UINT32,\
-                    "TOFD_P2T2TFLME",                  "TOFD_P2T2TFLM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P2T2TFL,                    UINT32,\
-                    "TOFD_P2T2TFL",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T2TFLv,                   UINT32,\
-                    "TOFD_P2T2TFLv",                   "TOFD_P2T2TFL"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P2T2TFTM,                   UINT32,\
-                    "TOFD_P2T2TFTM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T2TFTMI,                  UINT32,\
-                    "TOFD_P2T2TFTMI",                  "TOFD_P2T2TFTM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T2TFTME,                  UINT32,\
-                    "TOFD_P2T2TFTME",                  "TOFD_P2T2TFTM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P2T2TFT,                    UINT32,\
-                    "TOFD_P2T2TFT",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T2TFTv,                   UINT32,\
-                    "TOFD_P2T2TFTv",                   "TOFD_P2T2TFT"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P2T2TCLM,                   UINT32,\
-                    "TOFD_P2T2TCLM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T2TCLMI,                  UINT32,\
-                    "TOFD_P2T2TCLMI",                  "TOFD_P2T2TCLM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T2TCLME,                  UINT32,\
-                    "TOFD_P2T2TCLME",                  "TOFD_P2T2TCLM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P2T2TCL,                    UINT32,\
-                    "TOFD_P2T2TCL",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T2TCLv,                   UINT32,\
-                    "TOFD_P2T2TCLv",                   "TOFD_P2T2TCL"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P2T2TCTM,                   UINT32,\
-                    "TOFD_P2T2TCTM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T2TCTMI,                  UINT32,\
-                    "TOFD_P2T2TCTMI",                  "TOFD_P2T2TCTM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T2TCTME,                  UINT32,\
-                    "TOFD_P2T2TCTME",                  "TOFD_P2T2TCTM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P2T2TCT,                    UINT32,\
-                    "TOFD_P2T2TCT",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P2T2TCTv,                   UINT32,\
-                    "TOFD_P2T2TCTv",                   "TOFD_P2T2TCT"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P3T1TFLM,                   UINT32,\
-                    "TOFD_P3T1TFLM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T1TFLMI,                  UINT32,\
-                    "TOFD_P3T1TFLMI",                  "TOFD_P3T1TFLM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T1TFLME,                  UINT32,\
-                    "TOFD_P3T1TFLME",                  "TOFD_P3T1TFLM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P3T1TFL,                    UINT32,\
-                    "TOFD_P3T1TFL",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T1TFLv,                   UINT32,\
-                    "TOFD_P3T1TFLv",                   "TOFD_P3T1TFL"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P3T1TFTM,                   UINT32,\
-                    "TOFD_P3T1TFTM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T1TFTMI,                  UINT32,\
-                    "TOFD_P3T1TFTMI",                  "TOFD_P3T1TFTM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T1TFTME,                  UINT32,\
-                    "TOFD_P3T1TFTME",                  "TOFD_P3T1TFTM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P3T1TFT,                    UINT32,\
-                    "TOFD_P3T1TFT",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T1TFTv,                   UINT32,\
-                    "TOFD_P3T1TFTv",                   "TOFD_P3T1TFT"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P3T1TCLM,                   UINT32,\
-                    "TOFD_P3T1TCLM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T1TCLMI,                  UINT32,\
-                    "TOFD_P3T1TCLMI",                  "TOFD_P3T1TCLM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T1TCLME,                  UINT32,\
-                    "TOFD_P3T1TCLME",                  "TOFD_P3T1TCLM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P3T1TCL,                    UINT32,\
-                    "TOFD_P3T1TCL",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T1TCLv,                   UINT32,\
-                    "TOFD_P3T1TCLv",                   "TOFD_P3T1TCL"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P3T1TCTM,                   UINT32,\
-                    "TOFD_P3T1TCTM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T1TCTMI,                  UINT32,\
-                    "TOFD_P3T1TCTMI",                  "TOFD_P3T1TCTM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T1TCTME,                  UINT32,\
-                    "TOFD_P3T1TCTME",                  "TOFD_P3T1TCTM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P3T1TCT,                    UINT32,\
-                    "TOFD_P3T1TCT",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T1TCTv,                   UINT32,\
-                    "TOFD_P3T1TCTv",                   "TOFD_P3T1TCT"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P3T2TFLM,                   UINT32,\
-                    "TOFD_P3T2TFLM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T2TFLMI,                  UINT32,\
-                    "TOFD_P3T2TFLMI",                  "TOFD_P3T2TFLM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T2TFLME,                  UINT32,\
-                    "TOFD_P3T2TFLME",                  "TOFD_P3T2TFLM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P3T2TFL,                    UINT32,\
-                    "TOFD_P3T2TFL",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T2TFLv,                   UINT32,\
-                    "TOFD_P3T2TFLv",                   "TOFD_P3T2TFL"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P3T2TFTM,                   UINT32,\
-                    "TOFD_P3T2TFTM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T2TFTMI,                  UINT32,\
-                    "TOFD_P3T2TFTMI",                  "TOFD_P3T2TFTM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T2TFTME,                  UINT32,\
-                    "TOFD_P3T2TFTME",                  "TOFD_P3T2TFTM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P3T2TFT,                    UINT32,\
-                    "TOFD_P3T2TFT",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T2TFTv,                   UINT32,\
-                    "TOFD_P3T2TFTv",                   "TOFD_P3T2TFT"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P3T2TCLM,                   UINT32,\
-                    "TOFD_P3T2TCLM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T2TCLMI,                  UINT32,\
-                    "TOFD_P3T2TCLMI",                  "TOFD_P3T2TCLM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T2TCLME,                  UINT32,\
-                    "TOFD_P3T2TCLME",                  "TOFD_P3T2TCLM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P3T2TCL,                    UINT32,\
-                    "TOFD_P3T2TCL",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T2TCLv,                   UINT32,\
-                    "TOFD_P3T2TCLv",                   "TOFD_P3T2TCL"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P3T2TCTM,                   UINT32,\
-                    "TOFD_P3T2TCTM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T2TCTMI,                  UINT32,\
-                    "TOFD_P3T2TCTMI",                  "TOFD_P3T2TCTM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T2TCTME,                  UINT32,\
-                    "TOFD_P3T2TCTME",                  "TOFD_P3T2TCTM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P3T2TCT,                    UINT32,\
-                    "TOFD_P3T2TCT",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P3T2TCTv,                   UINT32,\
-                    "TOFD_P3T2TCTv",                   "TOFD_P3T2TCT"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P4T1TFLM,                   UINT32,\
-                    "TOFD_P4T1TFLM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T1TFLMI,                  UINT32,\
-                    "TOFD_P4T1TFLMI",                  "TOFD_P4T1TFLM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T1TFLME,                  UINT32,\
-                    "TOFD_P4T1TFLME",                  "TOFD_P4T1TFLM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P4T1TFL,                    UINT32,\
-                    "TOFD_P4T1TFL",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T1TFLv,                   UINT32,\
-                    "TOFD_P4T1TFLv",                   "TOFD_P4T1TFL"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P4T1TFTM,                   UINT32,\
-                    "TOFD_P4T1TFTM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T1TFTMI,                  UINT32,\
-                    "TOFD_P4T1TFTMI",                  "TOFD_P4T1TFTM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T1TFTME,                  UINT32,\
-                    "TOFD_P4T1TFTME",                  "TOFD_P4T1TFTM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P4T1TFT,                    UINT32,\
-                    "TOFD_P4T1TFT",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T1TFTv,                   UINT32,\
-                    "TOFD_P4T1TFTv",                   "TOFD_P4T1TFT"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P4T1TCLM,                   UINT32,\
-                    "TOFD_P4T1TCLM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T1TCLMI,                  UINT32,\
-                    "TOFD_P4T1TCLMI",                  "TOFD_P4T1TCLM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T1TCLME,                  UINT32,\
-                    "TOFD_P4T1TCLME",                  "TOFD_P4T1TCLM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P4T1TCL,                    UINT32,\
-                    "TOFD_P4T1TCL",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T1TCLv,                   UINT32,\
-                    "TOFD_P4T1TCLv",                   "TOFD_P4T1TCL"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P4T1TCTM,                   UINT32,\
-                    "TOFD_P4T1TCTM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T1TCTMI,                  UINT32,\
-                    "TOFD_P4T1TCTMI",                  "TOFD_P4T1TCTM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T1TCTME,                  UINT32,\
-                    "TOFD_P4T1TCTME",                  "TOFD_P4T1TCTM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P4T1TCT,                    UINT32,\
-                    "TOFD_P4T1TCT",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T1TCTv,                   UINT32,\
-                    "TOFD_P4T1TCTv",                   "TOFD_P4T1TCT"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P4T2TFLM,                   UINT32,\
-                    "TOFD_P4T2TFLM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T2TFLMI,                  UINT32,\
-                    "TOFD_P4T2TFLMI",                  "TOFD_P4T2TFLM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T2TFLME,                  UINT32,\
-                    "TOFD_P4T2TFLME",                  "TOFD_P4T2TFLM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P4T2TFL,                    UINT32,\
-                    "TOFD_P4T2TFL",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T2TFLv,                   UINT32,\
-                    "TOFD_P4T2TFLv",                   "TOFD_P4T2TFL"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P4T2TFTM,                   UINT32,\
-                    "TOFD_P4T2TFTM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T2TFTMI,                  UINT32,\
-                    "TOFD_P4T2TFTMI",                  "TOFD_P4T2TFTM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T2TFTME,                  UINT32,\
-                    "TOFD_P4T2TFTME",                  "TOFD_P4T2TFTM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P4T2TFT,                    UINT32,\
-                    "TOFD_P4T2TFT",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T2TFTv,                   UINT32,\
-                    "TOFD_P4T2TFTv",                   "TOFD_P4T2TFT"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P4T2TCLM,                   UINT32,\
-                    "TOFD_P4T2TCLM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T2TCLMI,                  UINT32,\
-                    "TOFD_P4T2TCLMI",                  "TOFD_P4T2TCLM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T2TCLME,                  UINT32,\
-                    "TOFD_P4T2TCLME",                  "TOFD_P4T2TCLM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P4T2TCL,                    UINT32,\
-                    "TOFD_P4T2TCL",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T2TCLv,                   UINT32,\
-                    "TOFD_P4T2TCLv",                   "TOFD_P4T2TCL"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P4T2TCTM,                   UINT32,\
-                    "TOFD_P4T2TCTM",6); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T2TCTMI,                  UINT32,\
-                    "TOFD_P4T2TCTMI",                  "TOFD_P4T2TCTM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T2TCTME,                  UINT32,\
-                    "TOFD_P4T2TCTME",                  "TOFD_P4T2TCTM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
-                     TOFD_P4T2TCT,                    UINT32,\
-                    "TOFD_P4T2TCT",60); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
-                     TOFD_P4T2TCTv,                   UINT32,\
-                    "TOFD_P4T2TCTv",                   "TOFD_P4T2TCT"); \
+                     TOF7,                            UINT32,\
+                    "TOF7",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF8,                            UINT32,\
+                    "TOF8",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF9,                            UINT32,\
+                    "TOF9",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF10,                           UINT32,\
+                    "TOF10",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF11,                           UINT32,\
+                    "TOF11",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF12,                           UINT32,\
+                    "TOF12",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF13,                           UINT32,\
+                    "TOF13",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF14,                           UINT32,\
+                    "TOF14",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF15,                           UINT32,\
+                    "TOF15",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF16,                           UINT32,\
+                    "TOF16",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF17,                           UINT32,\
+                    "TOF17",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF18,                           UINT32,\
+                    "TOF18",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF19,                           UINT32,\
+                    "TOF19",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF20,                           UINT32,\
+                    "TOF20",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF21,                           UINT32,\
+                    "TOF21",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF22,                           UINT32,\
+                    "TOF22",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF23,                           UINT32,\
+                    "TOF23",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF24,                           UINT32,\
+                    "TOF24",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF25,                           UINT32,\
+                    "TOF25",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF26,                           UINT32,\
+                    "TOF26",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF27,                           UINT32,\
+                    "TOF27",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF28,                           UINT32,\
+                    "TOF28",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF29,                           UINT32,\
+                    "TOF29",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF30,                           UINT32,\
+                    "TOF30",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF31,                           UINT32,\
+                    "TOF31",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     TOF32,                           UINT32,\
+                    "TOF32",16777215); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_1_1TAC,                     UINT32,\
+                    "NNP1_1_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_1_1CLK,                     UINT32,\
+                    "NNP1_1_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_1_1ADC,                     UINT32,\
+                    "NNP1_1_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_1_2TAC,                     UINT32,\
+                    "NNP1_1_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_1_2CLK,                     UINT32,\
+                    "NNP1_1_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_1_2ADC,                     UINT32,\
+                    "NNP1_1_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_2_1TAC,                     UINT32,\
+                    "NNP1_2_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_2_1CLK,                     UINT32,\
+                    "NNP1_2_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_2_1ADC,                     UINT32,\
+                    "NNP1_2_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_2_2TAC,                     UINT32,\
+                    "NNP1_2_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_2_2CLK,                     UINT32,\
+                    "NNP1_2_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_2_2ADC,                     UINT32,\
+                    "NNP1_2_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_3_1TAC,                     UINT32,\
+                    "NNP1_3_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_3_1CLK,                     UINT32,\
+                    "NNP1_3_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_3_1ADC,                     UINT32,\
+                    "NNP1_3_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_3_2TAC,                     UINT32,\
+                    "NNP1_3_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_3_2CLK,                     UINT32,\
+                    "NNP1_3_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_3_2ADC,                     UINT32,\
+                    "NNP1_3_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_4_1TAC,                     UINT32,\
+                    "NNP1_4_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_4_1CLK,                     UINT32,\
+                    "NNP1_4_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_4_1ADC,                     UINT32,\
+                    "NNP1_4_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_4_2TAC,                     UINT32,\
+                    "NNP1_4_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_4_2CLK,                     UINT32,\
+                    "NNP1_4_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_4_2ADC,                     UINT32,\
+                    "NNP1_4_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_5_1TAC,                     UINT32,\
+                    "NNP1_5_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_5_1CLK,                     UINT32,\
+                    "NNP1_5_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_5_1ADC,                     UINT32,\
+                    "NNP1_5_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_5_2TAC,                     UINT32,\
+                    "NNP1_5_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_5_2CLK,                     UINT32,\
+                    "NNP1_5_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_5_2ADC,                     UINT32,\
+                    "NNP1_5_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_6_1TAC,                     UINT32,\
+                    "NNP1_6_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_6_1CLK,                     UINT32,\
+                    "NNP1_6_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_6_1ADC,                     UINT32,\
+                    "NNP1_6_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_6_2TAC,                     UINT32,\
+                    "NNP1_6_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_6_2CLK,                     UINT32,\
+                    "NNP1_6_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_6_2ADC,                     UINT32,\
+                    "NNP1_6_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_7_1TAC,                     UINT32,\
+                    "NNP1_7_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_7_1CLK,                     UINT32,\
+                    "NNP1_7_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_7_1ADC,                     UINT32,\
+                    "NNP1_7_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_7_2TAC,                     UINT32,\
+                    "NNP1_7_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_7_2CLK,                     UINT32,\
+                    "NNP1_7_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_7_2ADC,                     UINT32,\
+                    "NNP1_7_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_8_1TAC,                     UINT32,\
+                    "NNP1_8_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_8_1CLK,                     UINT32,\
+                    "NNP1_8_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_8_1ADC,                     UINT32,\
+                    "NNP1_8_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_8_2TAC,                     UINT32,\
+                    "NNP1_8_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_8_2CLK,                     UINT32,\
+                    "NNP1_8_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_8_2ADC,                     UINT32,\
+                    "NNP1_8_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_9_1TAC,                     UINT32,\
+                    "NNP1_9_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_9_1CLK,                     UINT32,\
+                    "NNP1_9_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_9_1ADC,                     UINT32,\
+                    "NNP1_9_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_9_2TAC,                     UINT32,\
+                    "NNP1_9_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_9_2CLK,                     UINT32,\
+                    "NNP1_9_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_9_2ADC,                     UINT32,\
+                    "NNP1_9_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_10_1TAC,                    UINT32,\
+                    "NNP1_10_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_10_1CLK,                    UINT32,\
+                    "NNP1_10_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_10_1ADC,                    UINT32,\
+                    "NNP1_10_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_10_2TAC,                    UINT32,\
+                    "NNP1_10_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_10_2CLK,                    UINT32,\
+                    "NNP1_10_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_10_2ADC,                    UINT32,\
+                    "NNP1_10_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_11_1TAC,                    UINT32,\
+                    "NNP1_11_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_11_1CLK,                    UINT32,\
+                    "NNP1_11_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_11_1ADC,                    UINT32,\
+                    "NNP1_11_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_11_2TAC,                    UINT32,\
+                    "NNP1_11_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_11_2CLK,                    UINT32,\
+                    "NNP1_11_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_11_2ADC,                    UINT32,\
+                    "NNP1_11_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_12_1TAC,                    UINT32,\
+                    "NNP1_12_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_12_1CLK,                    UINT32,\
+                    "NNP1_12_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_12_1ADC,                    UINT32,\
+                    "NNP1_12_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_12_2TAC,                    UINT32,\
+                    "NNP1_12_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_12_2CLK,                    UINT32,\
+                    "NNP1_12_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_12_2ADC,                    UINT32,\
+                    "NNP1_12_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_13_1TAC,                    UINT32,\
+                    "NNP1_13_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_13_1CLK,                    UINT32,\
+                    "NNP1_13_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_13_1ADC,                    UINT32,\
+                    "NNP1_13_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_13_2TAC,                    UINT32,\
+                    "NNP1_13_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_13_2CLK,                    UINT32,\
+                    "NNP1_13_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_13_2ADC,                    UINT32,\
+                    "NNP1_13_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_14_1TAC,                    UINT32,\
+                    "NNP1_14_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_14_1CLK,                    UINT32,\
+                    "NNP1_14_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_14_1ADC,                    UINT32,\
+                    "NNP1_14_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_14_2TAC,                    UINT32,\
+                    "NNP1_14_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_14_2CLK,                    UINT32,\
+                    "NNP1_14_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_14_2ADC,                    UINT32,\
+                    "NNP1_14_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_15_1TAC,                    UINT32,\
+                    "NNP1_15_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_15_1CLK,                    UINT32,\
+                    "NNP1_15_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_15_1ADC,                    UINT32,\
+                    "NNP1_15_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_15_2TAC,                    UINT32,\
+                    "NNP1_15_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_15_2CLK,                    UINT32,\
+                    "NNP1_15_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_15_2ADC,                    UINT32,\
+                    "NNP1_15_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_16_1TAC,                    UINT32,\
+                    "NNP1_16_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_16_1CLK,                    UINT32,\
+                    "NNP1_16_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_16_1ADC,                    UINT32,\
+                    "NNP1_16_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_16_2TAC,                    UINT32,\
+                    "NNP1_16_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_16_2CLK,                    UINT32,\
+                    "NNP1_16_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_16_2ADC,                    UINT32,\
+                    "NNP1_16_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_17_1TAC,                    UINT32,\
+                    "NNP1_17_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_17_1CLK,                    UINT32,\
+                    "NNP1_17_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_17_1ADC,                    UINT32,\
+                    "NNP1_17_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_17_2TAC,                    UINT32,\
+                    "NNP1_17_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_17_2CLK,                    UINT32,\
+                    "NNP1_17_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_17_2ADC,                    UINT32,\
+                    "NNP1_17_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_18_1TAC,                    UINT32,\
+                    "NNP1_18_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_18_1CLK,                    UINT32,\
+                    "NNP1_18_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_18_1ADC,                    UINT32,\
+                    "NNP1_18_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_18_2TAC,                    UINT32,\
+                    "NNP1_18_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_18_2CLK,                    UINT32,\
+                    "NNP1_18_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_18_2ADC,                    UINT32,\
+                    "NNP1_18_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_19_1TAC,                    UINT32,\
+                    "NNP1_19_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_19_1CLK,                    UINT32,\
+                    "NNP1_19_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_19_1ADC,                    UINT32,\
+                    "NNP1_19_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_19_2TAC,                    UINT32,\
+                    "NNP1_19_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_19_2CLK,                    UINT32,\
+                    "NNP1_19_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_19_2ADC,                    UINT32,\
+                    "NNP1_19_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_20_1TAC,                    UINT32,\
+                    "NNP1_20_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_20_1CLK,                    UINT32,\
+                    "NNP1_20_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_20_1ADC,                    UINT32,\
+                    "NNP1_20_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_20_2TAC,                    UINT32,\
+                    "NNP1_20_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_20_2CLK,                    UINT32,\
+                    "NNP1_20_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_20_2ADC,                    UINT32,\
+                    "NNP1_20_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_21_1TAC,                    UINT32,\
+                    "NNP1_21_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_21_1CLK,                    UINT32,\
+                    "NNP1_21_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_21_1ADC,                    UINT32,\
+                    "NNP1_21_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_21_2TAC,                    UINT32,\
+                    "NNP1_21_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_21_2CLK,                    UINT32,\
+                    "NNP1_21_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_21_2ADC,                    UINT32,\
+                    "NNP1_21_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_22_1TAC,                    UINT32,\
+                    "NNP1_22_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_22_1CLK,                    UINT32,\
+                    "NNP1_22_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_22_1ADC,                    UINT32,\
+                    "NNP1_22_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_22_2TAC,                    UINT32,\
+                    "NNP1_22_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_22_2CLK,                    UINT32,\
+                    "NNP1_22_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_22_2ADC,                    UINT32,\
+                    "NNP1_22_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_23_1TAC,                    UINT32,\
+                    "NNP1_23_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_23_1CLK,                    UINT32,\
+                    "NNP1_23_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_23_1ADC,                    UINT32,\
+                    "NNP1_23_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_23_2TAC,                    UINT32,\
+                    "NNP1_23_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_23_2CLK,                    UINT32,\
+                    "NNP1_23_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_23_2ADC,                    UINT32,\
+                    "NNP1_23_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_24_1TAC,                    UINT32,\
+                    "NNP1_24_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_24_1CLK,                    UINT32,\
+                    "NNP1_24_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_24_1ADC,                    UINT32,\
+                    "NNP1_24_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_24_2TAC,                    UINT32,\
+                    "NNP1_24_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_24_2CLK,                    UINT32,\
+                    "NNP1_24_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_24_2ADC,                    UINT32,\
+                    "NNP1_24_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_25_1TAC,                    UINT32,\
+                    "NNP1_25_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_25_1CLK,                    UINT32,\
+                    "NNP1_25_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_25_1ADC,                    UINT32,\
+                    "NNP1_25_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_25_2TAC,                    UINT32,\
+                    "NNP1_25_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_25_2CLK,                    UINT32,\
+                    "NNP1_25_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_25_2ADC,                    UINT32,\
+                    "NNP1_25_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_26_1TAC,                    UINT32,\
+                    "NNP1_26_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_26_1CLK,                    UINT32,\
+                    "NNP1_26_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_26_1ADC,                    UINT32,\
+                    "NNP1_26_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_26_2TAC,                    UINT32,\
+                    "NNP1_26_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_26_2CLK,                    UINT32,\
+                    "NNP1_26_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_26_2ADC,                    UINT32,\
+                    "NNP1_26_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_27_1TAC,                    UINT32,\
+                    "NNP1_27_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_27_1CLK,                    UINT32,\
+                    "NNP1_27_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_27_1ADC,                    UINT32,\
+                    "NNP1_27_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_27_2TAC,                    UINT32,\
+                    "NNP1_27_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_27_2CLK,                    UINT32,\
+                    "NNP1_27_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_27_2ADC,                    UINT32,\
+                    "NNP1_27_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_28_1TAC,                    UINT32,\
+                    "NNP1_28_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_28_1CLK,                    UINT32,\
+                    "NNP1_28_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_28_1ADC,                    UINT32,\
+                    "NNP1_28_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_28_2TAC,                    UINT32,\
+                    "NNP1_28_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_28_2CLK,                    UINT32,\
+                    "NNP1_28_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_28_2ADC,                    UINT32,\
+                    "NNP1_28_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_29_1TAC,                    UINT32,\
+                    "NNP1_29_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_29_1CLK,                    UINT32,\
+                    "NNP1_29_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_29_1ADC,                    UINT32,\
+                    "NNP1_29_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_29_2TAC,                    UINT32,\
+                    "NNP1_29_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_29_2CLK,                    UINT32,\
+                    "NNP1_29_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_29_2ADC,                    UINT32,\
+                    "NNP1_29_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_30_1TAC,                    UINT32,\
+                    "NNP1_30_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_30_1CLK,                    UINT32,\
+                    "NNP1_30_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_30_1ADC,                    UINT32,\
+                    "NNP1_30_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_30_2TAC,                    UINT32,\
+                    "NNP1_30_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_30_2CLK,                    UINT32,\
+                    "NNP1_30_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_30_2ADC,                    UINT32,\
+                    "NNP1_30_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_31_1TAC,                    UINT32,\
+                    "NNP1_31_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_31_1CLK,                    UINT32,\
+                    "NNP1_31_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_31_1ADC,                    UINT32,\
+                    "NNP1_31_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_31_2TAC,                    UINT32,\
+                    "NNP1_31_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_31_2CLK,                    UINT32,\
+                    "NNP1_31_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_31_2ADC,                    UINT32,\
+                    "NNP1_31_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_32_1TAC,                    UINT32,\
+                    "NNP1_32_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_32_1CLK,                    UINT32,\
+                    "NNP1_32_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_32_1ADC,                    UINT32,\
+                    "NNP1_32_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_32_2TAC,                    UINT32,\
+                    "NNP1_32_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_32_2CLK,                    UINT32,\
+                    "NNP1_32_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_32_2ADC,                    UINT32,\
+                    "NNP1_32_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_33_1TAC,                    UINT32,\
+                    "NNP1_33_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_33_1CLK,                    UINT32,\
+                    "NNP1_33_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_33_1ADC,                    UINT32,\
+                    "NNP1_33_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_33_2TAC,                    UINT32,\
+                    "NNP1_33_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_33_2CLK,                    UINT32,\
+                    "NNP1_33_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_33_2ADC,                    UINT32,\
+                    "NNP1_33_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_34_1TAC,                    UINT32,\
+                    "NNP1_34_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_34_1CLK,                    UINT32,\
+                    "NNP1_34_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_34_1ADC,                    UINT32,\
+                    "NNP1_34_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_34_2TAC,                    UINT32,\
+                    "NNP1_34_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_34_2CLK,                    UINT32,\
+                    "NNP1_34_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_34_2ADC,                    UINT32,\
+                    "NNP1_34_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_35_1TAC,                    UINT32,\
+                    "NNP1_35_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_35_1CLK,                    UINT32,\
+                    "NNP1_35_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_35_1ADC,                    UINT32,\
+                    "NNP1_35_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_35_2TAC,                    UINT32,\
+                    "NNP1_35_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_35_2CLK,                    UINT32,\
+                    "NNP1_35_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_35_2ADC,                    UINT32,\
+                    "NNP1_35_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_36_1TAC,                    UINT32,\
+                    "NNP1_36_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_36_1CLK,                    UINT32,\
+                    "NNP1_36_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_36_1ADC,                    UINT32,\
+                    "NNP1_36_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_36_2TAC,                    UINT32,\
+                    "NNP1_36_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_36_2CLK,                    UINT32,\
+                    "NNP1_36_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_36_2ADC,                    UINT32,\
+                    "NNP1_36_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_37_1TAC,                    UINT32,\
+                    "NNP1_37_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_37_1CLK,                    UINT32,\
+                    "NNP1_37_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_37_1ADC,                    UINT32,\
+                    "NNP1_37_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_37_2TAC,                    UINT32,\
+                    "NNP1_37_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_37_2CLK,                    UINT32,\
+                    "NNP1_37_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_37_2ADC,                    UINT32,\
+                    "NNP1_37_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_38_1TAC,                    UINT32,\
+                    "NNP1_38_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_38_1CLK,                    UINT32,\
+                    "NNP1_38_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_38_1ADC,                    UINT32,\
+                    "NNP1_38_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_38_2TAC,                    UINT32,\
+                    "NNP1_38_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_38_2CLK,                    UINT32,\
+                    "NNP1_38_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_38_2ADC,                    UINT32,\
+                    "NNP1_38_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_39_1TAC,                    UINT32,\
+                    "NNP1_39_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_39_1CLK,                    UINT32,\
+                    "NNP1_39_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_39_1ADC,                    UINT32,\
+                    "NNP1_39_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_39_2TAC,                    UINT32,\
+                    "NNP1_39_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_39_2CLK,                    UINT32,\
+                    "NNP1_39_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_39_2ADC,                    UINT32,\
+                    "NNP1_39_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_40_1TAC,                    UINT32,\
+                    "NNP1_40_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_40_1CLK,                    UINT32,\
+                    "NNP1_40_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_40_1ADC,                    UINT32,\
+                    "NNP1_40_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_40_2TAC,                    UINT32,\
+                    "NNP1_40_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_40_2CLK,                    UINT32,\
+                    "NNP1_40_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_40_2ADC,                    UINT32,\
+                    "NNP1_40_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_41_1TAC,                    UINT32,\
+                    "NNP1_41_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_41_1CLK,                    UINT32,\
+                    "NNP1_41_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_41_1ADC,                    UINT32,\
+                    "NNP1_41_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_41_2TAC,                    UINT32,\
+                    "NNP1_41_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_41_2CLK,                    UINT32,\
+                    "NNP1_41_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_41_2ADC,                    UINT32,\
+                    "NNP1_41_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_42_1TAC,                    UINT32,\
+                    "NNP1_42_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_42_1CLK,                    UINT32,\
+                    "NNP1_42_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_42_1ADC,                    UINT32,\
+                    "NNP1_42_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_42_2TAC,                    UINT32,\
+                    "NNP1_42_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_42_2CLK,                    UINT32,\
+                    "NNP1_42_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_42_2ADC,                    UINT32,\
+                    "NNP1_42_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_43_1TAC,                    UINT32,\
+                    "NNP1_43_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_43_1CLK,                    UINT32,\
+                    "NNP1_43_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_43_1ADC,                    UINT32,\
+                    "NNP1_43_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_43_2TAC,                    UINT32,\
+                    "NNP1_43_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_43_2CLK,                    UINT32,\
+                    "NNP1_43_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_43_2ADC,                    UINT32,\
+                    "NNP1_43_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_44_1TAC,                    UINT32,\
+                    "NNP1_44_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_44_1CLK,                    UINT32,\
+                    "NNP1_44_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_44_1ADC,                    UINT32,\
+                    "NNP1_44_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_44_2TAC,                    UINT32,\
+                    "NNP1_44_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_44_2CLK,                    UINT32,\
+                    "NNP1_44_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_44_2ADC,                    UINT32,\
+                    "NNP1_44_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_45_1TAC,                    UINT32,\
+                    "NNP1_45_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_45_1CLK,                    UINT32,\
+                    "NNP1_45_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_45_1ADC,                    UINT32,\
+                    "NNP1_45_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_45_2TAC,                    UINT32,\
+                    "NNP1_45_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_45_2CLK,                    UINT32,\
+                    "NNP1_45_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_45_2ADC,                    UINT32,\
+                    "NNP1_45_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_46_1TAC,                    UINT32,\
+                    "NNP1_46_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_46_1CLK,                    UINT32,\
+                    "NNP1_46_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_46_1ADC,                    UINT32,\
+                    "NNP1_46_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_46_2TAC,                    UINT32,\
+                    "NNP1_46_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_46_2CLK,                    UINT32,\
+                    "NNP1_46_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_46_2ADC,                    UINT32,\
+                    "NNP1_46_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_47_1TAC,                    UINT32,\
+                    "NNP1_47_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_47_1CLK,                    UINT32,\
+                    "NNP1_47_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_47_1ADC,                    UINT32,\
+                    "NNP1_47_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_47_2TAC,                    UINT32,\
+                    "NNP1_47_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_47_2CLK,                    UINT32,\
+                    "NNP1_47_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_47_2ADC,                    UINT32,\
+                    "NNP1_47_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_48_1TAC,                    UINT32,\
+                    "NNP1_48_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_48_1CLK,                    UINT32,\
+                    "NNP1_48_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_48_1ADC,                    UINT32,\
+                    "NNP1_48_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_48_2TAC,                    UINT32,\
+                    "NNP1_48_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_48_2CLK,                    UINT32,\
+                    "NNP1_48_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_48_2ADC,                    UINT32,\
+                    "NNP1_48_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_49_1TAC,                    UINT32,\
+                    "NNP1_49_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_49_1CLK,                    UINT32,\
+                    "NNP1_49_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_49_1ADC,                    UINT32,\
+                    "NNP1_49_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_49_2TAC,                    UINT32,\
+                    "NNP1_49_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_49_2CLK,                    UINT32,\
+                    "NNP1_49_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_49_2ADC,                    UINT32,\
+                    "NNP1_49_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_50_1TAC,                    UINT32,\
+                    "NNP1_50_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_50_1CLK,                    UINT32,\
+                    "NNP1_50_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_50_1ADC,                    UINT32,\
+                    "NNP1_50_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_50_2TAC,                    UINT32,\
+                    "NNP1_50_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_50_2CLK,                    UINT32,\
+                    "NNP1_50_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP1_50_2ADC,                    UINT32,\
+                    "NNP1_50_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_1_1TAC,                     UINT32,\
+                    "NNP2_1_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_1_1CLK,                     UINT32,\
+                    "NNP2_1_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_1_1ADC,                     UINT32,\
+                    "NNP2_1_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_1_2TAC,                     UINT32,\
+                    "NNP2_1_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_1_2CLK,                     UINT32,\
+                    "NNP2_1_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_1_2ADC,                     UINT32,\
+                    "NNP2_1_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_2_1TAC,                     UINT32,\
+                    "NNP2_2_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_2_1CLK,                     UINT32,\
+                    "NNP2_2_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_2_1ADC,                     UINT32,\
+                    "NNP2_2_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_2_2TAC,                     UINT32,\
+                    "NNP2_2_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_2_2CLK,                     UINT32,\
+                    "NNP2_2_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_2_2ADC,                     UINT32,\
+                    "NNP2_2_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_3_1TAC,                     UINT32,\
+                    "NNP2_3_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_3_1CLK,                     UINT32,\
+                    "NNP2_3_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_3_1ADC,                     UINT32,\
+                    "NNP2_3_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_3_2TAC,                     UINT32,\
+                    "NNP2_3_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_3_2CLK,                     UINT32,\
+                    "NNP2_3_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_3_2ADC,                     UINT32,\
+                    "NNP2_3_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_4_1TAC,                     UINT32,\
+                    "NNP2_4_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_4_1CLK,                     UINT32,\
+                    "NNP2_4_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_4_1ADC,                     UINT32,\
+                    "NNP2_4_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_4_2TAC,                     UINT32,\
+                    "NNP2_4_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_4_2CLK,                     UINT32,\
+                    "NNP2_4_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_4_2ADC,                     UINT32,\
+                    "NNP2_4_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_5_1TAC,                     UINT32,\
+                    "NNP2_5_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_5_1CLK,                     UINT32,\
+                    "NNP2_5_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_5_1ADC,                     UINT32,\
+                    "NNP2_5_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_5_2TAC,                     UINT32,\
+                    "NNP2_5_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_5_2CLK,                     UINT32,\
+                    "NNP2_5_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_5_2ADC,                     UINT32,\
+                    "NNP2_5_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_6_1TAC,                     UINT32,\
+                    "NNP2_6_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_6_1CLK,                     UINT32,\
+                    "NNP2_6_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_6_1ADC,                     UINT32,\
+                    "NNP2_6_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_6_2TAC,                     UINT32,\
+                    "NNP2_6_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_6_2CLK,                     UINT32,\
+                    "NNP2_6_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_6_2ADC,                     UINT32,\
+                    "NNP2_6_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_7_1TAC,                     UINT32,\
+                    "NNP2_7_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_7_1CLK,                     UINT32,\
+                    "NNP2_7_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_7_1ADC,                     UINT32,\
+                    "NNP2_7_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_7_2TAC,                     UINT32,\
+                    "NNP2_7_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_7_2CLK,                     UINT32,\
+                    "NNP2_7_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_7_2ADC,                     UINT32,\
+                    "NNP2_7_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_8_1TAC,                     UINT32,\
+                    "NNP2_8_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_8_1CLK,                     UINT32,\
+                    "NNP2_8_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_8_1ADC,                     UINT32,\
+                    "NNP2_8_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_8_2TAC,                     UINT32,\
+                    "NNP2_8_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_8_2CLK,                     UINT32,\
+                    "NNP2_8_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_8_2ADC,                     UINT32,\
+                    "NNP2_8_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_9_1TAC,                     UINT32,\
+                    "NNP2_9_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_9_1CLK,                     UINT32,\
+                    "NNP2_9_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_9_1ADC,                     UINT32,\
+                    "NNP2_9_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_9_2TAC,                     UINT32,\
+                    "NNP2_9_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_9_2CLK,                     UINT32,\
+                    "NNP2_9_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_9_2ADC,                     UINT32,\
+                    "NNP2_9_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_10_1TAC,                    UINT32,\
+                    "NNP2_10_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_10_1CLK,                    UINT32,\
+                    "NNP2_10_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_10_1ADC,                    UINT32,\
+                    "NNP2_10_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_10_2TAC,                    UINT32,\
+                    "NNP2_10_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_10_2CLK,                    UINT32,\
+                    "NNP2_10_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_10_2ADC,                    UINT32,\
+                    "NNP2_10_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_11_1TAC,                    UINT32,\
+                    "NNP2_11_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_11_1CLK,                    UINT32,\
+                    "NNP2_11_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_11_1ADC,                    UINT32,\
+                    "NNP2_11_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_11_2TAC,                    UINT32,\
+                    "NNP2_11_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_11_2CLK,                    UINT32,\
+                    "NNP2_11_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_11_2ADC,                    UINT32,\
+                    "NNP2_11_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_12_1TAC,                    UINT32,\
+                    "NNP2_12_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_12_1CLK,                    UINT32,\
+                    "NNP2_12_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_12_1ADC,                    UINT32,\
+                    "NNP2_12_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_12_2TAC,                    UINT32,\
+                    "NNP2_12_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_12_2CLK,                    UINT32,\
+                    "NNP2_12_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_12_2ADC,                    UINT32,\
+                    "NNP2_12_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_13_1TAC,                    UINT32,\
+                    "NNP2_13_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_13_1CLK,                    UINT32,\
+                    "NNP2_13_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_13_1ADC,                    UINT32,\
+                    "NNP2_13_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_13_2TAC,                    UINT32,\
+                    "NNP2_13_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_13_2CLK,                    UINT32,\
+                    "NNP2_13_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_13_2ADC,                    UINT32,\
+                    "NNP2_13_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_14_1TAC,                    UINT32,\
+                    "NNP2_14_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_14_1CLK,                    UINT32,\
+                    "NNP2_14_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_14_1ADC,                    UINT32,\
+                    "NNP2_14_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_14_2TAC,                    UINT32,\
+                    "NNP2_14_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_14_2CLK,                    UINT32,\
+                    "NNP2_14_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_14_2ADC,                    UINT32,\
+                    "NNP2_14_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_15_1TAC,                    UINT32,\
+                    "NNP2_15_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_15_1CLK,                    UINT32,\
+                    "NNP2_15_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_15_1ADC,                    UINT32,\
+                    "NNP2_15_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_15_2TAC,                    UINT32,\
+                    "NNP2_15_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_15_2CLK,                    UINT32,\
+                    "NNP2_15_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_15_2ADC,                    UINT32,\
+                    "NNP2_15_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_16_1TAC,                    UINT32,\
+                    "NNP2_16_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_16_1CLK,                    UINT32,\
+                    "NNP2_16_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_16_1ADC,                    UINT32,\
+                    "NNP2_16_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_16_2TAC,                    UINT32,\
+                    "NNP2_16_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_16_2CLK,                    UINT32,\
+                    "NNP2_16_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_16_2ADC,                    UINT32,\
+                    "NNP2_16_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_17_1TAC,                    UINT32,\
+                    "NNP2_17_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_17_1CLK,                    UINT32,\
+                    "NNP2_17_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_17_1ADC,                    UINT32,\
+                    "NNP2_17_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_17_2TAC,                    UINT32,\
+                    "NNP2_17_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_17_2CLK,                    UINT32,\
+                    "NNP2_17_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_17_2ADC,                    UINT32,\
+                    "NNP2_17_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_18_1TAC,                    UINT32,\
+                    "NNP2_18_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_18_1CLK,                    UINT32,\
+                    "NNP2_18_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_18_1ADC,                    UINT32,\
+                    "NNP2_18_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_18_2TAC,                    UINT32,\
+                    "NNP2_18_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_18_2CLK,                    UINT32,\
+                    "NNP2_18_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_18_2ADC,                    UINT32,\
+                    "NNP2_18_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_19_1TAC,                    UINT32,\
+                    "NNP2_19_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_19_1CLK,                    UINT32,\
+                    "NNP2_19_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_19_1ADC,                    UINT32,\
+                    "NNP2_19_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_19_2TAC,                    UINT32,\
+                    "NNP2_19_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_19_2CLK,                    UINT32,\
+                    "NNP2_19_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_19_2ADC,                    UINT32,\
+                    "NNP2_19_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_20_1TAC,                    UINT32,\
+                    "NNP2_20_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_20_1CLK,                    UINT32,\
+                    "NNP2_20_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_20_1ADC,                    UINT32,\
+                    "NNP2_20_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_20_2TAC,                    UINT32,\
+                    "NNP2_20_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_20_2CLK,                    UINT32,\
+                    "NNP2_20_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_20_2ADC,                    UINT32,\
+                    "NNP2_20_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_21_1TAC,                    UINT32,\
+                    "NNP2_21_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_21_1CLK,                    UINT32,\
+                    "NNP2_21_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_21_1ADC,                    UINT32,\
+                    "NNP2_21_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_21_2TAC,                    UINT32,\
+                    "NNP2_21_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_21_2CLK,                    UINT32,\
+                    "NNP2_21_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_21_2ADC,                    UINT32,\
+                    "NNP2_21_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_22_1TAC,                    UINT32,\
+                    "NNP2_22_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_22_1CLK,                    UINT32,\
+                    "NNP2_22_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_22_1ADC,                    UINT32,\
+                    "NNP2_22_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_22_2TAC,                    UINT32,\
+                    "NNP2_22_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_22_2CLK,                    UINT32,\
+                    "NNP2_22_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_22_2ADC,                    UINT32,\
+                    "NNP2_22_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_23_1TAC,                    UINT32,\
+                    "NNP2_23_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_23_1CLK,                    UINT32,\
+                    "NNP2_23_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_23_1ADC,                    UINT32,\
+                    "NNP2_23_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_23_2TAC,                    UINT32,\
+                    "NNP2_23_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_23_2CLK,                    UINT32,\
+                    "NNP2_23_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_23_2ADC,                    UINT32,\
+                    "NNP2_23_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_24_1TAC,                    UINT32,\
+                    "NNP2_24_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_24_1CLK,                    UINT32,\
+                    "NNP2_24_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_24_1ADC,                    UINT32,\
+                    "NNP2_24_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_24_2TAC,                    UINT32,\
+                    "NNP2_24_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_24_2CLK,                    UINT32,\
+                    "NNP2_24_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_24_2ADC,                    UINT32,\
+                    "NNP2_24_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_25_1TAC,                    UINT32,\
+                    "NNP2_25_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_25_1CLK,                    UINT32,\
+                    "NNP2_25_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_25_1ADC,                    UINT32,\
+                    "NNP2_25_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_25_2TAC,                    UINT32,\
+                    "NNP2_25_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_25_2CLK,                    UINT32,\
+                    "NNP2_25_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_25_2ADC,                    UINT32,\
+                    "NNP2_25_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_26_1TAC,                    UINT32,\
+                    "NNP2_26_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_26_1CLK,                    UINT32,\
+                    "NNP2_26_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_26_1ADC,                    UINT32,\
+                    "NNP2_26_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_26_2TAC,                    UINT32,\
+                    "NNP2_26_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_26_2CLK,                    UINT32,\
+                    "NNP2_26_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_26_2ADC,                    UINT32,\
+                    "NNP2_26_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_27_1TAC,                    UINT32,\
+                    "NNP2_27_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_27_1CLK,                    UINT32,\
+                    "NNP2_27_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_27_1ADC,                    UINT32,\
+                    "NNP2_27_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_27_2TAC,                    UINT32,\
+                    "NNP2_27_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_27_2CLK,                    UINT32,\
+                    "NNP2_27_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_27_2ADC,                    UINT32,\
+                    "NNP2_27_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_28_1TAC,                    UINT32,\
+                    "NNP2_28_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_28_1CLK,                    UINT32,\
+                    "NNP2_28_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_28_1ADC,                    UINT32,\
+                    "NNP2_28_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_28_2TAC,                    UINT32,\
+                    "NNP2_28_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_28_2CLK,                    UINT32,\
+                    "NNP2_28_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_28_2ADC,                    UINT32,\
+                    "NNP2_28_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_29_1TAC,                    UINT32,\
+                    "NNP2_29_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_29_1CLK,                    UINT32,\
+                    "NNP2_29_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_29_1ADC,                    UINT32,\
+                    "NNP2_29_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_29_2TAC,                    UINT32,\
+                    "NNP2_29_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_29_2CLK,                    UINT32,\
+                    "NNP2_29_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_29_2ADC,                    UINT32,\
+                    "NNP2_29_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_30_1TAC,                    UINT32,\
+                    "NNP2_30_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_30_1CLK,                    UINT32,\
+                    "NNP2_30_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_30_1ADC,                    UINT32,\
+                    "NNP2_30_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_30_2TAC,                    UINT32,\
+                    "NNP2_30_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_30_2CLK,                    UINT32,\
+                    "NNP2_30_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_30_2ADC,                    UINT32,\
+                    "NNP2_30_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_31_1TAC,                    UINT32,\
+                    "NNP2_31_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_31_1CLK,                    UINT32,\
+                    "NNP2_31_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_31_1ADC,                    UINT32,\
+                    "NNP2_31_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_31_2TAC,                    UINT32,\
+                    "NNP2_31_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_31_2CLK,                    UINT32,\
+                    "NNP2_31_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_31_2ADC,                    UINT32,\
+                    "NNP2_31_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_32_1TAC,                    UINT32,\
+                    "NNP2_32_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_32_1CLK,                    UINT32,\
+                    "NNP2_32_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_32_1ADC,                    UINT32,\
+                    "NNP2_32_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_32_2TAC,                    UINT32,\
+                    "NNP2_32_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_32_2CLK,                    UINT32,\
+                    "NNP2_32_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_32_2ADC,                    UINT32,\
+                    "NNP2_32_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_33_1TAC,                    UINT32,\
+                    "NNP2_33_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_33_1CLK,                    UINT32,\
+                    "NNP2_33_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_33_1ADC,                    UINT32,\
+                    "NNP2_33_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_33_2TAC,                    UINT32,\
+                    "NNP2_33_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_33_2CLK,                    UINT32,\
+                    "NNP2_33_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_33_2ADC,                    UINT32,\
+                    "NNP2_33_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_34_1TAC,                    UINT32,\
+                    "NNP2_34_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_34_1CLK,                    UINT32,\
+                    "NNP2_34_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_34_1ADC,                    UINT32,\
+                    "NNP2_34_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_34_2TAC,                    UINT32,\
+                    "NNP2_34_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_34_2CLK,                    UINT32,\
+                    "NNP2_34_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_34_2ADC,                    UINT32,\
+                    "NNP2_34_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_35_1TAC,                    UINT32,\
+                    "NNP2_35_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_35_1CLK,                    UINT32,\
+                    "NNP2_35_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_35_1ADC,                    UINT32,\
+                    "NNP2_35_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_35_2TAC,                    UINT32,\
+                    "NNP2_35_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_35_2CLK,                    UINT32,\
+                    "NNP2_35_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_35_2ADC,                    UINT32,\
+                    "NNP2_35_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_36_1TAC,                    UINT32,\
+                    "NNP2_36_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_36_1CLK,                    UINT32,\
+                    "NNP2_36_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_36_1ADC,                    UINT32,\
+                    "NNP2_36_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_36_2TAC,                    UINT32,\
+                    "NNP2_36_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_36_2CLK,                    UINT32,\
+                    "NNP2_36_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_36_2ADC,                    UINT32,\
+                    "NNP2_36_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_37_1TAC,                    UINT32,\
+                    "NNP2_37_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_37_1CLK,                    UINT32,\
+                    "NNP2_37_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_37_1ADC,                    UINT32,\
+                    "NNP2_37_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_37_2TAC,                    UINT32,\
+                    "NNP2_37_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_37_2CLK,                    UINT32,\
+                    "NNP2_37_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_37_2ADC,                    UINT32,\
+                    "NNP2_37_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_38_1TAC,                    UINT32,\
+                    "NNP2_38_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_38_1CLK,                    UINT32,\
+                    "NNP2_38_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_38_1ADC,                    UINT32,\
+                    "NNP2_38_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_38_2TAC,                    UINT32,\
+                    "NNP2_38_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_38_2CLK,                    UINT32,\
+                    "NNP2_38_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_38_2ADC,                    UINT32,\
+                    "NNP2_38_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_39_1TAC,                    UINT32,\
+                    "NNP2_39_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_39_1CLK,                    UINT32,\
+                    "NNP2_39_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_39_1ADC,                    UINT32,\
+                    "NNP2_39_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_39_2TAC,                    UINT32,\
+                    "NNP2_39_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_39_2CLK,                    UINT32,\
+                    "NNP2_39_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_39_2ADC,                    UINT32,\
+                    "NNP2_39_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_40_1TAC,                    UINT32,\
+                    "NNP2_40_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_40_1CLK,                    UINT32,\
+                    "NNP2_40_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_40_1ADC,                    UINT32,\
+                    "NNP2_40_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_40_2TAC,                    UINT32,\
+                    "NNP2_40_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_40_2CLK,                    UINT32,\
+                    "NNP2_40_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_40_2ADC,                    UINT32,\
+                    "NNP2_40_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_41_1TAC,                    UINT32,\
+                    "NNP2_41_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_41_1CLK,                    UINT32,\
+                    "NNP2_41_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_41_1ADC,                    UINT32,\
+                    "NNP2_41_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_41_2TAC,                    UINT32,\
+                    "NNP2_41_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_41_2CLK,                    UINT32,\
+                    "NNP2_41_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_41_2ADC,                    UINT32,\
+                    "NNP2_41_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_42_1TAC,                    UINT32,\
+                    "NNP2_42_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_42_1CLK,                    UINT32,\
+                    "NNP2_42_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_42_1ADC,                    UINT32,\
+                    "NNP2_42_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_42_2TAC,                    UINT32,\
+                    "NNP2_42_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_42_2CLK,                    UINT32,\
+                    "NNP2_42_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_42_2ADC,                    UINT32,\
+                    "NNP2_42_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_43_1TAC,                    UINT32,\
+                    "NNP2_43_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_43_1CLK,                    UINT32,\
+                    "NNP2_43_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_43_1ADC,                    UINT32,\
+                    "NNP2_43_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_43_2TAC,                    UINT32,\
+                    "NNP2_43_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_43_2CLK,                    UINT32,\
+                    "NNP2_43_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_43_2ADC,                    UINT32,\
+                    "NNP2_43_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_44_1TAC,                    UINT32,\
+                    "NNP2_44_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_44_1CLK,                    UINT32,\
+                    "NNP2_44_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_44_1ADC,                    UINT32,\
+                    "NNP2_44_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_44_2TAC,                    UINT32,\
+                    "NNP2_44_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_44_2CLK,                    UINT32,\
+                    "NNP2_44_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_44_2ADC,                    UINT32,\
+                    "NNP2_44_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_45_1TAC,                    UINT32,\
+                    "NNP2_45_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_45_1CLK,                    UINT32,\
+                    "NNP2_45_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_45_1ADC,                    UINT32,\
+                    "NNP2_45_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_45_2TAC,                    UINT32,\
+                    "NNP2_45_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_45_2CLK,                    UINT32,\
+                    "NNP2_45_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_45_2ADC,                    UINT32,\
+                    "NNP2_45_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_46_1TAC,                    UINT32,\
+                    "NNP2_46_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_46_1CLK,                    UINT32,\
+                    "NNP2_46_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_46_1ADC,                    UINT32,\
+                    "NNP2_46_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_46_2TAC,                    UINT32,\
+                    "NNP2_46_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_46_2CLK,                    UINT32,\
+                    "NNP2_46_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_46_2ADC,                    UINT32,\
+                    "NNP2_46_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_47_1TAC,                    UINT32,\
+                    "NNP2_47_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_47_1CLK,                    UINT32,\
+                    "NNP2_47_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_47_1ADC,                    UINT32,\
+                    "NNP2_47_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_47_2TAC,                    UINT32,\
+                    "NNP2_47_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_47_2CLK,                    UINT32,\
+                    "NNP2_47_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_47_2ADC,                    UINT32,\
+                    "NNP2_47_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_48_1TAC,                    UINT32,\
+                    "NNP2_48_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_48_1CLK,                    UINT32,\
+                    "NNP2_48_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_48_1ADC,                    UINT32,\
+                    "NNP2_48_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_48_2TAC,                    UINT32,\
+                    "NNP2_48_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_48_2CLK,                    UINT32,\
+                    "NNP2_48_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_48_2ADC,                    UINT32,\
+                    "NNP2_48_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_49_1TAC,                    UINT32,\
+                    "NNP2_49_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_49_1CLK,                    UINT32,\
+                    "NNP2_49_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_49_1ADC,                    UINT32,\
+                    "NNP2_49_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_49_2TAC,                    UINT32,\
+                    "NNP2_49_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_49_2CLK,                    UINT32,\
+                    "NNP2_49_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_49_2ADC,                    UINT32,\
+                    "NNP2_49_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_50_1TAC,                    UINT32,\
+                    "NNP2_50_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_50_1CLK,                    UINT32,\
+                    "NNP2_50_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_50_1ADC,                    UINT32,\
+                    "NNP2_50_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_50_2TAC,                    UINT32,\
+                    "NNP2_50_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_50_2CLK,                    UINT32,\
+                    "NNP2_50_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP2_50_2ADC,                    UINT32,\
+                    "NNP2_50_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_1_1TAC,                     UINT32,\
+                    "NNP3_1_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_1_1CLK,                     UINT32,\
+                    "NNP3_1_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_1_1ADC,                     UINT32,\
+                    "NNP3_1_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_1_2TAC,                     UINT32,\
+                    "NNP3_1_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_1_2CLK,                     UINT32,\
+                    "NNP3_1_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_1_2ADC,                     UINT32,\
+                    "NNP3_1_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_2_1TAC,                     UINT32,\
+                    "NNP3_2_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_2_1CLK,                     UINT32,\
+                    "NNP3_2_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_2_1ADC,                     UINT32,\
+                    "NNP3_2_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_2_2TAC,                     UINT32,\
+                    "NNP3_2_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_2_2CLK,                     UINT32,\
+                    "NNP3_2_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_2_2ADC,                     UINT32,\
+                    "NNP3_2_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_3_1TAC,                     UINT32,\
+                    "NNP3_3_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_3_1CLK,                     UINT32,\
+                    "NNP3_3_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_3_1ADC,                     UINT32,\
+                    "NNP3_3_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_3_2TAC,                     UINT32,\
+                    "NNP3_3_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_3_2CLK,                     UINT32,\
+                    "NNP3_3_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_3_2ADC,                     UINT32,\
+                    "NNP3_3_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_4_1TAC,                     UINT32,\
+                    "NNP3_4_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_4_1CLK,                     UINT32,\
+                    "NNP3_4_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_4_1ADC,                     UINT32,\
+                    "NNP3_4_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_4_2TAC,                     UINT32,\
+                    "NNP3_4_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_4_2CLK,                     UINT32,\
+                    "NNP3_4_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_4_2ADC,                     UINT32,\
+                    "NNP3_4_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_5_1TAC,                     UINT32,\
+                    "NNP3_5_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_5_1CLK,                     UINT32,\
+                    "NNP3_5_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_5_1ADC,                     UINT32,\
+                    "NNP3_5_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_5_2TAC,                     UINT32,\
+                    "NNP3_5_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_5_2CLK,                     UINT32,\
+                    "NNP3_5_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_5_2ADC,                     UINT32,\
+                    "NNP3_5_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_6_1TAC,                     UINT32,\
+                    "NNP3_6_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_6_1CLK,                     UINT32,\
+                    "NNP3_6_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_6_1ADC,                     UINT32,\
+                    "NNP3_6_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_6_2TAC,                     UINT32,\
+                    "NNP3_6_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_6_2CLK,                     UINT32,\
+                    "NNP3_6_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_6_2ADC,                     UINT32,\
+                    "NNP3_6_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_7_1TAC,                     UINT32,\
+                    "NNP3_7_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_7_1CLK,                     UINT32,\
+                    "NNP3_7_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_7_1ADC,                     UINT32,\
+                    "NNP3_7_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_7_2TAC,                     UINT32,\
+                    "NNP3_7_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_7_2CLK,                     UINT32,\
+                    "NNP3_7_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_7_2ADC,                     UINT32,\
+                    "NNP3_7_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_8_1TAC,                     UINT32,\
+                    "NNP3_8_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_8_1CLK,                     UINT32,\
+                    "NNP3_8_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_8_1ADC,                     UINT32,\
+                    "NNP3_8_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_8_2TAC,                     UINT32,\
+                    "NNP3_8_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_8_2CLK,                     UINT32,\
+                    "NNP3_8_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_8_2ADC,                     UINT32,\
+                    "NNP3_8_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_9_1TAC,                     UINT32,\
+                    "NNP3_9_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_9_1CLK,                     UINT32,\
+                    "NNP3_9_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_9_1ADC,                     UINT32,\
+                    "NNP3_9_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_9_2TAC,                     UINT32,\
+                    "NNP3_9_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_9_2CLK,                     UINT32,\
+                    "NNP3_9_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_9_2ADC,                     UINT32,\
+                    "NNP3_9_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_10_1TAC,                    UINT32,\
+                    "NNP3_10_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_10_1CLK,                    UINT32,\
+                    "NNP3_10_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_10_1ADC,                    UINT32,\
+                    "NNP3_10_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_10_2TAC,                    UINT32,\
+                    "NNP3_10_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_10_2CLK,                    UINT32,\
+                    "NNP3_10_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_10_2ADC,                    UINT32,\
+                    "NNP3_10_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_11_1TAC,                    UINT32,\
+                    "NNP3_11_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_11_1CLK,                    UINT32,\
+                    "NNP3_11_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_11_1ADC,                    UINT32,\
+                    "NNP3_11_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_11_2TAC,                    UINT32,\
+                    "NNP3_11_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_11_2CLK,                    UINT32,\
+                    "NNP3_11_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_11_2ADC,                    UINT32,\
+                    "NNP3_11_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_12_1TAC,                    UINT32,\
+                    "NNP3_12_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_12_1CLK,                    UINT32,\
+                    "NNP3_12_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_12_1ADC,                    UINT32,\
+                    "NNP3_12_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_12_2TAC,                    UINT32,\
+                    "NNP3_12_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_12_2CLK,                    UINT32,\
+                    "NNP3_12_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_12_2ADC,                    UINT32,\
+                    "NNP3_12_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_13_1TAC,                    UINT32,\
+                    "NNP3_13_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_13_1CLK,                    UINT32,\
+                    "NNP3_13_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_13_1ADC,                    UINT32,\
+                    "NNP3_13_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_13_2TAC,                    UINT32,\
+                    "NNP3_13_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_13_2CLK,                    UINT32,\
+                    "NNP3_13_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_13_2ADC,                    UINT32,\
+                    "NNP3_13_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_14_1TAC,                    UINT32,\
+                    "NNP3_14_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_14_1CLK,                    UINT32,\
+                    "NNP3_14_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_14_1ADC,                    UINT32,\
+                    "NNP3_14_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_14_2TAC,                    UINT32,\
+                    "NNP3_14_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_14_2CLK,                    UINT32,\
+                    "NNP3_14_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_14_2ADC,                    UINT32,\
+                    "NNP3_14_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_15_1TAC,                    UINT32,\
+                    "NNP3_15_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_15_1CLK,                    UINT32,\
+                    "NNP3_15_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_15_1ADC,                    UINT32,\
+                    "NNP3_15_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_15_2TAC,                    UINT32,\
+                    "NNP3_15_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_15_2CLK,                    UINT32,\
+                    "NNP3_15_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_15_2ADC,                    UINT32,\
+                    "NNP3_15_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_16_1TAC,                    UINT32,\
+                    "NNP3_16_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_16_1CLK,                    UINT32,\
+                    "NNP3_16_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_16_1ADC,                    UINT32,\
+                    "NNP3_16_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_16_2TAC,                    UINT32,\
+                    "NNP3_16_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_16_2CLK,                    UINT32,\
+                    "NNP3_16_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_16_2ADC,                    UINT32,\
+                    "NNP3_16_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_17_1TAC,                    UINT32,\
+                    "NNP3_17_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_17_1CLK,                    UINT32,\
+                    "NNP3_17_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_17_1ADC,                    UINT32,\
+                    "NNP3_17_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_17_2TAC,                    UINT32,\
+                    "NNP3_17_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_17_2CLK,                    UINT32,\
+                    "NNP3_17_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_17_2ADC,                    UINT32,\
+                    "NNP3_17_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_18_1TAC,                    UINT32,\
+                    "NNP3_18_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_18_1CLK,                    UINT32,\
+                    "NNP3_18_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_18_1ADC,                    UINT32,\
+                    "NNP3_18_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_18_2TAC,                    UINT32,\
+                    "NNP3_18_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_18_2CLK,                    UINT32,\
+                    "NNP3_18_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_18_2ADC,                    UINT32,\
+                    "NNP3_18_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_19_1TAC,                    UINT32,\
+                    "NNP3_19_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_19_1CLK,                    UINT32,\
+                    "NNP3_19_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_19_1ADC,                    UINT32,\
+                    "NNP3_19_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_19_2TAC,                    UINT32,\
+                    "NNP3_19_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_19_2CLK,                    UINT32,\
+                    "NNP3_19_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_19_2ADC,                    UINT32,\
+                    "NNP3_19_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_20_1TAC,                    UINT32,\
+                    "NNP3_20_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_20_1CLK,                    UINT32,\
+                    "NNP3_20_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_20_1ADC,                    UINT32,\
+                    "NNP3_20_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_20_2TAC,                    UINT32,\
+                    "NNP3_20_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_20_2CLK,                    UINT32,\
+                    "NNP3_20_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_20_2ADC,                    UINT32,\
+                    "NNP3_20_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_21_1TAC,                    UINT32,\
+                    "NNP3_21_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_21_1CLK,                    UINT32,\
+                    "NNP3_21_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_21_1ADC,                    UINT32,\
+                    "NNP3_21_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_21_2TAC,                    UINT32,\
+                    "NNP3_21_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_21_2CLK,                    UINT32,\
+                    "NNP3_21_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_21_2ADC,                    UINT32,\
+                    "NNP3_21_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_22_1TAC,                    UINT32,\
+                    "NNP3_22_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_22_1CLK,                    UINT32,\
+                    "NNP3_22_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_22_1ADC,                    UINT32,\
+                    "NNP3_22_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_22_2TAC,                    UINT32,\
+                    "NNP3_22_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_22_2CLK,                    UINT32,\
+                    "NNP3_22_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_22_2ADC,                    UINT32,\
+                    "NNP3_22_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_23_1TAC,                    UINT32,\
+                    "NNP3_23_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_23_1CLK,                    UINT32,\
+                    "NNP3_23_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_23_1ADC,                    UINT32,\
+                    "NNP3_23_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_23_2TAC,                    UINT32,\
+                    "NNP3_23_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_23_2CLK,                    UINT32,\
+                    "NNP3_23_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_23_2ADC,                    UINT32,\
+                    "NNP3_23_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_24_1TAC,                    UINT32,\
+                    "NNP3_24_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_24_1CLK,                    UINT32,\
+                    "NNP3_24_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_24_1ADC,                    UINT32,\
+                    "NNP3_24_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_24_2TAC,                    UINT32,\
+                    "NNP3_24_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_24_2CLK,                    UINT32,\
+                    "NNP3_24_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_24_2ADC,                    UINT32,\
+                    "NNP3_24_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_25_1TAC,                    UINT32,\
+                    "NNP3_25_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_25_1CLK,                    UINT32,\
+                    "NNP3_25_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_25_1ADC,                    UINT32,\
+                    "NNP3_25_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_25_2TAC,                    UINT32,\
+                    "NNP3_25_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_25_2CLK,                    UINT32,\
+                    "NNP3_25_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_25_2ADC,                    UINT32,\
+                    "NNP3_25_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_26_1TAC,                    UINT32,\
+                    "NNP3_26_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_26_1CLK,                    UINT32,\
+                    "NNP3_26_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_26_1ADC,                    UINT32,\
+                    "NNP3_26_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_26_2TAC,                    UINT32,\
+                    "NNP3_26_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_26_2CLK,                    UINT32,\
+                    "NNP3_26_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_26_2ADC,                    UINT32,\
+                    "NNP3_26_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_27_1TAC,                    UINT32,\
+                    "NNP3_27_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_27_1CLK,                    UINT32,\
+                    "NNP3_27_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_27_1ADC,                    UINT32,\
+                    "NNP3_27_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_27_2TAC,                    UINT32,\
+                    "NNP3_27_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_27_2CLK,                    UINT32,\
+                    "NNP3_27_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_27_2ADC,                    UINT32,\
+                    "NNP3_27_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_28_1TAC,                    UINT32,\
+                    "NNP3_28_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_28_1CLK,                    UINT32,\
+                    "NNP3_28_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_28_1ADC,                    UINT32,\
+                    "NNP3_28_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_28_2TAC,                    UINT32,\
+                    "NNP3_28_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_28_2CLK,                    UINT32,\
+                    "NNP3_28_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_28_2ADC,                    UINT32,\
+                    "NNP3_28_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_29_1TAC,                    UINT32,\
+                    "NNP3_29_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_29_1CLK,                    UINT32,\
+                    "NNP3_29_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_29_1ADC,                    UINT32,\
+                    "NNP3_29_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_29_2TAC,                    UINT32,\
+                    "NNP3_29_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_29_2CLK,                    UINT32,\
+                    "NNP3_29_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_29_2ADC,                    UINT32,\
+                    "NNP3_29_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_30_1TAC,                    UINT32,\
+                    "NNP3_30_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_30_1CLK,                    UINT32,\
+                    "NNP3_30_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_30_1ADC,                    UINT32,\
+                    "NNP3_30_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_30_2TAC,                    UINT32,\
+                    "NNP3_30_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_30_2CLK,                    UINT32,\
+                    "NNP3_30_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_30_2ADC,                    UINT32,\
+                    "NNP3_30_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_31_1TAC,                    UINT32,\
+                    "NNP3_31_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_31_1CLK,                    UINT32,\
+                    "NNP3_31_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_31_1ADC,                    UINT32,\
+                    "NNP3_31_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_31_2TAC,                    UINT32,\
+                    "NNP3_31_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_31_2CLK,                    UINT32,\
+                    "NNP3_31_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_31_2ADC,                    UINT32,\
+                    "NNP3_31_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_32_1TAC,                    UINT32,\
+                    "NNP3_32_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_32_1CLK,                    UINT32,\
+                    "NNP3_32_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_32_1ADC,                    UINT32,\
+                    "NNP3_32_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_32_2TAC,                    UINT32,\
+                    "NNP3_32_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_32_2CLK,                    UINT32,\
+                    "NNP3_32_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_32_2ADC,                    UINT32,\
+                    "NNP3_32_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_33_1TAC,                    UINT32,\
+                    "NNP3_33_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_33_1CLK,                    UINT32,\
+                    "NNP3_33_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_33_1ADC,                    UINT32,\
+                    "NNP3_33_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_33_2TAC,                    UINT32,\
+                    "NNP3_33_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_33_2CLK,                    UINT32,\
+                    "NNP3_33_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_33_2ADC,                    UINT32,\
+                    "NNP3_33_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_34_1TAC,                    UINT32,\
+                    "NNP3_34_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_34_1CLK,                    UINT32,\
+                    "NNP3_34_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_34_1ADC,                    UINT32,\
+                    "NNP3_34_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_34_2TAC,                    UINT32,\
+                    "NNP3_34_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_34_2CLK,                    UINT32,\
+                    "NNP3_34_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_34_2ADC,                    UINT32,\
+                    "NNP3_34_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_35_1TAC,                    UINT32,\
+                    "NNP3_35_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_35_1CLK,                    UINT32,\
+                    "NNP3_35_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_35_1ADC,                    UINT32,\
+                    "NNP3_35_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_35_2TAC,                    UINT32,\
+                    "NNP3_35_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_35_2CLK,                    UINT32,\
+                    "NNP3_35_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_35_2ADC,                    UINT32,\
+                    "NNP3_35_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_36_1TAC,                    UINT32,\
+                    "NNP3_36_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_36_1CLK,                    UINT32,\
+                    "NNP3_36_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_36_1ADC,                    UINT32,\
+                    "NNP3_36_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_36_2TAC,                    UINT32,\
+                    "NNP3_36_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_36_2CLK,                    UINT32,\
+                    "NNP3_36_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_36_2ADC,                    UINT32,\
+                    "NNP3_36_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_37_1TAC,                    UINT32,\
+                    "NNP3_37_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_37_1CLK,                    UINT32,\
+                    "NNP3_37_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_37_1ADC,                    UINT32,\
+                    "NNP3_37_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_37_2TAC,                    UINT32,\
+                    "NNP3_37_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_37_2CLK,                    UINT32,\
+                    "NNP3_37_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_37_2ADC,                    UINT32,\
+                    "NNP3_37_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_38_1TAC,                    UINT32,\
+                    "NNP3_38_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_38_1CLK,                    UINT32,\
+                    "NNP3_38_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_38_1ADC,                    UINT32,\
+                    "NNP3_38_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_38_2TAC,                    UINT32,\
+                    "NNP3_38_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_38_2CLK,                    UINT32,\
+                    "NNP3_38_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_38_2ADC,                    UINT32,\
+                    "NNP3_38_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_39_1TAC,                    UINT32,\
+                    "NNP3_39_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_39_1CLK,                    UINT32,\
+                    "NNP3_39_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_39_1ADC,                    UINT32,\
+                    "NNP3_39_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_39_2TAC,                    UINT32,\
+                    "NNP3_39_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_39_2CLK,                    UINT32,\
+                    "NNP3_39_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_39_2ADC,                    UINT32,\
+                    "NNP3_39_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_40_1TAC,                    UINT32,\
+                    "NNP3_40_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_40_1CLK,                    UINT32,\
+                    "NNP3_40_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_40_1ADC,                    UINT32,\
+                    "NNP3_40_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_40_2TAC,                    UINT32,\
+                    "NNP3_40_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_40_2CLK,                    UINT32,\
+                    "NNP3_40_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_40_2ADC,                    UINT32,\
+                    "NNP3_40_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_41_1TAC,                    UINT32,\
+                    "NNP3_41_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_41_1CLK,                    UINT32,\
+                    "NNP3_41_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_41_1ADC,                    UINT32,\
+                    "NNP3_41_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_41_2TAC,                    UINT32,\
+                    "NNP3_41_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_41_2CLK,                    UINT32,\
+                    "NNP3_41_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_41_2ADC,                    UINT32,\
+                    "NNP3_41_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_42_1TAC,                    UINT32,\
+                    "NNP3_42_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_42_1CLK,                    UINT32,\
+                    "NNP3_42_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_42_1ADC,                    UINT32,\
+                    "NNP3_42_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_42_2TAC,                    UINT32,\
+                    "NNP3_42_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_42_2CLK,                    UINT32,\
+                    "NNP3_42_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_42_2ADC,                    UINT32,\
+                    "NNP3_42_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_43_1TAC,                    UINT32,\
+                    "NNP3_43_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_43_1CLK,                    UINT32,\
+                    "NNP3_43_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_43_1ADC,                    UINT32,\
+                    "NNP3_43_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_43_2TAC,                    UINT32,\
+                    "NNP3_43_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_43_2CLK,                    UINT32,\
+                    "NNP3_43_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_43_2ADC,                    UINT32,\
+                    "NNP3_43_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_44_1TAC,                    UINT32,\
+                    "NNP3_44_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_44_1CLK,                    UINT32,\
+                    "NNP3_44_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_44_1ADC,                    UINT32,\
+                    "NNP3_44_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_44_2TAC,                    UINT32,\
+                    "NNP3_44_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_44_2CLK,                    UINT32,\
+                    "NNP3_44_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_44_2ADC,                    UINT32,\
+                    "NNP3_44_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_45_1TAC,                    UINT32,\
+                    "NNP3_45_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_45_1CLK,                    UINT32,\
+                    "NNP3_45_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_45_1ADC,                    UINT32,\
+                    "NNP3_45_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_45_2TAC,                    UINT32,\
+                    "NNP3_45_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_45_2CLK,                    UINT32,\
+                    "NNP3_45_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_45_2ADC,                    UINT32,\
+                    "NNP3_45_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_46_1TAC,                    UINT32,\
+                    "NNP3_46_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_46_1CLK,                    UINT32,\
+                    "NNP3_46_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_46_1ADC,                    UINT32,\
+                    "NNP3_46_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_46_2TAC,                    UINT32,\
+                    "NNP3_46_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_46_2CLK,                    UINT32,\
+                    "NNP3_46_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_46_2ADC,                    UINT32,\
+                    "NNP3_46_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_47_1TAC,                    UINT32,\
+                    "NNP3_47_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_47_1CLK,                    UINT32,\
+                    "NNP3_47_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_47_1ADC,                    UINT32,\
+                    "NNP3_47_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_47_2TAC,                    UINT32,\
+                    "NNP3_47_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_47_2CLK,                    UINT32,\
+                    "NNP3_47_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_47_2ADC,                    UINT32,\
+                    "NNP3_47_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_48_1TAC,                    UINT32,\
+                    "NNP3_48_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_48_1CLK,                    UINT32,\
+                    "NNP3_48_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_48_1ADC,                    UINT32,\
+                    "NNP3_48_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_48_2TAC,                    UINT32,\
+                    "NNP3_48_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_48_2CLK,                    UINT32,\
+                    "NNP3_48_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_48_2ADC,                    UINT32,\
+                    "NNP3_48_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_49_1TAC,                    UINT32,\
+                    "NNP3_49_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_49_1CLK,                    UINT32,\
+                    "NNP3_49_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_49_1ADC,                    UINT32,\
+                    "NNP3_49_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_49_2TAC,                    UINT32,\
+                    "NNP3_49_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_49_2CLK,                    UINT32,\
+                    "NNP3_49_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_49_2ADC,                    UINT32,\
+                    "NNP3_49_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_50_1TAC,                    UINT32,\
+                    "NNP3_50_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_50_1CLK,                    UINT32,\
+                    "NNP3_50_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_50_1ADC,                    UINT32,\
+                    "NNP3_50_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_50_2TAC,                    UINT32,\
+                    "NNP3_50_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_50_2CLK,                    UINT32,\
+                    "NNP3_50_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP3_50_2ADC,                    UINT32,\
+                    "NNP3_50_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_1_1TAC,                     UINT32,\
+                    "NNP4_1_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_1_1CLK,                     UINT32,\
+                    "NNP4_1_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_1_1ADC,                     UINT32,\
+                    "NNP4_1_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_1_2TAC,                     UINT32,\
+                    "NNP4_1_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_1_2CLK,                     UINT32,\
+                    "NNP4_1_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_1_2ADC,                     UINT32,\
+                    "NNP4_1_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_2_1TAC,                     UINT32,\
+                    "NNP4_2_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_2_1CLK,                     UINT32,\
+                    "NNP4_2_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_2_1ADC,                     UINT32,\
+                    "NNP4_2_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_2_2TAC,                     UINT32,\
+                    "NNP4_2_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_2_2CLK,                     UINT32,\
+                    "NNP4_2_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_2_2ADC,                     UINT32,\
+                    "NNP4_2_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_3_1TAC,                     UINT32,\
+                    "NNP4_3_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_3_1CLK,                     UINT32,\
+                    "NNP4_3_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_3_1ADC,                     UINT32,\
+                    "NNP4_3_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_3_2TAC,                     UINT32,\
+                    "NNP4_3_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_3_2CLK,                     UINT32,\
+                    "NNP4_3_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_3_2ADC,                     UINT32,\
+                    "NNP4_3_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_4_1TAC,                     UINT32,\
+                    "NNP4_4_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_4_1CLK,                     UINT32,\
+                    "NNP4_4_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_4_1ADC,                     UINT32,\
+                    "NNP4_4_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_4_2TAC,                     UINT32,\
+                    "NNP4_4_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_4_2CLK,                     UINT32,\
+                    "NNP4_4_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_4_2ADC,                     UINT32,\
+                    "NNP4_4_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_5_1TAC,                     UINT32,\
+                    "NNP4_5_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_5_1CLK,                     UINT32,\
+                    "NNP4_5_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_5_1ADC,                     UINT32,\
+                    "NNP4_5_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_5_2TAC,                     UINT32,\
+                    "NNP4_5_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_5_2CLK,                     UINT32,\
+                    "NNP4_5_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_5_2ADC,                     UINT32,\
+                    "NNP4_5_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_6_1TAC,                     UINT32,\
+                    "NNP4_6_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_6_1CLK,                     UINT32,\
+                    "NNP4_6_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_6_1ADC,                     UINT32,\
+                    "NNP4_6_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_6_2TAC,                     UINT32,\
+                    "NNP4_6_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_6_2CLK,                     UINT32,\
+                    "NNP4_6_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_6_2ADC,                     UINT32,\
+                    "NNP4_6_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_7_1TAC,                     UINT32,\
+                    "NNP4_7_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_7_1CLK,                     UINT32,\
+                    "NNP4_7_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_7_1ADC,                     UINT32,\
+                    "NNP4_7_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_7_2TAC,                     UINT32,\
+                    "NNP4_7_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_7_2CLK,                     UINT32,\
+                    "NNP4_7_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_7_2ADC,                     UINT32,\
+                    "NNP4_7_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_8_1TAC,                     UINT32,\
+                    "NNP4_8_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_8_1CLK,                     UINT32,\
+                    "NNP4_8_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_8_1ADC,                     UINT32,\
+                    "NNP4_8_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_8_2TAC,                     UINT32,\
+                    "NNP4_8_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_8_2CLK,                     UINT32,\
+                    "NNP4_8_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_8_2ADC,                     UINT32,\
+                    "NNP4_8_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_9_1TAC,                     UINT32,\
+                    "NNP4_9_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_9_1CLK,                     UINT32,\
+                    "NNP4_9_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_9_1ADC,                     UINT32,\
+                    "NNP4_9_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_9_2TAC,                     UINT32,\
+                    "NNP4_9_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_9_2CLK,                     UINT32,\
+                    "NNP4_9_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_9_2ADC,                     UINT32,\
+                    "NNP4_9_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_10_1TAC,                    UINT32,\
+                    "NNP4_10_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_10_1CLK,                    UINT32,\
+                    "NNP4_10_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_10_1ADC,                    UINT32,\
+                    "NNP4_10_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_10_2TAC,                    UINT32,\
+                    "NNP4_10_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_10_2CLK,                    UINT32,\
+                    "NNP4_10_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_10_2ADC,                    UINT32,\
+                    "NNP4_10_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_11_1TAC,                    UINT32,\
+                    "NNP4_11_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_11_1CLK,                    UINT32,\
+                    "NNP4_11_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_11_1ADC,                    UINT32,\
+                    "NNP4_11_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_11_2TAC,                    UINT32,\
+                    "NNP4_11_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_11_2CLK,                    UINT32,\
+                    "NNP4_11_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_11_2ADC,                    UINT32,\
+                    "NNP4_11_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_12_1TAC,                    UINT32,\
+                    "NNP4_12_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_12_1CLK,                    UINT32,\
+                    "NNP4_12_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_12_1ADC,                    UINT32,\
+                    "NNP4_12_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_12_2TAC,                    UINT32,\
+                    "NNP4_12_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_12_2CLK,                    UINT32,\
+                    "NNP4_12_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_12_2ADC,                    UINT32,\
+                    "NNP4_12_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_13_1TAC,                    UINT32,\
+                    "NNP4_13_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_13_1CLK,                    UINT32,\
+                    "NNP4_13_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_13_1ADC,                    UINT32,\
+                    "NNP4_13_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_13_2TAC,                    UINT32,\
+                    "NNP4_13_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_13_2CLK,                    UINT32,\
+                    "NNP4_13_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_13_2ADC,                    UINT32,\
+                    "NNP4_13_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_14_1TAC,                    UINT32,\
+                    "NNP4_14_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_14_1CLK,                    UINT32,\
+                    "NNP4_14_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_14_1ADC,                    UINT32,\
+                    "NNP4_14_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_14_2TAC,                    UINT32,\
+                    "NNP4_14_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_14_2CLK,                    UINT32,\
+                    "NNP4_14_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_14_2ADC,                    UINT32,\
+                    "NNP4_14_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_15_1TAC,                    UINT32,\
+                    "NNP4_15_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_15_1CLK,                    UINT32,\
+                    "NNP4_15_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_15_1ADC,                    UINT32,\
+                    "NNP4_15_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_15_2TAC,                    UINT32,\
+                    "NNP4_15_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_15_2CLK,                    UINT32,\
+                    "NNP4_15_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_15_2ADC,                    UINT32,\
+                    "NNP4_15_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_16_1TAC,                    UINT32,\
+                    "NNP4_16_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_16_1CLK,                    UINT32,\
+                    "NNP4_16_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_16_1ADC,                    UINT32,\
+                    "NNP4_16_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_16_2TAC,                    UINT32,\
+                    "NNP4_16_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_16_2CLK,                    UINT32,\
+                    "NNP4_16_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_16_2ADC,                    UINT32,\
+                    "NNP4_16_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_17_1TAC,                    UINT32,\
+                    "NNP4_17_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_17_1CLK,                    UINT32,\
+                    "NNP4_17_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_17_1ADC,                    UINT32,\
+                    "NNP4_17_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_17_2TAC,                    UINT32,\
+                    "NNP4_17_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_17_2CLK,                    UINT32,\
+                    "NNP4_17_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_17_2ADC,                    UINT32,\
+                    "NNP4_17_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_18_1TAC,                    UINT32,\
+                    "NNP4_18_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_18_1CLK,                    UINT32,\
+                    "NNP4_18_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_18_1ADC,                    UINT32,\
+                    "NNP4_18_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_18_2TAC,                    UINT32,\
+                    "NNP4_18_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_18_2CLK,                    UINT32,\
+                    "NNP4_18_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_18_2ADC,                    UINT32,\
+                    "NNP4_18_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_19_1TAC,                    UINT32,\
+                    "NNP4_19_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_19_1CLK,                    UINT32,\
+                    "NNP4_19_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_19_1ADC,                    UINT32,\
+                    "NNP4_19_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_19_2TAC,                    UINT32,\
+                    "NNP4_19_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_19_2CLK,                    UINT32,\
+                    "NNP4_19_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_19_2ADC,                    UINT32,\
+                    "NNP4_19_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_20_1TAC,                    UINT32,\
+                    "NNP4_20_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_20_1CLK,                    UINT32,\
+                    "NNP4_20_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_20_1ADC,                    UINT32,\
+                    "NNP4_20_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_20_2TAC,                    UINT32,\
+                    "NNP4_20_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_20_2CLK,                    UINT32,\
+                    "NNP4_20_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_20_2ADC,                    UINT32,\
+                    "NNP4_20_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_21_1TAC,                    UINT32,\
+                    "NNP4_21_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_21_1CLK,                    UINT32,\
+                    "NNP4_21_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_21_1ADC,                    UINT32,\
+                    "NNP4_21_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_21_2TAC,                    UINT32,\
+                    "NNP4_21_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_21_2CLK,                    UINT32,\
+                    "NNP4_21_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_21_2ADC,                    UINT32,\
+                    "NNP4_21_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_22_1TAC,                    UINT32,\
+                    "NNP4_22_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_22_1CLK,                    UINT32,\
+                    "NNP4_22_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_22_1ADC,                    UINT32,\
+                    "NNP4_22_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_22_2TAC,                    UINT32,\
+                    "NNP4_22_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_22_2CLK,                    UINT32,\
+                    "NNP4_22_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_22_2ADC,                    UINT32,\
+                    "NNP4_22_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_23_1TAC,                    UINT32,\
+                    "NNP4_23_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_23_1CLK,                    UINT32,\
+                    "NNP4_23_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_23_1ADC,                    UINT32,\
+                    "NNP4_23_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_23_2TAC,                    UINT32,\
+                    "NNP4_23_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_23_2CLK,                    UINT32,\
+                    "NNP4_23_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_23_2ADC,                    UINT32,\
+                    "NNP4_23_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_24_1TAC,                    UINT32,\
+                    "NNP4_24_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_24_1CLK,                    UINT32,\
+                    "NNP4_24_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_24_1ADC,                    UINT32,\
+                    "NNP4_24_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_24_2TAC,                    UINT32,\
+                    "NNP4_24_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_24_2CLK,                    UINT32,\
+                    "NNP4_24_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_24_2ADC,                    UINT32,\
+                    "NNP4_24_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_25_1TAC,                    UINT32,\
+                    "NNP4_25_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_25_1CLK,                    UINT32,\
+                    "NNP4_25_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_25_1ADC,                    UINT32,\
+                    "NNP4_25_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_25_2TAC,                    UINT32,\
+                    "NNP4_25_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_25_2CLK,                    UINT32,\
+                    "NNP4_25_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_25_2ADC,                    UINT32,\
+                    "NNP4_25_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_26_1TAC,                    UINT32,\
+                    "NNP4_26_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_26_1CLK,                    UINT32,\
+                    "NNP4_26_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_26_1ADC,                    UINT32,\
+                    "NNP4_26_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_26_2TAC,                    UINT32,\
+                    "NNP4_26_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_26_2CLK,                    UINT32,\
+                    "NNP4_26_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_26_2ADC,                    UINT32,\
+                    "NNP4_26_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_27_1TAC,                    UINT32,\
+                    "NNP4_27_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_27_1CLK,                    UINT32,\
+                    "NNP4_27_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_27_1ADC,                    UINT32,\
+                    "NNP4_27_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_27_2TAC,                    UINT32,\
+                    "NNP4_27_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_27_2CLK,                    UINT32,\
+                    "NNP4_27_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_27_2ADC,                    UINT32,\
+                    "NNP4_27_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_28_1TAC,                    UINT32,\
+                    "NNP4_28_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_28_1CLK,                    UINT32,\
+                    "NNP4_28_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_28_1ADC,                    UINT32,\
+                    "NNP4_28_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_28_2TAC,                    UINT32,\
+                    "NNP4_28_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_28_2CLK,                    UINT32,\
+                    "NNP4_28_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_28_2ADC,                    UINT32,\
+                    "NNP4_28_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_29_1TAC,                    UINT32,\
+                    "NNP4_29_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_29_1CLK,                    UINT32,\
+                    "NNP4_29_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_29_1ADC,                    UINT32,\
+                    "NNP4_29_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_29_2TAC,                    UINT32,\
+                    "NNP4_29_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_29_2CLK,                    UINT32,\
+                    "NNP4_29_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_29_2ADC,                    UINT32,\
+                    "NNP4_29_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_30_1TAC,                    UINT32,\
+                    "NNP4_30_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_30_1CLK,                    UINT32,\
+                    "NNP4_30_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_30_1ADC,                    UINT32,\
+                    "NNP4_30_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_30_2TAC,                    UINT32,\
+                    "NNP4_30_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_30_2CLK,                    UINT32,\
+                    "NNP4_30_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_30_2ADC,                    UINT32,\
+                    "NNP4_30_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_31_1TAC,                    UINT32,\
+                    "NNP4_31_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_31_1CLK,                    UINT32,\
+                    "NNP4_31_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_31_1ADC,                    UINT32,\
+                    "NNP4_31_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_31_2TAC,                    UINT32,\
+                    "NNP4_31_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_31_2CLK,                    UINT32,\
+                    "NNP4_31_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_31_2ADC,                    UINT32,\
+                    "NNP4_31_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_32_1TAC,                    UINT32,\
+                    "NNP4_32_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_32_1CLK,                    UINT32,\
+                    "NNP4_32_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_32_1ADC,                    UINT32,\
+                    "NNP4_32_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_32_2TAC,                    UINT32,\
+                    "NNP4_32_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_32_2CLK,                    UINT32,\
+                    "NNP4_32_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_32_2ADC,                    UINT32,\
+                    "NNP4_32_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_33_1TAC,                    UINT32,\
+                    "NNP4_33_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_33_1CLK,                    UINT32,\
+                    "NNP4_33_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_33_1ADC,                    UINT32,\
+                    "NNP4_33_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_33_2TAC,                    UINT32,\
+                    "NNP4_33_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_33_2CLK,                    UINT32,\
+                    "NNP4_33_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_33_2ADC,                    UINT32,\
+                    "NNP4_33_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_34_1TAC,                    UINT32,\
+                    "NNP4_34_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_34_1CLK,                    UINT32,\
+                    "NNP4_34_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_34_1ADC,                    UINT32,\
+                    "NNP4_34_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_34_2TAC,                    UINT32,\
+                    "NNP4_34_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_34_2CLK,                    UINT32,\
+                    "NNP4_34_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_34_2ADC,                    UINT32,\
+                    "NNP4_34_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_35_1TAC,                    UINT32,\
+                    "NNP4_35_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_35_1CLK,                    UINT32,\
+                    "NNP4_35_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_35_1ADC,                    UINT32,\
+                    "NNP4_35_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_35_2TAC,                    UINT32,\
+                    "NNP4_35_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_35_2CLK,                    UINT32,\
+                    "NNP4_35_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_35_2ADC,                    UINT32,\
+                    "NNP4_35_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_36_1TAC,                    UINT32,\
+                    "NNP4_36_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_36_1CLK,                    UINT32,\
+                    "NNP4_36_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_36_1ADC,                    UINT32,\
+                    "NNP4_36_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_36_2TAC,                    UINT32,\
+                    "NNP4_36_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_36_2CLK,                    UINT32,\
+                    "NNP4_36_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_36_2ADC,                    UINT32,\
+                    "NNP4_36_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_37_1TAC,                    UINT32,\
+                    "NNP4_37_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_37_1CLK,                    UINT32,\
+                    "NNP4_37_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_37_1ADC,                    UINT32,\
+                    "NNP4_37_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_37_2TAC,                    UINT32,\
+                    "NNP4_37_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_37_2CLK,                    UINT32,\
+                    "NNP4_37_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_37_2ADC,                    UINT32,\
+                    "NNP4_37_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_38_1TAC,                    UINT32,\
+                    "NNP4_38_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_38_1CLK,                    UINT32,\
+                    "NNP4_38_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_38_1ADC,                    UINT32,\
+                    "NNP4_38_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_38_2TAC,                    UINT32,\
+                    "NNP4_38_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_38_2CLK,                    UINT32,\
+                    "NNP4_38_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_38_2ADC,                    UINT32,\
+                    "NNP4_38_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_39_1TAC,                    UINT32,\
+                    "NNP4_39_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_39_1CLK,                    UINT32,\
+                    "NNP4_39_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_39_1ADC,                    UINT32,\
+                    "NNP4_39_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_39_2TAC,                    UINT32,\
+                    "NNP4_39_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_39_2CLK,                    UINT32,\
+                    "NNP4_39_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_39_2ADC,                    UINT32,\
+                    "NNP4_39_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_40_1TAC,                    UINT32,\
+                    "NNP4_40_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_40_1CLK,                    UINT32,\
+                    "NNP4_40_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_40_1ADC,                    UINT32,\
+                    "NNP4_40_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_40_2TAC,                    UINT32,\
+                    "NNP4_40_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_40_2CLK,                    UINT32,\
+                    "NNP4_40_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_40_2ADC,                    UINT32,\
+                    "NNP4_40_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_41_1TAC,                    UINT32,\
+                    "NNP4_41_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_41_1CLK,                    UINT32,\
+                    "NNP4_41_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_41_1ADC,                    UINT32,\
+                    "NNP4_41_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_41_2TAC,                    UINT32,\
+                    "NNP4_41_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_41_2CLK,                    UINT32,\
+                    "NNP4_41_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_41_2ADC,                    UINT32,\
+                    "NNP4_41_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_42_1TAC,                    UINT32,\
+                    "NNP4_42_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_42_1CLK,                    UINT32,\
+                    "NNP4_42_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_42_1ADC,                    UINT32,\
+                    "NNP4_42_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_42_2TAC,                    UINT32,\
+                    "NNP4_42_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_42_2CLK,                    UINT32,\
+                    "NNP4_42_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_42_2ADC,                    UINT32,\
+                    "NNP4_42_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_43_1TAC,                    UINT32,\
+                    "NNP4_43_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_43_1CLK,                    UINT32,\
+                    "NNP4_43_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_43_1ADC,                    UINT32,\
+                    "NNP4_43_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_43_2TAC,                    UINT32,\
+                    "NNP4_43_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_43_2CLK,                    UINT32,\
+                    "NNP4_43_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_43_2ADC,                    UINT32,\
+                    "NNP4_43_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_44_1TAC,                    UINT32,\
+                    "NNP4_44_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_44_1CLK,                    UINT32,\
+                    "NNP4_44_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_44_1ADC,                    UINT32,\
+                    "NNP4_44_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_44_2TAC,                    UINT32,\
+                    "NNP4_44_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_44_2CLK,                    UINT32,\
+                    "NNP4_44_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_44_2ADC,                    UINT32,\
+                    "NNP4_44_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_45_1TAC,                    UINT32,\
+                    "NNP4_45_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_45_1CLK,                    UINT32,\
+                    "NNP4_45_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_45_1ADC,                    UINT32,\
+                    "NNP4_45_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_45_2TAC,                    UINT32,\
+                    "NNP4_45_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_45_2CLK,                    UINT32,\
+                    "NNP4_45_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_45_2ADC,                    UINT32,\
+                    "NNP4_45_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_46_1TAC,                    UINT32,\
+                    "NNP4_46_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_46_1CLK,                    UINT32,\
+                    "NNP4_46_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_46_1ADC,                    UINT32,\
+                    "NNP4_46_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_46_2TAC,                    UINT32,\
+                    "NNP4_46_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_46_2CLK,                    UINT32,\
+                    "NNP4_46_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_46_2ADC,                    UINT32,\
+                    "NNP4_46_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_47_1TAC,                    UINT32,\
+                    "NNP4_47_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_47_1CLK,                    UINT32,\
+                    "NNP4_47_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_47_1ADC,                    UINT32,\
+                    "NNP4_47_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_47_2TAC,                    UINT32,\
+                    "NNP4_47_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_47_2CLK,                    UINT32,\
+                    "NNP4_47_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_47_2ADC,                    UINT32,\
+                    "NNP4_47_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_48_1TAC,                    UINT32,\
+                    "NNP4_48_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_48_1CLK,                    UINT32,\
+                    "NNP4_48_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_48_1ADC,                    UINT32,\
+                    "NNP4_48_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_48_2TAC,                    UINT32,\
+                    "NNP4_48_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_48_2CLK,                    UINT32,\
+                    "NNP4_48_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_48_2ADC,                    UINT32,\
+                    "NNP4_48_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_49_1TAC,                    UINT32,\
+                    "NNP4_49_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_49_1CLK,                    UINT32,\
+                    "NNP4_49_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_49_1ADC,                    UINT32,\
+                    "NNP4_49_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_49_2TAC,                    UINT32,\
+                    "NNP4_49_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_49_2CLK,                    UINT32,\
+                    "NNP4_49_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_49_2ADC,                    UINT32,\
+                    "NNP4_49_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_50_1TAC,                    UINT32,\
+                    "NNP4_50_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_50_1CLK,                    UINT32,\
+                    "NNP4_50_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_50_1ADC,                    UINT32,\
+                    "NNP4_50_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_50_2TAC,                    UINT32,\
+                    "NNP4_50_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_50_2CLK,                    UINT32,\
+                    "NNP4_50_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP4_50_2ADC,                    UINT32,\
+                    "NNP4_50_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_1_1TAC,                     UINT32,\
+                    "NNP5_1_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_1_1CLK,                     UINT32,\
+                    "NNP5_1_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_1_1ADC,                     UINT32,\
+                    "NNP5_1_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_1_2TAC,                     UINT32,\
+                    "NNP5_1_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_1_2CLK,                     UINT32,\
+                    "NNP5_1_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_1_2ADC,                     UINT32,\
+                    "NNP5_1_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_2_1TAC,                     UINT32,\
+                    "NNP5_2_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_2_1CLK,                     UINT32,\
+                    "NNP5_2_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_2_1ADC,                     UINT32,\
+                    "NNP5_2_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_2_2TAC,                     UINT32,\
+                    "NNP5_2_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_2_2CLK,                     UINT32,\
+                    "NNP5_2_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_2_2ADC,                     UINT32,\
+                    "NNP5_2_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_3_1TAC,                     UINT32,\
+                    "NNP5_3_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_3_1CLK,                     UINT32,\
+                    "NNP5_3_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_3_1ADC,                     UINT32,\
+                    "NNP5_3_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_3_2TAC,                     UINT32,\
+                    "NNP5_3_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_3_2CLK,                     UINT32,\
+                    "NNP5_3_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_3_2ADC,                     UINT32,\
+                    "NNP5_3_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_4_1TAC,                     UINT32,\
+                    "NNP5_4_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_4_1CLK,                     UINT32,\
+                    "NNP5_4_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_4_1ADC,                     UINT32,\
+                    "NNP5_4_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_4_2TAC,                     UINT32,\
+                    "NNP5_4_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_4_2CLK,                     UINT32,\
+                    "NNP5_4_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_4_2ADC,                     UINT32,\
+                    "NNP5_4_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_5_1TAC,                     UINT32,\
+                    "NNP5_5_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_5_1CLK,                     UINT32,\
+                    "NNP5_5_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_5_1ADC,                     UINT32,\
+                    "NNP5_5_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_5_2TAC,                     UINT32,\
+                    "NNP5_5_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_5_2CLK,                     UINT32,\
+                    "NNP5_5_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_5_2ADC,                     UINT32,\
+                    "NNP5_5_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_6_1TAC,                     UINT32,\
+                    "NNP5_6_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_6_1CLK,                     UINT32,\
+                    "NNP5_6_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_6_1ADC,                     UINT32,\
+                    "NNP5_6_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_6_2TAC,                     UINT32,\
+                    "NNP5_6_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_6_2CLK,                     UINT32,\
+                    "NNP5_6_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_6_2ADC,                     UINT32,\
+                    "NNP5_6_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_7_1TAC,                     UINT32,\
+                    "NNP5_7_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_7_1CLK,                     UINT32,\
+                    "NNP5_7_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_7_1ADC,                     UINT32,\
+                    "NNP5_7_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_7_2TAC,                     UINT32,\
+                    "NNP5_7_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_7_2CLK,                     UINT32,\
+                    "NNP5_7_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_7_2ADC,                     UINT32,\
+                    "NNP5_7_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_8_1TAC,                     UINT32,\
+                    "NNP5_8_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_8_1CLK,                     UINT32,\
+                    "NNP5_8_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_8_1ADC,                     UINT32,\
+                    "NNP5_8_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_8_2TAC,                     UINT32,\
+                    "NNP5_8_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_8_2CLK,                     UINT32,\
+                    "NNP5_8_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_8_2ADC,                     UINT32,\
+                    "NNP5_8_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_9_1TAC,                     UINT32,\
+                    "NNP5_9_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_9_1CLK,                     UINT32,\
+                    "NNP5_9_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_9_1ADC,                     UINT32,\
+                    "NNP5_9_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_9_2TAC,                     UINT32,\
+                    "NNP5_9_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_9_2CLK,                     UINT32,\
+                    "NNP5_9_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_9_2ADC,                     UINT32,\
+                    "NNP5_9_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_10_1TAC,                    UINT32,\
+                    "NNP5_10_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_10_1CLK,                    UINT32,\
+                    "NNP5_10_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_10_1ADC,                    UINT32,\
+                    "NNP5_10_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_10_2TAC,                    UINT32,\
+                    "NNP5_10_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_10_2CLK,                    UINT32,\
+                    "NNP5_10_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_10_2ADC,                    UINT32,\
+                    "NNP5_10_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_11_1TAC,                    UINT32,\
+                    "NNP5_11_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_11_1CLK,                    UINT32,\
+                    "NNP5_11_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_11_1ADC,                    UINT32,\
+                    "NNP5_11_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_11_2TAC,                    UINT32,\
+                    "NNP5_11_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_11_2CLK,                    UINT32,\
+                    "NNP5_11_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_11_2ADC,                    UINT32,\
+                    "NNP5_11_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_12_1TAC,                    UINT32,\
+                    "NNP5_12_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_12_1CLK,                    UINT32,\
+                    "NNP5_12_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_12_1ADC,                    UINT32,\
+                    "NNP5_12_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_12_2TAC,                    UINT32,\
+                    "NNP5_12_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_12_2CLK,                    UINT32,\
+                    "NNP5_12_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_12_2ADC,                    UINT32,\
+                    "NNP5_12_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_13_1TAC,                    UINT32,\
+                    "NNP5_13_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_13_1CLK,                    UINT32,\
+                    "NNP5_13_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_13_1ADC,                    UINT32,\
+                    "NNP5_13_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_13_2TAC,                    UINT32,\
+                    "NNP5_13_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_13_2CLK,                    UINT32,\
+                    "NNP5_13_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_13_2ADC,                    UINT32,\
+                    "NNP5_13_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_14_1TAC,                    UINT32,\
+                    "NNP5_14_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_14_1CLK,                    UINT32,\
+                    "NNP5_14_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_14_1ADC,                    UINT32,\
+                    "NNP5_14_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_14_2TAC,                    UINT32,\
+                    "NNP5_14_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_14_2CLK,                    UINT32,\
+                    "NNP5_14_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_14_2ADC,                    UINT32,\
+                    "NNP5_14_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_15_1TAC,                    UINT32,\
+                    "NNP5_15_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_15_1CLK,                    UINT32,\
+                    "NNP5_15_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_15_1ADC,                    UINT32,\
+                    "NNP5_15_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_15_2TAC,                    UINT32,\
+                    "NNP5_15_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_15_2CLK,                    UINT32,\
+                    "NNP5_15_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_15_2ADC,                    UINT32,\
+                    "NNP5_15_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_16_1TAC,                    UINT32,\
+                    "NNP5_16_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_16_1CLK,                    UINT32,\
+                    "NNP5_16_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_16_1ADC,                    UINT32,\
+                    "NNP5_16_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_16_2TAC,                    UINT32,\
+                    "NNP5_16_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_16_2CLK,                    UINT32,\
+                    "NNP5_16_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_16_2ADC,                    UINT32,\
+                    "NNP5_16_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_17_1TAC,                    UINT32,\
+                    "NNP5_17_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_17_1CLK,                    UINT32,\
+                    "NNP5_17_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_17_1ADC,                    UINT32,\
+                    "NNP5_17_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_17_2TAC,                    UINT32,\
+                    "NNP5_17_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_17_2CLK,                    UINT32,\
+                    "NNP5_17_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_17_2ADC,                    UINT32,\
+                    "NNP5_17_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_18_1TAC,                    UINT32,\
+                    "NNP5_18_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_18_1CLK,                    UINT32,\
+                    "NNP5_18_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_18_1ADC,                    UINT32,\
+                    "NNP5_18_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_18_2TAC,                    UINT32,\
+                    "NNP5_18_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_18_2CLK,                    UINT32,\
+                    "NNP5_18_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_18_2ADC,                    UINT32,\
+                    "NNP5_18_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_19_1TAC,                    UINT32,\
+                    "NNP5_19_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_19_1CLK,                    UINT32,\
+                    "NNP5_19_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_19_1ADC,                    UINT32,\
+                    "NNP5_19_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_19_2TAC,                    UINT32,\
+                    "NNP5_19_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_19_2CLK,                    UINT32,\
+                    "NNP5_19_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_19_2ADC,                    UINT32,\
+                    "NNP5_19_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_20_1TAC,                    UINT32,\
+                    "NNP5_20_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_20_1CLK,                    UINT32,\
+                    "NNP5_20_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_20_1ADC,                    UINT32,\
+                    "NNP5_20_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_20_2TAC,                    UINT32,\
+                    "NNP5_20_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_20_2CLK,                    UINT32,\
+                    "NNP5_20_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_20_2ADC,                    UINT32,\
+                    "NNP5_20_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_21_1TAC,                    UINT32,\
+                    "NNP5_21_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_21_1CLK,                    UINT32,\
+                    "NNP5_21_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_21_1ADC,                    UINT32,\
+                    "NNP5_21_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_21_2TAC,                    UINT32,\
+                    "NNP5_21_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_21_2CLK,                    UINT32,\
+                    "NNP5_21_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_21_2ADC,                    UINT32,\
+                    "NNP5_21_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_22_1TAC,                    UINT32,\
+                    "NNP5_22_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_22_1CLK,                    UINT32,\
+                    "NNP5_22_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_22_1ADC,                    UINT32,\
+                    "NNP5_22_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_22_2TAC,                    UINT32,\
+                    "NNP5_22_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_22_2CLK,                    UINT32,\
+                    "NNP5_22_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_22_2ADC,                    UINT32,\
+                    "NNP5_22_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_23_1TAC,                    UINT32,\
+                    "NNP5_23_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_23_1CLK,                    UINT32,\
+                    "NNP5_23_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_23_1ADC,                    UINT32,\
+                    "NNP5_23_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_23_2TAC,                    UINT32,\
+                    "NNP5_23_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_23_2CLK,                    UINT32,\
+                    "NNP5_23_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_23_2ADC,                    UINT32,\
+                    "NNP5_23_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_24_1TAC,                    UINT32,\
+                    "NNP5_24_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_24_1CLK,                    UINT32,\
+                    "NNP5_24_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_24_1ADC,                    UINT32,\
+                    "NNP5_24_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_24_2TAC,                    UINT32,\
+                    "NNP5_24_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_24_2CLK,                    UINT32,\
+                    "NNP5_24_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_24_2ADC,                    UINT32,\
+                    "NNP5_24_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_25_1TAC,                    UINT32,\
+                    "NNP5_25_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_25_1CLK,                    UINT32,\
+                    "NNP5_25_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_25_1ADC,                    UINT32,\
+                    "NNP5_25_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_25_2TAC,                    UINT32,\
+                    "NNP5_25_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_25_2CLK,                    UINT32,\
+                    "NNP5_25_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_25_2ADC,                    UINT32,\
+                    "NNP5_25_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_26_1TAC,                    UINT32,\
+                    "NNP5_26_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_26_1CLK,                    UINT32,\
+                    "NNP5_26_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_26_1ADC,                    UINT32,\
+                    "NNP5_26_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_26_2TAC,                    UINT32,\
+                    "NNP5_26_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_26_2CLK,                    UINT32,\
+                    "NNP5_26_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_26_2ADC,                    UINT32,\
+                    "NNP5_26_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_27_1TAC,                    UINT32,\
+                    "NNP5_27_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_27_1CLK,                    UINT32,\
+                    "NNP5_27_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_27_1ADC,                    UINT32,\
+                    "NNP5_27_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_27_2TAC,                    UINT32,\
+                    "NNP5_27_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_27_2CLK,                    UINT32,\
+                    "NNP5_27_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_27_2ADC,                    UINT32,\
+                    "NNP5_27_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_28_1TAC,                    UINT32,\
+                    "NNP5_28_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_28_1CLK,                    UINT32,\
+                    "NNP5_28_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_28_1ADC,                    UINT32,\
+                    "NNP5_28_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_28_2TAC,                    UINT32,\
+                    "NNP5_28_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_28_2CLK,                    UINT32,\
+                    "NNP5_28_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_28_2ADC,                    UINT32,\
+                    "NNP5_28_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_29_1TAC,                    UINT32,\
+                    "NNP5_29_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_29_1CLK,                    UINT32,\
+                    "NNP5_29_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_29_1ADC,                    UINT32,\
+                    "NNP5_29_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_29_2TAC,                    UINT32,\
+                    "NNP5_29_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_29_2CLK,                    UINT32,\
+                    "NNP5_29_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_29_2ADC,                    UINT32,\
+                    "NNP5_29_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_30_1TAC,                    UINT32,\
+                    "NNP5_30_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_30_1CLK,                    UINT32,\
+                    "NNP5_30_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_30_1ADC,                    UINT32,\
+                    "NNP5_30_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_30_2TAC,                    UINT32,\
+                    "NNP5_30_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_30_2CLK,                    UINT32,\
+                    "NNP5_30_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_30_2ADC,                    UINT32,\
+                    "NNP5_30_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_31_1TAC,                    UINT32,\
+                    "NNP5_31_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_31_1CLK,                    UINT32,\
+                    "NNP5_31_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_31_1ADC,                    UINT32,\
+                    "NNP5_31_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_31_2TAC,                    UINT32,\
+                    "NNP5_31_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_31_2CLK,                    UINT32,\
+                    "NNP5_31_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_31_2ADC,                    UINT32,\
+                    "NNP5_31_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_32_1TAC,                    UINT32,\
+                    "NNP5_32_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_32_1CLK,                    UINT32,\
+                    "NNP5_32_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_32_1ADC,                    UINT32,\
+                    "NNP5_32_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_32_2TAC,                    UINT32,\
+                    "NNP5_32_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_32_2CLK,                    UINT32,\
+                    "NNP5_32_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_32_2ADC,                    UINT32,\
+                    "NNP5_32_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_33_1TAC,                    UINT32,\
+                    "NNP5_33_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_33_1CLK,                    UINT32,\
+                    "NNP5_33_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_33_1ADC,                    UINT32,\
+                    "NNP5_33_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_33_2TAC,                    UINT32,\
+                    "NNP5_33_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_33_2CLK,                    UINT32,\
+                    "NNP5_33_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_33_2ADC,                    UINT32,\
+                    "NNP5_33_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_34_1TAC,                    UINT32,\
+                    "NNP5_34_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_34_1CLK,                    UINT32,\
+                    "NNP5_34_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_34_1ADC,                    UINT32,\
+                    "NNP5_34_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_34_2TAC,                    UINT32,\
+                    "NNP5_34_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_34_2CLK,                    UINT32,\
+                    "NNP5_34_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_34_2ADC,                    UINT32,\
+                    "NNP5_34_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_35_1TAC,                    UINT32,\
+                    "NNP5_35_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_35_1CLK,                    UINT32,\
+                    "NNP5_35_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_35_1ADC,                    UINT32,\
+                    "NNP5_35_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_35_2TAC,                    UINT32,\
+                    "NNP5_35_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_35_2CLK,                    UINT32,\
+                    "NNP5_35_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_35_2ADC,                    UINT32,\
+                    "NNP5_35_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_36_1TAC,                    UINT32,\
+                    "NNP5_36_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_36_1CLK,                    UINT32,\
+                    "NNP5_36_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_36_1ADC,                    UINT32,\
+                    "NNP5_36_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_36_2TAC,                    UINT32,\
+                    "NNP5_36_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_36_2CLK,                    UINT32,\
+                    "NNP5_36_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_36_2ADC,                    UINT32,\
+                    "NNP5_36_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_37_1TAC,                    UINT32,\
+                    "NNP5_37_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_37_1CLK,                    UINT32,\
+                    "NNP5_37_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_37_1ADC,                    UINT32,\
+                    "NNP5_37_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_37_2TAC,                    UINT32,\
+                    "NNP5_37_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_37_2CLK,                    UINT32,\
+                    "NNP5_37_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_37_2ADC,                    UINT32,\
+                    "NNP5_37_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_38_1TAC,                    UINT32,\
+                    "NNP5_38_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_38_1CLK,                    UINT32,\
+                    "NNP5_38_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_38_1ADC,                    UINT32,\
+                    "NNP5_38_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_38_2TAC,                    UINT32,\
+                    "NNP5_38_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_38_2CLK,                    UINT32,\
+                    "NNP5_38_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_38_2ADC,                    UINT32,\
+                    "NNP5_38_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_39_1TAC,                    UINT32,\
+                    "NNP5_39_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_39_1CLK,                    UINT32,\
+                    "NNP5_39_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_39_1ADC,                    UINT32,\
+                    "NNP5_39_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_39_2TAC,                    UINT32,\
+                    "NNP5_39_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_39_2CLK,                    UINT32,\
+                    "NNP5_39_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_39_2ADC,                    UINT32,\
+                    "NNP5_39_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_40_1TAC,                    UINT32,\
+                    "NNP5_40_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_40_1CLK,                    UINT32,\
+                    "NNP5_40_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_40_1ADC,                    UINT32,\
+                    "NNP5_40_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_40_2TAC,                    UINT32,\
+                    "NNP5_40_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_40_2CLK,                    UINT32,\
+                    "NNP5_40_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_40_2ADC,                    UINT32,\
+                    "NNP5_40_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_41_1TAC,                    UINT32,\
+                    "NNP5_41_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_41_1CLK,                    UINT32,\
+                    "NNP5_41_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_41_1ADC,                    UINT32,\
+                    "NNP5_41_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_41_2TAC,                    UINT32,\
+                    "NNP5_41_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_41_2CLK,                    UINT32,\
+                    "NNP5_41_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_41_2ADC,                    UINT32,\
+                    "NNP5_41_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_42_1TAC,                    UINT32,\
+                    "NNP5_42_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_42_1CLK,                    UINT32,\
+                    "NNP5_42_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_42_1ADC,                    UINT32,\
+                    "NNP5_42_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_42_2TAC,                    UINT32,\
+                    "NNP5_42_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_42_2CLK,                    UINT32,\
+                    "NNP5_42_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_42_2ADC,                    UINT32,\
+                    "NNP5_42_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_43_1TAC,                    UINT32,\
+                    "NNP5_43_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_43_1CLK,                    UINT32,\
+                    "NNP5_43_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_43_1ADC,                    UINT32,\
+                    "NNP5_43_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_43_2TAC,                    UINT32,\
+                    "NNP5_43_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_43_2CLK,                    UINT32,\
+                    "NNP5_43_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_43_2ADC,                    UINT32,\
+                    "NNP5_43_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_44_1TAC,                    UINT32,\
+                    "NNP5_44_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_44_1CLK,                    UINT32,\
+                    "NNP5_44_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_44_1ADC,                    UINT32,\
+                    "NNP5_44_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_44_2TAC,                    UINT32,\
+                    "NNP5_44_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_44_2CLK,                    UINT32,\
+                    "NNP5_44_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_44_2ADC,                    UINT32,\
+                    "NNP5_44_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_45_1TAC,                    UINT32,\
+                    "NNP5_45_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_45_1CLK,                    UINT32,\
+                    "NNP5_45_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_45_1ADC,                    UINT32,\
+                    "NNP5_45_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_45_2TAC,                    UINT32,\
+                    "NNP5_45_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_45_2CLK,                    UINT32,\
+                    "NNP5_45_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_45_2ADC,                    UINT32,\
+                    "NNP5_45_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_46_1TAC,                    UINT32,\
+                    "NNP5_46_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_46_1CLK,                    UINT32,\
+                    "NNP5_46_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_46_1ADC,                    UINT32,\
+                    "NNP5_46_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_46_2TAC,                    UINT32,\
+                    "NNP5_46_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_46_2CLK,                    UINT32,\
+                    "NNP5_46_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_46_2ADC,                    UINT32,\
+                    "NNP5_46_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_47_1TAC,                    UINT32,\
+                    "NNP5_47_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_47_1CLK,                    UINT32,\
+                    "NNP5_47_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_47_1ADC,                    UINT32,\
+                    "NNP5_47_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_47_2TAC,                    UINT32,\
+                    "NNP5_47_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_47_2CLK,                    UINT32,\
+                    "NNP5_47_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_47_2ADC,                    UINT32,\
+                    "NNP5_47_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_48_1TAC,                    UINT32,\
+                    "NNP5_48_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_48_1CLK,                    UINT32,\
+                    "NNP5_48_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_48_1ADC,                    UINT32,\
+                    "NNP5_48_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_48_2TAC,                    UINT32,\
+                    "NNP5_48_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_48_2CLK,                    UINT32,\
+                    "NNP5_48_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_48_2ADC,                    UINT32,\
+                    "NNP5_48_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_49_1TAC,                    UINT32,\
+                    "NNP5_49_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_49_1CLK,                    UINT32,\
+                    "NNP5_49_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_49_1ADC,                    UINT32,\
+                    "NNP5_49_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_49_2TAC,                    UINT32,\
+                    "NNP5_49_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_49_2CLK,                    UINT32,\
+                    "NNP5_49_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_49_2ADC,                    UINT32,\
+                    "NNP5_49_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_50_1TAC,                    UINT32,\
+                    "NNP5_50_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_50_1CLK,                    UINT32,\
+                    "NNP5_50_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_50_1ADC,                    UINT32,\
+                    "NNP5_50_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_50_2TAC,                    UINT32,\
+                    "NNP5_50_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_50_2CLK,                    UINT32,\
+                    "NNP5_50_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP5_50_2ADC,                    UINT32,\
+                    "NNP5_50_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_1_1TAC,                     UINT32,\
+                    "NNP6_1_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_1_1CLK,                     UINT32,\
+                    "NNP6_1_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_1_1ADC,                     UINT32,\
+                    "NNP6_1_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_1_2TAC,                     UINT32,\
+                    "NNP6_1_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_1_2CLK,                     UINT32,\
+                    "NNP6_1_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_1_2ADC,                     UINT32,\
+                    "NNP6_1_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_2_1TAC,                     UINT32,\
+                    "NNP6_2_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_2_1CLK,                     UINT32,\
+                    "NNP6_2_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_2_1ADC,                     UINT32,\
+                    "NNP6_2_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_2_2TAC,                     UINT32,\
+                    "NNP6_2_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_2_2CLK,                     UINT32,\
+                    "NNP6_2_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_2_2ADC,                     UINT32,\
+                    "NNP6_2_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_3_1TAC,                     UINT32,\
+                    "NNP6_3_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_3_1CLK,                     UINT32,\
+                    "NNP6_3_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_3_1ADC,                     UINT32,\
+                    "NNP6_3_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_3_2TAC,                     UINT32,\
+                    "NNP6_3_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_3_2CLK,                     UINT32,\
+                    "NNP6_3_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_3_2ADC,                     UINT32,\
+                    "NNP6_3_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_4_1TAC,                     UINT32,\
+                    "NNP6_4_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_4_1CLK,                     UINT32,\
+                    "NNP6_4_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_4_1ADC,                     UINT32,\
+                    "NNP6_4_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_4_2TAC,                     UINT32,\
+                    "NNP6_4_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_4_2CLK,                     UINT32,\
+                    "NNP6_4_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_4_2ADC,                     UINT32,\
+                    "NNP6_4_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_5_1TAC,                     UINT32,\
+                    "NNP6_5_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_5_1CLK,                     UINT32,\
+                    "NNP6_5_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_5_1ADC,                     UINT32,\
+                    "NNP6_5_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_5_2TAC,                     UINT32,\
+                    "NNP6_5_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_5_2CLK,                     UINT32,\
+                    "NNP6_5_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_5_2ADC,                     UINT32,\
+                    "NNP6_5_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_6_1TAC,                     UINT32,\
+                    "NNP6_6_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_6_1CLK,                     UINT32,\
+                    "NNP6_6_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_6_1ADC,                     UINT32,\
+                    "NNP6_6_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_6_2TAC,                     UINT32,\
+                    "NNP6_6_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_6_2CLK,                     UINT32,\
+                    "NNP6_6_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_6_2ADC,                     UINT32,\
+                    "NNP6_6_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_7_1TAC,                     UINT32,\
+                    "NNP6_7_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_7_1CLK,                     UINT32,\
+                    "NNP6_7_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_7_1ADC,                     UINT32,\
+                    "NNP6_7_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_7_2TAC,                     UINT32,\
+                    "NNP6_7_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_7_2CLK,                     UINT32,\
+                    "NNP6_7_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_7_2ADC,                     UINT32,\
+                    "NNP6_7_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_8_1TAC,                     UINT32,\
+                    "NNP6_8_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_8_1CLK,                     UINT32,\
+                    "NNP6_8_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_8_1ADC,                     UINT32,\
+                    "NNP6_8_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_8_2TAC,                     UINT32,\
+                    "NNP6_8_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_8_2CLK,                     UINT32,\
+                    "NNP6_8_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_8_2ADC,                     UINT32,\
+                    "NNP6_8_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_9_1TAC,                     UINT32,\
+                    "NNP6_9_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_9_1CLK,                     UINT32,\
+                    "NNP6_9_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_9_1ADC,                     UINT32,\
+                    "NNP6_9_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_9_2TAC,                     UINT32,\
+                    "NNP6_9_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_9_2CLK,                     UINT32,\
+                    "NNP6_9_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_9_2ADC,                     UINT32,\
+                    "NNP6_9_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_10_1TAC,                    UINT32,\
+                    "NNP6_10_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_10_1CLK,                    UINT32,\
+                    "NNP6_10_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_10_1ADC,                    UINT32,\
+                    "NNP6_10_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_10_2TAC,                    UINT32,\
+                    "NNP6_10_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_10_2CLK,                    UINT32,\
+                    "NNP6_10_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_10_2ADC,                    UINT32,\
+                    "NNP6_10_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_11_1TAC,                    UINT32,\
+                    "NNP6_11_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_11_1CLK,                    UINT32,\
+                    "NNP6_11_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_11_1ADC,                    UINT32,\
+                    "NNP6_11_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_11_2TAC,                    UINT32,\
+                    "NNP6_11_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_11_2CLK,                    UINT32,\
+                    "NNP6_11_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_11_2ADC,                    UINT32,\
+                    "NNP6_11_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_12_1TAC,                    UINT32,\
+                    "NNP6_12_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_12_1CLK,                    UINT32,\
+                    "NNP6_12_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_12_1ADC,                    UINT32,\
+                    "NNP6_12_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_12_2TAC,                    UINT32,\
+                    "NNP6_12_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_12_2CLK,                    UINT32,\
+                    "NNP6_12_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_12_2ADC,                    UINT32,\
+                    "NNP6_12_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_13_1TAC,                    UINT32,\
+                    "NNP6_13_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_13_1CLK,                    UINT32,\
+                    "NNP6_13_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_13_1ADC,                    UINT32,\
+                    "NNP6_13_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_13_2TAC,                    UINT32,\
+                    "NNP6_13_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_13_2CLK,                    UINT32,\
+                    "NNP6_13_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_13_2ADC,                    UINT32,\
+                    "NNP6_13_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_14_1TAC,                    UINT32,\
+                    "NNP6_14_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_14_1CLK,                    UINT32,\
+                    "NNP6_14_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_14_1ADC,                    UINT32,\
+                    "NNP6_14_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_14_2TAC,                    UINT32,\
+                    "NNP6_14_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_14_2CLK,                    UINT32,\
+                    "NNP6_14_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_14_2ADC,                    UINT32,\
+                    "NNP6_14_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_15_1TAC,                    UINT32,\
+                    "NNP6_15_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_15_1CLK,                    UINT32,\
+                    "NNP6_15_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_15_1ADC,                    UINT32,\
+                    "NNP6_15_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_15_2TAC,                    UINT32,\
+                    "NNP6_15_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_15_2CLK,                    UINT32,\
+                    "NNP6_15_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_15_2ADC,                    UINT32,\
+                    "NNP6_15_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_16_1TAC,                    UINT32,\
+                    "NNP6_16_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_16_1CLK,                    UINT32,\
+                    "NNP6_16_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_16_1ADC,                    UINT32,\
+                    "NNP6_16_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_16_2TAC,                    UINT32,\
+                    "NNP6_16_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_16_2CLK,                    UINT32,\
+                    "NNP6_16_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_16_2ADC,                    UINT32,\
+                    "NNP6_16_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_17_1TAC,                    UINT32,\
+                    "NNP6_17_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_17_1CLK,                    UINT32,\
+                    "NNP6_17_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_17_1ADC,                    UINT32,\
+                    "NNP6_17_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_17_2TAC,                    UINT32,\
+                    "NNP6_17_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_17_2CLK,                    UINT32,\
+                    "NNP6_17_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_17_2ADC,                    UINT32,\
+                    "NNP6_17_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_18_1TAC,                    UINT32,\
+                    "NNP6_18_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_18_1CLK,                    UINT32,\
+                    "NNP6_18_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_18_1ADC,                    UINT32,\
+                    "NNP6_18_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_18_2TAC,                    UINT32,\
+                    "NNP6_18_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_18_2CLK,                    UINT32,\
+                    "NNP6_18_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_18_2ADC,                    UINT32,\
+                    "NNP6_18_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_19_1TAC,                    UINT32,\
+                    "NNP6_19_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_19_1CLK,                    UINT32,\
+                    "NNP6_19_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_19_1ADC,                    UINT32,\
+                    "NNP6_19_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_19_2TAC,                    UINT32,\
+                    "NNP6_19_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_19_2CLK,                    UINT32,\
+                    "NNP6_19_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_19_2ADC,                    UINT32,\
+                    "NNP6_19_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_20_1TAC,                    UINT32,\
+                    "NNP6_20_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_20_1CLK,                    UINT32,\
+                    "NNP6_20_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_20_1ADC,                    UINT32,\
+                    "NNP6_20_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_20_2TAC,                    UINT32,\
+                    "NNP6_20_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_20_2CLK,                    UINT32,\
+                    "NNP6_20_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_20_2ADC,                    UINT32,\
+                    "NNP6_20_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_21_1TAC,                    UINT32,\
+                    "NNP6_21_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_21_1CLK,                    UINT32,\
+                    "NNP6_21_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_21_1ADC,                    UINT32,\
+                    "NNP6_21_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_21_2TAC,                    UINT32,\
+                    "NNP6_21_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_21_2CLK,                    UINT32,\
+                    "NNP6_21_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_21_2ADC,                    UINT32,\
+                    "NNP6_21_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_22_1TAC,                    UINT32,\
+                    "NNP6_22_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_22_1CLK,                    UINT32,\
+                    "NNP6_22_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_22_1ADC,                    UINT32,\
+                    "NNP6_22_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_22_2TAC,                    UINT32,\
+                    "NNP6_22_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_22_2CLK,                    UINT32,\
+                    "NNP6_22_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_22_2ADC,                    UINT32,\
+                    "NNP6_22_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_23_1TAC,                    UINT32,\
+                    "NNP6_23_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_23_1CLK,                    UINT32,\
+                    "NNP6_23_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_23_1ADC,                    UINT32,\
+                    "NNP6_23_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_23_2TAC,                    UINT32,\
+                    "NNP6_23_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_23_2CLK,                    UINT32,\
+                    "NNP6_23_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_23_2ADC,                    UINT32,\
+                    "NNP6_23_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_24_1TAC,                    UINT32,\
+                    "NNP6_24_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_24_1CLK,                    UINT32,\
+                    "NNP6_24_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_24_1ADC,                    UINT32,\
+                    "NNP6_24_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_24_2TAC,                    UINT32,\
+                    "NNP6_24_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_24_2CLK,                    UINT32,\
+                    "NNP6_24_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_24_2ADC,                    UINT32,\
+                    "NNP6_24_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_25_1TAC,                    UINT32,\
+                    "NNP6_25_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_25_1CLK,                    UINT32,\
+                    "NNP6_25_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_25_1ADC,                    UINT32,\
+                    "NNP6_25_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_25_2TAC,                    UINT32,\
+                    "NNP6_25_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_25_2CLK,                    UINT32,\
+                    "NNP6_25_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_25_2ADC,                    UINT32,\
+                    "NNP6_25_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_26_1TAC,                    UINT32,\
+                    "NNP6_26_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_26_1CLK,                    UINT32,\
+                    "NNP6_26_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_26_1ADC,                    UINT32,\
+                    "NNP6_26_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_26_2TAC,                    UINT32,\
+                    "NNP6_26_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_26_2CLK,                    UINT32,\
+                    "NNP6_26_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_26_2ADC,                    UINT32,\
+                    "NNP6_26_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_27_1TAC,                    UINT32,\
+                    "NNP6_27_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_27_1CLK,                    UINT32,\
+                    "NNP6_27_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_27_1ADC,                    UINT32,\
+                    "NNP6_27_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_27_2TAC,                    UINT32,\
+                    "NNP6_27_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_27_2CLK,                    UINT32,\
+                    "NNP6_27_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_27_2ADC,                    UINT32,\
+                    "NNP6_27_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_28_1TAC,                    UINT32,\
+                    "NNP6_28_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_28_1CLK,                    UINT32,\
+                    "NNP6_28_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_28_1ADC,                    UINT32,\
+                    "NNP6_28_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_28_2TAC,                    UINT32,\
+                    "NNP6_28_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_28_2CLK,                    UINT32,\
+                    "NNP6_28_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_28_2ADC,                    UINT32,\
+                    "NNP6_28_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_29_1TAC,                    UINT32,\
+                    "NNP6_29_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_29_1CLK,                    UINT32,\
+                    "NNP6_29_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_29_1ADC,                    UINT32,\
+                    "NNP6_29_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_29_2TAC,                    UINT32,\
+                    "NNP6_29_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_29_2CLK,                    UINT32,\
+                    "NNP6_29_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_29_2ADC,                    UINT32,\
+                    "NNP6_29_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_30_1TAC,                    UINT32,\
+                    "NNP6_30_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_30_1CLK,                    UINT32,\
+                    "NNP6_30_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_30_1ADC,                    UINT32,\
+                    "NNP6_30_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_30_2TAC,                    UINT32,\
+                    "NNP6_30_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_30_2CLK,                    UINT32,\
+                    "NNP6_30_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_30_2ADC,                    UINT32,\
+                    "NNP6_30_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_31_1TAC,                    UINT32,\
+                    "NNP6_31_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_31_1CLK,                    UINT32,\
+                    "NNP6_31_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_31_1ADC,                    UINT32,\
+                    "NNP6_31_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_31_2TAC,                    UINT32,\
+                    "NNP6_31_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_31_2CLK,                    UINT32,\
+                    "NNP6_31_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_31_2ADC,                    UINT32,\
+                    "NNP6_31_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_32_1TAC,                    UINT32,\
+                    "NNP6_32_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_32_1CLK,                    UINT32,\
+                    "NNP6_32_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_32_1ADC,                    UINT32,\
+                    "NNP6_32_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_32_2TAC,                    UINT32,\
+                    "NNP6_32_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_32_2CLK,                    UINT32,\
+                    "NNP6_32_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_32_2ADC,                    UINT32,\
+                    "NNP6_32_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_33_1TAC,                    UINT32,\
+                    "NNP6_33_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_33_1CLK,                    UINT32,\
+                    "NNP6_33_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_33_1ADC,                    UINT32,\
+                    "NNP6_33_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_33_2TAC,                    UINT32,\
+                    "NNP6_33_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_33_2CLK,                    UINT32,\
+                    "NNP6_33_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_33_2ADC,                    UINT32,\
+                    "NNP6_33_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_34_1TAC,                    UINT32,\
+                    "NNP6_34_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_34_1CLK,                    UINT32,\
+                    "NNP6_34_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_34_1ADC,                    UINT32,\
+                    "NNP6_34_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_34_2TAC,                    UINT32,\
+                    "NNP6_34_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_34_2CLK,                    UINT32,\
+                    "NNP6_34_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_34_2ADC,                    UINT32,\
+                    "NNP6_34_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_35_1TAC,                    UINT32,\
+                    "NNP6_35_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_35_1CLK,                    UINT32,\
+                    "NNP6_35_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_35_1ADC,                    UINT32,\
+                    "NNP6_35_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_35_2TAC,                    UINT32,\
+                    "NNP6_35_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_35_2CLK,                    UINT32,\
+                    "NNP6_35_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_35_2ADC,                    UINT32,\
+                    "NNP6_35_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_36_1TAC,                    UINT32,\
+                    "NNP6_36_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_36_1CLK,                    UINT32,\
+                    "NNP6_36_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_36_1ADC,                    UINT32,\
+                    "NNP6_36_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_36_2TAC,                    UINT32,\
+                    "NNP6_36_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_36_2CLK,                    UINT32,\
+                    "NNP6_36_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_36_2ADC,                    UINT32,\
+                    "NNP6_36_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_37_1TAC,                    UINT32,\
+                    "NNP6_37_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_37_1CLK,                    UINT32,\
+                    "NNP6_37_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_37_1ADC,                    UINT32,\
+                    "NNP6_37_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_37_2TAC,                    UINT32,\
+                    "NNP6_37_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_37_2CLK,                    UINT32,\
+                    "NNP6_37_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_37_2ADC,                    UINT32,\
+                    "NNP6_37_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_38_1TAC,                    UINT32,\
+                    "NNP6_38_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_38_1CLK,                    UINT32,\
+                    "NNP6_38_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_38_1ADC,                    UINT32,\
+                    "NNP6_38_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_38_2TAC,                    UINT32,\
+                    "NNP6_38_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_38_2CLK,                    UINT32,\
+                    "NNP6_38_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_38_2ADC,                    UINT32,\
+                    "NNP6_38_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_39_1TAC,                    UINT32,\
+                    "NNP6_39_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_39_1CLK,                    UINT32,\
+                    "NNP6_39_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_39_1ADC,                    UINT32,\
+                    "NNP6_39_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_39_2TAC,                    UINT32,\
+                    "NNP6_39_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_39_2CLK,                    UINT32,\
+                    "NNP6_39_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_39_2ADC,                    UINT32,\
+                    "NNP6_39_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_40_1TAC,                    UINT32,\
+                    "NNP6_40_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_40_1CLK,                    UINT32,\
+                    "NNP6_40_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_40_1ADC,                    UINT32,\
+                    "NNP6_40_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_40_2TAC,                    UINT32,\
+                    "NNP6_40_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_40_2CLK,                    UINT32,\
+                    "NNP6_40_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_40_2ADC,                    UINT32,\
+                    "NNP6_40_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_41_1TAC,                    UINT32,\
+                    "NNP6_41_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_41_1CLK,                    UINT32,\
+                    "NNP6_41_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_41_1ADC,                    UINT32,\
+                    "NNP6_41_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_41_2TAC,                    UINT32,\
+                    "NNP6_41_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_41_2CLK,                    UINT32,\
+                    "NNP6_41_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_41_2ADC,                    UINT32,\
+                    "NNP6_41_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_42_1TAC,                    UINT32,\
+                    "NNP6_42_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_42_1CLK,                    UINT32,\
+                    "NNP6_42_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_42_1ADC,                    UINT32,\
+                    "NNP6_42_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_42_2TAC,                    UINT32,\
+                    "NNP6_42_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_42_2CLK,                    UINT32,\
+                    "NNP6_42_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_42_2ADC,                    UINT32,\
+                    "NNP6_42_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_43_1TAC,                    UINT32,\
+                    "NNP6_43_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_43_1CLK,                    UINT32,\
+                    "NNP6_43_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_43_1ADC,                    UINT32,\
+                    "NNP6_43_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_43_2TAC,                    UINT32,\
+                    "NNP6_43_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_43_2CLK,                    UINT32,\
+                    "NNP6_43_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_43_2ADC,                    UINT32,\
+                    "NNP6_43_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_44_1TAC,                    UINT32,\
+                    "NNP6_44_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_44_1CLK,                    UINT32,\
+                    "NNP6_44_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_44_1ADC,                    UINT32,\
+                    "NNP6_44_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_44_2TAC,                    UINT32,\
+                    "NNP6_44_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_44_2CLK,                    UINT32,\
+                    "NNP6_44_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_44_2ADC,                    UINT32,\
+                    "NNP6_44_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_45_1TAC,                    UINT32,\
+                    "NNP6_45_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_45_1CLK,                    UINT32,\
+                    "NNP6_45_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_45_1ADC,                    UINT32,\
+                    "NNP6_45_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_45_2TAC,                    UINT32,\
+                    "NNP6_45_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_45_2CLK,                    UINT32,\
+                    "NNP6_45_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_45_2ADC,                    UINT32,\
+                    "NNP6_45_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_46_1TAC,                    UINT32,\
+                    "NNP6_46_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_46_1CLK,                    UINT32,\
+                    "NNP6_46_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_46_1ADC,                    UINT32,\
+                    "NNP6_46_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_46_2TAC,                    UINT32,\
+                    "NNP6_46_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_46_2CLK,                    UINT32,\
+                    "NNP6_46_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_46_2ADC,                    UINT32,\
+                    "NNP6_46_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_47_1TAC,                    UINT32,\
+                    "NNP6_47_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_47_1CLK,                    UINT32,\
+                    "NNP6_47_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_47_1ADC,                    UINT32,\
+                    "NNP6_47_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_47_2TAC,                    UINT32,\
+                    "NNP6_47_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_47_2CLK,                    UINT32,\
+                    "NNP6_47_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_47_2ADC,                    UINT32,\
+                    "NNP6_47_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_48_1TAC,                    UINT32,\
+                    "NNP6_48_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_48_1CLK,                    UINT32,\
+                    "NNP6_48_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_48_1ADC,                    UINT32,\
+                    "NNP6_48_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_48_2TAC,                    UINT32,\
+                    "NNP6_48_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_48_2CLK,                    UINT32,\
+                    "NNP6_48_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_48_2ADC,                    UINT32,\
+                    "NNP6_48_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_49_1TAC,                    UINT32,\
+                    "NNP6_49_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_49_1CLK,                    UINT32,\
+                    "NNP6_49_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_49_1ADC,                    UINT32,\
+                    "NNP6_49_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_49_2TAC,                    UINT32,\
+                    "NNP6_49_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_49_2CLK,                    UINT32,\
+                    "NNP6_49_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_49_2ADC,                    UINT32,\
+                    "NNP6_49_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_50_1TAC,                    UINT32,\
+                    "NNP6_50_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_50_1CLK,                    UINT32,\
+                    "NNP6_50_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_50_1ADC,                    UINT32,\
+                    "NNP6_50_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_50_2TAC,                    UINT32,\
+                    "NNP6_50_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_50_2CLK,                    UINT32,\
+                    "NNP6_50_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP6_50_2ADC,                    UINT32,\
+                    "NNP6_50_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_1_1TAC,                     UINT32,\
+                    "NNP7_1_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_1_1CLK,                     UINT32,\
+                    "NNP7_1_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_1_1ADC,                     UINT32,\
+                    "NNP7_1_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_1_2TAC,                     UINT32,\
+                    "NNP7_1_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_1_2CLK,                     UINT32,\
+                    "NNP7_1_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_1_2ADC,                     UINT32,\
+                    "NNP7_1_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_2_1TAC,                     UINT32,\
+                    "NNP7_2_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_2_1CLK,                     UINT32,\
+                    "NNP7_2_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_2_1ADC,                     UINT32,\
+                    "NNP7_2_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_2_2TAC,                     UINT32,\
+                    "NNP7_2_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_2_2CLK,                     UINT32,\
+                    "NNP7_2_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_2_2ADC,                     UINT32,\
+                    "NNP7_2_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_3_1TAC,                     UINT32,\
+                    "NNP7_3_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_3_1CLK,                     UINT32,\
+                    "NNP7_3_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_3_1ADC,                     UINT32,\
+                    "NNP7_3_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_3_2TAC,                     UINT32,\
+                    "NNP7_3_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_3_2CLK,                     UINT32,\
+                    "NNP7_3_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_3_2ADC,                     UINT32,\
+                    "NNP7_3_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_4_1TAC,                     UINT32,\
+                    "NNP7_4_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_4_1CLK,                     UINT32,\
+                    "NNP7_4_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_4_1ADC,                     UINT32,\
+                    "NNP7_4_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_4_2TAC,                     UINT32,\
+                    "NNP7_4_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_4_2CLK,                     UINT32,\
+                    "NNP7_4_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_4_2ADC,                     UINT32,\
+                    "NNP7_4_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_5_1TAC,                     UINT32,\
+                    "NNP7_5_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_5_1CLK,                     UINT32,\
+                    "NNP7_5_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_5_1ADC,                     UINT32,\
+                    "NNP7_5_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_5_2TAC,                     UINT32,\
+                    "NNP7_5_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_5_2CLK,                     UINT32,\
+                    "NNP7_5_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_5_2ADC,                     UINT32,\
+                    "NNP7_5_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_6_1TAC,                     UINT32,\
+                    "NNP7_6_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_6_1CLK,                     UINT32,\
+                    "NNP7_6_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_6_1ADC,                     UINT32,\
+                    "NNP7_6_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_6_2TAC,                     UINT32,\
+                    "NNP7_6_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_6_2CLK,                     UINT32,\
+                    "NNP7_6_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_6_2ADC,                     UINT32,\
+                    "NNP7_6_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_7_1TAC,                     UINT32,\
+                    "NNP7_7_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_7_1CLK,                     UINT32,\
+                    "NNP7_7_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_7_1ADC,                     UINT32,\
+                    "NNP7_7_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_7_2TAC,                     UINT32,\
+                    "NNP7_7_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_7_2CLK,                     UINT32,\
+                    "NNP7_7_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_7_2ADC,                     UINT32,\
+                    "NNP7_7_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_8_1TAC,                     UINT32,\
+                    "NNP7_8_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_8_1CLK,                     UINT32,\
+                    "NNP7_8_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_8_1ADC,                     UINT32,\
+                    "NNP7_8_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_8_2TAC,                     UINT32,\
+                    "NNP7_8_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_8_2CLK,                     UINT32,\
+                    "NNP7_8_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_8_2ADC,                     UINT32,\
+                    "NNP7_8_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_9_1TAC,                     UINT32,\
+                    "NNP7_9_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_9_1CLK,                     UINT32,\
+                    "NNP7_9_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_9_1ADC,                     UINT32,\
+                    "NNP7_9_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_9_2TAC,                     UINT32,\
+                    "NNP7_9_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_9_2CLK,                     UINT32,\
+                    "NNP7_9_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_9_2ADC,                     UINT32,\
+                    "NNP7_9_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_10_1TAC,                    UINT32,\
+                    "NNP7_10_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_10_1CLK,                    UINT32,\
+                    "NNP7_10_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_10_1ADC,                    UINT32,\
+                    "NNP7_10_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_10_2TAC,                    UINT32,\
+                    "NNP7_10_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_10_2CLK,                    UINT32,\
+                    "NNP7_10_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_10_2ADC,                    UINT32,\
+                    "NNP7_10_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_11_1TAC,                    UINT32,\
+                    "NNP7_11_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_11_1CLK,                    UINT32,\
+                    "NNP7_11_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_11_1ADC,                    UINT32,\
+                    "NNP7_11_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_11_2TAC,                    UINT32,\
+                    "NNP7_11_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_11_2CLK,                    UINT32,\
+                    "NNP7_11_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_11_2ADC,                    UINT32,\
+                    "NNP7_11_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_12_1TAC,                    UINT32,\
+                    "NNP7_12_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_12_1CLK,                    UINT32,\
+                    "NNP7_12_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_12_1ADC,                    UINT32,\
+                    "NNP7_12_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_12_2TAC,                    UINT32,\
+                    "NNP7_12_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_12_2CLK,                    UINT32,\
+                    "NNP7_12_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_12_2ADC,                    UINT32,\
+                    "NNP7_12_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_13_1TAC,                    UINT32,\
+                    "NNP7_13_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_13_1CLK,                    UINT32,\
+                    "NNP7_13_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_13_1ADC,                    UINT32,\
+                    "NNP7_13_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_13_2TAC,                    UINT32,\
+                    "NNP7_13_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_13_2CLK,                    UINT32,\
+                    "NNP7_13_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_13_2ADC,                    UINT32,\
+                    "NNP7_13_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_14_1TAC,                    UINT32,\
+                    "NNP7_14_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_14_1CLK,                    UINT32,\
+                    "NNP7_14_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_14_1ADC,                    UINT32,\
+                    "NNP7_14_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_14_2TAC,                    UINT32,\
+                    "NNP7_14_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_14_2CLK,                    UINT32,\
+                    "NNP7_14_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_14_2ADC,                    UINT32,\
+                    "NNP7_14_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_15_1TAC,                    UINT32,\
+                    "NNP7_15_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_15_1CLK,                    UINT32,\
+                    "NNP7_15_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_15_1ADC,                    UINT32,\
+                    "NNP7_15_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_15_2TAC,                    UINT32,\
+                    "NNP7_15_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_15_2CLK,                    UINT32,\
+                    "NNP7_15_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_15_2ADC,                    UINT32,\
+                    "NNP7_15_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_16_1TAC,                    UINT32,\
+                    "NNP7_16_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_16_1CLK,                    UINT32,\
+                    "NNP7_16_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_16_1ADC,                    UINT32,\
+                    "NNP7_16_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_16_2TAC,                    UINT32,\
+                    "NNP7_16_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_16_2CLK,                    UINT32,\
+                    "NNP7_16_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_16_2ADC,                    UINT32,\
+                    "NNP7_16_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_17_1TAC,                    UINT32,\
+                    "NNP7_17_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_17_1CLK,                    UINT32,\
+                    "NNP7_17_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_17_1ADC,                    UINT32,\
+                    "NNP7_17_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_17_2TAC,                    UINT32,\
+                    "NNP7_17_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_17_2CLK,                    UINT32,\
+                    "NNP7_17_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_17_2ADC,                    UINT32,\
+                    "NNP7_17_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_18_1TAC,                    UINT32,\
+                    "NNP7_18_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_18_1CLK,                    UINT32,\
+                    "NNP7_18_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_18_1ADC,                    UINT32,\
+                    "NNP7_18_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_18_2TAC,                    UINT32,\
+                    "NNP7_18_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_18_2CLK,                    UINT32,\
+                    "NNP7_18_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_18_2ADC,                    UINT32,\
+                    "NNP7_18_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_19_1TAC,                    UINT32,\
+                    "NNP7_19_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_19_1CLK,                    UINT32,\
+                    "NNP7_19_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_19_1ADC,                    UINT32,\
+                    "NNP7_19_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_19_2TAC,                    UINT32,\
+                    "NNP7_19_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_19_2CLK,                    UINT32,\
+                    "NNP7_19_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_19_2ADC,                    UINT32,\
+                    "NNP7_19_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_20_1TAC,                    UINT32,\
+                    "NNP7_20_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_20_1CLK,                    UINT32,\
+                    "NNP7_20_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_20_1ADC,                    UINT32,\
+                    "NNP7_20_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_20_2TAC,                    UINT32,\
+                    "NNP7_20_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_20_2CLK,                    UINT32,\
+                    "NNP7_20_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_20_2ADC,                    UINT32,\
+                    "NNP7_20_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_21_1TAC,                    UINT32,\
+                    "NNP7_21_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_21_1CLK,                    UINT32,\
+                    "NNP7_21_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_21_1ADC,                    UINT32,\
+                    "NNP7_21_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_21_2TAC,                    UINT32,\
+                    "NNP7_21_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_21_2CLK,                    UINT32,\
+                    "NNP7_21_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_21_2ADC,                    UINT32,\
+                    "NNP7_21_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_22_1TAC,                    UINT32,\
+                    "NNP7_22_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_22_1CLK,                    UINT32,\
+                    "NNP7_22_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_22_1ADC,                    UINT32,\
+                    "NNP7_22_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_22_2TAC,                    UINT32,\
+                    "NNP7_22_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_22_2CLK,                    UINT32,\
+                    "NNP7_22_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_22_2ADC,                    UINT32,\
+                    "NNP7_22_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_23_1TAC,                    UINT32,\
+                    "NNP7_23_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_23_1CLK,                    UINT32,\
+                    "NNP7_23_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_23_1ADC,                    UINT32,\
+                    "NNP7_23_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_23_2TAC,                    UINT32,\
+                    "NNP7_23_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_23_2CLK,                    UINT32,\
+                    "NNP7_23_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_23_2ADC,                    UINT32,\
+                    "NNP7_23_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_24_1TAC,                    UINT32,\
+                    "NNP7_24_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_24_1CLK,                    UINT32,\
+                    "NNP7_24_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_24_1ADC,                    UINT32,\
+                    "NNP7_24_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_24_2TAC,                    UINT32,\
+                    "NNP7_24_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_24_2CLK,                    UINT32,\
+                    "NNP7_24_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_24_2ADC,                    UINT32,\
+                    "NNP7_24_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_25_1TAC,                    UINT32,\
+                    "NNP7_25_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_25_1CLK,                    UINT32,\
+                    "NNP7_25_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_25_1ADC,                    UINT32,\
+                    "NNP7_25_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_25_2TAC,                    UINT32,\
+                    "NNP7_25_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_25_2CLK,                    UINT32,\
+                    "NNP7_25_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_25_2ADC,                    UINT32,\
+                    "NNP7_25_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_26_1TAC,                    UINT32,\
+                    "NNP7_26_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_26_1CLK,                    UINT32,\
+                    "NNP7_26_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_26_1ADC,                    UINT32,\
+                    "NNP7_26_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_26_2TAC,                    UINT32,\
+                    "NNP7_26_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_26_2CLK,                    UINT32,\
+                    "NNP7_26_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_26_2ADC,                    UINT32,\
+                    "NNP7_26_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_27_1TAC,                    UINT32,\
+                    "NNP7_27_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_27_1CLK,                    UINT32,\
+                    "NNP7_27_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_27_1ADC,                    UINT32,\
+                    "NNP7_27_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_27_2TAC,                    UINT32,\
+                    "NNP7_27_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_27_2CLK,                    UINT32,\
+                    "NNP7_27_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_27_2ADC,                    UINT32,\
+                    "NNP7_27_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_28_1TAC,                    UINT32,\
+                    "NNP7_28_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_28_1CLK,                    UINT32,\
+                    "NNP7_28_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_28_1ADC,                    UINT32,\
+                    "NNP7_28_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_28_2TAC,                    UINT32,\
+                    "NNP7_28_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_28_2CLK,                    UINT32,\
+                    "NNP7_28_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_28_2ADC,                    UINT32,\
+                    "NNP7_28_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_29_1TAC,                    UINT32,\
+                    "NNP7_29_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_29_1CLK,                    UINT32,\
+                    "NNP7_29_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_29_1ADC,                    UINT32,\
+                    "NNP7_29_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_29_2TAC,                    UINT32,\
+                    "NNP7_29_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_29_2CLK,                    UINT32,\
+                    "NNP7_29_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_29_2ADC,                    UINT32,\
+                    "NNP7_29_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_30_1TAC,                    UINT32,\
+                    "NNP7_30_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_30_1CLK,                    UINT32,\
+                    "NNP7_30_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_30_1ADC,                    UINT32,\
+                    "NNP7_30_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_30_2TAC,                    UINT32,\
+                    "NNP7_30_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_30_2CLK,                    UINT32,\
+                    "NNP7_30_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_30_2ADC,                    UINT32,\
+                    "NNP7_30_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_31_1TAC,                    UINT32,\
+                    "NNP7_31_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_31_1CLK,                    UINT32,\
+                    "NNP7_31_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_31_1ADC,                    UINT32,\
+                    "NNP7_31_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_31_2TAC,                    UINT32,\
+                    "NNP7_31_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_31_2CLK,                    UINT32,\
+                    "NNP7_31_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_31_2ADC,                    UINT32,\
+                    "NNP7_31_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_32_1TAC,                    UINT32,\
+                    "NNP7_32_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_32_1CLK,                    UINT32,\
+                    "NNP7_32_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_32_1ADC,                    UINT32,\
+                    "NNP7_32_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_32_2TAC,                    UINT32,\
+                    "NNP7_32_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_32_2CLK,                    UINT32,\
+                    "NNP7_32_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_32_2ADC,                    UINT32,\
+                    "NNP7_32_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_33_1TAC,                    UINT32,\
+                    "NNP7_33_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_33_1CLK,                    UINT32,\
+                    "NNP7_33_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_33_1ADC,                    UINT32,\
+                    "NNP7_33_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_33_2TAC,                    UINT32,\
+                    "NNP7_33_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_33_2CLK,                    UINT32,\
+                    "NNP7_33_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_33_2ADC,                    UINT32,\
+                    "NNP7_33_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_34_1TAC,                    UINT32,\
+                    "NNP7_34_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_34_1CLK,                    UINT32,\
+                    "NNP7_34_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_34_1ADC,                    UINT32,\
+                    "NNP7_34_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_34_2TAC,                    UINT32,\
+                    "NNP7_34_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_34_2CLK,                    UINT32,\
+                    "NNP7_34_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_34_2ADC,                    UINT32,\
+                    "NNP7_34_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_35_1TAC,                    UINT32,\
+                    "NNP7_35_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_35_1CLK,                    UINT32,\
+                    "NNP7_35_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_35_1ADC,                    UINT32,\
+                    "NNP7_35_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_35_2TAC,                    UINT32,\
+                    "NNP7_35_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_35_2CLK,                    UINT32,\
+                    "NNP7_35_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_35_2ADC,                    UINT32,\
+                    "NNP7_35_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_36_1TAC,                    UINT32,\
+                    "NNP7_36_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_36_1CLK,                    UINT32,\
+                    "NNP7_36_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_36_1ADC,                    UINT32,\
+                    "NNP7_36_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_36_2TAC,                    UINT32,\
+                    "NNP7_36_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_36_2CLK,                    UINT32,\
+                    "NNP7_36_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_36_2ADC,                    UINT32,\
+                    "NNP7_36_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_37_1TAC,                    UINT32,\
+                    "NNP7_37_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_37_1CLK,                    UINT32,\
+                    "NNP7_37_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_37_1ADC,                    UINT32,\
+                    "NNP7_37_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_37_2TAC,                    UINT32,\
+                    "NNP7_37_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_37_2CLK,                    UINT32,\
+                    "NNP7_37_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_37_2ADC,                    UINT32,\
+                    "NNP7_37_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_38_1TAC,                    UINT32,\
+                    "NNP7_38_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_38_1CLK,                    UINT32,\
+                    "NNP7_38_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_38_1ADC,                    UINT32,\
+                    "NNP7_38_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_38_2TAC,                    UINT32,\
+                    "NNP7_38_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_38_2CLK,                    UINT32,\
+                    "NNP7_38_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_38_2ADC,                    UINT32,\
+                    "NNP7_38_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_39_1TAC,                    UINT32,\
+                    "NNP7_39_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_39_1CLK,                    UINT32,\
+                    "NNP7_39_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_39_1ADC,                    UINT32,\
+                    "NNP7_39_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_39_2TAC,                    UINT32,\
+                    "NNP7_39_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_39_2CLK,                    UINT32,\
+                    "NNP7_39_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_39_2ADC,                    UINT32,\
+                    "NNP7_39_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_40_1TAC,                    UINT32,\
+                    "NNP7_40_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_40_1CLK,                    UINT32,\
+                    "NNP7_40_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_40_1ADC,                    UINT32,\
+                    "NNP7_40_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_40_2TAC,                    UINT32,\
+                    "NNP7_40_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_40_2CLK,                    UINT32,\
+                    "NNP7_40_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_40_2ADC,                    UINT32,\
+                    "NNP7_40_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_41_1TAC,                    UINT32,\
+                    "NNP7_41_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_41_1CLK,                    UINT32,\
+                    "NNP7_41_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_41_1ADC,                    UINT32,\
+                    "NNP7_41_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_41_2TAC,                    UINT32,\
+                    "NNP7_41_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_41_2CLK,                    UINT32,\
+                    "NNP7_41_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_41_2ADC,                    UINT32,\
+                    "NNP7_41_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_42_1TAC,                    UINT32,\
+                    "NNP7_42_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_42_1CLK,                    UINT32,\
+                    "NNP7_42_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_42_1ADC,                    UINT32,\
+                    "NNP7_42_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_42_2TAC,                    UINT32,\
+                    "NNP7_42_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_42_2CLK,                    UINT32,\
+                    "NNP7_42_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_42_2ADC,                    UINT32,\
+                    "NNP7_42_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_43_1TAC,                    UINT32,\
+                    "NNP7_43_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_43_1CLK,                    UINT32,\
+                    "NNP7_43_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_43_1ADC,                    UINT32,\
+                    "NNP7_43_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_43_2TAC,                    UINT32,\
+                    "NNP7_43_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_43_2CLK,                    UINT32,\
+                    "NNP7_43_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_43_2ADC,                    UINT32,\
+                    "NNP7_43_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_44_1TAC,                    UINT32,\
+                    "NNP7_44_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_44_1CLK,                    UINT32,\
+                    "NNP7_44_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_44_1ADC,                    UINT32,\
+                    "NNP7_44_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_44_2TAC,                    UINT32,\
+                    "NNP7_44_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_44_2CLK,                    UINT32,\
+                    "NNP7_44_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_44_2ADC,                    UINT32,\
+                    "NNP7_44_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_45_1TAC,                    UINT32,\
+                    "NNP7_45_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_45_1CLK,                    UINT32,\
+                    "NNP7_45_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_45_1ADC,                    UINT32,\
+                    "NNP7_45_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_45_2TAC,                    UINT32,\
+                    "NNP7_45_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_45_2CLK,                    UINT32,\
+                    "NNP7_45_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_45_2ADC,                    UINT32,\
+                    "NNP7_45_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_46_1TAC,                    UINT32,\
+                    "NNP7_46_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_46_1CLK,                    UINT32,\
+                    "NNP7_46_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_46_1ADC,                    UINT32,\
+                    "NNP7_46_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_46_2TAC,                    UINT32,\
+                    "NNP7_46_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_46_2CLK,                    UINT32,\
+                    "NNP7_46_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_46_2ADC,                    UINT32,\
+                    "NNP7_46_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_47_1TAC,                    UINT32,\
+                    "NNP7_47_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_47_1CLK,                    UINT32,\
+                    "NNP7_47_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_47_1ADC,                    UINT32,\
+                    "NNP7_47_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_47_2TAC,                    UINT32,\
+                    "NNP7_47_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_47_2CLK,                    UINT32,\
+                    "NNP7_47_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_47_2ADC,                    UINT32,\
+                    "NNP7_47_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_48_1TAC,                    UINT32,\
+                    "NNP7_48_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_48_1CLK,                    UINT32,\
+                    "NNP7_48_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_48_1ADC,                    UINT32,\
+                    "NNP7_48_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_48_2TAC,                    UINT32,\
+                    "NNP7_48_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_48_2CLK,                    UINT32,\
+                    "NNP7_48_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_48_2ADC,                    UINT32,\
+                    "NNP7_48_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_49_1TAC,                    UINT32,\
+                    "NNP7_49_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_49_1CLK,                    UINT32,\
+                    "NNP7_49_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_49_1ADC,                    UINT32,\
+                    "NNP7_49_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_49_2TAC,                    UINT32,\
+                    "NNP7_49_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_49_2CLK,                    UINT32,\
+                    "NNP7_49_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_49_2ADC,                    UINT32,\
+                    "NNP7_49_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_50_1TAC,                    UINT32,\
+                    "NNP7_50_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_50_1CLK,                    UINT32,\
+                    "NNP7_50_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_50_1ADC,                    UINT32,\
+                    "NNP7_50_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_50_2TAC,                    UINT32,\
+                    "NNP7_50_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_50_2CLK,                    UINT32,\
+                    "NNP7_50_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP7_50_2ADC,                    UINT32,\
+                    "NNP7_50_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_1_1TAC,                     UINT32,\
+                    "NNP8_1_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_1_1CLK,                     UINT32,\
+                    "NNP8_1_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_1_1ADC,                     UINT32,\
+                    "NNP8_1_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_1_2TAC,                     UINT32,\
+                    "NNP8_1_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_1_2CLK,                     UINT32,\
+                    "NNP8_1_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_1_2ADC,                     UINT32,\
+                    "NNP8_1_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_2_1TAC,                     UINT32,\
+                    "NNP8_2_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_2_1CLK,                     UINT32,\
+                    "NNP8_2_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_2_1ADC,                     UINT32,\
+                    "NNP8_2_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_2_2TAC,                     UINT32,\
+                    "NNP8_2_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_2_2CLK,                     UINT32,\
+                    "NNP8_2_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_2_2ADC,                     UINT32,\
+                    "NNP8_2_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_3_1TAC,                     UINT32,\
+                    "NNP8_3_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_3_1CLK,                     UINT32,\
+                    "NNP8_3_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_3_1ADC,                     UINT32,\
+                    "NNP8_3_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_3_2TAC,                     UINT32,\
+                    "NNP8_3_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_3_2CLK,                     UINT32,\
+                    "NNP8_3_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_3_2ADC,                     UINT32,\
+                    "NNP8_3_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_4_1TAC,                     UINT32,\
+                    "NNP8_4_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_4_1CLK,                     UINT32,\
+                    "NNP8_4_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_4_1ADC,                     UINT32,\
+                    "NNP8_4_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_4_2TAC,                     UINT32,\
+                    "NNP8_4_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_4_2CLK,                     UINT32,\
+                    "NNP8_4_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_4_2ADC,                     UINT32,\
+                    "NNP8_4_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_5_1TAC,                     UINT32,\
+                    "NNP8_5_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_5_1CLK,                     UINT32,\
+                    "NNP8_5_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_5_1ADC,                     UINT32,\
+                    "NNP8_5_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_5_2TAC,                     UINT32,\
+                    "NNP8_5_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_5_2CLK,                     UINT32,\
+                    "NNP8_5_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_5_2ADC,                     UINT32,\
+                    "NNP8_5_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_6_1TAC,                     UINT32,\
+                    "NNP8_6_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_6_1CLK,                     UINT32,\
+                    "NNP8_6_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_6_1ADC,                     UINT32,\
+                    "NNP8_6_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_6_2TAC,                     UINT32,\
+                    "NNP8_6_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_6_2CLK,                     UINT32,\
+                    "NNP8_6_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_6_2ADC,                     UINT32,\
+                    "NNP8_6_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_7_1TAC,                     UINT32,\
+                    "NNP8_7_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_7_1CLK,                     UINT32,\
+                    "NNP8_7_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_7_1ADC,                     UINT32,\
+                    "NNP8_7_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_7_2TAC,                     UINT32,\
+                    "NNP8_7_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_7_2CLK,                     UINT32,\
+                    "NNP8_7_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_7_2ADC,                     UINT32,\
+                    "NNP8_7_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_8_1TAC,                     UINT32,\
+                    "NNP8_8_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_8_1CLK,                     UINT32,\
+                    "NNP8_8_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_8_1ADC,                     UINT32,\
+                    "NNP8_8_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_8_2TAC,                     UINT32,\
+                    "NNP8_8_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_8_2CLK,                     UINT32,\
+                    "NNP8_8_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_8_2ADC,                     UINT32,\
+                    "NNP8_8_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_9_1TAC,                     UINT32,\
+                    "NNP8_9_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_9_1CLK,                     UINT32,\
+                    "NNP8_9_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_9_1ADC,                     UINT32,\
+                    "NNP8_9_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_9_2TAC,                     UINT32,\
+                    "NNP8_9_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_9_2CLK,                     UINT32,\
+                    "NNP8_9_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_9_2ADC,                     UINT32,\
+                    "NNP8_9_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_10_1TAC,                    UINT32,\
+                    "NNP8_10_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_10_1CLK,                    UINT32,\
+                    "NNP8_10_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_10_1ADC,                    UINT32,\
+                    "NNP8_10_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_10_2TAC,                    UINT32,\
+                    "NNP8_10_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_10_2CLK,                    UINT32,\
+                    "NNP8_10_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_10_2ADC,                    UINT32,\
+                    "NNP8_10_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_11_1TAC,                    UINT32,\
+                    "NNP8_11_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_11_1CLK,                    UINT32,\
+                    "NNP8_11_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_11_1ADC,                    UINT32,\
+                    "NNP8_11_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_11_2TAC,                    UINT32,\
+                    "NNP8_11_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_11_2CLK,                    UINT32,\
+                    "NNP8_11_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_11_2ADC,                    UINT32,\
+                    "NNP8_11_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_12_1TAC,                    UINT32,\
+                    "NNP8_12_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_12_1CLK,                    UINT32,\
+                    "NNP8_12_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_12_1ADC,                    UINT32,\
+                    "NNP8_12_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_12_2TAC,                    UINT32,\
+                    "NNP8_12_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_12_2CLK,                    UINT32,\
+                    "NNP8_12_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_12_2ADC,                    UINT32,\
+                    "NNP8_12_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_13_1TAC,                    UINT32,\
+                    "NNP8_13_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_13_1CLK,                    UINT32,\
+                    "NNP8_13_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_13_1ADC,                    UINT32,\
+                    "NNP8_13_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_13_2TAC,                    UINT32,\
+                    "NNP8_13_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_13_2CLK,                    UINT32,\
+                    "NNP8_13_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_13_2ADC,                    UINT32,\
+                    "NNP8_13_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_14_1TAC,                    UINT32,\
+                    "NNP8_14_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_14_1CLK,                    UINT32,\
+                    "NNP8_14_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_14_1ADC,                    UINT32,\
+                    "NNP8_14_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_14_2TAC,                    UINT32,\
+                    "NNP8_14_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_14_2CLK,                    UINT32,\
+                    "NNP8_14_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_14_2ADC,                    UINT32,\
+                    "NNP8_14_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_15_1TAC,                    UINT32,\
+                    "NNP8_15_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_15_1CLK,                    UINT32,\
+                    "NNP8_15_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_15_1ADC,                    UINT32,\
+                    "NNP8_15_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_15_2TAC,                    UINT32,\
+                    "NNP8_15_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_15_2CLK,                    UINT32,\
+                    "NNP8_15_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_15_2ADC,                    UINT32,\
+                    "NNP8_15_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_16_1TAC,                    UINT32,\
+                    "NNP8_16_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_16_1CLK,                    UINT32,\
+                    "NNP8_16_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_16_1ADC,                    UINT32,\
+                    "NNP8_16_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_16_2TAC,                    UINT32,\
+                    "NNP8_16_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_16_2CLK,                    UINT32,\
+                    "NNP8_16_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_16_2ADC,                    UINT32,\
+                    "NNP8_16_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_17_1TAC,                    UINT32,\
+                    "NNP8_17_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_17_1CLK,                    UINT32,\
+                    "NNP8_17_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_17_1ADC,                    UINT32,\
+                    "NNP8_17_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_17_2TAC,                    UINT32,\
+                    "NNP8_17_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_17_2CLK,                    UINT32,\
+                    "NNP8_17_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_17_2ADC,                    UINT32,\
+                    "NNP8_17_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_18_1TAC,                    UINT32,\
+                    "NNP8_18_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_18_1CLK,                    UINT32,\
+                    "NNP8_18_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_18_1ADC,                    UINT32,\
+                    "NNP8_18_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_18_2TAC,                    UINT32,\
+                    "NNP8_18_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_18_2CLK,                    UINT32,\
+                    "NNP8_18_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_18_2ADC,                    UINT32,\
+                    "NNP8_18_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_19_1TAC,                    UINT32,\
+                    "NNP8_19_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_19_1CLK,                    UINT32,\
+                    "NNP8_19_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_19_1ADC,                    UINT32,\
+                    "NNP8_19_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_19_2TAC,                    UINT32,\
+                    "NNP8_19_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_19_2CLK,                    UINT32,\
+                    "NNP8_19_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_19_2ADC,                    UINT32,\
+                    "NNP8_19_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_20_1TAC,                    UINT32,\
+                    "NNP8_20_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_20_1CLK,                    UINT32,\
+                    "NNP8_20_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_20_1ADC,                    UINT32,\
+                    "NNP8_20_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_20_2TAC,                    UINT32,\
+                    "NNP8_20_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_20_2CLK,                    UINT32,\
+                    "NNP8_20_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_20_2ADC,                    UINT32,\
+                    "NNP8_20_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_21_1TAC,                    UINT32,\
+                    "NNP8_21_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_21_1CLK,                    UINT32,\
+                    "NNP8_21_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_21_1ADC,                    UINT32,\
+                    "NNP8_21_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_21_2TAC,                    UINT32,\
+                    "NNP8_21_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_21_2CLK,                    UINT32,\
+                    "NNP8_21_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_21_2ADC,                    UINT32,\
+                    "NNP8_21_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_22_1TAC,                    UINT32,\
+                    "NNP8_22_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_22_1CLK,                    UINT32,\
+                    "NNP8_22_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_22_1ADC,                    UINT32,\
+                    "NNP8_22_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_22_2TAC,                    UINT32,\
+                    "NNP8_22_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_22_2CLK,                    UINT32,\
+                    "NNP8_22_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_22_2ADC,                    UINT32,\
+                    "NNP8_22_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_23_1TAC,                    UINT32,\
+                    "NNP8_23_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_23_1CLK,                    UINT32,\
+                    "NNP8_23_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_23_1ADC,                    UINT32,\
+                    "NNP8_23_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_23_2TAC,                    UINT32,\
+                    "NNP8_23_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_23_2CLK,                    UINT32,\
+                    "NNP8_23_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_23_2ADC,                    UINT32,\
+                    "NNP8_23_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_24_1TAC,                    UINT32,\
+                    "NNP8_24_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_24_1CLK,                    UINT32,\
+                    "NNP8_24_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_24_1ADC,                    UINT32,\
+                    "NNP8_24_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_24_2TAC,                    UINT32,\
+                    "NNP8_24_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_24_2CLK,                    UINT32,\
+                    "NNP8_24_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_24_2ADC,                    UINT32,\
+                    "NNP8_24_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_25_1TAC,                    UINT32,\
+                    "NNP8_25_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_25_1CLK,                    UINT32,\
+                    "NNP8_25_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_25_1ADC,                    UINT32,\
+                    "NNP8_25_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_25_2TAC,                    UINT32,\
+                    "NNP8_25_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_25_2CLK,                    UINT32,\
+                    "NNP8_25_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_25_2ADC,                    UINT32,\
+                    "NNP8_25_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_26_1TAC,                    UINT32,\
+                    "NNP8_26_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_26_1CLK,                    UINT32,\
+                    "NNP8_26_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_26_1ADC,                    UINT32,\
+                    "NNP8_26_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_26_2TAC,                    UINT32,\
+                    "NNP8_26_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_26_2CLK,                    UINT32,\
+                    "NNP8_26_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_26_2ADC,                    UINT32,\
+                    "NNP8_26_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_27_1TAC,                    UINT32,\
+                    "NNP8_27_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_27_1CLK,                    UINT32,\
+                    "NNP8_27_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_27_1ADC,                    UINT32,\
+                    "NNP8_27_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_27_2TAC,                    UINT32,\
+                    "NNP8_27_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_27_2CLK,                    UINT32,\
+                    "NNP8_27_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_27_2ADC,                    UINT32,\
+                    "NNP8_27_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_28_1TAC,                    UINT32,\
+                    "NNP8_28_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_28_1CLK,                    UINT32,\
+                    "NNP8_28_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_28_1ADC,                    UINT32,\
+                    "NNP8_28_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_28_2TAC,                    UINT32,\
+                    "NNP8_28_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_28_2CLK,                    UINT32,\
+                    "NNP8_28_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_28_2ADC,                    UINT32,\
+                    "NNP8_28_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_29_1TAC,                    UINT32,\
+                    "NNP8_29_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_29_1CLK,                    UINT32,\
+                    "NNP8_29_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_29_1ADC,                    UINT32,\
+                    "NNP8_29_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_29_2TAC,                    UINT32,\
+                    "NNP8_29_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_29_2CLK,                    UINT32,\
+                    "NNP8_29_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_29_2ADC,                    UINT32,\
+                    "NNP8_29_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_30_1TAC,                    UINT32,\
+                    "NNP8_30_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_30_1CLK,                    UINT32,\
+                    "NNP8_30_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_30_1ADC,                    UINT32,\
+                    "NNP8_30_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_30_2TAC,                    UINT32,\
+                    "NNP8_30_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_30_2CLK,                    UINT32,\
+                    "NNP8_30_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_30_2ADC,                    UINT32,\
+                    "NNP8_30_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_31_1TAC,                    UINT32,\
+                    "NNP8_31_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_31_1CLK,                    UINT32,\
+                    "NNP8_31_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_31_1ADC,                    UINT32,\
+                    "NNP8_31_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_31_2TAC,                    UINT32,\
+                    "NNP8_31_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_31_2CLK,                    UINT32,\
+                    "NNP8_31_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_31_2ADC,                    UINT32,\
+                    "NNP8_31_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_32_1TAC,                    UINT32,\
+                    "NNP8_32_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_32_1CLK,                    UINT32,\
+                    "NNP8_32_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_32_1ADC,                    UINT32,\
+                    "NNP8_32_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_32_2TAC,                    UINT32,\
+                    "NNP8_32_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_32_2CLK,                    UINT32,\
+                    "NNP8_32_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_32_2ADC,                    UINT32,\
+                    "NNP8_32_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_33_1TAC,                    UINT32,\
+                    "NNP8_33_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_33_1CLK,                    UINT32,\
+                    "NNP8_33_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_33_1ADC,                    UINT32,\
+                    "NNP8_33_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_33_2TAC,                    UINT32,\
+                    "NNP8_33_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_33_2CLK,                    UINT32,\
+                    "NNP8_33_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_33_2ADC,                    UINT32,\
+                    "NNP8_33_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_34_1TAC,                    UINT32,\
+                    "NNP8_34_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_34_1CLK,                    UINT32,\
+                    "NNP8_34_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_34_1ADC,                    UINT32,\
+                    "NNP8_34_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_34_2TAC,                    UINT32,\
+                    "NNP8_34_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_34_2CLK,                    UINT32,\
+                    "NNP8_34_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_34_2ADC,                    UINT32,\
+                    "NNP8_34_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_35_1TAC,                    UINT32,\
+                    "NNP8_35_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_35_1CLK,                    UINT32,\
+                    "NNP8_35_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_35_1ADC,                    UINT32,\
+                    "NNP8_35_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_35_2TAC,                    UINT32,\
+                    "NNP8_35_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_35_2CLK,                    UINT32,\
+                    "NNP8_35_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_35_2ADC,                    UINT32,\
+                    "NNP8_35_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_36_1TAC,                    UINT32,\
+                    "NNP8_36_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_36_1CLK,                    UINT32,\
+                    "NNP8_36_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_36_1ADC,                    UINT32,\
+                    "NNP8_36_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_36_2TAC,                    UINT32,\
+                    "NNP8_36_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_36_2CLK,                    UINT32,\
+                    "NNP8_36_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_36_2ADC,                    UINT32,\
+                    "NNP8_36_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_37_1TAC,                    UINT32,\
+                    "NNP8_37_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_37_1CLK,                    UINT32,\
+                    "NNP8_37_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_37_1ADC,                    UINT32,\
+                    "NNP8_37_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_37_2TAC,                    UINT32,\
+                    "NNP8_37_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_37_2CLK,                    UINT32,\
+                    "NNP8_37_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_37_2ADC,                    UINT32,\
+                    "NNP8_37_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_38_1TAC,                    UINT32,\
+                    "NNP8_38_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_38_1CLK,                    UINT32,\
+                    "NNP8_38_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_38_1ADC,                    UINT32,\
+                    "NNP8_38_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_38_2TAC,                    UINT32,\
+                    "NNP8_38_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_38_2CLK,                    UINT32,\
+                    "NNP8_38_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_38_2ADC,                    UINT32,\
+                    "NNP8_38_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_39_1TAC,                    UINT32,\
+                    "NNP8_39_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_39_1CLK,                    UINT32,\
+                    "NNP8_39_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_39_1ADC,                    UINT32,\
+                    "NNP8_39_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_39_2TAC,                    UINT32,\
+                    "NNP8_39_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_39_2CLK,                    UINT32,\
+                    "NNP8_39_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_39_2ADC,                    UINT32,\
+                    "NNP8_39_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_40_1TAC,                    UINT32,\
+                    "NNP8_40_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_40_1CLK,                    UINT32,\
+                    "NNP8_40_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_40_1ADC,                    UINT32,\
+                    "NNP8_40_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_40_2TAC,                    UINT32,\
+                    "NNP8_40_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_40_2CLK,                    UINT32,\
+                    "NNP8_40_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_40_2ADC,                    UINT32,\
+                    "NNP8_40_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_41_1TAC,                    UINT32,\
+                    "NNP8_41_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_41_1CLK,                    UINT32,\
+                    "NNP8_41_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_41_1ADC,                    UINT32,\
+                    "NNP8_41_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_41_2TAC,                    UINT32,\
+                    "NNP8_41_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_41_2CLK,                    UINT32,\
+                    "NNP8_41_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_41_2ADC,                    UINT32,\
+                    "NNP8_41_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_42_1TAC,                    UINT32,\
+                    "NNP8_42_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_42_1CLK,                    UINT32,\
+                    "NNP8_42_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_42_1ADC,                    UINT32,\
+                    "NNP8_42_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_42_2TAC,                    UINT32,\
+                    "NNP8_42_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_42_2CLK,                    UINT32,\
+                    "NNP8_42_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_42_2ADC,                    UINT32,\
+                    "NNP8_42_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_43_1TAC,                    UINT32,\
+                    "NNP8_43_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_43_1CLK,                    UINT32,\
+                    "NNP8_43_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_43_1ADC,                    UINT32,\
+                    "NNP8_43_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_43_2TAC,                    UINT32,\
+                    "NNP8_43_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_43_2CLK,                    UINT32,\
+                    "NNP8_43_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_43_2ADC,                    UINT32,\
+                    "NNP8_43_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_44_1TAC,                    UINT32,\
+                    "NNP8_44_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_44_1CLK,                    UINT32,\
+                    "NNP8_44_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_44_1ADC,                    UINT32,\
+                    "NNP8_44_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_44_2TAC,                    UINT32,\
+                    "NNP8_44_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_44_2CLK,                    UINT32,\
+                    "NNP8_44_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_44_2ADC,                    UINT32,\
+                    "NNP8_44_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_45_1TAC,                    UINT32,\
+                    "NNP8_45_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_45_1CLK,                    UINT32,\
+                    "NNP8_45_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_45_1ADC,                    UINT32,\
+                    "NNP8_45_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_45_2TAC,                    UINT32,\
+                    "NNP8_45_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_45_2CLK,                    UINT32,\
+                    "NNP8_45_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_45_2ADC,                    UINT32,\
+                    "NNP8_45_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_46_1TAC,                    UINT32,\
+                    "NNP8_46_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_46_1CLK,                    UINT32,\
+                    "NNP8_46_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_46_1ADC,                    UINT32,\
+                    "NNP8_46_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_46_2TAC,                    UINT32,\
+                    "NNP8_46_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_46_2CLK,                    UINT32,\
+                    "NNP8_46_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_46_2ADC,                    UINT32,\
+                    "NNP8_46_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_47_1TAC,                    UINT32,\
+                    "NNP8_47_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_47_1CLK,                    UINT32,\
+                    "NNP8_47_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_47_1ADC,                    UINT32,\
+                    "NNP8_47_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_47_2TAC,                    UINT32,\
+                    "NNP8_47_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_47_2CLK,                    UINT32,\
+                    "NNP8_47_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_47_2ADC,                    UINT32,\
+                    "NNP8_47_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_48_1TAC,                    UINT32,\
+                    "NNP8_48_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_48_1CLK,                    UINT32,\
+                    "NNP8_48_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_48_1ADC,                    UINT32,\
+                    "NNP8_48_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_48_2TAC,                    UINT32,\
+                    "NNP8_48_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_48_2CLK,                    UINT32,\
+                    "NNP8_48_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_48_2ADC,                    UINT32,\
+                    "NNP8_48_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_49_1TAC,                    UINT32,\
+                    "NNP8_49_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_49_1CLK,                    UINT32,\
+                    "NNP8_49_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_49_1ADC,                    UINT32,\
+                    "NNP8_49_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_49_2TAC,                    UINT32,\
+                    "NNP8_49_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_49_2CLK,                    UINT32,\
+                    "NNP8_49_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_49_2ADC,                    UINT32,\
+                    "NNP8_49_2ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_50_1TAC,                    UINT32,\
+                    "NNP8_50_1TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_50_1CLK,                    UINT32,\
+                    "NNP8_50_1CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_50_1ADC,                    UINT32,\
+                    "NNP8_50_1ADC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_50_2TAC,                    UINT32,\
+                    "NNP8_50_2TAC",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_50_2CLK,                    UINT32,\
+                    "NNP8_50_2CLK",65535); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     NNP8_50_2ADC,                    UINT32,\
+                    "NNP8_50_2ADC",65535); \
   EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
                      PSPX1M,                          UINT32,\
                     "PSPX1M",65); \
@@ -1255,6 +10398,276 @@ typedef struct EXT_STR_h101_onion_t
                      fiberfour9E,                     UINT32,\
                     "fiberfour9E",160); \
   EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     PSPX5v,                          UINT32,\
+                    "PSPX5v",                          "PSPX5"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour1tM,                    UINT32,\
+                    "fiberfour1tM",16); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour1tMI,                   UINT32,\
+                    "fiberfour1tMI",                   "fiberfour1tM"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour1tME,                   UINT32,\
+                    "fiberfour1tME",                   "fiberfour1tM"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour1t,                     UINT32,\
+                    "fiberfour1t",160); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour1tv,                    UINT32,\
+                    "fiberfour1tv",                    "fiberfour1t"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour1EM,                    UINT32,\
+                    "fiberfour1EM",16); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour1EMI,                   UINT32,\
+                    "fiberfour1EMI",                   "fiberfour1EM"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour1EME,                   UINT32,\
+                    "fiberfour1EME",                   "fiberfour1EM"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour1E,                     UINT32,\
+                    "fiberfour1E",160); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour1Ev,                    UINT32,\
+                    "fiberfour1Ev",                    "fiberfour1E"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour2tM,                    UINT32,\
+                    "fiberfour2tM",16); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour2tMI,                   UINT32,\
+                    "fiberfour2tMI",                   "fiberfour2tM"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour2tME,                   UINT32,\
+                    "fiberfour2tME",                   "fiberfour2tM"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour2t,                     UINT32,\
+                    "fiberfour2t",160); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour2tv,                    UINT32,\
+                    "fiberfour2tv",                    "fiberfour2t"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour2EM,                    UINT32,\
+                    "fiberfour2EM",16); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour2EMI,                   UINT32,\
+                    "fiberfour2EMI",                   "fiberfour2EM"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour2EME,                   UINT32,\
+                    "fiberfour2EME",                   "fiberfour2EM"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour2E,                     UINT32,\
+                    "fiberfour2E",160); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour2Ev,                    UINT32,\
+                    "fiberfour2Ev",                    "fiberfour2E"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour3tM,                    UINT32,\
+                    "fiberfour3tM",16); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour3tMI,                   UINT32,\
+                    "fiberfour3tMI",                   "fiberfour3tM"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour3tME,                   UINT32,\
+                    "fiberfour3tME",                   "fiberfour3tM"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour3t,                     UINT32,\
+                    "fiberfour3t",160); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour3tv,                    UINT32,\
+                    "fiberfour3tv",                    "fiberfour3t"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour3EM,                    UINT32,\
+                    "fiberfour3EM",16); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour3EMI,                   UINT32,\
+                    "fiberfour3EMI",                   "fiberfour3EM"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour3EME,                   UINT32,\
+                    "fiberfour3EME",                   "fiberfour3EM"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour3E,                     UINT32,\
+                    "fiberfour3E",160); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour3Ev,                    UINT32,\
+                    "fiberfour3Ev",                    "fiberfour3E"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour4tM,                    UINT32,\
+                    "fiberfour4tM",16); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour4tMI,                   UINT32,\
+                    "fiberfour4tMI",                   "fiberfour4tM"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour4tME,                   UINT32,\
+                    "fiberfour4tME",                   "fiberfour4tM"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour4t,                     UINT32,\
+                    "fiberfour4t",160); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour4tv,                    UINT32,\
+                    "fiberfour4tv",                    "fiberfour4t"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour4EM,                    UINT32,\
+                    "fiberfour4EM",16); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour4EMI,                   UINT32,\
+                    "fiberfour4EMI",                   "fiberfour4EM"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour4EME,                   UINT32,\
+                    "fiberfour4EME",                   "fiberfour4EM"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour4E,                     UINT32,\
+                    "fiberfour4E",160); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour4Ev,                    UINT32,\
+                    "fiberfour4Ev",                    "fiberfour4E"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour5tM,                    UINT32,\
+                    "fiberfour5tM",16); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour5tMI,                   UINT32,\
+                    "fiberfour5tMI",                   "fiberfour5tM"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour5tME,                   UINT32,\
+                    "fiberfour5tME",                   "fiberfour5tM"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour5t,                     UINT32,\
+                    "fiberfour5t",160); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour5tv,                    UINT32,\
+                    "fiberfour5tv",                    "fiberfour5t"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour5EM,                    UINT32,\
+                    "fiberfour5EM",16); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour5EMI,                   UINT32,\
+                    "fiberfour5EMI",                   "fiberfour5EM"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour5EME,                   UINT32,\
+                    "fiberfour5EME",                   "fiberfour5EM"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour5E,                     UINT32,\
+                    "fiberfour5E",160); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour5Ev,                    UINT32,\
+                    "fiberfour5Ev",                    "fiberfour5E"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour6tM,                    UINT32,\
+                    "fiberfour6tM",16); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour6tMI,                   UINT32,\
+                    "fiberfour6tMI",                   "fiberfour6tM"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour6tME,                   UINT32,\
+                    "fiberfour6tME",                   "fiberfour6tM"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour6t,                     UINT32,\
+                    "fiberfour6t",160); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour6tv,                    UINT32,\
+                    "fiberfour6tv",                    "fiberfour6t"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour6EM,                    UINT32,\
+                    "fiberfour6EM",16); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour6EMI,                   UINT32,\
+                    "fiberfour6EMI",                   "fiberfour6EM"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour6EME,                   UINT32,\
+                    "fiberfour6EME",                   "fiberfour6EM"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour6E,                     UINT32,\
+                    "fiberfour6E",160); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour6Ev,                    UINT32,\
+                    "fiberfour6Ev",                    "fiberfour6E"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour7tM,                    UINT32,\
+                    "fiberfour7tM",16); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour7tMI,                   UINT32,\
+                    "fiberfour7tMI",                   "fiberfour7tM"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour7tME,                   UINT32,\
+                    "fiberfour7tME",                   "fiberfour7tM"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour7t,                     UINT32,\
+                    "fiberfour7t",160); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour7tv,                    UINT32,\
+                    "fiberfour7tv",                    "fiberfour7t"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour7EM,                    UINT32,\
+                    "fiberfour7EM",16); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour7EMI,                   UINT32,\
+                    "fiberfour7EMI",                   "fiberfour7EM"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour7EME,                   UINT32,\
+                    "fiberfour7EME",                   "fiberfour7EM"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour7E,                     UINT32,\
+                    "fiberfour7E",160); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour7Ev,                    UINT32,\
+                    "fiberfour7Ev",                    "fiberfour7E"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour8tM,                    UINT32,\
+                    "fiberfour8tM",16); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour8tMI,                   UINT32,\
+                    "fiberfour8tMI",                   "fiberfour8tM"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour8tME,                   UINT32,\
+                    "fiberfour8tME",                   "fiberfour8tM"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour8t,                     UINT32,\
+                    "fiberfour8t",160); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour8tv,                    UINT32,\
+                    "fiberfour8tv",                    "fiberfour8t"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour8EM,                    UINT32,\
+                    "fiberfour8EM",16); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour8EMI,                   UINT32,\
+                    "fiberfour8EMI",                   "fiberfour8EM"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour8EME,                   UINT32,\
+                    "fiberfour8EME",                   "fiberfour8EM"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour8E,                     UINT32,\
+                    "fiberfour8E",160); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour8Ev,                    UINT32,\
+                    "fiberfour8Ev",                    "fiberfour8E"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour9tM,                    UINT32,\
+                    "fiberfour9tM",16); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour9tMI,                   UINT32,\
+                    "fiberfour9tMI",                   "fiberfour9tM"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour9tME,                   UINT32,\
+                    "fiberfour9tME",                   "fiberfour9tM"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour9t,                     UINT32,\
+                    "fiberfour9t",160); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour9tv,                    UINT32,\
+                    "fiberfour9tv",                    "fiberfour9t"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour9EM,                    UINT32,\
+                    "fiberfour9EM",16); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour9EMI,                   UINT32,\
+                    "fiberfour9EMI",                   "fiberfour9EM"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+                     fiberfour9EME,                   UINT32,\
+                    "fiberfour9EME",                   "fiberfour9EM"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+                     fiberfour9E,                     UINT32,\
+                    "fiberfour9E",160); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
                      fiberfour9Ev,                    UINT32,\
                     "fiberfour9Ev",                    "fiberfour9E"); \
   \
@@ -1282,7 +10695,6 @@ typedef struct EXT_STR_h101_layout_t
     const char *_name;
   } _items[1];
   uint32_t _pack_list[9956];
-
 } EXT_STR_h101_layout;
 
 #define EXT_STR_h101_LAYOUT_INIT { \
@@ -1294,13 +10706,11 @@ typedef struct EXT_STR_h101_layout_t
   1, \
   { \
     { 0, sizeof(EXT_STR_h101), 0x808cf496, "h101" }, \
-
   }, \
   { \
-    0x40000000, 0x40000004, 0xc0000008, 0x00000004, \
-    0x00000002, 0x4000000c, 0x4000001c, 0x40000010, \
-    0x40000020, 0x40000014, 0x40000024, 0x40000018, \
-    0x40000028, 0xc000002c, 0x00000028, 0x00000001, \
+    0x40000000, 0x40000004, 0x40000008, 0x4000000c, \
+    0x40000010, 0x40000014, 0x40000018, 0x4000001c, \
+    0x40000020, 0x40000024, 0x40000028, 0x4000002c, \
     0x40000030, 0x40000034, 0x40000038, 0x4000003c, \
     0x40000040, 0x40000044, 0x40000048, 0x4000004c, \
     0x40000050, 0x40000054, 0x40000058, 0x4000005c, \
@@ -1311,10 +10721,9 @@ typedef struct EXT_STR_h101_layout_t
     0x400000a0, 0x400000a4, 0x400000a8, 0x400000ac, \
     0x400000b0, 0x400000b4, 0x400000b8, 0x400000bc, \
     0x400000c0, 0x400000c4, 0x400000c8, 0x400000cc, \
-    0xc00000d0, 0x00000004, 0x00000002, 0x400000d4, \
-    0x400000e4, 0x400000d8, 0x400000e8, 0x400000dc, \
-    0x400000ec, 0x400000e0, 0x400000f0, 0xc00000f4, \
-    0x00000028, 0x00000001, 0x400000f8, 0x400000fc, \
+    0x400000d0, 0x400000d4, 0x400000d8, 0x400000dc, \
+    0x400000e0, 0x400000e4, 0x400000e8, 0x400000ec, \
+    0x400000f0, 0x400000f4, 0x400000f8, 0x400000fc, \
     0x40000100, 0x40000104, 0x40000108, 0x4000010c, \
     0x40000110, 0x40000114, 0x40000118, 0x4000011c, \
     0x40000120, 0x40000124, 0x40000128, 0x4000012c, \
@@ -1324,11 +10733,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40000160, 0x40000164, 0x40000168, 0x4000016c, \
     0x40000170, 0x40000174, 0x40000178, 0x4000017c, \
     0x40000180, 0x40000184, 0x40000188, 0x4000018c, \
-    0x40000190, 0x40000194, 0xc0000198, 0x00000006, \
-    0x00000002, 0x4000019c, 0x400001b4, 0x400001a0, \
-    0x400001b8, 0x400001a4, 0x400001bc, 0x400001a8, \
-    0x400001c0, 0x400001ac, 0x400001c4, 0x400001b0, \
-    0x400001c8, 0xc00001cc, 0x0000003c, 0x00000001, \
+    0x40000190, 0x40000194, 0x40000198, 0x4000019c, \
+    0x400001a0, 0x400001a4, 0x400001a8, 0x400001ac, \
+    0x400001b0, 0x400001b4, 0x400001b8, 0x400001bc, \
+    0x400001c0, 0x400001c4, 0x400001c8, 0x400001cc, \
     0x400001d0, 0x400001d4, 0x400001d8, 0x400001dc, \
     0x400001e0, 0x400001e4, 0x400001e8, 0x400001ec, \
     0x400001f0, 0x400001f4, 0x400001f8, 0x400001fc, \
@@ -1344,11 +10752,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40000290, 0x40000294, 0x40000298, 0x4000029c, \
     0x400002a0, 0x400002a4, 0x400002a8, 0x400002ac, \
     0x400002b0, 0x400002b4, 0x400002b8, 0x400002bc, \
-    0xc00002c0, 0x00000006, 0x00000002, 0x400002c4, \
-    0x400002dc, 0x400002c8, 0x400002e0, 0x400002cc, \
-    0x400002e4, 0x400002d0, 0x400002e8, 0x400002d4, \
-    0x400002ec, 0x400002d8, 0x400002f0, 0xc00002f4, \
-    0x0000003c, 0x00000001, 0x400002f8, 0x400002fc, \
+    0x400002c0, 0x400002c4, 0x400002c8, 0x400002cc, \
+    0x400002d0, 0x400002d4, 0x400002d8, 0x400002dc, \
+    0x400002e0, 0x400002e4, 0x400002e8, 0x400002ec, \
+    0x400002f0, 0x400002f4, 0x400002f8, 0x400002fc, \
     0x40000300, 0x40000304, 0x40000308, 0x4000030c, \
     0x40000310, 0x40000314, 0x40000318, 0x4000031c, \
     0x40000320, 0x40000324, 0x40000328, 0x4000032c, \
@@ -1363,11 +10770,10 @@ typedef struct EXT_STR_h101_layout_t
     0x400003b0, 0x400003b4, 0x400003b8, 0x400003bc, \
     0x400003c0, 0x400003c4, 0x400003c8, 0x400003cc, \
     0x400003d0, 0x400003d4, 0x400003d8, 0x400003dc, \
-    0x400003e0, 0x400003e4, 0xc00003e8, 0x00000006, \
-    0x00000002, 0x400003ec, 0x40000404, 0x400003f0, \
-    0x40000408, 0x400003f4, 0x4000040c, 0x400003f8, \
-    0x40000410, 0x400003fc, 0x40000414, 0x40000400, \
-    0x40000418, 0xc000041c, 0x0000003c, 0x00000001, \
+    0x400003e0, 0x400003e4, 0x400003e8, 0x400003ec, \
+    0x400003f0, 0x400003f4, 0x400003f8, 0x400003fc, \
+    0x40000400, 0x40000404, 0x40000408, 0x4000040c, \
+    0x40000410, 0x40000414, 0x40000418, 0x4000041c, \
     0x40000420, 0x40000424, 0x40000428, 0x4000042c, \
     0x40000430, 0x40000434, 0x40000438, 0x4000043c, \
     0x40000440, 0x40000444, 0x40000448, 0x4000044c, \
@@ -1383,11 +10789,10 @@ typedef struct EXT_STR_h101_layout_t
     0x400004e0, 0x400004e4, 0x400004e8, 0x400004ec, \
     0x400004f0, 0x400004f4, 0x400004f8, 0x400004fc, \
     0x40000500, 0x40000504, 0x40000508, 0x4000050c, \
-    0xc0000510, 0x00000006, 0x00000002, 0x40000514, \
-    0x4000052c, 0x40000518, 0x40000530, 0x4000051c, \
-    0x40000534, 0x40000520, 0x40000538, 0x40000524, \
-    0x4000053c, 0x40000528, 0x40000540, 0xc0000544, \
-    0x0000003c, 0x00000001, 0x40000548, 0x4000054c, \
+    0x40000510, 0x40000514, 0x40000518, 0x4000051c, \
+    0x40000520, 0x40000524, 0x40000528, 0x4000052c, \
+    0x40000530, 0x40000534, 0x40000538, 0x4000053c, \
+    0x40000540, 0x40000544, 0x40000548, 0x4000054c, \
     0x40000550, 0x40000554, 0x40000558, 0x4000055c, \
     0x40000560, 0x40000564, 0x40000568, 0x4000056c, \
     0x40000570, 0x40000574, 0x40000578, 0x4000057c, \
@@ -1402,11 +10807,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40000600, 0x40000604, 0x40000608, 0x4000060c, \
     0x40000610, 0x40000614, 0x40000618, 0x4000061c, \
     0x40000620, 0x40000624, 0x40000628, 0x4000062c, \
-    0x40000630, 0x40000634, 0xc0000638, 0x00000006, \
-    0x00000002, 0x4000063c, 0x40000654, 0x40000640, \
-    0x40000658, 0x40000644, 0x4000065c, 0x40000648, \
-    0x40000660, 0x4000064c, 0x40000664, 0x40000650, \
-    0x40000668, 0xc000066c, 0x0000003c, 0x00000001, \
+    0x40000630, 0x40000634, 0x40000638, 0x4000063c, \
+    0x40000640, 0x40000644, 0x40000648, 0x4000064c, \
+    0x40000650, 0x40000654, 0x40000658, 0x4000065c, \
+    0x40000660, 0x40000664, 0x40000668, 0x4000066c, \
     0x40000670, 0x40000674, 0x40000678, 0x4000067c, \
     0x40000680, 0x40000684, 0x40000688, 0x4000068c, \
     0x40000690, 0x40000694, 0x40000698, 0x4000069c, \
@@ -1422,11 +10826,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40000730, 0x40000734, 0x40000738, 0x4000073c, \
     0x40000740, 0x40000744, 0x40000748, 0x4000074c, \
     0x40000750, 0x40000754, 0x40000758, 0x4000075c, \
-    0xc0000760, 0x00000006, 0x00000002, 0x40000764, \
-    0x4000077c, 0x40000768, 0x40000780, 0x4000076c, \
-    0x40000784, 0x40000770, 0x40000788, 0x40000774, \
-    0x4000078c, 0x40000778, 0x40000790, 0xc0000794, \
-    0x0000003c, 0x00000001, 0x40000798, 0x4000079c, \
+    0x40000760, 0x40000764, 0x40000768, 0x4000076c, \
+    0x40000770, 0x40000774, 0x40000778, 0x4000077c, \
+    0x40000780, 0x40000784, 0x40000788, 0x4000078c, \
+    0x40000790, 0x40000794, 0x40000798, 0x4000079c, \
     0x400007a0, 0x400007a4, 0x400007a8, 0x400007ac, \
     0x400007b0, 0x400007b4, 0x400007b8, 0x400007bc, \
     0x400007c0, 0x400007c4, 0x400007c8, 0x400007cc, \
@@ -1441,11 +10844,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40000850, 0x40000854, 0x40000858, 0x4000085c, \
     0x40000860, 0x40000864, 0x40000868, 0x4000086c, \
     0x40000870, 0x40000874, 0x40000878, 0x4000087c, \
-    0x40000880, 0x40000884, 0xc0000888, 0x00000006, \
-    0x00000002, 0x4000088c, 0x400008a4, 0x40000890, \
-    0x400008a8, 0x40000894, 0x400008ac, 0x40000898, \
-    0x400008b0, 0x4000089c, 0x400008b4, 0x400008a0, \
-    0x400008b8, 0xc00008bc, 0x0000003c, 0x00000001, \
+    0x40000880, 0x40000884, 0x40000888, 0x4000088c, \
+    0x40000890, 0x40000894, 0x40000898, 0x4000089c, \
+    0x400008a0, 0x400008a4, 0x400008a8, 0x400008ac, \
+    0x400008b0, 0x400008b4, 0x400008b8, 0x400008bc, \
     0x400008c0, 0x400008c4, 0x400008c8, 0x400008cc, \
     0x400008d0, 0x400008d4, 0x400008d8, 0x400008dc, \
     0x400008e0, 0x400008e4, 0x400008e8, 0x400008ec, \
@@ -1461,11 +10863,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40000980, 0x40000984, 0x40000988, 0x4000098c, \
     0x40000990, 0x40000994, 0x40000998, 0x4000099c, \
     0x400009a0, 0x400009a4, 0x400009a8, 0x400009ac, \
-    0xc00009b0, 0x00000006, 0x00000002, 0x400009b4, \
-    0x400009cc, 0x400009b8, 0x400009d0, 0x400009bc, \
-    0x400009d4, 0x400009c0, 0x400009d8, 0x400009c4, \
-    0x400009dc, 0x400009c8, 0x400009e0, 0xc00009e4, \
-    0x0000003c, 0x00000001, 0x400009e8, 0x400009ec, \
+    0x400009b0, 0x400009b4, 0x400009b8, 0x400009bc, \
+    0x400009c0, 0x400009c4, 0x400009c8, 0x400009cc, \
+    0x400009d0, 0x400009d4, 0x400009d8, 0x400009dc, \
+    0x400009e0, 0x400009e4, 0x400009e8, 0x400009ec, \
     0x400009f0, 0x400009f4, 0x400009f8, 0x400009fc, \
     0x40000a00, 0x40000a04, 0x40000a08, 0x40000a0c, \
     0x40000a10, 0x40000a14, 0x40000a18, 0x40000a1c, \
@@ -1480,11 +10881,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40000aa0, 0x40000aa4, 0x40000aa8, 0x40000aac, \
     0x40000ab0, 0x40000ab4, 0x40000ab8, 0x40000abc, \
     0x40000ac0, 0x40000ac4, 0x40000ac8, 0x40000acc, \
-    0x40000ad0, 0x40000ad4, 0xc0000ad8, 0x00000006, \
-    0x00000002, 0x40000adc, 0x40000af4, 0x40000ae0, \
-    0x40000af8, 0x40000ae4, 0x40000afc, 0x40000ae8, \
-    0x40000b00, 0x40000aec, 0x40000b04, 0x40000af0, \
-    0x40000b08, 0xc0000b0c, 0x0000003c, 0x00000001, \
+    0x40000ad0, 0x40000ad4, 0x40000ad8, 0x40000adc, \
+    0x40000ae0, 0x40000ae4, 0x40000ae8, 0x40000aec, \
+    0x40000af0, 0x40000af4, 0x40000af8, 0x40000afc, \
+    0x40000b00, 0x40000b04, 0x40000b08, 0x40000b0c, \
     0x40000b10, 0x40000b14, 0x40000b18, 0x40000b1c, \
     0x40000b20, 0x40000b24, 0x40000b28, 0x40000b2c, \
     0x40000b30, 0x40000b34, 0x40000b38, 0x40000b3c, \
@@ -1500,11 +10900,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40000bd0, 0x40000bd4, 0x40000bd8, 0x40000bdc, \
     0x40000be0, 0x40000be4, 0x40000be8, 0x40000bec, \
     0x40000bf0, 0x40000bf4, 0x40000bf8, 0x40000bfc, \
-    0xc0000c00, 0x00000006, 0x00000002, 0x40000c04, \
-    0x40000c1c, 0x40000c08, 0x40000c20, 0x40000c0c, \
-    0x40000c24, 0x40000c10, 0x40000c28, 0x40000c14, \
-    0x40000c2c, 0x40000c18, 0x40000c30, 0xc0000c34, \
-    0x0000003c, 0x00000001, 0x40000c38, 0x40000c3c, \
+    0x40000c00, 0x40000c04, 0x40000c08, 0x40000c0c, \
+    0x40000c10, 0x40000c14, 0x40000c18, 0x40000c1c, \
+    0x40000c20, 0x40000c24, 0x40000c28, 0x40000c2c, \
+    0x40000c30, 0x40000c34, 0x40000c38, 0x40000c3c, \
     0x40000c40, 0x40000c44, 0x40000c48, 0x40000c4c, \
     0x40000c50, 0x40000c54, 0x40000c58, 0x40000c5c, \
     0x40000c60, 0x40000c64, 0x40000c68, 0x40000c6c, \
@@ -1519,11 +10918,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40000cf0, 0x40000cf4, 0x40000cf8, 0x40000cfc, \
     0x40000d00, 0x40000d04, 0x40000d08, 0x40000d0c, \
     0x40000d10, 0x40000d14, 0x40000d18, 0x40000d1c, \
-    0x40000d20, 0x40000d24, 0xc0000d28, 0x00000006, \
-    0x00000002, 0x40000d2c, 0x40000d44, 0x40000d30, \
-    0x40000d48, 0x40000d34, 0x40000d4c, 0x40000d38, \
-    0x40000d50, 0x40000d3c, 0x40000d54, 0x40000d40, \
-    0x40000d58, 0xc0000d5c, 0x0000003c, 0x00000001, \
+    0x40000d20, 0x40000d24, 0x40000d28, 0x40000d2c, \
+    0x40000d30, 0x40000d34, 0x40000d38, 0x40000d3c, \
+    0x40000d40, 0x40000d44, 0x40000d48, 0x40000d4c, \
+    0x40000d50, 0x40000d54, 0x40000d58, 0x40000d5c, \
     0x40000d60, 0x40000d64, 0x40000d68, 0x40000d6c, \
     0x40000d70, 0x40000d74, 0x40000d78, 0x40000d7c, \
     0x40000d80, 0x40000d84, 0x40000d88, 0x40000d8c, \
@@ -1539,11 +10937,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40000e20, 0x40000e24, 0x40000e28, 0x40000e2c, \
     0x40000e30, 0x40000e34, 0x40000e38, 0x40000e3c, \
     0x40000e40, 0x40000e44, 0x40000e48, 0x40000e4c, \
-    0xc0000e50, 0x00000006, 0x00000002, 0x40000e54, \
-    0x40000e6c, 0x40000e58, 0x40000e70, 0x40000e5c, \
-    0x40000e74, 0x40000e60, 0x40000e78, 0x40000e64, \
-    0x40000e7c, 0x40000e68, 0x40000e80, 0xc0000e84, \
-    0x0000003c, 0x00000001, 0x40000e88, 0x40000e8c, \
+    0x40000e50, 0x40000e54, 0x40000e58, 0x40000e5c, \
+    0x40000e60, 0x40000e64, 0x40000e68, 0x40000e6c, \
+    0x40000e70, 0x40000e74, 0x40000e78, 0x40000e7c, \
+    0x40000e80, 0x40000e84, 0x40000e88, 0x40000e8c, \
     0x40000e90, 0x40000e94, 0x40000e98, 0x40000e9c, \
     0x40000ea0, 0x40000ea4, 0x40000ea8, 0x40000eac, \
     0x40000eb0, 0x40000eb4, 0x40000eb8, 0x40000ebc, \
@@ -1558,11 +10955,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40000f40, 0x40000f44, 0x40000f48, 0x40000f4c, \
     0x40000f50, 0x40000f54, 0x40000f58, 0x40000f5c, \
     0x40000f60, 0x40000f64, 0x40000f68, 0x40000f6c, \
-    0x40000f70, 0x40000f74, 0xc0000f78, 0x00000006, \
-    0x00000002, 0x40000f7c, 0x40000f94, 0x40000f80, \
-    0x40000f98, 0x40000f84, 0x40000f9c, 0x40000f88, \
-    0x40000fa0, 0x40000f8c, 0x40000fa4, 0x40000f90, \
-    0x40000fa8, 0xc0000fac, 0x0000003c, 0x00000001, \
+    0x40000f70, 0x40000f74, 0x40000f78, 0x40000f7c, \
+    0x40000f80, 0x40000f84, 0x40000f88, 0x40000f8c, \
+    0x40000f90, 0x40000f94, 0x40000f98, 0x40000f9c, \
+    0x40000fa0, 0x40000fa4, 0x40000fa8, 0x40000fac, \
     0x40000fb0, 0x40000fb4, 0x40000fb8, 0x40000fbc, \
     0x40000fc0, 0x40000fc4, 0x40000fc8, 0x40000fcc, \
     0x40000fd0, 0x40000fd4, 0x40000fd8, 0x40000fdc, \
@@ -1578,11 +10974,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40001070, 0x40001074, 0x40001078, 0x4000107c, \
     0x40001080, 0x40001084, 0x40001088, 0x4000108c, \
     0x40001090, 0x40001094, 0x40001098, 0x4000109c, \
-    0xc00010a0, 0x00000006, 0x00000002, 0x400010a4, \
-    0x400010bc, 0x400010a8, 0x400010c0, 0x400010ac, \
-    0x400010c4, 0x400010b0, 0x400010c8, 0x400010b4, \
-    0x400010cc, 0x400010b8, 0x400010d0, 0xc00010d4, \
-    0x0000003c, 0x00000001, 0x400010d8, 0x400010dc, \
+    0x400010a0, 0x400010a4, 0x400010a8, 0x400010ac, \
+    0x400010b0, 0x400010b4, 0x400010b8, 0x400010bc, \
+    0x400010c0, 0x400010c4, 0x400010c8, 0x400010cc, \
+    0x400010d0, 0x400010d4, 0x400010d8, 0x400010dc, \
     0x400010e0, 0x400010e4, 0x400010e8, 0x400010ec, \
     0x400010f0, 0x400010f4, 0x400010f8, 0x400010fc, \
     0x40001100, 0x40001104, 0x40001108, 0x4000110c, \
@@ -1597,11 +10992,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40001190, 0x40001194, 0x40001198, 0x4000119c, \
     0x400011a0, 0x400011a4, 0x400011a8, 0x400011ac, \
     0x400011b0, 0x400011b4, 0x400011b8, 0x400011bc, \
-    0x400011c0, 0x400011c4, 0xc00011c8, 0x00000006, \
-    0x00000002, 0x400011cc, 0x400011e4, 0x400011d0, \
-    0x400011e8, 0x400011d4, 0x400011ec, 0x400011d8, \
-    0x400011f0, 0x400011dc, 0x400011f4, 0x400011e0, \
-    0x400011f8, 0xc00011fc, 0x0000003c, 0x00000001, \
+    0x400011c0, 0x400011c4, 0x400011c8, 0x400011cc, \
+    0x400011d0, 0x400011d4, 0x400011d8, 0x400011dc, \
+    0x400011e0, 0x400011e4, 0x400011e8, 0x400011ec, \
+    0x400011f0, 0x400011f4, 0x400011f8, 0x400011fc, \
     0x40001200, 0x40001204, 0x40001208, 0x4000120c, \
     0x40001210, 0x40001214, 0x40001218, 0x4000121c, \
     0x40001220, 0x40001224, 0x40001228, 0x4000122c, \
@@ -1617,11 +11011,10 @@ typedef struct EXT_STR_h101_layout_t
     0x400012c0, 0x400012c4, 0x400012c8, 0x400012cc, \
     0x400012d0, 0x400012d4, 0x400012d8, 0x400012dc, \
     0x400012e0, 0x400012e4, 0x400012e8, 0x400012ec, \
-    0xc00012f0, 0x00000006, 0x00000002, 0x400012f4, \
-    0x4000130c, 0x400012f8, 0x40001310, 0x400012fc, \
-    0x40001314, 0x40001300, 0x40001318, 0x40001304, \
-    0x4000131c, 0x40001308, 0x40001320, 0xc0001324, \
-    0x0000003c, 0x00000001, 0x40001328, 0x4000132c, \
+    0x400012f0, 0x400012f4, 0x400012f8, 0x400012fc, \
+    0x40001300, 0x40001304, 0x40001308, 0x4000130c, \
+    0x40001310, 0x40001314, 0x40001318, 0x4000131c, \
+    0x40001320, 0x40001324, 0x40001328, 0x4000132c, \
     0x40001330, 0x40001334, 0x40001338, 0x4000133c, \
     0x40001340, 0x40001344, 0x40001348, 0x4000134c, \
     0x40001350, 0x40001354, 0x40001358, 0x4000135c, \
@@ -1636,11 +11029,10 @@ typedef struct EXT_STR_h101_layout_t
     0x400013e0, 0x400013e4, 0x400013e8, 0x400013ec, \
     0x400013f0, 0x400013f4, 0x400013f8, 0x400013fc, \
     0x40001400, 0x40001404, 0x40001408, 0x4000140c, \
-    0x40001410, 0x40001414, 0xc0001418, 0x00000006, \
-    0x00000002, 0x4000141c, 0x40001434, 0x40001420, \
-    0x40001438, 0x40001424, 0x4000143c, 0x40001428, \
-    0x40001440, 0x4000142c, 0x40001444, 0x40001430, \
-    0x40001448, 0xc000144c, 0x0000003c, 0x00000001, \
+    0x40001410, 0x40001414, 0x40001418, 0x4000141c, \
+    0x40001420, 0x40001424, 0x40001428, 0x4000142c, \
+    0x40001430, 0x40001434, 0x40001438, 0x4000143c, \
+    0x40001440, 0x40001444, 0x40001448, 0x4000144c, \
     0x40001450, 0x40001454, 0x40001458, 0x4000145c, \
     0x40001460, 0x40001464, 0x40001468, 0x4000146c, \
     0x40001470, 0x40001474, 0x40001478, 0x4000147c, \
@@ -1656,11 +11048,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40001510, 0x40001514, 0x40001518, 0x4000151c, \
     0x40001520, 0x40001524, 0x40001528, 0x4000152c, \
     0x40001530, 0x40001534, 0x40001538, 0x4000153c, \
-    0xc0001540, 0x00000006, 0x00000002, 0x40001544, \
-    0x4000155c, 0x40001548, 0x40001560, 0x4000154c, \
-    0x40001564, 0x40001550, 0x40001568, 0x40001554, \
-    0x4000156c, 0x40001558, 0x40001570, 0xc0001574, \
-    0x0000003c, 0x00000001, 0x40001578, 0x4000157c, \
+    0x40001540, 0x40001544, 0x40001548, 0x4000154c, \
+    0x40001550, 0x40001554, 0x40001558, 0x4000155c, \
+    0x40001560, 0x40001564, 0x40001568, 0x4000156c, \
+    0x40001570, 0x40001574, 0x40001578, 0x4000157c, \
     0x40001580, 0x40001584, 0x40001588, 0x4000158c, \
     0x40001590, 0x40001594, 0x40001598, 0x4000159c, \
     0x400015a0, 0x400015a4, 0x400015a8, 0x400015ac, \
@@ -1675,11 +11066,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40001630, 0x40001634, 0x40001638, 0x4000163c, \
     0x40001640, 0x40001644, 0x40001648, 0x4000164c, \
     0x40001650, 0x40001654, 0x40001658, 0x4000165c, \
-    0x40001660, 0x40001664, 0xc0001668, 0x00000006, \
-    0x00000002, 0x4000166c, 0x40001684, 0x40001670, \
-    0x40001688, 0x40001674, 0x4000168c, 0x40001678, \
-    0x40001690, 0x4000167c, 0x40001694, 0x40001680, \
-    0x40001698, 0xc000169c, 0x0000003c, 0x00000001, \
+    0x40001660, 0x40001664, 0x40001668, 0x4000166c, \
+    0x40001670, 0x40001674, 0x40001678, 0x4000167c, \
+    0x40001680, 0x40001684, 0x40001688, 0x4000168c, \
+    0x40001690, 0x40001694, 0x40001698, 0x4000169c, \
     0x400016a0, 0x400016a4, 0x400016a8, 0x400016ac, \
     0x400016b0, 0x400016b4, 0x400016b8, 0x400016bc, \
     0x400016c0, 0x400016c4, 0x400016c8, 0x400016cc, \
@@ -1695,11 +11085,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40001760, 0x40001764, 0x40001768, 0x4000176c, \
     0x40001770, 0x40001774, 0x40001778, 0x4000177c, \
     0x40001780, 0x40001784, 0x40001788, 0x4000178c, \
-    0xc0001790, 0x00000006, 0x00000002, 0x40001794, \
-    0x400017ac, 0x40001798, 0x400017b0, 0x4000179c, \
-    0x400017b4, 0x400017a0, 0x400017b8, 0x400017a4, \
-    0x400017bc, 0x400017a8, 0x400017c0, 0xc00017c4, \
-    0x0000003c, 0x00000001, 0x400017c8, 0x400017cc, \
+    0x40001790, 0x40001794, 0x40001798, 0x4000179c, \
+    0x400017a0, 0x400017a4, 0x400017a8, 0x400017ac, \
+    0x400017b0, 0x400017b4, 0x400017b8, 0x400017bc, \
+    0x400017c0, 0x400017c4, 0x400017c8, 0x400017cc, \
     0x400017d0, 0x400017d4, 0x400017d8, 0x400017dc, \
     0x400017e0, 0x400017e4, 0x400017e8, 0x400017ec, \
     0x400017f0, 0x400017f4, 0x400017f8, 0x400017fc, \
@@ -1714,11 +11103,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40001880, 0x40001884, 0x40001888, 0x4000188c, \
     0x40001890, 0x40001894, 0x40001898, 0x4000189c, \
     0x400018a0, 0x400018a4, 0x400018a8, 0x400018ac, \
-    0x400018b0, 0x400018b4, 0xc00018b8, 0x00000006, \
-    0x00000002, 0x400018bc, 0x400018d4, 0x400018c0, \
-    0x400018d8, 0x400018c4, 0x400018dc, 0x400018c8, \
-    0x400018e0, 0x400018cc, 0x400018e4, 0x400018d0, \
-    0x400018e8, 0xc00018ec, 0x0000003c, 0x00000001, \
+    0x400018b0, 0x400018b4, 0x400018b8, 0x400018bc, \
+    0x400018c0, 0x400018c4, 0x400018c8, 0x400018cc, \
+    0x400018d0, 0x400018d4, 0x400018d8, 0x400018dc, \
+    0x400018e0, 0x400018e4, 0x400018e8, 0x400018ec, \
     0x400018f0, 0x400018f4, 0x400018f8, 0x400018fc, \
     0x40001900, 0x40001904, 0x40001908, 0x4000190c, \
     0x40001910, 0x40001914, 0x40001918, 0x4000191c, \
@@ -1734,11 +11122,10 @@ typedef struct EXT_STR_h101_layout_t
     0x400019b0, 0x400019b4, 0x400019b8, 0x400019bc, \
     0x400019c0, 0x400019c4, 0x400019c8, 0x400019cc, \
     0x400019d0, 0x400019d4, 0x400019d8, 0x400019dc, \
-    0xc00019e0, 0x00000006, 0x00000002, 0x400019e4, \
-    0x400019fc, 0x400019e8, 0x40001a00, 0x400019ec, \
-    0x40001a04, 0x400019f0, 0x40001a08, 0x400019f4, \
-    0x40001a0c, 0x400019f8, 0x40001a10, 0xc0001a14, \
-    0x0000003c, 0x00000001, 0x40001a18, 0x40001a1c, \
+    0x400019e0, 0x400019e4, 0x400019e8, 0x400019ec, \
+    0x400019f0, 0x400019f4, 0x400019f8, 0x400019fc, \
+    0x40001a00, 0x40001a04, 0x40001a08, 0x40001a0c, \
+    0x40001a10, 0x40001a14, 0x40001a18, 0x40001a1c, \
     0x40001a20, 0x40001a24, 0x40001a28, 0x40001a2c, \
     0x40001a30, 0x40001a34, 0x40001a38, 0x40001a3c, \
     0x40001a40, 0x40001a44, 0x40001a48, 0x40001a4c, \
@@ -1753,11 +11140,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40001ad0, 0x40001ad4, 0x40001ad8, 0x40001adc, \
     0x40001ae0, 0x40001ae4, 0x40001ae8, 0x40001aec, \
     0x40001af0, 0x40001af4, 0x40001af8, 0x40001afc, \
-    0x40001b00, 0x40001b04, 0xc0001b08, 0x00000006, \
-    0x00000002, 0x40001b0c, 0x40001b24, 0x40001b10, \
-    0x40001b28, 0x40001b14, 0x40001b2c, 0x40001b18, \
-    0x40001b30, 0x40001b1c, 0x40001b34, 0x40001b20, \
-    0x40001b38, 0xc0001b3c, 0x0000003c, 0x00000001, \
+    0x40001b00, 0x40001b04, 0x40001b08, 0x40001b0c, \
+    0x40001b10, 0x40001b14, 0x40001b18, 0x40001b1c, \
+    0x40001b20, 0x40001b24, 0x40001b28, 0x40001b2c, \
+    0x40001b30, 0x40001b34, 0x40001b38, 0x40001b3c, \
     0x40001b40, 0x40001b44, 0x40001b48, 0x40001b4c, \
     0x40001b50, 0x40001b54, 0x40001b58, 0x40001b5c, \
     0x40001b60, 0x40001b64, 0x40001b68, 0x40001b6c, \
@@ -1773,11 +11159,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40001c00, 0x40001c04, 0x40001c08, 0x40001c0c, \
     0x40001c10, 0x40001c14, 0x40001c18, 0x40001c1c, \
     0x40001c20, 0x40001c24, 0x40001c28, 0x40001c2c, \
-    0xc0001c30, 0x00000006, 0x00000002, 0x40001c34, \
-    0x40001c4c, 0x40001c38, 0x40001c50, 0x40001c3c, \
-    0x40001c54, 0x40001c40, 0x40001c58, 0x40001c44, \
-    0x40001c5c, 0x40001c48, 0x40001c60, 0xc0001c64, \
-    0x0000003c, 0x00000001, 0x40001c68, 0x40001c6c, \
+    0x40001c30, 0x40001c34, 0x40001c38, 0x40001c3c, \
+    0x40001c40, 0x40001c44, 0x40001c48, 0x40001c4c, \
+    0x40001c50, 0x40001c54, 0x40001c58, 0x40001c5c, \
+    0x40001c60, 0x40001c64, 0x40001c68, 0x40001c6c, \
     0x40001c70, 0x40001c74, 0x40001c78, 0x40001c7c, \
     0x40001c80, 0x40001c84, 0x40001c88, 0x40001c8c, \
     0x40001c90, 0x40001c94, 0x40001c98, 0x40001c9c, \
@@ -1792,11 +11177,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40001d20, 0x40001d24, 0x40001d28, 0x40001d2c, \
     0x40001d30, 0x40001d34, 0x40001d38, 0x40001d3c, \
     0x40001d40, 0x40001d44, 0x40001d48, 0x40001d4c, \
-    0x40001d50, 0x40001d54, 0xc0001d58, 0x00000006, \
-    0x00000002, 0x40001d5c, 0x40001d74, 0x40001d60, \
-    0x40001d78, 0x40001d64, 0x40001d7c, 0x40001d68, \
-    0x40001d80, 0x40001d6c, 0x40001d84, 0x40001d70, \
-    0x40001d88, 0xc0001d8c, 0x0000003c, 0x00000001, \
+    0x40001d50, 0x40001d54, 0x40001d58, 0x40001d5c, \
+    0x40001d60, 0x40001d64, 0x40001d68, 0x40001d6c, \
+    0x40001d70, 0x40001d74, 0x40001d78, 0x40001d7c, \
+    0x40001d80, 0x40001d84, 0x40001d88, 0x40001d8c, \
     0x40001d90, 0x40001d94, 0x40001d98, 0x40001d9c, \
     0x40001da0, 0x40001da4, 0x40001da8, 0x40001dac, \
     0x40001db0, 0x40001db4, 0x40001db8, 0x40001dbc, \
@@ -1812,11 +11196,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40001e50, 0x40001e54, 0x40001e58, 0x40001e5c, \
     0x40001e60, 0x40001e64, 0x40001e68, 0x40001e6c, \
     0x40001e70, 0x40001e74, 0x40001e78, 0x40001e7c, \
-    0xc0001e80, 0x00000006, 0x00000002, 0x40001e84, \
-    0x40001e9c, 0x40001e88, 0x40001ea0, 0x40001e8c, \
-    0x40001ea4, 0x40001e90, 0x40001ea8, 0x40001e94, \
-    0x40001eac, 0x40001e98, 0x40001eb0, 0xc0001eb4, \
-    0x0000003c, 0x00000001, 0x40001eb8, 0x40001ebc, \
+    0x40001e80, 0x40001e84, 0x40001e88, 0x40001e8c, \
+    0x40001e90, 0x40001e94, 0x40001e98, 0x40001e9c, \
+    0x40001ea0, 0x40001ea4, 0x40001ea8, 0x40001eac, \
+    0x40001eb0, 0x40001eb4, 0x40001eb8, 0x40001ebc, \
     0x40001ec0, 0x40001ec4, 0x40001ec8, 0x40001ecc, \
     0x40001ed0, 0x40001ed4, 0x40001ed8, 0x40001edc, \
     0x40001ee0, 0x40001ee4, 0x40001ee8, 0x40001eec, \
@@ -1831,11 +11214,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40001f70, 0x40001f74, 0x40001f78, 0x40001f7c, \
     0x40001f80, 0x40001f84, 0x40001f88, 0x40001f8c, \
     0x40001f90, 0x40001f94, 0x40001f98, 0x40001f9c, \
-    0x40001fa0, 0x40001fa4, 0xc0001fa8, 0x00000006, \
-    0x00000002, 0x40001fac, 0x40001fc4, 0x40001fb0, \
-    0x40001fc8, 0x40001fb4, 0x40001fcc, 0x40001fb8, \
-    0x40001fd0, 0x40001fbc, 0x40001fd4, 0x40001fc0, \
-    0x40001fd8, 0xc0001fdc, 0x0000003c, 0x00000001, \
+    0x40001fa0, 0x40001fa4, 0x40001fa8, 0x40001fac, \
+    0x40001fb0, 0x40001fb4, 0x40001fb8, 0x40001fbc, \
+    0x40001fc0, 0x40001fc4, 0x40001fc8, 0x40001fcc, \
+    0x40001fd0, 0x40001fd4, 0x40001fd8, 0x40001fdc, \
     0x40001fe0, 0x40001fe4, 0x40001fe8, 0x40001fec, \
     0x40001ff0, 0x40001ff4, 0x40001ff8, 0x40001ffc, \
     0x40002000, 0x40002004, 0x40002008, 0x4000200c, \
@@ -1851,11 +11233,10 @@ typedef struct EXT_STR_h101_layout_t
     0x400020a0, 0x400020a4, 0x400020a8, 0x400020ac, \
     0x400020b0, 0x400020b4, 0x400020b8, 0x400020bc, \
     0x400020c0, 0x400020c4, 0x400020c8, 0x400020cc, \
-    0xc00020d0, 0x00000006, 0x00000002, 0x400020d4, \
-    0x400020ec, 0x400020d8, 0x400020f0, 0x400020dc, \
-    0x400020f4, 0x400020e0, 0x400020f8, 0x400020e4, \
-    0x400020fc, 0x400020e8, 0x40002100, 0xc0002104, \
-    0x0000003c, 0x00000001, 0x40002108, 0x4000210c, \
+    0x400020d0, 0x400020d4, 0x400020d8, 0x400020dc, \
+    0x400020e0, 0x400020e4, 0x400020e8, 0x400020ec, \
+    0x400020f0, 0x400020f4, 0x400020f8, 0x400020fc, \
+    0x40002100, 0x40002104, 0x40002108, 0x4000210c, \
     0x40002110, 0x40002114, 0x40002118, 0x4000211c, \
     0x40002120, 0x40002124, 0x40002128, 0x4000212c, \
     0x40002130, 0x40002134, 0x40002138, 0x4000213c, \
@@ -1870,11 +11251,10 @@ typedef struct EXT_STR_h101_layout_t
     0x400021c0, 0x400021c4, 0x400021c8, 0x400021cc, \
     0x400021d0, 0x400021d4, 0x400021d8, 0x400021dc, \
     0x400021e0, 0x400021e4, 0x400021e8, 0x400021ec, \
-    0x400021f0, 0x400021f4, 0xc00021f8, 0x00000006, \
-    0x00000002, 0x400021fc, 0x40002214, 0x40002200, \
-    0x40002218, 0x40002204, 0x4000221c, 0x40002208, \
-    0x40002220, 0x4000220c, 0x40002224, 0x40002210, \
-    0x40002228, 0xc000222c, 0x0000003c, 0x00000001, \
+    0x400021f0, 0x400021f4, 0x400021f8, 0x400021fc, \
+    0x40002200, 0x40002204, 0x40002208, 0x4000220c, \
+    0x40002210, 0x40002214, 0x40002218, 0x4000221c, \
+    0x40002220, 0x40002224, 0x40002228, 0x4000222c, \
     0x40002230, 0x40002234, 0x40002238, 0x4000223c, \
     0x40002240, 0x40002244, 0x40002248, 0x4000224c, \
     0x40002250, 0x40002254, 0x40002258, 0x4000225c, \
@@ -1890,11 +11270,10 @@ typedef struct EXT_STR_h101_layout_t
     0x400022f0, 0x400022f4, 0x400022f8, 0x400022fc, \
     0x40002300, 0x40002304, 0x40002308, 0x4000230c, \
     0x40002310, 0x40002314, 0x40002318, 0x4000231c, \
-    0xc0002320, 0x00000006, 0x00000002, 0x40002324, \
-    0x4000233c, 0x40002328, 0x40002340, 0x4000232c, \
-    0x40002344, 0x40002330, 0x40002348, 0x40002334, \
-    0x4000234c, 0x40002338, 0x40002350, 0xc0002354, \
-    0x0000003c, 0x00000001, 0x40002358, 0x4000235c, \
+    0x40002320, 0x40002324, 0x40002328, 0x4000232c, \
+    0x40002330, 0x40002334, 0x40002338, 0x4000233c, \
+    0x40002340, 0x40002344, 0x40002348, 0x4000234c, \
+    0x40002350, 0x40002354, 0x40002358, 0x4000235c, \
     0x40002360, 0x40002364, 0x40002368, 0x4000236c, \
     0x40002370, 0x40002374, 0x40002378, 0x4000237c, \
     0x40002380, 0x40002384, 0x40002388, 0x4000238c, \
@@ -1909,11 +11288,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40002410, 0x40002414, 0x40002418, 0x4000241c, \
     0x40002420, 0x40002424, 0x40002428, 0x4000242c, \
     0x40002430, 0x40002434, 0x40002438, 0x4000243c, \
-    0x40002440, 0x40002444, 0xc0002448, 0x00000006, \
-    0x00000002, 0x4000244c, 0x40002464, 0x40002450, \
-    0x40002468, 0x40002454, 0x4000246c, 0x40002458, \
-    0x40002470, 0x4000245c, 0x40002474, 0x40002460, \
-    0x40002478, 0xc000247c, 0x0000003c, 0x00000001, \
+    0x40002440, 0x40002444, 0x40002448, 0x4000244c, \
+    0x40002450, 0x40002454, 0x40002458, 0x4000245c, \
+    0x40002460, 0x40002464, 0x40002468, 0x4000246c, \
+    0x40002470, 0x40002474, 0x40002478, 0x4000247c, \
     0x40002480, 0x40002484, 0x40002488, 0x4000248c, \
     0x40002490, 0x40002494, 0x40002498, 0x4000249c, \
     0x400024a0, 0x400024a4, 0x400024a8, 0x400024ac, \
@@ -1929,11 +11307,10 @@ typedef struct EXT_STR_h101_layout_t
     0x40002540, 0x40002544, 0x40002548, 0x4000254c, \
     0x40002550, 0x40002554, 0x40002558, 0x4000255c, \
     0x40002560, 0x40002564, 0x40002568, 0x4000256c, \
-    0xc0002570, 0x00000006, 0x00000002, 0x40002574, \
-    0x4000258c, 0x40002578, 0x40002590, 0x4000257c, \
-    0x40002594, 0x40002580, 0x40002598, 0x40002584, \
-    0x4000259c, 0x40002588, 0x400025a0, 0xc00025a4, \
-    0x0000003c, 0x00000001, 0x400025a8, 0x400025ac, \
+    0x40002570, 0x40002574, 0x40002578, 0x4000257c, \
+    0x40002580, 0x40002584, 0x40002588, 0x4000258c, \
+    0x40002590, 0x40002594, 0x40002598, 0x4000259c, \
+    0x400025a0, 0x400025a4, 0x400025a8, 0x400025ac, \
     0x400025b0, 0x400025b4, 0x400025b8, 0x400025bc, \
     0x400025c0, 0x400025c4, 0x400025c8, 0x400025cc, \
     0x400025d0, 0x400025d4, 0x400025d8, 0x400025dc, \
