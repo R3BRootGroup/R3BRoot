@@ -165,7 +165,7 @@ void R3BFi4Cal2Hit::ReadGeometry(){
     position.close();
 
   }else{
-    if(position != "") 
+    if(fGeofile != "")
       LOG(ERROR) << "R3BFi4Cal2Hit NO Geometry file found : " << fGeofile << " -> Setting all to 0" << FairLogger::endl;
     else{ 
       LOG(INFO)  << "R3BFi4Cal2Hit NO Position file given :  -> Setting all to 0 " << FairLogger::endl;
@@ -183,17 +183,17 @@ void R3BFi4Cal2Hit::ReadGeometry(){
 }//Read
 
 Float_t R3BFi4Cal2Hit::ZPos(UInt_t fiber, UInt_t det_type){
-  return fRevPoint[2][det_type]+fiber*fFiber_width[det_type]*TMath::Sin(fAngle[det_type]);
+  return fRevPoint[2][det_type]+fiber*fFiber_width*TMath::Sin(fAngle[det_type]);
 }
 
 Float_t R3BFi4Cal2Hit::YPos(UInt_t fiber, UInt_t det_type){
   //might be possible from time difference not now!! also rotating the detector against each other possible
   if(det_type==1)  return -9999;
-  if(det_type==0)  return fiber*fFiber_width[det_type];//+fRevPoint[1];
+  if(det_type==0)  return fiber*fFiber_width;//+fRevPoint[1];
 }
 
 Float_t R3BFi4Cal2Hit::XPos(UInt_t fiber, UInt_t det_type){
-  if(det_type==1)  return fiber*fFiber_width[det_type-1];//*TMath::Cos(fAngle[det_type])+fRevPoint[0];
+  if(det_type==1)  return fiber*fFiber_width;//*TMath::Cos(fAngle[det_type])+fRevPoint[0];
   if(det_type==0)  return -9999;
 
 }

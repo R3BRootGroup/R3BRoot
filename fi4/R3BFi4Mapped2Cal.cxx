@@ -1,4 +1,4 @@
-3// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // -----                                                                   -----
 // -----                           R3BFi4Mapped2Cal                        -----
 // -----                    Created  21-01-2016 by R. Plag                 -----
@@ -178,7 +178,7 @@ void R3BFi4Mapped2Cal::ReadGainMatching(TString matchingfile){
   ifstream gainmatching;
   gainmatching.open(matchingfile);
   if(gainmatching.good()){
-    LOG(INFO) << "R3BFi4Mapped2Cal opening Gainmatching file : " << gainmatching << FairLogger::endl;
+    LOG(INFO) << "R3BFi4Mapped2Cal opening Gainmatching file : " << matchingfile << FairLogger::endl;
     std::string line, factor;
     int detector=0, channel=0;
     while(gainmatching.good()){
@@ -196,8 +196,8 @@ void R3BFi4Mapped2Cal::ReadGainMatching(TString matchingfile){
     gainmatching.close();
 
   }else{
-    if(gainmatching != "") 
-      LOG(ERROR) << "R3BFi4Mapped2Cal NO Gainmatching file : " << gainmatching << " -> Setting all gains equal to 1" << FairLogger::endl;
+    if(matchingfile != "")
+      LOG(ERROR) << "R3BFi4Mapped2Cal NO Gainmatching file : " << matchingfile << " -> Setting all gains equal to 1" << FairLogger::endl;
     else 
       LOG(INFO)  << "R3BFi4Mapped2Cal NO Gainmatching file :  -> Setting all gains equal to 1 " << FairLogger::endl;
     //printf("no matching-file given, the factor will be set to 1");
