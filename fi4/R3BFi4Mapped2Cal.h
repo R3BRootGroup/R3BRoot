@@ -43,7 +43,7 @@ class R3BFi4Mapped2Cal : public FairTask
     // calibration parameters, might be recreated in another way soon
     const static UInt_t fNDet = 8;
     const static UInt_t fNChannels = 16;
-    const static UInt_t fNMPPC = fNDet*fNChannels;
+    //const static UInt_t fNMPPC = fNDet*fNChannels;  // FIXME: commented out because of error with ROOT 5 dictionary
     const Float_t fTfactor = 1;
     UInt_t fMin_E = 0;
     UInt_t fMin_T = 0;
