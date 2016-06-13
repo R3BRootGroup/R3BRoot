@@ -76,6 +76,7 @@ include(R3BMacros)
 include(WriteConfigFile)
 include(Dart)
 include(CheckCompiler)
+include(WriteEnvCache)
 
 
 # R3BRoot uses from 10.08.15 C++11, so we need an compiler which supports C++11
@@ -353,3 +354,5 @@ if(NOT R3BROOT_MINIMAL)
 else(NOT R3BROOT_MINIMAL)
   WRITE_MINIMAL_CONFIG_FILE(config.sh)
 endif(NOT R3BROOT_MINIMAL)
+
+WRITE_ENV_CACHE(env_cache.sh)
