@@ -91,12 +91,12 @@ mfiData/R3BMfiPoint.cxx
 mfiData/R3BMfiDigi.cxx 
 pspData/R3BPspPoint.cxx
 pspData/R3BPspDigi.cxx
-
 neulandData/R3BNeulandUnpackData.cxx
 neulandData/R3BNeulandMappedData.cxx
 neulandData/R3BNeulandCalData.cxx
 pspData/R3BPspxMappedData.cxx
 pspData/R3BPspxCalData.cxx
+pspData/R3BPspxHitData.cxx
 losData/R3BLosMappedData.cxx
 actarData/R3BActarPoint.cxx
 losData/R3BLosCalData.cxx
@@ -106,7 +106,6 @@ tofData/R3BPaddleCalData.cxx
 fi4Data/R3BFi4MappedItem.cxx
 fi4Data/R3BFi4CalItem.cxx
 fi4Data/R3BFi4HitItem.cxx
-
 )
 
 

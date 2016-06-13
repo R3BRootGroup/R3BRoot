@@ -12,6 +12,7 @@ set(INCLUDE_DIRECTORIES
 ${R3BROOT_SOURCE_DIR}/r3bbase 
 ${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/psp
+${R3BROOT_SOURCE_DIR}/psp/par
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/calData
 # ${R3BROOT_SOURCE_DIR}/r3bdata/dchData
@@ -40,6 +41,10 @@ R3BGeoPsp.cxx
 R3BPspDigiPar.cxx
 R3BPspDigitizer.cxx   
 R3BPspxMapped2Cal.cxx
+R3BPspxCal2Hit.cxx
+par/R3BPspxMappedPar.cxx
+par/R3BPspxCalPar.cxx
+par/R3BPspxContFact.cxx
 )
 
 # fill list of header files from list of source files

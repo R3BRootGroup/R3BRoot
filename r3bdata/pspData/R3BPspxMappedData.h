@@ -1,5 +1,5 @@
-#ifndef R3BPSPXMAPPEDITEM_H
-#define R3BPSPXMAPPEDITEM_H
+#ifndef R3BPSPXMAPPEDDATA_H
+#define R3BPSPXMAPPEDDATA_H
 
 #include "TObject.h"
 
@@ -24,8 +24,8 @@ class R3BPspxMappedData : public TObject
     inline const UInt_t&  GetEnergy()   const { return fEnergy;   }
 
   private:
-	UChar_t fDetector; // 0..4
-    UChar_t fChannel;  // 0..64
+	UChar_t fDetector; // 1..5
+    UChar_t fChannel;  // 1..65
     UInt_t  fEnergy;   // 0xfff is energy data, Anything in 0xfffff000 indicates an error or overflow
 
   public:
