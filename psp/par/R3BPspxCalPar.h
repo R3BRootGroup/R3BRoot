@@ -40,10 +40,11 @@ class R3BPspxCalPar : public FairParGenericSet
     virtual ~R3BPspxCalPar();
     
     /** Getter & Setter **/
-    inline const Int_t& GetPspxParStation() const { return pspxcalparstation; }
+    inline const Int_t& GetPspxParDetector() const { return pspxcalpardetector; }
     inline const TArrayI& GetPspxParStrip() const { return pspxcalparstrip; }
     inline const TArrayI& GetPspxParOrientation() const { return pspxcalparorientation; }
     inline const TArrayF& GetPspxParGain() const { return pspxcalpargain; }
+    inline const TArrayI& GetPspxParEnergyThreshold() const { return pspxcalparenergythreshold; }
 
 
     /** Initialisation from input device**/
@@ -65,15 +66,16 @@ class R3BPspxCalPar : public FairParGenericSet
 
   private:
 
-    Int_t pspxcalparstation; //
+    Int_t pspxcalpardetector; //
     TArrayI pspxcalparstrip; //
     TArrayI pspxcalparorientation; //
     TArrayF pspxcalpargain;  //
+    TArrayI pspxcalparenergythreshold;  //
 
     R3BPspxCalPar(const R3BPspxCalPar&);
     R3BPspxCalPar& operator=(const R3BPspxCalPar&);
 
-    ClassDef(R3BPspxCalPar,1);
+    ClassDef(R3BPspxCalPar,2);
 
 
 };

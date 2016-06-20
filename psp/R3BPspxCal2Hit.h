@@ -22,6 +22,7 @@ const static Double_t strip_width=detector_length/nstrips; // in cm
 
 class TClonesArray;
 class R3BEventHeader;
+class R3BPspxHitPar;
 
 class R3BPspxCal2Hit : public FairTask
 {
@@ -30,7 +31,9 @@ class R3BPspxCal2Hit : public FairTask
     R3BPspxCal2Hit(const char* name, Int_t iVerbose);
     virtual ~R3BPspxCal2Hit();
 
-    virtual InitStatus Init();
+    virtual InitStatus Init();    
+    InitStatus ReInit();
+    void SetParContainers();
 
     virtual void Exec(Option_t* option);
 
@@ -42,15 +45,12 @@ class R3BPspxCal2Hit : public FairTask
     R3BEventHeader *fHeader;    // do we need that?
     TClonesArray* fCalItems; // holding input data
     TClonesArray* fHitItems;    // holding output data
-    TClonesArray* fCalibration; // holding slopes and offsets
     
-    // calibration parameters, might be recreated in another way soon
-    Float_t offset[length_array_detector][length_array_strip];
-    Float_t slope[length_array_detector][length_array_strip];
-    Int_t sign_x[length_array_detector];
-    Int_t sign_y[length_array_detector];
-    
-    void InitCalibration();
+    R3BPspxHitPar* fHitPar; // holding slopes and offsets
+    std::vector<vector<Float_t>> offset;
+    std::vector<vector<Float_t>> slope;
+    std::vector<Int_t> sign_x;
+    std::vector<Int_t> sign_y;
 
     // void CreateHistos();
     // void WriteHistos();

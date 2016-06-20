@@ -15,6 +15,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 ${R3BROOT_SOURCE_DIR}/r3bdata/caloData
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
+${R3BROOT_SOURCE_DIR}/r3bdata/pspData
 ${R3BROOT_SOURCE_DIR}/tcal
 )
 

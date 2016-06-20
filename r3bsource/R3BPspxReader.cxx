@@ -11,6 +11,8 @@
 extern "C" {
 #include "ext_data_client.h"
 #include "ext_h101_psp.h"
+//#include "ext_h101_psp_jun16.h"
+//#include "ext_h101.h"
 }
 
 R3BPspxReader::R3BPspxReader(EXT_STR_h101_PSP* data, UInt_t offset)
@@ -140,7 +142,7 @@ Bool_t R3BPspxReader::Read()
 */
 
 // loop over all detectors
-	for (int d=0;d<fMappedPar->GetPspxParStation();d++)
+	for (int d=0;d<fMappedPar->GetPspxParDetector();d++)
 	{
 		if (fMappedPar->GetPspxParStrip().At(d)==0) continue; // skip PSP3 (via MADC32)
 		
@@ -169,6 +171,7 @@ Bool_t R3BPspxReader::Read()
 			    //}
 			    
 			    if((energy&0x800000)) energy=energy-0x800000; //subtracting the sign bit (set to 1 for negative values)
+			    if(energy>60000) continue;
 			    
 			    new ((*fArray)[fArray->GetEntriesFast()])
 				    R3BPspxMappedData(d+1,channel,energy); // det,channel,energy counting from 1 for detectors and channels

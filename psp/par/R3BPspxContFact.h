@@ -28,7 +28,7 @@ class R3BPspxContFact : public FairContFact
     
     FairParSet* createContainer(FairContainer*);
     
-    ClassDef( R3BPspxContFact,0) // Factory for all Pspx parameter containers
+    ClassDef( R3BPspxContFact,1) // Factory for all Pspx parameter containers
 };
 
 #endif  /* !R3BPSPXCONTFACT_H */

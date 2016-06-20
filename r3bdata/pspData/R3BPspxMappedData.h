@@ -24,7 +24,7 @@ class R3BPspxMappedData : public TObject
     inline const UInt_t&  GetEnergy()   const { return fEnergy;   }
 
   private:
-	UShort_t fDetector; // 1..5
+    UShort_t fDetector; // 1..5
     UShort_t fChannel;  // 1..65
     UInt_t  fEnergy;   // 0xfff is energy data, Anything in 0xfffff000 indicates an error or overflow
 

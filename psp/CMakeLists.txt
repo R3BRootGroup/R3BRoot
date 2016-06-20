@@ -44,6 +44,7 @@ R3BPspxMapped2Cal.cxx
 R3BPspxCal2Hit.cxx
 par/R3BPspxMappedPar.cxx
 par/R3BPspxCalPar.cxx
+par/R3BPspxHitPar.cxx
 par/R3BPspxContFact.cxx
 )
 

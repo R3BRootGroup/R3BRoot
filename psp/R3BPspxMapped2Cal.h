@@ -38,10 +38,10 @@ class R3BPspxMapped2Cal : public FairTask
     R3BEventHeader *fHeader;    // do we need that?
     TClonesArray* fMappedItems; // holding input data
     TClonesArray* fCalItems;    // holding output data
-    TClonesArray* fCalibration; // holding slopes and offsets
     
-    R3BPspxCalPar* fCalPar;
+    R3BPspxCalPar* fCalPar; // holding slopes and offsets
     std::vector<vector<Float_t>> gain;
+    std::vector<vector<Int_t>> energythreshold;
 
     // void CreateHistos();
     // void WriteHistos();
