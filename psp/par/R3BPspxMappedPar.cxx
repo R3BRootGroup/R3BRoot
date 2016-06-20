@@ -26,7 +26,7 @@ R3BPspxMappedPar::R3BPspxMappedPar(const char* name,
     const char* context)
   : FairParGenericSet(name, title, context),
     pspxmappedparstrip(),
-    pspxmappedparstation(-1)
+    pspxmappedpardetector(-1)
 {
   detName="Pspx";
   //  ftutdetdigipar= new TArrayF(10);
@@ -58,7 +58,7 @@ void R3BPspxMappedPar::printparams()
 {
 
   LOG(INFO) <<"Print"<<FairLogger::endl;
-  LOG(INFO) << "pspxmappedparstation: " << pspxmappedparstation 
+  LOG(INFO) << "pspxmappedpardetector: " << pspxmappedpardetector 
 	    << FairLogger::endl;
   Int_t size =  pspxmappedparstrip.GetSize();
   LOG(INFO) <<"size: " << size << FairLogger::endl;
@@ -75,8 +75,8 @@ void R3BPspxMappedPar::putParams(FairParamList* l)
   LOG(INFO) << "I am in R3BPspxMappedPar::putParams " 
 	    << FairLogger::endl;
   if (!l) { return; }
-  l->add("R3BPspxMappedStations", pspxmappedparstation);
-  l->add("R3BPspxMappedStripsPerStation", pspxmappedparstrip);
+  l->add("R3BPspxMappedDetectors", pspxmappedpardetector);
+  l->add("R3BPspxMappedStripsPerDetector", pspxmappedparstrip);
   
 }
 
@@ -90,10 +90,10 @@ Bool_t R3BPspxMappedPar::getParams(FairParamList* l)
 	    << FairLogger::endl;
 
   if (!l) { return kFALSE; }
-  if ( ! l->fill("R3BPspxMappedStations", &pspxmappedparstation) ) { return kFALSE; }
-  pspxmappedparstrip.Set(pspxmappedparstation);
+  if ( ! l->fill("R3BPspxMappedDetectors", &pspxmappedpardetector) ) { return kFALSE; }
+  pspxmappedparstrip.Set(pspxmappedpardetector);
 
-  if ( ! l->fill("R3BPspxMappedStripsPerStation", &pspxmappedparstrip) ) { return kFALSE; }
+  if ( ! l->fill("R3BPspxMappedStripsPerDetector", &pspxmappedparstrip) ) { return kFALSE; }
 
   return kTRUE;
 }

@@ -16,7 +16,7 @@
 
 #include "R3BPspxMappedPar.h"
 #include "R3BPspxCalPar.h"
-//#include "R3BPspxHitPar.h"
+#include "R3BPspxHitPar.h"
 
 #include "FairRuntimeDb.h"
 
@@ -49,21 +49,22 @@ void R3BPspxContFact::setAllContainers()
 
   containers->Add(p1);
 
+  
   FairContainer* p2= new FairContainer("R3BPspxCalPar",
-                                       "Tutorial Cal Parameters",
+                                       "R3BPspx Cal Parameters",
                                        "TestDefaultContext");
   p2->addContext("TestNonDefaultContext");
 
   containers->Add(p2);
   
- /* 
+  
   FairContainer* p3= new FairContainer("R3BPspxHitPar",
-                                       "Tutorial Det Digi Parameters",
+                                       "R3BPspx Hit Parameters",
                                        "TestDefaultContext");
   p3->addContext("TestNonDefaultContext");
 
   containers->Add(p3);
-  */
+  
 }
 
 FairParSet* R3BPspxContFact::createContainer(FairContainer* c)
@@ -83,11 +84,10 @@ FairParSet* R3BPspxContFact::createContainer(FairContainer* c)
     p=new R3BPspxCalPar(c->getConcatName().Data(),
                                   c->GetTitle(),c->getContext());
   }
-  /*
   if (strcmp(name,"R3BPspxHitPar")==0) {
     p=new R3BPspxHitPar(c->getConcatName().Data(),
                                   c->GetTitle(),c->getContext());
   }
-  */
+  
   return p;
 }

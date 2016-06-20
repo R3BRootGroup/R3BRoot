@@ -15,6 +15,8 @@
 #include "R3BLosMappedData.h"
 #include "R3BPaddleTamexMappedData.h"
 #include "R3BPaddleCalData.h"
+#include "R3BPspxMappedData.h"
+#include "R3BPspxCalData.h"
 #include "R3BEventHeader.h"
 #include "R3BTCalEngine.h"
 
@@ -36,8 +38,10 @@ R3BOnlineSpectra::R3BOnlineSpectra()
     : FairTask("OnlineSpectra", 1)
     , fCalItemsLos(NULL)
     , fCalItemsTofd(NULL)
+    , fCalItemsPspx(NULL)
     , fMappedItemsLos(NULL)
     , fMappedItemsTofd(NULL)
+    , fMappedItemsPspx(NULL)
     , fTrigger(-1)
     , fNofPlanes(4)  
     , fPaddlesPerPlane(6)    
@@ -53,8 +57,10 @@ R3BOnlineSpectra::R3BOnlineSpectra(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fCalItemsLos(NULL)
     , fCalItemsTofd(NULL)
+    , fCalItemsPspx(NULL)
     , fMappedItemsLos(NULL)
     , fMappedItemsTofd(NULL)
+    , fMappedItemsPspx(NULL)
     , fTrigger(-1)
     , fNofPlanes(4)  
     , fPaddlesPerPlane(6)    
@@ -159,8 +165,7 @@ InitStatus R3BOnlineSpectra::Init()
     fh_cherenkovLos1 = new TH1F("cherenkovLos1", "Cherenkov 1 - Los", 10000, -100., 100.); 
     fh_cherenkovLos2 = new TH1F("cherenkovLos2", "Cherenkov 2 - Los", 10000, -100., 100.); 
     fh_cherenkovLos3 = new TH1F("cherenkovLos3", "Cherenkov average - Los", 10000, -100., 100.); 
-    
-    
+   
     cCherenkov->cd(1);
     fh_cherenkovLos1->Draw();
     cCherenkov->cd(2);
@@ -170,6 +175,129 @@ InitStatus R3BOnlineSpectra::Init()
     cCherenkov->cd(0);
     run->AddObject(cCherenkov);
 
+    // Pspx Data
+    fMappedItemsPspx = (TClonesArray*)mgr->GetObject("PspxMappedData");
+    fCalItemsPspx = (TClonesArray*)mgr->GetObject("PspxCalData");
+    
+    for(UInt_t i=0;i<4;i++){
+          fh_pspx_strips_psp[i] = new TH1F(Form("pspx_strips_psp%d",i), Form("Pspx strips PSP %d",i+1), 16, 1, 17); 
+    
+	  fh_pspx_energy_psp[i] = new TH1F(Form("pspx_energy_psp%d",i), Form("Pspx cathode energy PSP %d",i+1), 200, 0, 35000); 
+	  
+	  fh_pspx_multiplicity_psp[i] = new TH1F(Form("pspx_multiplicity_psp%d",i), Form("Pspx multiplicity PSP %d",i+1), 10, 0, 10); 
+    }
+    
+    fh_pspx_strips_psp[0]->GetXaxis()->SetTitle("y position / strips with 3mm width");
+    fh_pspx_strips_psp[1]->GetXaxis()->SetTitle("x position / strips with 3mm width");
+    fh_pspx_strips_psp[2]->GetXaxis()->SetTitle("y position / strips with 3mm width");
+    fh_pspx_strips_psp[3]->GetXaxis()->SetTitle("x position / strips with 3mm width"); 
+    
+    fh_pspx_pos1_strips = new TH2F("pspx_pos1_strips", "Pspx Position1", 16, 1, 17,16,1,17); 
+    fh_pspx_pos2_strips = new TH2F("pspx_pos2_strips", "Pspx Position2", 16, 1, 17,16,1,17);  
+    
+    fh_pspx_pos1_strips->GetYaxis()->SetTitle("y position / strips with 3mm width");
+    fh_pspx_pos1_strips->GetXaxis()->SetTitle("x position / strips with 3mm width"); 
+    fh_pspx_pos2_strips->GetYaxis()->SetTitle("y position / strips with 3mm width");
+    fh_pspx_pos2_strips->GetXaxis()->SetTitle("x position / strips with 3mm width");
+    
+    fh_pspx_pos1_energy = new TH2F("pspx_pos1_energy", "Pspx Position1", 32, -1, 1,32,-1,1); 
+    fh_pspx_pos2_energy = new TH2F("pspx_pos2_energy", "Pspx Position2", 32, -1, 1,32,-1,1);  
+    
+    fh_pspx_pos1_energy->GetYaxis()->SetTitle("y position / a.u.");
+    fh_pspx_pos1_energy->GetXaxis()->SetTitle("x position / a.u."); 
+    fh_pspx_pos2_energy->GetYaxis()->SetTitle("y position / a.u.");
+    fh_pspx_pos2_energy->GetXaxis()->SetTitle("x position / a.u.");
+    
+    
+    fh_pspx_cor_x_strips = new TH2F("pspx_cor_x_strips", "Pspx Position1", 16, 1, 17,16,1,17); 
+    fh_pspx_cor_y_strips = new TH2F("pspx_cor_y_strips", "Pspx Position2", 16, 1, 17,16,1,17);  
+    
+    fh_pspx_cor_x_strips->GetYaxis()->SetTitle("x position / strips with 3mm width");
+    fh_pspx_cor_x_strips->GetXaxis()->SetTitle("x position / strips with 3mm width"); 
+    fh_pspx_cor_y_strips->GetYaxis()->SetTitle("y position / strips with 3mm width");
+    fh_pspx_cor_y_strips->GetXaxis()->SetTitle("y position / strips with 3mm width");
+    
+    fh_pspx_cor_x_energy = new TH2F("pspx_cor_x_energy", "Pspx Position1", 32, -1, 1,32,-1,1); 
+    fh_pspx_cor_y_energy = new TH2F("pspx_cor_y_energy", "Pspx Position2", 32, -1, 1,32,-1,1);  
+    
+    fh_pspx_cor_x_energy->GetYaxis()->SetTitle("x position / a.u.");
+    fh_pspx_cor_x_energy->GetXaxis()->SetTitle("x position / a.u."); 
+    fh_pspx_cor_y_energy->GetYaxis()->SetTitle("y position / a.u.");
+    fh_pspx_cor_y_energy->GetXaxis()->SetTitle("y position / a.u.");
+    
+    TCanvas *cpspx_position = new TCanvas("pspx_position", "pspx_position", 10, 10, 500, 500);
+    cpspx_position->Divide(2, 2);
+    
+    cpspx_position->cd(1);
+    fh_pspx_pos1_strips->Draw();
+    cpspx_position->cd(2);
+    fh_pspx_pos2_strips->Draw();
+    cpspx_position->cd(3);
+    fh_pspx_pos1_energy->Draw();
+    cpspx_position->cd(4);
+    fh_pspx_pos2_energy->Draw();
+    cpspx_position->cd(0);
+    run->AddObject(cpspx_position);
+    
+    
+    TCanvas *cpspx_strips = new TCanvas("pspx_strips", "pspx_strips", 10, 10, 500, 500);
+    cpspx_strips->Divide(2, 2);
+    
+    cpspx_strips->cd(1);
+    fh_pspx_strips_psp[0]->Draw();
+    cpspx_strips->cd(2);
+    fh_pspx_strips_psp[1]->Draw();
+    cpspx_strips->cd(3);
+    fh_pspx_strips_psp[2]->Draw();
+    cpspx_strips->cd(4);
+    fh_pspx_strips_psp[3]->Draw();
+    cpspx_strips->cd(0);
+    run->AddObject(cpspx_strips);
+    
+    
+    TCanvas *cpspx_energy = new TCanvas("pspx_energy", "pspx_energy", 10, 10, 500, 500);
+    cpspx_energy->Divide(2, 2);
+    
+    cpspx_energy->cd(1);
+    fh_pspx_energy_psp[0]->Draw();
+    cpspx_energy->cd(2);
+    fh_pspx_energy_psp[1]->Draw();
+    cpspx_energy->cd(3);
+    fh_pspx_energy_psp[2]->Draw();
+    cpspx_energy->cd(4);
+    fh_pspx_energy_psp[3]->Draw();
+    cpspx_energy->cd(0);
+    run->AddObject(cpspx_energy);
+    
+    
+    TCanvas *cpspx_multiplicity = new TCanvas("pspx_multiplicity", "pspx_multiplicity", 10, 10, 500, 500);
+    cpspx_multiplicity->Divide(2, 2);
+    
+    cpspx_multiplicity->cd(1);
+    fh_pspx_multiplicity_psp[0]->Draw();
+    cpspx_multiplicity->cd(2);
+    fh_pspx_multiplicity_psp[1]->Draw();
+    cpspx_multiplicity->cd(3);
+    fh_pspx_multiplicity_psp[2]->Draw();
+    cpspx_multiplicity->cd(4);
+    fh_pspx_multiplicity_psp[3]->Draw();
+    cpspx_multiplicity->cd(0);
+    run->AddObject(cpspx_energy);
+    
+    TCanvas *cpspx_cor = new TCanvas("pspx_cor", "pspx_cor", 10, 10, 500, 500);
+    cpspx_cor->Divide(2, 2);
+    
+    cpspx_cor->cd(1);
+    fh_pspx_cor_x_strips->Draw();
+    cpspx_cor->cd(2);
+    fh_pspx_cor_y_strips->Draw();
+    cpspx_cor->cd(3);
+    fh_pspx_cor_x_energy->Draw();
+    cpspx_cor->cd(4);
+    fh_pspx_cor_y_energy->Draw();
+    cpspx_strips->cd(0);
+    run->AddObject(cpspx_cor);
+    
     return kSUCCESS;
 }
 
@@ -256,11 +384,10 @@ void R3BOnlineSpectra::Exec(Option_t* option)
           if(iSide==1)fh_tofd_channels[iPlane-1]->Fill(iBar);			         
           if(iSide==2)fh_tofd_channels[iPlane-1]->Fill(-iBar-1);			         
         }
-
-	
-      }		  
+      }
     }
 
+    
     if(fCalItemsTofd)
     {
       Double_t tot1=0.;
@@ -319,6 +446,106 @@ void R3BOnlineSpectra::Exec(Option_t* option)
       }	
 
    }
+
+    if(fCalItemsPspx)
+    {      
+      Int_t nHits = fCalItemsPspx->GetEntriesFast();    
+      Double_t max_energy1[4] = {0,0,0,0};
+      Double_t max_energy2[4] = {0,0,0,0};
+      Double_t max_strip[4] = {0,0,0,0};
+      
+      for (Int_t ihit = 0; ihit < nHits; ihit++)     
+      {
+	R3BPspxCalData *calData = (R3BPspxCalData*)fCalItemsPspx->At(ihit);
+	if(calData->GetEnergy1()>max_energy1[calData->GetDetector()-1] && calData->GetStrip()!=17){
+	  max_energy1[calData->GetDetector()-1]=calData->GetEnergy1();
+	  max_energy2[calData->GetDetector()-1]=calData->GetEnergy2();
+	  max_strip[calData->GetDetector()-1]=calData->GetStrip();
+	} 
+	
+	
+	if(calData->GetDetector()==1){
+	  if(calData->GetStrip()==17){
+	    fh_pspx_energy_psp[0]->Fill(calData->GetEnergy1());  
+	  }
+	} else if(calData->GetDetector()==2){
+	  if(calData->GetStrip()==17){
+	    fh_pspx_energy_psp[1]->Fill(calData->GetEnergy1());  
+	  }
+	} else if(calData->GetDetector()==3){ 
+	  if(calData->GetStrip()==17){
+	    fh_pspx_energy_psp[2]->Fill(calData->GetEnergy1());  
+	  }
+	} else if(calData->GetDetector()==4){
+	  if(calData->GetStrip()==17){
+	    fh_pspx_energy_psp[3]->Fill(calData->GetEnergy1());  
+	  }
+	} 
+      }
+      
+      fh_pspx_strips_psp[0]->Fill(max_strip[0]);  
+      fh_pspx_strips_psp[1]->Fill(max_strip[1]);  
+      fh_pspx_strips_psp[2]->Fill(max_strip[2]);  
+      fh_pspx_strips_psp[3]->Fill(max_strip[3]);  
+      
+      if(max_energy1[0]!=0 && max_energy1[1]!=0){
+	  fh_pspx_pos1_strips->Fill(max_strip[1],max_strip[0]); 
+	  if(max_energy2[0]!=0 && max_energy2[1]!=0){
+	      fh_pspx_pos1_energy->Fill(-(max_energy1[0]-max_energy2[0])/(max_energy1[0]+max_energy2[0]),(max_energy1[1]-max_energy2[1])/(max_energy1[1]+max_energy2[1]));
+	  }
+      }
+      if(max_energy1[2]!=0 && max_energy1[3]!=0){
+	  fh_pspx_pos2_strips->Fill(max_strip[3],max_strip[2]);
+	  if(max_energy2[2]!=0 && max_energy2[3]!=0){
+	      fh_pspx_pos2_energy->Fill(-(max_energy1[2]-max_energy2[2])/(max_energy1[2]+max_energy2[2]),-(max_energy1[3]-max_energy2[3])/(max_energy1[3]+max_energy2[3]));
+	  }
+      }
+      
+      if(max_energy1[1]!=0 && max_energy1[3]!=0){
+	  fh_pspx_cor_x_strips->Fill(max_strip[1],max_strip[3]);
+	  if(max_energy2[1]!=0 && max_energy2[3]!=0){
+	      fh_pspx_cor_x_energy->Fill(-(max_energy1[1]-max_energy2[1])/(max_energy1[1]+max_energy2[1]),-(max_energy1[3]-max_energy2[3])/(max_energy1[3]+max_energy2[3]));
+	  }
+      }
+      if(max_energy1[0]!=0 && max_energy1[2]!=0){
+	  fh_pspx_cor_y_strips->Fill(max_strip[0],max_strip[2]);
+	  if(max_energy2[0]!=0 && max_energy2[2]!=0){
+	      fh_pspx_cor_y_energy->Fill(-(max_energy1[0]-max_energy2[0])/(max_energy1[0]+max_energy2[0]),-(max_energy1[2]-max_energy2[2])/(max_energy1[2]+max_energy2[2]));
+	  }
+      }
+      
+    }
+
+   
+    if(fMappedItemsPspx)
+    {
+      Int_t mult1=0;
+      Int_t mult2=0;
+      Int_t mult3=0;
+      Int_t mult4=0;
+      
+      Int_t nHits = fMappedItemsPspx->GetEntriesFast();    
+      
+      for (Int_t ihit = 0; ihit < nHits; ihit++)     
+      {
+	R3BPspxMappedData *mappedData = (R3BPspxMappedData*)fMappedItemsPspx->At(ihit);
+	if(mappedData->GetDetector()==1){
+	  mult1++;
+	} else if(mappedData->GetDetector()==2){
+	  mult2++;
+	} else if(mappedData->GetDetector()==3){
+	  mult3++;
+	} else if(mappedData->GetDetector()==4){
+	  mult4++;
+	} 
+	
+      }
+      fh_pspx_multiplicity_psp[0]->Fill(mult1);
+      fh_pspx_multiplicity_psp[1]->Fill(mult2);
+      fh_pspx_multiplicity_psp[2]->Fill(mult3);
+      fh_pspx_multiplicity_psp[3]->Fill(mult4);
+      
+    }
  
 }
 
@@ -339,6 +566,14 @@ void R3BOnlineSpectra::FinishEvent()
     if (fMappedItemsTofd)
     {
         fMappedItemsTofd->Clear();
+    }
+    if (fMappedItemsPspx)
+    {
+        fMappedItemsPspx->Clear();
+    }
+    if (fMappedItemsPspx)
+    {
+        fMappedItemsPspx->Clear();
     }
 
 }

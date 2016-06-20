@@ -1,9 +1,9 @@
 #################################################################
-# Mapping parameter for Pspx
+# MAPPED parameter for Pspx
 #################################################################
-[R3BPspxMappingPar]
+[R3BPspxMappedPar]
 //-------------------------------------------------------------
-R3BPspxMappingStations: Int_t 5
-R3BPspxMappingStripsPerStation: Int_t \ 
-16  16  0  16  16
+R3BPspxMappedDetectors: Int_t 4
+R3BPspxMappedStripsPerDetector: Int_t \ 
+16  16  16  16
 #################################################

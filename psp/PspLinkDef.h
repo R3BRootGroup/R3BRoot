@@ -14,6 +14,7 @@
 #pragma link C++ class R3BPspxCal2Hit+;
 #pragma link C++ class R3BPspxMappedPar+;
 #pragma link C++ class R3BPspxCalPar+;
+#pragma link C++ class R3BPspxHitPar+;
 #pragma link C++ class R3BPspxContFact+;
 
 #endif

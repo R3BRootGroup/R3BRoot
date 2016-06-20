@@ -40,7 +40,7 @@ class R3BPspxMappedPar : public FairParGenericSet
     virtual ~R3BPspxMappedPar();
     
     /** Getter & Setter **/
-    inline const Int_t& GetPspxParStation() const { return pspxmappedparstation; }
+    inline const Int_t& GetPspxParDetector() const { return pspxmappedpardetector; }
     inline const TArrayI& GetPspxParStrip() const { return pspxmappedparstrip; }
 
 
@@ -64,7 +64,7 @@ class R3BPspxMappedPar : public FairParGenericSet
   private:
 
     TArrayI pspxmappedparstrip; //
-    Int_t pspxmappedparstation; //
+    Int_t pspxmappedpardetector; //
 
     R3BPspxMappedPar(const R3BPspxMappedPar&);
     R3BPspxMappedPar& operator=(const R3BPspxMappedPar&);

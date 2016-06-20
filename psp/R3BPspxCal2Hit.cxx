@@ -6,29 +6,27 @@
 // -----------------------------------------------------------------------------
 /* Convert Cal data to Hit data, meaning: calculating uv (internal) and
  * xy (external) coordinates for every event.
- * 
- * TODO replace 17 with nstrips+1
  */
 
 #include <iostream>
 using namespace std;
 
 #include "TClonesArray.h"
-
 #include "FairRootManager.h"
+#include "FairRuntimeDb.h"
 #include "FairRunOnline.h"
 #include "FairLogger.h"
 
 #include "R3BEventHeader.h"
 #include "R3BPspxCalData.h"
 #include "R3BPspxHitData.h"
+#include "R3BPspxHitPar.h"
 #include "R3BPspxCal2Hit.h"
 
 R3BPspxCal2Hit::R3BPspxCal2Hit()
     : fCalItems(NULL)
     , fHitItems(new TClonesArray("R3BPspxHitData"))
 {
-  InitCalibration();
 }
 
 R3BPspxCal2Hit::R3BPspxCal2Hit(const char* name, Int_t iVerbose)
@@ -36,7 +34,6 @@ R3BPspxCal2Hit::R3BPspxCal2Hit(const char* name, Int_t iVerbose)
     , fCalItems(NULL)
     , fHitItems(new TClonesArray("R3BPspxHitData"))
 {
-  InitCalibration();
 }
 
 R3BPspxCal2Hit::~R3BPspxCal2Hit()
@@ -54,11 +51,101 @@ InitStatus R3BPspxCal2Hit::Init()
 		return kFATAL;
 	}
     //fHitItems = (TClonesArray*)fMan->GetObject("R3BPspxHitData");
-    fCalibration = NULL; // care about that later
     FairRootManager::Instance()->Register("PspxHitData", "Land", fHitItems, kTRUE);
 
+    //fHitPar->printparams();
+    
+    //Initialisation of gain parameters
+    offset.resize(fHitPar->GetPspxParDetector());
+    slope.resize(fHitPar->GetPspxParDetector());
+    for(Int_t i=0; i<fHitPar->GetPspxParDetector();i++){
+	offset[i].resize(fHitPar->GetPspxParStrip().At(i));
+	slope[i].resize(fHitPar->GetPspxParStrip().At(i));
+    }
+    Int_t start_detector = 0; // entries, not lines
+    for(Int_t i=0; i<offset.size();i++){ //detectors
+      for(Int_t j=0; j<offset[i].size();j++){ //strips	  
+	  offset[i][j]=fHitPar->GetPspxParLinearParam().At(start_detector+3+j*3);
+	  slope[i][j]=fHitPar->GetPspxParLinearParam().At(start_detector+4+j*3);
+      }
+      start_detector = start_detector + 2 + 3*fHitPar->GetPspxParStrip().At(i);
+    }
+    LOG(INFO) << "R3BPspxCal2Hit :: Init() " << FairLogger::endl;
+    for(Int_t i=0; i<fHitPar->GetPspxParDetector();i++){
+      for(Int_t j=0; j<offset[i].size();j++){
+	LOG(INFO) << "offset["<<i<<"][" <<j<<"]=" << offset[i][j]    << FairLogger::endl;
+	LOG(INFO) << "slope["<<i<<"][" <<j<<"]=" << slope[i][j]    << FairLogger::endl;
+      }
+    }
+    //remain from initcalibration
+    sign_x.resize(fHitPar->GetPspxParDetector());
+    sign_y.resize(fHitPar->GetPspxParDetector());
+    for(UInt_t i=0;i<fHitPar->GetPspxParDetector();i++){	
+      sign_x[i]=fHitPar->GetPspxParOrientationXSign().At(i);
+      sign_y[i]=fHitPar->GetPspxParOrientationYSign().At(i);
+    }
+    
+    for(Int_t i=0; i<fHitPar->GetPspxParDetector();i++){
+      LOG(INFO) << "sign_x["<<i<<"]=" << sign_x[i]    << FairLogger::endl;
+      LOG(INFO) << "sign_y["<<i<<"]=" << sign_y[i]    << FairLogger::endl;
+    }
+         
+    
     return kSUCCESS;
 }
+
+
+// ----  Initialisation  ----------------------------------------------
+void R3BPspxCal2Hit::SetParContainers()
+{
+  LOG(INFO) << "R3BPspxCal2Hit :: SetParContainers() " 
+	    << FairLogger::endl;
+
+  fHitPar = (R3BPspxHitPar*) FairRuntimeDb::instance()->getContainer("R3BPspxHitPar");
+	    
+  // Get Base Container
+  //FairRunAna* ana = FairRunAna::Instance();
+  //FairRuntimeDb* rtdb=ana->GetRuntimeDb();
+
+  //fHitPar = (R3BPspxHitPar*) (rtdb->getContainer("R3BPspxHitPar"));
+  
+  if (!fHitPar)
+  {
+         LOG(ERROR) << "Could not get access to R3BPspxHitPar-Container." << FairLogger::endl;
+         return;
+  }
+
+  fHitPar->printparams();
+}
+// --------------------------------------------------------------------
+
+
+// ---- ReInit  -------------------------------------------------------
+InitStatus R3BPspxCal2Hit::ReInit()
+{
+
+  LOG(INFO) << " R3BPspxCal2Hit :: ReInit() " 
+	    << FairLogger::endl;
+
+
+  //FairRunAna* ana = FairRunAna::Instance();
+  //FairRuntimeDb* rtdb=ana->GetRuntimeDb();
+
+  //fDigiPar = (FairTutorialDet2DigiPar*) (rtdb->getContainer("FairTutorialDet2DigiPar"));
+
+  fHitPar = (R3BPspxHitPar*) FairRuntimeDb::instance()->getContainer("R3BPspxHitPar");
+ 
+  if (!fHitPar)
+  {
+         LOG(ERROR) << "Could not get access to R3BPspxHitPar-Container." << FairLogger::endl;
+         return kFATAL;
+  }
+	    
+  return kSUCCESS;
+}
+
+
+
 
 void R3BPspxCal2Hit::Exec(Option_t* option)
 {
@@ -74,105 +161,220 @@ void R3BPspxCal2Hit::Exec(Option_t* option)
     Float_t x;
     Float_t y;
     Float_t energy;
-    UInt_t mult[length_array_detector];
-    UInt_t strip_mult[length_array_detector];
+    
+    UInt_t x_mult[fHitPar->GetPspxParDetector()];
+    UInt_t y_mult[fHitPar->GetPspxParDetector()];
+    UInt_t e_mult[fHitPar->GetPspxParDetector()];
+    
+    UInt_t nstrips;
+    UInt_t strip;
+    UInt_t strip1;
+    UInt_t strip2;
                    
-    for(UInt_t j = 0; j<length_array_detector;j++){
-	mult[j]=0;
-	strip_mult[j]=0;
+    for(UInt_t j = 0; j<fHitPar->GetPspxParDetector();j++){
+	x_mult[j]=0;
+	y_mult[j]=0;
+	e_mult[j]=0;
     }
 
     Int_t nMapped = fCalItems->GetEntries();
     
-    
     // calculationg multiplicities
     for (Int_t i = 0; i < nMapped; i++) 
     {
+	  strip=0;
 	  R3BPspxCalData* mItem = (R3BPspxCalData*)fCalItems->At(i);
+	  strip=mItem->GetStrip();
+	  UInt_t detector=mItem->GetDetector();
 	    
 	  // calculating multiplicity
-          if(mItem->GetStrip()!=17){
-	    strip_mult[mItem->GetDetector()]++;
+	  if(strip>0 && strip<fHitPar->GetPspxParStrip().At(detector-1)+1){
+	    if(mItem->GetEnergy1()!=0){
+	      y_mult[detector-1]++;
+	    }
+	    if(mItem->GetEnergy2()!=0){
+	      y_mult[detector-1]++;
+	    }
+	  } else if(strip>fHitPar->GetPspxParStrip().At(detector-1) && strip<fHitPar->GetPspxParStrip().At(detector-1)*2+1){
+	    if(mItem->GetEnergy1()!=0){
+	      x_mult[detector-1]++;
+	    }
+	    if(mItem->GetEnergy2()!=0){
+	      x_mult[detector-1]++;
+	    }
+	  } else if(strip==fHitPar->GetPspxParStrip().At(detector-1)*2+1){
+	    if(mItem->GetEnergy1()!=0){
+	      e_mult[detector-1]++;
+	    }
 	  }
-	  mult[mItem->GetDetector()]++;
-	  if(mItem->GetEnergy2()!=0){
-	    mult[mItem->GetDetector()]++;
-	  }
-
     }
 
     // calculating positions for each detector
-    for(UInt_t detector = 1; detector<length_array_detector;detector++){
-      if(mult[detector]!=0){ // if nothing hit invalid
-	  u=0;
-	  v=0;
-	  x=0;
-	  y=0;
-	  energy=0;
-	  // 1 strip (2 channels) + cathode hit
-	  if(mult[detector]==3 && strip_mult[detector]==1){
-	    for(Int_t i = 0; i < nMapped; i++){
+    for(UInt_t detector = 0; detector<fHitPar->GetPspxParDetector();detector++){
+      if(x_mult[detector]==0 && y_mult[detector]==0 && e_mult[detector]==0) continue;
+      
+      u=0;
+      v=0;
+      x=0;
+      y=0;
+      energy=0;
+      
+      // 1 strip x direction
+      if(x_mult[detector]==2){
+	
+	for(Int_t i = 0; i < nMapped; i++){
 	       R3BPspxCalData* mItem = (R3BPspxCalData*)fCalItems->At(i);
 	       
-	       if(detector==mItem->GetDetector()){
-		  if(mItem->GetStrip()==17) energy=mItem->GetEnergy1();
-		  else if(mItem->GetStrip()>0 && mItem->GetStrip()<17){
-		      if(detector==4){//vertical detector (s438b: detector 4)
-			  u=(mItem->GetStrip()-nstrips/2.-0.5)/(nstrips/2.);
-			  v=(mItem->GetEnergy1()-mItem->GetEnergy2())/(mItem->GetEnergy1()+mItem->GetEnergy2());
-			  
-			  x=sign_x[detector]*u*detector_length/2.;
-			  y=offset[detector][mItem->GetStrip()]+slope[detector][mItem->GetStrip()]*v;
-		      }
-		      if(detector==5){//horizontal detector (s438b: detector 5)
-			  u=(mItem->GetEnergy1()-mItem->GetEnergy2())/(mItem->GetEnergy1()+mItem->GetEnergy2());
-			  v=(mItem->GetStrip()-nstrips/2.-0.5)/(nstrips/2.);
-					  
-			  x=offset[detector][mItem->GetStrip()]+slope[detector][mItem->GetStrip()]*u;
-			  y=sign_y[detector]*v*detector_length/2.;
-		      }
-		  }
-	      }
-	    }
-	  }
-
-	  // 2 strips (4 channels) + cathode hit
-	  if(mult[detector]==5 && strip_mult[detector]==2){
-	    for(Int_t i = 0; i < nMapped; i++){
-		R3BPspxCalData* mItem1 = (R3BPspxCalData*)fCalItems->At(i);
-		
-		if(mItem1->GetDetector()==detector){
-		  if(mItem1->GetStrip()==17) energy=mItem1->GetEnergy1();
-		  else{
-		    for(Int_t j = i+1; j < nMapped; j++){ // start with i+1 to avoid double counting of pairs
-		      R3BPspxCalData* mItem2 = (R3BPspxCalData*)fCalItems->At(j);
-		      
-		      if(mItem2->GetDetector()==detector && (mItem1->GetStrip()==mItem2->GetStrip()+1 || mItem1->GetStrip()==mItem2->GetStrip()-1) && mItem2->GetStrip()!=17){
-			if(detector==4){//vertical detector (s438b: detector 4)
-			    u=((mItem1->GetStrip()+mItem2->GetStrip())/2.-nstrips/2.-0.5)/(nstrips/2.);
-			    v=((mItem1->GetEnergy1()+mItem2->GetEnergy1())-(mItem1->GetEnergy2()+mItem2->GetEnergy2()))/(mItem1->GetEnergy1()+mItem2->GetEnergy1()+mItem1->GetEnergy2()+mItem2->GetEnergy2());
-			    
-			    x=sign_x[detector]*u*detector_length/2.;
-			    y=(offset[detector][mItem1->GetStrip()]+offset[detector][mItem2->GetStrip()])/2.+(slope[detector][mItem1->GetStrip()]+slope[detector][mItem2->GetStrip()])/2.*v;
-			}
-			if(detector==5){//horizontal detector (s438b: detector 5)
-			    u=((mItem1->GetEnergy1()+mItem2->GetEnergy1())-(mItem1->GetEnergy2()+mItem2->GetEnergy2()))/(mItem1->GetEnergy1()+mItem2->GetEnergy1()+mItem1->GetEnergy2()+mItem2->GetEnergy2());
-			    v=((mItem1->GetStrip()+mItem2->GetStrip())/2.-nstrips/2.-0.5)/(nstrips/2.);
-					    
-			    x=(offset[detector][mItem1->GetStrip()]+offset[detector][mItem2->GetStrip()])/2.+(slope[detector][mItem1->GetStrip()]+slope[detector][mItem2->GetStrip()])/2.*v;
-			    y=sign_y[detector]*v*detector_length/2.;
-			}		      
-		      }
-		    }
-		  }
-		}
-	    }
-	  }	
-
-	  if(energy!=0){
-	    new ((*fHitItems)[fHitItems->GetEntriesFast()]) R3BPspxHitData(detector,u,v,x,y,energy,mult[detector]); // det,u,v,x,y,energy, multiplicity
-	  }
+	       if(detector+1==mItem->GetDetector()){
+		 nstrips=fHitPar->GetPspxParStrip().At(detector);
+		 strip=mItem->GetStrip();
+		 
+		 // energy
+		 if(e_mult[detector]==1 && strip==nstrips*2+1){
+		  energy=mItem->GetEnergy1();
+		 } else if(e_mult[detector]==0 && strip>nstrips && strip<nstrips*2+1){
+		  energy=mItem->GetEnergy1()+mItem->GetEnergy2();
+		 }
+		 
+		 //position
+		 if(strip>nstrips && strip<nstrips*2+1){
+		    u=(mItem->GetEnergy1()-mItem->GetEnergy2())/(mItem->GetEnergy1()+mItem->GetEnergy2());
+		    v=(strip-1.5*nstrips-0.5)/(nstrips/2.);
+				    
+		    x=sign_x[detector]*(offset[detector][strip-nstrips-1]+slope[detector][strip-nstrips-1]*u);
+		    y=sign_y[detector]*v*fHitPar->GetPspxParLength().At(detector)/2.;
+		 }
+		 
+	       }
+	}
       }
+      
+      // 1 strip y direction
+      if(y_mult[detector]==2){
+	
+	for(Int_t i = 0; i < nMapped; i++){
+	       R3BPspxCalData* mItem = (R3BPspxCalData*)fCalItems->At(i);
+	       
+	       if(detector+1==mItem->GetDetector()){
+		 nstrips=fHitPar->GetPspxParStrip().At(detector);
+		 strip=mItem->GetStrip();
+		 
+		 // energy
+		 if(e_mult[detector]==1 && strip==nstrips*2+1){
+		  energy=mItem->GetEnergy1();
+		 } else if(e_mult[detector]==0 && strip>0 && strip<nstrips+1){
+		  energy=mItem->GetEnergy1()+mItem->GetEnergy2();
+		 }
+		 
+		 // position
+		 if(strip>0 && strip<nstrips+1){
+		    u=(strip-0.5*nstrips-0.5)/(nstrips/2.);
+		    v=(mItem->GetEnergy1()-mItem->GetEnergy2())/(mItem->GetEnergy1()+mItem->GetEnergy2());
+		    
+		    x=sign_x[detector]*u*fHitPar->GetPspxParLength().At(detector)/2.;
+		    y=sign_y[detector]*(offset[detector][strip-1]+slope[detector][strip-1]*v);
+		 }
+		 
+	       }
+	}
+      }
+	
+      // 2 strips x direction
+      if(x_mult[detector]==4){
+	for(Int_t i = 0; i < nMapped; i++){
+	       R3BPspxCalData* mItem1 = (R3BPspxCalData*)fCalItems->At(i);
+	       
+	       if(detector+1==mItem1->GetDetector()){
+		    nstrips=fHitPar->GetPspxParStrip().At(detector);
+		    strip1=mItem1->GetStrip();
+		    
+		    // energy
+		    if(e_mult[detector]==1 && strip1==nstrips*2+1){
+		      energy=mItem1->GetEnergy1();
+		    } else if(e_mult[detector]==0 && strip1>nstrips && strip1<nstrips*2+1){
+			      
+			for(Int_t j = i+1; j < nMapped; j++){ //start with i+1 to avoid double counting
+			    R3BPspxCalData* mItem2 = (R3BPspxCalData*)fCalItems->At(j);
+			    strip2=mItem2->GetStrip();
+			    
+			    if(detector+1==mItem2->GetDetector() && strip2>nstrips && strip2<nstrips*2+1 && (strip1==strip2+1 || strip1==strip2-1)){
+			      energy=mItem1->GetEnergy1()+mItem1->GetEnergy2()+mItem2->GetEnergy1()+mItem2->GetEnergy2();
+			    }
+			}
+		      
+		    }
+		    
+		    //position
+		    if(strip1>nstrips && strip1<nstrips*2+1){
+		      
+			    for(Int_t j = i+1; j < nMapped; j++){ //start with i+1 to avoid double counting
+				R3BPspxCalData* mItem2 = (R3BPspxCalData*)fCalItems->At(j);
+				strip2=mItem2->GetStrip();
+				
+				if(detector+1==mItem2->GetDetector() && strip2>nstrips && strip2<nstrips*2+1 && (strip1==strip2+1 || strip1==strip2-1)){
+				    u=((mItem1->GetEnergy1()+mItem2->GetEnergy1())-(mItem1->GetEnergy2()+mItem2->GetEnergy2()))/(mItem1->GetEnergy1()+mItem2->GetEnergy1()+mItem1->GetEnergy2()+mItem2->GetEnergy2());
+				    v=((strip1+strip2)/2.-1.5*nstrips-0.5)/(nstrips/2.);
+								
+				    x=sign_x[detector]*((offset[detector][strip1-nstrips-1]+offset[detector][strip2-nstrips-1])/2.+(slope[detector][strip1-nstrips-1]+slope[detector][strip2-nstrips-1])/2.*u);
+				    y=sign_y[detector]*v*fHitPar->GetPspxParLength().At(detector)/2.; 
+				} 
+			    }
+			    
+		    }
+		 
+	       }
+	}
+      }
+      
+      
+      // 2 strips y direction
+      if(y_mult[detector]==4){
+	for(Int_t i = 0; i < nMapped; i++){
+	       R3BPspxCalData* mItem1 = (R3BPspxCalData*)fCalItems->At(i);
+	       
+	       if(detector+1==mItem1->GetDetector()){
+		    nstrips=fHitPar->GetPspxParStrip().At(detector);
+		    strip1=mItem1->GetStrip();
+		    
+		    // energy
+		    if(e_mult[detector]==1 && strip1==nstrips*2+1){
+		      energy=mItem1->GetEnergy1();
+		    } else if(e_mult[detector]==0  && strip1>0 && strip1<nstrips+1){
+			      
+			for(Int_t j = i+1; j < nMapped; j++){ //start with i+1 to avoid double counting
+			    R3BPspxCalData* mItem2 = (R3BPspxCalData*)fCalItems->At(j);
+			    strip2=mItem2->GetStrip();
+			    
+			    if(detector+1==mItem2->GetDetector() && strip2>0 && strip2<nstrips+1 && (strip1==strip2+1 || strip1==strip2-1)){
+			      energy=mItem1->GetEnergy1()+mItem1->GetEnergy2()+mItem2->GetEnergy1()+mItem2->GetEnergy2();
+			    }
+			}
+		      
+		    }
+		    
+		    //position
+		    if(strip1>0 && strip1<nstrips+1){
+		      
+			    for(Int_t j = i+1; j < nMapped; j++){ //start with i+1 to avoid double counting
+				R3BPspxCalData* mItem2 = (R3BPspxCalData*)fCalItems->At(j);
+				strip2=mItem2->GetStrip();
+				
+				if(detector+1==mItem2->GetDetector() && strip2>0 && strip2<nstrips+1 && (strip1==strip2+1 || strip1==strip2-1)){
+				    u=((strip1+strip2)/2.-0.5*nstrips-0.5)/(nstrips/2.);
+				    v=((mItem1->GetEnergy1()+mItem2->GetEnergy1())-(mItem1->GetEnergy2()+mItem2->GetEnergy2()))/(mItem1->GetEnergy1()+mItem2->GetEnergy1()+mItem1->GetEnergy2()+mItem2->GetEnergy2());
+				    
+				    x=sign_x[detector]*u*fHitPar->GetPspxParLength().At(detector)/2.; 
+				    y=sign_y[detector]*((offset[detector][strip1-1]+offset[detector][strip2-1])/2.+(slope[detector][strip1-1]+slope[detector][strip2-1])/2.*v);
+				} 
+			    }
+			    
+		    }
+	       }
+	}
+      }
+
+      new ((*fHitItems)[fHitItems->GetEntriesFast()]) R3BPspxHitData(detector+1,u,v,x,y,energy,x_mult[detector]+y_mult[detector]+e_mult[detector]); 
+
     }
 
 
@@ -186,68 +388,6 @@ void R3BPspxCal2Hit::FinishEvent()
 void R3BPspxCal2Hit::FinishTask()
 {
 }
-
-void R3BPspxCal2Hit::InitCalibration()
-{
-  for(UInt_t i=0;i<length_array_detector;i++){	
-    sign_x[i]=1;
-    sign_y[i]=1;
-    
-    for(UInt_t j=0;j<length_array_strip;j++){
-	offset[i][j]=0;
-	slope[i][j]=detector_length/2.;
-    }
-  }
-          
-  sign_x[4]=-1;
-  sign_y[5]=-1;
-  
-  // done 28.04.16, test3 (cal), start counting with 1 for detector and channel,
-  // valid also for test4 (cal), check was done for most of the parameter
-  offset[4][6]=-0.00237587;
-  slope[4][6]=2.53953;
-  offset[4][7]=-0.00415368;
-  slope[4][7]=2.53824;
-  offset[4][8]=-0.00278635;
-  slope[4][8]=2.53776;
-  offset[4][9]=-0.00150658;
-  slope[4][9]=2.54448;
-  offset[4][10]=-0.00196951; //lower threshold for peak finder: 0.05
-  slope[4][10]=2.5441;
-  offset[4][11]=-0.0030721; //lower threshold for peak finder: 0.04
-  slope[4][11]=2.54395;
-  offset[4][12]=-0.00413915;
-  slope[4][12]=2.54397;
-  offset[4][13]=-0.00486661; //higher threshold for peak finder: 0.25
-  slope[4][13]=2.54077;
-
-  offset[5][4]=0.000601069;
-  slope[5][4]=2.51852;
-  offset[5][5]=0.000991526;
-  slope[5][5]=2.51812;
-  offset[5][6]=0.000623896;
-  slope[5][6]=2.5172;
-  offset[5][7]=0.00496261;
-  slope[5][7]=2.52705;
-  offset[5][8]=0.00704843;
-  slope[5][8]=2.52655;
-  offset[5][9]=0.00393909;
-  slope[5][9]=2.52172;
-  offset[5][10]=0.00514579;
-  slope[5][10]=2.53048;
-  offset[5][11]=0.00135386;
-  slope[5][11]=2.53206;
-  offset[5][12]=0.000110492;
-  slope[5][12]=2.53273;
-  offset[5][13]=0.00227417;
-  slope[5][13]=2.52753;
-  offset[5][14]=0.00386112;
-  slope[5][14]=2.53043;
-  offset[5][15]=0.00251124;
-  slope[5][15]=2.52448;
-
-}
-
 
 //void R3BPspxCal2Hit::WriteHistos() {}
 
