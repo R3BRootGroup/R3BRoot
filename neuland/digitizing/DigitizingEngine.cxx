@@ -127,10 +127,15 @@ Double_t DigitizingEngine::PMT::GetEnergy() const
 
 Double_t DigitizingEngine::PMT::BuildEnergy() const
 {
-    Double_t e;
-    e = GetQDC() * exp((2.*(fPaddleHalfLength)) * fAttenuation / 2.);
+    Double_t e = GetQDC();
+    // Apply reverse attenuation (TODO: Should be last?)
+    e = e * exp((2.*(fPaddleHalfLength)) * fAttenuation / 2.);
+    // Apply saturation
     e = e / (1. + fSaturationCoefficient * e);
+    // Apply energy smearing
     e = fRnd->Gaus(e, 0.05 * e);
+    // Apply reverse saturation
+    e = e / (1. - fSaturationCoefficient * e);
     return e;
 }
 

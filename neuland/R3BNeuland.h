@@ -15,14 +15,15 @@ class TClonesArray;
  * @author Jan Mayer
  * @since 12.01.2016
  * For each simulated event, TClonesArrays are filled:
- * - NeulandPoints (R3BLandPoint), each representing energy deposition and light yield of a track in a paddle
+ * - NeulandPoints (R3BNeulandPoint), each representing energy deposition and light yield of a track in a paddle
  * - NeulandPrimaryNeutronInteractionPoints (FairMCPoint), each representing the first interaction points of
  *   primary neutrons.
  * Suitable geometry files require proper naming of the active volume (see CheckIfSensitive) and copy numbers.
  */
 
-class R3BNeuland : public R3BDetector {
-public:
+class R3BNeuland : public R3BDetector
+{
+  public:
     /** Default constructor */
     R3BNeuland();
 
@@ -30,23 +31,23 @@ public:
      *@param name    detector name
      *@param active  sensitivity flag
      */
-    R3BNeuland(const char *name, Bool_t active);
+    R3BNeuland(const char* name, Bool_t active);
 
     /** Default Destructor */
-    //virtual ~R3BNeuland() = default;
-    virtual ~R3BNeuland() {};
+    // virtual ~R3BNeuland() = default;
+    virtual ~R3BNeuland(){};
 
     virtual void Initialize(); // override;
 
-    virtual Bool_t ProcessHits(FairVolume * = nullptr); // override;
+    virtual Bool_t ProcessHits(FairVolume* = nullptr); // override;
 
     virtual void EndOfEvent(); // override;
 
     virtual void Register(); // override;
 
-    virtual TClonesArray *GetCollection(Int_t iColl) const; // override;
+    virtual TClonesArray* GetCollection(Int_t iColl) const; // override;
 
-    virtual void Print(Option_t * = "") const; // override;
+    virtual void Print(Option_t* = "") const; // override;
 
     virtual void Reset(); // override;
 
@@ -57,13 +58,13 @@ public:
     virtual Bool_t CheckIfSensitive(std::string name); // override;
 
     /** May not be copy constructed */
-    //R3BNeuland(const R3BNeuland &) = delete;
-    //R3BNeuland &operator=(const R3BNeuland &) = delete;
+    // R3BNeuland(const R3BNeuland &) = delete;
+    // R3BNeuland &operator=(const R3BNeuland &) = delete;
 
-private:
-    //std::unique_ptr<TClonesArray> fNeulandPoints;
+  private:
+    // std::unique_ptr<TClonesArray> fNeulandPoints;
     TClonesArray* fNeulandPoints;
-    //std::unique_ptr<TClonesArray> fNeulandPrimaryNeutronInteractionPoints;
+    // std::unique_ptr<TClonesArray> fNeulandPrimaryNeutronInteractionPoints;
     TClonesArray* fNeulandPrimaryNeutronInteractionPoints;
 
     /** Track information to be stored until the track leaves the active volume. */
@@ -87,8 +88,8 @@ private:
      * ClassDefOverride to avoid inconsistent-missing-override warnings
      * ClassVersionID = 0, this class should not be read/written (no IO necessary)
      */
-    //ClassDefOverride(R3BNeuland, 0);
+    // ClassDefOverride(R3BNeuland, 0);
     ClassDef(R3BNeuland, 0);
 };
 
-#endif //R3BNEULAND_H
+#endif // R3BNEULAND_H
