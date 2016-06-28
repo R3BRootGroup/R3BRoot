@@ -65,6 +65,7 @@
 #pragma link C++ class R3BLosHitData+;
 #pragma link C++ class R3BPaddleTamexMappedData+;
 #pragma link C++ class R3BPaddleCalData+;
+#pragma link C++ class R3BTofdHitData+;
 #pragma link C++ class R3BNeulandUnpackData+;
 #pragma link C++ class R3BNeulandCalData+;
 #pragma link C++ class R3BActarPoint+;

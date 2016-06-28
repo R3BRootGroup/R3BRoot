@@ -21,7 +21,7 @@ class R3BLosCalData : public TObject
     // Getters
     inline const UChar_t&  GetDetector()  const { return fDetector; }
 
-	Double_t GetMeanTime();
+    Double_t GetMeanTime();
 
   private:
     UChar_t  fDetector;
@@ -33,7 +33,10 @@ class R3BLosCalData : public TObject
     Double_t fTime_b_ns;   // bottom
     Double_t fTime_ref_ns; // time reference (e.g. master trigger)
 
-    ClassDef(R3BLosCalData, 2)
+    Double_t fTime_cherenkov_l_ns;
+    Double_t fTime_cherenkov_r_ns;
+
+    ClassDef(R3BLosCalData, 3)
 };
 
 #endif

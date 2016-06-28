@@ -127,13 +127,13 @@ InitStatus R3BLosMapped2Cal::ReInit()
 
 void R3BLosMapped2Cal::Exec(Option_t* option)
 {
-	// check for requested trigger (Todo: should be done globablly / somewhere else)
-    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
+   // check for requested trigger (Todo: should be done globablly / somewhere else)
+   if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
 		return;
 
-    Int_t nHits = fMappedItems->GetEntriesFast();
-
-    for (Int_t ihit = 0; ihit < nHits; ihit++)
+//cout << "Trial" << endl;
+   Int_t nHits = fMappedItems->GetEntriesFast();
+   for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
        R3BLosMappedData* hit = (R3BLosMappedData*)fMappedItems->At(ihit);
        if (!hit) continue;
@@ -141,6 +141,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
        // channel numbers are stored 1-based (1..n)
        Int_t iDet = hit->GetDetector(); // 1..
        Int_t iCha = hit->GetChannel();  // 1..
+//       cout<<"Haik Test 2: "<<iDet<<"  "<<iCha<<endl; 
        UInt_t module = (iDet-1) * fNofChannels + (iCha-1); // channel index in TCalPar 0..
        
 	   if ((iDet<1) || (iDet>fNofDetectors))
@@ -204,7 +205,12 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
        for (int iCal=0;iCal<fNofCalItems;iCal++)
        {
 		   R3BLosCalData* aCalItem=(R3BLosCalData*)fCalItems->At(iCal);
-		   if (fabs(aCalItem->GetMeanTime()-time_ns) < LOS_COINC_WINDOW_NS)
+//cout<<aCalItem<<" "<<iDet<<" "<<(int)aCalItem->GetDetector()<<endl;
+		   if (aCalItem->GetDetector() != iDet) {
+		   	// Do not consider an item for another detector.
+		   	continue;
+		   }
+		   if (1 == iDet && fabs(aCalItem->GetMeanTime()-time_ns) < LOS_COINC_WINDOW_NS)
 		   {
 			   // check if item is already set. If so, we need to skip this event!
 			   switch (iCha)
@@ -214,31 +220,48 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 				   case 3 : if (!IS_NAN(aCalItem->fTime_l_ns))   LOG(ERROR) << "R3BLosMapped2Cal::Exec : Skip event because of unhandle-able pileup." << FairLogger::endl;break;
 				   case 4 : if (!IS_NAN(aCalItem->fTime_b_ns))   LOG(ERROR) << "R3BLosMapped2Cal::Exec : Skip event because of unhandle-able pileup." << FairLogger::endl;break;
 				   case 5 : if (!IS_NAN(aCalItem->fTime_ref_ns)) LOG(ERROR) << "R3BLosMapped2Cal::Exec : Skip event because of unhandle-able pileup." << FairLogger::endl;break;
-			   }       			   
+			   }
 			   calItem=aCalItem;
 			   break;
 		   }
-	   } 
-
-       if (!calItem) 
+		   else if (2 == iDet) {
+		   	// Do nothing special for Cherenkov, yet.
+			   calItem=aCalItem;
+			   break;
+		   }
+	   
+	    
+       }
+       if (!calItem)
        {
 		    // there is no detector hit with matching time. Hence, create a new one.
 			calItem = new ((*fCalItems)[fNofCalItems]) R3BLosCalData(iDet);
 			fNofCalItems += 1;
 	   }
-
 	   // set the time to the correct cal item
-	   switch (iCha)
-	   {
-		   case 1 : calItem->fTime_r_ns   = time_ns;break;
-		   case 2 : calItem->fTime_t_ns   = time_ns;break;
-		   case 3 : calItem->fTime_l_ns   = time_ns;break;
-		   case 4 : calItem->fTime_b_ns   = time_ns;break;
-		   case 5 : calItem->fTime_ref_ns = time_ns;break;
-		   default: LOG(INFO) << "R3BLosMapped2Cal::Exec : Channel number out of range: " << 
-           iCha << FairLogger::endl;
-	   }       
+	   if (1 == iDet) {
+		   switch (iCha)
+		   {
+			   case 1 : calItem->fTime_r_ns   = time_ns;break;
+			   case 2 : calItem->fTime_t_ns   = time_ns;break;
+			   case 3 : calItem->fTime_l_ns   = time_ns;break;
+			   case 4 : calItem->fTime_b_ns   = time_ns;break;
+			   case 5 : calItem->fTime_ref_ns = time_ns;break;
+			   default: LOG(INFO) << "R3BLosMapped2Cal::Exec : Channel number out of range: " << 
+	           iCha << FairLogger::endl;
+		   }
+	   }
+	   else if (2 == iDet) {
+	 	   switch (iCha)
+		   {
+			   case 1 : calItem->fTime_cherenkov_l_ns = time_ns;/*cout<<calItem<<" Cher_l "<<time_ns<<endl;*/break;
+			   case 2 : calItem->fTime_cherenkov_r_ns = time_ns;/*cout<<calItem<<" Cher_r "<<time_ns<<endl;*/break;
+			   default: LOG(INFO) << "R3BLosMapped2Cal::Exec : Channel number out of range: " << 
+	           iCha << FairLogger::endl;
+		   }
+	   }
     }
+//cout<<"Done"<<endl;
     
 }
 

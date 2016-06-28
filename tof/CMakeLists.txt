@@ -12,8 +12,10 @@ set(INCLUDE_DIRECTORIES
 ${R3BROOT_SOURCE_DIR}/r3bbase 
 ${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/tof
+${R3BROOT_SOURCE_DIR}/los
 ${R3BROOT_SOURCE_DIR}/tcal
 ${R3BROOT_SOURCE_DIR}/r3bdata
+${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/calData
 ${R3BROOT_SOURCE_DIR}/r3bdata/dchData
 ${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
@@ -46,6 +48,10 @@ R3BTof2pDigitizer.cxx
 R3BTofUnpack.cxx
 R3BTofdMapped2TCal.cxx
 R3BTofdMapped2TCalPar.cxx
+R3BTofdCal2HitPar.cxx
+R3BTofdCal2Hit.cxx
+R3BTofdHitModulePar.cxx
+R3BTofdHitPar.cxx
 )
 
 # fill list of header files from list of source files
@@ -55,7 +61,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF TofLinkDef.h)
 set(LIBRARY_NAME R3BTof)
 set(DEPENDENCIES
-    R3Bbase R3BPassive MCStack R3BData R3BTCal)
-
+    Spectrum R3Bbase R3BPassive MCStack R3BData R3BTCal)
+    
 GENERATE_LIBRARY()
 

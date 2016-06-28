@@ -10,7 +10,7 @@ extern "C" {
 #include "ext_h101_tofd.h"
 }
 
-#define MAX_TOFD_PLANES   4
+#define MAX_TOFD_PLANES   6
 
 R3BTofdReader::R3BTofdReader(EXT_STR_h101_TOFD* data, UInt_t offset)
 	: R3BReader("R3BTofdReader")
@@ -99,6 +99,9 @@ Bool_t R3BTofdReader::Read()
 // to reconstruct multi-hit data, but we check for same number of
 // multi-hits in leading and trailing edges and skip the event on mismatch
 
+	// HTT: edges book keeping.
+	int edges[MAX_TOFD_PLANES][6][2][2];
+	memset(edges, 0, sizeof edges);
 
 	// loop over all planes
 	for (int d=0;d<MAX_TOFD_PLANES;d++)
@@ -109,8 +112,11 @@ Bool_t R3BTofdReader::Read()
 			// check for same number of leading and trailing edges.
 			// we trust that we have same number of fine and coarse
 			// times because they come encoded together in the same 32bit word.
-			if (numChannels != data->TOFD_P[d].T[t].TFTM)
-				fLogger->Error(MESSAGE_ORIGIN,"TOFD: Different number of leading and trailing edges (plane=%d,side=%d).", d+1, t+1);
+            if (numChannels != data->TOFD_P[d].T[t].TFTM){
+//MH: we have to find out how we deal with theses events. For now, I comment out the error message
+//                 fLogger->Error(MESSAGE_ORIGIN,"TOFD: Different number of leading and trailing edges (plane=%d,side=%d).", d+1, t+1);
+               continue;
+            }
 	
 			// loop over channels
 			uint32_t curChannelStart=0;     // index in v for first item of current channel
@@ -119,7 +125,7 @@ Bool_t R3BTofdReader::Read()
 				uint32_t channel=data->TOFD_P[d].T[t].TFLMI[i]; // or 1..65
 				uint32_t nextChannelStart=data->TOFD_P[d].T[t].TFLME[i];  // index in v for first item of next channel
 				
-				for (int j=curChannelStart;j<nextChannelStart;j++)
+				for (int j=curChannelStart;j<nextChannelStart;j++) {
 					new ((*fArray)[fArray->GetEntriesFast()])
 						R3BPaddleTamexMappedData(d+1,    // 1..n
 							channel,				     // 1..n (bar)
@@ -129,10 +135,43 @@ Bool_t R3BTofdReader::Read()
 							data->TOFD_P[d].T[t].TCTv[j],  // coarse time trailing edge
 							data->TOFD_P[d].T[t].TFTv[j],  // fine time trailing edge
 							false);
+				}
 				
 				curChannelStart=nextChannelStart;
 			}
+
+			// HTT: Fill edge book.
+			int ofs = 0;
+			for (int i=0;i<data->TOFD_P[d].T[t].TFLM;i++) {
+				uint32_t channel = data->TOFD_P[d].T[t].TFLMI[i];
+				int next = data->TOFD_P[d].T[t].TFLME[i];
+				if (0 <= channel && 6 > channel) {
+					edges[d][channel][t][0] += next - ofs;
+				}
+				ofs = next;
+			}
+			ofs = 0;
+			for (int i=0;i<data->TOFD_P[d].T[t].TFTM;i++) {
+				uint32_t channel = data->TOFD_P[d].T[t].TFTMI[i];
+				int next = data->TOFD_P[d].T[t].TFTME[i];
+				if (0 <= channel && 6 > channel) {
+					edges[d][channel][t][1] += next - ofs;
+				}
+				ofs = next;
+			}
 		}
+
+	// HTT: Print mismatches.
+	for (int p = 0; MAX_TOFD_PLANES > p; ++p) {
+		for (int b = 0; 6 > b; ++b) {
+			if (edges[p][b][0][0] != edges[p][b][0][1] ||
+			    edges[p][b][0][0] != edges[p][b][1][0] ||
+			    edges[p][b][0][0] != edges[p][b][1][1]) {
+//				fLogger->Error(MESSAGE_ORIGIN, "TOFD: Plane=%d Bar=%d: Edge mismatch ([t=1,e=l]=%d,1t=%d,2l=%d,2r=%d).",
+//				    p + 1, b + 1, edges[p][b][0][0], edges[p][b][0][1], edges[p][b][1][0], edges[p][b][1][1]);
+			}
+		}
+	}
 
 
 

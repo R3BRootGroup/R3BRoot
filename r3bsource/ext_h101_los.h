@@ -39,6 +39,16 @@ typedef struct EXT_STR_h101_LOS_t
   uint32_t LOS1TCME[4 EXT_STRUCT_CTRL(LOS1TCM)] /* [1,40] */;
   uint32_t LOS1TC /* [0,40] */;
   uint32_t LOS1TCv[40 EXT_STRUCT_CTRL(LOS1TC)] /* [0,65535] */;    
+  uint32_t LOS2TFM /* [1,4] */;
+  uint32_t LOS2TFMI[4 EXT_STRUCT_CTRL(LOS2TFM)] /* [1,4] */;
+  uint32_t LOS2TFME[4 EXT_STRUCT_CTRL(LOS2TFM)] /* [1,40] */;
+  uint32_t LOS2TF /* [0,40] */;
+  uint32_t LOS2TFv[40 EXT_STRUCT_CTRL(LOS2TF)] /* [0,65535] */;
+  uint32_t LOS2TCM /* [1,4] */;
+  uint32_t LOS2TCMI[4 EXT_STRUCT_CTRL(LOS2TCM)] /* [1,4] */;
+  uint32_t LOS2TCME[4 EXT_STRUCT_CTRL(LOS2TCM)] /* [1,40] */;
+  uint32_t LOS2TC /* [0,40] */;
+  uint32_t LOS2TCv[40 EXT_STRUCT_CTRL(LOS2TC)] /* [0,65535] */;    
 } EXT_STR_h101_LOS;
 
 /********************************************************
@@ -61,7 +71,7 @@ typedef struct EXT_STR_h101_LOS_onion_t
     uint32_t TCME[4 /* TCM */];
     uint32_t TC;
     uint32_t TCv[40 /* TC */];
-  } LOS[1];
+  } LOS[2];
 } EXT_STR_h101_LOS_onion;
 
 /*******************************************************/
@@ -99,6 +109,36 @@ typedef struct EXT_STR_h101_LOS_onion_t
   EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      LOS1TCv,                         UINT32,\
                     "LOS1TCv",                         "LOS1TC"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
+                     LOS2TFM,                         UINT32,\
+                    "LOS2TFM",4); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
+                     LOS2TFMI,                        UINT32,\
+                    "LOS2TFMI",                        "LOS2TFM"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
+                     LOS2TFME,                        UINT32,\
+                    "LOS2TFME",                        "LOS2TFM"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
+                     LOS2TF,                          UINT32,\
+                    "LOS2TF",40); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
+                     LOS2TFv,                         UINT32,\
+                    "LOS2TFv",                         "LOS2TF"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
+                     LOS2TCM,                         UINT32,\
+                    "LOS2TCM",4); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
+                     LOS2TCMI,                        UINT32,\
+                    "LOS2TCMI",                        "LOS2TCM"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
+                     LOS2TCME,                        UINT32,\
+                    "LOS2TCME",                        "LOS2TCM"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
+                     LOS2TC,                          UINT32,\
+                    "LOS2TC",40); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
+                     LOS2TCv,                         UINT32,\
+                    "LOS2TCv",                         "LOS2TC"); \
   \
 } while (0);
 

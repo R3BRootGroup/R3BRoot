@@ -8,6 +8,8 @@
 
 #ifndef R3BONLINESPECTRA
 #define R3BONLINESPECTRA
+#define N_PLANE_MAX 100
+#define N_PADDLE_MAX 100
 
 #include "FairTask.h"
 
@@ -15,6 +17,7 @@ class TClonesArray;
 class TH1F;
 class TH2F;
 class R3BEventHeader;
+
 
 /**
  * This taks reads all detector data items and plots histograms 
@@ -84,29 +87,44 @@ class R3BOnlineSpectra : public FairTask
     /**
      * Methods for setting position offset and effective velocity of light
      */
-    inline void SetLosParameters(Double_t offsetX, Double_t offsetY, Double_t veff)
+    inline void SetLosParameters(Double_t offsetX, Double_t offsetY, Double_t veffX, Double_t veffY)
     {
         flosOffsetX = offsetX;
         flosOffsetY = offsetY;
-        flosVeff = veff;
+        flosVeffX = veffX;
+        flosVeffY = veffY;       
+    }
+    
+    /**
+     * Methods for setting number of planes and paddles
+     */
+    inline void SetNofModules(Int_t planes, Int_t ppp)
+    {
+        fNofPlanes   = planes;
+        fPaddlesPerPlane  = ppp;
     }
 
 
   private:
     TClonesArray* fMappedItemsLos;                 /**< Array with mapped items. */
     TClonesArray* fCalItemsLos;                    /**< Array with cal items. */
-    TClonesArray* fMappedItemsTofd;                    /**< Array with mapped items. */
-    TClonesArray* fCalItemsTofd;                    /**< Array with cal items. */
+    TClonesArray* fMappedItemsTofd;                /**< Array with mapped items. */
+    TClonesArray* fCalItemsTofd;                   /**< Array with cal items. */
 
 
 	// check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header;                     /**< Event header. */
     Int_t fTrigger;                             /**< Trigger value. */
+    Double_t fClockFreq;     /**< Clock cycle in [ns]. */
+    UInt_t fNofPlanes;  
+    UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */    
+
 
     UInt_t fNofDetectors;  /**< Number of detectors. */
     UInt_t fNofChannels;   /**< Number of channels per detector. */    
     UInt_t fNofModules;    /**< Total number of channels. */
-    Double_t flosVeff;
+    Double_t flosVeffX;   
+    Double_t flosVeffY;
     Double_t flosOffsetX;
     Double_t flosOffsetY;
 
@@ -114,12 +132,15 @@ class R3BOnlineSpectra : public FairTask
     TH1F *fh_los_tres;
     TH2F *fh_los_pos;
 
-    TH1F *fh_tofd_channels_plane1;    
-    TH1F *fh_tofd_channels_plane2;    
-    TH1F *fh_tofd_channels_plane3;    
-    TH1F *fh_tofd_channels_plane4;    
+    TH1F *fh_tofd_channels[N_PLANE_MAX];    
 
-    TH1F *fh_tofd_tdiff_p1_b1;    
+    TH1F* fhTotPm1[N_PLANE_MAX][N_PADDLE_MAX]; 
+    TH1F* fhTotPm2[N_PLANE_MAX][N_PADDLE_MAX]; 
+
+
+    TH1F *fh_cherenkovLos1;    
+    TH1F *fh_cherenkovLos2;    
+    TH1F *fh_cherenkovLos3;    
 
   public:
     ClassDef(R3BOnlineSpectra, 1)

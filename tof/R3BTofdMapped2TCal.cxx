@@ -34,7 +34,6 @@ R3BTofdMapped2TCal::R3BTofdMapped2TCal()
     : FairTask("TofdTcal", 1)
     , fMappedItems(NULL)
     , fCalItems(new TClonesArray("R3BPaddleCalData"))
-    , fCalItemMap(NULL)
     , fNofCalItems(0)
     , fNofTcalPars(0)
     , fNofEdges(0)
@@ -48,7 +47,6 @@ R3BTofdMapped2TCal::R3BTofdMapped2TCal(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fMappedItems(NULL)
     , fCalItems(new TClonesArray("R3BPaddleCalData"))
-    , fCalItemMap(NULL)
     , fNofCalItems(0)
     , fNofTcalPars(0)
     , fNofEdges(0)
@@ -118,11 +116,20 @@ InitStatus R3BTofdMapped2TCal::ReInit()
     return kSUCCESS;
 }
 
-/* And again: multi hit data.
- * How to do the reconstruction?
- * We should keep a list of all hits for each bar.
+/* In this loop we combine left and right PMs into one struct "R3BPaddleCalData".
+ * And again: multi hit data. How to do the reconstruction?
  * 
+ * This detector shouldnt have that much data.
+ * So in 0th-order, we can simply loop over all the data we have already
+ * converted and see if something fits together.
  */
+ 
+#define COINC_TIME_NS 1000 
+#define PM1 1
+#define PM2 2
+#define LEADING_EDGE  0
+#define TRAILING_EDGE 1
+ 
 void R3BTofdMapped2TCal::Exec(Option_t* option)
 {
 	// check for requested trigger (Todo: should be done globablly / somewhere else)
@@ -130,9 +137,6 @@ void R3BTofdMapped2TCal::Exec(Option_t* option)
 		return;
 
     Int_t nHits = fMappedItems->GetEntriesFast();
-
-	// clear map of reconstructed detectors
-	memset(fCalItemMap,0,sizeof(R3BPaddleCalData*) * fNofEdges/4);
 
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
@@ -142,7 +146,6 @@ void R3BTofdMapped2TCal::Exec(Option_t* option)
        Int_t iPlane = hit->GetPlaneId(); // 1..n
        Int_t iBar   = hit->GetBarId();   // 1..n
        Int_t iSide  = hit->GetSide();    // 1 or 2	
-//       printf("%d Tofd mapped P B S %d %d %d\n",ihit,iPlane,iBar,iSide);
        
 	   if ((iPlane<1) || (iPlane>fNofPlanes))
 	   {
@@ -157,44 +160,10 @@ void R3BTofdMapped2TCal::Exec(Option_t* option)
            continue;
        }
 
-       // get handle on CalItem of paddle
-       Int_t iCalItem=(iPlane-1)*fPaddlesPerPlane + (iBar-1);
-       if (!fCalItemMap[iCalItem]) 
+	   // convert times to ns
+	   double timeLT_ns[2]={0.0,0.0}; // leading and trailing edge
+	   for (int edge=0;edge<2;edge++) // loop over leading and trailing edge
        {
-			fCalItemMap[iCalItem] = new ((*fCalItems)[fNofCalItems]) R3BPaddleCalData(iPlane,iBar);
-			fNofCalItems += 1;
-	   }
-	   else // a CalItem already exists. See if our hit belongs to that one.
-	   {
-			if (iSide==1)
-			{
-			   if (!IS_NAN(fCalItemMap[iCalItem]->fTime1L_ns))
-			      LOG(ERROR) << "TOFD got multi hit " << FairLogger::endl;
-
-			}
-			else
-			{
-			   if (!IS_NAN(fCalItemMap[iCalItem]->fTime2L_ns))
-			      LOG(ERROR) << "TOFD got multi hit" << FairLogger::endl;
-			}
-		   
-	   }
-       
-       for (int edge=0;edge<2;edge++) // loop over leading and trailing edge
-       {
-		   /*
-	       // channel index in TCalPar 0..n-1 Remember: two edges per PM, two PM per bar
-	       UInt_t module = (iPlane-1) * fPaddlesPerPlane * 4  + (iBar-1)*4 + (iSide-1)*2 + edge; 
-	
-		   // Fetch calib data for current channel
-	       R3BTCalModulePar* par = fMapPar[module]; // calibration data for cur ch
-	       if (!par)
-	       {
-	           LOG(INFO) << "R3BTofdMapped2TCal::Exec : Tcal par not found, Plane: " << 
-	           iPlane << ", Bar: " << iBar << FairLogger::endl;
-	           continue;
-	       }
-	       */
 	       R3BTCalModulePar* par = fTcalPar->GetModuleParAt(iPlane, iBar, (iSide-1)*2 + edge+1);
 	       if (!par)
 	       {
@@ -218,27 +187,68 @@ void R3BTofdMapped2TCal::Exec(Option_t* option)
 	       }
 	
 		   // ... and add clock time
-	       time_ns = fClockFreq-time_ns + hit->GetCoarseTime(edge) * fClockFreq;
-	       
-				
-		   // set the time to the correct cal item
-		   
-			if (edge==0)
-			{
-			   if (iSide==1)
-			     fCalItemMap[iCalItem]->fTime1L_ns   = time_ns;
-			   else
-			     fCalItemMap[iCalItem]->fTime2L_ns   = time_ns;
-			}
-			else
-			{
-			   if (iSide==1)
-			     fCalItemMap[iCalItem]->fTime1T_ns   = time_ns;
-			   else
-			     fCalItemMap[iCalItem]->fTime2T_ns   = time_ns;
-			}
+	       timeLT_ns[edge] = fClockFreq-time_ns + hit->GetCoarseTime(edge) * fClockFreq;
+	   }
+
+	if (IS_NAN(timeLT_ns[0]) && IS_NAN(timeLT_ns[1])) continue;	
+
+
+
+		// see if we have already an incomplete CalItem that belongs to the 
+		// current hit (=> existingPart)
+		R3BPaddleCalData *existingPart=NULL;
+		
+		for (Int_t ie=0;ie<fNofCalItems;ie++)
+		{
+			R3BPaddleCalData* aCalData=(R3BPaddleCalData*)fCalItems->At(ie);
 			
+			if ((aCalData->GetPlane()!=iPlane) ||
+			    (aCalData->GetBar()  !=iBar)) continue; // not the droid we're looking for
+			    
+			if (iSide==PM1) // this hit has data for PM1
+			{
+				// make sure PM1 data in existing aCalData is still empty and that
+				// times of existing PM2 and new PM1 are within coinc window:
+				if ((IS_NAN(aCalData->fTime1L_ns) && IS_NAN(aCalData->fTime1T_ns)) && 
+					((fabs(aCalData->fTime2L_ns-timeLT_ns[LEADING_EDGE])  < COINC_TIME_NS) || 
+					 (fabs(aCalData->fTime2T_ns-timeLT_ns[TRAILING_EDGE]) < COINC_TIME_NS)))
+				{
+					existingPart=aCalData;
+					break;
+				}
+			}
+			else // new hit is for side=2
+			{
+				if ((IS_NAN(aCalData->fTime2L_ns) && IS_NAN(aCalData->fTime2T_ns)) &&
+					((fabs(aCalData->fTime1L_ns-timeLT_ns[LEADING_EDGE])  < COINC_TIME_NS) || 
+					 (fabs(aCalData->fTime1T_ns-timeLT_ns[TRAILING_EDGE]) < COINC_TIME_NS)))
+				{
+					existingPart=aCalData;
+					break;
+				}
+			}
 		}
+
+
+
+       if (!existingPart) 
+       {
+			existingPart = new ((*fCalItems)[fNofCalItems]) R3BPaddleCalData(iPlane,iBar);
+			fNofCalItems += 1;
+	   }
+	   
+				
+	   // finally set the time to the correct cal item
+	   if (iSide==PM1)
+	   {
+	     existingPart->fTime1L_ns   = timeLT_ns[0];
+	     existingPart->fTime1T_ns   = timeLT_ns[1];
+	   }
+	   else // PM2
+	   {
+	     existingPart->fTime2L_ns   = timeLT_ns[0];
+	     existingPart->fTime2T_ns   = timeLT_ns[1];
+	   }
 	   
     }
 

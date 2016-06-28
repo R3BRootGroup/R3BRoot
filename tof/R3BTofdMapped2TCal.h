@@ -19,6 +19,7 @@ class R3BTCalModulePar;
 class R3BTCalPar;
 class R3BEventHeader;
 
+
 /**
  * An analysis task to apply TCAL calibration for NeuLAND.
  * This class reads NeuLAND mapped items with TDC values and
@@ -109,15 +110,11 @@ class R3BTofdMapped2TCal : public FairTask
         fNofPlanes   = planes;
         fPaddlesPerPlane  = ppp;
         fNofEdges  = ppp * planes * 4; // two PMs per paddle, two edges per PM
-        
-        if (fCalItemMap) delete [] fCalItemMap;
-        fCalItemMap = new R3BPaddleCalData*[ fNofEdges/4 ];
     }
 
   private:
     TClonesArray* fMappedItems;                 /**< Array with mapped items - input data. */
     TClonesArray* fCalItems;                    /**< Array with cal items - output data. */
-    R3BPaddleCalData** fCalItemMap;              /**< used internally to reconstruct data. */
     Int_t fNofCalItems;                         /**< Number of produced time items per event. */
 
     R3BTCalPar* fTcalPar;                       /**< TCAL parameter container. */

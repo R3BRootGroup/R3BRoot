@@ -106,6 +106,7 @@ tofData/R3BPaddleCalData.cxx
 fi4Data/R3BFi4MappedItem.cxx
 fi4Data/R3BFi4CalItem.cxx
 fi4Data/R3BFi4HitItem.cxx
+tofData/R3BTofdHitData.cxx
 )
 
 

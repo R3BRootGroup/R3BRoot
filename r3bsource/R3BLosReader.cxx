@@ -11,8 +11,11 @@ extern "C" {
 #include EXP_SPECIFIC_H101_FILE
 }
 
-#define NUM_LOS_DETECTORS 1
+#define NUM_LOS_DETECTORS 2
 #define NUM_LOS_CHANNELS  4
+#include <iostream>
+
+using namespace std;
 
 R3BLosReader::R3BLosReader(EXT_STR_h101_LOS* data, UInt_t offset)
 	: R3BReader("R3BLosReader")
@@ -85,7 +88,7 @@ Bool_t R3BLosReader::Read()
 		{
 			uint32_t channel=data->LOS[d].TFMI[i]; // or 1..65
 			uint32_t nextChannelStart=data->LOS[d].TFME[i];  // index in v for first item of next channel
-			for (int j=curChannelStart;j<nextChannelStart;j++)
+			for (int j=curChannelStart;j<nextChannelStart;j++){
 				new ((*fArray)[fArray->GetEntriesFast()])
 					R3BLosMappedData(
 						d+1,
@@ -93,6 +96,7 @@ Bool_t R3BLosReader::Read()
 						data->LOS[d].TCv[j],
 						data->LOS[d].TFv[j]
 						); // det,channel,energy
+		}
 			
 			curChannelStart=nextChannelStart;
 		}

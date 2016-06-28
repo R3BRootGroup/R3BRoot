@@ -28,6 +28,10 @@ void unpack_ucesb()
 	TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
 	TString ucesb_dir = getenv("UCESB_DIR");
 	TString ucesb_path = ucesb_dir + "/../upexps/s438b/s438b";
+	
+	TString pspxpar_dir = "/u/syndikus/R3BRoot/psp/par/";
+	TString parPspxMappedFileName = "s438b_pspx_mapped.par";
+	TString parPspxCalFileName = "s438b_pspx_cal.par";
 
 	TString pspxpar_dir = "/home/bloeher/git/R3BRoot/psp/par/";
 	TString parPspxMappedFileName = "s438b_pspx_mapped.par";

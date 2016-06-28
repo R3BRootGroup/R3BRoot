@@ -30,6 +30,9 @@ R3BLosCalData::R3BLosCalData(	UChar_t detector )
     , fTime_l_ns( 0.0 / 0.0 )
     , fTime_b_ns( 0.0 / 0.0 )
     , fTime_ref_ns( 0.0 / 0.0 )
+
+    , fTime_cherenkov_l_ns(0.0 / 0.0)
+    , fTime_cherenkov_r_ns(0.0 / 0.0)
 {
 }
 
@@ -45,5 +48,3 @@ Double_t R3BLosCalData::GetMeanTime()
 }
 
 ClassImp(R3BLosCalData)
-
-
