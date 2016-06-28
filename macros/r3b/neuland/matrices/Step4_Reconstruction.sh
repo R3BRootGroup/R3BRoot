@@ -15,11 +15,12 @@ trap 'kill $(jobs -pr) 2>/dev/null' SIGINT SIGTERM EXIT
 COUNT=0
 for NDOUBLEPLANES in $(seq 4 50); do
 	for NNEUTRONS in $(seq 1 4); do
-		INPUT="$((132-${NNEUTRONS}))Sn_${NNEUTRONS}n_600AMeV_500keV.dat"
+		CLUSTER="${OUTDIR}/${DISTANCE}cm_${NDOUBLEPLANES}dp_${NNEUTRONS}n.digi.root"
+		CALIBR="${OUTDIR}/${DISTANCE}cm_${NDOUBLEPLANES}dp.neutroncuts.par.root"
 		NPLANES=$((${NDOUBLEPLANES}*2))
-		COMMAND="Step1_Simulate.C(${NEVENTS}, \"${OUTDIR}\", \"${DISTANCE}cm_${NDOUBLEPLANES}dp_${NNEUTRONS}n\", \"${INPUT}\", \"v2_${DISTANCE}cm_${NDOUBLEPLANES}dp\")"
+		COMMAND="Step4_Reconstruction.C(\"${CLUSTER}\", \"${CALIBR}\")"
 		# Note: The root call is extemely sensitive to the usage of ' and "
-		nice -n 19 root -l -q -b -e 'gInterpreter->AddIncludePath("'${VMCWORKDIR}'")' "${COMMAND}" &> "${OUTDIR}/${DISTANCE}cm_${NDOUBLEPLANES}dp_${NNEUTRONS}n.sim.log" &
+		nice -n 19 root -l -q -b "${COMMAND}" &> "${OUTDIR}/${DISTANCE}cm_${NDOUBLEPLANES}dp_${NNEUTRONS}n.reco.log" &
 		echo ${COMMAND}
 
 		# Only spawn so many processes at once
@@ -32,8 +33,3 @@ done
 
 # Wait for all background jobs to finish
 wait
-
-# Remove junk
-rm -f calor.out
-rm -f flukaerr.dat
-rm -f gphysi.dat
