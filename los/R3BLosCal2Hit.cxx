@@ -11,6 +11,8 @@
 
 #include "TClonesArray.h"
 
+#include "math.h"
+
 R3BLosCal2Hit::R3BLosCal2Hit()
     : FairTask("LosCal2Hit", 1)
     , fCalItems(NULL)

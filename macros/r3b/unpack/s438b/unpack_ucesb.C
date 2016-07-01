@@ -11,8 +11,7 @@
  * */
 
 extern "C" {
-//#include "/home/bloeher/git/R3BRoot/r3bsource/ext_h101_full.h"
-#include "/u/syndikus/R3BRoot/r3bsource/ext_h101.h"
+#include "/home/bloeher/git/R3BRoot/r3bsource/ext_h101_full.h"
 }
 
 void unpack_ucesb()
@@ -24,22 +23,23 @@ void unpack_ucesb()
 
 	/* Create source using ucesb for input ------------------ */
 
-	TString filename = "/SAT/hera/land/s438b/stitched/s438b/lmd/run238_*.lmd.gz";
-	TString outputFileName = "/u/syndikus/rootfiles/s438b/v2/run238_mapped_cal_deleteme.root";
+	TString filename = "/data/r3b/r3broot_dev/lmd/run238*.lmd.gz";
+	TString outputFileName = "/tmp/run238_mapped_cal_deleteme.root";
 	TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
 	TString ucesb_dir = getenv("UCESB_DIR");
 	TString ucesb_path = ucesb_dir + "/../upexps/s438b/s438b";
-	
-	TString pspxpar_dir = "/u/syndikus/R3BRoot/psp/par/";
+
+	TString pspxpar_dir = "/home/bloeher/git/R3BRoot/psp/par/";
 	TString parPspxMappedFileName = "s438b_pspx_mapped.par";
 	TString parPspxCalFileName = "s438b_pspx_cal.par";
 
-	EXT_STR_h101 ucesb_struct;
+	EXT_STR_h101_onion ucesb_struct;
 	R3BUcesbSource* source = new R3BUcesbSource(filename, ntuple_options,
-	    ucesb_path, &ucesb_struct, sizeof(ucesb_struct));
+	    ucesb_path, (EXT_STR_h101 *)&ucesb_struct, sizeof(ucesb_struct));
 	source->SetMaxEvents(nev);
 	//source->AddReader(new R3BUnpackReader(&ucesb_struct));
-	source->AddReader(new R3BPspxReader(&ucesb_struct));
+	source->AddReader(new R3BPspxReader(
+		(EXT_STR_h101_PSP *)&ucesb_struct.PSPX[0]));
 	/*source->AddReader(new R3BNeulandTamexReader(&ucesb_struct));*/
 
 	/* ------------------------------------------------------ */

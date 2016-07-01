@@ -156,247 +156,247 @@ typedef struct EXT_STR_h101_raw_nnp_tamex_onion_t
 
 /*******************************************************/
 
-#define EXT_STR_h101_raw_nnp_tamex_ITEMS_INFO(ok,si,struct_t,printerr) do { \
+#define EXT_STR_h101_raw_nnp_tamex_ITEMS_INFO(ok,si,offset,struct_t,printerr) do { \
   ok = 1; \
   /* RAW */ \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P1tcl_T1BM,                   UINT32,\
                     "NN_P1tcl_T1BM",50); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tcl_T1BMI,                  UINT32,\
                     "NN_P1tcl_T1BMI",                  "NN_P1tcl_T1BM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tcl_T1BME,                  UINT32,\
                     "NN_P1tcl_T1BME",                  "NN_P1tcl_T1BM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P1tcl_T1B,                    UINT32,\
                     "NN_P1tcl_T1B",10000); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tcl_T1Bv,                   UINT32,\
                     "NN_P1tcl_T1Bv",                   "NN_P1tcl_T1B"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P1tcl_T2BM,                   UINT32,\
                     "NN_P1tcl_T2BM",50); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tcl_T2BMI,                  UINT32,\
                     "NN_P1tcl_T2BMI",                  "NN_P1tcl_T2BM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tcl_T2BME,                  UINT32,\
                     "NN_P1tcl_T2BME",                  "NN_P1tcl_T2BM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P1tcl_T2B,                    UINT32,\
                     "NN_P1tcl_T2B",10000); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tcl_T2Bv,                   UINT32,\
                     "NN_P1tcl_T2Bv",                   "NN_P1tcl_T2B"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P1tfl_T1BM,                   UINT32,\
                     "NN_P1tfl_T1BM",50); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tfl_T1BMI,                  UINT32,\
                     "NN_P1tfl_T1BMI",                  "NN_P1tfl_T1BM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tfl_T1BME,                  UINT32,\
                     "NN_P1tfl_T1BME",                  "NN_P1tfl_T1BM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P1tfl_T1B,                    UINT32,\
                     "NN_P1tfl_T1B",10000); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tfl_T1Bv,                   UINT32,\
                     "NN_P1tfl_T1Bv",                   "NN_P1tfl_T1B"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P1tfl_T2BM,                   UINT32,\
                     "NN_P1tfl_T2BM",50); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tfl_T2BMI,                  UINT32,\
                     "NN_P1tfl_T2BMI",                  "NN_P1tfl_T2BM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tfl_T2BME,                  UINT32,\
                     "NN_P1tfl_T2BME",                  "NN_P1tfl_T2BM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P1tfl_T2B,                    UINT32,\
                     "NN_P1tfl_T2B",10000); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tfl_T2Bv,                   UINT32,\
                     "NN_P1tfl_T2Bv",                   "NN_P1tfl_T2B"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P1tct_T1BM,                   UINT32,\
                     "NN_P1tct_T1BM",50); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tct_T1BMI,                  UINT32,\
                     "NN_P1tct_T1BMI",                  "NN_P1tct_T1BM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tct_T1BME,                  UINT32,\
                     "NN_P1tct_T1BME",                  "NN_P1tct_T1BM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P1tct_T1B,                    UINT32,\
                     "NN_P1tct_T1B",10000); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tct_T1Bv,                   UINT32,\
                     "NN_P1tct_T1Bv",                   "NN_P1tct_T1B"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P1tct_T2BM,                   UINT32,\
                     "NN_P1tct_T2BM",50); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tct_T2BMI,                  UINT32,\
                     "NN_P1tct_T2BMI",                  "NN_P1tct_T2BM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tct_T2BME,                  UINT32,\
                     "NN_P1tct_T2BME",                  "NN_P1tct_T2BM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P1tct_T2B,                    UINT32,\
                     "NN_P1tct_T2B",10000); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tct_T2Bv,                   UINT32,\
                     "NN_P1tct_T2Bv",                   "NN_P1tct_T2B"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P1tft_T1BM,                   UINT32,\
                     "NN_P1tft_T1BM",50); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tft_T1BMI,                  UINT32,\
                     "NN_P1tft_T1BMI",                  "NN_P1tft_T1BM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tft_T1BME,                  UINT32,\
                     "NN_P1tft_T1BME",                  "NN_P1tft_T1BM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P1tft_T1B,                    UINT32,\
                     "NN_P1tft_T1B",10000); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tft_T1Bv,                   UINT32,\
                     "NN_P1tft_T1Bv",                   "NN_P1tft_T1B"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P1tft_T2BM,                   UINT32,\
                     "NN_P1tft_T2BM",50); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tft_T2BMI,                  UINT32,\
                     "NN_P1tft_T2BMI",                  "NN_P1tft_T2BM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tft_T2BME,                  UINT32,\
                     "NN_P1tft_T2BME",                  "NN_P1tft_T2BM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P1tft_T2B,                    UINT32,\
                     "NN_P1tft_T2B",10000); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P1tft_T2Bv,                   UINT32,\
                     "NN_P1tft_T2Bv",                   "NN_P1tft_T2B"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P2tcl_T1BM,                   UINT32,\
                     "NN_P2tcl_T1BM",50); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tcl_T1BMI,                  UINT32,\
                     "NN_P2tcl_T1BMI",                  "NN_P2tcl_T1BM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tcl_T1BME,                  UINT32,\
                     "NN_P2tcl_T1BME",                  "NN_P2tcl_T1BM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P2tcl_T1B,                    UINT32,\
                     "NN_P2tcl_T1B",10000); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tcl_T1Bv,                   UINT32,\
                     "NN_P2tcl_T1Bv",                   "NN_P2tcl_T1B"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P2tcl_T2BM,                   UINT32,\
                     "NN_P2tcl_T2BM",50); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tcl_T2BMI,                  UINT32,\
                     "NN_P2tcl_T2BMI",                  "NN_P2tcl_T2BM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tcl_T2BME,                  UINT32,\
                     "NN_P2tcl_T2BME",                  "NN_P2tcl_T2BM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P2tcl_T2B,                    UINT32,\
                     "NN_P2tcl_T2B",10000); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tcl_T2Bv,                   UINT32,\
                     "NN_P2tcl_T2Bv",                   "NN_P2tcl_T2B"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P2tfl_T1BM,                   UINT32,\
                     "NN_P2tfl_T1BM",50); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tfl_T1BMI,                  UINT32,\
                     "NN_P2tfl_T1BMI",                  "NN_P2tfl_T1BM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tfl_T1BME,                  UINT32,\
                     "NN_P2tfl_T1BME",                  "NN_P2tfl_T1BM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P2tfl_T1B,                    UINT32,\
                     "NN_P2tfl_T1B",10000); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tfl_T1Bv,                   UINT32,\
                     "NN_P2tfl_T1Bv",                   "NN_P2tfl_T1B"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P2tfl_T2BM,                   UINT32,\
                     "NN_P2tfl_T2BM",50); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tfl_T2BMI,                  UINT32,\
                     "NN_P2tfl_T2BMI",                  "NN_P2tfl_T2BM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tfl_T2BME,                  UINT32,\
                     "NN_P2tfl_T2BME",                  "NN_P2tfl_T2BM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P2tfl_T2B,                    UINT32,\
                     "NN_P2tfl_T2B",10000); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tfl_T2Bv,                   UINT32,\
                     "NN_P2tfl_T2Bv",                   "NN_P2tfl_T2B"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P2tct_T1BM,                   UINT32,\
                     "NN_P2tct_T1BM",50); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tct_T1BMI,                  UINT32,\
                     "NN_P2tct_T1BMI",                  "NN_P2tct_T1BM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tct_T1BME,                  UINT32,\
                     "NN_P2tct_T1BME",                  "NN_P2tct_T1BM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P2tct_T1B,                    UINT32,\
                     "NN_P2tct_T1B",10000); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tct_T1Bv,                   UINT32,\
                     "NN_P2tct_T1Bv",                   "NN_P2tct_T1B"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P2tct_T2BM,                   UINT32,\
                     "NN_P2tct_T2BM",50); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tct_T2BMI,                  UINT32,\
                     "NN_P2tct_T2BMI",                  "NN_P2tct_T2BM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tct_T2BME,                  UINT32,\
                     "NN_P2tct_T2BME",                  "NN_P2tct_T2BM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P2tct_T2B,                    UINT32,\
                     "NN_P2tct_T2B",10000); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tct_T2Bv,                   UINT32,\
                     "NN_P2tct_T2Bv",                   "NN_P2tct_T2B"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P2tft_T1BM,                   UINT32,\
                     "NN_P2tft_T1BM",50); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tft_T1BMI,                  UINT32,\
                     "NN_P2tft_T1BMI",                  "NN_P2tft_T1BM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tft_T1BME,                  UINT32,\
                     "NN_P2tft_T1BME",                  "NN_P2tft_T1BM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P2tft_T1B,                    UINT32,\
                     "NN_P2tft_T1B",10000); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tft_T1Bv,                   UINT32,\
                     "NN_P2tft_T1Bv",                   "NN_P2tft_T1B"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P2tft_T2BM,                   UINT32,\
                     "NN_P2tft_T2BM",50); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tft_T2BMI,                  UINT32,\
                     "NN_P2tft_T2BMI",                  "NN_P2tft_T2BM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tft_T2BME,                  UINT32,\
                     "NN_P2tft_T2BME",                  "NN_P2tft_T2BM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      NN_P2tft_T2B,                    UINT32,\
                     "NN_P2tft_T2B",10000); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      NN_P2tft_T2Bv,                   UINT32,\
                     "NN_P2tft_T2Bv",                   "NN_P2tft_T2B"); \
   \

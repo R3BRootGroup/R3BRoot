@@ -9,16 +9,17 @@
 extern "C" {
 #include "ext_data_client.h"
 #include "ext_h101_raw_nnp_tamex.h"
-#include "ext_h101_full.h"
 }
 
 /* Number of Neuland planes */
 #define N_PLANES 2
 
-R3BNeulandTamexReader::R3BNeulandTamexReader(EXT_STR_h101* data)
+R3BNeulandTamexReader::R3BNeulandTamexReader(EXT_STR_h101_raw_nnp_tamex* data,
+    UInt_t offset)
 	: R3BReader("R3BNeulandTamexReader")
 	, fNEvent(0)
 	, fData(data)
+	, fOffset(offset)
 	, fLogger(FairLogger::GetLogger())
     , fArray(new TClonesArray("R3BNeulandTamexMappedData"))
 {
@@ -31,8 +32,8 @@ Bool_t R3BNeulandTamexReader::Init(ext_data_struct_info *a_struct_info)
 {
 	int ok;
 
-	EXT_STR_h101_raw_nnp_tamex_ITEMS_INFO(ok, *a_struct_info,
-	    EXT_STR_h101, 0);
+	EXT_STR_h101_raw_nnp_tamex_ITEMS_INFO(ok, *a_struct_info, fOffset,
+	    EXT_STR_h101_raw_nnp_tamex, 0);
 
 	if (!ok) {
 		perror("ext_data_struct_info_item");
@@ -40,7 +41,7 @@ Bool_t R3BNeulandTamexReader::Init(ext_data_struct_info *a_struct_info)
 		    "Failed to setup structure information.");
 		return kFALSE;
 	}
-	
+
     // Register output array in tree
     FairRootManager::Instance()->Register("NeulandTamexMappedItem", "Land", fArray, kTRUE);
 
@@ -49,20 +50,21 @@ Bool_t R3BNeulandTamexReader::Init(ext_data_struct_info *a_struct_info)
 
 Bool_t R3BNeulandTamexReader::Read()
 {
-	EXT_STR_h101_onion_t *data = (EXT_STR_h101_onion_t *) fData;
+	EXT_STR_h101_raw_nnp_tamex_onion_t *data =
+	    (EXT_STR_h101_raw_nnp_tamex_onion_t *) fData;
 
 	/* Display data */
 	fLogger->Info(MESSAGE_ORIGIN, "  Event data:");
 
 	for (int plane = 0; plane < N_PLANES; ++plane) {
 		for (int pm = 0; pm < 2; ++pm) {
-			
+
             int idx = 0;
-            int start = 0; 
-            int stop = 0; 
+            int start = 0;
+            int stop = 0;
             int bar;
             int cLE,fLE,cTE,fTE;
-           			
+
 
             // the counter for coarse time and fine time should be always the same:
             if (data->NN_P[plane].tcl_T[pm].BM != data->NN_P[plane].tfl_T[pm].BM ||

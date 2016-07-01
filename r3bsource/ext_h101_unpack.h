@@ -35,13 +35,13 @@ typedef struct EXT_STR_h101_unpack_t
 
 /*******************************************************/
 
-#define EXT_STR_h101_unpack_ITEMS_INFO(ok,si,struct_t,printerr) do { \
+#define EXT_STR_h101_unpack_ITEMS_INFO(ok,si,offset,struct_t,printerr) do { \
   ok = 1; \
   /* UNPACK */ \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      TRIGGER,                         UINT32,\
                     "TRIGGER",15); \
-  EXT_STR_ITEM_INFO    (ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO    (ok,si,offset,struct_t,printerr,\
                      EVENTNO,                         UINT32,\
                     "EVENTNO"); \
 } while (0);

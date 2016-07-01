@@ -14,9 +14,10 @@ extern "C" {
 #define NUM_LOS_DETECTORS 1
 #define NUM_LOS_CHANNELS  4
 
-R3BLosReader::R3BLosReader(EXT_STR_h101* data)
+R3BLosReader::R3BLosReader(EXT_STR_h101_LOS* data, UInt_t offset)
 	: R3BReader("R3BLosReader")
 	, fData(data)
+	, fOffset(offset)
 	, fLogger(FairLogger::GetLogger())
     , fArray(new TClonesArray("R3BLosMappedData"))
 {
@@ -29,7 +30,8 @@ Bool_t R3BLosReader::Init(ext_data_struct_info *a_struct_info)
 {
 	int ok;
 
-	EXT_STR_h101_LOS_ITEMS_INFO(ok, *a_struct_info, EXT_STR_h101, 0);
+	EXT_STR_h101_LOS_ITEMS_INFO(ok, *a_struct_info, fOffset,
+	    EXT_STR_h101_LOS, 0);
 
 	if (!ok) {
 		perror("ext_data_struct_info_item");
@@ -43,7 +45,7 @@ Bool_t R3BLosReader::Init(ext_data_struct_info *a_struct_info)
 
 	// clear struct_writer's output struct. Seems ucesb doesn't do that
 	// for channels that are unknown to the current ucesb config.
-	EXT_STR_h101_onion* data = (EXT_STR_h101_onion*)fData;
+	EXT_STR_h101_LOS_onion* data = (EXT_STR_h101_LOS_onion*)fData;
 	for (int d=0;d<NUM_LOS_DETECTORS;d++)
 	    data->LOS[d].TFM=0;
 
@@ -53,7 +55,7 @@ Bool_t R3BLosReader::Init(ext_data_struct_info *a_struct_info)
 Bool_t R3BLosReader::Read()
 {
 	// Convert plain raw data to multi-dimensional array
-    EXT_STR_h101_onion* data = (EXT_STR_h101_onion*)fData;
+    EXT_STR_h101_LOS_onion* data = (EXT_STR_h101_LOS_onion*)fData;
 
 /*
 

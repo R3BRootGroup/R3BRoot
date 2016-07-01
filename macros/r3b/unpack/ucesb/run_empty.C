@@ -15,9 +15,15 @@
  * Note: R3Broot needs to be compiled after changing ext_h101.h
  * */
 
+
 extern "C" {
-#include "/home/bloeher/git/R3BRoot/r3bsource/ext_h101_full.h"
+#include "/home/bloeher/git/R3BRoot/r3bsource/ext_h101_unpack.h"
 }
+
+typedef struct EXT_STR_h101_t
+{
+	EXT_STR_h101_unpack unpack;
+} EXT_STR_h101;
 
 void run_empty()
 {
@@ -33,10 +39,13 @@ void run_empty()
 	TString ucesb_dir = getenv("UCESB_DIR");
 	TString ucesb_path = ucesb_dir + "/empty/empty";
 
+	//EXT_STR_h101 ucesb_struct;
 	EXT_STR_h101 ucesb_struct;
 	R3BUcesbSource* source = new R3BUcesbSource(filename, ntuple_options,
 	    ucesb_path, &ucesb_struct, sizeof(ucesb_struct));
-	source->AddReader(new R3BUnpackReader(&ucesb_struct));
+	source->AddReader(new R3BUnpackReader(
+	    (EXT_STR_h101_unpack *)&ucesb_struct,
+	    offsetof(EXT_STR_h101, unpack)));
 
 	/* ------------------------------------------------------ */
 
@@ -55,8 +64,8 @@ void run_empty()
 	/* ------------------------------------------------------ */
 
 	/* Add analysis task ------------------------------------ */
-	R3BLandRawAna* ana = new R3BLandRawAna("LandRawAna", 1);
-	run->AddTask(ana);
+	/*R3BLandRawAna* ana = new R3BLandRawAna("LandRawAna", 1);
+	run->AddTask(ana);*/
 	/* ------------------------------------------------------ */
 
 	/* Initialize ------------------------------------------- */

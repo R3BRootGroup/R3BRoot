@@ -12,9 +12,10 @@ extern "C" {
 #include "R3BPspxMappedData.h"
 
 
-R3BPspReader::R3BPspReader(EXT_STR_h101* data)
+R3BPspReader::R3BPspReader(EXT_STR_h101_PSP* data, UInt_t offset)
 	: R3BReader("R3BPspReader")
 	, fData(data)
+	, fOffset(offset)
 	, fLogger(FairLogger::GetLogger())
     , fArray(new TClonesArray("R3BPspxMappedData"))
 {
@@ -27,7 +28,8 @@ Bool_t R3BPspReader::Init(ext_data_struct_info *a_struct_info)
 {
 	int ok;
 
-	EXT_STR_h101_PSP_ITEMS_INFO(ok, *a_struct_info, EXT_STR_h101, 0);
+	EXT_STR_h101_PSP_ITEMS_INFO(ok, *a_struct_info, fOffset,
+	    EXT_STR_h101_PSP, 0);
 
 	if (!ok) {
 		perror("ext_data_struct_info_item");

@@ -6,13 +6,13 @@
 extern "C" {
 #include "ext_data_client.h"
 #include "ext_h101_unpack.h"
-#include "ext_h101_full.h"
 }
 
-R3BUnpackReader::R3BUnpackReader(EXT_STR_h101* data)
+R3BUnpackReader::R3BUnpackReader(EXT_STR_h101_unpack *data, UInt_t offset)
 	: R3BReader("R3BUnpackReader")
 	, fNEvent(0)
 	, fData(data)
+	, fOffset(offset)
 	, fLogger(FairLogger::GetLogger())
 	, fHeader(new R3BEventHeader())
 {
@@ -30,7 +30,8 @@ Bool_t R3BUnpackReader::Init(ext_data_struct_info *a_struct_info)
 {
 	int ok;
 
-	EXT_STR_h101_unpack_ITEMS_INFO(ok, *a_struct_info, EXT_STR_h101, 0);
+	EXT_STR_h101_unpack_ITEMS_INFO(ok, *a_struct_info, fOffset,
+	    EXT_STR_h101_unpack, 0);
 
 	if (!ok) {
 		perror("ext_data_struct_info_item");
@@ -58,7 +59,8 @@ Bool_t R3BUnpackReader::Read()
 
 	if (0 == (fNEvent % 1000))
 	{
-		LOG(DEBUG1) << "R3BUnpackReader : event : " << fNEvent << ", trigger : " << fData->TRIGGER << FairLogger::endl;
+		LOG(DEBUG1) << "R3BUnpackReader : event : " << fNEvent
+		    << ", trigger : " << fData->TRIGGER << FairLogger::endl;
 	}
 
 	fHeader->SetTrigger(fData->TRIGGER);

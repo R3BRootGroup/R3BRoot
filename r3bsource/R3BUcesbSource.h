@@ -21,6 +21,8 @@
  * This structure is produced using ucesb in the following way:
  * ./ucesb --ntuple=UNPACK:EVENTNO,UNPACK:TRIGGER,RAW,STRUCT_HH,ext_h101.h
  * */
+struct EXT_STR_h101_t;
+typedef struct EXT_STR_h101_t EXT_STR_h101;
 /*#include "ext_h101.h"*/
 
 class FairLogger;

@@ -3,13 +3,14 @@
 
 #include "R3BReader.h"
 
-typedef struct EXT_STR_h101_t EXT_STR_h101;
+struct EXT_STR_h101_FI4_t;
+typedef struct EXT_STR_h101_FI4_t EXT_STR_h101_FI4;
 class FairLogger;
 
 class R3BFiberReader : public R3BReader
 {
 	public:
-		R3BFiberReader(EXT_STR_h101 *);
+		R3BFiberReader(EXT_STR_h101_FI4 *, UInt_t);
 		~R3BFiberReader();
 
 		Bool_t Init(ext_data_struct_info *);
@@ -20,7 +21,9 @@ class R3BFiberReader : public R3BReader
 		/* An event counter */
 		//unsigned int fNEvent;
 		/* Reader specific data structure from ucesb */
-		EXT_STR_h101* fData;
+		EXT_STR_h101_FI4* fData;
+		/* Data offset */
+		UInt_t fOffset;
 		/* FairLogger */
 		FairLogger*	fLogger;
 		/* the structs of type R3BFi4MappedItem */

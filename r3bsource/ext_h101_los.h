@@ -66,37 +66,37 @@ typedef struct EXT_STR_h101_LOS_onion_t
 
 /*******************************************************/
 
-#define EXT_STR_h101_LOS_ITEMS_INFO(ok,si,struct_t,printerr) do { \
+#define EXT_STR_h101_LOS_ITEMS_INFO(ok,si,offset,struct_t,printerr) do { \
   ok = 1; \
   /* RAW */ \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      LOS1TFM,                         UINT32,\
                     "LOS1TFM",4); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      LOS1TFMI,                        UINT32,\
                     "LOS1TFMI",                        "LOS1TFM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      LOS1TFME,                        UINT32,\
                     "LOS1TFME",                        "LOS1TFM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      LOS1TF,                          UINT32,\
                     "LOS1TF",40); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      LOS1TFv,                         UINT32,\
                     "LOS1TFv",                         "LOS1TF"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      LOS1TCM,                         UINT32,\
                     "LOS1TCM",4); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      LOS1TCMI,                        UINT32,\
                     "LOS1TCMI",                        "LOS1TCM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      LOS1TCME,                        UINT32,\
                     "LOS1TCME",                        "LOS1TCM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      LOS1TC,                          UINT32,\
                     "LOS1TC",40); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      LOS1TCv,                         UINT32,\
                     "LOS1TCv",                         "LOS1TC"); \
   \

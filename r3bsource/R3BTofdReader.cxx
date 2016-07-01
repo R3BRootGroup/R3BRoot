@@ -8,14 +8,14 @@
 extern "C" {
 #include "ext_data_client.h"
 #include "ext_h101_tofd.h"
-#include EXP_SPECIFIC_H101_FILE
 }
 
 #define MAX_TOFD_PLANES   4
 
-R3BTofdReader::R3BTofdReader(EXT_STR_h101* data)
+R3BTofdReader::R3BTofdReader(EXT_STR_h101_TOFD* data, UInt_t offset)
 	: R3BReader("R3BTofdReader")
 	, fData(data)
+	, fOffset(offset)
 	, fLogger(FairLogger::GetLogger())
     , fArray(new TClonesArray("R3BPaddleTamexMappedData"))
 {
@@ -28,7 +28,8 @@ Bool_t R3BTofdReader::Init(ext_data_struct_info *a_struct_info)
 {
 	int ok;
 
-	EXT_STR_h101_TOFD_ITEMS_INFO(ok, *a_struct_info, EXT_STR_h101, 0);
+	EXT_STR_h101_TOFD_ITEMS_INFO(ok, *a_struct_info, fOffset,
+	    EXT_STR_h101_TOFD, 0);
 
 	if (!ok) {
 		perror("ext_data_struct_info_item");
@@ -42,10 +43,10 @@ Bool_t R3BTofdReader::Init(ext_data_struct_info *a_struct_info)
 
 
 	// initial clear (set number of hits to 0)
-	EXT_STR_h101_onion* data = (EXT_STR_h101_onion*)fData;
+	EXT_STR_h101_TOFD_onion* data = (EXT_STR_h101_TOFD_onion*)fData;
 	for (int d=0;d<MAX_TOFD_PLANES;d++)
 		for (int t=0;t<2;t++) // tube
-		{		
+		{
 			data->TOFD_P[d].T[t].TFLM=0;
 			data->TOFD_P[d].T[t].TFTM=0;
 		}
@@ -56,7 +57,7 @@ Bool_t R3BTofdReader::Init(ext_data_struct_info *a_struct_info)
 Bool_t R3BTofdReader::Read()
 {
 	// Convert plain raw data to multi-dimensional array
-    EXT_STR_h101_onion* data = (EXT_STR_h101_onion*)fData;
+    EXT_STR_h101_TOFD_onion* data = (EXT_STR_h101_TOFD_onion*)fData;
 
 #if 0
 

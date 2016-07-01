@@ -11,9 +11,10 @@ extern "C" {
 #include "ext_h101.h"
 }
 
-R3BFiberReader::R3BFiberReader(EXT_STR_h101* data)
+R3BFiberReader::R3BFiberReader(EXT_STR_h101_FI4* data, UInt_t offset)
 	: R3BReader("R3BFiberReader")
 	, fData(data)
+	, fOffset(offset)
 	, fLogger(FairLogger::GetLogger())
     , fArray(new TClonesArray("R3BFi4MappedItem"))
 {
@@ -26,7 +27,8 @@ Bool_t R3BFiberReader::Init(ext_data_struct_info *a_struct_info)
 {
 	int ok;
 
-	EXT_STR_h101_FI4_ITEMS_INFO(ok, *a_struct_info, EXT_STR_h101, 0);
+	EXT_STR_h101_FI4_ITEMS_INFO(ok, *a_struct_info, fOffset,
+	    EXT_STR_h101_FI4, 0);
 
 	if (!ok) {
 		perror("ext_data_struct_info_item");
@@ -44,13 +46,13 @@ Bool_t R3BFiberReader::Init(ext_data_struct_info *a_struct_info)
 Bool_t R3BFiberReader::Read()
 {
 	// Convert plain raw data to multi-dimensional array
-    EXT_STR_h101_onion* data = (EXT_STR_h101_onion*)fData;
+    EXT_STR_h101_FI4_onion* data = (EXT_STR_h101_FI4_onion*)fData;
 
 	// Display data
 	// fLogger->Info(MESSAGE_ORIGIN, "  Event data:");
-	
-	
-/* 
+
+
+/*
   // this is the data structure we have to read:
   struct {
     uint32_t M;                 // number of channels with data

@@ -149,277 +149,277 @@ typedef struct EXT_STR_h101_FI4_onion_t
 
 /*******************************************************/
 
-#define EXT_STR_h101_FI4_ITEMS_INFO(ok,si,struct_t,printerr) do { \
+#define EXT_STR_h101_FI4_ITEMS_INFO(ok,si,offset,struct_t,printerr) do { \
   ok = 1; \
   /* RAW */ \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour1tM,                    UINT32,\
                     "fiberfour1tM",16); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour1tMI,                   UINT32,\
                     "fiberfour1tMI",                   "fiberfour1tM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour1tME,                   UINT32,\
                     "fiberfour1tME",                   "fiberfour1tM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour1t,                     UINT32,\
                     "fiberfour1t",160); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour1tv,                    UINT32,\
                     "fiberfour1tv",                    "fiberfour1t"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour1EM,                    UINT32,\
                     "fiberfour1EM",16); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour1EMI,                   UINT32,\
                     "fiberfour1EMI",                   "fiberfour1EM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour1EME,                   UINT32,\
                     "fiberfour1EME",                   "fiberfour1EM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour1E,                     UINT32,\
                     "fiberfour1E",160); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour1Ev,                    UINT32,\
                     "fiberfour1Ev",                    "fiberfour1E"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour2tM,                    UINT32,\
                     "fiberfour2tM",16); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour2tMI,                   UINT32,\
                     "fiberfour2tMI",                   "fiberfour2tM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour2tME,                   UINT32,\
                     "fiberfour2tME",                   "fiberfour2tM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour2t,                     UINT32,\
                     "fiberfour2t",160); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour2tv,                    UINT32,\
                     "fiberfour2tv",                    "fiberfour2t"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour2EM,                    UINT32,\
                     "fiberfour2EM",16); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour2EMI,                   UINT32,\
                     "fiberfour2EMI",                   "fiberfour2EM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour2EME,                   UINT32,\
                     "fiberfour2EME",                   "fiberfour2EM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour2E,                     UINT32,\
                     "fiberfour2E",160); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour2Ev,                    UINT32,\
                     "fiberfour2Ev",                    "fiberfour2E"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour3tM,                    UINT32,\
                     "fiberfour3tM",16); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour3tMI,                   UINT32,\
                     "fiberfour3tMI",                   "fiberfour3tM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour3tME,                   UINT32,\
                     "fiberfour3tME",                   "fiberfour3tM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour3t,                     UINT32,\
                     "fiberfour3t",160); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour3tv,                    UINT32,\
                     "fiberfour3tv",                    "fiberfour3t"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour3EM,                    UINT32,\
                     "fiberfour3EM",16); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour3EMI,                   UINT32,\
                     "fiberfour3EMI",                   "fiberfour3EM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour3EME,                   UINT32,\
                     "fiberfour3EME",                   "fiberfour3EM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour3E,                     UINT32,\
                     "fiberfour3E",160); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour3Ev,                    UINT32,\
                     "fiberfour3Ev",                    "fiberfour3E"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour4tM,                    UINT32,\
                     "fiberfour4tM",16); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour4tMI,                   UINT32,\
                     "fiberfour4tMI",                   "fiberfour4tM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour4tME,                   UINT32,\
                     "fiberfour4tME",                   "fiberfour4tM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour4t,                     UINT32,\
                     "fiberfour4t",160); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour4tv,                    UINT32,\
                     "fiberfour4tv",                    "fiberfour4t"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour4EM,                    UINT32,\
                     "fiberfour4EM",16); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour4EMI,                   UINT32,\
                     "fiberfour4EMI",                   "fiberfour4EM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour4EME,                   UINT32,\
                     "fiberfour4EME",                   "fiberfour4EM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour4E,                     UINT32,\
                     "fiberfour4E",160); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour4Ev,                    UINT32,\
                     "fiberfour4Ev",                    "fiberfour4E"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour5tM,                    UINT32,\
                     "fiberfour5tM",16); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour5tMI,                   UINT32,\
                     "fiberfour5tMI",                   "fiberfour5tM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour5tME,                   UINT32,\
                     "fiberfour5tME",                   "fiberfour5tM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour5t,                     UINT32,\
                     "fiberfour5t",160); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour5tv,                    UINT32,\
                     "fiberfour5tv",                    "fiberfour5t"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour5EM,                    UINT32,\
                     "fiberfour5EM",16); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour5EMI,                   UINT32,\
                     "fiberfour5EMI",                   "fiberfour5EM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour5EME,                   UINT32,\
                     "fiberfour5EME",                   "fiberfour5EM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour5E,                     UINT32,\
                     "fiberfour5E",160); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour5Ev,                    UINT32,\
                     "fiberfour5Ev",                    "fiberfour5E"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour6tM,                    UINT32,\
                     "fiberfour6tM",16); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour6tMI,                   UINT32,\
                     "fiberfour6tMI",                   "fiberfour6tM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour6tME,                   UINT32,\
                     "fiberfour6tME",                   "fiberfour6tM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour6t,                     UINT32,\
                     "fiberfour6t",160); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour6tv,                    UINT32,\
                     "fiberfour6tv",                    "fiberfour6t"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour6EM,                    UINT32,\
                     "fiberfour6EM",16); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour6EMI,                   UINT32,\
                     "fiberfour6EMI",                   "fiberfour6EM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour6EME,                   UINT32,\
                     "fiberfour6EME",                   "fiberfour6EM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour6E,                     UINT32,\
                     "fiberfour6E",160); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour6Ev,                    UINT32,\
                     "fiberfour6Ev",                    "fiberfour6E"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour7tM,                    UINT32,\
                     "fiberfour7tM",16); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour7tMI,                   UINT32,\
                     "fiberfour7tMI",                   "fiberfour7tM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour7tME,                   UINT32,\
                     "fiberfour7tME",                   "fiberfour7tM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour7t,                     UINT32,\
                     "fiberfour7t",160); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour7tv,                    UINT32,\
                     "fiberfour7tv",                    "fiberfour7t"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour7EM,                    UINT32,\
                     "fiberfour7EM",16); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour7EMI,                   UINT32,\
                     "fiberfour7EMI",                   "fiberfour7EM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour7EME,                   UINT32,\
                     "fiberfour7EME",                   "fiberfour7EM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour7E,                     UINT32,\
                     "fiberfour7E",160); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour7Ev,                    UINT32,\
                     "fiberfour7Ev",                    "fiberfour7E"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour8tM,                    UINT32,\
                     "fiberfour8tM",16); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour8tMI,                   UINT32,\
                     "fiberfour8tMI",                   "fiberfour8tM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour8tME,                   UINT32,\
                     "fiberfour8tME",                   "fiberfour8tM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour8t,                     UINT32,\
                     "fiberfour8t",160); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour8tv,                    UINT32,\
                     "fiberfour8tv",                    "fiberfour8t"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour8EM,                    UINT32,\
                     "fiberfour8EM",16); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour8EMI,                   UINT32,\
                     "fiberfour8EMI",                   "fiberfour8EM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour8EME,                   UINT32,\
                     "fiberfour8EME",                   "fiberfour8EM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour8E,                     UINT32,\
                     "fiberfour8E",160); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour8Ev,                    UINT32,\
                     "fiberfour8Ev",                    "fiberfour8E"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour9tM,                    UINT32,\
                     "fiberfour9tM",16); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour9tMI,                   UINT32,\
                     "fiberfour9tMI",                   "fiberfour9tM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour9tME,                   UINT32,\
                     "fiberfour9tME",                   "fiberfour9tM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour9t,                     UINT32,\
                     "fiberfour9t",160); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour9tv,                    UINT32,\
                     "fiberfour9tv",                    "fiberfour9t"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour9EM,                    UINT32,\
                     "fiberfour9EM",16); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour9EMI,                   UINT32,\
                     "fiberfour9EMI",                   "fiberfour9EM"); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour9EME,                   UINT32,\
                     "fiberfour9EME",                   "fiberfour9EM"); \
-  EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      fiberfour9E,                     UINT32,\
                     "fiberfour9E",160); \
-  EXT_STR_ITEM_INFO_ZZP(ok,si,struct_t,printerr,\
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      fiberfour9Ev,                    UINT32,\
                     "fiberfour9Ev",                    "fiberfour9E"); \
   \
