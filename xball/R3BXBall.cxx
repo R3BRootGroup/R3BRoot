@@ -76,7 +76,7 @@ R3BXBall::R3BXBall() : R3BDetector("R3BXBall", kTRUE, kCAL) {
 
 
 // -----   Standard constructor   ------------------------------------------
-R3BXBall::R3BXBall(const char* name, Bool_t active) 
+R3BXBall::R3BXBall(const char* name, Bool_t active)
   : R3BDetector(name, active, kCAL) {
   ResetParameters();
   fXBallCollection = new TClonesArray("R3BXBallPoint");
@@ -274,12 +274,12 @@ void R3BXBall::BeginEvent()
 void R3BXBall::EndOfEvent() {
 
   if (fVerboseLevel) Print();
- 
-  if(fCollectionOption == 0) { 
+
+  if(fCollectionOption == 0) {
     fXBallCollection->Clear();
-  } else if(fCollectionOption == 1) { 
+  } else if(fCollectionOption == 1) {
     fXBallCrystalHitCollection->Clear();
-  } else if(fCollectionOption == 2) { 
+  } else if(fCollectionOption == 2) {
     fXBallCollection->Clear();
     fXBallCrystalHitCollection->Clear();
   }
@@ -293,7 +293,7 @@ void R3BXBall::EndOfEvent() {
 void R3BXBall::SetSpecialPhysicsCuts()
 {
     LOG(INFO) << "-I- R3BXBall: Adding customized Physics cut ... " << FairLogger::endl;
-    
+
     if (gGeoManager)
     {
         TGeoMedium* pSi = gGeoManager->GetMedium("NaI");
@@ -312,12 +312,12 @@ void R3BXBall::SetSpecialPhysicsCuts()
             gMC->Gstpar(pSi->GetId(), "DCAY", 1.0);
             gMC->Gstpar(pSi->GetId(), "MULS", 1.0);
             gMC->Gstpar(pSi->GetId(), "RAYL", 1.0);
-            
+
             // Setting Energy-CutOff for Si Only
-            Double_t cutE = 0.01; // GeV-> 1 keV
-            
+            Double_t cutE = 0.00001; // GeV-> 10 keV
+
             LOG(INFO) << "-I- R3BXBall: NaI Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV" << FairLogger::endl;
-            
+
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
             gMC->Gstpar(pSi->GetId(), "CUTELE", cutE); /** electrons (GeV)*/
@@ -333,14 +333,14 @@ void R3BXBall::SetSpecialPhysicsCuts()
         // <DB> trick to remove too much internal
         // tracking in the Aladin magnet yoke
         TGeoMedium* pFe = gGeoManager->GetMedium("iron");
-        
+
         if (pFe)
         {
             Double_t cutM = 1.e-01; // 100 MeV
             gMC->Gstpar(pFe->GetId(), "CUTELE", cutM);
             gMC->Gstpar(pFe->GetId(), "DRAY", 0.0);
         }
-        
+
     } //!gGeoManager
 }
 
@@ -348,11 +348,11 @@ void R3BXBall::SetSpecialPhysicsCuts()
 
 // -----   Public method Register   -------------------------------------------
 void R3BXBall::Register() {
-  if(fCollectionOption == 0) { 
+  if(fCollectionOption == 0) {
     FairRootManager::Instance()->Register("XBCrystalPoint", GetName(), fXBallCollection, kTRUE);
-  } else if(fCollectionOption == 1) { 
+  } else if(fCollectionOption == 1) {
     FairRootManager::Instance()->Register("XBCrystalHitSim", GetName(), fXBallCrystalHitCollection, kTRUE);
-  } else if(fCollectionOption == 2) { 
+  } else if(fCollectionOption == 2) {
     FairRootManager::Instance()->Register("XBCrystalPoint", GetName(), fXBallCollection, kTRUE);
     FairRootManager::Instance()->Register("XBCrystalHitSim", GetName(), fXBallCrystalHitCollection, kTRUE);
   }
@@ -363,13 +363,13 @@ void R3BXBall::Register() {
 
 // -----   Public method GetCollection   --------------------------------------
 TClonesArray* R3BXBall::GetCollection(Int_t iColl) const {
-  if(fCollectionOption == 0) { 
+  if(fCollectionOption == 0) {
     if (iColl == 0) return fXBallCollection;
     else return NULL;
-  } else if(fCollectionOption == 1) { 
+  } else if(fCollectionOption == 1) {
     if (iColl == 0) return fXBallCrystalHitCollection;
     else return NULL;
-  } else if(fCollectionOption == 2) { 
+  } else if(fCollectionOption == 2) {
     if (iColl == 0) return fXBallCollection;
     if (iColl == 1) return fXBallCrystalHitCollection;
     else return NULL;
@@ -382,13 +382,13 @@ TClonesArray* R3BXBall::GetCollection(Int_t iColl) const {
 // -----   Public method Print   ----------------------------------------------
 void R3BXBall::Print(Option_t* option) const
 {
-  if(fCollectionOption == 0) { 
+  if(fCollectionOption == 0) {
     Int_t nHits = fXBallCollection->GetEntriesFast();
     LOG(INFO) << "R3BXBall: " << nHits << " points registered in this event" << FairLogger::endl;
-  } else if(fCollectionOption == 1) { 
+  } else if(fCollectionOption == 1) {
     Int_t nHits = fXBallCrystalHitCollection->GetEntriesFast();
     LOG(INFO) << "R3BXBall: " << nHits << " hits registered in this event" << FairLogger::endl;
-  } else if(fCollectionOption == 2) { 
+  } else if(fCollectionOption == 2) {
     Int_t nHits = fXBallCollection->GetEntriesFast();
     LOG(INFO) << "R3BXBall: " << nHits << " points registered in this event" << FairLogger::endl;
     nHits = fXBallCrystalHitCollection->GetEntriesFast();
@@ -429,12 +429,12 @@ void R3BXBall::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 
 // -----   Private method AddHit   --------------------------------------------
 R3BXBallPoint* R3BXBall::AddHit(Int_t trackID, Int_t detID, Int_t type, Int_t cp, TVector3 posIn,
-        TVector3 posOut, TVector3 momIn, 
-        TVector3 momOut, Double_t time, 
+        TVector3 posOut, TVector3 momIn,
+        TVector3 momOut, Double_t time,
         Double_t length, Double_t eLoss) {
   TClonesArray& clref = *fXBallCollection;
   Int_t size = clref.GetEntriesFast();
-  if (fVerboseLevel>1) 
+  if (fVerboseLevel>1)
     LOG(INFO) << "R3BXBall: Adding Point at (" << posIn.X() << ", " << posIn.Y()
     << ", " << posIn.Z() << ") cm, detector " << detID << ", track "
     << trackID << ", energy loss " << eLoss*1e06 << " keV" << FairLogger::endl;
