@@ -69,7 +69,7 @@ InitStatus R3BNeulandMapped2CalPar::Init()
     {
         return kFATAL;
     }
-    fHits = (TClonesArray*)rm->GetObject("LandRawHitMapped");
+    fHits = (TClonesArray*)rm->GetObject("NeulandMappedData");
     if (!fHits)
     {
         return kFATAL;

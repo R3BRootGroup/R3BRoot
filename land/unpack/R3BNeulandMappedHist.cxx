@@ -12,95 +12,72 @@ using namespace std;
 #include "TH1F.h"
 #include "TH2F.h"
 
+#include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRunOnline.h"
-#include "FairLogger.h"
 
 #include "R3BEventHeader.h"
-#include "R3BNeulandUnpackData.h"
+#include "R3BLosMappedData.h"
 #include "R3BNeulandMappedData.h"
-#include "R3BPaddleTamexMappedItem.h"
-#include "R3BLosMappedItem.h"
-#include "R3BLandRawAna.h"
+#include "R3BNeulandMappedHist.h"
+#include "R3BPaddleTamexMappedData.h"
 
-R3BLandRawAna::R3BLandRawAna()
+R3BNeulandMappedHist::R3BNeulandMappedHist()
     : fnEvents(0)
     , fNItemsTotal(0)
     , fHeader(NULL)
-    , fLandRawHit(NULL)
-    , fLandRawHitMapped(NULL)
-    , fLosRawHit(NULL)
+    , fLandMappedData(NULL)
+    , fNeulandTamexHitMapped(NULL)
+    , fLosMappedData(NULL)
 {
 }
 
-R3BLandRawAna::R3BLandRawAna(const char* name, Int_t iVerbose)
+R3BNeulandMappedHist::R3BNeulandMappedHist(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fnEvents(0)
     , fNItemsTotal(0)
     , fHeader(NULL)
-    , fLandRawHit(NULL)
-    , fLandRawHitMapped(NULL)
-    , fLosRawHit(NULL)
+    , fLandMappedData(NULL)
+    , fNeulandTamexHitMapped(NULL)
+    , fLosMappedData(NULL)
 {
 }
 
-R3BLandRawAna::~R3BLandRawAna()
+R3BNeulandMappedHist::~R3BNeulandMappedHist()
 {
 }
 
-InitStatus R3BLandRawAna::Init()
+InitStatus R3BNeulandMappedHist::Init()
 {
     FairRootManager* fMan = FairRootManager::Instance();
     fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
-    fLandRawHit = (TClonesArray*)fMan->GetObject("LandRawHit");
-    fLandRawHitMapped = (TClonesArray*)fMan->GetObject("LandRawHitMapped");
-    fLosRawHit = (TClonesArray*)fMan->GetObject("LosRawHit");
+    fLandMappedData = (TClonesArray*)fMan->GetObject("NeulandMappedData");
+    fLosMappedData = (TClonesArray*)fMan->GetObject("LosMapped");
     fNeulandTamexHitMapped = (TClonesArray*)fMan->GetObject("NeulandTamexMappedItem");
     CreateHistos();
 
     return kSUCCESS;
 }
 
-void R3BLandRawAna::Exec(Option_t* option)
+void R3BNeulandMappedHist::Exec(Option_t* option)
 {
-    if(fHeader)
+    if (fHeader)
     {
         fh_trigger->Fill(fHeader->GetTrigger());
     }
 
-    if (fLandRawHit)
+    if (fLandMappedData)
     {
-        Int_t nLandRawHits = fLandRawHit->GetEntries();
-        R3BNeulandUnpackData* hit;
-        for (Int_t i = 0; i < nLandRawHits; i++)
-        {
-            hit = (R3BNeulandUnpackData*)fLandRawHit->At(i);
-            fh_land_raw_sam->Fill(hit->GetSam());
-            fh_land_raw_gtb->Fill(hit->GetGtb());
-            fh_land_raw_tacaddr->Fill(hit->GetTacAddr());
-            fh_land_raw_tacch->Fill(hit->GetTacCh());
-            fh_land_raw_cal->Fill(hit->GetCal());
-            fh_land_raw_clock->Fill(hit->GetClock());
-            fh_land_raw_tac->Fill(hit->GetTacData());
-            if(16 != hit->GetTacCh())
-            {
-                fh_land_raw_qdc->Fill(hit->GetQdcData());
-            }
-        }
-    }
-
-    if (fLandRawHitMapped)
-    {
-        Int_t nLandRawHitsMapped = fLandRawHitMapped->GetEntries();
-        fNItemsTotal += nLandRawHitsMapped;
+        Int_t nLandMapped = fLandMappedData->GetEntries();
+        fNItemsTotal += nLandMapped;
         R3BNeulandMappedData* hitmapped;
-        for (Int_t i = 0; i < nLandRawHitsMapped; i++)
+        for (Int_t i = 0; i < nLandMapped; i++)
         {
-            hitmapped = (R3BNeulandMappedData*)fLandRawHitMapped->At(i);
+            hitmapped = (R3BNeulandMappedData*)fLandMappedData->At(i);
             fh_land_mapped_is17->Fill(hitmapped->Is17());
-            if(! hitmapped->Is17())
+            if (!hitmapped->Is17())
             {
-                fh_land_mapped_barid->Fill((hitmapped->GetPlane()-1)*50 + hitmapped->GetPaddle());
+                fh_land_mapped_barid->Fill((hitmapped->GetPlane() - 1) * 50 + hitmapped->GetPaddle());
                 fh_land_mapped_side->Fill(hitmapped->GetSide());
                 fh_land_mapped_clock->Fill(hitmapped->GetClock());
                 fh_land_mapped_tac->Fill(hitmapped->GetTacData());
@@ -112,13 +89,13 @@ void R3BLandRawAna::Exec(Option_t* option)
     if (fNeulandTamexHitMapped)
     {
         Int_t nNeulandTamexHitsMapped = fNeulandTamexHitMapped->GetEntries();
-//        fNItemsTotal += nLandRawHitsMapped;
-        R3BNeulandTamexMappedItem* hitmapped;
+        //        fNItemsTotal += nLandRawHitsMapped;
+        R3BPaddleTamexMappedData* hitmapped;
         for (Int_t i = 0; i < nNeulandTamexHitsMapped; i++)
         {
-            hitmapped = (R3BPaddleTamexMappedItem*)fNeulandTamexHitMapped->At(i);
+            hitmapped = (R3BPaddleTamexMappedData*)fNeulandTamexHitMapped->At(i);
             fh_neuland_mapped_is17->Fill(hitmapped->Is17());
-            if(! hitmapped->Is17())
+            if (!hitmapped->Is17())
             {
                 fh_neuland_mapped_planeid->Fill(hitmapped->GetPlaneId());
                 fh_neuland_mapped_barid->Fill(hitmapped->GetBarId());
@@ -127,49 +104,40 @@ void R3BLandRawAna::Exec(Option_t* option)
                 fh_neuland_mapped_cte->Fill(hitmapped->GetCoarseTimeTE());
                 fh_neuland_mapped_fle->Fill(hitmapped->GetFineTimeLE());
                 fh_neuland_mapped_fte->Fill(hitmapped->GetFineTimeTE());
-//        cout<<"in ana: "<<hitmapped->GetPlaneId()<<"  "<<hitmapped->GetBarId()<<endl;
-           }
+                //        cout<<"in ana: "<<hitmapped->GetPlaneId()<<"  "<<hitmapped->GetBarId()<<endl;
+            }
         }
     }
 
-    if (fLosRawHit)
+    if (fLosMappedData)
     {
-        Int_t nLosRawHits = fLosRawHit->GetEntries();
-        R3BLosRawHit* loshit;
-        for (Int_t i = 0; i < nLosRawHits; i++)
+        Int_t nLosMapped = fLosMappedData->GetEntries();
+        R3BLosMappedData* loshit;
+        for (Int_t i = 0; i < nLosMapped; i++)
         {
-            loshit = (R3BLosRawHit*)fLosRawHit->At(i);
-            fh_los_raw_ch->Fill(loshit->GetChannel());
-            fh_los_raw_tdc->Fill(loshit->GetTdc());
-            fh_los_raw_clock->Fill(loshit->GetClock());
+            loshit = (R3BLosMappedData*)fLosMappedData->At(i);
+            fh_los_det->Fill(loshit->GetDetector());
+            fh_los_ch->Fill(loshit->GetChannel());
+            fh_los_tcoarse->Fill(loshit->GetTimeCoarse());
+            fh_los_tfine->Fill(loshit->GetTimeFine());
         }
     }
 
     fnEvents += 1;
-    if(0 == (fnEvents%1000))
+    if (0 == (fnEvents % 1000))
     {
-        LOG(INFO) << "R3BLandRawAna : " << fnEvents << " events collected" << FairLogger::endl;
+        LOG(INFO) << "R3BNeulandMappedHist : " << fnEvents << " events collected" << FairLogger::endl;
     }
 }
 
-void R3BLandRawAna::FinishTask()
+void R3BNeulandMappedHist::FinishTask()
 {
     WriteHistos();
-	
 }
 
-void R3BLandRawAna::CreateHistos()
+void R3BNeulandMappedHist::CreateHistos()
 {
     fh_trigger = new TH1F("h_trigger", "Trigger", 10, -0.5, 9.5);
-    
-    fh_land_raw_sam = new TH1F("h_land_raw_sam", "SAM", 20, -0.5, 19.5);
-    fh_land_raw_gtb = new TH1F("h_land_raw_gtb", "GTB", 10, -0.5, 9.5);
-    fh_land_raw_tacaddr = new TH1F("h_land_raw_tacaddr", "TAC module", 30, -0.5, 29.5);
-    fh_land_raw_tacch = new TH1F("h_land_raw_tacch", "TAC channel", 20, -0.5, 19.5);
-    fh_land_raw_cal = new TH1F("h_land_raw_cal", "Trigger", 20, -0.5, 19.5);
-    fh_land_raw_clock = new TH1F("h_land_raw_clock", "Clock count", 70, -0.5, 69.5);
-    fh_land_raw_tac = new TH1F("h_land_raw_tac", "TAC data", 500, 0., 5000.);
-    fh_land_raw_qdc = new TH1F("h_land_raw_qdc", "QDC data", 100, 0., 1000.);
 
     fh_land_mapped_is17 = new TH1F("h_land_mapped_is17", "Is 17", 4, -0.5, 3.5);
     fh_land_mapped_barid = new TH1F("h_land_mapped_barid", "Bar ID", 500, -0.5, 499.5);
@@ -187,22 +155,14 @@ void R3BLandRawAna::CreateHistos()
     fh_neuland_mapped_fle = new TH1F("h_neuland_mapped_fle", "Fine time LE", 600, 0., 600.);
     fh_neuland_mapped_fte = new TH1F("h_neuland_mapped_fte", "Fine time TE", 600, 0., 600.);
 
-    fh_los_raw_ch = new TH1F("h_los_raw_ch", "Channel", 20, -0.5, 19.5);
-    fh_los_raw_tdc = new TH1F("h_los_raw_tdc", "TDC data", 200, 0., 2000.);
-    fh_los_raw_clock = new TH1F("h_los_raw_clock", "Clock count", 1000, 0., 10000.);
+    fh_los_det = new TH1F("h_los_det", "Detector", 20, -0.5, 19.5);
+    fh_los_ch = new TH1F("h_los_ch", "Channel", 20, -0.5, 19.5);
+    fh_los_tcoarse = new TH1F("h_los_tcoarse", "Time coarse", 1000, 0., 10000.);
+    fh_los_tfine = new TH1F("h_los_tfine", "Time fine", 200, 0., 2000.);
 
     FairRunOnline* run = FairRunOnline::Instance();
-    
+
     run->AddObject(fh_trigger);
-    
-    run->AddObject(fh_land_raw_sam);
-    run->AddObject(fh_land_raw_gtb);
-    run->AddObject(fh_land_raw_tacaddr);
-    run->AddObject(fh_land_raw_tacch);
-    run->AddObject(fh_land_raw_cal);
-    run->AddObject(fh_land_raw_clock);
-    run->AddObject(fh_land_raw_tac);
-    run->AddObject(fh_land_raw_qdc);
 
     run->AddObject(fh_land_mapped_is17);
     run->AddObject(fh_land_mapped_barid);
@@ -219,16 +179,16 @@ void R3BLandRawAna::CreateHistos()
     run->AddObject(fh_neuland_mapped_cte);
     run->AddObject(fh_neuland_mapped_fle);
     run->AddObject(fh_neuland_mapped_fte);
-  
-    run->AddObject(fh_los_raw_ch);
-    run->AddObject(fh_los_raw_tdc);
-    run->AddObject(fh_los_raw_clock);
 
+    run->AddObject(fh_los_det);
+    run->AddObject(fh_los_ch);
+    run->AddObject(fh_los_tcoarse);
+    run->AddObject(fh_los_tfine);
 
     run->RegisterHttpCommand("/Reset_h_land_mapped_barid", "/h_land_mapped_barid/->Reset()");
 }
 
-void R3BLandRawAna::WriteHistos()
+void R3BNeulandMappedHist::WriteHistos()
 {
     fh_neuland_mapped_is17->Write();
     fh_neuland_mapped_planeid->Write();
@@ -240,4 +200,4 @@ void R3BLandRawAna::WriteHistos()
     fh_neuland_mapped_fte->Write();
 }
 
-ClassImp(R3BLandRawAna)
+ClassImp(R3BNeulandMappedHist)

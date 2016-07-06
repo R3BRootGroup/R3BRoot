@@ -21,6 +21,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
+${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
 ${R3BROOT_SOURCE_DIR}/r3bdb/landdb
 ${R3BROOT_SOURCE_DIR}/tcal
@@ -53,7 +54,7 @@ R3BNeutronCalibr2D.cxx
 R3BPrimPart.cxx
 R3BNeutronTracker2D.cxx
 R3BNeutHit.cxx
-#unpack/R3BLandRawAna.cxx
+unpack/R3BNeulandMappedHist.cxx
 #unpack/R3BLandRawAnaS438b.cxx
 #unpack/R3BLandMapping.cxx
 #unpack/R3BLandUnpack.cxx

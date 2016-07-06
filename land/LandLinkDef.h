@@ -20,7 +20,7 @@
 #pragma link C++ class R3BPrimPart+;
 #pragma link C++ class R3BNeutHit+;
 
-//#pragma link C++ class R3BLandRawAna+;
+#pragma link C++ class R3BNeulandMappedHist+;
 //#pragma link C++ class R3BLandRawAnaS438b+;
 //#pragma link C++ class R3BLandMapping+;
 //#pragma link C++ class R3BLandUnpack+;

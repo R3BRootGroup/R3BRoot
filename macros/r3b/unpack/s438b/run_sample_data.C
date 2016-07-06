@@ -1,4 +1,17 @@
 
+extern "C" {
+#include "ext_h101_unpack.h"
+#include "ext_h101_raw_nnp.h"
+#include "ext_h101_los.h"
+}
+
+typedef struct EXT_STR_h101_t
+{
+    EXT_STR_h101_unpack unpack;
+    EXT_STR_h101_raw_nnp_onion nnp;
+    EXT_STR_h101_LOS_onion los;
+} EXT_STR_h101;
+
 void run_sample_data()
 {
     TStopwatch timer;
@@ -7,45 +20,32 @@ void run_sample_data()
     const Int_t nev = -1;                                // number of events to read, -1 - untill CTRL+C
     const Int_t trigger = -1;                            // 1 - onspill, 2 - offspill. -1 - all
 
+    TString filename = "sample_data_2.lmd";
     TString outputFileName = "output_raw_land.root";     // name of output file
     const Int_t refresh = 100000;                        // refresh rate for saving control histograms
     TString parFileName = "params_raw_land.root";        // name of parameter file
 
-    const char *landMappingName = "cfg_neuland_s438b.hh";   // mapping file
-    const Int_t nBarsPerPlane = 50;                         // number of scintillator bars per plane
     const Int_t updateRate = 150000;
     const Int_t minStats = 10000;                           // minimum number of entries for TCAL calibration
     const Int_t nModules = 800;                             // number of photomultipliers (for TCAL calibration)
 
     // Create source with unpackers ----------------------------------------------
-    FairLmdSource* source = new FairLmdSource();
-    source->AddFile("sample_data_2.lmd");
-
-    R3BEventHeaderUnpack *event_unpack = new R3BEventHeaderUnpack();
-    source->AddUnpacker(event_unpack);
-
-    // NeuLAND MBS parameters -------------------------------
-    Short_t type = 94;
-    Short_t subType = 9400;
-    Short_t procId = 12;
-    Short_t subCrate = 0;
-    Short_t control = 3;
-    source->AddUnpacker(new R3BLandUnpack(type, subType, procId, subCrate, control));
-    // ------------------------------------------------------
-
-    // LOS MBS parameters -----------------------------------
-    type = 88;
-    subType = 8800;
-    procId = 12;
-    subCrate = 1;
-    control = 9;
-    source->AddUnpacker(new R3BLosUnpack(type, subType, procId, subCrate, control));
-    // ------------------------------------------------------
+    TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
+    TString ucesb_dir = getenv("UCESB_DIR");
+    TString ucesb_path = ucesb_dir + "/../upexps/s438b/s438b";
+    
+    EXT_STR_h101 ucesb_struct;
+    R3BUcesbSource* source = new R3BUcesbSource(filename, ntuple_options, ucesb_path, &ucesb_struct, sizeof(ucesb_struct));
+    source->SetMaxEvents(nev);
+    source->AddReader(new R3BUnpackReader((EXT_STR_h101_unpack*)&ucesb_struct.unpack, offsetof(EXT_STR_h101, unpack)));
+    source->AddReader(new R3BNeulandTacquilaReader((EXT_STR_h101_raw_nnp*)&ucesb_struct.nnp, offsetof(EXT_STR_h101, nnp)));
+    source->AddReader(new R3BLosReader((EXT_STR_h101_LOS*)&ucesb_struct.los, offsetof(EXT_STR_h101, los)));
     // ---------------------------------------------------------------------------
 
     // Create online run ---------------------------------------------------------
     FairRunOnline* run = new FairRunOnline(source);
     run->SetOutputFile(outputFileName.Data());
+    run->SetRunId(1111);
     // ---------------------------------------------------------------------------
 
     // Create ALADIN field map ---------------------------------------------------
@@ -56,13 +56,6 @@ void run_sample_data()
     run->SetField(magField);
     // ---------------------------------------------------------------------------
 
-    // Channel mapping -----------------------------------------------------------
-    R3BLandMapping* map = new R3BLandMapping();
-    map->SetFileName(landMappingName);
-    map->SetNofBarsPerPlane(nBarsPerPlane);
-    run->AddTask(map);
-    // ---------------------------------------------------------------------------
-
     // TCAL ----------------------------------------------------------------------
     R3BNeulandMapped2CalPar* tcalFill = new R3BNeulandMapped2CalPar("TcalFill");
     tcalFill->SetUpdateRate(updateRate);
@@ -71,15 +64,15 @@ void run_sample_data()
     tcalFill->SetNofModules(nModules);
     run->AddTask(tcalFill);
 
-    R3BLosTcalFill* losTcalFill = new R3BLosTcalFill("LosTcalFill");
+    R3BLosMapped2CalPar* losTcalFill = new R3BLosMapped2CalPar("LosTcalFill");
     losTcalFill->SetUpdateRate(updateRate);
     losTcalFill->SetMinStats(minStats);
-    losTcalFill->SetNofModules(20);
+    losTcalFill->SetNofModules(1, 4);
     run->AddTask(losTcalFill);
     // ---------------------------------------------------------------------------
 
     // Add analysis task ---------------------------------------------------------
-    R3BLandRawAna* ana = new R3BLandRawAna("LandRawAna", 1);
+    R3BNeulandMappedHist* ana = new R3BNeulandMappedHist("LandRawAna", 1);
     run->AddTask(ana);
     // ---------------------------------------------------------------------------
 
@@ -121,7 +114,7 @@ void run_sample_data()
     cout << "Parameter file is " << parFileName << endl;
     cout << "Real time " << rtime << " s, CPU time " << ctime << "s" << endl << endl;
 
-	if(ana->GetNItemsTotal() > 8000)
+	if(ana->GetNItemsTotal() > 7900)
 	{
 		cout << " Test passed" << endl;
 		cout << " All ok " << endl;
