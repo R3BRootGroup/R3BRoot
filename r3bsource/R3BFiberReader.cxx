@@ -8,7 +8,6 @@
 extern "C" {
 #include "ext_data_client.h"
 #include "ext_h101_fi4.h"
-#include "ext_h101.h"
 }
 
 R3BFiberReader::R3BFiberReader(EXT_STR_h101_FI4* data, UInt_t offset)

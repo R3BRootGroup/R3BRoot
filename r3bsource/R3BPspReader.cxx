@@ -3,7 +3,6 @@
 extern "C" {
 #include "ext_data_client.h"
 #include "ext_h101_psp.h"
-#include "ext_h101.h"
 }
 
 #include "TClonesArray.h"

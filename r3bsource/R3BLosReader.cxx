@@ -8,7 +8,6 @@
 extern "C" {
 #include "ext_data_client.h"
 #include "ext_h101_los.h"
-#include EXP_SPECIFIC_H101_FILE
 }
 
 #define NUM_LOS_DETECTORS 2

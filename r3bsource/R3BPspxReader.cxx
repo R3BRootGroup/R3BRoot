@@ -11,7 +11,6 @@
 extern "C" {
 #include "ext_data_client.h"
 #include "ext_h101_psp.h"
-#include "ext_h101.h"
 }
 
 R3BPspxReader::R3BPspxReader(EXT_STR_h101_PSP* data, UInt_t offset)
