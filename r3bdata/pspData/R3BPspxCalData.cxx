@@ -14,8 +14,8 @@ R3BPspxCalData::R3BPspxCalData()
 {
 }
 
-R3BPspxCalData::R3BPspxCalData(	UChar_t detector, 
-				UChar_t strip,
+R3BPspxCalData::R3BPspxCalData(	UShort_t detector, 
+				UShort_t strip,
 				Float_t energy1,
 				Float_t energy2)
     : fDetector(detector)

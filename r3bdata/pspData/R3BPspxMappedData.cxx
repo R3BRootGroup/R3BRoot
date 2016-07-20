@@ -12,8 +12,8 @@ R3BPspxMappedData::R3BPspxMappedData()
 {
 }
 
-R3BPspxMappedData::R3BPspxMappedData(	UChar_t detector, 
-										UChar_t channel,
+R3BPspxMappedData::R3BPspxMappedData(	UShort_t detector, 
+										UShort_t channel,
 										UInt_t energy)
     : fDetector(detector)
     , fChannel(channel)

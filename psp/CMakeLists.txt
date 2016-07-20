@@ -42,6 +42,7 @@ R3BPspDigiPar.cxx
 R3BPspDigitizer.cxx   
 R3BPspxMapped2Cal.cxx
 R3BPspxCal2Hit.cxx
+R3BPspCal2Hit.cxx
 par/R3BPspxMappedPar.cxx
 par/R3BPspxCalPar.cxx
 par/R3BPspxContFact.cxx

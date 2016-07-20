@@ -13,19 +13,19 @@ class R3BPspxMappedData : public TObject
     R3BPspxMappedData();
 
     // Standard Constructor
-    R3BPspxMappedData(UChar_t detector, UChar_t channel, UInt_t energy);
+    R3BPspxMappedData(UShort_t detector, UShort_t channel, UInt_t energy);
 
     // Destructor
     virtual ~R3BPspxMappedData() { }
 
     // Getters
-    inline const UChar_t& GetDetector() const { return fDetector; }
-    inline const UChar_t& GetChannel()  const { return fChannel;  }
+    inline const UShort_t& GetDetector() const { return fDetector; }
+    inline const UShort_t& GetChannel()  const { return fChannel;  }
     inline const UInt_t&  GetEnergy()   const { return fEnergy;   }
 
   private:
-	UChar_t fDetector; // 1..5
-    UChar_t fChannel;  // 1..65
+	UShort_t fDetector; // 1..5
+    UShort_t fChannel;  // 1..65
     UInt_t  fEnergy;   // 0xfff is energy data, Anything in 0xfffff000 indicates an error or overflow
 
   public:

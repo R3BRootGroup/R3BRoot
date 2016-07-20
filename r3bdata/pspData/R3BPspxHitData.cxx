@@ -16,7 +16,7 @@ R3BPspxHitData::R3BPspxHitData()
 {
 }
 
-R3BPspxHitData::R3BPspxHitData(UChar_t detector,
+R3BPspxHitData::R3BPspxHitData(UShort_t detector,
 				Float_t u,
 				Float_t v,
 				Float_t x,

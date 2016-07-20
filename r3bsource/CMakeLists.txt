@@ -46,7 +46,7 @@ if(WITH_UCESB)
 		R3BReader.cxx
 		R3BUnpackReader.cxx
 		R3BPspxReader.cxx
-		R3BFiberReader.cxx
+#		R3BFiberReader.cxx
 		R3BLosReader.cxx
 		R3BTofdReader.cxx
 		R3BNeulandTamexReader.cxx

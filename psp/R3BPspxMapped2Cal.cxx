@@ -170,6 +170,14 @@ void R3BPspxMapped2Cal::Exec(Option_t* option)
 	  strip1=(mItem1->GetChannel()+1)/2;
 	} else if(mItem1->GetChannel()>fCalPar->GetPspxParStrip().At(detector1-1)*2 && mItem1->GetChannel()<fCalPar->GetPspxParStrip().At(detector1-1)*4+1 && fCalPar->GetPspxParOrientation().At(detector1-1)==2){// horizontal detector
 	  strip1=(mItem1->GetChannel()-(fCalPar->GetPspxParStrip().At(detector1-1)*2-1))/2;
+	} else if (fCalPar->GetPspxParOrientation().At(detector1-1)==0) {
+		
+	  // old PSP style (4 corner anodes)
+	  strip1=mItem1->GetChannel()/2; // 1-4=anodes, 5=cathode, 6=pixel
+	  new ((*fCalItems)[fCalItems->GetEntriesFast()])
+		    R3BPspxCalData(detector1, strip1, 0.0/0.0, mItem1->GetEnergy()*gain[detector1-1][strip1-1]);
+	  continue;
+
 	} else if(mItem1->GetChannel()==fCalPar->GetPspxParStrip().At(detector1-1)*4+1){ //cathode
 	  strip1=fCalPar->GetPspxParStrip().At(detector1-1)+1;
 	}

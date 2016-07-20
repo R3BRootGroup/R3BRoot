@@ -12,5 +12,5 @@
 #pragma link C++ class R3BTofdReader+;
 #pragma link C++ class R3BNeulandTamexReader+;
 #pragma link C++ class R3BNeulandTacquilaReader+;
-#pragma link C++ class R3BFiberReader+;
+//#pragma link C++ class R3BFiberReader+;
 #endif

@@ -69,6 +69,10 @@ InitStatus R3BLosCal2Hit::ReInit()
  */
 void R3BLosCal2Hit::Exec(Option_t* option)
 {
+	Double_t flosVeff    = 7.; // cm/ns
+	Double_t flosOffsetX = -10.;
+	Double_t flosOffsetY = -4.1;
+	
     Int_t nDets = fCalItems->GetEntriesFast();
 
     for (Int_t i = 0; i < nDets; i++)
@@ -80,24 +84,37 @@ void R3BLosCal2Hit::Exec(Option_t* option)
        // be NAN if one time is missing.
        Double_t t_hor = calItem->fTime_r_ns + calItem->fTime_l_ns;
        Double_t t_ver = calItem->fTime_t_ns + calItem->fTime_b_ns;
+       Double_t x_cm  = 0.0/0.0;
+       Double_t y_cm  = 0.0/0.0;
        
        Double_t t_hit=0.0/0.0; // NAN
        if ((!isnan(t_hor)) && (!isnan(t_ver))) // have all four as it should be
+       {
 			t_hit=(t_hor+t_ver)/4;
+			x_cm=(calItem->fTime_r_ns-calItem->fTime_l_ns)/2.*flosVeff-flosOffsetX;
+			y_cm=(calItem->fTime_b_ns-calItem->fTime_t_ns)/2.*flosVeff-flosOffsetY;
+	   }
 	   else if (!isnan(t_hor))
+	   {
 			t_hit=t_hor/2;
+			x_cm=(calItem->fTime_r_ns-calItem->fTime_l_ns)/2.*flosVeff-flosOffsetX;
+	   }
 	   else if (!isnan(t_ver))
+	   {
 			t_hit=t_ver/2;
+			y_cm=(calItem->fTime_b_ns-calItem->fTime_t_ns)/2.*flosVeff-flosOffsetY;
+	   }
        else
 			continue;
+
+
 			
        // what shall we do with the master trigger?
        Double_t t_diff2MT=t_hit - calItem->fTime_ref_ns; // time relative to the master trig
               
-       new ((*fHitItems)[fNofHitItems]) R3BLosHitData(calItem->GetDetector(), t_hit , t_diff2MT);
+       new ((*fHitItems)[fNofHitItems]) R3BLosHitData(calItem->GetDetector(), t_hit , x_cm, y_cm, t_diff2MT);
        fNofHitItems += 1;
-    }
-    
+    }    
     
 }
 
