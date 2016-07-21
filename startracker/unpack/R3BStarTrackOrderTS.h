@@ -37,6 +37,80 @@ class R3BStarTrackOrderTS : public FairTask {
 
   // Data members:
 
+	unsigned long my_tm_stp;
+	Int_t my_wordtype; //
+	Int_t my_hitbit;
+	Int_t my_det_id;
+	Int_t my_side_id;
+	Int_t my_asic_id;
+	Int_t my_ch_id;
+	Int_t my_adc_data;
+	bool my_sync_flag;
+	bool my_pause_flag;
+	unsigned long my_tm_stp_ext;
+
+	Int_t my_new_wordtype; //
+	Int_t my_new_hitbit;
+	Int_t my_new_det_id;
+	Int_t my_new_side_id;
+	Int_t my_new_asic_id;
+	Int_t my_new_ch_id;
+	Int_t my_new_adc_data;
+
+
+	int my_info_code;
+	unsigned long my_info_field;
+	unsigned long my_tm_stp_hb;
+	unsigned long my_tm_stp_vhb;
+	unsigned long my_tm_stp_lb;
+
+	unsigned int tm_stp_code47_lb;
+
+	// for extarnal timestamp trigger
+	unsigned long my_tm_stp_Ext_hb;
+	unsigned long my_tm_stp_Ext_vhb;
+	unsigned long my_tm_stp_Ext_lb;
+
+	unsigned long word2_rec_time;
+
+	//arrays to check synchronization is going fine (or not!)
+	unsigned long tm_stp_msb_modules[30];   // 30 = total number of ladders
+	unsigned long my_tm_stp_msb; // most significant bits of time-stamp (in info code)
+
+	bool ts_sort_flag;
+	bool FirstSort_flag;
+	//bool FirstSort_flag4;
+	//bool FirstSort_flag7;
+	bool Word3;
+	//bool Info3;
+	bool Info4;
+
+	//long long n_first;
+	//long long n_loop;
+
+
+	/*
+	vector<long long> ts_temp;
+	vector<long long> index_block_temp, index_hit_temp;
+	//ts_temp.reserve(2048);
+	//index_block_temp.reserve(2048);
+	//index_hit_temp.reserve(2048);
+	//const int MAXsort; //do we need maximum number when we do not want to sort any more!?
+	int MAXsort; //do we need maximum number when we do not want to sort any more!?
+
+	unsigned long long my_tm_stp_5;
+	unsigned long my_tm_stp_lb_new;
+	unsigned long my_tm_stp_lb_cor;
+	unsigned long my_tm_stp_hb_cor;
+	unsigned long my_tm_stp_vhb_cor;
+	unsigned long ts_lb_part1;
+	unsigned long ts_lb_part2;
+	unsigned long ts_lb_part2_inv;
+	unsigned long ts_lb_part3;
+
+	*/
+
+
   // Input/Output
   TClonesArray* fRawData;
   // Additional data members
@@ -54,6 +128,9 @@ class R3BStarTrackOrderTS : public FairTask {
   TH1F *TS_TSext_diff;
   TH2F *TS_TSext;
   TH2F *TS_event;
+  TH2F *TS_event_reduce;
+  //TH2F *TS_4_5; 
+  //TH2F *TS_4_5_diff; 
   TH2F *TSext_event;
   TH2F *ADC_TS;
   TH2F *ADC_TS_p;
@@ -89,6 +166,15 @@ class R3BStarTrackOrderTS : public FairTask {
 	
   Int_t fNevents;
   Int_t fTotalHits; //  
+  Int_t fCount_45_78; //  
+  Int_t fCount_rejectA; //  
+  Int_t fCount_rejectB; //  
+  Int_t fCount_disorder; //  
+
+  vector<double> ts_code47;
+  vector<double> ts_code47_i;
+  vector<double> ts_code47_diff;
+
 
   // Added for handling calibration 
   //R3BTofCalPar* fCal_Par;

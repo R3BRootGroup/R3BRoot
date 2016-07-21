@@ -35,6 +35,47 @@ class R3BStarTrackRecTS : public FairTask {
 
   // Data members:
 
+	unsigned long my_tm_stp;
+	Int_t my_wordtype; //
+	Int_t my_hitbit;
+	Int_t my_det_id;
+	Int_t my_side_id;
+	Int_t my_asic_id;
+	Int_t my_ch_id;
+	Int_t my_adc_data;
+	bool my_sync_flag;
+	bool my_pause_flag;
+	unsigned long my_tm_stp_ext;
+
+	Int_t my_new_wordtype; //
+	Int_t my_new_hitbit;
+	Int_t my_new_det_id;
+	Int_t my_new_side_id;
+	Int_t my_new_asic_id;
+	Int_t my_new_ch_id;
+	Int_t my_new_adc_data;
+
+
+	int my_info_code;
+	unsigned long my_info_field;
+	unsigned long my_tm_stp_hb;
+	unsigned long my_tm_stp_vhb;
+	unsigned long my_tm_stp_lb;
+
+	// for extarnal timestamp trigger
+	unsigned long my_tm_stp_Ext_hb;
+	unsigned long my_tm_stp_Ext_vhb;
+	unsigned long my_tm_stp_Ext_lb;
+
+	//arrays to check synchronization is going fine (or not!)
+	unsigned long tm_stp_msb_modules[30];   // 30 = total number of ladders
+	unsigned long my_tm_stp_msb; // most significant bits of time-stamp (in info code)
+
+	bool Info4;
+
+
+
+
   // Input/Output
   TClonesArray* fRawData;
   // Additional data members
@@ -52,6 +93,7 @@ class R3BStarTrackRecTS : public FairTask {
   TH1F *TS_TSext_diff;
   TH2F *TS_TSext;
   TH2F *TS_event;
+  TH2F *TS_event_reduce;
   TH2F *TSext_event;
   TH2F *ADC_TS;
   TH2F *ADC_TS_p;
