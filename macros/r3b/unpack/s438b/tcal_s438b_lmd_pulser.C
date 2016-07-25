@@ -1,5 +1,5 @@
 
-void run(TString runNumber, TString refRun)
+void run(Int_t runNumber, Int_t refRun)
 {
     TStopwatch timer;
     timer.Start();
@@ -7,12 +7,16 @@ void run(TString runNumber, TString refRun)
     const Int_t nModules = 800;
     const Int_t trigger = 2;              // 1 - onspill, 2 - offspill. -1 - all
 
+    TString strRunNumber = "run";
+    strRunNumber += runNumber;
+    TString strRefRun = "run";
+    strRefRun += refRun;
     TString dirIn1 = "/Users/kresan/data/s438b/data/";
     TString dirOut = "/Users/kresan/data/s438b/tcal/";
-    TString inputFileName1 = dirIn1 + runNumber + "_raw.root";              // name of input file
-    TString parFileName    = dirIn1 + "params_" + runNumber + "_raw.root";  // name of parameter file
-    TString parFileName2   = dirIn1 + "params_" + refRun + "_raw.root";     // name of parameter file
-    TString outputFileName = dirOut + runNumber + "_tcal.root";             // name of output file
+    TString inputFileName1 = dirIn1 + strRunNumber + "_raw.root";              // name of input file
+    TString parFileName    = dirIn1 + "params_" + strRunNumber + "_raw.root";  // name of parameter file
+    TString parFileName2   = dirIn1 + "params_" + strRefRun + "_raw.root";     // name of parameter file
+    TString outputFileName = dirOut + strRunNumber + "_tcal.root";             // name of output file
 
     // Create analysis run -------------------------------------------------------
     FairRunAna* run = new FairRunAna();
@@ -21,13 +25,18 @@ void run(TString runNumber, TString refRun)
     // ---------------------------------------------------------------------------
 
     // ----- Runtime DataBase info -----------------------------------------------
+    Bool_t kParameterMerged = kTRUE;
     FairRuntimeDb* rtdb = run->GetRuntimeDb();
-    FairParRootFileIo* parIo1 = new FairParRootFileIo();
+    FairParRootFileIo* parIo1 = new FairParRootFileIo(kParameterMerged);
     parIo1->open(parFileName);
     rtdb->setFirstInput(parIo1);
-    FairParRootFileIo* parIo2 = new FairParRootFileIo();
+    FairParRootFileIo* parIo2 = new FairParRootFileIo(kParameterMerged);
     parIo2->open(parFileName2);
-    rtdb->setFirstInput(parIo2);
+    rtdb->setSecondInput(parIo2);
+    rtdb->addRun(runNumber);
+    rtdb->getContainer("LandTCalPar");
+    rtdb->setInputVersion(runNumber, (char*)"LandTCalPar", 1, 2);
+    rtdb->print();
     // ---------------------------------------------------------------------------
 
     // Time calibration ----------------------------------------------------------
@@ -41,6 +50,7 @@ void run(TString runNumber, TString refRun)
 
     // Initialize ----------------------------------------------------------------
     run->Init();
+    rtdb->print();
     FairLogger::GetLogger()->SetLogScreenLevel("INFO");
     // ---------------------------------------------------------------------------
 

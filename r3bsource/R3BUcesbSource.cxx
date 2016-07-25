@@ -120,7 +120,7 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
 	int ret;
 	(void)i; /* Why is i not used? Outer loop seems not to use it. */
 
-	fLogger->Info(MESSAGE_ORIGIN, "R3BUcesbSource::ReadEvent %d",
+	fLogger->Debug1(MESSAGE_ORIGIN, "R3BUcesbSource::ReadEvent %d",
 	    fNEvent++);
 
 	/* Need to initialize first */
@@ -156,7 +156,7 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
 	for (int r = 0; r < fReaders->GetEntriesFast(); ++r) {
 		R3BReader *reader = (R3BReader *)fReaders->At(r);
 
-		fLogger->Info(MESSAGE_ORIGIN, "  Reading reader %d (%s)", r,
+		fLogger->Debug1(MESSAGE_ORIGIN, "  Reading reader %d (%s)", r,
 		    reader->GetName());
 		reader->Read();
 	}

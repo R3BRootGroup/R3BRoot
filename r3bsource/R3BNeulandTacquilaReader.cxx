@@ -56,35 +56,33 @@ Bool_t R3BNeulandTacquilaReader::Read()
     EXT_STR_h101_raw_nnp_onion* data = (EXT_STR_h101_raw_nnp_onion*)fData;
 
     // Loop over all planes, bars and PMT's
+    Int_t bar;
     Int_t barId;
-    for (Int_t i = 0; i < 8; i++)
+    for (Int_t p = 0; p < 8; p++)
     {
-        for (Int_t j = 0; j < 50; j++)
+        for (Int_t pmt = 0; pmt < 2; pmt++)
         {
-            for (Int_t k = 0; k < 2; k++)
+            for (Int_t k = 0; k < data->NNP[p]._[pmt]._; k++)
             {
                 // Signal channel
-                UInt_t tdc1 = data->NNP[i]._[j]._[k].TAC;
-                UInt_t clock1 = data->NNP[i]._[j]._[k].CLK;
-                UInt_t qdc = data->NNP[i]._[j]._[k].ADC;
+                UInt_t tdc1 = data->NNP[p]._[pmt].TAC[k];
+                UInt_t clock1 = data->NNP[p]._[pmt].CLK[k];
+                UInt_t qdc = data->NNP[p]._[pmt].ADC[k];
 
                 // Stop signal (17-th channel)
-                UInt_t tdc2 = data->NNP[i]._[j]._[k].T;
-                //UInt_t clock2 = data->NNP[i]._[j]._[k].S;
+                UInt_t tdc2 = data->NNP[p]._[pmt].T[k];
+                //UInt_t clock2 = data->NNP[p]._[pmt].S[k];
+                
+                bar = data->NNP[p]._[pmt].I[k];
 
                 // Calculate global bar index
-                barId = i * 50 + j + 1;
+                barId = p * 50 + bar;
 
                 // Store data in output
-                if (tdc1)
+                if (tdc1 && tdc2)
                 {
                     new ((*fArray)[fArray->GetEntriesFast()])
-                        R3BNeulandMappedData(0, 0, 0, 0, 63 - clock1, 4095 - tdc1, qdc, i + 1, j + 1, k + 1, kFALSE);
-                }
-                if (tdc2)
-                {
-                    new ((*fArray)[fArray->GetEntriesFast()])
-                        R3BNeulandMappedData(0, 0, 0, 0, 0, 4095 - tdc2, 0, i + 1, j + 1, k + 1 + 2, kTRUE);
+                        R3BNeulandMappedData(0, 0, 0, 4095 - tdc2, 63 - clock1, 4095 - tdc1, qdc, p + 1, bar, pmt + 1, kFALSE);
                 }
             }
         }
