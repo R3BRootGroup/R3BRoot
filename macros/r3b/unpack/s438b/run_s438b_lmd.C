@@ -1,5 +1,11 @@
 
-void run(TString runNumber)
+typedef struct EXT_STR_h101_t
+{
+    EXT_STR_h101_unpack_t unpack;
+    EXT_STR_h101_raw_nnp_onion_t nnp;
+} EXT_STR_h101;
+
+void run(Int_t runNumber)
 {
     TStopwatch timer;
     timer.Start();
@@ -10,37 +16,34 @@ void run(TString runNumber)
     TString outDir = "/Users/kresan/data/s438b/data/";   // output directory
     TString histDir = "/Users/kresan/Sites/";            // web-server directory
 
-    TString outputFileName = outDir + runNumber + "_raw.root";                  // name of output file
-    TString histFileName = histDir + "hist_s438b_" + runNumber + "_raw.root";   // name of file with control histograms
-    const Int_t refresh = 100000;                                               // refresh rate for saving control histograms
-    TString parFileName = outDir + "params_" + runNumber + "_raw.root";         // name of parameter file
-    //const Long64_t maxSize = 1 * 1024 * 1024 * 1024;                          // 1 GByte       // file split size
+    TString strRunNumber = "run";
+    strRunNumber += runNumber;
+    TString filename = inDir + strRunNumber + "_*.lmd";
+    TString outputFileName = outDir + strRunNumber + "_raw.root";                  // name of output file
+    TString histFileName = histDir + "hist_s438b_" + strRunNumber + "_raw.root";   // name of file with control histograms
+    const Int_t refresh = 100000;                                                  // refresh rate for saving control histograms
+    TString parFileName = outDir + "params_" + strRunNumber + "_raw.root";         // name of parameter file
 
-    const char *landMappingName = "cfg_neuland_s438b.hh";   // mapping file
-    const Int_t nBarsPerPlane = 50;                         // number of scintillator bars per plane
     const Int_t updateRate = 150000;
     const Int_t minStats = 10000;                           // minimum number of entries for TCAL calibration
     const Int_t nModules = 800;                             // number of photomultipliers (for TCAL calibration)
 
     // Create source with unpackers ----------------------------------------------
-    FairLmdSource* source = new FairLmdSource();
-    source->AddPath(inDir, runNumber+"*");
+    TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
+    TString ucesb_dir = getenv("UCESB_DIR");
+    TString ucesb_path = ucesb_dir + "/../upexps/s438b/s438b";
 
-    R3BEventHeaderUnpack *event_unpack = new R3BEventHeaderUnpack();
-    source->AddUnpacker(event_unpack);
-
-    // NeuLAND MBS parameters -------------------------------
-    Short_t type = 94;
-    Short_t subType = 9400;
-    Short_t procId = 12;
-    Short_t subCrate = 0;
-    Short_t control = 3;
-    source->AddUnpacker(new R3BLandUnpack(type, subType, procId, subCrate, control));
-    // ------------------------------------------------------
+    EXT_STR_h101 ucesb_struct;
+    R3BUcesbSource* source = new R3BUcesbSource(filename, ntuple_options,
+                                                ucesb_path, &ucesb_struct, sizeof(ucesb_struct));
+    source->SetMaxEvents(nev);
+    source->AddReader(new R3BUnpackReader((EXT_STR_h101_unpack*)&ucesb_struct.unpack, offsetof(EXT_STR_h101, unpack)));
+    source->AddReader(new R3BNeulandTacquilaReader((EXT_STR_h101_raw_nnp*)&ucesb_struct.nnp, offsetof(EXT_STR_h101, nnp)));
     // ---------------------------------------------------------------------------
 
     // Create online run ---------------------------------------------------------
     FairRunOnline* run = new FairRunOnline(source);
+    run->SetRunId(runNumber);
     run->SetOutputFile(outputFileName.Data());
     run->SetGenerateHtml(kTRUE, histFileName.Data(), refresh);
     // ---------------------------------------------------------------------------
@@ -53,13 +56,6 @@ void run(TString runNumber)
     run->SetField(magField);
     // ---------------------------------------------------------------------------
 
-    // Channel mapping -----------------------------------------------------------
-    R3BLandMapping* map = new R3BLandMapping();
-    map->SetFileName(landMappingName);
-    map->SetNofBarsPerPlane(nBarsPerPlane);
-    run->AddTask(map);
-    // ---------------------------------------------------------------------------
-
     // TCAL ----------------------------------------------------------------------
     R3BNeulandMapped2CalPar* tcalFill = new R3BNeulandMapped2CalPar("TcalFill");
     tcalFill->SetUpdateRate(updateRate);
@@ -70,13 +66,12 @@ void run(TString runNumber)
     // ---------------------------------------------------------------------------
 
     // Add analysis task ---------------------------------------------------------
-    R3BLandRawAna* ana = new R3BLandRawAna("LandRawAna", 1);
+    R3BNeulandMappedHist* ana = new R3BNeulandMappedHist("LandRawAna", 1);
     run->AddTask(ana);
     // ---------------------------------------------------------------------------
 
     // Initialize ----------------------------------------------------------------
     run->Init();
-    //((TTree*)gFile->Get("cbmsim"))->SetMaxTreeSize(maxSize);
     FairLogger::GetLogger()->SetLogScreenLevel("INFO");
     // ---------------------------------------------------------------------------
 

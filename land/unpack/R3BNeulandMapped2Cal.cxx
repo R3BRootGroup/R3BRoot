@@ -96,7 +96,7 @@ InitStatus R3BNeulandMapped2Cal::Init()
         FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch R3BEventHeader not found");
     }
 
-    fRawHit = (TClonesArray*)mgr->GetObject("LandRawHitMapped");
+    fRawHit = (TClonesArray*)mgr->GetObject("NeulandMappedData");
     if (NULL == fRawHit)
     {
         FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch LandRawHitMapped not found");
@@ -149,6 +149,117 @@ void R3BNeulandMapped2Cal::Exec(Option_t* option)
         }
     }
 
+    if(nHits > 0)
+    {
+        if( ((R3BNeulandMappedData*)fRawHit->At(0))->GetSam() == 0 )
+        {
+            MakeCal();
+        }
+        else
+        {
+            MakeCalOld();
+        }
+    }
+
+    if (fPulserMode)
+    {
+        R3BNeulandCalData* pmt1;
+        Double_t time1;
+        for (Int_t i = 0; i < fNPmt; i++)
+        {
+            pmt1 = (R3BNeulandCalData*)fPmt->At(i);
+            if (pmt1->GetBarId() == 2 && pmt1->GetSide() == 1)
+            {
+                time1 = pmt1->GetTime();
+                break;
+            }
+        }
+        for (Int_t i = 0; i < fNPmt; i++)
+        {
+            pmt1 = (R3BNeulandCalData*)fPmt->At(i);
+            if (pmt1->GetBarId() == 5 && pmt1->GetSide() == 1)
+            {
+                fh_pulser_5_2->Fill(pmt1->GetTime() - time1);
+            }
+            if (pmt1->GetBarId() == 105 && pmt1->GetSide() == 1)
+            {
+                fh_pulser_105_2->Fill(pmt1->GetTime() - time1);
+            }
+        }
+    }
+}
+
+void R3BNeulandMapped2Cal::MakeCal()
+{
+    Int_t nHits = fRawHit->GetEntriesFast();
+    R3BNeulandMappedData* hit;
+    R3BNeulandMappedData* hit2;
+    Int_t iPlane;
+    Int_t iPaddle;
+    Int_t iSide;
+    Int_t channel;
+    Int_t tdc;
+    R3BTCalModulePar* par;
+    Double_t time;
+    Double_t time2;
+
+    for (Int_t khit = 0; khit < nHits; khit++)
+    {
+        hit2 = (R3BNeulandMappedData*)fRawHit->At(khit);
+        if (NULL == hit2)
+        {
+            continue;
+        }
+
+        iPlane = hit2->GetPlane();
+        iPaddle = hit2->GetPaddle();
+        iSide = hit2->GetSide();
+
+        if (!(par = fTcalPar->GetModuleParAt(iPlane, iPaddle, iSide)))
+        {
+            LOG(DEBUG) << "R3BNeulandMapped2Cal::Exec : Tcal par not found, channel: " << iPlane << " / " << iPaddle << " / " << iSide
+            << FairLogger::endl;
+            continue;
+        }
+
+        tdc = hit2->GetTacData();
+        time = par->GetTimeTacquila(tdc);
+        if (time < 0. || time > fClockFreq)
+        {
+            LOG(ERROR) << "R3BNeulandMapped2Cal::Exec : error in time calibration: ch=" << channel << ", tdc=" << tdc
+            << ", time=" << time << FairLogger::endl;
+            continue;
+        }
+
+        if (!(par = fTcalPar->GetModuleParAt(iPlane, iPaddle, iSide + 2)))
+        {
+            LOG(DEBUG) << "R3BNeulandMapped2Cal::Exec : Tcal par not found, channel: " << iPlane << " / " << iPaddle << " / " << (iSide+2)
+            << FairLogger::endl;
+            continue;
+        }
+        
+        tdc = hit2->GetCal();
+        time2 = par->GetTimeTacquila(tdc);
+        if (time2 < 0. || time2 > fClockFreq)
+        {
+            LOG(ERROR) << "R3BNeulandMapped2Cal::Exec : error in time calibration: ch=" << channel << ", tdc=" << tdc
+            << ", time=" << time2 << FairLogger::endl;
+            continue;
+        }
+
+        time = time - time2 + hit2->GetClock() * fClockFreq;
+        if (fWalkEnabled)
+        {
+            time += wlk(hit2->GetQdcData());
+        }
+        new ((*fPmt)[fNPmt]) R3BNeulandCalData((iPlane-1)*50 + iPaddle, iSide, time, hit2->GetQdcData());
+        fNPmt += 1;
+    }
+}
+
+void R3BNeulandMapped2Cal::MakeCalOld()
+{
+    Int_t nHits = fRawHit->GetEntriesFast();
     R3BNeulandMappedData* hit;
     R3BNeulandMappedData* hit2;
     Int_t iPlane;
@@ -189,7 +300,7 @@ void R3BNeulandMapped2Cal::Exec(Option_t* option)
         if (time < 0. || time > fClockFreq)
         {
             LOG(ERROR) << "R3BNeulandMapped2Cal::Exec : error in time calibration: ch=" << iPlane << " / " << iPaddle << " / " << iSide << ", tdc=" << tdc
-                       << ", time=" << time << FairLogger::endl;
+            << ", time=" << time << FairLogger::endl;
             continue;
         }
 
@@ -199,7 +310,7 @@ void R3BNeulandMapped2Cal::Exec(Option_t* option)
         if (fMap17Seen.find(index) != fMap17Seen.end() && fMap17Seen[index])
         {
             LOG(WARNING) << "R3BNeulandMapped2Cal::Exec : multiple stop signal for: GTB=" << gtb << ", TacAddr=" << tacAddr
-                         << FairLogger::endl;
+            << FairLogger::endl;
             //            continue;
         }
         fMap17Seen[index] = kTRUE;
@@ -257,33 +368,6 @@ void R3BNeulandMapped2Cal::Exec(Option_t* option)
         }
         new ((*fPmt)[fNPmt]) R3BNeulandCalData((iPlane-1)*50 + iPaddle, iSide, time2, hit2->GetQdcData());
         fNPmt += 1;
-    }
-
-    if (fPulserMode)
-    {
-        R3BNeulandCalData* pmt1;
-        Double_t time1;
-        for (Int_t i = 0; i < fNPmt; i++)
-        {
-            pmt1 = (R3BNeulandCalData*)fPmt->At(i);
-            if (pmt1->GetBarId() == 2 && pmt1->GetSide() == 1)
-            {
-                time1 = pmt1->GetTime();
-                break;
-            }
-        }
-        for (Int_t i = 0; i < fNPmt; i++)
-        {
-            pmt1 = (R3BNeulandCalData*)fPmt->At(i);
-            if (pmt1->GetBarId() == 5 && pmt1->GetSide() == 1)
-            {
-                fh_pulser_5_2->Fill(pmt1->GetTime() - time1);
-            }
-            if (pmt1->GetBarId() == 105 && pmt1->GetSide() == 1)
-            {
-                fh_pulser_105_2->Fill(pmt1->GetTime() - time1);
-            }
-        }
     }
 }
 

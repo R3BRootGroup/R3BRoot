@@ -120,6 +120,10 @@ void R3BNeulandMapped2CalPar::Exec(Option_t* option)
 
         // Fill TAC histogram
         fEngine->Fill(iPlane, iPaddle, iSide, hit->GetTacData());
+        if(0 == hit->GetSam())
+        {
+            fEngine->Fill(iPlane, iPaddle, iSide + 2, hit->GetCal());
+        }
     }
 
     // Increment events

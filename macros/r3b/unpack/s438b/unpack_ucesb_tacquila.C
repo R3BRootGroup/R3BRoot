@@ -31,8 +31,8 @@ void unpack_ucesb_tacquila()
     TString ucesb_path = ucesb_dir + "/../upexps/s438b/s438b";
 
     EXT_STR_h101 ucesb_struct;
-    R3BUcesbSource* source =
-        new R3BUcesbSource(filename, ntuple_options, ucesb_path, &ucesb_struct, sizeof(ucesb_struct));
+    R3BUcesbSource* source = new R3BUcesbSource(filename, ntuple_options,
+                                                ucesb_path, &ucesb_struct, sizeof(ucesb_struct));
     source->SetMaxEvents(nev);
     source->AddReader(new R3BUnpackReader((EXT_STR_h101_unpack*)&ucesb_struct.unpack, offsetof(EXT_STR_h101, unpack)));
     source->AddReader(new R3BNeulandTacquilaReader((EXT_STR_h101_raw_nnp*)&ucesb_struct.nnp, offsetof(EXT_STR_h101, nnp)));
@@ -42,6 +42,8 @@ void unpack_ucesb_tacquila()
     FairRunOnline* run = new FairRunOnline(source);
     run->SetOutputFile("output.root");
     run->SetRunId(269);
+    run->ActivateHttpServer();
+    run->SetAutoFinish(kFALSE);
     /* ------------------------------------------------------ */
 
     /* Create ALADIN field map ------------------------------ */
