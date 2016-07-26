@@ -1,15 +1,9 @@
 
-extern "C" {
-#include "ext_h101_unpack.h"
-#include "ext_h101_raw_nnp.h"
-#include "ext_h101_los.h"
-}
-
 typedef struct EXT_STR_h101_t
 {
-    EXT_STR_h101_unpack unpack;
-    EXT_STR_h101_raw_nnp_onion nnp;
-    EXT_STR_h101_LOS_onion los;
+    EXT_STR_h101_unpack_t unpack;
+    EXT_STR_h101_raw_nnp_onion_t nnp;
+    EXT_STR_h101_LOS_onion_t los;
 } EXT_STR_h101;
 
 void run_sample_data()

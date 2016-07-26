@@ -10,9 +10,11 @@
  * Put this header file into the 'r3bsource' directory and recompile.
  * */
 
-extern "C" {
-#include "/Users/kresan/R3BRoot/github/R3BRoot/r3bsource/ext_h101_full.h"
-}
+typedef struct EXT_STR_h101_t
+{
+    EXT_STR_h101_unpack_t unpack;
+    EXT_STR_h101_raw_nnp_onion_t nnp;
+} EXT_STR_h101;
 
 void unpack_ucesb_tacquila()
 {
@@ -32,9 +34,8 @@ void unpack_ucesb_tacquila()
     R3BUcesbSource* source =
         new R3BUcesbSource(filename, ntuple_options, ucesb_path, &ucesb_struct, sizeof(ucesb_struct));
     source->SetMaxEvents(nev);
-    source->AddReader(new R3BUnpackReader(&ucesb_struct));
-    /*source->AddReader(new R3BNeulandTamexReader(&ucesb_struct));*/
-    source->AddReader(new R3BNeulandTacquilaReader(&ucesb_struct));
+    source->AddReader(new R3BUnpackReader((EXT_STR_h101_unpack*)&ucesb_struct.unpack, offsetof(EXT_STR_h101, unpack)));
+    source->AddReader(new R3BNeulandTacquilaReader((EXT_STR_h101_raw_nnp*)&ucesb_struct.nnp, offsetof(EXT_STR_h101, nnp)));
     /* ------------------------------------------------------ */
 
     /* Create online run ------------------------------------ */
@@ -52,8 +53,8 @@ void unpack_ucesb_tacquila()
     /* ------------------------------------------------------ */
 
     /* Add analysis task ------------------------------------ */
-    //R3BLandRawAna* ana = new R3BLandRawAna("LandRawAna", 1);
-    //run->AddTask(ana);
+    R3BNeulandMappedHist* ana = new R3BNeulandMappedHist("LandRawAna", 1);
+    run->AddTask(ana);
     /* ------------------------------------------------------ */
 
     /* Initialize ------------------------------------------- */
