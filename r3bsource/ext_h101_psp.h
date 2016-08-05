@@ -29,31 +29,36 @@ typedef          int  int32_t;
 typedef struct EXT_STR_h101_PSP_t
 {
   /* RAW */
-  uint32_t PSPX1M /* [1,65] */;
-  uint32_t PSPX1MI[65 EXT_STRUCT_CTRL(PSPX1M)] /* [1,65] */;
-  uint32_t PSPX1ME[65 EXT_STRUCT_CTRL(PSPX1M)] /* [1,650] */;
-  uint32_t PSPX1 /* [0,650] */;
-  uint32_t PSPX1v[650 EXT_STRUCT_CTRL(PSPX1)] /* [-1,-1] */;
-  uint32_t PSPX2M /* [1,65] */;
-  uint32_t PSPX2MI[65 EXT_STRUCT_CTRL(PSPX2M)] /* [1,65] */;
-  uint32_t PSPX2ME[65 EXT_STRUCT_CTRL(PSPX2M)] /* [1,650] */;
-  uint32_t PSPX2 /* [0,650] */;
-  uint32_t PSPX2v[650 EXT_STRUCT_CTRL(PSPX2)] /* [-1,-1] */;
-  uint32_t PSPX3M /* [1,65] */;
-  uint32_t PSPX3MI[65 EXT_STRUCT_CTRL(PSPX3M)] /* [1,65] */;
-  uint32_t PSPX3ME[65 EXT_STRUCT_CTRL(PSPX3M)] /* [1,650] */;
-  uint32_t PSPX3 /* [0,650] */;
-  uint32_t PSPX3v[650 EXT_STRUCT_CTRL(PSPX3)] /* [-1,-1] */;
-  uint32_t PSPX4M /* [1,65] */;
-  uint32_t PSPX4MI[65 EXT_STRUCT_CTRL(PSPX4M)] /* [1,65] */;
-  uint32_t PSPX4ME[65 EXT_STRUCT_CTRL(PSPX4M)] /* [1,650] */;
-  uint32_t PSPX4 /* [0,650] */;
-  uint32_t PSPX4v[650 EXT_STRUCT_CTRL(PSPX4)] /* [-1,-1] */;
-  uint32_t PSPX5M /* [1,65] */;
-  uint32_t PSPX5MI[65 EXT_STRUCT_CTRL(PSPX5M)] /* [1,65] */;
-  uint32_t PSPX5ME[65 EXT_STRUCT_CTRL(PSPX5M)] /* [1,650] */;
-  uint32_t PSPX5 /* [0,650] */;
-  uint32_t PSPX5v[650 EXT_STRUCT_CTRL(PSPX5)] /* [-1,-1] */;
+  uint32_t PSPX1M /* [1,128] */;
+  uint32_t PSPX1MI[128 EXT_STRUCT_CTRL(PSPX1M)] /* [1,128] */;
+  uint32_t PSPX1ME[128 EXT_STRUCT_CTRL(PSPX1M)] /* [1,2560] */;
+  uint32_t PSPX1 /* [0,2560] */;
+  uint32_t PSPX1v[2560 EXT_STRUCT_CTRL(PSPX1)] /* [-1,-1] */;
+  uint32_t PSPX2M /* [1,128] */;
+  uint32_t PSPX2MI[128 EXT_STRUCT_CTRL(PSPX2M)] /* [1,128] */;
+  uint32_t PSPX2ME[128 EXT_STRUCT_CTRL(PSPX2M)] /* [1,2560] */;
+  uint32_t PSPX2 /* [0,2560] */;
+  uint32_t PSPX2v[2560 EXT_STRUCT_CTRL(PSPX2)] /* [-1,-1] */;
+  uint32_t PSPX3M /* [1,128] */;
+  uint32_t PSPX3MI[128 EXT_STRUCT_CTRL(PSPX3M)] /* [1,128] */;
+  uint32_t PSPX3ME[128 EXT_STRUCT_CTRL(PSPX3M)] /* [1,2560] */;
+  uint32_t PSPX3 /* [0,2560] */;
+  uint32_t PSPX3v[2560 EXT_STRUCT_CTRL(PSPX3)] /* [-1,-1] */;
+  uint32_t PSPX4M /* [1,128] */;
+  uint32_t PSPX4MI[128 EXT_STRUCT_CTRL(PSPX4M)] /* [1,128] */;
+  uint32_t PSPX4ME[128 EXT_STRUCT_CTRL(PSPX4M)] /* [1,2560] */;
+  uint32_t PSPX4 /* [0,2560] */;
+  uint32_t PSPX4v[2560 EXT_STRUCT_CTRL(PSPX4)] /* [-1,-1] */;
+  uint32_t PSPX5M /* [1,128] */;
+  uint32_t PSPX5MI[128 EXT_STRUCT_CTRL(PSPX5M)] /* [1,128] */;
+  uint32_t PSPX5ME[128 EXT_STRUCT_CTRL(PSPX5M)] /* [1,2560] */;
+  uint32_t PSPX5 /* [0,2560] */;
+  uint32_t PSPX5v[2560 EXT_STRUCT_CTRL(PSPX5)] /* [-1,-1] */;
+  uint32_t PSPX6M /* [1,128] */;
+  uint32_t PSPX6MI[128 EXT_STRUCT_CTRL(PSPX6M)] /* [1,128] */;
+  uint32_t PSPX6ME[128 EXT_STRUCT_CTRL(PSPX6M)] /* [1,2560] */;
+  uint32_t PSPX6 /* [0,2560] */;
+  uint32_t PSPX6v[2560 EXT_STRUCT_CTRL(PSPX6)] /* [-1,-1] */;
 
 } EXT_STR_h101_PSP;
 
@@ -68,11 +73,11 @@ typedef struct EXT_STR_h101_PSP_onion_t
   /* RAW */
   struct {
     uint32_t M;
-    uint32_t MI[65 /* M */];
-    uint32_t ME[65 /* M */];
+    uint32_t MI[128 /* M */];
+    uint32_t ME[128 /* M */];
     uint32_t _;
-    uint32_t v[650 /* _ */];
-  } PSPX[5];
+    uint32_t v[2560 /* _ */];
+  } PSPX[6];
 
 } EXT_STR_h101_PSP_onion;
 
@@ -83,7 +88,7 @@ typedef struct EXT_STR_h101_PSP_onion_t
   /* RAW */ \
   EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      PSPX1M,                          UINT32,\
-                    "PSPX1M",65); \
+                    "PSPX1M",128); \
   EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      PSPX1MI,                         UINT32,\
                     "PSPX1MI",                         "PSPX1M"); \
@@ -92,13 +97,13 @@ typedef struct EXT_STR_h101_PSP_onion_t
                     "PSPX1ME",                         "PSPX1M"); \
   EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      PSPX1,                           UINT32,\
-                    "PSPX1",650); \
+                    "PSPX1",2560); \
   EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      PSPX1v,                          UINT32,\
                     "PSPX1v",                          "PSPX1"); \
   EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      PSPX2M,                          UINT32,\
-                    "PSPX2M",65); \
+                    "PSPX2M",128); \
   EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      PSPX2MI,                         UINT32,\
                     "PSPX2MI",                         "PSPX2M"); \
@@ -107,13 +112,13 @@ typedef struct EXT_STR_h101_PSP_onion_t
                     "PSPX2ME",                         "PSPX2M"); \
   EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      PSPX2,                           UINT32,\
-                    "PSPX2",650); \
+                    "PSPX2",2560); \
   EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      PSPX2v,                          UINT32,\
                     "PSPX2v",                          "PSPX2"); \
   EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      PSPX3M,                          UINT32,\
-                    "PSPX3M",65); \
+                    "PSPX3M",128); \
   EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      PSPX3MI,                         UINT32,\
                     "PSPX3MI",                         "PSPX3M"); \
@@ -122,13 +127,13 @@ typedef struct EXT_STR_h101_PSP_onion_t
                     "PSPX3ME",                         "PSPX3M"); \
   EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      PSPX3,                           UINT32,\
-                    "PSPX3",650); \
+                    "PSPX3",2560); \
   EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      PSPX3v,                          UINT32,\
                     "PSPX3v",                          "PSPX3"); \
   EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      PSPX4M,                          UINT32,\
-                    "PSPX4M",65); \
+                    "PSPX4M",128); \
   EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      PSPX4MI,                         UINT32,\
                     "PSPX4MI",                         "PSPX4M"); \
@@ -137,13 +142,13 @@ typedef struct EXT_STR_h101_PSP_onion_t
                     "PSPX4ME",                         "PSPX4M"); \
   EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      PSPX4,                           UINT32,\
-                    "PSPX4",650); \
+                    "PSPX4",2560); \
   EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      PSPX4v,                          UINT32,\
                     "PSPX4v",                          "PSPX4"); \
   EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      PSPX5M,                          UINT32,\
-                    "PSPX5M",65); \
+                    "PSPX5M",128); \
   EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      PSPX5MI,                         UINT32,\
                     "PSPX5MI",                         "PSPX5M"); \
@@ -152,10 +157,25 @@ typedef struct EXT_STR_h101_PSP_onion_t
                     "PSPX5ME",                         "PSPX5M"); \
   EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
                      PSPX5,                           UINT32,\
-                    "PSPX5",650); \
+                    "PSPX5",2560); \
   EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
                      PSPX5v,                          UINT32,\
                     "PSPX5v",                          "PSPX5"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
+                     PSPX6M,                          UINT32,\
+                    "PSPX6M",128); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
+                     PSPX6MI,                         UINT32,\
+                    "PSPX6MI",                         "PSPX6M"); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
+                     PSPX6ME,                         UINT32,\
+                    "PSPX6ME",                         "PSPX6M"); \
+  EXT_STR_ITEM_INFO_LIM(ok,si,offset,struct_t,printerr,\
+                     PSPX6,                           UINT32,\
+                    "PSPX6",2560); \
+  EXT_STR_ITEM_INFO_ZZP(ok,si,offset,struct_t,printerr,\
+                     PSPX6v,                          UINT32,\
+                    "PSPX6v",                          "PSPX6"); \
   \
 } while (0);
 

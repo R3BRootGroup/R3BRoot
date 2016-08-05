@@ -163,7 +163,7 @@ Bool_t R3BPspxReader::Read()
 			// The first 22 bits are energy. Bit 23 should be 0. Bit 24 is sign.
 			if(energy!=0xEEEEEE){ //get rid of error message code
 
-				if (d==0) printf("PSP1 Ch %d Energy: %d = 0x%x\n",i,energy,energy);
+			    //if (d==0) printf("PSP1 Ch %d Energy: %d = 0x%x\n",i,energy,energy);
 			    //TODO Ask Ralf about Continue
 			    //if(d==0 || d==1 || d==3 || (d==4 && channel==65)){ // for s438b
 			    //  if(!(energy&0x800000)) continue;
