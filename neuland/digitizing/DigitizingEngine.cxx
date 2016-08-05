@@ -37,15 +37,6 @@ Double_t DigitizingEngine::fPaddleHalfLength = 0.;
 TRandom3 *DigitizingEngine::fRnd = new TRandom3();
 
 
-DigitizingEngine::DigitizingEngine()
-{
-}
-
-DigitizingEngine::~DigitizingEngine()
-{
-}
-
-
 Double_t DigitizingEngine::GetTriggerTime() const
 {
     Double_t triggerTime = 1e100;
@@ -62,7 +53,6 @@ Double_t DigitizingEngine::GetTriggerTime() const
     }
     return triggerTime;
 }
-
 
 
 bool DigitizingEngine::PMT::HasFired() const

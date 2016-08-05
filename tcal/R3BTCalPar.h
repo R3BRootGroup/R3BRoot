@@ -3,11 +3,14 @@
 
 #define NMODULEMAX 6000
 
+#define N_PLANE_MAX 100
+#define N_PADDLE_MAX 100
+#define N_SIDE_MAX 10
+
 #include "FairParGenericSet.h" // for FairParGenericSet
-
-#include "TObjArray.h"
-
 #include "R3BTCalModulePar.h"
+#include "TObjArray.h"
+#include <map>
 
 using namespace std;
 
@@ -63,18 +66,34 @@ class R3BTCalPar : public FairParGenericSet
     /**
      * Method to print value of parameters to the standard output.
      * Calls printParams() for every module container.
+     * Accessible from Context menu in TBrowser.
      */
-    void printParams();
+    void printParams(); // *MENU*
+
+    /**
+     * Method to print value of parameters for a specific module.
+     * @param plane an index of detector plane
+     * @param paddle a paddle index within the plane
+     * @param side a side of a paddle
+     * Accessible from Context menu in TBrowser.
+     */
+    void PrintModuleParams(Int_t plane, Int_t paddle, Int_t side); // *MENU*
+
+    /**
+     * Method to draw value of parameters for a specific module on a current Canvas.
+     * @param plane an index of detector plane
+     * @param paddle a paddle index within the plane
+     * @param side a side of a paddle
+     * Accessible from Context menu in TBrowser.
+     */
+    void DrawModuleParams(Int_t plane, Int_t paddle, Int_t side); // *MENU*
 
     /**
      * Method to add parameter container for a module.
      * Extends the array.
      * @param tch a parameter container for a detector module.
      */
-    void AddModulePar(R3BTCalModulePar* tch)
-    {
-        fTCalParams->Add(tch);
-    }
+    void AddModulePar(R3BTCalModulePar* tch);
 
     /**
      * Method to retrieve the arrray with module containers.
@@ -99,16 +118,16 @@ class R3BTCalPar : public FairParGenericSet
      * @param idx an index of a module.
      * @return parameter container of this module.
      */
-    R3BTCalModulePar* GetModuleParAt(Int_t idx)
-    {
-        return (R3BTCalModulePar*)fTCalParams->At(idx);
-    }
+    R3BTCalModulePar* GetModuleParAt(Int_t plane, Int_t paddle, Int_t side);
 
   private:
     const R3BTCalPar& operator=(const R3BTCalPar&); /**< an assignment operator */
     R3BTCalPar(const R3BTCalPar&);                  /**< a copy constructor */
 
     TObjArray* fTCalParams; /**< an array with parameter containers of all modules */
+
+    Bool_t fMapInit;             /**< a boolean flag for indication whether the indexing map is initialized */
+    map<Int_t, Int_t> fIndexMap; /**< a map between index of a container in array and plane,paddle,side */
 
     ClassDef(R3BTCalPar, 1);
 };

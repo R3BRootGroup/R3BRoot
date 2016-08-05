@@ -11,6 +11,9 @@
 #endif
 #include "R3BPhysicsList.h"
 
+
+ClassImp(R3BRunConfiguration)
+
 //_____________________________________________________________________________
 R3BRunConfiguration::R3BRunConfiguration(const TString& userGeometry,
                                              const TString& specialProcess)

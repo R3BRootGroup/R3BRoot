@@ -73,7 +73,7 @@ inline double Efficiency(const TH2F *h, const double &lower, const double &upper
   return Integral_2D(h, lower, upper, kappa) / h->GetEntries();
 }
 
-double GetCuts(const double *d, double *c) {
+void GetCuts(const double *d, double *c) {
   c[0] = CUT_ZERO;
   // d[0] is kappa!
   for (int i = 1; i < N_MAX; i++) {

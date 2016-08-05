@@ -2,6 +2,8 @@
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 
+Set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-overloaded-virtual")
+
 Set(SYSTEM_INCLUDE_DIRECTORIES 
 ${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
@@ -21,8 +23,12 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/lumonData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData  
 ${R3BROOT_SOURCE_DIR}/r3bdata/starttrackerData  
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData  
+${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mfiData  
+${R3BROOT_SOURCE_DIR}/r3bdata/fi4Data  
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData  
+${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
+${R3BROOT_SOURCE_DIR}/r3bdata/actarData
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -65,8 +71,6 @@ startrackerData/R3BSTaRTraHit.cxx
 startrackerData/R3BSTaRTrackerHit.cxx
 startrackerData/R3BSTaRTrackerDigitHit.cxx
 landData/R3BLandPoint.cxx
-landData/R3BNeuLandPoint.cxx 
-landData/R3BLandRawHit.cxx
 landData/R3BLandDigi.cxx 
 landData/R3BLandFirstHits.cxx 
 landData/R3BLandHit.cxx 
@@ -87,6 +91,22 @@ mfiData/R3BMfiPoint.cxx
 mfiData/R3BMfiDigi.cxx 
 pspData/R3BPspPoint.cxx
 pspData/R3BPspDigi.cxx
+neulandData/R3BNeulandUnpackData.cxx
+neulandData/R3BNeulandMappedData.cxx
+neulandData/R3BNeulandCalData.cxx
+pspData/R3BPspxMappedData.cxx
+pspData/R3BPspxCalData.cxx
+pspData/R3BPspxHitData.cxx
+losData/R3BLosMappedData.cxx
+actarData/R3BActarPoint.cxx
+losData/R3BLosCalData.cxx
+losData/R3BLosHitData.cxx
+neulandData/R3BPaddleTamexMappedData.cxx
+tofData/R3BPaddleCalData.cxx
+fi4Data/R3BFi4MappedItem.cxx
+fi4Data/R3BFi4CalItem.cxx
+fi4Data/R3BFi4HitItem.cxx
+tofData/R3BTofdHitData.cxx
 )
 
 

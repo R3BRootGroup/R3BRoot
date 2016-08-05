@@ -50,6 +50,7 @@ unpack/R3BCaloRawAna.cxx
 unpack/R3BCaloCrystalAna.cxx
 unpack/R3BCaloCalibParFinder.cxx
 unpack/R3BCaloMap.cxx
+unpack/R3BCaloPIDCal.cxx
 )
 
 if(FAIRDB_FOUND)

@@ -64,7 +64,7 @@ void run(TString runNumber)
     // ---------------------------------------------------------------------------
 
     // TCAL ----------------------------------------------------------------------
-    R3BLandTcalFill* landTcalFill = new R3BLandTcalFill("LandTcalFill");
+    R3BNeulandMapped2CalPar* landTcalFill = new R3BNeulandMapped2CalPar("NeulandMapped2Cal");
     landTcalFill->SetUpdateRate(updateRate);
     landTcalFill->SetMinStats(minStats);
     landTcalFill->SetNofModules(nModules, 40);

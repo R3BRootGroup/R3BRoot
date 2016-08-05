@@ -7,15 +7,10 @@
 #pragma link C++ class R3BGeoLand+;
 #pragma link C++ class R3BGeoLandPar;
 #pragma link C++ class R3BLand+;
-#pragma link C++ class R3BNeuLand+;
-#pragma link C++ class R3BNeuLandv1+;
 #pragma link C++ class R3BLandDigitizer+;
 #pragma link C++ class R3BLandDigitizerQA+;
 #pragma link C++ class R3BLandDigiPar+;
 #pragma link C++ class R3BNeutronTracker+;
-#pragma link C++ class R3BConstantFraction+;
-#pragma link C++ class R3BLandDigitizer_CFD+;
-#pragma link C++ class R3BLandDigiAnalyser+;
 #pragma link C++ class R3BLandContFact;
 
 #pragma link C++ class R3BNeuLandCluster+;
@@ -25,19 +20,21 @@
 #pragma link C++ class R3BPrimPart+;
 #pragma link C++ class R3BNeutHit+;
 
-#pragma link C++ class R3BLandRawAna+;
-#pragma link C++ class R3BLandRawAnaS438b+;
-#pragma link C++ class R3BLandMapping+;
-#pragma link C++ class R3BLandRawHitMapped+;
-#pragma link C++ class R3BLandUnpack+;
-#pragma link C++ class R3BLandTcalFill+;
+#pragma link C++ class R3BNeulandMappedHist+;
+//#pragma link C++ class R3BLandRawAnaS438b+;
+//#pragma link C++ class R3BLandMapping+;
+//#pragma link C++ class R3BLandUnpack+;
+#pragma link C++ class R3BNeulandMapped2CalPar+;
 #pragma link C++ class R3BLandParamRead+;
-#pragma link C++ class R3BLandPmt+;
-#pragma link C++ class R3BLandTcal+;
-#pragma link C++ class R3BLandTdiffFill+;
-#pragma link C++ class R3BLandTdiff+;
-#pragma link C++ class R3BLandAna+;
-#pragma link C++ class R3BLandTcalTest+;
+#pragma link C++ class R3BNeulandMapped2Cal+;
+//#pragma link C++ class R3BLandAna+;
+//#pragma link C++ class R3BNeulandCalTest+;
+#pragma link C++ class R3BNeulandCal2Hit+;
+#pragma link C++ class R3BNeulandCal2HitPar+;
+#pragma link C++ class R3BNeulandParFact+;
+#pragma link C++ class R3BNeulandHitPar+;
+#pragma link C++ class R3BNeulandHitModulePar+;
+
 
 #endif
 

@@ -24,7 +24,7 @@ using namespace std;
 #include "FairLogger.h"
 
 #include "R3BEventHeader.h"
-#include "R3BLandRawHit.h"
+#include "R3BNeulandUnpackData.h"
 #include "R3BCaloRawHit.h"
 #include "R3BLmdSource.h"
 
@@ -35,7 +35,7 @@ R3BLmdSource::R3BLmdSource()
     fNeuLandHits(NULL),
     fCalifaHits(NULL),
     fBufHeader(new R3BEventHeader()),
-    fBufNeuLand(new TClonesArray("R3BLandRawHit")),
+    fBufNeuLand(new TClonesArray("R3BNeulandUnpackData")),
     fTSUnit(1),
     fDelayCutLower(250),
     fDelayCutUpper(380),
@@ -59,7 +59,7 @@ R3BLmdSource::R3BLmdSource(const R3BLmdSource& source)
     fNeuLandHits(NULL),
     fCalifaHits(NULL),
     fBufHeader(new R3BEventHeader()),
-    fBufNeuLand(new TClonesArray("R3BLandRawHit")),
+    fBufNeuLand(new TClonesArray("R3BNeulandUnpackData")),
     fTSUnit(1),
     fDelayCutLower(250),
     fDelayCutUpper(380),
@@ -257,7 +257,7 @@ void R3BLmdSource::CopyNeuLandToBuf()
     // Copy NeuLAND raw hits
     for(Int_t i = 0; i < fNeuLandHits->GetEntries(); i++)
     {
-        new ((*fBufNeuLand)[i]) R3BLandRawHit(*((R3BLandRawHit*)fNeuLandHits->At(i)));
+        new ((*fBufNeuLand)[i]) R3BNeulandUnpackData(*((R3BNeulandUnpackData*)fNeuLandHits->At(i)));
     }
 }
 
@@ -272,7 +272,7 @@ void R3BLmdSource::CopyNeuLandToOutput()
     fNeuLandHits->Clear();
     for(Int_t i = 0; i < fBufNeuLand->GetEntries(); i++)
     {
-        new ((*fNeuLandHits)[i]) R3BLandRawHit(*((R3BLandRawHit*)fBufNeuLand->At(i)));
+        new ((*fNeuLandHits)[i]) R3BNeulandUnpackData(*((R3BNeulandUnpackData*)fBufNeuLand->At(i)));
     }
     
     // Clear the buffer

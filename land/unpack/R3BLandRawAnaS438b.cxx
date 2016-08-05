@@ -17,7 +17,7 @@ using namespace std;
 #include "FairLogger.h"
 
 #include "R3BEventHeader.h"
-#include "R3BLandRawHitMapped.h"
+#include "R3BNeulandMappedData.h"
 #include "R3BCaloRawHit.h"
 #include "R3BLandRawAnaS438b.h"
 
@@ -78,10 +78,10 @@ void R3BLandRawAnaS438b::Exec(Option_t* option)
     if (fLandRawHitMapped)
     {
         Int_t nLandRawHitsMapped = fLandRawHitMapped->GetEntries();
-        R3BLandRawHitMapped* hitmapped;
+        R3BNeulandMappedData* hitmapped;
         for (Int_t i = 0; i < nLandRawHitsMapped; i++)
         {
-            hitmapped = (R3BLandRawHitMapped*)fLandRawHitMapped->At(i);
+            hitmapped = (R3BNeulandMappedData*)fLandRawHitMapped->At(i);
             if(! hitmapped->Is17())
             {
                 if(nCalo1 > 0 && eCalo > 60)

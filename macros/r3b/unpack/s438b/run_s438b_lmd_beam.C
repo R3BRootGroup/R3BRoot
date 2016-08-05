@@ -52,6 +52,7 @@ void run(TString runNumber)
     FairRunOnline* run = new FairRunOnline(source);
     run->SetOutputFile(outputFileName.Data());
     run->SetGenerateHtml(kTRUE, histFileName.Data(), refresh);
+    run->ActivateHttpServer();
     // ---------------------------------------------------------------------------
 
     // Create ALADIN field map ---------------------------------------------------
@@ -70,11 +71,11 @@ void run(TString runNumber)
     // ---------------------------------------------------------------------------
 
     // TCAL ----------------------------------------------------------------------
-    R3BLandTcalFill* tcalFill = new R3BLandTcalFill("TcalFill");
+    R3BNeulandMapped2CalPar* tcalFill = new R3BNeulandMapped2CalPar("TcalFill");
     tcalFill->SetUpdateRate(updateRate);
     tcalFill->SetMinStats(minStats);
     tcalFill->SetTrigger(trigger);
-    tcalFill->SetNofModules(nModules, 50);
+    tcalFill->SetNofModules(nModules);
     run->AddTask(tcalFill);
 
     R3BLosTcalFill* losTcalFill = new R3BLosTcalFill("LosTcalFill");
@@ -108,7 +109,14 @@ void run(TString runNumber)
     // ---------------------------------------------------------------------------
 
     // Run -----------------------------------------------------------------------
-    run->Run(nev, 0);
+    if(nev < 0)
+    {
+        run->Run(nev, 0);
+    }
+    else
+    {
+        run->Run(0, nev);
+    }
     rtdb->saveOutput();
     // ---------------------------------------------------------------------------
 

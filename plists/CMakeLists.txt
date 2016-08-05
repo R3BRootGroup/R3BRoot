@@ -7,6 +7,7 @@ ${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
 ${GEANT4_INCLUDE_DIR}
 ${GEANT4VMC_INCLUDE_DIR}
+${CLHEP_INCLUDE_DIR}
 )
 
 set(INCLUDE_DIRECTORIES
@@ -38,8 +39,6 @@ G4EmHadronBuilder.cxx
 G4EmMuonBuilder.cxx
 G4EmQEDBuilder.cxx
 G4LowEnergyQEDBuilder.cxx
-G4PenelopeQEDBuilder.cxx
-G4StepLimiterBuilder.cxx
 G4StepLimiterMessenger.cxx
 G4StepLimiterPerRegion.cxx
 #EmBinaryCascadeBuilder.cxx
@@ -52,6 +51,27 @@ R3BPhysicsList.cxx
 R3BPhysicsListMessenger.cxx
 R3BRunConfiguration.cxx  
 )
+
+Set(R3BPLIST_LINKDEF PlistLinkDef.h)
+
+set(R3BPLIST_DICT_HEADERS R3BRunConfiguration.h)
+set(R3BPLIST_DICTIONARY G__R3BPlistDict.cxx)
+
+Set(INCLUDE
+${SYSTEM_INCLUDE_DIRECTORIES}
+${INCLUDE_DIRECTORIES}
+)
+
+if(ROOT_FOUND_VERSION LESS 59999)
+  ROOT_GENERATE_DICTIONARY("${R3BPLIST_DICT_HEADERS}" "${R3BPLIST_LINKDEF}" "${R3BPLIST_DICTIONARY}" "${INCLUDE}")
+
+  Set(SRCS
+      ${SRCS}
+      ${R3BPLIST_DICTIONARY}
+  )
+else(ROOT_FOUND_VERSION LESS 59999)
+  Set(LINKDEF PlistLinkDef.h)
+endif(ROOT_FOUND_VERSION LESS 59999)
 
 # fill list of header files from list of source files
 # by exchanging the file extension

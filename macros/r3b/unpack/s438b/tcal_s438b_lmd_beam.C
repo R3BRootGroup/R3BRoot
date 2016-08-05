@@ -29,9 +29,10 @@ void run(TString runNumber)
     // ---------------------------------------------------------------------------
 
     // Time calibration ----------------------------------------------------------
-    R3BLandTcal* landTcal = new R3BLandTcal("LandTcal", 1);
+    R3BNeulandMapped2Cal* landTcal = new R3BNeulandMapped2Cal("LandTcal", 1);
     landTcal->SetTrigger(trigger);
-    landTcal->SetNofModules(nModules, 50);
+    landTcal->SetNofModules(nModules);
+    landTcal->EnableWalk(kTRUE);
     run->AddTask(landTcal);
 
     R3BLosTcal* losTcal = new R3BLosTcal("LosTcal", 1);
@@ -39,7 +40,7 @@ void run(TString runNumber)
     run->AddTask(losTcal);
     // ---------------------------------------------------------------------------
 
-    R3BLandTcalTest *testTcal = new R3BLandTcalTest("TestTcal", 1);
+    R3BNeulandCalTest *testTcal = new R3BNeulandCalTest("TestTcal", 1);
     run->AddTask(testTcal);
 
     // Initialize ----------------------------------------------------------------

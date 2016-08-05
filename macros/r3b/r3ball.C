@@ -215,7 +215,7 @@ void r3ball(Int_t nEvents = 1,
     run->AddModule(land);
   }
   
-  // NeuLand Scintillator Detector
+  // DEPRECATED: NeuLand Scintillator Detector
   if(fDetList->FindObject("SCINTNEULAND")) {
     R3BDetector* land = new R3BLand("Land", kTRUE);
     land->SetVerboseLevel(1);
@@ -223,6 +223,13 @@ void r3ball(Int_t nEvents = 1,
     run->AddModule(land);
   }
   
+  // Neuland Detector
+  if(fDetList->FindObject("NEULAND")) {
+    R3BDetector* neuland = new R3BNeuland();
+    neuland->SetGeometryFileName(((TObjString*)fDetList->GetValue("NEULAND"))->GetString().Data());
+    run->AddModule(neuland);
+  }
+
   // MFI Detector
   if(fDetList->FindObject("MFI")) {
     R3BDetector* mfi = new R3BMfi("Mfi", kTRUE);

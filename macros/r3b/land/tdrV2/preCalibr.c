@@ -1,10 +1,10 @@
 void preCalibr(
   const Int_t n_events,
-  const string basename,
+  const TString basename,
   const Double_t beamE,
   const Double_t saturation,
   const Double_t integration,
-  const string output_affix = ""
+  const TString output_affix = ""
 ) {
 
   // ----- Files ---------------------------------------------------------------

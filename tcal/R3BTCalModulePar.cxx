@@ -1,7 +1,11 @@
 #include "R3BTCalModulePar.h"
 
-#include "FairParamList.h" // for FairParamList
 #include "FairLogger.h"
+#include "FairParamList.h" // for FairParamList
+
+#include "TF1.h"
+#include "TH1F.h"
+#include "TPad.h"
 
 using namespace std;
 
@@ -9,7 +13,8 @@ ClassImp(R3BTCalModulePar);
 
 R3BTCalModulePar::R3BTCalModulePar(const char* name, const char* title, const char* context, Bool_t own)
     : FairParGenericSet(name, title, context, own)
-    , fModuleId(0)
+    , fPlane(0)
+    , fPaddle(0)
     , fSide(0)
     , fNofChannels(0)
 {
@@ -28,7 +33,8 @@ void R3BTCalModulePar::putParams(FairParamList* list)
     {
         return;
     }
-    list->add("module_id", fModuleId);
+    list->add("plane", fPlane);
+    list->add("paddle", fPaddle);
     list->add("side", fSide);
     list->add("nofchannels", fNofChannels);
     list->add("bin_low", fBinLow, NCHMAX);
@@ -43,7 +49,11 @@ Bool_t R3BTCalModulePar::getParams(FairParamList* list)
     {
         return kFALSE;
     }
-    if (!list->fill("module_id", &fModuleId))
+    if (!list->fill("plane", &fPlane))
+    {
+        return kFALSE;
+    }
+    if (!list->fill("paddle", &fPaddle))
     {
         return kFALSE;
     }
@@ -77,7 +87,7 @@ Bool_t R3BTCalModulePar::getParams(FairParamList* list)
 
 void R3BTCalModulePar::clear()
 {
-    fModuleId = fSide = fNofChannels = 0;
+    fPlane = fPaddle = fSide = fNofChannels = 0;
     // <DB> Not so much overhead here.
     for (Int_t i = 0; i < NCHMAX; i++)
     {
@@ -90,7 +100,8 @@ void R3BTCalModulePar::clear()
 void R3BTCalModulePar::printParams()
 {
     LOG(INFO) << "   R3BTCalModulePar: Time Calibration Parameters: " << FairLogger::endl;
-    LOG(INFO) << "   fBarId: " << fModuleId << FairLogger::endl;
+    LOG(INFO) << "   fPlane: " << fPlane << FairLogger::endl;
+    LOG(INFO) << "   fPaddle: " << fPaddle << FairLogger::endl;
     LOG(INFO) << "   fSide: " << fSide << FairLogger::endl;
     LOG(INFO) << "   fNofChannels: " << fNofChannels << FairLogger::endl;
     for (Int_t i = 0; i < fNofChannels; i++)
@@ -125,4 +136,47 @@ Double_t R3BTCalModulePar::GetTimeVFTX(Int_t tdc)
         }
     }
     return -10000.;
+}
+
+void R3BTCalModulePar::DrawParams()
+{
+    Int_t type = 2; // VFTX
+    if (fNofChannels > 0)
+    {
+        if (fSlope[0] > 0)
+        {
+            type = 1; // Tacquila
+        }
+    }
+    else
+    {
+        return;
+    }
+    TH1F* h1 = new TH1F(Form("h1_%d_%d_%d", fPlane, fPaddle, fSide), "", 4096, -0.5, 4096.5);
+    h1->Draw();
+    for (Int_t i = 0; i < fNofChannels; i++)
+    {
+        if (1 == type)
+        {
+            TF1* f1 = new TF1(Form("f1_%d", i), "[0] + [1]*(x - [2])", fBinLow[i], fBinUp[i]);
+            f1->SetParameter(0, fOffset[i]);
+            f1->SetParameter(1, fSlope[i]);
+            f1->SetParameter(2, fBinLow[i]);
+            f1->Draw("same");
+        }
+        else if (2 == type)
+        {
+            h1->SetBinContent(fBinLow[i], fOffset[i]);
+        }
+    }
+
+    if (1 == type)
+    {
+        h1->GetYaxis()->SetRangeUser(0., 1.2 * fOffset[fNofChannels - 1]);
+    }
+    else if (2 == type)
+    {
+        h1->Draw();
+    }
+    gPad->Update();
 }

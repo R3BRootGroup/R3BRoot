@@ -16,8 +16,8 @@
 #include "FairLogger.h"
 
 #include "R3BLandMapping.h"
-#include "R3BLandRawHit.h"
-#include "R3BLandRawHitMapped.h"
+#include "R3BNeulandUnpackData.h"
+#include "R3BNeulandMappedData.h"
 
 using std::ifstream;
 
@@ -25,7 +25,7 @@ R3BLandMapping::R3BLandMapping()
     : nMappedElements(0)
     , fnEvents(0)
     , fNofBarsPerPlane(0)
-    , fLandHit(new TClonesArray("R3BLandRawHitMapped"))
+    , fLandHit(new TClonesArray("R3BNeulandMappedData"))
     , nEntry(0)
 {
 }
@@ -103,8 +103,9 @@ Bool_t R3BLandMapping::DoMapping()
                           << FairLogger::endl;
 
                 Int_t index = 1000000*i_sam + 10000*i_gtb + 100*i_tac_addr + (i_tac_ch-1);
-                v1map[index] = (i_plane - 1) * fNofBarsPerPlane + i_bar;
-                v2map[index] = i_side;
+                v1map[index] = i_plane;
+                v2map[index] = i_bar;
+                v3map[index] = i_side;
                 nMappedElements++;
                 
                 if (-1 == str.Index("NONE"))
@@ -120,8 +121,9 @@ Bool_t R3BLandMapping::DoMapping()
                     << FairLogger::endl;
                     
                     index = 1000000*i_sam + 10000*i_gtb + 100*i_tac_addr + (i_tac_ch-1);
-                    v1map[index] = -1;
-                    v2map[index] = -1;
+                    v1map[index] = i_plane;
+                    v2map[index] = i_bar;
+                    v3map[index] = i_side + 2;
                 }
             }
         }
@@ -141,7 +143,7 @@ void R3BLandMapping::Exec(Option_t* option)
 {
     // -------- Paddle identification ----------------------
     Int_t nHits = fRawData->GetEntries();
-    R3BLandRawHit* hit;
+    R3BNeulandUnpackData* hit;
     
     Int_t sam;
     Int_t gtb;
@@ -153,11 +155,12 @@ void R3BLandMapping::Exec(Option_t* option)
     Int_t qdcData;
     
     Bool_t is17;
-    Int_t barId;
+    Int_t plane;
+    Int_t paddle;
     Int_t side;
     for (Int_t i = 0; i < nHits; i++)
     {
-        hit = (R3BLandRawHit*)fRawData->At(i);
+        hit = (R3BNeulandUnpackData*)fRawData->At(i);
         sam = hit->GetSam();
         gtb = hit->GetGtb();
         tacaddr = hit->GetTacAddr();
@@ -175,22 +178,19 @@ void R3BLandMapping::Exec(Option_t* option)
         {
             is17 = kFALSE;
         }
-        barId = -2;
+        plane = -2;
+        paddle = -2;
         side = -2;
-        if(v1map.find(index) != v1map.end() && v2map.find(index) != v2map.end())
+        if(v1map.find(index) != v1map.end() && v2map.find(index) != v2map.end() && v3map.find(index) != v3map.end())
         {
-            barId = v1map[index];
-            side = v2map[index];
+            plane = v1map[index];
+            paddle = v2map[index];
+            side = v3map[index];
         }
         
-        if(barId != -2 && side != -2)
+        if(plane != -2 && paddle != -2 && side != -2)
         {
-            if((barId == -1 && side == -1) && !is17)
-            {
-                LOG(INFO) << tach << "  " << is17 << "  " << barId << "  " << side << FairLogger::endl;
-                FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Illegal barId");
-            }
-            new ((*fLandHit)[nEntry]) R3BLandRawHitMapped(sam, gtb, tacaddr, cal, clock, tacData, qdcData, barId, side, is17);
+            new ((*fLandHit)[nEntry]) R3BNeulandMappedData(sam, gtb, tacaddr, cal, clock, tacData, qdcData, plane, paddle, side, is17);
             nEntry++;
         }
     }

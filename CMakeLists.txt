@@ -76,6 +76,7 @@ include(R3BMacros)
 include(WriteConfigFile)
 include(Dart)
 include(CheckCompiler)
+include(WriteEnvCache)
 
 
 # R3BRoot uses from 10.08.15 C++11, so we need an compiler which supports C++11
@@ -248,6 +249,13 @@ Else(${IS_XCODE})
   SET(LD_LIBRARY_PATH  ${R3BLIBDIR} ${LD_LIBRARY_PATH})
 Endif(${IS_XCODE})
 
+find_package(ucesb)
+if(ucesb_FOUND)
+set(WITH_UCESB true)
+set(LD_LIBRARY_PATH ${ucesb_LIBRARY_DIR} ${LD_LIBRARY_PATH})
+endif(ucesb_FOUND)
+
+find_package(Garfield)
 
 Generate_Version_Info()
 
@@ -273,11 +281,15 @@ ENDIF (MODULE)
 
 IF(NOT MODULE)
 add_subdirectory (r3bbase)  
+if (WITH_UCESB)
+  add_subdirectory (r3bsource)
+endif (WITH_UCESB)
 add_subdirectory (passive) 
 add_subdirectory (cal)
 add_subdirectory (xball)
 add_subdirectory (dch) 
 add_subdirectory (gfi) 
+add_subdirectory (fi4) 
 add_subdirectory (land) 
 add_subdirectory (neuland)
 add_subdirectory (los)
@@ -299,6 +311,10 @@ add_subdirectory (psp)
 add_subdirectory (timestitcher)
 add_subdirectory (compilehelper)
 add_subdirectory (tcal)
+  IF(GARFIELD_FOUND)
+    add_subdirectory (actar)
+    Set(LD_LIBRARY_PATH ${GARFIELD_LIBRARY_DIR} ${LD_LIBRARY_PATH})
+  ENDIF(GARFIELD_FOUND)
 ENDIF (NOT MODULE)
 
 Execute_Process(COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-opengl
@@ -338,3 +354,5 @@ if(NOT R3BROOT_MINIMAL)
 else(NOT R3BROOT_MINIMAL)
   WRITE_MINIMAL_CONFIG_FILE(config.sh)
 endif(NOT R3BROOT_MINIMAL)
+
+WRITE_ENV_CACHE(env_cache.sh)

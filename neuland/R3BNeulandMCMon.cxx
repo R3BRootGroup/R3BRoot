@@ -34,7 +34,16 @@ InitStatus R3BNeulandMCMon::Init()
 {
     FairRootManager *rm = FairRootManager::Instance();
     fMCTracks = (TClonesArray *)rm->GetObject("MCTrack");
-    fLandPoints = (TClonesArray *)rm->GetObject("LandPoint");
+    if (fMCTracks == nullptr) {
+        LOG(FATAL) << "R3BNeulandDigiMon: No MCTrack!" << FairLogger::endl;
+        return kFATAL;
+    }
+
+    fLandPoints = (TClonesArray *)rm->GetObject("NeulandPoints");
+    if (fLandPoints == nullptr) {
+        LOG(FATAL) << "R3BNeulandDigiMon: No NeulandPoints!" << FairLogger::endl;
+        return kFATAL;
+    }
 
     fhPDG = new TH1D("hPDG", "Number of particles by PDG code created by primary neutron interaction resulting in a LandPoint", 8000, -4000, 4000);
     fhEPrimarys = new TH1D("hE_primarys", "Energy of primary particles", 10000, 0, 10000);

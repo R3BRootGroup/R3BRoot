@@ -24,6 +24,8 @@ void Step0_R3BNeulandSim(
    run->SetOutputFile(out_file);
    run->SetMaterials("media_r3b.geo");
 
+   //run->SetUserConfig("g4R3bConfig.C");
+   //run->SetUserCuts("SetR3BCuts.C");
 
    // Geometry: Cave
    FairModule *cave = new R3BCave("CAVE");

@@ -211,6 +211,7 @@ void R3BLandDigitizer::Exec(Option_t* opt)
   plength = fLandDigiPar->GetPaddleLength(); // [cm]
 
   Double_t Thresh = 0.16;
+//  Double_t Thresh = 0.05;
 
 
   Int_t nentries = fLandPoints->GetEntries();
