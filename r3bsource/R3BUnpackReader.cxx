@@ -64,6 +64,7 @@ Bool_t R3BUnpackReader::Read()
 	}
 
 	fHeader->SetTrigger(fData->TRIGGER);
+	fHeader->SetEventno(fNEvent);
 
     return kTRUE;
 }
