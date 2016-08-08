@@ -13,7 +13,7 @@ class R3BPspxHitData : public TObject
     R3BPspxHitData();
 
     // Standard Constructor
-    R3BPspxHitData(UShort_t detector, Float_t u, Float_t v, Float_t x, Float_t y, Float_t energy, UInt_t multiplicity);
+    R3BPspxHitData(UShort_t detector, Float_t u, Float_t v, Float_t x, Float_t y, Float_t energy, UInt_t multiplicity, UInt_t x_multiplicity, UInt_t y_multiplicity);
     
     // Destructor
     virtual ~R3BPspxHitData() { }
@@ -26,6 +26,8 @@ class R3BPspxHitData : public TObject
     inline const Float_t& GetY()   const { return fY;   }
     inline const Float_t& GetEnergy()   const { return fEnergy;   }
     inline const UInt_t& GetMultiplicity()   const { return fMultiplicity;   }
+    inline const UInt_t& GetXMultiplicity()   const { return fXMultiplicity;   }
+    inline const UInt_t& GetYMultiplicity()   const { return fYMultiplicity;   }
     
   private:
     UShort_t fDetector; // 1..5
@@ -35,9 +37,11 @@ class R3BPspxHitData : public TObject
     Float_t fY; // between -l/2,l/2
     Float_t fEnergy; // 
     UInt_t fMultiplicity; // 
+    UInt_t fXMultiplicity; // 
+    UInt_t fYMultiplicity; // 
         
   public:
-    ClassDef(R3BPspxHitData, 3)
+    ClassDef(R3BPspxHitData, 4)
 };
 
 #endif

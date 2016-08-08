@@ -239,10 +239,12 @@ void R3BPspxCal2Hit::Exec(Option_t* option)
 		 //position
 		 if(strip>nstrips && strip<nstrips*2+1){
 		    u=(mItem->GetEnergy1()-mItem->GetEnergy2())/(mItem->GetEnergy1()+mItem->GetEnergy2());
-		    v=(strip-1.5*nstrips-0.5)/(nstrips/2.);
-				    
 		    x=sign_x[detector]*(offset[detector][strip-nstrips-1]+slope[detector][strip-nstrips-1]*u);
-		    y=sign_y[detector]*v*fHitPar->GetPspxParLength().At(detector)/2.;
+		    
+		    if(y_mult[detector]!=2 && y_mult[detector]!=4){
+			v=(strip-1.5*nstrips-0.5)/(nstrips/2.);
+			y=sign_y[detector]*v*fHitPar->GetPspxParLength().At(detector)/2.;
+		    }
 		 }
 		 
 	       }
@@ -268,11 +270,13 @@ void R3BPspxCal2Hit::Exec(Option_t* option)
 		 
 		 // position
 		 if(strip>0 && strip<nstrips+1){
-		    u=(strip-0.5*nstrips-0.5)/(nstrips/2.);
 		    v=(mItem->GetEnergy1()-mItem->GetEnergy2())/(mItem->GetEnergy1()+mItem->GetEnergy2());
-		    
-		    x=sign_x[detector]*u*fHitPar->GetPspxParLength().At(detector)/2.;
 		    y=sign_y[detector]*(offset[detector][strip-1]+slope[detector][strip-1]*v);
+		    
+		    if(x_mult[detector]!=2 && x_mult[detector]!=4){
+			u=(strip-0.5*nstrips-0.5)/(nstrips/2.);
+			x=sign_x[detector]*u*fHitPar->GetPspxParLength().At(detector)/2.;
+		    }
 		 }
 		 
 	       }
@@ -313,10 +317,12 @@ void R3BPspxCal2Hit::Exec(Option_t* option)
 				
 				if(detector+1==mItem2->GetDetector() && strip2>nstrips && strip2<nstrips*2+1 && (strip1==strip2+1 || strip1==strip2-1)){
 				    u=((mItem1->GetEnergy1()+mItem2->GetEnergy1())-(mItem1->GetEnergy2()+mItem2->GetEnergy2()))/(mItem1->GetEnergy1()+mItem2->GetEnergy1()+mItem1->GetEnergy2()+mItem2->GetEnergy2());
-				    v=((strip1+strip2)/2.-1.5*nstrips-0.5)/(nstrips/2.);
-								
 				    x=sign_x[detector]*((offset[detector][strip1-nstrips-1]+offset[detector][strip2-nstrips-1])/2.+(slope[detector][strip1-nstrips-1]+slope[detector][strip2-nstrips-1])/2.*u);
-				    y=sign_y[detector]*v*fHitPar->GetPspxParLength().At(detector)/2.; 
+				    
+				    if(y_mult[detector]!=2 && y_mult[detector]!=4){
+					v=((strip1+strip2)/2.-1.5*nstrips-0.5)/(nstrips/2.);
+					y=sign_y[detector]*v*fHitPar->GetPspxParLength().At(detector)/2.; 
+				    }
 				} 
 			    }
 			    
@@ -360,11 +366,16 @@ void R3BPspxCal2Hit::Exec(Option_t* option)
 				strip2=mItem2->GetStrip();
 				
 				if(detector+1==mItem2->GetDetector() && strip2>0 && strip2<nstrips+1 && (strip1==strip2+1 || strip1==strip2-1)){
-				    u=((strip1+strip2)/2.-0.5*nstrips-0.5)/(nstrips/2.);
+				    
 				    v=((mItem1->GetEnergy1()+mItem2->GetEnergy1())-(mItem1->GetEnergy2()+mItem2->GetEnergy2()))/(mItem1->GetEnergy1()+mItem2->GetEnergy1()+mItem1->GetEnergy2()+mItem2->GetEnergy2());
 				    
-				    x=sign_x[detector]*u*fHitPar->GetPspxParLength().At(detector)/2.; 
+				    
 				    y=sign_y[detector]*((offset[detector][strip1-1]+offset[detector][strip2-1])/2.+(slope[detector][strip1-1]+slope[detector][strip2-1])/2.*v);
+				    
+				    if(x_mult[detector]!=2 && x_mult[detector]!=4){
+					u=((strip1+strip2)/2.-0.5*nstrips-0.5)/(nstrips/2.);  
+					x=sign_x[detector]*u*fHitPar->GetPspxParLength().At(detector)/2.;   
+				    }
 				} 
 			    }
 			    
@@ -373,7 +384,7 @@ void R3BPspxCal2Hit::Exec(Option_t* option)
 	}
       }
 
-      new ((*fHitItems)[fHitItems->GetEntriesFast()]) R3BPspxHitData(detector+1,u,v,x,y,energy,x_mult[detector]+y_mult[detector]+e_mult[detector]); 
+      new ((*fHitItems)[fHitItems->GetEntriesFast()]) R3BPspxHitData(detector+1,u,v,x,y,energy,x_mult[detector]+y_mult[detector]+e_mult[detector],x_mult[detector],y_mult[detector]); 
 
     }
 

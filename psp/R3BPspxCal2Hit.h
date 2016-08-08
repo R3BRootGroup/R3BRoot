@@ -12,14 +12,6 @@
 
 #include "FairTask.h"
 
-const static UInt_t ndetectors = 5;
-const static UInt_t nstrips = 16;
-const static UInt_t length_array_detector = ndetectors+1;
-const static UInt_t length_array_strip= nstrips+1;
-
-const static Double_t detector_length=5.; // in cm
-const static Double_t strip_width=detector_length/nstrips; // in cm
-
 class TClonesArray;
 class R3BEventHeader;
 class R3BPspxHitPar;

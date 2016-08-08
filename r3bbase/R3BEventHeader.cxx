@@ -6,7 +6,10 @@
 #include "R3BEventHeader.h"
 
 R3BEventHeader::R3BEventHeader()
-    : fTrigger(0)
+    : fEventno(0),
+    fTrigger(0),
+    fTimeStamp(0)
+    
 {
 }
 
