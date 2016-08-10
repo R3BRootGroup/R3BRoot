@@ -93,10 +93,6 @@ void R3BLmdSource::AddFile(TString fileName)
 
 Bool_t R3BLmdSource::Init()
 {
-  if(! FairMbsSource::Init()) {
-    return kFALSE;
-  }
-
   if(fFileNames->GetSize() == 0) {
     return kFALSE;
   }
