@@ -1,5 +1,7 @@
 #include "R3BNeulandDigi.h"
 
+using namespace std;
+
 ostream& operator<<(ostream& os, const R3BNeulandDigi& digi)
 {
     os << "R3BNeulandDigi: NeuLAND Digi in Paddle " << digi.GetPaddle() << std::endl

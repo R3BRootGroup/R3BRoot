@@ -1,5 +1,7 @@
 #include "R3BNeulandNeutron.h"
 
+using namespace std;
+
 ostream& operator<<(ostream& os, const R3BNeulandNeutron& digi)
 {
     os << "R3BNeulandNeutron: XYZTE    " << digi.GetPosition().X() << "    " << digi.GetPosition().Y() << "    "
