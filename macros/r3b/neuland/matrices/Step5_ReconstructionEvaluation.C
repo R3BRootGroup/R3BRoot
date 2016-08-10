@@ -7,29 +7,26 @@ inline void ConnectParFileToRuntimeDb(const TString parFile, FairRuntimeDb* rtdb
     rtdb->saveOutput();
 }
 
-void Step2_DigitizingClustering(const TString simFile)
+void Step5_ReconstructionEvaluation(const TString file)
 {
     TStopwatch timer;
     timer.Start();
 
-    const TString parFile = (TString(simFile).ReplaceAll(".sim.", ".par."));
-    const TString outFile = (TString(simFile).ReplaceAll(".sim.", ".digi."));
+    const TString parFile = (TString(file).ReplaceAll(".reco.", ".par."));
+    const TString mcpFile = (TString(file).ReplaceAll(".reco.", ".sim."));
+    const TString outFile = (TString(file).ReplaceAll(".reco.", ".eval."));
 
     FairRunAna* run = new FairRunAna();
     // FairLogger::GetLogger()->SetLogScreenLevel("DEBUG");
-    run->SetInputFile(simFile);
+    run->SetInputFile(file);
+    run->AddFriend(mcpFile);
     run->SetOutputFile(outFile);
     ConnectParFileToRuntimeDb(parFile, run->GetRuntimeDb());
 
-    run->AddTask(new R3BNeulandDigitizer());
-    run->AddTask(new R3BNeulandClusterFinder());
-
-    // Optional
-    // run->AddTask(new R3BNeulandMCMon());
-    // run->AddTask(new R3BNeulandDigiMon());
-    // run->AddTask(new R3BNeulandClusterMon());
+    run->AddTask(new R3BNeulandNeutronReconstructionEvaluation());
 
     run->Init();
+
     run->Run(0, 0);
 
     timer.Stop();
