@@ -1,5 +1,7 @@
 #include "R3BNeulandPoint.h"
 
+using namespace std;
+
 TVector3 R3BNeulandPoint::GetMomentum() const
 {
     TVector3 v;

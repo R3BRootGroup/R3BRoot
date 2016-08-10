@@ -2,6 +2,9 @@
 
 #include <algorithm>
 #include <stdexcept>
+#include <numeric>
+
+using namespace std;
 
 R3BNeulandDigi R3BNeulandCluster::GetFirstDigi() const
 {

@@ -62,6 +62,7 @@ generate_library()
 
 # Testing 
 enable_testing()
+Set(GTEST_ROOT ${SIMPATH})
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
