@@ -42,7 +42,8 @@ void r3ball(Int_t nEvents = 1,
             Double_t fMeasCurrent = 2000.,
             TString OutFile = "r3bsim.root",
             TString ParFile = "r3bpar.root",
-            TString InFile = "evt_gen.dat")
+            TString InFile = "evt_gen.dat",
+            Int_t randomSeed = 0)
 {
   TString dir = getenv("VMCWORKDIR");
   TString r3bdir = dir + "/macros";
@@ -371,7 +372,7 @@ void r3ball(Int_t nEvents = 1,
   
   // -----   Initialize simulation run   ------------------------------------
   run->Init();
-
+  gMC->SetRandom(new TRandom3(randomSeed));
   
   // ------  Increase nb of step for CALO
   Int_t nSteps = -15000;
