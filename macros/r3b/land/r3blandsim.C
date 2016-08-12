@@ -52,6 +52,6 @@ void r3blandsim(Int_t nNeutrons = 4, Int_t nEvents = 100, Int_t beamE = 600, Int
   Bool_t fR3BMagnet = kTRUE;
 
   // Main Sim function call
-  r3ball(nEvents,&detGeo,target,fEventDisplay,fMC,fGene,fUserPList,fR3BMagnet,2500.,OutFile,ParFile,EventDataFile);  
+  r3ball(nEvents,&detGeo,target,fEventDisplay,fMC,fGene,fUserPList,fR3BMagnet,2500.,OutFile,ParFile,EventDataFile,100);
 }
 
