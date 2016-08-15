@@ -108,7 +108,7 @@ void run_sample_data()
     cout << "Parameter file is " << parFileName << endl;
     cout << "Real time " << rtime << " s, CPU time " << ctime << "s" << endl << endl;
 
-	if(ana->GetNItemsTotal() > 7900)
+	if(ana->GetNItemsTotal() > 3800)
 	{
 		cout << " Test passed" << endl;
 		cout << " All ok " << endl;
