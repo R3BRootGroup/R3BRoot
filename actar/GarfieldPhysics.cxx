@@ -21,6 +21,12 @@
 
 #include "TGeoManager.h"
 #include "TGeoBBox.h"
+#include "TGeoTube.h"
+
+#include "FairLogger.h"
+
+double rTube = 0.;
+double lTube = 0.;
 
 // I.H.
 //#include "TGDMLParse.h"
@@ -176,7 +182,7 @@ void GarfieldPhysics::InitializePhysics() {
 	fAvalanche = new Garfield::AvalancheMicroscopic();
 	fComponentAnalyticField = new Garfield::ComponentAnalyticField();
 
-	CreateGeometry();
+	//CreateGeometry();
 
 	fDrift->SetSensor(fSensor);
 	fAvalanche->SetSensor(fSensor);
@@ -186,10 +192,29 @@ void GarfieldPhysics::InitializePhysics() {
 	fTrackHeed->SetSensor(fSensor);
 
 	fTrackHeed->EnableDeltaElectronTransport();
+
+
+    Garfield::GeometryRoot* geo = new Garfield::GeometryRoot();
+    geo->SetGeometry(gGeoManager);
+    geo->SetMedium("ArCO2", fMediumMagboltz);
+    fComponentAnalyticField->SetGeometry(geo);
+
+    TGeoTube* chamberInner = (TGeoTube*) gGeoManager->GetVolume("Actar_chamber_inner")->GetShape();
+    rTube = chamberInner->GetRmax();
+    lTube = chamberInner->GetDZ();
+//    fComponentAnalyticField->AddWire(0., 0., 2 * 25.e-4, 1000., "w");
+//    fComponentAnalyticField->AddTube(chamberInner->GetRmax(), 0., 0, "t");
+    fComponentAnalyticField->AddPlaneX(-1.*chamberInner->GetDZ(), 0, "1");
+    fComponentAnalyticField->AddPlaneX(chamberInner->GetDZ(), 1000., "2");
+
+    fSensor->SetArea(-1.*chamberInner->GetDX(), -1.*chamberInner->GetDY(), -1.*chamberInner->GetDZ(),
+                     chamberInner->GetDX(), chamberInner->GetDY(), chamberInner->GetDZ());
+    fSensor->AddComponent(fComponentAnalyticField);
 }
 
+
 void GarfieldPhysics::CreateGeometry() {
-	// Wire radius [cm]
+/*	// Wire radius [cm]
 	const double rWire = 25.e-4;
 	// Outer radius of the tube [cm]
 	const double rTube = 1.451;
@@ -212,7 +237,7 @@ void GarfieldPhysics::CreateGeometry() {
 	fComponentAnalyticField->AddTube(rTube, vTube, 0, "t");
 
 	fSensor->AddComponent(fComponentAnalyticField);
-
+*/
 }
 
 void GarfieldPhysics::DoIt(std::string particleName, double ekin_MeV,
@@ -224,9 +249,9 @@ void GarfieldPhysics::DoIt(std::string particleName, double ekin_MeV,
 	// Wire radius [cm]
 	const double rWire = 25.e-4;
 	// Outer radius of the tube [cm]
-	const double rTube = 1.45;
+	//const double rTube = 1.45;
 	// Half-length of the tube [cm]
-	const double lTube = 10.;
+	//const double lTube = 10.;
 
 	double eKin_eV = ekin_MeV * 1e+6;
 
