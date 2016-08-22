@@ -54,16 +54,7 @@ namespace
     {
         auto clusterer = Neuland::ClusteringEngine<int>();
         std::vector<int> digis{ 1, 2, 3, 7, 8, 9, 10, 12 };
-        try
-        {
-            clusterer.Clusterize(digis);
-        }
-        catch (const std::exception& err)
-        {
-            EXPECT_EQ(err.what(), std::string("bad_function_call"));
-            return;
-        }
-        FAIL() << "Expected std::bad_function_call";
+        EXPECT_ANY_THROW(clusterer.Clusterize(digis));
     }
 
     TEST(testClusteringEngine, check_SatisfiesClusteringCondition)
