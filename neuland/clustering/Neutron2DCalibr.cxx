@@ -26,7 +26,7 @@ namespace Neuland
     void Neutron2DCalibr::SetClusterFile(const UInt_t nNeutrons, const TString& filename)
     {
         fHists[nNeutrons] =
-            new TH2D(TString::UItoa(nNeutrons, 10), TString::UItoa(nNeutrons, 10) + "n", 50, 0, 2000, 35, 0, 70);
+            new TH2D(TString::UItoa(nNeutrons, 10), TString::UItoa(nNeutrons, 10) + "n", 50, 0, 2000, 70, 0, 70);
         fHists.at(nNeutrons)->GetXaxis()->SetTitle("Total Energy [MeV]");
         fHists.at(nNeutrons)->GetYaxis()->SetTitle("Number of Clusters");
 
@@ -61,7 +61,7 @@ namespace Neuland
             }
             else
             {
-                fHists[nNeutrons]->Fill(-1, -1);
+                fHists[nNeutrons]->Fill(0., 0.);
             }
         }
 
@@ -114,7 +114,7 @@ namespace Neuland
         }
         else
         {
-            y0 = 0;
+            y0 = -1;
         }
 
         const Double_t y3 = nNeutrons * k + k0;
@@ -123,10 +123,10 @@ namespace Neuland
         // std::cout << "(0, " << y0 << ") (" << x1 << ", 0) (" << x2 << ", 0) ( 0, " << y3 << ")" << std::endl;
 
         TCutG* cut = fCuts[nNeutrons];
-        cut->SetPoint(0, 0, y0);
-        cut->SetPoint(1, x1, 0);
-        cut->SetPoint(2, x2, 0);
-        cut->SetPoint(3, 0, y3);
+        cut->SetPoint(0, -1, y0);
+        cut->SetPoint(1, x1, -1);
+        cut->SetPoint(2, x2, -1);
+        cut->SetPoint(3, -1, y3);
         return cut;
     }
 
