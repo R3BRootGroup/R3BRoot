@@ -64,7 +64,7 @@ InitStatus R3BNeulandDigiMon::Init()
     hDepthVSForemostEnergy = new TH2D("hDepthVSFrontEnergy", "Depth vs Foremost Energy", 60, 1400, 1700, 100, 0, 100);
     hDepthVSSternmostEnergy =
         new TH2D("hDepthVSSternmostEnergy", "Depth vs Sternmost Energy", 60, 1400, 1700, 100, 0, 100);
-    hEtot = new TH1D("hEtot", "Total Energy", 1000, 0, 1000);
+    hEtot = new TH1D("hEtot", "Total Energy", 10000, 0, 10000);
     hDepthVSEtot = new TH2D("hDepthVSEtot", "Depth vs Total Energy", 60, 1400, 1700, 1000, 0, 1000);
     hPosVSEnergy = new TH2D("hPosVSEnergy", "Position vs Energy deposition", 60, 1400, 1700, 1000, 0, 1000);
 
