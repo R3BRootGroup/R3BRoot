@@ -11,12 +11,14 @@
 #endif
 #include "R3BPhysicsList.h"
 
+#include <QGSP_INCLXX.hh>
+
 
 ClassImp(R3BRunConfiguration)
 
 //_____________________________________________________________________________
 R3BRunConfiguration::R3BRunConfiguration(const TString& userGeometry,
-                                             const TString& specialProcess)
+    const TString& specialProcess)
   : TG4RunConfiguration(userGeometry, "emStandard", specialProcess) 
 {
 

@@ -38,6 +38,7 @@
 
 #include "G4IonINCLXXPhysics.hh"
 #include "G4HadronPhysicsQGSP_BERT.hh"
+#include "G4HadronPhysicsINCLXX.hh"
 
 // std G4 headers
 #include "G4UnitsTable.hh"
@@ -192,6 +193,10 @@ void R3BPhysicsList::AddPhysicsList(const G4String& name){
 
   } else if (name == "qgsp_bert") {
     RegisterPhysics(new G4HadronPhysicsQGSP_BERT());
+    G4cout << "R3BPhysicsList::AddPhysicsList <" << name << ">" << G4endl;
+    
+  } else if (name == "qgsp_inclxx") {
+    RegisterPhysics(new G4HadronPhysicsINCLXX());
     G4cout << "R3BPhysicsList::AddPhysicsList <" << name << ">" << G4endl;
     
   } else if (name == "ion_inclxx" && !ionIsRegisted) {
