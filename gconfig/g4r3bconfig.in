@@ -27,6 +27,8 @@
 #/R3B/phys/addPhysics binary
 /R3B/phys/addPhysics binary_ion
 /R3B/phys/addPhysics gamma_nuc
+#/R3B/phys/addPhysics qgsp_bert 
+#/R3B/phys/addPhysics qgsp_inclxx
 #/R3B/phys/stepMax 1. mm
 
 # Command to change the range cut threshold for electrons (Default is 1 mm):
