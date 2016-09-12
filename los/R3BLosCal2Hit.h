@@ -13,8 +13,6 @@
 
 #include "FairTask.h"
 
-using namespace std;
-
 class TClonesArray;
 
 /**
