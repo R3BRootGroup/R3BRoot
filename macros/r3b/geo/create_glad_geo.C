@@ -129,7 +129,7 @@ void create_glad_geo(const char* geoTag)
   t0->RotateY(90.0);
   t0->RotateZ(-90.0);
   t0->SetTranslation(0.0,0.0,DistanceToTarget+Correction);
-  t0->RotateY(+7.3);
+  t0->RotateY(+14.0);
   t0->RotateZ(180.0);
   TGeoCombiTrans *pGlobal = GetGlobalPosition(t0);
   
