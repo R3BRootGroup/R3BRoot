@@ -2,6 +2,7 @@
 
 #include "FairLogger.h"
 #include "FairParamList.h" // for FairParamList
+#include "FairRtdbRun.h"
 
 ClassImp(R3BTCalPar);
 
@@ -44,9 +45,7 @@ Bool_t R3BTCalPar::getParams(FairParamList* list)
     return kTRUE;
 }
 
-void R3BTCalPar::clear()
-{
-}
+void R3BTCalPar::clear() {}
 
 void R3BTCalPar::printParams()
 {
@@ -119,8 +118,7 @@ R3BTCalModulePar* R3BTCalPar::GetModuleParAt(Int_t plane, Int_t paddle, Int_t si
         return NULL;
     }
     Int_t arind = fIndexMap[index];
-    R3BTCalModulePar* par = (R3BTCalModulePar*)fTCalParams->At(arind);
-    return par;
+    return (R3BTCalModulePar*)fTCalParams->At(arind);
 }
 
 void R3BTCalPar::AddModulePar(R3BTCalModulePar* tch)
@@ -145,4 +143,51 @@ void R3BTCalPar::DrawModuleParams(Int_t plane, Int_t paddle, Int_t side)
     {
         par->DrawParams();
     }
+}
+
+Bool_t R3BTCalPar::SetModuleParValue(Int_t plane, Int_t paddle, Int_t side, Int_t tac_channel, Double_t value)
+{
+    R3BTCalModulePar* par = GetModuleParAt(plane, paddle, side);
+    if (NULL != par)
+    {
+        if (par->GetSlopeAt(0) > 0)
+        {
+            LOG(ERROR) << "R3BTCalPar::SetModuleParValue : this function does not support Tacquila."
+                       << FairLogger::endl;
+            return kFALSE;
+        }
+        Int_t i = 0;
+        for (; i < par->GetNofChannels(); i++)
+        {
+            if (par->GetBinLowAt(i) == tac_channel)
+            {
+                break;
+            }
+        }
+        par->SetOffsetAt(value, i);
+        return kTRUE;
+    }
+    return kFALSE;
+}
+
+void R3BTCalPar::SavePar(TString runNumber)
+{
+    this->Write();
+    FairRtdbRun* r1 = (FairRtdbRun*)gDirectory->Get(runNumber);
+    if (NULL == r1)
+    {
+        LOG(ERROR) << "Run " << runNumber << " does not exist in parameter file! Aborting." << FairLogger::endl;
+        return;
+    }
+    FairParVersion* ver = r1->getParVersion(GetName());
+    if (NULL == ver)
+    {
+        LOG(ERROR) << "Parameter container " << GetName() << " does not exist in parameter file! Aborting."
+                   << FairLogger::endl;
+        return;
+    }
+    ver->setRootVersion(ver->getRootVersion() + 1);
+    r1->Write();
+    LOG(INFO) << "Container " << GetName() << " is written to ROOT file. Version: " << ver->getRootVersion()
+              << FairLogger::endl;
 }

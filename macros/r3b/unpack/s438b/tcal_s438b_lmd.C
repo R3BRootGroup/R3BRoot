@@ -24,8 +24,6 @@ void run(TString runNumber)
     FairParRootFileIo* parIo1 = new FairParRootFileIo();
     parIo1->open(parFileName);
     rtdb->setFirstInput(parIo1);
-    rtdb->setOutput(parIo1);
-    rtdb->saveOutput();
     // ---------------------------------------------------------------------------
 
     // Time calibration ----------------------------------------------------------
