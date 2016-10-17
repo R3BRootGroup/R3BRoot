@@ -89,6 +89,24 @@ class R3BTCalPar : public FairParGenericSet
     void DrawModuleParams(Int_t plane, Int_t paddle, Int_t side); // *MENU*
 
     /**
+     * Method to manually set the time calibration in standalone ROOT session.
+     * @param plane an index of detector plane
+     * @param paddle a paddle index within the plane
+     * @param side a side of a paddle
+     * @param tac_channel a hardware time channel number
+     * @param value time value in [ns] for the specified channel
+     * @return kTRUE if electronics is VFTX and setting was successful
+     */
+    Bool_t SetModuleParValue(Int_t plane, Int_t paddle, Int_t side, Int_t tac_channel, Double_t value);
+
+    /**
+     * Method to save the edited parameters. New version will be created and
+     * corresponding entry in FairRtdbRun will be added.
+     * @param runNumber a run id of the current data set, for example "267"
+     */
+    void SavePar(TString runNumber);
+
+    /**
      * Method to add parameter container for a module.
      * Extends the array.
      * @param tch a parameter container for a detector module.
@@ -99,19 +117,13 @@ class R3BTCalPar : public FairParGenericSet
      * Method to retrieve the arrray with module containers.
      * @return an array with parameter containers of type R3BTCalModulePar.
      */
-    TObjArray* GetListOfModulePar()
-    {
-        return fTCalParams;
-    }
+    TObjArray* GetListOfModulePar() { return fTCalParams; }
 
     /**
      * Method to get number of modules storred in array.
      * @return size of array.
      */
-    Int_t GetNumModulePar()
-    {
-        return fTCalParams->GetEntries();
-    }
+    Int_t GetNumModulePar() { return fTCalParams->GetEntries(); }
 
     /**
      * Method to get single parameter container for a specific module.
