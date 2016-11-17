@@ -17,6 +17,7 @@ class TClonesArray;
 class TCanvas;
 class TGraph;
 class TF1;
+class TH1F;
 
 typedef std::set<UInt_t> ident_no_set;
 typedef std::pair<Float_t,Int_t> pair_value;
@@ -63,12 +64,11 @@ public:
 };
 
 struct bar{
-  Int_t fBarId;
-  Int_t fPdl;
+
   Double_t fTime [2];
   Double_t fQdc [2];
 
-  bar(Int_t barId, Int_t pdl) : fBarId(barId), fPdl(pdl){
+  bar(){
     fTime[0] = 0;
     fTime[1] = 0;
     fQdc[0] = 0;
@@ -91,20 +91,25 @@ class R3BNeulandCal2HitPar : public FairTask
     virtual void FinishEvent();
 
     virtual void FinishTask();
-
-    void SetMaxPaddleDistFromLine(Double_t d){
-	MAX_PADDLE_DIST_FROM_LINE = d;
-    }
     
-    void SetPlanes(Int_t planes){
-	fPlanes = planes;
-    }
-
+    inline void SetPlanes(Int_t planes){ fPlanes = planes; }     
+    
+    //Deviation threshold in %
+    inline void SetDeviationTH(Float_t f) { fDeviationTH = f; }
+    
+    //Max Error threshold in %
+    inline void SetErrorTH(Float_t f) { fErrorTH = f; }
+    
+    //Min QDC for Event
+    inline void SetMinEventQDC(Int_t i) { fMinEventQDC = i; }
+        
   private:
 
-    Double_t MAX_PADDLE_DIST_FROM_LINE = 1.0;
     Int_t fPlanes = 60;
     Int_t fPaddles = 50;
+    Float_t fDeviationTH = 20.0;
+    Float_t fErrorTH = 2.0;
+    Int_t fMinEventQDC = 100;
     
     TClonesArray* fLandPmt;
     R3BNeulandHitPar* fPar;
@@ -121,9 +126,11 @@ class R3BNeulandCal2HitPar : public FairTask
     std::vector<std::vector<n_calib_diff> > _collect_diff;
     std::vector<std::vector<n_calib_mean> > _collect_mean_within;
     std::vector<std::vector<std::vector<n_calib_mean> > > _collect_mean_cross;
-    std::vector<std::vector<n_calib_diff> > _collect_diff_e;
-    std::vector<std::vector<n_calib_mean> > _collect_mean_within_e;
-    std::vector<std::vector<std::vector<n_calib_mean> > > _collect_mean_cross_e;
+    
+    std::vector<std::vector<TH1F*>> _ecalhistos;
+    std::vector<std::vector<TGraph*>> _ecalgraphs;
+    
+    TH1F* distances;
 
     UInt_t _used_ident_no;
 

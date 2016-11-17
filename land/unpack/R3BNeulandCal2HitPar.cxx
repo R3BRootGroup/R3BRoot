@@ -1,6 +1,6 @@
 // ---------------------------------------------------------------------------------------
 // -----                           R3BNeulandCal2HitPar                              -----
-// -----         Copied from Land02/detector/land/n_gen_det_cosmic1 on 11-2015       -----
+// -----         Ported from Land02/detector/land/n_gen_det_cosmic1 on 11-2015       -----
 // ---------------------------------------------------------------------------------------
 
 #include "R3BNeulandCal2HitPar.h"
@@ -10,6 +10,8 @@
 #include "TGraph.h"
 #include "TPolyLine3D.h"
 #include "TH2D.h"
+#include "TH1F.h"
+#include "TVector3.h"
 #include "R3BNeulandHitModulePar.h"
 #include "R3BNeulandHitPar.h"
 #include "TF1.h"
@@ -187,7 +189,9 @@ namespace __gnu_cxx {
 const Double_t C_LIGHT = 29.9792458;                      // Speed of light [cm/ns]
 
 // const Double_t paddle_spacing = 10.4;                 // cm LAND parameter
-const Double_t paddle_spacing =  5.0;                 // cm NeuLAND parameter
+const Double_t PADDLE_SPACING =  5.0;                 // cm NeuLAND parameter
+
+const Double_t MINIMUM_IONIZING = 1.15;
 
 using namespace std;
 
@@ -236,16 +240,25 @@ bool n_calib_diff::calc_params(ident_no_set& bad_fit_idents, Double_t y0[2], Dou
       if (bad_fit_idents.find(_data[k]._ident_no) == bad_fit_idents.end()) {
          plot->SetPoint(n++, _data[k]._pos_track, _data[k]._pos_diff);
       }
-
-   if (n < 2) {
-      return false;
+      
+   if(n < 1000){
+      y0[0] = NAN;
+      y0[1] = NAN;
+      dydx[0] = NAN;
+      dydx[1] = NAN;
+      
+      plot->Delete();
+      fit->Delete();
+   
+      return false;   
    }
-
+   
    plot->Fit(fit, "q");
    y0[0] = fit->GetParameter(0);
    y0[1] = fit->GetParError(0);
    dydx[0] = fit->GetParameter(1);
    dydx[1] = fit->GetParError(1);
+
 
    plot->Delete();
    fit->Delete();
@@ -413,9 +426,6 @@ InitStatus R3BNeulandCal2HitPar::Init() {
    _collect_diff.resize(fPlanes, vector<n_calib_diff> (fPaddles));
    _collect_mean_within.resize(fPlanes, vector<n_calib_mean> (fPaddles - 1));
    _collect_mean_cross.resize(fPlanes - 1, vector<vector<n_calib_mean>> (fPaddles, vector<n_calib_mean> (fPaddles)));
-   _collect_diff_e.resize(fPlanes, vector<n_calib_diff> (fPaddles));
-   _collect_mean_within_e.resize(fPlanes, vector<n_calib_mean> (fPaddles - 1));
-   _collect_mean_cross_e.resize(fPlanes - 1, vector<vector<n_calib_mean>> (fPaddles, vector<n_calib_mean> (fPaddles)));
    bars.resize(fPlanes, vector<bar*> (0));
 
    fPar = (R3BNeulandHitPar*) FairRuntimeDb::instance()->getContainer("NeulandHitPar");
@@ -425,66 +435,79 @@ InitStatus R3BNeulandCal2HitPar::Init() {
    x_fit = new TF1("linear_fit_x", "[0]*x+[1]");
    y_fit = new TF1("linear_fit_y", "[0]*x+[1]");
 
+   
+   for(Int_t i = 0; i < fPlanes; i++){
+    std::vector<TH1F*> histos;
+    std::vector<TGraph*> graphs;
+     for(Int_t j = 0; j < fPaddles; j++){
+        std::string str = "h_Plane" + std::to_string(i) + "_Bar" + std::to_string(j);
+	const char* c = str.c_str();
+	TH1F* histo = new TH1F(c, c, 200, 0, 200);
+	histos.push_back(histo);
+	
+	TGraph* graph = new TGraph();
+	graphs.push_back(graph);
+	
+	bar* b = new bar();
+	bars[i].push_back(b);
+     }
+     
+     _ecalhistos.push_back(histos);
+     _ecalgraphs.push_back(graphs);
+   }
+   
    return kSUCCESS;
 }
 
-bool sortBars(bar* b1, bar* b2) {
-   return (b1->fPdl < b2->fPdl);
-}
+#include "bitset"
 
 void R3BNeulandCal2HitPar::Exec(Option_t* option) {
-   if (++fEventNumber % 10000 == 0)
-      FairLogger::GetLogger()->Info(MESSAGE_ORIGIN, "[R3BNeulandCal2HitPar] Event: %8d,    accepted Events: %8d", fEventNumber, nData);
+   if (++fEventNumber % 100000 == 0)
+      FairLogger::GetLogger()->Info(MESSAGE_ORIGIN, "R3BNeulandCal2HitPar::Exec : Event: %8d,    accepted Events: %8d", fEventNumber, nData);
 
    Int_t nItems = fLandPmt->GetEntriesFast();
-
-   if (nItems < 6) {
+   
+   if (nItems < 12) {
       LOG(DEBUG) << "Event cannot be used: too few hits!" << FairLogger::endl;
       return;
    }
+   
+   ULong_t hit_mask[fPlanes];
+   memset(hit_mask, 0, sizeof(hit_mask));
+   
+  {
+    ULong_t hm[fPlanes];
+    memset(hm, 0, sizeof(hm));
+    Int_t items = 0;
 
-   ULong_t hit_mask_t[fPlanes][2];
-   ULong_t hit_mask_e[fPlanes][2];
-
-   memset(hit_mask_t, 0, sizeof(hit_mask_t));
-   memset(hit_mask_e, 0, sizeof(hit_mask_e));
-
-
-
-   for (Int_t i = 0; i < nItems; i++) {
+    for (Int_t i = 0; i < nItems; i++) {
       R3BNeulandCalData* pmt = (R3BNeulandCalData*) fLandPmt->At(i);
+
       Int_t pl = (pmt->GetBarId() - 1) / fPaddles;
       Int_t pdl = (pmt->GetBarId() - 1) % fPaddles;
       Int_t side = pmt->GetSide() - 1;
-      Bool_t found = false;
-      bar* b;
+      
+      bar* b = bars[pl][pdl];
 
-      for (Int_t j = 0; j < bars[pl].size(); j++) {
-         b = bars[pl][j];
+      b->fTime[side] = pmt->GetTime();
+      b->fQdc[side] = pmt->GetQdc();
 
-         if (b->fPdl == pdl) {
-            b->fTime[side] = pmt->GetTime();
-            b->fQdc[side] = pmt->GetQdc();
-            found = true;
-            break;
-         }
+      if(hm[pl] & ((ULong_t (1) << pdl))){
+	if(b->fQdc[0] >= fMinEventQDC && b->fQdc[1] >= fMinEventQDC){
+	  items++;
+	  hit_mask[pl] |= ULong_t (1) << pdl;
+	}
       }
+      else
+	hm[pl] |= ULong_t (1) << pdl;
+    }
 
-      if (!found) {
-         b = new bar(pmt->GetBarId(), pdl);
-         b->fTime[side] = pmt->GetTime();
-         b->fQdc[side] = pmt->GetQdc();
-         bars[pl].push_back(b);
-      }
-
-      hit_mask_t[pl][side] |= ULong_t (1) << pdl;
-      hit_mask_e[pl][side] |= ULong_t (1) << pdl;
-   }
-
-   for (Int_t i = 0; i < fPlanes; i++) {
-      sort(bars[i].begin(), bars[i].end(), sortBars);
-   }
-
+    if (items < 6) {
+      LOG(DEBUG) << "Event cannot be used: too few hits!" << FairLogger::endl;
+      return;
+    } 
+  }
+   
    /*Now we now what fPlanes were hit
 
      Lets figure out if we have a reasonable track.
@@ -561,12 +584,6 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
      We can possible this way also operate on neutron data, since it
      will in most cases anyhow not fit the tracking... */
 
-   ULong_t hit_mask_use[fPlanes];
-
-   for (Int_t pl = 0; pl < fPlanes; pl++) {
-      hit_mask_use[pl] = (hit_mask_t[pl][0] | hit_mask_t[pl][1]);
-   }
-
    /*Now attempt to fit.  Even though this looks like for-ever loop,
      it is usually only executed once.  If we have to few points, then
      we simply return.  If one x (and/or) y point is too bad, it is
@@ -590,13 +607,13 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
       y_plot->Set(0);
 
       for (Int_t pl = FIRST_VERT_PLANE; pl < fPlanes; pl += 2) {
-         if (hit_mask_use[pl]) {
+         if (hit_mask[pl]) {
             x_hit_fPlanes++;
          }
       }
 
       for (Int_t pl = FIRST_HORZ_PLANE; pl < fPlanes; pl += 2) {
-         if (hit_mask_use[pl]) {
+         if (hit_mask[pl]) {
             y_hit_fPlanes++;
          }
       }
@@ -608,12 +625,12 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
 
       for (Int_t pl = 0; pl < fPlanes; pl++) {
          for (Int_t pdl = 0; pdl < fPaddles; pdl++) {
-            if ((hit_mask_use[pl] >> pdl) & ULong_t (1)) {
+            if ((hit_mask[pl] >> pdl) & ULong_t (1)) {
                if (pl % 2 == FIRST_VERT_PLANE) {
-                  x_plot->SetPoint(n_x++, pl, pdl);
+                  x_plot->SetPoint(n_x++, pl + 0.5, pdl + 0.5);
                }
                else {
-                  y_plot->SetPoint(n_y++, pl, pdl);
+                  y_plot->SetPoint(n_y++, pl + 0.5, pdl + 0.5);
                }
             }
          }
@@ -676,33 +693,31 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
        * fabs(dxdz*plane-x+x0) > VALUE*VALUE*(dxdz*dxdz+1)
        */
 
-      Double_t max_dist_scaled_x =
-         MAX_PADDLE_DIST_FROM_LINE * MAX_PADDLE_DIST_FROM_LINE * (dxdz * dxdz + 1);
-      Double_t max_dist_scaled_y =
-         MAX_PADDLE_DIST_FROM_LINE * MAX_PADDLE_DIST_FROM_LINE * (dydz * dydz + 1);
+      Double_t max_dist_scaled_x = 0.5 * sqrt(dxdz * dxdz + 1);
+      Double_t max_dist_scaled_y = 0.5 * sqrt(dydz * dydz + 1);
 
       Int_t bad_x = 0;
-      Int_t bad_y = 0;
-
+      Int_t bad_y = 0;        
+      
       for (Int_t pl = FIRST_VERT_PLANE; pl < fPlanes; pl += 2) {
-         ULong_t hm = hit_mask_use[pl];
+         ULong_t hm = hit_mask[pl];
 
          for (Int_t pdl = 0; hm; pdl++, hm >>= 1)
-            if (hm & 0x01) {
-               if (fabs(dxdz * pl - pdl + x0) > max_dist_scaled_x) {
-                  hit_mask_use[pl] &= ~(ULong_t (1) << pdl);
+            if (hm & 0x01) {	      
+               if (fabs(dxdz * (pl + 0.5) - (pdl + 0.5) + x0) > max_dist_scaled_x) {
+                  hit_mask[pl] &= ~(ULong_t (1) << pdl);
                   bad_x++;
                }
             }
       }
 
       for (Int_t pl = FIRST_HORZ_PLANE; pl < fPlanes; pl += 2) {
-         ULong_t hm = hit_mask_use[pl];
+         ULong_t hm = hit_mask[pl];
 
          for (Int_t pdl = 0; hm; pdl++, hm >>= 1)
             if (hm & 0x01) {
-               if (fabs(dydz * pl - pdl + y0) > max_dist_scaled_y) {
-                  hit_mask_use[pl] &= ~(ULong_t (1) << pdl);
+               if (fabs(dydz * (pl + 0.5) - (pdl + 0.5) + y0) > max_dist_scaled_y) {
+                  hit_mask[pl] &= ~(ULong_t (1) << pdl);
                   bad_y++;
                }
             }
@@ -725,12 +740,8 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
 
       // Since we want x and y to be zero at the middle of the detector, we subtract that from
       // the values x0 and y0.
-      x0 -= (fPaddles / 2 - 0.5);
-      y0 -= (fPaddles / 2 - 0.5);
-//       if (0) {    required for possible LAND support
-//          x0 = -x0;
-//          dxdz = -dxdz;
-//       }
+      x0 -= (fPaddles * 0.5);// - 0.5);
+      y0 -= (fPaddles * 0.5);// - 0.5);
 
       // If we reach this point, then we have one reasonable x line, and one
       // reasonable y line
@@ -740,54 +751,27 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
       /* And now add our information. */
 
       for (Int_t pl = 0; pl < fPlanes; pl++) {
-         ULong_t hm_t, hm_e;
-
-         hm_t = hit_mask_t[pl][0] & hit_mask_t[pl][1] & hit_mask_use[pl];
-         hm_e = hit_mask_e[pl][0] & hit_mask_e[pl][1] & hit_mask_t[pl][0] & hit_mask_t[pl][1] & hit_mask_use[pl];
-
-         if (hm_t)
-            for (UInt_t i = 0; i < bars[pl].size(); i++) {
-               bar* b = bars[pl][i];
-               Int_t pdl = b->fPdl;
-
-               if (!(hm_t & (ULong_t (1) << pdl))) {
+         if (hit_mask[pl])
+            for (UInt_t pdl = 0; pdl < fPaddles; pdl++) {               
+               if (!(hit_mask[pl] & (ULong_t (1) << pdl))) {
                   continue;
                }
 
-
-               Double_t t_diff = 0.5 * (b->fTime[1] - b->fTime[0]);
+	       bar* b = bars[pl][pdl];
+               
                nc_diff dmm;
 
                if (PLANE_IS_HORZ(pl)) {
-                  dmm._pos_track = paddle_spacing * (x0 + dxdz * pl) ;
+                  dmm._pos_track = PADDLE_SPACING * (x0 + dxdz * (pl + 0.5)) ;
                }
                else {
-                  dmm._pos_track = paddle_spacing * (y0 + dydz * pl);
-               }
+                  dmm._pos_track = PADDLE_SPACING * (y0 + dydz * (pl + 0.5));
+               }		
 
-               dmm._pos_diff  = (Float_t) t_diff;
+               dmm._pos_diff  = (Float_t) 0.5 * (b->fTime[1] - b->fTime[0]);;
                dmm._ident_no  = _used_ident_no;
-
+	       
                _collect_diff[pl][pdl]._data.push_back(dmm);
-
-               // And now the energies.  For now we only use energies where the
-               // times were also sane
-
-               if (!(hm_e & (ULong_t (1) << pdl))) {
-                  continue;
-               }
-
-               Double_t e_log = 0.5 * log(b->fQdc[1] / b->fQdc[0]);
-
-
-               if (ISNAN(e_log)) {
-                  continue;
-               }
-
-               // We reuse the dmm from the time.  only need to overwrite _pos_diff
-               dmm._pos_diff  = (Float_t) e_log;
-
-               _collect_diff_e[pl][pdl]._data.push_back(dmm);
             }
       }
 
@@ -807,29 +791,14 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
 
       for (Int_t pl = 0; pl < fPlanes; pl++) {
          // Paddles in the same plane
-
-         ULong_t hm_t;
-         ULong_t hm_e;
-
-         hm_t = hit_mask_t[pl][0] & hit_mask_t[pl][1] & hit_mask_use[pl];
-         hm_e = hit_mask_e[pl][0] & hit_mask_e[pl][1] & hit_mask_t[pl][0] & hit_mask_t[pl][1] & hit_mask_use[pl];
-
-         if (hm_t)
-            for (UInt_t i = 0; i < bars[pl].size() - 1; i++) {
-               bar* b1 = bars[pl][i];
-               bar* b2 = bars[pl][i + 1];
-
-               Int_t pdl  = b1->fPdl;
-               Int_t pdl2 = b2->fPdl;
-
-               if (pdl2 != pdl + 1) {
-                  continue;   // not neighbours
-               }
-
-               if ((hm_t & ((ULong_t) 0x03 << pdl)) != ((ULong_t) 0x03 << pdl)) {
+         if (hit_mask[pl])
+            for (UInt_t pdl = 0; pdl < fPaddles - 1; pdl++) {
+               if ((hit_mask[pl] & ((ULong_t) 0x03 << pdl)) != ((ULong_t) 0x03 << pdl)) {
                   continue;   // both hits not accepted for the muon
                }
-
+               
+               bar* b1 = bars[pl][pdl];
+               bar* b2 = bars[pl][pdl + 1];
 
                // This and next paddle were involved, so both should give
                // mean times
@@ -839,7 +808,7 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
 
                nc_mean dmm;
 
-               dmm._mean_diff = (Double_t)(mean2 - mean1);
+               dmm._mean_diff = (Float_t)(mean2 - mean1);
                dmm._mean_corr = 0;
 
                if (PLANE_IS_HORZ(pl)) {
@@ -869,7 +838,7 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
                   // (upper one (numbers increases upwards)), so
                   // correct for that
 
-                  dmm._mean_corr = (Float_t)(vert_flight_path * (-paddle_spacing / C_LIGHT));
+                  dmm._mean_corr = (Float_t)(vert_flight_path * (-PADDLE_SPACING / C_LIGHT));
 
                }
                else {
@@ -896,181 +865,192 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
 
                      if (dydz * dxdz > 0)
                         dmm._mean_corr =
-                           (Float_t)(horz_flight_path * (paddle_spacing / C_LIGHT));
+                           (Float_t)(horz_flight_path * (PADDLE_SPACING / C_LIGHT));
                      else
                         dmm._mean_corr =
-                           (Float_t)(horz_flight_path * (- paddle_spacing / C_LIGHT));
+                           (Float_t)(horz_flight_path * (- PADDLE_SPACING / C_LIGHT));
                   }
                }
 
                dmm._ident_no  = _used_ident_no;
 
                _collect_mean_within[pl][pdl]._data.push_back(dmm);
-
-               // And now deal with energies
-
-               if ((hm_e & ((ULong_t) 0x03 << pdl)) != ((ULong_t) 0x03 << pdl)) {
-                  continue;   // both hits not accepted for the muon
-               }
-
-               Double_t gmean1 = sqrt(b1->fQdc[1] + b1->fQdc[0]);
-               Double_t gmean2 = sqrt(b2->fQdc[1] + b2->fQdc[0]);
-
-               // Reuse the dmm from the time (ident_no)
-
-               dmm._mean_diff = (Float_t) log(gmean2 / gmean1);
-
-               // Since it is the same plane, at this stage we must assume the
-               // pathlength in both paddles to be the same.  No correction
-               // possible
-
-               dmm._mean_corr = 0;
-
-               _collect_mean_within_e[pl][pdl]._data.push_back(dmm);
             }
 
       }
+      
 
-      // And now deal with energies
-      for (Int_t pl = 0; pl < fPlanes - 1; pl++) {
-         // Hits in paddles from neighbouring fPlanes
-
-         ULong_t hm1_t, hm2_t;
-         ULong_t hm1_e, hm2_e;
-
-         hm1_t = hit_mask_t[pl  ][0] & hit_mask_t[pl  ][1] & hit_mask_use[pl  ];
-         hm2_t = hit_mask_t[pl + 1][0] & hit_mask_t[pl + 1][1] & hit_mask_use[pl + 1];
-
-         hm1_e = hit_mask_e[pl  ][0] & hit_mask_e[pl  ][1] & hit_mask_t[pl  ][0] & hit_mask_t[pl  ][1] & hit_mask_use[pl  ];
-         hm2_e = hit_mask_e[pl + 1][0] & hit_mask_e[pl + 1][1] & hit_mask_t[pl + 1][0] & hit_mask_t[pl + 1][1] & hit_mask_use[pl + 1];
-
-         if (hm1_t && hm2_t)
-            for (UInt_t i1 = 0; i1 < bars[pl].size(); i1++) {
-               bar* b1 = bars[pl][i1];
-
-               Int_t pdl1 = b1->fPdl;
-
-               if (!(hm1_t & (ULong_t (1) << pdl1))) {
-                  continue;
-               }
-
-               for (UInt_t i2 = 0; i2 < bars[pl + 1].size(); i2++) {
-                  bar* b2 = bars[pl + 1][i2];
-
-                  Int_t pdl2 = b2->fPdl;
-
-                  if (!(hm2_t & (ULong_t (1) << pdl2))) {
-                     continue;
-                  }
-
-                  // so, we have two hits.  pl  ,pdl1 (item1)
-                  //                        pl+1,pdl2 (item2)
-
-                  // This and next paddle were involved, so both should give
-                  // mean times
-
-                  Double_t t_mean1 = 0.5 * (b1->fTime[1] + b1->fTime[0]);
-                  Double_t t_mean2 = 0.5 * (b2->fTime[1] + b2->fTime[0]);
-
-                  nc_mean dmm;
-
-                  dmm._mean_diff = (Float_t)(t_mean2 - t_mean1);
-                  dmm._mean_corr = 0;
-                  dmm._ident_no  = _used_ident_no;
-
-                  // Figure out what the delay between the two fPlanes is
-
-                  // We calculate the flight-path as the distance to travel for dz=1
-
-                  if (fabs(dydz) > 0.5) {
-                     Double_t flight_path = sqrt(1 + dydz * dydz + dxdz * dxdz);
-
-                     if (dydz < 0) { // downwards when increasing z, so plane 2 is later
-                        dmm._mean_corr = (Float_t)(flight_path * (paddle_spacing / C_LIGHT));
-                     }
-                     else {   // plane 2 is earlier
-                        dmm._mean_corr = (Float_t)(flight_path * (- paddle_spacing / C_LIGHT));
-                     }
-                  }
-
-                  _collect_mean_cross[pl][pdl1][pdl2]._data.push_back(dmm);
-
-                  // And now the energies
-
-                  if (!(hm1_e & (ULong_t (1) << pdl1)) ||
-                        !(hm2_e & (ULong_t (1) << pdl2))) {
-                     continue;
-                  }
-
-                  Double_t gmean1 = sqrt(b1->fQdc[1] + b1->fQdc[0]);
-                  Double_t gmean2 = sqrt(b2->fQdc[1] + b2->fQdc[0]);
-
-                  // We can reuse the dmm from the times (ident_no)
-
-                  dmm._mean_diff = (Float_t) log(gmean2 / gmean1);
-
-                  dmm._mean_corr = 0;
-
-                  // Now, we can calculate estimates of the flight-paths in each
-                  // paddle.  The energy depositon should go linearly with this.
-                  // This should be corrected for.
-
-                  // In y paddle (vertical) we estimate
-
-                  // limit dz=1,  dz,dy,dx  => dz=1, dx=dxdz, dy=dydz
-
-                  // for this exercise, we can assume that dy does not limit anything.
-                  // however, if fabs(dxdz) > 1, then dx will limit the path and we use
-
-                  // limit dx=1,  dz,dy,dx  => dx=1,  dz=1/dxdz, dy=dydz/dxdz
-
-                  Double_t flight_path_y;
-
-                  if (fabs(dxdz) > 1) {
-                     flight_path_y = sqrt(1 + (1 + dydz * dydz) / (dxdz * dxdz));
-                  }
-                  else {
-                     flight_path_y = sqrt(1 + dydz * dydz + dxdz * dxdz);
-                  }
-
-                  // similarly for x-paddles (horisontal), only that y does the limit
-
-                  Double_t flight_path_x;
-
-                  if (fabs(dydz) > 1) {
-                     flight_path_x = sqrt(1 + (1 + dxdz * dxdz) / (dydz * dydz));
-                  }
-                  else {
-                     flight_path_x = sqrt(1 + dydz * dydz + dxdz * dxdz);
-                  }
-
-                  // Our expectation is that gmean_y / gmean_x = fp_y / fp_x
-
-                  if (PLANE_IS_HORZ(pl)) {    // gmean1 is y
-                     dmm._mean_corr = (Float_t)  log(flight_path_y / flight_path_x);
-                  }
-                  else {
-                     dmm._mean_corr = (Float_t) - log(flight_path_y / flight_path_x);
-                  }
-
-                  _collect_mean_cross_e[pl][pdl1][pdl2]._data.push_back(dmm);
-               }
-            }
+      for(Int_t pl = 0; pl < fPlanes - 1; pl++) { 
+         // Hits in paddles from neighbouring fPlanes 
+ 
+         if (hit_mask[pl] && hit_mask[pl+1]) 
+            for (UInt_t pdl1 = 0; pdl1 < fPaddles; pdl1++) { 
+               if (!(hit_mask[pl] & (ULong_t (1) << pdl1))) { 
+                  continue; 
+               } 
+               bar* b1 = bars[pl][pdl1]; 
+		
+               for (UInt_t pdl2 = 0; pdl2 < fPaddles; pdl2++) { 
+                  if (!(hit_mask[pl+1] & (ULong_t (1) << pdl2))) { 
+                     continue; 
+                  } 
+		  bar* b2 = bars[pl + 1][pdl2]; 
+                  // so, we have two hits.  pl  ,pdl1 (item1) 
+                  //                        pl+1,pdl2 (item2) 
+ 
+                  // This and next paddle were involved, so both should give 
+                  // mean times 
+ 
+                  Double_t t_mean1 = 0.5 * (b1->fTime[1] + b1->fTime[0]); 
+                  Double_t t_mean2 = 0.5 * (b2->fTime[1] + b2->fTime[0]); 
+ 
+                  nc_mean dmm; 
+ 
+                  dmm._mean_diff = (Float_t)(t_mean2 - t_mean1); 
+                  dmm._mean_corr = 0; 
+                  dmm._ident_no  = _used_ident_no; 
+ 
+                  // Figure out what the delay between the two fPlanes is 
+ 
+                  // We calculate the flight-path as the distance to travel for dz=1 
+ 
+                  if (fabs(dydz) > 0.5) { 
+                     Double_t flight_path = sqrt(1 + dydz * dydz + dxdz * dxdz); 
+ 
+                     if (dydz < 0) { // downwards when increasing z, so plane 2 is later 
+                        dmm._mean_corr = (Float_t)(flight_path * (PADDLE_SPACING / C_LIGHT)); 
+                     } 
+                     else {   // plane 2 is earlier 
+                        dmm._mean_corr = (Float_t)(flight_path * (- PADDLE_SPACING / C_LIGHT)); 
+                     } 
+                  } 
+ 
+                  _collect_mean_cross[pl][pdl1][pdl2]._data.push_back(dmm); 
+	       }
+	    }
+      }      
+      
+      x0 *= PADDLE_SPACING;
+      y0 *= PADDLE_SPACING;
+      
+      {
+	bar* b;
+	Int_t hit;
+	Double_t x, y, z, bound1, bound2, dist, qperdist;
+	TVector3 p[2];
+	for (Int_t pl = 0; pl < fPlanes; pl++) {
+	  for (Int_t pdl = 0; pdl < fPaddles; pdl++) {   
+	    if (!(hit_mask[pl] & (ULong_t(1) << pdl)))
+	      continue;
+	    
+	    b = bars[pl][pdl];
+	    
+	    hit = 0;
+	    bound1 = (2 * (pdl + 1) - fPaddles) * PADDLE_SPACING * 0.5;
+	    bound2 = (2 * pdl - fPaddles) * PADDLE_SPACING * 0.5;
+	    
+	    if(PLANE_IS_HORZ(pl)){      
+	      z = pl * PADDLE_SPACING;
+	      y = y0 + dydz * z;
+	      x = x0 + dxdz * z;
+	      
+	      if(y <= bound1  && y >= bound2 ){ //frontside
+		p[hit].SetXYZ(x, y, z);
+		hit++;
+	      }
+	      
+	      z = (pl + 1) * PADDLE_SPACING;
+	      y = y0 + dydz * z;
+	      x = x0 + dxdz * z;
+	      
+	      if(y <= bound1  && y >= bound2 ){ //backside
+		p[hit].SetXYZ(x, y, z);
+		hit++;
+	      }
+	      
+	      if(hit<2){
+		y = bound1;
+		z = (y - y0)/dydz;
+		x = x0 + dxdz * z;
+		if(z <= (pl + 1) * PADDLE_SPACING  && z >= pl * PADDLE_SPACING ){ //topside
+		  p[hit].SetXYZ(x, y, z);
+		  hit++;
+		}
+	      }
+	      
+	      if(hit < 2){
+		y = bound2;
+		z = (y - y0)/dydz;
+		x = x0 + dxdz * z;
+		if(z <= (pl + 1) * PADDLE_SPACING  && z >= pl * PADDLE_SPACING ){ //bottomside
+		  p[hit].SetXYZ(x, y, z);
+		}
+	      }	      
+	    }
+	    else{	      
+	      z = pl * PADDLE_SPACING;
+	      y = y0 + dydz * z;
+	      x = x0 + dxdz * z;
+	      
+	      if(x <= bound1  && x >= bound2 ){ //frontside
+		p[hit].SetXYZ(x, y, z);
+		hit++;
+	      }
+	      
+	      z = (pl + 1) * PADDLE_SPACING;
+	      y = y0 + dydz * z;
+	      x = x0 + dxdz * z;
+	      
+	      if(x <= bound1  && x >= bound2 ){ //backside
+		p[hit].SetXYZ(x, y, z);
+		hit++;
+	      }
+	      
+	      if(hit<2){
+		x = bound1;
+		z = (x - x0)/dydz;
+		y = y0 + dydz * z;
+	      
+		if(z <= (pl + 1) * PADDLE_SPACING  && z >= pl * PADDLE_SPACING ){ //leftside
+		  p[hit].SetXYZ(x, y, z);
+		  hit++;
+		}
+	      }
+	      
+	      if(hit < 2){
+		x = bound1;
+		z = (x - x0)/dydz;
+		y = y0 + dydz * z;
+		
+		if(z <= (pl + 1) * PADDLE_SPACING  && z >= pl * PADDLE_SPACING ){ //rightside
+		  p[hit].SetXYZ(x, y, z);
+		}
+	      }
+	    }
+	    
+	    if(hit == 2){
+	      dist = (p[0]-p[1]).Mag();
+	      if(dist > 4 && dist < 10){
+		qperdist = sqrt(b->fQdc[0] * b->fQdc[1]) / dist;
+		_ecalhistos[pl][pdl]->Fill(qperdist);
+		if(PLANE_IS_HORZ(pl))
+		  _ecalgraphs[pl][pdl]->SetPoint(_ecalgraphs[pl][pdl]->GetN(), (p[0] + 0.5*(p[1]-p[0])).X(), log(b->fQdc[0] / b->fQdc[1]));		
+		else
+		  _ecalgraphs[pl][pdl]->SetPoint(_ecalgraphs[pl][pdl]->GetN(), (p[0] + 0.5*(p[1]-p[0])).Y(), log(b->fQdc[0] / b->fQdc[1]));		
+	      }
+	    }	    
+	  }
+	}
       }
-
       break; // The loop is done (remove and you will have fun... )
    }
 }
 
 void R3BNeulandCal2HitPar::FinishEvent() {
-   for (Int_t i = 0; i < fPlanes; i++) {
-      for (Int_t j = 0; j < bars[i].size(); j++)
-         delete bars[i][j];
-      bars[i].resize(0);
-   }
 }
 
 void R3BNeulandCal2HitPar::FinishTask() {
+  
    LOG(INFO) << nData << " Events registered." << FairLogger::endl;
 
    LOG(INFO) << "**************TIMES**************" << FairLogger::endl;
@@ -1103,6 +1083,7 @@ void R3BNeulandCal2HitPar::FinishTask() {
 
    Double_t tdiff[fPlanes][fPaddles][2];
    Double_t invveff[fPlanes][fPaddles][2];
+   
    for (Int_t pl = 0; pl < fPlanes; pl++)
       for (Int_t pdl = 0; pdl < fPaddles; pdl++)
          _collect_diff[pl][pdl].calc_params(_bad_fit_idents, tdiff[pl][pdl], invveff[pl][pdl]);
@@ -1186,133 +1167,40 @@ void R3BNeulandCal2HitPar::FinishTask() {
             tsync[pl][pdl][1] = 1 / sqrt(syncer_t._solution[pl * fPaddles + pdl]._e2_inv);
          }
    }
-//    LOG (INFO) << "*************ENERGIES************" << FairLogger::endl;
-//
-//    LOG (INFO) << "Analysing history: e-diff" << FairLogger::endl;
-//
-//    for (Int_t pl = 0; pl < fPlanes; pl++)
-//       for (Int_t pdl = 0; pdl < fPaddles; pdl++) {
-//          LOG (DEBUG) << "=E-DIFF================= " << pl << "," << pdl << FairLogger::endl;
-//          _collect_diff_e[pl][pdl].analyse_history (_bad_fit_idents);
-//       }
-//
-//    LOG (INFO) << "Analysing history: e-mean-within" << FairLogger::endl;
-//
-//    for (Int_t pl = 0; pl < fPlanes; pl++)
-//       for (Int_t pdl = 0; pdl < fPaddles - 1; pdl++) {
-//          LOG (DEBUG) << "=E-MEAN-WITHIN================= mean: " << pl << ",(" << pdl << "-" << pdl + 1 << ")" << FairLogger::endl;
-//          _collect_mean_within_e[pl][pdl].analyse_history (_bad_fit_idents);
-//       }
-//
-//    LOG (INFO) << "Analysing history: e-mean-cross" << FairLogger::endl;
-//
-//    for (Int_t pl = 0; pl < fPlanes - 1; pl++)
-//       for (Int_t pdl1 = 0; pdl1 < fPaddles; pdl1++)
-//          for (Int_t pdl2 = 0; pdl2 < fPaddles; pdl2++) {
-//             LOG (DEBUG) << "=E-MEAN-CROSS================= mean: (" << pl << "," << pdl1 << ")-(" << pl + 1 << "," << pdl2 << FairLogger::endl;
-//             _collect_mean_cross_e[pl][pdl1][pdl2].analyse_history (_bad_fit_idents);
-//          }
-//
-//    LOG (INFO) << "Collecting and fitting history: e-diff" << FairLogger::endl;
-//
-//    for (Int_t pl = 0; pl < fPlanes; pl++)
-//       for (Int_t pdl = 0; pdl < fPaddles; pdl++) {
-//          Double_t v[2] = {0, 0};
-//          _collect_diff_e[pl][pdl].calc_params (_bad_fit_idents, v);
-//
-//          Double_t log_gain     = v[0];
-//
-//          Double_t gain     = exp (log_gain);
-
-//          syncModulePars[pl][pdl][1]->SetEnergieGain (gain);
-//          syncModulePars[pl][pdl][0]->SetEnergieGain (gain);
-//      }
-
-//    val_err_inv mean_diff_within_e[fPlanes][fPaddles - 1];
-//    val_err_inv mean_diff_cross_e[fPlanes - 1][fPaddles][fPaddles];
-//
-//    LOG (INFO) << "Collecting history: e-mean-within" << FairLogger::endl;
-//
-//    for (Int_t pl = 0; pl < fPlanes; pl++)
-//       for (Int_t pdl = 0; pdl < fPaddles - 1; pdl++) {
-//          LOG (DEBUG) << "=E-MEAN-WITHIN================= mean: " << pl << ",(" << pdl << "-" << pdl + 1 << ")" << FairLogger::endl;
-//          _collect_mean_within_e[pl][pdl].calc_params (_bad_fit_idents,
-//                mean_diff_within_e[pl][pdl]);
-//       }
-//
-//    LOG (INFO) << "Collecting history: e-mean-cross" << FairLogger::endl;
-//
-//    for (Int_t pl = 0; pl < fPlanes - 1; pl++)
-//       for (Int_t pdl1 = 0; pdl1 < fPaddles; pdl1++)
-//          for (Int_t pdl2 = 0; pdl2 < fPaddles; pdl2++) {
-//             LOG (DEBUG) << "=E-MEAN-CROSS================= mean: (" << pl << "," << pdl1 << ")-(" << pl + 1 << "," << pdl2 << FairLogger::endl;
-//             _collect_mean_cross_e[pl][pdl1][pdl2].calc_params (_bad_fit_idents,
-//                   mean_diff_cross_e[pl][pdl1][pdl2]);
-//          }
-//
-//    LOG (INFO) << "Syncing: e-mean" << FairLogger::endl;
-//
-//
-//    Float_t time_offset[fPlanes][fPaddles];
-//
-//    sparse_sync_pair_llq_mean_zero syncer_e;
-//
-//    /*time_ind will be zero if it cannot be determined, and otherwise
-//    indexed beginning at one.  One then add fPlanes_use-2 to get th
-//    index into the solution variable array
-//
-//    similar for plane_ind, but one subtracts 2 to get the index into
-//    the array.  0 is for undetermined offsets, index number one
-//    (first used plane, cannot be determined (implicitly 0.0)
-//    refernence plane) so it is also not used.
-//    */
-//
-//    for (Int_t pl = 0; pl < fPlanes; pl++)
-//       for (Int_t pdl = 0; pdl < fPaddles; pdl++) {
-//          time_offset[pl][pdl] = NAN;
-//       }
-//
-//    // now we simply need to set up the equations
-//
-//    for (Int_t pl = 0; pl < fPlanes; pl++)
-//       for (Int_t pdl = 0; pdl < fPaddles - 1; pdl++)
-//          if (ISFINITE (mean_diff_within_e[pl][pdl]._e2_inv) &&
-//                mean_diff_within_e[pl][pdl]._e2_inv > 0) {
-//             Double_t weight = sqrt (mean_diff_within_e[pl][pdl]._e2_inv);
-//
-//             syncer_e.add_sync_pair (pl * fPaddles + pdl  , -weight,
-//                                     pl * fPaddles + pdl + 1, weight,
-//                                     mean_diff_within_e[pl][pdl]._val * weight);
-//          }
-//
-//    for (Int_t pl = 0; pl < fPlanes - 1; pl++)
-//       for (Int_t pdl1 = 0; pdl1 < fPaddles; pdl1++)
-//          for (Int_t pdl2 = 0; pdl2 < fPaddles; pdl2++)
-//             if (ISFINITE (mean_diff_cross_e[pl][pdl1][pdl2]._e2_inv) &&
-//                   mean_diff_cross_e[pl][pdl1][pdl2]._e2_inv > 0) {
-//                Double_t weight = sqrt (mean_diff_cross_e[pl][pdl1][pdl2]._e2_inv);
-//
-//                /* for the syncer, we do not include the plane offsets
-//                in the equations.  They go into the constraining equations
-//                instead.  This a) make the solution not needing adding of
-//                the plane offsets.  b) Increases the sparsity of the matrix.
-//                (we do not need quad items)
-//                */
-//                syncer_e.add_sync_pair ( (pl) *fPaddles + pdl1, -weight,
-//                                         (pl + 1) *fPaddles + pdl2, weight,
-//                                         mean_diff_cross_e[pl][pdl1][pdl2]._val * weight);
-//             }
-//
-//    // And now do the dirty work
-//
-//    syncer_e.solve (fPlanes * fPaddles);
-//
-// //    for (Int_t pl = 0; pl < fPlanes; pl++)
-// //       for (Int_t pdl = 0; pdl < fPaddles; pdl++) {
-// //          time_offset[pl][pdl] = (Float_t) (syncer_e._solution[pl * fPaddles + pdl]._val);
-// //          syncModulePars[pl][pdl][1]->SetEnergieGain (syncModulePars[pl][pdl][1]->GetEnergieGain() + time_offset[pl][pdl]);
-// //          syncModulePars[pl][pdl][0]->SetEnergieGain (syncModulePars[pl][pdl][0]->GetEnergieGain() + time_offset[pl][pdl]);
-// //       }
+   LOG (INFO) << "*************ENERGIES************" << FairLogger::endl;
+   
+   Double_t ecal[fPlanes][fPaddles][2];
+   Double_t ecalerr[fPlanes][fPaddles][2];
+   TF1* gausfit = new TF1("Gaus","gaus", 0, 200);
+   TF1* linearfit = new TF1("linear", "[1]*x+[0]");
+   
+   for(Int_t pl = 0; pl < fPlanes; pl++)
+     for(Int_t pdl = 0; pdl < fPaddles; pdl++){
+       TH1F* histo = _ecalhistos[pl][pdl];
+       if(histo->GetEntries() < 1000){
+	  ecal[pl][pdl][0] = NAN;
+	  ecal[pl][pdl][1] = NAN;
+	  ecalerr[pl][pdl][0] = NAN;
+	  ecalerr[pl][pdl][1] = NAN;
+	  continue;
+       }
+       
+       Int_t max = histo->GetMaximumBin();
+       histo->Fit(gausfit,"qn","", max - 10, max + 10);
+       Double_t k0k1 = gausfit->GetParameter(1) * gausfit->GetParameter(1);
+       Double_t k0k1err = 2 * gausfit->GetParameter(1) * gausfit->GetParError(1);
+       
+       _ecalgraphs[pl][pdl]->Fit(linearfit, "q");
+       Double_t k0dk1 = exp(linearfit->GetParameter(0));
+       Double_t k0dk1err = k0dk1 * linearfit->GetParError(0);
+       
+       ecal[pl][pdl][0] = MINIMUM_IONIZING/sqrt(k0k1 * k0dk1);
+       ecal[pl][pdl][1] = MINIMUM_IONIZING/sqrt(k0k1 / k0dk1); 
+       
+       ecalerr[pl][pdl][0] = MINIMUM_IONIZING * pow(k0k1 * k0dk1,-1.5) * sqrt((k0dk1 * k0k1err) * (k0dk1 * k0k1err) + (k0k1 * k0dk1err) * (k0k1 * k0dk1err));       
+       ecalerr[pl][pdl][1] = MINIMUM_IONIZING * pow(k0k1 / k0dk1,-1.5) * sqrt((k0k1err / k0dk1) * (k0k1err / k0dk1) + ((k0k1 * k0dk1err /(k0dk1 * k0dk1)) * (k0k1 * k0dk1err /(k0dk1 * k0dk1)))); 
+     }
+   
 
    TH1F* h_tdiff = new TH1F("h_land_diffc", "TDiff vs BarID", fPaddles * fPlanes, 0.5, 0.5 + fPaddles * fPlanes);
    h_tdiff->SetMaximum(200);
@@ -1331,7 +1219,28 @@ void R3BNeulandCal2HitPar::FinishTask() {
    h_veff->SetMinimum(0);
    h_veff->GetXaxis()->SetTitle("BarID");
    h_veff->GetYaxis()->SetTitle("veff [cm/ns]");
+   
+   TH1F* h_ecal = new TH1F("h_land_ecal", "Gain vs BarID", 2 * fPaddles * fPlanes, 0.5, 0.5 + fPaddles * fPlanes);
+   h_veff->SetMaximum(15);
+   h_veff->SetMinimum(0);
+   h_veff->GetXaxis()->SetTitle("BarID");
+   h_veff->GetYaxis()->SetTitle("MeV/QDC");
 
+   Double_t av_gain = 0;  
+   Int_t n_av_gain = 0;
+ 
+   std::vector<TString> fails;
+   std::vector<TString> susp_s;
+   
+   
+   Bool_t calib[fPlanes][fPaddles];   
+   memset(calib, 0, sizeof(calib));
+   
+   Bool_t susp_b[fPlanes][fPaddles];   
+   memset(susp_b, 0, sizeof(susp_b));
+
+   char msg[100];
+   
    for (Int_t pl = 0; pl < fPlanes; pl++) {
       for (Int_t pdl = 0; pdl < fPaddles; pdl++) {
          for (Int_t pm = 0; pm < 2; pm++) {
@@ -1342,27 +1251,82 @@ void R3BNeulandCal2HitPar::FinishTask() {
             syncmodpar->SetTimeOffsetError(sqrt(tdiff[pl][pdl][1]*tdiff[pl][pdl][1] + tsync[pl][pdl][1] * tsync[pl][pdl][1]));
             syncmodpar->SetEffectiveSpeed(0.5 / invveff[pl][pdl][0]);
             syncmodpar->SetEffectiveSpeedError(fabs(0.5 * invveff[pl][pdl][1] / (invveff[pl][pdl][0] * invveff[pl][pdl][0])));
-            syncmodpar->SetEnergieGain(NAN);	//TODO
-            syncmodpar->SetEnergieGainError(NAN);	//TODO
-            FairLogger::GetLogger()->Info(MESSAGE_ORIGIN, "[%2d][%2d][%1d]: tdiff = %8.3f ± %8.3f  egain = %8.3f ± %8.3f",
+            syncmodpar->SetEnergieGain(ecal[pl][pdl][pm]);	
+            syncmodpar->SetEnergieGainError(ecalerr[pl][pdl][pm]);
+            FairLogger::GetLogger()->Info(MESSAGE_ORIGIN, "[%2d][%2d][%1d]: t = %8.3f ± %8.3f ± %8.3f        keV/QDC = %6.4f ± %6.4f",
                                           pl + 1, pdl + 1, pm + 1, syncmodpar->GetTimeOffset(),
-                                          syncmodpar->GetTimeOffsetError(), syncmodpar->GetEnergieGain(),
-                                          syncmodpar->GetEnergieGainError());
-            if (!ISNAN(syncmodpar->GetTimeOffset()))
-               fPar->AddModulePar(syncmodpar);
+                                          tdiff[pl][pdl][1], tsync[pl][pdl][1], syncmodpar->GetEnergieGain() * 1000,
+                                          syncmodpar->GetEnergieGainError() * 1000);
+            if (!ISNAN(syncmodpar->GetTimeOffset()) && !ISNAN(syncmodpar->GetEnergieGain())){
+	      fPar->AddModulePar(syncmodpar);
+	      
+	      Float_t dev = ecalerr[pl][pdl][pm]/ecal[pl][pdl][pm];
+	      if(dev > fErrorTH/100.){
+		sprintf(msg,"[%2d][%2d][%1d]: Gain-Fit-Error of %3.1f %s", pl + 1, pdl + 1, pm + 1, dev * 100,"%!");
+		susp_s.push_back(msg);
+		susp_b[pl][pdl] = kTRUE;
+	      }
+	      
+	      if(pm == 1){
+		h_tdiff->SetBinContent(syncmodpar->GetModuleId(), 2 * tdiff[pl][pdl][0]);
+		h_tsync->SetBinContent(syncmodpar->GetModuleId(), -tsync[pl][pdl][0]);
+		h_veff->SetBinContent(syncmodpar->GetModuleId(), fabs(0.5 / invveff[pl][pdl][0]));
+		
+		calib[pl][pdl] = kTRUE;
+	      }
+	      
+	      h_ecal->SetBinContent(2*syncmodpar->GetModuleId() + pm, ecal[pl][pdl][pm]);
+	      
+	      av_gain += ecal[pl][pdl][pm];
+	      n_av_gain++;	      
+	    }      
+	    else{
+	      if(ISNAN(syncmodpar->GetTimeOffset()))
+		sprintf(msg,"[%2d][%2d][%1d]: Time Calibration failed!", pl + 1, pdl + 1, pm + 1);
+	      else
+	        sprintf(msg,"[%2d][%2d][%1d]: Energy Calibration failed!", pl + 1, pdl + 1, pm + 1);
+	      fails.push_back(msg);
+	    }
          }
-         if (!ISNAN(tdiff[pl][pdl][0]))
-            h_tdiff->SetBinContent(pl * fPaddles + pdl + 1, 2*tdiff[pl][pdl][0]);
-         if (!ISNAN(tsync[pl][pdl][0]))
-            h_tsync->SetBinContent(pl * fPaddles + pdl + 1, -tsync[pl][pdl][0]);
-         if (!ISNAN(invveff[pl][pdl][0]))
-            h_veff->SetBinContent(pl * fPaddles + pdl + 1, fabs(0.5 / invveff[pl][pdl][0]));
+      }
+   }   
+   
+   av_gain = av_gain/n_av_gain;
+   
+   for (Int_t pl = 0; pl < fPlanes; pl++) {
+      for (Int_t pdl = 0; pdl < fPaddles; pdl++) {
+	 if(calib[fPlanes][fPaddles] && ! susp_b[fPlanes][fPaddles]) 
+           for (Int_t pm = 0; pm < 2; pm++) {
+	     
+	      Float_t dev = fabs((ecal[pl][pdl][pm] - av_gain)/av_gain);
+	      if(dev > fDeviationTH/100.){
+		sprintf(msg,"[%2d][%2d][%1d]: Deviation of %3.1f%s from average gain!", pl + 1, pdl + 1, pm + 1, dev * 100,"%");
+		susp_s.push_back(msg);
+	      }
+	   }
       }
    }
+ 
+   if(fails.size() > 0){
+      LOG(INFO) << FairLogger::endl << FairLogger::endl << FairLogger::endl;
+      LOG(INFO) << "Following PMTs failed to calibrate:" << FairLogger::endl;
+      for (Int_t i = 0; i < fails.size(); i++)
+	 LOG(INFO) << fails.at(i) << FairLogger::endl;     
+   }
+   
+   if(susp_s.size() > 0){
+      LOG(INFO) << FairLogger::endl << FairLogger::endl << FairLogger::endl;
+      LOG(INFO) << "Following PMTs are conspicuous:" << FairLogger::endl;
+      for (Int_t i = 0; i < susp_s.size(); i++)
+	 LOG(INFO) << susp_s.at(i) << FairLogger::endl;  
+   }
 
+   
    h_tdiff->Write();
    h_tsync->Write();
    h_veff->Write();
+   h_ecal->Write();
+   delete h_tdiff, h_tsync, h_veff;
 
    fPar->setChanged();
    LOG(INFO) << fPar->GetNumModulePar() << " PMTs calibrated!" << FairLogger::endl;

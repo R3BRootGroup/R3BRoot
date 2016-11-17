@@ -457,7 +457,7 @@ bool sparse_sync_pair_llq::solve(uint max_vars,bool add_eqn_for_each_set)
     }
 
   for (c = 0; c < scaling.size(); c++)
-    scaling[c] = /*1.0 / */sqrt(scaling[c]);
+    scaling[c] = 1.0 /sqrt(scaling[c]);
 
   for (r = 0; r < _pair_data.size(); r++)
     {

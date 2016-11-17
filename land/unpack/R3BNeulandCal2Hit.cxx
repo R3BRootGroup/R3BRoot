@@ -54,7 +54,9 @@ InitStatus R3BNeulandCal2Hit::Init() {
    }
 
    fMan->Register ("LandDigi", "Land", fLandDigi, kTRUE);
-      
+   
+   fNEvent = 0;
+    
    SetParameter();
    return kSUCCESS;
 }
@@ -70,20 +72,23 @@ void R3BNeulandCal2Hit::SetParameter(){
    std::map<Int_t, Bool_t> tempMapIsSet;
    std::map<Int_t, Double_t> tempMapVeff;
    std::map<Int_t, Double_t> tempMapTSync;
+   std::map<Int_t, Double_t> tempMapEGain;
    
    for (Int_t i = 0; i < fPar->GetNumModulePar(); i++) {
       R3BNeulandHitModulePar* fModulePar = fPar->GetModuleParAt(i);
-      Int_t id = fModulePar->GetModuleId()*2 + fModulePar->GetSide() - 3;
+      Int_t id = fModulePar->GetModuleId() * 2 + fModulePar->GetSide() - 3;
       tempMapIsSet[id] = kTRUE;
       tempMapVeff[id] = fModulePar->GetEffectiveSpeed();
       tempMapTSync[id] = fModulePar->GetTimeOffset();
+      tempMapEGain[id] = fModulePar->GetEnergieGain();
    }
      
-   LOG(INFO) << "Number of Parameter: " << fPar->GetNumModulePar() << FairLogger::endl;
+   LOG(INFO) << "R3BNeulandCal2Hit::SetParameter : Number of Parameters: " << fPar->GetNumModulePar() << FairLogger::endl;
    
    fMapIsSet = tempMapIsSet;
    fMapVeff = tempMapVeff;
    fMapTSync = tempMapTSync;
+   fMapEGain = tempMapEGain;
 }
 
 InitStatus R3BNeulandCal2Hit::ReInit() {
@@ -93,6 +98,9 @@ InitStatus R3BNeulandCal2Hit::ReInit() {
 }
 
 void R3BNeulandCal2Hit::Exec (Option_t* option) {
+   if(fVerbose != 0 && ++fNEvent % 100000 == 0)
+      FairLogger::GetLogger()->Info(MESSAGE_ORIGIN, "R3BNeulandCal2Hit::Exec : Event: %8d", fNEvent);
+     
    Int_t nLandPmt = fLandPmt->GetEntriesFast();
   
    R3BNeulandCalData* pmt1;
@@ -130,8 +138,8 @@ void R3BNeulandCal2Hit::Exec (Option_t* option) {
             continue;
          }
 
-         qdcL = pmt1->GetQdc();
-         qdcR = pmt2->GetQdc();
+         qdcL = pmt1->GetQdc() * fMapEGain[pmt1->GetBarId() * 2 - 2];
+         qdcR = pmt2->GetQdc() * fMapEGain[pmt1->GetBarId() * 2 - 1];
 	 		 
          veff = fMapVeff[(barId-1)*2];
          tdcL = pmt1->GetTime() + fMapTSync[pmt1->GetBarId() * 2 - 2];

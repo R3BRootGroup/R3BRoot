@@ -1,17 +1,22 @@
 
-void run(TString runNumber)
+void run(Int_t runNumber, Int_t pulserRunNumber)
 {
     TStopwatch timer;
     timer.Start();
 
+    TString strRunNumber = "run";
+    strRunNumber += runNumber;
+    TString strPulserRunNumber = "run";
+    strPulserRunNumber += pulserRunNumber;    
     const Int_t nModules = 800;
     const Int_t trigger = 2;              // 1 - onspill, 2 - offspill. -1 - all
-
     TString dirIn1 = "/Users/kresan/data/s438b/data/";
-    TString dirOut = "/Users/kresan/data/s438b/tcal/";
-    TString inputFileName1 = dirIn1 + runNumber + "_raw.root";              // name of input file
-    TString parFileName    = dirIn1 + "params_" + runNumber + "_raw.root";  // name of parameter file
-    TString outputFileName = dirOut + runNumber + "_tcal.root";             // name of output file
+    TString dirOut = "/Users/kresan/data/s438b/data/";
+
+    TString inputFileName1 	= dirIn1 + strRunNumber + "_raw.root";              		// name of input file
+    TString parFileName    	= dirIn1 + "params_" + strRunNumber + "_raw.root";  		// name of parameter file
+    TString pulsparFileName   	= dirIn1 + "params_" + strPulserRunNumber + "_QCal.root";  	// name of pulser parameter
+    TString outputFileName 	= dirOut + strRunNumber + "_tcal.root";             		// name of output file
 
     // Create analysis run -------------------------------------------------------
     FairRunAna* run = new FairRunAna();
@@ -21,9 +26,16 @@ void run(TString runNumber)
 
     // ----- Runtime DataBase info -----------------------------------------------
     FairRuntimeDb* rtdb = run->GetRuntimeDb();
-    FairParRootFileIo* parIo1 = new FairParRootFileIo();
+    Bool_t kParameterMerged = kTRUE;
+    FairParRootFileIo* parIo1 = new FairParRootFileIo(kParameterMerged);
     parIo1->open(parFileName);
+    FairParRootFileIo* parIo2 = new FairParRootFileIo(kParameterMerged);
+    parIo2->open(pulsparFileName);
     rtdb->setFirstInput(parIo1);
+    rtdb->setSecondInput(parIo2);
+    rtdb->addRun(runNumber);   
+    rtdb->getContainer("NeulandQCalPar");
+    rtdb->setInputVersion(runNumber, (char*)"NeulandQCalPar", 1, 2);
     // ---------------------------------------------------------------------------
 
     // Time calibration ----------------------------------------------------------

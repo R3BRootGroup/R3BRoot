@@ -43,6 +43,7 @@ class R3BNeulandCal2Hit : public FairTask
     TClonesArray* fLandDigi;
     R3BNeulandHitPar* fPar;
     Int_t fNDigi;
+    Int_t fNEvent;
     
     std::ifstream* fInFile;
     Bool_t fFirstPlaneHorisontal;
@@ -51,7 +52,7 @@ class R3BNeulandCal2Hit : public FairTask
     std::map<Int_t, Bool_t> fMapIsSet;
     std::map<Int_t, Double_t> fMapVeff;
     std::map<Int_t, Double_t> fMapTSync;
-    
+    std::map<Int_t, Double_t> fMapEGain;
     void ReadParameters();
 
   public:
