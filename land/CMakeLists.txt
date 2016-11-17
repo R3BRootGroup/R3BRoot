@@ -61,7 +61,7 @@ unpack/R3BNeulandMappedHist.cxx
 unpack/R3BNeulandMapped2CalPar.cxx
 unpack/R3BLandParamRead.cxx
 unpack/R3BNeulandMapped2Cal.cxx
-#unpack/R3BLandAna.cxx
+unpack/R3BNeulandHitHist.cxx
 #unpack/R3BNeulandCalTest.cxx
 unpack/R3BNeulandHitPar.cxx
 unpack/R3BNeulandCal2HitPar.cxx
@@ -70,6 +70,8 @@ unpack/R3BLandCosmic1Util.cxx
 unpack/R3BNeulandParFact.cxx
 unpack/R3BNeulandCal2Hit.cxx
 unpack/R3BNeulandHitModulePar.cxx
+unpack/R3BNeulandMapped2QCalPar.cxx
+unpack/R3BNeulandQCalPar.cxx
 )
 
 # fill list of header files from list of source files

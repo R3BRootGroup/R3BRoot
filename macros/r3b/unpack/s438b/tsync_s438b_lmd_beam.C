@@ -1,16 +1,21 @@
 
-void run(TString runNumber, TString refRun)
+void run(Int_t runNumber , Int_t cosmicRunNumber)
 {
     TStopwatch timer;
     timer.Start();
 
+    TString strRunNumber = "run";
+    strRunNumber += runNumber;
+    TString strCosmicRunNumber = "run";
+    strCosmicRunNumber += cosmicRunNumber;    
     TString dirIn1 = "/Users/kresan/data/s438b/data/";
-    TString dirIn2 = "/Users/kresan/data/s438b/tcal/";
-    TString dirOut = "/Users/kresan/data/s438b/digi/";
-    TString inputFileName1 = dirIn2 + runNumber + "_tcal_land.root";             // name of input file
-    TString parFileName1   = dirIn1 + "params_" + runNumber + "_raw_land.root";  // name of parameter file
-    TString parFileName2   = dirIn1 + "params_" + refRun + "_raw.root";          // name of parameter file
-    TString outputFileName = dirOut + runNumber + "_digi.root";                  // name of output file
+    TString dirIn2 = "/Users/kresan/data/s438b/data/";
+    TString dirOut = "/Users/kresan/data/s438b/data/";
+
+    TString inputFileName1 = dirIn2 + strRunNumber + "_tcal_land.root";             		// name of input file
+    TString parFileName1   = dirIn1 + "params_" + strRunNumber + "_raw.root";  			// name of parameter file
+    TString parFileName2   = dirIn1 + "params_" + strCosmicRunNumber + "_cosmic1.root";         // name of parameter file
+    TString outputFileName = dirOut + strRunNumber + "_digi.root";                  		// name of output file
 
     // Create analysis run -------------------------------------------------------
     FairRunAna* run = new FairRunAna();
@@ -20,28 +25,37 @@ void run(TString runNumber, TString refRun)
 
     // ----- Runtime DataBase info -----------------------------------------------
     FairRuntimeDb* rtdb = run->GetRuntimeDb();
-    FairParRootFileIo* parIo1 = new FairParRootFileIo();
+    Bool_t kParameterMerged = kTRUE;
+    FairParRootFileIo* parIo1 = new FairParRootFileIo(kParameterMerged);
     parIo1->open(parFileName1);
     rtdb->setFirstInput(parIo1);
-    FairParRootFileIo* parIo2 = new FairParRootFileIo();
+    FairParRootFileIo* parIo2 = new FairParRootFileIo(kParameterMerged);
     parIo2->open(parFileName2);
-    rtdb->setFirstInput(parIo2);
+    rtdb->setSecondInput(parIo2);
+    rtdb->addRun(runNumber);
+    rtdb->getContainer("NeulandHitPar");
+    rtdb->setInputVersion(runNumber, (char*)"NeulandHitPar", 1, 2);
     // ---------------------------------------------------------------------------
 
-    // cal2hit ---------------------------------------------------------
-    R3BNeulandCal2Hit* neulandCal2Hit= new R3BNeulandCal2Hit("NeulandCal2Hit", 1);
+    // R3BNeulandCal2Hit ---------------------------------------------------------
+    R3BNeulandCal2Hit* neulandCal2Hit= new R3BNeulandCal2Hit("NeulandCal2Hit", 0);
     neulandCal2Hit->SetFirstPlaneHorisontal();
     neulandCal2Hit->SetDistanceToTarget(1300.);
     run->AddTask(neulandCal2Hit);
     // ---------------------------------------------------------------------------
+    
+    // R3BLosCal2Hit -------------------------------------------------------------
+    R3BLosCal2Hit* loscal2hit = new R3BLosCal2Hit("R3BLosCal2Hit",0);
+    run->AddTask(loscal2hit);
+    // ---------------------------------------------------------------------------
 
     // Analysis ------------------------------------------------------------------
-    R3BLandAna* landAna = new R3BLandAna("LandAna", 1);
-    landAna->SetNofBars(400);
-    landAna->SetFirstPlaneHorisontal();
-    landAna->SetMinimalLOSSignals(3);
-    landAna->SetTimeOffset(1530.);
-    run->AddTask(landAna);
+    R3BNeulandHitHist* ana = new R3BNeulandHitHist("LandAna",1);
+    ana->SetNofBars(400);
+    ana->SetFirstPlaneHorisontal();
+    ana->SetTimeOffset(1516);
+    ana->SetDistance(14);
+    run->AddTask(ana);
     // ---------------------------------------------------------------------------
     
     // Initialize ----------------------------------------------------------------

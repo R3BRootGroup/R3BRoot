@@ -13,6 +13,7 @@ class TH1F;
 class R3BTCalModulePar;
 class R3BTCalPar;
 class R3BEventHeader;
+class R3BNeulandQCalPar;
 
 /**
  * An analysis task to apply TCAL calibration for NeuLAND.
@@ -123,7 +124,9 @@ class R3BNeulandMapped2Cal : public FairTask
         fWalkEnabled = walk;
     }
 
-  private:
+  private:   
+    void SetParameter();
+    
     Int_t fNEvents;                             /**< Event counter. */
     Bool_t fPulserMode;                         /**< Running with pulser data. */
     Bool_t fWalkEnabled;                        /**< Enable / Disable walk correction. */
@@ -132,11 +135,13 @@ class R3BNeulandMapped2Cal : public FairTask
     TClonesArray* fPmt;                         /**< Array with time items - output data. */
     Int_t fNPmt;                                /**< Number of produced time items per event. */
     R3BTCalPar* fTcalPar;                       /**< TCAL parameter container. */
+    R3BNeulandQCalPar* fQCalPar;                /**< QCAL parameter container. */
     Int_t fTrigger;                             /**< Trigger value. */
     Int_t fNofPMTs;                             /**< Number of photomultipliers. */
     std::map<Int_t, Bool_t> fMap17Seen;         /**< Map with flag of observed stop signal. */
     std::map<Int_t, Double_t> fMapStopTime;     /**< Map with value of stop time. */
     std::map<Int_t, Int_t> fMapStopClock;       /**< Map with value of stop clock. */
+    std::map<Int_t, Double_t> fMapQdcOffset;	/**< Map with value of qdc offset. */
     Double_t fClockFreq;                        /**< Clock cycle in [ns]. */
     TH1F* fh_pulser_5_2;                        /**< Resolution of one PMT. */
     TH1F* fh_pulser_105_2;                      /**< Resolution of one PMT. */

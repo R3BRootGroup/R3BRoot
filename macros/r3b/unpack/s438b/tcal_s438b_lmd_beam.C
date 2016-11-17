@@ -1,17 +1,25 @@
 
-void run(TString runNumber)
+void run(Int_t runNumber, Int_t cosmicRunNumber, Int_t pulsarRunNumber)
 {
     TStopwatch timer;
     timer.Start();
 
+    TString strRunNumber = "run";
+    strRunNumber += runNumber;
+    TString strCosmicRunNumber = "run";
+    strCosmicRunNumber += cosmicRunNumber;
+    TString strPulsarRunNumber = "run";
+    strPulsarRunNumber += pulsarRunNumber;
     const Int_t nModules = 800;
     const Int_t trigger = 1;              // 1 - onspill, 2 - offspill. -1 - all
 
     TString dirIn1 = "/Users/kresan/data/s438b/data/";
     TString dirOut = "/Users/kresan/data/s438b/tcal/";
-    TString inputFileName1 = dirIn1 + runNumber + "_raw_land.root";              // name of input file
-    TString parFileName    = dirIn1 + "params_" + runNumber + "_raw_land.root";  // name of parameter file
-    TString outputFileName = dirOut + runNumber + "_tcal_land.root";             // name of output file
+    TString inputFileName1 = dirIn1 + strRunNumber + "_raw.root";              			// name of input file
+    TString parFileName    = dirIn1 + "params_" + strRunNumber + "_raw.root";  			// name of parameter file
+TString cosmicParFileName    = dirIn1 + "params_" + strCosmicRunNumber + "_cosmic1.root";  	// name of cosmic parameter file
+    TString pulsarParFileName    = dirIn1 + "params_" + strPulsarRunNumber + "_QCal.root";  	// name of pulsar parameter file
+    TString outputFileName = dirOut + strRunNumber + "_tcal_land.root";             		// name of output file
 
     // Create analysis run -------------------------------------------------------
     FairRunAna* run = new FairRunAna();
@@ -20,12 +28,23 @@ void run(TString runNumber)
     // ---------------------------------------------------------------------------
 
     // ----- Runtime DataBase info -----------------------------------------------
+    Bool_t kParameterMerged = kTRUE;
     FairRuntimeDb* rtdb = run->GetRuntimeDb();
-    FairParRootFileIo* parIo1 = new FairParRootFileIo();
-    parIo1->open(parFileName);
+    FairParRootFileIo* parIo1 = new FairParRootFileIo(kParameterMerged);
+    TList *parlist = new TList();
+    parlist->Add(new TObjString(parFileName));
+    parlist->Add(new TObjString(cosmicParFileName));
+    parlist->Add(new TObjString(pulsarParFileName));
+    parIo1->open(parlist);
     rtdb->setFirstInput(parIo1);
     rtdb->setOutput(parIo1);
-    rtdb->saveOutput();
+    rtdb->addRun(runNumber);
+    rtdb->getContainer("LandTCalPar");
+    rtdb->setInputVersion(runNumber, (char*)"LandTCalPar", 1, 1);    
+    rtdb->getContainer("NeulandQCalPar");
+    rtdb->setInputVersion(runNumber, (char*)"NeulandQCalPar", 1, 1);
+    rtdb->getContainer("NeulandHitPar");
+    rtdb->setInputVersion(runNumber, (char*)"NeulandHitPar", 1, 1);
     // ---------------------------------------------------------------------------
 
     // Time calibration ----------------------------------------------------------
@@ -35,13 +54,13 @@ void run(TString runNumber)
     landTcal->EnableWalk(kTRUE);
     run->AddTask(landTcal);
 
-    R3BLosTcal* losTcal = new R3BLosTcal("LosTcal", 1);
-    losTcal->SetNofModules(20);
+    R3BLosMapped2Cal* losTcal = new R3BLosMapped2Cal("LosTcal", 1);
+    losTcal->SetNofModules(20, 4);
     run->AddTask(losTcal);
     // ---------------------------------------------------------------------------
 
-    R3BNeulandCalTest *testTcal = new R3BNeulandCalTest("TestTcal", 1);
-    run->AddTask(testTcal);
+    //R3BNeulandCalTest *testTcal = new R3BNeulandCalTest("TestTcal", 1);
+    //run->AddTask(testTcal);
 
     // Initialize ----------------------------------------------------------------
     run->Init();

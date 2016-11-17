@@ -1,10 +1,10 @@
 // -----------------------------------------------------------------------------
-// -----                               R3BLandAna                          -----
+// -----                            R3BNeulandHitHist                      -----
 // -----                     Created 22-04-2014 by D.Kresan                -----
 // -----------------------------------------------------------------------------
 
-#ifndef R3BLANDANA_H
-#define R3BLANDANA_H
+#ifndef R3BNEULANDHITHIST_H
+#define R3BNEULANDHITHIST_H
 
 #include "FairTask.h"
 
@@ -12,12 +12,12 @@ class TClonesArray;
 class TH1F;
 class TH2F;
 
-class R3BLandAna : public FairTask
+class R3BNeulandHitHist : public FairTask
 {
   public:
-    R3BLandAna();
-    R3BLandAna(const char* name, Int_t iVerbose);
-    virtual ~R3BLandAna();
+    R3BNeulandHitHist();
+    R3BNeulandHitHist(const char* name, Int_t iVerbose);
+    virtual ~R3BNeulandHitHist();
 
     virtual InitStatus Init();
 
@@ -29,17 +29,17 @@ class R3BLandAna : public FairTask
     
     inline void SetFirstPlaneHorisontal() { fFirstPlaneHorisontal = kTRUE; }
     
-    inline void SetMinimalLOSSignals(Int_t n) { fMinimalLOSSignals = n; }
-    
     inline void SetTimeOffset(Double_t t) { fTimeOffset = t; }
+    
+    inline void SetDistance(Double_t t) { fDistance = t; }
 
   private:
     Int_t fNofBars;
-    Int_t fMinimalLOSSignals = 4;
     Double_t fTimeOffset;
     Bool_t fFirstPlaneHorisontal;
     
     Int_t fnEvents;
+    Double_t fDistance;
 
     TClonesArray* fLandDigi;
     TClonesArray* fLosHit;
@@ -48,6 +48,7 @@ class R3BLandAna : public FairTask
     TH2F* fh_land_qdcbarid;
     TH1F* fh_land_tof;
     TH2F* fh_land_qdctof;
+    TH2F* fh_land_qdctof_norm;
     TH2F* fh_land_timebarid;
     TH2F* fh_land_tofbarid;
     TH2F* fh_land_betabarid;
@@ -65,16 +66,14 @@ class R3BLandAna : public FairTask
     
     TH2F* fh_los_corr;
     
-    TH1F* fh_land_norm_tof_bar;
-    TH1F* fh_land_norm_tof_plane;
-    TH1F* fh_land_norm_tof_total;
+    TH1F* fh_land_norm_tof;
         
     void CreateHistos();
 
     void WriteHistos();
 
   public:
-    ClassDef(R3BLandAna, 0)
+    ClassDef(R3BNeulandHitHist, 0)
 };
 
 #endif

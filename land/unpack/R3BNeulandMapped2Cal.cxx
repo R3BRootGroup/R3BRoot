@@ -9,6 +9,7 @@
 #include "R3BNeulandMappedData.h"
 #include "R3BNeulandCalData.h"
 #include "R3BTCalPar.h"
+#include "R3BNeulandQCalPar.h"
 #include "R3BEventHeader.h"
 
 #include "FairRunAna.h"
@@ -43,10 +44,12 @@ R3BNeulandMapped2Cal::R3BNeulandMapped2Cal()
     , fPmt(new TClonesArray("R3BNeulandCalData"))
     , fNPmt(0)
     , fTcalPar(NULL)
+    , fQCalPar(NULL)
     , fTrigger(-1)
     , fMap17Seen()
     , fMapStopTime()
     , fMapStopClock()
+    , fMapQdcOffset()
     , fClockFreq(1. / TACQUILA_CLOCK_MHZ * 1000.)
 {
 }
@@ -60,10 +63,12 @@ R3BNeulandMapped2Cal::R3BNeulandMapped2Cal(const char* name, Int_t iVerbose)
     , fPmt(new TClonesArray("R3BNeulandCalData"))
     , fNPmt(0)
     , fTcalPar(NULL)
+    , fQCalPar(NULL)
     , fTrigger(-1)
     , fMap17Seen()
     , fMapStopTime()
     , fMapStopClock()
+    , fMapQdcOffset()
     , fClockFreq(1. / TACQUILA_CLOCK_MHZ * 1000.)
 {
 }
@@ -107,6 +112,8 @@ InitStatus R3BNeulandMapped2Cal::Init()
     fh_pulser_5_2 = new TH1F("h_pulser_5_2", "Single PMT resolution Bar 5 vs 2", 40000, -200., 200.);
     fh_pulser_105_2 = new TH1F("h_pulser_105_2", "Single PMT resolution Bar 105 vs 2", 40000, -200., 200.);
 
+    SetParameter();
+    
     return kSUCCESS;
 }
 
@@ -115,11 +122,26 @@ void R3BNeulandMapped2Cal::SetParContainers()
     FairRunAna* ana = FairRunAna::Instance();
     FairRuntimeDb* rtdb = ana->GetRuntimeDb();
     fTcalPar = (R3BTCalPar*)(rtdb->getContainer("LandTCalPar"));
+    fQCalPar = (R3BNeulandQCalPar*)(rtdb->getContainer("NeulandQCalPar"));
+}
+
+void R3BNeulandMapped2Cal::SetParameter()
+{
+  
+  std::map<Int_t, Double_t> tempMapQdcOffset;
+
+  for (Int_t i = 0; i < fQCalPar->GetNumPar(); i++) 
+    tempMapQdcOffset[i] = fQCalPar->GetParAt(i);
+    
+  LOG(INFO) << "R3BNeulandMapped2Cal::SetParameter : Number of Parameters: " << fQCalPar->GetNumPar() << FairLogger::endl;
+  
+  fMapQdcOffset = tempMapQdcOffset;
 }
 
 InitStatus R3BNeulandMapped2Cal::ReInit()
 {
     SetParContainers();
+    SetParameter();
     return kSUCCESS;
 }
 
@@ -202,6 +224,7 @@ void R3BNeulandMapped2Cal::MakeCal()
     R3BTCalModulePar* par;
     Double_t time;
     Double_t time2;
+    Int_t qdc;
 
     for (Int_t khit = 0; khit < nHits; khit++)
     {
@@ -246,13 +269,16 @@ void R3BNeulandMapped2Cal::MakeCal()
             << ", time=" << time2 << FairLogger::endl;
             continue;
         }
-
+  
+        qdc = hit2->GetQdcData()-fMapQdcOffset[2*((iPlane-1)*50 + iPaddle) + iSide - 1];        
+        qdc = std::max(qdc,0);
+	
         time = time - time2 + hit2->GetClock() * fClockFreq;
         if (fWalkEnabled)
         {
-            time += wlk(hit2->GetQdcData());
+            time += wlk(qdc);
         }
-        new ((*fPmt)[fNPmt]) R3BNeulandCalData((iPlane-1)*50 + iPaddle, iSide, time, hit2->GetQdcData());
+        new ((*fPmt)[fNPmt]) R3BNeulandCalData((iPlane-1)*50 + iPaddle, iSide, time, qdc);
         fNPmt += 1;
     }
 }
@@ -270,6 +296,7 @@ void R3BNeulandMapped2Cal::MakeCalOld()
     R3BTCalModulePar* par;
     Double_t time;
     Double_t time2;
+    Int_t qdc;
     Int_t gtb;
     Int_t tacAddr;
     Int_t index;
@@ -317,7 +344,7 @@ void R3BNeulandMapped2Cal::MakeCalOld()
         fMapStopTime[index] = time;
         fMapStopClock[index] = hit->GetClock();
     }
-
+    
     for (Int_t khit = 0; khit < nHits; khit++)
     {
         hit2 = (R3BNeulandMappedData*)fRawHit->At(khit);
@@ -329,6 +356,8 @@ void R3BNeulandMapped2Cal::MakeCalOld()
         iPlane = hit2->GetPlane();
         iPaddle = hit2->GetPaddle();
         iSide = hit2->GetSide();
+	qdc = hit2->GetQdcData();
+	
         if (hit2->Is17())
         {
             // 17-th channel
@@ -361,12 +390,15 @@ void R3BNeulandMapped2Cal::MakeCalOld()
             << FairLogger::endl;
             continue;
         }
+        
+        qdc -= fMapQdcOffset[2*((iPlane-1)*50 + iPaddle) + iSide - 1];        
+        qdc = std::max(qdc,0);
+	
         time2 = time2 - fMapStopTime[index2] + hit2->GetClock() * fClockFreq;
         if (fWalkEnabled)
-        {
-            time2 += wlk(hit2->GetQdcData());
-        }
-        new ((*fPmt)[fNPmt]) R3BNeulandCalData((iPlane-1)*50 + iPaddle, iSide, time2, hit2->GetQdcData());
+            time2 += wlk(qdc);
+
+        new ((*fPmt)[fNPmt]) R3BNeulandCalData((iPlane-1)*50 + iPaddle, iSide, time2, qdc);
         fNPmt += 1;
     }
 }

@@ -1,15 +1,17 @@
 
-void run(TString runNumber)
+void run(Int_t runNumber)
 {
     TStopwatch timer;
     timer.Start();
 
+    TString strRunNumber = "run";
+    strRunNumber += runNumber;
     TString dirIn1 = "/Users/kresan/data/s438b/data/";
     TString dirIn2 = "/Users/kresan/data/s438b/data/";
     TString dirOut = "/Users/kresan/data/s438b/data/";
-    TString inputFileName1 = dirIn2 + runNumber + "_tcal.root";             // name of input file
-    TString parFileName    = dirIn1 + "params_" + runNumber + "_raw.root";  // name of parameter file
-    TString outputFileName = dirOut + runNumber + "_digi.root";            // name of output file
+    TString inputFileName1 = dirIn2 + strRunNumber + "_tcal.root";             		// name of input file
+    TString parFileName    = dirIn1 + "params_" + strRunNumber + "_cosmic1.root";  	// name of parameter file
+    TString outputFileName = dirOut + strRunNumber + "_digi.root";            		// name of output file
 
     // Create analysis run -------------------------------------------------------
     FairRunAna* run = new FairRunAna();
@@ -22,6 +24,9 @@ void run(TString runNumber)
     FairParRootFileIo* parIo1 = new FairParRootFileIo();
     parIo1->open(parFileName);
     rtdb->setFirstInput(parIo1);
+    rtdb->addRun(runNumber);   
+    rtdb->getContainer("NeulandHitPar");
+    rtdb->setInputVersion(runNumber, (char*)"NeulandHitPar", 1, 2);
     // ---------------------------------------------------------------------------
 
     // cal2hit ---------------------------------------------------------
@@ -29,14 +34,7 @@ void run(TString runNumber)
     //neulandCal2Hit->SetFirstPlaneHorisontal();
     run->AddTask(neulandCal2Hit);
     // ---------------------------------------------------------------------------
-
-    // Analysis ------------------------------------------------------------------
-//     R3BLandAna* landAna = new R3BLandAna("LandAna", 1);
-//     landAna->SetNofBars(400);
-//     landAna->SetFirstPlaneHorisontal();
-//     run->AddTask(landAna);
-    // ---------------------------------------------------------------------------
-    
+   
     // Initialize ----------------------------------------------------------------
     run->Init();
     FairLogger::GetLogger()->SetLogScreenLevel("INFO");

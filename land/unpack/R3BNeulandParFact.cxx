@@ -7,7 +7,8 @@
 /////////////////////////////////////////////////////////////
 #include "R3BNeulandParFact.h"
 
-#include "R3BNeulandHitPar.h"    // for R3BLandGeometryPar
+#include "R3BNeulandHitPar.h"
+#include "R3BNeulandQCalPar.h"
 #include "FairParSet.h"    // for FairParSet
 #include "FairRuntimeDb.h" // for FairRuntimeDb
 #include "FairLogger.h"
@@ -36,9 +37,12 @@ void R3BNeulandParFact::setAllContainers()
     /** Creates the Container objects with all accepted contexts and adds them to
      *  the list of containers.*/
 
-    FairContainer* p1 = new FairContainer("NeulandHitPar", "NeuLAND Modul Parameters", "TestDefaultContext"); //TODO
+    FairContainer* p1 = new FairContainer("NeulandHitPar", "NeuLAND Modul Parameters", "TestDefaultContext");
     p1->addContext("TestNonDefaultContext");
     containers->Add(p1);
+    FairContainer* p2 = new FairContainer("NeulandQCalPar", "NeuLAND Pedestal Parameters", "TestDefaultContext");
+    p2->addContext("TestNonDefaultContext");
+    containers->Add(p2);
 }
 
 FairParSet* R3BNeulandParFact::createContainer(FairContainer* c)
@@ -51,9 +55,12 @@ FairParSet* R3BNeulandParFact::createContainer(FairContainer* c)
     LOG(INFO) << "R3BNeulandParFact::createContainer : " << name << FairLogger::endl;
     FairParSet* p = NULL;
 
-    if (strcmp(name, "NeulandHitPar") == 0) //TODO
+    if (strcmp(name, "NeulandHitPar") == 0)
     {
         p = new R3BNeulandHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
+    else if(strcmp(name, "NeulandQCalPar") == 0){
+	p = new R3BNeulandQCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
     return p;
 }

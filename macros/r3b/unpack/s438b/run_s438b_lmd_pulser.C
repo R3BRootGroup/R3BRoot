@@ -10,13 +10,13 @@ void run(Int_t runNumber)
     TStopwatch timer;
     timer.Start();
 
+    TString strRunNumber = "run";
+    strRunNumber += runNumber;   
     const Int_t nev = -1;                                // number of events to read, -1 - untill CTRL+C
     TString inDir = "/Users/kresan/data/s438b/lmd/";     // directory with lmd files
     TString outDir = "/Users/kresan/data/s438b/data/";   // output directory
     TString histDir = "/Users/kresan/Sites/";            // web-server directory
 
-    TString strRunNumber = "run";
-    strRunNumber += runNumber;
     TString filename = inDir + strRunNumber + "_*.lmd";
     TString outputFileName = outDir + strRunNumber + "_raw.root";                  // name of output file
     TString histFileName = histDir + "hist_s438b_" + strRunNumber + "_raw.root";   // name of file with control histograms
