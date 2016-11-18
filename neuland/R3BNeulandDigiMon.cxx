@@ -8,6 +8,7 @@
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TH3D.h"
+#include "TDirectory.h"
 
 #include "FairRootManager.h"
 #include "FairLogger.h"
@@ -58,6 +59,7 @@ InitStatus R3BNeulandDigiMon::Init()
         rm->Register("NeulandDigiMon", "Digis in NeuLAND", fh3, kTRUE);
     }
 
+    hTime = new TH1D("hTime", "Digi time", 400, 0, 200);
     hDepth = new TH1D("hDepth", "Maxial penetration depth", 60, 1400, 1700);
     hForemostEnergy = new TH1D("hForemostEnergy", "Foremost energy deposition", 100, 0, 100);
     hSternmostEnergy = new TH1D("hSternmostEnergy", "Sternmost energy deposition", 100, 0, 100);
@@ -96,6 +98,7 @@ void R3BNeulandDigiMon::Exec(Option_t*)
     for (auto digi : digis)
     {
         hPosVSEnergy->Fill(digi->GetPosition().Z(), digi->GetE());
+        hTime->Fill(digi->GetT());
     }
 
     auto maxDepthDigi = std::max_element(digis.begin(),
@@ -139,7 +142,14 @@ void R3BNeulandDigiMon::Exec(Option_t*)
 
 void R3BNeulandDigiMon::Finish()
 {
+    TDirectory* tmp = gDirectory;
+    FairRootManager::Instance()->GetOutFile()->cd();
+
+    gDirectory->mkdir("NeulandDigiMon");
+    gDirectory->cd("NeulandDigiMon");
+
     hDepth->Write();
+    hTime->Write();
     hForemostEnergy->Write();
     hSternmostEnergy->Write();
     hDepthVSForemostEnergy->Write();
@@ -147,6 +157,8 @@ void R3BNeulandDigiMon::Finish()
     hEtot->Write();
     hDepthVSEtot->Write();
     hPosVSEnergy->Write();
+
+    gDirectory = tmp;
 }
 
 ClassImp(R3BNeulandDigiMon)

@@ -21,7 +21,16 @@
 R3BNeulandDigitizer::R3BNeulandDigitizer()
     : FairTask("R3B NeuLAND Digitizer", 0)
     , fNeulandDigis(new TClonesArray("R3BNeulandDigi"))
+    , fNeulandPixels(new TClonesArray("R3BNeulandPixel"))
     , fDigitizingEngine(new Neuland::DigitizingEngine())
+{
+}
+
+R3BNeulandDigitizer::R3BNeulandDigitizer(Neuland::DigitizingEngine* eng)
+    : FairTask("R3B NeuLAND Digitizer", 0)
+    , fNeulandDigis(new TClonesArray("R3BNeulandDigi"))
+    , fNeulandPixels(new TClonesArray("R3BNeulandPixel"))
+    , fDigitizingEngine(eng)
 {
 }
 
@@ -30,6 +39,10 @@ R3BNeulandDigitizer::~R3BNeulandDigitizer()
     if (fNeulandDigis)
     {
         delete fNeulandDigis;
+    }
+    if (fNeulandPixels)
+    {
+        delete fNeulandPixels;
     }
     if (fDigitizingEngine)
     {
@@ -84,15 +97,16 @@ InitStatus R3BNeulandDigitizer::Init()
     }
     fNeulandPoints = (TClonesArray*)ioman->GetObject("NeulandPoints");
 
-    // Set Output: TClonesArray of R3BNeulandDigis
+    // Set Output: TClonesArray of R3BNeulandDigis, TClonesArray of R3BNeulandPixles
     ioman->Register("NeulandDigis", "Digital response in Neuland", fNeulandDigis, kTRUE);
+    ioman->Register("NeulandPixels", "Neuland Pixels", fNeulandPixels, kTRUE);
 
     // Get Paddle Size
     LOG(DEBUG) << "R3BNeulandDigitizer: Paddle Half Length is: " << fNeulandGeoPar->GetPaddleHalfLength()
                << FairLogger::endl;
     fDigitizingEngine->SetPaddleHalfLength(fNeulandGeoPar->GetPaddleHalfLength());
 
-    // Initialise control histograms
+    // Initialize control histograms
     hPMl = new TH1F("PM_left", "Arrival times of left PM", 1000, 0., 1000.);
     hPMr = new TH1F("PM_right", "Arrival times of right PM", 1000, 0., 1000.);
     hMultOne = new TH1F("MultiplicityOne", "Paddle multiplicity: only one PMT per paddle", 3000, 0, 3000);
@@ -112,7 +126,7 @@ void R3BNeulandDigitizer::Exec(Option_t*)
 
     std::map<UInt_t, Double_t> paddleEnergyDeposit;
 
-    // Look at each Land Point, if it deposited energy in the szintillator, store it with reference to the bar
+    // Look at each Land Point, if it deposited energy in the scintillator, store it with reference to the bar
     const UInt_t nPoints = fNeulandPoints->GetEntries();
     R3BNeulandPoint* point;
     for (UInt_t l = 0; l < nPoints; l++)
@@ -196,6 +210,7 @@ void R3BNeulandDigitizer::Exec(Option_t*)
         {
             const TVector3 digiPositionLocal = TVector3(paddle.GetPosition(), 0., 0.);
             const TVector3 digiPositionGlobal = fNeulandGeoPar->ConvertToGlobalCoordinates(digiPositionLocal, paddleID);
+            const TVector3 digiPixel = fNeulandGeoPar->ConvertGlobalToPixel(digiPositionGlobal);
 
             new ((*fNeulandDigis)[fNeulandDigis->GetEntries()]) R3BNeulandDigi(paddleID,
                                                                                paddle.leftPMT.GetTDC(),
@@ -205,6 +220,12 @@ void R3BNeulandDigitizer::Exec(Option_t*)
                                                                                paddle.rightPMT.GetEnergy(),
                                                                                paddle.GetPaddleEnergy(),
                                                                                digiPositionGlobal);
+
+            new ((*fNeulandPixels)[fNeulandPixels->GetEntries()]) R3BNeulandPixel((Int_t)digiPixel.X(),
+                                                                                  (Int_t)digiPixel.Y(),
+                                                                                  (Int_t)digiPixel.Z(),
+                                                                                  (Float_t)paddle.GetPaddleTime(),
+                                                                                  (Float_t)paddle.GetPaddleEnergy());
 
             hElossVSQDC->Fill(paddleEnergyDeposit[paddleID], paddle.GetPaddleEnergy());
         }
@@ -219,6 +240,7 @@ void R3BNeulandDigitizer::Exec(Option_t*)
 void R3BNeulandDigitizer::Reset()
 {
     fNeulandDigis->Clear();
+    fNeulandPixels->Clear();
     fDigitizingEngine->Clear();
 }
 

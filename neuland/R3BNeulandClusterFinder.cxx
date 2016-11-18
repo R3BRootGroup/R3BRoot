@@ -19,10 +19,13 @@
  * Returns true if the Digis belong together in the same cluster and false otherwise. */
 static const auto clusteringCondition = [](const R3BNeulandDigi& a, const R3BNeulandDigi& b)
 {
-    return TMath::Abs(a.GetPosition().X() - b.GetPosition().X()) < 7.5 &&
-           TMath::Abs(a.GetPosition().Y() - b.GetPosition().Y()) < 7.5 &&
-           TMath::Abs(a.GetPosition().Z() - b.GetPosition().Z()) < 7.5 && TMath::Abs(a.GetT() - b.GetT()) < 1.0;
+    return TMath::Abs(a.GetPosition().X() - b.GetPosition().X()) < 3 * 7.5 &&
+           TMath::Abs(a.GetPosition().Y() - b.GetPosition().Y()) < 2 * 7.5 &&
+           TMath::Abs(a.GetPosition().Z() - b.GetPosition().Z()) < 2 * 7.5 && TMath::Abs(a.GetT() - b.GetT()) < 3 * 1.0;
 };
+
+// TODO: #ROOT6 Promote this to a member function
+static const auto fClusteringEngine = Neuland::ClusteringEngine<R3BNeulandDigi>(clusteringCondition);
 
 R3BNeulandClusterFinder::R3BNeulandClusterFinder()
     : FairTask("R3BNeulandClusterFinder")
@@ -81,18 +84,16 @@ void R3BNeulandClusterFinder::Exec(Option_t*)
     // Convert the TClonesArray to a std::vector
     // TODO: #ROOT6 Convert this into a (FairRoot) template function
     const Int_t nDigis = fNeulandDigis->GetEntries();
-    // Note: Reseving space can improve performance
+    // Note: Reserving space can improve performance
     fVectorDigis.reserve(nDigis);
     R3BNeulandDigi* digi;
     for (Int_t i = 0; i < nDigis; i++)
     {
         digi = (R3BNeulandDigi*)fNeulandDigis->At(i);
-        // Note: Derefencing, the vector does contain full objects, not just pointers
+        // Note: Dereferencing, the vector does contain full objects, not just pointers
         fVectorDigis.push_back(*digi);
     }
 
-    // TODO: #ROOT6 Promote this to a member function so the object does not have to be recreated for every event
-    auto fClusteringEngine = Neuland::ClusteringEngine<R3BNeulandDigi>(clusteringCondition);
     auto clusters = fClusteringEngine.Clusterize(fVectorDigis);
 
     for (auto& cluster : clusters)

@@ -7,6 +7,7 @@
 
 #include "R3BNeulandPoint.h"
 #include "R3BNeulandDigi.h"
+#include "R3BNeulandPixel.h"
 #include "R3BNeulandGeoPar.h"
 
 #include "DigitizingEngine.h"
@@ -35,6 +36,7 @@ class R3BNeulandDigitizer : public FairTask
 {
   public:
     R3BNeulandDigitizer();
+    R3BNeulandDigitizer(Neuland::DigitizingEngine *eng);
     ~R3BNeulandDigitizer();
 
   private:
@@ -60,6 +62,7 @@ class R3BNeulandDigitizer : public FairTask
     // TODO: #ROOT6 Replace raw pointers with std::unique_ptr?
     TClonesArray* fNeulandPoints;
     TClonesArray* fNeulandDigis;
+    TClonesArray* fNeulandPixels;
 
     R3BNeulandGeoPar* fNeulandGeoPar;
     Neuland::DigitizingEngine* fDigitizingEngine;

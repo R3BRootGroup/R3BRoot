@@ -1,3 +1,8 @@
+# ROOT5 is not supported
+If (ROOT_VERSION_MAJOR GREATER 5)
+	add_subdirectory(reconstruction)
+EndIf (ROOT_VERSION_MAJOR GREATER 5)
+
 set(LIBRARY_NAME R3BNeuland)
 set(LINKDEF NeulandLinkDef.h)
 
@@ -12,14 +17,12 @@ set(SRCS
 	R3BNeulandVisualizer.cxx
 	R3BNeulandDigitizer.cxx
 	R3BNeulandClusterFinder.cxx
-	R3BNeulandNeutronReconstruction.cxx
-	R3BNeulandNeutronReconstructionEvaluation.cxx
 	digitizing/DigitizingEngine.cxx
 	clustering/ClusteringEngine.cxx
 	clustering/Neutron2DCalibr.cxx
 	unpack/R3BNeulandTcalFill.cxx
 	unpack/R3BNeulandTcal.cxx
-	unpack/R3BNeulandPmt.cxx 
+	unpack/R3BNeulandPmt.cxx
 )
 change_file_extension(*.cxx *.h HEADERS "${SRCS}")
 
@@ -30,7 +33,8 @@ set(DEPENDENCIES
 # TODO: -Wno-ignored-qualifiers for R3BLandDigiPar
 # -Wno-overloaded-virtual is needed because of unavoidable Print() overloading in R3BStack
 # -pthread for gtest
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -Wformat-security -pthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -Wformat-security -pthread -march=native -O3")
+
 
 set(SYSTEM_INCLUDE_DIRECTORIES
 	${SYSTEM_INCLUDE_DIRECTORIES}
@@ -51,16 +55,18 @@ set(INCLUDE_DIRECTORIES
 )
 include_directories(${INCLUDE_DIRECTORIES})
 
+
 set(LINK_DIRECTORIES
 	${ROOT_LIBRARY_DIR}
 	${FAIRROOT_LIBRARY_DIR}
 )
 link_directories(${LINK_DIRECTORIES})
 
+
 generate_library()
 
 
-# Testing 
+# Testing
 enable_testing()
 Set(GTEST_ROOT ${SIMPATH})
 find_package(GTest REQUIRED)

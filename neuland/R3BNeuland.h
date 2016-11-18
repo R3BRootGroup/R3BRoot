@@ -9,6 +9,7 @@
 
 class FairVolume;
 class TClonesArray;
+class R3BNeulandGeoPar;
 
 /**
  * NeuLAND detector simulation class
@@ -62,10 +63,11 @@ class R3BNeuland : public R3BDetector
     // R3BNeuland &operator=(const R3BNeuland &) = delete;
 
   private:
-    // std::unique_ptr<TClonesArray> fNeulandPoints;
     TClonesArray* fNeulandPoints;
-    // std::unique_ptr<TClonesArray> fNeulandPrimaryNeutronInteractionPoints;
     TClonesArray* fNeulandPrimaryNeutronInteractionPoints;
+    TClonesArray* fNeulandPrimaryNeutronInteractionPixel;
+
+    R3BNeulandGeoPar* fNeulandGeoPar;
 
     /** Track information to be stored until the track leaves the active volume. */
     // TODO: Just fill an existing R3BLandPoint in the TClonesArray or

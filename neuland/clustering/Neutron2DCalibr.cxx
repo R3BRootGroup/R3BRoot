@@ -26,12 +26,12 @@ namespace Neuland
     void Neutron2DCalibr::SetClusterFile(const UInt_t nNeutrons, const TString& filename)
     {
         fHists[nNeutrons] =
-            new TH2D(TString::UItoa(nNeutrons, 10), TString::UItoa(nNeutrons, 10) + "n", 50, 0, 2000, 70, 0, 70);
+            new TH2D(TString::UItoa(nNeutrons, 10), TString::UItoa(nNeutrons, 10) + "n", 50, 0, 2000, 40, 0, 40);
         fHists.at(nNeutrons)->GetXaxis()->SetTitle("Total Energy [MeV]");
         fHists.at(nNeutrons)->GetYaxis()->SetTitle("Number of Clusters");
 
         TFile* file = new TFile(filename, "READ");
-        TTree* tree = (TTree*)file->Get("cbmsim");
+        TTree* tree = (TTree*)file->Get("evt");
         TBranch* branch = tree->GetBranch("NeulandClusters");
         TClonesArray* clusters = new TClonesArray("R3BNeulandCluster");
         branch->SetAddress(&clusters);
@@ -88,7 +88,7 @@ namespace Neuland
         Double_t step[nVars] = { 0.001, 0.5, 0.5 };
         Double_t variable[nVars] = { 0.04, 10, 3 };
         Double_t lower[nVars] = { 0.001, 1, 3 };
-        Double_t upper[nVars] = { 10, 100, 6 };
+        Double_t upper[nVars] = { 10, 20, 6 };
         min->SetLimitedVariable(0, "slope", variable[0], step[0], lower[0], upper[0]);
         min->SetLimitedVariable(1, "distance", variable[1], step[1], lower[1], upper[1]);
         min->SetLimitedVariable(2, "distance offset", variable[2], step[2], lower[2], upper[2]);
@@ -166,6 +166,7 @@ namespace Neuland
         for (auto& nh : fHists)
         {
             c->cd(nh.first);
+            nh.second->GetZaxis()->SetRangeUser(0,100);
             nh.second->Draw("colz");
             fCuts.at(nh.first)->Draw("same");
         }

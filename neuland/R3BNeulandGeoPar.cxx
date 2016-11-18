@@ -1,6 +1,7 @@
 #include "R3BNeulandGeoPar.h"
 
 #include <iostream>
+#include <algorithm>
 
 #include "TGeoMatrix.h"
 #include "TVector3.h"
@@ -99,6 +100,30 @@ TVector3 R3BNeulandGeoPar::ConvertToGlobalCoordinates(const TVector3& position, 
     return TVector3(pos_out[0], pos_out[1], pos_out[2]);
 }
 
+TVector3 R3BNeulandGeoPar::ConvertGlobalToPixel(const TVector3& position) const
+{
+    const Int_t nPixels = 50;
+    const Double_t sizePixel = 5;
+    const Int_t nPaddles = fNeulandGeoNode->GetNdaughters();
+    const Int_t nPlanes = nPaddles / nPixels;
+
+    Double_t pos_in[3] = { position.X(), position.Y(), position.Z() };
+    Double_t pos_tmp[3];
+
+    // First, convert to Neuland-local coordinates (consisting of all paddles)
+    fNeulandGeoNode->GetMatrix()->MasterToLocal(pos_in, pos_tmp);
+
+    // Note: PaddleHalfLength is 135 (light guides)
+    // Map x and y values with [-125.:125.] float to [0:nPixels-1] int
+    const Int_t x = std::min(std::max<Int_t>(0, pos_tmp[0] / sizePixel + nPixels / 2), nPixels - 1);
+    const Int_t y = std::min(std::max<Int_t>(0, pos_tmp[1] / sizePixel + nPixels / 2), nPixels - 1);
+
+    // Map z to [0:nPlanes-1]
+    const Int_t z = std::min(std::max<Int_t>(0, pos_tmp[2] / sizePixel + nPlanes / 2), nPlanes - 1);
+
+    return TVector3(x, y, z);
+}
+
 void R3BNeulandGeoPar::BuildPaddleLookup()
 {
     for (Int_t i = 0; i < fNeulandGeoNode->GetNdaughters(); i++)
@@ -107,5 +132,4 @@ void R3BNeulandGeoPar::BuildPaddleLookup()
         fPaddleGeoNodes[node->GetNumber()] = node;
     }
 }
-
 ClassImp(R3BNeulandGeoPar);

@@ -8,44 +8,45 @@
  */
 
 #include "FairTask.h"
+#include "ReconstructionEngine.h"
 
-class R3BNeulandNeutron2DPar;
 class TClonesArray;
 
 class R3BNeulandNeutronReconstruction : public FairTask
 {
   public:
-    R3BNeulandNeutronReconstruction();
+    R3BNeulandNeutronReconstruction(const TString input = "NeulandClusters", const TString output = "NeulandNeutrons");
+    // NOTE: Task consumes engine (sink). TODO: #ROOT6: Replace with uniqe_ptr at some point (#goodsink)
+    R3BNeulandNeutronReconstruction(Neuland::ReconstructionEngine* engine,
+                                    const TString input = "NeulandClusters",
+                                    const TString output = "NeulandNeutrons");
     ~R3BNeulandNeutronReconstruction();
 
   private:
-    // Rule of three/five: If a class requires a user-defined destructor, a user-defined copy
-    // constructor, or a user-defined copy assignment operator, it almost certainly requires all three
-    // Here no copy and no move is allowed
+    // No copy and no move is allowed (Rule of three/five)
     R3BNeulandNeutronReconstruction(const R3BNeulandNeutronReconstruction&);            // copy constructor
     R3BNeulandNeutronReconstruction(R3BNeulandNeutronReconstruction&&);                 // move constructor
     R3BNeulandNeutronReconstruction& operator=(const R3BNeulandNeutronReconstruction&); // copy assignment
     R3BNeulandNeutronReconstruction& operator=(R3BNeulandNeutronReconstruction&&);      // move assignment
 
   protected:
-    // TODO: #ROOT6: Declare functions overrriding virtual functions overrride
-    InitStatus Init();       // override
-    void Finish();           // override
-    void SetParContainers(); // override
+    InitStatus Init() override;
+    void Finish() override;
+
   public:
-    void Exec(Option_t*); // override
+    void Exec(Option_t*) override;
 
   private:
-    void Reset();
+    Neuland::ReconstructionEngine* fEngine;
 
-    // TODO: #ROOT6 Replace raw pointers with std::unique_ptr?
+    TString fInput;
+    TString fOutput;
+
     TClonesArray* fClusters;
     TClonesArray* fNeutrons;
 
-    R3BNeulandNeutron2DPar* fNeulandNeutron2DPar;
-
   public:
-    ClassDef(R3BNeulandNeutronReconstruction, 0);
+    ClassDefOverride(R3BNeulandNeutronReconstruction, 0);
 };
 
 #endif // R3BNEULANDNEUTRONRECONSTRUCTION_H
