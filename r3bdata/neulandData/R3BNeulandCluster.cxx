@@ -4,12 +4,25 @@
 #include <stdexcept>
 #include <numeric>
 
-using namespace std;
+R3BNeulandDigi R3BNeulandCluster::GetForemostDigi() const
+{
+    auto min = std::min_element(fDigis.cbegin(),
+                                fDigis.cend(),
+                                [](const R3BNeulandDigi& a, const R3BNeulandDigi& b)
+                                {
+                                    return a.GetPosition().Z() < b.GetPosition().Z();
+                                });
+    if (min == fDigis.end())
+    {
+        throw std::logic_error("R3BNeulandCluster::GetFirstDigi(): Cluster has no Digis!");
+    }
+    return *min;
+}
 
 R3BNeulandDigi R3BNeulandCluster::GetFirstDigi() const
 {
-    auto min = std::min_element(fDigis.begin(),
-                                fDigis.end(),
+    auto min = std::min_element(fDigis.cbegin(),
+                                fDigis.cend(),
                                 [](const R3BNeulandDigi& a, const R3BNeulandDigi& b)
                                 {
                                     return a.GetT() < b.GetT();
@@ -23,11 +36,26 @@ R3BNeulandDigi R3BNeulandCluster::GetFirstDigi() const
 
 R3BNeulandDigi R3BNeulandCluster::GetLastDigi() const
 {
-    auto max = std::max_element(fDigis.begin(),
-                                fDigis.end(),
+    auto max = std::max_element(fDigis.cbegin(),
+                                fDigis.cend(),
                                 [](const R3BNeulandDigi& a, const R3BNeulandDigi& b)
                                 {
                                     return a.GetT() < b.GetT();
+                                });
+    if (max == fDigis.end())
+    {
+        throw std::logic_error("R3BNeulandCluster::GetLastDigi(): Cluster has no Digis!");
+    }
+    return *max;
+}
+
+R3BNeulandDigi R3BNeulandCluster::GetMaxEnergyDigi() const
+{
+    auto max = std::max_element(fDigis.cbegin(),
+                                fDigis.cend(),
+                                [](const R3BNeulandDigi& a, const R3BNeulandDigi& b)
+                                {
+                                    return a.GetE() < b.GetE();
                                 });
     if (max == fDigis.end())
     {
@@ -47,12 +75,35 @@ Double_t R3BNeulandCluster::GetE() const
                            });
 }
 
-Double_t R3BNeulandCluster::GetT() const
+Double_t R3BNeulandCluster::GetT() const { return GetFirstDigi().GetT(); }
+
+TVector3 R3BNeulandCluster::GetEnergyCentroid() const
 {
-    return GetFirstDigi().GetT();
+    // analog to Geometrical Centroid \vec{c} = \frac{\sum_i (\vec{r}_{i} \cdot V_i)}{\sum_i V_i}
+    TVector3 centroid = std::accumulate(fDigis.cbegin(),
+                                        fDigis.cend(),
+                                        TVector3(),
+                                        [](const TVector3& c, const R3BNeulandDigi& digi)
+                                        {
+                                            return c + (digi.GetPosition() * digi.GetE());
+                                        });
+    return centroid * (1. / GetE());
 }
 
-ostream& operator<<(ostream& os, const R3BNeulandCluster& cluster)
+Double_t R3BNeulandCluster::GetEnergyMoment() const
+{
+    const TVector3 centroid = GetEnergyCentroid();
+    Double_t mom = std::accumulate(fDigis.cbegin(),
+                                   fDigis.cend(),
+                                   0.,
+                                   [&](const Double_t c, const R3BNeulandDigi& digi)
+                                   {
+                                       return c + (digi.GetPosition() - centroid).Mag() * digi.GetE();
+                                   });
+    return mom / GetE();
+}
+
+std::ostream& operator<<(std::ostream& os, const R3BNeulandCluster& cluster)
 {
     os << "R3BNeulandCluster: NeuLAND Cluster with size " << cluster.GetSize() << std::endl;
     if (cluster.GetSize() > 0)

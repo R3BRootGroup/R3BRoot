@@ -1,8 +1,8 @@
 #include "R3BNeulandDigi.h"
 
-using namespace std;
+static const Double_t c2 = 898.75517873681758374; // cm²/ns²
 
-ostream& operator<<(ostream& os, const R3BNeulandDigi& digi)
+std::ostream& operator<<(std::ostream& os, const R3BNeulandDigi& digi)
 {
     os << "R3BNeulandDigi: NeuLAND Digi in Paddle " << digi.GetPaddle() << std::endl
        << "    TdcL: " << digi.GetTdcL() << "    TdcR: " << digi.GetTdcR() << "    Time: " << digi.GetT() << std::endl
@@ -10,6 +10,13 @@ ostream& operator<<(ostream& os, const R3BNeulandDigi& digi)
        << "    Position XYZ: " << digi.GetPosition().X() << "    " << digi.GetPosition().Y() << "    "
        << digi.GetPosition().Z() << std::endl;
     return os;
+}
+
+Double_t R3BNeulandDigi::GetEToF(const Double_t mass) const
+{
+    const Double_t v2 = GetPosition().Mag2() / std::pow(GetT(), 2); // cm²/ns²
+    const Double_t gamma = 1. / std::sqrt(1. - (v2 / c2));
+    return (gamma - 1.) * mass;
 }
 
 void R3BNeulandDigi::Print(const Option_t*) const { std::cout << *this; }

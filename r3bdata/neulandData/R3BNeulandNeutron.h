@@ -11,14 +11,12 @@ class R3BNeulandNeutron : public TObject
   public:
     R3BNeulandNeutron()
         : fT(0)
-        , fE(0)
         , fPosition(TVector3(0, 0, 0))
     {
     }
 
-    R3BNeulandNeutron(const Double_t time, const Double_t energy, const TVector3& pos)
+    R3BNeulandNeutron(const Double_t time, const TVector3& pos)
         : fT(time)
-        , fE(energy)
         , fPosition(pos)
     {
     }
@@ -32,15 +30,16 @@ class R3BNeulandNeutron : public TObject
     void SetT(const Double_t time) { fT = time; }
     Double_t GetT() const { return fT; }
 
-    void SetE(const Double_t energy) { fE = energy; }
-    Double_t GetE() const { return fE; }
-
     void SetPosition(const TVector3& position) { fPosition = position; }
     TVector3 GetPosition() const { return fPosition; }
 
+    Double_t GetEtot() const;
+    Double_t GetEkin() const;
+    Double_t GetGamma() const;
+    TVector3 GetP() const;
+
   protected:
     Double_t fT;
-    Double_t fE;
     TVector3 fPosition;
 
   public:

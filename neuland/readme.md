@@ -94,7 +94,7 @@ In addition, some control histograms are created, while most control histograms 
 
 Clustering is the process of grouping Objects together by a specified condition. 
 
-The task `R3BNeulandClusterFinder` uses the  implementation in `Neuland::ClusteringEngine` of what can be called *handshake-chain clustering*, were a cluster is finished if all of the Digis in it have no neighbor that is not in the cluster.
+The task `R3BNeulandClusterFinder` uses the  implementation in `Neuland::ClusteringEngine` of what can be called *handshake-chain clustering*, where a cluster is finished if all of the Digis in it have no neighbor that is not in the cluster.
 
 The task takes the TClonesArray NeulandDigis(`R3BNeulandDigi`) and fills TClonesArray NeulandClusters(`R3BNeulandCluster`).
 

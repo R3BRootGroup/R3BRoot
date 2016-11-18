@@ -1,6 +1,7 @@
 #include "R3BNeuland.h"
 
 #include "R3BNeulandPoint.h"
+#include "R3BNeulandPixel.h"
 #include "R3BNeulandGeoPar.h"
 #include "R3BMCStack.h"
 
@@ -16,7 +17,7 @@
 #include "TGeoManager.h"
 #include "TGeoBBox.h"
 
-// Initialise variables from Birk' s Law
+// Initialize variables from Birk' s Law
 static constexpr Double_t BirkdP = 1.032;
 static constexpr Double_t BirkC1 = 0.013 / BirkdP;
 static constexpr Double_t BirkC2 = 9.6e-6 / (BirkdP * BirkdP);
@@ -45,6 +46,7 @@ R3BNeuland::R3BNeuland()
     : R3BDetector("R3BNeuland", kTRUE, kNEULAND)
     , fNeulandPoints(new TClonesArray("R3BNeulandPoint"))
     , fNeulandPrimaryNeutronInteractionPoints(new TClonesArray("FairMCPoint"))
+    , fNeulandPrimaryNeutronInteractionPixel(new TClonesArray("R3BNeulandPixel"))
 {
 }
 
@@ -52,6 +54,7 @@ R3BNeuland::R3BNeuland(const char* name, Bool_t active)
     : R3BDetector(name, active, kNEULAND)
     , fNeulandPoints(new TClonesArray("R3BNeulandPoint"))
     , fNeulandPrimaryNeutronInteractionPoints(new TClonesArray("FairMCPoint"))
+    , fNeulandPrimaryNeutronInteractionPixel(new TClonesArray("R3BNeulandPixel"))
 {
 }
 
@@ -161,8 +164,12 @@ void R3BNeuland::PostTrack()
                                                                                mom.Vect(),
                                                                                pos.T() * 1.0e09,
                                                                                gMC->TrackLength(),
-                                                                               mom.E(),
+                                                                               mom.E() - gMC->ParticleMass(2112),
                                                                                gMC->CurrentEvent());
+
+            const TVector3 pixel = fNeulandGeoPar->ConvertGlobalToPixel(pos.Vect());
+            new ((*fNeulandPrimaryNeutronInteractionPixel)[fNeulandPrimaryNeutronInteractionPixel->GetEntries()])
+                R3BNeulandPixel(pixel.X(), pixel.Y(), pixel.Z(), 0, pos.T() * 1.0e09);
         }
     }
 }
@@ -182,7 +189,6 @@ TClonesArray* R3BNeuland::GetCollection(Int_t iColl) const
 {
     if (iColl == 0)
     {
-        // return fNeulandPoints.get();
         return fNeulandPoints;
     }
     return nullptr;
@@ -190,12 +196,11 @@ TClonesArray* R3BNeuland::GetCollection(Int_t iColl) const
 
 void R3BNeuland::Register()
 {
-    // FairRootManager::Instance()->Register("NeulandPoints", GetName(), fNeulandPoints.get(), kTRUE);
     FairRootManager::Instance()->Register("NeulandPoints", GetName(), fNeulandPoints, kTRUE);
-    // FairRootManager::Instance()->Register("NeulandPrimaryNeutronInteractionPoints", GetName(),
-    // fNeulandPrimaryNeutronInteractionPoints.get(), kTRUE);
     FairRootManager::Instance()->Register(
         "NeulandPrimaryNeutronInteractionPoints", GetName(), fNeulandPrimaryNeutronInteractionPoints, kTRUE);
+    FairRootManager::Instance()->Register(
+        "NeulandPrimaryNeutronInteractionPixels", GetName(), fNeulandPrimaryNeutronInteractionPixel, kTRUE);
 }
 
 void R3BNeuland::Print(Option_t*) const
@@ -210,6 +215,7 @@ void R3BNeuland::Reset()
 {
     fNeulandPoints->Clear();
     fNeulandPrimaryNeutronInteractionPoints->Clear();
+    fNeulandPrimaryNeutronInteractionPixel->Clear();
     ResetValues();
 }
 
@@ -243,7 +249,7 @@ void R3BNeuland::WriteParameterFile()
 {
 
     FairRuntimeDb* rtdb = FairRun::Instance()->GetRuntimeDb();
-    R3BNeulandGeoPar* par = (R3BNeulandGeoPar*)rtdb->getContainer("R3BNeulandGeoPar");
+    fNeulandGeoPar = (R3BNeulandGeoPar*)rtdb->getContainer("R3BNeulandGeoPar");
 
     // Really bad way to find the Neuland *node* (not the volume!)
     TGeoNode* geoNodeNeuland = nullptr;
@@ -261,8 +267,8 @@ void R3BNeuland::WriteParameterFile()
         LOG(FATAL) << "volNeuland not found" << FairLogger::endl;
     }
 
-    par->SetNeulandGeoNode(geoNodeNeuland);
-    par->setChanged();
+    fNeulandGeoPar->SetNeulandGeoNode(geoNodeNeuland);
+    fNeulandGeoPar->setChanged();
 }
 
 ClassImp(R3BNeuland);

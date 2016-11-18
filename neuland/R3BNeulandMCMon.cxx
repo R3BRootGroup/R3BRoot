@@ -3,7 +3,10 @@
 #include <iostream>
 #include <string>
 
+#include "TH1D.h"
+#include "TH2D.h"
 #include "TH3D.h"
+#include "TDirectory.h"
 
 #include "FairRootManager.h"
 #include "FairLogger.h"
@@ -35,16 +38,28 @@ InitStatus R3BNeulandMCMon::Init()
     fMCTracks = (TClonesArray*)rm->GetObject("MCTrack");
     if (fMCTracks == nullptr)
     {
-        LOG(FATAL) << "R3BNeulandDigiMon: No MCTrack!" << FairLogger::endl;
+        LOG(FATAL) << "R3BNeulandMCMon: No MCTrack!" << FairLogger::endl;
         return kFATAL;
     }
 
     fNeulandPoints = (TClonesArray*)rm->GetObject("NeulandPoints");
     if (fNeulandPoints == nullptr)
     {
-        LOG(FATAL) << "R3BNeulandDigiMon: No NeulandPoints!" << FairLogger::endl;
+        LOG(FATAL) << "R3BNeulandMCMon: No NeulandPoints!" << FairLogger::endl;
         return kFATAL;
     }
+
+    fNPNIPs = (TClonesArray*)rm->GetObject("NeulandPrimaryNeutronInteractionPoints");
+    if (fNeulandPoints == nullptr)
+    {
+        LOG(FATAL) << "R3BNeulandMCMon: No NeulandPrimaryNeutronInteractionPoints!" << FairLogger::endl;
+        return kFATAL;
+    }
+
+    fhNPNIPsEToFVSTime =
+        new TH2D("NPNIPEToFVSTime", "NPNIP E_{ToF} vs. NPNIP Time", 100, 0, 1000, 500, 0, 500);
+    fhNPNIPsEToFVSTime->GetXaxis()->SetTitle("NPNIP E_{ToF} [MeV]");
+    fhNPNIPsEToFVSTime->GetYaxis()->SetTitle("NPNIP t [ns]");
 
     fhPDG = new TH1D("hPDG",
                      "Number of particles by PDG code created by primary neutron interaction resulting in a point",
@@ -63,6 +78,7 @@ InitStatus R3BNeulandMCMon::Init()
         "hE_secondary_neutrons", "Energy of neutron tracks created by primary neutron interaction", 6000, 0, 6000);
     fhMotherIDs = new TH1D("hmotherIDs", "MotherIDs", 6001, -1, 6000);
     fhPrimaryDaughterIDs = new TH1D("hprimary_daughter_IDs", "IDs of tracks with a primary mother", 6001, -1, 6000);
+    fhMCToF = new TH1D("fhMCToF", "Energy of primary Neutron - ToF Energy from PNIPS", 2001, -1000, 1000);
 
     if (fIs3DTrackEnabled)
     {
@@ -82,8 +98,8 @@ InitStatus R3BNeulandMCMon::Init()
 void R3BNeulandMCMon::Exec(Option_t*)
 {
 
-    /* raw MC Track based analysis */
     {
+        /* raw MC Track based analysis */
         const UInt_t nTracks = fMCTracks->GetEntries();
         R3BMCTrack* mcTrack;
 
@@ -106,11 +122,31 @@ void R3BNeulandMCMon::Exec(Option_t*)
                 fhEPrimaryNeutrons->Fill(GetKineticEnergy(mcTrack));
             }
 
-            // Remaining energy of neutrpns after first interaction
+            // Remaining energy of neutrons after first interaction
             if (IsMotherPrimaryNeutron(mcTrack) && mcTrack->GetPdgCode() == 2112)
             {
                 fhESecondaryNeutrons->Fill(GetKineticEnergy(mcTrack));
             }
+        }
+
+        const UInt_t nNPNIPs = fNPNIPs->GetEntries();
+        FairMCPoint* npnip;
+        for (UInt_t i = 0; i < nNPNIPs; i++)
+        {
+            npnip = (FairMCPoint*)fNPNIPs->At(i);
+
+            // WIP: ToF Calculation -> Should respect other origin than 0,0,0,0.
+            const Double_t s2 =
+                std::pow(npnip->GetX(), 2) + std::pow(npnip->GetY(), 2) + std::pow(npnip->GetZ(), 2); // cm²
+            const Double_t v2 = s2 / std::pow(npnip->GetTime(), 2);                                   // ns²
+
+            const Double_t c2 = 898.75517873681758374898; // cm²/ns²
+            const Double_t massNeutron = 939.565379;      // MeV/c²
+            const Double_t ETimeOfFlight = massNeutron * ((1. / std::sqrt(1 - (v2 / c2))) - 1);
+
+            mcTrack = (R3BMCTrack*)fMCTracks->At(npnip->GetTrackID());
+            fhNPNIPsEToFVSTime->Fill(ETimeOfFlight, npnip->GetTime());
+            fhMCToF->Fill(GetKineticEnergy(mcTrack) - ETimeOfFlight);
         }
     }
 
@@ -215,6 +251,12 @@ void R3BNeulandMCMon::Exec(Option_t*)
 
 void R3BNeulandMCMon::Finish()
 {
+    TDirectory* tmp = gDirectory;
+    FairRootManager::Instance()->GetOutFile()->cd();
+
+    gDirectory->mkdir("NeulandMCMon");
+    gDirectory->cd("NeulandMCMon");
+
     fhPDG->Write();
     fhEPrimarys->Write();
     fhEPrimaryNeutrons->Write();
@@ -223,6 +265,8 @@ void R3BNeulandMCMon::Finish()
     fhESecondaryNeutrons->Write();
     fhMotherIDs->Write();
     fhPrimaryDaughterIDs->Write();
+    fhMCToF->Write();
+    fhNPNIPsEToFVSTime->Write();
 
     for (const auto& kv : fhmEPdg)
     {
@@ -236,6 +280,8 @@ void R3BNeulandMCMon::Finish()
     {
         kv.second->Write();
     }
+
+    gDirectory = tmp;
 }
 
 ClassImp(R3BNeulandMCMon)

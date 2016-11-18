@@ -12,6 +12,8 @@
  */
 
 #include "FairTask.h"
+#include <vector>
+#include "R3BNeulandCluster.h"
 
 class TClonesArray;
 class TH1D;
@@ -27,9 +29,11 @@ class R3BNeulandClusterMon : public FairTask
     InitStatus Init();
     void Exec(Option_t* option);
     void Finish();
+    void Reset();
 
   private:
     TClonesArray* fNeulandClusters;
+    std::vector<R3BNeulandCluster> fVectorClusters;
 
     Bool_t fIs3DTrackEnabled;
     TH3D* fh3;
@@ -37,7 +41,20 @@ class R3BNeulandClusterMon : public FairTask
     TH1D* fhClusters;
     TH1D* fhClusterSize;
     TH1D* fhClusterEnergy;
+    TH1D* fhClusterEToF;
+    TH1D* fhClusterTime;
     TH2D* fhClusterNumberVSEnergy;
+    TH2D* fhClusterEToFVSEnergy;
+    TH2D* fhClusterEToFVSTime;
+    TH2D* fhClusterEVSTime;
+
+    TH2D* fhClusterForemostMinusCentroidVSEnergy;
+    TH2D* fhClusterForemostMinusMaxEnergyDigiPosVSEnergy;
+
+    TH2D* fhClusterCentroidMinusFirstDigiPosVSEnergy;
+    TH2D* fhClusterMaxEnergyDigiMinusFirstDigiPosVSEnergy;
+    TH2D* fhClusterMaxEnergyDigiMinusCentroidVSEnergy;
+    TH2D* fhClusterEnergyMomentVSEnergy;
 
     ClassDef(R3BNeulandClusterMon, 0);
 };

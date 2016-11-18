@@ -33,6 +33,7 @@ class R3BNeulandDigiMon : public FairTask
     Bool_t fIs3DTrackEnabled;
     TH3D* fh3;
 
+    TH1D* hTime;
     TH1D* hDepth;
     TH1D* hForemostEnergy;
     TH1D* hSternmostEnergy;

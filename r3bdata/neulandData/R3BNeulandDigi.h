@@ -43,7 +43,7 @@ class R3BNeulandDigi : public TObject
     // Rule of zero: Non-ownership-managing classes should not have custom
     // destructors, copy/move constructors or copy/move assignment operators.
 
-    // TODO: #ROOT6: Declare functions overrriding virtual functions overrride
+    // TODO: #ROOT6: Declare functions overriding virtual functions overrider
     void Print(const Option_t*) const; // override
 
     void SetTdcR(const Double_t time) { fTdcR = time; }
@@ -69,6 +69,8 @@ class R3BNeulandDigi : public TObject
 
     void SetPosition(const TVector3& position) { fPosition = position; }
     TVector3 GetPosition() const { return fPosition; }
+
+    Double_t GetEToF(const Double_t mass = 939.565379) const;
 
   protected:
     Int_t fPaddle;

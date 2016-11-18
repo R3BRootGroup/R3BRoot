@@ -38,6 +38,7 @@ class R3BNeulandGeoPar : public FairParGenericSet
     Double_t GetPaddleHalfLength() const;
     TVector3 ConvertToLocalCoordinates(const TVector3& position, const Int_t paddleID) const;
     TVector3 ConvertToGlobalCoordinates(const TVector3& position, const Int_t paddleID) const;
+    TVector3 ConvertGlobalToPixel(const TVector3& position) const;
 
   private:
     std::map<Int_t, TGeoNode*> fPaddleGeoNodes;

@@ -24,6 +24,7 @@
 #include <map>
 
 class TH1D;
+class TH2D;
 class TH3D;
 
 class R3BNeulandMCMon : public FairTask
@@ -41,6 +42,7 @@ class R3BNeulandMCMon : public FairTask
 
     TClonesArray* fMCTracks;
     TClonesArray* fNeulandPoints;
+    TClonesArray* fNPNIPs;
     TH1D* fhPDG;
     TH1D* fhEPrimarys;
     TH1D* fhEPrimaryNeutrons;
@@ -49,6 +51,8 @@ class R3BNeulandMCMon : public FairTask
     TH1D* fhESecondaryNeutrons;
     TH1D* fhMotherIDs;
     TH1D* fhPrimaryDaughterIDs;
+    TH1D* fhMCToF;
+    TH2D* fhNPNIPsEToFVSTime;
     std::map<Int_t, TH1D*> fhmEPdg;
     std::map<Int_t, TH1D*> fhmEtotPdg;
     std::map<Int_t, TH1D*> fhmEtotPdgRel;

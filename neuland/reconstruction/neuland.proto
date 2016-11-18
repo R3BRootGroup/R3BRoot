@@ -1,0 +1,32 @@
+syntax = "proto2";
+package Neuland;
+
+message Pixel {
+	optional int32 x = 1;
+	optional int32 y = 2;
+	optional int32 z = 3;
+	optional float e = 4;
+	optional float t = 5;
+}
+
+message Neutron {
+	optional int32 x = 1;
+	optional int32 y = 2;
+	optional int32 z = 3;
+	optional float t = 4;
+}
+
+message Digi {
+	optional int32 id = 1;
+	optional float tl = 2;
+	optional float tr = 3;
+	optional float e = 4;
+}
+
+message Event {
+	optional int32 runID = 1;
+	optional int32 eventID = 2;
+	repeated Pixel pixels = 3;
+	repeated Neutron neutrons = 4;
+	repeated Digi digis = 5;
+}
