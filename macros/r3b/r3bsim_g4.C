@@ -45,7 +45,7 @@ void r3bsim_g4()
   // ----------------------------------------------
   //     VMC Standard           kFALSE
   //     R3B Special            kTRUE;
-  Bool_t fUserPList = kTRUE;
+  Bool_t fUserPList = kFALSE;
 
   // Target type
   TString target1 = "LeadTarget";
@@ -110,5 +110,5 @@ void r3bsim_g4()
   // Main Sim function call
   r3ball(nEvents, &detGeo, target4, fEventDisplay, fMC, fGene, fUserPList,
          fR3BMagnet, 1500.,
-         OutFile, ParFile);
+         OutFile, ParFile, "", 335566);
 }
