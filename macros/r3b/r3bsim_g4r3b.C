@@ -16,7 +16,7 @@
 
 #include "r3ball.C"
 
-void r3bsim_g4()
+void r3bsim_g4r3b()
 {
   // Output files
   TString OutFile = "r3bsim_g4r3b.root";

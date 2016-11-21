@@ -145,6 +145,7 @@ void r3ball(Int_t nEvents = 1,
     //R3B Crystal Calorimeter
     R3BDetector* xball = new R3BXBall("XBall", kTRUE);
     xball->SetGeometryFileName(((TObjString*)fDetList->GetValue("CRYSTALBALL"))->GetString().Data());
+    ((R3BXBall*)xball)->SelectCollectionOption(2);
     run->AddModule(xball);
   }
   
@@ -380,6 +381,7 @@ void r3ball(Int_t nEvents = 1,
   
 
   FairLogger::GetLogger()->SetLogVerbosityLevel("LOW");
+  FairLogger::GetLogger()->SetLogScreenLevel("INFO");
 
   
   // -----   Initialize simulation run   ------------------------------------
