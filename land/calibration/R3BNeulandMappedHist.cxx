@@ -74,15 +74,11 @@ void R3BNeulandMappedHist::Exec(Option_t* option)
         for (Int_t i = 0; i < nLandMapped; i++)
         {
             hitmapped = (R3BNeulandMappedData*)fLandMappedData->At(i);
-            fh_land_mapped_is17->Fill(hitmapped->Is17());
-            if (!hitmapped->Is17())
-            {
-                fh_land_mapped_barid->Fill((hitmapped->GetPlane() - 1) * 50 + hitmapped->GetPaddle());
-                fh_land_mapped_side->Fill(hitmapped->GetSide());
-                fh_land_mapped_clock->Fill(hitmapped->GetClock());
-                fh_land_mapped_tac->Fill(hitmapped->GetTacData());
-                fh_land_mapped_qdc->Fill(hitmapped->GetQdcData());
-            }
+            fh_land_mapped_barid->Fill((hitmapped->GetPlane() - 1) * 50 + hitmapped->GetPaddle());
+            fh_land_mapped_side->Fill(hitmapped->GetSide());
+            fh_land_mapped_clock->Fill(hitmapped->GetClock());
+            fh_land_mapped_tac->Fill(hitmapped->GetTacData());
+            fh_land_mapped_qdc->Fill(hitmapped->GetQdcData());
         }
     }
 
@@ -139,7 +135,6 @@ void R3BNeulandMappedHist::CreateHistos()
 {
     fh_trigger = new TH1F("h_trigger", "Trigger", 10, -0.5, 9.5);
 
-    fh_land_mapped_is17 = new TH1F("h_land_mapped_is17", "Is 17", 4, -0.5, 3.5);
     fh_land_mapped_barid = new TH1F("h_land_mapped_barid", "Bar ID", 500, -0.5, 499.5);
     fh_land_mapped_side = new TH1F("h_land_mapped_side", "Side", 5, -0.5, 4.5);
     fh_land_mapped_clock = new TH1F("h_land_mapped_clock", "Clock count", 70, -0.5, 69.5);
@@ -164,7 +159,6 @@ void R3BNeulandMappedHist::CreateHistos()
 
     run->AddObject(fh_trigger);
 
-    run->AddObject(fh_land_mapped_is17);
     run->AddObject(fh_land_mapped_barid);
     run->AddObject(fh_land_mapped_side);
     run->AddObject(fh_land_mapped_clock);

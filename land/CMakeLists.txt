@@ -26,7 +26,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
 ${R3BROOT_SOURCE_DIR}/r3bdb/landdb
 ${R3BROOT_SOURCE_DIR}/tcal
 ${R3BROOT_SOURCE_DIR}/neuland/unpack
-${R3BROOT_SOURCE_DIR}/land/unpack
+${R3BROOT_SOURCE_DIR}/land/calibration
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -54,24 +54,21 @@ R3BNeutronCalibr2D.cxx
 R3BPrimPart.cxx
 R3BNeutronTracker2D.cxx
 R3BNeutHit.cxx
-unpack/R3BNeulandMappedHist.cxx
-#unpack/R3BLandRawAnaS438b.cxx
-#unpack/R3BLandMapping.cxx
-#unpack/R3BLandUnpack.cxx
-unpack/R3BNeulandMapped2CalPar.cxx
-unpack/R3BLandParamRead.cxx
-unpack/R3BNeulandMapped2Cal.cxx
-unpack/R3BNeulandHitHist.cxx
-#unpack/R3BNeulandCalTest.cxx
-unpack/R3BNeulandHitPar.cxx
-unpack/R3BNeulandCal2HitPar.cxx
-unpack/R3BLandCosmic1LSQR.cxx
-unpack/R3BLandCosmic1Util.cxx
-unpack/R3BNeulandParFact.cxx
-unpack/R3BNeulandCal2Hit.cxx
-unpack/R3BNeulandHitModulePar.cxx
-unpack/R3BNeulandMapped2QCalPar.cxx
-unpack/R3BNeulandQCalPar.cxx
+calibration/R3BNeulandMappedHist.cxx
+calibration/R3BNeulandMapped2CalPar.cxx
+calibration/R3BLandParamRead.cxx
+calibration/R3BNeulandMapped2Cal.cxx
+calibration/R3BNeulandHitHist.cxx
+#calibration/R3BNeulandCalTest.cxx
+calibration/R3BNeulandHitPar.cxx
+calibration/R3BNeulandCal2HitPar.cxx
+calibration/R3BLandCosmic1LSQR.cxx
+calibration/R3BLandCosmic1Util.cxx
+calibration/R3BNeulandParFact.cxx
+calibration/R3BNeulandCal2Hit.cxx
+calibration/R3BNeulandHitModulePar.cxx
+calibration/R3BNeulandMapped2QCalPar.cxx
+calibration/R3BNeulandQCalPar.cxx
 )
 
 # fill list of header files from list of source files

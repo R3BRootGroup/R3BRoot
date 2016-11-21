@@ -16,12 +16,9 @@ void run(Int_t runNumber)
     const Int_t trigger = 1;                             // 1 - onspill, 2 - offspill. -1 - all
     TString inDir = "/Users/kresan/data/s438b/lmd/";     // directory with lmd files
     TString outDir = "/Users/kresan/data/s438b/data/";   // output directory
-    TString histDir = "/Users/kresan/Sites/";            // web-server directory
 
     TString filename = inDir + strRunNumber + "_*.lmd";
     TString outputFileName = outDir + strRunNumber + "_raw.root";                  // name of output file
-    TString histFileName = histDir + "hist_s438b_" + strRunNumber + "_raw.root";   // name of file with control histograms
-    const Int_t refresh = 100000;                                                  // refresh rate for saving control histograms
     TString parFileName = outDir + "params_" + strRunNumber + "_raw.root";         // name of parameter file
 
     const Int_t updateRate = 150000;
@@ -46,7 +43,7 @@ void run(Int_t runNumber)
     FairRunOnline* run = new FairRunOnline(source);
     run->SetRunId(runNumber);
     run->SetOutputFile(outputFileName.Data());
-    run->SetGenerateHtml(kTRUE, histFileName.Data(), refresh);
+    //run->ActivateHttpServer(100000);
     // ---------------------------------------------------------------------------
 
     // Create ALADIN field map ---------------------------------------------------
@@ -58,12 +55,12 @@ void run(Int_t runNumber)
     // ---------------------------------------------------------------------------
 
     // TCAL ----------------------------------------------------------------------
-    //R3BNeulandMapped2CalPar* tcalFill = new R3BNeulandMapped2CalPar("TcalFill");
-    //tcalFill->SetUpdateRate(updateRate);
-    //tcalFill->SetMinStats(minStats);
-    //tcalFill->SetTrigger(trigger);
-    //tcalFill->SetNofModules(nModules);
-    //run->AddTask(tcalFill);
+    R3BNeulandMapped2CalPar* tcalFill = new R3BNeulandMapped2CalPar("TcalFill");
+    tcalFill->SetUpdateRate(updateRate);
+    tcalFill->SetMinStats(minStats);
+    tcalFill->SetTrigger(trigger);
+    tcalFill->SetNofModules(nModules);
+    run->AddTask(tcalFill);
 
     R3BLosMapped2CalPar* losTcalFill = new R3BLosMapped2CalPar("LosTcalFill");
     losTcalFill->SetUpdateRate(updateRate);

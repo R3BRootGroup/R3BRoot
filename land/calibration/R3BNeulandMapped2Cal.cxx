@@ -173,14 +173,7 @@ void R3BNeulandMapped2Cal::Exec(Option_t* option)
 
     if(nHits > 0)
     {
-        if( ((R3BNeulandMappedData*)fRawHit->At(0))->GetSam() == 0 )
-        {
-            MakeCal();
-        }
-        else
-        {
-            MakeCalOld();
-        }
+        MakeCal();
     }
 
     if (fPulserMode)
@@ -261,7 +254,7 @@ void R3BNeulandMapped2Cal::MakeCal()
             continue;
         }
         
-        tdc = hit2->GetCal();
+        tdc = hit2->GetStopT();
         time2 = par->GetTimeTacquila(tdc);
         if (time2 < 0. || time2 > fClockFreq)
         {
@@ -279,126 +272,6 @@ void R3BNeulandMapped2Cal::MakeCal()
             time += wlk(qdc);
         }
         new ((*fPmt)[fNPmt]) R3BNeulandCalData((iPlane-1)*50 + iPaddle, iSide, time, qdc);
-        fNPmt += 1;
-    }
-}
-
-void R3BNeulandMapped2Cal::MakeCalOld()
-{
-    Int_t nHits = fRawHit->GetEntriesFast();
-    R3BNeulandMappedData* hit;
-    R3BNeulandMappedData* hit2;
-    Int_t iPlane;
-    Int_t iPaddle;
-    Int_t iSide;
-    Int_t channel;
-    Int_t tdc;
-    R3BTCalModulePar* par;
-    Double_t time;
-    Double_t time2;
-    Int_t qdc;
-    Int_t gtb;
-    Int_t tacAddr;
-    Int_t index;
-    Int_t index2;
-
-    for (Int_t ihit = 0; ihit < nHits; ihit++)
-    {
-        hit = (R3BNeulandMappedData*)fRawHit->At(ihit);
-        if (NULL == hit)
-        {
-            continue;
-        }
-        if(! hit->Is17())
-        {
-            continue;
-        }
-        iPlane = hit->GetPlane();
-        iPaddle = hit->GetPaddle();
-        iSide = hit->GetSide();
-        if (!(par = fTcalPar->GetModuleParAt(iPlane, iPaddle, iSide)))
-        {
-            LOG(WARNING) << "R3BNeulandMapped2Cal::Exec : Tcal par not found, channel: " << iPlane << " / " << iPaddle << " / " << iSide << FairLogger::endl;
-            continue;
-        }
-
-        tdc = hit->GetTacData();
-        time = par->GetTimeTacquila(tdc);
-        if (time < 0. || time > fClockFreq)
-        {
-            LOG(ERROR) << "R3BNeulandMapped2Cal::Exec : error in time calibration: ch=" << iPlane << " / " << iPaddle << " / " << iSide << ", tdc=" << tdc
-            << ", time=" << time << FairLogger::endl;
-            continue;
-        }
-
-        gtb = hit->GetGtb();
-        tacAddr = hit->GetTacAddr();
-        index = hit->GetSam() * (MAX_TACQUILA_MODULE + 1) * (MAX_TACQUILA_GTB + 1) + gtb * (MAX_TACQUILA_MODULE + 1) + tacAddr;
-        if (fMap17Seen.find(index) != fMap17Seen.end() && fMap17Seen[index])
-        {
-            LOG(WARNING) << "R3BNeulandMapped2Cal::Exec : multiple stop signal for: GTB=" << gtb << ", TacAddr=" << tacAddr
-            << FairLogger::endl;
-            //            continue;
-        }
-        fMap17Seen[index] = kTRUE;
-        fMapStopTime[index] = time;
-        fMapStopClock[index] = hit->GetClock();
-    }
-    
-    for (Int_t khit = 0; khit < nHits; khit++)
-    {
-        hit2 = (R3BNeulandMappedData*)fRawHit->At(khit);
-        if (NULL == hit2)
-        {
-            continue;
-        }
-
-        iPlane = hit2->GetPlane();
-        iPaddle = hit2->GetPaddle();
-        iSide = hit2->GetSide();
-	qdc = hit2->GetQdcData();
-	
-        if (hit2->Is17())
-        {
-            // 17-th channel
-            continue;
-        }
-
-        if (!(par = fTcalPar->GetModuleParAt(iPlane, iPaddle, iSide)))
-        {
-            LOG(DEBUG) << "R3BNeulandMapped2Cal::Exec : Tcal par not found, channel: " << iPlane << " / " << iPaddle << " / " << iSide
-            << FairLogger::endl;
-            continue;
-        }
-
-        tdc = hit2->GetTacData();
-        time2 = par->GetTimeTacquila(tdc);
-        if (time2 < 0. || time2 > fClockFreq)
-        {
-            LOG(ERROR) << "R3BNeulandMapped2Cal::Exec : error in time calibration: ch=" << channel << ", tdc=" << tdc
-            << ", time=" << time2 << FairLogger::endl;
-            continue;
-        }
-
-        gtb = hit2->GetGtb();
-        tacAddr = hit2->GetTacAddr();
-        index2 = hit2->GetSam() * (MAX_TACQUILA_MODULE + 1) * (MAX_TACQUILA_GTB + 1) + gtb * (MAX_TACQUILA_MODULE + 1) + tacAddr;
-
-        if (fMap17Seen.find(index2) == fMap17Seen.end())
-        {
-            LOG(ERROR) << "R3BNeulandMapped2Cal::Exec : NO stop signal for: GTB=" << gtb << ", TacAddr=" << tacAddr
-            << FairLogger::endl;
-            continue;
-        }
-        
-        qdc -= fMapQdcOffset[2*((iPlane-1)*50 + iPaddle) + iSide - 1];        
-        qdc = std::max(qdc,0);
-	
-        time2 = time2 - fMapStopTime[index2] + hit2->GetClock() * fClockFreq;
-        if (fWalkEnabled)
-            time2 += wlk(qdc);
-
-        new ((*fPmt)[fNPmt]) R3BNeulandCalData((iPlane-1)*50 + iPaddle, iSide, time2, qdc);
         fNPmt += 1;
     }
 }

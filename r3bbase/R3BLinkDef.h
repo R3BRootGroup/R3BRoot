@@ -9,7 +9,6 @@
 #pragma link C++ class R3BEventHeader+;
 #pragma link C++ class R3BEventHeaderUnpack+;
 #pragma link C++ class R3BTimeStampUnpack+;
-#pragma link C++ class R3BLmdSource+;
 #pragma link C++ class R3BOnlineSpectra+;
 
 #endif

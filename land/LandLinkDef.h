@@ -21,9 +21,6 @@
 #pragma link C++ class R3BNeutHit+;
 
 #pragma link C++ class R3BNeulandMappedHist+;
-//#pragma link C++ class R3BLandRawAnaS438b+;
-//#pragma link C++ class R3BLandMapping+;
-//#pragma link C++ class R3BLandUnpack+;
 #pragma link C++ class R3BNeulandMapped2CalPar+;
 #pragma link C++ class R3BLandParamRead+;
 #pragma link C++ class R3BNeulandMapped2Cal+;

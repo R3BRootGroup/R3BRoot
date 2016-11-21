@@ -44,7 +44,6 @@ class R3BNeulandMappedHist : public FairTask
 
     TH1F* fh_trigger;
 
-    TH1F* fh_land_mapped_is17;
     TH1F* fh_land_mapped_barid;
     TH1F* fh_land_mapped_side;
     TH1F* fh_land_mapped_clock;
