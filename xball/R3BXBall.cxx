@@ -371,7 +371,7 @@ TClonesArray* R3BXBall::GetCollection(Int_t iColl) const {
     else return NULL;
   } else if(fCollectionOption == 2) {
     if (iColl == 0) return fXBallCollection;
-    if (iColl == 1) return fXBallCrystalHitCollection;
+    //if (iColl == 1) return fXBallCrystalHitCollection;
     else return NULL;
   } else return NULL;
 }
