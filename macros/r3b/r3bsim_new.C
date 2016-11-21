@@ -84,7 +84,7 @@ void r3bsim_new()
 //  detGeo.Add(new TObjString("CALIFA"),        new TObjString("califa_v14a.geo.root"));
   detGeo.Add(new TObjString("CALIFA"),        new TObjString("califa_10_v8.11.geo.root"));
 //  detGeo.Add(new TObjString("TOF"),           new TObjString("tof_v13a.geo.root"));
-//  detGeo.Add(new TObjString("MTOF"),          new TObjString("mtof_v13a.geo.root"));
+  detGeo.Add(new TObjString("MTOF"),          new TObjString("mtof_v13a.geo.root"));
 //  detGeo.Add(new TObjString("DTOF"),          new TObjString("dtof_v15a.geo.root"));
 //  detGeo.Add(new TObjString("DCH"),           new TObjString("dch_v13a.geo.root"));
   detGeo.Add(new TObjString("TRACKER"),       new TObjString("tra_v13vac.geo.root"));
@@ -110,5 +110,5 @@ void r3bsim_new()
   // Main Sim function call
   r3ball(nEvents, &detGeo, target4, fEventDisplay, fMC, fGene, fUserPList,
          fR3BMagnet, 1500.,
-         OutFile, ParFile);
+         OutFile, ParFile, "", 335566);
 }

@@ -255,7 +255,7 @@ void r3ball(Int_t nEvents = 1,
   
   // -----   Create R3B  magnetic field ----------------------------------------
   Int_t typeOfMagneticField = 0;
-  Int_t fieldScale = 1;
+  Float_t fieldScale = -0.68;
   Bool_t fVerbose = kFALSE;
   
   //NB: <D.B>
@@ -291,18 +291,30 @@ void r3ball(Int_t nEvents = 1,
   
   if (fGenerator.CompareTo("box") == 0  ) {
     // 2- Define the BOX generator
-    Int_t pdgId = 211; // pion beam
+    Int_t pdgId = 2212; // proton beam
     Double32_t theta1 = 0.;  // polar angle distribution
-    Double32_t theta2 = 7.;
-    Double32_t momentum = 0.8;
-    FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 50);
+    Double32_t theta2 = 2.;
+    Double32_t momentum = 1.3;
+    FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 3);
     boxGen->SetThetaRange(theta1, theta2);
-    boxGen->SetPRange(momentum, momentum*2.);
+    boxGen->SetPRange(momentum, momentum*1.2);
     boxGen->SetPhiRange(0, 360);
     boxGen->SetXYZ(0.0, 0.0, -1.5);
 //    boxGen->SetXYZ(0.0, 0.0, -300.);
     // add the box generator
     primGen->AddGenerator(boxGen);
+
+    // 128-Sn fragment
+    FairIonGenerator* ionGen = new FairIonGenerator(50, 128, 50, 10, 0., 0., 1.7, 0., 0., -100.);
+    primGen->AddGenerator(ionGen);
+
+    // neutrons
+    FairBoxGenerator* boxGen_n = new FairBoxGenerator(2112, 3);
+    boxGen_n->SetThetaRange(theta1, theta2);
+    boxGen_n->SetPRange(momentum, momentum*1.2);
+    boxGen_n->SetPhiRange(0, 360);
+    boxGen_n->SetXYZ(0.0, 0.0, -1.5);
+    primGen->AddGenerator(boxGen_n);
   }
   
   if (fGenerator.CompareTo("ascii") == 0  ) {
