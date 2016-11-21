@@ -15,5 +15,5 @@ SET_TESTS_PROPERTIES(r3bsim_new PROPERTIES PASS_REGULAR_EXPRESSION "TestPassed;A
 
 add_subdirectory(califa)
 add_subdirectory(land)
-add_subdirectory(unpack)
+add_subdirectory(s438b)
 add_subdirectory(neuland)

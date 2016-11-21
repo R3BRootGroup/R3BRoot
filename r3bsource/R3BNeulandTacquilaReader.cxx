@@ -82,7 +82,7 @@ Bool_t R3BNeulandTacquilaReader::Read()
                 if (tdc1 && tdc2)
                 {
                     new ((*fArray)[fArray->GetEntriesFast()])
-                        R3BNeulandMappedData(0, 0, 0, 4095 - tdc2, 63 - clock1, 4095 - tdc1, qdc, p + 1, bar, pmt + 1, kFALSE);
+                        R3BNeulandMappedData(63 - clock1, 4095 - tdc1, 4095 - tdc2, qdc, p + 1, bar, pmt + 1);
                 }
             }
         }

@@ -147,7 +147,6 @@ class R3BNeulandMapped2Cal : public FairTask
     TH1F* fh_pulser_105_2;                      /**< Resolution of one PMT. */
 
     void MakeCal();
-    void MakeCalOld();
 
   public:
     ClassDef(R3BNeulandMapped2Cal, 1)

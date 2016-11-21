@@ -35,7 +35,6 @@ R3BDetector.cxx
 R3BEventHeader.cxx
 R3BEventHeaderUnpack.cxx
 R3BTimeStampUnpack.cxx
-R3BLmdSource.cxx
 R3BOnlineSpectra.cxx
 )
 
