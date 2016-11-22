@@ -306,7 +306,8 @@ void r3ball(Int_t nEvents = 1,
     primGen->AddGenerator(boxGen);
 
     // 128-Sn fragment
-    FairIonGenerator* ionGen = new FairIonGenerator(50, 128, 50, 10, 0., 0., 1.3, 0., 0., -100.);
+    R3BIonGenerator* ionGen = new R3BIonGenerator(50, 128, 50, 10, 0., 0., 1.3);
+    ionGen->SetSpotRadius(0.1, -100., 0.);
     primGen->AddGenerator(ionGen);
 
     // neutrons
@@ -324,7 +325,9 @@ void r3ball(Int_t nEvents = 1,
   }
   
   if (fGenerator.CompareTo("r3b") == 0  ) {
-    R3BSpecificGenerator *pR3bGen = new R3BSpecificGenerator();
+    Int_t pdg = 2212;
+    Float_t beamEnergy = 1.;
+    R3BSpecificGenerator *pR3bGen = new R3BSpecificGenerator(pdg, beamEnergy);
     
     // R3bGen properties
     pR3bGen->SetBeamInteractionFlag("off");
@@ -340,9 +343,7 @@ void r3ball(Int_t nEvents = 1,
     pR3bGen->SetSimEmittanceFlag("off");
     
     // R3bGen Parameters
-    pR3bGen->SetBeamEnergy(1.); // Beam Energy in GeV
     pR3bGen->SetSigmaBeamEnergy(1.e-03); // Sigma(Ebeam) GeV
-    pR3bGen->SetParticleDefinition(2212); // Use Particle Pdg Code
     pR3bGen->SetEnergyPrim(0.3); // Particle Energy in MeV
     Int_t fMultiplicity = 50;
     pR3bGen->SetNumberOfParticles(fMultiplicity); // Mult.
