@@ -1,3 +1,6 @@
+
+void RemoveGeoManager();
+
 void run_digi_new()
 {
     // ----- Files ---------------------------------------------------------------
@@ -66,4 +69,25 @@ void run_digi_new()
     cout << " All ok " << endl;
     cout << " Digitization successful." << endl;
     // ---------------------------------------------------------------------------
+
+    RemoveGeoManager();
+}
+
+/**
+ * \ function RemoveGeoManager
+ * There are some problems when deleting our geometries. In some cases
+ * or combinations of geometries there is a double free of some memory
+ * which results in a crash of ROOT. To avoid this we have patched one
+ * ROOT class. With the newest ROOT6 version this isn't done any longer.
+ * As a workaround to avoid the crash we delete two TObjArrays ourself
+ * and then call the destructor of the TGeoManager at the end of the
+ * macro. To simplify this one also can use this function.
+ */
+void RemoveGeoManager()
+{
+  if (gROOT->GetVersionInt() >= 60602) {
+    gGeoManager->GetListOfVolumes()->Delete();
+    gGeoManager->GetListOfShapes()->Delete();
+    delete gGeoManager;
+  }
 }
