@@ -13,8 +13,8 @@
 
 #pragma link C++ class R3BKeepEventProbabilityMfi+;
 
-#pragma link C++ class R3BMfiRawHit+;
-#pragma link C++ class R3BMfiUnpack+;
+//#pragma link C++ class R3BMfiRawHit+;
+//#pragma link C++ class R3BMfiUnpack+;
 
 #endif
 
