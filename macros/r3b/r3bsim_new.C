@@ -109,6 +109,6 @@ void r3bsim_new()
 
   // Main Sim function call
   r3ball(nEvents, &detGeo, target4, fEventDisplay, fMC, fGene, fUserPList,
-         fR3BMagnet, 1500.,
+         fR3BMagnet, 2100.,
          OutFile, ParFile, "", 335566);
 }

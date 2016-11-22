@@ -256,7 +256,7 @@ void r3ball(Int_t nEvents = 1,
   
   // -----   Create R3B  magnetic field ----------------------------------------
   Int_t typeOfMagneticField = 0;
-  Float_t fieldScale = -0.68;
+  Float_t fieldScale = -0.5;
   Bool_t fVerbose = kFALSE;
   
   //NB: <D.B>
@@ -306,7 +306,7 @@ void r3ball(Int_t nEvents = 1,
     primGen->AddGenerator(boxGen);
 
     // 128-Sn fragment
-    FairIonGenerator* ionGen = new FairIonGenerator(50, 128, 50, 10, 0., 0., 1.7, 0., 0., -100.);
+    FairIonGenerator* ionGen = new FairIonGenerator(50, 128, 50, 10, 0., 0., 1.3, 0., 0., -100.);
     primGen->AddGenerator(ionGen);
 
     // neutrons
