@@ -6,7 +6,6 @@
 
 #pragma link C++ class R3BTPropagator+;
 #pragma link C++ class R3BPropagate+;
-#pragma link C++ class R3BTContFact;
 #pragma link C++ class R3BTGeoPar+;
 
 #endif

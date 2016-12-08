@@ -28,7 +28,6 @@ link_directories( ${LINK_DIRECTORIES})
 set(SRCS
 R3BTPropagator.cxx
 R3BPropagate.cxx
-R3BTContFact.cxx
 R3BTGeoPar.cxx
 )
 
