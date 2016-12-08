@@ -12,6 +12,9 @@
 #include "TClonesArray.h"
 
 #include "math.h"
+#include "TMath.h"
+
+#define IS_NAN(x) TMath::IsNaN(x)
 
 R3BLosCal2Hit::R3BLosCal2Hit()
     : FairTask("LosCal2Hit", 1)
@@ -88,18 +91,18 @@ void R3BLosCal2Hit::Exec(Option_t* option)
        Double_t y_cm  = 0.0/0.0;
        
        Double_t t_hit=0.0/0.0; // NAN
-       if ((!isnan(t_hor)) && (!isnan(t_ver))) // have all four as it should be
+       if ((!IS_NAN(t_hor)) && (!IS_NAN(t_ver))) // have all four as it should be
        {
 			t_hit=(t_hor+t_ver)/4;
 			x_cm=(calItem->fTime_r_ns-calItem->fTime_l_ns)/2.*flosVeff-flosOffsetX;
 			y_cm=(calItem->fTime_b_ns-calItem->fTime_t_ns)/2.*flosVeff-flosOffsetY;
 	   }
-	   else if (!isnan(t_hor))
+	   else if (!IS_NAN(t_hor))
 	   {
 			t_hit=t_hor/2;
 			x_cm=(calItem->fTime_r_ns-calItem->fTime_l_ns)/2.*flosVeff-flosOffsetX;
 	   }
-	   else if (!isnan(t_ver))
+	   else if (!IS_NAN(t_ver))
 	   {
 			t_hit=t_ver/2;
 			y_cm=(calItem->fTime_b_ns-calItem->fTime_t_ns)/2.*flosVeff-flosOffsetY;
