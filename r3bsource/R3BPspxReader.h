@@ -7,6 +7,7 @@ struct EXT_STR_h101_PSP_t;
 typedef struct EXT_STR_h101_PSP_t EXT_STR_h101_PSP;
 class FairLogger;
 class R3BPspxMappedPar;
+class TClonesArray;
 
 class R3BPspxReader : public R3BReader
 {
