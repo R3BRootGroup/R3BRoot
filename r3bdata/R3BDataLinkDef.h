@@ -73,6 +73,9 @@
 #pragma link C++ class R3BTofdHitData+;
 #pragma link C++ class R3BNeulandCalData+;
 #pragma link C++ class R3BActarPoint+;
+#pragma link C++ class R3BStrawtubesMappedData+;
+#pragma link C++ class R3BStrawtubesCalData+;
+#pragma link C++ class R3BStrawtubesHitData+;
 #pragma link C++ class R3BFi4MappedItem+;
 #pragma link C++ class R3BFi4CalItem+;
 #pragma link C++ class R3BFi4HitItem+;

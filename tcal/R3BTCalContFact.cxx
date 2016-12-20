@@ -49,6 +49,10 @@ void R3BTCalContFact::setAllContainers()
     FairContainer* p3 = new FairContainer("TofdTCalPar", "TOFD TCAL Calibration Parameters", "TestDefaultContext");
     p3->addContext("TestNonDefaultContext");
     containers->Add(p3);
+
+    FairContainer* p4 = new FairContainer("StrawtubesTCalPar", "Strawtubes TCAL Calibration Parameters", "TestDefaultContext");
+    p4->addContext("TestNonDefaultContext");
+    containers->Add(p4);
 }
 
 FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
@@ -70,6 +74,10 @@ FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
         p = new R3BTCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
     else if (strcmp(name, "TofdTCalPar") == 0)
+    {
+        p = new R3BTCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
+    else if (strcmp(name, "StrawtubesTCalPar") == 0)
     {
         p = new R3BTCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }

@@ -12,6 +12,7 @@
 #pragma link C++ class R3BTofdReader+;
 #pragma link C++ class R3BNeulandTamexReader+;
 #pragma link C++ class R3BNeulandTacquilaReader+;
+#pragma link C++ class R3BStrawtubesReader+;
 //#pragma link C++ class R3BFiberReader+;
 #pragma link C++ class EXT_STR_h101_unpack_t;
 #pragma link C++ class EXT_STR_h101_raw_nnp_onion_t;
