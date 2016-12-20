@@ -2,7 +2,7 @@
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 
-set(SYSTEM_INCLUDE_DIRECTORIES 
+set(SYSTEM_INCLUDE_DIRECTORIES
 ${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
 ${ucesb_INCLUDE_DIR}
@@ -17,6 +17,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
 ${R3BROOT_SOURCE_DIR}/r3bdata/fi4Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
+${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
 ${R3BROOT_SOURCE_DIR}/psp/par
 )
 
@@ -40,6 +41,7 @@ R3BLosReader.cxx
 R3BTofdReader.cxx
 R3BNeulandTamexReader.cxx
 R3BNeulandTacquilaReader.cxx
+R3BStrawtubesReader.cxx
 )
 
 Set(STRUCT_HEADERS
@@ -50,6 +52,7 @@ ext_h101_tofd.h
 ext_h101_psp.h
 #ext_h101_fi4.h
 ext_h101_raw_nnp_tamex.h
+ext_h101_strawtubes.h
 )
 
 # fill list of header files from list of source files
