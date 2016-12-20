@@ -1,0 +1,67 @@
+
+void run(Int_t runNumber, Int_t pulserRunNumber)
+{
+    TStopwatch timer;
+    timer.Start();
+
+    TString strRunNumber = "run";
+    strRunNumber += runNumber;
+    TString strPulserRunNumber = "run";
+    strPulserRunNumber += pulserRunNumber;    
+    const Int_t nModules = 800;
+    const Int_t trigger = 2;              // 1 - onspill, 2 - offspill. -1 - all
+    TString dirIn1 = "/Users/kresan/data/s438b/data/";
+    TString dirOut = "/Users/kresan/data/s438b/data/";
+
+    TString inputFileName1 	= dirIn1 + strRunNumber + "_raw.root";              		// name of input file
+    TString parFileName    	= dirIn1 + "params_" + strRunNumber + "_raw.root";  		// name of parameter file
+    TString pulsparFileName   	= dirIn1 + "params_" + strPulserRunNumber + "_QCal.root";  	// name of pulser parameter
+    TString outputFileName 	= dirOut + strRunNumber + "_tcal.root";             		// name of output file
+
+    // Create analysis run -------------------------------------------------------
+    FairRunAna* run = new FairRunAna();
+    run->SetInputFile(inputFileName1.Data());
+    run->SetOutputFile(outputFileName.Data());
+    // ---------------------------------------------------------------------------
+
+    // ----- Runtime DataBase info -----------------------------------------------
+    FairRuntimeDb* rtdb = run->GetRuntimeDb();
+    Bool_t kParameterMerged = kTRUE;
+    FairParRootFileIo* parIo1 = new FairParRootFileIo(kParameterMerged);
+    parIo1->open(parFileName);
+    FairParRootFileIo* parIo2 = new FairParRootFileIo(kParameterMerged);
+    parIo2->open(pulsparFileName);
+    rtdb->setFirstInput(parIo1);
+    rtdb->setSecondInput(parIo2);
+    rtdb->addRun(runNumber);   
+    rtdb->getContainer("NeulandQCalPar");
+    rtdb->setInputVersion(runNumber, (char*)"NeulandQCalPar", 1, 2);
+    // ---------------------------------------------------------------------------
+
+    // Time calibration ----------------------------------------------------------
+    R3BNeulandMapped2Cal* landTcal = new R3BNeulandMapped2Cal("LandTcal", 1);
+    landTcal->SetTrigger(trigger);
+    landTcal->SetNofModules(nModules);
+    landTcal->EnableWalk(kTRUE);
+    run->AddTask(landTcal);
+    // ---------------------------------------------------------------------------
+
+    // Initialize ----------------------------------------------------------------
+    run->Init();
+    FairLogger::GetLogger()->SetLogScreenLevel("INFO");
+    // ---------------------------------------------------------------------------
+
+    // Run -----------------------------------------------------------------------
+    run->Run();
+    // ---------------------------------------------------------------------------
+
+    timer.Stop();
+    Double_t rtime = timer.RealTime();
+    Double_t ctime = timer.CpuTime();
+    cout << endl << endl;
+    cout << "Macro finished succesfully." << endl;
+    cout << "Output file is " << outputFileName << endl;
+    cout << "Parameter file is " << parFileName << endl;
+    cout << "Real time " << rtime << " s, CPU time " << ctime << "s" << endl << endl;
+}
+

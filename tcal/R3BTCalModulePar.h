@@ -62,6 +62,11 @@ class R3BTCalModulePar : public FairParGenericSet
     void printParams();
 
     /**
+     * A method to draw vaues of parameters on the current Canvas.
+     */
+    void DrawParams();
+
+    /**
      * Member function for converting TDC value into time [ns]
      * using calibration parameters for TACQUILA electronics.
      * @param tdc a TDC value.
@@ -78,9 +83,13 @@ class R3BTCalModulePar : public FairParGenericSet
     Double_t GetTimeVFTX(Int_t tdc);
 
     /** Accessor functions **/
-    Int_t GetModuleId() const
+    Int_t GetPlane() const
     {
-        return fModuleId;
+        return fPlane;
+    }
+    Int_t GetPaddle() const
+    {
+        return fPaddle;
     }
     Int_t GetSide() const
     {
@@ -106,9 +115,13 @@ class R3BTCalModulePar : public FairParGenericSet
     {
         return fBinUp[i];
     }
-    void SetModuleId(Int_t i)
+    void SetPlane(Int_t i)
     {
-        fModuleId = i;
+        fPlane = i;
+    }
+    void SetPaddle(Int_t i)
+    {
+        fPaddle = i;
     }
     void SetSide(Int_t i)
     {
@@ -136,7 +149,8 @@ class R3BTCalModulePar : public FairParGenericSet
     }
 
   private:
-    Int_t fModuleId;          /**< Index of a detector module. */
+    Int_t fPlane;             /**< Index of a plane. */
+    Int_t fPaddle;            /**< Index of a paddle. */
     Int_t fSide;              /**< Side of a module: for NeuLAND - L/R PMT. */
     Int_t fNofChannels;       /**< Number of calibration parameters. */
     Int_t fBinLow[NCHMAX];    /**< Lower TDC range of a linear segment. */

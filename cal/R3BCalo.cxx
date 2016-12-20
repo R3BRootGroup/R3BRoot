@@ -145,7 +145,17 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
+#define U_MEV 931.4940954
 
+inline double BETA(const double M, const double E_kin)
+{
+  return sqrt(1. - M*M/((M+E_kin)*(M+E_kin)));
+}
+
+inline double GAMMA(const double M, const double E_kin)
+{
+  return 1. + E_kin/M;
+}
 
 // -----   Default constructor   -------------------------------------------
 R3BCalo::R3BCalo() : R3BDetector("R3BCalo", kTRUE, kCALIFA)
@@ -183,37 +193,41 @@ R3BCalo::R3BCalo(const char* name, Bool_t active)
   fNonUniformity = 0.;
   fGeometryVersion = 1;
 
-  tf_p_dNs = new TF1("tf_p_dNs","-[0]*[1]*exp(-[1]*(x-[3]))+[2]",0,1000);
-  tf_p_dNf = new TF1("tf_p_dNf","-[0]*[1]*exp(-[1]*(x-[3]))+[2]",0,1000);
-  tf_g_dNs = new TF1("tf_g_dNs","[2]",0,1000);
-  tf_g_dNf = new TF1("tf_g_dNf","[2]",0,1000);
+//  tf_p_dNs = new TF1("tf_p_dNs","-[0]*[1]*exp(-[1]*(x-[3]))+[2]",0,1000);
+//  tf_p_dNf = new TF1("tf_p_dNf","-[0]*[1]*exp(-[1]*(x-[3]))+[2]",0,1000);
+//  tf_g_dNs = new TF1("tf_g_dNs","[2]",0,1000);
+//  tf_g_dNf = new TF1("tf_g_dNf","[2]",0,1000);
+//
+//  tf_p_dNs->SetParameter(0,18.88 / 7.46);
+//  tf_p_dNs->SetParameter(1,0.0868);
+//  tf_p_dNs->SetParameter(2,4.228 / 7.46);
+//  tf_p_dNs->SetParameter(3,0);
+//
+//  tf_p_dNf->SetParameter(0,-18.88 / 7.46);
+//  tf_p_dNf->SetParameter(1,0.0868);
+//  tf_p_dNf->SetParameter(2,3.232 / 7.46);
+//  tf_p_dNf->SetParameter(3,0);
+//
+//  // tf_p_dNs->SetParameter(0,18.88);
+//  // tf_p_dNs->SetParameter(1,0.0868);
+//  // tf_p_dNs->SetParameter(2,4.228);
+//  // tf_p_dNs->SetParameter(3,4.117);
+//  // tf_p_dNs->SetParameter(4,4.259);
+//
+//  // tf_p_dNf->SetParameter(0,-32.66);
+//  // tf_p_dNf->SetParameter(1,0.07729);
+//  // tf_p_dNf->SetParameter(2,3.155);
+//  // tf_p_dNf->SetParameter(3,0);
+//  // tf_p_dNf->SetParameter(4,-3.947);
+//
+//  tf_g_dNs->SetParameter(2, tf_p_dNs->GetParameter(2));
+//  tf_g_dNf->SetParameter(2, tf_p_dNf->GetParameter(2));
 
-  tf_p_dNs->SetParameter(0,18.88 / 7.46);
-  tf_p_dNs->SetParameter(1,0.0868);
-  tf_p_dNs->SetParameter(2,4.228 / 7.46);
-  tf_p_dNs->SetParameter(3,0);
+  tf_dNf_dE = new TF1("tf_dNf_dE", "1./([0]+[1]*(x^[2])+[3]/(x^[4]))");
+  tf_dNs_dE = new TF1("tf_dNs_dE", "1./([0]+[1]*(x^[2])+[3]/(x^[4]))");
 
-  tf_p_dNf->SetParameter(0,-18.88 / 7.46);
-  tf_p_dNf->SetParameter(1,0.0868);
-  tf_p_dNf->SetParameter(2,3.232 / 7.46);
-  tf_p_dNf->SetParameter(3,0);
-
-
-
-  // tf_p_dNs->SetParameter(0,18.88);
-  // tf_p_dNs->SetParameter(1,0.0868);
-  // tf_p_dNs->SetParameter(2,4.228);
-  // tf_p_dNs->SetParameter(3,4.117);
-  // tf_p_dNs->SetParameter(4,4.259);
-
-  // tf_p_dNf->SetParameter(0,-32.66);
-  // tf_p_dNf->SetParameter(1,0.07729);
-  // tf_p_dNf->SetParameter(2,3.155);
-  // tf_p_dNf->SetParameter(3,0);
-  // tf_p_dNf->SetParameter(4,-3.947);
-
-  tf_g_dNs->SetParameter(2, tf_p_dNs->GetParameter(2));
-  tf_g_dNf->SetParameter(2, tf_p_dNf->GetParameter(2));
+  tf_dNf_dE->SetParameters(-1.79, 1.36e-2, 7.84e-1, 4.97, 1.75e-1);
+  tf_dNs_dE->SetParameters(-1.24e2, 6.3e-3, 1.27, 1.262e2, 2.3e-3);
 
 }
 // -------------------------------------------------------------------------
@@ -233,10 +247,12 @@ R3BCalo::~R3BCalo()
     fCaloCrystalHitCollection->Delete();
     delete fCaloCrystalHitCollection;
   }
-  delete tf_p_dNs;
-  delete tf_p_dNf;
-  delete tf_g_dNs;
-  delete tf_g_dNf;
+//  delete tf_p_dNs;
+//  delete tf_p_dNf;
+//  delete tf_g_dNs;
+//  delete tf_g_dNf;
+  delete tf_dNf_dE;
+  delete tf_dNs_dE;
 }
 // -------------------------------------------------------------------------
 void R3BCalo::Initialize()
@@ -270,7 +286,10 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
       sCrystalInfo tmpInfo;
       memset(&tmpInfo, 0, sizeof(sCrystalInfo));
       if(GetCrystalInfo(tmpInfo))
+      {
         fCrystal = &(fCrystalMap[nodeId] = tmpInfo);
+        fCrystal->density = gGeoManager->GetCurrentVolume()->GetMaterial()->GetDensity();
+      }
       else
         fCrystal = NULL;
     }
@@ -302,14 +321,36 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
     fLength = gMC->TrackLength();
     gMC->TrackPosition(fPosIn);
     gMC->TrackMomentum(fMomIn);
-    fEinc   = gMC->Etot();                  //be aware!! Relativistic mass!
+    fEinc   = gMC->Etot() - gMC->TrackMass();                  //be aware!! Relativistic mass!
   }
   
   // Sum energy loss for all steps in the active volume
   Double_t dE = gMC->Edep() * 1000.;         //in MeV
   Double_t post_E = (gMC->Etot() - gMC->TrackMass()) * 1000.;      //in MeV
   TString ptype = gMC->GetStack()->GetCurrentTrack()->GetName();
+  Double_t dx = gMC->TrackStep() * fCrystal->density;
 
+  Double_t M_in = gMC->TrackMass()*1000.;
+  Double_t A_in = M_in/U_MEV;
+  Double_t Z_in = gMC->TrackCharge();
+
+  const double Z_CsI = 54.;
+  const double A_CsI = 129.905; // g/mol
+  const double E_delta = 5.30227; //MeV
+  const double m_e = .5109989461; //MeV
+  const double slope_e = 1.33055;
+  const double K = .307075; // MeV cm**2/mol
+  //quenching
+  const double q_1 = 0.0396113;
+  const double q_2 = -0.0828619;
+  const double q_3 = 0.780435;
+
+  fELoss += dE / 1000.;       //back to GeV
+
+  if(dE > 0 && dx > 0)
+  {
+
+//    cout << ptype << " E = " << post_E << " MeV, dE = " << dE << " MeV, dx = " << dx << " g/cm**2" << ", dE/dx = " << (dE/dx) << " MeV cm**2/g" << endl;
 
   if(fCrystal->fEndcapIdentifier == 1) {
     //CC Phoswich
@@ -325,20 +366,59 @@ Bool_t R3BCalo::ProcessHits(FairVolume* vol)
   }
     
   } else if (fCrystal->fEndcapIdentifier == 0)  {
-    if(ptype == "proton") {
-      fNs += tf_p_dNs->Integral(post_E, post_E + dE);
-      fNf += tf_p_dNf->Integral(post_E, post_E + dE);
-    } else if (ptype == "e-" || ptype == "e+" || ptype == "gamma") {
-      fNs += tf_g_dNs->Integral(post_E, post_E + dE);
-      fNf += tf_g_dNf->Integral(post_E, post_E + dE);
-    } else {
-      //to be continued
-    }
+//    if (ptype == "e-" || ptype == "e+" || ptype == "gamma") {
+//      fNs += tf_g_dNs->Integral(post_E, post_E + dE);
+//      fNf += tf_g_dNf->Integral(post_E, post_E + dE);
+//    } else if(ptype == "proton") {
+//      fNs += tf_p_dNs->Integral(post_E, post_E + dE);
+//      fNf += tf_p_dNf->Integral(post_E, post_E + dE);
+//    }
+
+      if(ptype != "gamma" && post_E >= A_in*E_delta)
+      {
+	    double beta_cut = BETA(M_in, A_in*E_delta);
+	    double gamma_cut = GAMMA(M_in, A_in*E_delta);
+	    double beta = BETA(M_in, post_E);
+	    double gamma = GAMMA(M_in, post_E);
+	    double T_cut = 2.*m_e*beta_cut*beta_cut*gamma_cut*gamma_cut/(1.+2.*gamma_cut*m_e/M_in+(m_e/M_in)*(m_e/M_in));
+	    double T_max = 2.*m_e*beta*beta*gamma*gamma/(1.+2.*gamma*m_e/M_in+(m_e/M_in)*(m_e/M_in));
+	    double C = 0.5*K*Z_in*Z_in*Z_CsI/(A_CsI*beta*beta);
+	    
+	    //quenching
+	    double part1 = q_1/q_2 * (1/T_max - 1/T_cut + (log(T_cut/T_max) + log((T_max - q_2)/(T_cut - q_2))/q_2));
+	    double part2 = q_1 * beta * beta/T_max * (log(T_cut/T_max) + log((T_max - q_2)/(T_cut - q_2))/q_2);
+	    double N = 1/T_cut - 1/T_max - (beta*beta)/T_max * log(T_max/T_cut);
+	    double part3 = q_3 * N;
+	    double scaling = 1.;
+
+	    double dE_dxe = C*(log(T_max/T_cut) - beta*beta*(T_max - T_cut)/T_max);
+	    double dE_e = dE_dxe * dx;
+	    if(dE_e > dE){
+	      dE_e = dE;
+	    } 
+	    if(T_max < 2.){
+	      scaling = (part1 + part2 + part3)/N;
+	    }
+	    else{
+	      scaling = q_3;
+	    }
+
+//            cout << "  dE_e = " << dE_e << " MeV, N = " << N << ", scaling = " << scaling << endl;
+
+	    //std::cout << T_max << "  " << scaling << std::endl;
+	    fNf += (dE_e*scaling/(1+slope_e))/1000.;
+	    fNs += (dE_e*scaling/(1./slope_e + 1))/1000.;
+	    dE -= dE_e;
+      }
+
+    fNf += tf_dNf_dE->Eval(dE/dx)*dE/1000.;
+    fNs += tf_dNs_dE->Eval(dE/dx)*dE/1000.;
   } else {
     LOG(ERROR) << "R3BCalo: fEndcapIdentifier not valid in R3BCalo::ProcessHits(). " 
 		    << FairLogger::endl;
   }
-  fELoss += dE / 1000.;       //back to GeV
+  }
+  
   fNSteps++;
 
   // Set additional parameters at exit of active volume. Create R3BCaloPoint.

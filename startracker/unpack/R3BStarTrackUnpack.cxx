@@ -37,6 +37,7 @@ R3BStarTrackUnpack::R3BStarTrackUnpack(char *strTraDir,
 fRawData(new TClonesArray("R3BStarTrackRawHit")),
 fNHits(0)
 {
+  //  LOG(INFO) << "Subcrate=" << subCrate << endl;
 }
 
 
@@ -164,7 +165,7 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
     UInt_t adcData=0;  // adc value for energy loss in Si
     */
 
-    if( pl_data[0]==0x00000200)
+    if( pl_data[0]==0x00000200)   // identifiant du Silicon tracker
       {
 
 	while(l_s < size) { 
@@ -174,12 +175,26 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 	  //for (Int_t i1 = 0; i1 < 2; i1++)   
 	  //{ 
 
-	      if( ( ( (pl_data[l_s] >> 30) & 0x3) == 0x2) && ( ((pl_data[l_s] & 0xFFFFFFFF) != 0xFFFFFFFF)))  
+	  //
+	  // Only do a reset in order to check that the same number of time info_code=4 (7,14) and info code =5 (8,15)
+	  // 
+	  /*
+	    info_code=0;
+	    info_field=0;
+	    tsExt_lb=tsExt_hb=tsExt_vhb=0;
+	    ts_hb=0;
+	    ts_vhb=0;
+	    adcData=0;
+	    ts_lb=0;
+	 */  
+
+	  if( ( ( (pl_data[l_s] >> 30) & 0x3) == 0x2) && ( ((pl_data[l_s] & 0xFFFFFFFF) != 0xFFFFFFFF)))  // word type 2
 		{ 
 		  
 
 		  wordtype = (pl_data[l_s] >> 30) & 0x3; // bit 31:30
-		  
+		  //cout << "wordtype=" << wordtype << endl;
+
 		  //info_code = (pl_data[l_s] >> 20) & 0x0000000F; //bits 20:23
 		  
 		  info_code = (pl_data[l_s] & 0x00F00000) >> 20; //bits 20:23
@@ -188,7 +203,10 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 		  
 		  //tsExt_lb = (pl_data[(l_s+1)] & 0x0FFFFFFF); // low bit timestamp from master trigger  (To be checked)
 		  
-		  if(info_code == 4 || info_code == 7) ts_hb=info_field; 
+		  if(info_code == 4 || info_code == 7) {
+		    ts_hb=info_field;
+		    ts_code47_lb=(pl_data[l_s+1] & 0x0FFFFFFF); 
+		  } 
 		  if(info_code == 5 || info_code == 8) ts_vhb=info_field;
 		  //if(info_code == 7) ts_hb=info_field; 
 		  //if(info_code == 8) ts_vhb=info_field;
@@ -209,28 +227,26 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 
 		  l_s +=2;
 
-		  //new ((*fRawData)[fNHits]) R3BStarTrackRawHit(WR,WRlb, wordtype, hitbit, module_id, side, asic_id, strip_id, adcData, ts, ts_lb, tsExt, tsExt_lb,info_field, info_code);
-		  //fNHits++;
-		  new ((*fRawData)[fNHits]) R3BStarTrackRawHit(WRvhb,WRhb,WRlb, wordtype, hitbit, module_id, side, asic_id, strip_id, adcData, ts_vhb, ts_hb, ts_lb, tsExt_vhb, tsExt_hb, tsExt_lb,info_field, info_code);
+		  // filling the Raw hit TClonesArray for word type 2  
+		  new ((*fRawData)[fNHits]) R3BStarTrackRawHit(WRvhb,WRhb,WRlb, wordtype, hitbit, module_id, side, asic_id, strip_id, adcData, ts_vhb, ts_hb, ts_lb, tsExt_vhb, tsExt_hb, tsExt_lb,ts_code47_lb,info_field, info_code);
 		  fNHits++;
 
 		  //
-		  // reseting in order to check that the same number of time info_code=4 (7,14) and info code = 5 (8,15)
-		  // 
-		  info_code=0;
-		  info_field=0;
+		  // reset after filled the TClonesArray
+		  //
+		  info_code=info_field=0;
 		  tsExt_lb=tsExt_hb=tsExt_vhb=0;
 		  ts_hb=0;
 		  ts_vhb=0;
 
-		}else if(((pl_data[l_s] >> 30) & 0x3) == 0x3 && ( (pl_data[l_s] & 0xFFFFFFFF) != 0xFFFFFFFF ))
+		}else if(((pl_data[l_s] >> 30) & 0x3) == 0x3 && ( (pl_data[l_s] & 0xFFFFFFFF) != 0xFFFFFFFF ))  // word of type 3
 		{
 
 		  //LOG(INFO) << " pl_data[l_s]: " <<  ((pl_data[l_s] >> 30) & 0x3)  << FairLogger::endl;
 		  
 		  //LOG(INFO) << "R3BSTaRTrackUnpack :   wordB :" <<  (pl_data[l_s] & 0xC0000000) << FairLogger::endl;
 		  
-		  // wordtype=11;
+		  // wordtype=11 <=> 3 ;
 		  wordtype = (pl_data[l_s] >> 30) & 0x3; // bit 31:30
 		  if(wordtype!=3) cout << wordtype << endl;
 		  
@@ -258,8 +274,9 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 		  
 
 		  
-		  // if S438 data (Oct 2014 data): 
-		  //cout << "ts_init=" << pl_data[l_s+1] << endl;
+		  // if S438 data (Oct 2014 data):
+		  /* 
+		  //cout << "ts_init=" << (pl_data[l_s+1] & 0x0FFFFFFF)  << endl;
  		  ts_lb_part1 = pl_data[l_s+1] & 0x00000003; //take the 2 first less significant  bits;
 		  //cout << "ts_lb_part1=" << ts_lb_part1 << endl;
 		  ts_lb_part2= (pl_data[l_s+1] >> 2) & 0x00000FFF; // take the 12 bits after a shift of 2 bits
@@ -269,10 +286,12 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 		  ts_lb_part3 = pl_data[l_s+1] & 0x0FFFC000; //from bit 14 to 27;
 		  //cout << "ts_lb_part3=" << ts_lb_part3 << endl;
 		  ts_lb= (((ts_lb_part3 >> 2) + ts_lb_part2_inv) << 2)  + ts_lb_part1 ;
+		  */
 		  //cout << "ts_lb end=" << ts_lb << endl;
 		  
 		  // if not S438 data (ie after Oct 2014):
-		  //ts_lb= pl_data[l_s+1] & 0x0FFFFFFF;  // low bit time stamp in Silicon
+		  ts_lb= pl_data[l_s+1] & 0x0FFFFFFF;  // low bit time stamp in Silicon
+
 
 	          //LOG(INFO) << "R3BSTaRTrackUnpack :   pl_data[ls+1]:" << pl_data[l_s+1] << FairLogger::endl;
 		  
@@ -286,13 +305,14 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 		  //new ((*fRawData)[fNHits]) R3BStarTrackRawHit(WR,WRlb, wordtype, hitbit, module_id, side, asic_id, strip_id, adcData, ts, ts_lb, tsExt, tsExt_lb,info_field, info_code);
 		  //fNHits++;
 
-		  new ((*fRawData)[fNHits]) R3BStarTrackRawHit(WRvhb,WRhb,WRlb, wordtype, hitbit, module_id, side, asic_id, strip_id, adcData, ts_vhb, ts_hb, ts_lb, tsExt_vhb, tsExt_hb, tsExt_lb,info_field, info_code);
+
+		  // Filling the TCloneArray for word type 3
+		  new ((*fRawData)[fNHits]) R3BStarTrackRawHit(WRvhb,WRhb,WRlb, wordtype, hitbit, module_id, side, asic_id, strip_id, adcData, ts_vhb, ts_hb, ts_lb, tsExt_vhb, tsExt_hb, tsExt_lb,ts_code47_lb, info_field, info_code);
 		  fNHits++;
 
-		  // Resetting:
+		  // Resetting after filling the TClonesArray:
        		  adcData=0;
       		  ts_lb=0;
-
 
 		} else
 		{

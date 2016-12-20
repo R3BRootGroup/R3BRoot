@@ -15,6 +15,7 @@
 //
 //  -------------------------------------------------------------------------
 
+
 void StarTrackAnaDigit(Int_t nEvents = 1) {
 	
 	/*TString dir = getenv("VMCWORKDIR");
@@ -100,7 +101,8 @@ void StarTrackAnaDigit(Int_t nEvents = 1) {
 	// ...
 	//startraHF->SelectGeometryVersion(15);          
 	startraHF->SetDetectionThreshold(0.000000);  // 0 KeV
-	startraHF->SetExperimentalResolution(0.0000);  // 0 keV
+	//startraHF->SetExperimentalResolution(0.00002);  // sigma= 20 keV
+	startraHF->SetExperimentalResolution(0.00001);  // sigma= 10 keV
 	//startraHF->SetDetectionThreshold(0.000040);//40 KeV
 	//startraHF->SetExperimentalResolution(0.00005);  // 50 keV
 

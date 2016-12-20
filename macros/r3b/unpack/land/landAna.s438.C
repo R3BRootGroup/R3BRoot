@@ -40,7 +40,7 @@ void run(TString runNumber)
     // ---------------------------------------------------------------------------
 
     // Time calibration ----------------------------------------------------------
-    R3BLandTcal* landTcal = new R3BLandTcal("LandTcal", 0);
+    R3BNeulandMapped2Cal* landTcal = new R3BNeulandMapped2Cal("LandTcal", 0);
     landTcal->SetNofModules(nModules, 40);
     run->AddTask(landTcal);
 

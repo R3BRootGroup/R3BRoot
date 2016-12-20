@@ -122,6 +122,28 @@ void R3BLand::Initialize()
     fMapMcId[id2]=2;
     fMapMcId[id3]=3;
   }
+    
+    TGeoBBox *box = (TGeoBBox*) gGeoManager->GetVolume(gMC->VolId("padle_h_box5"))->GetShape();
+    TGeoBBox *bbox = (TGeoBBox*) gGeoManager->GetVolume(gMC->VolId("ALAND"))->GetShape();
+    TGeoBBox *bbbox = (TGeoBBox*) gGeoManager->GetVolume("CELL")->GetShape();
+    Int_t maxPlane;
+    Int_t maxPaddle;
+    maxPlane = (Int_t) (bbbox->GetDZ() / bbox->GetDZ());
+    if(fileName.Contains("neuland_proto")) {
+        maxPaddle = (Int_t) ( maxPlane * ((Int_t)(bbbox->GetDX()/bbox->GetDY())) );
+    } else if(fileName.Contains("neuland")) {
+        maxPaddle = (Int_t) ( maxPlane * ((Int_t)(box->GetDX()/bbox->GetDY())) );
+    } else {
+        maxPaddle = (Int_t) ( maxPlane * ((Int_t)(box->GetDX()/box->GetDY())) );
+    }
+    FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
+    R3BLandDigiPar* par=(R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
+    par->SetGeometryFileName(GetGeometryFileName());
+    par->SetMaxPaddle(maxPaddle);
+    par->SetMaxPlane(maxPlane);
+    par->SetPaddleLength(box->GetDX());
+    par->setChanged();
+
 
   // Sensitive Volumes :: Unique  Id
   //  paddle_h_box3       1
@@ -420,26 +442,6 @@ void R3BLand::ConstructGeometry()
   if(fileName.EndsWith(".root")) {
     LOG(INFO) << "Constructing (Neu)LAND geometry from ROOT file " << fileName.Data() << FairLogger::endl;
     ConstructRootGeometry();
-    TGeoBBox *box = (TGeoBBox*) gGeoManager->GetVolume(gMC->VolId("padle_h_box5"))->GetShape();
-    TGeoBBox *bbox = (TGeoBBox*) gGeoManager->GetVolume(gMC->VolId("ALAND"))->GetShape();
-    TGeoBBox *bbbox = (TGeoBBox*) gGeoManager->GetVolume("CELL")->GetShape();
-    Int_t maxPlane;
-    Int_t maxPaddle;
-    maxPlane = (Int_t) (bbbox->GetDZ() / bbox->GetDZ());
-    if(fileName.Contains("neuland_proto")) {
-      maxPaddle = (Int_t) ( maxPlane * ((Int_t)(bbbox->GetDX()/bbox->GetDY())) );
-    } else if(fileName.Contains("neuland")) {
-      maxPaddle = (Int_t) ( maxPlane * ((Int_t)(box->GetDX()/bbox->GetDY())) );
-    } else {
-      maxPaddle = (Int_t) ( maxPlane * ((Int_t)(box->GetDX()/box->GetDY())) );
-    }
-    FairRuntimeDb *rtdb= FairRun::Instance()->GetRuntimeDb();
-    R3BLandDigiPar* par=(R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
-    par->SetGeometryFileName(GetGeometryFileName());
-    par->SetMaxPaddle(maxPaddle);
-    par->SetMaxPlane(maxPlane);
-    par->SetPaddleLength(box->GetDX());
-    par->setChanged();
   } else {
     LOG(FATAL) << "Geometry file name is not set" << FairLogger::endl;
   }

@@ -99,6 +99,10 @@ public:
   Double_t GetPositionZ() const { return fPosZ; }
 
 
+  /** Accessor to field rotation **/
+  Double_t GetYAngle() const { return fYAngle; }
+
+
   /** Accessor to global scaling factor  **/
   Double_t GetScale() const { return fScale; }
 
@@ -152,7 +156,11 @@ public:
 
 
   /** Field centre position in global coordinates  **/
-  Double_t fPosX, fPosY, fPosZ; 
+  Double_t fPosX, fPosY, fPosZ;
+
+
+  /** Field rotation around Y axis **/
+  Double_t fYAngle;
 
 
   /** Field limits in local coordinate system **/
@@ -184,7 +192,7 @@ public:
 
 
 
- ClassDef(R3BGladFieldMap,1)
+ ClassDef(R3BGladFieldMap,2)
 
 };
 

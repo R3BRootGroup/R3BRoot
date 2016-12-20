@@ -23,8 +23,8 @@
 #include "G4EmMuonBuilder.h"
 #include "G4EmHadronBuilder.h"
 #include "G4LowEnergyQEDBuilder.h"
-#include "G4PenelopeQEDBuilder.h"
-#include "G4StepLimiterBuilder.h"
+#include "G4EmPenelopePhysics.hh"
+#include "G4StepLimiterPhysics.hh"
 #include "R3BDecaysBuilder.h"
 
 
@@ -36,6 +36,9 @@
 #include "G4IonBinaryCascadePhysics.hh"
 #include "G4EmExtraPhysics.hh"
 
+#include "G4IonINCLXXPhysics.hh"
+#include "G4HadronPhysicsQGSP_BERT.hh"
+#include "G4HadronPhysicsINCLXX.hh"
 
 // std G4 headers
 #include "G4UnitsTable.hh"
@@ -68,7 +71,7 @@ R3BPhysicsList::R3BPhysicsList():  G4VModularPhysicsList(){
   
   // Add Physics builders
   RegisterPhysics(new R3BParticlesBuilder());
-  steplimiter = new G4StepLimiterBuilder();
+  steplimiter = new G4StepLimiterPhysics();
 }
 
 
@@ -156,7 +159,7 @@ void R3BPhysicsList::AddPhysicsList(const G4String& name){
     G4cout << "R3BPhysicsList::AddPhysicsList <" << name << ">" << G4endl;
 
   } else if (name == "penelope" && !emBuilderIsRegisted) {
-    RegisterPhysics(new G4PenelopeQEDBuilder());
+    RegisterPhysics(new G4EmPenelopePhysics());
     RegisterPhysics(steplimiter);
     RegisterPhysics(new G4EmMuonBuilder());
     RegisterPhysics(new G4EmHadronBuilder());
@@ -187,7 +190,20 @@ void R3BPhysicsList::AddPhysicsList(const G4String& name){
     RegisterPhysics(new G4EmExtraPhysics());
     gnucIsRegisted = true;
     G4cout << "R3BPhysicsList::AddPhysicsList <" << name << ">" << G4endl;
+
+  } else if (name == "qgsp_bert") {
+    RegisterPhysics(new G4HadronPhysicsQGSP_BERT());
+    G4cout << "R3BPhysicsList::AddPhysicsList <" << name << ">" << G4endl;
     
+  } else if (name == "qgsp_inclxx") {
+    RegisterPhysics(new G4HadronPhysicsINCLXX());
+    G4cout << "R3BPhysicsList::AddPhysicsList <" << name << ">" << G4endl;
+    
+  } else if (name == "ion_inclxx" && !ionIsRegisted) {
+    RegisterPhysics(new G4IonINCLXXPhysics());
+    ionIsRegisted = true;
+    G4cout << "R3BPhysicsList::AddPhysicsList <" << name << ">" << G4endl;
+
   } else {
     G4cout << "R3BPhysicsList::AddPhysicsList <" << name << ">" 
            << " fail - module is already regitered or is unknown " << G4endl;

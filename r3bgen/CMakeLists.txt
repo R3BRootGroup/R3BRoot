@@ -51,6 +51,7 @@ R3BCALIFATestGenerator.cxx
 R3BAsciiIQMDGen.cxx
 R3BAsciiUrQMDGen.cxx
 R3BIonGenerator.cxx
+R3BGammaGenerator.cxx
 
 )
 

@@ -10,6 +10,7 @@
 #include "R3BmTofPoint.h"
 #include "R3BGeomTofPar.h"
 #include "R3BMCStack.h"
+#include "R3BTGeoPar.h"
 
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
@@ -89,6 +90,21 @@ void R3BmTof::Initialize()
 
     LOG(INFO) << "R3BmTof: initialisation" << FairLogger::endl;
     LOG(DEBUG) << "R3BmTof: Sci. Vol. (McId) " << gMC->VolId("mTOFLog") << FairLogger::endl;
+
+
+    fTGeoPar = (R3BTGeoPar*) FairRuntimeDb::instance()->getContainer("mTofGeoPar");
+
+    // Position and rotation
+    TGeoNode* main_vol = gGeoManager->GetTopVolume()->FindNode("mTOF_0");
+    TGeoMatrix *matr = main_vol->GetMatrix();
+    fTGeoPar->SetPosXYZ(matr->GetTranslation()[0], matr->GetTranslation()[1], matr->GetTranslation()[2]);
+    fTGeoPar->SetRotXYZ(0., -TMath::Abs(TMath::ASin(matr->GetRotationMatrix()[2]) * TMath::RadToDeg()), 0.);
+
+    // Dimensions
+    TGeoBBox *box = (TGeoBBox*) gGeoManager->GetVolume(gMC->VolId("mTOFLog"))->GetShape();
+    fTGeoPar->SetDimXYZ(box->GetDX(), box->GetDY(), box->GetDZ());
+
+    fTGeoPar->setChanged();
 }
 
 void R3BmTof::SetSpecialPhysicsCuts()
@@ -101,7 +117,7 @@ void R3BmTof::SetSpecialPhysicsCuts()
         if (pSi)
         {
             // Setting processes for Si only
-            gMC->Gstpar(pSi->GetId(), "LOSS", 2);
+            gMC->Gstpar(pSi->GetId(), "LOSS", 3);
             gMC->Gstpar(pSi->GetId(), "STRA", 1.0);
             gMC->Gstpar(pSi->GetId(), "PAIR", 1.0);
             gMC->Gstpar(pSi->GetId(), "COMP", 1.0);

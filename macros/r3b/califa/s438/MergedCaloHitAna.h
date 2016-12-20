@@ -42,7 +42,13 @@ public :
    Double_t        CaloHit_fTheta[kMaxcbmout_CALIFA_Hit_CaloHit];   //[cbmout.CALIFA Hit.CaloHit_]
    Double_t        CaloHit_fPhi[kMaxcbmout_CALIFA_Hit_CaloHit];   //[cbmout.CALIFA Hit.CaloHit_]
 
+   UInt_t        Pspx03n, Pspx01n, Pspx02n, Pspx04n, Pspx05n;
+   UInt_t        Pspx03ni[128];
+   UInt_t        Pspx03e01[128];
+
    Float_t      Pspx04e, Pspx05e;
+   Float_t      Pspx04u, Pspx05u;
+   Float_t      Pspx01u, Pspx02u;
 
    // List of branches
    TBranch        *b_cbmout_CALIFA_Hit_CaloHit_;   //!
@@ -59,6 +65,11 @@ public :
    TBranch        *b_CaloHit_fPhi;   //!
 
    TBranch        *b_Pspx04e, *b_Pspx05e;
+   TBranch        *b_Pspx04u, *b_Pspx05u;
+   TBranch        *b_Pspx01u, *b_Pspx02u;
+
+   TBranch        *b_Pspx03n, *b_Pspx03ni, *b_Pspx03e01;
+   TBranch        *b_Pspx01n, *b_Pspx02n, *b_Pspx04n, *b_Pspx05n;
 
    CaloHitAna(TTree *tree=0);
    virtual ~CaloHitAna();
@@ -66,10 +77,13 @@ public :
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
    virtual void     Init(TTree *tree);
-   virtual void     Loop(bool useProtonCut);
+   virtual void     Loop(const char *fout = NULL, const char *mode = "update");
    virtual void	    DrawPID(bool cut = false);
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
+
+//   void TestPSPX();
+   void SaveHists(const char *fout, const char *mode, TH1 **hists);
 };
 
 #endif
@@ -136,8 +150,6 @@ void CaloHitAna::Init(TTree *tree)
    fChain->SetBranchAddress("califa_CaloHit", &CaloHit_, &b_cbmout_CALIFA_Hit_CaloHit_);
    fChain->SetBranchAddress("califa_CaloHit.fUniqueID", CaloHit_fUniqueID, &b_CaloHit_fUniqueID);
    fChain->SetBranchAddress("califa_CaloHit.fBits", CaloHit_fBits, &b_CaloHit_fBits);
-   fChain->SetBranchAddress("califa_CaloHit.fPersistanceCheck", CaloHit_fPersistanceCheck, &b_CaloHit_fPersistanceCheck);
-   fChain->SetBranchAddress("califa_CaloHit.fVerbose", CaloHit_fVerbose, &b_CaloHit_fVerbose);
    fChain->SetBranchAddress("califa_CaloHit.fDefaultType", CaloHit_fDefaultType, &b_CaloHit_fDefaultType);
    fChain->SetBranchAddress("califa_CaloHit.fNbOfCrystalHits", CaloHit_fNbOfCrystalHits, &b_CaloHit_fNbOfCrystalHits);
    fChain->SetBranchAddress("califa_CaloHit.fEnergy", CaloHit_fEnergy, &b_CaloHit_fEnergy);
@@ -148,6 +160,18 @@ void CaloHitAna::Init(TTree *tree)
 
    fChain->SetBranchAddress("main_Pspx04e", &Pspx04e, &b_Pspx04e);
    fChain->SetBranchAddress("main_Pspx05e", &Pspx05e, &b_Pspx05e);
+   fChain->SetBranchAddress("main_Pspx04u", &Pspx04u, &b_Pspx04u);
+   fChain->SetBranchAddress("main_Pspx05u", &Pspx05u, &b_Pspx05u);
+   fChain->SetBranchAddress("main_Pspx01u", &Pspx01u, &b_Pspx01u);
+   fChain->SetBranchAddress("main_Pspx02u", &Pspx02u, &b_Pspx02u);
+
+   fChain->SetBranchAddress("main_Pspx01n", &Pspx01n, &b_Pspx01n);
+   fChain->SetBranchAddress("main_Pspx02n", &Pspx02n, &b_Pspx02n);
+   fChain->SetBranchAddress("main_Pspx03n", &Pspx03n, &b_Pspx03n);
+   fChain->SetBranchAddress("main_Pspx04n", &Pspx04n, &b_Pspx04n);
+   fChain->SetBranchAddress("main_Pspx05n", &Pspx05n, &b_Pspx05n);
+   fChain->SetBranchAddress("main_Pspx03ni", &Pspx03ni, &b_Pspx03ni);
+   fChain->SetBranchAddress("main_Pspx03e01", &Pspx03e01, &b_Pspx03e01);
 
    Notify();
 }

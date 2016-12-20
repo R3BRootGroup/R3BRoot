@@ -74,7 +74,7 @@
 
 
   // TCAL ----------------------------------------------------------------------
-  R3BLandTcalFill *tcalFill = new R3BLandTcalFill("TcalFill");
+  R3BNeulandMapped2CalPar *tcalFill = new R3BNeulandMapped2CalPar("NeulandMapped2Cal");
   tcalFill->SetUpdateRate(updateRate);
   tcalFill->SetMinStats(minStats);
   tcalFill->SetNofModules(nModules, 20);

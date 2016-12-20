@@ -1,3 +1,5 @@
+#include <vector>
+
 #include <TString.h>
 #include <TSystem.h>
 #include <TFile.h>
@@ -5,6 +7,7 @@
 #include <TGeoVolume.h>
 #include <TMath.h>
 #include <TVector3.h>
+#include <TGeoNavigator.h>
 
 #include <FairLogger.h>
 
@@ -27,7 +30,7 @@ R3BCaloGeometry* R3BCaloGeometry::Instance(int version)
   return inst;
 }
 
-R3BCaloGeometry::R3BCaloGeometry(int version)  : fGeometryVersion(version)
+R3BCaloGeometry::R3BCaloGeometry(int version)  : fGeometryVersion(version), fNavigator(NULL)
 {
   LOG(DEBUG) << "Creating new R3BCaloGeometry for version " << version << FairLogger::endl;
 
@@ -77,6 +80,8 @@ R3BCaloGeometry::R3BCaloGeometry(int version)  : fGeometryVersion(version)
   if(!gGeoManager)
     gGeoManager = new TGeoManager();
   gGeoManager->SetTopVolume(v);
+
+  fNavigator = new TGeoNavigator(gGeoManager);
 }
 
 void R3BCaloGeometry::GetAngles(Int_t iD, Double_t* polar, 
@@ -307,15 +312,24 @@ const char * R3BCaloGeometry::GetCrystalVolumePath(int iD)
   return nameVolume.Data();
 }
 
-double R3BCaloGeometry::GetDistanceThroughCrystals(TVector3 &startVertex, TVector3 &direction)
+double R3BCaloGeometry::GetDistanceThroughCrystals(TVector3 &startVertex, TVector3 &direction, TVector3 *hitPos, int *numCrystals, int *crystalIds)
 {
+  int maxNumCrystals = 0;
+
+  if(numCrystals != NULL && crystalIds != NULL)
+  {
+    maxNumCrystals = *numCrystals;
+    *numCrystals = 0;
+  }
+
   TGeoNode *n;
 
   gGeoManager->InitTrack(startVertex.X(), startVertex.Y(), startVertex.Z(),
       direction.X()/direction.Mag(), direction.Y()/direction.Mag(), direction.Z()/direction.Mag());
 
   double distance = 0;
-  bool inCrystal = false;
+  const Double_t *pos;
+  bool inCrystal = false, wasInCrystal = false;
   TString nodeName;
 
   while((n = gGeoManager->FindNextBoundaryAndStep()))
@@ -326,9 +340,122 @@ double R3BCaloGeometry::GetDistanceThroughCrystals(TVector3 &startVertex, TVecto
       distance += gGeoManager->GetStep();
 
     inCrystal = nodeName.BeginsWith("Crystal_");
+
+    if(inCrystal && maxNumCrystals != 0)
+    {
+      int cid = GetCrystalId(gGeoManager->GetPath());
+      if(cid != -1 && (*numCrystals == 0 || cid != crystalIds[(*numCrystals)-1]))
+      {
+        crystalIds[(*numCrystals)++] = cid;
+        maxNumCrystals--;
+      }
+    }
+
+    if(hitPos != NULL && inCrystal && !wasInCrystal)
+    {
+      pos = gGeoManager->GetCurrentPoint();
+      hitPos->SetXYZ(pos[0], pos[1], pos[2]);
+      wasInCrystal = true;
+    }
   }
 
   return distance;
+}
+
+int R3BCaloGeometry::GetCrystalId(const char *volumePath)
+{
+  std::vector<const char*> volumeNames;
+  std::vector<int> nodeCopies;
+  TGeoNode *n;
+
+  int crystalId = -1;
+
+  for(fNavigator->cd(volumePath); (n = fNavigator->GetCurrentNode()) != NULL; fNavigator->CdUp())
+  {
+    volumeNames.push_back(n->GetName());
+    nodeCopies.push_back(n->GetNumber());
+  }
+
+  if (fGeometryVersion==16 || fGeometryVersion==17 || fGeometryVersion==0x438b) {
+    //RESERVED FOR CALIFA 8.11 BARREL + CC 0.2
+    
+    if(volumeNames.size() < 4)
+    {
+      LOG(ERROR) << "R3BCaloGeometry::GetCrystalId(): Invalid path: " << volumePath << FairLogger::endl;
+      return -1;
+    }
+
+    int cp1 = nodeCopies[0];
+    int cpCry = nodeCopies[1];
+    int cpAlv = nodeCopies[2];
+    int cpSupAlv = nodeCopies[3];
+
+    int crystalType, crystalCopy;
+
+    const char *alveolusECPrefix = "Alveolus_EC";
+    const char *alveolusPrefix = "Alveolus";
+    const char *volumeName = volumeNames[3];
+    const char *volumeNameCrystal ="";
+
+    // Workaround to fix the hierarchy difference between Barrel and Endcap
+    if (strncmp("CalifaWorld", volumeName,10) == 0) {
+      volumeName = volumeNames[2];
+      volumeNameCrystal = volumeNames[0];
+    }
+    if (strncmp(alveolusECPrefix, volumeName, 11) == 0) {
+      crystalType = atoi(volumeNameCrystal+8);     //converting to int the crystal index
+      crystalCopy = cpAlv+1;
+
+      if(crystalType < 9 && crystalType%2 == 0) {
+	  crystalType -= 1;
+      }
+      crystalId = 3000 + cpAlv*24 + (crystalType-1);
+      
+      if (crystalType>24 || crystalType<1 ||
+	  crystalCopy>32 || crystalCopy<1 || 
+          crystalId<3000 || crystalId>4800)
+      {
+	LOG(ERROR) << "R3BCaloGeometry: Wrong crystal number in geometryVersion 16+ (CC). " 
+		   << FairLogger::endl;
+        return -1;
+      }
+    //if BARREL
+    } else if (strncmp(alveolusPrefix, volumeName,8) == 0) {
+
+      crystalType = atoi(volumeName+9);//converting to int the alveolus index
+      if (crystalType==1) {
+	//only one crystal per alveoli in this ring, running from 1 to 32
+        crystalCopy = cpSupAlv+1; 
+        crystalId = cpSupAlv+1;                    
+      } else if (crystalType>1 && crystalType<17) {
+	//running from 0*4+0+1=1 to 31*4+3+1=128
+        crystalCopy = cpSupAlv*4+cpCry+1;
+	//running from 32+0*128+0*4+0+1=1 to 32+14*128+31*4+3+1=1952
+        crystalId = 32+(crystalType-2)*128+cpSupAlv*4+cpCry+1; 
+      }
+      if (crystalType>16 || crystalType<1 || crystalCopy>128 || 
+	  crystalCopy<1 || crystalId>1952 || crystalId<1) 
+      {
+        LOG(ERROR) << "R3BCaloGeometry: Wrong crystal number in geometryVersion 16+ (BARREL)." 
+		   << FairLogger::endl;
+        return -1;
+      }
+    }
+    else
+    {
+      LOG(ERROR) << "R3BCaloGeometry: Impossible crystalType for geometryVersion 16+." 
+		      << FairLogger::endl;
+      return -1;
+    }
+  }
+  else
+  {
+    LOG(ERROR) << "R3BCaloGeometry: Geometry version not available in R3BCaloGeometry::GetCrystalId(). " 
+		    << FairLogger::endl;
+    return -1;
+  }
+
+  return crystalId;
 }
 
 ClassImp(R3BCaloGeometry);

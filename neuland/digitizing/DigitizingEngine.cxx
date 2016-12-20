@@ -37,15 +37,6 @@ Double_t DigitizingEngine::fPaddleHalfLength = 0.;
 TRandom3 *DigitizingEngine::fRnd = new TRandom3();
 
 
-DigitizingEngine::DigitizingEngine()
-{
-}
-
-DigitizingEngine::~DigitizingEngine()
-{
-}
-
-
 Double_t DigitizingEngine::GetTriggerTime() const
 {
     Double_t triggerTime = 1e100;
@@ -62,7 +53,6 @@ Double_t DigitizingEngine::GetTriggerTime() const
     }
     return triggerTime;
 }
-
 
 
 bool DigitizingEngine::PMT::HasFired() const
@@ -137,10 +127,15 @@ Double_t DigitizingEngine::PMT::GetEnergy() const
 
 Double_t DigitizingEngine::PMT::BuildEnergy() const
 {
-    Double_t e;
-    e = GetQDC() * exp((2.*(fPaddleHalfLength)) * fAttenuation / 2.);
+    Double_t e = GetQDC();
+    // Apply reverse attenuation (TODO: Should be last?)
+    e = e * exp((2.*(fPaddleHalfLength)) * fAttenuation / 2.);
+    // Apply saturation
     e = e / (1. + fSaturationCoefficient * e);
+    // Apply energy smearing
     e = fRnd->Gaus(e, 0.05 * e);
+    // Apply reverse saturation
+    e = e / (1. - fSaturationCoefficient * e);
     return e;
 }
 

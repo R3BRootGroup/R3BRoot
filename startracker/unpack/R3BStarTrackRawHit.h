@@ -26,7 +26,7 @@ public:
    **/
 
   // R3BStarTrackRawHit( UInt_t WRvhb, UInt_t WRhb , UInt_t WRlb, UInt_t wordtype, UInt_t hitbit, UInt_t moduleId, UInt_t side, UInt_t asicId, UInt_t stripId, UInt_t adc_data, UInt_t timevhb, UInt_t timehb, UInt_t timelb,  UInt_t timeExtvhb, UInt_t timeExthb, UInt_t timeExtlb, UInt_t infofield, UInt_t infocode);
- R3BStarTrackRawHit( UInt_t WRvhb, UInt_t WRhb , UInt_t WRlb, UInt_t wordtype, UInt_t hitbit, UInt_t moduleId, UInt_t side, UInt_t asicId, UInt_t stripId, UInt_t adc_data, ULong_t timevhb, ULong_t timehb, UInt_t timelb,  UInt_t timeExtvhb, UInt_t timeExthb, UInt_t timeExtlb, UInt_t infofield, UInt_t infocode);
+ R3BStarTrackRawHit( UInt_t WRvhb, UInt_t WRhb , UInt_t WRlb, UInt_t wordtype, UInt_t hitbit, UInt_t moduleId, UInt_t side, UInt_t asicId, UInt_t stripId, UInt_t adc_data, ULong_t timevhb, ULong_t timehb, UInt_t timelb,  UInt_t timeExtvhb, UInt_t timeExthb, UInt_t timeExtlb,  UInt_t time47lb,UInt_t infofield, UInt_t infocode);
   
   // vhb stands for very high bit
   // hb stands for  high bit
@@ -54,6 +54,7 @@ public:
   inline const UInt_t&  GetTimeExtvhb()      const { return fTimeExtvhb;      }
   inline const UInt_t&  GetTimeExthb()      const { return fTimeExthb;      }
   inline const UInt_t&  GetTimeExtlb()      const { return fTimeExtlb;      }
+  inline const UInt_t&  GetTime47lb()      const { return fTime47lb;      }
   inline const UInt_t&  GetInfoField()      const { return fInfoField;      }
   inline const UInt_t&  GetInfoCode()      const { return fInfoCode;      }
 	
@@ -78,7 +79,8 @@ protected:
   UInt_t  fTimeExtvhb;        //time (48 - 63 bits) of the external input
   UInt_t  fTimeExthb;        //time (28-47  bits) of the external input
   UInt_t  fTimeExtlb;        //time (low bit) of the external input
-  UInt_t  fInfoField;     //time of the interaction
+  UInt_t  fTime47lb;        //time (low bit) of the wordtype2 input
+   UInt_t  fInfoField;     //time of the interaction
   UInt_t  fInfoCode;      //time of the interaction
   
 public:
