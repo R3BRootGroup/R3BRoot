@@ -5,8 +5,10 @@
 #pragma link off all functions;
 
 #pragma link C++ class R3BTPropagator+;
-#pragma link C++ class R3BPropagate+;
 #pragma link C++ class R3BTGeoPar+;
+#pragma link C++ class R3BFragmentFitter+;
+#pragma link C++ class R3BTrackingDetector+;
+#pragma link C++ class R3BTrackingParticle+;
 
 #endif
 

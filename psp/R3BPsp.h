@@ -6,6 +6,7 @@
 
 class TClonesArray;
 class R3BPspPoint;
+class R3BTGeoPar;
 class FairVolume;
 
 class R3BPsp : public R3BDetector
@@ -129,6 +130,7 @@ class R3BPsp : public R3BDetector
     TClonesArray* fPspCollection;   //!  The hit collection
     Bool_t kGeoSaved;               //!
     TList* flGeoPar;                //!
+    R3BTGeoPar* fTGeoPar;           //!
 
     Float_t fZ1; //! z position of PSP1
     Float_t fZ2; //! z position of PSP2

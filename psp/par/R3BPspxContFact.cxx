@@ -18,6 +18,8 @@
 #include "R3BPspxMappedPar.h"
 #include "R3BPspxPrecalPar.h"
 
+#include "R3BTGeoPar.h"
+
 #include "FairRuntimeDb.h"
 
 #include <iostream>
@@ -60,6 +62,11 @@ void R3BPspxContFact::setAllContainers()
     p4->addContext("PspxNonDefaultContext");
 
     containers->Add(p4);
+
+    FairContainer* p5 = new FairContainer("PspGeoPar", "PSP geometry parameters", "TestDefaultContext");
+    p5->addContext("TestNonDefaultContext");
+
+    containers->Add(p5);
 }
 
 FairParSet* R3BPspxContFact::createContainer(FairContainer* c)
@@ -86,6 +93,10 @@ FairParSet* R3BPspxContFact::createContainer(FairContainer* c)
     if (strcmp(name, "R3BPspxHitPar") == 0)
     {
         p = new R3BPspxHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
+    if (strcmp(name, "PspGeoPar") == 0)
+    {
+        p = new R3BTGeoPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
 
     return p;

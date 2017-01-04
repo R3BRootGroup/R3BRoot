@@ -20,7 +20,8 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
-${R3BROOT_SOURCE_DIR}/r3bdata/trackerData)
+${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
+${R3BROOT_SOURCE_DIR}/tracking)
 
 include_directories( ${INCLUDE_DIRECTORIES})
 include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})

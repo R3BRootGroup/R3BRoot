@@ -1,5 +1,5 @@
 
-void propagator()
+void fragment_fitter()
 {
     TString inFile = "sim.root";
     TString parFile = "par.root";
@@ -19,7 +19,7 @@ void propagator()
     // -------------------------------------------------------------------------
 
     // Propagation task --------------------------------------------------------
-    R3BPropagate* prop = new R3BPropagate("R3BPropagate", kTRUE);
+    R3BFragmentFitter* prop = new R3BFragmentFitter("R3BFragmentFitter", kTRUE);
     run->AddTask(prop);
     // -------------------------------------------------------------------------
     
@@ -32,8 +32,8 @@ void propagator()
     timer.Start();
     
     // Run ---------------------------------------------------------------------
-    run->Run(100);
-    delete run;
+    run->Run();
+//    delete run;
     // -------------------------------------------------------------------------
     
     timer.Stop();

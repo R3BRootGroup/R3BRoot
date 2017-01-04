@@ -10,6 +10,8 @@ class R3BGladFieldMap;
 class FairRKPropagator;
 class R3BTGeoPar;
 class FairField;
+class R3BTrackingParticle;
+class R3BTrackingDetector;
 
 class R3BTPropagator : public TObject
 {
@@ -20,27 +22,18 @@ class R3BTPropagator : public TObject
 
     inline void SetmTofGeo(R3BTGeoPar* geo) { fmTofGeo = geo; }
 
-    Bool_t PropagateToDetector(const char* name,
-                               const TVector3& posin,
-                               const TVector3& momin,
-                               TVector3& posout,
-                               TVector3& momout);
+    Bool_t PropagateToDetector(R3BTrackingParticle* particle,
+                               R3BTrackingDetector* detector);
 
-    Bool_t PropagateToPlane(const TVector3& posin,
-                            const TVector3& momin,
+    Bool_t PropagateToPlane(R3BTrackingParticle* particle,
                             const TVector3& v1,
                             const TVector3& v2,
-                            const TVector3& v3,
-                            TVector3& posout,
-                            TVector3& momout);
+                            const TVector3& v3);
 
-    Bool_t PropagateToPlaneRK(const TVector3& vin,
-                              const TVector3& momin,
+    Bool_t PropagateToPlaneRK(R3BTrackingParticle* particle,
                               const TVector3& v1,
                               const TVector3& v2,
-                              const TVector3& v3,
-                              TVector3& posout,
-                              TVector3& momout);
+                              const TVector3& v3);
 
     Bool_t PropagateToHitOnPlane(const TVector3& vin,
                                  const TVector3& momin,
@@ -55,6 +48,8 @@ class R3BTPropagator : public TObject
                               const TVector3& v1,
                               const TVector3& normal,
                               TVector3& intersect);
+    
+    void SetVis(Bool_t vis = kTRUE) { fVis = vis; }
 
   private:
     FairRKPropagator* fFairProp;

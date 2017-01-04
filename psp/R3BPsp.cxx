@@ -1,4 +1,6 @@
 #include "R3BPsp.h"
+#include "R3BTGeoPar.h"
+
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
 #include "FairGeoNode.h"
@@ -78,6 +80,20 @@ R3BPsp::~R3BPsp()
 void R3BPsp::Initialize()
 {
     FairDetector::Initialize();
+
+    fTGeoPar = (R3BTGeoPar*) FairRuntimeDb::instance()->getContainer("PspGeoPar");
+
+    // Position and rotation
+    TGeoNode* main_vol = gGeoManager->GetVolume(gMC->VolId("PSPWorld"))->FindNode("PSP3LogWorld_3");
+    TGeoMatrix* matr = main_vol->GetMatrix();
+    fTGeoPar->SetPosXYZ(matr->GetTranslation()[0], matr->GetTranslation()[1], matr->GetTranslation()[2]);
+    fTGeoPar->SetRotXYZ(0., -TMath::Abs(TMath::ASin(matr->GetRotationMatrix()[2]) * TMath::RadToDeg()), 0.);
+
+    // Dimensions
+    TGeoBBox* box = (TGeoBBox*)gGeoManager->GetVolume(gMC->VolId("PSP3LogWorld"))->GetShape();
+    fTGeoPar->SetDimXYZ(box->GetDX(), box->GetDY(), box->GetDZ());
+
+    fTGeoPar->setChanged();
 
     LOG(INFO) << "R3BPsp: initialisation" << FairLogger::endl;
     LOG(DEBUG) << "R3BPsp: Vol. (McId) " << gMC->VolId("PSP1Log") << FairLogger::endl;
