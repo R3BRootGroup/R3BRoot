@@ -76,6 +76,7 @@ void preCalibr(Int_t nNeutrons = 4, Int_t nEvents = 100, Int_t beamE = 600, Int_
   // ----- Intialise and run ---------------------------------------------------
   fRun->Init();
   fRun->Run(0, nEvents);
+  delete fRun;
   // ---------------------------------------------------------------------------
 
 

@@ -113,5 +113,7 @@ void run_sample_data()
 		cout << " Test passed" << endl;
 		cout << " All ok " << endl;
 	}
+
+    delete run;
 }
 

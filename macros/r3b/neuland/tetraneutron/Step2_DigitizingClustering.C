@@ -27,4 +27,5 @@ void Step2_DigitizingClustering(const TString simFile, const TString outFile)
 
     run->Init();
     run->Run(0, 0);
+    delete run;
 }

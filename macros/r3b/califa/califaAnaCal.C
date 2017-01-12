@@ -51,6 +51,8 @@ void run(TString runNumber)
     run->Run(0, 10000);
     // ---------------------------------------------------------------------------
 
+    delete run;
+
     timer.Stop();
     Double_t rtime = timer.RealTime();
     Double_t ctime = timer.CpuTime();

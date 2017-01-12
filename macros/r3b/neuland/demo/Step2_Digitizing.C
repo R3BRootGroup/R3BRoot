@@ -27,6 +27,7 @@ void Step2_Digitizing(
 
     run->Init();
     run->Run(0, 0);
+    delete run;
 
     timer.Stop();
 

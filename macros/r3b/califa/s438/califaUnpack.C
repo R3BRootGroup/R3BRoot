@@ -74,6 +74,7 @@ void run(TString inputFile="", Int_t firstFileNumber=-999, Int_t lastFileNumber=
 
     // Run -----------------------------------------------------------------------
     run->Run(0, nEvents);
+    delete run;
     // ---------------------------------------------------------------------------
 
     timer.Stop();

@@ -80,6 +80,7 @@ void run(Int_t runNumber)
         run->Run(0, nev);
     }
     rtdb->saveOutput();
+    delete run;
     // ---------------------------------------------------------------------------
 
     timer.Stop();

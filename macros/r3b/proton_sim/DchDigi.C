@@ -94,6 +94,7 @@ void DchDigi(){
   // -----   Intialise and run   --------------------------------------------
   fRun->Init();
   fRun->Run(0, nEvents);
+  delete fRun;
 
   // -----   Finish   -------------------------------------------------------
   timer.Stop();
