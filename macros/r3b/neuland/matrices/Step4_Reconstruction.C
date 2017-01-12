@@ -32,6 +32,7 @@ void Step4_Reconstruction(const TString clusterFile, const TString calibrFile)
     run->Init();
     
     run->Run(0, 0);
+    delete run;
 
     timer.Stop();
 

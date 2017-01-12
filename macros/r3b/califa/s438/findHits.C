@@ -24,6 +24,8 @@ void findHits(TString inputFile="", TString outputFile="", Int_t nEvents = 0)
              
   fRun->Run(0,nEvents);
   
+  delete fRun;
+
   // -----   Finish   -------------------------------------------------------
   timer.Stop();
   Double_t rtime = timer.RealTime();

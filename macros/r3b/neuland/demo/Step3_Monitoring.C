@@ -30,6 +30,7 @@ void Step3_Monitoring(
 
     run->Init();
     run->Run(0, 0);
+    delete run;
 
     timer.Stop();
 

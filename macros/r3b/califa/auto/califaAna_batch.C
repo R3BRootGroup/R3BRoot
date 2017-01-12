@@ -73,7 +73,9 @@ void califaAna_batch(Int_t nEvents=1, Int_t fGeoVer=1, Double_t fThres=0.000050,
 	
 	fRun->Init();                     
 	fRun->Run(0, nEvents);
-	
+
+    delete fRun;
+
 	// -----   Finish   -------------------------------------------------------
 	timer.Stop();
 	Double_t rtime = timer.RealTime();

@@ -79,6 +79,7 @@ void unpack_ucesb_tacquila()
     /* Run -------------------------------------------------- */
     run->Run((nev < 0) ? nev : 0, (nev < 0) ? 0 : nev);
     rtdb->saveOutput();
+    delete run;
     /* ------------------------------------------------------ */
 
     timer.Stop();

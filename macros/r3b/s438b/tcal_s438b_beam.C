@@ -69,6 +69,7 @@ TString cosmicParFileName    = dirIn1 + "params_" + strCosmicRunNumber + "_cosmi
 
     // Run -----------------------------------------------------------------------
     run->Run();
+    delete run;
     // ---------------------------------------------------------------------------
 
     timer.Stop();

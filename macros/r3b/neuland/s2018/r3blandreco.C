@@ -93,4 +93,6 @@ void r3blandreco(Int_t nNeutrons = 4, Int_t nEvents = 100, Int_t beamE = 600, In
     cout << " All ok " << endl;
   }
   // ---------------------------------------------------------------------------
+
+  delete fRun;
 }

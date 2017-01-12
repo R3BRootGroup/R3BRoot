@@ -26,4 +26,5 @@ void Step5_ReconstructionEvaluation(const TString file)
 
     run->Init();
     run->Run(0, 0);
+    delete run;
 }

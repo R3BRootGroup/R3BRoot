@@ -31,6 +31,7 @@ void Step2_DigitizingClustering(const TString simFile)
 
     run->Init();
     run->Run(0, 0);
+    delete run;
 
     timer.Stop();
 
