@@ -35,6 +35,7 @@ class R3BNeulandQCalPar : public FairParGenericSet
 
     /**
      * Method to set the size of the array of parameters.
+     * @param size the array size
      */
     void SetSize(Int_t size);
 
@@ -58,39 +59,34 @@ class R3BNeulandQCalPar : public FairParGenericSet
     void printParams();
 
     /**
-     * Method to set parameter for a module.
-     * @param id id of the module.
-     * @param offset pedestal offset of the module.
+     * Method to set the pedestal offset of a PMT
+     * @param plane an index of detector plane [0, nPlanes-1]
+     * @param bar a bar index within the plane [0,49]
+     * @param side a side of a paddle {1,2}
+     * @param offset the pedestal offset
      */
-    void SetParAt(Int_t  id, Int_t offset)
+    void SetParAt(Int_t  plane, Int_t bar, Int_t side, Int_t offset)
     {
-        fParams[id] = offset;
+        fParams[((plane-1)*50 + (bar-1))*2 + side - 1] = offset;
     }
 
     /**
-     * Method to retrieve the pedestal offset of a module.
-     * @param id id of the module.
-     * @return pedestal offset of the module.
+     * Method to get the pedestal offset of a PMT
+     * @param plane an index of detector plane [0, nPlanes-1]
+     * @param bar a bar index within the plane [0,49]
+     * @param side a side of a paddle {1,2}
+     * @param offset the pedestal offset
      */
-    Int_t GetParAt(Int_t id)
+    Int_t GetParAt(Int_t plane, Int_t bar, Int_t side)
     {
-        return fParams[id];
-    }
-
-    /**
-     * Method to get number of modules storred in array.
-     * @return size of array.
-     */
-    Int_t GetNumPar()
-    {
-        return fParams.GetSize();
+        return fParams[((plane-1)*50 + (bar-1))*2 + side - 1];
     }
 
   private:
 
     TArrayI fParams; /**< an array with parameters of all modules */
 
-    ClassDef(R3BNeulandQCalPar, 1);
+    ClassDef(R3BNeulandQCalPar, 2);
 };
 
 #endif /* !R3BNEULANDQCALPAR_H*/

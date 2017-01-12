@@ -21,6 +21,9 @@
 #include "TMath.h"
 #include "TH1F.h"
 
+#define planes fNofPMTs/100
+#define toID(x,y,z) (((x-1)*50 + (y-1))*2 + (z-1))
+
 Double_t wlk(Double_t x)
 {
     Double_t y = 0;
@@ -129,11 +132,15 @@ void R3BNeulandMapped2Cal::SetParameter()
 {
   
   std::map<Int_t, Double_t> tempMapQdcOffset;
-
-  for (Int_t i = 0; i < fQCalPar->GetNumPar(); i++) 
-    tempMapQdcOffset[i] = fQCalPar->GetParAt(i);
+  Int_t i = 0;
+  for (Int_t plane = 1; i <= planes; plane++) 
+    for(Int_t bar = 1; bar <= 50; bar++)
+      for(Int_t side = 1; side <= 2; side++){
+	tempMapQdcOffset[i] = fQCalPar->GetParAt(plane, bar, side);
+	i++;
+      }
     
-  LOG(INFO) << "R3BNeulandMapped2Cal::SetParameter : Number of Parameters: " << fQCalPar->GetNumPar() << FairLogger::endl;
+  LOG(INFO) << "R3BNeulandMapped2Cal::SetParameter : Number of Parameters: " << i << FairLogger::endl;
   
   fMapQdcOffset = tempMapQdcOffset;
 }
@@ -263,7 +270,7 @@ void R3BNeulandMapped2Cal::MakeCal()
             continue;
         }
   
-        qdc = hit2->GetQdcData()-fMapQdcOffset[2*((iPlane-1)*50 + iPaddle) + iSide - 1];        
+        qdc = hit2->GetQdcData() - fMapQdcOffset[toID(iPlane, iPaddle, iSide)];        
         qdc = std::max(qdc,0);
 	
         time = time - time2 + hit2->GetClock() * fClockFreq;
