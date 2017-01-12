@@ -15,7 +15,7 @@ erel = int(sys.argv[5])
 directory = str(sys.argv[6])
 
 file = "output/%dcm_%ddp_%dn_%dAMeV_%dkeV.eval.root" % (distance, nDoublePlanes, nNeutrons, energy, erel)
-outfile = "output/%dcm_%ddp_%dn_%dAMeV_%dkeV_nRecoNPNIPs_%s.pdf" % (distance, nDoublePlanes, nNeutrons, energy, erel, directory)
+outfile = "./%dcm_%ddp_%dn_%dAMeV_%dkeV_nRecoNPNIPs_%s.pdf" % (distance, nDoublePlanes, nNeutrons, energy, erel, directory)
 
 tfile = ROOT.TFile.Open(file)
 hist = tfile.Get("%s/fhErelVSnNrecoNPNIPs" % directory)
@@ -97,4 +97,4 @@ except:
 
 canvas.SaveAs(outfile)
 
-#input("Press enter to continue...")
+input("Press enter to continue...")

@@ -1,22 +1,22 @@
 #include "R3BNeulandNeutronReconstructionMon.h"
 
-#include <iostream>
 #include <algorithm>
-#include <numeric>
 #include <cmath>
-#include <utility>
 #include <functional>
+#include <iostream>
+#include <numeric>
+#include <utility>
 
 #include "TClonesArray.h"
 #include "TDirectory.h"
 #include "TH1D.h"
 #include "TH2D.h"
 
-#include "FairRootManager.h"
-#include "FairRuntimeDb.h"
-#include "FairRtdbRun.h"
 #include "FairLogger.h"
 #include "FairMCPoint.h"
+#include "FairRootManager.h"
+#include "FairRtdbRun.h"
+#include "FairRuntimeDb.h"
 
 #include "R3BMCTrack.h"
 #include "R3BNeulandNeutron.h"
@@ -37,8 +37,7 @@ Double_t Score(const std::vector<std::pair<R3BNeulandNeutron, FairMCPoint>>& com
     return std::accumulate(combination.begin(),
                            combination.end(),
                            0.,
-                           [](const Double_t sum, const std::pair<R3BNeulandNeutron, FairMCPoint>& pair)
-                           {
+                           [](const Double_t sum, const std::pair<R3BNeulandNeutron, FairMCPoint>& pair) {
                                return sum + Distance(pair.first, pair.second);
                            });
 }
@@ -101,8 +100,9 @@ InitStatus R3BNeulandNeutronReconstructionMon::Init()
     }
     if (!TString(((TClonesArray*)ioman->GetObject(fInput))->GetClass()->GetName()).EqualTo("R3BNeulandNeutron"))
     {
-        LOG(FATAL) << "R3BNeulandNeutronReconstructionMon::Init Branch " << fInput << " does not contain "
-                                                                                      "R3BNeulandNeutrons!"
+        LOG(FATAL) << "R3BNeulandNeutronReconstructionMon::Init Branch " << fInput
+                   << " does not contain "
+                      "R3BNeulandNeutrons!"
                    << FairLogger::endl;
         return kFATAL;
     }
@@ -119,7 +119,8 @@ InitStatus R3BNeulandNeutronReconstructionMon::Init()
              .EqualTo("FairMCPoint"))
     {
         LOG(FATAL) << "R3BNeulandNeutronReconstructionMon::Init Branch NeulandPrimaryNeutronInteractionPoints "
-                      "does not contain FairMCPoints!" << FairLogger::endl;
+                      "does not contain FairMCPoints!"
+                   << FairLogger::endl;
         return kFATAL;
     }
     fPrimaryNeutronInteractionPoints = (TClonesArray*)ioman->GetObject("NeulandPrimaryNeutronInteractionPoints");
@@ -133,10 +134,13 @@ InitStatus R3BNeulandNeutronReconstructionMon::Init()
     if (!TString(((TClonesArray*)ioman->GetObject("MCTrack"))->GetClass()->GetName()).EqualTo("R3BMCTrack"))
     {
         LOG(FATAL) << "R3BNeulandNeutronReconstructionMon::Init Branch MCTrack "
-                      "does not contain FairMCPoints!" << FairLogger::endl;
+                      "does not contain FairMCPoints!"
+                   << FairLogger::endl;
         return kFATAL;
     }
     fMCTracks = (TClonesArray*)ioman->GetObject("MCTrack");
+
+    TH1::AddDirectory(kFALSE);
 
     fhScore = new TH1D("fhScore", "Neuland Neutron Reconstruction Score (lower is better)", 5000, 0, 5000);
     fhCountN = new TH1D("fhCountN", "Number of reconstructed Neutrons", 11, -0.5, 10.5);
@@ -144,11 +148,11 @@ InitStatus R3BNeulandNeutronReconstructionMon::Init()
         new TH1D("fhCountNdiff", "Number of reacted primary Neutrons - Number of reconstructed Neutrons", 11, -5, 5);
     fhEdiff = new TH1D("fhEdiff", "Energy of primary Neutron - Energy of reconstructed Neutron", 2001, -1000, 1000);
 
-    fhErel = new TH1D("fhErel", "fhErel", 1001, 0, 10);
-    fhErelMC = new TH1D("fhErelMC", "fhErelMC", 1001, 0, 10);
-    fhErelVSnNreco = new TH2D("fhErelVSnNreco", "fhErelVSnNreco", 1000, 0, 5, 11, -0.5, 10.5);
+    fhErel = new TH1D("fhErel", "fhErel", 5000, 0, 5000);
+    fhErelMC = new TH1D("fhErelMC", "fhErelMC", 5000, 0, 5000);
+    fhErelVSnNreco = new TH2D("fhErelVSnNreco", "fhErelVSnNreco", 5000, 0, 5000, 11, -0.5, 10.5);
 
-    fhErelVSnNrecoNPNIPs = new TH2D("fhErelVSnNrecoNPNIPs", "fhErelVSnNrecoNPNIPs", 1000, 0, 5, 11, -0.5, 10.5);
+    fhErelVSnNrecoNPNIPs = new TH2D("fhErelVSnNrecoNPNIPs", "fhErelVSnNrecoNPNIPs", 5000, 0, 5000, 11, -0.5, 10.5);
 
     fhNreacNreco = new TH2D("fhNreacNreco", "fhNreacNreco", 11, -0.5, 10.5, 11, -0.5, 10.5);
     fhNreacNreco->GetXaxis()->SetTitle("nReac");
@@ -283,14 +287,24 @@ void R3BNeulandNeutronReconstructionMon::Exec(Option_t*)
         }
 
         const Double_t minv = p4_reco.Mag() - m0_reco;
-        fhErel->Fill(minv);
-        fhErelVSnNreco->Fill(minv, nReconstructedNeutrons);
+        fhErel->Fill(minv * 1000.);
+        fhErelVSnNreco->Fill(minv * 1000., nReconstructedNeutrons);
+
+        if (fhmErelnReco[nReconstructedNeutrons] == nullptr)
+        {
+            fhmErelnReco[nReconstructedNeutrons] = new TH1D("fhErel" + TString::Itoa(nReconstructedNeutrons, 10),
+                                                            "fhErel" + TString::Itoa(nReconstructedNeutrons, 10),
+                                                            5000,
+                                                            0,
+                                                            5000);
+        }
+        fhmErelnReco.at(nReconstructedNeutrons)->Fill(minv * 1000.);
 
         const Double_t minv_mc = p4_mc.Mag() - m0_mc;
-        fhErelMC->Fill(minv_mc);
+        fhErelMC->Fill(minv_mc * 1000.);
 
         const Double_t minv_npnips = p4_npnips.Mag() - m0_npnips;
-        fhErelVSnNrecoNPNIPs->Fill(minv_npnips, nNPNIPS);
+        fhErelVSnNrecoNPNIPs->Fill(minv_npnips * 1000., nNPNIPS);
     }
 }
 
@@ -311,6 +325,11 @@ void R3BNeulandNeutronReconstructionMon::Finish()
     fhErelVSnNreco->Write();
     fhErelVSnNrecoNPNIPs->Write();
     fhNreacNreco->Write();
+
+    for (auto& nh : fhmErelnReco)
+    {
+        nh.second->Write();
+    }
 
     gDirectory = tmp;
 }

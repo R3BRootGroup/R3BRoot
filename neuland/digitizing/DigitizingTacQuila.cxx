@@ -1,8 +1,8 @@
 #include "DigitizingTacQuila.h"
 #include <algorithm>
 #include <cmath>
-#include <stdexcept>
 #include <memory>
+#include <stdexcept>
 
 namespace Neuland
 {
@@ -11,7 +11,7 @@ namespace Neuland
     {
         // Default Values
         fPaddleHalfLength = 0.;         // [cm]
-        fThresh = 1.;                   // [MeV]
+        fPMTThresh = 1.;                // [MeV]
         fSaturationCoefficient = 0.012; //
         fTimeRes = 0.15;                // time + Gaus(0., fTimeRes) [ns]
         fEResRel = 0.05;                // Gaus(e, fEResRel * e) []
@@ -156,7 +156,7 @@ namespace Neuland
             currentHeightOfLightPulse += hit.light;
 
             // If the light pulse is higher than the threshold, this hit causes the pmt to fire
-            if (currentHeightOfLightPulse * exp(par.fAttenuation * par.fPaddleHalfLength) > par.fThresh)
+            if (currentHeightOfLightPulse * exp(par.fAttenuation * par.fPaddleHalfLength) > par.fPMTThresh)
             {
                 return hit_it;
             }
@@ -241,7 +241,7 @@ namespace Neuland
             out[kv.first] = std::move(kv.second);
         }
         paddles.clear();
-        return std::move(out);
+        return out;
     }
 
 }; // namespace

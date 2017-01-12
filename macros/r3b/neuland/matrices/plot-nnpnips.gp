@@ -58,12 +58,14 @@ plot \
 	for [n = 1:4] for [m = 0:n] sprintf("< awk '$1 == 3500 && $3 == %d && $4 == %s && $5 == %d' eval-nnpnips.dat | sort -nk 2", n, energy, m) u ($2-0.5):6 ls 2*n-1 lw 1.5 dt m+1 w steps notitle
 unset output
 
-set output "plot-nnpnips-".energy."MeV-4n.pdf"
+do for [nN = 1:4] {
+set output "plot-nnpnips-".energy."MeV-".nN."n.pdf"
 plot \
-	for [n = 4:4] for [m = 0:n] f(x1,n,m) notitle ls 2*n lw 1 dt m+1, \
-	for [n = 4:4] for [m = 0:n] sprintf("< awk '$1 == 1400 && $3 == %d && $4 == %s && $5 == %d' eval-nnpnips.dat | sort -nk 2", n, energy, m) u ($2-0.5):6 ls 2*n   lw 1.5 dt m+1 w steps title sprintf("%dn incoming, %dn reacted", n, m)#, \
+	for [n = nN:nN] for [m = 0:n] f(x1,n,m) notitle ls 2*n lw 1 dt m+1, \
+	for [n = nN:nN] for [m = 0:n] sprintf("< awk '$1 == 1400 && $3 == %d && $4 == %s && $5 == %d' eval-nnpnips.dat | sort -nk 2", n, energy, m) u ($2-0.5):6 ls 2*n   lw 1.5 dt m+1 w steps title sprintf("%dn incoming, %dn reacted", n, m)#, \
 	#for [n = 4:4] for [m = 0:n] sprintf("< awk '$1 == 3500 && $3 == %d && $4 == %s && $5 == %d' eval-nnpnips.dat | sort -nk 2", n, energy, m) u ($2-0.5):6 ls 2*m-1 lw 1.5 w steps notitle
 unset output
+}
 unset label
 
 } # do energy

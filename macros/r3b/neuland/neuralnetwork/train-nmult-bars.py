@@ -25,11 +25,11 @@ learning_rate = 0.001
 batch_size = 50
 n_hidden_1 = 9000 # 1st layer num features
 n_hidden_2 = 256 # 2nd layer num features
-n_input = 60*50*3
+n_input = 12*2*50*3
 n_classes = 6
 
 # tf Graph input
-x = tf.placeholder(tf.float32, [None, 60*50, 3])
+x = tf.placeholder(tf.float32, [None, n_input//3, 3])
 y = tf.placeholder(tf.float32, [None, n_classes])
 keep_prob = tf.placeholder(tf.float32)
 
@@ -66,7 +66,7 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
 
 # Filler structures
 feature_filler = np.ndarray(
-    shape=(batch_size, 60*50, 3), dtype=np.float32)
+    shape=(batch_size, n_input//3, 3), dtype=np.float32)
 label_filler = np.ndarray(
     shape=(batch_size, n_classes), dtype=np.float32)
 
@@ -92,33 +92,34 @@ np.set_printoptions(linewidth=200)
 
 # Train
 event = neuland.Event()
-for n, batch in enumerate(chunks(dataarray, batch_size)):
-    feature_filler.fill(0.)
-    label_filler.fill(0.)
-    for m, data in enumerate(batch):
-        event.ParseFromString(data)
-        label_filler[m][len(event.neutrons)] = 1
-        for digi in event.digis:
-            feature_filler[m][digi.id-1] = [digi.e, digi.tl, digi.tr]
+for iteration in range(1,20,1):
+    for n, batch in enumerate(chunks(dataarray, batch_size)):
+        feature_filler.fill(0.)
+        label_filler.fill(0.)
+        for m, data in enumerate(batch):
+            event.ParseFromString(data)
+            label_filler[m][len(event.neutrons)] = 1
+            for digi in event.digis:
+                feature_filler[m][digi.id-1] = [digi.e, digi.tl, digi.tr]
 
-    sess.run([optimizer], feed_dict={x: feature_filler, y: label_filler, keep_prob: 0.7})
-    # labels_val, predictions_val = sess.run([tf.argmax(y,1), tf.argmax(pred,1)], feed_dict={x: feature_filler, y: label_filler, keep_prob: 0.7})
-    #print(labels_val)
-    #print(predictions_val)
-    #print("---")
+        sess.run([optimizer], feed_dict={x: feature_filler, y: label_filler, keep_prob: 0.7})
+        # labels_val, predictions_val = sess.run([tf.argmax(y,1), tf.argmax(pred,1)], feed_dict={x: feature_filler, y: label_filler, keep_prob: 0.7})
+        #print(labels_val)
+        #print(predictions_val)
+        #print("---")
 
-    if (n % 1 == 0): # % 100
-        # Calculate batch accuracy
-        acc, loss = sess.run([accuracy, cost], feed_dict={x: feature_filler, y: label_filler, keep_prob: 0.7})
-        # Calculate batch loss
-        print("Iter " + str(n*batch_size) + ", Minibatch Loss= " + \
-            "{:.6f}".format(loss) + ", Training Accuracy= " + \
-            "{:.5f}".format(acc))
+        if (n % 100 == 0): # % 100
+            # Calculate batch accuracy
+            acc, loss = sess.run([accuracy, cost], feed_dict={x: feature_filler, y: label_filler, keep_prob: 0.7})
+            # Calculate batch loss
+            print("i " + str(iteration) + " - nb " + str(n*batch_size) + ", Minibatch Loss= " + \
+                "{:.6f}".format(loss) + ", Training Accuracy= " + \
+                "{:.5f}".format(acc))
 
-    if (n % 250 == 0):
-        print("Saving ...")
-        save_path = saver.save(sess, "model.ckpt")
-        print("Saved Training to %s" % save_path)
+        if (n % 500 == 0):
+            print("Saving ...")
+            save_path = saver.save(sess, "model.ckpt")
+            print("Saved Training to %s" % save_path)
 
 print("Saving ...")
 save_path = saver.save(sess, "model.ckpt")

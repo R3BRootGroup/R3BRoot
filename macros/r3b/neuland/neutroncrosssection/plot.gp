@@ -2,76 +2,42 @@
 
 reset
 
+set encoding utf8
 load '../gp/Paired.plt'
-#load '../gp/Axes.plt'
+load '../gp/Axes.plt'
+
+set terminal pdfcairo enhanced font "NotoSans,12"
+
+set key inside top right Left reverse spacing 1.0 font ",9" maxrows 6
 
 set grid
 
-plists = 'FTFP\_BERT FTFP\_BERT\_HP FTFP\_INCLXX FTFP\_INCLXX\_HP FTF\_BIC QBBC QGSP\_BERT QGSP\_BERT\_HP QGSP\_BIC QGSP\_BIC\_HP QGSP\_FTFP\_BERT QGSP\_INCLXX QGSP\_INCLXX\_HP'
-
-do for [term in "pdf svg"]{
-if (term eq "svg"){
-	set terminal term enhanced font "Helvetica" dynamic
-	set key outside right Left reverse
-} else {
-	set terminal term enhanced font "Helvetica"
-	set key at graph 0.95,0.98 Left reverse
-}
-
-set xlabel "Neutron Energy [MeV]"
+set xlabel "Neutron kinetic energy [MeV]" offset 0,0.5
 set logscale x
+set xrange [1e1:1e4]
 set mxtics 10
-set xrange [2e0:1e4]
 
-set yrange [0:0.7]
 
-set output "plot-mctracks.".term
-set ylabel "Events with #MCTracks > 1 / All Events"
+set ylabel "Reacted neutrons (∝σ_{n,tot}) [%]" offset 1,0
+set yrange [0:40]
+set mytics 5
+
+set output "crosssection.pdf"
 plot \
-	for [plist in plists] \
-	sprintf("< awk '$1 == \"%s\"' eval-sim.dat 2>/dev/null | sort -k 2 -g", plist) using 2:3 w steps lw 2 title plist
+	sprintf("< awk '$1 == \"%s\"' eval-digi.dat | sort -nk 2", "HADRSTD"       ) using 2:($4*100) w steps ls 4  dt 3 lw 1 title 'G3 Default (HADR=1)', \
+	sprintf("< awk '$1 == \"%s\"' eval-digi.dat | sort -nk 2", "HADRRB"        ) using 2:($4*100) w steps ls 4  dt 1 lw 1 title 'G3 R3BRoot (HADR=5)', \
+	sprintf("< awk '$1 == \"%s\"' eval-digi.dat | sort -nk 2", "FTFP_BERT"     ) using 2:($4*100) w steps ls 1  dt 1 lw 1 title 'G4 FTFP\_BERT', \
+	sprintf("< awk '$1 == \"%s\"' eval-digi.dat | sort -nk 2", "FTFP_BERT_HP"  ) using 2:($4*100) w steps ls 1  dt 3 lw 1 title 'G4 FTFP\_BERT\_HP', \
+	sprintf("< awk '$1 == \"%s\"' eval-digi.dat | sort -nk 2", "FTFP_INCLXX"   ) using 2:($4*100) w steps ls 2  dt 1 lw 1 title 'G4 FTFP\_INCLXX', \
+	sprintf("< awk '$1 == \"%s\"' eval-digi.dat | sort -nk 2", "FTFP_INCLXX_HP") using 2:($4*100) w steps ls 2  dt 3 lw 1 title 'G4 FTFP\_INCLXX\_HP', \
+	sprintf("< awk '$1 == \"%s\"' eval-digi.dat | sort -nk 2", "FTF_BIC"       ) using 2:($4*100) w steps ls 9  dt 1 lw 1 title 'G4 FTF\_BIC', \
+	sprintf("< awk '$1 == \"%s\"' eval-digi.dat | sort -nk 2", "QBBC"          ) using 2:($4*100) w steps ls 10 dt 1 lw 1 title 'G4 QBBC', \
+	sprintf("< awk '$1 == \"%s\"' eval-digi.dat | sort -nk 2", "QGSP_BERT"     ) using 2:($4*100) w steps ls 5  dt 1 lw 1 title 'G4 QGSP\_BERT', \
+	sprintf("< awk '$1 == \"%s\"' eval-digi.dat | sort -nk 2", "QGSP_BERT_HP"  ) using 2:($4*100) w steps ls 5  dt 3 lw 1 title 'G4 QGSP\_BERT\_HP', \
+	sprintf("< awk '$1 == \"%s\"' eval-digi.dat | sort -nk 2", "QGSP_BIC"      ) using 2:($4*100) w steps ls 6  dt 1 lw 1 title 'G4 QGSP\_BIC', \
+	sprintf("< awk '$1 == \"%s\"' eval-digi.dat | sort -nk 2", "QGSP_BIC_HP"   ) using 2:($4*100) w steps ls 6  dt 3 lw 1 title 'G4 QGSP\_BIC\_HP', \
+	sprintf("< awk '$1 == \"%s\"' eval-digi.dat | sort -nk 2", "QGSP_FTFP_BERT") using 2:($4*100) w steps ls 7  dt 1 lw 1 title 'G4 QGSP\_FTFP\_BERT', \
+	sprintf("< awk '$1 == \"%s\"' eval-digi.dat | sort -nk 2", "QGSP_INCLXX"   ) using 2:($4*100) w steps ls 8  dt 1 lw 1 title 'G4 QGSP\_INCLXX', \
+	sprintf("< awk '$1 == \"%s\"' eval-digi.dat | sort -nk 2", "QGSP_INCLXX_HP") using 2:($4*100) w steps ls 8  dt 3 lw 1 title 'G4 QGSP\_INCLXX\_HP'
 unset output
-
-set output "plot-neulandpoints.".term
-set ylabel "Events with #NeulandPoints > 0 / All Events"
-plot \
-	for [plist in plists] \
-	sprintf("< awk '$1 == \"%s\"' eval-sim.dat 2>/dev/null | sort -k 2 -g", plist) using 2:4 w steps lw 2 title plist
-unset output
-
-set output "plot-neulanddigis.".term
-set ylabel "Events with #NeulandDigis > 0 / All Events"
-plot \
-	for [plist in plists] \
-	sprintf("< awk '$1 == \"%s\"' eval-digi.dat 2>/dev/null | sort -k 2 -g", plist) using 2:3 w steps lw 2 title plist
-unset output
-
-
-unset logscale x
-set mxtics 10
-set xrange [100:1000]
-
-set yrange [0:0.2]
-
-set output "plot-mctracks2.".term
-set ylabel "Events with #MCTracks > 1 / All Events"
-plot \
-	for [plist in plists] \
-	sprintf("< awk '$1 == \"%s\"' eval-sim.dat 2>/dev/null | sort -k 2 -g", plist) using 2:3 w steps lw 2 title plist
-unset output
-
-set output "plot-neulandpoints2.".term
-set ylabel "Events with #NeulandPoints > 0 / All Events"
-plot \
-	for [plist in plists] \
-	sprintf("< awk '$1 == \"%s\"' eval-sim.dat 2>/dev/null | sort -k 2 -g", plist) using 2:4 w steps lw 2 title plist
-unset output
-
-set output "plot-neulanddigis2.".term
-set ylabel "Events with #NeulandDigis > 0 / All Events"
-plot \
-	for [plist in plists] \
-	sprintf("< awk '$1 == \"%s\"' eval-digi.dat 2>/dev/null | sort -k 2 -g", plist) using 2:3 w steps lw 2 title plist
-unset output
-
-} # do term
+unset label

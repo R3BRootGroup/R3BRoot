@@ -8,17 +8,11 @@ def main(argv):
         m = re.search('.*\/(.*?)-([0-9\.]*)MeV.mon.root', infile)
 
         tfile = ROOT.TFile.Open(infile)
-        #tree = tfile.Get("evt")
 
-        # a = 0
-        # b = 0
-        # for event in tree:
-        #     a += 1
-        #     if event.NeulandDigis.GetEntries() > 0:
-        #         b += 1
         try:
-            hist = tfile.Get("NeulandDigiMon/hEtot")
-            print(m.group(1), m.group(2), hist.Integral(2, 10000) / hist.GetEntries() )#, b/a)
+            hist  = tfile.Get("NeulandDigiMon/hEtot")
+            hist2 = tfile.Get("NeulandMCMon/hE_tot")
+            print(m.group(1), m.group(2), hist.Integral(2, 10000) / hist.GetEntries(), hist2.Integral(2,10000) / hist2.GetEntries() )
         except:
             pass
 

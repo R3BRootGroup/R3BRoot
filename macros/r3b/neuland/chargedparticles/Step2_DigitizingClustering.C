@@ -22,7 +22,7 @@ void Step2_DigitizingClustering(const TString simFile)
     run->AddTask(new R3BNeulandClusterFinder());
 
     // Optional
-    run->AddTask(new R3BNeulandMCMon());
+    run->AddTask(new R3BNeulandMCMon("FULLSIMANA"));
     run->AddTask(new R3BNeulandDigiMon());
     run->AddTask(new R3BNeulandClusterMon());
 

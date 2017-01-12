@@ -1,17 +1,17 @@
 #include "R3BNeulandDigiMon.h"
 
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 #include <numeric>
 
 #include "TClonesArray.h"
+#include "TDirectory.h"
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TH3D.h"
-#include "TDirectory.h"
 
-#include "FairRootManager.h"
 #include "FairLogger.h"
+#include "FairRootManager.h"
 
 #include "R3BNeulandDigi.h"
 
@@ -72,6 +72,7 @@ InitStatus R3BNeulandDigiMon::Init()
     hDepthVSEtot = new TH2D("hDepthVSEtot", "Depth vs Total Energy", 60, 1400, 1700, 1000, 0, 1000);
     hdeltaEE = new TH2D("hdeltaEE", "Energy in Foremost Plane vs Etot", 100, 0, 2000, 100, 0, 250);
     hPosVSEnergy = new TH2D("hPosVSEnergy", "Position vs Energy deposition", 60, 1400, 1700, 1000, 0, 1000);
+    hBeta = new TH1D("hBeta", "Velocity", 200., 0., 1.);
 
     return kSUCCESS;
 }
@@ -102,14 +103,12 @@ void R3BNeulandDigiMon::Exec(Option_t*)
     {
         hPosVSEnergy->Fill(digi->GetPosition().Z(), digi->GetE());
         hTime->Fill(digi->GetT());
+        hBeta->Fill(digi->GetBeta());
     }
 
-    auto maxDepthDigi = std::max_element(digis.begin(),
-                                         digis.end(),
-                                         [](R3BNeulandDigi* a, R3BNeulandDigi* b)
-                                         {
-                                             return a->GetPosition().Z() < b->GetPosition().Z();
-                                         });
+    auto maxDepthDigi = std::max_element(digis.begin(), digis.end(), [](R3BNeulandDigi* a, R3BNeulandDigi* b) {
+        return a->GetPosition().Z() < b->GetPosition().Z();
+    });
     if (maxDepthDigi != digis.end())
     {
         hDepth->Fill((*maxDepthDigi)->GetPosition().Z());
@@ -117,19 +116,11 @@ void R3BNeulandDigiMon::Exec(Option_t*)
         hDepthVSSternmostEnergy->Fill((*maxDepthDigi)->GetPosition().Z(), (*maxDepthDigi)->GetE());
     }
 
-    auto minDepthDigi = std::min_element(digis.begin(),
-                                         digis.end(),
-                                         [](R3BNeulandDigi* a, R3BNeulandDigi* b)
-                                         {
-                                             return a->GetPosition().Z() < b->GetPosition().Z();
-                                         });
-    auto Etot = std::accumulate(digis.begin(),
-                                digis.end(),
-                                Double_t(0.),
-                                [](const Double_t a, R3BNeulandDigi* b)
-                                {
-                                    return a + b->GetE();
-                                });
+    auto minDepthDigi = std::min_element(digis.begin(), digis.end(), [](R3BNeulandDigi* a, R3BNeulandDigi* b) {
+        return a->GetPosition().Z() < b->GetPosition().Z();
+    });
+    auto Etot = std::accumulate(
+        digis.begin(), digis.end(), Double_t(0.), [](const Double_t a, R3BNeulandDigi* b) { return a + b->GetE(); });
 
     if (minDepthDigi != digis.end())
     {
@@ -163,6 +154,7 @@ void R3BNeulandDigiMon::Finish()
     hDepthVSEtot->Write();
     hPosVSEnergy->Write();
     hdeltaEE->Write();
+    hBeta->Write();
 
     gDirectory = tmp;
 }

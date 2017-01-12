@@ -41,11 +41,7 @@ class RunConfig
     TString GetNcut() const
     {
         return TString::Format(
-            //"%s/%dcm_%ddp_%dAMeV_%dkeV.neutroncuts.para.root", path.Data(), distance, nDoublePlanes, energy, erel);
-            "%s/%dcm_%ddp_600AMeV_500keV.neutroncuts.para.root",
-            path.Data(),
-            distance,
-            nDoublePlanes);
+            "%s/%dcm_%ddp_%dAMeV_%dkeV.neutroncuts.para.root", path.Data(), distance, nDoublePlanes, energy, erel);
     }
 
     TString GetReco() const

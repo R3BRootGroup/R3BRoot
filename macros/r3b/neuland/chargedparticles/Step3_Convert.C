@@ -1,10 +1,11 @@
 void SingleExportAscii(TH1* hist, ofstream& out, const TString separator = "\t")
 {
-	if(!hist){
-		// throw;
-		cout << "nope" << endl;
-		return;
-	}
+    if (!hist)
+    {
+        // throw;
+        cout << "nope" << endl;
+        return;
+    }
 
     out << "# Output " << hist->ClassName() << ": " << hist->GetName() << " (" << hist->GetTitle() << ")\n";
     if (hist->GetDimension() == 1)
@@ -47,15 +48,20 @@ void Step3_Convert(const TString filename)
     hists.push_back("NeulandDigiMon/hDepth");
     hists.push_back("NeulandDigiMon/hForemostEnergy");
     hists.push_back("NeulandDigiMon/hEtot");
+    hists.push_back("NeulandClusterMon/ClusterEnergyMoment");
+    hists.push_back("NeulandClusterMon/ClusterMaxEnergyDigiMinusFirstDigiMag");
 
-    //for (const TString& hist : hists)
-    for(Int_t i = 0; i < hists.size(); i++)
+
+    // for (const TString& hist : hists)
+    for (Int_t i = 0; i < hists.size(); i++)
     {
         const TString hist = hists.at(i);
         std::cout << hist << std::endl;
         TH1D* h = (TH1D*)file->GetObjectChecked(hist, "TH1D");
 
-        const TString outfile = (TString(filename).ReplaceAll("digi.root", TString(hist).ReplaceAll("NeulandDigiMon/", "") + ".dat"));
+        const TString outfile = (TString(filename).ReplaceAll(
+            "digi.root",
+            TString(hist).ReplaceAll("NeulandDigiMon/", "").ReplaceAll("NeulandClusterMon/", "") + ".dat"));
         ofstream outstream(outfile);
 
         SingleExportAscii(h, outstream);

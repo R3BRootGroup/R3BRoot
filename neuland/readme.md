@@ -1,25 +1,20 @@
 # NeuLAND module for r3broot
 
-## Changelog
-
-Only major change listed. See commit messages for detailed information.
-
-@40888c5 Massive overhaul of most classes, new clustering and event reconstruction. Will break some existing simulated / processed data. Also, interfaces of data storage classes have changed, requiring changes to, e.g., custom analysis scripts. Please simply rerun everything.
-
-@a53f685 Geometry overhaul
-
-@94441ec Neuland Detector class, digitizer updates
-
-@da55a13 Digitizer updates
-
-@cee744f New NeulandDigitizer and Digitization Engine
-
-
 ## Components
+Code for the NeuLAND Detector is split into different components:
+
+- simulation
+- digitizing
+- clustering
+- reconstruction
+- test
+- unpack
+- shared
+
 Note that in contrast to the old NeuLAND and LAND code in the /land/ directory, the spelling in e.g. class names is "Neuland", with a small "l".
 
 
-### Detectors
+### Simulation
 
 - [`R3BNeuland`](#detector-class) Main detector including light generation -> NeulandPoints
 
@@ -43,7 +38,7 @@ For separation of the actual physics/business logic from the IO-managing tasks.
 
 - `Neuland::DigitizingEngine`
 - [`Neuland::ClusteringEngine`](#implementation-of-the-handshake-chain-clustering)
-
+- `Neuland::ReconstructionEngine`
 
 ### Data Storage
 
@@ -194,11 +189,4 @@ The cuts are saved in the parameter file via `R3BNeulandNeutron2DPar`. Provided 
 
 ### Event Reconstruction
 
-Provided with the neutron multiplicity parameter *nN*, the task `R3BNeulandNeutronReconstruction` can try to find the neutron interaction points from the TClonesArray NeulandClusters (`R3BNeulandCluster`). This is currently done by sorting the clusters by time, taking the *nN* first, and using these clusters' first digi position. These positions are then saved to the TClonesArray NeulandNeutrons (`R3BNeulandNeutron`).
-
-Work in Progress
-
-### Reconstruction Evaluation 
-
-Work in Progress
-
+Provided with the neutron multiplicity parameter *nN*, the task `R3BNeulandNeutronReconstruction` can try to find the neutron interaction points from the TClonesArray NeulandClusters (`R3BNeulandCluster`). Currently, `RecoTDR` and `ClusterScoring` are available. These positions are then saved to the TClonesArray NeulandNeutrons (`R3BNeulandNeutron`).

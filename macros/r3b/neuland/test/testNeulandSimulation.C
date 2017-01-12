@@ -21,7 +21,7 @@ void testNeulandSimulation(
 
     // Basic simulation setup
     FairRunSim *run = new FairRunSim();
-    run->SetName("TGeant3");
+    run->SetName("TGeant4");
     run->SetOutputFile(outFile);
     run->SetMaterials("media_r3b.geo");
 

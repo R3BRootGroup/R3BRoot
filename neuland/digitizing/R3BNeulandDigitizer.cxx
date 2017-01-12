@@ -1,22 +1,22 @@
 #include "R3BNeulandDigitizer.h"
 
-#include <string>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <stdexcept>
+#include <string>
 
-#include "TGeoManager.h"
 #include "TClonesArray.h"
-#include "TMath.h"
+#include "TGeoManager.h"
+#include "TGeoNode.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TMath.h"
 #include "TString.h"
-#include "TGeoNode.h"
 
+#include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
-#include "FairLogger.h"
 
 #include "DigitizingTacQuila.h"
 
@@ -198,26 +198,43 @@ void R3BNeulandDigitizer::Exec(Option_t*)
             const TVector3 digiPositionGlobal = fNeulandGeoPar->ConvertToGlobalCoordinates(digiPositionLocal, paddleID);
             const TVector3 digiPixel = fNeulandGeoPar->ConvertGlobalToPixel(digiPositionGlobal);
 
-            new ((*fNeulandDigis)[fNeulandDigis->GetEntries()]) R3BNeulandDigi(paddleID,
-                                                                               paddle->GetLeftPMT()->GetTDC(),
-                                                                               paddle->GetRightPMT()->GetTDC(),
-                                                                               paddle->GetTime(),
-                                                                               paddle->GetLeftPMT()->GetEnergy(),
-                                                                               paddle->GetRightPMT()->GetEnergy(),
-                                                                               paddle->GetEnergy(),
-                                                                               digiPositionGlobal);
+            std::unique_ptr<R3BNeulandDigi> digi(new R3BNeulandDigi(paddleID,
+                                                                    paddle->GetLeftPMT()->GetTDC(),
+                                                                    paddle->GetRightPMT()->GetTDC(),
+                                                                    paddle->GetTime(),
+                                                                    paddle->GetLeftPMT()->GetEnergy(),
+                                                                    paddle->GetRightPMT()->GetEnergy(),
+                                                                    paddle->GetEnergy(),
+                                                                    digiPositionGlobal));
 
-            new ((*fNeulandPixels)[fNeulandPixels->GetEntries()]) R3BNeulandPixel((Int_t)digiPixel.X(),
-                                                                                  (Int_t)digiPixel.Y(),
-                                                                                  (Int_t)digiPixel.Z(),
-                                                                                  (Float_t)paddle->GetTime(),
-                                                                                  (Float_t)paddle->GetEnergy());
+            if (IsValid(digi.get()))
+            {
+                new ((*fNeulandDigis)[fNeulandDigis->GetEntries()]) R3BNeulandDigi(*std::move(digi.release()));
+
+                new ((*fNeulandPixels)[fNeulandPixels->GetEntries()]) R3BNeulandPixel((Int_t)digiPixel.X(),
+                                                                                      (Int_t)digiPixel.Y(),
+                                                                                      (Int_t)digiPixel.Z(),
+                                                                                      (Float_t)paddle->GetEnergy(),
+                                                                                      (Float_t)paddle->GetTime());
+            }
 
             hElossVSQDC->Fill(paddleEnergyDeposit[paddleID], paddle->GetEnergy());
         }
     } // loop over paddles
 
     LOG(DEBUG) << "R3BNeulandDigitizer: produced " << fNeulandDigis->GetEntries() << " digis" << FairLogger::endl;
+}
+
+inline Bool_t R3BNeulandDigitizer::IsValid(const R3BNeulandDigi* digi) const
+{
+    for (const auto& filter : fDigiFilters)
+    {
+        if (filter(digi) == false)
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 void R3BNeulandDigitizer::Finish()

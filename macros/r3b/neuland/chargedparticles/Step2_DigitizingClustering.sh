@@ -11,7 +11,7 @@ trap 'kill $(jobs -pr) 2>/dev/null' SIGINT SIGTERM EXIT
 COUNT=0
 for f in "${FILES[@]}"
 do
-	root -l -q -b 'Step2_DigitizingClustering.C('\"${f}\"')' &>/dev/null &
+	nice -n 19 root -l -q -b 'Step2_DigitizingClustering.C('\"${f}\"')' &>"${f}.log" &
 
 	# Only spawn so many processes at once
 	COUNT=$((${COUNT}+1))

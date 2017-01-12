@@ -1,16 +1,18 @@
 #ifndef R3B_NEULAND_DIGITIZER_H
 #define R3B_NEULAND_DIGITIZER_H
 
+#include <functional>
 #include <map>
+#include <vector>
 
 #include "TClonesArray.h"
 
 #include "FairTask.h"
 
-#include "R3BNeulandPoint.h"
 #include "R3BNeulandDigi.h"
-#include "R3BNeulandPixel.h"
 #include "R3BNeulandGeoPar.h"
+#include "R3BNeulandPixel.h"
+#include "R3BNeulandPoint.h"
 
 #include "DigitizingEngine.h"
 
@@ -57,6 +59,7 @@ class R3BNeulandDigitizer : public FairTask
 
   public:
     void Exec(Option_t*) override;
+    void AddFilter(const std::function<bool(const R3BNeulandDigi*)> f) { fDigiFilters.push_back(f); }
 
   private:
     std::unique_ptr<Neuland::DigitizingEngine> fDigitizingEngine; // owning (sink)
@@ -70,6 +73,9 @@ class R3BNeulandDigitizer : public FairTask
     std::unique_ptr<TClonesArray> fNeulandPixels; // owning
 
     R3BNeulandGeoPar* fNeulandGeoPar; // non-owning
+
+    Bool_t IsValid(const R3BNeulandDigi*) const;
+    std::vector<std::function<bool(const R3BNeulandDigi*)>> fDigiFilters;
 
     TH1F* hMultOne;
     TH1F* hMultTwo;

@@ -1,7 +1,7 @@
-#include <map>
-#include "TCutG.h"
 #include "R3BNeulandNeutron2DPar.h"
+#include "TCutG.h"
 #include "gtest/gtest.h"
+#include <map>
 
 namespace
 {
@@ -21,10 +21,10 @@ namespace
     {
         std::map<UInt_t, TCutG*> m;
         m[0] = new TCutG("cut0", 4);
-        m[0]->SetPoint(0, 0,  0);
+        m[0]->SetPoint(0, 0, 0);
         m[0]->SetPoint(1, 0, 10);
         m[0]->SetPoint(2, 10, 0);
-        m[0]->SetPoint(3, 0,  0);
+        m[0]->SetPoint(3, 0, 0);
         m[1] = new TCutG("cut1", 4);
         m[1]->SetPoint(0, 0, 10);
         m[1]->SetPoint(1, 0, 20);
@@ -39,16 +39,9 @@ namespace
         R3BNeulandNeutron2DPar par;
         par.SetNeutronCuts(m);
 
-        EXPECT_EQ(par.GetNeutronMultiplicity(4,4), 0);
-        EXPECT_EQ(par.GetNeutronMultiplicity(9,9), 1);
-        EXPECT_EQ(par.GetNeutronMultiplicity(14,14), 2);
-        EXPECT_EQ(par.GetNeutronMultiplicity(19,19), 3);
+        EXPECT_EQ(par.GetNeutronMultiplicity(4, 4), 0u);
+        EXPECT_EQ(par.GetNeutronMultiplicity(9, 9), 1u);
+        EXPECT_EQ(par.GetNeutronMultiplicity(14, 14), 2u);
+        EXPECT_EQ(par.GetNeutronMultiplicity(19, 19), 3u);
     }
-
-} // namespace
-
-int main(int argc, char** argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }

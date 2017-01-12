@@ -70,7 +70,14 @@ class R3BNeulandDigi : public TObject
     void SetPosition(const TVector3& position) { fPosition = position; }
     TVector3 GetPosition() const { return fPosition; }
 
+    Double_t GetBeta() const;
     Double_t GetEToF(const Double_t mass = 939.565379) const;
+
+    bool operator==(const R3BNeulandDigi& b) const
+    {
+        return this->GetPaddle() == b.GetPaddle() && this->GetT() == b.GetT() && this->GetE() == b.GetE() &&
+               this->GetPosition() == b.GetPosition();
+    }
 
   protected:
     Int_t fPaddle;

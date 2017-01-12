@@ -15,10 +15,12 @@ erel = int(sys.argv[5])
 
 file    = "output/%dcm_%ddp_%dn_%dAMeV_%dkeV.digi.root"    % (distance, nDoublePlanes, nNeutrons, energy, erel)
 parfile = "output/%dcm_%ddp_600AMeV_500keV.neutroncuts.para.root" % (distance, nDoublePlanes)
-outfile = "output/%dcm_%ddp_%dn_%dAMeV_%dkeV_2DCalibr.pdf" % (distance, nDoublePlanes, nNeutrons, energy, erel)
+outfile = "./%dcm_%ddp_%dn_%dAMeV_%dkeV_2DCalibr.pdf" % (distance, nDoublePlanes, nNeutrons, energy, erel)
 
 tfile = ROOT.TFile.Open(file)
 tparfile = ROOT.TFile.Open(parfile)
+
+print(tparfile.Get("R3BNeulandNeutron2DPar").GetNeutronCut(3))
 
 hist = tfile.Get("NeulandClusterMon/ClusterNumberEtot")
 
@@ -52,11 +54,11 @@ hist.Draw("colz")
 labels.DrawLatex(1800, 45, "%ddp" % nDoublePlanes)
 
 for i in [1, 2, 3, 4]:
-    cut = tparfile.Get("R3BNeulandNeutron2DPar").GetNeutronCuts()[i]
+    cut = tparfile.Get("R3BNeulandNeutron2DPar").GetNeutronCut(i)
     w = cut.IntegralHist(hist)
     labels.DrawLatex(70, i * 11 - 7, "%2d%%" % (w / 100))
     cut.Draw("same")
 
 canvas.SaveAs(outfile)
 
-#input("Press enter to continue...")
+input("Press enter to continue...")

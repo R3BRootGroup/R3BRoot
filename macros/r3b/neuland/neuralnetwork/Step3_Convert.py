@@ -37,7 +37,7 @@ print("Writing to protobuf stream %s" % sys.argv[1])
 ostream = stream.open(sys.argv[1], 'wb')
 
 for digifilename in sys.argv[2:]:
-  simufilename = digifilename.replace('.digi.', '.sim.')
+  simufilename = digifilename.replace('.digi.', '.simu.')
 
   print("Reading ROOT file %s" % digifilename)
   tfile = ROOT.TFile.Open(digifilename)

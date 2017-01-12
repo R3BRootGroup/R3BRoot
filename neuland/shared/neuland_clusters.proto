@@ -1,0 +1,28 @@
+syntax = "proto2";
+package NeulandClusters;
+
+message Vector {
+	optional float x = 1;
+	optional float y = 2;
+	optional float z = 3;
+}
+
+message Digi {
+	optional int32 id = 1;
+	optional float tl = 2;
+	optional float tr = 3;
+	optional float e = 4;
+	optional Vector pos = 5;
+}
+
+message Cluster {
+	repeated Digi digis = 1;
+	optional Vector energyCentroid = 2;
+	optional bool isPrimaryInteraction = 3;
+}
+
+message Event {
+	optional int32 runID = 1;
+	optional int32 eventID = 2;
+	repeated Cluster clusters = 3;
+}

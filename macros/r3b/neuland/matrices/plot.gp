@@ -49,7 +49,8 @@ set label boxed at graph 0.98,0.38 right sprintf("nDP: number of doubleplanes \n
 plot \
 	for [n = 1:4] f(x,n) notitle ls 2*n lw 1, \
 	for [n = 1:4] sprintf("< awk '$1 == 1400 && $3 == %d && $4 == %s' eval.dat | sort -nk 2", n, energy) u ($2-0.5):6 ls 2*n   lw 1.5 w steps title sprintf("%dn incoming, any signal detected", n), \
-	for [n = 1:4] sprintf("< awk '$1 == 3500 && $3 == %d && $4 == %s' eval.dat | sort -nk 2", n, energy) u ($2-0.5):6 ls 2*n-1 lw 1.5 w steps notitle
-unset output
+	for [n = 1:4] sprintf("< awk '$1 == 3500 && $3 == %d && $4 == %s' eval.dat | sort -nk 2", n, energy) u ($2-0.5):6 ls 2*n-1 lw 1.5 w steps notitle#, \
+	#for [n = 1:1] for [thresh = 8:12] sprintf("< awk '$1 == 1400 && $3 == %d && $4 == %s' eval.dat | sort -nk 2", n, energy) u ($2-0.5):thresh ls 2*n dt thresh-5  lw 1.5 w steps notitle
 unset label
+unset output
 } # do energy

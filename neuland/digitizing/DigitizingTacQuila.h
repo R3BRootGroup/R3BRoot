@@ -41,8 +41,8 @@
 
 #include "TRandom3.h"
 
-#include "Validated.h"
 #include "DigitizingEngine.h"
+#include "Validated.h"
 
 namespace Neuland
 {
@@ -51,7 +51,7 @@ namespace Neuland
         struct Params
         {
             Double_t fPaddleHalfLength;      // [cm]
-            Double_t fThresh;                // [MeV]
+            Double_t fPMTThresh;             // [MeV]
             Double_t fSaturationCoefficient; //
             Double_t fTimeRes;               // time + Gaus(0., fTimeRes) [ns]
             Double_t fEResRel;               // Gaus(e, fEResRel * e) []
@@ -125,7 +125,7 @@ namespace Neuland
       public:
         void SetPaddleHalfLength(const Double_t v) override { par.fPaddleHalfLength = v; }
 
-        void SetPMTThreshold(const Double_t v) { par.fThresh = v; }
+        void SetPMTThreshold(const Double_t v) { par.fPMTThresh = v; }
         void SetSaturationCoefficient(const Double_t v) { par.fSaturationCoefficient = v; }
         void SetTimeRes(const Double_t v) { par.fTimeRes = v; }
         void SetERes(const Double_t v) { par.fEResRel = v; }

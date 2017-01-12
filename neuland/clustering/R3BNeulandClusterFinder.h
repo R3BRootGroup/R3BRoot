@@ -11,48 +11,41 @@
  *
  */
 
-#include <memory>
-#include "TClonesArray.h"
-#include "FairTask.h"
-#include "R3BNeulandDigi.h"
 #include "ClusteringEngine.h"
+#include "FairTask.h"
+#include "R3BNeulandCluster.h"
+#include "R3BNeulandDigi.h"
+#include "TCAConnector.h"
 
 class R3BNeulandClusterFinder : public FairTask
 {
   public:
-    R3BNeulandClusterFinder(const Double_t dx = 2. * 7.5,
-                            const Double_t dy = 2. * 7.5,
-                            const Double_t dz = 3. * 7.5,
-                            const Double_t dt = 3.,
+    R3BNeulandClusterFinder(const Double_t dx = 1. * 7.5,
+                            const Double_t dy = 1. * 7.5,
+                            const Double_t dz = 2. * 7.5,
+                            const Double_t dt = 1.,
                             const TString input = "NeulandDigis",
                             const TString output = "NeulandClusters");
 
-    ~R3BNeulandClusterFinder() = default;
+    ~R3BNeulandClusterFinder() override = default;
 
-  private:
     // No copy and no move is allowed (Rule of three/five)
-    R3BNeulandClusterFinder(const R3BNeulandClusterFinder&);            // copy constructor
-    R3BNeulandClusterFinder(R3BNeulandClusterFinder&&);                 // move constructor
-    R3BNeulandClusterFinder& operator=(const R3BNeulandClusterFinder&); // copy assignment
-    R3BNeulandClusterFinder& operator=(R3BNeulandClusterFinder&&);      // move assignment
+    R3BNeulandClusterFinder(const R3BNeulandClusterFinder&) = delete;            // copy constructor
+    R3BNeulandClusterFinder(R3BNeulandClusterFinder&&) = delete;                 // move constructor
+    R3BNeulandClusterFinder& operator=(const R3BNeulandClusterFinder&) = delete; // copy assignment
+    R3BNeulandClusterFinder& operator=(R3BNeulandClusterFinder&&) = delete;      // move assignment
 
   protected:
     InitStatus Init() override;
-    void Finish() override;
 
   public:
     void Exec(Option_t*) override;
 
   private:
     Neuland::ClusteringEngine<R3BNeulandDigi> fClusteringEngine;
+    TCAInputConnector<R3BNeulandDigi> fDigis;
+    TCAOutputConnector<R3BNeulandCluster> fClusters;
 
-    TString fInput;
-    TString fOutput;
-
-    TClonesArray* fDigis;                    // non-owning
-    std::unique_ptr<TClonesArray> fClusters; // owning
-
-  public:
     ClassDefOverride(R3BNeulandClusterFinder, 0);
 };
 

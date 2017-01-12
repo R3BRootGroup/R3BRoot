@@ -2,7 +2,7 @@ void Step1_Simulate(const Int_t nEvents,
                     const TString basePath,
                     const TString baseName,
                     const UInt_t particleID,
-                    const Double_t momentum,
+                    const Double_t kinenergy,
                     const TString geoTag)
 {
     // System paths
@@ -16,7 +16,7 @@ void Step1_Simulate(const Int_t nEvents,
 
     // Basic simulation setup
     FairRunSim* run = new FairRunSim();
-    run->SetName("TGeant3");
+    run->SetName("TGeant4");
     run->SetOutputFile(outFile);
     run->SetMaterials("media_r3b.geo");
 
@@ -25,20 +25,20 @@ void Step1_Simulate(const Int_t nEvents,
 
     // Geometry: Cave
     FairModule* cave = new R3BCave("CAVE300MeV");
-    //cave->SetGeometryFileName("r3b_cave.geo");
+    // cave->SetGeometryFileName("r3b_cave.geo");
     cave->SetGeometryFileName("r3b_cave_vacuum.geo");
     run->AddModule(cave);
 
     // Geometry: Neuland
     R3BDetector* neuland = new R3BNeuland();
-    neuland->SetGeometryFileName("neuland_" + geoTag + ".geo.root");
+    neuland->SetGeometryFileName("neuland_v2_1400cm_50dp.geo.root");
     run->AddModule(neuland);
 
     // Primary particle generator
     FairBoxGenerator* boxGen = new FairBoxGenerator(particleID);
     boxGen->SetThetaRange(0., 1.);
     boxGen->SetPhiRange(0., 360.);
-    boxGen->SetPRange(momentum, momentum);
+    boxGen->SetEkinRange(kinenergy / 1000., kinenergy / 1000.);
     boxGen->SetXYZ(0., 0., 0.);
     boxGen->SetDebug(1);
     FairPrimaryGenerator* primGen = new FairPrimaryGenerator();

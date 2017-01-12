@@ -1,5 +1,6 @@
 #include "R3BNeulandDigi.h"
 
+static const Double_t c = 29.97924580000000105;   // cm/ns
 static const Double_t c2 = 898.75517873681758374; // cm²/ns²
 
 std::ostream& operator<<(std::ostream& os, const R3BNeulandDigi& digi)
@@ -11,6 +12,8 @@ std::ostream& operator<<(std::ostream& os, const R3BNeulandDigi& digi)
        << digi.GetPosition().Z() << std::endl;
     return os;
 }
+
+Double_t R3BNeulandDigi::GetBeta() const { return GetPosition().Mag() / (GetT() * c); }
 
 Double_t R3BNeulandDigi::GetEToF(const Double_t mass) const
 {

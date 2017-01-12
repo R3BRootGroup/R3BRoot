@@ -8,6 +8,7 @@
  */
 
 #include "FairTask.h"
+#include <map>
 
 class TClonesArray;
 class TH1D;
@@ -47,6 +48,7 @@ class R3BNeulandNeutronReconstructionMon : public FairTask
     TH2D* fhErelVSnNreco;
     TH2D* fhErelVSnNrecoNPNIPs;
     TH2D* fhNreacNreco;
+    std::map<Int_t, TH1D*> fhmErelnReco;
 
     TClonesArray* fPrimaryNeutronInteractionPoints;
     TClonesArray* fReconstructedNeutrons;

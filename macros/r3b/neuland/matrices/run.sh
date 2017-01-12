@@ -27,7 +27,8 @@ trap 'echo "Cleaning..."; rm -f calor.out; rm -f flukaerr.dat; rm -f gphysi.dat;
 # - log output (enable extended bash regex via shopt -s extglob)
 
 START=$(date +%s.%N)
-echo -e "'run.C(\"${OPERATION}\", \"${OUTDIR}\", "{1400,3500}", "{200,600,1000}", 500, "{1..50}", "{1..4}")'\n" | xargs -I CMD --max-procs 32 bash -c 'C='"'"'CMD'"'"'; echo `date --rfc-3339=seconds` ${C} && shopt -s extglob; nice -n 19 root -l -q -b -e "gInterpreter->AddIncludePath(\"'${VMCWORKDIR}'/macros/r3b/\")" "${C}" &> '${OUTDIR}'/${C//+([^a-zA-Z0-9])/_}.log'
+# echo -e "'run.C(\"${OPERATION}\", \"${OUTDIR}\", "{1400,3500}", "{200,600,1000}", 500, "{4..50}", "{1..4}")'\n" | xargs -I CMD --max-procs 32 bash -c 'C='"'"'CMD'"'"'; echo `date --rfc-3339=seconds` ${C} && shopt -s extglob; nice -n 19 root -l -q -b -e "gInterpreter->AddIncludePath(\"'${VMCWORKDIR}'/macros/r3b/\")" "${C}" &> '${OUTDIR}'/${C//+([^a-zA-Z0-9])/_}.log'
+echo -e "'run.C(\"${OPERATION}\", \"${OUTDIR}\", "{1400,3500}", "{200,600}", 500, "{4,12,30}", "{1..4}")'\n" | xargs -I CMD --max-procs 32 bash -c 'C='"'"'CMD'"'"'; echo `date --rfc-3339=seconds` ${C} && shopt -s extglob; nice -n 19 root -l -q -b -e "gInterpreter->AddIncludePath(\"'${VMCWORKDIR}'/macros/r3b/\")" "${C}" &> '${OUTDIR}'/${C//+([^a-zA-Z0-9])/_}.log'
 END=$(date +%s.%N)
 
 # Echo duration

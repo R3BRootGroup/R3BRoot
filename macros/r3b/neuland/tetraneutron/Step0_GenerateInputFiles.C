@@ -44,7 +44,7 @@ void Step0_GenerateInputFiles(const Int_t nNeutrons = 4,
 
     ofstream out;
     out.open(filename);
-    for (Int_t n = 0; n < 10000; n++)
+    for (Int_t n = 0; n < 100000; n++)
     {
         event.Generate();
 

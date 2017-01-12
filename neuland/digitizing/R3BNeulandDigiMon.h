@@ -48,6 +48,7 @@ class R3BNeulandDigiMon : public FairTask
     TH2D* hDepthVSEtot;
     TH2D* hPosVSEnergy;
     TH2D* hdeltaEE;
+    TH1D* hBeta;
 
     ClassDef(R3BNeulandDigiMon, 0);
 };

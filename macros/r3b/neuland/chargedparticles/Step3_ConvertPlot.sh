@@ -11,7 +11,7 @@ trap 'kill $(jobs -pr) 2>/dev/null' SIGINT SIGTERM EXIT
 COUNT=0
 for f in "${FILES[@]}"
 do
-	root -l -q -b 'Step3_Convert.C('\"${f}\"')' &>/dev/null &
+	nice -n 19 root -l -q -b 'Step3_Convert.C('\"${f}\"')' &>/dev/null &
 
 	# Only spawn so many processes at once
 	COUNT=$((${COUNT}+1))
@@ -25,4 +25,4 @@ done
 wait
 echo "${COUNT}/${#FILES[@]}"
 
-/bin/gnuplot -e "dir='${OUTDIR}'" Step3_Plot.gp
+#/bin/gnuplot -e "dir='${OUTDIR}'" Step3_Plot.gp
