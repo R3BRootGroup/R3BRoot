@@ -37,10 +37,10 @@ class R3BNeulandMapped2QCalPar : public FairTask
     
     R3BEventHeader* header;
     
-    std::vector<TH1F*> fData;
+    std::vector<std::vector<std::vector<TH1F*>>> fData;
 
   public:
-    ClassDef(R3BNeulandMapped2QCalPar, 0)
+    ClassDef(R3BNeulandMapped2QCalPar, 1)
 };
 
 #endif
