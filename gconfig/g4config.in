@@ -1,46 +1,19 @@
-# $Id: g4config.in,v 1.4 2006/03/30 12:26:13 turany Exp $
+# Geant4 configuration macro
 #
-# Geant4 configuration macro for Example02
-# (called from Root macro Config.C)
-
-# specs
-
-#/process/eLoss/subsec  false
-#/process/eLoss/minsubsec 2 cm
-  
-
-# B field -> 0
-#/mcDet/fieldType None
-
-# don't store secondaries
-#/mcTracking/saveSecondaries true
-
-
-#/mcPhysics/setSpecialCuts true
-#/mcPhysics/rangeCuts 0.1 mm
-/mcPhysics/rangeCutForElectron 0.1 mm
-#/mcPhysics/printGeneralCuts true
-
-
-#/cuts/setLowEdge 100 eV
-#/cuts/setHighEdge 100 GeV
-
-
-#/mcPhysics/rangeCutForGamma  1. mm
-#/mcPhysics/printGlobalCuts
-
-
-#/mcVerbose/all 2
-#/mcVerbose/geometryManager 1
-/mcVerbose/regionsManager 2
-#/mcVerbose/physicsList 2
-/tracking/verbose -1
-
-#/control/manual   
-#/control/createHTML  
-
-#/run/particle/dumpCutValues
-
-# Limit max number of Cerenkov photons per step
-# (Needed as Cerenkov process does not limit step itself)
+# NOTE: This macro is called before SetCuts.C
+# Settings set here *might* get overwritten
 #
+# NOTE: This macro is called before full initialization,
+# not all Geant4 functions can be used at this point
+# (e.g. dumping specific information). Check log for:
+# ***** Illegal application state < command > *****
+#
+# WARNING: Errors in this macro will not stop the simulation,
+# but only trigger a warning. Check output log for:
+# ***** COMMAND NOT FOUND < command > *****
+#
+
+/run/verbose 0
+/event/verbose 0
+/tracking/verbose 0
+/mcVerbose/all 0
