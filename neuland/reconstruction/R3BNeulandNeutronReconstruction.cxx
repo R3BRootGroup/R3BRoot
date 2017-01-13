@@ -37,6 +37,10 @@ R3BNeulandNeutronReconstruction::~R3BNeulandNeutronReconstruction()
     {
         delete fEngine;
     }
+    if (fNeutrons)
+    {
+        delete fNeutrons;
+    }
 }
 
 InitStatus R3BNeulandNeutronReconstruction::Init()
@@ -56,9 +60,8 @@ InitStatus R3BNeulandNeutronReconstruction::Init()
     }
     if (!TString(((TClonesArray*)ioman->GetObject(fInput))->GetClass()->GetName()).EqualTo("R3BNeulandCluster"))
     {
-        LOG(FATAL)
-            << "R3BNeulandNeutronReconstruction::Init Branch NeulandClusters does not contain R3BNeulandClusters!"
-            << FairLogger::endl;
+        LOG(FATAL) << "R3BNeulandNeutronReconstruction::Init Branch " << fInput
+                   << " does not contain R3BNeulandClusters!" << FairLogger::endl;
         return kFATAL;
     }
     fClusters = (TClonesArray*)ioman->GetObject(fInput);
@@ -84,7 +87,7 @@ void R3BNeulandNeutronReconstruction::Exec(Option_t*)
         clusters.push_back((R3BNeulandCluster*)fClusters->At(i));
     }
 
-    // Output
+    // Processing & Output
     for (auto neutron : fEngine->GetNeutrons(clusters))
     {
         // TODO: Not sure of move even does anything in this context

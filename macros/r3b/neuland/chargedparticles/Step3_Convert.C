@@ -30,31 +30,32 @@ void SingleExportAscii(TH1* hist, ofstream& out, const TString separator = "\t")
                     << hist->GetBinContent(i, j) << separator << xwidth << separator
                     << hist->GetYaxis()->GetBinWidth(j) / 2 << separator << hist->GetBinError(i, j) << endl;
             }
-            if (j > 1)
+            /*if (j > 1)
             {
                 out << endl; // produce a blank line after each set of Ybins for a certain Xbin. Gnuplot likes this.
-            }
+            }*/
         }
     }
 }
 
-Step3_Convert(const TString filename)
+void Step3_Convert(const TString filename)
 {
     TFile* file = new TFile(filename, "READ");
 
     std::vector<TString> hists;
-    // No brakcet enclosed initializer list in root 5
-    hists.push_back("hDepth");
-    hists.push_back("hForemostEnergy");
-    hists.push_back("hEtot");
+    // No bracket enclosed initializer list in root 5
+    hists.push_back("NeulandDigiMon/hDepth");
+    hists.push_back("NeulandDigiMon/hForemostEnergy");
+    hists.push_back("NeulandDigiMon/hEtot");
 
     //for (const TString& hist : hists)
     for(Int_t i = 0; i < hists.size(); i++)
     {
-    	const TString hist = hists.at(i);
+        const TString hist = hists.at(i);
+        std::cout << hist << std::endl;
         TH1D* h = (TH1D*)file->GetObjectChecked(hist, "TH1D");
-        
-        const TString outfile = (TString(filename).ReplaceAll("digi.root", hist + ".dat"));
+
+        const TString outfile = (TString(filename).ReplaceAll("digi.root", TString(hist).ReplaceAll("NeulandDigiMon/", "") + ".dat"));
         ofstream outstream(outfile);
 
         SingleExportAscii(h, outstream);

@@ -7,13 +7,15 @@ from builtins import input
 
 import ROOT
 
-dist = int(sys.argv[1])
-dp = int(sys.argv[2])
+distance = int(sys.argv[1])
+nDoublePlanes = int(sys.argv[2])
+nNeutrons = int(sys.argv[3])
+energy = int(sys.argv[4])
+erel = int(sys.argv[5])
 
-file = "output/%dcm_%ddp_4n.digi.root" % (dist, dp)
-parfile = "output/1400cm_%ddp.neutroncuts.par.root" % (dp)
-outfile = "%dcm_%ddp_2DCalibr_4nCut.pdf" % (dist, dp)
-
+file    = "output/%dcm_%ddp_%dn_%dAMeV_%dkeV.digi.root"    % (distance, nDoublePlanes, nNeutrons, energy, erel)
+parfile = "output/%dcm_%ddp_600AMeV_500keV.neutroncuts.para.root" % (distance, nDoublePlanes)
+outfile = "output/%dcm_%ddp_%dn_%dAMeV_%dkeV_2DCalibr.pdf" % (distance, nDoublePlanes, nNeutrons, energy, erel)
 
 tfile = ROOT.TFile.Open(file)
 tparfile = ROOT.TFile.Open(parfile)
@@ -47,7 +49,7 @@ pad1 = ROOT.TPad("pad1", "", 0.0, 0.0, 1.0, 1.0)
 pad1.Draw()
 pad1.cd()
 hist.Draw("colz")
-labels.DrawLatex(1800, 45, "%ddp" % dp)
+labels.DrawLatex(1800, 45, "%ddp" % nDoublePlanes)
 
 for i in [1, 2, 3, 4]:
     cut = tparfile.Get("R3BNeulandNeutron2DPar").GetNeutronCuts()[i]

@@ -7,10 +7,15 @@ from builtins import input
 
 import ROOT
 
-dist = int(sys.argv[1])
-dp = int(sys.argv[2])
-file = "output/%dcm_%ddp_4n.digi.root" % (dist, dp)
-outfile = "%dcm_%ddp_npnip.pdf" % (dist, dp)
+distance = int(sys.argv[1])
+nDoublePlanes = int(sys.argv[2])
+nNeutrons = int(sys.argv[3])
+energy = int(sys.argv[4])
+erel = int(sys.argv[5])
+
+file    = "output/%dcm_%ddp_%dn_%dAMeV_%dkeV.digi.root"    % (distance, nDoublePlanes, nNeutrons, energy, erel)
+parfile = "output/%dcm_%ddp_600AMeV_500keV.neutroncuts.para.root" % (distance, nDoublePlanes)
+outfile = "output/%dcm_%ddp_%dn_%dAMeV_%dkeV_npnip.pdf" % (distance, nDoublePlanes, nNeutrons, energy, erel)
 
 tfile = ROOT.TFile.Open(file)
 
@@ -59,7 +64,7 @@ py.Draw("colz")
 mlabels = ROOT.TLatex()
 mlabels.SetTextSize(0.07)
 mlabels.SetTextAlign(32)
-mlabels.DrawLatexNDC(0.89, 0.86, "%2dm, %ddp" % (dist/100, dp))
+mlabels.DrawLatexNDC(0.89, 0.86, "%2dm, %ddp" % (distance/100, nDoublePlanes))
 
 canvas.SaveAs(outfile)
 

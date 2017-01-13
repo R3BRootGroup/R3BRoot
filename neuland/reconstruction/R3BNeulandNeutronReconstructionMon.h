@@ -46,6 +46,7 @@ class R3BNeulandNeutronReconstructionMon : public FairTask
     TH1D* fhErelMC;
     TH2D* fhErelVSnNreco;
     TH2D* fhErelVSnNrecoNPNIPs;
+    TH2D* fhNreacNreco;
 
     TClonesArray* fPrimaryNeutronInteractionPoints;
     TClonesArray* fReconstructedNeutrons;

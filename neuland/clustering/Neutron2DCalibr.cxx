@@ -19,27 +19,44 @@
 #include "R3BNeulandCluster.h"
 #include "R3BNeulandNeutron2DPar.h"
 
+#include "FairMCPoint.h"
+
 namespace Neuland
 {
     Neutron2DCalibr::Neutron2DCalibr() {}
 
-    void Neutron2DCalibr::SetClusterFile(const UInt_t nNeutrons, const TString& filename)
+    void Neutron2DCalibr::AddClusterFile(const TString& filename)
     {
-        fHists[nNeutrons] =
-            new TH2D(TString::UItoa(nNeutrons, 10), TString::UItoa(nNeutrons, 10) + "n", 50, 0, 2000, 40, 0, 40);
-        fHists.at(nNeutrons)->GetXaxis()->SetTitle("Total Energy [MeV]");
-        fHists.at(nNeutrons)->GetYaxis()->SetTitle("Number of Clusters");
-
         TFile* file = new TFile(filename, "READ");
         TTree* tree = (TTree*)file->Get("evt");
+        tree->AddFriend("evt2=evt", TString(filename).ReplaceAll(".digi.root", ".simu.root"));
+
         TBranch* branch = tree->GetBranch("NeulandClusters");
         TClonesArray* clusters = new TClonesArray("R3BNeulandCluster");
         branch->SetAddress(&clusters);
+
+        TBranch* branch2 = tree->GetBranch("NeulandPrimaryNeutronInteractionPoints");
+        TClonesArray* npnips = new TClonesArray("FairMCPoint");
+        branch2->SetAddress(&npnips);
 
         const Int_t nEntries = tree->GetEntries();
         for (Int_t ei = 0; ei < nEntries; ei++)
         {
             branch->GetEntry(ei);
+            branch2->GetEntry(ei);
+
+            const UInt_t nNPNIPs = npnips->GetEntries();
+            /*if(nNPNIPs == 0){
+                continue;
+            }*/
+
+            if (fHists.find(nNPNIPs) == fHists.end())
+            {
+                fHists[nNPNIPs] =
+                    new TH2D(TString::UItoa(nNPNIPs, 10), TString::UItoa(nNPNIPs, 10) + "n reacted", 30, 0, 2000, 30, 0, 30);
+                fHists.at(nNPNIPs)->GetXaxis()->SetTitle("Total Energy [MeV]");
+                fHists.at(nNPNIPs)->GetYaxis()->SetTitle("Number of Clusters");
+            }
 
             Double_t Etot = 0.;
             Int_t validClusters = 0;
@@ -57,18 +74,20 @@ namespace Neuland
 
             if (Etot > 0)
             {
-                fHists[nNeutrons]->Fill(Etot, validClusters);
+                fHists[nNPNIPs]->Fill(Etot, validClusters);
             }
             else
             {
-                fHists[nNeutrons]->Fill(0., 0.);
+                fHists[nNPNIPs]->Fill(0., 0.);
             }
         }
 
         // Some delete action here
     }
 
-    void Neutron2DCalibr::Optimize()
+    void Neutron2DCalibr::Optimize(std::vector<Double_t> slope,
+                                   std::vector<Double_t> distance,
+                                   std::vector<Double_t> dist_off)
     {
         const UInt_t nVars = 3;
 
@@ -85,13 +104,13 @@ namespace Neuland
             nVars);
         min->SetFunction(f);
 
-        Double_t step[nVars] = { 0.001, 0.5, 0.5 };
+        /*Double_t step[nVars] = { 0.001, 0.5, 0.5 };
         Double_t variable[nVars] = { 0.04, 10, 3 };
         Double_t lower[nVars] = { 0.001, 1, 3 };
-        Double_t upper[nVars] = { 10, 20, 6 };
-        min->SetLimitedVariable(0, "slope", variable[0], step[0], lower[0], upper[0]);
-        min->SetLimitedVariable(1, "distance", variable[1], step[1], lower[1], upper[1]);
-        min->SetLimitedVariable(2, "distance offset", variable[2], step[2], lower[2], upper[2]);
+        Double_t upper[nVars] = { 10, 20, 6 };*/
+        min->SetLimitedVariable(0, "slope", slope.at(0), slope.at(1), slope.at(2), slope.at(3));
+        min->SetLimitedVariable(1, "distance", distance.at(0), distance.at(1), distance.at(2), distance.at(3));
+        min->SetLimitedVariable(2, "distance offset", dist_off.at(0), dist_off.at(1), dist_off.at(2), dist_off.at(3));
 
         min->Minimize();
 
@@ -160,13 +179,17 @@ namespace Neuland
                              114. / 255., 112. / 255., 96. / 255., 30. / 255. };
         TColor::CreateGradientColorTable(9, stops, red, green, blue, 255, 1);
 
-        TCanvas* c = new TCanvas("Neutron2DCalibr", "Neuland Neutron2D Calibr", 1000, (fHists.size() + 1) / 2 * 500);
-        c->Divide(2, (fHists.size() + 1) / 2);
+        TCanvas* c = new TCanvas("Neutron2DCalibr", "Neuland Neutron2D Calibr", 1000, fHists.size() / 2 * 500);
+        c->Divide(2, fHists.size() / 2);
 
         for (auto& nh : fHists)
         {
+            if (nh.first == 0)
+            {
+                continue;
+            }
             c->cd(nh.first);
-            nh.second->GetZaxis()->SetRangeUser(0,100);
+            nh.second->GetZaxis()->SetRangeUser(0, 500);
             nh.second->Draw("colz");
             fCuts.at(nh.first)->Draw("same");
         }
