@@ -39,7 +39,7 @@ if [ "$#" -lt "2" ]; then
   echo "-- Error -- installation (see example below)."
   echo ""
   print_example
-  exit 1
+  return
 fi
 
 # test if a valid ctest model is defined
@@ -48,7 +48,7 @@ if [ "$1" == "Experimental" -o "$1" == "Nightly" -o "$1" == "Continuous" -o "$1"
 else
   echo "-- Error -- This ctest model is not supported."
   echo "-- Error -- Possible arguments are Nightly, Experimental, Continuous or Profile."
-  exit 1
+  return
 fi 
 
 # test if the input file exists and execute it
@@ -57,7 +57,7 @@ if [ -e "$2" ];then
 else
   echo "-- Error -- Input file does not exist."
   echo "-- Error -- Please choose existing input file."
-  exit 1  
+  return  
 fi
 
 # set the ctest model to command line parameter

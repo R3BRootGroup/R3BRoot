@@ -1,0 +1,5 @@
+#!/bin/bash -l
+
+. Land_qcal_test.sh
+. Land_tcal_test.sh
+. Land_cosmic1_test.sh
