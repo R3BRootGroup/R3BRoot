@@ -10,3 +10,5 @@ add_test(landreco ${R3BROOT_BINARY_DIR}/macros/r3b/land/run_test.sh)
 SET_TESTS_PROPERTIES(landreco PROPERTIES TIMEOUT "300")
 SET_TESTS_PROPERTIES(landreco PROPERTIES PASS_REGULAR_EXPRESSION "Reconstruction successful")
 
+add_subdirectory(test)
+
