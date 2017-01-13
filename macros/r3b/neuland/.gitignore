@@ -3,6 +3,7 @@
 
 # Output files
 *.png
+*.dat
 *.pdf
 *.eps
 *.log

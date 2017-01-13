@@ -150,33 +150,38 @@ InitStatus R3BNeulandNeutronReconstructionMon::Init()
 
     fhErelVSnNrecoNPNIPs = new TH2D("fhErelVSnNrecoNPNIPs", "fhErelVSnNrecoNPNIPs", 1000, 0, 5, 11, -0.5, 10.5);
 
+    fhNreacNreco = new TH2D("fhNreacNreco", "fhNreacNreco", 11, -0.5, 10.5, 11, -0.5, 10.5);
+    fhNreacNreco->GetXaxis()->SetTitle("nReac");
+    fhNreacNreco->GetYaxis()->SetTitle("nReco");
+
     return kSUCCESS;
 }
 
 void R3BNeulandNeutronReconstructionMon::Exec(Option_t*)
 {
-    const UInt_t nReconstructedNeutrons = fReconstructedNeutrons->GetEntries();
+    const Int_t nReconstructedNeutrons = fReconstructedNeutrons->GetEntries();
     std::vector<R3BNeulandNeutron> neutrons;
     neutrons.reserve(nReconstructedNeutrons);
-    for (UInt_t i = 0; i < nReconstructedNeutrons; i++)
+    for (Int_t i = 0; i < nReconstructedNeutrons; i++)
     {
         neutrons.push_back(*((R3BNeulandNeutron*)fReconstructedNeutrons->At(i)));
     }
 
-    const UInt_t nNPNIPS = fPrimaryNeutronInteractionPoints->GetEntries();
+    const Int_t nNPNIPS = fPrimaryNeutronInteractionPoints->GetEntries();
     std::vector<FairMCPoint> npnips;
     npnips.reserve(nReconstructedNeutrons);
-    for (UInt_t i = 0; i < nNPNIPS; i++)
+    for (Int_t i = 0; i < nNPNIPS; i++)
     {
         npnips.push_back(*((FairMCPoint*)fPrimaryNeutronInteractionPoints->At(i)));
     }
     fhCountN->Fill(nReconstructedNeutrons);
     fhCountNdiff->Fill((Int_t)nNPNIPS - (Int_t)nReconstructedNeutrons);
+    fhNreacNreco->Fill(nNPNIPS, nReconstructedNeutrons);
 
     // Find the lowes score by brute force creating all combinations of MC-known and reconstructed neutron hits.
     // Score is the sum of distances. Note that detecting a wrong amount of neutrons will create a huge score
     // WiP. Slow because of all the copying
-    const auto allCombinations =
+    /*const auto allCombinations =
         GetAllCombinations<R3BNeulandNeutron, FairMCPoint>(neutrons,
                                                            npnips,
                                                            [](const FairMCPoint& a, const FairMCPoint& b)
@@ -209,7 +214,7 @@ void R3BNeulandNeutronReconstructionMon::Exec(Option_t*)
                 fhEdiff->Fill(-pair.first.GetEkin());
             }
         }
-    }
+    }*/
 
     // Erel
     // if (nReconstructedNeutrons == 0)
@@ -305,6 +310,7 @@ void R3BNeulandNeutronReconstructionMon::Finish()
     fhErelMC->Write();
     fhErelVSnNreco->Write();
     fhErelVSnNrecoNPNIPs->Write();
+    fhNreacNreco->Write();
 
     gDirectory = tmp;
 }

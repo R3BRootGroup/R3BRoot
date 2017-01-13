@@ -22,13 +22,11 @@ void Step2_DigitizingClustering(const TString simFile)
     run->AddTask(new R3BNeulandClusterFinder());
 
     // Optional
-    // run->AddTask(new R3BNeulandMCMon());
+    run->AddTask(new R3BNeulandMCMon());
     run->AddTask(new R3BNeulandDigiMon());
     run->AddTask(new R3BNeulandClusterMon());
 
     run->Init();
     run->Run(0, 0);
     delete run;
-
-    timer.Stop();
 }

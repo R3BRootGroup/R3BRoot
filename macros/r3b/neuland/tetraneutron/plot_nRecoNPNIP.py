@@ -7,12 +7,15 @@ from builtins import input
 
 import ROOT
 
-dist = int(sys.argv[1])
-dp = int(sys.argv[2])
-directory = str(sys.argv[3])
+distance = int(sys.argv[1])
+nDoublePlanes = int(sys.argv[2])
+nNeutrons = int(sys.argv[3])
+energy = int(sys.argv[4])
+erel = int(sys.argv[5])
+directory = str(sys.argv[6])
 
-file = "output/%dcm_%ddp_4n.eval.root" % (dist, dp)
-outfile = "%dcm_%ddp_nRecoNPNIP_%s.pdf" % (dist, dp, directory)
+file = "output/%dcm_%ddp_%dn_%dAMeV_%dkeV.eval.root" % (distance, nDoublePlanes, nNeutrons, energy, erel)
+outfile = "output/%dcm_%ddp_%dn_%dAMeV_%dkeV_nRecoNPNIPs_%s.pdf" % (distance, nDoublePlanes, nNeutrons, energy, erel, directory)
 
 tfile = ROOT.TFile.Open(file)
 hist = tfile.Get("%s/fhErelVSnNrecoNPNIPs" % directory)
@@ -20,6 +23,7 @@ hist = tfile.Get("%s/fhErelVSnNrecoNPNIPs" % directory)
 
 canvas = ROOT.TCanvas("glcanvas", "", 4 * 300, 3 * 300)
 ROOT.gStyle.SetOptStat(0)
+#ROOT.gStyle.SetOptFit(1011);
 
 # reverse viridis (wrapping lists in numpy arrays works better with root)
 # ROOT.gStyle.SetPalette(ROOT.kViridis)
@@ -63,32 +67,33 @@ px.SetTitle("E_{rel}")
 px.GetXaxis().SetRangeUser(0, 1)
 px.GetXaxis().SetTitle("E_{rel} [MeV]")
 px.Draw()
-fit = px.Fit("gaus", "S", "", 0.01, 0.2)
+fit = px.Fit("gaus", "S", "", 0.04, 0.16)
 try:
-	labels.DrawLatexNDC(0.3, 0.7, "#sigma = %2d keV" %
+    labels.DrawLatexNDC(0.3, 0.5, "#sigma = %2d keV" %
                     (fit.GetParams()[2] * 1000))
 except:
-	pass
+    pass
 
 mlabels = ROOT.TLatex()
 mlabels.SetTextSize(0.07)
 mlabels.SetTextAlign(32)
-mlabels.DrawLatexNDC(0.89, 0.86, "%2dm, %ddp" % (dist/100, dp))
+mlabels.DrawLatexNDC(0.89, 0.86, "%2dm, %ddp" % (distance/100, nDoublePlanes))
 
 
 pad1.cd(4)
-pxc = hist.ProjectionX("_pxc", 4 + 1, 4 + 1)
-pxc.SetTitle("E_{rel} with gate on 3-4 Neutrons")
+pxc = hist.ProjectionX("_pxc", nNeutrons + 1, nNeutrons + 1)
+pxc.SetTitle("E_{rel} with gate on %d Neutrons" % nNeutrons)
 pxc.GetXaxis().SetRangeUser(0, 1)
 pxc.GetXaxis().SetTitle("E_{rel} [MeV]")
 pxc.Draw()
-fitc = pxc.Fit("gaus", "S", "", 0.01, 0.2)
+fitc = pxc.Fit("gausn", "S", "", 0.9*erel/1000., 1.1*erel/1000.)
+#labels.DrawLatexNDC(0.5, 0.7, "Integral %d" % int(pxc.Integral(1,pxc.FindBin(0.2))) )
+#labels.DrawLatexNDC(0.3, 0.7, "A = %d" % int(fitc.GetParams()[0]) )
+#labels.DrawLatexNDC(0.3, 0.6, "E = %d keV" % (fitc.GetParams()[1] * 1000))
 try:
-	labels.DrawLatexNDC(0.3, 0.7, "#sigma = %2d keV" %
-                    (fitc.GetParams()[2] * 1000))
+	labels.DrawLatexNDC(0.3, 0.5, "#sigma = %2d keV" % (fitc.GetParams()[2] * 1000))
 except:
-	pass
-
+    pass
 
 canvas.SaveAs(outfile)
 

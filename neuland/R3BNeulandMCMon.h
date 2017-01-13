@@ -52,7 +52,10 @@ class R3BNeulandMCMon : public FairTask
     TH1D* fhMotherIDs;
     TH1D* fhPrimaryDaughterIDs;
     TH1D* fhMCToF;
+    TH1D* fhnNPNIPs;
     TH2D* fhNPNIPsEToFVSTime;
+    TH2D* fhNPNIPSrvsz;
+    TH2D* fhNPNIPSxy;
     std::map<Int_t, TH1D*> fhmEPdg;
     std::map<Int_t, TH1D*> fhmEtotPdg;
     std::map<Int_t, TH1D*> fhmEtotPdgRel;

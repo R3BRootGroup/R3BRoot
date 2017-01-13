@@ -11,10 +11,8 @@ namespace Neuland
     template <typename T>
     class ClusteringEngine
     {
-        // using Tit = typename std::vector<T>::iterator;
-        // using BinaryPredicate = std::function<bool(const T &, const T &)>;
-        typedef typename std::vector<T>::iterator Tit;
-        typedef std::function<bool(const T&, const T&)> BinaryPredicate;
+        using Tit = typename std::vector<T>::iterator;
+        using BinaryPredicate = std::function<bool(const T&, const T&)>;
 
       private:
         BinaryPredicate f;
@@ -22,7 +20,7 @@ namespace Neuland
         /* Partitions an already divided range by clustering both the items in the first part AND the items added to the
          * first part during this process with the items in the second part.
          * Takes the begin of a range of interest that acts as reference/seed, the end of that range which is the
-         * divider to the range to be analysed, the end of the container, and the clustering function.
+         * divider to the range to be analyzed, the end of the container, and the clustering function.
          * Returns the new divider between cluster and non-cluster */
         Tit moving_partition(const Tit begin, Tit moving_divider, const Tit end) const
         {
@@ -30,7 +28,7 @@ namespace Neuland
             // as well
             for (Tit a = begin; a != moving_divider; a++)
             {
-                // Partition returns iterator to the first element of the non-clusterd rest of the container
+                // Partition returns iterator to the first element of the non-clustered rest of the container
                 moving_divider = std::partition(moving_divider,
                                                 end,
                                                 [&](const T& b)
@@ -61,13 +59,13 @@ namespace Neuland
 
             /* Three iterators (read: markers for positions in the input vector) are required:
              * Begin is the start of the clustered part of the vector
-             * Divider seperates the clusterd part from the unclusted part, and
+             * Divider separates the clustered part from the unclustered part, and
              * end is the end of the vector*/
             Tit begin;
             Tit divider = from.begin();
             const Tit end = from.end();
 
-            /* While the end of the input vertor has not been reached, start a new cluster containing one element from
+            /* While the end of the input vector has not been reached, start a new cluster containing one element from
              * the unclustered part and then move all objects that match the clustering condition in that range.
              * This part of the input vector can then be move-constructed into a new vector = cluster */
             while (divider != end)

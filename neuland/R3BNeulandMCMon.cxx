@@ -56,8 +56,7 @@ InitStatus R3BNeulandMCMon::Init()
         return kFATAL;
     }
 
-    fhNPNIPsEToFVSTime =
-        new TH2D("NPNIPEToFVSTime", "NPNIP E_{ToF} vs. NPNIP Time", 100, 0, 1000, 500, 0, 500);
+    fhNPNIPsEToFVSTime = new TH2D("NPNIPEToFVSTime", "NPNIP E_{ToF} vs. NPNIP Time", 100, 0, 1000, 500, 0, 500);
     fhNPNIPsEToFVSTime->GetXaxis()->SetTitle("NPNIP E_{ToF} [MeV]");
     fhNPNIPsEToFVSTime->GetYaxis()->SetTitle("NPNIP t [ns]");
 
@@ -79,6 +78,16 @@ InitStatus R3BNeulandMCMon::Init()
     fhMotherIDs = new TH1D("hmotherIDs", "MotherIDs", 6001, -1, 6000);
     fhPrimaryDaughterIDs = new TH1D("hprimary_daughter_IDs", "IDs of tracks with a primary mother", 6001, -1, 6000);
     fhMCToF = new TH1D("fhMCToF", "Energy of primary Neutron - ToF Energy from PNIPS", 2001, -1000, 1000);
+
+    fhNPNIPSrvsz = new TH2D("fhNPNIPSrvsz", "NPNIPS R = #sqrt(x**2+y**2) vs z", 600, 1000, 4000, 40, 0, 200);
+    fhNPNIPSrvsz->GetXaxis()->SetTitle("NPNIP Z [cm]");
+    fhNPNIPSrvsz->GetYaxis()->SetTitle("NPNIP R [cm]");
+
+    fhNPNIPSxy = new TH2D("fhNPNIPSxy", "NPNIPS xy", 101, -200, 200, 101, -200, 200);
+    fhNPNIPSxy->GetXaxis()->SetTitle("NPNIP X [cm]");
+    fhNPNIPSxy->GetYaxis()->SetTitle("NPNIP Y [cm]");
+
+    fhnNPNIPs = new TH1D("fhnNPNIPs", "Number of NPNIPs per event", 10, -0.5, 9.5);
 
     if (fIs3DTrackEnabled)
     {
@@ -130,6 +139,7 @@ void R3BNeulandMCMon::Exec(Option_t*)
         }
 
         const UInt_t nNPNIPs = fNPNIPs->GetEntries();
+        fhnNPNIPs->Fill(nNPNIPs);
         FairMCPoint* npnip;
         for (UInt_t i = 0; i < nNPNIPs; i++)
         {
@@ -147,6 +157,8 @@ void R3BNeulandMCMon::Exec(Option_t*)
             mcTrack = (R3BMCTrack*)fMCTracks->At(npnip->GetTrackID());
             fhNPNIPsEToFVSTime->Fill(ETimeOfFlight, npnip->GetTime());
             fhMCToF->Fill(GetKineticEnergy(mcTrack) - ETimeOfFlight);
+            fhNPNIPSrvsz->Fill(npnip->GetZ(), std::sqrt(std::pow(npnip->GetX(), 2) + std::pow(npnip->GetY(), 2)));
+            fhNPNIPSxy->Fill(npnip->GetX(), npnip->GetY());
         }
     }
 
@@ -267,6 +279,9 @@ void R3BNeulandMCMon::Finish()
     fhPrimaryDaughterIDs->Write();
     fhMCToF->Write();
     fhNPNIPsEToFVSTime->Write();
+    fhNPNIPSrvsz->Write();
+    fhNPNIPSxy->Write();
+    fhnNPNIPs->Write();
 
     for (const auto& kv : fhmEPdg)
     {

@@ -31,12 +31,13 @@ namespace Neuland
       public:
         Neutron2DCalibr();
 
-        void SetClusterFile(const UInt_t nNeutrons, const TString& file);
-        // void SetK(const Double_t )
-        void Optimize();
-        void Print(std::ostream &out = std::cout) const;
-        void Draw(const TString &img = "") const;
-        void WriteParameterFile(const TString &parFile) const;
+        void AddClusterFile(const TString& file);
+        void Optimize(std::vector<Double_t> slope = { 0.04, 0.001, 0.001, 10 },
+                      std::vector<Double_t> distance = { 10, 0.5, 1, 20 },
+                      std::vector<Double_t> dist_off = { 3, 0.5, 3, 6 });
+        void Print(std::ostream& out = std::cout) const;
+        void Draw(const TString& img = "") const;
+        void WriteParameterFile(const TString& parFile) const;
 
       private:
         TCutG* GetCut(const UInt_t nNeutrons, const Double_t k, const Double_t k0, const Double_t m);

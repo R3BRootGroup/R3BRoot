@@ -31,3 +31,10 @@
 *.d
 *.pcm
 
+# Storage files
+*.gam
+
+# Generated folders and files 
+geometry/neuland_v2_*.root
+build/
+input/
