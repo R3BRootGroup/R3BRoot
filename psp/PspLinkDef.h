@@ -10,6 +10,12 @@
 // #pragma link C++ class R3BPspContFact;
 #pragma link C++ class R3BPspDigiPar+;
 #pragma link C++ class R3BPspDigitizer+;
+#pragma link C++ class R3BPspxMapped2Cal+;
+#pragma link C++ class R3BPspxCal2Hit+;
+#pragma link C++ class R3BPspxMappedPar+;
+#pragma link C++ class R3BPspxCalPar+;
+#pragma link C++ class R3BPspxHitPar+;
+#pragma link C++ class R3BPspxContFact+;
 
 #endif
 

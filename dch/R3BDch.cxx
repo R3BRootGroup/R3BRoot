@@ -126,7 +126,7 @@ void R3BDch::SetSpecialPhysicsCuts()
         {
             // Setting processes for Gas mixture only
             // ELoss + deltas + reduced fluctuation
-            gMC->Gstpar(pSi->GetId(), "LOSS", 2);
+            gMC->Gstpar(pSi->GetId(), "LOSS", 3);
             // collision sampling on PAI Model ( thin layer )
             gMC->Gstpar(pSi->GetId(), "STRA", 1.0);
             // Deltas on

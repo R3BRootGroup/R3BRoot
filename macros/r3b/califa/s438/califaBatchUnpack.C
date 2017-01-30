@@ -86,6 +86,7 @@ void run(TString inputFilePattern, TString outputFileName, Int_t nevents=-1)
 
     // Run -----------------------------------------------------------------------
     run->Run(nevents, 0);
+    delete run;
     // ---------------------------------------------------------------------------
 
     timer.Stop();

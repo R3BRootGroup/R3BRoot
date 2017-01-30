@@ -1,0 +1,11 @@
+GENERATE_ROOT_TEST_SCRIPT(${R3BROOT_SOURCE_DIR}/macros/r3b/neuland/test/testNeulandSimulation.C)
+add_test(NeulandSimulation ${R3BROOT_BINARY_DIR}/macros/r3b/neuland/test/testNeulandSimulation.sh)
+SET_TESTS_PROPERTIES(NeulandSimulation PROPERTIES TIMEOUT "2000")
+SET_TESTS_PROPERTIES(NeulandSimulation PROPERTIES PASS_REGULAR_EXPRESSION "Macro finished succesfully.")
+
+
+GENERATE_ROOT_TEST_SCRIPT(${R3BROOT_SOURCE_DIR}/macros/r3b/neuland/test/testNeulandDigitizer.C)
+add_test(NeulandDigitizer ${R3BROOT_BINARY_DIR}/macros/r3b/neuland/test/testNeulandDigitizer.sh)
+SET_TESTS_PROPERTIES(NeulandDigitizer PROPERTIES DEPENDS NeulandSimulation)
+SET_TESTS_PROPERTIES(NeulandDigitizer PROPERTIES TIMEOUT "1000")
+SET_TESTS_PROPERTIES(NeulandDigitizer PROPERTIES PASS_REGULAR_EXPRESSION "Macro finished succesfully.")

@@ -241,7 +241,7 @@ void create_gfi_geo(const char* geoTag)
   TGeoCombiTrans *pGlobal2 = GetGlobalPosition(pMatrix4);
     
   TGeoVolumeAssembly *pw1 = new TGeoVolumeAssembly("GFI");
-  pWorld->AddNode(pw1, 0);
+  pWorld->AddNode(pw1, 0, GetGlobalPosition(new TGeoCombiTrans()));
     
   pw1->AddNode( pGFILogWorld, 0, pGlobal1 );
   pw1->AddNode( pGFILogWorld, 1, pGlobal2 );

@@ -61,14 +61,6 @@ InitStatus R3BCaloCal::Init()
   return kSUCCESS;
 }
 
-void bicycle() {
-  static int pos=0;
-  char cursor[4]={'/','-','\\','|'};
-  printf("(%c)  (%c)  (%c)  (%c)  (%c)  (%c)  (%c)  \r                     ",cursor[pos],cursor[pos],cursor[pos],cursor[pos],cursor[pos],cursor[pos],cursor[pos]);
-  fflush(stdout);
-  pos = (pos+1)%4;
-			  }
-				 
 void R3BCaloCal::SetParContainers()
 {
   // Get run and runtime database
@@ -136,14 +128,19 @@ void R3BCaloCal::Exec(Option_t* option)
   Double_t tau = 878.625358; //electronics constant, taken a fixed value for the moment! // Not any more.. BP
    
   Int_t rawHits;        // Nb of RawHits in current event
+  Int_t calHits = 0;
   rawHits = fRawHitCA->GetEntries();
  
-  Double32_t gamma_gain, gamma_offs, range_gain, range_offs, pid_gain;
+  Double32_t gamma_gain, gamma_offs, range_gain, range_offs, pid_gain, nfbar, nsbar;
   R3BCaloDUCalPar *p;
  
   if (rawHits>0) {
     for (Int_t i=0; i<rawHits; i++) {
       rawHit= (R3BCaloRawHit*) fRawHitCA->At(i);      
+
+//      if(rawHit->GetError())
+//        continue;
+
       rawHit_id= rawHit->GetCrystalId();
       crystal_id = rawHit_id;
       p = fCaloCalPar->GetDUCalParAt(rawHit_id);
@@ -157,17 +154,30 @@ void R3BCaloCal::Exec(Option_t* option)
 	range_offs = p->GetRangeCal_offset();
 	energy = range_offs + (energy * range_gain);
       }
+
       n_f = (rawHit->GetNf() + ran->Rndm()-0.5); 
       n_s = (rawHit->GetNs() + ran->Rndm()-0.5); 
       if(calPID)
       {
-         n_f *= gamma_gain * p->GetPidGain();
-         n_s *= gamma_gain * p->GetPidGain();
+         n_f *= p->GetPidGain();
+         n_s *= p->GetPidGain();
 
-         if(calHighRange)
+         if(n_f + n_s != 0)
          {
-            n_f *= range_gain;
-            n_s *= range_gain;
+           nfbar = gamma_offs*n_f/(n_f + n_s) + gamma_gain*n_f;
+           nsbar = gamma_offs*n_s/(n_f + n_s) + gamma_gain*n_s;
+
+           n_f = nfbar;
+           n_s = nsbar;
+          
+           if(calHighRange)
+           {
+            nfbar = range_offs*n_f/(n_f+n_s) + range_gain * n_f;
+            nsbar = range_offs*n_s/(n_f+n_s) + range_gain * n_s;
+
+            n_f = nfbar;
+            n_s = nsbar;
+           }
          }
       }
       time = rawHit->GetTime();
@@ -180,8 +190,12 @@ void R3BCaloCal::Exec(Option_t* option)
 	  // E=par0*exp(TOT/par1)+par2, par1 is not constant..
 	
       //tot converted from 300MeV range channels to 30MeV range channels
-      tempResult = p->GetRangeCal_offset() + 
-	( tempResult* p->GetRangeCal_gain()); 
+//      tempResult = p->GetRangeCal_offset() + 
+//	( tempResult* p->GetRangeCal_gain()); 
+      if(!calHighRange)
+      {
+        tempResult /= p->GetRangeCal_gain();
+      }
 	
       //tot converted from 30MeV range channels to energy (keV)
          if(rawHit->GetTot()>0)
@@ -190,7 +204,7 @@ void R3BCaloCal::Exec(Option_t* option)
       	(tempResult * p->GetGammaCal_gain());
       		}
 	  else tot_energy = 0;
-      new ((*fCrystalHitCA)[i]) R3BCaloCrystalHit(crystal_id, energy, n_f, n_s, time, tot_energy);
+      new ((*fCrystalHitCA)[calHits++]) R3BCaloCrystalHit(crystal_id, energy, n_f, n_s, time, tot_energy);
       
     }  
   }

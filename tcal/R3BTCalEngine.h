@@ -2,13 +2,18 @@
 #ifndef _R3BTCAL_ENGINE_
 #define _R3BTCAL_ENGINE_
 
+#define MAX_TACQUILA_SAM 7     // 0 .. 7
+#define MAX_TACQUILA_GTB 1     // 0 and 1
+#define MAX_TACQUILA_MODULE 20 // 0 .. 20
+#define TACQUILA_NUM_GEOM ((MAX_TACQUILA_SAM + 1) * (MAX_TACQUILA_GTB + 1) * (MAX_TACQUILA_MODULE + 1))
+
 #define TACQUILA_CLOCK_MHZ 40.002903
 #define VFTX_CLOCK_MHZ 200
 
+#include "R3BTCalPar.h"
 #include "TObject.h"
 
 class TH1F;
-class R3BTCalPar;
 
 /**
  * Class with implementation of TCAL time calibration.
@@ -31,7 +36,7 @@ class R3BTCalEngine : public TObject
      * @param nModules a number of detector modules.
      * @param minStats a minimum number of entries per module.
      */
-    R3BTCalEngine(R3BTCalPar* param, Int_t nModules, Int_t minStats = 10000);
+    R3BTCalEngine(R3BTCalPar* param, Int_t minStats = 10000);
 
     /**
      * Destructor.
@@ -45,7 +50,7 @@ class R3BTCalEngine : public TObject
      * @param iModule an index of a module.
      * @param tdc a raw TDC value.
      */
-    void Fill(Int_t iModule, Int_t tdc);
+    void Fill(Int_t plane, Int_t paddle, Int_t side, Int_t tdc);
 
     /**
      * A method to calculate calibration parameters for Tacquila
@@ -98,12 +103,12 @@ class R3BTCalEngine : public TObject
     void LinearDown(TH1F* h1, Int_t iMin, Int_t iMax, Int_t& il, Int_t& ih, Double_t& slope, Double_t& offset);
 
   private:
-    Int_t fMinStats;      /**< Minimum number of entries in raw TDC distribution per module */
-    Int_t fNModules;      /**< Number of detector modules. */
-    TH1F** fhData;        /**< An array of histograms to store raw TDC distributions. */
-    TH1F** fhTime;        /**< An array of histograms to store unparametrized bin-by-bin calibration. */
-    R3BTCalPar* fCal_Par; /**< A pointer to the parameter container. */
-    Double_t fClockFreq;  /**< A clock cycle in [ns]. */
+    Int_t fMinStats; /**< Minimum number of entries in raw TDC distribution per module */
+    TH1F* fhData[N_PLANE_MAX][N_PADDLE_MAX][N_SIDE_MAX]; /**< An array of histograms to store raw TDC distributions. */
+    TH1F* fhTime[N_PLANE_MAX][N_PADDLE_MAX]
+                [N_SIDE_MAX]; /**< An array of histograms to store unparametrized bin-by-bin calibration. */
+    R3BTCalPar* fCal_Par;     /**< A pointer to the parameter container. */
+    Double_t fClockFreq;      /**< A clock cycle in [ns]. */
 
   public:
     ClassDef(R3BTCalEngine, 1)

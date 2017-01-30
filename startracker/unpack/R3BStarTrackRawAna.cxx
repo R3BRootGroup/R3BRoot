@@ -70,7 +70,7 @@ void R3BStarTrackRawAna::Exec(Option_t *option)
     thic->Fill(hit->GetInfoCode());
    }
 
-  if(0 == (fnEvents%100)) {
+  if(0 == (fnEvents%10)) {
     cout << "nEvents:" << fnEvents << "  nHits= " << nHits << endl;
   }
   fnEvents += 1;

@@ -1,3 +1,4 @@
+
 #include <iomanip>
 #include <iostream>
 #include "TGeoManager.h"
@@ -426,8 +427,10 @@ void ConstructGeometry4(TGeoMedium *pMed2, TGeoMedium *pMed15,
   // Shape: TargetEnveloppe type: TGeoTubeSeg
   // TargetEnveloppe Tube 1
   Double_t rmin = 0.000000;
-  Double_t rmax = 3.525000;  
-  dz   = 3.0250;
+  //Double_t rmax = 3.525000;  
+  //dz   = 3.0250;
+  Double_t rmax = 3.51000;  
+  dz   = 3.010;
   TGeoShape *pTargetEnveloppe = new TGeoTube("TargetEnveloppe",rmin,rmax,dz);
   TGeoVolume *pTargetEnveloppe_log = new TGeoVolume("TargetEnveloppe",pTargetEnveloppe, pMed2);
   pTargetEnveloppe_log->SetVisLeaves(kTRUE);
@@ -438,7 +441,8 @@ void ConstructGeometry4(TGeoMedium *pMed2, TGeoMedium *pMed15,
   // Shape: Target1 type: TGeoTubeSeg
   // Mylar Tube
   rmin = 3.5;          //1.000000;
-  rmax = 3.5250;       //for Mylar
+  //rmax = 3.5250;     //for 250 Mylar
+  rmax = 3.510;        //for 100 Mylar
   dz   = 3.;           //1.750000;
   TGeoShape *pTarget1 = new TGeoTube("Target1",rmin,rmax,dz);
   TGeoVolume *pTarget1_log = new TGeoVolume("Target1",pTarget1, pMed15);   // Mylar
@@ -459,8 +463,10 @@ void ConstructGeometry4(TGeoMedium *pMed2, TGeoMedium *pMed15,
   
   // Shape: Target3 type: TGeoTubeSeg
   rmin = 0.000000;
-  rmax = 3.5250;    //for mylar;
-  dz   = 0.012500;  // =half thickness for Mylar
+  //rmax = 3.5250;    //for 250 mylar;
+  //dz   = 0.012500;  // =half thickness for Mylar
+  rmax = 3.510;     //for 100 mylar;
+  dz   = 0.00500; // =half thickness for Mylar
   TGeoShape *pTarget3 = new TGeoTube("Target3",rmin,rmax,dz);
   TGeoVolume *pTarget3_log = new TGeoVolume("Target3",pTarget3, pMed15);    // Mylar
   pTarget3_log->SetVisLeaves(kTRUE);

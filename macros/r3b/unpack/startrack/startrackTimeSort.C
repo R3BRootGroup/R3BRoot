@@ -10,6 +10,8 @@
 
 #include <fstream>
 #include "TFile.h"
+#include "TGraph.h"
+#include "TCanvas.h"
 #include "TTree.h"
 #include <vector>
 
@@ -529,6 +531,18 @@ void startrackTimeSort(char* input, char* output)
   TS_TSext->Write();
   TS_event->Write();
   TSext_event->Write();
+
+  // This ti to create and save a graph rather than a 2D histogrma
+   output_Tree->Draw("StarTrackRawHit.nhit:StarTrackRawHit.tm_stp","","");
+   cout << output_Tree->GetSelectedRows() << endl;;
+   TGraph *gr = new TGraph(output_Tree->GetSelectedRows(),
+                                   output_Tree->GetV1(), output_Tree->GetV2());
+   gr->Draw("ap");
+   gr->Write();
+
+
+
+
   outFile->Write();
   outFile->Print(); 
   outFile->Close();

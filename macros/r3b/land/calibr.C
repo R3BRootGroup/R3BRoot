@@ -3,10 +3,12 @@
 
 
 Float_t kappa = 0.04;
-const Float_t misId[] = {0.4, 0.3, 0.2, 0.025};
+const Float_t misId[] = {0.1, 0.1, 0.1, 0.05};
+
+Float_t Integral_2D(TH2F *h1, Float_t cut1, Float_t cut2);
 
 // -----------------------------------------------------------------------------
-void calibr_2D(Int_t beamE, Int_t Erel, Kappa)
+void calibr_2D(Int_t beamE, Int_t Erel, Float_t Kappa)
 {
   Int_t d;
   if(Erel == 100) {
@@ -19,6 +21,8 @@ void calibr_2D(Int_t beamE, Int_t Erel, Kappa)
 
 
   // ----- Files -----------------------------------------------------
+  Float_t cuts[5];
+  cuts[0] = 5.;
   char strDir[] = ".";
   TString inFile[4];
   TFile *file[4];
@@ -33,7 +37,7 @@ void calibr_2D(Int_t beamE, Int_t Erel, Kappa)
     Style(h[i], "Total deposited energy (MeV)", "Number of clusters");
   }
   for(Int_t i = 1; i < 5; i++) {
-    cuts[i] = cuts[i-1] + 1.;
+    cuts[i] = cuts[i-1] + 300.;
     Float_t int0 = h[i-1]->GetEntries();
     Float_t int1 = Integral_2D(h[i-1], cuts[i-1], cuts[i]);
     Float_t int2 = Integral_2D(h[i-1], cuts[i], 1500.);
@@ -48,7 +52,7 @@ void calibr_2D(Int_t beamE, Int_t Erel, Kappa)
 	cuts[i] += 1.;
       }
       int1 = Integral_2D(h[i-1], cuts[i-1], cuts[i]);
-      int2 = Integral_2D(h[i-1], cuts[i], 1500.);
+      int2 = Integral_2D(h[i-1], cuts[i], 3000.);
       eff1 = int1 / int0;
       eff2 = int2 / int0;
       cout << "loop : " << i << "   " << cuts[i] << " : " << eff1 << "  " << eff2 << endl;
@@ -343,8 +347,8 @@ Float_t Integral_2D(TH2F *h1, Float_t cut1, Float_t cut2)
   Float_t e;
   for(Int_t ic = 0; ic < 150; ic++) {
     c = (Float_t)(ic+0.5);
-    for(Int_t ie = 0; ie < 1000; ie++) {
-      e = (Float_t)(ie+0.5)*1.;
+    for(Int_t ie = 0; ie < 150; ie++) {
+      e = (Float_t)(ie+0.5)*10.;
       if(c >= ( (0.-kappa*cut1)/(cut1-0.)*(e-0.)+kappa*cut1 )) {
 	if(c < ( (0.-kappa*cut2)/(cut2-0.)*(e-0.)+kappa*cut2 )) {
 	  integral += h1->GetBinContent(ie+1, ic+1);

@@ -4,7 +4,7 @@ void Config()
    // Load the User Defined Physics List
    cout << "-I- R3B Config(): Loading G4 User Defined Physics List " << endl;
 
-    gSystem->Load("libR3BPlist.so");
+   gSystem->Load("libR3BPlist");
 
     cout<<endl;
 
@@ -25,19 +25,19 @@ void Config()
 
 
    // Create the Run Configuration
-   //R3BRunConfiguration* runConfiguration
-   //  = new R3BRunConfiguration("geomRootToGeant4", "stepLimiter+specialCuts+specialControls");
+   R3BRunConfiguration* runConfiguration
+     = new R3BRunConfiguration("geomRoot", "specialCuts+stackPopper+stepLimiter+specialControls");
 
 /// Create the G4 VMC 
-   //TGeant4* geant4 = new TGeant4("TGeant4", "The Geant4 Monte Carlo",
-				// runConfiguration);
-   //cout << "-I- R3B Config(): Geant4 with R3B dedicated Physics list " << endl;
-   //cout << "-I- R3B Config(): has been created..." << endl;
+   TGeant4* geant4 = new TGeant4("TGeant4", "The Geant4 Monte Carlo",
+				 runConfiguration);
+   cout << "-I- R3B Config(): Geant4 with R3B dedicated Physics list " << endl;
+   cout << "-I- R3B Config(): has been created..." << endl;
 
 
   // Create Geant4 VMC
   //  
-  TGeant4 *geant4 = 0;
+/*  TGeant4 *geant4 = 0;
   if ( ! gMC ) {
     TG4RunConfiguration* runConfiguration 
       = new TG4RunConfiguration("geomRoot", 
@@ -51,7 +51,7 @@ void Config()
   } 
   else {
     cout << "Monte Carlo has been already created." << endl;
-  }  
+  }  */
 
 
 
