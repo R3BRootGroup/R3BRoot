@@ -68,6 +68,8 @@ calibration/R3BNeulandCal2Hit.cxx
 calibration/R3BNeulandHitModulePar.cxx
 calibration/R3BNeulandMapped2QCalPar.cxx
 calibration/R3BNeulandQCalPar.cxx
+calibration/R3BNeulandHitFiller.cxx
+calibration/R3BNeulandQCalFiller.cxx
 )
 
 # fill list of header files from list of source files

@@ -32,6 +32,7 @@
 #pragma link C++ class R3BNeulandHitModulePar+;
 #pragma link C++ class R3BNeulandMapped2QCalPar+;
 #pragma link C++ class R3BNeulandQCalPar+;
-
+#pragma link C++ class R3BNeulandHitFiller+;
+#pragma link C++ class R3BNeulandQCalFiller+;
 #endif
 

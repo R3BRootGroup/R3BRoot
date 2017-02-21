@@ -1,30 +1,3 @@
-struct Filler : FairTask{
-
-	TClonesArray* data = new TClonesArray("R3BNeulandMappedData", 100);
-	R3BEventHeader* header = new R3BEventHeader();
-	Int_t i = 0;
-
-	virtual InitStatus Init(){
-		FairRootManager::Instance()->Register ("NeulandMappedData", "NeuLAND", data, kTRUE);
-		FairRootManager::Instance()->Register ("R3BEventHeader", "", header, kTRUE);
-		return kSUCCESS;
-	}
-
-	virtual void  Exec(Option_t *option){
-		Int_t value;
-		i++;
-		for(Int_t j = 0; j < 100; j++){	
-			value = j + 100;	
-			if(i > 5000)
-				value += std::rand()%10 - 5;			
-			new ((*data)[j]) R3BNeulandMappedData(0, 0, 0, value, 1, j/2 + 1, j%2 + 1);
-		}			
-		header = new (header) R3BEventHeader();
-		header->SetTrigger(2);
-	}
-
-};
-
 void Land_qcal_test(){
     TStopwatch timer;
     timer.Start();
@@ -41,7 +14,7 @@ void Land_qcal_test(){
     // ---------------------------------------------------------------------------
 
     // ---------------------------------------------------------------------------
-    run->AddTask(new Filler());
+    run->AddTask(new R3BNeulandQCalFiller());
     // ---------------------------------------------------------------------------
 
     // ---------------------------------------------------------------------------
