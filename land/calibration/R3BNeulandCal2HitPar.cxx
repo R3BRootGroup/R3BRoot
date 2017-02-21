@@ -6,10 +6,7 @@
 #include "R3BNeulandCal2HitPar.h"
 #include "R3BNeulandCalData.h"
 #include "FairLogger.h"
-#include "TAxis.h"
 #include "TGraph.h"
-#include "TPolyLine3D.h"
-#include "TH2D.h"
 #include "TH1F.h"
 #include "TVector3.h"
 #include "R3BNeulandHitModulePar.h"
@@ -17,142 +14,7 @@
 #include "TF1.h"
 #include "TClonesArray.h"
 #include "FairRuntimeDb.h"
-#include "math.h"
-#include <algorithm>
-
-#ifndef _isfinite // Workaround for gcc (stdc99 etc bla, bla...)
-
-# if defined(__svr4__)
-# include <cmath>
-# endif
-
-# if (defined(__NetBSD__) || defined(__svr4__))
-// Not sure if this is the right test, but sun solaris needs this
-// This is so ugly!  I hate all the tricks and nastiness that went into
-// my header files to make stuff compile.  Hopefully, once the compilers has
-// settled on some kind of standard C++ that works the same, one could remove this
-// junk.
-namespace __gnu_cxx {
-   template<typename _Tp>
-   int
-   __capture_isfinite(_Tp __f) {
-      return isfinite(__f);
-   }
-};
-#  undef isfinite
-namespace __gnu_cxx {
-   template<typename _Tp>
-   int
-   isfinite(_Tp __f) {
-      return __capture_isfinite(__f);
-   }
-};
-# endif
-
-# define _isfinite __gnu_cxx::isfinite
-
-#endif
-
-#ifndef _isnan // Workaround for gcc (stdc99 etc bla, bla...)
-
-# if (defined(__NetBSD__) || defined(__svr4__) )  // Not sure if this is the right test, but sun solaris needs this
-namespace __gnu_cxx {
-   template<typename _Tp>
-   int
-   __capture_isnan(_Tp __f) {
-      return isnan(__f);
-   }
-};
-# undef isnan
-namespace __gnu_cxx {
-   template<typename _Tp>
-   int
-   isnan(_Tp __f) {
-      return __capture_isnan(__f);
-   }
-};
-# endif
-
-# define _isnan    __gnu_cxx::isnan
-#endif
-
-#ifdef __GNUC_PREREQ
-# if __GNUC_PREREQ (3, 2)
-#  define USING_GCC_3_2_LATER
-# endif
-#endif
-
-#ifdef __GNUC_PREREQ
-# if __GNUC_PREREQ (3, 3)
-#  define USING_GCC_3_3_LATER
-# endif
-#endif
-
-#ifdef __GNUC_PREREQ
-# if __GNUC_PREREQ (4, 1)
-#  define USING_GCC_4_1_LATER
-# endif
-#endif
-
-#ifdef __GNUC_PREREQ
-# if __GNUC_PREREQ (4, 3)
-#  define USING_GCC_4_3_LATER
-# endif
-#endif
-
-#if defined(USING_GCC_4_3_LATER)
-# define ISNAN(x)     __builtin_isnan(x)
-# define ISFINITE(x)  __builtin_isfinite(x)
-#elif defined(__FreeBSD__) || defined(USING_GCC_4_1_LATER)
-# define ISNAN(x)     isnan(x)
-# define ISFINITE(x)  isfinite(x)
-#elif defined(__svr4__)
-# define ISNAN(x)     _isnan(x)
-# define ISFINITE(x)  _isfinite(x)
-#elif defined(USING_GCC_3_2_LATER)
-# include <cmath>
-# define ISNAN(x)     _isnan(x)
-# define ISFINITE(x)  _isfinite(x)
-#elif defined(__NetBSD__)
-# include <cmath>
-# define ISNAN(x)     _isnan(x)
-# define ISFINITE(x)  _isfinite(x)
-#elif defined (__CYGWIN__)
-# define ISNAN(x)      myisnan(x)
-# define ISFINITE(x)   myisfinite(x)
-# include "util_c99.h"
-#elif defined (__llvm__)
-# include <cmath>
-# define ISNAN(x)      std::isnan(x)
-# define ISFINITE(x)   std::isfinite(x)
-#else
-# define ISNAN(x)     isnan(x)
-# define ISFINITE(x)  isfinite(x)
-#endif
-
-#ifdef USING_GCC_2_95
-# define isfinite(x)  finite(x)
-#endif
-
-#ifndef INFINITY
-# define INFINITY (0.0/1.0) // defined in math.h
-#endif
-
-#ifndef NAN
-# define NAN      (create_nan()) // sick and tired of messing around.  Ugly, slow
-# define NEED_CREATE_NAN 1
-#endif
-
-#define PPP_MISMATCH_PM1    ULong_t(0x0001)
-#define PPP_MISMATCH_PM2    ULong_t(0x0002)
-#define PPP_MASK_MISMATCH   (PPP_MISMATCH_PM1 | PPP_MISMATCH_PM2)
-#define PPP_DEAD_PM1        ULong_t(0x0004)
-#define PPP_DEAD_PM2        ULong_t(0x0008)
-#define PPP_MASK_DEAD       (PPP_DEAD_PM1 | PPP_DEAD_PM2)
-#define PPP_FIND_EXPECT1    ULong_t(0x0010)
-#define PPP_FIND_EXPECT2    ULong_t(0x0020)
-#define PPP_MASK_EXPECT     (PPP_FIND_EXPECT1 | PPP_FIND_EXPECT2)
-#define ADD_EXPECT(exp_i) if (!(ppp[(exp_i)/2]._flag & (PPP_DEAD_PM1 << ((exp_i) & 1)))) { expect[nexpect++] =  (exp_i); }
+#include "TMath.h"
 
 /* About numbering:  LAND is numbered in x from high x to low x
  * and in y from low y to high y.  Same applies to the VETO.
@@ -232,13 +94,13 @@ bool n_calib_mean::analyse_history(ident_no_set& bad_fit_idents) {
 }
 
 bool n_calib_diff::calc_params(ident_no_set& bad_fit_idents, Double_t y0[2], Double_t dydx[2]) {
-   TF1* fit = new TF1("linear_fit", "[1]*x+[0]");
-   TGraph* plot = new TGraph();
+   TF1 fit = TF1("linear_fit", "[1]*x+[0]");
+   TGraph plot;
    Int_t n = 0;
 
    for (UInt_t k = 0; k < _data.size(); k++)
       if (bad_fit_idents.find(_data[k]._ident_no) == bad_fit_idents.end()) {
-         plot->SetPoint(n++, _data[k]._pos_track, _data[k]._pos_diff);
+         plot.SetPoint(n++, _data[k]._pos_track, _data[k]._pos_diff);
       }
       
    if(n < 1000){
@@ -246,22 +108,16 @@ bool n_calib_diff::calc_params(ident_no_set& bad_fit_idents, Double_t y0[2], Dou
       y0[1] = NAN;
       dydx[0] = NAN;
       dydx[1] = NAN;
-      
-      plot->Delete();
-      fit->Delete();
    
       return false;   
    }
    
-   plot->Fit(fit, "q");
-   y0[0] = fit->GetParameter(0);
-   y0[1] = fit->GetParError(0);
-   dydx[0] = fit->GetParameter(1);
-   dydx[1] = fit->GetParError(1);
+   plot.Fit(&fit, "q");
+   y0[0] = fit.GetParameter(0);
+   y0[1] = fit.GetParError(0);
+   dydx[0] = fit.GetParameter(1);
+   dydx[1] = fit.GetParError(1);
 
-
-   plot->Delete();
-   fit->Delete();
    return true;
 }
 
@@ -275,22 +131,19 @@ bool n_calib_diff::analyse_history(ident_no_set& bad_fit_idents) {
 
       Int_t sections = (Int_t)(_data.size() / MIN_COUNTS_PER_SECTION - 1);
 
-      if (sections > MAX_SECTIONS) {
+      if (sections > MAX_SECTIONS)
          sections = MAX_SECTIONS;
-      }
 
-      if (sections < 3) { /* we cannot do any sanity checking */
+      if (sections < 3) /* we cannot do any sanity checking */
          return false;
-      }
 
       UInt_t n = (UInt_t) _data.size();
       /* resort the data according to position. */
 
       nc_diff d[n];
 
-      for (UInt_t k = 0; k < _data.size(); k++) {
+      for (UInt_t k = 0; k < _data.size(); k++)
          d[k] = _data[k];
-      }
 
       qsort(d, n, sizeof(nc_diff), compare_float);
 
@@ -299,19 +152,16 @@ bool n_calib_diff::analyse_history(ident_no_set& bad_fit_idents) {
       size_t data_per_sect = _data.size() / sections;
       size_t extra_data = _data.size() - sections * data_per_sect;
 
-      TF1* fit = new TF1("linear_fit", "[0]*x+[1]");
-      TGraph* plot = new TGraph();
+      TF1 fit = TF1("linear_fit", "[0]*x+[1]");
+      TGraph plot;
 
       for (Int_t sect = 0; sect < sections; sect++) {
-         size_t kmin =
-            sect     * data_per_sect + (sect * extra_data) / sections;
-         size_t kmax =
-            (sect + 1) * data_per_sect + ((sect + 1) * extra_data) / sections;
+         size_t kmin = sect * data_per_sect + (sect * extra_data) / sections;
+         size_t kmax = (sect + 1) * data_per_sect + ((sect + 1) * extra_data) / sections;
          UInt_t nk = (UInt_t)(kmax - kmin);
 
-         for (size_t k = kmin; k < kmax; k++) {
+         for (size_t k = kmin; k < kmax; k++)
             od[k - kmin] = d[k]._pos_diff;
-         }
 
          flt_ped_sigma pedsigma;
 
@@ -321,12 +171,9 @@ bool n_calib_diff::analyse_history(ident_no_set& bad_fit_idents) {
 
             size_t used = 0;
 
-            for (size_t k = kmin; k < kmax; k++) {
-               if (d[k]._pos_diff > min_accept &&
-                     d[k]._pos_diff < max_accept) {
-                  plot->SetPoint(used++, d[k]._pos_track, d[k]._pos_diff);
-               }
-            }
+            for (size_t k = kmin; k < kmax; k++)
+               if (d[k]._pos_diff > min_accept && d[k]._pos_diff < max_accept)
+                  plot.SetPoint(used++, d[k]._pos_track, d[k]._pos_diff);
          }
       }
 
@@ -335,28 +182,23 @@ bool n_calib_diff::analyse_history(ident_no_set& bad_fit_idents) {
        * distance should no longer depend on where in the section the point
        * is, and thus the cutting of noise be sharper.
        */
-      if (plot->GetN() < 2) {
+      if (plot.GetN() < 2)
          return false;
-      }
 
-      plot->Fit(fit, "q");
+      plot.Fit(&fit, "q");
 
-      Double_t y0   = fit->GetParameter(1);
-      Double_t dydx = fit->GetParameter(0);
+      Double_t y0   = fit.GetParameter(1);
+      Double_t dydx = fit.GetParameter(0);
 
-      plot->Set(0);
+      plot.Set(0);
 
       for (Int_t sect = 0; sect < sections; sect++) {
-         size_t kmin =
-            sect     * data_per_sect + (sect * extra_data) / sections;
-         size_t kmax =
-            (sect + 1) * data_per_sect + ((sect + 1) * extra_data) / sections;
+         size_t kmin = sect * data_per_sect + (sect * extra_data) / sections;
+         size_t kmax = (sect + 1) * data_per_sect + ((sect + 1) * extra_data) / sections;
          UInt_t nk = (UInt_t)(kmax - kmin);
 
-         for (size_t k = kmin; k < kmax; k++) {
-            od[k - kmin] =
-               (Float_t)(d[k]._pos_diff - (y0 + dydx * d[k]._pos_track));
-         }
+         for (size_t k = kmin; k < kmax; k++) 
+            od[k - kmin] = (Float_t)(d[k]._pos_diff - (y0 + dydx * d[k]._pos_track));
 
          flt_ped_sigma pedsigma;
 
@@ -367,22 +209,15 @@ bool n_calib_diff::analyse_history(ident_no_set& bad_fit_idents) {
             size_t used = 0;
 
             for (size_t k = kmin; k < kmax; k++) {
-               Double_t odval =
-                  (d[k]._pos_diff - (y0 + dydx * d[k]._pos_track));
+               Double_t odval = (d[k]._pos_diff - (y0 + dydx * d[k]._pos_track));
 
-               if (odval > min_accept &&
-                     odval < max_accept) {
-                  plot->SetPoint(used++, d[k]._pos_track, d[k]._pos_diff);
-               }
-               else {
+               if (odval > min_accept && odval < max_accept) 
+                  plot.SetPoint(used++, d[k]._pos_track, d[k]._pos_diff);
+               else 
                   bad_fit_idents.insert(d[k]._ident_no);
-               }
             }
          }
       }
-
-      plot->Delete();
-      fit->Delete();
    }
    return true;
 }
@@ -400,8 +235,13 @@ R3BNeulandCal2HitPar::R3BNeulandCal2HitPar(const char* name, Int_t iVerbose)
 }
 
 R3BNeulandCal2HitPar::~R3BNeulandCal2HitPar() {
-   if (fPar)
-      delete fPar;
+   if(x_plot){
+     delete x_plot, y_plot, x_fit, y_fit;
+       for(Int_t i = 0; i < fPlanes; i++)
+	 for(Int_t j = fPaddles; j >= 0; j--){
+	   delete bars[i][j], _ecalhistos[i][j], _ecalgraphs[i][j];
+	 }
+   }
 }
 
 InitStatus R3BNeulandCal2HitPar::Init() {
@@ -459,8 +299,6 @@ InitStatus R3BNeulandCal2HitPar::Init() {
    return kSUCCESS;
 }
 
-#include "bitset"
-
 void R3BNeulandCal2HitPar::Exec(Option_t* option) {
    if (++fEventNumber % 100000 == 0)
       FairLogger::GetLogger()->Info(MESSAGE_ORIGIN, "R3BNeulandCal2HitPar::Exec : Event: %8d,    accepted Events: %8d", fEventNumber, nData);
@@ -486,7 +324,7 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
       Int_t pl = (pmt->GetBarId() - 1) / fPaddles;
       Int_t pdl = (pmt->GetBarId() - 1) % fPaddles;
       Int_t side = pmt->GetSide() - 1;
-      
+
       bar* b = bars[pl][pdl];
 
       b->fTime[side] = pmt->GetTime();
@@ -606,35 +444,27 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
       x_plot->Set(0);
       y_plot->Set(0);
 
-      for (Int_t pl = FIRST_VERT_PLANE; pl < fPlanes; pl += 2) {
-         if (hit_mask[pl]) {
+      for (Int_t pl = FIRST_VERT_PLANE; pl < fPlanes; pl += 2) 
+         if (hit_mask[pl])
             x_hit_fPlanes++;
-         }
-      }
 
-      for (Int_t pl = FIRST_HORZ_PLANE; pl < fPlanes; pl += 2) {
-         if (hit_mask[pl]) {
+      for (Int_t pl = FIRST_HORZ_PLANE; pl < fPlanes; pl += 2)
+         if (hit_mask[pl])
             y_hit_fPlanes++;
-         }
-      }
 
       if (x_hit_fPlanes < 2 || y_hit_fPlanes < 2) {
          LOG(DEBUG) << "failed: too few fPlanes were hit!" << FairLogger::endl;
          return;
       }
 
-      for (Int_t pl = 0; pl < fPlanes; pl++) {
-         for (Int_t pdl = 0; pdl < fPaddles; pdl++) {
+      for (Int_t pl = 0; pl < fPlanes; pl++)
+         for (Int_t pdl = 0; pdl < fPaddles; pdl++)
             if ((hit_mask[pl] >> pdl) & ULong_t (1)) {
-               if (pl % 2 == FIRST_VERT_PLANE) {
+               if (pl % 2 == FIRST_VERT_PLANE)
                   x_plot->SetPoint(n_x++, pl + 0.5, pdl + 0.5);
-               }
-               else {
+               else
                   y_plot->SetPoint(n_y++, pl + 0.5, pdl + 0.5);
-               }
             }
-         }
-      }
 
       if (x_plot->GetN() < 3) {
          LOG(DEBUG) << "failed: checking impossible, abort (rather have fewer, than bad ones!)" << FairLogger::endl;
@@ -949,72 +779,57 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
 	    bound1 = (2 * (pdl + 1) - fPaddles) * PADDLE_SPACING * 0.5;
 	    bound2 = (2 * pdl - fPaddles) * PADDLE_SPACING * 0.5;
 	    
-	    if(PLANE_IS_HORZ(pl)){      
-	      z = pl * PADDLE_SPACING;
-	      y = y0 + dydz * z;
-	      x = x0 + dxdz * z;
+	    z = pl * PADDLE_SPACING;
+	    y = y0 + dydz * z;
+	    x = x0 + dxdz * z;
 	      
-	      if(y <= bound1  && y >= bound2 ){ //frontside
-		p[hit].SetXYZ(x, y, z);
-		hit++;
-	      }
+	    if(PLANE_IS_HORZ(pl)){
+	      if(y <= bound1  && y >= bound2 ) //frontside
+		p[hit++].SetXYZ(x, y, z);
 	      
 	      z = (pl + 1) * PADDLE_SPACING;
 	      y = y0 + dydz * z;
 	      x = x0 + dxdz * z;
 	      
-	      if(y <= bound1  && y >= bound2 ){ //backside
-		p[hit].SetXYZ(x, y, z);
-		hit++;
-	      }
-	      
+	      if(y <= bound1  && y >= bound2 )//backside
+		p[hit++].SetXYZ(x, y, z);
+		
 	      if(hit<2){
 		y = bound1;
 		z = (y - y0)/dydz;
 		x = x0 + dxdz * z;
-		if(z <= (pl + 1) * PADDLE_SPACING  && z >= pl * PADDLE_SPACING ){ //topside
-		  p[hit].SetXYZ(x, y, z);
-		  hit++;
-		}
+		
+		if(z <= (pl + 1) * PADDLE_SPACING  && z >= pl * PADDLE_SPACING ) //topside
+		  p[hit++].SetXYZ(x, y, z);
 	      }
 	      
 	      if(hit < 2){
 		y = bound2;
 		z = (y - y0)/dydz;
 		x = x0 + dxdz * z;
-		if(z <= (pl + 1) * PADDLE_SPACING  && z >= pl * PADDLE_SPACING ){ //bottomside
-		  p[hit].SetXYZ(x, y, z);
-		}
-	      }	      
-	    }
-	    else{	      
-	      z = pl * PADDLE_SPACING;
-	      y = y0 + dydz * z;
-	      x = x0 + dxdz * z;
-	      
-	      if(x <= bound1  && x >= bound2 ){ //frontside
-		p[hit].SetXYZ(x, y, z);
-		hit++;
+		if(z <= (pl + 1) * PADDLE_SPACING  && z >= pl * PADDLE_SPACING ) //bottomside
+		  p[hit++].SetXYZ(x, y, z);
+		
 	      }
+	    }
+	    else{
+	      if(x <= bound1  && x >= bound2 ) //frontside
+		p[hit++].SetXYZ(x, y, z);
 	      
 	      z = (pl + 1) * PADDLE_SPACING;
 	      y = y0 + dydz * z;
 	      x = x0 + dxdz * z;
 	      
-	      if(x <= bound1  && x >= bound2 ){ //backside
-		p[hit].SetXYZ(x, y, z);
-		hit++;
-	      }
+	      if(x <= bound1  && x >= bound2 ) //backside
+		p[hit++].SetXYZ(x, y, z);
 	      
 	      if(hit<2){
 		x = bound1;
 		z = (x - x0)/dydz;
 		y = y0 + dydz * z;
 	      
-		if(z <= (pl + 1) * PADDLE_SPACING  && z >= pl * PADDLE_SPACING ){ //leftside
-		  p[hit].SetXYZ(x, y, z);
-		  hit++;
-		}
+		if(z <= (pl + 1) * PADDLE_SPACING  && z >= pl * PADDLE_SPACING ) //leftside
+		  p[hit++].SetXYZ(x, y, z);
 	      }
 	      
 	      if(hit < 2){
@@ -1022,9 +837,8 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
 		z = (x - x0)/dydz;
 		y = y0 + dydz * z;
 		
-		if(z <= (pl + 1) * PADDLE_SPACING  && z >= pl * PADDLE_SPACING ){ //rightside
-		  p[hit].SetXYZ(x, y, z);
-		}
+		if(z <= (pl + 1) * PADDLE_SPACING  && z >= pl * PADDLE_SPACING ) //rightside
+		  p[hit++].SetXYZ(x, y, z);
 	      }
 	    }
 	    
@@ -1038,7 +852,7 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
 		else
 		  _ecalgraphs[pl][pdl]->SetPoint(_ecalgraphs[pl][pdl]->GetN(), (p[0] + 0.5*(p[1]-p[0])).Y(), log(b->fQdc[0] / b->fQdc[1]));		
 	      }
-	    }	    
+	    }
 	  }
 	}
       }
@@ -1050,19 +864,17 @@ void R3BNeulandCal2HitPar::FinishEvent() {
 }
 
 void R3BNeulandCal2HitPar::FinishTask() {
-  
-   LOG(INFO) << nData << " Events registered." << FairLogger::endl;
+   LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << nData << " Events registered." << FairLogger::endl;
 
-   LOG(INFO) << "**************TIMES**************" << FairLogger::endl;
+   LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << "**************TIMES**************" << FairLogger::endl;
 
-   LOG(INFO) << "Analysing history: t-diff" << FairLogger::endl;
+   LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << "Analysing history: t-diff" << FairLogger::endl;
 
    for (Int_t pl = 0; pl < fPlanes; pl++)
-      for (Int_t pdl = 0; pdl < fPaddles; pdl++) {
+      for (Int_t pdl = 0; pdl < fPaddles; pdl++)
          _collect_diff[pl][pdl].analyse_history(_bad_fit_idents);
-      }
 
-   LOG(INFO) << "Analysing history: t-mean-within" << FairLogger::endl;
+   LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << "Analysing history: t-mean-within" << FairLogger::endl;
 
    for (Int_t pl = 0; pl < fPlanes; pl++)
       for (Int_t pdl = 0; pdl < fPaddles - 1; pdl++) {
@@ -1070,7 +882,7 @@ void R3BNeulandCal2HitPar::FinishTask() {
          _collect_mean_within[pl][pdl].analyse_history(_bad_fit_idents);
       }
 
-   LOG(INFO) << "Analysing history: t-mean-cross" << FairLogger::endl;
+   LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << "Analysing history: t-mean-cross" << FairLogger::endl;
 
    for (Int_t pl = 0; pl < fPlanes - 1; pl++)
       for (Int_t pdl1 = 0; pdl1 < fPaddles; pdl1++)
@@ -1079,7 +891,7 @@ void R3BNeulandCal2HitPar::FinishTask() {
             _collect_mean_cross[pl][pdl1][pdl2].analyse_history(_bad_fit_idents);
          }
 
-   LOG(INFO) << "Collecting and fitting history: t-diff" << FairLogger::endl;
+   LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << "Collecting and fitting history: t-diff" << FairLogger::endl;
 
    Double_t tdiff[fPlanes][fPaddles][2];
    Double_t invveff[fPlanes][fPaddles][2];
@@ -1093,7 +905,7 @@ void R3BNeulandCal2HitPar::FinishTask() {
    val_err_inv mean_diff_cross_t[fPlanes - 1][fPaddles][fPaddles];
 
 
-   LOG(INFO) << "Collecting history: t-mean-within" << FairLogger::endl;
+   LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << "Collecting history: t-mean-within" << FairLogger::endl;
 
    /* this calcs a mean_diff from all the data stored in _collect_mean_within
    and stores the mean in mean_diff_within_t
@@ -1105,7 +917,7 @@ void R3BNeulandCal2HitPar::FinishTask() {
          _collect_mean_within[pl][pdl].calc_params(_bad_fit_idents, mean_diff_within_t[pl][pdl]);
       }
 
-   LOG(INFO) << "Collecting history: t-mean-cross" << FairLogger::endl;
+   LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << "Collecting history: t-mean-cross" << FairLogger::endl;
 
    for (Int_t pl = 0; pl < fPlanes - 1; pl++)
       for (Int_t pdl1 = 0; pdl1 < fPaddles; pdl1++)
@@ -1114,7 +926,7 @@ void R3BNeulandCal2HitPar::FinishTask() {
             _collect_mean_cross[pl][pdl1][pdl2].calc_params(_bad_fit_idents, mean_diff_cross_t[pl][pdl1][pdl2]);
          }
 
-   LOG(INFO) << "Syncing: t-mean" << FairLogger::endl;
+   LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << "Syncing: t-mean" << FairLogger::endl;
    Double_t tsync[fPlanes][fPaddles][2];
    {
       sparse_sync_pair_llq_mean_zero syncer_t;
@@ -1131,7 +943,7 @@ void R3BNeulandCal2HitPar::FinishTask() {
 
       for (Int_t pl = 0; pl < fPlanes; pl++)
          for (Int_t pdl = 0; pdl < fPaddles - 1; pdl++)
-            if (ISFINITE(mean_diff_within_t[pl][pdl]._e2_inv) &&
+            if (TMath::Finite(mean_diff_within_t[pl][pdl]._e2_inv) &&
                   mean_diff_within_t[pl][pdl]._e2_inv > 0) {
                Double_t weight = sqrt(mean_diff_within_t[pl][pdl]._e2_inv);
 
@@ -1143,7 +955,7 @@ void R3BNeulandCal2HitPar::FinishTask() {
       for (Int_t pl = 0; pl < fPlanes - 1; pl++)
          for (Int_t pdl1 = 0; pdl1 < fPaddles; pdl1++)
             for (Int_t pdl2 = 0; pdl2 < fPaddles; pdl2++)
-               if (ISFINITE(mean_diff_cross_t[pl][pdl1][pdl2]._e2_inv) &&
+               if (TMath::Finite(mean_diff_cross_t[pl][pdl1][pdl2]._e2_inv) &&
                      mean_diff_cross_t[pl][pdl1][pdl2]._e2_inv > 0) {
                   Double_t weight = sqrt(mean_diff_cross_t[pl][pdl1][pdl2]._e2_inv);
 
@@ -1167,12 +979,12 @@ void R3BNeulandCal2HitPar::FinishTask() {
             tsync[pl][pdl][1] = 1 / sqrt(syncer_t._solution[pl * fPaddles + pdl]._e2_inv);
          }
    }
-   LOG (INFO) << "*************ENERGIES************" << FairLogger::endl;
+   LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << "*************ENERGIES************" << FairLogger::endl;
    
    Double_t ecal[fPlanes][fPaddles][2];
    Double_t ecalerr[fPlanes][fPaddles][2];
-   TF1* gausfit = new TF1("Gaus","gaus", 0, 200);
-   TF1* linearfit = new TF1("linear", "[1]*x+[0]");
+   TF1 gausfit = TF1("Gaus","gaus", 0, 200);
+   TF1 linearfit = TF1("linear", "[1]*x+[0]");
    
    for(Int_t pl = 0; pl < fPlanes; pl++)
      for(Int_t pdl = 0; pdl < fPaddles; pdl++){
@@ -1185,14 +997,15 @@ void R3BNeulandCal2HitPar::FinishTask() {
 	  continue;
        }
        
-       Int_t max = histo->GetMaximumBin();
-       histo->Fit(gausfit,"qn","", max - 10, max + 10);
-       Double_t k0k1 = gausfit->GetParameter(1) * gausfit->GetParameter(1);
-       Double_t k0k1err = 2 * gausfit->GetParameter(1) * gausfit->GetParError(1);
+       Double_t max = histo->GetBinCenter(histo->GetMaximumBin());
+       gausfit.SetParameter(1, max);
+       histo->Fit(&gausfit,"qn","", max - 5, max + 5);
+       Double_t k0k1 = gausfit.GetParameter(1) * gausfit.GetParameter(1);
+       Double_t k0k1err = 2 * gausfit.GetParameter(1) * gausfit.GetParError(1);
        
-       _ecalgraphs[pl][pdl]->Fit(linearfit, "q");
-       Double_t k0dk1 = exp(linearfit->GetParameter(0));
-       Double_t k0dk1err = k0dk1 * linearfit->GetParError(0);
+       _ecalgraphs[pl][pdl]->Fit(&linearfit, "q");
+       Double_t k0dk1 = exp(linearfit.GetParameter(0));
+       Double_t k0dk1err = k0dk1 * linearfit.GetParError(0);
        
        ecal[pl][pdl][0] = MINIMUM_IONIZING/sqrt(k0k1 * k0dk1);
        ecal[pl][pdl][1] = MINIMUM_IONIZING/sqrt(k0k1 / k0dk1); 
@@ -1221,10 +1034,10 @@ void R3BNeulandCal2HitPar::FinishTask() {
    h_veff->GetYaxis()->SetTitle("veff [cm/ns]");
    
    TH1F* h_ecal = new TH1F("h_land_ecal", "Gain vs BarID", 2 * fPaddles * fPlanes, 0.5, 0.5 + fPaddles * fPlanes);
-   h_veff->SetMaximum(15);
-   h_veff->SetMinimum(0);
-   h_veff->GetXaxis()->SetTitle("BarID");
-   h_veff->GetYaxis()->SetTitle("MeV/QDC");
+   //h_ecal->SetMaximum(15);
+   h_ecal->SetMinimum(0);
+   h_ecal->GetXaxis()->SetTitle("BarID");
+   h_ecal->GetYaxis()->SetTitle("MeV/(100*QDC)");
 
    Double_t av_gain = 0;  
    Int_t n_av_gain = 0;
@@ -1241,13 +1054,13 @@ void R3BNeulandCal2HitPar::FinishTask() {
 
    char msg[100];
    
-   for (Int_t pl = 0; pl < fPlanes; pl++) {
-      for (Int_t pdl = 0; pdl < fPaddles; pdl++) {
+   for (Int_t pl = 0; pl < fPlanes; pl++)
+      for (Int_t pdl = 0; pdl < fPaddles; pdl++)
          for (Int_t pm = 0; pm < 2; pm++) {
             R3BNeulandHitModulePar* syncmodpar = new R3BNeulandHitModulePar();
             syncmodpar->SetModuleId(pl * fPaddles + pdl + 1);
             syncmodpar->SetSide(pm + 1);
-            syncmodpar->SetTimeOffset((1 - 2 * pm) *tdiff[pl][pdl][0] - tsync[pl][pdl][0]);
+            syncmodpar->SetTimeOffset((pm == 0 ? 1 : -1) * tdiff[pl][pdl][0] - tsync[pl][pdl][0]);
             syncmodpar->SetTimeOffsetError(sqrt(tdiff[pl][pdl][1]*tdiff[pl][pdl][1] + tsync[pl][pdl][1] * tsync[pl][pdl][1]));
             syncmodpar->SetEffectiveSpeed(0.5 / invveff[pl][pdl][0]);
             syncmodpar->SetEffectiveSpeedError(fabs(0.5 * invveff[pl][pdl][1] / (invveff[pl][pdl][0] * invveff[pl][pdl][0])));
@@ -1257,7 +1070,7 @@ void R3BNeulandCal2HitPar::FinishTask() {
                                           pl + 1, pdl + 1, pm + 1, syncmodpar->GetTimeOffset(),
                                           tdiff[pl][pdl][1], tsync[pl][pdl][1], syncmodpar->GetEnergieGain() * 1000,
                                           syncmodpar->GetEnergieGainError() * 1000);
-            if (!ISNAN(syncmodpar->GetTimeOffset()) && !ISNAN(syncmodpar->GetEnergieGain())){
+            if (!TMath::IsNaN(syncmodpar->GetTimeOffset()) && !TMath::IsNaN(syncmodpar->GetEnergieGain())){
 	      fPar->AddModulePar(syncmodpar);
 	      
 	      Float_t dev = ecalerr[pl][pdl][pm]/ecal[pl][pdl][pm];
@@ -1275,48 +1088,44 @@ void R3BNeulandCal2HitPar::FinishTask() {
 		calib[pl][pdl] = kTRUE;
 	      }
 	      
-	      h_ecal->SetBinContent(2*syncmodpar->GetModuleId() + pm, ecal[pl][pdl][pm]);
+	      h_ecal->SetBinContent(2*syncmodpar->GetModuleId() + pm, 100*ecal[pl][pdl][pm]);
 	      
 	      av_gain += ecal[pl][pdl][pm];
 	      n_av_gain++;	      
 	    }      
 	    else{
-	      if(ISNAN(syncmodpar->GetTimeOffset()))
+	      if(TMath::IsNaN(syncmodpar->GetTimeOffset()))
 		sprintf(msg,"[%2d][%2d][%1d]: Time Calibration failed!", pl + 1, pdl + 1, pm + 1);
 	      else
 	        sprintf(msg,"[%2d][%2d][%1d]: Energy Calibration failed!", pl + 1, pdl + 1, pm + 1);
 	      fails.push_back(msg);
 	    }
          }
-      }
-   }   
    
    av_gain = av_gain/n_av_gain;
    
-   for (Int_t pl = 0; pl < fPlanes; pl++) {
-      for (Int_t pdl = 0; pdl < fPaddles; pdl++) {
+   for (Int_t pl = 0; pl < fPlanes; pl++)
+      for (Int_t pdl = 0; pdl < fPaddles; pdl++)
 	 if(calib[fPlanes][fPaddles] && ! susp_b[fPlanes][fPaddles]) 
            for (Int_t pm = 0; pm < 2; pm++) {
-	     
 	      Float_t dev = fabs((ecal[pl][pdl][pm] - av_gain)/av_gain);
+	      
 	      if(dev > fDeviationTH/100.){
 		sprintf(msg,"[%2d][%2d][%1d]: Deviation of %3.1f%s from average gain!", pl + 1, pdl + 1, pm + 1, dev * 100,"%");
 		susp_s.push_back(msg);
 	      }
 	   }
-      }
-   }
  
    if(fails.size() > 0){
       LOG(INFO) << FairLogger::endl << FairLogger::endl << FairLogger::endl;
-      LOG(INFO) << "Following PMTs failed to calibrate:" << FairLogger::endl;
+      LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << "Following PMTs failed to calibrate:" << FairLogger::endl;
       for (Int_t i = 0; i < fails.size(); i++)
 	 LOG(INFO) << fails.at(i) << FairLogger::endl;     
    }
    
    if(susp_s.size() > 0){
       LOG(INFO) << FairLogger::endl << FairLogger::endl << FairLogger::endl;
-      LOG(INFO) << "Following PMTs are conspicuous:" << FairLogger::endl;
+      LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << "Following PMTs are conspicuous:" << FairLogger::endl;
       for (Int_t i = 0; i < susp_s.size(); i++)
 	 LOG(INFO) << susp_s.at(i) << FairLogger::endl;  
    }
@@ -1329,7 +1138,7 @@ void R3BNeulandCal2HitPar::FinishTask() {
    delete h_tdiff, h_tsync, h_veff;
 
    fPar->setChanged();
-   LOG(INFO) << fPar->GetNumModulePar() << " PMTs calibrated!" << FairLogger::endl;
+   LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << fPar->GetNumModulePar() << "/" << fPlanes*fPaddles*2 << " PMTs calibrated!" << FairLogger::endl;
 }
 
 ClassImp(R3BNeulandCal2HitPar)

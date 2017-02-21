@@ -129,8 +129,6 @@ class R3BNeulandCal2HitPar : public FairTask
     
     std::vector<std::vector<TH1F*>> _ecalhistos;
     std::vector<std::vector<TGraph*>> _ecalgraphs;
-    
-    TH1F* distances;
 
     UInt_t _used_ident_no;
 
