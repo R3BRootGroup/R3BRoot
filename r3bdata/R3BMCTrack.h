@@ -112,7 +112,7 @@ private:
    **  with the inline functions. 
    **  Bits 26-31 are spare for potential additional detectors.
    **/
-  Int_t fNPoints;
+  ULong_t fNPoints;
 
   // case of HIons
   Double32_t fMass;

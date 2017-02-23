@@ -39,18 +39,15 @@ Double_t c = 29.9792458;
 Double_t gBeamBeta;
 bool AuxSortClustersBeta(R3BNeuLandCluster*, R3BNeuLandCluster*);
 
-
-
 // -----------------------------------------------------------------------------
-R3BNeutronTracker2D::R3BNeutronTracker2D() :
-  FairTask("R3B NeuLAND Neutron Tracker")
-{ 
-  dio=10.6; //3 times half the diogonal of a paddle
+R3BNeutronTracker2D::R3BNeutronTracker2D()
+    : FairTask("R3B NeuLAND Neutron Tracker")
+    , f2DCutEnabled(kTRUE)
+    , fNNeutrons(0)
+{
+    dio = 10.6; // 3 times half the diogonal of a paddle
 }
 // -----------------------------------------------------------------------------
-
-
-
 
 // -----------------------------------------------------------------------------
 R3BNeutronTracker2D::~R3BNeutronTracker2D()
@@ -268,29 +265,46 @@ void R3BNeutronTracker2D::Exec(Option_t* opt)
   h_ncl_etot->Fill(fEtot, fNofClusters);
   h_ndigi_etot->Fill(fEtot, nentries);
 
-
-
-  if(fNofClusters >= ( (0.-fKappa*fCuts[4])/(fCuts[4]-0.)*(fEtot-0.)+fKappa*fCuts[4] )) {
-    nNeut = 5;
-  } else if(fNofClusters >= ( (0.-fKappa*fCuts[3])/(fCuts[3]-0.)*(fEtot-0.)+fKappa*fCuts[3] )) {
-    nNeut = 4;
-  } else if(fNofClusters >= ( (0.-fKappa*fCuts[2])/(fCuts[2]-0.)*(fEtot-0.)+fKappa*fCuts[2] )) {
-    nNeut = 3;
-  } else if(fNofClusters >= ( (0.-fKappa*fCuts[1])/(fCuts[1]-0.)*(fEtot-0.)+fKappa*fCuts[1] )) {
-    nNeut = 2;
-  } else if(fNofClusters >= ( (0.-fKappa*fCuts[0])/(fCuts[0]-0.)*(fEtot-0.)+fKappa*fCuts[0] )) {
-    nNeut = 1;
-  } else {
-    nNeut = 0;
+  if (f2DCutEnabled)
+  {
+      if (fNofClusters >= ((0. - fKappa * fCuts[4]) / (fCuts[4] - 0.) * (fEtot - 0.) + fKappa * fCuts[4]))
+      {
+          nNeut = 5;
+      }
+      else if (fNofClusters >= ((0. - fKappa * fCuts[3]) / (fCuts[3] - 0.) * (fEtot - 0.) + fKappa * fCuts[3]))
+      {
+          nNeut = 4;
+      }
+      else if (fNofClusters >= ((0. - fKappa * fCuts[2]) / (fCuts[2] - 0.) * (fEtot - 0.) + fKappa * fCuts[2]))
+      {
+          nNeut = 3;
+      }
+      else if (fNofClusters >= ((0. - fKappa * fCuts[1]) / (fCuts[1] - 0.) * (fEtot - 0.) + fKappa * fCuts[1]))
+      {
+          nNeut = 2;
+      }
+      else if (fNofClusters >= ((0. - fKappa * fCuts[0]) / (fCuts[0] - 0.) * (fEtot - 0.) + fKappa * fCuts[0]))
+      {
+          nNeut = 1;
+      }
+      else
+      {
+          nNeut = 0;
+      }
   }
-
+  else
+  {
+      nNeut = fNNeutrons;
+  }
 
   h_ntracks->Fill(nNeut);
     
 
   if(nNeut > 0) {
     // Find neutrons
+    nAboveThresh=0;
     AdvancedMethod();
+    //if(nAboveThresh > 3) cout<<"Neutrons above threshold: "<<nAboveThresh<<"  event: "<<eventNo<< "  Neutrons: " <<nNeut<<endl;
     hClusters1->Fill(fNofClusters1);
     h_ncl1_etot->Fill(fEtot, fNofClusters1);
   }
@@ -305,6 +319,15 @@ void R3BNeutronTracker2D::Exec(Option_t* opt)
     hMinv->Fill(fMinv);
     hExce->Fill(fExce);
   }
+/*
+  if(fMinv>0.45 && fMinv<0.55 && nNeut != 0 && fNofTracks == fNPrimNeut){ 
+	  cout<<" Good event: "<<eventNo<< "  Neutrons: " <<nNeut<<endl;
+      h_nofclusters->Fill(fNofClusters);
+      h_etot->Fill(fEtot);
+      h_ncl_etot->Fill(fEtot, fNofClusters);
+      h_ndigi_etot->Fill(fEtot, nentries);
+  }
+*/
 }
 // ----------------------------------------------------------------------------- 
 
@@ -351,7 +374,30 @@ Int_t R3BNeutronTracker2D::AdvancedMethod()
       if(TMath::Abs(beta-beamBeta) > (0.05*600./beamEnergy) && ic > 0) {
   	continue;
       }
+      
 
+/*
+      // Check if cluster has more energy than half the neutron energy
+      if(cluster->GetE() > 150. ) {
+		  nAboveThresh++;
+	   //cout<<"Cluster energy: "<<	cluster->GetE() <<"  event: "<<eventNo<<endl;   	
+      }
+*/
+/*
+      // Check cluster size
+      if(cluster->GetSize() < 8. ) {
+		//  nAboveThresh++;
+	   //cout<<"Cluster energy: "<<	cluster->GetE() <<"  event: "<<eventNo<<endl;   	
+	 continue;
+      }
+*/ 
+/*     
+      if(cluster->GetSize()*cluster->GetE()>2000. ) {
+//		  cout<<"Cluster energy: "<<	cluster->GetE()*cluster->GetSize() <<"  event: "<<eventNo<<endl;
+		  nAboveThresh++;
+      }
+*/
+     
       // Create neutron track
       fTracks[fNofTracks][0] = ic;
       mapUsed[ic] = kTRUE;
@@ -1141,8 +1187,8 @@ void R3BNeutronTracker2D::Finish()
   h_theta->Write();
 
   h_nofclusters->Write();
-  // h_etot->Write();
-  // h_ncl_etot->Write();
+  h_etot->Write();
+  h_ncl_etot->Write();
   h_ncl_etot_1->Write();
   h_ndigi_etot->Write();
   h_ncl1_etot->Write();

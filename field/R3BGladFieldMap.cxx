@@ -114,8 +114,11 @@ void R3BGladFieldMap::Init() {
     Fatal("Init", "No proper file name");
   }
 
-
-  gTrans   = new TVector3(0.0, 0.0, -113.4);
+  fPosX = 0.0;
+  fPosY = 0.0;
+  fPosZ = 113.4;
+  fYAngle = -14.;
+  gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
 }
 // ------------------------------------------------------------------------
 
@@ -131,7 +134,7 @@ Double_t R3BGladFieldMap::GetBx(Double_t x, Double_t y, Double_t z) {
   TVector3 localPoint(x,y,z);
   
   localPoint = localPoint + (*gTrans);
-  localPoint.RotateY(14.*TMath::DegToRad());
+  localPoint.RotateY(-fYAngle*TMath::DegToRad());
 
   Int_t ix    = 0;
   Int_t iy    = 0;
@@ -172,7 +175,7 @@ Double_t R3BGladFieldMap::GetBy(Double_t x, Double_t y, Double_t z) {
   TVector3 localPoint(x,y,z);
   
   localPoint = localPoint + (*gTrans);
-  localPoint.RotateY(14.*TMath::DegToRad());
+  localPoint.RotateY(-fYAngle*TMath::DegToRad());
 
   Int_t ix    = 0;
   Int_t iy    = 0;
@@ -221,7 +224,7 @@ Double_t R3BGladFieldMap::GetBz(Double_t x, Double_t y, Double_t z) {
   TVector3 localPoint(x,y,z);
   
   localPoint = localPoint + (*gTrans);
-  localPoint.RotateY(14.*TMath::DegToRad());
+  localPoint.RotateY(-fYAngle*TMath::DegToRad());
 
 
 
@@ -394,6 +397,7 @@ void R3BGladFieldMap::Print(Option_t *option) const
   cout << endl;
   cout << "----  Field centre position: ( " << setw(6) << fPosX << ", "
        << setw(6) << fPosY << ", " << setw(6) << fPosZ << ") cm" << endl;
+  cout << "----  Field rotation Y: " << setw(6) << fYAngle << " deg" << endl;
   cout << "----  Field scaling factor: " << fScale << endl;
 //  Double_t bx = GetBx(0.,0.,0.);
 //  Double_t by = GetBy(0.,0.,0.);
@@ -505,16 +509,16 @@ void R3BGladFieldMap::ReadAsciiFile(const char* fileName) {
           Int_t index4 = Int_t((x + fXmax)/fXstep)*2*fNy*fNz + Int_t((-y + fYmax)/fYstep)*fNz + Int_t((z-fZmin)/fZstep);
           
           TVector3 B1(bx, by, bz);
-          B1.RotateY(-14.*TMath::DegToRad());
+          B1.RotateY(fYAngle*TMath::DegToRad());
 
           TVector3 B2(-bx, by, bz);
-          B2.RotateY(-14.*TMath::DegToRad());
+          B2.RotateY(fYAngle*TMath::DegToRad());
 
           TVector3 B3(-bx, by, -bz);
-          B3.RotateY(-14.*TMath::DegToRad());
+          B3.RotateY(fYAngle*TMath::DegToRad());
 
           TVector3 B4(-bx, by, -bz);
-          B4.RotateY(-14.*TMath::DegToRad());
+          B4.RotateY(fYAngle*TMath::DegToRad());
 
           fBx->AddAt(factor*B1.X(), index1);
           fBy->AddAt(factor*B1.Y(), index1);

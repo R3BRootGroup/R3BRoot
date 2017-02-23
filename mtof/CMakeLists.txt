@@ -20,6 +20,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
+${R3BROOT_SOURCE_DIR}/tracking
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -49,7 +50,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF mTofLinkDef.h)
 set(LIBRARY_NAME R3BmTof)
 set(DEPENDENCIES
-    R3Bbase R3BPassive MCStack R3BData)
+    R3Bbase R3BPassive MCStack R3BData R3BTracking)
 
 GENERATE_LIBRARY()
 

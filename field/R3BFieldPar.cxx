@@ -5,6 +5,7 @@
 #include "R3BFieldMap.h"
 #include "R3BFieldConst.h"
 #include "R3BAladinFieldMap.h"
+#include "R3BGladFieldMap.h"
 
 #include "FairParamList.h"
 
@@ -165,6 +166,19 @@ void R3BFieldPar::SetParameters(FairField* field) {
       {
           R3BAladinFieldMap* aladinFieldMap = (R3BAladinFieldMap*) field;
           fCurrent = aladinFieldMap->GetCurrent();
+      }
+      else if(2 == fType)
+      {
+          R3BGladFieldMap* gladFieldMap = (R3BGladFieldMap*) field;
+          fPosX = gladFieldMap->GetPositionX();
+          fPosY = gladFieldMap->GetPositionY();
+          fPosZ = gladFieldMap->GetPositionZ();
+          fXmin = -gladFieldMap->GetXmax();
+          fXmax = gladFieldMap->GetXmax();
+          fYmin = -gladFieldMap->GetYmax();
+          fYmax = gladFieldMap->GetYmax();
+          fZmin = gladFieldMap->GetZmin();
+          fZmax = gladFieldMap->GetZmax();
       }
   }
 

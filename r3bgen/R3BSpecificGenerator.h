@@ -89,6 +89,7 @@ private:
 
 public:
   R3BSpecificGenerator();
+  R3BSpecificGenerator(Int_t pdg, Float_t beamEnergy);
   R3BSpecificGenerator(const R3BSpecificGenerator&);
   ~R3BSpecificGenerator();
 

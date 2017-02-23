@@ -42,7 +42,8 @@ void r3ball(Int_t nEvents = 1,
             Double_t fMeasCurrent = 2000.,
             TString OutFile = "r3bsim.root",
             TString ParFile = "r3bpar.root",
-            TString InFile = "evt_gen.dat")
+            TString InFile = "evt_gen.dat",
+            Int_t randomSeed = 0)
 {
   TString dir = getenv("VMCWORKDIR");
   TString r3bdir = dir + "/macros";
@@ -144,6 +145,7 @@ void r3ball(Int_t nEvents = 1,
     //R3B Crystal Calorimeter
     R3BDetector* xball = new R3BXBall("XBall", kTRUE);
     xball->SetGeometryFileName(((TObjString*)fDetList->GetValue("CRYSTALBALL"))->GetString().Data());
+    ((R3BXBall*)xball)->SelectCollectionOption(2);
     run->AddModule(xball);
   }
   
@@ -215,7 +217,7 @@ void r3ball(Int_t nEvents = 1,
     run->AddModule(land);
   }
   
-  // NeuLand Scintillator Detector
+  // DEPRECATED: NeuLand Scintillator Detector
   if(fDetList->FindObject("SCINTNEULAND")) {
     R3BDetector* land = new R3BLand("Land", kTRUE);
     land->SetVerboseLevel(1);
@@ -223,6 +225,13 @@ void r3ball(Int_t nEvents = 1,
     run->AddModule(land);
   }
   
+  // Neuland Detector
+  if(fDetList->FindObject("NEULAND")) {
+    R3BDetector* neuland = new R3BNeuland();
+    neuland->SetGeometryFileName(((TObjString*)fDetList->GetValue("NEULAND"))->GetString().Data());
+    run->AddModule(neuland);
+  }
+
   // MFI Detector
   if(fDetList->FindObject("MFI")) {
     R3BDetector* mfi = new R3BMfi("Mfi", kTRUE);
@@ -247,7 +256,7 @@ void r3ball(Int_t nEvents = 1,
   
   // -----   Create R3B  magnetic field ----------------------------------------
   Int_t typeOfMagneticField = 0;
-  Int_t fieldScale = 1;
+  Float_t fieldScale = -0.5;
   Bool_t fVerbose = kFALSE;
   
   //NB: <D.B>
@@ -283,18 +292,31 @@ void r3ball(Int_t nEvents = 1,
   
   if (fGenerator.CompareTo("box") == 0  ) {
     // 2- Define the BOX generator
-    Int_t pdgId = 211; // pion beam
+    Int_t pdgId = 2212; // proton beam
     Double32_t theta1 = 0.;  // polar angle distribution
-    Double32_t theta2 = 7.;
-    Double32_t momentum = 0.8;
-    FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 50);
+    Double32_t theta2 = 2.;
+    Double32_t momentum = 1.3;
+    FairBoxGenerator* boxGen = new FairBoxGenerator(pdgId, 3);
     boxGen->SetThetaRange(theta1, theta2);
-    boxGen->SetPRange(momentum, momentum*2.);
+    boxGen->SetPRange(momentum, momentum*1.2);
     boxGen->SetPhiRange(0, 360);
     boxGen->SetXYZ(0.0, 0.0, -1.5);
 //    boxGen->SetXYZ(0.0, 0.0, -300.);
     // add the box generator
     primGen->AddGenerator(boxGen);
+
+    // 128-Sn fragment
+    R3BIonGenerator* ionGen = new R3BIonGenerator(50, 128, 50, 10, 0., 0., 1.3);
+    ionGen->SetSpotRadius(0.1, -100., 0.);
+    primGen->AddGenerator(ionGen);
+
+    // neutrons
+    FairBoxGenerator* boxGen_n = new FairBoxGenerator(2112, 3);
+    boxGen_n->SetThetaRange(theta1, theta2);
+    boxGen_n->SetPRange(momentum, momentum*1.2);
+    boxGen_n->SetPhiRange(0, 360);
+    boxGen_n->SetXYZ(0.0, 0.0, -1.5);
+    primGen->AddGenerator(boxGen_n);
   }
   
   if (fGenerator.CompareTo("ascii") == 0  ) {
@@ -303,7 +325,9 @@ void r3ball(Int_t nEvents = 1,
   }
   
   if (fGenerator.CompareTo("r3b") == 0  ) {
-    R3BSpecificGenerator *pR3bGen = new R3BSpecificGenerator();
+    Int_t pdg = 2212;
+    Float_t beamEnergy = 1.;
+    R3BSpecificGenerator *pR3bGen = new R3BSpecificGenerator(pdg, beamEnergy);
     
     // R3bGen properties
     pR3bGen->SetBeamInteractionFlag("off");
@@ -319,9 +343,7 @@ void r3ball(Int_t nEvents = 1,
     pR3bGen->SetSimEmittanceFlag("off");
     
     // R3bGen Parameters
-    pR3bGen->SetBeamEnergy(1.); // Beam Energy in GeV
     pR3bGen->SetSigmaBeamEnergy(1.e-03); // Sigma(Ebeam) GeV
-    pR3bGen->SetParticleDefinition(2212); // Use Particle Pdg Code
     pR3bGen->SetEnergyPrim(0.3); // Particle Energy in MeV
     Int_t fMultiplicity = 50;
     pR3bGen->SetNumberOfParticles(fMultiplicity); // Mult.
@@ -360,11 +382,12 @@ void r3ball(Int_t nEvents = 1,
   
 
   FairLogger::GetLogger()->SetLogVerbosityLevel("LOW");
+  FairLogger::GetLogger()->SetLogScreenLevel("INFO");
 
   
   // -----   Initialize simulation run   ------------------------------------
   run->Init();
-
+  gMC->SetRandom(new TRandom3(randomSeed));
   
   // ------  Increase nb of step for CALO
   Int_t nSteps = -15000;

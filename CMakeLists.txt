@@ -1,8 +1,8 @@
 # The name of our project is “R3BBROOT”.  CMakeLists files in this project can
 # refer to the root source directory of the project as ${R3BROOT_SOURCE_DIR} or
-# as ${CMAKE_SOURCE_DIR} and to the root binary directory of the project as 
+# as ${CMAKE_SOURCE_DIR} and to the root binary directory of the project as
 # ${R3BROOT_BINARY_DIR} or ${CMAKE_BINARY_DIR}.
-# This difference is is important for the base classes which are in R3BROOT 
+# This difference is is important for the base classes which are in R3BROOT
 # and PANDAROOT.
 
 # Check if cmake has the required version
@@ -21,11 +21,11 @@ foreach(p
 endforeach()
 
 # Set name of our project to "R3BROOT". Has to be done
-# after check of cmake version                        
+# after check of cmake version
 project(R3BROOT)
 
-# Check if the FairRoot is still in source, since Jan 2014 FairRoot 
-# should be installed separately 
+# Check if the FairRoot is still in source, since Jan 2014 FairRoot
+# should be installed separately
 
 FIND_PATH(FAIRBASE NAMES FairRun.h  PATHS
   ${CMAKE_SOURCE_DIR}/base/steer
@@ -45,7 +45,7 @@ Else (FAIRBASE)
 EndIf (FAIRBASE)
 
 
-# where to look first for cmake modules, before ${CMAKE_ROOT}/Modules/ 
+# where to look first for cmake modules, before ${CMAKE_ROOT}/Modules/
 # is checked
 
 
@@ -76,11 +76,12 @@ include(R3BMacros)
 include(WriteConfigFile)
 include(Dart)
 include(CheckCompiler)
+include(WriteEnvCache)
 
 
 # R3BRoot uses from 10.08.15 C++11, so we need an compiler which supports C++11
 # Check if the used compiler support C++11. If not stop with an error message
-# Check also if FairSoft and FairRoot have been compiled with C++11 support 
+# Check also if FairSoft and FairRoot have been compiled with C++11 support
 If(NOT _HAS_CXX11_FLAG)
   Message(FATAL_ERROR "The used C++ compiler (${CMAKE_CXX_COMPILER}) does not support C++11. R3BRoot can only be compiled with compilers supporting C++11. Please install such an compiler.")
 EndIf()
@@ -131,7 +132,7 @@ CHECK_OUT_OF_SOURCE_BUILD()
 # message
 IF(NOT UNIX)
   MESSAGE(FATAL_ERROR "You're not on an UNIX system. The project was up to now only tested on UNIX systems, so we break here. If you want to go on please edit the CMakeLists.txt in the source directory.")
-ENDIF(NOT UNIX)  
+ENDIF(NOT UNIX)
 
 #Check if necessary environment variables are set
 #If not stop execution
@@ -227,27 +228,34 @@ If(NOT DEFINED ROOT_FOUND_VERSION)
 EndIf()
 MESSAGE("ROOT_FOUND_VERSION = ${ROOT_FOUND_VERSION}")
 
-If(ROOT_FOUND_VERSION LESS 59999) 
-  SET(FAIRROOT_LIBRARY_PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES} 
-   VERSION "${FAIRROOT_VERSION}" 
-   SOVERSION "${FAIRROOT_MAJOR_VERSION}" 
-   SUFFIX ".so" 
-  ) 
-Else() 
-  SET(FAIRROOT_LIBRARY_PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES} 
-   VERSION "${FAIRROOT_VERSION}" 
-   SOVERSION "${FAIRROOT_MAJOR_VERSION}" 
-  ) 
-EndIf() 
+If(ROOT_FOUND_VERSION LESS 59999)
+  SET(FAIRROOT_LIBRARY_PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES}
+   VERSION "${FAIRROOT_VERSION}"
+   SOVERSION "${FAIRROOT_MAJOR_VERSION}"
+   SUFFIX ".so"
+  )
+Else()
+  SET(FAIRROOT_LIBRARY_PROPERTIES ${FAIRROOT_LIBRARY_PROPERTIES}
+   VERSION "${FAIRROOT_VERSION}"
+   SOVERSION "${FAIRROOT_MAJOR_VERSION}"
+  )
+EndIf()
 
 string(COMPARE EQUAL "${CMAKE_GENERATOR}" "Xcode" IS_XCODE)
-SET(R3BLIBDIR ${CMAKE_BINARY_DIR}/lib)  
+SET(R3BLIBDIR ${CMAKE_BINARY_DIR}/lib)
 If(${IS_XCODE})
   SET(LD_LIBRARY_PATH  ${R3BLIBDIR}/Debug ${R3BLIBDIR} ${LD_LIBRARY_PATH})
 Else(${IS_XCODE})
   SET(LD_LIBRARY_PATH  ${R3BLIBDIR} ${LD_LIBRARY_PATH})
 Endif(${IS_XCODE})
 
+find_package(ucesb)
+if(ucesb_FOUND)
+set(WITH_UCESB true)
+set(LD_LIBRARY_PATH ${ucesb_LIBRARY_DIR} ${LD_LIBRARY_PATH})
+endif(ucesb_FOUND)
+
+find_package(Garfield)
 
 Generate_Version_Info()
 
@@ -260,7 +268,7 @@ add_subdirectory (fairtools)
 add_subdirectory (base)
 add_subdirectory (dbase)
 add_subdirectory (geobase)
-add_subdirectory (parbase) 
+add_subdirectory (parbase)
 add_subdirectory (generators)
 add_subdirectory (geane)
 add_subdirectory (trackbase)
@@ -268,37 +276,47 @@ add_subdirectory (MbsAPI)
 ENDIF (NOT FAIRROOT_FOUND)
 
 IF(MODULE)
-add_subdirectory (${MODULE}) 
+add_subdirectory (${MODULE})
 ENDIF (MODULE)
 
 IF(NOT MODULE)
-add_subdirectory (r3bbase)  
-add_subdirectory (passive) 
+add_subdirectory (r3bbase)
+if (WITH_UCESB)
+  add_subdirectory (r3bsource)
+endif (WITH_UCESB)
+add_subdirectory (passive)
 add_subdirectory (cal)
 add_subdirectory (xball)
-add_subdirectory (dch) 
-add_subdirectory (gfi) 
-add_subdirectory (land) 
+add_subdirectory (dch)
+add_subdirectory (gfi)
+add_subdirectory (fi4)
+add_subdirectory (land)
 add_subdirectory (neuland)
 add_subdirectory (los)
 add_subdirectory (mtof)
-add_subdirectory (dtof) 
+add_subdirectory (dtof)
 add_subdirectory (tof)
 add_subdirectory (tracker)
 add_subdirectory (startracker)
-add_subdirectory (r3bdata) 
+add_subdirectory (strawtubes)
+add_subdirectory (r3bdata)
 add_subdirectory (r3bdb)
-add_subdirectory (field) 
-add_subdirectory (macros)  
-add_subdirectory (r3bgen) 
+add_subdirectory (field)
+add_subdirectory (macros)
+add_subdirectory (r3bgen)
 add_subdirectory (plists)
-add_subdirectory (lumon) 
+add_subdirectory (lumon)
 add_subdirectory (evtvis)
 add_subdirectory (mfi)
 add_subdirectory (psp)
 add_subdirectory (timestitcher)
 add_subdirectory (compilehelper)
 add_subdirectory (tcal)
+add_subdirectory (tracking)
+  IF(GARFIELD_FOUND)
+    add_subdirectory (actar)
+    Set(LD_LIBRARY_PATH ${GARFIELD_LIBRARY_DIR} ${LD_LIBRARY_PATH})
+  ENDIF(GARFIELD_FOUND)
 ENDIF (NOT MODULE)
 
 Execute_Process(COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-opengl
@@ -326,7 +344,7 @@ endif(BUILD_DOXYGEN)
 
 if(RULE_CHECKER_FOUND)
 
-  ADD_CUSTOM_TARGET(RULES 
+  ADD_CUSTOM_TARGET(RULES
      COMMAND ${RULE_CHECKER_SCRIPT1} ${CMAKE_BINARY_DIR} viol > violations.html
      DEPENDS $ENV{ALL_RULES})
 
@@ -338,3 +356,5 @@ if(NOT R3BROOT_MINIMAL)
 else(NOT R3BROOT_MINIMAL)
   WRITE_MINIMAL_CONFIG_FILE(config.sh)
 endif(NOT R3BROOT_MINIMAL)
+
+WRITE_ENV_CACHE(env_cache.sh)

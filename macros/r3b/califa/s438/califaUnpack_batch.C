@@ -69,6 +69,7 @@ void califaUnpack_batch(TString inputFile="", Int_t firstFileNumber=-999, Int_t 
 
     // Run -----------------------------------------------------------------------
     run->Run(nevents, 0);
+    delete run;
     // ---------------------------------------------------------------------------
 
     timer.Stop();

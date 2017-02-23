@@ -8,9 +8,45 @@
 #include "FairIon.h"
 #include "R3BBackTrackingStorageState.h"
 
-
-
 R3BSpecificGenerator::R3BSpecificGenerator()
+    : pReadKinematics(NULL)
+    , pCDGenerator(NULL)
+    , pBackTrackingGenerator(NULL)
+    , gammasFlag("off")
+    , decaySchemeFlag("off")
+    , reactionFlag("off")
+    , reactionType("Elas")
+    , dissociationFlag("off")
+    , backTrackingFlag("off")
+    , targetType("Parafin0Deg")
+    , targetHalfThicknessPara((0.11 / 2.) / 10.) // cm
+    , targetThicknessLiH(3.5)                    // cm
+    , targetRadius(1.)                           // cm
+    , beamInteractionFlag("off")
+    , rndmFlag("off")
+    , rndmEneFlag("off")
+    , boostFlag("off")
+    , fPDGType(2212)
+    , kinEnergyPrim(1e-03)            // GeV - kinetic energy of the primary
+    , meanKinEnergyBeam(700. * 1e-03) // GeV - kinetic energy mean of the beam (per nucleon)
+    , sigmaKinEnergyBeam(1.e-03)      // GeV - kinetic energy sigma of the beam
+    , simEmittanceFlag("off")
+    , sigmaXInEmittance(1.)
+    , sigmaXPrimeInEmittance(0.0001)
+    , fPDGMass(0.)
+    , fMult(1)
+    , fP(0.)
+    , fPdir(0., 0., 1.)
+    , fCharge(0)
+    , fPol(0., 0., 0.)
+    , fPos(0., 0., 0.)
+    , fTime(0.)
+    , particlePrim("")
+    , isDumped(kFALSE)
+{
+}
+
+R3BSpecificGenerator::R3BSpecificGenerator(Int_t pdg, Float_t beamEnergy)
   : pReadKinematics(NULL), pCDGenerator(NULL), pBackTrackingGenerator(NULL),
     gammasFlag("off"),decaySchemeFlag("off"),reactionFlag("off"),reactionType("Elas"),
     dissociationFlag("off"), backTrackingFlag("off"),
@@ -19,9 +55,9 @@ R3BSpecificGenerator::R3BSpecificGenerator()
     targetThicknessLiH(3.5),  // cm
     targetRadius(1.),   // cm
     beamInteractionFlag("off"),rndmFlag("off"),
-    rndmEneFlag("off"),boostFlag("off"),fPDGType(2212),
+    rndmEneFlag("off"),boostFlag("off"),fPDGType(pdg),
     kinEnergyPrim(1e-03),          // GeV - kinetic energy of the primary
-    meanKinEnergyBeam(700.*1e-03), // GeV - kinetic energy mean of the beam (per nucleon)
+    meanKinEnergyBeam(beamEnergy), // GeV - kinetic energy mean of the beam (per nucleon)
     sigmaKinEnergyBeam(1.e-03),    // GeV - kinetic energy sigma of the beam
     simEmittanceFlag("off"),sigmaXInEmittance(1.),sigmaXPrimeInEmittance(0.0001),
     fPDGMass(0.),fMult(1),fP(0.),fPdir(0.,0.,1.),fCharge(0),fPol(0.,0.,0.),

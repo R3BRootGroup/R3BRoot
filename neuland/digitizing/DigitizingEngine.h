@@ -149,8 +149,9 @@ public:
 public:
     std::map<Int_t, Paddle> paddles;
 
-    DigitizingEngine();
-    ~DigitizingEngine();
+    DigitizingEngine(){};// = default;
+    ~DigitizingEngine(){};// = default;
+
 
     void SetPaddleHalfLength(const Double_t &v)
     {
@@ -165,6 +166,7 @@ public:
 
 
     Double_t GetTriggerTime() const;
+
 
     void DepositLight(const Int_t &paddle_id, const Double_t &time, const Double_t &light, const Double_t &dist)
     {

@@ -61,6 +61,7 @@ class R3BStarTrackUnpack : public FairUnpack {
     ULong_t ts_vhb;  // to be used if Time stamp is reconstructed in the unpacker (otherwise UInt_t is sufficient)
     //UInt_t ts_hb;
     ULong_t ts_hb;   // to be used if Time stamp is reconstructed in the unpacker (otherwise UInt_t is sufficient)
+    ULong_t ts_code47_lb;   // to be used if Time stamp is reconstructed in the unpacker (otherwise UInt_t is sufficient)
     UInt_t ts_lb;
     UInt_t ts_lb_part1;
     UInt_t ts_lb_part2;
