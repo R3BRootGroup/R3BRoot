@@ -111,7 +111,6 @@ void R3BNeulandTcalFill::Exec(Option_t*)
     R3BPaddleTamexMappedData* hit;
     Int_t iPlane;
     Int_t iBar;
-    Int_t iSide;
     
 
     // Loop over mapped hits

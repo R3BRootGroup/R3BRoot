@@ -21,8 +21,8 @@ class R3BEventHeader;
 
 
 /**
- * An analysis task to apply TCAL calibration for NeuLAND.
- * This class reads NeuLAND mapped items with TDC values and
+ * An analysis task to apply TCAL calibration.
+ * This class reads mapped items with TDC values and
  * produces time items with time in [ns]. It requires TCAL
  * calibration parameters, which are produced in a separate
  * analysis run containing R3BTofdMapped2TCalFill task.
