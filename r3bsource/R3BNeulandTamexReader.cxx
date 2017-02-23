@@ -55,7 +55,7 @@ Bool_t R3BNeulandTamexReader::Read()
 
 	/* Display data */
 	fLogger->Info(MESSAGE_ORIGIN, "  Event data:");
-
+/*
 	for (int plane = 0; plane < N_PLANES; ++plane) {
 		for (int pm = 0; pm < 2; ++pm) {
 
@@ -104,7 +104,7 @@ Bool_t R3BNeulandTamexReader::Read()
 	        }
 		}
 	}
-
+*/
 //	fNEvent = fData->EVENTNO;
     fNEvent += 1;
 
