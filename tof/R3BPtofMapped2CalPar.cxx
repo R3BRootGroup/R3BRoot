@@ -1,27 +1,9 @@
 // ----------------------------------------------------------------
-// -----            R3BTofdMapped2TCalPar (7ps VFTX)            -----
-// -----           Created Apr 2016 by R.Plag             -----
+// -----            R3BPtofMapped2TCalPar (TAMEX)             -----
 // ----------------------------------------------------------------
 
-/* Some notes:
- * 
- * There are different versions of VFTX:
- * 10px delivering 8 leading edges in Ch 1-8 and 8 trailing edges in
- *      Ch 9-16. This one was used for LOS1 but is not used in the analysis
- *  7px delivering 8 leading edges only. Used for LOS2 and this is the
- *      LOS we use for analysis.
- * 
- * For s438b we had no synchronisation between 50 MHz tacquila clock 
- * and the 200 MHz VFTX clock so we need to always subtract the time
- * of the master trigger from the LOS time.
- * The master trigger is on the last channel of the VFTX and handled
- * as 5th los channel.
- * 
- * This file handles 7ps VFTX only, hence we have one edge per channel.
- * 
- */
 
-#include "R3BTofdMapped2TCalPar.h"
+#include "R3BPtofMapped2CalPar.h"
 #include "R3BPaddleTamexMappedData.h"
 #include "R3BEventHeader.h"
 #include "R3BTCalPar.h"
@@ -42,8 +24,8 @@
 
 using namespace std;
 
-R3BTofdMapped2TCalPar::R3BTofdMapped2TCalPar()
-    : FairTask("R3BTofdMapped2TCalPar", 1)
+R3BPtofMapped2CalPar::R3BPtofMapped2CalPar()
+    : FairTask("R3BPtofMapped2CalPar", 1)
     , fUpdateRate(1000000)
     , fMinStats(100000)
     , fTrigger(-1)
@@ -54,7 +36,7 @@ R3BTofdMapped2TCalPar::R3BTofdMapped2TCalPar()
 {
 }
 
-R3BTofdMapped2TCalPar::R3BTofdMapped2TCalPar(const char* name, Int_t iVerbose)
+R3BPtofMapped2CalPar::R3BPtofMapped2CalPar(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fUpdateRate(1000000)
     , fMinStats(100000)
@@ -66,7 +48,7 @@ R3BTofdMapped2TCalPar::R3BTofdMapped2TCalPar(const char* name, Int_t iVerbose)
 {
 }
 
-R3BTofdMapped2TCalPar::~R3BTofdMapped2TCalPar()
+R3BPtofMapped2CalPar::~R3BPtofMapped2CalPar()
 {
 	if (fCal_Par)
 	{
@@ -78,7 +60,12 @@ R3BTofdMapped2TCalPar::~R3BTofdMapped2TCalPar()
     }
 }
 
-InitStatus R3BTofdMapped2TCalPar::Init()
+
+/*  !!!!!!!!!!!!!
+ * Define new container in: 
+ * /R3BRoot/tcal/R3BTCalContFact.cxx
+ */
+InitStatus R3BPtofMapped2CalPar::Init()
 {	
     FairRootManager* rm = FairRootManager::Instance();
     if (!rm)
@@ -86,10 +73,8 @@ InitStatus R3BTofdMapped2TCalPar::Init()
         return kFATAL;
     }
     
-    header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
-	// may be = NULL!
 	
-    fMapped = (TClonesArray*)rm->GetObject("TofdMapped");
+    fMapped = (TClonesArray*)rm->GetObject("PtofMapped");
     if (!fMapped)
     {
         return kFATAL;
@@ -97,10 +82,10 @@ InitStatus R3BTofdMapped2TCalPar::Init()
 
 	// container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
 	// to be set as dependency in CMakelists.txt (in this case in the tof directory)
-    fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofdTCalPar");
+    fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("PtofTCalPar");
 	if (!fCal_Par)
 	{
-		LOG(ERROR) << "R3BTofdMapped2TCalPar::Init() Couldn't get handle on TofdTCalPar. " << FairLogger::endl;
+		LOG(ERROR) << "R3BPtofMapped2CalPar::Init() Couldn't get handle on PtofTCalPar. " << FairLogger::endl;
         return kFATAL;
 		
 	}
@@ -109,7 +94,7 @@ InitStatus R3BTofdMapped2TCalPar::Init()
 
     if (!fNofModules)
     {
-		LOG(ERROR) << "R3BTofdMapped2TCalPar::Init() Number of modules not set. " << FairLogger::endl;
+		LOG(ERROR) << "R3BPtofMapped2CalPar::Init() Number of modules not set. " << FairLogger::endl;
         return kFATAL;
     }
     
@@ -118,11 +103,8 @@ InitStatus R3BTofdMapped2TCalPar::Init()
     return kSUCCESS;
 }
 
-void R3BTofdMapped2TCalPar::Exec(Option_t* option)
+void R3BPtofMapped2CalPar::Exec(Option_t* option)
 {
-	// test for requested trigger (if possible)
-    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger)) 
-		return;
 
     Int_t nHits = fMapped->GetEntries();
 
@@ -138,12 +120,12 @@ void R3BTofdMapped2TCalPar::Exec(Option_t* option)
         
         if (iPlane>=fNofPlanes) // this also errors for iDetector==0
         {
-            LOG(ERROR) << "R3BTofdMapped2TCalPar::Exec() : more detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes << FairLogger::endl;
+            LOG(ERROR) << "R3BPtofMapped2CalPar::Exec() : more detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes << FairLogger::endl;
             continue;
         }
         if (iBar>=fPaddlesPerPlane) // same here
         {
-            LOG(ERROR) << "R3BTofdMapped2TCalPar::Exec() : more bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane << FairLogger::endl;
+            LOG(ERROR) << "R3BPtofMapped2CalPar::Exec() : more bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane << FairLogger::endl;
             continue;
         }
 
@@ -163,14 +145,14 @@ void R3BTofdMapped2TCalPar::Exec(Option_t* option)
     fNEvents += 1;
 }
 
-void R3BTofdMapped2TCalPar::FinishEvent()
+void R3BPtofMapped2CalPar::FinishEvent()
 {
 }
 
-void R3BTofdMapped2TCalPar::FinishTask()
+void R3BPtofMapped2CalPar::FinishTask()
 {
     fEngine->CalculateParamVFTX();
     fCal_Par->printParams();
 }
 
-ClassImp(R3BTofdMapped2TCalPar)
+ClassImp(R3BPtofMapped2CalPar)

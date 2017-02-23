@@ -49,6 +49,7 @@ R3BTof2pDigitizer.cxx
 R3BTofdMapped2TCal.cxx
 R3BTofdMapped2TCalPar.cxx
 R3BPtofMapped2Cal.cxx
+R3BPtofMapped2CalPar.cxx
 R3BTofdCal2HitPar.cxx
 R3BTofdCal2Hit.cxx
 R3BTofdHitModulePar.cxx

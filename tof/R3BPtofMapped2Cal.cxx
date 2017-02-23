@@ -122,18 +122,20 @@ void R3BPtofMapped2Cal::Exec(Option_t* option)
 
 	for (Int_t ihit = 0; ihit < nHits; ihit++)
 	{
-		R3BPaddleTamexMappedData* hit = (R3BPaddleTamexMappedData*)fMappedItems->At(ihit);
-		if (!hit) continue; // should be an assert()
+		R3BPaddleTamexMappedData* mapped = (R3BPaddleTamexMappedData*)fMappedItems->At(ihit);
+		R3BPaddleCalData* cal = NULL;
 
-		Int_t iPlane = hit->GetPlaneId(); // 1..n; no need to check range
-		Int_t iBar   = hit->GetBarId();   // 1..n
-
-		R3BPaddleCalData* calData = new ((*fCalItems)[fNofCalItems]) R3BPaddleCalData(iPlane,iBar);
+		Int_t iPlane = mapped->GetPlaneId(); // 1..n; no need to check range
+		Int_t iBar   = mapped->GetBarId();   // 1..n
 
 		// convert times to ns
 		for (int tube=0;tube<2;tube++) // PM1 and PM2
 			for (int edge=0;edge<2;edge++) // loop over leading and trailing edge
 			{
+				// check if there is indeed data for this tube and edge:
+				if (mapped->GetFineTime(tube , edge)==0) continue;
+
+				// fetch calib params:
 				R3BTCalModulePar* par = fTcalPar->GetModuleParAt(iPlane, iBar, tube*2 + edge + 1); // 1..4
 				if (!par)
 				{
@@ -142,24 +144,28 @@ void R3BPtofMapped2Cal::Exec(Option_t* option)
 					continue;
 				}
 
+				// create CAL item only if data AND calib params are available:
+				if (!cal) 
+					cal = new ((*fCalItems)[fNofCalItems]) R3BPaddleCalData(iPlane,iBar);
+
 
 				// Convert TDC to [ns] ...
-				Double_t time_ns = par->GetTimeVFTX( hit->GetFineTime(tube , edge) );
+				Double_t time_ns = par->GetTimeVFTX( mapped->GetFineTime(tube , edge) );
 
 				if (time_ns < 0. || time_ns > fClockFreq )
 				{
 					LOG(ERROR) << 
 					"R3BPtofMapped2Cal::Exec : bad time in ns: Plane= " << iPlane << 
 					", bar= " << iBar << ",tube= " << (tube+1) <<
-					", time in channels = " << hit->GetFineTime(tube,edge) <<
+					", time in channels = " << mapped->GetFineTime(tube,edge) <<
 					", time in ns = " << time_ns  << FairLogger::endl;
 					continue;
 				}
 		
 				// ... and add clock time
-				time_ns = fClockFreq - time_ns + hit->GetCoarseTime(tube , edge) * fClockFreq;
+				time_ns = fClockFreq - time_ns + mapped->GetCoarseTime(tube , edge) * fClockFreq;
 
-				calData->SetTime(tube,edge,time_ns);
+				cal->SetTime(tube , edge , time_ns);
 			}
 	}
 }
