@@ -89,15 +89,163 @@ Bool_t R3BTofdReader::Read()
 
 #endif
 
-// ToDo: Here we need to implement the reconstruction of zero suppressed
-// multi hit data.
-// Problem: We have no possibility to know which edges belong together
-// because times are not calibrated yet. So we cannot reconstruct events
-// based on physics data (times).
-// In principle, each signal/hit should ALWAYS produce a leading and a
-// trailing edge, with a fine and coarse time each. So we use this info
-// to reconstruct multi-hit data, but we check for same number of
-// multi-hits in leading and trailing edges and skip the event on mismatch
+/* 
+ * We actually CAN do the full reconstruction of a paddle (PMs +
+ * leading + trailing edges) here in the reader since we can rely on the
+ * coarse time for the reconstruction. Sudden time offsets due to resetting
+ * of clock counters should not occur within the data of one paddle.
+ * 
+ * So we would do:
+ * 
+ * for (planes)
+ *   for (tube)
+ *     for (leading times)
+ * 		 add to existing entry or else create a new one
+ *     for (trailing times)
+ * 		 add to existing entry or create a new one
+ * 
+ */
+
+
+	
+	for (int d=0;d<MAX_TOFD_PLANES;d++)  // loop over all planes
+		for (int t=0;t<2;t++)            // loop over tube 1 and 2
+		{
+			// ******** leading edges ********
+			
+			// # of channels with data. not necessarly number of hits! (b/c multi hit)
+			uint32_t numChannels = data->TOFD_P[d].T[t].TFLM; 
+				
+			// loop over channels
+			uint32_t curChannelStart=0;     // index in v for first item of current channel
+			for (int i=0;i<numChannels;i++) 
+			{
+				uint32_t channel=data->TOFD_P[d].T[t].TFLMI[i]; // or 1..65
+				uint32_t nextChannelStart=data->TOFD_P[d].T[t].TFLME[i];  // index in v for first item of next channel
+				
+				for (int j=curChannelStart;j<nextChannelStart;j++) 
+				{
+					
+					R3BPaddleTamexMappedData* mapped=NULL;
+
+					// see if we can find a mappedData with matching PM1 leading coarse time
+					if (t==1)
+					{ 
+						int n=fArray->GetEntriesFast();
+						int coarse=data->TOFD_P[d].T[t].TCLv[j];
+						for (int k=0;k<n;k++)
+						{
+							R3BPaddleTamexMappedData* hit = (R3BPaddleTamexMappedData*)fArray->At(k);
+							// if leading time1 within 100ns window and time2 not yet set
+							if ((hit->fCoarseTime2LE==0) && (abs(hit->fCoarseTime1LE - coarse)<=20))
+							{
+								mapped=hit;
+								break;
+							}
+						}
+					}
+					
+					if (!mapped) mapped=new ((*fArray)[fArray->GetEntriesFast()])
+						R3BPaddleTamexMappedData(d+1,    // 1..n   (plane)
+							channel);				     // 1..n   (bar)
+
+					if (t==0) // PM1
+					{
+						mapped->fCoarseTime1LE= data->TOFD_P[d].T[t].TCLv[j];  // coarse time leading edge
+						mapped->fFineTime1LE  = data->TOFD_P[d].T[t].TFLv[j];  // fine time leading edge
+					}
+					else // PM2
+					{
+						mapped->fCoarseTime2LE= data->TOFD_P[d].T[t].TCLv[j];  // coarse time leading edge
+						mapped->fFineTime2LE  = data->TOFD_P[d].T[t].TFLv[j];  // fine time leading edge
+					}
+				}
+				
+				curChannelStart=nextChannelStart;
+			} // for leading edges
+			
+			
+
+
+			// ******** trailing edges ********
+			
+			// # of channels with data. not necessarly number of hits! (b/c multi hit)
+			numChannels = data->TOFD_P[d].T[t].TFTM; 
+				
+			// loop over channels
+			curChannelStart=0;     // index in v for first item of current channel
+			for (int i=0;i<numChannels;i++) 
+			{
+				uint32_t channel=data->TOFD_P[d].T[t].TFTMI[i]; // or 1..65
+				uint32_t nextChannelStart=data->TOFD_P[d].T[t].TFTME[i];  // index in v for first item of next channel
+				
+				for (int j=curChannelStart;j<nextChannelStart;j++) {
+					
+					R3BPaddleTamexMappedData* mapped=NULL;
+
+					// see if we can find a mappedData with matching PM1 data
+					int n=fArray->GetEntriesFast();
+					int coarse=data->TOFD_P[d].T[t].TCTv[j];
+					// matching a trailing time is only useful if the corresponding
+					// leading time is present. Meaning: no need to check trailing1
+					// to leading2 and vice-versa. This reduces the combinations we have to 
+					// check to:
+					// match trailing2 to leading2
+					// match trailing1 to leading1
+					
+					if (t==0) // do the if outside to most inner loop for performance reasons
+						 // PM1
+						for (int k=0;k<n;k++)
+						{
+							R3BPaddleTamexMappedData* hit = (R3BPaddleTamexMappedData*)fArray->At(k);
+							int tot=coarse - hit->fCoarseTime1LE;
+							if ((tot<=1000) && (tot>=0) &&   // time-over-treshold reasonable
+								(hit->fCoarseTime1TE==0) &&  // trailing not yet set
+								(hit->fCoarseTime1LE!=0))    // leading IS set (else tot is crap)
+							{
+								mapped=hit;
+								break;
+							}
+						}
+					else // PM2
+						for (int k=0;k<n;k++)
+						{
+							R3BPaddleTamexMappedData* hit = (R3BPaddleTamexMappedData*)fArray->At(k);
+							// if leading time within 5000ns window and trailing2 not yet set
+							int tot=coarse - hit->fCoarseTime2LE;
+							if ((tot<=1000) && (tot>=0) &&   // time-over-treshold reasonable
+								(hit->fCoarseTime2TE==0) &&  // trailing not yet set
+								(hit->fCoarseTime2LE!=0))    // leading IS set
+							{
+								mapped=hit;
+								break;
+							}
+						}
+					
+					if (!mapped) mapped=new ((*fArray)[fArray->GetEntriesFast()])
+						R3BPaddleTamexMappedData(d+1,    // 1..n   (plane)
+							channel);				     // 1..n   (bar)
+
+					if (t==0) // PM1
+					{
+						mapped->fCoarseTime1TE= data->TOFD_P[d].T[t].TCTv[j];  // coarse time leading edge
+						mapped->fFineTime1TE  = data->TOFD_P[d].T[t].TFTv[j];  // fine time leading edge
+					}
+					else      // PM2
+					{
+						mapped->fCoarseTime2TE= data->TOFD_P[d].T[t].TCTv[j];  // coarse time leading edge
+						mapped->fFineTime2TE  = data->TOFD_P[d].T[t].TFTv[j];  // fine time leading edge
+					}
+				}
+				
+				curChannelStart=nextChannelStart;
+			} // for trailing edges
+
+		} // for tubes
+
+
+#ifdef OLDTOFDREADER
+// Beginning of old stuff:
 
 	// HTT: edges book keeping.
 	int edges[MAX_TOFD_PLANES][6][2][2];
@@ -129,6 +277,7 @@ Bool_t R3BTofdReader::Read()
 				uint32_t channel=data->TOFD_P[d].T[t].TFLMI[i]; // or 1..65
 				if (channel!=data->TOFD_P[d].T[t].TFTMI[i])
 				{
+					// different channel number in leading and trailing 
 					//printf("Leading Ch %d Trailing Ch %d\n",channel,data->TOFD_P[d].T[t].TFTMI[i]);
 					return false;
 				}
@@ -136,6 +285,9 @@ Bool_t R3BTofdReader::Read()
 				uint32_t nextChannelStart=data->TOFD_P[d].T[t].TFLME[i];  // index in v for first item of next channel
 				if (nextChannelStart!=data->TOFD_P[d].T[t].TFTME[i])
 				{
+					// different number of (multi-)hits for leading and trailing
+					// in the current channel
+					
 					//printf("Different number of leading and trailing hits for P:%d B:%d S: %d\n\
 next Lead Ch %d next Trail Ch %d\n",d+1,channel,t+1,nextChannelStart,data->TOFD_P[d].T[t].TFTME[i]);
 					return false;
@@ -234,6 +386,7 @@ next Lead Ch %d next Trail Ch %d\n",d+1,channel,t+1,nextChannelStart,data->TOFD_
 	
 			}	
 */			
+#endif
     return kTRUE;
 }
 

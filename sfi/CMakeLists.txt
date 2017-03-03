@@ -20,7 +20,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/calData
 # ${R3BROOT_SOURCE_DIR}/r3bdata/dchData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
-${R3BROOT_SOURCE_DIR}/r3bdata/fi4Data
+${R3BROOT_SOURCE_DIR}/r3bdata/fibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData

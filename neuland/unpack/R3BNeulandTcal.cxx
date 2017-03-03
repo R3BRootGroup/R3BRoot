@@ -123,7 +123,6 @@ void R3BNeulandTcal::Exec(Option_t*)
     R3BPaddleTamexMappedData* hit;
     Int_t iPlane;
     Int_t iBar;
-    Int_t iSide;
     Int_t channel;
     Int_t tdc;
     R3BTCalModulePar* par;
@@ -139,24 +138,27 @@ void R3BNeulandTcal::Exec(Option_t*)
        }
        iPlane = hit->GetPlaneId();
        iBar = hit->GetBarId();
-       iSide = hit->GetSide();
        if (hit->Is17())
        {
            // 17-th channel
            continue;
        }
 
-       // Convert TDC to [ns]
-       if (! (par = fTcalPar->GetModuleParAt(iPlane, iBar, iSide)))
-       {
-           LOG(DEBUG) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide
-                      << FairLogger::endl;
-           continue;
-       }
+		for (Int_t iSide=0; iSide<2; iSide++)
+		{
+
+		// !!! There is the Edge missing GetModulePar( ... ) !!!
+		// Convert TDC to [ns]
+		if (! (par = fTcalPar->GetModuleParAt(iPlane, iBar, iSide)))
+		{
+			LOG(DEBUG) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide
+						<< FairLogger::endl;
+			continue;
+		}
        
 
-       tdc = hit->GetFineTimeLE();
-       timeLE = par->GetTimeVFTX(tdc);
+		tdc = hit->GetFineTime(iSide,0); // PM, edge
+		timeLE = par->GetTimeVFTX(tdc);
 
        if (! (par = fTcalPar->GetModuleParAt(iPlane, iBar, iSide + 2)))
        {
@@ -165,7 +167,7 @@ void R3BNeulandTcal::Exec(Option_t*)
            continue;
        }
       
-       tdc = hit->GetFineTimeTE();
+       tdc = hit->GetFineTime(iSide,1);
        timeTE = par->GetTimeVFTX(tdc);
        
 
@@ -182,13 +184,13 @@ void R3BNeulandTcal::Exec(Option_t*)
            continue;
        }
 
-       timeLE = fClockFreq-timeLE + hit->GetCoarseTimeLE() * fClockFreq;
-       timeTE = fClockFreq-timeTE + hit->GetCoarseTimeTE() * fClockFreq;
+       timeLE = fClockFreq-timeLE + hit->GetCoarseTime(iSide,0) * fClockFreq;
+       timeTE = fClockFreq-timeTE + hit->GetCoarseTime(iSide,1) * fClockFreq;
        
        
        new ((*fPmt)[fNPmt]) R3BNeulandPmt(iPlane, iBar, iSide, timeLE, timeTE-timeLE);
        fNPmt += 1;
-       
+		} // for Side
 
     }
 }

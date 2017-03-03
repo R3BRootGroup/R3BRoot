@@ -7,6 +7,7 @@
 #define MAX_TACQUILA_MODULE 20 // 0 .. 20
 #define TACQUILA_NUM_GEOM ((MAX_TACQUILA_SAM + 1) * (MAX_TACQUILA_GTB + 1) * (MAX_TACQUILA_MODULE + 1))
 
+#define CLOCK_TDC_MHZ 250
 #define TACQUILA_CLOCK_MHZ 40.002903
 #define VFTX_CLOCK_MHZ 200
 
@@ -17,7 +18,7 @@ class TH1F;
 
 /**
  * Class with implementation of TCAL time calibration.
- * Currently supported electronics: Tacquila and VFTX.
+ * Currently supported electronics: Clock TDC, Tacquila, and VFTX.
  * Clock frequency is set as a constant in MHz and the
  * clock cycle in ns is calculated from it.
  * Recommended value of minimum statistics per module is
@@ -36,7 +37,7 @@ class R3BTCalEngine : public TObject
      * @param nModules a number of detector modules.
      * @param minStats a minimum number of entries per module.
      */
-    R3BTCalEngine(R3BTCalPar* param, Int_t minStats = 10000);
+    R3BTCalEngine(R3BTCalPar *param, Int_t minStats = 10000);
 
     /**
      * Destructor.
@@ -51,6 +52,13 @@ class R3BTCalEngine : public TObject
      * @param tdc a raw TDC value.
      */
     void Fill(Int_t plane, Int_t paddle, Int_t side, Int_t tdc);
+
+    /**
+     * A method to calculate calibration parameters for clock TDC
+     * electronics. Parameters will be automatically stored.
+     * To be called from FinishTask() method of an analysis task.
+     */
+    void CalculateParamClockTDC();
 
     /**
      * A method to calculate calibration parameters for Tacquila

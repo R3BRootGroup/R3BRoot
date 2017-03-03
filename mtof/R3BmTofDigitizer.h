@@ -57,7 +57,9 @@ class R3BmTofDigitizer : public FairTask
   //- Control Hitograms
   
   TH1F * NtfXhis;
-  
+  TH1F * fMult;
+  TH1F * fEloss;
+
   Int_t eventNomTof;
   
   

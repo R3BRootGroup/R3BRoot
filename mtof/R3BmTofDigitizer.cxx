@@ -83,6 +83,14 @@ InitStatus R3BmTofDigitizer::Init() {
      NtfXhis->GetXaxis()->SetTitle("Position");
      NtfXhis->GetYaxis()->SetTitle("Counts");
 
+     fMult = new TH1F("fMult","fMult",50,0.,50.);
+     fMult->GetXaxis()->SetTitle("Multiplicity");
+     fMult->GetYaxis()->SetTitle("Counts");
+
+     fEloss = new TH1F("fEloss","fEloss",5000,0.,500.);
+     fEloss->GetXaxis()->SetTitle("Energy loss in MeV");
+     fEloss->GetYaxis()->SetTitle("Counts");
+
   return kSUCCESS;
 
 }
@@ -107,6 +115,7 @@ void R3BmTofDigitizer::Exec(Option_t* opt) {
   Double_t ntfpz;
   Double_t ntfe;
 
+  Int_t multi;
 
 //******************** NTF ********************//
   ntmul=0;
@@ -118,6 +127,7 @@ void R3BmTofDigitizer::Exec(Option_t* opt) {
   ntfpz=0;
   ntfe=0;
   
+  multi=0;
    for (Int_t l=0;l<nentriesmTof;l++){
 //   cout<<"entries-mTof "<<l<<endl;
     
@@ -154,7 +164,9 @@ void R3BmTofDigitizer::Exec(Option_t* opt) {
      Double_t PZ = ((PZ_in + PZ_out)/2);
 
      
-    
+     fEloss->Fill(TOFeloss);
+     if(TOFeloss>4.) multi++;
+     
     // offset - position of detector x: -154.815998; z: +761.75516
     // angle = -16.7 degrees
     // cos(angle) = 0.957822495
@@ -188,6 +200,8 @@ void R3BmTofDigitizer::Exec(Option_t* opt) {
      }
      
    }
+   if (multi>0) fMult->Fill(multi);
+   if(eventNomTof<100) cout << "Event " << eventNomTof << " Mult "<< multi << endl;
 
 AddHit(ntmul,ntfx,ntfy,ntft,ntfpath,ntfpx,ntfpy,ntfpz,ntfe);
 
@@ -209,6 +223,8 @@ void R3BmTofDigitizer::Finish()
 // Write control histograms
 
    NtfXhis->Write();
+   fEloss->Write();
+   fMult->Write();
 
 }
 

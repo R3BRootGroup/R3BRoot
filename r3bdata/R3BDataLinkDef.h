@@ -80,8 +80,13 @@
 #pragma link C++ class R3BStrawtubesMappedData+;
 #pragma link C++ class R3BStrawtubesCalData+;
 #pragma link C++ class R3BStrawtubesHitData+;
-#pragma link C++ class R3BFi4MappedItem+;
-#pragma link C++ class R3BFi4CalItem+;
-#pragma link C++ class R3BFi4HitItem+;
+#pragma link C++ class R3BPtofHit+;
+#pragma link C++ class R3BBunchedFiberCalData+;
+#pragma link C++ class R3BBunchedFiberHitData+;
+#pragma link C++ class R3BBunchedFiberMappedData+;
 #pragma link C++ class R3BFi4Point+;
+#pragma link C++ class R3BFi4HitItem+;
+#pragma link C++ class R3BFibMappedData+;
+#pragma link C++ class R3BFibCalData+;
+
 #endif

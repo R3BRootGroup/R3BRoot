@@ -22,18 +22,34 @@ class R3BPaddleCalData : public TObject
     //inline const UChar_t&  GetDetector()  const { return fDetector; }
     UInt_t GetPlane() const {return fPlane;}
     UInt_t GetBar() const {return fBar;}
+    
+    // tube: 0,1 edge: 0,1 time: in ns
+    void SetTime(int tube, int edge,Double_t t)
+    {
+		if (tube==0) 
+		{
+			if (edge==0) fTime1L_ns=t;
+			else      	 fTime1T_ns=t;
+		}
+		else
+		{
+			if (edge==0) fTime2L_ns=t;
+			else      	 fTime2T_ns=t;
+		}
+	}
 
   private:
     UInt_t fPlane;
     UInt_t fBar;
 
   public:
-    Double_t fTime1L_ns; // both PMs of a paddle
-    Double_t fTime1T_ns; // both PMs of a paddle
-    Double_t fTime2L_ns;
-    Double_t fTime2T_ns;
+	// ToDo: Would it be better to have arrays here?
+	Double_t fTime1L_ns; // both PMs of a paddle
+	Double_t fTime1T_ns; // both PMs of a paddle
+	Double_t fTime2L_ns;
+	Double_t fTime2T_ns;
 
-    ClassDef(R3BPaddleCalData, 2)
+	ClassDef(R3BPaddleCalData, 2)
 };
 
 #endif

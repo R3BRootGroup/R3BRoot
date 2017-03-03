@@ -53,17 +53,95 @@ void R3BTCalEngine::Fill(Int_t plane, Int_t paddle, Int_t side, Int_t tdc)
     {
         LOG(ERROR) << "R3BTCalEngine::Fill : index out of max range " << plane << " / " << paddle << " / " << side
                    << FairLogger::endl;
+        LOG(ERROR) << "R3BTCalEngine::Fill : ranges: " << N_PLANE_MAX << " / " << N_PADDLE_MAX  << " / " << N_SIDE_MAX
+                   << FairLogger::endl;
         return;
     }
     if (NULL == fhData[plane - 1][paddle - 1][side - 1])
     {
         char strName[255];
         sprintf(strName, "%s_tcaldata_%d_%d_%d", fCal_Par->GetName(), plane, paddle, side);
-        fhData[plane - 1][paddle - 1][side - 1] = new TH1F(strName, "", 4096, 0.5, 4096.5);
+        fhData[plane - 1][paddle - 1][side - 1] = new TH1F(strName, "", 4097, -0.5, 4096.5);
         sprintf(strName, "%s_time_%d_%d_%d", fCal_Par->GetName(), plane, paddle, side);
-        fhTime[plane - 1][paddle - 1][side - 1] = new TH1F(strName, "", 4096, 0.5, 4096.5);
+        fhTime[plane - 1][paddle - 1][side - 1] = new TH1F(strName, "", 4097, -0.5, 4096.5);
     }
     fhData[plane - 1][paddle - 1][side - 1]->Fill(tdc);
+}
+
+void R3BTCalEngine::CalculateParamClockTDC()
+{
+    fClockFreq = 1. / CLOCK_TDC_MHZ * 1000.;
+
+    for (Int_t i = 0; i < N_PLANE_MAX; i++)
+    {
+        for (Int_t j = 0; j < N_PADDLE_MAX; j++)
+        {
+            for (Int_t k = 0; k < N_SIDE_MAX; k++)
+            {
+                if (NULL == fhData[i][j][k])
+                {
+                    continue;
+                }
+                if (fhData[i][j][k]->GetEntries() < fMinStats)
+                {
+                    continue;
+                }
+
+                // Define range of channels
+                Int_t ic, iMin, iMax;
+                FindRange(fhData[i][j][k], ic, iMin, iMax);
+                if (iMin < 0 || iMax > 4097)
+                {
+                    return;
+                }
+                LOG(INFO) << "R3BTCalEngine::CalculateParamClockTDC() : Range of channels: " << iMin << " - " << iMax
+                          << FairLogger::endl;
+
+                Double_t total = fhData[i][j][k]->Integral(iMin, iMax);
+                for (Int_t ii = iMin; ii <= iMax; ii++)
+                {
+                    fhTime[i][j][k]->SetBinContent(ii, fhData[i][j][k]->Integral(iMin, ii) / total * fClockFreq);
+                }
+
+                Int_t nparam = 0;
+
+                R3BTCalModulePar* pTCal = NULL;
+                pTCal = new R3BTCalModulePar();
+                pTCal->SetPlane(i+1);
+                pTCal->SetPaddle(j+1);
+                pTCal->SetSide(k+1);
+
+                for (Int_t ibin = iMin; ibin <= iMax; ibin++)
+                {
+                    Double_t time = fhData[i][j][k]->Integral(iMin, ibin) / total;
+                    if (time > 1.)
+                    {
+                        FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Integration error.");
+                    }
+                    time *= fClockFreq;
+
+                    pTCal->SetBinLowAt(ibin, nparam);
+                    pTCal->SetOffsetAt(time, nparam);
+                    pTCal->IncrementNofChannels();
+                    nparam += 1;
+                }
+
+                fCal_Par->AddModulePar(pTCal);
+
+                LOG(INFO) << "R3BTCalEngine::CalculateParamClockTDC() : Number of parameters: " << nparam
+                          << FairLogger::endl;
+
+                fhData[i][j][k]->Write();
+                fhTime[i][j][k]->Write();
+
+                LOG(INFO) << "R3BTCalEngine::CalculateParamClockTDC() : Module: " << (i+1) << " / " << (j+1) << " / " << (k+1) << " is calibrated."
+                          << FairLogger::endl
+                          << FairLogger::endl;
+            }
+        }
+    }
+
+    fCal_Par->setChanged();
 }
 
 void R3BTCalEngine::CalculateParamTacquila()
@@ -88,7 +166,7 @@ void R3BTCalEngine::CalculateParamTacquila()
                 // Define range of channels
                 Int_t ic, iMin, iMax;
                 FindRange(fhData[i][j][k], ic, iMin, iMax);
-                if (iMin < 0 || iMax > 4095)
+                if (iMin < 0 || iMax > 4097)
                 {
                     return;
                 }
@@ -230,7 +308,7 @@ void R3BTCalEngine::CalculateParamVFTX()
                 // Define range of channels
                 Int_t ic, iMin, iMax;
                 FindRange(fhData[i][j][k], ic, iMin, iMax);
-                if (iMin < 0 || iMax > 4095)
+                if (iMin < 0 || iMax > 4097)
                 {
                     return;
                 }
@@ -289,7 +367,7 @@ void R3BTCalEngine::FindRange(TH1F* h1, Int_t& ic, Int_t& iMin, Int_t& iMax)
     Double_t mean = h1->GetMean();
     ic = (Int_t)(mean + 0.5);
 
-    for (Int_t i = 1; i <= 4096; i++)
+    for (Int_t i = 1; i <= 4097; i++)
     {
         if (h1->GetBinContent(i) > 0)
         {
@@ -298,11 +376,11 @@ void R3BTCalEngine::FindRange(TH1F* h1, Int_t& ic, Int_t& iMin, Int_t& iMax)
         }
     }
 
-    for (Int_t i = 4096; i >= 1; i--)
+    for (Int_t i = 4097; i >= 1; i--)
     {
         if (h1->GetBinContent(i) > 0)
         {
-            iMax = i + 1;
+            iMax = i;
             break;
         }
     }

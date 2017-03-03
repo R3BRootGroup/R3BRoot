@@ -16,6 +16,7 @@
 class TClonesArray;
 
 /**
+ * TODO: This explanation is humbug.
  * An analysis task to apply TCAL calibration for NeuLAND.
  * This class reads NeuLAND mapped items with TDC values and
  * produces time items with time in [ns]. It requires TCAL

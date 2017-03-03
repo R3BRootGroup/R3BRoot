@@ -23,7 +23,8 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
-${R3BROOT_SOURCE_DIR}/r3bdata/trackerData  )
+${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
+${R3BROOT_SOURCE_DIR}/r3bdata/ptofData  )
 
 include_directories( ${INCLUDE_DIRECTORIES})
 include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
@@ -52,6 +53,12 @@ R3BTofdCal2HitPar.cxx
 R3BTofdCal2Hit.cxx
 R3BTofdHitModulePar.cxx
 R3BTofdHitPar.cxx
+R3BPtofMapped2CalPar.cxx
+R3BPtofMapped2Cal.cxx
+calibration/R3BPtofCal2HitPar.cxx
+calibration/R3BPtofCal2Hit.cxx
+calibration/R3BPtofHitPar.cxx
+calibration/R3BPtofParFact.cxx
 )
 
 # fill list of header files from list of source files

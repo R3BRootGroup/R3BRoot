@@ -48,7 +48,10 @@ void R3BTCalContFact::setAllContainers()
     addContainer("LosTCalPar", "LOS TCAL Calibration Parameters");
     addContainer("TofdTCalPar", "TOFD TCAL Calibration Parameters");
     addContainer("StrawtubesTCalPar", "Strawtubes TCAL Calibration Parameters");
-    addContainer("PtofTCalPar", "PROF TCAL Calibration Parameters");
+    addContainer("Fi1TCalPar", "FI1 TCAL Calibration Parameters");
+    addContainer("Fi5TCalPar", "FI5 TCAL Calibration Parameters");
+    addContainer("Fi6TCalPar", "FI6 TCAL Calibration Parameters");
+    addContainer("PtofTCalPar", "PTOF TCAL Calibration Parameters");
 }
 
 FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
@@ -66,6 +69,9 @@ FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
     containerNames.push_back("LosTCalPar");
     containerNames.push_back("TofdTCalPar");
     containerNames.push_back("StrawtubesTCalPar");
+    containerNames.push_back("Fi1TCalPar");
+    containerNames.push_back("Fi5TCalPar");
+    containerNames.push_back("Fi6TCalPar");
     containerNames.push_back("PtofTCalPar");
 
     bool found = false;
