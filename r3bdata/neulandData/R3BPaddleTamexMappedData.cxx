@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------
-// -----              R3BPaddleTamexMappedData               -----
-// -----             Created 27-01-2015 by M.Heil             -----
+// -----              R3BPaddleTamexMappedData                -----
+// -----             Created August 2nd 2016 by R.Plag        -----
 // ----------------------------------------------------------------
 
 #include "R3BPaddleTamexMappedData.h"
@@ -8,34 +8,33 @@
 R3BPaddleTamexMappedData::R3BPaddleTamexMappedData()
     : fPlane(0)
     , fBar(0)
-    , fSide(0)
-    , fCoarseTimeLE(0)
-    , fFineTimeLE(0)
-    , fCoarseTimeTE(0)
-    , fFineTimeTE(0)
-    , fIs17(kFALSE)
+    , fCoarseTime1LE(0)
+    , fFineTime1LE(0)
+    , fCoarseTime1TE(0)
+    , fFineTime1TE(0)
+    , fCoarseTime2LE(0)
+    , fFineTime2LE(0)
+    , fCoarseTime2TE(0)
+    , fFineTime2TE(0)
 {
 }
 
 R3BPaddleTamexMappedData::R3BPaddleTamexMappedData(Int_t planeId,
-                              Int_t barId,
-                              Int_t side,
-                              Int_t coarseTimeLE,
-                              Int_t fineTimeLE,
-                              Int_t coarseTimeTE,
-                              Int_t fineTimeTE,
-                              Bool_t is17)
+                              Int_t barId)
     : fPlane(planeId)
     , fBar(barId)
-    , fSide(side)
-    , fCoarseTimeLE(coarseTimeLE)
-    , fFineTimeLE(fineTimeLE)
-    , fCoarseTimeTE(coarseTimeTE)
-    , fFineTimeTE(fineTimeTE)    
-    , fIs17(is17)
+    , fCoarseTime1LE(0)
+    , fFineTime1LE(0)
+    , fCoarseTime1TE(0)
+    , fFineTime1TE(0)
+    , fCoarseTime2LE(0)
+    , fFineTime2LE(0)
+    , fCoarseTime2TE(0)
+    , fFineTime2TE(0)
 {
 }
 
+/*
 R3BPaddleTamexMappedData::R3BPaddleTamexMappedData(const R3BPaddleTamexMappedData& right)
     : fPlane(right.fPlane)
     , fBar(right.fBar)
@@ -47,5 +46,5 @@ R3BPaddleTamexMappedData::R3BPaddleTamexMappedData(const R3BPaddleTamexMappedDat
     , fIs17(right.fIs17)
 {
 }
-
+*/
 ClassImp(R3BPaddleTamexMappedData)

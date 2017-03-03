@@ -1,7 +1,8 @@
 // ----------------------------------------------------------------
-// -----              R3BPaddleTamexMappedData               -----
-// -----             Created 27-01-2015 by M.Heil             -----
+// -----              R3BPaddleTamexMappedData                -----
+// -----             Created August 2nd 2016 by R.Plag        -----
 // ----------------------------------------------------------------
+
 
 #ifndef R3BPADDLETAMEXMAPPEDITEM_H
 #define R3BPADDLETAMEXMAPPEDITEM_H
@@ -17,14 +18,8 @@ class R3BPaddleTamexMappedData : public TObject
     /** Standard Constructor
      **/
     R3BPaddleTamexMappedData( Int_t planeId,
-                              Int_t barId,
-                              Int_t side,
-                              Int_t coarseTimeLE,
-                              Int_t fineTimeLE,
-                              Int_t coarseTimeTE,
-                              Int_t fineTimeTE,
-                              Bool_t is17);
-    R3BPaddleTamexMappedData(const R3BPaddleTamexMappedData&);
+                              Int_t barId);
+    //R3BPaddleTamexMappedData(const R3BPaddleTamexMappedData&);
    
     // Destructor
     virtual ~R3BPaddleTamexMappedData()
@@ -40,52 +35,80 @@ class R3BPaddleTamexMappedData : public TObject
     {
         return fBar;
     }
-    inline const Int_t& GetSide() const
+    
+    
+    inline const Int_t& GetCoarseTime1LE() const
     {
-        return fSide;
+        return fCoarseTime1LE;
     }
-    inline const Int_t& GetCoarseTimeLE() const
+    inline const Int_t& GetFineTime1LE() const
     {
-        return fCoarseTimeLE;
+        return fFineTime1LE;
     }
-    inline const Int_t& GetFineTimeLE() const
+    inline const Int_t& GetCoarseTime1TE() const
     {
-        return fFineTimeLE;
-    }
-    inline const Int_t& GetCoarseTimeTE() const
-    {
-        return fCoarseTimeTE;
+        return fCoarseTime1TE;
     }   
-    inline const Int_t& GetFineTimeTE() const
+    inline const Int_t& GetFineTime1TE() const
     {
-        return fFineTimeTE;
+        return fFineTime1TE;
     }
 
-	// e = edge: 0=leading 1=trailing
-    inline const Int_t& GetCoarseTime(int e) const
+
+    inline const Int_t& GetCoarseTime2LE() const
     {
-        return e ? fCoarseTimeTE : fCoarseTimeLE;
+        return fCoarseTime2LE;
     }
-    inline const Int_t& GetFineTime(int e) const
+    inline const Int_t& GetFineTime2LE() const
     {
-        return e ? fFineTimeTE : fFineTimeLE;
+        return fFineTime2LE;
+    }
+    inline const Int_t& GetCoarseTime2TE() const
+    {
+        return fCoarseTime2TE;
+    }   
+    inline const Int_t& GetFineTime2TE() const
+    {
+        return fFineTime2TE;
     }
 
-    inline const Bool_t& Is17() const
+
+
+
+	// t=0,1 e=0,1
+    inline const Int_t& GetFineTime(int t,int e) const
     {
-        return fIs17;
+        return t ? (e ? fFineTime2TE : fFineTime2LE) : (e ? fFineTime1TE : fFineTime1LE);
     }
+    
+    inline const Int_t& GetCoarseTime(int t,int e) const
+    {
+        return t ? (e ? fCoarseTime2TE : fCoarseTime2LE) : (e ? fCoarseTime1TE : fCoarseTime1LE);
+    }
+
+
+	// To be compatible with Tacquila data:
+	inline Bool_t Is17() const
+	{
+		return false;
+	}
 
   protected:
     Int_t fPlane; //... number of plane 1..n
     Int_t fBar;   //... number of bar   1..n
-    Int_t fSide;    //... PMT             1 or 2
-    Int_t fCoarseTimeLE;  //... coarse time of leading edge
-    Int_t fFineTimeLE;  //... fine time of leading edge
-    Int_t fCoarseTimeTE;  //... coarse time of trailing edge
-    Int_t fFineTimeTE;  //... fine time of trailing edge    
     
-    Bool_t fIs17; //... true if CH 17
+  public:  
+	// PM1:
+    Int_t fCoarseTime1LE;  //... coarse time of leading edge
+    Int_t fFineTime1LE;    //... fine time of leading edge
+    Int_t fCoarseTime1TE;  //... coarse time of trailing edge
+    Int_t fFineTime1TE;    //... fine time of trailing edge    
+	// PM2:
+    Int_t fCoarseTime2LE;  //... coarse time of leading edge
+    Int_t fFineTime2LE;    //... fine time of leading edge
+    Int_t fCoarseTime2TE;  //... coarse time of trailing edge
+    Int_t fFineTime2TE;    //... fine time of trailing edge    
+    
 
   public:
     ClassDef(R3BPaddleTamexMappedData, 1)
