@@ -111,7 +111,6 @@ void R3BNeulandTcalFill::Exec(Option_t*)
     R3BPaddleTamexMappedData* hit;
     Int_t iPlane;
     Int_t iBar;
-    Int_t iSide;
     
 
     // Loop over mapped hits
@@ -145,15 +144,19 @@ void R3BNeulandTcalFill::Exec(Option_t*)
 //        else
 //        {
             // PMT signal
-            iSide = hit->GetSide();
+            //iSide = hit->GetSide();
         
 //            LOG(INFO) << "Plane: " << iPlane << " Bar: " << iBar << " Side: " << iSide << " Cal channel: " << channel << "   "  << FairLogger::endl;
              
 //        }
 
         // Fill TAC histogram
-        fEngine->Fill(iPlane, iBar, iSide, hit->GetFineTimeLE());
-        fEngine->Fill(iPlane, iBar, iSide + 2, hit->GetFineTimeTE());
+        fEngine->Fill(iPlane, iBar, 0, hit->GetFineTime1LE());
+        fEngine->Fill(iPlane, iBar, 0 + 2, hit->GetFineTime1TE());
+
+        fEngine->Fill(iPlane, iBar, 1, hit->GetFineTime2LE());
+        fEngine->Fill(iPlane, iBar, 1 + 2, hit->GetFineTime2TE());
+
     }
 
     // Increment events
