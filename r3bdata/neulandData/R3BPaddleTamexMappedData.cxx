@@ -19,8 +19,7 @@ R3BPaddleTamexMappedData::R3BPaddleTamexMappedData()
 {
 }
 
-R3BPaddleTamexMappedData::R3BPaddleTamexMappedData(Int_t planeId,
-                              Int_t barId)
+R3BPaddleTamexMappedData::R3BPaddleTamexMappedData(Int_t planeId, Int_t barId)
     : fPlane(planeId)
     , fBar(barId)
     , fCoarseTime1LE(0)
@@ -34,17 +33,4 @@ R3BPaddleTamexMappedData::R3BPaddleTamexMappedData(Int_t planeId,
 {
 }
 
-/*
-R3BPaddleTamexMappedData::R3BPaddleTamexMappedData(const R3BPaddleTamexMappedData& right)
-    : fPlane(right.fPlane)
-    , fBar(right.fBar)
-    , fSide(right.fSide)
-    , fCoarseTimeLE(right.fCoarseTimeLE)
-    , fFineTimeLE(right.fFineTimeLE)
-    , fCoarseTimeTE(right.fCoarseTimeTE)
-    , fFineTimeTE(right.fFineTimeTE)        
-    , fIs17(right.fIs17)
-{
-}
-*/
 ClassImp(R3BPaddleTamexMappedData)
