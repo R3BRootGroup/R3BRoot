@@ -42,6 +42,7 @@ R3BPspxReader.cxx
 R3BLosReader.cxx
 R3BTofdReader.cxx
 R3BCalifaFebexReader.cxx
+#R3BPtofReader.cxx
 R3BNeulandTamexReader.cxx
 R3BNeulandTacquilaReader.cxx
 R3BStrawtubesReader.cxx
@@ -53,6 +54,7 @@ ext_h101_whiterabbit.h
 ext_h101_raw_nnp.h
 ext_h101_los.h
 ext_h101_tofd.h
+#ext_h101_ptof.h
 ext_h101_psp.h
 #ext_h101_fi4.h
 ext_h101_raw_califa_febex.h
