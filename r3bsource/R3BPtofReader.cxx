@@ -15,10 +15,11 @@ extern "C" {
 
 R3BPtofReader::R3BPtofReader(EXT_STR_h101_PTOF* data, UInt_t offset)
 	: R3BReader("R3BPtofReader")
-	  /* TODO: Initialise data members */
+	, fData(data)
+	, fOffset(offset)
+	, fLogger(FairLogger::GetLogger())
+	, fArray(new TClonesArray("R3BPaddleTamexMappedData"))
 {
-	(void)data;
-	(void)offset;
 }
 
 R3BPtofReader::~R3BPtofReader()
@@ -26,145 +27,238 @@ R3BPtofReader::~R3BPtofReader()
 
 Bool_t R3BPtofReader::Init(ext_data_struct_info *a_struct_info)
 {
-	/*
-	 * TODO:
-	 * - Add detector specific data items to the ext_data_struct_info
-	 *   Use the macro supplied in the ext_h101_ptof.h file.
-	 *   Take care to make use of fOffset.
-	 *
-	 * - Check the 'ok' variable for any errors and report errors
-	 *   using perror() and fLogger->Error().
-	 *   Returning kFALSE from this Init() function indicates an error.
-	 *
-	 * - Register the output array in the tree
-	 *   Use the Register() method of FairRootManager
-	 *   Chose an appropriate name for the output branch
-	 *
-	 * - Initially clear the fData structure by setting all
-	 *   'number of hits' values to 0.
-	 *
-	 * - Return with the appropriate value for success!
-	 */
-	(void)a_struct_info;
-	return kFALSE;
+	int ok;
+
+	EXT_STR_h101_PTOF_ITEMS_INFO(ok, *a_struct_info, fOffset,
+	    EXT_STR_h101_PTOF, 0);
+
+	if (!ok) {
+		perror("ext_data_struct_info_item");
+		fLogger->Error(MESSAGE_ORIGIN,
+		    "Failed to setup structure information.");
+		return kFALSE;
+	}
+
+	// Register output array in tree
+	FairRootManager::Instance()->Register("PtofMapped", "Land", fArray,
+	    kTRUE);
+
+
+	// initial clear (set number of hits to 0)
+	EXT_STR_h101_PTOF_onion* data = (EXT_STR_h101_PTOF_onion*)fData;
+	for (int d = 0; d < MAX_PTOF_PLANES; d++) {
+		for (int t = 0; t < N_TUBES_PER_PADDLE; t++) {
+			data->PTOF_P[d].T[t].TFLM = 0;
+			data->PTOF_P[d].T[t].TFTM = 0;
+		}
+	}
+
+	return kTRUE;
 }
 
 Bool_t R3BPtofReader::ReadLeadingEdges(EXT_STR_h101_PTOF_onion *data,
     int d, int t)
 {
-	/* TODO:
-	 * - Get the number of channels in this plane & tube
-	 * - Loop over all channels with multi-hits
-	 *   - Find out the bar index in this channel
-	 *   - Find out where the current channel ends
-	 *   - Loop over all hits in this channel
-	 *     - Call ReadLeadingEdgeChannel(...)
-	 * - Return success
-	 *
-	 * - Note:
-	 *     Number of hits: <name>M
-	 *     Array with channel indices: <name>MI
-	 *     Array with next channel start indices: <name>ME
-	 */
-	(void)data;
-	(void)d;
-	(void)t;
-	return kFALSE;
+	// # of channels with data. not necessarly number
+	// of hits! (b/c multi hit)
+	uint32_t numChannels = data->PTOF_P[d].T[t].TFLM;
+
+	// loop over channels
+	// index in v for first item of current channel
+	uint32_t curChannelStart = 0;
+	for (int i = 0; i < numChannels; i++)
+	{
+		// bar number 1..65
+		uint32_t bar;
+		// index in v for first item of next channel
+		uint32_t nextChannelStart;
+
+		bar = data->PTOF_P[d].T[t].TFLMI[i];
+		nextChannelStart = data->PTOF_P[d].T[t].TFLME[i];
+
+		for (int j = curChannelStart; j < nextChannelStart; j++)
+		{
+			ReadLeadingEdgeChannel(data, d, t, bar, j);
+		}
+
+		curChannelStart = nextChannelStart;
+	}
+	return kTRUE;
 }
 
 Bool_t R3BPtofReader::ReadTrailingEdges(EXT_STR_h101_PTOF_onion *data,
     int d, int t)
 {
-	/*
-	 * TODO:
-	 * - Do something similar to what is done in ReadLeadingEdges.
-	 *   Just for the trailing edges.
-	 */
-	(void)data;
-	(void)d;
-	(void)t;
-	return kFALSE;
+	// # of channels with data. not necessarly number
+	// of hits! (b/c multi hit)
+	uint32_t numChannels = data->PTOF_P[d].T[t].TFTM;
+
+	// loop over channels
+	// index in v for first item of current channel
+	uint32_t curChannelStart = 0;
+	for (int i = 0; i < numChannels; i++)
+	{
+		// or 1..65
+		uint32_t bar;
+		// index in v for first item of next channel
+		uint32_t nextChannelStart;
+		nextChannelStart = data->PTOF_P[d].T[t].TFTME[i];
+		bar = data->PTOF_P[d].T[t].TFTMI[i];
+
+		for (int j = curChannelStart; j < nextChannelStart; j++)
+		{
+			ReadTrailingEdgeChannel(data, d, t, bar, j);
+		}
+
+		curChannelStart=nextChannelStart;
+	}
+	return kTRUE;
 }
 
 #define MAX_TIME_DIFF_PADDLE_PMT 20 /* 20 * 5 ns = 100 ns */
 Bool_t R3BPtofReader::ReadLeadingEdgeChannel(EXT_STR_h101_PTOF_onion *data,
     int d, int t, uint32_t bar, int ch)
 {
-	/*
-	 * TODO:
-	 *
-	 * - Fill the leading edge times into the output array for either
-	 *   PM1 or PM2, but note the following:
-	 *
-	 * - If we have a hit in PM2, try to find a corresponding item in the
-	 *   already stored output array that contains a hit in PM1, under
-	 *   the condition that it has a leading time within a 100 ns window
-	 *   from this hit and not yet any leading edge time in PM2.
-	 *
-	 * - Note: Coarse time of this hit:
-	 *             <name>TCLv[ch]
-	 *         Coarse time of leading time hit in output array:
-	 *             hit->fCoarseTime2LE
-	 *         Use MAX_TIME_DIFF_PADDLE_PMT for the comparison
-	 *
-	 * - If no such hit is found, or if we have a hit in PM1, make a new
-	 *   item in the output array using placement new, i.e.
-	 *     new_hit = new ((*fArray)[index])R3BPaddleTamexMappedData(x,y);
-	 *
-	 * - In any case, fill the appropriate members of the (new) item with
-	 *   the times from the ucesb structure:
-	 *     - coarse time is <name>TCLv[ch]
-	 *     - fine time is   <name>TFLv[ch]
-	 *
-	 * - return success!
-	 */
+	R3BPaddleTamexMappedData* mapped = NULL;
 
-	return kFALSE;
+	/*
+	 * see if we can find a mappedData with
+	 * matching PM1 leading coarse time
+	 */
+	if (t == 1)
+	{
+		int n = fArray->GetEntriesFast();
+		int coarse = data->PTOF_P[d].T[t].TCLv[ch];
+
+		for (int k = 0; k < n; k++)
+		{
+			R3BPaddleTamexMappedData* hit =
+			    (R3BPaddleTamexMappedData*)fArray->At(k);
+
+			/*
+			 * if leading time1 within 100ns window
+			 * and time2 not yet set
+			 */
+			if ((hit->fCoarseTime2LE == 0)
+			    && (abs(hit->fCoarseTime1LE - coarse)
+				    <= MAX_TIME_DIFF_PADDLE_PMT))
+			{
+				mapped = hit;
+				break;
+			}
+		}
+	}
+
+	/*
+	 * Add a new hit to the array, if t == 0 or
+	 * No corresponding hit in PM1 found
+	 */
+	if (!mapped) mapped = new ((*fArray)[fArray->GetEntriesFast()])
+		R3BPaddleTamexMappedData(d + 1, bar); // plane, bar
+
+	/* Fill leading edge time members */
+	if (t == 0)
+	{
+		// PM1
+		mapped->fCoarseTime1LE = data->PTOF_P[d].T[t].TCLv[ch];
+		mapped->fFineTime1LE   = data->PTOF_P[d].T[t].TFLv[ch];
+	} else {
+		// PM2
+		mapped->fCoarseTime2LE = data->PTOF_P[d].T[t].TCLv[ch];
+		mapped->fFineTime2LE   = data->PTOF_P[d].T[t].TFLv[ch];
+	}
+	return kTRUE;
 }
 
 #define MAX_TIME_OVER_THRESHOLD 1000 /* 1000 * 5 ns = 5 us */
 Bool_t R3BPtofReader::ReadTrailingEdgeChannel(EXT_STR_h101_PTOF_onion *data,
     int d, int t, uint32_t bar, int ch)
 {
-	/*
-	 * TODO:
-	 * - Fill the trailing edge times into the output data array
-	 *
-	 * - First try to find a matching item in the output array, which
-	 *   has a leading edge time, and no trailing edge time set.
-	 *   Then test, if the leading edge is at most 5 us away from the
-	 *   current trailing time (too large time-over-threshold makes no
-	 *   sense).
-	 *   Note, that you have to make the test once for PM1 and once for
-	 *   PM2.
-	 *   The current coarse trailing time is in <name>TCTv[ch].
-	 *
-	 * - If no match is found, make a new item using placement new.
-	 *
-	 * - Then fill in the trailing edge time into the appropriate
-	 *   data members of the data item.
-	 *
-	 * - return success!
-	 */
-	return kFALSE;
+	R3BPaddleTamexMappedData* mapped = NULL;
+
+	// see if we can find a mappedData with matching PM1 data
+	int n = fArray->GetEntriesFast();
+	int coarse = data->PTOF_P[d].T[t].TCTv[ch];
+	// matching a trailing time is only useful if the corresponding
+	// leading time is present. Meaning: no need to check trailing1
+	// to leading2 and vice-versa. This reduces the combinations we have to 
+	// check to:
+	// match trailing2 to leading2
+	// match trailing1 to leading1
+
+	// do the if outside to most inner loop for performance reasons
+	if (t == 0) {
+		// PM1
+		for (int k = 0; k < n; k++)
+		{
+			R3BPaddleTamexMappedData* hit =
+			    (R3BPaddleTamexMappedData*)fArray->At(k);
+			int tot = coarse - hit->fCoarseTime1LE;
+			if ((tot <= MAX_TIME_OVER_THRESHOLD) && (tot >= 0)
+			    && (hit->fCoarseTime1TE == 0) /* no trailing */
+			    && (hit->fCoarseTime1LE != 0)) /* has leading */
+			{
+				mapped = hit;
+				break;
+			}
+		}
+	} else {
+		// PM2
+		for (int k = 0; k < n; k++)
+		{
+			R3BPaddleTamexMappedData* hit =
+			    (R3BPaddleTamexMappedData*)fArray->At(k);
+			int tot = coarse - hit->fCoarseTime2LE;
+			if ((tot <= MAX_TIME_OVER_THRESHOLD) && (tot >= 0)
+			    && (hit->fCoarseTime2TE == 0) /* no trailing */
+			    && (hit->fCoarseTime2LE != 0)) /* has leading */
+			{
+				mapped = hit;
+				break;
+			}
+		}
+	}
+
+	if (!mapped) mapped = new ((*fArray)[fArray->GetEntriesFast()])
+		R3BPaddleTamexMappedData(d + 1, bar); // plane, bar
+
+	if (t == 0)
+	{
+		// PM1
+		// coarse time leading edge
+		mapped->fCoarseTime1TE= data->PTOF_P[d].T[t].TCTv[ch];
+		// fine time leading edge
+		mapped->fFineTime1TE  = data->PTOF_P[d].T[t].TFTv[ch];
+	} else {
+		// PM2
+		// coarse time leading edge
+		mapped->fCoarseTime2TE= data->PTOF_P[d].T[t].TCTv[ch];
+		// fine time leading edge
+		mapped->fFineTime2TE  = data->PTOF_P[d].T[t].TFTv[ch];
+	}
+	return kTRUE;
 }
 
 Bool_t R3BPtofReader::Read()
 {
-	/* TODO:
-	 * - Convert fData to type EXT_STR_h101_PTOF_onion *.
-	 *   This makes it easier to access all the members.
-	 * - Loop over all planes and tubes and call the functions
-	 *     - ReadLeadingEdges()
-	 *     - ReadTrailingEdges()
-	 * - Return success!
-	 */
-	return kFALSE;
+	// Convert plain raw data to multi-dimensional array
+	EXT_STR_h101_PTOF_onion* data = (EXT_STR_h101_PTOF_onion*)fData;
+
+
+	for (int d = 0; d < MAX_PTOF_PLANES; d++)
+	{
+		for (int t = 0; t < N_TUBES_PER_PADDLE; t++)
+		{
+			ReadLeadingEdges(data, d, t);
+			ReadTrailingEdges(data, d, t);
+		}
+	}
 }
 
 void R3BPtofReader::Reset()
 {
-	// TODO: Reset the output array
+	// Reset the output array
+	fArray->Clear();
 }
 
 ClassImp(R3BPtofReader)
