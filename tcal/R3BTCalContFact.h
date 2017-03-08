@@ -40,6 +40,10 @@ class R3BTCalContFact : public FairContFact
 
   private:
     /**
+     * Method to add a standard container
+     */
+    void addContainer(TString, TString);
+    /**
      * Method to specify a list of parameter containers managed by this factory.
      * Support for additional detrectors has to be implemented in this function.
      */
