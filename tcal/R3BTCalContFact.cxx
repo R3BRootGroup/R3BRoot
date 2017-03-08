@@ -33,26 +33,23 @@ R3BTCalContFact::R3BTCalContFact()
     FairRuntimeDb::instance()->addContFactory(this);
 }
 
+void R3BTCalContFact::addContainer(TString name, TString description)
+{
+	auto container = new FairContainer(name, description,
+	    "TestDefaultContext");
+	container->addContext("TestNonDefaultContext");
+	containers->Add(container);
+}
+
 void R3BTCalContFact::setAllContainers()
 {
-    /** Creates the Container objects with all accepted contexts and adds them to
-     *  the list of containers.*/
-
-    FairContainer* p1 = new FairContainer("LandTCalPar", "NeuLAND TCAL Calibration Parameters", "TestDefaultContext");
-    p1->addContext("TestNonDefaultContext");
-    containers->Add(p1);
-
-    FairContainer* p2 = new FairContainer("LosTCalPar", "LOS TCAL Calibration Parameters", "TestDefaultContext");
-    p2->addContext("TestNonDefaultContext");
-    containers->Add(p2);
-
-    FairContainer* p3 = new FairContainer("TofdTCalPar", "TOFD TCAL Calibration Parameters", "TestDefaultContext");
-    p3->addContext("TestNonDefaultContext");
-    containers->Add(p3);
-
-    FairContainer* p4 = new FairContainer("StrawtubesTCalPar", "Strawtubes TCAL Calibration Parameters", "TestDefaultContext");
-    p4->addContext("TestNonDefaultContext");
-    containers->Add(p4);
+    /** Creates the Container objects with all accepted contexts and adds
+     *  them to the list of containers.*/
+    addContainer("LandTCalPar", "NeuLAND TCAL Calibration Parameters");
+    addContainer("LosTCalPar", "LOS TCAL Calibration Parameters");
+    addContainer("TofdTCalPar", "TOFD TCAL Calibration Parameters");
+    addContainer("StrawtubesTCalPar", "Strawtubes TCAL Calibration Parameters");
+    addContainer("PtofTCalPar", "PROF TCAL Calibration Parameters");
 }
 
 FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
@@ -62,25 +59,28 @@ FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
      * of this container, the name is concatinated with the context. */
 
     const char* name = c->GetName();
-    LOG(INFO) << "R3BTCalContFact::createContainer : " << name << FairLogger::endl;
-    FairParSet* p = NULL;
+    LOG(INFO) << "R3BTCalContFact::createContainer : " << name
+        << FairLogger::endl;
 
-    if (strcmp(name, "LandTCalPar") == 0)
-    {
-        p = new R3BTCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
-    }
-    else if (strcmp(name, "LosTCalPar") == 0)
-    {
-        p = new R3BTCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
-    }
-    else if (strcmp(name, "TofdTCalPar") == 0)
-    {
-        p = new R3BTCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
-    }
-    else if (strcmp(name, "StrawtubesTCalPar") == 0)
-    {
-        p = new R3BTCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    vector<const char *> containerNames;
+    containerNames.push_back("LandTCalPar");
+    containerNames.push_back("LosTCalPar");
+    containerNames.push_back("TofdTCalPar");
+    containerNames.push_back("StrawtubesTCalPar");
+    containerNames.push_back("PtofTCalPar");
+
+    bool found = false;
+    for (auto containerName : containerNames) {
+        if (strncmp(name, containerName, strlen(containerName)) == 0) {
+            found = true;
+            break;
+        }
     }
 
-    return p;
+    if (found == true) {
+        return new R3BTCalPar(c->getConcatName().Data(), c->GetTitle(),
+            c->getContext());
+    } else {
+        return nullptr;
+    }
 }
