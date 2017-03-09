@@ -52,8 +52,8 @@ R3BTofdCal2HitPar.cxx
 R3BTofdCal2Hit.cxx
 R3BTofdHitModulePar.cxx
 R3BTofdHitPar.cxx
-#calibration/R3BPtofMapped2CalPar.cxx
-#calibration/R3BPtofMapped2Cal.cxx
+R3BPtofMapped2CalPar.cxx
+#R3BPtofMapped2Cal.cxx
 )
 
 # fill list of header files from list of source files
