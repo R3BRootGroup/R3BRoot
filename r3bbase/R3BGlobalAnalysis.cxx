@@ -30,8 +30,8 @@
 #include "R3BGlobalAnalysis.h"
 #include "R3BLosCalData.h"
 #include "R3BLosMappedData.h"
-//#include "R3BPaddleTamexMappedData.h"
-//#include "R3BPaddleCalData.h"
+#include "R3BPaddleTamexMappedData.h"
+#include "R3BPaddleCalData.h"
 #include "R3BEventHeader.h"
 #include "R3BTCalEngine.h"
 #include "FairRunAna.h"
@@ -51,7 +51,9 @@ using namespace std;
 R3BGlobalAnalysis::R3BGlobalAnalysis()
     : FairTask("OnlineSpectra", 1)
     , fCalItemsLos(NULL)
+    , fCalItemsPtof(NULL)
     , fMappedItemsLos(NULL)
+    , fMappedItemsPtof(NULL)
     , fTrigger(-1)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
 {
@@ -60,7 +62,9 @@ R3BGlobalAnalysis::R3BGlobalAnalysis()
 R3BGlobalAnalysis::R3BGlobalAnalysis(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fCalItemsLos(NULL)
+    , fCalItemsPtof(NULL)
     , fMappedItemsLos(NULL)
+    , fMappedItemsPtof(NULL)
     , fTrigger(-1)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
 {
@@ -107,6 +111,44 @@ InitStatus R3BGlobalAnalysis::Init()
     cLos->cd(0);
     run->AddObject(cLos);
 
+    // Ptof data
+    // get access to Mapped data
+    fMappedItemsPtof = (TClonesArray*)mgr->GetObject("PtofMapped");
+
+    // get access to cal data
+    fCalItemsPtof = (TClonesArray*)mgr->GetObject("PtofCal");
+
+    // define histograms
+    fh_ptof_channels = new TH1F("ptof_channels", "PToF channels", 8, 0, 8.);
+    fh_ptof_channels->GetXaxis()->SetTitle("Bar number");
+    fh_ptof_channels->GetYaxis()->SetTitle("counts");  
+
+    fh_ptof_tot= new TH1F("ptof_tot", "PToF ToT", 500, 0, 50.);
+    fh_ptof_tot->GetXaxis()->SetTitle("ToT in ns");
+    fh_ptof_tot->GetYaxis()->SetTitle("counts");  
+
+    fh_ptof_tof= new TH1F("ptof_tof", "PToF ToF", 1000, 0, 10.);
+    fh_ptof_tof->GetXaxis()->SetTitle("ToF in ns");
+    fh_ptof_tof->GetYaxis()->SetTitle("counts");  
+    
+    fh_ptof_tot_vs_tof= new TH2F("ptof_tot_vs_tof", "PToF ToT vs. ToF", 1000, 0, 10., 500, 0, 50.);
+    fh_ptof_tot_vs_tof->GetXaxis()->SetTitle("ToF in ns");
+    fh_ptof_tot_vs_tof->GetYaxis()->SetTitle("ToT in ns");  
+
+    // define canvas in which all histograms are grouped
+    TCanvas *cPtof = new TCanvas("Ptof", "PTof", 10, 10, 500, 500);
+    cPtof->Divide(2, 2);
+    cPtof->cd(1);
+    fh_ptof_channels->Draw();    
+    cPtof->cd(2);
+    fh_ptof_tot->Draw();    
+    cPtof->cd(3);
+    fh_ptof_tof->Draw();    
+    cPtof->cd(4);
+    fh_ptof_tot_vs_tof->Draw("colz");        
+    cPtof->cd(0);
+    run->AddObject(cPtof);
+ 
        
     return kSUCCESS;
 }
@@ -157,7 +199,93 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
       }            						 
     }
 
+    // if mapped data of Ptof are available, fill the histograms
+    if(fMappedItemsPtof)
+    {
+      Int_t nHits = fMappedItemsPtof->GetEntriesFast();    
+      // loop over hits
+      for (Int_t ihit = 0; ihit < nHits; ihit++)     
+      {
+    	R3BPaddleTamexMappedData *hit = (R3BPaddleTamexMappedData*)fMappedItemsPtof->At(ihit);
+        if (!hit) continue; // should not happen
+
+        Int_t iPlane = hit->GetPlaneId(); // 1..n
+        Int_t iBar   = hit->GetBarId();   // 1..n
+           
+        fh_ptof_channels->Fill(iBar);       
+      }
+    }
+
+    // if calibrated data of LOS are available, fill histograms
+    if(fCalItemsPtof)
+    {
+      // define leading and trailing edge times of PMT1 and PMT2
+      Double_t t1l=0.;
+      Double_t t2l=0.;
+      Double_t t1t=0.;
+      Double_t t2t=0.;
       
+      // define time-over-threshold of PMT1 and PMT2
+      Double_t tot1=0.;
+      Double_t tot2=0.;
+     
+      Int_t nHits = fCalItemsPtof->GetEntriesFast();    
+      
+      // loop over hits
+      for (Int_t ihit = 0; ihit < nHits; ihit++)     
+      {
+    	  R3BPaddleCalData *hit = (R3BPaddleCalData*)fCalItemsPtof->At(ihit);
+          if (!hit) continue; // should not happen
+
+          Int_t iPlane  = hit->GetPlane();    // 1..n
+          Int_t iBar  = hit->GetBar();    // 1..n
+
+          // get all times of one bar
+          t1l=hit->fTime1L_ns;
+          t2l=hit->fTime2L_ns;
+          t1t=hit->fTime1T_ns;
+          t2t=hit->fTime2T_ns;
+
+	  // calculate time over threshold and check if clock counter went out of range
+          while(t1t - t1l < 0.) {
+	    t1t=t1t+2048.*fClockFreq; 
+	  }
+
+          while(t2t-t2l < 0.) {
+	    t2t=t2t+2048.*fClockFreq; 
+          }
+	 
+	  // calculate time of flight relative to LOS and check if clock counter went out of range
+	  while(t1l-timeLos<0.){
+	    t1t=t1t+2048.*fClockFreq; 
+	    t1l=t1l+2048.*fClockFreq; 
+	    t2t=t2t+2048.*fClockFreq; 
+	    t2l=t2l+2048.*fClockFreq; 			  
+          }
+       
+          tot1=t1t - t1l;		      
+          // negative time-over-thresholds should not happen
+	  if(tot1<0) {
+	          LOG(WARNING) << "Negative ToT "<< tot1<<FairLogger::endl;	
+	          LOG(WARNING) << "times1: " << t1t << " " << t1l << FairLogger::endl;		  
+	      }
+
+          tot2=t2t - t2l;	
+          // negative time-over-thresholds should not happen
+          if(tot2<0) {
+              LOG(WARNING) << "Negative ToT "<< tot2<<FairLogger::endl;              
+              LOG(WARNING) << "times2: " << t2t << " " << t2l << FairLogger::endl;		 
+          }
+ 
+          // fill histograms for bar 2 as example
+          if(iBar==2)
+          {
+            fh_ptof_tot->Fill(sqrt(tot1*tot2));
+            fh_ptof_tof->Fill((t1l+t2l)/2.-timeLos-3580.);
+            fh_ptof_tot_vs_tof->Fill((t1l+t2l)/2.-timeLos-3580.,sqrt(tot1*tot2));
+         }        	
+      }	
+   }   
 }
 
 void R3BGlobalAnalysis::FinishEvent()
@@ -170,6 +298,15 @@ void R3BGlobalAnalysis::FinishEvent()
     {
         fMappedItemsLos->Clear();
     }
+    if (fCalItemsPtof)
+    {
+        fCalItemsPtof->Clear();
+    }
+    if (fMappedItemsPtof)
+    {
+        fMappedItemsPtof->Clear();
+    }
+
 }
 
 void R3BGlobalAnalysis::FinishTask()
