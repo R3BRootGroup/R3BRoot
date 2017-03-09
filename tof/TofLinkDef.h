@@ -21,6 +21,11 @@
 #pragma link C++ class R3BTofdHitPar+;
 #pragma link C++ class R3BPtofMapped2CalPar+;
 #pragma link C++ class R3BPtofMapped2Cal+;
+#pragma link C++ class R3BPtofCal2HitPar+;
+#pragma link C++ class R3BPtofCal2Hit+;
+#pragma link C++ class R3BPtofHitPar+;
+#pragma link C++ class R3BPtofParFact+;
+
 
 #endif
 

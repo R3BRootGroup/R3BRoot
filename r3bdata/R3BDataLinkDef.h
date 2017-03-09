@@ -80,4 +80,6 @@
 #pragma link C++ class R3BFi4CalItem+;
 #pragma link C++ class R3BFi4HitItem+;
 #pragma link C++ class R3BFi4Point+;
+#pragma link C++ class R3BPtofHit+;
+
 #endif

@@ -116,6 +116,7 @@ fi4Data/R3BFi4CalItem.cxx
 fi4Data/R3BFi4HitItem.cxx
 tofData/R3BTofdHitData.cxx
 fi4Data/R3BFi4Point.cxx
+ptofData/R3BPtofHit.cxx
 )
 
 

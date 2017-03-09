@@ -1,0 +1,87 @@
+#ifndef R3BPTOFCAL2HITPAR_H
+#define R3BPTOFCAL2HITPAR_H
+
+#include "FairTask.h"
+
+class TClonesArray;
+class R3BPtofHitPar;
+class TH1D;
+
+class R3BPtofCal2HitPar : public FairTask
+{
+
+  public:
+    /**
+     * Default constructor.
+     * Creates an instance of the task with default parameters.
+     */
+    R3BPtofCal2HitPar();
+
+    /**
+     * Standard constructor.
+     * Creates an instance of the task.
+     * @param name a name of the task.
+     * @param iVerbose a verbosity level.
+     */
+    R3BPtofCal2HitPar(const char* name, Int_t iVerbose = 1);
+
+    /**
+     * Destructor.
+     * Frees the memory used by the object.
+     */
+    virtual ~R3BPtofCal2HitPar();
+
+    /**
+     * Method for task initialization.
+     * This function is called by the framework before
+     * the event loop.
+     * @return Initialization status. kSUCCESS, kERROR or kFATAL.
+     */
+    virtual InitStatus Init();
+
+    /**
+     * Method for event loop implementation.
+     * Is called by the framework every time a new event is read.
+     * @param option an execution option.
+     */
+    virtual void Exec(Option_t* option);
+
+    /**
+     * A method for finish of processing of an event.
+     * Is called by the framework for each event after executing
+     * the tasks.
+     */
+    virtual void FinishEvent();
+
+    /**
+     * Method for finish of the task execution.
+     * Is called by the framework after processing the event loop.
+     */
+    virtual void FinishTask();
+    
+    /**
+     * Method for setting the beam charge
+     * @param charge the charge in terms of e
+     */
+    void SetBeamCharge(Int_t charge){
+     fBeamCharge = charge; 
+    }
+
+  private:
+    Int_t fBeamCharge;
+    Int_t fYPosition;
+    
+    TH1D* fZScaleHistos[12];
+    TH1D* fTOffsetHistos[12];
+    
+    R3BPtofHitPar* fPar;
+    
+    Int_t fNEvents;         	/**< Event counter. */
+    TClonesArray* fCalData;  	/**< Array with cal data - input data. */
+
+  public:
+    ClassDef(R3BPtofCal2HitPar, 1)
+};
+
+#endif
+
