@@ -1,14 +1,17 @@
 // ------------------------------------------------------------
-// -----                  R3BPtofMapped2Cal               -----
-// -----          Created March 8th 2017 by ____          -----
-// -----                Folder: R3BRoot/tof               -----
+// -----                  R3BPtofMapped2TCal                -----
+// -----          Created Feb 9th 2017 by R.Plag          -----
 // ------------------------------------------------------------
 
-/* This class converts paddle data produced by Ptof from MAPPED level
- * to CAL level.
- * 
- * Data in MAPPED level is stored in class R3BPaddleTamexMappedData
- * Data in CAL level should be stored in class R3BPaddleCalData
+/* March 2017
+ * Reconstructing data into PaddleItems. Each paddle holds two times,
+ * (for PM1 and PM2). This allows to plot
+ * the time differences e.g. via evt->Draw(...) interactively (aka without
+ * looping over all channels) which is crucial for a quick check of the
+ * detector status during the experiment.
+ *  
+ * This code was copied from Tofd. Differences:
+ * - how many planes?
  * 
  */
 
@@ -28,75 +31,68 @@
 #include "TClonesArray.h"
 #include "TMath.h"
 
+#define IS_NAN(x) TMath::IsNaN(x)
 
 R3BPtofMapped2Cal::R3BPtofMapped2Cal()
 	: FairTask("TofdTcal", 1)
-// ToDo: initialize all members with default values
+	, fMappedItems(NULL)
+	, fCalItems(new TClonesArray("R3BPaddleCalData"))
+	, fNofCalItems(0)
+	, fNofTcalPars(0)
+	, fTcalPar(NULL)
+	, fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
 {
 }
 
 R3BPtofMapped2Cal::R3BPtofMapped2Cal(const char* name, Int_t iVerbose)
 	: FairTask(name, iVerbose)
-// ToDo: initialize all members with default values
+	, fMappedItems(NULL)
+	, fCalItems(new TClonesArray("R3BPaddleCalData"))
+	, fNofCalItems(0)
+	, fNofTcalPars(0)
+	, fTcalPar(NULL)
+	, fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
 {
 }
 
 R3BPtofMapped2Cal::~R3BPtofMapped2Cal()
 {
-// ToDo: free all memory that was consumed by "new" below
+	delete fCalItems;
+	fCalItems = NULL;
+	fNofCalItems = 0;
 }
 
 InitStatus R3BPtofMapped2Cal::Init()
 {
-/* ToDo: initialize and check all member variables. These are:
-		* check that we have a container with calibration parameters and
-		  that this container is not empty
-		* get access to the MAPPED data: initialize fMappedItems with
-		  the PtofMapped-Object created by the Ptof reader. Hint: You
-		  can call GetObject() at the FairRootManager to get a pointer
-		  on the mapped items.
-		* register the output array fCalItems at the FairRootManager.
-		Remember: you need to return either kSUCCESS or kFATAL
+	if (fTcalPar == NULL)
+	{
+		LOG(ERROR) << "Have no TCal parameter container" << FairLogger::endl;
+		return kFATAL; 
+	}
 
+	fNofTcalPars = fTcalPar->GetNumModulePar();
+	if (fNofTcalPars == 0)
+	{
+		LOG(ERROR) << "No TCal parameters in container PtofTCalPar" << FairLogger::endl;
+		return kFATAL;
+	}
 
-		Convert the following pseudo code into real C++:
-*/
+	LOG(INFO) << "R3BPtofMapped2Cal::Init : read " << fNofTcalPars << " modules" << FairLogger::endl;
 
-	if (calibration container not available)
-		print an error and stop
-
-	fNofTcalPars = ...
-	if (zero parameters available)
-		print an error and stop
-
-	get pointer to FairRootManager
+	FairRootManager* mgr = FairRootManager::Instance();
+	if (NULL == mgr)
+		FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
 
 	// get access to Mapped data
-	fMappedItems = ...
-	if (access to mapped items failed)
-		print an error and fail 
-	
-	request storage of fCalItems in output tree
+	fMappedItems = (TClonesArray*)mgr->GetObject("PtofMapped");
+	if (NULL == fMappedItems)
+		FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch PtofMapped not found");
+
+
+	// request storage of Cal data in output tree
+	mgr->Register("PtofCal", "Land", fCalItems, kTRUE);
 
 	return kSUCCESS;
-
-
-
-/* You may find the following functions helpful:
- * 
- * fTcalPar->GetNumModulePar()
- * 		returns number of calibration parameter in container
- * 
- * FairRootManager* mgr = FairRootManager::Instance();
- * 		returns pointer to FairRootManager
- * 
- * (TClonesArray*)mgr->GetObject("PtofMapped");
- * 		returns pointer to array "PtofMapped"
- * 
- * FairRootManager::Register("PtofCal", "Land", fCalItems, kTRUE);
- * 		Registers array fCalItems in the output tree as branch "PtofCal"
- * 
- */
 }
 
 
@@ -104,8 +100,9 @@ InitStatus R3BPtofMapped2Cal::Init()
 // Note that the container may still be empty at this point.
 void R3BPtofMapped2Cal::SetParContainers()
 {
-// ToDo: fetch the container with calibration parameters from FairRuntimeDb
-//       Error if the operation fails
+	fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("PtofTCalPar");
+	if (!fTcalPar)
+		LOG(ERROR) << "Could not get access to PtofTCalPar-Container." << FairLogger::endl;
 }
 
 
@@ -120,110 +117,69 @@ InitStatus R3BPtofMapped2Cal::ReInit()
  
 void R3BPtofMapped2Cal::Exec(Option_t* option)
 {
-/* ToDo: loop over all mapped items and convert all times to ns. 
- * 
- * Remember: Each mapped item contains 4 times: leading and trailing edge 
- * for PM 1 and PM 2. A time in mapped level consists of a coarse clock 
- * time and a fine TDC time.
- * 
- * For each time: 
- * Fetch the required calibration parameter from the fTcalPar container.
- * The containers GetModuleParAt(...) function returns an object of type
- * R3BTCalModulePar that you can use to convert the time.
- * 
- * Convert the fine time to ns by calling R3BTCalModulePar's GetTimeVFTX(...) 
- * 
- * Add the coarse time (in ns) to the converted fine time
- * 
- * Make sure the final time is stored in an object of type R3BPaddleCalData
- * which is added to the output array fCalItems. Remember that also the
- * output object R3BPaddleCalData contains 4 times!
- * 
- * Don't forget to handle errors.
- */
- 
-	// loop over all mapped items:
-	for (all items in fMappedItems)
+	Int_t nHits = fMappedItems->GetEntriesFast();
+
+	for (Int_t ihit = 0; ihit < nHits; ihit++)
 	{
-		// get pointers to the data we work with:
-		mapped = current mapped item we like to convert;
-		cal = NULL; // will later hold the CAL item
-		
-		// fetch plane and bar from mapped item for later usage:
-		iPlane = ...
-		iBar = ...
- 
-		// loop over all times of the current mapped item:
-		for (each PM) // PM 1 and PM 2
-			for (each edge) // leading and trailing edge
+		R3BPaddleTamexMappedData* mapped = (R3BPaddleTamexMappedData*)fMappedItems->At(ihit);
+		R3BPaddleCalData*            cal = NULL;
+
+		Int_t iPlane = mapped->GetPlaneId(); // 1..n; no need to check range
+		Int_t iBar   = mapped->GetBarId();   // 1..n
+
+		// convert times to ns
+		for (int tube=0;tube<2;tube++) // PM1 and PM2
+			for (int edge=0;edge<2;edge++) // loop over leading and trailing edge
 			{
-				// make sure this time is present (non-zero) in mapped item
-				if (time not present) continue;
-				
-				// fetch calib parameter. Handle error if needed.
-				par = ...;
-				
-				// now we have a time and a calib parameter: Ready to go!
-				// create a new cal item if needed:
-				if (!cal) cal = a new R3BPaddleCalData(iPlane,iBar);
-				
-				// convert fine time. Feel free to check the result for
-				// reasonable values
-				time_ns = ...
-				
-				// add coarse time
-				time_ns = fClockFreq - time_ns + coarseTime * fClockFreq;
-				
-				// store time in cal item
-				cal->SetTime(...)
+				// check if there is indeed data for this tube and edge:
+				if (mapped->GetFineTime(tube , edge)==0) continue;
+
+				// fetch calib params:
+				R3BTCalModulePar* par = fTcalPar->GetModuleParAt(iPlane, iBar, tube*2 + edge + 1); // 1..4
+				if (!par)
+				{
+					LOG(INFO) << "R3BPtofMapped2Cal::Exec : Tcal par not found, Plane: " << 
+					iPlane << ", Bar: " << iBar << ", Tube: " << (tube+1) << FairLogger::endl;
+					continue;
+				}
+
+				// create CAL item only if data AND calib params are available:
+				if (!cal) 
+					cal = new ((*fCalItems)[fNofCalItems]) R3BPaddleCalData(iPlane,iBar);
+
+
+				// Convert TDC to [ns] ...
+				Double_t time_ns = par->GetTimeVFTX( mapped->GetFineTime(tube , edge) );
+
+				if (time_ns < 0. || time_ns > fClockFreq )
+				{
+					LOG(ERROR) << 
+					"R3BPtofMapped2Cal::Exec : bad time in ns: Plane= " << iPlane << 
+					", bar= " << iBar << ",tube= " << (tube+1) <<
+					", time in channels = " << mapped->GetFineTime(tube,edge) <<
+					", time in ns = " << time_ns  << FairLogger::endl;
+					continue;
+				}
+		
+				// ... and add clock time
+				time_ns = fClockFreq - time_ns + mapped->GetCoarseTime(tube , edge) * fClockFreq;
+
+				cal->SetTime(tube , edge , time_ns);
 			}
 	}
-
-
-/* You may find the following functions helpful:
- * 
- * fMappedItems->GetEntriesFast()
- * 		returns the number of items in the array
- * 
- * (R3BPaddleTamexMappedData*)fMappedItems->At( #hitNumber )
- * 		returns a pointer to the item at position #hitNumber in the array
- * 
- * mapped->GetPlaneId()
- * mapped->GetBarId()
- * mapped->GetFineTime(tube , edge)
- * 		see: R3BRoot/r3bdata/neulandData/R3BPaddleTamexMappedData.h
- * 
- * fTcalPar->GetModuleParAt(iPlane, iBar, tube*2 + edge + 1)
- * 		returns a pointer to the corresponding R3BTCalModulePar
- * 		see: R3BRoot/tcal/R3BTCalPar.h and
- * 		     R3BRoot/tcal/R3BTCalModulePar.h
- * 
- * new ((*fCalItems)[fNofCalItems]) R3BPaddleCalData(iPlane,iBar)
- * 		returns a pointer to a new item of type R3BPaddleCalData at 
- * 		position fNofCalItems in the array fCalItems. 
- * 
- * par->GetTimeVFTX( fineTime )
- * 		see: R3BRoot/tcal/R3BTCalModulePar.h
- * 
- * cal->SetTime(tube , edge , time_ns)
- * 		see: R3BRoot/r3bdata/tofData/R3BPaddleCalData.h
- * 
- * LOG(INFO) << "some text" << FairLogger::endl
- * LOG(ERROR) << "some text" << FairLogger::endl
-*/
 }
 
 void R3BPtofMapped2Cal::FinishEvent()
 {
-// ToDo: clear all calItems (if any)
+	if (fCalItems)
+	{
+		fCalItems->Clear();
+		fNofCalItems = 0;
+	}
 }
 
 void R3BPtofMapped2Cal::FinishTask()
 {
-// Nothing to be done here
 }
 
 ClassImp(R3BPtofMapped2Cal)
-
-// ToDo: update CMakeLists.txt and TofLinkDef.h in the current folder
-// (R3BRoot/tof)
