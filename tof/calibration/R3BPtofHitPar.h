@@ -18,10 +18,62 @@ class R3BPtofHitPar : public FairParGenericSet
 	virtual void Print(Option_t *option="") const;
 	/** Accessor functions **/
 	
+	/**
+	* Method to set the parameter of a module.
+	* @param paddle the paddle index [1,12]
+	* @param tOffset1 the first time offset
+	* @param tOffset2 the second time offset
+	* @param vEff the effective speed of light
+	* @param zScale the charge scale
+	*/
+	void SetParAt(Int_t paddle, Double_t tOffset1, Double_t tOffset2, Double_t zScale, Double_t vEff)
+	{
+	  fTOffset1[paddle-1] = tOffset1;
+	  fTOffset2[paddle-1] = tOffset2;
+	  fZScale[paddle-1] = zScale;
+	  fVEff[paddle-1] = vEff;
+	}
+	
+	/**
+	* Method to get the time offset of a module.
+	* @param paddle the paddle index [1,12]
+	* @param side the side {1;2}
+	* @return the time offset
+	*/
+	Double_t GetTOffsetAt(Int_t paddle, Int_t side)
+	{
+	  if(side == 1)
+	    return fTOffset1[paddle-1];  
+	  else
+	    return fTOffset2[paddle-1]; 
+	}
+	
+	/**
+	* Method to get the z-scale of a module.
+	* @param paddle the paddle index [1,12]
+	* @return the z-scale offset
+	*/
+	Double_t GetZScaletAt(Int_t paddle)
+	{
+	  return fZScale[paddle-1];  
+	}
+	
+	/**
+	* Method to get the effective speed of light of a module.
+	* @param paddle the paddle index [1,12]
+	* @return the effective speed of light
+	*/
+	Double_t GetVEfftAt(Int_t paddle)
+	{
+	  return fVEff[paddle-1];  
+	}
 
   private:
-          //TODO define parameters: offset for pmt 1+2, chargescale, effective speed and their getters and setters
-          //use TArrayD Objects
+	TArrayD fTOffset1;	/**< an array with timeoffset parameters of modules */
+	TArrayD fTOffset2;	/**< an array with timeoffset parameters of modules */
+	TArrayD fZScale;	/**< an array with zscale parameters of all modules */
+	TArrayD fVEff;		/**< an array with veff parameters of all modules */
+
 
    ClassDef(R3BPtofHitPar,1);
 };

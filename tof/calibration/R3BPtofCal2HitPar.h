@@ -66,6 +66,15 @@ class R3BPtofCal2HitPar : public FairTask
     void SetBeamCharge(Int_t charge){
      fBeamCharge = charge; 
     }
+    
+    /**
+     * Method for setting the y-position of the sweep.
+     * If y != 0 this run will determine veff.
+     * @param yPositon the y-position of the sweep
+     */
+    void SetYPosition(Double_t yPosition){
+      fYPosition = yPosition;
+    }
 
   private:
     Int_t fBeamCharge;

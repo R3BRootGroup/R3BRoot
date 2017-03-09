@@ -87,7 +87,10 @@ class R3BPtofCal2Hit : public FairTask
 
 		R3BPtofHitPar* fHitPar;        /**< HIT parameter container. */
 		
-                //TODO define local parameter fields
+		TArrayD fTOffset1;	/**< an array with timeoffset parameters of modules */
+		TArrayD fTOffset2;	/**< an array with timeoffset parameters of modules */
+		TArrayD fZScale;	/**< an array with zscale parameters of all modules */
+		TArrayD fVEff;		/**< an array with veff parameters of all modules */
 
 	public:
 		ClassDef(R3BPtofCal2Hit, 1)

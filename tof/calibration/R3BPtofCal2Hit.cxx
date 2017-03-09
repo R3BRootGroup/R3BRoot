@@ -23,6 +23,10 @@ R3BPtofCal2Hit::R3BPtofCal2Hit()
 	, fHitItems(new TClonesArray("R3BPtofHit"))
 	, fHitPar(NULL)
 {
+  fTOffset1.Set(12);
+  fTOffset2.Set(12);
+  fZScale.Set(12);
+  fVEff.Set(12);
 }
 
 R3BPtofCal2Hit::R3BPtofCal2Hit(const char* name, Int_t iVerbose)
@@ -31,6 +35,10 @@ R3BPtofCal2Hit::R3BPtofCal2Hit(const char* name, Int_t iVerbose)
 	, fHitItems(new TClonesArray("R3BPtofHit"))
 	, fHitPar(NULL)
 {
+  fTOffset1.Set(12);
+  fTOffset2.Set(12);
+  fZScale.Set(12);
+  fVEff.Set(12);
 }
 
 R3BPtofCal2Hit::~R3BPtofCal2Hit()
@@ -50,7 +58,7 @@ InitStatus R3BPtofCal2Hit::Init() {
       FairLogger::GetLogger()->Fatal (MESSAGE_ORIGIN, "PtofCalData not found");
    }
 
-   // TODO Register the Hit-Data-Branch
+   fMan->Register ("PtofHit", "Ptof", fHitItems, kTRUE);
     
    SetParameter();
    return kSUCCESS;
@@ -62,7 +70,13 @@ void R3BPtofCal2Hit::SetParContainers() {
 
 
 void R3BPtofCal2Hit::SetParameter(){
-  //TODO set the parameters to the local fields
+
+  for(Int_t paddle = 0; paddle < 12; paddle++){
+    fTOffset1[paddle] = fHitPar->GetTOffsetAt(paddle+1, 1);
+    fTOffset2[paddle] = fHitPar->GetTOffsetAt(paddle+1, 2);
+    fZScale[paddle] = fHitPar->GetZScaletAt(paddle+1);
+    fVEff[paddle] = fHitPar->GetVEfftAt(paddle+1);
+  }
 }
 
 InitStatus R3BPtofCal2Hit::ReInit() {
@@ -78,16 +92,29 @@ void R3BPtofCal2Hit::Exec(Option_t* option)
   const Double_t paddle_width = 27.0;  //cm
   const Double_t paddle_height = 80.0; //cm
   const Double_t paddle_depth = 0.5;  //cm
-
   
-  Int_t nHitData = 0; // the position of the next HitData inside our TClonesArray -- see below
+  const Double_t plane_offset = 0.0;  //cm
   
-  // iterate over cal data and use the parameters to obtain hit-level-data  
+  Int_t nItems  = fCalItems->GetEntriesFast();
+  Int_t nHitData = 0;
   
-  // use the mean of the leading edge times as the time
-  
-  // create a new instance of R3BPtofHit with our data and store it inside the TClonesArray:
-  // new ((*fHitItems)[nHitData++]) R3BPtofHit(id, charge, time, x, y, z);
+  for(Int_t i = 0; i < nItems; i++){
+   R3BPaddleCalData* caldata = (R3BPaddleCalData*) fCalItems->At(i); 
+   
+   Int_t id = (caldata->GetPlane()-1)*6 + caldata->GetBar() - 1;
+   
+   Double_t t1 = caldata->fTime1L_ns + fTOffset1[id];
+   Double_t t2 = caldata->fTime2L_ns + fTOffset2[id];
+   Double_t time = (t1+t2)*0.5;
+   
+   Double_t charge = sqrt((caldata->fTime1T_ns - caldata->fTime1L_ns)*(caldata->fTime2T_ns - caldata->fTime2L_ns))*fZScale[id];
+   
+   Double_t xx = (id%6 - 3 + (id<6 ? 0 : -0.5))*paddle_width;
+   Double_t yy = (t2-t1)*fVEff[id];
+   Double_t zz = paddle_depth * 0.5 + (id < 6 ? 0 : paddle_depth + plane_offset)  ;
+   
+   new ((*fHitItems)[nHitData++]) R3BPtofHit(id+1, charge, time, xx, yy, zz);
+  }
 }
 
 void R3BPtofCal2Hit::FinishEvent()

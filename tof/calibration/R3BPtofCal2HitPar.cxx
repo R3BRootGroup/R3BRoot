@@ -59,8 +59,11 @@ InitStatus R3BPtofCal2HitPar::Init()
       return kFATAL;
    }
    
-  //TODO: get the pointer to the parameter-container "PtofHitPar" and store it in fPar (do not forget to typecast!)
-  // The parameter-contrainer are handled by the singleton class FairRuntimeDb
+  fPar = (R3BPtofHitPar*) FairRuntimeDb::instance()->getContainer("PtofHitPar");
+  if (NULL == fPar) {
+    FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "PtofHitPar not found!");
+    return kFATAL;
+  }
    
   for(Int_t i = 0; i < 12; i++){
     std::string str1 = "h_Module" + std::to_string(i) + "_ZScale";
@@ -77,9 +80,18 @@ InitStatus R3BPtofCal2HitPar::Init()
 
 void R3BPtofCal2HitPar::Exec(Option_t* option)
 {  
+  Int_t nData = fCalData->GetEntriesFast();
   
-  //TODO iterate of the Cal-Data and determine the energy and timeoffset for each event.
-  // Fill the data into the histograms
+  for(Int_t i = 0; i < nData; i++){
+    R3BPaddleCalData* cdata = (R3BPaddleCalData*)fCalData->At(i);
+    Int_t id = (cdata->GetPlane()-1)*6 + cdata->GetBar() - 1;
+    
+    Double_t Energy = sqrt((cdata->fTime1T_ns-cdata->fTime1L_ns)*(cdata->fTime2T_ns-cdata->fTime2L_ns));
+    Double_t TDiff = cdata->fTime2L_ns - cdata->fTime1L_ns;
+    
+    fZScaleHistos[id]->Fill(Energy);
+    fTOffsetHistos[id]->Fill(TDiff);
+  }
   
 }
 
@@ -89,21 +101,26 @@ void R3BPtofCal2HitPar::FinishEvent()
 
 void R3BPtofCal2HitPar::FinishTask()
 {
+  TF1 g = TF1("GAUS", "gaus(0)");
   
-  // TODO determine the parameters:
-  // you can get the maximum bin of a histogram with "->GetMaximumBin()" and the position of a bin with "->GetBinCenter(binNumber)"
-  
-  
-  // for a more precise parameter you can make a gaus fit around the maximum and use the 
-  // TF1("GAUS", "gaus(0)"); a gaus function parameters:   0: ampl   1: mean   2: sigma
-  // histo->Fit(pointerToGausFunction, "qn", "", center - 1, center + 1)   
-  //      Fits the histogram "histo" with a gaus function
-  //      "qn" suppresses output
-  //      the last two parameter determine the fit range
-  // the fit paramter will be stored in the funtction and can be accessed with "->GetParameter(n)"  where n is the parameter index 
-  
-
-  //fPar->setChanged() hast to be called so the paramters will be stored
+  for(Int_t i = 0; i < 12; i++){
+    
+    Double_t max, scale = 0, offset = 0;
+    
+    if(fZScaleHistos[i]->GetEntries() > 10000){
+      max = fZScaleHistos[i]->GetBinCenter(fZScaleHistos[i]->GetMaximumBin());
+      g.SetParameter(1, max);
+      fZScaleHistos[i]->Fit(&g, "qn", "", max - 1, max + 1);
+      scale = fBeamCharge/g.GetParameter(1);
+      
+      max = fTOffsetHistos[i]->GetBinCenter(fTOffsetHistos[i]->GetMaximumBin());
+      g.SetParameter(1, max);
+      fTOffsetHistos[i]->Fit(&g, "qn", "", max - 0.2, max + 0.2);
+      offset = g.GetParameter(1);
+    }
+    
+    fPar->SetParAt(i+1, 0.5*offset, -0.5*offset, scale, 6.5);
+  }
   fPar->setChanged();
 }
 
