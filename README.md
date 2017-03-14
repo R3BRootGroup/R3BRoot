@@ -41,6 +41,30 @@ root -l r3bsim.C
 
 This will create output file `r3bsim.root` with the simulation results and parameter file `r3bpar.root` with geometry and magnetic field parameters.
 
+After the simulation run:
+
+1. To start an event display:
+
+~~~bash
+root -l eventDisplay.C
+~~~
+
+2. To perform a quick analysis with GUI:
+
+~~~bash
+root -l r3bsim.root
+[] evt->StartViewer();
+~~~
+
+3. To convert the MC results into detector-like signals and open the output file:
+
+~~~bash
+root -l run_digi.C
+[].q
+root -l r3bhits.root
+[]evt->StartViewer();
+~~~
+
 # Data Analysis
 
 > ...Under development...
