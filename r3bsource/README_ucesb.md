@@ -9,46 +9,50 @@ For further information about ucesb, see the [write-up](http://fy.chalmers.se/~f
 Overview
 --------
 
-1. Install [R3BROOT](https://www.r3broot.gsi.de)
-2. Install ucesb
-3. Compile your experiment specific unpacker and test it on data
-4. Produce the header file for R3BROOT including the data structure
-5. Extract the parts for each detector and level (unpack / raw)
+1. Install ucesb (with FAIRROOT version of ROOT)
+2. Compile your experiment specific unpacker and test it on data
+3. Produce the header file for R3BROOT including the data structure
+4. Extract the parts for each detector and level (unpack / raw)
+5. Install [R3BROOT](https://www.r3broot.gsi.de)
 6. Write detector specific readers
 7. Write or modify your R3BROOT steering macro
 8. Run the macro
 
-1. Install R3BROOT
-------------------
 
-Installation information can be found on the website
+Install ucesb
+-------------
 
-2. Install ucesb
-----------------
+Checkout the most recent version of ucesb from the git repository:
 
-Checkout the most recent version of ucesb from the CVS repository:
-
-    export CVS_RSH="ssh"
-    cvs -d :ext:land@lxgs08.gsi.de:/u/johansso/CVS co unpacker
-    cvs -d :ext:land@lxgs08.gsi.de:/u/landcvs/CVS co unpackexps
+    git clone http://fy.chalmers.se/~f96hajo/ucesb/ucesb.git
 
 And also checkout the git repository with experiment unpackers:
 
     git clone lx-pool.gsi.de:/u/johansso/upexps
 
-Compile the empty ucesb unpacker *using the same version of ROOT* as you used for R3BROOT.
+Check that
+
+    which root
+
+points to your FAIRROOT installation directory!
+
+Compile the empty ucesb unpacker *using the same version of ROOT* as you used for FAIRROOT.
 
     make empty/empty
 
-Set the environment variable UCESB_DIR to the 'unpacker' directory, e.g.
+After compilation finished, make sure that the file
+
+    hbook/ext_data_clnt.o
+
+exists. Set the environment variable UCESB_DIR to the 'unpacker' directory, e.g.
 
     export UCESB_DIR=/u/$USER/path/to/unpacker
 
 Put this in your .bashrc to make it permanent. R3BROOT will look for ucesb at this location.
 
 
-3. Compile your experiment specific unpacker
---------------------------------------------
+Compile your experiment specific unpacker
+-----------------------------------------
 
 Also use *the same* ROOT version here.
 
@@ -56,8 +60,8 @@ Also use *the same* ROOT version here.
     make
 
 
-4. Produce the header file
---------------------------
+Produce the header file
+-----------------------
 
 Run ucesb with the struct_writer header generation option
 
@@ -68,9 +72,17 @@ This will produce the header file called 'ext_h101.h'.
 It contains the structure information for R3BROOT.
 The data coming from ucesb will adhere to this format.
 
+You can skip parts of the following step, if you do the header writing like this
 
-5. Extract the parts for each detector
---------------------------------------
+    ./sNNN --ntuple=<signals>,id=h101_<detector>,ext_h101_<detector>.h
+    # Example
+    ./s483 --ntuple=RAW:TOFD,id=h101_tofd,ext_h101_tofd.h
+
+This will already insert the correct detector names for you, if you like and only extract signals related to the specific detector.
+
+
+Extract the parts for each detector
+-----------------------------------
 
 At this point this part of the process is still manual:
 For this example we will use the RAW level data of POS.
@@ -81,16 +93,22 @@ For this example we will use the RAW level data of POS.
 - Delete all contents of the #define EXT_STR_h101_ITEMS_INFO(...) that don't relate to POS
 - Rename the #define statement to match the structure name.
 
-6. Write detector specific reader classes
------------------------------------------
+Install R3BROOT
+---------------
+
+Installation information can be found on the R3BROOT website
+
+
+Write detector specific reader classes
+--------------------------------------
 
 Have a look at r3bsource/R3BUnpackReader.[cxx/h].
 Your detector specific reader class should almost be a copy of this, mostly replacing 'unpack' with e.g. 'raw_pos'.
 And you will have to make sure that in the Read() function your detector specific data containers are filled with the data from the ucesb structure.
 
 
-7. Write or modify your R3BROOT steering macro
-----------------------------------------------
+Write or modify your R3BROOT steering macro
+-------------------------------------------
 
 An existing steering macro for the s438b experiment can be found in
 
@@ -99,8 +117,8 @@ An existing steering macro for the s438b experiment can be found in
 It shows how the R3BUcesbSource class is used and how Readers are added.
 
 
-8. Run the macro
-----------------
+Run the macro
+-------------
 
 Run this:
 
