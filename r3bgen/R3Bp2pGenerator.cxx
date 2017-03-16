@@ -43,7 +43,7 @@ R3Bp2pGenerator::R3Bp2pGenerator(const char* fileName)
   fInputFile = new ifstream(fFileName);
   if ( ! fInputFile->is_open() ) 
     Fatal("R3Bp2pGenerator","Cannot open input file.");
-  fOutputFile = new ofstream("vertex.out");
+//  fOutputFile = new ofstream("vertex.out");
 
   // fPDG=TDatabasePDG::Instance(); 
 }
@@ -98,14 +98,16 @@ Bool_t R3Bp2pGenerator::ReadEvent(FairPrimaryGenerator* primGen) {
   // Read event header line from input file
      *fInputFile >> pX1 >> pY1 >> pZ1 >> pXA >> pYA >> pZA >> pXL >> pYL >> pZL>> AMDiff >>  T1 >> Theta1 >> Phi1 >> TA >> ThetaA >> PhiA >> TB >> ThetaB >> PhiB >> InvMass >> t ;
 
-     vx=gRandom->Uniform(-1.5,1.5);
-     vy=gRandom->Uniform(-1.5,1.5);
-     // uncomment for Liq H target:
-     /*      
-     vz=gRandom->Uniform(0.,6.);
-     */
+//     vx=gRandom->Uniform(-1.5,1.5);
+//     vy=gRandom->Uniform(-1.5,1.5);
+//     // uncomment for Liq H target:
+//     /*      
+//     vz=gRandom->Uniform(0.,6.);
+//     */
+//
+//     vz = gRandom->Uniform(-0.25, 0.25);
 
-     *fOutputFile << vx << " " << vy << " " << vz << endl;
+//     *fOutputFile << vx << " " << vy << " " << vz << endl;
 
 
     pX1=pX1/1000.;
@@ -126,7 +128,7 @@ Bool_t R3Bp2pGenerator::ReadEvent(FairPrimaryGenerator* primGen) {
   if ( fInputFile->eof() ) {
     cout << "-I R3Bp2pGenerator: End of input file reached " << endl;
     CloseInput();
-    fOutputFile->close();
+//    fOutputFile->close();
     return kFALSE;
   }
 

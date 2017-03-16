@@ -174,9 +174,12 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 	  //for (Int_t i1 = 0; i1 < 2; i1++)   
 	  //{ 
 
-	      if( ( ( (pl_data[l_s] >> 30) & 0x3) == 0x2) && ( ((pl_data[l_s] & 0xFFFFFFFF) != 0xFFFFFFFF)))  
+
+	  // Case of word type 2:
+	  if( ( ( (pl_data[l_s] >> 30) & 0x3) == 0x2) && ( ((pl_data[l_s] & 0xFFFFFFFF) != 0xFFFFFFFF)))  // word type 2
 		{ 
 		  
+		  // reading infor from the first 32bit word (l_s) :
 
 		  wordtype = (pl_data[l_s] >> 30) & 0x3; // bit 31:30
 		  
@@ -197,6 +200,8 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 
 		  if(info_code == 14) tsExt_hb=info_field; // high bit (47:28) time from the external Master
 		  if(info_code == 15) tsExt_vhb=info_field; // high bit (63:48)time from the external Master
+
+		  // reading the second 32bit word (l_s+1):
 		  if(info_code == 14 || info_code == 15)
 		    {
 		      tsExt_lb = (pl_data[(l_s+1)] & 0x0FFFFFFF); // low bit timestamp from master trigger  (To be checked)
@@ -207,7 +212,7 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 		  //if(info_code==4)nInfo4++;
 		  //if(info_code==5)nInfo5++;
 
-		  l_s +=2;
+		  l_s +=2; //because we read a pair of 32bit word each time, we need to shift by 2 
 
 		  //new ((*fRawData)[fNHits]) R3BStarTrackRawHit(WR,WRlb, wordtype, hitbit, module_id, side, asic_id, strip_id, adcData, ts, ts_lb, tsExt, tsExt_lb,info_field, info_code);
 		  //fNHits++;
@@ -216,20 +221,26 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 
 		  //
 		  // reseting in order to check that the same number of time info_code=4 (7,14) and info code = 5 (8,15)
-		  // 
+		  //
+		  /* 
 		  info_code=0;
 		  info_field=0;
 		  tsExt_lb=tsExt_hb=tsExt_vhb=0;
 		  ts_hb=0;
 		  ts_vhb=0;
+		  */
 
-		}else if(((pl_data[l_s] >> 30) & 0x3) == 0x3 && ( (pl_data[l_s] & 0xFFFFFFFF) != 0xFFFFFFFF ))
+
+
+	    //Case of word type 3:
+		}else if(((pl_data[l_s] >> 30) & 0x3) == 0x3 && ( (pl_data[l_s] & 0xFFFFFFFF) != 0xFFFFFFFF ))  // word type 3
 		{
 
 		  //LOG(INFO) << " pl_data[l_s]: " <<  ((pl_data[l_s] >> 30) & 0x3)  << FairLogger::endl;
 		  
 		  //LOG(INFO) << "R3BSTaRTrackUnpack :   wordB :" <<  (pl_data[l_s] & 0xC0000000) << FairLogger::endl;
 		  
+		  // Reading the first 32 bit word:
 		  // wordtype=11;
 		  wordtype = (pl_data[l_s] >> 30) & 0x3; // bit 31:30
 		  if(wordtype!=3) cout << wordtype << endl;
@@ -257,7 +268,7 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 		  strip_id = (ADCchanIdent & 0x0000007F) +  0x1; // adding 0x1 to have real values from 1 to 128
 		  
 
-		  
+		  // Reading the second 32bit word:
 		  // if S438 data (Oct 2014 data): 
 		  //cout << "ts_init=" << pl_data[l_s+1] << endl;
  		  ts_lb_part1 = pl_data[l_s+1] & 0x00000003; //take the 2 first less significant  bits;
@@ -276,7 +287,7 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 
 	          //LOG(INFO) << "R3BSTaRTrackUnpack :   pl_data[ls+1]:" << pl_data[l_s+1] << FairLogger::endl;
 		  
-		  l_s +=2;	  
+		  l_s +=2; //because we read a pair of 32bit word each time, we need to shift by 2 	  
 		  
 		  //LOG(DEBUG) << "R3BStartrackerUnpack : Strip_ID IS " << strip_id << ",  Chip ID IS " << asic_id << " , Ladder ID IS " << module_id << " , ADC Data IS " << adcData << FairLogger::endl;
 		  //new ((*fRawData)[fNHits]) R3BStarTrackRawHit(module_id, side, asic_id, strip_id, adcData, lclock);
@@ -290,8 +301,8 @@ Bool_t R3BStarTrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 		  fNHits++;
 
 		  // Resetting:
-       		  adcData=0;
-      		  ts_lb=0;
+       		  //adcData=0;
+      		  //ts_lb=0;
 
 
 		} else

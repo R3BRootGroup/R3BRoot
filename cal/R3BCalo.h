@@ -41,6 +41,8 @@ class R3BCalo : public R3BDetector
     Int_t   volIdAlv;
     Int_t   cpAlv;
     Int_t   cpCry;
+
+    Double_t density;
   };
 
   /** Default constructor **/
@@ -183,11 +185,14 @@ class R3BCalo : public R3BDetector
     TClonesArray*  fCaloCrystalHitCollection;    //!  The crystal hit collection
 
     //! Defining functions for energy to light output calculation
-    TF1 *tf_p_dNs;    //!
-    TF1 *tf_p_dNf;    //!
-    TF1 *tf_g_dNs;    //!
-    TF1 *tf_g_dNf;    //!
-	
+//    TF1 *tf_p_dNs;    //!
+//    TF1 *tf_p_dNf;    //!
+//    TF1 *tf_g_dNs;    //!
+//    TF1 *tf_g_dNf;    //!
+
+    TF1 *tf_dNf_dE; //!
+    TF1 *tf_dNs_dE; //!
+
     // Selecting the geometry of the CALIFA calorimeter
     Int_t fGeometryVersion;
     // Adding some non-uniformity preliminary description
@@ -235,7 +240,7 @@ class R3BCalo : public R3BDetector
 
     Bool_t GetCrystalInfo(sCrystalInfo &info);
 
-    ClassDef(R3BCalo,3);
+    ClassDef(R3BCalo,4);
 };
 
 inline void R3BCalo::ResetParameters() {

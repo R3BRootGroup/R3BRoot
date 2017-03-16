@@ -1,0 +1,43 @@
+# #------------------------------------------------
+# The Virtual Monte Carlo examples
+# Copyright (C) 2007 - 2016 Ivana Hrivnacova
+# All rights reserved.
+#
+# For the licensing terms see geant4_vmc/LICENSE.
+# Contact: root-vmc@cern.ch
+#-------------------------------------------------
+
+#
+# Geant4 configuration macro for Garfield example
+# (called from Root macro g4Config.C)
+
+/mcVerbose/all 0
+/mcVerbose/runAction 1
+/mcVerbose/composedPhysicsList 2
+#/mcVerbose/physicsEmModel 2
+#/mcVerbose/physicsFastSimulation 2
+#/mcVerbose/modelConfigurationManager 2
+#/mcVerbose/composedPhysicsList 2
+#/mcVerbose/runManager 2
+#/mcVerbose/geometryManager 2
+
+#/tracking/verbose 1
+
+/control/cout/ignoreThreadsExcept 0
+
+# override default G4 production cuts table range
+/mcPhysics/productionCutsTableEnergyRange 100. eV  100. TeV
+
+# PAI ionization model configuration
+/mcPhysics/emModel/setEmModel PAI 
+/mcPhysics/emModel/setRegions ArCO2
+/mcPhysics/emModel/setParticles all 
+
+# Garfield simulation configuration
+/mcPhysics/fastSimulation/setModel garfieldModel
+/mcPhysics/fastSimulation/setParticles gamma e-
+/mcPhysics/fastSimulation/setRegions ArCO2
+
+# Garfield physics configuration
+/control/execute physics.in
+

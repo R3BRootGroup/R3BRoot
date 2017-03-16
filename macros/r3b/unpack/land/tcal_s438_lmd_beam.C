@@ -35,7 +35,7 @@ void run(TString runNumber)
     // ---------------------------------------------------------------------------
 
     // Time calibration ----------------------------------------------------------
-    R3BLandTcal* landTcal = new R3BLandTcal("LandTcal", 1);
+    R3BNeulandMapped2Cal* landTcal = new R3BNeulandMapped2Cal("NeulandMapped2Cal", 1);
     landTcal->SetNofModules(nModules, 40);
     landTcal->SetTrigger(1);
     run->AddTask(landTcal);
@@ -52,6 +52,7 @@ void run(TString runNumber)
 
     // Run -----------------------------------------------------------------------
     run->Run();
+    delete run;
     // ---------------------------------------------------------------------------
 
     timer.Stop();

@@ -3,7 +3,6 @@
 //
 //
 
-
 {
   TStopwatch timer;
   timer.Start();
@@ -11,8 +10,8 @@
 
   // Run over all events  (or blocks)
   Int_t nev = -1;
-  //Int_t nev =2;
- 
+  //nev=100931731456; 
+
   const char *outputFileName = "startrack_raw_data.root";
   const Long64_t maxSize = 1 * 1024 * 1024 * 1024; // GBytes
   
@@ -36,16 +35,17 @@
   //source->AddFile("/scratch/xry76555/R3B-data/GSIdata/run290_3777.lmd");  // !! Si only with Type =104, SubType=10400  - CH2 target
   //source->AddFile("/MIDAS/R3B/GSITest2014/lmd/sitracker_stripped.lmd");  // !! Si only with Type =104, SubType=10400
  
-//  char* strCalDir = "/home/work/example/";
+ //  char* strCalDir = "/home/work/example/";
 
 // TODO: set proper values to the variable below when the binary file is from GSI MBS DAQ is used.
 // To be checked:
   Short_t type = 104;
   Short_t subType = 10400;
   Short_t procId = 1; 
-  //Short_t subCrate = -1; // All sub-crates
-  Short_t subCrate = 0; // All sub-crates
-  Short_t control = 37;
+  Short_t subCrate = -1; // All sub-crates
+  //Short_t subCrate = 0; // All sub-crates
+  //Short_t subCrate = 20; // All sub-crates
+   Short_t control = 37;
 
 
   source->AddUnpacker(new R3BStarTrackUnpack("", type, subType,
@@ -104,6 +104,7 @@
  
   // Run -----------------------------------------------------------------------
   run->Run(nev, 0);
+  delete run;
   // ---------------------------------------------------------------------------
 
 

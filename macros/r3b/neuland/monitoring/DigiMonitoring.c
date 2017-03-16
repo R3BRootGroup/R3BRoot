@@ -32,6 +32,7 @@ void DigiMonitoring(
 
   run->Init();
   run->Run(0, num_events);
+  delete run;
 
 
   timer.Stop();

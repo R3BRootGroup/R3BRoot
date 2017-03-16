@@ -142,7 +142,7 @@ class R3BXBall : public R3BDetector
   virtual Bool_t CheckIfSensitive(std::string name);
 
   virtual void Initialize();
-  virtual void SetSpecialPhysicsCuts() {}
+  virtual void SetSpecialPhysicsCuts();
 
 
   /** Public method DrawCrystals

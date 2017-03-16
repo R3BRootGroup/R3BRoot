@@ -18,7 +18,7 @@
 #include "headers.hh"
 #include "info.hh"
 
-void run()
+void run(char *fname)
 {
 	//------- Output tree ----------
 	TFile file("quasi.root","RECREATE");
@@ -50,7 +50,7 @@ void run()
 
 	//Output text file for R3BROOT event generator
 	ofstream outfile,outfile_ascii;
-	outfile.open("quasi.out");
+	outfile.open(fname);
 	outfile_ascii.open("quasi_ascii.out");
 	char tooutfile[300];
 
@@ -348,9 +348,16 @@ double get_T(double sm, double max)
 	return (Trand*1000000); // returning value in MeV
 }
 
-int main()
+int main(int argc, char **argv)
 {
-	run();
-	return 0;
+  if(argc != 2)
+  {
+    run("quasi.out");
+  }
+  else
+  {
+    run(argv[1]);
+  }
+  return 0;
 }
 

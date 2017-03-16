@@ -107,11 +107,11 @@ void TPstyle()
   gStyle->SetFrameFillColor(10);
   gStyle->SetFrameBorderSize(1);
   //gStyle->SetFrameBorderMode(-1);
-  gStyle->SetFrameLineWidth(1.2);
+  gStyle->SetFrameLineWidth(1);
   gStyle->SetFrameLineColor(1);
 
   gStyle->SetHistFillColor(0);
-  gStyle->SetHistLineWidth(1.2);
+  gStyle->SetHistLineWidth(1);
   gStyle->SetHistLineColor(1);
 
   gStyle->SetPadColor(10);

@@ -20,13 +20,15 @@
 #   hadronic: elastic, binary, binary_ion, gamma_nuc, 
 #
 #/R3B/phys/addPhysics standard
-#/R3B/phys/addPhysics lowenergy
-/R3B/phys/addPhysics penelope
+/R3B/phys/addPhysics lowenergy
+#/R3B/phys/addPhysics penelope
 /R3B/phys/addPhysics decay
 /R3B/phys/addPhysics elastic
 #/R3B/phys/addPhysics binary
 /R3B/phys/addPhysics binary_ion
 /R3B/phys/addPhysics gamma_nuc
+#/R3B/phys/addPhysics qgsp_bert 
+#/R3B/phys/addPhysics qgsp_inclxx
 #/R3B/phys/stepMax 1. mm
 
 # Command to change the range cut threshold for electrons (Default is 1 mm):
@@ -49,7 +51,7 @@
 #/control/manual   
 #/control/createHTML  
 
-/run/particle/dumpCutValues
+#/run/particle/dumpCutValues
 
 # Limit max number of Cerenkov photons per step
 # (Needed as Cerenkov process does not limit step itself)

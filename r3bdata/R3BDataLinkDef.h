@@ -46,9 +46,7 @@
 #pragma link C++ class R3BTarget2pDigi+;
 #pragma link C++ class R3BSitrackerHit+;
 #pragma link C++ class R3BLandPoint+;
-#pragma link C++ class R3BNeuLandPoint+;
 #pragma link C++ class R3BNeutronTrack+;
-#pragma link C++ class R3BLandRawHit+;
 #pragma link C++ class R3BLandDigi+;
 #pragma link C++ class R3BLandFirstHits+;
 #pragma link C++ class R3BLandHit+;
@@ -58,6 +56,30 @@
 #pragma link C++ class R3BMfiDigi+;
 #pragma link C++ class R3BPspPoint+;
 #pragma link C++ class R3BPspDigi+;
+#pragma link C++ class R3BNeulandMappedData+;
+#pragma link C++ class R3BNeulandPoint+;
+#pragma link C++ class R3BNeulandDigi+;
+#pragma link C++ class R3BNeulandPixel+;
+#pragma link C++ class R3BNeulandCluster+;
+#pragma link C++ class R3BNeulandNeutron+;
+#pragma link C++ class R3BPspxMappedData+;
+#pragma link C++ class R3BPspxCalData+;
+#pragma link C++ class R3BPspxHitData+;
+#pragma link C++ class R3BLosMappedData+;
+#pragma link C++ class R3BLosCalData+;
+#pragma link C++ class R3BLosHitData+;
+#pragma link C++ class R3BPaddleTamexMappedData+;
+#pragma link C++ class R3BPaddleCalData+;
+#pragma link C++ class R3BTofdHitData+;
+#pragma link C++ class R3BNeulandCalData+;
+#pragma link C++ class R3BActarPoint+;
+#pragma link C++ class R3BStrawtubesMappedData+;
+#pragma link C++ class R3BStrawtubesCalData+;
+#pragma link C++ class R3BStrawtubesHitData+;
+#pragma link C++ class R3BFi4MappedItem+;
+#pragma link C++ class R3BFi4CalItem+;
+#pragma link C++ class R3BFi4HitItem+;
+
 
 #endif
 

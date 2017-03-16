@@ -1,4 +1,4 @@
-void preCalibr(Int_t nNeutrons, Int_t nEvents = 10000, Int_t beamE, Int_t Erel)
+void preCalibr(Int_t nNeutrons = 4, Int_t nEvents = 100, Int_t beamE = 600, Int_t Erel = 500)
 {
   Int_t d;
   if(Erel == 100) {
@@ -38,7 +38,12 @@ void preCalibr(Int_t nNeutrons, Int_t nEvents = 10000, Int_t beamE, Int_t Erel)
   // ----- Connect the Digitization Task ---------------------------------------
   R3BLandDigitizer* landDigitizer  = new R3BLandDigitizer(0);
   landDigitizer->UseBeam(beamE);
+  landDigitizer->SetTOFRange(400.);
   fRun->AddTask(landDigitizer);
+
+  R3BLandDigitizerQA* landDigitizerQA = new R3BLandDigitizerQA();
+  landDigitizerQA->SetBeamEnergy(beamE);
+  fRun->AddTask(landDigitizerQA);
   // ---------------------------------------------------------------------------
 
 
@@ -71,6 +76,7 @@ void preCalibr(Int_t nNeutrons, Int_t nEvents = 10000, Int_t beamE, Int_t Erel)
   // ----- Intialise and run ---------------------------------------------------
   fRun->Init();
   fRun->Run(0, nEvents);
+  delete fRun;
   // ---------------------------------------------------------------------------
 
 
@@ -85,5 +91,7 @@ void preCalibr(Int_t nNeutrons, Int_t nEvents = 10000, Int_t beamE, Int_t Erel)
   cout << "Parameter file writen " << parFile << endl;
   cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << endl;
   cout << endl;
+  cout << " Test passed" << endl;
+  cout << " All ok " << endl;
   // ---------------------------------------------------------------------------
 }

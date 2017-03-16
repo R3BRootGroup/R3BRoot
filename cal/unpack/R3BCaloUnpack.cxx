@@ -302,6 +302,14 @@ Bool_t R3BCaloUnpack::DoUnpack(Int_t *data, Int_t size) {
     if (overflow & 0x78E)  error |= 1<<2; //11110001110  PID not valid
     if (num_pileup)        error |= 1<<3;
     
+    
+    // Most propably signed overflow
+      if(n_f < -16384)
+        n_f += 65536;
+      if(n_s < -16384)
+        n_s += 65536;
+
+
      // Generates crystalID out of  pc, crate, board, channel
      UShort_t crystal_id = pc_id * (max_channel*max_card*max_sfp_id)
                         + sfp_id * (max_channel*max_card)

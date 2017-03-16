@@ -8,9 +8,13 @@ TGeoRotation *fGlobalRot = new TGeoRotation();
 
 // Create a null translation
 TGeoTranslation *fGlobalTrans = new TGeoTranslation();
+fGlobalTrans->SetTranslation(0.0,0.0,0.0);
 TGeoRotation *fRefRot = NULL;
 
-TGeoManager*  gGeoMan = NULL;
+TGeoManager*   gGeoMan           = NULL;
+
+
+
 
 Double_t fThetaX = 0.;
 Double_t fThetaY = 0.;
@@ -24,13 +28,9 @@ Double_t fZ = 0.;
 Bool_t fLocalTrans = kFALSE;
 Bool_t fLabTrans = kTRUE;
 
-TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef);
 
 void create_startra_geo_v15(const char* geoTag)
 {
-
-  fGlobalTrans->SetTranslation(0.0,0.0,0.0);
-
   // -------   Load media from media file   -----------------------------------
   FairGeoLoader*    geoLoad = new FairGeoLoader("TGeo","FairGeoLoader");
   FairGeoInterface* geoFace = geoLoad->getGeoInterface();
@@ -173,7 +173,6 @@ void create_startra_geo_v15(const char* geoTag)
   //Double_t WidthMin1= 2.25;    // Max width of detector (cm)
   Double_t WidthMin1= 1.971;    // Max width of detector (cm) as final specs
   Double_t Thickness1= 0.005;  // Half thickness of detector (cm) as final specs  -> total thickness: 100um
-  //Double_t Thickness1= 0.0005;  // Half thickness of detector (cm) as final specs  -> total thickness: 100um
   //Double_t Thickness1= 0.015;  // Half thickness of detector (cm)   -> total thickness: 300um
   Double_t Length1=21.794;      // length of detector (cm) as final specs
   //Double_t Length1=19.03;      // length of detector (cm
@@ -1654,7 +1653,7 @@ void create_startra_geo_v15(const char* geoTag)
   TGeoCompositeShape *CBFrame_mid;
   CBFrame_mid= new TGeoCompositeShape("CBFrame_mid", "((((Amid:T0_mid-Bmid:T1_mid)-Cmid:T2_mid)-Dmid:T3_mid)-Emid:T4_mid)-Fmid:T5_mid");
   
-  TGeoVolume *STaRTraCBFrameLog2 = new TGeoVolume("CBFRAME_MID",CBFrame_out, pCarbonFibreMedium);
+  TGeoVolume *STaRTraCBFrameLog2 = new TGeoVolume("CBFRAME_MID",CBFrame_mid, pCarbonFibreMedium);
   
   gGeoManager->AddVolume(STaRTraCBFrameLog2);
   
@@ -1819,6 +1818,7 @@ void create_startra_geo_v15(const char* geoTag)
 
 
 
+
 TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef)
 {
   if (fLocalTrans == kTRUE ) {
@@ -1834,7 +1834,7 @@ TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef)
     Double_t yAxis[3] = { 0. , 1. , 0. };
     Double_t zAxis[3] = { 0. , 0. , 1. };
     // Reference Rotation
-    fRefRot = fRef->GetRotation();
+    fRefRot = fRef;
     
     if (fRefRot) {
       Double_t mX[3] = {0.,0.,0.};
@@ -1891,7 +1891,7 @@ TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef)
       TGeoCombiTrans c3;
       c3.SetRotation(pTmp->GetRotation());
       TGeoCombiTrans c4;
-      c4.SetRotation(fRefRot);
+      c4.SetRotation(fRefRot->GetRotation());
       
       TGeoCombiTrans ccc = c3 * c4;
       

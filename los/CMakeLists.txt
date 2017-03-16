@@ -12,7 +12,6 @@ set(INCLUDE_DIRECTORIES
 ${R3BROOT_SOURCE_DIR}/r3bbase 
 ${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/los
-${R3BROOT_SOURCE_DIR}/los/unpack
 ${R3BROOT_SOURCE_DIR}/r3bdb/losdb
 ${R3BROOT_SOURCE_DIR}/r3bdata/
 ${R3BROOT_SOURCE_DIR}/r3bdata/calData
@@ -21,6 +20,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
+${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
 ${R3BROOT_SOURCE_DIR}/tcal
 )
@@ -36,11 +36,9 @@ ${FAIRROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
-unpack/R3BLosUnpack.cxx
-unpack/R3BLosRawHit.cxx
-unpack/R3BLosHit.cxx
-unpack/R3BLosTcalFill.cxx
-unpack/R3BLosTcal.cxx
+R3BLosMapped2Cal.cxx
+R3BLosMapped2CalPar.cxx
+R3BLosCal2Hit.cxx
 )
 
 # fill list of header files from list of source files

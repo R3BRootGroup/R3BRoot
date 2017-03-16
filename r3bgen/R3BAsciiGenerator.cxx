@@ -141,6 +141,12 @@ Bool_t R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen) {
 	  char ionName[20];
 	  if(1 == iZ && 2 == iA) {
 	    sprintf(ionName, "Deuteron");
+	  } else if(1 == iZ && 3 == iA) {
+	    sprintf(ionName, "Triton");
+	  } else if(2 == iZ && 3 == iA) {
+	    sprintf(ionName, "HE3");
+	  } else if (2 == iZ && 4 == iA) {
+	    sprintf(ionName, "Alpha");
 	  } else {
 	    sprintf(ionName, "Ion_%d_%d", iA, iZ);
 	  }

@@ -17,6 +17,9 @@
 #pragma link C++ class R3BStarTrackUnpack+;
 #pragma link C++ class R3BStarTrackUnpackPar+;
 #pragma link C++ class R3BStarTrackRawAna+;
+#pragma link C++ class R3BStarTrackOrderTS+;
+#pragma link C++ class R3BStarTrackRecTS+;
+#pragma link C++ class R3BStarTrackOrderTS+;
 //#pragma link C++ class R3BStarTrackSortRawAna+;
 #pragma link C++ class R3BStarTrackRawHit+;
 
