@@ -1,12 +1,12 @@
 # Purpose
 
-The R3BRoot software is created based on the FairRoot framework and can be used to perform Monte Carlo simulations and experimental data analysis of the R3B (Reactions with Relativistic Radioactive Beams) experiments in nuclear physics at the FAIR research center (Facility for Antiproton and Ion Research).
+The R3BRoot software is based on the FairRoot framework and can be used to perform Monte Carlo simulations and experimental data analysis of the R3B (Reactions with Relativistic Radioactive Beams) nuclear physics experiments at the FAIR research center (Facility for Antiproton and Ion Research).
 
-For the software-related user support post a new topic on our [forum](https://forum.gsi.de/index.php?t=index&cat=40&).
+For the software-related user support you can post a new topic on our [forum](https://forum.gsi.de/index.php?t=index&cat=40&).
 
 # Download
 
-~~~shell
+~~~bash
 git clone https://github.com/R3BRootGroup/R3BRoot.git
 cd R3BRoot
 git checkout dev
@@ -60,9 +60,9 @@ root -l r3bsim.root
 
 ~~~bash
 root -l run_digi.C
-[].q
+[] .q
 root -l r3bhits.root
-[]evt->StartViewer();
+[] evt->StartViewer();
 ~~~
 
 # Data Analysis
