@@ -3,30 +3,34 @@
 
 #include "TObject.h"
 
-// for the data analysis of the s438b PSPX detectors. 
-// Introduced by Ralf, Jan 2016
+/**
+ * Class containing PSPX detector data on Mapped level.
+ * Originally, this class was introduced for the analysis of s438b, but it also works for later experiments.
+ * @author Ralf Plag
+ * @since January 2016
+ */
 
 class R3BPspxMappedData : public TObject
 {
   public:
-    // Default Constructor
+    /** Default Constructor **/
     R3BPspxMappedData();
 
-    // Standard Constructor
+    /** Standard Constructor **/
     R3BPspxMappedData(UShort_t detector, UShort_t channel, UInt_t energy);
 
-    // Destructor
-    virtual ~R3BPspxMappedData() { }
+    /** Destructor **/
+    virtual ~R3BPspxMappedData() {}
 
     // Getters
     inline const UShort_t& GetDetector() const { return fDetector; }
-    inline const UShort_t& GetChannel()  const { return fChannel;  }
-    inline const UInt_t&  GetEnergy()   const { return fEnergy;   }
+    inline const UShort_t& GetChannel() const { return fChannel; }
+    inline const UInt_t& GetEnergy() const { return fEnergy; }
 
   private:
-    UShort_t fDetector; // 1..5
-    UShort_t fChannel;  // 1..65
-    UInt_t  fEnergy;   // 0xfff is energy data, Anything in 0xfffff000 indicates an error or overflow
+    UShort_t fDetector; /** Detector number, counting from 1 **/
+    UShort_t fChannel;  /** Channel number, counting from 1 **/
+    UInt_t fEnergy;     /**< Energy/Collected charge. **/
 
   public:
     ClassDef(R3BPspxMappedData, 2)

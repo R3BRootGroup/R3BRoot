@@ -63,6 +63,7 @@
 #pragma link C++ class R3BNeulandCluster+;
 #pragma link C++ class R3BNeulandNeutron+;
 #pragma link C++ class R3BPspxMappedData+;
+#pragma link C++ class R3BPspxPrecalData+;
 #pragma link C++ class R3BPspxCalData+;
 #pragma link C++ class R3BPspxHitData+;
 #pragma link C++ class R3BLosMappedData+;
@@ -82,4 +83,3 @@
 
 
 #endif
-

@@ -100,6 +100,7 @@ neulandData/R3BNeulandCluster.cxx
 neulandData/R3BNeulandNeutron.cxx
 neulandData/R3BNeulandPixel.cxx
 pspData/R3BPspxMappedData.cxx
+pspData/R3BPspxPrecalData.cxx
 pspData/R3BPspxCalData.cxx
 pspData/R3BPspxHitData.cxx
 losData/R3BLosMappedData.cxx
@@ -129,4 +130,3 @@ set(DEPENDENCIES
     Base FairTools)
 
 GENERATE_LIBRARY()
-

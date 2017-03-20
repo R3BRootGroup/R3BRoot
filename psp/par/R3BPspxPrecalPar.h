@@ -6,12 +6,12 @@
  *                  copied verbatim in the file "LICENSE"                       *
  ********************************************************************************/
 // -------------------------------------------------------------------------
-// -----               R3BPspxCalPar header file                   -----
-// -----                 Created 16/05/12  by I.Syndikus               -----
+// -----                R3BPspxPrecalPar header file                   -----
+// -----                 Created 17/03/13  by I.Syndikus               -----
 // -------------------------------------------------------------------------
 
-#ifndef R3BPSPXCALPAR_H
-#define R3BPSPXCALPAR_H
+#ifndef R3BPSPXPRECALPAR_H
+#define R3BPSPXPRECALPAR_H
 
 #include "FairParGenericSet.h"
 
@@ -24,28 +24,29 @@ class FairParIo;
 class FairParamList;
 
 /**
- * Class for Parameters for Precal2Cal Conversion for PSPX detector data.
+ * Class for Parameters for Mapped2Precal Conversion for PSPX detector data.
  * @author Ina Syndikus
- * @since May 12, 2016
+ * @since March 13, 2017
  */
 
-class R3BPspxCalPar : public FairParGenericSet
+class R3BPspxPrecalPar : public FairParGenericSet
 {
 
   public:
     /** Standard constructor **/
-    R3BPspxCalPar(const char* name = "R3BPspxCalPar",
-                  const char* title = "Pspx CAL parameters",
-                  const char* context = "Default");
+    R3BPspxPrecalPar(const char* name = "R3BPspxPrecalPar",
+                     const char* title = "Pspx PRECAL parameters",
+                     const char* context = "Default");
 
     /** Destructor **/
-    virtual ~R3BPspxCalPar();
+    virtual ~R3BPspxPrecalPar();
 
     // Getter & Setter
-    inline const Int_t& GetPspxParDetector() const { return pspxcalpardetector; }
-    inline const TArrayI& GetPspxParStrip() const { return pspxcalparstrip; }
-    inline const TArrayI& GetPspxParOrientation() const { return pspxcalparorientation; }
-    inline const TArrayF& GetPspxParGain() const { return pspxcalpargain; }
+    inline const Int_t& GetPspxParDetector() const { return pspxprecalpardetector; }
+    inline const TArrayI& GetPspxParStrip() const { return pspxprecalparstrip; }
+    inline const TArrayI& GetPspxParOrientation() const { return pspxprecalparorientation; }
+    inline const TArrayF& GetPspxParGain() const { return pspxprecalpargain; }
+    inline const TArrayI& GetPspxParEnergyThreshold() const { return pspxprecalparenergythreshold; }
 
     // Initialisation from input device
     // virtual Bool_t init(FairParIo* input);
@@ -65,15 +66,16 @@ class R3BPspxCalPar : public FairParGenericSet
     Bool_t getParams(FairParamList*);
 
   private:
-    Int_t pspxcalpardetector;      //
-    TArrayI pspxcalparstrip;       //
-    TArrayI pspxcalparorientation; //
-    TArrayF pspxcalpargain;        //
+    Int_t pspxprecalpardetector;          //
+    TArrayI pspxprecalparstrip;           //
+    TArrayI pspxprecalparorientation;     //
+    TArrayF pspxprecalpargain;            //
+    TArrayI pspxprecalparenergythreshold; //
 
-    R3BPspxCalPar(const R3BPspxCalPar&);
-    R3BPspxCalPar& operator=(const R3BPspxCalPar&);
+    R3BPspxPrecalPar(const R3BPspxPrecalPar&);
+    R3BPspxPrecalPar& operator=(const R3BPspxPrecalPar&);
 
-    ClassDef(R3BPspxCalPar, 3);
+    ClassDef(R3BPspxPrecalPar, 1);
 };
 
 #endif
