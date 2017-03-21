@@ -3,9 +3,8 @@
 
 #include "FairDetector.h"
 
-#include "TObject.h"
-#include "TVector3.h"
-#include "TGeoMatrix.h"
+class TVector3;
+class TGeoRotation;
 
 class R3BDetector : public FairDetector
 {
@@ -20,20 +19,26 @@ class R3BDetector : public FairDetector
     /** Destructor **/
     virtual ~R3BDetector();
 
+    /**construct geometry from root files (TGeo)*/
+    virtual void ConstructRootGeometry();
+    
     /** Transformation **/
-    void SetRotAnglesEuler(Double_t phi, Double_t theta, Double_t psi);
-    void SetRotAnglesXYZ(Double_t xx, Double_t yy, Double_t zz);
-    void SetTranslation(Double_t tx, Double_t ty, Double_t tz);
-
-    TGeoRotation* GetGlobalRot()
-    {
-        return fGlobalRot;
-    }
-    TGeoTranslation* GetGlobalTrans()
-    {
-        return fGlobalTrans;
-    }
-    TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans* fRef = NULL);
+    
+    /**
+     * Method to setup the position of the detector-origin.
+     * @param x The x-position of the detector origin
+     * @param y The x-position of the detector origin
+     * @param z The x-position of the detector origin
+     */
+    void SetPosition(Double_t x, Double_t y, Double_t z);
+    
+    /**
+     * Method to setup the rotation of the detector around the x-,y- and z-axis.
+     * @param x_deg The rotation around the x-Axis in degrees. This will be executed first.
+     * @param y_deg The rotation around the y-Axis in degrees. This will be executed second.
+     * @param z_deg The rotation around the z-Axis in degrees. This will be executed last.
+     */
+    void SetRotation(Double_t x_deg, Double_t y_deg, Double_t z_deg);
 
     inline void SetEnergyCut(Double_t cutE)
     {
@@ -48,23 +53,12 @@ class R3BDetector : public FairDetector
     }
 
   protected:
-    TGeoRotation* fGlobalRot;
-    TGeoTranslation* fGlobalTrans;
-    TGeoCombiTrans* fRefRot;
-
-    Double_t fThetaX;
-    Double_t fThetaY;
-    Double_t fThetaZ;
-
-    Bool_t fLabTrans;
-    Bool_t fLocalTrans;
-
-    Double_t fX, fY, fZ;
-    Double_t fPhi, fTheta, fPsi;
-
+    TVector3* fPosition;
+    TGeoRotation* fRotation;
+    
     Double_t fCutE;
 
-    ClassDef(R3BDetector, 1)
+    ClassDef(R3BDetector, 2)
 };
 
 #endif
