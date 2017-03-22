@@ -129,8 +129,8 @@ void eliall(Int_t nEvents,
       ty    =  0.0; // (cm)
       tz    =  0.0; // (cm)
      //target->SetRotAnglesEuler(phi,theta,psi);
-     target->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-     target->SetTranslation(tx,ty,tz);
+     //target->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
+     //target->SetTranslation(tx,ty,tz);
       run->AddModule(target);
   }
 
