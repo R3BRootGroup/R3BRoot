@@ -55,6 +55,26 @@ class R3BCalo : public R3BDetector
    **/
   R3BCalo(const char* name, Bool_t active);
 
+  /** Standard constructor.
+   *@param name    detetcor name
+   *@param geoFile name of the ROOT geometry file
+   *@param active  sensitivity flag
+   *@param x       position in cave
+   *@param y       position in cave
+   *@param z       position in cave
+   *@param rot_x   rotation in cave
+   *@param rot_y   rotation in cave
+   *@param rot_z   rotation in cave
+   **/
+  R3BCalo(const char* name,
+          TString geoFile,
+          Bool_t active,
+          Float_t x = 0.,
+          Float_t y = 0.,
+          Float_t z = 0.,
+          Float_t rot_x = 0.,
+          Float_t rot_y = 0.,
+          Float_t rot_z = 0.);
 
   /** Destructor **/
   virtual ~R3BCalo();
@@ -240,7 +260,7 @@ class R3BCalo : public R3BDetector
 
     Bool_t GetCrystalInfo(sCrystalInfo &info);
 
-    ClassDef(R3BCalo,4);
+    ClassDef(R3BCalo,5);
 };
 
 inline void R3BCalo::ResetParameters() {

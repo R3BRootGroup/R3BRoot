@@ -72,6 +72,31 @@ R3BTra::R3BTra(const char* name, Bool_t active)
 }
 // -------------------------------------------------------------------------
 
+// -----   Standard constructor   ------------------------------------------
+R3BTra::R3BTra(const char* name,
+               TString geoFile,
+               Bool_t active,
+               Float_t x,
+               Float_t y,
+               Float_t z,
+               Float_t rot_x,
+               Float_t rot_y,
+               Float_t rot_z)
+: R3BDetector(name, active, kTRA)
+{
+    ResetParameters();
+    SetGeometryFileName(geoFile);
+    SetPosition(x, y, z);
+    SetRotation(rot_x, rot_y, rot_z);
+    fTraCollection = new TClonesArray("R3BTraPoint");
+    fPosIndex = 0;
+    kGeoSaved = kFALSE;
+    flGeoPar = new TList();
+    flGeoPar->SetName(GetName());
+    fVerboseLevel = 1;
+}
+// -------------------------------------------------------------------------
+
 // -----   Destructor   ----------------------------------------------------
 R3BTra::~R3BTra()
 {

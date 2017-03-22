@@ -94,6 +94,36 @@ R3BXBall::R3BXBall(const char* name, Bool_t active)
 // -------------------------------------------------------------------------
 
 
+// -----   Standard constructor   ------------------------------------------
+R3BXBall::R3BXBall(const char* name,
+                   TString geoFile,
+                   Bool_t active,
+                   Float_t x,
+                   Float_t y,
+                   Float_t z,
+                   Float_t rot_x,
+                   Float_t rot_y,
+                   Float_t rot_z)
+: R3BDetector(name, active, kCAL) {
+    SetPosition(x, y, z);
+    SetRotation(rot_x, rot_y, rot_z);
+    SetGeometryFileName(geoFile);
+    ResetParameters();
+    fXBallCollection = new TClonesArray("R3BXBallPoint");
+    fXBallCrystalHitCollection = new TClonesArray("R3BXBallCrystalHitSim");
+    fPosIndex = 0;
+    kGeoSaved = kFALSE;
+    kDrawCrystals = kFALSE;
+    flGeoPar = new TList();
+    flGeoPar->SetName( GetName());
+    fVerboseLevel = 1;
+    fGeoVersion = 1;
+    fCollectionOption = 0;
+    fNonUniformity = 0.;
+}
+// -------------------------------------------------------------------------
+
+
 
 // -----   Destructor   ----------------------------------------------------
 R3BXBall::~R3BXBall() {

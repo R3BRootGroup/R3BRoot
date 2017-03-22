@@ -104,40 +104,27 @@ void create_mtof_geo(const char* geoTag)
   dx = -155.824045;//dE tracker, correction due to wrong angle
   dy = 0.523976;
   dz = 761.870346;
-  
-  // Rotation:
-  thx = -106.700000;    phx = 0.000000;
-  thy = 90.000000;    phy = 90.000000;
-  thz = -16.700000;    phz = 0.000000;
-  
-  /*    dx = -171.1;
+
+/*    dx = -171.1;
    dy = 2.400000;
    dz = 548.95;
-   // dz = 0.;
-   // Rotation:
-   thx = -121.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = -31.000000;    phz = 0.000000;*/
+   // dz = 0.;*/
   
-  TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
+  TGeoRotation *pMatrix3 = new TGeoRotation();
   TGeoCombiTrans*
   pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
-  
+
   /*
    // TRANSFORMATION MATRICES
    // Combi transformation:
    dx = 151.000000;
    dy = 0.000000;
    dz = 758.000000;
-   // Rotation:
-   thx = 106.700000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = 16.700000;    phz = 0.000000;
    TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
    TGeoCombiTrans*
    pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
    */
-  
+
   // Shape: World type: TGeoBBox
   TGeoVolume* pWorld = gGeoManager->GetTopVolume();
   pWorld->SetVisLeaves(kTRUE);

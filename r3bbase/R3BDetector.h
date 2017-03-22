@@ -16,6 +16,19 @@ class R3BDetector : public FairDetector
      **/
     R3BDetector(const char* Name, Bool_t Active, Int_t detId = 0);
 
+    /** Constructor with arguments
+     **/
+    R3BDetector(const char* Name,
+                TString geoFile,
+                Bool_t Active,
+                Float_t x = 0.,
+                Float_t y = 0.,
+                Float_t z = 0.,
+                Float_t rot_x = 0.,
+                Float_t rot_y = 0.,
+                Float_t rot_z = 0.,
+                Int_t detId = 0);
+
     /** Destructor **/
     virtual ~R3BDetector();
 

@@ -132,7 +132,7 @@ class R3BdTof : public R3BDetector
      **/
     void ResetParameters();
 
-    ClassDef(R3BdTof, 1);
+    ClassDef(R3BdTof, 2);
 };
 
 inline void R3BdTof::ResetParameters()

@@ -59,9 +59,34 @@ R3BmTof::R3BmTof()
 
 // -----   Standard constructor   ------------------------------------------
 R3BmTof::R3BmTof(const char* name, Bool_t active)
+: R3BDetector(name, active, kMTOF)
+{
+    ResetParameters();
+    fmTofCollection = new TClonesArray("R3BmTofPoint");
+    fPosIndex = 0;
+    kGeoSaved = kFALSE;
+    flGeoPar = new TList();
+    flGeoPar->SetName(GetName());
+    fVerboseLevel = 1;
+}
+// -------------------------------------------------------------------------
+
+// -----   Standard constructor   ------------------------------------------
+R3BmTof::R3BmTof(const char* name,
+                 TString geoFile,
+                 Bool_t active,
+                 Float_t x,
+                 Float_t y,
+                 Float_t z,
+                 Float_t rot_x,
+                 Float_t rot_y,
+                 Float_t rot_z)
     : R3BDetector(name, active, kMTOF)
 {
     ResetParameters();
+    SetGeometryFileName(geoFile);
+    SetPosition(x, y, z);
+    SetRotation(rot_x, rot_y, rot_z);
     fmTofCollection = new TClonesArray("R3BmTofPoint");
     fPosIndex = 0;
     kGeoSaved = kFALSE;

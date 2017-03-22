@@ -29,6 +29,25 @@ class R3BGfi : public R3BDetector
      *@param active  sensitivity flag
      **/
     R3BGfi(const char* name, Bool_t active);
+    
+    /** Standard constructor.
+     *@param name    detector name
+     *@param geoFile name of the geometry version
+     *@param active  sensitivity flag
+     *@param x,y,z   position of station 1 and 2
+     *@param rot_y   rotation of station 1 and 2
+     **/
+    R3BGfi(const char* name,
+           TString geoFile,
+           Bool_t active,
+           Double_t x1,
+           Double_t y1,
+           Double_t z1,
+           Double_t rot_y1,
+           Double_t x2,
+           Double_t y2,
+           Double_t z2,
+           Double_t rot_y2);
 
     /** Destructor **/
     virtual ~R3BGfi();
@@ -117,6 +136,11 @@ class R3BGfi : public R3BDetector
     TClonesArray* fGfiCollection;   //!  The hit collection
     Bool_t kGeoSaved;               //!
     TList* flGeoPar;                //!
+    
+    TVector3 fPos1; //!
+    TVector3 fPos2; //!
+    TGeoRotation* fRot1; //!
+    TGeoRotation* fRot2; //!
 
     /** Private method AddHit
      **
@@ -139,7 +163,7 @@ class R3BGfi : public R3BDetector
      **/
     void ResetParameters();
 
-    ClassDef(R3BGfi, 1);
+    ClassDef(R3BGfi, 3);
 };
 
 inline void R3BGfi::ResetParameters()

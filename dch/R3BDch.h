@@ -33,6 +33,27 @@ class R3BDch : public R3BDetector
      **/
     R3BDch(const char* name, Bool_t active);
 
+    /** Standard constructor.
+     *@param name    detector name
+     *@param geoFile name of the geometry version
+     *@param active  sensitivity flag
+     *@param x,y,z   position of station 1 and 2
+     *@param rot_y,rot_z  rotation of station 1 and 2
+     **/
+    R3BDch(const char* name,
+           TString geoFile,
+           Bool_t active,
+           Double_t x1,
+           Double_t y1,
+           Double_t z1,
+           Double_t rot_y1,
+           Double_t rot_z1,
+           Double_t x2,
+           Double_t y2,
+           Double_t z2,
+           Double_t rot_y2,
+           Double_t rot_z2);
+
     /** Destructor **/
     virtual ~R3BDch();
 
@@ -146,6 +167,11 @@ class R3BDch : public R3BDetector
     Bool_t fDynamicStepSize;        //!
     // Sensitive Ref Node
     TGeoMatrix* refMatrix; //! Trans reference Node
+    
+    TVector3 fPos1; //!
+    TVector3 fPos2; //!
+    TGeoRotation* fRot1; //!
+    TGeoRotation* fRot2; //!
 
     /** Private method AddHit
      **
@@ -185,7 +211,7 @@ class R3BDch : public R3BDetector
      **/
     void ResetParameters();
 
-    ClassDef(R3BDch, 1);
+    ClassDef(R3BDch, 3);
 };
 
 inline void R3BDch::ResetParameters()

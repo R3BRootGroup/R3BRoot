@@ -13,6 +13,7 @@ class R3BMagnet : public R3BModule {
   
 public:
   R3BMagnet(const char * name, const char *Title="R3B Magnet");
+  R3BMagnet(const char * name, TString geoFile, const char *Title="R3B Magnet");
   R3BMagnet();
   virtual ~R3BMagnet();
   

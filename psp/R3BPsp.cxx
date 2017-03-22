@@ -59,6 +59,9 @@ R3BPsp::R3BPsp()
 // -----   Standard constructor   ------------------------------------------
 R3BPsp::R3BPsp(const char* name, Bool_t active)
     : R3BDetector(name, active, kPSP)
+    , fZ1(-221.)
+    , fZ2(-89.)
+    , fZ3(94.1)
 {
     ResetParameters();
     fPspCollection = new TClonesArray("R3BPspPoint");
@@ -67,6 +70,37 @@ R3BPsp::R3BPsp(const char* name, Bool_t active)
     flGeoPar = new TList();
     flGeoPar->SetName(GetName());
     fVerboseLevel = 1;
+}
+// -------------------------------------------------------------------------
+
+// -----   Standard constructor   ------------------------------------------
+R3BPsp::R3BPsp(const char* name,
+               TString geoFile,
+               Bool_t active,
+               Float_t x,
+               Float_t y,
+               Float_t z,
+               Float_t rot_x,
+               Float_t rot_y,
+               Float_t rot_z,
+               Float_t z1,
+               Float_t z2,
+               Float_t z3)
+    : R3BDetector(name, active, kPSP)
+    , fZ1(z1)
+    , fZ2(z2)
+    , fZ3(z3)
+{
+    ResetParameters();
+    fPspCollection = new TClonesArray("R3BPspPoint");
+    fPosIndex = 0;
+    kGeoSaved = kFALSE;
+    flGeoPar = new TList();
+    flGeoPar->SetName(GetName());
+    fVerboseLevel = 1;
+    SetGeometryFileName(geoFile);
+    SetPosition(x, y, z);
+    SetRotation(rot_x, rot_y, rot_z);
 }
 // -------------------------------------------------------------------------
 
@@ -326,6 +360,20 @@ void R3BPsp::ConstructGeometry()
     {
         LOG(INFO) << "Constructing PSP geometry from ROOT file " << fileName.Data() << FairLogger::endl;
         ConstructRootGeometry();
+
+        TGeoNode* psp_node = gGeoManager->GetTopVolume()->GetNode("PSPWorld_0");
+
+        TGeoNode* node = psp_node->GetVolume()->GetNode("PSP1LogWorld_1");
+        TGeoCombiTrans* combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
+        combtrans->SetDz(fZ1);
+
+        node = psp_node->GetVolume()->GetNode("PSP2LogWorld_2");
+        combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
+        combtrans->SetDz(fZ2);
+
+        node = psp_node->GetVolume()->GetNode("PSP3LogWorld_3");
+        combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
+        combtrans->SetDz(fZ3);
     }
     else
     {

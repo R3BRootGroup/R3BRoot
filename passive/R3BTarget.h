@@ -7,7 +7,16 @@
 
 class R3BTarget : public R3BModule {
 public:
-  R3BTarget(const char * name, const char *Title="R3B Target");
+  R3BTarget(const char* name, const char* Title = "R3B Target");
+  R3BTarget(const char* name,
+            TString geoFile,
+            Float_t x = 0.,
+            Float_t y = 0.,
+            Float_t z = 0.,
+            Float_t rot_x = 0.,
+            Float_t rot_y = 0.,
+            Float_t rot_z = 0.,
+            const char* Title = "R3B Target");
   R3BTarget();
   virtual ~R3BTarget();
 

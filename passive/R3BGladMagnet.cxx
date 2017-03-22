@@ -27,12 +27,15 @@ R3BGladMagnet::R3BGladMagnet()
 {
 }
 
-
-R3BGladMagnet::R3BGladMagnet(const char * name, const char *Title)
-  : R3BModule(name ,Title)
+R3BGladMagnet::R3BGladMagnet(const char* name, const char* Title)
+    : R3BModule(name, Title)
 {
 }
 
+R3BGladMagnet::R3BGladMagnet(const char* name, TString geoFile, const char* Title)
+    : R3BModule(name, Title, geoFile, 0., 0., 350. - 119.94)
+{
+}
 
 void R3BGladMagnet::ConstructGeometry()
 {

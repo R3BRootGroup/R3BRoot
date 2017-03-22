@@ -42,7 +42,33 @@ R3BModule::R3BModule( const Char_t* Name, const Char_t* title, Bool_t Active)
 {
 }
 
+// -----   Standard constructor   ------------------------------------------
+R3BModule::R3BModule(const char* Name,
+                     const char* title,
+                     TString geoFile,
+                     Float_t x,
+                     Float_t y,
+                     Float_t z,
+                     Float_t rot_x,
+                     Float_t rot_y,
+                     Float_t rot_z,
+                     Bool_t Active)
+    : FairModule(Name, title, Active)
+    , fPosition(NULL)
+    , fRotation(NULL)
+{
+    if (TMath::Abs(x) > 0. || TMath::Abs(y) > 0. || TMath::Abs(z) > 0.)
+    {
+        SetPosition(x, y, z);
+    }
 
+    if (TMath::Abs(rot_x) > 0. || TMath::Abs(rot_y) > 0. || TMath::Abs(rot_z) > 0.)
+    {
+        SetRotation(rot_x, rot_y, rot_z);
+    }
+
+    SetGeometryFileName(geoFile);
+}
 
 // -----   Destructor   ----------------------------------------------------
 R3BModule::~R3BModule()

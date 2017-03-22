@@ -233,6 +233,74 @@ R3BCalo::R3BCalo(const char* name, Bool_t active)
 // -------------------------------------------------------------------------
 
 
+// -----   Standard constructor   ------------------------------------------
+R3BCalo::R3BCalo(const char* name,
+                 TString geoFile,
+                 Bool_t active,
+                 Float_t x,
+                 Float_t y,
+                 Float_t z,
+                 Float_t rot_x,
+                 Float_t rot_y,
+                 Float_t rot_z)
+    : R3BDetector(name, active, kCALIFA)
+{
+    ResetParameters();
+    fCrystal = NULL;
+    fCaloCollection = new TClonesArray("R3BCaloPoint");
+    fCaloCrystalHitCollection = new TClonesArray("R3BCaloCrystalHitSim");
+    fPosIndex = 0;
+    kGeoSaved = kFALSE;
+    flGeoPar = new TList();
+    flGeoPar->SetName( GetName());
+    fVerboseLevel = 1;
+    fNonUniformity = 0.;
+    fGeometryVersion = 1;
+
+    SetGeometryFileName(geoFile);
+    SetPosition(x, y, z);
+    SetRotation(rot_x, rot_y, rot_z);
+
+//  tf_p_dNs = new TF1("tf_p_dNs","-[0]*[1]*exp(-[1]*(x-[3]))+[2]",0,1000);
+//  tf_p_dNf = new TF1("tf_p_dNf","-[0]*[1]*exp(-[1]*(x-[3]))+[2]",0,1000);
+//  tf_g_dNs = new TF1("tf_g_dNs","[2]",0,1000);
+//  tf_g_dNf = new TF1("tf_g_dNf","[2]",0,1000);
+//
+//  tf_p_dNs->SetParameter(0,18.88 / 7.46);
+//  tf_p_dNs->SetParameter(1,0.0868);
+//  tf_p_dNs->SetParameter(2,4.228 / 7.46);
+//  tf_p_dNs->SetParameter(3,0);
+//
+//  tf_p_dNf->SetParameter(0,-18.88 / 7.46);
+//  tf_p_dNf->SetParameter(1,0.0868);
+//  tf_p_dNf->SetParameter(2,3.232 / 7.46);
+//  tf_p_dNf->SetParameter(3,0);
+//
+//  // tf_p_dNs->SetParameter(0,18.88);
+//  // tf_p_dNs->SetParameter(1,0.0868);
+//  // tf_p_dNs->SetParameter(2,4.228);
+//  // tf_p_dNs->SetParameter(3,4.117);
+//  // tf_p_dNs->SetParameter(4,4.259);
+//
+//  // tf_p_dNf->SetParameter(0,-32.66);
+//  // tf_p_dNf->SetParameter(1,0.07729);
+//  // tf_p_dNf->SetParameter(2,3.155);
+//  // tf_p_dNf->SetParameter(3,0);
+//  // tf_p_dNf->SetParameter(4,-3.947);
+//
+//  tf_g_dNs->SetParameter(2, tf_p_dNs->GetParameter(2));
+//  tf_g_dNf->SetParameter(2, tf_p_dNf->GetParameter(2));
+
+    tf_dNf_dE = new TF1("tf_dNf_dE", "1./([0]+[1]*(x^[2])+[3]/(x^[4]))");
+    tf_dNs_dE = new TF1("tf_dNs_dE", "1./([0]+[1]*(x^[2])+[3]/(x^[4]))");
+
+    tf_dNf_dE->SetParameters(-1.79, 1.36e-2, 7.84e-1, 4.97, 1.75e-1);
+    tf_dNs_dE->SetParameters(-1.24e2, 6.3e-3, 1.27, 1.262e2, 2.3e-3);
+
+}
+// -------------------------------------------------------------------------
+
+
 
 // -----   Destructor   ----------------------------------------------------
 R3BCalo::~R3BCalo()
