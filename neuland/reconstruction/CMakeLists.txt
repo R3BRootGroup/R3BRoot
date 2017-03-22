@@ -8,7 +8,7 @@ set(SRCS
 	ReconstructionEngine.cxx
 	Reconstruction2DCalibr.cxx
 	ReconstructionEGate.cxx
-	ReconstructionNeuralNetworkMultiplicity.cxx
+	# ReconstructionNeuralNetworkMultiplicity.cxx
 )
 change_file_extension(*.cxx *.h HEADERS "${SRCS}")
 
