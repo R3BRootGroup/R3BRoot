@@ -32,7 +32,7 @@ void Land_cosmic1_test(){
     // ---------------------------------------------------------------------------
 
     // Run -----------------------------------------------------------------------
-    run->Run(0, 2500000);
+    run->Run(0, 500000);
     rtdb->saveOutput();
     // ---------------------------------------------------------------------------
 
@@ -66,7 +66,7 @@ void Land_cosmic1_test(){
 	conOffset = arbSync1 - tSync1;
     }
     
-    if(par->GetNumModulePar() < cosmics->Planes*50*2 ){ // all have to be calibrated
+    if(par->GetNumModulePar() < cosmics->Planes*50*2*0.9 ){ // more than 90% have to be calibrated
       cout  << "Not enough PMTs calibrated!" << endl;
       failed = kTRUE;
     }  

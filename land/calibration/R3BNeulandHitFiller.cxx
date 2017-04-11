@@ -1,5 +1,5 @@
 #include "R3BNeulandHitFiller.h"
-#include "TRandom1.h"
+#include "TRandom3.h"
 #include "TVector3.h"
 #include "TMath.h"
 #include "TClonesArray.h"
@@ -13,7 +13,7 @@
 R3BNeulandHitFiller::R3BNeulandHitFiller()
 {
   data = new TClonesArray("R3BNeulandCalData", 100);
-  r = new TRandom1(0);
+  r = new TRandom3(0);
   r->SetSeed(1);
   
   for(Int_t i = 0; i < _nPlanes; i++)
