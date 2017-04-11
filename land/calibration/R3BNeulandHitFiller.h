@@ -6,7 +6,7 @@
 #include "FairTask.h"
 
 class TClonesArray;
-class TRandom1;
+class TRandom3;
 class TVector3;
 
 class R3BNeulandHitFiller : public FairTask{
@@ -32,7 +32,7 @@ class R3BNeulandHitFiller : public FairTask{
 	TVector3 getDirection();
 	
 	TClonesArray* data;
-	TRandom1* r;
+	TRandom3* r;
 	Int_t nData;
 	
     public:
