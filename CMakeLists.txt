@@ -257,7 +257,7 @@ endif(ucesb_FOUND)
 
 find_package(Garfield)
 
-Generate_Version_Info()
+R3B_Generate_Version_Info()
 
 # Recurse into the given subdirectories.  This does not actually
 # cause another cmake executable to run.  The same process will walk through
