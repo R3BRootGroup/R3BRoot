@@ -43,3 +43,14 @@ MACRO (ROOT_GENERATE_DICTIONARY_OLD_EXTRA INFILES LINKDEF_FILE OUTFILE INCLUDE_D
 
 ENDMACRO (ROOT_GENERATE_DICTIONARY_OLD_EXTRA)
 
+
+Macro (R3B_Generate_Version_Info)
+  Add_Custom_Target(svnheader ALL)
+
+  Add_Custom_Command(TARGET svnheader
+                     COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
+                     -DBINARY_DIR=${CMAKE_BINARY_DIR}
+                     -DINCLUDE_OUTPUT_DIRECTORY=${INCLUDE_OUTPUT_DIRECTORY}
+                     -P ${CMAKE_SOURCE_DIR}/cmake/modules/R3BGenerateVersionInfo.cmake
+                    )
+EndMacro (Generate_Version_Info)
