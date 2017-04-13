@@ -53,4 +53,4 @@ Macro (R3B_Generate_Version_Info)
                      -DINCLUDE_OUTPUT_DIRECTORY=${INCLUDE_OUTPUT_DIRECTORY}
                      -P ${CMAKE_SOURCE_DIR}/cmake/modules/R3BGenerateVersionInfo.cmake
                     )
-EndMacro (Generate_Version_Info)
+EndMacro (R3B_Generate_Version_Info)
