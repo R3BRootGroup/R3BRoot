@@ -27,15 +27,15 @@ class R3BPspxReader : public R3BReader
     Bool_t ReInit();
     void SetParContainers();
     Bool_t Read();
-    void Reset(); /** Reset the output array **/
+    void Reset(); /**< Reset the output array **/
 
   private:
-    EXT_STR_h101_PSP* fData;    /** Reader specific data structure from ucesb **/
-    UInt_t fOffset;             /** Data Offset **/
-    FairLogger* fLogger;        /** FairLogger **/
-    TClonesArray* fMappedItems; /** Array holding output (Mapped) data **/
+    EXT_STR_h101_PSP* fData;    /**< Reader specific data structure from ucesb */
+    UInt_t fOffset;             /**< Data Offset */
+    FairLogger* fLogger;        /**< FairLogger */
+    TClonesArray* fMappedItems; /**< Array holding output (Mapped) data */
 
-    R3BPspxMappedPar* fMappedPar; /** Parameter instance holding number of detectors & strips. **/
+    R3BPspxMappedPar* fMappedPar; /**< Parameter instance holding number of detectors & strips. */
 
   public:
     ClassDef(R3BPspxReader, 2);
