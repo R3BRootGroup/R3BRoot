@@ -28,9 +28,9 @@ class R3BPspxMappedData : public TObject
     inline const UInt_t& GetEnergy() const { return fEnergy; }
 
   private:
-    UShort_t fDetector; /** Detector number, counting from 1 **/
-    UShort_t fChannel;  /** Channel number, counting from 1 **/
-    UInt_t fEnergy;     /**< Energy/Collected charge. **/
+    UShort_t fDetector; /**< Detector number, counting from 1 */
+    UShort_t fChannel;  /**< Channel number, counting from 1 */
+    UInt_t fEnergy;     /**< Energy/Collected charge. */
 
   public:
     ClassDef(R3BPspxMappedData, 2)

@@ -37,9 +37,11 @@ void unpack_jun16_Xe_pspx(Int_t RunId = 111)
      const Int_t nev = 1000;
 
     /* Create source using ucesb for input ------------------ */
-
-    //  TString filename = "/home/huetchen/Desktop/sonja_x5/lmd/run" + runNumber + "_*.lmd";
+#ifdef RUN_ONLINE
+    TString filename = "/home/huetchen/Desktop/sonja_x5/lmd/run" + runNumber + "_*.lmd";
+#else
     TString filename = "/home/huetchen/Desktop/sonja_x5/root/run" + runNumber + "_pspx_mapped.root";
+#endif
     TString outputFileName = "/home/huetchen/Desktop/sonja_x5/root/run" + runNumber + "_pspx_all_test.root";
     TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW,PSPX";
     // TString ucesb_dir = getenv("UCESB_DIR");
@@ -51,7 +53,8 @@ void unpack_jun16_Xe_pspx(Int_t RunId = 111)
     TString parPspxPrecalFileName = "sDET_Xe_pspx_precal.par";
     TString parPspxCalFileName = "sDET_Xe_pspx_cal.par";
     TString parPspxHitFileName = "sDET_Xe_pspx_hit.par";
-/*
+
+#ifdef RUN_ONLINE
     EXT_STR_h101 ucesb_struct;
     R3BUcesbSource* source =
         new R3BUcesbSource(filename, ntuple_options, ucesb_path, &ucesb_struct, sizeof(ucesb_struct));
@@ -60,7 +63,7 @@ void unpack_jun16_Xe_pspx(Int_t RunId = 111)
     source->AddReader(new R3BUnpackReader((EXT_STR_h101_unpack*)&ucesb_struct.unpack, offsetof(EXT_STR_h101, unpack)));
     //  source->AddReader( new R3BLosReader ((EXT_STR_h101_LOS*)&ucesb_struct.los, offsetof(EXT_STR_h101, los)) );
     source->AddReader(new R3BPspxReader((EXT_STR_h101_PSP*)&ucesb_struct.psp, offsetof(EXT_STR_h101, psp)));
-*/
+#endif
 
     /* Create run ------------------------------------------- */
 #ifdef RUN_ONLINE

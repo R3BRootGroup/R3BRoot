@@ -44,10 +44,10 @@ class R3BPspxCal2Hit : public FairTask
 
   private:
     R3BEventHeader* fHeader; // do we need that?
-    TClonesArray* fCalItems; /** Array holding input (Cal) data **/
-    TClonesArray* fHitItems; /** Array holding output (Hit) data **/
+    TClonesArray* fCalItems; /**< Array holding input (Cal) data */
+    TClonesArray* fHitItems; /**< Array holding output (Hit) data */
 
-    R3BPspxHitPar* fHitPar; /** Parameter instance holding slopes and offsets **/
+    R3BPspxHitPar* fHitPar; /**< Parameter instance holding slopes and offsets */
     std::vector<vector<Float_t>> offset;
     std::vector<vector<Float_t>> slope;
     std::vector<Int_t> sign_x;

@@ -42,10 +42,10 @@ class R3BPspxPrecal2Cal : public FairTask
 
   private:
     R3BEventHeader* fHeader;    // do we need that?
-    TClonesArray* fPrecalItems; /** Array holding input (Precal) data **/
-    TClonesArray* fCalItems;    /** Array holding output (Cal) data **/
+    TClonesArray* fPrecalItems; /**< Array holding input (Precal) data */
+    TClonesArray* fCalItems;    /**< Array holding output (Cal) data */
 
-    R3BPspxCalPar* fCalPar; /** Parameter instance holding gain for energy correction **/
+    R3BPspxCalPar* fCalPar; /**< Parameter instance holding gain for energy correction */
     std::vector<vector<Float_t>> gain;
 
     // void CreateHistos();

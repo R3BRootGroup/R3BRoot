@@ -29,12 +29,12 @@ class R3BPspxCalData : public TObject
     inline const Float_t& GetEnergy2() const { return fEnergy2; }
 
   private:
-    UShort_t fDetector; /** Detector number, counting from 1 **/
-    UShort_t fStrip;    /** Strip number, counting from 1 **/
+    UShort_t fDetector; /**< Detector number, counting from 1 */
+    UShort_t fStrip;    /**< Strip number, counting from 1 */
     Float_t fEnergy1;   /**< Energy/Collected charge for odd channel corresponding to the strip. This value is gain
-                         corrected (Precal2Cal Energy Calibration).**/
+                         corrected (Precal2Cal Energy Calibration). */
     Float_t fEnergy2;   /**< Energy/Collected charge for even channel corresponding to the strip. This value is gain
-                         corrected (Precal2Cal Energy Calibration).**/
+                         corrected (Precal2Cal Energy Calibration). */
 
   public:
     ClassDef(R3BPspxCalData, 5)

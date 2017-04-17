@@ -44,10 +44,10 @@ class R3BPspxMapped2Precal : public FairTask
 
   private:
     R3BEventHeader* fHeader;    // do we need that?
-    TClonesArray* fMappedItems; /** Array holding input (Mapped) data **/
-    TClonesArray* fPrecalItems; /** Array holding output (Precal) data **/
+    TClonesArray* fMappedItems; /**< Array holding input (Mapped) data */
+    TClonesArray* fPrecalItems; /**< Array holding output (Precal) data */
 
-    R3BPspxPrecalPar* fPrecalPar; /** Parameter instance holding thresholds and gains for position correction **/
+    R3BPspxPrecalPar* fPrecalPar; /**< Parameter instance holding thresholds and gains for position correction */
     std::vector<vector<Float_t>> gain;
     std::vector<vector<Int_t>> energythreshold;
 
