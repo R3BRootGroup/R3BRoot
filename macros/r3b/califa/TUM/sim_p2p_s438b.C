@@ -135,8 +135,8 @@ Int_t sim_p2p_s438b(const char *path, int i){
    // Magnet Field definition
    Bool_t fR3BMagnet = kFALSE;
 	
-   // Including CaloHitFinder task (kFALSE by default)
-   Bool_t fCaloHitFinder = kTRUE; 
+   // Including CalifaHitFinder task (kFALSE by default)
+   Bool_t fCalifaHitFinder = kTRUE; 
 
    // Including StarTrackHitFinder task (kFALSE by default)
    Bool_t fStarTrackHitFinder = kFALSE;
@@ -152,7 +152,7 @@ Int_t sim_p2p_s438b(const char *path, int i){
 	  fGene,
 	  fUserPList,
 	  fR3BMagnet,
-	  fCaloHitFinder,
+	  fCalifaHitFinder,
 	  fStarTrackHitFinder,
 	  fMeasCurrent,
 	  OutFile,

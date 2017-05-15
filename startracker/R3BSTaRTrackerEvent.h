@@ -4,7 +4,7 @@
 #include <TObject.h>
 #include <TObjArray.h>
 #include "R3BSTaRTrackerHit.h"
-#include "../caloData/R3BCaloHit.h"
+#include "../califaData/R3BCalifaHitData.h"
 
 
 class R3BSTaRTrackerEvent : public TObject {
@@ -52,7 +52,7 @@ class R3BSTaRTrackerEvent : public TObject {
   Double_t fVtxPosition[3]; // primary vertex position
   Double_t fVtxError[3]; // primary vertex error
   TObjArray *fSTHits; // Hits in the Silicon Tracker (R3BSTaRTrackerHit), min 3 (1 track), or 6 (2 protons)
-  TObjArray *fCalifaHits; // CALIFA hit (R3BCaloHit)
+  TObjArray *fCalifaHits; // CALIFA hit (R3BCalifaHitData)
   TString fGeometryST; // geometry Silicon Tracker
 
   ClassDef(R3BSTaRTrackerEvent,1);

@@ -151,7 +151,7 @@ void r3ball(Int_t nEvents = 1,
 
   if (fDetList.FindObject("CALIFA") ) {
       // CALIFA Calorimeter
-      R3BDetector* calo = new R3BCalo("Califa", kTRUE);
+      R3BDetector* califa = new R3BCalifa("Califa", kTRUE);
       // Global position of the Module
       phi   =  0.0; // (deg)
       theta =  0.0; // (deg)
@@ -165,9 +165,9 @@ void r3ball(Int_t nEvents = 1,
       ty    =  0.0; // (cm)
       tz    =  0.0; // (cm)
       //calo->SetRotAnglesEuler(phi,theta,psi);
-      calo->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      calo->SetTranslation(tx,ty,tz);
-      run->AddModule(calo);
+      califa->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
+      califa->SetTranslation(tx,ty,tz);
+      run->AddModule(califa);
   }
 
   // Tracker

@@ -48,7 +48,7 @@ void califaUnpack_batch(TString inputFile="", Int_t firstFileNumber=-999, Int_t 
     Short_t subCrate = -1;
     Short_t control = 9;
     */
-    source->AddUnpacker(new R3BCaloUnpack("", type, subType, procId, subCrate, control));
+    source->AddUnpacker(new R3BCalifaUnpack("", type, subType, procId, subCrate, control));
     // ------------------------------------------------------
 
 
@@ -58,7 +58,7 @@ void califaUnpack_batch(TString inputFile="", Int_t firstFileNumber=-999, Int_t 
     // ---------------------------------------------------------------------------
 
     // Histograms ----------------------------------------------------------------
-    R3BCaloRawAna* rawAna = new R3BCaloRawAna();
+    R3BCalifaMappedDataAnalysis* rawAna = new R3BCalifaMappedDataAnalysis();
     run->AddTask(rawAna);
     // ---------------------------------------------------------------------------
 

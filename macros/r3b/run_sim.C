@@ -81,11 +81,11 @@ void run_sim()
     run->AddModule(new R3BSTaRTra("STaRTrack", "startra_v16-300_2layers.geo.root", kTRUE, 0., 0., 20.));
 
     // CALIFA
-    R3BCalo* calo = new R3BCalo("Califa", "califa_10_v8.11.geo.root", kTRUE, 0., 0., 0.);
-    calo->SelectGeometryVersion(10);
+    R3BCalifa* califa = new R3BCalifa("Califa", "califa_10_v8.11.geo.root", kTRUE, 0., 0., 0.);
+    califa->SelectGeometryVersion(10);
     // Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
-    calo->SetNonUniformity(1.0);
-    run->AddModule(calo);
+    califa->SetNonUniformity(1.0);
+    run->AddModule(califa);
 
     // Tof
     run->AddModule(new R3BTof("Tof", "tof_v17a.geo.root", kTRUE, -417.359574, 2.400000, 960.777114, 0., -31., 0.));

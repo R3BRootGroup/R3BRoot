@@ -150,12 +150,12 @@ void r3ball(Int_t nEvents = 1,
   
   if (fDetList->FindObject("CALIFA") ) {
     // CALIFA Calorimeter
-    R3BDetector* calo = new R3BCalo("Califa", kTRUE);
-    ((R3BCalo *)calo)->SelectGeometryVersion(10);
+    R3BDetector* califa = new R3BCalifa("Califa", kTRUE);
+    ((R3BCalifa *)califa)->SelectGeometryVersion(10);
     //Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
-    ((R3BCalo *)calo)->SetNonUniformity(1.0);
-    calo->SetGeometryFileName(((TObjString*)fDetList->GetValue("CALIFA"))->GetString().Data());
-    run->AddModule(calo);
+    ((R3BCalifa *)califa)->SetNonUniformity(1.0);
+    califa->SetGeometryFileName(((TObjString*)fDetList->GetValue("CALIFA"))->GetString().Data());
+    run->AddModule(califa);
   }
 
   // Tracker

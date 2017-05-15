@@ -4,14 +4,14 @@
 #include <TVector3.h>
 #include <TMath.h>
 
-#include <R3BCaloGeometry.h>
+#include <R3BCalifaGeometry.h>
 
 void DzVsTheta()
 {
   double phi, theta, dz;
   TVector3 vStart(0,0,0), vDir;
 
-  R3BCaloGeometry *geo = R3BCaloGeometry::Instance(17);
+  R3BCalifaGeometry *geo = R3BCalifaGeometry::Instance(17);
 
   TH2I *dztheta = new TH2I("dztheta", "dz vs Theta", 360, 0, 180, 5000, 0, 25);
 

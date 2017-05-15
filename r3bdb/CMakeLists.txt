@@ -4,6 +4,5 @@
 
 if(FAIRDB_FOUND)
 add_subdirectory (commondb)
-add_subdirectory (caldb)
 endif(FAIRDB_FOUND)
 

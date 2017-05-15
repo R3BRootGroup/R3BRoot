@@ -5,7 +5,7 @@
 //         Last Update: 12/04/2012
 //         Comments:
 //			Runs the CALIFA Hit Finder. Outputs a root file with 
-//			a collection (TClonesArray) of R3BCaloHits
+//			a collection (TClonesArray) of R3BCalifaHits
 //
 //  -------------------------------------------------------------------------
 //
@@ -52,7 +52,7 @@ void califaAna_batch(Int_t nEvents=1, Int_t fGeoVer=1, Double_t fThres=0.000050,
 	
 	// -----  Analysis routines for CALIFA	
 	
-	R3BCaloHitFinder* caloHF = new R3BCaloHitFinder();
+	R3BCalifaCrystalCal2Hit* califaHF = new R3BCalifaCrystalCal2Hit();
 	//Selecting the geometry version
 	// 0- CALIFA 5.0, including BARREL and ENDCAP.
 	// 1- CALIFA 7.05, only BARREL
@@ -63,13 +63,13 @@ void califaAna_batch(Int_t nEvents=1, Int_t fGeoVer=1, Double_t fThres=0.000050,
 	// 6- CALIFA 7.09+7.17, (ongoing work)
 	// 10- CALIFA 8.11, only BARREL (ongoing work) 
 	// ...
-	caloHF->SelectGeometryVersion(fGeoVer);          
-	//caloHF->SelectGeometryVersion(10);          
-	caloHF->SetDetectionThreshold(fThres);             //50 KeV  [fThres in GeV]
-	caloHF->SetExperimentalResolution(fExpRes);        //5% at 1 MeV
-	caloHF->SetAngularWindow(fDelPolar,fDelAzimuthal); //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
+	califaHF->SelectGeometryVersion(fGeoVer);          
+	//califaHF->SelectGeometryVersion(10);          
+	califaHF->SetDetectionThreshold(fThres);             //50 KeV  [fThres in GeV]
+	califaHF->SetExperimentalResolution(fExpRes);        //5% at 1 MeV
+	califaHF->SetAngularWindow(fDelPolar,fDelAzimuthal); //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
 
-	fRun->AddTask(caloHF);
+	fRun->AddTask(califaHF);
 	
 	fRun->Init();                     
 	fRun->Run(0, nEvents);

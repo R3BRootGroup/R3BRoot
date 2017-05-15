@@ -21,7 +21,8 @@
 //                         Visualization, // kFalse or kTRUE
 //                         fMC ,        // "TGeant3" or "TGeant4"
 //                         fGenerator   // Generator type
-//                         fCaloHitFinder // Activate CaloHitFinder task
+//                         fCalifaHitFinder // Activate CalifaHitFinder task
+//                                          // CrystalCalData level to HitData level
 //
 //  -------------------------------------------------------------------------
 
@@ -35,7 +36,7 @@ void r3ball(Int_t nEvents = 1,
             TString fGenerator = "box",
             Bool_t fUserPList = kFALSE,
             Bool_t fR3BMagnet = kTRUE,
-            Bool_t fCaloHitFinder = kFALSE,
+            Bool_t fCalifaHitFinder = kFALSE,
             Bool_t fStarTrackHitFinder = kFALSE,
             Double_t fMeasCurrent = 2000.,
             TString OutFile = "r3bsim.root",
@@ -154,13 +155,13 @@ void r3ball(Int_t nEvents = 1,
   
   if (fDetList.FindObject("CALIFA") ) {
     // CALIFA Calorimeter
-    R3BDetector* calo = new R3BCalo("Califa", kTRUE);
-//    ((R3BCalo *)calo)->SelectGeometryVersion(0x438b);
-    ((R3BCalo *)calo)->SelectGeometryVersion(17);
+    R3BDetector* califa = new R3BCalifa("Califa", kTRUE);
+//    ((R3BCalifa *)califa)->SelectGeometryVersion(0x438b);
+    ((R3BCalifa *)califa)->SelectGeometryVersion(17);
     //Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
-    ((R3BCalo *)calo)->SetNonUniformity(.0);
-    calo->SetGeometryFileName(((TObjString*)fDetList.GetValue("CALIFA"))->GetString().Data());
-    run->AddModule(calo);
+    ((R3BCalifa *)califa)->SetNonUniformity(.0);
+    califa->SetGeometryFileName(((TObjString*)fDetList.GetValue("CALIFA"))->GetString().Data());
+    run->AddModule(califa);
   }
 
   // Tracker
@@ -435,17 +436,17 @@ void r3ball(Int_t nEvents = 1,
   FairLogger::GetLogger()->SetLogVerbosityLevel("LOW");
 
  
-  // ----- Initialize CaloHitFinder task ------------------------------------
-  if(fCaloHitFinder) {
-    R3BCaloHitFinder* caloHF = new R3BCaloHitFinder();
-    caloHF->SetClusteringAlgorithm(1,0);
-    caloHF->SetDetectionThreshold(0.000050);//50 KeV
-    caloHF->SetExperimentalResolution(6.);  //percent @ 1 MeV
-    //caloHF->SetComponentResolution(.25);    //sigma = 0.5 MeV
-    caloHF->SetPhoswichResolution(3.,5.);   //percent @ 1 MeV for LaBr and LaCl 
-    caloHF->SelectGeometryVersion(17);
-    caloHF->SetAngularWindow(0.25,0.25);      //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
-    run->AddTask(caloHF);
+  // ----- Initialize CalifaHitFinder task (CrystalCal to Hit) ------------------------------------
+  if(fCalifaHitFinder) {
+    R3BCalifaCrystalCal2Hit* califaHF = new R3BCalifaCrystalCal2Hit();
+    califaHF->SetClusteringAlgorithm(1,0);
+    califaHF->SetDetectionThreshold(0.000050);//50 KeV
+    califaHF->SetExperimentalResolution(6.);  //percent @ 1 MeV
+    //califaHF->SetComponentResolution(.25);    //sigma = 0.5 MeV
+    califaHF->SetPhoswichResolution(3.,5.);   //percent @ 1 MeV for LaBr and LaCl 
+    califaHF->SelectGeometryVersion(17);
+    califaHF->SetAngularWindow(0.25,0.25);      //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
+    run->AddTask(califaHF);
   }
 
   // ----- Initialize StarTrackHitfinder task ------------------------------------

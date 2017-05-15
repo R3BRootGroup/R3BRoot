@@ -237,17 +237,17 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 	
 	//Crystal Hits (input)
 	TClonesArray* crystalHitCA;  
-	R3BCaloCrystalHitSim** crystalHit;
-	crystalHitCA = new TClonesArray("R3BCaloCrystalHitSim",5);
-	TBranch *branchCrystalHit = TCrystal->GetBranch("CaloCrystalHitSim");
+	R3BCalifaCrystalCalDataSim** crystalHit;
+	crystalHitCA = new TClonesArray("R3BCalifaCrystalCalDataSim",5);
+	TBranch *branchCrystalHit = TCrystal->GetBranch("CalifaCrystalCalDataSim");
 	branchCrystalHit->SetAddress(&crystalHitCA);
 
 	//Calo Hits (output)
 	TClonesArray* caloHitCA;  
-	R3BCaloHitSim** caloHit;
-	caloHitCA = new TClonesArray("R3BCaloHitSim",5);
-	TBranch *branchCaloHit = TCalo->GetBranch("CaloHitSim");
-	branchCaloHit->SetAddress(&caloHitCA);
+	R3BCalifaHitDataSim** caloHit;
+	caloHitCA = new TClonesArray("R3BCalifaHitDataSim",5);
+	TBranch *branchCalifaHitData = TCalo->GetBranch("CalifaHitDataSim");
+	branchCalifaHitData->SetAddress(&caloHitCA);
 	
 	//MCTrack(input)
 	TClonesArray* MCTrackCA;  
@@ -293,17 +293,17 @@ void checkResults_batch(Int_t totalEvents=1, Int_t fGeoVer=1, Double_t threshold
 		MCtracksPerEvent = MCTrackCA->GetEntries();
 
 		if(crystalHitsPerEvent>0) {
-			crystalHit = new R3BCaloCrystalHitSim*[crystalHitsPerEvent];
+			crystalHit = new R3BCalifaCrystalCalDataSim*[crystalHitsPerEvent];
 			for(Int_t j=0;j<crystalHitsPerEvent;j++){
-				crystalHit[j] = new R3BCaloCrystalHitSim;
-				crystalHit[j] = (R3BCaloCrystalHitSim*) crystalHitCA->At(j);      
+				crystalHit[j] = new R3BCalifaCrystalCalDataSim;
+				crystalHit[j] = (R3BCalifaCrystalCalDataSim*) crystalHitCA->At(j);      
 			}
 		}
 		if(caloHitsPerEvent>0) {
-			caloHit = new R3BCaloHitSim*[caloHitsPerEvent];
+			caloHit = new R3BCalifaHitDataSim*[caloHitsPerEvent];
 			for(Int_t j=0;j<caloHitsPerEvent;j++){
-				caloHit[j] = new R3BCaloHitSim;
-				caloHit[j] = (R3BCaloHitSim*) caloHitCA->At(j);      
+				caloHit[j] = new R3BCalifaHitDataSim;
+				caloHit[j] = (R3BCalifaHitDataSim*) caloHitCA->At(j);      
 			}
 		}		
 		if(MCtracksPerEvent>0) {

@@ -33,13 +33,13 @@ void run(TString runNumber)
     // ---------------------------------------------------------------------------
 
     // Calibration ----------------------------------------------------------
-    R3BCaloCal* caloCal = new R3BCaloCal("CaloCal", 0);
-    run->AddTask(caloCal);
+    R3BCalifaMapped2CrystalCal* califaCalibration  = new R3BCalifaMapped2CrystalCal("CalifaMapped2CrystalCal", 0);
+    run->AddTask(califaCalibration);
     // ---------------------------------------------------------------------------
 
     // Histograms ----------------------------------------------------------------
-    R3BCaloCrystalAna* caloAna = new R3BCaloCrystalAna("CaloCrystalAna", 1);
-    run->AddTask(caloCrystalAna);
+    R3BCalifaCrystalCalDataAnalysis* calibrationAna = new R3BCalifaCrystalCalDataAnalysis("CalifaCrystalCalDataAnalysis", 1);
+    run->AddTask(calibrationAna);
     // ---------------------------------------------------------------------------
 
     // Initialize ----------------------------------------------------------------

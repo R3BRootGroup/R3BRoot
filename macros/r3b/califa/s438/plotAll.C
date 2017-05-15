@@ -75,9 +75,9 @@ void plot(TString inputFile="") {
  
   //Crystal Hits
   TClonesArray* crystalHitCA;  
-  R3BCaloCrystalHit** crystalHit;
-  crystalHitCA = new TClonesArray("R3BCaloCrystalHit",5);
-  TBranch *branchCrystalHit = caloTree->GetBranch("CaloCrystalHit");
+  R3BCalifaCrystalCalData** crystalHit;
+  crystalHitCA = new TClonesArray("R3BCalifaCrystalCalData",5);
+  TBranch *branchCrystalHit = caloTree->GetBranch("CalifaCrystalCalData");
   if(branchCrystalHit) branchCrystalHit->SetAddress(&crystalHitCA);
   
   Int_t* crystalId=NULL; 
@@ -100,13 +100,13 @@ void plot(TString inputFile="") {
     secondEnergyP1=-1; secondEnergyP2=-1; secondToT_EnergyP1=-1; secondToT_EnergyP2=-1;
 
     if(crystalHitsPerEvent>0) {
-      crystalHit = new R3BCaloCrystalHit*[crystalHitsPerEvent];
+      crystalHit = new R3BCalifaCrystalCalData*[crystalHitsPerEvent];
       crystalId = new Int_t[crystalHitsPerEvent]; 
       energies = new Double_t[crystalHitsPerEvent];
       ToT_energies = new Double_t[crystalHitsPerEvent];
 
       for(Int_t h=0;h<crystalHitsPerEvent;h++) {
-	crystalHit[h] = (R3BCaloCrystalHit*) crystalHitCA->At(h);      
+	crystalHit[h] = (R3BCalifaCrystalCalData*) crystalHitCA->At(h);      
 	//filling info
 	if(plotMultiplicities) {
 	  hMult->Fill(crystalHit[h]->GetCrystalId());

@@ -1,6 +1,6 @@
 void califaEventDisplay()
 {
-  FairRunAna *fRun= new FairRunAna();
+  FairRunAna *fRun = new FairRunAna();
   
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
   FairParRootFileIo*  parIo1 = new FairParRootFileIo();
@@ -11,14 +11,14 @@ void califaEventDisplay()
   fRun->SetInputFile("sim_out.root");
   fRun->SetOutputFile("test.root");
   
-  R3BEventManager *fMan= new R3BEventManager();
-  R3BMCTracks *Track =  new R3BMCTracks ("Monte-Carlo Tracks");
+  R3BEventManager *fMan  = new R3BEventManager();
+  R3BMCTracks     *Track = new R3BMCTracks ("Monte-Carlo Tracks");
 
-  R3BCaloEventDisplay *CaloEvtVis = new R3BCaloEventDisplay("R3BCaloEventDisplay");
-  R3BCaloHitEventDisplay *CaloHitEvtVis = new R3BCaloHitEventDisplay("R3BCaloHitEventDisplay");
-  CaloEvtVis->SelectGeometryVersion(10);
-  fMan->AddTask(CaloEvtVis);
-  fMan->AddTask(CaloHitEvtVis);
+  R3BCalifaEventDisplay    *CalifaEvtVis    = new R3BCalifaEventDisplay("R3BCalifaEventDisplay");
+  R3BCalifaHitEventDisplay *CalifaHitEvtVis = new R3BCalifaHitEventDisplay("R3BCalifaHitEventDisplay");
+  CalifaEvtVis->SelectGeometryVersion(10);
+  fMan->AddTask(CalifaEvtVis);
+  fMan->AddTask(CalifaHitEvtVis);
 
   fMan->AddTask(Track);
   
