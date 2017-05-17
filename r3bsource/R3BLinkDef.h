@@ -7,6 +7,7 @@
 #pragma link C++ class R3BUcesbSource+;
 #pragma link C++ class R3BReader+;
 #pragma link C++ class R3BUnpackReader+;
+#pragma link C++ class R3BWhiterabbitReader+;
 #pragma link C++ class R3BPspxReader+;
 #pragma link C++ class R3BLosReader+;
 #pragma link C++ class R3BTofdReader+;
@@ -15,6 +16,7 @@
 #pragma link C++ class R3BStrawtubesReader+;
 //#pragma link C++ class R3BFiberReader+;
 #pragma link C++ class EXT_STR_h101_unpack_t;
+#pragma link C++ class EXT_STR_h101_whiterabbit_onion_t;
 #pragma link C++ class EXT_STR_h101_raw_nnp_onion_t;
 #pragma link C++ class EXT_STR_h101_LOS_onion_t;
 #pragma link C++ class EXT_STR_h101_TOFD_onion_t;

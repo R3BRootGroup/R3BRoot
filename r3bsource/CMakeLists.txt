@@ -35,6 +35,7 @@ set(SRCS
 R3BUcesbSource.cxx
 R3BReader.cxx
 R3BUnpackReader.cxx
+R3BWhiterabbitReader.cxx
 R3BPspxReader.cxx
 #R3BFiberReader.cxx
 R3BLosReader.cxx
@@ -46,6 +47,7 @@ R3BStrawtubesReader.cxx
 
 Set(STRUCT_HEADERS
 ext_h101_unpack.h
+ext_h101_whiterabbit.h
 ext_h101_raw_nnp.h
 ext_h101_los.h
 ext_h101_tofd.h
