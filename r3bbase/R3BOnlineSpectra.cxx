@@ -377,12 +377,11 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 
         Int_t iPlane = hit->GetPlaneId(); // 1..n
         Int_t iBar   = hit->GetBarId();   // 1..n
-        Int_t iSide  = hit->GetSide();    // 1 or 2	                
 
             
         if(iPlane<=fNofPlanes){
-          if(iSide==1)fh_tofd_channels[iPlane-1]->Fill(iBar);			         
-          if(iSide==2)fh_tofd_channels[iPlane-1]->Fill(-iBar-1);			         
+          fh_tofd_channels[iPlane-1]->Fill(iBar);
+          fh_tofd_channels[iPlane-1]->Fill(-iBar-1);
         }
       }
     }
