@@ -67,7 +67,7 @@ void run_sim()
 
     // GLAD
     run->AddModule(
-        new R3BGladMagnet("GladMagnet", "glad_v13a.geo.root", "R3BGlad Magnet")); // GLAD should not be moved or rotated
+        new R3BGladMagnet("GladMagnet", "glad_v17_flange.geo.root", "R3BGlad Magnet")); // GLAD should not be moved or rotated
 
     // PSP
     run->AddModule(new R3BPsp(

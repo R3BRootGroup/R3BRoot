@@ -86,7 +86,7 @@ Int_t sim_p2p_s438b(const char *path, int i){
   //detGeo.Add(new TObjString("ALADIN"),        
   //     new TObjString("aladin_v13a.geo.root"));
   //detGeo.Add(new TObjString("GLAD"),          
-  //	     new TObjString("glad_v13a.geo.root"));
+  //	     new TObjString("glad_v17_flange.geo.root"));
   //detGeo.Add(new TObjString("CRYSTALBALL"),   
   //         new TObjString("cal_v13a.geo.root"));
   detGeo.Add(new TObjString("CALIFA"),        

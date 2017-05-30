@@ -31,7 +31,7 @@ void runsim(Int_t nEvents = 0)
   TString fAladinGeo = "aladin_v13a.geo.root";         
 
   Bool_t  fGlad = false;             // Glad Magnet
-  TString fGladGeo = "glad_v13a.geo.root";
+  TString fGladGeo = "glad_v17_flange.geo.root";
 
   Bool_t  fXBall = false;            // Crystal Ball
   TString fXBallGeo = "cal_v13a.geo.root";
@@ -146,8 +146,7 @@ void runsim(Int_t nEvents = 0)
   //Glad Magnet definition
   if (fGlad && !fAladin) {
     fFieldMap = 1;
-    R3BModule* mag = new R3BGladMagnet("GladMagnet");
-    mag->SetGeometryFileName(fGladGeo);
+    R3BModule* mag = new R3BGladMagnet("GladMagnet", fGladGeo, "GLAD Magnet");
     run->AddModule(mag);
   }
 

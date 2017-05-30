@@ -20,8 +20,11 @@ public:
   void ConstructGeometry();
   
   Bool_t CheckIfSensitive(std::string name);
-  
-  ClassDef(R3BGladMagnet,1) //R3BGladMagnet
+
+private:
+  Float_t fGladAngle;
+
+  ClassDef(R3BGladMagnet,2) //R3BGladMagnet
 };
 
 #endif //R3BGladMAGNET_H

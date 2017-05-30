@@ -120,8 +120,7 @@ void r3ball_batch(Int_t nEvents = 1,
   //R3B Magnet definition
   if (fDetList->FindObject("GLAD") ) {
     fFieldMap = 1;
-    R3BModule* mag = new R3BGladMagnet("GladMagnet");
-    mag->SetGeometryFileName(((TObjString*)fDetList->GetValue("GLAD"))->GetString().Data());
+    R3BModule* mag = new R3BGladMagnet("GladMagnet", ((TObjString*)fDetList->GetValue("GLAD"))->GetString(), "GLAD Magnet");
     run->AddModule(mag);
   }
   
