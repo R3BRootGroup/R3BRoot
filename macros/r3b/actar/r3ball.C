@@ -279,7 +279,6 @@ void r3ball(Int_t nEvents = 1,
     }
   } else if(fFieldMap == 1){
     magField = new R3BGladFieldMap("R3BGladMap");
-    ((R3BGladFieldMap*)magField)->SetPosition(0., 0., +350-119.94);
     ((R3BGladFieldMap*)magField)->SetScale(-0.8);
     
     if ( fR3BMagnet == kTRUE ) {

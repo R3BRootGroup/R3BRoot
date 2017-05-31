@@ -415,7 +415,6 @@ void r3ball(Int_t nEvents = 1,
   // If the Global Position of the Magnet is changed
   // the Field Map has to be transformed accordingly
   R3BFieldMap* magField = new R3BFieldMap(typeOfMagneticField,fVerbose);
-  magField->SetPosition(0., 0., 0.);
   magField->SetScale(fieldScale);
 
   if ( fR3BMagnet == kTRUE ) {

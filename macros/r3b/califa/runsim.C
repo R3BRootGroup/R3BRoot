@@ -261,7 +261,6 @@ void runsim(Int_t nEvents = 0)
     }
   } else if(fFieldMap == 1){
     R3BGladFieldMap* magField = new R3BGladFieldMap("R3BGladMap");
-    magField->SetPosition(0., 0., +350-119.94);
     magField->SetScale(fFieldScale);
 
     if ( fR3BMagnet == kTRUE ) {

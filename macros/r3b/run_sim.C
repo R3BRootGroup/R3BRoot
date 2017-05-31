@@ -104,7 +104,6 @@ void run_sim()
     // If the Global Position of the Magnet is changed
     // the Field Map has to be transformed accordingly
     R3BGladFieldMap* magField = new R3BGladFieldMap("R3BGladMap");
-    magField->SetPosition(0., 0., +350 - 119.94);
     magField->SetScale(fieldScale);
 
     if (magnet == kTRUE)
