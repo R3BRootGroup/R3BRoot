@@ -13,7 +13,7 @@ class R3BLosHitData : public TObject
     R3BLosHitData();
 
     // Standard Constructor
-    R3BLosHitData(UChar_t detector,Double_t t,Double_t x, Double_t y,Double_t diff); 
+    R3BLosHitData(UChar_t detector,Double_t t,Double_t x, Double_t y, Double_t Z); 
 
     // Destructor
     virtual ~R3BLosHitData() { }
@@ -26,11 +26,12 @@ class R3BLosHitData : public TObject
     Double_t fTime_ns;         // average time of the scintillators
     Double_t fX_cm;			   // position in cm	
     Double_t fY_cm;
-    Double_t fTimeDiff2Ref_ns; // difference to master trigger time
+    Double_t fZ;               // Charge
+//    Double_t fTimeDiff2Ref_ns; // difference to master trigger time
 
   public:
 
-    ClassDef(R3BLosHitData, 2)
+    ClassDef(R3BLosHitData, 1)
 };
 
 #endif

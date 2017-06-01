@@ -43,8 +43,8 @@ R3BTofdCal2HitPar::R3BTofdCal2HitPar()
     , fUpdateRate(1000000)
     , fMinStats(100000)
     , fTrigger(-1)
-    , fNofPlanes(0)
-    , fPaddlesPerPlane(0)
+    , fNofPlanes(5)
+    , fPaddlesPerPlane(6)
     , fNEvents(0)
     , fCal_Par(NULL)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
@@ -74,8 +74,8 @@ R3BTofdCal2HitPar::R3BTofdCal2HitPar(const char* name, Int_t iVerbose)
     , fUpdateRate(1000000)
     , fMinStats(100000)
     , fTrigger(-1)
-    , fNofPlanes(0)
-    , fPaddlesPerPlane(0)
+    , fNofPlanes(5)
+    , fPaddlesPerPlane(6)
     , fNEvents(0)
     , fCal_Par(NULL)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
@@ -194,7 +194,7 @@ void R3BTofdCal2HitPar::Exec(Option_t* option)
         for (Int_t ihit = 0; ihit < nHits; ihit++)     
         {
     	    R3BLosCalData *calData = (R3BLosCalData*)fCalItemsLos->At(ihit);
-            timeLos=(calData->fTime_r_ns+calData->fTime_l_ns+calData->fTime_t_ns+calData->fTime_b_ns)/4.;			 
+            timeLos=(calData->fTimeV_r_ns+calData->fTimeV_l_ns+calData->fTimeV_t_ns+calData->fTimeV_b_ns)/4.;			 
         }						 
     }
     
@@ -281,8 +281,8 @@ void R3BTofdCal2HitPar::Exec(Option_t* option)
             char strName[255];
             sprintf(strName, "Time_Sync_Plane_%d_Bar_%d", iPlane, iBar);
 	    // for runs starting at 025:
-            //if (iPlane<3) fhTsync[iPlane - 1][iBar - 1] = new TH1F(strName, "", 100000, 10400., 10600.);
-            //if (iPlane>2) fhTsync[iPlane - 1][iBar - 1] = new TH1F(strName, "", 100000, 12400., 12600.);            
+            if (iPlane<3) fhTsync[iPlane - 1][iBar - 1] = new TH1F(strName, "", 20000, 180., 280.);
+            if (iPlane>2) fhTsync[iPlane - 1][iBar - 1] = new TH1F(strName, "", 100000, 2100., 2400.);            
 	    // for runs starting at 054:
             //if (iPlane<3) fhTsync[iPlane - 1][iBar - 1] = new TH1F(strName, "", 20000,  15700., 15800.);
             //if (iPlane>2) fhTsync[iPlane - 1][iBar - 1] = new TH1F(strName, "", 20000,  6800., 6900.);            
@@ -293,9 +293,7 @@ void R3BTofdCal2HitPar::Exec(Option_t* option)
             //if (iPlane<3) fhTsync[iPlane - 1][iBar - 1] = new TH1F(strName, "", 40000,  15400., 15600.);
             //if (iPlane>2) fhTsync[iPlane - 1][iBar - 1] = new TH1F(strName, "", 40000,  15400., 15600.);            
 	    // for runs starting at 137:
-            //fhTsync[iPlane - 1][iBar - 1] = new TH1F(strName, "", 50000, 4400., 4500.);
-	    // for runs starting at 154:
-            fhTsync[iPlane - 1][iBar - 1] = new TH1F(strName, "", 50000, 900., 1100.);
+           // fhTsync[iPlane - 1][iBar - 1] = new TH1F(strName, "", 50000, 4400., 4500.);
  	    // for runs starting at 160:
             //if (iPlane<3) fhTsync[iPlane - 1][iBar - 1] = new TH1F(strName, "", 50000, 13800., 13900.);
             //if (iPlane>2) fhTsync[iPlane - 1][iBar - 1] = new TH1F(strName, "", 50000, 13800., 13900.);            

@@ -26,44 +26,44 @@ R3BLosCal2Hit::R3BLosCal2Hit()
     , fCalItems(NULL)
     , fHitItems(new TClonesArray("R3BLosHitData"))
     , fNofHitItems(0)
-    , flosVeffX1(1.)
-    , flosVeffY1(1.)    
+    , flosVeffX1(14.)
+    , flosVeffY1(14.)    
     , flosOffsetX1(0.)
     , flosOffsetY1(0.)
-    , flosVeffX2(1.)
-    , flosVeffY2(1.)    
+    , flosVeffX2(14.)
+    , flosVeffY2(14.)    
     , flosOffsetX2(0.)
     , flosOffsetY2(0.)    
-    , flosVeffX1T(1.)
-    , flosVeffY1T(1.)    
+    , flosVeffX1T(14.)
+    , flosVeffY1T(14.)    
     , flosOffsetX1T(0.)
     , flosOffsetY1T(0.)
-    , flosVeffX2T(1.)
-    , flosVeffY2T(1.)    
+    , flosVeffX2T(14.)
+    , flosVeffY2T(14.)    
     , flosOffsetX2T(0.)
     , flosOffsetY2T(0.)
-    , flosVeffX1wc(1.)
-    , flosVeffY1wc(1.)    
+    , flosVeffX1wc(14.)
+    , flosVeffY1wc(14.)    
     , flosOffsetX1wc(0.)
     , flosOffsetY1wc(0.)
-    , flosVeffX2wc(1.)
-    , flosVeffY2wc(1.)    
+    , flosVeffX2wc(14.)
+    , flosVeffY2wc(14.)    
     , flosOffsetX2wc(0.)
     , flosOffsetY2wc(0.) 
-    , flosVeffX1Q(1.)
-    , flosVeffY1Q(1.)    
+    , flosVeffX1Q(14.)
+    , flosVeffY1Q(14.)    
     , flosOffsetX1Q(0.)
     , flosOffsetY1Q(0.)
-    , flosVeffX2Q(1.)
-    , flosVeffY2Q(1.)    
+    , flosVeffX2Q(14.)
+    , flosVeffY2Q(14.)    
     , flosOffsetX2Q(0.)
     , flosOffsetY2Q(0.) 
-    , flosVeffX1Qc(1.)
-    , flosVeffY1Qc(1.)    
+    , flosVeffX1Qc(14.)
+    , flosVeffY1Qc(14.)    
     , flosOffsetX1Qc(0.)
     , flosOffsetY1Qc(0.)
-    , flosVeffX2Qc(1.)
-    , flosVeffY2Qc(1.)    
+    , flosVeffX2Qc(14.)
+    , flosVeffY2Qc(14.)    
     , flosOffsetX2Qc(0.)
     , flosOffsetY2Qc(0.)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
@@ -214,44 +214,44 @@ R3BLosCal2Hit::R3BLosCal2Hit(const char* name, Int_t iVerbose)
     , fCalItems(NULL)
     , fHitItems(new TClonesArray("R3BLosHitData"))
     , fNofHitItems(0)
-    , flosVeffX1(1.)
-    , flosVeffY1(1.)    
+    , flosVeffX1(14.)
+    , flosVeffY1(14.)    
     , flosOffsetX1(0.)
     , flosOffsetY1(0.)
-    , flosVeffX2(1.)
-    , flosVeffY2(1.)    
+    , flosVeffX2(14.)
+    , flosVeffY2(14.)    
     , flosOffsetX2(0.)
     , flosOffsetY2(0.)
-    , flosVeffX1T(1.)
-    , flosVeffY1T(1.)    
+    , flosVeffX1T(14.)
+    , flosVeffY1T(14.)    
     , flosOffsetX1T(0.)
     , flosOffsetY1T(0.)
-    , flosVeffX2T(1.)
-    , flosVeffY2T(1.)    
+    , flosVeffX2T(14.)
+    , flosVeffY2T(14.)    
     , flosOffsetX2T(0.)
     , flosOffsetY2T(0.)
-    , flosVeffX1wc(1.)
-    , flosVeffY1wc(1.)    
+    , flosVeffX1wc(14.)
+    , flosVeffY1wc(14.)    
     , flosOffsetX1wc(0.)
     , flosOffsetY1wc(0.)
-    , flosVeffX2wc(1.)
-    , flosVeffY2wc(1.)    
+    , flosVeffX2wc(14.)
+    , flosVeffY2wc(14.)    
     , flosOffsetX2wc(0.)
     , flosOffsetY2wc(0.) 
-    , flosVeffX1Q(1.)
-    , flosVeffY1Q(1.)    
+    , flosVeffX1Q(14.)
+    , flosVeffY1Q(14.)    
     , flosOffsetX1Q(0.)
     , flosOffsetY1Q(0.)
-    , flosVeffX2Q(1.)
-    , flosVeffY2Q(1.)    
+    , flosVeffX2Q(14.)
+    , flosVeffY2Q(14.)    
     , flosOffsetX2Q(0.)
     , flosOffsetY2Q(0.)
-    , flosVeffX1Qc(1.)
-    , flosVeffY1Qc(1.)    
+    , flosVeffX1Qc(14.)
+    , flosVeffY1Qc(14.)    
     , flosOffsetX1Qc(0.)
     , flosOffsetY1Qc(0.)
-    , flosVeffX2Qc(1.)
-    , flosVeffY2Qc(1.)    
+    , flosVeffX2Qc(14.)
+    , flosVeffY2Qc(14.)    
     , flosOffsetX2Qc(0.)
     , flosOffsetY2Qc(0.) 
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
@@ -560,8 +560,9 @@ InitStatus R3BLosCal2Hit::Init()
     
     Icount = 0;
     
- // file with walk-correction parameters  
-   ifstream infile(fwalk_param_file.c_str());
+	    // walk parameters  
+     ifstream infile(fwalk_param_file.c_str());
+
    if (infile.is_open())
   {
     for(Int_t ivec = 0; ivec < 16; ivec++)  
@@ -583,47 +584,21 @@ InitStatus R3BLosCal2Hit::Init()
                
    }
   } 
-  else //cerr << "Unable to open file \""<<fwalk_param_file<<"\" with walk parameters!"<<endl;
-  {
-	cout << "*****************************************************************"<<endl;  
-	cout << "UNABLE TO OPEN FILE WITH WALK PARAMETERS! Parameters set to zero!"<<endl;
-	cout << "*****************************************************************"<<endl;
-	for(Int_t ivec = 0; ivec < 16; ivec++) 
-	{
-	 walk_par[ivec][0] = 10.;
-	 walk_par[ivec][1] = 1000.;
-	  for(Int_t iv = 2; iv < 11; iv++) 
-	  {
-	    walk_par[ivec][iv] = 0.;;
-	   }
-	 }  	  
-   }	  
-// file with tot-correction parameters
+  else cerr << "Unable to open file \""<<fwalk_param_file<<"\" with walk parameters!"<<endl;
+  
+      // tot parameters
      ifstream infile1(ftot_param_file.c_str());
 
    if (infile1.is_open())
   {
     for(Int_t ivec = 0; ivec < 8; ivec++)  
    {    
-     infile1 >> tot_par[ivec][0] >> tot_par[ivec][1] >> tot_par[ivec][2] >> tot_par[ivec][3] ;
+     infile1 >> tot_par[ivec][0] >> tot_par[ivec][1] >> tot_par[ivec][2] >> tot_par[ivec][3] >> tot_par[ivec][4] >>
+               tot_par[ivec][5] >> tot_par[ivec][6] >> tot_par[ivec][7];
                         
    }
   } 
-  else //cerr << "Unable to open file \""<<ftot_param_file<<"\" with tot parameters!"<<endl;  
-  {
-	cout << "****************************************************************"<<endl;
-	cout << "UNABLE TO OPEN FILE WITH ToT PARAMETERS! Parameters set to zero!"<<endl;
-	cout << "****************************************************************"<<endl;
-	for(Int_t ivec = 0; ivec < 8; ivec++) 
-	{
-	 tot_par[ivec][0] = 0.;
-	 tot_par[ivec][1] = 0.;  
-	 tot_par[ivec][2] = 0.;
-	 tot_par[ivec][3] = 1.; // Normalization factor
-	} 
-   }	   
-
-  
+  else cerr << "Unable to open file \""<<ftot_param_file<<"\" with tot parameters!"<<endl;  
   
   return kSUCCESS;
 }
@@ -644,8 +619,7 @@ InitStatus R3BLosCal2Hit::ReInit()
 void R3BLosCal2Hit::Exec(Option_t* option)
 { 
 	   Icount++;
- // ofstream myFile("data_483.dat",ios_base::out|ios_base::app);
-     
+	   
 
        // missing times are NAN, hence other times will also
        // be NAN if one time is missing.
@@ -1100,14 +1074,14 @@ void R3BLosCal2Hit::Exec(Option_t* option)
           {
               char strName[255];
               sprintf(strName, "LOS_Q");
-              fhQ = new TH1F(strName, "", 10000, fhQmin, fhQmax);              
+              fhQ = new TH1F(strName, "", fhQbin, fhQmin, fhQmax);              
           } 
           
           if (NULL == fhQtest )
           {
               char strName[255];
               sprintf(strName, "LOS_Q_test");
-              fhQtest = new TH1F(strName, "", 10000, fhQmin, fhQmax);              
+              fhQtest = new TH1F(strName, "", fhQbin, fhQmin, fhQmax);              
           } 
           
           if (NULL == fhQpix )
@@ -1834,6 +1808,10 @@ void R3BLosCal2Hit::Exec(Option_t* option)
               fht4t8T_corr  = new TH1F(strName, "",fhTbin, fhTmin, fhTmax);  			 
 	     }	     
 	    	     
+
+
+
+
 	     
     Int_t nDet = 0;    
     Int_t nHits = fCalItems->GetEntries();   
@@ -1978,6 +1956,8 @@ void R3BLosCal2Hit::Exec(Option_t* option)
              tott = time_t_T - time_t_L;
              totb = time_b_T - time_b_L;            
 
+          //   tot_ver = sqrt(tott*totb);
+           //  tot_hor = sqrt(totr*totl);
              
              tot_ver = (tott+totb)/2.;
              tot_hor = (totr+totl)/2.;         
@@ -2012,18 +1992,18 @@ void R3BLosCal2Hit::Exec(Option_t* option)
             totlb = time_lb_T - time_lb_L; 
             totpix = time_pix_T - time_pix_L;
             fhQpix->Fill(totpix);
-             
+            
+           // tot_135 = sqrt(totrt*totlb);
+           // tot_45 = sqrt(totlt*totrb); 
         
             tot_135 = (totrt+totlb)/2.;
-            tot_45 =  (totlt+totrb)/2.; 
-          
+            tot_45 =  (totlt+totrb)/2.;            
 		    
- // Spectra for performing walk corrections are filled:
- // For squared detector: 4 PMs signal + 4 reference signals
+ // Here comes walk correction for squared detector: 4 PMs signal + 4 reference signals
  // Difference between measured time of a single PM and a reference signal
  //  is plotted as a function of ToT of a given PM.
- // For octagonal detector, two runs are  made - once ref signal is put to channel 1 and once to channel 8.
- 	           
+ // For octagonal detector, two runs are  made - once ref signal is put to channel 1 and once to channel 8.              
+	           
          if(iSciType == 0 || iSciType ==2 || iSciType ==4)
          {
            ref_timeM=(time_rb_V + time_lt_V +time_rt_V + time_lb_V)/4.+33.;
@@ -2042,13 +2022,10 @@ void R3BLosCal2Hit::Exec(Option_t* option)
            if(tott>walk_par[0][0] && totlt>walk_par[1][0] && totl>walk_par[2][0] && 
               totlb>walk_par[3][0] && totb>walk_par[4][0] && totrb>walk_par[5][0] && 
               totr>walk_par[6][0] && totrt>walk_par[7][0]) Igood_event = 1;
-              
-              
-            Igood_event = 1;  
-              
   
      //     if(totpix > 89. && totpix < 91.) Igood_event = 1;
-		           		
+                           
+           
 		// MCFD 1,3,5,7 
 		   fht1Q1M->Fill(tott,(time_t_V-ref_timeM));
 	       fht3Q3M->Fill(totl,(time_l_V-ref_timeM));
@@ -2070,35 +2047,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 		   fht6Q6T->Fill(totrb,(time_rb_L-ref_timeT));
 		   fht8Q8T->Fill(totrt,(time_rt_L-ref_timeT));
 		     
-/*
-      	 if(!(IS_NAN(ref_timeM)) && !(IS_NAN(ref_timeT)))
-      	 {
-			myFile<<setprecision(10)<<"1 "<<time_t_V<<" "<<time_t_L<<" "<<tott<<endl;
-			myFile<<setprecision(10)<<"2 "<<time_lt_V<<" "<<time_lt_L<<" "<<totlt<<endl;
-			myFile<<setprecision(10)<<"3 "<<time_l_V<<" "<<time_l_L<<" "<<totl<<endl;
-			myFile<<setprecision(10)<<"4 "<<time_lb_V<<" "<<time_lb_L<<" "<<totlb<<endl;
-			myFile<<setprecision(10)<<"5 "<<time_b_V<<" "<<time_b_L<<" "<<totb<<endl;
-			myFile<<setprecision(10)<<"6 "<<time_rb_V<<" "<<time_rb_L<<" "<<totrb<<endl;
-			myFile<<setprecision(10)<<"7 "<<time_r_V<<" "<<time_r_L<<" "<<totr<<endl;
-			myFile<<setprecision(10)<<"8 "<<time_rt_V<<" "<<time_rt_L<<" "<<totrt<<endl;
-			myFile<<setprecision(10)<<"9 "<<ref_timeM<<" "<<ref_timeT<<" "<<
-			      (tott+totlt+totl+totlb+totb+totrb+totr+totrt)/8. <<endl;
-          }
-*/
-            	        	       
-      } // end if(iLOSType == 2) 	
- 
- 
- 
- 
- // Next, times are corrected for walk.
- 
-     if(iLOSType == 1 )  // Squared scintillator
-     {   
            
-        //  if(tott>walk_par[0][0] && totl>walk_par[2][0] && totb>walk_par[4][0] && totr>walk_par[6][0]) Igood_event = 1;
-                           
-          Igood_event = 1;  
                    
   // Walk correction for MCFD
    // PM1 
@@ -2106,15 +2055,32 @@ void R3BLosCal2Hit::Exec(Option_t* option)
              time_t_V_corr = time_t_V - walk(0,tott); 
                       
    // PM2 
+             
+             time_lt_V_corr = time_lt_V - walk(1,totlt);  
+                          
+    // PM3 
                                                      
              time_l_V_corr = time_l_V - walk(2,totl);
              
-   // PM3                                                                                            
-             time_b_V_corr = time_b_V - walk(4,totb);
-                                      
-   // PM4             
+    // PM4                                         
+                                                     
+             time_lb_V_corr = time_lb_V - walk(3,totlb);
+             
+    // PM5             
                                                     
-             time_r_V_corr = time_r_V - walk(6,totr);     
+             time_b_V_corr = time_b_V - walk(4,totb);
+                          
+    // PM6             
+                                                     
+             time_rb_V_corr = time_rb_V - walk(5,totrb);
+             
+    // PM7             
+                                                    
+             time_r_V_corr = time_r_V - walk(6,totr);
+             
+    // PM8             
+                                                     
+             time_rt_V_corr = time_rt_V - walk(7,totrt);	     
 		     
 		     
  // Walk correction for TAMEX
@@ -2124,83 +2090,41 @@ void R3BLosCal2Hit::Exec(Option_t* option)
              time_t_L_corr = time_t_L - walk(8,tott); 
                                    
    // PM2 
-             time_l_L_corr = time_l_L - walk(10,totl);
-                          
-   // PM3            
-             time_b_L_corr = time_b_L - walk(12,totb);
-             
-   // PM4             
-             time_r_L_corr = time_r_L - walk(14,totr);
-		     
-	     
-    // Walk-corrected position, for test purposes:    
-    
-         dx1 = (time_r_V_corr-time_l_V_corr) ;         
-         dy1 = (time_b_V_corr-time_t_V_corr) ;       
-         
-         
-         if(tott < walk_par[0][0] || tott > walk_par[0][1]) dy1 = 0.0/0.0; 		     
-         if(totl < walk_par[2][0] || totl > walk_par[2][1]) dx1 = 0.0/0.0;
-               	       
-      } // end if(iLOSType == 1)               
-
-    if(iLOSType == 2)  // Octogonal scintillator
-    {	           
-                            
-  // Walk correction for MCFD
-    // PM1             
-             time_t_V_corr = time_t_V - walk(0,tott); 
-                       
-    // PM2             
-             time_lt_V_corr = time_lt_V - walk(1,totlt);  
-                          
-    // PM3                                                     
-             time_l_V_corr = time_l_V - walk(2,totl);
-             
-    // PM4                                                                                             
-             time_lb_V_corr = time_lb_V - walk(3,totlb);
-             
-    // PM5                                                                
-             time_b_V_corr = time_b_V - walk(4,totb);
-                          
-    // PM6                                                                 
-             time_rb_V_corr = time_rb_V - walk(5,totrb);
-             
-    // PM7                                                                 
-             time_r_V_corr = time_r_V - walk(6,totr);
-             
-    // PM8                                                                 
-             time_rt_V_corr = time_rt_V - walk(7,totrt);	     
-		     
-		     
- // Walk correction for TAMEX
-	      
-    // PM1                                                     
-             time_t_L_corr = time_t_L - walk(8,tott); 
-                                   
-    // PM2                                                      
+                                                     
              time_lt_L_corr = time_lt_L - walk(9,totlt);               
                     
-    // PM3                                                                                 
+    // PM3                                         
+                                                     
              time_l_L_corr = time_l_L - walk(10,totl);
-                          
-    // PM4                                                                        
+             
+             
+    // PM4                                         
+                                                     
              time_lb_L_corr = time_lb_L - walk(11,totlb);
                       
-    // PM5                          
-             time_b_L_corr = time_b_L - walk(12,totb);
-                          
-    // PM6                         
-             time_rb_L_corr = time_rb_L - walk(13,totrb);                          
+
+    // PM5             
              
-    // PM7                          
+             time_b_L_corr = time_b_L - walk(12,totb);
+             
+             
+   // PM6             
+             
+             time_rb_L_corr = time_rb_L - walk(13,totrb);
+                          
+             
+    // PM7             
+             
              time_r_L_corr = time_r_L - walk(14,totr);
 		         
-    // PM8                          
+ 
+    // PM8             
+             
              time_rt_L_corr = time_rt_L - walk(15,totrt);
 		     
 	     
-    // Walk-corrected position, for test purposes:    
+    // Walk correction for the position
+    
     
          dx1 = (time_r_V_corr-time_l_V_corr) ;         
          dy1 = (time_b_V_corr-time_t_V_corr) ;       
@@ -2211,10 +2135,10 @@ void R3BLosCal2Hit::Exec(Option_t* option)
          if(totl < walk_par[2][0] || totl > walk_par[2][1]) dx1 = 0.0/0.0;
          if(totlb < walk_par[3][0] || totlb > walk_par[3][1]) dy2 = 0.0/0.0;
          if(totlt < walk_par[1][0] || totlt > walk_par[1][1]) dx2 = 0.0/0.0;
-
          
         if(Igood_event == 1){  
-			         
+			
+
 		// MCFD 1,3,5,7	 
  	      fht1Q1M_corr->Fill(tott,time_t_V_corr-ref_timeM);
 		  fht3Q3M_corr->Fill(totl,time_l_V_corr-ref_timeM);
@@ -2259,12 +2183,29 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 		   fht2t6T_corr->Fill((time_lt_L_corr+time_rb_L_corr)/2.-ref_timeT);
 		   fht3t7T_corr->Fill((time_r_L_corr+time_l_L_corr)/2.-ref_timeT);
 		   fht4t8T_corr->Fill((time_rt_L_corr+time_lb_L_corr)/2.-ref_timeT);
-           }  
-            	        	       
-      } // end if(iLOSType == 2) 	
+		   
+		  	             
+	  }  
+            	        
+ 	        
+// from now on use walk corrected times:            		    
+/*
+		    time_t_V=time_t_V_corr;
+		    time_b_V=time_b_V_corr;
+		    time_l_V=time_l_V_corr;
+		    time_r_V=time_r_V_corr;
+		    
+		    time_t_L=time_t_L_corr;
+		    time_b_L=time_b_L_corr;
+		    time_l_L=time_l_L_corr;
+		    time_r_L=time_r_L_corr;
+*/	
+	    
+          
+ 	      } // end if(iLOSType == 2) 	
 	            	  
-   if(iLOSType == 1 || iLOSType == 2 ) 
-     {
+   	    if(iLOSType == 1 || iLOSType == 2 ) 
+        {
 	// TAMEX:		  
 		   t_hor_T = (time_r_L + time_l_L)/2.;       		  
            t_ver_T = (time_t_L + time_b_L)/2.; 
@@ -2274,7 +2215,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
            
 		   x1T_cm=(time_r_L-time_l_L-flosOffsetX1T)*flosVeffX1T;
 		   y1T_cm=(time_b_L-time_t_L-flosOffsetY1T)*flosVeffY1T;
-		   		   
+		   
 		   x1T_cm_corr=(time_r_L_corr-time_l_L_corr);
 		   y1T_cm_corr=(time_b_L_corr-time_t_L_corr);	
 		   
@@ -2283,101 +2224,84 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 	       t_ver_M = (time_t_V + time_b_V)/2.;
            t_hor_M_corr = (time_r_V_corr + time_l_V_corr)/2.; 		  
 	       t_ver_M_corr = (time_t_V_corr + time_b_V_corr)/2.;
-	       
-	       Double_t  x_cm_temp,y_cm_temp;
-	       x_cm_temp=(time_r_V-time_l_V-flosOffsetX1)*flosVeffX1;
-	 	   y_cm_temp=(time_b_V-time_t_V-flosOffsetY1)*flosVeffY1;   
-/*	 	   
-	 	   y1_cm = y_cm_temp*cos(0.1714)-x_cm_temp*sin(0.1714);
-		   x1_cm = x_cm_temp*cos(0.1714)+y_cm_temp*sin(0.1714);   	       
-*/            	   
+	       x1_cm=(time_r_V-time_l_V-flosOffsetX1)*flosVeffX1;
+	 	   y1_cm=(time_b_V-time_t_V-flosOffsetY1)*flosVeffY1;      	       
            if(!(IS_NAN(dx1)) && !(IS_NAN(dy1))){ 
             x1_cm_corr=(dx1-flosOffsetX1wc)*flosVeffX1wc; 
 		    y1_cm_corr=(dy1-flosOffsetY1wc)*flosVeffY1wc;
 	       }
 
 		  }	  
- 
-     if(iLOSType == 2 ) 
-     {
+          if(iLOSType == 2 ) 
+          {
 	// TAMEX:		  
             t_45_T = (time_rb_L + time_lt_L)/2.; 		  
 	        t_135_T = (time_rt_L + time_lb_L)/2.; 
     		x2T_cm=(time_rb_L-time_lt_L-flosOffsetX2T)*flosVeffX2T;
 		    y2T_cm=(time_lb_L-time_rt_L-flosOffsetY2T)*flosVeffY2T;	
-		    
+
 
     // MCFD:	        
 	        t_45_M  = (time_rb_V + time_lt_V)/2.; 		  
 	        t_135_M = (time_rt_V + time_lb_V)/2.; 
-	        
             x2_cm=(time_rb_V-time_lt_V-flosOffsetX2)*flosVeffX2;
             y2_cm=(time_lb_V-time_rt_V-flosOffsetY2)*flosVeffY2;
-                       
             if(!(IS_NAN(dx2)) && !(IS_NAN(dy2))){        
  		   	 x2_cm_corr=(dx2-flosOffsetX2wc)*flosVeffX2wc;
 		     y2_cm_corr=(dy2-flosOffsetY2wc)*flosVeffY2wc;
 		    }	   		    	
     		
-	  }	 
+	      }	 
 	      
 	   if(iLOSType == 1) 
        {
-         // TAMEX 
+          tot = (tot_ver+tot_hor)/2.;
+          Z = tot;
+          fhQ->Fill(tot);
+ 
+        // TAMEX
           timeLosT = (t_hor_T + t_ver_T)/2.;
-          LosTresT = (time_r_L + time_l_L)/2.-(time_t_L + time_b_L)/2.; 		 
-          LosTresT_corr = (time_r_L_corr + time_l_L_corr)/2.-(time_t_L_corr + time_b_L_corr)/2.;		 
+          LosTresT = t_hor_T - t_ver_T; 
+          LosTresT_corr = t_hor_T_corr - t_ver_T_corr;              
+          fhTres_T->Fill(LosTresT);
+          fhTres_T_corr->Fill(LosTresT_corr);          
           xT_cm = x1T_cm;
-          yT_cm = y1T_cm;
-          xT_cm_corr = x1T_cm_corr;
-          yT_cm_corr = y1T_cm_corr;          
-         // MCFD 
-          timeLosM = (time_r_V + time_l_V + time_t_V + time_b_V)/4.;
-          LosTresM = (time_r_V + time_l_V)/2.-(time_t_V + time_b_V)/2.;		  
-          LosTresM_corr = (time_r_V_corr + time_l_V_corr)/2.-(time_t_V_corr + time_b_V_corr)/2.;
+          yT_cm = y1T_cm;      
+        // MCFD
+          timeLosM = (t_hor_M + t_ver_M)/2.;          
+          t_hit = timeLosM;
+          LosTresM = t_hor_M - t_ver_M;
+          LosTresM_corr = t_hor_M_corr - t_ver_M_corr;        
+          fhTres_M->Fill(LosTresM);
+          fhTres_M_corr->Fill(LosTresM_corr);
           x_cm = x1_cm;
-	      y_cm = y1_cm;	
-          x_cm_corr = x1_cm_corr;
-	      y_cm_corr = y1_cm_corr;
-
-
-  // Raumwinkel und Radius
-
-           xvar = x_cm;
-           yvar = y_cm;
-
-           rr_b = sqrt((l_SC/2.+yvar)*(l_SC/2.+yvar)+xvar*xvar);
-           rr_t = sqrt((l_SC/2.-yvar)*(l_SC/2.-yvar)+xvar*xvar);   
-           rr_l = sqrt((l_SC/2.-xvar)*(l_SC/2.-xvar)+yvar*yvar); 
-           rr_r = sqrt((l_SC/2.+xvar)*(l_SC/2.+xvar)+yvar*yvar);              		   		   
-           rw_t = atan((abs(xvar)+l_PM/2.)/(l_SC/2.-yvar))-atan((abs(xvar)-l_PM/2.)/(l_SC/2.-yvar));           
-           rw_b = atan((abs(xvar)+l_PM/2.)/(l_SC/2.+yvar))-atan((abs(xvar)-l_PM/2.)/(l_SC/2.+yvar));
-           rw_l = atan((abs(yvar)+l_PM/2.)/(l_SC/2.-xvar))-atan((abs(yvar)-l_PM/2.)/(l_SC/2.-xvar));           
-           rw_r = atan((abs(yvar)+l_PM/2.)/(l_SC/2.+xvar))-atan((abs(yvar)-l_PM/2.)/(l_SC/2.+xvar));       
-
-           totl_corr = satu(2,totl);
-           totr_corr = satu(6,totr);           
-           totb_corr = satu(4,totb); 
-           tott_corr = satu(0,tott);            
-                      
-    	   Double_t tot_ver_corr = (tott_corr+totb_corr)/2.;
-           Double_t tot_hor_corr = (totr_corr+totl_corr)/2.;
-
-
-		   rw_sum = (rw_t+rw_l+rw_b+rw_r)*180./3.14159265;	   
-		   fhRW->Fill(rw_sum);             	
-
-		if(!(IS_NAN(tott_corr)) && !(IS_NAN(totl_corr)) &&
-           !(IS_NAN(totb_corr)) && !(IS_NAN(totr_corr)) && 
-           tott_corr > 0. && totl_corr > 0. && totb_corr > 0. && 
-           totr_corr > 0. )
-        {  		    
-           tot_corr = (tott_corr +totl_corr + totb_corr + totr_corr)/4.;                       
-        } 	  
-           x1ToT_cm = ((totl-totr)/tot-flosOffsetX1Q)*flosVeffX1Q;
-           y1ToT_cm = ((tott-totb)/tot-flosOffsetY1Q)*flosVeffY1Q;
-           xToT = x1ToT_cm;
-           yToT = y1ToT_cm;
+          y_cm = y1_cm;
+        // Fill spectra  
+          fhTM_vs_Q->Fill(tot,LosTresM);
+          fhTM_vs_Q_corr->Fill(tot,LosTresM_corr);
+          fhTT_vs_Q->Fill(tot,LosTresM);     
+          fhTT_vs_Q_corr->Fill(tot,LosTresM_corr);          
+          fhTresMvsIcount->Fill(Icount,LosTresM);        
+          fhTresTvsIcount->Fill(Icount,LosTresT);  	    
+          fhXY->Fill(x_cm,y_cm);
+          fhXY_corr->Fill(x1_cm_corr,y1_cm_corr);       
+          fhXY1->Fill(x1_cm,y1_cm);
+          fhXYT->Fill(xT_cm,yT_cm);
+        //  fhXYT_corr->Fill(x1T_cm_corr,y1T_cm_corr);        
+          fhTresX_M->Fill(x_cm,LosTresM);
+          fhTresY_M->Fill(y_cm,LosTresM);
+          fhTresX_T->Fill(xT_cm,LosTresT);
+          fhTresY_T->Fill(yT_cm,LosTresT);
+          fhQ_vs_X->Fill(x1_cm,tot);
+          fhQ_vs_Y->Fill(y1_cm,tot);
+          fhQ_L->Fill(rw_l,totl);
+		  fhQ_B->Fill(rw_b,totb);
+		  fhQ_R->Fill(rw_r,totr);
+		  fhQ_T->Fill(rw_t,tott);			     
+		  fhQ_oddCh->Fill(tot_ver);
+		  fhQ_evCh->Fill(tot_hor);
+		  fhQ1_vs_Q5->Fill(tott,totb);
+		  fhQ3_vs_Q7->Fill(totl,totr);	
 	   }  
 	    	   
        if(iLOSType == 2)           
@@ -2419,11 +2343,11 @@ void R3BLosCal2Hit::Exec(Option_t* option)
            rw_b = atan((abs(xvar)+l_PM/2.)/(l_SC/2.+yvar))-atan((abs(xvar)-l_PM/2.)/(l_SC/2.+yvar));
            rw_l = atan((abs(yvar)+l_PM/2.)/(l_SC/2.-xvar))-atan((abs(yvar)-l_PM/2.)/(l_SC/2.-xvar));           
            rw_r = atan((abs(yvar)+l_PM/2.)/(l_SC/2.+xvar))-atan((abs(yvar)-l_PM/2.)/(l_SC/2.+xvar));       
- 
-           totl_corr = satu(2,totl);
-           totr_corr = satu(6,totr);           
-           totb_corr = satu(4,totb); 
-           tott_corr = satu(0,tott);         
+
+           totl_corr = totl * rw_l; // *90.48/43.81;
+           totr_corr = totr * rw_r; // *90.48/43.81;           
+           totb_corr = totb * rw_b; // *90.48/43.81; 
+           tott_corr = tott * rw_t; // *90.48/43.81;            
                       
     	   Double_t tot_ver_corr = (tott_corr+totb_corr)/2.;
            Double_t tot_hor_corr = (totr_corr+totl_corr)/2.;
@@ -2432,12 +2356,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 		   rw_sum = (rw_t+rw_l+rw_b+rw_r)*180./3.14159265;	   
 		   fhRW->Fill(rw_sum);             	
 
- 		if(!(IS_NAN(tott_corr)) && !(IS_NAN(totl_corr)) &&
-           !(IS_NAN(totb_corr)) && !(IS_NAN(totr_corr)) && 
-           tott_corr > 0. && totl_corr > 0. && totb_corr > 0. &&  totr_corr > 0. )
-        {  		    
-           tot_corr = (tott_corr +totl_corr + totb_corr + totr_corr)/4.;                       
-        }  
+           tot_corr = (sqrt(tott_corr*totb_corr)+sqrt(totr_corr*totl_corr))/2.;	  
            x1ToT_cm = ((totl-totr)/tot-flosOffsetX1Q)*flosVeffX1Q;
            y1ToT_cm = ((tott-totb)/tot-flosOffsetY1Q)*flosVeffY1Q;
            xToT = x1ToT_cm;
@@ -2490,6 +2409,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
                        
       }
 
+
           Double_t y_cm_temp, x_cm_temp;
 
           x_cm_temp = (x1_cm + (x2_cm/sqrt(2.)-y2_cm/sqrt(2.)))/2.;
@@ -2497,9 +2417,14 @@ void R3BLosCal2Hit::Exec(Option_t* option)
           
           y_cm = y_cm_temp;
           x_cm = x_cm_temp;
-       
-          x_cm_corr = (x1_cm_corr + (x2_cm_corr/sqrt(2.)-y2_cm_corr/sqrt(2.)))/2.;
-          y_cm_corr = (y1_cm_corr + (x2_cm_corr/sqrt(2.)+y2_cm_corr/sqrt(2.)))/2.;
+          if(Icount > 0) // 4.9e+6) // to "straightained" x,y spectra
+          {
+		//	y_cm = y_cm_temp*cos(0.1714)-x_cm_temp*sin(0.1714);
+		//	x_cm = x_cm_temp*cos(0.1714)+y_cm_temp*sin(0.1714);  
+		   }
+      
+           x_cm_corr = (x1_cm_corr + (x2_cm_corr/sqrt(2.)-y2_cm_corr/sqrt(2.)))/2.;
+           y_cm_corr = (y1_cm_corr + (x2_cm_corr/sqrt(2.)+y2_cm_corr/sqrt(2.)))/2.;
           
           
           if(IS_NAN(tott))  cout<<"IS_NAN(tott)"<<endl;
@@ -2529,26 +2454,38 @@ void R3BLosCal2Hit::Exec(Option_t* option)
         {
 			
            tot = (tot_ver + tot_hor + tot_45 + tot_135)/4.;
-		   	          
-      
-           x1ToT_cm = ((totl-totr)/(totl+totr)-flosOffsetX1Q)*flosVeffX1Q;
-           y1ToT_cm = ((tott-totb)/(tott+totb)-flosOffsetY1Q)*flosVeffY1Q;
-           x2ToT_cm = ((totlt-totrb)/(totlt+totrb)-flosOffsetX2Q)*flosVeffX2Q;
-           y2ToT_cm = ((totrt-totlb)/(totrt+totlb)-flosOffsetY2Q)*flosVeffY2Q; 
-          
-        /*   
-           x1ToT_cm = (log(totl/totr)-flosOffsetX1Q)*flosVeffX1Q;
-           y1ToT_cm = (log(tott/totb)-flosOffsetY1Q)*flosVeffY1Q;
-           x2ToT_cm = (log(totlt/totrb)-flosOffsetX2Q)*flosVeffX2Q;
-           y2ToT_cm = (log(totrt/totlb)-flosOffsetY2Q)*flosVeffY2Q; 
-         */  
+		   
+		   //tot = sqrt(sqrt(tot_ver * tot_hor * tot_45 * tot_135));
+			          
+           x1ToT_cm = ((totl-totr)/tot-flosOffsetX1Q)*flosVeffX1Q;
+           y1ToT_cm = ((tott-totb)/tot-flosOffsetY1Q)*flosVeffY1Q;
+           x2ToT_cm = ((totlt-totrb)/tot-flosOffsetX2Q)*flosVeffX2Q;
+           y2ToT_cm = ((totrt-totlb)/tot-flosOffsetY2Q)*flosVeffY2Q; 
            
            
-                    
-           xToT = (x1ToT_cm + (x2ToT_cm/sqrt(2.)-y2ToT_cm/sqrt(2.)))/2.;
-           yToT = (y1ToT_cm + (x2ToT_cm/sqrt(2.)+y2ToT_cm/sqrt(2.)))/2.; 
+           Double_t yToT_temp, xToT_temp;
+           
+           xToT_temp = (x1ToT_cm + (x2ToT_cm/sqrt(2.)-y2ToT_cm/sqrt(2.)))/2.;
+           yToT_temp = (y1ToT_cm + (x2ToT_cm/sqrt(2.)+y2ToT_cm/sqrt(2.)))/2.; 
  
-
+           xToT = xToT_temp;
+           yToT = yToT_temp;
+           if(Icount > 0) // 4.9e+6) // to "straightained" x,y spectra
+          {
+		//	yToT = yToT_temp*cos(0.15)-xToT_temp*sin(0.15);
+		//	xToT = xToT_temp*cos(0.1)+yToT_temp*sin(0.1);  
+		   }          
+            
+           xmean_cm = (xToT+x_cm)/2.;
+           ymean_cm = (yToT+y_cm)/2.;	
+         }
+         
+ /*        
+           if(xT_cm > -0.5 && xT_cm < -0.3) Igood_event = 0;
+           if(xT_cm > 0.22 && xT_cm < 0.71) Igood_event = 0; 
+           if(yT_cm > 0.35 && yT_cm < 0.56) Igood_event = 0;
+           if(yT_cm > -0.61 && yT_cm < -0.45) Igood_event = 0;
+ */          
   // Raumwinkel und Radius           
   
            xvar = x_cm;
@@ -2592,36 +2529,120 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 		   
 		   rw_sum = (rw_t+rw_lt+rw_l+rw_lb+rw_b+rw_rb+rw_r+rw_rt)*180./3.14159265;	   
 		   fhRW->Fill(rw_sum);
-		   		  
- // Correction for the PMs saturation:
-		  tott_corr  = satu(0,tott);
-		  totlt_corr = satu(1,totlt);
-		  totl_corr  = satu(2,totl);
-		  totlb_corr = satu(3,totlb);		  		  
-		  totb_corr  = satu(4,totb);
-		  totrb_corr = satu(5,totrb);
-		  totr_corr  = satu(6,totr);
-		  totrt_corr = satu(7,totrt);
-                          		   
-        x1real = ((totl_corr-totr_corr)/(totl_corr+totr_corr)-flosOffsetX1Qc)*flosVeffX1Qc;            
-        y1real = ((tott_corr-totb_corr)/(tott_corr+totb_corr)-flosOffsetY1Qc)*flosVeffY1Qc;
-   
-        
-        x2real = ((totlt_corr-totrb_corr)/(totlt_corr+totrb_corr)-flosOffsetX2Qc)*flosVeffX2Qc;            
-        y2real = ((totrt_corr-totlb_corr)/(totrt_corr+totlb_corr)-flosOffsetY2Qc)*flosVeffY2Qc; 
-
-        xreal = (x1real + (x2real/sqrt(2.)-y2real/sqrt(2.)))/2.;
-        yreal = (y1real + (x2real/sqrt(2.)+y2real/sqrt(2.)))/2.; 
-                
-        xvar = xreal;
-        yvar = yreal;
-           
-        xvar1 = xvar/sqrt(2.)+yvar/sqrt(2.);
-        yvar1 = -xvar/sqrt(2.)+yvar/sqrt(2.);  
- 
-
+		   
 		
-		if(!(IS_NAN(tott_corr)) && !(IS_NAN(totlt_corr)) && !(IS_NAN(totl_corr)) && !(IS_NAN(totlb_corr)) &&
+		  tott_scal = tott * ((2.*sin(rw_t/2.))/rr_t) / (0.5/6.); //* (0.38 / rw_t) / (6. / rr_t); // /(rr_t/(2.*sin(rw_t/2.))/10.);		  
+		  totl_scal = totl * ((2.*sin(rw_l/2.))/rr_l) / (0.5/6.); //*(0.38 / rw_l) / (6. / rr_l); // //(rr_l/(2.*sin(rw_l/2.))/5.);
+		  totb_scal = totb * ((2.*sin(rw_b/2.))/rr_b) / (0.5/6.); //*(0.38 / rw_b) / (6. / rr_b); // //(rr_b/(2.*sin(rw_b/2.))/10.); 
+		  totr_scal = totr * ((2.*sin(rw_r/2.))/rr_r) / (0.5/6.); //*(0.38 / rw_r) / (6. / rr_r); // //(rr_r/(2.*sin(rw_r/2.))/5.);   
+          totlt_scal = totlt * ((2.*sin(rw_lt/2.))/rr_lt) / (0.5/6.); //*(0.38 / rw_lt) / (6. / rr_lt); // //(rr_lt/(2.*sin(rw_lt/2.))/20.);
+		  totlb_scal = totlb * ((2.*sin(rw_lb/2.))/rr_lb) / (0.5/6.); //*(0.38 / rw_lb) / (6. / rr_lb); // //(rr_lb/(2.*sin(rw_lb/2.))/20.);
+		  totrb_scal = totrb * ((2.*sin(rw_rb/2.))/rr_rb) / (0.5/6.); //*(0.38 / rw_rb) / (6. / rr_rb); // //(rr_rb/(2.*sin(rw_rb/2.))/20.);
+		  totrt_scal = totrt * ((2.*sin(rw_rt/2.))/rr_rt) / (0.5/6.); //*(0.38 / rw_rt) / (6. / rr_rt); // //(rr_rt/(2.*sin(rw_rt/2.))/20.);
+		  
+		  
+		  totl_corr  = (55.*totl+360.*10.)/(360.-totl);
+		  totr_corr  = (65.*totr+350.*10.)/(350.-totr);
+		  
+		  tott_corr  = (55.*tott+380.*10.)/(380.-tott);
+		  totb_corr  = (65.*totb+380.*10.)/(380.-totb);
+		  
+		  totlt_corr = (35.*totlt+390.*10.)/(390.-totlt);
+		  totrb_corr = (35.*totrb+390.*10.)/(390.-totrb);
+		  
+		  totlb_corr = (35.*totlb+390.*10.)/(390.-totlb);
+		  totrt_corr = (35.*totrt+390.*10.)/(390.-totrt);
+		 
+		/* 
+		 tott_corr=log(150./(150.-tott))/0.008;
+		 totlt_corr=log(150./(150.-totlt))/0.008;
+		 totl_corr=log(150./(150.-totl))/0.008;
+		 totlb_corr=log(150./(150.-totlb))/0.008;
+		 totb_corr=log(150./(150.-totb))/0.008;
+		 totrb_corr=log(150./(150.-totrb))/0.008;
+		 totr_corr=log(150./(150.-totr))/0.008;
+		 totrt_corr=log(150./(150.-totrt))/0.008;
+		 */ 
+		  //cout<<tott<<", "<<tott_corr<<endl;
+
+    // ToT correction 
+ /*          
+	      Double_t x;    
+   // PM1 
+             x=rw_t;                
+             if(x < tot_par[0][0]) x = tot_par[0][0];              
+             if(x > tot_par[0][1]) x = tot_par[0][1];      
+             tott_corr = tott_scal + 110. - (tot_par[0][2] + tot_par[0][3]*x + tot_par[0][4]*x*x + 
+                                         tot_par[0][5]*x*x*x + tot_par[0][6]*x*x*x*x+
+                                         tot_par[0][7]*x*x*x*x*x );                                          
+             if(x < tot_par[0][0] || x > tot_par[0][1]) tott_corr = 0.0/0.0;		   
+             
+   // PM2 
+             x=rw_lt;               
+             if(x < tot_par[1][0]) x = tot_par[1][0];              
+             if(x > tot_par[1][1]) x = tot_par[1][1];            
+             totlt_corr = totlt_scal + 110. - (tot_par[1][2] + tot_par[1][3]*x + tot_par[1][4]*x*x + 
+                                         tot_par[1][5]*x*x*x + tot_par[1][6]*x*x*x*x+
+                                         tot_par[1][7]*x*x*x*x*x );                                          
+             if(x < tot_par[1][0] || x > tot_par[1][1]) totlt_corr = 0.0/0.0;		   
+             
+   // PM3 
+             x=rw_l;                
+             if(x < tot_par[2][0]) x = tot_par[2][0];              
+             if(x > tot_par[2][1]) x = tot_par[2][1];           
+             totl_corr = totl_scal + 110. - (tot_par[2][2] + tot_par[2][3]*x + tot_par[2][4]*x*x + 
+                                         tot_par[2][5]*x*x*x + tot_par[2][6]*x*x*x*x+
+                                         tot_par[2][7]*x*x*x*x*x );                                          
+             if(x < tot_par[2][0] || x > tot_par[2][1]) totl_corr = 0.0/0.0;		   
+             		   
+   // PM4 
+             x=rw_lb;                
+             if(x < tot_par[3][0]) x = tot_par[3][0];              
+             if(x > tot_par[3][1]) x = tot_par[3][1];           
+             totlb_corr = totlb_scal + 110. - (tot_par[3][2] + tot_par[3][3]*x + tot_par[3][4]*x*x + 
+                                         tot_par[3][5]*x*x*x + tot_par[3][6]*x*x*x*x+
+                                         tot_par[3][7]*x*x*x*x*x );                                          
+             if(x < tot_par[3][0] || x > tot_par[3][1]) totlb_corr = 0.0/0.0;		   
+             
+   // PM5 
+             x=rw_b;                 
+             if(x < tot_par[4][0]) x = tot_par[4][0];              
+             if(x > tot_par[4][1]) x = tot_par[4][1];          
+             totb_corr = totb_scal + 110. - (tot_par[4][2] + tot_par[4][3]*x + tot_par[4][4]*x*x + 
+                                         tot_par[4][5]*x*x*x + tot_par[4][6]*x*x*x*x+
+                                         tot_par[4][7]*x*x*x*x*x );                                          
+             if(x < tot_par[4][0] || x > tot_par[4][1]) totb_corr = 0.0/0.0;		   
+             		   
+   // PM6 
+             x=rw_rb;                
+             if(x < tot_par[5][0]) x = tot_par[5][0];              
+             if(x > tot_par[5][1]) x = tot_par[5][1];           
+             totrb_corr = totrb_scal + 110. - (tot_par[5][2] + tot_par[5][3]*x + tot_par[5][4]*x*x + 
+                                         tot_par[5][5]*x*x*x + tot_par[5][6]*x*x*x*x+
+                                         tot_par[5][7]*x*x*x*x*x );                                          
+             if(x < tot_par[5][0] || x > tot_par[5][1]) totrb_corr = 0.0/0.0;		   
+             
+   // PM7 
+             x=rw_r;                   
+             if(x < tot_par[6][0]) x = tot_par[6][0];              
+             if(x > tot_par[6][1]) x = tot_par[6][1];        
+             totr_corr = totr_scal + 110. - (tot_par[6][2] + tot_par[6][3]*x + tot_par[6][4]*x*x + 
+                                         tot_par[6][5]*x*x*x + tot_par[6][6]*x*x*x*x+
+                                         tot_par[6][7]*x*x*x*x*x );                                          
+             if(x < tot_par[6][0] || x > tot_par[6][1]) totr_corr = 0.0/0.0;
+             
+   // PM8 
+             x=rw_rt;                
+             if(x < tot_par[7][0]) x = tot_par[7][0];              
+             if(x > tot_par[7][1]) x = tot_par[7][1];           
+             totrt_corr = totrt_scal + 110. - (tot_par[7][2] + tot_par[7][3]*x + tot_par[7][4]*x*x + 
+                                         tot_par[7][5]*x*x*x + tot_par[7][6]*x*x*x*x+
+                                         tot_par[7][7]*x*x*x*x*x );                                          
+             if(x < tot_par[7][0] || x > tot_par[7][1]) totrt_corr = 0.0/0.0;		
+             
+*/                
+                          		   
+         if(!(IS_NAN(tott_corr)) && !(IS_NAN(totlt_corr)) && !(IS_NAN(totl_corr)) && !(IS_NAN(totlb_corr)) &&
            !(IS_NAN(totb_corr)) && !(IS_NAN(totrb_corr)) && !(IS_NAN(totr_corr)) && !(IS_NAN(totrt_corr))&&
            tott_corr > 0. && totlt_corr > 0. && totl_corr > 0. && totlb_corr > 0. && totb_corr > 0. && 
            totrb_corr > 0. && totr_corr > 0. && totrt_corr > 0.)
@@ -2629,32 +2650,30 @@ void R3BLosCal2Hit::Exec(Option_t* option)
            tot_corr = (totl_corr + totlt_corr + totlb_corr + tott_corr
                      + totr_corr + totrb_corr + totb_corr + totrt_corr)/8.;                       
         } 
-               
-            
-           xmean_cm = (xreal+x_cm)/2.;
-           ymean_cm = (yreal+y_cm)/2.;	
-         }
+
+
+        x1real = ((totl_corr-totr_corr)/(totl_corr+totr_corr)-flosOffsetX1Qc)*flosVeffX1Qc;            
+        y1real = ((tott_corr-totb_corr)/(tott_corr+totb_corr)-flosOffsetY1Qc)*flosVeffY1Qc;
+        
+        x2real = ((totlt_corr-totrb_corr)/(totlt_corr+totrb_corr)-flosOffsetX2Qc)*flosVeffX2Qc;            
+        y2real = ((totrt_corr-totlb_corr)/(totrt_corr+totlb_corr)-flosOffsetY2Qc)*flosVeffY2Qc; 
+
+        xreal = (x1real + (x2real/sqrt(2.)-y2real/sqrt(2.)))/2.;
+        yreal = (y1real + (x2real/sqrt(2.)+y2real/sqrt(2.)))/2.; 
+        
   
-       }   // end octagon
-       
-     } // end LOSTYPE=2
-     
-                 
-      if(iLOSType == 1 || iLOSType == 2 ) 
-      {
-        Z = tot;
-        t_hit = timeLosM; 
-       }
-       
- // Fill the spectra:
-       
-     if(iLOSType == 2 ) 
-      {                    
-      
-       if(Igood_event == 1)
-       {
+       }                        
+  // end octagon          
+
+          // always:
+  	      Z = tot;
+  
+          t_hit = timeLosM; 
+                    
+         if(Igood_event == 1){
 			 
-			  
+			 
+ 
   // MCFD times:    
           fhTres_M->Fill(LosTresM);
           fhTres_M_evCh->Fill((t_45_M - t_135_M));    
@@ -2682,9 +2701,8 @@ void R3BLosCal2Hit::Exec(Option_t* option)
   // x,y from MCFD:
           fhXY->Fill(x_cm,y_cm);
           fhXY1->Fill(x1_cm,y1_cm);
-          fhXY2->Fill(x2_cm,y2_cm); 
-      // Average of three:             
-          fhXYproj->Fill(((xreal+x_cm+xT_cm)/3.),(yreal+y_cm+yT_cm)/3.);
+          fhXY2->Fill(x2_cm,y2_cm);          
+          fhXYproj->Fill((x2_cm/sqrt(2.)-y2_cm/sqrt(2.)),(x2_cm/sqrt(2.)+y2_cm/sqrt(2.)));
   // x,y from MCFD walk corrected: 
           fhXY_corr->Fill(x_cm_corr,y_cm_corr);         
           fhXY1_corr->Fill(x1_cm_corr,y1_cm_corr);
@@ -2699,7 +2717,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
           fhXYQ2->Fill(x2ToT_cm,y2ToT_cm);                   
  // Mean value between MCFD and ToT:  
           fhXYmean->Fill(xmean_cm,ymean_cm);       		  	 
- // x,y from ToT corrected:             
+ // Mean value between MCFD, TAMEX and ToT:             
           fhXY_ToT_corr->Fill(xreal,yreal); 
           fhXY1_ToT_corr->Fill(x1real,y1real);
           fhXY2_ToT_corr->Fill(x2real,y2real);         
@@ -2732,25 +2750,25 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 		  fhQ4_vs_Q8_corr->Fill(totlb_corr,totrt_corr);
 
 	  
-		  fhQ_T->Fill(y_cm,tott); 		  
-		  fhQ_L->Fill(x_cm,totl);
- 	      fhQ_B->Fill(y_cm,totb); 
-		  fhQ_R->Fill(x_cm,totr);   		      
+		  fhQ_T->Fill(y1_cm_corr,tott); 		  
+		  fhQ_L->Fill(x1_cm_corr,totl);
+ 	      fhQ_B->Fill(y1_cm_corr,totb); 
+		  fhQ_R->Fill(x1_cm_corr,totr);   		      
 		  
-		  fhQ_RT->Fill(y_cm,totrt);		  
-          fhQ_LT->Fill(x_cm,totlt);  		  
-		  fhQ_LB->Fill(y_cm,totlb);
-		  fhQ_RB->Fill(x_cm,totrb);	
+		  fhQ_RT->Fill(y2_cm_corr,totrt);		  
+          fhQ_LT->Fill(x2_cm_corr,totlt);  		  
+		  fhQ_LB->Fill(y2_cm_corr,totlb);
+		  fhQ_RB->Fill(x2_cm_corr,totrb);	
 		  
-		  fhQ_T_corr->Fill(y_cm,tott_corr); 		  
-		  fhQ_L_corr->Fill(x_cm,totl_corr);
- 	      fhQ_B_corr->Fill(y_cm,totb_corr); 
-		  fhQ_R_corr->Fill(x_cm,totr_corr);   		      
+		  fhQ_T_corr->Fill(y1_cm_corr,tott_corr); 		  
+		  fhQ_L_corr->Fill(x1_cm_corr,totl_corr);
+ 	      fhQ_B_corr->Fill(y1_cm_corr,totb_corr); 
+		  fhQ_R_corr->Fill(x1_cm_corr,totr_corr);   		      
 		  
-		  fhQ_RT_corr->Fill(y_cm,totrt_corr);		  
-          fhQ_LT_corr->Fill(x_cm,totlt_corr);  		  
-		  fhQ_LB_corr->Fill(y_cm,totlb_corr);
-		  fhQ_RB_corr->Fill(x_cm,totrb_corr);	
+		  fhQ_RT_corr->Fill(y2_cm_corr,totrt_corr);		  
+          fhQ_LT_corr->Fill(x2_cm_corr,totlt_corr);  		  
+		  fhQ_LB_corr->Fill(y2_cm_corr,totlb_corr);
+		  fhQ_RB_corr->Fill(x2_cm_corr,totrb_corr);	
 
 
 
@@ -2779,104 +2797,13 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 		            
 	     }
 
-	   }  // end of LOSTYPE = 2
-	   
-	 if(iLOSType == 1 ) 
-      {                    
-      
-       if(Igood_event == 1)
-       {
-			 		  
-  // MCFD times:    
-          fhTres_M->Fill(LosTresM);   
-          fhTresMvsIcount->Fill(Icount,LosTresM);
-  // MCFD walk corrected times:			 
-          fhTres_M_corr->Fill(LosTresM_corr);		  
-          fhTreswcMvsIcount->Fill(Icount,LosTresM_corr);          
-   // TAMEX times:       
-	      fhTres_T->Fill(LosTresT);     
-          fhTresMvsIcount->Fill(Icount,LosTresM);
-  // TAMEX walk corrected times:			 
-          fhTres_T_corr->Fill(LosTresT_corr);		  
-          fhTreswcTvsIcount->Fill(Icount,LosTresT_corr);
-          
-   // dt combined:
-          fhTres_MT_corr->Fill((LosTresM_corr+LosTresT_corr)/2.);	        
-                    	                   
-  // x,y from MCFD:
-          fhXY->Fill(x_cm,y_cm);
-      // Average of two:             
-          fhXYproj->Fill(((xreal+x_cm+xT_cm)/3.),(yreal+y_cm+yT_cm)/3.);
-  // x,y from MCFD walk corrected: 
-          fhXY_corr->Fill(x_cm_corr,y_cm_corr);         
-  // x,y from TAMEX:	           
-          fhXYT->Fill(xT_cm,yT_cm);   
-  // x,y from ToT:            
-          fhXY_ToT->Fill(xToT,yToT);                         
- // Mean value between MCFD and ToT:  
-          fhXYmean->Fill(xmean_cm,ymean_cm);       		  	 
- // x,y from ToT corrected:             
-          fhXY_ToT_corr->Fill(xreal,yreal); 
-         
-          
- // ToT
-  	      fhQ->Fill(tot);
-          fhQtest->Fill(tot_corr);  
-                 
-          fhQ1vsIcount->Fill(Icount,tott);        
-          fhQ3vsIcount->Fill(Icount,totl);   
-          fhQ5vsIcount->Fill(Icount,totb);             
-          fhQ7vsIcount->Fill(Icount,totr);                             
-          		  		  
-		  fhQ1_vs_Q5->Fill(tott,totb);
-		  fhQ3_vs_Q7->Fill(totl,totr);	          	
- 		  fhQ1_vs_Q5_corr->Fill(tott_corr,totb_corr);
-		  fhQ3_vs_Q7_corr->Fill(totr_corr,totl_corr);           
-	  
-		  fhQ_T->Fill(y_cm,tott); 		  
-		  fhQ_L->Fill(x_cm,totl);
- 	      fhQ_B->Fill(y_cm,totb); 
-		  fhQ_R->Fill(x_cm,totr);   		      
-		  
-	  
-		  fhQ_T_corr->Fill(y_cm,tott_corr); 		  
-		  fhQ_L_corr->Fill(x_cm,totl_corr);
- 	      fhQ_B_corr->Fill(y_cm,totb_corr); 
-		  fhQ_R_corr->Fill(x_cm,totr_corr);   		      
-
- // Correlations:         
-          fhTresX_M->Fill(x_cm,LosTresM);
-          fhTresY_M->Fill(y_cm,LosTresM);
-          fhTresX_M_corr->Fill(x_cm,LosTresM_corr);
-          fhTresY_M_corr->Fill(y_cm,LosTresM_corr);          
-          
-          fhTresX_T->Fill(x_cm,LosTresT);
-          fhTresY_T->Fill(y_cm,LosTresT);
-          fhTresX_T_corr->Fill(x_cm,LosTresT_corr);
-          fhTresY_T_corr->Fill(y_cm,LosTresT_corr);          
-        
-          fhTM_vs_Q->Fill(tot,LosTresM);
-          fhTM_vs_Q_corr->Fill(tot,LosTresM_corr);
-          fhTT_vs_Q->Fill(tot,LosTresT);     
-          fhTT_vs_Q_corr->Fill(tot,LosTresT_corr);
-              
-          fhQ_vs_X->Fill(x_cm,tot);
-          fhQ_vs_Y->Fill(y_cm,tot); 
-               
-          fhQ_vs_X_corr->Fill(x_cm,tot_corr);
-          fhQ_vs_Y_corr->Fill(y_cm,tot_corr);
-          		  	
-		            
-	     }
-
-	   }  // end of LOSTYPE=1   	  
-	      	  
+	   }     	  
 		         
 	      	                
        new ((*fHitItems)[fNofHitItems]) R3BLosHitData(nDet, t_hit , x_cm, y_cm, Z);
        fNofHitItems += 1;
         
- //  myFile.close();
+   
         
 }
 
@@ -3032,8 +2959,7 @@ void R3BLosCal2Hit::FinishTask()
 	if(fht3t7T_corr) fht3t7T_corr->Write();	
 	if(fht4t8T_corr) fht4t8T_corr->Write();	
 	if(fhQpix) fhQpix->Write();
-	
-	}
+}
 
 Double_t R3BLosCal2Hit::walk(Int_t inum, Double_t tot)
 {
@@ -3063,24 +2989,6 @@ Double_t R3BLosCal2Hit::walk(Int_t inum, Double_t tot)
                           walk_par[inum][6] <<", "<< walk_par[inum][7] <<", "<< walk_par[inum][8] <<", "<<
                           walk_par[inum][9] <<", "<< walk_par[inum][10] <<endl; 
    */ 
-    return ysc;
-}
-
-Double_t R3BLosCal2Hit::satu(Int_t inum, Double_t tot)
-{
-
-    Double_t ysc=0./0. ;
-    
-    ysc = tot;
-    
-    if(tot_par[inum][0] > 0.)  
-    ysc  = (tot_par[inum][0]*tot+tot_par[inum][1])/(tot_par[inum][2]-tot)*tot_par[inum][3] ;
-      
-                                                                                
- /*   
-    cout<< inum<<", "<< tot_par[inum][0] <<", "<< tot_par[inum][1] <<", "<< tot_par[inum][2]<<", "<< tot_par[inum][3] <<endl; 
-    cout<<tot<<", "<<ysc<<endl;    
- */ 
     return ysc;
 }
 

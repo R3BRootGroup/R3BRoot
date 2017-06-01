@@ -66,6 +66,8 @@ void R3BTCalEngine::Fill(Int_t plane, Int_t paddle, Int_t side, Int_t tdc)
         fhTime[plane - 1][paddle - 1][side - 1] = new TH1F(strName, "", 4097, -0.5, 4096.5);
     }
     fhData[plane - 1][paddle - 1][side - 1]->Fill(tdc);
+    
+//  LOG(INFO) << "R3BTCalEngine:: " << plane << " " << paddle<< " "<<side<<" "<< fhData[plane - 1][paddle - 1][side - 1]->GetEntries()<<FairLogger::endl;  
 }
 
 void R3BTCalEngine::CalculateParamClockTDC()
@@ -292,16 +294,26 @@ void R3BTCalEngine::CalculateParamVFTX()
 
     for (Int_t i = 0; i < N_PLANE_MAX; i++)
     {
+  //  LOG(INFO) << "R3BTCalEngine::CalculateParamVFTX() : Plane: " << i << FairLogger::endl;
         for (Int_t j = 0; j < N_PADDLE_MAX; j++)
         {
+  //	 LOG(INFO) << "R3BTCalEngine::CalculateParamVFTX() : Paddle: " << j << FairLogger::endl;
+	
             for (Int_t k = 0; k < N_SIDE_MAX; k++)
             {
+   
+  // if(i == 0)   LOG(INFO) << "R3BTCalEngine::CalculateParamVFTX() : Detector: "<<i<<", Channel: "<<j<<", Type: " << k << FairLogger::endl;   
+   
+   
+   
                 if (NULL == fhData[i][j][k])
                 {
+		//			LOG(INFO) << "R3BTCalEngine::CalculateParamVFTX() : NULL: " << fhData[i][j][k]<< FairLogger::endl;
                     continue;
                 }
                 if (fhData[i][j][k]->GetEntries() < fMinStats)
                 {
+		//			LOG(INFO) << "R3BTCalEngine::CalculateParamVFTX() : fMinStatus: " << fhData[i][j][k]->GetEntries()<<", "<<fMinStats<< FairLogger::endl;
                     continue;
                 }
 

@@ -111,17 +111,23 @@ class R3BLosMapped2CalPar : public FairTask
     inline void SetNofModules(Int_t nDets, Int_t nCh)
     {
         fNofDetectors = nDets;		
-        fNofChannels  = nCh;
-        fNofModules   = nDets * nCh * 1; // 1 edge per channel
+        fNofChannels  = nCh;  // = 4 or 8 or 16
+        fNofTypes     = 3;
+        fNofModules   = nDets * nCh * 3 ; // 4 or 8 los signals *3 times per channel 12 or 24 in total
     }
 
   private:
     Int_t fUpdateRate; /**< An update rate. */
     Int_t fMinStats;   /**< Minimum statistics required per module. */
     Int_t fTrigger;    /**< Trigger value. */
-
+    Int_t Icounts1 = 0;
+    Int_t Icounts2 = 0;
+    Int_t Icounts3 = 0;
+    Int_t Icount[16][3]{};
+    
     UInt_t fNofDetectors;   /**< Number of LOS detectors. */
     UInt_t fNofChannels;    /**< Number of channels per detector. */
+    UInt_t fNofTypes = 3;       /**< Number of time-types per channel (VFTX, TAMEX leading/trailing). */
     UInt_t fNofModules;     /**< Total number of modules (=edges) to calibrate */
 
     Int_t fNEvents;         /**< Event counter. */

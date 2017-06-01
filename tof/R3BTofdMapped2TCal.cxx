@@ -161,7 +161,6 @@ void R3BTofdMapped2TCal::Exec(Option_t* option)
 		           iPlane << ", Bar: " << iBar << ", Tube: " << (tube+1) << FairLogger::endl;
 		           continue;
 		       }
-	
 		       
 		       // Convert TDC to [ns] ...
 		       Double_t time_ns = par->GetTimeVFTX( hit->GetFineTime(tube , edge) );

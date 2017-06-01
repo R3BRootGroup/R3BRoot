@@ -193,9 +193,9 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
     	  R3BLosCalData *calData = (R3BLosCalData*)fCalItemsLos->At(ihit);
 
           Int_t iDet=calData->GetDetector();
-          fh_los_tres->Fill((calData->fTime_r_ns+calData->fTime_l_ns)/2. -     		
-	                  (calData->fTime_t_ns+calData->fTime_b_ns)/2.);
-          timeLos=(calData->fTime_r_ns+calData->fTime_l_ns+calData->fTime_t_ns+calData->fTime_b_ns)/4.;		 
+          fh_los_tres->Fill((calData->fTimeV_r_ns+calData->fTimeV_l_ns)/2. -     		
+	                  (calData->fTimeV_t_ns+calData->fTimeV_b_ns)/2.);
+          timeLos=(calData->fTimeV_r_ns+calData->fTimeV_l_ns+calData->fTimeV_t_ns+calData->fTimeV_b_ns)/4.;		 
       }            						 
     }
 

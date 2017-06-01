@@ -62,6 +62,7 @@ ext_h101_fibone.h
 ext_h101_fibfive.h
 ext_h101_fibsix.h
 ext_h101_los.h
+ext_h101_los_tamex.h
 ext_h101_tofd.h
 ext_h101_ptof.h
 ext_h101_psp.h

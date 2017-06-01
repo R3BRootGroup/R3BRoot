@@ -29,6 +29,7 @@
 #pragma link C++ class EXT_STR_h101_FIBFIVE_onion_t;
 #pragma link C++ class EXT_STR_h101_FIBSIX_onion_t;
 #pragma link C++ class EXT_STR_h101_LOS_onion_t;
+#pragma link C++ class EXT_STR_h101_LOS_TAMEX_onion_t;
 #pragma link C++ class EXT_STR_h101_TOFD_onion_t;
 #pragma link C++ class EXT_STR_h101_PTOF_onion_t;
 #pragma link C++ class EXT_STR_h101_PSP_onion_t;

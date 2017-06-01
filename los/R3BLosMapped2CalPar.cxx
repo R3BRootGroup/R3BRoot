@@ -17,7 +17,7 @@
  * The master trigger is on the last channel of the VFTX and handled
  * as 5th los channel.
  * 
- * This file handles 7ps VFTX only, hence we have one edge per channel.
+ * This file handles 7ps VFTX and TAMEX2, hence we have three times per channel.
  * 
  */
 
@@ -36,6 +36,7 @@
 #include "TClonesArray.h"
 #include "TH1F.h"
 #include "TF1.h"
+#include "math.h"
 
 #include <iostream>
 #include <stdlib.h>
@@ -49,6 +50,7 @@ R3BLosMapped2CalPar::R3BLosMapped2CalPar()
     , fTrigger(-1)
     , fNofDetectors(0)
     , fNofChannels(0)
+    , fNofTypes(0)
     , fNEvents(0)
     , fCal_Par(NULL)
 {
@@ -61,6 +63,7 @@ R3BLosMapped2CalPar::R3BLosMapped2CalPar(const char* name, Int_t iVerbose)
     , fTrigger(-1)
     , fNofDetectors(0)
     , fNofChannels(0)
+    , fNofTypes(0)
     , fNEvents(0)
     , fCal_Par(NULL)
 {
@@ -80,6 +83,14 @@ R3BLosMapped2CalPar::~R3BLosMapped2CalPar()
 
 InitStatus R3BLosMapped2CalPar::Init()
 {
+	
+    for(UInt_t i = 0; i < 16; i++)
+    {
+     for(UInt_t k = 0; k < 3; k++)
+     {
+		Icount[i][k] = 0; 
+	 }
+	} 	 	
     FairRootManager* rm = FairRootManager::Instance();
     if (!rm)
     {
@@ -88,8 +99,9 @@ InitStatus R3BLosMapped2CalPar::Init()
     
     header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
 	// may be = NULL!
-	
-    fMapped = (TClonesArray*)rm->GetObject("LosMapped");
+
+
+    fMapped = (TClonesArray*)rm->GetObject("LosMapped");    
     if (!fMapped)
     {
         return kFATAL;
@@ -116,47 +128,64 @@ void R3BLosMapped2CalPar::Exec(Option_t* option)
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger)) 
 		return;
 
-    Int_t nHits = fMapped->GetEntries();
+    UInt_t nHits = fMapped->GetEntries();
+  
+
+  //cout<<"Mapped2CalPar: "<<nHits<<endl;
+
 
     // Loop over mapped hits
-    for (Int_t i = 0; i < nHits; i++)
+    for (UInt_t i = 0; i < nHits; i++)
     {
 		
         R3BLosMappedData* hit = (R3BLosMappedData*)fMapped->At(i);
-        if (!hit) continue; // should not happen
+        if (!hit) 
+        {
+			//cout<<"Mapped2CalPar no hit"<<endl;
+			continue; // should not happen
+	     }		
 
         
         // channel numbers are supposed to be 1-based (1..n)
-        UChar_t iDetector = hit->GetDetector()-1; // now 0..n-1
-        UChar_t iChannel  = hit->GetChannel()-1;  // now 0..n-1
-                
+        UInt_t iDetector = hit->GetDetector()-1; // now 0..n-1
+        UInt_t iChannel  = hit->GetChannel()-1;  // now 0..n-1
+        UInt_t iType     = hit->GetType();       // 0,1,2
+                  
+ // cout<<"Mapped2CalPar "<<iDetector<<", "<<iChannel<<", "<<iType<<endl;
         
-        if (iDetector>=fNofDetectors) // this also errors for iDetector==0
+        if (iDetector > (fNofDetectors-1)) 
         {
             LOG(ERROR) << "R3BLosMapped2CalPar::Exec() : more detectors than expected! Det: " << (iDetector+1) << " allowed are 1.." << fNofDetectors << FairLogger::endl;
             continue;
         }
-        if (iChannel>=fNofChannels) // same here
+        if (iChannel > (fNofChannels-1)) 
         {
-            LOG(ERROR) << "R3BLosMapped2CalPar::Exec() : more bars than expected! Det: " << (iDetector+1) << " allowed are 1.." << fNofChannels << FairLogger::endl;
+            LOG(ERROR) << "R3BLosMapped2CalPar::Exec() : more channels than expected! Channel: " << (iChannel+1) << " allowed are 1.." << fNofChannels << FairLogger::endl;
             continue;
         }
 
-
-		// remember: only one edge per channel
-		UInt_t iModule = iDetector * fNofChannels + iChannel; // 0..n-1
-		
-        // Check validity of module
-        if (iModule >= fNofModules)
+        if (iType > (fNofTypes-1)) 
         {
-            LOG(ERROR) << "Detector: " << iDetector << "  Ch: " << iChannel << " => Module: " << iModule << " out of range."  << FairLogger::endl;
-            FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Illegal detector ID...");
+            LOG(ERROR) << "R3BLosMapped2CalPar::Exec() : more time-types than expected! Type: " << iType << " allowed are 0.." << (fNofTypes-1) << FairLogger::endl;
+            continue;
         }
+  
 
-        // Fill TAC histogram
+        // Fill TAC histogram for VFTX and TAMEX
         //fEngine->Fill(iModule, hit->GetTimeFine());
-        // *** new ***
-        fEngine->Fill(iDetector+1, iChannel + 1, 1, hit->GetTimeFine());
+        // void Fill(Int_t plane, Int_t paddle, Int_t side, Int_t tdc); see R3BRoot/tcal/R3BTcalEngine.h
+        // *** new ***       
+                
+    //     if(isnan(hit->GetTimeFine())) cout << "Fine Time = nan" <<endl;  
+    
+       //  if(hit->GetTimeFine() <= 0) cout<<"time<=0 for"<< iChannel<<", "<<iType<<endl;    
+         
+         Icount[iChannel][iType]++;
+                
+    //   cout<<"Mapped2CalPar "<< iDetector<<", "<<iType<<", "<<  hit->GetTimeFine()<<endl;    
+        fEngine->Fill(iDetector+1, iChannel + 1, iType + 1, hit->GetTimeFine());
+                      
+              
     }
 
     // Increment events
@@ -165,12 +194,25 @@ void R3BLosMapped2CalPar::Exec(Option_t* option)
 
 void R3BLosMapped2CalPar::FinishEvent()
 {
+	
+	
 }
 
 void R3BLosMapped2CalPar::FinishTask()
 {
     fEngine->CalculateParamVFTX();
+    
+    
     fCal_Par->printParams();
+    
+    
+    for(UInt_t i = 0; i < 16; i++)
+    {
+     for(UInt_t k = 0; k < 3; k++)
+     {
+		if(Icount[i][k] > 0) cout<<"R3BLosMapped2CalPar::FinishTask  Channel: "<<i<<", Type: "<<k<<", Count: "<<Icount[i][k]<<endl; 
+	 }
+	} 	 
 }
 
 ClassImp(R3BLosMapped2CalPar)

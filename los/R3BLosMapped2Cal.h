@@ -109,8 +109,9 @@ class R3BLosMapped2Cal : public FairTask
     inline void SetNofModules(Int_t nDets, Int_t nChs)
     {
         fNofDetectors = nDets;
-        fNofChannels = nChs;
-        fNofModules  = nChs * nDets;
+        fNofChannels = nChs;  //=4 or 8  or 16    
+        fNofTypes     = 3;
+        fNofModules  = nChs * nDets * 3 ; // 4 or 8 los signals * 3 times per channel in total 12 or 24
     }
 
   private:
@@ -118,6 +119,8 @@ class R3BLosMapped2Cal : public FairTask
     TClonesArray* fMappedItems;                 /**< Array with mapped items - input data. */
     TClonesArray* fCalItems;                    /**< Array with cal items - output data. */
     Int_t fNofCalItems;                         /**< Number of produced time items per event. */
+    Int_t Icounts_good = 0;
+    Int_t Icounts_tot = 0;
 
     R3BTCalPar* fTcalPar;                       /**< TCAL parameter container. */
     UInt_t fNofTcalPars;                        /**< Number of modules in parameter file. */
@@ -127,7 +130,8 @@ class R3BLosMapped2Cal : public FairTask
     Int_t fTrigger;                             /**< Trigger value. */
 
     UInt_t fNofDetectors;  /**< Number of detectors. */
-    UInt_t fNofChannels;   /**< Number of channels per detector. */    
+    UInt_t fNofChannels;   /**< Number of channels per detector. */
+    UInt_t fNofTypes = 3;    
 	UInt_t fNofModules;    /**< Total number of channels. */
     Double_t fClockFreq;   /**< Clock cycle in [ns]. */
 

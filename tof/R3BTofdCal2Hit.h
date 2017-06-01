@@ -103,7 +103,6 @@ class R3BTofdCal2Hit : public FairTask
      * Method for calculation of saturation.
      */
     virtual Double_t saturation(Double_t x);
-    
     /**
      * Methods for setting number of planes and paddles
      */
@@ -150,14 +149,27 @@ class R3BTofdCal2Hit : public FairTask
     TH2F* fhxy;   
     TH1F* fhCharge3mm; 
     TH1F* fhCharge5mm; 
-    TH2F* fhCharge3mm_vs_x;
-    TH2F* fhCharge3mm_vs_y;
-    TH2F* fhCharge5mm_vs_x;
-    TH2F* fhCharge5mm_vs_y;    
     TH1F* fhCharge; 
     TH2F* fhSaturation1;     
-    TH2F* fhSaturation2;     
-   
+    TH2F* fhSaturation2;
+    TH1F* fhLosTimeM;     
+    TH1F* fhLosTimeP;
+    TH1F* fhLosTimeP_corr;
+    TH2F* fhLosTimeP_vs_TimeM;
+    TH2F* fhLosTimeP_vs_TimeM_corr;
+    TH1F* fhLosQ1;
+    TH1F* fhLosQ2;
+    TH2F* fhLosQ;
+    TH2F* fhLosQ_corr;
+    TH2F* fhLosQvsTP;
+    TH2F* fhLosQvsTP_corr;
+    TH2F* fhLosQvsTM;
+    TH2F* fhLosQvsX;
+    TH2F* fhLosQvsY;
+    TH2F* fhLosXYP;
+    TH2F* fh_los_pos;
+    
+       
   public:
     ClassDef(R3BTofdCal2Hit, 1)
 };

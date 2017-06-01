@@ -37,6 +37,8 @@
 #include "TClonesArray.h"
 #include <iostream>
 #include <sstream>
+#include "TMath.h"
+#define IS_NAN(x) TMath::IsNaN(x)
 using namespace std;
 
 
@@ -58,10 +60,38 @@ R3BOnlineSpectra::R3BOnlineSpectra()
     , fTrigger(-1)
     , fNofPlanes(4)  
     , fPaddlesPerPlane(6)    
-    , flosVeffX(14.)
-    , flosVeffY(14.)    
-    , flosOffsetX(0.)
-    , flosOffsetY(0.)
+    , flosVeffX1(1.)
+    , flosVeffY1(1.)    
+    , flosOffsetX1(0.)
+    , flosOffsetY1(0.)
+    , flosVeffX2(1.)
+    , flosVeffY2(1.)    
+    , flosOffsetX2(0.)
+    , flosOffsetY2(0.)    
+    , flosVeffX1T(1.)
+    , flosVeffY1T(1.)    
+    , flosOffsetX1T(0.)
+    , flosOffsetY1T(0.)
+    , flosVeffX2T(1.)
+    , flosVeffY2T(1.)    
+    , flosOffsetX2T(0.)
+    , flosOffsetY2T(0.)
+    , flosVeffX1wc(1.)
+    , flosVeffY1wc(1.)    
+    , flosOffsetX1wc(0.)
+    , flosOffsetY1wc(0.)
+    , flosVeffX2wc(1.)
+    , flosVeffY2wc(1.)    
+    , flosOffsetX2wc(0.)
+    , flosOffsetY2wc(0.) 
+    , flosVeffX1Q(1.)
+    , flosVeffY1Q(1.)    
+    , flosOffsetX1Q(0.)
+    , flosOffsetY1Q(0.)
+    , flosVeffX2Q(1.)
+    , flosVeffY2Q(1.)    
+    , flosOffsetX2Q(0.)
+    , flosOffsetY2Q(0.) 
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvents(0)
 {
@@ -85,10 +115,38 @@ R3BOnlineSpectra::R3BOnlineSpectra(const char* name, Int_t iVerbose)
     , fTrigger(-1)
     , fNofPlanes(4)  
     , fPaddlesPerPlane(6)    
-    , flosVeffX(14.)
-    , flosVeffY(14.)    
-    , flosOffsetX(0.)
-    , flosOffsetY(0.)
+    , flosVeffX1(1.)
+    , flosVeffY1(1.)    
+    , flosOffsetX1(0.)
+    , flosOffsetY1(0.)
+    , flosVeffX2(1.)
+    , flosVeffY2(1.)    
+    , flosOffsetX2(0.)
+    , flosOffsetY2(0.)    
+    , flosVeffX1T(1.)
+    , flosVeffY1T(1.)    
+    , flosOffsetX1T(0.)
+    , flosOffsetY1T(0.)
+    , flosVeffX2T(1.)
+    , flosVeffY2T(1.)    
+    , flosOffsetX2T(0.)
+    , flosOffsetY2T(0.)
+    , flosVeffX1wc(1.)
+    , flosVeffY1wc(1.)    
+    , flosOffsetX1wc(0.)
+    , flosOffsetY1wc(0.)
+    , flosVeffX2wc(1.)
+    , flosVeffY2wc(1.)    
+    , flosOffsetX2wc(0.)
+    , flosOffsetY2wc(0.) 
+    , flosVeffX1Q(1.)
+    , flosVeffY1Q(1.)    
+    , flosOffsetX1Q(0.)
+    , flosOffsetY1Q(0.)
+    , flosVeffX2Q(1.)
+    , flosVeffY2Q(1.)    
+    , flosOffsetX2Q(0.)
+    , flosOffsetY2Q(0.)   
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvents(0)
 {
@@ -120,25 +178,6 @@ InitStatus R3BOnlineSpectra::Init()
 	// get access to cal data
     fCalItemsLos = (TClonesArray*)mgr->GetObject("LosCal");
     
-    if(fCalItemsLos || fMappedItemsLos){
-       TCanvas *cLos = new TCanvas("Los", "LOS", 10, 10, 500, 500);
-       cLos->Divide(2, 2);
- 
-       fh_los_channels = new TH1F("los_channels", "LOS channels", 6, 0., 6.); 
-       fh_los_tres = new TH1F("los_time_res", "LOS Time resolution", 4000, -2., 2.);
-       fh_los_pos = new TH2F("los_position", "LOS xy position", 1000, -5., 5.,1000, -5., 5.);
-       fh_los_pos->GetXaxis()->SetTitle("X position / cm");
-       fh_los_pos->GetYaxis()->SetTitle("Y position / cm");  
-        
-       cLos->cd(1);
-       fh_los_channels->Draw();
-       cLos->cd(2);
-       fh_los_tres->Draw();
-       cLos->cd(3);
-       fh_los_pos->Draw();
-       cLos->cd(0);
-       run->AddObject(cLos);
-    }
 
 //-----------------------------------------------------------------------
 // Fiber 1 detector
@@ -497,6 +536,35 @@ InitStatus R3BOnlineSpectra::Init()
 		cpspx_strips->cd(0);
 		run->AddObject(cpspx_cor);
     }
+ 
+    TCanvas *cLos = new TCanvas("Los", "LOS", 10, 10, 850, 950);
+    cLos->Divide(2, 3);
+ 
+    fh_los_channels = new TH1F("los_channels", "LOS channels", 10, 0., 10.); 
+    fh_los_channels->GetXaxis()->SetTitle("Channel number");
+    fh_los_tres_MCFD = new TH1F("los_time_res_MCFD", "LOS MCFD Time resolution - raw", 8000, -4., 4.);
+    fh_los_tres_MCFD->GetXaxis()->SetTitle("Time MCFD / ns");
+    fh_los_tres_TAMEX = new TH1F("los_time_res_TAMEX", "LOS TAMEX Time resolution -raw ", 8000, -4., 4.);  
+    fh_los_tres_TAMEX->GetXaxis()->SetTitle("Time TAMEX / ns"); 
+    fh_los_pos = new TH2F("los_position", "LOS xy position not-calibrated", 2000, -10., 10.,2000, -10., 10.);
+    fh_los_pos->GetXaxis()->SetTitle("X position / ns");
+    fh_los_pos->GetYaxis()->SetTitle("Y position / ns"); 
+    fh_los_tot = new TH1F("los_tot","LOS Time-over-Threshold",2500,0.,250.); 
+    fh_los_tot->GetXaxis()->SetTitle("ToT / ns");
+    
+    cLos->cd(1);
+    fh_los_channels->Draw();
+    cLos->cd(3);
+    fh_los_tres_MCFD->Draw();
+    cLos->cd(4);
+    fh_los_tres_TAMEX->Draw();
+    cLos->cd(5);    
+    fh_los_pos->Draw("colZ");
+    cLos->cd(6);
+    fh_los_tot->Draw();
+    cLos->cd(0);
+    run->AddObject(cLos);
+
     return kSUCCESS;
 }
 
@@ -504,13 +572,63 @@ InitStatus R3BOnlineSpectra::Init()
 
 void R3BOnlineSpectra::Exec(Option_t* option)
 {
-    Double_t timeLos=0.;
-    Double_t cher1=0.;
-    Double_t cher2=0.;
-    Double_t cher3=0.;
-    Double_t cher4=0.;
-
-    
+       Double_t time_r_V = 0.0/0.0;   
+       Double_t time_t_V = 0.0/0.0;       
+       Double_t time_l_V = 0.0/0.0;       
+       Double_t time_b_V = 0.0/0.0;           
+       Double_t time_r_L = 0.0/0.0;
+       Double_t time_r_T = 0.0/0.0;
+       Double_t time_l_L = 0.0/0.0;
+       Double_t time_l_T = 0.0/0.0;
+       Double_t time_t_L = 0.0/0.0;
+       Double_t time_t_T = 0.0/0.0;
+       Double_t time_b_L = 0.0/0.0;
+       Double_t time_b_T = 0.0/0.0;  
+       Double_t time_rt_V = 0.0/0.0;   
+       Double_t time_lt_V = 0.0/0.0;       
+       Double_t time_lb_V = 0.0/0.0;       
+       Double_t time_rb_V = 0.0/0.0;           
+       Double_t time_rt_L = 0.0/0.0;
+       Double_t time_rt_T = 0.0/0.0;
+       Double_t time_lb_L = 0.0/0.0;
+       Double_t time_lb_T = 0.0/0.0;
+       Double_t time_lt_L = 0.0/0.0;
+       Double_t time_lt_T = 0.0/0.0;
+       Double_t time_rb_L = 0.0/0.0;
+       Double_t time_rb_T = 0.0/0.0;              
+       Double_t t_hor_M = 0.0/0.0;
+       Double_t t_ver_M = 0.0/0.0;
+       Double_t t_45_M = 0.0/0.0;
+       Double_t t_135_M = 0.0/0.0;
+       Double_t t_hor_T = 0.0/0.0;
+       Double_t t_ver_T = 0.0/0.0;
+       Double_t t_45_T = 0.0/0.0;
+       Double_t t_135_T = 0.0/0.0;
+       Double_t timeLosM = 0.0/0.0;
+       Double_t LosTresM = 0.0/0.0;
+       Double_t timeLosT = 0.0/0.0;
+       Double_t LosTresT = 0.0/0.0;
+       Double_t tot=0./0.0; 
+       Double_t totr = 0.0/0.0;
+       Double_t totl = 0.0/0.0;
+       Double_t tott = 0.0/0.0;
+       Double_t totb = 0.0/0.0; 
+       Double_t totrt = 0.0/0.0;
+       Double_t totlt = 0.0/0.0;
+       Double_t totlb = 0.0/0.0;
+       Double_t totrb = 0.0/0.0;
+       Double_t tot_45 = 0.0/0.0;
+       Double_t tot_135 = 0.0/0.0;
+       Double_t tot_hor = 0.0/0.0;
+       Double_t tot_ver = 0.0/0.0;
+       Double_t x_cm = 0.0/0.0;
+       Double_t y_cm = 0.0/0.0;
+       Double_t x1_cm = 0.0/0.0;
+       Double_t y1_cm = 0.0/0.0;
+       Double_t x2_cm = 0.0/0.0;
+       Double_t y2_cm = 0.0/0.0;
+       
+           
     Double_t timeTofd=0;
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
@@ -531,30 +649,210 @@ void R3BOnlineSpectra::Exec(Option_t* option)
          // channel numbers are stored 1-based (1..n)
          Int_t iDet = hit->GetDetector(); // 1..
          Int_t iCha = hit->GetChannel();  // 1..
+ 
          fh_los_channels->Fill(iCha);				         
       }
     }
 
     if(fCalItemsLos && fCalItemsLos->GetEntriesFast())
     {
-      Int_t nHits = fCalItemsLos->GetEntriesFast();    
-      for (Int_t ihit = 0; ihit < nHits; ihit++)     
+      Int_t nCha = fCalItemsLos->GetEntriesFast();    
+      Int_t iDet = 0;
+      
+                
+      for (Int_t iCha = 0; iCha < nCha; iCha++)     
       {
-    	  R3BLosCalData *calData = (R3BLosCalData*)fCalItemsLos->At(ihit);
+          R3BLosCalData *calData = (R3BLosCalData*)fCalItemsLos->At(iCha);
+    	  iDet=calData->GetDetector();
 
-          Int_t iDet=calData->GetDetector();
-          //LOG(DEBUG) << "test1 : "<<flosOffsetX<<"  "<<flosOffsetY<<"  "<<flosVeffX<<"  "<<flosVeffY<<FairLogger::endl;
-	      //LOG(DEBUG) <<"test2 : "<<calData->fTime_r_ns<<FairLogger::endl;
-
-          if(iDet==1){
-	          fh_los_tres->Fill((calData->fTime_r_ns+calData->fTime_l_ns)/2. -     		
-	                  (calData->fTime_t_ns+calData->fTime_b_ns)/2.);
-	          fh_los_pos->Fill((calData->fTime_r_ns-calData->fTime_l_ns-flosOffsetX)*flosVeffX,
-	                 (calData->fTime_b_ns-calData->fTime_t_ns-flosOffsetY)*flosVeffY);
-              timeLos=(calData->fTime_r_ns+calData->fTime_l_ns+calData->fTime_t_ns+calData->fTime_b_ns)/4.;		 
-	      }
+       if(iCha == 0) 
+        {   	     	                 
+   // Channels 1-4:
+          if(!(IS_NAN(calData->fTimeV_r_ns))) time_r_V = calData->fTimeV_r_ns;
+          if(!(IS_NAN(calData->fTimeV_t_ns))) time_t_V = calData->fTimeV_t_ns;
+          if(!(IS_NAN(calData->fTimeV_l_ns))) time_l_V = calData->fTimeV_l_ns;
+          if(!(IS_NAN(calData->fTimeV_b_ns))) time_b_V = calData->fTimeV_b_ns;  
+           // Channels 5-8:
+          if(!(IS_NAN(calData->fTimeV_rt_ns))) time_rt_V = calData->fTimeV_rt_ns;
+          if(!(IS_NAN(calData->fTimeV_lt_ns))) time_lt_V = calData->fTimeV_lt_ns;
+          if(!(IS_NAN(calData->fTimeV_lb_ns))) time_lb_V = calData->fTimeV_lb_ns;
+          if(!(IS_NAN(calData->fTimeV_rb_ns))) time_rb_V = calData->fTimeV_rb_ns; 
+          
+	    }
+       else if(iCha == 1)
+	   {                 
+  // Channels 1-4:      
+          if(!(IS_NAN(calData->fTimeL_r_ns))) time_r_L = calData->fTimeL_r_ns;
+          if(!(IS_NAN(calData->fTimeT_r_ns))) time_r_T = calData->fTimeT_r_ns;
+          if(!(IS_NAN(calData->fTimeL_t_ns))) time_t_L = calData->fTimeL_t_ns;
+          if(!(IS_NAN(calData->fTimeT_t_ns))) time_t_T = calData->fTimeT_t_ns;  
+          if(!(IS_NAN(calData->fTimeL_l_ns))) time_l_L = calData->fTimeL_l_ns;
+          if(!(IS_NAN(calData->fTimeT_l_ns))) time_l_T = calData->fTimeT_l_ns; 
+          if(!(IS_NAN(calData->fTimeL_b_ns))) time_b_L = calData->fTimeL_b_ns;
+          if(!(IS_NAN(calData->fTimeT_b_ns))) time_b_T = calData->fTimeT_b_ns;  
+          // Channels 5-8:
+          if(!(IS_NAN(calData->fTimeL_rt_ns))) time_rt_L = calData->fTimeL_rt_ns;
+          if(!(IS_NAN(calData->fTimeT_rt_ns))) time_rt_T = calData->fTimeT_rt_ns;
+          if(!(IS_NAN(calData->fTimeL_lt_ns))) time_lt_L = calData->fTimeL_lt_ns;
+          if(!(IS_NAN(calData->fTimeT_lt_ns))) time_lt_T = calData->fTimeT_lt_ns;  
+          if(!(IS_NAN(calData->fTimeL_lb_ns))) time_lb_L = calData->fTimeL_lb_ns;
+          if(!(IS_NAN(calData->fTimeT_lb_ns))) time_lb_T = calData->fTimeT_lb_ns; 
+          if(!(IS_NAN(calData->fTimeL_rb_ns))) time_rb_L = calData->fTimeL_rb_ns;
+          if(!(IS_NAN(calData->fTimeT_rb_ns))) time_rb_T = calData->fTimeT_rb_ns;  
+                     
+         }           
       }
-    }
+      
+          LOG(DEBUG) << "test1 : "<<flosOffsetX1<<"  "<<flosOffsetY1<<"  "<<flosVeffX1<<"  "<<flosVeffY1<<FairLogger::endl;
+
+	                 
+   if(iDet==1){
+
+	  UInt_t iLOSTypeMCFD = 0;
+	  UInt_t iLOSTypeTAMEX = 0;
+	  UInt_t iLOSType = 0;
+	  	 
+      if(time_r_V > 0. && !(IS_NAN(time_r_V)) && time_t_V > 0. && !(IS_NAN(time_t_V)) && time_l_V > 0. && !(IS_NAN(time_l_V)) && time_b_V > 0. && !(IS_NAN(time_b_V)) 
+      && IS_NAN(time_rt_V) && IS_NAN(time_rb_V) && IS_NAN(time_lt_V) && IS_NAN(time_lb_V))
+      {        
+       iLOSTypeMCFD = 1; // 4PM LOS
+      }
+      if(time_r_V > 0. && !(IS_NAN(time_r_V)) && time_t_V > 0. && !(IS_NAN(time_t_V)) && time_l_V > 0. && !(IS_NAN(time_l_V)) && time_b_V > 0. && !(IS_NAN(time_b_V)) 
+      && !(IS_NAN(time_rt_V)) && !(IS_NAN(time_rb_V)) && !(IS_NAN(time_lt_V)) && !(IS_NAN(time_lb_V))
+      && time_rt_V > 0. && time_lt_V > 0. && time_lb_V > 0. && time_rb_V > 0.)
+      {        
+       iLOSTypeMCFD = 2; // 8PM LOS
+      } 
+      if(time_r_L > 0. && !(IS_NAN(time_r_L)) && time_t_L > 0. && !(IS_NAN(time_t_L)) && time_l_L > 0. && !(IS_NAN(time_l_L)) && time_b_L > 0. && !(IS_NAN(time_b_L))
+      && time_r_T > 0. && !(IS_NAN(time_r_T)) && time_t_T > 0. && !(IS_NAN(time_t_T)) && time_l_T > 0. && !(IS_NAN(time_l_T)) && time_b_T > 0. && !(IS_NAN(time_b_T))
+      && IS_NAN(time_rt_L) && IS_NAN(time_rb_L) && IS_NAN(time_lt_L) && IS_NAN(time_lb_L))
+      {        
+       iLOSTypeTAMEX = 1;  // 4PM LOS
+      }
+      if(time_r_L > 0. && !(IS_NAN(time_r_L)) && time_t_L > 0. && !(IS_NAN(time_t_L)) && time_l_L > 0. && !(IS_NAN(time_l_L)) && time_b_L > 0. && !(IS_NAN(time_b_L))
+      && time_r_T > 0. && !(IS_NAN(time_r_T)) && time_t_T > 0. && !(IS_NAN(time_t_T)) && time_l_T > 0. && !(IS_NAN(time_l_T)) && time_b_T > 0. && !(IS_NAN(time_b_T))
+      && !(IS_NAN(time_rt_L)) && !(IS_NAN(time_rb_L)) && !(IS_NAN(time_lt_L)) && !(IS_NAN(time_lb_L))
+      && time_rt_L > 0. && time_lt_L > 0. && time_lb_L > 0. && time_rb_L > 0.
+      && !(IS_NAN(time_rt_T)) && !(IS_NAN(time_rb_T)) && !(IS_NAN(time_lt_T)) && !(IS_NAN(time_lb_T))
+      && time_rt_T > 0. && time_lt_T > 0. && time_lb_T > 0. && time_rb_T > 0.)
+      {        
+       iLOSTypeTAMEX = 2; // 8PMLOS
+      }            
+      
+// We will consider only events in which booth MCFD and TAMEX see same number of channels:
+      if(iLOSTypeTAMEX == 1 && iLOSTypeMCFD == 1) iLOSType = 1;
+      if(iLOSTypeTAMEX == 2 && iLOSTypeMCFD == 2) iLOSType = 2;
+       
+           if(iLOSType == 1 || iLOSType == 2) 
+          {
+            t_hor_M = (time_r_V + time_l_V)/2.; 		  
+	    t_ver_M = (time_t_V + time_b_V)/2.;
+	    x1_cm=(time_r_V-time_l_V-flosOffsetX1)*flosVeffX1;
+	    y1_cm=(time_b_V-time_t_V-flosOffsetY1)*flosVeffY1;
+			
+            t_hor_T = (time_r_L + time_l_L)/2.;       		  
+            t_ver_T = (time_t_L + time_b_L)/2.;	
+            
+            while(time_r_T - time_r_L <0.) 
+            {
+	         time_r_T=time_r_T+2048.*fClockFreq; 
+	        }  
+            while(time_l_T - time_l_L <0.) 
+            {
+	         time_l_T=time_l_T+2048.*fClockFreq; 
+	        }	      
+            while(time_t_T - time_t_L <0.) 
+            {
+	         time_t_T=time_t_T+2048.*fClockFreq; 
+	        }	                 
+            while(time_b_T - time_b_L <0.) 
+            {
+	         time_b_T=time_b_T+2048.*fClockFreq; 
+	        }
+	     totr = time_r_T - time_r_L;
+             totl = time_l_T - time_l_L;
+             tott = time_t_T - time_t_L;
+             totb = time_b_T - time_b_L;
+             
+             tot_ver = (tott+totb)/2.;
+  	     tot_hor = (totr+totl)/2.;
+     			
+		  }
+		  	  
+          if(iLOSType == 2 ) 
+          {
+            t_45_M  = (time_rb_V + time_lt_V)/2.; 		  
+	    t_135_M = (time_rt_V + time_lb_V)/2.; 
+	    x2_cm=(time_rb_V-time_lt_V-flosOffsetX2)*flosVeffX2;
+	    y2_cm=(time_rt_V-time_lb_V-flosOffsetY2)*flosVeffY2;	
+		
+	    t_45_T = (time_rb_L + time_lt_L)/2.; 		  
+	    t_135_T = (time_rt_L + time_lb_L)/2.;
+	        
+	   while(time_rt_T - time_rt_L <0.) 
+	       {
+	        time_rt_T=time_rt_T+2048.*fClockFreq; 
+	       }  
+           while(time_lt_T - time_lt_L <0.) 
+           {
+	        time_lt_T=time_lt_T+2048.*fClockFreq; 
+	       }	      
+           while(time_rb_T - time_rb_L <0.) 
+           {
+	        time_rb_T=time_rb_T+2048.*fClockFreq; 
+	       }	                 
+           while(time_lb_T - time_lb_L <0.) 
+           {
+	        time_lb_T=time_lb_T+2048.*fClockFreq; 
+	       } 
+            totrb = time_rb_T - time_rb_L;
+            totlt = time_lt_T - time_lt_L;
+            totrt = time_rt_T - time_rt_L;
+            totlb = time_lb_T - time_lb_L;	
+            
+            tot_135 = (totrt+totlb)/2.;
+            tot_45 = (totlt+totrb)/2.;
+        	
+	      }	      	  
+		  
+          if (iLOSType == 1) 
+          {
+            timeLosM = (t_hor_M + t_ver_M)/2.;
+            LosTresM = t_hor_M - t_ver_M;
+            fh_los_tres_MCFD->Fill(LosTresM);
+            x_cm = x1_cm;
+            y_cm = y1_cm;
+            fh_los_pos->Fill(x_cm,y_cm);
+            
+            timeLosT = (t_hor_T + t_ver_T)/2.;
+            LosTresT = t_hor_T - t_ver_T;         
+            fh_los_tres_TAMEX->Fill(LosTresT);
+            
+            tot = (tot_ver+tot_hor)/2.;
+            fh_los_tot->Fill(tot);
+        
+          }
+          
+	if (iLOSType == 2) 
+          {
+            timeLosM = (t_hor_M + t_ver_M + t_45_M + t_135_M)/4.;
+            LosTresM = ((t_hor_M + t_ver_M) - (t_45_M + t_135_M))/2.;
+            fh_los_tres_MCFD->Fill(LosTresM);
+            x_cm = (x1_cm + (x2_cm/sqrt(2.)+y2_cm/sqrt(2.)))/2.;
+	    y_cm = (y2_cm + (y2_cm/sqrt(2.)-x2_cm/sqrt(2.)))/2.;
+            fh_los_pos->Fill(x_cm,y_cm);
+	    
+	    timeLosT = (t_hor_T + t_ver_T + t_45_T + t_135_T)/4.;
+            LosTresT = ((t_hor_T + t_ver_T) - (t_45_T + t_135_T))/2.;         
+            fh_los_tres_TAMEX->Fill(LosTresT);
+	    
+	    tot = (tot_ver+tot_hor+tot_45+tot_135)/4.;
+            fh_los_tot->Fill(tot);
+           }
+      }
+    } else {
+	  cout<<"Wrong detector ID for LOS!"<<endl;
+    }	
 
 
 //----------------------------------------------------------------------
@@ -766,7 +1064,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
       Double_t t2t=0.;
      
       Int_t nHits = fCalItemsTofd->GetEntriesFast();    
-      
+ 
       for (Int_t ihit = 0; ihit < nHits; ihit++)     
       {
     	  R3BPaddleCalData *hit = (R3BPaddleCalData*)fCalItemsTofd->At(ihit);
@@ -789,7 +1087,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
           while(t2t-t2l < 0.) {
 	          t2t=t2t+2048.*fClockFreq; 
           }
-	      while(t1l-timeLos<0.){
+	      while(t1l-timeLosM<0.){
 	          t1t=t1t+2048.*fClockFreq; 
 	          t1l=t1l+2048.*fClockFreq; 
 	          t2t=t2t+2048.*fClockFreq; 
@@ -807,7 +1105,6 @@ void R3BOnlineSpectra::Exec(Option_t* option)
               LOG(WARNING) << "Negative ToT "<< tot2<<FairLogger::endl;              
               LOG(WARNING) << "times2: " << t2t << " " << t2l << FairLogger::endl;		 
           }
- 
           fh_tofd_TotPm1[iPlane-1][iBar-1]->Fill(tot1);
           fh_tofd_TotPm2[iPlane-1][iBar-1]->Fill(tot2);
         	
@@ -859,7 +1156,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
           while(t2t-t2l < 0.) {
 	          t2t=t2t+2048.*fClockFreq; 
           }
-	      while(t1l-timeLos<0.){
+	      while(t1l-timeLosM<0.){
 	          t1t=t1t+2048.*fClockFreq; 
 	          t1l=t1l+2048.*fClockFreq; 
 	          t2t=t2t+2048.*fClockFreq; 
@@ -910,7 +1207,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
           while(t2t-t2l < 0.) {
 	          t2t=t2t+2048.*fClockFreq; 
           }
-	      while(t1l-timeLos<0.){
+	      while(t1l-timeLosM<0.){
 	          t1t=t1t+2048.*fClockFreq; 
 	          t1l=t1l+2048.*fClockFreq; 
 	          t2t=t2t+2048.*fClockFreq; 
@@ -940,7 +1237,10 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 
       }
 
+ 
+	                 
    }
+
 
     if(fCalItemsPspx && fCalItemsPspx->GetEntriesFast())
     {      
@@ -1053,6 +1353,7 @@ void R3BOnlineSpectra::FinishEvent()
     {
         fCalItemsLos->Clear();
     }
+
     if (fCalItemsTofd)
     {
         fCalItemsTofd->Clear();

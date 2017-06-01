@@ -17,7 +17,6 @@ class TClonesArray;
 class TH1F;
 class TH2F;
 /**
- * TODO: This explanation is humbug.
  * An analysis task to apply TCAL calibration for NeuLAND.
  * This class reads NeuLAND mapped items with TDC values and
  * produces time items with time in [ns]. It requires TCAL
@@ -160,11 +159,6 @@ class R3BLosCal2Hit : public FairTask
      */
     virtual Double_t walk(Int_t inum, Double_t tot);
     
-       /**
-     * Method for saturation correction.
-     */
-    virtual Double_t satu(Int_t inum, Double_t tot);
-    
     /**
      * Method for finish of the task execution.
      * Is called by the framework after processing the event loop.
@@ -217,13 +211,13 @@ class R3BLosCal2Hit : public FairTask
     Double_t flosOffsetX2T;
     Double_t flosOffsetY2T; 
     Double_t walk_par[16][11]{}; // Array containing walk parameters: x=PM, y=min,max,p0...p9; MCFD and TAMEX considered
-    Double_t tot_par[8][4]{}; // Array containing walk parameters: x=PM, y=p0...p3;
+    Double_t tot_par[8][8]{}; // Array containing walk parameters: x=PM, y=min,max,p0...p6;
     Int_t    iSciType;
     std::string fwalk_param_file;
     std::string ftot_param_file;
     
     TClonesArray* fMapped;  /**< Array with mapped data - input data. */
-
+ 
     TH1F* fhTres_M; 
     TH1F* fhTres_T;
     TH1F* fhTres_M_corr;    
@@ -367,7 +361,6 @@ class R3BLosCal2Hit : public FairTask
 
 
     Int_t Icount=0;
-       
     
   public:
     ClassDef(R3BLosCal2Hit, 1)

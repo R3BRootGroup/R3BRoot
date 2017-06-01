@@ -89,13 +89,59 @@ class R3BOnlineSpectra : public FairTask
     /**
      * Methods for setting position offset and effective velocity of light
      */
-    inline void SetLosParameters(Double_t offsetX, Double_t offsetY, Double_t veffX, Double_t veffY)
+    inline void SetLosParamMCFD(Double_t offsetX1, Double_t offsetY1, Double_t veffX1, Double_t veffY1,
+                                 Double_t offsetX2, Double_t offsetY2, Double_t veffX2, Double_t veffY2)
     {
-        flosOffsetX = offsetX;
-        flosOffsetY = offsetY;
-        flosVeffX = veffX;
-        flosVeffY = veffY;       
-    }
+        flosOffsetX1 = offsetX1;
+        flosOffsetY1 = offsetY1;
+        flosVeffX1 = veffX1;
+        flosVeffY1 = veffY1;     
+        flosOffsetX2 = offsetX2;
+        flosOffsetY2 = offsetY2;
+        flosVeffX2 = veffX2;
+        flosVeffY2 = veffY2;
+  
+    }    
+    
+    inline void SetLosParamMCFDwc(Double_t offsetX1wc, Double_t offsetY1wc, Double_t veffX1wc, Double_t veffY1wc,
+                                 Double_t offsetX2wc, Double_t offsetY2wc, Double_t veffX2wc, Double_t veffY2wc)
+    {
+        flosOffsetX1wc = offsetX1wc;
+        flosOffsetY1wc = offsetY1wc;
+        flosVeffX1wc = veffX1wc;
+        flosVeffY1wc = veffY1wc;     
+        flosOffsetX2wc = offsetX2wc;
+        flosOffsetY2wc = offsetY2wc;
+        flosVeffX2wc = veffX2wc;
+        flosVeffY2wc = veffY2wc;
+    }    
+    
+    inline void SetLosParamToT(Double_t offsetX1Q, Double_t offsetY1Q, Double_t veffX1Q, Double_t veffY1Q,
+                                 Double_t offsetX2Q, Double_t offsetY2Q, Double_t veffX2Q, Double_t veffY2Q)
+    {
+        flosOffsetX1Q = offsetX1Q;
+        flosOffsetY1Q = offsetY1Q;
+        flosVeffX1Q = veffX1Q;
+        flosVeffY1Q = veffY1Q;     
+        flosOffsetX2Q = offsetX2Q;
+        flosOffsetY2Q = offsetY2Q;
+        flosVeffX2Q = veffX2Q;
+        flosVeffY2Q = veffY2Q;
+  
+    }    
+    
+    inline void SetLosParamTAMEX(Double_t offsetX1T, Double_t offsetY1T, Double_t veffX1T, Double_t veffY1T,
+                                 Double_t offsetX2T, Double_t offsetY2T, Double_t veffX2T, Double_t veffY2T)
+    {
+        flosOffsetX1T = offsetX1T;
+        flosOffsetY1T = offsetY1T;
+        flosVeffX1T = veffX1T;
+        flosVeffY1T = veffY1T;     
+        flosOffsetX2T = offsetX2T;
+        flosOffsetY2T = offsetY2T;
+        flosVeffX2T = veffX2T;
+        flosVeffY2T = veffY2T;  
+    }     
     
     /**
      * Methods for setting number of planes and paddles
@@ -134,13 +180,43 @@ class R3BOnlineSpectra : public FairTask
     UInt_t fNofDetectors;  /**< Number of detectors. */
     UInt_t fNofChannels;   /**< Number of channels per detector. */    
     UInt_t fNofModules;    /**< Total number of channels. */
-    Double_t flosVeffX;   
-    Double_t flosVeffY;
-    Double_t flosOffsetX;
-    Double_t flosOffsetY;
+    Double_t flosVeffX1;   
+    Double_t flosVeffY1;
+    Double_t flosOffsetX1;
+    Double_t flosOffsetY1;
+    Double_t flosVeffX2;   
+    Double_t flosVeffY2;
+    Double_t flosOffsetX2;
+    Double_t flosOffsetY2;
+    Double_t flosVeffX1wc;   
+    Double_t flosVeffY1wc;
+    Double_t flosOffsetX1wc;
+    Double_t flosOffsetY1wc;
+    Double_t flosVeffX2wc;   
+    Double_t flosVeffY2wc;
+    Double_t flosOffsetX2wc;
+    Double_t flosOffsetY2wc;
+    Double_t flosVeffX1Q;   
+    Double_t flosVeffY1Q;
+    Double_t flosOffsetX1Q;
+    Double_t flosOffsetY1Q;
+    Double_t flosVeffX2Q;   
+    Double_t flosVeffY2Q;
+    Double_t flosOffsetX2Q;
+    Double_t flosOffsetY2Q;
+    Double_t flosVeffX1T;   
+    Double_t flosVeffY1T;
+    Double_t flosOffsetX1T;
+    Double_t flosOffsetY1T;
+    Double_t flosVeffX2T;   
+    Double_t flosVeffY2T;
+    Double_t flosOffsetX2T;
+    Double_t flosOffsetY2T; 
 
     TH1F *fh_los_channels;    
-    TH1F *fh_los_tres;
+    TH1F *fh_los_tres_MCFD;
+    TH1F *fh_los_tres_TAMEX;
+    TH1F *fh_los_tot;
     TH2F *fh_los_pos;
 
     TH1F *fh_tofd_channels[N_PLANE_MAX];    
@@ -197,8 +273,15 @@ class R3BOnlineSpectra : public FairTask
     TH2F *fh_Fi6_multihit_s;
     TH2F *fh_Fi6_ToT_s;
     TH2F *fh_Fi6_ToTvsTime_s;
-   
- 
+    
+    TH1F* fh_los_t7;
+    TH1F* fh_los_t5;
+    TH1F* fh_los_t3;
+    TH1F* fh_los_t1;
+    TH1F* fh_los_t2;
+    TH1F* fh_los_t4;
+    TH1F* fh_los_t6;
+    TH1F* fh_los_t8;
   
   public:
     ClassDef(R3BOnlineSpectra, 1)
