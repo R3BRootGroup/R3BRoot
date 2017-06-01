@@ -318,6 +318,11 @@ add_subdirectory (tracking)
     add_subdirectory (actar)
     Set(LD_LIBRARY_PATH ${GARFIELD_LIBRARY_DIR} ${LD_LIBRARY_PATH})
   ENDIF(GARFIELD_FOUND)
+
+IF(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
+  add_subdirectory(sofia)
+ENDIF(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
+
 ENDIF (NOT MODULE)
 
 Execute_Process(COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-opengl
