@@ -108,7 +108,7 @@ void runsim(Int_t nEvents = 0)
   //  R3B Special Physics List in G4 case
   if ( (fUserPList) && (fMC.CompareTo("TGeant4") == 0) ) {
        run->SetUserConfig("g4R3bConfig.C");
-       run->SetUserCuts("SetR3BCuts.C");
+       run->SetUserCuts("SetCuts.C");
    }
 
   // -----   Create media   -------------------------------------------------

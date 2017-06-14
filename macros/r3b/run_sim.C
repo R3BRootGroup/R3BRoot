@@ -48,7 +48,7 @@ void run_sim()
     if ((userPList == kTRUE) && (transport.CompareTo("TGeant4") == 0))
     {
         run->SetUserConfig("g4R3bConfig.C");
-        run->SetUserCuts("SetR3BCuts.C");
+        run->SetUserCuts("SetCuts.C");
     }
 
     // -----   Create media   -------------------------------------------------

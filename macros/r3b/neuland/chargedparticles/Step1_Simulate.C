@@ -21,7 +21,7 @@ void Step1_Simulate(const Int_t nEvents,
     run->SetMaterials("media_r3b.geo");
 
     // run->SetUserConfig("g4R3bConfig.C");
-    // run->SetUserCuts("SetR3BCuts.C");
+    // run->SetUserCuts("SetCuts.C");
 
     // Geometry: Cave
     FairModule* cave = new R3BCave("CAVE300MeV");

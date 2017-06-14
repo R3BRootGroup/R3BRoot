@@ -1,23 +1,20 @@
-r3bevtvis()
+void r3bevtvis()
 {
-  // -----   Reconstruction run   -------------------------------------------
-  FairRunAna *fRun= new FairRunAna();
-  TFile* file = new TFile("r3bpar.root");
-  file->Get("FairBaseParSet"); 
-
-  // -----   Runtime database   ---------------------------------------------
+  FairRunAna *fRun = new FairRunAna();
+  
   FairRuntimeDb* rtdb = fRun->GetRuntimeDb();
-  FairParRootFileIo* parIn = new FairParRootFileIo();
-  parIn->open("r3bpar.root");
+  FairParRootFileIo*  parIo1 = new FairParRootFileIo();
+  parIo1->open("par.root");
+  rtdb->setFirstInput(parIo1);
   rtdb->print();
   
-  fRun->SetInputFile("r3bsim.root");
+  fRun->SetInputFile("sim.root");
   fRun->SetOutputFile("test.root");
-  //fRun->LoadGeometry();
   
-  R3BEventManager *fMan= new R3BEventManager();
-  R3BMCTracks *Track =  new R3BMCTracks ("Monte-Carlo Tracks");
-  
+  R3BEventManager *fMan  = new R3BEventManager();
+  R3BMCTracks     *Track = new R3BMCTracks ("Monte-Carlo Tracks");
+
   fMan->AddTask(Track);
+  
   fMan->Init();
 }

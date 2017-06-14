@@ -80,7 +80,7 @@ void eliall(Int_t nEvents,
        (fMC.CompareTo("TGeant4")   == 0)
       ){
        run->SetUserConfig("g4R3bConfig.C");
-       run->SetUserCuts("SetR3BCuts.C");
+       run->SetUserCuts("SetCuts.C");
    }
 
 

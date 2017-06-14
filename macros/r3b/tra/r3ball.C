@@ -80,7 +80,7 @@ void r3ball(Int_t nEvents = 1,
        (fMC.CompareTo("TGeant4")   == 0)
       ){
        run->SetUserConfig("g4R3bConfig.C");
-       run->SetUserCuts("SetR3BCuts.C");
+       run->SetUserCuts("SetCuts.C");
    }
 
 
