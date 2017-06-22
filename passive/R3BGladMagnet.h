@@ -9,6 +9,26 @@
 #include "R3BModule.h"
 #include "TGeoMatrix.h"
 
+/******************************************/
+//Edited on: 22.06.2017
+//by: Lorenzo Zanetti -- lzanetti@ikp.tu-darmstadt.de
+//Description:
+// Adding back compatibility for "just-by-name" constructor.
+// The macros __GLAD_POS_D{X,Y,Z} and __GLAD_ROT are being defined
+// in order to fix the placement from here
+// NOTE: overrides the placement in the geometry file!
+/*****************************************/
+
+//NOTE: as for now, these valuse are the same used
+//      for the geometry creation (v17).
+//      These will move also old files.
+#define __GLAD_POS_DX -42.0 //offset on the Z axis
+#define __GLAD_POS_DY 0.0 //offset on the Y axis (not present)
+#define __GLAD_POS_DZ 308.8 //offset on the Z axis (distance from target)
+#define __GLAD_ROT 14 //rotatio on the -Y axis
+                      //NOTE: there are a few rotation involved
+                      //      look at the R3BGladMagnet.cxx for details.
+
 class R3BGladMagnet : public R3BModule {
   
 public:
@@ -22,8 +42,6 @@ public:
   Bool_t CheckIfSensitive(std::string name);
 
 private:
-  Float_t fGladAngle;
-
   ClassDef(R3BGladMagnet,2) //R3BGladMagnet
 };
 
