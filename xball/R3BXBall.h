@@ -65,6 +65,28 @@ class R3BXBall : public R3BDetector
   R3BXBall(const char* name, Bool_t active);
 
 
+  /** Standard constructor.
+   *@param name    detetcor name
+   *@param geoFile name of the ROOT geometry file
+   *@param active  sensitivity flag
+   *@param x       position in cave
+   *@param y       position in cave
+   *@param z       position in cave
+   *@param rot_x   rotation in cave
+   *@param rot_y   rotation in cave
+   *@param rot_z   rotation in cave
+   **/
+  R3BXBall(const char* name,
+           TString geoFile,
+           Bool_t active,
+           Float_t x = 0.,
+           Float_t y = 0.,
+           Float_t z = 0.,
+           Float_t rot_x = 0.,
+           Float_t rot_y = 0.,
+           Float_t rot_z = 0.);
+
+
   /** Destructor **/
   virtual ~R3BXBall();
 
@@ -245,7 +267,7 @@ class R3BXBall : public R3BDetector
     Int_t  GetCrystalType(Int_t volID);
 
 
-    ClassDef(R3BXBall,1);
+    ClassDef(R3BXBall,2);
 
 };
 

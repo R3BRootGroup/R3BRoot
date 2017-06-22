@@ -136,7 +136,7 @@ class R3BActar : public R3BDetector
      **/
     void ResetParameters();
 
-    ClassDef(R3BActar, 1);
+    ClassDef(R3BActar, 2);
 };
 
 inline void R3BActar::ResetParameters()

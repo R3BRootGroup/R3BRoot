@@ -42,6 +42,35 @@ R3BDetector::R3BDetector(const Char_t* Name, Bool_t Active, Int_t detid)
 {
 }
 
+// -----   Standard constructor   ------------------------------------------
+R3BDetector::R3BDetector(const char* Name,
+                         TString geoFile,
+                         Bool_t Active,
+                         Float_t x,
+                         Float_t y,
+                         Float_t z,
+                         Float_t rot_x,
+                         Float_t rot_y,
+                         Float_t rot_z,
+                         Int_t detId)
+    : FairDetector(Name, Active, detId)
+    , fCutE(1e-3)
+    , fPosition(NULL)
+    , fRotation(NULL)
+{
+    if (TMath::Abs(x) > 0. || TMath::Abs(y) > 0. || TMath::Abs(z) > 0.)
+    {
+        SetPosition(x, y, z);
+    }
+
+    if (TMath::Abs(rot_x) > 0. || TMath::Abs(rot_y) > 0. || TMath::Abs(rot_z) > 0.)
+    {
+        SetRotation(rot_x, rot_y, rot_z);
+    }
+
+    SetGeometryFileName(geoFile);
+}
+
 // -----   Destructor   ----------------------------------------------------
 R3BDetector::~R3BDetector()
 {

@@ -52,9 +52,9 @@ void R3BStarTrackCalibPar::putParams(FairParamList* list)
 
 Bool_t R3BStarTrackCalibPar::getParams(FairParamList* list)
 {
-  std::cout<<"-I- R3BCaloCalibPar::getParams() called"<<std::endl;
+  std::cout<<"-I- R3BStarTrackCalibPar::getParams() called"<<std::endl;
   if (!list) return kFALSE;
-  std::cout<<"-I- R3BCaloCalibPar::getParams() 1 ";
+  std::cout<<"-I- R3BStarTrackCalibPar::getParams() 1 ";
   
   if (!list->fill("eneCalibGain_", eneCalibGain, numberOfStrips)) return kFALSE;
   if (!list->fill("eneCalibOffset", eneCalibOffset, numberOfStrips)) return kFALSE;

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 // -----                                                                   -----
-// -----                           R3BLandRawAnaS438bS438b                      -----
+// -----                      R3BLandRawAnaS438bS438b                      -----
 // -----                    Created  27-02-2015 by D. Kresan               -----
 // -----                                                                   -----
 // -----------------------------------------------------------------------------
@@ -18,13 +18,13 @@ using namespace std;
 
 #include "R3BEventHeader.h"
 #include "R3BNeulandMappedData.h"
-#include "R3BCaloRawHit.h"
+#include "R3BCalifaMappedData.h"
 #include "R3BLandRawAnaS438b.h"
 
 R3BLandRawAnaS438b::R3BLandRawAnaS438b()
     : fnEvents(0)
     , fLandRawHitMapped(NULL)
-    , fCaloRawHit(NULL)
+    , fCalifaMappedData(NULL)
 {
 }
 
@@ -32,7 +32,7 @@ R3BLandRawAnaS438b::R3BLandRawAnaS438b(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fnEvents(0)
     , fLandRawHitMapped(NULL)
-    , fCaloRawHit(NULL)
+    , fCalifaMappedData(NULL)
 {
 }
 
@@ -45,7 +45,7 @@ InitStatus R3BLandRawAnaS438b::Init()
     FairRootManager* fMan = FairRootManager::Instance();
     fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
     fLandRawHitMapped = (TClonesArray*)fMan->GetObject("LandRawHitMapped");
-    fCaloRawHit = (TClonesArray*)fMan->GetObject("CaloRawHit");
+    fCalifaMappedData = (TClonesArray*)fMan->GetObject("CalifaMappedData");
     CreateHistos();
 
     return kSUCCESS;
@@ -56,13 +56,13 @@ void R3BLandRawAnaS438b::Exec(Option_t* option)
     Int_t nCalo = 0;
     Int_t nCalo1 = 0;
     Double_t eCalo = 0.;
-    R3BCaloRawHit *caloHit;
-    if (fCaloRawHit)
+    R3BCalifaMappedData *caloHit;
+    if (fCalifaMappedData)
     {
-        nCalo = fCaloRawHit->GetEntries();
+        nCalo = fCalifaMappedData->GetEntries();
         for(Int_t i = 0; i < nCalo; i++)
         {
-            caloHit = (R3BCaloRawHit*) fCaloRawHit->At(i);
+            caloHit = (R3BCalifaMappedData*) fCalifaMappedData->At(i);
             eCalo += caloHit->GetEnergy();
             if(caloHit->GetEnergy() > 90.)
             {

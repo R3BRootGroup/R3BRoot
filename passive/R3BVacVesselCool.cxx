@@ -31,13 +31,28 @@ R3BVacVesselCool::R3BVacVesselCool()
   fVacVesselCoolName = NULL;
 }
 
-
-R3BVacVesselCool::R3BVacVesselCool(const char * name,  const char * title)
-  : R3BModule(name ,title)
+R3BVacVesselCool::R3BVacVesselCool(const char* name, const char* title)
+: R3BModule(name ,title)
 {
   fVacVesselCoolName = new TString(name);
 }
 
+R3BVacVesselCool::R3BVacVesselCool(const char* name,
+                                   TString geoFile,
+                                   Float_t x,
+                                   Float_t y,
+                                   Float_t z,
+                                   Float_t rot_x,
+                                   Float_t rot_y,
+                                   Float_t rot_z,
+                                   const char* title)
+  : R3BModule(name ,title)
+{
+  SetGeometryFileName(geoFile);
+  SetPosition(x, y, z);
+  SetRotation(rot_x, rot_y, rot_z);
+  fVacVesselCoolName = new TString(name);
+}
 
 void R3BVacVesselCool::ConstructGeometry()
 {

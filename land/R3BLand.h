@@ -37,7 +37,27 @@ public:
    *@param active  sensitivity flag
    **/
   R3BLand(const char* name, Bool_t active);
-  
+
+  /** Standard constructor.
+   *@param geoFile name of the ROOT geometry file
+   *@param active  sensitivity flag
+   *@param x       position in cave
+   *@param y       position in cave
+   *@param z       position in cave
+   *@param rot_x   rotation in cave
+   *@param rot_y   rotation in cave
+   *@param rot_z   rotation in cave
+   **/
+  R3BLand(const char* name,
+          TString geoFile,
+          Bool_t active,
+          Float_t x = 0.,
+          Float_t y = 0.,
+          Float_t z = 0.,
+          Float_t rot_x = 0.,
+          Float_t rot_y = 0.,
+          Float_t rot_z = 0.);
+
   /** Destructor **/
   virtual ~R3BLand();
   
@@ -169,7 +189,7 @@ private:
   
   void StepHistory();
   
-  ClassDef(R3BLand,3);
+  ClassDef(R3BLand,4);
 };
 
 

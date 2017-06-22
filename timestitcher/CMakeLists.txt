@@ -6,7 +6,7 @@ ${BASE_INCLUDE_DIRECTORIES}
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bdata
-${R3BROOT_SOURCE_DIR}/r3bdata/caloData
+${R3BROOT_SOURCE_DIR}/r3bdata/califaData
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -35,7 +35,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 # set(LINKDEF CaloLinkDef.h)
 set(LIBRARY_NAME timestitcher)
 set(DEPENDENCIES
-    R3BData R3BCalo)
+    R3BData R3BCalifa)
 
 GENERATE_LIBRARY()
 

@@ -16,7 +16,20 @@ class R3BModule : public FairModule
   /** Constructor with arguments
    **/
   R3BModule(const char* Name, const char* title, Bool_t Active=kFALSE);
-  
+
+  /** Constructor with arguments
+   **/
+  R3BModule(const char* Name,
+            const char* title,
+            TString geoFile,
+            Float_t x = 0.,
+            Float_t y = 0.,
+            Float_t z = 0.,
+            Float_t rot_x = 0.,
+            Float_t rot_y = 0.,
+            Float_t rot_z = 0.,
+            Bool_t Active = kFALSE);
+
   /** Destructor **/
   virtual ~R3BModule();
   

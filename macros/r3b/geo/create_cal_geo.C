@@ -470,7 +470,8 @@ cout << 3 << endl;
   TGeoVolume* pCBChamberLog = new TGeoVolume("CBChamberLog",pCBReactionChamber, pMed21);
   pCBChamberLog->SetVisLeaves(kTRUE);
   pCBChamberLog->SetLineColor(18);
-  pCBLogWorld->AddNode(pCBChamberLog, 0, zeroRotTrans);
+    TGeoCombiTrans* zeroRotTrans_1 = new TGeoCombiTrans(0., 0., 0., zeroRot);
+  pCBLogWorld->AddNode(pCBChamberLog, 0, zeroRotTrans_1);
 
   // Shape: CBConicalTube type: TGeoConeSeg
   dz = 14.600000;

@@ -12,6 +12,7 @@ set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bsource
 ${R3BROOT_SOURCE_DIR}/r3bbase
+${R3BROOT_SOURCE_DIR}/r3bdata/califaData
 ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
 ${R3BROOT_SOURCE_DIR}/r3bdata/fi4Data
@@ -35,10 +36,12 @@ set(SRCS
 R3BUcesbSource.cxx
 R3BReader.cxx
 R3BUnpackReader.cxx
+R3BWhiterabbitReader.cxx
 R3BPspxReader.cxx
 #R3BFiberReader.cxx
 R3BLosReader.cxx
 R3BTofdReader.cxx
+R3BCalifaFebexReader.cxx
 R3BNeulandTamexReader.cxx
 R3BNeulandTacquilaReader.cxx
 R3BStrawtubesReader.cxx
@@ -46,11 +49,13 @@ R3BStrawtubesReader.cxx
 
 Set(STRUCT_HEADERS
 ext_h101_unpack.h
+ext_h101_whiterabbit.h
 ext_h101_raw_nnp.h
 ext_h101_los.h
 ext_h101_tofd.h
 ext_h101_psp.h
 #ext_h101_fi4.h
+ext_h101_raw_califa_febex.h
 ext_h101_raw_nnp_tamex.h
 ext_h101_strawtubes.h
 )
@@ -82,4 +87,3 @@ Else(ROOT_FOUND_VERSION LESS 59999)
 EndIf(ROOT_FOUND_VERSION LESS 59999)
 
 GENERATE_LIBRARY()
-

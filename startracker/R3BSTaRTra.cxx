@@ -44,12 +44,34 @@ R3BSTaRTra::R3BSTaRTra() : R3BDetector("R3BSTaRTra", kTRUE, kSTaRTrack)
 }
 // -------------------------------------------------------------------------
 
-
-
 // -----   Standard constructor   ------------------------------------------
 R3BSTaRTra::R3BSTaRTra(const char* name, Bool_t active)
 : R3BDetector(name, active, kSTaRTrack) {
+    ResetParameters();
+    fTraCollection = new TClonesArray("R3BSTaRTraPoint");
+    fPosIndex = 0;
+    kGeoSaved = kFALSE;
+    flGeoPar = new TList();
+    flGeoPar->SetName( GetName());
+    fVerboseLevel = 1;
+}
+// -------------------------------------------------------------------------
+
+// -----   Standard constructor   ------------------------------------------
+R3BSTaRTra::R3BSTaRTra(const char* name,
+                       TString geoFile,
+                       Bool_t active,
+                       Float_t x,
+                       Float_t y,
+                       Float_t z,
+                       Float_t rot_x,
+                       Float_t rot_y,
+                       Float_t rot_z)
+: R3BDetector(name, active, kSTaRTrack) {
   ResetParameters();
+  SetGeometryFileName(geoFile);
+  SetPosition(x, y, z);
+  SetRotation(rot_x, rot_y, rot_z);
   fTraCollection = new TClonesArray("R3BSTaRTraPoint");
   fPosIndex = 0;
   kGeoSaved = kFALSE;

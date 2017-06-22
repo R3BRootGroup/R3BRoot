@@ -38,6 +38,22 @@ R3BTarget::R3BTarget(const char * name,  const char * title)
   fTargetName = new TString(name);
 }
 
+R3BTarget::R3BTarget(const char* name,
+                     TString geoFile,
+                     Float_t x,
+                     Float_t y,
+                     Float_t z,
+                     Float_t rot_x,
+                     Float_t rot_y,
+                     Float_t rot_z,
+                     const char* Title)
+    : R3BModule(name, Title)
+{
+    fTargetName = new TString(name);
+    SetGeometryFileName(geoFile);
+    SetPosition(x, y, z);
+    SetRotation(rot_x, rot_y, rot_z);
+}
 
 void R3BTarget::ConstructGeometry()
 {

@@ -150,7 +150,7 @@ class ELILuMon : public R3BDetector
     void ResetParameters();
 
 
-    ClassDef(ELILuMon,1);
+    ClassDef(ELILuMon,2);
 
 };
 

@@ -51,7 +51,7 @@ void run(TString inputFile="", Int_t firstFileNumber=-999, Int_t lastFileNumber=
     // Short_t procId = 1;
     // Short_t subCrate = -1;
     // Short_t control = 9;
-    source->AddUnpacker(new R3BCaloUnpack("", type, subType, procId, subCrate, control));
+    source->AddUnpacker(new R3BCalifaUnpack("", type, subType, procId, subCrate, control));
     // ------------------------------------------------------
 
 
@@ -63,7 +63,7 @@ void run(TString inputFile="", Int_t firstFileNumber=-999, Int_t lastFileNumber=
     FairRootManager::Instance()->SetCompressData(true);
 
     // Histograms ----------------------------------------------------------------
-//    R3BCaloRawAna* rawAna = new R3BCaloRawAna();
+//    R3BCalifaMappedDataAnalysis* rawAna = new R3BCalifaMappedDataAnalysis();
 //    run->AddTask(rawAna);
     // ---------------------------------------------------------------------------
 

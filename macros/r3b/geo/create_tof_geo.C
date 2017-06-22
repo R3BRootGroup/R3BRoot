@@ -110,9 +110,6 @@ void create_tof_geo(const char* geoTag)
   
   //   TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);  //this
   TGeoRotation *gRot = new TGeoRotation();
-  gRot->RotateX(0.);
-  gRot->RotateY(-31.000000);
-  gRot->RotateZ(0.);
   
   TGeoCombiTrans*
   //   pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);  //this

@@ -9,7 +9,7 @@ void runsim(Int_t nEvents = 0)
   Bool_t fVis = true;                // Store tracks for visualization
   Bool_t fUserPList= false;          // Use of R3B special physics list
   Bool_t fR3BMagnet = true;          // Magnetic field definition
-  Bool_t fCaloHitFinder = true;      // Apply hit finder task
+  Bool_t fCalifaHitFinder = true;    // Apply hit finder task
 
   TString fMC = "TGeant4";           // MonteCarlo engine: TGeant3, TGeant4, TFluka
   TString fGenerator = "box";        // Event generator type: box, gammas, r3b, ion, ascii
@@ -31,15 +31,15 @@ void runsim(Int_t nEvents = 0)
   TString fAladinGeo = "aladin_v13a.geo.root";         
 
   Bool_t  fGlad = false;             // Glad Magnet
-  TString fGladGeo = "glad_v13a.geo.root";
+  TString fGladGeo = "glad_v17_flange.geo.root";
 
   Bool_t  fXBall = false;            // Crystal Ball
   TString fXBallGeo = "cal_v13a.geo.root";
 
-  Bool_t  fCalo = true;              // Califa Calorimeter
-  TString fCaloGeo = "califa_10_v8.11.geo.root";
-  Int_t   fCaloGeoVer = 10;
-  Double_t fCaloNonU = 1.0; //Non-uniformity: 1 means +-1% max deviation   
+  Bool_t  fCalifa = true;           // Califa Calorimeter
+  TString fCalifaGeo = "califa_10_v8.11.geo.root";
+  Int_t   fCalifaGeoVer = 10;
+  Double_t fCalifaNonU = 1.0; //Non-uniformity: 1 means +-1% max deviation   
 
   Bool_t  fTracker = false;          // Tracker
   TString fTrackerGeo = "tra_v13vac.geo.root";
@@ -108,7 +108,7 @@ void runsim(Int_t nEvents = 0)
   //  R3B Special Physics List in G4 case
   if ( (fUserPList) && (fMC.CompareTo("TGeant4") == 0) ) {
        run->SetUserConfig("g4R3bConfig.C");
-       run->SetUserCuts("SetR3BCuts.C");
+       run->SetUserCuts("SetCuts.C");
    }
 
   // -----   Create media   -------------------------------------------------
@@ -146,25 +146,24 @@ void runsim(Int_t nEvents = 0)
   //Glad Magnet definition
   if (fGlad && !fAladin) {
     fFieldMap = 1;
-    R3BModule* mag = new R3BGladMagnet("GladMagnet");
-    mag->SetGeometryFileName(fGladGeo);
+    R3BModule* mag = new R3BGladMagnet("GladMagnet", fGladGeo, "GLAD Magnet");
     run->AddModule(mag);
   }
 
   //Crystal Ball
-  if (fXBall && !fCalo) {
+  if (fXBall && !fCalifa) {
     R3BDetector* xball = new R3BXBall("XBall", kTRUE);
     xball->SetGeometryFileName(fXBallGeo);
     run->AddModule(xball);
   }
   
   //CALIFA Calorimeter
-  if (fCalo && !fXBall) {
-    R3BDetector* calo = new R3BCalo("Califa", kTRUE);
-    ((R3BCalo *)calo)->SelectGeometryVersion(fCaloGeoVer);
-    ((R3BCalo *)calo)->SetNonUniformity(fCaloNonU);
-    calo->SetGeometryFileName(fCaloGeo);
-    run->AddModule(calo);
+  if (fCalifa && !fXBall) {
+    R3BDetector* califa = new R3BCalifa("Califa", kTRUE);
+    ((R3BCalifa *)califa)->SelectGeometryVersion(fCalifaGeoVer);
+    ((R3BCalifa *)califa)->SetNonUniformity(fCalifaNonU);
+    califa->SetGeometryFileName(fCalifaGeo);
+    run->AddModule(califa);
   }
   
   // Tracker
@@ -262,7 +261,6 @@ void runsim(Int_t nEvents = 0)
     }
   } else if(fFieldMap == 1){
     R3BGladFieldMap* magField = new R3BGladFieldMap("R3BGladMap");
-    magField->SetPosition(0., 0., +350-119.94);
     magField->SetScale(fFieldScale);
 
     if ( fR3BMagnet == kTRUE ) {
@@ -300,13 +298,13 @@ void runsim(Int_t nEvents = 0)
 
   FairLogger::GetLogger()->SetLogVerbosityLevel("LOW");
  
-  // ----- Initialize CaloHitFinder task ------------------------------------
-  if(fCaloHitFinder) {
-    R3BCaloHitFinder* caloHF = new R3BCaloHitFinder();
-    caloHF->SetDetectionThreshold(0.000050);//50 KeV
-    caloHF->SetExperimentalResolution(5.);  //5% at 1 MeV
-    caloHF->SetAngularWindow(3.2,3.2);      //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
-    run->AddTask(caloHF);
+  // ----- Initialize Califa HitFinder task (from CrystalCal Level to Hit Level)
+  if(fCalifaHitFinder) {
+    R3BCalifaCrystalCal2Hit* califaHF = new R3BCalifaCrystalCal2Hit();
+    califaHF->SetDetectionThreshold(0.000050);//50 KeV
+    califaHF->SetExperimentalResolution(5.);  //5% at 1 MeV
+    califaHF->SetAngularWindow(3.2,3.2);      //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
+    run->AddTask(califaHF);
   }
 	
   // -----   Initialize simulation run   ------------------------------------

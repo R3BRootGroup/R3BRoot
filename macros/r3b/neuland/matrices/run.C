@@ -46,7 +46,7 @@ void Simulate(const RunConfig& cfg)
     TMap geometry;
     // geometry.Add(new TObjString("TARGET"), new TObjString("target_" + target + ".geo.root"));
     // geometry.Add(new TObjString("ALADIN"), new TObjString("aladin_v13a.geo.root"));
-    // geometry.Add(new TObjString("GLAD"), new TObjString("glad_v13a.geo.root"));
+    // geometry.Add(new TObjString("GLAD"), new TObjString("glad_v17_flange.geo.root"));
     geometry.Add(new TObjString("GLAD"), new TObjString("glad_vacuum.geo.root"));
     // geometry.Add(new TObjString("CRYSTALBALL"), new TObjString("cal_v13a.geo.root"));
     // geometry.Add(new TObjString("DCH"), new TObjString("dch_v13a.geo.root"));

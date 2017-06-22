@@ -9,8 +9,8 @@ ${BASE_INCLUDE_DIRECTORIES}
 set(INCLUDE_DIRECTORIES
 ${R3BROOT_SOURCE_DIR}/field 
 ${R3BROOT_SOURCE_DIR}/geane
-${R3BROOT_SOURCE_DIR}/cal 
-${R3BROOT_SOURCE_DIR}/r3bdata/caloData
+${R3BROOT_SOURCE_DIR}/califa 
+${R3BROOT_SOURCE_DIR}/r3bdata/califaData
 ${R3BROOT_SOURCE_DIR}/eventdisplay
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/evtvis
@@ -30,8 +30,8 @@ link_directories( ${LINK_DIRECTORIES})
 set(SRCS
 R3BEventManager.cxx
 R3BEventManagerEditor.cxx
-R3BCaloEventDisplay.cxx
-R3BCaloHitEventDisplay.cxx
+R3BCalifaEventDisplay.cxx
+R3BCalifaHitEventDisplay.cxx
 R3BMCTracks.cxx
 R3BIonName.cxx
 )
@@ -43,7 +43,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF R3BEventDisplayLinkDef.h)
 set(LIBRARY_NAME R3BEvtVis)
 set(DEPENDENCIES
-    Field MCStack R3BData R3BCalo Geane EventDisplay)
+    Field MCStack R3BData R3BCalifa Geane EventDisplay)
 
 GENERATE_LIBRARY()
 

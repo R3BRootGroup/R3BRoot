@@ -67,8 +67,54 @@ R3BDch::R3BDch()
 // -----   Standard constructor   ------------------------------------------
 R3BDch::R3BDch(const char* name, Bool_t active)
     : R3BDetector(name, active, kDCH)
+    , fPos1(-123.219446, 3.597104, 444.126271)
+    , fPos2(-167.015888, 1.016917, 535.093884)
+    , fRot1(new TGeoRotation())
+    , fRot2(new TGeoRotation())
 {
     ResetParameters();
+    fRot1->RotateZ(-8.88);
+    fRot1->RotateY(-31.);
+    fRot2->RotateZ(9.35);
+    fRot2->RotateY(-31.);
+    fPosIndex = 0;
+    kGeoSaved = kFALSE;
+    flGeoPar = new TList();
+    flGeoPar->SetName(GetName());
+    fVerboseLevel = 1;
+    kHelium = kFALSE;
+    fDynamicStepSize = kFALSE;
+    fVerbose = kFALSE;
+    refMatrix = NULL;
+}
+// -------------------------------------------------------------------------
+
+// -----   Standard constructor   ------------------------------------------
+R3BDch::R3BDch(const char* name,
+               TString geoFile,
+               Bool_t active,
+               Double_t x1,
+               Double_t y1,
+               Double_t z1,
+               Double_t rot_y1,
+               Double_t rot_z1,
+               Double_t x2,
+               Double_t y2,
+               Double_t z2,
+               Double_t rot_y2,
+               Double_t rot_z2)
+    : R3BDetector(name, active, kDCH)
+    , fPos1(x1, y1, z1)
+    , fPos2(x2, y2, z2)
+    , fRot1(new TGeoRotation())
+    , fRot2(new TGeoRotation())
+{
+    ResetParameters();
+    SetGeometryFileName(geoFile);
+    fRot1->RotateZ(rot_z1);
+    fRot1->RotateY(rot_y1);
+    fRot2->RotateZ(rot_z2);
+    fRot2->RotateY(rot_y2);
     fPosIndex = 0;
     kGeoSaved = kFALSE;
     flGeoPar = new TList();
@@ -670,6 +716,29 @@ void R3BDch::ConstructGeometry()
     {
         LOG(INFO) << "Constructing DCH geometry from ROOT file " << fileName.Data() << FairLogger::endl;
         ConstructRootGeometry();
+        
+        TGeoNode* dch_node = gGeoManager->GetTopVolume()->GetNode("DCH_0");
+        
+        TGeoNode* node = dch_node->GetVolume()->GetNode("DCH1_0");
+        TGeoCombiTrans* combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
+        combtrans->SetDx(fPos1.X());
+        combtrans->SetDy(fPos1.Y());
+        combtrans->SetDz(fPos1.Z());
+        combtrans->SetRotation(fRot1);
+        
+        node = dch_node->GetVolume()->GetNode("DCH1_1");
+        combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
+        combtrans->SetDx(fPos2.X());
+        combtrans->SetDy(fPos2.Y());
+        combtrans->SetDz(fPos2.Z());
+        combtrans->SetRotation(fRot2);
+        
+        node = dch_node->GetVolume()->GetNode("HeParaLog_0");
+        combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
+        combtrans->SetDx((fPos1.X() + fPos2.X())/2.);
+        combtrans->SetDy(fPos2.Y());
+        combtrans->SetDz((fPos1.Z() + fPos2.Z())/2.);
+        combtrans->SetRotation(fRot1);
     }
     else
     {

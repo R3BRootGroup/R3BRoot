@@ -38,16 +38,16 @@ void plot(TString inputFile="") {
  
   //Raw Hits (input)
   TClonesArray* rawHitCA;  
-  R3BCaloRawHit** rawHit;
-  rawHitCA = new TClonesArray("R3BCaloRawHit",5);
-  TBranch *branchRawHit = caloTree->GetBranch("CaloRawHit");
+  R3BCalifaMappedData** rawHit;
+  rawHitCA = new TClonesArray("R3BCalifaMappedData",5);
+  TBranch *branchRawHit = caloTree->GetBranch("CalifaMappedData");
   if(branchRawHit) branchRawHit->SetAddress(&rawHitCA);
   
   //Crystal Hits
   TClonesArray* crystalHitCA;  
-  R3BCaloCrystalHit** crystalHit;
-  crystalHitCA = new TClonesArray("R3BCaloCrystalHit",5);
-  TBranch *branchCrystalHit = caloTree->GetBranch("CaloCrystalHit");
+  R3BCalifaCrystalCalData** crystalHit;
+  crystalHitCA = new TClonesArray("R3BCalifaCrystalCalData",5);
+  TBranch *branchCrystalHit = caloTree->GetBranch("CalifaCrystalCalData");
   if(branchCrystalHit) branchCrystalHit->SetAddress(&crystalHitCA);
   
   Long64_t nevents = caloTree->GetEntries();
@@ -65,17 +65,17 @@ void plot(TString inputFile="") {
     crystalHitsPerEvent = crystalHitCA->GetEntries(); 
     
     if(rawHitsPerEvent>0) {
-      rawHit = new R3BCaloRawHit*[rawHitsPerEvent];
+      rawHit = new R3BCalifaMappedData*[rawHitsPerEvent];
       for(Int_t j=0;j<rawHitsPerEvent;j++){
-	//rawHit[j] = new R3BCaloRawHit;
-	rawHit[j] = (R3BCaloRawHit*) rawHitCA->At(j);      
+	//rawHit[j] = new R3BCalifaMappedData;
+	rawHit[j] = (R3BCalifaMappedData*) rawHitCA->At(j);      
       }
     }
     if(crystalHitsPerEvent>0) {
-      crystalHit = new R3BCaloCrystalHit*[crystalHitsPerEvent];
+      crystalHit = new R3BCalifaCrystalCalData*[crystalHitsPerEvent];
       for(Int_t j=0;j<crystalHitsPerEvent;j++){
-	//crystalHit[j] = new R3BCaloCrystalHit;
-	crystalHit[j] = (R3BCaloCrystalHit*) crystalHitCA->At(j);      
+	//crystalHit[j] = new R3BCalifaCrystalCalData;
+	crystalHit[j] = (R3BCalifaCrystalCalData*) crystalHitCA->At(j);      
       }
     }
     

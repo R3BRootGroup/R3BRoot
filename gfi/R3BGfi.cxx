@@ -46,8 +46,45 @@ R3BGfi::R3BGfi()
 // -----   Standard constructor   ------------------------------------------
 R3BGfi::R3BGfi(const char* name, Bool_t active)
     : R3BDetector(name, active, kGFI)
+    , fPos1(-73.274339, 0.069976, 513.649524)
+    , fPos2(-147.135037, 0.069976, 729.680342)
+    , fRot1(new TGeoRotation())
+    , fRot2(new TGeoRotation())
 {
     ResetParameters();
+    fRot1->RotateY(-16.7);
+    fRot2->RotateY(-16.7);
+    fGfiCollection = new TClonesArray("R3BGfiPoint");
+    fPosIndex = 0;
+    kGeoSaved = kFALSE;
+    flGeoPar = new TList();
+    flGeoPar->SetName(GetName());
+    fVerboseLevel = 1;
+}
+// -------------------------------------------------------------------------
+
+// -----   Standard constructor   ------------------------------------------
+R3BGfi::R3BGfi(const char* name,
+               TString geoFile,
+               Bool_t active,
+               Double_t x1,
+               Double_t y1,
+               Double_t z1,
+               Double_t rot_y1,
+               Double_t x2,
+               Double_t y2,
+               Double_t z2,
+               Double_t rot_y2)
+    : R3BDetector(name, active, kGFI)
+    , fPos1(x1, y1, z1)
+    , fPos2(x2, y2, z2)
+    , fRot1(new TGeoRotation())
+    , fRot2(new TGeoRotation())
+{
+    ResetParameters();
+    SetGeometryFileName(geoFile);
+    fRot1->RotateY(rot_y1);
+    fRot2->RotateY(rot_y2);
     fGfiCollection = new TClonesArray("R3BGfiPoint");
     fPosIndex = 0;
     kGeoSaved = kFALSE;
@@ -328,6 +365,23 @@ void R3BGfi::ConstructGeometry()
     {
         LOG(INFO) << "Constructing GFI geometry from ROOT file " << fileName.Data() << FairLogger::endl;
         ConstructRootGeometry();
+        
+        TGeoNode* gfi_node = gGeoManager->GetTopVolume()->GetNode("GFI_0");
+        
+        TGeoNode* node = gfi_node->GetVolume()->GetNode("GFILogWorld_0");
+        TGeoCombiTrans* combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
+        combtrans->SetDx(fPos1.X());
+        combtrans->SetDy(fPos1.Y());
+        combtrans->SetDz(fPos1.Z());
+        combtrans->SetRotation(fRot1);
+        
+        node = gfi_node->GetVolume()->GetNode("GFILogWorld_1");
+        combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
+        combtrans->SetDx(fPos2.X());
+        combtrans->SetDy(fPos2.Y());
+        combtrans->SetDz(fPos2.Z());
+        combtrans->SetRotation(fRot2);
+
     }
     else
     {

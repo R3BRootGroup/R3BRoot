@@ -88,8 +88,9 @@ EndIf()
 
 Execute_process(COMMAND $ENV{SIMPATH}/bin/fairsoft-config --cxxflags OUTPUT_VARIABLE _res_fairsoft_config OUTPUT_STRIP_TRAILING_WHITESPACE)
 String(FIND ${_res_fairsoft_config} "-std=c++11" POS_C++11)
-If(${POS_C++11} EQUAL -1)
-  Message(FATAL_ERROR "FairSoft wasn't compiled with c++11 support. Please recompile FairSoft with a compiler which supports c++11.")
+String(FIND ${_res_fairsoft_config} "-std=c++1y" POS_C++1y)
+If(${POS_C++11} EQUAL -1 AND ${POS_C++1y} EQUAL -1)
+  Message(FATAL_ERROR "FairSoft wasn't compiled with c++11 or c++1y support. Please recompile FairSoft with a compiler which supports c++11 or c++1y.")
 EndIf()
 
 Execute_process(COMMAND $ENV{FAIRROOTPATH}/bin/fairroot-config --fairsoft_path OUTPUT_VARIABLE _simpath OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -285,7 +286,7 @@ if (WITH_UCESB)
   add_subdirectory (r3bsource)
 endif (WITH_UCESB)
 add_subdirectory (passive)
-add_subdirectory (cal)
+add_subdirectory (califa)
 add_subdirectory (xball)
 add_subdirectory (dch)
 add_subdirectory (gfi)
@@ -317,6 +318,11 @@ add_subdirectory (tracking)
     add_subdirectory (actar)
     Set(LD_LIBRARY_PATH ${GARFIELD_LIBRARY_DIR} ${LD_LIBRARY_PATH})
   ENDIF(GARFIELD_FOUND)
+
+IF(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
+  add_subdirectory(sofia)
+ENDIF(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
+
 ENDIF (NOT MODULE)
 
 Execute_Process(COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-opengl

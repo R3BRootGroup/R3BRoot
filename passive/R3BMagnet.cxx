@@ -34,6 +34,12 @@ R3BMagnet::R3BMagnet(const char * name, const char *Title)
 }
 
 
+R3BMagnet::R3BMagnet(const char * name, TString geoFile, const char *Title)
+: R3BModule(name, Title, geoFile, 0., 0., 350. - 95., 0., -7., 0.)
+{
+}
+
+
 void R3BMagnet::ConstructGeometry()
 {
   TString fileName = GetGeometryFileName();

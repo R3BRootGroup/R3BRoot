@@ -77,7 +77,7 @@ void r3ball(Int_t nEvents = 1,
   if ( (fUserPList  == kTRUE ) &&
       (fMC.CompareTo("TGeant4")   == 0)) {
     run->SetUserConfig("g4R3bConfig.C");
-    run->SetUserCuts("SetR3BCuts.C");
+    run->SetUserCuts("SetCuts.C");
   }
   
   
@@ -136,8 +136,7 @@ void r3ball(Int_t nEvents = 1,
   //R3B Magnet definition
   if (fDetList->FindObject("GLAD") ) {
     fFieldMap = 1;
-    R3BModule* mag = new R3BGladMagnet("GladMagnet");
-    mag->SetGeometryFileName(((TObjString*)fDetList->GetValue("GLAD"))->GetString().Data());
+    R3BModule* mag = new R3BGladMagnet("GladMagnet", ((TObjString*)fDetList->GetValue("GLAD"))->GetString(), "GLAD Magnet");
     run->AddModule(mag);
   }
   
@@ -151,12 +150,12 @@ void r3ball(Int_t nEvents = 1,
   
   if (fDetList->FindObject("CALIFA") ) {
     // CALIFA Calorimeter
-    R3BDetector* calo = new R3BCalo("Califa", kTRUE);
-    ((R3BCalo *)calo)->SelectGeometryVersion(10);
+    R3BDetector* califa = new R3BCalifa("Califa", kTRUE);
+    ((R3BCalifa *)califa)->SelectGeometryVersion(10);
     //Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
-    ((R3BCalo *)calo)->SetNonUniformity(1.0);
-    calo->SetGeometryFileName(((TObjString*)fDetList->GetValue("CALIFA"))->GetString().Data());
-    run->AddModule(calo);
+    ((R3BCalifa *)califa)->SetNonUniformity(1.0);
+    califa->SetGeometryFileName(((TObjString*)fDetList->GetValue("CALIFA"))->GetString().Data());
+    run->AddModule(califa);
   }
 
   // Tracker
@@ -275,7 +274,6 @@ void r3ball(Int_t nEvents = 1,
     }
   } else if(fFieldMap == 1){
     magField = new R3BGladFieldMap("R3BGladMap");
-    ((R3BGladFieldMap*)magField)->SetPosition(0., 0., +350-119.94);
     ((R3BGladFieldMap*)magField)->SetScale(fieldScale);
     
     if ( fR3BMagnet == kTRUE ) {

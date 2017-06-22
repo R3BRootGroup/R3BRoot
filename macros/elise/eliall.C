@@ -80,7 +80,7 @@ void eliall(Int_t nEvents,
        (fMC.CompareTo("TGeant4")   == 0)
       ){
        run->SetUserConfig("g4R3bConfig.C");
-       run->SetUserCuts("SetR3BCuts.C");
+       run->SetUserCuts("SetCuts.C");
    }
 
 
@@ -148,12 +148,12 @@ void eliall(Int_t nEvents,
 
   if (fDetList.FindObject("CALIFA") ) {
     // CALIFA Calorimeter
-    R3BDetector* calo = new R3BCalo("Califa", kTRUE);
-    ((R3BCalo *)calo)->SelectGeometryVersion(10);
+    R3BDetector* califa = new R3BCalifa("Califa", kTRUE);
+    ((R3BCalifa *)califa)->SelectGeometryVersion(10);
     //Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
-    ((R3BCalo *)calo)->SetNonUniformity(1.0);
-    calo->SetGeometryFileName("califa_v13_811.geo.root");
-    run->AddModule(calo);
+    ((R3BCalifa *)califa)->SetNonUniformity(1.0);
+    califa->SetGeometryFileName("califa_v13_811.geo.root");
+    run->AddModule(califa);
   }
 
   // Tracker

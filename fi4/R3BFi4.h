@@ -139,7 +139,7 @@ class R3BFi4 : public R3BDetector
      **/
     void ResetParameters();
 
-    ClassDef(R3BFi4, 1);
+    ClassDef(R3BFi4, 2);
 };
 
 inline void R3BFi4::ResetParameters()

@@ -58,14 +58,38 @@ R3BMfi::R3BMfi() : R3BDetector("R3BMfi", kTRUE, kMFI)
 }
 // -------------------------------------------------------------------------
 
-
+// -----   Standard constructor   ------------------------------------------
+R3BMfi::R3BMfi(const char* name, Bool_t active)
+: R3BDetector(name, active, kMFI)
+{
+    //   : R3BDetector(name, active, 1) {
+    ResetParameters();
+    fMfiCollection = new TClonesArray("R3BMfiPoint");
+    fPosIndex = 0;
+    kGeoSaved = kFALSE;
+    flGeoPar = new TList();
+    flGeoPar->SetName( GetName());
+    fVerboseLevel = 1;
+}
+// -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-R3BMfi::R3BMfi(const char* name, Bool_t active) 
+R3BMfi::R3BMfi(const char* name,
+               TString geoFile,
+               Bool_t active,
+               Float_t x,
+               Float_t y,
+               Float_t z,
+               Float_t rot_x,
+               Float_t rot_y,
+               Float_t rot_z)
   : R3BDetector(name, active, kMFI)
 {
 //   : R3BDetector(name, active, 1) {
   ResetParameters();
+  SetGeometryFileName(geoFile);
+  SetPosition(x, y, z);
+  SetRotation(rot_x, rot_y, rot_z);
   fMfiCollection = new TClonesArray("R3BMfiPoint");
   fPosIndex = 0;
   kGeoSaved = kFALSE;

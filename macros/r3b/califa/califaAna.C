@@ -6,7 +6,7 @@
 //         Last Update: 20/10/14
 //         Comments:
 //			Runs the CALIFA Hit Finder. Outputs a root file with 
-//			a collection (TClonesArray) of R3BCaloHits
+//			a collection (TClonesArray) of R3BCalifaHitData
 //
 //  -------------------------------------------------------------------------
 //
@@ -59,9 +59,9 @@ void califaAna(Int_t nEvents = 1) {
 
 
 	// -----  Analysis routines for CALIFA	
-	R3BCaloHitFinder* caloHF = new R3BCaloHitFinder();
+	R3BCalifaCrystalCal2Hit* califaHF = new R3BCalifaCrystalCal2Hit();
         TMap fDetList = new TMap();
-        caloHF->SetGeometryFileName(((TObjString*)&fDetList.GetValue("CALIFA"))->GetString().Data());
+        califaHF->SetGeometryFileName(((TObjString*)&fDetList.GetValue("CALIFA"))->GetString().Data());
 	//Selecting the geometry version
 	// 0- CALIFA 5.0, including BARREL and ENDCAP.
 	// 1- CALIFA 7.05, only BARREL
@@ -73,15 +73,15 @@ void califaAna(Int_t nEvents = 1) {
 	// 10- CALIFA 8.00, (ongoing work) 
 	// ...
 	// 16- CALIFA 8.11 + cc0.2 (ongoing work)
-	caloHF->SelectGeometryVersion(16);   
-	caloHF->SetClusteringAlgorithm(1,0);
-	caloHF->SetDetectionThreshold(0.000050);  //50 KeV
-	caloHF->SetExperimentalResolution(6.);    //6% at 1 MeV
-	caloHF->SetComponentResolution(.25);      //sigma = 0.25 MeV
-	caloHF->SetPhoswichResolution(3.,5.);     //percent @ 1 MeV for LaBr and LaCl 
-	caloHF->SetAngularWindow(3.2,3.2);        //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
+	califaHF->SelectGeometryVersion(16);   
+	califaHF->SetClusteringAlgorithm(1,0);
+	califaHF->SetDetectionThreshold(0.000050);  //50 KeV
+	califaHF->SetExperimentalResolution(6.);    //6% at 1 MeV
+	califaHF->SetComponentResolution(.25);      //sigma = 0.25 MeV
+	califaHF->SetPhoswichResolution(3.,5.);     //percent @ 1 MeV for LaBr and LaCl 
+	califaHF->SetAngularWindow(3.2,3.2);        //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
 
-	fRun->AddTask(caloHF);
+	fRun->AddTask(califaHF);
 	
 	// Number of events to process
 	Int_t nEvents = 100000;
@@ -89,7 +89,7 @@ void califaAna(Int_t nEvents = 1) {
 	fRun->Init();  
 	fRun->Run(0, nEvents);
 	
-    delete fRun;
+        delete fRun;
 
 	// -----   Finish   -------------------------------------------------------
 	timer.Stop();

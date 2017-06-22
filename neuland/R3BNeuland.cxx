@@ -58,6 +58,25 @@ R3BNeuland::R3BNeuland(const char* name, Bool_t active)
 {
 }
 
+R3BNeuland::R3BNeuland(const char* name,
+                       TString geoFile,
+                       Bool_t active,
+                       Float_t x,
+                       Float_t y,
+                       Float_t z,
+                       Float_t rot_x,
+                       Float_t rot_y,
+                       Float_t rot_z)
+    : R3BDetector(name, active, kNEULAND)
+    , fNeulandPoints(new TClonesArray("R3BNeulandPoint"))
+    , fNeulandPrimaryNeutronInteractionPoints(new TClonesArray("FairMCPoint"))
+    , fNeulandPrimaryNeutronInteractionPixel(new TClonesArray("R3BNeulandPixel"))
+{
+    SetGeometryFileName(geoFile);
+    SetPosition(x, y, z);
+    SetRotation(rot_x, rot_y, rot_z);
+}
+
 void R3BNeuland::Initialize()
 {
     LOG(INFO) << "R3BNeuland initialization ..." << FairLogger::endl;

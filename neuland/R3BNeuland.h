@@ -34,6 +34,27 @@ class R3BNeuland : public R3BDetector
      */
     R3BNeuland(const char* name, Bool_t active);
 
+    /** Standard constructor.
+     *@param name    detector name
+     *@param geoFile name of the ROOT geometry file
+     *@param active  sensitivity flag
+     *@param x       position in cave
+     *@param y       position in cave
+     *@param z       position in cave
+     *@param rot_x   rotation in cave
+     *@param rot_y   rotation in cave
+     *@param rot_z   rotation in cave
+     */
+    R3BNeuland(const char* name,
+               TString geoFile,
+               Bool_t active,
+               Float_t x = 0.,
+               Float_t y = 0.,
+               Float_t z = 0.,
+               Float_t rot_x = 0.,
+               Float_t rot_y = 0.,
+               Float_t rot_z = 0.);
+
     /** Default Destructor */
     // virtual ~R3BNeuland() = default;
     virtual ~R3BNeuland(){};
@@ -63,11 +84,11 @@ class R3BNeuland : public R3BDetector
     // R3BNeuland &operator=(const R3BNeuland &) = delete;
 
   private:
-    TClonesArray* fNeulandPoints;
-    TClonesArray* fNeulandPrimaryNeutronInteractionPoints;
-    TClonesArray* fNeulandPrimaryNeutronInteractionPixel;
+    TClonesArray* fNeulandPoints;                            //!
+    TClonesArray* fNeulandPrimaryNeutronInteractionPoints;   //!
+    TClonesArray* fNeulandPrimaryNeutronInteractionPixel;    //!
 
-    R3BNeulandGeoPar* fNeulandGeoPar;
+    R3BNeulandGeoPar* fNeulandGeoPar;                        //!
 
     /** Track information to be stored until the track leaves the active volume. */
     // TODO: Just fill an existing R3BLandPoint in the TClonesArray or
@@ -91,7 +112,7 @@ class R3BNeuland : public R3BDetector
      * ClassVersionID = 0, this class should not be read/written (no IO necessary)
      */
     // ClassDefOverride(R3BNeuland, 0);
-    ClassDef(R3BNeuland, 0);
+    ClassDef(R3BNeuland, 1);
 };
 
 #endif // R3BNEULAND_H

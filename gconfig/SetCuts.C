@@ -33,13 +33,13 @@ void SetCuts()
   gMC->SetProcess("LOSS",3); /**energy loss*/
   gMC->SetProcess("MULS",1); /**multiple scattering*/
 
-  Double_t cut1 = 1.0E-3;         // MeV --> 1 keV
-  Double_t cut2 = 1.0E-3;         // MeV --> 100 keV
+  Double_t cut1 = 1.0E-4;         // GeV --> 100 keV
+  Double_t cut2 = 1.0E-3;         // GeV --> 1 MeV
   Double_t cutb = 1.0E4;          // GeV --> 10 TeV
   Double_t tofmax = 1.E10;        // seconds
   cout << "SetCuts Macro: Setting cuts.." <<endl;
   
-  gMC->SetCut("CUTGAM",cut2);   /** gammas (GeV)*/
+  gMC->SetCut("CUTGAM",cut1);   /** gammas (GeV)*/
   gMC->SetCut("CUTELE",cut2);   /** electrons (GeV)*/
   gMC->SetCut("CUTNEU",cut1);   /** neutral hadrons (GeV)*/
   gMC->SetCut("CUTHAD",cut2);   /** charged hadrons (GeV)*/
