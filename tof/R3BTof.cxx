@@ -1,99 +1,57 @@
-// -------------------------------------------------------------------------
-// -----                        R3BTof source file                     -----
-// -----                  Created 26/03/09  by D.Bertini               -----
-// -------------------------------------------------------------------------
-#include <stdlib.h>
-
 #include "R3BTof.h"
-
-#include "R3BGeoTof.h"
-#include "R3BTofPoint.h"
-#include "R3BGeoTofPar.h"
-#include "R3BMCStack.h"
-
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
 #include "FairGeoNode.h"
 #include "FairGeoRootBuilder.h"
 #include "FairRootManager.h"
-#include "FairRuntimeDb.h"
 #include "FairRun.h"
+#include "FairRuntimeDb.h"
 #include "FairVolume.h"
-
+#include "R3BGeoTof.h"
+#include "R3BGeoTofPar.h"
+#include "R3BMCStack.h"
+#include "R3BTofPoint.h"
 #include "TClonesArray.h"
 #include "TGeoMCGeometry.h"
+#include "TGeoManager.h"
+#include "TObjArray.h"
 #include "TParticle.h"
 #include "TVirtualMC.h"
-#include "TObjArray.h"
+#include <stdlib.h>
 
-// includes for modeling
-#include "TGeoManager.h"
-
-// -----   Default constructor   -------------------------------------------
 R3BTof::R3BTof()
-    : R3BDetector("R3BTof", kTRUE, kTOF)
+    : R3BTof("")
 {
-    ResetParameters();
-    fTofCollection = new TClonesArray("R3BTofPoint");
-    fPosIndex = 0;
-    kGeoSaved = kFALSE;
-    flGeoPar = new TList();
-    flGeoPar->SetName(GetName());
-    fVerboseLevel = 1;
 }
-// -------------------------------------------------------------------------
 
-// -----   Standard constructor   ------------------------------------------
-R3BTof::R3BTof(const char* name, Bool_t active)
-: R3BDetector(name, active, kTOF)
+R3BTof::R3BTof(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot)
+    : R3BTof(geoFile, { trans, rot })
 {
-    ResetParameters();
-    fTofCollection = new TClonesArray("R3BTofPoint");
-    fPosIndex = 0;
-    kGeoSaved = kFALSE;
-    flGeoPar = new TList();
-    flGeoPar->SetName(GetName());
-    fVerboseLevel = 1;
 }
-// -------------------------------------------------------------------------
 
-// -----   Standard constructor   ------------------------------------------
-R3BTof::R3BTof(const char* name,
-               TString geoFile,
-               Bool_t active,
-               Float_t x,
-               Float_t y,
-               Float_t z,
-               Float_t rot_x,
-               Float_t rot_y,
-               Float_t rot_z)
-    : R3BDetector(name, active, kTOF)
+R3BTof::R3BTof(const TString& geoFile, const TGeoCombiTrans& combi)
+    : R3BDetector("R3BTof", kTOF, geoFile, combi)
+    , fTofCollection(new TClonesArray("R3BTofPoint"))
+    , fPosIndex(0)
+    , kGeoSaved(kFALSE)
+    , flGeoPar(new TList())
 {
-    ResetParameters();
-    SetGeometryFileName(geoFile);
-    SetPosition(x, y, z);
-    SetRotation(rot_x, rot_y, rot_z);
-    fTofCollection = new TClonesArray("R3BTofPoint");
-    fPosIndex = 0;
-    kGeoSaved = kFALSE;
-    flGeoPar = new TList();
     flGeoPar->SetName(GetName());
-    fVerboseLevel = 1;
+    ResetParameters();
 }
-// -------------------------------------------------------------------------
 
-// -----   Destructor   ----------------------------------------------------
 R3BTof::~R3BTof()
 {
     if (flGeoPar)
+    {
         delete flGeoPar;
+    }
     if (fTofCollection)
     {
         fTofCollection->Delete();
         delete fTofCollection;
     }
 }
-// -------------------------------------------------------------------------
 
 void R3BTof::Initialize()
 {
@@ -129,7 +87,8 @@ void R3BTof::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Si Only
             Double_t cutE = fCutE; // GeV-> 1 keV
 
-            LOG(INFO) << "-I- R3BTof: plasticForTOF Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV" << FairLogger::endl;
+            LOG(INFO) << "-I- R3BTof: plasticForTOF Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE
+                      << " GeV" << FairLogger::endl;
 
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -144,7 +103,7 @@ void R3BTof::SetSpecialPhysicsCuts()
             gMC->Gstpar(pSi->GetId(), "PPCUTM", -1.);  /** direct pair production by muons (GeV)*/
         }
 
-    } //!gGeoManager
+    } //! gGeoManager
 }
 
 // -----   Public method ProcessHits  --------------------------------------
@@ -176,8 +135,8 @@ Bool_t R3BTof::ProcessHits(FairVolume* vol)
         fVolumeID = vol->getMCid();
         gMC->TrackPosition(fPosOut);
         gMC->TrackMomentum(fMomOut);
-//        if (fELoss == 0.)
-//            return kFALSE;
+        //        if (fELoss == 0.)
+        //            return kFALSE;
 
         fTime_out = gMC->TrackTime() * 1.0e09; // also in case particle is stopped in detector, or decays...
         fLength_out = gMC->TrackLength();
@@ -196,7 +155,8 @@ Bool_t R3BTof::ProcessHits(FairVolume* vol)
             oldpos = gGeoManager->GetCurrentPoint();
             olddirection = gGeoManager->GetCurrentDirection();
 
-            //       cout << "1st direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] << endl;
+            //       cout << "1st direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] <<
+            //       endl;
 
             for (Int_t i = 0; i < 3; i++)
             {
@@ -276,10 +236,7 @@ void R3BTof::EndOfEvent()
 // ----------------------------------------------------------------------------
 
 // -----   Public method Register   -------------------------------------------
-void R3BTof::Register()
-{
-    FairRootManager::Instance()->Register("TOFPoint", GetName(), fTofCollection, kTRUE);
-}
+void R3BTof::Register() { FairRootManager::Instance()->Register("TOFPoint", GetName(), fTofCollection, kTRUE); }
 // ----------------------------------------------------------------------------
 
 // -----   Public method GetCollection   --------------------------------------
@@ -327,31 +284,23 @@ void R3BTof::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 }
 
 // -----   Private method AddHit   --------------------------------------------
-R3BTofPoint*
-    R3BTof::AddHit(Int_t trackID, Int_t detID, TVector3 posIn, TVector3 posOut, TVector3 momIn, TVector3 momOut, Double_t time, Double_t length, Double_t eLoss)
+R3BTofPoint* R3BTof::AddHit(Int_t trackID,
+                            Int_t detID,
+                            TVector3 posIn,
+                            TVector3 posOut,
+                            TVector3 momIn,
+                            TVector3 momOut,
+                            Double_t time,
+                            Double_t length,
+                            Double_t eLoss)
 {
     TClonesArray& clref = *fTofCollection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
-        LOG(INFO) << "R3BTof: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z() << ") cm,  detector " << detID << ", track " << trackID
-                  << ", energy loss " << eLoss * 1e06 << " keV" << FairLogger::endl;
+        LOG(INFO) << "R3BTof: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
+                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV"
+                  << FairLogger::endl;
     return new (clref[size]) R3BTofPoint(trackID, detID, posIn, posOut, momIn, momOut, time, length, eLoss);
-}
-
-// -----   Public method ConstructGeometry   ----------------------------------
-void R3BTof::ConstructGeometry()
-{
-    TString fileName = GetGeometryFileName();
-    if (fileName.EndsWith(".root"))
-    {
-        LOG(INFO) << "Constructing TOF geometry from ROOT file " << fileName.Data() << FairLogger::endl;
-        ConstructRootGeometry();
-    }
-    else
-    {
-        LOG(FATAL) << "TOF geometry file is not specified" << FairLogger::endl;
-        exit(1);
-    }
 }
 
 Bool_t R3BTof::CheckIfSensitive(std::string name)

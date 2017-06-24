@@ -3,9 +3,8 @@
 
 #include "R3BDetector.h"
 #include "TLorentzVector.h"
-
-#include <string>
 #include <memory>
+#include <string>
 
 class FairVolume;
 class TClonesArray;
@@ -29,35 +28,18 @@ class R3BNeuland : public R3BDetector
     R3BNeuland();
 
     /** Standard constructor.
-     *@param name    detector name
-     *@param active  sensitivity flag
-     */
-    R3BNeuland(const char* name, Bool_t active);
+     *@param geoFile name of the ROOT geometry file
+     *@param trans   position
+     *@param rot     rotation */
+    R3BNeuland(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot = TGeoRotation());
 
     /** Standard constructor.
-     *@param name    detector name
      *@param geoFile name of the ROOT geometry file
-     *@param active  sensitivity flag
-     *@param x       position in cave
-     *@param y       position in cave
-     *@param z       position in cave
-     *@param rot_x   rotation in cave
-     *@param rot_y   rotation in cave
-     *@param rot_z   rotation in cave
-     */
-    R3BNeuland(const char* name,
-               TString geoFile,
-               Bool_t active,
-               Float_t x = 0.,
-               Float_t y = 0.,
-               Float_t z = 0.,
-               Float_t rot_x = 0.,
-               Float_t rot_y = 0.,
-               Float_t rot_z = 0.);
+     *@param combi   position + rotation */
+    R3BNeuland(const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
 
     /** Default Destructor */
-    // virtual ~R3BNeuland() = default;
-    virtual ~R3BNeuland(){};
+    ~R3BNeuland() = default;
 
     virtual void Initialize(); // override;
 
@@ -73,8 +55,6 @@ class R3BNeuland : public R3BDetector
 
     virtual void Reset(); // override;
 
-    virtual void ConstructGeometry(); // override;
-
     virtual void PostTrack(); // override;
 
     virtual Bool_t CheckIfSensitive(std::string name); // override;
@@ -84,11 +64,11 @@ class R3BNeuland : public R3BDetector
     // R3BNeuland &operator=(const R3BNeuland &) = delete;
 
   private:
-    TClonesArray* fNeulandPoints;                            //!
-    TClonesArray* fNeulandPrimaryNeutronInteractionPoints;   //!
-    TClonesArray* fNeulandPrimaryNeutronInteractionPixel;    //!
+    TClonesArray* fNeulandPoints;                          //!
+    TClonesArray* fNeulandPrimaryNeutronInteractionPoints; //!
+    TClonesArray* fNeulandPrimaryNeutronInteractionPixel;  //!
 
-    R3BNeulandGeoPar* fNeulandGeoPar;                        //!
+    R3BNeulandGeoPar* fNeulandGeoPar; //!
 
     /** Track information to be stored until the track leaves the active volume. */
     // TODO: Just fill an existing R3BLandPoint in the TClonesArray or
@@ -107,12 +87,8 @@ class R3BNeuland : public R3BDetector
 
     void WriteParameterFile();
 
-    /** ROOT ClassDef
-     * ClassDefOverride to avoid inconsistent-missing-override warnings
-     * ClassVersionID = 0, this class should not be read/written (no IO necessary)
-     */
     // ClassDefOverride(R3BNeuland, 0);
-    ClassDef(R3BNeuland, 1);
+    ClassDef(R3BNeuland, 2);
 };
 
 #endif // R3BNEULAND_H

@@ -24,11 +24,11 @@ void runsim(Int_t nEvents = 0)
   Bool_t  fTarget = true;            // Target
   TString fTargetType = "LiH";       // Target selection: LeadTarget, Para, Para45, LiH
 
-  Bool_t  fVesselcool = false;       // SiTracker Cooling  
+  Bool_t  fVesselcool = false;       // SiTracker Cooling
   TString fVesselcoolGeo = "vacvessel_v13a.geo.root";
 
   Bool_t  fAladin = false;           // Aladin Magnet
-  TString fAladinGeo = "aladin_v13a.geo.root";         
+  TString fAladinGeo = "aladin_v13a.geo.root";
 
   Bool_t  fGlad = false;             // Glad Magnet
   TString fGladGeo = "glad_v17_flange.geo.root";
@@ -39,7 +39,7 @@ void runsim(Int_t nEvents = 0)
   Bool_t  fCalifa = true;           // Califa Calorimeter
   TString fCalifaGeo = "califa_10_v8.11.geo.root";
   Int_t   fCalifaGeoVer = 10;
-  Double_t fCalifaNonU = 1.0; //Non-uniformity: 1 means +-1% max deviation   
+  Double_t fCalifaNonU = 1.0; //Non-uniformity: 1 means +-1% max deviation
 
   Bool_t  fTracker = false;          // Tracker
   TString fTrackerGeo = "tra_v13vac.geo.root";
@@ -49,28 +49,28 @@ void runsim(Int_t nEvents = 0)
 
   Bool_t fDch = false;               // Drift Chambers
   TString fDchGeo = "dch_v13a.geo.root";
-  
+
   Bool_t fTof = false;               // ToF Detector
   TString fTofGeo = "tof_v13a.geo.root";
-  
+
   Bool_t fmTof = false;              // mTof Detector
   TString fmTofGeo = "mtof_v13a.geo.root";
-  
+
   Bool_t fGfi = false;               // Fiber Detector
   TString fGfiGeo = "gfi_v13a.geo.root";
-  
+
   Bool_t fLand = false;              // Land Detector
   TString fLandGeo = "land_v12a_10m.geo.root";
-  
-  Bool_t fNeuLand = false;           // NeuLand Detector 
+
+  Bool_t fNeuLand = false;           // NeuLand Detector
   TString fNeuLandGeo = "neuland_v12a_14m.geo.root";
-  
-  Bool_t fMfi = false;              // MFI Detector 
+
+  Bool_t fMfi = false;              // MFI Detector
   TString fMfiGeo = "mfi_v13a.geo.root";
-  
+
   Bool_t fPsp = false;              // PSP Detector
   TString fPspGeo = "psp_v13a.geo.root";
-  
+
   Bool_t fLumon = false;            // Luminosity Detector
   TString fLumonGeo = "lumon_v13a.geo.root";
 
@@ -99,7 +99,7 @@ void runsim(Int_t nEvents = 0)
   timer.Start();
   // ------------------------------------------------------------------------
 
- 
+
   // -----   Create simulation run   ----------------------------------------
   FairRunSim* run = new FairRunSim();
   run->SetName(fMC);                  // Transport engine
@@ -123,126 +123,92 @@ void runsim(Int_t nEvents = 0)
 
   //Target definition
   if (fTarget) {
-    R3BModule* target= new R3BTarget(fTargetType);
-    target->SetGeometryFileName("target_"+fTargetType+".geo.root");
-    run->AddModule(target);
+    run->AddModule(new R3BTarget(fTargetType, "target_" + fTargetType + ".geo.root"));
   }
 
   //SiTracker Cooling definition
   if (fVesselcool) {
-    R3BModule* vesselcool= new R3BVacVesselCool(fTargetType);
-    vesselcool->SetGeometryFileName(fVesselcoolGeo);
-    run->AddModule(vesselcool);
+    run->AddModule(new R3BVacVesselCool(fTargetType, fVesselcoolGeo));
   }
 
   //Aladin Magnet definition
   if (fAladin && !fGlad) {
     fFieldMap = 0;
-    R3BModule* mag = new R3BMagnet("AladinMagnet");
-    mag->SetGeometryFileName(fAladinGeo);
-    run->AddModule(mag);
+    run->AddModule(new R3BAladinMagnet(fAladinGeo));
   }
 
   //Glad Magnet definition
   if (fGlad && !fAladin) {
     fFieldMap = 1;
-    R3BModule* mag = new R3BGladMagnet("GladMagnet", fGladGeo, "GLAD Magnet");
-    run->AddModule(mag);
+    run->AddModule(new R3BGladMagnet(fGladGeo));
   }
 
   //Crystal Ball
   if (fXBall && !fCalifa) {
-    R3BDetector* xball = new R3BXBall("XBall", kTRUE);
-    xball->SetGeometryFileName(fXBallGeo);
-    run->AddModule(xball);
+    run->AddModule(new R3BXBall(fXBallGeo));
   }
-  
+
   //CALIFA Calorimeter
   if (fCalifa && !fXBall) {
-    R3BDetector* califa = new R3BCalifa("Califa", kTRUE);
-    ((R3BCalifa *)califa)->SelectGeometryVersion(fCalifaGeoVer);
-    ((R3BCalifa *)califa)->SetNonUniformity(fCalifaNonU);
-    califa->SetGeometryFileName(fCalifaGeo);
+    R3BCalifa* califa = new R3BCalifa(fCalifaGeo);
+    califa->SelectGeometryVersion(fCalifaGeoVer);
+    califa->SetNonUniformity(fCalifaNonU);
     run->AddModule(califa);
   }
-  
+
   // Tracker
   if (fTracker) {
-    R3BDetector* tra = new R3BTra("Tracker", kTRUE);
-    tra->SetGeometryFileName(fTrackerGeo);
-    run->AddModule(tra);
+    run->AddModule(new R3BTra(fTrackerGeo));
   }
-  
+
   // STaRTrack
   if (fStarTrack) {
-    R3BDetector* tra = new R3BSTaRTra("STaRTrack", kTRUE);
-    tra->SetGeometryFileName(fStarTrackGeo);
-    run->AddModule(tra);
+    run->AddModule(new R3BSTaRTra(fStarTrackGeo));
   }
 
   // DCH drift chambers
   if (fDch) {
-    R3BDetector* dch = new R3BDch("Dch", kTRUE);
-    dch->SetGeometryFileName(fDchGeo);
-    run->AddModule(dch);
+    run->AddModule(new R3BDch(fDchGeo));
   }
-  
+
   // Tof
   if (fTof) {
-    R3BDetector* tof = new R3BTof("Tof", kTRUE);
-    tof->SetGeometryFileName(fTofGeo);
-    run->AddModule(tof);
+    run->AddModule(new R3BTof(fTofGeo));
   }
-  
+
   // mTof
   if (fmTof) {
-    R3BDetector* mTof = new R3BmTof("mTof", kTRUE);
-    mTof->SetGeometryFileName(fmTofGeo);
-    run->AddModule(mTof);
+    run->AddModule(new R3BmTof(fmTofGeo));
   }
-  
+
   // GFI detector
   if (fGfi) {
-    R3BDetector* gfi = new R3BGfi("Gfi", kTRUE);
-    gfi->SetGeometryFileName(fGfiGeo);
-    run->AddModule(gfi);
+    run->AddModule(new R3BGfi(fGfiGeo));
   }
-  
+
   // Land Detector
   if (fLand && !fNeuLand) {
-    R3BDetector* land = new R3BLand("Land", kTRUE);
-    land->SetVerboseLevel(1);
-    land->SetGeometryFileName(fLandGeo);
-    run->AddModule(land);
+    run->AddModule(new R3BLand(fLandGeo));
   }
-  
+
   // NeuLand Scintillator Detector
   if(fNeuLand && !fLand) {
-    R3BDetector* land = new R3BLand("Land", kTRUE);
-    land->SetVerboseLevel(1);
-    land->SetGeometryFileName(fNeuLandGeo);
-    run->AddModule(land);
+    run->AddModule(new R3BLand(fNeuLandGeo));
   }
-  
+
   // MFI Detector
   if(fMfi) {
-    R3BDetector* mfi = new R3BMfi("Mfi", kTRUE);
-    mfi->SetGeometryFileName(fMfiGeo);
-    run->AddModule(mfi);
+    run->AddModule(new R3BMfi(fMfiGeo));
   }
 
   // PSP Detector
   if(fPsp) {
-    R3BDetector* psp = new R3BPsp("Psp", kTRUE);
-    psp->SetGeometryFileName(fPspGeo);
-    run->AddModule(psp);
+    run->AddModule(new R3BPsp(fPspGeo));
   }
-  
+
   // Luminosity detector
   if (fLumon) {
-    R3BDetector* lumon = new ELILuMon("LuMon", kTRUE);
-    lumon->SetGeometryFileName(fLumonGeo);
-    run->AddModule(lumon);
+    run->AddModule(new ELILuMon(fLumonGeo));
   }
 
   // -----   Create R3B  magnetic field ----------------------------------------
@@ -288,7 +254,7 @@ void runsim(Int_t nEvents = 0)
 	  boxGen->SetXYZ(0.0,0.0,0.0);
 	  // add the box generator
 	  primGen->AddGenerator(boxGen);
-  } 
+  }
 
   run->SetGenerator(primGen);
 
@@ -297,7 +263,7 @@ void runsim(Int_t nEvents = 0)
   run->SetStoreTraj(fVis);
 
   FairLogger::GetLogger()->SetLogVerbosityLevel("LOW");
- 
+
   // ----- Initialize Califa HitFinder task (from CrystalCal Level to Hit Level)
   if(fCalifaHitFinder) {
     R3BCalifaCrystalCal2Hit* califaHF = new R3BCalifaCrystalCal2Hit();
@@ -306,7 +272,7 @@ void runsim(Int_t nEvents = 0)
     califaHF->SetAngularWindow(3.2,3.2);      //[0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
     run->AddTask(califaHF);
   }
-	
+
   // -----   Initialize simulation run   ------------------------------------
   run->Init();
 
@@ -318,7 +284,7 @@ void runsim(Int_t nEvents = 0)
   rtdb->setOutput(parOut);
   rtdb->saveOutput();
   rtdb->print();
-  
+
   // -----   Start run   ----------------------------------------------------
   if (nEvents>0) run->Run(nEvents);
 
@@ -330,7 +296,7 @@ void runsim(Int_t nEvents = 0)
   cout << "Macro finished succesfully." << endl;
   cout << "Output file is "    << OutFile << endl;
   cout << "Parameter file is " << ParFile << endl;
-  cout << "Real time " << rtime << " s, CPU time " << ctime 
+  cout << "Real time " << rtime << " s, CPU time " << ctime
        << "s" << endl << endl;
   // ------------------------------------------------------------------------
 

@@ -1,16 +1,7 @@
-// -------------------------------------------------------------------------
-// -----                        R3BTra header file                     -----
-// -----                  Created 26/03/09  by D.Bertini               -----
-// -------------------------------------------------------------------------
-
-/**  R3BTra.h
- **/
-
 #ifndef R3BTRA_H
 #define R3BTRA_H
 
 #include "R3BDetector.h"
-
 #include "TLorentzVector.h"
 
 class TClonesArray;
@@ -19,40 +10,25 @@ class FairVolume;
 
 class R3BTra : public R3BDetector
 {
-
   public:
     /** Default constructor **/
     R3BTra();
 
     /** Standard constructor.
-     *@param name    detetcor name
-     *@param active  sensitivity flag
-     **/
-    R3BTra(const char* name, Bool_t active);
+     *@param geoFile name of the ROOT geometry file
+     *@param trans   position
+     *@param rot     rotation
+     */
+    R3BTra(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot = TGeoRotation());
 
     /** Standard constructor.
-     *@param name    detetcor name
      *@param geoFile name of the ROOT geometry file
-     *@param active  sensitivity flag
-     *@param x       position in cave
-     *@param y       position in cave
-     *@param z       position in cave
-     *@param rot_x   rotation in cave
-     *@param rot_y   rotation in cave
-     *@param rot_z   rotation in cave
-     **/
-    R3BTra(const char* name,
-           TString geoFile,
-           Bool_t active,
-           Float_t x = 0.,
-           Float_t y = 0.,
-           Float_t z = 0.,
-           Float_t rot_x = 0.,
-           Float_t rot_y = 0.,
-           Float_t rot_z = 0.);
+     *@param combi   position + rotation
+     */
+    R3BTra(const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
 
     /** Destructor **/
-    virtual ~R3BTra();
+    ~R3BTra();
 
     /** Virtual method ProcessHits
      **
@@ -111,11 +87,6 @@ class R3BTra : public R3BDetector
      **/
     virtual void CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset);
 
-    /** Virtaul method Construct geometry
-     **
-     ** Constructs the STS geometry
-     **/
-    virtual void ConstructGeometry();
     virtual void Initialize();
     virtual void SetSpecialPhysicsCuts();
 
@@ -141,7 +112,7 @@ class R3BTra : public R3BDetector
     TClonesArray* fTraCollection;   //!  The hit collection
     Bool_t kGeoSaved;               //!
     TList* flGeoPar;                //!
-    
+
     /** Private method AddHit
      **
      ** Adds a TraPoint to the HitCollection
@@ -163,7 +134,7 @@ class R3BTra : public R3BDetector
      **/
     void ResetParameters();
 
-    ClassDef(R3BTra, 2);
+    ClassDef(R3BTra, 3);
 };
 
 inline void R3BTra::ResetParameters()

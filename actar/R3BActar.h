@@ -1,13 +1,7 @@
-// -------------------------------------------------------------------------
-// -----                       R3BActar header file                    -----
-// -----                  Created 27/04/16  by D. Kresan               -----
-// -------------------------------------------------------------------------
-
 #ifndef R3BACTAR_H
 #define R3BACTAR_H
 
 #include "R3BDetector.h"
-
 #include "TLorentzVector.h"
 
 class TClonesArray;
@@ -16,19 +10,25 @@ class FairVolume;
 
 class R3BActar : public R3BDetector
 {
-
   public:
-    /** Default constructor **/
+    /** Default constructor */
     R3BActar();
 
     /** Standard constructor.
-     *@param name    detetcor name
-     *@param active  sensitivity flag
-     **/
-    R3BActar(const char* name, Bool_t active);
+     *@param geoFile name of the ROOT geometry file
+     *@param trans   position
+     *@param rot     rotation
+     */
+    R3BActar(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot = TGeoRotation());
+
+    /** Standard constructor.
+     *@param geoFile name of the ROOT geometry file
+     *@param combi   position + rotation
+     */
+    R3BActar(const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
 
     /** Destructor **/
-    virtual ~R3BActar();
+    ~R3BActar();
 
     /** Virtual method ProcessHits
      **
@@ -85,11 +85,6 @@ class R3BActar : public R3BDetector
      **/
     virtual void CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset);
 
-    /** Virtual method Construct geometry
-     **
-     ** Constructs the STS geometry
-     **/
-    virtual void ConstructGeometry();
     virtual Bool_t CheckIfSensitive(std::string name);
     virtual void Initialize();
     virtual void SetSpecialPhysicsCuts();

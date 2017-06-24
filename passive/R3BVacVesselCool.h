@@ -1,38 +1,26 @@
-//*-- AUTHOR : Marc Labiche
-//*-- Created : 28/06/2012
-#ifndef R3BVacVesselCool_H
-#define R3BVacVesselCool_H
+#ifndef R3BVACVESSELCOOL_H
+#define R3BVACVESSELCOOL_H
 
-#include "FairDetector.h"
 #include "R3BModule.h"
-#include <TString.h>
 
+class R3BVacVesselCool : public R3BModule
+{
+  public:
+    R3BVacVesselCool();
 
-class R3BVacVesselCool : public R3BModule {
-public:
-  R3BVacVesselCool(const char* name, const char* Title = "R3B VacVesselCool");
-  R3BVacVesselCool(const char* name,
-                   TString geoFile,
-                   Float_t x = 0.,
-                   Float_t y = 0.,
-                   Float_t z = 0.,
-                   Float_t rot_x = 0.,
-                   Float_t rot_y = 0.,
-                   Float_t rot_z = 0.,
-                   const char* Title = "R3B VacVesselCool");
-  R3BVacVesselCool();
-  virtual ~R3BVacVesselCool();
+    R3BVacVesselCool(const TString& name);
 
-  virtual void ConstructGeometry();
-  
-  virtual Bool_t CheckIfSensitive(std::string name);
-  
-protected:
-  TString *fVacVesselCoolName; //!
-  void ConstructGeometry1();
-  
-  ClassDef(R3BVacVesselCool,1)
+    R3BVacVesselCool(const TString& name,
+                     const TString& geoFile,
+                     const TGeoTranslation& trans,
+                     const TGeoRotation& rot = TGeoRotation());
+
+    R3BVacVesselCool(const TString& name, const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
+
+    void ConstructGeometry(); // override;
+
+    ClassDef(R3BVacVesselCool, 3)
+    // ClassDefOverride(R3BVacVesselCool, 3)
 };
 
-#endif //R3BVacVesselCool_H
-
+#endif // R3BVACVESSELCOOL_H

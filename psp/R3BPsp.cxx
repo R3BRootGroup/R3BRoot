@@ -1,122 +1,79 @@
-// -------------------------------------------------------------------------
-// -----                        R3BPsp source file                     -----
-// -----                  Created 26/03/09  by D.Bertini               -----
-// -------------------------------------------------------------------------
-#include <stdlib.h>
-
 #include "R3BPsp.h"
-
-#include "R3BGeoPsp.h"
-#include "R3BPspPoint.h"
-// #include "R3BGeoPspPar.h"
-#include "R3BMCStack.h"
-
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
 #include "FairGeoNode.h"
 #include "FairGeoRootBuilder.h"
 #include "FairRootManager.h"
-#include "FairRuntimeDb.h"
 #include "FairRun.h"
+#include "FairRuntimeDb.h"
 #include "FairVolume.h"
-
+#include "R3BGeoPsp.h"
+#include "R3BMCStack.h"
+#include "R3BPspPoint.h"
 #include "TClonesArray.h"
-#include "TGeoMCGeometry.h"
-#include "TParticle.h"
-#include "TVirtualMC.h"
-#include "TObjArray.h"
-
-// includes for modeling
-#include "TGeoManager.h"
-#include "TParticle.h"
-#include "TVirtualMC.h"
-#include "TGeoMatrix.h"
-#include "TGeoMaterial.h"
-#include "TGeoMedium.h"
+#include "TGeoArb8.h"
 #include "TGeoBBox.h"
+#include "TGeoBoolNode.h"
+#include "TGeoCompositeShape.h"
+#include "TGeoCone.h"
+#include "TGeoMCGeometry.h"
+#include "TGeoManager.h"
+#include "TGeoMaterial.h"
+#include "TGeoMatrix.h"
+#include "TGeoMedium.h"
 #include "TGeoPara.h"
 #include "TGeoPgon.h"
 #include "TGeoSphere.h"
-#include "TGeoArb8.h"
-#include "TGeoCone.h"
-#include "TGeoBoolNode.h"
-#include "TGeoCompositeShape.h"
+#include "TObjArray.h"
+#include "TParticle.h"
+#include "TVirtualMC.h"
+#include <stdlib.h>
 
-// -----   Default constructor   -------------------------------------------
 R3BPsp::R3BPsp()
-    : R3BDetector("R3BPsp", kTRUE, kPSP)
+    : R3BPsp("")
 {
-    ResetParameters();
-    fPspCollection = new TClonesArray("R3BPspPoint");
-    fPosIndex = 0;
-    kGeoSaved = kFALSE;
-    flGeoPar = new TList();
-    flGeoPar->SetName(GetName());
-    fVerboseLevel = 1;
 }
-// -------------------------------------------------------------------------
 
-// -----   Standard constructor   ------------------------------------------
-R3BPsp::R3BPsp(const char* name, Bool_t active)
-    : R3BDetector(name, active, kPSP)
-    , fZ1(-221.)
-    , fZ2(-89.)
-    , fZ3(94.1)
+R3BPsp::R3BPsp(const TString& geoFile,
+               const TGeoTranslation& trans,
+               const TGeoRotation& rot,
+               const Float_t z1,
+               const Float_t z2,
+               const Float_t z3)
+    : R3BPsp(geoFile, { trans, rot }, z1, z2, z3)
 {
-    ResetParameters();
-    fPspCollection = new TClonesArray("R3BPspPoint");
-    fPosIndex = 0;
-    kGeoSaved = kFALSE;
-    flGeoPar = new TList();
-    flGeoPar->SetName(GetName());
-    fVerboseLevel = 1;
 }
-// -------------------------------------------------------------------------
 
-// -----   Standard constructor   ------------------------------------------
-R3BPsp::R3BPsp(const char* name,
-               TString geoFile,
-               Bool_t active,
-               Float_t x,
-               Float_t y,
-               Float_t z,
-               Float_t rot_x,
-               Float_t rot_y,
-               Float_t rot_z,
-               Float_t z1,
-               Float_t z2,
-               Float_t z3)
-    : R3BDetector(name, active, kPSP)
+R3BPsp::R3BPsp(const TString& geoFile,
+               const TGeoCombiTrans& combi,
+               const Float_t z1,
+               const Float_t z2,
+               const Float_t z3)
+    : R3BDetector("R3BPsp", kPSP, geoFile, combi)
     , fZ1(z1)
     , fZ2(z2)
     , fZ3(z3)
+    , fPspCollection(new TClonesArray("R3BPspPoint"))
+    , fPosIndex(0)
+    , kGeoSaved(kFALSE)
+    , flGeoPar(new TList())
 {
-    ResetParameters();
-    fPspCollection = new TClonesArray("R3BPspPoint");
-    fPosIndex = 0;
-    kGeoSaved = kFALSE;
-    flGeoPar = new TList();
     flGeoPar->SetName(GetName());
-    fVerboseLevel = 1;
-    SetGeometryFileName(geoFile);
-    SetPosition(x, y, z);
-    SetRotation(rot_x, rot_y, rot_z);
+    ResetParameters();
 }
-// -------------------------------------------------------------------------
 
-// -----   Destructor   ----------------------------------------------------
 R3BPsp::~R3BPsp()
 {
-
     if (flGeoPar)
+    {
         delete flGeoPar;
+    }
     if (fPspCollection)
     {
         fPspCollection->Delete();
         delete fPspCollection;
     }
 }
-// -------------------------------------------------------------------------
 
 void R3BPsp::Initialize()
 {
@@ -152,7 +109,8 @@ void R3BPsp::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Si Only
             Double_t cutE = fCutE; // GeV-> 1 keV
 
-            LOG(INFO) << "-I- R3BPsp: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV" << FairLogger::endl;
+            LOG(INFO) << "-I- R3BPsp: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV"
+                      << FairLogger::endl;
 
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -166,7 +124,7 @@ void R3BPsp::SetSpecialPhysicsCuts()
             gMC->Gstpar(pSi->GetId(), "DCUTM", cutE);  /** delta-rays by muons (GeV)*/
             gMC->Gstpar(pSi->GetId(), "PPCUTM", -1.);  /** direct pair production by muons (GeV)*/
         }
-    } //!gGeoManager
+    } //! gGeoManager
 }
 
 // -----   Public method ProcessHits  --------------------------------------
@@ -264,9 +222,7 @@ Bool_t R3BPsp::ProcessHits(FairVolume* vol)
 }
 
 // -----   Public method EndOfEvent   -----------------------------------------
-void R3BPsp::BeginEvent()
-{
-}
+void R3BPsp::BeginEvent() {}
 
 // -----   Public method EndOfEvent   -----------------------------------------
 void R3BPsp::EndOfEvent()
@@ -280,10 +236,7 @@ void R3BPsp::EndOfEvent()
 // ----------------------------------------------------------------------------
 
 // -----   Public method Register   -------------------------------------------
-void R3BPsp::Register()
-{
-    FairRootManager::Instance()->Register("PSPPoint", GetName(), fPspCollection, kTRUE);
-}
+void R3BPsp::Register() { FairRootManager::Instance()->Register("PSPPoint", GetName(), fPspCollection, kTRUE); }
 // ----------------------------------------------------------------------------
 
 // -----   Public method GetCollection   --------------------------------------
@@ -346,8 +299,9 @@ R3BPspPoint* R3BPsp::AddHit(Int_t trackID,
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
     {
-        LOG(INFO) << "R3BPsp: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z() << ") cm,  detector " << detID << ", track " << trackID
-                  << ", energy loss " << eLoss * 1e06 << " keV" << FairLogger::endl;
+        LOG(INFO) << "R3BPsp: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
+                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV"
+                  << FairLogger::endl;
     }
     return new (clref[size]) R3BPspPoint(trackID, detID, plane, posIn, posOut, momIn, momOut, time, length, eLoss);
 }
@@ -360,6 +314,15 @@ void R3BPsp::ConstructGeometry()
     {
         LOG(INFO) << "Constructing PSP geometry from ROOT file " << fileName.Data() << FairLogger::endl;
         ConstructRootGeometry();
+
+        // TODO: Check if this works as expected
+        if (!fCombiTrans.IsIdentity())
+        {
+            TGeoNode* n = gGeoManager->GetTopNode()->GetDaughter(gGeoManager->GetTopNode()->GetNdaughters() - 1);
+            TGeoCombiTrans* combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)n)->GetMatrix();
+
+            *combtrans = fCombiTrans;
+        }
 
         TGeoNode* psp_node = gGeoManager->GetTopVolume()->GetNode("PSPWorld_0");
 

@@ -1,21 +1,17 @@
 #include "R3BNeuland.h"
-
-#include "R3BNeulandPoint.h"
-#include "R3BNeulandPixel.h"
-#include "R3BNeulandGeoPar.h"
-#include "R3BMCStack.h"
-
+#include "FairMCPoint.h"
 #include "FairRun.h"
 #include "FairRuntimeDb.h"
-#include "FairMCPoint.h"
-
+#include "R3BMCStack.h"
+#include "R3BNeulandGeoPar.h"
+#include "R3BNeulandPixel.h"
+#include "R3BNeulandPoint.h"
 #include "TClonesArray.h"
+#include "TGeoBBox.h"
+#include "TGeoManager.h"
 #include "TObjArray.h"
 #include "TParticle.h"
 #include "TVirtualMC.h"
-
-#include "TGeoManager.h"
-#include "TGeoBBox.h"
 
 // Initialize variables from Birk' s Law
 static constexpr Double_t BirkdP = 1.032;
@@ -43,38 +39,21 @@ inline Double_t GetLightYield(const Int_t charge, const Double_t length, const D
 }
 
 R3BNeuland::R3BNeuland()
-    : R3BDetector("R3BNeuland", kTRUE, kNEULAND)
-    , fNeulandPoints(new TClonesArray("R3BNeulandPoint"))
-    , fNeulandPrimaryNeutronInteractionPoints(new TClonesArray("FairMCPoint"))
-    , fNeulandPrimaryNeutronInteractionPixel(new TClonesArray("R3BNeulandPixel"))
+    : R3BNeuland("")
 {
 }
 
-R3BNeuland::R3BNeuland(const char* name, Bool_t active)
-    : R3BDetector(name, active, kNEULAND)
-    , fNeulandPoints(new TClonesArray("R3BNeulandPoint"))
-    , fNeulandPrimaryNeutronInteractionPoints(new TClonesArray("FairMCPoint"))
-    , fNeulandPrimaryNeutronInteractionPixel(new TClonesArray("R3BNeulandPixel"))
+R3BNeuland::R3BNeuland(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot)
+    : R3BNeuland(geoFile, { trans, rot })
 {
 }
 
-R3BNeuland::R3BNeuland(const char* name,
-                       TString geoFile,
-                       Bool_t active,
-                       Float_t x,
-                       Float_t y,
-                       Float_t z,
-                       Float_t rot_x,
-                       Float_t rot_y,
-                       Float_t rot_z)
-    : R3BDetector(name, active, kNEULAND)
+R3BNeuland::R3BNeuland(const TString& geoFile, const TGeoCombiTrans& combi)
+    : R3BDetector("R3BNeuland", kNEULAND, geoFile, combi)
     , fNeulandPoints(new TClonesArray("R3BNeulandPoint"))
     , fNeulandPrimaryNeutronInteractionPoints(new TClonesArray("FairMCPoint"))
     , fNeulandPrimaryNeutronInteractionPixel(new TClonesArray("R3BNeulandPixel"))
 {
-    SetGeometryFileName(geoFile);
-    SetPosition(x, y, z);
-    SetRotation(rot_x, rot_y, rot_z);
 }
 
 void R3BNeuland::Initialize()
@@ -236,20 +215,6 @@ void R3BNeuland::Reset()
     fNeulandPrimaryNeutronInteractionPoints->Clear();
     fNeulandPrimaryNeutronInteractionPixel->Clear();
     ResetValues();
-}
-
-void R3BNeuland::ConstructGeometry()
-{
-    TString fileName = GetGeometryFileName();
-    if (fileName.EndsWith(".root"))
-    {
-        LOG(INFO) << "Constructing (Neu)LAND geometry from ROOT file " << fileName.Data() << FairLogger::endl;
-        ConstructRootGeometry();
-    }
-    else
-    {
-        LOG(FATAL) << "Geometry file name is not set" << FairLogger::endl;
-    }
 }
 
 void R3BNeuland::ResetValues()

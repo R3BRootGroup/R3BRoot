@@ -1,7 +1,7 @@
 void run_aladin_sim()
 {
-    TString transport = "TGeant3";
-    Bool_t userPList = kTRUE;
+    TString transport = "TGeant4";
+    Bool_t userPList = kFALSE;
 
     TString outFile = "aladin_sim.root";
     TString parFile = "aladin_par.root";
@@ -68,26 +68,23 @@ void run_aladin_sim()
     // To skip the detector comment out the line with: run->AddModule(...
 
     // Target
-    run->AddModule(new R3BTarget(targetType.Data(), "target_" + targetType + ".geo.root", 0., 0., 0.));
+    run->AddModule(new R3BTarget(targetType, "target_" + targetType + ".geo.root"));
 
     // ALADIN
-    run->AddModule(new R3BMagnet(
-        "AladinMagnet", "aladin_v13a.geo.root", "ALADIN Magnet")); // ALADIN should not be moved or rotated
+    run->AddModule(new R3BAladinMagnet("aladin_v13a.geo.root")); // ALADIN should not be moved or rotated
 
     // Crystal-Ball
-    R3BXBall* xball = new R3BXBall("XBall", "cal_v13a.geo.root", kTRUE, 0., 0., 0.);
+    R3BXBall* xball = new R3BXBall("cal_v13a.geo.root");
     xball->SelectCollectionOption(2);
     run->AddModule(xball);
 
     // Tracker
-    R3BTra* tra = new R3BTra("Tracker", "tra_v13vac.geo.root", kTRUE, 0., 0., 0.);
+    R3BTra* tra = new R3BTra("tra_v13vac.geo.root");
     tra->SetEnergyCut(1e-4);
     run->AddModule(tra);
 
     // DCH
-    run->AddModule(new R3BDch("Dch",
-                              "dch_v13a.geo.root",
-                              kTRUE,
+    run->AddModule(new R3BDch("dch_v13a.geo.root",
                               -123.219446,
                               3.597104,
                               444.126271,
@@ -100,29 +97,20 @@ void run_aladin_sim()
                               9.35));
 
     // Tof
-    run->AddModule(new R3BTof("Tof", "tof_v17a.geo.root", kTRUE, -377.359574, 2.400000, 960.777114, 0., -31., 0.));
+    run->AddModule(new R3BTof("tof_v17a.geo.root", { -377.359574, 2.400000, 960.777114 }, { "", -90., +31., 90. }));
 
     // mTof
-    run->AddModule(new R3BmTof("mTof", "mtof_v17a.geo.root", kTRUE, -115.824045, 0.523976, 761.870346, 0., -16.7, 0.));
+    run->AddModule(new R3BmTof("mtof_v17a.geo.root", { -115.824045, 0.523976, 761.870346 }, { "", -90., +16.7, 90. }));
 
     // MFI
-    run->AddModule(new R3BMfi("Mfi", "mfi_v17a.geo.root", kTRUE, -63.82, 0., 520.25, 0., -13.5, 0.)); // s412
+    run->AddModule(new R3BMfi("mfi_v17a.geo.root", { -63.82, 0., 520.25 }, { "", -90., +13.5, 90. })); // s412
 
     // GFI detector
-    run->AddModule(new R3BGfi("Gfi",
-                              "gfi_v13a.geo.root",
-                              kTRUE,
-                              -73.274339,
-                              0.069976,
-                              513.649524,
-                              -16.7,
-                              -147.135037,
-                              0.069976,
-                              729.680342,
-                              -16.7));
+    run->AddModule(new R3BGfi(
+        "gfi_v13a.geo.root", -73.274339, 0.069976, 513.649524, -16.7, -147.135037, 0.069976, 729.680342, -16.7));
 
     // LAND
-    run->AddModule(new R3BLand("Land", "land_v12a_10m.geo.root", kTRUE, 0., 0., 1100.));
+    run->AddModule(new R3BLand("land_v12a_10m.geo.root", { 0., 0., 1100. }));
 
     // -----   Create R3B  magnetic field -------------------------------------
     // NB: <D.B>
@@ -278,4 +266,15 @@ void run_aladin_sim()
 
     cout << " Test passed" << endl;
     cout << " All ok " << endl;
+
+    // Snap a picture of the geometry
+    // If this crashes, set "OpenGL.SavePicturesViaFBO: no" in your .rootrc
+    /*gStyle->SetCanvasPreferGL(kTRUE);
+    gGeoManager->GetTopVolume()->Draw("ogl");
+    TGLViewer* v = (TGLViewer*)gPad->GetViewer3D();
+    v->SetStyle(TGLRnrCtx::kOutline);
+    v->RequestDraw();
+    v->SavePicture("run_aladin_sim-side.png");
+    v->SetPerspectiveCamera(TGLViewer::kCameraPerspXOZ, 25., 0, 0, -90. * TMath::DegToRad(), 0. * TMath::DegToRad());
+    v->SavePicture("run_aladin_sim-top.png");*/
 }

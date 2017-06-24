@@ -1,7 +1,7 @@
 void run_sim()
 {
-    TString transport = "TGeant3";
-    Bool_t userPList = kTRUE; // option for TGeant4
+    TString transport = "TGeant4";
+    Bool_t userPList = kFALSE; // option for TGeant4
 
     TString outFile = "sim.root";
     TString parFile = "par.root";
@@ -63,41 +63,38 @@ void run_sim()
     // To skip the detector comment out the line with: run->AddModule(...
 
     // Target
-    run->AddModule(new R3BTarget(targetType.Data(), "target_" + targetType + ".geo.root", 0., 0., 0.));
+    run->AddModule(new R3BTarget(targetType, "target_" + targetType + ".geo.root"));
 
     // GLAD
-    run->AddModule(
-        new R3BGladMagnet("GladMagnet", "glad_v17_flange.geo.root", "R3BGlad Magnet")); // GLAD should not be moved or rotated
+    run->AddModule(new R3BGladMagnet("glad_v17_flange.geo.root")); // GLAD should not be moved or rotated
 
     // PSP
-    run->AddModule(new R3BPsp(
-        "Psp", "psp_v13a.geo.root", kTRUE, 0., 0., 0., 0., 0., 0., -221., -89., 94.1)); // position, rotation, z1, z2,
-                                                                                        // z3
+    run->AddModule(new R3BPsp("psp_v13a.geo.root", {}, -221., -89., 94.1));
 
     // R3B SiTracker Cooling definition
-    run->AddModule(new R3BVacVesselCool(targetType.Data(), "vacvessel_v14a.geo.root", 0., 0., 0.));
+    run->AddModule(new R3BVacVesselCool(targetType, "vacvessel_v14a.geo.root"));
 
     // STaRTrack
-    run->AddModule(new R3BSTaRTra("STaRTrack", "startra_v16-300_2layers.geo.root", kTRUE, 0., 0., 20.));
+    run->AddModule(new R3BSTaRTra("startra_v16-300_2layers.geo.root", { 0., 0., 20. }));
 
     // CALIFA
-    R3BCalifa* califa = new R3BCalifa("Califa", "califa_10_v8.11.geo.root", kTRUE, 0., 0., 0.);
+    R3BCalifa* califa = new R3BCalifa("califa_10_v8.11.geo.root");
     califa->SelectGeometryVersion(10);
     // Selecting the Non-uniformity of the crystals (1 means +-1% max deviation)
     califa->SetNonUniformity(1.0);
     run->AddModule(califa);
 
     // Tof
-    run->AddModule(new R3BTof("Tof", "tof_v17a.geo.root", kTRUE, -417.359574, 2.400000, 960.777114, 0., -31., 0.));
+    run->AddModule(new R3BTof("tof_v17a.geo.root", { -417.359574, 2.400000, 960.777114 }, { "", -90., +31., 90. }));
 
     // mTof
-    run->AddModule(new R3BmTof("mTof", "mtof_v17a.geo.root", kTRUE, -155.824045, 0.523976, 761.870346, 0., -16.7, 0.));
+    run->AddModule(new R3BmTof("mtof_v17a.geo.root", { -155.824045, 0.523976, 761.870346 }, { "", -90., +16.7, 90. }));
 
     // MFI
-    run->AddModule(new R3BMfi("Mfi", "mfi_v17a.geo.root", kTRUE, -63.82, 0., 520.25, 0., -13.5, 0.)); // s412
+    run->AddModule(new R3BMfi("mfi_v17a.geo.root", { -63.82, 0., 520.25 }, { "", 90., +13.5, 90. })); // s412
 
     // NeuLAND
-    run->AddModule(new R3BLand("Land", "neuland_v12a_14m.geo.root", kTRUE, 0., 0., 1550.));
+    // run->AddModule(new R3BNeuland("neuland_test.geo.root", { 0., 0., 1400. + 12 * 5. }));
 
     // -----   Create R3B  magnetic field ----------------------------------------
     // NB: <D.B>
@@ -251,4 +248,15 @@ void run_sim()
 
     cout << " Test passed" << endl;
     cout << " All ok " << endl;
+
+    // Snap a picture of the geometry
+    // If this crashes, set "OpenGL.SavePicturesViaFBO: no" in your .rootrc
+    /*gStyle->SetCanvasPreferGL(kTRUE);
+    gGeoManager->GetTopVolume()->Draw("ogl");
+    TGLViewer* v = (TGLViewer*)gPad->GetViewer3D();
+    v->SetStyle(TGLRnrCtx::kOutline);
+    v->RequestDraw();
+    v->SavePicture("run_sim-side.png");
+    v->SetPerspectiveCamera(TGLViewer::kCameraPerspXOZ, 25., 0, 0, -90. * TMath::DegToRad(), 0. * TMath::DegToRad());
+    v->SavePicture("run_sim-top.png");*/
 }

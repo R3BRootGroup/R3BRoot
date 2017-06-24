@@ -1,16 +1,7 @@
-// -------------------------------------------------------------------------
-// -----                        R3BPsp header file                     -----
-// -----                  Created 26/03/09  by D.Bertini               -----
-// -------------------------------------------------------------------------
-
-/**  R3BPsp.h
- **/
-
 #ifndef R3BPSP_H
 #define R3BPSP_H
 
 #include "R3BDetector.h"
-
 #include "TLorentzVector.h"
 
 class TClonesArray;
@@ -19,51 +10,48 @@ class FairVolume;
 
 class R3BPsp : public R3BDetector
 {
-
   public:
     /** Default constructor **/
     R3BPsp();
 
     /** Standard constructor.
-     *@param name    detetcor name
-     *@param active  sensitivity flag
-     **/
-    R3BPsp(const char* name, Bool_t active);
+     *@param geoFile name of the ROOT geometry file
+     *@param trans   position
+     *@param rot     rotation
+     *@param z1      psp1 z position
+     *@param z2      psp2 z position
+     *@param z2      psp2 z position
+     */
+    R3BPsp(const TString& geoFile,
+           const TGeoTranslation& trans,
+           const TGeoRotation& rot = TGeoRotation(),
+           const Float_t z1 = -221.,
+           const Float_t z2 = -89.,
+           const Float_t z3 = 94.1);
 
     /** Standard constructor.
-     *@param name    detetcor name
      *@param geoFile name of the ROOT geometry file
-     *@param active  sensitivity flag
-     *@param x       position in cave
-     *@param y       position in cave
-     *@param z       position in cave
-     *@param rot_x   rotation in cave
-     *@param rot_y   rotation in cave
-     *@param rot_z   rotation in cave
-     **/
-    R3BPsp(const char* name,
-           TString geoFile,
-           Bool_t active,
-           Float_t x = 0.,
-           Float_t y = 0.,
-           Float_t z = 0.,
-           Float_t rot_x = 0.,
-           Float_t rot_y = 0.,
-           Float_t rot_z = 0.,
-           Float_t z1 = -221.,
-           Float_t z2 = -89.,
-           Float_t z3 = 94.1);
+     *@param combi   position + rotation
+     *@param z1      psp1 z position
+     *@param z2      psp2 z position
+     *@param z2      psp2 z position
+     */
+    R3BPsp(const TString& geoFile,
+           const TGeoCombiTrans& combi = TGeoCombiTrans(),
+           const Float_t z1 = -221.,
+           const Float_t z2 = -89.,
+           const Float_t z3 = 94.1);
 
     /** Destructor **/
-    virtual ~R3BPsp();
+    ~R3BPsp();
 
     /** Virtual method ProcessHits
-     **
-     ** Defines the action to be taken when a step is inside the
-     ** active volume. Creates a R3BPspPoint and adds it to the
-     ** collection.
-     *@param vol  Pointer to the active volume
-     **/
+    **
+    ** Defines the action to be taken when a step is inside the
+    ** active volume. Creates a R3BPspPoint and adds it to the
+    ** collection.
+    *@param vol  Pointer to the active volume
+    **/
     virtual Bool_t ProcessHits(FairVolume* vol = 0);
 
     /** Virtual method BeginEvent
@@ -142,9 +130,9 @@ class R3BPsp : public R3BDetector
     Bool_t kGeoSaved;               //!
     TList* flGeoPar;                //!
 
-    Float_t fZ1;  //! z position of PSP1
-    Float_t fZ2;  //! z position of PSP2
-    Float_t fZ3;  //! z position of PSP3
+    Float_t fZ1; //! z position of PSP1
+    Float_t fZ2; //! z position of PSP2
+    Float_t fZ3; //! z position of PSP3
 
     /** Private method AddHit
      **
@@ -167,7 +155,7 @@ class R3BPsp : public R3BDetector
      **/
     void ResetParameters();
 
-    ClassDef(R3BPsp, 2);
+    ClassDef(R3BPsp, 3);
 };
 
 inline void R3BPsp::ResetParameters()

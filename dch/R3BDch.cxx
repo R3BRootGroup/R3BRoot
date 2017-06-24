@@ -1,78 +1,49 @@
-// -------------------------------------------------------------------------
-// -----                        R3BDch source file                     -----
-// -----                  Created 26/03/09  by D.Bertini               -----
-// -------------------------------------------------------------------------
 #include "R3BDch.h"
-
-#include "R3BGeoDch.h"
-#include "R3BDchPoint.h"
-#include "R3BDchFullPoint.h"
-#include "R3BGeoDchPar.h"
-#include "R3BMCStack.h"
-
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
 #include "FairGeoNode.h"
 #include "FairGeoRootBuilder.h"
 #include "FairRootManager.h"
-#include "FairRuntimeDb.h"
 #include "FairRun.h"
+#include "FairRuntimeDb.h"
 #include "FairVolume.h"
-
+#include "R3BDchFullPoint.h"
+#include "R3BDchPoint.h"
+#include "R3BGeoDch.h"
+#include "R3BGeoDchPar.h"
+#include "R3BMCStack.h"
 #include "TClonesArray.h"
-#include "TGeoMCGeometry.h"
-#include "TParticle.h"
-#include "TVirtualMC.h"
-#include "TObjArray.h"
-
-// includes for modeling
-#include "TGeoManager.h"
-#include "TParticle.h"
-#include "TVirtualMC.h"
-#include "TGeoMatrix.h"
-#include "TGeoMaterial.h"
-#include "TGeoMedium.h"
+#include "TGeoArb8.h"
 #include "TGeoBBox.h"
+#include "TGeoBoolNode.h"
+#include "TGeoCompositeShape.h"
+#include "TGeoCone.h"
+#include "TGeoMCGeometry.h"
+#include "TGeoManager.h"
+#include "TGeoMaterial.h"
+#include "TGeoMatrix.h"
+#include "TGeoMedium.h"
 #include "TGeoPara.h"
 #include "TGeoPgon.h"
 #include "TGeoSphere.h"
-#include "TGeoArb8.h"
-#include "TGeoCone.h"
-#include "TGeoBoolNode.h"
-#include "TGeoCompositeShape.h"
+#include "TObjArray.h"
+#include "TParticle.h"
 #include "TRandom.h"
-
-#include <stdlib.h>
+#include "TVirtualMC.h"
 #include <iomanip>
+#include <stdlib.h>
 
 using namespace std;
 
-// -----   Default constructor   -------------------------------------------
-R3BDch::R3BDch()
-    : R3BDetector("R3BDch", kTRUE, kDCH)
-{
-    ResetParameters();
-    fPosIndex = 0;
-    kGeoSaved = kFALSE;
-    flGeoPar = new TList();
-    flGeoPar->SetName(GetName());
-    fVerboseLevel = 1;
-    kHelium = kFALSE;
-    fDynamicStepSize = kFALSE;
-    fVerbose = kFALSE;
-    refMatrix = NULL;
-}
-// -------------------------------------------------------------------------
-
-// -----   Standard constructor   ------------------------------------------
-R3BDch::R3BDch(const char* name, Bool_t active)
-    : R3BDetector(name, active, kDCH)
+R3BDch::R3BDch(const TString& geoFile)
+    : R3BDetector("R3BDch", kDCH)
     , fPos1(-123.219446, 3.597104, 444.126271)
     , fPos2(-167.015888, 1.016917, 535.093884)
     , fRot1(new TGeoRotation())
     , fRot2(new TGeoRotation())
 {
     ResetParameters();
+    SetGeometryFileName(geoFile);
     fRot1->RotateZ(-8.88);
     fRot1->RotateY(-31.);
     fRot2->RotateZ(9.35);
@@ -81,29 +52,24 @@ R3BDch::R3BDch(const char* name, Bool_t active)
     kGeoSaved = kFALSE;
     flGeoPar = new TList();
     flGeoPar->SetName(GetName());
-    fVerboseLevel = 1;
     kHelium = kFALSE;
     fDynamicStepSize = kFALSE;
     fVerbose = kFALSE;
     refMatrix = NULL;
 }
-// -------------------------------------------------------------------------
 
-// -----   Standard constructor   ------------------------------------------
-R3BDch::R3BDch(const char* name,
-               TString geoFile,
-               Bool_t active,
-               Double_t x1,
-               Double_t y1,
-               Double_t z1,
-               Double_t rot_y1,
-               Double_t rot_z1,
-               Double_t x2,
-               Double_t y2,
-               Double_t z2,
-               Double_t rot_y2,
-               Double_t rot_z2)
-    : R3BDetector(name, active, kDCH)
+R3BDch::R3BDch(const TString& geoFile,
+               const Double_t x1,
+               const Double_t y1,
+               const Double_t z1,
+               const Double_t rot_y1,
+               const Double_t rot_z1,
+               const Double_t x2,
+               const Double_t y2,
+               const Double_t z2,
+               const Double_t rot_y2,
+               const Double_t rot_z2)
+    : R3BDetector("R3BDch", kDCH)
     , fPos1(x1, y1, z1)
     , fPos2(x2, y2, z2)
     , fRot1(new TGeoRotation())
@@ -119,27 +85,25 @@ R3BDch::R3BDch(const char* name,
     kGeoSaved = kFALSE;
     flGeoPar = new TList();
     flGeoPar->SetName(GetName());
-    fVerboseLevel = 1;
     kHelium = kFALSE;
     fDynamicStepSize = kFALSE;
     fVerbose = kFALSE;
     refMatrix = NULL;
 }
-// -------------------------------------------------------------------------
 
-// -----   Destructor   ----------------------------------------------------
 R3BDch::~R3BDch()
 {
 
     if (flGeoPar)
+    {
         delete flGeoPar;
+    }
     if (fDchCollection)
     {
         fDchCollection->Delete();
         delete fDchCollection;
     }
 }
-// -------------------------------------------------------------------------
 
 void R3BDch::Initialize()
 {
@@ -191,7 +155,8 @@ void R3BDch::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Drift chamber Gas Only
             Double_t cutE = fCutE; // GeV-> 1 keV
 
-            LOG(INFO) << "-I- R3BDch: DCHgas Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV" << FairLogger::endl;
+            LOG(INFO) << "-I- R3BDch: DCHgas Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV"
+                      << FairLogger::endl;
 
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -206,7 +171,7 @@ void R3BDch::SetSpecialPhysicsCuts()
             gMC->Gstpar(pSi->GetId(), "PPCUTM", -1.);  /** direct pair production by muons (GeV)*/
         }
 
-    } //!gGeoManager
+    } //! gGeoManager
 }
 
 void R3BDch::FindNodePath(TObjArray* arr)
@@ -356,8 +321,8 @@ void R3BDch::RecordPartialMcHit()
         fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
         gMC->TrackPosition(fPosOut);
         gMC->TrackMomentum(fMomOut);
-//        if (fELoss == 0.)
-//            return;
+        //        if (fELoss == 0.)
+        //            return;
 
         fTime_out = gMC->TrackTime() * 1.0e09; // also in case particle is stopped in detector, or decays...
         fLength_out = gMC->TrackLength();
@@ -394,8 +359,8 @@ void R3BDch::RecordPartialMcHit()
 
             if (fPosIn.Z() < 30. && newpos[2] > 30.02)
             {
-                LOG(ERROR) << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] << " with safety = " << safety
-                           << FairLogger::endl;
+                LOG(ERROR) << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2]
+                           << " with safety = " << safety << FairLogger::endl;
                 LOG(ERROR) << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << FairLogger::endl;
                 LOG(ERROR) << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << FairLogger::endl;
             }
@@ -467,7 +432,8 @@ void R3BDch::PrintInfo()
     // Position
     Double_t x, y, z;
     gMC->TrackPosition(x, y, z);
-    LOG(INFO) << setw(8) << setprecision(3) << x << " " << setw(8) << setprecision(3) << y << " " << setw(8) << setprecision(3) << z << "  ";
+    LOG(INFO) << setw(8) << setprecision(3) << x << " " << setw(8) << setprecision(3) << y << " " << setw(8)
+              << setprecision(3) << z << "  ";
 
     // Kinetic energy
     Double_t px, py, pz, etot;
@@ -584,9 +550,7 @@ Double_t R3BDch::BetheBloch(Double_t bg)
 //}
 
 // -----   Public method EndOfEvent   -----------------------------------------
-void R3BDch::BeginEvent()
-{
-}
+void R3BDch::BeginEvent() {}
 // -----   Public method EndOfEvent   -----------------------------------------
 void R3BDch::EndOfEvent()
 {
@@ -705,7 +669,8 @@ R3BDchPoint* R3BDch::AddHit(Int_t trackId,
 {
     TClonesArray& clref = *fDchCollection;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BDchPoint(trackId, mod, layer, cell, posIn, posOut, momIn, momOut, lpos1, lmom1, lpos2, lmom2, time, length, eLoss);
+    return new (clref[size]) R3BDchPoint(
+        trackId, mod, layer, cell, posIn, posOut, momIn, momOut, lpos1, lmom1, lpos2, lmom2, time, length, eLoss);
 }
 
 // -----   Public method ConstructGeometry   ----------------------------------
@@ -716,28 +681,28 @@ void R3BDch::ConstructGeometry()
     {
         LOG(INFO) << "Constructing DCH geometry from ROOT file " << fileName.Data() << FairLogger::endl;
         ConstructRootGeometry();
-        
+
         TGeoNode* dch_node = gGeoManager->GetTopVolume()->GetNode("DCH_0");
-        
+
         TGeoNode* node = dch_node->GetVolume()->GetNode("DCH1_0");
         TGeoCombiTrans* combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
         combtrans->SetDx(fPos1.X());
         combtrans->SetDy(fPos1.Y());
         combtrans->SetDz(fPos1.Z());
         combtrans->SetRotation(fRot1);
-        
+
         node = dch_node->GetVolume()->GetNode("DCH1_1");
         combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
         combtrans->SetDx(fPos2.X());
         combtrans->SetDy(fPos2.Y());
         combtrans->SetDz(fPos2.Z());
         combtrans->SetRotation(fRot2);
-        
+
         node = dch_node->GetVolume()->GetNode("HeParaLog_0");
         combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
-        combtrans->SetDx((fPos1.X() + fPos2.X())/2.);
+        combtrans->SetDx((fPos1.X() + fPos2.X()) / 2.);
         combtrans->SetDy(fPos2.Y());
-        combtrans->SetDz((fPos1.Z() + fPos2.Z())/2.);
+        combtrans->SetDz((fPos1.Z() + fPos2.Z()) / 2.);
         combtrans->SetRotation(fRot1);
     }
     else
