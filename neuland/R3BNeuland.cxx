@@ -56,6 +56,25 @@ R3BNeuland::R3BNeuland(const TString& geoFile, const TGeoCombiTrans& combi)
 {
 }
 
+R3BNeuland::~R3BNeuland()
+{
+    if (fNeulandPoints)
+    {
+        fNeulandPoints->Delete();
+        delete fNeulandPoints;
+    }
+    if (fNeulandPrimaryNeutronInteractionPoints)
+    {
+        fNeulandPrimaryNeutronInteractionPoints->Delete();
+        delete fNeulandPrimaryNeutronInteractionPoints;
+    }
+    if (fNeulandPrimaryNeutronInteractionPixel)
+    {
+        fNeulandPrimaryNeutronInteractionPixel->Delete();
+        delete fNeulandPrimaryNeutronInteractionPixel;
+    }
+}
+
 void R3BNeuland::Initialize()
 {
     LOG(INFO) << "R3BNeuland initialization ..." << FairLogger::endl;

@@ -211,6 +211,10 @@ void r3ball(Int_t nEvents = 1,
     run->AddModule(new ELILuMon(((TObjString*)fDetList->GetValue("LUMON"))->GetString()));
   }
 
+  // DEPRECATED: NeuLand Scintillator Detector
+  if(fDetList->FindObject("SCINTNEULAND")) {
+    run->AddModule(new R3BLand(((TObjString*)fDetList->GetValue("SCINTNEULAND"))->GetString()));
+  }
 
   // -----   Create R3B  magnetic field ----------------------------------------
   Int_t typeOfMagneticField = 0;
