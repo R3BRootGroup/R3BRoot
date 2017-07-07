@@ -39,7 +39,7 @@ class R3BNeuland : public R3BDetector
     R3BNeuland(const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
 
     /** Default Destructor */
-    ~R3BNeuland() = default;
+    ~R3BNeuland();
 
     virtual void Initialize(); // override;
 
