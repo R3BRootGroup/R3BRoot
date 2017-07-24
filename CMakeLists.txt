@@ -70,7 +70,7 @@ ELSE(FAIRROOTPATH)
 ENDIF(FAIRROOTPATH)
 
 if(FAIRROOTPATH)
-  find_package(FAIRROOT REQUIRED)
+  find_package(FairRoot REQUIRED)
 endif(FAIRROOTPATH)
 
 include(CheckCXX11Features)
