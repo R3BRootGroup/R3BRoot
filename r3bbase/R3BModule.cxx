@@ -51,10 +51,8 @@ void R3BModule::ConstructRootGeometry()
 
     if (!fCombiTrans.IsIdentity())
     {
-        TGeoNode* n = gGeoManager->GetTopNode()->GetDaughter(gGeoManager->GetTopNode()->GetNdaughters() - 1);
-        TGeoCombiTrans* combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)n)->GetMatrix();
-
-        *combtrans = fCombiTrans;
+        auto n = gGeoManager->GetTopNode()->GetDaughter(gGeoManager->GetTopNode()->GetNdaughters() - 1);
+        ((TGeoNodeMatrix*)n)->SetMatrix(fCombiTrans.MakeClone());
     }
 }
 
