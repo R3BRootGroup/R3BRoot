@@ -340,17 +340,14 @@ void R3BGfi::ConstructGeometry()
 
         TGeoNode* node = gfi_node->GetVolume()->GetNode("GFILogWorld_0");
         TGeoCombiTrans* combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
-        combtrans->SetDx(fPos1.X());
-        combtrans->SetDy(fPos1.Y());
-        combtrans->SetDz(fPos1.Z());
-        combtrans->SetRotation(fRot1);
+        TGeoTranslation* tr1 = new TGeoTranslation(fPos1.X(), fPos1.Y(), fPos1.Z());
+        *combtrans = {*tr1, *fRot1};
 
         node = gfi_node->GetVolume()->GetNode("GFILogWorld_1");
         combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
-        combtrans->SetDx(fPos2.X());
-        combtrans->SetDy(fPos2.Y());
-        combtrans->SetDz(fPos2.Z());
-        combtrans->SetRotation(fRot2);
+        TGeoTranslation* tr2 = new TGeoTranslation(fPos2.X(), fPos2.Y(), fPos2.Z());
+        *combtrans = {*tr2, *fRot2};
+
     }
     else
     {
