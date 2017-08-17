@@ -9,6 +9,7 @@
 #pragma link C++ class R3BdTof+;
 #pragma link C++ class R3BdTofDigiPar+;
 #pragma link C++ class R3BdTofContFact;
+#pragma link C++ class R3BdTofDigitizer+;
 
 #endif
 

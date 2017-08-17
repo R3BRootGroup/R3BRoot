@@ -139,7 +139,7 @@ Bool_t R3BdTof::ProcessHits(FairVolume* vol)
     if (gMC->IsTrackExiting() || gMC->IsTrackStop() || gMC->IsTrackDisappeared())
     {
         fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
-        fVolumeID = vol->getMCid();
+        fVolumeID = vol->getCopyNo();
         gMC->TrackPosition(fPosOut);
         gMC->TrackMomentum(fMomOut);
         //        if (fELoss == 0.)
@@ -177,7 +177,7 @@ Bool_t R3BdTof::ProcessHits(FairVolume* vol)
             gGeoManager->SetCurrentDirection(-newdirection[0], -newdirection[1], -newdirection[2]);
 
             for (Int_t i = 0; i < 3; i++)
-            {
+             {
                 newpos[i] = oldpos[i] - (3 * safety * olddirection[i]);
             }
 
