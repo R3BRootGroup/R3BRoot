@@ -1,4 +1,4 @@
-#include "R3BFi4.h"
+#include "R3BFi5.h"
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
 #include "FairGeoNode.h"
@@ -8,7 +8,7 @@
 #include "FairRuntimeDb.h"
 #include "FairVolume.h"
 #include "R3BFi4Point.h"
-//#include "R3BGeoFi4.h"
+//#include "R3BGeoFi5.h"
 #include "R3BMCStack.h"
 #include "TClonesArray.h"
 #include "TGeoArb8.h"
@@ -29,19 +29,19 @@
 #include "TVirtualMC.h"
 #include <stdlib.h>
 
-R3BFi4::R3BFi4()
-    : R3BFi4("")
+R3BFi5::R3BFi5()
+    : R3BFi5("")
 {
 }
 
-R3BFi4::R3BFi4(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot)
-    : R3BFi4(geoFile, { trans, rot })
+R3BFi5::R3BFi5(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot)
+    : R3BFi5(geoFile, { trans, rot })
 {
 }
 
-R3BFi4::R3BFi4(const TString& geoFile, const TGeoCombiTrans& combi)
-    : R3BDetector("R3BFi4", kFI4, geoFile, combi)
-    , fFi4Collection(new TClonesArray("R3BFi4Point"))
+R3BFi5::R3BFi5(const TString& geoFile, const TGeoCombiTrans& combi)
+    : R3BDetector("R3BFI5", kFI5, geoFile, combi)
+    , fFi5Collection(new TClonesArray("R3BFi4Point"))
     , fPosIndex(0)
     , kGeoSaved(kFALSE)
     , flGeoPar(new TList())
@@ -50,30 +50,30 @@ R3BFi4::R3BFi4(const TString& geoFile, const TGeoCombiTrans& combi)
     ResetParameters();
 }
 
-R3BFi4::~R3BFi4()
+R3BFi5::~R3BFi5()
 {
     if (flGeoPar)
     {
         delete flGeoPar;
     }
-    if (fFi4Collection)
+    if (fFi5Collection)
     {
-        fFi4Collection->Delete();
-        delete fFi4Collection;
+        fFi5Collection->Delete();
+        delete fFi5Collection;
     }
 }
 
-void R3BFi4::Initialize()
+void R3BFi5::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BFi4: initialisation" << FairLogger::endl;
-    LOG(DEBUG) << "R3BFi4: Vol. (McId) " << gMC->VolId("FI41Log") << FairLogger::endl;
+    LOG(INFO) << "R3BFi5: initialisation" << FairLogger::endl;
+    LOG(DEBUG) << "R3BFi5: Vol. (McId) " << gMC->VolId("FI51Log") << FairLogger::endl;
 }
 
-void R3BFi4::SetSpecialPhysicsCuts()
+void R3BFi5::SetSpecialPhysicsCuts()
 {
-    LOG(INFO) << "-I- R3BFi4: Adding customized Physics cut ... " << FairLogger::endl;
+    LOG(INFO) << "-I- R3BFi5: Adding customized Physics cut ... " << FairLogger::endl;
 
     if (gGeoManager)
     {
@@ -97,7 +97,7 @@ void R3BFi4::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Si Only
             Double_t cutE = fCutE; // GeV-> 1 keV
 
-            LOG(INFO) << "-I- R3BFi4: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV"
+            LOG(INFO) << "-I- R3BFi5: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV"
                       << FairLogger::endl;
 
             // Si
@@ -116,7 +116,7 @@ void R3BFi4::SetSpecialPhysicsCuts()
 }
 
 // -----   Public method ProcessHits  --------------------------------------
-Bool_t R3BFi4::ProcessHits(FairVolume* vol)
+Bool_t R3BFi5::ProcessHits(FairVolume* vol)
 {
     // 2 Simple Det PLane
     // get Info from DCH planes
@@ -140,7 +140,7 @@ Bool_t R3BFi4::ProcessHits(FairVolume* vol)
     // Sum energy loss for all steps in the active volume
     fELoss += gMC->Edep();
 
-    // Set additional parameters at exit of active volume. Create R3BFi4Point.
+    // Set additional parameters at exit of active volume. Create R3BFi5Point.
     if (gMC->IsTrackExiting() || gMC->IsTrackStop() || gMC->IsTrackDisappeared())
     {
         fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
@@ -199,9 +199,9 @@ Bool_t R3BFi4::ProcessHits(FairVolume* vol)
                fLength,
                fELoss);
 
-        // Increment number of Fi4Points for this track
+        // Increment number of Fi5Points for this track
         R3BStack* stack = (R3BStack*)gMC->GetStack();
-        stack->AddPoint(kFI4);
+        stack->AddPoint(kFI5);
 
         ResetParameters();
     }
@@ -210,54 +210,54 @@ Bool_t R3BFi4::ProcessHits(FairVolume* vol)
 }
 
 // -----   Public method EndOfEvent   -----------------------------------------
-void R3BFi4::BeginEvent() {}
+void R3BFi5::BeginEvent() {}
 
 // -----   Public method EndOfEvent   -----------------------------------------
-void R3BFi4::EndOfEvent()
+void R3BFi5::EndOfEvent()
 {
     if (fVerboseLevel)
         Print();
-    fFi4Collection->Clear();
+    fFi5Collection->Clear();
 
     ResetParameters();
 }
 // ----------------------------------------------------------------------------
 
 // -----   Public method Register   -------------------------------------------
-void R3BFi4::Register() { FairRootManager::Instance()->Register("FI4Point", GetName(), fFi4Collection, kTRUE); }
+void R3BFi5::Register() { FairRootManager::Instance()->Register("Fi5Point", GetName(), fFi5Collection, kTRUE); }
 // ----------------------------------------------------------------------------
 
 // -----   Public method GetCollection   --------------------------------------
-TClonesArray* R3BFi4::GetCollection(Int_t iColl) const
+TClonesArray* R3BFi5::GetCollection(Int_t iColl) const
 {
     if (iColl == 0)
-        return fFi4Collection;
+        return fFi5Collection;
     else
         return NULL;
 }
 // ----------------------------------------------------------------------------
 
 // -----   Public method Print   ----------------------------------------------
-void R3BFi4::Print(Option_t* option) const
+void R3BFi5::Print(Option_t* option) const
 {
-    Int_t nHits = fFi4Collection->GetEntriesFast();
-    LOG(INFO) << "R3BFi4: " << nHits << " points registered in this event" << FairLogger::endl;
+    Int_t nHits = fFi5Collection->GetEntriesFast();
+    LOG(INFO) << "R3BFi5: " << nHits << " points registered in this event" << FairLogger::endl;
 }
 // ----------------------------------------------------------------------------
 
 // -----   Public method Reset   ----------------------------------------------
-void R3BFi4::Reset()
+void R3BFi5::Reset()
 {
-    fFi4Collection->Clear();
+    fFi5Collection->Clear();
     ResetParameters();
 }
 // ----------------------------------------------------------------------------
 
 // -----   Public method CopyClones   -----------------------------------------
-void R3BFi4::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
+void R3BFi5::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BFi4: " << nEntries << " entries to add" << FairLogger::endl;
+    LOG(INFO) << "R3BFi5: " << nEntries << " entries to add" << FairLogger::endl;
     TClonesArray& clref = *cl2;
     R3BFi4Point* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -268,11 +268,11 @@ void R3BFi4::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BFi4Point(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BFi4: " << cl2->GetEntriesFast() << " merged entries" << FairLogger::endl;
+    LOG(INFO) << "R3BFi5: " << cl2->GetEntriesFast() << " merged entries" << FairLogger::endl;
 }
 
 // -----   Private method AddHit   --------------------------------------------
-R3BFi4Point* R3BFi4::AddHit(Int_t trackID,
+R3BFi4Point* R3BFi5::AddHit(Int_t trackID,
                             Int_t detID,
                             Int_t plane,
                             TVector3 posIn,
@@ -283,24 +283,24 @@ R3BFi4Point* R3BFi4::AddHit(Int_t trackID,
                             Double_t length,
                             Double_t eLoss)
 {
-    TClonesArray& clref = *fFi4Collection;
+    TClonesArray& clref = *fFi5Collection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
     {
-        LOG(INFO) << "R3BFi4: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
+        LOG(INFO) << "R3BFi5: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV"
                   << FairLogger::endl;
     }
     return new (clref[size]) R3BFi4Point(trackID, detID, plane, posIn, posOut, momIn, momOut, time, length, eLoss);
 }
 
-Bool_t R3BFi4::CheckIfSensitive(std::string name)
+Bool_t R3BFi5::CheckIfSensitive(std::string name)
 {
-    if (TString(name).Contains("FI41Log") )
+    if (TString(name).Contains("FI51Log") )
     {
         return kTRUE;
     }
     return kFALSE;
 }
 
-ClassImp(R3BFi4)
+ClassImp(R3BFi5)

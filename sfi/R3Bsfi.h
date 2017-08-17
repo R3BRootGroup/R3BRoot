@@ -1,5 +1,5 @@
-#ifndef R3BFi4_H
-#define R3BFi4_H
+#ifndef R3Bsfi_H
+#define R3Bsfi_H
 
 #include "R3BDetector.h"
 #include "TLorentzVector.h"
@@ -8,32 +8,32 @@ class TClonesArray;
 class R3BFi4Point;
 class FairVolume;
 
-class R3BFi4 : public R3BDetector
+class R3Bsfi : public R3BDetector
 {
   public:
     /** Default constructor **/
-    R3BFi4();
+    R3Bsfi();
 
     /** Standard constructor.
      *@param geoFile name of the ROOT geometry file
      *@param trans   position
      *@param rot     rotation
      */
-    R3BFi4(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot = TGeoRotation());
+    R3Bsfi(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot = TGeoRotation());
 
     /** Standard constructor.
      *@param geoFile name of the ROOT geometry file
      *@param combi   position + rotation
      */
-    R3BFi4(const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
+    R3Bsfi(const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
 
     /** Destructor **/
-    ~R3BFi4();
+    ~R3Bsfi();
 
     /** Virtual method ProcessHits
      **
      ** Defines the action to be taken when a step is inside the
-     ** active volume. Creates a R3BFi4Point and adds it to the
+     ** active volume. Creates a R3BsfiPoint and adds it to the
      ** collection.
      *@param vol  Pointer to the active volume
      **/
@@ -106,7 +106,7 @@ class R3BFi4 : public R3BDetector
     Double32_t fLength;             //!  length
     Double32_t fELoss;              //!  energy loss
     Int_t fPosIndex;                //!
-    TClonesArray* fFi4Collection;   //!  The hit collection
+    TClonesArray* fsfiCollection;   //!  The hit collection
     Bool_t kGeoSaved;               //!
     TList* flGeoPar;                //!
 
@@ -131,10 +131,10 @@ class R3BFi4 : public R3BDetector
      **/
     void ResetParameters();
 
-    ClassDef(R3BFi4, 2);
+    ClassDef(R3Bsfi, 2);
 };
 
-inline void R3BFi4::ResetParameters()
+inline void R3Bsfi::ResetParameters()
 {
     fTrackID = fVolumeID = 0;
     fPosIn.SetXYZM(0.0, 0.0, 0.0, 0.0);

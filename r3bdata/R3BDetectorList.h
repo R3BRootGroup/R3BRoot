@@ -27,6 +27,10 @@ enum DetectorId
     kLUMON,
     kNEULAND,
     kACTAR,
+    kFI4,
+    kFI6,
+    kFI5,
+    kSFI,
     kLAST
 };
 
@@ -49,7 +53,11 @@ enum fDetectorType
     kVetoPoint,
     kSTarTraPoint,
     kLuMonPoint,
-    kNeulandPoint
+    kNeulandPoint,
+    kFI4Point,
+    kFI6Point,
+    kFI5Point,
+    kSFIPoint
 };
 
 enum SensorSide
