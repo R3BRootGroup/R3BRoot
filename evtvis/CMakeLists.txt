@@ -43,7 +43,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF R3BEventDisplayLinkDef.h)
 set(LIBRARY_NAME R3BEvtVis)
 set(DEPENDENCIES
-    Field MCStack R3BData R3BCalifa Geane EventDisplay)
+    Field R3BData R3BCalifa Geane EventDisplay)
 
 GENERATE_LIBRARY()
 

@@ -61,7 +61,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF CalifaLinkDef.h)
 set(LIBRARY_NAME R3BCalifa)
 set(DEPENDENCIES
-    R3Bbase R3BData R3BPassive MCStack R3BXBall)
+    R3Bbase R3BData R3BPassive R3BXBall)
 
 if(FAIRDB_FOUND)
 set(DEPENDENCIES

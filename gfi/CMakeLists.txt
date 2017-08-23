@@ -49,7 +49,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF GfiLinkDef.h)
 set(LIBRARY_NAME R3BGfi)
 set(DEPENDENCIES
-    R3Bbase R3BPassive MCStack R3BData)
+    R3Bbase R3BPassive R3BData)
 
 GENERATE_LIBRARY()
 
