@@ -1,7 +1,6 @@
 void run_sim()
 {
     TString transport = "TGeant4";
-    Bool_t userPList = kFALSE; // option for TGeant4
 
     TString outFile = "sim.root";
     TString parFile = "par.root";
@@ -43,13 +42,6 @@ void run_sim()
     run->SetName(transport);            // Transport engine
     run->SetOutputFile(outFile.Data()); // Output file
     FairRuntimeDb* rtdb = run->GetRuntimeDb();
-
-    //  R3B Special Physics List in G4 case
-    if ((userPList == kTRUE) && (transport.CompareTo("TGeant4") == 0))
-    {
-        run->SetUserConfig("g4R3bConfig.C");
-        run->SetUserCuts("SetCuts.C");
-    }
 
     // -----   Create media   -------------------------------------------------
     run->SetMaterials("media_r3b.geo"); // Materials
