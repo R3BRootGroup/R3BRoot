@@ -247,7 +247,7 @@ void eliall(Int_t nEvents,
 
     // ------  Increase nb of step for CALO
     Int_t nSteps = -15000;
-    gMC->SetMaxNStep(nSteps);
+    TVirtualMC::GetMC()->SetMaxNStep(nSteps);
 
     // -----   Runtime database   ---------------------------------------------
     Bool_t kParameterMerged = kTRUE;

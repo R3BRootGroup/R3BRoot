@@ -522,7 +522,7 @@ void r3ball(Int_t nEvents = 1,
   Int_t nSteps = -15000;
   // + means print information
   
-  gMC->SetMaxNStep(nSteps);
+  TVirtualMC::GetMC()->SetMaxNStep(nSteps);
 
   // -----   Runtime database   ---------------------------------------------
   Bool_t kParameterMerged = kTRUE;

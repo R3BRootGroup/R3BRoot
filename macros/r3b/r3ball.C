@@ -348,11 +348,11 @@ void r3ball(Int_t nEvents = 1,
 
   // -----   Initialize simulation run   ------------------------------------
   run->Init();
-  gMC->SetRandom(new TRandom3(randomSeed));
+  TVirtualMC::GetMC()->SetRandom(new TRandom3(randomSeed));
 
   // ------  Increase nb of step for CALO
   Int_t nSteps = -15000;
-  gMC->SetMaxNStep(nSteps);
+  TVirtualMC::GetMC()->SetMaxNStep(nSteps);
 
 
   // -----   Runtime database   ---------------------------------------------

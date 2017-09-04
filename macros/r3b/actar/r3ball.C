@@ -378,11 +378,11 @@ void r3ball(Int_t nEvents = 1,
   run->Init();
 
   // Customise Geant4 setting after initialization:
-  ((TGeant4*)gMC)->ProcessGeantMacro("g4config2.in");
+  ((TGeant4*)TVirtualMC::GetMC())->ProcessGeantMacro("g4config2.in");
   
   // ------  Increase nb of step for CALO
   Int_t nSteps = -15000;
-  gMC->SetMaxNStep(nSteps);
+  TVirtualMC::GetMC()->SetMaxNStep(nSteps);
   
   
   // -----   Runtime database   ---------------------------------------------

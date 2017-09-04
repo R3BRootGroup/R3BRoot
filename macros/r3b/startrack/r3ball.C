@@ -477,7 +477,7 @@ void r3ball(Int_t nEvents = 1,
   
   // ------  Increase nb of step for CALO
   Int_t nSteps = -15000;
-  gMC->SetMaxNStep(nSteps);
+  TVirtualMC::GetMC()->SetMaxNStep(nSteps);
   
   
   // -----   Runtime database   ---------------------------------------------

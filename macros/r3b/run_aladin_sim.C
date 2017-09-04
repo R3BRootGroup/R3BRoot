@@ -219,11 +219,11 @@ void run_aladin_sim()
 
     // -----   Initialize simulation run   ------------------------------------
     run->Init();
-    gMC->SetRandom(new TRandom3(randomSeed));
+    TVirtualMC::GetMC()->SetRandom(new TRandom3(randomSeed));
 
     // ------  Increase nb of step for CALO
     Int_t nSteps = -15000;
-    gMC->SetMaxNStep(nSteps);
+    TVirtualMC::GetMC()->SetMaxNStep(nSteps);
 
     // -----   Runtime database   ---------------------------------------------
     R3BFieldPar* fieldPar = (R3BFieldPar*)rtdb->getContainer("R3BFieldPar");
