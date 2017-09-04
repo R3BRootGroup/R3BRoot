@@ -12,6 +12,7 @@ R3BDetector::R3BDetector(const TString& name, const Int_t detId)
     : FairDetector(name, kTRUE, detId)
     , fCutE(1e-3)
 {
+    SetVerboseLevel(1);
 }
 
 R3BDetector::R3BDetector(const TString& name,

@@ -27,9 +27,13 @@ void run_digi()
     run->AddTask(mtof_digitizer);
     
     // DCH
-    R3BDch2pDigitizer* dch_digitizer = new R3BDch2pDigitizer();
+    R3BDch2pDigitizer* dch_2pdigitizer = new R3BDch2pDigitizer();
+    run->AddTask(dch_2pdigitizer);
+
+    // DCH
+    R3BDchDigitizer* dch_digitizer = new R3BDchDigitizer(1);
     run->AddTask(dch_digitizer);
-    
+
     // Tracker
     R3BTra2pDigitizer* tra_digitizer = new R3BTra2pDigitizer();
     run->AddTask(tra_digitizer);
