@@ -36,7 +36,6 @@ ${FAIRROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
-R3BPrimaryGenerator.cxx
 R3BSpecificGenerator.cxx
 R3BReadKinematics.cxx
 R3BCDGenerator.cxx
@@ -48,8 +47,6 @@ R3BCosmicGenerator.cxx
 R3Bp2pGenerator.cxx
 R3BLandGenerator.cxx
 R3BCALIFATestGenerator.cxx
-R3BAsciiIQMDGen.cxx
-R3BAsciiUrQMDGen.cxx
 R3BIonGenerator.cxx
 R3BGammaGenerator.cxx
 
