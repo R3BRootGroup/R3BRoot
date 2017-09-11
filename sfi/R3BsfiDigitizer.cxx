@@ -107,19 +107,19 @@ void R3BsfiDigitizer::Exec(Option_t* opt)
 	   //creating the storage for energy and time for each PMT
 	   // currently there is no difference between the two sides (no propagation in this version)
 	   
-	   std::vector<Double_t> energy_l [NumOfFibers/2];
+	   std::vector<Double_t>* energy_l = new std::vector<Double_t> [NumOfFibers/2];
 	   
 	   //std::vector<Double_t> energy_r [NumOfFibers/2];
 	   
-	   std::vector<Double_t> energy_t [NumOfFibers/2];
+	   std::vector<Double_t>* energy_t = new std::vector<Double_t> [NumOfFibers/2];
 	   
 	   //std::vector<Double_t> energy_b [NumOfFibers/2];
 	   
-	   std::vector<Double_t> time_l [NumOfFibers/2];
+	   std::vector<Double_t>* time_l = new std::vector<Double_t> [NumOfFibers/2];
 	   
 	   //std::vector<Double_t> time_r [NumOfFibers/2];
 	   
-	   std::vector<Double_t> time_to [NumOfFibers/2];
+	   std::vector<Double_t>* time_to = new std::vector<Double_t> [NumOfFibers/2];
 	   
 	   //std::vector<Double_t> time_b [NumOfFibers/2];
 	   
@@ -219,6 +219,12 @@ void R3BsfiDigitizer::Exec(Option_t* opt)
 				}
 		}
 	}
+
+
+    delete [] energy_l;
+    delete [] energy_t;
+    delete [] time_l;
+    delete [] time_to;
 		
 }
 // -------------------------------------------------------------------------

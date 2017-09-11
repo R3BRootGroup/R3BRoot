@@ -122,16 +122,15 @@ void R3BFi4Digitizer::Exec(Option_t* opt)
 	   if (!entryNum) return;
 	   
 	   //creating the storage for energy and time for each PMT
-	   
-	   std::vector<Double_t> energy_l [NumOfFibers/4];
+	   std::vector<Double_t>* energy_l = new std::vector<Double_t> [NumOfFibers/4];
 	   
 	   std::vector<Double_t> energy_r [8];
 	   
-	   std::vector<Double_t> time_l [NumOfFibers/4];
+	   std::vector<Double_t>* time_l = new std::vector<Double_t> [NumOfFibers/4];
 	   
 	   std::vector<Double_t> time_r [8];
 	   
-	   std::vector<Double_t> y_l [NumOfFibers/4];
+	   std::vector<Double_t>* y_l = new std::vector<Double_t> [NumOfFibers/4];
 	   
 	   std::vector<Double_t> y_r [8];
 	   
@@ -259,6 +258,10 @@ void R3BFi4Digitizer::Exec(Option_t* opt)
 					}
 				}
 			}
+
+            delete [] energy_l;
+            delete [] time_l;
+            delete [] y_l;
 		};
 		
 		//running the digitizer for the Fi detectors
