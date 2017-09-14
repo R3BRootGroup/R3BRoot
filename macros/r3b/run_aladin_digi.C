@@ -1,12 +1,9 @@
-
-void RemoveGeoManager();
-
-void run_digi_new()
+void run_aladin_digi()
 {
     // ----- Files ---------------------------------------------------------------
-    TString inFile = "r3bsim_new.root";
-    TString parFile = "r3bpar_new.root";
-    TString outFile = "r3bhits_new.root";
+    TString inFile = "aladin_sim.root";
+    TString parFile = "aladin_par.root";
+    TString outFile = "aladin_digi.root";
     // ---------------------------------------------------------------------------
 
     // ----- Timer ---------------------------------------------------------------
@@ -21,24 +18,33 @@ void run_digi_new()
     // ---------------------------------------------------------------------------
 
     // ----- Connect the Digitization Task ---------------------------------------
-    R3BCalifaCrystalCal2Hit* califa_digitizer = new R3BCalifaCrystalCal2Hit();
-    run->AddTask(califa_digitizer);
-    
+    // TOF
+    R3BTof2pDigitizer* tof_digitizer = new R3BTof2pDigitizer();
+    run->AddTask(tof_digitizer);
+
     // mTOF
     R3BmTofDigitizer* mtof_digitizer = new R3BmTofDigitizer();
     run->AddTask(mtof_digitizer);
 
-    // STaRTrack
-    R3BSTaRTraHitFinder* tra_digitizer = new R3BSTaRTraHitFinder();
+    // DCH
+    R3BDch2pDigitizer* dch_2pdigitizer = new R3BDch2pDigitizer();
+    run->AddTask(dch_2pdigitizer);
+
+    // DCH
+    R3BDchDigitizer* dch_digitizer = new R3BDchDigitizer(1);
+    run->AddTask(dch_digitizer);
+
+    // Tracker
+    R3BTra2pDigitizer* tra_digitizer = new R3BTra2pDigitizer();
     run->AddTask(tra_digitizer);
-    
+
+    // GFI
+    R3BGfiDigitizer* gfi_digitizer = new R3BGfiDigitizer();
+    run->AddTask(gfi_digitizer);
+
     // MFI
     R3BMfiDigitizer* mfi_digitizer = new R3BMfiDigitizer();
     run->AddTask(mfi_digitizer);
-    
-    // PSP
-    R3BPspDigitizer* psp_digitizer = new R3BPspDigitizer();
-    run->AddTask(psp_digitizer);
     // ---------------------------------------------------------------------------
 
     // ----- Runtime DataBase info -----------------------------------------------
@@ -53,6 +59,7 @@ void run_digi_new()
     // ----- Intialise and run ---------------------------------------------------
     run->Init();
     run->Run();
+    delete run;
     // ---------------------------------------------------------------------------
 
     // ----- Finish --------------------------------------------------------------
@@ -69,25 +76,4 @@ void run_digi_new()
     cout << " All ok " << endl;
     cout << " Digitization successful." << endl;
     // ---------------------------------------------------------------------------
-
-    RemoveGeoManager();
-}
-
-/**
- * \ function RemoveGeoManager
- * There are some problems when deleting our geometries. In some cases
- * or combinations of geometries there is a double free of some memory
- * which results in a crash of ROOT. To avoid this we have patched one
- * ROOT class. With the newest ROOT6 version this isn't done any longer.
- * As a workaround to avoid the crash we delete two TObjArrays ourself
- * and then call the destructor of the TGeoManager at the end of the
- * macro. To simplify this one also can use this function.
- */
-void RemoveGeoManager()
-{
-  if (gROOT->GetVersionInt() >= 60602) {
-    gGeoManager->GetListOfVolumes()->Delete();
-    gGeoManager->GetListOfShapes()->Delete();
-    delete gGeoManager;
-  }
 }
