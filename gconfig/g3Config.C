@@ -1,56 +1,85 @@
-// $Id: g3Config.C,v 1.1.1.1 2005/06/23 07:14:09 dbertini Exp $
-//
-// Configuration macro for Geant3 VirtualMC 
+// Configuration macro for Geant3 VirtualMC
 
 void Config()
 {
-  FairRunSim *fRun = FairRunSim::Instance();
-  TString* gModel = fRun->GetGeoModel();
-  TGeant3* geant3 = NULL;
-  if ( strncmp(gModel->Data(),"TGeo",4) == 0 ) {
-	geant3
-	  = new  TGeant3TGeo("C++ Interface to Geant3");
-	cout << "-I- G3Config: Geant3 with TGeo has been created."
-		 << endl;
-  }else{
-	geant3
-	  = new  TGeant3("C++ Interface to Geant3");
-	cout << "-I- G3Config: Geant3 native has been created."
-		 << endl;
-  }
-  // create R3B  Specific Stack
-  R3BStack *st = new R3BStack();
-  // Stack debug mode
-  st->SetDebug(kFALSE);
-//  st->SetDebug(kTRUE);
-  st->SetMinPoints(1);
-  st->StoreSecondaries(kTRUE);
-  
-  geant3->SetStack( st ) ;
-  
-  // ******* GEANT3  specific configuration for simulated Runs  *******
-  geant3->SetTRIG(1);         //Number of events to be processed
-  geant3->SetSWIT(4, 10);
-  geant3->SetDEBU(0, 0, 1);
-  
-  //<DB> Command for debugging purpose
-//  geant3->SetSWIT(2, 2);
-//  geant3->SetDEBU(1, 100, 2); 
-  
-  geant3->SetRAYL(1);
-  geant3->SetSTRA(1);
-  geant3->SetAUTO(1);         //Select automatic STMIN etc... calc. (AUTO 1) or manual (AUTO 0)
-  geant3->SetABAN(0);         //Restore 3.16 behaviour for abandoned tracks
-  geant3->SetOPTI(2);         //Select optimisation level for GEANT geometry searches (0,1,2)
-  geant3->SetERAN(5.e-7);
-  geant3->SetCKOV(1);     // cerenkov photons
-  //    geant3->SetHADR(5);     // gcalor
-  // set common stuff 
-  TString configm(gSystem->Getenv("VMCWORKDIR"));
-  TString cuts = configm + "/gconfig/SetCuts.C";
-  cout << "Physics cuts with script \n "<<  cuts.Data() << endl;
-  Int_t cut=gROOT->LoadMacro(cuts.Data());
-  if(cut==0)gInterpreter->ProcessLine("SetCuts()"); 
+    cout << "[g3Config]: Creating TGeant3 VirtualMC ..." << endl;
+
+    auto geant3 = new TGeant3TGeo("C++ Interface to Geant3");
+
+    auto stack = new R3BStack();
+    stack->SetDebug(kFALSE);
+    stack->StoreSecondaries(kTRUE);
+    stack->SetMinPoints(1);
+    geant3->SetStack(stack);
+
+    // Geant3 specific configuration for simulated Runs
+    geant3->SetTRIG(1);       // Number of events to be processed
+    geant3->SetSWIT(4, 10);   // (2, 2) for debugging
+    geant3->SetDEBU(0, 0, 1); // (1, 100, 2) for debugging
+
+    // Other Geant3 settings
+    geant3->SetAUTO(1); // Select automatic STMIN etc... calc. (AUTO 1) or manual (AUTO 0)
+    geant3->SetABAN(0); // Restore 3.16 behaviour for abandoned tracks
+    geant3->SetOPTI(2); // Select optimisation level for GEANT geometry searches (0,1,2)
+    geant3->SetERAN(5.e-7);
+
+    /* Geant3 Phyics Settings
+     * See http://hep.fi.infn.it/geant.pdf Page 188ff for more details
+     *
+     * These setting are (should be) equivalent to the setting in this file combined with the
+     * gMC->SetProcess("name", id) calls previously used in SetCuts.C
+     */
+
+    // Cerenkov photon generation
+    geant3->SetCKOV(1); // =1 (??) Cerenkov
+
+    // Rayleigh effect.
+    geant3->SetRAYL(1); // =1 Rayleigh effect.
+    // =0 (Default) No Rayleigh effect.
+
+    // Pair production.
+    geant3->SetPAIR(1); // =1 (Default) Pair production with generation of e-/e+
+
+    // Compton scattering.
+    geant3->SetCOMP(1); // =1 (Default) Compton scattering with generation of e-
+
+    // Photoelectric effect.
+    geant3->SetPHOT(1); // =1 (Default) Photo-electric effect with generation of the electron
+
+    // Nuclear fission induced by a photon.
+    geant3->SetPFIS(0); // =0 (Default) No photo-fission
+    // TODO: Evaluate usage of "=1 Photo-fission with generation of secondaries"
+
+    // delta-ray production.
+    geant3->SetDRAY(1); // =1 (Default) delty-rays production with generation of e-
+    // TODO: Evaluate "=2 delta-rays production without generation of e-" instead of cutting e-
+
+    // Positron annihilation.
+    geant3->SetANNI(1); // =1 (Default) Positron annihilation with generation of photons.
+
+    // bremsstrahlung
+    geant3->SetBREM(1); // =1 (Default) bremsstrahlung with generation of gamma
+
+    // Hadronic interactions.
+    geant3->SetHADR(5); // Use a user code hadronic package: =5 GCALOR
+    // =1 (Default) Hadronic interactions with generation of secondaries. (Do not use this)
+
+    // Muon-nucleus interactions.
+    geant3->SetMUNU(1); // =1 (Default) Muon-nucleus interactions with generation of secondaries.
+
+    // Decay in flight.
+    geant3->SetDCAY(1); // =1 (Default) Decay in flight with generation of secondaries
+
+    // Continuous energy loss.
+    geant3->SetLOSS(1); // =1 Continuous energy loss with generation of δ-rays above DCUTE (common /GCUTS/) and
+                        // restricted Landau fluctuations below DCUTE. (=3 Same as 1, kept for backward compatibility)
+
+    // Multiple scattering.
+    geant3->SetMULS(1); // =1 (Default) Multiple scattering according to Moliere theory
+
+    // Collision sampling method to simulate energy loss in thin material
+    geant3->SetSTRA(1); // =1 Collision sampling activated.
+    // =0 (Default) Collision sampling switched off.
+
+    // Not Set: SYNC =0 (Default) The synchrotron radiation is not simulated.
 }
-
-
