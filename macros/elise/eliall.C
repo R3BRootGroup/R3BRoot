@@ -109,6 +109,7 @@ void eliall(Int_t nEvents,
     }
 
     // R3B Magnet definition
+    Int_t fFieldMap = 0;
     if (fDetList.FindObject("ALADIN"))
     {
         fFieldMap = 0;
