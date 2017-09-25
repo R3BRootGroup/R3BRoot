@@ -28,7 +28,7 @@ void r3bsim()
   //   Geant3:                 "TGeant3"
   //   Geant4:                 "TGeant4"
   //   Fluka :                 "TFluka"
-  TString fMC = "TGeant3";
+  TString fMC = "TGeant4";
   
   //-------------------------------------------------
   // Primaries generation
@@ -45,7 +45,8 @@ void r3bsim()
   // ----------------------------------------------
   //     VMC Standard           kFALSE
   //     R3B Special            kTRUE;
-  Bool_t fUserPList = kTRUE;
+  Bool_t fUserPList = kFALSE;
+//  Bool_t fUserPList = kTRUE;
 
   // Target type
   TString target1 = "LeadTarget";
@@ -78,25 +79,27 @@ void r3bsim()
   //                            SCINTNEULAND
   TMap detGeo;
   detGeo.Add(new TObjString("TARGET"),        new TObjString("target_"+target4+".geo.root"));
-  detGeo.Add(new TObjString("ALADIN"),        new TObjString("aladin_v13a.geo.root"));
+//  detGeo.Add(new TObjString("ALADIN"),        new TObjString("aladin_v13a.geo.root"));
 //  detGeo.Add(new TObjString("GLAD"),          new TObjString("glad_v17_flange.geo.root"));
-  detGeo.Add(new TObjString("CRYSTALBALL"),   new TObjString("cal_v13a.geo.root"));
+//  detGeo.Add(new TObjString("CRYSTALBALL"),   new TObjString("cal_v13a.geo.root"));
 //  detGeo.Add(new TObjString("CALIFA"),        new TObjString("califa_v14a.geo.root"));
 //  detGeo.Add(new TObjString("CALIFA"),        new TObjString("califa_v13_811.geo.root"));
-  detGeo.Add(new TObjString("TOF"),           new TObjString("tof_v13a.geo.root"));
-  detGeo.Add(new TObjString("MTOF"),          new TObjString("mtof_v13a.geo.root"));
+//  detGeo.Add(new TObjString("TOF"),           new TObjString("tof_v13a.geo.root"));
+//  detGeo.Add(new TObjString("MTOF"),          new TObjString("mtof_v13a.geo.root"));
 //  detGeo.Add(new TObjString("DTOF"),          new TObjString("dtof_v15a.geo.root"));
-  detGeo.Add(new TObjString("DCH"),           new TObjString("dch_v13a.geo.root"));
-  detGeo.Add(new TObjString("TRACKER"),       new TObjString("tra_v13vac.geo.root"));
-//  detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startra_v14a.geo.root"));
-//  detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startra_v13a.geo.root"));
-  detGeo.Add(new TObjString("GFI"),           new TObjString("gfi_v13a.geo.root"));
-  detGeo.Add(new TObjString("LAND"),          new TObjString("land_v12a_10m.geo.root"));
+//  detGeo.Add(new TObjString("DCH"),           new TObjString("dch_v13a.geo.root"));
+//  detGeo.Add(new TObjString("TRACKER"),       new TObjString("tra_v13vac.geo.root"));
+
+  detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startrack_v14a.geo.root"));
+//  detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startrack_v13a.geo.root"));
+
+//  detGeo.Add(new TObjString("GFI"),           new TObjString("gfi_v13a.geo.root"));
+//  detGeo.Add(new TObjString("LAND"),          new TObjString("land_v12a_10m.geo.root"));
 //  detGeo.Add(new TObjString("SCINTNEULAND"),  new TObjString("neuland_v12a_14m.geo.root"));
 //  detGeo.Add(new TObjString("VACVESSELCOOL"), new TObjString("vacvessel_v14a.geo.root"));   // to be used only with the R3B tracker: "STaRTrack", not "TRACKER"
 //  detGeo.Add(new TObjString("VACVESSELCOOL"), new TObjString("vacvessel_v13a.geo.root"));
 //  detGeo.Add(new TObjString("MFI"),           new TObjString("mfi_v13a.geo.root"));
-  detGeo.Add(new TObjString("PSP"),           new TObjString("psp_v13a.geo.root"));
+//  detGeo.Add(new TObjString("PSP"),           new TObjString("psp_v13a.geo.root"));
 
   // Number of events
   Int_t nEvents = 1;

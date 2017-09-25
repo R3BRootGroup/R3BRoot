@@ -21,7 +21,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/vetoData  
 ${R3BROOT_SOURCE_DIR}/r3bdata/lumonData  
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData  
-${R3BROOT_SOURCE_DIR}/r3bdata/starttrackerData  
+${R3BROOT_SOURCE_DIR}/r3bdata/startrackData  
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData  
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mfiData
@@ -66,10 +66,12 @@ trackerData/R3BTraPoint.cxx
 trackerData/R3BTraHit.cxx
 trackerData/R3BSitrackerHit.cxx
 trackerData/R3BTrackerHit.cxx
-startrackerData/R3BSTaRTraPoint.cxx
-startrackerData/R3BSTaRTraHit.cxx
-startrackerData/R3BSTaRTrackerHit.cxx
-startrackerData/R3BSTaRTrackerDigitHit.cxx
+startrackData/R3BStartrackPoint.cxx
+startrackData/R3BStartrackHit.cxx
+#startrackData/R3BStartrackerHit.cxx
+startrackData/R3BStartrackerDigitHit.cxx
+startrackData/R3BStartrackMappedData.cxx
+startrackData/R3BStartrackCalData.cxx
 landData/R3BLandPoint.cxx
 landData/R3BLandDigi.cxx
 landData/R3BLandFirstHits.cxx

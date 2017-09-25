@@ -157,8 +157,10 @@ void r3ball(Int_t nEvents = 1,
   }
 
   // STaRTrack
+//  if (fDetList->FindObject("STaRTrack")  ) {
+//    run->AddModule(new R3BSTaRTra(((TObjString*)fDetList->GetValue("STaRTrack"))->GetString()));
   if (fDetList->FindObject("STaRTrack")  ) {
-    run->AddModule(new R3BSTaRTra(((TObjString*)fDetList->GetValue("STaRTrack"))->GetString()));
+    run->AddModule(new R3BStartrack(((TObjString*)fDetList->GetValue("STaRTrack"))->GetString()));
   }
 
   // DCH drift chambers

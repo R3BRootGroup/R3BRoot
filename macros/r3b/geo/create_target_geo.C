@@ -13,7 +13,7 @@ TGeoTranslation *fGlobalTrans = new TGeoTranslation();
 TGeoRotation *fRefRot = NULL;
 
 TGeoManager* gGeoMan = NULL;
-TGeoVolume* gTop;
+//TGeoVolume* gTop;
 
 
 Double_t fThetaX = 0.;
@@ -85,7 +85,7 @@ void create_target_geo(const char* geoTag = "LiH")
   gGeoBuild->createMedium(mAir);
   TGeoMedium* pMed2 = gGeoMan->GetMedium("Air");
   if ( ! pMed2 ) Fatal("Main", "Medium Air not found");
-
+ 
   FairGeoMedium* mMylar      = gGeoMedia->getMedium("mylar");
   if ( ! mMylar ) Fatal("Main", "FairMedium mylar not found");
   gGeoBuild->createMedium(mMylar);
@@ -122,7 +122,7 @@ void create_target_geo(const char* geoTag = "LiH")
   // --------------   Create geometry and top volume  -------------------------
   gGeoMan = (TGeoManager*)gROOT->FindObject("FAIRGeom");
   gGeoMan->SetName("TARGETgeom");
-  gTop = new TGeoVolumeAssembly("TOP");
+  TGeoVolume* gTop = new TGeoVolumeAssembly("TOP");
   gGeoMan->SetTopVolume(gTop);
   // --------------------------------------------------------------------------
 
@@ -192,6 +192,9 @@ void ConstructGeometry1(TGeoMedium *lead)
   gTop->AddNode(pTargetEnveloppe_log, 0, pGlobal);
   */
 
+  // Shape: World type: TGeoBBox
+  TGeoVolume* pWorld = gGeoManager->GetTopVolume();
+  pWorld->SetVisLeaves(kTRUE);
 
   // Shape: LeadTarget type: TGeoBBox
   dx = 1.500000;	//s318
@@ -207,7 +210,8 @@ void ConstructGeometry1(TGeoMedium *lead)
 
   //pTargetEnveloppe_log->AddNode(pleadTarget_log, 0, pGlobal);
   TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix);
-  gTop->AddNode(keep, 0, pGlobal);
+  pWorld->AddNode(keep, 0, pGlobal);
+//  gTop->AddNode(keep, 0, pGlobal);
 }
 
 
@@ -239,6 +243,9 @@ void ConstructGeometry2(TGeoMedium *pMed38, TGeoMedium *pMed2)
   TGeoRotation *pMatrix3 = new TGeoRotation("", thx, phx, thy, phy, thz, phz);
   TGeoCombiTrans *pMatrix2 = new TGeoCombiTrans("", dx, dy, dz, pMatrix3);
 
+  // Shape: World type: TGeoBBox
+  TGeoVolume* pWorld = gGeoManager->GetTopVolume();
+  pWorld->SetVisLeaves(kTRUE);
   
   // Shape: TargetEnveloppe type: TGeoTubeSeg
   // TargetEnveloppe Tube 1
@@ -249,9 +256,10 @@ void ConstructGeometry2(TGeoMedium *pMed38, TGeoMedium *pMed2)
   TGeoVolume *pTargetEnveloppe_log = new TGeoVolume("TargetEnveloppe",pTargetEnveloppe, pMed2);
   pTargetEnveloppe_log->SetVisLeaves(kTRUE);
   TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix2);
-  gTop->AddNode(pTargetEnveloppe_log, 0, pGlobal);
+//  gTop->AddNode(pTargetEnveloppe_log, 0, pGlobal);
  
-
+  pWorld->AddNode(pTargetEnveloppe_log, 0, pGlobal);
+ 
 
   rmin = 0.000000;
   rmax = 1.000000;
@@ -301,6 +309,9 @@ void ConstructGeometry3(TGeoMedium *pMed38, TGeoMedium *pMed2)
   TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
   TGeoCombiTrans *pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
   
+  // Shape: World type: TGeoBBox
+  TGeoVolume* pWorld = gGeoManager->GetTopVolume();
+  pWorld->SetVisLeaves(kTRUE);
 
   // Shape: TargetEnveloppe type: TGeoTubeSeg
   // TargetEnveloppe Tube 1
@@ -314,7 +325,8 @@ void ConstructGeometry3(TGeoMedium *pMed38, TGeoMedium *pMed2)
   TGeoVolume *pTargetEnveloppe_log = new TGeoVolume("TargetEnveloppe",pTargetEnveloppe, pMed2);
   pTargetEnveloppe_log->SetVisLeaves(kTRUE);
   TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix2);
-  gTop->AddNode(pTargetEnveloppe_log, 0, pGlobal);
+  //  gTop->AddNode(pTargetEnveloppe_log, 0, pGlobal);
+  pWorld->AddNode(pTargetEnveloppe_log, 0, pGlobal);
 
 
   // Shape: Para45deg type: TGeoPara
@@ -393,7 +405,8 @@ void ConstructGeometry4(TGeoMedium *pMed2, TGeoMedium *pMed15,
   // Combi transformation: 
   dx = 0.000000;
   dy = 0.000000;
-  dz = 3.012500;  // 0.007500;
+  //dz = 3.012500;  // 0.007500;
+  dz = 3.00500;  // 0.007500;
   // Rotation: 
   thx = 90.000000;    phx = 0.000000;
   thy = 90.000000;    phy = 90.000000;
@@ -404,7 +417,8 @@ void ConstructGeometry4(TGeoMedium *pMed2, TGeoMedium *pMed15,
   // Combi transformation: 
   dx = 0.000000;
   dy = 0.000000;
-  dz = -3.012500;  // 3.522500;
+  //dz = -3.012500;  // 3.522500;
+  dz = -3.00500;  // 3.522500;
   // Rotation: 
   thx = 90.000000;    phx = 0.000000;
   thy = 90.000000;    phy = 90.000000;
@@ -423,6 +437,9 @@ void ConstructGeometry4(TGeoMedium *pMed2, TGeoMedium *pMed15,
   TGeoRotation *pMatrix13 = new TGeoRotation("", thx,phx,thy,phy,thz,phz);
   TGeoCombiTrans *pMatrix12 = new TGeoCombiTrans("", dx,dy,dz,pMatrix13);
 
+  // Shape: World type: TGeoBBox
+  TGeoVolume* pWorld = gGeoManager->GetTopVolume();
+  pWorld->SetVisLeaves(kTRUE);
 
   // Shape: TargetEnveloppe type: TGeoTubeSeg
   // TargetEnveloppe Tube 1
@@ -435,7 +452,8 @@ void ConstructGeometry4(TGeoMedium *pMed2, TGeoMedium *pMed15,
   TGeoVolume *pTargetEnveloppe_log = new TGeoVolume("TargetEnveloppe",pTargetEnveloppe, pMed2);
   pTargetEnveloppe_log->SetVisLeaves(kTRUE);
   TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix2);
-  gTop->AddNode(pTargetEnveloppe_log, 0, pGlobal);
+  //  gTop->AddNode(pTargetEnveloppe_log, 0, pGlobal);
+  pWorld->AddNode(pTargetEnveloppe_log, 0, pGlobal);
   
   
   // Shape: Target1 type: TGeoTubeSeg
@@ -486,6 +504,7 @@ void ConstructGeometry4(TGeoMedium *pMed2, TGeoMedium *pMed15,
   TGeoVolume *pTarget4_log = new TGeoVolume("Target4",pTarget4, pMedAu);    // Gold
   pTarget4_log->SetVisLeaves(kTRUE);
 //gTop->AddNode(pTarget4_log, 0, pMatrix12);
+//pWorld->AddNode(pTarget4_log, 0, pMatrix12);
 }
 
 
@@ -516,6 +535,9 @@ void ConstructGeometry5(TGeoMedium *pMedCarbon)
   TGeoRotation *pRot = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
   TGeoCombiTrans *pMatrix = new TGeoCombiTrans("", dx,dy,dz,pRot);
 
+  // Shape: World type: TGeoBBox
+  TGeoVolume* pWorld = gGeoManager->GetTopVolume();
+  pWorld->SetVisLeaves(kTRUE);
 
   dx = 1.500000;	//s318
   dy = 1.500000;	//s318
@@ -528,7 +550,8 @@ void ConstructGeometry5(TGeoMedium *pMedCarbon)
   keep->AddNode(pCarbonTarget_log, 0, pMatrix);
 
   TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix);
-  gTop->AddNode(keep, 0, pGlobal);
+  // gTop->AddNode(keep, 0, pGlobal);
+  pWorld->AddNode(keep, 0, pGlobal);
 }
 
 
@@ -559,6 +582,10 @@ void ConstructGeometry6(TGeoMedium *pMed16)
   TGeoRotation *pRot = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
   TGeoCombiTrans *pMatrix = new TGeoCombiTrans("", dx,dy,dz,pRot);
 
+  // Shape: World type: TGeoBBox
+  TGeoVolume* pWorld = gGeoManager->GetTopVolume();
+  pWorld->SetVisLeaves(kTRUE);
+
 
   dx = 1.500000;	//s318
   dy = 1.500000;	//s318
@@ -571,7 +598,8 @@ void ConstructGeometry6(TGeoMedium *pMed16)
   keep->AddNode(pCH2Target_log, 0, pMatrix);
 
   TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix);
-  gTop->AddNode(keep, 0, pGlobal);
+  // gTop->AddNode(keep, 0, pGlobal);
+  pWorld->AddNode(keep, 0, pGlobal);
 }
 
 
@@ -602,6 +630,11 @@ void ConstructGeometry7(TGeoMedium *pMed)
   TGeoRotation *pRot = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
   TGeoCombiTrans *pMatrix = new TGeoCombiTrans("", dx,dy,dz,pRot);
 
+  // Shape: World type: TGeoBBox
+  TGeoVolume* pWorld = gGeoManager->GetTopVolume();
+  pWorld->SetVisLeaves(kTRUE);
+
+
   dx = 1.500000;	//s318
   dy = 1.500000;	//s318
   dz = 0.1000;		//arbitrary thickness, 2mm for convenience
@@ -613,7 +646,8 @@ void ConstructGeometry7(TGeoMedium *pMed)
   keep->AddNode(pVacuumTarget_log, 0, pMatrix);
 
   TGeoCombiTrans* pGlobal = GetGlobalPosition(pMatrix);
-  gTop->AddNode(keep, 0, pGlobal);
+  //  gTop->AddNode(keep, 0, pGlobal);
+  pWorld->AddNode(keep, 0, pGlobal);
 }
 
 

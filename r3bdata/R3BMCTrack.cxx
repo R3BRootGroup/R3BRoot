@@ -119,7 +119,7 @@ void R3BMCTrack::Print(Option_t* option) const
          << ", LAND " << GetNPoints(kLAND) << ", GFI " << GetNPoints(kGFI) << ", mTOF " << GetNPoints(kMTOF)
          << ", dTOF " << GetNPoints(kDTOF) << ", TOF " << GetNPoints(kTOF) << ", TRACKER " << GetNPoints(kTRA)
          << ", CALIFA " << GetNPoints(kCALIFA) << ", MFI " << GetNPoints(kMFI) << ", PSP " << GetNPoints(kPSP)
-         << ", VETO " << GetNPoints(kVETO) << ", STaRTrack " << GetNPoints(kSTaRTrack) << ", LUMON "
+         << ", VETO " << GetNPoints(kVETO) << ", STARTRACK " << GetNPoints(kSTARTRACK) << ", LUMON "
          << GetNPoints(kLUMON) << ", NeuLAND " << GetNPoints(kNEULAND) << endl;
 }
 // -------------------------------------------------------------------------
@@ -175,7 +175,7 @@ Int_t R3BMCTrack::GetNPoints(DetectorId detId) const
         return ((fNPoints & 0xC00000) >> 22);
     else if (detId == kVETO)
         return ((fNPoints & 0x3000000) >> 24);
-    else if (detId == kSTaRTrack)
+    else if (detId == kSTARTRACK)
         return ((fNPoints & 0xC000000) >> 26);
     else if (detId == kLUMON)
         return ((fNPoints & 0x30000000) >> 28);
@@ -260,7 +260,7 @@ void R3BMCTrack::SetNPoints(Int_t iDet, Int_t nP)
     {
         fNPoints = (fNPoints & (~0x3000000)) | (nPoints << 24);
     }
-    else if (iDet == kSTaRTrack)
+    else if (iDet == kSTARTRACK)
     {
         fNPoints = (fNPoints & (~0xC000000)) | (nPoints << 26);
     }

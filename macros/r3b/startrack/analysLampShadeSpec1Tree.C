@@ -46,7 +46,8 @@ void analysEvents(Int_t analType=1, char* input, char* output) {
   //----  Load R3B specific libraries ---------------------------------------
   gSystem->Load("libR3Bbase");
   gSystem->Load("libR3BData");
-  gSystem->Load("libR3BSTaRTra");
+//  gSystem->Load("libR3BSTaRTra");
+  gSystem->Load("libR3BStartrack");
 
   gROOT->Reset();
   gROOT->SetStyle("Default");
@@ -66,7 +67,8 @@ void analysEvents(Int_t analType=1, char* input, char* output) {
   //opening the simulated File and Tree
   TFile *file1 = TFile::Open(input);
   // if only one input file:
-  TTree* T = (TTree*)file1->Get("cbmsim");  // cbmsim is the name of the Tree
+  //TTree* T = (TTree*)file1->Get("cbmsim");  // cbmsim is the name of the Tree
+  TTree* T = (TTree*)file1->Get("evt");  // evt is the name of the Tree
 
     
   //output File and Tree for the analysis result
@@ -160,7 +162,7 @@ void analysEvents(Int_t analType=1, char* input, char* output) {
   TBranchElement *brMCStackPDG = (TBranchElement*)T->GetBranch("MCTrack.fPdgCode");   // PDG code of particle
   TBranchElement *brMCStackMass = (TBranchElement*)T->GetBranch("MCTrack.fMass");     // Mass of the particle (GeV/c2
   TBranchElement *brMCStackMother = (TBranchElement*)T->GetBranch("MCTrack.fMotherId"); // id of the parents particle
-
+/*
   TBranchElement *branchTrackX = (TBranchElement*)T->GetBranch("STaRTraPoint.fX");
   TBranchElement *branchTrackY = (TBranchElement*)T->GetBranch("STaRTraPoint.fY");
   TBranchElement *branchTrackZ = (TBranchElement*)T->GetBranch("STaRTraPoint.fZ");
@@ -171,6 +173,17 @@ void analysEvents(Int_t analType=1, char* input, char* output) {
   TBranchElement *branchDetectorID = (TBranchElement*)T->GetBranch("STaRTraPoint.fDetectorID");
   TBranchElement *branchDetCopyID = (TBranchElement*)T->GetBranch("STaRTraPoint.fDetCopyID");
   TBranchElement *branchTrackID = (TBranchElement*)T->GetBranch("STaRTraPoint.fTrackID");
+*/
+  TBranchElement *branchTrackX = (TBranchElement*)T->GetBranch("StartrackPoint.fX");
+  TBranchElement *branchTrackY = (TBranchElement*)T->GetBranch("StartrackPoint.fY");
+  TBranchElement *branchTrackZ = (TBranchElement*)T->GetBranch("StartrackPoint.fZ");
+  TBranchElement *branchTrackPX = (TBranchElement*)T->GetBranch("StartrackPoint.fPx");
+  TBranchElement *branchTrackPY = (TBranchElement*)T->GetBranch("StartrackPoint.fPy");
+  TBranchElement *branchTrackPZ = (TBranchElement*)T->GetBranch("StartrackPoint.fPz");
+  TBranchElement *branchELoss = (TBranchElement*)T->GetBranch("StartrackPoint.fELoss");
+  TBranchElement *branchDetectorID = (TBranchElement*)T->GetBranch("StartrackPoint.fDetectorID");
+  TBranchElement *branchDetCopyID = (TBranchElement*)T->GetBranch("StartrackPoint.fDetCopyID");
+  TBranchElement *branchTrackID = (TBranchElement*)T->GetBranch("StartrackPoint.fTrackID");
  
   TBranchElement *branchXBallX = (TBranchElement*)T->GetBranch("CrystalPoint.fX");
   TBranchElement *branchXBallY = (TBranchElement*)T->GetBranch("CrystalPoint.fY");

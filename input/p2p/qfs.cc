@@ -18,6 +18,8 @@
 #include "headers.hh"
 #include "info.hh"
 
+using namespace std;
+
 void run(char *fname)
 {
 	//------- Output tree ----------

@@ -12,13 +12,16 @@
 //
 //--------------------------------------------------------------------
 
-Int_t r3bsim(){
+#include "r3ball.C"
+
+
+void r3bsim(){
 
    // Load the Main Simulation macro
    //gROOT->LoadMacro("r3ball.C");
-  TString macro_r3ball = getenv("VMCWORKDIR");
-  macro_r3ball += "/macros/r3b/startrack/r3ball.C";
-  gROOT->LoadMacro(macro_r3ball.Data());
+   //TString macro_r3ball = getenv("VMCWORKDIR");
+   //macro_r3ball += "/macros/r3b/startrack/r3ball.C";
+   //gROOT->LoadMacro(macro_r3ball.Data());
 
   // Output files
   TString OutFile = "r3bsim.root";
@@ -58,7 +61,7 @@ Int_t r3bsim(){
    //     VMC Standard           kFALSE
    //     R3B Special            kTRUE;
 
-   Bool_t fUserPList= kTRUE;
+   Bool_t fUserPList= kFALSE; // TRUE;
 
    // Target type
    TString target1="LeadTarget";
@@ -105,7 +108,8 @@ Int_t r3bsim(){
 //  detGeo.Add(new TObjString("GLAD"),          new TObjString("glad_v17_flange.geo.root"));
 //  detGeo.Add(new TObjString("CRYSTALBALL"),   new TObjString("cal_v13a.geo.root"));
   //detGeo.Add(new TObjString("CALIFA"),        new TObjString("califa_Marc.geo.root"));
-  detGeo.Add(new TObjString("CALIFA"),        new TObjString("califa_v14a.geo.root"));
+  //detGeo.Add(new TObjString("CALIFA"),        new TObjString("califa_v14a.geo.root"));
+    detGeo.Add(new TObjString("CALIFA"),        new TObjString("califa_10_v8.11.geo.root"));
 //  detGeo.Add(new TObjString("TOF"),           new TObjString("tof_v13a.geo.root"));
 //  detGeo.Add(new TObjString("MTOF"),          new TObjString("mtof_v13a.geo.root"));
 //  detGeo.Add(new TObjString("DCH"),           new TObjString("dch_v13a.geo.root"));
@@ -116,7 +120,7 @@ Int_t r3bsim(){
   //detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startra_v16.geo.root"));  
   //detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startra_v16-300.geo.root"));
   //detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startra_v16_2layers.geo.root")); // for elastic
-  detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startra_v16-300_2layers.geo.root")); // for elastic
+  detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startrack_v16-300_2layers.geo.root")); // for elastic
 //  detGeo.Add(new TObjString("STaRTrack"),     new TObjString("startra_S438.geo.root"));
 //  detGeo.Add(new TObjString("GFI"),           new TObjString("gfi_v13a.geo.root"));
 //  detGeo.Add(new TObjString("LAND"),          new TObjString("land_v12a_10m.geo.root"));
@@ -152,18 +156,19 @@ Int_t r3bsim(){
 
    // Main Sim function call
    r3ball(  nEvents,
-            detGeo,
+            &detGeo,
 	    target4, //           target2,
 	    fEventDisplay,
 	    fMC,
 	    fGene,
 	    fUserPList,
             fR3BMagnet,
-       	    1500.,
+       	    2500.,
 	    OutFile,
 	    ParFile,
 	    InFile   // for ascii evt generator
           );      
+
 
 }
 

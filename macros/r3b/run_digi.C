@@ -25,7 +25,10 @@ void run_digi()
     run->AddTask(califa_digitizer);
 
     // STaRTrack
-    R3BSTaRTraHitFinder* tra_digitizer = new R3BSTaRTraHitFinder();
+
+    //R3BStartrackHitFinder* tra_digitizer = new R3BStartrackHitFinder();  // R3BStartrackHitFinder() is obsolete
+    R3BStartrackDigit* tra_digitizer = new R3BStartrackDigit();
+
     run->AddTask(tra_digitizer);
 
     // PSP

@@ -29,7 +29,8 @@ void run_digi_Fi4()
     run->AddTask(mtof_digitizer);
 
     // STaRTrack
-    R3BSTaRTraHitFinder* tra_digitizer = new R3BSTaRTraHitFinder();
+    //R3BSTaRTraHitFinder* tra_digitizer = new R3BSTaRTraHitFinder(); // obsolete
+    R3BStartrackDigit* tra_digitizer = new R3BStartrackDigit();
     run->AddTask(tra_digitizer);
     
     // MFI

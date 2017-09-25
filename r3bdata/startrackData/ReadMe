@@ -1,0 +1,18 @@
+
+
+Note:
+
+
+- R3BStartrackMappedData is used to unpack raw data from lmd file (it is used in r3bsource/R3BStartrackReader.cxx)
+
+- Class R3BStartrackMappedData_2-32bitWordonly is a preliminary version of R3BStartrackMappedData 
+and only translate the pair of 32bit words in lmd file into a r3broot root file. So Not very useful
+(to be used with r3bsource/R3BStartrackReader_2-32bitwords.cxx)
+
+- R3BStartrackPoint, R3BStartrackerHit and R3BStartrackHit are used for the simulation of "raw data"
+
+- R3BStartrackerDigitHit is used to digitize the raw simulated data. It is invoked in R3BStartrackDigit class which is used in a macros/r3b/startrack/SimReal/2Layers/StartrackAnaDigit.C.
+
+
+
+

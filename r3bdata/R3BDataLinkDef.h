@@ -31,10 +31,14 @@
 #pragma link C++ class R3BTofDigi+;
 #pragma link C++ class R3BTof2pDigi+;
 #pragma link C++ class R3BVetoPoint+;
-#pragma link C++ class R3BSTaRTraPoint+;
-#pragma link C++ class R3BSTaRTraHit+;
-#pragma link C++ class R3BSTaRTrackerHit+;
-#pragma link C++ class R3BSTaRTrackerDigitHit+;
+#pragma link C++ class R3BStartrackPoint+;
+#pragma link C++ class R3BStartrackHit+;
+
+//#pragma link C++ class R3BStartrackerHit+;
+
+#pragma link C++ class R3BStartrackerDigitHit+;
+#pragma link C++ class R3BStartrackMappedData+;
+#pragma link C++ class R3BStartrackCalData+;
 #pragma link C++ class R3BTraPoint+;
 #pragma link C++ class R3BTraHit+;
 #pragma link C++ class R3BTrackerHit+;

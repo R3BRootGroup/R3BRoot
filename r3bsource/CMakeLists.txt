@@ -20,6 +20,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
 ${R3BROOT_SOURCE_DIR}/psp/par
+${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
 )
 
 set(LINK_DIRECTORIES
@@ -45,6 +46,7 @@ R3BCalifaFebexReader.cxx
 R3BNeulandTamexReader.cxx
 R3BNeulandTacquilaReader.cxx
 R3BStrawtubesReader.cxx
+R3BStartrackReader.cxx
 )
 
 Set(STRUCT_HEADERS
@@ -58,6 +60,7 @@ ext_h101_psp.h
 ext_h101_raw_califa_febex.h
 ext_h101_raw_nnp_tamex.h
 ext_h101_strawtubes.h
+ext_h101_star.h
 )
 
 # fill list of header files from list of source files
