@@ -1,18 +1,8 @@
-// -------------------------------------------------------------------------
-// -----                        R3BDch header file                     -----
-// -----                  Created 26/03/09  by D.Bertini               -----
-// -------------------------------------------------------------------------
-
-/**  R3BDch.h
- **/
-
 #ifndef R3BDCH_H
 #define R3BDCH_H
 
 #include "R3BDetector.h"
-
 #include "TLorentzVector.h"
-
 #include <string>
 
 class TClonesArray;
@@ -25,16 +15,29 @@ class R3BDch : public R3BDetector
 
   public:
     /** Default constructor **/
-    R3BDch();
+    R3BDch(const TString& geoFile = "");
 
     /** Standard constructor.
-     *@param name    detetcor name
+     *@param name    detector name
+     *@param geoFile name of the geometry version
      *@param active  sensitivity flag
+     *@param x,y,z   position of station 1 and 2
+     *@param rot_y,rot_z  rotation of station 1 and 2
      **/
-    R3BDch(const char* name, Bool_t active);
+    R3BDch(const TString& geoFile,
+           const Double_t x1,
+           const Double_t y1,
+           const Double_t z1,
+           const Double_t rot_y1,
+           const Double_t rot_z1,
+           const Double_t x2,
+           const Double_t y2,
+           const Double_t z2,
+           const Double_t rot_y2,
+           const Double_t rot_z2);
 
     /** Destructor **/
-    virtual ~R3BDch();
+    ~R3BDch();
 
     /** Virtual method ProcessHits
      **
@@ -101,22 +104,13 @@ class R3BDch : public R3BDetector
 
     virtual void Initialize();
     virtual void SetSpecialPhysicsCuts();
-    void SetHeliumBag(Bool_t bag)
-    {
-        kHelium = bag;
-    }
-    void SetDynamicStepSize(Bool_t step)
-    {
-        fDynamicStepSize = step;
-    }
+    void SetHeliumBag(Bool_t bag) { kHelium = bag; }
+    void SetDynamicStepSize(Bool_t step) { fDynamicStepSize = step; }
 
     // renormalization of MC step size
     Double_t BetheBloch(Double_t bg);
     void SetStepToNextCollision();
-    void SetVerbosity(Bool_t verb)
-    {
-        fVerbose = verb;
-    }
+    void SetVerbosity(Bool_t verb) { fVerbose = verb; }
 
     void PrintInfo();
     void RecordFullMcHit();
@@ -146,6 +140,11 @@ class R3BDch : public R3BDetector
     Bool_t fDynamicStepSize;        //!
     // Sensitive Ref Node
     TGeoMatrix* refMatrix; //! Trans reference Node
+
+    TVector3 fPos1;      //!
+    TVector3 fPos2;      //!
+    TGeoRotation* fRot1; //!
+    TGeoRotation* fRot2; //!
 
     /** Private method AddHit
      **
@@ -185,7 +184,7 @@ class R3BDch : public R3BDetector
      **/
     void ResetParameters();
 
-    ClassDef(R3BDch, 1);
+    ClassDef(R3BDch, 3);
 };
 
 inline void R3BDch::ResetParameters()

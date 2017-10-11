@@ -1,16 +1,4 @@
-// -------------------------------------------------------------------------
-// -----                       R3BActar source file                    -----
-// -----                  Created 27/04/16  by D. Kresan               -----
-// -------------------------------------------------------------------------
-#include <stdlib.h>
-
-#include "GarfieldPhysics.h"
-
 #include "R3BActar.h"
-
-#include "R3BActarPoint.h"
-#include "R3BMCStack.h"
-
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
 #include "FairGeoNode.h"
@@ -19,53 +7,48 @@
 #include "FairRun.h"
 #include "FairRuntimeDb.h"
 #include "FairVolume.h"
-
+#include "GarfieldPhysics.h"
+#include "R3BActarPoint.h"
+#include "R3BMCStack.h"
 #include "TClonesArray.h"
 #include "TObjArray.h"
 #include "TParticle.h"
 #include "TVirtualMC.h"
+#include <stdlib.h>
 
-// -----   Default constructor   -------------------------------------------
 R3BActar::R3BActar()
-    : R3BDetector("R3BActar", kTRUE, kACTAR)
+    : R3BActar("")
 {
-    ResetParameters();
-    fPspCollection = new TClonesArray("R3BActarPoint");
-    fPosIndex = 0;
-    kGeoSaved = kFALSE;
-    flGeoPar = new TList();
-    flGeoPar->SetName(GetName());
-    fVerboseLevel = 1;
 }
-// -------------------------------------------------------------------------
 
-// -----   Standard constructor   ------------------------------------------
-R3BActar::R3BActar(const char* name, Bool_t active)
-    : R3BDetector(name, active, kACTAR)
+R3BActar::R3BActar(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot)
+    : R3BActar(geoFile, { trans, rot })
 {
-    ResetParameters();
-    fPspCollection = new TClonesArray("R3BActarPoint");
-    fPosIndex = 0;
-    kGeoSaved = kFALSE;
-    flGeoPar = new TList();
-    flGeoPar->SetName(GetName());
-    fVerboseLevel = 1;
 }
-// -------------------------------------------------------------------------
 
-// -----   Destructor   ----------------------------------------------------
+R3BActar::R3BActar(const TString& geoFile, const TGeoCombiTrans& combi)
+    : R3BDetector("R3BActar", kACTAR, geoFile, combi)
+    , fPspCollection(new TClonesArray("R3BActarPoint"))
+    , fPosIndex(0)
+    , kGeoSaved(kFALSE)
+    , flGeoPar(new TList())
+{
+    flGeoPar->SetName(GetName());
+    ResetParameters();
+}
+
 R3BActar::~R3BActar()
 {
-
     if (flGeoPar)
+    {
         delete flGeoPar;
+    }
     if (fPspCollection)
     {
         fPspCollection->Delete();
         delete fPspCollection;
     }
 }
-// -------------------------------------------------------------------------
 
 void R3BActar::Initialize()
 {
@@ -77,7 +60,7 @@ void R3BActar::Initialize()
 
 void R3BActar::SetSpecialPhysicsCuts()
 {
-    //LOG(INFO) << "R3BActar: Adding customized Physics cut ... " << FairLogger::endl;
+    // LOG(INFO) << "R3BActar: Adding customized Physics cut ... " << FairLogger::endl;
 
     return;
 
@@ -216,9 +199,7 @@ Bool_t R3BActar::ProcessHits(FairVolume* vol)
 }
 
 // -----   Public method EndOfEvent   -----------------------------------------
-void R3BActar::BeginEvent()
-{
-}
+void R3BActar::BeginEvent() {}
 
 // -----   Public method EndOfEvent   -----------------------------------------
 void R3BActar::EndOfEvent()
@@ -247,10 +228,7 @@ void R3BActar::EndOfEvent()
 // ----------------------------------------------------------------------------
 
 // -----   Public method Register   -------------------------------------------
-void R3BActar::Register()
-{
-    FairRootManager::Instance()->Register("ActarPoint", GetName(), fPspCollection, kTRUE);
-}
+void R3BActar::Register() { FairRootManager::Instance()->Register("ActarPoint", GetName(), fPspCollection, kTRUE); }
 // ----------------------------------------------------------------------------
 
 // -----   Public method GetCollection   --------------------------------------
@@ -318,22 +296,6 @@ R3BActarPoint* R3BActar::AddHit(Int_t trackID,
                   << FairLogger::endl;
     }
     return new (clref[size]) R3BActarPoint(trackID, detID, plane, posIn, posOut, momIn, momOut, time, length, eLoss);
-}
-
-// -----   Public method ConstructGeometry   ----------------------------------
-void R3BActar::ConstructGeometry()
-{
-    TString fileName = GetGeometryFileName();
-    if (fileName.EndsWith(".root"))
-    {
-        LOG(INFO) << "Constructing ACTAR geometry from ROOT file " << fileName.Data() << FairLogger::endl;
-        ConstructRootGeometry();
-    }
-    else
-    {
-        LOG(FATAL) << "ACTAR geometry file is not specified" << FairLogger::endl;
-        exit(1);
-    }
 }
 
 Bool_t R3BActar::CheckIfSensitive(std::string name)

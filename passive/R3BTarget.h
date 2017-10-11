@@ -1,25 +1,31 @@
-#ifndef R3BTarget_H
-#define R3BTarget_H
+#ifndef R3BTARGET_H
+#define R3BTARGET_H
 
 #include "R3BModule.h"
-#include <TString.h>
 
+class R3BTGeoPar;
 
-class R3BTarget : public R3BModule {
-public:
-  R3BTarget(const char * name, const char *Title="R3B Target");
-  R3BTarget();
-  virtual ~R3BTarget();
+class R3BTarget : public R3BModule
+{
+  public:
+    R3BTarget();
 
-  virtual void ConstructGeometry();
-  
-  virtual Bool_t CheckIfSensitive(std::string name);
+    R3BTarget(const TString& name);
+
+    R3BTarget(const TString& name,
+              const TString& geoFile,
+              const TGeoTranslation& trans,
+              const TGeoRotation& rot = TGeoRotation());
+
+    R3BTarget(const TString& name, const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
+
+    virtual void ConstructGeometry();
+
+    ClassDef(R3BTarget, 3)
+    void SetParContainers();
   
 protected:
-  TString *fTargetName; //!
-  
-public:
-  ClassDef(R3BTarget,1)
+    R3BTGeoPar *fTGeoPar; //!
 };
 
-#endif //R3BTarget_H
+#endif // R3BTARGET_H

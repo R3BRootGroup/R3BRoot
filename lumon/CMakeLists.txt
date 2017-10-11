@@ -49,7 +49,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF LuMonLinkDef.h)
 set(LIBRARY_NAME ELILuMon)
 set(DEPENDENCIES
-    R3Bbase R3BPassive MCStack R3BTof R3BData)
+    R3Bbase R3BPassive R3BTof R3BData)
 
 GENERATE_LIBRARY()
 

@@ -80,7 +80,7 @@ void r3ball(Int_t nEvents = 1,
        (fMC.CompareTo("TGeant4")   == 0)
       ){
        run->SetUserConfig("g4R3bConfig.C");
-       run->SetUserCuts("SetR3BCuts.C");
+       run->SetUserCuts("SetCuts.C");
    }
 
 
@@ -151,7 +151,7 @@ void r3ball(Int_t nEvents = 1,
 
   if (fDetList.FindObject("CALIFA") ) {
       // CALIFA Calorimeter
-      R3BDetector* calo = new R3BCalo("Califa", kTRUE);
+      R3BDetector* califa = new R3BCalifa("Califa", kTRUE);
       // Global position of the Module
       phi   =  0.0; // (deg)
       theta =  0.0; // (deg)
@@ -165,9 +165,9 @@ void r3ball(Int_t nEvents = 1,
       ty    =  0.0; // (cm)
       tz    =  0.0; // (cm)
       //calo->SetRotAnglesEuler(phi,theta,psi);
-      calo->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
-      calo->SetTranslation(tx,ty,tz);
-      run->AddModule(calo);
+      califa->SetRotAnglesXYZ(thetaX,thetaY,thetaZ);
+      califa->SetTranslation(tx,ty,tz);
+      run->AddModule(califa);
   }
 
   // Tracker
@@ -415,7 +415,6 @@ void r3ball(Int_t nEvents = 1,
   // If the Global Position of the Magnet is changed
   // the Field Map has to be transformed accordingly
   R3BFieldMap* magField = new R3BFieldMap(typeOfMagneticField,fVerbose);
-  magField->SetPosition(0., 0., 0.);
   magField->SetScale(fieldScale);
 
   if ( fR3BMagnet == kTRUE ) {
@@ -523,7 +522,7 @@ void r3ball(Int_t nEvents = 1,
   Int_t nSteps = -15000;
   // + means print information
   
-  gMC->SetMaxNStep(nSteps);
+  TVirtualMC::GetMC()->SetMaxNStep(nSteps);
 
   // -----   Runtime database   ---------------------------------------------
   Bool_t kParameterMerged = kTRUE;

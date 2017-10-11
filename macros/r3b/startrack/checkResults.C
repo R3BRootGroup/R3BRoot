@@ -190,20 +190,21 @@ void checkResults() {
 	TH2F* h1_User = new TH2F("h1_User","Double hits, ... where?",400,-2.5,2.5,400,-2.5,2.5);
 
 	//TTree* TCalo = (TTree*)file0->Get("cbmsim");
-	TTree* TCrystal = (TTree*)file1->Get("cbmsim");
+	//TTree* TCrystal = (TTree*)file1->Get("cbmsim");
+	TTree* TCrystal = (TTree*)file1->Get("evt");
 	
 	//Crystal Hits (input)
 	TClonesArray* crystalHitCA;  
-	R3BCaloCrystalHitSim** crystalHit;
-	crystalHitCA = new TClonesArray("R3BCaloCrystalHitSim",5);
-	TBranch *branchCrystalHit = TCrystal->GetBranch("CrystalHitSim");
+	R3BCalifaCrystalCalDataSim** crystalHit;
+	crystalHitCA = new TClonesArray("R3BCalifaCrystalCalDataSim",5);
+	TBranch *branchCrystalHit = TCrystal->GetBranch("CrystalCalDataSim");
 	branchCrystalHit->SetAddress(&crystalHitCA);
 
 	//Calo Hits (output)
 	TClonesArray* caloHitCA;  
-	R3BCaloHitSim** caloHit;
-	caloHitCA = new TClonesArray("R3BCaloHitSim",5);
-	TBranch *branchCaloHit = TCrystal->GetBranch("CaloHitSim");
+	R3BCalifaHitDataSim** caloHit;
+	caloHitCA = new TClonesArray("R3BCalifaHitDataSim",5);
+	TBranch *branchCaloHit = TCrystal->GetBranch("CalifaHitDataSim");
 	branchCaloHit->SetAddress(&caloHitCA);
 	
 	//MCTrack(input)
@@ -249,17 +250,17 @@ void checkResults() {
 		MCtracksPerEvent = MCTrackCA->GetEntries();
 		
 		if(crystalHitsPerEvent>0) {
-			crystalHit = new R3BCaloCrystalHitSim*[crystalHitsPerEvent];
+			crystalHit = new R3BCalifaCrystalCalDataSim*[crystalHitsPerEvent];
 			for(Int_t j=0;j<crystalHitsPerEvent;j++){
-				crystalHit[j] = new R3BCaloCrystalHitSim;
-				crystalHit[j] = (R3BCaloCrystalHitSim*) crystalHitCA->At(j);      
+				crystalHit[j] = new R3BCalifaCrystalCalDataSim;
+				crystalHit[j] = (R3BCalifaCrystalCalDataSim*) crystalHitCA->At(j);      
 			}
 		}
 		if(caloHitsPerEvent>0) {
-			caloHit = new R3BCaloHitSim*[caloHitsPerEvent];
+			caloHit = new R3BCalifaHitDataSim*[caloHitsPerEvent];
 			for(Int_t j=0;j<caloHitsPerEvent;j++){
-				caloHit[j] = new R3BCaloHitSim;
-				caloHit[j] = (R3BCaloHitSim*) caloHitCA->At(j);      
+				caloHit[j] = new R3BCalifaHitDataSim;
+				caloHit[j] = (R3BCalifaHitDataSim*) caloHitCA->At(j);      
 			}
 		}		
 		if(MCtracksPerEvent>0) {

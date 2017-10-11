@@ -4,7 +4,7 @@ Int_t  califa_test()
   FairRuntimeDb* db = FairRuntimeDb::instance();
 
    // Create in memory the relevant container
-  R3BCaloCalPar* par = (R3BCaloCalPar*)(db->getContainer("CaloCalPar"));  
+  R3BCalifaCrystalCalPar* par = (R3BCalifaCrystalCalPar*)(db->getContainer("CalifaCrystalCalPar"));  
 
   // Set the SQL IO as first input
   FairParAsciiFileIo* inp = new FairParAsciiFileIo();
@@ -22,7 +22,7 @@ Int_t  califa_test()
 
   // Get the container after initialisation
   // from the RuntimeDB
-  R3BCaloCalPar* par = (R3BCaloCalPar*)(db->getContainer("CaloCalPar"));
+  R3BCalifaCrystalCalPar* par = (R3BCalifaCrystalCalPar*)(db->getContainer("CalifaCrystalCalPar"));
 
   // Dump the Parameters
   cout << endl;

@@ -13,6 +13,7 @@ ${R3BROOT_SOURCE_DIR}/tracking
 ${R3BROOT_SOURCE_DIR}/field
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
+${R3BROOT_SOURCE_DIR}/r3bdata/pspData
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -27,8 +28,10 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
 R3BTPropagator.cxx
-R3BPropagate.cxx
 R3BTGeoPar.cxx
+R3BFragmentFitter.cxx
+R3BTrackingDetector.cxx
+R3BTrackingParticle.cxx
 )
 
 # fill list of header files from list of source files

@@ -1,6 +1,0 @@
-#!/bin/bash -l
-
-. r3bsim_new.sh
-
-. run_digi_new.sh
-

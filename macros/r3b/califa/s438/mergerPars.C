@@ -76,10 +76,10 @@ void mergerPars(TString inputFile1="", TString inputFile2="",
 
   //PARS ASCII FILE HEADER
   output << "##############################################################################\n";
-  output << "# Class:   R3BCaloCalPar\n";
+  output << "# Class:   R3BCalifaCrystalCalPar\n";
   output << "# Context: TestDefaultContext\n";
   output << "##############################################################################\n";
-  output << "[CaloCalPar]\n";
+  output << "[CalifaCrystalCalPar]\n";
   output << "//----------------------------------------------------------------------------\n";
   output << "NrOfDUnits:  Int_t  128\n";
 

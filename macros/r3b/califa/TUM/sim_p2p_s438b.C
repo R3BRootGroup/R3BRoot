@@ -86,7 +86,7 @@ Int_t sim_p2p_s438b(const char *path, int i){
   //detGeo.Add(new TObjString("ALADIN"),        
   //     new TObjString("aladin_v13a.geo.root"));
   //detGeo.Add(new TObjString("GLAD"),          
-  //	     new TObjString("glad_v13a.geo.root"));
+  //	     new TObjString("glad_v17_flange.geo.root"));
   //detGeo.Add(new TObjString("CRYSTALBALL"),   
   //         new TObjString("cal_v13a.geo.root"));
   detGeo.Add(new TObjString("CALIFA"),        
@@ -135,8 +135,8 @@ Int_t sim_p2p_s438b(const char *path, int i){
    // Magnet Field definition
    Bool_t fR3BMagnet = kFALSE;
 	
-   // Including CaloHitFinder task (kFALSE by default)
-   Bool_t fCaloHitFinder = kTRUE; 
+   // Including CalifaHitFinder task (kFALSE by default)
+   Bool_t fCalifaHitFinder = kTRUE; 
 
    // Including StarTrackHitFinder task (kFALSE by default)
    Bool_t fStarTrackHitFinder = kFALSE;
@@ -152,7 +152,7 @@ Int_t sim_p2p_s438b(const char *path, int i){
 	  fGene,
 	  fUserPList,
 	  fR3BMagnet,
-	  fCaloHitFinder,
+	  fCalifaHitFinder,
 	  fStarTrackHitFinder,
 	  fMeasCurrent,
 	  OutFile,

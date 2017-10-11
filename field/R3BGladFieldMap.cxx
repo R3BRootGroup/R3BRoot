@@ -116,7 +116,7 @@ void R3BGladFieldMap::Init() {
 
   fPosX = 0.0;
   fPosY = 0.0;
-  fPosZ = 113.4;
+  fPosZ = 163.4;
   fYAngle = -14.;
   gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
 }

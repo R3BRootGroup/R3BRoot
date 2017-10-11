@@ -18,7 +18,32 @@
 //                 
 //  -------------------------------------------------------------------------
 
-void RecResultsClust(Int_t mode, char* output) {
+
+Double_t GetThetaTrk(Double_t X, Double_t Y, Double_t Z);
+Double_t GetPhiTrk(Double_t X, Double_t Y);
+
+Float_t GetThetaTrack(Float_t X, Float_t Y);
+Float_t GetThetaScat(Float_t X, Float_t Y, Float_t Z);
+Float_t GetPhiScat(Float_t X, Float_t Y, Float_t Z);
+Float_t GetEnergy(Float_t X, Float_t Y, Float_t Z, Float_t M);
+Double_t GetERec(Double_t Ep, Double_t Th, Double_t Phi, Double_t Ebeam);
+Float_t GetERec(Float_t Ep3, Float_t Ep4, Float_t Th3, Float_t Phi3, Float_t Th4, Float_t Phi4, Float_t Ebeam);
+Float_t GetThetaCM(Float_t th3l);
+Float_t GetXVertex(Float_t X1, Float_t X2, Float_t X3, Float_t X4, Float_t Y1, Float_t Y2, Float_t Y3, Float_t Y4);
+Float_t GetYVertex(Float_t X1, Float_t X2, Float_t X3, Float_t X4, Float_t Y1, Float_t Y2, Float_t Y3, Float_t Y4);
+Float_t GetZVertex(Float_t X1, Float_t X2, Float_t X3, Float_t X4, Float_t Z1, Float_t Z2, Float_t Z3, Float_t Z4);
+void DistToBeam( Float_t Xa,  Float_t Ya, Float_t Za ,  Float_t Xb,  Float_t Yb, Float_t Zb, Float_t Beam_spot, Double_t* radius, Double_t* Xtarget, Double_t* Ytarget);
+
+Bool_t IsFromTarget( Float_t Xa,  Float_t Ya, Float_t Za ,  Float_t Xb,  Float_t Yb, Float_t Zb, Float_t Beam_spot_radius, Float_t target_thick); 
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include "TFile.h"
+#include "TTree.h"
+
+
+void RecResultsClust(Int_t mode, const char* output) {
 
 
   gROOT->Reset();
@@ -38,7 +63,7 @@ void RecResultsClust(Int_t mode, char* output) {
 
 
 	//sprintf(title0,"%s","startrackerAnaDigit_Notrgt_PencilBeam.root");  	
-	sprintf(title0,"%s","startrackerAnaDigit.root");  	
+	sprintf(title0,"%s","startrackAnaDigi.root");  	
  	//sprintf(title1,"%s","r3bsim.root");  
 	TFile *file0 = TFile::Open(title0);
 	//TFile *file1 = TFile::Open(title1);
@@ -132,7 +157,8 @@ void RecResultsClust(Int_t mode, char* output) {
 
 
 	//Input trees:
-	TTree* TStarTrackDigit = (TTree*)file0->Get("cbmsim");
+	//TTree* TStarTrackDigit = (TTree*)file0->Get("cbmsim");
+	TTree* TStarTrackDigit = (TTree*)file0->Get("evt");
 	//TTree* TStarTracker = (TTree*)file1->Get("cbmsim");
 	
 	//Output file:
@@ -169,14 +195,14 @@ void RecResultsClust(Int_t mode, char* output) {
 	
 	// for the tracker digit
                      
-	TBranchElement *branchDigitELoss = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fEnergy");
-	TBranchElement *branchDigitDetID = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fDetector");
-	TBranchElement *branchChip = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fChip");
-	TBranchElement *branchSide = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fSide");
-	TBranchElement *branchStrip = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fStrip");
+	TBranchElement *branchDigitELoss = (TBranchElement*)TStarTrackDigit->GetBranch("StartrackerDigitHit.fEnergy");
+	TBranchElement *branchDigitDetID = (TBranchElement*)TStarTrackDigit->GetBranch("StartrackerDigitHit.fDetector");
+	TBranchElement *branchChip = (TBranchElement*)TStarTrackDigit->GetBranch("StartrackerDigitHit.fChip");
+	TBranchElement *branchSide = (TBranchElement*)TStarTrackDigit->GetBranch("StartrackerDigitHit.fSide");
+	TBranchElement *branchStrip = (TBranchElement*)TStarTrackDigit->GetBranch("StartrackerDigitHit.fStrip");
 	//TBranchElement *branchStripfrt = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fStripfrt");
 	//TBranchElement *branchStripbck = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fStripbck");
-	TBranchElement *branchDigitTime = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fTime");
+	TBranchElement *branchDigitTime = (TBranchElement*)TStarTrackDigit->GetBranch("StartrackerDigitHit.fTime");
 
 	//for califa
 	/*
@@ -270,19 +296,19 @@ void RecResultsClust(Int_t mode, char* output) {
 	Double_t *Za;
 	Double_t *Phia;
 	Double_t *Epa;
-	Double_t *part_a;  
+	Int_t *part_a;  
 	Double_t *Xb;  // intermidiate layer
 	Double_t *Yb;
 	Double_t *Zb;
 	Double_t *Phib;
 	Double_t *Epb;
-	Double_t *part_b;
+	Int_t *part_b;
 	Double_t *Xc;  // Outer layer
 	Double_t *Yc;
 	Double_t *Zc;
 	Double_t *Phic;
 	Double_t *Epc;
-	Double_t *part_c;
+	Int_t *part_c;
 
 
 	// added for elastic case
@@ -869,11 +895,11 @@ void RecResultsClust(Int_t mode, char* output) {
 
 	Int_t CountGoodTrk = 0;
 	Int_t CountTrk = 0;
-	if(mode==1)
-	  {
+	//if(mode==1)
+	//  {
 	    Int_t CountGoodTrk2 = 0;
 	    Double_t CountTrk2 = 0;
-	  }
+	//  }
 
        	for(Int_t i=0;i<nevents;i++){
        	//for(Int_t i=0;i<20;i++){
@@ -1462,12 +1488,16 @@ void RecResultsClust(Int_t mode, char* output) {
 		    Double_t Xtarg=0;  // reconstructed X of target+beam
 		    Double_t Ytarg=0;  // reconstructed Y of target+beam
 		    Int_t trk=0;
-		    theta=new Double_t[TrackMult_Middl40];  // using TrackMult_Middl40 here since we look for tracking between inner and intermediate layer.		
-		    phi=new Double_t[TrackMult_Middl40];    // using TrackMult_Middl40 here since we look for tracking between inner and intermediate layer.		
-		    Ep=new Double_t[TrackMult_Middl40];     // using TrackMult_Middl40 here since we look for tracking between inner and intermediate layer.		
-		    part_a=new Double_t[TrackMult_Inner40];
-		    part_b=new Double_t[TrackMult_Middl40];
-		    part_c=new Double_t[TrackMult_Outer40];
+
+
+
+		    theta=new Double_t[TrkMult_Middl40];  // using TrackMult_Middl40 here since we look for tracking between inner and intermediate layer.		
+		    phi=new Double_t[TrkMult_Middl40];    // using TrackMult_Middl40 here since we look for tracking between inner and intermediate layer.		
+		    Ep=new Double_t[TrkMult_Middl40];     // using TrackMult_Middl40 here since we look for tracking between inner and intermediate layer.		
+
+		    part_a=new Int_t[TrkMult_Inner40];
+		    part_b=new Int_t[TrkMult_Middl40];
+		    part_c=new Int_t[TrkMult_Outer40];
 
 		    for(Int_t k=0; k<TrackMult; k++){
 		      
@@ -1675,12 +1705,14 @@ void RecResultsClust(Int_t mode, char* output) {
 		    */
 		    /* For general tracking:*/ 
 		    Int_t trk=0;
+/*
 		    theta=new Double_t[TrackMult_Middl40];  // using TrackMult_Middl40 here since we look for tracking between inner and intermediate layer.		
 		    phi=new Double_t[TrackMult_Middl40];    // using TrackMult_Middl40 here since we look for tracking between inner and intermediate layer.		
 		    Ep=new Double_t[TrackMult_Middl40];     // using TrackMult_Middl40 here since we look for tracking between inner and intermediate layer.		
 		    part_a=new Double_t[TrackMult_Inner40];
 		    part_b=new Double_t[TrackMult_Middl40];
 		    part_c=new Double_t[TrackMult_Outer40];
+*/
 		    ////////////////////////////////////////
 		    
 		    for(Int_t k=0; k<TrackMult; k++){
@@ -2211,8 +2243,8 @@ Float_t GetPhiScat(Float_t X, Float_t Y, Float_t Z){
   if(X<0 && Y<0)Phi=TMath::PiOver2()+atan(Y/X);
   if(X>0 && Y<=0)Phi=1.5*TMath::Pi()+atan(Y/X);
 
-  if(X=0 && Y>0)Phi=1.5*TMath::Pi()+TMath::Pi()/2;
-  if(X=0 && Y<0)Phi=TMath::PiOver2()+TMath::Pi()/2;
+  if(X==0 && Y>0)Phi=1.5*TMath::Pi()+TMath::Pi()/2;
+  if(X==0 && Y<0)Phi=TMath::PiOver2()+TMath::Pi()/2;
 
   
   return Phi;
@@ -2227,7 +2259,7 @@ Float_t GetEnergy(Float_t X, Float_t Y, Float_t Z, Float_t M){
   Float_t E;
   Float_t T;
   Float_t P;
-  Float_t M; // GeV/C^2
+  //Float_t M; // GeV/C^2
   Float_t amugev = 931.5016/1000;
 
   // E=(pow(X,2)+pow(Y,2)+pow(Z,2))/(2.*M); //Non-relativistic
@@ -2398,10 +2430,9 @@ void DistToBeam( Float_t Xa,  Float_t Ya, Float_t Za ,  Float_t Xb,  Float_t Yb,
 
   //cout << "r=" << r << endl;
   //cout << "radius=" << *radius << endl;
-  //cout << "Xtarget=" << *Xtarget << " Ytarget=" << *Ytarget << endl;
+  //cout << "Xtarget=" << *Xtarget << " Ytarget=" << *Ytarget << endl; 
 
-   return 0;
- 
+ return;
 
 }
 

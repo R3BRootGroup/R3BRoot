@@ -19,10 +19,10 @@
 #include <TLorentzVector.h>
 
 #include <R3BMCTrack.h>
-#include <R3BCaloRawHit.h>
-#include <R3BCaloHitSim.h>
-#include <R3BCaloCrystalHitSim.h>
-#include <R3BCaloGeometry.h>
+#include <R3BCalifaMappedData.h>
+#include <R3BCalifaHitDataSim.h>
+#include <R3BCalifaCrystalCalDataSim.h>
+#include <R3BCalifaGeometry.h>
 #include <R3BDetectorList.h>
 #include <startrackerData/R3BSTaRTrackerHit.h>
 
@@ -61,7 +61,7 @@ void GenChannelMapping()
   int crystalId;
   double foo;
 
-  R3BCaloGeometry *geo = R3BCaloGeometry::Instance(fGeometryVersion);
+  R3BCalifaGeometry *geo = R3BCalifaGeometry::Instance(fGeometryVersion);
 
   for(int i = 0; i < 128; i++)
   {
@@ -96,15 +96,15 @@ void GenChannelMapping()
       delete hits;
 
     TBranch *b;
-    if((b = events->GetBranch("CaloCrystalHit")))
+    if((b = events->GetBranch("CalifaCrystalCalData")))
     {
       // Experimental data
-      hits = new TClonesArray("R3BCaloCrystalHit");
+      hits = new TClonesArray("R3BCalifaCrystalCalData");
     }
-    else if((b = events->GetBranch("CaloCrystalHitSim")))
+    else if((b = events->GetBranch("CalifaCrystalCalDataSim")))
     {
       // Simulated data
-      hits = new TClonesArray("R3BCaloCrystalHitSim");
+      hits = new TClonesArray("R3BCalifaCrystalCalDataSim");
     }
     else
     {
@@ -118,9 +118,9 @@ void GenChannelMapping()
     if(hits)    
       events->SetBranchAddress(b->GetName(), &hits);
 
-    if((b = events->GetBranch("CaloRawHit")))
+    if((b = events->GetBranch("CalifaMappedData")))
     {
-      rawHits = new TClonesArray("R3BCaloRawHit");
+      rawHits = new TClonesArray("R3BCalifaMappedData");
       events->SetBranchAddress(b->GetName(), &rawHits);
     }
     else
@@ -130,22 +130,22 @@ void GenChannelMapping()
     if(caloHits)
       delete caloHits;
 
-    if((b = events->GetBranch("CaloHit")))
+    if((b = events->GetBranch("CalifaHitData")))
     {
-      caloHits = new TClonesArray("R3BCaloHit");
+      caloHits = new TClonesArray("R3BCalifaHitData");
 //      b->SetAddress(&caloHits);
-      events->SetBranchAddress("CaloHit", &caloHits);
+      events->SetBranchAddress("CalifaHitData", &caloHits);
     }
-    else if((b = events->GetBranch("califa_CaloHit")))
+    else if((b = events->GetBranch("califa_CalifaHitData")))
     {
-      caloHits = new TClonesArray("R3BCaloHit");
-      events->SetBranchAddress("califa_CaloHit", &caloHits);
+      caloHits = new TClonesArray("R3BCalifaHitData");
+      events->SetBranchAddress("califa_CalifaHitData", &caloHits);
     }
-    else if((b = events->GetBranch("CaloHitSim")))
+    else if((b = events->GetBranch("CalifaHitDataSim")))
     {
-      caloHits = new TClonesArray("R3BCaloHitSim");
+      caloHits = new TClonesArray("R3BCalifaHitDataSim");
 //      b->SetAddress(&caloHits);
-      events->SetBranchAddress("CaloHitSim", &caloHits);
+      events->SetBranchAddress("CalifaHitDataSim", &caloHits);
     }
     else
       caloHits = NULL;
@@ -215,7 +215,7 @@ public:
 
       for(int j = 0; j < hits->GetEntries(); j++)
       {
-        h->Fill(((R3BCaloCrystalHit*)hits->At(j))->GetCrystalId());
+        h->Fill(((R3BCalifaCrystalCalData*)hits->At(j))->GetCrystalId());
       }
     }
 
@@ -226,13 +226,13 @@ public:
   {
   if(!caloHits)
   {
-    cerr << "No CaloHits found." << endl;
+    cerr << "No CalifaHitDatas found." << endl;
     return;
   }
 
   TH1 *h = getTH1(1000, 0, 1000, "Energy (MeV)", hist);
 
-  R3BCaloHit *hit;
+  R3BCalifaHitData *hit;
 
   for(Long64_t i = 0; i < n; i++)
   {
@@ -240,7 +240,7 @@ public:
 
     for(int j = 0; j < caloHits->GetEntries(); j++)
     {
-      hit = dynamic_cast<R3BCaloHit*>(caloHits->At(j));
+      hit = dynamic_cast<R3BCalifaHitData*>(caloHits->At(j));
       if(usePid)
         h->Fill((hit->GetNf() + hit->GetNs()) * 1000.);
       else
@@ -260,14 +260,14 @@ public:
     }
 
     hist = getTH2(500,0,1000,500,0,1000, "QPID Energy vs PeakSensing Energy (MeV)", hist);
-    R3BCaloCrystalHit *hit;
+    R3BCalifaCrystalCalData *hit;
 
     for(Long64_t i = 0; i < n; i++)
     {
       events->GetEntry(i);
       for(int j = 0; j < hits->GetEntries(); j++)
       {
-        hit = dynamic_cast<R3BCaloCrystalHit*>(hits->At(j));
+        hit = dynamic_cast<R3BCalifaCrystalCalData*>(hits->At(j));
         hist->Fill(hit->GetEnergy() * 1000., (hit->GetNf() + hit->GetNs())*1000.);
       }
     }
@@ -279,13 +279,13 @@ public:
   {
     if(!caloHits)
     {
-      cerr << "No CaloHits found." << endl;
+      cerr << "No CalifaHitDatas found." << endl;
       return;
     }
 
     TH2 *h = getTH2(500,0,1000,500,0,1000, "QPID Energy vs PeakSensing Energy (MeV)", hist);
 
-    R3BCaloHit *hit;
+    R3BCalifaHitData *hit;
 
     for(Long64_t i = 0; i < n; i++)
     {
@@ -293,7 +293,7 @@ public:
 
       for(int j = 0; j < caloHits->GetEntries(); j++)
       {
-        hit = dynamic_cast<R3BCaloHit*>(caloHits->At(j));
+        hit = dynamic_cast<R3BCalifaHitData*>(caloHits->At(j));
         h->Fill(hit->GetEnergy() * 1000., (hit->GetNf() + hit->GetNs())*1000.);
       }
     }
@@ -305,11 +305,11 @@ public:
   {
     if(!caloHits)
     {
-      cerr << "No CaloHits in tree." << endl;
+      cerr << "No CalifaHitDatas in tree." << endl;
       return;
     }
 
-    R3BCaloHit *hit;
+    R3BCalifaHitData *hit;
     h = getTH2(1000,0,500,1000,0,250, "abs(Ns - f(Nf))", h);
 
     for(Long64_t i = 0; i < n; i++)
@@ -318,7 +318,7 @@ public:
 
       for(int j = 0; j < caloHits->GetEntries(); j++)
       {
-        hit = dynamic_cast<R3BCaloHit*>(caloHits->At(j));
+        hit = dynamic_cast<R3BCalifaHitData*>(caloHits->At(j));
 
         if(!cut->IsInside(1000. * hit->GetNf(), 1000. * hit->GetNs()))
           continue;
@@ -347,7 +347,7 @@ public:
 
     TH1 *h = getTH1(1000, 0, 1000, "Energy (MeV)", hist);
 
-    R3BCaloCrystalHit *hit;
+    R3BCalifaCrystalCalData *hit;
 
     for(Long64_t i = 0; i < n; i++)
     {
@@ -355,7 +355,7 @@ public:
 
       for(int j = 0; j < hits->GetEntries(); j++)
       {
-        hit = (R3BCaloCrystalHit*)hits->At(j);
+        hit = (R3BCalifaCrystalCalData*)hits->At(j);
         if(crystalId == -1 || crystalId == hit->GetCrystalId())
         {
           if(usePid)
@@ -379,7 +379,7 @@ public:
 
     TH1 *h = getTH1(1000, 0, 0x8000, "Energy (au)", hist);
 
-    R3BCaloRawHit *hit;
+    R3BCalifaMappedData *hit;
 
     for(Long64_t i = 0; i < n; i++)
     {
@@ -387,7 +387,7 @@ public:
 
       for(int j = 0; j < rawHits->GetEntries(); j++)
       {
-        hit = (R3BCaloRawHit*)rawHits->At(j);
+        hit = (R3BCalifaMappedData*)rawHits->At(j);
         if(crystalId == -1 || crystalId == hit->GetCrystalId())
           h->Fill(hit->GetEnergy());
       }
@@ -399,12 +399,12 @@ public:
   void PID(int crystalId = -1, Long64_t nEvents = -1, TH2 *hist = NULL, TCutG *cut = NULL, TCutG *pidvse = NULL, double thetamin=-1, double thetamax=-1)
   {
     TH2 *h = getTH2(500, 0, 1000, 500, 0, 1000, "Ns vs Nf (MeV)", hist);
-    R3BCaloCrystalHit *hit;
+    R3BCalifaCrystalCalData *hit;
 
     double theta, phi, rho;
-    R3BCaloGeometry *geo = NULL;
+    R3BCalifaGeometry *geo = NULL;
     if(thetamin >= 0 || thetamax >= 0)
-      geo = R3BCaloGeometry::Instance(fGeometryVersion);
+      geo = R3BCalifaGeometry::Instance(fGeometryVersion);
 
     for(Long64_t i = 0; i < n; i++)
     {
@@ -412,7 +412,7 @@ public:
 
       for(int j = 0; j < hits->GetEntries(); j++)
       {
-        hit = (R3BCaloCrystalHit*)hits->At(j);
+        hit = (R3BCalifaCrystalCalData*)hits->At(j);
 
         if(geo)
         {
@@ -459,7 +459,7 @@ public:
 
     GenChannelMapping();
 
-    R3BCaloCrystalHit *hit;
+    R3BCalifaCrystalCalData *hit;
 
     TH2 **hists = new TH2*[num];
     for(int i = 0; i < num; i++)
@@ -473,7 +473,7 @@ public:
 
       for(int j = 0; j < hits->GetEntries(); j++)
       {
-        hit = dynamic_cast<R3BCaloCrystalHit*>(hits->At(j));
+        hit = dynamic_cast<R3BCalifaCrystalCalData*>(hits->At(j));
         ch = getChannelNr(hit->GetCrystalId());
         if(ch < 0 || ch >= num)
           continue;
@@ -505,7 +505,7 @@ public:
 
     GenChannelMapping();
 
-    R3BCaloCrystalHit *hit;
+    R3BCalifaCrystalCalData *hit;
 
     TH1 **hists = new TH1*[num];
     for(int i = 0; i < num; i++)
@@ -519,7 +519,7 @@ public:
 
       for(int j = 0; j < hits->GetEntries(); j++)
       {
-        hit = dynamic_cast<R3BCaloCrystalHit*>(hits->At(j));
+        hit = dynamic_cast<R3BCalifaCrystalCalData*>(hits->At(j));
         ch = getChannelNr(hit->GetCrystalId());
         if(ch < 0 || ch >= num)
           continue;
@@ -624,12 +624,12 @@ public:
   {
     if(!caloHits)
     {
-      cerr << "No CaloHit in tree!" << endl;
+      cerr << "No CalifaHitData in tree!" << endl;
       return;
     }
 
     TH2 *h = getTH2(500, 0, 500, 500, 0, 500, "Ns vs Nf (MeV)", hist);
-    R3BCaloHit *hit;
+    R3BCalifaHitData *hit;
 
     double r_nsnf;
 
@@ -639,7 +639,7 @@ public:
 
       for(int j = 0; j < caloHits->GetEntries(); j++)
       {
-        hit = (R3BCaloHit*)caloHits->At(j);
+        hit = (R3BCalifaHitData*)caloHits->At(j);
 
 
         // Normalize PID to energy
@@ -680,7 +680,7 @@ public:
   void EnergyVsCrystalId(TH2 *hist = NULL)
   {
     TH2 *h = getTH2(500, 0, 4000, 500, 0, 1000, "Energy vs Crystal Id", hist);
-    R3BCaloCrystalHit *hit;
+    R3BCalifaCrystalCalData *hit;
 
     for(Long64_t i = 0; i < n; i++)
     {
@@ -688,7 +688,7 @@ public:
 
       for(int j = 0; j < hits->GetEntries(); j++)
       {
-        hit = (R3BCaloCrystalHit*)hits->At(j);
+        hit = (R3BCalifaCrystalCalData*)hits->At(j);
         h->Fill(hit->GetCrystalId(), hit->GetEnergy()*1000.0);
       }
     }
@@ -699,10 +699,10 @@ public:
   void EnergyVsTheta(TH2 *hist = NULL)
   {
     TH2 *h = getTH2(50, 0, 180, 500, 0, 1000, "Energy vs Theta", hist);
-    R3BCaloCrystalHit *hit;
+    R3BCalifaCrystalCalData *hit;
     Double_t phi, theta, rho;
 
-    R3BCaloGeometry *geo = R3BCaloGeometry::Instance(fGeometryVersion);
+    R3BCalifaGeometry *geo = R3BCalifaGeometry::Instance(fGeometryVersion);
   
     for(Long64_t i = 0; i < n; i++)
     {
@@ -710,7 +710,7 @@ public:
 
       for(int j = 0; j < hits->GetEntries(); j++)
       {
-        hit = (R3BCaloCrystalHit*)hits->At(j);
+        hit = (R3BCalifaCrystalCalData*)hits->At(j);
         geo->GetAngles(hit->GetCrystalId(), &theta, &phi, &rho);
 
         h->Fill(theta * 180.0 / TMath::Pi(), hit->GetEnergy()*1000.0);
@@ -724,12 +724,12 @@ public:
   {
     if(!caloHits)
     {
-      cerr << "No CaloHit in tree!" << endl;
+      cerr << "No CalifaHitData in tree!" << endl;
       return;
     }
 
     TH2 *h = getTH2(50, 0, 180, 500, 0, 1000, "Energy vs Theta", hist);
-    R3BCaloHit *hit;
+    R3BCalifaHitData *hit;
 
     for(Long64_t i = 0; i < n; i++)
     {
@@ -737,7 +737,7 @@ public:
 
       for(int j = 0; j < caloHits->GetEntries(); j++)
       {
-        hit = (R3BCaloHit*)caloHits->At(j);
+        hit = (R3BCalifaHitData*)caloHits->At(j);
         h->Fill(hit->GetTheta() * 180.0 / TMath::Pi(), hit->GetEnergy() * 1000.0);
       }
     }
@@ -750,7 +750,7 @@ public:
   {
     if(!caloHits || !tracks)
     {
-      cerr << "No CaloHit or MCTrack in tree!" << endl;
+      cerr << "No CalifaHitData or MCTrack in tree!" << endl;
       return;
     }
 
@@ -758,7 +758,7 @@ public:
     htheta = getTH2(50, 0, 180, 50, 0, 180, "Theta Hit vs Theta Track", htheta);
 
     R3BMCTrack *t;
-    R3BCaloHit *h;
+    R3BCalifaHitData *h;
     TVector3 v;
 
     for(Long64_t i = 0; i < n; i++)
@@ -773,7 +773,7 @@ public:
 
       for(int j = 0; j < caloHits->GetEntries(); j++)
       {
-        h = dynamic_cast<R3BCaloHit*>(caloHits->At(j));
+        h = dynamic_cast<R3BCalifaHitData*>(caloHits->At(j));
         htheta->Fill(v.Theta() * 180. / TMath::Pi(), h->GetTheta() * 180.0 / TMath::Pi());
         hphi->Fill(v.Phi() * 180. / TMath::Pi(), h->GetPhi() * 180.0 / TMath::Pi());
       }
@@ -822,7 +822,7 @@ public:
       hists[i] = new TH2I(Form("iphos_%d", i), Form("E vs DE %d", i), 250, 0, 500, 250, 200,1000);
 
     R3BMCTrack *track;
-    R3BCaloHit *hit;
+    R3BCalifaHitData *hit;
     double eprim, phi, theta;
     int j, channel;
 
@@ -846,7 +846,7 @@ public:
 
       for(j = 0; j < caloHits->GetEntries(); j++)
       {
-        hit = dynamic_cast<R3BCaloHit*>(caloHits->At(j));
+        hit = dynamic_cast<R3BCalifaHitData*>(caloHits->At(j));
 
         if(!cut_iphos->IsInside(hit->GetNf(), hit->GetNs()))
           continue;
@@ -895,7 +895,7 @@ public:
       return;
     }
 
-    R3BCaloGeometry *geo = R3BCaloGeometry::Instance(0x438b);
+    R3BCalifaGeometry *geo = R3BCalifaGeometry::Instance(0x438b);
     if(!geo)
     {
       cerr << "Could not load Califa geometry manager" << endl;
@@ -906,7 +906,7 @@ public:
     TH2I *hdztheta_track = new TH2I("hdztheta_track", "iPhos", 1800, 0, 90, 1000, 0, 50);
 
     R3BMCTrack *t;
-    R3BCaloHit *h;
+    R3BCalifaHitData *h;
     TVector3 startVertex, momentum, hitPos;
 
     double eprim, dz;
@@ -937,7 +937,7 @@ public:
 
       for(j = 0; j < caloHits->GetEntries(); j++)
       {
-        h = dynamic_cast<R3BCaloHit*>(caloHits->At(j));
+        h = dynamic_cast<R3BCalifaHitData*>(caloHits->At(j));
         if(cut_iphos->IsInside(1000. * h->GetNf(), 1000. * h->GetNs()))
         {
           hdztheta->Fill(h->GetTheta()*180./TMath::Pi(), dz);
@@ -982,11 +982,11 @@ public:
 
     double dz_region[3] = {220,180,170};
 
-    R3BCaloGeometry *geo = R3BCaloGeometry::Instance(0x438b);
+    R3BCalifaGeometry *geo = R3BCalifaGeometry::Instance(0x438b);
     TVector3 vStart(0,0,0), vDir;
 
     R3BMCTrack *t;
-    R3BCaloHit *h;
+    R3BCalifaHitData *h;
     
     double eprim, theta;
 
@@ -1013,7 +1013,7 @@ public:
 
       for(j = 0; j < caloHits->GetEntries(); j++)
       {
-        h = dynamic_cast<R3BCaloHit*>(caloHits->At(j));
+        h = dynamic_cast<R3BCalifaHitData*>(caloHits->At(j));
         if(h->GetNbOfCrystalHits() != 1)
           continue;
 
@@ -1109,7 +1109,7 @@ public:
 
 
 
-  R3BCaloGeometry *geo = R3BCaloGeometry::Instance(0x438b);
+  R3BCalifaGeometry *geo = R3BCalifaGeometry::Instance(0x438b);
   TVector3 vStart(0,0,0), vDirection;
   
     int region;
@@ -1126,7 +1126,7 @@ public:
 //    hrespfx[3] = new TH1F("hrespfx_total", "Resolution FWHM % total", 200, 200, 1000);
 
     R3BMCTrack *t;
-    R3BCaloHit *h;
+    R3BCalifaHitData *h;
     
     double eprim, theta, e_iphos, de_hit;
     double nprim;
@@ -1161,7 +1161,7 @@ public:
   
         eprim = 1000. * (t->GetEnergy() - t->GetMass());
 
-        h = dynamic_cast<R3BCaloHit*>(caloHits->At(j));
+        h = dynamic_cast<R3BCalifaHitData*>(caloHits->At(j));
 
         if(h->GetNbOfCrystalHits() != 1)
         {
@@ -1357,7 +1357,7 @@ public:
       return;
     }
 
-    R3BCaloGeometry *geo = R3BCaloGeometry::Instance(0x438b);
+    R3BCalifaGeometry *geo = R3BCalifaGeometry::Instance(0x438b);
     if(!geo)
     {
       cerr << "Could not load Califa geometry manager" << endl;
@@ -1367,7 +1367,7 @@ public:
     TH3I *hiphos = new TH3I("hiphos", "iPhos", 250, 0, 500, 250, 0, 50, 250, 200, 1000);
 
     R3BMCTrack *t;
-    R3BCaloHit *h;
+    R3BCalifaHitData *h;
     TVector3 startVertex, momentum;
 
     double eprim, dz;
@@ -1396,7 +1396,7 @@ public:
 
       for(j = 0; j < caloHits->GetEntries(); j++)
       {
-        h = dynamic_cast<R3BCaloHit*>(caloHits->At(j));
+        h = dynamic_cast<R3BCalifaHitData*>(caloHits->At(j));
         if(cut_iphos->IsInside(h->GetNf(), h->GetNs()))
           hiphos->Fill(1000. * h->GetEnergy(), dz, eprim);
       }
@@ -1443,7 +1443,7 @@ void P2P(Long64_t nMax = 0, bool usetracks = true, bool useiphos = false, bool u
 
     if(!caloHits)
     {
-      cerr << "No CaloHit in tree" << endl;
+      cerr << "No CalifaHitData in tree" << endl;
       return;
     }
 
@@ -1553,7 +1553,7 @@ void P2P(Long64_t nMax = 0, bool usetracks = true, bool useiphos = false, bool u
     TRandom3 rnd;
 
     R3BMCTrack *t;
-    R3BCaloHit *h;
+    R3BCalifaHitData *h;
     TVector3 v;
 
     Long64_t j;
@@ -1629,7 +1629,7 @@ void P2P(Long64_t nMax = 0, bool usetracks = true, bool useiphos = false, bool u
 #endif
 
 #if REQUIRE_DZ
-  R3BCaloGeometry *geo = R3BCaloGeometry::Instance(0x438b);
+  R3BCalifaGeometry *geo = R3BCalifaGeometry::Instance(0x438b);
   TVector3 vStart(0,0,0), vDirection;
 
     double dz_region[3] = {220,180,170};
@@ -1697,7 +1697,7 @@ void P2P(Long64_t nMax = 0, bool usetracks = true, bool useiphos = false, bool u
         eMax[0] = 0; eMax[1] = 0;
         for(j = 0; j < caloHits->GetEntries(); j++)
         {
-          h = dynamic_cast<R3BCaloHit*>(caloHits->At(j));
+          h = dynamic_cast<R3BCalifaHitData*>(caloHits->At(j));
 #if REQUIRE_DZ
           if(h->GetNbOfCrystalHits() != 1)
           {
@@ -1874,7 +1874,7 @@ void P2P(Long64_t nMax = 0, bool usetracks = true, bool useiphos = false, bool u
         bool found_matching_track;
         for(int ih = 0; ih < 2; ih++)
         {
-          h = dynamic_cast<R3BCaloHit*>(caloHits->At(idxMax[ih]));
+          h = dynamic_cast<R3BCalifaHitData*>(caloHits->At(idxMax[ih]));
           found_matching_track = false;
           for(int it = 0; it < 2; it++)
           {
@@ -1932,7 +1932,7 @@ void P2P(Long64_t nMax = 0, bool usetracks = true, bool useiphos = false, bool u
         bool found_matching_track;
         for(int ih = 0; ih < 2; ih++)
         {
-          h = dynamic_cast<R3BCaloHit*>(caloHits->At(idxMax[ih]));
+          h = dynamic_cast<R3BCalifaHitData*>(caloHits->At(idxMax[ih]));
           found_matching_track = false;
           for(int it = 0; it < startrackHits->GetEntries(); it++)
           {
@@ -1962,7 +1962,7 @@ void P2P(Long64_t nMax = 0, bool usetracks = true, bool useiphos = false, bool u
         _[1] = 1 - _[0];
         for(j = 0; j < 2; j++)
         {
-          h = dynamic_cast<R3BCaloHit*>(caloHits->At(idxMax[j]));
+          h = dynamic_cast<R3BCalifaHitData*>(caloHits->At(idxMax[j]));
           theta[_[j]] = h->GetTheta() * 180. / TMath::Pi() + rnd.Uniform(-THETA_SMEARING/2., THETA_SMEARING/2.);
           phi[_[j]] = h->GetPhi() * 180. / TMath::Pi() + rnd.Uniform(-PHI_SMEARING/2.,PHI_SMEARING/2.);
           e[_[j]] = 1000. * eMax[j];
@@ -2039,9 +2039,9 @@ void P2P(Long64_t nMax = 0, bool usetracks = true, bool useiphos = false, bool u
 
         if(Q.Mag() - MASS_RESIDUAL < -.5 && !usetracks)
         {
-          h = dynamic_cast<R3BCaloHit*>(caloHits->At(idxMax[0]));
+          h = dynamic_cast<R3BCalifaHitData*>(caloHits->At(idxMax[0]));
           hqpid_false->Fill(h->GetNf(), h->GetNs());
-          h = dynamic_cast<R3BCaloHit*>(caloHits->At(idxMax[1]));
+          h = dynamic_cast<R3BCalifaHitData*>(caloHits->At(idxMax[1]));
           hqpid_false->Fill(h->GetNf(), h->GetNs());
 
           cout << i << ": " << e[0] << " MeV, " << e[1] << " MeV" << endl;

@@ -36,7 +36,6 @@ ${FAIRROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
-R3BPrimaryGenerator.cxx
 R3BSpecificGenerator.cxx
 R3BReadKinematics.cxx
 R3BCDGenerator.cxx
@@ -48,11 +47,9 @@ R3BCosmicGenerator.cxx
 R3Bp2pGenerator.cxx
 R3BLandGenerator.cxx
 R3BCALIFATestGenerator.cxx
-R3BAsciiIQMDGen.cxx
-R3BAsciiUrQMDGen.cxx
 R3BIonGenerator.cxx
 R3BGammaGenerator.cxx
-
+R3BPhaseSpaceGenerator.cxx
 )
 
 # fill list of header files from list of source files
@@ -66,3 +63,12 @@ set(DEPENDENCIES
 
 GENERATE_LIBRARY()
 
+# Testing
+enable_testing()
+Set(GTEST_ROOT ${SIMPATH})
+find_package(GTest REQUIRED)
+include_directories(${GTEST_INCLUDE_DIRS})
+
+add_executable(testR3BPhaseSpaceGenerator testR3BPhaseSpaceGenerator.cxx)
+target_link_libraries(testR3BPhaseSpaceGenerator ${GTEST_BOTH_LIBRARIES} ${ROOT_LIBRARIES} R3BGen)
+add_test(R3BPhaseSpaceGeneratorUnitTest ${EXECUTABLE_OUTPUT_PATH}/testR3BPhaseSpaceGenerator)

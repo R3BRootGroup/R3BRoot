@@ -16,7 +16,25 @@
 //	(the macro will plot and text information as a function of these settings)
 //  -------------------------------------------------------------------------
 
-void RecResults(char* output) {
+
+Double_t GetThetaTrk(Double_t X, Double_t Y, Double_t Z);
+Double_t GetPhiTrk(Double_t X, Double_t Y);
+Float_t GetThetaTrack(Float_t X, Float_t Y);
+Float_t GetThetaScat(Float_t X, Float_t Y, Float_t Z);
+Float_t GetPhiScat(Float_t X, Float_t Y, Float_t Z);
+Float_t GetEnergy(Float_t X, Float_t Y, Float_t Z, Float_t M);
+Double_t GetERec(Double_t Ep, Double_t Th, Double_t Phi, Double_t Ebeam);
+Float_t GetERec(Float_t Ep3, Float_t Ep4, Float_t Th3, Float_t Phi3, Float_t Th4, Float_t Phi4, Float_t Ebeam);
+Float_t GetThetaCM(Float_t th3l);
+Float_t GetXVertex(Float_t X1, Float_t X2, Float_t X3, Float_t X4, Float_t Y1, Float_t Y2, Float_t Y3, Float_t Y4);
+Float_t GetYVertex(Float_t X1, Float_t X2, Float_t X3, Float_t X4, Float_t Y1, Float_t Y2, Float_t Y3, Float_t Y4);
+Float_t GetZVertex(Float_t X1, Float_t X2, Float_t X3, Float_t X4, Float_t Z1, Float_t Z2, Float_t Z3, Float_t Z4);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include "TFile.h"
+#include "TTree.h"
+
+void RecResults(const char* output) {
 
 
 
@@ -51,9 +69,10 @@ void RecResults(char* output) {
 
 	*/
 
-
-	sprintf(title0,"%s","startrackerAnaDigit.root");  	
- 	//sprintf(title1,"%s","r3bsim.root");  
+	//sprintf(title0,"%s","startrackerAnaDigit.root");  	
+	//sprintf(title0,"%s","startrackAnaDigit.root");  	
+ 	sprintf(title0,"%s","startrackAnaDigi.root");  	
+	//sprintf(title1,"%s","r3bsim.root");  
 	TFile *file0 = TFile::Open(title0);
 	//TFile *file1 = TFile::Open(title1);
 	
@@ -141,7 +160,8 @@ void RecResults(char* output) {
 
 
 	//Input trees:
-	TTree* TStarTrackDigit = (TTree*)file0->Get("cbmsim");
+//	TTree* TStarTrackDigit = (TTree*)file0->Get("cbmsim");
+	TTree* TStarTrackDigit = (TTree*)file0->Get("evt");
 	//TTree* TStarTracker = (TTree*)file1->Get("cbmsim");
 	
 	//Output file:
@@ -177,7 +197,7 @@ void RecResults(char* output) {
 	*/
 	
 	// for the tracker digit
-                     
+  /*                   
 	TBranchElement *branchDigitELoss = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fEnergy");
 	TBranchElement *branchDigitDetID = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fDetector");  // = DetcopyId here
 	TBranchElement *branchChip = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fChip");
@@ -186,6 +206,15 @@ void RecResults(char* output) {
 	//TBranchElement *branchStripfrt = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fStripfrt");
 	//TBranchElement *branchStripbck = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fStripbck");
 	TBranchElement *branchDigitTime = (TBranchElement*)TStarTrackDigit->GetBranch("STaRTrackerDigitHit.fTime");
+  */
+	TBranchElement *branchDigitELoss = (TBranchElement*)TStarTrackDigit->GetBranch("StartrackerDigitHit.fEnergy");
+	TBranchElement *branchDigitDetID = (TBranchElement*)TStarTrackDigit->GetBranch("StartrackerDigitHit.fDetector");  // = DetcopyId here
+	TBranchElement *branchChip = (TBranchElement*)TStarTrackDigit->GetBranch("StartrackerDigitHit.fChip");
+	TBranchElement *branchSide = (TBranchElement*)TStarTrackDigit->GetBranch("StartrackerDigitHit.fSide");
+	TBranchElement *branchStrip = (TBranchElement*)TStarTrackDigit->GetBranch("StartrackerDigitHit.fStrip");
+	//TBranchElement *branchStripfrt = (TBranchElement*)TStarTrackDigit->GetBranch("StartrackerDigitHit.fStripfrt");
+	//TBranchElement *branchStripbck = (TBranchElement*)TStarTrackDigit->GetBranch("StartrackerDigitHit.fStripbck");
+	TBranchElement *branchDigitTime = (TBranchElement*)TStarTrackDigit->GetBranch("StartrackerDigitHit.fTime");
 
 	//for califa
 	/*
@@ -1002,7 +1031,7 @@ void RecResults(char* output) {
 	    // 1st loop over TOTAL Tracker  Multiplicity = hit multiplicity (reading the tree)
 	    //
 
-	    //cout << "#### Reading the Tree  ####" <<  endl;
+	    cout << "#### Reading the Tree  ####" <<  endl;
 
 
 	    for(Int_t j=0; j<TotalTrackMult; j++)
@@ -1798,8 +1827,8 @@ Float_t GetPhiScat(Float_t X, Float_t Y, Float_t Z){
   if(X<0 && Y<0)Phi=TMath::PiOver2()+atan(Y/X);
   if(X>0 && Y<=0)Phi=1.5*TMath::Pi()+atan(Y/X);
 
-  if(X=0 && Y>0)Phi=1.5*TMath::Pi()+TMath::Pi()/2;
-  if(X=0 && Y<0)Phi=TMath::PiOver2()+TMath::Pi()/2;
+  if(X==0 && Y>0)Phi=1.5*TMath::Pi()+TMath::Pi()/2;
+  if(X==0 && Y<0)Phi=TMath::PiOver2()+TMath::Pi()/2;
 
   
   return Phi;
@@ -1814,7 +1843,7 @@ Float_t GetEnergy(Float_t X, Float_t Y, Float_t Z, Float_t M){
   Float_t E;
   Float_t T;
   Float_t P;
-  Float_t M; // GeV/C^2
+//  Float_t M; // GeV/C^2
   Float_t amugev = 931.5016/1000;
 
   // E=(pow(X,2)+pow(Y,2)+pow(Z,2))/(2.*M); //Non-relativistic

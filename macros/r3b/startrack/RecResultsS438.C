@@ -140,7 +140,8 @@ void RecResultsS438(char* output) {
 
 
 	//Input trees:
-	TTree* TStarTrackDigit = (TTree*)file0->Get("cbmsim");
+	//TTree* TStarTrackDigit = (TTree*)file0->Get("cbmsim");
+	TTree* TStarTrackDigit = (TTree*)file0->Get("evt");
 	//TTree* TStarTracker = (TTree*)file1->Get("cbmsim");
 	
 	//Output file:

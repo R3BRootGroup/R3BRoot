@@ -36,10 +36,10 @@ make
 cd %BUILD_DIRECTORY%
 . ./config.sh
 cd ../R3BRoot/macros/r3b/
-root -l r3bsim.C
+root -l run_sim.C
 ~~~
 
-This will create output file `r3bsim.root` with the simulation results and parameter file `r3bpar.root` with geometry and magnetic field parameters.
+This will create output file `sim.root` with the simulation results and parameter file `par.root` with geometry and magnetic field parameters.
 
 After the simulation run:
 
@@ -52,7 +52,7 @@ root -l eventDisplay.C
 2. To perform a quick analysis with GUI:
 
 ~~~bash
-root -l r3bsim.root
+root -l sim.root
 [] evt->StartViewer();
 ~~~
 

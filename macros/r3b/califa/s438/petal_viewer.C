@@ -36,9 +36,9 @@ void petal_viewer(TString inputFile="") {
  
   //Raw Hits (input)
   TClonesArray* rawHitCA;  
-  R3BCaloRawHit** rawHit;
-  rawHitCA = new TClonesArray("R3BCaloCrystalHit",5);
-  TBranch *branchRawHit = caloTree->GetBranch("CaloCrystalHit");
+  R3BCalifaMappedData** rawHit;
+  rawHitCA = new TClonesArray("R3BCalifaMappedData",5);
+  TBranch *branchRawHit = caloTree->GetBranch("CalifaMappedData");
   branchRawHit->SetAddress(&rawHitCA);
   
   Long64_t nevents = caloTree->GetEntries();
@@ -58,7 +58,7 @@ void petal_viewer(TString inputFile="") {
     //loop in RAW Hits
     if(rawHitsPerEvent>0) {
       for(Int_t h=0;h<rawHitsPerEvent;h++){
-	R3BCaloCrystalHit *hit = (R3BCaloCrystalHit*)rawHitCA->At(h);
+	R3BCalifaMappedData *hit = (R3BCalifaMappedData*)rawHitCA->At(h);
 	E_p1[hit->GetCrystalId()]->Fill(hit->GetEnergy());
 	//	cout<<"E "<<rawHit[h]->GetEnergy()<<endl;
       }

@@ -1,39 +1,35 @@
-// -------------------------------------------------------------------------
-// -----                        R3BGfi source file                     -----
-// -----                  Created 26/03/09  by D.Bertini               -----
-// -------------------------------------------------------------------------
-#include <stdlib.h>
-
 #include "R3BGfi.h"
-
-#include "R3BGeoGfi.h"
-#include "R3BGfiPoint.h"
-#include "R3BGeoGfiPar.h"
-#include "R3BMCStack.h"
-
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
 #include "FairGeoNode.h"
 #include "FairGeoRootBuilder.h"
 #include "FairRootManager.h"
-#include "FairRuntimeDb.h"
 #include "FairRun.h"
+#include "FairRuntimeDb.h"
 #include "FairVolume.h"
-
+#include "R3BGeoGfi.h"
+#include "R3BGeoGfiPar.h"
+#include "R3BGfiPoint.h"
+#include "R3BMCStack.h"
 #include "TClonesArray.h"
 #include "TGeoMCGeometry.h"
+#include "TGeoManager.h"
+#include "TObjArray.h"
 #include "TParticle.h"
 #include "TVirtualMC.h"
-#include "TObjArray.h"
+#include <stdlib.h>
 
-// includes for modeling
-#include "TGeoManager.h"
-
-// -----   Default constructor   -------------------------------------------
-R3BGfi::R3BGfi()
-    : R3BDetector("R3BGfi", kTRUE, kGFI)
+R3BGfi::R3BGfi(const TString& geoFile)
+    : R3BDetector("R3BGfi", kGFI)
+    , fPos1(-73.274339, 0.069976, 513.649524)
+    , fPos2(-147.135037, 0.069976, 729.680342)
+    , fRot1(new TGeoRotation())
+    , fRot2(new TGeoRotation())
 {
     ResetParameters();
+    SetGeometryFileName(geoFile);
+    fRot1->RotateY(-16.7);
+    fRot2->RotateY(-16.7);
     fGfiCollection = new TClonesArray("R3BGfiPoint");
     fPosIndex = 0;
     kGeoSaved = kFALSE;
@@ -41,13 +37,26 @@ R3BGfi::R3BGfi()
     flGeoPar->SetName(GetName());
     fVerboseLevel = 1;
 }
-// -------------------------------------------------------------------------
 
-// -----   Standard constructor   ------------------------------------------
-R3BGfi::R3BGfi(const char* name, Bool_t active)
-    : R3BDetector(name, active, kGFI)
+R3BGfi::R3BGfi(const TString& geoFile,
+               const Double_t x1,
+               const Double_t y1,
+               const Double_t z1,
+               const Double_t rot_y1,
+               const Double_t x2,
+               const Double_t y2,
+               const Double_t z2,
+               const Double_t rot_y2)
+    : R3BDetector("R3BGfi", kGFI)
+    , fPos1(x1, y1, z1)
+    , fPos2(x2, y2, z2)
+    , fRot1(new TGeoRotation())
+    , fRot2(new TGeoRotation())
 {
     ResetParameters();
+    SetGeometryFileName(geoFile);
+    fRot1->RotateY(rot_y1);
+    fRot2->RotateY(rot_y2);
     fGfiCollection = new TClonesArray("R3BGfiPoint");
     fPosIndex = 0;
     kGeoSaved = kFALSE;
@@ -55,21 +64,19 @@ R3BGfi::R3BGfi(const char* name, Bool_t active)
     flGeoPar->SetName(GetName());
     fVerboseLevel = 1;
 }
-// -------------------------------------------------------------------------
 
-// -----   Destructor   ----------------------------------------------------
 R3BGfi::~R3BGfi()
 {
-
     if (flGeoPar)
+    {
         delete flGeoPar;
+    }
     if (fGfiCollection)
     {
         fGfiCollection->Delete();
         delete fGfiCollection;
     }
 }
-// -------------------------------------------------------------------------
 
 void R3BGfi::Initialize()
 {
@@ -105,7 +112,8 @@ void R3BGfi::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Si Only
             Double_t cutE = fCutE; // GeV-> 1 keV
 
-            LOG(INFO) << "-I- R3BGfi: plasticForGFI Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV" << FairLogger::endl;
+            LOG(INFO) << "-I- R3BGfi: plasticForGFI Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE
+                      << " GeV" << FairLogger::endl;
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
             gMC->Gstpar(pSi->GetId(), "CUTELE", cutE); /** electrons (GeV)*/
@@ -119,7 +127,7 @@ void R3BGfi::SetSpecialPhysicsCuts()
             gMC->Gstpar(pSi->GetId(), "PPCUTM", -1.);  /** direct pair production by muons (GeV)*/
         }
 
-    } //!gGeoManager
+    } //! gGeoManager
 }
 
 // -----   Public method ProcessHits  --------------------------------------
@@ -155,8 +163,8 @@ Bool_t R3BGfi::ProcessHits(FairVolume* vol)
         fVolumeID = vol->getMCid();
         gMC->TrackPosition(fPosOut);
         gMC->TrackMomentum(fMomOut);
-//        if (fELoss == 0.)
-//            return kFALSE;
+        //        if (fELoss == 0.)
+        //            return kFALSE;
 
         fTime_out = gMC->TrackTime() * 1.0e09; // also in case particle is stopped in detector, or decays...
         fLength_out = gMC->TrackLength();
@@ -175,7 +183,8 @@ Bool_t R3BGfi::ProcessHits(FairVolume* vol)
             oldpos = gGeoManager->GetCurrentPoint();
             olddirection = gGeoManager->GetCurrentDirection();
 
-            //       cout << "1st direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] << endl;
+            //       cout << "1st direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] <<
+            //       endl;
 
             for (Int_t i = 0; i < 3; i++)
             {
@@ -195,8 +204,8 @@ Bool_t R3BGfi::ProcessHits(FairVolume* vol)
 
             if (fPosIn.Z() < 30. && newpos[2] > 30.02)
             {
-                LOG(ERROR) << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] << " with safety = " << safety
-                           << FairLogger::endl;
+                LOG(ERROR) << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2]
+                           << " with safety = " << safety << FairLogger::endl;
                 LOG(ERROR) << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << FairLogger::endl;
                 LOG(ERROR) << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << FairLogger::endl;
             }
@@ -250,10 +259,7 @@ void R3BGfi::EndOfEvent()
 // ----------------------------------------------------------------------------
 
 // -----   Public method Register   -------------------------------------------
-void R3BGfi::Register()
-{
-    FairRootManager::Instance()->Register("GFIPoint", GetName(), fGfiCollection, kTRUE);
-}
+void R3BGfi::Register() { FairRootManager::Instance()->Register("GFIPoint", GetName(), fGfiCollection, kTRUE); }
 // ----------------------------------------------------------------------------
 
 // -----   Public method GetCollection   --------------------------------------
@@ -315,8 +321,9 @@ R3BGfiPoint* R3BGfi::AddHit(Int_t trackID,
     TClonesArray& clref = *fGfiCollection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
-        LOG(INFO) << "R3BGfi: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z() << ") cm,  detector " << detID << ", track " << trackID
-                  << ", energy loss " << eLoss * 1e06 << " keV" << FairLogger::endl;
+        LOG(INFO) << "R3BGfi: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
+                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV"
+                  << FairLogger::endl;
     return new (clref[size]) R3BGfiPoint(trackID, detID, plane, posIn, posOut, momIn, momOut, time, length, eLoss);
 }
 
@@ -328,6 +335,19 @@ void R3BGfi::ConstructGeometry()
     {
         LOG(INFO) << "Constructing GFI geometry from ROOT file " << fileName.Data() << FairLogger::endl;
         ConstructRootGeometry();
+
+        TGeoNode* gfi_node = gGeoManager->GetTopVolume()->GetNode("GFI_0");
+
+        TGeoNode* node = gfi_node->GetVolume()->GetNode("GFILogWorld_0");
+        TGeoCombiTrans* combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
+        TGeoTranslation* tr1 = new TGeoTranslation(fPos1.X(), fPos1.Y(), fPos1.Z());
+        *combtrans = {*tr1, *fRot1};
+
+        node = gfi_node->GetVolume()->GetNode("GFILogWorld_1");
+        combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
+        TGeoTranslation* tr2 = new TGeoTranslation(fPos2.X(), fPos2.Y(), fPos2.Z());
+        *combtrans = {*tr2, *fRot2};
+
     }
     else
     {

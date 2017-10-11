@@ -20,17 +20,17 @@ Analysis:
 	     
 		The tracks are reconstructed in 2 steps with: 
 
-		root -l StarTrackAnaDigit.C   -> reads the r3bsim.root output file and creates a new output tree called "startrackerAnaDigit.root" 
+		root -l StartrackAnaDigi.C   -> reads the r3bsim.root output file and creates a new output tree called "startrackAnaDigi.root" 
 		     			      	 with RAW information similar to the DAQ output
 
 		.L RecResults.C  
-		RecResult("output.root")      -> reads the "startrackerAnaDigit.root" and reconstruct tracks and other physical observables from the detector Id, strip ID, energy loss and time 
+		RecResult("output.root")      -> reads the "startrackAnaDigi.root" and reconstruct tracks and other physical observables from the detector Id, strip ID, energy loss and time 
 
 		or .L RecResultsGene.C
-		RecResultGene("output.root")  -> reads the "startrackerAnaDigit.root" and reconstruct tracks and other physical observables from the detector Id, strip ID, energy loss and time 
+		RecResultGene("output.root")  -> reads the "startrackAnaDigi.root" and reconstruct tracks and other physical observables from the detector Id, strip ID, energy loss and time 
 						      as above but more general (looking at all hits in each layers)
 		or .L RecResultsClust.C
-		RecResultsClust(mode,"output.root")  -> reads the "startrackerAnaDigit.root" and reconstruct tracks and other physical observables from the detector Id, strip ID, energy loss and time
+		RecResultsClust(mode,"output.root")  -> reads the "startrackAnaDigi.root" and reconstruct tracks and other physical observables from the detector Id, strip ID, energy loss and time
 	                                                  as above but with also a search and identification of strip cluster (RECOMMANDED !!!!)
 							  mode=0 : Elastic/Inelastic (pp), (pp'), (p,d), (pd'), ...
 							  mode=1 : Knock out (p2p), (ppd), ... 	 

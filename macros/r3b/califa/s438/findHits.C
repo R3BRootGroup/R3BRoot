@@ -11,7 +11,7 @@ void findHits(TString inputFile="", TString outputFile="", Int_t nEvents = 0)
   fRun->SetOutputFile(outputFile);
  
   // Hit finder
-  R3BCaloHitFinder *hitFinder = new R3BCaloHitFinder();
+  R3BCalifaCrystalCal2Hit *hitFinder = new R3BCalifaCrystalCal2Hit();
   // Select s438b Demonstrator Geometry
   hitFinder->SelectGeometryVersion(0x438b);
   hitFinder->SetAngularWindow(6.0*TMath::Pi()/180.0, 6.0*TMath::Pi()/180.0, 0);

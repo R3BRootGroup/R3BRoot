@@ -1,16 +1,7 @@
-// -------------------------------------------------------------------------
-// -----                        R3BGfi header file                     -----
-// -----                  Created 26/03/09  by D.Bertini               -----
-// -------------------------------------------------------------------------
-
-/**  R3BGfi.h
- **/
-
 #ifndef R3BGFI_H
 #define R3BGFI_H
 
 #include "R3BDetector.h"
-
 #include "TLorentzVector.h"
 
 class TClonesArray;
@@ -19,19 +10,29 @@ class FairVolume;
 
 class R3BGfi : public R3BDetector
 {
-
   public:
     /** Default constructor **/
-    R3BGfi();
+    R3BGfi(const TString& geoFile = "");
 
     /** Standard constructor.
-     *@param name    detetcor name
+     *@param name    detector name
+     *@param geoFile name of the geometry version
      *@param active  sensitivity flag
+     *@param x,y,z   position of station 1 and 2
+     *@param rot_y   rotation of station 1 and 2
      **/
-    R3BGfi(const char* name, Bool_t active);
+    R3BGfi(const TString& geoFile,
+           const Double_t x1,
+           const Double_t y1,
+           const Double_t z1,
+           const Double_t rot_y1,
+           const Double_t x2,
+           const Double_t y2,
+           const Double_t z2,
+           const Double_t rot_y2);
 
     /** Destructor **/
-    virtual ~R3BGfi();
+    ~R3BGfi();
 
     /** Virtual method ProcessHits
      **
@@ -118,6 +119,11 @@ class R3BGfi : public R3BDetector
     Bool_t kGeoSaved;               //!
     TList* flGeoPar;                //!
 
+    TVector3 fPos1;      //!
+    TVector3 fPos2;      //!
+    TGeoRotation* fRot1; //!
+    TGeoRotation* fRot2; //!
+
     /** Private method AddHit
      **
      ** Adds a GfiPoint to the HitCollection
@@ -139,7 +145,7 @@ class R3BGfi : public R3BDetector
      **/
     void ResetParameters();
 
-    ClassDef(R3BGfi, 1);
+    ClassDef(R3BGfi, 3);
 };
 
 inline void R3BGfi::ResetParameters()

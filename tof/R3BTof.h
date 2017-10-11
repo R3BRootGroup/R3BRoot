@@ -1,16 +1,7 @@
-// -------------------------------------------------------------------------
-// -----                        R3BTof header file                     -----
-// -----                  Created 26/03/09  by D.Bertini               -----
-// -------------------------------------------------------------------------
-
-/**  R3BTof.h
- **/
-
 #ifndef R3BTOF_H
 #define R3BTOF_H
 
 #include "R3BDetector.h"
-
 #include "TLorentzVector.h"
 
 class TClonesArray;
@@ -19,19 +10,25 @@ class FairVolume;
 
 class R3BTof : public R3BDetector
 {
-
   public:
     /** Default constructor **/
     R3BTof();
 
     /** Standard constructor.
-     *@param name    detetcor name
-     *@param active  sensitivity flag
-     **/
-    R3BTof(const char* name, Bool_t active);
+     *@param geoFile name of the ROOT geometry file
+     *@param trans   position
+     *@param rot     rotation
+     */
+    R3BTof(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot = TGeoRotation());
+
+    /** Standard constructor.
+     *@param geoFile name of the ROOT geometry file
+     *@param combi   position + rotation
+     */
+    R3BTof(const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
 
     /** Destructor **/
-    virtual ~R3BTof();
+    ~R3BTof();
 
     /** Virtual method ProcessHits
      **
@@ -88,12 +85,6 @@ class R3BTof : public R3BDetector
      **/
     virtual void CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset);
 
-    /** Virtaul method Construct geometry
-     **
-     ** Constructs the STS geometry
-     **/
-    virtual void ConstructGeometry();
-
     virtual Bool_t CheckIfSensitive(std::string name);
 
     virtual void Initialize();
@@ -125,8 +116,15 @@ class R3BTof : public R3BDetector
      **
      ** Adds a TofPoint to the HitCollection
      **/
-    R3BTofPoint*
-        AddHit(Int_t trackID, Int_t detID, TVector3 posIn, TVector3 pos_out, TVector3 momIn, TVector3 momOut, Double_t time, Double_t length, Double_t eLoss);
+    R3BTofPoint* AddHit(Int_t trackID,
+                        Int_t detID,
+                        TVector3 posIn,
+                        TVector3 pos_out,
+                        TVector3 momIn,
+                        TVector3 momOut,
+                        Double_t time,
+                        Double_t length,
+                        Double_t eLoss);
 
     /** Private method ResetParameters
      **
@@ -134,7 +132,7 @@ class R3BTof : public R3BDetector
      **/
     void ResetParameters();
 
-    ClassDef(R3BTof, 1);
+    ClassDef(R3BTof, 3);
 };
 
 inline void R3BTof::ResetParameters()

@@ -79,7 +79,7 @@ void r3bsim_g4()
   TMap detGeo;
   detGeo.Add(new TObjString("TARGET"),        new TObjString("target_"+target4+".geo.root"));
   detGeo.Add(new TObjString("ALADIN"),        new TObjString("aladin_v13a.geo.root"));
-//  detGeo.Add(new TObjString("GLAD"),          new TObjString("glad_v13a.geo.root"));
+//  detGeo.Add(new TObjString("GLAD"),          new TObjString("glad_v17_flange.geo.root"));
   detGeo.Add(new TObjString("CRYSTALBALL"),   new TObjString("cal_v13a.geo.root"));
 //  detGeo.Add(new TObjString("CALIFA"),        new TObjString("califa_v14a.geo.root"));
 //  detGeo.Add(new TObjString("CALIFA"),        new TObjString("califa_v13_811.geo.root"));

@@ -553,8 +553,19 @@ void create_aladin_geo(const char* geoTag)
   
   cell->AddNode(pAupLog,1,pMatrix67);
   cell->AddNode(pAdownLog,1,pMatrix68);
+
+
+    TGeoVolumeAssembly* top_cell = new TGeoVolumeAssembly("ALADIN");
+
+    TGeoCombiTrans* inverse_matr = new TGeoCombiTrans("");
+    inverse_matr->SetTranslation(0., 0., -1. * DistanceFromtargetToAladinCenter);
+    inverse_matr->RotateY(-1. * Aladin_angle);
+    top_cell->AddNode(cell, 1, inverse_matr);
+
+    TGeoCombiTrans* aladin_matr = new TGeoCombiTrans(0., 0., DistanceFromtargetToAladinCenter, rot_aladin);
+
   
-  top->AddNode(cell, 1, pMatrix0);
+  top->AddNode(top_cell, 1, aladin_matr);
   
   
   

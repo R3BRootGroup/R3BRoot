@@ -3,9 +3,8 @@
 
 #include "R3BDetector.h"
 #include "TLorentzVector.h"
-
-#include <string>
 #include <memory>
+#include <string>
 
 class FairVolume;
 class TClonesArray;
@@ -29,14 +28,18 @@ class R3BNeuland : public R3BDetector
     R3BNeuland();
 
     /** Standard constructor.
-     *@param name    detector name
-     *@param active  sensitivity flag
-     */
-    R3BNeuland(const char* name, Bool_t active);
+     *@param geoFile name of the ROOT geometry file
+     *@param trans   position
+     *@param rot     rotation */
+    R3BNeuland(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot = TGeoRotation());
+
+    /** Standard constructor.
+     *@param geoFile name of the ROOT geometry file
+     *@param combi   position + rotation */
+    R3BNeuland(const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
 
     /** Default Destructor */
-    // virtual ~R3BNeuland() = default;
-    virtual ~R3BNeuland(){};
+    ~R3BNeuland();
 
     virtual void Initialize(); // override;
 
@@ -52,8 +55,6 @@ class R3BNeuland : public R3BDetector
 
     virtual void Reset(); // override;
 
-    virtual void ConstructGeometry(); // override;
-
     virtual void PostTrack(); // override;
 
     virtual Bool_t CheckIfSensitive(std::string name); // override;
@@ -63,11 +64,11 @@ class R3BNeuland : public R3BDetector
     // R3BNeuland &operator=(const R3BNeuland &) = delete;
 
   private:
-    TClonesArray* fNeulandPoints;
-    TClonesArray* fNeulandPrimaryNeutronInteractionPoints;
-    TClonesArray* fNeulandPrimaryNeutronInteractionPixel;
+    TClonesArray* fNeulandPoints;                          //!
+    TClonesArray* fNeulandPrimaryNeutronInteractionPoints; //!
+    TClonesArray* fNeulandPrimaryNeutronInteractionPixel;  //!
 
-    R3BNeulandGeoPar* fNeulandGeoPar;
+    R3BNeulandGeoPar* fNeulandGeoPar; //!
 
     /** Track information to be stored until the track leaves the active volume. */
     // TODO: Just fill an existing R3BLandPoint in the TClonesArray or
@@ -86,12 +87,8 @@ class R3BNeuland : public R3BDetector
 
     void WriteParameterFile();
 
-    /** ROOT ClassDef
-     * ClassDefOverride to avoid inconsistent-missing-override warnings
-     * ClassVersionID = 0, this class should not be read/written (no IO necessary)
-     */
     // ClassDefOverride(R3BNeuland, 0);
-    ClassDef(R3BNeuland, 0);
+    ClassDef(R3BNeuland, 2);
 };
 
 #endif // R3BNEULAND_H

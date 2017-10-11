@@ -1,35 +1,6 @@
-#include <iomanip>
-#include <iostream>
-#include "TGeoManager.h"
-#include "TMath.h"
-
-// Create Matrix Unity
-TGeoRotation *fGlobalRot = new TGeoRotation();
-
-// Create a null translation
-TGeoTranslation *fGlobalTrans = new TGeoTranslation();
-TGeoRotation *fRefRot = NULL;
-
-TGeoManager*  gGeoMan = NULL;
-
-Double_t fThetaX = 0.;
-Double_t fThetaY = 0.;
-Double_t fThetaZ = 0.;
-Double_t fPhi   = 0.;
-Double_t fTheta = 0.;
-Double_t fPsi   = 0.;
-Double_t fX = 0.;
-Double_t fY = 0.;
-Double_t fZ = 0.;
-Bool_t fLocalTrans = kFALSE;
-Bool_t fLabTrans = kTRUE;
-
-TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef);
-
 void create_dtof_geo(const char* geoTag)
 {
 
-  fGlobalTrans->SetTranslation(0.0,0.0,0.0);
 
   // -------   Load media from media file   -----------------------------------
   FairGeoLoader*    geoLoad = new FairGeoLoader("TGeo","FairGeoLoader");
@@ -63,7 +34,8 @@ void create_dtof_geo(const char* geoTag)
   FairGeoMedium* mTof      = geoMedia->getMedium("plasticFormTOF");
   if ( ! mTof ) Fatal("Main", "FairMedium plasticFormTOF not found");
   geoBuild->createMedium(mTof);
-  TGeoMedium* pMed34 = gGeoMan->GetMedium("plasticFormTOF");
+  TGeoMedium* pMed34 
+  = gGeoMan->GetMedium("plasticFormTOF");
   if ( ! pMed34 ) Fatal("Main", "Medium plasticFormTOF not found");
   // --------------------------------------------------------------------------
 
@@ -76,121 +48,81 @@ void create_dtof_geo(const char* geoTag)
   gGeoMan->SetTopVolume(top);
   // --------------------------------------------------------------------------
 
-
-
-  // out-of-file geometry definition
-  Double_t dx,dy,dz;
-  Double_t a;
-  Double_t thx, phx, thy, phy, thz, phz;
-  Double_t z, density, w;
-  Int_t nel, numed;
-  
-
-  
-  // TRANSFORMATION MATRICES
-  // Combi transformation:
-  //NTF position
-  //dx = -154.815998;//Justyna
-  //dy = 0.000000;  //Justyna
-  //dz = 761.755160;//Justyna
-  //dx = -157.536214;//Justyna new
-  //dy = -0.010000;  //Justyna new
-  ////dz = 760.939056;//Justyna new
-  //dz = 760.139056;//Justyna
-  //dx = -155.709;//dE tracker
-  //dy = 0.524;
-  ////dz = 761.487;
-  //dz = 760.687;	//try -0.8 like Justyna
   
   //LABPOS(FTF,-155.824045,0.523976,761.870346)
-  dx = -155.824045;//dE tracker, correction due to wrong angle
-  dy = 0.523976;
-  dz = 761.870346;
+  Float_t x = -155.824045;//dE tracker, correction due to wrong angle
+  Float_t y = 0.523976;
+  Float_t z = 761.870346;
   
-  // Rotation:
-  thx = -106.700000;    phx = 0.000000;
-  thy = 90.000000;    phy = 90.000000;
-  thz = -16.700000;    phz = 0.000000;
+  // Rotation: 16.7 around y-axis
+
   
-  /*    dx = -171.1;
-   dy = 2.400000;
-   dz = 548.95;
-   // dz = 0.;
-   // Rotation:
-   thx = -121.000000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = -31.000000;    phz = 0.000000;*/
+  TGeoRotation *pMatrix1 = new TGeoRotation();
+  pMatrix1->RotateY(-16.7);
+  TGeoCombiTrans* pMatrix2 = new TGeoCombiTrans("", x,y,z,pMatrix1);
+
   
-  TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-  TGeoCombiTrans*
-  pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
-  
-  /*
-   // TRANSFORMATION MATRICES
-   // Combi transformation:
-   dx = 151.000000;
-   dy = 0.000000;
-   dz = 758.000000;
-   // Rotation:
-   thx = 106.700000;    phx = 0.000000;
-   thy = 90.000000;    phy = 90.000000;
-   thz = 16.700000;    phz = 0.000000;
-   TGeoRotation *pMatrix3 = new TGeoRotation("",thx,phx,thy,phy,thz,phz);
-   TGeoCombiTrans*
-   pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
-   */
+
   
   // Shape: World type: TGeoBBox
-  TGeoVolume* pWorld = gGeoManager->GetTopVolume();
+  TGeoVolume* pWorld = gGeoManager->GetTopVolume(); // Top volume
   pWorld->SetVisLeaves(kTRUE);
-  
-  // Create a global Mother Volume
-  /*
-   dx = 200.000000;
-   dy = 200.000000;
-   dz = 200.000000;
-   TGeoShape *pBoxWorld = new TGeoBBox("mTofBoxWorld", dx,dy,dz);
-   TGeoVolume*
-   pWorld  = new TGeoVolume("mTofBoxLogWorld",pBoxWorld, pMed2);
-   pWorld->SetVisLeaves(kTRUE);
-   TGeoCombiTrans *pGlobalc = GetGlobalPosition();
-   
-   // add the sphere as Mother Volume
-   pAWorld->AddNode(pWorld, 0, pGlobalc);
-   */
+  TGeoVolumeAssembly* pW = new TGeoVolumeAssembly("dTOF"); // keeping volume 
+  pWorld->AddNode(pW, 0, pMatrix2);
   
   
   // SHAPES, VOLUMES AND GEOMETRICAL HIERARCHY
   // Shape: mTOFBox type: TGeoBBox
-  dx = 24.000000;
-  dy = 24.000000;
-  //dz = 0.250000;	//wrong: should be 0.5->1cm total
-  dz = 0.500000;
+  Float_t detector_width = 13.500000;
+  Float_t detector_height = 50.000000;
+  Float_t detector_thickness = 0.500000; 
+
+  Float_t paddle_width = 1.350000;
+  Float_t paddle_thickness = 0.250000; 
   
-  /*   dx = 94.450000;  //TFW size
-   dy = 73.450000;
-   dz = 0.500000;*/
   
-  TGeoShape *pmTOFBox = new TGeoBBox("dTOFBox", dx,dy,dz);
-  // Volume: mTOFLog
-  TGeoVolume *
-  pmTOFLog = new TGeoVolume("dTOFLog",pmTOFBox, pMed34);
-  pmTOFLog->SetVisLeaves(kTRUE);
+  // define number of layers and paddles with sizes of the detector
+  Int_t number_layers = detector_thickness/paddle_thickness; // number of layers
+  Int_t number_paddles = detector_width/paddle_width; // number of paddles per layer
   
-  TGeoVolumeAssembly *pmTof = new TGeoVolumeAssembly("dTOF");
-  TGeoCombiTrans *t0 = new TGeoCombiTrans("t0");
-  pmTof->AddNode(pmTOFLog, 0, t0);
+  /*// directly set number of layers and paddles
+  Int_t number_layers = 2;
+  Int_t number_paddles = 10; */
   
-  TGeoCombiTrans *pGlobal = GetGlobalPosition(pMatrix2);
-  if (pGlobal){
-    pWorld->AddNode(pmTof, 0, pGlobal);
-  }else{
-    pWorld->AddNode(pmTof, 0, pMatrix2);
+  TGeoShape *TOFd_Paddle_Box = new TGeoBBox("TOFd_Paddle_Box", paddle_width,detector_height,paddle_thickness);
+  // Volume
+  //TGeoVolume* TOFd_Paddle_Log = new TGeoVolume("mTOFLog",TOFd_Paddle_Box, pMed34); //TOFd_Paddle_Log
+  //TOFd_Paddle_Log->SetVisLeaves(kTRUE);
+  
+  cout << number_paddles << endl;
+  
+  // build layers of paddles 
+  int layer_label;
+  int paddle_index = 0 ;
+  
+  for(int layer_number = 0; layer_number < number_layers; layer_number++){
+	  
+	  if((layer_number%2)==0){layer_label=0;} else {layer_label=1;}
+	  
+	  
+	  for(int paddle_number = 0; paddle_number < number_paddles; paddle_number++){
+		  
+		Float_t paddle_xposition = -detector_width + paddle_width*(1+layer_label) + paddle_number*(paddle_width*2 + 0.05);
+		Float_t paddle_zposition = -detector_thickness + paddle_thickness + (layer_number*(paddle_thickness*2 + 0.05));
+		
+		TGeoCombiTrans* pMatrix3 = new TGeoCombiTrans("", paddle_xposition,0,paddle_zposition,new TGeoRotation());
+		
+		TGeoVolume* TOFd_Paddle_Log = new TGeoVolume(Form("dTOFLog%d",paddle_index),TOFd_Paddle_Box, pMed34);
+		
+		if((paddle_index%2)==0){TOFd_Paddle_Log->SetLineColor(kBlue);}
+		else {TOFd_Paddle_Log->SetLineColor(kRed);}
+		
+		
+		pW->AddNode(TOFd_Paddle_Log, paddle_index, pMatrix3);
+		cout << "paddle number" << paddle_index << endl ;
+		paddle_index++;
+	  }
   }
-  
-  
-//  AddSensitiveVolume(pmTOFLog);
-//  fNbOfSensitiveVol+=1;
   
   
   
@@ -205,112 +137,3 @@ void create_dtof_geo(const char* geoTag)
   geoFile->Close();
   // --------------------------------------------------------------------------
 }
-
-
-
-
-TGeoCombiTrans* GetGlobalPosition(TGeoCombiTrans *fRef)
-{
-  if (fLocalTrans == kTRUE ) {
-    
-    if ( ( fThetaX == 0 )  && ( fThetaY==0 )  && ( fThetaZ == 0 )
-	 &&
-	 ( fX == 0 ) && ( fY == 0 ) && ( fZ == 0 )
-	 )  return fRef;
-    
-    
-    // X axis
-    Double_t xAxis[3] = { 1. , 0. , 0. };
-    Double_t yAxis[3] = { 0. , 1. , 0. };
-    Double_t zAxis[3] = { 0. , 0. , 1. };
-    // Reference Rotation
-    fRefRot = fRef->GetRotation();
-    
-    if (fRefRot) {
-      Double_t mX[3] = {0.,0.,0.};
-      Double_t mY[3] = {0.,0.,0.};
-      Double_t mZ[3] = {0.,0.,0.};
-      
-      fRefRot->LocalToMasterVect(xAxis,mX);
-      fRefRot->LocalToMasterVect(yAxis,mY);
-      fRefRot->LocalToMasterVect(zAxis,mZ);
-      
-      Double_t a[4]={ mX[0],mX[1],mX[2], fThetaX };
-      Double_t b[4]={ mY[0],mY[1],mY[2], fThetaY };
-      Double_t c[4]={ mZ[0],mZ[1],mZ[2], fThetaZ };
-      
-      ROOT::Math::AxisAngle aX(a,a+4);
-      ROOT::Math::AxisAngle aY(b,b+4);
-      ROOT::Math::AxisAngle aZ(c,c+4);
-      
-      ROOT::Math::Rotation3D fMatX( aX );
-      ROOT::Math::Rotation3D fMatY( aY );
-      ROOT::Math::Rotation3D fMatZ( aZ );
-      
-      ROOT::Math::Rotation3D  fRotXYZ = (fMatZ * (fMatY * fMatX));
-      
-      //cout << fRotXYZ << endl;
-      
-      Double_t fRotable[9]={0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0};
-      fRotXYZ.GetComponents(
-			    fRotable[0],fRotable[3],fRotable[6],
-			    fRotable[1],fRotable[4],fRotable[7],
-			    fRotable[2],fRotable[5],fRotable[8]
-			    );
-      TGeoRotation *pRot = new TGeoRotation();
-      pRot->SetMatrix(fRotable);
-      TGeoCombiTrans *pTmp = new TGeoCombiTrans(*fGlobalTrans,*pRot);
-      
-      // ne peut pas etre applique ici
-      // il faut differencier trans et rot dans la multi.
-      TGeoRotation rot_id;
-      rot_id.SetAngles(0.0,0.0,0.0);
-      
-      TGeoCombiTrans c1;
-      c1.SetRotation(rot_id);
-      const Double_t *t = pTmp->GetTranslation();
-      c1.SetTranslation(t[0],t[1],t[2]);
-      
-      TGeoCombiTrans c2;
-      c2.SetRotation(rot_id);
-      const Double_t *tt = fRefRot->GetTranslation();
-      c2.SetTranslation(tt[0],tt[1],tt[2]);
-      
-      TGeoCombiTrans cc = c1 * c2 ;
-      
-      TGeoCombiTrans c3;
-      c3.SetRotation(pTmp->GetRotation());
-      TGeoCombiTrans c4;
-      c4.SetRotation(fRefRot);
-      
-      TGeoCombiTrans ccc = c3 * c4;
-      
-      TGeoCombiTrans pGlobal;
-      pGlobal.SetRotation(ccc.GetRotation());
-      const Double_t *allt = cc.GetTranslation();
-      pGlobal.SetTranslation(allt[0],allt[1],allt[2]);
-      
-      return  ( new TGeoCombiTrans( pGlobal ) );
-      
-    }else{
-      
-      cout << "-E- R3BDetector::GetGlobalPosition() \
-	      No. Ref. Transformation defined ! " << endl;
-      cout << "-E- R3BDetector::GetGlobalPosition() \
-	      cannot create Local Transformation " << endl;
-      return NULL;
-    } //! fRefRot
-    
-  } else {
-    // Lab Transf.
-    if ( ( fPhi == 0 )  && ( fTheta==0 )  && ( fPsi == 0 )
-	 &&
-	 ( fX == 0 ) && ( fY == 0 ) && ( fZ == 0 )
-	 )  return fRef;
-    
-    
-    return ( new TGeoCombiTrans(*fGlobalTrans,*fGlobalRot) );
-    
-  }
-}
-

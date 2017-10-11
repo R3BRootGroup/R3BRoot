@@ -10,7 +10,7 @@
 #include <TVector3.h>
 #include <TGeoArb8.h>
 
-#include "../../../../cal/R3BCaloGeometry.h"
+#include "../../../../califa/R3BCalifaGeometry.h"
 
 int fbxPetalCrystalIdBase[64] =
 {
@@ -51,7 +51,7 @@ TGeoRotation rotPetal;
 
 double theta_exp[128], theta_sim, dtmp;
 
-R3BCaloGeometry *geo_sim;
+R3BCalifaGeometry *geo_sim;
 
 using namespace std;
 
@@ -61,8 +61,8 @@ void PlotPhiTheta()
   TH2I *hexpphi = new TH2I("hexpphi", "Phi Experiment", 128, 0, 128, 360, 0, 360);
   TH2I *hsimtheta = new TH2I("hsimtheta", "Theta Sim Model", 128, 0, 128, 180, 0, 180);
   TH2I *hexptheta = new TH2I("hexptheta", "Theta Experiment", 128, 0, 128, 180, 0, 180);
-  R3BCaloGeometry *geo = R3BCaloGeometry::Instance(17);
-  R3BCaloGeometry *geoe = R3BCaloGeometry::Instance(0x438b);
+  R3BCalifaGeometry *geo = R3BCalifaGeometry::Instance(17);
+  R3BCalifaGeometry *geoe = R3BCalifaGeometry::Instance(0x438b);
 
   double phi, theta, dtmp;
   int crystalId, fbxChannel, order, row, petal;
@@ -219,7 +219,7 @@ void CalcChiSqu(int &npar, double *gin, double &f, double *par, int iflag)
 // Note: Execute with Alveoli copies 0, 1 to get transformation matrix
 void Fit()
 {
-  geo_sim = R3BCaloGeometry::Instance(0x438b);
+  geo_sim = R3BCalifaGeometry::Instance(0x438b);
 
   for(int i = 0; i < 64; i++)
   {
@@ -288,8 +288,8 @@ void Plot()
     htheta[i] = new TH2I(Form("theta%d", i), Form("Theta %d", i), 180, 0, 180, 180, 0, 180);
   }
 
-  R3BCaloGeometry *gsim = R3BCaloGeometry::Instance(17);
-  R3BCaloGeometry *gexp = R3BCaloGeometry::Instance(0x438b);
+  R3BCalifaGeometry *gsim = R3BCalifaGeometry::Instance(17);
+  R3BCalifaGeometry *gexp = R3BCalifaGeometry::Instance(0x438b);
 
   double phi_exp, theta_exp, rho_exp, phi_sim, theta_sim, rho_sim;
 

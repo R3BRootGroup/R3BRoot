@@ -10,15 +10,14 @@
 #pragma link C++ class R3BMCTrack+;
 
 #pragma link C++ class R3BXBallPoint+;
-#pragma link C++ class R3BCaloRawHit+;
 #pragma link C++ class R3BXBallCrystalHit+;
 #pragma link C++ class R3BXBallCrystalHitSim+;
-#pragma link C++ class R3BCaloCrystalHit+;
-#pragma link C++ class R3BCaloCrystalHitSim+;
-#pragma link C++ class R3BCaloRawHit+;
-#pragma link C++ class R3BCaloHit+;
-#pragma link C++ class R3BCaloHitSim+;
-#pragma link C++ class R3BCaloPoint+;
+#pragma link C++ class R3BCalifaMappedData+;
+#pragma link C++ class R3BCalifaCrystalCalData+;
+#pragma link C++ class R3BCalifaHitData+;
+#pragma link C++ class R3BCalifaPoint+;
+#pragma link C++ class R3BCalifaCrystalCalDataSim+;
+#pragma link C++ class R3BCalifaHitDataSim+;
 #pragma link C++ class R3BDchPoint+;
 #pragma link C++ class R3BDchFullPoint+;
 #pragma link C++ class R3BDchDigi+;
@@ -32,10 +31,14 @@
 #pragma link C++ class R3BTofDigi+;
 #pragma link C++ class R3BTof2pDigi+;
 #pragma link C++ class R3BVetoPoint+;
-#pragma link C++ class R3BSTaRTraPoint+;
-#pragma link C++ class R3BSTaRTraHit+;
-#pragma link C++ class R3BSTaRTrackerHit+;
-#pragma link C++ class R3BSTaRTrackerDigitHit+;
+#pragma link C++ class R3BStartrackPoint+;
+#pragma link C++ class R3BStartrackHit+;
+
+//#pragma link C++ class R3BStartrackerHit+;
+
+#pragma link C++ class R3BStartrackerDigitHit+;
+#pragma link C++ class R3BStartrackMappedData+;
+#pragma link C++ class R3BStartrackCalData+;
 #pragma link C++ class R3BTraPoint+;
 #pragma link C++ class R3BTraHit+;
 #pragma link C++ class R3BTrackerHit+;
@@ -80,6 +83,5 @@
 #pragma link C++ class R3BFi4MappedItem+;
 #pragma link C++ class R3BFi4CalItem+;
 #pragma link C++ class R3BFi4HitItem+;
-
-
+#pragma link C++ class R3BFi4Point+;
 #endif

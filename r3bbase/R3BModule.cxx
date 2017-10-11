@@ -1,93 +1,59 @@
-/////////////////////////////////////////////////////////////////
-//*-- AUTHOR : Denis Bertini     <D.Bertini@gsi.de>
-//*-- Date: 20/08/2009
-//*-- Last Update: 04/03/06 by Denis Bertini
-// --------------------------------------------------------------
-// Description:
-//   The R3B Module base class
-//
-// --------------------------------------------------------------
-// Comments:
-//
-//  20/08/09 R3B Module base class
-//              - Including local ref. frame Rotation using
-//                Axis Angles.
-//              - Euler based angles supported
-//                Rotation/Translation / Lab
-// --------------------------------------------------------------
-/////////////////////////////////////////////////////////////////
-
 #include "R3BModule.h"
-
-// Math ROOT package
-#include "TMath.h"
+#include "FairLogger.h"
 #include "TGeoManager.h"
-#include "TVector3.h"
 
-// -----   Default constructor   -------------------------------------------
 R3BModule::R3BModule()
-  : FairModule()
-  , fPosition(NULL)
-  , fRotation(NULL)
+    : FairModule()
 {
 }
 
-
-
-// -----   Standard constructor   ------------------------------------------
-R3BModule::R3BModule( const Char_t* Name, const Char_t* title, Bool_t Active)
-  : FairModule(Name,title,Active)
-  , fPosition(NULL)
-  , fRotation(NULL)
+R3BModule::R3BModule(const TString& name, const TString& title, const Bool_t active)
+    : FairModule(name, title, active)
 {
 }
 
-
-
-// -----   Destructor   ----------------------------------------------------
-R3BModule::~R3BModule()
+R3BModule::R3BModule(const TString& name,
+                     const TString& title,
+                     const Bool_t active,
+                     const TString& geoFile,
+                     const TGeoTranslation& trans,
+                     const TGeoRotation& rot)
+    : R3BModule(name, title, active, geoFile, { trans, rot })
 {
-  if(fRotation)
-    delete fRotation;
-  if(fPosition)
-    delete fPosition;
+}
+
+R3BModule::R3BModule(const TString& name,
+                     const TString& title,
+                     const Bool_t active,
+                     const TString& geoFile,
+                     const TGeoCombiTrans& combi)
+    : FairModule(name, title, active)
+    , fCombiTrans(combi)
+{
+    SetGeometryFileName(geoFile);
+}
+
+void R3BModule::ConstructGeometry()
+{
+    if (!GetGeometryFileName().EndsWith(".root"))
+    {
+        LOG(FATAL) << GetName() << " (which is a " << ClassName() << ") geometry file is not specified!"
+                   << FairLogger::endl;
+    }
+    ConstructRootGeometry();
 }
 
 void R3BModule::ConstructRootGeometry()
 {
-  FairModule::ConstructRootGeometry();
-  
-  TGeoNode* n = gGeoManager->GetTopNode()->GetDaughter(gGeoManager->GetTopNode()->GetNdaughters()-1);
-  TGeoCombiTrans* combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)n)->GetMatrix();
-  
-  if(!fPosition)
-   fPosition = new TVector3(combtrans->GetTranslation()[0], combtrans->GetTranslation()[1], combtrans->GetTranslation()[2]);
+    LOG(INFO) << "R3BModule: Constructing " << GetName() << " (which is a " << ClassName()
+              << ") geometry from ROOT file " << GetGeometryFileName() << " ..." << FairLogger::endl;
+    FairModule::ConstructRootGeometry();
 
-  if(fRotation)
-    combtrans->SetRotation(fRotation);
-  
-  combtrans->SetDx(fPosition->X());  
-  combtrans->SetDy(fPosition->Y());  
-  combtrans->SetDz(fPosition->Z());  
-}
-
-void R3BModule::SetPosition(Double_t x, Double_t y, Double_t z)
-{
-  if(fPosition)
-    delete fPosition;
-  
-  fPosition = new TVector3(x, y, z);
-}
-
-void R3BModule::SetRotation(Double_t x_deg, Double_t y_deg, Double_t z_deg)
-{
-  if(fRotation)
-    delete fRotation;
-    
-  fRotation = new TGeoRotation();
-  fRotation->RotateX(x_deg);
-  fRotation->RotateY(y_deg);
-  fRotation->RotateZ(z_deg);
+    if (!fCombiTrans.IsIdentity())
+    {
+        auto n = gGeoManager->GetTopNode()->GetDaughter(gGeoManager->GetTopNode()->GetNdaughters() - 1);
+        ((TGeoNodeMatrix*)n)->SetMatrix(fCombiTrans.MakeClone());
+    }
 }
 
 ClassImp(R3BModule)

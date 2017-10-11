@@ -103,10 +103,7 @@ void create_mfi_geo(const char* geoTag)
   // Rotation:
   //pschrock: its easier to use 'Rotate' functions
   TGeoRotation *gRot = new TGeoRotation();
-  gRot->RotateX(0.);
-  gRot->RotateY(-13.5000000); // s412
-  gRot->RotateZ(0.);
-  
+
   TGeoCombiTrans*
   //    pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,pMatrix3);
   pMatrix2 = new TGeoCombiTrans("", dx,dy,dz,gRot);

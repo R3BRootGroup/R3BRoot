@@ -1,45 +1,58 @@
-// -------------------------------------------------------------------------
-// -----                        R3BPsp header file                     -----
-// -----                  Created 26/03/09  by D.Bertini               -----
-// -------------------------------------------------------------------------
-
-/**  R3BPsp.h
- **/
-
 #ifndef R3BPSP_H
 #define R3BPSP_H
 
 #include "R3BDetector.h"
-
 #include "TLorentzVector.h"
 
 class TClonesArray;
 class R3BPspPoint;
+class R3BTGeoPar;
 class FairVolume;
 
 class R3BPsp : public R3BDetector
 {
-
   public:
     /** Default constructor **/
     R3BPsp();
 
     /** Standard constructor.
-     *@param name    detetcor name
-     *@param active  sensitivity flag
-     **/
-    R3BPsp(const char* name, Bool_t active);
+     *@param geoFile name of the ROOT geometry file
+     *@param trans   position
+     *@param rot     rotation
+     *@param z1      psp1 z position
+     *@param z2      psp2 z position
+     *@param z2      psp2 z position
+     */
+    R3BPsp(const TString& geoFile,
+           const TGeoTranslation& trans,
+           const TGeoRotation& rot = TGeoRotation(),
+           const Float_t z1 = -221.,
+           const Float_t z2 = -89.,
+           const Float_t z3 = 94.1);
+
+    /** Standard constructor.
+     *@param geoFile name of the ROOT geometry file
+     *@param combi   position + rotation
+     *@param z1      psp1 z position
+     *@param z2      psp2 z position
+     *@param z2      psp2 z position
+     */
+    R3BPsp(const TString& geoFile,
+           const TGeoCombiTrans& combi = TGeoCombiTrans(),
+           const Float_t z1 = -221.,
+           const Float_t z2 = -89.,
+           const Float_t z3 = 94.1);
 
     /** Destructor **/
-    virtual ~R3BPsp();
+    ~R3BPsp();
 
     /** Virtual method ProcessHits
-     **
-     ** Defines the action to be taken when a step is inside the
-     ** active volume. Creates a R3BPspPoint and adds it to the
-     ** collection.
-     *@param vol  Pointer to the active volume
-     **/
+    **
+    ** Defines the action to be taken when a step is inside the
+    ** active volume. Creates a R3BPspPoint and adds it to the
+    ** collection.
+    *@param vol  Pointer to the active volume
+    **/
     virtual Bool_t ProcessHits(FairVolume* vol = 0);
 
     /** Virtual method BeginEvent
@@ -117,6 +130,11 @@ class R3BPsp : public R3BDetector
     TClonesArray* fPspCollection;   //!  The hit collection
     Bool_t kGeoSaved;               //!
     TList* flGeoPar;                //!
+    R3BTGeoPar* fTGeoPar;           //!
+
+    Float_t fZ1; //! z position of PSP1
+    Float_t fZ2; //! z position of PSP2
+    Float_t fZ3; //! z position of PSP3
 
     /** Private method AddHit
      **
@@ -139,7 +157,7 @@ class R3BPsp : public R3BDetector
      **/
     void ResetParameters();
 
-    ClassDef(R3BPsp, 1);
+    ClassDef(R3BPsp, 3);
 };
 
 inline void R3BPsp::ResetParameters()

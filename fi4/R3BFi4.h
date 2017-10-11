@@ -1,16 +1,7 @@
-// -------------------------------------------------------------------------
-// -----                        R3BFi4 header file                     -----
-// -----                  Created 26/03/09  by D.Bertini               -----
-// -------------------------------------------------------------------------
-
-/**  R3BFi4.h
- **/
-
-#ifndef R3BFI4_H
-#define R3BFI4_H
+#ifndef R3BFi4_H
+#define R3BFi4_H
 
 #include "R3BDetector.h"
-
 #include "TLorentzVector.h"
 
 class TClonesArray;
@@ -19,19 +10,25 @@ class FairVolume;
 
 class R3BFi4 : public R3BDetector
 {
-
   public:
     /** Default constructor **/
     R3BFi4();
 
     /** Standard constructor.
-     *@param name    detetcor name
-     *@param active  sensitivity flag
-     **/
-    R3BFi4(const char* name, Bool_t active);
+     *@param geoFile name of the ROOT geometry file
+     *@param trans   position
+     *@param rot     rotation
+     */
+    R3BFi4(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot = TGeoRotation());
+
+    /** Standard constructor.
+     *@param geoFile name of the ROOT geometry file
+     *@param combi   position + rotation
+     */
+    R3BFi4(const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
 
     /** Destructor **/
-    virtual ~R3BFi4();
+    ~R3BFi4();
 
     /** Virtual method ProcessHits
      **
@@ -88,11 +85,6 @@ class R3BFi4 : public R3BDetector
      **/
     virtual void CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset);
 
-    /** Virtual method Construct geometry
-     **
-     ** Constructs the STS geometry
-     **/
-    virtual void ConstructGeometry();
     virtual Bool_t CheckIfSensitive(std::string name);
     virtual void Initialize();
     virtual void SetSpecialPhysicsCuts();
@@ -139,7 +131,7 @@ class R3BFi4 : public R3BDetector
      **/
     void ResetParameters();
 
-    ClassDef(R3BFi4, 1);
+    ClassDef(R3BFi4, 2);
 };
 
 inline void R3BFi4::ResetParameters()

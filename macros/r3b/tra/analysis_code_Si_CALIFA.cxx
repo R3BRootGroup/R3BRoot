@@ -128,11 +128,11 @@ void analEvents(Int_t analType=1, char* output) {
 	TH2F *EdE2 = new TH2F("EdE2","ECsI vs ESi",50,0.,0.005,300,0.,0.3);
     TH2F *ETHETA_CAL = new TH2F("ETheta","Theta vs ECsI",1800,0.,180.,4000,0.,0.4);
 
-	//Calo Hits
+	//Califa Hits
 	TClonesArray* caloHitCA;  
-	R3BCaloHit** caloHit;
-	caloHitCA = new TClonesArray("R3BCaloHit",5);
-	TBranch *branchCaloHit = TCal->GetBranch("CaloHit");
+	R3BCalifaHitData** caloHit;
+	caloHitCA = new TClonesArray("R3BCalifaHitData",5);
+	TBranch *branchCaloHit = TCal->GetBranch("CalifaHitData");
 	branchCaloHit->SetAddress(&caloHitCA);
 
 	//Tracker Hits
@@ -217,12 +217,12 @@ void analEvents(Int_t analType=1, char* output) {
 			CsIPhi = new Double_t[caloHitsPerEvent+1];
 			CsITheta = new Double_t[caloHitsPerEvent+1];
 
-            caloHit = new R3BCaloHit*[caloHitsPerEvent+1];
+                        caloHit = new R3BCalifaHitData*[caloHitsPerEvent+1];
             
 			for(Int_t j=0;j<caloHitsPerEvent;j++){
                 
-				caloHit[j] = new R3BCaloHit;
-				caloHit[j] = (R3BCaloHit*) caloHitCA->At(j);
+				caloHit[j] = new R3BCalifaHitData;
+				caloHit[j] = (R3BCalifaHitData*) caloHitCA->At(j);
                 
 				CsIE[j] = caloHit[j]->GetEnergy();
 				CsIPhi[j] = caloHit[j]->GetPhi();	

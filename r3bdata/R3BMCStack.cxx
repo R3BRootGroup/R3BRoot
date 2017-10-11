@@ -10,7 +10,7 @@
 #include "FairRootManager.h"
 #include "FairLogger.h"
 
-#include "caloData/R3BCaloCrystalHitSim.h"
+#include "califaData/R3BCalifaCrystalCalDataSim.h"
 
 #include "TError.h"
 #include "TLorentzVector.h"
@@ -325,7 +325,7 @@ void R3BStack::UpdateTrackIndex(TRefArray* detList) {
       
       // --> Update track index for all MCPoints in the collection
       for (Int_t iPoint=0; iPoint<nPoints; iPoint++) {
-        R3BCaloCrystalHitSim* point = (R3BCaloCrystalHitSim*)hitArray->At(iPoint);
+        R3BCalifaCrystalCalDataSim* point = (R3BCalifaCrystalCalDataSim*)hitArray->At(iPoint);
         Int_t iTrack = point->GetTrackId();
         
         fIndexIter = fIndexMap.find(iTrack);

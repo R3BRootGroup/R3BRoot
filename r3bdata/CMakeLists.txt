@@ -10,19 +10,19 @@ ${BASE_INCLUDE_DIRECTORIES}
 )
 
 set(INCLUDE_DIRECTORIES
-${R3BROOT_SOURCE_DIR}/r3bdata
-${R3BROOT_SOURCE_DIR}/r3bdata/xballData
-${R3BROOT_SOURCE_DIR}/r3bdata/caloData
-${R3BROOT_SOURCE_DIR}/r3bdata/dhcData
-${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
-${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
-${R3BROOT_SOURCE_DIR}/r3bdata/dtofData
-${R3BROOT_SOURCE_DIR}/r3bdata/tofData
-${R3BROOT_SOURCE_DIR}/r3bdata/vetoData
-${R3BROOT_SOURCE_DIR}/r3bdata/lumonData
-${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
-${R3BROOT_SOURCE_DIR}/r3bdata/starttrackerData
-${R3BROOT_SOURCE_DIR}/r3bdata/landData
+${R3BROOT_SOURCE_DIR}/r3bdata  
+${R3BROOT_SOURCE_DIR}/r3bdata/xballData  
+${R3BROOT_SOURCE_DIR}/r3bdata/califaData
+${R3BROOT_SOURCE_DIR}/r3bdata/dhcData  
+${R3BROOT_SOURCE_DIR}/r3bdata/gfiData  
+${R3BROOT_SOURCE_DIR}/r3bdata/mtofData  
+${R3BROOT_SOURCE_DIR}/r3bdata/dtofData  
+${R3BROOT_SOURCE_DIR}/r3bdata/tofData  
+${R3BROOT_SOURCE_DIR}/r3bdata/vetoData  
+${R3BROOT_SOURCE_DIR}/r3bdata/lumonData  
+${R3BROOT_SOURCE_DIR}/r3bdata/trackerData  
+${R3BROOT_SOURCE_DIR}/r3bdata/startrackData  
+${R3BROOT_SOURCE_DIR}/r3bdata/landData  
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mfiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/fi4Data
@@ -48,13 +48,12 @@ R3BMCTrack.cxx
 xballData/R3BXBallPoint.cxx
 xballData/R3BXBallCrystalHit.cxx
 xballData/R3BXBallCrystalHitSim.cxx
-caloData/R3BCaloCrystalHit.cxx
-caloData/R3BCaloCrystalHitSim.cxx
-caloData/R3BCaloRawHit.cxx
-caloData/R3BCaloHit.cxx
-caloData/R3BCaloHitSim.cxx
-caloData/R3BCaloPoint.cxx
-caloData/R3BCaloRawHit.cxx
+califaData/R3BCalifaCrystalCalData.cxx
+califaData/R3BCalifaCrystalCalDataSim.cxx
+califaData/R3BCalifaMappedData.cxx
+califaData/R3BCalifaHitData.cxx
+califaData/R3BCalifaHitDataSim.cxx
+califaData/R3BCalifaPoint.cxx
 dchData/R3BDchPoint.cxx
 dchData/R3BDchFullPoint.cxx
 gfiData/R3BGfiPoint.cxx
@@ -67,10 +66,12 @@ trackerData/R3BTraPoint.cxx
 trackerData/R3BTraHit.cxx
 trackerData/R3BSitrackerHit.cxx
 trackerData/R3BTrackerHit.cxx
-startrackerData/R3BSTaRTraPoint.cxx
-startrackerData/R3BSTaRTraHit.cxx
-startrackerData/R3BSTaRTrackerHit.cxx
-startrackerData/R3BSTaRTrackerDigitHit.cxx
+startrackData/R3BStartrackPoint.cxx
+startrackData/R3BStartrackHit.cxx
+#startrackData/R3BStartrackerHit.cxx
+startrackData/R3BStartrackerDigitHit.cxx
+startrackData/R3BStartrackMappedData.cxx
+startrackData/R3BStartrackCalData.cxx
 landData/R3BLandPoint.cxx
 landData/R3BLandDigi.cxx
 landData/R3BLandFirstHits.cxx
@@ -116,6 +117,7 @@ fi4Data/R3BFi4MappedItem.cxx
 fi4Data/R3BFi4CalItem.cxx
 fi4Data/R3BFi4HitItem.cxx
 tofData/R3BTofdHitData.cxx
+fi4Data/R3BFi4Point.cxx
 )
 
 

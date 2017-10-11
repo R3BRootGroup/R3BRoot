@@ -1,16 +1,7 @@
-// -------------------------------------------------------------------------
-// -----                        R3BdTof header file                    -----
-// -----                  Created 18/05/15  by D. Kresan               -----
-// -------------------------------------------------------------------------
-
-/**  R3BdTof.h
- **/
-
 #ifndef R3BDTOF_H
 #define R3BDTOF_H
 
 #include "R3BDetector.h"
-
 #include "TLorentzVector.h"
 
 class TClonesArray;
@@ -19,19 +10,25 @@ class FairVolume;
 
 class R3BdTof : public R3BDetector
 {
-
   public:
     /** Default constructor **/
     R3BdTof();
 
     /** Standard constructor.
-     *@param name    detetcor name
-     *@param active  sensitivity flag
-     **/
-    R3BdTof(const char* name, Bool_t active);
+     *@param geoFile name of the ROOT geometry file
+     *@param trans   position
+     *@param rot     rotation
+     */
+    R3BdTof(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot = TGeoRotation());
+
+    /** Standard constructor.
+     *@param geoFile name of the ROOT geometry file
+     *@param combi   position + rotation
+     */
+    R3BdTof(const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
 
     /** Destructor **/
-    virtual ~R3BdTof();
+    ~R3BdTof();
 
     /** Virtual method ProcessHits
      **
@@ -43,7 +40,7 @@ class R3BdTof : public R3BDetector
     virtual Bool_t ProcessHits(FairVolume* vol = 0);
 
     /** Virtual method BeginEvent
-     **
+     ** 
      ** If verbosity level is set, print hit collection at the
      ** end of the event and resets it afterwards.
      **/
@@ -88,11 +85,6 @@ class R3BdTof : public R3BDetector
      **/
     virtual void CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset);
 
-    /** Virtaul method Construct geometry
-     **
-     ** Constructs the STS geometry
-     **/
-    virtual void ConstructGeometry();
     virtual Bool_t CheckIfSensitive(std::string name);
     virtual void Initialize();
     virtual void SetSpecialPhysicsCuts();
@@ -123,8 +115,15 @@ class R3BdTof : public R3BDetector
      **
      ** Adds a mTofPoint to the HitCollection
      **/
-    R3BdTofPoint*
-        AddHit(Int_t trackID, Int_t detID, TVector3 posIn, TVector3 pos_out, TVector3 momIn, TVector3 momOut, Double_t time, Double_t length, Double_t eLoss);
+    R3BdTofPoint* AddHit(Int_t trackID,
+                         Int_t detID,
+                         TVector3 posIn,
+                         TVector3 pos_out,
+                         TVector3 momIn,
+                         TVector3 momOut,
+                         Double_t time,
+                         Double_t length,
+                         Double_t eLoss);
 
     /** Private method ResetParameters
      **
@@ -132,7 +131,7 @@ class R3BdTof : public R3BDetector
      **/
     void ResetParameters();
 
-    ClassDef(R3BdTof, 1);
+    ClassDef(R3BdTof, 2);
 };
 
 inline void R3BdTof::ResetParameters()

@@ -1,8 +1,8 @@
 ##############################################################################
-# Class:   R3BCaloCalPar
+# Class:   R3BCalifaCrystalCalPar
 # Context: TestDefaultContext
 ##############################################################################
-[CaloCalPar]
+[CalifaCrystalCalPar]
 //----------------------------------------------------------------------------
 NrOfDUnits:  Int_t  128
 0:   Double_t  \

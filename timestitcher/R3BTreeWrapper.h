@@ -13,7 +13,7 @@ namespace R3BCalifaTimestitcher
    protected:
       enum ArrayType
       {
-         CaloRawHit, CaloCrystalHit, CaloHit
+         CalifaMappedData, CalifaCrystalCalData, CalifaHitData
       };
 
       TObjArray *ptrObjArr;

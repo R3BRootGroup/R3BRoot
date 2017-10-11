@@ -5,9 +5,9 @@
 #include <TTree.h>
 #include <TLeaf.h>
 
-#include "../r3bdata/caloData/R3BCaloRawHit.h"
-#include "../r3bdata/caloData/R3BCaloCrystalHit.h"
-#include "../r3bdata/caloData/R3BCaloHit.h"
+#include "../r3bdata/califaData/R3BCalifaMappedData.h"
+#include "../r3bdata/califaData/R3BCalifaCrystalCalData.h"
+#include "../r3bdata/califaData/R3BCalifaHitData.h"
 
 #include "R3BTreeWrapper.h"
 #include "libtimestitcher.h"
@@ -19,23 +19,23 @@ namespace R3BCalifaTimestitcher
    R3BTreeWrapper::R3BTreeWrapper(TTree *_tree, branchptrmap_t &branchmap, uint32_t _id) : TreeWrapper(_tree, _id)
    {
       // Try...
-      // ...R3BCaloRawHit
-      if(branchmap.count("CaloRawHit") > 0)
+      // ...R3BCalifaMappedData
+      if(branchmap.count("CalifaMappedData") > 0)
       {
-         ptrObjArr = static_cast<TObjArray*>(branchmap["CaloRawHit"]);
-         type = CaloRawHit;
+         ptrObjArr = static_cast<TObjArray*>(branchmap["CalifaMappedData"]);
+         type = CalifaMappedData;
       }
-      // ...R3BCaloCrystalHit
-      else if(branchmap.count("CaloCrystalHit") > 0)
+      // ...R3BCalifaCrystalCalData
+      else if(branchmap.count("CalifaCrystalCalData") > 0)
       {
-         ptrObjArr = static_cast<TObjArray*>(branchmap["CaloCrystalHit"]);
-         type = CaloCrystalHit;
+         ptrObjArr = static_cast<TObjArray*>(branchmap["CalifaCrystalCalData"]);
+         type = CalifaCrystalCalData;
       }
-      // ...R3BCaloHit
-      else if(branchmap.count("CaloHit") > 0)
+      // ...R3BCalifaHitData
+      else if(branchmap.count("CalifaHitData") > 0)
       {
-         ptrObjArr = static_cast<TObjArray*>(branchmap["CaloHit"]);
-         type = CaloHit;
+         ptrObjArr = static_cast<TObjArray*>(branchmap["CalifaHitData"]);
+         type = CalifaHitData;
       }
       else
          throw runtime_error("R3BTreeWrapper: Unknown tree structure!");
@@ -49,33 +49,33 @@ namespace R3BCalifaTimestitcher
 
       switch(type)
       {
-      case CaloRawHit:
+      case CalifaMappedData:
          {
-          R3BCaloRawHit *rawHit = dynamic_cast<R3BCaloRawHit*>(ptrObjArr->At(0));
+          R3BCalifaMappedData *rawHit = dynamic_cast<R3BCalifaMappedData*>(ptrObjArr->At(0));
           if(!rawHit)
-             throw runtime_error("R3BTreeWrapper::getTS(): Could not cast to R3BCaloRawHit!");
+             throw runtime_error("R3BTreeWrapper::getTS(): Could not cast to R3BCalifaMappedData!");
 
           return rawHit->GetTime();
           break;
          }
       
-      case CaloCrystalHit:
+      case CalifaCrystalCalData:
          {
-            R3BCaloCrystalHit *crystalHit = dynamic_cast<R3BCaloCrystalHit*>(ptrObjArr->At(0));
+            R3BCalifaCrystalCalData *crystalHit = dynamic_cast<R3BCalifaCrystalCalData*>(ptrObjArr->At(0));
             if(!crystalHit)
-               throw runtime_error("R3BTreeWrapper::getTS(): Could not cast to R3BCaloCrystalHit!");
+               throw runtime_error("R3BTreeWrapper::getTS(): Could not cast to R3BCalifaCrystalCalData!");
 
             return crystalHit->GetTime();
             break;
          }
 
-      case CaloHit:
+      case CalifaHitData:
          {
-            R3BCaloHit *caloHit = dynamic_cast<R3BCaloHit*>(ptrObjArr->At(0));
-            if(!caloHit)
-               throw runtime_error("R3BTreeWrapper::getTS(): Could not cast to R3BCaloHit!");
+            R3BCalifaHitData *califaHit = dynamic_cast<R3BCalifaHitData*>(ptrObjArr->At(0));
+            if(!califaHit)
+               throw runtime_error("R3BTreeWrapper::getTS(): Could not cast to R3BCalifaHitData!");
 
-            return caloHit->GetTime();
+            return califaHit->GetTime();
             break;
          }
 

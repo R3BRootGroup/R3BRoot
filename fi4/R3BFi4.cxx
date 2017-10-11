@@ -1,88 +1,67 @@
-// -------------------------------------------------------------------------
-// -----                        R3BFi4 source file                     -----
-// -----                  Created 26/03/09  by D.Bertini               -----
-// -------------------------------------------------------------------------
-#include <stdlib.h>
-
 #include "R3BFi4.h"
-
-#include "R3BGeoFi4.h"
-#include "R3BFi4Point.h"
-// #include "R3BGeoFi4Par.h"
-#include "R3BMCStack.h"
-
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
 #include "FairGeoNode.h"
 #include "FairGeoRootBuilder.h"
 #include "FairRootManager.h"
-#include "FairRuntimeDb.h"
 #include "FairRun.h"
+#include "FairRuntimeDb.h"
 #include "FairVolume.h"
-
+#include "R3BFi4Point.h"
+//#include "R3BGeoFi4.h"
+#include "R3BMCStack.h"
 #include "TClonesArray.h"
-#include "TGeoMCGeometry.h"
-#include "TParticle.h"
-#include "TVirtualMC.h"
-#include "TObjArray.h"
-
-// includes for modeling
-#include "TGeoManager.h"
-#include "TParticle.h"
-#include "TVirtualMC.h"
-#include "TGeoMatrix.h"
-#include "TGeoMaterial.h"
-#include "TGeoMedium.h"
+#include "TGeoArb8.h"
 #include "TGeoBBox.h"
+#include "TGeoBoolNode.h"
+#include "TGeoCompositeShape.h"
+#include "TGeoCone.h"
+#include "TGeoMCGeometry.h"
+#include "TGeoManager.h"
+#include "TGeoMaterial.h"
+#include "TGeoMatrix.h"
+#include "TGeoMedium.h"
 #include "TGeoPara.h"
 #include "TGeoPgon.h"
 #include "TGeoSphere.h"
-#include "TGeoArb8.h"
-#include "TGeoCone.h"
-#include "TGeoBoolNode.h"
-#include "TGeoCompositeShape.h"
+#include "TObjArray.h"
+#include "TParticle.h"
+#include "TVirtualMC.h"
+#include <stdlib.h>
 
-// -----   Default constructor   -------------------------------------------
 R3BFi4::R3BFi4()
-    : R3BDetector("R3BFi4", kTRUE, kFI4)
+    : R3BFi4("")
 {
-    ResetParameters();
-    fFi4Collection = new TClonesArray("R3BFi4Point");
-    fPosIndex = 0;
-    kGeoSaved = kFALSE;
-    flGeoPar = new TList();
-    flGeoPar->SetName(GetName());
-    fVerboseLevel = 1;
 }
-// -------------------------------------------------------------------------
 
-// -----   Standard constructor   ------------------------------------------
-R3BFi4::R3BFi4(const char* name, Bool_t active)
-    : R3BDetector(name, active, kFI4)
+R3BFi4::R3BFi4(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot)
+    : R3BFi4(geoFile, { trans, rot })
 {
-    ResetParameters();
-    fFi4Collection = new TClonesArray("R3BFi4Point");
-    fPosIndex = 0;
-    kGeoSaved = kFALSE;
-    flGeoPar = new TList();
-    flGeoPar->SetName(GetName());
-    fVerboseLevel = 1;
 }
-// -------------------------------------------------------------------------
 
-// -----   Destructor   ----------------------------------------------------
+R3BFi4::R3BFi4(const TString& geoFile, const TGeoCombiTrans& combi)
+    : R3BDetector("R3BFi4", kFI4, geoFile, combi)
+    , fFi4Collection(new TClonesArray("R3BFi4Point"))
+    , fPosIndex(0)
+    , kGeoSaved(kFALSE)
+    , flGeoPar(new TList())
+{
+    flGeoPar->SetName(GetName());
+    ResetParameters();
+}
+
 R3BFi4::~R3BFi4()
 {
-
     if (flGeoPar)
+    {
         delete flGeoPar;
+    }
     if (fFi4Collection)
     {
         fFi4Collection->Delete();
         delete fFi4Collection;
     }
 }
-// -------------------------------------------------------------------------
 
 void R3BFi4::Initialize()
 {
@@ -118,7 +97,8 @@ void R3BFi4::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Si Only
             Double_t cutE = fCutE; // GeV-> 1 keV
 
-            LOG(INFO) << "-I- R3BFi4: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV" << FairLogger::endl;
+            LOG(INFO) << "-I- R3BFi4: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV"
+                      << FairLogger::endl;
 
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -132,7 +112,7 @@ void R3BFi4::SetSpecialPhysicsCuts()
             gMC->Gstpar(pSi->GetId(), "DCUTM", cutE);  /** delta-rays by muons (GeV)*/
             gMC->Gstpar(pSi->GetId(), "PPCUTM", -1.);  /** direct pair production by muons (GeV)*/
         }
-    } //!gGeoManager
+    } //! gGeoManager
 }
 
 // -----   Public method ProcessHits  --------------------------------------
@@ -164,7 +144,7 @@ Bool_t R3BFi4::ProcessHits(FairVolume* vol)
     if (gMC->IsTrackExiting() || gMC->IsTrackStop() || gMC->IsTrackDisappeared())
     {
         fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
-        fVolumeID = vol->getMCid();
+        fVolumeID = vol-> getMotherCopyNo();	
         gMC->TrackPosition(fPosOut);
         gMC->TrackMomentum(fMomOut);
         if (fELoss == 0.)
@@ -209,7 +189,7 @@ Bool_t R3BFi4::ProcessHits(FairVolume* vol)
         }
 
         AddHit(fTrackID,
-               fVolumeID,
+               /*fVolumeID*//*copyNo*/planeNr,
                planeNr,
                TVector3(fPosIn.X(), fPosIn.Y(), fPosIn.Z()),
                TVector3(fPosOut.X(), fPosOut.Y(), fPosOut.Z()),
@@ -230,9 +210,7 @@ Bool_t R3BFi4::ProcessHits(FairVolume* vol)
 }
 
 // -----   Public method EndOfEvent   -----------------------------------------
-void R3BFi4::BeginEvent()
-{
-}
+void R3BFi4::BeginEvent() {}
 
 // -----   Public method EndOfEvent   -----------------------------------------
 void R3BFi4::EndOfEvent()
@@ -246,10 +224,7 @@ void R3BFi4::EndOfEvent()
 // ----------------------------------------------------------------------------
 
 // -----   Public method Register   -------------------------------------------
-void R3BFi4::Register()
-{
-    FairRootManager::Instance()->Register("FI4Point", GetName(), fFi4Collection, kTRUE);
-}
+void R3BFi4::Register() { FairRootManager::Instance()->Register("FI4Point", GetName(), fFi4Collection, kTRUE); }
 // ----------------------------------------------------------------------------
 
 // -----   Public method GetCollection   --------------------------------------
@@ -312,31 +287,16 @@ R3BFi4Point* R3BFi4::AddHit(Int_t trackID,
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
     {
-        LOG(INFO) << "R3BFi4: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z() << ") cm,  detector " << detID << ", track " << trackID
-                  << ", energy loss " << eLoss * 1e06 << " keV" << FairLogger::endl;
+        LOG(INFO) << "R3BFi4: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
+                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV"
+                  << FairLogger::endl;
     }
     return new (clref[size]) R3BFi4Point(trackID, detID, plane, posIn, posOut, momIn, momOut, time, length, eLoss);
 }
 
-// -----   Public method ConstructGeometry   ----------------------------------
-void R3BFi4::ConstructGeometry()
-{
-    TString fileName = GetGeometryFileName();
-    if (fileName.EndsWith(".root"))
-    {
-        LOG(INFO) << "Constructing FI4 geometry from ROOT file " << fileName.Data() << FairLogger::endl;
-        ConstructRootGeometry();
-    }
-    else
-    {
-        LOG(FATAL) << "FI4 geometry file is not specified" << FairLogger::endl;
-        exit(1);
-    }
-}
-
 Bool_t R3BFi4::CheckIfSensitive(std::string name)
 {
-    if (TString(name).Contains("FI41Log") || TString(name).Contains("FI42Log") || TString(name).Contains("FI43Log"))
+    if (TString(name).Contains("FI41Log") )
     {
         return kTRUE;
     }

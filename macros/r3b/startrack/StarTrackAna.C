@@ -60,14 +60,15 @@ void StarTrackAna(Int_t nEvents = 1) {
 	//gSystem->Load("libR3BGen");
 	gSystem->Load("libR3BPassive");
 	gSystem->Load("libR3BData");
-	//gSystem->Load("libR3BCal");
-	//gSystem->Load("libR3BCalo");
+	//gSystem->Load("libR3BXBall");
+	//gSystem->Load("libR3BCalifa");
 	//gSystem->Load("libR3BDch");
 	//gSystem->Load("libR3BGfi");
 	//gSystem->Load("libR3BLand");
 	//gSystem->Load("libR3BmTof");
 	//gSystem->Load("libR3BTof");
-	gSystem->Load("libR3BSTaRTra");
+	//gSystem->Load("libR3BSTaRTra");  // obsolete since 2017
+	gSystem->Load("libR3BStartrack");
 	//gSystem->Load("libR3BChimera");
 	//gSystem->Load("libELILuMon");
 	
@@ -93,7 +94,7 @@ void StarTrackAna(Int_t nEvents = 1) {
 	
 	//fRun->LoadGeometry(); //Needed for what??
 	
-	R3BSTaRTraHitFinder* startraHF = new R3BSTaRTraHitFinder();
+	R3BSTaRTraHitFinder* startraHF = new R3BSTaRTraHitFinder();  // !!! obsolete (replaced by R3BStartrackDigit)
 	//Selecting the geometry version
 	// 0- STARTRACKER 5.0.
 	// ...

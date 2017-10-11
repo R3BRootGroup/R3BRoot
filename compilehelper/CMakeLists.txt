@@ -22,7 +22,6 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
-${R3BROOT_SOURCE_DIR}/r3bdb/caldb
 ${R3BROOT_SOURCE_DIR}/compilehelper
 )
 
@@ -50,7 +49,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF LinkDef.h)
 set(LIBRARY_NAME R3BMacroCompiler)
 #set(DEPENDENCIES
-#    R3Bbase R3BData R3BPassive MCStack R3BXBall)
+#    R3Bbase R3BData R3BPassive R3BXBall)
 
 GENERATE_LIBRARY()
 

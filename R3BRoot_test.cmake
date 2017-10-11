@@ -1,10 +1,3 @@
-
-
-
-
-
-
-
 Set(CTEST_SOURCE_DIRECTORY $ENV{SOURCEDIR})
 Set(CTEST_BINARY_DIRECTORY $ENV{BUILDDIR})
 Set(CTEST_SITE $ENV{SITE})
@@ -58,9 +51,13 @@ Ctest_Configure(BUILD "${CTEST_BINARY_DIRECTORY}"
 Ctest_Build(BUILD "${CTEST_BINARY_DIRECTORY}")
 Ctest_Test(BUILD "${CTEST_BINARY_DIRECTORY}" 
            PARALLEL_LEVEL $ENV{number_of_processors}
+           RETURN_VALUE _ctest_test_ret_val
           )
 If(GCOV_COMMAND)
   Ctest_Coverage(BUILD "${CTEST_BINARY_DIRECTORY}")
 EndIf()
 Ctest_Submit()
  
+if (_ctest_test_ret_val)
+    Message(FATAL_ERROR "Some tests failed.")
+endif()

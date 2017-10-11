@@ -40,7 +40,7 @@ Unpacking: (example with 10 files of run 140925, from 0100 to 0110, 22Na calib. 
 	   root [2] .q
 
 	   Then, a new file r3broot/macros/r3b/califa/s438/data/na22__raw.root
-	   contains the R3BCaloRawHit (rawHits for short)
+	   contains the R3BCalifaMappedData (rawHits for short)
 	   
 	   [An alternative is califaUnpack_batch.C, where you simply do
 	   root -l -b -q 'califaUnpack_batch.C("1000mv_30mev_",362,364)';
@@ -51,8 +51,8 @@ Unpacking: (example with 10 files of run 140925, from 0100 to 0110, 22Na calib. 
 
 Calibration:(example with run 140925, as before)
 
-           The R3BCaloRawHit datamembers storing are channels. The task R3BCaloCal
-	   convert them to R3BCaloCrystalHit where energies are in keV. The macro
+           The R3BCalifaMappedData datamembers storing are channels. The task R3BCalifaMapped2CrystalCal
+	   convert them to R3BCalifaCrystalCalData where energies are in keV. The macro
 	   r3broot/macros/r3b/califa/s438/califaCal.C does this work, once a 
 	   ROOT parameters file is given for the run to analyze. An ascii file can
 	   be also given just modifying the FairParRootFileIo for a FairParAsciiFileIo
@@ -66,7 +66,7 @@ Calibration:(example with run 140925, as before)
 				
 				(califa_allPars.root in the s438 file)
 
-	   the output  with R3BCaloCrystalHits will be in na22__calTest.root 
+	   the output  with R3BCalifaCrystalCalData hits will be in na22__calTest.root 
 
  It is recommended to use a symbolic link to outside of the r3broot dir
  $ ln -s /path/to/your/data data
@@ -211,7 +211,7 @@ Getting ToT calibration parameters: (example with run 140927) // needs new E=par
 Adding the parameters to r3broot: (example from the outcome of the previous points)
 
        This step allows to enter the parameters in the adequate parameter container
-       in R3BRoot for moving from RawHits to CrystalHits (R3BCaloCrystalHit).
+       in R3BRoot for moving from MappedData hits to CrystalCalData hits (R3BCalifaCrystalCalData).
        Assuming you have text files with the parameters obtained following the previous macros:	
        calPars_140925.txt, gainPars_pulser_140926.txt, gainPars_ToT_140927.txt
        (the fQuenchingFactor calibration parameter is for the moment fixed to 0.9 in the macro!)
@@ -255,25 +255,24 @@ ADDITIONAL INFO FOR THE INITIALIZATION OF THE CALIBRATION PARAMETER CONTAINERS (
 	   $ root -l califa_test.C
 	   root [0]
 	   Processing califa_test.C...
-	   Warning in <TEnvRec::ChangeValue>: duplicate entry <Library.R3BCaloContFact=R3BCaloDB libBase.so> for level 0; ignored
-	   -I-R3BCaloContFact::createContainer CaloCalPar
+	   -I-R3BCalifaContFact::createContainer CalifaCrystalCalPar
 
 	   *************************************************************
 	        initialisation for run id 1411817945
 	   *************************************************************
-	   -I- FairRunTimeDB::InitContainer() CaloCalPar
+	   -I- FairRunTimeDB::InitContainer() CalifaCrystalCalPar
  	   s: NrOfDUnits:  Int_t  128 n: 10
  	   s: 0:   Double_t  \  n: 1
 	   ...
-	   [INFO   ] ***  CaloCalPar written to ROOT file   version: 1
+	   [INFO   ] ***  CalifaCrystalCalPar written to ROOT file   version: 1
 	   --------------------------------------------------------------------------------
 	   --------------  actual containers in runtime database  -------------------------
-	   CaloCalPar                                     Califa Calib Parameters
+	   CalifaCrystalCalPar                                     Califa Calib Parameters
 	   --------------  runs, versions  ------------------------------------------------
 	   run id
 	     container                                        1st-inp    2nd-inp    output
 	   run: 1411817945
-	     CaloCalPar                                             1         -1          1
+	     CalifaCrystalCalPar                                             1         -1          1
 	   --------------  input/output  --------------------------------------------------
 	   first Input:
 	   Ascii I/O ducals.par is open

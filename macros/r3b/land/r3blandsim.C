@@ -44,7 +44,7 @@ void r3blandsim(Int_t nNeutrons = 4, Int_t nEvents = 100, Int_t beamE = 600, Int
   detGeo.Add(new TObjString("ALADIN"),        new TObjString("aladin_v13a.geo.root"));
   detGeo.Add(new TObjString("CRYSTALBALL"),   new TObjString("cal_v13a.geo.root"));
   detGeo.Add(new TObjString("DCH"),           new TObjString("dch_v13a.geo.root"));
-  detGeo.Add(new TObjString("SCINTNEULAND"),  new TObjString(det));
+  detGeo.Add(new TObjString("LAND"),          new TObjString(det));
 
   Bool_t fEventDisplay = kTRUE;
 
