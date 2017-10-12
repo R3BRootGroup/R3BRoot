@@ -263,7 +263,7 @@ void R3BStartrackMapped2Cal::Exec(Option_t* option)
 			  NbReject++;
 			  fNbReject++;
 
-			  if(abs(my_new_ts - my_prev_ts)>1e8)my_prev_ts=ts_temp.at(j-1);
+			  if(fabs(my_new_ts - my_prev_ts)>1e8)my_prev_ts=ts_temp.at(j-1);
 			  //if(j==n_loop-1)fW3TSlast=my_prev_ts;
 			}else
 			{
