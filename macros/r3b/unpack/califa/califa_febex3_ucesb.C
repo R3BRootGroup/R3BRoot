@@ -8,77 +8,79 @@
  * (present file is valid for 9 modules and 16 channels for module)
  * */
 
- typedef struct EXT_STR_h101_t {
-     EXT_STR_h101_unpack_t unpack;
-     EXT_STR_h101_CALIFA_t califa;
- } EXT_STR_h101;
+typedef struct EXT_STR_h101_t {
+  EXT_STR_h101_unpack_t unpack;
+  EXT_STR_h101_CALIFA_t califa;
+} EXT_STR_h101;
 
 void califa_febex3_ucesb() {
-	TStopwatch timer;
-	timer.Start();
+  TStopwatch timer;
+  timer.Start();
 
   //const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
   const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
 
-	/* Create source using ucesb for input ------------------ */
+  /* Create source using ucesb for input ------------------ */
 
-	TString filename = "/Users/hapol/Desktop/UCESB_CALIFA_TESTS/data_0001.lmd";
-	TString outputFileName = "/Users/hapol/Desktop/UCESB_CALIFA_TESTS/data_0001.root";
+  //TString filename = "/Users/hapol/Desktop/UCESB_CALIFA_TESTS/data_0001.lmd";
+  //TString outputFileName = "/Users/hapol/Desktop/UCESB_CALIFA_TESTS/data_0001.root";
+  TString filename = "/Users/hapol/R3B/CALWG/Krakow2017/DATA/027/data_0001.lmd";
+  TString outputFileName = "/Users/hapol/R3B/CALWG/Krakow2017/DATA/027/data_0001.root";
 
-	TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
-	TString ucesb_dir = getenv("UCESB_DIR");
+  TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
+  TString ucesb_dir = getenv("UCESB_DIR");
 
-	TString ucesb_path = ucesb_dir + "/../upexps/califalisbon16/califa";
+  TString ucesb_path = ucesb_dir + "/../upexps/califaKrakow17/califa";
 
-	EXT_STR_h101 ucesb_struct;
+  EXT_STR_h101 ucesb_struct;
 
-	R3BUcesbSource* source = new R3BUcesbSource(filename, ntuple_options,
-	    ucesb_path, &ucesb_struct, sizeof(ucesb_struct));
-	source->SetMaxEvents(nev);
+  R3BUcesbSource* source = new R3BUcesbSource(filename, ntuple_options,
+					      ucesb_path, &ucesb_struct, sizeof(ucesb_struct));
+  source->SetMaxEvents(nev);
 
-	source->AddReader(new R3BUnpackReader((EXT_STR_h101_unpack*)&ucesb_struct,
-		offsetof(EXT_STR_h101, unpack)));
-	source->AddReader(new R3BCalifaFebexReader((EXT_STR_h101_CALIFA*)&ucesb_struct.califa,
-    offsetof(EXT_STR_h101, califa)));
-	/* ------------------------------------------------------ */
+  source->AddReader(new R3BUnpackReader((EXT_STR_h101_unpack*)&ucesb_struct,
+					offsetof(EXT_STR_h101, unpack)));
+  source->AddReader(new R3BCalifaFebexReader((EXT_STR_h101_CALIFA*)&ucesb_struct.califa,
+					     offsetof(EXT_STR_h101, califa)));
+  /* ------------------------------------------------------ */
 
-	/* Create online run ------------------------------------ */
-	FairRunOnline* run = new FairRunOnline(source);
-	run->SetRunId(1495624105);
-	run->SetOutputFile(outputFileName);
+  /* Create online run ------------------------------------ */
+  FairRunOnline* run = new FairRunOnline(source);
+  run->SetRunId(1495624105);
+  run->SetOutputFile(outputFileName);
 
-	/* Add analysis task ------------------------------------ */
-	/* ------------------------------------------------------ */
+  /* Add analysis task ------------------------------------ */
+  /* ------------------------------------------------------ */
 
-	/* Initialize ------------------------------------------- */
-	run->Init();
-	FairLogger::GetLogger()->SetLogScreenLevel("INFO");
-	/* ------------------------------------------------------ */
+  /* Initialize ------------------------------------------- */
+  run->Init();
+  FairLogger::GetLogger()->SetLogScreenLevel("INFO");
+  /* ------------------------------------------------------ */
 
-	/* Runtime data base ------------------------------------ */
-	/*FairRuntimeDb* rtdb = run->GetRuntimeDb();
-	R3BFieldPar* fieldPar = (R3BFieldPar*)rtdb->getContainer("R3BFieldPar");
-	fieldPar->SetParameters(magField);
-	fieldPar->setChanged();
-	Bool_t kParameterMerged = kTRUE;
-	FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
-	parOut->open(parFileName);
-	rtdb->setOutput(parOut);
-	rtdb->print();*/
-	/* ------------------------------------------------------ */
+  /* Runtime data base ------------------------------------ */
+  /*FairRuntimeDb* rtdb = run->GetRuntimeDb();
+    R3BFieldPar* fieldPar = (R3BFieldPar*)rtdb->getContainer("R3BFieldPar");
+    fieldPar->SetParameters(magField);
+    fieldPar->setChanged();
+    Bool_t kParameterMerged = kTRUE;
+    FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
+    parOut->open(parFileName);
+    rtdb->setOutput(parOut);
+    rtdb->print();*/
+  /* ------------------------------------------------------ */
 
-	/* Run -------------------------------------------------- */
-	run->Run(nev, 0);
-	/*rtdb->saveOutput();*/
+  /* Run -------------------------------------------------- */
+  run->Run(nev, 0);
+  /*rtdb->saveOutput();*/
   delete run;
-	/* ------------------------------------------------------ */
+  /* ------------------------------------------------------ */
 
-	timer.Stop();
-	Double_t rtime = timer.RealTime();
-	Double_t ctime = timer.CpuTime();
-	cout << endl << endl;
-	cout << "Macro finished succesfully." << endl;
-	cout << "Output file is " << outputFileName << endl;
-	cout << "Real time " << rtime << " s, CPU time " << ctime << " s"
-	     << endl << endl;
+  timer.Stop();
+  Double_t rtime = timer.RealTime();
+  Double_t ctime = timer.CpuTime();
+  cout << endl << endl;
+  cout << "Macro finished succesfully." << endl;
+  cout << "Output file is " << outputFileName << endl;
+  cout << "Real time " << rtime << " s, CPU time " << ctime << " s"
+       << endl << endl;
 }
