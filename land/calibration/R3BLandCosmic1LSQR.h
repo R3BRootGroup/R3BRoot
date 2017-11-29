@@ -369,7 +369,6 @@ typedef struct LSQR_FUNC {
 /*---------------------*/
 /* Function prototypes */
 /*---------------------*/
-
 void lsqr_error( const char *, int );
 
 lvec *alloc_lvec( long );
