@@ -49,6 +49,7 @@ public:
   // Allow change of length of time gate for QDC ("Integration time") at runtime
   inline void SetTOFRange(const Double_t& TOFRange) {  fTOFRange = TOFRange;  }
   inline Double_t GetTOFRange() const  {  return fTOFRange;  }
+
   Double_t BuildTOFRangeFromBeamEnergy(const Double_t &e);
   // Compatibility to not break existing code
   inline void UseBeam(const Double_t& beamEnergy) { fBeamEnergy = beamEnergy; }

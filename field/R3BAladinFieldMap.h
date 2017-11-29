@@ -154,7 +154,6 @@ public:
   /** Accessor to field map file **/
   const char* GetFileName() { return fFileName.Data(); }
 
-
   void CalcFieldDiv(R3BFieldInterp f[3],Double_t d[3]);
 
 

@@ -73,14 +73,14 @@
      /*  associated functions.                                        */
      /*                                                               */
      /*---------------------------------------------------------------*/
-/*
-void lsqr_error( char  *msg,
+
+void lsqr_error( const char  *msg,
                  int   code  )
 {
   fprintf(stderr, "\t%s\n", msg);
   exit(code);
 }
-*/
+
      /*---------------------------------------------------------------*/
      /*                                                               */
      /*  Define the allocation function for a long vector with        */

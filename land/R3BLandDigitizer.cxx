@@ -32,8 +32,7 @@ double fun1(double *x, double *par)
   return TMath::Exp(-0.5*TMath::Power((x[0]-par[0])/sigma, 2));
 }
 
-
-inline Double_t R3BLandDigitizer::BuildTOFRangeFromBeamEnergy(const Double_t &e) // [ns]
+Double_t R3BLandDigitizer::BuildTOFRangeFromBeamEnergy(const Double_t &e) // [ns]
 {
   if(e > 1100) {
     return 15.;

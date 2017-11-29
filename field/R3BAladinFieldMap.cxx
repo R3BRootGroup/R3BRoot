@@ -267,7 +267,7 @@ void R3BAladinFieldMap::Init() {
   
 }
 
-void CalcFieldDiv(R3BFieldInterp f[3],double d[3])
+void R3BAladinFieldMap::CalcFieldDiv(R3BFieldInterp f[3],double d[3])
 {
   // Assume that the measurement values are at the same locations (not
   // completely true)

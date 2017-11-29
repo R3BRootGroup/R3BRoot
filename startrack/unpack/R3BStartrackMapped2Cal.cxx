@@ -33,6 +33,7 @@ using namespace std;
 #include "R3BStartrackMappedData.h"
 #include "R3BStartrackCalData.h"
 
+R3BStartrackMapped2Cal::R3BStartrackMapped2Cal(){}
 
 R3BStartrackMapped2Cal::R3BStartrackMapped2Cal(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
