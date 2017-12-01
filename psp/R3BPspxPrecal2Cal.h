@@ -46,13 +46,13 @@ class R3BPspxPrecal2Cal : public FairTask
     TClonesArray* fCalItems;    /**< Array holding output (Cal) data */
 
     R3BPspxCalPar* fCalPar; /**< Parameter instance holding gain for energy correction */
-    std::vector<vector<Float_t>> gain;
+    std::vector<std::vector<Float_t>> gain;
 
     // void CreateHistos();
     // void WriteHistos();
 
   public:
-    ClassDef(R3BPspxPrecal2Cal, 1)
+    ClassDef(R3BPspxPrecal2Cal, 2)
 };
 
 #endif

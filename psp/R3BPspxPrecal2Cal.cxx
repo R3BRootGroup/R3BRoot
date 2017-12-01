@@ -7,7 +7,6 @@
 
 #include <iostream>
 #include <limits>
-using namespace std;
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
@@ -147,7 +146,8 @@ void R3BPspxPrecal2Cal::Exec(Option_t* option)
 {
     /**
      * Does the conversion from Precal to Cal level. It is called for every event.
-     * Applies (strip specific) gains to the energy entries of every strip.
+     * Applies (strip specific) gains to the energy entries of every strip. This is necessary 
+     * for energy calibration.
      */
 
     if (!fPrecalItems)
@@ -156,8 +156,8 @@ void R3BPspxPrecal2Cal::Exec(Option_t* option)
         return;
     }
 
-    Int_t detector;
-    Int_t strip;
+    UShort_t detector;
+    UShort_t strip;
     Float_t energy1;
     Float_t energy2;
 
@@ -166,8 +166,8 @@ void R3BPspxPrecal2Cal::Exec(Option_t* option)
     // Calculating strip and energys
     for (Int_t i = 0; i < nPrecal; i++)
     {
-        detector = std::numeric_limits<Int_t>::quiet_NaN();
-        strip = std::numeric_limits<Int_t>::quiet_NaN();
+        detector = std::numeric_limits<UShort_t>::quiet_NaN();
+        strip = std::numeric_limits<UShort_t>::quiet_NaN();
         energy1 = std::numeric_limits<Float_t>::quiet_NaN();
         energy2 = std::numeric_limits<Float_t>::quiet_NaN();
 

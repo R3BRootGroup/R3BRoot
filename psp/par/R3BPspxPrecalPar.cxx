@@ -21,8 +21,8 @@
 
 R3BPspxPrecalPar::R3BPspxPrecalPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
-    , pspxprecalparstrip()
-    , pspxprecalpardetector(-1)
+    , pspxprecalpardetector()
+    , pspxprecalparstrip(-1)
     , pspxprecalparorientation(-1)
     , pspxprecalpargain(-1)
     , pspxprecalparenergythreshold(-1)

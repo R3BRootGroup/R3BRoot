@@ -1,13 +1,12 @@
 // -----------------------------------------------------------------------------
 // -----                                                                   -----
 // -----                           R3BPspxCal2Hit                          -----
-// -----		               created 09-03-2016 by I. Syndikus		           -----
+// -----	     created 09-03-2016 by I. Syndikus		           -----
 // -----                                                                   -----
 // -----------------------------------------------------------------------------
 
 #include <iostream>
 #include <limits>
-using namespace std;
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
@@ -62,8 +61,17 @@ InitStatus R3BPspxCal2Hit::Init()
     slope.resize(fHitPar->GetPspxParDetector());
     for (Int_t i = 0; i < fHitPar->GetPspxParDetector(); i++)
     {
-        offset[i].resize(fHitPar->GetPspxParStrip().At(i));
-        slope[i].resize(fHitPar->GetPspxParStrip().At(i));
+        if (fHitPar->GetPspxParOrientation().At(i) == 1 || fHitPar->GetPspxParOrientation().At(i) == 2 ||
+            fHitPar->GetPspxParOrientation().At(i) == 0)
+        { // strips on 1 side
+            offset[i].resize(fHitPar->GetPspxParStrip().At(i));
+	    slope[i].resize(fHitPar->GetPspxParStrip().At(i));
+        }
+        else if (fHitPar->GetPspxParOrientation().At(i) == 3)
+        { // strips on 2 side1
+            offset[i].resize(fHitPar->GetPspxParStrip().At(i) * 2);
+	    slope[i].resize(fHitPar->GetPspxParStrip().At(i) * 2);
+        }
     }
     Int_t start_detector = 0; // entries, not lines
     for (Int_t i = 0; i < offset.size(); i++)
@@ -187,20 +195,20 @@ void R3BPspxCal2Hit::Exec(Option_t* option)
     Float_t sigma_y;
     Float_t energy;
 
-    UInt_t x_mult[fHitPar->GetPspxParDetector()];
-    UInt_t y_mult[fHitPar->GetPspxParDetector()];
-    UInt_t e_mult[fHitPar->GetPspxParDetector()];
+    UShort_t x_mult[fHitPar->GetPspxParDetector()];
+    UShort_t y_mult[fHitPar->GetPspxParDetector()];
+    UShort_t e_mult[fHitPar->GetPspxParDetector()];
 
-    UInt_t nstrips;
-    UInt_t strip;
-    UInt_t strip1;
-    UInt_t strip2;
+    UShort_t nstrips;
+    UShort_t strip;
+    UShort_t strip1;
+    UShort_t strip2;
 
-    for (UInt_t j = 0; j < fHitPar->GetPspxParDetector(); j++)
+    for (UShort_t j = 0; j < fHitPar->GetPspxParDetector(); j++)
     {
-        x_mult[j] = std::numeric_limits<UInt_t>::quiet_NaN();
-        y_mult[j] = std::numeric_limits<UInt_t>::quiet_NaN();
-        e_mult[j] = std::numeric_limits<UInt_t>::quiet_NaN();
+        x_mult[j] = std::numeric_limits<UShort_t>::quiet_NaN();
+        y_mult[j] = std::numeric_limits<UShort_t>::quiet_NaN();
+        e_mult[j] = std::numeric_limits<UShort_t>::quiet_NaN();
     }
 
     Int_t nMapped = fCalItems->GetEntries();
@@ -208,7 +216,7 @@ void R3BPspxCal2Hit::Exec(Option_t* option)
     // calculationg multiplicities
     for (Int_t i = 0; i < nMapped; i++)
     {
-        strip = std::numeric_limits<UInt_t>::quiet_NaN();
+        strip = std::numeric_limits<UShort_t>::quiet_NaN();
 
         R3BPspxCalData* mItem = (R3BPspxCalData*)fCalItems->At(i);
         strip = mItem->GetStrip();
@@ -248,7 +256,7 @@ void R3BPspxCal2Hit::Exec(Option_t* option)
     }
 
     // calculating positions for each detector
-    for (UInt_t detector = 0; detector < fHitPar->GetPspxParDetector(); detector++)
+    for (UShort_t detector = 0; detector < fHitPar->GetPspxParDetector(); detector++)
     {
         if (x_mult[detector] == 0 && y_mult[detector] == 0 && e_mult[detector] == 0)
             continue;
@@ -261,10 +269,10 @@ void R3BPspxCal2Hit::Exec(Option_t* option)
         sigma_y = std::numeric_limits<Float_t>::quiet_NaN();
         energy = std::numeric_limits<Float_t>::quiet_NaN();
 
-        nstrips = std::numeric_limits<UInt_t>::quiet_NaN();
-        strip = std::numeric_limits<UInt_t>::quiet_NaN();
-        strip1 = std::numeric_limits<UInt_t>::quiet_NaN();
-        strip2 = std::numeric_limits<UInt_t>::quiet_NaN();
+        nstrips = std::numeric_limits<UShort_t>::quiet_NaN();
+        strip = std::numeric_limits<UShort_t>::quiet_NaN();
+        strip1 = std::numeric_limits<UShort_t>::quiet_NaN();
+        strip2 = std::numeric_limits<UShort_t>::quiet_NaN();
 
         nstrips = fHitPar->GetPspxParStrip().At(detector);
 
@@ -303,10 +311,17 @@ void R3BPspxCal2Hit::Exec(Option_t* option)
                     // position
                     if (strip > nstrips && strip < nstrips * 2 + 1)
                     {
-                        u = (mItem->GetEnergy1() - mItem->GetEnergy2()) / (mItem->GetEnergy1() + mItem->GetEnergy2());
-                        x = sign_x[detector] *
-                            (offset[detector][strip - nstrips - 1] + slope[detector][strip - nstrips - 1] * u);
-                        sigma_x = 0; // ToDo
+			u = (mItem->GetEnergy1() - mItem->GetEnergy2()) / (mItem->GetEnergy1() + mItem->GetEnergy2());		
+			
+			if(fHitPar->GetPspxParOrientation().At(detector) == 3){
+		            x = sign_x[detector] *
+				(offset[detector][strip - 1] + slope[detector][strip - 1] * u);
+			} else if(fHitPar->GetPspxParOrientation().At(detector) == 2) {
+			    x = sign_x[detector] *
+				(offset[detector][strip - nstrips - 1] + slope[detector][strip - nstrips - 1] * u);
+			
+			}
+                        sigma_x = 0; // ToDo  
 
                         if (y_mult[detector] != 2 && y_mult[detector] != 4)
                         {
@@ -397,12 +412,21 @@ void R3BPspxCal2Hit::Exec(Option_t* option)
                                      (mItem1->GetEnergy2() + mItem2->GetEnergy2())) /
                                     (mItem1->GetEnergy1() + mItem2->GetEnergy1() + mItem1->GetEnergy2() +
                                      mItem2->GetEnergy2());
-                                x = sign_x[detector] *
+				    
+				if(fHitPar->GetPspxParOrientation().At(detector) == 3){
+				    x = sign_x[detector] *
+                                    ((offset[detector][strip1 - 1] + offset[detector][strip2 - 1]) /
+                                         2. +
+                                     (slope[detector][strip1 - 1] + slope[detector][strip2 - 1]) /
+                                         2. * u);
+				} else if(fHitPar->GetPspxParOrientation().At(detector) == 2) {
+				    x = sign_x[detector] *
                                     ((offset[detector][strip1 - nstrips - 1] + offset[detector][strip2 - nstrips - 1]) /
                                          2. +
                                      (slope[detector][strip1 - nstrips - 1] + slope[detector][strip2 - nstrips - 1]) /
                                          2. * u);
-                                sigma_x = 0; // ToDo
+				}
+				sigma_x = 0; // ToDo
 
                                 if (y_mult[detector] != 2 && y_mult[detector] != 4)
                                 {

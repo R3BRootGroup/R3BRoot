@@ -1,4 +1,3 @@
-
 #include "R3BPspxMappedData.h"
 
 R3BPspxMappedData::R3BPspxMappedData()
@@ -8,7 +7,7 @@ R3BPspxMappedData::R3BPspxMappedData()
 {
 }
 
-R3BPspxMappedData::R3BPspxMappedData(UShort_t detector, UShort_t channel, UInt_t energy)
+R3BPspxMappedData::R3BPspxMappedData(UShort_t detector, UShort_t channel, Int_t energy)
     : fDetector(detector)
     , fChannel(channel)
     , fEnergy(energy)

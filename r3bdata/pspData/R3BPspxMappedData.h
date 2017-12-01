@@ -6,7 +6,7 @@
 /**
  * Class containing PSPX detector data on Mapped level.
  * Originally, this class was introduced for the analysis of s438b, but it also works for later experiments.
- * @author Ralf Plag
+ * @author Ralf Plag, Ina Syndikus
  * @since January 2016
  */
 
@@ -17,7 +17,7 @@ class R3BPspxMappedData : public TObject
     R3BPspxMappedData();
 
     /** Standard Constructor **/
-    R3BPspxMappedData(UShort_t detector, UShort_t channel, UInt_t energy);
+    R3BPspxMappedData(UShort_t detector, UShort_t channel, Int_t energy);
 
     /** Destructor **/
     virtual ~R3BPspxMappedData() {}
@@ -25,15 +25,15 @@ class R3BPspxMappedData : public TObject
     // Getters
     inline const UShort_t& GetDetector() const { return fDetector; }
     inline const UShort_t& GetChannel() const { return fChannel; }
-    inline const UInt_t& GetEnergy() const { return fEnergy; }
+    inline const Int_t& GetEnergy() const { return fEnergy; }
 
   private:
     UShort_t fDetector; /**< Detector number, counting from 1 */
     UShort_t fChannel;  /**< Channel number, counting from 1 */
-    UInt_t fEnergy;     /**< Energy/Collected charge. */
+    Int_t fEnergy;     /**< Energy/Collected charge */
 
   public:
-    ClassDef(R3BPspxMappedData, 2)
+    ClassDef(R3BPspxMappedData, 3)
 };
 
 #endif

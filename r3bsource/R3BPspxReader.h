@@ -11,8 +11,8 @@ class TClonesArray;
 
 /**
  * Class to unpack (with ucesb) to Mapped data for PSPX detector data.
- * This includes: Checking for error messages & ignoring the sign bit.
- * @author Ralf Plag (?), Bastian Löher(?), Ina Syndikus
+ * This includes: Checking for error messages.
+ * @author Ralf Plag (?), Bastian Loeher(?), Ina Syndikus
  */
 
 class R3BPspxReader : public R3BReader
@@ -38,7 +38,7 @@ class R3BPspxReader : public R3BReader
     R3BPspxMappedPar* fMappedPar; /**< Parameter instance holding number of detectors & strips. */
 
   public:
-    ClassDef(R3BPspxReader, 2);
+    ClassDef(R3BPspxReader, 3);
 };
 
 #endif

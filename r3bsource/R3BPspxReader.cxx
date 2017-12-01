@@ -26,11 +26,12 @@ R3BPspxReader::R3BPspxReader(EXT_STR_h101_PSP* data, UInt_t offset)
 
 R3BPspxReader::~R3BPspxReader() {}
 
+/**
+  * Initialize output data. Read input data.
+  */
 Bool_t R3BPspxReader::Init(ext_data_struct_info* a_struct_info)
 {
-    /**
-     * Initialize output data. Read input data.
-     */
+
     int ok;
 
     EXT_STR_h101_PSP_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_PSP, 0);
@@ -49,12 +50,11 @@ Bool_t R3BPspxReader::Init(ext_data_struct_info* a_struct_info)
 }
 
 // ----  Initialisation  ----------------------------------------------
+/**
+  * Initialize/Reads parameter file for conversion.
+  */
 void R3BPspxReader::SetParContainers()
 {
-    /**
-     * Initialize/Reads parameter file for conversion.
-     */
-
     LOG(INFO) << "R3BPspxReader :: SetParContainers() " << FairLogger::endl;
 
     fMappedPar = (R3BPspxMappedPar*)FairRuntimeDb::instance()->getContainer("R3BPspxMappedPar");
@@ -73,15 +73,13 @@ void R3BPspxReader::SetParContainers()
 
     fMappedPar->printparams();
 }
-// --------------------------------------------------------------------
 
 // ---- ReInit  -------------------------------------------------------
+/**
+  * Initialize/Reads parameter file for conversion.
+  */
 Bool_t R3BPspxReader::ReInit()
 {
-    /**
-     * Initialize/Reads parameter file for conversion.
-     */
-
     LOG(INFO) << " R3BPspxReader :: ReInit() " << FairLogger::endl;
 
     // FairRunAna* ana = FairRunAna::Instance();
@@ -99,18 +97,16 @@ Bool_t R3BPspxReader::ReInit()
 
     return kTRUE;
 }
-// --------------------------------------------------------------------
 
+// --------------------------------------------------------------------
+/**
+  * Does the unpacking to Mapped level. It is called for every event.
+  * Converts plain raw data to multi-dimensional array.
+  * Ignores energies with an error message.
+  * Although, ucesb is multi-hit capable, only the first entry is used for the PSPX detectors.
+  */
 Bool_t R3BPspxReader::Read()
 {
-    /**
-     * Does the unpacking to Mapped level. It is called for every event.
-     * Converts plain raw data to multi-dimensional array.
-     * Ignores energies with an error message.
-     * Ignores sign bit. Therefore, all energies in Mapped level are positive.
-     * Although, ucesb is multi-hit capable, only the first entry is used for the PSPX detectors.
-     */
-
     EXT_STR_h101_PSP_onion* data = (EXT_STR_h101_PSP_onion*)fData;
 
     // Display data
@@ -156,7 +152,7 @@ Bool_t R3BPspxReader::Read()
     for (int d = 0; d < fMappedPar->GetPspxParDetector(); d++)
     {
         if (fMappedPar->GetPspxParStrip().At(d) == 0)
-            continue; // skip PSP3 (via MADC32)
+            continue; // skip PSPs that are read out with other electronics (e.g. MADC32)
 
         uint32_t numChannels = data->PSPX[d].M; // not necessarly number of hits! (b/c multi hit)
 
@@ -164,28 +160,28 @@ Bool_t R3BPspxReader::Read()
         uint32_t curChannelStart = 0; // index in v for first item of current channel
         for (int i = 0; i < numChannels; i++)
         {
-            uint32_t channel = data->PSPX[d].MI[i];          // or 1..65
+            uint32_t channel = data->PSPX[d].MI[i];          // counting from 1 to max number of channels for an detector
             uint32_t nextChannelStart = data->PSPX[d].ME[i]; // index in v for first item of next channel
 
             // if we had multi hit data, we would need to read
             // j=curChannelStart; j < nextChannelStart; j++.
             // For the PSPs, however, we take the first hit only:
-            uint32_t energy = data->PSPX[d].v[curChannelStart];
+            int32_t energy = data->PSPX[d].v[curChannelStart];
 
-            // The first 22 bits are energy. Bit 23 should be 0. Bit 24 is sign.
+            // For certain (old) unpackers: The first 22 bits are energy. Bit 23 should be 0. Bit 24 is sign.
             // comment from old s438b reader:  0xfff is energy data, Anything in 0xfffff000 indicates an error or
             // overflow. still usefull?
-            if (energy != 0xEEEEEE)
-            { // get rid of error message code
-
-                if ((energy & 0x800000))
-                    energy = energy - 0x800000; // subtracting the sign bit (set to 1 for negative values)
-                if (energy > 60000)
-                    continue;
-
-                new ((*fMappedItems)[fMappedItems->GetEntriesFast()]) R3BPspxMappedData(
-                    d + 1, channel, energy); // det,channel,energy counting from 1 for detectors and channels
-            }
+	    
+           // if (energy == 0xEEEEEE) continue; // get rid of error message code: only valid for certain ucesb unpackers
+	    if (energy == -3075811 || energy == -3075810) continue; // get rid of error message code: -3075810 = 0xeeeeee2, -3075811 = 0xeeeee3
+	    
+	    //if ((energy & 0x800000))
+	    //    energy = -1*(energy - 0x800000); // subtracting the sign bit (set to 1 for negative values) and multiplying with -1 to get negative energy value, only possible for certain ucesb unpackers
+	      
+	    if(TMath::Abs(energy)<4194303){ // max value possible for Febex
+		new ((*fMappedItems)[fMappedItems->GetEntriesFast()]) R3BPspxMappedData(
+		  d + 1, channel, energy); // det,channel,energy counting from 1 for detectors and channels
+	    }
 
             curChannelStart = nextChannelStart;
         }

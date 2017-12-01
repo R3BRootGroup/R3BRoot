@@ -37,7 +37,7 @@ class R3BPspxPrecalData : public TObject
                          corrected (Mapped2Precal Position Calibration).*/
 
   public:
-    ClassDef(R3BPspxPrecalData, 1)
+    ClassDef(R3BPspxPrecalData, 2)
 };
 
 #endif

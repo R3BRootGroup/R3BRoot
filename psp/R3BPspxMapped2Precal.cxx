@@ -1,13 +1,12 @@
 // -----------------------------------------------------------------------------
 // -----                                                                   -----
 // -----                           R3BPspxMapped2Precal                    -----
-// -----                    Created  13-03-2017 by I. Syndikus		         -----
+// -----                    Created  13-03-2017 by I. Syndikus		   -----
 // -----                                                                   -----
 // -----------------------------------------------------------------------------
 
 #include <iostream>
 #include <limits>
-using namespace std;
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
@@ -185,7 +184,8 @@ void R3BPspxMapped2Precal::Exec(Option_t* option)
     /**
      * Does the conversion from Mapped to Precal level. It is called for every event.
      * Energies, which are below a channel specific threshold, will be ignored.
-     * Applies (strip specific) gains to the energy entries of even channels.
+     * Applies (strip specific) gains to the energy entries of even channels. This is
+     * the first calibration step for the position reconstruction.
      */
 
     if (!fMappedItems)
@@ -194,10 +194,10 @@ void R3BPspxMapped2Precal::Exec(Option_t* option)
         return;
     }
 
-    Int_t detector1;
-    Int_t detector2;
-    Int_t strip1;
-    Int_t strip2;
+    UShort_t detector1;
+    UShort_t detector2;
+    UShort_t strip1;
+    UShort_t strip2;
     Float_t energy1;
     Float_t energy2;
 
@@ -213,10 +213,10 @@ void R3BPspxMapped2Precal::Exec(Option_t* option)
     // Calculating strip and energys
     for (Int_t i = 0; i < nMapped; i++)
     {
-        detector1 = std::numeric_limits<Int_t>::quiet_NaN();
-        detector2 = std::numeric_limits<Int_t>::quiet_NaN();
-        strip1 = std::numeric_limits<Int_t>::quiet_NaN();
-        strip2 = std::numeric_limits<Int_t>::quiet_NaN();
+        detector1 = std::numeric_limits<UShort_t>::quiet_NaN();
+        detector2 = std::numeric_limits<UShort_t>::quiet_NaN();
+        strip1 = std::numeric_limits<UShort_t>::quiet_NaN();
+        strip2 = std::numeric_limits<UShort_t>::quiet_NaN();
         energy1 = std::numeric_limits<Float_t>::quiet_NaN();
         energy2 = std::numeric_limits<Float_t>::quiet_NaN();
 
@@ -225,7 +225,7 @@ void R3BPspxMapped2Precal::Exec(Option_t* option)
         if (fPrecalPar->GetPspxParStrip().At(detector1 - 1) == 0)
             continue;
 
-        // calculating stripnumber
+        // calculating stripnumber, only for valid channel number
         if (mItem1->GetChannel() > 0 && mItem1->GetChannel() < fPrecalPar->GetPspxParStrip().At(detector1 - 1) * 4 + 1)
         { // strips
             strip1 = (mItem1->GetChannel() + 1) / 2;
@@ -240,7 +240,7 @@ void R3BPspxMapped2Precal::Exec(Option_t* option)
         {
             if (strip1 == fPrecalPar->GetPspxParStrip().At(detector1 - 1) * 2 + 1)
             { // cathode
-                if (mItem1->GetEnergy() <
+                if (TMath::Abs(mItem1->GetEnergy()) <
                     energythreshold[detector1 - 1][fPrecalPar->GetPspxParStrip().At(detector1 - 1) * 2])
                     continue;
                 energy1 = mItem1->GetEnergy();
@@ -251,12 +251,12 @@ void R3BPspxMapped2Precal::Exec(Option_t* option)
                 if (fPrecalPar->GetPspxParOrientation().At(detector1 - 1) == 1 ||
                     fPrecalPar->GetPspxParOrientation().At(detector1 - 1) == 3)
                 { // vertical strips or strips in both directions
-                    if (mItem1->GetEnergy() < energythreshold[detector1 - 1][mItem1->GetChannel() - 1])
+                    if (TMath::Abs(mItem1->GetEnergy()) < energythreshold[detector1 - 1][mItem1->GetChannel() - 1])
                         continue;
                 }
                 else if (fPrecalPar->GetPspxParOrientation().At(detector1 - 1) == 2)
                 { // horizontal strips
-                    if (mItem1->GetEnergy() <
+                    if (TMath::Abs(mItem1->GetEnergy()) <
                         energythreshold[detector1 - 1]
                                        [mItem1->GetChannel() - 1 - 2 * fPrecalPar->GetPspxParStrip().At(detector1 - 1)])
                         continue; // different counting of array and in root file + counting from #Strips+1 to #Strips*2
@@ -298,12 +298,12 @@ void R3BPspxMapped2Precal::Exec(Option_t* option)
                         if (fPrecalPar->GetPspxParOrientation().At(detector2 - 1) == 1 ||
                             fPrecalPar->GetPspxParOrientation().At(detector1 - 1) == 3)
                         { // vertical strips or strips in both directions
-                            if (mItem2->GetEnergy() < energythreshold[detector2 - 1][mItem2->GetChannel() - 1])
+                            if (TMath::Abs(mItem2->GetEnergy()) < energythreshold[detector2 - 1][mItem2->GetChannel() - 1])
                                 continue;
                         }
                         else if (fPrecalPar->GetPspxParOrientation().At(detector2 - 1) == 2)
                         { // horizontal strips
-                            if (mItem2->GetEnergy() <
+                            if (TMath::Abs(mItem2->GetEnergy()) <
                                 energythreshold[detector2 - 1][mItem2->GetChannel() - 1 -
                                                                2 * fPrecalPar->GetPspxParStrip().At(detector1 - 1)])
                                 continue; // different counting of array and in root file + counting from #Strips+1 to
@@ -329,11 +329,7 @@ void R3BPspxMapped2Precal::Exec(Option_t* option)
                                       gain[detector1 - 1]
                                           [strip1 - 1 -
                                            fPrecalPar->GetPspxParStrip().At(detector1 - 1)]; // different counting
-                            // of array and in root
-                            // file + counting from
-                            // #Strips+1 to
-                            // #Strips*2 for
-                            // horizontal strips
+                            // of array and in root file + counting from #Strips+1 to #Strips*2 for horizontal strips
                         }
                     }
                 }

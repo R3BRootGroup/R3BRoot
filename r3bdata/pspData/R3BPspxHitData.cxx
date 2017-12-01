@@ -1,4 +1,3 @@
-
 #include "R3BPspxHitData.h"
 
 R3BPspxHitData::R3BPspxHitData()
@@ -24,9 +23,9 @@ R3BPspxHitData::R3BPspxHitData(UShort_t detector,
                                Float_t sigma_x,
                                Float_t sigma_y,
                                Float_t energy,
-                               UInt_t multiplicity,
-                               UInt_t multiplicity_x,
-                               UInt_t multiplicity_y)
+                               UShort_t multiplicity,
+                               UShort_t multiplicity_x,
+                               UShort_t multiplicity_y)
     : fDetector(detector)
     , fU(u)
     , fV(v)

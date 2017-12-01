@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 // -----                                                                   -----
 // -----                           R3BPspxCal2Hit                          -----
-// -----		                created 09-03-2016 by I. Syndikus		           -----
+// -----             created 09-03-2016 by I. Syndikus		           -----
 // -----                                                                   -----
 // -----------------------------------------------------------------------------
 
@@ -48,10 +48,10 @@ class R3BPspxCal2Hit : public FairTask
     TClonesArray* fHitItems; /**< Array holding output (Hit) data */
 
     R3BPspxHitPar* fHitPar; /**< Parameter instance holding slopes and offsets */
-    std::vector<vector<Float_t>> offset;
-    std::vector<vector<Float_t>> slope;
-    std::vector<Int_t> sign_x;
-    std::vector<Int_t> sign_y;
+    std::vector<std::vector<Float_t>> offset;
+    std::vector<std::vector<Float_t>> slope;
+    std::vector<Short_t> sign_x;
+    std::vector<Short_t> sign_y;
 
     // void CreateHistos();
     // void WriteHistos();

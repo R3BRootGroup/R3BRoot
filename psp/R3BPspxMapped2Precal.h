@@ -4,8 +4,6 @@
 // -----                    Created 13-03-2017 by I. Syndikus		           -----
 // -----                                                                   -----
 // -----------------------------------------------------------------------------
-/* Converts Mapped data to Precal data
- */
 
 #ifndef R3BPSPXMAPPED2PRECAL_H
 #define R3BPSPXMAPPED2PRECAL_H
@@ -48,8 +46,8 @@ class R3BPspxMapped2Precal : public FairTask
     TClonesArray* fPrecalItems; /**< Array holding output (Precal) data */
 
     R3BPspxPrecalPar* fPrecalPar; /**< Parameter instance holding thresholds and gains for position correction */
-    std::vector<vector<Float_t>> gain;
-    std::vector<vector<Int_t>> energythreshold;
+    std::vector<std::vector<Float_t>> gain;
+    std::vector<std::vector<Int_t>> energythreshold;
 
     // void CreateHistos();
     // void WriteHistos();
