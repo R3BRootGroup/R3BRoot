@@ -31,6 +31,10 @@ enum DetectorId
     kFI6,
     kFI5,
     kSFI,
+#ifdef SOFIA
+    kSOFSCI,
+    kSOFAT,
+#endif
     kLAST
 };
 
@@ -58,6 +62,10 @@ enum fDetectorType
     kFI6Point,
     kFI5Point,
     kSFIPoint
+#ifdef SOFIA
+    ,kSOFSCIPoint
+    ,kSOFATPoint
+#endif
 };
 
 enum SensorSide

@@ -382,6 +382,9 @@ add_subdirectory (tracking)
   ENDIF(GARFIELD_FOUND)
 
 IF(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
+  Message("Building SOFIA framework...")
+  Set(WITH_SOFIA true)
+  add_definitions(-DSOFIA)
   add_subdirectory(sofia)
 ENDIF(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
 
