@@ -191,6 +191,12 @@ Int_t R3BMCTrack::GetNPoints(DetectorId detId) const
         return ((fNPoints & 0xC000000000) >> 38);
     else if (detId == kSFI)
         return ((fNPoints & 0x30000000000) >> 40);
+#ifdef SOFIA
+    else if (detId == kSOFSCI)
+        return ((fNPoints & 0xC0000000000) >> 42);
+    else if (detId == kSOFAT)
+        return ((fNPoints & 0x300000000000) >> 44);
+#endif
     else
     {
         cout << "-E- R3BMCTrack::GetNPoints: Unknown detector ID " << detId << endl;
@@ -292,6 +298,16 @@ void R3BMCTrack::SetNPoints(Int_t iDet, Int_t nP)
     {
         fNPoints = (fNPoints & (~0x30000000000)) | (nPoints << 40);
     }
+#ifdef SOFIA
+    else if (iDet == kSOFSCI)
+    {
+        fNPoints = (fNPoints & (~0xC0000000000)) | (nPoints << 42);
+    }
+    else if (iDet == kSOFAT)
+    {
+        fNPoints = (fNPoints & (~0x300000000000)) | (nPoints << 44);
+    }
+#endif
     else
     {
         cout << "-E- R3BMCTrack::SetNPoints: Unknown detector ID " << iDet << endl;
