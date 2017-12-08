@@ -225,11 +225,11 @@ void R3BPspxCal2Hit::Exec(Option_t* option)
         // calculating multiplicity
         if (strip > 0 && strip < fHitPar->GetPspxParStrip().At(detector - 1) + 1)
         {
-            if (mItem->GetEnergy1() != 0)
+            if (mItem->GetEnergy1() != 0&& !isnan(mItem->GetEnergy1()) )
             {
                 y_mult[detector - 1]++;
             }
-            if (mItem->GetEnergy2() != 0)
+            if (mItem->GetEnergy2() != 0&& !isnan(mItem->GetEnergy2()) )
             {
                 y_mult[detector - 1]++;
             }
@@ -237,18 +237,18 @@ void R3BPspxCal2Hit::Exec(Option_t* option)
         else if (strip > fHitPar->GetPspxParStrip().At(detector - 1) &&
                  strip < fHitPar->GetPspxParStrip().At(detector - 1) * 2 + 1)
         {
-            if (mItem->GetEnergy1() != 0)
+            if (mItem->GetEnergy1() != 0&& !isnan(mItem->GetEnergy1()) )
             {
                 x_mult[detector - 1]++;
             }
-            if (mItem->GetEnergy2() != 0)
+            if (mItem->GetEnergy2() != 0&& !isnan(mItem->GetEnergy2()) )
             {
                 x_mult[detector - 1]++;
             }
         }
         else if (strip == fHitPar->GetPspxParStrip().At(detector - 1) * 2 + 1)
         {
-            if (mItem->GetEnergy1() != 0)
+            if (mItem->GetEnergy1() != 0&& !isnan(mItem->GetEnergy1()) )
             {
                 e_mult[detector - 1]++;
             }
