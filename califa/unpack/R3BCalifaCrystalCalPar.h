@@ -1,77 +1,73 @@
-#ifndef R3BCALIFACRYSTALCALPAR1_H
-#define R3BCALIFACRYSTALCALPAR1_H
+// ------------------------------------------------------------------
+// -----         R3BCalifaCrystalCalPar header file             -----
+// -----            Created 22/07/14   by H.Alvarez             -----
+// -----            Modified 20/03/17  by P.Cabanelas           -----
+// -----            Modified 11/12/17  by E.Galiana             -----
+// ------------------------------------------------------------------
 
-#include "FairParGenericSet.h"          // for FairParGenericSet
 
+#ifndef R3BCALIFACRYSTALCALPAR_H
+#define R3BCALIFACRYSTALCALPAR_H
+
+#include "FairParGenericSet.h" // for FairParGenericSet
+
+#include "TObject.h"
+#include <TObjString.h>
 #include "TObjArray.h"
-#include "TGeoMaterial.h" 
-#include "Rtypes.h"                     // for Double_t, Int_t, UInt_t, etc
-#include <iostream>                     // for operator<<, basic_ostream, etc
-#include <string>                       // for string
-
-#include "R3BCalifaDUCalPar.h"
+#include "TArrayF.h"
 
 using namespace std;
 
-class FairDbOutTableBuffer;
-class FairDbResultPool;
-class FairDbObjTableMap;
-class FairDbValRecord;
 class FairParamList;
 
-
-class R3BCalifaCrystalCalPar : public FairDbObjTableMap
-{
-
-  public :
-    R3BCalifaCrystalCalPar (const char* name="R3BCalifaCrystalCalPar",
-                  const char* title="Califa Calibration Parameter",
-                  const char* context="TestDefaultContext",
-                  Bool_t own=kTRUE);
-    virtual ~R3BCalifaCrystalCalPar(void);
-
-    void   clear(void);
-    void   putParams(FairParamList* list);
-    Bool_t getParams(FairParamList* list);
-    void   Print();
-    void ReadFile(string file);
-
-	// Lists handling  
-    void   AddDUCalPar(R3BCalifaDUCalPar* tch){fDUCalParams->Add(tch);}  
-    TObjArray* GetListOfDUCalPar(Int_t side) {return fDUCalParams;}
-    Int_t GetNumDUCalPar() {return fDUCalParams->GetEntries();} 
-    R3BCalifaDUCalPar* GetDUCalParAt(Int_t idx){return (R3BCalifaDUCalPar*) fDUCalParams->At(idx);} 
-
-
-   // Add-ons: SQL descriptors for the parameter class
-    virtual std::string GetTableDefinition(const char* Name = 0){std::string rr=""; return rr;}
-
-    virtual FairDbObjTableMap* CreateObjTableMap() const {
-      return new R3BCalifaCrystalCalPar();
-    }
-
-    // Atomic IO (intrinsic)
-    virtual void Fill(FairDbResultPool& res_in,
-                      const FairDbValRecord* valrec){;}
-    virtual void Store(FairDbOutTableBuffer& res_out,
-                       const FairDbValRecord* valrec) const {;}
-
-    // Global IO using run_id
-    virtual void fill(UInt_t rid);
-    virtual void store(UInt_t rid);
-
-    virtual ValCondition GetContext(UInt_t rid) {
-      return ValCondition(FairDbDetector::kCal,
-                          DataType::kData,
-                          ValTimeStamp(rid));
-    }
-
-
-  private:
-    TObjArray* fDUCalParams;
-
-    ClassDef(R3BCalifaCrystalCalPar,1); // R3BCalifaCrystalCalPar Parameter Container example
+class R3BCalifaCrystalCalPar : public FairParGenericSet {
+  
+ public:
+  
+  /** Standard constructor **/
+  R3BCalifaCrystalCalPar( const char* name    = "califaCrystalCalPar",
+			  const char* title   = "Califa CrystalCal Parameters",
+			  const char* context = "CalifaCalParContext");
+  
+  /** Destructor **/
+  virtual ~R3BCalifaCrystalCalPar();
+  
+  /** Method to reset all parameters **/
+  virtual void clear();
+  
+  /** Method to store all parameters using FairRuntimeDB **/
+  virtual void putParams(FairParamList* list); 
+  
+  /** Method to retrieve all parameters using FairRuntimeDB**/
+  Bool_t getParams(FairParamList* list);
+  
+  /** Method to print values of parameters to the standard output **/
+  void printParams();
+  
+  /** Accessor functions **/
+  const Double_t GetNumCrystals(){return fNumCrystals;}
+  const Double_t GetNumParametersFit(){return fNumParamsFit;}
+  TArrayF* GetCryCalParams(){return fCryCalParams;}
+  
+  void SetNumCrystals(Int_t numberCry){fNumCrystals=numberCry;}
+  void SetNumParametersFit(Int_t numberParams){fNumParamsFit=numberParams;}
+  void SetCryCalParams(Float_t cc, Int_t ii ){fCryCalParams->AddAt(cc, ii);}
+  
+  /** Create more Methods if you need them! **/
+  
+ private:
+  
+  TArrayF* fCryCalParams;/*< Calibration Parameters of Crystals>*/
+  Int_t fNumCrystals;	/*< number of crystals>*/
+  Int_t fNumParamsFit;	/*< number of cal parameters in the fit
+			  pol1: A_fit & B_fit
+			  pol2: A_fit, B_fit & C_fit>*/
+  
+  const R3BCalifaCrystalCalPar& operator=(const R3BCalifaCrystalCalPar&);/*< an assignment operator>*/
+  
+  R3BCalifaCrystalCalPar( const R3BCalifaCrystalCalPar&);/*< a copy constructor >*/
+  
+  ClassDef(R3BCalifaCrystalCalPar,1);
 };
 
-#endif /* !R3BCALIFACRYSTALCALPAR_H*/
-
+#endif

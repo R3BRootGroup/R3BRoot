@@ -49,7 +49,7 @@ unpack/R3BCalifaCrystalCalDataAnalysis.cxx
 unpack/R3BCalifaMapped2CrystalCalPar.cxx
 unpack/R3BCalifaMappingReader.cxx
 unpack/R3BCalifaCrystalCal2CrystalCalPID.cxx
-#unpack/R3BCalifaCrystalCalPar.cxx
+unpack/R3BCalifaCrystalCalPar.cxx
 #unpack/R3BCalifaDUCalPar.cxx
 )
 
@@ -60,12 +60,13 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF CalifaLinkDef.h)
 set(LIBRARY_NAME R3BCalifa)
 set(DEPENDENCIES
-    R3Bbase R3BData R3BPassive R3BXBall)
+    Spectrum R3Bbase R3BData R3BPassive R3BXBall)
 
 if(FAIRDB_FOUND)
 set(DEPENDENCIES
     ${DEPENDENCIES} FairDB)
 endif(FAIRDB_FOUND)
+
 
 GENERATE_LIBRARY()
 

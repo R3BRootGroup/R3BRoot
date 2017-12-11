@@ -8,15 +8,15 @@
  * (present file is valid for 9 modules and 16 channels for module)
  * */
 
-typedef struct EXT_STR_h101_t {
-  EXT_STR_h101_unpack_t unpack;
-  EXT_STR_h101_CALIFA_t califa;
-} EXT_STR_h101;
+ typedef struct EXT_STR_h101_t {
+   EXT_STR_h101_unpack_t unpack;
+   EXT_STR_h101_CALIFA_t califa;
+ } EXT_STR_h101;
 
-void califa_febex3_ucesb() {
+void califa_febex3_ucesb2() {
   TStopwatch timer;
   timer.Start();
-  
+
   //const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
   const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
   
@@ -44,67 +44,38 @@ void califa_febex3_ucesb() {
   
   /* Create online run ------------------------------------ */
   FairRunOnline* run = new FairRunOnline(source);
-  //run->SetRunId(1495624105);
   run->SetRunId(1513078509);
   run->SetOutputFile(outputFileName);
   
-  /* Add analysis task ------------------------------------ */
+  /* Add analysis task ------------------------------------ */  
   
-  //R3BCalifaMapped2CrystalCalPar ----
-  TArrayF* EnergythePeaks = new TArrayF();
-  Float_t e1=1332.5;
-  Float_t e2=1173.2;
-  EnergythePeaks->Set(2);
-  EnergythePeaks->AddAt(e1,0);
-  EnergythePeaks->AddAt(e2,1);
-  
-  R3BCalifaMapped2CrystalCalPar* CalPar = new R3BCalifaMapped2CrystalCalPar();  
-  CalPar->SetNumCrystals(512); //3 petals*64cry
-  CalPar->SetMinStadistics(1000);
-  CalPar->SetNumParameterFit(2);//OPTIONAL by default 2
-  CalPar->SetCalRange_left(100);  
-  CalPar->SetCalRange_right(400);
-  CalPar->SetCalRange_bins(300);    
-  CalPar->SetSigma(3.0);
-  CalPar->SetThreshold(0.0001);      
-  CalPar->SetEnergyPeaks(EnergythePeaks);
-  run->AddTask(CalPar);
+  //R3BCalifaMapped2CrystalCal ---
+  R3BCalifaMapped2CrystalCal* Map2Cal = new R3BCalifaMapped2CrystalCal();
+  run->AddTask(Map2Cal);
   /* ------------------------------------------------------ */
   
   /* Initialize ------------------------------------------- */
-  run->Init();
+  //run->Init();
   FairLogger::GetLogger()->SetLogScreenLevel("INFO");
   /* ------------------------------------------------------ */
   
   /* Runtime data base ------------------------------------ */
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
-  /*R3BFieldPar* fieldPar = (R3BFieldPar*)rtdb->getContainer("R3BFieldPar");
-    fieldPar->SetParameters(magField);
-    fieldPar->setChanged();*/
-  
-  //Choose Root or Ascii file	
-  //1-Root file with the Calibartion Parameters
-  Bool_t kParameterMerged = kTRUE;
-  FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
-  parOut->open("Califa_CalibParam.root");
-  rtdb->setOutput(parOut);
-  rtdb->saveOutput();
+  //FairParAsciiFileIo* parIo1 = new FairParAsciiFileIo();//Ascii
+  //parIo1->open("Params.par","in");
+  FairParRootFileIo* parIo1 = new FairParRootFileIo();//Root
+  parIo1->open("Califa_CalibParam.root","in");
+  rtdb->setFirstInput(parIo1);
   rtdb->print();
-  
-  //2-Ascii file with the Calibartion Parameters
-  /*FairParAsciiFileIo* parIo1 = new FairParAsciiFileIo();
-    parIo1->open("Califa_CalibParam.par","out");
-    rtdb->setOutput(parIo1);
-    rtdb->saveOutput();
-    rtdb->print();*/
   /* ------------------------------------------------------ */
   
   /* Run -------------------------------------------------- */
+  run->Init();
   run->Run(nev,0);
-  /*rtdb->saveOutput();*/
+  //rtdb->saveOutput();
   delete run;
   /* ------------------------------------------------------ */
-
+  
   timer.Stop();
   Double_t rtime = timer.RealTime();
   Double_t ctime = timer.CpuTime();

@@ -17,7 +17,7 @@
 #pragma link C++ class R3BCalifaCrystalCalDataAnalysis+;
 #pragma link C++ class R3BCalifaMappingReader+;
 #pragma link C++ class R3BCalifaCrystalCal2CrystalCalPID+;
-//#pragma link C++ class R3BCalifaCrystalCalPar+;
+#pragma link C++ class R3BCalifaCrystalCalPar+;
 //#pragma link C++ class R3BCalifaDUCalPar+;
 
 #pragma link C++ class R3BCalifaCrystalCal2Hit+;
