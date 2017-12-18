@@ -121,6 +121,9 @@ void R3BMCTrack::Print(Option_t* option) const
          << ", CALIFA " << GetNPoints(kCALIFA) << ", MFI " << GetNPoints(kMFI) << ", PSP " << GetNPoints(kPSP)
          << ", VETO " << GetNPoints(kVETO) << ", STARTRACK " << GetNPoints(kSTARTRACK) << ", LUMON "
          << GetNPoints(kLUMON) << ", NeuLAND " << GetNPoints(kNEULAND) << endl;
+#ifdef SOFIA
+    cout << ", SCI " << GetNPoints(kSOFSCI) << ", AT " << GetNPoints(kSOFAT) << ", TRIM " << GetNPoints(kSOFTRIM) << ", MWPC1 " << GetNPoints(kSOFMWPC1) << ", TWIM " << GetNPoints(kSOFTWIM) << ", MWPC2 " << GetNPoints(kSOFMWPC2) << ", SOF ToF Wall " << GetNPoints(kSOFTofWall) << endl;
+#endif
 }
 // -------------------------------------------------------------------------
 
@@ -196,6 +199,16 @@ Int_t R3BMCTrack::GetNPoints(DetectorId detId) const
         return ((fNPoints & 0xC0000000000) >> 42);
     else if (detId == kSOFAT)
         return ((fNPoints & 0x300000000000) >> 44);
+    else if (detId == kSOFTRIM)
+        return ((fNPoints & 0xC00000000000) >> 46);
+    else if (detId == kSOFMWPC1)
+        return ((fNPoints & 0x3000000000000) >> 48);
+    else if (detId == kSOFTWIM)
+        return ((fNPoints & 0xC000000000000) >> 50);
+    else if (detId == kSOFMWPC2)
+        return ((fNPoints & 0x30000000000000) >> 52);
+    else if (detId == kSOFTofWall)
+        return ((fNPoints & 0xC0000000000000) >> 54);
 #endif
     else
     {
@@ -306,6 +319,26 @@ void R3BMCTrack::SetNPoints(Int_t iDet, Int_t nP)
     else if (iDet == kSOFAT)
     {
         fNPoints = (fNPoints & (~0x300000000000)) | (nPoints << 44);
+    }
+    else if (iDet == kSOFTRIM)
+    {
+        fNPoints = (fNPoints & (~0xC00000000000)) | (nPoints << 46);
+    }
+    else if (iDet == kSOFMWPC1)
+    {
+        fNPoints = (fNPoints & (~0x3000000000000)) | (nPoints << 48);
+    }
+    else if (iDet == kSOFTWIM)
+    {
+        fNPoints = (fNPoints & (~0xC000000000000)) | (nPoints << 50);
+    }
+    else if (iDet == kSOFMWPC2)
+    {
+        fNPoints = (fNPoints & (~0x30000000000000)) | (nPoints << 52);
+    }
+    else if (iDet == kSOFTofWall)
+    {
+        fNPoints = (fNPoints & (~0xC0000000000000)) | (nPoints << 54);
     }
 #endif
     else

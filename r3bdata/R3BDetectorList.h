@@ -34,6 +34,11 @@ enum DetectorId
 #ifdef SOFIA
     kSOFSCI,
     kSOFAT,
+    kSOFTRIM,
+    kSOFMWPC1,
+    kSOFTWIM,
+    kSOFMWPC2,
+    kSOFTofWall,
 #endif
     kLAST
 };
@@ -65,6 +70,11 @@ enum fDetectorType
 #ifdef SOFIA
     ,kSOFSCIPoint
     ,kSOFATPoint
+    ,kSOFTRIMPoint
+    ,kSOFMWPC1Point
+    ,kSOFTWIMPoint
+    ,kSOFMWPC2Point
+    ,kSOFTofWallPoint
 #endif
 };
 
