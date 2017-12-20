@@ -56,7 +56,7 @@ void testR3BPhaseSpaceGeneratorIntegration()
     run.Run(1);
 
     // Test Output
-    auto file = run.GetOutputFile();
+    auto file = TFile::Open("testR3BPhaseSpaceGeneratorIntegration.root");
     auto tree = (TTree*)file->Get("evt");
     auto mctc = new TClonesArray("R3BMCTrack");
     tree->SetBranchAddress("MCTrack", &mctc);

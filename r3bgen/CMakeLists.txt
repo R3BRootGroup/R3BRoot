@@ -12,6 +12,21 @@
 #  "-ffriend-injection")
 #ENDIF(${req_gcc_major_vers} MATCHES "4" AND NOT ${req_gcc_minor_vers} MATCHES "0")
 
+
+#########################################################
+# temporary workaround for testR3BPhaseSpaceGenerator.cxx
+# while FairVersion.h is not working
+execute_process(COMMAND ${FAIRROOTPATH}/bin/fairroot-config --major_version
+    OUTPUT_VARIABLE fairroot_major_version)
+execute_process(COMMAND ${FAIRROOTPATH}/bin/fairroot-config --minor_version
+    OUTPUT_VARIABLE fairroot_minor_version) 
+
+if((${fairroot_major_version} EQUAL 17 AND ${fairroot_minor_version} EQUAL 10) OR ${fairroot_major_version} GREATER 17)
+message("using new FairPrimaryGenerator interface")
+add_definitions(-DFairPrimaryGeneratorAddTrackNewInterface)
+endif((${fairroot_major_version} EQUAL 17 AND ${fairroot_minor_version} EQUAL 10) OR ${fairroot_major_version} GREATER 17)
+#########################################################
+
 Set(SYSTEM_INCLUDE_DIRECTORIES 
 ${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
