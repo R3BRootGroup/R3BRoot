@@ -1,5 +1,6 @@
 #include "FairPrimaryGenerator.h"
 #include "R3BPhaseSpaceGenerator.h"
+#include "TMCProcess.h"
 #include "TVector3.h"
 #include "gtest/gtest.h"
 #include <stdexcept>
@@ -25,7 +26,12 @@ namespace
                       Bool_t wanttracking = true,
                       Double_t e = -9e9,
                       Double_t tof = 0.,
-                      Double_t weight = 0.) override
+                      Double_t weight = 0.
+#ifdef FairPrimaryGeneratorAddTrackNewInterface
+                      ,TMCProcess proc = kPPrimary
+#endif
+                     ) override
+
         {
             nTracks++;
             PDGs.push_back(pdgid);
