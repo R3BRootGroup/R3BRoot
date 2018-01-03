@@ -12,6 +12,7 @@ using namespace std;
 Bool_t R3BGammaGenerator::Init()
 {
   fRandom.SetSeed(0);
+  return kTRUE;
 }
 
 Bool_t R3BGammaGenerator::ReadEvent(FairPrimaryGenerator *primGen)
@@ -110,7 +111,7 @@ void R3BGammaGenerator::GenerateGamma(double E, FairPrimaryGenerator *primGen)
   TLorentzVector vGamma(vMomentum, E);
   vGamma.Boost(fBeta);
 
-  LOG(DEBUG) << "R3BGammaGenerator: Sending gamma: E_rest = " << (1000.*E) << " MeV, E_lab = " << (1000.*vGamma.E()) << " MeV, Theta_lab = " << (vGamma.Theta()*180./TMath::Pi()) << "°" << FairLogger::endl;
+  LOG(DEBUG) << "R3BGammaGenerator: Sending gamma: E_rest = " << (1000.*E) << " MeV, E_lab = " << (1000.*vGamma.E()) << " MeV, Theta_lab = " << (vGamma.Theta()*180./TMath::Pi()) << " deg" << FairLogger::endl;
 
   primGen->AddTrack(22, vGamma.Px(), vGamma.Py(), vGamma.Pz(), 0, 0, 0);
 }

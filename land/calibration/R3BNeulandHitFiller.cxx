@@ -28,7 +28,8 @@ R3BNeulandHitFiller::R3BNeulandHitFiller()
 
 R3BNeulandHitFiller::~R3BNeulandHitFiller()
 {
-  delete data, r;
+  delete data;
+  delete r;
 }
 
 TVector3 R3BNeulandHitFiller::getDirection(){

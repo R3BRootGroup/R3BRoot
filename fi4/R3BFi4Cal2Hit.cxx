@@ -147,7 +147,7 @@ void R3BFi4Cal2Hit::ReadGeometry(){
     std::string line, xpos,ypos,zpos,angle;
     int ndet=0;
     while(position.good()){
-      if(ndet=fNDet){
+      if(ndet==fNDet){
 	LOG(WARNING)  << "R3BFi4Cal2Hit in Position file are more detectors given than used: after " << fNDet << " line everything is ignored!!"<< FairLogger::endl;
 	break;
       }
@@ -188,14 +188,13 @@ Float_t R3BFi4Cal2Hit::ZPos(UInt_t fiber, UInt_t det_type){
 
 Float_t R3BFi4Cal2Hit::YPos(UInt_t fiber, UInt_t det_type){
   //might be possible from time difference not now!! also rotating the detector against each other possible
-  if(det_type==1)  return -9999;
   if(det_type==0)  return fiber*fFiber_width;//+fRevPoint[1];
+  return -9999;
 }
 
 Float_t R3BFi4Cal2Hit::XPos(UInt_t fiber, UInt_t det_type){
   if(det_type==1)  return fiber*fFiber_width;//*TMath::Cos(fAngle[det_type])+fRevPoint[0];
-  if(det_type==0)  return -9999;
-
+  return -9999;
 }
 //void R3BFi4Cal2Hit::WriteHistos() {}
 

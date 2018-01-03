@@ -236,7 +236,16 @@ R3BNeulandCal2HitPar::R3BNeulandCal2HitPar(const char* name, Int_t iVerbose)
 
 R3BNeulandCal2HitPar::~R3BNeulandCal2HitPar() {
    if(x_plot){
-     delete x_plot, y_plot, x_fit, y_fit;
+     delete x_plot;
+     if(y_plot) {
+       delete y_plot;
+     }
+     if(x_fit) {
+       delete x_fit;
+     }
+     if(y_fit) {
+       delete y_fit;
+     }
        for(Int_t i = 0; i < fPlanes; i++)
 	 for(Int_t j = fPaddles; j >= 0; j--){
 	   delete bars[i][j], _ecalhistos[i][j], _ecalgraphs[i][j];
@@ -1135,7 +1144,9 @@ void R3BNeulandCal2HitPar::FinishTask() {
    h_tsync->Write();
    h_veff->Write();
    h_ecal->Write();
-   delete h_tdiff, h_tsync, h_veff;
+   delete h_tdiff;
+   delete h_tsync;
+   delete h_veff;
 
    fPar->setChanged();
    LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << fPar->GetNumModulePar() << "/" << fPlanes*fPaddles*2 << " PMTs calibrated!" << FairLogger::endl;

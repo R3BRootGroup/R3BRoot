@@ -234,6 +234,7 @@ next Lead Ch %d next Trail Ch %d\n",d+1,channel,t+1,nextChannelStart,data->TOFD_
 	
 			}	
 */			
+    return kTRUE;
 }
 
 void R3BTofdReader::Reset()

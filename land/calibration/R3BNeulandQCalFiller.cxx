@@ -11,7 +11,8 @@ R3BNeulandQCalFiller::R3BNeulandQCalFiller()
 
 R3BNeulandQCalFiller::~R3BNeulandQCalFiller()
 {
-  delete data, header;
+  delete data;
+  delete header;
 }
 
 InitStatus R3BNeulandQCalFiller::Init()

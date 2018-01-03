@@ -190,6 +190,8 @@ Bool_t R3BPspxReader::Read()
             curChannelStart = nextChannelStart;
         }
     }
+
+    return kTRUE;
 }
 
 void R3BPspxReader::Reset() { fMappedItems->Clear(); }
