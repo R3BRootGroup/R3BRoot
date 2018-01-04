@@ -1,9 +1,9 @@
-void run_sim()
+void run_gen_sim()
 {
-    TString transport = "TGeant4";
+    TString transport = "TGeant3";
 
-    TString outFile = "sim.root";
-    TString parFile = "par.root";
+    TString outFile = "gen_sim.root";
+    TString parFile = "gen_par.root";
 
     Bool_t magnet = kTRUE;
     Float_t fieldScale = -0.6;
@@ -11,7 +11,7 @@ void run_sim()
     TString generator1 = "box";
     TString generator2 = "ascii";
     TString generator3 = "r3b";
-    TString generator = generator1;
+    TString generator = generator3;
     TString inputFile = "";
 
     Int_t nEvents = 1;

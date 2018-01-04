@@ -13,8 +13,8 @@ void preCalibr(Int_t nNeutrons = 4, Int_t nEvents = 100, Int_t beamE = 600, Int_
 
   char str[100];
   sprintf(str, "%1dAMeV.%1dn.%1dkeV.%1dm.root", beamE,nNeutrons, Erel, d);
-  TString inFile  = TString(strDir) + "/r3bsim." + TString(str);
-  TString parFile  = TString(strDir) + "/r3bpar." + TString(str);
+  TString inFile  = TString(strDir) + "/sim." + TString(str);
+  TString parFile  = TString(strDir) + "/par." + TString(str);
   TString outFile  = TString(strDir) + "/r3bcalibr." + TString(str);
   // ---------------------------------------------------------------------------
 

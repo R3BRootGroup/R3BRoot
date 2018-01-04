@@ -14,9 +14,9 @@ void r3blandreco(Int_t nNeutrons = 4, Int_t nEvents = 100, Int_t beamE = 600, In
   char str2[100];
   sprintf(str, "%1dAMeV.%1dn.%1dkeV.%1dm.root", beamE,nNeutrons, Erel, d);
   sprintf(str2, "%1dAMeV.%1dkeV.%1dm", beamE, Erel, d);
-  TString inFile  = TString(strDir) + "/r3bsim." + TString(str);
+  TString inFile  = TString(strDir) + "/sim." + TString(str);
   TString digiFile  = TString(strDir) + "/r3bcalibr." + TString(str);
-  TString parFile  = TString(strDir) + "/r3bpar." + TString(str);
+  TString parFile  = TString(strDir) + "/par." + TString(str);
   TString calibrFile  = TString(strDir) + "/r3bcalibr." + TString(str2) + ".txt";
   TString outFile  = TString(strDir) + "/r3breco." + TString(str);
   // ---------------------------------------------------------------------------

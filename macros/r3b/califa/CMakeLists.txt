@@ -1,8 +1,3 @@
-GENERATE_ROOT_TEST_SCRIPT(${R3BROOT_SOURCE_DIR}/macros/r3b/califa/r3bsim.C)
-add_test(califasim ${R3BROOT_BINARY_DIR}/macros/r3b/califa/r3bsim.sh)
-SET_TESTS_PROPERTIES(califasim PROPERTIES TIMEOUT "100")
-SET_TESTS_PROPERTIES(califasim PROPERTIES PASS_REGULAR_EXPRESSION "TestPassed;All ok")
-
 GENERATE_ROOT_TEST_SCRIPT(${R3BROOT_SOURCE_DIR}/macros/r3b/califa/runsim.C)
 add_test(califasim2 ${R3BROOT_BINARY_DIR}/macros/r3b/califa/runsim.sh)
 SET_TESTS_PROPERTIES(califasim2 PROPERTIES TIMEOUT "100")

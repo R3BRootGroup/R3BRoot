@@ -1,6 +1,6 @@
 #!/bin/bash -l
 
-. r3blandsim.sh
+. run_sim.sh
 
 . preCalibr.sh
 
