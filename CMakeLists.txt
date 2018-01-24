@@ -388,6 +388,13 @@ IF(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
   add_subdirectory(sofia)
 ENDIF(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
 
+IF(EXISTS "${R3BROOT_SOURCE_DIR}/glad-tpc/")
+  Message("Building GLAD-TPC detector...")
+  Set(WITH_GTPC true)
+  add_definitions(-DGTPC)
+  add_subdirectory(glad-tpc)
+ENDIF(EXISTS "${R3BROOT_SOURCE_DIR}/glad-tpc/")
+
 ENDIF (NOT MODULE)
 
 Execute_Process(COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-opengl
