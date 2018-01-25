@@ -40,6 +40,9 @@ enum DetectorId
     kSOFMWPC2,
     kSOFTofWall,
 #endif
+#ifdef GTPC
+    kGTPC,
+#endif
     kLAST
 };
 
@@ -75,6 +78,9 @@ enum fDetectorType
     ,kSOFTWIMPoint
     ,kSOFMWPC2Point
     ,kSOFTofWallPoint
+#endif
+#ifdef GTPC
+    ,kGTPCPoint
 #endif
 };
 

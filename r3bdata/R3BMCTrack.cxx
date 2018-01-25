@@ -124,6 +124,9 @@ void R3BMCTrack::Print(Option_t* option) const
 #ifdef SOFIA
     cout << ", SCI " << GetNPoints(kSOFSCI) << ", AT " << GetNPoints(kSOFAT) << ", TRIM " << GetNPoints(kSOFTRIM) << ", MWPC1 " << GetNPoints(kSOFMWPC1) << ", TWIM " << GetNPoints(kSOFTWIM) << ", MWPC2 " << GetNPoints(kSOFMWPC2) << ", SOF ToF Wall " << GetNPoints(kSOFTofWall) << endl;
 #endif
+#ifdef GTPC
+    cout << ", GTPC " << GetNPoints(kGTPC) << endl;
+#endif
 }
 // -------------------------------------------------------------------------
 
@@ -209,6 +212,10 @@ Int_t R3BMCTrack::GetNPoints(DetectorId detId) const
         return ((fNPoints & 0x30000000000000) >> 52);
     else if (detId == kSOFTofWall)
         return ((fNPoints & 0xC0000000000000) >> 54);
+#endif
+#ifdef GTPC
+    else if (detId == kGTPC)
+        return ((fNPoints & 0x300000000000000) >> 56);
 #endif
     else
     {
@@ -339,6 +346,12 @@ void R3BMCTrack::SetNPoints(Int_t iDet, Int_t nP)
     else if (iDet == kSOFTofWall)
     {
         fNPoints = (fNPoints & (~0xC0000000000000)) | (nPoints << 54);
+    }
+#endif
+#ifdef GTPC
+    else if (iDet == kGTPC)
+    {
+        fNPoints = (fNPoints & (~0x300000000000000)) | (nPoints << 56);
     }
 #endif
     else
