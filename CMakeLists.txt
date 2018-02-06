@@ -48,6 +48,8 @@ Else (FAIRBASE)
 
 EndIf (FAIRBASE)
 
+#added a variable to point to r3broot path in the system
+SET( R3BROOTPATH ${CMAKE_INSTALL_PREFIX} )
 
 # where to look first for cmake modules, before ${CMAKE_ROOT}/Modules/
 # is checked
@@ -79,7 +81,7 @@ include(CheckCXX11Features)
 # Load some basic macros which are needed later on
 include(FairMacros)
 include(R3BMacros)
-include(WriteConfigFile)
+include(WriteConfigFile_r3b)
 include(Dart)
 include(CheckCompiler)
 include(WriteEnvCache)
