@@ -8,7 +8,7 @@ void califaFindPidCal(TString inputFile, TString outputFile,
   
   // -----   Create analysis run   ----------------------------------------
   FairRunAna* fRun = new FairRunAna();
-  fRun->SetInputFile(inputFile);
+  fRun->SetSource(new FairFileSource(inputFile));
   fRun->SetOutputFile(outputFile);
   
   FairRootManager::Instance()->SetCompressData(true);

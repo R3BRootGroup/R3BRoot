@@ -19,7 +19,7 @@ void landDigi(){
 
   // -----   Digitization run   -------------------------------------------
   FairRunAna *fRun= new FairRunAna();
-  fRun->SetInputFile(inFile1);
+  fRun->SetSource(new FairFileSource(inFile1));
 //  fRun->AddFile(inFile2);
 //  fRun->AddFile(inFile3);
 //  fRun->AddFile(inFile4);

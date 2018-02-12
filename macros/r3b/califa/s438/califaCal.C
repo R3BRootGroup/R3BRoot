@@ -36,7 +36,7 @@ void califaCal(TString inputFile="", TString outputFile="",
   FairLogger::GetLogger()->SetLogScreenLevel("INFO");
   // -----   Create analysis run   ----------------------------------------
   FairRunAna* fRun = new FairRunAna();
-  fRun->SetInputFile(inputFile);
+  fRun->SetSource(new FairFileSource(inputFile));
   fRun->SetOutputFile(outputFile);
 
   FairRootManager::Instance()->SetCompressData(true);

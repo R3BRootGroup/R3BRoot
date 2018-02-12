@@ -9,7 +9,7 @@
   rtdb->setFirstInput(parIo1);
   rtdb->print();
  
-  fRun->SetInputFile("sim.600AMeV.4n.500keV.14m.root");
+  fRun->SetSource(new FairFileSource("sim.600AMeV.4n.500keV.14m.root"));
   fRun->SetOutputFile("test.root");
 
   R3BEventManager *fMan= new R3BEventManager();

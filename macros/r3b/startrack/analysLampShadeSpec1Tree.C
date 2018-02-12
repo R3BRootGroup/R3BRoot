@@ -60,7 +60,7 @@ void analysEvents(Int_t analType=1, char* input, char* output) {
 
   // -----   Reconstruction run   -------------------------------------------
   //  FairRunAna *fRun= new FairRunAna();
-  //  fRun->SetInputFile(input);
+  //  fRun->SetSource(new FairFileSource(input));
   //  fRun->LoadGeometry();
   //  fRun->SetOutputFile(output);
 

@@ -16,7 +16,7 @@ void run_digi()
 
     // ----- Digitization --------------------------------------------------------
     FairRunAna* run = new FairRunAna();
-    run->SetInputFile(inFile);
+    run->SetSource(new FairFileSource(inFile));
     run->SetOutputFile(outFile);
     // ---------------------------------------------------------------------------
 

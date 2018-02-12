@@ -46,7 +46,7 @@ void califaAna(Int_t nEvents = 1) {
 	
 	// -----   Create analysis run   ----------------------------------------
 	FairRunAna* fRun = new FairRunAna();
-	fRun->SetInputFile(InFile.Data());
+	fRun->SetSource(new FairFileSource(InFile));
 	fRun->SetOutputFile(OutFile.Data());
 
 	// -----   Runtime database   ---------------------------------------------

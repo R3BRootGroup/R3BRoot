@@ -16,7 +16,7 @@ void TofDigi(){
 
   // -----   Digitization run   -------------------------------------------
   FairRunAna *fRun= new FairRunAna();
-  fRun->SetInputFile(inFile);
+  fRun->SetSource(new FairFileSource(inFile));
   fRun->SetOutputFile(outFile);
 
 

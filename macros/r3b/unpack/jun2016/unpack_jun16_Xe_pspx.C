@@ -71,7 +71,7 @@ void unpack_jun16_Xe_pspx(Int_t RunId = 111)
     run->SetRunId(RunId);
 #else
     FairRunAna* run = new FairRunAna();
-    run->SetInputFile(filename);
+    run->SetSource(new FairFileSource(filename));
 #endif
 
     run->SetOutputFile(outputFileName.Data());

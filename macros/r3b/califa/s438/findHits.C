@@ -7,7 +7,7 @@ void findHits(TString inputFile="", TString outputFile="", Int_t nEvents = 0)
   
   // -----   Create analysis run   ----------------------------------------
   FairRunAna* fRun = new FairRunAna();
-  fRun->SetInputFile(inputFile);
+  fRun->SetSource(new FairFileSource(inputFile));
   fRun->SetOutputFile(outputFile);
  
   // Hit finder

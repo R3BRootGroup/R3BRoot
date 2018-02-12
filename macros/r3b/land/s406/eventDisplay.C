@@ -8,7 +8,7 @@
   rtdb->setFirstInput(parIo1);
   rtdb->print();
 
-  fRun->SetInputFile("/Users/kresan/neuland/r3bsim.s406.255AMeV.root");
+  fRun->SetSource(new FairFileSource("/Users/kresan/neuland/r3bsim.s406.255AMeV.root"));
   fRun->SetOutputFile("test.root");
 
   R3BEventManager *fMan = new R3BEventManager();

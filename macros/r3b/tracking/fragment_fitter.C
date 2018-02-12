@@ -7,7 +7,7 @@ void fragment_fitter()
     
     // Create analysis run -----------------------------------------------------
     FairRunAna* run = new FairRunAna();
-    run->SetInputFile(inFile.Data());
+    run->SetSource(new FairFileSource(inFile));
     run->SetOutputFile(outFile.Data());
     // -------------------------------------------------------------------------
     

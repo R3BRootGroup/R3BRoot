@@ -18,7 +18,7 @@ eventDisplay()
 
  //-------
  
-  fRun->SetInputFile("r3bsim.root");
+  fRun->SetSource(new FairFileSource("r3bsim.root"));
   fRun->SetOutputFile("test.root");
 
   fRun->LoadGeometry();

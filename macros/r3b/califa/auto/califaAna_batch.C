@@ -47,7 +47,7 @@ void califaAna_batch(Int_t nEvents=1, Int_t fGeoVer=1, Double_t fThres=0.000050,
         rtdb->setFirstInput(parIo1);
         rtdb->print();
 
-	fRun->SetInputFile("r3bsim.root");
+	fRun->SetSource(new FairFileSource("r3bsim.root"));
 	fRun->SetOutputFile("califaAna.root");
 	
 	// -----  Analysis routines for CALIFA	

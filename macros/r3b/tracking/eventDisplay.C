@@ -8,7 +8,7 @@ void eventDisplay()
   rtdb->setFirstInput(parIo1);
   rtdb->print();
   
-  fRun->SetInputFile("sim.root");
+  fRun->SetSource(new FairFileSource("sim.root"));
   fRun->SetOutputFile("test.root");
   
   FairEventManager *fMan= new FairEventManager();

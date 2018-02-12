@@ -8,7 +8,7 @@ void califaEventDisplay()
   rtdb->setFirstInput(parIo1);
   rtdb->print();
   
-  fRun->SetInputFile("sim_out.root");
+  fRun->SetSource(new FairFileSource("sim_out.root"));
   fRun->SetOutputFile("test.root");
   
   R3BEventManager *fMan  = new R3BEventManager();

@@ -20,13 +20,15 @@ eventDisplay()
 
 
  //-------
+
+  //FairFileSource* source = new FairFileSource("r3bsim.root");
+  //source->AddFriend("land_digi.root");
+  //FairFileSource* source = new FairFileSource("/lustre/land/jmargan/simulation/Ox_1p/r3bsim_bug.root");
+  FairFileSource* source = new FairFileSource("/u/fwamers/Promotion/L_Analysis/s318/qfs_analysis/ne17/sim_r3broot/output/r3bsim.root");
+  //FairFileSource* source = new FairFileSource("r3bsim_1000ev_01-30en.root");
+
+  fRun->SetSource(source);
  
-// fRun->SetInputFile("r3bsim.root");
- //fRun->SetInputFile("/lustre/land/jmargan/simulation/Ox_1p/r3bsim_bug.root");
- fRun->SetInputFile("/u/fwamers/Promotion/L_Analysis/s318/qfs_analysis/ne17/sim_r3broot/output/r3bsim.root");
- 
-// fRun->SetInputFile("r3bsim_1000ev_01-30en.root");
-//  fRun->AddFriend("land_digi.root"); // 2nd file where LandHits or whatever are stored
 //  fRun->SetOutputFile("test.root");
   //fRun->SetOutputFile("/lustre/land/jmargan/simulation/Ox_1p/test.root");
   fRun->SetOutputFile("/u/fwamers/Promotion/L_Analysis/s318/qfs_analysis/ne17/sim_r3broot/output/test.root");

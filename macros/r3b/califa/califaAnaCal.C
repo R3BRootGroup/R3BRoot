@@ -12,7 +12,7 @@ void run(TString runNumber)
 
     // Create analysis run -------------------------------------------------------
     FairRunAna* run = new FairRunAna();
-    run->SetInputFile(inputFileName.Data());
+    run->SetSource(new FairFileSource(inputFileName));
     run->SetOutputFile(outputFileName.Data());
     // ---------------------------------------------------------------------------
 
