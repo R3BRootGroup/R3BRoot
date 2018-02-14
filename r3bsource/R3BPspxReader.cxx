@@ -173,12 +173,16 @@ Bool_t R3BPspxReader::Read()
             // overflow. still usefull?
 	    
            // if (energy == 0xEEEEEE) continue; // get rid of error message code: only valid for certain ucesb unpackers
-	    if (energy == -3075811 || energy == -3075810) continue; // get rid of error message code: -3075810 = 0xeeeeee2, -3075811 = 0xeeeee3
+
+//	    if (energy == -3075811 || energy == -3075810) {
+//		LOG(ERROR)<< "R3BPspxReader::Read(): Error Code from Febex Unpacker" << FairLogger::endl;
+//		continue; // get rid of error message code: -3075810 = 0xeeeeee2, -3075811 = 0xeeeee3
+//	    }
 	    
 	    //if ((energy & 0x800000))
 	    //    energy = -1*(energy - 0x800000); // subtracting the sign bit (set to 1 for negative values) and multiplying with -1 to get negative energy value, only possible for certain ucesb unpackers
 	      
-	    if(TMath::Abs(energy)<4194303){ // max value possible for Febex
+	    if(TMath::Abs(energy)<4194303){ // = 2^22 -1 max value possible for Febex wtih 22 bits for enery entry + additional sign bit #24
 		new ((*fMappedItems)[fMappedItems->GetEntriesFast()]) R3BPspxMappedData(
 		  d + 1, channel, energy); // det,channel,energy counting from 1 for detectors and channels
 	    }

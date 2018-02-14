@@ -225,6 +225,10 @@ void R3BPspxMapped2Precal::Exec(Option_t* option)
         if (fPrecalPar->GetPspxParStrip().At(detector1 - 1) == 0)
             continue;
 
+	// get rif of error message from Febex
+	if(mItem1->GetEnergy()==-3075811 || mItem1->GetEnergy()==-3075810)
+            continue;
+
         // calculating stripnumber, only for valid channel number
         if (mItem1->GetChannel() > 0 && mItem1->GetChannel() < fPrecalPar->GetPspxParStrip().At(detector1 - 1) * 4 + 1)
         { // strips
@@ -280,6 +284,10 @@ void R3BPspxMapped2Precal::Exec(Option_t* option)
                     detector2 = mItem2->GetDetector();
                     if (fPrecalPar->GetPspxParStrip().At(detector2 - 1) == 0)
                         continue;
+
+		    // get rif of error message from Febex
+		    if(mItem2->GetEnergy()==-3075811 || mItem2->GetEnergy()==-3075810)
+		        continue;
 
                     // calculating stripnumber
                     if (mItem2->GetChannel() > 0 &&
