@@ -119,6 +119,7 @@ fibData/R3BBunchedFiberCalData.cxx
 fibData/R3BBunchedFiberHitData.cxx
 fibData/R3BBunchedFiberMappedData.cxx
 fibData/R3BFi4Point.cxx
+fibData/R3BFi4HitItem.cxx
 fibData/R3BFibMappedData.cxx
 fibData/R3BFibCalData.cxx
 )
