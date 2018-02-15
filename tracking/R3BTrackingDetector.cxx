@@ -1,4 +1,6 @@
 
+
+#include "R3BHit.h"
 #include "R3BTrackingDetector.h"
 #include "R3BTGeoPar.h"
 
@@ -10,9 +12,13 @@
 #include "TMath.h"
 #include "TLine.h"
 
-R3BTrackingDetector::R3BTrackingDetector(const char* geoParName, const char* hitArray)
-    : fGeoParName(geoParName)
+using namespace std;
+
+R3BTrackingDetector::R3BTrackingDetector(const char* detectorName, const char* geoParName, const char* hitArray)
+    : fDetectorName(detectorName)
+    , fGeoParName(geoParName)
     , fDataName(hitArray)
+    , fArrayHits(NULL)
 {
     section = -1; // unknown
 
@@ -24,19 +30,31 @@ R3BTrackingDetector::R3BTrackingDetector(const char* geoParName, const char* hit
 
 R3BTrackingDetector::~R3BTrackingDetector() {}
 
-void R3BTrackingDetector::SetHit(Double_t x, Double_t y, Double_t z)
+void R3BTrackingDetector::SetHit(Double_t x, Double_t y)
 {
-    hit_xyz.SetXYZ(x, y, z);
-    GlobalToLocal(hit_xyz, hit_x, hit_y);
+    hit_x = x;
+    hit_y = y;
 }
 
 void R3BTrackingDetector::SetHitTime(Double_t time) { hit_time = time; }
 
 InitStatus R3BTrackingDetector::Init()
 {
-    pos0 = TVector3(0., 0., -fGeo->GetDimZ());
-    pos1 = TVector3(fGeo->GetDimX(), fGeo->GetDimY(), -fGeo->GetDimZ());
-    pos2 = TVector3(-fGeo->GetDimX(), fGeo->GetDimY(), -fGeo->GetDimZ());
+    Double_t offset_z = 0.;
+
+    if (GetDetectorName().EqualTo("fi4"))
+    {
+        offset_z = -0.01;
+    }
+
+    if (GetDetectorName().EqualTo("tofd"))
+    {
+        offset_z = -0.25;
+    }
+
+    pos0 = TVector3(0., 0., offset_z);
+    pos1 = TVector3(fGeo->GetDimX(), fGeo->GetDimY(), offset_z);
+    pos2 = TVector3(-fGeo->GetDimX(), fGeo->GetDimY(), offset_z);
 
     pos0.RotateY(fGeo->GetRotY() * TMath::DegToRad());
     pos1.RotateY(fGeo->GetRotY() * TMath::DegToRad());
@@ -48,11 +66,13 @@ InitStatus R3BTrackingDetector::Init()
     pos1 += trans;
     pos2 += trans;
 
+    norm = ((pos1 - pos0).Cross(pos2 - pos0)).Unit();
+
     // get access to hit data
     if (!fDataName.EqualTo(""))
     {
-        hits = (TClonesArray*)FairRootManager::Instance()->GetObject(fDataName);
-        if (NULL == hits)
+        fArrayHits = (TClonesArray*)FairRootManager::Instance()->GetObject(fDataName);
+        if (NULL == fArrayHits)
         {
             LOG(ERROR) << "No " << fDataName << " array found in input file." << FairLogger::endl;
             return kERROR;
@@ -62,10 +82,57 @@ InitStatus R3BTrackingDetector::Init()
     return kSUCCESS;
 }
 
+void R3BTrackingDetector::CopyHits()
+{
+    hits.clear();
+    for (Int_t i = 0; i < fArrayHits->GetEntriesFast(); i++)
+    {
+        R3BHit* hit = (R3BHit*)fArrayHits->At(i);
+        hits.push_back(hit);
+    }
+}
+
 void R3BTrackingDetector::GlobalToLocal(const TVector3& posGlobal, Double_t& x_local, Double_t& y_local)
 {
-    x_local = (posGlobal - pos0).X();
-    y_local = (posGlobal - pos0).Y();
+    TVector3 local = posGlobal - pos0;
+    local.RotateY(-fGeo->GetRotY() * TMath::DegToRad());
+    x_local = local.X();
+    y_local = local.Y();
+}
+
+Double_t R3BTrackingDetector::GetEnergyLoss(const R3BTrackingParticle* particle)
+{
+    Double_t Z2 = fGeo->GetZ();
+    Double_t A2 = fGeo->GetA();
+    Double_t density = fGeo->GetDensity();
+    Double_t I = fGeo->GetI();
+    Double_t Z1 = particle->GetCharge();
+    const Double_t K = 0.307075;
+    const Double_t me = 0.5109989461;
+    Double_t beta = particle->GetBeta();
+    Double_t gamma = particle->GetGamma();
+    Double_t dx = 2. * fGeo->GetDimZ() * density;
+    Double_t Tmax = 2 * me * TMath::Power(beta * gamma, 2);
+    Double_t h_omega = 28.816 * 1e-6 * TMath::Sqrt(density * Z2 / A2);
+    Double_t eloss = dx * K * TMath::Power(Z1, 2) * Z2 / A2 / TMath::Power(beta, 2) *
+                     (0.5 * TMath::Log(2 * me * beta * beta * gamma * gamma * Tmax / (I * I)) - beta * beta -
+                      (TMath::Log(h_omega / I) + TMath::Log(beta * gamma) - 0.5));
+    //    Double_t eloss = dx * K * TMath::Power(Z1,2) * Z2/A2 / TMath::Power(beta,2) *
+    //    (0.5*TMath::Log(2*me*beta*beta*gamma*gamma*Tmax/(I*I)) - beta*beta);
+
+    //    if(fGeoParName.EqualTo("TargetGeoPar"))
+    //    {
+    //        Z2 = 6.45628;
+    //        A2 = 12.8772;
+    //        density = 1.39;
+    //        I = 78.7;
+    //        dx = 2. * 0.005 * density;
+    //        h_omega = 28.816*1e-6*TMath::Sqrt(density*Z2/A2);
+    //        eloss += dx * K * TMath::Power(Z1,2) * Z2/A2 / TMath::Power(beta,2) *
+    //        (TMath::Log(2*me*beta*beta*gamma*gamma/I) - beta*beta - (TMath::Log(h_omega/I) + TMath::Log(beta*gamma) -
+    //        0.5));
+    //    }
+    return eloss;
 }
 
 void R3BTrackingDetector::SetParContainers()
@@ -82,4 +149,4 @@ void R3BTrackingDetector::Draw(Option_t*)
     l11->Draw();
 }
 
-ClassImp(R3BTrackingDetector) 
+ClassImp(R3BTrackingDetector)

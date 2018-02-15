@@ -10,6 +10,7 @@
 #include "R3BFi4Point.h"
 //#include "R3BGeoFi5.h"
 #include "R3BMCStack.h"
+#include "R3BTGeoPar.h"
 #include "TClonesArray.h"
 #include "TGeoArb8.h"
 #include "TGeoBBox.h"
@@ -66,6 +67,25 @@ R3BFi5::~R3BFi5()
 void R3BFi5::Initialize()
 {
     FairDetector::Initialize();
+
+    fTGeoPar = (R3BTGeoPar*)FairRuntimeDb::instance()->getContainer("fi5GeoPar");
+
+    // Position and rotation
+    TGeoNode* main_node = gGeoManager->GetTopVolume()->FindNode("Fi5World_0");
+    TGeoMatrix* matr = main_node->GetMatrix();
+    fTGeoPar->SetPosXYZ(matr->GetTranslation()[0], matr->GetTranslation()[1], matr->GetTranslation()[2]);
+    fTGeoPar->SetRotXYZ(0., -TMath::Abs(TMath::ASin(matr->GetRotationMatrix()[2]) * TMath::RadToDeg()), 0.);
+
+    // Dimensions
+    TGeoBBox* box = (TGeoBBox*)main_node->GetVolume()->GetShape();
+    fTGeoPar->SetDimXYZ(box->GetDX(), box->GetDY(), box->GetDZ());
+
+    TGeoVolume* tube_vol = gGeoManager->GetVolume(gMC->VolId("FI5Log"));
+    TGeoMaterial* material = tube_vol->GetMaterial();
+    Double_t I = 57.4 * 1e-6; // Mean excitation energy in MeV (polypropylene)!!!
+    fTGeoPar->SetMaterial(material->GetZ(), material->GetA(), material->GetDensity(), I);
+
+    fTGeoPar->setChanged();
 
     LOG(INFO) << "R3BFi5: initialisation" << FairLogger::endl;
     LOG(DEBUG) << "R3BFi5: Vol. (McId) " << gMC->VolId("FI51Log") << FairLogger::endl;

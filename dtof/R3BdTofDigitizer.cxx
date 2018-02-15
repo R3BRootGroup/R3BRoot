@@ -139,7 +139,7 @@ void R3BdTofDigitizer::Exec(Option_t* opt) {
 				if (vPoints[channel].at(point)->GetEnergyLoss() < 1.) continue;
 				fHist1->Fill(vPoints[channel].at(point)->GetEnergyLoss());
 				
-				if (0==point || (vPoints[channel].at(point)->GetTime() - MapOfHits[channel]->GetTimeDifference()) > 30) {  //add new hits
+				if (0==point || (vPoints[channel].at(point)->GetTime() - MapOfHits[channel]->GetTime()) > 30) {  //add new hits
 											
 				int layer_label; int paddle_number;
 				if(channel < number_paddles){layer_label=0; paddle_number = channel;} 
@@ -159,7 +159,7 @@ void R3BdTofDigitizer::Exec(Option_t* opt) {
 				
 				else{			//update hit
 					MapOfHits[channel]->SetTime(vPoints[channel].at(point)->GetTime());
-					MapOfHits[channel]->SetEnergyLoss(vPoints[channel].at(point)->GetEnergyLoss() + MapOfHits[channel]->GetEnergyLoss());
+					MapOfHits[channel]->SetEloss(vPoints[channel].at(point)->GetEnergyLoss() + MapOfHits[channel]->GetEloss());
 				}
 
 			}
@@ -174,7 +174,7 @@ void R3BdTofDigitizer::Exec(Option_t* opt) {
 	
 	for (auto& i : MapOfHits){
 		
-		fHist2->Fill(i.second->GetEnergyLoss());
+		fHist2->Fill(i.second->GetEloss());
 		
 		if (i.first >= number_paddles){continue;}
 		
@@ -194,7 +194,7 @@ void R3BdTofDigitizer::Exec(Option_t* opt) {
 		// sum over energy loss
 		Double_t sum_eloss = 0;
 		for (Int_t j=0; j < vHits.size(); j++){	
-			sum_eloss += vHits[j]->GetEnergyLoss();
+			sum_eloss += vHits[j]->GetEloss();
 		}
 		
 		// average over energy loss
@@ -203,7 +203,7 @@ void R3BdTofDigitizer::Exec(Option_t* opt) {
 		
 		// set merged energy loss as new energy loss for hits
 		for (Int_t j=0; j < vHits.size(); j++){	
-			vHits[j]->SetEnergyLoss(merged_eloss);
+			vHits[j]->SetEloss(merged_eloss);
 		}
 	
 	vHits.clear();
@@ -213,7 +213,7 @@ void R3BdTofDigitizer::Exec(Option_t* opt) {
 	
 	for (auto& i : MapOfHits){
 		new ((*fdTofHits)[counter]) R3BTofdHitData(*(i.second));
-		fHist3->Fill(i.second->GetEnergyLoss());
+		fHist3->Fill(i.second->GetEloss());
 		delete i.second;
 		counter++;
 	}

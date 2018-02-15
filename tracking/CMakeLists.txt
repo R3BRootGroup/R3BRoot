@@ -12,8 +12,9 @@ set(INCLUDE_DIRECTORIES
 ${R3BROOT_SOURCE_DIR}/tracking
 ${R3BROOT_SOURCE_DIR}/field
 ${R3BROOT_SOURCE_DIR}/r3bdata
-${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
+${R3BROOT_SOURCE_DIR}/r3bdata/dtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
+${R3BROOT_SOURCE_DIR}/r3bdata/fibData
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

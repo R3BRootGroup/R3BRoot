@@ -20,6 +20,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/dtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
+${R3BROOT_SOURCE_DIR}/tracking
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

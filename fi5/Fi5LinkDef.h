@@ -7,7 +7,7 @@
 #pragma link C++ class R3BFi5+;
 #pragma link C++ class R3BFi5Cal2Hit+;
 #pragma link C++ class R3BFi5Mapped2Cal+;
-
+#pragma link C++ class R3BFi5ContFact;
 
 #endif
 

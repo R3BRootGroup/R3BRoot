@@ -21,7 +21,9 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
-${R3BROOT_SOURCE_DIR}/r3bdata/trackerData)
+${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
+${R3BROOT_SOURCE_DIR}/tracking
+)
 
 include_directories( ${INCLUDE_DIRECTORIES})
 include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
@@ -38,7 +40,7 @@ set(SRCS
 R3BFi4.cxx  
 #R3BGeoFi4.cxx   
 # R3BGeoFi4Par.cxx   
-# R3BFi4ContFact.cxx
+R3BFi4ContFact.cxx
 #R3BFi4DigiPar.cxx
 R3BFi4Digitizer.cxx   
 R3BFi4Mapped2Cal.cxx
@@ -52,7 +54,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF Fi4LinkDef.h)
 Set(LIBRARY_NAME R3BFi4)
 Set(DEPENDENCIES
-    R3Bbase R3BData R3BPassive)
+    R3Bbase R3BData R3BPassive R3BTracking)
 
 GENERATE_LIBRARY()
 

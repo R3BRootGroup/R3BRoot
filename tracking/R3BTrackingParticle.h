@@ -6,6 +6,8 @@
 #include "TVector3.h"
 #include "TMath.h"
 
+class R3BTrackingDetector;
+
 class R3BTrackingParticle : public TObject
 {
   public:
@@ -51,11 +53,14 @@ class R3BTrackingParticle : public TObject
     void SetMomentum(Double_t* p) { fMomentum.SetXYZ(p[0], p[1], p[2]); }
     void SetCosines(Double_t* cos) { fMomentum.SetXYZ(cos[0] * cos[3], cos[1] * cos[3], cos[2] * cos[3]); }
 
+    void SetStartBeta(const Double_t& startBeta);
     void SetBeta(const Double_t& beta);
     void SetMass(const Double_t& mass);
     void UpdateMomentum();
 
     void AddStep(Double_t step) { fLength += step; }
+
+    void SetChi2(Double_t chi2) { fChi2 = chi2; }
 
     Double_t GetX() const { return fPosition.X(); }
     Double_t GetY() const { return fPosition.Y(); }
@@ -66,11 +71,21 @@ class R3BTrackingParticle : public TObject
 
     const TVector3& GetStartPosition() const { return fStartPosition; }
     const TVector3& GetStartMomentum() const { return fStartMomentum; }
+    Double_t GetStartBeta() const { return fStartBeta; }
+    Double_t GetStartGamma() const { return TMath::Sqrt(1. / (1. - fStartBeta * fStartBeta)); }
 
     Double_t GetBeta() const { return fBeta; }
     Double_t GetGamma() const { return TMath::Sqrt(1. / (1. - fBeta * fBeta)); }
     Double_t GetMass() const { return fMass; }
     Double_t GetLength() const { return fLength; }
+
+    Double_t GetChi2() const { return fChi2; }
+
+    void PassThroughDetector(R3BTrackingDetector* det, Double_t weight = 1.);
+
+    void SetStartMomentum(const TVector3& startMomentum) { fStartMomentum = startMomentum; }
+
+    Double_t DeltaEToDeltaBeta(Double_t eloss);
 
     void Reset();
 
@@ -78,12 +93,15 @@ class R3BTrackingParticle : public TObject
     Double_t fCharge;
     TVector3 fStartPosition;
     TVector3 fStartMomentum;
-    Double_t fBeta;
+    Double_t fStartBeta;
     Double_t fMass;
 
     TVector3 fPosition;
     TVector3 fMomentum;
+    Double_t fBeta;
     Double_t fLength;
+
+    Double_t fChi2;
 
     ClassDef(R3BTrackingParticle, 1)
 };

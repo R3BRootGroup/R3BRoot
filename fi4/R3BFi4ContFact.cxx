@@ -3,18 +3,17 @@
 
 /////////////////////////////////////////////////////////////
 //
-//  R3BdTofContFact
+//  R3BFi4ContFact
 //
 //  Factory for the parameter containers in libR3BmTof
 //
 /////////////////////////////////////////////////////////////
 
 
-#include "R3BdTofContFact.h"
+#include "R3BFi4ContFact.h"
 
 //#include "R3BmTofParRootFileIo.h"
 //#include "R3BmTofParAsciiFileIo.h"
-#include "R3BGeodTofPar.h"
 //#include "R3BmTofDigiPar.h"
 #include "R3BTGeoPar.h"
 
@@ -31,19 +30,19 @@
 using std::cout;
 using std::endl;
 
-ClassImp(R3BdTofContFact)
+ClassImp(R3BFi4ContFact)
 
-static R3BdTofContFact gR3BdTofContFact;
+static R3BFi4ContFact gR3BFi4ContFact;
 
-R3BdTofContFact::R3BdTofContFact() {
+R3BFi4ContFact::R3BFi4ContFact() {
   // Constructor (called when the library is loaded)
-  fName="R3BdTofContFact";
+  fName="R3BFi4ContFact";
   fTitle="Factory for parameter containers in libR3BdTof";
   setAllContainers();
   FairRuntimeDb::instance()->addContFactory(this);
 }
 
-void R3BdTofContFact::setAllContainers() {
+void R3BFi4ContFact::setAllContainers() {
   /** Creates the Container objects with all accepted contexts and adds them to
    *  the list of containers for the STS library.*/
    /*
@@ -61,12 +60,12 @@ void R3BdTofContFact::setAllContainers() {
     containers->Add(p2);
     */
     
-    FairContainer* p2 = new FairContainer("tofdGeoPar", "Tofd geometry parameters", "TestDefaultContext");
+    FairContainer* p2 = new FairContainer("fi4GeoPar", "Fi4 geometry parameters", "TestDefaultContext");
     p2->addContext("TestNonDefaultContext");
     containers->Add(p2);
 }
 
-FairParSet* R3BdTofContFact::createContainer(FairContainer* c) {
+FairParSet* R3BFi4ContFact::createContainer(FairContainer* c) {
   /** mTofls the constructor of the corresponding parameter container.
    * For an actual context, which is not an empty string and not the default context
    * of this container, the name is concatinated with the context. */
@@ -81,7 +80,7 @@ FairParSet* R3BdTofContFact::createContainer(FairContainer* c) {
     p=new CbmGeoStsPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
   }*/
     
-    if (strcmp(name, "tofdGeoPar") == 0)
+    if (strcmp(name, "fi4GeoPar") == 0)
     {
         p = new R3BTGeoPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
@@ -89,7 +88,7 @@ FairParSet* R3BdTofContFact::createContainer(FairContainer* c) {
   return p;
 }
 
-void  R3BdTofContFact::activateParIo(FairParIo* io) {
+void  R3BFi4ContFact::activateParIo(FairParIo* io) {
   // activates the input/output class for the parameters
   // needed by the Sts
   /*

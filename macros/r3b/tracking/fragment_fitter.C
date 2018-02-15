@@ -3,11 +3,14 @@ void fragment_fitter()
 {
     TString inFile = "sim.root";
     TString parFile = "par.root";
+    TString digiFile = "digi.root";
     TString outFile = "tracking.root";
     
     // Create analysis run -----------------------------------------------------
     FairRunAna* run = new FairRunAna();
-    run->SetSource(new FairFileSource(inFile));
+    FairFileSource* source = new FairFileSource(inFile);
+    source->AddFriend(digiFile);
+    run->SetSource(source);
     run->SetOutputFile(outFile.Data());
     // -------------------------------------------------------------------------
     
@@ -26,6 +29,7 @@ void fragment_fitter()
     // Initialize --------------------------------------------------------------
     run->Init();
     FairLogger::GetLogger()->SetLogScreenLevel("INFO");
+
     // -------------------------------------------------------------------------
     
     TStopwatch timer;

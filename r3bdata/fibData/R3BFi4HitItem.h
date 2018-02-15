@@ -1,13 +1,13 @@
 #ifndef R3BFi4HITITEM_H
 #define R3BFi4HITITEM_H
 
-#include "TObject.h"
+#include "R3BHit.h"
 
 // for the data analysis of the s438b PSPX detectors. 
 // Introduced by Ralf, Jan 2016
 // adapted by Joachim March 2016
 
-class R3BFi4HitItem : public TObject
+class R3BFi4HitItem : public R3BHit
 {
  public:
   // Default Constructor
@@ -24,9 +24,6 @@ class R3BFi4HitItem : public TObject
   // Getters
   inline const UChar_t& GetDetector()       const { return fDetector; }
   inline const UInt_t&  GetFiber()          const { return fFiber_n;  }
-  inline const Float_t& GetFiber_Xpos()     const { return fFiber_Xpos;  }
-  inline const Float_t& GetFiber_Ypos()     const { return fFiber_Ypos;  }
-  inline const Float_t& GetFiber_Zpos()     const { return fFiber_Zpos;  }
   inline const Float_t& GetEnergy_top()     const { return fEnergy_top;  }
   inline const Float_t& GetEnergy_bottom()  const { return fEnergy_bottom;   }
   inline const Float_t& GetTime_top()       const { return fTime_top;    }
@@ -35,16 +32,13 @@ class R3BFi4HitItem : public TObject
  private:
   UChar_t fDetector;
   UInt_t  fFiber_n;
-  Float_t fFiber_Xpos; 
-  Float_t fFiber_Ypos; 
-  Float_t fFiber_Zpos; 
   Float_t fEnergy_top;   // 0xfff is energy data, Anything in 0xfffff000 indicates an error or overflow
   Float_t fEnergy_bottom;
   Float_t fTime_top;   
   Float_t fTime_bottom;   
     
  public:
-    ClassDef(R3BFi4HitItem, 2)
+    ClassDef(R3BFi4HitItem, 3)
       };
 
 #endif

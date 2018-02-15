@@ -7,6 +7,7 @@
 class TClonesArray;
 class R3BFi4Point;
 class FairVolume;
+class R3BTGeoPar;
 
 class R3BFi5 : public R3BDetector
 {
@@ -109,6 +110,8 @@ class R3BFi5 : public R3BDetector
     TClonesArray* fFi5Collection;   //!  The hit collection
     Bool_t kGeoSaved;               //!
     TList* flGeoPar;                //!
+
+    R3BTGeoPar* fTGeoPar;           //!
 
     /** Private method AddHit
      **

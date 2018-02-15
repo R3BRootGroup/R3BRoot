@@ -8,9 +8,6 @@
 R3BFi4HitItem::R3BFi4HitItem()
     : fDetector(0)
     , fFiber_n(0)
-    , fFiber_Xpos(0)
-    , fFiber_Ypos(0)
-    , fFiber_Zpos(0)
     , fEnergy_top(0)
     , fEnergy_bottom(0)
     , fTime_top(0)
@@ -18,7 +15,7 @@ R3BFi4HitItem::R3BFi4HitItem()
 {
 }
 
-R3BFi4HitItem::R3BFi4HitItem(	UInt_t detector, 
+R3BFi4HitItem::R3BFi4HitItem(UInt_t detector,
 				UInt_t fiber,
 				Float_t xpos,
 				Float_t ypos,
@@ -27,16 +24,13 @@ R3BFi4HitItem::R3BFi4HitItem(	UInt_t detector,
 				Float_t energy_bottom,
 				Float_t time_top,
 				Float_t time_bottom)
-: fDetector(detector)
+: R3BHit(0, xpos, ypos, 0., 0.)
+  , fDetector(detector)
   , fFiber_n(fiber)
-  , fFiber_Xpos(xpos)
-  , fFiber_Ypos(ypos)
-  , fFiber_Zpos(zpos)
   , fEnergy_top(energy_top)
   , fEnergy_bottom(energy_bottom)
   , fTime_top(time_top)
   , fTime_bottom(time_bottom)
-  
 {
 }
 

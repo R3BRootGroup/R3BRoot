@@ -17,24 +17,7 @@ R3BTofdHitData::R3BTofdHitData(	Double_t t,
 						     Double_t ELoss,
 						     Double_t ID
 						     )
-    : fTime_ns(t) 
-    , fXpos_cm(x)
-    , fYpos_cm(y)
-    , fZ(Z)
-    , fTimeDiff2Ref_ns( tdiff )
-    , fEnergyLoss( ELoss )
-    , fDetectorNumber(ID)
-{
-}
-
-R3BTofdHitData::R3BTofdHitData(const R3BTofdHitData& right)
-    : fTime_ns(right.fTime_ns) 
-    , fXpos_cm(right.fXpos_cm)
-    , fYpos_cm(right.fYpos_cm)
-    , fZ(right.fZ)
-    , fTimeDiff2Ref_ns( right.fTimeDiff2Ref_ns )
-    , fEnergyLoss( right.fEnergyLoss )
-    , fDetectorNumber(right.fDetectorNumber)
+: R3BHit(ID, x, y, ELoss, tdiff)
 {
 }
 

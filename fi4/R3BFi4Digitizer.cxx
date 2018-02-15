@@ -39,9 +39,12 @@ using std::cout;
 using std::endl;
 		
 
-R3BFi4Digitizer::R3BFi4Digitizer() :
-  FairTask("R3B Fi4 Digitization scheme ") 
-  { 
+R3BFi4Digitizer::R3BFi4Digitizer()
+  : FairTask("R3B Fi4 Digitization scheme ")
+  , fFi4Points(NULL)
+  , fFi6Points(NULL)
+  , fFi5Points(NULL)
+{
 	  
 	esigma = 0.001;
 	tsigma = 0.01;
@@ -49,9 +52,12 @@ R3BFi4Digitizer::R3BFi4Digitizer() :
 	  
 }
 
-R3BFi4Digitizer::R3BFi4Digitizer(Double_t e, Double_t t, Double_t y) :
-  FairTask("R3B Fi4 Digitization scheme ") 
-  { 
+R3BFi4Digitizer::R3BFi4Digitizer(Double_t e, Double_t t, Double_t y)
+  : FairTask("R3B Fi4 Digitization scheme ")
+  , fFi4Points(NULL)
+  , fFi6Points(NULL)
+  , fFi5Points(NULL)
+{
 	  
 	esigma = e;
 	tsigma = t;
@@ -266,19 +272,29 @@ void R3BFi4Digitizer::Exec(Option_t* opt)
 		
 		//running the digitizer for the Fi detectors
 		
-		Digitize(fFi4Points, fFi4Hits, 4000, 4);
-		
+    if(fFi4Points)
+    {
+        Digitize(fFi4Points, fFi4Hits, 4000, 4);
+    }
+
+    if(fFi6Points)
+    {
 		Digitize(fFi6Points, fFi6Hits, 2048, 6);
-		
+    }
+
+    if(fFi5Points)
+    {
 		Digitize(fFi5Points, fFi5Hits, 2048, 5);
-		
+    }
 		
 }
 // -------------------------------------------------------------------------
 
 void R3BFi4Digitizer::Reset()
 {
- if (fFi4Hits) fFi4Hits->Clear();
+    if (fFi4Hits) fFi4Hits->Clear();
+    if (fFi6Hits) fFi6Hits->Clear();
+    if (fFi5Hits) fFi5Hits->Clear();
 }   
 
 void R3BFi4Digitizer::Finish()

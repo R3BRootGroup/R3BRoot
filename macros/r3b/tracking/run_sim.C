@@ -12,10 +12,10 @@ void run_sim()
     TString generator1 = "box";
     TString generator2 = "ascii";
     TString generator3 = "r3b";
-    TString generator = generator1;
-    TString inputFile = "";
+    TString generator = generator2;
+    TString inputFile = "fragment_tracker.dat";
 
-    Int_t nEvents = 1;
+    Int_t nEvents = 3000;
     Bool_t storeTrajectories = kTRUE;
     Int_t randomSeed = 335566; // 0 for time-dependent random numbers
 
@@ -70,6 +70,12 @@ void run_sim()
 
     // PSP
     run->AddModule(new R3BPsp("psp_v13a.geo.root", {}, -221., -89., 94.1));
+    
+    // Fi4 detector
+    run->AddModule(new R3BFi4("fi4_v17a.geo.root", {-73.274339-TMath::Tan(TMath::DegToRad()*16.7)*100, 0.069976, 513.649524+100.}, {"" ,-90.,16.7,90.}));
+
+    // Fi5 detector
+    run->AddModule(new R3BFi5("fi5_v17a.geo.root", {-73.274339-TMath::Tan(TMath::DegToRad()*16.7)*200, 0.069976, 513.649524+200.}, {"" ,-90.,16.7,90.}));
 
     // R3B SiTracker Cooling definition
     //run->AddModule(new R3BVacVesselCool(targetType, "vacvessel_v14a.geo.root"));
@@ -87,8 +93,8 @@ void run_sim()
     // Tof
     //run->AddModule(new R3BTof("tof_v17a.geo.root", { -417.359574, 2.400000, 960.777114 }, { "", -90., +31., 90. }));
 
-    // mTof
-    run->AddModule(new R3BmTof("mtof_v17a.geo.root", { -155.824045, 0.523976, 761.870346 }, { "", -90., +16.7, 90. }));
+    // dTof
+    run->AddModule(new R3BdTof("dtof_v17a.geo.root", { -155.824045+(2.7*5)*TMath::Cos(16.7*TMath::DegToRad()), 0.523976, 761.870346 }, { "", -90., +16.7, 90. }));
 
     // MFI
     //run->AddModule(new R3BMfi("mfi_v17a.geo.root", { -63.82, 0., 520.25 }, { "", 90., +13.5, 90. })); // s412
@@ -118,7 +124,7 @@ void run_sim()
 
     if (generator.CompareTo("box") == 0)
     {
-        FairIonGenerator* boxGen = new FairIonGenerator(50, 128, 50, 1, 0., 0., 1.3, 0., 0., 0.);
+        FairIonGenerator* boxGen = new FairIonGenerator(50, 128, 50, 1, 0., 0., 1.4, 0., 0., 0.);
         primGen->AddGenerator(boxGen);
     }
 

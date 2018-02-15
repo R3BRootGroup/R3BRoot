@@ -193,7 +193,7 @@ Bool_t R3BTPropagator::PropagateToPlaneRK(R3BTrackingParticle* particle,
         particle->AddStep(length);
 
         nStep += 1;
-        if (!LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), v1, norm, intersect))
+        if (LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), v1, norm, intersect))
         {
             for (Int_t ii = 0; ii < 7; ii++)
             {

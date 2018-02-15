@@ -10,6 +10,7 @@
 #include "R3BGeodTof.h"
 #include "R3BGeodTofPar.h"
 #include "R3BMCStack.h"
+#include "R3BTGeoPar.h"
 #include "R3BdTofPoint.h"
 #include "TClonesArray.h"
 #include "TGeoArb8.h"
@@ -70,6 +71,20 @@ void R3BdTof::Initialize()
 
     LOG(INFO) << "R3BdTof: initialisation" << FairLogger::endl;
     LOG(DEBUG) << "R3BdTof: Sci. Vol. (McId) " << gMC->VolId("dTOFLog") << FairLogger::endl;
+    
+    fTGeoPar = (R3BTGeoPar*)FairRuntimeDb::instance()->getContainer("tofdGeoPar");
+    
+    // Position and rotation
+    TGeoNode* main_vol = gGeoManager->GetTopVolume()->FindNode("dTOF_0");
+    TGeoMatrix* matr = main_vol->GetMatrix();
+    fTGeoPar->SetPosXYZ(matr->GetTranslation()[0], matr->GetTranslation()[1], matr->GetTranslation()[2]);
+    fTGeoPar->SetRotXYZ(0., -TMath::Abs(TMath::ASin(matr->GetRotationMatrix()[2]) * TMath::RadToDeg()), 0.);
+    
+    // Dimensions
+    TGeoBBox* box = (TGeoBBox*)main_vol->GetVolume()->GetShape();
+    fTGeoPar->SetDimXYZ(box->GetDX(), box->GetDY(), box->GetDZ());
+    
+    fTGeoPar->setChanged();
 }
 
 void R3BdTof::SetSpecialPhysicsCuts()

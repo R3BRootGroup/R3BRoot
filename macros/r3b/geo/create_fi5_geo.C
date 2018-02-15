@@ -1,3 +1,8 @@
+#include "TGeoManager.h"
+#include "TGeoBBox.h"
+
+TGeoManager* gGeoMan;
+
 void create_fi5_geo(const char* geoTag)
 {
 
@@ -89,7 +94,7 @@ void create_fi5_geo(const char* geoTag)
   
   // Volume: GFILogWorld
   
-  TGeoVolume*   pGFILogWorld = new TGeoVolumeAssembly("GFILogWorld");
+  TGeoVolume*   pGFILogWorld = new TGeoVolumeAssembly("Fi5World");
   pGFILogWorld->SetVisLeaves(kTRUE);
   
   // Global positioning
