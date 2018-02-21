@@ -3,7 +3,6 @@ typedef struct EXT_STR_h101_t
 {
     EXT_STR_h101_unpack_t unpack;
     EXT_STR_h101_raw_nnp_onion_t nnp;
-    EXT_STR_h101_LOS_onion_t los;
 } EXT_STR_h101;
 
 void run_sample_data()
@@ -33,7 +32,6 @@ void run_sample_data()
     source->SetMaxEvents(nev);
     source->AddReader(new R3BUnpackReader((EXT_STR_h101_unpack*)&ucesb_struct.unpack, offsetof(EXT_STR_h101, unpack)));
     source->AddReader(new R3BNeulandTacquilaReader((EXT_STR_h101_raw_nnp*)&ucesb_struct.nnp, offsetof(EXT_STR_h101, nnp)));
-    source->AddReader(new R3BLosReader((EXT_STR_h101_LOS*)&ucesb_struct.los, offsetof(EXT_STR_h101, los)));
     // ---------------------------------------------------------------------------
 
     // Create online run ---------------------------------------------------------
@@ -57,12 +55,6 @@ void run_sample_data()
     tcalFill->SetTrigger(trigger);
     tcalFill->SetNofModules(nModules);
     run->AddTask(tcalFill);
-
-    R3BLosMapped2CalPar* losTcalFill = new R3BLosMapped2CalPar("LosTcalFill");
-    losTcalFill->SetUpdateRate(updateRate);
-    losTcalFill->SetMinStats(minStats);
-    losTcalFill->SetNofModules(1, 4);
-    run->AddTask(losTcalFill);
     // ---------------------------------------------------------------------------
 
     // Add analysis task ---------------------------------------------------------
