@@ -14,7 +14,7 @@ void Step2_DigitizingClustering(const TString simFile)
 
     FairRunAna* run = new FairRunAna();
     // FairLogger::GetLogger()->SetLogScreenLevel("DEBUG");
-    run->SetInputFile(simFile);
+    run->SetSource(new FairFileSource(simFile);
     run->SetOutputFile(outFile);
     ConnectParFileToRuntimeDb(parFile, run->GetRuntimeDb());
 

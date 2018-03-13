@@ -50,6 +50,7 @@ std::vector<R3BNeulandNeutron> Neuland::RecoTDR::GetNeutrons(const std::vector<R
     FilterClustersByEnergyDeposit(clusters);
     FilterClustersByBeta(clusters);
     SortClustersByRValue(clusters);
+    PrioritizeTimeWiseFirstCluster(clusters);
 
     std::vector<R3BNeulandNeutron> neutrons;
     for (UInt_t n = 0; n < clusters.size() && n < nNeutrons; n++)
@@ -122,4 +123,13 @@ UInt_t Neuland::RecoTDR::FindNumberOfNeutrons(std::vector<R3BNeulandCluster*>& c
         return 0; // Can test better this way. Don't forget to Init();
     }
     return fPar->GetNeutronMultiplicity(Etot, nClusters);
+}
+
+void Neuland::RecoTDR::PrioritizeTimeWiseFirstCluster(std::vector<R3BNeulandCluster*>& clusters) const
+{
+    auto timewiseFirstCluster =
+        std::min_element(clusters.begin(), clusters.end(), [](const R3BNeulandCluster* a, const R3BNeulandCluster* b) {
+            return a->GetT() < b->GetT();
+        });
+    std::rotate(clusters.begin(), timewiseFirstCluster, timewiseFirstCluster + 1);
 }

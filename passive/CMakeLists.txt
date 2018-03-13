@@ -26,6 +26,7 @@ link_directories( ${LINK_DIRECTORIES})
 set(SRCS
 R3BCave.cxx
 R3BGeoCave.cxx
+R3BGeoGDML.cxx
 R3BGeoMagnet.cxx
 R3BGeoPassivePar.cxx
 R3BGeoPipe.cxx

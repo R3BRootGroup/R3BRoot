@@ -13,9 +13,8 @@ namespace
       protected:
         void SetUp() override
         {
-            fClusters.push_back(new R3BNeulandCluster(
-                R3BNeulandDigi{ 874, 74.0923, 75.5003, 65.1535, 2.44689, 1.85643, 2.13131, { -7.5, 9.85647, 1487.5 } }
-            ));
+            fClusters.push_back(new R3BNeulandCluster(R3BNeulandDigi{
+                874, 74.0923, 75.5003, 65.1535, 2.44689, 1.85643, 2.13131, { -7.5, 9.85647, 1487.5 } }));
             fClusters.push_back(new R3BNeulandCluster({
                 R3BNeulandDigi{ 425, 71.403, 69.528, 60.8227, 32.1342, 35.0932, 33.5811, { -13.1249, -2.5, 1442.5 } },
                 R3BNeulandDigi{ 426, 70.7576, 69.5846, 60.5282, 43.3598, 46.4116, 44.8598, { -8.21099, 2.5, 1442.5 } },
@@ -23,11 +22,9 @@ namespace
                 R3BNeulandDigi{ 428, 70.7084, 69.9433, 60.683, 17.4303, 19.8725, 18.6114, { -5.3562, 12.5, 1442.5 } },
             }));
             fClusters.push_back(new R3BNeulandCluster(
-                R3BNeulandDigi{ 523, 70.0093, 72.2564, 61.49, 65.1076, 50.0853, 57.1045, { 15.7294, -12.5, 1452.5 } }
-            ));
+                R3BNeulandDigi{ 523, 70.0093, 72.2564, 61.49, 65.1076, 50.0853, 57.1045, { 15.7294, -12.5, 1452.5 } }));
             fClusters.push_back(new R3BNeulandCluster(
-                R3BNeulandDigi{ 829, 71.509, 73.4678, 62.8456, 5.41213, 4.57457, 4.97576, { 13.7115, 17.5, 1482.5 } }
-            ));
+                R3BNeulandDigi{ 829, 71.509, 73.4678, 62.8456, 5.41213, 4.57457, 4.97576, { 13.7115, 17.5, 1482.5 } }));
             fClusters.push_back(new R3BNeulandCluster({
                 R3BNeulandDigi{ 925, 73.6385, 71.8902, 63.1215, 1.43794, 1.76745, 1.59421, { -12.2376, -2.5, 1492.5 } },
                 R3BNeulandDigi{ 974, 72.915, 72.227, 62.9281, 11.6925, 13.4288, 12.5306, { -7.5, -4.81552, 1497.5 } },
@@ -70,11 +67,10 @@ namespace
         {
             fClusters.push_back(new R3BNeulandCluster(
                 // Some Random Cluster that is not related to the others
-                R3BNeulandDigi{ 874, 74.0923, 75.5003, 65.1535, 2.44689, 1.85643, 2.13131, { -7.5, 9.85647, 1487.5 } }
-            ));
+                R3BNeulandDigi{
+                    874, 74.0923, 75.5003, 65.1535, 2.44689, 1.85643, 2.13131, { -7.5, 9.85647, 1487.5 } }));
             fClusters.push_back(new R3BNeulandCluster(
-                R3BNeulandDigi{ 627, 70.3447, 73.3119, 62.1854, 24.4598, 18.9215, 21.5131, { 20.7703, 7.5, 1462.5 } }
-            ));
+                R3BNeulandDigi{ 627, 70.3447, 73.3119, 62.1854, 24.4598, 18.9215, 21.5131, { 20.7703, 7.5, 1462.5 } }));
             fClusters.push_back(new R3BNeulandCluster({
                 // Triggers IsElastic with the Cluster above
                 R3BNeulandDigi{ 1032, 72.2410, 76.5411, 64.7482, 45.0953, 23.9844, 32.8874, { 30.1012, 32.5, 1502.5 } },
@@ -168,6 +164,14 @@ namespace
             // Magic numbers from R3BNeutronTracker2D Advanced Method
             return std::abs(a->GetBeta() - BetaBeam) < (0.05 * 600. / EnergyBeam);
         }));
+    }
+
+    TEST_F(testRecoTDR, putsFirstClusterInTimeToTheFront)
+    {
+        RecoTDR rs{};
+        rs.PrioritizeTimeWiseFirstCluster(fClusters);
+
+        EXPECT_EQ(60.5282, fClusters.at(0)->GetT());
     }
 
     TEST_F(testRecoTDRElasticAnd2DPar, filtersClustersByElasticScattering)

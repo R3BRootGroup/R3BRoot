@@ -53,7 +53,7 @@ TGeoVolume *BuildPaddleVolume()
     FairGeoBuilder  *geoBuild = geoLoad->getGeoBuilder();
     FairGeoMedia    *geoMedia = geoFace->getMedia();
     const TGeoMedium *medBC408 = BuildMaterial("BC408", geoMedia, geoBuild);
-    const TGeoMedium *medCH2   = BuildMaterial("CH2", geoMedia, geoBuild);
+    const TGeoMedium *medCH2   = BuildMaterial("polyethylene", geoMedia, geoBuild);
     const TGeoMedium *medAl    = BuildMaterial("aluminium", geoMedia, geoBuild);
 
     // Prepare Transformations for cones

@@ -62,6 +62,7 @@ class R3BNeulandMCMon : public FairTask
     TH2D* fhNPNIPsEToFVSTime;
     TH2D* fhNPNIPSrvsz;
     TH2D* fhNPNIPSxy;
+    TH2D* fhThetaLight;
     std::map<Int_t, TH1D*> fhmEPdg;
     std::map<Int_t, TH1D*> fhmEtotPdg;
     std::map<Int_t, TH1D*> fhmEtotPdgRel;
@@ -112,6 +113,8 @@ class R3BNeulandMCMon : public FairTask
     {
         return (mcTrack->GetEnergy() - mcTrack->GetMass()) * 1000.;
     }
+
+    inline Double_t GetTheta(const R3BMCTrack* mcTrack) { return std::acos(mcTrack->GetPz() / mcTrack->GetP()); }
 
     ClassDefOverride(R3BNeulandMCMon, 0)
 };

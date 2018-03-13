@@ -111,6 +111,8 @@ InitStatus R3BNeulandMCMon::Init()
     fhnSecondaryNeutrons = new TH1D("NumberSecondaryNeutrons", "Number of Secondary Neutrons", 10, -0.5, 9.5);
     fhnSecondaryProtons = new TH1D("NumberSecondaryProtons", "Number of Secondary Protons", 10, -0.5, 9.5);
 
+    fhThetaLight = new TH2D("fhThetaLight", "fhThetaLight", 200, -100, 100, 400, 0, 400);
+
     if (fIs3DTrackEnabled)
     {
         // XYZ -> ZXY (side view)
@@ -190,13 +192,10 @@ void R3BNeulandMCMon::Exec(Option_t*)
         Double_t EtotPrim = 0.;
 
         const UInt_t nLandPoints = fNeulandPoints->GetEntries();
-        R3BNeulandPoint* point;
-        R3BMCTrack* mcTrack;
-
         for (UInt_t iLP = 0; iLP < nLandPoints; iLP++)
         {
-            point = (R3BNeulandPoint*)fNeulandPoints->At(iLP);
-            mcTrack = (R3BMCTrack*)fMCTracks->At(point->GetTrackID());
+            const R3BNeulandPoint* point = (R3BNeulandPoint*)fNeulandPoints->At(iLP);
+            const R3BMCTrack* mcTrack = (R3BMCTrack*)fMCTracks->At(point->GetTrackID());
 
             Etot += point->GetLightYield() * 1000.;
 
@@ -232,6 +231,8 @@ void R3BNeulandMCMon::Exec(Option_t*)
                 EtotPDG[mcTrack->GetPdgCode()] = 0.;
             }
             EtotPDG[mcTrack->GetPdgCode()] += point->GetLightYield() * 1000.; // point->GetEnergyLoss()*1000.;
+
+            fhThetaLight->Fill(GetTheta(mcTrack), point->GetLightYield() * 1000.);
         }
 
         fhEtot->Fill(Etot);
@@ -427,6 +428,7 @@ void R3BNeulandMCMon::Finish()
     fhNPNIPSrvsz->Write();
     fhNPNIPSxy->Write();
     fhnNPNIPs->Write();
+    fhThetaLight->Write();
 
     gDirectory = tmp;
     gDirectory->cd("NeulandMCMon");

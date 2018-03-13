@@ -25,7 +25,7 @@ void preCalibr(Int_t nNeutrons = 4, Int_t nEvents = 100, Int_t beamE = 600, Int_
 
   // ----- Digitization --------------------------------------------------------
   FairRunAna *fRun= new FairRunAna();
-  fRun->SetInputFile(inFile);
+  fRun->SetSource(new FairFileSource(inFile));
   fRun->SetOutputFile(outFile);
   // ---------------------------------------------------------------------------
 

@@ -56,6 +56,16 @@ R3BNeuland::R3BNeuland(const TString& geoFile, const TGeoCombiTrans& combi)
 {
 }
 
+R3BNeuland::R3BNeuland(Int_t nDP, const TGeoTranslation& trans, const TGeoRotation& rot)
+    : R3BNeuland(nDP, { trans, rot })
+{
+}
+
+R3BNeuland::R3BNeuland(const Int_t nDP, const TGeoCombiTrans& combi)
+    : R3BNeuland(TString::Format("neuland_v3_%ddp.geo.root", nDP), combi)
+{
+}
+
 R3BNeuland::~R3BNeuland()
 {
     if (fNeulandPoints)

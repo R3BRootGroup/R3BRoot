@@ -1,3 +1,4 @@
+// clang-format off
 #ifdef __CINT__
 
 #pragma link off all globals;
@@ -12,6 +13,7 @@
 #pragma link C++ class R3BCave+;
 
 #pragma link C++ class R3BGeoCave;
+#pragma link C++ class R3BGeoGDML+;
 #pragma link C++ class R3BGeoPipe;
 #pragma link C++ class R3BGeoVacVesselCool;
 #pragma link C++ class R3BGeoTarget;

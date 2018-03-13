@@ -73,6 +73,7 @@ InitStatus R3BNeulandDigiMon::Init()
     hdeltaEE = new TH2D("hdeltaEE", "Energy in Foremost Plane vs Etot", 100, 0, 2000, 100, 0, 250);
     hPosVSEnergy = new TH2D("hPosVSEnergy", "Position vs Energy deposition", 60, 1400, 1700, 1000, 0, 1000);
     hBeta = new TH1D("hBeta", "Velocity", 200., 0., 1.);
+    hE = new TH1D("hE", "Digi Energy", 300, 0., 300.);
 
     return kSUCCESS;
 }
@@ -104,6 +105,7 @@ void R3BNeulandDigiMon::Exec(Option_t*)
         hPosVSEnergy->Fill(digi->GetPosition().Z(), digi->GetE());
         hTime->Fill(digi->GetT());
         hBeta->Fill(digi->GetBeta());
+        hE->Fill(digi->GetE());
     }
 
     auto maxDepthDigi = std::max_element(digis.begin(), digis.end(), [](R3BNeulandDigi* a, R3BNeulandDigi* b) {
@@ -155,6 +157,7 @@ void R3BNeulandDigiMon::Finish()
     hPosVSEnergy->Write();
     hdeltaEE->Write();
     hBeta->Write();
+    hE->Write();
 
     gDirectory = tmp;
 }

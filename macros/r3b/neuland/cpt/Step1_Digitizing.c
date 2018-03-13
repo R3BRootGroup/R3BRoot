@@ -23,7 +23,7 @@ void Step1_Digitizing(
   const TString out_file = base_path + "/digi." + base_name + ".root";
 
   FairRunAna* run = new FairRunAna();
-  run->SetInputFile(sim_file);
+  run->SetSource(new FairFileSource(sim_file));
   run->SetOutputFile(out_file);
   ConnectParFileToRuntimeDb(par_file, run->GetRuntimeDb());
 

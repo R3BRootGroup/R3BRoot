@@ -1,6 +1,5 @@
 #include "R3BNeulandClusterFinder.h"
 #include "FairLogger.h"
-#include "TMath.h"
 #include <algorithm>
 #include <iostream>
 #include <vector>

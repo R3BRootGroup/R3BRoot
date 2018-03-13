@@ -36,34 +36,45 @@ class R3BNeuland : public R3BDetector
     /** Standard constructor.
      *@param geoFile name of the ROOT geometry file
      *@param combi   position + rotation */
-    R3BNeuland(const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
+    explicit R3BNeuland(const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
+
+    /** Standard constructor.
+     *@param nDP     number of double planes
+     *@param trans   position
+     *@param rot     rotation */
+    R3BNeuland(Int_t nDP, const TGeoTranslation& trans, const TGeoRotation& rot = TGeoRotation());
+
+    /** Standard constructor.
+     *@param nDP     number of double planes
+     *@param combi   position + rotation */
+    explicit R3BNeuland(Int_t nDP, const TGeoCombiTrans& combi = TGeoCombiTrans());
 
     /** Default Destructor */
-    ~R3BNeuland();
+    ~R3BNeuland() override;
 
-    virtual void Initialize() override;
+    void Initialize() override;
 
-    virtual Bool_t ProcessHits(FairVolume* = nullptr) override;
+    Bool_t ProcessHits(FairVolume* = nullptr) override;
 
-    virtual void EndOfEvent() override;
+    void EndOfEvent() override;
 
-    virtual void Register() override;
+    void Register() override;
 
-    virtual TClonesArray* GetCollection(Int_t iColl) const override;
+    TClonesArray* GetCollection(Int_t iColl) const override;
 
-    virtual void Print(Option_t* = "") const override;
+    void Print(Option_t* = "") const override;
 
-    virtual void Reset() override;
+    void Reset() override;
 
-    // virtual void ConstructGeometry() override;
+    void PostTrack() override;
 
-    virtual void PostTrack() override;
+    Bool_t CheckIfSensitive(std::string name) override;
 
-    virtual Bool_t CheckIfSensitive(std::string name) override;
-
-    /** May not be copy constructed */
-    R3BNeuland(const R3BNeuland&) = delete;
-    R3BNeuland& operator=(const R3BNeuland&) = delete;
+    // No copy and no move is allowed (Rule of three/five)
+    R3BNeuland(const R3BNeuland&) = delete;            // copy constructor
+    R3BNeuland(R3BNeuland&&) = delete;                 // move constructor
+    R3BNeuland& operator=(const R3BNeuland&) = delete; // copy assignment
+    R3BNeuland& operator=(R3BNeuland&&) = delete;      // move assignment
 
   private:
     TClonesArray* fNeulandPoints;                          //!

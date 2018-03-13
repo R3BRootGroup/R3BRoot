@@ -90,7 +90,7 @@ void Simulate(const RunConfig& cfg)
 void Digitize(const RunConfig& cfg)
 {
     FairRunAna* run = new FairRunAna();
-    run->SetInputFile(cfg.GetSimu());
+    run->SetSource(new FairFileSource(cfg.GetSimu()));
     run->SetOutputFile(cfg.GetDigi());
     ConnectParFileToRuntimeDb(cfg.GetPara(), run->GetRuntimeDb());
 
@@ -119,7 +119,7 @@ void Reconstruct(const RunConfig& cfg)
     auto etheta = new TH2D("etheta", "", 100, 0, 1000, 100, -1, 1);
 
     FairRunAna* run = new FairRunAna();
-    run->SetInputFile(cfg.GetDigi());
+    run->SetSource(new FairFileSource(cfg.GetDigi()));
     run->SetOutputFile(cfg.GetReco());
     ConnectParFilesToRuntimeDb(cfg.GetPara(), cfg.GetNcut(), run->GetRuntimeDb());
 
@@ -222,7 +222,7 @@ void Evaluate(const RunConfig& cfg)
     auto etheta = new TH2D("etheta", "", 100, 0, 1000, 100, -1, 1);
 
     FairRunAna* run = new FairRunAna();
-    run->SetInputFile(cfg.GetReco());
+    run->SetSource(new FairFileSource(cfg.GetReco()));
     run->AddFriend(cfg.GetSimu());
     run->AddFriend(cfg.GetDigi());
     run->SetOutputFile(cfg.GetEval());

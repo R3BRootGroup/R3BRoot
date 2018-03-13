@@ -1,3 +1,6 @@
+#ifndef R3BVALIDATED_H
+#define R3BVALIDATED_H
+
 //=============================================================================
 //
 // D A templatised class to represent data which can be validated, for instance
@@ -128,3 +131,5 @@ Validated<T>::operator T() const
     assert(valid() && "Cannot return invalid data.");
     return m_data;
 }
+
+#endif // R3BVALIDATED_H

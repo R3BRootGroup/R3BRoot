@@ -97,6 +97,9 @@ class R3BNeulandClusterMon : public FairTask
     TH1D* fhDeltaT;
     TH1D* fhForemostMinusFirstDigiTime;
 
+    TH2D* fhThetaEDigi;
+    TH2D* fhThetaEDigiCosTheta;
+
     Filterable<R3BNeulandCluster*> fClusterFilters;
 
   public:

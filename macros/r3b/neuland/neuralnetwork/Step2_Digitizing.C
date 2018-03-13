@@ -13,7 +13,7 @@ void Step2_Digitizing(const TString simFile)
     const TString outFile = (TString(simFile).ReplaceAll(".sim.", ".digi."));
 
     FairRunAna* run = new FairRunAna();
-    run->SetInputFile(simFile);
+    run->SetSource(new FairFileSource(simFile));
     run->SetOutputFile(outFile);
     ConnectParFileToRuntimeDb(parFile, run->GetRuntimeDb());
 

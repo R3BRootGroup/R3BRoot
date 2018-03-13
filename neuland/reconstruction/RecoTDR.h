@@ -20,6 +20,7 @@ namespace Neuland
         void FilterClustersByEnergyDeposit(std::vector<R3BNeulandCluster*>&) const;
         void FilterClustersByBeta(std::vector<R3BNeulandCluster*>&) const;
         void FilterClustersByElasticScattering(std::vector<R3BNeulandCluster*>&) const;
+        void PrioritizeTimeWiseFirstCluster(std::vector<R3BNeulandCluster*>&) const;
         UInt_t FindNumberOfNeutrons(std::vector<R3BNeulandCluster*>&) const;
 
       private:

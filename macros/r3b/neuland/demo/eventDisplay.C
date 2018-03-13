@@ -8,7 +8,7 @@ void eventDisplay(const TString input_file, const TString par_file)
     rtdb->setFirstInput(parIo1);
     rtdb->print();
 
-    fRun->SetInputFile(input_file);
+    fRun->SetSource(new FairFileSource(input_file));
     fRun->SetOutputFile("out.root");
 
     FairEventManager *fMan = new FairEventManager();

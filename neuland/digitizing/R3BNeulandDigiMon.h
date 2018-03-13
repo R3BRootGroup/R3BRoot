@@ -45,6 +45,7 @@ class R3BNeulandDigiMon : public FairTask
     TH2D* hDepthVSForemostEnergy;
     TH2D* hDepthVSSternmostEnergy;
     TH1D* hEtot;
+    TH1D* hE;
     TH2D* hDepthVSEtot;
     TH2D* hPosVSEnergy;
     TH2D* hdeltaEE;

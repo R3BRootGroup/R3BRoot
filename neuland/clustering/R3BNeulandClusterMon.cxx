@@ -16,6 +16,16 @@
 #include "ElasticScattering.h"
 #include "R3BNeulandCluster.h"
 
+constexpr double rad2deg = 180. / 3.141592653589793238463;
+
+inline Double_t GetTheta(const R3BNeulandCluster* cluster)
+{
+    const auto direction = cluster->GetLastDigi().GetPosition() - cluster->GetFirstDigi().GetPosition();
+    const auto x = std::acos(direction.Y() / direction.Mag()) * rad2deg;
+    // Not sure, but Kondos Theta is -90:90
+    return x - 90.;
+}
+
 R3BNeulandClusterMon::R3BNeulandClusterMon(const TString input, const TString output, const Option_t* option)
     : FairTask("R3B NeuLAND NeulandCluster Monitor")
     , fInput(input)
@@ -223,6 +233,9 @@ InitStatus R3BNeulandClusterMon::Init()
     fhForemostMinusFirstDigiTime =
         new TH1D("fhForemostMinusFirstDigiTime", "T_{Foremost} - T_{First Digi}", 1000, -10, 10);
 
+    fhThetaEDigi = new TH2D("fhThetaEDigi", "fhThetaEDigi", 1000, -500, 500, 400, 0, 400);
+    fhThetaEDigiCosTheta = new TH2D("fhThetaEDigiCosTheta", "fhThetaEDigiCosTheta", 1000, -500, 500, 400, 0, 400);
+
     return kSUCCESS;
 }
 
@@ -304,6 +317,16 @@ void R3BNeulandClusterMon::Exec(Option_t*)
         fhDeltaT->Fill(cluster->GetLastDigi().GetT() - cluster->GetFirstDigi().GetT());
 
         fhForemostMinusFirstDigiTime->Fill(cluster->GetForemostDigi().GetT() - cluster->GetFirstDigi().GetT());
+
+        if (cluster->GetSize() > 4)
+        {
+            const auto theta = GetTheta(cluster);
+            for (const auto& digi : cluster->GetDigis())
+            {
+                fhThetaEDigi->Fill(theta, digi.GetE());
+                fhThetaEDigiCosTheta->Fill(theta, digi.GetE() * std::cos(theta / rad2deg));
+            }
+        }
     }
 
     std::sort(clusters.begin(), clusters.end(), [](const R3BNeulandCluster* a, const R3BNeulandCluster* b) {
@@ -402,6 +425,9 @@ void R3BNeulandClusterMon::Finish()
     fhDistFromCenterVSEToF->Write();
     fhDeltaT->Write();
     fhForemostMinusFirstDigiTime->Write();
+
+    fhThetaEDigi->Write();
+    fhThetaEDigiCosTheta->Write();
 
     gDirectory = tmp;
 }

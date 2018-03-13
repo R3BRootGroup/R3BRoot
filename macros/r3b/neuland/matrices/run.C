@@ -110,7 +110,7 @@ void Simulate(const RunConfig& cfg)
 void Digitize(const RunConfig& cfg)
 {
     FairRunAna* run = new FairRunAna();
-    run->SetInputFile(cfg.GetSimu());
+    run->SetSource(new FairFileSource(cfg.GetSimu()));
     run->SetOutputFile(cfg.GetDigi());
     ConnectParFileToRuntimeDb(cfg.GetPara(), run->GetRuntimeDb());
 
@@ -162,7 +162,7 @@ void Digitize(const RunConfig& cfg)
 void Reconstruct(const RunConfig& cfg)
 {
     FairRunAna* run = new FairRunAna();
-    run->SetInputFile(cfg.GetDigi());
+    run->SetSource(new FairFileSource(cfg.GetDigi()));
     run->SetOutputFile(cfg.GetReco());
     ConnectParFilesToRuntimeDb(cfg.GetPara(), cfg.GetNcut(), run->GetRuntimeDb());
 
@@ -211,7 +211,7 @@ void Reconstruct(const RunConfig& cfg)
 void Evaluate(const RunConfig& cfg)
 {
     FairRunAna* run = new FairRunAna();
-    run->SetInputFile(cfg.GetReco());
+    run->SetSource(new FairFileSource(cfg.GetReco()));
     run->AddFriend(cfg.GetSimu());
     run->AddFriend(cfg.GetDigi());
     run->SetOutputFile(cfg.GetEval());

@@ -20,7 +20,7 @@ static Double_t gEmptyBinSupressor(const Double_t* x, const Double_t*)
 R3BNeulandVisualizer::R3BNeulandVisualizer(const TString& inputFileName, const TString& what)
 {
     fFile = new TFile(inputFileName, "read");
-    fTree = (TTree*)fFile->Get("cbmsim");
+    fTree = (TTree*)fFile->Get("evt");
 
     fIndex = 0;
 

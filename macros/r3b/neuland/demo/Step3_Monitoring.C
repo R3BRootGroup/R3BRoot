@@ -20,7 +20,7 @@ void Step3_Monitoring(
     const TString outFile  = (TString(simFile).ReplaceAll(".sim.", ".mon."));
 
     FairRunAna *run = new FairRunAna();
-    run->SetInputFile(simFile);
+    run->SetSource(new FairFileSource(simFile));
     run->AddFriend(digiFile);
     run->SetOutputFile(outFile);
     ConnectParFileToRuntimeDb(parFile, run->GetRuntimeDb());
