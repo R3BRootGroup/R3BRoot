@@ -12,6 +12,7 @@ class R3BFieldPar;
 class R3BTPropagator;
 class R3BTrackingDetector;
 class R3BTrackingParticle;
+class R3BTrackingSetup;
 
 class TH1F;
 
@@ -52,13 +53,13 @@ class R3BFragmentFitter : public FairTask
     R3BFieldPar* fFieldPar;
     R3BTPropagator* fPropagator;
     TClonesArray* fArrayMCTracks; // simulation output??? To compare?
-    TClonesArray* fArrayFi4Points;
-    TClonesArray* fArrayFi5Points;
-    std::vector<R3BTrackingDetector*> fDetectors; // array of R3BTrackingDetector
+    R3BTrackingSetup* fDetectors; // array of R3BTrackingDetector
     std::vector<R3BTrackingParticle*> fFragments;
     TClonesArray* fArrayFragments;
     Int_t fNEvents;
     Bool_t fVis;
+    
+    Double_t fAfterGladResolution;
 
     TH1F* fh_mult_psp;
     TH1F* fh_mult_fi4;
@@ -68,10 +69,8 @@ class R3BFragmentFitter : public FairTask
     TH1F* fh_eloss_psp;
     TH1F* fh_eloss_fi4_mc;
     TH1F* fh_eloss_fi4;
-    TH1F* fh_x_res[5];
-    TH1F* fh_x_pull[5];
-    TH1F* fh_delta_fi4;
-    TH1F* fh_delta_fi5;
+    TH1F* fh_x_res[6];
+    TH1F* fh_x_pull[6];
     TH1F* fh_A_reco1;
     TH1F* fh_A_reco2;
     TH1F* fh_mom_res;

@@ -20,7 +20,7 @@ void generate_input()
 
         (*ofile) << "   " << i << "   1   0.   0." << endl;
         (*ofile) << "      -1   " << Z << "   " << A[index] << "   "
-        << px << "   " << py << "   " << pz << "   0.   0.   0.   " << mass[index] << endl;
+        << px << "   " << py << "   " << pz << "   0.   0.   3.   " << mass[index] << endl;
     }
     
     ofile->close();

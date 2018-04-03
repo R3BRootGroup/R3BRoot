@@ -17,6 +17,7 @@ ${R3BROOT_SOURCE_DIR}/fiber
 ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/tcal
+${R3BROOT_SOURCE_DIR}/tracking
 ${R3BROOT_SOURCE_DIR}/r3bdata/calData
 # ${R3BROOT_SOURCE_DIR}/r3bdata/dchData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
@@ -47,6 +48,7 @@ R3BFi6Mapped2CalPar.cxx
 R3BFi6Mapped2Cal.cxx
 R3BFi6Cal2Hit.cxx
 #R3BFi4Cal2Hit.cxx
+R3BFi6ContFact.cxx
 )
 
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
@@ -54,6 +56,6 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF Fi6LinkDef.h)
 Set(LIBRARY_NAME R3BFi6)
 Set(DEPENDENCIES
-    R3Bbase R3BData R3BPassive MCStack R3BTCal R3BBunchedFiber)
+    R3Bbase R3BData R3BPassive MCStack R3BTCal R3BBunchedFiber R3BTracking)
 
 GENERATE_LIBRARY()

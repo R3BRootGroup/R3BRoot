@@ -42,6 +42,7 @@ R3BTPropagator::R3BTPropagator(R3BGladFieldMap* field, Bool_t vis)
     {
         fc4 = new TCanvas("c4", "", 900, 10, 600, 600);
         TH2F* h3 = new TH2F("h3", "", 180, -450., 450., 180, -100., 800.);
+        h3->SetStats(kFALSE);
         h3->Draw();
 
         TLine* l1 = new TLine(-fPlane1[1].X(), fPlane1[1].Z(), -fPlane1[2].X(), fPlane1[2].Z());
@@ -106,6 +107,7 @@ Bool_t R3BTPropagator::PropagateToPlane(R3BTrackingParticle* particle,
         step = (intersect - particle->GetPosition()).Mag();
         particle->SetPosition(intersect);
         particle->AddStep(step);
+        LOG(DEBUG2) << intersect.X() << " " << intersect.Y() << " " << intersect.Z() << FairLogger::endl;
     }
 
     crossed = LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), fPlane2[0], fNorm2, intersect);

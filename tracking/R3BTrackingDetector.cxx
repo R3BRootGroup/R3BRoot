@@ -14,14 +14,14 @@
 
 using namespace std;
 
-R3BTrackingDetector::R3BTrackingDetector(const char* detectorName, const char* geoParName, const char* hitArray)
+R3BTrackingDetector::R3BTrackingDetector(const char* detectorName, EDetectorType type,
+                                         const char* geoParName, const char* hitArray)
     : fDetectorName(detectorName)
     , fGeoParName(geoParName)
     , fDataName(hitArray)
+    , section(type)
     , fArrayHits(NULL)
 {
-    section = -1; // unknown
-
     // resolutions (for chi2)
     res_x = 1; // dummy values that allow calculating chi2
     res_y = 1;
@@ -51,6 +51,8 @@ InitStatus R3BTrackingDetector::Init()
     {
         offset_z = -0.25;
     }
+    
+    fGeo->printParams();
 
     pos0 = TVector3(0., 0., offset_z);
     pos1 = TVector3(fGeo->GetDimX(), fGeo->GetDimY(), offset_z);
@@ -84,6 +86,10 @@ InitStatus R3BTrackingDetector::Init()
 
 void R3BTrackingDetector::CopyHits()
 {
+    if(NULL == fArrayHits)
+    {
+        return;
+    }
     hits.clear();
     for (Int_t i = 0; i < fArrayHits->GetEntriesFast(); i++)
     {
@@ -102,6 +108,8 @@ void R3BTrackingDetector::GlobalToLocal(const TVector3& posGlobal, Double_t& x_l
 
 Double_t R3BTrackingDetector::GetEnergyLoss(const R3BTrackingParticle* particle)
 {
+    TVector3 mom_track = particle->GetMomentum().Unit();
+    
     Double_t Z2 = fGeo->GetZ();
     Double_t A2 = fGeo->GetA();
     Double_t density = fGeo->GetDensity();
@@ -114,7 +122,7 @@ Double_t R3BTrackingDetector::GetEnergyLoss(const R3BTrackingParticle* particle)
     Double_t dx = 2. * fGeo->GetDimZ() * density;
     Double_t Tmax = 2 * me * TMath::Power(beta * gamma, 2);
     Double_t h_omega = 28.816 * 1e-6 * TMath::Sqrt(density * Z2 / A2);
-    Double_t eloss = dx * K * TMath::Power(Z1, 2) * Z2 / A2 / TMath::Power(beta, 2) *
+    Double_t eloss = 1./mom_track.Dot(norm) * dx * K * TMath::Power(Z1, 2) * Z2 / A2 / TMath::Power(beta, 2) *
                      (0.5 * TMath::Log(2 * me * beta * beta * gamma * gamma * Tmax / (I * I)) - beta * beta -
                       (TMath::Log(h_omega / I) + TMath::Log(beta * gamma) - 0.5));
     //    Double_t eloss = dx * K * TMath::Power(Z1,2) * Z2/A2 / TMath::Power(beta,2) *

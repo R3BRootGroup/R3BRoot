@@ -115,7 +115,7 @@ class R3BTGeoPar : public FairParGenericSet
     Double_t fDensity;
     Double_t fI;
     
-    ClassDef(R3BTGeoPar, 1);
+    ClassDef(R3BTGeoPar, 2);
 };
 
 #endif /* !R3BTGEOPAR_H*/

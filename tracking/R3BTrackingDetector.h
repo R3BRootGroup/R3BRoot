@@ -10,6 +10,8 @@
 #include "TString.h"
 #include "R3BTrackingParticle.h"
 
+enum EDetectorType { kBeforeTarget, kTarget, kTargetGlad, kAfterGlad, kTof };
+
 class R3BHit;
 class TClonesArray;
 class R3BTGeoPar;
@@ -19,7 +21,7 @@ class R3BTGeoPar;
 class R3BTrackingDetector : public TObject
 {
   public:
-    R3BTrackingDetector(const char* detectorName, const char* geoParName, const char* hitArray = NULL);
+    R3BTrackingDetector(const char* detectorName, EDetectorType type, const char* geoParName, const char* hitArray = NULL);
     virtual ~R3BTrackingDetector();
     void SetHit(Double_t x, Double_t y);
     void SetHitTime(Double_t time);
@@ -53,7 +55,7 @@ class R3BTrackingDetector : public TObject
     TVector3 norm;
 
     // which section of the setup: 0=before target 1=target-glad 2=after glad
-    Int_t section;
+    EDetectorType section;
 
     // material + thickness
     // ??

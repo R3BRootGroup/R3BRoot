@@ -10,9 +10,9 @@
 #include "R3BMCTrack.h"
 #include "R3BdTofPoint.h"
 #include "R3BPspPoint.h"
-#include "R3BFi4Point.h"
 #include "R3BTPropagator.h"
 #include "R3BTrackingDetector.h"
+#include "R3BTrackingSetup.h"
 #include "R3BTGeoPar.h"
 #include "R3BTrackingParticle.h"
 #include "R3BHit.h"
@@ -38,16 +38,18 @@ R3BFragmentFitter::R3BFragmentFitter(const char* name, Bool_t vis, Int_t verbose
     , fFieldPar(NULL)
     , fPropagator(NULL)
     , fArrayMCTracks(NULL)
+    , fDetectors(new R3BTrackingSetup())
     , fArrayFragments(new TClonesArray("R3BTrackingParticle"))
     , fNEvents(0)
     , fVis(vis)
 {
     // this is the list of detectors (active areas) we use for tracking
-    fDetectors.push_back(new R3BTrackingDetector("target", "TargetGeoPar"));
-    fDetectors.push_back(new R3BTrackingDetector("psp", "PspGeoPar", "PspDigi"));
-    fDetectors.push_back(new R3BTrackingDetector("fi4", "fi4GeoPar", "Fi4Hit"));
-    fDetectors.push_back(new R3BTrackingDetector("fi5", "fi5GeoPar", "Fi5Hit"));
-    fDetectors.push_back(new R3BTrackingDetector("tofd", "tofdGeoPar", "TofdHit"));
+    fDetectors->AddDetector("target", kTarget, "TargetGeoPar");
+    fDetectors->AddDetector("psp", kTargetGlad, "PspGeoPar", "PspDigi");
+    fDetectors->AddDetector("fi4", kAfterGlad, "fi4GeoPar", "Fi4Hit");
+    fDetectors->AddDetector("fi5", kAfterGlad, "fi5GeoPar", "Fi5Hit");
+    //fDetectors->AddDetector("fi6", kAfterGlad, "fi6GeoPar", "Fi6Hit");
+    fDetectors->AddDetector("tofd", kTof, "tofdGeoPar", "TofdHit");
 }
 
 R3BFragmentFitter::~R3BFragmentFitter() {}
@@ -96,20 +98,6 @@ InitStatus R3BFragmentFitter::Init()
         return kERROR;
     }
 
-    fArrayFi4Points = (TClonesArray*)man->GetObject("FI4Point");
-    if (NULL == fArrayFi4Points)
-    {
-        LOG(ERROR) << "No Fi4 points array found in input file." << FairLogger::endl;
-        return kERROR;
-    }
-
-    fArrayFi5Points = (TClonesArray*)man->GetObject("Fi5Point");
-    if (NULL == fArrayFi5Points)
-    {
-        LOG(ERROR) << "No Fi5 points array found in input file." << FairLogger::endl;
-        return kERROR;
-    }
-
     man->Register("TrackingParticle", "Tracking", fArrayFragments, kTRUE);
 
     if (!InitPropagator())
@@ -117,10 +105,7 @@ InitStatus R3BFragmentFitter::Init()
         return kERROR;
     }
 
-    for (auto const& x : fDetectors)
-    {
-        x->Init();
-    }
+    fDetectors->Init();
 
     fh_mult_psp = new TH1F("h_mult_psp", "Multiplicity PSP", 20, -0.5, 19.5);
     fh_mult_fi4 = new TH1F("h_mult_fi4", "Multiplicity Fi4", 20, -0.5, 19.5);
@@ -130,16 +115,14 @@ InitStatus R3BFragmentFitter::Init()
     fh_eloss_psp = new TH1F("h_eloss_psp", "Energy loss PSP", 2000, 0., 200.);
     fh_eloss_fi4_mc = new TH1F("h_eloss_fi4_mc", "Energy loss Fi4 (MC truth)", 2000, 0., 200.);
     fh_eloss_fi4 = new TH1F("h_eloss_fi4", "Energy loss Fi4", 2000, 0., 200.);
-    fh_delta_fi4 = new TH1F("h_delta_fi4", "xpoint - xhit", 200, -1., 1.);
-    fh_delta_fi5 = new TH1F("h_delta_fi5", "xpoint - xhit", 200, -1., 1.);
-    fh_A_reco1 = new TH1F("h_A_reco1", "Reconstructed mass, step 1", 400., 120., 140.);
-    fh_A_reco2 = new TH1F("h_A_reco2", "Reconstructed mass, step 2", 400., 120., 140.);
+    fh_A_reco1 = new TH1F("h_A_reco1", "Reconstructed mass, step 1", 200., 120., 140.);
+    fh_A_reco2 = new TH1F("h_A_reco2", "Reconstructed mass, step 2", 200., 120., 140.);
     fh_mom_res = new TH1F("h_mom_res", "Momentum resolution", 200, -0.01, 0.01);
     fh_mass_res = new TH1F("h_mass_res", "Mass resolution", 100, -0.05, 0.05);
-    fh_chi2 = new TH1F("h_chi2", "Chi2", 1000, 0., 10.);
+    fh_chi2 = new TH1F("h_chi2", "Chi2", 100, 0., 10.);
 
-    Double_t ranges[] = { 0.1, 0.1, 1., 1., 10. };
-    for (Int_t i = 0; i < 5; i++)
+    Double_t ranges[] = { 0.1, 0.1, 1., 1., 10., 10. };
+    for (Int_t i = 0; i < 6; i++)
     {
         fh_x_res[i] = new TH1F(Form("h_x_res%d", i), Form("x residual %d", i), 2000, -ranges[i], ranges[i]);
         fh_x_pull[i] = new TH1F(Form("h_x_pull%d", i), Form("x pull %d", i), 200, -10., 10.);
@@ -164,10 +147,7 @@ void R3BFragmentFitter::SetParContainers()
 {
     fFieldPar = (R3BFieldPar*)FairRuntimeDb::instance()->getContainer("R3BFieldPar");
 
-    for (auto const& x : fDetectors)
-    {
-        x->SetParContainers();
-    }
+    fDetectors->SetParContainers();
 }
 
 void R3BFragmentFitter::Exec(const Option_t*)
@@ -184,19 +164,14 @@ void R3BFragmentFitter::Exec(const Option_t*)
      * Then call fit_fragment() to optimize the track and calculate
      * particle properties.
      */
-    for (auto const& x : fDetectors)
-    {
-        if (!x->GetDetectorName().EqualTo("target"))
-        {
-            x->CopyHits();
-        }
-    }
+    fDetectors->CopyHits();
 
-    R3BTrackingDetector* target = fDetectors.at(0);
-    R3BTrackingDetector* psp = fDetectors.at(1);
-    R3BTrackingDetector* fi4 = fDetectors.at(2);
-    R3BTrackingDetector* fi5 = fDetectors.at(3);
-    R3BTrackingDetector* tof = fDetectors.at(4);
+    R3BTrackingDetector* target = fDetectors->GetByName("target");
+    R3BTrackingDetector* psp = fDetectors->GetByName("psp");
+    R3BTrackingDetector* fi4 = fDetectors->GetByName("fi4");
+    R3BTrackingDetector* fi5 = fDetectors->GetByName("fi5");
+    //R3BTrackingDetector* fi6 = fDetectors->GetByName("fi6");
+    R3BTrackingDetector* tof = fDetectors->GetByName("tofd");
 
     // remember: in this test, target hast no data
     // if (target->hits->GetEntriesFast()==0) return; // no error, can always happen
@@ -204,30 +179,12 @@ void R3BFragmentFitter::Exec(const Option_t*)
         return; // no error, can always happen
     if (fi4->hits.size() == 0)
         return; // no error, can always happen
+    if (fi5->hits.size() == 0)
+        return; // no error, can always happen
+//    if (fi6->hits.size() == 0)
+//        return; // no error, can always happen
     if (tof->hits.size() == 0)
         return; // no error, can always happen
-
-    for (Int_t i = 0; i < fArrayFi4Points->GetEntriesFast(); i++)
-    {
-        R3BFi4Point* point = (R3BFi4Point*)fArrayFi4Points->At(i);
-        for (auto const& x : fi4->hits)
-        {
-            Double_t x_l, y_l;
-            fi4->GlobalToLocal(TVector3(point->GetXIn(), point->GetYIn(), point->GetZIn()), x_l, y_l);
-            fh_delta_fi4->Fill(x_l - x->GetX());
-        }
-    }
-
-    for (Int_t i = 0; i < fArrayFi5Points->GetEntriesFast(); i++)
-    {
-        R3BFi4Point* point = (R3BFi4Point*)fArrayFi5Points->At(i);
-        for (auto const& x : fi5->hits)
-        {
-            Double_t x_l, y_l;
-            fi5->GlobalToLocal(TVector3(point->GetXIn(), point->GetYIn(), point->GetZIn()), x_l, y_l);
-            fh_delta_fi5->Fill(x_l - x->GetX());
-        }
-    }
 
     // fetch start pos, default momentum and charge from the simulation
     // (just for this test!)
@@ -269,6 +226,8 @@ void R3BFragmentFitter::Exec(const Option_t*)
     // try to fit all possible combination of hits. (For now just one)
     // for (all psp hits)
     //    for (all tof hits)
+    fPropagator->SetVis(kFALSE);
+
     {
         target->SetHit(0., 0.);
         target->SetHitTime(0.);
@@ -279,16 +238,13 @@ void R3BFragmentFitter::Exec(const Option_t*)
             {
                 continue;
             }
-            psp->SetHit(-xpsp->GetX(), xpsp->GetY());
+            psp->SetHit(xpsp->GetX(), xpsp->GetY());
             psp->SetHitTime(xpsp->GetTime());
+            psp->res_x = 0.0200;
             fh_eloss_psp_mc->Fill(xpsp->GetEloss()); // MeV
 
             for (auto const& xfi4 : fi4->hits)
             {
-                //                if(1 == (((R3BFi4HitItem*)xfi4)->GetFiber()%2))
-                //                {
-                //                    continue;
-                //                }
                 fi4->SetHit(xfi4->GetX(), xfi4->GetY());
                 fi4->SetHitTime(xfi4->GetTime());
                 fh_eloss_fi4_mc->Fill(xfi4->GetEloss()); // MeV
@@ -299,34 +255,35 @@ void R3BFragmentFitter::Exec(const Option_t*)
                     fi5->SetHit(xfi5->GetX(), xfi5->GetY());
                     fi5->SetHitTime(xfi5->GetTime());
                     fi5->res_x = 0.0400 / TMath::Sqrt(12.);
+                    
+//                    for (auto const& xfi6 : fi6->hits)
+//                    {
+//                        fi6->SetHit(xfi6->GetX(), xfi6->GetY());
+//                        fi6->SetHitTime(xfi6->GetTime());
+//                        fi6->res_x = 0.0500 / TMath::Sqrt(12.);
 
                     for (auto const& xtof : tof->hits)
                     {
-                        //                        if(xtof->GetDetId() > 9)
-                        //                        {
-                        //                            continue;
-                        //                        }
                         tof->SetHit(xtof->GetX(), xtof->GetY());
                         tof->SetHitTime(xtof->GetTime());
                         tof->res_x = 2.7 / TMath::Sqrt(12.);
-
+                        tof->res_t = 0.03;
+                        
                         // Initial values
-                        Double_t mass = 100. * 0.9314940954;
-                        Double_t velocity0 = 0.85;
-                        TVector3 pos0(target->hit_x, target->hit_y, 0.);
-                        TVector3 direction0((TVector3(psp->hit_x - 0.005, psp->hit_y, psp->pos0.Z()) - pos0).Unit());
-
+                        Double_t mass = 120. * 0.9314940954;//2.*particle->GetCharge() * 0.9314940954;
+                        Double_t velocity0 = 0.86;
+                        TVector3 pos0(target->hit_x, target->hit_y, target->pos0.Z());
+                        TVector3 direction0((TVector3(psp->hit_x, psp->hit_y, psp->pos0.Z()) - pos0).Unit());
+                        
+                        LOG(DEBUG1) << "Start position: " << pos0.X()
+                        << " " << pos0.Y() << " " << pos0.Z() << FairLogger::endl;
+                        LOG(DEBUG1) << "Start direction: " << direction0.X()
+                        << " " << direction0.Y() << " " << direction0.Z() << FairLogger::endl;
+                        LOG(DEBUG1) << direction0.Mag() << FairLogger::endl;
+                        
                         Double_t gamma0 = TMath::Sqrt(1. / (1. - velocity0 * velocity0));
                         Double_t momentum0 = velocity0 * gamma0 * mass;
-
-                        //    LOG(INFO) << "Initial position: ";
-                        //    pos0.Print();
-                        //    std::cout << FairLogger::endl;
-                        //    LOG(INFO) << "Initial direction: ";
-                        //    direction0.Print();
-                        //    std::cout << FairLogger::endl;
-                        //    LOG(INFO) << "Initial velocity: " << velocity0 << FairLogger::endl;
-
+                        
                         // Create object for particle which will be fitted
                         R3BTrackingParticle* candidate = new R3BTrackingParticle(particle->GetCharge(),
                                                                                  pos0.X(),
@@ -337,13 +294,14 @@ void R3BFragmentFitter::Exec(const Option_t*)
                                                                                  momentum0 * direction0.Z(),
                                                                                  velocity0,
                                                                                  mass);
-
+                        
                         // find momentum
                         // momin is only a first guess
                         FitFragment(candidate);
-
+                        
                         fFragments.push_back(candidate);
                     }
+                    //}
                 }
             }
         }
@@ -387,18 +345,24 @@ void R3BFragmentFitter::Exec(const Option_t*)
         Double_t x_l = 0.;
         Double_t y_l = 0.;
         Int_t iDet = 0;
-        for (auto const& det : fDetectors)
+        fPropagator->SetVis();
+        for (auto const& det : fDetectors->GetArray())
         {
-            fPropagator->PropagateToDetector(candidate, det);
-            if (!det->GetDetectorName().EqualTo("tofd"))
+            if(kTarget != det->section)
+            {
+                fPropagator->PropagateToDetector(candidate, det);
+            }
+
+            if(kTof != det->section)
             {
                 Double_t weight = 1.;
-//                if (det->GetDetectorName().EqualTo("target"))
-//                {
-//                    weight = 0.;
-//                }
+                if(kTarget == det->section)
+                {
+                    weight = 0.5;
+                }
                 candidate->PassThroughDetector(det, weight);
             }
+
             // Convert global track coordinates into local on the det plane
             det->GlobalToLocal(candidate->GetPosition(), x_l, y_l);
             fh_x_res[iDet]->Fill(x_l - det->hit_x);
@@ -466,29 +430,20 @@ void R3BFragmentFitter::FitFragment(R3BTrackingParticle* candidate)
     // (after the particle was tracked twice with different m0), I
     // recalculated dm/dx using the actual data.
 
-    //    R3BTrackingDetector* target = fDetectors.at(0);
-    //    R3BTrackingDetector* psp = fDetectors.at(1);
-    R3BTrackingDetector* fi4 = fDetectors.at(2);
-    R3BTrackingDetector* fi5 = fDetectors.at(3);
-    R3BTrackingDetector* tof = fDetectors.at(4);
-
-    //    // Estimate velocity based on time measurement by TOF wall
-    //    velocity0 = Velocity(candidate);
-    //    // Set new beta value, recalculate state vector and put particle back to
-    //    // target
-    //    candidate->SetStartBeta(velocity0);
-    //    candidate->SetBeta(velocity0);
-    //    candidate->UpdateMomentum();
-    //    candidate->Reset();
-
     Double_t sdev = 0.;
     Double_t devTof;
     Double_t time;
     Double_t chi2;
     Double_t beta = candidate->GetStartBeta();
     Double_t mass = candidate->GetMass();
+    Double_t dbetadt;
+    Double_t dmdx;
 
     Bool_t stopHere = kFALSE;
+    
+    fAfterGladResolution = fDetectors->GetAfterGladResolution();
+    
+    R3BTrackingDetector* tof = fDetectors->GetFirstByType(kTof);
 
     for (Int_t i = 0; i < maxIter; i++)
     {
@@ -497,6 +452,8 @@ void R3BFragmentFitter::FitFragment(R3BTrackingParticle* candidate)
 
         // Always start an iteration from the target
         candidate->Reset();
+
+        //fPropagator->SetVis(kTRUE);
 
         // Calculate deviation of track from a measured TOF hit
         sdev = TrackFragment(candidate, kTRUE, devTof, time, chi2);
@@ -509,27 +466,27 @@ void R3BFragmentFitter::FitFragment(R3BTrackingParticle* candidate)
 
         // Calculate dm/dx by changing mass by 1 GeV and measuring deviation of
         // track on the TOF wall
-        Double_t dbetadt = DbetaDt(candidate);
-        // Reset the mass to original value, reset the track
-        candidate->SetStartBeta(beta);
-        candidate->UpdateMomentum();
-        candidate->Reset();
-
-        //        Double_t dbetadx = DbetaDx(candidate);
-        //        // Reset the mass to original value, reset the track
-        //        candidate->SetStartBeta(beta);
-        //        candidate->UpdateMomentum();
-        //        candidate->Reset();
+        //if(0 == i || TMath::Abs(time - tof->hit_time) > 0.5)
+        {
+            dbetadt = DbetaDt(candidate);
+            // Reset the mass to original value, reset the track
+            candidate->SetStartBeta(beta);
+            candidate->UpdateMomentum();
+            candidate->Reset();
+        }
 
         // Calculate dm/dx by changing mass by 1 GeV and measuring deviation of
         // track on the TOF wall
-        Double_t dmdx = DmDx(candidate, kTRUE);
-        // Reset the mass to original value, reset the track
-        candidate->SetMass(mass);
-        candidate->UpdateMomentum();
-        candidate->Reset();
+        //if(0 == i || TMath::Abs(sdev) > 1.)
+        {
+            dmdx = DmDx(candidate, kTRUE);
+            // Reset the mass to original value, reset the track
+            candidate->SetMass(mass);
+            candidate->UpdateMomentum();
+            candidate->Reset();
+        }
 
-        if (TMath::Abs(time - tof->hit_time) > 2 * 0.03)
+        if (TMath::Abs(time - tof->hit_time) > 2 * tof->res_t)
         {
             // Correct the mass to achieve better extrapolation to hit
             Double_t dbeta = dbetadt * (time - tof->hit_time);
@@ -539,7 +496,7 @@ void R3BFragmentFitter::FitFragment(R3BTrackingParticle* candidate)
             candidate->UpdateMomentum();
             stopHere = kFALSE;
         }
-        if (TMath::Abs(sdev) > 2 * TMath::Sqrt(fi4->res_x * fi4->res_x + fi5->res_x * fi5->res_x))
+        if (TMath::Abs(sdev) > 2 * fAfterGladResolution)
         {
             // Correct the mass to achieve better extrapolation to hit
             mass -= dmdx * sdev;
@@ -574,7 +531,6 @@ Double_t R3BFragmentFitter::TrackFragment(R3BTrackingParticle* particle,
                                           Double_t& time,
                                           Double_t& chi2)
 {
-    fPropagator->SetVis(kFALSE);
     Bool_t result = kFALSE;
     Double_t sdev = 0.;
     Double_t x_l = 0.;
@@ -585,30 +541,27 @@ Double_t R3BFragmentFitter::TrackFragment(R3BTrackingParticle* particle,
     Double_t prev_l = 0.;
 
     // Propagate through the setup, defined by array of detectors
-    for (auto const& det : fDetectors)
+    for (auto const& det : fDetectors->GetArray())
     {
         LOG(DEBUG2) << FairLogger::endl;
-        LOG(DEBUG2) << "Propagating to z=" << det->hit_xyz.Z() << FairLogger::endl;
+        LOG(DEBUG2) << "Propagating to z=" << det->pos0.Z() << FairLogger::endl;
 
-        result = fPropagator->PropagateToDetector(particle, det);
-
-        if (!det->GetDetectorName().EqualTo("target"))
+        if(kTarget != det->section)
         {
+            result = fPropagator->PropagateToDetector(particle, det);
+            
             time += (particle->GetLength() - prev_l) / (particle->GetBeta() * SPEED_OF_LIGHT);
             prev_l = particle->GetLength();
         }
 
-        if (energyLoss)
+        if (energyLoss && kTof != det->section)
         {
             Double_t weight = 1.;
-//            if (det->GetDetectorName().EqualTo("target"))
-//            {
-//                weight = 0.;
-//            }
-            if (!det->GetDetectorName().EqualTo("tofd"))
+            if(kTarget == det->section)
             {
-                particle->PassThroughDetector(det, weight);
+                weight = 0.5;
             }
+            particle->PassThroughDetector(det, weight);
         }
 
         if (det->GetDetectorName().EqualTo("psp"))
@@ -627,39 +580,31 @@ Double_t R3BFragmentFitter::TrackFragment(R3BTrackingParticle* particle,
         det->GlobalToLocal(particle->GetPosition(), x_l, y_l);
 
         // X deviation at the last detector
-        if (det->GetDetectorName().EqualTo("fi4") || det->GetDetectorName().EqualTo("fi5"))
+        if (kAfterGlad == det->section)
         {
             sdev += x_l - det->hit_x;
         }
 
         // X deviation at the last detector
-        if (det->GetDetectorName().EqualTo("tofd"))
+        if (kTof == det->section)
         {
             devTof = x_l - det->hit_x;
         }
 
-        //        if(! det->GetDetectorName().EqualTo("tofd"))
-        //        {
-        //            chi2 += TMath::Power((x_l - det->hit_x)/det->res_x, 2);
-        //        }
-
-        if (det->GetDetectorName().EqualTo("fi4") || det->GetDetectorName().EqualTo("fi5") ||
-            det->GetDetectorName().EqualTo("tofd"))
-        {
-            chi2 += TMath::Power((x_l - det->hit_x) / det->res_x, 2);
-        }
+        chi2 += TMath::Power((x_l - det->hit_x) / det->res_x, 2);
 
         LOG(DEBUG2) << "Track length " << particle->GetLength() << " cm" << FairLogger::endl;
     }
 
     sdev /= 2;
+    
+    chi2 /= (fDetectors->GetArray().size() - 2);
 
     LOG(DEBUG2) << "Deviation at TOF wall : " << sdev << FairLogger::endl;
     LOG(DEBUG2) << "                 chi2 : " << chi2 << FairLogger::endl;
     LOG(DEBUG2) << "                 time : " << time << FairLogger::endl;
     LOG(DEBUG2) << "Track length " << particle->GetLength() << " cm" << FairLogger::endl;
 
-    fPropagator->SetVis();
     return sdev;
 }
 
@@ -673,14 +618,14 @@ Double_t R3BFragmentFitter::TrackFragment(R3BTrackingParticle* particle,
 Double_t R3BFragmentFitter::Velocity(R3BTrackingParticle* candidate)
 {
     fPropagator->SetVis(kFALSE);
-    R3BTrackingDetector* target = fDetectors.at(0);
-    R3BTrackingDetector* tof = fDetectors.at(4);
+    R3BTrackingDetector* target = fDetectors->GetByName("target");
+    R3BTrackingDetector* tof = fDetectors->GetByName("tofd");
 
     fPropagator->PropagateToDetector(candidate, tof);
     // TrackFragment(candidate);
     Double_t beta = candidate->GetLength() / (tof->hit_time - target->hit_time) / SPEED_OF_LIGHT;
     LOG(INFO) << "Velocity estimation (TOF) " << beta << "   length = " << candidate->GetLength() << FairLogger::endl;
-    fPropagator->SetVis();
+
     return beta;
 }
 
@@ -712,7 +657,6 @@ Double_t R3BFragmentFitter::DbetaDx(R3BTrackingParticle* candidate)
 
     LOG(DEBUG1) << "dbeta/dx = " << dbetadx << " 1/cm" << FairLogger::endl << FairLogger::endl;
 
-    fPropagator->SetVis();
     return dbetadx;
 }
 
@@ -741,7 +685,6 @@ Double_t R3BFragmentFitter::DbetaChi2(R3BTrackingParticle* candidate)
 
     LOG(DEBUG1) << "dbeta/dchi2 = " << dbetachi2 << " 1/cm" << FairLogger::endl << FairLogger::endl;
 
-    fPropagator->SetVis();
     return dbetachi2;
 }
 
@@ -770,7 +713,6 @@ Double_t R3BFragmentFitter::DbetaDt(R3BTrackingParticle* candidate)
 
     LOG(DEBUG1) << "dbeta/dt = " << dbetadt << " 1/ns" << FairLogger::endl << FairLogger::endl;
 
-    fPropagator->SetVis();
     return dbetadt;
 }
 
@@ -802,8 +744,6 @@ Double_t R3BFragmentFitter::DmDx(R3BTrackingParticle* candidate, Bool_t energy_l
 
     LOG(DEBUG1) << "dm/dx = " << dmdx << " GeV/cm" << FairLogger::endl << FairLogger::endl;
 
-    fPropagator->SetVis();
-
     return dmdx;
 }
 
@@ -834,8 +774,6 @@ Double_t R3BFragmentFitter::DmDxTof(R3BTrackingParticle* candidate, Bool_t energ
     Double_t dmdx = dm / (devTof2 - devTof1);
 
     LOG(DEBUG1) << "dm/dx = " << dmdx << " GeV/cm" << FairLogger::endl << FairLogger::endl;
-
-    fPropagator->SetVis();
 
     return dmdx;
 }
@@ -869,33 +807,35 @@ Double_t R3BFragmentFitter::DmDt(R3BTrackingParticle* candidate, Bool_t energy_l
 
     LOG(DEBUG1) << "dm/dt = " << dmdt << " GeV/ns" << FairLogger::endl << FairLogger::endl;
 
-    fPropagator->SetVis();
-
     return dmdt;
 }
 
 void R3BFragmentFitter::Finish()
 {
+    fh_mult_psp->Write();
+    fh_mult_fi4->Write();
+    fh_mult_fi5->Write();
+    fh_mult_tofd->Write();
+    fh_eloss_psp_mc->Write();
+    fh_eloss_psp->Write();
+    fh_eloss_fi4_mc->Write();
+    fh_eloss_fi4->Write();
+    fh_A_reco1->Write();
+    fh_A_reco2->Write();
+    fh_mom_res->Write();
+    fh_mass_res->Write();
+    fh_chi2->Write();
+    for (Int_t i = 0; i < 6; i++)
+    {
+        fh_x_res[i]->Write();
+        fh_x_pull[i]->Write();
+    }
+
     if (fVis)
     {
-        for (auto const& det : fDetectors)
+        for (auto const& det : fDetectors->GetArray())
         {
             det->Draw();
-
-            if (det->GetDetectorName().EqualTo("tofd"))
-            {
-                //                for(Int_t i = 0; i < det->hits->GetEntriesFast(); i++)
-                //                {
-                //                    R3BdTofPoint* point = (R3BdTofPoint*) det->hits->At(i);
-                //                    R3BMCTrack* track = (R3BMCTrack*) fArrayMCTracks->At(point->GetTrackID());
-                //                    if(track->GetMotherId() != -1)
-                //                    {
-                //                        continue;
-                //                    }
-                //                    TArc* arc = new TArc(-point->GetXIn(), point->GetZIn(), 0.1);
-                //                    arc->Draw();
-                //                }
-            }
         }
 
         TCanvas* c11 = new TCanvas("c11", "", 10, 10, 1000, 1000);
@@ -916,17 +856,11 @@ void R3BFragmentFitter::Finish()
         fh_eloss_psp_mc->Draw();
         fh_eloss_psp->Draw("same");
 
-        TCanvas* c3 = new TCanvas("c3", "", 200, 10, 1000, 500);
-        c3->Divide(2, 1);
-        //        fh_eloss_fi4_mc->SetLineStyle(2);
-        //        fh_eloss_fi4_mc->SetLineColor(2);
-        //        fh_eloss_fi4_mc->Draw();
-        //        fh_eloss_fi4->Draw("same");
-        c3->cd(1);
-        fh_delta_fi4->Draw();
-        c3->cd(2);
-        fh_delta_fi5->Draw();
-        c3->cd(0);
+//        TCanvas* c3 = new TCanvas("c3", "", 200, 10, 1000, 500);
+//        c3->Divide(2, 1);
+//        c3->cd(1);
+//        c3->cd(2);
+//        c3->cd(0);
 
         TCanvas* c5 = new TCanvas("c5", "", 400, 10, 1000, 500);
         c5->Divide(2, 1);
@@ -953,7 +887,7 @@ void R3BFragmentFitter::Finish()
 
         TCanvas* c8 = new TCanvas("c8", "", 10, 10, 1500, 500);
         c8->Divide(3, 2);
-        for (Int_t i = 0; i < 5; i++)
+        for (Int_t i = 0; i < 6; i++)
         {
             c8->cd(i + 1);
             fh_x_res[i]->Draw();
@@ -962,7 +896,7 @@ void R3BFragmentFitter::Finish()
 
         TCanvas* c9 = new TCanvas("c9", "", 10, 10, 1500, 500);
         c9->Divide(3, 2);
-        for (Int_t i = 0; i < 5; i++)
+        for (Int_t i = 0; i < 6; i++)
         {
             c9->cd(i + 1);
             fh_x_pull[i]->Draw();
@@ -975,6 +909,7 @@ Bool_t R3BFragmentFitter::InitPropagator()
 {
     FairField* fairField = FairRunAna::Instance()->GetField();
     R3BGladFieldMap* gladField = NULL;
+    fFieldPar->printParams();
     if (2 == fFieldPar->GetType())
     {
         gladField = (R3BGladFieldMap*)fairField;

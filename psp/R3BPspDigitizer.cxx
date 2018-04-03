@@ -138,8 +138,7 @@ void R3BPspDigitizer::Exec(Option_t* opt) {
      if(fZ>0.0){ //i.e. psp3
 
 //      psp3x=(((fX + 0.0) * 1.0) - ((fZ - 94.1) * (0.0)));
-     psp3x=-fX;  //to be consistent with mfi, gfi, tof-walls, right-handed?
-//      psp3x=fX;  //+ for s412?
+     psp3x=fX;
      psp3y=fY;
      psp3e += PSPeloss;
      
@@ -150,6 +149,9 @@ void R3BPspDigitizer::Exec(Option_t* opt) {
     } //PID
      
    }
+
+    psp3x = gRandom->Gaus(psp3x, 0.0200);
+    psp3y = gRandom->Gaus(psp3y, 0.0200);
 
 AddHit( psp3mul, psp3x, psp3y, psp3e);
 

@@ -33,6 +33,7 @@ R3BTGeoPar.cxx
 R3BFragmentFitter.cxx
 R3BTrackingDetector.cxx
 R3BTrackingParticle.cxx
+R3BTrackingSetup.cxx
 )
 
 # fill list of header files from list of source files

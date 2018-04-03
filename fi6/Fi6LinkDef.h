@@ -10,6 +10,7 @@
 #pragma link C++ class R3BFi6Mapped2CalPar+;
 #pragma link C++ class R3BFi6Mapped2Cal+;
 #pragma link C++ class R3BFi6Cal2Hit+;
+#pragma link C++ class R3BFi6ContFact;
 
 
 #endif

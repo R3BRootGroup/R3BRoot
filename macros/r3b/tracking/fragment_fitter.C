@@ -16,9 +16,13 @@ void fragment_fitter()
     
     // Runtime DataBase info ---------------------------------------------------
     FairRuntimeDb* rtdb = run->GetRuntimeDb();
-    FairParRootFileIo* parIo1 = new FairParRootFileIo();
+    Bool_t kParameterMerged = kTRUE;
+    FairParRootFileIo* parIo1 = new FairParRootFileIo(kParameterMerged);
     parIo1->open(parFile.Data());
     rtdb->setFirstInput(parIo1);
+    FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
+    parIo2->open("setup.par", "in");
+    rtdb->setSecondInput(parIo2);
     // -------------------------------------------------------------------------
 
     // Propagation task --------------------------------------------------------
