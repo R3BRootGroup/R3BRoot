@@ -1,0 +1,13 @@
+#Readme about the macros for the AMS detector
+
+- Look at mapped data from reader:
+>> root -l unpack_gsi2018_ams_mapped.C
+
+- Fill the container of parameters to obtain cal and hit data:
+>> root -l unpack_gsi2018_ams_mapped2calpar.C
+
+- Cal data:
+>> root -l unpack_gsi2018_ams_mapped2cal.C
+
+- Hit data:
+>> root -l unpack_gsi2018_ams_mapped2hit.C
