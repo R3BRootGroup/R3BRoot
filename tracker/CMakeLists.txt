@@ -20,6 +20,8 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
+${R3BROOT_SOURCE_DIR}/tracker/unpackams
+${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -49,6 +51,9 @@ R3BTraFraDigitizer.cxx
 R3BTarget2pDigiPar.cxx
 R3BTarget2pDigitizer.cxx   
 R3BTraHitFinder.cxx
+unpackams/R3BAmsStripCalPar.cxx
+unpackams/R3BAmsMapped2StripCalPar.cxx
+unpackams/R3BAmsMapped2StripCal.cxx
 )
 
 # fill list of header files from list of source files

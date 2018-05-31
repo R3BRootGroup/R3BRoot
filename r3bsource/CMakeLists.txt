@@ -21,6 +21,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
 ${R3BROOT_SOURCE_DIR}/psp/par
 ${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
+${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 )
 
 set(LINK_DIRECTORIES
@@ -63,6 +64,8 @@ R3BNeulandTamexReader.cxx
 R3BNeulandTacquilaReader.cxx
 R3BStrawtubesReader.cxx
 R3BStartrackReader.cxx
+R3BAmsReader.cxx
+#R3BFib4Reader.cxx
 )
 
 Set(STRUCT_HEADERS
