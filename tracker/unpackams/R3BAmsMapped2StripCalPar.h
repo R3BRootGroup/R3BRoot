@@ -60,6 +60,7 @@ class R3BAmsMapped2StripCalPar : public FairTask {
   const Double_t GetSigma(){return fSigma;}
   const Double_t GetMean(){return fMean;}
   const Int_t GetMinStadistics(){return fMinStadistics;}
+  const Int_t GetMaxSigma(){return fMaxSigma;}
   
   void SetNumDetectors(Int_t numberDet){fNumDets=numberDet;}
   void SetNumStrips(Int_t numberStrip){fNumStrips=numberStrip;}
@@ -71,6 +72,7 @@ class R3BAmsMapped2StripCalPar : public FairTask {
   void SetSigma(Double_t sigma){fSigma=sigma;}
   void SetMean(Double_t mean){fMean=mean;}
   void SetMinStadistics(Int_t minstad){fMinStadistics=minstad;}
+  void SetMaxSigma(Double_t sigma){fMaxSigma=sigma;}
 
  protected:
   //Number of histograms, limits and bining
@@ -81,6 +83,7 @@ class R3BAmsMapped2StripCalPar : public FairTask {
   Int_t fMapHistos_left;		
   Int_t fMapHistos_right;
   Int_t fMapHistos_bins;
+  Int_t fMaxSigma;//Maximum sigma to mark dead strips, pedestal -1
 
   //Minimum stadistics and parameters
   Int_t fMinStadistics;

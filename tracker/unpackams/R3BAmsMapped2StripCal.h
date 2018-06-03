@@ -57,7 +57,7 @@ class R3BAmsMapped2StripCal : public FairTask {
   Int_t NumStripsS;
   Int_t NumStripsK;
   Int_t NumParams;
-  Double_t MaxSigma;
+  Int_t MaxSigma;
   TArrayF* CalParams;
   
   R3BAmsStripCalPar* fCal_Par;       /**< Parameter container. >*/ 

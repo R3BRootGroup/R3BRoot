@@ -7,17 +7,17 @@
  * Put this header file into the 'r3bsource' directory and recompile.
  * */
 
-typedef struct EXT_STR_h101_t {//FIXME for ams
-  EXT_STR_h101_unpack_t unpack;
-  EXT_STR_h101_CALIFA_t califa;
-} EXT_STR_h101;
+ typedef struct EXT_STR_h101_t {//FIXME for ams
+   EXT_STR_h101_unpack_t unpack;
+   EXT_STR_h101_CALIFA_t califa;
+ } EXT_STR_h101;
 
-void unpack_gsi2018_ams_calpar() {
+void unpack_gsi2018_ams_mapped2hit() {
   TStopwatch timer;
   timer.Start();
-  
+
   //const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
-  const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
+  const Int_t nev = 3000; /* number of events to read, -1 - until CTRL+C */
   
   /* Create source using ucesb for input ------------------ */
   
@@ -38,51 +38,35 @@ void unpack_gsi2018_ams_calpar() {
   source->AddReader(new R3BUnpackReader((EXT_STR_h101_unpack*)&ucesb_struct,
 					offsetof(EXT_STR_h101, unpack)));
   source->AddReader(new R3BAmsReader((EXT_STR_h101_CALIFA*)&ucesb_struct.califa,
-					     offsetof(EXT_STR_h101, califa)));//FIXME
+					     offsetof(EXT_STR_h101, califa)));
 
   
   /* Create online run ------------------------------------ */
   FairRunOnline* run = new FairRunOnline(source);
   run->SetRunId(1513078509);
   run->SetOutputFile(outputFileName);
-
   
-  /* Add analysis task ------------------------------------ */
-  R3BAmsMapped2StripCalPar* CalPar = new R3BAmsMapped2StripCalPar();
-  CalPar->SetNumDetectors(4); // Number of ams detectors 
-  CalPar->SetNumStrips(1024); // 1024 strips per ams detector
-  CalPar->SetNumStripsK(384); // 384 strips for the K-side
-  CalPar->SetNumStripsS(640); // 640 strips for the S-side
-  CalPar->SetMaxSigma(5);     // Max. sigma to mark dead strips: 5 ADC units
-  CalPar->SetMinStadistics(1000);
-  CalPar->SetCalRange_left(0);  
-  CalPar->SetCalRange_right(2000);
-  CalPar->SetCalRange_bins(500);
-  run->AddTask(CalPar);
+  /* Runtime data base ------------------------------------ */
+  FairRuntimeDb* rtdb = run->GetRuntimeDb();
+
+  /* Add analysis task ------------------------------------ */  
+  R3BAmsMapped2StripCal* Map2Cal = new R3BAmsMapped2StripCal();
+  run->AddTask(Map2Cal);
+  R3BAmsCal2Hit* Cal2Hit = new R3BAmsCal2Hit();
+  run->AddTask(Cal2Hit);
+
+
+  FairParRootFileIo* parIo1 = new FairParRootFileIo();
+  parIo1->open("Ams_CalibParam.root","in");
+  rtdb->setFirstInput(parIo1);
+  rtdb->print();
 
 
   /* Initialize ------------------------------------------- */
   run->Init();
+  //    FairLogger::GetLogger()->SetLogScreenLevel("WARNING");
+  //    FairLogger::GetLogger()->SetLogScreenLevel("DEBUG");
   FairLogger::GetLogger()->SetLogScreenLevel("INFO");
-  //FairLogger::GetLogger()->SetLogScreenLevel("WARNING");
-  //FairLogger::GetLogger()->SetLogScreenLevel("DEBUG");
-  /* ------------------------------------------------------ */
-  
-
-  /* Runtime data base ------------------------------------ */
-  FairRuntimeDb* rtdb = run->GetRuntimeDb();
-
-  //Choose Root or Ascii file	
-  //1-Root file with the Calibartion Parameters
-  Bool_t kParameterMerged = kTRUE;
-  FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
-  parOut->open("Ams_CalibParam.root");
-  rtdb->setOutput(parOut);
-  
-  //2-Ascii file with the Calibartion Parameters
-  /*FairParAsciiFileIo* parIo1 = new FairParAsciiFileIo();
-  parIo1->open("Ams_CalibParam.par","out");
-  rtdb->setOutput(parIo1);*/
 
 
   /* Run -------------------------------------------------- */
@@ -90,7 +74,7 @@ void unpack_gsi2018_ams_calpar() {
 
 
   /* Save parameters (if needed) -------------------------- */
-  rtdb->saveOutput();
+  //rtdb->saveOutput();
 
 
   /* Finish ----------------------------------------------- */

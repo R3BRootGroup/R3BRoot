@@ -21,7 +21,6 @@
 #include "TMath.h"
 #include "TVector3.h"
 #include "TGeoMatrix.h"
-#include "TF1.h"
 
 #include <iostream>
 #include <stdlib.h>
@@ -37,6 +36,7 @@ R3BAmsMapped2StripCalPar::R3BAmsMapped2StripCalPar() :
   fNumStrips(0),
   fNumStripsS(0),
   fNumStripsK(0),
+  fMaxSigma(5),
   fMinStadistics(0),
   fMapHistos_left(0),
   fMapHistos_right(0),
@@ -56,6 +56,7 @@ R3BAmsMapped2StripCalPar::R3BAmsMapped2StripCalPar(const char* name, Int_t iVerb
   fNumStrips(0),
   fNumStripsS(0),
   fNumStripsK(0),
+  fMaxSigma(5),
   fMinStadistics(0),
   fMapHistos_left(0),
   fMapHistos_right(0),
@@ -73,6 +74,8 @@ R3BAmsMapped2StripCalPar::~R3BAmsMapped2StripCalPar() {
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BAmsMapped2StripCalPar::Init() {
+
+  LOG(INFO) << "R3BAmsMapped2StripCalPar: Init" << FairLogger::endl;
 
   char name[100];
   
@@ -140,12 +143,14 @@ void R3BAmsMapped2StripCalPar::FinishEvent() {
 void R3BAmsMapped2StripCalPar::FinishTask() {
   
   SearchPedestals();
+  //fStrip_Par->printParams();
 }
 
 //------------------
 void R3BAmsMapped2StripCalPar::SearchPedestals(){
-  
-  
+
+  LOG(INFO) << "R3BAmsMapped2StripCalPar: Search pedestals" << FairLogger::endl;
+
   Int_t numPars =3;// by default number of parameters=3
   
   fStrip_Par->SetNumDets(fNumDets);
@@ -160,14 +165,25 @@ void R3BAmsMapped2StripCalPar::SearchPedestals(){
     if (fh_Map_energy_strip[i+d*fNumStrips]->GetEntries()>fMinStadistics){
       
       TF1 *f1 = new TF1 ("f1", "gaus", fMapHistos_left, fMapHistos_right);
-      
+      f1->SetParameter(1,100.);      
+      f1->SetParameter(2,2.);
+
       fh_Map_energy_strip[i+d*fNumStrips]->Fit("f1","RQ0");
-      
-      for(Int_t h=0; h<numPars;h++){
-	fStrip_Par->SetStripCalParams(f1->GetParameter(h),numPars*i+h+d*fNumStrips);
-      }  
-      
-    }else {std::cout<<"Histogram NO Fitted, detector: " << d+1 << ", strip: "<< i+1 <<endl;} 
+
+      //Fill container:
+      fStrip_Par->SetStripCalParams(f1->GetParameter(0),numPars*i+d*numPars*fNumStrips);
+      if(f1->GetParameter(2)<fMaxSigma){
+       fStrip_Par->SetStripCalParams(f1->GetParameter(1),numPars*i+d*numPars*fNumStrips+1);
+      }else{
+       fStrip_Par->SetStripCalParams(-1,numPars*i+d*fNumStrips+1);//dead strip
+      }
+      fStrip_Par->SetStripCalParams(f1->GetParameter(2),numPars*i+d*numPars*fNumStrips+2);
+
+    }else {
+      fStrip_Par->SetStripCalParams(-1,numPars*i+d*numPars*fNumStrips+1);//dead strip
+      fStrip_Par->SetStripCalParams(0,numPars*i+d*numPars*fNumStrips+2);
+      LOG(WARNING)<<"Histogram NO Fitted, detector: " << d+1 << ", strip: "<< i+1 <<FairLogger::endl;
+    }
    }
   }
   
@@ -176,10 +192,4 @@ void R3BAmsMapped2StripCalPar::SearchPedestals(){
 
 }
 
-/*
-  void R3BAmsMapped2StripCalPar::SetOutputFile(const char *outFile)
-  {
-  fOutputFile = const_cast<char*>(outFile);
-  }
-*/
 ClassImp(R3BAmsMapped2StripCalPar)

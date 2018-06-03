@@ -30,7 +30,7 @@ R3BAmsMapped2StripCal::R3BAmsMapped2StripCal() :
   NumStripsS(0),
   NumStripsK(0),
   NumParams(0),
-  MaxSigma(5.),
+  MaxSigma(5),
   CalParams(NULL),
   fCal_Par(NULL),
   fAmsMappedDataCA(NULL),
@@ -46,7 +46,7 @@ R3BAmsMapped2StripCal::R3BAmsMapped2StripCal(const char* name, Int_t iVerbose) :
   NumStripsS(0),
   NumStripsK(0),
   NumParams(0),
-  MaxSigma(5.),
+  MaxSigma(5),
   CalParams(NULL),
   fCal_Par(NULL),
   fAmsMappedDataCA(NULL),
@@ -75,7 +75,7 @@ void R3BAmsMapped2StripCal::SetParContainers() {
     LOG(ERROR)<<"R3BAmsMapped2StripCalPar::Init() Couldn't get handle on amsStripCalPar container"<<FairLogger::endl;
   }
   else{
-    std::cout<<"R3BAmsMapped2StripCalPar:: amsStripCalPar container open"<<endl;
+    LOG(INFO)<<"R3BAmsMapped2StripCalPar:: amsStripCalPar container open"<<FairLogger::endl;
   }
 }
 
@@ -93,18 +93,26 @@ void R3BAmsMapped2StripCal::SetParameter(){
   LOG(INFO)<<"R3BAmsMapped2StripCal: Nb strips: "<< NumStrips <<FairLogger::endl;
   LOG(INFO)<<"R3BAmsMapped2StripCal: Nb strips S-side: "<< NumStripsS <<FairLogger::endl;
   LOG(INFO)<<"R3BAmsMapped2StripCal: Nb strips K-side: "<< NumStripsK <<FairLogger::endl;
-  LOG(INFO)<<"R3BAmsMapped2StripCal: Nb parameters for Fit: "<< NumParams <<FairLogger::endl;
+  LOG(INFO)<<"R3BAmsMapped2StripCal: Nb parameters from pedestal fit: "<< NumParams <<FairLogger::endl;
   
   CalParams= new TArrayF();
   Int_t array_size = NumDets*NumStrips*NumParams;
   CalParams->Set(array_size);	
   CalParams=fCal_Par->GetStripCalParams();//Array with the Cal parameters
 
+  //Count the number of dead strips per AMS detector
+  for(Int_t d = 0; d < NumDets; d++){
+  Int_t numdeadstrips=0;
+  for(Int_t i = 0; i < NumStrips; i++)if(CalParams->GetAt(NumParams*i+1+NumStrips*d*NumParams)==-1)numdeadstrips++;
+  LOG(INFO)<<"R3BAmsMapped2StripCal: Nb of dead strips in AMS detector " <<d<< ": "<< numdeadstrips <<FairLogger::endl;
+  }
 }
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BAmsMapped2StripCal::Init()
-{ 
+{
+  LOG(INFO) << "R3BAmsMapped2StripCal: Init" << FairLogger::endl;
+
   //INPUT DATA
   FairRootManager* rootManager = FairRootManager::Instance();
   if (!rootManager) { return kFATAL;}
@@ -139,12 +147,12 @@ void R3BAmsMapped2StripCal::Exec(Option_t* option)
   Reset();
   
   if (!fCal_Par) {
-    std::cout<<"NO Container Parameter!!"<<endl<<endl;
+    LOG(ERROR)<<"NO Container Parameter!!"<<FairLogger::endl;
   }  
   
   //Reading the Input -- Mapped Data --
   Int_t nHits = fAmsMappedDataCA->GetEntries();
-  if(nHits!=NumStrips && nHits>0)LOG(WARNING) << "R3BAmsMapped2StripCal: nHits!=NumStrips"<<FairLogger::endl;
+  if(nHits!=NumStrips*NumDets && nHits>0)LOG(WARNING) << "R3BAmsMapped2StripCal: nHits!=NumStrips*NumDets"<<FairLogger::endl;
   if(!nHits) return;
   
   R3BAmsMappedData** mappedData;
@@ -155,16 +163,55 @@ void R3BAmsMapped2StripCal::Exec(Option_t* option)
   Double_t energy;
   Double_t pedestal=0.;
   Double_t sigma=0.;
+  Double_t SynAdcs[16*NumDets];
+
   
+  //Look for ADC baselines
+  for(Int_t i = 0; i < 16*NumDets; i++)SynAdcs[i]=0.;
   
+  Int_t nbadc=0;
+  Int_t minnb=4;
+  Double_t h=0;
+  /*
   for(Int_t i = 0; i < nHits; i++) {
     mappedData[i] = (R3BAmsMappedData*)(fAmsMappedDataCA->At(i));
 
     detId   = mappedData[i]->GetDetectorId();
     stripId = mappedData[i]->GetStripId();
 
-    pedestal=CalParams->GetAt(3*stripId+1);
-    sigma=CalParams->GetAt(3*stripId+2);
+    pedestal=CalParams->GetAt(NumParams*stripId+1);
+    sigma=CalParams->GetAt(NumParams*stripId+2);
+    energy  = mappedData[i]->GetEnergy()-pedestal;
+
+//LOG(WARNING)<<  pedestal << " "<<  sigma << " " <<  energy << " "<<nbadc<<FairLogger::endl;
+
+    if(energy<sigma*3. && i<64*(nbadc+1)){
+     if(pedestal>-1){
+      SynAdcs[nbadc]=SynAdcs[nbadc]+energy;
+      h=h+1.;
+      if(h==minnb){
+       SynAdcs[nbadc]=SynAdcs[nbadc]/h;
+       nbadc++;
+       i=64*nbadc-1;
+       h=0;
+      }
+     }
+    }else{
+     SynAdcs[nbadc]=0.;
+     LOG(WARNING) << "R3BAmsMapped2StripCal: NO baseline found for ADC "<<nbadc<<FairLogger::endl;
+     nbadc++;
+    }
+  }
+  */
+  
+  nbadc=0;
+  for(Int_t i = 0; i < nHits; i++) {
+    mappedData[i] = (R3BAmsMappedData*)(fAmsMappedDataCA->At(i));
+    detId   = mappedData[i]->GetDetectorId();
+    stripId = mappedData[i]->GetStripId();
+
+    pedestal=CalParams->GetAt(NumParams*stripId+1+detId*NumStrips*NumParams);
+    sigma=CalParams->GetAt(NumParams*stripId+2+detId*NumStrips*NumParams);
 
     if(stripId<NumStripsS){
      sideId=0;
@@ -172,8 +219,10 @@ void R3BAmsMapped2StripCal::Exec(Option_t* option)
      sideId=1;
      stripId=stripId-NumStripsS;
     }
-    energy  = mappedData[i]->GetEnergy()-pedestal;
+    if(i%64==0 && i>0){nbadc++;}
+    energy  = mappedData[i]->GetEnergy()-pedestal-SynAdcs[nbadc];
 
+    if(energy>4.*sigma && pedestal!=-1)
     AddCalData(detId,sideId,stripId,energy);
   }
   

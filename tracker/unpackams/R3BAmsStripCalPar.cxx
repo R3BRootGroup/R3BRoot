@@ -103,11 +103,14 @@ void R3BAmsStripCalPar::printParams() {
   LOG(INFO) << "R3BAmsStripCalPar: ams strip Parameters: "<<FairLogger::endl;
   Int_t array_size = fNumDets*fNumStrips*fNumParamsFit;
   
-  for(Int_t i=0;i<fNumDets*fNumStrips;i++) {      
-    cout << "AMS Strip number: " << i+1 << endl;
+  for(Int_t d=0;d<fNumDets;d++) {
+    cout << "AMS detector number: " << d << endl;
+   for(Int_t i=0;i<fNumStrips;i++) {      
+    cout << "AMS Strip number: " << i << endl;
     for(Int_t j=0;j<fNumParamsFit;j++) {
-      cout << "FitParam("<<j<<") = "<<fStripCalParams->GetAt(i*fNumParamsFit+j) << endl;
+      cout << "FitParam("<<j<<") = "<<fStripCalParams->GetAt(d*fNumParamsFit*fNumStrips+i*fNumParamsFit+j) << endl;
     }
+   }
   }
 }
 

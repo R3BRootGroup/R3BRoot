@@ -127,6 +127,7 @@ fibData/R3BFibMappedData.cxx
 fibData/R3BFibCalData.cxx
 amsData/R3BAmsMappedData.cxx
 amsData/R3BAmsStripCalData.cxx
+amsData/R3BAmsHitData.cxx
 )
 
 
