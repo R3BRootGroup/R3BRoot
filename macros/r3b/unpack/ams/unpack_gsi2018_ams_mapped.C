@@ -12,7 +12,7 @@ typedef struct EXT_STR_h101_t {//FIXME for ams
   EXT_STR_h101_CALIFA_t califa;
 } EXT_STR_h101;
 
-void unpack_gsi2018_ams_raw2map() {
+void unpack_gsi2018_ams_mapped() {
   TStopwatch timer;
   timer.Start();
   

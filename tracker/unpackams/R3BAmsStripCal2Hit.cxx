@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-// -----         R3BAmsCal2Hit source file                             -----
+// -----         R3BAmsStripCal2Hit source file                        -----
 // -----             Created 01/06/18  by J.L. Rodriguez-Sanchez       -----
 // -------------------------------------------------------------------------
 
@@ -19,10 +19,10 @@
 //Califa headers
 #include "R3BAmsStripCalData.h"
 #include "R3BAmsHitData.h"
-#include "R3BAmsCal2Hit.h"
+#include "R3BAmsStripCal2Hit.h"
 
-//R3BAmsCal2Hit: Default Constructor --------------------------
-R3BAmsCal2Hit::R3BAmsCal2Hit() : 
+//R3BAmsStripCal2Hit: Default Constructor --------------------------
+R3BAmsStripCal2Hit::R3BAmsStripCal2Hit() : 
   FairTask("R3B Hit-AMS Calibrator",1),
   fPitchK(104.),
   fPitchS(110.),
@@ -31,8 +31,8 @@ R3BAmsCal2Hit::R3BAmsCal2Hit() :
 {
 }
 
-//R3BAmsCal2HitPar: Standard Constructor --------------------------
-R3BAmsCal2Hit::R3BAmsCal2Hit(const char* name, Int_t iVerbose) :
+//R3BAmsStripCal2HitPar: Standard Constructor --------------------------
+R3BAmsStripCal2Hit::R3BAmsStripCal2Hit(const char* name, Int_t iVerbose) :
   FairTask(name, iVerbose),
   fPitchK(104.),
   fPitchS(110.),
@@ -41,16 +41,16 @@ R3BAmsCal2Hit::R3BAmsCal2Hit(const char* name, Int_t iVerbose) :
 {  
 }
 
-//Virtual R3BAmsCal2Hit: Destructor
-R3BAmsCal2Hit::~R3BAmsCal2Hit()
+//Virtual R3BAmsStripCal2Hit: Destructor
+R3BAmsStripCal2Hit::~R3BAmsStripCal2Hit()
 {
-  LOG(INFO) << "R3BAmsCal2Hit: Delete instance" << FairLogger::endl;
+  LOG(INFO) << "R3BAmsStripCal2Hit: Delete instance" << FairLogger::endl;
 }
 
 // -----   Public method Init   --------------------------------------------
-InitStatus R3BAmsCal2Hit::Init()
+InitStatus R3BAmsStripCal2Hit::Init()
 { 
-  LOG(INFO) << "R3BAmsCal2Hit: Init" << FairLogger::endl;
+  LOG(INFO) << "R3BAmsStripCal2Hit: Init" << FairLogger::endl;
 
   //INPUT DATA
   FairRootManager* rootManager = FairRootManager::Instance();
@@ -68,13 +68,13 @@ InitStatus R3BAmsCal2Hit::Init()
 }
 
 // -----   Public method ReInit   ----------------------------------------------
-InitStatus R3BAmsCal2Hit::ReInit()
+InitStatus R3BAmsStripCal2Hit::ReInit()
 {
   return kSUCCESS;
 }
 
 // -----   Public method Execution   --------------------------------------------
-void R3BAmsCal2Hit::Exec(Option_t* option)
+void R3BAmsStripCal2Hit::Exec(Option_t* option)
 {
   
   //if(++nEvents % 10000 == 0)
@@ -132,13 +132,13 @@ void R3BAmsCal2Hit::Exec(Option_t* option)
 }
 
 // -----   Protected method Finish   --------------------------------------------
-void R3BAmsCal2Hit::Finish()
+void R3BAmsStripCal2Hit::Finish()
 {
   
 }
 
 // -----   Public method Reset   ------------------------------------------------
-void R3BAmsCal2Hit::Reset()
+void R3BAmsStripCal2Hit::Reset()
 {
   LOG(DEBUG) << "Clearing HitData Structure" << FairLogger::endl;
   if(fAmsHitDataCA)fAmsHitDataCA->Clear();
@@ -146,7 +146,7 @@ void R3BAmsCal2Hit::Reset()
 
 
 // -----   Private method AddHitData  --------------------------------------------
-R3BAmsHitData* R3BAmsCal2Hit::AddHitData(Int_t detid, Int_t numhit, Double_t x, Double_t y, Double_t z, Double_t energy)
+R3BAmsHitData* R3BAmsStripCal2Hit::AddHitData(Int_t detid, Int_t numhit, Double_t x, Double_t y, Double_t z, Double_t energy)
 {
   //It fills the R3BAmsHitData
   TClonesArray& clref = *fAmsHitDataCA;
@@ -154,4 +154,4 @@ R3BAmsHitData* R3BAmsCal2Hit::AddHitData(Int_t detid, Int_t numhit, Double_t x, 
   return new(clref[size]) R3BAmsHitData(detid,numhit,x,y,z,energy);
 }
 
-ClassImp(R3BAmsCal2Hit)
+ClassImp(R3BAmsStripCal2Hit)

@@ -20,19 +20,19 @@ public:
    *@param stripId     Strip unique identifier
    *@param energy      Total energy deposited in the strip
    **/
-  R3BAmsMappedData(UShort_t detId, UShort_t stripId, Int_t energy);
+  R3BAmsMappedData(Int_t detId, Int_t stripId, Int_t energy);
   
   //Destructor
   ~R3BAmsMappedData() { }
   
   //Getters
-  inline const UShort_t& GetDetectorId() const { return fDetId;   }
-  inline const UShort_t& GetStripId()    const { return fStripId; }
-  inline const Int_t&    GetEnergy()     const { return fEnergy;  } 
+  inline const Int_t& GetDetectorId() const { return fDetId;   }
+  inline const Int_t& GetStripId()    const { return fStripId; }
+  inline const Int_t& GetEnergy()     const { return fEnergy;  } 
   
 protected:
-  UShort_t fDetId, fStripId;  // detector and strip unique identifiers
-  Int_t    fEnergy;           // total energy in the strip
+  Int_t fDetId, fStripId;  // detector and strip unique identifiers
+  Int_t fEnergy;           // total energy in the strip
    
 public:
   ClassDef(R3BAmsMappedData,1)

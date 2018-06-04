@@ -1,31 +1,31 @@
 // ----------------------------------------------------------------------
 // -----                                                            -----
-// -----                     R3BAmsCal2Hit                          -----
+// -----                     R3BAmsStripCal2Hit                     -----
 // -----             Created 01/06/18  by J.L. Rodriguez-Sanchez    -----
 // ----------------------------------------------------------------------
 
-#ifndef R3BAmsCal2Hit_H
-#define R3BAmsCal2Hit_H
+#ifndef R3BAmsStripCal2Hit_H
+#define R3BAmsStripCal2Hit_H
 
 #include "FairTask.h"
-#include "R3BAmsCal2Hit.h"
+#include "R3BAmsStripCal2Hit.h"
 #include "R3BAmsStripCalData.h"
 #include "R3BAmsHitData.h"
 #include <TRandom.h>
 
 class TClonesArray;
 
-class R3BAmsCal2Hit : public FairTask {
+class R3BAmsStripCal2Hit : public FairTask {
   
  public:
   /** Default constructor **/
-  R3BAmsCal2Hit();
+  R3BAmsStripCal2Hit();
 
   /** Standard constructor **/
-  R3BAmsCal2Hit(const char* name, Int_t iVerbose=1);
+  R3BAmsStripCal2Hit(const char* name, Int_t iVerbose=1);
   
   /** Destructor **/
-  virtual ~R3BAmsCal2Hit();
+  virtual ~R3BAmsStripCal2Hit();
   
   /** Virtual method Exec **/
   virtual void Exec(Option_t* option);
@@ -57,7 +57,7 @@ class R3BAmsCal2Hit : public FairTask {
 
  public:
   //Class definition
-  ClassDef(R3BAmsCal2Hit, 1)
+  ClassDef(R3BAmsStripCal2Hit, 1)
     };
 
 #endif

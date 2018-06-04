@@ -45,15 +45,18 @@ void unpack_gsi2018_ams_mapped2cal() {
   FairRunOnline* run = new FairRunOnline(source);
   run->SetRunId(1513078509);
   run->SetOutputFile(outputFileName);
+
   
   /* Runtime data base ------------------------------------ */
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
+
 
   /* Add analysis task ------------------------------------ */  
   R3BAmsMapped2StripCal* Map2Cal = new R3BAmsMapped2StripCal();
   run->AddTask(Map2Cal);
 
 
+  /* Load parameters   ------------------------------------ */ 
   FairParRootFileIo* parIo1 = new FairParRootFileIo();
   parIo1->open("Ams_CalibParam.root","in");
   rtdb->setFirstInput(parIo1);

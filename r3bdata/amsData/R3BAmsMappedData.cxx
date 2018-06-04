@@ -16,7 +16,7 @@ R3BAmsMappedData::R3BAmsMappedData()
 
 //------------------------------
 
-R3BAmsMappedData::R3BAmsMappedData(UShort_t detId, UShort_t stripId, Int_t energy)
+R3BAmsMappedData::R3BAmsMappedData(Int_t detId, Int_t stripId, Int_t energy)
   : fDetId(detId),
     fStripId(stripId),
     fEnergy(energy) 

@@ -17,7 +17,7 @@ void unpack_gsi2018_ams_mapped2hit() {
   timer.Start();
 
   //const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
-  const Int_t nev = 3000; /* number of events to read, -1 - until CTRL+C */
+  const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
   
   /* Create source using ucesb for input ------------------ */
   
@@ -46,16 +46,19 @@ void unpack_gsi2018_ams_mapped2hit() {
   run->SetRunId(1513078509);
   run->SetOutputFile(outputFileName);
   
+
   /* Runtime data base ------------------------------------ */
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
+
 
   /* Add analysis task ------------------------------------ */  
   R3BAmsMapped2StripCal* Map2Cal = new R3BAmsMapped2StripCal();
   run->AddTask(Map2Cal);
-  R3BAmsCal2Hit* Cal2Hit = new R3BAmsCal2Hit();
+  R3BAmsStripCal2Hit* Cal2Hit = new R3BAmsStripCal2Hit();
   run->AddTask(Cal2Hit);
 
 
+  /* Load parameters   ------------------------------------ */ 
   FairParRootFileIo* parIo1 = new FairParRootFileIo();
   parIo1->open("Ams_CalibParam.root","in");
   rtdb->setFirstInput(parIo1);

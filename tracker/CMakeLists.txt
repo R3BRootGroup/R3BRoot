@@ -54,7 +54,7 @@ R3BTraHitFinder.cxx
 unpackams/R3BAmsStripCalPar.cxx
 unpackams/R3BAmsMapped2StripCalPar.cxx
 unpackams/R3BAmsMapped2StripCal.cxx
-unpackams/R3BAmsCal2Hit.cxx
+unpackams/R3BAmsStripCal2Hit.cxx
 )
 
 # fill list of header files from list of source files
