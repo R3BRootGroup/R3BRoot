@@ -1,6 +1,7 @@
 
 #include "R3BTrackingParticle.h"
 #include "R3BTrackingDetector.h"
+#include "FairLogger.h"
 
 R3BTrackingParticle::R3BTrackingParticle()
     : fCharge(0.)
@@ -74,6 +75,17 @@ void R3BTrackingParticle::PassThroughDetector(R3BTrackingDetector* det, Double_t
     Double_t mom = fMomentum.Mag();
     Double_t etot = TMath::Sqrt(fMomentum.Mag2() + fMass * fMass);
     Double_t mom2 = TMath::Sqrt(TMath::Power(etot - eloss, 2) - fMass * fMass);
+    fMomentum = fMomentum * (mom2 / mom);
+}
+
+void R3BTrackingParticle::PassThroughDetectorBackward(R3BTrackingDetector* det, Double_t weight)
+{
+    Double_t eloss = weight * det->GetEnergyLoss(this) * 1e-3;
+    fBeta = fBeta + DeltaEToDeltaBeta(eloss);
+    //    UpdateMomentum();
+    Double_t mom = fMomentum.Mag();
+    Double_t etot = TMath::Sqrt(fMomentum.Mag2() + fMass * fMass);
+    Double_t mom2 = TMath::Sqrt(TMath::Power(etot + eloss, 2) - fMass * fMass);
     fMomentum = fMomentum * (mom2 / mom);
 }
 

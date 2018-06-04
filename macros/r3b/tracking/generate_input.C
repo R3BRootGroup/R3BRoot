@@ -18,9 +18,13 @@ void generate_input()
         Double_t px = p * TMath::Sin(theta) * TMath::Cos(phi);
         Double_t py = p * TMath::Sin(theta) * TMath::Sin(phi);
 
+        Double_t vx = gRandom->Gaus(0., 0.1);
+        Double_t vy = gRandom->Gaus(0., 0.1);
+        Double_t vz = gRandom->Uniform(-0.0049, 0.0049);
+
         (*ofile) << "   " << i << "   1   0.   0." << endl;
         (*ofile) << "      -1   " << Z << "   " << A[index] << "   "
-        << px << "   " << py << "   " << pz << "   0.   0.   3.   " << mass[index] << endl;
+        << px << "   " << py << "   " << pz << "   " << vx << "   " << vy << "   " << vz << "   " << mass[index] << endl;
     }
     
     ofile->close();

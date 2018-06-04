@@ -26,6 +26,7 @@ class R3BTrackingParticle : public TObject
     virtual ~R3BTrackingParticle();
 
     Double_t GetCharge() const { return fCharge; }
+    void SetCharge(Double_t charge) { fCharge = charge; }
 
     void GetPosition(Double_t* xyz) const
     {
@@ -82,7 +83,9 @@ class R3BTrackingParticle : public TObject
     Double_t GetChi2() const { return fChi2; }
 
     void PassThroughDetector(R3BTrackingDetector* det, Double_t weight = 1.);
+    void PassThroughDetectorBackward(R3BTrackingDetector* det, Double_t weight = 1.);
 
+    void SetStartPosition(const TVector3& startPosition) { fStartPosition = startPosition; }
     void SetStartMomentum(const TVector3& startMomentum) { fStartMomentum = startMomentum; }
 
     Double_t DeltaEToDeltaBeta(Double_t eloss);

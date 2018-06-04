@@ -24,7 +24,7 @@ void run_sim()
     TString target2 = "Para";
     TString target3 = "Para45";
     TString target4 = "LiH";
-    TString targetType = target4;
+    TString targetType = target2;
 
     // ------------------------------------------------------------------------
     // Stable part ------------------------------------------------------------
@@ -75,10 +75,10 @@ void run_sim()
     run->AddModule(new R3BFi4("fi4_v17a.geo.root", {(614. - 308.8)*TMath::Tan(-18.*TMath::DegToRad()) - 42., 0.069976, 614.}, {"" ,-90.,16.7,90.}));
 
     // Fi5 detector
-    run->AddModule(new R3BFi5("fi5_v17a.geo.root", {(714. - 308.8)*TMath::Tan(-18.*TMath::DegToRad()) - 42., 0.069976, 714.}, {"" ,-90.,16.7,90.}));
+    run->AddModule(new R3BFi5("fi5_v17a.geo.root", {(664. - 308.8)*TMath::Tan(-18.*TMath::DegToRad()) - 42., 0.069976, 664.}, {"" ,-90.,16.7,90.}));
 
     // Fi6 detector
-    //run->AddModule(new R3BFi6("fi6_v17a.geo.root", {-73.274339-TMath::Tan(TMath::DegToRad()*16.7)*230, 0.069976, 513.649524+230.}, {"" ,-90.,16.7,90.}));
+    run->AddModule(new R3BFi6("fi6_v17a.geo.root", {(714. - 308.8)*TMath::Tan(-18.*TMath::DegToRad()) - 42., 0.069976, 714.}, {"" ,-90.,16.7,90.}));
 
     // R3B SiTracker Cooling definition
     //run->AddModule(new R3BVacVesselCool(targetType, "vacvessel_v14a.geo.root"));

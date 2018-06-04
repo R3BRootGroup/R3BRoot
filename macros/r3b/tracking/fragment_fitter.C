@@ -21,7 +21,7 @@ void fragment_fitter()
     parIo1->open(parFile.Data());
     rtdb->setFirstInput(parIo1);
     FairParAsciiFileIo* parIo2 = new FairParAsciiFileIo();
-    parIo2->open("setup.par", "in");
+    parIo2->open("setup_Para.par", "in");
     rtdb->setSecondInput(parIo2);
     // -------------------------------------------------------------------------
 

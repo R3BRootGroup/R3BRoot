@@ -35,6 +35,7 @@ class R3BTrackingDetector : public TObject
     void Draw(Option_t* option = "");
 
     void GlobalToLocal(const TVector3& posGlobal, Double_t& x_local, Double_t& y_local);
+    void LocalToGlobal(TVector3& posGlobal, Double_t x_local, Double_t y_local);
 
     const TString& GetDetectorName() const { return fDetectorName; }
 

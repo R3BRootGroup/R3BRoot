@@ -24,11 +24,19 @@ class R3BTPropagator : public TObject
 
     Bool_t PropagateToDetector(R3BTrackingParticle* particle,
                                R3BTrackingDetector* detector);
+    
+    Bool_t PropagateToDetectorBackward(R3BTrackingParticle* particle,
+                                       R3BTrackingDetector* detector);
 
     Bool_t PropagateToPlane(R3BTrackingParticle* particle,
                             const TVector3& v1,
                             const TVector3& v2,
                             const TVector3& v3);
+    
+    Bool_t PropagateToPlaneBackward(R3BTrackingParticle* particle,
+                                    const TVector3& v1,
+                                    const TVector3& v2,
+                                    const TVector3& v3);
 
     Bool_t PropagateToPlaneRK(R3BTrackingParticle* particle,
                               const TVector3& v1,

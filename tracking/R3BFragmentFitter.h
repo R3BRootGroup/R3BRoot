@@ -7,6 +7,11 @@
 #include <vector>
 #include <string>
 
+#include "Math/Minimizer.h"
+#include "Math/Factory.h"
+#include "Math/Functor.h"
+#include "Minuit2/Minuit2Minimizer.h"
+
 class TClonesArray;
 class R3BFieldPar;
 class R3BTPropagator;
@@ -31,7 +36,9 @@ class R3BFragmentFitter : public FairTask
 
     virtual void Finish();
 
-    void FitFragment(R3BTrackingParticle* particle);
+    Int_t FitFragment(R3BTrackingParticle* particle);
+    
+    Int_t FitFragmentBackward(R3BTrackingParticle* particle);
 
     Double_t TrackFragment(R3BTrackingParticle* particle,
                            Bool_t energyLoss,
@@ -49,6 +56,8 @@ class R3BFragmentFitter : public FairTask
 
   private:
     Bool_t InitPropagator();
+    
+    ROOT::Math::Minimizer* fMinimum;
 
     R3BFieldPar* fFieldPar;
     R3BTPropagator* fPropagator;
@@ -69,6 +78,7 @@ class R3BFragmentFitter : public FairTask
     TH1F* fh_eloss_psp;
     TH1F* fh_eloss_fi4_mc;
     TH1F* fh_eloss_fi4;
+    TH1F* fh_ncand;
     TH1F* fh_x_res[6];
     TH1F* fh_x_pull[6];
     TH1F* fh_A_reco1;
@@ -76,6 +86,7 @@ class R3BFragmentFitter : public FairTask
     TH1F* fh_mom_res;
     TH1F* fh_mass_res;
     TH1F* fh_chi2;
+    TH1F* fh_vz_res;
 
     ClassDef(R3BFragmentFitter, 1)
 };

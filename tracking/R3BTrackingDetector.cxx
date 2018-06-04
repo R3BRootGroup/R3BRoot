@@ -106,6 +106,13 @@ void R3BTrackingDetector::GlobalToLocal(const TVector3& posGlobal, Double_t& x_l
     y_local = local.Y();
 }
 
+void R3BTrackingDetector::LocalToGlobal(TVector3& posGlobal, Double_t x_local, Double_t y_local)
+{
+    posGlobal = TVector3(x_local, y_local, 0.);
+    posGlobal.RotateY(fGeo->GetRotY() * TMath::DegToRad());
+    posGlobal = posGlobal + pos0;
+}
+
 Double_t R3BTrackingDetector::GetEnergyLoss(const R3BTrackingParticle* particle)
 {
     TVector3 mom_track = particle->GetMomentum().Unit();
@@ -122,11 +129,11 @@ Double_t R3BTrackingDetector::GetEnergyLoss(const R3BTrackingParticle* particle)
     Double_t dx = 2. * fGeo->GetDimZ() * density;
     Double_t Tmax = 2 * me * TMath::Power(beta * gamma, 2);
     Double_t h_omega = 28.816 * 1e-6 * TMath::Sqrt(density * Z2 / A2);
-    Double_t eloss = 1./mom_track.Dot(norm) * dx * K * TMath::Power(Z1, 2) * Z2 / A2 / TMath::Power(beta, 2) *
-                     (0.5 * TMath::Log(2 * me * beta * beta * gamma * gamma * Tmax / (I * I)) - beta * beta -
-                      (TMath::Log(h_omega / I) + TMath::Log(beta * gamma) - 0.5));
-    //    Double_t eloss = dx * K * TMath::Power(Z1,2) * Z2/A2 / TMath::Power(beta,2) *
-    //    (0.5*TMath::Log(2*me*beta*beta*gamma*gamma*Tmax/(I*I)) - beta*beta);
+    Double_t eloss = dx * K * TMath::Power(Z1, 2) * Z2 / A2 / TMath::Power(beta, 2) *
+    (0.5 * TMath::Log(2 * me * beta * beta * gamma * gamma * Tmax / (I * I)) - beta * beta -
+     (TMath::Log(h_omega / I) + TMath::Log(beta * gamma) - 0.5));
+//    Double_t eloss = dx * K * TMath::Power(Z1,2) * Z2/A2 / TMath::Power(beta,2) *
+//    (0.5*TMath::Log(2*me*beta*beta*gamma*gamma*Tmax/(I*I)) - beta*beta);
 
     //    if(fGeoParName.EqualTo("TargetGeoPar"))
     //    {
