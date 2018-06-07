@@ -4,6 +4,7 @@
                     
 #include "TRandom.h"
 #include "TMath.h"
+#include "TF1.h"
 
 #include "TClonesArray.h"
 #include "FairRootManager.h"
@@ -30,6 +31,13 @@ R3BAmsReader::R3BAmsReader(EXT_STR_h101_CALIFA* data,
   fOffset(offset),
   fLogger(FairLogger::GetLogger()),
   fArray(new TClonesArray("R3BAmsMappedData")) {
+
+
+f1 = new TF1 ("f1", "gaus", 0, 640);
+f1->SetParameter(0,350);
+f1->SetParameter(1,320);
+f1->SetParameter(2,5);
+
 }
 
 R3BAmsReader::~R3BAmsReader() {
@@ -70,19 +78,41 @@ Bool_t R3BAmsReader::Read() {
 	/* Display data */
 	fLogger->Debug(MESSAGE_ORIGIN, "R3BAmsReader::Read() Event data");
 
-  UShort_t detector = 0;
+  int detector = 4;
 
   //SELECT THE FOR LOOP BASED ON THE MAPPING...
 //  for (int strip = 0; strip < fData->AMS_ENE; ++strip) { FIXME
 
+
+  for(int det = 0; det < detector; det++){
+
   for (int strip = 0; strip < 1024; ++strip) {
 
-    UShort_t stripNumber = strip;//fData->AMS_ENEI[strip];
-    uint16_t energy = 400.+100.*cos(strip/500.*3.1415*2.) + gRandom->Gaus(0.,10.);//fData->AMS_ENEv[strip];
+    //UShort_t stripNumber = strip;//fData->AMS_ENEI[strip];
+    Int_t energy = 400.+100.*cos(strip/500.*3.1415*2.) + gRandom->Gaus(0.,2.);//fData->AMS_ENEv[strip];
+
+
+    if(strip<640 && fNEvent%1==0){
+  int offset=gRandom->Gaus(0,150);
+  f1->SetParameter(1,300+offset);
+    energy = energy+f1->Eval(strip);}
+    if(strip>=640 && fNEvent%1==0){
+  int offset=gRandom->Gaus(0,50);
+  f1->SetParameter(1,190+offset);
+    energy = energy+f1->Eval(strip-640);}
+
+
+    if(strip%2==0 || strip%3==0)energy = energy-150.;
+
+    //if(strip<64&& fNEvent%500==0)energy=energy-5.;
+    //if(strip>=64&& fNEvent%500==0)energy=energy-10.;
 
     //First detector must be zero!!
-    if(fNEvent<2000)new ((*fArray)[fArray->GetEntriesFast()]) R3BAmsMappedData(detector,stripNumber, energy);
+    if(fNEvent<2000)new ((*fArray)[fArray->GetEntriesFast()]) R3BAmsMappedData(det,strip,energy);
 	}
+
+    }
+
     fNEvent += 1;
     return kTRUE;
 }

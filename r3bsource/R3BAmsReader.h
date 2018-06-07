@@ -2,6 +2,9 @@
 #define R3BAMSREADER_H
 
 #include "R3BReader.h"
+
+#include "TF1.h"
+
 class TClonesArray;
 class FairLogger;
 /* FIXME
@@ -43,6 +46,8 @@ class R3BAmsReader : public R3BReader {
 		UInt_t fOffset;
 		/* FairLogger */
 		FairLogger*     fLogger;
+
+                TF1 *f1;
 
 	  TClonesArray* fArray; /**< Output array. */
 
