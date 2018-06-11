@@ -50,6 +50,7 @@ unpack/R3BCalifaMapped2CrystalCalPar.cxx
 unpack/R3BCalifaMappingReader.cxx
 unpack/R3BCalifaCrystalCal2CrystalCalPID.cxx
 unpack/R3BCalifaCrystalCalPar.cxx
+unpack/R3BCalifaOnlineSpectra.cxx
 #unpack/R3BCalifaDUCalPar.cxx
 )
 
