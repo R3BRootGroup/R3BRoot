@@ -22,7 +22,7 @@ void califa_febex3_unpack() {
   /* Create source using ucesb for input ------------------ */
   
   TString filename = "/media/mbsdaq/extDisk/data/168_2018-06-07_12-38-32/data_0001.lmd";
-  TString outputFileName = "./data_0001.root";
+  TString outputFileName = "./dataMap_0001.root";
 
   TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
   TString ucesb_dir = getenv("UCESB_DIR");

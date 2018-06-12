@@ -21,7 +21,7 @@ void califa_febex3_mapped2cal() {
   const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
   
   /* Create source using ucesb for input ------------------ */
-  TString filename = "/media/mbsdaq/extDisk/data/168_2018-06-07_12-38-32/data_0001.lmd";
+  TString filename = "/media/mbsdaq/extDisk/data/168_2018-06-07_12-38-32/dataMap_0001.lmd";
   TString outputFileName = "./dataCal_0001.root";
   TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
   TString ucesb_dir = getenv("UCESB_DIR");
