@@ -35,14 +35,6 @@ class R3BTPropagator : public TObject
                               const TVector3& v2,
                               const TVector3& v3);
 
-    Bool_t PropagateToHitOnPlane(const TVector3& vin,
-                                 const TVector3& momin,
-                                 const TVector3& v1,
-                                 const TVector3& v2,
-                                 const TVector3& hit,
-                                 TVector3& posout,
-                                 TVector3& momout);
-
     Bool_t LineIntersectPlane(const TVector3& pos,
                               const TVector3& mom,
                               const TVector3& v1,

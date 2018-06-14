@@ -224,37 +224,6 @@ Bool_t R3BTPropagator::PropagateToPlaneRK(R3BTrackingParticle* particle,
     return kTRUE;
 }
 
-Bool_t R3BTPropagator::PropagateToHitOnPlane(const TVector3& vin,
-                                             const TVector3& momin,
-                                             const TVector3& v1,
-                                             const TVector3& v2,
-                                             const TVector3& hit,
-                                             TVector3& posout,
-                                             TVector3& momout)
-{
-    Double_t charge = 50.;
-    Double_t vecRKIn[7];
-    Double_t vec1[3] = { v1.X(), v1.Y(), v1.Z() };
-    Double_t vec2[3] = { v2.X(), v2.Y(), v2.Z() };
-    Double_t vec3[3] = { hit.X(), hit.Y(), hit.Z() };
-    Double_t vecOut[7];
-
-    vecRKIn[0] = vin.X();
-    vecRKIn[1] = vin.Y();
-    vecRKIn[2] = vin.Z();
-    vecRKIn[3] = momin.X() / momin.Mag();
-    vecRKIn[4] = momin.Y() / momin.Mag();
-    vecRKIn[5] = momin.Z() / momin.Mag();
-    vecRKIn[6] = momin.Mag();
-
-    fFairProp->PropagatToPlane(charge, vecRKIn, vec1, vec2, vec3, vecOut);
-
-    posout.SetXYZ(vecOut[0], vecOut[1], vecOut[2]);
-    momout.SetXYZ(vecOut[3] * vecOut[6], vecOut[4] * vecOut[6], vecOut[5] * vecOut[6]);
-
-    return kTRUE;
-}
-
 Bool_t R3BTPropagator::LineIntersectPlane(const TVector3& pos,
                                           const TVector3& mom,
                                           const TVector3& v1,
