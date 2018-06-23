@@ -4,7 +4,7 @@
 Code for the NeuLAND Detector is split into different components:
 
 - simulation
-- digitizing
+- [digitizing](digitizing/readme.md)
 - clustering
 - reconstruction
 - test
@@ -14,39 +14,25 @@ Code for the NeuLAND Detector is split into different components:
 Note that in contrast to the old NeuLAND and LAND code in the /land/ directory, the spelling in e.g. class names is "Neuland", with a small "l".
 
 
-### Simulation
-
-- [`R3BNeuland`](#detector-class) Main detector including light generation -> NeulandPoints
-
-
 ### Tasks
 
 These tasks are derived from FairTask and used in the steering macros.
 
 - `R3BNeulandMCMon`: Control histograms for MonteCarlo data (NeulandPoints)
-- [`R3BNeulandDigitizer`](#digitizing): Detector response, NeulandPoints -> NeulandDigis
-- `R3BNeulandDigiMon`: Control histograms for digitized data (NeulandDigis)
-- [`R3BNeulandClusterFinder`](#clustering): Clustering of digitized data, NeulandDigis -> NeulandClusters
+- [`R3BNeulandDigitizer`](#digitizing): Detector response, NeulandPoints -> NeulandHits
+- `R3BNeulandHitMon`: Control histograms for digitized data (NeulandHits)
+- [`R3BNeulandClusterFinder`](#clustering): Clustering of digitized data, NeulandHits -> NeulandClusters
 - `R3BNeulandClusterMon`: ControlHistograms for clusters (NeulandClusters)
 - [`R3BNeulandNeutronReconstruction`](#event-reconstruction): Determination of Neutron first interaction points, NeulandClusters -> NeulandNeutrons
 - `R3BNeulandNeutronReconstructionEvaluation`: Comparison of reconstructed with actual neutron interaction points.
-
-
-### Engines
-
-For separation of the actual physics/business logic from the IO-managing tasks.
-
-- `Neuland::DigitizingEngine`
-- [`Neuland::ClusteringEngine`](#implementation-of-the-handshake-chain-clustering)
-- `Neuland::ReconstructionEngine`
 
 ### Data Storage
 
 Note that the classes indented for storing data (derived from TObject for usage with TClonesArray) are located in `r3bdata/neulandData`. 
 
 - `R3BNeulandPoint`: Basic MonteCarlo energy depositions and light yield, see, [Detector Class](#detector-class)
-- `R3BNeulandDigi`: Combined NeulandPoints, digitized with detector response, see [Digitizing](#digitizing). Also indented for mapped and calibrated experimental data.
-- `R3BNeulandCluster`: Clusters consisting out of NeulandDigis that belong together according to clustering conditions, see [Clustering](#clustering)
+- `R3BNeulandHit`: Combined NeulandPoints, digitized with detector response, see [Digitizing](#digitizing). Also indented for mapped and calibrated experimental data.
+- `R3BNeulandCluster`: Clusters consisting out of NeulandHits that belong together according to clustering conditions, see [Clustering](#clustering)
 - `R3BNeulandNeutron`: Position, Energy and Time information for neutron interactions found by event reconstruction processes
 
 
@@ -64,7 +50,6 @@ Note that the classes indented for storing data (derived from TObject for usage 
 
 
 ## Detector Class
-
 `R3BNeuland` is the main class derived from `R3BDetector` for use in simulations. Note that it does not include the geometry itself, but takes `neuland_v2_` geometry files from `/geometry/`. Suitable geometry files require proper naming of the active volume and copy numbers. See [Geometry](#geometry)
 
 It fills to main outputs for each simulated event:
@@ -76,13 +61,10 @@ Control histograms are extracted to `R3BNeulandMCMon`.
 
 ## Digitizing
 
-The Digitizing task `R3BNeulandDigitizer` handles the Input and Output of data while invoking the `Neuland::DigitizingEngine` for the actual processing. The Digitizing Engine is independent of any (Fair-/R3B-)Root class except the random number generator and can be reused in other projects if necessary.
+The Digitizing task `R3BNeulandDigitizer` handles the Input and Output of data while invoking the `Neuland::DigitizingEngine` for the actual processing. 
 
-The task takes the TClonesArray NeulandPoints(`R3BNeulandPoint`) and fills TClonesArray NeulandDigis(`R3BNeulandDigi`). In addition the configuration storage `NeulandGeoPar`
+See [digitizing/](digitizing/readme.md) for more details.
 
-The digitizing engine is awaiting further changes reflecting changes in the NeuLAND electronics. (Work in Progress)
-
-In addition, some control histograms are created, while most control histograms are extracted to `R3BNeulandDigiMon`.
 
 
 ## Clustering
@@ -91,7 +73,7 @@ Clustering is the process of grouping Objects together by a specified condition.
 
 The task `R3BNeulandClusterFinder` uses the  implementation in `Neuland::ClusteringEngine` of what can be called *handshake-chain clustering*, where a cluster is finished if all of the Digis in it have no neighbor that is not in the cluster.
 
-The task takes the TClonesArray NeulandDigis(`R3BNeulandDigi`) and fills TClonesArray NeulandClusters(`R3BNeulandCluster`).
+The task takes the TClonesArray NeulandHits(`R3BNeulandHit`) and fills TClonesArray NeulandClusters(`R3BNeulandCluster`).
 
 Control histograms are located  to `R3BNeulandClusterMon`.
 

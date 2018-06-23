@@ -1,11 +1,9 @@
 #include "R3BNeulandGeoPar.h"
-
-#include <algorithm>
-#include <iostream>
-
 #include "TGeoBBox.h"
 #include "TGeoMatrix.h"
 #include "TVector3.h"
+#include <algorithm>
+#include <iostream>
 
 #include "FairParamList.h"
 

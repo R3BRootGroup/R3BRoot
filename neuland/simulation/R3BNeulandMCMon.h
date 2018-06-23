@@ -1,3 +1,6 @@
+#ifndef R3BNEULANDMCMON_H
+#define R3BNEULANDMCMON_H
+
 /** Neuland Monte Carlo Monitor
  * @author Jan Mayer
  * @since  07.07.2015
@@ -20,13 +23,10 @@
  *          Requires MCTracks, NeulandPoints and NPNIPS from R3BNeuland simulation.
  */
 
-#ifndef R3BNEULANDMCMON_H
-#define R3BNEULANDMCMON_H 1
-
 #include "FairTask.h"
 #include "R3BMCTrack.h"
 #include "R3BNeulandPoint.h"
-#include "TClonesArray.h"
+#include "TCAConnector.h"
 #include <map>
 
 class TH1D;
@@ -38,17 +38,31 @@ class R3BNeulandMCMon : public FairTask
   public:
     R3BNeulandMCMon(const Option_t* option = "");
 
+    ~R3BNeulandMCMon() override = default;
+
+    // No copy and no move is allowed (Rule of three/five)
+    R3BNeulandMCMon(const R3BNeulandMCMon&) = delete;            // copy constructor
+    R3BNeulandMCMon(R3BNeulandMCMon&&) = delete;                 // move constructor
+    R3BNeulandMCMon& operator=(const R3BNeulandMCMon&) = delete; // copy assignment
+    R3BNeulandMCMon& operator=(R3BNeulandMCMon&&) = delete;      // move assignment
+
+  protected:
     InitStatus Init() override;
-    void Exec(Option_t* option) override;
     void Finish() override;
+
+  public:
+    void Exec(Option_t*) override;
 
   private:
     Bool_t fIs3DTrackEnabled;
     Bool_t fIsFullSimAnaEnabled;
 
-    TClonesArray* fMCTracks;
-    TClonesArray* fNeulandPoints;
-    TClonesArray* fNPNIPs;
+    TCAInputConnector<FairMCPoint> fPrimaryNeutronInteractionPoints;
+    TCAInputConnector<R3BMCTrack> fMCTracks;
+    TCAInputConnector<R3BNeulandPoint> fNeulandPoints;
+
+    int nEvents;
+
     TH1D* fhPDG;
     TH1D* fhEPrimarys;
     TH1D* fhEPrimaryNeutrons;
@@ -63,11 +77,17 @@ class R3BNeulandMCMon : public FairTask
     TH2D* fhNPNIPSrvsz;
     TH2D* fhNPNIPSxy;
     TH2D* fhThetaLight;
+    TH2D* fhElossVSLight;
+    TH2D* fhElossVSLightLog;
     std::map<Int_t, TH1D*> fhmEPdg;
     std::map<Int_t, TH1D*> fhmEtotPdg;
     std::map<Int_t, TH1D*> fhmEtotPdgRel;
 
     std::map<Int_t, TH1D*> fhmEnergyByProductPdg;
+    std::map<Int_t, TH1D*> fhmCountByProductPdg;
+    std::map<std::string, TH1D*> fhmEnergyByProductPdgReduced;
+    std::map<std::string, TH1D*> fhmCountByProductPdgReduced;
+    std::map<Int_t, TH2D*> fhmElossVSLightLogPdg;
     std::map<TString, TH1D*> fhmEnergyByReaction;
     std::map<TString, std::map<Int_t, TH1D*>> fhmmEnergyByReactionByProductPdg;
     TH1D* fhnProducts;
@@ -77,44 +97,7 @@ class R3BNeulandMCMon : public FairTask
     TH1D* fhnSecondaryNeutrons;
 
     TH3D* fh3;
-
-    // TODO: Thats not the business of this class, should be in R3BMCTrack
-    // Note: Reference to the pointer to R3BMCTrack so it can be changed within the function
-    inline Bool_t GetMotherTrack(const Int_t i, R3BMCTrack*& motherTrack)
-    {
-        if (i < fMCTracks->GetEntries() && i >= 0)
-        {
-            motherTrack = (R3BMCTrack*)fMCTracks->At(i);
-            return true;
-        }
-        return false;
-    }
-
-    inline Bool_t IsPrimaryNeutron(const R3BMCTrack* mcTrack)
-    {
-        if (mcTrack->GetPdgCode() == 2112 && mcTrack->GetMotherId() == -1)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    inline Bool_t IsMotherPrimaryNeutron(const R3BMCTrack* mcTrack)
-    {
-        R3BMCTrack* motherTrack;
-        if (GetMotherTrack(mcTrack->GetMotherId(), motherTrack) && IsPrimaryNeutron(motherTrack))
-        {
-            return true;
-        }
-        return false;
-    }
-
-    inline Double_t GetKineticEnergy(const R3BMCTrack* mcTrack)
-    {
-        return (mcTrack->GetEnergy() - mcTrack->GetMass()) * 1000.;
-    }
-
-    inline Double_t GetTheta(const R3BMCTrack* mcTrack) { return std::acos(mcTrack->GetPz() / mcTrack->GetP()); }
+    TH3D* fh3PNIP;
 
     ClassDefOverride(R3BNeulandMCMon, 0)
 };

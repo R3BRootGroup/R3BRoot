@@ -41,5 +41,4 @@ R3BPaddleTamexMappedData::R3BPaddleTamexMappedData(Int_t planeId, Int_t barId)
 {
 }
 
-
 ClassImp(R3BPaddleTamexMappedData)

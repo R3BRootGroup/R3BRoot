@@ -1,13 +1,11 @@
 #ifndef TCACONNECTOR
 #define TCACONNECTOR
 
-#include <exception>
-#include <vector>
-
+#include "FairRootManager.h"
 #include "TClonesArray.h"
 #include "TString.h"
-
-#include "FairRootManager.h"
+#include <exception>
+#include <vector>
 
 template <typename T>
 class TCAInputConnector
@@ -59,7 +57,7 @@ class TCAInputConnector
         fV.reserve(n);
         for (Int_t i = 0; i < n; i++)
         {
-            fV.push_back((T*)fTCA->At(i));
+            fV.emplace_back((T*)fTCA->At(i));
         }
         return fV;
     }
@@ -77,7 +75,7 @@ class TCAInputConnector
         fV.reserve(n);
         for (Int_t i = 0; i < n; i++)
         {
-            fV.push_back(*(T*)fTCA->At(i));
+            fV.emplace_back(*(T*)fTCA->At(i));
         }
         return fV;
     }

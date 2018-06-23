@@ -55,7 +55,7 @@ std::vector<R3BNeulandNeutron> Neuland::RecoTDR::GetNeutrons(const std::vector<R
     std::vector<R3BNeulandNeutron> neutrons;
     for (UInt_t n = 0; n < clusters.size() && n < nNeutrons; n++)
     {
-        neutrons.emplace_back(clusters.at(n)->GetT(), clusters.at(n)->GetPosition());
+        neutrons.emplace_back(*clusters.at(n));
     }
     return neutrons;
 }

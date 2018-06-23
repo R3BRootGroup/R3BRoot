@@ -6,6 +6,6 @@
 namespace Neuland
 {
     bool IsElastic(const R3BNeulandCluster*, const R3BNeulandCluster*);
-} // namespace
+} // namespace Neuland
 
 #endif // NEULAND_ISELASTIC

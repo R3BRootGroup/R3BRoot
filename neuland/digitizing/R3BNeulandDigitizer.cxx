@@ -1,47 +1,28 @@
 #include "R3BNeulandDigitizer.h"
-
-#include <fstream>
-#include <iostream>
-#include <stdexcept>
-#include <string>
-
-#include "TClonesArray.h"
+#include "DigitizingTacQuila.h"
+#include "FairLogger.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
 #include "TGeoManager.h"
 #include "TGeoNode.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TMath.h"
 #include "TString.h"
+#include <iostream>
+#include <stdexcept>
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunAna.h"
-#include "FairRuntimeDb.h"
-
-#include "DigitizingTacQuila.h"
-
-R3BNeulandDigitizer::R3BNeulandDigitizer(const TString input, const TString output, const TString outputpx)
-    : FairTask("R3BNeulandDigitizer")
-    , fDigitizingEngine(new Neuland::DigitizingTacQuila())
-    , fInput(input)
-    , fOutput(output)
-    , fOutputPx(outputpx)
-    , fNeulandDigis(new TClonesArray("R3BNeulandDigi"))
-    , fNeulandPixels(new TClonesArray("R3BNeulandPixel"))
+R3BNeulandDigitizer::R3BNeulandDigitizer(TString input, TString output)
+    : R3BNeulandDigitizer(new Neuland::DigitizingTacQuila(), std::move(input), std::move(output))
 {
 }
 
-R3BNeulandDigitizer::R3BNeulandDigitizer(Neuland::DigitizingEngine* engine,
-                                         const TString input,
-                                         const TString output,
-                                         const TString outputpx)
+R3BNeulandDigitizer::R3BNeulandDigitizer(Neuland::DigitizingEngine* engine, TString input, TString output)
     : FairTask("R3BNeulandDigitizer")
+    , fPoints(input)
+    , fHits(output)
     , fDigitizingEngine(engine)
-    , fInput(input)
-    , fOutput(output)
-    , fOutputPx(outputpx)
-    , fNeulandDigis(new TClonesArray("R3BNeulandDigi"))
-    , fNeulandPixels(new TClonesArray("R3BNeulandPixel"))
 {
 }
 
@@ -71,35 +52,8 @@ void R3BNeulandDigitizer::SetParContainers()
 
 InitStatus R3BNeulandDigitizer::Init()
 {
-    FairRootManager* ioman = FairRootManager::Instance();
-    if (!ioman)
-    {
-        LOG(FATAL) << "R3BNeulandDigitizer::Init: No FairRootManager" << FairLogger::endl;
-        return kFATAL;
-    }
-
-    // Set Input: TClonesArray of R3BNeulandPoints
-    if ((TClonesArray*)ioman->GetObject(fInput) == nullptr)
-    {
-        LOG(FATAL) << "R3BNeulandDigitizer::Init No NeulandPoints!" << FairLogger::endl;
-        return kFATAL;
-    }
-    if (!TString(((TClonesArray*)ioman->GetObject(fInput))->GetClass()->GetName()).EqualTo("R3BNeulandPoint"))
-    {
-        LOG(FATAL) << "R3BNeulandDigitizer::Init Branch " << fInput << " does not contain R3BNeulandPoints!"
-                   << FairLogger::endl;
-        return kFATAL;
-    }
-    fNeulandPoints = (TClonesArray*)ioman->GetObject(fInput);
-
-    // Set Output: TClonesArray of R3BNeulandDigis, TClonesArray of R3BNeulandPixles
-    ioman->Register(fOutput, "Digital response in Neuland", fNeulandDigis.get(), kTRUE);
-    ioman->Register(fOutputPx, "Neuland Pixels", fNeulandPixels.get(), kTRUE);
-
-    // Get Paddle Size
-    LOG(DEBUG) << "R3BNeulandDigitizer: Paddle Half Length is: " << fNeulandGeoPar->GetPaddleHalfLength()
-               << FairLogger::endl;
-    fDigitizingEngine->SetPaddleHalfLength(fNeulandGeoPar->GetPaddleHalfLength());
+    fPoints.Init();
+    fHits.Init();
 
     // Initialize control histograms
     hMultOne = new TH1F("MultiplicityOne", "Paddle multiplicity: only one PMT per paddle", 3000, 0, 3000);
@@ -115,17 +69,10 @@ InitStatus R3BNeulandDigitizer::Init()
 
 void R3BNeulandDigitizer::Exec(Option_t*)
 {
-    fNeulandDigis->Clear();
-    fNeulandPixels->Clear();
-
     std::map<UInt_t, Double_t> paddleEnergyDeposit;
     // Look at each Land Point, if it deposited energy in the scintillator, store it with reference to the bar
-    const UInt_t nPoints = fNeulandPoints->GetEntries();
-    R3BNeulandPoint* point;
-    for (UInt_t l = 0; l < nPoints; l++)
+    for (const auto& point : fPoints.Retrieve())
     {
-        point = (R3BNeulandPoint*)fNeulandPoints->At(l);
-
         if (point->GetEnergyLoss() > 0.)
         {
             const Int_t paddleID = point->GetPaddle();
@@ -142,107 +89,90 @@ void R3BNeulandDigitizer::Exec(Option_t*)
             // Within the paddle frame, the relevant distance of the light from the pmt is always given by the
             // X-Coordinate
             const Double_t dist = converted_position.X();
-            try
-            {
-                fDigitizingEngine->DepositLight(paddleID, point->GetTime(), point->GetLightYield() * 1000., dist);
-                paddleEnergyDeposit[paddleID] += point->GetEnergyLoss() * 1000;
-            }
-            catch (std::exception& e)
-            {
-                LOG(FATAL) << "NeulandDigitizer: " << e.what() << FairLogger::endl;
-            }
-
+            fDigitizingEngine->DepositLight(paddleID, point->GetTime(), point->GetLightYield() * 1000., dist);
+            paddleEnergyDeposit[paddleID] += point->GetEnergyLoss() * 1000;
         } // eloss
-    }     // MC hits
+    }     // points
 
-    // Fill histograms
-    Int_t multOne = 0;
-    Int_t multTwo = 0;
     const Double_t triggerTime = fDigitizingEngine->GetTriggerTime();
-    auto paddles = fDigitizingEngine->ExtractPaddles();
+    const auto paddles = fDigitizingEngine->ExtractPaddles();
+
+    // Fill control histograms
+    hMultOne->Fill(std::count_if(paddles.begin(),
+                                 paddles.end(),
+                                 [](const std::pair<const Int_t, std::unique_ptr<Neuland::Digitizing::Paddle>>& kv) {
+                                     return kv.second->HasHalfFired();
+                                 }));
+
+    hMultTwo->Fill(std::count_if(paddles.begin(),
+                                 paddles.end(),
+                                 [](const std::pair<const Int_t, std::unique_ptr<Neuland::Digitizing::Paddle>>& kv) {
+                                     return kv.second->HasFired();
+                                 }));
 
     for (const auto& kv : paddles)
     {
+        const Int_t paddleID = kv.first;
         const auto& paddle = kv.second;
-
-        // Multiplicity if only PMT has fired
-        if (paddle->GetLeftPMT()->HasFired() && !paddle->GetRightPMT()->HasFired())
+        if (paddle->HasFired())
         {
-            multOne++;
+            hRLTimeToTrig->Fill(paddle->GetLeftChannel()->GetTDC() - triggerTime);
+            hRLTimeToTrig->Fill(paddle->GetRightChannel()->GetTDC() - triggerTime);
+            hElossVSQDC->Fill(paddleEnergyDeposit[paddleID], paddle->GetEnergy());
         }
-        if (!paddle->GetLeftPMT()->HasFired() && paddle->GetRightPMT()->HasFired())
-        {
-            multOne++;
-        }
+    }
 
-        // Multiplicity if two PMT have fired
-        if (paddle->GetLeftPMT()->HasFired() && paddle->GetRightPMT()->HasFired())
-        {
-            multTwo++;
-            hRLTimeToTrig->Fill(paddle->GetLeftPMT()->GetTDC() - triggerTime);
-            hRLTimeToTrig->Fill(paddle->GetRightPMT()->GetTDC() - triggerTime);
-        }
-    } // loop over paddles
-    hMultOne->Fill(multOne);
-    hMultTwo->Fill(multTwo);
-
-    // Create Digis
+    // Create Hits
+    std::vector<R3BNeulandHit> hits;
+    hits.reserve(paddles.size());
     for (const auto& kv : paddles)
     {
         const Int_t paddleID = kv.first;
         const auto& paddle = kv.second;
 
-        if (paddle->HasFired())
+        if (!paddle->HasFired())
         {
-            const TVector3 digiPositionLocal = TVector3(paddle->GetPosition(), 0., 0.);
-            const TVector3 digiPositionGlobal = fNeulandGeoPar->ConvertToGlobalCoordinates(digiPositionLocal, paddleID);
-            const TVector3 digiPixel = fNeulandGeoPar->ConvertGlobalToPixel(digiPositionGlobal);
+            continue;
+        }
 
-            std::unique_ptr<R3BNeulandDigi> digi(new R3BNeulandDigi(paddleID,
-                                                                    paddle->GetLeftPMT()->GetTDC(),
-                                                                    paddle->GetRightPMT()->GetTDC(),
-                                                                    paddle->GetTime(),
-                                                                    paddle->GetLeftPMT()->GetEnergy(),
-                                                                    paddle->GetRightPMT()->GetEnergy(),
-                                                                    paddle->GetEnergy(),
-                                                                    digiPositionGlobal));
+        const TVector3 hitPositionLocal = TVector3(paddle->GetPosition(), 0., 0.);
+        const TVector3 hitPositionGlobal = fNeulandGeoPar->ConvertToGlobalCoordinates(hitPositionLocal, paddleID);
+        const TVector3 hitPixel = fNeulandGeoPar->ConvertGlobalToPixel(hitPositionGlobal);
 
-            if (IsValid(digi.get()))
-            {
-                new ((*fNeulandDigis)[fNeulandDigis->GetEntries()]) R3BNeulandDigi(*std::move(digi.release()));
+        R3BNeulandHit hit(paddleID,
+                          paddle->GetLeftChannel()->GetTDC(),
+                          paddle->GetRightChannel()->GetTDC(),
+                          paddle->GetTime(),
+                          paddle->GetLeftChannel()->GetEnergy(),
+                          paddle->GetRightChannel()->GetEnergy(),
+                          paddle->GetEnergy(),
+                          hitPositionGlobal,
+                          hitPixel);
 
-                new ((*fNeulandPixels)[fNeulandPixels->GetEntries()]) R3BNeulandPixel((Int_t)digiPixel.X(),
-                                                                                      (Int_t)digiPixel.Y(),
-                                                                                      (Int_t)digiPixel.Z(),
-                                                                                      (Float_t)paddle->GetEnergy(),
-                                                                                      (Float_t)paddle->GetTime());
-            }
-
-            hElossVSQDC->Fill(paddleEnergyDeposit[paddleID], paddle->GetEnergy());
+        if (fHitFilters.IsValid(hit))
+        {
+            hits.push_back(hit);
         }
     } // loop over paddles
 
-    LOG(DEBUG) << "R3BNeulandDigitizer: produced " << fNeulandDigis->GetEntries() << " digis" << FairLogger::endl;
-}
-
-inline Bool_t R3BNeulandDigitizer::IsValid(const R3BNeulandDigi* digi) const
-{
-    for (const auto& filter : fDigiFilters)
-    {
-        if (filter(digi) == false)
-        {
-            return false;
-        }
-    }
-    return true;
+    LOG(DEBUG) << "R3BNeulandDigitizer: produced " << hits.size() << " hits" << FairLogger::endl;
+    fHits.Store(hits);
 }
 
 void R3BNeulandDigitizer::Finish()
 {
+    TDirectory* tmp = gDirectory;
+    FairRootManager::Instance()->GetOutFile()->cd();
+
+    gDirectory->mkdir("R3BNeulandDigitizer");
+    gDirectory->cd("R3BNeulandDigitizer");
+
     hMultOne->Write();
     hMultTwo->Write();
     hRLTimeToTrig->Write();
     hElossVSQDC->Write();
+
+    gDirectory = tmp;
 }
 
 ClassImp(R3BNeulandDigitizer);

@@ -77,10 +77,7 @@ class R3BNeulandTcalFill : public FairTask
      * Method for setting the update rate.
      * @param rate an update rate value (events).
      */
-    inline void SetUpdateRate(Int_t rate)
-    {
-        fUpdateRate = rate;
-    }
+    inline void SetUpdateRate(Int_t rate) { fUpdateRate = rate; }
 
     /**
      * Method for setting minimum required statistics per module.
@@ -89,19 +86,13 @@ class R3BNeulandTcalFill : public FairTask
      * calibrated.
      * @param minStats a value of minimum statistics required.
      */
-    inline void SetMinStats(Int_t minStats)
-    {
-        fMinStats = minStats;
-    }
+    inline void SetMinStats(Int_t minStats) { fMinStats = minStats; }
 
     /**
      * Method for selecting events with certain trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
-    inline void SetTrigger(Int_t trigger)
-    {
-        fTrigger = trigger;
-    }
+    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
 
     /**
      * Method for setting number of modules in NeuLAND setup.
@@ -111,7 +102,7 @@ class R3BNeulandTcalFill : public FairTask
      */
     inline void SetNofModules(Int_t nPlanes, Int_t nBars, Int_t n17)
     {
-        fNofPlanes = nPlanes;		
+        fNofPlanes = nPlanes;
         fNofBars = nBars;
         fNof17 = n17;
     }
@@ -122,8 +113,8 @@ class R3BNeulandTcalFill : public FairTask
     Int_t fTrigger;    /**< Trigger value. */
 
     Int_t fNofPlanes; /**< Number of NeuLAND planes. */
-    Int_t fNofBars; /**< Number of NeuLAND bars per plane. */
-    Int_t fNof17;   /**< Number of channels with stop signal. */
+    Int_t fNofBars;   /**< Number of NeuLAND bars per plane. */
+    Int_t fNof17;     /**< Number of channels with stop signal. */
 
     Int_t fNEvents;         /**< Event counter. */
     R3BTCalPar* fCal_Par;   /**< Parameter container. */

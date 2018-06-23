@@ -14,6 +14,6 @@ namespace Neuland
         virtual void Init() {}
         virtual std::vector<R3BNeulandNeutron> GetNeutrons(const std::vector<R3BNeulandCluster*>&) const = 0;
     };
-}
+} // namespace Neuland
 
 #endif // NEULANDRECONSTRUCTIONENGINEH

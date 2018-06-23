@@ -88,10 +88,7 @@ class R3BNeulandTcal : public FairTask
      * Method for setting the trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
-    inline void SetTrigger(Int_t trigger)
-    {
-        fTrigger = trigger;
-    }
+    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
 
     /**
      * Method for setting the number of NeuLAND modules.
@@ -100,26 +97,26 @@ class R3BNeulandTcal : public FairTask
      */
     inline void SetNofModules(Int_t nPlanes, Int_t nBars, Int_t n17)
     {
-        fNofPlanes = nPlanes;		
+        fNofPlanes = nPlanes;
         fNofBars = nBars;
         fNof17 = n17;
     }
 
   private:
-    Int_t fNEvents;                             /**< Event counter. */
-    R3BEventHeader* header;                     /**< Event header. */
-    TClonesArray* fMappedHit;                      /**< Array with raw items - input data. */
-    TClonesArray* fPmt;                         /**< Array with time items - output data. */
-    Int_t fNPmt;                                /**< Number of produced time items per event. */
-    R3BTCalPar* fTcalPar;                       /**< TCAL parameter container. */
-    Int_t fTrigger;                             /**< Trigger value. */
-    Int_t fNofPlanes;                           /**< Number of planes. */
-    Int_t fNofBars;                             /**< Number of bars per plane. */    
-    Int_t fNof17;                               /**< Number of channels with stop signal. */
-//    std::map<Int_t, Bool_t> fMap17Seen;         /**< Map with flag of observed stop signal. */
-//    std::map<Int_t, Double_t> fMapStopTime;     /**< Map with value of stop time. */
-//    std::map<Int_t, Int_t> fMapStopClock;       /**< Map with value of stop clock. */
-    Double_t fClockFreq;                        /**< Clock cycle in [ns]. */
+    Int_t fNEvents;           /**< Event counter. */
+    R3BEventHeader* header;   /**< Event header. */
+    TClonesArray* fMappedHit; /**< Array with raw items - input data. */
+    TClonesArray* fPmt;       /**< Array with time items - output data. */
+    Int_t fNPmt;              /**< Number of produced time items per event. */
+    R3BTCalPar* fTcalPar;     /**< TCAL parameter container. */
+    Int_t fTrigger;           /**< Trigger value. */
+    Int_t fNofPlanes;         /**< Number of planes. */
+    Int_t fNofBars;           /**< Number of bars per plane. */
+    Int_t fNof17;             /**< Number of channels with stop signal. */
+    //    std::map<Int_t, Bool_t> fMap17Seen;         /**< Map with flag of observed stop signal. */
+    //    std::map<Int_t, Double_t> fMapStopTime;     /**< Map with value of stop time. */
+    //    std::map<Int_t, Int_t> fMapStopClock;       /**< Map with value of stop clock. */
+    Double_t fClockFreq; /**< Clock cycle in [ns]. */
 
   public:
     ClassDef(R3BNeulandTcal, 1)

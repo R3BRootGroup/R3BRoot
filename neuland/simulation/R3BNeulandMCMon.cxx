@@ -1,71 +1,116 @@
 #include "R3BNeulandMCMon.h"
-
+#include "FairLogger.h"
+#include "FairRootManager.h"
+#include "FairRun.h"
+#include "TDirectory.h"
+#include "TH1D.h"
+#include "TH2D.h"
+#include "TH3D.h"
 #include <algorithm>
 #include <iostream>
 #include <numeric>
 #include <string>
 
-#include "TDirectory.h"
-#include "TH1D.h"
-#include "TH2D.h"
-#include "TH3D.h"
+inline Bool_t IsPrimaryNeutron(const R3BMCTrack* mcTrack)
+{
+    return (mcTrack->GetPdgCode() == 2112 && mcTrack->GetMotherId() == -1);
+}
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRun.h"
+inline Bool_t IsMotherPrimaryNeutron(const R3BMCTrack* mcTrack, const std::vector<R3BMCTrack*>& tracks)
+{
+    if (mcTrack->GetMotherId() < 0 || size_t(mcTrack->GetMotherId()) >= tracks.size())
+    {
+        return false;
+    }
+    return IsPrimaryNeutron(tracks.at(mcTrack->GetMotherId()));
+}
+
+inline Double_t GetKineticEnergy(const R3BMCTrack* mcTrack)
+{
+    return (mcTrack->GetEnergy() - mcTrack->GetMass()) * 1000.;
+}
+
+inline Double_t GetTheta(const R3BMCTrack* mcTrack) { return std::acos(mcTrack->GetPz() / mcTrack->GetP()); }
+
+static std::map<int, std::string> lookup_table = {
+    { -211, "pion" }, { 22, "gamma" },        { 111, "pion" },        { 211, "pion" },         { 2112, "n" },
+    { 2212, "p" },    { 1000010020, "d, t" }, { 1000010030, "d, t" }, { 1000020030, "alpha" }, { 1000020040, "alpha" },
+};
+
+std::string lookup(int pid)
+{
+    const auto l = lookup_table.find(pid);
+    if (l == lookup_table.end())
+    {
+        return std::string("heavy");
+    }
+    else
+    {
+        return l->second;
+    }
+}
+
+template <typename T>
+void writeout(std::map<T, TH1D*>& map, const std::string& what, const int nEvents = 0)
+{
+    if (!map.empty())
+    {
+        std::ostream* out = &std::cout;
+        std::ofstream of;
+        if (FairRun::Instance() != nullptr)
+        {
+            const std::string f = FairRun::Instance()->GetOutputFile()->GetName() + std::string(".") + what + ".dat";
+            std::cout << "Writing to file " << f << std::endl;
+            of.open(f);
+            out = &of;
+        }
+        gDirectory->mkdir(what.c_str());
+        gDirectory->cd(what.c_str());
+        for (const auto& kv : map)
+        {
+            auto h = kv.second;
+            const auto c = h->GetEntries();
+            if (nEvents > 0 && nEvents > c)
+            {
+                h->Fill(0., nEvents - c);
+            }
+            *out << kv.first << "\t" << c << "\t" << h->GetMean() << "\t" << h->GetMeanError() << std::endl;
+            kv.second->Write();
+        }
+        gDirectory->cd("..");
+    }
+}
 
 R3BNeulandMCMon::R3BNeulandMCMon(const Option_t* option)
     : FairTask("R3B NeuLAND Neuland Monte Carlo Monitor")
+    , fIs3DTrackEnabled(false)
+    , fIsFullSimAnaEnabled(false)
+    , fPrimaryNeutronInteractionPoints("NeulandPrimaryNeutronInteractionPoints")
+    , fMCTracks("MCTrack")
+    , fNeulandPoints("NeulandPoints")
+    , nEvents(0)
 {
     LOG(INFO) << "Using R3B NeuLAND Neuland Monte Carlo Monitor" << FairLogger::endl;
 
     TString opt = option;
     opt.ToUpper();
-
     if (opt.Contains("3DTRACK"))
     {
         fIs3DTrackEnabled = true;
         LOG(INFO) << "... with 3D track visualization" << FairLogger::endl;
     }
-    else
-    {
-        fIs3DTrackEnabled = false;
-    }
-
     if (opt.Contains("FULLSIMANA"))
     {
         fIsFullSimAnaEnabled = true;
         LOG(INFO) << "... with full simulation neutron reaction product analysis" << FairLogger::endl;
     }
-    else
-    {
-        fIsFullSimAnaEnabled = false;
-    }
 }
 
 InitStatus R3BNeulandMCMon::Init()
 {
-    FairRootManager* rm = FairRootManager::Instance();
-    fMCTracks = (TClonesArray*)rm->GetObject("MCTrack");
-    if (fMCTracks == nullptr)
-    {
-        LOG(FATAL) << "R3BNeulandMCMon: No MCTrack!" << FairLogger::endl;
-        return kFATAL;
-    }
-
-    fNeulandPoints = (TClonesArray*)rm->GetObject("NeulandPoints");
-    if (fNeulandPoints == nullptr)
-    {
-        LOG(FATAL) << "R3BNeulandMCMon: No NeulandPoints!" << FairLogger::endl;
-        return kFATAL;
-    }
-
-    fNPNIPs = (TClonesArray*)rm->GetObject("NeulandPrimaryNeutronInteractionPoints");
-    if (fNeulandPoints == nullptr)
-    {
-        LOG(FATAL) << "R3BNeulandMCMon: No NeulandPrimaryNeutronInteractionPoints!" << FairLogger::endl;
-        return kFATAL;
-    }
+    fPrimaryNeutronInteractionPoints.Init();
+    fMCTracks.Init();
+    fNeulandPoints.Init();
 
     fhNPNIPsEToFVSTime = new TH2D("NPNIPEToFVSTime", "NPNIP E_{ToF} vs. NPNIP Time", 100, 0, 1000, 500, 0, 500);
     fhNPNIPsEToFVSTime->GetXaxis()->SetTitle("NPNIP E_{ToF} [MeV]");
@@ -111,18 +156,59 @@ InitStatus R3BNeulandMCMon::Init()
     fhnSecondaryNeutrons = new TH1D("NumberSecondaryNeutrons", "Number of Secondary Neutrons", 10, -0.5, 9.5);
     fhnSecondaryProtons = new TH1D("NumberSecondaryProtons", "Number of Secondary Protons", 10, -0.5, 9.5);
 
+    // bins = 10**numpy.arange(-2,2.42,0.03)
+    std::array<double, 148> bins = {
+        1.00000000e-02, 1.07151931e-02, 1.14815362e-02, 1.23026877e-02, 1.31825674e-02, 1.41253754e-02, 1.51356125e-02,
+        1.62181010e-02, 1.73780083e-02, 1.86208714e-02, 1.99526231e-02, 2.13796209e-02, 2.29086765e-02, 2.45470892e-02,
+        2.63026799e-02, 2.81838293e-02, 3.01995172e-02, 3.23593657e-02, 3.46736850e-02, 3.71535229e-02, 3.98107171e-02,
+        4.26579519e-02, 4.57088190e-02, 4.89778819e-02, 5.24807460e-02, 5.62341325e-02, 6.02559586e-02, 6.45654229e-02,
+        6.91830971e-02, 7.41310241e-02, 7.94328235e-02, 8.51138038e-02, 9.12010839e-02, 9.77237221e-02, 1.04712855e-01,
+        1.12201845e-01, 1.20226443e-01, 1.28824955e-01, 1.38038426e-01, 1.47910839e-01, 1.58489319e-01, 1.69824365e-01,
+        1.81970086e-01, 1.94984460e-01, 2.08929613e-01, 2.23872114e-01, 2.39883292e-01, 2.57039578e-01, 2.75422870e-01,
+        2.95120923e-01, 3.16227766e-01, 3.38844156e-01, 3.63078055e-01, 3.89045145e-01, 4.16869383e-01, 4.46683592e-01,
+        4.78630092e-01, 5.12861384e-01, 5.49540874e-01, 5.88843655e-01, 6.30957344e-01, 6.76082975e-01, 7.24435960e-01,
+        7.76247117e-01, 8.31763771e-01, 8.91250938e-01, 9.54992586e-01, 1.02329299e+00, 1.09647820e+00, 1.17489755e+00,
+        1.25892541e+00, 1.34896288e+00, 1.44543977e+00, 1.54881662e+00, 1.65958691e+00, 1.77827941e+00, 1.90546072e+00,
+        2.04173794e+00, 2.18776162e+00, 2.34422882e+00, 2.51188643e+00, 2.69153480e+00, 2.88403150e+00, 3.09029543e+00,
+        3.31131121e+00, 3.54813389e+00, 3.80189396e+00, 4.07380278e+00, 4.36515832e+00, 4.67735141e+00, 5.01187234e+00,
+        5.37031796e+00, 5.75439937e+00, 6.16595002e+00, 6.60693448e+00, 7.07945784e+00, 7.58577575e+00, 8.12830516e+00,
+        8.70963590e+00, 9.33254301e+00, 1.00000000e+01, 1.07151931e+01, 1.14815362e+01, 1.23026877e+01, 1.31825674e+01,
+        1.41253754e+01, 1.51356125e+01, 1.62181010e+01, 1.73780083e+01, 1.86208714e+01, 1.99526231e+01, 2.13796209e+01,
+        2.29086765e+01, 2.45470892e+01, 2.63026799e+01, 2.81838293e+01, 3.01995172e+01, 3.23593657e+01, 3.46736850e+01,
+        3.71535229e+01, 3.98107171e+01, 4.26579519e+01, 4.57088190e+01, 4.89778819e+01, 5.24807460e+01, 5.62341325e+01,
+        6.02559586e+01, 6.45654229e+01, 6.91830971e+01, 7.41310241e+01, 7.94328235e+01, 8.51138038e+01, 9.12010839e+01,
+        9.77237221e+01, 1.04712855e+02, 1.12201845e+02, 1.20226443e+02, 1.28824955e+02, 1.38038426e+02, 1.47910839e+02,
+        1.58489319e+02, 1.69824365e+02, 1.81970086e+02, 1.94984460e+02, 2.08929613e+02, 2.23872114e+02, 2.39883292e+02,
+        2.57039578e+02,
+    };
+
+    fhElossVSLight = new TH2D("fhElossVSLight",
+                              "Deposited Energy vs Generated Light",
+                              bins.size() - 1,
+                              bins.data(),
+                              bins.size() - 1,
+                              bins.data());
+    fhElossVSLightLog = new TH2D("fhElossVSLightLog", "Deposited Energy vs Generated Light", 600, -3, 3, 600, -3, 3);
+
     fhThetaLight = new TH2D("fhThetaLight", "fhThetaLight", 200, -100, 100, 400, 0, 400);
 
     if (fIs3DTrackEnabled)
     {
         // XYZ -> ZXY (side view)
+
         fh3 = new TH3D("hMCTracks", "hMCTracks", 60, 1400, 1700, 50, -125, 125, 50, -125, 125);
         fh3->SetTitle("NeuLAND MCTracks");
         fh3->GetXaxis()->SetTitle("Z");
         fh3->GetYaxis()->SetTitle("X");
         fh3->GetZaxis()->SetTitle("Y");
+        FairRootManager::Instance()->Register("NeulandMCMon", "MC Tracks in NeuLAND", fh3, kTRUE);
 
-        rm->Register("NeulandMCMon", "MC Tracks in NeuLAND", fh3, kTRUE);
+        fh3PNIP = new TH3D("h3DNPNIPS", "h3DNPNIPS", 60, 1400, 1700, 50, -125, 125, 50, -125, 125);
+        fh3PNIP->SetTitle("NeuLAND 3D NPNIPS");
+        fh3PNIP->GetXaxis()->SetTitle("Z");
+        fh3PNIP->GetYaxis()->SetTitle("X");
+        fh3PNIP->GetZaxis()->SetTitle("Y");
+        FairRootManager::Instance()->Register("Neuland3DPNIP", "First interactions in NeuLAND", fh3PNIP, kTRUE);
     }
 
     return kSUCCESS;
@@ -130,60 +216,52 @@ InitStatus R3BNeulandMCMon::Init()
 
 void R3BNeulandMCMon::Exec(Option_t*)
 {
+    nEvents++;
 
+    const auto npnips = fPrimaryNeutronInteractionPoints.Retrieve();
+    const auto mcTracks = fMCTracks.Retrieve();
+    const auto points = fNeulandPoints.Retrieve();
+
+    for (const auto& mcTrack : mcTracks)
     {
-        /* raw MC Track based analysis */
-        const UInt_t nTracks = fMCTracks->GetEntries();
-        R3BMCTrack* mcTrack;
+        // Distribution of MC Track mother id's
+        fhMotherIDs->Fill(mcTrack->GetMotherId());
 
-        for (UInt_t i = 0; i < nTracks; i++)
+        // Energy of primary Particles
+        if (mcTrack->GetMotherId() == -1)
         {
-            mcTrack = (R3BMCTrack*)fMCTracks->At(i);
-
-            // Distribution of MC Track mother id's
-            fhMotherIDs->Fill(mcTrack->GetMotherId());
-
-            // Energy of primary Particles
-            if (mcTrack->GetMotherId() == -1)
-            {
-                fhEPrimarys->Fill(GetKineticEnergy(mcTrack));
-            }
-
-            // Energy of primary Neutrons
-            if (IsPrimaryNeutron(mcTrack))
-            {
-                fhEPrimaryNeutrons->Fill(GetKineticEnergy(mcTrack));
-            }
-
-            // Remaining energy of neutrons after first interaction
-            if (IsMotherPrimaryNeutron(mcTrack) && mcTrack->GetPdgCode() == 2112)
-            {
-                fhESecondaryNeutrons->Fill(GetKineticEnergy(mcTrack));
-            }
+            fhEPrimarys->Fill(GetKineticEnergy(mcTrack));
         }
 
-        const UInt_t nNPNIPs = fNPNIPs->GetEntries();
-        fhnNPNIPs->Fill(nNPNIPs);
-        FairMCPoint* npnip;
-        for (UInt_t i = 0; i < nNPNIPs; i++)
+        // Energy of primary Neutrons
+        if (IsPrimaryNeutron(mcTrack))
         {
-            npnip = (FairMCPoint*)fNPNIPs->At(i);
-
-            // WIP: ToF Calculation -> Should respect other origin than 0,0,0,0.
-            const Double_t s2 =
-                std::pow(npnip->GetX(), 2) + std::pow(npnip->GetY(), 2) + std::pow(npnip->GetZ(), 2); // cm²
-            const Double_t v2 = s2 / std::pow(npnip->GetTime(), 2);                                   // ns²
-
-            const Double_t c2 = 898.75517873681758374898; // cm²/ns²
-            const Double_t massNeutron = 939.565379;      // MeV/c²
-            const Double_t ETimeOfFlight = massNeutron * ((1. / std::sqrt(1 - (v2 / c2))) - 1);
-
-            mcTrack = (R3BMCTrack*)fMCTracks->At(npnip->GetTrackID());
-            fhNPNIPsEToFVSTime->Fill(ETimeOfFlight, npnip->GetTime());
-            fhMCToF->Fill(GetKineticEnergy(mcTrack) - ETimeOfFlight);
-            fhNPNIPSrvsz->Fill(npnip->GetZ(), std::sqrt(std::pow(npnip->GetX(), 2) + std::pow(npnip->GetY(), 2)));
-            fhNPNIPSxy->Fill(npnip->GetX(), npnip->GetY());
+            fhEPrimaryNeutrons->Fill(GetKineticEnergy(mcTrack));
         }
+
+        // Remaining energy of neutrons after first interaction
+        if (IsMotherPrimaryNeutron(mcTrack, mcTracks) && mcTrack->GetPdgCode() == 2112)
+        {
+            fhESecondaryNeutrons->Fill(GetKineticEnergy(mcTrack));
+        }
+    }
+
+    fhnNPNIPs->Fill(npnips.size());
+    for (const auto& npnip : npnips)
+    {
+        // WIP: ToF Calculation -> Should respect other origin than 0,0,0,0.
+        const Double_t s2 = std::pow(npnip->GetX(), 2) + std::pow(npnip->GetY(), 2) + std::pow(npnip->GetZ(), 2); // cm²
+        const Double_t v2 = s2 / std::pow(npnip->GetTime(), 2); // ns²
+
+        const Double_t c2 = 898.75517873681758374898; // cm²/ns²
+        const Double_t massNeutron = 939.565379;      // MeV/c²
+        const Double_t ETimeOfFlight = massNeutron * ((1. / std::sqrt(1 - (v2 / c2))) - 1);
+
+        auto mcTrack = mcTracks.at(npnip->GetTrackID());
+        fhNPNIPsEToFVSTime->Fill(ETimeOfFlight, npnip->GetTime());
+        fhMCToF->Fill(GetKineticEnergy(mcTrack) - ETimeOfFlight);
+        fhNPNIPSrvsz->Fill(npnip->GetZ(), std::sqrt(std::pow(npnip->GetX(), 2) + std::pow(npnip->GetY(), 2)));
+        fhNPNIPSxy->Fill(npnip->GetX(), npnip->GetY());
     }
 
     {
@@ -191,16 +269,14 @@ void R3BNeulandMCMon::Exec(Option_t*)
         Double_t Etot = 0.;
         Double_t EtotPrim = 0.;
 
-        const UInt_t nLandPoints = fNeulandPoints->GetEntries();
-        for (UInt_t iLP = 0; iLP < nLandPoints; iLP++)
+        for (const auto& point : points)
         {
-            const R3BNeulandPoint* point = (R3BNeulandPoint*)fNeulandPoints->At(iLP);
-            const R3BMCTrack* mcTrack = (R3BMCTrack*)fMCTracks->At(point->GetTrackID());
+            const R3BMCTrack* mcTrack = mcTracks.at(point->GetTrackID());
 
             Etot += point->GetLightYield() * 1000.;
 
             // Select tracks with a primary neutron mother
-            if (IsMotherPrimaryNeutron(mcTrack))
+            if (IsMotherPrimaryNeutron(mcTrack, mcTracks))
             {
 
                 // Total energy of non-neutron secondary particles where mother is a primary neutron
@@ -231,6 +307,25 @@ void R3BNeulandMCMon::Exec(Option_t*)
                 EtotPDG[mcTrack->GetPdgCode()] = 0.;
             }
             EtotPDG[mcTrack->GetPdgCode()] += point->GetLightYield() * 1000.; // point->GetEnergyLoss()*1000.;
+
+            fhElossVSLight->Fill(point->GetEnergyLoss() * 1000., point->GetLightYield() * 1000.);
+            fhElossVSLightLog->Fill(std::log10(point->GetEnergyLoss() * 1000.),
+                                    std::log10(point->GetLightYield() * 1000.));
+
+            if (!fhmElossVSLightLogPdg[mcTrack->GetPdgCode()])
+            {
+                fhmElossVSLightLogPdg[mcTrack->GetPdgCode()] =
+                    new TH2D("fhElossVSLightLog_" + TString::Itoa(mcTrack->GetPdgCode(), 10),
+                             "Deposited Energy vs Generated Light",
+                             600,
+                             -3,
+                             3,
+                             600,
+                             -3,
+                             3);
+            }
+            fhmElossVSLightLogPdg[mcTrack->GetPdgCode()]->Fill(std::log10(point->GetEnergyLoss() * 1000.),
+                                                               std::log10(point->GetLightYield() * 1000.));
 
             fhThetaLight->Fill(GetTheta(mcTrack), point->GetLightYield() * 1000.);
         }
@@ -268,10 +363,10 @@ void R3BNeulandMCMon::Exec(Option_t*)
         std::vector<int> primaryNeutronIDs;
         std::map<int, std::vector<R3BMCTrack*>> tracksByPrimaryNeutronID;
 
-        const Int_t nTracks = fMCTracks->GetEntries();
+        const Int_t nTracks = mcTracks.size();
         for (Int_t j = 0; j < nTracks; j++)
         {
-            R3BMCTrack* track = (R3BMCTrack*)fMCTracks->At(j);
+            R3BMCTrack* track = mcTracks.at(j);
             if (track->GetMotherId() == -1 && track->GetPdgCode() == 2112)
             {
                 primaryNeutronIDs.push_back(j);
@@ -280,7 +375,7 @@ void R3BNeulandMCMon::Exec(Option_t*)
 
         for (Int_t j = 0; j < nTracks; j++)
         {
-            R3BMCTrack* track = (R3BMCTrack*)fMCTracks->At(j);
+            R3BMCTrack* track = mcTracks.at(j);
             for (const Int_t primaryNeutronID : primaryNeutronIDs)
             {
                 if (track->GetMotherId() == primaryNeutronID)
@@ -334,8 +429,19 @@ void R3BNeulandMCMon::Exec(Option_t*)
 
             if (fIsFullSimAnaEnabled)
             {
+                std::map<int, int> mCountByProductPdg;
+
                 for (const auto& track : tracks)
                 {
+                    if (mCountByProductPdg.find(track->GetPdgCode()) == mCountByProductPdg.end())
+                    {
+                        mCountByProductPdg[track->GetPdgCode()] = 1;
+                    }
+                    else
+                    {
+                        mCountByProductPdg[track->GetPdgCode()]++;
+                    }
+
                     auto& hEnergy = fhmEnergyByProductPdg[track->GetPdgCode()];
                     if (hEnergy == nullptr)
                     {
@@ -346,6 +452,33 @@ void R3BNeulandMCMon::Exec(Option_t*)
                                            1000);
                     }
                     hEnergy->Fill(1000. * (track->GetEnergy() - track->GetMass()));
+
+                    const auto l = lookup(track->GetPdgCode());
+                    auto& hEnergyRed = fhmEnergyByProductPdgReduced[l];
+                    if (hEnergyRed == nullptr)
+                    {
+                        hEnergyRed = new TH1D(l.c_str(), l.c_str(), 1000, 0, 1000);
+                    }
+                    hEnergyRed->Fill(1000. * (track->GetEnergy() - track->GetMass()));
+                }
+
+                for (const auto& kv : mCountByProductPdg)
+                {
+                    const int pdg = kv.first;
+                    auto& hCount = fhmCountByProductPdg[pdg];
+                    if (hCount == nullptr)
+                    {
+                        hCount = new TH1D(TString::Itoa(pdg, 10), TString::Itoa(pdg, 10), 10, 0, 10);
+                    }
+                    hCount->Fill(kv.second);
+
+                    const auto l = lookup(kv.first);
+                    auto& hCountRed = fhmCountByProductPdgReduced[l];
+                    if (hCountRed == nullptr)
+                    {
+                        hCountRed = new TH1D(l.c_str(), l.c_str(), 10, 0, 10);
+                    }
+                    hCountRed->Fill(kv.second);
                 }
 
                 std::sort(tracks.begin(), tracks.end(), [](const R3BMCTrack* a, const R3BMCTrack* b) {
@@ -389,20 +522,20 @@ void R3BNeulandMCMon::Exec(Option_t*)
 
     if (fIs3DTrackEnabled)
     {
-        // For 3D Vis
-        const UInt_t nPoints = fNeulandPoints->GetEntries();
-        R3BNeulandPoint* point;
         fh3->Reset("ICES");
-        for (UInt_t i = 0; i < nPoints; i++)
+        for (const auto& point : points)
         {
-            point = (R3BNeulandPoint*)fNeulandPoints->At(i);
             if (point->GetLightYield() > 0)
             {
-                fh3->Fill(point->GetPosition().Z(),
-                          point->GetPosition().X(),
-                          point->GetPosition().Y(),
-                          point->GetEnergyLoss() * 1000.);
+                const auto pos = point->GetPosition();
+                fh3->Fill(pos.Z(), pos.X(), pos.Y(), point->GetEnergyLoss() * 1000.);
             }
+        }
+
+        fh3PNIP->Reset("ICES");
+        for (const auto& npnip : npnips)
+        {
+            fh3PNIP->Fill(npnip->GetZ(), npnip->GetX(), npnip->GetY(), npnip->GetTime());
         }
     }
 }
@@ -429,6 +562,8 @@ void R3BNeulandMCMon::Finish()
     fhNPNIPSxy->Write();
     fhnNPNIPs->Write();
     fhThetaLight->Write();
+    fhElossVSLight->Write();
+    fhElossVSLightLog->Write();
 
     gDirectory = tmp;
     gDirectory->cd("NeulandMCMon");
@@ -438,6 +573,10 @@ void R3BNeulandMCMon::Finish()
     gDirectory->mkdir("LightYieldByProductPdg");
     gDirectory->cd("LightYieldByProductPdg");
     for (const auto& kv : fhmEPdg)
+    {
+        kv.second->Write();
+    }
+    for (const auto& kv : fhmElossVSLightLogPdg)
     {
         kv.second->Write();
     }
@@ -470,53 +609,13 @@ void R3BNeulandMCMon::Finish()
     fhnSecondaryProtons->Write();
     fhnSecondaryNeutrons->Write();
 
-    if (fhmEnergyByProductPdg.size() > 0)
-    {
-        std::cout << "By Product:" << std::endl;
-        std::ostream* out = &std::cout;
-        std::ofstream of;
-        if (FairRun::Instance() != nullptr)
-        {
-            // const  TString f = FairRun::Instance()->GetOutputFileName() + ".ByProduct.dat";
-            const TString f = TString(FairRun::Instance()->GetOutputFile()->GetName()) + ".ByProduct.dat";
-            std::cout << "Writing to file " << f << std::endl;
-            of.open(f);
-            out = &of;
-        }
-        gDirectory->mkdir("EnergyByProductPdg");
-        gDirectory->cd("EnergyByProductPdg");
-        for (const auto& kv : fhmEnergyByProductPdg)
-        {
-            *out << kv.first << ":\t" << kv.second->GetEntries() << std::endl;
-            kv.second->Write();
-        }
-        gDirectory->cd("..");
-    }
+    writeout(fhmEnergyByProductPdg, "EnergyByProduct");
+    writeout(fhmEnergyByProductPdgReduced, "EnergyByProductReduced");
+    writeout(fhmCountByProductPdg, "CountByProduct", nEvents);
+    writeout(fhmCountByProductPdgReduced, "CountByProductReduced", nEvents);
+    writeout(fhmEnergyByReaction, "EnergyByReaction");
 
-    if (fhmEnergyByReaction.size() > 0)
-    {
-        std::cout << "By Reaction:" << std::endl;
-        std::ostream* out = &std::cout;
-        std::ofstream of;
-        if (FairRun::Instance() != nullptr)
-        {
-            // const TString f = FairRun::Instance()->GetOutputFileName() + ".ByReaction.dat";
-            const TString f = TString(FairRun::Instance()->GetOutputFile()->GetName()) + ".ByReaction.dat";
-            std::cout << "Writing to file " << f << std::endl;
-            of.open(f);
-            out = &of;
-        }
-        gDirectory->mkdir("EnergyByReaction");
-        gDirectory->cd("EnergyByReaction");
-        for (const auto& kv : fhmEnergyByReaction)
-        {
-            *out << kv.first << ":\t" << kv.second->GetEntries() << std::endl;
-            kv.second->Write();
-        }
-        gDirectory->cd("..");
-    }
-
-    if (fhmmEnergyByReactionByProductPdg.size() > 0)
+    if (!fhmmEnergyByReactionByProductPdg.empty())
     {
         gDirectory->mkdir("EnergyByReactionByProductPdg");
         gDirectory->cd("EnergyByReactionByProductPdg");

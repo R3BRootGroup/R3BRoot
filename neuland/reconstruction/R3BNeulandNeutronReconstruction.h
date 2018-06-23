@@ -18,8 +18,8 @@ class R3BNeulandNeutronReconstruction : public FairTask
 {
   public:
     R3BNeulandNeutronReconstruction(Neuland::ReconstructionEngine* engine,
-                                    const TString input = "NeulandClusters",
-                                    const TString output = "NeulandNeutrons");
+                                    TString input = "NeulandClusters",
+                                    TString output = "NeulandNeutrons");
     ~R3BNeulandNeutronReconstruction() override = default;
 
     // No copy and no move is allowed (Rule of three/five)

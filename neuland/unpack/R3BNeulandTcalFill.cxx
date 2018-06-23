@@ -4,20 +4,20 @@
 // ----------------------------------------------------------------
 
 #include "R3BNeulandTcalFill.h"
-#include "R3BPaddleTamexMappedData.h"
 #include "R3BEventHeader.h"
-#include "R3BTCalPar.h"
+#include "R3BPaddleTamexMappedData.h"
 #include "R3BTCalEngine.h"
+#include "R3BTCalPar.h"
 
-#include "FairRootManager.h"
-#include "FairRuntimeDb.h"
-#include "FairRunIdGenerator.h"
-#include "FairRtdbRun.h"
 #include "FairLogger.h"
+#include "FairRootManager.h"
+#include "FairRtdbRun.h"
+#include "FairRunIdGenerator.h"
+#include "FairRuntimeDb.h"
 
 #include "TClonesArray.h"
-#include "TH1F.h"
 #include "TF1.h"
+#include "TH1F.h"
 
 #include <iostream>
 #include <stdlib.h>
@@ -70,10 +70,10 @@ InitStatus R3BNeulandTcalFill::Init()
         return kFATAL;
     }
     header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
- /*   if (!header)
-    {
-        return kFATAL;
-    }*/
+    /*   if (!header)
+       {
+           return kFATAL;
+       }*/
     fHits = (TClonesArray*)rm->GetObject("NeulandTamexMappedData");
     if (!fHits)
     {
@@ -90,28 +90,27 @@ InitStatus R3BNeulandTcalFill::Init()
 
 void R3BNeulandTcalFill::Exec(Option_t*)
 {
- /*   if (fTrigger >= 0)
-    {
-        if (header->GetTrigger() != fTrigger)
+    /*   if (fTrigger >= 0)
+       {
+           if (header->GetTrigger() != fTrigger)
+           {
+               return;
+           }
+       }*/
+
+    Int_t nHits = fHits->GetEntries();
+    //    LOG(INFO) << "number of hits:" << nHits << "   "  << FairLogger::endl;
+
+    /*
+        if (nHits > (fNofPMTs / 2))
         {
             return;
         }
-    }*/
-
-    Int_t nHits = fHits->GetEntries();
-//    LOG(INFO) << "number of hits:" << nHits << "   "  << FairLogger::endl;
-
-/*
-    if (nHits > (fNofPMTs / 2))
-    {
-        return;
-    }
-*/
+    */
 
     R3BPaddleTamexMappedData* hit;
     Int_t iPlane;
     Int_t iBar;
-    
 
     // Loop over mapped hits
     for (Int_t i = 0; i < nHits; i++)
@@ -124,31 +123,33 @@ void R3BNeulandTcalFill::Exec(Option_t*)
 
         iPlane = hit->GetPlaneId();
         iBar = hit->GetBarId();
-        
-        if (iPlane>fNofPlanes)
+
+        if (iPlane > fNofPlanes)
         {
-            LOG(ERROR) << "R3BNeulandTcalFill::Exec() : more planes then expected! Plane: " << iPlane << FairLogger::endl;
+            LOG(ERROR) << "R3BNeulandTcalFill::Exec() : more planes then expected! Plane: " << iPlane
+                       << FairLogger::endl;
             continue;
         }
-        if (iBar>fNofBars)
+        if (iBar > fNofBars)
         {
             LOG(ERROR) << "R3BNeulandTcalFill::Exec() : more bars then expected! Plane: " << iBar << FairLogger::endl;
             continue;
         }
 
-//        if (hit->Is17())
-//        {
-            // 17-th channel
-//MH            channel = fNofPMTs + hit->GetGtb() * 20 + hit->GetTacAddr();
-//        }
-//        else
-//        {
-            // PMT signal
-            //iSide = hit->GetSide();
-        
-//            LOG(INFO) << "Plane: " << iPlane << " Bar: " << iBar << " Side: " << iSide << " Cal channel: " << channel << "   "  << FairLogger::endl;
-             
-//        }
+        //        if (hit->Is17())
+        //        {
+        // 17-th channel
+        // MH            channel = fNofPMTs + hit->GetGtb() * 20 + hit->GetTacAddr();
+        //        }
+        //        else
+        //        {
+        // PMT signal
+        // iSide = hit->GetSide();
+
+        //            LOG(INFO) << "Plane: " << iPlane << " Bar: " << iBar << " Side: " << iSide << " Cal channel: " <<
+        //            channel << "   "  << FairLogger::endl;
+
+        //        }
 
         // Fill TAC histogram
         fEngine->Fill(iPlane, iBar, 0, hit->GetFineTime1LE());
@@ -156,20 +157,14 @@ void R3BNeulandTcalFill::Exec(Option_t*)
 
         fEngine->Fill(iPlane, iBar, 1, hit->GetFineTime2LE());
         fEngine->Fill(iPlane, iBar, 1 + 2, hit->GetFineTime2TE());
-
     }
 
     // Increment events
     fNEvents += 1;
 }
 
-void R3BNeulandTcalFill::FinishEvent()
-{
-}
+void R3BNeulandTcalFill::FinishEvent() {}
 
-void R3BNeulandTcalFill::FinishTask()
-{
-    fEngine->CalculateParamVFTX();
-}
+void R3BNeulandTcalFill::FinishTask() { fEngine->CalculateParamVFTX(); }
 
 ClassImp(R3BNeulandTcalFill)

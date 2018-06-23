@@ -5,12 +5,13 @@
 #include "TFile.h"
 #include "TH3D.h"
 #include "TTree.h"
+#include <memory>
 
 class R3BNeulandVisualizer
 {
   public:
     R3BNeulandVisualizer(const TString& input_file, const TString& what);
-    virtual ~R3BNeulandVisualizer();
+    virtual ~R3BNeulandVisualizer() = default; // to avoid a ROOT-based (?) warning
 
     inline void ShowEvent(const UInt_t i)
     {
@@ -28,10 +29,10 @@ class R3BNeulandVisualizer
     void Visualize();
 
   private:
-    TFile* fFile;
-    TTree* fTree;
-    TH3D* fh3;
-    TCanvas* fCanvas;
+    std::shared_ptr<TFile> fFile;
+    TTree* fTree; // non-owning
+    TH3D* fh3;    // non-owning
+    std::shared_ptr<TCanvas> fCanvas;
     UInt_t fIndex;
 
     ClassDef(R3BNeulandVisualizer, 0);

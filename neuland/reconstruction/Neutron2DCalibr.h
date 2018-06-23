@@ -1,6 +1,8 @@
 #ifndef NEULANDNEUTRON2DCALIBR
 #define NEULANDNEUTRON2DCALIBR
 
+#include "Filterable.h"
+#include "R3BNeulandCluster.h"
 #include "Rtypes.h"
 #include "TString.h"
 #include <iostream>
@@ -38,16 +40,19 @@ namespace Neuland
         void Print(std::ostream& out = std::cout) const;
         void Draw(const TString& img = "") const;
         void WriteParameterFile(const TString& parFile) const;
+        void AddFilter(const Filterable<R3BNeulandCluster*>::Filter f) { fClusterFilters.Add(f); }
 
       private:
         TCutG* GetCut(const UInt_t nNeutrons, const Double_t k, const Double_t k0, const Double_t m);
         Double_t WastedEfficiency(const Double_t* d);
 
         UInt_t fNMax;
-        std::map<UInt_t, TH2D*> fHists;
+        std::map<UInt_t, TH2D*> fHistsNreac;
+        std::map<UInt_t, TH2D*> fHistsNin;
         std::map<UInt_t, TCutG*> fCuts;
+        Filterable<R3BNeulandCluster*> fClusterFilters;
     };
 
-}; // namespace
+}; // namespace Neuland
 
 #endif // NEULANDNEUTRON2DCALIBR

@@ -44,4 +44,4 @@ namespace
         EXPECT_EQ(par.GetNeutronMultiplicity(14, 14), 2u);
         EXPECT_EQ(par.GetNeutronMultiplicity(19, 19), 3u);
     }
-}
+} // namespace

@@ -1,10 +1,9 @@
 #include "R3BNeulandVisualizer.h"
-
 #include "TF1.h"
 #include "TList.h"
+#include "TPaletteAxis.h"
 #include "TROOT.h"
 #include "TStyle.h"
-
 #include <iostream>
 
 /* This function is required to suppress boxes for empty bins - make them transparent.*/
@@ -18,23 +17,23 @@ static Double_t gEmptyBinSupressor(const Double_t* x, const Double_t*)
 }
 
 R3BNeulandVisualizer::R3BNeulandVisualizer(const TString& inputFileName, const TString& what)
+    : fFile(std::make_shared<TFile>(inputFileName, "read"))
+    , fTree((TTree*)fFile->Get("evt"))
+    , fh3(nullptr)
+    , fCanvas(nullptr)
+    , fIndex(0)
 {
-    fFile = new TFile(inputFileName, "read");
-    fTree = (TTree*)fFile->Get("evt");
-
-    fIndex = 0;
-
-    fh3 = 0;
     fTree->SetBranchAddress(what, &fh3);
 
     gStyle->SetCanvasPreferGL(kTRUE);
-    gStyle->SetOptStat(1111);
-    fCanvas = new TCanvas("canvas", "NeuLAND 3D Event Visualization", 0, 0, 800, 800);
-    fCanvas->Divide(2, 2);
+    gStyle->SetPalette(kViridis);
+    gStyle->SetOptStat(0);
+
+    // Needs to be after setting gStyle
+    fCanvas = std::make_shared<TCanvas>("canvas", "NeuLAND 3D Event Visualization", 0, 0, 800, 800);
+
     Visualize();
 }
-
-R3BNeulandVisualizer::~R3BNeulandVisualizer() {}
 
 void R3BNeulandVisualizer::Visualize()
 {
@@ -49,17 +48,7 @@ void R3BNeulandVisualizer::Visualize()
     TList* const lof = fh3->GetListOfFunctions();
     lof->Add(new TF1("TransferFunction", gEmptyBinSupressor, 0., 1000., 0));
 
-    fCanvas->cd(1);
     fh3->Draw("glcolz");
-
-    fCanvas->cd(2);
-    fh3->ProjectionX()->Draw();
-
-    fCanvas->cd(3);
-    fh3->ProjectionY()->Draw();
-
-    fCanvas->cd(4);
-    fh3->ProjectionZ()->Draw();
 
     fCanvas->Flush();
 }

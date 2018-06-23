@@ -5,6 +5,7 @@ namespace Neuland
     ClusterScoring::ClusterScoring()
         : fMinScore(0.)
         , fMaxN(100)
+        , fPrimaryClusters("NeulandPrimaryClustersMultiple") // Delete Me
     {
     }
 
@@ -12,6 +13,7 @@ namespace Neuland
         : fOps(ops)
         , fMinScore(0.)
         , fMaxN(100)
+        , fPrimaryClusters("NeulandPrimaryClustersMultiple") // Delete Me
     {
     }
 
@@ -41,13 +43,26 @@ namespace Neuland
             return false;
         });
 
+        /*const auto nNeutrons = fPrimaryClusters.Retrieve().size(); // Delete Me
+        for (UInt_t n = 0; n < scoredClusters.size() && n < nNeutrons; n++)
+        {
+            // std::cout << scoredClusters.at(n).score << "\t";
+            if (scoredClusters.at(n).score >= fMinScore)
+            {
+                neutrons.emplace_back(scoredClusters.at(n).cluster->GetT(),
+                                      scoredClusters.at(n).cluster->GetPosition());
+            }
+        }*/
+        // std::cout << std::endl;
+
         for (const auto& sc : scoredClusters)
         {
             if (sc.score >= fMinScore && neutrons.size() < fMaxN)
             {
-                neutrons.emplace_back(sc.cluster->GetT(), sc.cluster->GetPosition());
+                neutrons.emplace_back(*sc.cluster);
             }
         }
+
         return neutrons;
     }
 
@@ -111,10 +126,10 @@ namespace Neuland
             }
 
             const auto en = Neuland::NeutronEnergyFromElasticProtonScattering(sc.cluster);
-            const bool isMatchingToF = std::abs(en - sc.cluster->GetFirstDigi().GetEToF()) < 50.;
+            const bool isMatchingToF = std::abs(en - sc.cluster->GetFirstHit().GetEToF()) < 50.;
             if (isMatchingToF)
             {
-                sc.score += (50. - std::abs(en - sc.cluster->GetFirstDigi().GetEToF())) / 5.;
+                sc.score += (50. - std::abs(en - sc.cluster->GetFirstHit().GetEToF())) / 5.;
             }
         }
     };
@@ -142,7 +157,7 @@ namespace Neuland
         std::for_each(scs.begin(), scs.end(), [](ScoredCluster& sc) {
             if (sc.cluster->GetSize() < 5)
             {
-                sc.score -= 1.;
+                // sc.score -= 1.;
             }
             if (sc.cluster->GetSize() > 5 && sc.cluster->GetSize() < 10)
             {
@@ -164,12 +179,23 @@ namespace Neuland
         for (auto sc : scs)
         {
             if (sc.cluster->GetSize() >= 2 &&
-                (sc.cluster->GetForemostDigi().GetT() - sc.cluster->GetFirstDigi().GetT()) > 0.1)
+                (sc.cluster->GetForemostHit().GetT() - sc.cluster->GetFirstHit().GetT()) > 0.1)
             {
                 queue.emplace_back(sc.cluster, sc.score - 1.);
             }
         }
         scs.insert(scs.end(), queue.begin(), queue.end());
+    };
+
+    const ClusterScoring::Scorer ClusterScoring::scoreFirstCluster = [](ScoredClusters& scs) {
+        auto timewiseFirstCluster =
+            std::min_element(scs.begin(), scs.end(), [](const ScoredCluster& a, const ScoredCluster& b) {
+                return a.cluster->GetT() < b.cluster->GetT();
+            });
+        if (timewiseFirstCluster != scs.end())
+        {
+            timewiseFirstCluster->score += 10;
+        }
     };
 
 } // namespace Neuland

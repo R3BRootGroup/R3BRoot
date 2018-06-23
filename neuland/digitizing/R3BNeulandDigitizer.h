@@ -1,20 +1,13 @@
 #ifndef R3B_NEULAND_DIGITIZER_H
 #define R3B_NEULAND_DIGITIZER_H
 
-#include <functional>
-#include <map>
-#include <vector>
-
-#include "TClonesArray.h"
-
-#include "FairTask.h"
-
-#include "R3BNeulandDigi.h"
-#include "R3BNeulandGeoPar.h"
-#include "R3BNeulandPixel.h"
-#include "R3BNeulandPoint.h"
-
 #include "DigitizingEngine.h"
+#include "FairTask.h"
+#include "Filterable.h"
+#include "R3BNeulandGeoPar.h"
+#include "R3BNeulandHit.h"
+#include "R3BNeulandPoint.h"
+#include "TCAConnector.h"
 
 class TGeoNode;
 class TH1F;
@@ -24,10 +17,10 @@ class TH2F;
  * NeuLAND digitizing finder task
  * @author Jan Mayer
  *
- * For each event, get the R3BNeulandPoints and apply the detector response to create R3BNeulandDigis.
+ * For each event, get the R3BNeulandPoints and apply the detector response to create R3BNeulandHits.
  *   Input:  Branch NeulandPoints = TClonesArray("R3BNeulandPoint")
  *           Stored Neuland Geometry Parameter NeulandGeoPar
- *   Output: Branch NeulandDigis  = TClonesArray("R3BNeulandDigi")
+ *   Output: Branch NeulandHits  = TClonesArray("R3BNeulandDigi")
  *   Additional output: Some control histograms
  *
  */
@@ -35,22 +28,18 @@ class TH2F;
 class R3BNeulandDigitizer : public FairTask
 {
   public:
-    R3BNeulandDigitizer(const TString input = "NeulandPoints",
-                        const TString output = "NeulandDigis",
-                        const TString outputpx = "NeulandPixels");
+    R3BNeulandDigitizer(TString input = "NeulandPoints", TString output = "NeulandHits");
     R3BNeulandDigitizer(Neuland::DigitizingEngine* engine,
-                        const TString input = "NeulandPoints",
-                        const TString output = "NeulandDigis",
-                        const TString outputpx = "NeulandPixels");
+                        TString input = "NeulandPoints",
+                        TString output = "NeulandHits");
 
-    ~R3BNeulandDigitizer() = default;
+    ~R3BNeulandDigitizer() override = default;
 
-  private:
     // No copy and no move is allowed (Rule of three/five)
-    R3BNeulandDigitizer(const R3BNeulandDigitizer&);            // copy constructor
-    R3BNeulandDigitizer(R3BNeulandDigitizer&&);                 // move constructor
-    R3BNeulandDigitizer& operator=(const R3BNeulandDigitizer&); // copy assignment
-    R3BNeulandDigitizer& operator=(R3BNeulandDigitizer&&);      // move assignment
+    R3BNeulandDigitizer(const R3BNeulandDigitizer&) = delete;            // copy constructor
+    R3BNeulandDigitizer(R3BNeulandDigitizer&&) = delete;                 // move constructor
+    R3BNeulandDigitizer& operator=(const R3BNeulandDigitizer&) = delete; // copy assignment
+    R3BNeulandDigitizer& operator=(R3BNeulandDigitizer&&) = delete;      // move assignment
 
   protected:
     InitStatus Init() override;
@@ -59,23 +48,17 @@ class R3BNeulandDigitizer : public FairTask
 
   public:
     void Exec(Option_t*) override;
-    void AddFilter(const std::function<bool(const R3BNeulandDigi*)> f) { fDigiFilters.push_back(f); }
+    void AddFilter(const Filterable<R3BNeulandHit&>::Filter& f) { fHitFilters.Add(f); }
 
   private:
-    std::unique_ptr<Neuland::DigitizingEngine> fDigitizingEngine; // owning (sink)
+    TCAInputConnector<R3BNeulandPoint> fPoints;
+    TCAOutputConnector<R3BNeulandHit> fHits;
 
-    TString fInput;
-    TString fOutput;
-    TString fOutputPx;
+    std::unique_ptr<Neuland::DigitizingEngine> fDigitizingEngine; // owning
 
-    TClonesArray* fNeulandPoints;                 // non-owning
-    std::unique_ptr<TClonesArray> fNeulandDigis;  // owning
-    std::unique_ptr<TClonesArray> fNeulandPixels; // owning
+    Filterable<R3BNeulandHit&> fHitFilters;
 
     R3BNeulandGeoPar* fNeulandGeoPar; // non-owning
-
-    Bool_t IsValid(const R3BNeulandDigi*) const;
-    std::vector<std::function<bool(const R3BNeulandDigi*)>> fDigiFilters;
 
     TH1F* hMultOne;
     TH1F* hMultTwo;

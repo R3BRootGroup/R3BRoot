@@ -1,36 +1,21 @@
-// -----------------------------------------------------------------------
-// -----                    R3BNeulandCalData                        -----
-// -----              Created 22-04-2014 by D.Kresan                 -----
-// -----------------------------------------------------------------------
-
 #ifndef R3BNEULANDCALDATA_H
 #define R3BNEULANDCALDATA_H
 
 #include "TObject.h"
+#include <iostream>
 
 class R3BNeulandCalData : public TObject
 {
   public:
-    R3BNeulandCalData();
+    R3BNeulandCalData() = default;
     R3BNeulandCalData(Int_t barId, Int_t side, Double_t time, Int_t qdc);
-    virtual ~R3BNeulandCalData();
 
-    inline const Int_t& GetBarId() const
-    {
-        return fBarId;
-    }
-    inline const Int_t& GetSide() const
-    {
-        return fSide;
-    }
-    inline const Double_t& GetTime() const
-    {
-        return fTime;
-    }
-    inline const Int_t& GetQdc() const
-    {
-        return fQdc;
-    }
+    Int_t GetBarId() const { return fBarId; }
+    Int_t GetSide() const { return fSide; }
+    Double_t GetTime() const { return fTime; }
+    Int_t GetQdc() const { return fQdc; }
+
+    void Print(const Option_t*) const override;
 
   private:
     Int_t fBarId;
@@ -38,8 +23,9 @@ class R3BNeulandCalData : public TObject
     Double_t fTime;
     Int_t fQdc;
 
-  public:
-    ClassDef(R3BNeulandCalData, 1)
+    ClassDefOverride(R3BNeulandCalData, 1)
 };
 
-#endif
+std::ostream& operator<<(std::ostream&, const R3BNeulandCalData&); // Support easy printing
+
+#endif // R3BNEULANDCALDATA_H

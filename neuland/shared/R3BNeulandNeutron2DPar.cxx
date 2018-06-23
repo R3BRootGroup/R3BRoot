@@ -1,5 +1,4 @@
 #include "R3BNeulandNeutron2DPar.h"
-
 #include "FairParamList.h"
 #include "TObjString.h"
 #include <iostream>

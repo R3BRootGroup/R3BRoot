@@ -4,7 +4,7 @@
 #include "FairRuntimeDb.h"
 #include "R3BMCStack.h"
 #include "R3BNeulandGeoPar.h"
-#include "R3BNeulandPixel.h"
+#include "R3BNeulandNeutron.h"
 #include "R3BNeulandPoint.h"
 #include "TClonesArray.h"
 #include "TGeoBBox.h"
@@ -52,7 +52,7 @@ R3BNeuland::R3BNeuland(const TString& geoFile, const TGeoCombiTrans& combi)
     : R3BDetector("R3BNeuland", kNEULAND, geoFile, combi)
     , fNeulandPoints(new TClonesArray("R3BNeulandPoint"))
     , fNeulandPrimaryNeutronInteractionPoints(new TClonesArray("FairMCPoint"))
-    , fNeulandPrimaryNeutronInteractionPixel(new TClonesArray("R3BNeulandPixel"))
+    , fNeulandPrimaryNeutrons(new TClonesArray("R3BNeulandNeutron"))
 {
 }
 
@@ -78,10 +78,10 @@ R3BNeuland::~R3BNeuland()
         fNeulandPrimaryNeutronInteractionPoints->Delete();
         delete fNeulandPrimaryNeutronInteractionPoints;
     }
-    if (fNeulandPrimaryNeutronInteractionPixel)
+    if (fNeulandPrimaryNeutrons)
     {
-        fNeulandPrimaryNeutronInteractionPixel->Delete();
-        delete fNeulandPrimaryNeutronInteractionPixel;
+        fNeulandPrimaryNeutrons->Delete();
+        delete fNeulandPrimaryNeutrons;
     }
 }
 
@@ -152,7 +152,7 @@ Bool_t R3BNeuland::ProcessHits(FairVolume*)
                                                       fLightYield);
 
         // Increment number of LandPoints for this track
-        R3BStack* stack = (R3BStack*)gMC->GetStack();
+        auto stack = (R3BStack*)gMC->GetStack();
         stack->AddPoint(kNEULAND);
         ResetValues();
     }
@@ -195,8 +195,8 @@ void R3BNeuland::PostTrack()
                                                                                gMC->CurrentEvent());
 
             const TVector3 pixel = fNeulandGeoPar->ConvertGlobalToPixel(pos.Vect());
-            new ((*fNeulandPrimaryNeutronInteractionPixel)[fNeulandPrimaryNeutronInteractionPixel->GetEntries()])
-                R3BNeulandPixel(pixel.X(), pixel.Y(), pixel.Z(), 0, pos.T() * 1.0e09);
+            new ((*fNeulandPrimaryNeutrons)[fNeulandPrimaryNeutrons->GetEntries()])
+                R3BNeulandNeutron(paddleID, pos.T() * 1.0e09, pos.Vect(), pixel);
         }
     }
 }
@@ -226,8 +226,7 @@ void R3BNeuland::Register()
     FairRootManager::Instance()->Register("NeulandPoints", GetName(), fNeulandPoints, kTRUE);
     FairRootManager::Instance()->Register(
         "NeulandPrimaryNeutronInteractionPoints", GetName(), fNeulandPrimaryNeutronInteractionPoints, kTRUE);
-    FairRootManager::Instance()->Register(
-        "NeulandPrimaryNeutronInteractionPixels", GetName(), fNeulandPrimaryNeutronInteractionPixel, kTRUE);
+    FairRootManager::Instance()->Register("NeulandPrimaryNeutrons", GetName(), fNeulandPrimaryNeutrons, kTRUE);
 }
 
 void R3BNeuland::Print(Option_t*) const
@@ -242,7 +241,7 @@ void R3BNeuland::Reset()
 {
     fNeulandPoints->Clear();
     fNeulandPrimaryNeutronInteractionPoints->Clear();
-    fNeulandPrimaryNeutronInteractionPixel->Clear();
+    fNeulandPrimaryNeutrons->Clear();
     ResetValues();
 }
 

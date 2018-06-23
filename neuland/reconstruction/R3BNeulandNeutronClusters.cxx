@@ -1,107 +1,46 @@
 #include "R3BNeulandNeutronClusters.h"
-
+#include "TH1D.h"
 #include <algorithm>
 
-#include "TClonesArray.h"
-#include "TH1D.h"
-
-#include "FairLogger.h"
-#include "FairMCPoint.h"
-#include "FairRootManager.h"
-#include "FairRtdbRun.h"
-#include "FairRuntimeDb.h"
-
-#include "R3BNeulandCluster.h"
-
-R3BNeulandNeutronClusters::R3BNeulandNeutronClusters(const TString input,
-                                                     const TString outputPrimary,
-                                                     const TString outputSecondary,
-                                                     const Double_t maxDist)
+R3BNeulandNeutronClusters::R3BNeulandNeutronClusters(TString input,
+                                                     TString outputPrimary,
+                                                     TString outputSecondary,
+                                                     Double_t maxDist)
     : FairTask("R3B Neuland Neutron Cluster Finder")
-    , fInput(input)
-    , fOutputPrimary(outputPrimary)
-    , fOutputSecondary(outputSecondary)
     , fMaxDist(maxDist)
-    , fPrimaryClusters(new TClonesArray("R3BNeulandCluster"))
-    , fSecondaryClusters(new TClonesArray("R3BNeulandCluster"))
+    , fPrimaryNeutronInteractionPoints("NeulandPrimaryNeutronInteractionPoints")
+    , fClusters(input)
+    , fPrimaryClusters(outputPrimary)
+    , fPrimaryClustersMultiple(outputPrimary + "Multiple")
+    , fPrimaryClustersSO(outputPrimary + "SO")
+    , fPrimaryClustersMO(outputPrimary + "MO")
+    , fSecondaryClusters(outputSecondary)
+    , fhNeutronClusterDistance(new TH1D("fhNeutronClusterDistance", "fhNeutronClusterDistance", 1000, 0, 100))
+    , fhNeutronClusterUsage(new TH1D("fhNeutronClusterUsage", "fhNeutronClusterUsage", 10, 0, 10))
+    , fhUnmatchedClusters(new TH1D("fhUnmatchedClusters", "fhUnmatchedClusters", 10, 0, 10))
 {
 }
 
-R3BNeulandNeutronClusters::~R3BNeulandNeutronClusters() {}
-
 InitStatus R3BNeulandNeutronClusters::Init()
 {
-    FairRootManager* ioman = FairRootManager::Instance();
-    if (!ioman)
-    {
-        LOG(FATAL) << "R3BNeulandNeutronClusters::Init: No FairRootManager" << FairLogger::endl;
-        return kFATAL;
-    }
-
-    // Set Input: TClonesArray of R3BNeulandClusters
-    if ((TClonesArray*)ioman->GetObject(fInput) == nullptr)
-    {
-        LOG(FATAL) << "R3BNeulandNeutronClusters::Init No " << fInput << "!" << FairLogger::endl;
-        return kFATAL;
-    }
-    if (!TString(((TClonesArray*)ioman->GetObject(fInput))->GetClass()->GetName()).EqualTo("R3BNeulandCluster"))
-    {
-        LOG(FATAL) << "R3BNeulandNeutronClusters::Init Branch " << fInput << " does not contain R3BNeulandCluster"
-                   << FairLogger::endl;
-        return kFATAL;
-    }
-    fClustersIn = (TClonesArray*)ioman->GetObject(fInput);
-
-    // Set Input: TClonesArray of FairMCPoints
-    if ((TClonesArray*)ioman->GetObject("NeulandPrimaryNeutronInteractionPoints") == nullptr)
-    {
-        LOG(FATAL) << "R3BNeulandNeutronClusters::Init No NeulandPrimaryNeutronInteractionPoints!" << FairLogger::endl;
-        return kFATAL;
-    }
-    if (!TString(((TClonesArray*)ioman->GetObject("NeulandPrimaryNeutronInteractionPoints"))->GetClass()->GetName())
-             .EqualTo("FairMCPoint"))
-    {
-        LOG(FATAL) << "R3BNeulandNeutronClusters::Init Branch NeulandPrimaryNeutronInteractionPoints does not contain "
-                      "FairMCPoints!"
-                   << FairLogger::endl;
-        return kFATAL;
-    }
-    fPrimaryNeutronInteractionPoints = (TClonesArray*)ioman->GetObject("NeulandPrimaryNeutronInteractionPoints");
-
-    // Set Output: TClonesArray of R3BNeulandClusters
-    ioman->Register(fOutputPrimary, "Cluster closest to NPNIPs", fPrimaryClusters, kTRUE);
-    ioman->Register(fOutputSecondary, "Secondary Clusters", fSecondaryClusters, kTRUE);
-
-    fhNeutronClusterDistance = new TH1D("fhNeutronClusterDistance", "fhNeutronClusterDistance", 1000, 0, 100);
-    fhNeutronClusterUsage = new TH1D("fhNeutronClusterUsage", "fhNeutronClusterUsage", 10, 0, 10);
+    fPrimaryNeutronInteractionPoints.Init();
+    fClusters.Init();
+    fPrimaryClusters.Init();
+    fPrimaryClustersMultiple.Init();
+    fPrimaryClustersSO.Init();
+    fPrimaryClustersMO.Init();
+    fSecondaryClusters.Init();
 
     return kSUCCESS;
 }
 
 void R3BNeulandNeutronClusters::Exec(Option_t*)
 {
-    fPrimaryClusters->Clear();
-    fSecondaryClusters->Clear();
-
-    const Int_t nClustersIn = fClustersIn->GetEntries();
-    std::vector<R3BNeulandCluster*> clustersIn;
-    clustersIn.reserve(nClustersIn);
-    for (Int_t i = 0; i < nClustersIn; i++)
-    {
-        auto c = (R3BNeulandCluster*)(((R3BNeulandCluster*)fClustersIn->At(i))->Clone());
-        clustersIn.push_back(std::move(c));
-    }
-
-    const Int_t nNPNIPS = fPrimaryNeutronInteractionPoints->GetEntries();
-    std::vector<FairMCPoint*> npnips;
-    npnips.reserve(nNPNIPS);
-    for (Int_t i = 0; i < nNPNIPS; i++)
-    {
-        npnips.push_back(((FairMCPoint*)fPrimaryNeutronInteractionPoints->At(i)));
-    }
+    const auto clusters = fClusters.Retrieve();
+    const auto npnips = fPrimaryNeutronInteractionPoints.Retrieve();
 
     std::map<const R3BNeulandCluster*, int> marks;
-    for (const auto& cluster : clustersIn)
+    for (const auto& cluster : clusters)
     {
         marks[cluster] = 0;
     }
@@ -110,40 +49,83 @@ void R3BNeulandNeutronClusters::Exec(Option_t*)
     for (const FairMCPoint* npnip : npnips)
     {
         npnip->Position(npnippos);
+
+        // Search for the cluster with the smallest distance to the PNIP
         auto min = std::min_element(
-            clustersIn.begin(), clustersIn.end(), [&](const R3BNeulandCluster* a, const R3BNeulandCluster* b) {
-                return (a->GetFirstDigi().GetPosition() - npnippos).Mag() <
-                       (b->GetFirstDigi().GetPosition() - npnippos).Mag();
+            clusters.begin(), clusters.end(), [&](const R3BNeulandCluster* a, const R3BNeulandCluster* b) {
+                return (a->GetPosition() - npnippos).Mag() < (b->GetPosition() - npnippos).Mag();
             });
-        if (min != clustersIn.end())
+        if (min != clusters.end())
         {
-            const Double_t minDist = ((*min)->GetFirstDigi().GetPosition() - npnippos).Mag();
+            const Double_t minDist = ((*min)->GetPosition() - npnippos).Mag();
             fhNeutronClusterDistance->Fill(minDist);
             if (minDist < fMaxDist)
             {
-                new ((*fPrimaryClusters)[fPrimaryClusters->GetEntries()]) R3BNeulandCluster(**min);
-                // Removal here means considering each cluster can only be used once,
-                // but as there can be multiple PNIP in one cluster, do it differently
-                // clustersIn.erase(min);
+                // Cluster for this PNIP found
                 marks.at(*min)++;
+                fhUnmatchedClusters->Fill(0);
+            }
+            else
+            {
+                // Cluster is too far away
+                fhUnmatchedClusters->Fill(1);
             }
         }
+        else
+        {
+            // No clusters in event ;-(
+            fhUnmatchedClusters->Fill(2);
+        }
     }
+
+    std::vector<R3BNeulandCluster> primaryClusters;
+    std::vector<R3BNeulandCluster> primaryClustersMultiple;
+    std::vector<R3BNeulandCluster> primaryClustersSO;
+    std::vector<R3BNeulandCluster> primaryClustersMO;
+    std::vector<R3BNeulandCluster> secondaryClusters;
 
     for (const auto& cb : marks)
     {
         fhNeutronClusterUsage->Fill(cb.second);
+
         if (cb.second == 0)
         {
-            new ((*fSecondaryClusters)[fSecondaryClusters->GetEntries()]) R3BNeulandCluster(*(cb.first));
+            // It is not a primary cluster
+            secondaryClusters.emplace_back(*cb.first);
+        }
+        else
+        {
+            // It corresponds to one or more primary clusters
+            primaryClusters.emplace_back(*cb.first);
+
+            for (int i = 0; i < cb.second; i++)
+            {
+                primaryClustersMultiple.emplace_back(*cb.first);
+            }
+
+            if (cb.second > 1)
+            {
+                primaryClustersMO.emplace_back(*cb.first);
+            }
+            else
+            {
+                primaryClustersSO.emplace_back(*cb.first);
+            }
         }
     }
+
+    fPrimaryClusters.Store(primaryClusters);
+    fPrimaryClustersMultiple.Store(primaryClustersMultiple);
+    fPrimaryClustersSO.Store(primaryClustersSO);
+    fPrimaryClustersMO.Store(primaryClustersMO);
+    fSecondaryClusters.Store(secondaryClusters);
 }
 
 void R3BNeulandNeutronClusters::Finish()
 {
     fhNeutronClusterDistance->Write();
     fhNeutronClusterUsage->Write();
+    fhUnmatchedClusters->Write();
 }
 
 ClassImp(R3BNeulandNeutronClusters)

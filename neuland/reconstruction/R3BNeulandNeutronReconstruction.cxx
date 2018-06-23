@@ -1,12 +1,9 @@
 #include "R3BNeulandNeutronReconstruction.h"
-
 #include "FairLogger.h"
-#include "ReconstructionOperation.h"
-#include <exception>
 
 R3BNeulandNeutronReconstruction::R3BNeulandNeutronReconstruction(Neuland::ReconstructionEngine* engine,
-                                                                 const TString input,
-                                                                 const TString output)
+                                                                 TString input,
+                                                                 TString output)
     : FairTask("R3B Neuland Neutron Reconstruction")
     , fEngine(engine)
     , fClusters(input)
@@ -17,17 +14,9 @@ R3BNeulandNeutronReconstruction::R3BNeulandNeutronReconstruction(Neuland::Recons
 
 InitStatus R3BNeulandNeutronReconstruction::Init()
 {
-    try
-    {
-        fEngine->Init();
-        fClusters.Init();
-        fNeutrons.Init();
-    }
-    catch (const std::exception& e)
-    {
-        LOG(FATAL) << "R3BNeulandNeutronReconstruction" << e.what() << FairLogger::endl;
-    }
-
+    fEngine->Init();
+    fClusters.Init();
+    fNeutrons.Init();
     return kSUCCESS;
 }
 

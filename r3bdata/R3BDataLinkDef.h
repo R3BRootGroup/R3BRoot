@@ -66,8 +66,7 @@
 #pragma link C++ class R3BPspDigi+;
 #pragma link C++ class R3BNeulandMappedData+;
 #pragma link C++ class R3BNeulandPoint+;
-#pragma link C++ class R3BNeulandDigi+;
-#pragma link C++ class R3BNeulandPixel+;
+#pragma link C++ class R3BNeulandHit+;
 #pragma link C++ class R3BNeulandCluster+;
 #pragma link C++ class R3BNeulandNeutron+;
 #pragma link C++ class R3BPspxMappedData+;

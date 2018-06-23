@@ -1,35 +1,33 @@
 #include "R3BNeulandClusterMon.h"
-
-#include <algorithm>
-#include <iostream>
-#include <numeric>
-
+#include "ElasticScattering.h"
+#include "FairLogger.h"
+#include "FairRootManager.h"
+#include "R3BNeulandCluster.h"
 #include "TClonesArray.h"
 #include "TDirectory.h"
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TH3D.h"
-
-#include "FairLogger.h"
-#include "FairRootManager.h"
-
-#include "ElasticScattering.h"
-#include "R3BNeulandCluster.h"
+#include <algorithm>
+#include <iostream>
+#include <numeric>
+#include <utility>
 
 constexpr double rad2deg = 180. / 3.141592653589793238463;
 
 inline Double_t GetTheta(const R3BNeulandCluster* cluster)
 {
-    const auto direction = cluster->GetLastDigi().GetPosition() - cluster->GetFirstDigi().GetPosition();
+    const auto direction = cluster->GetLastHit().GetPosition() - cluster->GetFirstHit().GetPosition();
     const auto x = std::acos(direction.Y() / direction.Mag()) * rad2deg;
     // Not sure, but Kondos Theta is -90:90
     return x - 90.;
 }
 
-R3BNeulandClusterMon::R3BNeulandClusterMon(const TString input, const TString output, const Option_t* option)
+R3BNeulandClusterMon::R3BNeulandClusterMon(TString input, TString output, const Option_t* option)
     : FairTask("R3B NeuLAND NeulandCluster Monitor")
-    , fInput(input)
-    , fOutput(output)
+    , fNeulandClusters(input)
+    , fOutput(std::move(output))
+    , fBeta(0.793) // 600 Mev?
 {
     LOG(INFO) << "Using R3B NeuLAND NeulandCluster Monitor" << FairLogger::endl;
 
@@ -47,30 +45,16 @@ R3BNeulandClusterMon::R3BNeulandClusterMon(const TString input, const TString ou
     }
 }
 
-R3BNeulandClusterMon::~R3BNeulandClusterMon() {}
-
 InitStatus R3BNeulandClusterMon::Init()
 {
+    fNeulandClusters.Init();
+
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
     {
         LOG(FATAL) << "R3BNeulandClusterMon::Init: No FairRootManager" << FairLogger::endl;
         return kFATAL;
     }
-
-    // Set Input: TClonesArray of R3BNeulandClusters
-    if ((TClonesArray*)ioman->GetObject(fInput) == nullptr)
-    {
-        LOG(FATAL) << "R3BNeulandClusterMon::Init No NeulandClusters!" << FairLogger::endl;
-        return kFATAL;
-    }
-    if (!TString(((TClonesArray*)ioman->GetObject(fInput))->GetClass()->GetName()).EqualTo("R3BNeulandCluster"))
-    {
-        LOG(FATAL) << "R3BNeulandClusterMon::Init Branch " << fInput << " does not contain R3BNeulandClusters!"
-                   << FairLogger::endl;
-        return kFATAL;
-    }
-    fNeulandClusters = (TClonesArray*)ioman->GetObject(fInput);
 
     if (fIs3DTrackEnabled)
     {
@@ -93,6 +77,7 @@ InitStatus R3BNeulandClusterMon::Init()
         new TH2D("ClusterEnergyVSSize", "Energy for each Cluster vs Cluster Size", 2000, 0., 2000., 100, 0., 100.);
     fhClusterTime = new TH1D("ClusterTime", "Time for each Cluster", 5000, 0., 500.);
     fhClusterEToF = new TH1D("ClusterEToF", "Cluster EToF", 2000, 0, 2000);
+    fhClusterRValue = new TH1D("ClusterRValue", "Log Cluster R Value", 20000, -10, 1);
 
     fhClusterSizeVSEToF =
         new TH2D("ClusterSizeVSEToF", "Number of Digis for each Cluster vs EToF", 100, 0, 100, 2000, 0, 2000);
@@ -109,6 +94,8 @@ InitStatus R3BNeulandClusterMon::Init()
                                            1200,
                                            0,
                                            1200.);
+
+    fhENFromScatterVSEToF = new TH2D("ENFromScatterVSEToF", "ENFromScatterVSEToF", 1000, 0, 1000, 1000, 0, 1000);
 
     fhClusterNumberVSEnergy =
         new TH2D("ClusterNumberEtot", "Number of Clusters vs. Total Energy", 200, 0, 2000, 50, 0, 50);
@@ -127,6 +114,9 @@ InitStatus R3BNeulandClusterMon::Init()
     fhClusterEVSTime = new TH2D("ClusterEVSTime", "Cluster E vs. Cluster Time", 250, 0, 250, 500, 0, 250);
     fhClusterEVSTime->GetXaxis()->SetTitle("Cluster E [MeV]");
     fhClusterEVSTime->GetYaxis()->SetTitle("Cluster t [ns]");
+
+    fhClusterLastMinusFirstDigiMagVSEnergy = new TH2D(
+        "ClusterLastMinusFirstDigiMagVSEnergy", "ClusterLastMinusFirstDigiMagVSEnergy", 101, 0, 100, 60, 0, 600);
 
     fhClusterForemostMinusCentroidVSEnergy =
         new TH2D("ClusterForemostMinusCentroidVSEnergy",
@@ -236,37 +226,35 @@ InitStatus R3BNeulandClusterMon::Init()
     fhThetaEDigi = new TH2D("fhThetaEDigi", "fhThetaEDigi", 1000, -500, 500, 400, 0, 400);
     fhThetaEDigiCosTheta = new TH2D("fhThetaEDigiCosTheta", "fhThetaEDigiCosTheta", 1000, -500, 500, 400, 0, 400);
 
+    hT = new TH1D("hT", "Cluster Digi Delta T", 3000, 0., 15.);
+    hTNeigh = new TH1D("hTNeigh", "Cluster Digi Neigh Delta T", 3000, 0., 15.);
+
     return kSUCCESS;
 }
 
 void R3BNeulandClusterMon::Exec(Option_t*)
 {
-    const UInt_t nClusters = fNeulandClusters->GetEntries();
+    auto clusters = fNeulandClusters.Retrieve();
+    clusters.erase(
+        std::remove_if(
+            clusters.begin(), clusters.end(), [&](R3BNeulandCluster* c) { return !(fClusterFilters.IsValid(c)); }),
+        clusters.end());
+
+    const auto nClusters = clusters.size();
 
     if (fIs3DTrackEnabled)
     {
         fh3->Reset("ICES");
-        for (UInt_t i = 0; i < nClusters; i++)
+        for (const auto& cluster : clusters)
         {
-            const R3BNeulandCluster* cluster = (R3BNeulandCluster*)fNeulandClusters->At(i);
-            const auto start = cluster->GetFirstDigi().GetPosition();
+            const auto start = cluster->GetFirstHit().GetPosition();
             // XYZ -> ZXY (side view)
             fh3->Fill(start.Z(), start.X(), start.Y(), cluster->GetE());
         }
     }
 
-    std::vector<R3BNeulandCluster*> clusters;
-    clusters.reserve(nClusters);
-    Double_t etot = 0.;
-    for (UInt_t i = 0; i < nClusters; i++)
-    {
-        const auto cluster = (R3BNeulandCluster*)fNeulandClusters->At(i);
-        etot += cluster->GetE();
-        if (fClusterFilters.IsValid(cluster))
-        {
-            clusters.push_back(cluster);
-        }
-    }
+    const Double_t etot = std::accumulate(
+        clusters.begin(), clusters.end(), 0., [](Double_t sum, const R3BNeulandCluster* c) { return sum + c->GetE(); });
 
     fhClusterNumberVSEnergy->Fill(etot, nClusters);
 
@@ -276,52 +264,59 @@ void R3BNeulandClusterMon::Exec(Option_t*)
         fhClusterTime->Fill(cluster->GetT());
         fhClusterSize->Fill(cluster->GetSize());
         fhClusterEnergy->Fill(cluster->GetE());
+        fhClusterRValue->Fill(std::log10(cluster->GetRCluster(fBeta)));
         fhClusterEnergyVSSize->Fill(cluster->GetE(), cluster->GetSize());
-        fhClusterEToF->Fill(cluster->GetFirstDigi().GetEToF());
-        fhClusterEToFVSEnergy->Fill(cluster->GetFirstDigi().GetEToF(), cluster->GetE());
-        fhClusterEToFVSTime->Fill(cluster->GetFirstDigi().GetEToF(), cluster->GetT());
-        fhClusterEVSTime->Fill(cluster->GetFirstDigi().GetE(), cluster->GetT());
+        fhClusterEToF->Fill(cluster->GetFirstHit().GetEToF());
+        fhClusterEToFVSEnergy->Fill(cluster->GetFirstHit().GetEToF(), cluster->GetE());
+        fhClusterEToFVSTime->Fill(cluster->GetFirstHit().GetEToF(), cluster->GetT());
+        fhClusterEVSTime->Fill(cluster->GetFirstHit().GetE(), cluster->GetT());
 
-        fhClusterEnergyVSEToF->Fill(cluster->GetE(), cluster->GetFirstDigi().GetEToF());
-        fhClusterSizeVSEToF->Fill(cluster->GetSize(), cluster->GetFirstDigi().GetEToF());
-        fhClusterEnergyVSSizeVSEToF->Fill(cluster->GetE(), cluster->GetSize(), cluster->GetFirstDigi().GetEToF());
+        fhClusterEnergyVSEToF->Fill(cluster->GetE(), cluster->GetFirstHit().GetEToF());
+        fhClusterSizeVSEToF->Fill(cluster->GetSize(), cluster->GetFirstHit().GetEToF());
+        fhClusterEnergyVSSizeVSEToF->Fill(cluster->GetE(), cluster->GetSize(), cluster->GetFirstHit().GetEToF());
+        if (cluster->GetSize() > 2)
+        {
+            fhClusterForemostMinusCentroidVSEnergy->Fill(
+                (cluster->GetForemostHit().GetPosition() - cluster->GetEnergyCentroid()).Mag(), cluster->GetE());
 
-        fhClusterForemostMinusCentroidVSEnergy->Fill(
-            (cluster->GetForemostDigi().GetPosition() - cluster->GetEnergyCentroid()).Mag(), cluster->GetE());
+            fhClusterForemostMinusMaxEnergyDigiPosVSEnergy->Fill(
+                (cluster->GetForemostHit().GetPosition() - cluster->GetMaxEnergyHit().GetPosition()).Mag(),
+                cluster->GetE());
 
-        fhClusterForemostMinusMaxEnergyDigiPosVSEnergy->Fill(
-            (cluster->GetForemostDigi().GetPosition() - cluster->GetMaxEnergyDigi().GetPosition()).Mag(),
-            cluster->GetE());
+            fhClusterCentroidMinusFirstDigiPosVSEnergy->Fill(
+                (cluster->GetEnergyCentroid() - cluster->GetFirstHit().GetPosition()).Mag(), cluster->GetE());
 
-        fhClusterCentroidMinusFirstDigiPosVSEnergy->Fill(
-            (cluster->GetEnergyCentroid() - cluster->GetFirstDigi().GetPosition()).Mag(), cluster->GetE());
+            fhClusterMaxEnergyDigiMinusFirstDigiPosVSEnergy->Fill(
+                (cluster->GetMaxEnergyHit().GetPosition() - cluster->GetFirstHit().GetPosition()).Mag(),
+                cluster->GetE());
+            fhClusterMaxEnergyDigiMinusCentroidVSEnergy->Fill(
+                (cluster->GetMaxEnergyHit().GetPosition() - cluster->GetEnergyCentroid()).Mag(), cluster->GetE());
+            fhClusterEnergyMomentVSEnergy->Fill(cluster->GetEnergyMoment(), cluster->GetE());
+            fhClusterEnergyMomentVSClusterSize->Fill(cluster->GetEnergyMoment(), cluster->GetSize());
 
-        fhClusterMaxEnergyDigiMinusFirstDigiPosVSEnergy->Fill(
-            (cluster->GetMaxEnergyDigi().GetPosition() - cluster->GetFirstDigi().GetPosition()).Mag(), cluster->GetE());
-        fhClusterMaxEnergyDigiMinusCentroidVSEnergy->Fill(
-            (cluster->GetMaxEnergyDigi().GetPosition() - cluster->GetEnergyCentroid()).Mag(), cluster->GetE());
-        fhClusterEnergyMomentVSEnergy->Fill(cluster->GetEnergyMoment(), cluster->GetE());
-        fhClusterEnergyMomentVSClusterSize->Fill(cluster->GetEnergyMoment(), cluster->GetSize());
+            fhClusterLastMinusFirstDigiMagVSEnergy->Fill(
+                (cluster->GetLastHit().GetPosition() - cluster->GetFirstHit().GetPosition()).Mag(), cluster->GetE());
 
-        fhClusterEnergyMoment->Fill(cluster->GetEnergyMoment());
-        fhClusterMaxEnergyDigiMinusFirstDigiMag->Fill(
-            (cluster->GetMaxEnergyDigi().GetPosition() - cluster->GetFirstDigi().GetPosition()).Mag());
+            fhClusterEnergyMoment->Fill(cluster->GetEnergyMoment());
+            fhClusterMaxEnergyDigiMinusFirstDigiMag->Fill(
+                (cluster->GetMaxEnergyHit().GetPosition() - cluster->GetFirstHit().GetPosition()).Mag());
+        }
 
-        fhZ->Fill(cluster->GetFirstDigi().GetPosition().Z());
-        fhZVSEToF->Fill(cluster->GetFirstDigi().GetPosition().Z(), cluster->GetEToF());
-        fhDistFromCenter->Fill(std::sqrt(std::pow(cluster->GetFirstDigi().GetPosition().X(), 2) +
-                                         std::pow(cluster->GetFirstDigi().GetPosition().Y(), 2)));
-        fhDistFromCenterVSEToF->Fill(std::sqrt(std::pow(cluster->GetFirstDigi().GetPosition().X(), 2) +
-                                               std::pow(cluster->GetFirstDigi().GetPosition().Y(), 2)),
+        fhZ->Fill(cluster->GetFirstHit().GetPosition().Z());
+        fhZVSEToF->Fill(cluster->GetFirstHit().GetPosition().Z(), cluster->GetEToF());
+        fhDistFromCenter->Fill(std::sqrt(std::pow(cluster->GetFirstHit().GetPosition().X(), 2) +
+                                         std::pow(cluster->GetFirstHit().GetPosition().Y(), 2)));
+        fhDistFromCenterVSEToF->Fill(std::sqrt(std::pow(cluster->GetFirstHit().GetPosition().X(), 2) +
+                                               std::pow(cluster->GetFirstHit().GetPosition().Y(), 2)),
                                      cluster->GetEToF());
-        fhDeltaT->Fill(cluster->GetLastDigi().GetT() - cluster->GetFirstDigi().GetT());
+        fhDeltaT->Fill(cluster->GetLastHit().GetT() - cluster->GetFirstHit().GetT());
 
-        fhForemostMinusFirstDigiTime->Fill(cluster->GetForemostDigi().GetT() - cluster->GetFirstDigi().GetT());
+        fhForemostMinusFirstDigiTime->Fill(cluster->GetForemostHit().GetT() - cluster->GetFirstHit().GetT());
 
         if (cluster->GetSize() > 4)
         {
             const auto theta = GetTheta(cluster);
-            for (const auto& digi : cluster->GetDigis())
+            for (const auto& digi : cluster->GetHits())
             {
                 fhThetaEDigi->Fill(theta, digi.GetE());
                 fhThetaEDigiCosTheta->Fill(theta, digi.GetE() * std::cos(theta / rad2deg));
@@ -337,6 +332,8 @@ void R3BNeulandClusterMon::Exec(Option_t*)
     {
         if (cluster->GetSize() >= 3)
         {
+            fhENFromScatterVSEToF->Fill(Neuland::NeutronEnergyFromElasticProtonScattering(cluster), cluster->GetEToF());
+
             fhClusterEnergyVSScatteredRecoilAngle->Fill(cluster->GetE(),
                                                         std::acos(Neuland::RecoilScatteringAngle(cluster)));
         }
@@ -353,9 +350,9 @@ void R3BNeulandClusterMon::Exec(Option_t*)
             fhScatteredNEnergyVSEdep->Fill(Neuland::ScatteredNeutronEnergy(*ita, *itb), (*ita)->GetE());
 
             const Double_t EelasticHeavy = Neuland::NeutronEnergyFromElasticScattering(*ita, *itb, 11000);
-            fhEToFVSEelastic->Fill((*ita)->GetFirstDigi().GetEToF(), EelasticHeavy);
+            fhEToFVSEelastic->Fill((*ita)->GetFirstHit().GetEToF(), EelasticHeavy);
             // const Double_t EelasticProton = Neuland::NeutronEnergyFromElasticScattering(*ita, *itb, 1000);
-            // fhEToFVSEelastic->Fill((*ita)->GetFirstDigi().GetEToF(), EelasticProton);
+            // fhEToFVSEelastic->Fill((*ita)->GetFirstHit().GetEToF(), EelasticProton);
 
             if (Neuland::ScatteredNeutronEnergy(*ita, *itb) > 10.)
             {
@@ -370,8 +367,26 @@ void R3BNeulandClusterMon::Exec(Option_t*)
                     fhSumAngleVSRatioErecoEtof->Fill(
                         std::acos(Neuland::ScatteredNeutronAngle(*ita, *itb)) +
                             std::acos(Neuland::RecoilScatteringAngle(*ita)),
-                        Neuland::NeutronEnergyFromElasticProtonScattering(*ita) / (*ita)->GetFirstDigi().GetEToF());
+                        Neuland::NeutronEnergyFromElasticProtonScattering(*ita) / (*ita)->GetFirstHit().GetEToF());
                 }
+            }
+        }
+    }
+
+    for (const auto& cluster : clusters)
+    {
+        const auto& digis = cluster->GetHits();
+        for (auto it1 = digis.begin(); it1 != digis.end(); it1++)
+        {
+            for (auto it2 = it1 + 1; it2 != digis.end(); it2++)
+            {
+                if (std::abs(it1->GetPosition().X() - it2->GetPosition().X()) < 7.5 &&
+                    std::abs(it1->GetPosition().Y() - it2->GetPosition().Y()) < 7.5 &&
+                    std::abs(it1->GetPosition().Z() - it2->GetPosition().Z()) < 7.5)
+                {
+                    hTNeigh->Fill(std::abs(it1->GetT() - it2->GetT()));
+                }
+                hT->Fill(std::abs(it1->GetT() - it2->GetT()));
             }
         }
     }
@@ -389,6 +404,7 @@ void R3BNeulandClusterMon::Finish()
     fhClusterSize->Write();
     fhClusterEnergyVSSize->Write();
     fhClusterEnergy->Write();
+    fhClusterRValue->Write();
     fhClusterTime->Write();
     fhClusterNumberVSEnergy->Write();
     fhClusterEToF->Write();
@@ -398,7 +414,7 @@ void R3BNeulandClusterMon::Finish()
 
     fhClusterSizeVSEToF->Write();
     fhClusterEnergyVSEToF->Write();
-    fhClusterEnergyVSSizeVSEToF->Write();
+    // fhClusterEnergyVSSizeVSEToF->Write();
 
     fhClusterForemostMinusCentroidVSEnergy->Write();
     fhClusterForemostMinusMaxEnergyDigiPosVSEnergy->Write();
@@ -410,6 +426,9 @@ void R3BNeulandClusterMon::Finish()
     fhClusterEVSTime->Write();
     fhClusterEnergyMoment->Write();
     fhClusterMaxEnergyDigiMinusFirstDigiMag->Write();
+    fhClusterLastMinusFirstDigiMagVSEnergy->Write();
+
+    fhENFromScatterVSEToF->Write();
 
     fhEToFVSEelastic->Write();
     fhScatteredNEnergyVSAngle->Write();
@@ -428,6 +447,9 @@ void R3BNeulandClusterMon::Finish()
 
     fhThetaEDigi->Write();
     fhThetaEDigiCosTheta->Write();
+
+    hT->Write();
+    hTNeigh->Write();
 
     gDirectory = tmp;
 }

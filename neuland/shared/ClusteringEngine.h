@@ -75,6 +75,6 @@ namespace Neuland
         }
     };
 
-}; // namespace
+}; // namespace Neuland
 
 #endif // NEULANDCLUSTERINGENGINEH

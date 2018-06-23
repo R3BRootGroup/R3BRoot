@@ -79,7 +79,7 @@ class R3BNeuland : public R3BDetector
   private:
     TClonesArray* fNeulandPoints;                          //!
     TClonesArray* fNeulandPrimaryNeutronInteractionPoints; //!
-    TClonesArray* fNeulandPrimaryNeutronInteractionPixel;  //!
+    TClonesArray* fNeulandPrimaryNeutrons;                 //!
 
     R3BNeulandGeoPar* fNeulandGeoPar; //!
 

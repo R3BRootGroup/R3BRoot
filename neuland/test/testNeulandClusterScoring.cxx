@@ -10,7 +10,7 @@ namespace
       protected:
         void SetUp() override
         {
-            auto cluster = new R3BNeulandCluster{ R3BNeulandDigi{} };
+            auto cluster = new R3BNeulandCluster{ R3BNeulandHit{} };
             clusters_.push_back(cluster);
         }
 
@@ -55,4 +55,4 @@ namespace
         auto neutrons = rs.GetNeutrons(clusters_);
         EXPECT_EQ(neutrons.size(), 1u);
     }
-}
+} // namespace

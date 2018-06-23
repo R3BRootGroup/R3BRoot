@@ -15,11 +15,11 @@ class Filterable
 
   public:
     Filterable() = default;
-    Filterable(const std::vector<Filter>& vf)
+    explicit Filterable(const std::vector<Filter>& vf)
         : filters(vf)
     {
     }
-    inline void Add(const Filter f) { filters.push_back(f); }
+    inline void Add(const Filter& f) { filters.push_back(f); }
     inline bool IsValid(const T t) const
     {
         for (const auto& filter : filters)

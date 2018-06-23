@@ -14,9 +14,9 @@
 #include "FairTask.h"
 #include "Filterable.h"
 #include "R3BNeulandCluster.h"
+#include "TCAConnector.h"
 #include <vector>
 
-class TClonesArray;
 class TH1D;
 class TH2D;
 class TH3D;
@@ -24,19 +24,17 @@ class TH3D;
 class R3BNeulandClusterMon : public FairTask
 {
   public:
-    R3BNeulandClusterMon(const TString input = "NeulandClusters",
-                         const TString output = "NeulandClusterMon",
+    R3BNeulandClusterMon(TString input = "NeulandClusters",
+                         TString output = "NeulandClusterMon",
                          const Option_t* option = "");
-    ~R3BNeulandClusterMon();
 
-    void AddFilter(const Filterable<R3BNeulandCluster*>::Filter f) { fClusterFilters.Add(f); }
+    ~R3BNeulandClusterMon() override = default;
 
-  private:
     // No copy and no move is allowed (Rule of three/five)
-    R3BNeulandClusterMon(const R3BNeulandClusterMon&);            // copy constructor
-    R3BNeulandClusterMon(R3BNeulandClusterMon&&);                 // move constructor
-    R3BNeulandClusterMon& operator=(const R3BNeulandClusterMon&); // copy assignment
-    R3BNeulandClusterMon& operator=(R3BNeulandClusterMon&&);      // move assignment
+    R3BNeulandClusterMon(const R3BNeulandClusterMon&) = delete;            // copy constructor
+    R3BNeulandClusterMon(R3BNeulandClusterMon&&) = delete;                 // move constructor
+    R3BNeulandClusterMon& operator=(const R3BNeulandClusterMon&) = delete; // copy assignment
+    R3BNeulandClusterMon& operator=(R3BNeulandClusterMon&&) = delete;      // move assignment
 
   protected:
     InitStatus Init() override;
@@ -44,12 +42,14 @@ class R3BNeulandClusterMon : public FairTask
 
   public:
     void Exec(Option_t*) override;
+    void SetBeta(double b) { fBeta = b; }
+    void AddFilter(const Filterable<R3BNeulandCluster*>::Filter& f) { fClusterFilters.Add(f); }
 
   private:
-    TString fInput;
+    TCAInputConnector<R3BNeulandCluster> fNeulandClusters;
     TString fOutput;
 
-    TClonesArray* fNeulandClusters; // non-owning
+    double fBeta; // just for ClusterRValue
 
     Bool_t fIs3DTrackEnabled;
     TH3D* fh3;
@@ -57,6 +57,7 @@ class R3BNeulandClusterMon : public FairTask
     TH1D* fhClusters;
     TH1D* fhClusterSize;
     TH1D* fhClusterEnergy;
+    TH1D* fhClusterRValue;
     TH2D* fhClusterEnergyVSSize;
     TH1D* fhClusterEToF;
     TH1D* fhClusterTime;
@@ -81,6 +82,9 @@ class R3BNeulandClusterMon : public FairTask
     TH2D* fhClusterEnergyMomentVSClusterSize;
     TH1D* fhClusterEnergyMoment;
     TH1D* fhClusterMaxEnergyDigiMinusFirstDigiMag;
+    TH2D* fhClusterLastMinusFirstDigiMagVSEnergy;
+
+    TH2D* fhENFromScatterVSEToF;
 
     TH2D* fhEToFVSEelastic;
     TH2D* fhScatteredNEnergyVSAngle;
@@ -99,6 +103,9 @@ class R3BNeulandClusterMon : public FairTask
 
     TH2D* fhThetaEDigi;
     TH2D* fhThetaEDigiCosTheta;
+
+    TH1D* hT;
+    TH1D* hTNeigh;
 
     Filterable<R3BNeulandCluster*> fClusterFilters;
 

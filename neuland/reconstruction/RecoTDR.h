@@ -29,6 +29,6 @@ namespace Neuland
         Double_t fBetaBeam;
         Double_t fClusterMinE;
     };
-}
+} // namespace Neuland
 
 #endif // NEULAND_RECOTDR_H

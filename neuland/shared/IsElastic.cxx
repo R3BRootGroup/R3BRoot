@@ -43,7 +43,7 @@ bool Neuland::IsElastic(const R3BNeulandCluster* cl1, const R3BNeulandCluster* c
     // TVector3 pos1;
     // TVector3 pos2;
 
-    const TVector3 pos1 = c1->GetFirstDigi().GetPosition();
+    const TVector3 pos1 = c1->GetFirstHit().GetPosition();
 
     //    incoming particle
     // vector from previous interaction to present interaction
@@ -52,7 +52,7 @@ bool Neuland::IsElastic(const R3BNeulandCluster* cl1, const R3BNeulandCluster* c
     Double_t v1z = pos1.Z() - z0;
     // time difference and distance between previous interaction to present
     // interaction
-    Double_t dt = c1->GetFirstDigi().GetT() - t0;
+    Double_t dt = c1->GetFirstHit().GetT() - t0;
     Double_t dr = sqrt(v1x * v1x + v1y * v1y + v1z * v1z);
 
     Double_t beta1 = dr / dt / c;
@@ -77,7 +77,7 @@ bool Neuland::IsElastic(const R3BNeulandCluster* cl1, const R3BNeulandCluster* c
     Double_t K1max = En1max - amu;
 
     // particle 4 is proton
-    const TVector3 pos2 = c1->GetLastDigi().GetPosition();
+    const TVector3 pos2 = c1->GetLastHit().GetPosition();
     Double_t v4x = (pos2 - pos1).X();
     Double_t v4y = (pos2 - pos1).Y();
     Double_t v4z = (pos2 - pos1).Z();
@@ -87,7 +87,7 @@ bool Neuland::IsElastic(const R3BNeulandCluster* cl1, const R3BNeulandCluster* c
     Double_t v5z = v1x * v4y - v1y * v4x;
 
     Double_t tempAngle;
-    dt = c1->GetLastDigi().GetT() - c1->GetFirstDigi().GetT();
+    dt = c1->GetLastHit().GetT() - c1->GetFirstHit().GetT();
     dr = sqrt(v4x * v4x + v4y * v4y + v4z * v4z);
 
     Double_t theta4Measured = acos((v1x * v4x + v1y * v4y + v1z * v4z) / sqrt(v1x * v1x + v1y * v1y + v1z * v1z) /
@@ -144,7 +144,7 @@ bool Neuland::IsElastic(const R3BNeulandCluster* cl1, const R3BNeulandCluster* c
         theta4Measuredmax = 1.55;
 
     // calculate velocity of neutron after scattering
-    const TVector3 pos3 = c2->GetFirstDigi().GetPosition();
+    const TVector3 pos3 = c2->GetFirstHit().GetPosition();
     Double_t v3x = (pos3 - pos1).X();
     Double_t v3y = (pos3 - pos1).Y();
     Double_t v3z = (pos3 - pos1).Z();
@@ -209,7 +209,7 @@ bool Neuland::IsElastic(const R3BNeulandCluster* cl1, const R3BNeulandCluster* c
     if (theta3max > 1.55)
         theta3max = 1.55;
 
-    dt = c2->GetLastDigi().GetT() - c2->GetFirstDigi().GetT();
+    dt = c2->GetLastHit().GetT() - c2->GetFirstHit().GetT();
     dr = sqrt(v3x * v3x + v3y * v3y + v3z * v3z);
 
     Double_t beta3 = dr / dt / c;

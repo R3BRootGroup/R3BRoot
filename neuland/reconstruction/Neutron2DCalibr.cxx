@@ -1,8 +1,12 @@
 #include "Neutron2DCalibr.h"
-
+#include "FairMCPoint.h"
+#include "FairParRootFileIo.h"
+#include "FairRuntimeDb.h"
 #include "Math/Factory.h"
 #include "Math/Functor.h"
 #include "Math/Minimizer.h"
+#include "R3BMCTrack.h"
+#include "R3BNeulandNeutron2DPar.h"
 #include "TBranch.h"
 #include "TCanvas.h"
 #include "TClonesArray.h"
@@ -13,13 +17,63 @@
 #include "TStyle.h"
 #include "TTree.h"
 
-#include "FairParRootFileIo.h"
-#include "FairRuntimeDb.h"
+unsigned int GetNin(const TClonesArray* tracks)
+{
+    unsigned int n = 0;
 
-#include "R3BNeulandCluster.h"
-#include "R3BNeulandNeutron2DPar.h"
+    const Int_t nTracks = tracks->GetEntries();
+    for (Int_t i = 0; i < nTracks; i++)
+    {
+        auto track = (R3BMCTrack*)tracks->At(i);
+        if (track->GetMotherId() == -1 && track->GetPdgCode() == 2112)
+        {
+            n++;
+        }
+    }
+    return n;
+}
 
-#include "FairMCPoint.h"
+TH2D* GetOrBuildHist(std::map<UInt_t, TH2D*>& map, const unsigned int i, const TString& name, const TString& title)
+{
+    if (map.find(i) == map.end())
+    {
+        map[i] = new TH2D(name + TString::UItoa(i, 10), TString::UItoa(i, 10) + title, 300, 0, 3000, 50, 0, 50);
+        map.at(i)->GetXaxis()->SetTitle("Total Energy [MeV]");
+        map.at(i)->GetYaxis()->SetTitle("Number of Clusters");
+    }
+    return map.at(i);
+}
+
+void DoPrint(std::ostream& out, const std::map<UInt_t, TH2D*>& map, const std::map<UInt_t, TCutG*>& cuts)
+{
+    out << "\t";
+    for (const auto& nh : map)
+    {
+        out << nh.first << "n\t";
+    }
+    out << "Purity";
+    out << std::endl;
+
+    for (const auto& nc : cuts)
+    {
+        const UInt_t nOut = nc.first;
+        const TCutG* cut = nc.second;
+
+        out << nOut << "n:\t";
+
+        Double_t sum = 0.;
+        for (const auto& nh : map)
+        {
+            sum += ((Double_t)cut->IntegralHist(nh.second) / (Double_t)nh.second->GetEntries());
+            out << ((Double_t)cut->IntegralHist(nh.second) / (Double_t)nh.second->GetEntries()) << "\t";
+        }
+        if (map.find(nOut) != map.end())
+        {
+            out << (Double_t)cut->IntegralHist(map.at(nOut)) / (Double_t)(map.at(nOut)->GetEntries()) / sum;
+        }
+        out << std::endl;
+    }
+}
 
 namespace Neuland
 {
@@ -30,37 +84,28 @@ namespace Neuland
 
     void Neutron2DCalibr::AddClusterFile(const TString& filename)
     {
-        TFile* file = new TFile(filename, "READ");
-        TTree* tree = (TTree*)file->Get("evt");
+        auto file = new TFile(filename, "READ");
+        auto tree = (TTree*)file->Get("evt");
         tree->AddFriend("evt2=evt", TString(filename).ReplaceAll(".digi.root", ".simu.root"));
 
         TBranch* branch = tree->GetBranch("NeulandClusters");
-        TClonesArray* clusters = new TClonesArray("R3BNeulandCluster");
+        auto clusters = new TClonesArray("R3BNeulandCluster");
         branch->SetAddress(&clusters);
 
         TBranch* branch2 = tree->GetBranch("NeulandPrimaryNeutronInteractionPoints");
-        TClonesArray* npnips = new TClonesArray("FairMCPoint");
+        auto npnips = new TClonesArray("FairMCPoint");
         branch2->SetAddress(&npnips);
+
+        TBranch* branch3 = tree->GetBranch("MCTrack");
+        auto tracks = new TClonesArray("R3BMCTrack");
+        branch3->SetAddress(&tracks);
 
         const Int_t nEntries = tree->GetEntries();
         for (Int_t ei = 0; ei < nEntries; ei++)
         {
             branch->GetEntry(ei);
             branch2->GetEntry(ei);
-
-            const UInt_t nNPNIPs = npnips->GetEntries();
-            if (nNPNIPs == 0 || nNPNIPs > fNMax)
-            {
-                continue;
-            }
-
-            if (fHists.find(nNPNIPs) == fHists.end())
-            {
-                fHists[nNPNIPs] = new TH2D(
-                    TString::UItoa(nNPNIPs, 10), TString::UItoa(nNPNIPs, 10) + "n reacted", 30, 0, 2000, 30, 0, 30);
-                fHists.at(nNPNIPs)->GetXaxis()->SetTitle("Total Energy [MeV]");
-                fHists.at(nNPNIPs)->GetYaxis()->SetTitle("Number of Clusters");
-            }
+            branch3->GetEntry(ei);
 
             Double_t Etot = 0.;
             Int_t validClusters = 0;
@@ -68,25 +113,28 @@ namespace Neuland
 
             for (Int_t ci = 0; ci < nClusters; ci++)
             {
-                R3BNeulandCluster* cluster = (R3BNeulandCluster*)clusters->At(ci);
-                if (cluster->GetE() > 0.)
+                auto cluster = (R3BNeulandCluster*)clusters->At(ci);
+                Etot += cluster->GetE();
+                if (fClusterFilters.IsValid(cluster))
                 {
-                    Etot += cluster->GetE();
                     validClusters++;
                 }
             }
 
-            if (Etot > 0)
+            const unsigned int nNPNIPs = npnips->GetEntries();
+            if (nNPNIPs <= fNMax)
             {
-                fHists[nNPNIPs]->Fill(Etot, validClusters);
+                auto h = GetOrBuildHist(fHistsNreac, nNPNIPs, "hEC", "n reacted");
+                h->Fill(Etot, validClusters);
             }
-            else
+
+            const unsigned int nNin = GetNin(tracks);
+            if (nNin <= fNMax)
             {
-                fHists[nNPNIPs]->Fill(0., 0.);
+                auto h = GetOrBuildHist(fHistsNin, nNin, "hNin", "n incoming");
+                h->Fill(Etot, validClusters);
             }
         }
-
-        // Some delete action here
     }
 
     void Neutron2DCalibr::Optimize(std::vector<Double_t> slope,
@@ -156,7 +204,7 @@ namespace Neuland
         GetCut(0, k, k0, m);
 
         Double_t wasted_efficiency = 0;
-        for (auto& nh : fHists)
+        for (auto& nh : fHistsNreac)
         {
             const UInt_t nNeutrons = nh.first;
             wasted_efficiency += 1. - ((Double_t)GetCut(nNeutrons, k, k0, m)->IntegralHist(nh.second) /
@@ -178,18 +226,36 @@ namespace Neuland
                              114. / 255., 112. / 255., 96. / 255., 30. / 255. };
         TColor::CreateGradientColorTable(9, stops, red, green, blue, 255, 1);
 
-        TCanvas* c = new TCanvas("Neutron2DCalibr", "Neuland Neutron2D Calibr", 1000, fHists.size() / 2 * 500);
-        c->Divide(2, fHists.size() / 2);
+        auto c = new TCanvas("Neutron2DCalibr", "Neuland Neutron2D Calibr", 500 * fNMax, 500);
+        c->Divide(fNMax, 1);
 
-        for (auto& nh : fHists)
+        for (auto& nh : fHistsNreac)
         {
             if (nh.first == 0)
             {
                 continue;
             }
             c->cd(nh.first);
-            nh.second->GetZaxis()->SetRangeUser(0, 500);
-            nh.second->Draw("colz");
+
+            gPad->SetTopMargin(0.03);
+            gPad->SetBottomMargin(0.15);
+            gPad->SetLeftMargin(0.06);
+            gPad->SetRightMargin(0.13);
+
+            auto hist = nh.second;
+            hist->SetLineWidth(1);
+            hist->SetTitle("");
+            hist->SetXTitle("");
+            hist->GetXaxis()->SetRangeUser(0, 2500);
+            hist->SetYTitle("");
+            hist->GetXaxis()->SetLabelFont(134);
+            hist->GetYaxis()->SetLabelFont(134);
+            hist->GetZaxis()->SetLabelFont(134);
+            hist->GetXaxis()->SetLabelSize(25);
+            hist->GetYaxis()->SetLabelSize(25);
+            hist->GetZaxis()->SetLabelSize(25);
+
+            hist->Draw("colz");
             fCuts.at(nh.first)->Draw("same");
         }
 
@@ -203,33 +269,13 @@ namespace Neuland
 
     void Neutron2DCalibr::Print(std::ostream& out) const
     {
-        out << "\t";
-        for (const auto& nh : fHists)
-        {
-            out << nh.first << "n\t";
-        }
-        out << "Purity";
+        out << "REAC" << std::endl;
+        DoPrint(out, fHistsNreac, fCuts);
         out << std::endl;
 
-        for (const auto& nc : fCuts)
-        {
-            const UInt_t nOut = nc.first;
-            const TCutG* cut = nc.second;
-
-            out << nOut << "n:\t";
-
-            Double_t sum = 0.;
-            for (const auto& nh : fHists)
-            {
-                sum += ((Double_t)cut->IntegralHist(nh.second) / (Double_t)nh.second->GetEntries());
-                out << ((Double_t)cut->IntegralHist(nh.second) / (Double_t)nh.second->GetEntries()) << "\t";
-            }
-            if (fHists.find(nOut) != fHists.end())
-            {
-                out << (Double_t)cut->IntegralHist(fHists.at(nOut)) / (Double_t)(fHists.at(nOut)->GetEntries()) / sum;
-            }
-            out << std::endl;
-        }
+        out << "IN" << std::endl;
+        DoPrint(out, fHistsNin, fCuts);
+        out << std::endl;
     }
 
     void Neutron2DCalibr::WriteParameterFile(const TString& parFile) const
@@ -249,5 +295,15 @@ namespace Neuland
 
         rtdb->saveOutput();
         rtdb->print();
+
+        for (auto& nh : fHistsNreac)
+        {
+            nh.second->Write();
+        }
+
+        for (auto& nh : fHistsNin)
+        {
+            nh.second->Write();
+        }
     }
-}; // namespace
+}; // namespace Neuland

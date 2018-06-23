@@ -6,13 +6,15 @@
 #include "R3BNeulandNeutron.h"
 #include "TCAConnector.h"
 #include "TH1D.h"
+#include <iostream>
 
 class R3BNeulandNeutronReconstructionStatistics : public FairTask
 {
   public:
     R3BNeulandNeutronReconstructionStatistics(const TString primary = "NeulandNeutronClusters",
                                               const TString secondary = "NeulandPrimaryClusters",
-                                              const TString predicted = "NeulandSecondaryClusters");
+                                              const TString predicted = "NeulandSecondaryClusters",
+                                              std::ostream& out = std::cout);
     ~R3BNeulandNeutronReconstructionStatistics() override = default;
 
     // No copy and no move is allowed (Rule of three/five)
@@ -36,11 +38,17 @@ class R3BNeulandNeutronReconstructionStatistics : public FairTask
     TCAInputConnector<R3BNeulandCluster> fSecondaryClusters;
     TCAInputConnector<R3BNeulandNeutron> fPredictedNeutrons;
     TString fPredictedName;
-    TH1D* fTP;
-    TH1D* fFP;
-    TH1D* fFN;
-    TH1D* fTN;
-    TH1D* fF1;
+    TH1D* fhTP;
+    TH1D* fhFP;
+    TH1D* fhFN;
+    TH1D* fhTN;
+    TH1D* fhF1;
+    int fTP;
+    int fFP;
+    int fFN;
+    int fTN;
+    std::ostream& fOut;
+    std::vector<int> fMult;
 
   public:
     ClassDefOverride(R3BNeulandNeutronReconstructionStatistics, 0);

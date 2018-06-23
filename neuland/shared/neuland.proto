@@ -1,32 +1,35 @@
 syntax = "proto2";
 package Neuland;
 
+message Vector {
+    optional float x = 1;
+    optional float y = 2;
+    optional float z = 3;
+}
+
 message Pixel {
-	optional int32 x = 1;
-	optional int32 y = 2;
-	optional int32 z = 3;
-	optional float e = 4;
-	optional float t = 5;
+    optional int32 x = 1;
+    optional int32 y = 2;
+    optional int32 z = 3;
 }
 
-message Neutron {
-	optional int32 x = 1;
-	optional int32 y = 2;
-	optional int32 z = 3;
-	optional float t = 4;
+message Hit {
+    optional int32 id   = 1;
+    optional float e    = 2;
+    optional float t    = 3;
+    optional Vector pos = 4;
+    optional Pixel px   = 5;
 }
 
-message Digi {
-	optional int32 id = 1;
-	optional float tl = 2;
-	optional float tr = 3;
-	optional float e = 4;
+message Cluster {
+    repeated Hit hits = 1;
+    optional Vector energyCentroid = 2;
+    optional int32 primaryInteractions = 3;
 }
 
 message Event {
-	optional int32 runID = 1;
-	optional int32 eventID = 2;
-	repeated Pixel pixels = 3;
-	repeated Neutron neutrons = 4;
-	repeated Digi digis = 5;
+    optional int32 runID = 1;
+    optional int32 eventID = 2;
+    repeated Hit neutrons = 3;
+    repeated Cluster clusters = 4;
 }

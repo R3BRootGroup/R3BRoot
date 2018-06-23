@@ -4,6 +4,7 @@
 #include "ElasticScattering.h"
 #include "IsElastic.h"
 #include "ReconstructionEngine.h"
+#include <TCAConnector.h> // Delete me
 #include <algorithm>
 #include <functional>
 #include <memory>
@@ -48,11 +49,16 @@ namespace Neuland
         static const Scorer scoreElasticSecondaryInterations;
         static const Scorer scoreClusterSize;
         static const Scorer handleMultiHitClusters;
+        static const Scorer scoreFirstCluster;
+
+        void Init() override { fPrimaryClusters.Init(); } // Delete Me
 
       private:
         std::vector<Scorer> fOps;
         Double_t fMinScore;
         UInt_t fMaxN;
+
+        TCAInputConnector<R3BNeulandCluster> fPrimaryClusters; // Delete Me
     };
 } // namespace Neuland
 

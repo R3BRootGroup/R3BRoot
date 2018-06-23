@@ -17,6 +17,6 @@ namespace Neuland
                                     const R3BNeulandCluster* second,
                                     const Double_t targetMass);
     Double_t ElasticScatteringTargetMass(const R3BNeulandCluster* first, const R3BNeulandCluster* second);
-} // namespace
+} // namespace Neuland
 
 #endif // NEULAND_ELASTICPROTONENERGY

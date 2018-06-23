@@ -14,7 +14,7 @@ R3BNeulandClusterFinder::R3BNeulandClusterFinder(const Double_t dx,
     , fDigis(input)
     , fClusters(output)
 {
-    fClusteringEngine.SetClusteringCondition([=](const R3BNeulandDigi& a, const R3BNeulandDigi& b) {
+    fClusteringEngine.SetClusteringCondition([=](const R3BNeulandHit& a, const R3BNeulandHit& b) {
         return std::abs(a.GetPosition().X() - b.GetPosition().X()) < dx &&
                std::abs(a.GetPosition().Y() - b.GetPosition().Y()) < dy &&
                std::abs(a.GetPosition().Z() - b.GetPosition().Z()) < dz && std::abs(a.GetT() - b.GetT()) < dt;
@@ -23,15 +23,8 @@ R3BNeulandClusterFinder::R3BNeulandClusterFinder(const Double_t dx,
 
 InitStatus R3BNeulandClusterFinder::Init()
 {
-    try
-    {
-        fDigis.Init();
-        fClusters.Init();
-    }
-    catch (const std::exception& e)
-    {
-        LOG(FATAL) << "R3BNeulandClusterFinder: " << e.what() << FairLogger::endl;
-    }
+    fDigis.Init();
+    fClusters.Init();
     return kSUCCESS;
 }
 
@@ -49,7 +42,7 @@ void R3BNeulandClusterFinder::Exec(Option_t*)
     std::vector<R3BNeulandCluster> clusters;
     clusters.reserve(nClusters);
     std::transform(
-        clusteredDigis.begin(), clusteredDigis.end(), std::back_inserter(clusters), [](std::vector<R3BNeulandDigi>& v) {
+        clusteredDigis.begin(), clusteredDigis.end(), std::back_inserter(clusters), [](std::vector<R3BNeulandHit>& v) {
             return R3BNeulandCluster(std::move(v));
         });
     fClusters.Store(clusters);

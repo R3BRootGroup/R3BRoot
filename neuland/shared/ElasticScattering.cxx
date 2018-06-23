@@ -2,8 +2,8 @@
 #include "TVector3.h"
 #include <cmath>
 
-using std::sqrt;
 using std::pow;
+using std::sqrt;
 
 namespace Neuland
 {
@@ -19,8 +19,8 @@ namespace Neuland
 
     Double_t RecoilScatteringAngle(const R3BNeulandCluster* cluster)
     {
-        const TVector3 pNUnit = cluster->GetFirstDigi().GetPosition().Unit();
-        const TVector3 pp_Unit = (cluster->GetEnergyCentroid() - cluster->GetFirstDigi().GetPosition()).Unit();
+        const TVector3 pNUnit = cluster->GetFirstHit().GetPosition().Unit();
+        const TVector3 pp_Unit = (cluster->GetEnergyCentroid() - cluster->GetFirstHit().GetPosition()).Unit();
         const Double_t cosTheta = pNUnit.Dot(pp_Unit);
         return cosTheta;
     }
@@ -28,12 +28,12 @@ namespace Neuland
     Double_t ScatteredNeutronEnergy(const R3BNeulandCluster* first, const R3BNeulandCluster* second)
     {
         const Double_t E0n = 938.; // Rest Mass Neutron [MeV]
-        const TVector3 pN_ = second->GetFirstDigi().GetPosition() - first->GetFirstDigi().GetPosition();
+        const TVector3 pN_ = second->GetFirstHit().GetPosition() - first->GetFirstHit().GetPosition();
         const Double_t t = second->GetT() - first->GetT();
 
         const Double_t v2 = pN_.Mag2() / std::pow(t, 2); // cm²/ns²
         const Double_t c2 = 898.75517873681758374;       // cm²/ns²
-        if (v2 > c2 || v2 > first->GetFirstDigi().GetPosition().Mag2() / std::pow(first->GetT(), 2))
+        if (v2 > c2 || v2 > first->GetFirstHit().GetPosition().Mag2() / std::pow(first->GetT(), 2))
         {
             return 0;
         }
@@ -45,8 +45,8 @@ namespace Neuland
 
     Double_t ScatteredNeutronAngle(const R3BNeulandCluster* first, const R3BNeulandCluster* second)
     {
-        const TVector3 pNUnit = first->GetFirstDigi().GetPosition().Unit();
-        const TVector3 pN_Unit = (second->GetFirstDigi().GetPosition() - first->GetFirstDigi().GetPosition()).Unit();
+        const TVector3 pNUnit = first->GetFirstHit().GetPosition().Unit();
+        const TVector3 pN_Unit = (second->GetFirstHit().GetPosition() - first->GetFirstHit().GetPosition()).Unit();
         const Double_t cosTheta = pNUnit.Dot(pN_Unit); // \cos(\theta_{NN'})
         return cosTheta;
     }
@@ -123,7 +123,7 @@ namespace Neuland
         const Double_t E0n = 938.;
         const Double_t E0k = targetMass;
 
-        const Double_t En = first->GetFirstDigi().GetEToF() + E0n;
+        const Double_t En = first->GetFirstHit().GetEToF() + E0n;
         const Double_t En_ = ScatteredNeutronEnergy(first, second) + E0n;
         const Double_t Ek_ = first->GetE() + targetMass;
         const Double_t cosTheta = ScatteredNeutronAngle(first, second);
@@ -137,7 +137,7 @@ namespace Neuland
     {
         const Double_t E0n = 938.;
 
-        const Double_t En = first->GetFirstDigi().GetEToF() + E0n;
+        const Double_t En = first->GetFirstHit().GetEToF() + E0n;
         const Double_t En_ = ScatteredNeutronEnergy(first, second) + E0n;
         const Double_t Ek_kin = first->GetE();
         const Double_t cosTheta = ScatteredNeutronAngle(first, second);
@@ -148,4 +148,4 @@ namespace Neuland
 
         return E0k;
     }
-}
+} // namespace Neuland

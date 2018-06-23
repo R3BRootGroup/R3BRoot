@@ -5,7 +5,7 @@ using namespace std;
 TVector3 R3BNeulandPoint::GetMomentum() const
 {
     TVector3 v;
-    //Momentum(v); // TODO: #fairroot: FairMCPoint not const
+    // Momentum(v); // TODO: #fairroot: FairMCPoint not const
     v.SetXYZ(fPx, fPy, fPz);
     return v;
 }

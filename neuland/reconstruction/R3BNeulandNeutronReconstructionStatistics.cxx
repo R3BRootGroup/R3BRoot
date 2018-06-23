@@ -1,5 +1,7 @@
 #include "R3BNeulandNeutronReconstructionStatistics.h"
 #include "FairLogger.h"
+#include <iostream>
+#include <numeric>
 
 template <class T>
 typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type almost_equal(T x, T y, int ulp)
@@ -13,15 +15,22 @@ typename std::enable_if<!std::numeric_limits<T>::is_integer, bool>::type almost_
 
 R3BNeulandNeutronReconstructionStatistics::R3BNeulandNeutronReconstructionStatistics(const TString primary,
                                                                                      const TString secondary,
-                                                                                     const TString predicted)
+                                                                                     const TString predicted,
+                                                                                     std::ostream& out)
     : fPrimaryClusters(primary)
     , fSecondaryClusters(secondary)
     , fPredictedNeutrons(predicted)
     , fPredictedName(predicted)
-    , fTP(nullptr)
-    , fFP(nullptr)
-    , fFN(nullptr)
-    , fTN(nullptr)
+    , fhTP(nullptr)
+    , fhFP(nullptr)
+    , fhFN(nullptr)
+    , fhTN(nullptr)
+    , fTP(0)
+    , fFP(0)
+    , fFN(0)
+    , fTN(0)
+    , fOut(out)
+    , fMult(100)
 {
 }
 
@@ -39,11 +48,11 @@ InitStatus R3BNeulandNeutronReconstructionStatistics::Init()
     }
 
     TH1::AddDirectory(kFALSE);
-    fTP = new TH1D("fTP", "True Positive", 10, 0., 10.);
-    fFN = new TH1D("fFN", "False Negative", 10, 0., 10.);
-    fFP = new TH1D("fFP", "False Positive", 10, 0., 10.);
-    fTN = new TH1D("fTN", "True Negative", 30, 0., 30.);
-    fF1 = new TH1D("fF1", "F1 Value", 11, 0., 1.1);
+    fhTP = new TH1D("fhTP", "True Positive", 10, 0., 10.);
+    fhFN = new TH1D("fhFN", "False Negative", 10, 0., 10.);
+    fhFP = new TH1D("fhFP", "False Positive", 10, 0., 10.);
+    fhTN = new TH1D("fhTN", "True Negative", 30, 0., 30.);
+    fhF1 = new TH1D("fhF1", "F1 Value", 11, 0., 1.1);
 
     return kSUCCESS;
 }
@@ -60,6 +69,8 @@ void R3BNeulandNeutronReconstructionStatistics::Exec(Option_t*)
                almost_equal(c->GetPosition().Z(), n->GetPosition().Z(), 2);
     };
 
+    fMult[predictedPositive.size()]++;
+
     double truePositives = 0.;
     for (const auto& c : actualPositive)
     {
@@ -73,8 +84,10 @@ void R3BNeulandNeutronReconstructionStatistics::Exec(Option_t*)
         }
     }
     const double falseNegatives = (double)actualPositive.size() - truePositives;
-    fTP->Fill(truePositives);
-    fFN->Fill(falseNegatives);
+    fTP += truePositives;
+    fhTP->Fill(truePositives);
+    fFN += falseNegatives;
+    fhFN->Fill(falseNegatives);
 
     double falsePositives = 0.;
     for (const auto& c : actualNegative)
@@ -89,8 +102,10 @@ void R3BNeulandNeutronReconstructionStatistics::Exec(Option_t*)
         }
     }
     const double trueNegatives = (double)actualNegative.size() - falsePositives;
-    fFP->Fill(falsePositives);
-    fTN->Fill(trueNegatives);
+    fFP += falsePositives;
+    fhFP->Fill(falsePositives);
+    fTN += trueNegatives;
+    fhTN->Fill(trueNegatives);
 
     const double precision = truePositives / (truePositives + falsePositives);
     const double recall = truePositives / (truePositives + falseNegatives);
@@ -100,7 +115,7 @@ void R3BNeulandNeutronReconstructionStatistics::Exec(Option_t*)
             return 0.;
         return (1. + beta * beta) * (precision * recall) / ((beta * beta * precision) + recall);
     };
-    fF1->Fill(Fbeta(1.));
+    fhF1->Fill(Fbeta(1.));
 }
 
 void R3BNeulandNeutronReconstructionStatistics::Finish()
@@ -111,26 +126,39 @@ void R3BNeulandNeutronReconstructionStatistics::Finish()
     gDirectory->mkdir(fPredictedName + "Statistics");
     gDirectory->cd(fPredictedName + "Statistics");
 
-    fTP->Write();
-    fFN->Write();
-    fFP->Write();
-    fTN->Write();
-    fF1->Write();
+    fhTP->Write();
+    fhFN->Write();
+    fhFP->Write();
+    fhTN->Write();
+    fhF1->Write();
 
     gDirectory = tmp;
 
-    /*const double precision = (double)fTP / ((double)fTP + (double)fFP);
+    const double precision = (double)fTP / ((double)fTP + (double)fFP);
     const double recall = (double)fTP / ((double)fTP + (double)fFN);
     auto Fbeta = [&](double beta) {
         return (1. + beta * beta) * (precision * recall) / ((beta * beta * precision) + recall);
     };
+    const double accuracy = (double)(fTP + fTN) / (double)(fTP + fTN + fFP + fFN);
 
-    std::cout << fPredictedName << "\tTruePositive\t" << fTP << "\n"
-              << fPredictedName << "\tFalsePositive\t" << fFP << "\n"
-              << fPredictedName << "\tFalseNegative\t" << fFN << "\n"
-              << fPredictedName << "\tTrueNegative\t" << fTN << "\n"
-              << fPredictedName << "\tPrecision\t" << precision << "\n"
-              << fPredictedName << "\tRecall\t" << recall << "\n"
-              << fPredictedName << "\tF1\t" << Fbeta(1.) << "\n"
-              << std::endl;*/
+    fOut << "PREC DATA"
+         << "\n";
+    fOut << fPredictedName << "\tTruePositive \t" << fTP << "\t" << (double)fTP / ((double)fTP + (double)fFN) << "\n"
+         << fPredictedName << "\tFalsePositive\t" << fFP << "\t" << (double)fFP / ((double)fTN + (double)fFP) << "\n"
+         << fPredictedName << "\tFalseNegative\t" << fFN << "\t" << (double)fFN / ((double)fTP + (double)fFN) << "\n"
+         << fPredictedName << "\tTrueNegative \t" << fTN << "\t" << (double)fTN / ((double)fTN + (double)fFP) << "\n"
+         << fPredictedName << "\tAccuracy\t" << accuracy << "\n"
+         << fPredictedName << "\tPrecision\t" << precision << "\n"
+         << fPredictedName << "\tSensitivity\t" << recall << "\n"
+         << fPredictedName << "\tF1\t" << Fbeta(1.) << "\n"
+         << "\n";
+
+    fOut << "MULT DATA"
+         << "\n";
+    const int sum = std::accumulate(fMult.begin(), fMult.end(), 0);
+    for (unsigned int i = 0; i < fMult.size(); i++)
+    {
+        fOut << i << "\t" << fMult[i] << "\t" << (double)fMult[i] / (double)sum << "\n";
+    }
+    fOut << "END" << std::endl;
 }

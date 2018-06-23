@@ -5,6 +5,27 @@ static const Double_t massNeutron = 939.565379;   // MeV/c²
 static const Double_t c = 29.9792458;             // cm/ns
 static const Double_t c2 = 898.75517873681758374; // cm²/ns²
 
+R3BNeulandNeutron::R3BNeulandNeutron(Int_t paddle, Double_t time, const TVector3& pos, const TVector3& pix)
+    : fPaddle(paddle)
+    , fT(time)
+    , fPosition(pos)
+    , fPixel(pix)
+{
+}
+
+R3BNeulandNeutron::R3BNeulandNeutron(const R3BNeulandHit& hit)
+    : fPaddle(hit.GetPaddle())
+    , fT(hit.GetT())
+    , fPosition(hit.GetPosition())
+    , fPixel(hit.GetPixel())
+{
+}
+
+R3BNeulandNeutron::R3BNeulandNeutron(const R3BNeulandCluster& cluster)
+    : R3BNeulandNeutron(cluster.GetFirstHit())
+{
+}
+
 Double_t R3BNeulandNeutron::GetGamma() const
 {
     const Double_t v2 = GetPosition().Mag2() / std::pow(GetT(), 2); // cm²/ns²
