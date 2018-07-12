@@ -97,6 +97,7 @@ ext_h101_raw_nnp_tamex.h
 ext_h101_strawtubes.h
 ext_h101_star.h
 ext_h101_fibfour.h
+ext_h101_sst.h
 )
 
 # fill list of header files from list of source files

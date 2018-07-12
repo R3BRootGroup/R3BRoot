@@ -11,19 +11,18 @@
 #include "R3BAmsMappedData.h"
 #include "ext_data_struct_info.hh"
 
-/*FIXME
+
 extern "C" {
 #include "ext_data_client.h"
-#include "ext_h101_ams.h"
-}*/
-
+#include "ext_h101_sst.h"
+}
+/*
 extern "C" {
 #include "ext_data_client.h"
 #include "ext_h101_raw_califa_febex.h"
 }
-
-//R3BAmsReader::R3BAmsReader(EXT_STR_h101_AMS* data,
-R3BAmsReader::R3BAmsReader(EXT_STR_h101_CALIFA* data,
+*/
+R3BAmsReader::R3BAmsReader(EXT_STR_h101_SST* data,
     UInt_t offset)
 	: R3BReader("R3BAmsReader"),
   fNEvent(0),
@@ -49,11 +48,11 @@ R3BAmsReader::~R3BAmsReader() {
 Bool_t R3BAmsReader::Init(ext_data_struct_info *a_struct_info) {
 	int ok;
 
-	//EXT_STR_h101_AMS_ITEMS_INFO(ok, *a_struct_info, fOffset, FIXME
-	  //  EXT_STR_h101_AMS, 0);
+	EXT_STR_h101_SST_ITEMS_INFO(ok, *a_struct_info, fOffset,
+	    EXT_STR_h101_SST, 0);
 
-	EXT_STR_h101_CALIFA_ITEMS_INFO(ok, *a_struct_info, fOffset,
-	    EXT_STR_h101_CALIFA, 0);
+	//EXT_STR_h101_CALIFA_ITEMS_INFO(ok, *a_struct_info, fOffset,
+	  //  EXT_STR_h101_CALIFA, 0);
 
 	if (!ok) {
 		perror("ext_data_struct_info_item");
@@ -69,11 +68,11 @@ Bool_t R3BAmsReader::Init(ext_data_struct_info *a_struct_info) {
 }
 
 Bool_t R3BAmsReader::Read() {
- // EXT_STR_h101_AMS_onion_t *data =FIXME
-//	    (EXT_STR_h101_AMS_onion_t *) fData;
+  EXT_STR_h101_SST_onion_t *data =
+	    (EXT_STR_h101_SST_onion_t *) fData;
 
-  EXT_STR_h101_CALIFA_onion_t *data =
-	    (EXT_STR_h101_CALIFA_onion_t *) fData;
+//  EXT_STR_h101_CALIFA_onion_t *data =
+//	    (EXT_STR_h101_CALIFA_onion_t *) fData;
 
 	/* Display data */
 	fLogger->Debug(MESSAGE_ORIGIN, "R3BAmsReader::Read() Event data");

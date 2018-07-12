@@ -45,4 +45,5 @@
 #pragma link C++ class EXT_STR_h101_raw_nnp_tamex_onion_t;
 #pragma link C++ class EXT_STR_h101_STAR_onion_t;
 #pragma link C++ class EXT_STR_h101_FIBFOUR_onion_t;
+#pragma link C++ class EXT_STR_h101_SST_onion_t;
 #endif

@@ -9,7 +9,7 @@
 
 typedef struct EXT_STR_h101_t {//FIXME for ams
   EXT_STR_h101_unpack_t unpack;
-  EXT_STR_h101_CALIFA_t califa;
+  EXT_STR_h101_SST_t sst;
 } EXT_STR_h101;
 
 void unpack_gsi2018_ams_mapped() {
@@ -21,13 +21,13 @@ void unpack_gsi2018_ams_mapped() {
   
   /* Create source using ucesb for input ------------------ */
   
-  TString filename = "~/lmd/data_0003.lmd";
+  TString filename = "~/lmd/ams.lmd";
   TString outputFileName = "data_0001.root";
   
   TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
   TString ucesb_dir = getenv("UCESB_DIR");
   
-  TString ucesb_path = ucesb_dir + "/../upexps/califaKrakow17/califa";//FIXME
+  TString ucesb_path = ucesb_dir + "/../upexps/201810_s444/201810_s444";//FIXME
   
   EXT_STR_h101 ucesb_struct;
   
@@ -37,13 +37,13 @@ void unpack_gsi2018_ams_mapped() {
   
   source->AddReader(new R3BUnpackReader((EXT_STR_h101_unpack*)&ucesb_struct,
 					offsetof(EXT_STR_h101, unpack)));
-  source->AddReader(new R3BAmsReader((EXT_STR_h101_CALIFA*)&ucesb_struct.califa,
-					     offsetof(EXT_STR_h101, califa)));//FIXME
+  source->AddReader(new R3BAmsReader((EXT_STR_h101_SST*)&ucesb_struct.sst,
+					     offsetof(EXT_STR_h101, sst)));//FIXME
 
   
   /* Create online run ------------------------------------ */
   FairRunOnline* run = new FairRunOnline(source);
-  run->SetRunId(1513078509);
+  //run->SetRunId(1513078509);
   run->SetOutputFile(outputFileName);
 
 
