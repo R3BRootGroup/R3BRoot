@@ -23,6 +23,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
 ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
 ${R3BROOT_SOURCE_DIR}/tcal
+${R3BROOT_SOURCE_DIR}/r3bdata/ptofData
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

@@ -10,7 +10,7 @@
  * looping over all channels) which is crucial for a quick check of the
  * detector status during the experiment.
  *  
- * This code was copied from Tofd. Differences:
+ * This code was copied from Ptof. Differences:
  * - how many planes?
  * 
  */
@@ -91,7 +91,6 @@ InitStatus R3BPtofMapped2Cal::Init()
 	if (NULL == fMappedItems)
 		FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch PtofMapped not found");
 
-
 	// request storage of Cal data in output tree
 	mgr->Register("PtofCal", "Land", fCalItems, kTRUE);
 
@@ -121,11 +120,10 @@ InitStatus R3BPtofMapped2Cal::ReInit()
 void R3BPtofMapped2Cal::Exec(Option_t* option)
 {
 	Int_t nHits = fMappedItems->GetEntriesFast();
-
+    
 	for (Int_t ihit = 0; ihit < nHits; ihit++)
 	{
 		R3BPaddleTamexMappedData* mapped = (R3BPaddleTamexMappedData*)fMappedItems->At(ihit);
-
 
 		Int_t iPlane = mapped->GetPlaneId(); // 1..n; no need to check range
 		Int_t iBar   = mapped->GetBarId();   // 1..n
@@ -150,10 +148,10 @@ void R3BPtofMapped2Cal::Exec(Option_t* option)
 
 
 				// Convert TDC to [ns] ...
-				if (mapped->GetFineTime(tube , edge) == -1) continue;
-				
+				if (mapped->GetFineTime(tube , edge) == -1) {
+					continue;
+				}
 				Double_t time_ns = par->GetTimeVFTX( mapped->GetFineTime(tube , edge) );
-
 				if (time_ns < 0. || time_ns > fClockFreq )
 				{
 					LOG(ERROR) << 
@@ -166,9 +164,11 @@ void R3BPtofMapped2Cal::Exec(Option_t* option)
 		
 				// ... and add clock time
 				time_ns = fClockFreq - time_ns + mapped->GetCoarseTime(tube , edge) * fClockFreq;
-                LOG(DEBUG) << "Test: Bar: "<<iBar<<"  tube= "<<tube<<"  edge= "<<edge<<"  time in ns = " << time_ns  << FairLogger::endl;
+                if(iBar==40){
+					LOG(ERROR) << "Test: Plane: "<<iPlane<<"  Bar: "<<iBar<<"  tube= "<<tube<<"  edge= "<<edge
+					<<"  time in ns = " << time_ns  << FairLogger::endl;
+				}
 				cal->SetTime(tube , edge , time_ns);
-
 			}
 	}
 }

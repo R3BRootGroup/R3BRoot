@@ -38,6 +38,7 @@
 #pragma link C++ class R3BAmsStripCalData+;
 #pragma link C++ class R3BAmsHitData+;
 
+
 //#pragma link C++ class R3BStartrackerHit+;
 
 #pragma link C++ class R3BStartrackerDigitHit+;
@@ -98,5 +99,8 @@
 #pragma link C++ class R3BFi7HitItem+;
 #pragma link C++ class R3BFibMappedData+;
 #pragma link C++ class R3BFibCalData+;
+#pragma link C++ class R3BSci8MappedData+;
+#pragma link C++ class R3BSci8CalData+;
+#pragma link C++ class R3BSci8HitData+;
 
 #endif

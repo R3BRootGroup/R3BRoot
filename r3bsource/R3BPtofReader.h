@@ -74,9 +74,9 @@ class R3BPtofReader : public R3BReader
 		Bool_t ReadLeadingEdges(EXT_STR_h101_PTOF_onion *, int);
 		Bool_t ReadTrailingEdges(EXT_STR_h101_PTOF_onion *, int);
 		Bool_t ReadLeadingEdgeChannel(EXT_STR_h101_PTOF_onion *, 
-		    uint32_t, uint32_t, int);
+		    uint32_t, uint32_t, uint32_t, int);
 		Bool_t ReadTrailingEdgeChannel(EXT_STR_h101_PTOF_onion *, 
-		    uint32_t, uint32_t, int);
+		    uint32_t, uint32_t, uint32_t, int);
         Bool_t FindCoarseCounterReference(EXT_STR_h101_PTOF_onion *);
 
 	public:

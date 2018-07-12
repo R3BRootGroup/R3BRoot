@@ -101,9 +101,6 @@ Double_t R3BLosCalData::GetMeanTime()
 	if (!isnan(fTimeT_rb_ns)) {mean+=fTimeT_rb_ns;num_times++;}
 	if (!isnan(fTimeT_lt_ns)) {mean+=fTimeT_lt_ns;num_times++;}
 	if (!isnan(fTimeT_lb_ns)) {mean+=fTimeT_lb_ns;num_times++;}	
-	if (!isnan(fTimeV_ref_ns)) {mean+=fTimeV_ref_ns;num_times++;}
-	if (!isnan(fTimeL_ref_ns)) {mean+=fTimeL_ref_ns;num_times++;}
-	if (!isnan(fTimeT_ref_ns)) {mean+=fTimeT_ref_ns;num_times++;}
 	
 		
 	return num_times ? mean/num_times : NAN;

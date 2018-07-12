@@ -18,9 +18,10 @@
 
 #/mcPhysics/setSpecialCuts true
 #/mcPhysics/rangeCuts 0.1 mm
-/mcPhysics/rangeCutForElectron 0.1 mm
+/mcPhysics/rangeCutForElectron 1000000000 mm
 #/mcPhysics/printGeneralCuts true
 
+/process/msc/inactivate
 
 #/cuts/setLowEdge 100 eV
 #/cuts/setHighEdge 100 GeV

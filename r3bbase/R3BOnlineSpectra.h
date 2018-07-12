@@ -213,6 +213,7 @@ class R3BOnlineSpectra : public FairTask
     TH2F *fh_los_multihitVFTX;
     TH2F *fh_los_multihitLEAD;
     TH2F *fh_los_multihitTRAI;
+    TH2F *fh_los_pos;
     
     TH1F *fh_channels_Fib[14];
     TH1F *fh_fibers_Fib[14];

@@ -10,7 +10,7 @@
 #define R3BGLOBALANALYSIS
 
 #include "FairTask.h"
-
+ 
 class TClonesArray;
 class TH1F;
 class TH2F;

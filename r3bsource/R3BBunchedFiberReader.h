@@ -10,11 +10,12 @@
 //  Z = C(oarse) or F(ine) time from electronics.
 // For example:
 //  SIGNAL(FIBONE_TMLC, ...);
-// Note that sub-detectors (e.g. layers) are not mentioned in the mapping,
-// since channels should anyhow not be intertwined, e.g. the first sub occupies
-// the first 256/2 channels, the second the next 256/2 channels and so on. The
-// constructor however takes the number of subs called to simplify the numbers
-// in the user code a little. -> Not important, layers are now treated as separate detectors (a and b).
+// Note that sub-detectors (e.g. cloned parts side by side) are not mentioned
+// in the mapping, since channels should anyhow not be intertwined, e.g. the
+// first sub occupies the first 256/2 channels, the second the next 256/2
+// channels and so on. The constructor however takes the number of subs to
+// simplify the numbers in the user code a little.
+// Layers are treated as separate detectors, e.g. Fi1a and Fi1b.
 //
 // Note that MappedData refers to a single multi-hit electronics channel
 // connected to some bunch of fibers, NOT one fiber, so that Mapped2Cal

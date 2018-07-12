@@ -27,8 +27,7 @@ class R3BPaddleCalData : public TObject
     UInt_t GetBar() const {return fBar;}
     
     // tube: 0,1 edge: 0,1 time: in ns
-  
-    void SetTime(int tube, int edge,Double_t t)
+    void SetTime(int tube, int edge, Double_t t)
     {
 		if (tube==0) 
 		{

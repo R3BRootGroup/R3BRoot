@@ -3,6 +3,24 @@
 
 void SetCuts()
 {
+ // Switch on/off the physics processes (global)
+  // Please consult the file data/galice.cuts for detector
+  // specific settings, i.e. DRAY
+  gMC->SetProcess("DCAY",1); // Particle decay
+  gMC->SetProcess("PAIR",1); // Pair production
+  gMC->SetProcess("COMP",1); // Compton scattering
+  gMC->SetProcess("PHOT",1); // Photo effect
+  gMC->SetProcess("PFIS",0); // Photo fission
+  gMC->SetProcess("DRAY",0); // Delta rays
+  gMC->SetProcess("ANNI",1); // Positron annihilation
+  gMC->SetProcess("BREM",1); // Bremstrahlung
+  gMC->SetProcess("MUNU",1); // Muon nuclear interactions
+  gMC->SetProcess("CKOV",1); // Cerenkov production
+  gMC->SetProcess("HADR",5); // Hadronic interactions
+  gMC->SetProcess("LOSS",2); // Energy loss (2=complete fluct.)
+  gMC->SetProcess("MULS",1); // Multiple scattering
+  gMC->SetProcess("RAYL",1); // Rayleigh scattering
+
     cout << "[SetCuts]: Setting Cuts ..." << endl;
 
     const Double_t cut1 = 1.0E-4;  // GeV --> 100 keV

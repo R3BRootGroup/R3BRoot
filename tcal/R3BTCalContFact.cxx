@@ -69,6 +69,7 @@ void R3BTCalContFact::setAllContainers()
     ADD_FIBER(Fi10, FI10);
     ADD_FIBER(Fi11, FI11);
     addContainer("PtofTCalPar", "PTOF TCAL Calibration Parameters");
+    addContainer("Sci8TCalPar", "S8 TCAL Calibration Parameters");
 }
 
 FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
@@ -107,6 +108,7 @@ FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
     PUSH_FIBER(Fi10);
     PUSH_FIBER(Fi11);
     containerNames.push_back("PtofTCalPar");
+    containerNames.push_back("Sci8TCalPar");
 
     bool found = false;
     for (auto containerName : containerNames) {

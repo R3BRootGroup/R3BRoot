@@ -3,6 +3,8 @@
 
 #include "FairTask.h"
 
+#define PtofPaddlesPerPlane 8
+
 class TClonesArray;
 class R3BPtofHitPar;
 class TH1D;
@@ -80,8 +82,8 @@ class R3BPtofCal2HitPar : public FairTask
     Int_t fBeamCharge;
     Int_t fYPosition;
     
-    TH1D* fZScaleHistos[12];
-    TH1D* fTOffsetHistos[12];
+    TH1D* fZScaleHistos[2*PtofPaddlesPerPlane];
+    TH1D* fTOffsetHistos[2*PtofPaddlesPerPlane];
     
     R3BPtofHitPar* fPar;
     

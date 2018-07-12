@@ -51,128 +51,144 @@ Bool_t R3BPtofReader::Init(ext_data_struct_info *a_struct_info)
 	return kTRUE;
 }
 
-Bool_t R3BPtofReader::ReadLeadingEdges(EXT_STR_h101_PTOF_onion *data,
-				       int t)
+Bool_t R3BPtofReader::ReadLeadingEdges(EXT_STR_h101_PTOF_onion *data, int t)
 {
-  // # of channels with data. not necessarily number
-  // of hits! (b/c multi hit)
-  uint32_t numChannels = data->PTOF_TFLM;
-  LOG(DEBUG) << "mult leading "<<numChannels<<"---------------------------"<< FairLogger::endl;
+	// # of channels with data. not necessarily number
+	// of hits! (b/c multi hit)
+	uint32_t numChannels = data->PTOF_TFLM;
+	LOG(DEBUG) << "mult leading "<<numChannels<<"---------------------------"<< FairLogger::endl;
   
-  // loop over channels
-  // index in v for first item of current channel
-  uint32_t curChannelStart = 0;
-  for (int i = 0; i < numChannels; i++)
-	{
-	  // bar number 1..65
-	  uint32_t pmt;
-	  uint32_t bar;
-	  uint32_t tube;
-	  // index in v for first item of next channel
-	  uint32_t nextChannelStart;
-	  
-	  pmt = data->PTOF_TFLMI[i];
-	  nextChannelStart = data->PTOF_TFLME[i];
-	  Int_t num_cha=4; // for the full PToF this is 32 because the first PMT of the upper side is in channel 33 
-	  if(pmt>num_cha) {
-	    if (pmt == 8)
-	      {
-		bar = 8;
-	      }
-	    else
-	      {
-		bar=(pmt-num_cha)*2;
-	      }
-	    tube=1;
-	  }
-	  else{
-	    if (pmt == 4)
-	      {
-		bar = 8;
-	      }
-	    else
-	      {
-		bar=pmt*2-1;
-	      }
-	    tube=0;
-	  }
-	  LOG(DEBUG) << "leading pmt: "<<pmt<<  "  tube: "<<tube<< "  bar: "<< bar<< FairLogger::endl;
-	  LOG(DEBUG) << "Multihit  "<<nextChannelStart-curChannelStart<< FairLogger::endl;
-	  
-//        nextChannelStart=curChannelStart+1;
-        
-	  for (int j = curChannelStart; j < nextChannelStart; j++)
-	    {
-	      if (bar == 8)
+	// loop over channels
+	// index in v for first item of current channel
+	uint32_t curChannelStart = 0;
+	for (int i = 0; i < numChannels; i++)
 		{
-		  ReadLeadingEdgeChannel(data, tube, bar, j);
+		// bar number 1..65
+		uint32_t plane;
+		uint32_t pmt;
+		uint32_t bar;
+		uint32_t tube;
+		// index in v for first item of next channel
+		uint32_t nextChannelStart;
+	  
+		pmt = data->PTOF_TFLMI[i];
+		nextChannelStart = data->PTOF_TFLME[i];
+		Int_t num_cha=3; // for the full PToF this is 32 because the first PMT of the upper side is in channel 33 
+		if(pmt>num_cha) { 
+			bar=(pmt-num_cha)*2;
+			tube=1;
+			plane=1;
 		}
-	      else
-		{
-		  if (bar > 1) ReadLeadingEdgeChannel(data, tube, bar-1, j);
-		  ReadLeadingEdgeChannel(data, tube, bar, j);
-		  if (bar < 6) ReadLeadingEdgeChannel(data, tube, bar+1, j);
+		else{
+			bar=pmt*2-1;
+			tube=0;
+			plane=2;
 		}
+		//only for kvi2018 beam time
+		if(pmt==7){
+			bar=8;
+			tube=0;
+			plane=1;
+		}
+		if(pmt==8){
+			bar=8;
+			tube=1;
+			plane=1;
+		}
+
+		LOG(DEBUG) << "leading pmt: "<<pmt<<  "  tube: "<<tube<< "  bar: "<< bar<< FairLogger::endl;
+		LOG(DEBUG) << "Multihit  "<<nextChannelStart-curChannelStart<< FairLogger::endl;
+
+		for (int j = curChannelStart; j < nextChannelStart; j++){
+			if(plane==1){
+				if(bar>1) ReadLeadingEdgeChannel(data, 2, tube, bar-1, j);
+				ReadLeadingEdgeChannel(data, 1, tube, bar, j);
+				ReadLeadingEdgeChannel(data, 2, tube, bar, j);
+				if(bar<8) ReadLeadingEdgeChannel(data, 1, tube, bar+1, j);
+			}
+			if(plane==2){
+				if(bar>1)ReadLeadingEdgeChannel(data, 1, tube, bar-1, j);
+				ReadLeadingEdgeChannel(data, 1, tube, bar, j);
+				ReadLeadingEdgeChannel(data, 2, tube, bar, j);
+				if(bar<8) ReadLeadingEdgeChannel(data, 2, tube, bar+1, j);
+			}
 	    }
 	  
-	  curChannelStart = nextChannelStart;
+		curChannelStart = nextChannelStart;
 	}
 	return kTRUE;
 }
 
-Bool_t R3BPtofReader::ReadTrailingEdges(EXT_STR_h101_PTOF_onion *data,
-					int t)
+Bool_t R3BPtofReader::ReadTrailingEdges(EXT_STR_h101_PTOF_onion *data, int t)
 {
-	 // # of channels with data. not necessarly number
-	 // of hits! (b/c multi hit)
-	 uint32_t numChannels = data->PTOF_TFTM;
-	 LOG(DEBUG) << "mult trailing "<<numChannels<<"---------------------------"<< FairLogger::endl;
+	// # of channels with data. not necessarly number
+	// of hits! (b/c multi hit)
+	uint32_t numChannels = data->PTOF_TFTM;
+	LOG(DEBUG) << "mult trailing "<<numChannels<<"---------------------------"<< FairLogger::endl;
 	 
-	 // loop over channels
-	 // index in v for first item of current channel
-	 uint32_t curChannelStart = 0;
-	 for (int i = 0; i < numChannels; i++)
-	   {
-	     // or 1..65
-	     uint32_t bar;
-	     uint32_t tube;
-	     uint32_t pmt;
-	     // index in v for first item of next channel
-	     uint32_t nextChannelStart;
-	     nextChannelStart = data->PTOF_TFTME[i];
-	     //PTOF_TFTMI is not a bar number but a PMT number.
-	     //Now we convert this to a bar number.
-	     pmt = data->PTOF_TFTMI[i];
-	     LOG(DEBUG) << "trailing pmt  "<<pmt<< FairLogger::endl;
-	     Int_t num_cha=4; // for the full PToF this is 32 because the first PMT of the upper side is in channel 33 
-	     if(pmt>num_cha) { 
-	       bar=(pmt-num_cha)*2;
-	       tube=1;
-	     }
-	     else{
-	       bar=pmt*2-1;
-	       tube=0;
-	     }
-	     LOG(DEBUG)<< "trailing pmt: "<< pmt << "  tube: "<<tube<< "  bar: "<< bar<< FairLogger::endl;
-	     LOG(DEBUG) << "Multihit  "<<nextChannelStart-curChannelStart<< FairLogger::endl;
-	     
-	     //        nextChannelStart=curChannelStart+1;
-	     
-	     for (int j = curChannelStart; j < nextChannelStart; j++)
-	       {
-		 if (bar>1) ReadTrailingEdgeChannel(data, tube, bar-1, j);			
-		 ReadTrailingEdgeChannel(data, tube, bar, j);
-		 ReadTrailingEdgeChannel(data, tube, bar+1, j);
-	       }
-	     
-	     curChannelStart=nextChannelStart;
-	   }
-	 return kTRUE;
+	// loop over channels
+	// index in v for first item of current channel
+	uint32_t curChannelStart = 0;
+	for (int i = 0; i < numChannels; i++) {
+		// or 1..65
+		uint32_t plane;
+		uint32_t bar;
+		uint32_t tube;
+		uint32_t pmt;
+		// index in v for first item of next channel
+		uint32_t nextChannelStart;
+		nextChannelStart = data->PTOF_TFTME[i];
+		//PTOF_TFTMI is not a bar number but a PMT number.
+		//Now we convert this to a bar number.
+		pmt = data->PTOF_TFTMI[i];
+		LOG(DEBUG) << "trailing pmt  "<<pmt<< FairLogger::endl;
+		Int_t num_cha=3; // for the full PToF this is 32 because the first PMT of the upper side is in channel 33 
+		if(pmt>num_cha) {
+			bar=(pmt-num_cha)*2;
+			tube=1;
+			plane=1;
+		}
+		else{
+			bar=pmt*2-1;
+			tube=0;
+			plane=2;
+		}
+		//only for kvi2018 beam time
+		if(pmt==7){
+			bar=8;
+			tube=0;
+			plane=1;
+		}
+		if(pmt==8){
+			bar=8;
+			tube=1;
+			plane=1;
+		}
+		LOG(DEBUG)<< "trailing pmt: "<< pmt << "  tube: "<<tube<< "  bar: "<< bar<< FairLogger::endl;
+		LOG(DEBUG) << "Multihit  "<<nextChannelStart-curChannelStart<< FairLogger::endl;
+	     	     
+		for (int j = curChannelStart; j < nextChannelStart; j++) {
+			if(plane==1){
+				if(bar>1) ReadTrailingEdgeChannel(data, 2, tube, bar-1, j);
+				ReadTrailingEdgeChannel(data, 1, tube, bar, j);
+				ReadTrailingEdgeChannel(data, 2, tube, bar, j);
+				if(bar<8) ReadTrailingEdgeChannel(data, 1, tube, bar+1, j);
+			}
+			if(plane==2){
+				if(bar>1) ReadTrailingEdgeChannel(data, 1, tube, bar-1, j);
+				ReadTrailingEdgeChannel(data, 1, tube, bar, j);
+				ReadTrailingEdgeChannel(data, 2, tube, bar, j);
+				if(bar<8) ReadTrailingEdgeChannel(data, 2, tube, bar+1, j);
+			}
+		}
+		curChannelStart=nextChannelStart;
+	}
+	return kTRUE;
 }
 
-#define MAX_TIME_DIFF_PADDLE_PMT 10 /* 20 * 5 ns = 100 ns */
+#define MAX_TIME_DIFF_PADDLE_PMT 20 /* 20 * 5 ns = 100 ns */
 Bool_t R3BPtofReader::ReadLeadingEdgeChannel(EXT_STR_h101_PTOF_onion *data,
-					     uint32_t tube, uint32_t bar, int ch)
+	uint32_t plane, uint32_t tube, uint32_t bar, Int_t ch)
 {
 	R3BPaddleTamexMappedData* mapped = NULL;
 	/*
@@ -189,33 +205,36 @@ Bool_t R3BPtofReader::ReadLeadingEdgeChannel(EXT_STR_h101_PTOF_onion *data,
 	LOG(DEBUG) << "n  "<<n<< FairLogger::endl;
 	
 	for (int k = 0; k < n; k++){
-	  R3BPaddleTamexMappedData* hit = (R3BPaddleTamexMappedData*)fArray->At(k);
-	  //
-	  // see if other PM has a hit and if leading time is within 
-	  // coincidence window
-	  //
-	  // we need a new hit if we have already registered a hit for this PM
+		R3BPaddleTamexMappedData* hit = (R3BPaddleTamexMappedData*)fArray->At(k);
+		//
+		// see if other PM has a hit and if leading time is within 
+		// coincidence window
+		//
+		// we need a new hit if we have already registered a hit for this PM
 	  
-	  //LOG(DEBUG) << "Current bar "<< hit->GetBarId()  << FairLogger::endl;
-	  if(hit->GetBarId()!=bar){
-	    continue;
-	  }
-	  if (tube == 0){
-	    if(hit->fCoarseTime1LE == -1 && 
-	       (abs(hit->fCoarseTime2LE - coarse)<= MAX_TIME_DIFF_PADDLE_PMT)){
-	      mapped = hit;
-	      //LOG(DEBUG) << "Mapped bar"<<bar<<" tube "<<tube<<" coarse= "<<coarse<<" hit2 " << hit->fCoarseTime2LE  << FairLogger::endl;
-	      break;
-	    }
-	  }
-	  if (tube == 1){
-	    if ((hit->fCoarseTime2LE == -1) &&
-		(abs(hit->fCoarseTime1LE - coarse)<= MAX_TIME_DIFF_PADDLE_PMT)){
-	      mapped = hit;
-	      //LOG(DEBUG) << "Mapped "<<bar<<" tube "<<tube<<" coarse= "<<coarse<<" hit1 " << hit->fCoarseTime1LE  << FairLogger::endl;
-	      break;
-	    }
-	  }
+		//LOG(DEBUG) << "Current bar "<< hit->GetBarId()  << FairLogger::endl;
+		if(hit->GetBarId()!=bar){
+			continue;
+		}
+		if(hit->GetPlaneId()!=plane){
+			continue;
+		}
+		if (tube == 0){
+			if(hit->fCoarseTime1LE == -1 && 
+			(abs(hit->fCoarseTime2LE - coarse)<= MAX_TIME_DIFF_PADDLE_PMT)){
+				mapped = hit;
+				//LOG(DEBUG) << "Mapped bar"<<bar<<" tube "<<tube<<" coarse= "<<coarse<<" hit2 " << hit->fCoarseTime2LE  << FairLogger::endl;
+				break;
+			}
+		}
+		if (tube == 1){
+			if ((hit->fCoarseTime2LE == -1) &&
+			(abs(hit->fCoarseTime1LE - coarse)<= MAX_TIME_DIFF_PADDLE_PMT)){
+				mapped = hit;
+				//LOG(DEBUG) << "Mapped "<<bar<<" tube "<<tube<<" coarse= "<<coarse<<" hit1 " << hit->fCoarseTime1LE  << FairLogger::endl;
+				break;
+			}
+		}
 	}
 	
 	//
@@ -223,14 +242,14 @@ Bool_t R3BPtofReader::ReadLeadingEdgeChannel(EXT_STR_h101_PTOF_onion *data,
     // No corresponding hit in the other PM found	
     //
     if (!mapped) {
-		LOG(DEBUG) << "new event in bar "<<bar<<" tube "<<tube<<" coarse= "<<coarse << FairLogger::endl;
+		LOG(DEBUG) << "new event in plane "<< plane<<" bar "<<bar<<" tube "<<tube<<" coarse= "<<coarse << FairLogger::endl;
 	}
 	else{
-		LOG(DEBUG) << "same event in bar "<<bar<<" tube "<<tube<<" coarse= "<<coarse << FairLogger::endl;		
+		LOG(DEBUG) << "same event in plane "<<plane<<" bar "<<bar<<" tube "<<tube<<" coarse= "<<coarse << FairLogger::endl;		
 	}
 	
 	if (!mapped) mapped = new ((*fArray)[fArray->GetEntriesFast()])
-		R3BPaddleTamexMappedData(1, bar); // plane, bar
+		R3BPaddleTamexMappedData(plane, bar); // plane, bar
 		
 	// Fill leading edge time members 
 	if(tube==0){
@@ -248,7 +267,7 @@ Bool_t R3BPtofReader::ReadLeadingEdgeChannel(EXT_STR_h101_PTOF_onion *data,
 
 #define MAX_TIME_OVER_THRESHOLD 1000 /* 1000 * 5 ns = 5 us */
 Bool_t R3BPtofReader::ReadTrailingEdgeChannel(EXT_STR_h101_PTOF_onion *data,
-    uint32_t tube, uint32_t bar, int ch)
+    uint32_t plane, uint32_t tube, uint32_t bar, int ch)
 {
 	R3BPaddleTamexMappedData* mapped = NULL;
 
@@ -279,8 +298,11 @@ Bool_t R3BPtofReader::ReadTrailingEdgeChannel(EXT_STR_h101_PTOF_onion *data,
 			if(hit->GetBarId()!=bar){
 				continue;
 			}			
+			if(hit->GetPlaneId()!=plane){
+				continue;
+			}
 			int tot = coarse - hit->fCoarseTime1LE;
-		LOG(DEBUG) << "checking tube 1, bar: "<<bar<<" coarse: "<<coarse<<" tot: "<<tot<< FairLogger::endl; 
+			LOG(DEBUG) << "checking tube 1, bar: "<<bar<<" coarse: "<<coarse<<" tot: "<<tot<< FairLogger::endl; 
 			if ((tot <= MAX_TIME_OVER_THRESHOLD) && (tot >= 0)
 			    && (hit->fCoarseTime1TE == -1) /* no trailing */
 			    && (hit->fCoarseTime1LE != -1)) /* has leading */
@@ -300,8 +322,11 @@ Bool_t R3BPtofReader::ReadTrailingEdgeChannel(EXT_STR_h101_PTOF_onion *data,
 			if(hit->GetBarId()!=bar){
 				continue;
 			}			
+			if(hit->GetPlaneId()!=plane){
+				continue;
+			}
 			int tot = coarse - hit->fCoarseTime2LE;
-		LOG(DEBUG) << "checking tube 2, bar: "<<bar<< " coarse: "<<coarse<<" tot: "<<tot<< FairLogger::endl; 
+			LOG(DEBUG) << "checking tube 2, bar: "<<bar<< " coarse: "<<coarse<<" tot: "<<tot<< FairLogger::endl; 
 			if ((tot <= MAX_TIME_OVER_THRESHOLD) && (tot >= 0)
 			    && (hit->fCoarseTime2TE == -1) // no trailing 
 			    && (hit->fCoarseTime2LE != -1)) // has leading
@@ -319,7 +344,7 @@ Bool_t R3BPtofReader::ReadTrailingEdgeChannel(EXT_STR_h101_PTOF_onion *data,
  		LOG(DEBUG) << "entry "<<n<< FairLogger::endl; 
     }
 	if (!mapped) mapped = new ((*fArray)[fArray->GetEntriesFast()])
-		R3BPaddleTamexMappedData(1, bar); // plane, bar
+		R3BPaddleTamexMappedData(plane, bar); // plane, bar
     if(tube==0){
 		// PM1
 		// coarse time leading edge

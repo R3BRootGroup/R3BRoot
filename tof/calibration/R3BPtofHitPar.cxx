@@ -4,10 +4,10 @@
 
 R3BPtofHitPar::R3BPtofHitPar(const char* name, const char* title, const char* context)
   : FairParGenericSet(name,title,context)
-  , fTOffset1(TArrayD(12))
-  , fTOffset2(TArrayD(12))
-  , fZScale(TArrayD(12))
-  , fVEff(TArrayD(12))
+  , fTOffset1(TArrayD(24))
+  , fTOffset2(TArrayD(24))
+  , fZScale(TArrayD(24))
+  , fVEff(TArrayD(24))
 {
 }
 

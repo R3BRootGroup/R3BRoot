@@ -10,6 +10,8 @@
 
 #include "FairTask.h"
 
+#define PtofPaddlesPerPlane 8
+
 class TClonesArray;
 class R3BPtofHitPar;
 class TArrayD;
@@ -86,6 +88,8 @@ class R3BPtofCal2Hit : public FairTask
 		TClonesArray* fHitItems;  	/**< Array with HIT items - output data. */
 
 		R3BPtofHitPar* fHitPar;        /**< HIT parameter container. */
+		
+		Int_t fNEvents;         /**< Event counter. */
 		
 		TArrayD fTOffset1;	/**< an array with timeoffset parameters of modules */
 		TArrayD fTOffset2;	/**< an array with timeoffset parameters of modules */

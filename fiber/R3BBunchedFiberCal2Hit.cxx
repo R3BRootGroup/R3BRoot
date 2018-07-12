@@ -115,6 +115,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t *option)
 	 */
         auto fiber_id = (mapmt.max_leading->GetChannel() - 1) * fChPerSub[1] +
             (spmt.max_leading->GetChannel() % fChPerSub[1]);
+
         // TODO: Use it_sub->direction to find real life coordinates.
 
         // Fix fiber installation mistakes.
