@@ -33,6 +33,7 @@ class R3BLosMappedData : public TObject
     UInt_t fTimeCoarse;   
     UInt_t fTimeFine;
 
+    Int_t fNEvents = 0;
     
 
   public:

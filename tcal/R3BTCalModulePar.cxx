@@ -112,6 +112,19 @@ void R3BTCalModulePar::printParams()
     }
 }
 
+Double_t R3BTCalModulePar::GetTimeClockTDC(Int_t tdc)
+{
+    for (Int_t i = 0; i < fNofChannels; i++)
+    {
+        if (tdc == fBinLow[i])
+        {
+            Double_t time = fOffset[i];
+            return time;
+        }
+    }
+    return -10000.;
+}
+
 Double_t R3BTCalModulePar::GetTimeTacquila(Int_t tdc)
 {
 	tdc = tdc + 1;
@@ -167,7 +180,7 @@ void R3BTCalModulePar::DrawParams()
         }
         else if (2 == type)
         {
-            h1->SetBinContent(fBinLow[i], fOffset[i]);
+            h1->SetBinContent(1 + fBinLow[i], fOffset[i]);
         }
     }
 

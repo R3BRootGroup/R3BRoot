@@ -8,13 +8,20 @@
 
 #ifndef R3BONLINESPECTRA
 #define R3BONLINESPECTRA
-#define N_PLANE_MAX 100
-#define N_PADDLE_MAX 100
+#define N_PLANE_MAX_TOFD 4
+#define N_PADDLE_MAX_TOFD 50
 #define N_PADDLE_MAX_PTOF 100
 #define N_PSPX 4
 
 #include "FairTask.h"
+#include <sstream>
+#include <fstream>
+#include <iostream>
+#include <array>
 
+#include "TClonesArray.h"
+#include "TMath.h"
+#include <cstdlib>
 class TClonesArray;
 class TH1F;
 class TH2F;
@@ -87,63 +94,6 @@ class R3BOnlineSpectra : public FairTask
     }
     
     /**
-     * Methods for setting position offset and effective velocity of light
-     */
-    inline void SetLosParamMCFD(Double_t offsetX1, Double_t offsetY1, Double_t veffX1, Double_t veffY1,
-                                 Double_t offsetX2, Double_t offsetY2, Double_t veffX2, Double_t veffY2)
-    {
-        flosOffsetX1 = offsetX1;
-        flosOffsetY1 = offsetY1;
-        flosVeffX1 = veffX1;
-        flosVeffY1 = veffY1;     
-        flosOffsetX2 = offsetX2;
-        flosOffsetY2 = offsetY2;
-        flosVeffX2 = veffX2;
-        flosVeffY2 = veffY2;
-  
-    }    
-    
-    inline void SetLosParamMCFDwc(Double_t offsetX1wc, Double_t offsetY1wc, Double_t veffX1wc, Double_t veffY1wc,
-                                 Double_t offsetX2wc, Double_t offsetY2wc, Double_t veffX2wc, Double_t veffY2wc)
-    {
-        flosOffsetX1wc = offsetX1wc;
-        flosOffsetY1wc = offsetY1wc;
-        flosVeffX1wc = veffX1wc;
-        flosVeffY1wc = veffY1wc;     
-        flosOffsetX2wc = offsetX2wc;
-        flosOffsetY2wc = offsetY2wc;
-        flosVeffX2wc = veffX2wc;
-        flosVeffY2wc = veffY2wc;
-    }    
-    
-    inline void SetLosParamToT(Double_t offsetX1Q, Double_t offsetY1Q, Double_t veffX1Q, Double_t veffY1Q,
-                                 Double_t offsetX2Q, Double_t offsetY2Q, Double_t veffX2Q, Double_t veffY2Q)
-    {
-        flosOffsetX1Q = offsetX1Q;
-        flosOffsetY1Q = offsetY1Q;
-        flosVeffX1Q = veffX1Q;
-        flosVeffY1Q = veffY1Q;     
-        flosOffsetX2Q = offsetX2Q;
-        flosOffsetY2Q = offsetY2Q;
-        flosVeffX2Q = veffX2Q;
-        flosVeffY2Q = veffY2Q;
-  
-    }    
-    
-    inline void SetLosParamTAMEX(Double_t offsetX1T, Double_t offsetY1T, Double_t veffX1T, Double_t veffY1T,
-                                 Double_t offsetX2T, Double_t offsetY2T, Double_t veffX2T, Double_t veffY2T)
-    {
-        flosOffsetX1T = offsetX1T;
-        flosOffsetY1T = offsetY1T;
-        flosVeffX1T = veffX1T;
-        flosVeffY1T = veffY1T;     
-        flosOffsetX2T = offsetX2T;
-        flosOffsetY2T = offsetY2T;
-        flosVeffX2T = veffX2T;
-        flosVeffY2T = veffY2T;  
-    }     
-    
-    /**
      * Methods for setting number of planes and paddles
      */
     inline void SetNofModules(Int_t planes, Int_t ppp)
@@ -160,14 +110,63 @@ class R3BOnlineSpectra : public FairTask
     TClonesArray* fCalItemsTofd;                   /**< Array with cal items. */
     TClonesArray* fMappedItemsPspx;                    /**< Array with mapped items. */
     TClonesArray* fCalItemsPspx;                    /**< Array with cal items. */
-    TClonesArray* fMappedItemsFi1;                 /**< Array with mapped items. */
-    TClonesArray* fHitItemsFi1;                    /**< Array with cal items. */
+ 
+    TClonesArray* fMappedItemsFi0;                 /**< Array with mapped items. */
+    TClonesArray* fHitItemsFi0;                    /**< Array with cal items. */
+    TClonesArray* fMappedItemsFi1a;                 /**< Array with mapped items. */
+    TClonesArray* fHitItemsFi1a;                    /**< Array with cal items. */
+    TClonesArray* fMappedItemsFi1b;                 /**< Array with mapped items. */
+    TClonesArray* fHitItemsFi1b;                    /**< Array with cal items. */
+    TClonesArray* fMappedItemsFi2a;                 /**< Array with mapped items. */
+    TClonesArray* fHitItemsFi2a;                    /**< Array with cal items. */
+    TClonesArray* fMappedItemsFi2b;                 /**< Array with mapped items. */
+    TClonesArray* fHitItemsFi2b;
+    TClonesArray* fMappedItemsFi3a;                 /**< Array with mapped items. */
+    TClonesArray* fHitItemsFi3a;                    /**< Array with cal items. */
+    TClonesArray* fMappedItemsFi3b;                 /**< Array with mapped items. */
+    TClonesArray* fHitItemsFi3b;                    /**< Array with cal items. */
+    TClonesArray* fMappedItemsFi4;                 /**< Array with mapped items. */
+    TClonesArray* fHitItemsFi4;                    /**< Array with cal items. */
     TClonesArray* fMappedItemsFi5;                 /**< Array with mapped items. */
     TClonesArray* fHitItemsFi5;                    /**< Array with cal items. */
     TClonesArray* fMappedItemsFi6;                 /**< Array with mapped items. */
     TClonesArray* fHitItemsFi6;                    /**< Array with cal items. */
+    TClonesArray* fMappedItemsFi7;                 /**< Array with mapped items. */
+    TClonesArray* fHitItemsFi7;                    /**< Array with cal items. */
+    TClonesArray* fMappedItemsFi8;                 /**< Array with mapped items. */
+    TClonesArray* fHitItemsFi8;                    /**< Array with cal items. */
+    TClonesArray* fMappedItemsFi9;                 /**< Array with mapped items. */
+    TClonesArray* fHitItemsFi9;                    /**< Array with cal items. */
+    TClonesArray* fMappedItemsFi10;                 /**< Array with mapped items. */
+    TClonesArray* fHitItemsFi10;                    /**< Array with cal items. */
+    TClonesArray* fMappedItemsFi11;                 /**< Array with mapped items. */
+    TClonesArray* fHitItemsFi11;                    /**< Array with cal items. */  
     TClonesArray* fCalItemsPtof;                   /**< Array with cal items. */
+
+
+    std::vector<TClonesArray*> aMapped = {fMappedItemsFi1a,fMappedItemsFi1b,fMappedItemsFi2a,fMappedItemsFi2b,
+		                                  fMappedItemsFi3a,fMappedItemsFi3b,fMappedItemsFi4,fMappedItemsFi5,
+		                                  fMappedItemsFi6,fMappedItemsFi7,fMappedItemsFi8,fMappedItemsFi9,
+		                                  fMappedItemsFi10,fMappedItemsFi11};
+                                      
+    std::vector<TClonesArray*> aHit = {fHitItemsFi1a,fHitItemsFi1b,fHitItemsFi2a,fHitItemsFi2b,
+		                               fHitItemsFi3a,fHitItemsFi3b,fHitItemsFi4,fHitItemsFi5,fHitItemsFi6,fHitItemsFi7,
+		                               fHitItemsFi8,fHitItemsFi9,fHitItemsFi10,fHitItemsFi11};                                      
+ // If FiberI is present or not:
+    bool FibPresent[14]={false};            
+    Int_t  ifibdet;           
+    std::string Mapped[14]={"Fi1aMapped","Fi1bMapped","Fi2aMapped","Fi2bMapped","Fi3aMapped","Fi3bMapped",
+	                        "Fi4Mapped","Fi5Mapped","Fi6Mapped","Fi7Mapped","Fi8Mapped","Fi9Mapped",
+	                        "Fi10Mapped","Fi11Mapped"};
+    std::string Hit[14]={"Fi1aHit","Fi1bHit","Fi2aHit","Fi2bHit","Fi3aHit","Fi3bHit",
+	                     "Fi4Hit","Fi5Hit","Fi6Hit","Fi7Hit","Fi8Hit","Fi9Hit",
+	                     "Fi10Hit","Fi11Hit"};
+    const char* cMapped[14];
+    const char* cHit[14]; 
+// Number of fibers per detector
+   Double_t n_fiber[14]={256.,256.,256.,256,512.,512.,2048.,2048.,1024.,512.,512.,512.,1024.,1024.};    
     
+     
 	// check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header;                     /**< Event header. */
     Int_t fTrigger;                             /**< Trigger value. */
@@ -175,54 +174,40 @@ class R3BOnlineSpectra : public FairTask
     UInt_t fNofPlanes;  
     UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */    
 
-    Int_t fNEvents;         /**< Event counter. */
+    Int_t fNEvents = 0;         /**< Event counter. */
 
+    Int_t fNEvents1;
+    
     UInt_t fNofDetectors;  /**< Number of detectors. */
     UInt_t fNofChannels;   /**< Number of channels per detector. */    
     UInt_t fNofModules;    /**< Total number of channels. */
-    Double_t flosVeffX1;   
-    Double_t flosVeffY1;
-    Double_t flosOffsetX1;
-    Double_t flosOffsetY1;
-    Double_t flosVeffX2;   
-    Double_t flosVeffY2;
-    Double_t flosOffsetX2;
-    Double_t flosOffsetY2;
-    Double_t flosVeffX1wc;   
-    Double_t flosVeffY1wc;
-    Double_t flosOffsetX1wc;
-    Double_t flosOffsetY1wc;
-    Double_t flosVeffX2wc;   
-    Double_t flosVeffY2wc;
-    Double_t flosOffsetX2wc;
-    Double_t flosOffsetY2wc;
-    Double_t flosVeffX1Q;   
-    Double_t flosVeffY1Q;
-    Double_t flosOffsetX1Q;
-    Double_t flosOffsetY1Q;
-    Double_t flosVeffX2Q;   
-    Double_t flosVeffY2Q;
-    Double_t flosOffsetX2Q;
-    Double_t flosOffsetY2Q;
-    Double_t flosVeffX1T;   
-    Double_t flosVeffY1T;
-    Double_t flosOffsetX1T;
-    Double_t flosOffsetY1T;
-    Double_t flosVeffX2T;   
-    Double_t flosVeffY2T;
-    Double_t flosOffsetX2T;
-    Double_t flosOffsetY2T; 
-
+    
+    
+       
     TH1F *fh_los_channels;    
     TH1F *fh_los_tres_MCFD;
     TH1F *fh_los_tres_TAMEX;
-    TH1F *fh_los_tot;
-    TH2F *fh_los_pos;
+    TH2F *fh_los_tot;
+    TH1F *fh_los_tot_mean;
+    
+    TH1F *fh_channels_Fib[14];
+    TH1F *fh_fibers_Fib[14];
+    TH1F *fh_mult_Fib[14];
+    TH2F *fh_Fib_ToF[14];
+    TH1F *fh_Fib_pos[14];
+    TH2F *fh_time_Fib[14];
+    TH2F *fh_multihit_m_Fib[14];   
+    TH2F *fh_multihit_s_Fib[14];
+    TH2F *fh_ToT_m_Fib[14];
+    TH2F *fh_ToT_s_Fib[14];
+    TH2F *fh_FibervsTime_Fib[14];
+    
+    
+    TH1F *fh_tofd_channels[N_PLANE_MAX_TOFD];    
+    TH2F *fh_tofd_ToF[N_PLANE_MAX_TOFD];
 
-    TH1F *fh_tofd_channels[N_PLANE_MAX];    
-
-    TH1F* fh_tofd_TotPm1[N_PLANE_MAX][N_PADDLE_MAX]; 
-    TH1F* fh_tofd_TotPm2[N_PLANE_MAX][N_PADDLE_MAX]; 
+    TH2F* fh_tofd_TotPm1[N_PLANE_MAX_TOFD]; 
+    TH2F* fh_tofd_TotPm2[N_PLANE_MAX_TOFD]; 
  
  
     TH1F *fh_ptof_channels; 
@@ -247,41 +232,9 @@ class R3BOnlineSpectra : public FairTask
     TH2F *fh_pspx_cor_x_energy;
     TH2F *fh_pspx_cor_y_energy;
 
-    TH1F *fh_Fi1_channels;
-    TH1F *fh_Fi1_fibers;
-    TH2F *fh_Fi1_multihit;
-    TH2F *fh_Fi1_ToT;
-    TH2F *fh_Fi1_ToTvsTime;
-    TH2F *fh_Fi1_multihit_s;
-    TH2F *fh_Fi1_ToT_s;
-    TH2F *fh_Fi1_ToTvsTime_s;
-   
-    TH1F *fh_Fi5_channels;
-    TH1F *fh_Fi5_fibers;
-    TH2F *fh_Fi5_multihit;
-    TH2F *fh_Fi5_ToT;
-    TH2F *fh_Fi5_ToTvsTime;
-    TH2F *fh_Fi5_multihit_s;
-    TH2F *fh_Fi5_ToT_s;
-    TH2F *fh_Fi5_ToTvsTime_s;
-   
-    TH1F *fh_Fi6_channels;
-    TH1F *fh_Fi6_fibers;
-    TH2F *fh_Fi6_multihit;
-    TH2F *fh_Fi6_ToT;
-    TH2F *fh_Fi6_ToTvsTime;
-    TH2F *fh_Fi6_multihit_s;
-    TH2F *fh_Fi6_ToT_s;
-    TH2F *fh_Fi6_ToTvsTime_s;
+
     
-    TH1F* fh_los_t7;
-    TH1F* fh_los_t5;
-    TH1F* fh_los_t3;
-    TH1F* fh_los_t1;
-    TH1F* fh_los_t2;
-    TH1F* fh_los_t4;
-    TH1F* fh_los_t6;
-    TH1F* fh_los_t8;
+ 
   
   public:
     ClassDef(R3BOnlineSpectra, 1)

@@ -4,6 +4,10 @@
 // ----------------------------------------------------------------
 
 #include "R3BPaddleTamexMappedData.h"
+#include <iostream>
+#include <stdlib.h>
+
+using namespace std;
 
 R3BPaddleTamexMappedData::R3BPaddleTamexMappedData()
     : fPlane(0)

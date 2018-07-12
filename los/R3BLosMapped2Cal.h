@@ -134,6 +134,7 @@ class R3BLosMapped2Cal : public FairTask
     UInt_t fNofTypes = 3;    
 	UInt_t fNofModules;    /**< Total number of channels. */
     Double_t fClockFreq;   /**< Clock cycle in [ns]. */
+    UInt_t fNEvent;
 
   public:
     ClassDef(R3BLosMapped2Cal, 1)

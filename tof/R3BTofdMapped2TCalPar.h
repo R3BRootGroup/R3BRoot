@@ -112,7 +112,7 @@ class R3BTofdMapped2TCalPar : public FairTask
     {
         fNofPlanes = nDets;		
         fPaddlesPerPlane  = nCh;
-        fNofModules   = nDets * nCh * 1; // 1 edge per channel
+        fNofModules   = nDets * nCh * 4; // 1 edge per channel
     }
 
   private:

@@ -5,14 +5,15 @@
 #include "R3BBunchedFiberMappedData.h"
 
 R3BBunchedFiberReader::R3BBunchedFiberReader(char const *a_name, UInt_t
-    a_offset, UInt_t a_mapmt_channel_num, UInt_t a_spmt_channel_num)
+    a_offset, UInt_t a_sub_num, UInt_t a_mapmt_channel_num, UInt_t
+    a_spmt_channel_num)
   : R3BReader(TString("R3B") + a_name + "Reader")
   , fName(a_name)
   , fOffset(a_offset)
   , fMappedArray(new TClonesArray("R3BBunchedFiberMappedData"))
 {
-  fChannelNum[0] = a_mapmt_channel_num;
-  fChannelNum[1] = a_spmt_channel_num;
+  fChannelNum[0] = a_sub_num * a_mapmt_channel_num;
+  fChannelNum[1] = a_sub_num * a_spmt_channel_num;
 }
 
 Bool_t R3BBunchedFiberReader::Init()
@@ -29,6 +30,9 @@ Bool_t R3BBunchedFiberReader::Init()
         }
       }
     }
+    if (0 == fChannelNum[1]) {
+      break;
+    }
   }
   FairRootManager::Instance()->Register(fName + "Mapped", "Land",
       fMappedArray, kTRUE);
@@ -37,6 +41,7 @@ Bool_t R3BBunchedFiberReader::Init()
 
 Bool_t R3BBunchedFiberReader::Read()
 {
+	//LOG(ERROR) << "R3BBunchedFiberReader::Read BEGIN" << FairLogger::endl;
   for (size_t side_i = 0; side_i < 2; ++side_i) {
     for (size_t edge_i = 0; edge_i < 2; ++edge_i) {
       auto const &e = fMHL[side_i][edge_i];
@@ -90,7 +95,11 @@ Bool_t R3BBunchedFiberReader::Read()
         }
       }
     }
+    if (0 == fChannelNum[1]) {
+      break;
+    }
   }
+  //LOG(ERROR) << "R3BBunchedFiberReader::Read END" << FairLogger::endl;
   return kTRUE;
 }
 

@@ -3,6 +3,8 @@
 R3BFi1Cal2Hit::R3BFi1Cal2Hit(Int_t a_verbose)
   : R3BBunchedFiberCal2Hit("Fi1", a_verbose, 256, 1)
 {
+  CreateSub(VERTICAL, 0);
+  CreateSub(HORIZONTAL, 0);
 }
 
 R3BFi1Cal2Hit::~R3BFi1Cal2Hit()

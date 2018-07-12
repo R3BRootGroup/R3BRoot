@@ -576,12 +576,12 @@ InitStatus R3BLosCal2Hit::Init()
                walk_par[ivec][5] >> walk_par[ivec][6] >> walk_par[ivec][7] >> walk_par[ivec][8] >> walk_par[ivec][9] >>
                walk_par[ivec][10];
                
-  
+ /* 
       cout<<setprecision(10)<< ivec<<", "<< walk_par[ivec][0] <<", "<< walk_par[ivec][1] <<", "<< walk_par[ivec][2] <<", "<< 
                           walk_par[ivec][3] <<", "<< walk_par[ivec][4] <<", "<< walk_par[ivec][5] <<", "<<
                           walk_par[ivec][6] <<", "<< walk_par[ivec][7] <<", "<< walk_par[ivec][8] <<", "<<
                           walk_par[ivec][9] <<", "<< walk_par[ivec][10] <<endl;       
-               
+  */             
    }
   } 
   else //cerr << "Unable to open file \""<<fwalk_param_file<<"\" with walk parameters!"<<endl;
@@ -625,7 +625,7 @@ InitStatus R3BLosCal2Hit::Init()
    }	   
 
   
-  
+  //cout << "R3BLosCal2Hit::Init END" << endl;
   return kSUCCESS;
 }
 
@@ -644,6 +644,7 @@ InitStatus R3BLosCal2Hit::ReInit()
  */
 void R3BLosCal2Hit::Exec(Option_t* option)
 { 
+	//cout << "R3BLosCal2Hit::Exec BEGIN: " << Icount << endl;
 	   Icount++;
  // ofstream myFile("data_483.dat",ios_base::out|ios_base::app);
      
@@ -849,15 +850,15 @@ void R3BLosCal2Hit::Exec(Option_t* option)
      // min,max,Nbins for time spectra  
        Double_t fhTmin = -20.; //-5.; //-10
        Double_t fhTmax = 20.; //5.;  // 10
-       Int_t    fhTbin = 20000; //10000; // 20000
+       Int_t    fhTbin = 2000; //10000; // 20000
      // min,max,Nbins for ToT spectra        
        Double_t fhQmin = 0.;
        Double_t fhQmax = 200; //300.; //150
        Int_t    fhQbin = 4000; //0; //3000; //1500
      // min,max,Nbins for X and Y spectra
-       Double_t fhXmin = -4.; //-5
-       Double_t fhXmax = 4.; // 5
-       Int_t    fhXbin = 800; // 1000
+       Double_t fhXmin = -5.; //-5
+       Double_t fhXmax = 5.; // 5
+       Int_t    fhXbin = 2000; // 1000
       // min,max,Nbins for radius spectra
        Double_t fhRmin = -2.;//0.;
        Double_t fhRmax = 2.;//10.;
@@ -1220,7 +1221,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
           {
               char strName[255];
               sprintf(strName, "X_vs_Y_mean");
-              fhXYmean = new TH2F(strName, "", fhXbin, fhXmin, fhXmax,fhXbin, fhXmin, fhXmax);              
+              fhXYmean = new TH2F(strName, "", 4000, fhXmin, fhXmax,4000, fhXmin, fhXmax);              
           }
 
          if (NULL == fhXY_corr )
@@ -1248,14 +1249,14 @@ void R3BLosCal2Hit::Exec(Option_t* option)
           {
               char strName[255];
               sprintf(strName, "X_vs_Y_ToT");
-              fhXY_ToT = new TH2F(strName, "", 2000, fhXmin, fhXmax, 2000, fhXmin, fhXmax);              
+              fhXY_ToT = new TH2F(strName, "", 4000, fhXmin, fhXmax, 4000, fhXmin, fhXmax);              
           }       
           
           if (NULL == fhXY_ToT_corr )
           {
               char strName[255];
               sprintf(strName, "X_vs_Y_ToT_corr");
-              fhXY_ToT_corr = new TH2F(strName, "", fhXbin, fhXmin, fhXmax,fhXbin, fhXmin, fhXmax);              
+              fhXY_ToT_corr = new TH2F(strName, "", 4000, fhXmin, fhXmax,4000, fhXmin, fhXmax);              
           }      
           
            if (NULL == fhXY1_ToT_corr )
@@ -1276,7 +1277,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
           {
               char strName[255];
               sprintf(strName, "X2_vs_Y2_proj");
-              fhXYproj = new TH2F(strName, "", 5000, fhXmin, fhXmax,5000, fhXmin, fhXmax);              
+              fhXYproj = new TH2F(strName, "", 4000, fhXmin, fhXmax,4000, fhXmin, fhXmax);              
           }  
           
          if (NULL == fhXY1 )
@@ -1847,61 +1848,50 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 
       nDet = calItem->GetDetector();
 
-/*   
- cout<<"VFTX 1-4 "<<ihit<<", "<<calItem->fTimeV_r_ns<<", "<<calItem->fTimeV_t_ns<<", "<<calItem->fTimeV_l_ns<<", "<<calItem->fTimeV_b_ns<<endl;
- cout<<"TAMEX L 1-4 "<<ihit<<", "<<calItem->fTimeL_r_ns<<", "<<calItem->fTimeL_t_ns<<", "<<calItem->fTimeL_l_ns<<", "<<calItem->fTimeL_b_ns<<endl;
- cout<<"TAMEX T 1-4 "<<ihit<<", "<<calItem->fTimeT_r_ns<<", "<<calItem->fTimeT_t_ns<<", "<<calItem->fTimeT_l_ns<<", "<<calItem->fTimeT_b_ns<<endl;
- cout<<"VFTX 5-8 "<<ihit<<", "<<calItem->fTimeV_rt_ns<<", "<<calItem->fTimeV_lt_ns<<", "<<calItem->fTimeV_lb_ns<<", "<<calItem->fTimeV_rb_ns<<endl;
- cout<<"TAMEX L 5-8 "<<ihit<<", "<<calItem->fTimeL_rt_ns<<", "<<calItem->fTimeL_lt_ns<<", "<<calItem->fTimeL_lb_ns<<", "<<calItem->fTimeL_rb_ns<<endl;
- cout<<"TAMEX T 5-8 "<<ihit<<", "<<calItem->fTimeT_rt_ns<<", "<<calItem->fTimeT_lt_ns<<", "<<calItem->fTimeT_lb_ns<<", "<<calItem->fTimeT_rb_ns<<endl;
+/*  
+ cout<<" VFTX   1-4 "<<ihit<<", "<<calItem->fTimeV_t_ns<<", "<<calItem->fTimeV_lt_ns<<", "<<calItem->fTimeV_l_ns<<", "<<calItem->fTimeV_lb_ns<<endl;
+ cout<<"TAMEX L 1-4 "<<ihit<<", "<<calItem->fTimeL_t_ns<<", "<<calItem->fTimeL_lt_ns<<", "<<calItem->fTimeL_l_ns<<", "<<calItem->fTimeL_lb_ns<<endl;
+ cout<<"TAMEX T 1-4 "<<ihit<<", "<<calItem->fTimeT_t_ns<<", "<<calItem->fTimeT_lt_ns<<", "<<calItem->fTimeT_l_ns<<", "<<calItem->fTimeT_lb_ns<<endl;
+ cout<<" VFTX   5-8 "<<ihit<<", "<<calItem->fTimeV_b_ns<<", "<<calItem->fTimeV_rb_ns<<", "<<calItem->fTimeV_r_ns<<", "<<calItem->fTimeV_rt_ns<<endl;
+ cout<<"TAMEX L 5-8 "<<ihit<<", "<<calItem->fTimeL_b_ns<<", "<<calItem->fTimeL_rb_ns<<", "<<calItem->fTimeL_r_ns<<", "<<calItem->fTimeL_rt_ns<<endl;
+ cout<<"TAMEX T 5-8 "<<ihit<<", "<<calItem->fTimeT_b_ns<<", "<<calItem->fTimeT_rb_ns<<", "<<calItem->fTimeT_r_ns<<", "<<calItem->fTimeT_rt_ns<<endl;
 */
          if(ihit == 0) 
          {
-  // Channels 1-4 VFTX:
+ // VFTX: 
            if(!(IS_NAN(calItem->fTimeV_r_ns))) time_r_V = calItem->fTimeV_r_ns;
            if(!(IS_NAN(calItem->fTimeV_t_ns))) time_t_V = calItem->fTimeV_t_ns;
            if(!(IS_NAN(calItem->fTimeV_l_ns))) time_l_V = calItem->fTimeV_l_ns;
            if(!(IS_NAN(calItem->fTimeV_b_ns))) time_b_V = calItem->fTimeV_b_ns;  
-  // Channels 5-8 VFTX:
            if(!(IS_NAN(calItem->fTimeV_rt_ns))) time_rt_V = calItem->fTimeV_rt_ns;
            if(!(IS_NAN(calItem->fTimeV_lt_ns))) time_lt_V = calItem->fTimeV_lt_ns;
            if(!(IS_NAN(calItem->fTimeV_lb_ns))) time_lb_V = calItem->fTimeV_lb_ns;
            if(!(IS_NAN(calItem->fTimeV_rb_ns))) time_rb_V = calItem->fTimeV_rb_ns; 
-   // Pixel signal (15th channel):         
-          if(!(IS_NAN(calItem->fTimeV_pix_ns))) time_pix_V = calItem->fTimeV_pix_ns;        
-  // Reference signal (16th channel):         
-          if(!(IS_NAN(calItem->fTimeV_ref_ns))) time_ref_V = calItem->fTimeV_ref_ns;
           
-//  cout<<"VFTX in "<<calItem->fTimeV_t_ns<<", "<<calItem->fTimeV_lt_ns<<", "<<calItem->fTimeV_l_ns<<", "<<calItem->fTimeV_lb_ns<<", "<<calItem->fTimeV_b_ns<<", "<<calItem->fTimeV_rb_ns<<", "<<calItem->fTimeV_r_ns<<", "<<calItem->fTimeV_rt_ns<<endl;          
-	     }
-	     else if(ihit == 1)
-	     {                 
-  // Channels 1-4 TAMEX:      
+ // cout<<"VFTX in "<<calItem->fTimeV_t_ns<<", "<<calItem->fTimeV_lt_ns<<", "<<calItem->fTimeV_l_ns<<", "<<calItem->fTimeV_lb_ns<<", "<<calItem->fTimeV_b_ns<<", "<<calItem->fTimeV_rb_ns<<", "<<calItem->fTimeV_r_ns<<", "<<calItem->fTimeV_rt_ns<<endl;          
+	    // }
+	   //  else if(ihit == 1)
+	    // {                 
+ // TAMEX:         
            if(!(IS_NAN(calItem->fTimeL_r_ns))) time_r_L = calItem->fTimeL_r_ns;
-           if(!(IS_NAN(calItem->fTimeT_r_ns))) time_r_T = calItem->fTimeT_r_ns;
            if(!(IS_NAN(calItem->fTimeL_t_ns))) time_t_L = calItem->fTimeL_t_ns;
-           if(!(IS_NAN(calItem->fTimeT_t_ns))) time_t_T = calItem->fTimeT_t_ns;  
            if(!(IS_NAN(calItem->fTimeL_l_ns))) time_l_L = calItem->fTimeL_l_ns;
-           if(!(IS_NAN(calItem->fTimeT_l_ns))) time_l_T = calItem->fTimeT_l_ns; 
            if(!(IS_NAN(calItem->fTimeL_b_ns))) time_b_L = calItem->fTimeL_b_ns;
-           if(!(IS_NAN(calItem->fTimeT_b_ns))) time_b_T = calItem->fTimeT_b_ns;  
- // Channels 5-8 TAMEX:
            if(!(IS_NAN(calItem->fTimeL_rt_ns))) time_rt_L = calItem->fTimeL_rt_ns;
-           if(!(IS_NAN(calItem->fTimeT_rt_ns))) time_rt_T = calItem->fTimeT_rt_ns;
            if(!(IS_NAN(calItem->fTimeL_lt_ns))) time_lt_L = calItem->fTimeL_lt_ns;
-           if(!(IS_NAN(calItem->fTimeT_lt_ns))) time_lt_T = calItem->fTimeT_lt_ns;  
            if(!(IS_NAN(calItem->fTimeL_lb_ns))) time_lb_L = calItem->fTimeL_lb_ns;
-           if(!(IS_NAN(calItem->fTimeT_lb_ns))) time_lb_T = calItem->fTimeT_lb_ns; 
            if(!(IS_NAN(calItem->fTimeL_rb_ns))) time_rb_L = calItem->fTimeL_rb_ns;
+ //cout<<"TAMEX L in "<<calItem->fTimeL_t_ns<<", "<<calItem->fTimeL_lt_ns<<", "<<calItem->fTimeL_l_ns<<", "<<calItem->fTimeL_lb_ns<<", "<<calItem->fTimeL_b_ns<<", "<<calItem->fTimeL_rb_ns<<", "<<calItem->fTimeL_r_ns<<", "<<calItem->fTimeL_rt_ns<<endl;
+	              
+           if(!(IS_NAN(calItem->fTimeT_r_ns))) time_r_T = calItem->fTimeT_r_ns;
+           if(!(IS_NAN(calItem->fTimeT_t_ns))) time_t_T = calItem->fTimeT_t_ns;  
+           if(!(IS_NAN(calItem->fTimeT_l_ns))) time_l_T = calItem->fTimeT_l_ns; 
+           if(!(IS_NAN(calItem->fTimeT_b_ns))) time_b_T = calItem->fTimeT_b_ns;  
+           if(!(IS_NAN(calItem->fTimeT_rt_ns))) time_rt_T = calItem->fTimeT_rt_ns;
+           if(!(IS_NAN(calItem->fTimeT_lt_ns))) time_lt_T = calItem->fTimeT_lt_ns;  
+           if(!(IS_NAN(calItem->fTimeT_lb_ns))) time_lb_T = calItem->fTimeT_lb_ns; 
            if(!(IS_NAN(calItem->fTimeT_rb_ns))) time_rb_T = calItem->fTimeT_rb_ns;  
-// Pixel signal (15th channel): 
-           if(!(IS_NAN(calItem->fTimeL_pix_ns))) time_pix_L = calItem->fTimeL_pix_ns;
-           if(!(IS_NAN(calItem->fTimeT_pix_ns))) time_pix_T = calItem->fTimeT_pix_ns;             
-// Reference signal (16th channel): 
-           if(!(IS_NAN(calItem->fTimeL_ref_ns))) time_ref_L = calItem->fTimeL_ref_ns;
-           if(!(IS_NAN(calItem->fTimeT_ref_ns))) time_ref_T = calItem->fTimeT_ref_ns;
            
-// cout<<"TAMEX L in "<<calItem->fTimeL_t_ns<<", "<<calItem->fTimeL_lt_ns<<", "<<calItem->fTimeL_l_ns<<", "<<calItem->fTimeL_lb_ns<<", "<<calItem->fTimeL_b_ns<<", "<<calItem->fTimeL_rb_ns<<", "<<calItem->fTimeL_r_ns<<", "<<calItem->fTimeL_rt_ns<<endl;
  
 // cout<<"TAMEX T in "<<calItem->fTimeT_t_ns<<", "<<calItem->fTimeT_lt_ns<<", "<<calItem->fTimeT_l_ns<<", "<<calItem->fTimeT_lb_ns<<", "<<calItem->fTimeT_b_ns<<", "<<calItem->fTimeT_rb_ns<<", "<<calItem->fTimeT_r_ns<<", "<<calItem->fTimeT_rt_ns<<endl;         
 	     }   
@@ -1950,7 +1940,8 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 // We will consider only events in which booth MCFD and TAMEX see same number of channels:
       if(iLOSTypeTAMEX == 1 && iLOSTypeMCFD == 1) iLOSType = 1;
       if(iLOSTypeTAMEX == 2 && iLOSTypeMCFD == 2) iLOSType = 2;
-           
+   //   if(iLOSTypeMCFD == 1) iLOSType = 1;
+   //   if(iLOSTypeMCFD == 2) iLOSType = 2;           
       
 //    cout<<"ILOSType: "<< iLOSTypeMCFD<<", "<<iLOSTypeTAMEX<<endl;      
 //    cout<<"VFTX 1-8 "<<time_t_V<<", "<<time_lt_V<<", "<<time_l_V<<", "<<time_lb_V<<", "<<time_b_V<<", "<<time_rb_V<<", "<<time_r_V<<", "<<time_rt_V<<endl;          
@@ -2039,27 +2030,30 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 			//ref_timeT=time_ref_L+48.;			
 		  }	 
   
-                 
+      /*           
            if(tott>walk_par[0][0] && totlt>walk_par[1][0] && totl>walk_par[2][0] && 
               totlb>walk_par[3][0] && totb>walk_par[4][0] && totrb>walk_par[5][0] && 
               totr>walk_par[6][0] && totrt>walk_par[7][0]) Igood_event = 1;
+       */       
               
+           Igood_event = 1;  
               
-            Igood_event = 1;  
+  // This is for 12C beam:
+          //if((tot_ver+tot_hor+tot_45+tot_135)/4. > 53.4 && (tot_ver+tot_hor+tot_45+tot_135)/4. < 59.1) Igood_event = 1;
+         //   if(tott>18.5 && totlt>18.2 && totl>20.5 && totlb>18.2 && totb>18.2 && totrb>21.0 && totr>19.0 && totrt>17. &&
+         //      tott<23.2 && totlt<24.5 && totl<24.0 && totlb<24.0 && totb<22.4 && totrb<24.5 && totr<22.6 && totrt<23.) Igood_event = 1;
               
-  
-     //     if(totpix > 89. && totpix < 91.) Igood_event = 1;
 		           		
 		// MCFD 1,3,5,7 
-		   fht1Q1M->Fill(tott,(time_t_V-ref_timeM));
-	       fht3Q3M->Fill(totl,(time_l_V-ref_timeM));
-	       fht5Q5M->Fill(totb,(time_b_V-ref_timeM));	  
-		   fht7Q7M->Fill(totr,(time_r_V-ref_timeM));
+		   fht1Q1M->Fill(tott,(time_t_V-time_b_V));
+	       fht3Q3M->Fill(totl,(time_l_V-time_r_V));
+	       fht5Q5M->Fill(totb,(time_b_V-time_t_V));	  
+		   fht7Q7M->Fill(totr,(time_r_V-time_l_V));
 	    // MCFD 2,4,6,8   
-		   fht2Q2M->Fill(totlt,(time_lt_V-ref_timeM));
-		   fht4Q4M->Fill(totlb,(time_lb_V-ref_timeM));	  
-		   fht6Q6M->Fill(totrb,(time_rb_V-ref_timeM));
-		   fht8Q8M->Fill(totrt,(time_rt_V-ref_timeM));
+		   fht2Q2M->Fill(totlt,(time_lt_V-time_rb_V));
+		   fht4Q4M->Fill(totlb,(time_lb_V-time_rt_V));	  
+		   fht6Q6M->Fill(totrb,(time_rb_V-time_lt_V));
+		   fht8Q8M->Fill(totrt,(time_rt_V-time_lb_V));
 		// TAMEX 1,3,5,7 
 		   fht1Q1T->Fill(tott,(time_t_L-ref_timeT));
 	       fht3Q3T->Fill(totl,(time_l_L-ref_timeT));
@@ -2080,7 +2074,9 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 			myFile<<setprecision(10)<<"4 "<<time_lb_V<<" "<<time_lb_L<<" "<<totlb<<endl;
 			myFile<<setprecision(10)<<"5 "<<time_b_V<<" "<<time_b_L<<" "<<totb<<endl;
 			myFile<<setprecision(10)<<"6 "<<time_rb_V<<" "<<time_rb_L<<" "<<totrb<<endl;
-			myFile<<setprecision(10)<<"7 "<<time_r_V<<" "<<time_r_L<<" "<<totr<<endl;
+	 one really produces data so it's ok to throw all
+        * detector hits into the same list (and hence traversing a longer
+        * list than strictly necessary for the reconstruction)		myFile<<setprecision(10)<<"7 "<<time_r_V<<" "<<time_r_L<<" "<<totr<<endl;
 			myFile<<setprecision(10)<<"8 "<<time_rt_V<<" "<<time_rt_L<<" "<<totrt<<endl;
 			myFile<<setprecision(10)<<"9 "<<ref_timeM<<" "<<ref_timeT<<" "<<
 			      (tott+totlt+totl+totlb+totb+totrb+totr+totrt)/8. <<endl;
@@ -2136,7 +2132,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 	     
     // Walk-corrected position, for test purposes:    
     
-         dx1 = (time_r_V_corr-time_l_V_corr) ;         
+         dx1 = (time_l_V_corr-time_r_V_corr) ;         
          dy1 = (time_b_V_corr-time_t_V_corr) ;       
          
          
@@ -2203,9 +2199,9 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 	     
     // Walk-corrected position, for test purposes:    
     
-         dx1 = (time_r_V_corr-time_l_V_corr) ;         
+         dx1 = (time_l_V_corr-time_r_V_corr) ;         
          dy1 = (time_b_V_corr-time_t_V_corr) ;       
-         dx2 = (time_rb_V_corr-time_lt_V_corr) ;         
+         dx2 = (time_lt_V_corr-time_rb_V_corr) ;         
          dy2 = (time_lb_V_corr-time_rt_V_corr) ;
          
          if(tott < walk_par[0][0] || tott > walk_par[0][1]) dy1 = 0.0/0.0; 		     
@@ -2273,10 +2269,10 @@ void R3BLosCal2Hit::Exec(Option_t* option)
  		   t_hor_T_corr = (time_r_L_corr + time_l_L_corr)/2.;       		  
            t_ver_T_corr = (time_t_L_corr + time_b_L_corr)/2.;          
            
-		   x1T_cm=(time_r_L-time_l_L-flosOffsetX1T)*flosVeffX1T;
+		   x1T_cm=(time_l_L-time_r_L-flosOffsetX1T)*flosVeffX1T;
 		   y1T_cm=(time_b_L-time_t_L-flosOffsetY1T)*flosVeffY1T;
 		   		   
-		   x1T_cm_corr=(time_r_L_corr-time_l_L_corr);
+		   x1T_cm_corr=(time_l_L_corr-time_r_L_corr);
 		   y1T_cm_corr=(time_b_L_corr-time_t_L_corr);	
 		   
 	// MCFD:	           
@@ -2286,8 +2282,9 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 	       t_ver_M_corr = (time_t_V_corr + time_b_V_corr)/2.;
 	       
 	       Double_t  x_cm_temp,y_cm_temp;
-	       x_cm_temp=(time_r_V-time_l_V-flosOffsetX1)*flosVeffX1;
-	 	   y_cm_temp=(time_b_V-time_t_V-flosOffsetY1)*flosVeffY1;   
+	       x1_cm=(time_l_V-time_r_V-flosOffsetX1)*flosVeffX1;
+	 	   y1_cm=(time_b_V-time_t_V-flosOffsetY1)*flosVeffY1;  
+	 	    
 /*	 	   
 	 	   y1_cm = y_cm_temp*cos(0.1714)-x_cm_temp*sin(0.1714);
 		   x1_cm = x_cm_temp*cos(0.1714)+y_cm_temp*sin(0.1714);   	       
@@ -2304,7 +2301,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 	// TAMEX:		  
             t_45_T = (time_rb_L + time_lt_L)/2.; 		  
 	        t_135_T = (time_rt_L + time_lb_L)/2.; 
-    		x2T_cm=(time_rb_L-time_lt_L-flosOffsetX2T)*flosVeffX2T;
+    		x2T_cm=(time_lt_L-time_rb_L-flosOffsetX2T)*flosVeffX2T;
 		    y2T_cm=(time_lb_L-time_rt_L-flosOffsetY2T)*flosVeffY2T;	
 		    
 
@@ -2312,7 +2309,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 	        t_45_M  = (time_rb_V + time_lt_V)/2.; 		  
 	        t_135_M = (time_rt_V + time_lb_V)/2.; 
 	        
-            x2_cm=(time_rb_V-time_lt_V-flosOffsetX2)*flosVeffX2;
+            x2_cm=(time_lt_V-time_rb_V-flosOffsetX2)*flosVeffX2;
             y2_cm=(time_lb_V-time_rt_V-flosOffsetY2)*flosVeffY2;
                        
             if(!(IS_NAN(dx2)) && !(IS_NAN(dy2))){        
@@ -2464,10 +2461,23 @@ void R3BLosCal2Hit::Exec(Option_t* option)
                           (time_rb_L_corr + time_lt_L_corr + time_rt_L_corr+ time_lb_L_corr)/4.; 
                        
       }
-          xT_cm = (x1T_cm + (x2T_cm/sqrt(2.)-y2T_cm/sqrt(2.)))/2.;
-          yT_cm = (y1T_cm + (x2T_cm/sqrt(2.)+y2T_cm/sqrt(2.)))/2.;
+      //    xT_cm = (x1T_cm + (x2T_cm/sqrt(2.)-y2T_cm/sqrt(2.)))/2.;
+      //    yT_cm = (y1T_cm + (x2T_cm/sqrt(2.)+y2T_cm/sqrt(2.)))/2.;
           
+  // New coordinate system since KVI (transformation for 22.5 deg):  
+  /*      
+          xT_cm = (x1T_cm*cos(3.141593/8.) + y1T_cm*sin(3.141593/8.) + 
+                   x2T_cm*cos(3.141593/8.) - y2T_cm*sin(3.141593/8.))/2.;
+                   
+          yT_cm = (y1T_cm*cos(3.141593/8.) - x1T_cm*sin(3.141593/8.) +
+                   x2T_cm*sin(3.141593/8.) + y2T_cm*cos(3.141593/8.))/2.;    
+                   
+    */               
+          xT_cm = (time_l_L+time_lb_L)/2.-(time_r_L+time_rt_L)/2.;                  
+          yT_cm = (time_b_L+time_rb_L)/2.-(time_t_L+time_lt_L)/2.;
           
+          xT_cm=(xT_cm-1.347)*0.742;
+	   	  yT_cm=(yT_cm-0.139)*0.911;
           			
          if(!(IS_NAN(tott)) && !(IS_NAN(totlt)) && !(IS_NAN(totl)) && !(IS_NAN(totlb)) &&
            !(IS_NAN(totb)) && !(IS_NAN(totrb)) && !(IS_NAN(totr)) && !(IS_NAN(totrt)) &&
@@ -2493,16 +2503,36 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 
           Double_t y_cm_temp, x_cm_temp;
 
-          x_cm_temp = (x1_cm + (x2_cm/sqrt(2.)-y2_cm/sqrt(2.)))/2.;
-          y_cm_temp = (y1_cm + (x2_cm/sqrt(2.)+y2_cm/sqrt(2.)))/2.;
+    //      x_cm_temp = (x1_cm + (x2_cm/sqrt(2.)-y2_cm/sqrt(2.)))/2.;
+    //      y_cm_temp = (y1_cm + (x2_cm/sqrt(2.)+y2_cm/sqrt(2.)))/2.;
           
-          y_cm = y_cm_temp;
-          x_cm = x_cm_temp;
+    //      y_cm = y_cm_temp;
+    //      x_cm = x_cm_temp;
        
-          x_cm_corr = (x1_cm_corr + (x2_cm_corr/sqrt(2.)-y2_cm_corr/sqrt(2.)))/2.;
-          y_cm_corr = (y1_cm_corr + (x2_cm_corr/sqrt(2.)+y2_cm_corr/sqrt(2.)))/2.;
+  // New coordinate system since KVI (transformation for 22.5 deg):         
+          /*
+          x_cm = (x1_cm*cos(3.141593/8.)+y1_cm*sin(3.141593/8.) + 
+                  x2_cm*cos(3.141593/8.)-y2_cm*sin(3.141593/8.))/2.;
+          y_cm = (y1_cm*cos(3.141593/8.)-x1_cm*sin(3.141593/8.) +
+                  x2_cm*sin(3.141593/8.)+y2_cm*cos(3.141593/8.))/2.;             
+           */
+                  
+          x_cm = (time_l_V+time_lb_V)/2.-(time_r_V+time_rt_V)/2.;                  
+          y_cm = (time_b_V+time_rb_V)/2.-(time_t_V+time_lt_V)/2.;
+       
+          x_cm=(x_cm-0.0222)*1.870;
+		  y_cm=(y_cm+0.194063)*2.238;
           
+                   
+  //        x_cm_corr = (x1_cm_corr + (x2_cm_corr/sqrt(2.)-y2_cm_corr/sqrt(2.)))/2.;
+  //        y_cm_corr = (y1_cm_corr + (x2_cm_corr/sqrt(2.)+y2_cm_corr/sqrt(2.)))/2.;
           
+          x_cm_corr = (x1_cm_corr*cos(3.141593/8.)+y1_cm_corr*sin(3.141593/8.) + 
+                       x2_cm_corr*cos(3.141593/8.)-y2_cm_corr*sin(3.141593/8.))/2.;
+          y_cm_corr = (y1_cm_corr*cos(3.141593/8.)-x1_cm_corr*sin(3.141593/8.) +
+                       x2_cm_corr*sin(3.141593/8.)+y2_cm_corr*cos(3.141593/8.))/2.;  
+          
+   /*       
           if(IS_NAN(tott))  cout<<"IS_NAN(tott)"<<endl;
           if(IS_NAN(totlt)) cout<<"IS_NAN(totlt)"<<endl;
           if(IS_NAN(totl))  cout<<"IS_NAN(totl)"<<endl;          
@@ -2520,7 +2550,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
           if(totrb == 0.0) cout<<"totrb=0"<<endl;          
           if(totr == 0.0)  cout<<"totr=0"<<endl;          
           if(totrt == 0.0) cout<<"totrt=0"<<endl;          
-          
+    */      
         
           
         if(!(IS_NAN(tott)) && !(IS_NAN(totlt)) && !(IS_NAN(totl)) && !(IS_NAN(totlb)) &&
@@ -2530,25 +2560,30 @@ void R3BLosCal2Hit::Exec(Option_t* option)
         {
 			
            tot = (tot_ver + tot_hor + tot_45 + tot_135)/4.;
-		   	          
-      
-           x1ToT_cm = ((totl-totr)/(totl+totr)-flosOffsetX1Q)*flosVeffX1Q;
+     
+           x1ToT_cm = ((totr-totl)/(totl+totr)-flosOffsetX1Q)*flosVeffX1Q;
            y1ToT_cm = ((tott-totb)/(tott+totb)-flosOffsetY1Q)*flosVeffY1Q;
-           x2ToT_cm = ((totlt-totrb)/(totlt+totrb)-flosOffsetX2Q)*flosVeffX2Q;
-           y2ToT_cm = ((totrt-totlb)/(totrt+totlb)-flosOffsetY2Q)*flosVeffY2Q; 
-          
-        /*   
-           x1ToT_cm = (log(totl/totr)-flosOffsetX1Q)*flosVeffX1Q;
-           y1ToT_cm = (log(tott/totb)-flosOffsetY1Q)*flosVeffY1Q;
-           x2ToT_cm = (log(totlt/totrb)-flosOffsetX2Q)*flosVeffX2Q;
-           y2ToT_cm = (log(totrt/totlb)-flosOffsetY2Q)*flosVeffY2Q; 
-         */  
            
-           
+           x2ToT_cm = ((totrb-totlt)/(totlt+totrb)-flosOffsetX2Q)*flosVeffX2Q; 
+           y2ToT_cm = ((totrt-totlb)/(totrt+totlb)-flosOffsetY2Q)*flosVeffY2Q;                  
                     
-           xToT = (x1ToT_cm + (x2ToT_cm/sqrt(2.)-y2ToT_cm/sqrt(2.)))/2.;
-           yToT = (y1ToT_cm + (x2ToT_cm/sqrt(2.)+y2ToT_cm/sqrt(2.)))/2.; 
+    //       xToT = (x1ToT_cm + (x2ToT_cm/sqrt(2.)-y2ToT_cm/sqrt(2.)))/2.;
+    //       yToT = (y1ToT_cm + (x2ToT_cm/sqrt(2.)+y2ToT_cm/sqrt(2.)))/2.; 
  
+ // New coordinate system since KVI (transformation for 22.5 deg): 
+ /*
+          xToT = (x1ToT_cm*cos(3.141593/8.)+y1ToT_cm*sin(3.141593/8.) + 
+                  x2ToT_cm*cos(3.141593/8.)-y2ToT_cm*sin(3.141593/8.))/2.;
+          yToT = (y1ToT_cm*cos(3.141593/8.)-x1ToT_cm*sin(3.141593/8.) +
+                  x2ToT_cm*sin(3.141593/8.)+y2ToT_cm*cos(3.141593/8.))/2.;    
+*/
+
+           xToT=((totr+totrt)/2.-(totl+totlb)/2.)/((totl+totlb+totr+totrt)/4.);
+           yToT=((tott+totlt)/2.-(totb+totrb)/2.)/((tott+totlt+totrb+totb)/4.);
+    
+           xToT = (xToT-0.0044)*4.510;
+           yToT = (yToT+0.02423)*4.492;
+
 
   // Raumwinkel und Radius           
   
@@ -2611,14 +2646,29 @@ void R3BLosCal2Hit::Exec(Option_t* option)
         x2real = ((totlt_corr-totrb_corr)/(totlt_corr+totrb_corr)-flosOffsetX2Qc)*flosVeffX2Qc;            
         y2real = ((totrt_corr-totlb_corr)/(totrt_corr+totlb_corr)-flosOffsetY2Qc)*flosVeffY2Qc; 
 
-        xreal = (x1real + (x2real/sqrt(2.)-y2real/sqrt(2.)))/2.;
-        yreal = (y1real + (x2real/sqrt(2.)+y2real/sqrt(2.)))/2.; 
-                
-        xvar = xreal;
-        yvar = yreal;
+  //      xreal = (x1real + (x2real/sqrt(2.)-y2real/sqrt(2.)))/2.;
+  //      yreal = (y1real + (x2real/sqrt(2.)+y2real/sqrt(2.)))/2.; 
+        
+        
+  // New coordinate system since KVI (transformation for 22.5 deg): 
+/*
+          xreal = (x1real*cos(3.141593/8.)+y1real*sin(3.141593/8.) + 
+                  x2real*cos(3.141593/8.)-y2real*sin(3.141593/8.))/2.;
+          yreal = (y1real*cos(3.141593/8.)-x1real*sin(3.141593/8.) +
+                  x2real*sin(3.141593/8.)+y2real*cos(3.141593/8.))/2.; 
+*/
+          xreal=((totr_corr+totrt_corr)/2.-(totl_corr+totlb_corr)/2.)/((totl_corr+totlb_corr+totr_corr+totrt_corr)/4.);
+          yreal=((tott_corr+totlt_corr)/2.-(totb_corr+totrb_corr)/2.)/((tott_corr+totlt_corr+totrb_corr+totb_corr)/4.);                
+          xreal = (xreal-0.0044)*4.510;
+          yreal = (yreal+0.02423)*4.492;
+
+
+
+          xvar = xreal;
+          yvar = yreal;
            
-        xvar1 = xvar/sqrt(2.)+yvar/sqrt(2.);
-        yvar1 = -xvar/sqrt(2.)+yvar/sqrt(2.);  
+          xvar1 = xvar/sqrt(2.)+yvar/sqrt(2.);
+          yvar1 = -xvar/sqrt(2.)+yvar/sqrt(2.);  
  
 
 		
@@ -2632,8 +2682,8 @@ void R3BLosCal2Hit::Exec(Option_t* option)
         } 
                
             
-           xmean_cm = (xreal+x_cm)/2.;
-           ymean_cm = (yreal+y_cm)/2.;	
+           xmean_cm = (xreal+xT_cm)/2.;
+           ymean_cm = (yreal+yT_cm)/2.;	
          }
   
        }   // end octagon
@@ -2657,49 +2707,55 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 			 
 			  
   // MCFD times:    
-          fhTres_M->Fill(LosTresM);
-          fhTres_M_evCh->Fill((t_45_M - t_135_M));    
-          fhTres_M_oddCh->Fill((t_hor_M - t_ver_M));               
+          fhTres_M->Fill(LosTresM);          
+          fhTres_M_oddCh->Fill((t_45_M - t_135_M));    
+          fhTres_M_evCh->Fill((t_hor_M - t_ver_M));               
           fhTresMvsIcount->Fill(Icount,LosTresM);
   // MCFD walk corrected times:			 
           fhTres_M_corr->Fill(LosTresM_corr);		  
-          fhTres_M_oddCh_corr->Fill((time_r_V_corr  + time_l_V_corr)/2. - (time_t_V_corr  +  time_b_V_corr)/2.); 	  
-          fhTres_M_evCh_corr->Fill((time_rb_V_corr + time_lt_V_corr)/2. - (time_rt_V_corr + time_lb_V_corr)/2.);	
+          fhTres_M_evCh_corr->Fill((time_r_V_corr  + time_l_V_corr)/2. - (time_t_V_corr  +  time_b_V_corr)/2.); 	  
+          fhTres_M_oddCh_corr->Fill((time_rb_V_corr + time_lt_V_corr)/2. - (time_rt_V_corr + time_lb_V_corr)/2.);	
           fhTreswcMvsIcount->Fill(Icount,LosTresM_corr);          
    // TAMEX times:       
 	      fhTres_T->Fill(LosTresT); 
-          fhTres_T_evCh->Fill((t_45_T - t_135_T));    
-          fhTres_T_oddCh->Fill((t_hor_T - t_ver_T));               
+	      
+	   //   cout<<"TAMEX t,tot: "<<LosTresT<<", "<<tot<<endl;
+	      
+          fhTres_T_oddCh->Fill((t_45_T - t_135_T));    
+          fhTres_T_evCh->Fill((t_hor_T - t_ver_T));               
           fhTresMvsIcount->Fill(Icount,LosTresM);
   // TAMEX walk corrected times:			 
           fhTres_T_corr->Fill(LosTresT_corr);		  
-          fhTres_T_oddCh_corr->Fill((time_r_L_corr  + time_l_L_corr)/2. - (time_t_L_corr  +  time_b_L_corr)/2.); 	  
-          fhTres_T_evCh_corr->Fill((time_rb_L_corr + time_lt_L_corr)/2. - (time_rt_L_corr + time_lb_L_corr)/2.);	
+          fhTres_T_oddCh_corr->Fill((time_rb_L_corr  + time_lt_L_corr)/2. - (time_rt_L_corr  +  time_lb_L_corr)/2.); 	  
+          fhTres_T_evCh_corr->Fill((time_b_L_corr + time_t_L_corr)/2. - (time_r_L_corr + time_l_L_corr)/2.);	
           fhTreswcTvsIcount->Fill(Icount,LosTresT_corr);
           
    // dt combined:
           fhTres_MT_corr->Fill((LosTresM_corr+LosTresT_corr)/2.);	        
                     	                   
-  // x,y from MCFD:
-          fhXY->Fill(x_cm,y_cm);
+  // x,y from MCFD:          
+          fhXY->Fill(x_cm,y_cm);         
           fhXY1->Fill(x1_cm,y1_cm);
           fhXY2->Fill(x2_cm,y2_cm); 
-      // Average of three:             
-          fhXYproj->Fill(((xreal+x_cm+xT_cm)/3.),(yreal+y_cm+yT_cm)/3.);
+      // Average of three:          
+          fhXYproj->Fill(((xreal+x_cm+xT_cm)/3.),(yreal+y_cm+yT_cm)/3.);                      
+      // Mean value between TAMEX and ToT:  
+          fhXYmean->Fill(xmean_cm,ymean_cm);         
+          
   // x,y from MCFD walk corrected: 
           fhXY_corr->Fill(x_cm_corr,y_cm_corr);         
           fhXY1_corr->Fill(x1_cm_corr,y1_cm_corr);
           fhXY2_corr->Fill(x2_cm_corr,y2_cm_corr);
-  // x,y from TAMEX:	           
+  // x,y from TAMEX:	                     
           fhXYT->Fill(xT_cm,yT_cm); 
           fhXYT1->Fill(x1T_cm,y1T_cm);
-          fhXYT2->Fill(x2T_cm,y2T_cm);        
+          fhXYT2->Fill(x2T_cm,y2T_cm);
+          
   // x,y from ToT:            
           fhXY_ToT->Fill(xToT,yToT);         
           fhXYQ1->Fill(x1ToT_cm,y1ToT_cm);
           fhXYQ2->Fill(x2ToT_cm,y2ToT_cm);                   
- // Mean value between MCFD and ToT:  
-          fhXYmean->Fill(xmean_cm,ymean_cm);       		  	 
+        		  	 
  // x,y from ToT corrected:             
           fhXY_ToT_corr->Fill(xreal,yreal); 
           fhXY1_ToT_corr->Fill(x1real,y1real);
@@ -2709,28 +2765,28 @@ void R3BLosCal2Hit::Exec(Option_t* option)
   	      fhQ->Fill(tot);
           fhQtest->Fill(tot_corr);  
                  
-          fhQ1vsIcount->Fill(Icount,tott);        
-          fhQ3vsIcount->Fill(Icount,totl);   
-          fhQ5vsIcount->Fill(Icount,totb);             
-          fhQ7vsIcount->Fill(Icount,totr);            
-          fhQ2vsIcount->Fill(Icount,totlt);        
-          fhQ4vsIcount->Fill(Icount,totlb);   
-          fhQ6vsIcount->Fill(Icount,totrb);             
-          fhQ8vsIcount->Fill(Icount,totrt);	                     
+          fhQ1vsIcount->Fill(Icount,totlt);        
+          fhQ3vsIcount->Fill(Icount,totlb);   
+          fhQ5vsIcount->Fill(Icount,totrb);             
+          fhQ7vsIcount->Fill(Icount,totrt);            
+          fhQ2vsIcount->Fill(Icount,totl);        
+          fhQ4vsIcount->Fill(Icount,totb);   
+          fhQ6vsIcount->Fill(Icount,totr);             
+          fhQ8vsIcount->Fill(Icount,tott);	                     
           
-          fhQ_oddCh->Fill((tott + totl + totb + totr )/4.);
-          fhQ_evCh->Fill((totlt + totlb + totrb + totrt)/4.);
-		  fhQ_oddCh_corr->Fill((tott_corr + totl_corr + totb_corr + totr_corr )/4.);
-		  fhQ_evCh_corr->Fill((totlt_corr + totlb_corr + totrb_corr + totrt_corr)/4.);
+          fhQ_oddCh->Fill((totlt + totlb + totrb + totrt )/4.);
+          fhQ_evCh->Fill((tott + totb + totr + totl)/4.);
+		  fhQ_oddCh_corr->Fill((totlt_corr + totlb_corr + totrb_corr + totrt_corr )/4.);
+		  fhQ_evCh_corr->Fill((tott_corr + totb_corr + totr_corr + totl_corr)/4.);
 		  		  
-		  fhQ1_vs_Q5->Fill(tott,totb);
-		  fhQ3_vs_Q7->Fill(totl,totr);	          	
-		  fhQ2_vs_Q6->Fill(totlt,totrb);
-		  fhQ4_vs_Q8->Fill(totlb,totrt);
- 		  fhQ1_vs_Q5_corr->Fill(tott_corr,totb_corr);
-		  fhQ3_vs_Q7_corr->Fill(totr_corr,totl_corr);           
-		  fhQ2_vs_Q6_corr->Fill(totlt_corr,totrb_corr);
-		  fhQ4_vs_Q8_corr->Fill(totlb_corr,totrt_corr);
+		  fhQ1_vs_Q5->Fill(totlt,totrb);
+		  fhQ3_vs_Q7->Fill(totlb,totrt);	          	
+		  fhQ2_vs_Q6->Fill(totl,totr);
+		  fhQ4_vs_Q8->Fill(totb,tott);
+ 		  fhQ1_vs_Q5_corr->Fill(totlt_corr,totrb_corr);
+		  fhQ3_vs_Q7_corr->Fill(totlb_corr,totrt_corr);           
+		  fhQ2_vs_Q6_corr->Fill(totl_corr,totr_corr);
+		  fhQ4_vs_Q8_corr->Fill(totb_corr,tott_corr);
 
 	  
 		  fhQ_T->Fill(y_cm,tott); 		  
@@ -2834,38 +2890,38 @@ void R3BLosCal2Hit::Exec(Option_t* option)
  		  fhQ1_vs_Q5_corr->Fill(tott_corr,totb_corr);
 		  fhQ3_vs_Q7_corr->Fill(totr_corr,totl_corr);           
 	  
-		  fhQ_T->Fill(y_cm,tott); 		  
-		  fhQ_L->Fill(x_cm,totl);
- 	      fhQ_B->Fill(y_cm,totb); 
-		  fhQ_R->Fill(x_cm,totr);   		      
+		  fhQ_T->Fill(yT_cm,tott); 		  
+		  fhQ_L->Fill(xT_cm,totl);
+ 	      fhQ_B->Fill(yT_cm,totb); 
+		  fhQ_R->Fill(xT_cm,totr);   		      
 		  
 	  
-		  fhQ_T_corr->Fill(y_cm,tott_corr); 		  
-		  fhQ_L_corr->Fill(x_cm,totl_corr);
- 	      fhQ_B_corr->Fill(y_cm,totb_corr); 
-		  fhQ_R_corr->Fill(x_cm,totr_corr);   		      
+		  fhQ_T_corr->Fill(yT_cm,tott_corr); 		  
+		  fhQ_L_corr->Fill(xT_cm,totl_corr);
+ 	      fhQ_B_corr->Fill(yT_cm,totb_corr); 
+		  fhQ_R_corr->Fill(xT_cm,totr_corr);   		      
 
  // Correlations:         
-          fhTresX_M->Fill(x_cm,LosTresM);
-          fhTresY_M->Fill(y_cm,LosTresM);
-          fhTresX_M_corr->Fill(x_cm,LosTresM_corr);
-          fhTresY_M_corr->Fill(y_cm,LosTresM_corr);          
+          fhTresX_M->Fill(xT_cm,LosTresM);
+          fhTresY_M->Fill(yT_cm,LosTresM);
+          fhTresX_M_corr->Fill(xT_cm,LosTresM_corr);
+          fhTresY_M_corr->Fill(yT_cm,LosTresM_corr);          
           
-          fhTresX_T->Fill(x_cm,LosTresT);
-          fhTresY_T->Fill(y_cm,LosTresT);
-          fhTresX_T_corr->Fill(x_cm,LosTresT_corr);
-          fhTresY_T_corr->Fill(y_cm,LosTresT_corr);          
+          fhTresX_T->Fill(xT_cm,LosTresT);
+          fhTresY_T->Fill(yT_cm,LosTresT);
+          fhTresX_T_corr->Fill(xT_cm,LosTresT_corr);
+          fhTresY_T_corr->Fill(yT_cm,LosTresT_corr);          
         
           fhTM_vs_Q->Fill(tot,LosTresM);
           fhTM_vs_Q_corr->Fill(tot,LosTresM_corr);
           fhTT_vs_Q->Fill(tot,LosTresT);     
           fhTT_vs_Q_corr->Fill(tot,LosTresT_corr);
               
-          fhQ_vs_X->Fill(x_cm,tot);
-          fhQ_vs_Y->Fill(y_cm,tot); 
+          fhQ_vs_X->Fill(xT_cm,tot);
+          fhQ_vs_Y->Fill(yT_cm,tot); 
                
-          fhQ_vs_X_corr->Fill(x_cm,tot_corr);
-          fhQ_vs_Y_corr->Fill(y_cm,tot_corr);
+          fhQ_vs_X_corr->Fill(xT_cm,tot_corr);
+          fhQ_vs_Y_corr->Fill(yT_cm,tot_corr);
           		  	
 		            
 	     }
@@ -2878,7 +2934,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
        fNofHitItems += 1;
         
  //  myFile.close();
-        
+        //cout << "R3BLosCal2Hit::Exec END: " << Icount << endl;
 }
 
 void R3BLosCal2Hit::FinishEvent()
@@ -2897,15 +2953,44 @@ void R3BLosCal2Hit::FinishTask()
 {
 	if(fhTres_M) fhTres_M->Write() ;
 	if(fhTres_T) fhTres_T->Write() ;	
+	if(fhTres_M_oddCh) fhTres_M_oddCh->Write() ;
+	if(fhTres_T_oddCh) fhTres_T_oddCh->Write() ;	
+	if(fhTres_M_evCh) fhTres_M_evCh->Write() ;
+	if(fhTres_T_evCh) fhTres_T_evCh->Write() ;	
+	if(fhQ) fhQ->Write() ;
+	if(fhQ_evCh) fhQ_evCh->Write();
+    if(fhQ_oddCh) fhQ_oddCh->Write();
+	if(fhQ_vs_X) fhQ_vs_X->Write() ;
+	if(fhQ_vs_Y) fhQ_vs_Y->Write();	
+	if(fhTM_vs_Q) fhTM_vs_Q->Write() ;
+	if(fhTT_vs_Q) fhTT_vs_Q->Write() ;	    	
+	if(fhXY) fhXY->Write() ;	
+	if(fhXYmean) fhXYmean->Write() ;	
+	if(fhXY_ToT) fhXY_ToT->Write();
+	if(fhXYproj) fhXYproj->Write() ;
+	if(fhXY1) fhXY1->Write();
+	if(fhXY2) fhXY2->Write() ;	
+	if(fhXYT) fhXYT->Write();
+	if(fhXYT1) fhXYT1->Write() ;
+	if(fhXYT2) fhXYT2->Write() ;	
+	if(fhXYQ1) fhXYQ1->Write() ;
+	if(fhXYQ2) fhXYQ2->Write() ;
+	if(fhQ1_vs_Q5) fhQ1_vs_Q5->Write() ;	
+	if(fhQ2_vs_Q6) fhQ2_vs_Q6->Write() ;	
+	if(fhQ3_vs_Q7) fhQ3_vs_Q7->Write() ;
+	if(fhQ4_vs_Q8) fhQ4_vs_Q8->Write() ;
+	if(fhTresX_M) fhTresX_M->Write() ;
+	if(fhTresY_M) fhTresY_M->Write() ;
+	if(fhTresX_T) fhTresX_T->Write() ;
+	if(fhTresY_T) fhTresY_T->Write() ;	
+	
+			
+	if(1 == 1){					
 	if(fhTres_T_corr) fhTres_T_corr->Write() ;	
 	if(fhTres_M_corr) fhTres_M_corr->Write() ;
 	if(fhTres_MT_corr) fhTres_MT_corr->Write();
-	if(fhTres_M_oddCh) fhTres_M_oddCh->Write() ;
-	if(fhTres_T_oddCh) fhTres_T_oddCh->Write() ;	
 	if(fhTres_T_oddCh_corr) fhTres_T_oddCh_corr->Write() ;	
 	if(fhTres_M_oddCh_corr) fhTres_M_oddCh_corr->Write() ;	
-	if(fhTres_M_evCh) fhTres_M_evCh->Write() ;
-	if(fhTres_T_evCh) fhTres_T_evCh->Write() ;	
 	if(fhTres_T_evCh_corr) fhTres_T_evCh_corr->Write() ;	
 	if(fhTres_M_evCh_corr) fhTres_M_evCh_corr->Write() ;	
 	if(fhQ_L) fhQ_L->Write() ;
@@ -2924,51 +3009,25 @@ void R3BLosCal2Hit::FinishTask()
 	if(fhQ_LB_corr)  fhQ_LB_corr->Write();
 	if(fhQ_RB_corr) fhQ_RB_corr->Write() ;
 	if(fhQ_RT_corr) fhQ_RT_corr->Write();
-	if(fhQ) fhQ->Write() ;
-	if(fhQ_evCh) fhQ_evCh->Write();
-    if(fhQ_oddCh) fhQ_oddCh->Write();
     if(fhQ_evCh_corr) fhQ_evCh_corr->Write();
     if(fhQ_oddCh_corr) fhQ_oddCh_corr->Write();
-	if(fhQ_vs_X) fhQ_vs_X->Write() ;
-	if(fhQ_vs_Y) fhQ_vs_Y->Write();	
 	if(fhQ_vs_X_corr) fhQ_vs_X_corr->Write() ;
-	if(fhQ_vs_Y_corr) fhQ_vs_Y_corr->Write() ;
-	if(fhTM_vs_Q) fhTM_vs_Q->Write() ;
-	if(fhTT_vs_Q) fhTT_vs_Q->Write() ;	
+	if(fhQ_vs_Y_corr) fhQ_vs_Y_corr->Write() ;	
 	if(fhTM_vs_Q_corr) fhTM_vs_Q_corr->Write() ;
 	if(fhTT_vs_Q_corr) fhTT_vs_Q_corr->Write() ;
-	if(fhXY) fhXY->Write() ;	
-	if(fhXYmean) fhXYmean->Write() ;	
-	if(fhXY_corr) fhXY_corr->Write() ;	
-	if(fhXY_ToT) fhXY_ToT->Write();	
+	if(fhXY_corr) fhXY_corr->Write() ;		
 	if(fhXY_ToT_corr) fhXY_ToT_corr->Write() ;
 	if(fhXY1_ToT_corr) fhXY1_ToT_corr->Write() ;
 	if(fhXY2_ToT_corr) fhXY2_ToT_corr->Write() ;
 	if(fhXY1_corr) fhXY1_corr->Write() ;
 	if(fhXY2_corr) fhXY2_corr->Write() ;
-	if(fhXYproj) fhXYproj->Write() ;
-	if(fhXY1) fhXY1->Write();
-	if(fhXY2) fhXY2->Write() ;	
-	if(fhXYT) fhXYT->Write();
-	if(fhXYT1) fhXYT1->Write() ;
-	if(fhXYT2) fhXYT2->Write() ;	
-	if(fhXYQ1) fhXYQ1->Write() ;
-	if(fhXYQ2) fhXYQ2->Write() ;
-	if(fhQ1_vs_Q5) fhQ1_vs_Q5->Write() ;	
 	if(fhQ1_vs_Q5_corr) fhQ1_vs_Q5_corr->Write() ;
-	if(fhQ2_vs_Q6) fhQ2_vs_Q6->Write() ;	
 	if(fhQ2_vs_Q6_corr) fhQ2_vs_Q6_corr->Write() ;
-	if(fhQ3_vs_Q7) fhQ3_vs_Q7->Write() ;
-	if(fhQ3_vs_Q7_corr) fhQ3_vs_Q7_corr->Write() ;
-	if(fhQ4_vs_Q8) fhQ4_vs_Q8->Write() ;	
+	if(fhQ3_vs_Q7_corr) fhQ3_vs_Q7_corr->Write() ;	
 	if(fhQ4_vs_Q8_corr) fhQ4_vs_Q8_corr->Write() ;
 	if(fhQtest) fhQtest->Write() ;
-	if(fhTresX_M) fhTresX_M->Write() ;
-	if(fhTresY_M) fhTresY_M->Write() ;
 	if(fhTresX_M_corr) fhTresX_M_corr->Write() ;
 	if(fhTresY_M_corr) fhTresY_M_corr->Write() ;	
-	if(fhTresX_T) fhTresX_T->Write() ;
-	if(fhTresY_T) fhTresY_T->Write() ;
 	if(fhTresX_T_corr) fhTresX_T_corr->Write() ;
 	if(fhTresY_T_corr) fhTresY_T_corr->Write() ;	
 	if(fht1Q1M) fht1Q1M->Write() ;			
@@ -3033,8 +3092,9 @@ void R3BLosCal2Hit::FinishTask()
 	if(fht3t7T_corr) fht3t7T_corr->Write();	
 	if(fht4t8T_corr) fht4t8T_corr->Write();	
 	if(fhQpix) fhQpix->Write();
-	
-	}
+   }
+		
+}
 
 Double_t R3BLosCal2Hit::walk(Int_t inum, Double_t tot)
 {

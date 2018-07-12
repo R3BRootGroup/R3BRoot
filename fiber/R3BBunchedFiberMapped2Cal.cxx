@@ -13,17 +13,18 @@
 #include "R3BTCalEngine.h"
 
 R3BBunchedFiberMapped2Cal::R3BBunchedFiberMapped2Cal(const char *a_name, Int_t
-    a_verbose, UInt_t a_mapmt_num, UInt_t a_spmt_num)
+    a_verbose, Bool_t a_skip_spmt)
   : FairTask(TString("R3B") + a_name + "Mapped2Cal", a_verbose)
   , fName(a_name)
-  , fTCalPar(nullptr)
+  , fSkipSPMT(a_skip_spmt)
+  , fMAPMTTCalPar(nullptr)
+  , fSPMTTCalPar(nullptr)
   , fMappedItems(nullptr)
   , fCalItems(new TClonesArray("R3BBunchedFiberCalData"))
   , fNofCalItems(0)
   , fClockFreq(1000. / CLOCK_TDC_MHZ)
+  , fTamexFreq(1000. / VFTX_CLOCK_MHZ)
 {
-  fSideNum[0] = a_mapmt_num;
-  fSideNum[1] = a_spmt_num;
 }
 
 R3BBunchedFiberMapped2Cal::~R3BBunchedFiberMapped2Cal()
@@ -33,14 +34,15 @@ R3BBunchedFiberMapped2Cal::~R3BBunchedFiberMapped2Cal()
 
 InitStatus R3BBunchedFiberMapped2Cal::Init()
 {
-  if (!fTCalPar) {
-    LOG(ERROR) << "No TCal parameter container, "
+  if (!fMAPMTTCalPar || !(fSkipSPMT || fSPMTTCalPar)) {
+    LOG(ERROR) << "TCal parameter containers missing, "
         "did you forget SetParContainers?" << FairLogger::endl;
     return kERROR; 
   }
-  if (0 == fTCalPar->GetNumModulePar()) {
-    LOG(ERROR) << "No TCal parameters in container " << fTCalPar->GetName() <<
-        "." << FairLogger::endl;
+  if (0 == fMAPMTTCalPar->GetNumModulePar() ||	  
+      (!fSkipSPMT && 0 == fSPMTTCalPar->GetNumModulePar())) {
+    LOG(ERROR) << "No TCal parameters in containers " << fMAPMTTCalPar->GetName() <<
+	" or " << fSPMTTCalPar->GetName() << "." << FairLogger::endl;
     return kERROR;
   }
   auto mgr = FairRootManager::Instance();
@@ -60,11 +62,15 @@ InitStatus R3BBunchedFiberMapped2Cal::Init()
 
 void R3BBunchedFiberMapped2Cal::SetParContainers()
 {
-  fTCalPar = (R3BTCalPar *)FairRuntimeDb::instance()->getContainer(fName +
-      "TCalPar");
-  if (!fTCalPar) {
-    LOG(ERROR) << "Could not get access to " << fName << "TCalPar-Container." << FairLogger::endl;
-  }
+#define GET_TCALPAR(NAME) do {\
+  auto name = fName + #NAME"TCalPar";\
+  f##NAME##TCalPar = (R3BTCalPar *)FairRuntimeDb::instance()->getContainer(name);\
+  if (!f##NAME##TCalPar) {\
+    LOG(ERROR) << "Could not get access to " << name << " container." << FairLogger::endl;\
+  }\
+} while (0)
+  GET_TCALPAR(MAPMT);
+  GET_TCALPAR(SPMT);
 }
 
 InitStatus R3BBunchedFiberMapped2Cal::ReInit()
@@ -88,9 +94,10 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t *option)
         FairLogger::endl;
 
     // Fetch tcal parameters.
-    auto par = fTCalPar->GetModuleParAt(1,
-        channel * 2 - (mapped->IsLeading() ? 1 : 0),
-        mapped->IsMAPMT() ? 1 : 2);
+    auto tcal_channel_i = channel * 2 - (mapped->IsLeading() ? 1 : 0);
+    auto par = mapped->IsMAPMT() ?
+	fMAPMTTCalPar->GetModuleParAt(1, tcal_channel_i, 1) :
+	fSPMTTCalPar->GetModuleParAt(1, tcal_channel_i, 1);
     if (!par) {
       LOG(WARNING) << "R3BBunchedFiberMapped2Cal::Exec:Channel=" << channel <<
           ": TCal par not found." << FairLogger::endl;
@@ -103,22 +110,41 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t *option)
       // TODO: Is this really ok?
       continue;
     }
-    auto fine_ns = par->GetTimeVFTX(fine_raw);
+    auto fine_ns = par->GetTimeClockTDC(fine_raw);
     LOG(DEBUG) << " R3BBunchedFiberMapped2Cal::Exec: Fine raw=" << fine_raw <<
         " -> ns=" << fine_ns << '.' << FairLogger::endl;
-    if (fine_ns < 0. || fine_ns >= fClockFreq) {
-      LOG(WARNING) << 
-          "R3BBunchedFiberMapped2Cal::Exec:Channel=" << channel <<
-          ": Bad fine time (raw=" << fine_raw << ",ns=" << fine_ns << ")." << FairLogger::endl;
-      continue;
-    }
 
-    // Calculate final time with clock cycles.
-    auto time_ns = mapped->GetCoarse() * fClockFreq +
-        (mapped->IsLeading() ? -fine_ns : fine_ns);
-    LOG(DEBUG) << " R3BBunchedFiberMapped2Cal::Exec:Channel=" << channel << ": Time=" <<
+	// we have to differ between single PMT which is on Tamex and MAPMT which is on clock TDC
+	Double_t time_ns=-1;
+	if(mapped->IsMAPMT()){
+		if (fine_ns < 0. || fine_ns >= fClockFreq) {
+			LOG(ERROR) << 
+			"R3BBunchedFiberMapped2Cal::Exec:Channel=" << channel <<
+			": Bad CTDC fine time (raw=" << fine_raw << ",ns=" << fine_ns << ")." << FairLogger::endl;
+			continue;
+		}
+
+		// Calculate final time with clock cycles.
+		time_ns = mapped->GetCoarse() * fClockFreq +
+		(mapped->IsLeading() ? -fine_ns : fine_ns);
+		LOG(DEBUG) << " R3BBunchedFiberMapped2Cal::Exec:Channel=" << channel << ": Time=" <<
         time_ns  << "ns." << FairLogger::endl;
+	}
+	else{
+		if (fine_ns < 0. || fine_ns >= fTamexFreq) {
+			LOG(ERROR) << 
+			"R3BBunchedFiberMapped2Cal::Exec:Channel=" << channel <<
+			": Bad Tamex fine time (raw=" << fine_raw << ",ns=" << fine_ns << ")." << FairLogger::endl;
+			continue;
+		}
 
+		// Calculate final time with clock cycles.
+		time_ns = mapped->GetCoarse() * fTamexFreq +
+		(mapped->IsLeading() ? -fine_ns : fine_ns);
+		LOG(DEBUG) << " R3BBunchedFiberMapped2Cal::Exec:Channel=" << channel << ": Time=" <<
+        time_ns  << "ns." << FairLogger::endl;
+		
+	}
     new ((*fCalItems)[fNofCalItems++])
         R3BBunchedFiberCalData(
             mapped->IsMAPMT(),

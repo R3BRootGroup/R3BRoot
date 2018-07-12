@@ -6,7 +6,7 @@
 #include "R3BFi5Mapped2Cal.h"
 
 R3BFi5Mapped2Cal::R3BFi5Mapped2Cal(Int_t a_verbose)
-  : R3BBunchedFiberMapped2Cal("Fi5", a_verbose, 256, 4)
+  : R3BBunchedFiberMapped2Cal("Fi5", a_verbose)
 {
 }
 

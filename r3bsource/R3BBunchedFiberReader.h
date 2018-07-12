@@ -10,6 +10,11 @@
 //  Z = C(oarse) or F(ine) time from electronics.
 // For example:
 //  SIGNAL(FIBONE_TMLC, ...);
+// Note that sub-detectors (e.g. layers) are not mentioned in the mapping,
+// since channels should anyhow not be intertwined, e.g. the first sub occupies
+// the first 256/2 channels, the second the next 256/2 channels and so on. The
+// constructor however takes the number of subs called to simplify the numbers
+// in the user code a little. -> Not important, layers are now treated as separate detectors (a and b).
 //
 // Note that MappedData refers to a single multi-hit electronics channel
 // connected to some bunch of fibers, NOT one fiber, so that Mapped2Cal
@@ -38,7 +43,7 @@ class TClonesArray;
 //
 
 #define LENGTH(x) (sizeof x / sizeof *x)
-#define R3B_BUNCHED_FIBER_INIT(NAME, data) do {\
+#define R3B_BUNCHED_FIBER_INIT_BEGIN_(NAME)\
   int ok;\
   EXT_STR_h101_##NAME##_ITEMS_INFO(ok, *a_struct_info, fOffset,\
       EXT_STR_h101_##NAME, 0);\
@@ -46,7 +51,11 @@ class TClonesArray;
     LOG(ERROR) << "Failed to setup UCESB structure information." <<\
 	  FairLogger::endl;\
     return kFALSE;\
-  }\
+  }
+#define R3B_BUNCHED_FIBER_INIT_END_\
+  return R3BBunchedFiberReader::Init()
+#define R3B_BUNCHED_FIBER_INIT(NAME, data) do {\
+  R3B_BUNCHED_FIBER_INIT_BEGIN_(NAME);\
   R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][0][0], data->NAME##_TMLC);\
   R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][0][1], data->NAME##_TMLF);\
   R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][1][0], data->NAME##_TMTC);\
@@ -55,7 +64,15 @@ class TClonesArray;
   R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[1][0][1], data->NAME##_TSLF);\
   R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[1][1][0], data->NAME##_TSTC);\
   R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[1][1][1], data->NAME##_TSTF);\
-  return R3BBunchedFiberReader::Init();\
+  R3B_BUNCHED_FIBER_INIT_END_;\
+} while (0)
+#define R3B_BUNCHED_FIBER_INIT_MAPMT_ONLY(NAME, data) do {\
+  R3B_BUNCHED_FIBER_INIT_BEGIN_(NAME);\
+  R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][0][0], data->NAME##_TMLC);\
+  R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][0][1], data->NAME##_TMLF);\
+  R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][1][0], data->NAME##_TMTC);\
+  R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][1][1], data->NAME##_TMTF);\
+  R3B_BUNCHED_FIBER_INIT_END_;\
 } while (0)
 #define R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(dst, src) do {\
   dst._M      = &src##M;\
@@ -86,7 +103,7 @@ class R3BBunchedFiberReader: public R3BReader
       size_t _v_len;
     };
 
-    R3BBunchedFiberReader(char const *, UInt_t, UInt_t, UInt_t);
+    R3BBunchedFiberReader(char const *, UInt_t, UInt_t, UInt_t, UInt_t);
     Bool_t Init();
     Bool_t Read();
     void Reset();

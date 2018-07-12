@@ -11,7 +11,7 @@ class R3BBunchedFiberHitData: public TObject
 {
   public:
     R3BBunchedFiberHitData();
-    R3BBunchedFiberHitData(Int_t, Double_t, Double_t, Double_t, Double_t);
+    R3BBunchedFiberHitData(Int_t, Double_t, Double_t, Double_t, Double_t, Double_t);
     virtual ~R3BBunchedFiberHitData();
 
     Int_t GetFiberId() const;
@@ -20,6 +20,7 @@ class R3BBunchedFiberHitData: public TObject
     Double_t GetTime_ns() const;
     Double_t GetMAPMTToT_ns() const;
     Double_t GetSPMTToT_ns() const;
+    Double_t GetToT_ns() const;
 
   private:
     Int_t fFiberId;
@@ -28,6 +29,7 @@ class R3BBunchedFiberHitData: public TObject
     Double_t fTime_ns;
     Double_t fMAPMTToT_ns;
     Double_t fSPMTToT_ns;
+    Double_t fToT_ns;
 
     ClassDef(R3BBunchedFiberHitData, 1)
 };

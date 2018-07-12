@@ -27,7 +27,7 @@ class R3BBunchedFiberMapped2Cal: public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BBunchedFiberMapped2Cal(const char *, Int_t, UInt_t, UInt_t);
+    R3BBunchedFiberMapped2Cal(const char *, Int_t, Bool_t = false);
 
     /**
      * Destructor.
@@ -78,11 +78,14 @@ class R3BBunchedFiberMapped2Cal: public FairTask
   private:
     TString fName;
     UInt_t fSideNum[2];
-    R3BTCalPar *fTCalPar;
+    Bool_t fSkipSPMT;
+    R3BTCalPar *fMAPMTTCalPar;
+    R3BTCalPar *fSPMTTCalPar;
     TClonesArray *fMappedItems;
     TClonesArray *fCalItems;
     Int_t fNofCalItems;
     Double_t fClockFreq;
+    Double_t fTamexFreq;
 
   public:
     ClassDef(R3BBunchedFiberMapped2Cal, 1)

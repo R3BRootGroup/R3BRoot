@@ -2,7 +2,10 @@
 #define R3BPADDLECALITEM_H
 
 #include "TObject.h"
-
+#include <sstream>
+#include <fstream>
+#include <iostream>
+using namespace std;
 // for the data analysis of the paddle-type detectors. 
 // Introduced by Ralf, Apr 2016
 
@@ -24,6 +27,7 @@ class R3BPaddleCalData : public TObject
     UInt_t GetBar() const {return fBar;}
     
     // tube: 0,1 edge: 0,1 time: in ns
+  
     void SetTime(int tube, int edge,Double_t t)
     {
 		if (tube==0) 
@@ -36,7 +40,29 @@ class R3BPaddleCalData : public TObject
 			if (edge==0) fTime2L_ns=t;
 			else      	 fTime2T_ns=t;
 		}
+	}	
+		
+   void SetTimeL(int tube, int edge,Double_t t)
+    {
+		if (tube==0) fTime1L_ns=t;
+			else     fTime2L_ns=t;
+		//cout<< "PaddleCalData lead "<<tube<<", "<<edge<<", "<<fTime1L_ns<<"; "<<fTime2L_ns<<endl;
 	}
+				
+    void SetTimeT(int tube, int edge,Double_t t)
+    {
+		if (tube==0) fTime1T_ns=t;
+			else     fTime2T_ns=t;		
+		//	cout<< "PaddleCalData trail "<<tube<<", "<<edge<<", "<<fTime1T_ns<<"; "<<fTime2T_ns<<endl;
+	}
+	/*
+	void SetTime(int tube, int edge,Double_t t)
+    {
+		if (edge==1) fTime1L_ns=t;
+		if (edge==2) fTime1T_ns=t;
+		if (edge==3) fTime2L_ns=t;
+		if (edge==4) fTime2T_ns=t;
+	}*/
 
   private:
     UInt_t fPlane;

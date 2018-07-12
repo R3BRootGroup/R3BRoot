@@ -125,6 +125,23 @@ void R3BTofdMapped2TCal::Exec(Option_t* option)
 
     Int_t nHits = fMappedItems->GetEntriesFast();
 
+   Int_t timefine = -10;
+   Int_t timecoarse = -10;
+   Int_t Nbar = nHits / 4;
+   
+   if(nHits%4 != 0) {
+	   //cout<<"R3BTofdMapped2TCal SOME TIMES ARE MISSING; EVENT SKIPPED!!! "<< nHits<<endl;
+	   return;
+   }	
+      
+   if(nHits>24 ) {
+	   //cout<<"R3BTofdMapped2TCal MULTIHIT; EVENT SKIPPED!!! "<< nHits<<endl;
+	   return;
+   }	
+       
+   Int_t edge,tube,edget;
+ 
+   
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
 		
@@ -143,18 +160,92 @@ void R3BTofdMapped2TCal::Exec(Option_t* option)
 	   if ((iBar<1) || (iBar>fPaddlesPerPlane))
 	   {
            LOG(INFO) << "R3BTofdMapped2TCal::Exec : Bar number out of range: " << 
-           iBar << FairLogger::endl;
+           iBar << ", "<<fPaddlesPerPlane<<FairLogger::endl;
            continue;
        }
 
-	   R3BPaddleCalData* calData = new ((*fCalItems)[fNofCalItems]) R3BPaddleCalData(iPlane,iBar);
+	   R3BPaddleCalData* calData = new ((*fCalItems)[fNofCalItems++]) R3BPaddleCalData(iPlane,iBar);
 
+	    
+	  if(ihit < Nbar) {
+		  timefine = hit->GetFineTime1LE();
+		  timecoarse = hit->GetCoarseTime1LE();
+		  tube = 0;
+		  edge = 1;
+		  edget = 0;
+	  }	  
+	  if(ihit < 2*Nbar && ihit >= Nbar) {
+		  timefine = hit->GetFineTime1TE();
+		  timecoarse = hit->GetCoarseTime1TE();
+		  tube = 0;
+		  edge = 2;
+		  edget = 1;
+	  }
+	  if(ihit < 3*Nbar && ihit >= 2*Nbar) {
+		  timefine = hit->GetFineTime2LE();
+		  timecoarse = hit->GetCoarseTime2LE();
+		  tube = 1;
+		  edge = 3;
+		  edget = 0;
+	  }	  
+	  if(ihit < 4*Nbar && ihit >= 3*Nbar){
+		  timefine = hit->GetFineTime2TE();
+		  timecoarse = hit->GetCoarseTime2TE();
+		  tube = 1;
+		  edge = 4;
+		  edget = 1;
+	  }
+	 
+	 
+	 R3BTCalModulePar* par = fTcalPar->GetModuleParAt(iPlane, iBar, edge);
+	 
+	 if (!par)
+		       {
+		           LOG(INFO) << "R3BTofdMapped2TCal::Exec : Tcal par not found, Plane: " << 
+		           iPlane << ", Bar: " << iBar << ", Tube: " << (tube+1) << FairLogger::endl;
+		           continue;
+		       }
+		       
+		       // Convert TDC to [ns] ...
+		       Double_t time_ns = par->GetTimeVFTX( timefine );
+		    /*   
+		       if (time_ns < 0. || time_ns > fClockFreq )
+		       {
+		           LOG(ERROR) << 
+		           "R3BTofdMapped2TCal::Exec : bad time in ns: Plane= " << iPlane << 
+		           ", bar= " << iBar << ",tube= " << (tube+1) <<", nHits= "<<nHits<<
+		           ", time in channels = " << timefine <<
+		           ", time in ns = " << time_ns  << FairLogger::endl;
+		           continue;
+		       }
+		     */ 
+			   // ... and add clock time
+		       time_ns = fClockFreq - time_ns + timecoarse * fClockFreq;
+		      		       		      	       
+	       
+	  if(ihit < Nbar) {
+		  calData->SetTimeL(tube,0,time_ns);
+	  }	  
+	  if(ihit < 2*Nbar && ihit >= Nbar) {
+		  calData->SetTimeT(tube,1,time_ns);
+	  }
+	  if(ihit < 3*Nbar && ihit >= 2*Nbar) {
+		  calData->SetTimeL(tube,0,time_ns);
+	  }	  
+	  if(ihit < 4*Nbar && ihit >= 3*Nbar){
+		  calData->SetTimeT(tube,1,time_ns);
+	  }	
+	  
+	  
+	  /*       
 	   // convert times to ns
-	   for (int tube=0;tube<2;tube++) // PM1 and PM2
+	   for (int tube=0;tube<2;tube++){ // PM1 and PM2   
 		   for (int edge=0;edge<2;edge++) // loop over leading and trailing edge
 	       {
+	
 			   // PM1:
 		       R3BTCalModulePar* par = fTcalPar->GetModuleParAt(iPlane, iBar, tube*2 + edge + 1); // 1..4
+		       
 		       if (!par)
 		       {
 		           LOG(INFO) << "R3BTofdMapped2TCal::Exec : Tcal par not found, Plane: " << 
@@ -164,7 +255,9 @@ void R3BTofdMapped2TCal::Exec(Option_t* option)
 		       
 		       // Convert TDC to [ns] ...
 		       Double_t time_ns = par->GetTimeVFTX( hit->GetFineTime(tube , edge) );
-		
+		      
+
+           
 		       if (time_ns < 0. || time_ns > fClockFreq )
 		       {
 		           LOG(ERROR) << 
@@ -174,14 +267,16 @@ void R3BTofdMapped2TCal::Exec(Option_t* option)
 		           ", time in ns = " << time_ns  << FairLogger::endl;
 		           continue;
 		       }
-		
+		      
 			   // ... and add clock time
 		       time_ns = fClockFreq - time_ns + hit->GetCoarseTime(tube , edge) * fClockFreq;
 		       
 		       calData->SetTime(tube,edge,time_ns);
 	
 		   }
-  
+        }
+        */
+       
     }
 
 }

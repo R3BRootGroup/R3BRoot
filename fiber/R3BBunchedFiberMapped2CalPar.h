@@ -15,6 +15,11 @@ class R3BTCalEngine;
 class R3BBunchedFiberMapped2CalPar: public FairTask
 {
   public:
+    enum Electronics {
+      CTDC,
+      TAMEX
+    };
+
     /**
      * Standard constructor.
      * Creates an instance of the task.
@@ -23,7 +28,7 @@ class R3BBunchedFiberMapped2CalPar: public FairTask
      * @param a_update_rate a update rate for online histograms.
      * @param a_min_stats a minimum statistics for calibration.
      */
-    R3BBunchedFiberMapped2CalPar(const char *, Int_t, Int_t = 1e6, Int_t = 1e5);
+    R3BBunchedFiberMapped2CalPar(const char *, Int_t, enum Electronics = TAMEX, Int_t = 1e6, Int_t = 1e5);
 
     /**
      * Destructor.
@@ -76,9 +81,12 @@ class R3BBunchedFiberMapped2CalPar: public FairTask
 
   private:
     TString fName;
-    R3BTCalPar *fTCalPar;
+    enum Electronics fSPMTElectronics;
     TClonesArray *fMapped;
-    R3BTCalEngine *fEngine;
+    R3BTCalPar    *fMAPMTTCalPar;
+    R3BTCalEngine *fMAPMTEngine;
+    R3BTCalPar    *fSPMTTCalPar;
+    R3BTCalEngine *fSPMTEngine;
     Int_t fUpdateRate;
     Int_t fMinStats;
 

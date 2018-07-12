@@ -99,35 +99,25 @@ void R3BTCalEngine::CalculateParamClockTDC()
                 LOG(INFO) << "R3BTCalEngine::CalculateParamClockTDC() : Range of channels: " << iMin << " - " << iMax
                           << FairLogger::endl;
 
-                Double_t total = fhData[i][j][k]->Integral(iMin, iMax);
-                for (Int_t ii = iMin; ii <= iMax; ii++)
-                {
-                    fhTime[i][j][k]->SetBinContent(ii, fhData[i][j][k]->Integral(iMin, ii) / total * fClockFreq);
-                }
-
                 Int_t nparam = 0;
-
-                R3BTCalModulePar* pTCal = NULL;
-                pTCal = new R3BTCalModulePar();
+                auto pTCal = new R3BTCalModulePar;
                 pTCal->SetPlane(i+1);
                 pTCal->SetPaddle(j+1);
                 pTCal->SetSide(k+1);
 
-                for (Int_t ibin = iMin; ibin <= iMax; ibin++)
+                Double_t total = fhData[i][j][k]->Integral(iMin, iMax);
+                for (Int_t ii = iMin; ii < iMax; ii++)
                 {
-                    Double_t time = fhData[i][j][k]->Integral(iMin, ibin) / total;
-                    if (time > 1.)
-                    {
-                        FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Integration error.");
-                    }
-                    time *= fClockFreq;
+                    auto bin_mid = fhData[i][j][k]->Integral(iMin, ii) + fhData[i][j][k]->GetBinContent(1 + ii) * 0.5;
+                    auto time_ns = bin_mid / total * fClockFreq;
 
-                    pTCal->SetBinLowAt(ibin, nparam);
-                    pTCal->SetOffsetAt(time, nparam);
+                    fhTime[i][j][k]->SetBinContent(1 + ii, time_ns);
+
+                    pTCal->SetBinLowAt(ii, nparam);
+                    pTCal->SetOffsetAt(time_ns, nparam);
                     pTCal->IncrementNofChannels();
-                    nparam += 1;
+                    nparam++;
                 }
-
                 fCal_Par->AddModulePar(pTCal);
 
                 LOG(INFO) << "R3BTCalEngine::CalculateParamClockTDC() : Number of parameters: " << nparam
@@ -374,6 +364,9 @@ void R3BTCalEngine::CalculateParamVFTX()
     fCal_Par->setChanged();
 }
 
+// iMin == left side of fine times.
+// iMax == right side of fine times.
+// I.e. iMin <= fine-time <= iMax-1.
 void R3BTCalEngine::FindRange(TH1F* h1, Int_t& ic, Int_t& iMin, Int_t& iMax)
 {
     Double_t mean = h1->GetMean();

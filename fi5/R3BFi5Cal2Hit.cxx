@@ -1,7 +1,7 @@
 #include "R3BFi5Cal2Hit.h"
 
 R3BFi5Cal2Hit::R3BFi5Cal2Hit(Int_t a_verbose)
-  : R3BBunchedFiberCal2Hit("Fi5", a_verbose, 256, 4)
+  : R3BBunchedFiberCal2Hit("Fi5", a_verbose, VERTICAL, 2, 256, 4)
 {
 }
 

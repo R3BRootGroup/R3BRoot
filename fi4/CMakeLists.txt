@@ -11,11 +11,10 @@ set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase 
 ${R3BROOT_SOURCE_DIR}/passive
-${R3BROOT_SOURCE_DIR}/psp
 ${R3BROOT_SOURCE_DIR}/fi4
+${R3BROOT_SOURCE_DIR}/fiber
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/calData
-# ${R3BROOT_SOURCE_DIR}/r3bdata/dchData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
 ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
@@ -38,7 +37,7 @@ link_directories( ${LINK_DIRECTORIES})
 set(SRCS
 #Put here your sourcefiles
 R3BFi4.cxx  
-#R3BGeoFi4.cxx   
+# R3BGeoFi4.cxx   
 # R3BGeoFi4Par.cxx   
 R3BFi4ContFact.cxx
 #R3BFi4DigiPar.cxx
@@ -54,7 +53,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF Fi4LinkDef.h)
 Set(LIBRARY_NAME R3BFi4)
 Set(DEPENDENCIES
-    R3Bbase R3BData R3BPassive R3BTracking)
+    R3Bbase R3BData R3BPassive R3BTracking R3BBunchedFiber)
 
 GENERATE_LIBRARY()
 

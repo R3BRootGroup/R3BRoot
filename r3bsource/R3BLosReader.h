@@ -18,7 +18,7 @@ class R3BLosReader : public R3BReader
 		Bool_t Init(ext_data_struct_info *);
 		Bool_t Read();
 		void Reset();
-        virtual void FinishTask();
+		virtual void FinishTask();
         
 	private:
 		/* Reader specific data structure from ucesb */
@@ -29,12 +29,7 @@ class R3BLosReader : public R3BReader
 		FairLogger*	fLogger;
 		/* the structs of type R3BLosxMappedItem */
 		TClonesArray* fArray; /**< Output array. */
-        Int_t Ievents = 0;
-        Int_t Icounts2 = 0;        
-        Int_t Icounts3 = 0;
-        Int_t Icount[16][3]{};
-        
-
+        Int_t fNEvents = 0;
         
 	public:
 		ClassDef(R3BLosReader, 0);

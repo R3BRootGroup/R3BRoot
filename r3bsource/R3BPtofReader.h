@@ -6,8 +6,8 @@
 
 /* The structure containing the data layout of PTOF detector */
 struct EXT_STR_h101_ptof_t;
-typedef struct EXT_STR_h101_ptof_t EXT_STR_h101_PTOF;
-typedef struct EXT_STR_h101_ptof_onion_t EXT_STR_h101_PTOF_onion;
+typedef struct EXT_STR_h101_PTOF_t EXT_STR_h101_PTOF;
+typedef struct EXT_STR_h101_PTOF_onion_t EXT_STR_h101_PTOF_onion;
 
 /* Forward declaration of FairLogger */
 class FairLogger;

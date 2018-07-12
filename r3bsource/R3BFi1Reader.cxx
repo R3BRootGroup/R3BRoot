@@ -7,7 +7,7 @@ extern "C" {
 }
 
 R3BFi1Reader::R3BFi1Reader(EXT_STR_h101_FIBONE *a_data, UInt_t a_offset)
-  : R3BBunchedFiberReader("Fi1", a_offset, 256, 1)
+  : R3BBunchedFiberReader("Fi1", a_offset, 2, 256, 1)
   , fData((EXT_STR_h101_FIBONE_onion *)a_data)
 {
 }

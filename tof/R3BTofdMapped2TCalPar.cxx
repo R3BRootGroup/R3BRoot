@@ -126,6 +126,16 @@ void R3BTofdMapped2TCalPar::Exec(Option_t* option)
 
     Int_t nHits = fMapped->GetEntries();
 
+    Int_t Nbar = nHits / 4; // 4 times (L/T PM1 & L/T PM2)
+    Int_t timetemp;
+    Int_t edge;
+    
+    if(nHits%4 != 0){
+	//	cout<<"R3BTofdMapped2TCalPar:: Some channels are missing, event skipped!!! "<< nHits<<endl;
+	//	return;
+	}
+	
+     
     // Loop over mapped hits
     for (Int_t i = 0; i < nHits; i++)
     {
@@ -136,27 +146,47 @@ void R3BTofdMapped2TCalPar::Exec(Option_t* option)
         Int_t iPlane = hit->GetPlaneId(); // 1..n
         Int_t iBar   = hit->GetBarId();   // 1..n
         
-        if (iPlane>=fNofPlanes) // this also errors for iDetector==0
+        
+        if (iPlane>fNofPlanes) // this also errors for iDetector==0
         {
-            LOG(ERROR) << "R3BTofdMapped2TCalPar::Exec() : more detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes << FairLogger::endl;
+            LOG(ERROR) << "R3BTofdMapped2TCalPar::Exec() : more planes than expected! Plane: " << iPlane << " allowed are 1.." << fNofPlanes << FairLogger::endl;
             continue;
         }
-        if (iBar>=fPaddlesPerPlane) // same here
+        if (iBar>fPaddlesPerPlane) // same here
         {
             LOG(ERROR) << "R3BTofdMapped2TCalPar::Exec() : more bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane << FairLogger::endl;
             continue;
         }
 
+         if(i < Nbar){ 
+           timetemp = hit->GetFineTime1LE();
+           edge = 1;
+	     }
+	     if(i < 2*Nbar && i >= Nbar){
+		   timetemp = hit->GetFineTime1TE();
+		   edge = 2;
+		 }  
+	     if(i < 3*Nbar && i >= 2*Nbar){ 
+			timetemp = hit->GetFineTime2LE();
+			edge = 3;
+		 }	
+	     if(i < 4*Nbar && i >= 3*Nbar){
+			timetemp = hit->GetFineTime2TE();
+			edge = 4;
+		}	
+	  
+      //   cout<<"Mappet2CalPar: "<<i<<", "<<iBar<<", "<<edge<<", "<<timetemp<<endl;
+         fEngine->Fill(iPlane, iBar, edge, timetemp);
 
+/*	
 		for (Int_t edge=0;edge<2;edge++)
-		{
-	
+		{	
 	        // Fill TAC histogram
 	        //fEngine->Fill(iModule, hit->GetFineTime(edge));
 	        fEngine->Fill(iPlane, iBar, 0 + edge+1, hit->GetFineTime(0,edge));
 	        fEngine->Fill(iPlane, iBar, 2 + edge+1, hit->GetFineTime(1,edge));
-
 	    }
+	  */
     }
 
     // Increment events

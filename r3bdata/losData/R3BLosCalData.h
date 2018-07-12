@@ -20,9 +20,17 @@ class R3BLosCalData : public TObject
 
     // Getters
     inline const UInt_t&  GetDetector()  const { return fDetector; }
-
+//    inline const UInt_t&  GetVFTXNcha()  const { return fVFTXNcha; }
+//    inline const UInt_t&  GetTAMEXNcha()  const { return fTAMEXNcha; }
+    
     Double_t GetMeanTime();
-
+    Double_t GetMeanTimeTAMEXL();
+    Double_t GetMeanTimeTAMEXT();
+    Double_t GetMeanTimeVFTX();
+    UInt_t GetVFTXNcha();
+    UInt_t GetTAMEXLNcha();
+    UInt_t GetTAMEXTNcha();
+    
   private:
     UInt_t  fDetector;
 

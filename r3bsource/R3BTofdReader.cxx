@@ -4,13 +4,16 @@
 #include "FairRootManager.h"
 #include "R3BTofdReader.h"
 #include "R3BPaddleTamexMappedData.h" 
-
+#include <iostream>
+#include <sstream>
+using namespace std;
 extern "C" {
 #include "ext_data_client.h"
 #include "ext_h101_tofd.h"
 }
 
-#define MAX_TOFD_PLANES   6
+//#define MAX_TOFD_PLANES   6
+#define MAX_TOFD_PLANES (sizeof data->TOFD_P / sizeof data->TOFD_P[0])
 
 R3BTofdReader::R3BTofdReader(EXT_STR_h101_TOFD* data, UInt_t offset)
 	: R3BReader("R3BTofdReader")
@@ -153,11 +156,16 @@ Bool_t R3BTofdReader::Read()
 					{
 						mapped->fCoarseTime1LE= data->TOFD_P[d].T[t].TCLv[j];  // coarse time leading edge
 						mapped->fFineTime1LE  = data->TOFD_P[d].T[t].TFLv[j];  // fine time leading edge
+						
+				//	cout<<"TOFDReader PM1 leading times: "<<numChannels <<", "<<channel<<","<<t<<", "<<data->TOFD_P[d].T[t].TFLv[j]<<", "<<	data->TOFD_P[d].T[t].TCLv[j]<<endl;
+						
+						
 					}
 					else // PM2
 					{
 						mapped->fCoarseTime2LE= data->TOFD_P[d].T[t].TCLv[j];  // coarse time leading edge
 						mapped->fFineTime2LE  = data->TOFD_P[d].T[t].TFLv[j];  // fine time leading edge
+				//	cout<<"TOFDReader PM2 leading times: "<<numChannels <<", "<<channel<<","<<t<<", "<<data->TOFD_P[d].T[t].TFLv[j]<<", "<<	data->TOFD_P[d].T[t].TCLv[j]<<endl;
 					}
 				}
 				
@@ -230,11 +238,17 @@ Bool_t R3BTofdReader::Read()
 					{
 						mapped->fCoarseTime1TE= data->TOFD_P[d].T[t].TCTv[j];  // coarse time leading edge
 						mapped->fFineTime1TE  = data->TOFD_P[d].T[t].TFTv[j];  // fine time leading edge
+					
+				//	cout<<"TOFDReader PM1 trailing times: "<<numChannels <<", "<<channel<<","<<t<<", "<<data->TOFD_P[d].T[t].TFTv[j]<<", "<<data->TOFD_P[d].T[t].TCTv[j]<<endl;
+					
 					}
 					else      // PM2
 					{
 						mapped->fCoarseTime2TE= data->TOFD_P[d].T[t].TCTv[j];  // coarse time leading edge
 						mapped->fFineTime2TE  = data->TOFD_P[d].T[t].TFTv[j];  // fine time leading edge
+					
+				//	cout<<"TOFDReader PM2 trailing times: "<<numChannels <<", "<<channel<<","<<t<<", "<<data->TOFD_P[d].T[t].TFTv[j] <<", "<<data->TOFD_P[d].T[t].TCTv[j]<<endl;
+					
 					}
 				}
 				

@@ -68,6 +68,14 @@ class R3BTCalModulePar : public FairParGenericSet
 
     /**
      * Member function for converting TDC value into time [ns]
+     * using calibration parameters for clock TDC electronics.
+     * @param tdc a TDC value.
+     * @return time value in nanoseconds.
+     */
+    Double_t GetTimeClockTDC(Int_t tdc);
+
+    /**
+     * Member function for converting TDC value into time [ns]
      * using calibration parameters for TACQUILA electronics.
      * @param tdc a TDC value.
      * @return time value in nanoseconds.
