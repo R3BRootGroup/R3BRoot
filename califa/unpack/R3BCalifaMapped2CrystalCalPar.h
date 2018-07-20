@@ -73,6 +73,8 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask {
   void SetThreshold(Double_t threshold){fThreshold=threshold;}
   void SetNumParameterFit(Int_t numberParFit){fNumParam=numberParFit;}
   void SetMinStadistics(Int_t minstad){fMinStadistics=minstad;}
+
+  void SetDebugMode(Int_t debug){fDebugMode=debug;}
   
   void SetEnergyPeaks(TArrayF* thePeaks) {
     fEnergyPeaks = thePeaks;
@@ -96,6 +98,8 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask {
   
   TArrayF* fEnergyPeaks;
   Double_t* fChannelPeaks;
+
+  Int_t fDebugMode;
   
   R3BCalifaCrystalCalPar* fCal_Par;  /**< Parameter container. >*/ 
   TClonesArray* fCalifaMappedDataCA; /**< Array with CALIFA Mapped- input data. >*/

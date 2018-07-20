@@ -49,7 +49,9 @@ R3BCalifaMapped2CrystalCalPar::R3BCalifaMapped2CrystalCalPar() :
   fSigma(0),
   fThreshold(0),
   fEnergyPeaks(NULL),
-  fOutputFile(NULL) {
+  fOutputFile(NULL),
+  fDebugMode(0)
+{
   
 }
 
@@ -68,7 +70,9 @@ R3BCalifaMapped2CrystalCalPar::R3BCalifaMapped2CrystalCalPar(const char* name, I
   fSigma(0),
   fThreshold(0),
   fEnergyPeaks(NULL),
-  fOutputFile(NULL) {
+  fOutputFile(NULL),
+  fDebugMode(0)
+{
   
 }
 
@@ -81,7 +85,7 @@ R3BCalifaMapped2CrystalCalPar::~R3BCalifaMapped2CrystalCalPar() {
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BCalifaMapped2CrystalCalPar::Init() {
-  
+
   if(!fEnergyPeaks){
     fEnergyPeaks = new TArrayF;
     fEnergyPeaks->Set(fNumPeaks);
@@ -182,16 +186,19 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks(){
   fCal_Par->SetNumCrystals(fNumCrystals);
   fCal_Par->SetNumParametersFit(fNumParam);
   fCal_Par->GetCryCalParams()->Set(numPars*fNumCrystals);
-   
+
   TSpectrum *ss= new TSpectrum(fNumPeaks);  
   
   for (Int_t i=0;i<fNumCrystals;i++){
     
     if (fh_Map_energy_crystal[i]->GetEntries()>fMinStadistics){
       
-      nfound = ss->Search(fh_Map_energy_crystal[i],fSigma,"goff",fThreshold);
+      if(fDebugMode) nfound = ss->Search(fh_Map_energy_crystal[i],fSigma,"",fThreshold);
+      else  nfound = ss->Search(fh_Map_energy_crystal[i],fSigma,"goff",fThreshold);
+      //	std::cout<< i << " " << nfound <<" "<< fThreshold << std::endl;
       fChannelPeaks = (Double_t*) ss->GetPositionX();
       TMath::Sort(nfound, fChannelPeaks, idx, kTRUE);
+
       
       //Calibrated Spectrum
       Double_t X[fNumPeaks+1];
@@ -203,10 +210,12 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks(){
       for (Int_t j=0;j<fNumPeaks;j++){
 	X[j+1]=fChannelPeaks[idx[fNumPeaks-j-1]];
 	Y[j+1]=fEnergyPeaks->GetAt(fNumPeaks-j-1);
+
+	std::cout<<"CrystalId="<<i+1<<" "<< j+1  <<" "<< X[j+1]  << std::endl;
       }
       
       TF1 *f1;
-      
+     
       if (fNumParam){
 	
 	if (fNumParam==1){
@@ -234,13 +243,15 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks(){
       
       TGraph* graph = new TGraph (fNumPeaks+1, X, Y);
       graph->Fit("f1","Q");//Quiet mode (minimum printing)
-      
+
       
       for(Int_t h=0; h<numPars;h++){
 	fCal_Par->SetCryCalParams(f1->GetParameter(h),numPars*i+h);
 	Double_t par;
 	par=f1->GetParameter(h);
       }  
+
+      if(fDebugMode) fh_Map_energy_crystal[i]->Write();
       
     }else {std::cout<<"Histogram NO Fitted number "<<i+1<<endl;}
     
