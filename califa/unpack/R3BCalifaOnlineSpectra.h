@@ -10,6 +10,12 @@
 #define N_MAX_PETALS 8
 
 #include "FairTask.h"
+#include <sstream>
+#include <fstream>
+#include <iostream>
+#include <array>
+#include "TMath.h"
+#include <cstdlib>
 
 class TClonesArray;
 class TH1F;

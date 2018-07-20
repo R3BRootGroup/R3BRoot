@@ -5,8 +5,8 @@
  * Do not edit - automatically generated.
  */
 
-#ifndef __GUARD_H101_EXT_H101_RAW_CALIFA_FEBEX_H__
-#define __GUARD_H101_EXT_H101_RAW_CALIFA_FEBEX_H__
+#ifndef __GUARD_H101_CALIFA_EXT_H101_RAW_CALIFA_FEBEX_H__
+#define __GUARD_H101_CALIFA_EXT_H101_RAW_CALIFA_FEBEX_H__
 
 #ifndef __CINT__
 # include <stdint.h>
@@ -159,7 +159,7 @@ typedef struct EXT_STR_h101_CALIFA_layout_t
   5135, \
   1, \
   { \
-    { 0, sizeof(EXT_STR_h101_CALIFA), 0xc0426bc3, "h101" }, \
+    { 0, sizeof(EXT_STR_h101_CALIFA), 0xc0426bc3, "h101_CALIFA" }, \
   }, \
   { \
     0xc0000000, 0x00000200, 0x00000002, 0x40000004, \
@@ -1449,6 +1449,6 @@ typedef struct EXT_STR_h101_CALIFA_layout_t
   } \
 };
 
-#endif/*__GUARD_H101_EXT_H101_RAW_CALIFA_FEBEX_H__*/
+#endif/*__GUARD_H101_CALIFA_EXT_H101_RAW_CALIFA_FEBEX_H__*/
 
 /*******************************************************/

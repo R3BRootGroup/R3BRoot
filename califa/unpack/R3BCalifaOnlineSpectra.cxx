@@ -12,6 +12,7 @@
 #include "R3BCalifaCrystalCalData.h"
 #include "R3BEventHeader.h"
 
+
 #include "FairRunAna.h"
 #include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
@@ -25,6 +26,10 @@
 #include "TClonesArray.h"
 #include <iostream>
 #include <sstream>
+#include <cstdlib>
+#include <fstream>
+#include <ctime>
+#include <array>
 #include "TMath.h"
 
 using namespace std;
@@ -61,7 +66,9 @@ InitStatus R3BCalifaOnlineSpectra::Init() {
   
   FairRootManager* mgr = FairRootManager::Instance();
   if (NULL == mgr)
-    FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
+    LOG(FATAL) << "R3BCalifaOnlineSpectra::Init FairRootManager not found" << FairLogger::endl;
+  
+  
   header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
   FairRunOnline *run = FairRunOnline::Instance();
   
@@ -73,8 +80,14 @@ InitStatus R3BCalifaOnlineSpectra::Init() {
   
   
   if(fMappedItemsCalifa || fCalItemsCalifa){     
-    //reading the file    
+    //reading the file
+    Bool_t noFile = kFALSE;    
     ifstream *FileHistos = new ifstream(fCalifaFile);
+    if(!FileHistos->is_open()){
+      LOG(WARNING) << "R3BCalifaOnlineSpectra:  No Histogram definition file" 
+		   << FairLogger::endl;
+      noFile=kTRUE;
+    }
     
     Double_t arry_bins[fCalifaNumPetals*64+1];
     Double_t arry_maxE[fCalifaNumPetals*64+1];
@@ -83,8 +96,17 @@ InitStatus R3BCalifaOnlineSpectra::Init() {
     Double_t maxE;
     Double_t minE;
     
-    for (Int_t i=0; i<fCalifaNumPetals*64+1; i++){
-      *FileHistos>>arry_bins[i]>>arry_minE[i]>>arry_maxE[i];	
+    if(!noFile) {
+      for (Int_t i=0; i<fCalifaNumPetals*64+1; i++){
+	*FileHistos>>arry_bins[i]>>arry_minE[i]>>arry_maxE[i];	
+      }
+    }
+    else{
+      for (Int_t i=0; i<fCalifaNumPetals*64+1; i++){
+	arry_bins[i] = 3000;
+	arry_minE[i] = 0; 
+	arry_maxE[i] = 3000;	
+      }
     }
     
     bins= arry_bins[fCalifaNumPetals*64]; //the last line is a general setting
@@ -184,53 +206,54 @@ InitStatus R3BCalifaOnlineSpectra::Init() {
     }
     */
 
-    /*
+    
     //CANVAS 1
-    TCanvas *cCalifa1 = new TCanvas("Califa petal vs cryId", 
-				    "Califa petal vs cryId", 
+    TCanvas *cCalifa1 = new TCanvas("Califa_petal_vs_cryId", 
+				    "Califa_petal_vs_cryId", 
 				    10, 10, 500, 500);
     //cCalifa1->Divide(2);
     //cCalifa1->cd(1);
     fh_Califa_cryId_petal->Draw("COLZ");
     //cCalifa1->cd(0);
     run->AddObject(cCalifa1);
-    */
+    
     /*
     //CANVAS 2
     TCanvas *cCalifa2 = new TCanvas(Name3, Name3, 10, 10, 500, 500);
     fh_Califa_cryId_energy->Draw("COLZ");
     run->AddObject(cCalifa2);
     */
-    /*
+    
     //CANVAS 3 
     TCanvas* cCalifa3[fCalifaNumPetals][4];		
     for(Int_t i=0; i<fCalifaNumPetals; i++){
       for (Int_t k=0;k<4;k++){
 	char Name4[255];
-	sprintf(Name4, "Califa Petal %d.%d", i+1,k+1);
+	sprintf(Name4, "Califa_Petal_%d_section_%d", i+1,k+1);
 	cCalifa3[i][k] = new TCanvas(Name4, Name4, 10, 10, 500, 500);
 	cCalifa3[i][k]->Divide(4,4);
 	for(Int_t j=0; j<16;j++){  
 	  cCalifa3[i][k]->cd(j+1);
+	  gPad->SetLogy();
 	  fh_Califa_crystals[i][j+16*k]->Draw();
 	}
 	cCalifa3[i][k]->cd(0);
 	run->AddObject(cCalifa3[i][k]);
       }
     }
-    */
+    /*
     TCanvas* cCalifa3;	
     char Name4[255];
-    sprintf(Name4, "Califa Petal 2 seccion 2");
-    cCalifa3 = new TCanvas(Name4, Name4, 0, 0, 1000, 1000);
+    sprintf(Name4, "Califa_Petal_2_seccion_2");
+    cCalifa3 = new TCanvas(Name4, Name4, 10, 10, 950, 650);
     cCalifa3->Divide(4,4);
-    for(Int_t j=15; j<16;j++){  
+    for(Int_t j=0; j<16;j++){  
       cCalifa3->cd(j+1);
       fh_Califa_crystals[1][j+16*1]->Draw();
     }
-    cCalifa3->cd(0);
+    //cCalifa3->cd(0);
     run->AddObject(cCalifa3);
-
+*/
     //FOLDER 3 
     TFolder* folCalifa3[fCalifaNumPetals][4];		
     for(Int_t i=0; i<fCalifaNumPetals; i++){
@@ -244,18 +267,18 @@ InitStatus R3BCalifaOnlineSpectra::Init() {
 	run->AddObject(folCalifa3[i][k]);
       }
     }
-    /*
+    
     //  CANVAS 4  -------------------------------     
     TCanvas* cCalifa4[fCalifaNumPetals];
     for (Int_t i=0;i<fCalifaNumPetals;i++){
       char Name9[255];
-      if (fCalON==true)	sprintf(Name9, "Califa_Cal Energy petal %d", i+1);
-      else sprintf(Name9, "Califa_Map Energy petal %d", i+1);
+      if (fCalON==true)	sprintf(Name9, "Califa_Cal_Energy_petal_%d", i+1);
+      else sprintf(Name9, "Califa_Map_Energy_petal_%d", i+1);
       cCalifa4[i] = new TCanvas(Name9, Name9, 10, 10, 500, 500);
       fh_Califa_energy_per_petal[i]->Draw();
       run->AddObject(cCalifa4[i]);
     }
-    */
+    
     //FOLDER4
     TFolder* folCalifa4;
     char Name99[255];
@@ -290,7 +313,8 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option) {
   
   FairRootManager* mgr = FairRootManager::Instance();
   if (NULL == mgr)
-    FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
+    LOG(FATAL) << "R3BCalifaOnlineSpectra::Exec FairRootManager not found" << FairLogger::endl;
+
   
   // check for requested trigger (is this right?)
   //if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
