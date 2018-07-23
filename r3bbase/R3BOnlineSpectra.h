@@ -101,6 +101,8 @@ class R3BOnlineSpectra : public FairTask
         fNofPlanes   = planes;
         fPaddlesPerPlane  = ppp;
     }
+    
+    void Reset_LOS_Histo();
 
 
   private:

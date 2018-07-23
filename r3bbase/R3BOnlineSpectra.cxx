@@ -36,6 +36,7 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TCanvas.h"
+#include "THttpServer.h"
 
 #include "TClonesArray.h"
 #include <sstream>
@@ -181,6 +182,8 @@ InitStatus R3BOnlineSpectra::Init()
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     FairRunOnline *run = FairRunOnline::Instance();
 
+    run->GetHttpServer()->Register("Tasks", this);
+
 // create histograms of all detectors    
 
 //------------------------------------------------------------------------ 
@@ -220,6 +223,8 @@ InitStatus R3BOnlineSpectra::Init()
 		fh_los_tot_mean->Draw();
 		cLos->cd(0);
 		run->AddObject(cLos);
+        
+        run->GetHttpServer()->RegisterCommand("Reset_LOS", Form("/Tasks/%s/->Reset_LOS_Histo()", GetName()));
 	}
 	
 
@@ -628,7 +633,14 @@ InitStatus R3BOnlineSpectra::Init()
     return kSUCCESS;
 }
 
-
+void R3BOnlineSpectra::Reset_LOS_Histo()
+{
+    fh_los_channels->Reset();
+    fh_los_tres_MCFD->Reset();
+    fh_los_tres_TAMEX->Reset();
+    fh_los_tot->Reset();
+    fh_los_tot_mean->Reset();
+}
 
 void R3BOnlineSpectra::Exec(Option_t* option)
 {
