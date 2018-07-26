@@ -65,6 +65,7 @@ R3BCALIFATestGenerator.cxx
 R3BIonGenerator.cxx
 R3BGammaGenerator.cxx
 R3BPhaseSpaceGenerator.cxx
+R3Bp2pevtGenerator.cxx
 )
 
 # fill list of header files from list of source files

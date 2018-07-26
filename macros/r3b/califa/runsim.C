@@ -12,7 +12,7 @@ void runsim(Int_t nEvents = 0)
   Bool_t fCalifaHitFinder = true;    // Apply hit finder task
 
   TString fMC = "TGeant4";           // MonteCarlo engine: TGeant3, TGeant4, TFluka
-  TString fGenerator = "box";        // Event generator type: box, gammas, r3b, ion, ascii
+  TString fGenerator = "p2p_s444";        // Event generator type: box, gammas, r3b, ion, ascii
   TString fEventFile = "";           // Input event file in the case of ascii generator
 
   Int_t    fFieldMap = -1;           // Magentic field map selector
@@ -256,6 +256,50 @@ void runsim(Int_t nEvents = 0)
 	  primGen->AddGenerator(boxGen);
   }
 
+ if (fGenerator.CompareTo("p2p_s444") == 0  ) {
+    R3Bp2pevtGenerator* gen = new R3Bp2pevtGenerator();
+    int a = 12;
+    double unit = 931.494061;
+    double energy = 200.;//MeV/u
+    double defect_a = 0.;
+    double defect_res = 8.66770703125;
+    double mass = a*unit+defect_a;
+    double momentum = sqrt(energy*energy + 2*energy*mass);
+    //calculate beta/gamma
+    double beta = momentum/(energy+mass);
+    double exe = 4.444;
+    double mproton = 938.2720813;
+    gen->SetHeavyNucleus(a,defect_a,defect_res);
+    gen->SetLightNucleus(mproton,mproton);
+    gen->SetExcitation(exe);
+    gen->SetInverse(false);
+    gen->SetIsotropic(true);
+    gen->SetMomDistrib(100.);
+    gen->SetBeamEnergy(energy);
+    TVector3 bet;
+    bet.SetXYZ(0,0,beta);
+    primGen->AddGenerator(gen);
+
+#if 1
+    // Coincident gammas
+    R3BGammaGenerator *gammaGen = new R3BGammaGenerator();
+    
+    gammaGen->SetEnergyLevel(0, 0.);
+    gammaGen->SetEnergyLevel(1, 4.444E-3);
+    // gammaGen->SetEnergyLevel(2, 4E-3);
+
+    //gammaGen->SetBranchingRatio(2, 1, 0.);
+    //gammaGen->SetBranchingRatio(2, 0, 1.);
+    gammaGen->SetBranchingRatio(1, 0, 1.);
+
+    gammaGen->SetInitialLevel(1);
+
+    //gammaGen->SetLorentzBoost(TVector3(0, 0, 0.777792));
+    //gammaGen->SetLorentzBoost(TVector3(0, 0, 0.757909));
+    gammaGen->SetLorentzBoost(bet);
+    primGen->AddGenerator(gammaGen);
+#endif
+ }
   run->SetGenerator(primGen);
 
 
@@ -279,11 +323,11 @@ void runsim(Int_t nEvents = 0)
   // -----   Runtime database   ---------------------------------------------
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
   Bool_t kParameterMerged = kTRUE;
-  FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
-  parOut->open(ParFile.Data());
-  rtdb->setOutput(parOut);
-  rtdb->saveOutput();
-  rtdb->print();
+  //FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
+  //parOut->open(ParFile.Data());
+  //rtdb->setOutput(parOut);
+  //rtdb->saveOutput();
+  //rtdb->print();
 
   // -----   Start run   ----------------------------------------------------
   if (nEvents>0) run->Run(nEvents);
