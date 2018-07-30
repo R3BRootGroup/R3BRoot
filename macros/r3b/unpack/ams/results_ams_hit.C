@@ -29,7 +29,7 @@ void results_ams_hit(){
     TString filename = "data_0001.root";
 
     //DEFINE THE NUMBER OF AMS DETECTORS  -------------------------------------
-    Int_t   nbdet = 4;
+    Int_t   nbdet = 4;//Experiment s444 
 
     //HISTOGRAMS   ------------------------------------------------------------
     TH2F * hams[160];

@@ -1,8 +1,9 @@
 /* Additional info:
  * To generate the header file used for the R3BUcesbSource (ext_h101.h), use:
  *
- * $UCESB_DIR/upexps/201810_s444 --ntuple=UNPACK:TRIGGER,UNPACK:EVENTNO,RAW\
- *     STRUCT_HH,ext_h101.h
+ * ./201810_s444 --ntuple=RAW:SST,id=h101_AMS,ext_h101_ams.h
+ *
+ * at $UCESB_DIR/upexps/201810_s444
  *
  * Put this header file into the 'r3bsource' directory and recompile.
  * */

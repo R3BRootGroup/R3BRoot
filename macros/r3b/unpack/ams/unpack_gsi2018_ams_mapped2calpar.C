@@ -1,8 +1,9 @@
 /* Additional info:
  * To generate the header file used for the R3BUcesbSource (ext_h101.h), use:
  *
- * $UCESB_DIR/upexps/201810_s444 --ntuple=UNPACK:TRIGGER,UNPACK:EVENTNO,RAW\
- *     STRUCT_HH,ext_h101.h
+ * ./201810_s444 --ntuple=RAW:SST,id=h101_AMS,ext_h101_ams.h
+ *
+ * at $UCESB_DIR/upexps/201810_s444
  *
  * Put this header file into the 'r3bsource' directory and recompile.
  * */
@@ -49,7 +50,7 @@ void unpack_gsi2018_ams_mapped2calpar() {
   
   /* Add analysis task ------------------------------------ */
   R3BAmsMapped2StripCalPar* CalPar = new R3BAmsMapped2StripCalPar();
-  CalPar->SetNumDetectors(2); // Number of ams detectors 
+  CalPar->SetNumDetectors(4); // Number of ams detectors 
   CalPar->SetNumStrips(1024); // 1024 strips per ams detector
   CalPar->SetNumStripsK(384); // 384 strips for the K-side
   CalPar->SetNumStripsS(640); // 640 strips for the S-side
