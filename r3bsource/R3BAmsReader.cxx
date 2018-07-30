@@ -55,16 +55,25 @@ Bool_t R3BAmsReader::Read() {
 	/* Display data */
 	fLogger->Debug(MESSAGE_ORIGIN, "R3BAmsReader::Read() Event data");
 
+ //First AMS detector
  for (int strip = 0; strip < fData->SST1; ++strip) {
- //First detector must be zero!!
   new ((*fArray)[fArray->GetEntriesFast()]) R3BAmsMappedData(0,strip,fData->SST1E[strip]);
-
  }
 
+ //Second AMS detector
  for (int strip = 0; strip < fData->SST2; ++strip) {
   new ((*fArray)[fArray->GetEntriesFast()]) R3BAmsMappedData(1,strip,fData->SST2E[strip]);
  }
 
+ //Third AMS detector
+ for (int strip = 0; strip < fData->SST3; ++strip) {
+  new ((*fArray)[fArray->GetEntriesFast()]) R3BAmsMappedData(2,strip,fData->SST3E[strip]);
+ }
+
+ //Fourth AMS detector
+ for (int strip = 0; strip < fData->SST4; ++strip) {
+  new ((*fArray)[fArray->GetEntriesFast()]) R3BAmsMappedData(3,strip,fData->SST4E[strip]);
+ }
 
     fNEvent += 1;
     return kTRUE;
