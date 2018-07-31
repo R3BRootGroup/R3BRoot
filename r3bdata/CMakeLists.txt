@@ -30,6 +30,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
 ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 ${R3BROOT_SOURCE_DIR}/r3bdata/actarData
 ${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
+${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -124,6 +125,9 @@ fibData/R3BFi4CalItem.cxx
 fibData/R3BFi4HitItem.cxx
 fibData/R3BFibMappedData.cxx
 fibData/R3BFibCalData.cxx
+amsData/R3BAmsMappedData.cxx
+amsData/R3BAmsStripCalData.cxx
+amsData/R3BAmsHitData.cxx
 )
 
 

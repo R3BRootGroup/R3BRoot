@@ -1,5 +1,6 @@
 //*-- AUTHOR : Denis Bertini
 //*-- Created : 20/03/2009
+//*-- Modified: 29/05/2018, J.L. Rodriguez
 
 /////////////////////////////////////////////////////////////
 //
@@ -22,6 +23,8 @@
 #include "FairParRootFileIo.h"
 #include "FairParAsciiFileIo.h"
 #include "FairLogger.h"
+
+#include "R3BAmsStripCalPar.h"
 
 #include "TClass.h"
 
@@ -60,6 +63,14 @@ void R3BTraContFact::setAllContainers()
     containers->Add(p1);
     containers->Add(p2);
     */
+
+  FairContainer* p1= new FairContainer("amsStripCalPar",
+                                       "AMS Strip Parameters",
+                                       "AMSCalParContext");
+  p1->addContext("AMSCalParContext");
+  
+  containers->Add(p1);
+
 }
 
 
@@ -81,7 +92,17 @@ FairParSet* R3BTraContFact::createContainer(FairContainer* c)
   }
   return p;
   */
-  return NULL;
+
+  const char* name=c->GetName();
+  LOG(INFO) << "R3BTraContFact: Create container name: " << name << FairLogger::endl;
+  FairParSet* p=0;
+  if (strcmp(name,"amsStripCalPar")==0){
+    p=new R3BAmsStripCalPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
+  }
+  return p;
+
+
+ // return NULL;
 }
 
 
