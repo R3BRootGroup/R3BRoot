@@ -43,6 +43,7 @@ class R3BAmsStripCal2Hit : public FairTask {
   /** Virtual method Finish **/
   virtual void Finish();
   
+  void SetOnline(Bool_t option){fOnline=option;}
   
  private:
 
@@ -51,6 +52,8 @@ class R3BAmsStripCal2Hit : public FairTask {
   TClonesArray* fAmsStripCalDataCA;  /**< Array with AMS Cal- input data. >*/
   TClonesArray* fAmsHitDataCA;       /**< Array with AMS Hit- output data. >*/
   
+  Bool_t fOnline;//Don't store data for online
+
   /** Private method AddHitData **/
   //** Adds a AmsHitData to the HitCollection
   R3BAmsHitData* AddHitData(Int_t detid, Int_t numhit, Double_t x, Double_t y, Double_t z, Double_t energy);

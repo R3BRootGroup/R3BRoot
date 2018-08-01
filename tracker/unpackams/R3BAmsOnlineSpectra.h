@@ -15,6 +15,7 @@
 #include "TMath.h"
 #include <cstdlib>
 #include "TH2F.h"
+#include "TCanvas.h"
 
 class TClonesArray;
 class R3BEventHeader;
@@ -91,11 +92,15 @@ class R3BAmsOnlineSpectra : public FairTask {
   Int_t fTrigger;                       /**< Trigger value. */
   Int_t fNEvents;        	   	/**< Event counter. */
   
+  TCanvas* cMap;
+  TCanvas* cCal;
+  TCanvas* cHit;
 
-  
   TH2F* fh_Ams_energy_allStrips[4];
+  TH2F* fh_Ams_energy_allCalStrips[8];
+  TH2F* fh_Ams_hit[4];
   
-  TString fAmsFile;        	        /**< Config file name. */
+  //TString fAmsFile;        	        /**< Config file name. */
   Bool_t  fCalON;                 	/**< Mapped or Cal selector. */
   
  public:

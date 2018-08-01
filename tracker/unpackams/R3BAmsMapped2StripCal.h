@@ -46,7 +46,8 @@ class R3BAmsMapped2StripCal : public FairTask {
   
   /** Virtual method Finish **/
   virtual void Finish();
-  
+
+  void SetOnline(Bool_t option){fOnline=option;}
   
  private:
   
@@ -59,6 +60,8 @@ class R3BAmsMapped2StripCal : public FairTask {
   Int_t NumParams;
   Int_t MaxSigma;
   TArrayF* CalParams;
+
+  Bool_t fOnline;//Don't store data for online
   
   R3BAmsStripCalPar* fCal_Par;       /**< Parameter container. >*/ 
   TClonesArray* fAmsMappedDataCA;    /**< Array with AMS Mapped- input data. >*/
