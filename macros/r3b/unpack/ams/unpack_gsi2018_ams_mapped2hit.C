@@ -44,7 +44,7 @@ void unpack_gsi2018_ams_mapped2hit() {
   
   /* Create online run ------------------------------------ */
   FairRunOnline* run = new FairRunOnline(source);
-  run->SetRunId(1513078509);
+  run->SetRunId(1);
   run->SetOutputFile(outputFileName);
   
 

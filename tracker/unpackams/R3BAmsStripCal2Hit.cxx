@@ -27,7 +27,8 @@ R3BAmsStripCal2Hit::R3BAmsStripCal2Hit() :
   fPitchK(104.),
   fPitchS(110.),
   fAmsStripCalDataCA(NULL),
-  fAmsHitDataCA(NULL)
+  fAmsHitDataCA(NULL),
+  fOnline(kFALSE)
 {
 }
 
@@ -37,7 +38,8 @@ R3BAmsStripCal2Hit::R3BAmsStripCal2Hit(const char* name, Int_t iVerbose) :
   fPitchK(104.),
   fPitchS(110.),
   fAmsStripCalDataCA(NULL),
-  fAmsHitDataCA(NULL)
+  fAmsHitDataCA(NULL),
+  fOnline(kFALSE)
 {  
 }
 
@@ -62,8 +64,14 @@ InitStatus R3BAmsStripCal2Hit::Init()
   //OUTPUT DATA
   //Hit data
   fAmsHitDataCA = new TClonesArray("R3BAmsHitData",10);
+
+  if(!fOnline){
   rootManager->Register("AmsHitData", "AMS Hit", fAmsHitDataCA, kTRUE);
-  
+  }else{
+  rootManager->Register("AmsHitData", "AMS Hit", fAmsHitDataCA, kFALSE);
+  }  
+
+
   return kSUCCESS;
 }
 

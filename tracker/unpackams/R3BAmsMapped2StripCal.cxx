@@ -34,7 +34,8 @@ R3BAmsMapped2StripCal::R3BAmsMapped2StripCal() :
   CalParams(NULL),
   fCal_Par(NULL),
   fAmsMappedDataCA(NULL),
-  fAmsStripCalDataCA(NULL)
+  fAmsStripCalDataCA(NULL),
+  fOnline(kFALSE)
 {
 }
 
@@ -50,7 +51,8 @@ R3BAmsMapped2StripCal::R3BAmsMapped2StripCal(const char* name, Int_t iVerbose) :
   CalParams(NULL),
   fCal_Par(NULL),
   fAmsMappedDataCA(NULL),
-  fAmsStripCalDataCA(NULL)
+  fAmsStripCalDataCA(NULL),
+  fOnline(kFALSE)
 {  
 }
 
@@ -123,8 +125,13 @@ InitStatus R3BAmsMapped2StripCal::Init()
   //OUTPUT DATA
   //Calibrated data
   fAmsStripCalDataCA = new TClonesArray("R3BAmsStripCalData",10);
+
+  if(!fOnline){
   rootManager->Register("AmsStripCalData", "AMS strip Cal", fAmsStripCalDataCA, kTRUE);
-  
+  }else{
+  rootManager->Register("AmsStripCalData", "AMS strip Cal", fAmsStripCalDataCA, kFALSE);
+  }
+
   SetParameter();
   return kSUCCESS;
 }
