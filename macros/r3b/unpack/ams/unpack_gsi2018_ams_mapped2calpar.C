@@ -18,11 +18,11 @@ void unpack_gsi2018_ams_mapped2calpar() {
   timer.Start();
   
   //const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
-  const Int_t nev = 5000; /* number of events to read, -1 - until CTRL+C */
+  const Int_t nev = -1; /* number of events to read, -1 - until CTRL+C */
   
   /* Create source using ucesb for input ------------------ */
   
-  TString filename = "~/lmd/ams.lmd";
+  TString filename = "~/ams.lmd";
   TString outputFileName = "data_0001.root";
   
   TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
@@ -75,15 +75,15 @@ void unpack_gsi2018_ams_mapped2calpar() {
 
   //Choose Root or Ascii file	
   //1-Root file with the Calibartion Parameters
-  Bool_t kParameterMerged = kTRUE;/*
+  Bool_t kParameterMerged = kTRUE;
   FairParRootFileIo* parOut = new FairParRootFileIo(kParameterMerged);
   parOut->open("Ams_CalibParam.root");
-  rtdb->setOutput(parOut);*/
+  rtdb->setOutput(parOut);
   
   //2-Ascii file with the Calibartion Parameters
-  FairParAsciiFileIo* parIo1 = new FairParAsciiFileIo();
-  parIo1->open("Ams_CalibParam.par","out");
-  rtdb->setOutput(parIo1);
+  //FairParAsciiFileIo* parIo1 = new FairParAsciiFileIo();
+  //parIo1->open("Ams_CalibParam.par","out");
+  //rtdb->setOutput(parIo1);
 
 
   /* Run -------------------------------------------------- */

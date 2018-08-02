@@ -25,7 +25,9 @@ void unpack_gsi2018_ams_online() {
   
   /* Create source using ucesb for input ------------------ */
   
-  TString filename = "~/lmd/ams.lmd";
+  TString filename = "--stream=lxg0898:6002";
+  //TString filename = "/u/land/nyx/land/htoernqv/ams.lmd";
+  
   TString outputFileName = "data_online.root";
   
   TString ntuple_options = "UNPACK:EVENTNO,UNPACK:TRIGGER,RAW";
@@ -57,7 +59,9 @@ void unpack_gsi2018_ams_online() {
   FairRunOnline* run = new FairRunOnline(source);
   run->SetRunId(1);
   run->SetOutputFile(outputFileName);
-  run->ActivateHttpServer(Int_t refresh = 2000, Int_t port=8044);
+  Int_t refresh = 2000;
+  Int_t port=8044;
+  run->ActivateHttpServer(refresh, port);
 
 
   /* Runtime data base ------------------------------------ */

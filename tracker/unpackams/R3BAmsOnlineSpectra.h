@@ -79,7 +79,9 @@ class R3BAmsOnlineSpectra : public FairTask {
    * Method for setting the Data Level (Mapped or Cal)
    */ 
   inline void SetDisplayCalOn(Bool_t On){fCalON=On;}
-  
+
+
+  void Reset_AMS_Histo();
   
  private:
   

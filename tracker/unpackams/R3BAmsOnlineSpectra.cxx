@@ -13,7 +13,7 @@
 #include "R3BAmsStripCalData.h"
 #include "R3BAmsHitData.h"
 #include "R3BEventHeader.h"
-
+#include "THttpServer.h"
 
 #include "FairRunAna.h"
 #include "FairRunOnline.h"
@@ -27,6 +27,7 @@
 
 #include "TClonesArray.h"
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <cstdlib>
 #include <fstream>
@@ -68,11 +69,14 @@ InitStatus R3BAmsOnlineSpectra::Init() {
   
   FairRootManager* mgr = FairRootManager::Instance();
   if (NULL == mgr)
-    LOG(FATAL) << "R3BAmsOnlineSpectra::Init FairRootManager not found" << FairLogger::endl;
-  
-  
+    FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "R3BAmsOnlineSpectra::Init FairRootManager not found");
   header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+
   FairRunOnline *run = FairRunOnline::Instance();
+  run->GetHttpServer()->Register("",this);
+
+  
+  //create histograms of all detectors  
   
   //get access to Mapped data
   fMappedItemsAms = (TClonesArray*)mgr->GetObject("AmsMappedData");
@@ -113,6 +117,7 @@ InitStatus R3BAmsOnlineSpectra::Init() {
      fh_Ams_energy_allStrips[i]->GetXaxis()->SetTitle("Strip number");
      fh_Ams_energy_allStrips[i]->GetYaxis()->SetTitle("Energy [channels]");
      fh_Ams_energy_allStrips[i]->GetYaxis()->SetTitleOffset(1.4);
+     fh_Ams_energy_allStrips[i]->GetXaxis()->CenterTitle(true);
      fh_Ams_energy_allStrips[i]->GetYaxis()->CenterTitle(true);
      cMap->cd(i+1);
      fh_Ams_energy_allStrips[i]->Draw("col"); 
@@ -129,7 +134,8 @@ InitStatus R3BAmsOnlineSpectra::Init() {
       fh_Ams_energy_allCalStrips[i*2+j] = new TH2F(Name1, Name2, 384, 0, 384, bins, minE, maxE);
       fh_Ams_energy_allCalStrips[i*2+j]->GetXaxis()->SetTitle("Strip number");
       fh_Ams_energy_allCalStrips[i*2+j]->GetYaxis()->SetTitle("Energy [channels]");
-      fh_Ams_energy_allCalStrips[i*2+j]->GetYaxis()->SetTitleOffset(1.2);
+      fh_Ams_energy_allCalStrips[i*2+j]->GetYaxis()->SetTitleOffset(1.4);
+      fh_Ams_energy_allCalStrips[i*2+j]->GetXaxis()->CenterTitle(true);
       fh_Ams_energy_allCalStrips[i*2+j]->GetYaxis()->CenterTitle(true);
       cCal->cd(i*2+1+j);
       fh_Ams_energy_allCalStrips[i*2+j]->Draw("col");
@@ -143,8 +149,10 @@ InitStatus R3BAmsOnlineSpectra::Init() {
      fh_Ams_hit[i] = new TH2F(Name1, Name2, 350, 0, 70., 200, 0, 40.);    
      fh_Ams_hit[i]->GetXaxis()->SetTitle("X [mm]");
      fh_Ams_hit[i]->GetYaxis()->SetTitle("Y [mm]");
-     fh_Ams_hit[i]->GetYaxis()->SetTitleOffset(1.2);
-     fh_Ams_hit[i]->GetXaxis()->SetTitleOffset(1.);
+     fh_Ams_hit[i]->GetXaxis()->CenterTitle(true);
+     fh_Ams_hit[i]->GetYaxis()->CenterTitle(true);
+     fh_Ams_hit[i]->GetYaxis()->SetTitleOffset(1.1);
+     fh_Ams_hit[i]->GetXaxis()->SetTitleOffset(1.1);
      cHit->cd(i+1);
      fh_Ams_hit[i]->Draw("col"); 
     }
@@ -155,8 +163,33 @@ InitStatus R3BAmsOnlineSpectra::Init() {
     mainfolAms->Add(cCal);
     mainfolAms->Add(cHit);
     run->AddObject(mainfolAms);
-  
+
+    //Register command to reset histograms
+    run->GetHttpServer()->RegisterCommand("Reset_AMS", Form("/Objects/%s/->Reset_AMS_Histo()", GetName()));
+    
   return kSUCCESS;
+}
+
+void R3BAmsOnlineSpectra::Reset_AMS_Histo()
+{
+    LOG(INFO) << "R3BAmsOnlineSpectra::Reset_AMS_Histo" << FairLogger::endl;
+
+    //Mapped data
+    for(Int_t i=0;i<4;i++){
+     fh_Ams_energy_allStrips[i]->Reset();
+    }
+
+    //Cal data
+    for(Int_t i=0;i<4;i++){
+     for(Int_t j=0;j<2;j++){
+      fh_Ams_energy_allCalStrips[i*2+j]->Reset();
+     }
+    }
+    
+    //Hit data
+    for(Int_t i=0;i<4;i++){
+     fh_Ams_hit[i]->Reset();
+    }
 }
 
 
@@ -214,12 +247,10 @@ void R3BAmsOnlineSpectra::FinishEvent() {
     {
         fMappedItemsAms->Clear();
     }
-
     if (fCalItemsAms)
     {
         fCalItemsAms->Clear();
     }
-
     if (fHitItemsAms)
     {
         fHitItemsAms->Clear();
@@ -232,17 +263,14 @@ void R3BAmsOnlineSpectra::FinishTask() {
     if(fMappedItemsAms){
 	cMap->Write();
     }
-
     if (fCalItemsAms)
     {
 	cCal->Write();
     }
-
     if (fHitItemsAms)
     {
 	cHit->Write();
     }
-
 }
 
 ClassImp(R3BAmsOnlineSpectra)
