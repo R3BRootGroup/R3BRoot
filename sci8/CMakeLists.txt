@@ -1,4 +1,4 @@
-# Create a library called "libR3B" which includes the source files given in
+# Create a library called "libR3BCal" which includes the source files given in
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 
@@ -10,18 +10,18 @@ ${BASE_INCLUDE_DIRECTORIES}
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase 
-${R3BROOT_SOURCE_DIR}/r3bdata/landData
-${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
-${R3BROOT_SOURCE_DIR}/r3bdata/califaData
-${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
-${R3BROOT_SOURCE_DIR}/los
-${R3BROOT_SOURCE_DIR}/r3bdata/losData
+${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/sci8
-${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
-${R3BROOT_SOURCE_DIR}/r3bdata/tofData
+${R3BROOT_SOURCE_DIR}/r3bdata/
+${R3BROOT_SOURCE_DIR}/r3bdata/calData
+${R3BROOT_SOURCE_DIR}/r3bdata/dchData
+${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
-${R3BROOT_SOURCE_DIR}/r3bdata/pspData
-${R3BROOT_SOURCE_DIR}/r3bdata/fibData
+${R3BROOT_SOURCE_DIR}/r3bdata/tofData
+${R3BROOT_SOURCE_DIR}/r3bdata/landData
+${R3BROOT_SOURCE_DIR}/r3bdata/losData
+${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
+${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
 ${R3BROOT_SOURCE_DIR}/tcal
 )
 
@@ -36,23 +36,19 @@ ${FAIRROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
-R3BModule.cxx 
-R3BDetector.cxx 
-R3BEventHeader.cxx
-R3BOnlineSpectra.cxx
-R3BGlobalAnalysis.cxx
+R3BSci8Mapped2Cal.cxx
+R3BSci8Mapped2CalPar.cxx
+R3BSci8Cal2Hit.cxx
 )
 
 # fill list of header files from list of source files
 # by exchanging the file extension
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
-Set(LINKDEF R3BLinkDef.h)
-
+Set(LINKDEF LosLinkDef.h)
+Set(LIBRARY_NAME R3BSci8)
 Set(DEPENDENCIES
-    GeoBase ParBase MbsAPI Base FairTools R3BData Core Geom GenVector Physics Matrix MathCore)
-
-Set(LIBRARY_NAME R3Bbase)
+    R3Bbase R3BData R3BPassive R3BTCal)
 
 GENERATE_LIBRARY()
 

@@ -103,11 +103,14 @@ class R3BOnlineSpectra : public FairTask
     }
     
     void Reset_LOS_Histo();
-
-
+    void Reset_SCI8_Histo();
+    void Reset_TOFD_Histo();
+ 
   private:
     TClonesArray* fMappedItemsLos;                 /**< Array with mapped items. */
     TClonesArray* fCalItemsLos;                    /**< Array with cal items. */
+    TClonesArray* fMappedItemsSci8;                 /**< Array with mapped items. */
+    TClonesArray* fCalItemsSci8;                    /**< Array with cal items. */
     TClonesArray* fMappedItemsTofd;                /**< Array with mapped items. */
     TClonesArray* fCalItemsTofd;                   /**< Array with cal items. */
     TClonesArray* fMappedItemsPspx;                    /**< Array with mapped items. */
@@ -184,13 +187,32 @@ class R3BOnlineSpectra : public FairTask
     UInt_t fNofChannels;   /**< Number of channels per detector. */    
     UInt_t fNofModules;    /**< Total number of channels. */
     
-    
+    TH1F *fh_sci8_channels;    
+    TH1F *fh_sci8_tres_MCFD;
+    TH1F *fh_sci8_tres_TAMEX;
+    TH1F *fh_sci8_tot_mean;
+    TH1F *fh_tof_sci8;
+    TH2F *fh_sci8_tot;
+    TH1F *fh_sci8_dt_hits;
+    TH1F *fh_sci8_dt_hits_l;
+    TH1F *fh_sci8_dt_hits_t;
+    TH1F *fh_sci8_multihit;
+    TH2F *fh_sci8_multihitVFTX;
+    TH2F *fh_sci8_multihitLEAD;
+    TH2F *fh_sci8_multihitTRAI;   
        
     TH1F *fh_los_channels;    
     TH1F *fh_los_tres_MCFD;
     TH1F *fh_los_tres_TAMEX;
-    TH2F *fh_los_tot;
     TH1F *fh_los_tot_mean;
+    TH2F *fh_los_tot;
+    TH1F *fh_los_dt_hits;
+    TH1F *fh_los_dt_hits_l;
+    TH1F *fh_los_dt_hits_t;
+    TH1F *fh_los_multihit;
+    TH2F *fh_los_multihitVFTX;
+    TH2F *fh_los_multihitLEAD;
+    TH2F *fh_los_multihitTRAI;
     
     TH1F *fh_channels_Fib[14];
     TH1F *fh_fibers_Fib[14];
@@ -202,15 +224,13 @@ class R3BOnlineSpectra : public FairTask
     TH2F *fh_multihit_s_Fib[14];
     TH2F *fh_ToT_m_Fib[14];
     TH2F *fh_ToT_s_Fib[14];
-    TH2F *fh_FibervsTime_Fib[14];
     
     
-    TH1F *fh_tofd_channels[N_PLANE_MAX_TOFD];    
+    TH1F *fh_tofd_channels[N_PLANE_MAX_TOFD];   
+    TH2F *fh_tofd_multihit[N_PLANE_MAX_TOFD];
     TH2F *fh_tofd_ToF[N_PLANE_MAX_TOFD];
-
-    TH2F* fh_tofd_TotPm1[N_PLANE_MAX_TOFD]; 
-    TH2F* fh_tofd_TotPm2[N_PLANE_MAX_TOFD]; 
- 
+    TH2F* fh_tofd_TotPm[N_PLANE_MAX_TOFD]; 
+    TH2F* fh_tofd_dt[3];
  
     TH1F *fh_ptof_channels; 
     TH1F *fh_ptof_channels_cut; 

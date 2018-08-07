@@ -24,6 +24,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
 ${R3BROOT_SOURCE_DIR}/r3bdata/startrackData  
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData  
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
+${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/mfiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
@@ -107,12 +108,15 @@ pspData/R3BPspxPrecalData.cxx
 pspData/R3BPspxCalData.cxx
 pspData/R3BPspxHitData.cxx
 losData/R3BLosMappedData.cxx
+losData/R3BLosCalData.cxx
+losData/R3BLosHitData.cxx
+sci8Data/R3BSci8MappedData.cxx
+sci8Data/R3BSci8CalData.cxx
+sci8Data/R3BSci8HitData.cxx
 actarData/R3BActarPoint.cxx
 strawtubesData/R3BStrawtubesMappedData.cxx
 strawtubesData/R3BStrawtubesCalData.cxx
 strawtubesData/R3BStrawtubesHitData.cxx
-losData/R3BLosCalData.cxx
-losData/R3BLosHitData.cxx
 neulandData/R3BPaddleTamexMappedData.cxx
 tofData/R3BPaddleCalData.cxx
 tofData/R3BTofdHitData.cxx

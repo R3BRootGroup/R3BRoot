@@ -17,8 +17,8 @@ R3BLosMappedData::R3BLosMappedData()
     : fDetector(0)     // Detector number: 1...n
     , fChannel(0)      // Channel number:  1...n (n = 4 (old LOS), 8 (new LOS))
     , fType(0)         // Type: 0 = VFTX time, 1 = TAMEX leading edge, 2 = TAMEX trailing edge
-    , fTimeFine(0)     // Fine time
-    , fTimeCoarse(0)   // Coarse time
+    , fTimeFine(-1)     // Fine time
+    , fTimeCoarse(-1)   // Coarse time
 {
 }
 
@@ -32,9 +32,7 @@ R3BLosMappedData::R3BLosMappedData(	UInt_t detector,
     , fType(type)
     , fTimeFine(timeFine)
     , fTimeCoarse(timeCoarse)
-   
 {
-//LOG(INFO)
 //cout<<"R3BLosMappedData: chann. "<< channel <<", type "<<type<<", fine/coarse Times: "<<timeFine<<", "
 //<<timeCoarse<<endl;
 /* Everything fine here!
@@ -42,6 +40,9 @@ R3BLosMappedData::R3BLosMappedData(	UInt_t detector,
  if(timeFine <= 0 || IS_NAN(timeFine) ) LOG(INFO)<<"LosMappedData FineTime wrong value for channel: "<<channel<<" type: "<<type<<" value: "<<timeFine<<FairLogger::endl;
  if(timeCoarse < 0 || IS_NAN(timeCoarse)) LOG(INFO)<<"LosMappedData CoarseTime wrong value for channel: "<<channel<<" type: "<<type<<" value: "<<timeCoarse<<FairLogger::endl;
  
-*/}
+*/	 
+}    
+    
+   
 
 ClassImp(R3BLosMappedData)

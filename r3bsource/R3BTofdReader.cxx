@@ -110,7 +110,6 @@ Bool_t R3BTofdReader::Read()
  */
 
 
-	
 	for (int d=0;d<MAX_TOFD_PLANES;d++)  // loop over all planes
 		for (int t=0;t<2;t++)            // loop over tube 1 and 2
 		{
@@ -126,6 +125,7 @@ Bool_t R3BTofdReader::Read()
 				uint32_t channel=data->TOFD_P[d].T[t].TFLMI[i]; // or 1..65
 				uint32_t nextChannelStart=data->TOFD_P[d].T[t].TFLME[i];  // index in v for first item of next channel
 				
+			
 				for (int j=curChannelStart;j<nextChannelStart;j++) 
 				{
 					
@@ -148,12 +148,16 @@ Bool_t R3BTofdReader::Read()
 						}
 					}
 					
-					if (!mapped) mapped=new ((*fArray)[fArray->GetEntriesFast()])
-						R3BPaddleTamexMappedData(d+1,    // 1..n   (plane)
-							channel);				     // 1..n   (bar)
+					if (!mapped) {
+						mapped=new ((*fArray)[fArray->GetEntriesFast()])
+							R3BPaddleTamexMappedData(d+1, // 1..n (plane)
+							channel);              // 1..n (bar)
+						mapped->fEdge = 1;
+					}
 
 					if (t==0) // PM1
 					{
+						mapped->fSide = 1;
 						mapped->fCoarseTime1LE= data->TOFD_P[d].T[t].TCLv[j];  // coarse time leading edge
 						mapped->fFineTime1LE  = data->TOFD_P[d].T[t].TFLv[j];  // fine time leading edge
 						
@@ -163,6 +167,7 @@ Bool_t R3BTofdReader::Read()
 					}
 					else // PM2
 					{
+						mapped->fSide = 2;
 						mapped->fCoarseTime2LE= data->TOFD_P[d].T[t].TCLv[j];  // coarse time leading edge
 						mapped->fFineTime2LE  = data->TOFD_P[d].T[t].TFLv[j];  // fine time leading edge
 				//	cout<<"TOFDReader PM2 leading times: "<<numChannels <<", "<<channel<<","<<t<<", "<<data->TOFD_P[d].T[t].TFLv[j]<<", "<<	data->TOFD_P[d].T[t].TCLv[j]<<endl;
@@ -230,12 +235,16 @@ Bool_t R3BTofdReader::Read()
 							}
 						}
 					
-					if (!mapped) mapped=new ((*fArray)[fArray->GetEntriesFast()])
-						R3BPaddleTamexMappedData(d+1,    // 1..n   (plane)
-							channel);				     // 1..n   (bar)
+					if (!mapped) {
+						mapped=new ((*fArray)[fArray->GetEntriesFast()])
+							R3BPaddleTamexMappedData(d+1, // 1..n (plane)
+									channel);             // 1..n (bar)
+						mapped->fEdge = 2;
+					}
 
 					if (t==0) // PM1
 					{
+						mapped->fSide = 1;
 						mapped->fCoarseTime1TE= data->TOFD_P[d].T[t].TCTv[j];  // coarse time leading edge
 						mapped->fFineTime1TE  = data->TOFD_P[d].T[t].TFTv[j];  // fine time leading edge
 					
@@ -244,6 +253,7 @@ Bool_t R3BTofdReader::Read()
 					}
 					else      // PM2
 					{
+						mapped->fSide = 2;
 						mapped->fCoarseTime2TE= data->TOFD_P[d].T[t].TCTv[j];  // coarse time leading edge
 						mapped->fFineTime2TE  = data->TOFD_P[d].T[t].TFTv[j];  // fine time leading edge
 					

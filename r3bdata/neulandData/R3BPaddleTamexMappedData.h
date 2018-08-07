@@ -32,6 +32,14 @@ class R3BPaddleTamexMappedData : public TObject
     {
         return fBar;
     }
+    inline const Int_t& GetSideId() const
+    {
+        return fSide;
+    }
+    inline const Int_t& GetEdgeId() const
+    {
+        return fEdge;
+    }
 
 
     inline const Int_t& GetCoarseTime1LE() const
@@ -87,6 +95,10 @@ class R3BPaddleTamexMappedData : public TObject
     {
 	    return false;
     }
+
+  public:
+    Int_t fSide;  //... number of side  1/2
+    Int_t fEdge;  //... number of edge  1/2
 
   protected:
     Int_t fPlane; //... number of plane 1..n

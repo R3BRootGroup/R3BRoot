@@ -36,8 +36,8 @@
 
 
 
-#define LOS_COINC_WINDOW_V_NS 20 // VFTX 20
-#define LOS_COINC_WINDOW_T_NS 10240 // TAMEX 5*2048, needed as in some cases trailing coarse time = 0, and if this happens then the average value of outside the coinc_window  
+#define LOS_COINC_WINDOW_V_NS 280 
+#define LOS_COINC_WINDOW_T_NS 50 // Same as VFTX, as leading and trailing times are separately treated  
 #define IS_NAN(x) TMath::IsNaN(x)
 
 
@@ -108,6 +108,7 @@ InitStatus R3BLosMapped2Cal::Init()
 
 	// request storage of Cal data in output tree
     mgr->Register("LosCal", "Land", fCalItems, kTRUE);
+    fCalItems->Clear();
     
     return kSUCCESS;
 }
@@ -140,9 +141,10 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 
 	Int_t nHits = fMappedItems->GetEntriesFast();
 
-   if(nHits == 24){
+
 	for (Int_t ihit = 0; ihit < nHits; ihit++)  // nHits = Nchannel_LOS * NTypes = 4 or 8 * 3
 	{
+				
 		R3BLosMappedData* hit = (R3BLosMappedData*)fMappedItems->At(ihit);
 		if (!hit) continue;
 
@@ -151,7 +153,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 		UInt_t iCha  = hit->GetChannel();  // 1..
 		UInt_t iType = hit->GetType();     // 0,1,2
 
-	//	if(nHits>24) cout<<"R3BLosMapped2Cal: Channel "<<iCha<<", type "<<iType<<", nHits "<<nHits<<", ihit "<<ihit<<", timeFine "<<hit->GetTimeFine()<<endl;
+	//	if(nHits == 48 && iType ==1) cout<<"R3BLosMapped2Cal: Channel "<<iCha<<", type "<<iType<<", nHits "<<nHits<<", ihit "<<ihit<<", timeFine "<<hit->GetTimeFine()<<endl;
          
 
 		if ((iDet<1) || (iDet>fNofDetectors))
@@ -177,9 +179,6 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 
 		Double_t times_raw_ns = par->GetTimeVFTX( hit->GetTimeFine() );
 
-
-		//     cout<<"Mapped2Cal 1: "<<iCha<<", "<<iType<<", "<<hit->GetTimeFine() <<", "<<hit->GetTimeCoarse()<<", "<<times_raw_ns<<endl;
-
 		if (times_raw_ns < 0. || times_raw_ns > fClockFreq || IS_NAN(times_raw_ns) )
 		{
 
@@ -195,11 +194,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 		// ... and add clock time
 		Double_t times_ns = fClockFreq-times_raw_ns + hit->GetTimeCoarse() * fClockFreq;
 		
-	/*	
-		if(nHits > 24)   
-		cout<<"Mapped2Cal 2: "<<nHits<<", "<<iCha<<", "<<iType<<", "<< hit->GetTimeFine()<<", "
-				<<hit->GetTimeCoarse()<<", "<<times_raw_ns<<", "<<times_ns<<endl;           
-    */
+   
     
 		/* Note: we have multi-hit data...
 		 *  
@@ -216,16 +211,10 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 		 * which are actually just one. Hm... this should be very rare. 
 		 * Care about that later if it becomes necessary. 
 		 * 
-		 * Even though we have technically two LOS detectors in s438b,
-		 * only one really produces data so it's ok to throw all
-		 * detector hits into the same list (and hence traversing a longer
-		 * list than strictly necessary for the reconstruction)
 		 */
 
-		// see if there is already a detector hit around that time 
+ 		// see if there is already a detector hit around that time 
 		R3BLosCalData* calItem=NULL;
-
-		 //  cout<<"fNofCalItems: "<<fNofCalItems<<endl;
 
 		int iCal;
 		for (iCal=0;iCal<fNofCalItems;iCal++)
@@ -237,35 +226,30 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 				continue;
 			}
             
-   //  if(nHits>24)  cout<<"mapped "<<ihit<<", "<<iCal<<", "<<fNofCalItems<<", "<<iType<<"; "<<aCalItem->GetVFTXNcha()<<", "<<aCalItem->GetTAMEXLNcha()<<", "<<aCalItem->GetTAMEXTNcha()<<endl;     
-            
 			Double_t  LOS_COINC_WINDOW_NS;
 			Double_t Tdev;
 			Bool_t LOS_COINC = false;
 			
 			if(iType == 0) {
 				LOS_COINC_WINDOW_NS = LOS_COINC_WINDOW_V_NS;
-				Tdev = fabs(aCalItem->GetMeanTimeVFTX())-times_ns;
-	           	if(Tdev < LOS_COINC_WINDOW_NS) LOS_COINC = true;	
+				Tdev = fabs(aCalItem->GetMeanTimeVFTX()-times_ns);
+				if(Tdev < LOS_COINC_WINDOW_NS) LOS_COINC = true;	
 			}	
 			if(iType == 1 ) {
 				LOS_COINC_WINDOW_NS = LOS_COINC_WINDOW_T_NS;   
-                Tdev = fabs(aCalItem->GetMeanTimeTAMEXL())-times_ns;
-                if(Tdev < LOS_COINC_WINDOW_NS && aCalItem->GetTAMEXLNcha() > 0) LOS_COINC = true;
-                if(aCalItem->GetVFTXNcha() == 8 && IS_NAN(Tdev) && aCalItem->GetTAMEXLNcha() == 0) LOS_COINC = true; // First Tamex leading time
+                Tdev = fabs(aCalItem->GetMeanTimeTAMEXL()-times_ns);
+                if(Tdev < LOS_COINC_WINDOW_NS && aCalItem->GetTAMEXLNcha() > 0 ) LOS_COINC = true;
+                if(IS_NAN(Tdev) && aCalItem->GetTAMEXLNcha() == 0) LOS_COINC = true; // First Tamex leading time
             }
 			if(iType == 2) {
 				LOS_COINC_WINDOW_NS = LOS_COINC_WINDOW_T_NS;   
-                Tdev = fabs(aCalItem->GetMeanTimeTAMEXT())-times_ns;               
-                if(Tdev < LOS_COINC_WINDOW_NS && aCalItem->GetTAMEXTNcha() > 0) LOS_COINC = true;
-                if(aCalItem->GetTAMEXLNcha() == 8 && IS_NAN(Tdev) && aCalItem->GetTAMEXTNcha() == 0) LOS_COINC = true; // First Tamex trailing time
+                Tdev = fabs(aCalItem->GetMeanTimeTAMEXT()-times_ns);               
+                if(Tdev < LOS_COINC_WINDOW_NS && aCalItem->GetTAMEXTNcha() > 0 ) LOS_COINC = true;
+                if(IS_NAN(Tdev) && aCalItem->GetTAMEXTNcha() == 0) LOS_COINC = true; // First Tamex trailing time
             }            
-                
-
-		//	if(fabs(aCalItem->GetMeanTime()-times_ns) < LOS_COINC_WINDOW_NS)		
+         
 			if(LOS_COINC){
 				// check if item is already set. If so, we need to skip this event!
-
 				switch (iCha)
 				{
 
@@ -314,13 +298,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 				if (!calItem)
 					calItem=aCalItem;
 			} 
-			
-		/*	
-			if(nHits == 24 && ihit == 24 && aCalItem->GetTAMEXLNcha() != aCalItem->GetTAMEXTNcha() ) cout<<"NTL != NTT at start "<<fNEvent<<", "<<fNofCalItems<<", "
-		                                                                     <<aCalItem->GetTAMEXLNcha()<<", "<<aCalItem->GetTAMEXTNcha()<<", "
-		                                                                    <<aCalItem->GetVFTXNcha()<<endl;  
-         */
-         
+        
 		}
 		if (!calItem)
 		{
@@ -330,10 +308,8 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 		}
 		// set the time to the correct cal item       
 
-		//  if(iCha == 1) //before KVI setup
-		if(iCha == 8)   // since KVI
+		if(iCha == 8) 
 		{ 
-			//	cout<<"Mapped2Cal "<<iCha<<", "<<iType<<", "<<times_ns<<", "<<fNofCalItems<<endl;	
 
 			if(iType == 0) {
 				calItem->fTimeV_t_ns   = times_ns;
@@ -350,10 +326,8 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 				if ( calItem->fTimeT_t_ns < 0. || IS_NAN(calItem->fTimeT_t_ns) ) LOG(INFO)<<"Problem with  fTimeT_t_ns: "<< calItem->fTimeT_t_ns<< " "<<times_ns<<" "<<endl;					      
 			}
 		}		  	
-		// if(iCha == 3)    //before KVI setup
-		if(iCha == 2)   // since KVI
+		if(iCha == 2)   
 		{ 
-			//	cout<<"Mapped2Cal "<<iCha<<", "<<iType<<", "<<times_ns<<", "<<fNofCalItems<<endl;		
 
 			if(iType == 0) {
 				calItem->fTimeV_l_ns   = times_ns;
@@ -370,10 +344,8 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 				if ( calItem->fTimeT_l_ns < 0. || IS_NAN(calItem->fTimeT_l_ns) ) LOG(INFO)<<"Problem with  fTimeT_l_ns: "<< calItem->fTimeT_l_ns<< " "<<times_ns<<" "<<endl;					      
 			}
 		}		  
-		//if(iCha == 5) //before KVI setup
-		if(iCha == 4)   // since KVI
+		if(iCha == 4)   
 		{ 
-			//    cout<<"Mapped2Cal "<<iCha<<", "<<iType<<", "<<times_ns<<", "<<fNofCalItems<<endl;	
 
 			if(iType == 0) {
 				calItem->fTimeV_b_ns   = times_ns;
@@ -390,10 +362,8 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 				if ( calItem->fTimeT_b_ns < 0. || IS_NAN(calItem->fTimeT_b_ns) ) LOG(INFO)<<"Problem with  fTimeT_b_ns: "<< calItem->fTimeT_b_ns<< " "<<times_ns<<" "<<endl;					      
 			}
 		}	
-		// if(iCha == 7) //before KVI setup
-		if(iCha == 6)   // since KVI
+		if(iCha == 6)   
 		{ 
-			//	cout<<"Mapped2Cal "<<iCha<<", "<<iType<<", "<<times_ns<<", "<<fNofCalItems<<endl;		
 
 			if(iType == 0) {
 				calItem->fTimeV_r_ns   = times_ns;
@@ -410,11 +380,8 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 				if ( calItem->fTimeT_r_ns < 0. || IS_NAN(calItem->fTimeT_r_ns) ) LOG(INFO)<<"Problem with  fTimeT_r_ns: "<< calItem->fTimeT_r_ns<< " "<<times_ns<<" "<<endl;					      
 			}
 		}		  	  
-
-		//if(iCha == 2)//before KVI setup
-		if(iCha == 1)   // since KVI
+		if(iCha == 1)   
 		{ 
-			//    cout<<"Mapped2Cal "<<iCha<<", "<<iType<<", "<<times_ns<<", "<<fNofCalItems<<endl;		
 
 			if(iType == 0) {
 				calItem->fTimeV_lt_ns   = times_ns;
@@ -431,10 +398,8 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 				if ( calItem->fTimeT_lt_ns < 0. || IS_NAN(calItem->fTimeT_lt_ns) ) LOG(INFO)<<"Problem with  fTimeT_lt_ns: "<< calItem->fTimeT_lt_ns<< " "<<times_ns<<" "<<endl;					      
 			}
 		}	
-		// if(iCha == 4)//before KVI setup
-		if(iCha == 3)   // since KVI
+		if(iCha == 3)   
 		{ 
-			//	cout<<"Mapped2Cal "<<iCha<<", "<<iType<<", "<<times_ns<<", "<<fNofCalItems<<endl;		
 
 			if(iType == 0) {
 				calItem->fTimeV_lb_ns   = times_ns;
@@ -451,10 +416,8 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 				if ( calItem->fTimeT_lb_ns < 0. || IS_NAN(calItem->fTimeT_lb_ns) ) LOG(INFO)<<"Problem with  fTimeT_lb_ns: "<< calItem->fTimeT_lb_ns<< " "<<times_ns<<" "<<endl;					      
 			}
 		}		  
-		// if(iCha == 6)  //before KVI setup
-		if(iCha == 5)   // since KVI
+		if(iCha == 5)   
 		{ 
-			//    cout<<"Mapped2Cal "<<iCha<<", "<<iType<<", "<<times_ns<<", "<<fNofCalItems<<endl;		
 
 			if(iType == 0) {
 				calItem->fTimeV_rb_ns   = times_ns;
@@ -471,10 +434,8 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 				if ( calItem->fTimeT_rb_ns < 0. || IS_NAN(calItem->fTimeT_rb_ns) ) LOG(INFO)<<"Problem with  fTimeT_rb_ns: "<< calItem->fTimeT_rb_ns<< " "<<times_ns<<" "<<endl;					      
 			}
 		}
-		// if(iCha == 8)  //before KVI setup
-		if(iCha == 7)   // since KVI
+		if(iCha == 7)   
 		{ 
-			//	    cout<<"Mapped2Cal "<<iCha<<", "<<iType<<", "<<times_ns<<", "<<fNofCalItems<<endl;		
 
 			if(iType == 0) {
 				calItem->fTimeV_rt_ns   = times_ns;
@@ -490,22 +451,10 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 				calItem->fTimeT_rt_ns   = times_ns;
 				if ( calItem->fTimeT_rt_ns < 0. || IS_NAN(calItem->fTimeT_rt_ns) ) LOG(INFO)<<"Problem with  fTimeT_rt_ns: "<< calItem->fTimeT_rt_ns<< " "<<times_ns<<" "<<endl;					      
 			}
-		}
-		
-	/*	
-		if(nHits == 24 && ihit == 24 && calItem->GetTAMEXLNcha() != calItem->GetTAMEXTNcha() ) cout<<"NTL != NTT at exit "<<fNEvent<<", "<<fNofCalItems<<", "<<nHits<<", "
-		                                                                               <<calItem->GetTAMEXLNcha()<<", "<<calItem->GetTAMEXTNcha()<<", "
-		                                                                                <<calItem->GetVFTXNcha()<<endl;
-    */
-   
+		} 
     
- 
+	//if(fNEvent == 9698 || fNEvent == 9701 || fNEvent == 9704) cout<<"Mapped2Cal "<<fNEvent<<"; "<<nHits<<", "<<iCha<<", "<<iType<<", "<<times_ns<<", "<<hit->GetTimeFine()<<", "<<hit->GetTimeCoarse()<<endl;		  			
 
-	// cout<<"Mapped2Cal "<<ihit<<", "<<fNofCalItems<<", "<<iCha<<", "<<iType<<", "<<times_ns<<endl;		  			
-		// cout<<"Icounts_tot "<<Icounts_tot<<endl;    
-		//cout<<"Done"<<endl;
-
-		//       }
 		continue;
 skip_event_pileup:
 				LOG(WARNING) << "R3BLosMapped2Cal::Exec : " << fNEvent
@@ -516,15 +465,9 @@ skip_event_pileup:
 					<< FairLogger::endl;
 	
 	}
-   } // end if(nHits)	
+  	
 	
 	++fNEvent;
-	
-		
-	
-	
-	// END TESTING
-	
 	
 	
 }

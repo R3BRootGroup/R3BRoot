@@ -118,6 +118,7 @@ InitStatus R3BTofdMapped2TCalPar::Init()
     return kSUCCESS;
 }
 
+// HTT: TODO: Get rid of paddle structure in mapped level, calibration does not care.
 void R3BTofdMapped2TCalPar::Exec(Option_t* option)
 {
 	// test for requested trigger (if possible)
@@ -125,27 +126,17 @@ void R3BTofdMapped2TCalPar::Exec(Option_t* option)
 		return;
 
     Int_t nHits = fMapped->GetEntries();
-
-    Int_t Nbar = nHits / 4; // 4 times (L/T PM1 & L/T PM2)
-    Int_t timetemp;
-    Int_t edge;
-    
-    if(nHits%4 != 0){
-	//	cout<<"R3BTofdMapped2TCalPar:: Some channels are missing, event skipped!!! "<< nHits<<endl;
-	//	return;
-	}
-	
      
     // Loop over mapped hits
     for (Int_t i = 0; i < nHits; i++)
     {
-		
         R3BPaddleTamexMappedData* hit = (R3BPaddleTamexMappedData*)fMapped->At(i);
         if (!hit) continue; // should not happen
 
         Int_t iPlane = hit->GetPlaneId(); // 1..n
         Int_t iBar   = hit->GetBarId();   // 1..n
-        
+        Int_t iSide  = hit->GetSideId();  // 1/2
+        Int_t iEdge  = hit->GetEdgeId();  // 1/2
         
         if (iPlane>fNofPlanes) // this also errors for iDetector==0
         {
@@ -158,24 +149,23 @@ void R3BTofdMapped2TCalPar::Exec(Option_t* option)
             continue;
         }
 
-         if(i < Nbar){ 
-           timetemp = hit->GetFineTime1LE();
-           edge = 1;
-	     }
-	     if(i < 2*Nbar && i >= Nbar){
-		   timetemp = hit->GetFineTime1TE();
-		   edge = 2;
-		 }  
-	     if(i < 3*Nbar && i >= 2*Nbar){ 
+	Int_t timetemp;
+	Int_t edge = iSide * 2 + iEdge - 2;
+	if (1 == iSide) {
+		if (1 == iEdge) {
+			timetemp = hit->GetFineTime1LE();
+		} else {
+			timetemp = hit->GetFineTime1TE();
+		}
+	} else {
+		if (1 == iEdge) {
 			timetemp = hit->GetFineTime2LE();
-			edge = 3;
-		 }	
-	     if(i < 4*Nbar && i >= 3*Nbar){
+		} else {
 			timetemp = hit->GetFineTime2TE();
-			edge = 4;
-		}	
+		}
+	}	
 	  
-      //   cout<<"Mappet2CalPar: "<<i<<", "<<iBar<<", "<<edge<<", "<<timetemp<<endl;
+//         cout<<"Mapped2CalPar: edge_tot="<<i<<", plane="<<iPlane<<", bar="<<iBar<<", edge="<<edge<<", "<<timetemp<<endl;
          fEngine->Fill(iPlane, iBar, edge, timetemp);
 
 /*	

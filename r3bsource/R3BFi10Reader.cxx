@@ -6,7 +6,7 @@ extern "C" {
 #include "ext_h101_fibten.h"
 }
 
-R3BFi6Reader::R3BFi10Reader(EXT_STR_h101_FIBTEN *a_data, UInt_t a_offset)
+R3BFi10Reader::R3BFi10Reader(EXT_STR_h101_FIBTEN *a_data, UInt_t a_offset)
   : R3BBunchedFiberReader("Fi10", a_offset, 2, 256, 2)
   , fData((EXT_STR_h101_FIBTEN_onion *)a_data)
 {

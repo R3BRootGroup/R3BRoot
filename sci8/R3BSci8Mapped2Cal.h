@@ -1,18 +1,19 @@
-// ------------------------------------------------------------
-// -----                  R3BLosMapped2Cal                -----
-// -----            Created 4-02-2016 by R.Plag           -----
-// ----- Convert mapped data to time calibrated data      -----
-// ------------------------------------------------------------
+// ---------------------------------------------------------------
+// -----                  R3BSci8Mapped2Cal                   -----
+// -----            Created August 7th 2018 by A. Kelic-Heil -----
+// ----- Convert mapped data to time calibrated data         -----
+// ----- Following R3BLosMapped2Cal                          -----
+// ---------------------------------------------------------------
 
 
 
-#ifndef R3BLOSMAPPED2CAL
-#define R3BLOSMAPPED2CAL
+#ifndef R3BSCI8MAPPED2CAL
+#define R3BSCI8MAPPED2CAL
 
 #include <map>
 
 #include "FairTask.h"
-#include "R3BLosCalData.h"
+#include "R3BSci8CalData.h"
 
 class TClonesArray;
 class TH1F;
@@ -26,9 +27,9 @@ class R3BEventHeader;
  * This class reads NeuLAND mapped items with TDC values and
  * produces time items with time in [ns]. It requires TCAL
  * calibration parameters, which are produced in a separate
- * analysis run containing R3BLosMapped2CalFill task.
+ * analysis run containing R3BSci8Mapped2CalFill task.
  */
-class R3BLosMapped2Cal : public FairTask
+class R3BSci8Mapped2Cal : public FairTask
 {
 
   public:
@@ -36,7 +37,7 @@ class R3BLosMapped2Cal : public FairTask
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BLosMapped2Cal();
+    R3BSci8Mapped2Cal();
 
     /**
      * Standard constructor.
@@ -44,13 +45,13 @@ class R3BLosMapped2Cal : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BLosMapped2Cal(const char* name, Int_t iVerbose = 1);
+    R3BSci8Mapped2Cal(const char* name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BLosMapped2Cal();
+    virtual ~R3BSci8Mapped2Cal();
 
     /**
      * Method for task initialization.
@@ -109,9 +110,9 @@ class R3BLosMapped2Cal : public FairTask
     inline void SetNofModules(Int_t nDets, Int_t nChs)
     {
         fNofDetectors = nDets;
-        fNofChannels = nChs;  //=4 or 8  or 16    
+        fNofChannels = nChs;  //=2   
         fNofTypes     = 3;
-        fNofModules  = nChs * nDets * 3 ; // 4 or 8 los signals * 3 times per channel in total 12 or 24
+        fNofModules  = nChs * nDets * 3 ; 
     }
 
   private:
@@ -137,7 +138,7 @@ class R3BLosMapped2Cal : public FairTask
     UInt_t fNEvent;
 
   public:
-    ClassDef(R3BLosMapped2Cal, 1)
+    ClassDef(R3BSci8Mapped2Cal, 1)
 };
 
 #endif

@@ -17,6 +17,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
 ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
+${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
 ${R3BROOT_SOURCE_DIR}/psp/par
@@ -54,9 +55,10 @@ R3BFi6Reader.cxx
 R3BFi7Reader.cxx
 #R3BFi8Reader.cxx
 #R3BFi9Reader.cxx
-#R3BFi10Reader.cxx
+R3BFi10Reader.cxx
 #R3BFi11Reader.cxx
 R3BLosReader.cxx
+R3BSci8Reader.cxx
 R3BTofdReader.cxx
 R3BCalifaFebexReader.cxx
 R3BPtofReader.cxx
@@ -85,10 +87,10 @@ ext_h101_fibsix.h
 ext_h101_fibseven.h
 #ext_h101_fibeight.h
 #ext_h101_fibnine.h
-#ext_h101_fibten.h
+ext_h101_fibten.h
 #ext_h101_fibeleven.h
-ext_h101_los.h
 ext_h101_los_tamex.h
+ext_h101_sci8.h
 ext_h101_tofd.h
 ext_h101_ptof.h
 ext_h101_psp.h

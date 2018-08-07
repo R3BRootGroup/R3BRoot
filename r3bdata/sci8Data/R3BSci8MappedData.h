@@ -1,22 +1,21 @@
-#ifndef R3BLOSMAPPEDITEM_H
-#define R3BLOSMAPPEDITEM_H
+#ifndef R3BSCI8MAPPEDITEM_H
+#define R3BSCI8MAPPEDITEM_H
 
 #include "TObject.h"
 
-// for the data analysis of the LOS detectors. 
-// Introduced by Ralf, Jan 2016
+// for the data analysis of the SCI8 detectors. 
 
-class R3BLosMappedData : public TObject
+class R3BSci8MappedData : public TObject
 {
   public:
     // Default Constructor
-    R3BLosMappedData();
+    R3BSci8MappedData();
 
     // Standard Constructor
-    R3BLosMappedData(UInt_t detector, UInt_t channel, UInt_t type, UInt_t timeFine, UInt_t timeCoarse); 
+    R3BSci8MappedData(UInt_t detector, UInt_t channel, UInt_t type, UInt_t timeFine, UInt_t timeCoarse); 
 
     // Destructor
-    virtual ~R3BLosMappedData() { }
+    virtual ~R3BSci8MappedData() { }
 
     // Getters
     inline const UInt_t& GetDetector()    const { return fDetector;  }
@@ -36,7 +35,7 @@ class R3BLosMappedData : public TObject
     
 
   public:
-    ClassDef(R3BLosMappedData, 1) //2
+    ClassDef(R3BSci8MappedData, 1) 
 };
 
 #endif

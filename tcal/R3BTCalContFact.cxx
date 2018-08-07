@@ -46,6 +46,7 @@ void R3BTCalContFact::setAllContainers()
      *  them to the list of containers.*/
     addContainer("LandTCalPar", "NeuLAND TCAL Calibration Parameters");
     addContainer("LosTCalPar", "LOS TCAL Calibration Parameters");
+    addContainer("Sci8TCalPar", "SCI8 TCAL Calibration Parameters");
     addContainer("TofdTCalPar", "TOFD TCAL Calibration Parameters");
     addContainer("StrawtubesTCalPar", "Strawtubes TCAL Calibration Parameters");
 #define ADD_FIBER(Name, NAME) do {\
@@ -83,6 +84,7 @@ FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
     vector<const char *> containerNames;
     containerNames.push_back("LandTCalPar");
     containerNames.push_back("LosTCalPar");
+    containerNames.push_back("Sci8TCalPar");
     containerNames.push_back("TofdTCalPar");
     containerNames.push_back("StrawtubesTCalPar");
 #define PUSH_FIBER(Name) do {\
