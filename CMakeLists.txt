@@ -410,6 +410,13 @@ IF(EXISTS "${R3BROOT_SOURCE_DIR}/glad-tpc/")
   add_subdirectory(glad-tpc)
 ENDIF(EXISTS "${R3BROOT_SOURCE_DIR}/glad-tpc/")
 
+IF(EXISTS "${R3BROOT_SOURCE_DIR}/frs/")
+  Message("Building FRS framework...")
+  Set(WITH_FRS true)
+  add_definitions(-DFRS)
+  add_subdirectory(frs)
+ENDIF(EXISTS "${R3BROOT_SOURCE_DIR}/frs/")
+
 ENDIF (NOT MODULE)
 
 Execute_Process(COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-opengl
