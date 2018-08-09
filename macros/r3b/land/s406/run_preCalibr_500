@@ -1,8 +1,0 @@
-#!/bin/bash
-
-root -l << EOF
-.L preCalibr.C
-preCalibr(498)
-.q
-EOF
-
