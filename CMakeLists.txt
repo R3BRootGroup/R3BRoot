@@ -24,9 +24,12 @@ endforeach()
 # after check of cmake version
 project(R3BROOT)
 
+If (NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
+  Message( FATAL_ERROR "\nmacros repository is missing in the R3BRoot source directory\ncd ../R3BRoot\ngit clone https://github.com/R3BRootGroup/macros.git" )
+EndIf (NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
+
 # Check if the FairRoot is still in source, since Jan 2014 FairRoot
 # should be installed separately
-
 FIND_PATH(FAIRBASE NAMES FairRun.h  PATHS
   ${CMAKE_SOURCE_DIR}/base/steer
   NO_DEFAULT_PATH
