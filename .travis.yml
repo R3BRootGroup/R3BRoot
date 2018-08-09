@@ -33,6 +33,7 @@ before_script:
     - echo "export SITE=\"Travis CI - ${TRAVIS_PULL_REQUEST}\"" >> Dart.cfg;
     - echo $PWD
     - cat Dart.cfg
+    - git clone https://github.com/R3BRootGroup/macros.git
 
 script:
     - ./Dart.sh Experimental Dart.cfg
