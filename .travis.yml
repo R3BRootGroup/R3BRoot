@@ -34,6 +34,9 @@ before_script:
     - echo $PWD
     - cat Dart.cfg
     - git clone https://github.com/R3BRootGroup/macros.git
+    - cd macros
+    - git checkout dev
+    - cd ..
 
 script:
     - ./Dart.sh Experimental Dart.cfg
