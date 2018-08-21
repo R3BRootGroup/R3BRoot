@@ -24,8 +24,10 @@ R3BPspxHitPar::R3BPspxHitPar(const char* name, const char* title, const char* co
     , pspxhitparstrip()
     , pspxhitpardetector(-1)
     , pspxhitparorientation(-1)
-    , pspxhitparorientationxsign(-1)
-    , pspxhitparorientationysign(-1)
+    , pspxhitparorientationxposition(-1)
+    , pspxhitparorientationyposition(-1)
+    , pspxhitparorientationxstrip(-1)
+    , pspxhitparorientationystrip(-1)
     , pspxhitparlength(-1)
     , pspxhitparlinearparam(-1)
 {
@@ -50,22 +52,29 @@ void R3BPspxHitPar::printparams()
     size = pspxhitparorientation.GetSize();
     LOG(INFO) << "pspxhitparorientation size: " << size << FairLogger::endl;
 
-    size = pspxhitparorientationxsign.GetSize();
-    LOG(INFO) << "pspxhitparorientationxsign size: " << size << FairLogger::endl;
+    size = pspxhitparorientationxposition.GetSize();
+    LOG(INFO) << "pspxhitparorientationxposition size: " << size << FairLogger::endl;
 
-    size = pspxhitparorientationysign.GetSize();
-    LOG(INFO) << "pspxhitparorientationysign size: " << size << FairLogger::endl;
+    size = pspxhitparorientationyposition.GetSize();
+    LOG(INFO) << "pspxhitparorientationyposition size: " << size << FairLogger::endl;
+
+    size = pspxhitparorientationxstrip.GetSize();
+    LOG(INFO) << "pspxhitparorientationxstrip size: " << size << FairLogger::endl;
+
+    size = pspxhitparorientationystrip.GetSize();
+    LOG(INFO) << "pspxhitparorientationystrip size: " << size << FairLogger::endl;
 
     size = pspxhitparlength.GetSize();
     LOG(INFO) << "pspxhitparlength size: " << size << FairLogger::endl;
 
-    LOG(INFO) << "Detectorno.: No. of Strips, Orientation of Strips, Orientation Sign of X-Strips, Orientation Sign of "
-                 "Y-Strips, Length of Detector"
+    LOG(INFO) << "Detectorno.: No. of Strips, Orientation of Strips, Orientation X Position, Orientation Y Position, "
+                 "Orientation X Strips, Orientation Y Strips, Length of Detector"
               << FairLogger::endl;
     for (Int_t i = 0; i < size; i++)
     {
         LOG(INFO) << i << " :" << pspxhitparstrip.GetAt(i) << ", " << pspxhitparorientation.GetAt(i) << ", "
-                  << pspxhitparorientationxsign.GetAt(i) << ", " << pspxhitparorientationysign.GetAt(i) << ", "
+                  << pspxhitparorientationxposition.GetAt(i) << ", " << pspxhitparorientationyposition.GetAt(i) << ", "
+                  << pspxhitparorientationxstrip.GetAt(i) << ", " << pspxhitparorientationystrip.GetAt(i) << ", "
                   << pspxhitparlength.GetAt(i) << FairLogger::endl;
     }
 
@@ -88,8 +97,10 @@ void R3BPspxHitPar::putParams(FairParamList* l)
     l->add("R3BPspxHitDetectors", pspxhitpardetector);
     l->add("R3BPspxHitStripsPerDetector", pspxhitparstrip);
     l->add("R3BPspxHitOrientationOfDetector", pspxhitparorientation);
-    l->add("R3BPspxHitOrientationXSignOfDetector", pspxhitparorientationxsign);
-    l->add("R3BPspxHitOrientationYSignOfDetector", pspxhitparorientationysign);
+    l->add("R3BPspxHitOrientationXSignOfDetector", pspxhitparorientationxposition);
+    l->add("R3BPspxHitOrientationYSignOfDetector", pspxhitparorientationyposition);
+    l->add("R3BPspxHitOrientationXSignOfDetector", pspxhitparorientationxstrip);
+    l->add("R3BPspxHitOrientationYSignOfDetector", pspxhitparorientationystrip);
     l->add("R3BPspxHitLengthOfDetector", pspxhitparlength);
 
     Int_t count_sectors = 0;
@@ -127,11 +138,19 @@ Bool_t R3BPspxHitPar::getParams(FairParamList* l)
     {
         return kFALSE;
     }
-    if (!l->fill("R3BPspxHitOrientationXSignOfDetector", &pspxhitparorientationxsign))
+    if (!l->fill("R3BPspxHitOrientationXSignOfPosition", &pspxhitparorientationxposition))
     {
         return kFALSE;
     }
-    if (!l->fill("R3BPspxHitOrientationYSignOfDetector", &pspxhitparorientationysign))
+    if (!l->fill("R3BPspxHitOrientationYSignOfPosition", &pspxhitparorientationyposition))
+    {
+        return kFALSE;
+    }
+    if (!l->fill("R3BPspxHitOrientationXSignOfStrip", &pspxhitparorientationxstrip))
+    {
+        return kFALSE;
+    }
+    if (!l->fill("R3BPspxHitOrientationYSignOfStrip", &pspxhitparorientationystrip))
     {
         return kFALSE;
     }

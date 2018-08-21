@@ -18,14 +18,18 @@
 [R3BPspxHitPar]
 //-------------------------------------------------------------
 R3BPspxHitDetectors: Int_t 1
-R3BPspxHitStripsPerDetector: Int_t \ 
+R3BPspxHitStripsPerDetector: Int_t \
 32
 R3BPspxHitOrientationOfDetector: Int_t \
 3
-R3BPspxHitOrientationXSignOfDetector: Int_t \
+R3BPspxHitOrientationXSignOfPosition: Int_t \
 1
-R3BPspxHitOrientationYSignOfDetector: Int_t \
+R3BPspxHitOrientationYSignOfPosition: Int_t \
 1
+R3BPspxHitOrientationXSignOfStrip: Int_t \
+1
+R3BPspxHitOrientationYSignOfStrip: Int_t \
+-1
 R3BPspxHitLengthOfDetector: Float_t \
 10.0
 R3BPspxHitLinearParamForStrips: Float_t  \
@@ -61,7 +65,7 @@ R3BPspxHitLinearParamForStrips: Float_t  \
   29.0 0.0 5.0 \
   30.0 0.0 5.0 \
   31.0 0.0 5.0 \
-  32.0 0.0 5.0 \  
+  32.0 0.0 5.0 \
   33.0 0.0 5.0 \
   34.0 0.0 5.0 \
   35.0 0.0 5.0 \

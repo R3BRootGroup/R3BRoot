@@ -45,8 +45,10 @@ class R3BPspxHitPar : public FairParGenericSet
     inline const Int_t& GetPspxParDetector() const { return pspxhitpardetector; }
     inline const TArrayI& GetPspxParStrip() const { return pspxhitparstrip; }
     inline const TArrayI& GetPspxParOrientation() const { return pspxhitparorientation; }
-    inline const TArrayI& GetPspxParOrientationXSign() const { return pspxhitparorientationxsign; }
-    inline const TArrayI& GetPspxParOrientationYSign() const { return pspxhitparorientationysign; }
+    inline const TArrayI& GetPspxParOrientationXPosition() const { return pspxhitparorientationxposition; }
+    inline const TArrayI& GetPspxParOrientationYPosition() const { return pspxhitparorientationyposition; }
+    inline const TArrayI& GetPspxParOrientationXStrip() const { return pspxhitparorientationxstrip; }
+    inline const TArrayI& GetPspxParOrientationYStrip() const { return pspxhitparorientationystrip; }
     inline const TArrayF& GetPspxParLength() const { return pspxhitparlength; }
     inline const TArrayF& GetPspxParLinearParam() const { return pspxhitparlinearparam; }
 
@@ -68,18 +70,20 @@ class R3BPspxHitPar : public FairParGenericSet
     Bool_t getParams(FairParamList*);
 
   private:
-    Int_t pspxhitpardetector;           //
-    TArrayI pspxhitparstrip;            //
-    TArrayI pspxhitparorientation;      //
-    TArrayI pspxhitparorientationxsign; //
-    TArrayI pspxhitparorientationysign; //
-    TArrayF pspxhitparlength;           //
-    TArrayF pspxhitparlinearparam;      //
+    Int_t pspxhitpardetector;               //
+    TArrayI pspxhitparstrip;                //
+    TArrayI pspxhitparorientation;          //
+    TArrayI pspxhitparorientationxposition; //
+    TArrayI pspxhitparorientationyposition; //
+    TArrayI pspxhitparorientationxstrip;    //
+    TArrayI pspxhitparorientationystrip;    //
+    TArrayF pspxhitparlength;               //
+    TArrayF pspxhitparlinearparam;          //
 
     R3BPspxHitPar(const R3BPspxHitPar&);
     R3BPspxHitPar& operator=(const R3BPspxHitPar&);
 
-    ClassDef(R3BPspxHitPar, 2);
+    ClassDef(R3BPspxHitPar, 3);
 };
 
 #endif
