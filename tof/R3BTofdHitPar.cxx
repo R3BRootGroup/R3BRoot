@@ -83,13 +83,13 @@ R3BTofdHitModulePar* R3BTofdHitPar::GetModuleParAt(Int_t plane, Int_t paddle)
             }
             tplane = par->GetPlane();
             tpaddle = par->GetPaddle();
-            if (tplane < 1 || tplane > N_PLANE_MAX || tpaddle < 1 || tpaddle > N_PADDLE_MAX)
+            if (tplane < 1 || tplane > N_PLANE_TOFD_MAX || tpaddle < 1 || tpaddle > N_PADDLE_TOFD_MAX)
             {
                 LOG(ERROR) << "R3BTofdHitPar::GetModuleParAt : error in plane/paddle indexing. " << tplane << " / "
                            << tpaddle << FairLogger::endl;
                 continue;
             }
-            index = (tplane - 1) * N_PADDLE_MAX + tpaddle - 1;
+            index = (tplane - 1) * N_PADDLE_TOFD_MAX + tpaddle - 1;
             if (fIndexMap.find(index) != fIndexMap.end())
             {
                 LOG(ERROR) << "R3BTofdHitPar::GetModuleParAt : parameter found more than once. " << tplane << " / "
@@ -101,12 +101,12 @@ R3BTofdHitModulePar* R3BTofdHitPar::GetModuleParAt(Int_t plane, Int_t paddle)
         fMapInit = kTRUE;
     }
 
-    if (plane < 1 || plane > N_PLANE_MAX || paddle < 1 || paddle > N_PADDLE_MAX)
+    if (plane < 1 || plane > N_PLANE_TOFD_MAX || paddle < 1 || paddle > N_PADDLE_TOFD_MAX)
     {
         LOG(ERROR) << "R3BTofdHitPar::GetModuleParAt : error in plane/paddle indexing. " << plane << " / " << paddle << FairLogger::endl;
         return NULL;
     }
-    Int_t index = (plane - 1) * N_PADDLE_MAX + paddle - 1;
+    Int_t index = (plane - 1) * N_PADDLE_TOFD_MAX + paddle - 1;
 
     if (fIndexMap.find(index) == fIndexMap.end())
     {

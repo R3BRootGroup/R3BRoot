@@ -11,7 +11,7 @@ class R3BTrackingSetup
 {
   public:
     R3BTrackingSetup();
-    ~R3BTrackingSetup();
+    virtual ~R3BTrackingSetup();
 
     void AddDetector(const std::string& name,
                      EDetectorType type,

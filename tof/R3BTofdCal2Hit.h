@@ -8,8 +8,8 @@
 #ifndef R3BTOFDCAL2HIT
 #define R3BTOFDCAL2HIT
 
-#define N_PLANE_MAX 100
-#define N_PADDLE_MAX 100
+#define N_PLANE_TOFD_MAX 100
+#define N_PADDLE_TOFD_MAX 100
 
 #include <map>
 
@@ -126,25 +126,25 @@ class R3BTofdCal2Hit : public FairTask
     UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */    
 
 // arrays of control histograms
-    TH1F* fhPos[N_PLANE_MAX][N_PADDLE_MAX]; 
-    TH1F* fhTotPm1[N_PLANE_MAX][N_PADDLE_MAX]; 
-    TH1F* fhTotPm2[N_PLANE_MAX][N_PADDLE_MAX]; 
-    TH1F* fhTotPm1Sat[N_PLANE_MAX][N_PADDLE_MAX]; 
-    TH1F* fhTotPm2Sat[N_PLANE_MAX][N_PADDLE_MAX];     
-    TH1F* fhQPm1[N_PLANE_MAX][N_PADDLE_MAX]; 
-    TH1F* fhQPm2[N_PLANE_MAX][N_PADDLE_MAX]; 
-    TH1F* fhQ[N_PLANE_MAX][N_PADDLE_MAX];   
-    TH2F* fhQ1vsPos[N_PLANE_MAX][N_PADDLE_MAX];   
-    TH2F* fhQ2vsPos[N_PLANE_MAX][N_PADDLE_MAX];   
-    TH2F* fhQvsPos[N_PLANE_MAX][N_PADDLE_MAX];   
-    TH2F* fhTotPm1vsTotPm2[N_PLANE_MAX][N_PADDLE_MAX];   
-    TH2F* fhTotPm1satvsTotPm2sat[N_PLANE_MAX][N_PADDLE_MAX];   
-    TH2F* fhTdiffvsQ[N_PLANE_MAX][N_PADDLE_MAX];   
-    TH2F* fhTot1vsPos[N_PLANE_MAX][N_PADDLE_MAX];   
-    TH2F* fhTot2vsPos[N_PLANE_MAX][N_PADDLE_MAX];   
-    TH2F* fhQvsQ[N_PLANE_MAX][N_PADDLE_MAX];   
-    TH2F* fhQvsTof[N_PLANE_MAX][N_PADDLE_MAX];   
-    TH2F* fhSqrtQvsPos[N_PLANE_MAX][N_PADDLE_MAX];   
+    TH1F* fhPos[N_PLANE_TOFD_MAX][N_PADDLE_TOFD_MAX];
+    TH1F* fhTotPm1[N_PLANE_TOFD_MAX][N_PADDLE_TOFD_MAX];
+    TH1F* fhTotPm2[N_PLANE_TOFD_MAX][N_PADDLE_TOFD_MAX];
+    TH1F* fhTotPm1Sat[N_PLANE_TOFD_MAX][N_PADDLE_TOFD_MAX];
+    TH1F* fhTotPm2Sat[N_PLANE_TOFD_MAX][N_PADDLE_TOFD_MAX];
+    TH1F* fhQPm1[N_PLANE_TOFD_MAX][N_PADDLE_TOFD_MAX];
+    TH1F* fhQPm2[N_PLANE_TOFD_MAX][N_PADDLE_TOFD_MAX];
+    TH1F* fhQ[N_PLANE_TOFD_MAX][N_PADDLE_TOFD_MAX];
+    TH2F* fhQ1vsPos[N_PLANE_TOFD_MAX][N_PADDLE_TOFD_MAX];
+    TH2F* fhQ2vsPos[N_PLANE_TOFD_MAX][N_PADDLE_TOFD_MAX];
+    TH2F* fhQvsPos[N_PLANE_TOFD_MAX][N_PADDLE_TOFD_MAX];
+    TH2F* fhTotPm1vsTotPm2[N_PLANE_TOFD_MAX][N_PADDLE_TOFD_MAX];
+    TH2F* fhTotPm1satvsTotPm2sat[N_PLANE_TOFD_MAX][N_PADDLE_TOFD_MAX];
+    TH2F* fhTdiffvsQ[N_PLANE_TOFD_MAX][N_PADDLE_TOFD_MAX];
+    TH2F* fhTot1vsPos[N_PLANE_TOFD_MAX][N_PADDLE_TOFD_MAX];
+    TH2F* fhTot2vsPos[N_PLANE_TOFD_MAX][N_PADDLE_TOFD_MAX];
+    TH2F* fhQvsQ[N_PLANE_TOFD_MAX][N_PADDLE_TOFD_MAX];
+    TH2F* fhQvsTof[N_PLANE_TOFD_MAX][N_PADDLE_TOFD_MAX];
+    TH2F* fhSqrtQvsPos[N_PLANE_TOFD_MAX][N_PADDLE_TOFD_MAX];
     
     TH2F* fhxy;   
     TH1F* fhCharge3mm; 
