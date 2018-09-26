@@ -4,6 +4,8 @@
 // -------------------------------------------------------------------------
 #include "R3BMCTrack.h"
 
+#include "FairLogger.h"
+
 #include <iostream>
 
 using std::cout;
@@ -20,7 +22,7 @@ R3BMCTrack::R3BMCTrack()
     , fStartY(0.)
     , fStartZ(0.)
     , fStartT(0.)
-    , fNPoints(0)
+    , fNPoints({})
     , fMass(0.)
 {
 }
@@ -36,7 +38,7 @@ R3BMCTrack::R3BMCTrack(Int_t pdgCode,
                        Double_t y,
                        Double_t z,
                        Double_t t,
-                       Int_t nPoints = 0)
+                       std::array<int, kLAST+1> nPoints)
     : fPdgCode(pdgCode)
     , fMotherId(motherId)
     , fPx(px)
@@ -46,17 +48,9 @@ R3BMCTrack::R3BMCTrack(Int_t pdgCode,
     , fStartY(y)
     , fStartZ(z)
     , fStartT(t)
-    , fNPoints(0)
+    , fNPoints(nPoints)
     , fMass(0.)
 {
-    if (nPoints >= 0)
-    {
-        fNPoints = nPoints;
-    }
-    else
-    {
-        fNPoints = 0;
-    }
 }
 // -------------------------------------------------------------------------
 
@@ -88,7 +82,7 @@ R3BMCTrack::R3BMCTrack(TParticle* part, Int_t fMC)
     , fStartY(part->Vy())
     , fStartZ(part->Vz())
     , fStartT(0.)
-    , fNPoints(0)
+    , fNPoints({})
     , fMass(part->GetMass())
 {
     if (fMC == 0)
@@ -155,209 +149,24 @@ Double_t R3BMCTrack::GetRapidity() const
 // -----   Public method GetNPoints   --------------------------------------
 Int_t R3BMCTrack::GetNPoints(DetectorId detId) const
 {
-    if (detId == kREF)
-        return (fNPoints & 0x3);
-    else if (detId == kDCH)
-        return ((fNPoints & 0xC) >> 2);
-    else if (detId == kCAL)
-        return ((fNPoints & 0x30) >> 4);
-    else if (detId == kLAND)
-        return ((fNPoints & 0xC0) >> 6);
-    else if (detId == kGFI)
-        return ((fNPoints & 0x300) >> 8);
-    else if (detId == kMTOF)
-        return ((fNPoints & 0xC00) >> 10);
-    else if (detId == kDTOF)
-        return ((fNPoints & 0x3000) >> 12);
-    else if (detId == kTOF)
-        return ((fNPoints & 0xC000) >> 14);
-    else if (detId == kTRA)
-        return ((fNPoints & 0x30000) >> 16);
-    else if (detId == kCALIFA)
-        return ((fNPoints & 0xC0000) >> 18);
-    else if (detId == kMFI)
-        return ((fNPoints & 0x300000) >> 20);
-    else if (detId == kPSP)
-        return ((fNPoints & 0xC00000) >> 22);
-    else if (detId == kVETO)
-        return ((fNPoints & 0x3000000) >> 24);
-    else if (detId == kSTARTRACK)
-        return ((fNPoints & 0xC000000) >> 26);
-    else if (detId == kLUMON)
-        return ((fNPoints & 0x30000000) >> 28);
-    else if (detId == kNEULAND)
-        return ((fNPoints & 0xC0000000) >> 30);
-    else if (detId == kACTAR)
-        return ((fNPoints & 0x300000000) >> 32);
-    else if (detId == kFI4)
-        return ((fNPoints & 0xC00000000) >> 34);
-    else if (detId == kFI6)
-        return ((fNPoints & 0x3000000000) >> 36);
-    else if (detId == kFI5)
-        return ((fNPoints & 0xC000000000) >> 38);
-    else if (detId == kSFI)
-        return ((fNPoints & 0x30000000000) >> 40);
-#ifdef SOFIA
-    else if (detId == kSOFSCI)
-        return ((fNPoints & 0xC0000000000) >> 42);
-    else if (detId == kSOFAT)
-        return ((fNPoints & 0x300000000000) >> 44);
-    else if (detId == kSOFTRIM)
-        return ((fNPoints & 0xC00000000000) >> 46);
-    else if (detId == kSOFMWPC1)
-        return ((fNPoints & 0x3000000000000) >> 48);
-    else if (detId == kSOFTWIM)
-        return ((fNPoints & 0xC000000000000) >> 50);
-    else if (detId == kSOFMWPC2)
-        return ((fNPoints & 0x30000000000000) >> 52);
-    else if (detId == kSOFTofWall)
-        return ((fNPoints & 0xC0000000000000) >> 54);
-#endif
-#ifdef GTPC
-    else if (detId == kGTPC)
-        return ((fNPoints & 0x300000000000000) >> 56);
-#endif
-    else
+    if(detId < 0 || detId >= fNPoints.size())
     {
-        cout << "-E- R3BMCTrack::GetNPoints: Unknown detector ID " << detId << endl;
+        LOG(ERROR) << "Unknown detector ID " << detId;
         return 0;
     }
+    return fNPoints.at(detId);
 }
 // -------------------------------------------------------------------------
 
 // -----   Public method SetNPoints   --------------------------------------
 void R3BMCTrack::SetNPoints(Int_t iDet, Int_t nP)
 {
-    ULong_t nPoints = nP;
-    if (nPoints > 3)
+    if(iDet < 0 || iDet >= fNPoints.size())
     {
-        nPoints = 3;
+        LOG(ERROR) << "Unknown detector ID " << iDet;
+        return;
     }
-
-    if (iDet == kREF)
-    {
-        fNPoints = (fNPoints & (~0x3)) | nPoints;
-    }
-    else if (iDet == kDCH)
-    {
-        fNPoints = (fNPoints & (~0xC)) | (nPoints << 2);
-    }
-    else if (iDet == kCAL)
-    {
-        fNPoints = (fNPoints & (~0x30)) | (nPoints << 4);
-    }
-    else if (iDet == kLAND)
-    {
-        fNPoints = (fNPoints & (~0xC0)) | (nPoints << 6);
-    }
-    else if (iDet == kGFI)
-    {
-        fNPoints = (fNPoints & (~0x300)) | (nPoints << 8);
-    }
-    else if (iDet == kMTOF)
-    {
-        fNPoints = (fNPoints & (~0xC00)) | (nPoints << 10);
-    }
-    else if (iDet == kDTOF)
-    {
-        fNPoints = (fNPoints & (~0x3000)) | (nPoints << 12);
-    }
-    else if (iDet == kTOF)
-    {
-        fNPoints = (fNPoints & (~0xC000)) | (nPoints << 14);
-    }
-    else if (iDet == kTRA)
-    {
-        fNPoints = (fNPoints & (~0x30000)) | (nPoints << 16);
-    }
-    else if (iDet == kCALIFA)
-    {
-        fNPoints = (fNPoints & (~0xC0000)) | (nPoints << 18);
-    }
-    else if (iDet == kMFI)
-    {
-        fNPoints = (fNPoints & (~0x300000)) | (nPoints << 20);
-    }
-    else if (iDet == kPSP)
-    {
-        fNPoints = (fNPoints & (~0xC00000)) | (nPoints << 22);
-    }
-    else if (iDet == kVETO)
-    {
-        fNPoints = (fNPoints & (~0x3000000)) | (nPoints << 24);
-    }
-    else if (iDet == kSTARTRACK)
-    {
-        fNPoints = (fNPoints & (~0xC000000)) | (nPoints << 26);
-    }
-    else if (iDet == kLUMON)
-    {
-        fNPoints = (fNPoints & (~0x30000000)) | (nPoints << 28);
-    }
-    else if (iDet == kNEULAND)
-    {
-        fNPoints = (fNPoints & (~0xC0000000)) | (nPoints << 30);
-    }
-    else if (iDet == kACTAR)
-    {
-        fNPoints = (fNPoints & (~0x300000000)) | (nPoints << 32);
-    }
-    else if (iDet == kFI4)
-    {
-        fNPoints = (fNPoints & (~0xC00000000)) | (nPoints << 34);
-    }
-    else if (iDet == kFI6)
-    {
-        fNPoints = (fNPoints & (~0x3000000000)) | (nPoints << 36);
-    }
-    else if (iDet == kFI5)
-    {
-        fNPoints = (fNPoints & (~0xC000000000)) | (nPoints << 38);
-    }
-    else if (iDet == kSFI)
-    {
-        fNPoints = (fNPoints & (~0x30000000000)) | (nPoints << 40);
-    }
-#ifdef SOFIA
-    else if (iDet == kSOFSCI)
-    {
-        fNPoints = (fNPoints & (~0xC0000000000)) | (nPoints << 42);
-    }
-    else if (iDet == kSOFAT)
-    {
-        fNPoints = (fNPoints & (~0x300000000000)) | (nPoints << 44);
-    }
-    else if (iDet == kSOFTRIM)
-    {
-        fNPoints = (fNPoints & (~0xC00000000000)) | (nPoints << 46);
-    }
-    else if (iDet == kSOFMWPC1)
-    {
-        fNPoints = (fNPoints & (~0x3000000000000)) | (nPoints << 48);
-    }
-    else if (iDet == kSOFTWIM)
-    {
-        fNPoints = (fNPoints & (~0xC000000000000)) | (nPoints << 50);
-    }
-    else if (iDet == kSOFMWPC2)
-    {
-        fNPoints = (fNPoints & (~0x30000000000000)) | (nPoints << 52);
-    }
-    else if (iDet == kSOFTofWall)
-    {
-        fNPoints = (fNPoints & (~0xC0000000000000)) | (nPoints << 54);
-    }
-#endif
-#ifdef GTPC
-    else if (iDet == kGTPC)
-    {
-        fNPoints = (fNPoints & (~0x300000000000000)) | (nPoints << 56);
-    }
-#endif
-    else
-    {
-        cout << "-E- R3BMCTrack::SetNPoints: Unknown detector ID " << iDet << endl;
-    }
+    fNPoints[iDet] = nP;
 }
 // -------------------------------------------------------------------------
 

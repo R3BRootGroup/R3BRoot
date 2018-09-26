@@ -236,10 +236,7 @@ void R3BStack::FillTrackArray() {
       new( (*fTracks)[fNTracks]) R3BMCTrack(GetParticle(iPart),fMC);
       fIndexMap[iPart] = fNTracks;
       // --> Set the number of points in the detectors for this track
-      for (Int_t iDet=kREF; iDet<kLAST; iDet++) {
-        pair<Int_t, Int_t> a(iPart, iDet);
-        track->SetNPoints(iDet, fPointsMap[a]);
-      }
+      track->SetNPoints(fPointsMap[iPart]);
       
       fNTracks++;
       //cout << "-I- TParticle time " << GetParticle(iPart)->T() << endl;
@@ -394,10 +391,8 @@ void R3BStack::Print(Int_t iVerbose) const
 
 // -----   Public method AddPoint (for current track)   --------------------
 void R3BStack::AddPoint(DetectorId detId) {
-  Int_t iDet = detId;
-  pair<Int_t, Int_t> a(fCurrentTrack, iDet);
-  if ( fPointsMap.find(a) == fPointsMap.end() ) fPointsMap[a] = 1;
-  else fPointsMap[a]++;
+  if ( fPointsMap.find(fCurrentTrack) == fPointsMap.end() ) fPointsMap[fCurrentTrack][detId] = 1;
+  else fPointsMap[fCurrentTrack][detId]++;
 }
 // -------------------------------------------------------------------------
 
@@ -406,10 +401,8 @@ void R3BStack::AddPoint(DetectorId detId) {
 // -----   Public method AddPoint (for arbitrary track)  -------------------
 void R3BStack::AddPoint(DetectorId detId, Int_t iTrack) {
   if ( iTrack < 0 ) return;
-  Int_t iDet = detId;
-  pair<Int_t, Int_t> a(iTrack, iDet);
-  if ( fPointsMap.find(a) == fPointsMap.end() ) fPointsMap[a] = 1;
-  else fPointsMap[a]++;
+  if ( fPointsMap.find(iTrack) == fPointsMap.end() ) fPointsMap[iTrack][detId] = 1;
+  else fPointsMap[iTrack][detId]++;
 }
 // -------------------------------------------------------------------------
 
@@ -462,9 +455,8 @@ void R3BStack::SelectTracks() {
     // --> Calculate number of points
     Int_t nPoints = 0;
     for (Int_t iDet=kREF; iDet<kLAST; iDet++) {
-      pair<Int_t, Int_t> a(i, iDet);
-      if ( fPointsMap.find(a) != fPointsMap.end() )
-        nPoints += fPointsMap[a];
+      if ( fPointsMap.find(i) != fPointsMap.end() )
+        nPoints += fPointsMap[i][iDet];
     }
     
     // --> Check for cuts (store primaries in any case)

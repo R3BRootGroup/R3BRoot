@@ -26,6 +26,8 @@
  #include "TDatabasePDG.h"
 #endif
 
+#include <array>
+
 
 class R3BMCTrack : public TObject
 {
@@ -40,7 +42,7 @@ class R3BMCTrack : public TObject
   /**  Standard constructor  **/
   R3BMCTrack(Int_t pdgCode, Int_t motherID, Double_t px, Double_t py,
 	     Double_t pz, Double_t x, Double_t y, Double_t z, 
-	     Double_t t, Int_t nPoints);
+	     Double_t t, std::array<int, kLAST+1> nPoints);
 
   /**  Copy constructor  **/
   R3BMCTrack(const R3BMCTrack&);
@@ -88,6 +90,7 @@ class R3BMCTrack : public TObject
   /**  Modifiers  **/
   void SetMotherId(Int_t id) { fMotherId = id; }
   void SetNPoints(Int_t iDet, Int_t np);
+  void SetNPoints(std::array<int, kLAST+1> nPoints) { fNPoints = nPoints; }
 
 
 
@@ -112,7 +115,7 @@ private:
    **  with the inline functions. 
    **  Bits 26-31 are spare for potential additional detectors.
    **/
-  ULong_t fNPoints;
+  std::array<int, kLAST+1> fNPoints;
 
   // case of HIons
   Double32_t fMass;

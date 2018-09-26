@@ -38,6 +38,7 @@
 #include "TVirtualMCStack.h"
 
 #include <map>
+#include <array>
 #include <stack>
 
 class R3BStack : public FairGenericStack
@@ -225,7 +226,7 @@ class R3BStack : public FairGenericStack
 
 
   /** STL map from track index and detector ID to number of MCPoints **/
-  std::map<std::pair<Int_t, Int_t>, Int_t> fPointsMap;     //!
+  std::map<int, std::array<int, kLAST+1>> fPointsMap;     //!
 
   
   /** Some indizes and counters **/
