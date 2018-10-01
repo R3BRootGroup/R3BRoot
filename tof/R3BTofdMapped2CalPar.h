@@ -21,7 +21,7 @@ class R3BTCalEngine;
  * @author D. Kresan
  * @since September 7, 2015
  */
-class R3BTofdMapped2TCalPar : public FairTask
+class R3BTofdMapped2CalPar : public FairTask
 {
 
   public:
@@ -29,7 +29,7 @@ class R3BTofdMapped2TCalPar : public FairTask
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BTofdMapped2TCalPar();
+    R3BTofdMapped2CalPar();
 
     /**
      * Standard constructor.
@@ -37,13 +37,13 @@ class R3BTofdMapped2TCalPar : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BTofdMapped2TCalPar(const char* name, Int_t iVerbose = 1);
+    R3BTofdMapped2CalPar(const char *, Int_t = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BTofdMapped2TCalPar();
+    virtual ~R3BTofdMapped2CalPar();
 
     /**
      * Method for task initialization.
@@ -51,36 +51,33 @@ class R3BTofdMapped2TCalPar : public FairTask
      * the event loop.
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
-    virtual InitStatus Init();
+    InitStatus Init();
 
     /**
      * Method for event loop implementation.
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Exec(Option_t* option);
+    void Exec(Option_t *);
 
     /**
      * A method for finish of processing of an event.
      * Is called by the framework for each event after executing
      * the tasks.
      */
-    virtual void FinishEvent();
+    void FinishEvent();
 
     /**
      * Method for finish of the task execution.
      * Is called by the framework after processing the event loop.
      */
-    virtual void FinishTask();
+    void FinishTask();
 
     /**
      * Method for setting the update rate for control histograms
      * @param rate an update rate value (events).
      */
-    inline void SetUpdateRate(Int_t rate)
-    {
-        fUpdateRate = rate;
-    }
+    void SetUpdateRate(Int_t);
 
     /**
      * Method for setting minimum required statistics per module.
@@ -89,51 +86,30 @@ class R3BTofdMapped2TCalPar : public FairTask
      * calibrated.
      * @param minStats a value of minimum statistics required.
      */
-    inline void SetMinStats(Int_t minStats)
-    {
-        fMinStats = minStats;
-    }
-
-    /**
-     * Method for selecting events with certain trigger value.
-     * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
-     */
-    inline void SetTrigger(Int_t trigger)
-    {
-        fTrigger = trigger;
-    }
+    void SetMinStats(Int_t);
 
     /**
      * Method for setting number of LOS detectors and channels.
      * @param nDets number of detectors.
      * @param nCh number of channels per detector (4+master trigger?)
      */
-    inline void SetNofModules(Int_t nDets, Int_t nCh)
-    {
-        fNofPlanes = nDets;		
-        fPaddlesPerPlane  = nCh;
-        fNofModules   = nDets * nCh * 4; // 1 edge per channel
-    }
+    void SetNofModules(Int_t, Int_t);
 
   private:
     Int_t fUpdateRate; /**< An update rate. */
     Int_t fMinStats;   /**< Minimum statistics required per module. */
-    Int_t fTrigger;    /**< Trigger value. */
 
     UInt_t fNofPlanes;      /**< Number of planes. */
     UInt_t fPaddlesPerPlane;/**< Number of bars per plane. */
     UInt_t fNofModules;     /**< Total number of modules (=edges) to calibrate */
 
-    Int_t fNEvents;         /**< Event counter. */
-    R3BTCalPar* fCal_Par;   /**< Parameter container. */
-    TClonesArray* fMapped;  /**< Array with mapped data - input data. */
-    R3BEventHeader* header; /**< Event header - input data. */
+    R3BTCalPar *fCalPar;    /**< Parameter container. */
+    TClonesArray *fMapped;  /**< Array with mapped data - input data. */
 
-    R3BTCalEngine* fEngine; /**< Instance of the TCAL engine. */
+    R3BTCalEngine *fEngine; /**< Instance of the TCAL engine. */
 
   public:
-    ClassDef(R3BTofdMapped2TCalPar, 1)
+    ClassDef(R3BTofdMapped2CalPar, 1)
 };
 
 #endif
-

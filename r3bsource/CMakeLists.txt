@@ -56,7 +56,7 @@ R3BFi7Reader.cxx
 #R3BFi8Reader.cxx
 #R3BFi9Reader.cxx
 R3BFi10Reader.cxx
-#R3BFi11Reader.cxx
+R3BFi11Reader.cxx
 R3BLosReader.cxx
 R3BSci8Reader.cxx
 R3BTofdReader.cxx
@@ -99,11 +99,7 @@ ext_h101_raw_nnp_tamex.h
 ext_h101_strawtubes.h
 ext_h101_star.h
 ext_h101_fibfour.h
-<<<<<<< HEAD
 ext_h101_ams.h
-=======
-ext_h101_sci8.h
->>>>>>> Beamtime preparation
 )
 
 # fill list of header files from list of source files

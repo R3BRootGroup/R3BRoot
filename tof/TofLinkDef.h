@@ -13,8 +13,8 @@
 #pragma link C++ class R3BTof2pDigiPar+;
 #pragma link C++ class R3BTof2pDigitizer+;
 //#pragma link C++ class R3BTofUnpack+;
-#pragma link C++ class R3BTofdMapped2TCal+;
-#pragma link C++ class R3BTofdMapped2TCalPar+;
+#pragma link C++ class R3BTofdMapped2Cal+;
+#pragma link C++ class R3BTofdMapped2CalPar+;
 #pragma link C++ class R3BTofdCal2HitPar+;
 #pragma link C++ class R3BTofdCal2Hit+;
 #pragma link C++ class R3BTofdHitModulePar+;

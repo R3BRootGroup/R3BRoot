@@ -52,9 +52,9 @@ R3BTofdCal2HitPar::R3BTofdCal2HitPar()
     , fTofdQ(0.)
     , fParaFile("")
 {
-    for (Int_t i = 0; i < N_PLANE_MAX; i++)
+    for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
     {
-        for (Int_t j = 0; j < N_PADDLE_MAX; j++)
+        for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
             fhTdiff[i][j] = NULL;
             fhTotPm1[i][j] = NULL;		
@@ -83,9 +83,9 @@ R3BTofdCal2HitPar::R3BTofdCal2HitPar(const char* name, Int_t iVerbose)
     , fTofdQ(0.)
     , fParaFile("")
 {
-    for (Int_t i = 0; i < N_PLANE_MAX; i++)
+    for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
     {
-        for (Int_t j = 0; j < N_PADDLE_MAX; j++)
+        for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
             fhTdiff[i][j] = NULL;
             fhTotPm1[i][j] = NULL;		
@@ -101,9 +101,9 @@ R3BTofdCal2HitPar::R3BTofdCal2HitPar(const char* name, Int_t iVerbose)
 
 R3BTofdCal2HitPar::~R3BTofdCal2HitPar()
 {
-    for (Int_t i = 0; i < N_PLANE_MAX; i++)
+    for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
     {
-        for (Int_t j = 0; j < N_PADDLE_MAX; j++)
+        for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
             if (fhTdiff[i][j]) delete fhTdiff[i][j];
             if (fhTotPm1[i][j]) delete fhTotPm1[i][j];
@@ -179,10 +179,10 @@ void R3BTofdCal2HitPar::Exec(Option_t* option)
     Double_t t1t=0.;
     Double_t t2t=0.;
     Double_t timeLos=0;
-    Double_t t[N_PLANE_MAX+1][N_PADDLE_MAX+1], Q[N_PLANE_MAX+1][N_PADDLE_MAX+1];     
+    Double_t t[N_TOFD_HIT_PLANE_MAX+1][N_TOFD_HIT_PADDLE_MAX+1], Q[N_PLANE_MAX+1][N_PADDLE_MAX+1];     
      
-    for(Int_t i=1;i<=N_PLANE_MAX;i++){
-        for(Int_t j=1;j<=N_PADDLE_MAX;j++){
+    for(Int_t i=1;i<=N_TOFD_HIT_PLANE_MAX;i++){
+        for(Int_t j=1;j<=N_TOFD_HIT_PADDLE_MAX;j++){
             t[i][j]=0.;
             Q[i][j]=0.;	  
         }    
@@ -394,9 +394,9 @@ void R3BTofdCal2HitPar::FinishEvent()
 void R3BTofdCal2HitPar::FinishTask()
 {
  
-   for (Int_t i = 0; i < N_PLANE_MAX; i++)
+   for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
   {
-      for (Int_t j = 0; j < N_PADDLE_MAX; j++)
+      for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
       { 
           if (fhTot1vsPos[i][j]) fhTot1vsPos[i][j]->Write();
           if (fhTot2vsPos[i][j]) fhTot2vsPos[i][j]->Write();
@@ -464,9 +464,9 @@ void R3BTofdCal2HitPar::FinishTask()
           a_file.close();	 
 	  } 
       else{
-	      for (Int_t i = 0; i < N_PLANE_MAX; i++)
+	      for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
 	      {
-	         for (Int_t j = 0; j < N_PADDLE_MAX; j++)
+	         for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
 	         {
 	            if (fhTot1vsPos[i][j]) {
 	                R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i+1, j+1);
@@ -513,9 +513,9 @@ void R3BTofdCal2HitPar::calcOffset()
    Int_t nfound;
 
  
-    for (Int_t i = 0; i < N_PLANE_MAX; i++)
+    for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
     {
-        for (Int_t j = 0; j < N_PADDLE_MAX; j++)
+        for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
             if (fhTdiff[i][j]) {
                 LOG(WARNING) << " Plane "<< i+1<<" Bar "<< j+1<<FairLogger::endl;  
@@ -538,9 +538,9 @@ void R3BTofdCal2HitPar::calcOffset()
   */
   
    	R3BTofdHitModulePar *mpar;
-	for (Int_t i = 0; i < N_PLANE_MAX; i++)
+	for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
 	{
-        for (Int_t j = 0; j < N_PADDLE_MAX; j++)
+        for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
         	mpar = new R3BTofdHitModulePar();
         	Double_t offset = 0.;
@@ -565,8 +565,8 @@ void R3BTofdCal2HitPar::calcOffset()
 void R3BTofdCal2HitPar::calcSync()
 {
 
-    for (Int_t i = 0; i < N_PLANE_MAX; i++){	    
-        for (Int_t j = 0; j < N_PADDLE_MAX; j++){        
+    for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++){	    
+        for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++){        
 			if(fhTsync[i][j]){
                 R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i+1, j+1);
                 Double_t offset1=par->GetOffset1();
@@ -588,9 +588,9 @@ void R3BTofdCal2HitPar::calcSync()
 
 void R3BTofdCal2HitPar::calcVeff()
 {
-	    for (Int_t i = 0; i < N_PLANE_MAX; i++)
+	    for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
 	    {
-            for (Int_t j = 0; j < N_PADDLE_MAX; j++)
+            for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
             {
         	Double_t max = 0.;
 		    Double_t veff = 7.;

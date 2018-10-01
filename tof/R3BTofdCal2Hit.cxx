@@ -19,8 +19,8 @@
 #include "TClonesArray.h"
 #include "TMath.h"
 
-#define N_PLANE_MAX 100
-#define N_PADDLE_MAX 100
+#define N_TOFD_HIT_PLANE_MAX 100
+#define N_TOFD_HIT_PADDLE_MAX 100
 
 R3BTofdCal2Hit::R3BTofdCal2Hit()
     : FairTask("TofdCal2Hit", 1)
@@ -59,9 +59,9 @@ R3BTofdCal2Hit::R3BTofdCal2Hit()
     fhLosXYP = NULL;
     fh_los_pos = NULL;
     
-    for (Int_t i = 0; i < N_PLANE_MAX; i++)
+    for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
     {
-        for (Int_t j = 0; j < N_PADDLE_MAX; j++)
+        for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
             fhPos[i][j] = NULL;
             fhTotPm1[i][j] = NULL;		
@@ -123,9 +123,9 @@ R3BTofdCal2Hit::R3BTofdCal2Hit(const char* name, Int_t iVerbose)
     fhLosXYP = NULL;
     fh_los_pos = NULL;
     
-    for (Int_t i = 0; i < N_PLANE_MAX; i++)
+    for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
     {
-        for (Int_t j = 0; j < N_PADDLE_MAX; j++)
+        for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
             fhPos[i][j] = NULL;
             fhTotPm1[i][j] = NULL;		
@@ -176,9 +176,9 @@ R3BTofdCal2Hit::~R3BTofdCal2Hit()
     if (fh_los_pos) delete fh_los_pos;
    
       
-    for (Int_t i = 0; i < N_PLANE_MAX; i++)
+    for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
     {
-        for (Int_t j = 0; j < N_PADDLE_MAX; j++)
+        for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
             if (fhPos[i][j]) delete fhPos[i][j];
             if (fhTotPm1[i][j]) delete fhTotPm1[i][j];
@@ -300,9 +300,9 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 	  Double_t tof51=1000;
 	  Double_t tof52=1000;
     
-      Double_t t[N_PLANE_MAX+1][N_PADDLE_MAX+1],x[N_PLANE_MAX+1][N_PADDLE_MAX+1];
-      Double_t y[N_PLANE_MAX+1][N_PADDLE_MAX+1],Q[N_PLANE_MAX+1][N_PADDLE_MAX+1];     
-      Double_t tof[N_PLANE_MAX+1][N_PADDLE_MAX+1];     
+      Double_t t[N_TOFD_HIT_PLANE_MAX+1][N_TOFD_HIT_PADDLE_MAX+1],x[N_PLANE_MAX+1][N_PADDLE_MAX+1];
+      Double_t y[N_TOFD_HIT_PLANE_MAX+1][N_TOFD_HIT_PADDLE_MAX+1],Q[N_PLANE_MAX+1][N_PADDLE_MAX+1];     
+      Double_t tof[N_TOFD_HIT_PLANE_MAX+1][N_TOFD_HIT_PADDLE_MAX+1];     
      
       for(Int_t i=1;i<=fNofPlanes;i++){
         for(Int_t j=1;j<=fPaddlesPerPlane;j++){
@@ -953,9 +953,9 @@ void R3BTofdCal2Hit::FinishEvent()
 void R3BTofdCal2Hit::FinishTask()
 {
 
-    for (Int_t i = 0; i < N_PLANE_MAX; i++)
+    for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
     {
-        for (Int_t j = 0; j < N_PADDLE_MAX; j++)
+        for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
             if (fhPos[i][j]) fhPos[i][j]->Write();
             if (fhTotPm1[i][j]) fhTotPm1[i][j]->Write();

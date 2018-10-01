@@ -120,8 +120,10 @@ strawtubesData/R3BStrawtubesMappedData.cxx
 strawtubesData/R3BStrawtubesCalData.cxx
 strawtubesData/R3BStrawtubesHitData.cxx
 neulandData/R3BPaddleTamexMappedData.cxx
-tofData/R3BPaddleCalData.cxx
+tofData/R3BTofdMappedData.cxx
+tofData/R3BTofdCalData.cxx
 tofData/R3BTofdHitData.cxx
+tofData/R3BPaddleCalData.cxx
 ptofData/R3BPtofHit.cxx
 fibData/R3BBunchedFiberCalData.cxx
 fibData/R3BBunchedFiberHitData.cxx

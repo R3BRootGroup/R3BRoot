@@ -47,8 +47,8 @@ R3BTofDigitizer.cxx
 R3BTof2pDigiPar.cxx
 R3BTof2pDigitizer.cxx  
 #R3BTofUnpack.cxx
-R3BTofdMapped2TCal.cxx
-R3BTofdMapped2TCalPar.cxx
+R3BTofdMapped2Cal.cxx
+R3BTofdMapped2CalPar.cxx
 R3BTofdCal2HitPar.cxx
 R3BTofdCal2Hit.cxx
 R3BTofdHitModulePar.cxx
@@ -71,4 +71,3 @@ set(DEPENDENCIES
     Spectrum R3Bbase R3BPassive R3BData R3BTCal)
     
 GENERATE_LIBRARY()
-

@@ -3,9 +3,9 @@
 
 #define NMODULEMAX 6000
 
-#define N_PLANE_MAX 100
-#define N_PADDLE_MAX 100
-#define N_SIDE_MAX 10
+#define N_TOFD_HIT_PLANE_MAX 100
+#define N_TOFD_HIT_PADDLE_MAX 100
+#define N_TOFD_HIT_SIDE_MAX 10
 
 #include "FairParGenericSet.h" // for FairParGenericSet
 #include "R3BTofdHitModulePar.h"

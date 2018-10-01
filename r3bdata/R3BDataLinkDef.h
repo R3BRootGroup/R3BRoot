@@ -82,6 +82,8 @@
 #pragma link C++ class R3BSci8HitData+;
 #pragma link C++ class R3BPaddleTamexMappedData+;
 #pragma link C++ class R3BPaddleCalData+;
+#pragma link C++ class R3BTofdMappedData+;
+#pragma link C++ class R3BTofdCalData+;
 #pragma link C++ class R3BTofdHitData+;
 #pragma link C++ class R3BNeulandCalData+;
 #pragma link C++ class R3BActarPoint+;

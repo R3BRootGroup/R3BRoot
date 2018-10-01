@@ -71,12 +71,7 @@ R3BLosMapped2Cal::R3BLosMapped2Cal(const char* name, Int_t iVerbose)
 
 R3BLosMapped2Cal::~R3BLosMapped2Cal()
 {
-    if (fCalItems)
-    {
-        delete fCalItems;
-        fCalItems = NULL;
-        fNofCalItems = 0;
-    }
+  delete fCalItems;
 }
 
 InitStatus R3BLosMapped2Cal::Init()
