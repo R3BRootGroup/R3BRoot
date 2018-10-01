@@ -15,6 +15,7 @@ using namespace std;
 R3Bp2pevtGenerator::R3Bp2pevtGenerator()
 {
 	this->SetValues(0,0,0,0,false,false);
+	T_LIMIT=10000000.;
 	fRandom.SetSeed(0);
 }
 
@@ -34,7 +35,7 @@ void R3Bp2pevtGenerator::SetHeavyNucleus(int A,double M_def,double M_res)
 	A_BEAM=A;
 	double UNIT = 931.494061;
 	MA=A*UNIT+M_def;
-	MB+=(A-1)*UNIT+M_res;
+	MB=(A-1)*UNIT+M_res;
 	return;
 }
 void R3Bp2pevtGenerator::SetLightNucleus(double ma,double mi)
@@ -68,6 +69,21 @@ void R3Bp2pevtGenerator::SetMomDistrib(double mom)
 	return;
 }
 
+void R3Bp2pevtGenerator::Print()
+{
+  cout << "***** Print generator values *****" << endl;
+  cout << "Energy: \t" <<  ENERGY << endl;
+  cout << "A Beam: \t" << A_BEAM << endl;
+  cout << "Mass A: \t" <<  MA << endl;
+  cout << "Mass B: \t" << MB << endl;
+  cout << "Mass a: \t" << Ma << endl;
+  cout << "Mass i: \t" << Mi << endl;
+  cout << "T_Limit: \t" << T_LIMIT << endl;
+  cout << "Sigma Fermi: \t" << MOM_SIGMA << endl;
+  cout << "WQ Isotropic: \t" << ISOTROPIC << endl;
+  cout << "Inverse kinematics: \t" << INVERSE << endl;
+}
+
 Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator *primGen)
 {
 	double E = ENERGY;
@@ -78,10 +94,12 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator *primGen)
 	    LOG(ERROR) << "R3Bp2pevtGenerator: E < 0!" << FairLogger::endl;
 	    return kFALSE;
 	  }
+	fRandom.SetSeed(0);
 	//  	gRandom = new TRandom3(); //default
 	//  	gRandom->SetSeed(0);//using computer time
 	//  	TRandom2 r1;
 	//  	r1.SetSeed(0);
+	R3Bp2pevtGenerator::Print();
 	  bool evt=false;
 	  if(INVERSE)
 	  {
@@ -95,11 +113,11 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator *primGen)
 			const double S_first = (EA+Mi)*(EA+Mi) - PA*PA;	// Invariant mass (Mandelstam S-variable)
 			const double sigma = MOM_SIGMA; 		// Internal momentum spread of the cluster "a" inside "A"
 
-			std::cout << "\n****** Beam parameters ********";
-			std::cout << "\nMA:\t" << MA << " MeV";
-			std::cout << "\nTotal momentum:\t" << PA << " MeV";
-			std::cout << "\nTotal energy:\t"   << EA << " MeV";
-			std::cout << "\nBeta (beam):\t" << (-bA) << "\nGamma (beam):\t" << gA << "\n\n";
+			LOG(DEBUG) << "\n****** Beam parameters ********" << FairLogger::endl;
+			LOG(DEBUG) << "\nMA:\t" << MA << " MeV" << FairLogger::endl;
+			LOG(DEBUG) << "\nTotal momentum:\t" << PA << " MeV" << FairLogger::endl;
+			LOG(DEBUG) << "\nTotal energy:\t"   << EA << " MeV" << FairLogger::endl;
+		        LOG(DEBUG) << "\nBeta (beam):\t" << (-bA) << "\nGamma (beam):\t" << gA << "\n\n" << FairLogger::endl;
 
 			while(!evt) //eventloop
 			{
@@ -135,11 +153,11 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator *primGen)
 				double EB  = sqrt(MB*MB + PB.Mag2());
 
 				//------- Lorentz transformations into laboratory system ---------
-				std::pair<double, double> lora = Lorentz(gA,bA,Ea,Pa.Z());
+				std::pair<double, double> lora =  R3Bp2pevtGenerator::Lorentz(gA,bA,Ea,Pa.Z());
 				double EaL = lora.first; //cluster energy in lab
 				Pa.SetZ(lora.second); 	 //cluster Pz in lab
 
-				std::pair<double, double> lorB = Lorentz(gA,bA,EB,PB.Z());
+				std::pair<double, double> lorB =  R3Bp2pevtGenerator::Lorentz(gA,bA,EB,PB.Z());
 				double EBL = lorB.first; //energy of the residual B in lab
 				PB.SetZ(lorB.second);    //Pz of the residual B in lab
 
@@ -165,14 +183,14 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator *primGen)
 				double beta_cm = -Pa.Mag()/(EaL+Mi);
 				double gamma_cm = 1/sqrt(1-beta_cm*beta_cm);
 
-				std::pair<double, double> lora1 = Lorentz(gamma_cm,beta_cm,CM.e_scat,P1cm.Z());
-				std::pair<double, double> lora2 = Lorentz(gamma_cm,beta_cm,CM.e_clust,P2cm.Z());
+				std::pair<double, double> lora1 =  R3Bp2pevtGenerator::Lorentz(gamma_cm,beta_cm,CM.e_scat,P1cm.Z());
+				std::pair<double, double> lora2 =  R3Bp2pevtGenerator::Lorentz(gamma_cm,beta_cm,CM.e_clust,P2cm.Z());
 
 				P1cm.SetZ(lora1.second);
 				P2cm.SetZ(lora2.second);
 				//-------- Rotating back to the beam direction -----------
-				TVector3 P1L = DREHUNG(P1cm,Pa);
-				TVector3 P2L = DREHUNG(P2cm,Pa);
+				TVector3 P1L = R3Bp2pevtGenerator::DREHUNG(P1cm,Pa);
+				TVector3 P2L = R3Bp2pevtGenerator::DREHUNG(P2cm,Pa);
 
 				evt=true;
 				LOG(DEBUG) << "R3Bp2pevtGenerator: Sending p2pevt: P1 : "<< P1L.Px() << " , " << P1L.Py() << " , " << P1L.Pz() << "\n P2 : "
@@ -185,7 +203,7 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator *primGen)
 
 				}
 	  }
-	  else
+	  else if(!INVERSE)
 	  {
 	  	//--------------------- Beam parameters -----------------------------
 	  	const Double_t Tkin = E;										 // Total kinetic energy (MeV) of the projectile
@@ -235,7 +253,7 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator *primGen)
 	  		TLorentzVector LVstart = LVa + LVi;
 	  		double S = LVstart.Mag2(); //Mandelstam invariant
 
-	  		cm_values CM = CENMASS(S,Ma_off,Mi,Ma,ISOTROPIC);
+	  		cm_values CM = R3Bp2pevtGenerator::CENMASS(S,Ma_off,Mi,Ma,ISOTROPIC);
 	  		if(!CM.good)
 	  			{
 	  				//cout << "non physical" << endl;
@@ -255,8 +273,8 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator *primGen)
 	  		double beta_cm = 0.00000 - LVstart.Beta();
 	  		double gamma_cm = 1/sqrt(1-beta_cm*beta_cm);
 
-	  		std::pair<double, double> lora1 = Lorentz(gamma_cm,beta_cm,CM.e_scat,P1cm.Z());
-	  		std::pair<double, double> lora2 = Lorentz(gamma_cm,beta_cm,CM.e_clust,P2cm.Z());
+	  		std::pair<double, double> lora1 = R3Bp2pevtGenerator::Lorentz(gamma_cm,beta_cm,CM.e_scat,P1cm.Z());
+	  		std::pair<double, double> lora2 = R3Bp2pevtGenerator::Lorentz(gamma_cm,beta_cm,CM.e_clust,P2cm.Z());
 
 	  		P1cm.SetZ(lora1.second);
 	  		P2cm.SetZ(lora2.second);
@@ -337,7 +355,7 @@ cm_values R3Bp2pevtGenerator::CENMASS(double s,double m2off,double m1,double m2,
 
 	// Kinematics before the scattering process
 	// (with one off-shell mass)
-	double p2_off = sqrt(CINEMA(X,Y,Z))/2/sqrs;
+	double p2_off = sqrt( R3Bp2pevtGenerator::CINEMA(X,Y,Z))/2/sqrs;
 	double p1_off = p2_off;
 	// CM energies
 	double e1_off = (s+Z-Y)/2/sqrs;
@@ -347,7 +365,7 @@ cm_values R3Bp2pevtGenerator::CENMASS(double s,double m2off,double m1,double m2,
 	Y = m2*m2;  Z = m1*m1;
 	//And check whether the kinematical function is ok
 	//for this specific kinematical case
-	double ERROR_CI = CINEMA(X,Y,Z);
+	double ERROR_CI =  R3Bp2pevtGenerator::CINEMA(X,Y,Z);
 	if(ERROR_CI <= 0.){
 		//cout << "\nERROR!!! Kinematical function is negative!";
 		return output;
@@ -355,7 +373,7 @@ cm_values R3Bp2pevtGenerator::CENMASS(double s,double m2off,double m1,double m2,
 
 	// Kinematics after the scattering process
 	// (with all real masses)
-	double p2 = sqrt(CINEMA(X,Y,Z))/2/sqrs;
+	double p2 = sqrt( R3Bp2pevtGenerator::CINEMA(X,Y,Z))/2/sqrs;
 	double p1 = p2;
 	double e1 = (s+Z-Y)/2/sqrs;
 	double e2 = (s+Y-Z)/2/sqrs;
@@ -370,8 +388,8 @@ cm_values R3Bp2pevtGenerator::CENMASS(double s,double m2off,double m1,double m2,
 
 	double t;
 	// Generate random momentum transfer for this kinematical case
-	if(!isotropic){ t = get_T(s,tmax); }			//Using parameterized cross sections
-	else{ t = gRandom->Uniform(0.,T_LIMIT) * (-1); } //Isotropic scattering
+	if(!isotropic){ t = R3Bp2pevtGenerator::get_T(s,tmax); }			//Using parameterized cross sections
+	else{ t = fRandom.Uniform(0.,T_LIMIT) * (-1); } //Isotropic scattering
 
 	//double COSINE = (t - m2off*m2off - m2*m2 + 2*e2_off*e2)/(2*p2_off*p2);
 	double COSINE = (t - 2*m1*m1 + 2*e1_off*e1)/(2*p1_off*p1);
@@ -431,7 +449,7 @@ double R3Bp2pevtGenerator::get_T(double sm, double max)
 	//double Tmin = min*0.000001;
 
 	//double Tmax = -2*pCM*pCM*(1 - cos(PI))*0.000001; //in (GeV/c)�
-	Double_t rr = gRandom->Uniform(-1.,1.);// to randomize wrt 90 degrees
+	Double_t rr = fRandom.Uniform(-1.,1.);// to randomize wrt 90 degrees
 	double mandels = sm * 0.000001; // in GeV�
 	//cout << "\nMandelstam S = " << mandels << "\t Tmax/2 = " << Tmax/2 << "\t Random: " << rr;
 
