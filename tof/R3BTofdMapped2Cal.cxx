@@ -12,6 +12,8 @@
  * detector status during the experiment.
  */
 
+#include <assert.h>
+
 #include "R3BTofdMapped2Cal.h"
 
 #include "TClonesArray.h"
