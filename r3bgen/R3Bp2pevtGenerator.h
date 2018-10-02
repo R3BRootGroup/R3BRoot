@@ -53,7 +53,8 @@ class R3Bp2pevtGenerator : public FairGenerator
     void SetExcitation(double exe);// Set Excitation energy
     void SetLightNucleus(double ma,double mi); //Set Incoming outgoing particle mass
     void SetBeamEnergy(double E);
-  protected:
+    void Print();
+ protected:
     /**
         * Set Values for target end beam nucleus, Cross section and kinematics
         */
