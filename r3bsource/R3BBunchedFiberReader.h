@@ -115,7 +115,7 @@ class R3BBunchedFiberReader: public R3BReader
     UCESBMultiHitLink fMHL[2][2][2];
 
   private:
-    TString fName;
+    TString fShortName; // e.g. "Fi1a", "Fi2", ...
     // [0=MAPMT,1=SPMT].
     UInt_t fChannelNum[2];
     TClonesArray *fMappedArray;

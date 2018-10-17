@@ -6,8 +6,8 @@
 #ifndef R3BTOFDCAL2HITPAR_H
 #define R3BTOFDCAL2HITPAR_H
 
-#define N_TOFD_HIT_PLANE_MAX 100
-#define N_TOFD_HIT_PADDLE_MAX 100
+#define N_TOFD_HIT_PLANE_MAX 4
+#define N_TOFD_HIT_PADDLE_MAX 44
 
 #include "R3BTCalEngine.h"
 #include "FairTask.h"

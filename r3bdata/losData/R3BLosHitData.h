@@ -23,13 +23,13 @@ class R3BLosHitData : public TObject
 
   private:
     UChar_t  fDetector;		   // 1..n
+//    Double_t fTimeDiff2Ref_ns; // difference to master trigger time
+
+  public:
     Double_t fTime_ns;         // average time of the scintillators
     Double_t fX_cm;			   // position in cm	
     Double_t fY_cm;
     Double_t fZ;               // Charge
-//    Double_t fTimeDiff2Ref_ns; // difference to master trigger time
-
-  public:
 
     ClassDef(R3BLosHitData, 1)
 };

@@ -1,6 +1,7 @@
 #ifndef _R3BREADER_H
 #define _R3BREADER_H
 
+#include "TString.h"
 #include "TObject.h"
 
 extern "C" {
@@ -13,7 +14,7 @@ extern "C" {
 class R3BReader : public TObject
 {
 	public:
-		R3BReader(const char *);
+		R3BReader(TString const &);
 		virtual ~R3BReader();
 
 		/* Setup structure information */
@@ -25,10 +26,10 @@ class R3BReader : public TObject
 		/* Reset */
 		virtual void Reset() = 0;
 		/* Return actual name of the reader */
-		const char *GetName() { return fName; }
+		const char *GetName() { return fName.Data(); }
 
 	protected:
-		const char *fName;
+		TString fName;
 
 	public:
 		ClassDef(R3BReader, 0);

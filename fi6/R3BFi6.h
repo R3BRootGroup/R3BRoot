@@ -5,7 +5,7 @@
 #include "TLorentzVector.h"
 
 class TClonesArray;
-class R3BFi4Point;
+class R3BFibPoint;
 class FairVolume;
 
 class R3BFi6 : public R3BDetector
@@ -112,9 +112,9 @@ class R3BFi6 : public R3BDetector
 
     /** Private method AddHit
      **
-     ** Adds a Fi4Point to the HitCollection
+     ** Adds a FibPoint to the HitCollection
      **/
-    R3BFi4Point* AddHit(Int_t trackID,
+    R3BFibPoint* AddHit(Int_t trackID,
                         Int_t detID,
                         Int_t plane,
                         TVector3 posIn,

@@ -149,7 +149,7 @@ InitStatus R3BTofdCal2HitPar::Init()
 
 
     return kSUCCESS;
-}
+} 
 
 void R3BTofdCal2HitPar::SetParContainers()
 {
@@ -165,6 +165,7 @@ void R3BTofdCal2HitPar::SetParContainers()
 
 void R3BTofdCal2HitPar::Exec(Option_t* option)
 {
+	if(fNEvents/1000000.==(int)fNEvents/1000000) cout<<"Events: "<<fNEvents<<endl;
 	// test for requested trigger (if possible)
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger)) 
 		return;
@@ -212,12 +213,12 @@ void R3BTofdCal2HitPar::Exec(Option_t* option)
         Int_t iBar  = hit->GetBar();    // 1..n
 
         
-        if (iPlane>=fNofPlanes) // this also errors for iDetector==0
+        if (iPlane>fNofPlanes) // this also errors for iDetector==0
         {
             LOG(ERROR) << "R3BTofdCal2HitPar::Exec() : more detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes << FairLogger::endl;
             continue;
         }
-        if (iBar>=fPaddlesPerPlane) // same here
+        if (iBar>fPaddlesPerPlane) // same here
         {
             LOG(ERROR) << "R3BTofdCal2HitPar::Exec() : more bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane << FairLogger::endl;
             continue;
@@ -230,7 +231,7 @@ void R3BTofdCal2HitPar::Exec(Option_t* option)
             char strName2[255];
             sprintf(strName1, "Time_Diff_Plane_%d_Bar_%d", iPlane, iBar);
             sprintf(strName2, "Time Diff Plane %d Bar %d", iPlane, iBar);
-            fhTdiff[iPlane - 1][iBar - 1] = new TH1F(strName1, strName2, 4000, -20., 20.);
+            fhTdiff[iPlane - 1][iBar - 1] = new TH1F(strName1, strName2, 8000, -40., 40.);
             fhTdiff[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Time difference (PM1 - PM2) in ns");
             fhTdiff[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Counts");
         }
@@ -238,7 +239,7 @@ void R3BTofdCal2HitPar::Exec(Option_t* option)
         {
             char strName[255];
             sprintf(strName, "ToT_Plane_%d_Bar_%d_PM_1", iPlane, iBar);
-            fhTotPm1[iPlane - 1][iBar - 1] = new TH1F(strName, "", 5000, 0., 500.);
+            fhTotPm1[iPlane - 1][iBar - 1] = new TH1F(strName, "", 3000, 0., 300.);
             fhTotPm1[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToT of PM1 in ns");
             fhTotPm1[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Counts");
         }
@@ -246,7 +247,7 @@ void R3BTofdCal2HitPar::Exec(Option_t* option)
         {
             char strName[255];
             sprintf(strName, "ToT_Plane_%d_Bar_%d_PM_2", iPlane, iBar);
-            fhTotPm2[iPlane - 1][iBar - 1] = new TH1F(strName, "", 5000, 0., 500.);
+            fhTotPm2[iPlane - 1][iBar - 1] = new TH1F(strName, "", 3000, 0., 300.);
             fhTotPm2[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToT of PM2 in ns");
             fhTotPm2[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Counts");
         }
@@ -254,7 +255,7 @@ void R3BTofdCal2HitPar::Exec(Option_t* option)
         {
             char strName[255];
             sprintf(strName, "Plane_%d_Bar_%d_ToT1vsToT2", iPlane, iBar);
-            fhTot1vsTot2[iPlane - 1][iBar - 1] = new TH2F(strName, "", 500, 0., 500.,500,0.,500.);
+            fhTot1vsTot2[iPlane - 1][iBar - 1] = new TH2F(strName, "", 600, 0., 300.,600,0.,300.);
             fhTot1vsTot2[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToT of PM2 in ns");
             fhTot1vsTot2[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Tot of PM1 in ns");
         }
@@ -262,8 +263,8 @@ void R3BTofdCal2HitPar::Exec(Option_t* option)
         {
             char strName[255];
             sprintf(strName, "Tot1_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-            if(iPlane<3) fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 5000, 0., 1000.);
-            if(iPlane>2) fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 5000, 0., 1000.);
+            if(iPlane<3) fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 1000, 0., 200.);
+            if(iPlane>2) fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 1000, 0., 200.);
             fhTot1vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToT of PM2 in ns");
             fhTot1vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Tot of PM1 in ns");
              
@@ -273,16 +274,16 @@ void R3BTofdCal2HitPar::Exec(Option_t* option)
         {
             char strName[255];
             sprintf(strName, "Tot2_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-            if(iPlane<3) fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 5000, 0., 1000.);
-            if(iPlane>2) fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 5000, 0., 1000.);
+            if(iPlane<3) fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 1000, 0., 200.);
+            if(iPlane>2) fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 1000, 0., 200.);
         }
         if (NULL == fhTsync[iPlane - 1][iBar - 1])
         {
             char strName[255];
             sprintf(strName, "Time_Sync_Plane_%d_Bar_%d", iPlane, iBar);
 	    // for runs starting at 025:
-            if (iPlane<3) fhTsync[iPlane - 1][iBar - 1] = new TH1F(strName, "", 20000, 180., 280.);
-            if (iPlane>2) fhTsync[iPlane - 1][iBar - 1] = new TH1F(strName, "", 100000, 2100., 2400.);            
+            fhTsync[iPlane - 1][iBar - 1] = new TH1F(strName, "", 20000, 0, 200.);
+//            if (iPlane>2) fhTsync[iPlane - 1][iBar - 1] = new TH1F(strName, "", 100000, 2100., 2400.);            
 	    // for runs starting at 054:
             //if (iPlane<3) fhTsync[iPlane - 1][iBar - 1] = new TH1F(strName, "", 20000,  15700., 15800.);
             //if (iPlane>2) fhTsync[iPlane - 1][iBar - 1] = new TH1F(strName, "", 20000,  6800., 6900.);            
@@ -425,8 +426,8 @@ void R3BTofdCal2HitPar::FinishTask()
    }
 
    Double_t para[4];
-   Double_t min=-35;
-   Double_t max= 35;
+   Double_t min=-40;
+   Double_t max= 40;
    if(fTofdQ!=0){
       if(fParaFile!=""){
 //		  char filename1[100];
@@ -634,7 +635,7 @@ void R3BTofdCal2HitPar::doubleExp(TH2F *histo, Double_t min, Double_t max, Doubl
     }
     TGraph *gr1=new TGraph();
     TGraph *gr2=new TGraph();
-    TCanvas *cfit_exp=new TCanvas("cfit_exp","fit exponential",0,0,800,800);   
+    TCanvas *cfit_exp=new TCanvas("cfit_exp","fit exponential",100,100,500,500);   
 
     cfit_exp->Clear();
     cfit_exp->Divide(1,3);
@@ -652,7 +653,7 @@ void R3BTofdCal2HitPar::doubleExp(TH2F *histo, Double_t min, Double_t max, Doubl
         x[n]=histo1->GetXaxis()->GetBinCenter(i);      
         Int_t binmax = histo_py->GetMaximumBin();
         y[n] = histo_py->GetXaxis()->GetBinCenter(binmax);
-        if(histo_py->GetMaximum()>100) n++; 
+        if(histo_py->GetMaximum()>10) n++; 
         delete histo_py;
     }
 
@@ -682,7 +683,7 @@ void R3BTofdCal2HitPar::doubleExp(TH2F *histo, Double_t min, Double_t max, Doubl
         x[n]=histo2->GetXaxis()->GetBinCenter(i);      
         Int_t binmax = histo_py->GetMaximumBin();
         y[n] = histo_py->GetXaxis()->GetBinCenter(binmax);
-        if(histo_py->GetMaximum()>100) n++; 
+        if(histo_py->GetMaximum()>10) n++; 
         delete histo_py;
    }
     

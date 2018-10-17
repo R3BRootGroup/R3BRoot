@@ -13,6 +13,5 @@
 #pragma link C++ class R3BFi4Mapped2Cal+;
 #pragma link C++ class R3BFi4Cal2Hit+;
 
-
 #endif
 

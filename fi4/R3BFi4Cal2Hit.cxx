@@ -1,7 +1,7 @@
 #include "R3BFi4Cal2Hit.h"
 
-R3BFi4Cal2Hit::R3BFi4Cal2Hit(Int_t a_verbose)
-  : R3BBunchedFiberCal2Hit("Fi4", a_verbose, VERTICAL, 2, 256, 4)
+R3BFi4Cal2Hit::R3BFi4Cal2Hit(Bool_t a_is_calibrator, Int_t a_verbose)
+  : R3BBunchedFiberCal2Hit("Fi4", a_verbose, VERTICAL, 2, 256, 4, a_is_calibrator)
 {
 }
 

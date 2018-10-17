@@ -1,0 +1,141 @@
+#include "R3BBunchedFiberHitPar.h"
+
+#include "FairLogger.h"
+#include "FairParamList.h" // for FairParamList
+
+ClassImp(R3BBunchedFiberHitPar);
+
+R3BBunchedFiberHitPar::R3BBunchedFiberHitPar(const char* name, const char* title, const char* context, Bool_t own)
+    : FairParGenericSet(name, title, context, own)
+    , fHitParams(new TObjArray(NMODULEMAX))
+    , fMapInit(kFALSE)
+{
+}
+
+R3BBunchedFiberHitPar::~R3BBunchedFiberHitPar()
+{
+    if (fHitParams)
+    {
+        delete fHitParams;
+        fHitParams = NULL;
+    }
+}
+
+void R3BBunchedFiberHitPar::putParams(FairParamList* list)
+{
+    LOG(INFO) << "R3BBunchedFiberHitPar::putParams() called" << FairLogger::endl;
+    if (!list)
+    {
+        return;
+    }
+    list->addObject(GetName(), fHitParams);
+}
+
+Bool_t R3BBunchedFiberHitPar::getParams(FairParamList* list)
+{
+    if (!list)
+    {
+        return kFALSE;
+    }
+    if (!list->fillObject(GetName(), fHitParams))
+    {
+        return kFALSE;
+    }
+    return kTRUE;
+}
+
+void R3BBunchedFiberHitPar::clear()
+{
+}
+
+void R3BBunchedFiberHitPar::printParams()
+{
+
+    LOG(INFO) << " -----------  " << GetName() << " Fiber Hit Parameters -------------  " << FairLogger::endl;
+
+    LOG(INFO) << " Number of HIT Parameters " << fHitParams->GetEntries() << FairLogger::endl;
+    for (Int_t i = 0; i < fHitParams->GetEntries(); i++)
+    {
+        R3BBunchedFiberHitModulePar* t_par = (R3BBunchedFiberHitModulePar*)fHitParams->At(i);
+        LOG(INFO) << "----------------------------------------------------------------------" << FairLogger::endl;
+        if (t_par)
+        {
+            t_par->printParams();
+        }
+    }
+}
+
+R3BBunchedFiberHitModulePar* R3BBunchedFiberHitPar::GetModuleParAt(Int_t fiber)
+{
+    if (!fMapInit)
+    {
+        fIndexMap.clear();
+        R3BBunchedFiberHitModulePar* par;
+        Int_t tFiber;
+        Int_t index;
+        for (Int_t i = 0; i < fHitParams->GetEntries(); i++)
+        {
+            par = (R3BBunchedFiberHitModulePar*)fHitParams->At(i);
+            if (NULL == par)
+            {
+                continue;
+            }
+            tFiber = par->GetFiber();
+            if (tFiber < 1 || tFiber > N_FIBER_MAX )
+            {
+                LOG(ERROR) << "R3BBunchedFiberHitPar::GetModuleParAt : error in fiber indexing. " << tFiber 
+                           << FairLogger::endl;
+                continue;
+            }
+            index = tFiber - 1;
+            if (fIndexMap.find(index) != fIndexMap.end())
+            {
+                LOG(ERROR) << "R3BBunchedFiberHitPar::GetModuleParAt : parameter found more than once. " << tFiber
+                           << FairLogger::endl;
+                continue;
+            }
+            fIndexMap[index] = i;
+        }
+        fMapInit = kTRUE;
+    }
+
+    if (fiber < 1 || fiber > N_FIBER_MAX )
+    {
+        LOG(ERROR) << "R3BBunchedFiberHitPar::GetModuleParAt : error in fiber indexing. " << fiber << FairLogger::endl;
+        return NULL;
+    }
+    Int_t index = fiber - 1;
+
+    if (fIndexMap.find(index) == fIndexMap.end())
+    {
+        LOG(WARNING) << "R3BBunchedFiberHitPar::GetModuleParAt : parameter not found for: " << fiber << FairLogger::endl;
+        return NULL;
+    }
+    Int_t arind = fIndexMap[index];
+    R3BBunchedFiberHitModulePar* par = (R3BBunchedFiberHitModulePar*)fHitParams->At(arind);
+    return par;
+}
+
+void R3BBunchedFiberHitPar::AddModulePar(R3BBunchedFiberHitModulePar* tch)
+{
+    fMapInit = kFALSE;
+    fHitParams->Add(tch);
+}
+
+void R3BBunchedFiberHitPar::PrintModuleParams(Int_t fiber)
+{
+    R3BBunchedFiberHitModulePar* par = GetModuleParAt(fiber);
+    if (NULL != par)
+    {
+        par->printParams();
+    }
+}
+
+void R3BBunchedFiberHitPar::DrawModuleParams(Int_t fiber)
+{
+    R3BBunchedFiberHitModulePar* par = GetModuleParAt(fiber);
+    if (NULL != par)
+    {
+        par->DrawParams();
+    }
+}

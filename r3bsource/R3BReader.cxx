@@ -1,8 +1,8 @@
 #include "R3BReader.h"
 
-R3BReader::R3BReader(const char *name)
+R3BReader::R3BReader(TString const & a_name)
 	: TObject()
-	, fName(name)
+	, fName(a_name)
 {}
 
 R3BReader::~R3BReader() {}

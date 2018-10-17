@@ -26,14 +26,14 @@ enum DetectorId
     kSTARTRACK,
     kLUMON,
     kNEULAND,
-    kACTAR,
-    kFI3A,
-    kFI3B,
+//    kACTAR,
+    kFI3a,
+    kFI3b,
     kFI4,
     kFI6,
-    kFI5,
     kFI7,
     kFI8,
+    kFI5,
     kFI10,
     kFI11,
     kSFI,
@@ -51,9 +51,7 @@ enum DetectorId
 #endif
     kLAST
 };
-
 /** Unique identifier for all R3B Point and Hit types **/
-
 enum fDetectorType
 {
     kUnknown,
@@ -72,13 +70,13 @@ enum fDetectorType
     kStartrackPoint,
     kLuMonPoint,
     kNeulandPoint,
-    kFI3APoint,
-    kFI3BPoint,
+    kFI3aPoint,
+    kFI3bPoint,
     kFI4Point,
     kFI6Point,
-    kFI5Point,
     kFI7Point,
     kFI8Point,
+    kFI5Point,
     kFI10Point,
     kFI11Point,
     kSFIPoint

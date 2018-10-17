@@ -7,5 +7,9 @@
 #pragma link C++ class R3BBunchedFiberCal2Hit+;
 #pragma link C++ class R3BBunchedFiberMapped2CalPar+;
 #pragma link C++ class R3BBunchedFiberMapped2Cal+;
+#pragma link C++ class R3BBunchedFiberHitModulePar+;
+#pragma link C++ class R3BBunchedFiberHitPar+;
+#pragma link C++ class R3BFiberContFact+;
+
 
 #endif

@@ -8,12 +8,13 @@
 #ifndef R3BTOFDCAL2HIT
 #define R3BTOFDCAL2HIT
 
-#define N_TOFD_HIT_PLANE_MAX 100
-#define N_TOFD_HIT_PADDLE_MAX 100
+#define N_TOFD_HIT_PLANE_MAX 4
+#define N_TOFD_HIT_PADDLE_MAX 44
 
 #include <map>
 
 #include "FairTask.h"
+#include "THnSparse.h"
 
 class TClonesArray;
 class R3BTofdHitModulePar;
@@ -98,6 +99,10 @@ class R3BTofdCal2Hit : public FairTask
      */
     virtual Double_t walk(Double_t Q);
 
+    /**
+     * Method for beta correction.
+     */
+    virtual Double_t betaCorr(Double_t delta);
 
     /**
      * Method for calculation of saturation.
@@ -116,56 +121,56 @@ class R3BTofdCal2Hit : public FairTask
     TClonesArray* fCalItems; /**< Array with Cal items - input data. */
     TClonesArray* fHitItems; /**< Array with Hit items - output data. */
     TClonesArray* fCalItemsLos;                    /**< Array with cal items. */
+    TClonesArray* fHitItemsLos;                    /**< Array with cal items. */
     UInt_t fNofHitItems;     /**< Number of hit items for cur event. */
     R3BTofdHitPar* fHitPar;                       /**< Hit parameter container. */
     UInt_t fNofHitPars;                        /**< Number of modules in parameter file. */
     Double_t fClockFreq;     /**< Clock cycle in [ns]. */
     Int_t fTrigger;                             /**< Trigger value. */
     Double_t fTofdQ;
+    UInt_t fnEvents;
     UInt_t fNofPlanes;  
     UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */    
 
 // arrays of control histograms
-    TH1F* fhPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX]; 
-    TH1F* fhTotPm1[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX]; 
-    TH1F* fhTotPm2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX]; 
-    TH1F* fhTotPm1Sat[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX]; 
-    TH1F* fhTotPm2Sat[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];     
-    TH1F* fhQPm1[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX]; 
-    TH1F* fhQPm2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX]; 
-    TH1F* fhQ[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
     TH2F* fhQ1vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
     TH2F* fhQ2vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
     TH2F* fhQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
-    TH2F* fhTotPm1vsTotPm2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
-    TH2F* fhTotPm1satvsTotPm2sat[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
-    TH2F* fhTdiffvsQ[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
-    TH2F* fhTot1vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
-    TH2F* fhTot2vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
-    TH2F* fhQvsQ[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
+    TH2F* fhTdiffvsQ[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX*2+1];   
+//	THnSparse* fhQvsQ[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX*2+1]; 
+    TH2F* fhQvsQ[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX*2+1];   
     TH2F* fhQvsTof[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
     TH2F* fhSqrtQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
     
+    TH2F* fhQPm1[N_TOFD_HIT_PLANE_MAX]; 
+    TH2F* fhQPm2[N_TOFD_HIT_PLANE_MAX]; 
+    TH2F* fhQ[N_TOFD_HIT_PLANE_MAX];   
+
+/*
+    TH2F* fhTotPm1vsTotPm2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
+    TH2F* fhTotPm1satvsTotPm2sat[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
+    TH2F* fhTot1vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
+    TH2F* fhTot2vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
+    TH2F* fhPos[N_TOFD_HIT_PLANE_MAX]; 
+    TH2F* fhTotPm1[N_TOFD_HIT_PLANE_MAX]; 
+    TH2F* fhTotPm2[N_TOFD_HIT_PLANE_MAX]; 
+    TH2F* fhTotPm1Sat[N_TOFD_HIT_PLANE_MAX]; 
+    TH2F* fhTotPm2Sat[N_TOFD_HIT_PLANE_MAX];     
+*/
+
     TH2F* fhxy;   
-    TH1F* fhCharge3mm; 
-    TH1F* fhCharge5mm; 
     TH1F* fhCharge; 
-    TH2F* fhSaturation1;     
-    TH2F* fhSaturation2;
-    TH1F* fhLosTimeM;     
-    TH1F* fhLosTimeP;
-    TH1F* fhLosTimeP_corr;
-    TH2F* fhLosTimeP_vs_TimeM;
-    TH2F* fhLosTimeP_vs_TimeM_corr;
-    TH1F* fhLosQ1;
-    TH1F* fhLosQ2;
-    TH2F* fhLosQ;
-    TH2F* fhLosQ_corr;
-    TH2F* fhLosQvsTP;
-    TH2F* fhLosQvsTP_corr;
-    TH2F* fhLosQvsTM;
-    TH2F* fhLosQvsX;
-    TH2F* fhLosQvsY;
+    TH2F* fhChargevsTof;
+    TH2F* fhChargevsPos;
+	TH2F* fhQp12;
+	TH2F* fhQp34;
+	
+    
+//    TH2F* fhSaturation1;     
+//    TH2F* fhSaturation2;
+
+	TH2F* fhChargeLosTofD;
+
     TH2F* fhLosXYP;
     TH2F* fh_los_pos;
     

@@ -14,6 +14,7 @@ ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
 ${R3BROOT_SOURCE_DIR}/tcal
+${R3BROOT_SOURCE_DIR}/tracking
 )
 
 include_directories(${INCLUDE_DIRECTORIES})
@@ -29,6 +30,8 @@ link_directories(${LINK_DIRECTORIES})
 set(SRCS
 R3BFi3bCal2Hit.cxx
 R3BFi3bMapped2Cal.cxx
+R3BFi3b.cxx  
+R3BFi3bContFact.cxx
 )
 
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
@@ -36,6 +39,6 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF Fi3bLinkDef.h)
 Set(LIBRARY_NAME R3BFi3b)
 Set(DEPENDENCIES
-    R3BBunchedFiber)
+    R3BBunchedFiber R3BTracking R3BData)
 
 GENERATE_LIBRARY()

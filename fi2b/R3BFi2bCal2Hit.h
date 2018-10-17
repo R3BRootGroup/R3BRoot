@@ -6,7 +6,7 @@
 class R3BFi2bCal2Hit: public R3BBunchedFiberCal2Hit
 {
   public:
-    R3BFi2bCal2Hit(Direction, Int_t = 1);
+    R3BFi2bCal2Hit(Direction, Bool_t, Int_t = 1);
     virtual ~R3BFi2bCal2Hit();
     UInt_t FixMistake(UInt_t);
 

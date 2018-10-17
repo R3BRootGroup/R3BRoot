@@ -850,19 +850,19 @@ void R3BLosCal2Hit::Exec(Option_t* option)
      // min,max,Nbins for time spectra  
        Double_t fhTmin = -20.; //-5.; //-10
        Double_t fhTmax = 20.; //5.;  // 10
-       Int_t    fhTbin = 2000; //10000; // 20000
+       Int_t    fhTbin = 200; //10000; // 20000
      // min,max,Nbins for ToT spectra        
        Double_t fhQmin = 0.;
        Double_t fhQmax = 200; //300.; //150
-       Int_t    fhQbin = 4000; //0; //3000; //1500
+       Int_t    fhQbin = 400; //0; //3000; //1500
      // min,max,Nbins for X and Y spectra
        Double_t fhXmin = -5.; //-5
        Double_t fhXmax = 5.; // 5
-       Int_t    fhXbin = 2000; // 1000
+       Int_t    fhXbin = 200; // 1000
       // min,max,Nbins for radius spectra
        Double_t fhRmin = -2.;//0.;
        Double_t fhRmax = 2.;//10.;
-       Int_t    fhRbin = 1000;
+       Int_t    fhRbin = 100;
        
           if (NULL == fhTres_M )
           {
@@ -2951,6 +2951,7 @@ void R3BLosCal2Hit::FinishEvent()
 
 void R3BLosCal2Hit::FinishTask()
 {
+	if(1==0){
 	if(fhTres_M) fhTres_M->Write() ;
 	if(fhTres_T) fhTres_T->Write() ;	
 	if(fhTres_M_oddCh) fhTres_M_oddCh->Write() ;
@@ -2983,9 +2984,9 @@ void R3BLosCal2Hit::FinishTask()
 	if(fhTresY_M) fhTresY_M->Write() ;
 	if(fhTresX_T) fhTresX_T->Write() ;
 	if(fhTresY_T) fhTresY_T->Write() ;	
-	
+	}
 			
-	if(1 == 1){					
+	if(1 == 0){					
 	if(fhTres_T_corr) fhTres_T_corr->Write() ;	
 	if(fhTres_M_corr) fhTres_M_corr->Write() ;
 	if(fhTres_MT_corr) fhTres_MT_corr->Write();

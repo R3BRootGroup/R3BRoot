@@ -15,6 +15,7 @@ class TClonesArray;
 class R3BTCalPar;
 class R3BTofdMappedData;
 class R3BTofdCalData;
+class R3BEventHeader;
 
 /**
  * An analysis task to apply TCAL calibration for NeuLAND.
@@ -90,7 +91,10 @@ class R3BTofdMapped2Cal : public FairTask
      * Method for setting the trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
-    void SetTrigger(Int_t);
+    inline void SetTrigger(Int_t trigger)
+    {
+        fTrigger = trigger;
+    }
 
     /**
      * Method for setting the number of NeuLAND modules.
@@ -112,6 +116,10 @@ class R3BTofdMapped2Cal : public FairTask
     UInt_t fNofPlanes;  
     UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */    
     Double_t fClockFreq;     /**< Clock cycle in [ns]. */
+
+	// check for trigger should be done globablly (somewhere else)
+    R3BEventHeader* header;                     /**< Event header. */
+    Int_t fTrigger;                             /**< Trigger value. */
 
     // Fast lookup for matching mapped data.
     std::vector<std::vector<R3BTofdCalData *>> fCalLookup;

@@ -182,7 +182,7 @@ void R3BLosMapped2CalPar::Exec(Option_t* option)
          
          Icount[iChannel][iType]++;
                 
-    //   cout<<"Mapped2CalPar "<< iDetector<<", "<<iType<<", "<<  hit->GetTimeFine()<<endl;    
+       //cout<<"Mapped2CalPar "<< iDetector<<", "<<iType<<", "<<  hit->GetTimeFine()<<endl;    
         fEngine->Fill(iDetector+1, iChannel + 1, iType + 1, hit->GetTimeFine());
                       
               

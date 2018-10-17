@@ -7,7 +7,7 @@
 #include "FairRun.h"
 #include "FairRuntimeDb.h"
 #include "FairVolume.h"
-#include "R3BFi4Point.h"
+#include "R3BFibPoint.h"
 //#include "R3BGeoFi6.h"
 #include "R3BMCStack.h"
 #include "TClonesArray.h"
@@ -41,7 +41,7 @@ R3BFi6::R3BFi6(const TString& geoFile, const TGeoTranslation& trans, const TGeoR
 
 R3BFi6::R3BFi6(const TString& geoFile, const TGeoCombiTrans& combi)
     : R3BDetector("R3BFI6", kFI6, geoFile, combi)
-    , fFi6Collection(new TClonesArray("R3BFi4Point"))
+    , fFi6Collection(new TClonesArray("R3BFibPoint"))
     , fPosIndex(0)
     , kGeoSaved(kFALSE)
     , flGeoPar(new TList())
@@ -259,20 +259,20 @@ void R3BFi6::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
     Int_t nEntries = cl1->GetEntriesFast();
     LOG(INFO) << "R3BFi6: " << nEntries << " entries to add" << FairLogger::endl;
     TClonesArray& clref = *cl2;
-    R3BFi4Point* oldpoint = NULL;
+    R3BFibPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
     {
-        oldpoint = (R3BFi4Point*)cl1->At(i);
+        oldpoint = (R3BFibPoint*)cl1->At(i);
         Int_t index = oldpoint->GetTrackID() + offset;
         oldpoint->SetTrackID(index);
-        new (clref[fPosIndex]) R3BFi4Point(*oldpoint);
+        new (clref[fPosIndex]) R3BFibPoint(*oldpoint);
         fPosIndex++;
     }
     LOG(INFO) << "R3BFi6: " << cl2->GetEntriesFast() << " merged entries" << FairLogger::endl;
 }
 
 // -----   Private method AddHit   --------------------------------------------
-R3BFi4Point* R3BFi6::AddHit(Int_t trackID,
+R3BFibPoint* R3BFi6::AddHit(Int_t trackID,
                             Int_t detID,
                             Int_t plane,
                             TVector3 posIn,
@@ -291,7 +291,7 @@ R3BFi4Point* R3BFi6::AddHit(Int_t trackID,
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV"
                   << FairLogger::endl;
     }
-    return new (clref[size]) R3BFi4Point(trackID, detID, plane, posIn, posOut, momIn, momOut, time, length, eLoss);
+    return new (clref[size]) R3BFibPoint(trackID, detID, plane, posIn, posOut, momIn, momOut, time, length, eLoss);
 }
 
 Bool_t R3BFi6::CheckIfSensitive(std::string name)

@@ -8,8 +8,8 @@ R3BBunchedFiberReader::R3BBunchedFiberReader(char const *a_name, UInt_t
     a_offset, UInt_t a_sub_num, UInt_t a_mapmt_channel_num, UInt_t
     a_spmt_channel_num)
   : R3BReader(TString("R3B") + a_name + "Reader")
-  , fName(a_name)
   , fOffset(a_offset)
+  , fShortName(a_name)
   , fMappedArray(new TClonesArray("R3BBunchedFiberMappedData"))
 {
   fChannelNum[0] = a_sub_num * a_mapmt_channel_num;
@@ -34,7 +34,7 @@ Bool_t R3BBunchedFiberReader::Init()
       break;
     }
   }
-  FairRootManager::Instance()->Register(fName + "Mapped", "Land",
+  FairRootManager::Instance()->Register(fShortName + "Mapped", "Land",
       fMappedArray, kTRUE);
   return kTRUE;
 }
@@ -99,6 +99,53 @@ Bool_t R3BBunchedFiberReader::Read()
       break;
     }
   }
+
+// HTT HAXX!!!
+if (0) {
+  auto const &spmt_lead = fMHL[1][0][0];
+  auto const &spmt_trail = fMHL[1][1][0];
+  size_t li = 0, ti = 0;
+  size_t lj = 0, tj = 0;
+  bool has_header = false;
+  for (;;) {
+    if (li >= *spmt_lead._M || ti >= *spmt_trail._M) {
+      break;
+    }
+    size_t lc = spmt_lead._MI[li];
+    size_t tc = spmt_trail._MI[ti];
+    if (lc < tc) {
+      lj = spmt_lead._ME[li];
+      ++li;
+      continue;
+    }
+    if (lc > tc) {
+      tj = spmt_trail._ME[ti];
+      ++ti;
+      continue;
+    }
+    for (;;) {
+      if (lj >= spmt_lead._ME[li] || tj >= spmt_trail._ME[ti]) {
+        break;
+      }
+      auto d = 0xfff & (spmt_trail._v[tj] - spmt_lead._v[lj] + 0x1000);
+      if (d > 0x7ff) {
+        ++tj;
+        continue;
+      } else if (d > 2) {
+        if (!has_header) {
+          std::cout << "Event\n";
+          has_header = true;
+        }
+        std::cout << lc << ": " << d << '\n';
+      }
+      ++lj;
+      ++tj;
+    }
+    ++li;
+    ++ti;
+  }
+}
+
   //LOG(ERROR) << "R3BBunchedFiberReader::Read END" << FairLogger::endl;
   return kTRUE;
 }

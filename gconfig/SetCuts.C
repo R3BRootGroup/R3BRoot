@@ -11,7 +11,7 @@ void SetCuts()
   gMC->SetProcess("COMP",1); // Compton scattering
   gMC->SetProcess("PHOT",1); // Photo effect
   gMC->SetProcess("PFIS",0); // Photo fission
-  gMC->SetProcess("DRAY",0); // Delta rays
+  gMC->SetProcess("DRAY",1); // Delta rays
   gMC->SetProcess("ANNI",1); // Positron annihilation
   gMC->SetProcess("BREM",1); // Bremstrahlung
   gMC->SetProcess("MUNU",1); // Muon nuclear interactions

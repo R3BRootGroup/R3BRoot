@@ -38,6 +38,7 @@ R3BPassiveContFact.cxx
 R3BPipe.cxx
 R3BVacVesselCool.cxx
 R3BTarget.cxx
+R3BCollimator.cxx
 )
 
 # fill list of header files from list of source files

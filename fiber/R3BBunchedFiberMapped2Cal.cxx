@@ -99,7 +99,7 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t *option)
 	fMAPMTTCalPar->GetModuleParAt(1, tcal_channel_i, 1) :
 	fSPMTTCalPar->GetModuleParAt(1, tcal_channel_i, 1);
     if (!par) {
-      LOG(WARNING) << "R3BBunchedFiberMapped2Cal::Exec:Channel=" << channel <<
+      LOG(WARNING) << "R3BBunchedFiberMapped2Cal::Exec (" << fName << "): Channel=" << channel <<
           ": TCal par not found." << FairLogger::endl;
       continue;
     }
@@ -119,7 +119,7 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t *option)
 	if(mapped->IsMAPMT()){
 		if (fine_ns < 0. || fine_ns >= fClockFreq) {
 			LOG(ERROR) << 
-			"R3BBunchedFiberMapped2Cal::Exec:Channel=" << channel <<
+			"R3BBunchedFiberMapped2Cal::Exec (" << fName << "): Channel=" << channel <<
 			": Bad CTDC fine time (raw=" << fine_raw << ",ns=" << fine_ns << ")." << FairLogger::endl;
 			continue;
 		}
@@ -127,13 +127,13 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t *option)
 		// Calculate final time with clock cycles.
 		time_ns = mapped->GetCoarse() * fClockFreq +
 		(mapped->IsLeading() ? -fine_ns : fine_ns);
-		LOG(DEBUG) << " R3BBunchedFiberMapped2Cal::Exec:Channel=" << channel << ": Time=" <<
+		LOG(DEBUG) << " R3BBunchedFiberMapped2Cal::Exec (" << fName << "): Channel=" << channel << ": Time=" <<
         time_ns  << "ns." << FairLogger::endl;
 	}
 	else{
 		if (fine_ns < 0. || fine_ns >= fTamexFreq) {
 			LOG(ERROR) << 
-			"R3BBunchedFiberMapped2Cal::Exec:Channel=" << channel <<
+			"R3BBunchedFiberMapped2Cal::Exec (" << fName << "): Channel=" << channel <<
 			": Bad Tamex fine time (raw=" << fine_raw << ",ns=" << fine_ns << ")." << FairLogger::endl;
 			continue;
 		}

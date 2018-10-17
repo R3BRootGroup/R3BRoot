@@ -6,4 +6,7 @@
 
 #pragma link C++ class R3BFi7Cal2Hit+;
 #pragma link C++ class R3BFi7Mapped2Cal+;
+#pragma link C++ class R3BFi7+;
+#pragma link C++ class R3BFi7Digitizer+;
+#pragma link C++ class R3BFi7ContFact;
 #endif

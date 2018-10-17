@@ -8,6 +8,7 @@
 #pragma link C++ class R3BAladinMagnet+;
 #pragma link C++ class R3BGladMagnet+;
 #pragma link C++ class R3BTarget+;
+#pragma link C++ class R3BCollimator+;
 #pragma link C++ class R3BPipe+;
 #pragma link C++ class R3BVacVesselCool+;
 #pragma link C++ class R3BCave+;

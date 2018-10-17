@@ -27,6 +27,10 @@ set(SRCS
 R3BBunchedFiberMapped2CalPar.cxx
 R3BBunchedFiberMapped2Cal.cxx
 R3BBunchedFiberCal2Hit.cxx
+R3BBunchedFiberHitModulePar.cxx
+R3BBunchedFiberHitPar.cxx
+R3BFiberContFact.cxx
+
 )
 
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
@@ -34,6 +38,6 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF BunchedFiberLinkDef.h)
 Set(LIBRARY_NAME R3BBunchedFiber)
 set(DEPENDENCIES
-    R3Bbase R3BPassive R3BData R3BTCal)
+     R3BPassive R3BData R3BTCal)
 
 GENERATE_LIBRARY()

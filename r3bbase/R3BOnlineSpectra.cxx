@@ -60,131 +60,33 @@
 using namespace std;
 
 R3BOnlineSpectra::R3BOnlineSpectra()
-    : FairTask("OnlineSpectra", 1)
-    , fCalItemsLos(NULL)
-    , fCalItemsSci8(NULL)
-    , fCalItemsTofd(NULL)
-    , fCalItemsPspx(NULL)
-    , fCalItemsPtof(NULL)
-    , fPrecalItemsPspx(NULL)
-    , fHitItemsFi0(NULL)
-    , fHitItemsFi1a(NULL)
-    , fHitItemsFi1b(NULL)
-    , fHitItemsFi2a(NULL)
-    , fHitItemsFi2b(NULL)
-    , fHitItemsFi3a(NULL)
-    , fHitItemsFi3b(NULL)
-    , fHitItemsFi4(NULL)
-    , fHitItemsFi5(NULL)
-    , fHitItemsFi6(NULL)
-    , fHitItemsFi7(NULL)
-    , fHitItemsFi8(NULL)
-    , fHitItemsFi9(NULL)
-    , fHitItemsFi10(NULL)
-    , fHitItemsFi11(NULL)
-    , fHitItemsPspx(NULL)
-    , fMappedItemsLos(NULL)
-    , fMappedItemsSci8(NULL)
-    , fMappedItemsTofd(NULL)
-    , fMappedItemsPspx(NULL)
-    , fMappedItemsFi0(NULL)
-    , fMappedItemsFi1a(NULL)
-    , fMappedItemsFi1b(NULL)
-    , fMappedItemsFi2a(NULL)
-    , fMappedItemsFi2b(NULL)
-    , fMappedItemsFi3a(NULL)
-    , fMappedItemsFi3b(NULL)
-    , fMappedItemsFi4(NULL)
-    , fMappedItemsFi5(NULL)
-    , fMappedItemsFi6(NULL)
-    , fMappedItemsFi7(NULL)
-    , fMappedItemsFi8(NULL)
-    , fMappedItemsFi9(NULL)
-    , fMappedItemsFi10(NULL)
-    , fMappedItemsFi11(NULL)
-    , fTrigger(-1)
-    , fNofPlanes(4)
-    , fPaddlesPerPlane(6)
-    , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
-    , fNEvents(0)
-    , fNEvents1(0)
-{
-}
+    : R3BOnlineSpectra("OnlineSpectra", 1)
+{}
 
 R3BOnlineSpectra::R3BOnlineSpectra(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fCalItemsLos(NULL)
-    , fCalItemsSci8(NULL)
-    , fCalItemsTofd(NULL)
-    , fCalItemsPspx(NULL)
-    , fCalItemsPtof(NULL)
-    , fPrecalItemsPspx(NULL)
-    , fHitItemsFi0(NULL)
-    , fHitItemsFi1a(NULL)
-    , fHitItemsFi1b(NULL)
-    , fHitItemsFi2a(NULL)
-    , fHitItemsFi2b(NULL)
-    , fHitItemsFi3a(NULL)
-    , fHitItemsFi3b(NULL)
-    , fHitItemsFi4(NULL)
-    , fHitItemsFi5(NULL)
-    , fHitItemsFi6(NULL)
-    , fHitItemsFi7(NULL)
-    , fHitItemsFi8(NULL)
-    , fHitItemsFi9(NULL)
-    , fHitItemsFi10(NULL)
-    , fHitItemsFi11(NULL)
-    , fHitItemsPspx(NULL)
-    , fMappedItemsLos(NULL)
-    , fMappedItemsSci8(NULL)
-    , fMappedItemsTofd(NULL)
-    , fMappedItemsPspx(NULL)
-    , fMappedItemsFi0(NULL)
-    , fMappedItemsFi1a(NULL)
-    , fMappedItemsFi1b(NULL)
-    , fMappedItemsFi2a(NULL)
-    , fMappedItemsFi2b(NULL)
-    , fMappedItemsFi3a(NULL)
-    , fMappedItemsFi3b(NULL)
-    , fMappedItemsFi4(NULL)
-    , fMappedItemsFi5(NULL)
-    , fMappedItemsFi6(NULL)
-    , fMappedItemsFi7(NULL)
-    , fMappedItemsFi8(NULL)
-    , fMappedItemsFi9(NULL)
-    , fMappedItemsFi10(NULL)
-    , fMappedItemsFi11(NULL)
     , fTrigger(-1)
-    , fNofPlanes(4)
-    , fPaddlesPerPlane(6)
+    , fNofPlanes(N_PLANE_MAX_TOFD)  
+    , fPaddlesPerPlane(N_PADDLE_MAX_TOFD) 
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvents(0)
-    , fNEvents1(0)
 {
 }
 
 R3BOnlineSpectra::~R3BOnlineSpectra()
 {
-    for (int i = 0; i < 14; i++)
-    {
-        if (fh_channels_Fib[i])
-            delete (fh_channels_Fib[i]);
-        if (fh_fibers_Fib[i])
-            delete (fh_fibers_Fib[i]);
-        if (fh_mult_Fib[i])
-            delete (fh_mult_Fib[i]);
-        if (fh_time_Fib[i])
-            delete (fh_time_Fib[i]);
-        if (fh_multihit_m_Fib[i])
-            delete (fh_multihit_m_Fib[i]);
-        if (fh_multihit_s_Fib[i])
-            delete (fh_multihit_s_Fib[i]);
-        if (fh_ToT_m_Fib[i])
-            delete (fh_ToT_m_Fib[i]);
-        if (fh_ToT_s_Fib[i])
-            delete (fh_ToT_s_Fib[i]);
-    }
+   for(int i = 0; i < NOF_FIB_DET; i++) {	
+     delete fh_channels_Fib[i];
+     delete fh_fibers_Fib[i];
+     delete fh_mult_Fib[i];
+     delete fh_time_Fib[i];
+     delete fh_multihit_m_Fib[i];   
+     delete fh_multihit_s_Fib[i];
+     delete fh_ToT_m_Fib[i];
+     delete fh_ToT_s_Fib[i];
+   } 
 }
+
 
 InitStatus R3BOnlineSpectra::Init()
 {
@@ -205,17 +107,32 @@ InitStatus R3BOnlineSpectra::Init()
 
 	run->GetHttpServer()->Register("/Tasks", this);
 
+
+        // Get objects for detectors on all levels
+        assert(DET_MAX + 1 == sizeof(fDetectorNames)/sizeof(fDetectorNames[0]));
+        printf("Have %d fiber detectors.\n", NOF_FIB_DET);
+        for (int det = 0; det < DET_MAX; det++)
+        {
+                fMappedItems.push_back((TClonesArray *)mgr->GetObject(Form("%sMapped", fDetectorNames[det])));
+                if (NULL == fMappedItems.at(det)) {
+                  printf("Could not find mapped data for '%s'.\n", fDetectorNames[det]);
+                }
+                fCalItems.push_back((TClonesArray *)mgr->GetObject(Form("%sCal", fDetectorNames[det])));
+                fHitItems.push_back((TClonesArray *)mgr->GetObject(Form("%sHit", fDetectorNames[det])));
+        }
+
+
+
+	//------------------------------------------------------------------------ 
 	// create histograms of all detectors  
+	//------------------------------------------------------------------------ 
+
+
 
 	//------------------------------------------------------------------------ 
 	// Sci8 detector
-	// get access to Mapped data
-	fMappedItemsSci8 = (TClonesArray*)mgr->GetObject("Sci8Mapped");
-	// get access to cal data
-	fCalItemsSci8 = (TClonesArray*)mgr->GetObject("Sci8Cal");
 
-
-	if(fMappedItemsSci8){
+	if(fMappedItems.at(DET_SCI8)){
 		TCanvas *cSci8 = new TCanvas("Sci8", "SCI8", 10, 10, 850, 850);
 
 		fh_sci8_channels = new TH1F("sci8_channels", "SCI8 channels", 4, 0., 4.); 
@@ -237,7 +154,7 @@ InitStatus R3BOnlineSpectra::Init()
 		fh_sci8_dt_hits_l->GetXaxis()->SetTitle("dt_LEAD between two hits / ns");
 		fh_sci8_dt_hits_t = new TH1F("sci8_dt_hits_t", "SCI8 dt multihits trailing",40000,-2000,2000);
 		fh_sci8_dt_hits_t->GetXaxis()->SetTitle("dt_TRAIL between two hits / ns");
-		fh_sci8_tres_MCFD = new TH1F("sci8_time_res_MCFD", "SCI8 MCFD Time resolution - raw", 8000, -4., 4.);
+		fh_sci8_tres_MCFD = new TH1F("sci8_time_res_MCFD", "SCI8 MCFD Time resolution - raw", 30000, 0., 300.);
 		fh_sci8_tres_MCFD->GetXaxis()->SetTitle("Time MCFD / ns");
 		fh_sci8_tres_TAMEX = new TH1F("sci8_time_res_TAMEX", "SCI8 TAMEX Time resolution -raw ", 8000, -4., 4.);  
 		fh_sci8_tres_TAMEX->GetXaxis()->SetTitle("Time TAMEX / ns"); 
@@ -293,15 +210,9 @@ InitStatus R3BOnlineSpectra::Init()
 
 	//------------------------------------------------------------------------ 
 	// Los detector
-	// get access to Mapped data
-	fMappedItemsLos = (TClonesArray*)mgr->GetObject("LosMapped");
-	// get access to cal data
-	fCalItemsLos = (TClonesArray*)mgr->GetObject("LosCal");
 
-
-	if(fMappedItemsLos){
+	if(fMappedItems.at(DET_LOS)){
 		TCanvas *cLos = new TCanvas("Los", "LOS", 10, 10, 750, 850);
-
 
 		fh_los_channels = new TH1F("los_channels", "LOS channels", 10, 0., 10.); 
 		fh_los_channels->GetXaxis()->SetTitle("Channel number");
@@ -322,6 +233,15 @@ InitStatus R3BOnlineSpectra::Init()
 		fh_los_dt_hits_l->GetXaxis()->SetTitle("dt_LEAD between two hits / ns");
 		fh_los_dt_hits_t = new TH1F("los_dt_hits_t", "LOS dt multihits trailing",40000,-2000,2000);
 		fh_los_dt_hits_t->GetXaxis()->SetTitle("dt_TRAIL between two hits / ns");
+
+        fh_los_pos_MCFD = new TH2F("los_pos_MCFD", "LOS MCFD Position emp. cal.", 4000, -10., 10.,4000, -10., 10.);
+		fh_los_pos_MCFD->GetXaxis()->SetTitle("X position / cm");
+		fh_los_pos_MCFD->GetYaxis()->SetTitle("Y position / cm"); 
+		fh_los_pos_TAMEX = new TH2F("los_pos_TAMEX", "LOS TAMEX Position emp. cal.", 4000, -10., 10.,4000, -10., 10.);
+		fh_los_pos_TAMEX->GetXaxis()->SetTitle("X position / cm");
+		fh_los_pos_TAMEX->GetYaxis()->SetTitle("Y position / cm"); 
+
+
 		fh_los_tres_MCFD = new TH1F("los_time_res_MCFD", "LOS MCFD Time resolution - raw", 8000, -4., 4.);
 		fh_los_tres_MCFD->GetXaxis()->SetTitle("Time MCFD / ns");
 		fh_los_tres_TAMEX = new TH1F("los_time_res_TAMEX", "LOS TAMEX Time resolution -raw ", 8000, -4., 4.);  
@@ -333,7 +253,7 @@ InitStatus R3BOnlineSpectra::Init()
 		fh_los_tot_mean->GetYaxis()->SetTitle("Counts");
 		fh_los_tot_mean->GetXaxis()->SetTitle("ToT / ns");
 
-		cLos->Divide(2,3);
+		cLos->Divide(3,3);
 		cLos->cd(1);
 		fh_los_channels->Draw();		
 		cLos->cd(2);gPad->SetLogy();
@@ -346,24 +266,28 @@ InitStatus R3BOnlineSpectra::Init()
 		fh_los_tres_MCFD->Draw();
 		cLos->cd(6);
 		fh_los_tres_TAMEX->Draw();		
+		cLos->cd(7);gPad->SetLogz();
+		fh_los_pos_MCFD->Draw("colz");
+		cLos->cd(8);gPad->SetLogz();
+		fh_los_pos_TAMEX->Draw("colz");	
 		cLos->cd(0);
 		run->AddObject(cLos);
 
 		run->GetHttpServer()->RegisterCommand("Reset_LOS", Form("/Tasks/%s/->Reset_LOS_Histo()", GetName()));
 
 		TCanvas *cLos1 = new TCanvas("Los_additional", "LOS-additional", 10, 10, 850, 950);
-		cLos1->Divide(3, 4);
-		cLos1->cd(4);		
+		cLos1->Divide(2, 3);
+		cLos1->cd(1);		
 		fh_los_dt_hits->Draw();	
-		cLos1->cd(5);		
+		cLos1->cd(2);		
 		fh_los_dt_hits_l->Draw();	
-		cLos1->cd(6);		
+		cLos1->cd(3);		
 		fh_los_dt_hits_t->Draw();				
-		cLos1->cd(7);gPad->SetLogz();
+		cLos1->cd(4);gPad->SetLogz();
 		fh_los_multihitVFTX->Draw("colz");		
-		cLos1->cd(8);gPad->SetLogz();
+		cLos1->cd(5);gPad->SetLogz();
 		fh_los_multihitLEAD->Draw("colz");		
-		cLos1->cd(9);gPad->SetLogz();
+		cLos1->cd(6);gPad->SetLogz();
 		fh_los_multihitTRAI->Draw("colz");		
 		cLos1->cd(0);
 
@@ -371,102 +295,45 @@ InitStatus R3BOnlineSpectra::Init()
 
 
 	//-----------------------------------------------------------------------
-	// Fiber Detectors 1-14
-
-	// First see if a given FiberI is present (there is probably a better way to do it):
-	fMappedItemsFi1a = (TClonesArray*)mgr->GetObject("Fi1aMapped");
-	if(fMappedItemsFi1a) FibPresent[0] = true;
-	fMappedItemsFi1b = (TClonesArray*)mgr->GetObject("Fi1bMapped");
-	if(fMappedItemsFi1b) FibPresent[1] = true;
-	fMappedItemsFi2a = (TClonesArray*)mgr->GetObject("Fi2aMapped");
-	if(fMappedItemsFi2a) FibPresent[2] = true;  
-	fMappedItemsFi2b = (TClonesArray*)mgr->GetObject("Fi2bMapped");
-	if(fMappedItemsFi2b) FibPresent[3] = true;      
-	fMappedItemsFi3a = (TClonesArray*)mgr->GetObject("Fi3aMapped");
-	if(fMappedItemsFi3a) FibPresent[4] = true;      
-	fMappedItemsFi3b = (TClonesArray*)mgr->GetObject("Fi3bMapped");
-	if(fMappedItemsFi3b) FibPresent[5] = true;      
-	fMappedItemsFi4 = (TClonesArray*)mgr->GetObject("Fi4Mapped");
-	if(fMappedItemsFi4) FibPresent[6] = true;      
-	fMappedItemsFi5 = (TClonesArray*)mgr->GetObject("Fi5Mapped");
-	if(fMappedItemsFi5) FibPresent[7] = true;     
-	fMappedItemsFi6 = (TClonesArray*)mgr->GetObject("Fi6Mapped");
-	if(fMappedItemsFi6) FibPresent[8] = true;      
-	fMappedItemsFi7 = (TClonesArray*)mgr->GetObject("Fi7Mapped");
-	if(fMappedItemsFi7) FibPresent[9] = true;      
-	fMappedItemsFi8 = (TClonesArray*)mgr->GetObject("Fi8Mapped");
-	if(fMappedItemsFi8) FibPresent[10] = true;     
-	fMappedItemsFi9 = (TClonesArray*)mgr->GetObject("Fi9Mapped");
-	if(fMappedItemsFi9) FibPresent[11] = true;      
-	fMappedItemsFi10 = (TClonesArray*)mgr->GetObject("Fi10Mapped");
-	if(fMappedItemsFi10) FibPresent[12] = true;      
-	fMappedItemsFi11 = (TClonesArray*)mgr->GetObject("Fi11Mapped");
-	if(fMappedItemsFi11) FibPresent[13] = true; 
+	// Fiber Detectors 1-NOF_FIB_DET
 
 	char canvName[255];
-	TCanvas *FibCanvas[14];
+	TCanvas *FibCanvas[NOF_FIB_DET];
 
-	for(Int_t ifibcount = 0; ifibcount < 14; ifibcount++){
+	for(Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++){
 
 		std::stringstream fibhitobj;
 		std::stringstream fibmapobj;
 		std::stringstream FiName;   
 		std::string temp;	  
 
-		std::stringstream histName1,histName2,histName3,histName4,histName5,histName6,histName7,histName8,histName9,histName10,histName11,histName12;
-		std::stringstream histTitle1,histTitle2,histTitle3,histTitle4,histTitle5,histTitle6,histTitle7,histTitle8,histTitle9,histTitle10,histTitle11,histTitle12;	   	    	 
+		std::stringstream histName1,histName2,histName3,histName4,histName5,histName6,
+                  histName7,histName8,histName9,histName10,histName11,histName12,histName13;
+		std::stringstream histTitle1,histTitle2,histTitle3,histTitle4,histTitle5,histTitle6,
+                  histTitle7,histTitle8,histTitle9,histTitle10,histTitle11,histTitle12,histTitle13;	   	    	 
 
-		if(FibPresent[ifibcount]){
-			if(ifibcount < 6){
-				if(ifibcount == 0 || ifibcount ==1) ifibdet = 1; 
-				if(ifibcount == 2 || ifibcount ==3) ifibdet = 2; 
-				if(ifibcount == 4 || ifibcount ==5) ifibdet = 3;
-				if(ifibcount % 2 == 0) FiName<<"Fi"<<ifibdet<<"a";	
-				else FiName<<"Fi"<<ifibdet<<"b";				 
-			}	
-			if(ifibcount > 5) {
-				ifibdet = ifibcount-2;
-				FiName<<"Fi"<<ifibdet;
-			}	      
-
-			// get access to Mapped data     
-			fibmapobj<<FiName.str()<<"Mapped";  
-			temp = fibmapobj.str();
-			cMapped[ifibcount] = Mapped[ifibcount].c_str();
-			aMapped.at(ifibcount) = (TClonesArray*)mgr->GetObject(cMapped[ifibcount]); 
-
-			// get access to cal data     
-			fibhitobj<<FiName.str()<<"Hit";  
-			temp = fibhitobj.str();
-			cHit[ifibcount] = Hit[ifibcount].c_str(); 
-			aHit.at(ifibcount) = (TClonesArray*)mgr->GetObject(cHit[ifibcount]);
-		} 
-
-		if(aMapped.at(ifibcount)){
+		if(fMappedItems.at(DET_FI_FIRST + ifibcount)) {
 
 			const char* chistName;
 			const char* chistTitle;
-			const char* cfibName;
+                        const char* detName;
 			std::string tempTitle;
 			std::string tempName;
 			std::stringstream tempFibName;
 			std::string tempFibNames;
 			std::stringstream tempCanvName;
-			std::string stempCanvNames;
 
-			tempFibNames = FiName.str(); 
-			cfibName = tempFibNames.c_str();
-			stempCanvNames = FiName.str(); 
+                        detName = fDetectorNames[DET_FI_FIRST + ifibcount];
 
-			cout<<"I am creating canvas "<<stempCanvNames.c_str()<<endl;
+			cout << "I am creating canvas " << detName <<endl;
 
-			FibCanvas[ifibcount]=new TCanvas(stempCanvNames.c_str(),stempCanvNames.c_str(), 10, 10, 910, 910);
+			FibCanvas[ifibcount]=new TCanvas(detName, detName, 10, 10, 910, 910);
 
 			// Channels:   
-			histName1<<cfibName<<"_channels";
+			histName1 << detName << "_channels";
 			tempName=histName1.str();
 			chistName=tempName.c_str();
-			histTitle1<<cfibName<<" channels";
+			histTitle1 << detName << " channels";
 			tempTitle=histTitle1.str();
 			chistTitle=tempTitle.c_str();
 			fh_channels_Fib[ifibcount] = new TH1F(chistName, chistTitle, 520, 0., 520.);
@@ -475,10 +342,10 @@ InitStatus R3BOnlineSpectra::Init()
 			tempName.clear();
 			tempTitle.clear();      
 			// Fibers:
-			histName2<<cfibName<<"_fibers";
+			histName2 << detName << "_fibers";
 			tempName=histName2.str();
 			chistName=tempName.c_str();
-			histTitle2<<cfibName<<" fibers";
+			histTitle2 << detName << " fibers";
 			tempTitle=histTitle2.str();
 			chistTitle=tempTitle.c_str();
 			fh_fibers_Fib[ifibcount] = new TH1F(chistName, chistTitle, 2100, 0., 2100.); 
@@ -486,11 +353,11 @@ InitStatus R3BOnlineSpectra::Init()
 			fh_fibers_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
 			tempName.clear();
 			tempTitle.clear();
-			// Multiplicity (no of hitted fibers):
-			histName3<<cfibName<<"_mult";
+			// Multiplicity (number of hit fibers):
+			histName3 << detName << "_mult";
 			tempName=histName3.str();
 			chistName=tempName.c_str();
-			histTitle3<<cfibName<<" No hitted fibers ";
+			histTitle3 << detName << " # of hit fibers ";
 			tempTitle=histTitle3.str();
 			chistTitle=tempTitle.c_str();
 			fh_mult_Fib[ifibcount] = new TH1F(chistName, chistTitle, 100, 0., 100.);	   
@@ -499,10 +366,10 @@ InitStatus R3BOnlineSpectra::Init()
 			tempName.clear();
 			tempTitle.clear();   
 			// Multihit MAPMT:
-			histName5<<cfibName<<"_multihit_m";
+			histName5 << detName << "_multihit_m";
 			tempName=histName5.str();
 			chistName=tempName.c_str();
-			histTitle5<<cfibName<<" multihits MAPMT";
+			histTitle5 << detName << " multihits MAPMT";
 			tempTitle=histTitle5.str();
 			chistTitle=tempTitle.c_str();   
 			fh_multihit_m_Fib[ifibcount] = new TH2F(chistName, chistTitle, 520, 0., 520., 20, 0., 20.);
@@ -511,10 +378,10 @@ InitStatus R3BOnlineSpectra::Init()
 			tempName.clear();
 			tempTitle.clear();	   
 			// Multihit SAPMT:
-			histName6<<cfibName<<"_multihit_s";
+			histName6 << detName << "_multihit_s";
 			tempName=histName6.str();
 			chistName=tempName.c_str();
-			histTitle6<<cfibName<<" multihits SAPMT";
+			histTitle6 << detName << " multihits SAPMT";
 			tempTitle=histTitle6.str();
 			chistTitle=tempTitle.c_str();	   
 			fh_multihit_s_Fib[ifibcount] = new TH2F(chistName, chistTitle, 16, 0., 16., 20, 0., 20.);   	   
@@ -523,10 +390,10 @@ InitStatus R3BOnlineSpectra::Init()
 			tempName.clear();
 			tempTitle.clear(); 
 			// ToT MAPMT:  
-			histName7<<cfibName<<"_tot_m";
+			histName7 << detName << "_tot_m";
 			tempName=histName7.str();
 			chistName=tempName.c_str();
-			histTitle7<<cfibName<<" ToT of MAPMT";
+			histTitle7 << detName << " ToT of MAPMT";
 			tempTitle=histTitle7.str();
 			chistTitle=tempTitle.c_str();	   
 			fh_ToT_m_Fib[ifibcount] = new TH2F(chistName, chistTitle, 2100, 0., 2100., 400, 0., 200.);   	   
@@ -535,10 +402,10 @@ InitStatus R3BOnlineSpectra::Init()
 			tempName.clear();
 			tempTitle.clear();
 			// ToT SAPMT:  
-			histName8<<cfibName<<"_tot_s";
+			histName8 << detName << "_tot_s";
 			tempName=histName8.str();
 			chistName=tempName.c_str();
-			histTitle8<<cfibName<<" ToT of SAPMT";
+			histTitle8 << detName << " ToT of SAPMT";
 			tempTitle=histTitle8.str();
 			chistTitle=tempTitle.c_str();	   
 			fh_ToT_s_Fib[ifibcount] = new TH2F(chistName, chistTitle, 2100, 0., 2100., 400, 0., 200.);   	   
@@ -547,10 +414,10 @@ InitStatus R3BOnlineSpectra::Init()
 			tempName.clear();
 			tempTitle.clear();	   
 			// Time of fiber: 
-			histName9<<cfibName<<"_TimevsFiber";
+			histName9 << detName << "_TimevsFiber";
 			tempName=histName9.str();
 			chistName=tempName.c_str();
-			histTitle9<<cfibName<<" Time vs Fiber";
+			histTitle9 << detName << " Time vs Fiber";
 			tempTitle=histTitle9.str();
 			chistTitle=tempTitle.c_str();
 			fh_time_Fib[ifibcount]= new TH2F(chistName, chistTitle, 2100, 0., 2100., 20000, -1024., 1024.);
@@ -559,10 +426,10 @@ InitStatus R3BOnlineSpectra::Init()
 			tempName.clear();
 			tempTitle.clear();
 			// ToF LOS -> Fiber:
-			histName11<<cfibName<<"_tof";
+			histName11 << detName << "_tof";
 			tempName=histName11.str();
 			chistName=tempName.c_str();
-			histTitle11<<cfibName<<" ToF LOS to Fiber ";
+			histTitle11 << detName << " ToF LOS to Fiber ";
 			tempTitle=histTitle11.str();
 			chistTitle=tempTitle.c_str();
 			fh_Fib_ToF[ifibcount] = new TH2F(chistName, chistTitle, 2100, 0., 2100.,10000, -5000., 5000.);	   
@@ -571,10 +438,10 @@ InitStatus R3BOnlineSpectra::Init()
 			tempName.clear();
 			tempTitle.clear();         
 			// Not-calibrated position:
-			histName12<<cfibName<<"_pos";
+			histName12 << detName << "_pos";
 			tempName=histName12.str();
 			chistName=tempName.c_str();
-			histTitle12<<cfibName<<" Not-calibrated position ";
+			histTitle12 << detName << " Not-calibrated position ";
 			tempTitle=histTitle12.str();
 			chistTitle=tempTitle.c_str();
 			fh_Fib_pos[ifibcount] = new TH1F(chistName, chistTitle, 6000, -1500., 1500.);	   
@@ -582,8 +449,20 @@ InitStatus R3BOnlineSpectra::Init()
 			fh_Fib_pos[ifibcount]->GetYaxis()->SetTitle("Counts");
 			tempName.clear();
 			tempTitle.clear();
+			// hit fiber number vs. event number:
+			histName13 << detName << "_fib_vs_event";
+			tempName=histName13.str();
+			chistName=tempName.c_str();
+			histTitle13 << detName << " Fiber # vs. Event # ";
+			tempTitle=histTitle13.str();
+			chistTitle=tempTitle.c_str();
+			fh_Fib_vs_Events[ifibcount] = new TH2F(chistName, chistTitle, 10000,0,5e6,1100, 0., 1100.);	   
+			fh_Fib_vs_Events[ifibcount]->GetYaxis()->SetTitle("Fiber number");
+			fh_Fib_vs_Events[ifibcount]->GetXaxis()->SetTitle("Event number");
+			tempName.clear();
+			tempTitle.clear();         
 
-			FibCanvas[ifibcount]->Divide(3, 3);
+			FibCanvas[ifibcount]->Divide(3, 4);
 			FibCanvas[ifibcount]->cd(1);
 			fh_channels_Fib[ifibcount]->Draw();
 			FibCanvas[ifibcount]->cd(2);gPad->SetLogz();
@@ -604,21 +483,24 @@ InitStatus R3BOnlineSpectra::Init()
 			fh_Fib_ToF[ifibcount]->Draw("colz");
 			FibCanvas[ifibcount]->cd(9);
 			fh_Fib_pos[ifibcount]->Draw();
+			FibCanvas[ifibcount]->cd(10);
+			fh_Fib_vs_Events[ifibcount]->Draw("colz");        
 
 			FibCanvas[ifibcount]->cd(0);
 			run->AddObject(FibCanvas[ifibcount]);     
 
 
-		}	 // end if(Mapped)
-	} // end for(ifibcount)
+		}	// end if(Mapped)
+		
+	}  // end for(ifibcount)
+	if(NOF_FIB_DET>0) run->GetHttpServer()->RegisterCommand("Reset_Fibers", Form("/Tasks/%s/->Reset_FIBERS_Histo()", GetName()));
+
 
 
 	//---------------------------------------------------------------------------------------
 	//Ptof detector
 
-	fCalItemsPtof = (TClonesArray*)mgr->GetObject("PtofCal");
-
-	if(fCalItemsPtof){
+	if(fCalItems.at(DET_PTOF)){
 
 		TCanvas *cPtof_plane = new TCanvas("Ptof_plane", "Ptof plane", 10, 10, 510, 510);
 		cPtof_plane->Divide(1, 2);
@@ -673,8 +555,7 @@ InitStatus R3BOnlineSpectra::Init()
 	//---------------------------------------------------------------------------------------------------
 	//TofD detector
 
-	fMappedItemsTofd = (TClonesArray*)mgr->GetObject("TofdMapped");
-	if(fMappedItemsTofd){
+	if(fMappedItems.at(DET_TOFD)){
 		TCanvas *cTofd_planes = new TCanvas("TOFD_planes", "TOFD planes", 10, 10, 1100, 1000);
 		cTofd_planes->Divide(5, 4);
 
@@ -773,231 +654,8 @@ InitStatus R3BOnlineSpectra::Init()
 		run->GetHttpServer()->RegisterCommand("Reset_TOFD", Form("/Tasks/%s/->Reset_TOFD_Histo()", GetName())); 
 	}
 
-	fCalItemsTofd = (TClonesArray*)mgr->GetObject("TofdCal");
+	// -------------------------------------------------------------------------
 
-    //------------------------------------------------------------------------
-    // PSPX detector
-    // get access to data
-    fMappedItemsPspx = (TClonesArray*)mgr->GetObject("PspxMappedData");
-    fPrecalItemsPspx = (TClonesArray*)mgr->GetObject("PspxPrecalData");
-    fCalItemsPspx = (TClonesArray*)mgr->GetObject("PspxCalData");
-    fHitItemsPspx = (TClonesArray*)mgr->GetObject("PspxHitData");
-
-    TCanvas* cPspx_comp = new TCanvas("Pspx_comp", "Pspx Comparison", 10, 10, 1100, 1000);
-    cPspx_comp->Divide(N_PSPX, 3);
-
-    Int_t Emax = 2000;
-
-    if (fMappedItemsPspx)
-    {
-        // LOG(INFO) << "Init MappedPspx" << FairLogger::endl;
-
-        for (UInt_t i = 0; i < N_PSPX; i++)
-        {
-            if (i % 2 == 0)
-            { // even numbers = read out with energy filter
-                fh_pspx_channel_x[i] =
-                    new TH1F(Form("pspx_%d_energyreadout_channel_x", i / 2),
-                             Form("Pspx %d Energy Readout: x Channel;x Position / Channel;Counts", i / 2 + 1),
-                             2 * N_STRIPS_PSPX,
-                             1,
-                             2 * N_STRIPS_PSPX + 1);
-                fh_pspx_channel_y[i] =
-                    new TH1F(Form("pspx_%d_energyreadout_channel_y", i / 2),
-                             Form("Pspx %d Energy Readout: y Channel;y Position / Channel;Counts", i / 2 + 1),
-                             2 * N_STRIPS_PSPX,
-                             2 * N_STRIPS_PSPX,
-                             4 * N_STRIPS_PSPX + 1);
-
-                fh_pspx_multiplicity_x[i] =
-                    new TH1F(Form("pspx_%d_energyreadout_multiplicity_x", i / 2),
-                             Form("Pspx %d Energy Readout: x Multiplicity;Multiplicity;Counts", i / 2 + 1),
-                             10,
-                             0,
-                             10);
-                fh_pspx_multiplicity_y[i] =
-                    new TH1F(Form("pspx_%d_energyreadout_multiplicity_y", i / 2),
-                             Form("Pspx %d Energy Readout: y Multiplicity;Multiplicity;Counts", i / 2 + 1),
-                             10,
-                             0,
-                             10);
-                fh_pspx_strips_position[i] = new TH2F(
-                    Form("pspx_%d_energyreadout_strips", i),
-                    Form("Pspx %d Energy Readout Position;x Position / Strips; y Position / Strips", i / 2 + 1),
-                    N_STRIPS_PSPX,
-                    1,
-                    N_STRIPS_PSPX + 1,
-                    N_STRIPS_PSPX,
-                    N_STRIPS_PSPX,
-                    2 * N_STRIPS_PSPX + 1);
-            }
-            else
-            { // odd numbers = read out with position filter
-                fh_pspx_channel_x[i] =
-                    new TH1F(Form("pspx_%d_positionreadout_channel_x", i / 2),
-                             Form("Pspx %d Position Readout: x Channel;x Position / Channel;Counts", i / 2 + 1),
-                             2 * N_STRIPS_PSPX,
-                             1,
-                             2 * N_STRIPS_PSPX + 1);
-                fh_pspx_channel_y[i] =
-                    new TH1F(Form("pspx_%d_positionreadout_channel_y", i / 2),
-                             Form("Pspx %d Position Readout: y Channel;y Position / Channel;Counts", i / 2 + 1),
-                             2 * N_STRIPS_PSPX,
-                             2 * N_STRIPS_PSPX,
-                             4 * N_STRIPS_PSPX + 1);
-
-                fh_pspx_multiplicity_x[i] =
-                    new TH1F(Form("pspx_%d_positionreadout_multiplicity_x", i / 2),
-                             Form("Pspx %d Position Readout: x Multiplicity;Multiplicity;Counts", i / 2 + 1),
-                             10,
-                             0,
-                             10);
-                fh_pspx_multiplicity_y[i] =
-                    new TH1F(Form("pspx_%d_positionreadout_multiplicity_y", i / 2),
-                             Form("Pspx %d Position Readout: y Multiplicity;Multiplicity;Counts", i / 2 + 1),
-                             10,
-                             0,
-                             10);
-                fh_pspx_strips_position[i] = new TH2F(
-                    Form("pspx_%d_positionreadout_strips", i),
-                    Form("Pspx %d Position Readout Position;x Position / Strips; y Position / Strips", i / 2 + 1),
-                    N_STRIPS_PSPX,
-                    1,
-                    N_STRIPS_PSPX + 1,
-                    N_STRIPS_PSPX,
-                    N_STRIPS_PSPX,
-                    2 * N_STRIPS_PSPX + 1);
-            }
-        }
-
-        TCanvas* cPspx_strips = new TCanvas("Pspx_strips", "Pspx Strips", 10, 10, 1100, 1000);
-        cPspx_strips->Divide(N_PSPX, 2);
-
-        for (UInt_t i = 0; i < N_PSPX; i++)
-        {
-            cPspx_strips->cd(i + 1);
-            fh_pspx_channel_x[i]->Draw();
-
-            cPspx_strips->cd(i + 1 + N_PSPX);
-            fh_pspx_channel_y[i]->Draw();
-        }
-
-        run->AddObject(cPspx_strips);
-
-        TCanvas* cPspx_multiplicity = new TCanvas("Pspx_multiplicity", "Pspx Multiplicity", 10, 10, 1100, 1000);
-        cPspx_multiplicity->Divide(N_PSPX, 2);
-
-        for (UInt_t i = 0; i < N_PSPX; i++)
-        {
-            cPspx_multiplicity->cd(i + 1);
-            fh_pspx_multiplicity_x[i]->Draw();
-
-            cPspx_multiplicity->cd(i + 1 + N_PSPX);
-            fh_pspx_multiplicity_y[i]->Draw();
-        }
-
-        run->AddObject(cPspx_multiplicity);
-
-        // Fill cPspx_comp with Mapped level data
-        for (UInt_t i = 0; i < N_PSPX; i++)
-        {
-            cPspx_comp->cd(i + 1);
-            fh_pspx_strips_position[i]->Draw("colz");
-
-            // Remove the current axis
-            fh_pspx_strips_position[i]->GetYaxis()->SetLabelOffset(999);
-            fh_pspx_strips_position[i]->GetYaxis()->SetTickLength(0);
-
-            // Redraw the new inverted axis
-            gPad->Update();
-            TGaxis* newaxis = new TGaxis(gPad->GetUxmin(),
-                                         gPad->GetUymax(),
-                                         gPad->GetUxmin() - 0.001,
-                                         gPad->GetUymin(),
-                                         fh_pspx_strips_position[i]->GetYaxis()->GetXmin(),
-                                         fh_pspx_strips_position[i]->GetYaxis()->GetXmax(),
-                                         510,
-                                         "+");
-            newaxis->SetLabelOffset(0.003);
-            newaxis->SetLabelSize(0.03);
-            newaxis->SetTickLength(0.025);
-            newaxis->Draw();
-        }
-    }
-
-    if (fCalItemsPspx)
-    {
-        UInt_t nbins = 200;
-
-        for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
-        {
-            fh_pspx_cal_energy_frontback[i] =
-                new TH2F(Form("pspx_%d_energy_frontback", i),
-                         Form("Pspx %d Energy Back vs Front;Front Energy / arb.u.;Back Energy / arb.u.", i + 1),
-                         nbins,
-                         0,
-                         Emax,
-                         nbins,
-                         -Emax,
-                         0);
-        }
-
-        // Fill cPspx_comp with Cal level data
-        for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
-        {
-            cPspx_comp->cd(i * 2 + 1 + N_PSPX);
-            fh_pspx_cal_energy_frontback[i]->Draw("colz");
-        }
-    }
-
-    if (fHitItemsPspx)
-    {
-        UInt_t nbins = 100;
-        UInt_t length = 10; // detector length, range of histogram
-
-        for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
-        {
-            fh_pspx_hit_position[i] = new TH2F(Form("pspx_%d_position_cm", i),
-                                               Form("Pspx %d Position;x Position / cm; y Position / cm", i + 1),
-                                               nbins,
-                                               -length / 2.,
-                                               length / 2.,
-                                               nbins,
-                                               -length / 2.,
-                                               length / 2.);
-
-            fh_pspx_hit_energy[i] = new TH1F(
-                Form("pspx_%d_energy", i), Form("Pspx %d Energy;Energy / arb.u.; Counts", i + 1), nbins, 0, Emax);
-        }
-
-        TCanvas* cPspx_hit = new TCanvas("Pspx_hit", "Pspx Hit", 10, 10, 1100, 1000);
-        cPspx_hit->Divide((N_PSPX + 1) / 2, 2);
-
-        for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
-        {
-            cPspx_hit->cd(i + 1);
-            fh_pspx_hit_position[i]->Draw("colz");
-
-            cPspx_hit->cd(i + 1 + (N_PSPX + 1) / 2);
-            fh_pspx_hit_energy[i]->Draw();
-        }
-
-        run->AddObject(cPspx_hit);
-
-        // Fill cPspx_comp with Hit level data-((channel_y[i][0] + 1) / 2) + 3 * N_STRIPS_PSPX + 1)
-        for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
-        {
-            cPspx_comp->cd(i * 2 + 2 * N_PSPX + 1); // supposed to be +2 if
-                                                    // energy and position
-                                                    // readout is used
-            fh_pspx_hit_position[i]->Draw("colz");
-        }
-    }
-
-    run->AddObject(cPspx_comp);
-
-    run->GetHttpServer()->RegisterCommand("Reset_PSPX", Form("/Tasks/%s/->Reset_PSPX_Histo()", GetName()));
-    
     // -------------------------------------------------------------------------
 
     return kSUCCESS;
@@ -1048,36 +706,24 @@ void R3BOnlineSpectra::Reset_TOFD_Histo()
     fh_tofd_dt[1]->Reset();
     fh_tofd_dt[2]->Reset();
 }
-
-void R3BOnlineSpectra::Reset_PSPX_Histo()
+void R3BOnlineSpectra::Reset_FIBERS_Histo()
 {
-    if (fMappedItemsPspx)
-    {
-        for (UInt_t i = 0; i < N_PSPX; i++)
-        {
-            fh_pspx_channel_x[i]->Reset();
-            fh_pspx_channel_y[i]->Reset();
-            fh_pspx_multiplicity_x[i]->Reset();
-            fh_pspx_multiplicity_y[i]->Reset();
-            fh_pspx_strips_position[i]->Reset();
-        }
-    }
-    if (fCalItemsPspx)
-    {
-        for (UInt_t i = 0; i < N_PSPX / 2; i++)
-        {
-            fh_pspx_cal_energy_frontback[i]->Reset();
-        }
-    }
-    if (fHitItemsPspx)
-    {
-        for (UInt_t i = 0; i < N_PSPX / 2; i++)
-        {
-            fh_pspx_hit_position[i]->Reset();
-            fh_pspx_hit_energy[i]->Reset();
-        }
-    }
+	for(Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++){
+		if(fMappedItems.at(DET_FI_FIRST + ifibcount)) {
+			fh_channels_Fib[ifibcount]->Reset();
+			fh_multihit_m_Fib[ifibcount]->Reset(); 
+			fh_multihit_s_Fib[ifibcount]->Reset();      
+			fh_fibers_Fib[ifibcount]->Reset();
+			fh_mult_Fib[ifibcount]->Reset();      
+			fh_ToT_m_Fib[ifibcount]->Reset();
+			fh_ToT_s_Fib[ifibcount]->Reset();
+			fh_Fib_ToF[ifibcount]->Reset();
+			fh_Fib_pos[ifibcount]->Reset();
+			fh_Fib_vs_Events[ifibcount]->Reset();   
+		}     
+     }
 }
+
 
 void R3BOnlineSpectra::Exec(Option_t* option)
 {
@@ -1100,6 +746,10 @@ void R3BOnlineSpectra::Exec(Option_t* option)
   Double_t timeLos[10] = {0.0};
   Double_t totsum[10] = {0.0}; 
   Double_t tot[10][8] = {0.0/0.0};
+  Double_t xT_cm[10] = {0.0/0.0};
+  Double_t yT_cm[10] = {0.0/0.0};
+  Double_t xV_cm[10] = {0.0/0.0};
+  Double_t yV_cm[10] = {0.0/0.0};  
 
 
   Double_t timeTofd=0;
@@ -1113,15 +763,16 @@ void R3BOnlineSpectra::Exec(Option_t* option)
   Bool_t LOSID = true; 
   Int_t Multip;
 
-  if(fMappedItemsLos && fMappedItemsLos->GetEntriesFast())
+  if(fMappedItems.at(DET_LOS))
   {
-    Int_t nHits = fMappedItemsLos->GetEntriesFast();
+    auto det = fMappedItems.at(DET_LOS);
+    Int_t nHits = det->GetEntriesFast();
 
     Multip = nHits;
 
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-      R3BLosMappedData* hit = (R3BLosMappedData*)fMappedItemsLos->At(ihit);
+      R3BLosMappedData* hit = (R3BLosMappedData*)det->At(ihit);
       if (!hit) continue;
 
       // channel numbers are stored 1-based (1..n)
@@ -1134,9 +785,10 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 
 
   Int_t nPart;   
-  if(fCalItemsLos && fCalItemsLos->GetEntriesFast())
+  if(fCalItems.at(DET_LOS))
   {
-    nPart = fCalItemsLos->GetEntriesFast();  
+    auto det = fCalItems.at(DET_LOS);
+    nPart = det->GetEntriesFast();  
 
     fh_los_multihit->Fill(nPart);
 
@@ -1151,7 +803,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
       /* 
        * nPart is the number of particle passing through LOS detector in one event
        */ 
-      R3BLosCalData *calData = (R3BLosCalData*)fCalItemsLos->At(iPart);
+      R3BLosCalData *calData = (R3BLosCalData*)det->At(iPart);
       iDet=calData->GetDetector();
 
       // lt=0, l=1,lb=2,b=3,rb=4,r=5,rt=6,t=7 
@@ -1341,6 +993,22 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 	  if(nPMV == 8) fh_los_tres_MCFD->Fill(LosTresM[iPart]);
 	  if(nPMT == 8) fh_los_tres_TAMEX->Fill(LosTresT[iPart]);
 	  if(nPMT == 8) fh_los_tot_mean->Fill(totsum[iPart]);
+	  // Position from tamex:    
+      xT_cm[iPart] = (time_L[iPart][5]+time_L[iPart][6])/2.-(time_L[iPart][1]+time_L[iPart][2])/2.;                  
+      yT_cm[iPart] = (time_L[iPart][7]+time_L[iPart][0])/2.-(time_L[iPart][3]+time_L[iPart][4])/2.;
+      // Empirical calibration (to be properly done): 
+      xT_cm[iPart] = (xT_cm[iPart] - 0.) * 1.;
+      yT_cm[iPart] = (yT_cm[iPart] - 0.) * 1.;
+      
+      // Position from VFTX:
+      xV_cm[iPart] = (time_V[iPart][5]+time_V[iPart][6])/2.-(time_V[iPart][1]+time_V[iPart][2])/2.;                  
+      yV_cm[iPart] = (time_V[iPart][7]+time_V[iPart][0])/2.-(time_V[iPart][3]+time_V[iPart][4])/2.;
+      // Empirical calibration (to be properly done): 
+      xV_cm[iPart] = (xV_cm[iPart] - 0.) * 3.;
+      yV_cm[iPart] = (yV_cm[iPart] - 0.) * 3.;
+     
+      if(nPMV == 8) fh_los_pos_MCFD->Fill(xV_cm[iPart],yV_cm[iPart]);
+	  if(nPMT == 8) fh_los_pos_TAMEX->Fill(xT_cm[iPart],yT_cm[iPart]);     
 	}     
 
       } 
@@ -1377,15 +1045,16 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 
   Int_t MultipS8;
 
-  if(fMappedItemsSci8 && fMappedItemsSci8->GetEntriesFast())
+  if(fMappedItems.at(DET_SCI8))
   {
-    Int_t nHits = fMappedItemsSci8->GetEntriesFast();
+    auto det = fMappedItems.at(DET_SCI8);
+    Int_t nHits = det->GetEntriesFast();
 
     MultipS8 = nHits;
 
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-      R3BSci8MappedData* hit = (R3BSci8MappedData*)fMappedItemsSci8->At(ihit);
+      R3BSci8MappedData* hit = (R3BSci8MappedData*)det->At(ihit);
       if (!hit) continue;
 
       // channel numbers are stored 1-based (1..n)
@@ -1398,9 +1067,10 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 
 
   Int_t nPartS8;   
-  if(fCalItemsSci8 && fCalItemsSci8->GetEntriesFast())
+  if(fCalItems.at(DET_SCI8))
   {
-    nPartS8 = fCalItemsSci8->GetEntriesFast();  
+    auto det = fCalItems.at(DET_SCI8);
+    nPartS8 = det->GetEntriesFast();  
 
     fh_sci8_multihit->Fill(nPartS8);
 
@@ -1415,7 +1085,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
       /* 
        * nPart is the number of particle passing through Sci8 detector in one event
        */ 
-      R3BSci8CalData *calDataS8 = (R3BSci8CalData*)fCalItemsSci8->At(iPart);
+      R3BSci8CalData *calDataS8 = (R3BSci8CalData*)det->At(iPart);
       iDet = calDataS8->GetDetector();
 
 
@@ -1554,28 +1224,22 @@ void R3BOnlineSpectra::Exec(Option_t* option)
   //----------------------------------------------------------------------
   Double_t dtime = 0.0/0.0;
 
-  for(Int_t ifibcount = 0; ifibcount < 14; ifibcount++)
+  for(Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)
   { 
 
     Int_t iFib = 0;  
 
-    if(FibPresent[ifibcount])
-    {	   	 
-      // get access to Mapped data     
-      aMapped.at(ifibcount) = (TClonesArray*)mgr->GetObject(cMapped[ifibcount]); 
-      // get access to cal data     
-      aHit.at(ifibcount) = (TClonesArray*)mgr->GetObject(cHit[ifibcount]);
-    } 
+    auto detMapped = fMappedItems.at(DET_FI_FIRST + ifibcount);
+    auto detHit = fHitItems.at(DET_FI_FIRST + ifibcount);
 
-    if(aMapped.at(ifibcount)) 
+    if(detMapped) 
     {
-
-      Int_t nHits = aMapped.at(ifibcount)->GetEntriesFast();
+      Int_t nHits = detMapped->GetEntriesFast();
       std::vector<UInt_t> mapmt_num(512);
       std::vector<UInt_t> spmt_num(16);
       for (Int_t ihit = 0; ihit < nHits; ihit++)
       {
-	R3BBunchedFiberMappedData* hit = (R3BBunchedFiberMappedData*)aMapped.at(ifibcount)->At(ihit);
+	R3BBunchedFiberMappedData* hit = (R3BBunchedFiberMappedData*)detMapped->At(ihit);
 	if (!hit) continue;
 
 	// channel numbers are stored 1-based (1..n)
@@ -1606,14 +1270,12 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 	auto s = spmt_num.at(i);
 	if(s > 0) fh_multihit_s_Fib[ifibcount]->Fill(i,s); // multihit of a given PADI channel
       }
+    }
 
 
-    } // end if(aMapped[ifibcount])
-
-
-    if(aHit.at(ifibcount)) 
+    if(detHit) 
     {
-      Int_t nHits = aHit.at(ifibcount)->GetEntriesFast(); 
+      Int_t nHits = detHit->GetEntriesFast(); 
 
       Double_t posfib = 0./0.;
       Double_t totMax = 0.;     
@@ -1626,7 +1288,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 	Double_t tMAPMT = 0./0.;
 	Double_t tSPMT = 0./0.;
 
-	R3BBunchedFiberHitData* hit = (R3BBunchedFiberHitData*)aHit.at(ifibcount)->At(ihit);
+	R3BBunchedFiberHitData* hit = (R3BBunchedFiberHitData*)detHit->At(ihit);
 	if (!hit) continue;
 
 	iFib = hit->GetFiberId();  // 1..
@@ -1638,26 +1300,26 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 	dtime = tMAPMT-tSPMT;		
 
 	// "Push" two times in the same clock cycle:	
-	while(dtime < 1024.) 
-	{
-	  tSPMT = tSPMT - 2048.; 
-	  dtime = tMAPMT - tSPMT;
-	}
-	while(dtime > 1024.) 
-	{
-	  tSPMT = tSPMT + 2048.; 
-	  dtime = tMAPMT - tSPMT;
-	}			
+		while(dtime < -1024) 
+		{
+			tSPMT = tSPMT - 2048.; 
+			dtime = tMAPMT - tSPMT;
+		}
+		while(dtime > 1024.) 
+		{
+			tSPMT = tSPMT + 2048.; 
+			dtime = tMAPMT - tSPMT;
+		}			
 
 	// "Push" the Fib times in the same cycle with LOS:
 	if(timeLos[0]>0. && !(IS_NAN(timeLos[0])))
 	{
-	  while(tMAPMT - timeLos[0] < 5000.)
+	  while(tMAPMT - timeLos[0] < 4096.)
 	  {
 	    tMAPMT = tMAPMT + 2048.*4.; 
 	    tSPMT = tSPMT + 2048.*4.; 		  
 	  }		
-	  while(tMAPMT - timeLos[0] > 5000.)
+	  while(tMAPMT - timeLos[0] > 4096.)
 	  {
 	    tMAPMT = tMAPMT - 2048.*4.; 
 	    tSPMT = tSPMT - 2048.*4.; 		  
@@ -1680,7 +1342,8 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 	  fh_ToT_m_Fib[ifibcount]->Fill(iFib,hit->GetMAPMTToT_ns());
 	  fh_time_Fib[ifibcount]->Fill(iFib,tMAPMT-tSPMT);
 	  fh_Fib_ToF[ifibcount]->Fill(iFib,tof_fib);
-	  fh_Fib_pos[ifibcount]->Fill(posfib);	     
+	  fh_Fib_pos[ifibcount]->Fill(posfib);	
+	  fh_Fib_vs_Events[ifibcount]->Fill(fNEvents,iFib);	
 	}  
 
       }  // end for(ihit)
@@ -1697,13 +1360,14 @@ void R3BOnlineSpectra::Exec(Option_t* option)
   //----------------------------------------------------------------------
 
   Int_t NumPaddles[4]={0};
-  if(fMappedItemsTofd )
+  if(fMappedItems.at(DET_TOFD))
   {
-    Int_t nMapped = fMappedItemsTofd->GetEntriesFast();  	
+    auto det = fMappedItems.at(DET_TOFD);
+    Int_t nMapped = det->GetEntriesFast();  	
     Int_t iPlaneMem = 1, iBarMem = 0; 
     for (Int_t imapped = 0; imapped < nMapped; imapped++)     
     {
-      auto mapped = (R3BTofdMappedData const *)fMappedItemsTofd->At(imapped);
+      auto mapped = (R3BTofdMappedData const *)det->At(imapped);
       if (!mapped) continue; // should not happen
 
       Int_t const iPlane = mapped->GetDetectorId(); // 1..n
@@ -1724,16 +1388,18 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 
       if(iPlane<=fNofPlanes)
       {
-	fh_tofd_channels[iPlane-1]->Fill(iBar);
-	fh_tofd_channels[iPlane-1]->Fill(-iBar-1);
+	if(iSide==1) fh_tofd_channels[iPlane-1]->Fill(-iBar-1);
+	if(iSide==2) fh_tofd_channels[iPlane-1]->Fill(iBar);
+	
       }
     }
   }
 
 
-  if(fCalItemsTofd)
+  if(fCalItems.at(DET_TOFD))
   {
-    Int_t nCals = fCalItemsTofd->GetEntriesFast();
+    auto det = fCalItems.at(DET_TOFD);
+    Int_t nCals = det->GetEntriesFast();
 
     Double_t tot1[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD]={0./0.};
     Double_t tot2[10][N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD]={0./0.};
@@ -1751,7 +1417,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 
     for (Int_t ical = 0; ical < nCals; ical++)     
     {
-      auto cal = (R3BTofdCalData const *)fCalItemsTofd->At(ical);
+      auto cal = (R3BTofdCalData const *)det->At(ical);
       if (!cal) continue; // should not happen
 
       Int_t const iPlane  = cal->GetDetectorId();    // 1..n
@@ -1764,13 +1430,13 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 //          ' ' << cal->GetTimeTT_ns() << std::endl;
 
       // get all times of one bar
-      /*                 
+/*                       
 			 cout<<"TOFD Online: "<<fNEvents<<", "<<nCals<<"; "<<ical<<"; "<<iPlane<<", "<<iBar<<", "<<iBarMem<<", "<<", "<<
 			 cal->fTime1L_ns<<", "<<cal->fTime1T_ns<<", "<<
 			 cal->fTime2L_ns<<", "<<cal->fTime2T_ns<<endl;
-       */        
-
-      if(iBar != iBarMem || NumPaddles[iPlane-1] == 1) // condition on NumPaddles to be removed when more paddles in plane 3 and 4 activ!!! 
+*/         
+/*
+      if(iBar != iBarMem ) 
       {
 	jmult[iPlane-1][iBar-1] = 0;
 	if (!IS_NAN(cal->GetTimeBL_ns())) t1l[0][iPlane-1][iBar-1] = cal->GetTimeBL_ns();
@@ -1790,6 +1456,17 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 	Bar_present[jm][iPlane-1][iBar-1] = true;
       }
       iBarMem = iBar;
+*/
+
+
+
+		Int_t jm = jmult[iPlane-1][iBar-1];
+		if (!IS_NAN(cal->GetTimeBL_ns())) t1l[jm][iPlane-1][iBar-1] = cal->GetTimeBL_ns();
+		if (!IS_NAN(cal->GetTimeBT_ns())) t1t[jm][iPlane-1][iBar-1] = cal->GetTimeBT_ns();
+		if (!IS_NAN(cal->GetTimeTL_ns())) t2l[jm][iPlane-1][iBar-1] = cal->GetTimeTL_ns();
+		if (!IS_NAN(cal->GetTimeTT_ns())) t2t[jm][iPlane-1][iBar-1] = cal->GetTimeTT_ns();
+		Bar_present[jm][iPlane-1][iBar-1] = true;
+		jmult[iPlane-1][iBar-1] = jmult[iPlane-1][iBar-1] + 1;
 
     }
 
@@ -1802,7 +1479,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
      */ 
     for (Int_t ipl = 0; ipl < N_PLANE_MAX_TOFD; ipl++)
       for(Int_t ibr = 0; ibr < N_PADDLE_MAX_TOFD; ibr++)
-	for(Int_t jm=0; jm < jmult[ipl][ibr]+1; jm++)
+	for(Int_t jm=0; jm < jmult[ipl][ibr]; jm++)
 	{  
 
 	  if(Bar_present[jm][ipl][ibr])
@@ -1810,7 +1487,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 	    Int_t iPlane  = ipl+1;    // 1..n
 	    Int_t iBar  = ibr+1;    // 1..n
 
-	    fh_tofd_multihit[ipl]->Fill(ibr+1,jmult[ipl][ibr]+1);
+	    fh_tofd_multihit[ipl]->Fill(ibr+1,jmult[ipl][ibr]);
 
 	    // calculate time over threshold and check if clock counter went out of range
 
@@ -1830,30 +1507,33 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 	    if( !(IS_NAN(timeLos[ilc])) && timeLos[ilc]>0.)
 	    {
 
-	      while(t1l[jm][iPlane-1][iBar-1] < timeLos[ilc])
-	      {
-		t1t[jm][iPlane-1][iBar-1] += 2048.*fClockFreq;
-		t1l[jm][iPlane-1][iBar-1] += 2048.*fClockFreq;
+			while(t1l[jm][iPlane-1][iBar-1] < timeLos[ilc])
+			{
+				t1t[jm][iPlane-1][iBar-1] += 2048.*fClockFreq;
+				t1l[jm][iPlane-1][iBar-1] += 2048.*fClockFreq;
+			}
+			while(t2l[jm][iPlane-1][iBar-1] < timeLos[ilc])
+			{
+				t2t[jm][iPlane-1][iBar-1] += 2048.*fClockFreq;
+				t2l[jm][iPlane-1][iBar-1] += 2048.*fClockFreq;
+			}
+	  
 		}
-		  while(t2l[jm][iPlane-1][iBar-1] < timeLos[ilc])
-		  {
-		t2t[jm][iPlane-1][iBar-1] += 2048.*fClockFreq;
-		t2l[jm][iPlane-1][iBar-1] += 2048.*fClockFreq;
-	      }
-	      // ToF	  
-	      t_paddle[jm][iPlane-1][iBar-1] = (t1l[jm][iPlane-1][iBar-1] + t2l[jm][iPlane-1][iBar-1])/2.;
+	  
+		// ToF	  
+		t_paddle[jm][iPlane-1][iBar-1] = (t1l[jm][iPlane-1][iBar-1] + t2l[jm][iPlane-1][iBar-1])/2.;
 
-	      //  between 2 bars in 2 planes  
+	    //  between 2 bars in 2 planes  
+		if(ipl > 0){
+			fh_tofd_dt[ipl-1]->Fill(iBar,t_paddle[jm][ipl][iBar-1]-t_paddle[jm][ipl-1][iBar-1]);
+		}		            
 
-	      if(ipl > 0){
-		fh_tofd_dt[ipl-1]->Fill(iBar,t_paddle[jm][ipl][iBar-1]-t_paddle[jm][ipl-1][iBar-1]);
-
-	      }		            
-
-	      // between LOS and paddle          		            
-	      ToF[jm][iPlane-1][iBar-1] = fmod(t_paddle[jm][iPlane-1][iBar-1] - timeLos[ilc] + 5*8192, 5*2048);
-	      fh_tofd_ToF[iPlane-1]->Fill(iBar,ToF[jm][iPlane-1][iBar-1]);
-	    }		   
+	    if( !(IS_NAN(timeLos[ilc])) && timeLos[ilc]>0.)
+	    {
+			// between LOS and paddle          		            
+			ToF[jm][iPlane-1][iBar-1] = fmod(t_paddle[jm][iPlane-1][iBar-1] - timeLos[ilc] + 5*8192, 5*2048);
+			fh_tofd_ToF[iPlane-1]->Fill(iBar,ToF[jm][iPlane-1][iBar-1]);
+		}	    		   
 	    // ToT   
 	    tot1[jm][iPlane-1][iBar-1]=t1t[jm][iPlane-1][iBar-1] - t1l[jm][iPlane-1][iBar-1];		      
 	    if(tot1[jm][iPlane-1][iBar-1]<0) 
@@ -1869,8 +1549,8 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 	      cout<<"Times2: "<<t2t[jm][iPlane-1][iBar-1]<<" "<<t2l[jm][iPlane-1][iBar-1]<<endl;		 
 	    }
 
-	    fh_tofd_TotPm[iPlane-1]->Fill(iBar,tot1[jm][iPlane-1][iBar-1]);
-	    fh_tofd_TotPm[iPlane-1]->Fill(-iBar-1,tot2[jm][iPlane-1][iBar-1]);
+	    fh_tofd_TotPm[iPlane-1]->Fill(iBar,tot2[jm][iPlane-1][iBar-1]);
+	    fh_tofd_TotPm[iPlane-1]->Fill(-iBar-1,tot1[jm][iPlane-1][iBar-1]);
 
 	  }
 	}
@@ -1880,7 +1560,10 @@ void R3BOnlineSpectra::Exec(Option_t* option)
   // PTOF
   //----------------------------------------------------------------------
 
-  if(fCalItemsPtof){
+  if(fCalItems.at(DET_PTOF))
+  {
+    auto det = fCalItems.at(DET_PTOF);
+
     Double_t tot1=0.;
     Double_t tot2=0.;
     Double_t t1l=0.;
@@ -1890,10 +1573,10 @@ void R3BOnlineSpectra::Exec(Option_t* option)
     Bool_t bar_quer1=false;
     Bool_t bar_quer2=false;
 
-    Int_t nHits = fCalItemsPtof->GetEntriesFast();    
+    Int_t nHits = det->GetEntriesFast();    
     LOG(DEBUG) << "nHits: " << nHits << FairLogger::endl;
     for (Int_t ihit = 0; ihit < nHits; ihit++)     {
-      R3BPaddleCalData *hit = (R3BPaddleCalData*)fCalItemsPtof->At(ihit);
+      R3BPaddleCalData *hit = (R3BPaddleCalData*)det->At(ihit);
 
       if (!hit) continue; // should not happen
 
@@ -1947,10 +1630,10 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 
     //once again
 
-    nHits = fCalItemsPtof->GetEntriesFast();    
+    nHits = det->GetEntriesFast();    
     //		LOG(DEBUG) << "nHits: " << nHits << FairLogger::endl;
     for (Int_t ihit = 0; ihit < nHits; ihit++){
-      R3BPaddleCalData *hit = (R3BPaddleCalData*)fCalItemsPtof->At(ihit);
+      R3BPaddleCalData *hit = (R3BPaddleCalData*)det->At(ihit);
 
       if (!hit) continue; // should not happen
 
@@ -1999,252 +1682,58 @@ void R3BOnlineSpectra::Exec(Option_t* option)
     }
   }
 
-    //----------------------------------------------------------------------
-    // PSPX
-    //----------------------------------------------------------------------
-    if (fMappedItemsPspx)
-    {
-        UInt_t mult_x[N_PSPX];
-        UInt_t mult_y[N_PSPX];
-
-        UInt_t channel_x[N_PSPX][N_STRIPS_PSPX * 2];
-        UInt_t channel_y[N_PSPX][N_STRIPS_PSPX * 2];
-
-        for (UInt_t i = 0; i < N_PSPX; i++)
-        {
-            mult_x[i] = 0;
-            mult_y[i] = 0;
-
-            for (UInt_t j = 0; j < N_STRIPS_PSPX * 2; j++)
-            {
-                channel_x[i][j] = 0;
-                channel_y[i][j] = 0;
-            }
-        }
-
-        Int_t nHits = fMappedItemsPspx->GetEntriesFast();
-
-        for (Int_t ihit = 0; ihit < nHits; ihit++)
-        {
-            for (UInt_t i = 0; i < N_PSPX; i++)
-            {
-                R3BPspxMappedData* mappedData = (R3BPspxMappedData*)fMappedItemsPspx->At(ihit);
-                if (mappedData->GetDetector() == i + 1 && mappedData->GetChannel() > N_STRIPS_PSPX * 2 &&
-                    mappedData->GetChannel() < N_STRIPS_PSPX * 4 + 1)
-                {
-                    // LOG(INFO) << "Test1 " << i << " " << mappedData->GetDetector() << " " <<
-                    // mappedData->GetChannel()<< FairLogger::endl;
-                    channel_y[i][mult_y[i]] = mappedData->GetChannel();
-                    mult_y[i]++;
-                }
-                else if (mappedData->GetDetector() == i + 1 && mappedData->GetChannel() > 0 &&
-                         mappedData->GetChannel() < N_STRIPS_PSPX * 2 + 1)
-                {
-                    // LOG(INFO) << "Test2 " << i << " " << mappedData->GetDetector() << " " <<
-                    // mappedData->GetChannel()<< FairLogger::endl;
-                    channel_x[i][mult_x[i]] = mappedData->GetChannel();
-                    mult_x[i]++;
-                }
-            }
-        }
-
-        for (UInt_t i = 0; i < N_PSPX; i++)
-        {
-            // LOG(INFO) << "Test3 " << i << " " << mult_x[i] << " " << mult_y[i] << FairLogger::endl;
-            fh_pspx_multiplicity_x[i]->Fill(mult_x[i]);
-            fh_pspx_multiplicity_y[i]->Fill(mult_y[i]);
-            // LOG(INFO) << "Test4 " << fh_pspx_multiplicity_x[i]->GetBinContent(1) << FairLogger::endl;
-
-            if (mult_x[i] == 2 && mult_y[i] == 2 &&
-                (channel_x[i][0] == channel_x[i][1] + 1 || channel_x[i][0] == channel_x[i][1] - 1) &&
-                (channel_y[i][0] == channel_y[i][1] + 1 || channel_y[i][0] == channel_y[i][1] - 1))
-            {
-                fh_pspx_strips_position[i]->Fill((channel_x[i][0] + 1) / 2,
-                                                 -((channel_y[i][0] + 1) / 2) + 3 * N_STRIPS_PSPX +
-                                                     1); // with inverted axis to account for orientation
-                // fh_pspx_strips_position[i]->Fill((channel_x[i][0] + 1) / 2, ((channel_y[i][0] + 1) / 2)); //without
-                // inverted axis => wrong orientation y axis
-            }
-
-            for (Int_t j = 0; j < mult_x[i]; j++)
-            {
-                fh_pspx_channel_x[i]->Fill(channel_x[i][j]);
-            }
-
-            for (Int_t j = 0; j < mult_y[i]; j++)
-            {
-                fh_pspx_channel_y[i]->Fill(channel_y[i][j]);
-            }
-        }
-    }
-
-    if (fCalItemsPspx)
-    {
-        Int_t energy_front[N_PSPX];
-        Int_t energy_back[N_PSPX];
-
-        for (UInt_t i = 0; i < N_PSPX; i++)
-        {
-            energy_front[i] = 0;
-            energy_back[i] = 0;
-        }
-
-        Int_t nHits = fCalItemsPspx->GetEntriesFast();
-
-        for (Int_t ihit = 0; ihit < nHits; ihit++)
-        {
-            for (UInt_t i = 0; i < N_PSPX; i++)
-            {
-                R3BPspxCalData* calData = (R3BPspxCalData*)fCalItemsPspx->At(ihit);
-                if (calData->GetDetector() == i + 1 && calData->GetStrip() > N_STRIPS_PSPX &&
-                    calData->GetStrip() < N_STRIPS_PSPX * 2 + 1)
-                {
-                    energy_back[i] += (calData->GetEnergy1() + calData->GetEnergy2());
-                }
-                else if (calData->GetDetector() == i + 1 && calData->GetStrip() > 0 &&
-                         calData->GetStrip() < N_STRIPS_PSPX + 1)
-                {
-                    energy_front[i] += (calData->GetEnergy1() + calData->GetEnergy2());
-                }
-            }
-        }
-
-        for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
-        {
-            // LOG(INFO) << "Test " << i << " " << energy_front[i] << " " << energy_back[i] << FairLogger::endl;
-            fh_pspx_cal_energy_frontback[i]->Fill(energy_front[i], energy_back[i]);
-        }
-    }
-
-    if (fHitItemsPspx)
-    {
-        Int_t nHits = fHitItemsPspx->GetEntriesFast();
-
-        for (Int_t ihit = 0; ihit < nHits; ihit++)
-        {
-            for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
-            {
-                R3BPspxHitData* hitData = (R3BPspxHitData*)fHitItemsPspx->At(ihit);
-
-                if (hitData->GetDetector() == i * 2 + 1)
-                {
-                    fh_pspx_hit_energy[i]->Fill(hitData->GetEnergy());
-                    fh_pspx_hit_position[i]->Fill(hitData->GetX(), hitData->GetY());
-                }
-            }
-        }
-    }
 
     fNEvents += 1;
 }
 
 void R3BOnlineSpectra::FinishEvent()
 {
-    if (fCalItemsLos)
-    {
-        fCalItemsLos->Clear();
+  for(Int_t det = 0; det < DET_MAX; det++) {
+    if(fMappedItems.at(det)) {
+      fMappedItems.at(det)->Clear(); 
     }
-
-    if (fCalItemsTofd)
-    {
-        fCalItemsTofd->Clear();
+    if(fCalItems.at(det)) {
+      fCalItems.at(det)->Clear(); 
     }
-    if (fCalItemsPtof)
-    {
-        fCalItemsPtof->Clear();
+    if(fHitItems.at(det)) {
+      fHitItems.at(det)->Clear(); 
     }
-    if (fMappedItemsLos)
-    {
-        fMappedItemsLos->Clear();
-    }
-    if (fMappedItemsTofd)
-    {
-        fMappedItemsTofd->Clear();
-    }
-
-    for (Int_t ifibcount = 0; ifibcount < 11; ifibcount++)
-    {
-        if (aMapped[ifibcount])
-        {
-            aMapped[ifibcount]->Clear();
-        }
-        if (aHit[ifibcount])
-        {
-            aHit[ifibcount]->Clear();
-        }
-    }
-
-    if (fMappedItemsPspx)
-    {
-        fMappedItemsPspx->Clear();
-    }
-    if (fPrecalItemsPspx)
-    {
-        fPrecalItemsPspx->Clear();
-    }
-    if (fCalItemsPspx)
-    {
-        fCalItemsPspx->Clear();
-    }
-    if (fHitItemsPspx)
-    {
-        fHitItemsPspx->Clear();
-    }
+  }  	  
 }
 
 void R3BOnlineSpectra::FinishTask()
-{
-    if (fMappedItemsLos)
+{    
+  if(fMappedItems.at(DET_LOS)){
+    fh_los_channels->Write();
+    fh_los_tot->Write();
+//    fh_los_pos_MCFD->Write();
+//    fh_los_pos_TAMEX->Write();
+  }
+	if(fCalItems.at(DET_TOFD))
+	{
+		for(Int_t i=0; i<4;i++){
+			fh_tofd_TotPm[i]->Write();
+			fh_tofd_TotPm[i]->Write();
+			fh_tofd_TotPm[i]->Write();
+		}
+	}    
+  for(Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++) {	
+    if(fMappedItems.at(ifibcount + DET_FI_FIRST)) 
     {
-        fh_los_channels->Write();
-        fh_los_tot->Write();
+      fh_channels_Fib[ifibcount]->Write();
+      fh_fibers_Fib[ifibcount]->Write();
+      fh_mult_Fib[ifibcount]->Write();
+      fh_time_Fib[ifibcount]->Write();
+      fh_multihit_m_Fib[ifibcount]->Write();   
+      fh_multihit_s_Fib[ifibcount]->Write();
+      fh_ToT_m_Fib[ifibcount]->Write();
+      fh_ToT_s_Fib[ifibcount]->Write();
+      fh_Fib_vs_Events[ifibcount]->Write();
+      fh_Fib_ToF[ifibcount]->Write();
     }
+  }   		 
+ 
 
-    for (Int_t ifibcount = 0; ifibcount < 11; ifibcount++)
-    {
-
-        if (aMapped[ifibcount])
-        {
-
-            fh_channels_Fib[ifibcount]->Write();
-            fh_fibers_Fib[ifibcount]->Write();
-            fh_mult_Fib[ifibcount]->Write();
-            fh_time_Fib[ifibcount]->Write();
-            fh_multihit_m_Fib[ifibcount]->Write();
-            fh_multihit_s_Fib[ifibcount]->Write();
-            fh_ToT_m_Fib[ifibcount]->Write();
-            fh_ToT_s_Fib[ifibcount]->Write();
-        }
-    }
-
-    if (fMappedItemsPspx)
-    {
-        // LOG(INFO) << "Finish MappedPspx" << FairLogger::endl;
-
-        for (UInt_t i = 0; i < N_PSPX; i++)
-        {
-            fh_pspx_channel_x[i]->Write();
-            fh_pspx_channel_y[i]->Write();
-            fh_pspx_multiplicity_x[i]->Write();
-            fh_pspx_multiplicity_y[i]->Write();
-            fh_pspx_strips_position[i]->Write();
-        }
-    }
-    if (fCalItemsPspx)
-    {
-        for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
-        {
-            fh_pspx_cal_energy_frontback[i]->Write();
-        }
-    }
-    if (fHitItemsPspx)
-    {
-        for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
-        {
-            fh_pspx_hit_energy[i]->Write();
-            fh_pspx_hit_position[i]->Write();
-        }
-    }
 }
 
 ClassImp(R3BOnlineSpectra)

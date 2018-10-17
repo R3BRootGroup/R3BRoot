@@ -21,6 +21,7 @@
 #include "TClonesArray.h"
 #include "TMath.h"
 #include <cstdlib>
+
 class TClonesArray;
 class TH1F;
 class TH2F;
@@ -100,88 +101,93 @@ class R3BOnlineSpectra : public FairTask
     void Reset_LOS_Histo();
     void Reset_SCI8_Histo();
     void Reset_TOFD_Histo();
-    void Reset_PSPX_Histo();
-
+    void Reset_FIBERS_Histo();
+ 
   private:
-    TClonesArray* fMappedItemsLos;  /**< Array with mapped items. */
-    TClonesArray* fCalItemsLos;     /**< Array with cal items. */
-    TClonesArray* fMappedItemsSci8; /**< Array with mapped items. */
-    TClonesArray* fCalItemsSci8;    /**< Array with cal items. */
-    TClonesArray* fMappedItemsTofd; /**< Array with mapped items. */
-    TClonesArray* fCalItemsTofd;    /**< Array with cal items. */
+    std::vector<TClonesArray *> fMappedItems;
+    std::vector<TClonesArray *> fCalItems;
+    std::vector<TClonesArray *> fHitItems;
 
-    TClonesArray* fMappedItemsPspx; /**< Array with Mapped items for Pspx. */
-    TClonesArray* fPrecalItemsPspx; /**< Array with Precal items for Pspx. */
-    TClonesArray* fCalItemsPspx;    /**< Array with Cal items for Pspx. */
-    TClonesArray* fHitItemsPspx;    /**< Array with Hit items for Pspx. */
+    enum DetectorInstances
+    {
+      DET_AMS,
+      DET_CALIFA,
+      DET_FI_FIRST,
+      DET_FI1A = DET_FI_FIRST,
+      DET_FI1B,
+      DET_FI2A,
+      DET_FI2B,
+      DET_FI3A,
+      DET_FI3B,
+      DET_FI4,
+      DET_FI5,
+      DET_FI6,
+      DET_FI7,
+      DET_FI8,
+      DET_FI9,
+      DET_FI10,
+      DET_FI11,
+      DET_FI_LAST = DET_FI11,
+      DET_L3T,
+      DET_LOS,
+      DET_MUSIC,
+      DET_NEULAND,
+      DET_PSPX,
+      DET_PTOF,
+      DET_ROLU,
+      DET_SCI8,
+      DET_STRAW,
+      DET_TOFD,
+      DET_MAX
+    };
+ 
+#define NOF_FIB_DET (DET_FI_LAST - DET_FI_FIRST + 1)
 
-    TClonesArray* fMappedItemsFi0;  /**< Array with mapped items. */
-    TClonesArray* fHitItemsFi0;     /**< Array with cal items. */
-    TClonesArray* fMappedItemsFi1a; /**< Array with mapped items. */
-    TClonesArray* fHitItemsFi1a;    /**< Array with cal items. */
-    TClonesArray* fMappedItemsFi1b; /**< Array with mapped items. */
-    TClonesArray* fHitItemsFi1b;    /**< Array with cal items. */
-    TClonesArray* fMappedItemsFi2a; /**< Array with mapped items. */
-    TClonesArray* fHitItemsFi2a;    /**< Array with cal items. */
-    TClonesArray* fMappedItemsFi2b; /**< Array with mapped items. */
-    TClonesArray* fHitItemsFi2b;
-    TClonesArray* fMappedItemsFi3a; /**< Array with mapped items. */
-    TClonesArray* fHitItemsFi3a;    /**< Array with cal items. */
-    TClonesArray* fMappedItemsFi3b; /**< Array with mapped items. */
-    TClonesArray* fHitItemsFi3b;    /**< Array with cal items. */
-    TClonesArray* fMappedItemsFi4;  /**< Array with mapped items. */
-    TClonesArray* fHitItemsFi4;     /**< Array with cal items. */
-    TClonesArray* fMappedItemsFi5;  /**< Array with mapped items. */
-    TClonesArray* fHitItemsFi5;     /**< Array with cal items. */
-    TClonesArray* fMappedItemsFi6;  /**< Array with mapped items. */
-    TClonesArray* fHitItemsFi6;     /**< Array with cal items. */
-    TClonesArray* fMappedItemsFi7;  /**< Array with mapped items. */
-    TClonesArray* fHitItemsFi7;     /**< Array with cal items. */
-    TClonesArray* fMappedItemsFi8;  /**< Array with mapped items. */
-    TClonesArray* fHitItemsFi8;     /**< Array with cal items. */
-    TClonesArray* fMappedItemsFi9;  /**< Array with mapped items. */
-    TClonesArray* fHitItemsFi9;     /**< Array with cal items. */
-    TClonesArray* fMappedItemsFi10; /**< Array with mapped items. */
-    TClonesArray* fHitItemsFi10;    /**< Array with cal items. */
-    TClonesArray* fMappedItemsFi11; /**< Array with mapped items. */
-    TClonesArray* fHitItemsFi11;    /**< Array with cal items. */
-    TClonesArray* fCalItemsPtof;    /**< Array with cal items. */
+    const char *fDetectorNames[DET_MAX + 1] =
+    {
+      "Ams",
+      "Califa",
+      "Fi1a",
+      "Fi1b",
+      "Fi2a",
+      "Fi2b",
+      "Fi3a",
+      "Fi3b",
+      "Fi4",
+      "Fi5",
+      "Fi6",
+      "Fi7",
+      "Fi8",
+      "Fi9",
+      "Fi10",
+      "Fi11",
+      "L3t",
+      "Los",
+      "Music",
+      "Neuland",
+      "Pspx",
+      "Ptof",
+      "Rolu",
+      "Sci8",
+      "Straw",
+      "Tofd",
+      NULL
+   };
 
-    std::vector<TClonesArray*> aMapped = { fMappedItemsFi1a, fMappedItemsFi1b, fMappedItemsFi2a, fMappedItemsFi2b,
-                                           fMappedItemsFi3a, fMappedItemsFi3b, fMappedItemsFi4,  fMappedItemsFi5,
-                                           fMappedItemsFi6,  fMappedItemsFi7,  fMappedItemsFi8,  fMappedItemsFi9,
-                                           fMappedItemsFi10, fMappedItemsFi11 };
-
-    std::vector<TClonesArray*> aHit = { fHitItemsFi1a, fHitItemsFi1b, fHitItemsFi2a, fHitItemsFi2b, fHitItemsFi3a,
-                                        fHitItemsFi3b, fHitItemsFi4,  fHitItemsFi5,  fHitItemsFi6,  fHitItemsFi7,
-                                        fHitItemsFi8,  fHitItemsFi9,  fHitItemsFi10, fHitItemsFi11 };
     // If FiberI is present or not:
-    bool FibPresent[14] = { false };
-    Int_t ifibdet;
-    std::string Mapped[14] = { "Fi1aMapped", "Fi1bMapped", "Fi2aMapped", "Fi2bMapped", "Fi3aMapped",
-                               "Fi3bMapped", "Fi4Mapped",  "Fi5Mapped",  "Fi6Mapped",  "Fi7Mapped",
-                               "Fi8Mapped",  "Fi9Mapped",  "Fi10Mapped", "Fi11Mapped" };
-    std::string Hit[14] = { "Fi1aHit", "Fi1bHit", "Fi2aHit", "Fi2bHit", "Fi3aHit", "Fi3bHit", "Fi4Hit",
-                            "Fi5Hit",  "Fi6Hit",  "Fi7Hit",  "Fi8Hit",  "Fi9Hit",  "Fi10Hit", "Fi11Hit" };
-    const char* cMapped[14];
-    const char* cHit[14];
+    Int_t  ifibdet;           
     // Number of fibers per detector
-    Double_t n_fiber[14] = { 256., 256., 256., 256, 512., 512., 2048., 2048., 1024., 512., 512., 512., 1024., 1024. };
-
-    // check for trigger should be done globablly (somewhere else)
-    R3BEventHeader* header; /**< Event header. */
-    Int_t fTrigger;         /**< Trigger value. */
-    Double_t fClockFreq;    /**< Clock cycle in [ns]. */
-    UInt_t fNofPlanes;
-    UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */
-
-    Int_t fNEvents = 0; /**< Event counter. */
-
-    Int_t fNEvents1;
+    Double_t n_fiber[NOF_FIB_DET]={256.,256.,256.,256,512.,512.,2048.,2048.,1024.,512.,512.,512.,1024.,1024.};    
     
-    UInt_t fNofDetectors;  /**< Number of detectors. */
-    UInt_t fNofChannels;   /**< Number of channels per detector. */    
-    UInt_t fNofModules;    /**< Total number of channels. */
+     
+	// check for trigger should be done globablly (somewhere else)
+    R3BEventHeader* header;                     /**< Event header. */
+    Int_t fTrigger;                             /**< Trigger value. */
+    Double_t fClockFreq;     /**< Clock cycle in [ns]. */
+    UInt_t fNofPlanes;  
+    UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */    
+
+    Int_t fNEvents = 0;         /**< Event counter. */
     
     TH1F *fh_sci8_channels;    
     TH1F *fh_sci8_tres_MCFD;
@@ -209,23 +215,27 @@ class R3BOnlineSpectra : public FairTask
     TH2F *fh_los_multihitVFTX;
     TH2F *fh_los_multihitLEAD;
     TH2F *fh_los_multihitTRAI;
+    TH2F *fh_los_pos_MCFD;
+    TH2F *fh_los_pos_TAMEX;
     TH2F *fh_los_pos;
     
-    TH1F *fh_channels_Fib[14];
-    TH1F *fh_fibers_Fib[14];
-    TH1F *fh_mult_Fib[14];
-    TH2F *fh_Fib_ToF[14];
-    TH1F *fh_Fib_pos[14];
-    TH2F *fh_time_Fib[14];
-    TH2F *fh_multihit_m_Fib[14];   
-    TH2F *fh_multihit_s_Fib[14];
-    TH2F *fh_ToT_m_Fib[14];
-    TH2F *fh_ToT_s_Fib[14];
-        
-    TH1F* fh_tofd_channels[N_PLANE_MAX_TOFD];
-    TH2F* fh_tofd_multihit[N_PLANE_MAX_TOFD];
-    TH2F* fh_tofd_ToF[N_PLANE_MAX_TOFD];
-    TH2F* fh_tofd_TotPm[N_PLANE_MAX_TOFD];
+    TH1F *fh_channels_Fib[NOF_FIB_DET];
+    TH1F *fh_fibers_Fib[NOF_FIB_DET];
+    TH1F *fh_mult_Fib[NOF_FIB_DET];
+    TH2F *fh_Fib_ToF[NOF_FIB_DET];
+    TH1F *fh_Fib_pos[NOF_FIB_DET];
+    TH2F *fh_time_Fib[NOF_FIB_DET];
+    TH2F *fh_multihit_m_Fib[NOF_FIB_DET];   
+    TH2F *fh_multihit_s_Fib[NOF_FIB_DET];
+    TH2F *fh_ToT_m_Fib[NOF_FIB_DET];
+    TH2F *fh_ToT_s_Fib[NOF_FIB_DET];
+    TH2F *fh_Fib_vs_Events[NOF_FIB_DET];
+    
+    
+    TH1F *fh_tofd_channels[N_PLANE_MAX_TOFD];   
+    TH2F *fh_tofd_multihit[N_PLANE_MAX_TOFD];
+    TH2F *fh_tofd_ToF[N_PLANE_MAX_TOFD];
+    TH2F* fh_tofd_TotPm[N_PLANE_MAX_TOFD]; 
     TH2F* fh_tofd_dt[3];
 
     TH1F* fh_ptof_channels;

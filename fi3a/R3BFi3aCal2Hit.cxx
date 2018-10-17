@@ -1,7 +1,7 @@
 #include "R3BFi3aCal2Hit.h"
 
-R3BFi3aCal2Hit::R3BFi3aCal2Hit(Direction a_direction, Int_t a_verbose)
-  : R3BBunchedFiberCal2Hit("Fi3a", a_verbose, a_direction, 1, 256, 1)
+R3BFi3aCal2Hit::R3BFi3aCal2Hit(Direction a_direction, Bool_t a_is_calibrator, Int_t a_verbose)
+  : R3BBunchedFiberCal2Hit("Fi3a", a_verbose, a_direction, 1, 256, 2, a_is_calibrator)
 {
 }
 

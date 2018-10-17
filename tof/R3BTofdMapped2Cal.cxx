@@ -26,6 +26,8 @@
 #include "R3BTofdCalData.h"
 #include "R3BTofdMappedData.h"
 
+#include "R3BEventHeader.h"
+
 #define IS_NAN(x) TMath::IsNaN(x)
 
 namespace {
@@ -41,6 +43,7 @@ R3BTofdMapped2Cal::R3BTofdMapped2Cal()
   , fNofTcalPars(0)
   , fNofPlanes(0)
   , fPaddlesPerPlane(0)
+  , fTrigger(-1)
   , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
   , fCalLookup()
 {
@@ -55,6 +58,7 @@ R3BTofdMapped2Cal::R3BTofdMapped2Cal()
   , fNofTcalPars(0)
   , fNofPlanes(0)
   , fPaddlesPerPlane(0)
+  , fTrigger(-1)  
   , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
   , fCalLookup()
 {
@@ -119,6 +123,11 @@ InitStatus R3BTofdMapped2Cal::ReInit()
 
 void R3BTofdMapped2Cal::Exec(Option_t *option)
 {
+		// check for requested trigger (Todo: should be done globablly / somewhere else)
+	if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
+		return;
+
+
   for (auto it = fCalLookup.begin(); fCalLookup.end() != it; ++it) {
     auto &vec = *it;
     vec.clear();
