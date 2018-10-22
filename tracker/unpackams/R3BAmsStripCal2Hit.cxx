@@ -113,10 +113,7 @@ void R3BAmsStripCal2Hit::Exec(Option_t* option)
    for(Int_t j = 0; j < 2; j++)for(Int_t k = 0; k < 2; k++)CoG[i][j][k]=0.;
   }
 
-  //Position Z: FIXME from macro analysis
-  Double_t PosZ[MaxNumDet]={-6.,-3.,3.,6.};
-
- 
+// 
   for(Int_t i = 0; i < nHits; i++) {
     calData[i] = (R3BAmsStripCalData*)(fAmsStripCalDataCA->At(i));
     detId=calData[i]->GetDetId();
@@ -132,7 +129,7 @@ void R3BAmsStripCal2Hit::Exec(Option_t* option)
 
   // Add hits per detector:TODO only multiplicity one
   for(Int_t i = 0; i < MaxNumDet; i++){
-    if(CountDet[i]>0)AddHitData(i,1,CoG[i][0][0]/CoG[i][0][1]*fPitchS/1000.,CoG[i][1][0]/CoG[i][1][1]*fPitchK/1000.,PosZ[i],SumEnergy[i]);
+    if(CountDet[i]>0)AddHitData(i,1,CoG[i][0][0]/CoG[i][0][1]*fPitchS/1000.,CoG[i][1][0]/CoG[i][1][1]*fPitchK/1000.,SumEnergy[i]);
   }
 
   if(calData) delete calData;
@@ -154,12 +151,12 @@ void R3BAmsStripCal2Hit::Reset()
 
 
 // -----   Private method AddHitData  --------------------------------------------
-R3BAmsHitData* R3BAmsStripCal2Hit::AddHitData(Int_t detid, Int_t numhit, Double_t x, Double_t y, Double_t z, Double_t energy)
+R3BAmsHitData* R3BAmsStripCal2Hit::AddHitData(Int_t detid, Int_t numhit, Double_t x, Double_t y, Double_t energy)
 {
   //It fills the R3BAmsHitData
   TClonesArray& clref = *fAmsHitDataCA;
   Int_t size = clref.GetEntriesFast();
-  return new(clref[size]) R3BAmsHitData(detid,numhit,x,y,z,energy);
+  return new(clref[size]) R3BAmsHitData(detid,numhit,x,y,energy);
 }
 
 ClassImp(R3BAmsStripCal2Hit)
