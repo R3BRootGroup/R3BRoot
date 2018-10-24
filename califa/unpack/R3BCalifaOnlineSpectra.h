@@ -10,6 +10,7 @@
 #define N_MAX_PETALS 8
 
 #include "FairTask.h"
+#include "TCanvas.h"
 #include <sstream>
 #include <fstream>
 #include <iostream>
@@ -85,25 +86,42 @@ class R3BCalifaOnlineSpectra : public FairTask {
   }
   
   /**
-   * Method for setting number of crystals
-   */
-  //inline void SetOneCrystal(Int_t onecry) {
-  //  fCalifaOneCrystal = onecry;
-  //}
-  
-  /**
    * Method for setting the configuration parameters file
    */  
   inline void SetCalifaConfigFile(TString file){fCalifaFile=file;}
   
   /**
+   * Method to select binning and max range
+   */
+
+  void SetRange_bins(Int_t Histos_bins){fMapHistos_bins=Histos_bins;}
+  void SetRange_max(Int_t Histos_max){fMapHistos_max=Histos_max;}
+
+  /**
+   * Method to reset histograms
+   */
+  void Reset_CALIFA_Histo();
+
+  /**
+   * Method to change histogram scales
+   */
+  void Log_CALIFA_Histo();
+
+  /**
    * Method for setting the Data Level (Mapped or Cal)
-   */ 
-  inline void SetDisplayCalOn(Bool_t On){fCalON=On;}
-  
-  
+   */
+  void Map2Cal_CALIFA_Histo();
+
+  /**
+   * Method for setting histogram sequence (Febex or Preamp. channels)
+   */
+  void Febex2Preamp_CALIFA_Histo();
+
  private:
   
+  Int_t fMapHistos_max;
+  Int_t fMapHistos_bins;
+
   TClonesArray* fMappedItemsCalifa;     /**< Array with mapped items. */
   TClonesArray* fCalItemsCalifa;        /**< Array with cal items. */
   
@@ -113,17 +131,35 @@ class R3BCalifaOnlineSpectra : public FairTask {
   Int_t fNEvents;        	   	/**< Event counter. */
   
   Int_t fCalifaNumPetals;              	/**< Number of Petals. */
-  // Int_t fCalifaOneCrystal;      	/**< Crystal for plots. */
-  
-  TH1F* fh_Califa_energy_per_petal[N_MAX_PETALS];	
-  TH1F* fh_Califa_crystals [N_MAX_PETALS][N_MAX_CRY];
-  TH1F* fh_Califa_energy_oneCry;
-  
-  TH2F* fh_Califa_cryId_energy;
+  Int_t fNumCrystalPetal;        	/**< Crystals per Petal. */
+  Int_t fOrderFebexPreamp[16];          /**< Selector for febex or preamp sequence. */  
+
+  //Raw data
   TH2F* fh_Califa_cryId_petal;
+  TH1F* fh_Califa_energy_per_petal[N_MAX_PETALS];	
+  TH1F* fh_Califa_crystals[N_MAX_PETALS][N_MAX_CRY];  
+  TH2F* fh_Califa_cryId_energy;
+  TH2F* fh_Califa_coinc_petal1;
+  TH2F* fh_Califa_coinc_petal2;
+
+  //Cal data
+  TH2F* fh_Califa_cryId_energy_cal;
+  TH1F* fh_Califa_energy_per_petal_cal[N_MAX_PETALS];
+  TH1F* fh_Califa_crystals_cal[N_MAX_PETALS][N_MAX_CRY];
   
   TString fCalifaFile;        	        /**< Config file name. */
-  Bool_t  fCalON;                 	/**< Mapped or Cal selector. */
+  Bool_t  fCalON;                 	/**< Cal selector. */
+  Bool_t  fLogScale;                 	/**< Selecting scale. */
+  Bool_t  fRaw2Cal;                     /**< Mapped or Cal selector. */
+  Bool_t  fFebex2Preamp;                /**< Febex or Preamp selector. */
+
+  TCanvas* cMap;
+  TCanvas* cCalifa1;
+  TCanvas* cCalifa2;
+  TCanvas* cCalifa3;
+  TCanvas* cCalifa4[N_MAX_PETALS][4];
+  TCanvas* cCalifa5;
+  TCanvas* cCalifa6;
   
  public:
   ClassDef(R3BCalifaOnlineSpectra, 1)
