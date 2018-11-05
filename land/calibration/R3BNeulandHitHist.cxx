@@ -45,7 +45,7 @@ InitStatus R3BNeulandHitHist::Init()
     FairRootManager* fMan = FairRootManager::Instance();
     if (!fMan)
     {
-        FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
+        LOG(fatal) << "FairRootManager not found";
     }
     fLandDigi = (TClonesArray*)fMan->GetObject("LandDigi");
     fLosHit = (TClonesArray*)fMan->GetObject("LosHit");

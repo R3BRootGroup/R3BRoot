@@ -43,18 +43,18 @@ InitStatus R3BNeulandMapped2QCalPar::Init()
 {
   FairRootManager* fMan = FairRootManager::Instance();
   if (! fMan) {
-    FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, " FairRootManager not found.");
+    LOG(fatal) << " FairRootManager not found.";
     return kFATAL;
   }
   fHits = (TClonesArray*) fMan->GetObject("NeulandMappedData");
   if (!fHits) {
-    FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, " Branch: NeulandMappedData not found in Tree.");
+    LOG(fatal) << " Branch: NeulandMappedData not found in Tree.";
     return kFATAL;
   } 
   header = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
   if (!header)
   {
-    FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, " Branch: R3BEventHeader not found in Tree.");
+    LOG(fatal) << " Branch: R3BEventHeader not found in Tree.";
     return kFATAL;
   }
   

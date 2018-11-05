@@ -389,7 +389,7 @@ void R3BFieldMap::Init() {
   else {
     cerr << "-E- R3BFieldMap::Init: No proper file name defined! ("
 	 << fFileName << ")" << endl;
-    Fatal("Init", "No proper file name");
+     LOG(fatal) << "Init: No proper file name";
     }
 */
 

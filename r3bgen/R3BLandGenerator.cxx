@@ -7,6 +7,7 @@
 #include "FairPrimaryGenerator.h"
 #include "FairIon.h"
 #include "FairRunSim.h"
+#include "FairLogger.h"
 
 //ROOT INCLUDES
 #include "TDatabasePDG.h"
@@ -58,7 +59,7 @@ R3BLandGenerator::R3BLandGenerator(const char* fileName)
   // Open first the file to read all particles
   fInputFile = new TFile(fFileName,"READ");
 
-  if ( ! fInputFile->IsOpen() )  Fatal("R3BLandGenerator","Cannot open input file.");
+  if ( ! fInputFile->IsOpen() )  LOG(fatal) << "R3BLandGenerator: Cannot open input file.";
 
   tree = (TTree*)fInputFile->Get("Tree");
   lPDG = (TLeaf*)tree->GetLeaf("PDG");

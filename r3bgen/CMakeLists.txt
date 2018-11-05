@@ -87,5 +87,5 @@ find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
 add_executable(testR3BPhaseSpaceGenerator testR3BPhaseSpaceGenerator.cxx)
-target_link_libraries(testR3BPhaseSpaceGenerator ${GTEST_BOTH_LIBRARIES} ${ROOT_LIBRARIES} FairLogger::FairLogger R3BGen)
+target_link_libraries(testR3BPhaseSpaceGenerator ${GTEST_BOTH_LIBRARIES} ${ROOT_LIBRARIES} FairLogger::FairLogger ParBase R3BGen)
 add_test(R3BPhaseSpaceGeneratorUnitTest ${EXECUTABLE_OUTPUT_PATH}/testR3BPhaseSpaceGenerator)

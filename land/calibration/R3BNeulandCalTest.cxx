@@ -51,7 +51,7 @@ InitStatus R3BNeulandCalTest::Init()
     FairRootManager* fMan = FairRootManager::Instance();
     if (!fMan)
     {
-        FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
+        LOG(fatal) << "FairRootManager not found";
     }
     fLandPmt = (TClonesArray*)fMan->GetObject("NeulandCalData");
     fNeulandPmt = (TClonesArray*)fMan->GetObject("NeulandPmt");

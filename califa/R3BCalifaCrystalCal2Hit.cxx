@@ -58,10 +58,10 @@ void R3BCalifaCrystalCal2Hit::SetParContainers()
 {
   // // Get run and runtime database
   // FairRunAna* run = FairRunAna::Instance();
-  // if (!run) Fatal("R3BCalifaCrystalCal2Hit::SetParContainers", "No analysis run");
+    // if (!run) LOG(fatal) << "R3BCalifaCrystalCal2Hit::SetParContainers: No analysis run";
 
   // FairRuntimeDb* rtdb = run->GetRuntimeDb();
-  // if (!rtdb) Fatal("R3BCalifaCrystalCal2Hit::SetParContainers", "No runtime database");
+    // if (!rtdb) LOG(fatal) << "R3BCalifaCrystalCal2Hit::SetParContainers: No runtime database";
 
   // fCalifaHitFinderPar = (R3BCalifaCrystalCal2HitPar*)(rtdb->getContainer("R3BCalifaCrystalCal2HitPar"));
   // if ( fVerbose && fCalifaHitFinderPar ) {
@@ -77,7 +77,7 @@ InitStatus R3BCalifaCrystalCal2Hit::Init()
 {
 
   FairRootManager* ioManager = FairRootManager::Instance();
-  if ( !ioManager ) Fatal("Init", "No FairRootManager");
+    if ( !ioManager ) LOG(fatal) << "Init: No FairRootManager";
   if( !ioManager->GetObject("CalifaCrystalCalDataSim") ) {
      fCrystalHitCA = (TClonesArray*) ioManager->GetObject("CalifaCrystalCalData");
   } else {

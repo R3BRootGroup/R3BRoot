@@ -9,6 +9,7 @@
 
 #include "R3BCosmicGenerator.h"
 #include "FairPrimaryGenerator.h"
+#include "FairLogger.h"
 
 #include "TRandom.h"
 #include "TParticlePDG.h"
@@ -50,15 +51,14 @@ Bool_t R3BCosmicGenerator::Init()
   // Initialize generator
 
   if (fPhiMax-fPhiMin>360)
-    Fatal("Init()","R3BCosmicGenerator: phi range is too wide: %f<phi<%f",
-	  fPhiMin,fPhiMax);
+    LOG(fatal) << "Init(): R3BCosmicGenerator: phi range is too wide: " << fPhiMin << "<phi<" << fPhiMax;
   if (fPointVtxIsSet && fBoxVtxIsSet)
-    Fatal("Init()","R3BCosmicGenerator: Cannot set point and box vertices simultaneously");
+    LOG(fatal) << "Init(): R3BCosmicGenerator: Cannot set point and box vertices simultaneously";
 
   // Check for particle type
   TDatabasePDG* pdgBase = TDatabasePDG::Instance();
   TParticlePDG *particle = pdgBase->GetParticle(fPDGType);
-  if (! particle) Fatal("R3BCosmicGenerator","PDG code %d not defined.",fPDGType);
+  if (! particle) LOG(fatal) << "R3BCosmicGenerator: PDG code " << fPDGType << " not defined.";
   fPDGMass = particle->Mass();
   return kTRUE;
 }

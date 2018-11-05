@@ -69,7 +69,7 @@ InitStatus R3BAmsOnlineSpectra::Init() {
   
   FairRootManager* mgr = FairRootManager::Instance();
   if (NULL == mgr)
-    FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "R3BAmsOnlineSpectra::Init FairRootManager not found");
+    LOG(fatal) << "R3BAmsOnlineSpectra::Init FairRootManager not found";
   header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
   FairRunOnline *run = FairRunOnline::Instance();

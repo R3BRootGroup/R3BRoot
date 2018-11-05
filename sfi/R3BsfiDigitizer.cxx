@@ -6,6 +6,7 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "FairLogger.h"
 
 
 // includes for modeling
@@ -78,7 +79,7 @@ InitStatus R3BsfiDigitizer::Init() {
 
   // Get input array 
   FairRootManager* ioman = FairRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No FairRootManager");
+  if ( ! ioman ) LOG(fatal) << "Init: No FairRootManager";
   fPoints = (TClonesArray*) ioman->GetObject("SFIPoint");
   
   fMCTrack = (TClonesArray*) ioman->GetObject("MCTrack");

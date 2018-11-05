@@ -89,7 +89,7 @@ InitStatus R3BLosMapped2Cal::Init()
 	// present though and hence may be null. Take care when using.
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
+        LOG(fatal) << "FairRootManager not found";
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
 
@@ -98,7 +98,7 @@ InitStatus R3BLosMapped2Cal::Init()
  
     
     if (NULL == fMappedItems)
-        FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch LosMapped not found");
+        LOG(fatal) << "Branch LosMapped not found";
 
 
 	// request storage of Cal data in output tree

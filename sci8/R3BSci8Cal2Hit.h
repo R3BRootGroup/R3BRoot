@@ -91,7 +91,7 @@ class R3BSci8Cal2Hit : public FairTask
     {
         fsci8OffsetXT = offsetXT;
         fsci8VeffXT = veffXT;
-    }     /**
+    }
 	   
  
     /*

@@ -124,12 +124,12 @@ InitStatus R3BStrawtubesMapped2Cal::Init()
 
   FairRootManager *mgr = FairRootManager::Instance();
   if (!mgr) {
-    FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
+    LOG(fatal) << "FairRootManager not found";
   }
 
   fMappedItems = (TClonesArray*)mgr->GetObject("StrawtubesMapped");
   if (!fMappedItems) {
-    FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch StrawtubesMapped not found");
+    LOG(fatal) << "Branch StrawtubesMapped not found";
   }
 
   mgr->Register("StrawtubesCal", "Land", fCalItems, kTRUE);

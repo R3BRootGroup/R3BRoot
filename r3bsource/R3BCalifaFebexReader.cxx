@@ -49,8 +49,8 @@ Bool_t R3BCalifaFebexReader::Init(ext_data_struct_info *a_struct_info) {
 }
 
 Bool_t R3BCalifaFebexReader::Read() {
-  EXT_STR_h101_CALIFA_onion_t *data =
-	    (EXT_STR_h101_CALIFA_onion_t *) fData;
+  //EXT_STR_h101_CALIFA_onion_t *data =
+	//    (EXT_STR_h101_CALIFA_onion_t *) fData;
 
   /* Display data */
   LOG(DEBUG)<<"R3BCalifaFebexReader::Read() Event data."<<FairLogger::endl;

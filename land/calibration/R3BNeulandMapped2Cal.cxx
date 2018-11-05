@@ -95,19 +95,19 @@ InitStatus R3BNeulandMapped2Cal::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
     {
-        FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
+        LOG(fatal) << "FairRootManager not found";
     }
 
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     if (NULL == header)
     {
-        FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch R3BEventHeader not found");
+        LOG(fatal) << "Branch R3BEventHeader not found";
     }
 
     fRawHit = (TClonesArray*)mgr->GetObject("NeulandMappedData");
     if (NULL == fRawHit)
     {
-        FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch LandRawHitMapped not found");
+        LOG(fatal) << "Branch LandRawHitMapped not found";
     }
 
     mgr->Register("NeulandCalData", "Land", fPmt, kTRUE);

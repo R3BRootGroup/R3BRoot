@@ -48,19 +48,19 @@ InitStatus R3BPtofCal2HitPar::Init()
 	FairRootManager* fMan = FairRootManager::Instance();
 
 	if (! fMan) {
-		FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found!");
+		LOG(fatal) << "FairRootManager not found!";
 		return kFATAL;
 	}
 
 	fCalData = (TClonesArray*) fMan->GetObject("PtofCal");
 	if (NULL == fCalData) {
-		FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch PtofCal not found!");
+		LOG(fatal) << "Branch PtofCal not found!";
 		return kFATAL;
 	}
    
 	fPar = (R3BPtofHitPar*) FairRuntimeDb::instance()->getContainer("PtofHitPar");
 	if (NULL == fPar) {
-		FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "PtofHitPar not found!");
+		LOG(fatal) << "PtofHitPar not found!";
 		return kFATAL;
 	}
    

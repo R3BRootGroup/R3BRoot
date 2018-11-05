@@ -6,6 +6,7 @@
 #include "FairPrimaryGenerator.h"
 #include "FairIon.h"
 #include "FairRunSim.h"
+#include "FairLogger.h"
 
 #include "TDatabasePDG.h"
 #include "TParticlePDG.h"
@@ -43,7 +44,7 @@ R3BAsciiGenerator::R3BAsciiGenerator(const char* fileName)
   // Open first the file to register all new ions.
   fInputFile = new ifstream(fFileName);
   if ( ! fInputFile->is_open() ) 
-    Fatal("R3BAsciiGenerator","Cannot open input file.");
+    LOG(fatal) << "R3BAsciiGenerator: Cannot open input file.";
   cout << "-I- R3BAsciiGenerator: Looking for ions..." << endl;
 
   Int_t nIons = RegisterIons();

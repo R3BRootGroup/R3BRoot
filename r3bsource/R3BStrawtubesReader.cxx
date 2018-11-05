@@ -31,7 +31,7 @@ Bool_t R3BStrawtubesReader::Init(ext_data_struct_info *a_struct_info)
   EXT_STR_h101_STRAWTUBES_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_STRAWTUBES, 1);
   if (!ok) {
     perror("ext_data_struct_info_item");
-    fLogger->Error(MESSAGE_ORIGIN, "Failed to setup structure information.");
+    LOG(error) << "Failed to setup structure information.";
     return kFALSE;
   }
 
@@ -60,8 +60,9 @@ Bool_t R3BStrawtubesReader::Read()
         }
       }
       if (fOnion->STRAW[plane_i].S[side_i].TF != vector_i) {
-        fLogger->Error(MESSAGE_ORIGIN, "Straw plane=%d: UCESB multi-hit "
-		  "structure corrupt (TF=%d, vector_i=%d)!", plane_i, fOnion->STRAW[plane_i].S[side_i].TF, vector_i);
+          LOG(error) << "Straw plane=" << plane_i << ": UCESB multi-hit "
+                                                     "structure corrupt (TF="
+                     << fOnion->STRAW[plane_i].S[side_i].TF << ", vector_i=" << vector_i << ")!";
       }
     }
   }

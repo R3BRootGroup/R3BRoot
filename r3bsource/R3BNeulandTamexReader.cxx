@@ -37,8 +37,7 @@ Bool_t R3BNeulandTamexReader::Init(ext_data_struct_info *a_struct_info)
 
 	if (!ok) {
 		perror("ext_data_struct_info_item");
-		fLogger->Error(MESSAGE_ORIGIN,
-		    "Failed to setup structure information.");
+		LOG(error) << "Failed to setup structure information.";
 		return kFALSE;
 	}
 
@@ -50,12 +49,13 @@ Bool_t R3BNeulandTamexReader::Init(ext_data_struct_info *a_struct_info)
 
 Bool_t R3BNeulandTamexReader::Read()
 {
-	EXT_STR_h101_raw_nnp_tamex_onion_t *data =
-	    (EXT_STR_h101_raw_nnp_tamex_onion_t *) fData;
+	//EXT_STR_h101_raw_nnp_tamex_onion_t *data =
+	 //   (EXT_STR_h101_raw_nnp_tamex_onion_t *) fData;
 
 	/* Display data */
-	fLogger->Info(MESSAGE_ORIGIN, "  Event data:");
+	LOG(info) << "  Event data:";
 /*
+    char strMessage[1000];
 	for (int plane = 0; plane < N_PLANES; ++plane) {
 		for (int pm = 0; pm < 2; ++pm) {
 
@@ -71,21 +71,21 @@ Bool_t R3BNeulandTamexReader::Read()
                 data->NN_P[plane].tcl_T[pm].B != data->NN_P[plane].tfl_T[pm].B ||
                 data->NN_P[plane].tct_T[pm].BM != data->NN_P[plane].tft_T[pm].BM ||
                 data->NN_P[plane].tct_T[pm].B != data->NN_P[plane].tft_T[pm].B ){
-				fLogger->Info(MESSAGE_ORIGIN, "  Bad event, counter of coarse times and fine times do not match \n");
+				LOG(info) << "  Bad event, counter of coarse times and fine times do not match");
 				return kFALSE;
 			}
 			
            // the counter for leading and trailing edge should be always the same:
             if (data->NN_P[plane].tcl_T[pm].B != data->NN_P[plane].tct_T[pm].B ||
                 data->NN_P[plane].tfl_T[pm].B != data->NN_P[plane].tft_T[pm].B ){
-				fLogger->Info(MESSAGE_ORIGIN, "  Bad event, mismatch of trailing and leading edges \n");
+				LOG(info) << "  Bad event, mismatch of trailing and leading edges");
 				return kFALSE;
 			}
 
             for (int hit=0; hit<data->NN_P[plane].tcl_T[pm].BM;hit++){
 				bar = data->NN_P[plane].tcl_T[pm].BMI[hit];
 				stop = data->NN_P[plane].tcl_T[pm].BME[hit];
-//				fLogger->Info(MESSAGE_ORIGIN, "  bar %d, multihit %d \n", bar, stop-start);
+//				LOG(info) << "  bar " << bar << ", multihit " << (stop-start);
 				
                 for (int multi=start; multi<stop; multi++){
 				    cLE = data->NN_P[plane].tcl_T[pm].Bv[multi];
@@ -93,8 +93,8 @@ Bool_t R3BNeulandTamexReader::Read()
 				    cTE = data->NN_P[plane].tct_T[pm].Bv[multi];
 				    fTE = data->NN_P[plane].tft_T[pm].Bv[multi];					
 										
-//				    fLogger->Info(MESSAGE_ORIGIN, " leading coarse time %d, fine time %d \n", cLE, fLE);					
-//				    fLogger->Info(MESSAGE_ORIGIN, " trailing coarse time %d, fine time %d \n",cTE, fTE);					
+//				    LOG(info) << " leading coarse time " << cLE << ", fine time " << fLE;
+//				    LOG(info) << " trailing coarse time " << cTE << ", fine time " << fTE;
 			    
                     new ((*fArray)[fArray->GetEntriesFast()])
                         R3BPaddleTamexMappedData(plane, bar, pm, cLE, fLE, cTE, fTE, kFALSE);

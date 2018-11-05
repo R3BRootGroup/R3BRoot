@@ -1,5 +1,6 @@
 
 #include "FairPrimaryGenerator.h"
+#include "FairLogger.h"
 #include "R3BSpecificGenerator.h"
 #include "R3BBeamInfo.h"
 #include "TRandom.h"
@@ -83,7 +84,7 @@ R3BSpecificGenerator::R3BSpecificGenerator(Int_t pdg, Float_t beamEnergy)
   FairRunSim* run = FairRunSim::Instance();
   if ( ! run ) {
     cout << "-E- R3BSpecificGenerator: No FairRun instantiated!" << endl;
-    Fatal("R3BSpecificGenerator", "No FairRun instantiated!");
+    LOG(fatal) << "R3BSpecificGenerator: No FairRun instantiated!";
   }
   // - add the Ion definition
   run->AddNewIon(fIon);
@@ -145,7 +146,7 @@ Bool_t R3BSpecificGenerator::Init()
   TDatabasePDG* pdgBase = TDatabasePDG::Instance();
   TParticlePDG *particle = pdgBase->GetParticle(fPDGType);
   if (! particle){
-      Fatal("R3BSpecificGenerator","PDG code %d not defined.",fPDGType);
+      LOG(fatal) << "R3BSpecificGenerator: PDG code " << fPDGType << " not defined.";
 
   } else {
       fPDGMass = particle->Mass();
@@ -535,7 +536,7 @@ Bool_t R3BSpecificGenerator::ReadEvent(FairPrimaryGenerator* primGen)
       // Check for particle type
       TDatabasePDG* pdgBase = TDatabasePDG::Instance();
       TParticlePDG *particle = pdgBase->GetParticle(fPDGType);
-      if (! particle) Fatal("R3BSpecificGenerator","PDG code %d not defined.",fPDGType);
+      if (! particle) LOG(fatal) << "R3BSpecificGenerator: PDG code " << fPDGType << " not defined.";
 
       TVector3 direction;
       //Randomize in emission angle (if not, emission is normal to beam line)
@@ -608,7 +609,7 @@ Bool_t R3BSpecificGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 	  fPDGType = 2212;
 	  pdgBase->GetParticle(fPDGType);
 	  particle = pdgBase->GetParticle(fPDGType);
-	  if (! particle) Fatal("R3BSpecificGenerator","PDG code %d not defined.",fPDGType);
+      if (! particle) LOG(fatal) << "R3BSpecificGenerator: PDG code " << fPDGType << " not defined.";
 	  amu = particle->Mass();  // Mass in GeV
 
 
@@ -849,7 +850,7 @@ Bool_t R3BSpecificGenerator::ReadEvent(FairPrimaryGenerator* primGen)
       fPDGType = 2212;
       TDatabasePDG* pdgBase = TDatabasePDG::Instance();
       TParticlePDG *particle = pdgBase->GetParticle(fPDGType);
-      if (! particle) Fatal("R3bSpecificGenerator","PDG code %d not defined.",fPDGType);
+      if (! particle) LOG(fatal) << "R3bSpecificGenerator: PDG code " << fPDGType << " not defined.";
 
 
       // Adding Particles to Specific Stack
@@ -955,7 +956,7 @@ Bool_t R3BSpecificGenerator::ReadEvent(FairPrimaryGenerator* primGen)
       fPDGType = 2212;
       TDatabasePDG* pdgBase = TDatabasePDG::Instance();
       TParticlePDG *particle = pdgBase->GetParticle(fPDGType);
-      if (! particle) Fatal("R3bSpecificGenerator","PDG code %d not defined.",fPDGType);
+      if (! particle) LOG(fatal) << "R3bSpecificGenerator: PDG code " << fPDGType << " not defined.";
 
       //final settings for proton
       //Double_t fE=pBackTrackingGenerator->GetE1()/1000. + particle->Mass(); // Etot_part in GeV!

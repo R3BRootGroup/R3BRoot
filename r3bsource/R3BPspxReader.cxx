@@ -39,7 +39,7 @@ Bool_t R3BPspxReader::Init(ext_data_struct_info* a_struct_info)
     if (!ok)
     {
         perror("ext_data_struct_info_item");
-        fLogger->Error(MESSAGE_ORIGIN, "Failed to setup structure information.");
+        LOG(error) << "Failed to setup structure information.";
         return kFALSE;
     }
 
@@ -110,7 +110,7 @@ Bool_t R3BPspxReader::Read()
     EXT_STR_h101_PSP_onion* data = (EXT_STR_h101_PSP_onion*)fData;
 
     // Display data
-    // fLogger->Info(MESSAGE_ORIGIN, "  Event data:");
+    //LOG(info) << "  Event data:";
 
     /*
       // this is the data structure we have to read:

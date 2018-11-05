@@ -61,7 +61,7 @@ InitStatus R3BdTofDigitizer::Init() {
 //  cout<<"Init "<<endl;
   // Get input array 
   FairRootManager* ioman = FairRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No FairRootManager");
+  if ( ! ioman ) LOG(fatal) << "Init: No FairRootManager";
   fdTofPoints = (TClonesArray*) ioman->GetObject("dTOFPoint");
   fMCTrack = (TClonesArray*) ioman->GetObject("MCTrack");
    

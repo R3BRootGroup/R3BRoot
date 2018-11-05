@@ -22,6 +22,7 @@ R3Bp2pevtGenerator::R3Bp2pevtGenerator()
 Bool_t R3Bp2pevtGenerator::Init()
 {
 	fRandom.SetSeed(0);
+    return kTRUE;
 }
 
 void R3Bp2pevtGenerator::SetBeamEnergy(double E)

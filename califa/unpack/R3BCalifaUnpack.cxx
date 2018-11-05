@@ -76,10 +76,10 @@ void R3BCalifaUnpack::SetParContainers() {
   
   // Get run and runtime database
   FairRunAna* run = FairRunAna::Instance();
-  if (!run) Fatal("R3BCalifaUnpack::SetParContainers", "No analysis run");
+    if (!run) LOG(fatal) << "R3BCalifaUnpack::SetParContainers: No analysis run";
   
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
-  if (!rtdb) Fatal("R3BCalifaUnpack::SetParContainers", "No runtime database");
+    if (!rtdb) LOG(fatal) << "R3BCalifaUnpack::SetParContainers: No runtime database";
   
   fCalifaMappedPar = (R3BCalifaMappedPar*)(rtdb->getContainer("R3BCalifaMappedPar"));
   

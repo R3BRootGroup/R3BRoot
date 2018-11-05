@@ -13,6 +13,7 @@
 
 #include "FairPrimaryGenerator.h"
 #include "FairMCEventHeader.h"
+#include "FairLogger.h"
 
 #include "TDatabasePDG.h"
 
@@ -42,7 +43,7 @@ R3Bp2pGenerator::R3Bp2pGenerator(const char* fileName)
   cout << "-I R3Bp2pGenerator: Opening input file " << fileName << endl;
   fInputFile = new ifstream(fFileName);
   if ( ! fInputFile->is_open() ) 
-    Fatal("R3Bp2pGenerator","Cannot open input file.");
+    LOG(fatal) << "R3Bp2pGenerator: Cannot open input file.";
 //  fOutputFile = new ofstream("vertex.out");
 
   // fPDG=TDatabasePDG::Instance(); 

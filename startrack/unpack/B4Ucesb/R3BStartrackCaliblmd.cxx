@@ -52,10 +52,10 @@ void R3BStartrackCalib::SetParContainers()
 {
   // Get run and runtime database
   FairRunAna* run = FairRunAna::Instance();
-  if (!run) Fatal("R3BStartrackCalib::SetParContainers", "No analysis run");
+  if (!run) LOG(fatal) << "R3BStartrackCalib::SetParContainers: No analysis run";
   
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
-  if (!rtdb) Fatal("R3BStarTraCalib::SetParContainers", "No runtime database");
+  if (!rtdb) LOG(fatal) << "R3BStarTraCalib::SetParContainers: No runtime database";
   
   fStartrackCalibPar = (R3BStartrackCalibPar*)(rtdb->getContainer("R3BStartrackCalibPar"));
   
@@ -72,7 +72,7 @@ void R3BStartrackCalib::Register()
   LOG(DEBUG) << "Registering" << FairLogger::endl;
   FairRootManager *fMan = FairRootManager::Instance();
   if(! fMan) { 
-    Fatal("Init", "No FairRootManager");
+    LOG(fatal) << "Init: No FairRootManager";
     return;
   }
   fRawHitCA = (TClonesArray*) fMan->GetObject("StartrackRawHit");

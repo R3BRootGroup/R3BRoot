@@ -102,14 +102,14 @@ bool n_calib_diff::calc_params(ident_no_set& bad_fit_idents, Double_t y0[2], Dou
       if (bad_fit_idents.find(_data[k]._ident_no) == bad_fit_idents.end()) {
          plot.SetPoint(n++, _data[k]._pos_track, _data[k]._pos_diff);
       }
-      
+    
    if(n < 1000){
       y0[0] = NAN;
       y0[1] = NAN;
       dydx[0] = NAN;
       dydx[1] = NAN;
    
-      return false;   
+      return false;
    }
    
    plot.Fit(&fit, "q");
@@ -197,7 +197,7 @@ bool n_calib_diff::analyse_history(ident_no_set& bad_fit_idents) {
          size_t kmax = (sect + 1) * data_per_sect + ((sect + 1) * extra_data) / sections;
          UInt_t nk = (UInt_t)(kmax - kmin);
 
-         for (size_t k = kmin; k < kmax; k++) 
+         for (size_t k = kmin; k < kmax; k++)
             od[k - kmin] = (Float_t)(d[k]._pos_diff - (y0 + dydx * d[k]._pos_track));
 
          flt_ped_sigma pedsigma;
@@ -211,9 +211,9 @@ bool n_calib_diff::analyse_history(ident_no_set& bad_fit_idents) {
             for (size_t k = kmin; k < kmax; k++) {
                Double_t odval = (d[k]._pos_diff - (y0 + dydx * d[k]._pos_track));
 
-               if (odval > min_accept && odval < max_accept) 
+               if (odval > min_accept && odval < max_accept)
                   plot.SetPoint(used++, d[k]._pos_track, d[k]._pos_diff);
-               else 
+               else
                   bad_fit_idents.insert(d[k]._ident_no);
             }
          }
@@ -247,9 +247,9 @@ R3BNeulandCal2HitPar::~R3BNeulandCal2HitPar() {
        delete y_fit;
      }
        for(Int_t i = 0; i < fPlanes; i++)
-	 for(Int_t j = fPaddles; j >= 0; j--){
-	   delete bars[i][j], _ecalhistos[i][j], _ecalgraphs[i][j];
-	 }
+     for(Int_t j = fPaddles; j >= 0; j--){
+       delete bars[i][j], _ecalhistos[i][j], _ecalgraphs[i][j];
+     }
    }
 }
 
@@ -258,14 +258,14 @@ InitStatus R3BNeulandCal2HitPar::Init() {
    FairRootManager* fMan = FairRootManager::Instance();
 
    if (! fMan) {
-      FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
+      LOG(fatal) << "FairRootManager not found";
       return kFATAL;
    }
 
    fLandPmt = (TClonesArray*) fMan->GetObject("NeulandCalData");
 
    if (NULL == fLandPmt) {
-      FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch NeulandCalData not found");
+      LOG(fatal) << "Branch NeulandCalData not found";
       return kFATAL;
    }
 
@@ -290,15 +290,15 @@ InitStatus R3BNeulandCal2HitPar::Init() {
     std::vector<TGraph*> graphs;
      for(Int_t j = 0; j < fPaddles; j++){
         std::string str = "h_Plane" + std::to_string(i) + "_Bar" + std::to_string(j);
-	const char* c = str.c_str();
-	TH1F* histo = new TH1F(c, c, 200, 0, 200);
-	histos.push_back(histo);
-	
-	TGraph* graph = new TGraph();
-	graphs.push_back(graph);
-	
-	bar* b = new bar();
-	bars[i].push_back(b);
+    const char* c = str.c_str();
+    TH1F* histo = new TH1F(c, c, 200, 0, 200);
+    histos.push_back(histo);
+    
+    TGraph* graph = new TGraph();
+    graphs.push_back(graph);
+    
+    bar* b = new bar();
+    bars[i].push_back(b);
      }
      
      _ecalhistos.push_back(histos);
@@ -309,8 +309,14 @@ InitStatus R3BNeulandCal2HitPar::Init() {
 }
 
 void R3BNeulandCal2HitPar::Exec(Option_t* option) {
+    
+    char strMessage[1000];
+    
    if (++fEventNumber % 100000 == 0)
-      FairLogger::GetLogger()->Info(MESSAGE_ORIGIN, "R3BNeulandCal2HitPar::Exec : Event: %8d,    accepted Events: %8d", fEventNumber, nData);
+   {
+      sprintf(strMessage, "R3BNeulandCal2HitPar::Exec : Event: %8d,    accepted Events: %8d\n", fEventNumber, nData);
+       LOG(info) << strMessage;
+   }
 
    Int_t nItems = fLandPmt->GetEntriesFast();
    
@@ -340,19 +346,19 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
       b->fQdc[side] = pmt->GetQdc();
 
       if(hm[pl] & ((ULong_t (1) << pdl))){
-	if(b->fQdc[0] >= fMinEventQDC && b->fQdc[1] >= fMinEventQDC){
-	  items++;
-	  hit_mask[pl] |= ULong_t (1) << pdl;
-	}
+    if(b->fQdc[0] >= fMinEventQDC && b->fQdc[1] >= fMinEventQDC){
+      items++;
+      hit_mask[pl] |= ULong_t (1) << pdl;
+    }
       }
       else
-	hm[pl] |= ULong_t (1) << pdl;
+    hm[pl] |= ULong_t (1) << pdl;
     }
 
     if (items < 6) {
       LOG(DEBUG) << "Event cannot be used: too few hits!" << FairLogger::endl;
       return;
-    } 
+    }
   }
    
    /*Now we now what fPlanes were hit
@@ -453,7 +459,7 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
       x_plot->Set(0);
       y_plot->Set(0);
 
-      for (Int_t pl = FIRST_VERT_PLANE; pl < fPlanes; pl += 2) 
+      for (Int_t pl = FIRST_VERT_PLANE; pl < fPlanes; pl += 2)
          if (hit_mask[pl])
             x_hit_fPlanes++;
 
@@ -493,10 +499,17 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
       Double_t y0   = y_fit->GetParameter(1);
       Double_t dydz = y_fit->GetParameter(0);
 
-      FairLogger::GetLogger()->Debug1(MESSAGE_ORIGIN, "x hits: %d (%d)  y hits: %d (%d)",
-                                      x_hit_fPlanes, (Int_t) x_plot->GetN(), y_hit_fPlanes, (Int_t) y_plot->GetN());
-      FairLogger::GetLogger()->Debug1(MESSAGE_ORIGIN, "x = %5.1f %+6.2f * z", x0, dxdz);
-      FairLogger::GetLogger()->Debug1(MESSAGE_ORIGIN, "y = %5.1f %+6.2f * z", y0, dydz);
+      sprintf(strMessage,
+              "x hits: %d (%d)  y hits: %d (%d)\n",
+              x_hit_fPlanes,
+              (Int_t)x_plot->GetN(),
+              y_hit_fPlanes,
+              (Int_t)y_plot->GetN());
+      LOG(debug1) << strMessage;
+      sprintf(strMessage, "x = %5.1f %+6.2f * z\n", x0, dxdz);
+      LOG(debug1) << strMessage;
+      sprintf(strMessage, "y = %5.1f %+6.2f * z\n", y0, dydz);
+      LOG(debug1) << strMessage;
 
       /* Now check that all hits we have make sense, i.e. are
        * somewhere close to the track line.
@@ -536,13 +549,13 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
       Double_t max_dist_scaled_y = 0.5 * sqrt(dydz * dydz + 1);
 
       Int_t bad_x = 0;
-      Int_t bad_y = 0;        
+      Int_t bad_y = 0;
       
       for (Int_t pl = FIRST_VERT_PLANE; pl < fPlanes; pl += 2) {
          ULong_t hm = hit_mask[pl];
 
          for (Int_t pdl = 0; hm; pdl++, hm >>= 1)
-            if (hm & 0x01) {	      
+            if (hm & 0x01) {
                if (fabs(dxdz * (pl + 0.5) - (pdl + 0.5) + x0) > max_dist_scaled_x) {
                   hit_mask[pl] &= ~(ULong_t (1) << pdl);
                   bad_x++;
@@ -591,12 +604,12 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
 
       for (Int_t pl = 0; pl < fPlanes; pl++) {
          if (hit_mask[pl])
-            for (UInt_t pdl = 0; pdl < fPaddles; pdl++) {               
+            for (UInt_t pdl = 0; pdl < fPaddles; pdl++) {
                if (!(hit_mask[pl] & (ULong_t (1) << pdl))) {
                   continue;
                }
 
-	       bar* b = bars[pl][pdl];
+           bar* b = bars[pl][pdl];
                
                nc_diff dmm;
 
@@ -605,11 +618,11 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
                }
                else {
                   dmm._pos_track = PADDLE_SPACING * (y0 + dydz * (pl + 0.5));
-               }		
+               }
 
                dmm._pos_diff  = (Float_t) 0.5 * (b->fTime[1] - b->fTime[0]);;
                dmm._ident_no  = _used_ident_no;
-	       
+           
                _collect_diff[pl][pdl]._data.push_back(dmm);
             }
       }
@@ -719,151 +732,151 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option) {
       }
       
 
-      for(Int_t pl = 0; pl < fPlanes - 1; pl++) { 
-         // Hits in paddles from neighbouring fPlanes 
+      for(Int_t pl = 0; pl < fPlanes - 1; pl++) {
+         // Hits in paddles from neighbouring fPlanes
  
-         if (hit_mask[pl] && hit_mask[pl+1]) 
-            for (UInt_t pdl1 = 0; pdl1 < fPaddles; pdl1++) { 
-               if (!(hit_mask[pl] & (ULong_t (1) << pdl1))) { 
-                  continue; 
-               } 
-               bar* b1 = bars[pl][pdl1]; 
-		
-               for (UInt_t pdl2 = 0; pdl2 < fPaddles; pdl2++) { 
-                  if (!(hit_mask[pl+1] & (ULong_t (1) << pdl2))) { 
-                     continue; 
-                  } 
-		  bar* b2 = bars[pl + 1][pdl2]; 
-                  // so, we have two hits.  pl  ,pdl1 (item1) 
-                  //                        pl+1,pdl2 (item2) 
+         if (hit_mask[pl] && hit_mask[pl+1])
+            for (UInt_t pdl1 = 0; pdl1 < fPaddles; pdl1++) {
+               if (!(hit_mask[pl] & (ULong_t (1) << pdl1))) {
+                  continue;
+               }
+               bar* b1 = bars[pl][pdl1];
+        
+               for (UInt_t pdl2 = 0; pdl2 < fPaddles; pdl2++) {
+                  if (!(hit_mask[pl+1] & (ULong_t (1) << pdl2))) {
+                     continue;
+                  }
+          bar* b2 = bars[pl + 1][pdl2];
+                  // so, we have two hits.  pl  ,pdl1 (item1)
+                  //                        pl+1,pdl2 (item2)
  
-                  // This and next paddle were involved, so both should give 
-                  // mean times 
+                  // This and next paddle were involved, so both should give
+                  // mean times
  
-                  Double_t t_mean1 = 0.5 * (b1->fTime[1] + b1->fTime[0]); 
-                  Double_t t_mean2 = 0.5 * (b2->fTime[1] + b2->fTime[0]); 
+                  Double_t t_mean1 = 0.5 * (b1->fTime[1] + b1->fTime[0]);
+                  Double_t t_mean2 = 0.5 * (b2->fTime[1] + b2->fTime[0]);
  
-                  nc_mean dmm; 
+                  nc_mean dmm;
  
-                  dmm._mean_diff = (Float_t)(t_mean2 - t_mean1); 
-                  dmm._mean_corr = 0; 
-                  dmm._ident_no  = _used_ident_no; 
+                  dmm._mean_diff = (Float_t)(t_mean2 - t_mean1);
+                  dmm._mean_corr = 0;
+                  dmm._ident_no  = _used_ident_no;
  
-                  // Figure out what the delay between the two fPlanes is 
+                  // Figure out what the delay between the two fPlanes is
  
-                  // We calculate the flight-path as the distance to travel for dz=1 
+                  // We calculate the flight-path as the distance to travel for dz=1
  
-                  if (fabs(dydz) > 0.5) { 
-                     Double_t flight_path = sqrt(1 + dydz * dydz + dxdz * dxdz); 
+                  if (fabs(dydz) > 0.5) {
+                     Double_t flight_path = sqrt(1 + dydz * dydz + dxdz * dxdz);
  
-                     if (dydz < 0) { // downwards when increasing z, so plane 2 is later 
-                        dmm._mean_corr = (Float_t)(flight_path * (PADDLE_SPACING / C_LIGHT)); 
-                     } 
-                     else {   // plane 2 is earlier 
-                        dmm._mean_corr = (Float_t)(flight_path * (- PADDLE_SPACING / C_LIGHT)); 
-                     } 
-                  } 
+                     if (dydz < 0) { // downwards when increasing z, so plane 2 is later
+                        dmm._mean_corr = (Float_t)(flight_path * (PADDLE_SPACING / C_LIGHT));
+                     }
+                     else {   // plane 2 is earlier
+                        dmm._mean_corr = (Float_t)(flight_path * (- PADDLE_SPACING / C_LIGHT));
+                     }
+                  }
  
-                  _collect_mean_cross[pl][pdl1][pdl2]._data.push_back(dmm); 
-	       }
-	    }
-      }      
+                  _collect_mean_cross[pl][pdl1][pdl2]._data.push_back(dmm);
+           }
+        }
+      }
       
       x0 *= PADDLE_SPACING;
       y0 *= PADDLE_SPACING;
       
       {
-	bar* b;
-	Int_t hit;
-	Double_t x, y, z, bound1, bound2, dist, qperdist;
-	TVector3 p[2];
-	for (Int_t pl = 0; pl < fPlanes; pl++) {
-	  for (Int_t pdl = 0; pdl < fPaddles; pdl++) {   
-	    if (!(hit_mask[pl] & (ULong_t(1) << pdl)))
-	      continue;
-	    
-	    b = bars[pl][pdl];
-	    
-	    hit = 0;
-	    bound1 = (2 * (pdl + 1) - fPaddles) * PADDLE_SPACING * 0.5;
-	    bound2 = (2 * pdl - fPaddles) * PADDLE_SPACING * 0.5;
-	    
-	    z = pl * PADDLE_SPACING;
-	    y = y0 + dydz * z;
-	    x = x0 + dxdz * z;
-	      
-	    if(PLANE_IS_HORZ(pl)){
-	      if(y <= bound1  && y >= bound2 ) //frontside
-		p[hit++].SetXYZ(x, y, z);
-	      
-	      z = (pl + 1) * PADDLE_SPACING;
-	      y = y0 + dydz * z;
-	      x = x0 + dxdz * z;
-	      
-	      if(y <= bound1  && y >= bound2 )//backside
-		p[hit++].SetXYZ(x, y, z);
-		
-	      if(hit<2){
-		y = bound1;
-		z = (y - y0)/dydz;
-		x = x0 + dxdz * z;
-		
-		if(z <= (pl + 1) * PADDLE_SPACING  && z >= pl * PADDLE_SPACING ) //topside
-		  p[hit++].SetXYZ(x, y, z);
-	      }
-	      
-	      if(hit < 2){
-		y = bound2;
-		z = (y - y0)/dydz;
-		x = x0 + dxdz * z;
-		if(z <= (pl + 1) * PADDLE_SPACING  && z >= pl * PADDLE_SPACING ) //bottomside
-		  p[hit++].SetXYZ(x, y, z);
-		
-	      }
-	    }
-	    else{
-	      if(x <= bound1  && x >= bound2 ) //frontside
-		p[hit++].SetXYZ(x, y, z);
-	      
-	      z = (pl + 1) * PADDLE_SPACING;
-	      y = y0 + dydz * z;
-	      x = x0 + dxdz * z;
-	      
-	      if(x <= bound1  && x >= bound2 ) //backside
-		p[hit++].SetXYZ(x, y, z);
-	      
-	      if(hit<2){
-		x = bound1;
-		z = (x - x0)/dydz;
-		y = y0 + dydz * z;
-	      
-		if(z <= (pl + 1) * PADDLE_SPACING  && z >= pl * PADDLE_SPACING ) //leftside
-		  p[hit++].SetXYZ(x, y, z);
-	      }
-	      
-	      if(hit < 2){
-		x = bound1;
-		z = (x - x0)/dydz;
-		y = y0 + dydz * z;
-		
-		if(z <= (pl + 1) * PADDLE_SPACING  && z >= pl * PADDLE_SPACING ) //rightside
-		  p[hit++].SetXYZ(x, y, z);
-	      }
-	    }
-	    
-	    if(hit == 2){
-	      dist = (p[0]-p[1]).Mag();
-	      if(dist > 4 && dist < 10){
-		qperdist = sqrt(b->fQdc[0] * b->fQdc[1]) / dist;
-		_ecalhistos[pl][pdl]->Fill(qperdist);
-		if(PLANE_IS_HORZ(pl))
-		  _ecalgraphs[pl][pdl]->SetPoint(_ecalgraphs[pl][pdl]->GetN(), (p[0] + 0.5*(p[1]-p[0])).X(), log(b->fQdc[0] / b->fQdc[1]));		
-		else
-		  _ecalgraphs[pl][pdl]->SetPoint(_ecalgraphs[pl][pdl]->GetN(), (p[0] + 0.5*(p[1]-p[0])).Y(), log(b->fQdc[0] / b->fQdc[1]));		
-	      }
-	    }
-	  }
-	}
+    bar* b;
+    Int_t hit;
+    Double_t x, y, z, bound1, bound2, dist, qperdist;
+    TVector3 p[2];
+    for (Int_t pl = 0; pl < fPlanes; pl++) {
+      for (Int_t pdl = 0; pdl < fPaddles; pdl++) {
+        if (!(hit_mask[pl] & (ULong_t(1) << pdl)))
+          continue;
+        
+        b = bars[pl][pdl];
+        
+        hit = 0;
+        bound1 = (2 * (pdl + 1) - fPaddles) * PADDLE_SPACING * 0.5;
+        bound2 = (2 * pdl - fPaddles) * PADDLE_SPACING * 0.5;
+        
+        z = pl * PADDLE_SPACING;
+        y = y0 + dydz * z;
+        x = x0 + dxdz * z;
+          
+        if(PLANE_IS_HORZ(pl)){
+          if(y <= bound1  && y >= bound2 ) //frontside
+        p[hit++].SetXYZ(x, y, z);
+          
+          z = (pl + 1) * PADDLE_SPACING;
+          y = y0 + dydz * z;
+          x = x0 + dxdz * z;
+          
+          if(y <= bound1  && y >= bound2 )//backside
+        p[hit++].SetXYZ(x, y, z);
+        
+          if(hit<2){
+        y = bound1;
+        z = (y - y0)/dydz;
+        x = x0 + dxdz * z;
+        
+        if(z <= (pl + 1) * PADDLE_SPACING  && z >= pl * PADDLE_SPACING ) //topside
+          p[hit++].SetXYZ(x, y, z);
+          }
+          
+          if(hit < 2){
+        y = bound2;
+        z = (y - y0)/dydz;
+        x = x0 + dxdz * z;
+        if(z <= (pl + 1) * PADDLE_SPACING  && z >= pl * PADDLE_SPACING ) //bottomside
+          p[hit++].SetXYZ(x, y, z);
+        
+          }
+        }
+        else{
+          if(x <= bound1  && x >= bound2 ) //frontside
+        p[hit++].SetXYZ(x, y, z);
+          
+          z = (pl + 1) * PADDLE_SPACING;
+          y = y0 + dydz * z;
+          x = x0 + dxdz * z;
+          
+          if(x <= bound1  && x >= bound2 ) //backside
+        p[hit++].SetXYZ(x, y, z);
+          
+          if(hit<2){
+        x = bound1;
+        z = (x - x0)/dydz;
+        y = y0 + dydz * z;
+          
+        if(z <= (pl + 1) * PADDLE_SPACING  && z >= pl * PADDLE_SPACING ) //leftside
+          p[hit++].SetXYZ(x, y, z);
+          }
+          
+          if(hit < 2){
+        x = bound1;
+        z = (x - x0)/dydz;
+        y = y0 + dydz * z;
+        
+        if(z <= (pl + 1) * PADDLE_SPACING  && z >= pl * PADDLE_SPACING ) //rightside
+          p[hit++].SetXYZ(x, y, z);
+          }
+        }
+        
+        if(hit == 2){
+          dist = (p[0]-p[1]).Mag();
+          if(dist > 4 && dist < 10){
+        qperdist = sqrt(b->fQdc[0] * b->fQdc[1]) / dist;
+        _ecalhistos[pl][pdl]->Fill(qperdist);
+        if(PLANE_IS_HORZ(pl))
+          _ecalgraphs[pl][pdl]->SetPoint(_ecalgraphs[pl][pdl]->GetN(), (p[0] + 0.5*(p[1]-p[0])).X(), log(b->fQdc[0] / b->fQdc[1]));
+        else
+          _ecalgraphs[pl][pdl]->SetPoint(_ecalgraphs[pl][pdl]->GetN(), (p[0] + 0.5*(p[1]-p[0])).Y(), log(b->fQdc[0] / b->fQdc[1]));
+          }
+        }
+      }
+    }
       }
       break; // The loop is done (remove and you will have fun... )
    }
@@ -873,6 +886,7 @@ void R3BNeulandCal2HitPar::FinishEvent() {
 }
 
 void R3BNeulandCal2HitPar::FinishTask() {
+    char strMessage[1000];
    LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << nData << " Events registered." << FairLogger::endl;
 
    LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << "**************TIMES**************" << FairLogger::endl;
@@ -887,8 +901,9 @@ void R3BNeulandCal2HitPar::FinishTask() {
 
    for (Int_t pl = 0; pl < fPlanes; pl++)
       for (Int_t pdl = 0; pdl < fPaddles - 1; pdl++) {
-         FairLogger::GetLogger()->Debug(MESSAGE_ORIGIN, "================== mean: %2d,(%2d-%2d)", pl, pdl, pdl + 1);
-         _collect_mean_within[pl][pdl].analyse_history(_bad_fit_idents);
+          sprintf(strMessage, "================== mean: %2d,(%2d-%2d)\n", pl, pdl, pdl + 1);
+          LOG(debug) << strMessage;
+          _collect_mean_within[pl][pdl].analyse_history(_bad_fit_idents);
       }
 
    LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << "Analysing history: t-mean-cross" << FairLogger::endl;
@@ -999,11 +1014,11 @@ void R3BNeulandCal2HitPar::FinishTask() {
      for(Int_t pdl = 0; pdl < fPaddles; pdl++){
        TH1F* histo = _ecalhistos[pl][pdl];
        if(histo->GetEntries() < 1000){
-	  ecal[pl][pdl][0] = NAN;
-	  ecal[pl][pdl][1] = NAN;
-	  ecalerr[pl][pdl][0] = NAN;
-	  ecalerr[pl][pdl][1] = NAN;
-	  continue;
+      ecal[pl][pdl][0] = NAN;
+      ecal[pl][pdl][1] = NAN;
+      ecalerr[pl][pdl][0] = NAN;
+      ecalerr[pl][pdl][1] = NAN;
+      continue;
        }
        
        Double_t max = histo->GetBinCenter(histo->GetMaximumBin());
@@ -1017,10 +1032,10 @@ void R3BNeulandCal2HitPar::FinishTask() {
        Double_t k0dk1err = k0dk1 * linearfit.GetParError(0);
        
        ecal[pl][pdl][0] = MINIMUM_IONIZING/sqrt(k0k1 * k0dk1);
-       ecal[pl][pdl][1] = MINIMUM_IONIZING/sqrt(k0k1 / k0dk1); 
+       ecal[pl][pdl][1] = MINIMUM_IONIZING/sqrt(k0k1 / k0dk1);
        
-       ecalerr[pl][pdl][0] = MINIMUM_IONIZING * pow(k0k1 * k0dk1,-1.5) * sqrt((k0dk1 * k0k1err) * (k0dk1 * k0k1err) + (k0k1 * k0dk1err) * (k0k1 * k0dk1err));       
-       ecalerr[pl][pdl][1] = MINIMUM_IONIZING * pow(k0k1 / k0dk1,-1.5) * sqrt((k0k1err / k0dk1) * (k0k1err / k0dk1) + ((k0k1 * k0dk1err /(k0dk1 * k0dk1)) * (k0k1 * k0dk1err /(k0dk1 * k0dk1)))); 
+       ecalerr[pl][pdl][0] = MINIMUM_IONIZING * pow(k0k1 * k0dk1,-1.5) * sqrt((k0dk1 * k0k1err) * (k0dk1 * k0k1err) + (k0k1 * k0dk1err) * (k0k1 * k0dk1err));
+       ecalerr[pl][pdl][1] = MINIMUM_IONIZING * pow(k0k1 / k0dk1,-1.5) * sqrt((k0k1err / k0dk1) * (k0k1err / k0dk1) + ((k0k1 * k0dk1err /(k0dk1 * k0dk1)) * (k0k1 * k0dk1err /(k0dk1 * k0dk1))));
      }
    
 
@@ -1048,17 +1063,17 @@ void R3BNeulandCal2HitPar::FinishTask() {
    h_ecal->GetXaxis()->SetTitle("BarID");
    h_ecal->GetYaxis()->SetTitle("MeV/(100*QDC)");
 
-   Double_t av_gain = 0;  
+   Double_t av_gain = 0;
    Int_t n_av_gain = 0;
  
    std::vector<TString> fails;
    std::vector<TString> susp_s;
    
    
-   Bool_t calib[fPlanes][fPaddles];   
+   Bool_t calib[fPlanes][fPaddles];
    memset(calib, 0, sizeof(calib));
    
-   Bool_t susp_b[fPlanes][fPaddles];   
+   Bool_t susp_b[fPlanes][fPaddles];
    memset(susp_b, 0, sizeof(susp_b));
 
    char msg[100];
@@ -1073,70 +1088,77 @@ void R3BNeulandCal2HitPar::FinishTask() {
             syncmodpar->SetTimeOffsetError(sqrt(tdiff[pl][pdl][1]*tdiff[pl][pdl][1] + tsync[pl][pdl][1] * tsync[pl][pdl][1]));
             syncmodpar->SetEffectiveSpeed(0.5 / invveff[pl][pdl][0]);
             syncmodpar->SetEffectiveSpeedError(fabs(0.5 * invveff[pl][pdl][1] / (invveff[pl][pdl][0] * invveff[pl][pdl][0])));
-            syncmodpar->SetEnergieGain(ecal[pl][pdl][pm]);	
+            syncmodpar->SetEnergieGain(ecal[pl][pdl][pm]);
             syncmodpar->SetEnergieGainError(ecalerr[pl][pdl][pm]);
-            FairLogger::GetLogger()->Info(MESSAGE_ORIGIN, "[%2d][%2d][%1d]: t = %8.3f ± %8.3f ± %8.3f        keV/QDC = %6.4f ± %6.4f",
-                                          pl + 1, pdl + 1, pm + 1, syncmodpar->GetTimeOffset(),
-                                          tdiff[pl][pdl][1], tsync[pl][pdl][1], syncmodpar->GetEnergieGain() * 1000,
-                                          syncmodpar->GetEnergieGainError() * 1000);
+            sprintf(strMessage,
+                    "[%2d][%2d][%1d]: t = %8.3f ± %8.3f ± %8.3f        keV/QDC = %6.4f ± %6.4f\n",
+                    pl + 1,
+                    pdl + 1,
+                    pm + 1,
+                    syncmodpar->GetTimeOffset(),
+                    tdiff[pl][pdl][1],
+                    tsync[pl][pdl][1],
+                    syncmodpar->GetEnergieGain() * 1000,
+                    syncmodpar->GetEnergieGainError() * 1000);
+            LOG(info) << strMessage;
             if (!TMath::IsNaN(syncmodpar->GetTimeOffset()) && !TMath::IsNaN(syncmodpar->GetEnergieGain())){
-	      fPar->AddModulePar(syncmodpar);
-	      
-	      Float_t dev = ecalerr[pl][pdl][pm]/ecal[pl][pdl][pm];
-	      if(dev > fErrorTH/100.){
-		sprintf(msg,"[%2d][%2d][%1d]: Gain-Fit-Error of %3.1f %s", pl + 1, pdl + 1, pm + 1, dev * 100,"%!");
-		susp_s.push_back(msg);
-		susp_b[pl][pdl] = kTRUE;
-	      }
-	      
-	      if(pm == 1){
-		h_tdiff->SetBinContent(syncmodpar->GetModuleId(), 2 * tdiff[pl][pdl][0]);
-		h_tsync->SetBinContent(syncmodpar->GetModuleId(), -tsync[pl][pdl][0]);
-		h_veff->SetBinContent(syncmodpar->GetModuleId(), fabs(0.5 / invveff[pl][pdl][0]));
-		
-		calib[pl][pdl] = kTRUE;
-	      }
-	      
-	      h_ecal->SetBinContent(2*syncmodpar->GetModuleId() + pm, 100*ecal[pl][pdl][pm]);
-	      
-	      av_gain += ecal[pl][pdl][pm];
-	      n_av_gain++;	      
-	    }      
-	    else{
-	      if(TMath::IsNaN(syncmodpar->GetTimeOffset()))
-		sprintf(msg,"[%2d][%2d][%1d]: Time Calibration failed!", pl + 1, pdl + 1, pm + 1);
-	      else
-	        sprintf(msg,"[%2d][%2d][%1d]: Energy Calibration failed!", pl + 1, pdl + 1, pm + 1);
-	      fails.push_back(msg);
-	    }
+          fPar->AddModulePar(syncmodpar);
+          
+          Float_t dev = ecalerr[pl][pdl][pm]/ecal[pl][pdl][pm];
+          if(dev > fErrorTH/100.){
+        sprintf(msg,"[%2d][%2d][%1d]: Gain-Fit-Error of %3.1f %s", pl + 1, pdl + 1, pm + 1, dev * 100,"%!");
+        susp_s.push_back(msg);
+        susp_b[pl][pdl] = kTRUE;
+          }
+          
+          if(pm == 1){
+        h_tdiff->SetBinContent(syncmodpar->GetModuleId(), 2 * tdiff[pl][pdl][0]);
+        h_tsync->SetBinContent(syncmodpar->GetModuleId(), -tsync[pl][pdl][0]);
+        h_veff->SetBinContent(syncmodpar->GetModuleId(), fabs(0.5 / invveff[pl][pdl][0]));
+        
+        calib[pl][pdl] = kTRUE;
+          }
+          
+          h_ecal->SetBinContent(2*syncmodpar->GetModuleId() + pm, 100*ecal[pl][pdl][pm]);
+          
+          av_gain += ecal[pl][pdl][pm];
+          n_av_gain++;
+        }
+        else{
+          if(TMath::IsNaN(syncmodpar->GetTimeOffset()))
+        sprintf(msg,"[%2d][%2d][%1d]: Time Calibration failed!", pl + 1, pdl + 1, pm + 1);
+          else
+            sprintf(msg,"[%2d][%2d][%1d]: Energy Calibration failed!", pl + 1, pdl + 1, pm + 1);
+          fails.push_back(msg);
+        }
          }
    
    av_gain = av_gain/n_av_gain;
    
    for (Int_t pl = 0; pl < fPlanes; pl++)
       for (Int_t pdl = 0; pdl < fPaddles; pdl++)
-	 if(calib[fPlanes][fPaddles] && ! susp_b[fPlanes][fPaddles]) 
+     if(calib[fPlanes][fPaddles] && ! susp_b[fPlanes][fPaddles])
            for (Int_t pm = 0; pm < 2; pm++) {
-	      Float_t dev = fabs((ecal[pl][pdl][pm] - av_gain)/av_gain);
-	      
-	      if(dev > fDeviationTH/100.){
-		sprintf(msg,"[%2d][%2d][%1d]: Deviation of %3.1f%s from average gain!", pl + 1, pdl + 1, pm + 1, dev * 100,"%");
-		susp_s.push_back(msg);
-	      }
-	   }
+          Float_t dev = fabs((ecal[pl][pdl][pm] - av_gain)/av_gain);
+          
+          if(dev > fDeviationTH/100.){
+        sprintf(msg,"[%2d][%2d][%1d]: Deviation of %3.1f%s from average gain!", pl + 1, pdl + 1, pm + 1, dev * 100,"%");
+        susp_s.push_back(msg);
+          }
+       }
  
    if(fails.size() > 0){
       LOG(INFO) << FairLogger::endl << FairLogger::endl << FairLogger::endl;
       LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << "Following PMTs failed to calibrate:" << FairLogger::endl;
       for (Int_t i = 0; i < fails.size(); i++)
-	 LOG(INFO) << fails.at(i) << FairLogger::endl;     
+     LOG(INFO) << fails.at(i) << FairLogger::endl;
    }
    
    if(susp_s.size() > 0){
       LOG(INFO) << FairLogger::endl << FairLogger::endl << FairLogger::endl;
       LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << "Following PMTs are conspicuous:" << FairLogger::endl;
       for (Int_t i = 0; i < susp_s.size(); i++)
-	 LOG(INFO) << susp_s.at(i) << FairLogger::endl;  
+     LOG(INFO) << susp_s.at(i) << FairLogger::endl;
    }
 
    

@@ -85,10 +85,10 @@ void R3BLandDigitizer::SetParContainers()
 {
   // Get run and runtime database
   FairRunAna* run = FairRunAna::Instance();
-  if ( ! run ) Fatal("SetParContainers", "No analysis run");
+  if ( ! run ) LOG(fatal) << "SetParContainers: No analysis run";
 
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
-  if ( ! rtdb ) Fatal("SetParContainers", "No runtime database");
+  if ( ! rtdb ) LOG(fatal) << "SetParContainers: No runtime database";
 
   fLandDigiPar = (R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
 
@@ -106,7 +106,7 @@ InitStatus R3BLandDigitizer::Init()
 {
   // Get input array
   FairRootManager* ioman = FairRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No FairRootManager");
+  if ( ! ioman ) LOG(fatal) << "Init: No FairRootManager";
   fLandPoints = (TClonesArray*) ioman->GetObject("LandPoint");
 
   // Register output array LandDigi

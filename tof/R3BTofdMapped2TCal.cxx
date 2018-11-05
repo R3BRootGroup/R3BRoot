@@ -82,13 +82,13 @@ InitStatus R3BTofdMapped2TCal::Init()
   // present though and hence may be null. Take care when using.
   FairRootManager* mgr = FairRootManager::Instance();
   if (NULL == mgr)
-    FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
+    LOG(fatal) << "FairRootManager not found";
   header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
   // get access to Mapped data
   fMappedItems = (TClonesArray*)mgr->GetObject("TofdMapped");
   if (NULL == fMappedItems)
-    FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch TofdMapped not found");
+    LOG(fatal) << "Branch TofdMapped not found";
 
   // request storage of Cal data in output tree
   mgr->Register("TofdCal", "Land", fCalItems, kTRUE);

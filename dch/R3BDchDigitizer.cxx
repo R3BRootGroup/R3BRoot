@@ -101,10 +101,10 @@ void R3BDchDigitizer::SetParContainers() {
 
   // Get run and runtime database
   FairRunAna* run = FairRunAna::Instance();
-  if ( ! run ) Fatal("SetParContainers", "No analysis run");
+    if ( ! run ) LOG(fatal) << "SetParContainers: No analysis run";
 
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
-  if ( ! rtdb ) Fatal("SetParContainers", "No runtime database");
+    if ( ! rtdb ) LOG(fatal) << "SetParContainers: No runtime database";
 
   fDchDigiPar = (R3BDchDigiPar*)(rtdb->getContainer("R3BDchDigiPar"));
 
@@ -122,7 +122,7 @@ InitStatus R3BDchDigitizer::Init() {
 
   // Get input array
   FairRootManager* ioman = FairRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No FairRootManager");
+    if ( ! ioman ) LOG(fatal) << "Init: No FairRootManager";
   fDchPoints = (TClonesArray*) ioman->GetObject("DCHPoint");
   fDchMCTrack = (TClonesArray*) ioman->GetObject("MCTrack");
   

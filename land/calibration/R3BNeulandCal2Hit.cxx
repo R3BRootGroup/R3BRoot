@@ -45,12 +45,12 @@ R3BNeulandCal2Hit::~R3BNeulandCal2Hit() {
 InitStatus R3BNeulandCal2Hit::Init() {
    FairRootManager* fMan = FairRootManager::Instance();
    if (!fMan) {
-      FairLogger::GetLogger()->Fatal (MESSAGE_ORIGIN, "FairRootManager not found");
+      LOG(fatal) << "FairRootManager not found";
    }
 
    fLandPmt = (TClonesArray*) fMan->GetObject ("NeulandCalData");
    if (!fLandPmt) {
-      FairLogger::GetLogger()->Fatal (MESSAGE_ORIGIN, "NeulandCalData not found");
+      LOG(fatal) << "NeulandCalData not found";
    }
 
    fMan->Register ("LandDigi", "Land", fLandDigi, kTRUE);
@@ -99,7 +99,7 @@ InitStatus R3BNeulandCal2Hit::ReInit() {
 
 void R3BNeulandCal2Hit::Exec (Option_t* option) {
    if(fVerbose != 0 && ++fNEvent % 100000 == 0)
-      FairLogger::GetLogger()->Info(MESSAGE_ORIGIN, "R3BNeulandCal2Hit::Exec : Event: %8d", fNEvent);
+      LOG(info) << "R3BNeulandCal2Hit::Exec : Event: " << fNEvent;
      
    Int_t nLandPmt = fLandPmt->GetEntriesFast();
   

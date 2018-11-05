@@ -34,8 +34,7 @@ Bool_t R3BTofdReader::Init(ext_data_struct_info *a_struct_info)
 
   if (!ok) {
     perror("ext_data_struct_info_item");
-    fLogger->Error(MESSAGE_ORIGIN,
-        "Failed to setup structure information.");
+    LOG(error) << "Failed to setup structure information.";
     return kFALSE;
   }
 

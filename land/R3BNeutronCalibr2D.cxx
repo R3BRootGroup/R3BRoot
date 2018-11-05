@@ -10,6 +10,7 @@
 #include "TH2F.h"
 
 #include "FairRootManager.h"
+#include "FairLogger.h"
 
 #include "R3BLandDigi.h"
 #include "R3BNeutronCalibr2D.h"
@@ -44,7 +45,7 @@ InitStatus R3BNeutronCalibr2D::Init()
 {
   // Get input array 
   FairRootManager* ioman = FairRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No FairRootManager");
+  if ( ! ioman ) LOG(fatal) << "Init: No FairRootManager";
   fArrayDigi = (TClonesArray*) ioman->GetObject("LandDigi");
   fArrayCluster = (TClonesArray*) ioman->GetObject("NeuLandCluster");
      

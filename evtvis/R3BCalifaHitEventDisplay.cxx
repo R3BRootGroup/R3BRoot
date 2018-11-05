@@ -13,6 +13,7 @@
 #include "FairMCTracks.h"
 #include "FairTask.h"
 #include "FairMCTracks.h"
+#include "FairLogger.h"
 
 #include "R3BCalifaHitData.h"
 #include "R3BCalifaHitDataSim.h"
@@ -82,7 +83,7 @@ InitStatus R3BCalifaHitEventDisplay::Init()
 {
 
   FairRootManager* ioManager = FairRootManager::Instance();
-  if ( !ioManager ) Fatal("Init", "No FairRootManager");
+  if ( !ioManager ) LOG(fatal) << "Init:No FairRootManager";
   if( !ioManager->GetObject("CalifaHitDataSim") ) {
      fCaloHitCA = (TClonesArray*) ioManager->GetObject("CalifaHitData");
   } else {

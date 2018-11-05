@@ -50,7 +50,7 @@ Bool_t R3BUcesbSource::Init()
 	fFd = popen(command.str().c_str(), "r");
 	if (nullptr == fFd) {
 		perror("popen()");
-		fLogger->Fatal(MESSAGE_ORIGIN, "popen() failed");
+		LOG(fatal) << "popen() failed";
 		return kFALSE;
 	}
 
@@ -58,10 +58,9 @@ Bool_t R3BUcesbSource::Init()
 	status = fClient.connect(fileno(fFd));
 	if (kFALSE == status) {
 		perror("ext_data_clnt::connect()");
-		fLogger->Error(MESSAGE_ORIGIN,
-		    "ext_data_clnt::connect() failed");
-		fLogger->Fatal(MESSAGE_ORIGIN, "ucesb: %s",
-		    fClient.last_error());
+		LOG(error) << "ext_data_clnt::connect() failed";
+		LOG(fatal) << "ucesb: " <<
+		    fClient.last_error();
 		return kFALSE;
 	}
 
@@ -73,8 +72,8 @@ Bool_t R3BUcesbSource::InitUnpackers()
     /* Initialize all readers */
     for (int i = 0; i < fReaders->GetEntriesFast(); ++i) {
         if (!((R3BReader *)fReaders->At(i))->Init(&fStructInfo)) {
-            fLogger->Fatal(MESSAGE_ORIGIN, "ucesb: %s",
-                           fClient.last_error());
+            LOG(fatal) << "ucesb: " <<
+                           fClient.last_error();
             return kFALSE;
         }
     }
@@ -83,9 +82,9 @@ Bool_t R3BUcesbSource::InitUnpackers()
     Bool_t status = fClient.setup(NULL, 0, &fStructInfo, fEventSize);
     if (status != 0) {
         perror("ext_data_clnt::setup()");
-        fLogger->Error(MESSAGE_ORIGIN, "ext_data_clnt::setup() failed");
-        fLogger->Fatal(MESSAGE_ORIGIN, "ucesb: %s",
-                       fClient.last_error());
+        LOG(error) << "ext_data_clnt::setup() failed";
+        LOG(fatal) << "ucesb: %s" <<
+                       fClient.last_error();
         return kFALSE;
     }
     
@@ -104,7 +103,7 @@ Bool_t R3BUcesbSource::ReInitUnpackers()
     /* Initialize all readers */
     for (int i = 0; i < fReaders->GetEntriesFast(); ++i) {
         if (!((R3BReader *)fReaders->At(i))->ReInit()) {
-            fLogger->Fatal(MESSAGE_ORIGIN, "ReInit of a reader failed.");
+            LOG(fatal) << "ReInit of a reader failed.";
             return kFALSE;
         }
     }
@@ -120,8 +119,7 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
 	int ret;
 	(void)i; /* Why is i not used? Outer loop seems not to use it. */
 
-	fLogger->Debug1(MESSAGE_ORIGIN, "R3BUcesbSource::ReadEvent %d",
-	    fNEvent++);
+	LOG(debug1) << "R3BUcesbSource::ReadEvent " << (fNEvent++);
 
 	/* Need to initialize first */
 	if (nullptr == fFd) {
@@ -131,15 +129,14 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
 	/* Fetch data */
 	ret = fClient.fetch_event(fEvent, fEventSize);
 	if (0 == ret) {
-		fLogger->Info(MESSAGE_ORIGIN, "R3BUcesbSource::End of input");
+		LOG(info) << "R3BUcesbSource::End of input";
 		return 1;
 	}
 	if (-1 == ret) {
 		perror("ext_data_clnt::fetch_event()");
-		fLogger->Error(MESSAGE_ORIGIN,
-		    "ext_data_clnt::fetch_event() failed");
-		fLogger->Fatal(MESSAGE_ORIGIN, "ucesb: %s",
-		    fClient.last_error());
+		LOG(error) << "ext_data_clnt::fetch_event() failed";
+		LOG(fatal) << "ucesb: " <<
+		    fClient.last_error();
 		return 0;
 	}
 
@@ -147,8 +144,7 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
 	ret = fClient.get_raw_data(&raw, &raw_words);
 	if (0 != ret) {
 		perror("ext_data_clnt::get_raw_data()");
-		fLogger->Fatal(MESSAGE_ORIGIN,
-		    "Failed to get raw data.\n");
+		LOG(fatal) << "Failed to get raw data.";
 		return 0;
 	}
 
@@ -156,8 +152,7 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
 	for (int r = 0; r < fReaders->GetEntriesFast(); ++r) {
 		R3BReader *reader = (R3BReader *)fReaders->At(r);
 
-		fLogger->Debug1(MESSAGE_ORIGIN, "  Reading reader %d (%s)", r,
-		    reader->GetName());
+		LOG(debug1) << "  Reading reader " << r << " (" << reader->GetName() << ")";
 		reader->Read();
 	}
 
@@ -166,7 +161,7 @@ Int_t R3BUcesbSource::ReadEvent(UInt_t i)
 		int w, j;
 		const uint32_t *u = (const uint32_t *) raw;
 
-		fLogger->Info(MESSAGE_ORIGIN, "  Raw data:");
+		LOG(info) << "  Raw data:";
 		for (w = 0; w < raw_words; w += 8)
 		{
 			printf ("    RAW%4x:", w);
@@ -187,7 +182,7 @@ void R3BUcesbSource::Close()
 	ret = fClient.close();
 	if (0 != ret) {
 		perror("ext_data_clnt::close()");
-		fLogger->Fatal(MESSAGE_ORIGIN, "ext_data_clnt::close() failed");
+		LOG(fatal) << "ext_data_clnt::close() failed";
 	}
 
 	/* Close pipe */
@@ -196,7 +191,7 @@ void R3BUcesbSource::Close()
 		status = pclose(fFd);
 		if (-1 == status) {
 			perror("pclose()");
-			fLogger->Fatal(MESSAGE_ORIGIN, "pclose() failed");
+			LOG(fatal) << "pclose() failed";
 			abort();
 		}
 	}

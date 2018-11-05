@@ -145,7 +145,7 @@ InitStatus R3BTofdCal2HitPar::Init()
     }
     fCalItemsLos = (TClonesArray*)rm->GetObject("LosCal");
     if (NULL == fCalItemsLos)
-        FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch LosCal not found");
+        LOG(fatal) << "Branch LosCal not found";
 
 
     return kSUCCESS;

@@ -5,6 +5,7 @@
 #include "R3BIonGenerator.h"
 
 #include "FairPrimaryGenerator.h"
+#include "FairLogger.h"
 
 #include "FairIon.h"
 #include "FairRunSim.h"
@@ -85,7 +86,7 @@ R3BIonGenerator::R3BIonGenerator(const Char_t* ionName, Int_t mult,
   }
   if(fIon==0 && part==0 ){
      cout << "-E- R3BIonGenerator: Ion or Particle is not defined !" << endl;
-     Fatal("R3BIonGenerator", "No FairRun instantised!");      
+    LOG(fatal) << "R3BIonGenerator: No FairRun instantised!";
   }
     
 }
@@ -116,7 +117,7 @@ R3BIonGenerator::R3BIonGenerator(Int_t z, Int_t a, Int_t q, Int_t mult,
   FairRunSim* run = FairRunSim::Instance();
   if ( ! run ) {
     cout << "-E- FairIonGenerator: No FairRun instantised!" << endl;
-    Fatal("FairIonGenerator", "No FairRun instantised!");
+    LOG(fatal) << "FairIonGenerator: No FairRun instantised!";
   }
   run->AddNewIon(fIon);
 }

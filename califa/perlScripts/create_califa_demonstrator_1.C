@@ -59,46 +59,46 @@ void create_califa_geo(const char* geoTag)
   FairGeoBuilder* geoBuild = geoLoad->getGeoBuilder();
 
   FairGeoMedium* mAir      = geoMedia->getMedium("Air");
-  if ( ! mAir ) Fatal("Main", "FairMedium Air not found");
+  if ( ! mAir ) LOG("fatal") << "FairMedium Air not found";
   geoBuild->createMedium(mAir);
   TGeoMedium* pAirMedium = gGeoMan->GetMedium("Air");
-  if ( ! pAirMedium ) Fatal("Main", "Medium Air not found");
+  if ( ! pAirMedium ) LOG(fatal) << "Medium Air not found";
 
   FairGeoMedium* mCsI      = geoMedia->getMedium("CsI");
-  if ( ! mCsI ) Fatal("Main", "FairMedium CsI not found");
+  if ( ! mCsI ) LOG(fatal) << "FairMedium CsI not found";
   geoBuild->createMedium(mCsI);
   TGeoMedium* pCsIMedium = gGeoMan->GetMedium("CsI");
-  if ( ! pCsIMedium ) Fatal("Main", "Medium CsI not found");
+  if ( ! pCsIMedium ) LOG(fatal) << "Medium CsI not found";
 
   FairGeoMedium* mCar      = geoMedia->getMedium("CarbonFibre");
-  if ( ! mCar ) Fatal("Main", "FairMedium CarbonFibre not found");
+  if ( ! mCar ) LOG(fatal) << "FairMedium CarbonFibre not found";
   geoBuild->createMedium(mCar);
   TGeoMedium* pCarbonFibreMedium = gGeoMan->GetMedium("CarbonFibre");
-  if ( ! pCarbonFibreMedium ) Fatal("Main", "Medium CarbonFibre not found");
+  if ( ! pCarbonFibreMedium ) LOG(fatal) << "Medium CarbonFibre not found";
 
   FairGeoMedium* mLaCl      = geoMedia->getMedium("LaCl");
-  if ( ! mLaCl ) Fatal("Main", "FairMedium LaCl not found");
+  if ( ! mLaCl ) LOG(fatal) << "FairMedium LaCl not found";
   geoBuild->createMedium(mLaCl);
   TGeoMedium* pLaClMedium = gGeoMan->GetMedium("LaCl");
-  if ( ! pLaClMedium ) Fatal("Main", "Medium LaCl not found");
+  if ( ! pLaClMedium ) LOG(fatal) << "Medium LaCl not found";
 
   FairGeoMedium* mLaBr      = geoMedia->getMedium("LaBr");
-  if ( ! mLaBr ) Fatal("Main", "FairMedium LaBr not found");
+  if ( ! mLaBr ) LOG(fatal) << "FairMedium LaBr not found";
   geoBuild->createMedium(mLaBr);
   TGeoMedium* pLaBrMedium = gGeoMan->GetMedium("LaBr");
-  if ( ! pLaBrMedium ) Fatal("Main", "Medium LaBr not found");
+  if ( ! pLaBrMedium ) LOG(fatal) << "Medium LaBr not found";
   
   FairGeoMedium* mTfl      = geoMedia->getMedium("Tefflon");
-  if ( ! mTfl ) Fatal("Main", "FairMedium Tefflon not found");
+  if ( ! mTfl ) LOG(fatal) << "FairMedium Tefflon not found";
   geoBuild->createMedium(mTfl);
   TGeoMedium* pWrappingMedium = gGeoMan->GetMedium("Tefflon");
-  if ( ! pWrappingMedium ) Fatal("Main", "Medium Tefflon not found");
+  if ( ! pWrappingMedium ) LOG(fatal) << "Medium Tefflon not found";
 
   FairGeoMedium* mAl      = geoMedia->getMedium("aluminium");
-  if ( ! mAl ) Fatal("Main", "FairMedium aluminium not found");
+  if ( ! mAl ) LOG(fatal) << "FairMedium aluminium not found";
   geoBuild->createMedium(mAl);
   TGeoMedium* pAlHousing = gGeoMan->GetMedium("aluminium");
-  if ( ! pAlHousing ) Fatal("Main", "Medium aluminium not found");
+  if ( ! pAlHousing ) LOG(fatal) << "Medium aluminium not found";
   // --------------------------------------------------------------------------
 
 

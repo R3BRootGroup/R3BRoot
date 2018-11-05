@@ -75,10 +75,10 @@ void R3BCalifaCrystalCal2CrystalCalPID::SetParContainers()
 {
 //  // Get run and runtime database
 //  FairRunAna* run = FairRunAna::Instance();
-//  if (!run) Fatal("R3BCalifaCrystalCal2CrystalCalPID::SetParContainers", "No analysis run");
+    //  if (!run) LOG(fatal) << "R3BCalifaCrystalCal2CrystalCalPID::SetParContainers: No analysis run";
 //  
 //  FairRuntimeDb* rtdb = run->GetRuntimeDb();
-//  if (!rtdb) Fatal("R3BCalifaCrystalCal2CrystalCalPID::SetParContainers", "No runtime database");
+    //  if (!rtdb) LOG(fatal) << "R3BCalifaCrystalCal2CrystalCalPID::SetParContainers: No runtime database";
 //  
 //  if ( fVerbose && fCaloCalPar ) {
 //    LOG(INFO) << "R3BCalifaCrystalCal2CrystalCalPID::SetParContainers() "<< FairLogger::endl;
@@ -93,12 +93,12 @@ void R3BCalifaCrystalCal2CrystalCalPID::Register()
   LOG(DEBUG) << "Registering" << FairLogger::endl;
   FairRootManager *fMan = FairRootManager::Instance();
   if(! fMan) { 
-    Fatal("Init", "No FairRootManager");
+      LOG(fatal) << "Init: No FairRootManager";
     return;
   }
   fCrystalCalDataCA = (TClonesArray*) fMan->GetObject("CalifaCrystalCalData");
   if(NULL == fCrystalCalDataCA) {
-    FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch CalifaCrystalCalData not found");
+    LOG(fatal) << "Branch CalifaCrystalCalData not found";
     }
 }
 

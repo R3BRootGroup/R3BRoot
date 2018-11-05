@@ -84,12 +84,12 @@ InitStatus R3BPtofMapped2Cal::Init()
 
 	FairRootManager* mgr = FairRootManager::Instance();
 	if (NULL == mgr)
-		FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
+		LOG(fatal) << "FairRootManager not found";
 
 	// get access to Mapped data
 	fMappedItems = (TClonesArray*)mgr->GetObject("PtofMapped");
 	if (NULL == fMappedItems)
-		FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch PtofMapped not found");
+		LOG(fatal) << "Branch PtofMapped not found";
 
 	// request storage of Cal data in output tree
 	mgr->Register("PtofCal", "Land", fCalItems, kTRUE);

@@ -52,12 +52,12 @@ R3BPtofCal2Hit::~R3BPtofCal2Hit()
 InitStatus R3BPtofCal2Hit::Init() {
    FairRootManager* fMan = FairRootManager::Instance();
    if (!fMan) {
-      FairLogger::GetLogger()->Fatal (MESSAGE_ORIGIN, "FairRootManager not found");
+      LOG(fatal) << "FairRootManager not found";
    }
 
    fCalItems = (TClonesArray*) fMan->GetObject ("PtofCal");
    if (!fCalItems) {
-      FairLogger::GetLogger()->Fatal (MESSAGE_ORIGIN, "PtofCalData not found");
+      LOG(fatal) << "PtofCalData not found";
    }
 
    fMan->Register ("PtofHit", "Ptof", fHitItems, kTRUE);

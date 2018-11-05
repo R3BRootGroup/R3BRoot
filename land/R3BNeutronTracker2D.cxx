@@ -18,6 +18,7 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "FairLogger.h"
 
 #include "R3BLandDigiPar.h"
 #include "R3BLandDigi.h"
@@ -63,10 +64,10 @@ void R3BNeutronTracker2D::SetParContainers()
 {
   // Get run and runtime database
   FairRunAna* run = FairRunAna::Instance();
-  if ( ! run ) Fatal("SetParContainers", "No analysis run");
+  if ( ! run ) LOG(fatal) << "SetParContainers: No analysis run";
 
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
-  if ( ! rtdb ) Fatal("SetParContainers", "No runtime database");
+  if ( ! rtdb ) LOG(fatal) << "SetParContainers: No runtime database";
 
   fLandDigiPar = (R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
 
@@ -85,7 +86,7 @@ InitStatus R3BNeutronTracker2D::Init()
 {
   // Get input array 
   FairRootManager* ioman = FairRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No FairRootManager");
+  if ( ! ioman ) LOG(fatal) << "Init: No FairRootManager";
   fLandPoints = (TClonesArray*) ioman->GetObject("LandPoint");
   fLandMCTrack = (TClonesArray*) ioman->GetObject("MCTrack");
   fLandDigi = (TClonesArray*) ioman->GetObject("LandDigi");
@@ -127,7 +128,7 @@ void R3BNeutronTracker2D::ReadCalibrFile(char *name)
   cFile.open(name);
   // Check if opened succesfully
   if(! cFile.is_open()) {
-    Fatal("ReadCalibrFile", "Calibration file does not exist! Aborting...");
+    LOG(fatal) << "ReadCalibrFile: Calibration file does not exist! Aborting...";
   }
 
   // Read parameters

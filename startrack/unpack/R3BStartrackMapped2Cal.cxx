@@ -73,14 +73,14 @@ InitStatus R3BStartrackMapped2Cal::Init()
 	// try to get a handle on the EventHeader. EventHeader may not be 
 	// present though and hence may be null. Take care when using.
     FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
+    if (NULL == mgr)LOG(fatal) << "FairRootManager not found";
     //header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
 	// get access to Mapped data
     fMappedItemsCA = (TClonesArray*)mgr->GetObject("StartrackMapped");  // = branch name in TTree
     if (!fMappedItemsCA)
       {
-        FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch StartrackMapped not found");
+        LOG(fatal) << "Branch StartrackMapped not found";
 	return kFATAL;
       }
 

@@ -43,8 +43,7 @@ Bool_t R3BStartrackReader::Init(ext_data_struct_info *a_struct_info)
 
 	if (!ok) {
 		perror("ext_data_struct_info_item");
-		fLogger->Error(MESSAGE_ORIGIN,
-		    "Failed to setup structure information.");
+		LOG(error) << "Failed to setup structure information.";
 		return kFALSE;
 	}
 
@@ -60,7 +59,7 @@ Bool_t R3BStartrackReader::Read()
     EXT_STR_h101_STAR_onion_t* data = (EXT_STR_h101_STAR_onion_t*)fData;
 
 	// Display data
-        // fLogger->Info(MESSAGE_ORIGIN, "R3BStartrackReader::Read() Event data:");
+        // LOG(info) << "R3BStartrackReader::Read() Event data:";
 	
 
     Int_t wordtype=-1;

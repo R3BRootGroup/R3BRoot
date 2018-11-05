@@ -12,6 +12,7 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "FairLogger.h"
 
 #include "TGeoManager.h"
 
@@ -33,7 +34,7 @@ R3BSTaRTraHitFinder::~R3BSTaRTraHitFinder() {
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BSTaRTraHitFinder::Init() {
 	FairRootManager* ioManager = FairRootManager::Instance();
-	if ( !ioManager ) Fatal("Init", "No FairRootManager");
+	if ( !ioManager ) LOG(fatal) << "Init: No FairRootManager";
 	fTrackerHitCA = (TClonesArray*) ioManager->GetObject("TraPoint");
 	
 	

@@ -33,7 +33,7 @@ R3BTraHitFinder::~R3BTraHitFinder() {
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BTraHitFinder::Init() {
 	FairRootManager* ioManager = FairRootManager::Instance();
-	if ( !ioManager ) Fatal("Init", "No FairRootManager");
+    if ( !ioManager ) LOG(fatal) << "Init: No FairRootManager";
 	fTrackerHitCA = (TClonesArray*) ioManager->GetObject("TraPoint");
 	
 	

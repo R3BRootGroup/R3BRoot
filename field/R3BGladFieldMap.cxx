@@ -111,7 +111,7 @@ void R3BGladFieldMap::Init() {
   else {
     cerr << "-E- R3BGladFieldMap::Init: No proper file name defined! ("
 	 << fFileName << ")" << endl;
-    Fatal("Init", "No proper file name");
+    LOG(fatal) << "Init: No proper file name";
   }
 
   fPosX = 0.0;
@@ -438,7 +438,7 @@ void R3BGladFieldMap::ReadAsciiFile(const char* fileName) {
   ifstream mapFile(fileName);
   if ( ! mapFile.is_open() ) {
     cerr << "-E- R3BGladFieldMap:ReadAsciiFile: Could not open file! " << endl;
-    Fatal("ReadAsciiFile","Could not open file");
+    LOG(fatal) << "ReadAsciiFile: Could not open file";
   }
 
   // Read map type
@@ -453,7 +453,7 @@ void R3BGladFieldMap::ReadAsciiFile(const char* fileName) {
 	 << endl;
     cout << "    Field map is of type " << fType 
 	 << " but map on file is of type " << iType << endl;
-    Fatal("ReadAsciiFile","Incompatible map types");
+    LOG(fatal) << "ReadAsciiFile: Incompatible map types";
   }
 
   // Read grid parameters
@@ -573,7 +573,7 @@ void R3BGladFieldMap::ReadRootFile(const char* fileName,
   if (!(file->IsOpen())) {
     cerr << "-E- R3BGladFieldMap::ReadRootfile: Cannot read from file! " 
 	 << endl;
-    Fatal("ReadRootFile","Cannot read from file");
+    LOG(fatal) << "ReadRootFile: Cannot read from file";
   }
 
   // Get the field data object
@@ -612,7 +612,7 @@ void R3BGladFieldMap::SetField(const R3BGladFieldMapData* data) {
 	     << endl;
 	cout << "    Field map is of type " << fType 
 	     << " but map on file is of type " << data->GetType() << endl;
-	Fatal("SetField","Incompatible map types");
+    LOG(fatal) << "SetField: Incompatible map types";
       }
     else
       cout << "   R3BGladFieldMap::SetField: Warning:  You are using PosDepScaled map (original map type = 3)" << endl;

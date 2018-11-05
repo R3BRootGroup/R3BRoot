@@ -34,8 +34,7 @@ Bool_t R3BPtofReader::Init(ext_data_struct_info *a_struct_info)
 
 	if (!ok) {
 		perror("ext_data_struct_info_item");
-		fLogger->Error(MESSAGE_ORIGIN,
-		    "Failed to setup structure information.");
+		LOG(error) << "Failed to setup structure information.";
 		return kFALSE;
 	}
 
@@ -407,6 +406,8 @@ Bool_t R3BPtofReader::Read()
 	
 	ReadLeadingEdges(data, 0);
 	ReadTrailingEdges(data, 0);
+    
+    return kTRUE;
 }
 
 void R3BPtofReader::Reset()

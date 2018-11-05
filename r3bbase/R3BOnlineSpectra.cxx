@@ -199,7 +199,7 @@ InitStatus R3BOnlineSpectra::Init()
 
 	FairRootManager* mgr = FairRootManager::Instance();
 	if (NULL == mgr)
-		FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
+		LOG(fatal) << "FairRootManager not found";
 	header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 	FairRunOnline *run = FairRunOnline::Instance();
 
@@ -1105,7 +1105,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
   Double_t timeTofd=0;
   FairRootManager* mgr = FairRootManager::Instance();
   if (NULL == mgr)
-    FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
+    LOG(fatal) << "FairRootManager not found";
   // check for requested trigger (Todo: should be done globablly / somewhere else)
   if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
     return;

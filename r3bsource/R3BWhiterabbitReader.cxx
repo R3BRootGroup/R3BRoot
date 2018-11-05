@@ -33,8 +33,7 @@ Bool_t R3BWhiterabbitReader::Init(ext_data_struct_info *a_struct_info)
 
 	if (!ok) {
 		perror("ext_data_struct_info_item");
-		fLogger->Error(MESSAGE_ORIGIN,
-		    "Failed to setup structure information.");
+		LOG(error) << "Failed to setup structure information.";
 		return kFALSE;
 	}
 
@@ -46,13 +45,15 @@ Bool_t R3BWhiterabbitReader::Init(ext_data_struct_info *a_struct_info)
 
 Bool_t R3BWhiterabbitReader::Read()
 {
-	fLogger->Info(MESSAGE_ORIGIN, "WhiterabbitReader::Read BEGIN");
+    char strMessage[1000];
+	LOG(info) << "WhiterabbitReader::Read BEGIN";
 	if (fData->TIMESTAMP_MASTER_ID != 0
 	    && fWhiterabbitId != fData->TIMESTAMP_MASTER_ID) {
-		fLogger->Error(MESSAGE_ORIGIN,
+		sprintf(strMessage,
 		    "Event %u: Whiterabbit ID mismatch: expect %u, got %u\n",
 		    fEventHeader->GetEventno(),
 		    fWhiterabbitId, fData->TIMESTAMP_MASTER_ID);
+        LOG(error) << strMessage;
 	}
 
 	if (fEventHeader != nullptr) {
@@ -74,13 +75,15 @@ Bool_t R3BWhiterabbitReader::Read()
 	}
 
 	/* Display data */
-	fLogger->Info(MESSAGE_ORIGIN, "  Whiterabbit timestamp (id=%u):",
+	sprintf(strMessage, "  Whiterabbit timestamp (id=%u):\n",
 	    fData->TIMESTAMP_MASTER_ID);
-	fLogger->Info(MESSAGE_ORIGIN, "  e%04x h%04x m%04x l%04x",
+    LOG(info) << strMessage;
+	sprintf(strMessage, "  e%04x h%04x m%04x l%04x\n",
 		fData->TIMESTAMP_MASTER_WR_T4, fData->TIMESTAMP_MASTER_WR_T3,
 		fData->TIMESTAMP_MASTER_WR_T2, fData->TIMESTAMP_MASTER_WR_T1);
+    LOG(info) << strMessage;
 
-	fLogger->Info(MESSAGE_ORIGIN, "WhiterabbitReader::Read END");
+	LOG(info) << "WhiterabbitReader::Read END";
     return kTRUE;
 }
 

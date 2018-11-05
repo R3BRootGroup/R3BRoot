@@ -228,13 +228,13 @@ InitStatus R3BTofdCal2Hit::Init()
     // get access to Cal data
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
+        LOG(fatal) << "FairRootManager not found";
     fCalItems = (TClonesArray*)mgr->GetObject("TofdCal");
     if (NULL == fCalItems)
-        FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch TofdCal not found");
+        LOG(fatal) << "Branch TofdCal not found";
     fCalItemsLos = (TClonesArray*)mgr->GetObject("LosCal");
      if (NULL == fCalItemsLos)
-        FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch LosCal not found");
+        LOG(fatal) << "Branch LosCal not found";
 
 
     // request storage of Hit data in output tree

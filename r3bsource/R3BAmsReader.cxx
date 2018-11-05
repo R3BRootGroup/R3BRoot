@@ -51,8 +51,8 @@ Bool_t R3BAmsReader::Init(ext_data_struct_info *a_struct_info) {
 }
 
 Bool_t R3BAmsReader::Read() {
-  EXT_STR_h101_AMS_onion_t *data =
-	    (EXT_STR_h101_AMS_onion_t *) fData;
+  //EXT_STR_h101_AMS_onion_t *data =
+	//    (EXT_STR_h101_AMS_onion_t *) fData;
 
  /* Display data */
  LOG(DEBUG)<<"R3BAmsReader::Read() Event data."<<FairLogger::endl;

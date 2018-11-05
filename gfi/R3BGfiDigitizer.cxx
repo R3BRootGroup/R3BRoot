@@ -3,6 +3,7 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "FairLogger.h"
 
 
 // includes for modeling
@@ -46,10 +47,10 @@ void R3BGfiDigitizer::SetParContainers() {
 
   // Get run and runtime database
   FairRunAna* run = FairRunAna::Instance();
-  if ( ! run ) Fatal("SetParContainers", "No analysis run");
+  if ( ! run ) LOG(fatal) << "SetParContainers: No analysis run";
 
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
-  if ( ! rtdb ) Fatal("SetParContainers", "No runtime database");
+  if ( ! rtdb ) LOG(fatal) << "SetParContainers: No runtime database";
 
   fGfiDigiPar = (R3BGfiDigiPar*)(rtdb->getContainer("R3BGfiDigiPar"));
 
@@ -68,7 +69,7 @@ InitStatus R3BGfiDigitizer::Init() {
 //  cout<<"Init "<<endl;
   // Get input array 
   FairRootManager* ioman = FairRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No FairRootManager");
+  if ( ! ioman ) LOG(fatal) << "Init: No FairRootManager";
   fGfiPoints = (TClonesArray*) ioman->GetObject("GFIPoint");
   fGfiMCTrack = (TClonesArray*) ioman->GetObject("MCTrack");
   

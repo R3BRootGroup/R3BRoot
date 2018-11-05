@@ -84,11 +84,11 @@ InitStatus R3BSci8Cal2Hit::Init()
 	// get access to Cal data
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
+        LOG(fatal) << "FairRootManager not found";
         
     fCalItems = (TClonesArray*)mgr->GetObject("Sci8Cal");
     if (NULL == fCalItems)
-        FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch Sci8Cal not found");
+        LOG(fatal) << "Branch Sci8Cal not found";
 
 	// request storage of Hit data in output tree
     mgr->Register("Sci8Hit", "Land", fHitItems, kTRUE);

@@ -96,8 +96,6 @@
 #pragma link C++ class R3BFi4Point+;
 #pragma link C++ class R3BFi4CalItem+;
 #pragma link C++ class R3BFi4HitItem+;
-#pragma link C++ class R3BFi7Point+;
-#pragma link C++ class R3BFi7HitItem+;
 #pragma link C++ class R3BFibMappedData+;
 #pragma link C++ class R3BFibCalData+;
 #pragma link C++ class R3BSci8MappedData+;

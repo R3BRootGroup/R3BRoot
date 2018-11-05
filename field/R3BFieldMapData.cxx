@@ -53,7 +53,7 @@ R3BFieldMapData::R3BFieldMapData(const char* name,
   fBz = new TArrayF(*(map.GetBz()));
 
   // Take out scaling factor and convert from kG to T
-  if ( map.GetScale() == 0. ) Fatal("R3BFieldMap", "Zero scaling factor");
+  if ( map.GetScale() == 0. ) LOG(fatal) << "R3BFieldMap: Zero scaling factor";
   Double_t factor = map.GetScale() * 10.; 
   Int_t index = 0;
   for (Int_t ix=0; ix<fNx; ix++) {

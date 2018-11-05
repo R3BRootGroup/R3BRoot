@@ -35,8 +35,7 @@ Bool_t R3BUnpackReader::Init(ext_data_struct_info *a_struct_info)
 
 	if (!ok) {
 		perror("ext_data_struct_info_item");
-		fLogger->Error(MESSAGE_ORIGIN,
-		    "Failed to setup structure information.");
+		LOG(error) << "Failed to setup structure information.";
 		return kFALSE;
 	}
 
@@ -49,11 +48,13 @@ Bool_t R3BUnpackReader::Init(ext_data_struct_info *a_struct_info)
 Bool_t R3BUnpackReader::Read()
 {
 	/* Display data */
-//	fLogger->Info(MESSAGE_ORIGIN, "  Event data:");
-//	fLogger->Info(MESSAGE_ORIGIN, "  %10d (d%10d): %2d\n",
+//	LOG(info) << "  Event data:";
+//  char strMessage[1000];
+//	sprintf(strMessage, "  %10d (d%10d): %2d\n",
 //		fData->EVENTNO,
 //		fData->EVENTNO - fNEvent,
 //		fData->TRIGGER);
+//  LOG(info) << strMessage;
 
 	fNEvent = fData->EVENTNO;
 

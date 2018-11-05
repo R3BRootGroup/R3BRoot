@@ -45,10 +45,10 @@ void R3BTraFraDigitizer::SetParContainers() {
 
   // Get run and runtime database
   FairRunAna* run = FairRunAna::Instance();
-  if ( ! run ) Fatal("SetParContainers", "No analysis run");
+  if ( ! run ) LOG(fatal) << "SetParContainers: No analysis run";
 
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
-  if ( ! rtdb ) Fatal("SetParContainers", "No runtime database");
+  if ( ! rtdb ) LOG(fatal) << "SetParContainers: No runtime database";
 
   fTraFraDigiPar = (R3BTraFraDigiPar*)(rtdb->getContainer("R3BTraFraDigiPar"));
 
@@ -67,7 +67,7 @@ InitStatus R3BTraFraDigitizer::Init() {
 //  LOG(INFO)<<"Init "<<FairLogger::endl;
   // Get input array 
   FairRootManager* ioman = FairRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No FairRootManager");
+  if ( ! ioman ) LOG(fatal) << "Init: No FairRootManager";
   fTraFraPoints = (TClonesArray*) ioman->GetObject("TraPoint");
   fTraFraMCTrack = (TClonesArray*) ioman->GetObject("MCTrack");
   fMCTrack = (TClonesArray*) ioman->GetObject("MCTrack");

@@ -60,7 +60,7 @@ Bool_t R3BTofUnpack::DoUnpack(Int_t *data, Int_t size)
         
         if ((p1[0] & 0xff000000) != 0xab000000)
         {
-            FairLogger::GetLogger()->Error(MESSAGE_ORIGIN, "Wrong TFW sub-event header");
+            LOG(error) << "Wrong TFW sub-event header";
             return kFALSE;
         }
         

@@ -68,7 +68,7 @@ InitStatus R3BNeulandTcal::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
     {
-        FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
+        LOG(fatal) << "FairRootManager not found";
     }
     /*
         header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
@@ -80,7 +80,7 @@ InitStatus R3BNeulandTcal::Init()
     fMappedHit = (TClonesArray*)mgr->GetObject("NeulandTamexMappedData");
     if (NULL == fMappedHit)
     {
-        FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch R3BNeulandTamexMappedData not found");
+        LOG(fatal) << "Branch R3BNeulandTamexMappedData not found";
     }
 
     mgr->Register("NeulandPmt", "Land", fPmt, kTRUE);

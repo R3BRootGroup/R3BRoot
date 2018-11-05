@@ -13,6 +13,7 @@
 #include "TH2F.h"
 
 #include "FairRootManager.h"
+#include "FairLogger.h"
 
 #include "R3BLandDigi.h"
 #include "R3BNeuLandCluster.h"
@@ -181,7 +182,7 @@ void R3BNeuLandClusterFinder::Exec(Option_t *option)
 	// Check if properly sorted
 	if(delt < 0.) {
 	  // 2-nd digi has earlier time. Stop here.
-	  Fatal("Exec()", "Sorting of digis failed.");
+      LOG(fatal) << "Exec(): Sorting of digis failed.";
 	}
         
 	// Check if neighbour

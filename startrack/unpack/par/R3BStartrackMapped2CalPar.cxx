@@ -70,7 +70,7 @@ InitStatus R3BStartrackMapped2CalPar::Init()
   LOG(DEBUG) << "Registering" << FairLogger::endl;
   FairRootManager* fMan = FairRootManager::Instance();
   if(!fMan) {
-    Fatal("Init", "No FairRootManager");
+    LOG(fatal) << "Init: No FairRootManager";
     return kFATAL;
   }
 

@@ -336,7 +336,7 @@ void R3BTCalEngine::CalculateParamVFTX()
                     Double_t time = fhData[i][j][k]->Integral(iMin, ibin) / total;
                     if (time > 1.)
                     {
-                        FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Integration error.");
+                        LOG(fatal) << "Integration error.";
                     }
                     time *= fClockFreq;
 
@@ -398,7 +398,7 @@ void R3BTCalEngine::LinearUp(TH1F* h1, Int_t iMin, Int_t iMax, Int_t& il, Int_t&
     Double_t t2 = h1->Integral(iMin, ih) / tot; // * fClockFreq;
     if (t1 > 1. || t2 > 1.)
     {
-        Fatal("LinearUp", "Integration error");
+        LOG(fatal) << "LinearUp: Integration error";
     }
     t1 *= fClockFreq;
     t2 *= fClockFreq;

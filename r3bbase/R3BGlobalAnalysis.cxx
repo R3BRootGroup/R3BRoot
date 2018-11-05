@@ -80,7 +80,7 @@ InitStatus R3BGlobalAnalysis::Init()
     LOG(INFO) << "R3BGlobalAnalysis::Init " << FairLogger::endl;
     
     FairRootManager* mgr = FairRootManager::Instance();    
-    if (NULL == mgr) FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
+    if (NULL == mgr) LOG(fatal) << "FairRootManager not found";
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
     FairRunOnline *run = FairRunOnline::Instance();
@@ -159,7 +159,7 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
 {
 
     FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr) FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
+    if (NULL == mgr) LOG(fatal) << "FairRootManager not found";
     
     // check for requested trigger (Todo: should be done globablly / somewhere else)
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))

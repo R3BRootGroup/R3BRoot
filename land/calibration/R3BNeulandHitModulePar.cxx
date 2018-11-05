@@ -67,12 +67,16 @@ void R3BNeulandHitModulePar::clear() {
 }
 
 void R3BNeulandHitModulePar::printParams() {
-   LOG (INFO) << "   R3BNeulandHitModulePar: Calibration Parameters: " << FairLogger::endl;
-   LOG (INFO) << "   fBarId: " << fModuleId << FairLogger::endl;
-   LOG (INFO) << "   fSide: " << fSide << FairLogger::endl;
-   FairLogger::GetLogger()->Info (MESSAGE_ORIGIN, "   fTimeOffset: %4.2f  ±   %4.2f", fTimeOffset, fTimeOffsetError);
-   FairLogger::GetLogger()->Info (MESSAGE_ORIGIN, "   fEffectiveSpeed: %4.2f  ±   %4.2f", fEffectiveSpeed, fEffectiveSpeedError);
-   FairLogger::GetLogger()->Info (MESSAGE_ORIGIN, "   fEnergieGain: %4.2f  ±   %4.2f", fEnergieGain, fEnergieGainError);
+    LOG(INFO) << "   R3BNeulandHitModulePar: Calibration Parameters: " << FairLogger::endl;
+    LOG(INFO) << "   fBarId: " << fModuleId << FairLogger::endl;
+    LOG(INFO) << "   fSide: " << fSide << FairLogger::endl;
+    char strMessage[1000];
+    sprintf(strMessage, "   fTimeOffset: %4.2f  ±   %4.2f\n", fTimeOffset, fTimeOffsetError);
+    LOG(info) << strMessage;
+    sprintf(strMessage, "   fEffectiveSpeed: %4.2f  ±   %4.2f\n", fEffectiveSpeed, fEffectiveSpeedError);
+    LOG(info) << strMessage;
+    sprintf(strMessage, "   fEnergieGain: %4.2f  ±   %4.2f\n", fEnergieGain, fEnergieGainError);
+    LOG(info) << strMessage;
 }
 
 ClassImp (R3BNeulandHitModulePar);

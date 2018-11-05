@@ -23,6 +23,7 @@ link_directories(${GTEST_LIBS_DIR}
 set(TEST_DEPENDENCIES
     ${GTEST_BOTH_LIBRARIES}
     ${ROOT_LIBRARIES}
+    FairLogger::FairLogger
     R3Bbase
     R3BData
     R3BNeulandShared

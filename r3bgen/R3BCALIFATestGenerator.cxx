@@ -6,6 +6,7 @@
 #include "R3BCALIFATestGenerator.h"
 
 #include "FairPrimaryGenerator.h"
+#include "FairLogger.h"
 
 #include "TRandom.h"
 #include "TParticlePDG.h"
@@ -48,36 +49,35 @@ Bool_t R3BCALIFATestGenerator::Init()
   // Initialize generator
 	
   if (fPhiMax-fPhiMin>360)
-	Fatal("Init()","R3BCALIFATestGenerator: phi range is too wide: %f<phi<%f",
-		fPhiMin,fPhiMax);
+    LOG(fatal) << "Init(): R3BCALIFATestGenerator: phi range is too wide: "<< fPhiMin << "<phi<" << fPhiMax;
   if (fPRangeIsSet && fPtRangeIsSet)
-	Fatal("Init()","R3BCALIFATestGenerator: Cannot set P and Pt ranges simultaneously");
+    LOG(fatal) << "Init(): R3BCALIFATestGenerator: Cannot set P and Pt ranges simultaneously";
   if (fPRangeIsSet && fYRangeIsSet)
-	Fatal("Init()","R3BCALIFATestGenerator: Cannot set P and Y ranges simultaneously");
+    LOG(fatal) << "Init(): R3BCALIFATestGenerator: Cannot set P and Y ranges simultaneously";
   if ( (fThetaRangeIsSet && fYRangeIsSet) ||
 		(fThetaRangeIsSet && fEtaRangeIsSet) ||
 		(fYRangeIsSet     && fEtaRangeIsSet) )
-	Fatal("Init()","R3BCALIFATestGenerator: Cannot set Y, Theta or Eta ranges simultaneously");
+    LOG(fatal) << "Init(): R3BCALIFATestGenerator: Cannot set Y, Theta or Eta ranges simultaneously";
   if (fPointVtxIsSet && fBoxVtxIsSet)
-	Fatal("Init()","R3BCALIFATestGenerator: Cannot set point and box vertices simultaneously");
+    LOG(fatal) << "Init(): R3BCALIFATestGenerator: Cannot set point and box vertices simultaneously";
 	
   //CALIFA specifics
   if (fBetaOfEmittingFragment>1) 
-	Fatal("Init()","R3BCALIFATestGenerator: beta of fragment larger than 1!");
+    LOG(fatal) << "Init(): R3BCALIFATestGenerator: beta of fragment larger than 1!";
 
   Double32_t sumBranchingRatios=0;
   for (Int_t i=0;i<fGammasDefinedInNuclearDecay;i++) {
 	if(fGammaBranchingRatios[i]>1)
-	  Fatal("Init()","R3BCALIFATestGenerator: gamma branching ratio in position %i larger than 1!",i);
+    LOG(fatal) << "Init(): R3BCALIFATestGenerator: gamma branching ratio in position " << i << " larger than 1!";
 	sumBranchingRatios += fGammaBranchingRatios[i];
   }
   if(sumBranchingRatios>1)
-	Fatal("Init()","R3BCALIFATestGenerator: gamma branching ratio sum larger than 1!");
+    LOG(fatal) << "Init(): R3BCALIFATestGenerator: gamma branching ratio sum larger than 1!";
 	  
 	// Check for particle type
 	TDatabasePDG* pdgBase = TDatabasePDG::Instance();
 	TParticlePDG *particle = pdgBase->GetParticle(fPDGType);
-	if (! particle) Fatal("R3BCALIFATestGenerator","PDG code %d not defined.",fPDGType);
+    if (! particle) LOG(fatal) << "R3BCALIFATestGenerator: PDG code " << fPDGType << " not defined.";
 	fPDGMass = particle->Mass();
   return kTRUE;
 }
@@ -138,7 +138,7 @@ Bool_t R3BCALIFATestGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     }
 
 	if(fNuclearDecayChainIsSet){
-	  if(fPDGType!=22) Fatal("R3BCALIFATestGenerator","PDG code %d is not a gamma!",fPDGType);
+        if(fPDGType!=22) LOG(fatal) << "R3BCALIFATestGenerator: PDG code " << fPDGType << " is not a gamma!";
 	  br = gRandom->Uniform();
 	  for(Int_t i=0;i<fGammasDefinedInNuclearDecay;i++) {
 	    if(br<fGammaBranchingRatios[i]) {
