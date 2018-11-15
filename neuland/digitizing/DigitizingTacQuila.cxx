@@ -11,9 +11,10 @@ namespace Neuland
         Params::Params()
             : fPMTThresh(1.)                // [MeV]
             , fSaturationCoefficient(0.012) //
-            , fTimeRes(0.15)                // time + Gaus(0., fTimeRes) [ns]
-            , fEResRel(0.05)                // Gaus(e, fEResRel * e) []
-            , fIntegrationTime(400.)        // [ns]
+            , fExperimentalDataIsCorrectedForSaturation(true)
+            , fTimeRes(0.15)         // time + Gaus(0., fTimeRes) [ns]
+            , fEResRel(0.05)         // Gaus(e, fEResRel * e) []
+            , fIntegrationTime(400.) // [ns]
             , fRnd(new TRandom3())
         {
         }
@@ -118,7 +119,10 @@ namespace Neuland
             // Apply energy smearing
             e = par.fRnd->Gaus(e, par.fEResRel * e);
             // Apply reverse saturation
-            e = e / (1. - par.fSaturationCoefficient * e);
+            if (par.fExperimentalDataIsCorrectedForSaturation)
+            {
+                e = e / (1. - par.fSaturationCoefficient * e);
+            }
             return e;
         }
 

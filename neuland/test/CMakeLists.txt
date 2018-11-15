@@ -32,3 +32,18 @@ set(TEST_DEPENDENCIES
 add_executable(${PROJECT_TEST_NAME} ${TEST_SRC_FILES})
 target_link_libraries(${PROJECT_TEST_NAME} ${TEST_DEPENDENCIES})
 add_test(${PROJECT_TEST_NAME} ${EXECUTABLE_OUTPUT_PATH}/${PROJECT_TEST_NAME})
+
+generate_root_test_script(${R3BROOT_SOURCE_DIR}/neuland/test/testNeulandSimulation.C)
+add_test(NeulandSimulation ${R3BROOT_BINARY_DIR}/neuland/test/testNeulandSimulation.sh)
+set_tests_properties(NeulandSimulation PROPERTIES TIMEOUT "2000")
+set_tests_properties(NeulandSimulation
+                     PROPERTIES PASS_REGULAR_EXPRESSION "Macro finished succesfully.")
+
+generate_root_test_script(${R3BROOT_SOURCE_DIR}/neuland/test/testNeulandDigitizer.C)
+add_test(NeulandDigitizer ${R3BROOT_BINARY_DIR}/neuland/test/testNeulandDigitizer.sh)
+set_tests_properties(NeulandDigitizer PROPERTIES DEPENDS NeulandSimulation)
+set_tests_properties(NeulandDigitizer PROPERTIES TIMEOUT "1000")
+set_tests_properties(NeulandDigitizer
+                     PROPERTIES PASS_REGULAR_EXPRESSION "Macro finished succesfully.")
+
+add_subdirectory(calibration)

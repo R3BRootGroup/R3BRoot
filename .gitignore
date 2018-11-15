@@ -35,10 +35,15 @@
 *.gam
 
 # Generated folders and files 
-geometry/neuland_v2_*.root
+geometry/neuland_v*.root
 build/
 input/
+
 macros/
+
+.idea/
+build-r3broot.sh
+cmake-build-debug/
 
 sofia/
 

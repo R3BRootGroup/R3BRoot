@@ -11,6 +11,8 @@ set(INCLUDE_DIRECTORIES
 
 link_directories(${ROOT_LIBRARY_DIR} ${Boost_LIBRARY_DIRS} ${FAIRROOT_LIBRARY_DIR})
 
+
+add_subdirectory(calibration)
 add_subdirectory(clustering)
 add_subdirectory(digitizing)
 add_subdirectory(reconstruction)

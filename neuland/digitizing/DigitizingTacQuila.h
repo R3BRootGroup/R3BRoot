@@ -13,9 +13,10 @@ namespace Neuland
         {
             Double_t fPMTThresh;             // [MeV]
             Double_t fSaturationCoefficient; //
-            Double_t fTimeRes;               // time + Gaus(0., fTimeRes) [ns]
-            Double_t fEResRel;               // Gaus(e, fEResRel * e) []
-            Double_t fIntegrationTime;       // [ns]
+            Bool_t fExperimentalDataIsCorrectedForSaturation;
+            Double_t fTimeRes;         // time + Gaus(0., fTimeRes) [ns]
+            Double_t fEResRel;         // Gaus(e, fEResRel * e) []
+            Double_t fIntegrationTime; // [ns]
             std::shared_ptr<TRandom3> fRnd;
 
             Params();
@@ -61,6 +62,10 @@ namespace Neuland
 
         void SetPMTThreshold(const Double_t v) { fTQP.fPMTThresh = v; }
         void SetSaturationCoefficient(const Double_t v) { fTQP.fSaturationCoefficient = v; }
+        void SetExperimentalDataIsCorrectedForSaturation(const Bool_t v)
+        {
+            fTQP.fExperimentalDataIsCorrectedForSaturation = v;
+        }
         void SetTimeRes(const Double_t v) { fTQP.fTimeRes = v; }
         void SetERes(const Double_t v) { fTQP.fEResRel = v; }
         void SetIntegrationTime(const Double_t v) { fTQP.fIntegrationTime = v; }

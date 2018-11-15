@@ -84,8 +84,6 @@ class R3BNeuland : public R3BDetector
     R3BNeulandGeoPar* fNeulandGeoPar; //!
 
     /** Track information to be stored until the track leaves the active volume. */
-    // TODO: Just fill an existing R3BLandPoint in the TClonesArray or
-    //       Use an R3BLandPoint as Member Variable to move construct into TClonesarray?
     Int_t fTrackID;
     Int_t fPaddleID;
     TLorentzVector fPosIn, fPosOut;

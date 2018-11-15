@@ -13,7 +13,7 @@ namespace Neuland
       public:
         RecoTDR();
         void Init() override;
-        R3BNeulandNeutron2DPar* Get2DPar() { return fPar; }
+        R3BNeulandNeutron2DPar* Get2DPar() const { return fPar; }
         std::vector<R3BNeulandNeutron> GetNeutrons(const std::vector<R3BNeulandCluster*>&) const override;
         void SetBeam(Double_t EBeamMeV, Double_t BetaBeam);
         void SortClustersByRValue(std::vector<R3BNeulandCluster*>&) const;

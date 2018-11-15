@@ -4,25 +4,19 @@
 // ----------------------------------------------------------------
 
 #include "R3BNeulandTcalFill.h"
-#include "R3BEventHeader.h"
-#include "R3BPaddleTamexMappedData.h"
-#include "R3BTCalEngine.h"
-#include "R3BTCalPar.h"
-
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRtdbRun.h"
 #include "FairRunIdGenerator.h"
 #include "FairRuntimeDb.h"
-
+#include "R3BEventHeader.h"
+#include "R3BPaddleTamexMappedData.h"
+#include "R3BTCalEngine.h"
+#include "R3BTCalPar.h"
 #include "TClonesArray.h"
 #include "TF1.h"
 #include "TH1F.h"
-
-#include <iostream>
 #include <stdlib.h>
-
-using namespace std;
 
 R3BNeulandTcalFill::R3BNeulandTcalFill()
     : FairTask("R3BNeulandTCalFill", 1)

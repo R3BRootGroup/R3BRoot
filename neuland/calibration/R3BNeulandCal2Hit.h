@@ -1,0 +1,48 @@
+#ifndef R3BNEULANDCAL2HIT_H
+#define R3BNEULANDCAL2HIT_H
+
+#include "FairTask.h"
+#include "R3BNeulandCalData.h"
+#include "R3BNeulandHit.h"
+#include "TCAConnector.h"
+#include <map>
+
+class R3BNeulandHitPar;
+
+class R3BNeulandCal2Hit : public FairTask
+{
+  public:
+    R3BNeulandCal2Hit();
+    ~R3BNeulandCal2Hit() override = default;
+
+    InitStatus Init() override;
+    InitStatus ReInit() override;
+    void SetParContainers() override;
+    void Exec(Option_t*) override;
+
+    inline void SetFirstPlaneHorizontal() { fFirstPlaneHorizontal = kTRUE; }
+
+    // Distance to target in cm
+    inline void SetDistanceToTarget(Double_t d) { fDistanceToTarget = d; }
+
+  private:
+    void SetParameter();
+
+    TCAInputConnector<R3BNeulandCalData> fCalData;
+    TCAOutputConnector<R3BNeulandHit> fHits;
+
+    R3BNeulandHitPar* fPar;
+
+    Bool_t fFirstPlaneHorizontal;
+    Double_t fDistanceToTarget;
+
+    std::map<Int_t, Bool_t> fMapIsSet;
+    std::map<Int_t, Double_t> fMapVeff;
+    std::map<Int_t, Double_t> fMapTSync;
+    std::map<Int_t, Double_t> fMapEGain;
+
+  public:
+    ClassDefOverride(R3BNeulandCal2Hit, 0)
+};
+
+#endif
