@@ -39,6 +39,7 @@
 #include <fstream>
 #include <ctime>
 #include <array>
+#include <algorithm>
 #include "TMath.h"
 #define IS_NAN(x) TMath::IsNaN(x)
 
@@ -366,106 +367,39 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option) {
 
       // lt=0, l=1,lb=2,b=3,rb=4,r=5,rt=6,t=7 
 
-      // VFTX Channels 1-4:
-      if(!(IS_NAN(calData->fTimeV_r_ns))) {
-	time_V[iPart][5] = calData->fTimeV_r_ns;
-	nPart_VFTX[5] += 1;
-      }	  
-      if(!(IS_NAN(calData->fTimeV_t_ns))) {
-	time_V[iPart][7] = calData->fTimeV_t_ns;
-	nPart_VFTX[7] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeV_l_ns))) {
-	time_V[iPart][1] = calData->fTimeV_l_ns;
-	nPart_VFTX[1] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeV_b_ns))) {
-	time_V[iPart][3] = calData->fTimeV_b_ns;  
-	nPart_VFTX[3] += 1;
-      }	
-      // VFTX Channels 5-8:
-      if(!(IS_NAN(calData->fTimeV_rt_ns))) {
-	time_V[iPart][6] = calData->fTimeV_rt_ns;
-	nPart_VFTX[6] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeV_lt_ns))) {
-	time_V[iPart][0] = calData->fTimeV_lt_ns;
-	nPart_VFTX[0] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeV_lb_ns))) {
-	time_V[iPart][2] = calData->fTimeV_lb_ns;
-	nPart_VFTX[2] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeV_rb_ns))) {
-	time_V[iPart][4] = calData->fTimeV_rb_ns;                 
-	nPart_VFTX [4]+= 1;
-      }	
-      // TAMEX Channels 1-4:      
-      if(!(IS_NAN(calData->fTimeL_r_ns))) {
-	time_L[iPart][5] = calData->fTimeL_r_ns;
-	nPart_LEAD[5] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_r_ns))) {
-	time_T[iPart][5] = calData->fTimeT_r_ns;
-	nPart_TRAI[5] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeL_t_ns))) {
-	time_L[iPart][7] = calData->fTimeL_t_ns;
-	nPart_LEAD[7] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_t_ns))) {
-	time_T[iPart][7] = calData->fTimeT_t_ns;
-	nPart_TRAI[7] += 1;
-      }	  
-      if(!(IS_NAN(calData->fTimeL_l_ns))) {
-	time_L[iPart][1] = calData->fTimeL_l_ns;
-	nPart_LEAD[1] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_l_ns))) {
-	time_T[iPart][1] = calData->fTimeT_l_ns; 
-	nPart_TRAI[1] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeL_b_ns))) {
-	time_L[iPart][3] = calData->fTimeL_b_ns;
-	nPart_LEAD[3] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_b_ns))) {
-	time_T[iPart][3] = calData->fTimeT_b_ns;  
-	nPart_TRAI[3] += 1;
-      }	
-      // TAMEX Channels 5-8:
-      if(!(IS_NAN(calData->fTimeL_rt_ns))) {
-	time_L[iPart][6] = calData->fTimeL_rt_ns;
-	nPart_LEAD[6] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_rt_ns))) {
-	time_T[iPart][6] = calData->fTimeT_rt_ns;
-	nPart_TRAI[6] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeL_lt_ns))) {
-	time_L[iPart][0] = calData->fTimeL_lt_ns;
-	nPart_LEAD[0] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_lt_ns))) {
-	time_T[iPart][0] = calData->fTimeT_lt_ns; 
-	nPart_TRAI[0] += 1;
-      }	 
-      if(!(IS_NAN(calData->fTimeL_lb_ns))) {
-	time_L[iPart][2] = calData->fTimeL_lb_ns;
-	nPart_LEAD[2] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_lb_ns))) {
-	time_T[iPart][2] = calData->fTimeT_lb_ns; 
-	nPart_TRAI[2] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeL_rb_ns))) {
-	time_L[iPart][4] = calData->fTimeL_rb_ns;
-	nPart_LEAD[4] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_rb_ns))) {
-	time_T[iPart][4] = calData->fTimeT_rb_ns;  
-	nPart_TRAI[4] += 1;
-      }	
+     for(Int_t iCha = 0; iCha < 8; iCha++){
+		 
+	  time_V[iPart][iCha] = 0./0.;   
+	  if(!(IS_NAN(calData->GetTimeV_ns(iCha)))){   // VFTX
+		nPart_VFTX[iCha] += 1;
+	  	time_V[iPart][iCha] = calData->GetTimeV_ns(iCha);
+	  }	
+	  	  
+	  time_L[iPart][iCha] = 0./0.;
+	  if(!(IS_NAN(calData->GetTimeL_ns(iCha)))){   // TAMEX leading
+		nPart_LEAD[iCha] += 1;
+		time_L[iPart][iCha]=calData->GetTimeL_ns(iCha);
+	  }	
+	  time_T[iPart][iCha] = 0./0.;
+	  if(!(IS_NAN(calData->GetTimeT_ns(iCha)))){   // TAMEX trailing
+		nPart_TRAI[iCha] += 1;
+		time_T[iPart][iCha]=calData->GetTimeT_ns(iCha); 
+	  }
+      
+     }
+     
+     // Sorting VFTX data:
+
+	 std::qsort(time_V, nPart, sizeof(*time_V),
+        [](const void *arg1, const void *arg2)->int
+        {
+            double const *lhs = static_cast<double const*>(arg1);
+            double const *rhs = static_cast<double const*>(arg2);
+                       
+            return (lhs[0] < rhs[0]) ? -1
+                :  ((rhs[0] < lhs[0]) ? 1 : 0);
+        });
+      // End sorting     
 
 /*
       if(iPart > 0 && Multip%8 == 0) 

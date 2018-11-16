@@ -10,9 +10,9 @@
 #define R3BLOSMAPPED2CAL
 
 #include <map>
+#include <vector>
 
 #include "FairTask.h"
-#include "R3BLosCalData.h"
 
 class TClonesArray;
 class TH1F;
@@ -20,6 +20,8 @@ class TH2F;
 class R3BTCalModulePar;
 class R3BTCalPar;
 class R3BEventHeader;
+class R3BLosMappedData;
+class R3BLosCalData;
 
 /**
  * An analysis task to apply TCAL calibration for NeuLAND.
@@ -58,39 +60,39 @@ class R3BLosMapped2Cal : public FairTask
      * the event loop.
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
-    virtual InitStatus Init();
+    InitStatus Init();
 
     /**
      * Method for initialization of the parameter containers.
      * Called by the framework prior to Init() method.
      */
-    virtual void SetParContainers();
+    void SetParContainers();
 
     /**
      * Method for re-initialization of parameter containers
      * in case the Run ID has changed.
      */
-    virtual InitStatus ReInit();
+    InitStatus ReInit();
 
     /**
      * Method for event loop implementation.
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Exec(Option_t* option);
+    void Exec(Option_t *);
 
     /**
      * A method for finish of processing of an event.
      * Is called by the framework for each event after executing
      * the tasks.
      */
-    virtual void FinishEvent();
+    void FinishEvent();
 
     /**
      * Method for finish of the task execution.
      * Is called by the framework after processing the event loop.
      */
-    virtual void FinishTask();
+    void FinishTask();
 
     /** 
      * Method for setting the trigger value.
@@ -106,6 +108,7 @@ class R3BLosMapped2Cal : public FairTask
      * @param nPMTs a number of photomultipliers.
      * @param n17 a number of channels with stop signal (17-th channel).
      */
+     
     inline void SetNofModules(Int_t nDets, Int_t nChs)
     {
         fNofDetectors = nDets;
@@ -115,14 +118,14 @@ class R3BLosMapped2Cal : public FairTask
     }
 
   private:
-    //std::map<Int_t, R3BTCalModulePar*> fMapPar; /**< Map for matching mdoule ID with parameter container. */
-    TClonesArray* fMappedItems;                 /**< Array with mapped items - input data. */
-    TClonesArray* fCalItems;                    /**< Array with cal items - output data. */
-    Int_t fNofCalItems;                         /**< Number of produced time items per event. */
-    Int_t Icounts_good = 0;
-    Int_t Icounts_tot = 0;
+    size_t GetCalLookupIndex(R3BLosMappedData const &) const;
+    
+    TClonesArray *fMappedItems;                 /**< Array with mapped items - input data. */
+    TClonesArray *fCalItems;                    /**< Array with cal items - output data. */
 
-    R3BTCalPar* fTcalPar;                       /**< TCAL parameter container. */
+    Int_t fNofCalItems;                         /**< Number of produced time items per event. */
+
+    R3BTCalPar *fTcalPar;                       /**< TCAL parameter container. */
     UInt_t fNofTcalPars;                        /**< Number of modules in parameter file. */
 
 	// check for trigger should be done globablly (somewhere else)
@@ -131,11 +134,14 @@ class R3BLosMapped2Cal : public FairTask
 
     UInt_t fNofDetectors;  /**< Number of detectors. */
     UInt_t fNofChannels;   /**< Number of channels per detector. */
-    UInt_t fNofTypes = 3;    
+    UInt_t fNofTypes;    
 	UInt_t fNofModules;    /**< Total number of channels. */
     Double_t fClockFreq;   /**< Clock cycle in [ns]. */
     UInt_t fNEvent;
 
+// Fast lookup for matching mapped data.
+    std::vector<std::vector<R3BLosCalData *>> fCalLookup;
+    
   public:
     ClassDef(R3BLosMapped2Cal, 1)
 };

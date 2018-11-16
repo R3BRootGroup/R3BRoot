@@ -106,5 +106,6 @@
 #pragma link C++ class R3BSci8MappedData+;
 #pragma link C++ class R3BSci8CalData+;
 #pragma link C++ class R3BSci8HitData+;
+#pragma link C++ class R3BBeamMonitorMappedData+;
 
 #endif

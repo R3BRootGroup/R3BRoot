@@ -74,6 +74,9 @@ size_t R3BTofdMapped2Cal::GetCalLookupIndex(R3BTofdMappedData const &a_mapped)
 {
   size_t i = (a_mapped.GetDetectorId() - 1) * fPaddlesPerPlane +
       (a_mapped.GetBarId() - 1);
+      
+  //  cout<<i<<";"<<fCalLookup.size()<<"; "<<a_mapped.GetDetectorId()<<"; "<<a_mapped.GetBarId()<<endl   ;   
+      
   assert(i < fCalLookup.size());
   return i;
 }

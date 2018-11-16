@@ -20,6 +20,8 @@
 
 #include "TClonesArray.h"
 #include "TMath.h"
+using namespace std;
+#define IS_NAN(x) TMath::IsNaN(x)
 
 #define N_TOFD_HIT_PLANE_MAX 4
 #define N_TOFD_HIT_PADDLE_MAX 44

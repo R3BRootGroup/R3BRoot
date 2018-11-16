@@ -16,6 +16,8 @@
 #include "R3BSci8CalData.h"
 #include "R3BSci8MappedData.h"
 
+#include "R3BBeamMonitorMappedData.h"
+
 #include "R3BTofdCalData.h"
 #include "R3BTofdMappedData.h"
 
@@ -56,6 +58,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 #define IS_NAN(x) TMath::IsNaN(x)
 using namespace std;
 
@@ -66,6 +69,7 @@ R3BOnlineSpectra::R3BOnlineSpectra()
 R3BOnlineSpectra::R3BOnlineSpectra(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fTrigger(-1)
+    , fTpat(-1)
     , fNofPlanes(N_PLANE_MAX_TOFD)  
     , fPaddlesPerPlane(N_PADDLE_MAX_TOFD) 
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
@@ -75,6 +79,10 @@ R3BOnlineSpectra::R3BOnlineSpectra(const char* name, Int_t iVerbose)
 
 R3BOnlineSpectra::~R3BOnlineSpectra()
 {
+//	delete fhTpat ;
+//	delete fhTrigger;
+//	delete fh_SEETRAM;
+	
    for(int i = 0; i < NOF_FIB_DET; i++) {	
      delete fh_channels_Fib[i];
      delete fh_fibers_Fib[i];
@@ -84,12 +92,13 @@ R3BOnlineSpectra::~R3BOnlineSpectra()
      delete fh_multihit_s_Fib[i];
      delete fh_ToT_m_Fib[i];
      delete fh_ToT_s_Fib[i];
-   } 
+   }
 }
 
 
 InitStatus R3BOnlineSpectra::Init()
 {
+
 	// Initialize random number:
 	std::srand(std::time(0)); //use current time as seed for random generator
 
@@ -102,12 +111,20 @@ InitStatus R3BOnlineSpectra::Init()
 	FairRootManager* mgr = FairRootManager::Instance();
 	if (NULL == mgr)
 		LOG(fatal) << "FairRootManager not found";
+
 	header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 	FairRunOnline *run = FairRunOnline::Instance();
 
 	run->GetHttpServer()->Register("/Tasks", this);
-
-
+	
+/*
+// get access to BeamMonitor Mapped data
+    fbmonMappedItems = (TClonesArray*)mgr->GetObject("BeamMonitorMapped");  
+     if (NULL == fbmonMappedItems){
+      LOG(ERROR) << "Branch BeamMonitorMapped not found" << FairLogger::endl;
+      return kFATAL;
+     }
+*/    
         // Get objects for detectors on all levels
         assert(DET_MAX + 1 == sizeof(fDetectorNames)/sizeof(fDetectorNames[0]));
         printf("Have %d fiber detectors.\n", NOF_FIB_DET);
@@ -120,7 +137,6 @@ InitStatus R3BOnlineSpectra::Init()
                 fCalItems.push_back((TClonesArray *)mgr->GetObject(Form("%sCal", fDetectorNames[det])));
                 fHitItems.push_back((TClonesArray *)mgr->GetObject(Form("%sHit", fDetectorNames[det])));
         }
-
 
 
 	//------------------------------------------------------------------------ 
@@ -188,109 +204,118 @@ InitStatus R3BOnlineSpectra::Init()
 		run->AddObject(cSci8);
 
 		run->GetHttpServer()->RegisterCommand("Reset_SCI8", Form("/Tasks/%s/->Reset_SCI8_Histo()", GetName()));
-		/*
-		   TCanvas *cSci8a = new TCanvas("Sci8_adittional", "SCI8_additional", 10, 10, 850, 750);
+ 
+	}	
 
-		   cSci8a->Divide(3, 2);
-		   cSci8a->cd(1);		
-		   fh_sci8_dt_hits->Draw();	
-		   cSci8a->cd(2);		
-		   fh_sci8_dt_hits_l->Draw();	
-		   cSci8a->cd(3);		
-		   fh_sci8_dt_hits_t->Draw();				
-		   cSci8a->cd(4);gPad->SetLogz();
-		   fh_sci8_multihitVFTX->Draw("colz");		
-		   cSci8a->cd(5);gPad->SetLogz();
-		   fh_sci8_multihitLEAD->Draw("colz");		
-		   cSci8a->cd(6);gPad->SetLogz();
-		   fh_sci8_multihitTRAI->Draw("colz");		
-		   cSci8a->cd(0);
-		 */ 
-	}
+	if(fMappedItems.at(DET_BMON)){		
+		fhTpat = new TH1F("Tpat", "Tpat", 20, 0, 20);
+        fhTpat->GetXaxis()->SetTitle("Tpat value");
+        fhTrigger = new TH1F("Trigger", "Trigger all", 20, 0, 20);
+        fhTrigger->GetXaxis()->SetTitle("Trigger value");
+        
+        fh_SEETRAM = new TH2F("SEE", "SEE",7200,0,3600,15000,0,150000);
+        fh_SEETRAM->GetXaxis()->SetTitle("time / sec");
+        fh_SEETRAM->GetYaxis()->SetTitle("SEETRAM counts");
+        
+        fh_IC = new TH2F("IC", "IC",7200,0,3600,15000,0,150000);
+        fh_IC->GetXaxis()->SetTitle("time / sec");
+        fh_IC->GetYaxis()->SetTitle("IC counts");
+        
+        fh_TOFDOR = new TH2F("TOFDOR", "TOFDOR",7200,0,3600,15000,0,150000);
+        fh_TOFDOR->GetXaxis()->SetTitle("time / sec");
+        fh_TOFDOR->GetYaxis()->SetTitle("TOFDOR counts");
+        
+		TCanvas *cbmon = new TCanvas("Beam_Monitor", "Beam Monitors", 820, 10, 700, 800);
+		cbmon->Divide(3,2);	
+		cbmon->cd(1);gPad->SetLogy();
+		fhTrigger->Draw();
+		cbmon->cd(2);gPad->SetLogy();
+		fhTpat->Draw();
+		cbmon->cd(4);gPad->SetLogz();
+		fh_SEETRAM ->Draw("colz");
+		cbmon->cd(5);gPad->SetLogz();
+		fh_IC->Draw("colz");
+		cbmon->cd(6);gPad->SetLogz();
+		fh_TOFDOR->Draw("colz");	
+		cbmon->cd(0);
+		run->AddObject(cbmon);
+		
+		run->GetHttpServer()->RegisterCommand("Reset_BMON", Form("/Tasks/%s/->Reset_BMON_Histo()", GetName()));
+}
+
 
 	//------------------------------------------------------------------------ 
 	// Los detector
 
 	if(fMappedItems.at(DET_LOS)){
-		TCanvas *cLos = new TCanvas("Los", "LOS", 10, 10, 750, 850);
+		TCanvas *cLos = new TCanvas("Los", "LOS", 10, 10, 910, 810);
 
 		fh_los_channels = new TH1F("los_channels", "LOS channels", 10, 0., 10.); 
 		fh_los_channels->GetXaxis()->SetTitle("Channel number");
-		fh_los_multihit = new TH1F("los_multihit", "LOS multihit",20, 0., 20.);
+		fh_los_multihit = new TH1F("los_multihit", "LOS multihit && all 8 PMs",10, 0., 10.);
 		fh_los_multihit->GetXaxis()->SetTitle("Multihit");		
-		fh_los_multihitVFTX = new TH2F("los_vftx_multihit", "LOS VFTX multihit",10, 0., 10.,20, 0., 20.);
-		fh_los_multihitVFTX->GetYaxis()->SetTitle("Multihit ");
-		fh_los_multihitVFTX->GetXaxis()->SetTitle("Channel number");
-		fh_los_multihitLEAD = new TH2F("los_lead_multihit", "LOS TAMEX Leading multihit",10, 0., 10.,20, 0., 20.);
-		fh_los_multihitLEAD->GetYaxis()->SetTitle("Multihit ");
-		fh_los_multihitLEAD->GetXaxis()->SetTitle("Channel number");
-		fh_los_multihitTRAI = new TH2F("los_trai_multihit", "LOS TAMEX Trailing multihit",10, 0., 10.,20, 0., 20.);
-		fh_los_multihitTRAI->GetYaxis()->SetTitle("Multihit ");		
-		fh_los_multihitTRAI->GetXaxis()->SetTitle("Channel number");
-		fh_los_dt_hits = new TH1F("los_dt_hits", "LOS dt multihits",40000,-2000,2000);
-		fh_los_dt_hits->GetXaxis()->SetTitle("dt_VFTX between two hits / ns");
-		fh_los_dt_hits_l = new TH1F("los_dt_hits_l", "LOS dt multihits leading",40000,-2000,2000);
-		fh_los_dt_hits_l->GetXaxis()->SetTitle("dt_LEAD between two hits / ns");
-		fh_los_dt_hits_t = new TH1F("los_dt_hits_t", "LOS dt multihits trailing",40000,-2000,2000);
-		fh_los_dt_hits_t->GetXaxis()->SetTitle("dt_TRAIL between two hits / ns");
-
-        fh_los_pos_MCFD = new TH2F("los_pos_MCFD", "LOS MCFD Position emp. cal.", 4000, -10., 10.,4000, -10., 10.);
+	
+        fh_los_pos_MCFD = new TH2F("los_pos_MCFD", "LOS MCFD Position ", 1000, -5., 5.,1000, -5., 5.);
 		fh_los_pos_MCFD->GetXaxis()->SetTitle("X position / cm");
 		fh_los_pos_MCFD->GetYaxis()->SetTitle("Y position / cm"); 
-		fh_los_pos_TAMEX = new TH2F("los_pos_TAMEX", "LOS TAMEX Position emp. cal.", 4000, -10., 10.,4000, -10., 10.);
+		fh_los_pos_TAMEX = new TH2F("los_pos_TAMEX", "LOS TAMEX Position ", 1000, -5., 5.,1000, -5., 5.);
 		fh_los_pos_TAMEX->GetXaxis()->SetTitle("X position / cm");
 		fh_los_pos_TAMEX->GetYaxis()->SetTitle("Y position / cm"); 
-
-
-		fh_los_tres_MCFD = new TH1F("los_time_res_MCFD", "LOS MCFD Time resolution - raw", 8000, -4., 4.);
+        fh_los_pos_ToT = new TH2F("los_pos_ToT", "LOS ToT Position ", 1000, -5., 5.,1000, -5., 5.);
+		fh_los_pos_ToT->GetXaxis()->SetTitle("X position / cm");
+		fh_los_pos_ToT->GetYaxis()->SetTitle("Y position / cm");
+		fh_los_dt_hits_ToT= new TH2F("los_dt_ToT", "LOS ToT dt ",5000,0,3000,500,0,200.); 
+		fh_los_dt_hits_ToT->GetXaxis()->SetTitle("dt between two hits / ns");
+		fh_los_dt_hits_ToT->GetYaxis()->SetTitle("ToT / ns");
+		fh_los_dt_first_ToT= new TH2F("los_dt_events_ToT", "LOS ToT dtevents ",5000,0,150000,500,0,200.); 
+		fh_los_dt_first_ToT->GetXaxis()->SetTitle("dt between two events / ns");
+		fh_los_dt_first_ToT->GetYaxis()->SetTitle("ToT / ns");
+		
+		fh_los_tres_MCFD = new TH1F("los_time_res_MCFD", "LOS MCFD Time resolution - raw", 4000, -4., 4.);
 		fh_los_tres_MCFD->GetXaxis()->SetTitle("Time MCFD / ns");
-		fh_los_tres_TAMEX = new TH1F("los_time_res_TAMEX", "LOS TAMEX Time resolution -raw ", 8000, -4., 4.);  
+		fh_los_tres_TAMEX = new TH1F("los_time_res_TAMEX", "LOS TAMEX Time resolution -raw ", 4000, -4., 4.);  
 		fh_los_tres_TAMEX->GetXaxis()->SetTitle("Time TAMEX / ns"); 
-		fh_los_tot = new TH2F("los_tot","LOS ToT vs PM",10,0,10,3000,0.,300.); 
+		fh_los_tot = new TH2F("los_tot","LOS ToT vs PM",10,0,10,3100,-10.,300.); 
 		fh_los_tot->GetXaxis()->SetTitle("PMT number");
 		fh_los_tot->GetYaxis()->SetTitle("ToT / ns");
-		fh_los_tot_mean = new TH1F("los_tot_mean","LOS mean ToT",30000,0.,300.); 
+		fh_los_tot_mean = new TH1F("los_tot_mean","LOS mean ToT",1500,0.,300.); 
 		fh_los_tot_mean->GetYaxis()->SetTitle("Counts");
 		fh_los_tot_mean->GetXaxis()->SetTitle("ToT / ns");
+        fh_los_ihit_ToT= new TH2F("los_tot_ihit","LOS ToT vs ihit",10,0,10,3100,-10.,300.);
+        fh_los_ihit_ToT ->GetXaxis()->SetTitle("iHit");
+        fh_los_ihit_ToT ->GetYaxis()->SetTitle("ToT / ns");
+        
 
-		cLos->Divide(3,3);
+
+		cLos->Divide(4,3);
 		cLos->cd(1);
 		fh_los_channels->Draw();		
 		cLos->cd(2);gPad->SetLogy();
 		fh_los_multihit->Draw();
 		cLos->cd(3);gPad->SetLogz();
-		fh_los_tot->Draw("colz");
-		cLos->cd(4);
-		fh_los_tot_mean->Draw();	
-		cLos->cd(5);
-		fh_los_tres_MCFD->Draw();
-		cLos->cd(6);
-		fh_los_tres_TAMEX->Draw();		
+		fh_los_tot->Draw("colz");      
+		cLos->cd(4);gPad->SetLogy();
+		fh_los_tot_mean->Draw();
+		cLos->cd(5);gPad->SetLogz();
+		fh_los_ihit_ToT	->Draw("colz");
+		cLos->cd(6);gPad->SetLogz();
+		fh_los_dt_first_ToT->Draw("colz");
 		cLos->cd(7);gPad->SetLogz();
+		fh_los_dt_hits_ToT->Draw("colz");			
+		cLos->cd(8);gPad->SetLogy();
+		fh_los_tres_MCFD->Draw();
+		cLos->cd(9);gPad->SetLogy();
+		fh_los_tres_TAMEX->Draw();
+		cLos->cd(10);gPad->SetLogz();
+		fh_los_pos_ToT->Draw("colz");
+		cLos->cd(11);gPad->SetLogz();
 		fh_los_pos_MCFD->Draw("colz");
-		cLos->cd(8);gPad->SetLogz();
-		fh_los_pos_TAMEX->Draw("colz");	
+		cLos->cd(12);gPad->SetLogz();
+		fh_los_pos_TAMEX->Draw("colz");		
 		cLos->cd(0);
 		run->AddObject(cLos);
 
 		run->GetHttpServer()->RegisterCommand("Reset_LOS", Form("/Tasks/%s/->Reset_LOS_Histo()", GetName()));
-
-		TCanvas *cLos1 = new TCanvas("Los_additional", "LOS-additional", 10, 10, 850, 950);
-		cLos1->Divide(2, 3);
-		cLos1->cd(1);		
-		fh_los_dt_hits->Draw();	
-		cLos1->cd(2);		
-		fh_los_dt_hits_l->Draw();	
-		cLos1->cd(3);		
-		fh_los_dt_hits_t->Draw();				
-		cLos1->cd(4);gPad->SetLogz();
-		fh_los_multihitVFTX->Draw("colz");		
-		cLos1->cd(5);gPad->SetLogz();
-		fh_los_multihitLEAD->Draw("colz");		
-		cLos1->cd(6);gPad->SetLogz();
-		fh_los_multihitTRAI->Draw("colz");		
-		cLos1->cd(0);
-
 	}
 
 
@@ -606,6 +631,7 @@ InitStatus R3BOnlineSpectra::Init()
 			}
 		}
 
+
 		cTofd_planes->cd(1);
 		fh_tofd_channels[0]->Draw();
 		cTofd_planes->cd(2);gPad->SetLogz();
@@ -656,9 +682,7 @@ InitStatus R3BOnlineSpectra::Init()
 
 	// -------------------------------------------------------------------------
 
-    // -------------------------------------------------------------------------
-
-    return kSUCCESS;
+	return kSUCCESS;
 }
 
 void R3BOnlineSpectra::Reset_LOS_Histo()
@@ -666,15 +690,25 @@ void R3BOnlineSpectra::Reset_LOS_Histo()
     fh_los_channels->Reset();
     fh_los_tres_MCFD->Reset();
     fh_los_tres_TAMEX->Reset();
+    fh_los_pos_ToT->Reset();
     fh_los_tot->Reset();
     fh_los_tot_mean->Reset();
+    fh_los_pos_MCFD->Reset();
+    fh_los_pos_TAMEX->Reset();    
     fh_los_dt_hits->Reset();
     fh_los_dt_hits_l->Reset();
     fh_los_dt_hits_t->Reset();
     fh_los_multihit->Reset();
-    fh_los_multihitVFTX->Reset();
-    fh_los_multihitLEAD->Reset();
-    fh_los_multihitTRAI->Reset();
+    fh_los_ihit_ToT->Reset();
+}
+
+void R3BOnlineSpectra::Reset_BMON_Histo()
+{
+    fhTrigger->Reset();
+    fhTpat->Reset();
+    fh_SEETRAM->Reset();
+    fh_IC->Reset();
+    fh_TOFDOR->Reset();
 }
 
 void R3BOnlineSpectra::Reset_SCI8_Histo()
@@ -724,9 +758,96 @@ void R3BOnlineSpectra::Reset_FIBERS_Histo()
      }
 }
 
-
 void R3BOnlineSpectra::Exec(Option_t* option)
 {
+//  cout << "fNEvents " << fNEvents << endl;
+
+	  FairRootManager* mgr = FairRootManager::Instance();
+  if (NULL == mgr){
+    //FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
+    LOG(ERROR) <<  "FairRootManager not found" <<FairLogger::endl;
+   return;
+  }
+  
+ // Double_t time_spill_start, time_spill_end;
+  
+  if(header->GetTrigger() == 12)   time_spill_start =  header->GetTimeStamp();    // spill start in nsec
+  if(header->GetTrigger() == 13)   time_spill_end =  header->GetTimeStamp();    // spill end  in nsec
+  
+//  if(header->GetTrigger() == 12)   cout<<"SPILL START: "<<fNEvents<<"; "<<header->GetTrigger()<<", "<<header->GetTimeStamp()<<endl;
+//  if(header->GetTrigger() == 13)   cout<<"SPILL END  : "<<fNEvents<<"; "<<header->GetTrigger()<<", "<<header->GetTimeStamp()<<endl;
+
+
+// fh_spill_length->Fill(time_spill_start-time_spill_end);
+  
+  fhTrigger->Fill(header->GetTrigger());
+  
+ 
+//   check for requested trigger (Todo: should be done globablly / somewhere else)
+  if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
+    return;   
+    
+
+
+
+ Int_t tpatbin; 
+ for(int i = 0; i < 16; i++){  
+  tpatbin = (header->GetTpat() & (1 << i));
+  if(tpatbin != 0) fhTpat->Fill(i+1);
+ }  
+ 
+ 
+if(fMappedItems.at(DET_BMON)){
+	
+	auto det = fMappedItems.at(DET_BMON);
+    Int_t nHitsbm = det->GetEntriesFast();
+    
+    for (Int_t ihit = 0; ihit < nHitsbm; ihit++)
+    {
+      R3BBeamMonitorMappedData* hit = (R3BBeamMonitorMappedData*)det->At(ihit);
+      if (!hit) continue;
+
+      signed long long IC = hit->GetIC(); // negative values if offset not high enough
+      signed long long SEETRAM = hit->GetSEETRAM();  // negative values if offset not high enough
+      unsigned long long TOFDOR = hit->GetTOFDOR(); // only positive values possible
+      
+      unsigned long long time = header->GetTimeStamp();
+      
+      if(fNEvents == 0 ){ //|| header->GetTrigger() == 13) {
+		  time_bmon_mem = time;
+          see_mem = SEETRAM;
+          ic_mem = IC;
+          tofdor_mem = TOFDOR;
+       }   
+       
+     //  cout<<"IC: "<< (time-time_bmon_mem)/1e9<<"; "<<IC<<"; "<<ic_mem<<"; "<<header->GetTrigger()<<endl;
+       
+      fh_IC->Fill((time-time_bmon_mem)/1.e9,IC-ic_mem);
+     
+      fh_SEETRAM->Fill((time-time_bmon_mem)/1.e9,SEETRAM-see_mem);
+     
+      fh_TOFDOR->Fill((time-time_bmon_mem)/1.e9,TOFDOR-tofdor_mem);
+      
+      				         
+    }
+
+} 
+   
+ //fhTpat->Fill(header->GetTpat());
+ // fTpat = 1-16; fTpat_bit = 0-15
+ Int_t fTpat_bit = fTpat - 1; 
+ Int_t itpat;
+ Int_t tpatvalue;
+ if(fTpat_bit >= 0)  
+ {                    
+   itpat = header->GetTpat(); 
+   tpatvalue = (itpat & (1 << fTpat_bit)) >> fTpat_bit;
+   
+  // cout<<"Tpatval: "<<tpatvalue<<", "<<itpat<<endl;
+   if( (tpatvalue == 0)) return;
+  }
+     
+     
   //----------------------------------------------------------------------
   // LOS detector
   //----------------------------------------------------------------------
@@ -736,6 +857,10 @@ void R3BOnlineSpectra::Exec(Option_t* option)
   //   rt| |l
   //   r | |lb
   //   rb\ /b 
+
+  
+
+  Double_t timeTofd=0;
   Double_t time_V[10][8] = {0.0/0.0};  // [multihit][pm]         
   Double_t time_L[10][8] = {0.0/0.0};
   Double_t time_T[10][8] = {0.0/0.0};          
@@ -748,25 +873,20 @@ void R3BOnlineSpectra::Exec(Option_t* option)
   Double_t tot[10][8] = {0.0/0.0};
   Double_t xT_cm[10] = {0.0/0.0};
   Double_t yT_cm[10] = {0.0/0.0};
+  Double_t xToT_cm[10] = {0.0/0.0};
+  Double_t yToT_cm[10] = {0.0/0.0};
   Double_t xV_cm[10] = {0.0/0.0};
   Double_t yV_cm[10] = {0.0/0.0};  
+  Double_t time_V_temp[10][8] = {0.0/0.0};
 
-
-  Double_t timeTofd=0;
-  FairRootManager* mgr = FairRootManager::Instance();
-  if (NULL == mgr)
-    LOG(fatal) << "FairRootManager not found";
-  // check for requested trigger (Todo: should be done globablly / somewhere else)
-  if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
-    return;
-
-  Bool_t LOSID = true; 
+   
   Int_t Multip;
 
   if(fMappedItems.at(DET_LOS))
   {
     auto det = fMappedItems.at(DET_LOS);
     Int_t nHits = det->GetEntriesFast();
+
 
     Multip = nHits;
 
@@ -787,175 +907,134 @@ void R3BOnlineSpectra::Exec(Option_t* option)
   Int_t nPart;   
   if(fCalItems.at(DET_LOS))
   {
+	Bool_t LOSID = false;
+
     auto det = fCalItems.at(DET_LOS);
-    nPart = det->GetEntriesFast();  
-
-    fh_los_multihit->Fill(nPart);
-
+    nPart = det->GetEntriesFast(); 
+  
+	
     Int_t iDet = 0;
+    
     Int_t nPart_VFTX[8] = {0};
     Int_t nPart_LEAD[8] = {0};
     Int_t nPart_TRAI[8] = {0};
 
-    for (Int_t iPart = 0; iPart < nPart; iPart++)     
-    {
+    
 
+    for (Int_t iPart = 0; iPart < nPart; iPart++) 
+   {
       /* 
        * nPart is the number of particle passing through LOS detector in one event
        */ 
       R3BLosCalData *calData = (R3BLosCalData*)det->At(iPart);
       iDet=calData->GetDetector();
-
-      // lt=0, l=1,lb=2,b=3,rb=4,r=5,rt=6,t=7 
-
-      // VFTX Channels 1-4:
-      if(!(IS_NAN(calData->fTimeV_r_ns))) {
-	time_V[iPart][5] = calData->fTimeV_r_ns;
-	nPart_VFTX[5] += 1;
-      }	  
-      if(!(IS_NAN(calData->fTimeV_t_ns))) {
-	time_V[iPart][7] = calData->fTimeV_t_ns;
-	nPart_VFTX[7] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeV_l_ns))) {
-	time_V[iPart][1] = calData->fTimeV_l_ns;
-	nPart_VFTX[1] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeV_b_ns))) {
-	time_V[iPart][3] = calData->fTimeV_b_ns;  
-	nPart_VFTX[3] += 1;
-      }	
-      // VFTX Channels 5-8:
-      if(!(IS_NAN(calData->fTimeV_rt_ns))) {
-	time_V[iPart][6] = calData->fTimeV_rt_ns;
-	nPart_VFTX[6] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeV_lt_ns))) {
-	time_V[iPart][0] = calData->fTimeV_lt_ns;
-	nPart_VFTX[0] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeV_lb_ns))) {
-	time_V[iPart][2] = calData->fTimeV_lb_ns;
-	nPart_VFTX[2] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeV_rb_ns))) {
-	time_V[iPart][4] = calData->fTimeV_rb_ns;                 
-	nPart_VFTX [4]+= 1;
-      }	
-      // TAMEX Channels 1-4:      
-      if(!(IS_NAN(calData->fTimeL_r_ns))) {
-	time_L[iPart][5] = calData->fTimeL_r_ns;
-	nPart_LEAD[5] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_r_ns))) {
-	time_T[iPart][5] = calData->fTimeT_r_ns;
-	nPart_TRAI[5] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeL_t_ns))) {
-	time_L[iPart][7] = calData->fTimeL_t_ns;
-	nPart_LEAD[7] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_t_ns))) {
-	time_T[iPart][7] = calData->fTimeT_t_ns;
-	nPart_TRAI[7] += 1;
-      }	  
-      if(!(IS_NAN(calData->fTimeL_l_ns))) {
-	time_L[iPart][1] = calData->fTimeL_l_ns;
-	nPart_LEAD[1] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_l_ns))) {
-	time_T[iPart][1] = calData->fTimeT_l_ns; 
-	nPart_TRAI[1] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeL_b_ns))) {
-	time_L[iPart][3] = calData->fTimeL_b_ns;
-	nPart_LEAD[3] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_b_ns))) {
-	time_T[iPart][3] = calData->fTimeT_b_ns;  
-	nPart_TRAI[3] += 1;
-      }	
-      // TAMEX Channels 5-8:
-      if(!(IS_NAN(calData->fTimeL_rt_ns))) {
-	time_L[iPart][6] = calData->fTimeL_rt_ns;
-	nPart_LEAD[6] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_rt_ns))) {
-	time_T[iPart][6] = calData->fTimeT_rt_ns;
-	nPart_TRAI[6] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeL_lt_ns))) {
-	time_L[iPart][0] = calData->fTimeL_lt_ns;
-	nPart_LEAD[0] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_lt_ns))) {
-	time_T[iPart][0] = calData->fTimeT_lt_ns; 
-	nPart_TRAI[0] += 1;
-      }	 
-      if(!(IS_NAN(calData->fTimeL_lb_ns))) {
-	time_L[iPart][2] = calData->fTimeL_lb_ns;
-	nPart_LEAD[2] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_lb_ns))) {
-	time_T[iPart][2] = calData->fTimeT_lb_ns; 
-	nPart_TRAI[2] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeL_rb_ns))) {
-	time_L[iPart][4] = calData->fTimeL_rb_ns;
-	nPart_LEAD[4] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_rb_ns))) {
-	time_T[iPart][4] = calData->fTimeT_rb_ns;  
-	nPart_TRAI[4] += 1;
-      }	
-
-
-      if(iPart > 0 && Multip%8 == 0) 
-      {
-	for(int k=0; k<8; k++) 
-	{
-	  if(time_V[iPart][k] > 0. && time_V[iPart-1][k] > 0. && !(IS_NAN(time_V[iPart][k])) && !(IS_NAN(time_V[iPart-1][k]))) 
-	  {
-	    fh_los_dt_hits->Fill(time_V[iPart][k]-time_V[iPart-1][k]); 
+           
+     for(Int_t iCha = 0; iCha < 8; iCha++){
+		 
+	  time_V[iPart][iCha] = 0./0.;   
+	  if(!(IS_NAN(calData->GetTimeV_ns(iCha)))){   // VFTX
+		nPart_VFTX[iCha] += 1;
+	  	time_V[iPart][iCha] = calData->GetTimeV_ns(iCha);
+	  }	
+	  	  
+	  time_L[iPart][iCha] = 0./0.;
+	  if(!(IS_NAN(calData->GetTimeL_ns(iCha)))){   // TAMEX leading
+		nPart_LEAD[iCha] += 1;
+		time_L[iPart][iCha]=calData->GetTimeL_ns(iCha);
+	  }	
+	  time_T[iPart][iCha] = 0./0.;
+	  if(!(IS_NAN(calData->GetTimeT_ns(iCha)))){   // TAMEX trailing
+		nPart_TRAI[iCha] += 1;
+		time_T[iPart][iCha]=calData->GetTimeT_ns(iCha); 
 	  }
-	  if(time_L[iPart][k] > 0. && time_L[iPart-1][k] > 0. && !(IS_NAN(time_L[iPart][k])) && !(IS_NAN(time_L[iPart-1][k]))) 
-	  {
-	    fh_los_dt_hits_l->Fill(time_L[iPart][k]-time_L[iPart-1][k]); 
-	  }
-	  if(time_T[iPart][k] > 0. && time_T[iPart-1][k] > 0. && !(IS_NAN(time_T[iPart][k])) && !(IS_NAN(time_T[iPart-1][k]))) 
-	  {
-	    fh_los_dt_hits_t->Fill(time_T[iPart][k]-time_T[iPart-1][k]); 
-	  }
-	}	
-      }	  
+      
+     }
+     
+     if (!calData) 
+         {
+		   cout<<"LOS !calData"<<endl;	 
+           continue; // can this happen?
+         }
+    }
+    
+ // Sorting VFTX data:
+
+	std::qsort(time_V, nPart, sizeof(*time_V),
+        [](const void *arg1, const void *arg2)->int
+        {
+            double const *lhs = static_cast<double const*>(arg1);
+            double const *rhs = static_cast<double const*>(arg2);
+                       
+            return (lhs[0] < rhs[0]) ? -1
+                :  ((rhs[0] < lhs[0]) ? 1 : 0);
+        });
+// End sorting      
+     
+       fNEvents_LOS = fNEvents_LOS+1;
+     //  cout<<"fNEvents LOS= "<<fNEvents_LOS<<endl;
+        
+    for (Int_t iPart = 0; iPart < nPart; iPart++)     
+    {
+		   
+      Bool_t iLOSTypeMCFD = false;
+	  Bool_t iLOSTypeTAMEX = false;
+	  Bool_t iLOSType = false;
+	     
+      if( time_V[iPart][0] > 0. && !(IS_NAN(time_V[iPart][0])) && time_V[iPart][1] > 0. && !(IS_NAN(time_V[iPart][1])) && 
+          time_V[iPart][2] > 0. && !(IS_NAN(time_V[iPart][2])) && time_V[iPart][3] > 0. && !(IS_NAN(time_V[iPart][3])) &&
+          time_V[iPart][4] > 0. && !(IS_NAN(time_V[iPart][4])) && time_V[iPart][5] > 0. && !(IS_NAN(time_V[iPart][5])) && 
+          time_V[iPart][6] > 0. && !(IS_NAN(time_V[iPart][6])) && time_V[iPart][7] > 0. && !(IS_NAN(time_V[iPart][7]))          
+      )
+      {        
+         iLOSTypeMCFD = true; // all 8 MCFD times
+      } 
+      
+      if( time_L[iPart][0] > 0. && !(IS_NAN(time_L[iPart][0])) && time_L[iPart][1] > 0. && !(IS_NAN(time_L[iPart][1])) && 
+          time_L[iPart][2] > 0. && !(IS_NAN(time_L[iPart][2])) && time_L[iPart][3] > 0. && !(IS_NAN(time_L[iPart][3])) &&
+          time_L[iPart][4] > 0. && !(IS_NAN(time_L[iPart][4])) && time_L[iPart][5] > 0. && !(IS_NAN(time_L[iPart][5])) && 
+          time_L[iPart][6] > 0. && !(IS_NAN(time_L[iPart][6])) && time_L[iPart][7] > 0. && !(IS_NAN(time_L[iPart][7])) &&
+          
+          time_T[iPart][0] > 0. && !(IS_NAN(time_T[iPart][0])) && time_T[iPart][1] > 0. && !(IS_NAN(time_T[iPart][1])) && 
+          time_T[iPart][2] > 0. && !(IS_NAN(time_T[iPart][2])) && time_T[iPart][3] > 0. && !(IS_NAN(time_T[iPart][3])) &&
+          time_T[iPart][4] > 0. && !(IS_NAN(time_T[iPart][4])) && time_T[iPart][5] > 0. && !(IS_NAN(time_T[iPart][5])) && 
+          time_T[iPart][6] > 0. && !(IS_NAN(time_T[iPart][6])) && time_T[iPart][7] > 0. && !(IS_NAN(time_T[iPart][7]))
+       )
+      {        
+         iLOSTypeTAMEX = true; // all 8 leading and trailing times       
+      }     
+
+      
+// We will consider only events in which booth MCFD and TAMEX see same number of channels:
+      if(iLOSTypeTAMEX  && iLOSTypeMCFD ) iLOSType = true;
+
 
       if(iDet==1)
       {
 
-	// lt=0, l=1,lb=2,b=3,rb=4,r=5,rt=6,t=7    
 
-	//if(iPart >= 0)
-	if(1 == 1)
+	if(1==1) //(iLOSType)
 	{ 
+		
 	  int nPMT = 0;
 	  int nPMV = 0;	        
 
 	  for(int ipm=0; ipm<8; ipm++)
-	  {     
+	  { 
+		  		  	  
+		tot[iPart][ipm] = 0./0.;      
 	    if(time_T[iPart][ipm] > 0. &&  time_L[iPart][ipm] > 0. && !(IS_NAN(time_T[iPart][ipm])) && !(IS_NAN(time_L[iPart][ipm]))) 
 	    {     
-	      while(time_T[iPart][ipm] - time_L[iPart][ipm] < 0.) 
+	      while(time_T[iPart][ipm] - time_L[iPart][ipm] <= 0.) 
 	      {
-		time_T[iPart][ipm] = time_T[iPart][ipm] + 2048.*fClockFreq; 
+		    time_T[iPart][ipm] = time_T[iPart][ipm] + 2048.*fClockFreq; 
 	      }
 
 	      nPMT = nPMT +1;
 	      tot[iPart][ipm] = time_T[iPart][ipm] - time_L[iPart][ipm];
 	    }
 
-	    totsum[iPart] += tot[iPart][ipm];
+	    if(tot[iPart][ipm] != 0. && !(IS_NAN(tot[iPart][ipm]))) totsum[iPart] += tot[iPart][ipm];
 
-	    if(tot[iPart][ipm] != 0. && !(IS_NAN(tot[iPart][ipm]))) fh_los_tot->Fill(ipm+1,tot[iPart][ipm]);
 
 	    if(time_L[iPart][ipm] > 0. && !(IS_NAN(time_L[iPart][ipm]))) timeLosT[iPart] += time_L[iPart][ipm];
 
@@ -966,50 +1045,76 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 	    }	 
 	  }
 
-	  totsum[iPart] = totsum[iPart]/nPMT;
-	  /* 
-	     if(totsum[iPart] < 88.) cout<<fNEvents<<"; "<<nPart<<"; "<<iPart<<", "<<totsum[iPart]<<tot[iPart][0]<<
-	     ", "<<tot[iPart][1]<<", " <<tot[iPart][2]<<", "<<tot[iPart][3]<<", "<<tot[iPart][4]<<", "
-	     <<tot[iPart][5]<<", "<<tot[iPart][6]<<", "<<tot[iPart][7]<<endl;
-	   */ 
-
+	   totsum[iPart] = totsum[iPart]/nPMT;
+	  
 	  timeLosM[iPart] = timeLosM[iPart]/nPMV;
 
 	  timeLosT[iPart] = timeLosT[iPart]/nPMT;
 
 	  timeLos[iPart] = timeLosM[iPart];
 
-	  //    if(!(timeLosM[iPart] > 0.) && IS_NAN(timeLosM[iPart])) 
-	  //        cout<<"R3BOnline WARNING!! LOS VFTX time < 0 or nan! If nan we take TAMEX time, if <0 no ToF info for this event!! "<<timeLosM[iPart]<<endl;
-	  // Line below only after VFTX and TAMEX clocks are synhronized!
-	  //  if(IS_NAN(timeLosM[iPart])) timeLos[iPart] = timeLosT[iPart];
 
-
-	  if(nPMV == 8) LosTresM[iPart] = ((time_V[iPart][0]+time_V[iPart][2]+time_V[iPart][4]+time_V[iPart][6]) - 
-	      (time_V[iPart][1]+time_V[iPart][3]+time_V[iPart][5]+time_V[iPart][7]))/4.;  	  		          
-	  if(nPMT == 8) LosTresT[iPart] = ((time_L[iPart][0]+time_L[iPart][2]+time_L[iPart][4]+time_L[iPart][6]) - 
+	   LosTresM[iPart] = ((time_V[iPart][0]+time_V[iPart][2]+time_V[iPart][4]+time_V[iPart][6]) - 
+	      (time_V[iPart][1]+time_V[iPart][3]+time_V[iPart][5]+time_V[iPart][7]))/4.;  	 
+     
+       LosTresT[iPart] = ((time_L[iPart][0]+time_L[iPart][2]+time_L[iPart][4]+time_L[iPart][6]) - 
 	      (time_L[iPart][1]+time_L[iPart][3]+time_L[iPart][5]+time_L[iPart][7]))/4.;  
 
-	  if(nPMV == 8) fh_los_tres_MCFD->Fill(LosTresM[iPart]);
-	  if(nPMT == 8) fh_los_tres_TAMEX->Fill(LosTresT[iPart]);
-	  if(nPMT == 8) fh_los_tot_mean->Fill(totsum[iPart]);
+
 	  // Position from tamex:    
-      xT_cm[iPart] = (time_L[iPart][5]+time_L[iPart][6])/2.-(time_L[iPart][1]+time_L[iPart][2])/2.;                  
-      yT_cm[iPart] = (time_L[iPart][7]+time_L[iPart][0])/2.-(time_L[iPart][3]+time_L[iPart][4])/2.;
-      // Empirical calibration (to be properly done): 
-      xT_cm[iPart] = (xT_cm[iPart] - 0.) * 1.;
-      yT_cm[iPart] = (yT_cm[iPart] - 0.) * 1.;
+      xT_cm[iPart] = ((time_L[iPart][5]+time_L[iPart][6])/2.-(time_L[iPart][1]+time_L[iPart][2])/2.)*(-1.);                  
+      yT_cm[iPart] = ((time_L[iPart][7]+time_L[iPart][0])/2.-(time_L[iPart][3]+time_L[iPart][4])/2.)*(-1.);
+      xT_cm[iPart] = (xT_cm[iPart] - flosOffsetXT) * flosVeffXT;
+      yT_cm[iPart] = (yT_cm[iPart] - flosOffsetYT) * flosVeffYT;
       
       // Position from VFTX:
-      xV_cm[iPart] = (time_V[iPart][5]+time_V[iPart][6])/2.-(time_V[iPart][1]+time_V[iPart][2])/2.;                  
-      yV_cm[iPart] = (time_V[iPart][7]+time_V[iPart][0])/2.-(time_V[iPart][3]+time_V[iPart][4])/2.;
-      // Empirical calibration (to be properly done): 
-      xV_cm[iPart] = (xV_cm[iPart] - 0.) * 3.;
-      yV_cm[iPart] = (yV_cm[iPart] - 0.) * 3.;
+      xV_cm[iPart] = ((time_V[iPart][5]+time_V[iPart][6])/2.-(time_V[iPart][1]+time_V[iPart][2])/2.)*(-1.);                  
+      yV_cm[iPart] = ((time_V[iPart][7]+time_V[iPart][0])/2.-(time_V[iPart][3]+time_V[iPart][4])/2.)*(-1.);
+      xV_cm[iPart] = (xV_cm[iPart] - flosOffsetXV) * flosVeffXV;
+      yV_cm[iPart] = (yV_cm[iPart] - flosOffsetYV) * flosVeffYV;
+    
+      // Position from ToT:                       		   
+      xToT_cm[iPart] = (((tot[iPart][5]+tot[iPart][6])/2.-(tot[iPart][1]+tot[iPart][2])/2.)/
+                      ((tot[iPart][1]+tot[iPart][2]+tot[iPart][5]+tot[iPart][6])/4.));
+                          
+      yToT_cm[iPart] = (((tot[iPart][0]+tot[iPart][7])/2.-(tot[iPart][3]+tot[iPart][4])/2.)/
+                      ((tot[iPart][7]+tot[iPart][0]+tot[iPart][3]+tot[iPart][4])/4.));     
+                                     
+      xToT_cm[iPart] = (xToT_cm[iPart]-flosOffsetXQ)*flosVeffXQ;
+      yToT_cm[iPart] = (yToT_cm[iPart]-flosOffsetYQ)*flosVeffYQ;
+	 	 
+  
+     if(nPMV == 8 && nPMT == 8 ){
+		 
+     fh_los_tot_mean->Fill(totsum[iPart]);
      
-      if(nPMV == 8) fh_los_pos_MCFD->Fill(xV_cm[iPart],yV_cm[iPart]);
-	  if(nPMT == 8) fh_los_pos_TAMEX->Fill(xT_cm[iPart],yT_cm[iPart]);     
+     if(iPart < 1 ) {
+			Double_t timediff=float(header->GetTimeStamp()-time_V_mem);
+			fh_los_dt_first_ToT->Fill(timediff,totsum[iPart]);
+	 }			 
+	 
+	 if(iPart > 0) fh_los_dt_hits_ToT->Fill(timeLosM[iPart]-timeLosM[iPart-1],totsum[iPart]);
+
+      for(int ipm=0; ipm<8; ipm++)
+	  {
+	    fh_los_tot->Fill(ipm+1,tot[iPart][ipm]);
+	    	    	
+	      
+	   }
+	     
+      	  	 		 
+	  fh_los_tres_MCFD->Fill(LosTresM[iPart]);
+	  fh_los_tres_TAMEX->Fill(LosTresT[iPart]);
+      fh_los_pos_MCFD->Fill(xV_cm[iPart],yV_cm[iPart]);
+	  fh_los_pos_TAMEX->Fill(xT_cm[iPart],yT_cm[iPart]); 
+	  fh_los_pos_ToT->Fill(xToT_cm[iPart],yToT_cm[iPart]);
+	  fh_los_ihit_ToT->Fill(iPart,totsum[iPart]);
+	  fh_los_multihit->Fill(iPart+1); 
+	 
+     }  
 	}     
+
+     if(iPart == nPart-1)  time_V_mem = header->GetTimeStamp();  // memorize time of the last hit
 
       } 
       else 
@@ -1017,15 +1122,8 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 	cout<<"Wrong detector ID for LOS!"<<endl;
       }
     } 
-
-    for(int ik=0; ik<8; ik++)
-    {	
-      fh_los_multihitVFTX->Fill(ik+1,nPart_VFTX[ik]);
-      fh_los_multihitLEAD->Fill(ik+1,nPart_LEAD[ik]);
-      fh_los_multihitTRAI->Fill(ik+1,nPart_TRAI[ik]);
-    }    
+        
   }	
-
 
 
   //----------------------------------------------------------------------
@@ -1067,6 +1165,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 
 
   Int_t nPartS8;   
+
   if(fCalItems.at(DET_SCI8))
   {
     auto det = fCalItems.at(DET_SCI8);
@@ -1085,6 +1184,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
       /* 
        * nPart is the number of particle passing through Sci8 detector in one event
        */ 
+
       R3BSci8CalData *calDataS8 = (R3BSci8CalData*)det->At(iPart);
       iDet = calDataS8->GetDetector();
 
@@ -1395,7 +1495,6 @@ void R3BOnlineSpectra::Exec(Option_t* option)
     }
   }
 
-
   if(fCalItems.at(DET_TOFD))
   {
     auto det = fCalItems.at(DET_TOFD);
@@ -1682,12 +1781,12 @@ void R3BOnlineSpectra::Exec(Option_t* option)
     }
   }
 
-
-    fNEvents += 1;
+  fNEvents += 1;
 }
 
 void R3BOnlineSpectra::FinishEvent()
 {
+   
   for(Int_t det = 0; det < DET_MAX; det++) {
     if(fMappedItems.at(det)) {
       fMappedItems.at(det)->Clear(); 
@@ -1706,17 +1805,25 @@ void R3BOnlineSpectra::FinishTask()
   if(fMappedItems.at(DET_LOS)){
     fh_los_channels->Write();
     fh_los_tot->Write();
-//    fh_los_pos_MCFD->Write();
-//    fh_los_pos_TAMEX->Write();
+    fh_los_dt_hits_ToT->Write();
+    fh_los_ihit_ToT->Write();
   }
-	if(fCalItems.at(DET_TOFD))
-	{
-		for(Int_t i=0; i<4;i++){
-			fh_tofd_TotPm[i]->Write();
-			fh_tofd_TotPm[i]->Write();
-			fh_tofd_TotPm[i]->Write();
-		}
-	}    
+ 
+ if(fMappedItems.at(DET_BMON)){ 
+    fhTpat->Write();
+  //  fh_spill_length->Write();
+    fhTrigger->Write();
+    fh_SEETRAM->Write();
+    fh_IC->Write();
+    fh_TOFDOR->Write();
+    
+}  
+  if(fCalItems.at(DET_TOFD))
+  {
+      for(Int_t i; i<4;i++){
+         fh_tofd_TotPm[i]->Write();
+      }
+  }    
   for(Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++) {	
     if(fMappedItems.at(ifibcount + DET_FI_FIRST)) 
     {
@@ -1731,9 +1838,7 @@ void R3BOnlineSpectra::FinishTask()
       fh_Fib_vs_Events[ifibcount]->Write();
       fh_Fib_ToF[ifibcount]->Write();
     }
-  }   		 
- 
-
+  }
 }
 
 ClassImp(R3BOnlineSpectra)

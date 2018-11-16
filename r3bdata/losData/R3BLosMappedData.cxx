@@ -14,9 +14,9 @@ using namespace std;
 
 
 R3BLosMappedData::R3BLosMappedData()
-    : fDetector(0)     // Detector number: 1...n
-    , fChannel(0)      // Channel number:  1...n (n = 4 (old LOS), 8 (new LOS))
-    , fType(0)         // Type: 0 = VFTX time, 1 = TAMEX leading edge, 2 = TAMEX trailing edge
+    : fDetector(-1)     // Detector number: 1...n
+    , fChannel(-1)      // Channel number:  1...n (n = 4 (old LOS), 8 (new LOS))
+    , fType(-1)         // Type: 0 = VFTX time, 1 = TAMEX leading edge, 2 = TAMEX trailing edge
     , fTimeFine(-1)     // Fine time
     , fTimeCoarse(-1)   // Coarse time
 {
@@ -43,6 +43,28 @@ R3BLosMappedData::R3BLosMappedData(	UInt_t detector,
 */	 
 }    
     
-   
+UInt_t R3BLosMappedData::GetDetector() const
+{
+  return fDetector;
+}
+
+UInt_t R3BLosMappedData::GetChannel() const
+{
+  return fChannel;
+}
+
+UInt_t R3BLosMappedData::GetType() const
+{
+  return fType;
+}
+UInt_t R3BLosMappedData::GetTimeCoarse() const
+{
+  return fTimeCoarse;
+}
+
+UInt_t R3BLosMappedData::GetTimeFine() const
+{
+  return fTimeFine;
+}   
 
 ClassImp(R3BLosMappedData)

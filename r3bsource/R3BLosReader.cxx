@@ -1,5 +1,5 @@
 #include "FairLogger.h"
-
+#include "R3BEventHeader.h"
 #include "TClonesArray.h"
 #include "FairRootManager.h"
 #include "R3BLosReader.h"
@@ -15,6 +15,8 @@ extern "C" {
 #include <iostream>
 
 using namespace std;
+
+
 
 R3BLosReader::R3BLosReader(EXT_STR_h101_LOS_TAMEX* data, UInt_t offset)
   : R3BReader("R3BLosReader")
@@ -37,7 +39,16 @@ Bool_t R3BLosReader::Init(ext_data_struct_info *a_struct_info)
 {
 
   int ok;
-
+    
+	// try to get a handle on the EventHeader. EventHeader may not be 
+	// present though and hence may be null. Take care when using.
+    FairRootManager* mgr = FairRootManager::Instance();
+    if (NULL == mgr)
+        LOG(ERROR) <<  "FairRootManager not found" <<FairLogger::endl; 
+    	
+	header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+    
+	
   EXT_STR_h101_LOS_TAMEX_ITEMS_INFO(ok, *a_struct_info, fOffset,
       EXT_STR_h101_LOS_TAMEX, 0);
   if (!ok) {
@@ -45,7 +56,7 @@ Bool_t R3BLosReader::Init(ext_data_struct_info *a_struct_info)
     LOG(error) << "Failed to setup structure information.";
     return kFALSE;
   }
-
+  
   // Register output array in tree
   if(!fOnline){
    FairRootManager::Instance()->Register("LosMapped", "Land", fArray, kTRUE);
@@ -53,6 +64,7 @@ Bool_t R3BLosReader::Init(ext_data_struct_info *a_struct_info)
    FairRootManager::Instance()->Register("LosMapped", "Land", fArray, kFALSE);
   }
   fArray->Clear();
+   
 
   // clear struct_writer's output struct. Seems ucesb doesn't do that
   // for channels that are unknown to the current ucesb config.
@@ -69,7 +81,9 @@ Bool_t R3BLosReader::Init(ext_data_struct_info *a_struct_info)
 }
 
 Bool_t R3BLosReader::Read()
-{
+{   
+
+	 
   // Convert plain raw data to multi-dimensional array
   EXT_STR_h101_LOS_TAMEX_onion *data = (EXT_STR_h101_LOS_TAMEX_onion *)fData;
 
@@ -107,16 +121,31 @@ Bool_t R3BLosReader::Read()
    */
 
   // loop over all detectors
+  
 
   for (uint32_t d = 0; d < NUM_LOS_DETECTORS; d++) {
 
+/*
+    if(data->LOS[d].VTF != data->LOS[d].VTC) return kFALSE;
+    if(data->LOS[d].TTFL != data->LOS[d].TTCL) return kFALSE;
+    if(data->LOS[d].TTFT != data->LOS[d].TTCT) return kFALSE;
+    if(data->LOS[d].VTF < data->LOS[d].TTFL) return kFALSE;
+    if(data->LOS[d].TTFL != data->LOS[d].TTFT) return kFALSE;
+    
+    if(data->LOS[d].VTFM != data->LOS[d].VTCM) return kFALSE;
+    if(data->LOS[d].TTFLM != data->LOS[d].TTCLM) return kFALSE;
+    if(data->LOS[d].TTFTM != data->LOS[d].TTCTM) return kFALSE;
+    if(data->LOS[d].VTFM < data->LOS[d].TTFLM) return kFALSE;
+    if(data->LOS[d].TTFLM != data->LOS[d].TTFTM) return kFALSE;
+*/    
     //
     // VFTX2.
     //
 
     uint32_t const c_vftx2_range = 8192;
     uint32_t numData = data->LOS[d].VTF;
-
+    
+ 
     // Coarse counter reset recovery:
     // Divide the course counter range 0..8191 into four pieces.
     // If we have _any_ hit in the uppermost quarter, then all hits in the
@@ -141,6 +170,9 @@ Bool_t R3BLosReader::Read()
         if (do_increment && coarse_vftx < c_vftx2_range / 4) {
           coarse_vftx += c_vftx2_range;
         }
+        
+  //      if(header->GetTrigger() != 1) cout<< "Trigger in LosReader: "<<header->GetTrigger()<<endl;
+        
         new ((*fArray)[fArray->GetEntriesFast()])
           R3BLosMappedData(
               d + 1,                // detector number
@@ -152,13 +184,13 @@ Bool_t R3BLosReader::Read()
       }
       curChannelStart = nextChannelStart;
     }
-
+ 
     //
     // TAMEX3.
     //
 
     // Coarse counter recovery like VFTX2, but consider both edges.
-    do_increment = false;
+    do_increment = false;    
     uint32_t const c_tamex3_range = 2048;
 
     numData = data->LOS[d].TTCL;
@@ -234,8 +266,8 @@ Bool_t R3BLosReader::Read()
           if (1 == iTypeL && iCha == channel) {
             uint32_t coarse_leading = hit->GetTimeCoarse();
             int32_t tot = coarse_trailing - coarse_leading;
-            // 25 units -> 25 * 5 = 125 ns.
-            if ((tot <= 25) && (tot >= 0)) {
+            // 30 units -> 30 * 5 = 150 ns. 
+            if ((tot <= 35) && (tot >= 0)) {
               new ((*fArray)[fArray->GetEntriesFast()])
                 R3BLosMappedData(
                     d + 1,

@@ -35,6 +35,7 @@
 #include <iostream>
 #include <stdlib.h>
 
+#define IS_NAN(x) TMath::IsNaN(x)
 using namespace std;
 
 R3BTofdCal2HitPar::R3BTofdCal2HitPar()
@@ -180,7 +181,8 @@ void R3BTofdCal2HitPar::Exec(Option_t* option)
     Double_t t1t=0.;
     Double_t t2t=0.;
     Double_t timeLos=0;
-    Double_t t[N_TOFD_HIT_PLANE_MAX+1][N_TOFD_HIT_PADDLE_MAX+1], Q[N_PLANE_MAX+1][N_PADDLE_MAX+1];     
+    Double_t t[N_TOFD_HIT_PLANE_MAX+1][N_TOFD_HIT_PADDLE_MAX+1], Q[N_PLANE_MAX+1][N_PADDLE_MAX+1]; 
+    Double_t time_r_V,time_t_V,time_l_V,time_b_V,time_rt_V,time_lt_V,time_lb_V,time_rb_V;    
      
     for(Int_t i=1;i<=N_TOFD_HIT_PLANE_MAX;i++){
         for(Int_t j=1;j<=N_TOFD_HIT_PADDLE_MAX;j++){
@@ -195,8 +197,21 @@ void R3BTofdCal2HitPar::Exec(Option_t* option)
         for (Int_t ihit = 0; ihit < nHits; ihit++)     
         {
     	    R3BLosCalData *calData = (R3BLosCalData*)fCalItemsLos->At(ihit);
-            timeLos=(calData->fTimeV_r_ns+calData->fTimeV_l_ns+calData->fTimeV_t_ns+calData->fTimeV_b_ns)/4.;			 
-        }						 
+    	    
+    	      Int_t iDet=calData->GetDetector();
+              //Int_t iCha=calData->GetChannel();
+      
+              if(!(IS_NAN(calData->GetTimeV_ns(5))) ) time_r_V = calData->GetTimeV_ns(5);
+              if(!(IS_NAN(calData->GetTimeV_ns(7))) ) time_t_V = calData->GetTimeV_ns(7);
+              if(!(IS_NAN(calData->GetTimeV_ns(1))) ) time_l_V = calData->GetTimeV_ns(1);
+              if(!(IS_NAN(calData->GetTimeV_ns(3))) ) time_b_V = calData->GetTimeV_ns(3);  
+              if(!(IS_NAN(calData->GetTimeV_ns(6))) ) time_rt_V = calData->GetTimeV_ns(6);
+              if(!(IS_NAN(calData->GetTimeV_ns(0)))) time_lt_V = calData->GetTimeV_ns(0);
+              if(!(IS_NAN(calData->GetTimeV_ns(2))) ) time_lb_V = calData->GetTimeV_ns(2);
+              if(!(IS_NAN(calData->GetTimeV_ns(4))) ) time_rb_V = calData->GetTimeV_ns(4);
+              	      
+    	    }     	      
+              timeLos=(time_r_V+time_t_V+time_l_V+time_b_V+time_rt_V+time_lt_V+time_lb_V+time_rb_V)/8.;				 
     }
     
     Int_t nHits = fCalData->GetEntries();

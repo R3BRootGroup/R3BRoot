@@ -10,14 +10,12 @@
  * looping over all channels) which is crucial for a quick check of the
  * detector status during the experiment.
  *  
- * There is a fifth channel "ref" available which holds the master 
- * trigger, as time reference.
  *  
  */
 
 
 #include "R3BLosMapped2Cal.h"
-
+#include "R3BLosCalData.h"
 #include "R3BTCalEngine.h"
 #include "R3BLosMappedData.h"
 #include "R3BTCalPar.h"
@@ -36,8 +34,8 @@
 
 
 
-#define LOS_COINC_WINDOW_V_NS 280 
-#define LOS_COINC_WINDOW_T_NS 50 // Same as VFTX, as leading and trailing times are separately treated  
+#define LOS_COINC_WINDOW_V_NS 200  
+#define LOS_COINC_WINDOW_T_NS 190  // Same as VFTX, as leading and trailing times are separately treated  
 #define IS_NAN(x) TMath::IsNaN(x)
 
 
@@ -49,7 +47,7 @@ R3BLosMapped2Cal::R3BLosMapped2Cal()
     , fNofTcalPars(0)
     , fNofModules(0)
     , fTcalPar(NULL)
-    , fTrigger(-1)
+    , fTrigger(-1)  
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvent(0)
 {
@@ -63,7 +61,7 @@ R3BLosMapped2Cal::R3BLosMapped2Cal(const char* name, Int_t iVerbose)
     , fNofTcalPars(0)
     , fNofModules(0)
     , fTcalPar(NULL)
-    , fTrigger(-1)
+    , fTrigger(1)  //trigger 1 - onspill, 2 - offspill, -1 - all events
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvent(0)
 {
@@ -89,7 +87,13 @@ InitStatus R3BLosMapped2Cal::Init()
 	// present though and hence may be null. Take care when using.
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(fatal) << "FairRootManager not found";
+
+    {
+      //  FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
+     LOG(ERROR) << "FairRootManager not found" << FairLogger::endl;
+     return kFATAL;
+    }  
+        
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
 
@@ -97,9 +101,11 @@ InitStatus R3BLosMapped2Cal::Init()
     fMappedItems = (TClonesArray*)mgr->GetObject("LosMapped");
  
     
-    if (NULL == fMappedItems)
-        LOG(fatal) << "Branch LosMapped not found";
-
+    if (NULL == fMappedItems){
+      //  FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch LosMapped not found");
+      LOG(ERROR) << "Branch LosMapped not found" << FairLogger::endl;
+      return kFATAL;
+     }
 
 	// request storage of Cal data in output tree
     mgr->Register("LosCal", "Land", fCalItems, kTRUE);
@@ -131,15 +137,19 @@ InitStatus R3BLosMapped2Cal::ReInit()
 void R3BLosMapped2Cal::Exec(Option_t* option)
 {
 	// check for requested trigger (Todo: should be done globablly / somewhere else)
+	
 	if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
 		return;
+
 
 	Int_t nHits = fMappedItems->GetEntriesFast();
 
 
 	for (Int_t ihit = 0; ihit < nHits; ihit++)  // nHits = Nchannel_LOS * NTypes = 4 or 8 * 3
 	{
-				
+		Double_t times_ns = 0./0.;
+		Double_t times_raw_ns = 0./0.;
+			
 		R3BLosMappedData* hit = (R3BLosMappedData*)fMappedItems->At(ihit);
 		if (!hit) continue;
 
@@ -148,9 +158,14 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 		UInt_t iCha  = hit->GetChannel();  // 1..
 		UInt_t iType = hit->GetType();     // 0,1,2
 
-	//	if(nHits == 48 && iType ==1) cout<<"R3BLosMapped2Cal: Channel "<<iCha<<", type "<<iType<<", nHits "<<nHits<<", ihit "<<ihit<<", timeFine "<<hit->GetTimeFine()<<endl;
+ // if(fNEvent == 273 || fNEvent == 362 || fNEvent == 554) 
+ //   cout<<"R3BLosMapped2Cal: Channel "<<iCha<<", type "<<iType<<", nHits "<<nHits<<", ihit "<<ihit<<", timeFine "<<hit->GetTimeFine()<<endl;
          
 
+       if(nHits%8 != 0) return;
+
+     //  if(nHits != 24) return;
+       
 		if ((iDet<1) || (iDet>fNofDetectors))
 		{
 			LOG(INFO) << "R3BLosMapped2Cal::Exec : Detector number out of range: " << 
@@ -172,7 +187,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 
 		// Convert TDC to [ns] ...
 
-		Double_t times_raw_ns = par->GetTimeVFTX( hit->GetTimeFine() );
+		times_raw_ns = par->GetTimeVFTX( hit->GetTimeFine() );
 
 		if (times_raw_ns < 0. || times_raw_ns > fClockFreq || IS_NAN(times_raw_ns) )
 		{
@@ -187,8 +202,9 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 		}
 
 		// ... and add clock time
-		Double_t times_ns = fClockFreq-times_raw_ns + hit->GetTimeCoarse() * fClockFreq;
+		times_ns = fClockFreq-times_raw_ns + hit->GetTimeCoarse() * fClockFreq;
 		
+//if(fNEvent == 2387) cout<<"Mapped2Cal bef "<<fNEvent<<"; "<<fNofCalItems<<", "<<nHits<<", "<<iCha<<", "<<iType<<", "<<times_ns<<", "<<hit->GetTimeFine()<<", "<<hit->GetTimeCoarse()<<endl;		  			
    
     
 		/* Note: we have multi-hit data...
@@ -249,44 +265,44 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 				{
 
 					case 1 : {
-							 if (iType == 0 && !IS_NAN(aCalItem->fTimeV_lt_ns))  goto skip_event_pileup;
-							 if (iType == 1 && !IS_NAN(aCalItem->fTimeL_lt_ns))  goto skip_event_pileup;
-							 if (iType == 2 && !IS_NAN(aCalItem->fTimeT_lt_ns))  goto skip_event_pileup;
+							 if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(0)))  goto skip_event_pileup;
+							 if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(0)))  goto skip_event_pileup;
+							 if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(0)))  goto skip_event_pileup;
 						 } break;
 					case 3 : {
-							 if (iType == 0 && !IS_NAN(aCalItem->fTimeV_lb_ns))  goto skip_event_pileup;
-							 if (iType == 1 && !IS_NAN(aCalItem->fTimeL_lb_ns))  goto skip_event_pileup;
-							 if (iType == 2 && !IS_NAN(aCalItem->fTimeT_lb_ns))  goto skip_event_pileup;
+							 if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(2)))  goto skip_event_pileup;
+							 if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(2)))  goto skip_event_pileup;
+							 if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(2)))  goto skip_event_pileup;
 						 } break;
 					case 5 : {
-							 if (iType == 0 && !IS_NAN(aCalItem->fTimeV_rb_ns))  goto skip_event_pileup;
-							 if (iType == 1 && !IS_NAN(aCalItem->fTimeL_rb_ns))  goto skip_event_pileup;
-							 if (iType == 2 && !IS_NAN(aCalItem->fTimeT_rb_ns))  goto skip_event_pileup;
+							 if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(4)))  goto skip_event_pileup;
+							 if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(4)))  goto skip_event_pileup;
+							 if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(4)))  goto skip_event_pileup;
 						 } break;
 					case 7 : {
-							 if (iType == 0 && !IS_NAN(aCalItem->fTimeV_rt_ns)) goto skip_event_pileup;
-							 if (iType == 1 && !IS_NAN(aCalItem->fTimeL_rt_ns)) goto skip_event_pileup;
-							 if (iType == 2 && !IS_NAN(aCalItem->fTimeT_rt_ns)) goto skip_event_pileup;
+							 if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(6))) goto skip_event_pileup;
+							 if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(6))) goto skip_event_pileup;
+							 if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(6))) goto skip_event_pileup;
 						 } break;        				   
 					case 2 : {
-							 if (iType == 0 && !IS_NAN(aCalItem->fTimeV_l_ns))  goto skip_event_pileup;
-							 if (iType == 1 && !IS_NAN(aCalItem->fTimeL_l_ns))  goto skip_event_pileup;
-							 if (iType == 2 && !IS_NAN(aCalItem->fTimeT_l_ns))  goto skip_event_pileup;
+							 if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(1)))  goto skip_event_pileup;
+							 if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(1)))  goto skip_event_pileup;
+							 if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(1)))  goto skip_event_pileup;
 						 } break;
 					case 4 : {
-							 if (iType == 0 && !IS_NAN(aCalItem->fTimeV_b_ns))  goto skip_event_pileup;
-							 if (iType == 1 && !IS_NAN(aCalItem->fTimeL_b_ns))  goto skip_event_pileup;
-							 if (iType == 2 && !IS_NAN(aCalItem->fTimeT_b_ns))  goto skip_event_pileup;
+							 if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(3)))  goto skip_event_pileup;
+							 if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(3)))  goto skip_event_pileup;
+							 if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(3)))  goto skip_event_pileup;
 						 } break;
 					case 6 : {
-							 if (iType == 0 && !IS_NAN(aCalItem->fTimeV_r_ns))  goto skip_event_pileup;
-							 if (iType == 1 && !IS_NAN(aCalItem->fTimeL_r_ns))  goto skip_event_pileup;
-							 if (iType == 2 && !IS_NAN(aCalItem->fTimeT_r_ns))  goto skip_event_pileup;
+							 if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(5)))  goto skip_event_pileup;
+							 if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(5)))  goto skip_event_pileup;
+							 if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(5)))  goto skip_event_pileup;
 						 } break;
 					case 8 : {
-							 if (iType == 0 && !IS_NAN(aCalItem->fTimeV_t_ns))  goto skip_event_pileup;
-							 if (iType == 1 && !IS_NAN(aCalItem->fTimeL_t_ns))  goto skip_event_pileup;
-							 if (iType == 2 && !IS_NAN(aCalItem->fTimeT_t_ns))  goto skip_event_pileup;
+							 if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(7)))  goto skip_event_pileup;
+							 if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(7)))  goto skip_event_pileup;
+							 if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(7)))  goto skip_event_pileup;
 						 } break;
 
 				}
@@ -298,157 +314,33 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 		if (!calItem)
 		{
 			// there is no detector hit with matching time. Hence, create a new one.
-			calItem = new ((*fCalItems)[fNofCalItems]) R3BLosCalData(iDet);
-			fNofCalItems += 1;
+			calItem = new ((*fCalItems)[fNofCalItems++]) R3BLosCalData(iDet);
+			//fNofCalItems += 1;
 		}
 		// set the time to the correct cal item       
 
-		if(iCha == 8) 
-		{ 
+		 
 
 			if(iType == 0) {
-				calItem->fTimeV_t_ns   = times_ns;
-				if ( calItem->fTimeV_t_ns < 0. || IS_NAN(calItem->fTimeV_t_ns) ) LOG(INFO)<<"Problem with  fTimeV_t_ns: "<< calItem->fTimeV_t_ns<< " "<<times_ns<<" "<<endl;
+				calItem->fTimeV_ns[iCha-1]   = times_ns;
+				if ( calItem->fTimeV_ns[iCha-1] < 0. || IS_NAN(calItem->fTimeV_ns[iCha-1]) ) LOG(INFO)<<"Problem with  fTimeV_ns: "<< calItem->fTimeV_ns[iCha-1]<< " "<<times_ns<<" "<<endl;
 			}
 
 			if(iType == 1) {
-				calItem->fTimeL_t_ns   = times_ns;
-				if ( calItem->fTimeL_t_ns < 0. || IS_NAN(calItem->fTimeL_t_ns) ) LOG(INFO)<<"Problem with  fTimeL_t_ns: "<< calItem->fTimeL_t_ns<< " "<<times_ns<<" "<<endl;	
+				calItem->fTimeL_ns[iCha-1]   = times_ns;
+				if ( calItem->fTimeL_ns[iCha-1] < 0. || IS_NAN(calItem->fTimeL_ns[iCha-1]) ) LOG(INFO)<<"Problem with  fTimeL_ns: "<< calItem->fTimeL_ns[iCha-1]<< " "<<times_ns<<" "<<endl;
 			}
 
 			if(iType == 2) {
-				calItem->fTimeT_t_ns   = times_ns;
-				if ( calItem->fTimeT_t_ns < 0. || IS_NAN(calItem->fTimeT_t_ns) ) LOG(INFO)<<"Problem with  fTimeT_t_ns: "<< calItem->fTimeT_t_ns<< " "<<times_ns<<" "<<endl;					      
+				calItem->fTimeT_ns[iCha-1]   = times_ns;
+				if ( calItem->fTimeT_ns[iCha-1] < 0. || IS_NAN(calItem->fTimeT_ns[iCha-1]) ) LOG(INFO)<<"Problem with  fTimeT_ns: "<< calItem->fTimeT_ns[iCha-1]<< " "<<times_ns<<" "<<endl;
 			}
-		}		  	
-		if(iCha == 2)   
-		{ 
-
-			if(iType == 0) {
-				calItem->fTimeV_l_ns   = times_ns;
-				if ( calItem->fTimeV_l_ns < 0. || IS_NAN(calItem->fTimeV_l_ns) ) LOG(INFO)<<"Problem with  fTimeV_l_ns: "<< calItem->fTimeV_l_ns<< " "<<times_ns<<" "<<endl;
-			}
-
-			if(iType == 1) {
-				calItem->fTimeL_l_ns   = times_ns;
-				if ( calItem->fTimeL_l_ns < 0. || IS_NAN(calItem->fTimeL_l_ns) ) LOG(INFO)<<"Problem with  fTimeL_l_ns: "<< calItem->fTimeL_l_ns<< " "<<times_ns<<" "<<endl;	
-			}
-
-			if(iType == 2) {
-				calItem->fTimeT_l_ns   = times_ns;
-				if ( calItem->fTimeT_l_ns < 0. || IS_NAN(calItem->fTimeT_l_ns) ) LOG(INFO)<<"Problem with  fTimeT_l_ns: "<< calItem->fTimeT_l_ns<< " "<<times_ns<<" "<<endl;					      
-			}
-		}		  
-		if(iCha == 4)   
-		{ 
-
-			if(iType == 0) {
-				calItem->fTimeV_b_ns   = times_ns;
-				if ( calItem->fTimeV_b_ns < 0. || IS_NAN(calItem->fTimeV_b_ns) ) LOG(INFO)<<"Problem with  fTimeV_b_ns: "<< calItem->fTimeV_b_ns<< " "<<times_ns<<" "<<endl;
-			}
-
-			if(iType == 1) {
-				calItem->fTimeL_b_ns   = times_ns;
-				if ( calItem->fTimeL_b_ns < 0. || IS_NAN(calItem->fTimeL_b_ns) ) LOG(INFO)<<"Problem with  fTimeL_b_ns: "<< calItem->fTimeL_b_ns<< " "<<times_ns<<" "<<endl;	
-			}
-
-			if(iType == 2) {
-				calItem->fTimeT_b_ns   = times_ns;
-				if ( calItem->fTimeT_b_ns < 0. || IS_NAN(calItem->fTimeT_b_ns) ) LOG(INFO)<<"Problem with  fTimeT_b_ns: "<< calItem->fTimeT_b_ns<< " "<<times_ns<<" "<<endl;					      
-			}
-		}	
-		if(iCha == 6)   
-		{ 
-
-			if(iType == 0) {
-				calItem->fTimeV_r_ns   = times_ns;
-				if ( calItem->fTimeV_r_ns < 0. || IS_NAN(calItem->fTimeV_r_ns) ) LOG(INFO)<<"Problem with  fTimeV_r_ns: "<< calItem->fTimeV_r_ns<< " "<<times_ns<<" "<<endl;
-			}		
-
-			if(iType == 1) {
-				calItem->fTimeL_r_ns   = times_ns;
-				if ( calItem->fTimeL_r_ns < 0. || IS_NAN(calItem->fTimeL_r_ns) ) LOG(INFO)<<"Problem with  fTimeL_r_ns: "<< calItem->fTimeL_r_ns<< " "<<times_ns<<" "<<endl;	
-			}
-
-			if(iType == 2) {
-				calItem->fTimeT_r_ns   = times_ns;
-				if ( calItem->fTimeT_r_ns < 0. || IS_NAN(calItem->fTimeT_r_ns) ) LOG(INFO)<<"Problem with  fTimeT_r_ns: "<< calItem->fTimeT_r_ns<< " "<<times_ns<<" "<<endl;					      
-			}
-		}		  	  
-		if(iCha == 1)   
-		{ 
-
-			if(iType == 0) {
-				calItem->fTimeV_lt_ns   = times_ns;
-				if ( calItem->fTimeV_lt_ns < 0. || IS_NAN(calItem->fTimeV_lt_ns) ) LOG(INFO)<<"Problem with  fTimeV_lt_ns: "<< calItem->fTimeV_lt_ns<< " "<<times_ns<<" "<<endl;
-			}
-
-			if(iType == 1) {
-				calItem->fTimeL_lt_ns   = times_ns;
-				if ( calItem->fTimeL_lt_ns < 0. || IS_NAN(calItem->fTimeL_lt_ns) ) LOG(INFO)<<"Problem with  fTimeL_lt_ns: "<< calItem->fTimeL_lt_ns<< " "<<times_ns<<" "<<endl;	
-			}
-
-			if(iType == 2) {
-				calItem->fTimeT_lt_ns   = times_ns;
-				if ( calItem->fTimeT_lt_ns < 0. || IS_NAN(calItem->fTimeT_lt_ns) ) LOG(INFO)<<"Problem with  fTimeT_lt_ns: "<< calItem->fTimeT_lt_ns<< " "<<times_ns<<" "<<endl;					      
-			}
-		}	
-		if(iCha == 3)   
-		{ 
-
-			if(iType == 0) {
-				calItem->fTimeV_lb_ns   = times_ns;
-				if ( calItem->fTimeV_lb_ns < 0. || IS_NAN(calItem->fTimeV_lb_ns) ) LOG(INFO)<<"Problem with  fTimeV_lb_ns: "<< calItem->fTimeV_lb_ns<< " "<<times_ns<<" "<<endl;
-			}
-
-			if(iType == 1) {
-				calItem->fTimeL_lb_ns   = times_ns;
-				if ( calItem->fTimeL_lb_ns < 0. || IS_NAN(calItem->fTimeL_lb_ns) ) LOG(INFO)<<"Problem with  fTimeL_lb_ns: "<< calItem->fTimeL_lb_ns<< " "<<times_ns<<" "<<endl;	
-			}
-
-			if(iType == 2) {
-				calItem->fTimeT_lb_ns   = times_ns;
-				if ( calItem->fTimeT_lb_ns < 0. || IS_NAN(calItem->fTimeT_lb_ns) ) LOG(INFO)<<"Problem with  fTimeT_lb_ns: "<< calItem->fTimeT_lb_ns<< " "<<times_ns<<" "<<endl;					      
-			}
-		}		  
-		if(iCha == 5)   
-		{ 
-
-			if(iType == 0) {
-				calItem->fTimeV_rb_ns   = times_ns;
-				if ( calItem->fTimeV_rb_ns < 0. || IS_NAN(calItem->fTimeV_rb_ns) ) LOG(INFO)<<"Problem with  fTimeV_rb_ns: "<< calItem->fTimeV_rb_ns<< " "<<times_ns<<" "<<endl;
-			}
-
-			if(iType == 1) {
-				calItem->fTimeL_rb_ns   = times_ns;
-				if ( calItem->fTimeL_rb_ns < 0. || IS_NAN(calItem->fTimeL_rb_ns) ) LOG(INFO)<<"Problem with  fTimeL_rb_ns: "<< calItem->fTimeL_rb_ns<< " "<<times_ns<<" "<<endl;	
-			}
-
-			if(iType == 2) {
-				calItem->fTimeT_rb_ns   = times_ns;
-				if ( calItem->fTimeT_rb_ns < 0. || IS_NAN(calItem->fTimeT_rb_ns) ) LOG(INFO)<<"Problem with  fTimeT_rb_ns: "<< calItem->fTimeT_rb_ns<< " "<<times_ns<<" "<<endl;					      
-			}
-		}
-		if(iCha == 7)   
-		{ 
-
-			if(iType == 0) {
-				calItem->fTimeV_rt_ns   = times_ns;
-				if ( calItem->fTimeV_rt_ns < 0. || IS_NAN(calItem->fTimeV_rt_ns) ) LOG(INFO)<<"Problem with  fTimeV_rt_ns: "<< calItem->fTimeV_rt_ns<< " "<<times_ns<<" "<<endl;
-			}
-
-			if(iType == 1) {
-				calItem->fTimeL_rt_ns   = times_ns;
-				if ( calItem->fTimeL_rt_ns < 0. || IS_NAN(calItem->fTimeL_rt_ns) ) LOG(INFO)<<"Problem with  fTimeL_rt_ns: "<< calItem->fTimeL_rt_ns<< " "<<times_ns<<" "<<endl;	
-			}
-
-			if(iType == 2) {
-				calItem->fTimeT_rt_ns   = times_ns;
-				if ( calItem->fTimeT_rt_ns < 0. || IS_NAN(calItem->fTimeT_rt_ns) ) LOG(INFO)<<"Problem with  fTimeT_rt_ns: "<< calItem->fTimeT_rt_ns<< " "<<times_ns<<" "<<endl;					      
-			}
-		} 
+	
+	
+    //if(fNEvent == 25383 || fNEvent == 322367 || fNEvent == 399481) 
     
-	//if(fNEvent == 9698 || fNEvent == 9701 || fNEvent == 9704) cout<<"Mapped2Cal "<<fNEvent<<"; "<<nHits<<", "<<iCha<<", "<<iType<<", "<<times_ns<<", "<<hit->GetTimeFine()<<", "<<hit->GetTimeCoarse()<<endl;		  			
+   // if(fNEvent == 24733) cout<<"Mapped2Cal "<<fNEvent<<"; "<<fNofCalItems<<", "<<nHits<<", "<<iCha<<", "<<iType<<", "<<
+   //                            times_ns<<", "<<hit->GetTimeFine()<<", "<<hit->GetTimeCoarse()<<endl;		  			
 
 		continue;
 skip_event_pileup:

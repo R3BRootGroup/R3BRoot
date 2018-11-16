@@ -12,6 +12,7 @@ set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bsource
 ${R3BROOT_SOURCE_DIR}/r3bbase
+${R3BROOT_SOURCE_DIR}/r3bdata/beammonitorData
 ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
 ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
@@ -40,12 +41,15 @@ set(SRCS
 R3BUcesbSource.cxx
 R3BReader.cxx
 R3BUnpackReader.cxx
-R3BWhiterabbitReader.cxx
+#R3BWhiterabbitReader.cxx
 R3BWhiterabbitMasterReader.cxx
 R3BWhiterabbitCalifaReader.cxx
 R3BWhiterabbitAmsReader.cxx
+R3BTrloiiTpatReader.cxx
+R3BTimestampMasterReader.cxx
 R3BPspxReader.cxx
 R3BBunchedFiberReader.cxx
+R3BBeamMonitorReader.cxx
 R3BFi0Reader.cxx
 #R3BFi1aReader.cxx
 #R3BFi1bReader.cxx
@@ -80,6 +84,9 @@ ext_h101_whiterabbit.h
 ext_h101_wrmaster.h
 ext_h101_wrcalifa.h
 ext_h101_wrams.h
+ext_h101_tpat.h
+ext_h101_timestamp_master.h
+ext_h101_bmon.h
 ext_h101_fibzero.h
 #ext_h101_fibonea.h
 #ext_h101_fiboneb.h

@@ -9,7 +9,7 @@
 #define N_PLANE_MAX_TOFD 4
 #define N_PADDLE_MAX_TOFD 50
 #define N_PADDLE_MAX_PTOF 100
-#define N_PSPX 1 // max value 4 at the moment
+#define N_PSPX 4 // max value 4 at the moment
 #define N_STRIPS_PSPX 32
 
 #include "FairTask.h"
@@ -82,12 +82,41 @@ class R3BOnlineSpectra : public FairTask
      * Is called by the framework after processing the event loop.
      */
     virtual void FinishTask();
+    
+    
+    /**
+     * Methods for setting position offset and effective velocity of light
+     */
+    inline void SetLosXYMCFD(Double_t offsetX, Double_t offsetY, Double_t veffX, Double_t veffY)
+    {
+        flosOffsetXV = offsetX;
+        flosOffsetYV = offsetY;
+        flosVeffXV = veffX;
+        flosVeffYV = veffY;      
+    }    
 
+    inline void SetLosXYTAMEX(Double_t offsetXT, Double_t offsetYT, Double_t veffXT, Double_t veffYT)
+    {
+        flosOffsetXT = offsetXT;
+        flosOffsetYT = offsetYT;
+        flosVeffXT = veffXT;
+        flosVeffYT = veffYT;       
+    }    
+    
+    inline void SetLosXYToT(Double_t offsetXQ, Double_t offsetYQ, Double_t veffXQ, Double_t veffYQ)
+    {
+        flosOffsetXQ = offsetXQ;
+        flosOffsetYQ = offsetYQ;
+        flosVeffXQ = veffXQ;
+        flosVeffYQ = veffYQ;       
+    }       
     /**
      * Method for setting the trigger value.
-     * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
+     * @param trigger 1 - physics, 2 - offspill, -1 - all events.
      */
     inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
+    inline void SetTpat(Int_t tpat) { fTpat = tpat; }
+    
 
     /**
      * Methods for setting number of planes and paddles
@@ -100,6 +129,7 @@ class R3BOnlineSpectra : public FairTask
 
     void Reset_LOS_Histo();
     void Reset_SCI8_Histo();
+    void Reset_BMON_Histo();
     void Reset_TOFD_Histo();
     void Reset_FIBERS_Histo();
  
@@ -112,6 +142,7 @@ class R3BOnlineSpectra : public FairTask
     {
       DET_AMS,
       DET_CALIFA,
+      DET_BMON,
       DET_FI_FIRST,
       DET_FI1A = DET_FI_FIRST,
       DET_FI1B,
@@ -147,6 +178,7 @@ class R3BOnlineSpectra : public FairTask
     {
       "Ams",
       "Califa",
+      "BeamMonitor",
       "Fi1a",
       "Fi1b",
       "Fi2a",
@@ -183,11 +215,37 @@ class R3BOnlineSpectra : public FairTask
 	// check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header;                     /**< Event header. */
     Int_t fTrigger;                             /**< Trigger value. */
+    Int_t fTpat;
     Double_t fClockFreq;     /**< Clock cycle in [ns]. */
     UInt_t fNofPlanes;  
     UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */    
-
-    Int_t fNEvents = 0;         /**< Event counter. */
+    
+ //   TClonesArray *fbmonMappedItems;
+    
+    Double_t flosVeffXV;   
+    Double_t flosVeffYV;
+    Double_t flosOffsetXV;
+    Double_t flosOffsetYV;
+    Double_t flosVeffXT;   
+    Double_t flosVeffYT;
+    Double_t flosOffsetXT;
+    Double_t flosOffsetYT;
+    Double_t flosVeffXQ;   
+    Double_t flosVeffYQ;
+    Double_t flosOffsetXQ;
+    Double_t flosOffsetYQ;
+    unsigned long long time_V_mem = 0, time_bmon_mem = 0., see_mem = 0, ic_mem=0, tofdor_mem = 0;
+    unsigned long long time_spill_start=0, time_spill_end=0;
+    
+    long fNEvents = 0;         /**< Event counter. */
+    long fNEvents_LOS = 0;
+    
+    TH1F *fhTpat;
+    TH1F *fh_spill_length;
+    TH1F *fhTrigger;
+    TH2F *fh_SEETRAM;
+    TH2F *fh_IC;
+    TH2F *fh_TOFDOR;
     
     TH1F *fh_sci8_channels;    
     TH1F *fh_sci8_tres_MCFD;
@@ -217,7 +275,11 @@ class R3BOnlineSpectra : public FairTask
     TH2F *fh_los_multihitTRAI;
     TH2F *fh_los_pos_MCFD;
     TH2F *fh_los_pos_TAMEX;
-    TH2F *fh_los_pos;
+    TH2F *fh_los_pos_ToT;
+    TH2F *fh_los_ihit_ToT;
+    TH2F *fh_los_dt_hits_ToT;
+    TH2F *fh_los_dt_first_ToT;
+    TH2F *fh_los_dt_hits_VT;
     
     TH1F *fh_channels_Fib[NOF_FIB_DET];
     TH1F *fh_fibers_Fib[NOF_FIB_DET];
@@ -230,7 +292,6 @@ class R3BOnlineSpectra : public FairTask
     TH2F *fh_ToT_m_Fib[NOF_FIB_DET];
     TH2F *fh_ToT_s_Fib[NOF_FIB_DET];
     TH2F *fh_Fib_vs_Events[NOF_FIB_DET];
-    
     
     TH1F *fh_tofd_channels[N_PLANE_MAX_TOFD];   
     TH2F *fh_tofd_multihit[N_PLANE_MAX_TOFD];

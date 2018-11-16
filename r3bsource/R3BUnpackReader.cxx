@@ -7,6 +7,9 @@ extern "C" {
 #include "ext_data_client.h"
 #include "ext_h101_unpack.h"
 }
+#include <iostream>
+
+using namespace std;
 
 R3BUnpackReader::R3BUnpackReader(EXT_STR_h101_unpack *data, UInt_t offset)
 	: R3BReader("R3BUnpackReader")
@@ -66,6 +69,8 @@ Bool_t R3BUnpackReader::Read()
 
 	fHeader->SetTrigger(fData->TRIGGER);
 	fHeader->SetEventno(fNEvent);
+
+//    if(fData->TRIGGER != 1) cout<<"R3BUnpack: "<<fData->TRIGGER<<endl;
 
     return kTRUE;
 }
