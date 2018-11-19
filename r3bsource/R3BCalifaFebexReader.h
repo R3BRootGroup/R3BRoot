@@ -38,6 +38,8 @@ class R3BCalifaFebexReader : public R3BReader {
 		/* FairLogger */
 		FairLogger*	fLogger;
 
+                Bool_t fOnline;//Don't store data for online
+
 	  TClonesArray* fArray; /**< Output array. */
 
 	public:

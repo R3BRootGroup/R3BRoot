@@ -17,6 +17,7 @@ R3BCalifaFebexReader::R3BCalifaFebexReader(EXT_STR_h101_CALIFA* data,
   fNEvent(0),
   fData(data),
   fOffset(offset),
+  fOnline(kFALSE),
   fLogger(FairLogger::GetLogger()),
   fArray(new TClonesArray("R3BCalifaMappedData")) {
 }
@@ -41,7 +42,12 @@ Bool_t R3BCalifaFebexReader::Init(ext_data_struct_info *a_struct_info) {
 	}
 
     // Register output array in tree
+  if(!fOnline){
     FairRootManager::Instance()->Register("CalifaMappedData", "Califa", fArray, kTRUE);
+  }else{
+    FairRootManager::Instance()->Register("CalifaMappedData", "Califa", fArray, kFALSE);
+
+  }  
 
 	return kTRUE;
 }

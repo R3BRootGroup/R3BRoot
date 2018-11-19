@@ -647,17 +647,30 @@ void R3BCalifaOnlineSpectra::FinishTask() {
     //TFile *MyFile = new TFile("hist.root","RECREATE"); 
     //if ( MyFile->IsOpen() ) cout << "File opened successfully"<<endl;
     //fh_Califa_cryId_petal->Write();
-    fh_Califa_cryId_energy->Write();
-    
+   fh_Califa_cryId_energy->Write();
+
+   //mapped data
+   if (fMappedItemsCalifa){    
     for(Int_t i=0; i<fCalifaNumPetals; i++){
       for (Int_t k=0;k<4;k++){
     	for(Int_t j=0; j<16;j++){
     	  fh_Califa_crystals[i][j+16*k]->Write();
+    	}
+      }
+    }
+   }
+   //cal data
+   if (fCalItemsCalifa){
+    for(Int_t i=0; i<fCalifaNumPetals; i++){
+      for (Int_t k=0;k<4;k++){
+    	for(Int_t j=0; j<16;j++){
     	  fh_Califa_crystals_cal[i][j+16*k]->Write();
     	}
       }
     }
-    
+   }
+
+ 
     //for (Int_t i=0;i<fCalifaNumPetals;i++){
     //  fh_Califa_energy_per_petal[i]->Write();
     //}
