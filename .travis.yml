@@ -16,24 +16,27 @@ before_install:
                             libx11-dev libxft-dev libxext-dev libxpm-dev libxmu-dev libglu1-mesa-dev libgl1-mesa-dev
                             ncurses-dev libcurl4-openssl-dev curl bzip2 gzip unzip tar subversion git xutils-dev flex
                             bison lsb-release python-dev libc6-dev-i386 libxml2-dev wget libssl-dev
-                            automake autoconf libtool gcc-7 g++-7 gfortran-7 gcc-8 g++-8 gfortran-8 gcc-5 g++-5 gfortran-5;
+                            automake autoconf libtool;
+    - 'if [ "$GCC_VERSION" -ne "4" ]; then
+        sudo apt-get install -y gcc-$GCC_VERSION gfortran-$GCC_VERSION g++-$GCC_VERSION;
+      fi'
     - wget https://neptun.ikp.physik.tu-darmstadt.de/lib/R3BRootBase_gcc$GCC_VERSION.deb;
     - sudo dpkg -i R3BRootBase_gcc$GCC_VERSION.deb;
 
 install:
 
 before_script:
+    - 'if [ "$GCC_VERSION" -eq "4" ]; then
+        export CC=gcc
+        export CXX=g++
+      else
+        export CC="gcc-$GCC_VERSION"
+        export CXX="g++-$GCC_VERSION"
+      fi'
     - $CXX --version
     - cmake --version
-    - 'if [ $GCC_VERSION -eq 4 ]; then
-        export CCOMPILER=gcc
-        export CXXCOMPILER=g++
-      else
-        export CCOMPILER="gcc-$GCC_VERSION"
-        export CXXCOMPILER="g++-$GCC_VERSION"
-      fi'
     - echo "export LINUX_FLAVOUR=Ubuntu14.04" > Dart.cfg;
-    - echo "export EXTRA_FLAGS=\"-DCMAKE_CXX_COMPILER=$CXXCOMPILER;-DCMAKE_C_COMPILER=$CCOMPILER\" " >> Dart.cfg;
+    - echo "export EXTRA_FLAGS=\"-DCMAKE_CXX_COMPILER=$CXX;-DCMAKE_C_COMPILER=$CC\" " >> Dart.cfg;
     - source /opt/R3BRootBase/versions.sh;
     - echo "export FAIRSOFT_VERSION=${FAIRSOFT_VERSION}" >> Dart.cfg;
     - echo "export FAIRROOT_VERSION=${FAIRROOT_VERSION}" >> Dart.cfg;
@@ -46,10 +49,6 @@ before_script:
     - echo "export SITE=\"Travis CI - ${TRAVIS_PULL_REQUEST} - gcc-${GCC_VERSION}\"" >> Dart.cfg;
     - echo $PWD
     - cat Dart.cfg
-    - git clone https://github.com/R3BRootGroup/macros.git
-    - cd macros
-    - git checkout dev
-    - cd ..
 
 script:
     - ./Dart.sh Experimental Dart.cfg
