@@ -21,7 +21,7 @@
 #include "R3BPspxHitData.h"
 #include "R3BPspxHitPar.h"
 
-using namespace std;
+//using namespace std;
 
 R3BPspxCal2Hit::R3BPspxCal2Hit()
     : fCalItems(NULL)
