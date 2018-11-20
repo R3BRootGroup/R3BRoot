@@ -27,11 +27,11 @@ install:
 
 before_script:
     - 'if [ "$GCC_VERSION" -eq "4" ]; then
-        export CC=gcc
-        export CXX=g++
+        export CC=gcc;
+        export CXX=g++;
       else
-        export CC="gcc-$GCC_VERSION"
-        export CXX="g++-$GCC_VERSION"
+        export CC=gcc-$GCC_VERSION;
+        export CXX=g++-$GCC_VERSION;
       fi'
     - $CXX --version
     - cmake --version
