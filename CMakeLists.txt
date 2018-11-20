@@ -211,6 +211,12 @@ else(Boost_FOUND)
     set(Boost_Avail 0)
 endif(Boost_FOUND)
 
+if(SIMPATH)
+  set(CMAKE_PREFIX_PATH ${SIMPATH} ${CMAKE_PREFIX_PATH})
+endif()
+
+find_package(FairLogger 1.1.0 REQUIRED)
+
 setbasicvariables()
 
 # Check if FairRoot was compiled with FairDB option

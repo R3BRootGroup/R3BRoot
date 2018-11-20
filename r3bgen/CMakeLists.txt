@@ -44,6 +44,7 @@ include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
+${FairLogger_LIBDIR}
 #${PLUTO_LIBRARY_DIR}
 ${FAIRROOT_LIBRARY_DIR}
 )
@@ -75,7 +76,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF R3BGenLinkDef.h)
 set(LIBRARY_NAME R3BGen)
 set(DEPENDENCIES
-    Field Gen)
+    FairTools Field Gen)
 
 GENERATE_LIBRARY()
 
@@ -86,5 +87,5 @@ find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
 add_executable(testR3BPhaseSpaceGenerator testR3BPhaseSpaceGenerator.cxx)
-target_link_libraries(testR3BPhaseSpaceGenerator ${GTEST_BOTH_LIBRARIES} ${ROOT_LIBRARIES} R3BGen)
+target_link_libraries(testR3BPhaseSpaceGenerator ${GTEST_BOTH_LIBRARIES} ${ROOT_LIBRARIES} FairLogger::FairLogger R3BGen)
 add_test(R3BPhaseSpaceGeneratorUnitTest ${EXECUTABLE_OUTPUT_PATH}/testR3BPhaseSpaceGenerator)

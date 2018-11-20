@@ -1,26 +1,41 @@
 language: cpp
 os: linux
 compiler: gcc
-dist: trusty
+dist: xenial
 sudo: required
+env: 
+    - GCC_VERSION=5
+#    - GCC_VERSION=7
+#    - GCC_VERSION=8
 
 before_install:
+    - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y;
     - sudo apt-get update -q;
     - sudo apt-get install -y cmake cmake-data g++ gcc gfortran build-essential make patch sed
                             libx11-dev libxft-dev libxext-dev libxpm-dev libxmu-dev libglu1-mesa-dev libgl1-mesa-dev
                             ncurses-dev libcurl4-openssl-dev curl bzip2 gzip unzip tar subversion git xutils-dev flex
                             bison lsb-release python-dev libc6-dev-i386 libxml2-dev wget libssl-dev
                             automake autoconf libtool;
-    - wget https://www.r3broot.gsi.de/system/files/R3BRootBase_1.0.deb;
-    - sudo dpkg -i R3BRootBase_1.0.deb;
+    - 'if [ "$GCC_VERSION" -ne "5" ]; then
+        sudo apt-get install -y gcc-$GCC_VERSION gfortran-$GCC_VERSION g++-$GCC_VERSION;
+      fi'
+    - wget https://www.r3broot.gsi.de/system/files/R3BRootBase_gcc$GCC_VERSION.deb;
+    - sudo dpkg -i R3BRootBase_gcc$GCC_VERSION.deb;
 
 install:
 
 before_script:
+    - 'if [ "$GCC_VERSION" -eq "5" ]; then
+        export CC=gcc;
+        export CXX=g++;
+      else
+        export CC=gcc-$GCC_VERSION;
+        export CXX=g++-$GCC_VERSION;
+      fi'
     - $CXX --version
     - cmake --version
-    - echo "export LINUX_FLAVOUR=Ubuntu14.04" > Dart.cfg;
-    - echo "export EXTRA_FLAGS=\"-DCMAKE_CXX_COMPILER=g++;-DCMAKE_C_COMPILER=gcc\" " >> Dart.cfg;
+    - echo "export LINUX_FLAVOUR=Ubuntu16.04" > Dart.cfg;
+    - echo "export EXTRA_FLAGS=\"-DCMAKE_CXX_COMPILER=$CXX;-DCMAKE_C_COMPILER=$CC;-DUSE_DIFFERENT_COMPILER=TRUE\" " >> Dart.cfg;
     - source /opt/R3BRootBase/versions.sh;
     - echo "export FAIRSOFT_VERSION=${FAIRSOFT_VERSION}" >> Dart.cfg;
     - echo "export FAIRROOT_VERSION=${FAIRROOT_VERSION}" >> Dart.cfg;
@@ -30,7 +45,7 @@ before_script:
     - echo "export UCESB_DIR=/opt/R3BRootBase/ucesb" >> Dart.cfg;
     - echo "export BUILDDIR=/tmp/r3broot/build_r3broot" >> Dart.cfg;
     - echo "export SOURCEDIR=$PWD" >> Dart.cfg;
-    - echo "export SITE=\"Travis CI - ${TRAVIS_PULL_REQUEST}\"" >> Dart.cfg;
+    - echo "export SITE=\"Travis CI - ${TRAVIS_PULL_REQUEST} - gcc-${GCC_VERSION}\"" >> Dart.cfg;
     - echo $PWD
     - cat Dart.cfg
     - git clone https://github.com/R3BRootGroup/macros.git
@@ -44,7 +59,7 @@ script:
 notifications:
     email:
         recipients:
-            - D.Kresan@gsi.de
             - Va.Wagner@gsi.de
+            - D.Kresan@gsi.de
         on_success: always
         on_failure: always
