@@ -28,6 +28,10 @@ class R3BCalifaFebexReader : public R3BReader {
 		Bool_t Read();
 		void Reset();
 
+
+                /** Accessor to select online mode **/
+                void SetOnline(Bool_t option){fOnline=option;} 
+
 	private:
 		/* An event counter */
 		unsigned int fNEvent;
@@ -40,7 +44,7 @@ class R3BCalifaFebexReader : public R3BReader {
 
                 Bool_t fOnline;//Don't store data for online
 
-	  TClonesArray* fArray; /**< Output array. */
+	        TClonesArray* fArray; /**< Output array. */
 
 	public:
 		ClassDef(R3BCalifaFebexReader, 0);
