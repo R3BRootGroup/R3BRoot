@@ -18,7 +18,6 @@ R3BCalifaFebexReader::R3BCalifaFebexReader(EXT_STR_h101_CALIFA* data,
   fData(data),
   fOffset(offset),
   fOnline(kFALSE),
-  fLogger(FairLogger::GetLogger()),
   fArray(new TClonesArray("R3BCalifaMappedData")) {
 }
 
@@ -29,35 +28,32 @@ R3BCalifaFebexReader::~R3BCalifaFebexReader() {
 }
 
 Bool_t R3BCalifaFebexReader::Init(ext_data_struct_info *a_struct_info) {
-	int ok;
-
-	EXT_STR_h101_CALIFA_ITEMS_INFO(ok, *a_struct_info, fOffset,
+  Int_t ok;
+  LOG(INFO) << "R3BCalifaFebexReader::Init" << FairLogger::endl;
+  EXT_STR_h101_CALIFA_ITEMS_INFO(ok, *a_struct_info, fOffset,
 	    EXT_STR_h101_CALIFA, 0);
 
-	if (!ok) {
-		perror("ext_data_struct_info_item");
-		fLogger->Debug(MESSAGE_ORIGIN,
-		    "Failed to setup structure information.");
-		return kFALSE;
-	}
+  if (!ok) {
+        LOG(ERROR)<<"R3BCalifaFebexReader::Failed to setup structure information."<<FairLogger::endl;
+	return kFALSE;
+  }
 
-    // Register output array in tree
+  // Register output array in tree
   if(!fOnline){
     FairRootManager::Instance()->Register("CalifaMappedData", "Califa", fArray, kTRUE);
   }else{
     FairRootManager::Instance()->Register("CalifaMappedData", "Califa", fArray, kFALSE);
-
   }  
 
-	return kTRUE;
+  return kTRUE;
 }
 
 Bool_t R3BCalifaFebexReader::Read() {
   EXT_STR_h101_CALIFA_onion_t *data =
 	    (EXT_STR_h101_CALIFA_onion_t *) fData;
 
-	/* Display data */
-	fLogger->Debug(MESSAGE_ORIGIN, "R3BCalifaFebexReader::Read() Event data");
+  /* Display data */
+  LOG(DEBUG)<<"R3BCalifaFebexReader::Read() Event data."<<FairLogger::endl;
 
   //SELECT THE FOR LOOP BASED ON THE MAPPING...
   for (int crystal = 0; crystal < fData->CALIFA_ENE; ++crystal) {

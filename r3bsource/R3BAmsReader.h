@@ -4,7 +4,6 @@
 #include "R3BReader.h"
 
 class TClonesArray;
-class FairLogger;
 
 struct EXT_STR_h101_AMS_t;
 typedef struct EXT_STR_h101_AMS_t EXT_STR_h101_AMS;
@@ -37,10 +36,10 @@ class R3BAmsReader : public R3BReader {
 		EXT_STR_h101_AMS* fData;
 		/* Data offset */
 		UInt_t fOffset;
-		/* FairLogger */
-		FairLogger*     fLogger;
-
-	  TClonesArray* fArray; /**< Output array. */
+                //Don't store data for online
+                Bool_t fOnline;
+                /**< Output array. */
+	        TClonesArray* fArray; 
 
 	public:
 		ClassDef(R3BAmsReader, 0);

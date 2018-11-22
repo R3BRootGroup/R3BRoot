@@ -19,7 +19,7 @@ R3BAmsReader::R3BAmsReader(EXT_STR_h101_AMS* data,
   fNEvent(0),
   fData(data),
   fOffset(offset),
-  fLogger(FairLogger::GetLogger()),
+  fOnline(kFALSE),
   fArray(new TClonesArray("R3BAmsMappedData")) {
 }
 
@@ -30,30 +30,32 @@ R3BAmsReader::~R3BAmsReader() {
 }
 
 Bool_t R3BAmsReader::Init(ext_data_struct_info *a_struct_info) {
-	int ok;
-
-	EXT_STR_h101_AMS_ITEMS_INFO(ok, *a_struct_info, fOffset,
+  Int_t ok;
+  LOG(INFO) << "R3BAmsReader::Init" << FairLogger::endl;
+  EXT_STR_h101_AMS_ITEMS_INFO(ok, *a_struct_info, fOffset,
 	    EXT_STR_h101_AMS, 0);
 
-	if (!ok) {
-		perror("ext_data_struct_info_item");
-		fLogger->Debug(MESSAGE_ORIGIN,
-		    "Failed to setup structure information.");
-		return kFALSE;
-	}
+  if (!ok) {
+        LOG(ERROR)<<"R3BAmsReader::Failed to setup structure information."<<FairLogger::endl;
+	return kFALSE;
+  }
 
-    // Register output array in tree
+  // Register output array in tree
+  if(!fOnline){
     FairRootManager::Instance()->Register("AmsMappedData", "AMS", fArray, kTRUE);
+  }else{
+    FairRootManager::Instance()->Register("AmsMappedData", "AMS", fArray, kFALSE);
+  }
 
-	return kTRUE;
+  return kTRUE;
 }
 
 Bool_t R3BAmsReader::Read() {
   EXT_STR_h101_AMS_onion_t *data =
 	    (EXT_STR_h101_AMS_onion_t *) fData;
 
-	/* Display data */
-	fLogger->Debug(MESSAGE_ORIGIN, "R3BAmsReader::Read() Event data");
+ /* Display data */
+ LOG(DEBUG)<<"R3BAmsReader::Read() Event data."<<FairLogger::endl;
 
  //First AMS detector
  for (int strip = 0; strip < fData->SST1; ++strip) {

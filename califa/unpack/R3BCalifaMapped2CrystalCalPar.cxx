@@ -3,20 +3,10 @@
 // -----             Created 22/07/14  by H.Alvarez                    -----
 // -----            Modified 20/03/17  by P.Cabanelas                  -----
 // -----            Modified 11/12/17  by E.Galiana                    -----
+// -----            Modified 27/11/18  by J.L. Rodriguez               -----
 // -------------------------------------------------------------------------
-#include "R3BCalifaMappedData.h"
-#include "R3BCalifaMapped2CrystalCalPar.h"
-#include "R3BEventHeader.h"
-#include "R3BCalifaCrystalCalPar.h"
 
-#include "FairRootManager.h"
-#include "FairRunAna.h"
-#include "FairRuntimeDb.h"
-//#include "FairRunIdGenerator.h"
-//#include "FairRtdbRun.h"
-#include "FairLogger.h"
-#include "TGeoManager.h"
-
+//ROOT headers
 #include "TClonesArray.h"
 #include "TObjArray.h"
 #include "TRandom.h"
@@ -28,6 +18,19 @@
 #include "TSpectrum.h"
 #include "TGraph.h"
 #include "TF1.h"
+
+//Fair headers
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
+#include "FairLogger.h"
+#include "TGeoManager.h"
+
+//Califa headers
+#include "R3BCalifaMappedData.h"
+#include "R3BCalifaMapped2CrystalCalPar.h"
+#include "R3BEventHeader.h"
+#include "R3BCalifaCrystalCalPar.h"
 
 #include <iostream>
 #include <stdlib.h>
@@ -85,6 +88,8 @@ R3BCalifaMapped2CrystalCalPar::~R3BCalifaMapped2CrystalCalPar() {
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BCalifaMapped2CrystalCalPar::Init() {
+
+  LOG(INFO)<<"R3BCalifaMapped2CrystalCalPar::Init()"<<FairLogger::endl;
 
   if(!fEnergyPeaks){
     fEnergyPeaks = new TArrayF;
@@ -177,7 +182,6 @@ void R3BCalifaMapped2CrystalCalPar::FinishTask() {
 void R3BCalifaMapped2CrystalCalPar::SearchPeaks(){
   
   Int_t nfound=0;
-  Int_t idx[fNumPeaks];
   
   Int_t numPars;
   if (fNumParam){numPars=fNumParam;}
@@ -197,25 +201,27 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks(){
       else  nfound = ss->Search(fh_Map_energy_crystal[i],fSigma,"goff",fThreshold);
       //	std::cout<< i << " " << nfound <<" "<< fThreshold << std::endl;
       fChannelPeaks = (Double_t*) ss->GetPositionX();
+
+      Int_t idx[nfound];
       TMath::Sort(nfound, fChannelPeaks, idx, kTRUE);
 
-      
       //Calibrated Spectrum
-      Double_t X[fNumPeaks+1];
-      Double_t Y[fNumPeaks+1];
+      Double_t X[nfound+1];
+      Double_t Y[nfound+1];
       
       X[0]=0.;
       Y[0]=0.;
       
-      for (Int_t j=0;j<fNumPeaks;j++){
-	X[j+1]=fChannelPeaks[idx[fNumPeaks-j-1]];
-	Y[j+1]=fEnergyPeaks->GetAt(fNumPeaks-j-1);
-
-	std::cout<<"CrystalId="<<i+1<<" "<< j+1  <<" "<< X[j+1]  << std::endl;
+      for (Int_t j=0;j<nfound;j++){
+	X[j]=fChannelPeaks[idx[nfound-j-1]];
+	Y[j]=fEnergyPeaks->GetAt(nfound-j-1);
+	//std::cout<<"CrystalId="<<i+1<<" "<< j+1  <<" "<< X[j+1]  << std::endl;
       }
+      X[nfound+1]=0.;
+      Y[nfound+1]=0.;
+
       
       TF1 *f1;
-     
       if (fNumParam){
 	
 	if (fNumParam==1){
@@ -234,11 +240,11 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks(){
 	  f1 = new TF1 ("f1", "[0]+[1]*x+[2]*pow(x,2)+[3]*pow(x,3)+[4]*pow(x,4)", fMapHistos_left, fMapHistos_right);
 	}
 	if (fNumParam>5){
-	  std::cout<<endl<<"ERROR: The number of fit parameters can not be higher than 5!"<<endl;
+	  LOG(WARNING)<<"R3BCalifaMapped2CrystalCalPar:: The number of fit parameters can not be higher than 5"<<FairLogger::endl;
 	}
       }else{
-	std::cout<<endl<<"No imput number of fit parameters, therefore, by default NumberParameters=2"<<endl;
-	f1 = new TF1 ("f1", "[0]+[1]*x", fMapHistos_left, fMapHistos_right);
+	  LOG(INFO)<<"R3BCalifaMapped2CrystalCalPar:: No imput number of fit parameters, therefore, by default NumberParameters=2"<<FairLogger::endl;
+	  f1 = new TF1 ("f1", "[0]+[1]*x", fMapHistos_left, fMapHistos_right);
       }
       
       TGraph* graph = new TGraph (fNumPeaks+1, X, Y);
@@ -253,8 +259,9 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks(){
 
       if(fDebugMode) fh_Map_energy_crystal[i]->Write();
       
-    }else {std::cout<<"Histogram NO Fitted number "<<i+1<<endl;}
-    
+    }else{
+          LOG(WARNING)<<"R3BCalifaMapped2CrystalCalPar::Histogram NO Fitted number "<<i+1<<FairLogger::endl;
+         }
   }
   
   delete ss;

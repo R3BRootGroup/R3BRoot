@@ -28,13 +28,14 @@
 #include "R3BCalifaCrystalCalPar.h"
 
 //R3BCalifaMapped2CrystalCal: Constructor
-R3BCalifaMapped2CrystalCal::R3BCalifaMapped2CrystalCal() : FairTask("R3B CALIFA Calibrator"),
-							   NumCrystals(0),
-							   NumParams(0),
-							   CalParams(NULL),
-							   fCal_Par(NULL),
-							   fCalifaMappedDataCA(NULL),
-							   fCalifaCryCalDataCA(NULL)
+R3BCalifaMapped2CrystalCal::R3BCalifaMapped2CrystalCal() : 
+  FairTask("R3B CALIFA Calibrator"),
+  NumCrystals(0),
+  NumParams(0),
+  CalParams(NULL),
+  fCal_Par(NULL),
+  fCalifaMappedDataCA(NULL),
+  fCalifaCryCalDataCA(NULL)
 {
 }
 
@@ -61,7 +62,7 @@ void R3BCalifaMapped2CrystalCal::SetParContainers() {
     LOG(ERROR)<<"R3BCalifaMapped2CrystalCalPar::Init() Couldn't get handle on califaCrystalCalPar container"<<FairLogger::endl;
   }
   if (fCal_Par){
-    std::cout<<"R3BCalifaMapped2CrystalCalPar:: califaCrystalCalPar container open"<<endl;
+    LOG(INFO)<<"R3BCalifaMapped2CrystalCalPar:: califaCrystalCalPar container open"<<FairLogger::endl;
   }
 }
 
@@ -124,7 +125,7 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
   Reset();
   
   if (!fCal_Par) {
-    std::cout<<"NO Container Parameter!!"<<endl<<endl;
+    LOG(WARNING)<<"R3BCalifaMapped2CrystalCal::NO Container Parameter!!"<<FairLogger::endl;
   }  
   
   //Reading the Input -- Mapped Data --
@@ -138,7 +139,7 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
   Int_t Nf;
   Int_t Ns;
   ULong_t Time;
-  UChar_t Error;
+  UChar_t Erro;
   UShort_t Tot;
   Double_t energy;
   Double_t param0;
@@ -156,7 +157,7 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
     Nf        = mappedData[i]->GetNf();
     Ns        = mappedData[i]->GetNs();
     Time      = mappedData[i]->GetTime();
-    Error     = mappedData[i]->GetError();
+    Erro     = mappedData[i]->GetError();
     Tot       = mappedData[i]->GetTot();
     
      

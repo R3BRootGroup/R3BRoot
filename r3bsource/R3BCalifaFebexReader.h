@@ -3,7 +3,6 @@
 
 #include "R3BReader.h"
 class TClonesArray;
-class FairLogger;
 
 struct EXT_STR_h101_CALIFA_t;
 typedef struct EXT_STR_h101_CALIFA_t EXT_STR_h101_CALIFA;
@@ -39,12 +38,10 @@ class R3BCalifaFebexReader : public R3BReader {
 		EXT_STR_h101_CALIFA* fData;
 		/* Data offset */
 		UInt_t fOffset;
-		/* FairLogger */
-		FairLogger*	fLogger;
-
-                Bool_t fOnline;//Don't store data for online
-
-	        TClonesArray* fArray; /**< Output array. */
+                //Don't store data for online
+                Bool_t fOnline;
+                /**< Output array. */
+	        TClonesArray* fArray; 
 
 	public:
 		ClassDef(R3BCalifaFebexReader, 0);
