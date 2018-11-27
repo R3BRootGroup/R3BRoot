@@ -209,16 +209,13 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks(){
       Double_t X[nfound+1];
       Double_t Y[nfound+1];
       
-      X[0]=0.;
-      Y[0]=0.;
-      
       for (Int_t j=0;j<nfound;j++){
 	X[j]=fChannelPeaks[idx[nfound-j-1]];
 	Y[j]=fEnergyPeaks->GetAt(nfound-j-1);
 	//std::cout<<"CrystalId="<<i+1<<" "<< j+1  <<" "<< X[j+1]  << std::endl;
       }
-      X[nfound+1]=0.;
-      Y[nfound+1]=0.;
+      X[nfound]=0.;
+      Y[nfound]=0.;
 
       
       TF1 *f1;
