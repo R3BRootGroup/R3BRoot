@@ -117,6 +117,11 @@ class R3BCalifaOnlineSpectra : public FairTask {
    */
   void Febex2Preamp_CALIFA_Histo();
 
+  /**
+   * Mapping s444 crystals
+   */
+  Int_t Map_For_s444(Int_t val);
+
  private:
   
   Int_t fMapHistos_max;
