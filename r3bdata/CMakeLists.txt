@@ -43,6 +43,7 @@ set(SRCS
     R3BMCStack.cxx
     R3BMCTrack.cxx
     R3BHit.cxx
+    R3BDouble.cxx
     xballData/R3BXBallPoint.cxx
     xballData/R3BXBallCrystalHit.cxx
     xballData/R3BXBallCrystalHitSim.cxx
