@@ -36,7 +36,8 @@ ${BASE_INCLUDE_DIRECTORIES}
 set(INCLUDE_DIRECTORIES
 ${R3BROOT_SOURCE_DIR}/field 
 ${R3BROOT_SOURCE_DIR}/generators 
-${R3BROOT_SOURCE_DIR}/r3bgen
+${R3BROOT_SOURCE_DIR}/r3bgen 
+${R3BROOT_SOURCE_DIR}/r3bdata
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -76,7 +77,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF R3BGenLinkDef.h)
 set(LIBRARY_NAME R3BGen)
 set(DEPENDENCIES
-    FairTools Field Gen)
+    FairTools Field Gen R3BData)
 
 GENERATE_LIBRARY()
 

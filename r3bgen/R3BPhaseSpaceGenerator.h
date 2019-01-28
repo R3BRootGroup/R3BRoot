@@ -3,11 +3,19 @@
 
 // Wrapper for TGenPhaseSpace
 
-#include "FairGenerator.h"
-#include "FairIon.h"
-#include "TGenPhaseSpace.h"
 #include <string>
 #include <vector>
+#include <functional>
+
+#include "TGenPhaseSpace.h"
+#include "TRandom3.h"
+#include "TGraph.h"
+#include "TF1.h"
+
+#include "FairGenerator.h"
+#include "FairIon.h"
+
+#include "R3BDouble.h"
 
 class R3BPhaseSpaceGenerator : public FairGenerator
 {
@@ -18,19 +26,45 @@ class R3BPhaseSpaceGenerator : public FairGenerator
     void AddHeavyIon(const FairIon& ion);
 
     void SetBeamEnergyAMeV(const Double_t EBeam_AMeV);
-    void SetErelkeV(const Double_t Erel_keV) { fErel_keV = Erel_keV; }
+    void SetBeamEnergyDistAMeV(const std::function<Double_t(Double_t)> dist, const Double_t minE, const Double_t maxE,
+                         const Int_t samples = 1000);
+    void SetBeamEnergyDistAMeV(const TGraph& dist, const Double_t minE = -1., const Double_t maxE = -1.,
+                         const Int_t samples = 1000);
+    void SetBeamEnergyDistAMeV(const TF1& dist, const Double_t minE = -1., const Double_t maxE = -1.,
+                         const Int_t samples = 1000);
+                         
+    void SetErelkeV(const Double_t Erel_keV);              
+    void SetErelDistkeV(const std::function<Double_t(Double_t)> dist, const Double_t minE, const Double_t maxE,
+                         const Int_t samples = 1000);
+    void SetErelDistkeV(const TGraph& dist, const Double_t minE = -1., const Double_t maxE = -1.,
+                         const Int_t samples = 1000);
+    void SetErelDistkeV(const TF1& dist, const Double_t minE = -1., const Double_t maxE = -1.,
+                         const Int_t samples = 1000);
 
+    R3BDouble* GetBeamEnergyAMeV() { return &fBeamEnergy_AMeV;}                    
+    R3BDouble* GetErelkeV() { return &fErel_keV;}
+    R3BDouble* GetBeamBeta() { return &fBeta;}
+    R3BDouble* GetBeamGamma() { return &fGamma;}
+    
     Bool_t Init() override;
     Bool_t ReadEvent(FairPrimaryGenerator* primGen) override;
     // FairGenerator* CloneGenerator() const override;
 
   private:
-    Double_t fGamma;
-    Double_t fBeta;
-    Double_t fErel_keV;
+    R3BDouble fGamma;
+    R3BDouble fBeta;
+    R3BDouble fBeamEnergy_AMeV;
+    R3BDouble fErel_keV;
+    TGraph fBeamEnergyLookup;
+    TGraph fErelLookup;
+    TRandom3 fRngGen;
+    Bool_t fConstBeamEnergy;
+    Bool_t fConstErel;
     TGenPhaseSpace fPhaseSpace;
     std::vector<Int_t> fPDGCodes;
     std::vector<Double_t> fMasses;
+
+    TGraph SetupLookupGraph(std::function<Double_t(Double_t)> dist, const Double_t minE, const Double_t maxE, const Int_t samples);
 
     ClassDefOverride(R3BPhaseSpaceGenerator, 1);
 };
