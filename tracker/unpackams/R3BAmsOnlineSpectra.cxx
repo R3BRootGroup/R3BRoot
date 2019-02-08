@@ -44,7 +44,7 @@ R3BAmsOnlineSpectra::R3BAmsOnlineSpectra()
   , fHitItemsAms(NULL)
   , fTrigger(-1)
   , fNEvents(0)
-  , fCalON(0) {
+  , fNbDet(4) {
 }
 
 R3BAmsOnlineSpectra::R3BAmsOnlineSpectra(const char* name, Int_t iVerbose)
@@ -54,7 +54,7 @@ R3BAmsOnlineSpectra::R3BAmsOnlineSpectra(const char* name, Int_t iVerbose)
   , fHitItemsAms(NULL)
   , fTrigger(-1)
   , fNEvents(0)
-  , fCalON(0) {
+  , fNbDet(4) {
 }
 
 R3BAmsOnlineSpectra::~R3BAmsOnlineSpectra() {
@@ -100,17 +100,23 @@ InitStatus R3BAmsOnlineSpectra::Init() {
 
     //  CANVAS 2  -------------------------------     
     cCal = new TCanvas("AMS_cal", "Cal info", 10, 10, 500, 500);
-    cCal->Divide(2,4);
+    cCal->Divide(2,fNbDet);
 
-    //  CANVAS 3  -------------------------------     
-    cHit = new TCanvas("AMS_hit", "Hit info", 10, 10, 500, 500);
-    cHit->Divide(2,2);
+    //  CANVAS 3  -------------------------------    
+    cHit[0] = new TCanvas("AMS_hit_top", "Hit info", 10, 10, 500, 500);
+    cHit[0]->Divide(2,2);
+    cHit[1] = new TCanvas("AMS_hit_right", "Hit info", 10, 10, 500, 500);
+    cHit[1]->Divide(2,2);
+    cHit[2] = new TCanvas("AMS_hit_down", "Hit info", 10, 10, 500, 500);
+    cHit[2]->Divide(2,2);
+    cHit[3] = new TCanvas("AMS_hit_left", "Hit info", 10, 10, 500, 500);
+    cHit[3]->Divide(2,2);
 
     char Name1[255]; 
     char Name2[255];
 
     //Mapped data
-    for(Int_t i=0;i<4;i++){//one histo per detector
+    for(Int_t i=0;i<fNbDet;i++){//one histo per detector
      sprintf(Name1, "fh_Ams_energy_allStrips_%d", i+1);	  
      sprintf(Name2, "Energy vs strip number for AMS Det: %d", i+1);
      fh_Ams_energy_allStrips[i] = new TH2F(Name1, Name2, 1024, 0, 1024, bins, minE, maxE);    
@@ -124,7 +130,7 @@ InitStatus R3BAmsOnlineSpectra::Init() {
     }
 
     //Cal data
-    for(Int_t i=0;i<4;i++){//two histo per detector
+    for(Int_t i=0;i<fNbDet;i++){//two histo per detector
      for(Int_t j=0;j<2;j++){
       sprintf(Name1, "fh_Ams_energy_allCalStrips_%d", i*2+j);	  
       sprintf(Name2, "Cal_Energy vs strip number for AMS Det: %d and Side: %d", i+1, j);
@@ -143,25 +149,49 @@ InitStatus R3BAmsOnlineSpectra::Init() {
     }
 
     //Hit data
-    for(Int_t i=0;i<4;i++){//one histo per detector
-     sprintf(Name1, "fh_Ams_hit_%d", i+1);	  
+    for(Int_t i=0;i<fNbDet;i++){//one histo per detector
+     sprintf(Name1, "fh_Ams_hit_Mul_%d", i+1);	  
+     sprintf(Name2, "Multiplicity Det: %d", i+1);
+     fh_Ams_hit_Mul[i] = new TH1F(Name1, Name2, 10, -0.5, 9.5);    
+     fh_Ams_hit_Mul[i]->GetXaxis()->SetTitle("Multiplicity");
+     fh_Ams_hit_Mul[i]->GetYaxis()->SetTitle("Counts");
+     fh_Ams_hit_Mul[i]->GetXaxis()->CenterTitle(true);
+     fh_Ams_hit_Mul[i]->GetYaxis()->CenterTitle(true);
+     fh_Ams_hit_Mul[i]->GetYaxis()->SetTitleOffset(1.1);
+     fh_Ams_hit_Mul[i]->GetXaxis()->SetTitleOffset(1.1);
+     cHit[i]->cd(1);
+     fh_Ams_hit_Mul[i]->Draw("");
+
+     sprintf(Name1, "fh_Ams_hit_Pos_%d", i+1);	  
      sprintf(Name2, "Y vs X for AMS Det: %d", i+1);
-     fh_Ams_hit[i] = new TH2F(Name1, Name2, 350, 0, 70., 200, 0, 40.);    
-     fh_Ams_hit[i]->GetXaxis()->SetTitle("X [mm]");
-     fh_Ams_hit[i]->GetYaxis()->SetTitle("Y [mm]");
-     fh_Ams_hit[i]->GetXaxis()->CenterTitle(true);
-     fh_Ams_hit[i]->GetYaxis()->CenterTitle(true);
-     fh_Ams_hit[i]->GetYaxis()->SetTitleOffset(1.1);
-     fh_Ams_hit[i]->GetXaxis()->SetTitleOffset(1.1);
-     cHit->cd(i+1);
-     fh_Ams_hit[i]->Draw("col"); 
+     fh_Ams_hit_Pos[i] = new TH2F(Name1, Name2, 350, 0, 70., 200, 0, 40.);    
+     fh_Ams_hit_Pos[i]->GetXaxis()->SetTitle("X [mm]");
+     fh_Ams_hit_Pos[i]->GetYaxis()->SetTitle("Y [mm]");
+     fh_Ams_hit_Pos[i]->GetXaxis()->CenterTitle(true);
+     fh_Ams_hit_Pos[i]->GetYaxis()->CenterTitle(true);
+     fh_Ams_hit_Pos[i]->GetYaxis()->SetTitleOffset(1.1);
+     fh_Ams_hit_Pos[i]->GetXaxis()->SetTitleOffset(1.1);
+     cHit[i]->cd(2);
+     fh_Ams_hit_Pos[i]->Draw("col");
+
+     sprintf(Name1, "fh_Ams_hit_E_%d", i+1);	  
+     sprintf(Name2, "Energy_Y vs Energy_X for AMS Det: %d", i+1);
+     fh_Ams_hit_E[i] = new TH2F(Name1, Name2, 200, 0, 6000., 200, 0, 6000.);    
+     fh_Ams_hit_E[i]->GetXaxis()->SetTitle("Energy_X [ADC units]");
+     fh_Ams_hit_E[i]->GetYaxis()->SetTitle("Energy_Y [ADC units]");
+     fh_Ams_hit_E[i]->GetXaxis()->CenterTitle(true);
+     fh_Ams_hit_E[i]->GetYaxis()->CenterTitle(true);
+     fh_Ams_hit_E[i]->GetYaxis()->SetTitleOffset(1.1);
+     fh_Ams_hit_E[i]->GetXaxis()->SetTitleOffset(1.1);
+     cHit[i]->cd(3);
+     fh_Ams_hit_E[i]->Draw("col");
     }
 
     //MAIN FOLDER-AMS
     TFolder* mainfolAms = new TFolder("AMS","AMS info");      
     mainfolAms->Add(cMap);
     mainfolAms->Add(cCal);
-    mainfolAms->Add(cHit);
+    for(Int_t i=0;i<fNbDet;i++)mainfolAms->Add(cHit[i]);
     run->AddObject(mainfolAms);
 
     //Register command to reset histograms
@@ -175,20 +205,22 @@ void R3BAmsOnlineSpectra::Reset_AMS_Histo()
     LOG(INFO) << "R3BAmsOnlineSpectra::Reset_AMS_Histo" << FairLogger::endl;
 
     //Mapped data
-    for(Int_t i=0;i<4;i++){
+    for(Int_t i=0;i<fNbDet;i++){
      fh_Ams_energy_allStrips[i]->Reset();
     }
 
     //Cal data
-    for(Int_t i=0;i<4;i++){
+    for(Int_t i=0;i<fNbDet;i++){
      for(Int_t j=0;j<2;j++){
       fh_Ams_energy_allCalStrips[i*2+j]->Reset();
      }
     }
     
     //Hit data
-    for(Int_t i=0;i<4;i++){
-     fh_Ams_hit[i]->Reset();
+    for(Int_t i=0;i<fNbDet;i++){
+     fh_Ams_hit_Mul[i]->Reset();
+     fh_Ams_hit_Pos[i]->Reset();
+     fh_Ams_hit_E[i]->Reset();
     }
 }
 
@@ -228,13 +260,17 @@ void R3BAmsOnlineSpectra::Exec(Option_t* option) {
   if(fHitItemsAms && fHitItemsAms->GetEntriesFast()){
     Int_t nHits = fHitItemsAms->GetEntriesFast();
     //std::cout << nHits << std::endl;
-    //FIXME: check plots for multiplicity>1
+    Int_t mulhit[fNbDet];
+    for(Int_t i=0;i<fNbDet;i++)mulhit[i]=0;
     for (Int_t ihit = 0; ihit < nHits; ihit++){
       R3BAmsHitData* hit = 
 	(R3BAmsHitData*)fHitItemsAms->At(ihit);
       if (!hit) continue;
-      fh_Ams_hit[hit->GetDetId()]->Fill(hit->GetX(),hit->GetY());
+      fh_Ams_hit_Pos[hit->GetDetId()]->Fill(hit->GetX(),hit->GetY());
+      fh_Ams_hit_E[hit->GetDetId()]->Fill(hit->GetEnergyX(),hit->GetEnergyY());
+      mulhit[hit->GetDetId()]++;
     }
+    for(Int_t i=0;i<fNbDet;i++)fh_Ams_hit_Mul[i]->Fill(mulhit[i]);
   }
  
   fNEvents += 1;
@@ -269,7 +305,7 @@ void R3BAmsOnlineSpectra::FinishTask() {
     }
     if (fHitItemsAms)
     {
-	cHit->Write();
+	for(Int_t i=0;i<fNbDet;i++)cHit[i]->Write();
     }
 }
 

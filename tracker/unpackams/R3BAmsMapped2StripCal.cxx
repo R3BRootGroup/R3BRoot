@@ -105,7 +105,9 @@ void R3BAmsMapped2StripCal::SetParameter(){
   //Count the number of dead strips per AMS detector
   for(Int_t d = 0; d < NumDets; d++){
   Int_t numdeadstrips=0;
-  for(Int_t i = 0; i < NumStrips; i++)if(CalParams->GetAt(NumParams*i+1+NumStrips*d*NumParams)==-1)numdeadstrips++;
+  for(Int_t i = 0; i < NumStrips; i++){if(CalParams->GetAt(NumParams*i+1+NumStrips*d*NumParams)==-1)numdeadstrips++;
+  //LOG(INFO)<<"Nb detectors: "<< d<<", strip: "<<i<<" : " << CalParams->GetAt(NumParams*i+1+NumStrips*d*NumParams)<<" : " << CalParams->GetAt(NumParams*i+2+NumStrips*d*NumParams)<<FairLogger::endl;
+   }
   LOG(INFO)<<"R3BAmsMapped2StripCal: Nb of dead strips in AMS detector " <<d<< ": "<< numdeadstrips <<FairLogger::endl;
   }
 }
@@ -226,10 +228,12 @@ void R3BAmsMapped2StripCal::Exec(Option_t* option)
      sideId=1;
      stripId=stripId-NumStripsS;
     }
-    if(i%64==0 && i>0){nbadc++;}
+    if(i%63==0 && i>0){nbadc++;}
     energy  = mappedData[i]->GetEnergy()-pedestal-SynAdcs[nbadc];
 
-    if(energy>4.*sigma && pedestal!=-1)
+    //We accept the hit if the energy is larger than 5 times the sigma of the pedestal 
+    //and the strip is not dead
+    if(energy>5.*sigma && pedestal!=-1)
     AddCalData(detId,sideId,stripId,energy);
   }
   

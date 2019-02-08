@@ -21,6 +21,8 @@
 #include "TMath.h"
 #include "TVector3.h"
 #include "TGeoMatrix.h"
+#include "TCanvas.h"
+#include "TGraph.h"
 
 #include <iostream>
 #include <stdlib.h>
@@ -32,15 +34,15 @@ R3BAmsMapped2StripCalPar::R3BAmsMapped2StripCalPar() :
   FairTask("R3B AMS Pedestal Finder ",1),
   fStrip_Par(NULL),
   fAmsMappedDataCA(NULL),
-  fNumDets(0),
-  fNumStrips(0),
-  fNumStripsS(0),
-  fNumStripsK(0),
+  fNumDets(4),
+  fNumStrips(1024),
+  fNumStripsS(640),
+  fNumStripsK(384),
   fMaxSigma(5),
-  fMinStadistics(0),
+  fMinStadistics(1000),
   fMapHistos_left(0),
-  fMapHistos_right(0),
-  fMapHistos_bins(0),
+  fMapHistos_right(4000),
+  fMapHistos_bins(4000),
   fSigma(0),
   fMean(0),
   fOutputFile(NULL) {
@@ -52,15 +54,15 @@ R3BAmsMapped2StripCalPar::R3BAmsMapped2StripCalPar(const char* name, Int_t iVerb
   FairTask(name, iVerbose),
   fStrip_Par(NULL),
   fAmsMappedDataCA(NULL),
-  fNumDets(0),
-  fNumStrips(0),
-  fNumStripsS(0),
-  fNumStripsK(0),
+  fNumDets(4),
+  fNumStrips(1024),
+  fNumStripsS(640),
+  fNumStripsK(384),
   fMaxSigma(5),
-  fMinStadistics(0),
+  fMinStadistics(1000),
   fMapHistos_left(0),
-  fMapHistos_right(0),
-  fMapHistos_bins(0),
+  fMapHistos_right(4000),
+  fMapHistos_bins(4000),
   fSigma(0),
   fMean(0),
   fOutputFile(NULL) {
@@ -159,35 +161,71 @@ void R3BAmsMapped2StripCalPar::SearchPedestals(){
   fStrip_Par->SetNumStripsK(fNumStripsK);
   fStrip_Par->GetStripCalParams()->Set(numPars*fNumStrips*fNumDets);
 
+  TCanvas* cPar=new TCanvas("AMS","",0,0,800,1000);;
+  char Name[255];
+  cPar->Divide(2,2);
+
+  int nbstrip=0;
+
   for(Int_t d=0;d<fNumDets;d++){
+   double x[fNumStrips],y[fNumStrips];
+
+   sprintf(Name, "AMS_%d", d);
+   //cPar[d] = new TCanvas(Name,Name,0,0,600,400);
+
    for (Int_t i=0;i<fNumStrips;i++){
-    
+    x[i]=0.;y[i]=0.;
+    nbstrip=numPars*i+d*numPars*fNumStrips;
+
     if (fh_Map_energy_strip[i+d*fNumStrips]->GetEntries()>fMinStadistics){
       
       TF1 *f1 = new TF1 ("f1", "gaus", fMapHistos_left, fMapHistos_right);
-      f1->SetParameter(1,100.);      
+      f1->SetParameter(1,400.);      
       f1->SetParameter(2,2.);
 
       fh_Map_energy_strip[i+d*fNumStrips]->Fit("f1","RQ0");
 
+      y[i]=f1->GetParameter(2);
+      x[i]=i;
+
       //Fill container:
-      fStrip_Par->SetStripCalParams(f1->GetParameter(0),numPars*i+d*numPars*fNumStrips);
-      if(f1->GetParameter(2)<fMaxSigma){
-       fStrip_Par->SetStripCalParams(f1->GetParameter(1),numPars*i+d*numPars*fNumStrips+1);
+      fStrip_Par->SetStripCalParams(f1->GetParameter(0),nbstrip);
+      if(f1->GetParameter(2)<fMaxSigma&&f1->GetParameter(2)>0.1){
+       fStrip_Par->SetStripCalParams(f1->GetParameter(1),nbstrip+1);
+       fStrip_Par->SetStripCalParams(f1->GetParameter(2),nbstrip+2);
       }else{
-       fStrip_Par->SetStripCalParams(-1,numPars*i+d*fNumStrips+1);//dead strip
+       fStrip_Par->SetStripCalParams(-1,nbstrip+1);//dead strip
+       fStrip_Par->SetStripCalParams(0,nbstrip+2);
+       //LOG(WARNING)<<"Dead strip, detector: " << d+1 << ", strip: "<< i+1 <<", "<< f1->GetParameter(2) <<FairLogger::endl;
       }
-      fStrip_Par->SetStripCalParams(f1->GetParameter(2),numPars*i+d*numPars*fNumStrips+2);
+      
 
     }else {
-      fStrip_Par->SetStripCalParams(-1,numPars*i+d*numPars*fNumStrips+1);//dead strip
-      fStrip_Par->SetStripCalParams(0,numPars*i+d*numPars*fNumStrips+2);
+      fStrip_Par->SetStripCalParams(-1,nbstrip+1);//dead strip
+      fStrip_Par->SetStripCalParams(0,nbstrip+2);
       LOG(WARNING)<<"Histogram NO Fitted, detector: " << d+1 << ", strip: "<< i+1 <<FairLogger::endl;
     }
    }
+  //Draw sigma for pedestals
+  TGraph* gPar = new TGraph(fNumStrips,x,y);
+  gPar->SetTitle(Name);
+  gPar->SetMarkerStyle(20);
+  gPar->SetMarkerColor(4);
+  cPar->cd(d+1);
+  TH1F* fhamspar = new TH1F(Name, Name, 1044, -10, 1034);
+  fhamspar->SetMinimum(0);
+  fhamspar->SetMaximum(20);
+  fhamspar->GetXaxis()->SetTitle("Strip number");
+  fhamspar->GetXaxis()->SetTitleOffset(1.4);
+  fhamspar->GetYaxis()->SetTitle("Sigma [ADC units]");
+  fhamspar->GetYaxis()->SetTitleOffset(1.4);
+  fhamspar->GetXaxis()->CenterTitle(true);
+  fhamspar->GetYaxis()->CenterTitle(true);
+  gPar->SetHistogram(fhamspar);
+  gPar->Draw("ap");
   }
-  
-  fStrip_Par->setChanged();
+  cPar->Write();
+  fStrip_Par->setChanged();  
   return;
 
 }

@@ -66,7 +66,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF TraLinkDef.h)
 set(LIBRARY_NAME R3BTra)
 set(DEPENDENCIES
-    R3Bbase R3BData)
+    Spectrum R3Bbase R3BData)
 
 if(FAIRDB_FOUND)
 set(DEPENDENCIES

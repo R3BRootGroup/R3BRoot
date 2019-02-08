@@ -7,6 +7,9 @@
 #include "TClonesArray.h"
 #include "TMath.h"
 #include "TRandom.h"
+#include "TSpectrum.h"
+#include "TH1F.h"
+#include "TF1.h"
 
 //Fair headers
 #include "FairRootManager.h"
@@ -26,6 +29,8 @@ R3BAmsStripCal2Hit::R3BAmsStripCal2Hit() :
   FairTask("R3B Hit-AMS Calibrator",1),
   fPitchK(104.),
   fPitchS(110.),
+  fMaxNumDet(4),//Max number of AMS detectors set to 4, experiment s444
+  fMaxNumClusters(3),//Max number of clusters per ams detector set to 3, experiment s444
   fAmsStripCalDataCA(NULL),
   fAmsHitDataCA(NULL),
   fOnline(kFALSE)
@@ -37,6 +42,8 @@ R3BAmsStripCal2Hit::R3BAmsStripCal2Hit(const char* name, Int_t iVerbose) :
   FairTask(name, iVerbose),
   fPitchK(104.),
   fPitchS(110.),
+  fMaxNumDet(4),//Max number of AMS detectors set to 4, experiment s444
+  fMaxNumClusters(3),//Max number of clusters per ams detector set to 3, experiment s444
   fAmsStripCalDataCA(NULL),
   fAmsHitDataCA(NULL),
   fOnline(kFALSE)
@@ -71,6 +78,11 @@ InitStatus R3BAmsStripCal2Hit::Init()
   rootManager->Register("AmsHitData", "AMS Hit", fAmsHitDataCA, kFALSE);
   }  
 
+  char Name[255];
+  for(Int_t i = 0; i < fMaxNumDet*2; i++){
+  sprintf(Name,"hams_%d",i+1);
+  hams[i]= new TH1F(Name,"",1024,-0.5,1023.5);
+  }
 
   return kSUCCESS;
 }
@@ -83,55 +95,57 @@ InitStatus R3BAmsStripCal2Hit::ReInit()
 
 // -----   Public method Execution   --------------------------------------------
 void R3BAmsStripCal2Hit::Exec(Option_t* option)
-{
-  
-  //if(++nEvents % 10000 == 0)
-  //LOG(INFO) << nEvents << FairLogger::endl;
-  
+{ 
   //Reset entries in output arrays, local arrays
   Reset();
-  
 
   //Reading the Input -- Cal Data --
   Int_t nHits = fAmsStripCalDataCA->GetEntries();
   if(!nHits) return;
   
+  // Data from cal level
   R3BAmsStripCalData** calData;
   calData=new R3BAmsStripCalData*[nHits];
   Int_t detId;
   Int_t sideId;
   Int_t stripId;
   Double_t energy;
-
-  const Int_t MaxNumDet=10;//Max number of AMS detectors set to 10
-  Double_t SumEnergy[MaxNumDet];
-  Int_t CountDet[MaxNumDet];
-  Double_t CoG[MaxNumDet][2][2];
-  for(Int_t i = 0; i < MaxNumDet; i++){
-   SumEnergy[i]=0.;
-   CountDet[i]=0;
-   for(Int_t j = 0; j < 2; j++)for(Int_t k = 0; k < 2; k++)CoG[i][j][k]=0.;
-  }
-
-// 
   for(Int_t i = 0; i < nHits; i++) {
     calData[i] = (R3BAmsStripCalData*)(fAmsStripCalDataCA->At(i));
     detId=calData[i]->GetDetId();
     sideId=calData[i]->GetSideId();
     stripId=calData[i]->GetStripId();
     energy=calData[i]->GetEnergy();
-
-    CountDet[detId]++;
-    CoG[detId][sideId][0] = CoG[detId][sideId][0] + energy*stripId;
-    CoG[detId][sideId][1] = CoG[detId][sideId][1] + energy;
-    SumEnergy[detId] = SumEnergy[detId] + energy;
+    hams[detId*2+sideId]->SetBinContent(stripId+1,energy);
+    //std::cout << stripId <<" "<< energy << std::endl;
   }
 
-  // Add hits per detector:TODO only multiplicity one
-  for(Int_t i = 0; i < MaxNumDet; i++){
-    if(CountDet[i]>0)AddHitData(i,1,CoG[i][0][0]/CoG[i][0][1]*fPitchS/1000.,CoG[i][1][0]/CoG[i][1][1]*fPitchK/1000.,SumEnergy[i]);
+  Int_t nfoundS=0, nfoundK=0;
+  TSpectrum *ss= new TSpectrum(100);
+  for(Int_t i = 0; i < fMaxNumDet; i++){
+   // Looking for hits in side S
+   nfoundS = ss->Search(hams[i*2],1.,"goff",0.0001);
+   fChannelPeaks = (Double_t*) ss->GetPositionX();
+   //for(int j=0;j<nfound;j++)std::cout << nfound <<" "<< fChannelPeaks[j] << std::endl;
+   Double_t clusterS[nfoundS][2];
+   DefineClusters(nfoundS, fPitchS, fChannelPeaks, hams[i*2], clusterS);
+
+   // Looking for hits in side K
+   nfoundK = ss->Search(hams[i*2+1],1.,"goff",0.0001);
+   fChannelPeaks = (Double_t*) ss->GetPositionX();
+   //for(int j=0;j<nfound;j++)std::cout << nfound <<" "<< fChannelPeaks[j] << std::endl;
+   Double_t clusterK[nfoundK][2];
+   DefineClusters(nfoundK, fPitchK, fChannelPeaks, hams[i*2+1], clusterK);
+
+   // Add hits per detector from the maximum energy to the lower one, but limiting the number 
+   // of clusters per detector to fMaxNumClusters
+   if(nfoundK>0&&nfoundS>0){
+    for(Int_t mul=0;mul<std::min(std::min(nfoundK,nfoundS),fMaxNumClusters);mul++)
+     AddHitData(i,mul,clusterS[mul][1],clusterK[mul][1],clusterS[mul][0],clusterK[mul][0]);
+   }
   }
 
+  for(Int_t i = 0; i < fMaxNumDet*2; i++)hams[i]->Reset();
   if(calData) delete calData;
   return;
 }
@@ -140,6 +154,43 @@ void R3BAmsStripCal2Hit::Exec(Option_t* option)
 void R3BAmsStripCal2Hit::Finish()
 {
   
+}
+
+// -----   Protected method to define clusters   --------------------------------
+void R3BAmsStripCal2Hit::DefineClusters(Int_t nfound, Double_t fPitch, Double_t *fChannels, TH1F* hsst, Double_t cluster[][2])
+{
+  //std::cout << "Search " << std::endl;
+
+  Double_t SumEnergy[nfound], Position[nfound], energy = 0.;
+  Int_t CountDet = 0;
+  Double_t CoG[2];
+  //Double_t cluster[nfound][2];
+  for(Int_t i = 0; i < nfound; i++){
+   SumEnergy[i] = 0.;
+   Position[i] = 0.;
+   for(Int_t j = 0; j < 2; j++)cluster[i][j]=0.;
+  }
+
+  for(Int_t i = 0; i < nfound; i++){
+   for(Int_t j = 0; j < 2; j++)CoG[j] = 0.;
+   Int_t initstrip = fChannels[i]-2;
+   if(initstrip<0)initstrip = 0;
+   for(Int_t strip = initstrip; strip < fChannels[i]+2; strip++){
+   energy = hsst->GetBinContent(strip+1);
+   // std::cout<< strip <<" "<< energy <<std::endl;
+   CoG[0] = CoG[0] + energy*strip;
+   CoG[1] = CoG[1] + energy;
+   SumEnergy[i] = SumEnergy[i] + energy;
+   }
+   Position[i] = CoG[0]/CoG[1]*fPitch/1000.;
+  }
+  // for(Int_t i = 0; i < nfound; i++)std::cout<< i <<" " << SumEnergy[i] <<" "<< Position[i] <<std::endl;
+
+  for(Int_t j = 0; j < nfound; j++){
+   cluster[j][0] = SumEnergy[j];
+   cluster[j][1] = Position[j];
+  }
+  //for(Int_t i = 0; i < nfound; i++)std::cout<< i <<" " << cluster[i][0] <<" "<< cluster[i][1] <<std::endl;
 }
 
 // -----   Public method Reset   ------------------------------------------------
@@ -151,12 +202,12 @@ void R3BAmsStripCal2Hit::Reset()
 
 
 // -----   Private method AddHitData  --------------------------------------------
-R3BAmsHitData* R3BAmsStripCal2Hit::AddHitData(Int_t detid, Int_t numhit, Double_t x, Double_t y, Double_t energy)
+R3BAmsHitData* R3BAmsStripCal2Hit::AddHitData(Int_t detid, Int_t numhit, Double_t x, Double_t y, Double_t energy_x, Double_t energy_y)
 {
   //It fills the R3BAmsHitData
   TClonesArray& clref = *fAmsHitDataCA;
   Int_t size = clref.GetEntriesFast();
-  return new(clref[size]) R3BAmsHitData(detid,numhit,x,y,energy);
+  return new(clref[size]) R3BAmsHitData(detid,numhit,x,y,energy_x,energy_y);
 }
 
 ClassImp(R3BAmsStripCal2Hit)

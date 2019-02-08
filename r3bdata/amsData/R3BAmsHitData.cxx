@@ -13,18 +13,20 @@ R3BAmsHitData::R3BAmsHitData()
     fNumHit(0),
     fX(0),
     fY(0),
-    fEnergy(0)
+    fEnergyX(0),
+    fEnergyY(0)
 {
 }
 
 // -----   Standard constructor   ------------------------------------------
-R3BAmsHitData::R3BAmsHitData(Int_t detid, Int_t numhit, Double_t x, Double_t y, Double_t energy) 
+R3BAmsHitData::R3BAmsHitData(Int_t detid, Int_t numhit, Double_t x, Double_t y, Double_t energy_x, Double_t energy_y) 
   : FairMultiLinkedData(),
     fDetId(detid),
     fNumHit(numhit),
     fX(x),
     fY(y),
-    fEnergy(energy)
+    fEnergyX(energy_x),
+    fEnergyY(energy_y)
 {
 }
 // -------------------------------------------------------------------------
@@ -35,7 +37,8 @@ R3BAmsHitData::R3BAmsHitData(const R3BAmsHitData& right)
     fNumHit(right.fNumHit),
     fX(right.fX),
     fY(right.fY),
-    fEnergy(right.fEnergy)
+    fEnergyX(right.fEnergyX),
+    fEnergyY(right.fEnergyY)
 {
 }
 
@@ -48,7 +51,7 @@ R3BAmsHitData::~R3BAmsHitData()
 void R3BAmsHitData::Print(const Option_t* opt) const {
   LOG(INFO) << "-I- R3BAmsHitData: a HitData in detector " << fDetId 
        << " number of hit " << fNumHit 
-       << " position [X,Y,Z] = " << fX <<", " << fY << FairLogger::endl;
-  LOG(INFO) << " Energy = " << fEnergy << " (GeV in sim)" << FairLogger::endl;
+       << " position [X,Y] = " << fX <<", " << fY << FairLogger::endl;
+  LOG(INFO) << " Energy [X,Y] = " << fEnergyX << " , " << fEnergyY << " (GeV in sim)" << FairLogger::endl;
 }
 // -------------------------------------------------------------------------

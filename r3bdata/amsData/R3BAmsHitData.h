@@ -26,9 +26,10 @@ public:
    *@param fNumHit   Number of hits
    *@param fX        Position X [mm]
    *@param fY        Position Y [mm]
-   *@param fEnergy   Total energy deposited by hit ([GeV] in sim)
+   *@param fEnergyX   Total energy deposited in X direction by hit ([GeV] in sim)
+   *@param fEnergyY   Total energy deposited in Y direction by hit ([GeV] in sim)
    **/
-  R3BAmsHitData(Int_t detid, Int_t numhit, Double_t x, Double_t y, Double_t energy);
+  R3BAmsHitData(Int_t detid, Int_t numhit, Double_t x, Double_t y, Double_t energy_x, Double_t energy_y);
 
   /** Copy constructor **/
   R3BAmsHitData(const R3BAmsHitData&);
@@ -43,14 +44,16 @@ public:
   Int_t    GetNumHit()     const { return fNumHit; }
   Double_t    GetX()       const { return fX; }
   Double_t    GetY()       const { return fY; }
-  Double_t GetEnergy()     const { return fEnergy; }
+  Double_t GetEnergyX()     const { return fEnergyX; }
+  Double_t GetEnergyY()     const { return fEnergyY; }
 
   /** Modifiers **/
   void SetDetId(Int_t detid)      { fDetId = detid; }
   void SetNumHit(Int_t numhit)    { fNumHit = numhit; }
   void SetX(Double_t x)           { fX = x;}
   void SetY(Double_t y)           { fY = y;}
-  void SetEnergy(Double_t energy) { fEnergy = energy;}
+  void SetEnergyX(Double_t energy) { fEnergyX = energy;}
+  void SetEnergyY(Double_t energy) { fEnergyY = energy;}
 
   /** Output to screen **/
   virtual void Print(const Option_t* opt) const;
@@ -59,7 +62,7 @@ protected:
   Int_t fDetId;
   Int_t fNumHit;    
   Double_t fX, fY;  
-  Double_t fEnergy; 
+  Double_t fEnergyX,fEnergyY; 
 
   ClassDef(R3BAmsHitData,1)
 

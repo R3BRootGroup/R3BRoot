@@ -42,21 +42,27 @@ class R3BAmsStripCal2Hit : public FairTask {
   
   /** Virtual method Finish **/
   virtual void Finish();
+
+  virtual void DefineClusters(Int_t nfound, Double_t fPitch, Double_t *fChannels, TH1F* hsst, Double_t cluster[][2]);
   
   void SetOnline(Bool_t option){fOnline=option;}
+  void SetMaxNumDet(Int_t NbDet){fMaxNumDet=NbDet;}
   
  private:
 
   Double_t fPitchK, fPitchS;
+  Int_t fMaxNumDet, fMaxNumClusters;
+  TH1F* hams[16];
 
   TClonesArray* fAmsStripCalDataCA;  /**< Array with AMS Cal- input data. >*/
   TClonesArray* fAmsHitDataCA;       /**< Array with AMS Hit- output data. >*/
   
   Bool_t fOnline;//Don't store data for online
+  Double_t* fChannelPeaks;
 
   /** Private method AddHitData **/
   //** Adds a AmsHitData to the HitCollection
-  R3BAmsHitData* AddHitData(Int_t detid, Int_t numhit, Double_t x, Double_t y, Double_t energy);
+  R3BAmsHitData* AddHitData(Int_t detid, Int_t numhit, Double_t x, Double_t y, Double_t energy_x, Double_t energy_y);
 
  public:
   //Class definition

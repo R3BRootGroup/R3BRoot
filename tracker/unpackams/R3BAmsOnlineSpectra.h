@@ -76,9 +76,9 @@ class R3BAmsOnlineSpectra : public FairTask {
   
   
   /**
-   * Method for setting the Data Level (Mapped or Cal)
+   * Method for setting the number of AMS detectors
    */ 
-  inline void SetDisplayCalOn(Bool_t On){fCalON=On;}
+  void SetNumDet(Int_t NbDet){fNbDet=NbDet;}
 
 
   void Reset_AMS_Histo();
@@ -90,20 +90,22 @@ class R3BAmsOnlineSpectra : public FairTask {
   TClonesArray* fHitItemsAms;        /**< Array with hit items. */
   
   // check for trigger should be done globablly (somewhere else)
-  R3BEventHeader* header;               /**< Event header. */
-  Int_t fTrigger;                       /**< Trigger value. */
-  Int_t fNEvents;        	   	/**< Event counter. */
+  R3BEventHeader* header;            /**< Event header. */
+  Int_t fTrigger;                    /**< Trigger value. */
+  Int_t fNEvents;        	     /**< Event counter. */
   
   TCanvas* cMap;
   TCanvas* cCal;
-  TCanvas* cHit;
+  TCanvas* cHit[4];
 
   TH2F* fh_Ams_energy_allStrips[4];
   TH2F* fh_Ams_energy_allCalStrips[8];
-  TH2F* fh_Ams_hit[4];
+  TH2F* fh_Ams_hit_Pos[4];
+  TH2F* fh_Ams_hit_E[4];
+  TH1F* fh_Ams_hit_Mul[4];
   
-  //TString fAmsFile;        	        /**< Config file name. */
-  Bool_t  fCalON;                 	/**< Mapped or Cal selector. */
+  //TString fAmsFile;        	      /**< Config file name. */
+  Int_t fNbDet;                       /**< Number of AMS detectors. */
   
  public:
   ClassDef(R3BAmsOnlineSpectra, 1)
