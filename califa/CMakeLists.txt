@@ -30,7 +30,7 @@ include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
 ${FAIRROOT_LIBRARY_DIR}
-) 
+)
 
 link_directories( ${LINK_DIRECTORIES})
 
@@ -38,16 +38,12 @@ set(SRCS
 #Put here your sourcefiles
 R3BCalifa.cxx
 R3BCalifaGeometry.cxx
-R3BCalifaCrystalCal2Hit.cxx  
-R3BCalifaHitPar.cxx  
+R3BCalifaCrystalCal2Hit.cxx
+R3BCalifaHitPar.cxx
 R3BCalifaContFact.cxx
-unpack/R3BCalifaUnpack.cxx
-unpack/R3BCalifaMappedPar.cxx
-unpack/R3BCalifaMappedDataAnalysis.cxx
 unpack/R3BCalifaMapped2CrystalCal.cxx
 unpack/R3BCalifaCrystalCalDataAnalysis.cxx
 unpack/R3BCalifaMapped2CrystalCalPar.cxx
-unpack/R3BCalifaMappingReader.cxx
 unpack/R3BCalifaCrystalCal2CrystalCalPID.cxx
 unpack/R3BCalifaCrystalCalPar.cxx
 unpack/R3BCalifaOnlineSpectra.cxx
@@ -70,4 +66,3 @@ endif(FAIRDB_FOUND)
 
 
 GENERATE_LIBRARY()
-
