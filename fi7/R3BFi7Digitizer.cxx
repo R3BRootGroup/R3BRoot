@@ -46,10 +46,10 @@ void R3BFi7Digitizer::SetParContainers() {
 
   // Get run and runtime database
   FairRunAna* run = FairRunAna::Instance();
-  if ( ! run ) Fatal("SetParContainers", "No analysis run");
+  if ( ! run ) LOG(fatal) << "SetParContainers : No analysis run";
 
   FairRuntimeDb* rtdb = run->GetRuntimeDb();
-  if ( ! rtdb ) Fatal("SetParContainers", "No runtime database");
+  if ( ! rtdb ) LOG(fatal) << "SetParContainers : No runtime database";
 
   fFi7DigiPar = (R3BFi7DigiPar*)(rtdb->getContainer("R3BFi7DigiPar"));
 
@@ -68,7 +68,7 @@ InitStatus R3BFi7Digitizer::Init() {
 //  cout<<"Init "<<endl;
   // Get input array 
   FairRootManager* ioman = FairRootManager::Instance();
-  if ( ! ioman ) Fatal("Init", "No FairRootManager");
+  if ( ! ioman ) LOG(fatal) << "Init : No FairRootManager";
   fFi7Points = (TClonesArray*) ioman->GetObject("FI7Point");
   fFi7MCTrack = (TClonesArray*) ioman->GetObject("MCTrack");
   

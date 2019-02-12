@@ -6,6 +6,7 @@
 #include "R3BNeulandCalData.h"
 #include "R3BNeulandHit.h"
 #include "TCAConnector.h"
+#include <array>
 
 class TCanvas;
 class TH1D;
