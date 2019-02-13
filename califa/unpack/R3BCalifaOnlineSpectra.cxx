@@ -138,9 +138,9 @@ InitStatus R3BCalifaOnlineSpectra::Init() {
 				    10, 10, 500, 500);
 
     fh_Califa_cryId_petal = new TH2F("fh_Califa_cryNb_petal","Califa petal number vs crystal number",
-                    fNumCrystalPetal,1,fNumCrystalPetal+1,fCalifaNumPetals,1,fCalifaNumPetals+1);
+                    fNumCrystalPetal,0.5,fNumCrystalPetal+0.5,fCalifaNumPetals,0.5,fCalifaNumPetals+0.5);
     fh_Califa_cryId_petal->GetXaxis()->SetTitle("Crystal number [1-64]");
-    fh_Califa_cryId_petal->GetYaxis()->SetTitle("Petal number [1-7]");
+    fh_Califa_cryId_petal->GetYaxis()->SetTitle("Petal number [1-8]");
     fh_Califa_cryId_petal->GetYaxis()->SetTitleOffset(1.2);
     fh_Califa_cryId_petal->GetXaxis()->CenterTitle(true);
     fh_Califa_cryId_petal->GetYaxis()->CenterTitle(true);
@@ -192,22 +192,62 @@ InitStatus R3BCalifaOnlineSpectra::Init() {
     char Name5[255]; char Name6[255]; TString Xaxis1;
     char Name7[255]; char Name8[255]; TString Xaxis2;
     for (Int_t i=0;i<fCalifaNumPetals;i++){
-
-      sprintf(Name5, "h_Califa_Map_energy_per_petal_%d", i+1);
-      sprintf(Name6, "Califa Map Energy per petal %d", i+1);
+      if(i<7){//FIXME:for experiment s444
+      sprintf(Name5, "h_Califa_Map_energy_for_petal_%d", i+1);
+      sprintf(Name6, "Califa Map Energy for petal %d", i+1);
       Xaxis1="Energy (channels)";
       fh_Califa_energy_per_petal[i] = new TH1F(Name5, Name6, bins, minE, maxE);
       fh_Califa_energy_per_petal[i]->GetXaxis()->SetTitle(Xaxis1);
 
-      sprintf(Name7, "h_Califa_Cal_energy_per_petal_%d", i+1);
-      sprintf(Name8, "Califa Cal Energy per petal %d", i+1);
+      sprintf(Name7, "h_Califa_Cal_energy_for_petal_%d", i+1);
+      sprintf(Name8, "Califa Cal Energy for petal %d", i+1);
       Xaxis2="Energy (keV)";
       fh_Califa_energy_per_petal_cal[i] = new TH1F(Name7, Name8, bins, minE, maxE);
       fh_Califa_energy_per_petal_cal[i]->GetXaxis()->SetTitle(Xaxis2);
 
       cCalifa3->cd(i+1);
+      gPad->SetLogy();
       fh_Califa_energy_per_petal[i]->Draw();
+      }
     }
+
+
+    //CANVAS 3bis for proton range: experiment s444
+    cCalifa3b = new TCanvas("Califa Energy_per_petal_proton", "Califa Energy per petal for proton range", 10, 10, 500, 500);
+    cCalifa3b->Divide(2,1);
+
+    sprintf(Name5, "h_Califa_Map_energy_for_petal__%d_proton", 1);
+    sprintf(Name6, "Califa Map Energy for petal %d proton range", 1);
+    Xaxis1="Energy (channels)";
+    fh_Califa_energy_per_petal[7] = new TH1F(Name5, Name6, bins, minE, maxE);
+    fh_Califa_energy_per_petal[7]->GetXaxis()->SetTitle(Xaxis1);
+
+    sprintf(Name7, "h_Califa_Cal_energy_for_petal_%d_proton", 1);
+    sprintf(Name8, "Califa Cal Energy for petal %d proton range", 1);
+    Xaxis2="Energy (keV)";
+    fh_Califa_energy_per_petal_cal[7] = new TH1F(Name7, Name8, bins, minE, maxE);
+    fh_Califa_energy_per_petal_cal[7]->GetXaxis()->SetTitle(Xaxis2);
+
+    cCalifa3b->cd(1);
+    gPad->SetLogy();
+    fh_Califa_energy_per_petal[7]->Draw();
+
+    sprintf(Name5, "h_Califa_Map_energy_for_petal__%d_proton", 4);
+    sprintf(Name6, "Califa Map Energy for petal %d proton range", 4);
+    Xaxis1="Energy (channels)";
+    fh_Califa_energy_per_petal[8] = new TH1F(Name5, Name6, bins, minE, maxE);
+    fh_Califa_energy_per_petal[8]->GetXaxis()->SetTitle(Xaxis1);
+
+    sprintf(Name7, "h_Califa_Cal_energy_for_petal_%d_proton", 4);
+    sprintf(Name8, "Califa Cal Energy for petal %d proton range", 4);
+    Xaxis2="Energy (keV)";
+    fh_Califa_energy_per_petal_cal[8] = new TH1F(Name7, Name8, bins, minE, maxE);
+    fh_Califa_energy_per_petal_cal[8]->GetXaxis()->SetTitle(Xaxis2);
+
+    cCalifa3b->cd(2);
+    gPad->SetLogy();
+    fh_Califa_energy_per_petal[8]->Draw();
+
 
     //CANVAS 4
     char Name9[255];
@@ -215,9 +255,23 @@ InitStatus R3BCalifaOnlineSpectra::Init() {
     char Name12[255]; 	char Name13[255]; TString Xaxis4;
     for(Int_t i=0; i<fCalifaNumPetals; i++){
       for (Int_t k=0;k<4;k++){
+
+        if(i<7){
 	sprintf(Name9, "Califa_Petal_%d_section_%d", i+1,k+1);
 	cCalifa4[i][k] = new TCanvas(Name9, Name9, 10, 10, 500, 500);
 	cCalifa4[i][k]->Divide(4,4);
+        }else{
+         if(k<2){
+	  sprintf(Name9, "Califa_Petal_%d_section_%d_proton",1,k+1);
+	  cCalifa4[i][k] = new TCanvas(Name9, Name9, 10, 10, 500, 500);
+	  cCalifa4[i][k]->Divide(4,4);
+         }else{
+	  sprintf(Name9, "Califa_Petal_%d_section_%d_proton",4,k-1);
+	  cCalifa4[i][k] = new TCanvas(Name9, Name9, 10, 10, 500, 500);
+	  cCalifa4[i][k]->Divide(4,4);
+         }
+        }
+
 	for(Int_t j=0; j<16;j++){
 
 	  sprintf(Name10, "h_Califa_Map_Petal_%d_%d_Crystal_%d_energy (Febex)",i+1, k+1, j+1);
@@ -260,14 +314,14 @@ InitStatus R3BCalifaOnlineSpectra::Init() {
 
 
     //CANVAS 5
-    cCalifa5 = new TCanvas("Califa_petal_1and2_vs_petal_6",
-				    "Coinc. 1and2 vs 6",
+    cCalifa5 = new TCanvas("Califa_petal_1_vs_petal_3and4",
+				    "Coinc. 1 vs 3and4",
 				    10, 10, 500, 500);
 
-    fh_Califa_coinc_petal1 = new TH2F("fh_Califa_petal_1and2_vs_petal_6","Califa coinc. petals 1and2 vs 6",
+    fh_Califa_coinc_petal1 = new TH2F("fh_Califa_petal_1_vs_petal_3and4","Califa coinc. petals 1 vs 3 and 4",
                                  bins, minE, maxE,bins, minE, maxE);
-    fh_Califa_coinc_petal1->GetXaxis()->SetTitle("Energy petal 1 and 2 (channels)");
-    fh_Califa_coinc_petal1->GetYaxis()->SetTitle("Energy petal 6 (channels)");
+    fh_Califa_coinc_petal1->GetXaxis()->SetTitle("Energy petal 1  (channels)");
+    fh_Califa_coinc_petal1->GetYaxis()->SetTitle("Energy petal 3 and 4 (channels)");
     fh_Califa_coinc_petal1->GetYaxis()->SetTitleOffset(1.2);
     fh_Califa_coinc_petal1->GetXaxis()->CenterTitle(true);
     fh_Califa_coinc_petal1->GetYaxis()->CenterTitle(true);
@@ -275,18 +329,32 @@ InitStatus R3BCalifaOnlineSpectra::Init() {
 
 
     //CANVAS 6
-    cCalifa6 = new TCanvas("Califa_petal_3_vs_petal_7",
-				    "Coinc. 3 vs 7",
+    cCalifa6 = new TCanvas("Califa_petal_2_vs_petal_5",
+				    "Coinc. 2 vs 5",
 				    10, 10, 500, 500);
 
-    fh_Califa_coinc_petal2 = new TH2F("fh_Califa_petal_3_vs_petal_7","Califa coinc. petals 3 vs 7",
+    fh_Califa_coinc_petal2 = new TH2F("fh_Califa_petal_2_vs_petal_5","Califa coinc. petals 2 vs 5",
                                  bins, minE, maxE,bins, minE, maxE);
-    fh_Califa_coinc_petal2->GetXaxis()->SetTitle("Energy petal 3 (channels)");
-    fh_Califa_coinc_petal2->GetYaxis()->SetTitle("Energy petal 7 (channels)");
+    fh_Califa_coinc_petal2->GetXaxis()->SetTitle("Energy petal 2 (channels)");
+    fh_Califa_coinc_petal2->GetYaxis()->SetTitle("Energy petal 5 (channels)");
     fh_Califa_coinc_petal2->GetYaxis()->SetTitleOffset(1.2);
     fh_Califa_coinc_petal2->GetXaxis()->CenterTitle(true);
     fh_Califa_coinc_petal2->GetYaxis()->CenterTitle(true);
     fh_Califa_coinc_petal2->Draw("COLZ");
+
+    //CANVAS 7
+    cCalifa7 = new TCanvas("Califa_petal_1_vs_petal_4_proton",
+				    "Coinc. 1 vs 4 for proton range",
+				    10, 10, 500, 500);
+
+    fh_Califa_coinc_petal3 = new TH2F("fh_Califa_petal_1_vs_petal_4_proton_range","Califa coinc. petals 1 vs 4 for proton range",
+                                 bins, minE, maxE,bins, minE, maxE);
+    fh_Califa_coinc_petal3->GetXaxis()->SetTitle("Energy petal 1  (channels)");
+    fh_Califa_coinc_petal3->GetYaxis()->SetTitle("Energy petal 4 (channels)");
+    fh_Califa_coinc_petal3->GetYaxis()->SetTitleOffset(1.2);
+    fh_Califa_coinc_petal3->GetXaxis()->CenterTitle(true);
+    fh_Califa_coinc_petal3->GetYaxis()->CenterTitle(true);
+    fh_Califa_coinc_petal3->Draw("COLZ");
 
 
     //MAIN FOLDER-Califa
@@ -294,6 +362,7 @@ InitStatus R3BCalifaOnlineSpectra::Init() {
     mainfolCalifa->Add(cCalifa1);
     mainfolCalifa->Add(cCalifa2);
     mainfolCalifa->Add(cCalifa3);
+    mainfolCalifa->Add(cCalifa3b);//proton range, s444
     for(Int_t i=0; i<fCalifaNumPetals; i++){
       for (Int_t k=0;k<4;k++){
        mainfolCalifa->Add(cCalifa4[i][k]);
@@ -301,6 +370,7 @@ InitStatus R3BCalifaOnlineSpectra::Init() {
     }
     mainfolCalifa->Add(cCalifa5);
     mainfolCalifa->Add(cCalifa6);
+    mainfolCalifa->Add(cCalifa7);
     run->AddObject(mainfolCalifa);
 
     //Register command to reset histograms
@@ -326,6 +396,8 @@ void R3BCalifaOnlineSpectra::Reset_CALIFA_Histo()
    fh_Califa_cryId_energy->Reset();
    fh_Califa_coinc_petal1->Reset();
    fh_Califa_coinc_petal2->Reset();
+   fh_Califa_coinc_petal3->Reset();
+   fh_Califa_energy_per_petal[8]->Reset();//s444
 
     for(Int_t i=0; i<fCalifaNumPetals; i++){
       fh_Califa_energy_per_petal[i]->Reset();
@@ -338,6 +410,7 @@ void R3BCalifaOnlineSpectra::Reset_CALIFA_Histo()
 
    if(fCalON){
     fh_Califa_cryId_energy_cal->Reset();
+    fh_Califa_energy_per_petal_cal[8]->Reset();//s444
     for(Int_t i=0; i<fCalifaNumPetals; i++){
       fh_Califa_energy_per_petal_cal[i]->Reset();
       for(Int_t k=0;k<4;k++){
@@ -365,7 +438,22 @@ void R3BCalifaOnlineSpectra::Log_CALIFA_Histo()
         }
       }
     }
-
+    for(Int_t i=0; i<fCalifaNumPetals-1; i++){
+    cCalifa3->cd(i+1);
+    if(fLogScale){
+      gPad->SetLogy(0);
+    }else{
+      gPad->SetLogy(1);
+    }
+    }
+    for(Int_t i=0; i<2; i++){
+    cCalifa3b->cd(i+1);
+    if(fLogScale){
+      gPad->SetLogy(0);
+    }else{
+      gPad->SetLogy(1);
+    }
+    }
     if(fLogScale) fLogScale=kFALSE;
     else   fLogScale=kTRUE;
 }
@@ -383,6 +471,11 @@ void R3BCalifaOnlineSpectra::Map2Cal_CALIFA_Histo()
      for(Int_t i=0; i<fCalifaNumPetals; i++){
       cCalifa3->cd(i+1);
       fh_Califa_energy_per_petal[i]->Draw();
+     }
+
+     for(Int_t i=0; i<2; i++){
+      cCalifa3b->cd(i+1);
+      fh_Califa_energy_per_petal[6+i]->Draw();
      }
 
      for(Int_t i=0; i<fCalifaNumPetals; i++){
@@ -405,6 +498,11 @@ void R3BCalifaOnlineSpectra::Map2Cal_CALIFA_Histo()
      for(Int_t i=0; i<fCalifaNumPetals; i++){
       cCalifa3->cd(i+1);
       fh_Califa_energy_per_petal_cal[i]->Draw();
+     }
+
+     for(Int_t i=0; i<2; i++){
+      cCalifa3b->cd(i+1);
+      fh_Califa_energy_per_petal[6+i]->Draw();
      }
 
      for(Int_t i=0; i<fCalifaNumPetals; i++){
@@ -432,6 +530,11 @@ void R3BCalifaOnlineSpectra::Map2Cal_CALIFA_Histo()
       fh_Califa_energy_per_petal[i]->Draw();
      }
 
+     for(Int_t i=0; i<2; i++){
+      cCalifa3b->cd(i+1);
+      fh_Califa_energy_per_petal[6+i]->Draw();
+     }
+
      for(Int_t i=0; i<fCalifaNumPetals; i++){
       for(Int_t k=0;k<4;k++){
        for(Int_t j=0; j<16;j++){
@@ -452,6 +555,11 @@ void R3BCalifaOnlineSpectra::Map2Cal_CALIFA_Histo()
      for(Int_t i=0; i<fCalifaNumPetals; i++){
       cCalifa3->cd(i+1);
       fh_Califa_energy_per_petal_cal[i]->Draw();
+     }
+
+     for(Int_t i=0; i<2; i++){
+      cCalifa3b->cd(i+1);
+      fh_Califa_energy_per_petal_cal[6+i]->Draw();
      }
 
      for(Int_t i=0; i<fCalifaNumPetals; i++){
@@ -556,7 +664,8 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option) {
   if(fMappedItemsCalifa && fMappedItemsCalifa->GetEntriesFast()){
     Int_t nHits = fMappedItemsCalifa->GetEntriesFast();
 
-    Double_t E0=0., E1=0., E2=0., E5=0., E6=0.;
+    Double_t E0=0., E1=0., E2=0., E3=0., E4=0., E5=0., E6=0.;
+    Double_t E0p=0., E1p=0.;//proton range for petal 1 vs 3and4
 
     for (Int_t ihit = 0; ihit < nHits; ihit++){
       R3BCalifaMappedData* hit =
@@ -569,20 +678,32 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option) {
 
       fh_Califa_cryId_energy->Fill(cryId+1,hit->GetEnergy());
       //individual energy histo for each crystalId
-      fh_Califa_crystals [petal][cryId_petal]->Fill(hit->GetEnergy());
+      fh_Califa_crystals[petal][cryId_petal]->Fill(hit->GetEnergy());
       //energy(channels) sum for each petal
-      fh_Califa_energy_per_petal[petal]->Fill(hit->GetEnergy());
+      if(petal<7)fh_Califa_energy_per_petal[petal]->Fill(hit->GetEnergy());//s444
       if(petal==0)E0=E0+hit->GetEnergy();
       if(petal==1)E1=E1+hit->GetEnergy();
       if(petal==2)E2=E2+hit->GetEnergy();
+      if(petal==3)E3=E3+hit->GetEnergy();
+      if(petal==4)E4=E4+hit->GetEnergy();
       if(petal==5)E5=E5+hit->GetEnergy();
       if(petal==6)E6=E6+hit->GetEnergy();
+      //s444
+      if(petal==7&cryId>447&cryId<480){
+       E0p=E0p+hit->GetEnergy();
+       fh_Califa_energy_per_petal[petal]->Fill(hit->GetEnergy());
+      }
+      if(petal==7&cryId>479){
+       E1p=E1p+hit->GetEnergy();
+       fh_Califa_energy_per_petal[8]->Fill(hit->GetEnergy());
+      }
       //crystalId vs petal number
       fh_Califa_cryId_petal->Fill(cryId_petal+1, petal+1);
     }
 
-   if(E0+E1>0 && E5>0)fh_Califa_coinc_petal1->Fill(E0+E1, E5);
-   if(E2>0 && E6>0)fh_Califa_coinc_petal2->Fill(E2, E6);
+   if(E0>0 && E2+E3>0)fh_Califa_coinc_petal1->Fill(E0, E2+E3);
+   if(E1>0 && E4>0)fh_Califa_coinc_petal2->Fill(E1, E4);
+   if(E0p>0 && E1p>0)fh_Califa_coinc_petal3->Fill(E0p, E1p);
 
   }
 
@@ -602,7 +723,13 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option) {
       //individual energy histo for each crystalId
       fh_Califa_crystals_cal[petal][cryId_petal]->Fill(hit->GetEnergy());
       //energy(channels) sum for each petal
-      fh_Califa_energy_per_petal_cal[petal]->Fill(hit->GetEnergy());
+      if(petal<7)fh_Califa_energy_per_petal_cal[petal]->Fill(hit->GetEnergy());//s444
+      if(petal==7&cryId>447&cryId<480){
+       fh_Califa_energy_per_petal_cal[petal]->Fill(hit->GetEnergy());
+      }
+      if(petal==7&cryId>479){
+       fh_Califa_energy_per_petal_cal[8]->Fill(hit->GetEnergy());
+      }
     }
   }
   fNEvents += 1;
@@ -627,6 +754,7 @@ void R3BCalifaOnlineSpectra::FinishTask() {
       cCalifa1->Write();
       cCalifa2->Write();
       cCalifa3->Write();
+      cCalifa3b->Write();
       for(Int_t i=0; i<fCalifaNumPetals; i++){
         for(Int_t k=0;k<4;k++){
           cCalifa4[i][k]->Write();
@@ -634,6 +762,7 @@ void R3BCalifaOnlineSpectra::FinishTask() {
       }
       cCalifa5->Write();
       cCalifa6->Write();
+      cCalifa7->Write();
    }
 
 
@@ -679,6 +808,7 @@ void R3BCalifaOnlineSpectra::FinishTask() {
     //MyFile->Close();
   //}
 }
+
 
 Int_t R3BCalifaOnlineSpectra::Map_For_s444(Int_t val) {
   // With this mapping all the code can remain unchanged
@@ -813,10 +943,56 @@ Int_t R3BCalifaOnlineSpectra::Map_For_s444(Int_t val) {
                     408, 415, 414, 413, 412, 411, 410, 409,
                     390, 389, 388, 387, 386, 385, 384, 391,
                     392, 399, 398, 397, 396, 395, 394, 393};
+  Int_t nbcry=0;
   for(Int_t i=0; i<512;i++){
-    if(id_1[i]==val) return id_2[i];
+    if(id_1[i]==val)nbcry = id_2[i];
   }
-  return -1;
+
+  //New arrangement due to dual preamps
+  if(nbcry>=0&&nbcry<64){
+    nbcry=nbcry+128;//USC1: petal 3
+  }
+  else if(nbcry>63&&nbcry<80){
+    nbcry=nbcry-64+448+32;//USC2: proton range, preamp 1, section 1
+  }
+  else if(nbcry>79&&nbcry<96){
+    nbcry=nbcry-80+192;//USC2: gamma range, preamp 1, section 1
+  }
+  else if(nbcry>95&&nbcry<112){
+    nbcry=nbcry-96+448+48;//USC2: proton range, preamp 1, section 2
+  }
+  else if(nbcry>111&&nbcry<128){
+    nbcry=nbcry-112+192+16;//USC2: gamma range, preamp 1, section 2
+  }
+  else if(nbcry>127&&nbcry<144){
+    nbcry=nbcry-128+192+32;//USC2: preamp 2, section 1
+  }
+  else if(nbcry>143&&nbcry<160){
+    nbcry=nbcry-144+192+48;//USC2: preamp 2, section 2
+  }
+  else if(nbcry>159&&nbcry<176){
+    nbcry=nbcry-160+448;//TUDA1: proton range, preamp 1, section 1
+  }
+  else if(nbcry>175&&nbcry<192){
+    nbcry=nbcry-176;//TUDA1: gamma range, preamp 1, section 1
+  }
+  else if(nbcry>191&&nbcry<208){
+    nbcry=nbcry-192+448+16;//TUDA1: proton range, preamp 1, section 2
+  }
+  else if(nbcry>207&&nbcry<224){
+    nbcry=nbcry-208+16;//TUDA1: gamma range, preamp 1, section 2
+  }
+  else if(nbcry>223&&nbcry<240){
+    nbcry=nbcry-224+32;//TUDA1: preamp 2, section 1
+  }
+  else if(nbcry>239&&nbcry<256){
+    nbcry=nbcry-240+48;//TUDA1: preamp 2, section 2
+  }
+  else if(nbcry>447){
+    nbcry=nbcry-448+64;//TUDA2: petal 2
+  }
+
+  return nbcry;
 }
 
 ClassImp(R3BCalifaOnlineSpectra)

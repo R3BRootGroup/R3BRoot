@@ -141,15 +141,16 @@ class R3BCalifaOnlineSpectra : public FairTask {
 
   //Raw data
   TH2F* fh_Califa_cryId_petal;
-  TH1F* fh_Califa_energy_per_petal[N_MAX_PETALS];	
+  TH1F* fh_Califa_energy_per_petal[N_MAX_PETALS+1];//+1 for proton range:s444	
   TH1F* fh_Califa_crystals[N_MAX_PETALS][N_MAX_CRY];  
   TH2F* fh_Califa_cryId_energy;
   TH2F* fh_Califa_coinc_petal1;
   TH2F* fh_Califa_coinc_petal2;
+  TH2F* fh_Califa_coinc_petal3;
 
   //Cal data
   TH2F* fh_Califa_cryId_energy_cal;
-  TH1F* fh_Califa_energy_per_petal_cal[N_MAX_PETALS];
+  TH1F* fh_Califa_energy_per_petal_cal[N_MAX_PETALS+1];//+1 for proton range:s444
   TH1F* fh_Califa_crystals_cal[N_MAX_PETALS][N_MAX_CRY];
   
   TString fCalifaFile;        	        /**< Config file name. */
@@ -162,9 +163,11 @@ class R3BCalifaOnlineSpectra : public FairTask {
   TCanvas* cCalifa1;
   TCanvas* cCalifa2;
   TCanvas* cCalifa3;
+  TCanvas* cCalifa3b;//proton range
   TCanvas* cCalifa4[N_MAX_PETALS][4];
   TCanvas* cCalifa5;
   TCanvas* cCalifa6;
+  TCanvas* cCalifa7;
   
  public:
   ClassDef(R3BCalifaOnlineSpectra, 1)

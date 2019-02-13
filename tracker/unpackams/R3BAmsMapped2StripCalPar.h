@@ -46,8 +46,13 @@ class R3BAmsMapped2StripCalPar : public FairTask {
   
   /** Virtual method Search pedestals **/
   virtual void SearchPedestals();
+
+  /** Virtual method to print parameters **/
+  virtual void PrintParamsDaq();
   
   void SetOutputFile(const char *outFile);
+
+  void SetPrintParamsDaq(Bool_t print){fPrint=print;}
   
   /** Accessor functions **/
   const Int_t GetNumDetectors(){return fNumDets;}
@@ -74,7 +79,7 @@ class R3BAmsMapped2StripCalPar : public FairTask {
   void SetMinStadistics(Int_t minstad){fMinStadistics=minstad;}
   void SetMaxSigma(Double_t sigma){fMaxSigma=sigma;}
 
- protected:
+  protected:
   //Number of histograms, limits and bining
   Int_t fNumDets;
   Int_t fNumStrips;
@@ -84,11 +89,13 @@ class R3BAmsMapped2StripCalPar : public FairTask {
   Int_t fMapHistos_right;
   Int_t fMapHistos_bins;
   Int_t fMaxSigma;//Maximum sigma to mark dead strips, pedestal -1
+  Double_t parameters[8*1024][2];
 
   //Minimum stadistics and parameters
   Int_t fMinStadistics;
   Double_t fSigma;
   Double_t fMean;
+  Bool_t fPrint;
 
   R3BAmsStripCalPar* fStrip_Par;  /**< Parameter container. >*/ 
   TClonesArray* fAmsMappedDataCA; /**< Array with AMS Mapped- input data. >*/

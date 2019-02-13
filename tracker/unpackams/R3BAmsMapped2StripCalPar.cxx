@@ -45,6 +45,7 @@ R3BAmsMapped2StripCalPar::R3BAmsMapped2StripCalPar() :
   fMapHistos_bins(4000),
   fSigma(0),
   fMean(0),
+  fPrint(kFALSE),
   fOutputFile(NULL) {
   
 }
@@ -65,6 +66,7 @@ R3BAmsMapped2StripCalPar::R3BAmsMapped2StripCalPar(const char* name, Int_t iVerb
   fMapHistos_bins(4000),
   fSigma(0),
   fMean(0),
+  fPrint(kFALSE),
   fOutputFile(NULL) {
   
 }
@@ -145,7 +147,44 @@ void R3BAmsMapped2StripCalPar::FinishEvent() {
 void R3BAmsMapped2StripCalPar::FinishTask() {
   
   SearchPedestals();
+  if(fPrint)PrintParamsDaq();
   //fStrip_Par->printParams();
+}
+
+//------------------
+void R3BAmsMapped2StripCalPar::PrintParamsDaq(){
+
+  LOG(INFO) << "R3BAmsMapped2StripCalPar: Print parameters for DAQ" << FairLogger::endl;
+
+  FILE *fOut1=fopen("sidped.txt","wt");
+  FILE *fOut2=fopen("sidsig_r.txt","wt");
+  FILE *fOut3=fopen("sidsig.txt","wt");
+
+  //Values taken from /u/land/.old/siderem 
+  //This was implemented for the experiment s444
+  //For other experiments one should revise the numbers
+  Double_t cn_limit = 15.;
+  Float_t threshold1 = 4.0;
+  Float_t threshold2 = 2.;
+
+  for(Int_t d=0;d<fNumDets;d++){
+    fprintf(fOut1,"50%i20000\n",d+1);		
+    fprintf(fOut2,"50%i20000\n",d+1);		
+    fprintf(fOut3,"50%i20000\n",d+1);
+    for (Int_t i=1;i<=fNumStrips;i++){
+     fprintf(fOut1,"%4x ", int(8.*parameters[d*fNumStrips +i-1][0]));
+     fprintf(fOut2,"%4x ", int(8.*TMath::Min(threshold1*parameters[d*fNumStrips +i-1][1],cn_limit)));		
+     fprintf(fOut3,"%4x ", int(8.*threshold2 * parameters[d*fNumStrips +i-1][1]));
+     if(i && !(i%16)){
+	fprintf(fOut1,"\n");		
+	fprintf(fOut2,"\n");		
+	fprintf(fOut3,"\n");
+     }
+    }
+  }
+  fclose(fOut1);
+  fclose(fOut2);
+  fclose(fOut3);
 }
 
 //------------------
@@ -165,13 +204,12 @@ void R3BAmsMapped2StripCalPar::SearchPedestals(){
   char Name[255];
   cPar->Divide(2,2);
 
-  int nbstrip=0;
+  Int_t nbstrip=0;
+  for(Int_t d=0;d<fNumDets*fNumStrips;d++)for (Int_t i=0;i<2;i++)parameters[d][i]=0.;
 
   for(Int_t d=0;d<fNumDets;d++){
-   double x[fNumStrips],y[fNumStrips];
-
+   Double_t x[fNumStrips],y[fNumStrips];
    sprintf(Name, "AMS_%d", d);
-   //cPar[d] = new TCanvas(Name,Name,0,0,600,400);
 
    for (Int_t i=0;i<fNumStrips;i++){
     x[i]=0.;y[i]=0.;
@@ -187,6 +225,10 @@ void R3BAmsMapped2StripCalPar::SearchPedestals(){
 
       y[i]=f1->GetParameter(2);
       x[i]=i;
+
+      //Parameters for DAQ
+      parameters[d*fNumStrips+i][0]=f1->GetParameter(1);
+      parameters[d*fNumStrips+i][1]=f1->GetParameter(2);
 
       //Fill container:
       fStrip_Par->SetStripCalParams(f1->GetParameter(0),nbstrip);
