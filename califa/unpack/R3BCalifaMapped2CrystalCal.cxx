@@ -34,6 +34,7 @@ R3BCalifaMapped2CrystalCal::R3BCalifaMapped2CrystalCal() :
   NumParams(0),
   CalParams(NULL),
   fCal_Par(NULL),
+  fOnline(kFALSE),
   fCalifaMappedDataCA(NULL),
   fCalifaCryCalDataCA(NULL)
 {
@@ -54,15 +55,15 @@ void R3BCalifaMapped2CrystalCal::SetParContainers() {
   //Reading califaCrystalCalPar from FairRuntimeDb
   FairRuntimeDb* rtdb = FairRuntimeDb::instance();
   if (!rtdb) { 
-    LOG(ERROR)<<"FairRuntimeDb not opened!"<<FairLogger::endl;
+    LOG(ERROR)<<"R3BCalifaMapped2CrystalCal:: FairRuntimeDb not opened!"<<FairLogger::endl;
   }
   
   fCal_Par=(R3BCalifaCrystalCalPar*)rtdb->getContainer("califaCrystalCalPar");
   if (!fCal_Par) {
-    LOG(ERROR)<<"R3BCalifaMapped2CrystalCalPar::Init() Couldn't get handle on califaCrystalCalPar container"<<FairLogger::endl;
+    LOG(ERROR)<<"R3BCalifaMapped2CrystalCal::Init() Couldn't get handle on califaCrystalCalPar container"<<FairLogger::endl;
   }
   if (fCal_Par){
-    LOG(INFO)<<"R3BCalifaMapped2CrystalCalPar:: califaCrystalCalPar container open"<<FairLogger::endl;
+    LOG(INFO)<<"R3BCalifaMapped2CrystalCal:: califaCrystalCalPar container open"<<FairLogger::endl;
   }
 }
 
@@ -78,6 +79,8 @@ void R3BCalifaMapped2CrystalCal::SetParameter(){
   CalParams->Set(array_size);	
   CalParams=fCal_Par->GetCryCalParams();//Array with the Cal parameters
   
+  LOG(INFO)<<"R3BCalifaMapped2CrystalCal:: Max Crystal ID "<<NumCrystals<<FairLogger::endl;
+  LOG(INFO)<<"R3BCalifaMapped2CrystalCal:: Nb of parameters used in the fits "<<NumParams<<FairLogger::endl;
   
 }
 
@@ -87,7 +90,10 @@ void R3BCalifaMapped2CrystalCal::SetParameter(){
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BCalifaMapped2CrystalCal::Init()
-{ 
+{
+
+  LOG(INFO)<<"R3BCalifaMapped2CrystalCal::Init()"<<FairLogger::endl;
+
   //INPUT DATA
   FairRootManager* rootManager = FairRootManager::Instance();
   if (!rootManager) { return kFATAL;}
@@ -98,7 +104,11 @@ InitStatus R3BCalifaMapped2CrystalCal::Init()
   //OUTPUT DATA
   //Calibrated data
   fCalifaCryCalDataCA = new TClonesArray("R3BCalifaCrystalCalData",10);
-  rootManager->Register("CalifaCrystalCalData", "CALIFA Crystal Cal", fCalifaCryCalDataCA, kTRUE);
+  if(!fOnline){
+    rootManager->Register("CalifaCrystalCalData", "CALIFA Crystal Cal", fCalifaCryCalDataCA, kTRUE);
+  }else{
+    rootManager->Register("CalifaCrystalCalData", "CALIFA Crystal Cal", fCalifaCryCalDataCA, kFALSE);
+  }
   
   SetParameter();
   return kSUCCESS;

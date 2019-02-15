@@ -168,17 +168,27 @@ void R3BAmsMapped2StripCalPar::PrintParamsDaq(){
   Float_t threshold2 = 2.;
 
   for(Int_t d=0;d<fNumDets;d++){
-    fprintf(fOut1,"50%i20000\n",d+1);		
+    if(d<2){
+    fprintf(fOut1,"50%i20000\n",d+1);//sam+gtb+siderem+20000	
     fprintf(fOut2,"50%i20000\n",d+1);		
     fprintf(fOut3,"50%i20000\n",d+1);
+        std::cout << "50"<< d+1<<"20000\n"<< std::endl;
+    }else{
+    fprintf(fOut1,"51%i20000\n",d-1);//sam+gtb+siderem+20000	
+    fprintf(fOut2,"51%i20000\n",d-1);		
+    fprintf(fOut3,"51%i20000\n",d-1);
+        std::cout << "51"<< d-1<<"20000\n"<< std::endl;
+    }
     for (Int_t i=1;i<=fNumStrips;i++){
      fprintf(fOut1,"%4x ", int(8.*parameters[d*fNumStrips +i-1][0]));
      fprintf(fOut2,"%4x ", int(8.*TMath::Min(threshold1*parameters[d*fNumStrips +i-1][1],cn_limit)));		
      fprintf(fOut3,"%4x ", int(8.*threshold2 * parameters[d*fNumStrips +i-1][1]));
+     std::cout << "\t " << int(parameters[d*fNumStrips +i-1][0]);
      if(i && !(i%16)){
 	fprintf(fOut1,"\n");		
 	fprintf(fOut2,"\n");		
 	fprintf(fOut3,"\n");
+        std::cout << std::endl;
      }
     }
   }

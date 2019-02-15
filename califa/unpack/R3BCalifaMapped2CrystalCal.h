@@ -48,7 +48,9 @@ class R3BCalifaMapped2CrystalCal : public FairTask {
   
   /** Virtual method Finish **/
   virtual void Finish();
-  
+
+  /** Accessor to select online mode **/
+  void SetOnline(Bool_t option){fOnline=option;} 
   
  private:
   
@@ -57,6 +59,8 @@ class R3BCalifaMapped2CrystalCal : public FairTask {
   Int_t NumCrystals=0;
   Int_t NumParams=0;
   TArrayF* CalParams;
+  //Don't store data for online
+  Bool_t fOnline;
   
   R3BCalifaCrystalCalPar* fCal_Par;  /**< Parameter container. >*/ 
   TClonesArray* fCalifaMappedDataCA; /**< Array with CALIFA Mapped- input data. >*/

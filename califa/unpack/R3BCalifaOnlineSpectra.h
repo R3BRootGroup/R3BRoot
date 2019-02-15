@@ -129,6 +129,7 @@ class R3BCalifaOnlineSpectra : public FairTask {
 
   TClonesArray* fMappedItemsCalifa;     /**< Array with mapped items. */
   TClonesArray* fCalItemsCalifa;        /**< Array with cal items. */
+  TClonesArray* fHitItemsCalifa;        /**< Array with hit items. */
   
   // check for trigger should be done globablly (somewhere else)
   R3BEventHeader* header;               /**< Event header. */
@@ -138,6 +139,9 @@ class R3BCalifaOnlineSpectra : public FairTask {
   Int_t fCalifaNumPetals;              	/**< Number of Petals. */
   Int_t fNumCrystalPetal;        	/**< Crystals per Petal. */
   Int_t fOrderFebexPreamp[16];          /**< Selector for febex or preamp sequence. */  
+  //Multiplicities
+  TH1F* fh_Califa_Mult[N_MAX_PETALS+1];  
+  TH1F* fh_Califa_MultHit[N_MAX_PETALS+1];  
 
   //Raw data
   TH2F* fh_Califa_cryId_petal;
@@ -152,6 +156,10 @@ class R3BCalifaOnlineSpectra : public FairTask {
   TH2F* fh_Califa_cryId_energy_cal;
   TH1F* fh_Califa_energy_per_petal_cal[N_MAX_PETALS+1];//+1 for proton range:s444
   TH1F* fh_Califa_crystals_cal[N_MAX_PETALS][N_MAX_CRY];
+
+  //Hit data
+  TH2F* fh_Califa_theta_phi;
+  TH2F* fh_Califa_theta_energy[N_MAX_PETALS];
   
   TString fCalifaFile;        	        /**< Config file name. */
   Bool_t  fCalON;                 	/**< Cal selector. */
@@ -168,7 +176,10 @@ class R3BCalifaOnlineSpectra : public FairTask {
   TCanvas* cCalifa5;
   TCanvas* cCalifa6;
   TCanvas* cCalifa7;
-  
+  TCanvas* cCalifa8;
+  TCanvas* cCalifa_hitpetal[N_MAX_PETALS];
+  TCanvas* cCalifa10;
+
  public:
   ClassDef(R3BCalifaOnlineSpectra, 1)
 };
