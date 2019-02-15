@@ -57,6 +57,7 @@ unpackams/R3BAmsMapped2StripCalPar.cxx
 unpackams/R3BAmsMapped2StripCal.cxx
 unpackams/R3BAmsStripCal2Hit.cxx
 unpackams/R3BAmsOnlineSpectra.cxx
+unpackams/R3BAmsCalifaCorrelatedOnlineSpectra.cxx
 )
 
 # fill list of header files from list of source files

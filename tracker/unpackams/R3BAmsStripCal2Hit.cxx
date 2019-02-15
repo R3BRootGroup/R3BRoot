@@ -121,7 +121,7 @@ void R3BAmsStripCal2Hit::Exec(Option_t* option)
   }
 
   Int_t nfoundS=0, nfoundK=0;
-  TSpectrum *ss= new TSpectrum(100);
+  TSpectrum *ss= new TSpectrum(1000);
   for(Int_t i = 0; i < fMaxNumDet; i++){
    // Looking for hits in side S
    nfoundS = ss->Search(hams[i*2],1.,"goff",0.0001);

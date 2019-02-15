@@ -48,6 +48,9 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask {
   
   /** Virtual method Search peaks and calibrate **/
   virtual void SearchPeaks();
+
+  /** Method to Search for preamp ranges **/
+  bool Searchrange(Int_t val);
   
   void SetOutputFile(const char *outFile);
   
@@ -68,6 +71,9 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask {
   void SetCalRange_left(Int_t Histos_left){fMapHistos_left=Histos_left;}
   void SetCalRange_right(Int_t Histos_right){fMapHistos_right=Histos_right;}
   void SetCalRange_bins(Int_t Histos_bins){fMapHistos_bins=Histos_bins;}
+  void SetCalRangeP_left(Int_t Histos_left){fMapHistos_leftp=Histos_left;}
+  void SetCalRangeP_right(Int_t Histos_right){fMapHistos_rightp=Histos_right;}
+  void SetCalRangeP_bins(Int_t Histos_bins){fMapHistos_binsp=Histos_bins;}
   void SetNumPeaks(Int_t numberpeaks){fNumPeaks=numberpeaks;}
   void SetSigma(Double_t sigma){fSigma=sigma;}
   void SetThreshold(Double_t threshold){fThreshold=threshold;}
@@ -85,9 +91,12 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask {
  protected:
   
   Int_t fNumCrystals;
-  Int_t fMapHistos_left;		
+  Int_t fMapHistos_left;//gamma range		
   Int_t fMapHistos_right;
   Int_t fMapHistos_bins;
+  Int_t fMapHistos_leftp;//particle range		
+  Int_t fMapHistos_rightp;
+  Int_t fMapHistos_binsp;
   
   Int_t fNumParam;
   Int_t fMinStadistics;

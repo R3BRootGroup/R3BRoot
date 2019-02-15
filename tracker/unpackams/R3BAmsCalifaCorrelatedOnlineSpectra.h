@@ -1,11 +1,11 @@
-// ------------------------------------------------------------
-// -----                  R3BAmsOnlineSpectra             -----
-// -----    Created 22/07/18  by J.L. Rodriguez-Sanchez   -----
-// -----           Fill AMS online histograms             -----
-// ------------------------------------------------------------
+// --------------------------------------------------------------
+// -----       R3BAmsCalifaCorrelatedOnlineSpectra             --
+// -----    Created 17/02/19  by J.L. Rodriguez-Sanchez        --
+// ----- Fill AMS and CALIFA correlations in online histograms --
+// --------------------------------------------------------------
 
-#ifndef R3BAmsOnlineSpectra_H
-#define R3BAmsOnlineSpectra_H
+#ifndef R3BAmsCalifaCorrelatedOnlineSpectra_H
+#define R3BAmsCalifaCorrelatedOnlineSpectra_H
 
 #include "FairTask.h"
 #include <sstream>
@@ -21,16 +21,17 @@ class TClonesArray;
 class R3BEventHeader;
 
 /**
- * This taks reads AMS data and plots online histograms 
+ *  This taks reads hit data from AMS and califa detectors and plots
+ *  online histograms 
  */
-class R3BAmsOnlineSpectra : public FairTask {
+class R3BAmsCalifaCorrelatedOnlineSpectra : public FairTask {
   
  public:
   /**
    * Default constructor.
    * Creates an instance of the task with default parameters.
    */
-  R3BAmsOnlineSpectra();
+  R3BAmsCalifaCorrelatedOnlineSpectra();
   
   /**
    * Standard constructor.
@@ -38,13 +39,13 @@ class R3BAmsOnlineSpectra : public FairTask {
    * @param name a name of the task.
    * @param iVerbose a verbosity level.
    */
-  R3BAmsOnlineSpectra(const char* name, Int_t iVerbose = 1);
+  R3BAmsCalifaCorrelatedOnlineSpectra(const char* name, Int_t iVerbose = 1);
   
   /**
    * Destructor.
    * Frees the memory used by the object.
    */
-  virtual ~R3BAmsOnlineSpectra();
+  virtual ~R3BAmsCalifaCorrelatedOnlineSpectra();
   
   /**
    * Method for task initialization.
@@ -81,13 +82,13 @@ class R3BAmsOnlineSpectra : public FairTask {
   void SetNumDet(Int_t NbDet){fNbDet=NbDet;}
 
 
-  void Reset_AMS_Histo();
+  void Reset_AMS_CALIFA_Histo();
   
  private:
   
-  TClonesArray* fMappedItemsAms;     /**< Array with mapped items. */
-  TClonesArray* fCalItemsAms;        /**< Array with cal items. */
-  TClonesArray* fHitItemsAms;        /**< Array with hit items. */
+  TClonesArray* fHitItemsAms;        /**< Array with AMS hit items. */
+  TClonesArray* fHitItemsCalifa;     /**< Array with CALIFA hit items. */
+
   
   // check for trigger should be done globablly (somewhere else)
   R3BEventHeader* header;            /**< Event header. */
@@ -102,14 +103,13 @@ class R3BAmsOnlineSpectra : public FairTask {
   TH2F* fh_Ams_energy_allCalStrips[8];
   TH2F* fh_Ams_hit_Pos[4];
   TH2F* fh_Ams_hit_E[4];
-  TH2F* fh_Ams_hit_E_theta[4];
   TH1F* fh_Ams_hit_Mul[4];
   
   //TString fAmsFile;        	      /**< Config file name. */
   Int_t fNbDet;                       /**< Number of AMS detectors. */
   
  public:
-  ClassDef(R3BAmsOnlineSpectra, 1)
+  ClassDef(R3BAmsCalifaCorrelatedOnlineSpectra, 1)
 };
 
 #endif
