@@ -71,12 +71,20 @@ class R3BCalifaCrystalCal2Hit : public FairTask
      *@param Lacl  Double parameter used to set the experimental resolution in % for LaCl
      **/
     void SetPhoswichResolution(Double_t LaBr, Double_t LaCl);
+
     /** Public method SetDetectionThreshold
      **
      ** Defines the minimum energy requested in a crystal to be considered in a calorimeter Hit
      *@param thresholdEne  Double parameter used to set the threshold
      **/
     void SetDetectionThreshold(Double_t thresholdEne);
+
+    /** Public method SetDRThreshold
+     **
+     ** Defines the minimum energy requested in a crystal to be considered in a calorimeter Hit
+     *@param thresholdEne  Double parameter used to set the threshold
+     **/
+    void SetDRThreshold(Double_t DRthresholdEne);
 
     /** Public method SetAngularWindow
      **
@@ -125,6 +133,8 @@ class R3BCalifaCrystalCal2Hit : public FairTask
     Int_t fGeometryVersion;
     // Minimum energy requested in a crystal to be considered in a calorimeter Hit
     Double_t fThreshold;
+    // Threshold for selecting gamma or proton branch in double reading channels
+    Double_t fDRThreshold;
     // Experimental resolution @ 1 MeV
     Double_t fCrystalResolution;
     // Experimental resolution for Nf and Ns
