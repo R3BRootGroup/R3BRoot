@@ -1,9 +1,10 @@
-#ifndef R3BNEULANDMAPPED2CALPAR_H
-#define R3BNEULANDMAPPED2CALPAR_H
+#ifndef R3BNEULANDTACQUILAMAPPED2CALPAR_H
+#define R3BNEULANDTACQUILAMAPPED2CALPAR_H
 
 #include "FairTask.h"
 
 class R3BTCalPar;
+class TClonesArray;
 class R3BEventHeader;
 class R3BTCalEngine;
 
@@ -15,7 +16,7 @@ class R3BTCalEngine;
  * @author D. Kresan
  * @since September 7, 2015
  */
-class R3BNeulandMapped2CalPar : public FairTask
+class R3BNeulandTacquilaMapped2CalPar : public FairTask
 {
 
   public:
@@ -23,7 +24,7 @@ class R3BNeulandMapped2CalPar : public FairTask
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BNeulandMapped2CalPar();
+    R3BNeulandTacquilaMapped2CalPar();
 
     /**
      * Standard constructor.
@@ -31,13 +32,13 @@ class R3BNeulandMapped2CalPar : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BNeulandMapped2CalPar(const char* name, Int_t iVerbose = 1);
+    R3BNeulandTacquilaMapped2CalPar(const char* name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BNeulandMapped2CalPar();
+    virtual ~R3BNeulandTacquilaMapped2CalPar();
 
     /**
      * Method for task initialization.
@@ -68,6 +69,12 @@ class R3BNeulandMapped2CalPar : public FairTask
     virtual void FinishTask();
 
     /**
+     * Method for setting the update rate.
+     * @param rate an update rate value (events).
+     */
+    inline void SetUpdateRate(Int_t rate) { fUpdateRate = rate; }
+
+    /**
      * Method for setting minimum required statistics per module.
      * Only detector modules with number of entries in TDC
      * distribution greater than minimum statistics will be
@@ -86,23 +93,14 @@ class R3BNeulandMapped2CalPar : public FairTask
      * Method for setting number of modules in NeuLAND setup.
      * @param nPMTs a number of photomultipliers.
      */
-    inline void SetNofModules(Int_t nPlanes, Int_t nBars)
-    {
-        fNofPlanes = nPlanes;
-        fNofBarsPerPlane = nBars;
-        fNofPMTs = nPlanes * nBars * 4;
-    }
+    inline void SetNofModules(Int_t nPMTs) { fNofPMTs = nPMTs; }
 
   private:
-    Int_t fMinStats; /**< Minimum statistics required per module. */
-    Int_t fTrigger;  /**< Trigger value. */
+    Int_t fUpdateRate; /**< An update rate. */
+    Int_t fMinStats;   /**< Minimum statistics required per module. */
+    Int_t fTrigger;    /**< Trigger value. */
 
-    Int_t fNofPlanes;       /**< Number of photomultipliers. */
-    Int_t fNofBarsPerPlane; /**< Number of photomultipliers. */
-    Int_t fNofPMTs;         /**< Number of NeuLAND modules. */
-
-    Int_t checkcounts;
-    Int_t counts[60][50][4];
+    Int_t fNofPMTs; /**< Number of NeuLAND modules. */
 
     Int_t fNEvents;         /**< Event counter. */
     R3BTCalPar* fCal_Par;   /**< Parameter container. */
@@ -112,7 +110,7 @@ class R3BNeulandMapped2CalPar : public FairTask
     R3BTCalEngine* fEngine; /**< Instance of the TCAL engine. */
 
   public:
-    ClassDef(R3BNeulandMapped2CalPar, 1)
+    ClassDef(R3BNeulandTacquilaMapped2CalPar, 1)
 };
 
 #endif

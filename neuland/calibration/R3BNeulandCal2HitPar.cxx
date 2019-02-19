@@ -53,7 +53,9 @@ const Double_t C_LIGHT = 29.9792458; // Speed of light [cm/ns]
 // const Double_t paddle_spacing = 10.4;                 // cm LAND parameter
 const Double_t PADDLE_SPACING = 5.0; // cm NeuLAND parameter
 
-const Double_t MINIMUM_IONIZING = 1.15;
+const Double_t MINIMUM_IONIZING = 2.30; // vadim 1.15 ???
+
+using namespace std;
 
 bool n_calib_mean::calc_params(ident_no_set& bad_fit_idents, val_err_inv& mean)
 {
@@ -96,7 +98,7 @@ bool n_calib_mean::analyse_history(ident_no_set& bad_fit_idents)
     return true;
 }
 
-bool n_calib_diff::calc_params(ident_no_set& bad_fit_idents, Double_t y0[2], Double_t dydx[2])
+Bool_t n_calib_diff::calc_params(ident_no_set& bad_fit_idents, Double_t y0[3], Double_t dydx[2])
 {
     TF1 fit = TF1("linear_fit", "[1]*x+[0]");
     TGraph plot;
@@ -112,6 +114,7 @@ bool n_calib_diff::calc_params(ident_no_set& bad_fit_idents, Double_t y0[2], Dou
     {
         y0[0] = NAN;
         y0[1] = NAN;
+        y0[2] = NAN;
         dydx[0] = NAN;
         dydx[1] = NAN;
 
@@ -124,6 +127,16 @@ bool n_calib_diff::calc_params(ident_no_set& bad_fit_idents, Double_t y0[2], Dou
     dydx[0] = fit.GetParameter(1);
     dydx[1] = fit.GetParError(1);
 
+    /*TH1F* resolution = new TH1F("resolution", "resolution", 1000, -50, 50);
+
+    for (UInt_t k = 0; k < _data.size(); k++)
+      if (bad_fit_idents.find(_data[k]._ident_no) == bad_fit_idents.end()){
+        resolution->Fill(_data[k]._pos_diff - _data[k]._pos_track*dydx[0]);
+      }
+
+    resolution->Draw("colz");
+    y0[2] = resolution->GetStdDev();
+    */
     return true;
 }
 
@@ -238,6 +251,7 @@ R3BNeulandCal2HitPar::R3BNeulandCal2HitPar()
     : FairTask("R3BNeulandCal2HitPar")
     , fPar(NULL)
     , fLandPmt(NULL)
+    , fMappedLos(NULL)
 {
 }
 
@@ -245,6 +259,7 @@ R3BNeulandCal2HitPar::R3BNeulandCal2HitPar(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fPar(NULL)
     , fLandPmt(NULL)
+    , fMappedLos(NULL)
 {
 }
 
@@ -282,6 +297,13 @@ InitStatus R3BNeulandCal2HitPar::Init()
     {
         LOG(fatal) << "FairRootManager not found";
         return kFATAL;
+    }
+
+    fMappedLos = (TClonesArray*)fMan->GetObject("LosMapped");
+
+    if (NULL == fMappedLos)
+    {
+        LOG(info) << "Branch LosMapped not found, its ok";
     }
 
     fLandPmt = (TClonesArray*)fMan->GetObject("NeulandCalData");
@@ -335,14 +357,21 @@ InitStatus R3BNeulandCal2HitPar::Init()
 
 void R3BNeulandCal2HitPar::Exec(Option_t* option)
 {
-    if (++fEventNumber % 100000 == 0)
-        LOG(INFO) << "R3BNeulandCal2HitPar::Exec : Event: " << fEventNumber << "accepted Events: " << nData;
 
+    if (fMappedLos && fMappedLos->GetEntriesFast() > 0)
+        return;
+
+    if (++fEventNumber % 100000 == 0)
+    {
+        char output[128];
+        sprintf(output, "R3BNeulandCal2HitPar::Exec : Event: %8d,    accepted Events: %8d", fEventNumber, nData);
+        LOG(INFO) << "\r" << output << FairLogger::flush;
+    }
     Int_t nItems = fLandPmt->GetEntriesFast();
 
     if (nItems < 12)
     {
-        LOG(DEBUG) << "Event cannot be used: too few hits!" << FairLogger::endl;
+        LOG(DEBUG) << "Event cannot be used: too few hits : " << nItems << "!" << FairLogger::endl;
         return;
     }
 
@@ -379,9 +408,9 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option)
                 hm[pl] |= ULong_t(1) << pdl;
         }
 
-        if (items < 6)
+        if (items < 4)
         {
-            LOG(DEBUG) << "Event cannot be used: too few hits!" << FairLogger::endl;
+            LOG(DEBUG) << "Event cannot be used: too few hits : " << items << "!" << FairLogger::endl;
             return;
         }
     }
@@ -509,13 +538,13 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option)
                         y_plot->SetPoint(n_y++, pl + 0.5, pdl + 0.5);
                 }
 
-        if (x_plot->GetN() < 3)
+        if (x_plot->GetN() < 2)
         {
             LOG(DEBUG) << "failed: checking impossible, abort (rather have fewer, than bad ones!)" << FairLogger::endl;
             return;
         }
 
-        if (y_plot->GetN() < 3)
+        if (y_plot->GetN() < 2)
         {
             LOG(DEBUG) << "failed: checking impossible, abort (rather have fewer, than bad ones!)" << FairLogger::endl;
             return;
@@ -568,8 +597,8 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option)
          * fabs(dxdz*plane-x+x0) > VALUE*VALUE*(dxdz*dxdz+1)
          */
 
-        Double_t max_dist_scaled_x = 0.5 * sqrt(dxdz * dxdz + 1);
-        Double_t max_dist_scaled_y = 0.5 * sqrt(dydz * dydz + 1);
+        Double_t max_dist_scaled_x = 1.0 * sqrt(dxdz * dxdz + 1);
+        Double_t max_dist_scaled_y = 1.0 * sqrt(dydz * dydz + 1);
 
         Int_t bad_x = 0;
         Int_t bad_y = 0;
@@ -985,7 +1014,7 @@ void R3BNeulandCal2HitPar::FinishTask()
     LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : "
               << "Collecting and fitting history: t-diff" << FairLogger::endl;
 
-    Double_t tdiff[fPlanes][fPaddles][2];
+    Double_t tdiff[fPlanes][fPaddles][3];
     Double_t invveff[fPlanes][fPaddles][2];
 
     for (Int_t pl = 0; pl < fPlanes; pl++)

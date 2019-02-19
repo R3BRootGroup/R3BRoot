@@ -77,10 +77,10 @@ InitStatus R3BNeulandTcal::Init()
             FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch R3BEventHeader not found");
         }
     */
-    fMappedHit = (TClonesArray*)mgr->GetObject("NeulandTamexMappedData");
+    fMappedHit = (TClonesArray*)mgr->GetObject("NeulandMappedData");
     if (NULL == fMappedHit)
     {
-        LOG(fatal) << "Branch R3BNeulandTamexMappedData not found";
+        LOG(fatal) << "Branch NeulandMappedData not found";
     }
 
     mgr->Register("NeulandPmt", "Land", fPmt, kTRUE);

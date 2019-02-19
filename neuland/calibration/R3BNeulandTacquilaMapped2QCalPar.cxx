@@ -1,30 +1,30 @@
-#include "R3BNeulandMapped2QCalPar.h"
+#include "R3BNeulandTacquilaMapped2QCalPar.h"
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
 #include "R3BEventHeader.h"
-#include "R3BNeulandMappedData.h"
 #include "R3BNeulandQCalPar.h"
+#include "R3BNeulandTacquilaMappedData.h"
 #include "R3BTCalEngine.h"
 #include "TClonesArray.h"
 #include "TH1F.h"
 
 #define nPMTs 2 * fPaddles* fPlanes
 
-R3BNeulandMapped2QCalPar::R3BNeulandMapped2QCalPar(const char* name, Int_t iVerbose)
+R3BNeulandTacquilaMapped2QCalPar::R3BNeulandTacquilaMapped2QCalPar(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fPar(NULL)
     , fHits(NULL)
 {
 }
 
-R3BNeulandMapped2QCalPar::R3BNeulandMapped2QCalPar()
-    : FairTask("R3BNeulandMapped2QCalPar")
+R3BNeulandTacquilaMapped2QCalPar::R3BNeulandTacquilaMapped2QCalPar()
+    : FairTask("R3BNeulandTacquilaMapped2QCalPar")
     , fPar(NULL)
     , fHits(NULL)
 {
 }
 
-R3BNeulandMapped2QCalPar::~R3BNeulandMapped2QCalPar()
+R3BNeulandTacquilaMapped2QCalPar::~R3BNeulandTacquilaMapped2QCalPar()
 {
     if (fData.size() > 0)
         for (Int_t plane = fPlanes - 1; plane >= 0; plane--)
@@ -36,7 +36,7 @@ R3BNeulandMapped2QCalPar::~R3BNeulandMapped2QCalPar()
         delete fPar;
 }
 
-InitStatus R3BNeulandMapped2QCalPar::Init()
+InitStatus R3BNeulandTacquilaMapped2QCalPar::Init()
 {
     FairRootManager* fMan = FairRootManager::Instance();
     if (!fMan)
@@ -44,10 +44,10 @@ InitStatus R3BNeulandMapped2QCalPar::Init()
         LOG(fatal) << " FairRootManager not found.";
         return kFATAL;
     }
-    fHits = (TClonesArray*)fMan->GetObject("NeulandMappedData");
+    fHits = (TClonesArray*)fMan->GetObject("NeulandTacquilaMappedData");
     if (!fHits)
     {
-        LOG(fatal) << " Branch: NeulandMappedData not found in Tree.";
+        LOG(fatal) << " Branch: NeulandTacquilaMappedData not found in Tree.";
         return kFATAL;
     }
     header = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
@@ -81,9 +81,9 @@ InitStatus R3BNeulandMapped2QCalPar::Init()
     return kSUCCESS;
 }
 
-void R3BNeulandMapped2QCalPar::Exec(Option_t* option)
+void R3BNeulandTacquilaMapped2QCalPar::Exec(Option_t* option)
 {
-    R3BNeulandMappedData* hit;
+    R3BNeulandTacquilaMappedData* hit;
     Int_t nHits = fHits->GetEntries();
 
     if (header->GetTrigger() != 2)
@@ -94,7 +94,7 @@ void R3BNeulandMapped2QCalPar::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        hit = (R3BNeulandMappedData*)fHits->At(i);
+        hit = (R3BNeulandTacquilaMappedData*)fHits->At(i);
         if (!hit)
             continue;
 
@@ -102,7 +102,7 @@ void R3BNeulandMapped2QCalPar::Exec(Option_t* option)
     }
 }
 
-void R3BNeulandMapped2QCalPar::FinishTask()
+void R3BNeulandTacquilaMapped2QCalPar::FinishTask()
 {
     Int_t i = 0;
     TH1F* pars = new TH1F("QCalPar", "Pedestal Offset", nPMTs, 0.5, nPMTs + 0.5);
@@ -121,4 +121,4 @@ void R3BNeulandMapped2QCalPar::FinishTask()
     fPar->setChanged();
 }
 
-ClassImp(R3BNeulandMapped2QCalPar)
+ClassImp(R3BNeulandTacquilaMapped2QCalPar)

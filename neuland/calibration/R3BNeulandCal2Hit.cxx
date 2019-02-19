@@ -31,8 +31,7 @@ InitStatus R3BNeulandCal2Hit::Init()
 
 void R3BNeulandCal2Hit::SetParContainers()
 {
-    FairRuntimeDb* rtdb = FairRunAna::Instance()->GetRuntimeDb();
-    fPar = (R3BNeulandHitPar*)rtdb->getContainer("NeulandHitPar");
+    fPar = (R3BNeulandHitPar*)FairRuntimeDb::instance()->getContainer("NeulandHitPar");
 }
 
 void R3BNeulandCal2Hit::SetParameter()
@@ -48,7 +47,7 @@ void R3BNeulandCal2Hit::SetParameter()
         Int_t id = fModulePar->GetModuleId() * 2 + fModulePar->GetSide() - 3;
         tempMapIsSet[id] = kTRUE;
         tempMapVeff[id] = fModulePar->GetEffectiveSpeed();
-        tempMapTSync[id] = fModulePar->GetTimeOffset();
+        tempMapTSync[id] = fModulePar->GetTimeOffset() + fPar->GetGlobalTimeOffset();
         tempMapEGain[id] = fModulePar->GetEnergieGain();
     }
 
@@ -111,7 +110,7 @@ void R3BNeulandCal2Hit::Exec(Option_t*)
 
         const Double_t tdcL = pmt1->GetTime() + fMapTSync[pmt1->GetBarId() * 2 - 2];
         const Double_t tdcR = pmt2->GetTime() + fMapTSync[pmt2->GetBarId() * 2 - 1];
-        const Double_t tdc = (tdcL + tdcR) / 2.;
+        const Double_t tdc = (tdcL + tdcR) / 2. - fGlobalTimeOffset;
 
         const Double_t veff = fMapVeff[(barId - 1) * 2];
         const Int_t plane = ((barId - 1) / 50) + 1;

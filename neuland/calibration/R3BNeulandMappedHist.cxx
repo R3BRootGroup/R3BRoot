@@ -4,14 +4,15 @@
 #include "FairRunOnline.h"
 #include "R3BEventHeader.h"
 #include "R3BLosMappedData.h"
-#include "R3BNeulandMappedData.h"
+#include "R3BNeulandTacquilaMappedData.h"
 #include "R3BPaddleTamexMappedData.h"
 #include "TClonesArray.h"
 #include "TH1F.h"
 #include "TH2F.h"
 
 R3BNeulandMappedHist::R3BNeulandMappedHist()
-    : fnEvents(0)
+    : FairTask("NeulandMappedHist", 1)
+    , fnEvents(0)
     , fNItemsTotal(0)
     , fHeader(NULL)
     , fLandMappedData(NULL)
@@ -37,9 +38,9 @@ InitStatus R3BNeulandMappedHist::Init()
 {
     FairRootManager* fMan = FairRootManager::Instance();
     fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
-    fLandMappedData = (TClonesArray*)fMan->GetObject("NeulandMappedData");
+    fLandMappedData = (TClonesArray*)fMan->GetObject("NeulandTacquilaMappedData");
     fLosMappedData = (TClonesArray*)fMan->GetObject("LosMapped");
-    fNeulandTamexHitMapped = (TClonesArray*)fMan->GetObject("NeulandTamexMappedItem");
+    fNeulandTamexHitMapped = (TClonesArray*)fMan->GetObject("NeulandMappedData");
     CreateHistos();
 
     return kSUCCESS;
@@ -56,10 +57,10 @@ void R3BNeulandMappedHist::Exec(Option_t* option)
     {
         Int_t nLandMapped = fLandMappedData->GetEntries();
         fNItemsTotal += nLandMapped;
-        R3BNeulandMappedData* hitmapped;
+        R3BNeulandTacquilaMappedData* hitmapped;
         for (Int_t i = 0; i < nLandMapped; i++)
         {
-            hitmapped = (R3BNeulandMappedData*)fLandMappedData->At(i);
+            hitmapped = (R3BNeulandTacquilaMappedData*)fLandMappedData->At(i);
             fh_land_mapped_barid->Fill((hitmapped->GetPlane() - 1) * 50 + hitmapped->GetPaddle());
             fh_land_mapped_side->Fill(hitmapped->GetSide());
             fh_land_mapped_clock->Fill(hitmapped->GetClock());

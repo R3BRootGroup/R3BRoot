@@ -6,6 +6,7 @@
 R3BNeulandHitPar::R3BNeulandHitPar(const char* name, const char* title, const char* context, Bool_t own)
     : FairParGenericSet(name, title, context, own)
     , fParams(new TObjArray(NMODULEMAX))
+    , fGlobalTimeOffset(0.0)
 {
 }
 

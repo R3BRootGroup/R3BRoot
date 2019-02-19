@@ -73,7 +73,6 @@ R3BAmsReader.cxx
 Set(STRUCT_HEADERS
 ext_h101_unpack.h
 ext_h101_whiterabbit.h
-ext_h101_raw_nnp.h
 ext_h101_fibzero.h
 #ext_h101_fibonea.h
 #ext_h101_fiboneb.h
@@ -95,6 +94,7 @@ ext_h101_tofd.h
 ext_h101_ptof.h
 ext_h101_psp.h
 ext_h101_raw_califa_febex.h
+ext_h101_raw_nnp_tacquila.h
 ext_h101_raw_nnp_tamex.h
 ext_h101_strawtubes.h
 ext_h101_star.h

@@ -1,8 +1,3 @@
-// ------------------------------------------------------------
-// -----               R3BNeulandMapped2Cal               -----
-// -----          Created 22-04-2014 by D.Kresan          -----
-// ------------------------------------------------------------
-
 #include "R3BNeulandMapped2Cal.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
@@ -10,47 +5,24 @@
 #include "FairRuntimeDb.h"
 #include "R3BEventHeader.h"
 #include "R3BNeulandCalData.h"
-#include "R3BNeulandMappedData.h"
-#include "R3BNeulandQCalPar.h"
+#include "R3BPaddleTamexMappedData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
 #include "TClonesArray.h"
-#include "TH1F.h"
+#include "TH2F.h"
 #include "TMath.h"
-
-#define planes fNofPMTs / 100
-#define toID(x, y, z) (((x - 1) * 50 + (y - 1)) * 2 + (z - 1))
-
-Double_t wlk(Double_t x)
-{
-    Double_t y = 0;
-
-    Double_t par1 = 1500.;                                                // +-0.2238
-    Double_t par2 = 0.00075;                                              //+-2.355e-05
-    y = par1 * TMath::Power(x, par2) - (par1 * TMath::Power(400., par2)); // Michael's
-
-    // y=2.29083*log(x)-0.0870157*log(x)*log(x)-4.57824;  // mine
-
-    return y;
-    // return 0.;
-}
 
 R3BNeulandMapped2Cal::R3BNeulandMapped2Cal()
     : FairTask("NeulandMapped2Cal", 1)
     , fNEvents(0)
     , fPulserMode(kFALSE)
     , fWalkEnabled(kTRUE)
-    , fRawHit(NULL)
+    , fMapped(NULL)
     , fPmt(new TClonesArray("R3BNeulandCalData"))
     , fNPmt(0)
     , fTcalPar(NULL)
-    , fQCalPar(NULL)
     , fTrigger(-1)
-    , fMap17Seen()
-    , fMapStopTime()
-    , fMapStopClock()
-    , fMapQdcOffset()
-    , fClockFreq(1. / TACQUILA_CLOCK_MHZ * 1000.)
+    , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
 {
 }
 
@@ -59,17 +31,12 @@ R3BNeulandMapped2Cal::R3BNeulandMapped2Cal(const char* name, Int_t iVerbose)
     , fNEvents(0)
     , fPulserMode(kFALSE)
     , fWalkEnabled(kTRUE)
-    , fRawHit(NULL)
+    , fMapped(NULL)
     , fPmt(new TClonesArray("R3BNeulandCalData"))
     , fNPmt(0)
     , fTcalPar(NULL)
-    , fQCalPar(NULL)
     , fTrigger(-1)
-    , fMap17Seen()
-    , fMapStopTime()
-    , fMapStopClock()
-    , fMapQdcOffset()
-    , fClockFreq(1. / TACQUILA_CLOCK_MHZ * 1000.)
+    , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
 {
 }
 
@@ -85,68 +52,59 @@ R3BNeulandMapped2Cal::~R3BNeulandMapped2Cal()
 
 InitStatus R3BNeulandMapped2Cal::Init()
 {
-    LOG(INFO) << "R3BNeulandMapped2Cal::Init : read " << fTcalPar->GetNumModulePar() << " calibrated modules"
-              << FairLogger::endl;
-    // fTcalPar->printParams();
+    fNofTcalPars = fTcalPar->GetNumModulePar();
+
+    if (fNofTcalPars == 0)
+    {
+        LOG(ERROR) << "There are no TCal parameters in container LandTCalPar" << FairLogger::endl;
+        return kFATAL;
+    }
+
+    LOG(INFO) << "R3BNeulandMapped2Cal::Init : read " << fNofTcalPars << " calibrated modules" << FairLogger::endl;
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
     {
-        LOG(fatal) << "FairRootManager not found";
+        LOG(FATAL) << "FairRootManager not found";
     }
 
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     if (NULL == header)
     {
-        LOG(fatal) << "Branch R3BEventHeader not found";
+        LOG(FATAL) << "Branch R3BEventHeader not found";
     }
 
-    fRawHit = (TClonesArray*)mgr->GetObject("NeulandMappedData");
-    if (NULL == fRawHit)
+    fMapped = (TClonesArray*)mgr->GetObject("NeulandMappedData");
+    if (NULL == fMapped)
     {
-        LOG(fatal) << "Branch LandRawHitMapped not found";
+        LOG(FATAL) << "Branch NeulandMapped not found";
     }
 
-    mgr->Register("NeulandCalData", "Land", fPmt, kTRUE);
+    mgr->Register("NeulandCalData", "Neuland", fPmt, kTRUE);
 
-    fh_pulser_5_2 = new TH1F("h_pulser_5_2", "Single PMT resolution Bar 5 vs 2", 40000, -200., 200.);
-    fh_pulser_105_2 = new TH1F("h_pulser_105_2", "Single PMT resolution Bar 105 vs 2", 40000, -200., 200.);
-
-    SetParameter();
+    htcal1 = new TH2F("htcal1", "htcal1", 800, 0.5, 800.5, 500, -1., 6.);
+    htcal2 = new TH2F("htcal2", "htcal2", 800, 0.5, 800.5, 500, -1., 6.);
+    htcal3 = new TH2F("htcal3", "htcal3", 800, 0.5, 800.5, 500, -1., 6.);
+    htcal4 = new TH2F("htcal4", "htcal4", 800, 0.5, 800.5, 500, -1., 6.);
 
     return kSUCCESS;
 }
 
 void R3BNeulandMapped2Cal::SetParContainers()
 {
-    FairRunAna* ana = FairRunAna::Instance();
-    FairRuntimeDb* rtdb = ana->GetRuntimeDb();
-    fTcalPar = (R3BTCalPar*)(rtdb->getContainer("LandTCalPar"));
-    fQCalPar = (R3BNeulandQCalPar*)(rtdb->getContainer("NeulandQCalPar"));
-}
+    fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LandTCalPar");
 
-void R3BNeulandMapped2Cal::SetParameter()
-{
-
-    std::map<Int_t, Double_t> tempMapQdcOffset;
-    Int_t i = 0;
-    for (Int_t plane = 1; i <= planes; plane++)
-        for (Int_t bar = 1; bar <= 50; bar++)
-            for (Int_t side = 1; side <= 2; side++)
-            {
-                tempMapQdcOffset[i] = fQCalPar->GetParAt(plane, bar, side);
-                i++;
-            }
-
-    LOG(INFO) << "R3BNeulandMapped2Cal::SetParameter : Number of Parameters: " << i << FairLogger::endl;
-
-    fMapQdcOffset = tempMapQdcOffset;
+    if (!fTcalPar)
+    {
+        LOG(ERROR) << "Could not get access to LandTCalPar-Container." << FairLogger::endl;
+        fNofTcalPars = 0;
+        return;
+    }
 }
 
 InitStatus R3BNeulandMapped2Cal::ReInit()
 {
     SetParContainers();
-    SetParameter();
     return kSUCCESS;
 }
 
@@ -160,7 +118,7 @@ void R3BNeulandMapped2Cal::Exec(Option_t* option)
         }
     }
 
-    Int_t nHits = fRawHit->GetEntriesFast();
+    Int_t nHits = fMapped->GetEntriesFast();
     if (fPulserMode)
     {
         if (nHits < fNofPMTs)
@@ -176,108 +134,128 @@ void R3BNeulandMapped2Cal::Exec(Option_t* option)
         }
     }
 
-    if (nHits > 0)
+    if (nHits >= fNhitmin) // ig  0
     {
         MakeCal();
-    }
-
-    if (fPulserMode)
-    {
-        R3BNeulandCalData* pmt1;
-        Double_t time1;
-        for (Int_t i = 0; i < fNPmt; i++)
-        {
-            pmt1 = (R3BNeulandCalData*)fPmt->At(i);
-            if (pmt1->GetBarId() == 2 && pmt1->GetSide() == 1)
-            {
-                time1 = pmt1->GetTime();
-                break;
-            }
-        }
-        for (Int_t i = 0; i < fNPmt; i++)
-        {
-            pmt1 = (R3BNeulandCalData*)fPmt->At(i);
-            if (pmt1->GetBarId() == 5 && pmt1->GetSide() == 1)
-            {
-                fh_pulser_5_2->Fill(pmt1->GetTime() - time1);
-            }
-            if (pmt1->GetBarId() == 105 && pmt1->GetSide() == 1)
-            {
-                fh_pulser_105_2->Fill(pmt1->GetTime() - time1);
-            }
-        }
     }
 }
 
 void R3BNeulandMapped2Cal::MakeCal()
 {
-    Int_t nHits = fRawHit->GetEntriesFast();
-    R3BNeulandMappedData* hit;
-    R3BNeulandMappedData* hit2;
-    Int_t iPlane;
-    Int_t iPaddle;
-    Int_t iSide;
-    Int_t channel;
-    Int_t tdc;
+    Int_t nHits = fMapped->GetEntriesFast();
+
     R3BTCalModulePar* par;
-    Double_t time;
-    Double_t time2;
-    Int_t qdc;
 
-    for (Int_t khit = 0; khit < nHits; khit++)
+    Int_t tdc;
+    Double_t timeLE;
+    Double_t timeTE;
+
+    for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        hit2 = (R3BNeulandMappedData*)fRawHit->At(khit);
-        if (NULL == hit2)
+        R3BPaddleTamexMappedData* hit = (R3BPaddleTamexMappedData*)fMapped->At(ihit);
+        if (NULL == hit)
         {
             continue;
         }
 
-        iPlane = hit2->GetPlane();
-        iPaddle = hit2->GetPaddle();
-        iSide = hit2->GetSide();
+        Double_t qdc = -1.;
 
-        if (!(par = fTcalPar->GetModuleParAt(iPlane, iPaddle, iSide)))
+        Int_t iPlane = hit->GetPlaneId();
+        Int_t iBar = hit->GetBarId();
+        Int_t iSide = -1 == hit->fCoarseTime1LE ? 2 : 1;
+
+        if (hit->Is17())
         {
-            LOG(DEBUG) << "R3BNeulandMapped2Cal::Exec : Tcal par not found, channel: " << iPlane << " / " << iPaddle
-                       << " / " << iSide << FairLogger::endl;
+            // 17-th channel
             continue;
         }
 
-        tdc = hit2->GetTacData();
-        time = par->GetTimeTacquila(tdc);
-        if (time < 0. || time > fClockFreq)
+        if ((iPlane < 1) || (iPlane > fNofPlanes))
         {
-            LOG(ERROR) << "R3BNeulandMapped2Cal::Exec : error in time calibration: ch=" << channel << ", tdc=" << tdc
-                       << ", time=" << time << FairLogger::endl;
+            LOG(INFO) << "R3BNeulandMapped2TCal::Exec : Plane number out of range: " << iPlane << FairLogger::endl;
+            continue;
+        }
+        if ((iBar < 1) || (iBar > fNofBarsPerPlane))
+        {
+            LOG(INFO) << "R3BNeulandMapped2TCal::Exec : Bar number out of range: " << iBar << FairLogger::endl;
             continue;
         }
 
-        if (!(par = fTcalPar->GetModuleParAt(iPlane, iPaddle, iSide + 2)))
+        int edge = 2 * iSide - 1;
+
+        // Convert TDC to [ns] leading
+        if (!(par = fTcalPar->GetModuleParAt(iPlane, iBar, edge)))
         {
-            LOG(DEBUG) << "R3BNeulandMapped2Cal::Exec : Tcal par not found, channel: " << iPlane << " / " << iPaddle
-                       << " / " << (iSide + 2) << FairLogger::endl;
+            LOG(DEBUG) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide
+                       << FairLogger::endl;
             continue;
         }
 
-        tdc = hit2->GetStopT();
-        time2 = par->GetTimeTacquila(tdc);
-        if (time2 < 0. || time2 > fClockFreq)
+        tdc = 1 == iSide ? hit->fFineTime1LE : hit->fFineTime2LE;
+        timeLE = par->GetTimeVFTX(tdc);
+
+        // Convert TDC to [ns] trailing
+        if (!(par = fTcalPar->GetModuleParAt(iPlane, iBar, edge + 1)))
         {
-            LOG(ERROR) << "R3BNeulandMapped2Cal::Exec : error in time calibration: ch=" << channel << ", tdc=" << tdc
-                       << ", time=" << time2 << FairLogger::endl;
+            LOG(DEBUG) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide
+                       << FairLogger::endl;
             continue;
         }
 
-        qdc = hit2->GetQdcData() - fMapQdcOffset[toID(iPlane, iPaddle, iSide)];
-        qdc = std::max(qdc, 0);
+        tdc = 1 == iSide ? hit->fFineTime1TE : hit->fFineTime2TE;
+        timeTE = par->GetTimeVFTX(tdc);
 
-        time = time - time2 + hit2->GetClock() * fClockFreq;
+        if (timeLE < 0. || timeLE > fClockFreq || timeTE < 0. || timeTE > fClockFreq)
+        {
+            LOG(ERROR) << "R3BNeulandMapped2Tcal::Exec : error in time calibration: ch= " << iPlane << iBar << iSide
+                       << ", tdc= " << tdc << ", time leading edge = " << timeLE << ", time trailing edge = " << timeTE
+                       << FairLogger::endl;
+            continue;
+        }
+
+        if (1 == iSide)
+        {
+            htcal1->Fill((iPlane - 1) * 50 + iBar, timeLE);
+            htcal2->Fill((iPlane - 1) * 50 + iBar, timeTE);
+        }
+        if (2 == iSide)
+        {
+            htcal3->Fill((iPlane - 1) * 50 + iBar, timeLE);
+            htcal4->Fill((iPlane - 1) * 50 + iBar, timeTE);
+        }
+
+        auto coarse = 1 == iSide ? hit->fCoarseTime1LE : hit->fCoarseTime2LE;
+        timeLE = fClockFreq - timeLE + coarse * fClockFreq;
+        coarse = 1 == iSide ? hit->fCoarseTime1TE : hit->fCoarseTime2TE;
+        timeTE = fClockFreq - timeTE + coarse * fClockFreq;
+
+        if (timeTE - timeLE < 0)
+        {
+            qdc = 2048 * fClockFreq + timeTE - timeLE;
+        }
+        else
+        {
+            qdc = timeTE - timeLE;
+        }
+
         if (fWalkEnabled)
-        {
-            time += wlk(qdc);
-        }
-        new ((*fPmt)[fNPmt]) R3BNeulandCalData((iPlane - 1) * 50 + iPaddle, iSide, time, qdc);
+            timeLE = timeLE + WalkCorrection(qdc);
+
+        new ((*fPmt)[fNPmt]) R3BNeulandCalData((iPlane - 1) * 50 + iBar, iSide, timeLE, qdc);
         fNPmt += 1;
+
+        /* if (timeTE-timeLE < 0)
+          {
+            new ((*fPmt)[fNPmt]) R3BNeulandCalData((iPlane-1)*50+iBar, iSide, timeLE,
+                               2048*fClockFreq + timeTE-timeLE);
+            fNPmt += 1;
+          }
+        else
+          {
+            new ((*fPmt)[fNPmt]) R3BNeulandCalData((iPlane-1)*50+iBar, iSide, timeLE,
+                               timeTE-timeLE);
+            fNPmt += 1;
+            } */
     }
 }
 
@@ -293,17 +271,78 @@ void R3BNeulandMapped2Cal::FinishEvent()
         fPmt->Clear();
         fNPmt = 0;
     }
-    fMap17Seen.clear();
-    fMapStopTime.clear();
-    fMapStopClock.clear();
 
     fNEvents += 1;
 }
 
 void R3BNeulandMapped2Cal::FinishTask()
 {
-    fh_pulser_5_2->Write();
-    fh_pulser_105_2->Write();
+
+    htcal1->Write();
+    htcal2->Write();
+    htcal3->Write();
+    htcal4->Write();
+}
+
+Double_t R3BNeulandMapped2Cal::WalkCorrection(Double_t x)
+{
+    Double_t y = 0;
+
+    if (x < 0.)
+        return y;
+
+    Double_t walkval[34] = { 69.5,  // 18
+                             68.0,  // 22
+                             67.6,  // 26
+                             65.6,  // 30
+                             65.0,  // 34
+                             63.8,  // 38
+                             62.9,  // 42
+                             62.5,  // 46
+                             62.1,  // 50
+                             61.8,  // 54
+                             61.5,  // 58
+                             61.0,  // 62
+                             60.85, // 66
+                             60.7,  // 70
+                             60.55, // 74
+                             60.4,  // 78
+                             60.3,  // 82  60.25
+                             60.27, // 86  60.4
+                             60.05, // 90
+                             60.05, // 94 60.1
+                             60.0,  // 98
+                             59.8,  // 102
+                             59.7,  // 106
+                             59.6,  // 110
+                             59.6,  // 114
+                             59.55, // 118
+                             59.4,  // 122
+                             59.4,  // 126
+                             59.3,  // 130
+                             59.25, // 134
+                             59.05, // 138
+                             59.0,  // 142  58.95
+                             58.95, 58.91 };
+
+    if (x < 16.)
+        y = 70.5 - x / 4.;
+
+    for (Int_t i = 0; i < 34; i++)
+    {
+
+        if (x >= 16. + 4. * i && x < 20 + 4. * i)
+            y = walkval[i];
+    }
+
+    if (x >= 152. && x < 160.)
+        y = 58.9 + 0.08 / 8. * (160. - x);
+    if (x >= 160.)
+        y = 58.55 + 0.3 / 30. * (190. - x);
+    // if (x>=160.&&x<190.) y = 58.7 + 0.4/30.*(190.-x);
+    // if (x>=190.) y = 58.5;
+
+    return 58.6 - y;
 }
 
 ClassImp(R3BNeulandMapped2Cal)

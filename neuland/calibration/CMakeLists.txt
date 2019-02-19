@@ -13,8 +13,11 @@ include_directories(${INCLUDE_DIRECTORIES})
 
 set(SRCS
     R3BNeulandMappedHist.cxx
-    R3BNeulandMapped2CalPar.cxx
     R3BNeulandMapped2Cal.cxx
+    R3BNeulandMapped2CalPar.cxx
+    R3BNeulandTacquilaMapped2Cal.cxx
+    R3BNeulandTacquilaMapped2CalPar.cxx
+    R3BNeulandTacquilaMapped2QCalPar.cxx
     R3BNeulandHitHist.cxx
     # R3BNeulandCalTest.cxx
     R3BNeulandHitPar.cxx
@@ -24,7 +27,6 @@ set(SRCS
     R3BNeulandParFact.cxx
     R3BNeulandCal2Hit.cxx
     R3BNeulandHitModulePar.cxx
-    R3BNeulandMapped2QCalPar.cxx
     R3BNeulandQCalPar.cxx
     R3BNeulandHitFiller.cxx
     R3BNeulandQCalFiller.cxx)

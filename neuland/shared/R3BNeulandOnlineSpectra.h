@@ -5,6 +5,7 @@
 #include "R3BLosCalData.h"
 #include "R3BNeulandCalData.h"
 #include "R3BNeulandHit.h"
+#include "R3BPaddleTamexMappedData.h"
 #include "TCAConnector.h"
 #include <array>
 
@@ -25,9 +26,10 @@ class R3BNeulandOnlineSpectra : public FairTask
     void ResetHistos();
 
   private:
-    static const unsigned int fNPlanes = 8;
-    static const unsigned int fNBars = fNPlanes * 100;
+    static const unsigned int fNPlanes = 16;
+    static const unsigned int fNBars = fNPlanes * 50;
 
+    TCAInputConnector<R3BPaddleTamexMappedData> fNeulandMappedData;
     TCAInputConnector<R3BNeulandCalData> fNeulandCalData;
     TCAInputConnector<R3BNeulandHit> fNeulandHits;
     TCAInputConnector<R3BLosCalData> fLosCalData;
@@ -35,15 +37,23 @@ class R3BNeulandOnlineSpectra : public FairTask
     TH1D* hTstart;
     TH1D* hNstart;
 
+    std::array<TH1D*, 4> ahMappedBar1;
+    std::array<TH1D*, 4> ahMappedBar2;
+
     std::array<TH2D*, 2> ahCalTvsBar;
     std::array<TH2D*, 2> ahCalEvsBar;
 
-    std::array<TH2D*, 3> ahHitTvsBar;
-    std::array<TH2D*, 3> ahHitEvsBar;
+    TH2D* hHitEvsBar;
+
+    TH2D* hHitEvsBarCosmics;
 
     TH2D* hTdiffvsBar;
     TH2D* hToFvsBar;
     TH2D* hTofvsEhit;
+
+    TH2D* hTdiffvsBarCosmics;
+    TH2D* hDT375;
+    TH2D* hDT425;
 
     std::array<TH2D*, fNPlanes> ahXYperPlane;
 

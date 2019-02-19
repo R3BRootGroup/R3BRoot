@@ -25,6 +25,9 @@ class R3BNeulandCal2Hit : public FairTask
     // Distance to target in cm
     inline void SetDistanceToTarget(Double_t d) { fDistanceToTarget = d; }
 
+    // Global time offset in ns
+    inline void SetGlobalTimeOffset(Double_t t0) { fGlobalTimeOffset = t0; }
+
   private:
     void SetParameter();
 
@@ -35,6 +38,7 @@ class R3BNeulandCal2Hit : public FairTask
 
     Bool_t fFirstPlaneHorizontal;
     Double_t fDistanceToTarget;
+    Double_t fGlobalTimeOffset;
 
     std::map<Int_t, Bool_t> fMapIsSet;
     std::map<Int_t, Double_t> fMapVeff;

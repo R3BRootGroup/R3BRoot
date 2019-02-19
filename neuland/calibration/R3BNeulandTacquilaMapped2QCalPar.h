@@ -1,5 +1,5 @@
-#ifndef R3BNEULANDMAPPED2QCALPAR_H
-#define R3BNEULANDMAPPED2QCALPAR_H
+#ifndef R3BNEULANDTACQUILAMAPPED2QCALPAR_H
+#define R3BNEULANDTACQUILAMAPPED2QCALPAR_H
 
 #include "FairTask.h"
 
@@ -8,13 +8,13 @@ class TH1F;
 class R3BEventHeader;
 class R3BNeulandQCalPar;
 
-class R3BNeulandMapped2QCalPar : public FairTask
+class R3BNeulandTacquilaMapped2QCalPar : public FairTask
 {
 
   public:
-    R3BNeulandMapped2QCalPar();
-    R3BNeulandMapped2QCalPar(const char* name, Int_t iVerbose = 1);
-    virtual ~R3BNeulandMapped2QCalPar();
+    R3BNeulandTacquilaMapped2QCalPar();
+    R3BNeulandTacquilaMapped2QCalPar(const char* name, Int_t iVerbose = 1);
+    virtual ~R3BNeulandTacquilaMapped2QCalPar();
 
     virtual InitStatus Init();
 
@@ -38,7 +38,7 @@ class R3BNeulandMapped2QCalPar : public FairTask
     std::vector<std::vector<std::vector<TH1F*>>> fData;
 
   public:
-    ClassDef(R3BNeulandMapped2QCalPar, 1)
+    ClassDef(R3BNeulandTacquilaMapped2QCalPar, 1)
 };
 
 #endif

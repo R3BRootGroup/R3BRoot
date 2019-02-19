@@ -5,8 +5,8 @@
  * Do not edit - automatically generated.
  */
 
-#ifndef __GUARD_H101_EXT_H101_RAW_NNP_H__
-#define __GUARD_H101_EXT_H101_RAW_NNP_H__
+#ifndef __GUARD_H101_EXT_H101_RAW_NNP_TACQUILA_H__
+#define __GUARD_H101_EXT_H101_RAW_NNP_TACQUILA_H__
 
 #ifndef __CINT__
 # include <stdint.h>
@@ -26,7 +26,7 @@ typedef          int  int32_t;
  * Plain structure (layout as ntuple/root file):
  */
 
-typedef struct EXT_STR_h101_raw_nnp_t
+typedef struct EXT_STR_h101_raw_nnp_tacquila_t
 {
   /* RAW */
   uint32_t NNP1_1 /* [0,50] */;
@@ -126,7 +126,7 @@ typedef struct EXT_STR_h101_raw_nnp_t
   uint32_t NNP8_2ADC[50 EXT_STRUCT_CTRL(NNP8_2)] /* [0,65535] */;
   uint32_t NNP8_2T[50 EXT_STRUCT_CTRL(NNP8_2)] /* [0,65535] */;
 
-} EXT_STR_h101_raw_nnp;
+} EXT_STR_h101_raw_nnp_tacquila;
 
 /********************************************************
  *
@@ -134,7 +134,7 @@ typedef struct EXT_STR_h101_raw_nnp_t
  * recovered (recommended):
  */
 
-typedef struct EXT_STR_h101_raw_nnp_onion_t
+typedef struct EXT_STR_h101_raw_nnp_tacquila_onion_t
 {
   /* RAW */
   struct {
@@ -148,11 +148,11 @@ typedef struct EXT_STR_h101_raw_nnp_onion_t
     } _[2];
   } NNP[8];
 
-} EXT_STR_h101_raw_nnp_onion;
+} EXT_STR_h101_raw_nnp_tacquila_onion;
 
 /*******************************************************/
 
-#define EXT_STR_h101_raw_nnp_ITEMS_INFO(ok,si,struct_t,offset,printerr) do { \
+#define EXT_STR_h101_raw_nnp_tacquila_ITEMS_INFO(ok,si,struct_t,offset,printerr) do { \
   ok = 1; \
   /* RAW */ \
   EXT_STR_ITEM_INFO_LIM(ok,si,struct_t,offset,printerr,\
@@ -446,6 +446,6 @@ typedef struct EXT_STR_h101_raw_nnp_onion_t
   \
 } while (0);
 
-#endif/*__GUARD_H101_EXT_H101_RAW_NNP_H__*/
+#endif/*__GUARD_H101_EXT_H101_RAW_NNP_TACQUILA_H__*/
 
 /*******************************************************/

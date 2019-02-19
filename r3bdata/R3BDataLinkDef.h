@@ -65,7 +65,7 @@
 #pragma link C++ class R3BMfiDigi+;
 #pragma link C++ class R3BPspPoint+;
 #pragma link C++ class R3BPspDigi+;
-#pragma link C++ class R3BNeulandMappedData+;
+#pragma link C++ class R3BNeulandTacquilaMappedData+;
 #pragma link C++ class R3BNeulandPoint+;
 #pragma link C++ class R3BNeulandHit+;
 #pragma link C++ class R3BNeulandCluster+;

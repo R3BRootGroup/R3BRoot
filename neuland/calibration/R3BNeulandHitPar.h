@@ -79,10 +79,16 @@ class R3BNeulandHitPar : public FairParGenericSet
      */
     R3BNeulandHitModulePar* GetModuleParAt(Int_t idx) { return (R3BNeulandHitModulePar*)fParams->At(idx); }
 
+    // Global time offset in ns
+    inline Double_t GetGlobalTimeOffset() { return fGlobalTimeOffset; }
+    inline void SetGlobalTimeOffset(Double_t t0) { fGlobalTimeOffset = t0; }
+
   private:
     TObjArray* fParams; /**< an array with parameter containers of all modules */
 
-    ClassDef(R3BNeulandHitPar, 1);
+    Double_t fGlobalTimeOffset;
+
+    ClassDef(R3BNeulandHitPar, 2);
 };
 
 #endif /* !R3BNEULANDHITPAR_H*/

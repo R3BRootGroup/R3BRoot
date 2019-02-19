@@ -92,7 +92,7 @@ set(SRCS
     mfiData/R3BMfiDigi.cxx
     pspData/R3BPspPoint.cxx
     pspData/R3BPspDigi.cxx
-    neulandData/R3BNeulandMappedData.cxx
+    neulandData/R3BNeulandTacquilaMappedData.cxx
     neulandData/R3BNeulandCalData.cxx
     neulandData/R3BNeulandPoint.cxx
     neulandData/R3BNeulandHit.cxx

@@ -1,8 +1,3 @@
-// ----------------------------------------------------------------
-// -----                 R3BNeulandMapped2CalPar              -----
-// -----             Created 04-04-2014 by D.Kresan           -----
-// ----------------------------------------------------------------
-
 #include "R3BNeulandMapped2CalPar.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
@@ -10,19 +5,22 @@
 #include "FairRunIdGenerator.h"
 #include "FairRuntimeDb.h"
 #include "R3BEventHeader.h"
-#include "R3BNeulandMappedData.h"
+#include "R3BPaddleTamexMappedData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
 #include "TClonesArray.h"
 #include "TF1.h"
-#include "TH1F.h"
+#include <iostream>
+#include <signal.h>
 #include <stdlib.h>
 
+using namespace std;
+
 R3BNeulandMapped2CalPar::R3BNeulandMapped2CalPar()
-    : fUpdateRate(1000000)
+    : FairTask("R3BNeulandMapped2TCalPar", 1)
     , fMinStats(100000)
     , fTrigger(-1)
-    , fNofPMTs(0)
+    //    , fNofPMTs(0)
     , fNEvents(0)
     , fCal_Par(NULL)
 {
@@ -30,10 +28,9 @@ R3BNeulandMapped2CalPar::R3BNeulandMapped2CalPar()
 
 R3BNeulandMapped2CalPar::R3BNeulandMapped2CalPar(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fUpdateRate(1000000)
     , fMinStats(100000)
     , fTrigger(-1)
-    , fNofPMTs(0)
+    //, fNofPMTs(0)
     , fNEvents(0)
     , fCal_Par(NULL)
 {
@@ -69,16 +66,38 @@ InitStatus R3BNeulandMapped2CalPar::Init()
         return kFATAL;
     }
 
+    // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
+    // to be set as dependency in CMakelists.txt (in this case in the land directory)
     fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LandTCalPar");
     fCal_Par->setChanged();
 
     fEngine = new R3BTCalEngine(fCal_Par, fMinStats);
+
+    for (Int_t pln = 0; pln < fNofPlanes; pln++)
+    {
+        for (Int_t bar = 0; bar < fNofBarsPerPlane; bar++)
+        {
+            for (Int_t pmt = 0; pmt < 4; pmt++)
+            {
+                counts[pln][bar][pmt] = 0;
+            }
+        }
+    }
+
+    checkcounts = 0;
 
     return kSUCCESS;
 }
 
 void R3BNeulandMapped2CalPar::Exec(Option_t* option)
 {
+
+    if (checkcounts == fNofPMTs)
+    {
+        std::cout << "done " << std::endl;
+        raise(SIGINT);
+    }
+
     if (fTrigger >= 0)
     {
         if (header->GetTrigger() != fTrigger)
@@ -90,31 +109,63 @@ void R3BNeulandMapped2CalPar::Exec(Option_t* option)
     Int_t nHits = fHits->GetEntries();
     if (nHits > (fNofPMTs / 2))
     {
-        return;
+        // return;
     }
-
-    R3BNeulandMappedData* hit;
-    Int_t iPlane;
-    Int_t iPaddle;
-    Int_t iSide;
 
     // Loop over mapped hits
     for (Int_t i = 0; i < nHits; i++)
     {
-        hit = (R3BNeulandMappedData*)fHits->At(i);
+        auto hit = (R3BPaddleTamexMappedData*)fHits->At(i);
         if (!hit)
         {
             continue;
         }
 
         // Check bar ID
-        iPlane = hit->GetPlane();
-        iPaddle = hit->GetPaddle();
-        iSide = hit->GetSide();
+        Int_t iPlane = hit->GetPlaneId();
+        Int_t iBar = hit->GetBarId();
+        Int_t iSide = -1 == hit->fCoarseTime1LE ? 2 : 1;
 
-        // Fill TAC histogram
-        fEngine->Fill(iPlane, iPaddle, iSide, hit->GetTacData());
-        fEngine->Fill(iPlane, iPaddle, iSide + 2, hit->GetStopT());
+        // fill 1    1LE
+        //      2    1TE
+        //      3    2LE
+        //      4    2TE
+
+        Int_t iFine;
+        if (1 == iSide)
+        {
+            iFine = hit->fFineTime1LE;
+        }
+        else
+        {
+            iFine = hit->fFineTime2LE;
+        }
+
+        fEngine->Fill(iPlane, iBar, (iSide - 1) * 2 + 1, iFine);
+        counts[iPlane - 1][iBar - 1][(iSide - 1) * 2]++;
+        if (counts[iPlane - 1][iBar - 1][(iSide - 1) * 2] == fMinStats)
+        {
+            checkcounts++;
+            std::cout << iPlane << "a     " << iBar << "   " << iSide << std::endl;
+            std::cout << checkcounts << std::endl;
+        }
+
+        if (1 == iSide)
+        {
+            iFine = hit->fFineTime1TE;
+        }
+        else
+        {
+            iFine = hit->fFineTime2TE;
+        }
+        fEngine->Fill(iPlane, iBar, (iSide - 1) * 2 + 2, iFine);
+        counts[iPlane - 1][iBar - 1][(iSide - 1) * 2 + 1]++;
+        if (counts[iPlane - 1][iBar - 1][(iSide - 1) * 2 + 1] == fMinStats)
+        {
+            checkcounts++;
+            std::cout << iPlane << "b     " << iBar << "   " << iSide << std::endl;
+            std::cout << checkcounts << std::endl;
+        }
     }
 
     // Increment events
@@ -123,6 +174,10 @@ void R3BNeulandMapped2CalPar::Exec(Option_t* option)
 
 void R3BNeulandMapped2CalPar::FinishEvent() {}
 
-void R3BNeulandMapped2CalPar::FinishTask() { fEngine->CalculateParamTacquila(); }
+void R3BNeulandMapped2CalPar::FinishTask()
+{
+    fEngine->CalculateParamVFTX();
+    fCal_Par->printParams();
+}
 
 ClassImp(R3BNeulandMapped2CalPar)

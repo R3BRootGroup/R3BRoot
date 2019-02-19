@@ -68,7 +68,7 @@ InitStatus R3BNeulandTcalFill::Init()
        {
            return kFATAL;
        }*/
-    fHits = (TClonesArray*)rm->GetObject("NeulandTamexMappedData");
+    fHits = (TClonesArray*)rm->GetObject("NeulandMappedData");
     if (!fHits)
     {
         return kFATAL;

@@ -1,24 +1,25 @@
-#ifndef R3BNEULANDMAPPED2CAL_H
-#define R3BNEULANDMAPPED2CAL_H
+#ifndef R3BNEULANDTACQUILAMAPPED2CAL_H
+#define R3BNEULANDTACQUILAMAPPED2CAL_H
 
 #include "FairTask.h"
-#include "TH2F.h"
 
 class TClonesArray;
+class TH1F;
 class R3BTCalModulePar;
 class R3BTCalPar;
 class R3BEventHeader;
+class R3BNeulandQCalPar;
 
 /**
  * An analysis task to apply TCAL calibration for NeuLAND.
  * This class reads NeuLAND raw items with TDC values and
  * produces time items with time in [ns]. It requires TCAL
  * calibration parameters, which are produced in a separate
- * analysis run containing R3BNeulandMapped2CalPar task.
+ * analysis run containing R3BNeulandTacquilaMapped2CalPar task.
  * @author D. Kresan
  * @since September 7, 2015
  */
-class R3BNeulandMapped2Cal : public FairTask
+class R3BNeulandTacquilaMapped2Cal : public FairTask
 {
 
   public:
@@ -26,7 +27,7 @@ class R3BNeulandMapped2Cal : public FairTask
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BNeulandMapped2Cal();
+    R3BNeulandTacquilaMapped2Cal();
 
     /**
      * Standard constructor.
@@ -34,13 +35,13 @@ class R3BNeulandMapped2Cal : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BNeulandMapped2Cal(const char* name, Int_t iVerbose = 1);
+    R3BNeulandTacquilaMapped2Cal(const char* name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BNeulandMapped2Cal();
+    virtual ~R3BNeulandTacquilaMapped2Cal();
 
     /**
      * Method for task initialization.
@@ -90,15 +91,9 @@ class R3BNeulandMapped2Cal : public FairTask
 
     /**
      * Method for setting the number of NeuLAND modules.
-     * @param nPlanes a number of planes.
-     * @param nBars a number of bars per plane.
+     * @param nPMTs a number of photomultipliers.
      */
-    inline void SetNofModules(Int_t nPlanes, Int_t nBars)
-    {
-        fNofPlanes = nPlanes;
-        fNofBarsPerPlane = nBars;
-        fNofPMTs = nPlanes * nBars * 2;
-    }
+    inline void SetNofModules(Int_t nPMTs) { fNofPMTs = nPMTs; }
 
     /**
      * Method to set running mode for pulser data analysis.
@@ -112,42 +107,32 @@ class R3BNeulandMapped2Cal : public FairTask
      */
     inline void EnableWalk(Bool_t walk = kTRUE) { fWalkEnabled = walk; }
 
-    inline void SetNhitmin(Int_t nhitmin = 1) { fNhitmin = nhitmin; }
-
   private:
-    Int_t fNEvents;      /**< Event counter. */
-    Bool_t fPulserMode;  /**< Running with pulser data. */
-    Bool_t fWalkEnabled; /**< Enable / Disable walk correction. */
+    void SetParameter();
 
-    TClonesArray* fMapped; /**< Array with raw items - input data. */
-    TClonesArray* fPmt;    /**< Array with time items - output data. */
-    Int_t fNPmt;           /**< Number of produced time items per event. */
-
-    R3BTCalPar* fTcalPar; /**< TCAL parameter container. */
-    UInt_t fNofTcalPars;  /**< Number of modules in parameter file. */
-
-    R3BEventHeader* header; /**< Event header. */
-    Int_t fTrigger;         /**< Trigger value. */
-
-    Int_t fNofPlanes;       /**< Number of photomultipliers. */
-    Int_t fNofBarsPerPlane; /**< Number of photomultipliers. */
-    Int_t fNofPMTs;         /**< Number of photomultipliers. */
-
-    Double_t fClockFreq; /**< Clock cycle in [ns]. */
+    Int_t fNEvents;                          /**< Event counter. */
+    Bool_t fPulserMode;                      /**< Running with pulser data. */
+    Bool_t fWalkEnabled;                     /**< Enable / Disable walk correction. */
+    R3BEventHeader* header;                  /**< Event header. */
+    TClonesArray* fRawHit;                   /**< Array with raw items - input data. */
+    TClonesArray* fPmt;                      /**< Array with time items - output data. */
+    Int_t fNPmt;                             /**< Number of produced time items per event. */
+    R3BTCalPar* fTcalPar;                    /**< TCAL parameter container. */
+    R3BNeulandQCalPar* fQCalPar;             /**< QCAL parameter container. */
+    Int_t fTrigger;                          /**< Trigger value. */
+    Int_t fNofPMTs;                          /**< Number of photomultipliers. */
+    std::map<Int_t, Bool_t> fMap17Seen;      /**< Map with flag of observed stop signal. */
+    std::map<Int_t, Double_t> fMapStopTime;  /**< Map with value of stop time. */
+    std::map<Int_t, Int_t> fMapStopClock;    /**< Map with value of stop clock. */
+    std::map<Int_t, Double_t> fMapQdcOffset; /**< Map with value of qdc offset. */
+    Double_t fClockFreq;                     /**< Clock cycle in [ns]. */
+    TH1F* fh_pulser_5_2;                     /**< Resolution of one PMT. */
+    TH1F* fh_pulser_105_2;                   /**< Resolution of one PMT. */
 
     void MakeCal();
 
-    Double_t WalkCorrection(Double_t);
-
-    TH2F* htcal1;
-    TH2F* htcal2;
-    TH2F* htcal3;
-    TH2F* htcal4;
-
-    Int_t fNhitmin;
-
   public:
-    ClassDef(R3BNeulandMapped2Cal, 1)
+    ClassDef(R3BNeulandTacquilaMapped2Cal, 1)
 };
 
 #endif

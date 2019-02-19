@@ -19,7 +19,7 @@ void testNeulandQcal()
     // ---------------------------------------------------------------------------
 
     // ---------------------------------------------------------------------------
-    R3BNeulandMapped2QCalPar* pedpar = new R3BNeulandMapped2QCalPar();
+    R3BNeulandTacquilaMapped2QCalPar* pedpar = new R3BNeulandTacquilaMapped2QCalPar();
     pedpar->SetPlanes(1);
     run->AddTask(pedpar);
     // ---------------------------------------------------------------------------
