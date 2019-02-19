@@ -65,6 +65,8 @@ R3BFi8Reader.cxx
 #R3BFi9Reader.cxx
 R3BFi10Reader.cxx
 R3BFi11Reader.cxx
+R3BFi12Reader.cxx
+R3BFi13Reader.cxx
 R3BLosReader.cxx
 R3BSci8Reader.cxx
 R3BTofdReader.cxx
@@ -102,6 +104,8 @@ ext_h101_fibeight.h
 #ext_h101_fibnine.h
 ext_h101_fibten.h
 ext_h101_fibeleven.h
+ext_h101_fibtwelve.h
+ext_h101_fibthirteen.h
 ext_h101_los_tamex.h
 ext_h101_sci8.h
 ext_h101_tofd.h

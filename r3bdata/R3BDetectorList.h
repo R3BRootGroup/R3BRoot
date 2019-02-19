@@ -36,6 +36,8 @@ enum DetectorId
     kFI5,
     kFI10,
     kFI11,
+    kFI12,
+    kFI13,
     kSFI,
 #ifdef SOFIA
     kSOFSCI,

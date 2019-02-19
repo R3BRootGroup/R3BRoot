@@ -637,8 +637,8 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
         <<" tof: "<<tof_fib_s << " tM: "<<tof_fib_m << endl;
     }       
         
-                if(ToT>totMax && abs(tof_fib_s-tof[ifibcount])<20. && ToT<1000.) {
-                //if(ToT>totMax) {
+//                if(ToT>totMax && abs(tof_fib_s-tof[ifibcount])<20. && ToT<1000.) {
+                if(ToT>totMax && ToT<1000.) {
                     totMax=ToT;
                     iFibMax=iFib;
                     spmtMax=hit->GetSPMTToT_ns();

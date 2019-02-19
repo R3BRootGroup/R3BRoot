@@ -92,7 +92,9 @@ R3BOnlineSpectra::~R3BOnlineSpectra()
      delete fh_multihit_s_Fib[i];
      delete fh_ToT_m_Fib[i];
      delete fh_ToT_s_Fib[i];
-   }
+     delete fh_ToT_single_Fib[i];
+     delete fh_channels_single_Fib[i];
+   } 
 }
 
 
@@ -275,7 +277,7 @@ InitStatus R3BOnlineSpectra::Init()
 		fh_los_tres_MCFD->GetXaxis()->SetTitle("Time MCFD / ns");
 		fh_los_tres_TAMEX = new TH1F("los_time_res_TAMEX", "LOS TAMEX Time resolution -raw ", 4000, -4., 4.);  
 		fh_los_tres_TAMEX->GetXaxis()->SetTitle("Time TAMEX / ns"); 
-		fh_los_tot = new TH2F("los_tot","LOS ToT vs PM",10,0,10,3100,-10.,300.); 
+		fh_los_tot = new TH2F("los_tot","LOS ToT vs PMT",10,0,10,3000,0.,300.); 
 		fh_los_tot->GetXaxis()->SetTitle("PMT number");
 		fh_los_tot->GetYaxis()->SetTitle("ToT / ns");
 		fh_los_tot_mean = new TH1F("los_tot_mean","LOS mean ToT",1500,0.,300.); 
@@ -332,10 +334,6 @@ InitStatus R3BOnlineSpectra::Init()
 		std::stringstream FiName;   
 		std::string temp;	  
 
-		std::stringstream histName1,histName2,histName3,histName4,histName5,histName6,
-                  histName7,histName8,histName9,histName10,histName11,histName12,histName13;
-		std::stringstream histTitle1,histTitle2,histTitle3,histTitle4,histTitle5,histTitle6,
-                  histTitle7,histTitle8,histTitle9,histTitle10,histTitle11,histTitle12,histTitle13;	   	    	 
 
 		if(fMappedItems.at(DET_FI_FIRST + ifibcount)) {
 
@@ -348,144 +346,66 @@ InitStatus R3BOnlineSpectra::Init()
 			std::string tempFibNames;
 			std::stringstream tempCanvName;
 
-                        detName = fDetectorNames[DET_FI_FIRST + ifibcount];
+            detName = fDetectorNames[DET_FI_FIRST + ifibcount];
 
 			cout << "I am creating canvas " << detName <<endl;
 
 			FibCanvas[ifibcount]=new TCanvas(detName, detName, 10, 10, 910, 910);
 
 			// Channels:   
-			histName1 << detName << "_channels";
-			tempName=histName1.str();
-			chistName=tempName.c_str();
-			histTitle1 << detName << " channels";
-			tempTitle=histTitle1.str();
-			chistTitle=tempTitle.c_str();
-			fh_channels_Fib[ifibcount] = new TH1F(chistName, chistTitle, 520, 0., 520.);
+			fh_channels_Fib[ifibcount] = new TH1F(Form("%s_channels",detName), Form("%s channels",detName), 520, 0., 520.);
 			fh_channels_Fib[ifibcount]->GetXaxis()->SetTitle("Channel number");
 			fh_channels_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
-			tempName.clear();
-			tempTitle.clear();      
+			// Channels:   
+			fh_channels_single_Fib[ifibcount] = new TH1F(Form("%s_channels_single",detName), Form("%s channels of single PMTs",detName), 10, 0., 10.);
+			fh_channels_single_Fib[ifibcount]->GetXaxis()->SetTitle("Channel number");
+			fh_channels_single_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
 			// Fibers:
-			histName2 << detName << "_fibers";
-			tempName=histName2.str();
-			chistName=tempName.c_str();
-			histTitle2 << detName << " fibers";
-			tempTitle=histTitle2.str();
-			chistTitle=tempTitle.c_str();
-			fh_fibers_Fib[ifibcount] = new TH1F(chistName, chistTitle, 2100, 0., 2100.); 
+			fh_fibers_Fib[ifibcount] = new TH1F(Form("%s_fibers",detName), Form("%s fibers",detName), N_FIBER_PLOT, 0., N_FIBER_PLOT); 
 			fh_fibers_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
 			fh_fibers_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
-			tempName.clear();
-			tempTitle.clear();
 			// Multiplicity (number of hit fibers):
-			histName3 << detName << "_mult";
-			tempName=histName3.str();
-			chistName=tempName.c_str();
-			histTitle3 << detName << " # of hit fibers ";
-			tempTitle=histTitle3.str();
-			chistTitle=tempTitle.c_str();
-			fh_mult_Fib[ifibcount] = new TH1F(chistName, chistTitle, 100, 0., 100.);	   
+			fh_mult_Fib[ifibcount] = new TH1F(Form("%s_mult",detName), Form("%s mult",detName), 100, 0., 100.);	   
 			fh_mult_Fib[ifibcount]->GetXaxis()->SetTitle("Multiplicity");
 			fh_mult_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
-			tempName.clear();
-			tempTitle.clear();   
 			// Multihit MAPMT:
-			histName5 << detName << "_multihit_m";
-			tempName=histName5.str();
-			chistName=tempName.c_str();
-			histTitle5 << detName << " multihits MAPMT";
-			tempTitle=histTitle5.str();
-			chistTitle=tempTitle.c_str();   
-			fh_multihit_m_Fib[ifibcount] = new TH2F(chistName, chistTitle, 520, 0., 520., 20, 0., 20.);
+			fh_multihit_m_Fib[ifibcount] = new TH2F(Form("%s_multihit_m",detName), Form("%s multihits MAPMT",detName), 520, 0., 520., 20, 0., 20.);
 			fh_multihit_m_Fib[ifibcount]->GetXaxis()->SetTitle("MAPMT channel");
 			fh_multihit_m_Fib[ifibcount]->GetYaxis()->SetTitle("Multihit");
-			tempName.clear();
-			tempTitle.clear();	   
 			// Multihit SAPMT:
-			histName6 << detName << "_multihit_s";
-			tempName=histName6.str();
-			chistName=tempName.c_str();
-			histTitle6 << detName << " multihits SAPMT";
-			tempTitle=histTitle6.str();
-			chistTitle=tempTitle.c_str();	   
-			fh_multihit_s_Fib[ifibcount] = new TH2F(chistName, chistTitle, 16, 0., 16., 20, 0., 20.);   	   
-			fh_multihit_s_Fib[ifibcount]->GetXaxis()->SetTitle("SAPMT channel");
+			fh_multihit_s_Fib[ifibcount] = new TH2F(Form("%s_multihit_s",detName), Form("%s multihits single PMT",detName), 16, 0., 16., 20, 0., 20.);   	   
+			fh_multihit_s_Fib[ifibcount]->GetXaxis()->SetTitle("Single PMT channel");
 			fh_multihit_s_Fib[ifibcount]->GetYaxis()->SetTitle("Multihit");
-			tempName.clear();
-			tempTitle.clear(); 
 			// ToT MAPMT:  
-			histName7 << detName << "_tot_m";
-			tempName=histName7.str();
-			chistName=tempName.c_str();
-			histTitle7 << detName << " ToT of MAPMT";
-			tempTitle=histTitle7.str();
-			chistTitle=tempTitle.c_str();	   
-			fh_ToT_m_Fib[ifibcount] = new TH2F(chistName, chistTitle, 2100, 0., 2100., 400, 0., 200.);   	   
+			fh_ToT_m_Fib[ifibcount] = new TH2F(Form("%s_tot_m",detName), Form("%s ToT of MAPMT",detName), N_FIBER_PLOT, 0., N_FIBER_PLOT, 400, 0., 20.);   	   
 			fh_ToT_m_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
 			fh_ToT_m_Fib[ifibcount]->GetYaxis()->SetTitle("ToT / ns");
-			tempName.clear();
-			tempTitle.clear();
 			// ToT SAPMT:  
-			histName8 << detName << "_tot_s";
-			tempName=histName8.str();
-			chistName=tempName.c_str();
-			histTitle8 << detName << " ToT of SAPMT";
-			tempTitle=histTitle8.str();
-			chistTitle=tempTitle.c_str();	   
-			fh_ToT_s_Fib[ifibcount] = new TH2F(chistName, chistTitle, 2100, 0., 2100., 400, 0., 200.);   	   
+			fh_ToT_s_Fib[ifibcount] = new TH2F(Form("%s_tot_s",detName), Form("%s ToT of single PMT",detName), N_FIBER_PLOT, 0., N_FIBER_PLOT, 400, 0., 40.);   	   
 			fh_ToT_s_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
 			fh_ToT_s_Fib[ifibcount]->GetYaxis()->SetTitle("ToT / ns");
-			tempName.clear();
-			tempTitle.clear();	   
 			// Time of fiber: 
-			histName9 << detName << "_TimevsFiber";
-			tempName=histName9.str();
-			chistName=tempName.c_str();
-			histTitle9 << detName << " Time vs Fiber";
-			tempTitle=histTitle9.str();
-			chistTitle=tempTitle.c_str();
-			fh_time_Fib[ifibcount]= new TH2F(chistName, chistTitle, 2100, 0., 2100., 20000, -1024., 1024.);
+			fh_time_Fib[ifibcount]= new TH2F(Form("%s_TimevsFiber",detName), Form("%s Time vs Fiber",detName), N_FIBER_PLOT, 0., N_FIBER_PLOT, 20000, -1024., 1024.);
 			fh_time_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
 			fh_time_Fib[ifibcount]->GetYaxis()->SetTitle("tMAPMT-tSPMT");
-			tempName.clear();
-			tempTitle.clear();
 			// ToF LOS -> Fiber:
-			histName11 << detName << "_tof";
-			tempName=histName11.str();
-			chistName=tempName.c_str();
-			histTitle11 << detName << " ToF LOS to Fiber ";
-			tempTitle=histTitle11.str();
-			chistTitle=tempTitle.c_str();
-			fh_Fib_ToF[ifibcount] = new TH2F(chistName, chistTitle, 2100, 0., 2100.,10000, -5000., 5000.);	   
+			fh_Fib_ToF[ifibcount] = new TH2F(Form("%s_tof",detName), Form("%s ToF LOS to Fiber",detName), N_FIBER_PLOT, 0., N_FIBER_PLOT,10000, -5000., 5000.);	   
 			fh_Fib_ToF[ifibcount]->GetYaxis()->SetTitle("ToF / ns");
 			fh_Fib_ToF[ifibcount]->GetXaxis()->SetTitle("Fiber number");
-			tempName.clear();
-			tempTitle.clear();         
 			// Not-calibrated position:
-			histName12 << detName << "_pos";
-			tempName=histName12.str();
-			chistName=tempName.c_str();
-			histTitle12 << detName << " Not-calibrated position ";
-			tempTitle=histTitle12.str();
-			chistTitle=tempTitle.c_str();
-			fh_Fib_pos[ifibcount] = new TH1F(chistName, chistTitle, 6000, -1500., 1500.);	   
+			fh_Fib_pos[ifibcount] = new TH1F(Form("%s_pos",detName), Form("%s Not-calibrated position",detName), 6000, -1500., 1500.);	   
 			fh_Fib_pos[ifibcount]->GetXaxis()->SetTitle("Position");
 			fh_Fib_pos[ifibcount]->GetYaxis()->SetTitle("Counts");
-			tempName.clear();
-			tempTitle.clear();
 			// hit fiber number vs. event number:
-			histName13 << detName << "_fib_vs_event";
-			tempName=histName13.str();
-			chistName=tempName.c_str();
-			histTitle13 << detName << " Fiber # vs. Event # ";
-			tempTitle=histTitle13.str();
-			chistTitle=tempTitle.c_str();
-			fh_Fib_vs_Events[ifibcount] = new TH2F(chistName, chistTitle, 10000,0,5e6,1100, 0., 1100.);	   
+			fh_Fib_vs_Events[ifibcount] = new TH2F(Form("%s_fib_vs_event",detName), Form("%s Fiber # vs. Event #",detName), 10000,0,5e6,1100, 0., 1100.);	   
 			fh_Fib_vs_Events[ifibcount]->GetYaxis()->SetTitle("Fiber number");
 			fh_Fib_vs_Events[ifibcount]->GetXaxis()->SetTitle("Event number");
-			tempName.clear();
-			tempTitle.clear();         
+			// ToT SAPMT:  
+			fh_ToT_single_Fib[ifibcount] = new TH2F(Form("%s_tot_single",detName), Form("%s ToT of single PMTs",detName), 10, 0., 10., 400, 0., 40.);   	   
+			fh_ToT_single_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
+			fh_ToT_single_Fib[ifibcount]->GetYaxis()->SetTitle("ToT / ns");
+
+
 
 			FibCanvas[ifibcount]->Divide(3, 4);
 			FibCanvas[ifibcount]->cd(1);
@@ -510,6 +430,10 @@ InitStatus R3BOnlineSpectra::Init()
 			fh_Fib_pos[ifibcount]->Draw();
 			FibCanvas[ifibcount]->cd(10);
 			fh_Fib_vs_Events[ifibcount]->Draw("colz");        
+			FibCanvas[ifibcount]->cd(11);
+			fh_ToT_single_Fib[ifibcount]->Draw("colz");        
+			FibCanvas[ifibcount]->cd(12);
+			fh_channels_single_Fib[ifibcount]->Draw();
 
 			FibCanvas[ifibcount]->cd(0);
 			run->AddObject(FibCanvas[ifibcount]);     
@@ -1024,9 +948,11 @@ void R3BOnlineSpectra::Reset_FIBERS_Histo()
 			fh_mult_Fib[ifibcount]->Reset();      
 			fh_ToT_m_Fib[ifibcount]->Reset();
 			fh_ToT_s_Fib[ifibcount]->Reset();
+			fh_ToT_single_Fib[ifibcount]->Reset();
 			fh_Fib_ToF[ifibcount]->Reset();
 			fh_Fib_pos[ifibcount]->Reset();
 			fh_Fib_vs_Events[ifibcount]->Reset();   
+			fh_channels_single_Fib[ifibcount]->Reset();
 		}     
      }
 }
@@ -1183,7 +1109,10 @@ if(fMappedItems.at(DET_BMON)){
   Int_t nPart;   
   if(fCalItems.at(DET_LOS))
   {
-	Bool_t LOSID = false;
+    auto det = fCalItems.at(DET_LOS);
+    nPart = det->GetEntriesFast();  
+
+    if (nPart>0) fh_los_multihit->Fill(nPart);
 
     auto det = fCalItems.at(DET_LOS);
     nPart = det->GetEntriesFast(); 
@@ -1595,141 +1524,150 @@ if(fMappedItems.at(DET_BMON)){
 
 
 
-  //----------------------------------------------------------------------
-  // Fiber detectors
-  //----------------------------------------------------------------------
-  Double_t dtime = 0.0/0.0;
+    //----------------------------------------------------------------------
+    // Fiber detectors
+    //----------------------------------------------------------------------
+    Double_t dtime = 0.0/0.0;
 
-  for(Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)
-  { 
+    for(Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)
+    { 
 
-    Int_t iFib = 0;  
+        Int_t iFib = 0;  
 
-    auto detMapped = fMappedItems.at(DET_FI_FIRST + ifibcount);
-    auto detHit = fHitItems.at(DET_FI_FIRST + ifibcount);
+        auto detMapped = fMappedItems.at(DET_FI_FIRST + ifibcount);
+        auto detHit = fHitItems.at(DET_FI_FIRST + ifibcount);
 
-    if(detMapped) 
-    {
-      Int_t nHits = detMapped->GetEntriesFast();
-      std::vector<UInt_t> mapmt_num(512);
-      std::vector<UInt_t> spmt_num(16);
-      for (Int_t ihit = 0; ihit < nHits; ihit++)
-      {
-	R3BBunchedFiberMappedData* hit = (R3BBunchedFiberMappedData*)detMapped->At(ihit);
-	if (!hit) continue;
+        if(detMapped) 
+        {
+            Int_t nHits = detMapped->GetEntriesFast();
+            std::vector<UInt_t> mapmt_num(512);
+            std::vector<UInt_t> spmt_num(16);
+            for (Int_t ihit = 0; ihit < nHits; ihit++)
+            {
+	            R3BBunchedFiberMappedData* hit = (R3BBunchedFiberMappedData*)detMapped->At(ihit);
+	            if (!hit) continue;
 
-	// channel numbers are stored 1-based (1..n)
-	Int_t iCha = hit->GetChannel();  // 1..
+	            // channel numbers are stored 1-based (1..n)
+	            Int_t iCha = hit->GetChannel();  // 1..
 
-	if (hit->IsMAPMT() && hit->IsLeading()) 
-	{
-	  fh_channels_Fib[ifibcount]->Fill(iCha);    // Fill which clockTDC channel has events
+	            if (hit->IsMAPMT() && hit->IsLeading()) 
+	            {
+	                fh_channels_Fib[ifibcount]->Fill(iCha);    // Fill which clockTDC channel has events
+	                ++mapmt_num.at(hit->GetChannel() - 1);     // multihit of a given clockTDC channel
+	            }
 
-	  ++mapmt_num.at(hit->GetChannel() - 1);     // multihit of a given clockTDC channel
-	}
+	            if (!hit->IsMAPMT() && hit->IsLeading()) 
+	            {
+	                fh_channels_single_Fib[ifibcount]->Fill(iCha);    // Fill which single PMT channel has events
+	                ++spmt_num.at(hit->GetChannel() - 1);      // multihit of a given PADI channel
+	            }
+            }
 
-	if (!hit->IsMAPMT() && hit->IsLeading()) 
-	{
+            for (int i = 0; i < 512; ++i) 
+            { 
+	            auto m = mapmt_num.at(i);
+	            if(m > 0) fh_multihit_m_Fib[ifibcount]->Fill(i+1,m);  // multihit of a given clockTDC channel      
+            }
 
-	  ++spmt_num.at(hit->GetChannel() - 1);      // multihit of a given PADI channel
-	}
-      }
-
-      for (int i = 0; i < 512; ++i) 
-      { 
-	auto m = mapmt_num.at(i);
-	if(m > 0) fh_multihit_m_Fib[ifibcount]->Fill(i,m);  // multihit of a given clockTDC channel      
-      }
-
-      for (int i = 0; i < 16; ++i) 
-      {
-	auto s = spmt_num.at(i);
-	if(s > 0) fh_multihit_s_Fib[ifibcount]->Fill(i,s); // multihit of a given PADI channel
-      }
-    }
-
-
-    if(detHit) 
-    {
-      Int_t nHits = detHit->GetEntriesFast(); 
-
-      Double_t posfib = 0./0.;
-      Double_t totMax = 0.;     
-      Double_t tfib=0./0., tof_fib= 0./0.;
-      Double_t randx;
-      Int_t iFibmax = 0;
-
-      for (Int_t ihit = 0; ihit < nHits; ihit++)
-      {
-	Double_t tMAPMT = 0./0.;
-	Double_t tSPMT = 0./0.;
-
-	R3BBunchedFiberHitData* hit = (R3BBunchedFiberHitData*)detHit->At(ihit);
-	if (!hit) continue;
-
-	iFib = hit->GetFiberId();  // 1..
-
-	// times
-	tMAPMT = hit->GetMAPMTTime_ns();
-	tSPMT = hit->GetSPMTTime_ns();
-
-	dtime = tMAPMT-tSPMT;		
-
-	// "Push" two times in the same clock cycle:	
-		while(dtime < -1024) 
-		{
-			tSPMT = tSPMT - 2048.; 
-			dtime = tMAPMT - tSPMT;
-		}
-		while(dtime > 1024.) 
-		{
-			tSPMT = tSPMT + 2048.; 
-			dtime = tMAPMT - tSPMT;
-		}			
-
-	// "Push" the Fib times in the same cycle with LOS:
-	if(timeLos[0]>0. && !(IS_NAN(timeLos[0])))
-	{
-	  while(tMAPMT - timeLos[0] < 4096.)
-	  {
-	    tMAPMT = tMAPMT + 2048.*4.; 
-	    tSPMT = tSPMT + 2048.*4.; 		  
-	  }		
-	  while(tMAPMT - timeLos[0] > 4096.)
-	  {
-	    tMAPMT = tMAPMT - 2048.*4.; 
-	    tSPMT = tSPMT - 2048.*4.; 		  
-	  }
-	}
-
-	// Not-calibrated ToF:	 
-	//tfib = (tMAPMT + tSPMT) / 2.;
-	tfib = tSPMT;
-	if(tfib > 0. && !(IS_NAN(tfib)) && timeLos[0]>0. && !(IS_NAN(timeLos[0]))) tof_fib = tfib - timeLos[0];
-
-	// Not-calibrated position:  
-	randx = (std::rand() / (float)RAND_MAX);
-	if(iFib > 0) posfib = (-n_fiber[ifibcount]/2.+iFib+(0.5-randx)); 
-
-	if(hit->GetSPMTToT_ns() > 0) 
-	{
-	  fh_fibers_Fib[ifibcount]->Fill(iFib);  
-	  fh_ToT_s_Fib[ifibcount]->Fill(iFib,hit->GetSPMTToT_ns());
-	  fh_ToT_m_Fib[ifibcount]->Fill(iFib,hit->GetMAPMTToT_ns());
-	  fh_time_Fib[ifibcount]->Fill(iFib,tMAPMT-tSPMT);
-	  fh_Fib_ToF[ifibcount]->Fill(iFib,tof_fib);
-	  fh_Fib_pos[ifibcount]->Fill(posfib);	
-	  fh_Fib_vs_Events[ifibcount]->Fill(fNEvents,iFib);	
-	}  
-
-      }  // end for(ihit)
-
-      fh_mult_Fib[ifibcount]->Fill(nHits);            
-
-    }  // end if(aHit[ifibcount]) 
+            for (int i = 0; i < 16; ++i) 
+            {
+	            auto s = spmt_num.at(i);
+	            if(s > 0) fh_multihit_s_Fib[ifibcount]->Fill(i+1,s); // multihit of a given PADI channel
+            }
+        }
 
 
-  } // end for(ifibcount)
+        if(detHit) 
+        {
+            Int_t nHits = detHit->GetEntriesFast(); 
+
+            Double_t posfib = 0./0.;
+            Double_t totMax = 0.;     
+            Double_t tfib=0./0., tof_fib= 0./0.;
+            Double_t randx;
+            Int_t iFibmax = 0;
+
+            for (Int_t ihit = 0; ihit < nHits; ihit++)
+            {
+	            Double_t tMAPMT = 0./0.;
+	            Double_t tSPMT = 0./0.;
+
+                R3BBunchedFiberHitData* hit = (R3BBunchedFiberHitData*)detHit->At(ihit);
+	            if (!hit) continue;
+
+	            iFib = hit->GetFiberId();  // 1..
+
+                // times
+                tMAPMT = hit->GetMAPMTTime_ns();
+                tSPMT = hit->GetSPMTTime_ns();
+
+	            dtime = tMAPMT-tSPMT;		
+
+                // "Push" two times in the same clock cycle:	
+                while(dtime < -1024) 
+                {
+                    tSPMT = tSPMT - 2048.; 
+                    dtime = tMAPMT - tSPMT;
+                }
+                while(dtime > 1024.) 
+                {
+                    tSPMT = tSPMT + 2048.; 
+                    dtime = tMAPMT - tSPMT;
+                }			
+
+                // "Push" the Fib times in the same cycle with LOS:
+                if(timeLos[0]>0. && !(IS_NAN(timeLos[0])))
+                {
+	                while(tMAPMT - timeLos[0] < 4096.)
+                    {
+                        tMAPMT = tMAPMT + 2048.*4.; 
+                        tSPMT = tSPMT + 2048.*4.; 		  
+	                }		
+                    while(tMAPMT - timeLos[0] > 4096.)
+	                {
+                        tMAPMT = tMAPMT - 2048.*4.; 
+                        tSPMT = tSPMT - 2048.*4.; 		  
+                    }
+                }
+
+                // Not-calibrated ToF:	 
+                //tfib = (tMAPMT + tSPMT) / 2.;
+                tfib = tSPMT;
+                if(tfib > 0. && !(IS_NAN(tfib)) && timeLos[0]>0. && !(IS_NAN(timeLos[0]))) tof_fib = tfib - timeLos[0];
+
+                // Not-calibrated position:  
+                randx = (std::rand() / (float)RAND_MAX);
+                if(iFib > 0) posfib = (-n_fiber[ifibcount]/2.+iFib+(0.5-randx)); 
+
+                if(hit->GetSPMTToT_ns() > 0) 
+                {
+                    fh_fibers_Fib[ifibcount]->Fill(iFib);  
+                    fh_ToT_s_Fib[ifibcount]->Fill(iFib,hit->GetSPMTToT_ns());
+                    fh_ToT_m_Fib[ifibcount]->Fill(iFib,hit->GetMAPMTToT_ns());
+                    fh_time_Fib[ifibcount]->Fill(iFib,tMAPMT-tSPMT);
+                    fh_Fib_ToF[ifibcount]->Fill(iFib,tof_fib);
+                    fh_Fib_pos[ifibcount]->Fill(posfib);	
+                    fh_Fib_vs_Events[ifibcount]->Fill(fNEvents,iFib);	
+                    if(ifibcount==12 || ifibcount==13){
+                        fh_ToT_single_Fib[ifibcount]->Fill((iFib-1)%2+1+2*((iFib-1)/512),hit->GetSPMTToT_ns());
+//                    cout<<"Test: "<<ifibcount<<" ifib: "<<iFib<<" single PMT: "<< (iFib)%2+1+2*((iFib-1)/512)<<endl;
+                    }
+
+                    if(ifibcount==14 || ifibcount==15){
+                        fh_ToT_single_Fib[ifibcount]->Fill((iFib-1)%2+1+2*((iFib-1)/512),hit->GetSPMTToT_ns());
+//                    cout<<"Test: "<<ifibcount<<" ifib: "<<iFib<<" single PMT: "<< (iFib-1)%2+1+2*((iFib-1)/512)<<endl;
+                    }
+                    
+                    if(ifibcount==9 || ifibcount==10){
+                        fh_ToT_single_Fib[ifibcount]->Fill((iFib-1)/256+1,hit->GetSPMTToT_ns());
+                    }
+                }  
+            }  // end for(ihit)
+
+            if(nHits>0) fh_mult_Fib[ifibcount]->Fill(nHits);            
+
+        }  // end if(aHit[ifibcount]) 
+    } // end for(ifibcount)
 
   //----------------------------------------------------------------------
   // TOFD
@@ -2270,8 +2208,10 @@ void R3BOnlineSpectra::FinishTask()
       fh_multihit_s_Fib[ifibcount]->Write();
       fh_ToT_m_Fib[ifibcount]->Write();
       fh_ToT_s_Fib[ifibcount]->Write();
+      fh_ToT_single_Fib[ifibcount]->Write();
       fh_Fib_vs_Events[ifibcount]->Write();
       fh_Fib_ToF[ifibcount]->Write();
+      fh_channels_single_Fib[ifibcount]->Write();
     }
   }
 

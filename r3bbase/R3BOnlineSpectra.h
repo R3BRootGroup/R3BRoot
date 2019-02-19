@@ -11,6 +11,7 @@
 #define N_PADDLE_MAX_PTOF 100
 #define N_PSPX 6
 #define N_STRIPS_PSPX 32
+#define N_FIBER_PLOT 1050 // range to plot
 
 #include "FairTask.h"
 #include <array>
@@ -158,7 +159,9 @@ class R3BOnlineSpectra : public FairTask
       DET_FI9,
       DET_FI10,
       DET_FI11,
-      DET_FI_LAST = DET_FI11,
+      DET_FI12,
+      DET_FI13,
+      DET_FI_LAST = DET_FI13,
       DET_L3T,
       DET_LOS,
       DET_MUSIC,
@@ -193,6 +196,8 @@ class R3BOnlineSpectra : public FairTask
       "Fi9",
       "Fi10",
       "Fi11",
+      "Fi12",
+      "Fi13",
       "L3t",
       "Los",
       "Music",
@@ -282,6 +287,7 @@ class R3BOnlineSpectra : public FairTask
     TH2F *fh_los_dt_hits_VT;
     
     TH1F *fh_channels_Fib[NOF_FIB_DET];
+    TH1F *fh_channels_single_Fib[NOF_FIB_DET];
     TH1F *fh_fibers_Fib[NOF_FIB_DET];
     TH1F *fh_mult_Fib[NOF_FIB_DET];
     TH2F *fh_Fib_ToF[NOF_FIB_DET];
@@ -292,6 +298,8 @@ class R3BOnlineSpectra : public FairTask
     TH2F *fh_ToT_m_Fib[NOF_FIB_DET];
     TH2F *fh_ToT_s_Fib[NOF_FIB_DET];
     TH2F *fh_Fib_vs_Events[NOF_FIB_DET];
+    TH2F *fh_ToT_single_Fib[NOF_FIB_DET];
+    
     
     TH1F *fh_tofd_channels[N_PLANE_MAX_TOFD];   
     TH2F *fh_tofd_multihit[N_PLANE_MAX_TOFD];
