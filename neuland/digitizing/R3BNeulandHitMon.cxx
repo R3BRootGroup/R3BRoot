@@ -43,7 +43,8 @@ InitStatus R3BNeulandHitMon::Init()
         FairRootManager::Instance()->Register("NeulandHitMon", "Hits in NeuLAND", fh3, kTRUE);
     }
 
-    hTime = new TH1D("hTime", "Hit time", 400, 0, 200);
+    hTime = new TH1D("hTime", "Hit time", 30000, -1000, 1000);
+    hTimeAdj = new TH1D("hTimeAdj", "Hit Time adjusted for flight path", 30000, -1000, 1000);
     hMult = new TH1D("hMult", "Hit Multiplicity", 30, -0.5, 29.5);
     hDepth = new TH1D("hDepth", "Maxial penetration depth", 60, 1400, 1700);
     hForemostEnergy = new TH1D("hForemostEnergy", "Foremost energy deposition", 100, 0, 100);
@@ -59,8 +60,8 @@ InitStatus R3BNeulandHitMon::Init()
     hE = new TH1D("hE", "Hit Energy", 300, 0., 300.);
     hX = new TH1D("hX", "Hit X", 300, -150, 150.);
     hY = new TH1D("hY", "Hit Y", 300, -150, 150.);
-    hT = new TH1D("hT", "Hit Delta T", 3000, -15., -15.);
-    hTNeigh = new TH1D("hTNeigh", "Hit Neigh Delta T", 3000, -15., -15.);
+    hT = new TH1D("hT", "Hit Delta T", 30000, -15., -15.);
+    hTNeigh = new TH1D("hTNeigh", "Hit Neigh Delta T", 30000, -15., -15.);
 
     return kSUCCESS;
 }
@@ -83,6 +84,7 @@ void R3BNeulandHitMon::Exec(Option_t*)
     {
         hPosVSEnergy->Fill(hit->GetPosition().Z(), hit->GetE());
         hTime->Fill(hit->GetT());
+        hTimeAdj->Fill(fDistanceToTarget / hit->GetPosition().Mag() * hit->GetT());
         hBeta->Fill(hit->GetBeta());
         hE->Fill(hit->GetE());
         hX->Fill(hit->GetPosition().X());
@@ -144,6 +146,7 @@ void R3BNeulandHitMon::Finish()
     hDepth->Write();
     hMult->Write();
     hTime->Write();
+    hTimeAdj->Write();
     hForemostEnergy->Write();
     hSternmostEnergy->Write();
     hDepthVSForemostEnergy->Write();

@@ -24,6 +24,8 @@ class R3BNeulandOnlineSpectra : public FairTask
     void FinishTask() override;
 
     void ResetHistos();
+    void ResetHistosMapped();
+    void SetDistanceToTarget(double x) { fDistanceToTarget = x; }
 
   private:
     static const unsigned int fNPlanes = 16;
@@ -56,6 +58,8 @@ class R3BNeulandOnlineSpectra : public FairTask
     TH2D* hDT425;
 
     std::array<TH2D*, fNPlanes> ahXYperPlane;
+
+    double fDistanceToTarget;
 
   private:
     bool IsBeam() const;

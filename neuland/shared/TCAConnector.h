@@ -5,6 +5,7 @@
 #include "TClonesArray.h"
 #include "TString.h"
 #include <exception>
+#include <utility>
 #include <vector>
 
 template <typename T>
@@ -16,15 +17,16 @@ class TCAInputConnector
     TClonesArray* fTCA; // non-owning
 
   public:
-    TCAInputConnector(const TString& b)
-        : fBranchName(b)
+    TCAInputConnector(TString b)
+        : fBranchName(std::move(b))
         , fClassName(T().ClassName())
+        , fTCA(nullptr)
     {
     }
 
     void Init()
     {
-        FairRootManager* ioman = FairRootManager::Instance();
+        auto ioman = FairRootManager::Instance();
         if (ioman == nullptr)
         {
             throw std::runtime_error("TCAInputConnector: No FairRootManager");
@@ -46,12 +48,11 @@ class TCAInputConnector
 
     std::vector<T*> Retrieve() const
     {
+        std::vector<T*> fV;
         if (fTCA == nullptr)
         {
             throw std::runtime_error("TCAInputConnector: TClonesArray not available");
         }
-
-        std::vector<T*> fV;
 
         const Int_t n = fTCA->GetEntries();
         fV.reserve(n);
@@ -64,12 +65,78 @@ class TCAInputConnector
 
     std::vector<T> RetrieveObjects() const
     {
+        std::vector<T> fV;
         if (fTCA == nullptr)
         {
             throw std::runtime_error("TCAInputConnector: TClonesArray not available");
         }
 
+        const Int_t n = fTCA->GetEntries();
+        fV.reserve(n);
+        for (Int_t i = 0; i < n; i++)
+        {
+            fV.emplace_back(*(T*)fTCA->At(i));
+        }
+        return fV;
+    }
+};
+
+template <typename T>
+class TCAOptionalInputConnector
+{
+  private:
+    TString fBranchName;
+    TString fClassName;
+    TClonesArray* fTCA; // non-owning
+
+  public:
+    TCAOptionalInputConnector(TString b)
+        : fBranchName(std::move(b))
+        , fClassName(T().ClassName())
+        , fTCA(nullptr)
+    {
+    }
+
+    void Init()
+    {
+        auto ioman = FairRootManager::Instance();
+        if (ioman == nullptr)
+        {
+            throw std::runtime_error("TCAInputConnector: No FairRootManager");
+        }
+        fTCA = (TClonesArray*)ioman->GetObject(fBranchName);
+        if (fTCA != nullptr && !TString(fTCA->GetClass()->GetName()).EqualTo(fClassName))
+        {
+            throw std::runtime_error(TString("TCAInputConnector: TClonesArray " + fBranchName +
+                                             " does not contain elements of type " + fClassName)
+                                         .Data());
+        }
+    }
+
+    std::vector<T*> Retrieve() const
+    {
+        std::vector<T*> fV;
+        if (fTCA == nullptr)
+        {
+            return fV;
+        }
+
+        const Int_t n = fTCA->GetEntries();
+        fV.reserve(n);
+        for (Int_t i = 0; i < n; i++)
+        {
+            fV.emplace_back((T*)fTCA->At(i));
+        }
+        return fV;
+    }
+
+    std::vector<T> RetrieveObjects() const
+    {
         std::vector<T> fV;
+        if (fTCA == nullptr)
+        {
+            return fV;
+        }
 
         const Int_t n = fTCA->GetEntries();
         fV.reserve(n);
@@ -90,15 +157,16 @@ class TCAOutputConnector
     TClonesArray* fTCA; // non-owning
 
   public:
-    TCAOutputConnector(const TString& b)
-        : fBranchName(b)
+    TCAOutputConnector(TString b)
+        : fBranchName(std::move(b))
         , fClassName(T().ClassName())
+        , fTCA(nullptr)
     {
     }
 
     void Init()
     {
-        FairRootManager* ioman = FairRootManager::Instance();
+        auto ioman = FairRootManager::Instance();
         if (ioman == nullptr)
         {
             throw std::runtime_error("TCAOutputConnector: No FairRootManager");

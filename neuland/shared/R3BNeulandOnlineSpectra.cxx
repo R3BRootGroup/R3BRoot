@@ -22,8 +22,13 @@ InitStatus R3BNeulandOnlineSpectra::Init()
     std::srand(std::time(0)); // use current time as seed for random generator
 
     auto run = FairRunOnline::Instance();
-    run->GetHttpServer()->Register("/Tasks", this);
-    run->GetHttpServer()->RegisterCommand("Reset_Neuland", Form("/Tasks/%s/->ResetHistos()", GetName()));
+    if (run)
+    {
+        run->GetHttpServer()->Register("/Tasks", this);
+        run->GetHttpServer()->RegisterCommand("Reset_Neuland", Form("/Tasks/%s/->ResetHistos()", GetName()));
+        run->GetHttpServer()->RegisterCommand("Reset_Neuland_Mapped",
+                                              Form("/Tasks/%s/->ResetHistosMapped()", GetName()));
+    }
 
     fNeulandMappedData.Init();
     fNeulandCalData.Init();
@@ -60,7 +65,10 @@ InitStatus R3BNeulandOnlineSpectra::Init()
     ahMappedBar2[3]->Draw("same");
 
     canvasMapped->cd(0);
-    run->AddObject(canvasMapped);
+    if (run)
+    {
+        run->AddObject(canvasMapped);
+    }
 
     auto canvasCal = new TCanvas("NeulandCal", "NeulandCal", 10, 10, 850, 850);
     canvasCal->Divide(2, 3);
@@ -92,7 +100,10 @@ InitStatus R3BNeulandOnlineSpectra::Init()
     ahCalEvsBar[1]->Draw("colz");
 
     canvasCal->cd(0);
-    run->AddObject(canvasCal);
+    if (run)
+    {
+        run->AddObject(canvasCal);
+    }
 
     auto canvasHit = new TCanvas("NeulandHit", "NeulandHit", 10, 10, 850, 850);
     canvasHit->Divide(2, 2);
@@ -105,16 +116,19 @@ InitStatus R3BNeulandOnlineSpectra::Init()
     canvasHit->cd(2);
     hTdiffvsBar->Draw("colz");
 
-    hToFvsBar = new TH2D("hTofvsBar", "Tof vs Bars", fNBars, 0.5, fNBars + 0.5, 2000, 40, 200);
+    hToFvsBar = new TH2D("hTofvsBar", "Tof vs Bars", fNBars, 0.5, fNBars + 0.5, 6000, -3000, 3000);
     canvasHit->cd(3);
     hToFvsBar->Draw("colz");
 
-    hTofvsEhit = new TH2D("hTofvsEhit", "Tof vs Ehit", 1000, 0, 60, 2000, 40, 200);
+    hTofvsEhit = new TH2D("hTofvsEhit", "Tof vs Ehit", 1000, 0, 60, 6000, -3000, 3000);
     canvasHit->cd(4);
     hTofvsEhit->Draw("colz");
 
     canvasHit->cd(0);
-    run->AddObject(canvasHit);
+    if (run)
+    {
+        run->AddObject(canvasHit);
+    }
 
     auto canvasHitCosmics = new TCanvas("NeulandHitCosmics", "NeulandHitCosmics", 10, 10, 850, 850);
     canvasHitCosmics->Divide(2, 2);
@@ -138,7 +152,10 @@ InitStatus R3BNeulandOnlineSpectra::Init()
     hDT425->Draw("colz");
 
     canvasHitCosmics->cd(0);
-    run->AddObject(canvasHitCosmics);
+    if (run)
+    {
+        run->AddObject(canvasHitCosmics);
+    }
 
     auto canvasPlaneXY = new TCanvas("NeulandPlaneXY", "NeulandPlaneXY", 10, 10, 850, 850);
     canvasPlaneXY->Divide(4, 4);
@@ -156,7 +173,10 @@ InitStatus R3BNeulandOnlineSpectra::Init()
         ahXYperPlane[i]->Draw("colz");
     }
     canvasPlaneXY->cd(0);
-    run->AddObject(canvasPlaneXY);
+    if (run)
+    {
+        run->AddObject(canvasPlaneXY);
+    }
 
     return kSUCCESS;
 }
@@ -211,11 +231,11 @@ void R3BNeulandOnlineSpectra::Exec(Option_t*)
             hHitEvsBar->Fill(bar, hit->GetE());
             hTdiffvsBar->Fill(bar, hit->GetTdcL() - hit->GetTdcR());
 
-            Double_t s = hit->GetPosition().Mag();
+            const Double_t tadj = fDistanceToTarget / hit->GetPosition().Mag() * hit->GetT();
 
             if (hit->GetE() > 7.)
-                hToFvsBar->Fill(bar, 1520. / s * fmod(hit->GetT() - start + 5 * 8192 + 2000, 5 * 2048));
-            hTofvsEhit->Fill(hit->GetE(), 1520. / s * fmod(hit->GetT() - start + 5 * 8192 + 2000, 5 * 2048));
+                hToFvsBar->Fill(bar, tadj);
+            hTofvsEhit->Fill(hit->GetE(), tadj);
 
             randx = (std::rand() / (float)RAND_MAX);
             const int plane = static_cast<const int>(std::floor((hit->GetPaddle() - 1) / 50));
@@ -314,6 +334,18 @@ void R3BNeulandOnlineSpectra::ResetHistos()
     {
         ahXYperPlane[i]->Reset();
     }
+}
+
+void R3BNeulandOnlineSpectra::ResetHistosMapped()
+{
+    ahMappedBar1[0]->Reset();
+    ahMappedBar1[1]->Reset();
+    ahMappedBar1[2]->Reset();
+    ahMappedBar1[3]->Reset();
+    ahMappedBar2[0]->Reset();
+    ahMappedBar2[1]->Reset();
+    ahMappedBar2[2]->Reset();
+    ahMappedBar2[3]->Reset();
 }
 
 double R3BNeulandOnlineSpectra::GetTstart() const

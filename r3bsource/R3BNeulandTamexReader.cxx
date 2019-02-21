@@ -13,12 +13,11 @@ extern "C"
 
 R3BNeulandTamexReader::R3BNeulandTamexReader(EXT_STR_h101_raw_nnp_tamex* data, UInt_t offset)
     : R3BReader("R3BNeulandTamexReader")
-    , fNEvent(0)
     , fData(data)
     , fOffset(offset)
-    , fLogger(FairLogger::GetLogger())
     , fArray(new TClonesArray("R3BPaddleTamexMappedData"))
-    , fNofPlanes(2)
+    , fNofPlanes(sizeof(((EXT_STR_h101_raw_nnp_tamex_onion_t*)(data))->NN_P) /
+                 sizeof(*(((EXT_STR_h101_raw_nnp_tamex_onion_t*)(data))->NN_P)))
 {
 }
 
@@ -45,16 +44,12 @@ Bool_t R3BNeulandTamexReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BNeulandTamexReader::Read()
 {
-    EXT_STR_h101_raw_nnp_tamex_onion_t* data = (EXT_STR_h101_raw_nnp_tamex_onion_t*)fData;
-
-    /* Display data */
-    // fLogger->Info(MESSAGE_ORIGIN, "  Event data:");
+    const auto data = (EXT_STR_h101_raw_nnp_tamex_onion_t*)fData;
 
     for (int plane = 0; plane < fNofPlanes; ++plane)
     {
         for (int pm = 0; pm < 2; ++pm)
         {
-
             int idx = 0;
             int start = 0;
             int stop = 0;
@@ -83,7 +78,7 @@ Bool_t R3BNeulandTamexReader::Read()
             {
                 bar = data->NN_P[plane].tcl_T[pm].BMI[hit];
                 stop = data->NN_P[plane].tcl_T[pm].BME[hit];
-                //				fLogger->Info(MESSAGE_ORIGIN, "  bar %d, multihit %d \n", bar, stop-start);
+                // fLogger->Info(MESSAGE_ORIGIN, "  bar %d, multihit %d \n", bar, stop-start);
 
                 for (int multi = start; multi < stop; multi++)
                 {
@@ -116,18 +111,9 @@ Bool_t R3BNeulandTamexReader::Read()
         }
     }
 
-    //	fNEvent = fData->EVENTNO;
-    fNEvent += 1;
-
     return kTRUE;
 }
 
-void R3BNeulandTamexReader::Reset()
-{
-    // Reset the output array
-    fArray->Clear();
-
-    //	fNEvent = 0;
-}
+void R3BNeulandTamexReader::Reset() { fArray->Clear(); }
 
 ClassImp(R3BNeulandTamexReader)

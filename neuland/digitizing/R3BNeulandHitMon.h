@@ -38,15 +38,20 @@ class R3BNeulandHitMon : public FairTask
   public:
     void Exec(Option_t*) override;
 
+    void SetDistanceToTarget(double x) { fDistanceToTarget = x; }
+
   private:
     TString fOutput;
 
     TCAInputConnector<R3BNeulandHit> fHits;
 
+    double fDistanceToTarget;
+
     Bool_t fIs3DTrackEnabled;
     TH3D* fh3;
 
     TH1D* hTime;
+    TH1D* hTimeAdj;
     TH1D* hMult;
     TH1D* hDepth;
     TH1D* hForemostEnergy;
