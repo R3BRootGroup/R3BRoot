@@ -62,7 +62,7 @@ class R3BAmsStripCal2Hit : public FairTask {
 
   /** Private method AddHitData **/
   //** Adds a AmsHitData to the HitCollection
-  R3BAmsHitData* AddHitData(Int_t detid, Int_t numhit, Double_t x, Double_t y, Double_t energy_x, Double_t energy_y);
+  R3BAmsHitData* AddHitData(Int_t detid, Int_t numhit, Double_t x, Double_t y, Double_t theta, Double_t phi, Double_t energy_x, Double_t energy_y);
 
  public:
   //Class definition

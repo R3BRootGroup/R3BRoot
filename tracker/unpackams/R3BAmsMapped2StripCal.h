@@ -48,6 +48,11 @@ class R3BAmsMapped2StripCal : public FairTask {
   virtual void Finish();
 
   void SetOnline(Bool_t option){fOnline=option;}
+
+  /**
+   * Method for setting the thresholds: Signal>sigma_strip*ThresSigma
+   */ 
+  void SetThresholdSigma(Double_t th){ThresSigma=th;}
   
  private:
   
@@ -59,6 +64,7 @@ class R3BAmsMapped2StripCal : public FairTask {
   Int_t NumStripsK;
   Int_t NumParams;
   Int_t MaxSigma;
+  Double_t ThresSigma;
   TArrayF* CalParams;
 
   Bool_t fOnline;//Don't store data for online

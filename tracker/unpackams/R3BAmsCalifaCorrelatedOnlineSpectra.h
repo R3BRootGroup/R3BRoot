@@ -96,14 +96,14 @@ class R3BAmsCalifaCorrelatedOnlineSpectra : public FairTask {
   Int_t fNEvents;        	     /**< Event counter. */
   
   TCanvas* cMap;
-  TCanvas* cCal;
-  TCanvas* cHit[4];
+  //TCanvas* cCal;
+  //TCanvas* cHit[4];
 
-  TH2F* fh_Ams_energy_allStrips[4];
-  TH2F* fh_Ams_energy_allCalStrips[8];
-  TH2F* fh_Ams_hit_Pos[4];
-  TH2F* fh_Ams_hit_E[4];
-  TH1F* fh_Ams_hit_Mul[4];
+  TH2F* fh_Califa_coinc_petal1;
+  //TH2F* fh_Ams_energy_allCalStrips[8];
+  //TH2F* fh_Ams_hit_Pos[4];
+  //TH2F* fh_Ams_hit_E[4];
+  //TH1F* fh_Ams_hit_Mul[4];
   
   //TString fAmsFile;        	      /**< Config file name. */
   Int_t fNbDet;                       /**< Number of AMS detectors. */

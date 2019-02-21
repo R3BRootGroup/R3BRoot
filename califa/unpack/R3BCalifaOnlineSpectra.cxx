@@ -304,7 +304,7 @@ InitStatus R3BCalifaOnlineSpectra::Init() {
 	  Xaxis4="Energy (keV)";
 
 	  fh_Califa_crystals[i][j+16*k] = new TH1F(Name10, Name11,
-		     arry_bins[j+16*k], arry_minE[j+16*k], arry_maxE[j+16*k]);
+		     65535, 0, 65535);
 	  fh_Califa_crystals[i][j+16*k]->SetTitleSize(1.5,"t");
 	  fh_Califa_crystals[i][j+16*k]->GetXaxis()->SetTitle(Xaxis3);
 	  fh_Califa_crystals[i][j+16*k]->GetXaxis()->SetLabelSize(0.06);

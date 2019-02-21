@@ -24,6 +24,7 @@
 #include "TH2F.h"
 #include "TCanvas.h"
 #include "TFolder.h"
+#include "TRandom.h"
 
 #include "TClonesArray.h"
 #include <iostream>
@@ -34,6 +35,7 @@
 #include <ctime>
 #include <array>
 #include "TMath.h"
+#include "TVector3.h"
 
 using namespace std;
 
@@ -176,7 +178,7 @@ InitStatus R3BAmsOnlineSpectra::Init() {
 
      sprintf(Name1, "fh_Ams_hit_E_%d", i+1);	  
      sprintf(Name2, "Energy_Y vs Energy_Z for AMS Det: %d", i+1);
-     fh_Ams_hit_E[i] = new TH2F(Name1, Name2, 200, 0, 6000., 200, 0, 6000.);    
+     fh_Ams_hit_E[i] = new TH2F(Name1, Name2, 2000, 0, 6000., 2000, 0, 6000.);    
      fh_Ams_hit_E[i]->GetXaxis()->SetTitle("Energy_Z [ADC units]");
      fh_Ams_hit_E[i]->GetYaxis()->SetTitle("Energy_Y [ADC units]");
      fh_Ams_hit_E[i]->GetXaxis()->CenterTitle(true);
@@ -187,9 +189,9 @@ InitStatus R3BAmsOnlineSpectra::Init() {
      fh_Ams_hit_E[i]->Draw("col");
 
      sprintf(Name1, "fh_Ams_hit_E_theta_%d", i+1);	  
-     sprintf(Name2, "Energy_Z vs Z for AMS Det: %d", i+1);
-     fh_Ams_hit_E_theta[i] = new TH2F(Name1, Name2, 200, 0, 6000., 200, 0, 6000.);    
-     fh_Ams_hit_E_theta[i]->GetXaxis()->SetTitle("Z [mm]");
+     sprintf(Name2, "Energy_Z vs Theta for AMS Det: %d", i+1);
+     fh_Ams_hit_E_theta[i] = new TH2F(Name1, Name2, 500, 0, 90., 500, 0., 6000.);    
+     fh_Ams_hit_E_theta[i]->GetXaxis()->SetTitle("Theta [degrees]");
      fh_Ams_hit_E_theta[i]->GetYaxis()->SetTitle("Energy_Z [ADC units]");
      fh_Ams_hit_E_theta[i]->GetXaxis()->CenterTitle(true);
      fh_Ams_hit_E_theta[i]->GetYaxis()->CenterTitle(true);
@@ -199,11 +201,101 @@ InitStatus R3BAmsOnlineSpectra::Init() {
      fh_Ams_hit_E_theta[i]->Draw("col");
     }
 
+
+    //CANVAS 7
+    cAMSangles = new TCanvas("AMS_Theta_vs_Phi",
+				    "Theta vs Phi",
+				    10, 10, 500, 500);
+    fh_ams_theta_phi = new TH2F("Ams_theta_vs_phi","AMS theta vs phi",
+                                 90, 0, 90,180, -180, 180);
+    fh_ams_theta_phi->GetXaxis()->SetTitle("Theta (degrees)");
+    fh_ams_theta_phi->GetYaxis()->SetTitle("Phi (degrees)");
+    fh_ams_theta_phi->GetXaxis()->SetTitleOffset(1.2);
+    fh_ams_theta_phi->GetYaxis()->SetTitleOffset(1.2);
+    fh_ams_theta_phi->GetXaxis()->CenterTitle(true);
+    fh_ams_theta_phi->GetYaxis()->CenterTitle(true);
+    fh_ams_theta_phi->Draw("COLZ");
+
+
+    //CANVAS 8
+    cHitone = new TCanvas("AMS_theta_top_bottom", "theta between opposite detectors", 10, 10, 500, 500);
+    cHitone->Divide(1,2);
+
+    fh_ams_thetatop_thetabottom = new TH2F("Ams_theta_top_vs_theta_bottom","AMS theta top vs theta bottom",
+                                 90, 0, 90,90, 0, 90);
+    fh_ams_thetatop_thetabottom->GetXaxis()->SetTitle("Theta top (degrees)");
+    fh_ams_thetatop_thetabottom->GetYaxis()->SetTitle("Theta bottom (degrees)");
+    fh_ams_thetatop_thetabottom->GetXaxis()->SetTitleOffset(1.2);
+    fh_ams_thetatop_thetabottom->GetYaxis()->SetTitleOffset(1.2);
+    fh_ams_thetatop_thetabottom->GetXaxis()->CenterTitle(true);
+    fh_ams_thetatop_thetabottom->GetYaxis()->CenterTitle(true);
+    cHitone->cd(1);
+    fh_ams_thetatop_thetabottom->Draw("COLZ");
+
+    sprintf(Name1, "fh_Ams_opening_angle1");	  
+    sprintf(Name2, "AMS Opening Angle (beam hits target at (0,0,0))");
+    fh_Ams_openangle1 = new TH1F(Name1, Name2, 140, 0, 140);    
+    fh_Ams_openangle1->GetXaxis()->SetTitle("Opening angle [degrees]");
+    fh_Ams_openangle1->GetYaxis()->SetTitle("Counts");
+    fh_Ams_openangle1->GetXaxis()->CenterTitle(true);
+    fh_Ams_openangle1->GetYaxis()->CenterTitle(true);
+    fh_Ams_openangle1->GetYaxis()->SetTitleOffset(1.2);
+    fh_Ams_openangle1->GetXaxis()->SetTitleOffset(1.2);
+    cHitone->cd(2);
+    fh_Ams_openangle1->Draw();
+
+
+    //  CANVAS 9  -------------------------------    
+    cHittwo = new TCanvas("AMS_theta_left_right", "theta between opposite detectors", 10, 10, 500, 500);
+    cHittwo->Divide(1,2);
+
+    fh_ams_thetaright_thetaleft = new TH2F("Ams_theta_left_vs_theta_right","AMS theta left vs theta right",
+                                 90, 0, 90,90, 0, 90);
+    fh_ams_thetaright_thetaleft->GetXaxis()->SetTitle("Theta left (degrees)");
+    fh_ams_thetaright_thetaleft->GetYaxis()->SetTitle("Theta right (degrees)");
+    fh_ams_thetaright_thetaleft->GetXaxis()->SetTitleOffset(1.2);
+    fh_ams_thetaright_thetaleft->GetYaxis()->SetTitleOffset(1.2);
+    fh_ams_thetaright_thetaleft->GetXaxis()->CenterTitle(true);
+    fh_ams_thetaright_thetaleft->GetYaxis()->CenterTitle(true);
+    cHittwo->cd(1);
+    fh_ams_thetaright_thetaleft->Draw("COLZ");
+
+
+    sprintf(Name1, "fh_Ams_opening_angle2");	  
+    sprintf(Name2, "AMS Opening Angle (beam hits target at (0,0,0))");
+    fh_Ams_openangle2 = new TH1F(Name1, Name2, 140, 0, 140);    
+    fh_Ams_openangle2->GetXaxis()->SetTitle("Opening angle [degrees]");
+    fh_Ams_openangle2->GetYaxis()->SetTitle("Counts");
+    fh_Ams_openangle2->GetXaxis()->CenterTitle(true);
+    fh_Ams_openangle2->GetYaxis()->CenterTitle(true);
+    fh_Ams_openangle2->GetYaxis()->SetTitleOffset(1.2);
+    fh_Ams_openangle2->GetXaxis()->SetTitleOffset(1.2);
+    cHittwo->cd(2);
+    fh_Ams_openangle2->Draw();
+
+
+    //  CANVAS 10  ------------------------------ 
+    cHitPhis = new TCanvas("AMS_Phi_Angles", "Phi between opposite detectors", 10, 10, 500, 500);
+    fh_ams_phis = new TH2F("Ams_phis","AMS Phi angles between opposite detectors",
+                                 90, 0, 360,90, 0, 360);
+    fh_ams_phis->GetXaxis()->SetTitle("Phi1 (degrees)");
+    fh_ams_phis->GetYaxis()->SetTitle("Phi2 (degrees)");
+    fh_ams_phis->GetXaxis()->SetTitleOffset(1.2);
+    fh_ams_phis->GetYaxis()->SetTitleOffset(1.2);
+    fh_ams_phis->GetXaxis()->CenterTitle(true);
+    fh_ams_phis->GetYaxis()->CenterTitle(true);
+    fh_ams_phis->Draw("COLZ");
+
+
     //MAIN FOLDER-AMS
     TFolder* mainfolAms = new TFolder("AMS","AMS info");      
     mainfolAms->Add(cMap);
     if(fCalItemsAms)mainfolAms->Add(cCal);
     if(fHitItemsAms)for(Int_t i=0;i<fNbDet;i++)mainfolAms->Add(cHit[i]);
+    mainfolAms->Add(cAMSangles);
+    mainfolAms->Add(cHitone);
+    mainfolAms->Add(cHittwo);
+    mainfolAms->Add(cHitPhis);
     run->AddObject(mainfolAms);
 
     //Register command to reset histograms
@@ -235,6 +327,12 @@ void R3BAmsOnlineSpectra::Reset_AMS_Histo()
      fh_Ams_hit_E[i]->Reset();
      fh_Ams_hit_E_theta[i]->Reset();
     }
+    fh_ams_theta_phi->Reset();
+    fh_ams_thetatop_thetabottom->Reset();
+    fh_ams_thetaright_thetaleft->Reset();
+    fh_ams_phis->Reset();
+    fh_Ams_openangle1->Reset();
+    fh_Ams_openangle2->Reset();
 }
 
 
@@ -269,24 +367,130 @@ void R3BAmsOnlineSpectra::Exec(Option_t* option) {
     }
   }
 
+  TVector3 master[1000][fNbDet];
+  Int_t mulhit[fNbDet];
+  for(Int_t i=0;i<fNbDet;i++)mulhit[i]=0;
   //Fill hit data
   if(fHitItemsAms && fHitItemsAms->GetEntriesFast()){
     Int_t nHits = fHitItemsAms->GetEntriesFast();
     //std::cout << nHits << std::endl;
-    Int_t mulhit[fNbDet];
-    for(Int_t i=0;i<fNbDet;i++)mulhit[i]=0;
+       //std::cout << "Ev:" << std::endl;
     for (Int_t ihit = 0; ihit < nHits; ihit++){
       R3BAmsHitData* hit = 
 	(R3BAmsHitData*)fHitItemsAms->At(ihit);
       if (!hit) continue;
       fh_Ams_hit_Pos[hit->GetDetId()]->Fill(hit->GetX(),hit->GetY());
       fh_Ams_hit_E[hit->GetDetId()]->Fill(hit->GetEnergyX(),hit->GetEnergyY());
-      fh_Ams_hit_E_theta[hit->GetDetId()]->Fill(hit->GetX(),hit->GetEnergyX());
+      fh_Ams_hit_E_theta[hit->GetDetId()]->Fill(hit->GetTheta()/TMath::Pi()*180.,hit->GetEnergyX());
+      fh_ams_theta_phi->Fill(hit->GetTheta()/TMath::Pi()*180.,hit->GetPhi()/TMath::Pi()*180.);
+      if(mulhit[hit->GetDetId()]<1000){
+       master[mulhit[hit->GetDetId()]][hit->GetDetId()].SetMagThetaPhi(1.,hit->GetTheta(),hit->GetPhi()); 
+       //std::cout << hit->GetDetId() << std::endl;
+      }
       mulhit[hit->GetDetId()]++;
     }
     for(Int_t i=0;i<fNbDet;i++)fh_Ams_hit_Mul[i]->Fill(mulhit[i]);
   }
- 
+
+  Double_t thetaopen=0., phi1=0., phi2=0.;
+
+  for(Int_t i=0;i<mulhit[0];i++){
+   for(Int_t j=i+1;j<mulhit[1];j++){
+     phi1=master[i][0].Phi();
+     phi2=master[j][1].Phi();
+     if(phi1<0)phi1=phi1+2.*TMath::Pi();
+     if(phi2<0)phi2=phi2+2.*TMath::Pi();
+     if(0.5<gRandom->Uniform(0.,1.))
+      fh_ams_phis->Fill(phi1/TMath::Pi()*180.,phi2/TMath::Pi()*180.);
+     else
+      fh_ams_phis->Fill(phi2/TMath::Pi()*180.,phi1/TMath::Pi()*180.);
+   }
+  }
+
+  for(Int_t i=0;i<mulhit[0];i++){
+   for(Int_t j=i+1;j<mulhit[2];j++){
+    //std::cout<< master[i].Angle(master[j])/TMath::Pi()*180. <<std::endl;
+    thetaopen=master[i][0].Angle(master[j][2])/TMath::Pi()*180.;
+    if(thetaopen>0){
+     fh_ams_thetatop_thetabottom->Fill(master[i][0].Theta()/TMath::Pi()*180.,master[j][2].Theta()/TMath::Pi()*180.);
+     fh_Ams_openangle1->Fill(thetaopen);
+     phi1=master[i][0].Phi();
+     phi2=master[j][2].Phi();
+     //std::cout<< phi1 << " " <<phi2 <<std::endl;
+     if(phi1<0)phi1=phi1+2.*TMath::Pi();
+     if(phi2<0)phi2=phi2+2.*TMath::Pi();
+     if(0.5<gRandom->Uniform(0.,1.))
+      fh_ams_phis->Fill(phi1/TMath::Pi()*180.,phi2/TMath::Pi()*180.);
+     else
+      fh_ams_phis->Fill(phi2/TMath::Pi()*180.,phi1/TMath::Pi()*180.);
+    }else{std::cout << "Problem with opening angles" << std::endl;}
+   }
+  }
+
+  for(Int_t i=0;i<mulhit[0];i++){
+   for(Int_t j=i+1;j<mulhit[3];j++){
+     phi1=master[i][0].Phi();
+     phi2=master[j][3].Phi();
+     if(phi1<0)phi1=phi1+2.*TMath::Pi();
+     if(phi2<0)phi2=phi2+2.*TMath::Pi();
+     if(0.5<gRandom->Uniform(0.,1.))
+      fh_ams_phis->Fill(phi1/TMath::Pi()*180.,phi2/TMath::Pi()*180.);
+     else
+      fh_ams_phis->Fill(phi2/TMath::Pi()*180.,phi1/TMath::Pi()*180.);
+   }
+  }
+
+  for(Int_t i=0;i<mulhit[1];i++){
+   for(Int_t j=i+1;j<mulhit[2];j++){
+     phi1=master[i][1].Phi();
+     phi2=master[j][2].Phi();
+     if(phi1<0)phi1=phi1+2.*TMath::Pi();
+     if(phi2<0)phi2=phi2+2.*TMath::Pi();
+     if(0.5<gRandom->Uniform(0.,1.))
+      fh_ams_phis->Fill(phi1/TMath::Pi()*180.,phi2/TMath::Pi()*180.);
+     else
+      fh_ams_phis->Fill(phi2/TMath::Pi()*180.,phi1/TMath::Pi()*180.);
+   }
+  }
+
+
+
+  for(Int_t i=0;i<mulhit[1];i++){
+   for(Int_t j=i+1;j<mulhit[3];j++){
+    
+    //std::cout<< master[i].Angle(master[j])/TMath::Pi()*180. <<std::endl;
+    thetaopen=master[i][1].Angle(master[j][3])/TMath::Pi()*180.;
+    if(thetaopen>0){
+     fh_ams_thetaright_thetaleft->Fill(master[i][1].Theta()/TMath::Pi()*180.,master[j][3].Theta()/TMath::Pi()*180.);
+     fh_Ams_openangle2->Fill(thetaopen);
+     phi1=master[i][1].Phi();
+     phi2=master[j][3].Phi();
+     if(phi1<0)phi1=phi1+2.*TMath::Pi();
+     if(phi2<0)phi2=phi2+2.*TMath::Pi();
+     if(0.5<gRandom->Uniform(0.,1.))
+      fh_ams_phis->Fill(phi1/TMath::Pi()*180.,phi2/TMath::Pi()*180.);
+     else
+      fh_ams_phis->Fill(phi2/TMath::Pi()*180.,phi1/TMath::Pi()*180.);
+    }else{std::cout << "Problem with opening angles" << std::endl;}
+   }
+  }
+
+  for(Int_t i=0;i<mulhit[2];i++){
+   for(Int_t j=i+1;j<mulhit[3];j++){
+     phi1=master[i][2].Phi();
+     phi2=master[j][3].Phi();
+     if(phi1<0)phi1=phi1+2.*TMath::Pi();
+     if(phi2<0)phi2=phi2+2.*TMath::Pi();
+     if(0.5<gRandom->Uniform(0.,1.))
+      fh_ams_phis->Fill(phi1/TMath::Pi()*180.,phi2/TMath::Pi()*180.);
+     else
+      fh_ams_phis->Fill(phi2/TMath::Pi()*180.,phi1/TMath::Pi()*180.);
+   }
+  }
+
+
+
+
   fNEvents += 1;
 }
 
@@ -320,6 +524,10 @@ void R3BAmsOnlineSpectra::FinishTask() {
     if (fHitItemsAms)
     {
 	for(Int_t i=0;i<fNbDet;i++)cHit[i]->Write();
+        cAMSangles->Write();
+        cHitone->Write();
+        cHittwo->Write();
+        cHitPhis->Write();
     }
 }
 

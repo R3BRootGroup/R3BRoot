@@ -31,6 +31,7 @@ R3BAmsMapped2StripCal::R3BAmsMapped2StripCal() :
   NumStripsK(0),
   NumParams(0),
   MaxSigma(5),
+  ThresSigma(7),
   CalParams(NULL),
   fCal_Par(NULL),
   fAmsMappedDataCA(NULL),
@@ -48,6 +49,7 @@ R3BAmsMapped2StripCal::R3BAmsMapped2StripCal(const char* name, Int_t iVerbose) :
   NumStripsK(0),
   NumParams(0),
   MaxSigma(5),
+  ThresSigma(7),
   CalParams(NULL),
   fCal_Par(NULL),
   fAmsMappedDataCA(NULL),
@@ -233,7 +235,7 @@ void R3BAmsMapped2StripCal::Exec(Option_t* option)
 
     //We accept the hit if the energy is larger than 5 times the sigma of the pedestal 
     //and the strip is not dead
-    if(energy>5.*sigma && pedestal!=-1)
+    if(energy>ThresSigma*sigma && pedestal!=-1)
     AddCalData(detId,sideId,stripId,energy);
   }
   

@@ -87,7 +87,6 @@ R3BCalifaGeometry::R3BCalifaGeometry(int version)  : fGeometryVersion(version), 
   gGeoManager->SetTopVolume(v);
 
   fNavigator = new TGeoNavigator(gGeoManager);
-  f->Close();
 }
 
 void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t* polar,
