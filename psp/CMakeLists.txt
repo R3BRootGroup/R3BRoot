@@ -45,6 +45,7 @@ R3BPspDigitizer.cxx
 R3BPspxMapped2Precal.cxx
 R3BPspxPrecal2Cal.cxx
 R3BPspxCal2Hit.cxx
+R3BPspxOnlineSpectra.cxx
 par/R3BPspxMappedPar.cxx
 par/R3BPspxPrecalPar.cxx
 par/R3BPspxCalPar.cxx
@@ -60,5 +61,10 @@ Set(LINKDEF PspLinkDef.h)
 Set(LIBRARY_NAME R3BPsp)
 Set(DEPENDENCIES
     R3Bbase R3BData R3BPassive)
+
+if(FAIRDB_FOUND)
+set(DEPENDENCIES
+    ${DEPENDENCIES} FairDB)
+endif(FAIRDB_FOUND)
 
 GENERATE_LIBRARY()

@@ -20,13 +20,17 @@ R3BLosReader::R3BLosReader(EXT_STR_h101_LOS_TAMEX* data, UInt_t offset)
   : R3BReader("R3BLosReader")
   , fData(data)
   , fOffset(offset)
-    , fLogger(FairLogger::GetLogger())
-    , fArray(new TClonesArray("R3BLosMappedData"))
+  , fOnline(kFALSE)
+  , fLogger(FairLogger::GetLogger())
+  , fArray(new TClonesArray("R3BLosMappedData"))
 {
 }
 
 R3BLosReader::~R3BLosReader()
 {
+  if (fArray){
+		delete fArray;
+	}
 }
 
 Bool_t R3BLosReader::Init(ext_data_struct_info *a_struct_info)
@@ -43,7 +47,11 @@ Bool_t R3BLosReader::Init(ext_data_struct_info *a_struct_info)
   }
 
   // Register output array in tree
-  FairRootManager::Instance()->Register("LosMapped", "Land", fArray, kTRUE);
+  if(!fOnline){
+   FairRootManager::Instance()->Register("LosMapped", "Land", fArray, kTRUE);
+  }else{
+   FairRootManager::Instance()->Register("LosMapped", "Land", fArray, kFALSE);
+  }
   fArray->Clear();
 
   // clear struct_writer's output struct. Seems ucesb doesn't do that

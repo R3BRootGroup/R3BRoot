@@ -13,6 +13,7 @@
 
 #include "TObject.h"
 #include "FairMultiLinkedData.h"
+#include "TVector3.h"
 
 class R3BAmsHitData : public FairMultiLinkedData 
 {
@@ -31,7 +32,7 @@ public:
    *@param fEnergyX   Total energy deposited in X direction by hit ([GeV] in sim)
    *@param fEnergyY   Total energy deposited in Y direction by hit ([GeV] in sim)
    **/
-  R3BAmsHitData(Int_t detid, Int_t numhit, Double_t x, Double_t y, Double_t theta, Double_t phi, Double_t energy_x, Double_t energy_y);
+  R3BAmsHitData(Int_t detid, Int_t numhit, Double_t x, Double_t y, TVector3 master, Double_t energy_x, Double_t energy_y);
 
   /** Copy constructor **/
   R3BAmsHitData(const R3BAmsHitData&);
@@ -46,8 +47,9 @@ public:
   Int_t    GetNumHit()     const { return fNumHit; }
   Double_t    GetX()       const { return fX;      }
   Double_t    GetY()       const { return fY;      }
-  Double_t GetTheta()      const { return fTheta;  }
-  Double_t GetPhi()        const { return fPhi;    }
+  Double_t GetTheta()      const { return fmaster.Theta();  }
+  Double_t GetPhi()        const { return fmaster.Phi();    }
+  TVector3 GetPosLab()     const { return fmaster; }
   Double_t GetEnergyX()    const { return fEnergyX;}
   Double_t GetEnergyY()    const { return fEnergyY;}
 
@@ -56,8 +58,9 @@ public:
   void SetNumHit(Int_t numhit)     { fNumHit = numhit; }
   void SetX(Double_t x)            { fX = x;           }
   void SetY(Double_t y)            { fY = y;           }
-  void SetTheta(Double_t theta)    { fTheta = theta;   }
-  void SetPhi(Double_t phi)        { fPhi = phi;       }
+  void SetTheta(Double_t theta)    { fmaster.SetTheta(theta);}
+  void SetPhi(Double_t phi)        { fmaster.SetPhi(phi);    }
+  void SetPosLab(TVector3 v)       { fmaster = v;      }
   void SetEnergyX(Double_t energy) { fEnergyX = energy;}
   void SetEnergyY(Double_t energy) { fEnergyY = energy;}
 
@@ -67,7 +70,8 @@ public:
 protected:
   Int_t fDetId;
   Int_t fNumHit;    
-  Double_t fX, fY, fTheta, fPhi;  
+  Double_t fX, fY, fTheta, fPhi;
+  TVector3 fmaster;
   Double_t fEnergyX,fEnergyY; 
 
   ClassDef(R3BAmsHitData,1)
