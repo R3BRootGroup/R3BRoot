@@ -88,6 +88,9 @@ class R3BAmsCalifaCorrelatedOnlineSpectra : public FairTask {
   
   TClonesArray* fHitItemsAms;        /**< Array with AMS hit items. */
   TClonesArray* fHitItemsCalifa;     /**< Array with CALIFA hit items. */
+  TClonesArray* fCalItemsLos;
+
+  Double_t fClockFreq;     /**< Clock cycle in [ns]. */
 
   
   // check for trigger should be done globablly (somewhere else)
@@ -95,11 +98,16 @@ class R3BAmsCalifaCorrelatedOnlineSpectra : public FairTask {
   Int_t fTrigger;                    /**< Trigger value. */
   Int_t fNEvents;        	     /**< Event counter. */
   
-  TCanvas* cMap;
+  TCanvas* cMap1,* cMap2;
+  TCanvas* cAMSangles, *cHitone, *cHittwo, *cHitPhis;
   //TCanvas* cCal;
   //TCanvas* cHit[4];
 
-  TH2F* fh_Califa_coinc_petal1;
+  TH2F* fh_Califa_coinc_petal1,* fh_Califa_coinc_petal2;
+  TH2F *fh_los_pos_MCFD;
+  TH2F *fh_los_pos_TAMEX;
+  TH1F* fh_Ams_openangle1, *fh_Ams_openangle2;
+  TH2F* fh_ams_theta_phi, *fh_ams_thetatop_thetabottom, *fh_ams_thetaright_thetaleft, *fh_ams_phis;
   //TH2F* fh_Ams_energy_allCalStrips[8];
   //TH2F* fh_Ams_hit_Pos[4];
   //TH2F* fh_Ams_hit_E[4];

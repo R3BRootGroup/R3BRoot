@@ -56,7 +56,7 @@ InitStatus R3BPspxPrecal2Cal::Init()
     // fCalItems = (TClonesArray*)fMan->GetObject("R3BPspxCalData");
     FairRootManager::Instance()->Register("PspxCalData", "Pspx", fCalItems, kTRUE);
 
-    // fCalPar->printparams();
+     //fCalPar->printparams();
 
     // Initialisation of gain parameters
     gain.resize(fCalPar->GetPspxParDetector());

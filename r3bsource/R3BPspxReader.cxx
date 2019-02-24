@@ -19,12 +19,19 @@ R3BPspxReader::R3BPspxReader(EXT_STR_h101_PSP* data, UInt_t offset)
     : R3BReader("R3BPspxReader")
     , fData(data)
     , fOffset(offset)
+    , fOnline(kFALSE)
+    , fNbDetectors(6)
     , fLogger(FairLogger::GetLogger())
     , fMappedItems(new TClonesArray("R3BPspxMappedData"))
 {
 }
 
-R3BPspxReader::~R3BPspxReader() {}
+R3BPspxReader::~R3BPspxReader() 
+{
+  if (fMappedItems){
+		delete fMappedItems;
+	}
+}
 
 /**
   * Initialize output data. Read input data.
@@ -32,9 +39,9 @@ R3BPspxReader::~R3BPspxReader() {}
 Bool_t R3BPspxReader::Init(ext_data_struct_info* a_struct_info)
 {
 
-    int ok;
-
-    EXT_STR_h101_PSP_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_PSP, 0);
+  Int_t ok;
+  LOG(INFO) << "R3BPspxReader::Init" << FairLogger::endl;
+  EXT_STR_h101_PSP_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_PSP, 0);
 
     if (!ok)
     {
@@ -64,7 +71,7 @@ void R3BPspxReader::SetParContainers()
     // FairRuntimeDb* rtdb=ana->GetRuntimeDb();
 
     // fMappedPar = (R3BPspxMappedPar*) (rtdb->getContainer("R3BPspxMappedPar"));
-
+/*
     if (!fMappedPar)
     {
         LOG(ERROR) << "Could not get access to R3BPspxMappedPar-Container." << FairLogger::endl;
@@ -72,6 +79,8 @@ void R3BPspxReader::SetParContainers()
     }
 
     fMappedPar->printparams();
+
+*/
 }
 
 // ---- ReInit  -------------------------------------------------------
@@ -86,7 +95,7 @@ Bool_t R3BPspxReader::ReInit()
     // FairRuntimeDb* rtdb=ana->GetRuntimeDb();
 
     // fMappedPar = (R3BPspxMappedPar*) (rtdb->getContainer("R3BPspxMappedPar"));
-
+/*
     fMappedPar = (R3BPspxMappedPar*)FairRuntimeDb::instance()->getContainer("R3BPspxMappedPar");
 
     if (!fMappedPar)
@@ -94,7 +103,7 @@ Bool_t R3BPspxReader::ReInit()
         LOG(ERROR) << "Could not get access to R3BPspxMappedPar-Container." << FairLogger::endl;
         return kFALSE;
     }
-
+*/
     return kTRUE;
 }
 
@@ -149,10 +158,10 @@ Bool_t R3BPspxReader::Read()
     */
 
     // loop over all detectors
-    for (int d = 0; d < fMappedPar->GetPspxParDetector(); d++)
+    for (int d = 0; d < fNbDetectors; d++)
     {
-        if (fMappedPar->GetPspxParStrip().At(d) == 0)
-            continue; // skip PSPs that are read out with other electronics (e.g. MADC32)
+       // if (fMappedPar->GetPspxParStrip().At(d) == 0)
+         //   continue; // skip PSPs that are read out with other electronics (e.g. MADC32)
 
         uint32_t numChannels = data->PSPX[d].M; // not necessarly number of hits! (b/c multi hit)
 

@@ -14,11 +14,13 @@ ${R3BROOT_SOURCE_DIR}/xball
 ${R3BROOT_SOURCE_DIR}/califa
 ${R3BROOT_SOURCE_DIR}/tracker
 ${R3BROOT_SOURCE_DIR}/r3bdata
+${R3BROOT_SOURCE_DIR}/tcal
 ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
 ${R3BROOT_SOURCE_DIR}/r3bdata/dchData
 ${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
+${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
 ${R3BROOT_SOURCE_DIR}/tracker/unpackams

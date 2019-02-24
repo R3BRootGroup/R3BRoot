@@ -15,20 +15,22 @@ R3BAmsHitData::R3BAmsHitData()
     fY(0),
     fTheta(0),
     fPhi(0),
+    fmaster(0,0,0),
     fEnergyX(0),
     fEnergyY(0)
 {
 }
 
 // -----   Standard constructor   ------------------------------------------
-R3BAmsHitData::R3BAmsHitData(Int_t detid, Int_t numhit, Double_t x, Double_t y, Double_t theta, Double_t phi, Double_t energy_x, Double_t energy_y) 
+R3BAmsHitData::R3BAmsHitData(Int_t detid, Int_t numhit, Double_t x, Double_t y, TVector3 master, Double_t energy_x, Double_t energy_y) 
   : FairMultiLinkedData(),
     fDetId(detid),
     fNumHit(numhit),
     fX(x),
     fY(y),
-    fTheta(theta),
-    fPhi(phi),
+    //fTheta(theta),
+    //fPhi(phi),
+    fmaster(master),
     fEnergyX(energy_x),
     fEnergyY(energy_y)
 {
@@ -41,8 +43,9 @@ R3BAmsHitData::R3BAmsHitData(const R3BAmsHitData& right)
     fNumHit(right.fNumHit),
     fX(right.fX),
     fY(right.fY),
-    fTheta(right.fTheta),
-    fPhi(right.fPhi),
+    //fTheta(right.fTheta),
+    //fPhi(right.fPhi),
+    fmaster(right.fmaster),
     fEnergyX(right.fEnergyX),
     fEnergyY(right.fEnergyY)
 {

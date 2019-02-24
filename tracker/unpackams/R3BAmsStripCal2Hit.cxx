@@ -6,11 +6,9 @@
 //ROOT headers
 #include "TClonesArray.h"
 #include "TMath.h"
-#include "TRandom.h"
 #include "TSpectrum.h"
 #include "TH1F.h"
 #include "TF1.h"
-#include "TVector3.h"
 
 //Fair headers
 #include "FairRootManager.h"
@@ -161,7 +159,7 @@ void R3BAmsStripCal2Hit::Exec(Option_t* option)
        y=clusterK[mul][1]-20.;
      }
      TVector3 master(x,y,z);
-     AddHitData(i,mul,clusterS[mul][1],clusterK[mul][1],master.Theta(),master.Phi(),clusterS[mul][0],clusterK[mul][0]);
+     AddHitData(i,mul,clusterS[mul][1],clusterK[mul][1],master,clusterS[mul][0],clusterK[mul][0]);
     }
    }
   }
@@ -223,12 +221,12 @@ void R3BAmsStripCal2Hit::Reset()
 
 
 // -----   Private method AddHitData  --------------------------------------------
-R3BAmsHitData* R3BAmsStripCal2Hit::AddHitData(Int_t detid, Int_t numhit, Double_t x, Double_t y, Double_t theta, Double_t phi, Double_t energy_x, Double_t energy_y)
+R3BAmsHitData* R3BAmsStripCal2Hit::AddHitData(Int_t detid, Int_t numhit, Double_t x, Double_t y, TVector3 master, Double_t energy_x, Double_t energy_y)
 {
   //It fills the R3BAmsHitData
   TClonesArray& clref = *fAmsHitDataCA;
   Int_t size = clref.GetEntriesFast();
-  return new(clref[size]) R3BAmsHitData(detid,numhit,x,y,theta,phi,energy_x,energy_y);
+  return new(clref[size]) R3BAmsHitData(detid,numhit,x,y,master,energy_x,energy_y);
 }
 
 ClassImp(R3BAmsStripCal2Hit)

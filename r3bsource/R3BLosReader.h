@@ -19,6 +19,9 @@ class R3BLosReader : public R3BReader
 		Bool_t Read();
 		void Reset();
 		virtual void FinishTask();
+
+                /** Accessor to select online mode **/
+                void SetOnline(Bool_t option){fOnline=option;} 
         
 	private:
 		/* Reader specific data structure from ucesb */
@@ -29,6 +32,8 @@ class R3BLosReader : public R3BReader
 		FairLogger*	fLogger;
 		/* the structs of type R3BLosxMappedItem */
 		TClonesArray* fArray; /**< Output array. */
+                //Don't store data for online
+                Bool_t fOnline;
         Int_t fNEvents = 0;
         
 	public:
