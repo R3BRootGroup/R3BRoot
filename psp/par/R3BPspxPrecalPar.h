@@ -75,7 +75,7 @@ class R3BPspxPrecalPar : public FairParGenericSet
     R3BPspxPrecalPar(const R3BPspxPrecalPar&);
     R3BPspxPrecalPar& operator=(const R3BPspxPrecalPar&);
 
-    ClassDef(R3BPspxPrecalPar, 1);
+    ClassDef(R3BPspxPrecalPar, 2);
 };
 
 #endif

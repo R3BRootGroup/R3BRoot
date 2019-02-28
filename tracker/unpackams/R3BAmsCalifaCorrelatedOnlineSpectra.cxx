@@ -198,7 +198,7 @@ InitStatus R3BAmsCalifaCorrelatedOnlineSpectra::Init() {
     cMap1 = new TCanvas("AMS_top_right_Petal_1", "Correlation AMS_top_right and Califa Petals 1", 10, 10, 500, 500);
     //cMap->Divide(2,2);
 
-    fh_Califa_coinc_petal1 = new TH2F("Ams_top_right_vs_petal_1","Correlation AMS_top_right and Califa Petals 1",
+    fh_Califa_coinc_petal1 = new TH2F("Ams_top_right_vs_petal_1","Correlation AMS_top_right and Califa Petal 1",
                                  90, 0, 90, 30, 0, 90);
     fh_Califa_coinc_petal1->GetXaxis()->SetTitle("Theta AMS (degrees)");
     fh_Califa_coinc_petal1->GetYaxis()->SetTitle("Theta petal 1 (degrees)");
@@ -206,6 +206,20 @@ InitStatus R3BAmsCalifaCorrelatedOnlineSpectra::Init() {
     fh_Califa_coinc_petal1->GetXaxis()->CenterTitle(true);
     fh_Califa_coinc_petal1->GetYaxis()->CenterTitle(true);
     fh_Califa_coinc_petal1->Draw("COLZ");
+
+    //  CANVAS 1  -------------------------------     
+    cMap1e = new TCanvas("AMS_top_right_Petal_1_E", "Correlation AMS_top_right and Califa Petals 1", 10, 10, 500, 500);
+    //cMap->Divide(2,2);
+
+    fh_Califa_coinc_petal1e = new TH2F("Ams_top_right_vs_petal_1_E","Correlation AMS_top_right and Califa Petal 1",
+                                 1000, 0, 5000, 250, 0, 600);
+    fh_Califa_coinc_petal1e->GetXaxis()->SetTitle("Energy AMS (arb. units)");
+    fh_Califa_coinc_petal1e->GetYaxis()->SetTitle("Energy petal 1 (MeV)");
+    fh_Califa_coinc_petal1e->GetYaxis()->SetTitleOffset(1.3);
+    fh_Califa_coinc_petal1e->GetXaxis()->CenterTitle(true);
+    fh_Califa_coinc_petal1e->GetYaxis()->CenterTitle(true);
+    fh_Califa_coinc_petal1e->Draw("COLZ");
+
 
     //  CANVAS 1  -------------------------------     
     cMap2 = new TCanvas("AMS_left_bottom_Petal_3_4", "Correlation AMS_left_bottom and Califa Petals 3 and 4", 10, 10, 500, 500);
@@ -219,6 +233,19 @@ InitStatus R3BAmsCalifaCorrelatedOnlineSpectra::Init() {
     fh_Califa_coinc_petal2->GetXaxis()->CenterTitle(true);
     fh_Califa_coinc_petal2->GetYaxis()->CenterTitle(true);
     fh_Califa_coinc_petal2->Draw("COLZ");
+
+    cMap2e = new TCanvas("AMS_left_bottom_Petal_3_4_E", "Correlation AMS_left_bottom and Califa Petals 3 and 4", 10, 10, 500, 500);
+    //cMap->Divide(2,2);
+
+    fh_Califa_coinc_petal2e = new TH2F("Ams_left_bottom_vs_petal_3and4_E","Correlation AMS_left_bottom and Califa Petals 3 and 4",
+                                 1000, 0, 5000, 250, 0, 600);
+    fh_Califa_coinc_petal2e->GetXaxis()->SetTitle("Energy AMS (arb. units)");
+    fh_Califa_coinc_petal2e->GetYaxis()->SetTitle("Energy petal 3 and 4 (MeV)");
+    fh_Califa_coinc_petal2e->GetYaxis()->SetTitleOffset(1.3);
+    fh_Califa_coinc_petal2e->GetXaxis()->CenterTitle(true);
+    fh_Califa_coinc_petal2e->GetYaxis()->CenterTitle(true);
+    fh_Califa_coinc_petal2e->Draw("COLZ");
+
 
 
     TCanvas *cLos = new TCanvas("Los", "LOS", 10, 10, 750, 850);
@@ -244,6 +271,8 @@ InitStatus R3BAmsCalifaCorrelatedOnlineSpectra::Init() {
   mainfolAmsCal->Add(cHitPhis);
   mainfolAmsCal->Add(cMap1);
   mainfolAmsCal->Add(cMap2);
+  mainfolAmsCal->Add(cMap1e);
+  mainfolAmsCal->Add(cMap2e);
   mainfolAmsCal->Add(cLos);
   run->AddObject(mainfolAmsCal);
 
@@ -261,6 +290,10 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Reset_AMS_CALIFA_Histo()
 
     fh_Califa_coinc_petal1->Reset();
     fh_Califa_coinc_petal2->Reset();
+
+
+    fh_Califa_coinc_petal1e->Reset();
+    fh_Califa_coinc_petal2e->Reset();
 
     fh_ams_theta_phi->Reset();
     fh_ams_thetatop_thetabottom->Reset();
@@ -285,6 +318,10 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option) {
   FairRootManager* mgr = FairRootManager::Instance();
   if (NULL == mgr)
     LOG(FATAL) << "R3BAmsCalifaCorrelatedOnlineSpectra::Exec FairRootManager not found" << FairLogger::endl;
+
+  //if(header->GetTrigger()!=1){cout << header->GetTrigger()<<endl;}
+  if ((fTrigger >= 0) && (header) && (header->GetTrigger() != 1))
+    return;
 
 
 //los
@@ -557,7 +594,8 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option) {
 
 
   double hitams[100][2];
-  for(Int_t i = 0; i < 100; i++)for(Int_t j = 0; j < 2; j++)hitams[i][j]=0.;
+  double hitamse[100][2];
+  for(Int_t i = 0; i < 100; i++)for(Int_t j = 0; j < 2; j++){hitams[i][j]=0.;hitamse[i][j]=0.;}
   Int_t nbhitams[2];
   for(Int_t j = 0; j < 2; j++)nbhitams[j]=0;
   TVector3 master[1000][fNbDet];
@@ -573,8 +611,8 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option) {
       R3BAmsHitData* hit = 
 	(R3BAmsHitData*)fHitItemsAms->At(ihit);
       if (!hit) continue;
-      if (hit->GetEnergyX()<50 || hit->GetEnergyY()<50 ||
-          hit->GetEnergyX()>4500 || hit->GetEnergyY()>4500)
+      if (hit->GetEnergyX()<80 || hit->GetEnergyY()<80 ||
+          hit->GetEnergyX()>8500 || hit->GetEnergyY()>8500)
 	      continue;
 
       if(mulhit[hit->GetDetId()]<1000){
@@ -596,12 +634,14 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option) {
         TVector3 ams = hit->GetPosLab()-PosBeam;
 
         hitams[nbhitams[1]][1]=ams.Theta()/TMath::Pi()*180.;
+        hitamse[nbhitams[1]][1]=hit->GetEnergyX()+hit->GetEnergyY();
         nbhitams[1]++;
       }else{
 
         TVector3 ams = hit->GetPosLab()-PosBeam;
 
         hitams[nbhitams[0]][0]=ams.Theta()/TMath::Pi()*180.;
+        hitamse[nbhitams[0]][0]=hit->GetEnergyX()+hit->GetEnergyY();
         nbhitams[0]++;
       }
 
@@ -611,7 +651,8 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option) {
 
   //CALIFA
   Double_t hitcal[100][2];
-  for(Int_t i = 0; i < 100; i++)for(Int_t j = 0; j < 2; j++)hitcal[i][j]=0.;
+  Double_t hitcale[100][2];
+  for(Int_t i = 0; i < 100; i++)for(Int_t j = 0; j < 2; j++){hitcal[i][j]=0.;hitcale[i][j]=0.;}
   Int_t nbhitcal[2];
   for(Int_t j = 0; j < 2; j++)nbhitcal[j]=0;
   if(fHitItemsCalifa && fHitItemsCalifa->GetEntriesFast()){
@@ -625,10 +666,14 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option) {
       theta=hit->GetTheta()/TMath::Pi()*180.;
       phi=hit->GetPhi()/TMath::Pi()*180.;
       if(phi>120&&theta>10){//petal 1
-        hitcal[nbhitcal[0]][0]=theta;nbhitcal[0]++;
+        hitcal[nbhitcal[0]][0]=theta;
+        hitcale[nbhitcal[0]][0]=hit->GetEnergy()/1000.;
+        nbhitcal[0]++;
       } else 
       if(phi>-100&&phi<-10&&theta>10){//petal 3 and 4
-        hitcal[nbhitcal[0]][1]=theta;nbhitcal[1]++;
+        hitcal[nbhitcal[0]][1]=theta;
+        hitcale[nbhitcal[0]][1]=hit->GetEnergy()/1000.;
+        nbhitcal[1]++;
       }
     }
   }
@@ -638,8 +683,10 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option) {
   if (nbhitams[0]>0 && nbhitcal[0]>0){
    for(Int_t i = 0; i < nbhitams[0]; i++){
      for(Int_t j = 0; j < nbhitcal[0]; j++){
-       if(std::abs(hitcal[j][0]-hitams[i][0])<window && hitcal[j][0]>10.)
+       if(std::abs(hitcal[j][0]-hitams[i][0])<window && hitcal[j][0]>10.){
        fh_Califa_coinc_petal1->Fill(hitams[i][0],hitcal[j][0]);
+       fh_Califa_coinc_petal1e->Fill(hitamse[i][0],hitcale[j][0]);
+       }
      }
    }
   }
@@ -648,8 +695,10 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option) {
   if (nbhitams[1]>0 && nbhitcal[1]>0){
    for(Int_t i = 0; i < nbhitams[1]; i++){
      for(Int_t j = 0; j < nbhitcal[1]; j++){
-       if(std::abs(hitcal[j][1]-hitams[i][1])<window && hitcal[j][1]>10.)
+       if(std::abs(hitcal[j][1]-hitams[i][1])<window && hitcal[j][1]>10.){
        fh_Califa_coinc_petal2->Fill(hitams[i][1],hitcal[j][1]);
+       fh_Califa_coinc_petal2e->Fill(hitamse[i][1],hitcale[j][1]);
+       }
      }
    }
   }
@@ -790,6 +839,8 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::FinishTask() {
     {
        cMap1->Write();
        cMap2->Write();
+       cMap1e->Write();
+       cMap2e->Write();
     }
 }
 

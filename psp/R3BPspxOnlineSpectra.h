@@ -110,6 +110,7 @@ class R3BPspxOnlineSpectra : public FairTask
 
     TH1F* fh_pspx_hit_energy[(N_PSPX + 1) / 2];           /**< PSPX energy on hit level */
     TH2F* fh_pspx_cal_energy_frontback[(N_PSPX + 1) / 2]; /**< PSPX energy front vs back on cal level */
+    TH2F* fh_pspx_energy_strip[3],*fh_pspx_map;
 
   public:
     ClassDef(R3BPspxOnlineSpectra, 1)

@@ -174,11 +174,11 @@ void R3BAmsMapped2StripCal::Exec(Option_t* option)
   Double_t energy;
   Double_t pedestal=0.;
   Double_t sigma=0.;
-  Double_t SynAdcs[16*NumDets];
+ // Double_t SynAdcs[16*NumDets];
 
   
   //Look for ADC baselines
-  for(Int_t i = 0; i < 16*NumDets; i++)SynAdcs[i]=0.;
+  //for(Int_t i = 0; i < 16*NumDets; i++)SynAdcs[i]=0.;
   
   Int_t nbadc=0;
   Int_t minnb=4;
@@ -231,12 +231,13 @@ void R3BAmsMapped2StripCal::Exec(Option_t* option)
      stripId=stripId-NumStripsS;
     }
     if(i%63==0 && i>0){nbadc++;}
-    energy  = mappedData[i]->GetEnergy()-pedestal-SynAdcs[nbadc];
+    energy  = mappedData[i]->GetEnergy()-pedestal;//-SynAdcs[nbadc];
 
     //We accept the hit if the energy is larger than 5 times the sigma of the pedestal 
     //and the strip is not dead
-    if(energy>ThresSigma*sigma && pedestal!=-1)
-    AddCalData(detId,sideId,stripId,energy);
+    if(energy>ThresSigma*sigma && pedestal!=-1){
+     AddCalData(detId,sideId,stripId,energy);
+    }
   }
   
   

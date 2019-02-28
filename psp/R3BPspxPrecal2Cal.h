@@ -52,7 +52,7 @@ class R3BPspxPrecal2Cal : public FairTask
     // void WriteHistos();
 
   public:
-    ClassDef(R3BPspxPrecal2Cal, 2)
+    ClassDef(R3BPspxPrecal2Cal, 3)
 };
 
 #endif

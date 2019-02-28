@@ -23,6 +23,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
 ${R3BROOT_SOURCE_DIR}/psp/par
 ${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
 ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
+${R3BROOT_SOURCE_DIR}/r3bdata/wrData
 )
 
 set(LINK_DIRECTORIES
@@ -40,6 +41,9 @@ R3BUcesbSource.cxx
 R3BReader.cxx
 R3BUnpackReader.cxx
 R3BWhiterabbitReader.cxx
+R3BWhiterabbitMasterReader.cxx
+R3BWhiterabbitCalifaReader.cxx
+R3BWhiterabbitAmsReader.cxx
 R3BPspxReader.cxx
 R3BBunchedFiberReader.cxx
 R3BFi0Reader.cxx
@@ -73,6 +77,9 @@ R3BAmsReader.cxx
 Set(STRUCT_HEADERS
 ext_h101_unpack.h
 ext_h101_whiterabbit.h
+ext_h101_wrmaster.h
+ext_h101_wrcalifa.h
+ext_h101_wrams.h
 ext_h101_fibzero.h
 #ext_h101_fibonea.h
 #ext_h101_fiboneb.h

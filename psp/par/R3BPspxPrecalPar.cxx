@@ -81,11 +81,21 @@ void R3BPspxPrecalPar::putParams(FairParamList* l)
     Int_t count_strips = 0;
     for (Int_t i = 0; i < pspxprecalpardetector; i++)
     {
-        count_strips += pspxprecalparstrip[i];
+        if (pspxprecalparorientation[i] == 1 || pspxprecalparorientation[i] == 2)
+        {
+            count_strips += pspxprecalparstrip[i];
+        }
+        else if (pspxprecalparorientation[i] == 3)
+        {
+            count_strips += pspxprecalparstrip[i] * 2;
+        }
+        else
+        {
+            LOG(ERROR) << "R3BPspxPrecalPar::putParams: Orientation of Detector not valid! " << FairLogger::endl;
+        }
     }
-    Int_t array_size =
-        (count_strips * 2 +
-         pspxprecalpardetector * 2); // count all entries: lines with strip info + lines with detector info
+    // count all entries: lines with strip info + lines with detector info
+    Int_t array_size = (count_strips * 2 + pspxprecalpardetector * 2);
     LOG(INFO) << "R3BPspxPrecalGainForStrips Array Size: " << array_size << FairLogger::endl;
     pspxprecalpargain.Set(array_size);
     l->add("R3BPspxPrecalGainForStrips", pspxprecalpargain);
@@ -97,12 +107,10 @@ void R3BPspxPrecalPar::putParams(FairParamList* l)
         {
             count_cathode++;
         }
+        // else: for X5/orientation=3, count_cathode=0;
     }
-    array_size =
-        (count_strips * 2 * 2 + pspxprecalpardetector * 2 + count_cathode * 2); // count all entries: lines with
-                                                                                // channel info + lines with
-                                                                                // detector info + lines with
-                                                                                // cathode channel info
+    // count all entries: lines with channel info + lines with detector info + lines with cathode channel info
+    array_size = (count_strips * 2 * 2 + pspxprecalpardetector * 2 + count_cathode * 2);
     LOG(INFO) << "R3BPspxPrecalEnergyThresholdForChannels Array Size: " << array_size << FairLogger::endl;
     pspxprecalparenergythreshold.Set(array_size);
     l->add("R3BPspxPrecalEnergyThresholdForChannels", pspxprecalparenergythreshold);
@@ -136,10 +144,22 @@ Bool_t R3BPspxPrecalPar::getParams(FairParamList* l)
     Int_t count_strips = 0;
     for (Int_t i = 0; i < pspxprecalpardetector; i++)
     {
-        count_strips += pspxprecalparstrip[i];
+        if (pspxprecalparorientation[i] == 1 || pspxprecalparorientation[i] == 2)
+        {
+            count_strips += pspxprecalparstrip[i];
+        }
+        else if (pspxprecalparorientation[i] == 3)
+        {
+            count_strips += pspxprecalparstrip[i] * 2;
+        }
+        else
+        {
+            LOG(ERROR) << "R3BPspxPrecalPar::getParams: Orientation of Detector not valid! " << FairLogger::endl;
+            return kFALSE;
+        }
     }
     LOG(INFO) << "Total number of strips: " << count_strips << FairLogger::endl;
-
+    // count all entries: lines with strip info + lines with detector info
     Int_t array_size = (count_strips * 2 + pspxprecalpardetector * 2);
     LOG(INFO) << "R3BPspxPrecalGainForStrips Array Size: " << array_size << FairLogger::endl;
     pspxprecalpargain.Set(array_size);
@@ -156,9 +176,10 @@ Bool_t R3BPspxPrecalPar::getParams(FairParamList* l)
         {
             count_cathode++;
         }
+        // else: for X5/orientation=3, count_cathode=0;
     }
     LOG(INFO) << "Number of detectors with cathode: " << count_cathode << FairLogger::endl;
-
+    // count all entries: lines with channel info + lines with detector info + lines with cathode channel info
     array_size = (count_strips * 2 * 2 + pspxprecalpardetector * 2 + count_cathode * 2);
     LOG(INFO) << "R3BPspxPrecalEnergyThresholdForChannels Array Size: " << array_size << FairLogger::endl;
     pspxprecalparenergythreshold.Set(array_size);

@@ -21,7 +21,7 @@
 #include "R3BPspxHitData.h"
 #include "R3BPspxHitPar.h"
 
-//using namespace std;
+// using namespace std;
 
 R3BPspxCal2Hit::R3BPspxCal2Hit()
     : fCalItems(NULL)
@@ -85,7 +85,7 @@ InitStatus R3BPspxCal2Hit::Init()
             offset[i][j] = fHitPar->GetPspxParLinearParam().At(start_detector + 3 + j * 3);
             slope[i][j] = fHitPar->GetPspxParLinearParam().At(start_detector + 4 + j * 3);
         }
-        start_detector = start_detector + 2 + 3 * fHitPar->GetPspxParStrip().At(i);
+        start_detector = start_detector + 2 + 3 * offset[i].size();
     }
     LOG(INFO) << "R3BPspxCal2Hit :: Init() " << FairLogger::endl;
     for (Int_t i = 0; i < fHitPar->GetPspxParDetector(); i++)
@@ -184,6 +184,8 @@ void R3BPspxCal2Hit::Exec(Option_t* option)
      * Using the provided parameters the x/y position is calculated from the u/v positons acccording to
      * position_cm = sign * (offset + slope * position_au)
      * The sign is used to give the final positons in a general coordinate system.
+     * Depending on whether the postiton is determined via charge devision (formulas given above) or by the number of
+     * the hit strip, the variables sign_pos or sign_strip are used, respectively.
      * The qualitiy of the x/y positons is given by sigma. At the moment sigma = 0 for construction with the explained
      * method and sigma = 1 for events, for which only the strip number could be used to determine the position.
      * The total energy is either determined from the cathode (back, X1) or from the mean of the sum of the front and

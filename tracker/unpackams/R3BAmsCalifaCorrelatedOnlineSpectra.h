@@ -100,10 +100,12 @@ class R3BAmsCalifaCorrelatedOnlineSpectra : public FairTask {
   
   TCanvas* cMap1,* cMap2;
   TCanvas* cAMSangles, *cHitone, *cHittwo, *cHitPhis;
+  TCanvas* cMap1e,* cMap2e;
   //TCanvas* cCal;
   //TCanvas* cHit[4];
 
   TH2F* fh_Califa_coinc_petal1,* fh_Califa_coinc_petal2;
+  TH2F* fh_Califa_coinc_petal1e,* fh_Califa_coinc_petal2e;
   TH2F *fh_los_pos_MCFD;
   TH2F *fh_los_pos_TAMEX;
   TH1F* fh_Ams_openangle1, *fh_Ams_openangle2;

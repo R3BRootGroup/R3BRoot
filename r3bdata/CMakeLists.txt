@@ -8,6 +8,7 @@ set(SYSTEM_INCLUDE_DIRECTORIES ${SYSTEM_INCLUDE_DIRECTORIES} ${BASE_INCLUDE_DIRE
 
 set(INCLUDE_DIRECTORIES
     ${R3BROOT_SOURCE_DIR}/r3bdata
+    ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
     ${R3BROOT_SOURCE_DIR}/r3bdata/xballData
     ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
     ${R3BROOT_SOURCE_DIR}/r3bdata/dhcData
@@ -42,6 +43,9 @@ link_directories(${LINK_DIRECTORIES})
 set(SRCS
     R3BMCStack.cxx
     R3BMCTrack.cxx
+    wrData/R3BWRMasterData.cxx
+    wrData/R3BWRCalifaData.cxx
+    wrData/R3BWRAmsData.cxx
     R3BHit.cxx
     R3BDouble.cxx
     xballData/R3BXBallPoint.cxx

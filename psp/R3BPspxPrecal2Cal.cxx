@@ -56,7 +56,7 @@ InitStatus R3BPspxPrecal2Cal::Init()
     // fCalItems = (TClonesArray*)fMan->GetObject("R3BPspxCalData");
     FairRootManager::Instance()->Register("PspxCalData", "Pspx", fCalItems, kTRUE);
 
-     //fCalPar->printparams();
+    // fCalPar->printparams();
 
     // Initialisation of gain parameters
     gain.resize(fCalPar->GetPspxParDetector());
@@ -68,7 +68,7 @@ InitStatus R3BPspxPrecal2Cal::Init()
             gain[i].resize(fCalPar->GetPspxParStrip().At(i));
         }
         else if (fCalPar->GetPspxParOrientation().At(i) == 3)
-        { // strips on 2 side1
+        { // strips on 2 sides
             gain[i].resize(fCalPar->GetPspxParStrip().At(i) * 2);
         }
     }
@@ -79,7 +79,7 @@ InitStatus R3BPspxPrecal2Cal::Init()
         { // strips
             gain[i][j] = fCalPar->GetPspxParGain().At(start_detector + 3 + j * 2);
         }
-        start_detector = start_detector + 2 + 2 * fCalPar->GetPspxParStrip().At(i);
+        start_detector = start_detector + 2 + 2 * gain[i].size();
     }
     LOG(INFO) << "R3BPspxPrecal2Cal :: Init() " << FairLogger::endl;
     for (Int_t i = 0; i < fCalPar->GetPspxParDetector(); i++)
@@ -146,7 +146,7 @@ void R3BPspxPrecal2Cal::Exec(Option_t* option)
 {
     /**
      * Does the conversion from Precal to Cal level. It is called for every event.
-     * Applies (strip specific) gains to the energy entries of every strip. This is necessary 
+     * Applies (strip specific) gains to the energy entries of every strip. This is necessary
      * for energy calibration.
      */
 

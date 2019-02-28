@@ -44,10 +44,11 @@ class R3BAmsStripCal2Hit : public FairTask {
   /** Virtual method Finish **/
   virtual void Finish();
 
-  virtual void DefineClusters(Int_t nfound, Double_t fPitch, Double_t *fChannels, TH1F* hsst, Double_t cluster[][2]);
+  virtual void DefineClusters(Int_t *nfound, Double_t fPitch, Double_t *fChannels, TH1F* hsst, Double_t cluster[][2]);
   
   void SetOnline(Bool_t option){fOnline=option;}
   void SetMaxNumDet(Int_t NbDet){fMaxNumDet=NbDet;}
+  void SetMaxNumClusters(Int_t max){fMaxNumClusters=max;}
   
  private:
 

@@ -128,14 +128,17 @@ void R3BAmsStripCal2Hit::Exec(Option_t* option)
    fChannelPeaks = (Double_t*) ss->GetPositionX();
    //for(int j=0;j<nfound;j++)std::cout << nfound <<" "<< fChannelPeaks[j] << std::endl;
    Double_t clusterS[nfoundS][2];
-   DefineClusters(nfoundS, fPitchS, fChannelPeaks, hams[i*2], clusterS);
+   DefineClusters(&nfoundS, fPitchS, fChannelPeaks, hams[i*2], clusterS);
 
    // Looking for hits in side K
    nfoundK = ss->Search(hams[i*2+1],1.,"goff",0.0001);
    fChannelPeaks = (Double_t*) ss->GetPositionX();
    //for(int j=0;j<nfound;j++)std::cout << nfound <<" "<< fChannelPeaks[j] << std::endl;
+   //std::cout << " antes:"<< nfoundK << std::endl;
    Double_t clusterK[nfoundK][2];
-   DefineClusters(nfoundK, fPitchK, fChannelPeaks, hams[i*2+1], clusterK);
+   DefineClusters(&nfoundK, fPitchK, fChannelPeaks, hams[i*2+1], clusterK);
+
+   //std::cout << nfoundK  << std::endl;
 
    // Add hits per detector from the maximum energy to the lower one, but limiting the number 
    // of clusters per detector to fMaxNumClusters
@@ -176,9 +179,12 @@ void R3BAmsStripCal2Hit::Finish()
 }
 
 // -----   Protected method to define clusters   --------------------------------
-void R3BAmsStripCal2Hit::DefineClusters(Int_t nfound, Double_t fPitch, Double_t *fChannels, TH1F* hsst, Double_t cluster[][2])
+void R3BAmsStripCal2Hit::DefineClusters(Int_t *nfoundhits, Double_t fPitch, Double_t *fChannels, TH1F* hsst, Double_t cluster[][2])
 {
   //std::cout << "Search " << std::endl;
+
+  Int_t nfound = *nfoundhits;
+  *nfoundhits=0;
 
   Double_t SumEnergy[nfound], Position[nfound], energy = 0.;
   Int_t CountDet = 0;
@@ -192,23 +198,31 @@ void R3BAmsStripCal2Hit::DefineClusters(Int_t nfound, Double_t fPitch, Double_t 
 
   for(Int_t i = 0; i < nfound; i++){
    for(Int_t j = 0; j < 2; j++)CoG[j] = 0.;
-   Int_t initstrip = fChannels[i]-2;
+   Int_t initstrip = fChannels[i];
+   for(int k=0;k<10;k++)if(hsst->GetBinContent(fChannels[i]-k)>0)initstrip--;else break;
    if(initstrip<0)initstrip = 0;
-   for(Int_t strip = initstrip; strip < fChannels[i]+2; strip++){
+   Int_t finalstrip=fChannels[i]+1;
+   for(Int_t strip = initstrip; strip < finalstrip; strip++){
    energy = hsst->GetBinContent(strip+1);
+   if(hsst->GetBinContent(strip+2)>0)finalstrip++;
    // std::cout<< strip <<" "<< energy <<std::endl;
    CoG[0] = CoG[0] + energy*strip;
    CoG[1] = CoG[1] + energy;
    SumEnergy[i] = SumEnergy[i] + energy;
+   hsst->SetBinContent(strip+1,0.);
    }
    Position[i] = CoG[0]/CoG[1]*fPitch/1000.;
   }
   // for(Int_t i = 0; i < nfound; i++)std::cout<< i <<" " << SumEnergy[i] <<" "<< Position[i] <<std::endl;
-
+  Int_t v=0;
   for(Int_t j = 0; j < nfound; j++){
-   cluster[j][0] = SumEnergy[j];
-   cluster[j][1] = Position[j];
+   if(SumEnergy[j]>50.){
+    cluster[v][0] = SumEnergy[j];
+    cluster[v][1] = Position[j];
+    v++;
+   }
   }
+  *nfoundhits=v;
   //for(Int_t i = 0; i < nfound; i++)std::cout<< i <<" " << cluster[i][0] <<" "<< cluster[i][1] <<std::endl;
 }
 

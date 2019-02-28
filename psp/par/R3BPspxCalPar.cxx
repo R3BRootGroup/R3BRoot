@@ -73,10 +73,21 @@ void R3BPspxCalPar::putParams(FairParamList* l)
     Int_t count_strips = 0;
     for (Int_t i = 0; i < pspxcalpardetector; i++)
     {
-        count_strips += pspxcalparstrip[i];
+        if (pspxcalparorientation[i] == 1 || pspxcalparorientation[i] == 2)
+        {
+            count_strips += pspxcalparstrip[i];
+        }
+        else if (pspxcalparorientation[i] == 3)
+        {
+            count_strips += pspxcalparstrip[i] * 2;
+        }
+        else
+        {
+            LOG(ERROR) << "R3BPspxCalPar::putParams: Orientation of Detector not valid! " << FairLogger::endl;
+        }
     }
-    Int_t array_size = (count_strips * 2 +
-                        pspxcalpardetector * 2); // count all entries: lines with strip info + lines with detector info
+    // count all entries: lines with strip info + lines with detector info
+    Int_t array_size = (count_strips * 2 + pspxcalpardetector * 2);
     LOG(INFO) << "R3BPspxCalGainForStrips Array Size: " << array_size << FairLogger::endl;
     pspxcalpargain.Set(array_size);
     l->add("R3BPspxCalGainForStrips", pspxcalpargain);
@@ -110,10 +121,22 @@ Bool_t R3BPspxCalPar::getParams(FairParamList* l)
     Int_t count_strips = 0;
     for (Int_t i = 0; i < pspxcalpardetector; i++)
     {
-        count_strips += pspxcalparstrip[i];
+        if (pspxcalparorientation[i] == 1 || pspxcalparorientation[i] == 2)
+        {
+            count_strips += pspxcalparstrip[i];
+        }
+        else if (pspxcalparorientation[i] == 3)
+        {
+            count_strips += pspxcalparstrip[i] * 2;
+        }
+        else
+        {
+            LOG(ERROR) << "R3BPspxCalPar::getParams: Orientation of Detector not valid! " << FairLogger::endl;
+            return kFALSE;
+        }
     }
     LOG(INFO) << "Total number of strips: " << count_strips << FairLogger::endl;
-
+    // count all entries: lines with strip info + lines with detector info
     Int_t array_size = (count_strips * 2 + pspxcalpardetector * 2);
     LOG(INFO) << "R3BPspxCalGainForStrips Array Size: " << array_size << FairLogger::endl;
     pspxcalpargain.Set(array_size);

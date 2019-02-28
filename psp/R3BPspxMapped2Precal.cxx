@@ -44,6 +44,7 @@ InitStatus R3BPspxMapped2Precal::Init()
      * Print parameters, if verbosity is set to INFO.
      */
 
+    // LOG(INFO) << "R3BPspxMapped2Precal :: Init() " << FairLogger::endl;
     FairRootManager* fMan = FairRootManager::Instance();
     fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
     fMappedItems = (TClonesArray*)fMan->GetObject("PspxMappedData"); // = branch name in TTree
@@ -67,7 +68,7 @@ InitStatus R3BPspxMapped2Precal::Init()
             gain[i].resize(fPrecalPar->GetPspxParStrip().At(i));
         }
         else if (fPrecalPar->GetPspxParOrientation().At(i) == 3)
-        { // strips on 2 side1
+        { // strips on 2 sides
             gain[i].resize(fPrecalPar->GetPspxParStrip().At(i) * 2);
         }
     }
@@ -78,7 +79,7 @@ InitStatus R3BPspxMapped2Precal::Init()
         { // strips
             gain[i][j] = fPrecalPar->GetPspxParGain().At(start_detector + 3 + j * 2);
         }
-        start_detector = start_detector + 2 + 2 * fPrecalPar->GetPspxParStrip().At(i);
+        start_detector = start_detector + 2 + 2 * gain[i].size();
     }
     LOG(INFO) << "R3BPspxMapped2Precal :: Init() " << FairLogger::endl;
     for (Int_t i = 0; i < fPrecalPar->GetPspxParDetector(); i++)
@@ -109,16 +110,8 @@ InitStatus R3BPspxMapped2Precal::Init()
         { // channels
             energythreshold[i][j] = fPrecalPar->GetPspxParEnergyThreshold().At(start_detector + 3 + j * 2);
         }
-        if (fPrecalPar->GetPspxParOrientation().At(i) == 1 || fPrecalPar->GetPspxParOrientation().At(i) == 2)
-        { // cathode cannel available
-            start_detector = start_detector + 2 + 2 * 2 * fPrecalPar->GetPspxParStrip().At(i) + 2;
-        }
-        else if (fPrecalPar->GetPspxParOrientation().At(i) == 3)
-        {
-            start_detector = start_detector + 2 + 2 * 4 * fPrecalPar->GetPspxParStrip().At(i);
-        }
+        start_detector = start_detector + 2 + 2 * energythreshold[i].size();
     }
-    // LOG(INFO) << "R3BPspxMapped2Precal :: Init() " << FairLogger::endl;
     for (Int_t i = 0; i < fPrecalPar->GetPspxParDetector(); i++)
     {
         for (Int_t j = 0; j < energythreshold[i].size(); j++)
@@ -225,8 +218,8 @@ void R3BPspxMapped2Precal::Exec(Option_t* option)
         if (fPrecalPar->GetPspxParStrip().At(detector1 - 1) == 0)
             continue;
 
-	// get rif of error message from Febex
-	if(mItem1->GetEnergy()==-3075811 || mItem1->GetEnergy()==-3075810)
+        // get rif of error message from Febex
+        if (mItem1->GetEnergy() == -3075811 || mItem1->GetEnergy() == -3075810)
             continue;
 
         // calculating stripnumber, only for valid channel number
@@ -285,9 +278,9 @@ void R3BPspxMapped2Precal::Exec(Option_t* option)
                     if (fPrecalPar->GetPspxParStrip().At(detector2 - 1) == 0)
                         continue;
 
-		    // get rif of error message from Febex
-		    if(mItem2->GetEnergy()==-3075811 || mItem2->GetEnergy()==-3075810)
-		        continue;
+                    // get rif of error message from Febex
+                    if (mItem2->GetEnergy() == -3075811 || mItem2->GetEnergy() == -3075810)
+                        continue;
 
                     // calculating stripnumber
                     if (mItem2->GetChannel() > 0 &&
@@ -306,7 +299,8 @@ void R3BPspxMapped2Precal::Exec(Option_t* option)
                         if (fPrecalPar->GetPspxParOrientation().At(detector2 - 1) == 1 ||
                             fPrecalPar->GetPspxParOrientation().At(detector1 - 1) == 3)
                         { // vertical strips or strips in both directions
-                            if (TMath::Abs(mItem2->GetEnergy()) < energythreshold[detector2 - 1][mItem2->GetChannel() - 1])
+                            if (TMath::Abs(mItem2->GetEnergy()) <
+                                energythreshold[detector2 - 1][mItem2->GetChannel() - 1])
                                 continue;
                         }
                         else if (fPrecalPar->GetPspxParOrientation().At(detector2 - 1) == 2)

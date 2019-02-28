@@ -103,12 +103,25 @@ void R3BPspxHitPar::putParams(FairParamList* l)
     l->add("R3BPspxHitOrientationYSignOfDetector", pspxhitparorientationystrip);
     l->add("R3BPspxHitLengthOfDetector", pspxhitparlength);
 
-    Int_t count_sectors = 0;
+    Int_t count_strips = 0;
     for (Int_t i = 0; i < pspxhitpardetector; i++)
     {
-        count_sectors += pspxhitparstrip[i];
+        if (pspxhitparorientation[i] == 1 || pspxhitparorientation[i] == 2)
+        {
+            count_strips += pspxhitparstrip[i];
+        }
+        else if (pspxhitparorientation[i] == 3)
+        {
+            count_strips += pspxhitparstrip[i] * 2;
+        }
+        else
+        {
+            LOG(ERROR) << "R3BPspxHitPar::putParams: Orientation of Detector not valid! " << FairLogger::endl;
+        }
     }
-    Int_t array_size = (count_sectors * 3 + pspxhitpardetector * 2); //????
+    // count all entries: lines with strip info + lines with detector info,
+    // can change when more than a linear polynomial function is used => more parameters
+    Int_t array_size = (count_strips * 3 + pspxhitpardetector * 2);
     LOG(INFO) << "Array Size: " << array_size << FairLogger::endl;
     pspxhitparlinearparam.Set(array_size);
     l->add("R3BPspxHitLinearParamForStrips", pspxhitparlinearparam);
@@ -159,14 +172,27 @@ Bool_t R3BPspxHitPar::getParams(FairParamList* l)
         return kFALSE;
     }
 
-    Int_t count_sectors = 0;
+    Int_t count_strips = 0;
     for (Int_t i = 0; i < pspxhitpardetector; i++)
     {
-        count_sectors += pspxhitparstrip[i];
+        if (pspxhitparorientation[i] == 1 || pspxhitparorientation[i] == 2)
+        {
+            count_strips += pspxhitparstrip[i];
+        }
+        else if (pspxhitparorientation[i] == 3)
+        {
+            count_strips += pspxhitparstrip[i] * 2;
+        }
+        else
+        {
+            LOG(ERROR) << "R3BPspxHitPar::getParams: Orientation of Detector not valid! " << FairLogger::endl;
+            return kFALSE;
+        }
     }
-    LOG(INFO) << "Total number of strips: " << count_sectors << FairLogger::endl;
-
-    Int_t array_size = (count_sectors * 3 + pspxhitpardetector * 2);
+    LOG(INFO) << "Total number of strips: " << count_strips << FairLogger::endl;
+    // count all entries: lines with strip info + lines with detector info,
+    // can change when more than a linear polynomial function is used => more parameters
+    Int_t array_size = (count_strips * 3 + pspxhitpardetector * 2);
     LOG(INFO) << "Array Size: " << array_size << FairLogger::endl;
     pspxhitparlinearparam.Set(array_size);
     if (!(l->fill("R3BPspxHitLinearParamForStrips", &pspxhitparlinearparam)))

@@ -73,7 +73,7 @@ class R3BPspxCalPar : public FairParGenericSet
     R3BPspxCalPar(const R3BPspxCalPar&);
     R3BPspxCalPar& operator=(const R3BPspxCalPar&);
 
-    ClassDef(R3BPspxCalPar, 3);
+    ClassDef(R3BPspxCalPar, 4);
 };
 
 #endif

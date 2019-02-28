@@ -53,7 +53,7 @@ class R3BPspxMapped2Precal : public FairTask
     // void WriteHistos();
 
   public:
-    ClassDef(R3BPspxMapped2Precal, 1)
+    ClassDef(R3BPspxMapped2Precal, 2)
 };
 
 #endif

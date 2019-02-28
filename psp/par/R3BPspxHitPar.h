@@ -83,7 +83,7 @@ class R3BPspxHitPar : public FairParGenericSet
     R3BPspxHitPar(const R3BPspxHitPar&);
     R3BPspxHitPar& operator=(const R3BPspxHitPar&);
 
-    ClassDef(R3BPspxHitPar, 3);
+    ClassDef(R3BPspxHitPar, 4);
 };
 
 #endif

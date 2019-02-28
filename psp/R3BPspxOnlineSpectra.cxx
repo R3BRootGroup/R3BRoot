@@ -31,15 +31,15 @@
 #include "THttpServer.h"
 
 #include "TClonesArray.h"
-#include "TMath.h"
-#include <TRandom3.h>
-#include <TRandomGen.h>
-#include <array>
-#include <cstdlib>
-#include <ctime>
-#include <fstream>
 #include <iostream>
+#include <fstream>
 #include <sstream>
+#include <cstdlib>
+#include <fstream>
+#include <ctime>
+#include <array>
+#include "TMath.h"
+#include "TVector3.h"
 
 using namespace std;
 
@@ -92,11 +92,22 @@ InitStatus R3BPspxOnlineSpectra::Init()
 
 
     //MAIN FOLDER-AMS
-    TFolder* mainfolPspx = new TFolder("PSPX","PSPX info");  
+    TFolder* mainfolPspx = new TFolder("PSPX","PSPX info");
+    TCanvas* cMap = new TCanvas("Map_PSPX", "Pspx Map", 10, 10, 1100, 1000);
+    fh_pspx_map = new TH2F("PSPX_map","PSPX_map",5008,0.5,1028.5,300,-5.,20.5);
+    fh_pspx_map->GetXaxis()->SetTitle("Strip number [1-128]");
+    fh_pspx_map->GetYaxis()->SetTitle("Detector number [1-3]");
+    fh_pspx_map->GetXaxis()->CenterTitle(true);
+    fh_pspx_map->GetYaxis()->CenterTitle(true);
+    fh_pspx_map->GetYaxis()->SetTitleOffset(1.5);
+    fh_pspx_map->GetXaxis()->SetTitleOffset(1.1);
+    cMap->cd();
+    fh_pspx_map->Draw("colz");
+    mainfolPspx->Add(cMap);
 
 
     TCanvas* cPspx_comp = new TCanvas("Pspx_comp", "Pspx Comparison", 10, 10, 1100, 1000);
-    cPspx_comp->Divide(2, 3);
+    cPspx_comp->Divide(6, 3);
 
     Int_t Emax = 500000;
 
@@ -185,6 +196,9 @@ InitStatus R3BPspxOnlineSpectra::Init()
         TCanvas* cPspx_strips = new TCanvas("Pspx_strips", "Pspx Strips", 10, 10, 1100, 1000);
         cPspx_strips->Divide(N_PSPX, 2);
 
+        TCanvas* cPspx_energy_strips = new TCanvas("Pspx_energy_vs_strip", "Pspx energy vs Strips", 10, 10, 1100, 1000);
+        cPspx_energy_strips->Divide(3, 1);
+
         for (UInt_t i = 0; i < N_PSPX; i++)
         {
             cPspx_strips->cd(i + 1);
@@ -195,6 +209,21 @@ InitStatus R3BPspxOnlineSpectra::Init()
         }
 
         mainfolPspx->Add(cPspx_strips);
+
+        for (UInt_t i = 0; i < 3; i++)
+        {
+          fh_pspx_energy_strip[i] = new TH2F(Form("PSPX_%d_energy_strips", i+1), Form("PSPX %d Energy vs Strip number", i +1),
+                                     N_STRIPS_PSPX*4,1, N_STRIPS_PSPX*4 + 1, 32500, 0, 65535);
+          fh_pspx_energy_strip[i]->GetXaxis()->SetTitle("Strip number[1-128]");
+          fh_pspx_energy_strip[i]->GetYaxis()->SetTitle("Energy [0-65535]");
+          fh_pspx_energy_strip[i]->GetXaxis()->CenterTitle(true);
+          fh_pspx_energy_strip[i]->GetYaxis()->CenterTitle(true);
+          fh_pspx_energy_strip[i]->GetYaxis()->SetTitleOffset(1.5);
+          fh_pspx_energy_strip[i]->GetXaxis()->SetTitleOffset(1.1);
+          cPspx_energy_strips->cd(i+1);
+          fh_pspx_energy_strip[i]->Draw("colz");
+        }
+        mainfolPspx->Add(cPspx_energy_strips);
 
         TCanvas* cPspx_multiplicity = new TCanvas("Pspx_multiplicity", "Pspx Multiplicity", 10, 10, 1100, 1000);
         cPspx_multiplicity->Divide(N_PSPX, 2);
@@ -330,6 +359,9 @@ void R3BPspxOnlineSpectra::Reset_PSPX_Histo()
             fh_pspx_multiplicity_y[i]->Reset();
             fh_pspx_strips_position[i]->Reset();
         }
+        fh_pspx_map->Reset();
+        for (UInt_t i = 0; i < 3; i++)
+            fh_pspx_energy_strip[i]->Reset();
     }
     if (fCalItemsPspx)
     {
@@ -387,6 +419,12 @@ void R3BPspxOnlineSpectra::Exec(Option_t* option)
         {
             R3BPspxMappedData* mappedData = (R3BPspxMappedData*)fMappedItemsPspx->At(ihit);
             UInt_t i = mappedData->GetDetector() - 1;
+
+                //std::cout <<i<<" "<<mappedData->GetChannel()<<" "<<mappedData->GetEnergy()<< std::endl;
+                fh_pspx_energy_strip[int(i/N_PSPX)]->Fill(mappedData->GetChannel(),mappedData->GetEnergy());
+
+                fh_pspx_map->Fill(mappedData->GetChannel(),i);
+
                 if (mappedData->GetChannel() > N_STRIPS_PSPX * 2 &&
                     mappedData->GetChannel() < N_STRIPS_PSPX * 4 + 1)
                 {
@@ -547,6 +585,8 @@ void R3BPspxOnlineSpectra::FinishTask()
             fh_pspx_multiplicity_y[i]->Write();
             fh_pspx_strips_position[i]->Write();
         }
+        for (UInt_t i = 0; i < 3; i++)
+            fh_pspx_energy_strip[i]->Write();
     }
     if (fCalItemsPspx)
     {
