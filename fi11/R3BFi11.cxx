@@ -203,7 +203,6 @@ Bool_t R3BFi11::ProcessHits(FairVolume* vol)
         // Increment number of Fi11Points for this track
         R3BStack* stack = (R3BStack*)gMC->GetStack();
         stack->AddPoint(kFI11);
-
         ResetParameters();
     }
 

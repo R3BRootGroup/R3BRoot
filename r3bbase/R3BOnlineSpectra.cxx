@@ -1060,11 +1060,9 @@ if(fMappedItems.at(DET_BMON)){
   //   rt| |l
   //   r | |lb
   //   rb\ /b 
-
-  
-
   Double_t timeTofd=0;
-  Double_t time_V[10][8] = {0.0/0.0};  // [multihit][pm]         
+  Double_t time_V[10][8] = {0.0/0.0};  // [multihit][pm]       
+  Double_t time_V_temp[10][8] = {0.0/0.0};   
   Double_t time_L[10][8] = {0.0/0.0};
   Double_t time_T[10][8] = {0.0/0.0};          
   Double_t timeLosM[10] = {0.0};
@@ -1164,6 +1162,7 @@ if(fMappedItems.at(DET_BMON)){
     
  // Sorting VFTX data:
 
+//HEAD
 	std::qsort(time_V, nPart, sizeof(*time_V),
         [](const void *arg1, const void *arg2)->int
         {
@@ -1211,6 +1210,134 @@ if(fMappedItems.at(DET_BMON)){
       
 // We will consider only events in which booth MCFD and TAMEX see same number of channels:
       if(iLOSTypeTAMEX  && iLOSTypeMCFD ) iLOSType = true;
+//=======
+      // lt=0, l=1,lb=2,b=3,rb=4,r=5,rt=6,t=7 
+// AKH changes
+      // VFTX Channels 1-4:
+      if(!(IS_NAN(calData->fTimeV_r_ns))) {
+	time_V_temp[iPart][5] = calData->fTimeV_r_ns;
+	if(nPart == 1) time_V[iPart][5] = time_V_temp[iPart][5]; 
+	if(nPart > 1) time_V[nPart-1-iPart][5] = time_V_temp[iPart][5];
+	nPart_VFTX[5] += 1;
+      }	  
+      if(!(IS_NAN(calData->fTimeV_t_ns))) {
+	time_V_temp[iPart][7] = calData->fTimeV_t_ns;
+	if(nPart == 1) time_V[iPart][7] = time_V_temp[iPart][7]; 
+	if(nPart > 1) time_V[nPart-1-iPart][7] = time_V_temp[iPart][7];
+	nPart_VFTX[7] += 1;
+      }	
+      if(!(IS_NAN(calData->fTimeV_l_ns))) {
+	time_V_temp[iPart][1] = calData->fTimeV_l_ns;
+	if(nPart == 1) time_V[iPart][1] = time_V_temp[iPart][1]; 
+	if(nPart > 1) time_V[nPart-1-iPart][1] = time_V_temp[iPart][1];
+	nPart_VFTX[1] += 1;
+      }	
+      if(!(IS_NAN(calData->fTimeV_b_ns))) {
+	time_V_temp[iPart][3] = calData->fTimeV_b_ns;
+	if(nPart == 1) time_V[iPart][3] = time_V_temp[iPart][3]; 
+	if(nPart > 1) time_V[nPart-1-iPart][3] = time_V_temp[iPart][3];  
+	nPart_VFTX[3] += 1;
+      }	
+      // VFTX Channels 5-8:
+      if(!(IS_NAN(calData->fTimeV_rt_ns))) {
+	time_V_temp[iPart][6] = calData->fTimeV_rt_ns;
+	if(nPart == 1) time_V[iPart][6] = time_V_temp[iPart][6]; 
+	if(nPart > 1) time_V[nPart-1-iPart][6] = time_V_temp[iPart][6];
+	nPart_VFTX[6] += 1;
+      }	
+      if(!(IS_NAN(calData->fTimeV_lt_ns))) {
+	time_V_temp[iPart][0] = calData->fTimeV_lt_ns;
+	if(nPart == 1) time_V[iPart][0] = time_V_temp[iPart][0]; 
+	if(nPart > 1) time_V[nPart-1-iPart][0] = time_V_temp[iPart][0];
+	nPart_VFTX[0] += 1;
+      }	
+      if(!(IS_NAN(calData->fTimeV_lb_ns))) {
+	time_V_temp[iPart][2] = calData->fTimeV_lb_ns;
+	if(nPart == 1) time_V[iPart][2] = time_V_temp[iPart][2]; 
+	if(nPart > 1) time_V[nPart-1-iPart][2] = time_V_temp[iPart][2];
+	nPart_VFTX[2] += 1;
+      }	
+      if(!(IS_NAN(calData->fTimeV_rb_ns))) {
+	time_V_temp[iPart][4] = calData->fTimeV_rb_ns;
+	if(nPart == 1) time_V[iPart][4] = time_V_temp[iPart][4]; 
+	if(nPart > 1) time_V[nPart-1-iPart][4] = time_V_temp[iPart][4];                 
+	nPart_VFTX [4]+= 1;
+      }	
+// AKH end      
+      
+      // TAMEX Channels 1-4:      
+      if(!(IS_NAN(calData->fTimeL_r_ns))) {
+	time_L[iPart][5] = calData->fTimeL_r_ns;
+	nPart_LEAD[5] += 1;
+      }	
+      if(!(IS_NAN(calData->fTimeT_r_ns))) {
+	time_T[iPart][5] = calData->fTimeT_r_ns;
+	nPart_TRAI[5] += 1;
+      }	
+      if(!(IS_NAN(calData->fTimeL_t_ns))) {
+	time_L[iPart][7] = calData->fTimeL_t_ns;
+	nPart_LEAD[7] += 1;
+      }	
+      if(!(IS_NAN(calData->fTimeT_t_ns))) {
+	time_T[iPart][7] = calData->fTimeT_t_ns;
+	nPart_TRAI[7] += 1;
+      }	  
+      if(!(IS_NAN(calData->fTimeL_l_ns))) {
+	time_L[iPart][1] = calData->fTimeL_l_ns;
+	nPart_LEAD[1] += 1;
+      }	
+      if(!(IS_NAN(calData->fTimeT_l_ns))) {
+	time_T[iPart][1] = calData->fTimeT_l_ns; 
+	nPart_TRAI[1] += 1;
+      }	
+      if(!(IS_NAN(calData->fTimeL_b_ns))) {
+	time_L[iPart][3] = calData->fTimeL_b_ns;
+	nPart_LEAD[3] += 1;
+      }	
+      if(!(IS_NAN(calData->fTimeT_b_ns))) {
+	time_T[iPart][3] = calData->fTimeT_b_ns;  
+	nPart_TRAI[3] += 1;
+      }	
+      // TAMEX Channels 5-8:
+      if(!(IS_NAN(calData->fTimeL_rt_ns))) {
+	time_L[iPart][6] = calData->fTimeL_rt_ns;
+	nPart_LEAD[6] += 1;
+      }	
+      if(!(IS_NAN(calData->fTimeT_rt_ns))) {
+	time_T[iPart][6] = calData->fTimeT_rt_ns;
+	nPart_TRAI[6] += 1;
+      }	
+      if(!(IS_NAN(calData->fTimeL_lt_ns))) {
+	time_L[iPart][0] = calData->fTimeL_lt_ns;
+	nPart_LEAD[0] += 1;
+      }	
+      if(!(IS_NAN(calData->fTimeT_lt_ns))) {
+	time_T[iPart][0] = calData->fTimeT_lt_ns; 
+	nPart_TRAI[0] += 1;
+      }	 
+      if(!(IS_NAN(calData->fTimeL_lb_ns))) {
+	time_L[iPart][2] = calData->fTimeL_lb_ns;
+	nPart_LEAD[2] += 1;
+      }	
+      if(!(IS_NAN(calData->fTimeT_lb_ns))) {
+	time_T[iPart][2] = calData->fTimeT_lb_ns; 
+	nPart_TRAI[2] += 1;
+      }	
+      if(!(IS_NAN(calData->fTimeL_rb_ns))) {
+	time_L[iPart][4] = calData->fTimeL_rb_ns;
+	nPart_LEAD[4] += 1;
+      }	
+      if(!(IS_NAN(calData->fTimeT_rb_ns))) {
+	time_T[iPart][4] = calData->fTimeT_rb_ns;  
+	nPart_TRAI[4] += 1;
+      }	
+
+// AKH added
+   }
+   for (Int_t iPart = 0; iPart < nPart; iPart++)     
+    {
+// AKH end		
+// >>>>>>> Changes for s473
 
 
       if(iDet==1)

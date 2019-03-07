@@ -27,6 +27,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
 ${R3BROOT_SOURCE_DIR}/tcal
 ${R3BROOT_SOURCE_DIR}/r3bdata/ptofData
 ${R3BROOT_SOURCE_DIR}/fiber
+${R3BROOT_SOURCE_DIR}/r3bdata
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})

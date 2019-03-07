@@ -69,10 +69,12 @@ R3BTofdCal2Hit::R3BTofdCal2Hit()
 		fhQ[i] = NULL;
         for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
+/*			
             fhQ1vsPos[i][j] = NULL;		
 	        fhQ2vsPos[i][j] = NULL;
 	        fhQvsPos[i][j] = NULL;
 	        fhSqrtQvsPos[i][j] = NULL;
+*/	        
 /*
 	        fhTotPm1vsTotPm2[i][j] = NULL;
 	        fhTotPm1satvsTotPm2sat[i][j] = NULL;
@@ -131,10 +133,12 @@ R3BTofdCal2Hit::R3BTofdCal2Hit(const char* name, Int_t iVerbose)
         fhQ[i] = NULL;
         for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
+/*			
             fhQ1vsPos[i][j] = NULL;		
 	        fhQ2vsPos[i][j] = NULL;
 	        fhQvsPos[i][j] = NULL;
 	        fhSqrtQvsPos[i][j] = NULL;
+*/	    
 /*
 	        fhTotPm1vsTotPm2[i][j] = NULL;
 	        fhTotPm1satvsTotPm2sat[i][j] = NULL;
@@ -180,10 +184,12 @@ R3BTofdCal2Hit::~R3BTofdCal2Hit()
         if (fhQ[i]) delete fhQ[i];
         for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
+/*
             if (fhQ1vsPos[i][j]) delete fhQ1vsPos[i][j];
             if (fhQ2vsPos[i][j]) delete fhQ2vsPos[i][j];
             if (fhQvsPos[i][j]) delete fhQvsPos[i][j];
             if (fhSqrtQvsPos[i][j]) delete fhSqrtQvsPos[i][j];
+*/            
             if (fhTdiffvsQ[i][2*j]) delete fhTdiffvsQ[i][2*j];
             if (fhTdiffvsQ[i][2*j+1]) delete fhTdiffvsQ[i][2*j+1];
 /*
@@ -470,14 +476,15 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 			fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 200, 0., 200.);
 		}
 */
-
+        Double_t max_charge=80.;
+        
 		if (NULL == fhQPm1[iPlane - 1])
 		{
 			char strName1[255];
 			sprintf(strName1, "Q_Plane_%d_PM_1", iPlane);
 			char strName2[255];
 			sprintf(strName2, "Q_Plane %d PM1", iPlane);
-			fhQPm1[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 100, 0., 100.);
+			fhQPm1[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 100, 0., max_charge);
 			fhQPm1[iPlane - 1]->GetYaxis()->SetTitle("Charge PM1");
 			fhQPm1[iPlane - 1]->GetXaxis()->SetTitle("Paddle number");
 		}
@@ -487,7 +494,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 			sprintf(strName1, "Q_Plane_%d_PM_2", iPlane);
 			char strName2[255];
 			sprintf(strName2, "Q_Plane %d PM2", iPlane);
-			fhQPm2[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 100, 0., 100.);
+			fhQPm2[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 100, 0., max_charge);
 			fhQPm2[iPlane - 1]->GetYaxis()->SetTitle("Charge PM2");
 			fhQPm2[iPlane - 1]->GetXaxis()->SetTitle("Paddle number");
 		}
@@ -497,15 +504,16 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 			sprintf(strName1, "Q_Plane_%d", iPlane);
 			char strName2[255];
 			sprintf(strName2, "Q_Plane %d ", iPlane);
-			fhQ[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 100, 0., 100.);
+			fhQ[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 1000, 0., max_charge);
 			fhQ[iPlane - 1]->GetYaxis()->SetTitle("Charge");
 			fhQ[iPlane - 1]->GetXaxis()->SetTitle("Paddle number");
 		}
+/*
 		if (NULL == fhQ1vsPos[iPlane - 1][iBar - 1])
 		{
 			char strName[255];
 			sprintf(strName, "Q1_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-			fhQ1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 200, 0., 100.);
+			fhQ1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 200, 0., max_charge);
 			fhQ1vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Charge PM1");
 			fhQ1vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position in cm");
 		}
@@ -513,7 +521,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 		{
 			char strName[255];
 			sprintf(strName, "Q2_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-			fhQ2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 200, 0., 100.);
+			fhQ2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 200, 0., max_charge);
 			fhQ2vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Charge PM2");
 			fhQ2vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position in cm");
 		}
@@ -521,7 +529,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 		{
 			char strName[255];
 			sprintf(strName, "Q_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-			fhQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 500, 0., 100.);
+			fhQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 500, 0., max_charge);
 			fhQvsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Charge");
 			fhQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position in cm");
 		}
@@ -529,11 +537,11 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 		{
 			char strName[255];
 			sprintf(strName, "SqrtQ_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-			fhSqrtQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 500, 0., 200.);
+			fhSqrtQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 500, 0., max_charge);
 			fhSqrtQvsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("sqrt(PM1*PM2)");
 			fhSqrtQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position in cm");
 		}
-
+*/
 		if (NULL == fhTdiffvsQ[iPlane - 1][2*iBar - 2])
 		{
 			char strName[255];
@@ -570,7 +578,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 		{
 			char strName[255];
 			sprintf(strName, "Q_vs_Q_Plane_%d_Bar_%d", iPlane, iBar*2-1);
-			fhQvsQ[iPlane - 1][iBar*2 - 2] = new TH2F(strName, "", 1000, 0, 100, 1000, 0., 100.);
+			fhQvsQ[iPlane - 1][iBar*2 - 2] = new TH2F(strName, "", 1000, 0, max_charge, 1000, 0., max_charge);
 			char strNamex[255];
 			if(iPlane==4){
 				sprintf(strNamex, "Charge plane %d", 1);
@@ -588,7 +596,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 			{
 				char strName[255];
 				sprintf(strName, "Q_vs_Q_Plane_%d_Bar_%d", iPlane, iBar*2-2);
-				fhQvsQ[iPlane - 1][iBar*2 - 3] = new TH2F(strName, "", 1000, 0, 100, 1000, 0., 100.);
+				fhQvsQ[iPlane - 1][iBar*2 - 3] = new TH2F(strName, "", 1000, 0, max_charge, 1000, 0., max_charge);
 				char strNamex[255];
 				if(iPlane==4){
 					sprintf(strNamex, "Charge plane %d", 1);
@@ -607,7 +615,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 			{
 				char strName[255];
 				sprintf(strName, "Q_vs_Q_Plane_%d_Bar_%d", iPlane, iBar*2);
-				fhQvsQ[iPlane - 1][iBar*2 -1] = new TH2F(strName, "", 1000, 0, 100, 1000, 0., 100.);
+				fhQvsQ[iPlane - 1][iBar*2 -1] = new TH2F(strName, "", 1000, 0, max_charge, 1000, 0., max_charge);
 				char strNamex[255];
 				if(iPlane==4){
 					sprintf(strNamex, "Charge plane %d", 1);
@@ -668,7 +676,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 		{
 			char strName[255];
 			sprintf(strName, "Q_vs_ToF_Plane_%d_Bar_%d", iPlane, iBar);
-			fhQvsTof[iPlane - 1][iBar - 1] = new TH2F(strName, "", 1000, 0., 100., 1000, -10, 40 );
+			fhQvsTof[iPlane - 1][iBar - 1] = new TH2F(strName, "", 1000, 0., max_charge, 1000, -10, 40 );
 			fhQvsTof[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToF in ns");
 			fhQvsTof[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Charge");
 		}
@@ -676,7 +684,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 		{
 			char strName[255];
 			sprintf(strName, "Charge_of_TofD");
-			fhCharge = new TH1F(strName, "", 1000, 0., 100.);
+			fhCharge = new TH1F(strName, "", 1000, 0., max_charge);
 			fhCharge->GetYaxis()->SetTitle("Counts");
 			fhCharge->GetXaxis()->SetTitle("Charge");
 		}
@@ -701,7 +709,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 		{
 			char strName[255];
 			sprintf(strName, "Charge_vs_Pos_p12");
-			fhQp12 = new TH2F(strName, "", 100, 0, 100, 1000, 0., 100.);
+			fhQp12 = new TH2F(strName, "", 100, 0, 100, 1000, 0., max_charge);
 			fhQp12->GetYaxis()->SetTitle("Average charge of plane 1 and 2");
 			fhQp12->GetXaxis()->SetTitle("Bar number");
 		}
@@ -710,7 +718,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 		{
 			char strName[255];
 			sprintf(strName, "Charge_vs_Pos_p34");
-			fhQp34 = new TH2F(strName, "", 100, 0, 100, 1000, 0., 100.);
+			fhQp34 = new TH2F(strName, "", 100, 0, 100, 1000, 0., max_charge);
 			fhQp34->GetYaxis()->SetTitle("Average charge of plane 3 and 4");
 			fhQp34->GetXaxis()->SetTitle("Bar number");
 		}
@@ -857,10 +865,10 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 			fhQPm1[iPlane-1]->Fill(iBar,q1);
 			fhQPm2[iPlane-1]->Fill(iBar,q2);
 			fhQ[iPlane-1]->Fill(iBar,(q1+q2)/2.);
-			fhQ1vsPos[iPlane-1][iBar-1]->Fill(Pos, q1);
-			fhQ2vsPos[iPlane-1][iBar-1]->Fill(Pos, q2);
-			fhQvsPos[iPlane-1][iBar-1]->Fill(Pos, (q1+q2)/2.);
-			fhSqrtQvsPos[iPlane-1][iBar-1]->Fill(Pos, sqrt(tot1*tot2));
+//			fhQ1vsPos[iPlane-1][iBar-1]->Fill(Pos, q1);
+//			fhQ2vsPos[iPlane-1][iBar-1]->Fill(Pos, q2);
+//			fhQvsPos[iPlane-1][iBar-1]->Fill(Pos, (q1+q2)/2.);
+//			fhSqrtQvsPos[iPlane-1][iBar-1]->Fill(Pos, sqrt(tot1*tot2));
 //			fhTot1vsPos[iPlane-1][iBar-1]->Fill(Pos, tot1);
 //			fhTot2vsPos[iPlane-1][iBar-1]->Fill(Pos, tot2);
 			fhQvsTof[iPlane-1][iBar-1]->Fill((q1+q2)/2.,ToF);
@@ -952,12 +960,12 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 				if(Q[i][j]>0.) fhChargeLosTofD->Fill(Q[i][j],LosQ);
 			}
 			//average plane 1 and 2
-			if(i==1 && Q[1][j]>0 && Q[2][j]>0){
+			if(i==1 && Q[1][j]>0 && Q[2][j]>0 && abs(Q[1][j] - Q[2][j])<2.5){
 				Qp12[j]=(Q[1][j]+Q[2][j])/2.;
 				fhQp12->Fill(j,Qp12[j]);
 			}
 			//average plane 3 and 4
-			if(i==3 && Q[3][j]>0 && Q[4][j]>0){
+			if(i==3 && Q[3][j]>0 && Q[4][j]>0 && abs(Q[3][j] - Q[4][j])<2.5){
 				Qp34[j]=(Q[3][j]+Q[4][j])/2.;
 				fhQp34->Fill(j,Qp34[j]);
 			}
@@ -988,28 +996,34 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 		}
 	}
       // average measurements of 4 planes
-      
+/*      
 	  maxmax_Z=max_Z[1];
 	  maxmax_x=max_x[1];
       maxmax_y=max_y[1];
       maxmax_t=max_t[1];
       maxmax_bar=max_bar[1];
       maxmax_plane=1;
-      
+*/      
 	  Double_t Z_ave=maxmax_Z;
 	  Double_t x_ave=maxmax_x;
       Double_t y_ave=maxmax_y;
       Double_t t_ave=maxmax_t;
 
-      for(Int_t p=1;p<3;p++){
+      for(Int_t p=1;p<5;p++){
 		  // only add to average if they have seen similar Q, otherwise a reaction took place or no hit 
-		if(abs(maxmax_Z-max_Z[p])<1.5 && abs(maxmax_bar-max_bar[p])<2 && p!=maxmax_plane){
+		if(abs(maxmax_Z-max_Z[p])<2.5 && abs(maxmax_bar-max_bar[p])<2 && p!=maxmax_plane){
           Z_ave=(Z_ave+max_Z[p])/2.;
           x_ave=(x_ave+max_x[p])/2.;
           y_ave=(y_ave+max_y[p])/2.;
           t_ave=(t_ave+max_t[p])/2.;
 		}
       }
+
+      if(Z_ave>35. && Z_ave<32.){
+		  cout<<"Average: "<<Z_ave<<endl;
+		  cout<<"p1: "<<max_Z[1]<<" p2: "<<max_Z[2]<<" p3: "<<max_Z[3]<<" p4: "<<max_Z[4]<<endl;
+     		  
+	  }
       if(Z_ave>0){
 		fhCharge->Fill(Z_ave);     
 		fhxy->Fill(x_ave,y_ave);
@@ -1019,7 +1033,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 //	cout<<"Average: "<<Z_ave<<endl;
 	      
 		// write out calibrated event
-		new ((*fHitItems)[fNofHitItems]) R3BTofdHitData(t_ave, x_ave , y_ave, Z_ave, timeRef);
+		new ((*fHitItems)[fNofHitItems]) R3BTofdHitData(t_ave,  x_ave , y_ave, Z_ave, t_ave, Z_ave, 1);
 		fNofHitItems += 1;
 	  }
 	fnEvents++;
@@ -1061,10 +1075,12 @@ void R3BTofdCal2Hit::FinishTask()
         if (fhQ[i]) fhQ[i]->Write();
         for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
+/*			
             if (fhQ1vsPos[i][j]) fhQ1vsPos[i][j]->Write();
             if (fhQ2vsPos[i][j]) fhQ2vsPos[i][j]->Write();
             if (fhQvsPos[i][j]) fhQvsPos[i][j]->Write();
             if (fhSqrtQvsPos[i][j]) fhSqrtQvsPos[i][j]->Write();
+*/
 /*
             if (fhTotPm1vsTotPm2[i][j]) fhTotPm1vsTotPm2[i][j]->Write();
             if (fhTotPm1satvsTotPm2sat[i][j]) fhTotPm1satvsTotPm2sat[i][j]->Write();

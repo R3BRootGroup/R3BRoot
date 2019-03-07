@@ -195,7 +195,8 @@ class R3BGlobalAnalysis : public FairTask
     Int_t fNEvents = 0;         /**< Event counter. */
     Int_t fFibEvents = 0;         /**< Event counter. */
     Double_t max_values[NOF_FIB_DET][2048];
-        
+    Int_t FibMax[NOF_FIB_DET];   
+     
     TH2F *fhChargeLosTofD;
     TH2F *fh_los_pos;
     
@@ -214,17 +215,16 @@ class R3BGlobalAnalysis : public FairTask
     TH2F *fh_ToT_s_Fib[NOF_FIB_DET];
     TH2F *fh_Fib_vs_Events[NOF_FIB_DET];
     TH2F *fh_Fibs_vs_Events[NOF_FIB_DET];
+    TH2F *fh_Fibs_vs_Tofd[NOF_FIB_DET];
+
+    TH2F *fh_Fib_vs_Fib[NOF_FIB_DET][NOF_FIB_DET];
+    TH2F *fh_Fib_dx[NOF_FIB_DET][NOF_FIB_DET];
     
     TH2F *fh_Cave_position;
     
-    TH1F *fh_tofd_channels[N_PLANE_MAX_TOFD];   
-    TH2F *fh_tofd_multihit[N_PLANE_MAX_TOFD];
-    TH2F *fh_tofd_ToF[N_PLANE_MAX_TOFD];
-    TH2F* fh_tofd_TotPm[N_PLANE_MAX_TOFD]; 
-    //TH2F* fh_tofd_TotvsPos[N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD]; 
-    TH2F* fh_tofd_TotvsPos;
-    TH2F* fh_tofd_dt[3];
- 
+    TH2F* fh_tofd_pos;
+    TH1F* fh_tofd_charge;    
+    
     TH1F *fh_ptof_channels; 
     TH1F *fh_ptof_channels_cut; 
     TH1F *fh_ptof_test1;   
