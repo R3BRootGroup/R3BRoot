@@ -126,7 +126,7 @@ class R3BTra : public R3BDetector
                         TVector3 momOut,
                         Double_t time,
                         Double_t length,
-                        Double_t eLoss);
+                        Double_t eLoss, Int_t pdgcode);
 
     /** Private method ResetParameters
      **

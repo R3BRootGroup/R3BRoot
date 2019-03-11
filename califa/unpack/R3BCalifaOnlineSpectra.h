@@ -160,7 +160,8 @@ class R3BCalifaOnlineSpectra : public FairTask {
   //Hit data
   TH2F* fh_Califa_theta_phi;
   TH2F* fh_Califa_theta_energy[N_MAX_PETALS];
-  
+  TH1F* fh_Califa_total_energy;
+
   TString fCalifaFile;        	        /**< Config file name. */
   Bool_t  fCalON;                 	/**< Cal selector. */
   Bool_t  fLogScale;                 	/**< Selecting scale. */
@@ -179,6 +180,7 @@ class R3BCalifaOnlineSpectra : public FairTask {
   TCanvas* cCalifa8;
   TCanvas* cCalifa_hitpetal[N_MAX_PETALS];
   TCanvas* cCalifa10;
+  TCanvas* cCalifa_hitenergy;
 
  public:
   ClassDef(R3BCalifaOnlineSpectra, 1)

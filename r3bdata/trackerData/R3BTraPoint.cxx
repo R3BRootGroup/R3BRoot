@@ -13,8 +13,8 @@ using std::flush;
 
 // -----   Default constructor   -------------------------------------------
 R3BTraPoint::R3BTraPoint() : FairMCPoint() {
-  fX_out      = fY_out  = fZ_out  = 0.;
-  fPx_out     = fPy_out = fPz_out = 0.;
+  fX_out      = fY_out  = fZ_out  = fEloss = 0.;
+  fPx_out     = fPy_out = fPz_out = 0.; fPid=0;
 }
 // -------------------------------------------------------------------------
 
@@ -24,12 +24,14 @@ R3BTraPoint::R3BTraPoint() : FairMCPoint() {
 R3BTraPoint::R3BTraPoint(Int_t trackID, Int_t detID, Int_t detCopyID,
 			 TVector3 posIn, 
 			 TVector3 posOut, TVector3 momIn, TVector3 momOut,
-			 Double_t tof, Double_t length, Double_t eLoss) 
+			 Double_t tof, Double_t length, Double_t eLoss, Int_t PId) 
   : FairMCPoint(trackID, detID, posIn, momIn, tof, length, eLoss) {
   fDetCopyID = detCopyID;  // added by Marc
   fX_out  = posOut.X();
   fY_out  = posOut.Y();
   fZ_out  = posOut.Z();
+  fEloss  = eLoss;
+  fPid = PId;
   fPx_out = momOut.Px();
   fPy_out = momOut.Py();
   fPz_out = momOut.Pz();

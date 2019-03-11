@@ -17,6 +17,7 @@ R3BCalifaGeometry* R3BCalifaGeometry::inst = NULL;
 
 R3BCalifaGeometry* R3BCalifaGeometry::Instance(int version)
 {
+  LOG(INFO) << "R3BCalifaGeometry::Init " << FairLogger::endl;
   if(!inst)
     inst = new R3BCalifaGeometry(version);
   else if(inst->fGeometryVersion != version)
@@ -63,6 +64,8 @@ R3BCalifaGeometry::R3BCalifaGeometry(int version)  : fGeometryVersion(version), 
     LOG(ERROR) << "R3BCalifaGeometry: Unsupported geometry version: " << version << FairLogger::endl;
     return;
   }
+
+  LOG(INFO) << "R3BCalifaGeometry::Geometry file " <<geoPath<< FairLogger::endl;
 
   if(gGeoManager && strcmp(gGeoManager->GetTopVolume()->GetName(), "cave") == 0)
   {

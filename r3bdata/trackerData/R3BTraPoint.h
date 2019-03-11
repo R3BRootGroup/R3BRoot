@@ -20,12 +20,10 @@
 
 class R3BTraPoint : public FairMCPoint 
 {
-
  public:
 
   /** Default constructor **/
   R3BTraPoint();
-
 
   /** Constructor with arguments
    *@param trackID  Index of MCTrack
@@ -38,11 +36,12 @@ class R3BTraPoint : public FairMCPoint
    *@param tof      Time since event start [ns]
    *@param length   Track length since creation [cm]
    *@param eLoss    Energy deposit [GeV]
+   *@param pid      Particle ID
    **/
-  R3BTraPoint(Int_t trackID, Int_t detID, Int_t detCopyID, // detCopyID added by Marc
+  R3BTraPoint(Int_t trackID, Int_t detID, Int_t detCopyID,
 	      TVector3 posIn, 
 	      TVector3 posOut, TVector3 momIn, TVector3 momOut,
-	      Double_t tof, Double_t length, Double_t eLoss);
+	      Double_t tof, Double_t length, Double_t eLoss, Int_t pid);
 
 
   /** Copy constructor **/
@@ -54,9 +53,11 @@ class R3BTraPoint : public FairMCPoint
 
 
   /** Accessors **/
-  Int_t GetDetCopyID()   const { return fDetCopyID; } // added by Marc
+  Int_t GetDetCopyID()   const { return fDetCopyID; }
   Double_t GetXIn()   const { return fX; }
+  Double_t GetEloss()   const { return fEloss; }
   Double_t GetYIn()   const { return fY; }
+  Int_t GetPid()   const { return fPid;  }
   Double_t GetZIn()   const { return fZ; }
   Double_t GetXOut()  const { return fX_out; }
   Double_t GetYOut()  const { return fY_out; }
@@ -90,17 +91,13 @@ class R3BTraPoint : public FairMCPoint
   virtual void Print(const Option_t* opt) const;
 
 
-
  protected:
 
-  Double32_t fX_out,  fY_out,  fZ_out;
+  Double32_t fX_out,  fY_out,  fZ_out, fEloss;
   Double32_t fPx_out, fPy_out, fPz_out;
-  Int_t fDetCopyID; // added by Marc
-
-
+  Int_t fDetCopyID, fPid;
 
   ClassDef(R3BTraPoint,1)
-
 };
 
 
