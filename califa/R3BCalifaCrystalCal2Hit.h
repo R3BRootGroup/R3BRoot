@@ -14,6 +14,7 @@
 #include "FairTask.h"
 #include "R3BCalifaHitData.h"
 #include "R3BCalifaHitDataSim.h"
+#include "R3BCalifaGeometry.h"
 //#include "R3BCalifaCrystalCal2HitPar.h"
 
 class TClonesArray;
@@ -158,6 +159,9 @@ class R3BCalifaCrystalCal2Hit : public FairTask
 
     // Parameter class
     //R3BCalifaCrystalCal2HitPar* fCalifaHitFinderPar;
+
+
+    R3BCalifaGeometry *fGeo;
 
   private:
 

@@ -45,6 +45,7 @@ R3BCalifaCrystalCal2Hit::R3BCalifaCrystalCal2Hit() : FairTask("R3B CALIFA Crysta
   fCrystalHitCA=0;
   fCalifaHitCA=0;
   nEvents=0;
+  fGeo=0;
   //fCalifaHitFinderPar=0;
 }
 
@@ -79,7 +80,7 @@ void R3BCalifaCrystalCal2Hit::SetParContainers()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BCalifaCrystalCal2Hit::Init()
 {
-
+  LOG(INFO) << "R3BCalifaCrystalCal2Hit::Init " << FairLogger::endl;
   FairRootManager* ioManager = FairRootManager::Instance();
     if ( !ioManager ) LOG(fatal) << "Init: No FairRootManager";
   if( !ioManager->GetObject("CalifaCrystalCalDataSim") ) {
@@ -98,6 +99,9 @@ InitStatus R3BCalifaCrystalCal2Hit::Init()
      ioManager->Register("CalifaHitData", "CALIFA Hit", fCalifaHitCA, kTRUE);
   }
 
+  // Use new R3BCalifaGeometry class to get geometrical information
+  fGeo = R3BCalifaGeometry::Instance(fGeometryVersion);
+
   // Parameter retrieval from par container
   // ...
 
@@ -105,7 +109,7 @@ InitStatus R3BCalifaCrystalCal2Hit::Init()
   // Table for crystal parameters from Geometry
 
 
-  // Initialization of variables, histograms, ...
+  // Initialization of variables, ...
 
 
   return kSUCCESS;
@@ -352,7 +356,7 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
 void R3BCalifaCrystalCal2Hit::Reset()
 {
   // Clear the CA structure
-
+  LOG(DEBUG) << "Clearing CalifaHitData Structure" << FairLogger::endl;
   if (fCalifaHitCA) fCalifaHitCA->Clear();
 }
 
@@ -434,7 +438,6 @@ void R3BCalifaCrystalCal2Hit::GetAngles(Int_t iD, Double_t* polar, Double_t* azi
 void R3BCalifaCrystalCal2Hit::GetAngles(Int_t iD, Double_t* polar,
 				 Double_t* azimuthal, Double_t* rho)
 {
-
   Double_t local[3]={0,0,0};
   Double_t master[3];
   Int_t crystalType = 0;
@@ -442,18 +445,18 @@ void R3BCalifaCrystalCal2Hit::GetAngles(Int_t iD, Double_t* polar,
   Int_t alveolusCopy =0;
   Int_t crystalInAlveolus=0;
 
-if (fGeometryVersion>=16) {
+  if (fGeometryVersion>=16) {
     // Use new R3BCalifaGeometry class to get geometrical information
-    R3BCalifaGeometry::Instance(fGeometryVersion)->GetAngles(iD, polar, azimuthal, rho);
+    fGeo->GetAngles(iD, polar, azimuthal, rho);
     return;
   } else LOG(ERROR) << "R3BCalifaCrystalCal2Hit: Geometry version not available in R3BCalifa::ProcessHits(). " << FairLogger::endl;
 
 
-  TVector3 masterV(master[0],master[1],master[2]);
+  //TVector3 masterV(master[0],master[1],master[2]);
   //masterV.Print();
-  *polar=masterV.Theta();
-  *azimuthal=masterV.Phi();
-  *rho=masterV.Mag();
+  //*polar=masterV.Theta();
+  //*azimuthal=masterV.Phi();
+  //*rho=masterV.Mag();
 }
 
 
