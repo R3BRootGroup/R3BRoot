@@ -169,6 +169,7 @@ void R3BAmsStripCal2Hit::Exec(Option_t* option)
 
   for(Int_t i = 0; i < fMaxNumDet*2; i++)hams[i]->Reset();
   if(calData) delete calData;
+  delete ss;
   return;
 }
 
