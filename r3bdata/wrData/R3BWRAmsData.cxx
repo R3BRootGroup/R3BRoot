@@ -14,7 +14,7 @@ R3BWRAmsData::R3BWRAmsData()
 
 //------------------------------
 
-R3BWRAmsData::R3BWRAmsData(Int_t timestamp)
+R3BWRAmsData::R3BWRAmsData(uint64_t timestamp)
   : fTimeStamp(timestamp)
 {
 }

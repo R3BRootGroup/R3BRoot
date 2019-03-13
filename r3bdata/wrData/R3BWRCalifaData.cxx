@@ -14,7 +14,7 @@ R3BWRCalifaData::R3BWRCalifaData()
 
 //------------------------------
 
-R3BWRCalifaData::R3BWRCalifaData(Int_t timestamp)
+R3BWRCalifaData::R3BWRCalifaData(uint64_t timestamp)
   : fTimeStamp(timestamp)
 {
 }

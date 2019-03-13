@@ -53,8 +53,7 @@ Bool_t R3BWhiterabbitCalifaReader::Init(ext_data_struct_info *a_struct_info)
     FairRootManager::Instance()->Register("WRCalifaData", "WRCalifa", fArray, kFALSE);
   }
 
-  //fData->TIMESTAMP_CALIFA_ID = 4;
-
+  fData->TIMESTAMP_CALIFA_ID = 0;
   return kTRUE;
 }
 
@@ -91,7 +90,7 @@ fData->TIMESTAMP_CALIFA_WR_T2, fData->TIMESTAMP_CALIFA_WR_T1);*/
 		fNEvent++;
 	}
 
-	//fData->TIMESTAMP_CALIFA_ID = 4;
+	fData->TIMESTAMP_CALIFA_ID = 0;
 	return kTRUE;
 }
 

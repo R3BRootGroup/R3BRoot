@@ -53,7 +53,7 @@ Bool_t R3BWhiterabbitAmsReader::Init(ext_data_struct_info *a_struct_info)
     FairRootManager::Instance()->Register("WRAmsData", "WRAms", fArray, kFALSE);
   }
 
-  //fData->TIMESTAMP_AMS_ID = 3;
+  fData->TIMESTAMP_AMS_ID = 0;
 
   return kTRUE;
 }
@@ -83,7 +83,6 @@ fData->TIMESTAMP_AMS_WR_T2, fData->TIMESTAMP_AMS_WR_T1);*/
 			| ((uint64_t) fData->TIMESTAMP_AMS_WR_T3 << 32)
 			| ((uint64_t) fData->TIMESTAMP_AMS_WR_T2 << 16)
 			|  (uint64_t) fData->TIMESTAMP_AMS_WR_T1;
-
 		//fEventHeader->SetTimeStamp(timestamp);
 		fNEvent = fEventHeader->GetEventno();
                 new ((*fArray)[fArray->GetEntriesFast()]) R3BWRAmsData(timestamp);
@@ -91,7 +90,7 @@ fData->TIMESTAMP_AMS_WR_T2, fData->TIMESTAMP_AMS_WR_T1);*/
 		fNEvent++;
 	}
 
-	//fData->TIMESTAMP_AMS_ID = 3;
+	fData->TIMESTAMP_AMS_ID = 0;
 	return kTRUE;
 }
 

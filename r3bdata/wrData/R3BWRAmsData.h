@@ -18,16 +18,16 @@ public:
   /** Standard Constructor
    *@param timestamp
    **/
-  R3BWRAmsData(Int_t timestamp);
+  R3BWRAmsData(uint64_t timestamp);
   
   //Destructor
   ~R3BWRAmsData() { }
   
   //Getters
-  inline const Int_t& GetTimeStamp() const { return fTimeStamp;   }
+  inline const uint64_t GetTimeStamp() const { return fTimeStamp;   }
   
 protected:
-  Int_t fTimeStamp;  // timestamp for master
+  uint64_t fTimeStamp;  // timestamp for ams detectors
    
 public:
   ClassDef(R3BWRAmsData,1)

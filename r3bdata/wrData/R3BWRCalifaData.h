@@ -18,16 +18,16 @@ public:
   /** Standard Constructor
    *@param timestamp
    **/
-  R3BWRCalifaData(Int_t timestamp);
+  R3BWRCalifaData(uint64_t timestamp);
   
   //Destructor
   ~R3BWRCalifaData() { }
   
   //Getters
-  inline const Int_t& GetTimeStamp() const { return fTimeStamp;   }
+  inline const uint64_t GetTimeStamp() const { return fTimeStamp;   }
   
 protected:
-  Int_t fTimeStamp;  // timestamp for master
+  uint64_t fTimeStamp;  // timestamp for califa
    
 public:
   ClassDef(R3BWRCalifaData,1)

@@ -53,7 +53,7 @@ Bool_t R3BWhiterabbitMasterReader::Init(ext_data_struct_info *a_struct_info)
     FairRootManager::Instance()->Register("WRMasterData", "WRMaster", fArray, kFALSE);
   }
 
-  //fData->TIMESTAMP_MASTER_ID = 0;
+  fData->TIMESTAMP_MASTER_ID = 0;
 
   return kTRUE;
 }
@@ -63,10 +63,6 @@ Bool_t R3BWhiterabbitMasterReader::Read()
 	if (!fData->TIMESTAMP_MASTER_ID) {
 		return kTRUE;
 	}
-/*printf("master %08x %08x %08x %08x %08x \n",
-fData->TIMESTAMP_MASTER_ID,
-fData->TIMESTAMP_MASTER_WR_T4, fData->TIMESTAMP_MASTER_WR_T3,
-fData->TIMESTAMP_MASTER_WR_T2, fData->TIMESTAMP_MASTER_WR_T1);*/
 
 	if (fWhiterabbitId != fData->TIMESTAMP_MASTER_ID) {
 		char strMessage[1000];
@@ -78,20 +74,22 @@ fData->TIMESTAMP_MASTER_WR_T2, fData->TIMESTAMP_MASTER_WR_T1);*/
 	}
 
 	if (fEventHeader != nullptr) {
+/*printf("master %08x %08x %08x %08x %08x \n",
+fData->TIMESTAMP_MASTER_ID,
+fData->TIMESTAMP_MASTER_WR_T4, fData->TIMESTAMP_MASTER_WR_T3,
+fData->TIMESTAMP_MASTER_WR_T2, fData->TIMESTAMP_MASTER_WR_T1);*/
 		uint64_t timestamp =
 			  ((uint64_t) fData->TIMESTAMP_MASTER_WR_T4 << 48)
 			| ((uint64_t) fData->TIMESTAMP_MASTER_WR_T3 << 32)
 			| ((uint64_t) fData->TIMESTAMP_MASTER_WR_T2 << 16)
 			|  (uint64_t) fData->TIMESTAMP_MASTER_WR_T1;
-
-		//fEventHeader->SetTimeStamp(timestamp);
 		fNEvent = fEventHeader->GetEventno();
                 new ((*fArray)[fArray->GetEntriesFast()]) R3BWRMasterData(timestamp);
 	} else {
 		fNEvent++;
 	}
 
-	//fData->TIMESTAMP_MASTER_ID = 0;
+	fData->TIMESTAMP_MASTER_ID = 0;
 	return kTRUE;
 }
 

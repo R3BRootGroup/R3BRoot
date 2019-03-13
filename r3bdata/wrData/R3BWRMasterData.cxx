@@ -14,7 +14,7 @@ R3BWRMasterData::R3BWRMasterData()
 
 //------------------------------
 
-R3BWRMasterData::R3BWRMasterData(Int_t timestamp)
+R3BWRMasterData::R3BWRMasterData(uint64_t timestamp)
   : fTimeStamp(timestamp)
 {
 }
