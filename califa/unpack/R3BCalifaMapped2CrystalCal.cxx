@@ -45,6 +45,8 @@ R3BCalifaMapped2CrystalCal::R3BCalifaMapped2CrystalCal() :
 R3BCalifaMapped2CrystalCal::~R3BCalifaMapped2CrystalCal()
 {
   LOG(INFO) << "R3BCalifaMapped2CrystalCal: Delete instance" << FairLogger::endl;
+  delete fCalifaMappedDataCA;
+  delete fCalifaCryCalDataCA;
 }
 
 
@@ -103,7 +105,7 @@ InitStatus R3BCalifaMapped2CrystalCal::Init()
    
   //OUTPUT DATA
   //Calibrated data
-  fCalifaCryCalDataCA = new TClonesArray("R3BCalifaCrystalCalData",10);
+  fCalifaCryCalDataCA = new TClonesArray("R3BCalifaCrystalCalData",50);
   if(!fOnline){
     rootManager->Register("CalifaCrystalCalData", "CALIFA Crystal Cal", fCalifaCryCalDataCA, kTRUE);
   }else{
@@ -113,8 +115,6 @@ InitStatus R3BCalifaMapped2CrystalCal::Init()
   SetParameter();
   return kSUCCESS;
 }
-
-
 
 
 // -----   Public method ReInit   ----------------------------------------------

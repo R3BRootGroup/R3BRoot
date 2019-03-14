@@ -20,6 +20,9 @@ class R3BWhiterabbitCalifaReader : public R3BReader
 		Bool_t Read();
 		void Reset();
 
+                /** Accessor to select online mode **/
+                void SetOnline(Bool_t option){fOnline=option;} 
+
 	private:
 		/* An event counter */
 		UInt_t fNEvent;

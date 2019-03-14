@@ -27,7 +27,11 @@ using std::cerr;
 using std::endl;
 
 
-R3BCalifaCrystalCal2Hit::R3BCalifaCrystalCal2Hit() : FairTask("R3B CALIFA CrystalCal to Hit Finder")
+R3BCalifaCrystalCal2Hit::R3BCalifaCrystalCal2Hit() : 
+  FairTask("R3B CALIFA CrystalCal to Hit Finder"),
+  fCrystalHitCA(NULL),
+  fCalifaHitCA(NULL),
+  fOnline(kFALSE)
 {
   fGeometryVersion=17; //default version 8.11 BARREL
   fThreshold=0.;     //no threshold
@@ -42,8 +46,6 @@ R3BCalifaCrystalCal2Hit::R3BCalifaCrystalCal2Hit() : FairTask("R3B CALIFA Crysta
   fClusteringAlgorithmSelector=1;
   fParCluster1=0;
   kSimulation = false;
-  fCrystalHitCA=0;
-  fCalifaHitCA=0;
   nEvents=0;
   fGeo=0;
   //fCalifaHitFinderPar=0;
@@ -92,11 +94,15 @@ InitStatus R3BCalifaCrystalCal2Hit::Init()
 
   // Register output array either CalifaHitData or CalifaHitDataSim
   if(kSimulation) {
-     fCalifaHitCA = new TClonesArray("R3BCalifaHitDataSim",1000);
+     fCalifaHitCA = new TClonesArray("R3BCalifaHitDataSim",50);
      ioManager->Register("CalifaHitDataSim", "CALIFA Hit Sim", fCalifaHitCA, kTRUE);
   } else {
-     fCalifaHitCA = new TClonesArray("R3BCalifaHitData",1000);
-     ioManager->Register("CalifaHitData", "CALIFA Hit", fCalifaHitCA, kTRUE);
+     fCalifaHitCA = new TClonesArray("R3BCalifaHitData",50);
+     if(!fOnline){
+       ioManager->Register("CalifaHitData", "CALIFA Hit", fCalifaHitCA, kTRUE);
+     }else{
+       ioManager->Register("CalifaHitData", "CALIFA Hit", fCalifaHitCA, kFALSE);
+     }
   }
 
   // Use new R3BCalifaGeometry class to get geometrical information
@@ -113,18 +119,13 @@ InitStatus R3BCalifaCrystalCal2Hit::Init()
 
 
   return kSUCCESS;
-
 }
-
 
 
 // -----   Public method ReInit   --------------------------------------------
 InitStatus R3BCalifaCrystalCal2Hit::ReInit()
 {
-
-
   return kSUCCESS;
-
 }
 
 

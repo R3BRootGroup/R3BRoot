@@ -107,9 +107,15 @@ class R3BCalifaCrystalCal2Hit : public FairTask
      **/
     void SetClusteringAlgorithm(Int_t ClusteringAlgorithmSelector, Double_t ParCluster1) ;
 
+    /** Virtual method SetParContainers **/
+    virtual void SetParContainers();
 
+    /** Virtual method Finish **/
+    virtual void Finish();
 
-
+    /** Accessor to select online mode **/
+    void SetOnline(Bool_t option){fOnline=option;} 
+  
 
   protected:
 
@@ -120,16 +126,11 @@ class R3BCalifaCrystalCal2Hit : public FairTask
     /** Virtual method ReInit **/
     virtual InitStatus ReInit();
 
-    /** Virtual method SetParContainers **/
-    virtual void SetParContainers();
-
-    /** Virtual method Finish **/
-    virtual void Finish();
-
-
     TClonesArray* fCrystalHitCA;
     TClonesArray* fCalifaHitCA;
 
+    //Don't store data for online
+    Bool_t fOnline;
     // Selecting the geometry of the CALIFA calorimeter
     Int_t fGeometryVersion;
     // Minimum energy requested in a crystal to be considered in a calorimeter Hit
