@@ -399,37 +399,67 @@ void R3BLosCal2Hit::Exec(Option_t* option)
        // be NAN if one time is missing.
      //  cout<<nHits<<"; "<<narr<<endl;
        
-       Double_t time_V[nHits][8] = {0.0/0.0};  // [multihit][pm] 
-       Double_t time_V_temp[nHits][8] = {0.0/0.0};        
-       Double_t time_L[nHits][8] = {0.0/0.0};
-       Double_t time_T[nHits][8] = {0.0/0.0};  
-       Double_t time_V_corr[nHits][8] = {0.0/0.0};  // [multihit][pm]         
-       Double_t time_L_corr[nHits][8] = {0.0/0.0};        
-       Double_t timeLosM[nHits] = {0.0};
-       Double_t LosTresM[nHits] = {0.0/0.0};
-       Double_t timeLosT[nHits] = {0.0};
-       Double_t LosTresT[nHits] = {0.0/0.0};       
-       Double_t timeLos[nHits] = {0.0};
-       Double_t timeLosM_corr[nHits] = {0.0};
-       Double_t LosTresM_corr[nHits] = {0.0/0.0};
-       Double_t timeLosT_corr[nHits] = {0.0};
-       Double_t LosTresT_corr[nHits] = {0.0/0.0};       
-       Double_t timeLos_corr[nHits] = {0.0};      
-       Double_t totsum[nHits] = {0.0}; 
-       Double_t tot[nHits][8] = {0.0/0.0};
-       Double_t totsum_corr[nHits] = {0.0}; 
-       Double_t tot_corr[nHits][8] = {0.0/0.0};
-       Double_t xT_cm[nHits] = {0.0/0.0};
-       Double_t yT_cm[nHits] = {0.0/0.0};
-       Double_t xV_cm[nHits] = {0.0/0.0};
-       Double_t yV_cm[nHits] = {0.0/0.0};                 
-       Double_t xToT_cm[nHits] = {0.0/0.0};
-       Double_t yToT_cm[nHits] = {0.0/0.0};   
-       Double_t x_cm[nHits] = {0.0/0.0};
-       Double_t y_cm[nHits] = {0.0/0.0};      
-       Double_t Z[nHits] = {0.0};     
-       Double_t t_hit[nHits] = {0.0/0.0}; // NAN
-       
+       Double_t time_V[nHits][8];  // [multihit][pm] 
+       Double_t time_V_temp[nHits][8];        
+       Double_t time_L[nHits][8];
+       Double_t time_T[nHits][8];  
+       Double_t time_V_corr[nHits][8];  // [multihit][pm]         
+       Double_t time_L_corr[nHits][8];        
+       Double_t timeLosM[nHits];
+       Double_t LosTresM[nHits];
+       Double_t timeLosT[nHits];
+       Double_t LosTresT[nHits];       
+       Double_t timeLos[nHits];
+       Double_t timeLosM_corr[nHits];
+       Double_t LosTresM_corr[nHits];
+       Double_t timeLosT_corr[nHits];
+       Double_t LosTresT_corr[nHits];       
+       Double_t timeLos_corr[nHits];      
+       Double_t totsum[nHits]; 
+       Double_t tot[nHits][8];
+       Double_t totsum_corr[nHits]; 
+       Double_t tot_corr[nHits][8];
+       Double_t xT_cm[nHits];
+       Double_t yT_cm[nHits];
+       Double_t xV_cm[nHits];
+       Double_t yV_cm[nHits];                 
+       Double_t xToT_cm[nHits];
+       Double_t yToT_cm[nHits];   
+       Double_t x_cm[nHits];
+       Double_t y_cm[nHits];      
+       Double_t Z[nHits];     
+       Double_t t_hit[nHits]; // NAN
+
+       memset(time_V, 0./0., nHits*8*sizeof(Double_t));
+       memset(time_V_temp, 0./0., nHits*8*sizeof(Double_t));
+       memset(time_L, 0./0., nHits*8*sizeof(Double_t));
+       memset(time_T, 0./0., nHits*8*sizeof(Double_t));
+       memset(time_V_corr, 0./0., nHits*8*sizeof(Double_t));
+       memset(time_L_corr, 0./0., nHits*8*sizeof(Double_t));
+       memset(timeLosM, 0., nHits*sizeof(Double_t));
+       memset(LosTresM, 0./0., nHits*sizeof(Double_t));
+       memset(timeLosT, 0., nHits*sizeof(Double_t));
+       memset(LosTresT, 0./0., nHits*sizeof(Double_t));
+       memset(timeLos, 0., nHits*sizeof(Double_t));
+       memset(timeLosM_corr, 0., nHits*sizeof(Double_t));
+       memset(LosTresM_corr, 0./0., nHits*sizeof(Double_t));
+       memset(timeLosT_corr, 0., nHits*sizeof(Double_t));
+       memset(LosTresT_corr, 0./0., nHits*sizeof(Double_t));
+       memset(timeLos_corr, 0., nHits*sizeof(Double_t));
+       memset(totsum, 0., nHits*sizeof(Double_t));
+       memset(tot, 0./0., nHits*8*sizeof(Double_t));
+       memset(totsum_corr, 0., nHits*sizeof(Double_t));
+       memset(tot_corr, 0./0., nHits*8*sizeof(Double_t));
+       memset(xT_cm, 0./0., nHits*sizeof(Double_t));
+       memset(yT_cm, 0./0., nHits*sizeof(Double_t));
+       memset(xV_cm, 0./0., nHits*sizeof(Double_t));
+       memset(yV_cm, 0./0., nHits*sizeof(Double_t));
+       memset(xToT_cm, 0./0., nHits*sizeof(Double_t));
+       memset(yToT_cm, 0./0., nHits*sizeof(Double_t));
+       memset(x_cm, 0./0., nHits*sizeof(Double_t));
+       memset(y_cm, 0./0., nHits*sizeof(Double_t));
+       memset(Z, 0., nHits*sizeof(Double_t));
+       memset(t_hit, 0./0., nHits*sizeof(Double_t));
        
        Int_t nDet = 0;        
         

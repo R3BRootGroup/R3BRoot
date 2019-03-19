@@ -192,9 +192,9 @@ Double_t R3BLosCalData::GetMeanTime()
 	Double_t mean=0;
 	Int_t num_times=0;
    for(Int_t i=0; i<8; i++){	
-	if (!isnan(fTimeV_ns[i])) {mean+=fTimeV_ns[i];num_times++;}
-	if (!isnan(fTimeL_ns[i])) {mean+=fTimeL_ns[i];num_times++;}
-	if (!isnan(fTimeT_ns[i])) {mean+=fTimeT_ns[i];num_times++;}
+	if (!std::isnan(fTimeV_ns[i])) {mean+=fTimeV_ns[i];num_times++;}
+	if (!std::isnan(fTimeL_ns[i])) {mean+=fTimeL_ns[i];num_times++;}
+	if (!std::isnan(fTimeT_ns[i])) {mean+=fTimeT_ns[i];num_times++;}
    }	
 	
 		
@@ -205,7 +205,7 @@ Double_t R3BLosCalData::GetMeanTimeTAMEXL()
 	Double_t mean=0;
 	Int_t num_times=0;
 	for(Int_t i=0; i<8; i++){
-	 if (!isnan(fTimeL_ns[i])) {mean+=fTimeL_ns[i];num_times++;}
+	 if (!std::isnan(fTimeL_ns[i])) {mean+=fTimeL_ns[i];num_times++;}
     }	
 	return num_times ? mean/num_times : NAN;
 }
@@ -215,7 +215,7 @@ Double_t R3BLosCalData::GetMeanTimeTAMEXT()
 	Double_t mean=0;
 	Int_t num_times=0;
 	for(Int_t i=0; i<8; i++){
-	 if (!isnan(fTimeT_ns[i])) {mean+=fTimeT_ns[i];num_times++;}
+	 if (!std::isnan(fTimeT_ns[i])) {mean+=fTimeT_ns[i];num_times++;}
     }
 
 		
@@ -227,7 +227,7 @@ UInt_t R3BLosCalData::GetTAMEXLNcha()
 {
 	Int_t num_times=0;
 	for(Int_t i=0; i<8; i++){
-	 if (!isnan(fTimeL_ns[i])) {num_times++;}
+	 if (!std::isnan(fTimeL_ns[i])) {num_times++;}
 	}	
 		
 	return num_times ;
@@ -237,7 +237,7 @@ UInt_t R3BLosCalData::GetTAMEXTNcha()
 {
 	Int_t num_times=0;
 	for(Int_t i=0; i<8; i++){
-	 if (!isnan(fTimeT_ns[i])) {num_times++;}
+	 if (!std::isnan(fTimeT_ns[i])) {num_times++;}
 	}	
 
 		
@@ -250,7 +250,7 @@ Double_t R3BLosCalData::GetMeanTimeVFTX()
 	Double_t mean=0;
 	Int_t num_times=0;
 	for(Int_t i=0; i<8; i++){
-	 if (!isnan(fTimeV_ns[i])) {mean+=fTimeV_ns[i];num_times++;}
+	 if (!std::isnan(fTimeV_ns[i])) {mean+=fTimeV_ns[i];num_times++;}
     }
 		
 		
@@ -260,7 +260,7 @@ UInt_t R3BLosCalData::GetVFTXNcha()
 {
 	Int_t num_times=0;
 	for(Int_t i=0; i<8; i++){
-	 if (!isnan(fTimeV_ns[i])) {num_times++;}
+	 if (!std::isnan(fTimeV_ns[i])) {num_times++;}
 	}
 		
 		
