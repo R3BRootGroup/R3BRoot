@@ -15,6 +15,7 @@ ${R3BROOT_SOURCE_DIR}/xball
 ${R3BROOT_SOURCE_DIR}/califa
 ${R3BROOT_SOURCE_DIR}/califa/unpack
 ${R3BROOT_SOURCE_DIR}/r3bdata
+${R3BROOT_SOURCE_DIR}/r3bdata/wrData
 ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
 ${R3BROOT_SOURCE_DIR}/r3bdata/dchData
 ${R3BROOT_SOURCE_DIR}/r3bdata/gfiData

@@ -226,7 +226,12 @@ void R3BAmsMapped2StripCalPar::SearchPedestals(){
     nbstrip=numPars*i+d*numPars*fNumStrips;
 
     if (fh_Map_energy_strip[i+d*fNumStrips]->GetEntries()>fMinStadistics){
-      
+      //Bins with a number of counts less than 30% of the maximum are set to zero 
+      for(Int_t k2=0;k2<fMapHistos_bins;k2++){
+       if(fh_Map_energy_strip[i+d*fNumStrips]->GetBinContent(k2)<0.3*fh_Map_energy_strip[i+d*fNumStrips]->GetMaximum())
+         fh_Map_energy_strip[i+d*fNumStrips]->SetBinContent(k2,0);
+      }
+
       TF1 *f1 = new TF1 ("f1", "gaus", fMapHistos_left, fMapHistos_right);
       f1->SetParameter(1,400.);      
       f1->SetParameter(2,2.);

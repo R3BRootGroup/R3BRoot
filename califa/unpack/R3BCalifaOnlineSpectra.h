@@ -127,21 +127,27 @@ class R3BCalifaOnlineSpectra : public FairTask {
   Int_t fMapHistos_max;
   Int_t fMapHistos_bins;
 
-  TClonesArray* fMappedItemsCalifa;     /**< Array with mapped items. */
-  TClonesArray* fCalItemsCalifa;        /**< Array with cal items. */
-  TClonesArray* fHitItemsCalifa;        /**< Array with hit items. */
+  TClonesArray* fMappedItemsCalifa;     /**< Array with mapped items.    */
+  TClonesArray* fCalItemsCalifa;        /**< Array with cal items.       */
+  TClonesArray* fHitItemsCalifa;        /**< Array with hit items.       */
+  TClonesArray* fWRItemsCalifa;         /**< Array with WR-Califa items. */
+  TClonesArray* fWRItemsMaster;         /**< Array with WR-Master items. */
   
-  // check for trigger should be done globablly (somewhere else)
-  R3BEventHeader* header;               /**< Event header. */
+  //Check for trigger should be done globablly (somewhere else)
+  R3BEventHeader* header;               /**< Event header.  */
   Int_t fTrigger;                       /**< Trigger value. */
   Int_t fNEvents;        	   	/**< Event counter. */
   
-  Int_t fCalifaNumPetals;              	/**< Number of Petals. */
+  Int_t fCalifaNumPetals;              	/**< Number of Petals.   */
   Int_t fNumCrystalPetal;        	/**< Crystals per Petal. */
-  Int_t fOrderFebexPreamp[16];          /**< Selector for febex or preamp sequence. */  
+  Int_t fOrderFebexPreamp[16];          /**< Selector for febex or preamp sequence. */ 
+ 
   //Multiplicities
   TH1F* fh_Califa_Mult[N_MAX_PETALS+1];  
   TH1F* fh_Califa_MultHit[N_MAX_PETALS+1];  
+
+  //WR data
+  TH1F* fh_Califa_wr;
 
   //Raw data
   TH2F* fh_Califa_cryId_petal;
@@ -169,6 +175,7 @@ class R3BCalifaOnlineSpectra : public FairTask {
   Bool_t  fFebex2Preamp;                /**< Febex or Preamp selector. */
 
   TCanvas* cMap;
+  TCanvas* cCalifa_wr;
   TCanvas* cCalifa1;
   TCanvas* cCalifa2;
   TCanvas* cCalifa3;

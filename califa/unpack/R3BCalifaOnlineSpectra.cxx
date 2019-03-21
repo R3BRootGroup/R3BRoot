@@ -11,6 +11,8 @@
 #include "R3BCalifaMappedData.h"
 #include "R3BCalifaHitData.h"
 #include "R3BCalifaCrystalCalData.h"
+#include "R3BWRCalifaData.h"
+#include "R3BWRMasterData.h"
 #include "R3BEventHeader.h"
 #include "THttpServer.h"
 
@@ -40,6 +42,8 @@ R3BCalifaOnlineSpectra::R3BCalifaOnlineSpectra()
   , fMappedItemsCalifa(NULL)
   , fCalItemsCalifa(NULL)
   , fHitItemsCalifa(NULL)
+  , fWRItemsCalifa(NULL)
+  , fWRItemsMaster(NULL)
   , fTrigger(-1)
   , fNEvents(0)
   , fCalifaNumPetals(1)
@@ -57,6 +61,8 @@ R3BCalifaOnlineSpectra::R3BCalifaOnlineSpectra(const char* name, Int_t iVerbose)
   , fMappedItemsCalifa(NULL)
   , fCalItemsCalifa(NULL)
   , fHitItemsCalifa(NULL)
+  , fWRItemsCalifa(NULL)
+  , fWRItemsMaster(NULL)
   , fTrigger(-1)
   , fNEvents(0)
   , fCalifaNumPetals(1)
@@ -70,6 +76,12 @@ R3BCalifaOnlineSpectra::R3BCalifaOnlineSpectra(const char* name, Int_t iVerbose)
 }
 
 R3BCalifaOnlineSpectra::~R3BCalifaOnlineSpectra() {
+  LOG(INFO) << "R3BCalifaOnlineSpectra: Delete instance" << FairLogger::endl;
+  delete fMappedItemsCalifa;
+  delete fCalItemsCalifa;
+  delete fHitItemsCalifa;
+  delete fWRItemsCalifa;
+  delete fWRItemsMaster;
 }
 
 InitStatus R3BCalifaOnlineSpectra::Init() {
@@ -110,6 +122,18 @@ InitStatus R3BCalifaOnlineSpectra::Init() {
   fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaHitData");
   if (!fHitItemsCalifa) {
    LOG(INFO)<<"R3BCalifaOnlineSpectra::Init CalifaHitData not found"<<FairLogger::endl;
+  }
+
+  //get access to WR-Califa data
+  fWRItemsCalifa = (TClonesArray*)mgr->GetObject("WRCalifaData");
+  if (!fWRItemsCalifa) {
+   LOG(INFO)<<"R3BCalifaOnlineSpectra::Init WRCalifaData not found"<<FairLogger::endl;
+  }
+
+  //get access to WR-Master data
+  fWRItemsMaster = (TClonesArray*)mgr->GetObject("WRMasterData");
+  if (!fWRItemsMaster) {
+   LOG(INFO)<<"R3BCalifaOnlineSpectra::Init WRMasterData not found"<<FairLogger::endl;
   }
 
   //reading the file
@@ -408,7 +432,7 @@ InitStatus R3BCalifaOnlineSpectra::Init() {
     fh_Califa_theta_energy[k]->GetYaxis()->CenterTitle(true);
     fh_Califa_theta_energy[k]->Draw("COLZ");
     }
-    //Total
+    //Theta vs energy
     sprintf(Name14, "Califa_calorimeter_theta_vs_energy");
     sprintf(Name15, "fh_Califa_Petal_total_theta_vs_energy");
     sprintf(Name16, "Califa theta vs energy for full calorimeter");
@@ -437,7 +461,21 @@ InitStatus R3BCalifaOnlineSpectra::Init() {
     fh_Califa_total_energy->Draw("");
     gPad->SetLogy();
 
+
+    //Difference between WRs
+    sprintf(Name14, "WR_Califa_Master");
+    sprintf(Name15, "fh_WR_Califa_Master");
+    sprintf(Name16, "WR-Califa - WR-Master");
+    cCalifa_wr = new TCanvas(Name14, Name14, 10, 10, 500, 500);
+    fh_Califa_wr=new TH1F(Name15,Name16, 600, -1, 4100);
+    fh_Califa_wr->GetXaxis()->SetTitle("WR-Califa - WR-Master");
+    fh_Califa_wr->GetYaxis()->SetTitle("Counts");
+    fh_Califa_wr->GetYaxis()->SetTitleOffset(1.4);
+    fh_Califa_wr->GetXaxis()->CenterTitle(true);
+    fh_Califa_wr->GetYaxis()->CenterTitle(true);
+    fh_Califa_wr->Draw("");
     
+
     //CANVAS 10
     char Name17[255];char Name18[255];
     char Name19[255];char Name20[255];
@@ -486,6 +524,7 @@ InitStatus R3BCalifaOnlineSpectra::Init() {
 
     //MAIN FOLDER-Califa
     TFolder* mainfolCalifa = new TFolder("CALIFA","CALIFA info");
+    mainfolCalifa->Add(cCalifa_wr);
     mainfolCalifa->Add(cCalifa1);
     mainfolCalifa->Add(cCalifa2);
     mainfolCalifa->Add(cCalifa3);
@@ -527,6 +566,7 @@ void R3BCalifaOnlineSpectra::Reset_CALIFA_Histo()
     LOG(INFO) << "R3BCalifaOnlineSpectra::Reset_CALIFA_Histo" << FairLogger::endl;
 
    fh_Califa_cryId_petal->Reset();
+   fh_Califa_wr->Reset();
    fh_Califa_cryId_energy->Reset();
    fh_Califa_coinc_petal1->Reset();
    fh_Califa_coinc_petal2->Reset();
@@ -838,8 +878,32 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option) {
   if (NULL == mgr)
     LOG(FATAL) << "R3BCalifaOnlineSpectra::Exec FairRootManager not found" << FairLogger::endl;
 
-  Int_t counter[8];
 
+  uint64_t wrc=0;
+  if(fWRItemsCalifa && fWRItemsCalifa->GetEntriesFast()){
+    Int_t nHits = fWRItemsCalifa->GetEntriesFast();
+    for (Int_t ihit = 0; ihit < nHits; ihit++){
+      R3BWRCalifaData* hit =
+	(R3BWRCalifaData*)fWRItemsCalifa->At(ihit);
+      if (!hit) continue;
+      wrc=hit->GetTimeStamp();
+    }
+  }
+  uint64_t wrm=0;
+  if(fWRItemsMaster && fWRItemsMaster->GetEntriesFast()){
+    Int_t nHits = fWRItemsMaster->GetEntriesFast();
+    for (Int_t ihit = 0; ihit < nHits; ihit++){
+      R3BWRMasterData* hit =
+	(R3BWRMasterData*)fWRItemsMaster->At(ihit);
+      if (!hit) continue;
+      wrm=hit->GetTimeStamp();
+    }
+  }
+  if(fWRItemsCalifa->GetEntriesFast() || fWRItemsMaster->GetEntriesFast()){
+      fh_Califa_wr->Fill(wrc-wrm);
+  }
+  
+  Int_t counter[8];
   if(fMappedItemsCalifa && fMappedItemsCalifa->GetEntriesFast()){
     Int_t nHits = fMappedItemsCalifa->GetEntriesFast();
 
@@ -986,10 +1050,22 @@ void R3BCalifaOnlineSpectra::FinishEvent() {
     {
         fHitItemsCalifa->Clear();
     }
+    if (fWRItemsCalifa)
+    {
+        fWRItemsCalifa->Clear();
+    }
+    if (fWRItemsMaster)
+    {
+        fWRItemsMaster->Clear();
+    }
 }
 
 
 void R3BCalifaOnlineSpectra::FinishTask() {
+
+   if(fWRItemsCalifa&&fWRItemsMaster){
+      cCalifa_wr->Write();
+   }
 
    if(fMappedItemsCalifa){
       fh_Califa_cryId_energy->Write();
