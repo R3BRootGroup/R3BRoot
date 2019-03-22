@@ -35,7 +35,7 @@ namespace {
 }
 
 R3BTofdMapped2Cal::R3BTofdMapped2Cal()
-  : FairTask("TofdTcal", 1)
+  : FairTask("R3BTofdMapped2Cal", 1)
   , fMappedItems(nullptr)
   , fCalItems(new TClonesArray("R3BTofdCalData"))
   , fNofCalItems(0)

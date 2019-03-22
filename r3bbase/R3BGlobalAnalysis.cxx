@@ -152,7 +152,7 @@ InitStatus R3BGlobalAnalysis::Init()
         fh_los_pos = new TH2F(strName, "", 2000, -10., 10., 2000, -10., 10.);              
             
         sprintf(strName, "LosQ_vs_TofdQ");
-        fhChargeLosTofD = new TH2F(strName, "", 200, 0., 20., 200, 0., 20.);              
+        fhChargeLosTofD = new TH2F(strName, "", 1000, 0., 80., 1000, 0., 80.);              
         fhChargeLosTofD->GetYaxis()->SetTitle("Charge LOS");
         fhChargeLosTofD->GetXaxis()->SetTitle("Charge ToFD");                                             
     }
@@ -192,137 +192,59 @@ InitStatus R3BGlobalAnalysis::Init()
             cout << "I am creating canvas " << detName <<endl;
 
             // Channels:   
-            histName1 << detName << "_channels";
-            tempName=histName1.str();
-            chistName=tempName.c_str();
-            histTitle1 << detName << " channels";
-            tempTitle=histTitle1.str();
-            chistTitle=tempTitle.c_str();
-            fh_channels_Fib[ifibcount] = new TH1F(chistName, chistTitle, 520, 0., 520.);
+			fh_channels_Fib[ifibcount] = new TH1F(Form("%s_channels",detName), Form("%s channels",detName), 520, 0., 520.);
             fh_channels_Fib[ifibcount]->GetXaxis()->SetTitle("Channel number");
             fh_channels_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
-            tempName.clear();
-            tempTitle.clear();      
+
             // Fibers:
-            histName2 << detName << "_fibers";
-            tempName=histName2.str();
-            chistName=tempName.c_str();
-            histTitle2 << detName << " fibers";
-            tempTitle=histTitle2.str();
-            chistTitle=tempTitle.c_str();
-            fh_fibers_Fib[ifibcount] = new TH1F(chistName, chistTitle, 2100, 0., 2100.); 
+			fh_fibers_Fib[ifibcount] = new TH1F(Form("%s_fibers",detName), Form("%s fibers",detName), N_FIBER_PLOT, 0., N_FIBER_PLOT); 
             fh_fibers_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
             fh_fibers_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
-            tempName.clear();
-            tempTitle.clear();
+
             // Fiber:
-            histName22 << detName << "_fiber";
-            tempName=histName22.str();
-            chistName=tempName.c_str();
-            histTitle22 << detName << " fiber";
-            tempTitle=histTitle22.str();
-            chistTitle=tempTitle.c_str();
-            fh_fiber_Fib[ifibcount] = new TH1F(chistName, chistTitle, 1050, 1., 2101.); 
+			fh_fiber_Fib[ifibcount] = new TH1F(Form("%s_fiber",detName), Form("%s fiber",detName), N_FIBER_PLOT, 0., N_FIBER_PLOT); 
             fh_fiber_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
             fh_fiber_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
-            tempName.clear();
-            tempTitle.clear();
+
             // Multiplicity (number of hit fibers):
-            histName3 << detName << "_mult";
-            tempName=histName3.str();
-            chistName=tempName.c_str();
-            histTitle3 << detName << " # of hit fibers ";
-            tempTitle=histTitle3.str();
-            chistTitle=tempTitle.c_str();
-            fh_mult_Fib[ifibcount] = new TH1F(chistName, chistTitle, 100, 0., 100.);       
+			fh_mult_Fib[ifibcount] = new TH1F(Form("%s_mult",detName), Form("%s # of fibers",detName), 100, 0., 100.);	   
             fh_mult_Fib[ifibcount]->GetXaxis()->SetTitle("Multiplicity");
             fh_mult_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
-            tempName.clear();
-            tempTitle.clear();   
+
             // Multihit MAPMT:
-            histName5 << detName << "_multihit_m";
-            tempName=histName5.str();
-            chistName=tempName.c_str();
-            histTitle5 << detName << " multihits MAPMT";
-            tempTitle=histTitle5.str();
-            chistTitle=tempTitle.c_str();   
-            fh_multihit_m_Fib[ifibcount] = new TH2F(chistName, chistTitle, 520, 0., 520., 20, 0., 20.);
+			fh_multihit_m_Fib[ifibcount] = new TH2F(Form("%s_multihit_m",detName), Form("%s multihits MAPMT",detName), 520, 0., 520., 20, 0., 20.);
             fh_multihit_m_Fib[ifibcount]->GetXaxis()->SetTitle("MAPMT channel");
             fh_multihit_m_Fib[ifibcount]->GetYaxis()->SetTitle("Multihit");
-            tempName.clear();
-            tempTitle.clear();     
+
             // Multihit SAPMT:
-            histName6 << detName << "_multihit_s";
-            tempName=histName6.str();
-            chistName=tempName.c_str();
-            histTitle6 << detName << " multihits SAPMT";
-            tempTitle=histTitle6.str();
-            chistTitle=tempTitle.c_str();      
-            fh_multihit_s_Fib[ifibcount] = new TH2F(chistName, chistTitle, 16, 0., 16., 20, 0., 20.);          
+			fh_multihit_s_Fib[ifibcount] = new TH2F(Form("%s_multihit_s",detName), Form("%s multihits single PMT",detName), 16, 0., 16., 20, 0., 20.);   	   
             fh_multihit_s_Fib[ifibcount]->GetXaxis()->SetTitle("SAPMT channel");
             fh_multihit_s_Fib[ifibcount]->GetYaxis()->SetTitle("Multihit");
-            tempName.clear();
-            tempTitle.clear(); 
+
             // ToT MAPMT:  
-            histName7 << detName << "_tot_m";
-            tempName=histName7.str();
-            chistName=tempName.c_str();
-            histTitle7 << detName << " ToT of MAPMT";
-            tempTitle=histTitle7.str();
-            chistTitle=tempTitle.c_str();      
-            fh_ToT_m_Fib[ifibcount] = new TH2F(chistName, chistTitle, 2100, 0., 2100., 400, 0., 200.);         
+			fh_ToT_m_Fib[ifibcount] = new TH2F(Form("%s_tot_m",detName), Form("%s ToT of MAPMT",detName), N_FIBER_PLOT, 0., N_FIBER_PLOT, 400, 0., 20.);   	   
             fh_ToT_m_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
             fh_ToT_m_Fib[ifibcount]->GetYaxis()->SetTitle("ToT / ns");
-            tempName.clear();
-            tempTitle.clear();
+
             // ToT SAPMT:  
-            histName8 << detName << "_tot_s";
-            tempName=histName8.str();
-            chistName=tempName.c_str();
-            histTitle8 << detName << " ToT of SAPMT";
-            tempTitle=histTitle8.str();
-            chistTitle=tempTitle.c_str();      
-            fh_ToT_s_Fib[ifibcount] = new TH2F(chistName, chistTitle, 2100, 0., 2100., 400, 0., 200.);         
+			fh_ToT_s_Fib[ifibcount] = new TH2F(Form("%s_tot_s",detName), Form("%s ToT of single PMT",detName), N_FIBER_PLOT, 0., N_FIBER_PLOT, 400, 0., 40.);   	   
             fh_ToT_s_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
             fh_ToT_s_Fib[ifibcount]->GetYaxis()->SetTitle("ToT / ns");
-            tempName.clear();
-            tempTitle.clear();     
+
             // Time of fiber: 
-            histName9 << detName << "_TimevsFiber";
-            tempName=histName9.str();
-            chistName=tempName.c_str();
-            histTitle9 << detName << " Time vs Fiber";
-            tempTitle=histTitle9.str();
-            chistTitle=tempTitle.c_str();
-            fh_time_Fib[ifibcount]= new TH2F(chistName, chistTitle, 2100, 0., 2100., 2000, -1024., 1024.);
+			fh_time_Fib[ifibcount]= new TH2F(Form("%s_TimevsFiber",detName), Form("%s Time vs Fiber",detName), N_FIBER_PLOT, 0., N_FIBER_PLOT, 20000, -1024., 1024.);
             fh_time_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
             fh_time_Fib[ifibcount]->GetYaxis()->SetTitle("tMAPMT-tSPMT");
-            tempName.clear();
-            tempTitle.clear();
+
             // ToF LOS -> Fiber:
-            histName11 << detName << "_tof";
-            tempName=histName11.str();
-            chistName=tempName.c_str();
-            histTitle11 << detName << " ToF LOS to Fiber ";
-            tempTitle=histTitle11.str();
-            chistTitle=tempTitle.c_str();
-            fh_Fib_ToF[ifibcount] = new TH2F(chistName, chistTitle, 2100, 0., 2100.,1000, -5000., 5000.);      
+			fh_Fib_ToF[ifibcount] = new TH2F(Form("%s_tof",detName), Form("%s ToF LOS to Fiber",detName), N_FIBER_PLOT, 0., N_FIBER_PLOT,10000, -5000., 5000.);	   
             fh_Fib_ToF[ifibcount]->GetYaxis()->SetTitle("ToF / ns");
             fh_Fib_ToF[ifibcount]->GetXaxis()->SetTitle("Fiber number");
-            tempName.clear();
-            tempTitle.clear();         
+
             // Not-calibrated position:
-            histName12 << detName << "_xpos";
-            tempName=histName12.str();
-            chistName=tempName.c_str();
-            histTitle12 << detName << " Not-calibrated x-position ";
-            tempTitle=histTitle12.str();
-            chistTitle=tempTitle.c_str();
-            fh_xpos_Fib[ifibcount] = new TH1F(chistName, chistTitle, 6000, -1500., 1500.);     
+			fh_xpos_Fib[ifibcount] = new TH1F(Form("%s_pos",detName), Form("%s Not-calibrated position",detName), 6000, -1500., 1500.);	   
             fh_xpos_Fib[ifibcount]->GetXaxis()->SetTitle("x-Position");
             fh_xpos_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
-            tempName.clear();
-            tempTitle.clear();
 
             // hit fiber number vs. event number:
 			fh_Fib_vs_Events[ifibcount] = new TH2F(Form("%s_fib_vs_event",detName), Form("%s Fiber # vs. Event #",detName), 1000,0,5e6,1100, 0., 1100.);	   
@@ -352,7 +274,7 @@ InitStatus R3BGlobalAnalysis::Init()
             for(Int_t j = ifibcount+1; j < NOF_FIB_DET; j++){
 				detName2 = fDetectorNames[DET_FI_FIRST + j];
 	     	    fh_Fib_dx[ifibcount][j] = new TH2F(Form("fib%s_fib%s_dx",detName,detName2), 
-	     	        Form("dx of Fiber %s and Fiber %",detName2,detName), 110,0,1100,400, -500., 500.);    
+	     	        Form("dx of Fiber %s and Fiber %",detName2,detName), 1100,0,1100,1000, -500., 500.);    
                 fh_Fib_dx[ifibcount][j]->GetYaxis()->SetTitle("dx");
                 fh_Fib_dx[ifibcount][j]->GetXaxis()->SetTitle(Form("Fiber%s",detName));;
 		    }
@@ -558,7 +480,7 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
     }
     
     
-    fhChargeLosTofD->Fill(TofdQ,LosQ/10.);
+    fhChargeLosTofD->Fill(TofdQ,LosQ/2.);
 
 
     //----------------------------------------------------------------------
@@ -740,12 +662,12 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
     //      if(abs(tof_fib_s-tof[ifibcount])<20.) 
             if(totMax>0) 
             {
-				if(LosQ>1. && TofdQ>1.1 && TofdQ<2.8) {
+				if(LosQ>1. && TofdQ>1.1 && TofdQ>0.8) {
                     fh_fibers_Fib[ifibcount]->Fill(iFibMax);  
                     fh_fiber_Fib[ifibcount]->Fill(iFibMax);  
                     fh_ToT_s_Fib[ifibcount]->Fill(iFibMax,spmtMax);
                     fh_ToT_m_Fib[ifibcount]->Fill(iFibMax,mapmtMax);
-                    fh_time_Fib[ifibcount]->Fill(iFibMax,y);
+                    fh_time_Fib[ifibcount]->Fill(iFibMax,yposfib);
                     fh_Fib_ToF[ifibcount]->Fill(iFibMax,tofMax);
                     fh_xpos_Fib[ifibcount]->Fill(xposfib);  
                     fh_ypos_Fib[ifibcount]->Fill(yposfib);  
@@ -757,7 +679,7 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
 
             if (nHits>0) fh_mult_Fib[ifibcount]->Fill(nHits);      
             
-            if(LosQ>1. && TofdQ>1.1 && TofdQ<2.8) {
+            if(LosQ>1. && TofdQ>1.1 && TofdQ>0.8) {
                 fh_Fibs_vs_Tofd[ifibcount]->Fill(TofdX,iFibMax);
                 //cout<<"test "<<TofdX<<"  "<<iFibMax<<endl;
 			}
@@ -781,7 +703,7 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
     for(Int_t i = 0; i < NOF_FIB_DET; i++){
         for(Int_t j = i+1; j < NOF_FIB_DET; j++){
 			if(fHitItems.at(i + DET_FI_FIRST) && fHitItems.at(j + DET_FI_FIRST))  {
-				           if(LosQ>1. && TofdQ>1.1 && TofdQ<2.8) {
+				           if(LosQ>1. && TofdQ>1.1 && TofdQ>0.8) {
 				               fh_Fib_vs_Fib[i][j]->Fill(FibMax[i],FibMax[j]);
 				               if(FibMax[i]>0 && FibMax[j]>0) fh_Fib_dx[i][j]->Fill(FibMax[i],FibMax[j]-FibMax[i]);				
 						   }

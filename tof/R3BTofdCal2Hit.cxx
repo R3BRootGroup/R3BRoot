@@ -231,15 +231,18 @@ InitStatus R3BTofdCal2Hit::Init()
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
         LOG(fatal) << "FairRootManager not found";
+    
     fCalItems = (TClonesArray*)mgr->GetObject("TofdCal");
     if (NULL == fCalItems)
         LOG(fatal) << "Branch TofdCal not found";
+    
     fCalItemsLos = (TClonesArray*)mgr->GetObject("LosCal");
-     if (NULL == fCalItemsLos)
-        LOG(fatal) << "Branch LosCal not found";
+    if (NULL == fCalItemsLos)
+         LOG(WARNING) << "Branch LosCal not found" <<FairLogger::endl;
 
     fHitItemsLos = (TClonesArray*)mgr->GetObject("LosHit");
-     if (NULL == fHitItemsLos) LOG(ERROR) << "Branch LosHit not found" << FairLogger::endl;
+    if (NULL == fHitItemsLos) 
+         LOG(WARNING) << "Branch LosHit not found" <<FairLogger::endl;
 
     // request storage of Hit data in output tree
     mgr->Register("TofdHit", "Land", fHitItems, kTRUE);
@@ -956,7 +959,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 				fhQvsQ[i-1][j-1]->Fill(Q[1][j], Q[i][j]);
 			}
 
-			if (i==1 && j==40){
+			if (i==1 && j==40 && LosQ>0.){
 				if(Q[i][j]>0.) fhChargeLosTofD->Fill(Q[i][j],LosQ);
 			}
 			//average plane 1 and 2
@@ -1111,8 +1114,10 @@ void R3BTofdCal2Hit::FinishTask()
 
 Double_t R3BTofdCal2Hit::betaCorr(Double_t delta)
 {
-	Double_t corr=-3.*delta;
-//	corr=0.;
+//	Double_t corr=-3.*delta;  //correction for Ag
+	Double_t corr=-1.*delta;  //correction for 12C
+	
+	corr=0.;
 	return corr;
 }
 

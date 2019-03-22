@@ -356,50 +356,62 @@ InitStatus R3BOnlineSpectra::Init()
 			fh_channels_Fib[ifibcount] = new TH1F(Form("%s_channels",detName), Form("%s channels",detName), 520, 0., 520.);
 			fh_channels_Fib[ifibcount]->GetXaxis()->SetTitle("Channel number");
 			fh_channels_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
+
 			// Channels:   
 			fh_channels_single_Fib[ifibcount] = new TH1F(Form("%s_channels_single",detName), Form("%s channels of single PMTs",detName), 10, 0., 10.);
 			fh_channels_single_Fib[ifibcount]->GetXaxis()->SetTitle("Channel number");
 			fh_channels_single_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
+
 			// Fibers:
 			fh_fibers_Fib[ifibcount] = new TH1F(Form("%s_fibers",detName), Form("%s fibers",detName), N_FIBER_PLOT, 0., N_FIBER_PLOT); 
 			fh_fibers_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
 			fh_fibers_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
+
 			// Multiplicity (number of hit fibers):
 			fh_mult_Fib[ifibcount] = new TH1F(Form("%s_mult",detName), Form("%s mult",detName), 100, 0., 100.);	   
 			fh_mult_Fib[ifibcount]->GetXaxis()->SetTitle("Multiplicity");
 			fh_mult_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
+
 			// Multihit MAPMT:
 			fh_multihit_m_Fib[ifibcount] = new TH2F(Form("%s_multihit_m",detName), Form("%s multihits MAPMT",detName), 520, 0., 520., 20, 0., 20.);
 			fh_multihit_m_Fib[ifibcount]->GetXaxis()->SetTitle("MAPMT channel");
 			fh_multihit_m_Fib[ifibcount]->GetYaxis()->SetTitle("Multihit");
+
 			// Multihit SAPMT:
 			fh_multihit_s_Fib[ifibcount] = new TH2F(Form("%s_multihit_s",detName), Form("%s multihits single PMT",detName), 16, 0., 16., 20, 0., 20.);   	   
 			fh_multihit_s_Fib[ifibcount]->GetXaxis()->SetTitle("Single PMT channel");
 			fh_multihit_s_Fib[ifibcount]->GetYaxis()->SetTitle("Multihit");
+
 			// ToT MAPMT:  
-			fh_ToT_m_Fib[ifibcount] = new TH2F(Form("%s_tot_m",detName), Form("%s ToT of MAPMT",detName), N_FIBER_PLOT, 0., N_FIBER_PLOT, 400, 0., 20.);   	   
+			fh_ToT_m_Fib[ifibcount] = new TH2F(Form("%s_tot_m",detName), Form("%s ToT of MAPMT",detName), N_FIBER_PLOT, 0., N_FIBER_PLOT, 200, 0., 20.);   	   
 			fh_ToT_m_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
 			fh_ToT_m_Fib[ifibcount]->GetYaxis()->SetTitle("ToT / ns");
+
 			// ToT SAPMT:  
 			fh_ToT_s_Fib[ifibcount] = new TH2F(Form("%s_tot_s",detName), Form("%s ToT of single PMT",detName), N_FIBER_PLOT, 0., N_FIBER_PLOT, 400, 0., 40.);   	   
 			fh_ToT_s_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
 			fh_ToT_s_Fib[ifibcount]->GetYaxis()->SetTitle("ToT / ns");
+
 			// Time of fiber: 
-			fh_time_Fib[ifibcount]= new TH2F(Form("%s_TimevsFiber",detName), Form("%s Time vs Fiber",detName), N_FIBER_PLOT, 0., N_FIBER_PLOT, 20000, -1024., 1024.);
+			fh_time_Fib[ifibcount]= new TH2F(Form("%s_TimevsFiber",detName), Form("%s Time vs Fiber",detName), N_FIBER_PLOT, 0., N_FIBER_PLOT, 2048, -1024., 1024.);
 			fh_time_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
 			fh_time_Fib[ifibcount]->GetYaxis()->SetTitle("tMAPMT-tSPMT");
+
 			// ToF LOS -> Fiber:
 			fh_Fib_ToF[ifibcount] = new TH2F(Form("%s_tof",detName), Form("%s ToF LOS to Fiber",detName), N_FIBER_PLOT, 0., N_FIBER_PLOT,10000, -5000., 5000.);	   
 			fh_Fib_ToF[ifibcount]->GetYaxis()->SetTitle("ToF / ns");
 			fh_Fib_ToF[ifibcount]->GetXaxis()->SetTitle("Fiber number");
+
 			// Not-calibrated position:
-			fh_Fib_pos[ifibcount] = new TH1F(Form("%s_pos",detName), Form("%s Not-calibrated position",detName), 6000, -1500., 1500.);	   
+			fh_Fib_pos[ifibcount] = new TH1F(Form("%s_pos",detName), Form("%s Not-calibrated position",detName), 2100, -1050., 1050.);	   
 			fh_Fib_pos[ifibcount]->GetXaxis()->SetTitle("Position");
 			fh_Fib_pos[ifibcount]->GetYaxis()->SetTitle("Counts");
+
 			// hit fiber number vs. event number:
 			fh_Fib_vs_Events[ifibcount] = new TH2F(Form("%s_fib_vs_event",detName), Form("%s Fiber # vs. Event #",detName), 10000,0,5e6,1100, 0., 1100.);	   
 			fh_Fib_vs_Events[ifibcount]->GetYaxis()->SetTitle("Fiber number");
 			fh_Fib_vs_Events[ifibcount]->GetXaxis()->SetTitle("Event number");
+
 			// ToT SAPMT:  
 			fh_ToT_single_Fib[ifibcount] = new TH2F(Form("%s_tot_single",detName), Form("%s ToT of single PMTs",detName), 10, 0., 10., 400, 0., 40.);   	   
 			fh_ToT_single_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
@@ -522,7 +534,7 @@ InitStatus R3BOnlineSpectra::Init()
 			sprintf(strName3, "tofd_ToT_plane_%d", j+1);
 			char strName4[255];
 			sprintf(strName4, "Tofd ToT plane %d", j+1);        
-			fh_tofd_TotPm[j] = new TH2F(strName3, strName4, 90,-45,45,30000,0.,300.);
+			fh_tofd_TotPm[j] = new TH2F(strName3, strName4, 90,-45,45,3000,0.,300.);
 			fh_tofd_TotPm[j]->GetXaxis()->SetTitle("Bar number");
 			fh_tofd_TotPm[j]->GetYaxis()->SetTitle("ToT / ns");
 
@@ -530,7 +542,7 @@ InitStatus R3BOnlineSpectra::Init()
 			sprintf(strName7, "tofd_ToF_plane_%d", j+1);
 			char strName8[255];
 			sprintf(strName8, "TOFD-LOS ToF plane %d", j+1); 
-			fh_tofd_ToF[j] = new TH2F(strName7, strName8, 15,0,15, 1e4, 0, 1e2);
+			fh_tofd_ToF[j] = new TH2F(strName7, strName8, 15,0,15, 1000, 0, 100);
 			fh_tofd_ToF[j]->GetXaxis()->SetTitle("Bar number");
 			fh_tofd_ToF[j]->GetYaxis()->SetTitle("ToF / ns");
 
@@ -549,7 +561,7 @@ InitStatus R3BOnlineSpectra::Init()
 				sprintf(strName5, "tofd_ToF_plane_%d_%d", jk, jk+1);
 				char strName6[255];
 				sprintf(strName6, "Tofd ToF plane %d and %d ", jk, jk+1); 
-				fh_tofd_dt[j] = new TH2F(strName5, strName6, 50,0,50,8000, -40., 40);
+				fh_tofd_dt[j] = new TH2F(strName5, strName6, 50,0,50,800, -40., 40);
 				fh_tofd_dt[j]->GetXaxis()->SetTitle("Bar number");
 				fh_tofd_dt[j]->GetYaxis()->SetTitle("dt / ns");
 			}
