@@ -18,6 +18,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -118,7 +119,17 @@ class R3BOnlineSpectra : public FairTask
     inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
     inline void SetTpat(Int_t tpat) { fTpat = tpat; }
     
-
+    /**
+     * Methods for setting reset and readout times for Bmon
+     */
+    inline void SetBmon(Int_t time_range, Double_t time_step, Int_t sens_SEE, Int_t sens_IC)
+    {
+        reset_time = time_range;
+        read_time = time_step;
+        fsens_SEE = sens_SEE;
+        fsens_IC = sens_IC;
+        
+    }
     /**
      * Methods for setting number of planes and paddles
      */
@@ -239,18 +250,34 @@ class R3BOnlineSpectra : public FairTask
     Double_t flosVeffYQ;
     Double_t flosOffsetXQ;
     Double_t flosOffsetYQ;
-    unsigned long long time_V_mem = 0, time_bmon_mem = 0., see_mem = 0, ic_mem=0, tofdor_mem = 0;
+
+    unsigned long long time_V_mem = 0, time_start = 0, time = 0, time_mem = 0;
+    unsigned long long time_prev_read = 0, time_to_read = 0;
+    unsigned long ic_mem=0, see_mem = 0,  tofdor_mem = 0;
+    unsigned long ic_start=0, see_start = 0,  tofdor_start = 0;
     unsigned long long time_spill_start=0, time_spill_end=0;
+    Double_t time_clear = -1.;
+    Double_t tdiff = 0.;
+    Double_t fNorm = 1.;
+    Int_t iclear_count = 1;
+    UInt_t reset_time ; // time after which bmon spectra are reseted
+    Double_t read_time ; // step in which scalers are read, in sec 
+    Int_t fsens_SEE, fsens_IC; // SEETRAM and IC sensitivity, between -4 and -10
+    Double_t calib_SEE = 1.; // SEETRAM calibration factor
+    Double_t see_offset = 7.1; // SEETRAM offset in kHz
     
-    long fNEvents = 0;         /**< Event counter. */
-    long fNEvents_LOS = 0;
+    unsigned long fNEvents = 0, fNEvents_start = 0;         /**< Event counter. */
     
     TH1F *fhTpat;
     TH1F *fh_spill_length;
     TH1F *fhTrigger;
-    TH2F *fh_SEETRAM;
-    TH2F *fh_IC;
-    TH2F *fh_TOFDOR;
+    TH1F *fh_IC_spill;
+    TH1F *fh_SEE_spill;
+    TH1F *fh_TOFDOR_spill;
+    TH1F *fh_IC;
+    TH1F *fh_SEE;
+    TH1F *fh_TOFDOR;
+   // TH1F *h3;
     
     TH1F *fh_sci8_channels;    
     TH1F *fh_sci8_tres_MCFD;

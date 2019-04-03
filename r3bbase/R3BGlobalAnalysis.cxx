@@ -480,7 +480,7 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
     }
     
     
-    fhChargeLosTofD->Fill(TofdQ,LosQ/2.);
+    //fhChargeLosTofD->Fill(TofdQ,LosQ/2.);
 
 
     //----------------------------------------------------------------------
@@ -600,14 +600,14 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
                 }           
         
                 // "Push" the Fib times in the same cycle with LOS:
-                if(timeLos[0]>0. && !(IS_NAN(timeLos[0])))
+                if(timeTofd[0]>0. && !(IS_NAN(timeTofd[0])))
                 {
-                    while(tSPMT - timeLos[0] < 4096.)
+                    while(tSPMT - timeTofd[0] < 4096.)
                     {
                         tMAPMT = tMAPMT + 2048.*4.; 
                         tSPMT = tSPMT + 2048.*4.;         
                     }       
-                    while(tSPMT - timeLos[0] > 4096.)
+                    while(tSPMT - timeTofd[0] > 4096.)
                     {
                         tMAPMT = tMAPMT - 2048.*4.; 
                         tSPMT = tSPMT - 2048.*4.;         
@@ -624,8 +624,8 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
                 // Not-calibrated ToF:   
         //      tfib = (tMAPMT + tSPMT) / 2.;
                 tfib = tSPMT;
-                if(tfib > 0. && !(IS_NAN(tfib)) && timeLos[0]>0. && !(IS_NAN(timeLos[0]))) tof_fib_s = tfib - timeLos[0];   
-                if(tMAPMT > 0. && !(IS_NAN(tMAPMT)) && timeLos[0]>0. && !(IS_NAN(timeLos[0]))) tof_fib_m = tMAPMT - timeLos[0]; 
+                if(tfib > 0. && !(IS_NAN(tfib)) && timeTofd[0]>0. && !(IS_NAN(timeTofd[0]))) tof_fib_s = tfib - timeTofd[0];   
+                if(tMAPMT > 0. && !(IS_NAN(tMAPMT)) && timeTofd[0]>0. && !(IS_NAN(timeTofd[0]))) tof_fib_m = tMAPMT - timeTofd[0]; 
                     
         
     //if(fNEvents<10000 && ifibcount == 13){
@@ -662,7 +662,7 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
     //      if(abs(tof_fib_s-tof[ifibcount])<20.) 
             if(totMax>0) 
             {
-				if(LosQ>1. && TofdQ>1.1 && TofdQ>0.8) {
+				if(TofdQ>0. && TofdQ<100.) {
                     fh_fibers_Fib[ifibcount]->Fill(iFibMax);  
                     fh_fiber_Fib[ifibcount]->Fill(iFibMax);  
                     fh_ToT_s_Fib[ifibcount]->Fill(iFibMax,spmtMax);
@@ -679,7 +679,7 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
 
             if (nHits>0) fh_mult_Fib[ifibcount]->Fill(nHits);      
             
-            if(LosQ>1. && TofdQ>1.1 && TofdQ>0.8) {
+            if(TofdQ>0. && TofdQ<100.) {
                 fh_Fibs_vs_Tofd[ifibcount]->Fill(TofdX,iFibMax);
                 //cout<<"test "<<TofdX<<"  "<<iFibMax<<endl;
 			}
@@ -703,7 +703,7 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
     for(Int_t i = 0; i < NOF_FIB_DET; i++){
         for(Int_t j = i+1; j < NOF_FIB_DET; j++){
 			if(fHitItems.at(i + DET_FI_FIRST) && fHitItems.at(j + DET_FI_FIRST))  {
-				           if(LosQ>1. && TofdQ>1.1 && TofdQ>0.8) {
+				           if(TofdQ>0. && TofdQ<100.) {
 				               fh_Fib_vs_Fib[i][j]->Fill(FibMax[i],FibMax[j]);
 				               if(FibMax[i]>0 && FibMax[j]>0) fh_Fib_dx[i][j]->Fill(FibMax[i],FibMax[j]-FibMax[i]);				
 						   }

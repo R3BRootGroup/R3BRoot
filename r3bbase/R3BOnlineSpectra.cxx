@@ -48,11 +48,13 @@
 #include "TH2F.h"
 #include "THttpServer.h"
 
+
 #include "TClonesArray.h"
 #include "TMath.h"
 #include <TRandom3.h>
 #include <TRandomGen.h>
 #include <array>
+#include <vector>
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
@@ -119,14 +121,7 @@ InitStatus R3BOnlineSpectra::Init()
 
 	run->GetHttpServer()->Register("/Tasks", this);
 	
-/*
-// get access to BeamMonitor Mapped data
-    fbmonMappedItems = (TClonesArray*)mgr->GetObject("BeamMonitorMapped");  
-     if (NULL == fbmonMappedItems){
-      LOG(ERROR) << "Branch BeamMonitorMapped not found" << FairLogger::endl;
-      return kFATAL;
-     }
-*/    
+   
         // Get objects for detectors on all levels
         assert(DET_MAX + 1 == sizeof(fDetectorNames)/sizeof(fDetectorNames[0]));
         printf("Have %d fiber detectors.\n", NOF_FIB_DET);
@@ -209,42 +204,75 @@ InitStatus R3BOnlineSpectra::Init()
  
 	}	
 
-	if(fMappedItems.at(DET_BMON)){		
+	if(fMappedItems.at(DET_BMON)){	
+		
+    // get the theoretical calib factors for SEETRAM
+        Double_t fexp = float(fsens_SEE+9);
+        Double_t fpow = float(pow(10.,fexp));
+        calib_SEE = 135641.7786*fpow;	
+        cout<<fsens_SEE<<", "<<fexp<<", "<<fpow<<", "<<calib_SEE<<endl;	
+			
+		TCanvas *cbmon = new TCanvas("Beam_Monitor", "Beam Monitors", 820, 10, 900, 900);
+		Int_t Nbin_bmon= reset_time / read_time;
+		
 		fhTpat = new TH1F("Tpat", "Tpat", 20, 0, 20);
         fhTpat->GetXaxis()->SetTitle("Tpat value");
+        
         fhTrigger = new TH1F("Trigger", "Trigger all", 20, 0, 20);
         fhTrigger->GetXaxis()->SetTitle("Trigger value");
         
-        fh_SEETRAM = new TH2F("SEE", "SEE",7200,0,3600,15000,0,150000);
-        fh_SEETRAM->GetXaxis()->SetTitle("time / sec");
-        fh_SEETRAM->GetYaxis()->SetTitle("SEETRAM counts");
-        
-        fh_IC = new TH2F("IC", "IC",7200,0,3600,15000,0,150000);
+        fh_spill_length = new TH1F("spill_length", "Spill ", Nbin_bmon, 0, reset_time);
+        fh_spill_length->GetXaxis()->SetTitle("time / sec"); 
+                
+        fh_IC = new TH1F("IC", "IC ", Nbin_bmon, 0, reset_time);
         fh_IC->GetXaxis()->SetTitle("time / sec");
         fh_IC->GetYaxis()->SetTitle("IC counts");
         
-        fh_TOFDOR = new TH2F("TOFDOR", "TOFDOR",7200,0,3600,15000,0,150000);
+        fh_SEE = new TH1F("SEETRAM", "SEETRAM ", Nbin_bmon, 0, reset_time);
+        fh_SEE->GetXaxis()->SetTitle("time / sec");
+        fh_SEE->GetYaxis()->SetTitle("SEETRAM counts");
+
+        fh_TOFDOR = new TH1F("TOFDOR", "TOFDOR ", Nbin_bmon, 0, reset_time);
         fh_TOFDOR->GetXaxis()->SetTitle("time / sec");
         fh_TOFDOR->GetYaxis()->SetTitle("TOFDOR counts");
+       
+        fh_IC_spill = new TH1F("IC_spill", "IC rate in kHz ", Nbin_bmon, 0, reset_time);
+        fh_IC_spill->GetXaxis()->SetTitle("time / sec");
+        fh_IC_spill->GetYaxis()->SetTitle("IC rate / kHz");
         
-		TCanvas *cbmon = new TCanvas("Beam_Monitor", "Beam Monitors", 820, 10, 700, 800);
-		cbmon->Divide(3,2);	
+        fh_SEE_spill = new TH1F("SEE_spill", "SEE particle rate ", Nbin_bmon, 0, reset_time);
+        fh_SEE_spill->GetXaxis()->SetTitle("time / sec");
+        fh_SEE_spill->GetYaxis()->SetTitle("Particles / sec");
+        
+		fh_TOFDOR_spill = new TH1F("TOFDOR_spill", "TOFDOR rate in kHz ", Nbin_bmon, 0, reset_time);
+        fh_TOFDOR_spill->GetXaxis()->SetTitle("time / sec");
+        fh_TOFDOR_spill->GetYaxis()->SetTitle("TOFDOR rate / kHz");
+        
+		cbmon->Divide(3,3);	
 		cbmon->cd(1);gPad->SetLogy();
 		fhTrigger->Draw();
 		cbmon->cd(2);gPad->SetLogy();
 		fhTpat->Draw();
-		cbmon->cd(4);gPad->SetLogz();
-		fh_SEETRAM ->Draw("colz");
-		cbmon->cd(5);gPad->SetLogz();
-		fh_IC->Draw("colz");
-		cbmon->cd(6);gPad->SetLogz();
-		fh_TOFDOR->Draw("colz");	
+		cbmon->cd(3);
+		fh_spill_length->Draw();
+		cbmon->cd(4);
+		fh_IC->Draw("hist");
+		cbmon->cd(5);
+		fh_SEE ->Draw("hist");
+		cbmon->cd(6);
+		fh_TOFDOR->Draw("hist");	
+		cbmon->cd(7);
+		fh_IC_spill->Draw("hist");
+		cbmon->cd(8);
+		fh_SEE_spill->Draw("hist");
+		cbmon->cd(9);
+		fh_TOFDOR_spill->Draw("hist");
 		cbmon->cd(0);
+		
 		run->AddObject(cbmon);
 		
 		run->GetHttpServer()->RegisterCommand("Reset_BMON", Form("/Tasks/%s/->Reset_BMON_Histo()", GetName()));
 }
-
 
 	//------------------------------------------------------------------------ 
 	// Los detector
@@ -889,9 +917,14 @@ void R3BOnlineSpectra::Reset_BMON_Histo()
 {
     fhTrigger->Reset();
     fhTpat->Reset();
-    fh_SEETRAM->Reset();
+    fh_spill_length->Reset();
     fh_IC->Reset();
+    fh_IC_spill->Reset();
+    fh_SEE->Reset();
+    fh_SEE_spill->Reset();
     fh_TOFDOR->Reset();
+    fh_TOFDOR_spill->Reset();
+    
 }
 
 void R3BOnlineSpectra::Reset_SCI8_Histo()
@@ -979,21 +1012,31 @@ void R3BOnlineSpectra::Exec(Option_t* option)
     LOG(ERROR) <<  "FairRootManager not found" <<FairLogger::endl;
    return;
   }
+
+   time = header->GetTimeStamp(); 
   
- // Double_t time_spill_start, time_spill_end;
+  if(time_start == 0 && time > 0){
+     time_start = time;
+     fNEvents_start = fNEvents;
+  }
+      Bool_t spectra_clear = false; 
+      Double_t xtime = double(time-time_start)/1.e9; 
+  // for reseting spectra	  
+	  Int_t icount = iclear_count*reset_time; // reset after reset_time (sec) 	 
+	  if(time_clear < 0. && int(xtime)%icount == 0 && xtime > 1.){
+		 time_clear = xtime;
+	     spectra_clear = true;
+	  }
   
-  if(header->GetTrigger() == 12)   time_spill_start =  header->GetTimeStamp();    // spill start in nsec
+  if(header->GetTrigger() == 12) time_spill_start =  header->GetTimeStamp();    // spill start in nsec   
   if(header->GetTrigger() == 13)   time_spill_end =  header->GetTimeStamp();    // spill end  in nsec
   
-//  if(header->GetTrigger() == 12)   cout<<"SPILL START: "<<fNEvents<<"; "<<header->GetTrigger()<<", "<<header->GetTimeStamp()<<endl;
-//  if(header->GetTrigger() == 13)   cout<<"SPILL END  : "<<fNEvents<<"; "<<header->GetTrigger()<<", "<<header->GetTimeStamp()<<endl;
-
-
-// fh_spill_length->Fill(time_spill_start-time_spill_end);
+  if(header->GetTrigger() == 12)   cout<<"Spill start: "<<double(time_spill_start-time_start)/1.e9<<" sec" <<endl;
+  if(header->GetTrigger() == 13)   cout<<"Spill stop: "<<double(time_spill_end-time_start)/1.e9<<" sec" <<endl;
   
  if(fMappedItems.at(DET_BMON)){ 
   fhTrigger->Fill(header->GetTrigger());
-}
+ }
   
  
 //   check for requested trigger (Todo: should be done globablly / somewhere else)
@@ -1011,9 +1054,25 @@ void R3BOnlineSpectra::Exec(Option_t* option)
  }  
 }
  
+ // fTpat = 1-16; fTpat_bit = 0-15
+ Int_t fTpat_bit = fTpat - 1; 
+ Int_t itpat;
+ Int_t tpatvalue;
+ if(fTpat_bit >= 0)  
+ {                    
+   itpat = header->GetTpat(); 
+   tpatvalue = (itpat && (1 << fTpat_bit)) >> fTpat_bit;
+   if( (tpatvalue == 0)) return;
+  }
+  
+   
+  if(fMappedItems.at(DET_BMON)){
+  unsigned long IC ; 
+  unsigned long SEETRAM, SEETRAM_raw ;  
+  unsigned long TOFDOR ; 
  
-if(fMappedItems.at(DET_BMON)){
-	
+  Bool_t bmon_read = false;
+  	
 	auto det = fMappedItems.at(DET_BMON);
     Int_t nHitsbm = det->GetEntriesFast();
     
@@ -1022,48 +1081,89 @@ if(fMappedItems.at(DET_BMON)){
       R3BBeamMonitorMappedData* hit = (R3BBeamMonitorMappedData*)det->At(ihit);
       if (!hit) continue;
 
-      signed long long IC = hit->GetIC(); // negative values if offset not high enough
-      signed long long SEETRAM = hit->GetSEETRAM();  // negative values if offset not high enough
-      unsigned long long TOFDOR = hit->GetTOFDOR(); // only positive values possible
+      IC = hit->GetIC(); // negative values if offset not high enough
+      SEETRAM_raw = hit->GetSEETRAM();  // raw counts
+      TOFDOR = hit->GetTOFDOR(); // only positive values possible
+      SEETRAM = SEETRAM_raw * calib_SEE; // calibrated SEETRAM counts
       
-      unsigned long long time = header->GetTimeStamp();
-      
-      if(fNEvents == 0 ){ //|| header->GetTrigger() == 13) {
-		  time_bmon_mem = time;
+      if(fNEvents == fNEvents_start ) {
           see_mem = SEETRAM;
           ic_mem = IC;
           tofdor_mem = TOFDOR;
-       }   
+          time_mem = time_start;
+          see_start = SEETRAM;
+          ic_start = IC;
+          tofdor_start = TOFDOR;
+          time_prev_read = time_start;
+       }  
        
-     //  cout<<"IC: "<< (time-time_bmon_mem)/1e9<<"; "<<IC<<"; "<<ic_mem<<"; "<<header->GetTrigger()<<endl;
-       
-      fh_IC->Fill((time-time_bmon_mem)/1.e9,IC-ic_mem);
-     
-      fh_SEETRAM->Fill((time-time_bmon_mem)/1.e9,SEETRAM-see_mem);
-     
-      fh_TOFDOR->Fill((time-time_bmon_mem)/1.e9,TOFDOR-tofdor_mem);
+      if( time > 0 ){	  
+ 	       
+ 	      // cout<<SEETRAM_raw<<"; "<<see_offset<<"; "<<calib_SEE<<", "<<SEETRAM<<", "<<see_mem<<endl;
+ 	       
+      fh_spill_length->Fill((time-time_mem)/1e9); 
       
+  // Spectra below are filled every read_time (secs)
+     if(time_to_read == 0 && (time-time_prev_read) >= read_time * 1000000000){
+	    time_to_read = time;
+	    bmon_read = true;	 
+	 }	 
+        		  
+    if(bmon_read){
+	
+	  tdiff = double(time-time_mem)/1.e9; 
+ 	  fNorm = 1.e-3/(double(time-time_prev_read)/1.e9);  // kHz
+ 	         
+   // IC:   
+      Int_t yIC = IC-ic_start;    
+      fh_IC->Fill(tdiff, yIC);	          
+      fh_IC_spill->Fill(tdiff,(IC-ic_mem)*fNorm);
+      ic_mem = IC;  
+      
+		     
+   // SEETRAM:   
+      Int_t ySEE = SEETRAM-see_start;    
+      fh_SEE->Fill(tdiff,ySEE);
+      Double_t ySEE_part = (SEETRAM-see_mem)*fNorm*1.e+3-see_offset*calib_SEE;
+      fh_SEE_spill->Fill(tdiff,ySEE_part);
+      see_mem = SEETRAM; 
+      
+   // TOFDOR:   
+      Int_t yTOFDOR = TOFDOR-tofdor_start;    
+      fh_TOFDOR->Fill(tdiff,yTOFDOR);            
+      fh_TOFDOR_spill->Fill(tdiff,(TOFDOR-tofdor_mem)*fNorm);
+      tofdor_mem = TOFDOR; 
+      
+      time_to_read = 0;
+      time_prev_read = time;
+      bmon_read = false;
+      
+     }
+      
+       if(spectra_clear){	
+		fh_spill_length->Reset();	
+		fh_IC_spill->Reset("ICESM");
+		fh_SEE_spill->Reset("ICESM");
+		fh_TOFDOR_spill->Reset("ICESM");
+		fh_IC->Reset("ICESM");
+		fh_SEE->Reset("ICESM");
+		fh_TOFDOR->Reset("ICESM");
+		time_mem = time;  
+		time_clear = -1.; 
+		iclear_count = iclear_count + 1;
+		spectra_clear = false; 
+		see_start = SEETRAM;
+		ic_start = IC;
+		tofdor_start = TOFDOR;
+	   }	
+	  
+     }
       				         
     }
 
-} 
+ }
    
- //fhTpat->Fill(header->GetTpat());
- // fTpat = 1-16; fTpat_bit = 0-15
- Int_t fTpat_bit = fTpat - 1; 
- Int_t itpat;
- Int_t tpatvalue;
- if(fTpat_bit >= 0)  
- {                    
-   itpat = header->GetTpat(); 
-   tpatvalue = (itpat & (1 << fTpat_bit)) >> fTpat_bit;
-   
-  // cout<<"Tpatval: "<<tpatvalue<<", "<<itpat<<endl;
-   if( (tpatvalue == 0)) return;
-  }
-     
-     
-  //----------------------------------------------------------------------
+   //----------------------------------------------------------------------
   // LOS detector
   //----------------------------------------------------------------------
   // Time nomenclature for LOS:
@@ -1072,9 +1172,11 @@ if(fMappedItems.at(DET_BMON)){
   //   rt| |l
   //   r | |lb
   //   rb\ /b 
+
+  
+
   Double_t timeTofd=0;
-  Double_t time_V[10][8] = {0.0/0.0};  // [multihit][pm]       
-  Double_t time_V_temp[10][8] = {0.0/0.0};   
+  Double_t time_V[10][8] = {0.0/0.0};  // [multihit][pm]         
   Double_t time_L[10][8] = {0.0/0.0};
   Double_t time_T[10][8] = {0.0/0.0};          
   Double_t timeLosM[10] = {0.0};
@@ -1119,22 +1221,13 @@ if(fMappedItems.at(DET_BMON)){
   Int_t nPart;   
   if(fCalItems.at(DET_LOS))
   {
-    auto det = fCalItems.at(DET_LOS);
-    nPart = det->GetEntriesFast();  
-
-    if (nPart>0) fh_los_multihit->Fill(nPart);
+	Bool_t LOSID = false;
 
     auto det = fCalItems.at(DET_LOS);
     nPart = det->GetEntriesFast(); 
   
 	
-    Int_t iDet = 0;
-    
-    Int_t nPart_VFTX[8] = {0};
-    Int_t nPart_LEAD[8] = {0};
-    Int_t nPart_TRAI[8] = {0};
-
-    
+    Int_t iDet = 0;   
 
     for (Int_t iPart = 0; iPart < nPart; iPart++) 
    {
@@ -1148,18 +1241,15 @@ if(fMappedItems.at(DET_BMON)){
 		 
 	  time_V[iPart][iCha] = 0./0.;   
 	  if(!(IS_NAN(calData->GetTimeV_ns(iCha)))){   // VFTX
-		nPart_VFTX[iCha] += 1;
 	  	time_V[iPart][iCha] = calData->GetTimeV_ns(iCha);
 	  }	
 	  	  
 	  time_L[iPart][iCha] = 0./0.;
 	  if(!(IS_NAN(calData->GetTimeL_ns(iCha)))){   // TAMEX leading
-		nPart_LEAD[iCha] += 1;
 		time_L[iPart][iCha]=calData->GetTimeL_ns(iCha);
 	  }	
 	  time_T[iPart][iCha] = 0./0.;
 	  if(!(IS_NAN(calData->GetTimeT_ns(iCha)))){   // TAMEX trailing
-		nPart_TRAI[iCha] += 1;
 		time_T[iPart][iCha]=calData->GetTimeT_ns(iCha); 
 	  }
       
@@ -1174,7 +1264,6 @@ if(fMappedItems.at(DET_BMON)){
     
  // Sorting VFTX data:
 
-//HEAD
 	std::qsort(time_V, nPart, sizeof(*time_V),
         [](const void *arg1, const void *arg2)->int
         {
@@ -1186,9 +1275,6 @@ if(fMappedItems.at(DET_BMON)){
         });
 // End sorting      
      
-       fNEvents_LOS = fNEvents_LOS+1;
-     //  cout<<"fNEvents LOS= "<<fNEvents_LOS<<endl;
-        
     for (Int_t iPart = 0; iPart < nPart; iPart++)     
     {
 		   
@@ -1222,134 +1308,6 @@ if(fMappedItems.at(DET_BMON)){
       
 // We will consider only events in which booth MCFD and TAMEX see same number of channels:
       if(iLOSTypeTAMEX  && iLOSTypeMCFD ) iLOSType = true;
-//=======
-      // lt=0, l=1,lb=2,b=3,rb=4,r=5,rt=6,t=7 
-// AKH changes
-      // VFTX Channels 1-4:
-      if(!(IS_NAN(calData->fTimeV_r_ns))) {
-	time_V_temp[iPart][5] = calData->fTimeV_r_ns;
-	if(nPart == 1) time_V[iPart][5] = time_V_temp[iPart][5]; 
-	if(nPart > 1) time_V[nPart-1-iPart][5] = time_V_temp[iPart][5];
-	nPart_VFTX[5] += 1;
-      }	  
-      if(!(IS_NAN(calData->fTimeV_t_ns))) {
-	time_V_temp[iPart][7] = calData->fTimeV_t_ns;
-	if(nPart == 1) time_V[iPart][7] = time_V_temp[iPart][7]; 
-	if(nPart > 1) time_V[nPart-1-iPart][7] = time_V_temp[iPart][7];
-	nPart_VFTX[7] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeV_l_ns))) {
-	time_V_temp[iPart][1] = calData->fTimeV_l_ns;
-	if(nPart == 1) time_V[iPart][1] = time_V_temp[iPart][1]; 
-	if(nPart > 1) time_V[nPart-1-iPart][1] = time_V_temp[iPart][1];
-	nPart_VFTX[1] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeV_b_ns))) {
-	time_V_temp[iPart][3] = calData->fTimeV_b_ns;
-	if(nPart == 1) time_V[iPart][3] = time_V_temp[iPart][3]; 
-	if(nPart > 1) time_V[nPart-1-iPart][3] = time_V_temp[iPart][3];  
-	nPart_VFTX[3] += 1;
-      }	
-      // VFTX Channels 5-8:
-      if(!(IS_NAN(calData->fTimeV_rt_ns))) {
-	time_V_temp[iPart][6] = calData->fTimeV_rt_ns;
-	if(nPart == 1) time_V[iPart][6] = time_V_temp[iPart][6]; 
-	if(nPart > 1) time_V[nPart-1-iPart][6] = time_V_temp[iPart][6];
-	nPart_VFTX[6] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeV_lt_ns))) {
-	time_V_temp[iPart][0] = calData->fTimeV_lt_ns;
-	if(nPart == 1) time_V[iPart][0] = time_V_temp[iPart][0]; 
-	if(nPart > 1) time_V[nPart-1-iPart][0] = time_V_temp[iPart][0];
-	nPart_VFTX[0] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeV_lb_ns))) {
-	time_V_temp[iPart][2] = calData->fTimeV_lb_ns;
-	if(nPart == 1) time_V[iPart][2] = time_V_temp[iPart][2]; 
-	if(nPart > 1) time_V[nPart-1-iPart][2] = time_V_temp[iPart][2];
-	nPart_VFTX[2] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeV_rb_ns))) {
-	time_V_temp[iPart][4] = calData->fTimeV_rb_ns;
-	if(nPart == 1) time_V[iPart][4] = time_V_temp[iPart][4]; 
-	if(nPart > 1) time_V[nPart-1-iPart][4] = time_V_temp[iPart][4];                 
-	nPart_VFTX [4]+= 1;
-      }	
-// AKH end      
-      
-      // TAMEX Channels 1-4:      
-      if(!(IS_NAN(calData->fTimeL_r_ns))) {
-	time_L[iPart][5] = calData->fTimeL_r_ns;
-	nPart_LEAD[5] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_r_ns))) {
-	time_T[iPart][5] = calData->fTimeT_r_ns;
-	nPart_TRAI[5] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeL_t_ns))) {
-	time_L[iPart][7] = calData->fTimeL_t_ns;
-	nPart_LEAD[7] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_t_ns))) {
-	time_T[iPart][7] = calData->fTimeT_t_ns;
-	nPart_TRAI[7] += 1;
-      }	  
-      if(!(IS_NAN(calData->fTimeL_l_ns))) {
-	time_L[iPart][1] = calData->fTimeL_l_ns;
-	nPart_LEAD[1] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_l_ns))) {
-	time_T[iPart][1] = calData->fTimeT_l_ns; 
-	nPart_TRAI[1] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeL_b_ns))) {
-	time_L[iPart][3] = calData->fTimeL_b_ns;
-	nPart_LEAD[3] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_b_ns))) {
-	time_T[iPart][3] = calData->fTimeT_b_ns;  
-	nPart_TRAI[3] += 1;
-      }	
-      // TAMEX Channels 5-8:
-      if(!(IS_NAN(calData->fTimeL_rt_ns))) {
-	time_L[iPart][6] = calData->fTimeL_rt_ns;
-	nPart_LEAD[6] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_rt_ns))) {
-	time_T[iPart][6] = calData->fTimeT_rt_ns;
-	nPart_TRAI[6] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeL_lt_ns))) {
-	time_L[iPart][0] = calData->fTimeL_lt_ns;
-	nPart_LEAD[0] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_lt_ns))) {
-	time_T[iPart][0] = calData->fTimeT_lt_ns; 
-	nPart_TRAI[0] += 1;
-      }	 
-      if(!(IS_NAN(calData->fTimeL_lb_ns))) {
-	time_L[iPart][2] = calData->fTimeL_lb_ns;
-	nPart_LEAD[2] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_lb_ns))) {
-	time_T[iPart][2] = calData->fTimeT_lb_ns; 
-	nPart_TRAI[2] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeL_rb_ns))) {
-	time_L[iPart][4] = calData->fTimeL_rb_ns;
-	nPart_LEAD[4] += 1;
-      }	
-      if(!(IS_NAN(calData->fTimeT_rb_ns))) {
-	time_T[iPart][4] = calData->fTimeT_rb_ns;  
-	nPart_TRAI[4] += 1;
-      }	
-
-// AKH added
-   }
-   for (Int_t iPart = 0; iPart < nPart; iPart++)     
-    {
-// AKH end		
-// >>>>>>> Changes for s473
 
 
       if(iDet==1)
@@ -1434,7 +1392,7 @@ if(fMappedItems.at(DET_BMON)){
      
      if(iPart < 1 ) {
 			Double_t timediff=float(header->GetTimeStamp()-time_V_mem);
-			fh_los_dt_first_ToT->Fill(timediff,totsum[iPart]);
+			fh_los_dt_first_ToT->Fill(timediff/1.e3,totsum[iPart]);
 	 }			 
 	 
 	 if(iPart > 0) fh_los_dt_hits_ToT->Fill(timeLosM[iPart]-timeLosM[iPart-1],totsum[iPart]);
@@ -1797,8 +1755,12 @@ if(fMappedItems.at(DET_BMON)){
 //                    cout<<"Test: "<<ifibcount<<" ifib: "<<iFib<<" single PMT: "<< (iFib-1)%2+1+2*((iFib-1)/512)<<endl;
                     }
                     
-                    if(ifibcount==9 || ifibcount==10){
+                    if(ifibcount==9 || ifibcount==10 ){
                         fh_ToT_single_Fib[ifibcount]->Fill((iFib-1)/256+1,hit->GetSPMTToT_ns());
+                    }
+                    
+                    if(ifibcount==4 || ifibcount==5 ){
+                        fh_ToT_single_Fib[ifibcount]->Fill((iFib-1)%2+1,hit->GetSPMTToT_ns());
                     }
                 }  
             }  // end for(ihit)
@@ -2323,12 +2285,14 @@ void R3BOnlineSpectra::FinishTask()
  
  if(fMappedItems.at(DET_BMON)){ 
     fhTpat->Write();
-  //  fh_spill_length->Write();
+    fh_spill_length->Write();
     fhTrigger->Write();
-    fh_SEETRAM->Write();
     fh_IC->Write();
+    fh_SEE->Write();
     fh_TOFDOR->Write();
-    
+    fh_IC_spill->Write();
+    fh_SEE_spill->Write();
+    fh_TOFDOR_spill->Write();
 }  
   if(fCalItems.at(DET_TOFD))
   {
