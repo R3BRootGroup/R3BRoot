@@ -34,12 +34,12 @@ R3BWhiterabbitCalifaReader::~R3BWhiterabbitCalifaReader()
 Bool_t R3BWhiterabbitCalifaReader::Init(ext_data_struct_info *a_struct_info)
 {
   Int_t ok;
-  LOG(INFO) << "R3BWhiterabbitCalifaReader::Init" << FairLogger::endl;
+  LOG(INFO) << "R3BWhiterabbitCalifaReader::Init";
   EXT_STR_h101_WRCALIFA_ITEMS_INFO(ok, *a_struct_info, fOffset,
 	    EXT_STR_h101_WRCALIFA, 0);
 
   if (!ok) {
-     LOG(ERROR)<<"R3BWhiterabbitCalifaReader::Failed to setup structure information."<<FairLogger::endl;
+     LOG(ERROR)<<"R3BWhiterabbitCalifaReader::Failed to setup structure information.";
      return kFALSE;
   }
 

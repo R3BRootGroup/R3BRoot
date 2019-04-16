@@ -40,36 +40,36 @@ void R3BPspxPrecalPar::clear()
 
 void R3BPspxPrecalPar::printparams()
 {
-    LOG(INFO) << "Print" << FairLogger::endl;
-    LOG(INFO) << "pspxprecalpardetector: " << pspxprecalpardetector << FairLogger::endl;
+    LOG(INFO) << "Print";
+    LOG(INFO) << "pspxprecalpardetector: " << pspxprecalpardetector;
     Int_t size = pspxprecalparstrip.GetSize();
-    LOG(INFO) << "pspxprecalparstrip size: " << size << FairLogger::endl;
-    LOG(INFO) << "Detectorno.: No. of Strips, Orientation of strips" << FairLogger::endl;
+    LOG(INFO) << "pspxprecalparstrip size: " << size;
+    LOG(INFO) << "Detectorno.: No. of Strips, Orientation of strips";
     for (Int_t i = 0; i < size; i++)
     {
         LOG(INFO) << i << " :" << pspxprecalparstrip.GetAt(i) << ", " << pspxprecalparorientation.GetAt(i)
-                  << FairLogger::endl;
+                 ;
     }
 
     size = pspxprecalpargain.GetSize();
-    LOG(INFO) << "pspxprecalpargain size: " << size << FairLogger::endl;
+    LOG(INFO) << "pspxprecalpargain size: " << size;
     for (Int_t i = 0; i < size; i++)
     {
-        LOG(INFO) << i << " :" << pspxprecalpargain.GetAt(i) << FairLogger::endl;
+        LOG(INFO) << i << " :" << pspxprecalpargain.GetAt(i);
     }
 
     size = pspxprecalparenergythreshold.GetSize();
-    LOG(INFO) << "pspxprecalparenergythreshold size: " << size << FairLogger::endl;
+    LOG(INFO) << "pspxprecalparenergythreshold size: " << size;
     for (Int_t i = 0; i < size; i++)
     {
-        LOG(INFO) << i << " :" << pspxprecalparenergythreshold.GetAt(i) << FairLogger::endl;
+        LOG(INFO) << i << " :" << pspxprecalparenergythreshold.GetAt(i);
     }
 }
 
 void R3BPspxPrecalPar::putParams(FairParamList* l)
 {
     //   print();
-    LOG(INFO) << "I am in R3BPspxPrecalPar::putParams " << FairLogger::endl;
+    LOG(INFO) << "I am in R3BPspxPrecalPar::putParams ";
     if (!l)
     {
         return;
@@ -91,12 +91,12 @@ void R3BPspxPrecalPar::putParams(FairParamList* l)
         }
         else
         {
-            LOG(ERROR) << "R3BPspxPrecalPar::putParams: Orientation of Detector not valid! " << FairLogger::endl;
+            LOG(ERROR) << "R3BPspxPrecalPar::putParams: Orientation of Detector not valid! ";
         }
     }
     // count all entries: lines with strip info + lines with detector info
     Int_t array_size = (count_strips * 2 + pspxprecalpardetector * 2);
-    LOG(INFO) << "R3BPspxPrecalGainForStrips Array Size: " << array_size << FairLogger::endl;
+    LOG(INFO) << "R3BPspxPrecalGainForStrips Array Size: " << array_size;
     pspxprecalpargain.Set(array_size);
     l->add("R3BPspxPrecalGainForStrips", pspxprecalpargain);
 
@@ -111,7 +111,7 @@ void R3BPspxPrecalPar::putParams(FairParamList* l)
     }
     // count all entries: lines with channel info + lines with detector info + lines with cathode channel info
     array_size = (count_strips * 2 * 2 + pspxprecalpardetector * 2 + count_cathode * 2);
-    LOG(INFO) << "R3BPspxPrecalEnergyThresholdForChannels Array Size: " << array_size << FairLogger::endl;
+    LOG(INFO) << "R3BPspxPrecalEnergyThresholdForChannels Array Size: " << array_size;
     pspxprecalparenergythreshold.Set(array_size);
     l->add("R3BPspxPrecalEnergyThresholdForChannels", pspxprecalparenergythreshold);
 }
@@ -119,7 +119,7 @@ void R3BPspxPrecalPar::putParams(FairParamList* l)
 Bool_t R3BPspxPrecalPar::getParams(FairParamList* l)
 {
     // print();
-    LOG(INFO) << "I am in R3BPspxPrecalPar::getParams " << FairLogger::endl;
+    LOG(INFO) << "I am in R3BPspxPrecalPar::getParams ";
 
     if (!l)
     {
@@ -154,18 +154,18 @@ Bool_t R3BPspxPrecalPar::getParams(FairParamList* l)
         }
         else
         {
-            LOG(ERROR) << "R3BPspxPrecalPar::getParams: Orientation of Detector not valid! " << FairLogger::endl;
+            LOG(ERROR) << "R3BPspxPrecalPar::getParams: Orientation of Detector not valid! ";
             return kFALSE;
         }
     }
-    LOG(INFO) << "Total number of strips: " << count_strips << FairLogger::endl;
+    LOG(INFO) << "Total number of strips: " << count_strips;
     // count all entries: lines with strip info + lines with detector info
     Int_t array_size = (count_strips * 2 + pspxprecalpardetector * 2);
-    LOG(INFO) << "R3BPspxPrecalGainForStrips Array Size: " << array_size << FairLogger::endl;
+    LOG(INFO) << "R3BPspxPrecalGainForStrips Array Size: " << array_size;
     pspxprecalpargain.Set(array_size);
     if (!(l->fill("R3BPspxPrecalGainForStrips", &pspxprecalpargain)))
     {
-        LOG(WARNING) << "Could not initialize R3BPspxPrecalGainForStrips" << FairLogger::endl;
+        LOG(WARNING) << "Could not initialize R3BPspxPrecalGainForStrips";
         return kFALSE;
     }
 
@@ -178,14 +178,14 @@ Bool_t R3BPspxPrecalPar::getParams(FairParamList* l)
         }
         // else: for X5/orientation=3, count_cathode=0;
     }
-    LOG(INFO) << "Number of detectors with cathode: " << count_cathode << FairLogger::endl;
+    LOG(INFO) << "Number of detectors with cathode: " << count_cathode;
     // count all entries: lines with channel info + lines with detector info + lines with cathode channel info
     array_size = (count_strips * 2 * 2 + pspxprecalpardetector * 2 + count_cathode * 2);
-    LOG(INFO) << "R3BPspxPrecalEnergyThresholdForChannels Array Size: " << array_size << FairLogger::endl;
+    LOG(INFO) << "R3BPspxPrecalEnergyThresholdForChannels Array Size: " << array_size;
     pspxprecalparenergythreshold.Set(array_size);
     if (!(l->fill("R3BPspxPrecalEnergyThresholdForChannels", &pspxprecalparenergythreshold)))
     {
-        LOG(WARNING) << "Could not initialize R3BPspxPrecalEnergyThresholdForChannels" << FairLogger::endl;
+        LOG(WARNING) << "Could not initialize R3BPspxPrecalEnergyThresholdForChannels";
         return kFALSE;
     }
 

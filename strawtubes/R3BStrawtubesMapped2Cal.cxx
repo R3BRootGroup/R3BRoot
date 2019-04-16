@@ -43,8 +43,7 @@ void R3BStrawtubesMapped2Cal::Exec(Option_t *option)
     R3BStrawtubesMappedData *mapped = (R3BStrawtubesMappedData
         *)fMappedItems->At(mapped_i);
     if (!mapped) {
-      LOG(ERROR) << "R3BStrawtubesMapped2Cal::Exec: NULL mapped item?" <<
-          FairLogger::endl;
+      LOG(ERROR) << "R3BStrawtubesMapped2Cal::Exec: NULL mapped item?";
       continue;
     }
 
@@ -54,7 +53,7 @@ void R3BStrawtubesMapped2Cal::Exec(Option_t *option)
       LOG(ERROR) << "R3BStrawtubesMapped2Cal::Exec: Tcal par not found, "
           "mapped=(plane=" << (int)mapped->GetPlane() << ",side=" <<
           (int)mapped->GetSide() << ",straw=" << (int)mapped->GetStraw() <<
-          ")" << FairLogger::endl;
+          ")";
       continue;
     }
 
@@ -63,8 +62,7 @@ void R3BStrawtubesMapped2Cal::Exec(Option_t *option)
       LOG(ERROR) << "R3BStrawtubesMapped2Cal::Exec: Bad fine time, "
           "mapped=(plane=" << mapped->GetPlane() << ",side=" <<
           mapped->GetSide() << ",straw=" << mapped->GetStraw() <<
-          ", raw=" << mapped->GetTimeFine() << ", ns=" << time_ns << "." <<
-          FairLogger::endl;
+          ", raw=" << mapped->GetTimeFine() << ", ns=" << time_ns << ".";
       continue;
     }
 
@@ -82,8 +80,7 @@ void R3BStrawtubesMapped2Cal::Exec(Option_t *option)
       }
       // Pile-up galore?
       if (COINC_NS > fabs(cal_test->GetTime(mapped->GetSide()) - time_ns)) {
-        LOG(ERROR) << "R3BStrawtubesMapped2Cal::Exec: Crazy pileup." <<
-            FairLogger::endl;
+        LOG(ERROR) << "R3BStrawtubesMapped2Cal::Exec: Crazy pileup.";
         continue;
       }
       // Out of range.
@@ -118,7 +115,7 @@ void R3BStrawtubesMapped2Cal::FinishTask()
 InitStatus R3BStrawtubesMapped2Cal::Init()
 {
   if (0 == fTcalPar->GetNumModulePar()) {
-    LOG(ERROR) << "There are no TCal parameters in container StrawtubesTCalPar" << FairLogger::endl;
+    LOG(ERROR) << "There are no TCal parameters in container StrawtubesTCalPar";
     return kFATAL;
   }
 
@@ -147,7 +144,7 @@ void R3BStrawtubesMapped2Cal::SetParContainers()
 {
   fTcalPar = (R3BTCalPar *)FairRuntimeDb::instance()->getContainer("StrawtubesTCalPar");
   if (!fTcalPar) {
-    LOG(ERROR) << "No StrawtubesTCalPar container." << FairLogger::endl;
+    LOG(ERROR) << "No StrawtubesTCalPar container.";
     return;
   }
 }

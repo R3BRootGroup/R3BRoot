@@ -87,7 +87,7 @@ R3BNeuland::~R3BNeuland()
 
 void R3BNeuland::Initialize()
 {
-    LOG(INFO) << "R3BNeuland initialization ..." << FairLogger::endl;
+    LOG(INFO) << "R3BNeuland initialization ...";
 
     FairDetector::Initialize();
 
@@ -102,7 +102,7 @@ Bool_t R3BNeuland::ProcessHits(FairVolume*)
     {
         if (!fLastHitDone)
         {
-            LOG(WARNING) << "R3BNeuland: Incomplete hit discarded" << FairLogger::endl;
+            LOG(WARNING) << "R3BNeuland: Incomplete hit discarded";
             ResetValues();
         }
 
@@ -138,7 +138,7 @@ Bool_t R3BNeuland::ProcessHits(FairVolume*)
         // Add Point
         LOG(DEBUG) << "R3BNeuland: Adding Point at (" << fPosIn.X() << ", " << fPosIn.Y() << ", " << fPosIn.Z()
                    << ") cm,  paddle " << fPaddleID << ", track " << fTrackID << ", energy loss " << fELoss << " GeV "
-                   << gMC->GetStack()->GetCurrentParentTrackNumber() << FairLogger::endl;
+                   << gMC->GetStack()->GetCurrentParentTrackNumber();
 
         Int_t size = fNeulandPoints->GetEntriesFast();
         new ((*fNeulandPoints)[size]) R3BNeulandPoint(fTrackID,
@@ -182,7 +182,7 @@ void R3BNeuland::PostTrack()
             LOG(DEBUG) << "R3BNeuland::PostTrack()"
                        << " TrackNumber: " << ((R3BStack*)gMC->GetStack())->GetCurrentTrackNumber() << " XYZTE "
                        << pos.X() << " " << pos.Y() << " " << pos.Z() << " " << pos.T() << " " << mom.E()
-                       << " VolName: " << gMC->CurrentVolName() << " PaddleID: " << paddleID << FairLogger::endl;
+                       << " VolName: " << gMC->CurrentVolName() << " PaddleID: " << paddleID;
 
             Int_t size = fNeulandPrimaryNeutronInteractionPoints->GetEntriesFast();
             new ((*fNeulandPrimaryNeutronInteractionPoints)[size]) FairMCPoint(gMC->GetStack()->GetCurrentTrackNumber(),
@@ -232,9 +232,9 @@ void R3BNeuland::Register()
 void R3BNeuland::Print(Option_t*) const
 {
     LOG(INFO) << "R3BNeuland: " << fNeulandPoints->GetEntries() << " Neuland Points registered in this event"
-              << FairLogger::endl;
+             ;
     LOG(INFO) << "R3BNeuland: " << fNeulandPrimaryNeutronInteractionPoints->GetEntries()
-              << " Neuland Primary Neutron Interaction Points registered in this event" << FairLogger::endl;
+              << " Neuland Primary Neutron Interaction Points registered in this event";
 }
 
 void R3BNeuland::Reset()
@@ -276,7 +276,7 @@ void R3BNeuland::WriteParameterFile()
 
     if (!geoNodeNeuland)
     {
-        LOG(FATAL) << "volNeuland not found" << FairLogger::endl;
+        LOG(FATAL) << "volNeuland not found";
     }
 
     fNeulandGeoPar->SetNeulandGeoNode(geoNodeNeuland);

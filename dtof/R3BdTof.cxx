@@ -69,13 +69,13 @@ void R3BdTof::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BdTof: initialisation" << FairLogger::endl;
-    LOG(DEBUG) << "R3BdTof: Sci. Vol. (McId) " << gMC->VolId("dTOFLog") << FairLogger::endl;
+    LOG(INFO) << "R3BdTof: initialisation";
+    LOG(DEBUG) << "R3BdTof: Sci. Vol. (McId) " << gMC->VolId("dTOFLog");
 }
 
 void R3BdTof::SetSpecialPhysicsCuts()
 {
-    LOG(INFO) << "-I- R3BdTof: Adding customized Physics cut ... " << FairLogger::endl;
+    LOG(INFO) << "-I- R3BdTof: Adding customized Physics cut ... ";
 
     if (gGeoManager)
     {
@@ -100,7 +100,7 @@ void R3BdTof::SetSpecialPhysicsCuts()
             Double_t cutE = fCutE; // GeV-> 1 keV
 
             LOG(INFO) << "-I- R3BdTof: plasticFormTOF Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE
-                      << " GeV" << FairLogger::endl;
+                      << " GeV";
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
             gMC->Gstpar(pSi->GetId(), "CUTELE", cutE); /** electrons (GeV)*/
@@ -261,7 +261,7 @@ TClonesArray* R3BdTof::GetCollection(Int_t iColl) const
 void R3BdTof::Print(Option_t* option) const
 {
     Int_t nHits = fdTofCollection->GetEntriesFast();
-    LOG(INFO) << "R3BdTof: " << nHits << " points registered in this event" << FairLogger::endl;
+    LOG(INFO) << "R3BdTof: " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
@@ -277,7 +277,7 @@ void R3BdTof::Reset()
 void R3BdTof::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BdTof: " << nEntries << " entries to add" << FairLogger::endl;
+    LOG(INFO) << "R3BdTof: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
     R3BdTofPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -288,7 +288,7 @@ void R3BdTof::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BdTofPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BdTof: " << cl2->GetEntriesFast() << " merged entries" << FairLogger::endl;
+    LOG(INFO) << "R3BdTof: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -307,7 +307,7 @@ R3BdTofPoint* R3BdTof::AddHit(Int_t trackID,
     if (fVerboseLevel > 1)
         LOG(INFO) << "R3BdTof: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV"
-                  << FairLogger::endl;
+                 ;
     return new (clref[size]) R3BdTofPoint(trackID, detID, posIn, posOut, momIn, momOut, time, length, eLoss);
 }
 

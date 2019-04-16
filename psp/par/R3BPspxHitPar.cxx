@@ -44,52 +44,52 @@ void R3BPspxHitPar::clear()
 
 void R3BPspxHitPar::printparams()
 {
-    LOG(INFO) << "Print" << FairLogger::endl;
-    LOG(INFO) << "pspxhitpardetector: " << pspxhitpardetector << FairLogger::endl;
+    LOG(INFO) << "Print";
+    LOG(INFO) << "pspxhitpardetector: " << pspxhitpardetector;
     Int_t size = pspxhitparstrip.GetSize();
-    LOG(INFO) << "pspxhitparstrip size: " << size << FairLogger::endl;
+    LOG(INFO) << "pspxhitparstrip size: " << size;
 
     size = pspxhitparorientation.GetSize();
-    LOG(INFO) << "pspxhitparorientation size: " << size << FairLogger::endl;
+    LOG(INFO) << "pspxhitparorientation size: " << size;
 
     size = pspxhitparorientationxposition.GetSize();
-    LOG(INFO) << "pspxhitparorientationxposition size: " << size << FairLogger::endl;
+    LOG(INFO) << "pspxhitparorientationxposition size: " << size;
 
     size = pspxhitparorientationyposition.GetSize();
-    LOG(INFO) << "pspxhitparorientationyposition size: " << size << FairLogger::endl;
+    LOG(INFO) << "pspxhitparorientationyposition size: " << size;
 
     size = pspxhitparorientationxstrip.GetSize();
-    LOG(INFO) << "pspxhitparorientationxstrip size: " << size << FairLogger::endl;
+    LOG(INFO) << "pspxhitparorientationxstrip size: " << size;
 
     size = pspxhitparorientationystrip.GetSize();
-    LOG(INFO) << "pspxhitparorientationystrip size: " << size << FairLogger::endl;
+    LOG(INFO) << "pspxhitparorientationystrip size: " << size;
 
     size = pspxhitparlength.GetSize();
-    LOG(INFO) << "pspxhitparlength size: " << size << FairLogger::endl;
+    LOG(INFO) << "pspxhitparlength size: " << size;
 
     LOG(INFO) << "Detectorno.: No. of Strips, Orientation of Strips, Orientation X Position, Orientation Y Position, "
                  "Orientation X Strips, Orientation Y Strips, Length of Detector"
-              << FairLogger::endl;
+             ;
     for (Int_t i = 0; i < size; i++)
     {
         LOG(INFO) << i << " :" << pspxhitparstrip.GetAt(i) << ", " << pspxhitparorientation.GetAt(i) << ", "
                   << pspxhitparorientationxposition.GetAt(i) << ", " << pspxhitparorientationyposition.GetAt(i) << ", "
                   << pspxhitparorientationxstrip.GetAt(i) << ", " << pspxhitparorientationystrip.GetAt(i) << ", "
-                  << pspxhitparlength.GetAt(i) << FairLogger::endl;
+                  << pspxhitparlength.GetAt(i);
     }
 
     size = pspxhitparlinearparam.GetSize();
-    LOG(INFO) << "size: " << size << FairLogger::endl;
+    LOG(INFO) << "size: " << size;
     for (Int_t i = 0; i < size; i++)
     {
-        LOG(INFO) << i << " :" << pspxhitparlinearparam.GetAt(i) << FairLogger::endl;
+        LOG(INFO) << i << " :" << pspxhitparlinearparam.GetAt(i);
     }
 }
 
 void R3BPspxHitPar::putParams(FairParamList* l)
 {
     //   print();
-    LOG(INFO) << "I am in R3BPspxHitPar::putParams " << FairLogger::endl;
+    LOG(INFO) << "I am in R3BPspxHitPar::putParams ";
     if (!l)
     {
         return;
@@ -116,13 +116,13 @@ void R3BPspxHitPar::putParams(FairParamList* l)
         }
         else
         {
-            LOG(ERROR) << "R3BPspxHitPar::putParams: Orientation of Detector not valid! " << FairLogger::endl;
+            LOG(ERROR) << "R3BPspxHitPar::putParams: Orientation of Detector not valid! ";
         }
     }
     // count all entries: lines with strip info + lines with detector info,
     // can change when more than a linear polynomial function is used => more parameters
     Int_t array_size = (count_strips * 3 + pspxhitpardetector * 2);
-    LOG(INFO) << "Array Size: " << array_size << FairLogger::endl;
+    LOG(INFO) << "Array Size: " << array_size;
     pspxhitparlinearparam.Set(array_size);
     l->add("R3BPspxHitLinearParamForStrips", pspxhitparlinearparam);
 }
@@ -130,7 +130,7 @@ void R3BPspxHitPar::putParams(FairParamList* l)
 Bool_t R3BPspxHitPar::getParams(FairParamList* l)
 {
     // print();
-    LOG(INFO) << "I am in R3BPspxHitPar::getParams " << FairLogger::endl;
+    LOG(INFO) << "I am in R3BPspxHitPar::getParams ";
 
     if (!l)
     {
@@ -185,19 +185,19 @@ Bool_t R3BPspxHitPar::getParams(FairParamList* l)
         }
         else
         {
-            LOG(ERROR) << "R3BPspxHitPar::getParams: Orientation of Detector not valid! " << FairLogger::endl;
+            LOG(ERROR) << "R3BPspxHitPar::getParams: Orientation of Detector not valid! ";
             return kFALSE;
         }
     }
-    LOG(INFO) << "Total number of strips: " << count_strips << FairLogger::endl;
+    LOG(INFO) << "Total number of strips: " << count_strips;
     // count all entries: lines with strip info + lines with detector info,
     // can change when more than a linear polynomial function is used => more parameters
     Int_t array_size = (count_strips * 3 + pspxhitpardetector * 2);
-    LOG(INFO) << "Array Size: " << array_size << FairLogger::endl;
+    LOG(INFO) << "Array Size: " << array_size;
     pspxhitparlinearparam.Set(array_size);
     if (!(l->fill("R3BPspxHitLinearParamForStrips", &pspxhitparlinearparam)))
     {
-        LOG(WARNING) << "Could not initialize R3BPspxHitLinearParamForStrips" << FairLogger::endl;
+        LOG(WARNING) << "Could not initialize R3BPspxHitLinearParamForStrips";
         return kFALSE;
     }
 

@@ -47,7 +47,7 @@ void R3BNeulandClusterFinder::Exec(Option_t*)
         });
     fClusters.Store(clusters);
 
-    LOG(DEBUG) << "R3BNeulandClusterFinder - nDigis nCluster:" << nDigis << " " << clusters.size() << FairLogger::endl;
+    LOG(DEBUG) << "R3BNeulandClusterFinder - nDigis nCluster:" << nDigis << " " << clusters.size();
 }
 
 ClassImp(R3BNeulandClusterFinder);

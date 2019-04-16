@@ -44,7 +44,7 @@ Bool_t R3BLosReader::Init(ext_data_struct_info *a_struct_info)
 	// present though and hence may be null. Take care when using.
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(ERROR) <<  "FairRootManager not found" <<FairLogger::endl; 
+        LOG(ERROR) <<  "FairRootManager not found"; 
     	
 	header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     

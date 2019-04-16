@@ -29,7 +29,7 @@ R3BNeulandClusterMon::R3BNeulandClusterMon(TString input, TString output, const 
     , fOutput(std::move(output))
     , fBeta(0.793) // 600 Mev?
 {
-    LOG(INFO) << "Using R3B NeuLAND NeulandCluster Monitor" << FairLogger::endl;
+    LOG(INFO) << "Using R3B NeuLAND NeulandCluster Monitor";
 
     TString opt = option;
     opt.ToUpper();
@@ -37,7 +37,7 @@ R3BNeulandClusterMon::R3BNeulandClusterMon(TString input, TString output, const 
     if (opt.Contains("3DTRACK"))
     {
         fIs3DTrackEnabled = true;
-        LOG(INFO) << "... with 3D track visualization" << FairLogger::endl;
+        LOG(INFO) << "... with 3D track visualization";
     }
     else
     {
@@ -52,7 +52,7 @@ InitStatus R3BNeulandClusterMon::Init()
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
     {
-        LOG(FATAL) << "R3BNeulandClusterMon::Init: No FairRootManager" << FairLogger::endl;
+        LOG(FATAL) << "R3BNeulandClusterMon::Init: No FairRootManager";
         return kFATAL;
     }
 

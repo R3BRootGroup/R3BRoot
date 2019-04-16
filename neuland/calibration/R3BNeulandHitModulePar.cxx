@@ -15,7 +15,7 @@ R3BNeulandHitModulePar::~R3BNeulandHitModulePar() {}
 
 void R3BNeulandHitModulePar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BNeulandHitModulePar::putParams() called" << FairLogger::endl;
+    LOG(INFO) << "R3BNeulandHitModulePar::putParams() called";
     if (!list)
     {
         return;
@@ -76,9 +76,9 @@ void R3BNeulandHitModulePar::clear() {}
 
 void R3BNeulandHitModulePar::printParams()
 {
-    LOG(INFO) << "   R3BNeulandHitModulePar: Calibration Parameters: " << FairLogger::endl;
-    LOG(INFO) << "   fBarId: " << fModuleId << FairLogger::endl;
-    LOG(INFO) << "   fSide: " << fSide << FairLogger::endl;
+    LOG(INFO) << "   R3BNeulandHitModulePar: Calibration Parameters: ";
+    LOG(INFO) << "   fBarId: " << fModuleId;
+    LOG(INFO) << "   fSide: " << fSide;
     char strMessage[1000];
     sprintf(strMessage, "   fTimeOffset: %4.2f  ±   %4.2f\n", fTimeOffset, fTimeOffsetError);
     LOG(info) << strMessage;

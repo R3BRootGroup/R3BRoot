@@ -47,7 +47,7 @@ R3BStartrackCal2Hit::R3BStartrackCal2Hit() : FairTask("R3B STaRTracker Hit Raw S
 
 R3BStartrackCal2Hit::~R3BStartrackCal2Hit() {
 
-  LOG(INFO) << "R3BStartrackCal2Hit: Delete instance" << FairLogger::endl;
+  LOG(INFO) << "R3BStartrackCal2Hit: Delete instance";
   delete fStartrackHitCA;
   delete fStartrackerHitCA;
 
@@ -66,8 +66,8 @@ void R3BStartrackCal2Hit::SetParContainers() {
   fStartrackHitPar = (R3BStartrackHitPar*)(rtdb->getContainer("R3BStartrackHitPar"));
 
   if ( fStartrackHitPar ) {
-      LOG(INFO) << "-I- R3BStartrackCal2Hit::SetParContainers() "<< FairLogger::endl;
-      LOG(INFO) << "-I- Container R3BStartrackHitPar  loaded " << FairLogger::endl;
+      LOG(INFO) << "-I- R3BStartrackCal2Hit::SetParContainers() ";
+      LOG(INFO) << "-I- Container R3BStartrackHitPar  loaded ";
   }
 
 }

@@ -34,12 +34,12 @@ R3BWhiterabbitMasterReader::~R3BWhiterabbitMasterReader()
 Bool_t R3BWhiterabbitMasterReader::Init(ext_data_struct_info *a_struct_info)
 {
   Int_t ok;
-  LOG(INFO) << "R3BWhiterabbitMasterReader::Init" << FairLogger::endl;
+  LOG(INFO) << "R3BWhiterabbitMasterReader::Init";
   EXT_STR_h101_WRMASTER_ITEMS_INFO(ok, *a_struct_info, fOffset,
 	    EXT_STR_h101_WRMASTER, 0);
 
   if (!ok) {
-     LOG(ERROR)<<"R3BWhiterabbitMasterReader::Failed to setup structure information."<<FairLogger::endl;
+     LOG(ERROR)<<"R3BWhiterabbitMasterReader::Failed to setup structure information.";
      return kFALSE;
   }
 

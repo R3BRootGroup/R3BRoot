@@ -72,11 +72,11 @@ InitStatus R3BTofdMapped2TCal::Init()
 {
   fNofTcalPars = fTcalPar->GetNumModulePar();
   if (fNofTcalPars == 0) {
-    LOG(ERROR) << "There are no TCal parameters in container TofdTCalPar" << FairLogger::endl;
+    LOG(ERROR) << "There are no TCal parameters in container TofdTCalPar";
     return kFATAL;
   }
 
-  LOG(INFO) << "R3BTofdMapped2TCal::Init : read " << fNofTcalPars << " modules" << FairLogger::endl;
+  LOG(INFO) << "R3BTofdMapped2TCal::Init : read " << fNofTcalPars << " modules";
 
   // try to get a handle on the EventHeader. EventHeader may not be
   // present though and hence may be null. Take care when using.
@@ -101,7 +101,7 @@ void R3BTofdMapped2TCal::SetParContainers()
 {
   fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofdTCalPar");
   if (!fTcalPar) {
-    LOG(ERROR) << "Could not get access to TofdTCalPar-Container." << FairLogger::endl;
+    LOG(ERROR) << "Could not get access to TofdTCalPar-Container.";
     fNofTcalPars = 0;
     return;
   }
@@ -130,12 +130,12 @@ void R3BTofdMapped2TCal::Exec(Option_t* option)
 
     if ((iDetector<1) || (iDetector>fNofPlanes)) {
       LOG(DEBUG) << "R3BTofdMapped2TCal::Exec : Plane number out of range: " <<
-        iDetector << FairLogger::endl;
+        iDetector;
       continue;
     }
     if ((iBar<1) || (iBar>fPaddlesPerPlane)) {
       LOG(DEBUG) << "R3BTofdMapped2TCal::Exec : Bar number out of range: " <<
-        iBar << ", "<<fPaddlesPerPlane<<FairLogger::endl;
+        iBar << ", "<<fPaddlesPerPlane;
       continue;
     }
 
@@ -161,7 +161,7 @@ void R3BTofdMapped2TCal::Exec(Option_t* option)
 
     if (!par) {
       LOG(INFO) << "R3BTofdMapped2TCal::Exec : Tcal par not found, Plane: " <<
-        iDetector << ", Bar: " << iBar << ", Edge: " << iEdge << FairLogger::endl;
+        iDetector << ", Bar: " << iBar << ", Edge: " << iEdge;
       continue;
     }
 

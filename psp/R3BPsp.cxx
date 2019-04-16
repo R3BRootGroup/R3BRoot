@@ -81,13 +81,13 @@ void R3BPsp::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BPsp: initialisation" << FairLogger::endl;
-    LOG(DEBUG) << "R3BPsp: Vol. (McId) " << gMC->VolId("PSP1Log") << FairLogger::endl;
+    LOG(INFO) << "R3BPsp: initialisation";
+    LOG(DEBUG) << "R3BPsp: Vol. (McId) " << gMC->VolId("PSP1Log");
 }
 
 void R3BPsp::SetSpecialPhysicsCuts()
 {
-    LOG(INFO) << "-I- R3BPsp: Adding customized Physics cut ... " << FairLogger::endl;
+    LOG(INFO) << "-I- R3BPsp: Adding customized Physics cut ... ";
 
     if (gGeoManager)
     {
@@ -112,7 +112,7 @@ void R3BPsp::SetSpecialPhysicsCuts()
             Double_t cutE = fCutE; // GeV-> 1 keV
 
             LOG(INFO) << "-I- R3BPsp: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV"
-                      << FairLogger::endl;
+                     ;
 
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -255,7 +255,7 @@ TClonesArray* R3BPsp::GetCollection(Int_t iColl) const
 void R3BPsp::Print(Option_t* option) const
 {
     Int_t nHits = fPspCollection->GetEntriesFast();
-    LOG(INFO) << "R3BPsp: " << nHits << " points registered in this event" << FairLogger::endl;
+    LOG(INFO) << "R3BPsp: " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
@@ -271,7 +271,7 @@ void R3BPsp::Reset()
 void R3BPsp::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BPsp: " << nEntries << " entries to add" << FairLogger::endl;
+    LOG(INFO) << "R3BPsp: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
     R3BPspPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -282,7 +282,7 @@ void R3BPsp::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BPspPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BPsp: " << cl2->GetEntriesFast() << " merged entries" << FairLogger::endl;
+    LOG(INFO) << "R3BPsp: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -303,7 +303,7 @@ R3BPspPoint* R3BPsp::AddHit(Int_t trackID,
     {
         LOG(INFO) << "R3BPsp: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV"
-                  << FairLogger::endl;
+                 ;
     }
     return new (clref[size]) R3BPspPoint(trackID, detID, plane, posIn, posOut, momIn, momOut, time, length, eLoss);
 }
@@ -314,7 +314,7 @@ void R3BPsp::ConstructGeometry()
     TString fileName = GetGeometryFileName();
     if (fileName.EndsWith(".root"))
     {
-        LOG(INFO) << "Constructing PSP geometry from ROOT file " << fileName.Data() << FairLogger::endl;
+        LOG(INFO) << "Constructing PSP geometry from ROOT file " << fileName.Data();
         ConstructRootGeometry();
 
         // TODO: Check if this works as expected
@@ -342,7 +342,7 @@ void R3BPsp::ConstructGeometry()
     }
     else
     {
-        LOG(FATAL) << "PSP geometry file is not specified" << FairLogger::endl;
+        LOG(FATAL) << "PSP geometry file is not specified";
         exit(1);
     }
 }

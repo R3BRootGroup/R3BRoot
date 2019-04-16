@@ -81,12 +81,12 @@ InitStatus R3BPspxPrecal2Cal::Init()
         }
         start_detector = start_detector + 2 + 2 * gain[i].size();
     }
-    LOG(INFO) << "R3BPspxPrecal2Cal :: Init() " << FairLogger::endl;
+    LOG(INFO) << "R3BPspxPrecal2Cal :: Init() ";
     for (Int_t i = 0; i < fCalPar->GetPspxParDetector(); i++)
     {
         for (Int_t j = 0; j < gain[i].size(); j++)
         {
-            LOG(INFO) << "gain[" << i << "][" << j << "]=" << gain[i][j] << FairLogger::endl;
+            LOG(INFO) << "gain[" << i << "][" << j << "]=" << gain[i][j];
         }
     }
 
@@ -99,7 +99,7 @@ void R3BPspxPrecal2Cal::SetParContainers()
      * Initialize/Reads parameter file for conversion.
      */
 
-    LOG(INFO) << "R3BPspxPrecal2Cal :: SetParContainers() " << FairLogger::endl;
+    LOG(INFO) << "R3BPspxPrecal2Cal :: SetParContainers() ";
 
     fCalPar = (R3BPspxCalPar*)FairRuntimeDb::instance()->getContainer("R3BPspxCalPar");
 
@@ -111,7 +111,7 @@ void R3BPspxPrecal2Cal::SetParContainers()
 
     if (!fCalPar)
     {
-        LOG(ERROR) << "Could not get access to R3BPspxCalPar-Container." << FairLogger::endl;
+        LOG(ERROR) << "Could not get access to R3BPspxCalPar-Container.";
         return;
     }
 
@@ -124,7 +124,7 @@ InitStatus R3BPspxPrecal2Cal::ReInit()
      * Initialize/Reads parameter file for conversion.
      */
 
-    LOG(INFO) << " R3BPspxPrecal2Cal :: ReInit() " << FairLogger::endl;
+    LOG(INFO) << " R3BPspxPrecal2Cal :: ReInit() ";
 
     // FairRunAna* ana = FairRunAna::Instance();
     // FairRuntimeDb* rtdb=ana->GetRuntimeDb();
@@ -135,7 +135,7 @@ InitStatus R3BPspxPrecal2Cal::ReInit()
 
     if (!fCalPar)
     {
-        LOG(ERROR) << "Could not get access to R3BPspxCalPar-Container." << FairLogger::endl;
+        LOG(ERROR) << "Could not get access to R3BPspxCalPar-Container.";
         return kFATAL;
     }
 

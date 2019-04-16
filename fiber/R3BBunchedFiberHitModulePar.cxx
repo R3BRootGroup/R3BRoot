@@ -31,7 +31,7 @@ R3BBunchedFiberHitModulePar::~R3BBunchedFiberHitModulePar()
 
 void R3BBunchedFiberHitModulePar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BBunchedFiberHitModulePar::putParams() called" << FairLogger::endl;
+    LOG(INFO) << "R3BBunchedFiberHitModulePar::putParams() called";
     if (!list)
     {
         return;
@@ -64,14 +64,14 @@ void R3BBunchedFiberHitModulePar::clear()
 
 void R3BBunchedFiberHitModulePar::printParams()
 {
-    LOG(INFO) << "   R3BBunchedFiberHitModulePar: FIBER HIT Calibration Parameters: " << FairLogger::endl;
-    LOG(INFO) << "   fFiber: " << fFiber << FairLogger::endl;
-    LOG(INFO) << "   fOffset1: " << fOffset1 << FairLogger::endl;
-    LOG(INFO) << "   fOffset2: " << fOffset2 << FairLogger::endl;
-    LOG(INFO) << "   fVeff: " << fVeff << FairLogger::endl;
-    LOG(INFO) << "   fGainMA: " << fGainMA << FairLogger::endl;
-    LOG(INFO) << "   fGainS: " << fGainS << FairLogger::endl;
-    LOG(INFO) << "   fSync2: " << fSync << FairLogger::endl;
+    LOG(INFO) << "   R3BBunchedFiberHitModulePar: FIBER HIT Calibration Parameters: ";
+    LOG(INFO) << "   fFiber: " << fFiber;
+    LOG(INFO) << "   fOffset1: " << fOffset1;
+    LOG(INFO) << "   fOffset2: " << fOffset2;
+    LOG(INFO) << "   fVeff: " << fVeff;
+    LOG(INFO) << "   fGainMA: " << fGainMA;
+    LOG(INFO) << "   fGainS: " << fGainS;
+    LOG(INFO) << "   fSync2: " << fSync;
 }
 
 

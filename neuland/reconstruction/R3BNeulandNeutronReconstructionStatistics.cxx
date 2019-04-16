@@ -44,7 +44,7 @@ InitStatus R3BNeulandNeutronReconstructionStatistics::Init()
     }
     catch (const std::exception& e)
     {
-        LOG(FATAL) << "R3BNeulandNeutronReconstruction" << e.what() << FairLogger::endl;
+        LOG(FATAL) << "R3BNeulandNeutronReconstruction" << e.what();
     }
 
     TH1::AddDirectory(kFALSE);

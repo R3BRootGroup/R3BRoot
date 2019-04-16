@@ -72,7 +72,7 @@ R3BAmsCalifaCorrelatedOnlineSpectra::~R3BAmsCalifaCorrelatedOnlineSpectra() {
 
 InitStatus R3BAmsCalifaCorrelatedOnlineSpectra::Init() {
   
-  LOG(INFO) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init " << FairLogger::endl;
+  LOG(INFO) << "R3BAmsCalifaCorrelatedOnlineSpectra::Init ";
   
   // try to get a handle on the EventHeader. EventHeader may not be 
   // present though and hence may be null. Take care when using.
@@ -91,19 +91,19 @@ InitStatus R3BAmsCalifaCorrelatedOnlineSpectra::Init() {
   //get access to Hit data
   fHitItemsAms = (TClonesArray*)mgr->GetObject("AmsHitData");
   if (!fHitItemsAms) {
-   LOG(INFO)<<"R3BAmsCalifaCorrelatedOnlineSpectra::Init AmsHitData not found"<<FairLogger::endl;
+   LOG(INFO)<<"R3BAmsCalifaCorrelatedOnlineSpectra::Init AmsHitData not found";
   }
 
   //get access to Hit data
   fHitItemsCalifa = (TClonesArray*)mgr->GetObject("CalifaHitData");
   if (!fHitItemsCalifa) {
-   LOG(INFO)<<"R3BAmsCalifaCorrelatedOnlineSpectra::Init CalifaHitData not found"<<FairLogger::endl;
+   LOG(INFO)<<"R3BAmsCalifaCorrelatedOnlineSpectra::Init CalifaHitData not found";
   }
 
   //get access to Hit data
   fCalItemsLos = (TClonesArray*)mgr->GetObject("LosCal");
   if (!fCalItemsLos) {
-   LOG(INFO)<<"R3BAmsCalifaCorrelatedOnlineSpectra::Init LosCalData not found"<<FairLogger::endl;
+   LOG(INFO)<<"R3BAmsCalifaCorrelatedOnlineSpectra::Init LosCalData not found";
   }
 
 
@@ -286,7 +286,7 @@ InitStatus R3BAmsCalifaCorrelatedOnlineSpectra::Init() {
 
 void R3BAmsCalifaCorrelatedOnlineSpectra::Reset_AMS_CALIFA_Histo()
 {
-    LOG(INFO) << "R3BAmsCalifaCorrelatedOnlineSpectra::Reset_LOS_AMS_CALIFA_Histo" << FairLogger::endl;
+    LOG(INFO) << "R3BAmsCalifaCorrelatedOnlineSpectra::Reset_LOS_AMS_CALIFA_Histo";
 
 
     fh_Califa_coinc_petal1->Reset();
@@ -318,7 +318,7 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option) {
   
   FairRootManager* mgr = FairRootManager::Instance();
   if (NULL == mgr)
-    LOG(FATAL) << "R3BAmsCalifaCorrelatedOnlineSpectra::Exec FairRootManager not found" << FairLogger::endl;
+    LOG(FATAL) << "R3BAmsCalifaCorrelatedOnlineSpectra::Exec FairRootManager not found";
 
   //if(header->GetTrigger()!=1){cout << header->GetTrigger()<<endl;}
   if ((fTrigger >= 0) && (header) && (header->GetTrigger() != 1))

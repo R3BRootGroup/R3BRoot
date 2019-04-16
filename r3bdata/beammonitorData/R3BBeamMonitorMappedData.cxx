@@ -23,7 +23,7 @@ R3BBeamMonitorMappedData::R3BBeamMonitorMappedData(	UInt_t IC,
     , fTOFDOR(TOFDOR)
 {
 /* 
- LOG(INFO)<<"LosBeamMonitorData: "<<IC<<",  "<<SEETRAM<<", "<<TOFDOR<<FairLogger::endl;
+ LOG(INFO)<<"LosBeamMonitorData: "<<IC<<",  "<<SEETRAM<<", "<<TOFDOR;
  
 */	 
 }    

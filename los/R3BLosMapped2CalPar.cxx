@@ -112,7 +112,7 @@ InitStatus R3BLosMapped2CalPar::Init()
 
     if (!fNofModules)
     {
-		LOG(ERROR) << "R3BLosMapped2CalPar::Init() Number of modules not set. " << FairLogger::endl;
+		LOG(ERROR) << "R3BLosMapped2CalPar::Init() Number of modules not set. ";
         return kFATAL;
     }
     
@@ -155,18 +155,18 @@ void R3BLosMapped2CalPar::Exec(Option_t* option)
         
         if (iDetector > (fNofDetectors-1)) 
         {
-            LOG(ERROR) << "R3BLosMapped2CalPar::Exec() : more detectors than expected! Det: " << (iDetector+1) << " allowed are 1.." << fNofDetectors << FairLogger::endl;
+            LOG(ERROR) << "R3BLosMapped2CalPar::Exec() : more detectors than expected! Det: " << (iDetector+1) << " allowed are 1.." << fNofDetectors;
             continue;
         }
         if (iChannel > (fNofChannels-1)) 
         {
-            LOG(ERROR) << "R3BLosMapped2CalPar::Exec() : more channels than expected! Channel: " << (iChannel+1) << " allowed are 1.." << fNofChannels << FairLogger::endl;
+            LOG(ERROR) << "R3BLosMapped2CalPar::Exec() : more channels than expected! Channel: " << (iChannel+1) << " allowed are 1.." << fNofChannels;
             continue;
         }
 
         if (iType > (fNofTypes-1)) 
         {
-            LOG(ERROR) << "R3BLosMapped2CalPar::Exec() : more time-types than expected! Type: " << iType << " allowed are 0.." << (fNofTypes-1) << FairLogger::endl;
+            LOG(ERROR) << "R3BLosMapped2CalPar::Exec() : more time-types than expected! Type: " << iType << " allowed are 0.." << (fNofTypes-1);
             continue;
         }
   

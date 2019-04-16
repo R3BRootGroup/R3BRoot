@@ -109,8 +109,8 @@ void R3BDchDigitizer::SetParContainers() {
   fDchDigiPar = (R3BDchDigiPar*)(rtdb->getContainer("R3BDchDigiPar"));
 
   if ( fDchDigiPar ) {
-    LOG(INFO) << "R3BDchDigitizer::SetParContainers() " << FairLogger::endl;
-    LOG(INFO) << "Container R3BDchDigiPar  loaded " << FairLogger::endl;
+    LOG(INFO) << "R3BDchDigitizer::SetParContainers() ";
+    LOG(INFO) << "Container R3BDchDigiPar  loaded ";
   }
 
 }
@@ -209,7 +209,7 @@ void R3BDchDigitizer::Exec(Option_t* opt) {
    eventNoDch+=1;
   
      Int_t nentriesDch = fDchPoints->GetEntries();
-	  LOG(INFO) << nentriesDch << FairLogger::endl;
+	  LOG(INFO) << nentriesDch;
      
      Int_t TrackId=0;
 

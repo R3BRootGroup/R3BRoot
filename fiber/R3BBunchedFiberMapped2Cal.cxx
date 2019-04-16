@@ -36,24 +36,24 @@ InitStatus R3BBunchedFiberMapped2Cal::Init()
 {
   if (!fMAPMTTCalPar || !(fSkipSPMT || fSPMTTCalPar)) {
     LOG(ERROR) << "TCal parameter containers missing, "
-        "did you forget SetParContainers?" << FairLogger::endl;
+        "did you forget SetParContainers?";
     return kERROR; 
   }
   if (0 == fMAPMTTCalPar->GetNumModulePar() ||	  
       (!fSkipSPMT && 0 == fSPMTTCalPar->GetNumModulePar())) {
     LOG(ERROR) << "No TCal parameters in containers " << fMAPMTTCalPar->GetName() <<
-	" or " << fSPMTTCalPar->GetName() << "." << FairLogger::endl;
+	" or " << fSPMTTCalPar->GetName() << ".";
     return kERROR;
   }
   auto mgr = FairRootManager::Instance();
   if (!mgr) {
-    LOG(ERROR) << "FairRootManager not found." << FairLogger::endl;
+    LOG(ERROR) << "FairRootManager not found.";
     return kERROR;
   }
   auto name = fName + "Mapped";
   fMappedItems = (TClonesArray *)mgr->GetObject(name);
   if (!fMappedItems) {
-    LOG(ERROR) << "Branch " << name << " not found." << FairLogger::endl;
+    LOG(ERROR) << "Branch " << name << " not found.";
     return kERROR;
   }
   mgr->Register(fName + "Cal", "Land", fCalItems, kTRUE);
@@ -66,7 +66,7 @@ void R3BBunchedFiberMapped2Cal::SetParContainers()
   auto name = fName + #NAME"TCalPar";\
   f##NAME##TCalPar = (R3BTCalPar *)FairRuntimeDb::instance()->getContainer(name);\
   if (!f##NAME##TCalPar) {\
-    LOG(ERROR) << "Could not get access to " << name << " container." << FairLogger::endl;\
+    LOG(ERROR) << "Could not get access to " << name << " container.";\
   }\
 } while (0)
   GET_TCALPAR(MAPMT);
@@ -83,15 +83,14 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t *option)
 {
   auto mapped_num = fMappedItems->GetEntriesFast();
   LOG(DEBUG) << "R3BBunchedFiberMapped2Cal::Exec:fMappedItems=" <<
-      fMappedItems->GetName() << '.' << FairLogger::endl;
+      fMappedItems->GetName() << '.';
   for (auto i = 0; i < mapped_num; i++) {
     auto mapped = (R3BBunchedFiberMappedData *)fMappedItems->At(i);
     assert(mapped);
 
     auto channel = mapped->GetChannel();
     LOG(DEBUG) << " R3BBunchedFiberMapped2Cal::Exec:Channel=" << channel << ":Edge=" <<
-        (mapped->IsLeading() ? "Leading" : "Trailing") << '.' <<
-        FairLogger::endl;
+        (mapped->IsLeading() ? "Leading" : "Trailing") << '.';
 
     // Fetch tcal parameters.
     auto tcal_channel_i = channel * 2 - (mapped->IsLeading() ? 1 : 0);
@@ -100,7 +99,7 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t *option)
 	fSPMTTCalPar->GetModuleParAt(1, tcal_channel_i, 1);
     if (!par) {
       LOG(WARNING) << "R3BBunchedFiberMapped2Cal::Exec (" << fName << "): Channel=" << channel <<
-          ": TCal par not found." << FairLogger::endl;
+          ": TCal par not found.";
       continue;
     }
 
@@ -112,7 +111,7 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t *option)
     }
     auto fine_ns = par->GetTimeClockTDC(fine_raw);
     LOG(DEBUG) << " R3BBunchedFiberMapped2Cal::Exec: Fine raw=" << fine_raw <<
-        " -> ns=" << fine_ns << '.' << FairLogger::endl;
+        " -> ns=" << fine_ns << '.';
 
 	// we have to differ between single PMT which is on Tamex and MAPMT which is on clock TDC
 	Double_t time_ns=-1;
@@ -120,7 +119,7 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t *option)
 		if (fine_ns < 0. || fine_ns >= fClockFreq) {
 			LOG(ERROR) << 
 			"R3BBunchedFiberMapped2Cal::Exec (" << fName << "): Channel=" << channel <<
-			": Bad CTDC fine time (raw=" << fine_raw << ",ns=" << fine_ns << ")." << FairLogger::endl;
+			": Bad CTDC fine time (raw=" << fine_raw << ",ns=" << fine_ns << ").";
 			continue;
 		}
 
@@ -128,13 +127,13 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t *option)
 		time_ns = mapped->GetCoarse() * fClockFreq +
 		(mapped->IsLeading() ? -fine_ns : fine_ns);
 		LOG(DEBUG) << " R3BBunchedFiberMapped2Cal::Exec (" << fName << "): Channel=" << channel << ": Time=" <<
-        time_ns  << "ns." << FairLogger::endl;
+        time_ns  << "ns.";
 	}
 	else{
 		if (fine_ns < 0. || fine_ns >= fTamexFreq) {
 			LOG(ERROR) << 
 			"R3BBunchedFiberMapped2Cal::Exec (" << fName << "): Channel=" << channel <<
-			": Bad Tamex fine time (raw=" << fine_raw << ",ns=" << fine_ns << ")." << FairLogger::endl;
+			": Bad Tamex fine time (raw=" << fine_raw << ",ns=" << fine_ns << ").";
 			continue;
 		}
 
@@ -142,7 +141,7 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t *option)
 		time_ns = mapped->GetCoarse() * fTamexFreq +
 		(mapped->IsLeading() ? -fine_ns : fine_ns);
 		LOG(DEBUG) << " R3BBunchedFiberMapped2Cal::Exec:Channel=" << channel << ": Time=" <<
-        time_ns  << "ns." << FairLogger::endl;
+        time_ns  << "ns.";
 		
 	}
     new ((*fCalItems)[fNofCalItems++])

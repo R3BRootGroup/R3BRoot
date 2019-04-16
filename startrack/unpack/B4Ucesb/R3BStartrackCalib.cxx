@@ -33,7 +33,7 @@ R3BStartrackCalib::R3BStartrackCalib() : FairTask("R3B Startracker Calibrator"),
 //Virtual R3BStartrackCalib: Public method
 R3BStartrackCalib::~R3BStartrackCalib()
 {
-  LOG(INFO) << "R3BStartrackCalib: Delete instance" << FairLogger::endl;
+  LOG(INFO) << "R3BStartrackCalib: Delete instance";
   delete fRawHitCA;
   delete fSiDetHitCA;
 }
@@ -60,8 +60,8 @@ void R3BStartrackCalib::SetParContainers()
   fStartrackCalibPar = (R3BStartrackCalibPar*)(rtdb->getContainer("R3BStartrackCalibPar"));
   
   if ( fVerbose && fStartrackCalibPar ) {
-    LOG(INFO) << "R3BStarTraCalib::SetParContainers() "<< FairLogger::endl;
-    LOG(INFO) << "Container R3BStarTraCalibPar loaded " << FairLogger::endl;
+    LOG(INFO) << "R3BStarTraCalib::SetParContainers() ";
+    LOG(INFO) << "Container R3BStarTraCalibPar loaded ";
   }  
 }
 
@@ -69,7 +69,7 @@ void R3BStartrackCalib::SetParContainers()
 //Register: Protected method
 void R3BStartrackCalib::Register()
 {
-  LOG(DEBUG) << "Registering" << FairLogger::endl;
+  LOG(DEBUG) << "Registering";
   FairRootManager *fMan = FairRootManager::Instance();
   if(! fMan) { 
     LOG(fatal) << "Init: No FairRootManager";
@@ -92,7 +92,7 @@ InitStatus R3BStartrackCalib::ReInit()
 void R3BStartrackCalib::Exec(Option_t* opt)
 {
   
-  LOG(DEBUG) << "Calibring Startracker Raw Data" << FairLogger::endl;
+  LOG(DEBUG) << "Calibring Startracker Raw Data";
   
   R3BStartrackRawHit**    rawHit;
   Int_t module_id=0;  
@@ -135,14 +135,14 @@ void R3BStartrackCalib::Finish()
 //Reset: Public method
 void R3BStartrackCalib::Reset()
 {
-  LOG(DEBUG) << "Clearing Si tracker Hit Data Structure" << FairLogger::endl;
+  LOG(DEBUG) << "Clearing Si tracker Hit Data Structure";
   if(fSiDetHitCA)fSiDetHitCA->Clear();
 }
 
 
 Int_t R3BStartrackCalib::MapModuleID(R3BStartrackRawHit* chit)
 {
-  LOG(DEBUG) << "Mapping Module ID in R3BStarTraCalib" << FairLogger::endl;
+  LOG(DEBUG) << "Mapping Module ID in R3BStarTraCalib";
 
   //Implement here the mapping from the unpacker to physical strip numbers
   return chit->GetModuleId();
@@ -150,7 +150,7 @@ Int_t R3BStartrackCalib::MapModuleID(R3BStartrackRawHit* chit)
 
 Int_t R3BStartrackCalib::MapSide(R3BStartrackRawHit* chit)
 {
-  LOG(DEBUG) << "Mapping Side ID in R3BStarTraCalib" << FairLogger::endl;
+  LOG(DEBUG) << "Mapping Side ID in R3BStarTraCalib";
 
   //Implement here the mapping from the unpacker to physical strip numbers
   return chit->GetSide();
@@ -158,7 +158,7 @@ Int_t R3BStartrackCalib::MapSide(R3BStartrackRawHit* chit)
 
 Int_t R3BStartrackCalib::MapAsicID(R3BStartrackRawHit* chit)
 {
-  LOG(DEBUG) << "Mapping Asic ID in R3BStarTraCalib" << FairLogger::endl;
+  LOG(DEBUG) << "Mapping Asic ID in R3BStarTraCalib";
 
   //Implement here the mapping from the unpacker to physical strip numbers
   return chit->GetAsicId();
@@ -166,7 +166,7 @@ Int_t R3BStartrackCalib::MapAsicID(R3BStartrackRawHit* chit)
 
 Int_t R3BStartrackCalib::MapStripID(R3BStartrackRawHit* chit)
 {
-  LOG(DEBUG) << "Mapping Strip ID in R3BStarTraCalib" << FairLogger::endl;
+  LOG(DEBUG) << "Mapping Strip ID in R3BStarTraCalib";
 
   //Implement here the mapping from the unpacker to physical strip numbers
   return chit->GetStripId();
@@ -175,7 +175,7 @@ Int_t R3BStartrackCalib::MapStripID(R3BStartrackRawHit* chit)
 
 Double32_t R3BStartrackCalib::CalibrateEnergy(R3BStartrackRawHit* chit)
 {
-  LOG(DEBUG) << "Calibrating Energies in R3BStarTraCalib" << FairLogger::endl;
+  LOG(DEBUG) << "Calibrating Energies in R3BStarTraCalib";
 
   //Implement here the energy calibration based on the parameters
   return chit->GetADCdata();
@@ -183,7 +183,7 @@ Double32_t R3BStartrackCalib::CalibrateEnergy(R3BStartrackRawHit* chit)
 
 Double32_t R3BStartrackCalib::CalibrateTime(R3BStartrackRawHit* chit)
 {
-  LOG(DEBUG) << "Calibrating Time in R3BStarTraCalib" << FairLogger::endl;
+  LOG(DEBUG) << "Calibrating Time in R3BStarTraCalib";
 
   //Implement here the time calibration based on the parameters
   return chit->GetTimelb();

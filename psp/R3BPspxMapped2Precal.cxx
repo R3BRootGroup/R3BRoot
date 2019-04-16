@@ -44,7 +44,7 @@ InitStatus R3BPspxMapped2Precal::Init()
      * Print parameters, if verbosity is set to INFO.
      */
 
-    // LOG(INFO) << "R3BPspxMapped2Precal :: Init() " << FairLogger::endl;
+    // LOG(INFO) << "R3BPspxMapped2Precal :: Init() ";
     FairRootManager* fMan = FairRootManager::Instance();
     fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
     fMappedItems = (TClonesArray*)fMan->GetObject("PspxMapped"); // = branch name in TTree
@@ -81,12 +81,12 @@ InitStatus R3BPspxMapped2Precal::Init()
         }
         start_detector = start_detector + 2 + 2 * gain[i].size();
     }
-    LOG(INFO) << "R3BPspxMapped2Precal :: Init() " << FairLogger::endl;
+    LOG(INFO) << "R3BPspxMapped2Precal :: Init() ";
     for (Int_t i = 0; i < fPrecalPar->GetPspxParDetector(); i++)
     {
         for (Int_t j = 0; j < gain[i].size(); j++)
         {
-            LOG(INFO) << "gain[" << i << "][" << j << "]=" << gain[i][j] << FairLogger::endl;
+            LOG(INFO) << "gain[" << i << "][" << j << "]=" << gain[i][j];
         }
     }
 
@@ -116,7 +116,7 @@ InitStatus R3BPspxMapped2Precal::Init()
     {
         for (Int_t j = 0; j < energythreshold[i].size(); j++)
         {
-            LOG(INFO) << "energythreshold[" << i << "][" << j << "]=" << energythreshold[i][j] << FairLogger::endl;
+            LOG(INFO) << "energythreshold[" << i << "][" << j << "]=" << energythreshold[i][j];
         }
     }
 
@@ -129,7 +129,7 @@ void R3BPspxMapped2Precal::SetParContainers()
      * Initialize/Reads parameter file for conversion.
      */
 
-    LOG(INFO) << "R3BPspxMapped2Precal :: SetParContainers() " << FairLogger::endl;
+    LOG(INFO) << "R3BPspxMapped2Precal :: SetParContainers() ";
 
     fPrecalPar = (R3BPspxPrecalPar*)FairRuntimeDb::instance()->getContainer("R3BPspxPrecalPar");
 
@@ -141,7 +141,7 @@ void R3BPspxMapped2Precal::SetParContainers()
 
     if (!fPrecalPar)
     {
-        LOG(ERROR) << "Could not get access to R3BPspxPrecalPar-Container." << FairLogger::endl;
+        LOG(ERROR) << "Could not get access to R3BPspxPrecalPar-Container.";
         return;
     }
 
@@ -154,7 +154,7 @@ InitStatus R3BPspxMapped2Precal::ReInit()
      * Initialize/Reads parameter file for conversion.
      */
 
-    LOG(INFO) << " R3BPspxMapped2Precal :: ReInit() " << FairLogger::endl;
+    LOG(INFO) << " R3BPspxMapped2Precal :: ReInit() ";
 
     // FairRunAna* ana = FairRunAna::Instance();
     // FairRuntimeDb* rtdb=ana->GetRuntimeDb();
@@ -165,7 +165,7 @@ InitStatus R3BPspxMapped2Precal::ReInit()
 
     if (!fPrecalPar)
     {
-        LOG(ERROR) << "Could not get access to R3BPspxPrecalPar-Container." << FairLogger::endl;
+        LOG(ERROR) << "Could not get access to R3BPspxPrecalPar-Container.";
         return kFATAL;
     }
 

@@ -17,13 +17,13 @@ R3BCalifaGeometry* R3BCalifaGeometry::inst = NULL;
 
 R3BCalifaGeometry* R3BCalifaGeometry::Instance(int version)
 {
-  LOG(INFO) << "R3BCalifaGeometry::Init " << FairLogger::endl;
+  LOG(INFO) << "R3BCalifaGeometry::Init ";
   if(!inst)
     inst = new R3BCalifaGeometry(version);
   else if(inst->fGeometryVersion != version)
   {
     LOG(ERROR) << "R3BCalifaGeometry::Instance(): Existing instance with different geometry version than requested. "
-              << "Undefined beheaviour possible!" << FairLogger::endl;
+              << "Undefined beheaviour possible!";
 
     inst = new R3BCalifaGeometry(version);
   }
@@ -33,7 +33,7 @@ R3BCalifaGeometry* R3BCalifaGeometry::Instance(int version)
 
 R3BCalifaGeometry::R3BCalifaGeometry(int version)  : fGeometryVersion(version), fNavigator(NULL)
 {
-  LOG(DEBUG) << "Creating new R3BCalifaGeometry for version " << version << FairLogger::endl;
+  LOG(DEBUG) << "Creating new R3BCalifaGeometry for version " << version;
 
   TString geoPath = gSystem->Getenv("VMCWORKDIR");
   geoPath += "/geometry/";
@@ -61,26 +61,26 @@ R3BCalifaGeometry::R3BCalifaGeometry(int version)  : fGeometryVersion(version), 
     break;
 
   default:
-    LOG(ERROR) << "R3BCalifaGeometry: Unsupported geometry version: " << version << FairLogger::endl;
+    LOG(ERROR) << "R3BCalifaGeometry: Unsupported geometry version: " << version;
     return;
   }
 
-  LOG(INFO) << "R3BCalifaGeometry::Geometry file " <<geoPath<< FairLogger::endl;
+  LOG(INFO) << "R3BCalifaGeometry::Geometry file " <<geoPath;
 
   if(gGeoManager && strcmp(gGeoManager->GetTopVolume()->GetName(), "cave") == 0)
   {
     // Already set up (MC mode)
-    LOG(DEBUG) << "R3BCalifaGeometry: Using existing geometry" << FairLogger::endl;
+    LOG(DEBUG) << "R3BCalifaGeometry: Using existing geometry";
     return;
   }
 
   // Stand alone mode
-  LOG(DEBUG) << "R3BCalifaGeometry: Creating new geometry" << FairLogger::endl;
+  LOG(DEBUG) << "R3BCalifaGeometry: Creating new geometry";
   TFile *f = new TFile(geoPath, "READ");
   TGeoVolume *v = dynamic_cast<TGeoVolume*>(f->Get("TOP"));
   if(!v)
   {
-    LOG(ERROR) << "R3BCalifaGeometry: Could not open CALIFA geometry file: No TOP volume" << FairLogger::endl;
+    LOG(ERROR) << "R3BCalifaGeometry: Could not open CALIFA geometry file: No TOP volume";
     return;
   }
 
@@ -197,7 +197,7 @@ void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t* polar,
       if(gGeoManager->CheckPath(nameVolume)) gGeoManager->cd(nameVolume);
       else {
 	LOG(ERROR) << "R3BCalifaCrysta2Hit: Invalid crystal path: " << nameVolume
-		   << FairLogger::endl;
+		  ;
 	return;
       }
       gGeoManager->LocalToMaster(local, master);
@@ -227,7 +227,7 @@ void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t* polar,
 
     if(!gGeoManager->cd(nameVolume))
     {
-      LOG(ERROR) << "R3BCalifaGeometry: Invalid volume path: " << nameVolume << FairLogger::endl;
+      LOG(ERROR) << "R3BCalifaGeometry: Invalid volume path: " << nameVolume;
       return;
     }
 
@@ -239,7 +239,7 @@ void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t* polar,
   }
  else
  {
-   LOG(ERROR) << "R3BCalifaGeometry: Geometry version not available in R3BCalifaGeometry::GetAngles(). " << FairLogger::endl;
+   LOG(ERROR) << "R3BCalifaGeometry: Geometry version not available in R3BCalifaGeometry::GetAngles(). ";
    return;
  }
 
@@ -313,13 +313,13 @@ const char * R3BCalifaGeometry::GetCrystalVolumePath(int iD)
     }
     else
     {
-      LOG(ERROR) << "R3BCalifaGeometry: Invalid crystal ID " << iD << " for geometry version 17" << FairLogger::endl;
+      LOG(ERROR) << "R3BCalifaGeometry: Invalid crystal ID " << iD << " for geometry version 17";
       return NULL;
     }
     break;
 
     default:
-      LOG(ERROR) << "R3BCalifaGeometry: Invalid geometry version for GetCrystalVolumePath()" << FairLogger::endl;
+      LOG(ERROR) << "R3BCalifaGeometry: Invalid geometry version for GetCrystalVolumePath()";
       return NULL;
   }
 
@@ -395,7 +395,7 @@ int R3BCalifaGeometry::GetCrystalId(const char *volumePath)
 
     if(volumeNames.size() < 4)
     {
-      LOG(ERROR) << "R3BCalifaGeometry::GetCrystalId(): Invalid path: " << volumePath << FairLogger::endl;
+      LOG(ERROR) << "R3BCalifaGeometry::GetCrystalId(): Invalid path: " << volumePath;
       return -1;
     }
 
@@ -430,7 +430,7 @@ int R3BCalifaGeometry::GetCrystalId(const char *volumePath)
           crystalId<3000 || crystalId>4800)
       {
 	LOG(ERROR) << "R3BCalifaGeometry: Wrong crystal number in geometryVersion 16+ (CC). "
-		   << FairLogger::endl;
+		  ;
         return -1;
       }
     //if BARREL
@@ -451,21 +451,21 @@ int R3BCalifaGeometry::GetCrystalId(const char *volumePath)
 	  crystalCopy<1 || crystalId>1952 || crystalId<1)
       {
         LOG(ERROR) << "R3BCalifaGeometry: Wrong crystal number in geometryVersion 16+ (BARREL)."
-		   << FairLogger::endl;
+		  ;
         return -1;
       }
     }
     else
     {
       LOG(ERROR) << "R3BCalifaGeometry: Impossible crystalType for geometryVersion 16+."
-		      << FairLogger::endl;
+		     ;
       return -1;
     }
   }
   else
   {
     LOG(ERROR) << "R3BCalifaGeometry: Geometry version not available in R3BCalifaGeometry::GetCrystalId(). "
-		    << FairLogger::endl;
+		   ;
     return -1;
   }
 

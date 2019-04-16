@@ -7,7 +7,7 @@
 #pragma link C++ class R3BUcesbSource+;
 #pragma link C++ class R3BReader+;
 #pragma link C++ class R3BUnpackReader+;
-#pragma link C++ class R3BWhiterabbitReader+;
+//#pragma link C++ class R3BWhiterabbitReader+;
 #pragma link C++ class R3BWhiterabbitMasterReader+;
 #pragma link C++ class R3BWhiterabbitCalifaReader+;
 #pragma link C++ class R3BWhiterabbitAmsReader+;
@@ -45,7 +45,7 @@
 #pragma link C++ class EXT_STR_h101_TPAT_t;
 #pragma link C++ class EXT_STR_h101_timestamp_master_onion_t;
 #pragma link C++ class EXT_STR_h101_BMON_onion_t;
-#pragma link C++ class EXT_STR_h101_raw_nnp_onion_t;
+//#pragma link C++ class EXT_STR_h101_raw_nnp_onion_t;
 #pragma link C++ class EXT_STR_h101_FIBZERO_onion_t;
 #pragma link C++ class EXT_STR_h101_FIBTHREEA_onion_t;
 #pragma link C++ class EXT_STR_h101_FIBTHREEB_onion_t;

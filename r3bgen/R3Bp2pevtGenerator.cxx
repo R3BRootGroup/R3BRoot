@@ -92,7 +92,7 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator *primGen)
 
 	if(E <= 0)
 	  {
-	    LOG(ERROR) << "R3Bp2pevtGenerator: E < 0!" << FairLogger::endl;
+	    LOG(ERROR) << "R3Bp2pevtGenerator: E < 0!";
 	    return kFALSE;
 	  }
 	fRandom.SetSeed(0);
@@ -114,11 +114,11 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator *primGen)
 			const double S_first = (EA+Mi)*(EA+Mi) - PA*PA;	// Invariant mass (Mandelstam S-variable)
 			const double sigma = MOM_SIGMA; 		// Internal momentum spread of the cluster "a" inside "A"
 
-			LOG(DEBUG) << "\n****** Beam parameters ********" << FairLogger::endl;
-			LOG(DEBUG) << "\nMA:\t" << MA << " MeV" << FairLogger::endl;
-			LOG(DEBUG) << "\nTotal momentum:\t" << PA << " MeV" << FairLogger::endl;
-			LOG(DEBUG) << "\nTotal energy:\t"   << EA << " MeV" << FairLogger::endl;
-		        LOG(DEBUG) << "\nBeta (beam):\t" << (-bA) << "\nGamma (beam):\t" << gA << "\n\n" << FairLogger::endl;
+			LOG(DEBUG) << "\n****** Beam parameters ********";
+			LOG(DEBUG) << "\nMA:\t" << MA << " MeV";
+			LOG(DEBUG) << "\nTotal momentum:\t" << PA << " MeV";
+			LOG(DEBUG) << "\nTotal energy:\t"   << EA << " MeV";
+		        LOG(DEBUG) << "\nBeta (beam):\t" << (-bA) << "\nGamma (beam):\t" << gA << "\n\n";
 
 			while(!evt) //eventloop
 			{
@@ -195,7 +195,7 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator *primGen)
 
 				evt=true;
 				LOG(DEBUG) << "R3Bp2pevtGenerator: Sending p2pevt: P1 : "<< P1L.Px() << " , " << P1L.Py() << " , " << P1L.Pz() << "\n P2 : "
-						<< P2L.Px() << " , " << P2L.Py() << " , " << P2L.Pz() << " " << FairLogger::endl;
+						<< P2L.Px() << " , " << P2L.Py() << " , " << P2L.Pz() << " ";
 				primGen->AddTrack(2212, P1L.Px()/1000., P1L.Py()/1000., P1L.Pz()/1000., 0, 0, 0);
 				primGen->AddTrack(2212, P2L.Px()/1000., P2L.Py()/1000., P2L.Pz()/1000., 0, 0, 0);
 
@@ -297,7 +297,7 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator *primGen)
 	  		evt=true;
 
 	  		LOG(DEBUG) << "R3Bp2pevtGenerator: Sending p2pevt: P1 : "<< P1L.Px() << " , " << P1L.Py() << " , " << P1L.Pz() << "\n P2 : "
-	  						<< P2L.Px() << " , " << P2L.Py() << " , " << P2L.Pz() << " " << FairLogger::endl;
+	  						<< P2L.Px() << " , " << P2L.Py() << " , " << P2L.Pz() << " ";
 	  	  primGen->AddTrack(2212, P1cm.Px()/1000., P1cm.Py()/1000., P1cm.Pz()/1000., 0, 0, 0);
 	  	  primGen->AddTrack(2212, P2cm.Px()/1000., P2cm.Py()/1000., P2cm.Pz()/1000., 0, 0, 0);
 

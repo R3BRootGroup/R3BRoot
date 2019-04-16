@@ -52,7 +52,7 @@ void R3BCalifaCrystalCalDataAnalysis::Exec(Option_t *option)
     thTime->Fill(hit->GetTime());
   }
   if(0 == (fnEvents%100)) {
-    LOG(INFO) << fnEvents << " events, multiplicity:  " << nHits << FairLogger::endl;
+    LOG(INFO) << fnEvents << " events, multiplicity:  " << nHits;
   }
   fnEvents += 1;
 }
@@ -86,7 +86,7 @@ void R3BCalifaCrystalCalDataAnalysis::WriteHistos()
   thNf->Write();
   thNs->Write();
   thTime->Write();
-  LOG(INFO) << "R3BCalifaCrystalCalDataAnalysis --- Histograms written to Root File ..." << FairLogger::endl; 
+  LOG(INFO) << "R3BCalifaCrystalCalDataAnalysis --- Histograms written to Root File ..."; 
 }
 
 

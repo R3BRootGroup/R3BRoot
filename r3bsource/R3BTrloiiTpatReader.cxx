@@ -15,7 +15,6 @@ R3BTrloiiTpatReader::R3BTrloiiTpatReader(EXT_STR_h101_TPAT *data, UInt_t offset)
     , fNEvent(0)
 	, fData(data)
 	, fOffset(offset)
-	, fLogger(FairLogger::GetLogger())
 	, fEventHeader(nullptr)
 {
 }
@@ -33,8 +32,7 @@ Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info *a_struct_info)
 
 	if (!ok) {
 		perror("ext_data_struct_info_item");
-		fLogger->Error(MESSAGE_ORIGIN,
-		    "Failed to setup structure information.");
+		LOG(error) << "Failed to setup structure information.";
 		return kFALSE;
 	}
 
@@ -46,7 +44,7 @@ Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info *a_struct_info)
 
 Bool_t R3BTrloiiTpatReader::Read()
 {
-	fLogger->Info(MESSAGE_ORIGIN, "TrloiiTpatReader::Read BEGIN");
+	LOG(info) << "TrloiiTpatReader::Read BEGIN";
 
 	if (nullptr != fEventHeader) {
 		fEventHeader->SetTpat(fData->TPATv[0]);
@@ -57,16 +55,17 @@ Bool_t R3BTrloiiTpatReader::Read()
 
 	if (0 == (fNEvent % 1000)) {
 		LOG(DEBUG1) << "R3BTrloiiTpatReader : event : " << fNEvent
-		    << FairLogger::endl;
+		   ;
 	}
 
 	/* Display data */
-	fLogger->Info(MESSAGE_ORIGIN, "  Trlo II Tpat = 0x%04x.",
-            fData->TPATv[0]);
+  char str[256];
+  sprintf(str, "  Trlo II Tpat = 0x%04x.", fData->TPATv[0]);
+	LOG(info) << str;
             
   //  cout<<"TPAT: "<<fData->TPATv[0]<<endl;
 
-	fLogger->Info(MESSAGE_ORIGIN, "TrloiiTpatReader::Read END");
+	LOG(info) << "TrloiiTpatReader::Read END";
         return kTRUE;
 }
 

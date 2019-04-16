@@ -54,7 +54,7 @@ R3BCalifaCrystalCal2Hit::R3BCalifaCrystalCal2Hit() :
 
 R3BCalifaCrystalCal2Hit::~R3BCalifaCrystalCal2Hit()
 {
-  LOG(INFO) << "R3BCalifaCrystalCal2Hit: Delete instance" << FairLogger::endl;
+  LOG(INFO) << "R3BCalifaCrystalCal2Hit: Delete instance";
   delete fCrystalHitCA;
   delete fCalifaHitCA;
 }
@@ -72,8 +72,8 @@ void R3BCalifaCrystalCal2Hit::SetParContainers()
 
   // fCalifaHitFinderPar = (R3BCalifaCrystalCal2HitPar*)(rtdb->getContainer("R3BCalifaCrystalCal2HitPar"));
   // if ( fVerbose && fCalifaHitFinderPar ) {
-  //   LOG(INFO) << "R3BCalifaCrystalCal2Hit::SetParContainers() "<< FairLogger::endl;
-  //   LOG(INFO) << "Container R3BCalifaCrystalCal2HitPar loaded " << FairLogger::endl;
+  //   LOG(INFO) << "R3BCalifaCrystalCal2Hit::SetParContainers() ";
+  //   LOG(INFO) << "Container R3BCalifaCrystalCal2HitPar loaded ";
   // }
 
 }
@@ -82,7 +82,7 @@ void R3BCalifaCrystalCal2Hit::SetParContainers()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BCalifaCrystalCal2Hit::Init()
 {
-  LOG(INFO) << "R3BCalifaCrystalCal2Hit::Init " << FairLogger::endl;
+  LOG(INFO) << "R3BCalifaCrystalCal2Hit::Init ";
   FairRootManager* ioManager = FairRootManager::Instance();
     if ( !ioManager ) LOG(fatal) << "Init: No FairRootManager";
   if( !ioManager->GetObject("CalifaCrystalCalDataSim") ) {
@@ -134,7 +134,7 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
 {
   
   //if(++nEvents % 10000 == 0)
-  //LOG(INFO) << nEvents << FairLogger::endl;
+  //LOG(INFO) << nEvents;
   
   // Reset entries in output arrays, local arrays
   Reset();
@@ -357,7 +357,7 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
 void R3BCalifaCrystalCal2Hit::Reset()
 {
   // Clear the CA structure
-  LOG(DEBUG) << "Clearing CalifaHitData Structure" << FairLogger::endl;
+  LOG(DEBUG) << "Clearing CalifaHitData Structure";
   if (fCalifaHitCA) fCalifaHitCA->Clear();
 }
 
@@ -382,7 +382,7 @@ void R3BCalifaCrystalCal2Hit::SetExperimentalResolution(Double_t crystalRes)
 {
   fCrystalResolution = crystalRes;
   LOG(INFO) << "R3BCalifaCrystalCal2Hit::SetExperimentalResolution to "
-	    << fCrystalResolution << "% @ 1 MeV." << FairLogger::endl;
+	    << fCrystalResolution << "% @ 1 MeV.";
 }
 
 
@@ -391,7 +391,7 @@ void R3BCalifaCrystalCal2Hit::SetComponentResolution(Double_t componentRes)
 {
   fComponentResolution = componentRes;
   LOG(INFO) << "R3BCalifaCrystalCal2Hit::SetComponentResolution to "
-	    << fComponentResolution << " MeV." << FairLogger::endl;
+	    << fComponentResolution << " MeV.";
 }
 
 // -----  Public method SetExperimentalResolution  ----------------------------------
@@ -400,7 +400,7 @@ void R3BCalifaCrystalCal2Hit::SetPhoswichResolution(Double_t LaBr, Double_t LaCl
   fLaBrResolution = LaBr;
   fLaClResolution = LaCl;
   LOG(INFO) << "R3BCalifaCrystalCal2Hit::SetPhoswichResolution to "
-	    << fLaBrResolution << "% @ 1 MeV (LaBr) and to " << fLaClResolution << "% @ 1 MeV (LaCl)" << FairLogger::endl;
+	    << fLaBrResolution << "% @ 1 MeV (LaBr) and to " << fLaClResolution << "% @ 1 MeV (LaCl)";
 }
 
 // -----  Public method SetDetectionThreshold  ----------------------------------
@@ -409,11 +409,11 @@ void R3BCalifaCrystalCal2Hit::SetDetectionThreshold(Double_t thresholdEne)
   fThreshold = thresholdEne;
   if(kSimulation) {
     LOG(INFO) << "R3BCalifaCrystalCal2Hit::SetDetectionThreshold to "
-	     << fThreshold << " GeV." << FairLogger::endl;
+	     << fThreshold << " GeV.";
   }
   else{
     LOG(INFO) << "R3BCalifaCrystalCal2Hit::SetDetectionThreshold to "
-         << fThreshold << " keV." << FairLogger::endl;
+         << fThreshold << " keV.";
   }
 }
 
@@ -422,7 +422,7 @@ void R3BCalifaCrystalCal2Hit::SetDRThreshold(Double_t DRthresholdEne)
 {
   fDRThreshold = DRthresholdEne;
   LOG(INFO) << "R3BCalifaCrystalCal2Hit::SetDRThreshold to "
-	    << fDRThreshold << " keV." << FairLogger::endl;
+	    << fDRThreshold << " keV.";
 }
 
 
@@ -450,7 +450,7 @@ void R3BCalifaCrystalCal2Hit::GetAngles(Int_t iD, Double_t* polar,
     // Use new R3BCalifaGeometry class to get geometrical information
     fGeo->GetAngles(iD, polar, azimuthal, rho);
     return;
-  } else LOG(ERROR) << "R3BCalifaCrystalCal2Hit: Geometry version not available in R3BCalifa::ProcessHits(). " << FairLogger::endl;
+  } else LOG(ERROR) << "R3BCalifaCrystalCal2Hit: Geometry version not available in R3BCalifa::ProcessHits(). ";
 
 
   //TVector3 masterV(master[0],master[1],master[2]);

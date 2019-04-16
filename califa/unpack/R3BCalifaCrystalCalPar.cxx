@@ -42,11 +42,11 @@ void R3BCalifaCrystalCalPar::clear() {
 
 // ----  Method putParams ------------------------------------------------------
 void R3BCalifaCrystalCalPar::putParams(FairParamList* list) {
-  LOG(INFO) <<"R3BCalifaCrystalCalPar::putParams() called" <<FairLogger::endl;
+  LOG(INFO) <<"R3BCalifaCrystalCalPar::putParams() called";
   if (!list){ return; }
   
   Int_t array_size = fNumCrystals*fNumParamsFit;
-  LOG(INFO) <<"Array Size: "<<array_size <<FairLogger::endl;
+  LOG(INFO) <<"Array Size: "<<array_size;
   
   fCryCalParams->Set(array_size);
   
@@ -58,7 +58,7 @@ void R3BCalifaCrystalCalPar::putParams(FairParamList* list) {
 
 // ----  Method getParams ------------------------------------------------------
 Bool_t R3BCalifaCrystalCalPar::getParams(FairParamList* list) {
-  LOG(INFO) <<"R3BCalifaCrystalCalPar::getParams() called" <<FairLogger::endl;
+  LOG(INFO) <<"R3BCalifaCrystalCalPar::getParams() called";
   if (!list){ return kFALSE;}
   
   if (!list->fill("califaCrystalNumberPar", &fNumCrystals) ) { 
@@ -70,11 +70,11 @@ Bool_t R3BCalifaCrystalCalPar::getParams(FairParamList* list) {
   }
   
   Int_t array_size = fNumCrystals*fNumParamsFit;
-  LOG(INFO) <<"Array Size: "<<array_size <<FairLogger::endl;
+  LOG(INFO) <<"Array Size: "<<array_size;
   fCryCalParams->Set(array_size);
   
   if (!(list->fill("califaCrystalCalPar",fCryCalParams))){
-    LOG(INFO)<< "---Could not initialize califaCrystalCalPar"<<FairLogger::endl;
+    LOG(INFO)<< "---Could not initialize califaCrystalCalPar";
     return kFALSE;
   }
   
@@ -83,7 +83,7 @@ Bool_t R3BCalifaCrystalCalPar::getParams(FairParamList* list) {
 
 // ----  Method printParams ----------------------------------------------------
 void R3BCalifaCrystalCalPar::printParams() {	
-  LOG(INFO) << "R3BCalifaCrystalCalPar: Califa Crystal Calibration Parameters: "<<FairLogger::endl;
+  LOG(INFO) << "R3BCalifaCrystalCalPar: Califa Crystal Calibration Parameters: ";
   Int_t array_size = fNumCrystals*fNumParamsFit;
   
   for(Int_t i=0;i<fNumCrystals;i++) {      

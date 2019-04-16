@@ -48,7 +48,7 @@ FairParSet* R3BPtofParFact::createContainer(FairContainer* c)
      * of this container, the name is concatinated with the context. */
 
     const char* name = c->GetName();
-    LOG(INFO) << "R3BPtofParFact::createContainer : " << name << FairLogger::endl;
+    LOG(INFO) << "R3BPtofParFact::createContainer : " << name;
     FairParSet* p = NULL;
 
     if (strcmp(name, "PtofHitPar") == 0)

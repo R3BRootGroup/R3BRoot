@@ -42,7 +42,7 @@ Bool_t R3BPspxReader::Init(ext_data_struct_info* a_struct_info)
 {
 
   Int_t ok;
-  LOG(INFO) << "R3BPspxReader::Init" << FairLogger::endl;
+  LOG(INFO) << "R3BPspxReader::Init";
   EXT_STR_h101_PSP_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_PSP, 0);
 
     if (!ok)
@@ -64,7 +64,7 @@ Bool_t R3BPspxReader::Init(ext_data_struct_info* a_struct_info)
   */
 void R3BPspxReader::SetParContainers()
 {
-    LOG(INFO) << "R3BPspxReader :: SetParContainers() " << FairLogger::endl;
+    LOG(INFO) << "R3BPspxReader :: SetParContainers() ";
 
     fMappedPar = (R3BPspxMappedPar*)FairRuntimeDb::instance()->getContainer("R3BPspxMappedPar");
 
@@ -76,7 +76,7 @@ void R3BPspxReader::SetParContainers()
 /*
     if (!fMappedPar)
     {
-        LOG(ERROR) << "Could not get access to R3BPspxMappedPar-Container." << FairLogger::endl;
+        LOG(ERROR) << "Could not get access to R3BPspxMappedPar-Container.";
         return;
     }
 
@@ -91,7 +91,7 @@ void R3BPspxReader::SetParContainers()
   */
 Bool_t R3BPspxReader::ReInit()
 {
-    LOG(INFO) << " R3BPspxReader :: ReInit() " << FairLogger::endl;
+    LOG(INFO) << " R3BPspxReader :: ReInit() ";
 
     // FairRunAna* ana = FairRunAna::Instance();
     // FairRuntimeDb* rtdb=ana->GetRuntimeDb();
@@ -102,7 +102,7 @@ Bool_t R3BPspxReader::ReInit()
 
     if (!fMappedPar)
     {
-        LOG(ERROR) << "Could not get access to R3BPspxMappedPar-Container." << FairLogger::endl;
+        LOG(ERROR) << "Could not get access to R3BPspxMappedPar-Container.";
         return kFALSE;
     }
 */
@@ -186,7 +186,7 @@ Bool_t R3BPspxReader::Read()
            // if (energy == 0xEEEEEE) continue; // get rid of error message code: only valid for certain ucesb unpackers
 
 //	    if (energy == -3075811 || energy == -3075810) {
-//		LOG(ERROR)<< "R3BPspxReader::Read(): Error Code from Febex Unpacker" << FairLogger::endl;
+//		LOG(ERROR)<< "R3BPspxReader::Read(): Error Code from Febex Unpacker";
 //		continue; // get rid of error message code: -3075810 = 0xeeeeee2, -3075811 = 0xeeeee3
 //	    }
 	    

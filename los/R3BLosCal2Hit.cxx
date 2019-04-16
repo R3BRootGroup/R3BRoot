@@ -279,12 +279,12 @@ InitStatus R3BLosCal2Hit::Init()
 {
 	// get access to Cal data
     FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr) LOG(ERROR) <<  "FairRootManager not found" <<FairLogger::endl;
+    if (NULL == mgr) LOG(ERROR) <<  "FairRootManager not found";
          
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
           
     fCalItems = (TClonesArray*)mgr->GetObject("LosCal");
-    if (NULL == fCalItems) LOG(ERROR) <<  "Branch LosCal not found" <<FairLogger::endl;
+    if (NULL == fCalItems) LOG(ERROR) <<  "Branch LosCal not found";
   
 	// request storage of Hit data in output tree
     mgr->Register("LosHit", "Land", fHitItems, kTRUE);

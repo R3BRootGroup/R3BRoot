@@ -29,12 +29,12 @@ R3BCalifaFebexReader::~R3BCalifaFebexReader() {
 
 Bool_t R3BCalifaFebexReader::Init(ext_data_struct_info *a_struct_info) {
   Int_t ok;
-  LOG(INFO) << "R3BCalifaFebexReader::Init" << FairLogger::endl;
+  LOG(INFO) << "R3BCalifaFebexReader::Init";
   EXT_STR_h101_CALIFA_ITEMS_INFO(ok, *a_struct_info, fOffset,
 	    EXT_STR_h101_CALIFA, 0);
 
   if (!ok) {
-        LOG(ERROR)<<"R3BCalifaFebexReader::Failed to setup structure information."<<FairLogger::endl;
+        LOG(ERROR)<<"R3BCalifaFebexReader::Failed to setup structure information.";
 	return kFALSE;
   }
 
@@ -53,7 +53,7 @@ Bool_t R3BCalifaFebexReader::Read() {
 	//    (EXT_STR_h101_CALIFA_onion_t *) fData;
 
   /* Display data */
-  LOG(DEBUG)<<"R3BCalifaFebexReader::Read() Event data."<<FairLogger::endl;
+  LOG(DEBUG)<<"R3BCalifaFebexReader::Read() Event data.";
 
   //SELECT THE FOR LOOP BASED ON THE MAPPING...
   for (int crystal = 0; crystal < fData->CALIFA_ENE; ++crystal) {

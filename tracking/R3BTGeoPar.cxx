@@ -28,7 +28,7 @@ R3BTGeoPar::~R3BTGeoPar() {}
 
 void R3BTGeoPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BTGeoPar::putParams() called" << FairLogger::endl;
+    LOG(INFO) << "R3BTGeoPar::putParams() called";
     if (!list)
     {
         return;
@@ -121,10 +121,10 @@ void R3BTGeoPar::SetMaterial(const Double_t& Z, const Double_t& A, const Double_
 
 void R3BTGeoPar::printParams()
 {
-    LOG(INFO) << " -----------  " << GetName() << " Geometry Parameters -------------  " << FairLogger::endl;
-    LOG(INFO) << " Position in cave: " << fPosX << " " << fPosY << " " << fPosZ << FairLogger::endl;
-    LOG(INFO) << " Rotation in deg: " << fRotX << " " << fRotY << " " << fRotZ << FairLogger::endl;
-    LOG(INFO) << " Dimensions: " << fDimX << " " << fDimY << " " << fDimZ << FairLogger::endl;
-    LOG(INFO) << " Z=" << fZ << " A=" << fA << " Density=" << fDensity << " Ionisation=" << fI << FairLogger::endl;
-    LOG(INFO) << " ------------------------------------------------------------------  " << FairLogger::endl;
+    LOG(INFO) << " -----------  " << GetName() << " Geometry Parameters -------------  ";
+    LOG(INFO) << " Position in cave: " << fPosX << " " << fPosY << " " << fPosZ;
+    LOG(INFO) << " Rotation in deg: " << fRotX << " " << fRotY << " " << fRotZ;
+    LOG(INFO) << " Dimensions: " << fDimX << " " << fDimY << " " << fDimZ;
+    LOG(INFO) << " Z=" << fZ << " A=" << fA << " Density=" << fDensity << " Ionisation=" << fI;
+    LOG(INFO) << " ------------------------------------------------------------------  ";
 }

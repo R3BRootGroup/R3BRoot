@@ -45,7 +45,7 @@ fNHits(0)
 //Virtual R3BStartrackUnpack: Public method
 R3BStartrackUnpack::~R3BStartrackUnpack()
 {
-  LOG(INFO) << "R3BStartrackUnpack: Delete instance" << FairLogger::endl;
+  LOG(INFO) << "R3BStartrackUnpack: Delete instance";
   delete fRawData;
 }
 
@@ -63,7 +63,7 @@ Bool_t R3BStartrackUnpack::Init()
 //Register: Protected method
 void R3BStartrackUnpack::Register()
 {
-  LOG(INFO) << "Registration of Startrack Unpacker" << FairLogger::endl;
+  LOG(INFO) << "Registration of Startrack Unpacker";
  FairRootManager *fMan = FairRootManager::Instance();
   if(! fMan) {
     return;
@@ -80,7 +80,7 @@ Bool_t R3BStartrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
    
   // TODO: adapt it for Tracker when  data format is known for tracker
   
-  //LOG(INFO) << "R3BStartrackUnpack : Unpacking... size = " << size << FairLogger::endl;
+  //LOG(INFO) << "R3BStartrackUnpack : Unpacking... size = " << size;
 
   UInt_t l_s = 0;
   UInt_t* pl_data = (UInt_t*)(data + l_s); 
@@ -113,7 +113,7 @@ Bool_t R3BStartrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 
  
 
-	   //LOG(INFO) << "R3BStartrackUnpack :   size:" << l_da_siz << FairLogger::endl;
+	   //LOG(INFO) << "R3BStartrackUnpack :   size:" << l_da_siz;
 
 	   //l_s += 1;
        pl_data = (UInt_t*)(data + l_s);
@@ -122,7 +122,7 @@ Bool_t R3BStartrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
       	   //if( (pl_data[l_s] & 0xC0000000) == 0x80000000 && ( (pl_data[l_s] & 0xFFFFFFFF) != 0xFFFFFFFF ) )  // 0x8=1000
            if( ((pl_data[l_s] >> 30) & 0x3) == 0x2 && ( (pl_data[l_s] & 0xFFFFFFFF) != 0xFFFFFFFF ) )  // 0x8=1000
 	     {
-	       //LOG(INFO) << "R3BStartrackUnpack :   wordA :" <<  (pl_data[l_s] & 0x80000000) << FairLogger::endl;
+	       //LOG(INFO) << "R3BStartrackUnpack :   wordA :" <<  (pl_data[l_s] & 0x80000000);
 	       //wordtype=10;
 		wordtype = (pl_data[l_s] >> 30) & 0x3; // bit 31:30
 
@@ -134,7 +134,7 @@ Bool_t R3BStartrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 
 	       //read timestamp High bit
 	        //ts1= (pl_data[l_s] & 0x000FFFFF);
-                //LOG(INFO) << "R3BStartrackUnpack :   ts1 :" <<  ts1 << FairLogger::endl;
+                //LOG(INFO) << "R3BStartrackUnpack :   ts1 :" <<  ts1;
 	     }
 
 
@@ -144,9 +144,9 @@ Bool_t R3BStartrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 
        	   if( ( ( (pl_data[l_s] >> 30) & 0x3) == 3) && ( ((pl_data[l_s] & 0xFFFFFFFF) != 0xFFFFFFFF)) )  
 	     { 
-	       //LOG(INFO) << " pl_data: " <<  ((pl_data[l_s] >> 30) & 0x3)  << FairLogger::endl;
+	       //LOG(INFO) << " pl_data: " <<  ((pl_data[l_s] >> 30) & 0x3) ;
 
-	       //LOG(INFO) << "R3BStartrackUnpack :   wordB :" <<  (pl_data[l_s] & 0xC0000000) << FairLogger::endl;
+	       //LOG(INFO) << "R3BStartrackUnpack :   wordB :" <<  (pl_data[l_s] & 0xC0000000);
 
 	        // wordtype=11;
 		wordtype = (pl_data[l_s] >> 30) & 0x3; // bit 31:30
@@ -154,7 +154,7 @@ Bool_t R3BStartrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 
 		hitbit= (pl_data[l_s] >> 29) & 0x01;
 
-	       //LOG(INFO) << "R3BStartrackUnpack :   hitbit :" <<  hitbit << FairLogger::endl;
+	       //LOG(INFO) << "R3BStartrackUnpack :   hitbit :" <<  hitbit;
 
 		  adcData = (pl_data[l_s] & 0x00000FFF);
 
@@ -193,7 +193,7 @@ Bool_t R3BStartrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 
 
        
-       //LOG(DEBUG) << "R3BStartrackerUnpack : Strip_ID IS " << strip_id << ",  Chip ID IS " << asic_id << " , Ladder ID IS " << module_id << " , ADC Data IS " << adcData << FairLogger::endl;
+       //LOG(DEBUG) << "R3BStartrackerUnpack : Strip_ID IS " << strip_id << ",  Chip ID IS " << asic_id << " , Ladder ID IS " << module_id << " , ADC Data IS " << adcData;
        //new ((*fRawData)[fNHits]) R3BStartrackRawHit(module_id, side, asic_id, strip_id, adcData, lclock);
 
        //new ((*fRawData)[fNHits]) R3BStartrackRawHit(wordtype, hitbit, module_id, side, asic_id, strip_id, adcData, lclock);
@@ -203,7 +203,7 @@ Bool_t R3BStartrackUnpack::DoUnpack(Int_t *data, Int_t size)  // used for Mbs fo
 
   }
 
-  //LOG(INFO) << "R3BStartrackUnpack : Number of hits in Startracker: " << fNHits << FairLogger::endl;
+  //LOG(INFO) << "R3BStartrackUnpack : Number of hits in Startracker: " << fNHits;
     return kTRUE;
   
 }
@@ -242,13 +242,13 @@ Bool_t R3BStartrackUnpack::DoUnpack2(Int_t *data_word0, Int_t *data_word1, Int_t
   //cout << "data_word1=" << *pl_data_word1 << endl; 
   
 
-  //LOG(INFO) << "Unpacking Startracker data" << FairLogger::endl;
-  LOG(DEBUG) << "Unpacking Startracker data" << FairLogger::endl;
+  //LOG(INFO) << "Unpacking Startracker data";
+  LOG(DEBUG) << "Unpacking Startracker data";
  
 
   wordtype = (*data_word0 >> 30) & 0x3; // bit 31:30
 
-  //if(wordtype==2) LOG(INFO) << "Words type 2(10) or 3(11)=" << wordtype << FairLogger::endl;
+  //if(wordtype==2) LOG(INFO) << "Words type 2(10) or 3(11)=" << wordtype;
 
   // Check if word_0 begins with:
   // - 10 then is type A word. 
@@ -260,7 +260,7 @@ Bool_t R3BStartrackUnpack::DoUnpack2(Int_t *data_word0, Int_t *data_word1, Int_t
       // A (10):
       if ( (*data_word0 & 0xC0000000)==0x80000000 && ( ((*data_word0 & 0xFFFFFFFF) != 0xFFFFFFFF) && ((*data_word1 & 0xFFFFFFFF) != 0xFFFFFFFF)) ){
 	//cout << "Words type A (msb=10)." << std::endl;
-	LOG(DEBUG) << "Words type A (msb=10)." << FairLogger::endl;
+	LOG(DEBUG) << "Words type A (msb=10).";
 	word_0A=*pl_data_word0;
 	word_1A=*pl_data_word1;
 	
@@ -273,7 +273,7 @@ Bool_t R3BStartrackUnpack::DoUnpack2(Int_t *data_word0, Int_t *data_word1, Int_t
 	  (*data_word1 & 0xFFFFFFFF) == 0xFFFFFFFF) {
 	  // this marks the point after which there is no more good data in the block_main
 	  // log_file << "End of block " << itr_1 << std::endl; 
-	  //LOG(INFO) << "End of block " <<  FairLogger::endl; 
+	  //LOG(INFO) << "End of block "; 
 	  //flag_terminator=true;
 	  break;
 	  }
@@ -286,7 +286,7 @@ Bool_t R3BStartrackUnpack::DoUnpack2(Int_t *data_word0, Int_t *data_word1, Int_t
 	// Extract time stamp.
 	timestamp =  (unsigned long) (word_1A & 0x0FFFFFFF);
 	
-	// LOG(INFO) << "Info_field " << info_field <<  FairLogger::endl; 
+	// LOG(INFO) << "Info_field " << info_field; 
 	
 	//}  // end of while(l_s<size)
 
@@ -319,13 +319,13 @@ Bool_t R3BStartrackUnpack::DoUnpack2(Int_t *data_word0, Int_t *data_word1, Int_t
 	  (*data_word1 & 0xFFFFFFFF) == 0xFFFFFFFF) {
 	  // this marks the point after which there is no more good data in the block_main
 	  // log_file << "End of block " << itr_1 << std::endl; 
-	  //LOG(INFO) << "End of block " <<  FairLogger::endl; 
+	  //LOG(INFO) << "End of block "; 
 	  //flag_terminator=true;
 	  break;
 	  }
 	*/
 	
-	LOG(DEBUG) << "At GOSIP memory" << FairLogger::endl;
+	LOG(DEBUG) << "At GOSIP memory";
         
 	// Real R3B Si Tracker data channel
 	
@@ -377,16 +377,16 @@ Bool_t R3BStartrackUnpack::DoUnpack2(Int_t *data_word0, Int_t *data_word1, Int_t
    
 
   
-	    //LOG(INFO) << " --------- event " << FairLogger::endl
-    LOG(DEBUG) << " --------- event " << FairLogger::endl
-    << "        hitbit " << hitbit << FairLogger::endl
-    << "        Channel_id " << channel_id << FairLogger::endl
-    << "        ASIC_id " << asic_id << FairLogger::endl
-    << "        Side " << side << FairLogger::endl
-    << "        Module_id " << module_id << FairLogger::endl
-    << "        energy " << energy << FairLogger::endl
-    << "        timestamp " << timestamp << FairLogger::endl
-    << "=================================" << FairLogger::endl;
+	    //LOG(INFO) << " --------- event "
+    LOG(DEBUG) << " --------- event "
+    << "        hitbit " << hitbit
+    << "        Channel_id " << channel_id
+    << "        ASIC_id " << asic_id
+    << "        Side " << side
+    << "        Module_id " << module_id
+    << "        energy " << energy
+    << "        timestamp " << timestamp
+    << "=================================";
     
     //new ((*fRawData)[fNHits]) R3BStartrackRawHit(channel_id, asic_id, module_id, energy, timestamp);
     //new ((*fRawData)[fNHits]) R3BStartrackRawHit(wordtype, hitbit, module_id, side, asic_id, channel_id, energy, timestamp);
@@ -395,9 +395,9 @@ Bool_t R3BStartrackUnpack::DoUnpack2(Int_t *data_word0, Int_t *data_word1, Int_t
  
   } // end of while(l_s<size)
   
-  LOG(DEBUG) << "End of memory" << FairLogger::endl;
-  LOG(DEBUG) << "R3BStartrackUnpack: Number of Si Tracker raw hits: " << fNHits << FairLogger::endl;
-  //LOG(INFO) << "R3BStartrackUnpack: Number of Si Tracker raw hits: " << fNHits << FairLogger::endl;
+  LOG(DEBUG) << "End of memory";
+  LOG(DEBUG) << "R3BStartrackUnpack: Number of Si Tracker raw hits: " << fNHits;
+  //LOG(INFO) << "R3BStartrackUnpack: Number of Si Tracker raw hits: " << fNHits;
   
   
   return kTRUE;
@@ -408,7 +408,7 @@ Bool_t R3BStartrackUnpack::DoUnpack2(Int_t *data_word0, Int_t *data_word1, Int_t
 //Reset: Public method
 void R3BStartrackUnpack::Reset()
 {
-  LOG(DEBUG) << "Clearing Data Structure" << FairLogger::endl;
+  LOG(DEBUG) << "Clearing Data Structure";
   fRawData->Clear();
   fNHits = 0;
 }

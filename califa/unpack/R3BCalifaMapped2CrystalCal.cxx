@@ -44,7 +44,7 @@ R3BCalifaMapped2CrystalCal::R3BCalifaMapped2CrystalCal() :
 //Virtual R3BCalifaMapped2CrystalCal: Destructor
 R3BCalifaMapped2CrystalCal::~R3BCalifaMapped2CrystalCal()
 {
-  LOG(INFO) << "R3BCalifaMapped2CrystalCal: Delete instance" << FairLogger::endl;
+  LOG(INFO) << "R3BCalifaMapped2CrystalCal: Delete instance";
   delete fCalifaMappedDataCA;
   delete fCalifaCryCalDataCA;
 }
@@ -57,15 +57,15 @@ void R3BCalifaMapped2CrystalCal::SetParContainers() {
   //Reading califaCrystalCalPar from FairRuntimeDb
   FairRuntimeDb* rtdb = FairRuntimeDb::instance();
   if (!rtdb) { 
-    LOG(ERROR)<<"R3BCalifaMapped2CrystalCal:: FairRuntimeDb not opened!"<<FairLogger::endl;
+    LOG(ERROR)<<"R3BCalifaMapped2CrystalCal:: FairRuntimeDb not opened!";
   }
   
   fCal_Par=(R3BCalifaCrystalCalPar*)rtdb->getContainer("califaCrystalCalPar");
   if (!fCal_Par) {
-    LOG(ERROR)<<"R3BCalifaMapped2CrystalCal::Init() Couldn't get handle on califaCrystalCalPar container"<<FairLogger::endl;
+    LOG(ERROR)<<"R3BCalifaMapped2CrystalCal::Init() Couldn't get handle on califaCrystalCalPar container";
   }
   if (fCal_Par){
-    LOG(INFO)<<"R3BCalifaMapped2CrystalCal:: califaCrystalCalPar container open"<<FairLogger::endl;
+    LOG(INFO)<<"R3BCalifaMapped2CrystalCal:: califaCrystalCalPar container open";
   }
 }
 
@@ -81,8 +81,8 @@ void R3BCalifaMapped2CrystalCal::SetParameter(){
   CalParams->Set(array_size);	
   CalParams=fCal_Par->GetCryCalParams();//Array with the Cal parameters
   
-  LOG(INFO)<<"R3BCalifaMapped2CrystalCal:: Max Crystal ID "<<NumCrystals<<FairLogger::endl;
-  LOG(INFO)<<"R3BCalifaMapped2CrystalCal:: Nb of parameters used in the fits "<<NumParams<<FairLogger::endl;
+  LOG(INFO)<<"R3BCalifaMapped2CrystalCal:: Max Crystal ID "<<NumCrystals;
+  LOG(INFO)<<"R3BCalifaMapped2CrystalCal:: Nb of parameters used in the fits "<<NumParams;
   
 }
 
@@ -94,7 +94,7 @@ void R3BCalifaMapped2CrystalCal::SetParameter(){
 InitStatus R3BCalifaMapped2CrystalCal::Init()
 {
 
-  LOG(INFO)<<"R3BCalifaMapped2CrystalCal::Init()"<<FairLogger::endl;
+  LOG(INFO)<<"R3BCalifaMapped2CrystalCal::Init()";
 
   //INPUT DATA
   FairRootManager* rootManager = FairRootManager::Instance();
@@ -129,13 +129,13 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
 {
   
   //if(++nEvents % 10000 == 0)
-  //LOG(INFO) << nEvents << FairLogger::endl;
+  //LOG(INFO) << nEvents;
   
   //Reset entries in output arrays, local arrays
   Reset();
   
   if (!fCal_Par) {
-    LOG(WARNING)<<"R3BCalifaMapped2CrystalCal::NO Container Parameter!!"<<FairLogger::endl;
+    LOG(WARNING)<<"R3BCalifaMapped2CrystalCal::NO Container Parameter!!";
   }  
   
   //Reading the Input -- Mapped Data --
@@ -232,7 +232,7 @@ void R3BCalifaMapped2CrystalCal::Finish()
 // -----   Public method Reset   ------------------------------------------------
 void R3BCalifaMapped2CrystalCal::Reset()
 {
-  LOG(DEBUG) << "Clearing CrystalCalData Structure" << FairLogger::endl;
+  LOG(DEBUG) << "Clearing CrystalCalData Structure";
   if(fCalifaCryCalDataCA)fCalifaCryCalDataCA->Clear();
 }
 

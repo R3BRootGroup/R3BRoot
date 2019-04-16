@@ -365,13 +365,13 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option)
     {
         char output[128];
         sprintf(output, "R3BNeulandCal2HitPar::Exec : Event: %8d,    accepted Events: %8d", fEventNumber, nData);
-        LOG(INFO) << "\r" << output << FairLogger::flush;
+        LOG(INFO) << "\r" << output;
     }
     Int_t nItems = fLandPmt->GetEntriesFast();
 
     if (nItems < 12)
     {
-        LOG(DEBUG) << "Event cannot be used: too few hits : " << nItems << "!" << FairLogger::endl;
+        LOG(DEBUG) << "Event cannot be used: too few hits : " << nItems << "!";
         return;
     }
 
@@ -410,7 +410,7 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option)
 
         if (items < 4)
         {
-            LOG(DEBUG) << "Event cannot be used: too few hits : " << items << "!" << FairLogger::endl;
+            LOG(DEBUG) << "Event cannot be used: too few hits : " << items << "!";
             return;
         }
     }
@@ -524,7 +524,7 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option)
 
         if (x_hit_fPlanes < 2 || y_hit_fPlanes < 2)
         {
-            LOG(DEBUG) << "failed: too few fPlanes were hit!" << FairLogger::endl;
+            LOG(DEBUG) << "failed: too few fPlanes were hit!";
             return;
         }
 
@@ -540,13 +540,13 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option)
 
         if (x_plot->GetN() < 2)
         {
-            LOG(DEBUG) << "failed: checking impossible, abort (rather have fewer, than bad ones!)" << FairLogger::endl;
+            LOG(DEBUG) << "failed: checking impossible, abort (rather have fewer, than bad ones!)";
             return;
         }
 
         if (y_plot->GetN() < 2)
         {
-            LOG(DEBUG) << "failed: checking impossible, abort (rather have fewer, than bad ones!)" << FairLogger::endl;
+            LOG(DEBUG) << "failed: checking impossible, abort (rather have fewer, than bad ones!)";
             return;
         }
 
@@ -641,7 +641,7 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option)
             if (bad_x + bad_y == 1)
                 continue; // Only one bad, continue
 
-            LOG(DEBUG) << "failed: too many bad points" << FairLogger::endl;
+            LOG(DEBUG) << "failed: too many bad points";
             return;
         }
 
@@ -657,7 +657,7 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option)
         // If we reach this point, then we have one reasonable x line, and one
         // reasonable y line
 
-        LOG(DEBUG) << "succeeded!" << FairLogger::endl;
+        LOG(DEBUG) << "succeeded!";
 
         /* And now add our information. */
 
@@ -977,20 +977,20 @@ void R3BNeulandCal2HitPar::FinishEvent() {}
 
 void R3BNeulandCal2HitPar::FinishTask()
 {
-    LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << nData << " Events registered." << FairLogger::endl;
+    LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << nData << " Events registered.";
 
     LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : "
-              << "**************TIMES**************" << FairLogger::endl;
+              << "**************TIMES**************";
 
     LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : "
-              << "Analysing history: t-diff" << FairLogger::endl;
+              << "Analysing history: t-diff";
 
     for (Int_t pl = 0; pl < fPlanes; pl++)
         for (Int_t pdl = 0; pdl < fPaddles; pdl++)
             _collect_diff[pl][pdl].analyse_history(_bad_fit_idents);
 
     LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : "
-              << "Analysing history: t-mean-within" << FairLogger::endl;
+              << "Analysing history: t-mean-within";
 
     for (Int_t pl = 0; pl < fPlanes; pl++)
         for (Int_t pdl = 0; pdl < fPaddles - 1; pdl++)
@@ -1000,19 +1000,19 @@ void R3BNeulandCal2HitPar::FinishTask()
         }
 
     LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : "
-              << "Analysing history: t-mean-cross" << FairLogger::endl;
+              << "Analysing history: t-mean-cross";
 
     for (Int_t pl = 0; pl < fPlanes - 1; pl++)
         for (Int_t pdl1 = 0; pdl1 < fPaddles; pdl1++)
             for (Int_t pdl2 = 0; pdl2 < fPaddles; pdl2++)
             {
                 LOG(DEBUG) << "================== mean: (" << pl << "," << pdl1 << ")-(" << pl + 1 << "," << pdl2 << ")"
-                           << FairLogger::endl;
+                          ;
                 _collect_mean_cross[pl][pdl1][pdl2].analyse_history(_bad_fit_idents);
             }
 
     LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : "
-              << "Collecting and fitting history: t-diff" << FairLogger::endl;
+              << "Collecting and fitting history: t-diff";
 
     Double_t tdiff[fPlanes][fPaddles][3];
     Double_t invveff[fPlanes][fPaddles][2];
@@ -1025,7 +1025,7 @@ void R3BNeulandCal2HitPar::FinishTask()
     val_err_inv mean_diff_cross_t[fPlanes - 1][fPaddles][fPaddles];
 
     LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : "
-              << "Collecting history: t-mean-within" << FairLogger::endl;
+              << "Collecting history: t-mean-within";
 
     /* this calcs a mean_diff from all the data stored in _collect_mean_within
     and stores the mean in mean_diff_within_t
@@ -1034,24 +1034,24 @@ void R3BNeulandCal2HitPar::FinishTask()
     for (Int_t pl = 0; pl < fPlanes; pl++)
         for (Int_t pdl = 0; pdl < fPaddles - 1; pdl++)
         {
-            LOG(DEBUG) << "================== mean: " << pl << ",(" << pdl << "-" << pdl + 1 << ")" << FairLogger::endl;
+            LOG(DEBUG) << "================== mean: " << pl << ",(" << pdl << "-" << pdl + 1 << ")";
             _collect_mean_within[pl][pdl].calc_params(_bad_fit_idents, mean_diff_within_t[pl][pdl]);
         }
 
     LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : "
-              << "Collecting history: t-mean-cross" << FairLogger::endl;
+              << "Collecting history: t-mean-cross";
 
     for (Int_t pl = 0; pl < fPlanes - 1; pl++)
         for (Int_t pdl1 = 0; pdl1 < fPaddles; pdl1++)
             for (Int_t pdl2 = 0; pdl2 < fPaddles; pdl2++)
             {
                 LOG(DEBUG) << "================== mean: (" << pl << "," << pdl1 << ")-(" << pl + 1 << "," << pdl2 << ")"
-                           << FairLogger::endl;
+                          ;
                 _collect_mean_cross[pl][pdl1][pdl2].calc_params(_bad_fit_idents, mean_diff_cross_t[pl][pdl1][pdl2]);
             }
 
     LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : "
-              << "Syncing: t-mean" << FairLogger::endl;
+              << "Syncing: t-mean";
     Double_t tsync[fPlanes][fPaddles][2];
     {
         sparse_sync_pair_llq_mean_zero syncer_t;
@@ -1111,7 +1111,7 @@ void R3BNeulandCal2HitPar::FinishTask()
             }
     }
     LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : "
-              << "*************ENERGIES************" << FairLogger::endl;
+              << "*************ENERGIES************";
 
     Double_t ecal[fPlanes][fPaddles][2];
     Double_t ecalerr[fPlanes][fPaddles][2];
@@ -1275,20 +1275,20 @@ void R3BNeulandCal2HitPar::FinishTask()
 
     if (fails.size() > 0)
     {
-        LOG(INFO) << FairLogger::endl << FairLogger::endl << FairLogger::endl;
+        LOG(INFO);
         LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : "
-                  << "Following PMTs failed to calibrate:" << FairLogger::endl;
+                  << "Following PMTs failed to calibrate:";
         for (Int_t i = 0; i < fails.size(); i++)
-            LOG(INFO) << fails.at(i) << FairLogger::endl;
+            LOG(INFO) << fails.at(i);
     }
 
     if (susp_s.size() > 0)
     {
-        LOG(INFO) << FairLogger::endl << FairLogger::endl << FairLogger::endl;
+        LOG(INFO);
         LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : "
-                  << "Following PMTs are conspicuous:" << FairLogger::endl;
+                  << "Following PMTs are conspicuous:";
         for (Int_t i = 0; i < susp_s.size(); i++)
-            LOG(INFO) << susp_s.at(i) << FairLogger::endl;
+            LOG(INFO) << susp_s.at(i);
     }
 
     h_tdiff->Write();
@@ -1301,7 +1301,7 @@ void R3BNeulandCal2HitPar::FinishTask()
 
     fPar->setChanged();
     LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << fPar->GetNumModulePar() << "/" << fPlanes * fPaddles * 2
-              << " PMTs calibrated!" << FairLogger::endl;
+              << " PMTs calibrated!";
 }
 
 ClassImp(R3BNeulandCal2HitPar)

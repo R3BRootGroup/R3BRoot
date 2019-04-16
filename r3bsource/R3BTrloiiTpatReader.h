@@ -25,8 +25,6 @@ class R3BTrloiiTpatReader : public R3BReader
 		EXT_STR_h101_TPAT* fData;
 		/* Offset of detector specific data in full data structure */
 		UInt_t fOffset;
-		/* FairLogger */
-		FairLogger *fLogger;
 		/* A pointer to the R3BEventHeader structure */
 		R3BEventHeader *fEventHeader;
 

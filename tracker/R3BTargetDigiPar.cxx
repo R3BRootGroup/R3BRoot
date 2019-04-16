@@ -10,7 +10,7 @@ R3BTargetDigiPar::R3BTargetDigiPar(const char* name, const char* title, const ch
 
 void R3BTargetDigiPar::putParams(FairParamList* list)
 {
-  LOG(INFO)<<"R3BTargetDigiPar::putParams() called"<<FairLogger::endl;
+  LOG(INFO)<<"R3BTargetDigiPar::putParams() called";
   if(!list) return;
 //  list->add("max_paddle", (Int_t)nMaxPaddle);
 //  list->add("max_plane", (Int_t)nMaxPlane);
@@ -18,7 +18,7 @@ void R3BTargetDigiPar::putParams(FairParamList* list)
 
 Bool_t R3BTargetDigiPar::getParams(FairParamList* list)
 {
-  LOG(INFO)<<"R3BTargetDigiPar::getParams() called"<<FairLogger::endl;
+  LOG(INFO)<<"R3BTargetDigiPar::getParams() called";
   if (!list) return kFALSE;
   LOG(INFO)<<"R3BTargetDigiPar::getParams() 1 ";
   
@@ -30,9 +30,9 @@ Bool_t R3BTargetDigiPar::getParams(FairParamList* list)
 
 void R3BTargetDigiPar::Print(Option_t *option) const
 {
-    LOG(INFO)<<"Target Digi Parameters:"<<FairLogger::endl;
-//    LOG(INFO)<<"   Max Paddle   = "<<nMaxPaddle<<FairLogger::endl;
-//    LOG(INFO)<<"   Max Plane   = "<<nMaxPlane<<FairLogger::endl;
+    LOG(INFO)<<"Target Digi Parameters:";
+//    LOG(INFO)<<"   Max Paddle   = "<<nMaxPaddle;
+//    LOG(INFO)<<"   Max Plane   = "<<nMaxPlane;
 }
 
 ClassImp(R3BTargetDigiPar);

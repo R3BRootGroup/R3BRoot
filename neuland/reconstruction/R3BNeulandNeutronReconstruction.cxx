@@ -9,7 +9,7 @@ R3BNeulandNeutronReconstruction::R3BNeulandNeutronReconstruction(Neuland::Recons
     , fClusters(input)
     , fNeutrons(output)
 {
-    LOG(INFO) << "Using R3B Neuland Neutron Reconstruction" << FairLogger::endl;
+    LOG(INFO) << "Using R3B Neuland Neutron Reconstruction";
 }
 
 InitStatus R3BNeulandNeutronReconstruction::Init()

@@ -55,7 +55,7 @@ void R3BStartrackStripAna::Exec(Option_t *option)
     thTime->Fill(hit->GetTime());
   }
   if(0 == (fnEvents%100)) {
-    LOG(INFO) << fnEvents << " events, multiplicity:  " << nHits << FairLogger::endl;
+    LOG(INFO) << fnEvents << " events, multiplicity:  " << nHits;
   }
   fnEvents += 1;
 }
@@ -98,7 +98,7 @@ void R3BStartrackStripAna::WriteHistos()
   thStripID->Write();
   thEnergy->Write();
   thTime->Write();
-  LOG(INFO) << "R3BStartrackStripAna --- Histograms written to Root File ..." << FairLogger::endl; 
+  LOG(INFO) << "R3BStartrackStripAna --- Histograms written to Root File ..."; 
 }
 
 

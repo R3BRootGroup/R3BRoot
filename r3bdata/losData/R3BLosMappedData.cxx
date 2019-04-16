@@ -37,8 +37,8 @@ R3BLosMappedData::R3BLosMappedData(	UInt_t detector,
 //<<timeCoarse<<endl;
 /* Everything fine here!
  
- if(timeFine <= 0 || IS_NAN(timeFine) ) LOG(INFO)<<"LosMappedData FineTime wrong value for channel: "<<channel<<" type: "<<type<<" value: "<<timeFine<<FairLogger::endl;
- if(timeCoarse < 0 || IS_NAN(timeCoarse)) LOG(INFO)<<"LosMappedData CoarseTime wrong value for channel: "<<channel<<" type: "<<type<<" value: "<<timeCoarse<<FairLogger::endl;
+ if(timeFine <= 0 || IS_NAN(timeFine) ) LOG(INFO)<<"LosMappedData FineTime wrong value for channel: "<<channel<<" type: "<<type<<" value: "<<timeFine;
+ if(timeCoarse < 0 || IS_NAN(timeCoarse)) LOG(INFO)<<"LosMappedData CoarseTime wrong value for channel: "<<channel<<" type: "<<type<<" value: "<<timeCoarse;
  
 */	 
 }    

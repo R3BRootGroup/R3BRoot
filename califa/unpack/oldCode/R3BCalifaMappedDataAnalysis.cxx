@@ -51,7 +51,7 @@ void R3BCalifaMappedDataAnalysis::Exec(Option_t *option)
     tht->Fill(hit->GetTime());
   }
   if(0 == (fnEvents%100)) {
-    LOG(INFO) << fnEvents << " events, multiplicity:  " << nHits << FairLogger::endl;
+    LOG(INFO) << fnEvents << " events, multiplicity:  " << nHits;
   }
   fnEvents += 1;
 }
@@ -79,7 +79,7 @@ void R3BCalifaMappedDataAnalysis::WriteHistos()
   thc->Write();
   the->Write();
   tht->Write();
-  LOG(INFO) << "R3BCalifaMappedDataAnalysis --- Histograms written to Root File ..." << FairLogger::endl; 
+  LOG(INFO) << "R3BCalifaMappedDataAnalysis --- Histograms written to Root File ..."; 
 }
 
 

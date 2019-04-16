@@ -55,7 +55,7 @@ void R3BNeulandCal2Hit::SetParameter()
     }
 
     LOG(INFO) << "R3BNeulandCal2Hit::SetParameter : Number of Parameters: " << fPar->GetNumModulePar()
-              << FairLogger::endl;
+             ;
 
     fMapIsSet = tempMapIsSet;
     fMapVeff = tempMapVeff;
