@@ -57,8 +57,8 @@ void R3BStartrackDigit::SetParContainers() {
   fStartrackHitPar = (R3BStartrackHitPar*)(rtdb->getContainer("R3BStartrackHitPar"));
 
   if ( fStartrackHitPar ) {
-      LOG(INFO) << "-I- R3BStartrackDigit::SetParContainers() "<< FairLogger::endl;
-      LOG(INFO) << "-I- Container R3BStartrackHitPar  loaded " << FairLogger::endl;
+      LOG(INFO) << "-I- R3BStartrackDigit::SetParContainers() ";
+      LOG(INFO) << "-I- Container R3BStartrackHitPar  loaded ";
   }
 
 }

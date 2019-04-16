@@ -61,7 +61,7 @@ FairParSet* R3BLandContFact::createContainer(FairContainer* c) {
    * of this container, the name is concatinated with the context. */
 
   const char* name=c->GetName();
-  LOG(INFO) << "R3BLandContFact: Create container name: " << name << FairLogger::endl;
+  LOG(INFO) << "R3BLandContFact: Create container name: " << name;
   FairParSet* p=0;
   if (strcmp(name,"R3BLandDigiPar")==0) {
     p=new R3BLandDigiPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());

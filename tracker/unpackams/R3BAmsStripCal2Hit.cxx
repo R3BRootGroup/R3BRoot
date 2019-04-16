@@ -52,13 +52,13 @@ R3BAmsStripCal2Hit::R3BAmsStripCal2Hit(const char* name, Int_t iVerbose) :
 //Virtual R3BAmsStripCal2Hit: Destructor
 R3BAmsStripCal2Hit::~R3BAmsStripCal2Hit()
 {
-  LOG(INFO) << "R3BAmsStripCal2Hit: Delete instance" << FairLogger::endl;
+  LOG(INFO) << "R3BAmsStripCal2Hit: Delete instance";
 }
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BAmsStripCal2Hit::Init()
 { 
-  LOG(INFO) << "R3BAmsStripCal2Hit: Init" << FairLogger::endl;
+  LOG(INFO) << "R3BAmsStripCal2Hit: Init";
 
   //INPUT DATA
   FairRootManager* rootManager = FairRootManager::Instance();
@@ -230,7 +230,7 @@ void R3BAmsStripCal2Hit::DefineClusters(Int_t *nfoundhits, Double_t fPitch, Doub
 // -----   Public method Reset   ------------------------------------------------
 void R3BAmsStripCal2Hit::Reset()
 {
-  LOG(DEBUG) << "Clearing HitData Structure" << FairLogger::endl;
+  LOG(DEBUG) << "Clearing HitData Structure";
   if(fAmsHitDataCA)fAmsHitDataCA->Clear();
 }
 

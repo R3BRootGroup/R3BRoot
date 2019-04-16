@@ -38,7 +38,7 @@ void R3BModule::ConstructGeometry()
     if (!GetGeometryFileName().EndsWith(".root"))
     {
         LOG(FATAL) << GetName() << " (which is a " << ClassName() << ") geometry file is not specified!"
-                   << FairLogger::endl;
+                  ;
     }
     ConstructRootGeometry();
 }
@@ -46,7 +46,7 @@ void R3BModule::ConstructGeometry()
 void R3BModule::ConstructRootGeometry()
 {
     LOG(INFO) << "R3BModule: Constructing " << GetName() << " (which is a " << ClassName()
-              << ") geometry from ROOT file " << GetGeometryFileName() << " ..." << FairLogger::endl;
+              << ") geometry from ROOT file " << GetGeometryFileName() << " ...";
     FairModule::ConstructRootGeometry();
 
     if (!fCombiTrans.IsIdentity())

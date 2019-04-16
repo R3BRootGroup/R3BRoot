@@ -19,14 +19,14 @@ void Neuland::RecoTDR::Init()
     auto rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
-        LOG(FATAL) << "Neuland::RecoTDR::Init: No FairRuntimeDb!" << FairLogger::endl;
+        LOG(FATAL) << "Neuland::RecoTDR::Init: No FairRuntimeDb!";
         return;
     }
 
     fPar = (R3BNeulandNeutron2DPar*)rtdb->getContainer("R3BNeulandNeutron2DPar");
     if (!fPar)
     {
-        LOG(FATAL) << "Neuland::RecoTDR::Init: No R3BNeulandNeutron2DPar!" << FairLogger::endl;
+        LOG(FATAL) << "Neuland::RecoTDR::Init: No R3BNeulandNeutron2DPar!";
         return;
     }
 

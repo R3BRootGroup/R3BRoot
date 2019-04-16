@@ -11,7 +11,7 @@ R3BNeulandQCalPar::~R3BNeulandQCalPar() {}
 
 void R3BNeulandQCalPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BNeulandQCalPar::putParams() called" << FairLogger::endl;
+    LOG(INFO) << "R3BNeulandQCalPar::putParams() called";
     if (!list)
     {
         return;
@@ -21,7 +21,7 @@ void R3BNeulandQCalPar::putParams(FairParamList* list)
 
 Bool_t R3BNeulandQCalPar::getParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BNeulandQCalPar::getParams() called" << FairLogger::endl;
+    LOG(INFO) << "R3BNeulandQCalPar::getParams() called";
     if (!list)
     {
         return kFALSE;
@@ -42,11 +42,11 @@ void R3BNeulandQCalPar::SetSize(Int_t size)
 void R3BNeulandQCalPar::printParams()
 {
 
-    LOG(INFO) << " -----------  " << GetName() << " NeuLAND Parameters -------------  " << FairLogger::endl;
-    LOG(INFO) << " Number of Parameters " << fParams.GetSize() << FairLogger::endl;
+    LOG(INFO) << " -----------  " << GetName() << " NeuLAND Parameters -------------  ";
+    LOG(INFO) << " Number of Parameters " << fParams.GetSize();
     for (Int_t i = 0; i < fParams.GetSize(); i++)
-        LOG(INFO) << "PMT Nr. " << i << " : pedestal level = " << fParams.At(i) << FairLogger::endl;
-    LOG(INFO) << "----------------------------------------------------------------------" << FairLogger::endl;
+        LOG(INFO) << "PMT Nr. " << i << " : pedestal level = " << fParams.At(i);
+    LOG(INFO) << "----------------------------------------------------------------------";
 }
 
 ClassImp(R3BNeulandQCalPar);

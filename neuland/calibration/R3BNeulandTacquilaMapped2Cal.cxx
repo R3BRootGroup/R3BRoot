@@ -86,7 +86,7 @@ R3BNeulandTacquilaMapped2Cal::~R3BNeulandTacquilaMapped2Cal()
 InitStatus R3BNeulandTacquilaMapped2Cal::Init()
 {
     LOG(INFO) << "R3BNeulandTacquilaMapped2Cal::Init : read " << fTcalPar->GetNumModulePar() << " calibrated modules"
-              << FairLogger::endl;
+             ;
     // fTcalPar->printParams();
 
     FairRootManager* mgr = FairRootManager::Instance();
@@ -138,7 +138,7 @@ void R3BNeulandTacquilaMapped2Cal::SetParameter()
                 i++;
             }
 
-    LOG(INFO) << "R3BNeulandTacquilaMapped2Cal::SetParameter : Number of Parameters: " << i << FairLogger::endl;
+    LOG(INFO) << "R3BNeulandTacquilaMapped2Cal::SetParameter : Number of Parameters: " << i;
 
     fMapQdcOffset = tempMapQdcOffset;
 }
@@ -239,7 +239,7 @@ void R3BNeulandTacquilaMapped2Cal::MakeCal()
         if (!(par = fTcalPar->GetModuleParAt(iPlane, iPaddle, iSide)))
         {
             LOG(DEBUG) << "R3BNeulandTacquilaMapped2Cal::Exec : Tcal par not found, channel: " << iPlane << " / "
-                       << iPaddle << " / " << iSide << FairLogger::endl;
+                       << iPaddle << " / " << iSide;
             continue;
         }
 
@@ -248,14 +248,14 @@ void R3BNeulandTacquilaMapped2Cal::MakeCal()
         if (time < 0. || time > fClockFreq)
         {
             LOG(ERROR) << "R3BNeulandTacquilaMapped2Cal::Exec : error in time calibration: ch=" << channel
-                       << ", tdc=" << tdc << ", time=" << time << FairLogger::endl;
+                       << ", tdc=" << tdc << ", time=" << time;
             continue;
         }
 
         if (!(par = fTcalPar->GetModuleParAt(iPlane, iPaddle, iSide + 2)))
         {
             LOG(DEBUG) << "R3BNeulandTacquilaMapped2Cal::Exec : Tcal par not found, channel: " << iPlane << " / "
-                       << iPaddle << " / " << (iSide + 2) << FairLogger::endl;
+                       << iPaddle << " / " << (iSide + 2);
             continue;
         }
 
@@ -264,7 +264,7 @@ void R3BNeulandTacquilaMapped2Cal::MakeCal()
         if (time2 < 0. || time2 > fClockFreq)
         {
             LOG(ERROR) << "R3BNeulandTacquilaMapped2Cal::Exec : error in time calibration: ch=" << channel
-                       << ", tdc=" << tdc << ", time=" << time2 << FairLogger::endl;
+                       << ", tdc=" << tdc << ", time=" << time2;
             continue;
         }
 
@@ -286,7 +286,7 @@ void R3BNeulandTacquilaMapped2Cal::FinishEvent()
     if (fVerbose && 0 == (fNEvents % 1000))
     {
         LOG(INFO) << "R3BNeulandTacquilaMapped2Cal::Exec : event=" << fNEvents << " nPMTs=" << fNPmt
-                  << FairLogger::endl;
+                 ;
     }
 
     if (fPmt)

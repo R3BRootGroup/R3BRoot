@@ -4,82 +4,54 @@
 # is is important for the base classes which are in R3BROOT and PANDAROOT.
 
 # Check if cmake has the required version
-cmake_minimum_required(VERSION 2.8.2 FATAL_ERROR)
-
-# CMP0025   Compiler id for Apple Clang is now AppleClang. CMP0042   MACOSX_RPATH is enabled by
-# default.
-
-foreach(p
-        CMP0025 # CMake 3.0
-        CMP0042 # CMake 3.0
-        )
-    if(POLICY ${p})
-        cmake_policy(SET ${p} NEW)
-    endif()
-endforeach()
+cmake_minimum_required(VERSION 3.11.0 FATAL_ERROR)
 
 # Set name of our project to "R3BROOT". Has to be done after check of cmake version
 project(R3BROOT)
 
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
-    message(
-        FATAL_ERROR
+    message(FATAL_ERROR
             "\nmacros repository is missing in the R3BRoot source directory\ncd ../R3BRoot\ngit clone https://github.com/R3BRootGroup/macros.git"
-        )
+           )
 endif(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
 
-# Check if the FairRoot is still in source, since Jan 2014 FairRoot should be installed separately
-find_path(FAIRBASE NAMES FairRun.h PATHS ${CMAKE_SOURCE_DIR}/base/steer NO_DEFAULT_PATH)
+# Check for needed environment variables
+IF(NOT DEFINED ENV{FAIRROOTPATH})
+  MESSAGE(FATAL_ERROR "You did not define the environment variable FAIRROOTPATH which is needed to find FairRoot. Please set this variable and execute cmake again.")
+ENDIF(NOT DEFINED ENV{FAIRROOTPATH})
+SET(FAIRROOTPATH $ENV{FAIRROOTPATH})
 
-if(FAIRBASE)
-    message(STATUS "Found FAIRBASE")
-    set(FAIRBASE ${FAIRBASE})
-else(FAIRBASE)
-    message(STATUS "NOT Found FAIRBASE")
-    if(FAIRROOT_ROOT)
-        set(FAIRROOTPATH ${FAIRROOT_ROOT})
-    else(FAIRROOT_ROOT)
-        if(NOT DEFINED ENV{FAIRROOTPATH})
-            message(
-                FATAL_ERROR
-                    "You did not define the environment variable FAIRROOTPATH which is needed to find FairRoot. Please set this variable and execute cmake again."
-                )
-        endif(NOT DEFINED ENV{FAIRROOTPATH})
-        set(FAIRROOTPATH $ENV{FAIRROOTPATH})
-    endif(FAIRROOT_ROOT)
+IF(NOT DEFINED ENV{SIMPATH})
+  MESSAGE(FATAL_ERROR "You did not define the environment variable SIMPATH which is nedded to find the external packages. Please set this variable and execute cmake again.")
+ENDIF(NOT DEFINED ENV{SIMPATH})
+SET(SIMPATH $ENV{SIMPATH})
 
-endif(FAIRBASE)
+STRING(REGEX MATCHALL "[^:]+" PATH $ENV{PATH})
+
+set(CMAKE_MODULE_PATH "${FAIRROOTPATH}/share/fairbase/cmake/modules" ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH "${FAIRROOTPATH}/share/fairbase/cmake/modules_old" ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
+
+Set(CheckSrcDir "${FAIRROOTPATH}/share/fairbase/cmake/checks")
+
+# set cmake policies
+include(FairRootCmakePolicies)
+set_fairroot_cmake_policies()
+
+find_package(FairRoot)
+
+execute_process(COMMAND ${FAIRROOTPATH}/bin/fairroot-config --major_version OUTPUT_VARIABLE FR_MAJOR_VERSION)
+execute_process(COMMAND ${FAIRROOTPATH}/bin/fairroot-config --minor_version OUTPUT_VARIABLE FR_MINOR_VERSION)
+execute_process(COMMAND ${FAIRROOTPATH}/bin/fairroot-config --patch_version OUTPUT_VARIABLE FR_PATCH_VERSION)
+if(${FR_MAJOR_VERSION} LESS 18 OR ${FR_MINOR_VERSION} LESS 2)
+  Message(FATAL_ERROR "Incompatible FairRoot version detected. R3BRoot requires FairRoot v18.2.0")
+endif()
 
 # added a variable to point to r3broot path in the system
 set(R3BROOTPATH ${CMAKE_INSTALL_PREFIX})
 
-# where to look first for cmake modules, before ${CMAKE_ROOT}/Modules/ is checked
-
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
-set(CMAKE_MODULE_PATH "${FAIRROOTPATH}/share/fairbase/cmake/modules" ${CMAKE_MODULE_PATH})
-if(NOT FAIRROOT_ROOT)
-    set(CMAKE_MODULE_PATH "${FAIRROOTPATH}/share/fairbase/cmake/modules_old" ${CMAKE_MODULE_PATH})
-endif(NOT FAIRROOT_ROOT)
-
 # Check if the compiler support specific C++11 features Up to now this is only a check since the
 # code does not use any of the features of the new standard
-
-if(FAIRROOTPATH)
-    set(CheckSrcDir "${FAIRROOTPATH}/share/fairbase/cmake/checks")
-else(FAIRROOTPATH)
-    set(CheckSrcDir "${CMAKE_SOURCE_DIR}/cmake/checks")
-endif(FAIRROOTPATH)
-
-if(FAIRROOTPATH)
-  find_package(FairRoot REQUIRED)
-  execute_process(COMMAND ${FAIRROOTPATH}/bin/fairroot-config --major_version OUTPUT_VARIABLE FR_MAJOR_VERSION)
-  execute_process(COMMAND ${FAIRROOTPATH}/bin/fairroot-config --minor_version OUTPUT_VARIABLE FR_MINOR_VERSION)
-  execute_process(COMMAND ${FAIRROOTPATH}/bin/fairroot-config --patch_version OUTPUT_VARIABLE FR_PATCH_VERSION)
-  if(${FR_MAJOR_VERSION} LESS 18)
-    Message(FATAL_ERROR "Incompatible FairRoot version detected. R3BRoot requires FairRoot v18.0.0")
-  endif()
-endif(FAIRROOTPATH)
-
 include(CheckCXX11Features)
 
 # Load some basic macros which are needed later on
@@ -100,36 +72,40 @@ if(NOT _HAS_CXX11_FLAG)
         )
 endif()
 
-if(NOT FAIRROOT_ROOT)
-    execute_process(COMMAND $ENV{SIMPATH}/bin/fairsoft-config --cxxflags
-                    OUTPUT_VARIABLE _res_fairsoft_config
-                    OUTPUT_STRIP_TRAILING_WHITESPACE)
-    string(FIND ${_res_fairsoft_config} "-std=c++11" POS_C++11)
-    string(FIND ${_res_fairsoft_config} "-std=c++1y" POS_C++1y)
-    if(${POS_C++11} EQUAL -1 AND ${POS_C++1y} EQUAL -1)
-        message(
-            FATAL_ERROR
-                "FairSoft wasn't compiled with c++11 or c++1y support. Please recompile FairSoft with a compiler which supports c++11 or c++1y."
-            )
-    endif()
+if(SIMPATH)
+  set(CMAKE_PREFIX_PATH ${SIMPATH} ${CMAKE_PREFIX_PATH})
+endif()
 
-    execute_process(COMMAND $ENV{FAIRROOTPATH}/bin/fairroot-config --fairsoft_path
-                    OUTPUT_VARIABLE _simpath
-                    OUTPUT_STRIP_TRAILING_WHITESPACE)
-    remove_trailing_slash($ENV{SIMPATH})
-    set(_simpath ${_ret_val})
-    remove_trailing_slash(${_simpath})
-    set(_fairroot_config ${_ret_val})
-    string(COMPARE EQUAL
-                   ${_simpath}
-                   ${_fairroot_config}
-                   _same_fairsoft)
-    if(NOT _same_fairsoft)
-        message(STATUS "FairSoft version used for FairRoot compilation: ${_fairroot_config}")
-        message(STATUS "FairSoft version now (defined by SIMPATH): ${_simpath}")
-        message(FATAL_ERROR "Both versions must be the same.")
-    endif()
-endif(NOT FAIRROOT_ROOT)
+find_package2(PUBLIC ROOT  VERSION 6.10.00  REQUIRED)
+find_package2(PUBLIC FairLogger  VERSION 1.2.0 REQUIRED)
+find_package2(PUBLIC Pythia6)
+find_package2(PUBLIC Pythia8)
+
+find_package2(PUBLIC Geant3)
+if(Geant3_FOUND)
+  Set(Geant3_LIBRARY_DIR ${Geant3_DIR}/${Geant3_CMAKE_INSTALL_LIBDIR})
+  FIND_PATH(Geant3_SYSTEM_DIR NAMES data PATHS
+           ${Geant3_DIR}/../../share/geant3
+           NO_DEFAULT_PATH)
+endif()
+
+find_package2(PUBLIC Geant4)
+#find_package2(PUBLIC GEANT4DATA)
+
+find_package2(PUBLIC VGM)
+
+find_package2(PUBLIC Geant4VMC)
+if(Geant4VMC_FOUND)
+  Set(Geant4VMC_LIBRARY_DIR "${Geant4VMC_DIR}/${Geant4VMC_CMAKE_INSTALL_LIBDIR}")
+  Set(Geant4VMC_SHARE_DIR "${Geant4VMC_DIR}/share")
+  Find_Path(Geant4VMC_MACRO_DIR NAMES g4libs.C PATHS
+    ${Geant4VMC_SHARE_DIR}/Geant4VMC-${Geant4VMC_VERSION}/examples/macro
+    NO_DEFAULT_PATH
+  )
+Endif()
+
+#find_package(CLHEP)
+find_package(HEPMC)
 
 # Check the compiler and set the compile and link flags
 check_compiler()
@@ -161,156 +137,38 @@ if(NOT UNIX)
         )
 endif(NOT UNIX)
 
-# Check if necessary environment variables are set If not stop execution
-if(NOT FAIRROOT_ROOT)
-    if(NOT R3BROOT_MINIMAL)
-        if(NOT DEFINED ENV{SIMPATH})
-            message(
-                FATAL_ERROR
-                    "You did not define the environment variable SIMPATH which is nedded to find the external packages. Please set this variable and execute cmake again."
-                )
-        endif(NOT DEFINED ENV{SIMPATH})
-        string(REGEX MATCHALL
-                     "[^:]+"
-                     PATH
-                     $ENV{PATH})
-        set(SIMPATH $ENV{SIMPATH})
-    else(NOT R3BROOT_MINIMAL)
-        if(NOT DEFINED ENV{ROOTSYS})
-            message(
-                FATAL_ERROR
-                    "You did not define the environment variable ROOTSYS which is nedded for the installation of the minimal version of FairRoot. Please set this variable and execute cmake again."
-                )
-        endif(NOT DEFINED ENV{ROOTSYS})
-    endif(NOT R3BROOT_MINIMAL)
-endif(NOT FAIRROOT_ROOT)
-
 # Check if the external packages are installed into a separate install directory
 check_external_package_install_dir()
 
-if(NOT FAIRROOT_ROOT)
-    if(FAIRSOFT_EXTERN)
-        set(BOOST_ROOT ${SIMPATH})
-        set(GSL_DIR ${SIMPATH})
-    else(FAIRSOFT_EXTERN)
-        set(BOOST_ROOT ${SIMPATH}/basics/boost)
-        set(GSL_DIR ${SIMPATH}/basics/gsl)
-    endif(FAIRSOFT_EXTERN)
-endif(NOT FAIRROOT_ROOT)
-
 set(Boost_NO_SYSTEM_PATHS TRUE)
 set(Boost_NO_BOOST_CMAKE TRUE)
-message("-- Looking for Boost ...")
-# If an older version of boost is found both of the variables below are cached and in a second cmake
-# run, a good boost version is found even if the version is to old. To overcome this problem both
-# variables are cleared before checking for boost.
+
+If(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
+  set(BOOST_ROOT ${SIMPATH})
+  set(GSL_DIR ${SIMPATH})
+Else(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
+  set(BOOST_ROOT ${SIMPATH}/basics/boost)
+  set(GSL_DIR ${SIMPATH}/basics/gsl)
+EndIf(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
+
 unset(Boost_INCLUDE_DIR CACHE)
 unset(Boost_LIBRARY_DIRS CACHE)
-find_package(Boost 1.41
-             COMPONENTS thread
-                        system
-                        timer
-                        program_options)
+find_package2(PUBLIC Boost
+  VERSION 1.67 ${FairMQ_Boost_VERSION}
+  COMPONENTS thread system timer program_options random filesystem chrono exception 
+regex serialization log log_setup atomic date_time signals ${FairMQ_Boost_COMPONENTS}
+)
 if(Boost_FOUND)
     set(Boost_Avail 1)
 else(Boost_FOUND)
     set(Boost_Avail 0)
 endif(Boost_FOUND)
 
-if(SIMPATH)
-  set(CMAKE_PREFIX_PATH ${SIMPATH} ${CMAKE_PREFIX_PATH})
-endif()
+#if(SIMPATH)
+#  set(CMAKE_PREFIX_PATH ${SIMPATH} ${CMAKE_PREFIX_PATH})
+#endif()
 
-find_package(FairLogger 1.1.0 REQUIRED)
-
-setbasicvariables()
-
-# Check if FairRoot was compiled with FairDB option
-find_library(FAIRDB_FOUND FairDB ${FAIRROOTPATH}/lib NO_DEFAULT_PATH)
-if(FAIRDB_FOUND)
-    message("Found FairDB ...")
-    add_definitions(-DWITH_FAIRDB)
-    set(DEFINITIONS "${DEFINITIONS} -DWITH_FAIRDB")
-else(FAIRDB_FOUND)
-    message("Building without dbase ...")
-endif(FAIRDB_FOUND)
-
-# searches for needed packages REQUIRED means that cmake will stop if this packages are not found
-# For example the framework can run without GEANT4, but ROOT is mandatory
-if(R3BROOT_MINIMAL)
-    message("******* Install minimal FairRoot Version ********")
-    find_package(ROOT 6 REQUIRED)
-else(R3BROOT_MINIMAL)
-    find_package(ROOT 6 REQUIRED)
-    # find_package(PLUTO REQUIRED) find_package(GENERATORS REQUIRED)
-    if(FAIRROOT_ROOT)
-
-        message(STATUS "Looking for GEANT3...")
-        find_package(Geant3 REQUIRED)
-        if(Geant3_DIR)
-            set(GEANT3_INCLUDE_DIR ${Geant3_INCLUDE_DIRS})
-            set(GEANT3_LIBRARIES ${Geant3_LIBRARIES})
-            set(GEANT3_LIBRARY_DIR ${Geant3_DIR}/..)
-            set(LD_LIBRARY_PATH ${LD_LIBRARY_PATH} ${GEANT3_LIBRARY_DIR})
-            find_path(GEANT3_SYSTEM_DIR
-                      NAMES data
-                      PATHS ${Geant3_DIR}/../../share/geant3
-                      NO_DEFAULT_PATH)
-            set(GEANT3_FOUND TRUE)
-            message(STATUS "Looking for GEANT3... - found ${GEANT3_LIBRARIES}")
-        endif(Geant3_DIR)
-
-        message(STATUS "Looking for GEANT4...")
-        find_package(Geant4 REQUIRED)
-        if(Geant4_DIR)
-            set(GEANT4_INCLUDE_DIR ${Geant4_INCLUDE_DIRS})
-            set(GEANT4_LIBRARY_DIR "${Geant4_DIR}/..")
-            set(LD_LIBRARY_PATH ${LD_LIBRARY_PATH} ${GEANT4_LIBRARY_DIR})
-            set(GEANT4_SHARE_DIR "${Geant4_DIR}/../../share")
-            set(GEANT4_FOUND TRUE)
-            message(STATUS "Looking for GEANT4... - found ${GEANT4_LIBRARY_DIR}")
-            set(CMAKE_MODULE_PATH "${FAIRROOTPATH}/cmake/modules_old" ${CMAKE_MODULE_PATH})
-            find_package(GEANT4DATA)
-        endif(Geant4_DIR)
-
-        message(STATUS "Looking for GEANT4VMC...")
-        find_package(Geant4VMC REQUIRED)
-        if(Geant4VMC_DIR)
-            set(GEANT4VMC_INCLUDE_DIR ${Geant4VMC_INCLUDE_DIRS})
-            set(GEANT4VMC_LIBRARY_DIR "${Geant4VMC_DIR}/..")
-            set(LD_LIBRARY_PATH ${LD_LIBRARY_PATH} ${GEANT4VMC_LIBRARY_DIR})
-            set(GEANT4VMC_SHARE_DIR "${Geant4VMC_DIR}/../../share")
-            find_path(GEANT4VMC_MACRO_DIR
-                      NAMES g4libs.C
-                      PATHS ${GEANT4VMC_SHARE_DIR}/Geant4VMC-3.3.0/examples/macro
-                      NO_DEFAULT_PATH)
-            set(GEANT4VMC_FOUND TRUE)
-            message(STATUS "Looking for GEANT4VMC... - found ${GEANT4VMC_LIBRARY_DIR}")
-        endif(Geant4VMC_DIR)
-
-        message(STATUS "Looking for VGM...")
-        find_package(VGM)
-        if(VGM_DIR)
-            set(VGM_INCLUDE_DIR ${VGM_INCLUDE_DIRS})
-            set(VGM_LIBRARY_DIR "${VGM_DIR}/..")
-            set(LD_LIBRARY_PATH ${LD_LIBRARY_PATH} ${VGM_LIBRARY_DIR})
-            set(VGM_FOUND TRUE)
-            message(STATUS "Looking for VGM... - found ${VGM_LIBRARY_DIR}")
-        endif()
-        # find_package(CLHEP REQUIRED)
-    else(FAIRROOT_ROOT)
-        find_package(GEANT3 REQUIRED)
-        find_package(GEANT4 REQUIRED)
-        find_package(GEANT4DATA)
-        find_package(GEANT4VMC REQUIRED)
-        find_package(CLHEP REQUIRED)
-    endif(FAIRROOT_ROOT)
-    # find_package(RuleChecker)
-endif(R3BROOT_MINIMAL)
-
-# set a variable which should be used in all CMakeLists.txt Defines all basic include directories
-# from fairbase
-setbasicvariables()
+SetBasicVariables()
 
 # Set the library version in the main CMakeLists.txt
 set(R3BROOT_MAJOR_VERSION 0)
@@ -493,3 +351,133 @@ else(NOT R3BROOT_MINIMAL)
 endif(NOT R3BROOT_MINIMAL)
 
 write_env_cache(env_cache.sh)
+
+# Summary ######################################################################
+if(CMAKE_CXX_FLAGS)
+  message(STATUS "  ")
+  message(STATUS "  ${Cyan}GLOBAL CXX FLAGS${CR}  ${BGreen}${CMAKE_CXX_FLAGS}${CR}")
+endif()
+if(CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "  ")
+  message(STATUS "  ${Cyan}BUILD TYPE         CXX FLAGS${CR}")
+  string(TOUPPER "${CMAKE_BUILD_TYPE}" selected_type)
+  foreach(type IN LISTS CMAKE_CONFIGURATION_TYPES)
+   string(TOUPPER "${type}" type_upper)
+   if(type_upper STREQUAL selected_type)
+     pad("${type}" 18 " " type_padded)
+     message(STATUS "${BGreen}* ${type_padded}${CMAKE_CXX_FLAGS_${type_upper}}${CR}")
+   else()
+     pad("${type}" 18 " " type_padded)
+     message(STATUS "  ${BWhite}${type_padded}${CR}${CMAKE_CXX_FLAGS_${type_upper}}")
+   endif()
+   unset(type_padded)
+   unset(type_upper)
+ endforeach()
+message(STATUS "  ")
+message(STATUS "  (Change the build type with ${BMagenta}-DCMAKE_BUILD_TYPE=...${CR})")
+endif()
+
+if(PROJECT_PACKAGE_DEPENDENCIES)
+  message(STATUS "  ")
+  message(STATUS "  ${Cyan}DEPENDENCY FOUND     VERSION                   PREFIX${CR}")
+  foreach(dep IN LISTS PROJECT_PACKAGE_DEPENDENCIES)
+    if(${dep}_VERSION)
+      if(${dep} STREQUAL DDS)
+        set(version_str "${BGreen}${${dep}_MAJOR_VERSION}.${${dep}_MINOR_VERSION}${CR}")
+      elseif(${dep} STREQUAL Boost)
+        if(Boost_VERSION_MAJOR)
+          set(version_str "${BGreen}${${dep}_VERSION_MAJOR}.${${dep}_VERSION_MINOR}${CR}")
+        else()
+          set(version_str "${BGreen}${${dep}_MAJOR_VERSION}.${${dep}_MINOR_VERSION}${CR}")
+        endif()
+      else()
+        set(version_str "${BGreen}${${dep}_VERSION}${CR}")
+      endif()
+    else()
+      set(version_str "${BYellow}unknown${CR}")
+    endif()
+    if(PROJECT_${dep}_VERSION)
+      set(version_req_str " (>= ${PROJECT_${dep}_VERSION})")
+    endif()
+    pad(${dep} 20 " " dep_padded)
+    if(DISABLE_COLOR)
+      pad("${version_str}${version_req_str}" 25 " " version_padded)
+    else()
+      pad("${version_str}${version_req_str}" 25 " " version_padded COLOR 1)
+    endif()
+    set(prefix ${${dep}_PREFIX})
+    if(${dep} STREQUAL Boost)
+      if(TARGET Boost::headers)
+        get_target_property(boost_include Boost::headers INTERFACE_INCLUDE_DIRECTORIES)
+      else()
+        get_target_property(boost_include Boost::boost INTERFACE_INCLUDE_DIRECTORIES)
+      endif()
+      get_filename_component(prefix ${boost_include}/.. ABSOLUTE)
+    elseif(${dep} STREQUAL Protobuf)
+      get_filename_component(prefix ${Protobuf_INCLUDE_DIRS}/.. ABSOLUTE)
+    elseif(${dep} STREQUAL msgpack)
+      get_target_property(msgpack_include msgpackc INTERFACE_INCLUDE_DIRECTORIES)
+      get_filename_component(prefix ${msgpack_include}/.. ABSOLUTE)
+    elseif(${dep} STREQUAL Pythia6)
+      get_filename_component(prefix ${PYTHIA6_LIBRARY_DIR}/.. ABSOLUTE)
+    elseif(${dep} STREQUAL Pythia8)
+      get_filename_component(prefix ${PYTHIA8_LIB_DIR}/.. ABSOLUTE)
+    elseif(${dep} STREQUAL FairLogger)
+      if(FairLogger_PREFIX)
+        set(prefix ${FairLogger_PREFIX})
+      else()
+        set(prefix ${FairLogger_ROOT})
+      endif()
+    elseif(${dep} STREQUAL FairMQ)
+      if(FairMQ_PREFIX)
+        set(prefix ${FairMQ_PREFIX})
+      else()
+        set(prefix ${FairMQ_ROOT})
+      endif()
+    elseif(${dep} STREQUAL yaml-cpp)
+      get_filename_component(prefix ${YAML_CPP_INCLUDE_DIR}/.. ABSOLUTE)
+    elseif(${dep} STREQUAL Geant4VMC)
+      string(REPLACE ":" ";" geant4vmc_include ${Geant4VMC_INCLUDE_DIRS})
+      list(GET geant4vmc_include 0 geant4vmc_include)
+      get_filename_component(prefix ${geant4vmc_include}/../.. ABSOLUTE)
+    elseif(${dep} STREQUAL Geant3)
+      string(REPLACE ":" ";" geant3_include ${Geant3_INCLUDE_DIRS})
+      list(GET geant3_include 0 geant3_include)
+      get_filename_component(prefix ${geant3_include}/../.. ABSOLUTE)
+    elseif(${dep} STREQUAL Geant4)
+      list(GET Geant4_INCLUDE_DIRS 0 geant4_include)
+      get_filename_component(prefix ${geant4_include}/../.. ABSOLUTE)
+    elseif(${dep} STREQUAL VGM)
+      string(REPLACE ":" ";" vgm_include ${VGM_INCLUDE_DIRS})
+      list(GET vgm_include 0 vgm_include)
+      get_filename_component(prefix ${vgm_include}/.. ABSOLUTE)
+    elseif(${dep} STREQUAL ROOT)
+      set(prefix ${ROOT_INSTALL_DIR})
+    elseif(${dep} STREQUAL IWYU)
+      get_filename_component(prefix ${IWYU_BINARY}/.. ABSOLUTE)
+    elseif(${dep} STREQUAL yaml-cpp)
+      get_filename_component(prefix ${YAML_CPP_INCLUDE_DIR}/.. ABSOLUTE)
+    endif()
+
+    message(STATUS "  ${BWhite}${dep_padded}${CR}${version_padded}${prefix}")
+
+    if(${dep} STREQUAL Geant3)
+      message(STATUS "                                          G3SYS: ${Geant3_SYSTEM_DIR}")
+    endif()
+    if(${dep} STREQUAL Geant4)
+      foreach(dataset IN LISTS Geant4_DATASETS)
+        pad(${Geant4_DATASET_${dataset}_ENVVAR} 20 " " envvar_padded LEFT)
+        message(STATUS "                          ${envvar_padded}: ${Geant4_DATASET_${dataset}_PATH}")
+      endforeach()
+    endif()
+
+    unset(version_str)
+    unset(version_padded)
+    unset(version_req_str)
+  endforeach()
+endif()
+message(STATUS "  ")
+
+   ################################################################################
+
+

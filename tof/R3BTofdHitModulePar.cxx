@@ -38,7 +38,7 @@ R3BTofdHitModulePar::~R3BTofdHitModulePar()
 
 void R3BTofdHitModulePar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BTofdHitModulePar::putParams() called" << FairLogger::endl;
+    LOG(INFO) << "R3BTofdHitModulePar::putParams() called";
     if (!list)
     {
         return;
@@ -76,15 +76,15 @@ void R3BTofdHitModulePar::clear()
 
 void R3BTofdHitModulePar::printParams()
 {
-    LOG(INFO) << "   R3BTofdHitModulePar: TOFd HIT Calibration Parameters: " << FairLogger::endl;
-    LOG(INFO) << "   fPlane: " << fPlane << FairLogger::endl;
-    LOG(INFO) << "   fPaddle: " << fPaddle << FairLogger::endl;
-    LOG(INFO) << "   fOffset1: " << fOffset1 << FairLogger::endl;
-    LOG(INFO) << "   fOffset2: " << fOffset2 << FairLogger::endl;
-    LOG(INFO) << "   fVeff: " << fVeff << FairLogger::endl;
-    LOG(INFO) << "   fParams1: " << fPar1a<<"  "<< fPar1b<<"  "<< fPar1c<<"  "<< fPar1d << FairLogger::endl;
-    LOG(INFO) << "   fParams2: " << fPar2a<<"  "<< fPar2b<<"  "<< fPar2c<<"  "<< fPar2d << FairLogger::endl;
-    LOG(INFO) << "   fSync2: " << fSync << FairLogger::endl;
+    LOG(INFO) << "   R3BTofdHitModulePar: TOFd HIT Calibration Parameters: ";
+    LOG(INFO) << "   fPlane: " << fPlane;
+    LOG(INFO) << "   fPaddle: " << fPaddle;
+    LOG(INFO) << "   fOffset1: " << fOffset1;
+    LOG(INFO) << "   fOffset2: " << fOffset2;
+    LOG(INFO) << "   fVeff: " << fVeff;
+    LOG(INFO) << "   fParams1: " << fPar1a<<"  "<< fPar1b<<"  "<< fPar1c<<"  "<< fPar1d;
+    LOG(INFO) << "   fParams2: " << fPar2a<<"  "<< fPar2b<<"  "<< fPar2c<<"  "<< fPar2d;
+    LOG(INFO) << "   fSync2: " << fSync;
 }
 
 

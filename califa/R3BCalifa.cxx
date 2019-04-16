@@ -237,8 +237,8 @@ void R3BCalifa::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BCalifa: initialisation" << FairLogger::endl;
-    LOG(DEBUG) << "-I- R3BCalifa: Vol (McId) def" << FairLogger::endl;
+    LOG(INFO) << "R3BCalifa: initialisation";
+    LOG(DEBUG) << "-I- R3BCalifa: Vol (McId) def";
 
     TGeoVolume* vol = gGeoManager->GetVolume("CalifaWorld");
     vol->SetVisibility(kFALSE);
@@ -285,7 +285,7 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
     if (fVerboseLevel > 1)
         LOG(INFO) << "R3BCalifa: Processing Points in Alveolus Nb " << fCrystal->volIdAlv << ", copy Nb "
                   << fCrystal->cpAlv << ", crystal copy Nb " << fCrystal->cpCry << " and unique crystal identifier "
-                  << fCrystal->crystalId << FairLogger::endl;
+                  << fCrystal->crystalId;
 
     if (gMC->IsTrackEntering())
     {
@@ -345,7 +345,7 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
             else
             {
                 LOG(ERROR) << "R3BCalifa: fPhoswichIdentifier not valid in R3BCalifa::ProcessHits(). "
-                           << FairLogger::endl;
+                          ;
             }
         }
         else if (fCrystal->fEndcapIdentifier == 0)
@@ -408,7 +408,7 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
         }
         else
         {
-            LOG(ERROR) << "R3BCalifa: fEndcapIdentifier not valid in R3BCalifa::ProcessHits(). " << FairLogger::endl;
+            LOG(ERROR) << "R3BCalifa: fEndcapIdentifier not valid in R3BCalifa::ProcessHits(). ";
         }
     }
 
@@ -582,7 +582,7 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
     volIdAlv = gMC->CurrentVolOffID(2, cpAlv);
     // next is needed for versions 8.# and later
     volIdSupAlv = gMC->CurrentVolOffID(3, cpSupAlv);
-    // LOG(ERROR) << "TEST INITIAL. " <<  gMC->CurrentVolPath()<< FairLogger::endl;
+    // LOG(ERROR) << "TEST INITIAL. " <<  gMC->CurrentVolPath();
 
     info.volIdAlv = volIdAlv;
     info.cpAlv = cpAlv;
@@ -618,14 +618,14 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             }
             else
             {
-                LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometry 0 (v5.0)" << FairLogger::endl;
+                LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometry 0 (v5.0)";
                 return kFALSE;
             }
         }
         else
         {
             LOG(ERROR) << "R3BCalifa: Energy collected in non-sensitive volume for geometry 0 (v5.0)"
-                       << FairLogger::endl;
+                      ;
             return kFALSE;
         }
     }
@@ -650,13 +650,13 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             if (info.crystalType > 24 || info.crystalType < 1 || info.crystalCopy > 160 || info.crystalCopy < 1 ||
                 info.crystalId > 3840 || info.crystalId < 1)
             {
-                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 1 (v7.05). " << FairLogger::endl;
+                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 1 (v7.05). ";
                 return kFALSE;
             }
         }
         else
         {
-            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 1 (v7.05)" << FairLogger::endl;
+            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 1 (v7.05)";
             return kFALSE;
         }
     }
@@ -681,13 +681,13 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             if (info.crystalType > 20 || info.crystalType < 1 || info.crystalCopy > 128 || info.crystalCopy < 1 ||
                 info.crystalId > 2560 || info.crystalId < 1)
             {
-                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 2 (v7.07)" << FairLogger::endl;
+                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 2 (v7.07)";
                 return kFALSE;
             }
         }
         else
         {
-            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 2 (v7.07)" << FairLogger::endl;
+            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 2 (v7.07)";
             return kFALSE;
         }
     }
@@ -717,13 +717,13 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             if (info.crystalType > 19 || info.crystalType < 1 || info.crystalCopy > 128 || info.crystalCopy < 1 ||
                 info.crystalId > 2144 || info.crystalId < 1)
             {
-                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 3 (v7.07). " << FairLogger::endl;
+                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 3 (v7.07). ";
                 return kFALSE;
             }
         }
         else
         {
-            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 3 (v7.07)" << FairLogger::endl;
+            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 3 (v7.07)";
             return kFALSE;
         }
     }
@@ -747,13 +747,13 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             if (info.crystalType > 23 || info.crystalType < 1 || info.crystalCopy > 32 || info.crystalCopy < 1 ||
                 info.crystalId < 3000 || info.crystalId > 3736)
             {
-                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 4 (v7.17). " << FairLogger::endl;
+                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 4 (v7.17). ";
                 return kFALSE;
             }
         }
         else
         {
-            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 4 (v7.17)" << FairLogger::endl;
+            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 4 (v7.17)";
             return kFALSE;
         }
     }
@@ -775,7 +775,7 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             if (info.crystalType > 23 || info.crystalType < 1 || info.crystalCopy > 32 || info.crystalCopy < 1 ||
                 info.crystalId < 3000 || info.crystalId > 3736)
             {
-                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 5 (v7.17). " << FairLogger::endl;
+                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 5 (v7.17). ";
                 return kFALSE;
             }
         }
@@ -787,13 +787,13 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             if (info.crystalType > 20 || info.crystalType < 1 || info.crystalCopy > 128 || info.crystalCopy < 1 ||
                 info.crystalId > 2560 || info.crystalId < 1)
             {
-                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 5 (v7.07)" << FairLogger::endl;
+                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 5 (v7.07)";
                 return kFALSE;
             }
         }
         else
         {
-            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 5." << FairLogger::endl;
+            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 5.";
             return kFALSE;
         }
     }
@@ -815,7 +815,7 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             if (info.crystalType > 23 || info.crystalType < 1 || info.crystalCopy > 32 || info.crystalCopy < 1 ||
                 info.crystalId < 3000 || info.crystalId > 3736)
             {
-                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 6 (v7.17)." << FairLogger::endl;
+                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 6 (v7.17).";
                 return kFALSE;
             }
         }
@@ -837,13 +837,13 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             if (info.crystalType > 19 || info.crystalType < 1 || info.crystalCopy > 128 || info.crystalCopy < 1 ||
                 info.crystalId > 2144 || info.crystalId < 1)
             {
-                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 6 (v7.07). " << FairLogger::endl;
+                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 6 (v7.07). ";
                 return false;
             }
         }
         else
         {
-            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 6." << FairLogger::endl;
+            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 6.";
             return kFALSE;
         }
     }
@@ -861,13 +861,13 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             if (info.crystalType > 30 || info.crystalType < 1 || info.crystalCopy > 60 || info.crystalCopy < 1 ||
                 info.crystalId < 3000 || info.crystalId > 4800)
             {
-                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 10 (endcap). " << FairLogger::endl;
+                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 10 (endcap). ";
                 return kFALSE;
             }
         }
         else
         {
-            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 7." << FairLogger::endl;
+            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 7.";
             return kFALSE;
         }
     }
@@ -888,7 +888,7 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             if (info.crystalType > 30 || info.crystalType < 1 || info.crystalCopy > 60 || info.crystalCopy < 1 ||
                 info.crystalId < 3000 || info.crystalId > 4800)
             {
-                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 10 (endcap). " << FairLogger::endl;
+                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 10 (endcap). ";
                 return kFALSE;
             }
         }
@@ -900,13 +900,13 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             if (info.crystalType > 20 || info.crystalType < 1 || info.crystalCopy > 128 || info.crystalCopy < 1 ||
                 info.crystalId > 2560 || info.crystalId < 1)
             {
-                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 5 (v7.07)" << FairLogger::endl;
+                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 5 (v7.07)";
                 return kFALSE;
             }
         }
         else
         {
-            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 8." << FairLogger::endl;
+            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 8.";
             return kFALSE;
         }
     }
@@ -924,7 +924,7 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             if (info.crystalType > 30 || info.crystalType < 1 || info.crystalCopy > 60 || info.crystalCopy < 1 ||
                 info.crystalId < 3000 || info.crystalId > 4800)
             {
-                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 9 (endcap). " << FairLogger::endl;
+                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 9 (endcap). ";
                 return kFALSE;
             }
         }
@@ -946,13 +946,13 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             if (info.crystalType > 19 || info.crystalType < 1 || info.crystalCopy > 128 || info.crystalCopy < 1 ||
                 info.crystalId > 2144 || info.crystalId < 1)
             {
-                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 9 (v7.07). " << FairLogger::endl;
+                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 9 (v7.07). ";
                 return kFALSE;
             }
         }
         else
         {
-            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 9." << FairLogger::endl;
+            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 9.";
             return kFALSE;
         }
     }
@@ -989,18 +989,18 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             }
 
             LOG(INFO) << "volIdAlv: " << volIdAlv << ", volIdSupAlv: " << volIdSupAlv << ", volumeName: " << volumeName
-                      << FairLogger::endl;
+                     ;
 
             if (info.crystalType > 16 || info.crystalType < 1 || info.crystalCopy > 128 || info.crystalCopy < 1 ||
                 info.crystalId > 1952 || info.crystalId < 1)
             {
-                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 10. " << FairLogger::endl;
+                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 10. ";
                 return kFALSE;
             }
         }
         else
         {
-            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 10." << FairLogger::endl;
+            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 10.";
             return kFALSE;
         }
     }
@@ -1020,7 +1020,7 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             if (info.crystalType > 30 || info.crystalType < 1 || info.crystalCopy > 60 || info.crystalCopy < 1 ||
                 info.crystalId < 3000 || info.crystalId > 4800)
             {
-                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 11 (endcap). " << FairLogger::endl;
+                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 11 (endcap). ";
                 return kFALSE;
             }
         }
@@ -1043,13 +1043,13 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             if (info.crystalType > 16 || info.crystalType < 1 || info.crystalCopy > 128 || info.crystalCopy < 1 ||
                 info.crystalId > 1952 || info.crystalId < 1)
             {
-                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 11. " << FairLogger::endl;
+                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 11. ";
                 return kFALSE;
             }
         }
         else
         {
-            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 11." << FairLogger::endl;
+            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 11.";
             return kFALSE;
         }
     }
@@ -1065,7 +1065,7 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
         {
             volumeName = gMC->VolName(volIdAlv);
         }
-        // LOG(INFO) << "volIdSupAlv: " << volIdSupAlv << ", volumeName: " << volumeName << FairLogger::endl;
+        // LOG(INFO) << "volIdSupAlv: " << volIdSupAlv << ", volumeName: " << volumeName;
         // if ENDCAP
         if (strncmp(alveolusECPrefix, volumeName, 11) == 0)
         {
@@ -1075,7 +1075,7 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             if (info.crystalType > 15 || info.crystalType < 1 || info.crystalCopy > 60 || info.crystalCopy < 1 ||
                 info.crystalId < 3000 || info.crystalId > 4800)
             {
-                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 15 (iPhos). " << FairLogger::endl;
+                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 15 (iPhos). ";
                 return kFALSE;
             }
             // if BARREL
@@ -1104,7 +1104,7 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
                            // volumeName
                            //<< "info.crystalType: " <<info.crystalType << ", info.crystalCopy: " <<info.crystalCopy <<
                            //", info.crystalId: " << info.crystalId
-                           << FairLogger::endl;
+                          ;
                 return kFALSE;
             }
         }
@@ -1113,7 +1113,7 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             LOG(ERROR)
                 << "R3BCalifa: Impossible info.crystalType for geometryVersion 15."
                 //<< "volIdAlv: " << volIdAlv << ", volIdSupAlv: " << volIdSupAlv << ", volumeName: " << volumeName
-                << FairLogger::endl;
+               ;
             return kFALSE;
         }
     }
@@ -1162,7 +1162,7 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             if (info.crystalType > 24 || info.crystalType < 1 || info.crystalCopy > 32 || info.crystalCopy < 1 ||
                 info.crystalId < 3000 || info.crystalId > 4800)
             {
-                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 16 (CC). " << FairLogger::endl;
+                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 16 (CC). ";
                 return kFALSE;
             }
             // if BARREL
@@ -1187,19 +1187,19 @@ Bool_t R3BCalifa::GetCrystalInfo(sCrystalInfo& info)
             if (info.crystalType > 16 || info.crystalType < 1 || info.crystalCopy > 128 || info.crystalCopy < 1 ||
                 info.crystalId > 1952 || info.crystalId < 1)
             {
-                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 16 (BARREL)." << FairLogger::endl;
+                LOG(ERROR) << "R3BCalifa: Wrong crystal number in geometryVersion 16 (BARREL).";
                 return kFALSE;
             }
         }
         else
         {
-            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 16." << FairLogger::endl;
+            LOG(ERROR) << "R3BCalifa: Impossible info.crystalType for geometryVersion 16.";
             return kFALSE;
         }
     }
     else
     {
-        LOG(ERROR) << "R3BCalifa: Geometry version not available in R3BCalifa::ProcessHits(). " << FairLogger::endl;
+        LOG(ERROR) << "R3BCalifa: Geometry version not available in R3BCalifa::ProcessHits(). ";
         return kFALSE;
     }
 
@@ -1261,9 +1261,9 @@ TClonesArray* R3BCalifa::GetCollection(Int_t iColl) const
 void R3BCalifa::Print(Option_t* option) const
 {
     Int_t nHits = fCaloCollection->GetEntriesFast();
-    LOG(INFO) << "R3BCalifa: " << nHits << " points registered in this event" << FairLogger::endl;
+    LOG(INFO) << "R3BCalifa: " << nHits << " points registered in this event";
     Int_t nCrystalHits = fCaloCrystalHitCollection->GetEntriesFast();
-    LOG(INFO) << "R3BCalifa: " << nCrystalHits << " sim crystal hits registered in this event." << FairLogger::endl;
+    LOG(INFO) << "R3BCalifa: " << nCrystalHits << " sim crystal hits registered in this event.";
 }
 // ----------------------------------------------------------------------------
 
@@ -1280,7 +1280,7 @@ void R3BCalifa::Reset()
 void R3BCalifa::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BCalifa: " << nEntries << " entries to add" << FairLogger::endl;
+    LOG(INFO) << "R3BCalifa: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
     R3BCalifaPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -1291,7 +1291,7 @@ void R3BCalifa::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BCalifaPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BCalifa: " << cl2->GetEntriesFast() << " merged entries" << FairLogger::endl;
+    LOG(INFO) << "R3BCalifa: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 // -----   Private method AddPoint   --------------------------------------------
@@ -1315,7 +1315,7 @@ R3BCalifaPoint* R3BCalifa::AddPoint(Int_t trackID,
     if (fVerboseLevel > 1)
         LOG(INFO) << "R3BCalifa: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV"
-                  << FairLogger::endl;
+                 ;
     return new (clref[size])
         R3BCalifaPoint(trackID, detID, volid, copy, ident, posIn, posOut, momIn, momOut, time, length, eLoss, Nf, Ns);
 }
@@ -1342,9 +1342,9 @@ R3BCalifaCrystalCalDataSim* R3BCalifa::AddCrystalHit(Int_t type,
     {
         LOG(INFO) << "-I- R3BCalifa: Adding Sim Crystal Hit in detector type " << type << ", and copy " << copy
                   << " with unique identifier " << ident << " entering with " << einc * 1e06 << " keV, depositing "
-                  << energy * 1e06 << " keV" << FairLogger::endl;
+                  << energy * 1e06 << " keV";
         LOG(INFO) << " -I- trackid: " << trackid << " volume id: " << volid << " partrackid : " << partrackid
-                  << " type: " << pdgtype << " unique id: " << uniqueid << FairLogger::endl;
+                  << " type: " << pdgtype << " unique id: " << uniqueid;
     }
     return new (clref[size]) R3BCalifaCrystalCalDataSim(
         type, copy, ident, energy, Nf, Ns, time, steps, einc, trackid, volid, partrackid, pdgtype, uniqueid);
@@ -1367,7 +1367,7 @@ void R3BCalifa::SelectGeometryVersion(Int_t version) { fGeometryVersion = versio
 void R3BCalifa::SetNonUniformity(Double_t nonU)
 {
     fNonUniformity = nonU;
-    LOG(INFO) << "R3BCalifa::SetNonUniformity to " << fNonUniformity << " %" << FairLogger::endl;
+    LOG(INFO) << "R3BCalifa::SetNonUniformity to " << fNonUniformity << " %";
 }
 
 Bool_t R3BCalifa::CheckIfSensitive(std::string name)

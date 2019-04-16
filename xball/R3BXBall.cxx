@@ -83,12 +83,12 @@ void R3BXBall::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BXBall initialisation" << FairLogger::endl;
-    LOG(DEBUG) << "R3BXBall: Vol. (McId)" << FairLogger::endl;
-    LOG(DEBUG) << "R3BXBall: Crystal A : " << gMC->VolId("crystalLogNAJA") << FairLogger::endl;
-    LOG(DEBUG) << "R3BXBall: Crystal B : " << gMC->VolId("crystalLogNAJB") << FairLogger::endl;
-    LOG(DEBUG) << "R3BXBall: Crystal C : " << gMC->VolId("crystalLogNAJC") << FairLogger::endl;
-    LOG(DEBUG) << "R3BXBall: Crystal D : " << gMC->VolId("crystalLogNAJD") << FairLogger::endl;
+    LOG(INFO) << "R3BXBall initialisation";
+    LOG(DEBUG) << "R3BXBall: Vol. (McId)";
+    LOG(DEBUG) << "R3BXBall: Crystal A : " << gMC->VolId("crystalLogNAJA");
+    LOG(DEBUG) << "R3BXBall: Crystal B : " << gMC->VolId("crystalLogNAJB");
+    LOG(DEBUG) << "R3BXBall: Crystal C : " << gMC->VolId("crystalLogNAJC");
+    LOG(DEBUG) << "R3BXBall: Crystal D : " << gMC->VolId("crystalLogNAJD");
 
     // Crystals type ID
     // type  ID
@@ -294,7 +294,7 @@ void R3BXBall::EndOfEvent()
 
 void R3BXBall::SetSpecialPhysicsCuts()
 {
-    LOG(INFO) << "-I- R3BXBall: Adding customized Physics cut ... " << FairLogger::endl;
+    LOG(INFO) << "-I- R3BXBall: Adding customized Physics cut ... ";
 
     if (gGeoManager)
     {
@@ -319,7 +319,7 @@ void R3BXBall::SetSpecialPhysicsCuts()
             Double_t cutE = 0.00001; // GeV-> 10 keV
 
             LOG(INFO) << "-I- R3BXBall: NaI Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV"
-                      << FairLogger::endl;
+                     ;
 
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -402,19 +402,19 @@ void R3BXBall::Print(Option_t* option) const
     if (fCollectionOption == 0)
     {
         Int_t nHits = fXBallCollection->GetEntriesFast();
-        LOG(INFO) << "R3BXBall: " << nHits << " points registered in this event" << FairLogger::endl;
+        LOG(INFO) << "R3BXBall: " << nHits << " points registered in this event";
     }
     else if (fCollectionOption == 1)
     {
         Int_t nHits = fXBallCrystalHitCollection->GetEntriesFast();
-        LOG(INFO) << "R3BXBall: " << nHits << " hits registered in this event" << FairLogger::endl;
+        LOG(INFO) << "R3BXBall: " << nHits << " hits registered in this event";
     }
     else if (fCollectionOption == 2)
     {
         Int_t nHits = fXBallCollection->GetEntriesFast();
-        LOG(INFO) << "R3BXBall: " << nHits << " points registered in this event" << FairLogger::endl;
+        LOG(INFO) << "R3BXBall: " << nHits << " points registered in this event";
         nHits = fXBallCrystalHitCollection->GetEntriesFast();
-        LOG(INFO) << "R3BXBall: " << nHits << " hits registered in this event" << FairLogger::endl;
+        LOG(INFO) << "R3BXBall: " << nHits << " hits registered in this event";
     }
 }
 // ----------------------------------------------------------------------------
@@ -432,7 +432,7 @@ void R3BXBall::Reset()
 void R3BXBall::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BXBall: " << nEntries << " entries to add" << FairLogger::endl;
+    LOG(INFO) << "R3BXBall: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
     R3BXBallPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -443,7 +443,7 @@ void R3BXBall::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BXBallPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BXBall: " << cl2->GetEntriesFast() << " merged entries." << FairLogger::endl;
+    LOG(INFO) << "R3BXBall: " << cl2->GetEntriesFast() << " merged entries.";
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -464,7 +464,7 @@ R3BXBallPoint* R3BXBall::AddHit(Int_t trackID,
     if (fVerboseLevel > 1)
         LOG(INFO) << "R3BXBall: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm, detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV"
-                  << FairLogger::endl;
+                 ;
     return new (clref[size]) R3BXBallPoint(trackID, detID, type, cp, posIn, posOut, momIn, momOut, time, length, eLoss);
 }
 
@@ -485,9 +485,9 @@ R3BXBallCrystalHitSim* R3BXBall::AddCrystalHit(Int_t type,
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
         LOG(INFO) << "R3BXBall: Adding Hit in detector type " << type << ", and number " << copy << " entering with "
-                  << einc * 1e06 << " keV, depositing " << energy * 1e06 << " keV" << FairLogger::endl
+                  << einc * 1e06 << " keV, depositing " << energy * 1e06 << " keV"
                   << " trackid: " << trackid << " volume id: " << volid << " partrackid : " << partrackid
-                  << " type: " << pdgtype << " unique id: " << uniqueid << FairLogger::endl;
+                  << " type: " << pdgtype << " unique id: " << uniqueid;
     return new (clref[size])
         R3BXBallCrystalHitSim(type, copy, energy, time, steps, einc, trackid, volid, partrackid, pdgtype, uniqueid);
 }
@@ -506,7 +506,7 @@ Double_t R3BXBall::NUSmearing(Double_t inputEnergy)
 void R3BXBall::SetNonUniformity(Double_t nonU)
 {
     fNonUniformity = nonU;
-    LOG(INFO) << "R3BXBall::SetNonUniformity to " << fNonUniformity << " %" << FairLogger::endl;
+    LOG(INFO) << "R3BXBall::SetNonUniformity to " << fNonUniformity << " %";
 }
 
 Bool_t R3BXBall::CheckIfSensitive(std::string name)

@@ -95,7 +95,7 @@ R3BCalifaMapped2CrystalCalPar::~R3BCalifaMapped2CrystalCalPar() {
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BCalifaMapped2CrystalCalPar::Init() {
 
-  LOG(INFO)<<"R3BCalifaMapped2CrystalCalPar::Init"<<FairLogger::endl;
+  LOG(INFO)<<"R3BCalifaMapped2CrystalCalPar::Init";
 
   if(!fEnergyPeaks){
     fEnergyPeaks = new TArrayF;
@@ -131,7 +131,7 @@ InitStatus R3BCalifaMapped2CrystalCalPar::Init() {
   
   fCal_Par=(R3BCalifaCrystalCalPar*)rtdb->getContainer("califaCrystalCalPar");
   if (!fCal_Par) {
-    LOG(ERROR)<<"R3BCalifaMapped2CrystalCalPar::Init() Couldn't get handle on califaCrystalCalPar container"<<FairLogger::endl;
+    LOG(ERROR)<<"R3BCalifaMapped2CrystalCalPar::Init() Couldn't get handle on califaCrystalCalPar container";
     return kFATAL;
   }
   
@@ -261,10 +261,10 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks(){
 	  f1 = new TF1 ("f1", "[0]+[1]*x+[2]*pow(x,2)+[3]*pow(x,3)+[4]*pow(x,4)", fleft, fright);
 	}
 	if (fNumParam>5){
-	  LOG(WARNING)<<"R3BCalifaMapped2CrystalCalPar:: The number of fit parameters can not be higher than 5"<<FairLogger::endl;
+	  LOG(WARNING)<<"R3BCalifaMapped2CrystalCalPar:: The number of fit parameters can not be higher than 5";
 	}
       }else{
-	  LOG(INFO)<<"R3BCalifaMapped2CrystalCalPar:: No imput number of fit parameters, therefore, by default NumberParameters=2"<<FairLogger::endl;
+	  LOG(INFO)<<"R3BCalifaMapped2CrystalCalPar:: No imput number of fit parameters, therefore, by default NumberParameters=2";
 	  f1 = new TF1 ("f1", "[0]+[1]*x", fleft, fright);
       }
       
@@ -289,7 +289,7 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks(){
       if(fDebugMode) fh_Map_energy_crystal[i]->Write();
       
     }else{
-          LOG(WARNING)<<"R3BCalifaMapped2CrystalCalPar::Histogram NO Fitted number "<<i<<FairLogger::endl;
+          LOG(WARNING)<<"R3BCalifaMapped2CrystalCalPar::Histogram NO Fitted number "<<i;
          }
   }
   

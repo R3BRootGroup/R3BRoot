@@ -31,7 +31,7 @@ R3BMfiUnpack::R3BMfiUnpack(Short_t type, Short_t subType, Short_t procId, Short_
 // Virtual R3BMfiUnpack: Public method
 R3BMfiUnpack::~R3BMfiUnpack()
 {
-    LOG(INFO) << "R3BMfiUnpack: Delete instance" << FairLogger::endl;
+    LOG(INFO) << "R3BMfiUnpack: Delete instance";
     delete fRawData;
 }
 
@@ -45,8 +45,8 @@ Bool_t R3BMfiUnpack::Init()
 // Register: Protected method
 void R3BMfiUnpack::Register()
 {
-    //  LOG(DEBUG) << "Registering" << FairLogger::endl;
-    LOG(INFO) << "R3BMfiUnpack : Registering..." << FairLogger::endl;
+    //  LOG(DEBUG) << "Registering";
+    LOG(INFO) << "R3BMfiUnpack : Registering...";
     FairRootManager* fMan = FairRootManager::Instance();
     if (!fMan)
     {
@@ -58,7 +58,7 @@ void R3BMfiUnpack::Register()
 // DoUnpack: Public method
 Bool_t R3BMfiUnpack::DoUnpack(Int_t* data, Int_t size)
 {
-    LOG(DEBUG) << "R3BMfiUnpack : Unpacking... size = " << size << FairLogger::endl;
+    LOG(DEBUG) << "R3BMfiUnpack : Unpacking... size = " << size;
 
     UInt_t l_i = 0;
     while((data[l_i] & 0xfff00000) == 0xadd00000)
@@ -112,18 +112,18 @@ Bool_t R3BMfiUnpack::DoUnpack(Int_t* data, Int_t size)
             index[id] += 1;
             
             LOG(DEBUG) << nxtId << "  " << gemexId << "  " << trigger << " tot=" << size
-            << "   " << triggerTs << FairLogger::endl;
+            << "   " << triggerTs;
         }
     }
     
-    LOG(INFO) << "R3BMfiUnpack : Number of hits in MFI: " << fNHits << FairLogger::endl;
+    LOG(INFO) << "R3BMfiUnpack : Number of hits in MFI: " << fNHits;
     return kTRUE;
 }
 
 // Reset: Public method
 void R3BMfiUnpack::Reset()
 {
-    LOG(DEBUG) << "R3BMfiUnpack : Clearing Data Structure" << FairLogger::endl;
+    LOG(DEBUG) << "R3BMfiUnpack : Clearing Data Structure";
     fRawData->Clear();
     fNHits = 0;
 }

@@ -82,7 +82,7 @@ FairParSet* R3BTraContFact::createContainer(FairContainer* c)
    * of this container, the name is concatinated with the context. */
   /*
   const char* name=c->GetName();
-  LOG(INFO) << "container name " << name << FairLogger::endl;
+  LOG(INFO) << "container name " << name;
   FairParSet* p=0;
   if (strcmp(name,"R3BTraDigiPar")==0) {
     p=new R3BTraDigiPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
@@ -94,7 +94,7 @@ FairParSet* R3BTraContFact::createContainer(FairContainer* c)
   */
 
   const char* name=c->GetName();
-  LOG(INFO) << "R3BTraContFact: Create container name: " << name << FairLogger::endl;
+  LOG(INFO) << "R3BTraContFact: Create container name: " << name;
   FairParSet* p=0;
   if (strcmp(name,"amsStripCalPar")==0){
     p=new R3BAmsStripCalPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());

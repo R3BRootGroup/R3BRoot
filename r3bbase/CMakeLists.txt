@@ -33,12 +33,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata
 include_directories( ${INCLUDE_DIRECTORIES})
 include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 
-set(LINK_DIRECTORIES
-${ROOT_LIBRARY_DIR}
-${FAIRROOT_LIBRARY_DIR}
-) 
-
-link_directories( ${LINK_DIRECTORIES})
+link_directories(${FAIRROOT_LIBRARY_DIR} ${ROOT_LIBRARY_DIR})
 
 set(SRCS
 R3BModule.cxx 

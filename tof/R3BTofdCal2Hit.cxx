@@ -244,7 +244,7 @@ InitStatus R3BTofdCal2Hit::Init()
     fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
     if (!fHitPar)
     {
-		LOG(ERROR) << "Could not get access to TofdHitPar-Container." << FairLogger::endl;
+		LOG(ERROR) << "Could not get access to TofdHitPar-Container.";
 		fNofHitPars=0;
 		return kFATAL;
     }
@@ -252,7 +252,7 @@ InitStatus R3BTofdCal2Hit::Init()
     fNofHitPars = fHitPar->GetNumModulePar();
     if (fNofHitPars==0)
     {
-	LOG(ERROR) << "There are no Hit parameters in container TofdHitPar" << FairLogger::endl;
+	LOG(ERROR) << "There are no Hit parameters in container TofdHitPar";
 	return kFATAL;
     }
     
@@ -267,11 +267,11 @@ InitStatus R3BTofdCal2Hit::Init()
     
     fCalItemsLos = (TClonesArray*)mgr->GetObject("LosCal");
     if (NULL == fCalItemsLos)
-         LOG(WARNING) << "Branch LosCal not found" <<FairLogger::endl;
+         LOG(WARNING) << "Branch LosCal not found";
 
     fHitItemsLos = (TClonesArray*)mgr->GetObject("LosHit");
     if (NULL == fHitItemsLos) 
-         LOG(WARNING) << "Branch LosHit not found" <<FairLogger::endl;
+         LOG(WARNING) << "Branch LosHit not found";
 
     // request storage of Hit data in output tree
     mgr->Register("TofdHit", "Land", fHitItems, kTRUE);
@@ -286,7 +286,7 @@ void R3BTofdCal2Hit::SetParContainers()
     fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
     if (!fHitPar)
     {
-		LOG(ERROR) << "Could not get access to TofdHitPar-Container." << FairLogger::endl;
+		LOG(ERROR) << "Could not get access to TofdHitPar-Container.";
 		fNofHitPars=0;
 		return;
 	}
@@ -330,7 +330,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 		Int_t nHits = fHitItemsLos->GetEntriesFast();
 		for (Int_t ihit = 0; ihit < nHits; ihit++)     
 		{
-			LOG(WARNING) << "LOS Ihit  "<< ihit<<" "<<nHits<<FairLogger::endl;
+			LOG(WARNING) << "LOS Ihit  "<< ihit<<" "<<nHits;
 			R3BLosHitData *hitData = (R3BLosHitData*)fHitItemsLos->At(ihit);
 			if(ihit==0) timeLos=hitData->fTime_ns;
 
@@ -362,13 +362,13 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 		Int_t nHits = fCalItemsLos->GetEntriesFast();    
 		for (Int_t ihit = 0; ihit < nHits; ihit++)     
 		{
-			LOG(WARNING) << "LOS Ihit  "<< ihit<<" "<<nHits<<FairLogger::endl;
+			LOG(WARNING) << "LOS Ihit  "<< ihit<<" "<<nHits;
 			  
 			R3BLosCalData *calData = (R3BLosCalData*)fCalItemsLos->At(ihit);
 			timeLos=(calData->fTimeV_r_ns+calData->fTimeV_l_ns+calData->fTimeV_t_ns+calData->fTimeV_b_ns)/4.;
 			LosTresM=(calData->fTimeV_r_ns+calData->fTimeV_l_ns)/2.-(calData->fTimeV_t_ns+calData->fTimeV_b_ns)/2.;
             
-			LOG(WARNING) << "LOS MCFD  "<< LosTresM<<" "<<timeLos<<FairLogger::endl;
+			LOG(WARNING) << "LOS MCFD  "<< LosTresM<<" "<<timeLos;
               
               
 			if (NULL == fh_los_pos)
@@ -461,12 +461,12 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 				Int_t iBar  = top->GetBarId();    // 1..n
 				if (iPlane>fNofPlanes) // this also errors for iDetector==0
 				{
-					LOG(ERROR) << "R3BTofdCal2HitPar::Exec() : more detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes << FairLogger::endl;
+					LOG(ERROR) << "R3BTofdCal2HitPar::Exec() : more detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes;
 					continue;
 				}
 				if (iBar>fPaddlesPerPlane) // same here
 				{
-					LOG(ERROR) << "R3BTofdCal2HitPar::Exec() : more bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane << FairLogger::endl;
+					LOG(ERROR) << "R3BTofdCal2HitPar::Exec() : more bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane;
 					continue;
 				}
 
@@ -488,7 +488,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 				if (!par)
 				{
 					LOG(INFO) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << 
-					top->GetDetectorId() << ", Bar: " << top->GetBarId() << FairLogger::endl;
+					top->GetDetectorId() << ", Bar: " << top->GetBarId();
 					continue;
 				}
 				// calculate tdiff 
@@ -504,7 +504,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 				y[iPlane][iBar*2-1]=pos;
  
 				// calculate time-of-flight
-				if(timeLos==0) LOG(WARNING) << "Los Time is zero! "<< FairLogger::endl;	
+				if(timeLos==0) LOG(WARNING) << "Los Time is zero! ";	
 				auto ToF = (bot_ns+top_ns)/2.-timeLos-par->GetSync();
                 while(ToF < -c_range_ns/2) ToF += c_range_ns;
                 while(ToF >  c_range_ns/2) ToF -= c_range_ns;
@@ -747,7 +747,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 		for(Int_t j=1;j<fPaddlesPerPlane*2;j++){
 		 
 		//for(Int_t j=1;kTRUE;j++){
-			//LOG(INFO) << j << FairLogger::endl;
+			//LOG(INFO) << j;
 //            if(Q[2][j]>0.){
 		        //new ((*fHitItems)[fNofHitItems]) R3BTofdHitData(tof[2][j], x[2][j], y[2][j], Q[2][j], tof[2][j], Q[2][j], 1);
 //		        fNofHitItems += 1;				

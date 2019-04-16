@@ -53,8 +53,8 @@ void R3BTraDigitizer::SetParContainers() {
   fTraDigiPar = (R3BTraDigiPar*)(rtdb->getContainer("R3BTraDigiPar"));
 
   if ( fTraDigiPar ) {
-      LOG(INFO) << "-I- R3BTraDigitizer::SetParContainers() "<<FairLogger::endl;
-      LOG(INFO) << "-I- Container R3BTraDigiPar  loaded " <<FairLogger::endl;
+      LOG(INFO) << "-I- R3BTraDigitizer::SetParContainers() ";
+      LOG(INFO) << "-I- Container R3BTraDigiPar  loaded ";
   }
 }
 
@@ -62,7 +62,7 @@ void R3BTraDigitizer::SetParContainers() {
 
 
 InitStatus R3BTraDigitizer::Init() {
-//  LOG(INFO)<<"Init "<<FairLogger::endl;
+//  LOG(INFO)<<"Init ";
   // Get input array 
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) LOG(fatal) << "Init: No FairRootManager";
@@ -88,7 +88,7 @@ void R3BTraDigitizer::Exec(Option_t* opt) {
 
    Reset();
    eventNoTra+=1;
-//     if(eventNoTra/1000. == (int)eventNoTra/1000.) LOG(INFO)<<"Event #: "<<eventNoTra-1<FairLogger::endl;
+//     if(eventNoTra/1000. == (int)eventNoTra/1000.) LOG(INFO)<<"Event #: "<<eventNoTra-1;
      
      Int_t nentriesTra = fTraPoints->GetEntries();
 //     Int_t nentries = fMCTrack->GetEntries();
@@ -151,7 +151,7 @@ void R3BTraDigitizer::Exec(Option_t* opt) {
 
 
    for (Int_t l=0;l<nentriesTra;l++){
-//   LOG(INFO)<<"entries "<<l<FairLogger::endl;
+//   LOG(INFO)<<"entries "<<l;
     
      R3BTraPoint *Tra_obj = (R3BTraPoint*) fTraPoints->At(l);
 
@@ -194,7 +194,7 @@ void R3BTraDigitizer::Exec(Option_t* opt) {
 	ss03_kbw_f = 2;  //kpos for 1 SST swop (with 3.9936-) - requirement for tracker
 	ss03_karea_f = 0;
 	ss03_keta_f = 0;
-//	LOG(INFO)<<"SST1 - fragment "<<PID<FairLogger::endl;   
+//	LOG(INFO)<<"SST1 - fragment "<<PID;   
       }     
       //if (DetID==16)
       //if (DetID==22)
@@ -216,7 +216,7 @@ void R3BTraDigitizer::Exec(Option_t* opt) {
 	ss06_kbw_f = 2;
 	ss06_karea_f = 0;
 	ss06_keta_f = 0;	
-//	LOG(INFO)<<"SST2 - fragment "<<PID<FairLogger::endl;
+//	LOG(INFO)<<"SST2 - fragment "<<PID;
       }
             
    }
@@ -243,8 +243,8 @@ void R3BTraDigitizer::Exec(Option_t* opt) {
 	ss03_kbw_p1 = 2;   //kpos for 1 SST swop (with 3.9936-) - requirement for tracker 
 	ss03_karea_p1 = 0;
 	ss03_keta_p1 = 0;
-//	LOG(INFO)<<"SST1 - proton "<<PID<FairLogger::endl;
-//	LOG(INFO)<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID<FairLogger::endl;
+//	LOG(INFO)<<"SST1 - proton "<<PID;
+//	LOG(INFO)<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID;
       }     
       //if (DetID==16)
       //if (DetID==22)
@@ -266,8 +266,8 @@ void R3BTraDigitizer::Exec(Option_t* opt) {
 	ss06_kbw_p1 = 2;
 	ss06_karea_p1 = 0;
 	ss06_keta_p1 = 0;
-//	LOG(INFO)<<"SST2 - proton "<<PID<FairLogger::endl;
-//	LOG(INFO)<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID<FairLogger::endl;   
+//	LOG(INFO)<<"SST2 - proton "<<PID;
+//	LOG(INFO)<<"l "<<l<<" DetID "<<DetID<<" PID "<<PID;   
       }
      
     }     
@@ -288,7 +288,7 @@ ss06_sarea_p1,ss06_seta_p1,ss06_ke_p1,ss06_kpos_p1,ss06_kbw_p1,ss06_karea_p1,ss0
 
 void R3BTraDigitizer::Reset(){
 // Clear the structure
-//   LOG(INFO) << " -I- Digit Reset() called " <<FairLogger::endl;
+//   LOG(INFO) << " -I- Digit Reset() called ";
 
    
  if (fTraDigi ) fTraDigi->Clear();
@@ -318,7 +318,7 @@ ss03_kpos_f,ss03_kbw_f,ss03_karea_f,ss03_keta_f,ss06_se_f,ss06_spos_f,ss06_sbw_f
 ss06_ke_f,ss06_kpos_f,ss06_kbw_f,ss06_karea_f,ss06_keta_f,ss03_se_p1,ss03_spos_p1,ss03_sbw_p1,ss03_sarea_p1,
 ss03_seta_p1,ss03_ke_p1,ss03_kpos_p1,ss03_kbw_p1,ss03_karea_p1,ss03_keta_p1,ss06_se_p1,ss06_spos_p1,ss06_sbw_p1,
 ss06_sarea_p1,ss06_seta_p1,ss06_ke_p1,ss06_kpos_p1,ss06_kbw_p1,ss06_karea_p1,ss06_keta_p1);
-LOG(INFO)<<"Point 19"<<FairLogger::endl; 
+LOG(INFO)<<"Point 19"; 
 }
 
 

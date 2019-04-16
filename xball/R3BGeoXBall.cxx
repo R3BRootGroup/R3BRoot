@@ -27,7 +27,7 @@ const char* R3BGeoXBall::getModuleName(Int_t m)
   // Returns the module name of sts number m
   if(m < 0) {
   	LOG(ERROR) << "R3BGeoXBall::getModuleName:: Module number "
-    << m << " not known!" << FairLogger::endl;
+    << m << " not known!";
     return "";
   }
   if(m < 9) {

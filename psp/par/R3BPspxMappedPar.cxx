@@ -38,20 +38,20 @@ void R3BPspxMappedPar::clear()
 void R3BPspxMappedPar::printparams()
 {
 
-    LOG(INFO) << "Print" << FairLogger::endl;
-    LOG(INFO) << "pspxmappedpardetector: " << pspxmappedpardetector << FairLogger::endl;
+    LOG(INFO) << "Print";
+    LOG(INFO) << "pspxmappedpardetector: " << pspxmappedpardetector;
     Int_t size = pspxmappedparstrip.GetSize();
-    LOG(INFO) << "size: " << size << FairLogger::endl;
+    LOG(INFO) << "size: " << size;
     for (Int_t i = 0; i < size; i++)
     {
-        LOG(INFO) << i << " :" << pspxmappedparstrip.GetAt(i) << FairLogger::endl;
+        LOG(INFO) << i << " :" << pspxmappedparstrip.GetAt(i);
     }
 }
 
 void R3BPspxMappedPar::putParams(FairParamList* l)
 {
     //   print();
-    LOG(INFO) << "I am in R3BPspxMappedPar::putParams " << FairLogger::endl;
+    LOG(INFO) << "I am in R3BPspxMappedPar::putParams ";
     if (!l)
     {
         return;
@@ -63,7 +63,7 @@ void R3BPspxMappedPar::putParams(FairParamList* l)
 Bool_t R3BPspxMappedPar::getParams(FairParamList* l)
 {
     // print();
-    LOG(INFO) << "I am in R3BPspxMappedPar::getParams " << FairLogger::endl;
+    LOG(INFO) << "I am in R3BPspxMappedPar::getParams ";
 
     if (!l)
     {

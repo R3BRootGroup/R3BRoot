@@ -21,7 +21,7 @@ R3BNeulandHitPar::~R3BNeulandHitPar()
 
 void R3BNeulandHitPar::putParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BNeulandHitPar::putParams() called" << FairLogger::endl;
+    LOG(INFO) << "R3BNeulandHitPar::putParams() called";
     if (!list)
     {
         return;
@@ -31,7 +31,7 @@ void R3BNeulandHitPar::putParams(FairParamList* list)
 
 Bool_t R3BNeulandHitPar::getParams(FairParamList* list)
 {
-    LOG(INFO) << "R3BNeulandHitPar::getParams() called" << FairLogger::endl;
+    LOG(INFO) << "R3BNeulandHitPar::getParams() called";
     if (!list)
     {
         return kFALSE;
@@ -48,13 +48,13 @@ void R3BNeulandHitPar::clear() {}
 void R3BNeulandHitPar::printParams()
 {
 
-    LOG(INFO) << " -----------  " << GetName() << " NeuLAND Parameters -------------  " << FairLogger::endl;
+    LOG(INFO) << " -----------  " << GetName() << " NeuLAND Parameters -------------  ";
 
-    LOG(INFO) << " Number of Parameters " << fParams->GetEntries() << FairLogger::endl;
+    LOG(INFO) << " Number of Parameters " << fParams->GetEntries();
     for (Int_t i = 0; i < fParams->GetEntries(); i++)
     {
         R3BNeulandHitModulePar* t_par = (R3BNeulandHitModulePar*)fParams->At(i);
-        LOG(INFO) << "----------------------------------------------------------------------" << FairLogger::endl;
+        LOG(INFO) << "----------------------------------------------------------------------";
         if (t_par)
         {
             t_par->printParams();

@@ -4,7 +4,7 @@ compiler: gcc
 dist: xenial
 sudo: required
 env: 
-    - GCC_VERSION=5 FAIRSOFT_VERSION=may18p1 FAIRROOT_VERSION=18.0.6
+    - GCC_VERSION=5 FAIRSOFT_VERSION=jun19p1 FAIRROOT_VERSION=18.2.0
 #    - GCC_VERSION=7
 #    - GCC_VERSION=8
 services:
@@ -24,19 +24,13 @@ before_install:
 install:
 
 before_script:
+ -  cd $HOME
+ -  mkdir container
+ -  cd container
  -  echo "FROM fairroot:${FAIRROOT_VERSION}_${FAIRSOFT_VERSION}_ubuntu" > Dockerfile
  -  echo "MAINTAINER Dmytro Kresan <d.kresan@gsi.de>" >> Dockerfile
- -  echo "ENTRYPOINT cd /root && echo '#!/bin/bash\n \\" >> Dockerfile
- -  echo "COMMIT=${TRAVIS_COMMIT};\n \\" >> Dockerfile
- -  echo "SLUG=${TRAVIS_REPO_SLUG};\n \\" >> Dockerfile
- -  echo "if [ \"${TRAVIS_PULL_REQUEST}\" = \"true\" ] ; then\n \\" >> Dockerfile
- -  echo "  COMMIT=${TRAVIS_PULL_REQUEST_SHA};\n \\" >> Dockerfile
- -  echo "  SLUG=${TRAVIS_PULL_REQUEST_SLUG};\n \\" >> Dockerfile
- -  echo "fi\n \\" >> Dockerfile
- -  echo "echo \${SLUG} \${COMMIT}\n \\" >> Dockerfile
- -  echo "cd /root && git clone https://github.com/\${SLUG} && cd R3BRoot &&\n \\" >> Dockerfile
- -  echo "git checkout \${COMMIT} && git clone https://github.com/R3BRootGroup/macros.git && cd macros && git checkout dev' > clone.sh && \\" >> Dockerfile
- -  echo "cd /root && chmod +x clone.sh && ./clone.sh && cd /root &&\\" >> Dockerfile
+ -  echo "ENTRYPOINT cd /root/R3BRoot && git clone https://github.com/R3BRootGroup/macros.git && \\" >> Dockerfile
+ -  echo "cd macros && git checkout dev && cd /root && \\" >> Dockerfile
  -  echo "echo 'export LINUX_FLAVOUR=Ubuntu-16.04\n\\" >> Dockerfile
  -  echo "export FAIRSOFT_VERSION=${FAIRSOFT_VERSION}\n\\" >> Dockerfile
  -  echo "export FAIRROOT_VERSION=v${FAIRROOT_VERSION}\n\\" >> Dockerfile
@@ -50,14 +44,15 @@ before_script:
  -  echo "/root/R3BRoot/Dart.sh Experimental /root/Dart.cfg" >> Dockerfile
  - cat Dockerfile
  - docker build -t r3broot:${TRAVIS_COMMIT} .
+ - cd $HOME
 
 script:
-    - docker run r3broot:${TRAVIS_COMMIT}
+    - docker run -v $HOME/build/R3BRootGroup/R3BRoot:/root/R3BRoot r3broot:${TRAVIS_COMMIT}
 
 notifications:
     email:
         recipients:
-            - Va.Wagner@gsi.de
+#            - Va.Wagner@gsi.de
             - D.Kresan@gsi.de
         on_success: always
         on_failure: always

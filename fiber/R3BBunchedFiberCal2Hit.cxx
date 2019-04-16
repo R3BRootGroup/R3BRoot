@@ -56,13 +56,13 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
 {
   auto mgr = FairRootManager::Instance();
   if (!mgr) {
-    LOG(ERROR) << "FairRootManager not found." << FairLogger::endl;
+    LOG(ERROR) << "FairRootManager not found.";
     return kERROR;
   }
   auto name = fName + "Cal";
   fCalItems = (TClonesArray *)mgr->GetObject(name);
   if (!fCalItems) {
-    LOG(ERROR) << "Branch " << name << " not found." << FairLogger::endl;
+    LOG(ERROR) << "Branch " << name << " not found.";
     return kERROR;
   }
   mgr->Register(fName + "Hit", "Land", fHitItems, kTRUE);
@@ -76,12 +76,12 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     auto container = fName + "HitPar";
     fHitPar = (R3BBunchedFiberHitPar *)FairRuntimeDb::instance()->getContainer(container);
     if (!fHitPar){
-      LOG(ERROR) << "Could not get " << container << " container." << FairLogger::endl;
+      LOG(ERROR) << "Could not get " << container << " container.";
       fNofHitPars = 0;
     } else {
       fNofHitPars = fHitPar->GetNumModulePar();
       if (0 == fNofHitPars){
-        LOG(ERROR) << "No Hit parameters in " << container << " container." << FairLogger::endl;
+        LOG(ERROR) << "No Hit parameters in " << container << " container.";
         fHitPar = nullptr;
       }
     }
@@ -135,7 +135,7 @@ void R3BBunchedFiberCal2Hit::SetParContainers()
   // to be set as dependency in CMakelists.txt (in this case in the tof directory)
   fCalPar = (R3BBunchedFiberHitPar *)FairRuntimeDb::instance()->getContainer(fName + "HitPar");
   if (!fCalPar) {
-    LOG(ERROR) << "R3BTofdCal2Hit::Init() Couldn't get " << fName << "HitPar. " << FairLogger::endl;
+    LOG(ERROR) << "R3BTofdCal2Hit::Init() Couldn't get " << fName << "HitPar. ";
   }
 }
 

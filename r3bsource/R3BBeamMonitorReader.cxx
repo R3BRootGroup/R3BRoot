@@ -39,7 +39,7 @@ Bool_t R3BBeamMonitorReader::Init(ext_data_struct_info *a_struct_info)
 	// present though and hence may be null. Take care when using.
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-         LOG(ERROR) <<  "FairRootManager not found" <<FairLogger::endl; 
+         LOG(ERROR) <<  "FairRootManager not found"; 
     	
 	header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     
@@ -48,7 +48,7 @@ Bool_t R3BBeamMonitorReader::Init(ext_data_struct_info *a_struct_info)
       EXT_STR_h101_BMON, 0);
   if (!ok) {
     perror("ext_data_struct_info_item"); 
-    LOG(ERROR) <<  "Failed to setup structure information." <<FairLogger::endl; 
+    LOG(ERROR) <<  "Failed to setup structure information."; 
     
     return kFALSE;
   }

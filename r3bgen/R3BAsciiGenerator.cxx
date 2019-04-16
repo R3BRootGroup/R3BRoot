@@ -37,9 +37,9 @@ R3BAsciiGenerator::R3BAsciiGenerator(std::string fileName)
     , fDZ(0.)
     , fBoxVtxIsSet(false)
 {
-    LOG(INFO) << "R3BAsciiGenerator: Looking for ions..." << FairLogger::endl;
+    LOG(INFO) << "R3BAsciiGenerator: Looking for ions...";
     const int nIons = RegisterIons();
-    LOG(INFO) << "R3BAsciiGenerator: " << nIons << " ions registered." << FairLogger::endl;
+    LOG(INFO) << "R3BAsciiGenerator: " << nIons << " ions registered.";
 }
 
 R3BAsciiGenerator::R3BAsciiGenerator(const TString& fileName)
@@ -88,7 +88,7 @@ bool R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     }
 
     LOG(INFO) << "R3BAsciiGenerator: Reading Event: " << eventId << ",  pBeam = " << pBeam << "GeV, b = " << b
-              << " fm, multiplicity " << nTracks << FairLogger::endl;
+              << " fm, multiplicity " << nTracks;
 
     // Loop over tracks in the current event
     for (int itrack = 0; itrack < nTracks; itrack++)
@@ -129,8 +129,7 @@ bool R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen)
             TParticlePDG* part = fPDG->GetParticle(ionName);
             if (!part)
             {
-                LOG(WARNING) << "R3BAsciiGenerator::ReadEvent: Cannot find " << ionName << " in database!"
-                             << FairLogger::endl;
+                LOG(WARNING) << "R3BAsciiGenerator::ReadEvent: Cannot find " << ionName << " in database!";
                 continue;
             }
             pdgType = part->PdgCode();
@@ -240,7 +239,7 @@ void R3BAsciiGenerator::CheckAndOpen()
     // Open file or re-open if end reached
     if (fInputFile.eof() || !fInputFile.is_open())
     {
-        LOG(INFO) << "R3BAsciiGenerator: Reading input file " << fFileName << FairLogger::endl;
+        LOG(INFO) << "R3BAsciiGenerator: Reading input file " << fFileName;
         fInputFile.close();
         fInputFile.open(fFileName);
     }
@@ -248,7 +247,7 @@ void R3BAsciiGenerator::CheckAndOpen()
     // Check for input file
     if (!fInputFile.is_open())
     {
-        LOG(FATAL) << "R3BAsciiGenerator: Input file not open!" << FairLogger::endl;
+        LOG(FATAL) << "R3BAsciiGenerator: Input file not open!";
     }
 }
 

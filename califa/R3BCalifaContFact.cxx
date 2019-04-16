@@ -65,7 +65,7 @@ FairParSet* R3BCalifaContFact::createContainer(FairContainer* c) {
    */
   
   const char* name=c->GetName();
-  LOG(INFO) << "R3BCalifaContFact: Create container name: " << name << FairLogger::endl;
+  LOG(INFO) << "R3BCalifaContFact: Create container name: " << name;
   FairParSet* p=0;
   if (strcmp(name,"califaCrystalCalPar")==0){
     p=new R3BCalifaCrystalCalPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
@@ -87,7 +87,7 @@ FairParSet* R3BCalifaContFact::createContainer(FairContainer* c) {
   return p;
   
   const char* name=c->GetName();
-  LOG(INFO) << "R3BLandContFact: Create container name: " << name << FairLogger::endl;
+  LOG(INFO) << "R3BLandContFact: Create container name: " << name;
   FairParSet* p=0;
   if (strcmp(name,"R3BLandDigiPar")==0) {
   p=new R3BLandDigiPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());

@@ -93,8 +93,8 @@ void R3BLandDigitizer::SetParContainers()
   fLandDigiPar = (R3BLandDigiPar*)(rtdb->getContainer("R3BLandDigiPar"));
 
   if ( fVerbose && fLandDigiPar ) {
-    LOG(INFO) << "R3BLandDigitizer::SetParContainers() "<< FairLogger::endl;
-    LOG(INFO) << "Container R3BLandDigiPar loaded " << FairLogger::endl;
+    LOG(INFO) << "R3BLandDigitizer::SetParContainers() ";
+    LOG(INFO) << "Container R3BLandDigiPar loaded ";
   }
 }
 // ----------------------------------------------------------------------------
@@ -119,8 +119,8 @@ InitStatus R3BLandDigitizer::Init()
   nplanes = fLandDigiPar->GetMaxPlane();
   paddle_per_plane=(npaddles-1)/nplanes;
   LOG(INFO) << "R3BLandDigitizer: # paddles: " << npaddles-1
-  << ", # planes: " << nplanes << FairLogger::endl;
-  LOG(INFO) << "R3BLandDigitizer: paddles per plane: " << paddle_per_plane << FairLogger::endl;
+  << ", # planes: " << nplanes;
+  LOG(INFO) << "R3BLandDigitizer: paddles per plane: " << paddle_per_plane;
   c = 2.99792458E8;
   cMedia = 14.; // speed of light in material in [cm/ns]
 //  cMedia = c / 1.58 * 1e9; // speed of light in material in [cm/ns]
@@ -253,17 +253,17 @@ void R3BLandDigitizer::Exec(Option_t* opt)
       Int_t m = PMmult[paddle];
 
       if (m>1500) {
-        LOG(ERROR) << "R3BLandDigitizer: Too many hits in one paddle: "<< m << " hits" << FairLogger::endl
-        << "entry " << l << " after sorting" << FairLogger::endl
-        << "paddle " << paddle << FairLogger::endl
-        << "padlle mult " << PMmult[paddle] << FairLogger::endl
-        << "Sector " << scint << FairLogger::endl
-        << "eloss " << eloss << FairLogger::endl
-        << "light yield " << light << FairLogger::endl
-        << "time " << time << FairLogger::endl
-        << "X In " << x << FairLogger::endl
-        << "Y In " << y << FairLogger::endl
-        << "Z In " << z << FairLogger::endl;
+        LOG(ERROR) << "R3BLandDigitizer: Too many hits in one paddle: "<< m << " hits"
+        << "entry " << l << " after sorting"
+        << "paddle " << paddle
+        << "padlle mult " << PMmult[paddle]
+        << "Sector " << scint
+        << "eloss " << eloss
+        << "light yield " << light
+        << "time " << time
+        << "X In " << x
+        << "Y In " << y
+        << "Z In " << z;
         return;
       }
 
@@ -617,7 +617,7 @@ void R3BLandDigitizer::Exec(Option_t* opt)
 
   if(fVerbose) {
     LOG(INFO) << "R3BLandDigitizer: produced "
-    << fLandDigi->GetEntries() << " digis" << FairLogger::endl;
+    << fLandDigi->GetEntries() << " digis";
   }
 }
 // ----------------------------------------------------------------------------

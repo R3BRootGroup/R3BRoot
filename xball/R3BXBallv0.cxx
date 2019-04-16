@@ -97,12 +97,12 @@ void R3BXBallv0::Initialize()
 {
   FairDetector::Initialize();
   
-  LOG(INFO) << "R3BXBallv0 initialisation" << FairLogger::endl;
-  LOG(DEBUG) << "R3BXBallv0: Vol. (McId)" << FairLogger::endl;
-  LOG(DEBUG) << "R3BXBallv0: Crystal A   : " << gMC->VolId("crystalLogNAJA")<< FairLogger::endl;
-  LOG(DEBUG) << "R3BXBallv0: Crystal B   : " << gMC->VolId("crystalLogNAJB")<< FairLogger::endl;
-  LOG(DEBUG) << "R3BXBallv0: Crystal C   : " << gMC->VolId("crystalLogNAJC")<< FairLogger::endl;
-  LOG(DEBUG) << "R3BXBallv0: Crystal D   : " << gMC->VolId("crystalLogNAJD")<< FairLogger::endl;
+  LOG(INFO) << "R3BXBallv0 initialisation";
+  LOG(DEBUG) << "R3BXBallv0: Vol. (McId)";
+  LOG(DEBUG) << "R3BXBallv0: Crystal A   : " << gMC->VolId("crystalLogNAJA");
+  LOG(DEBUG) << "R3BXBallv0: Crystal B   : " << gMC->VolId("crystalLogNAJB");
+  LOG(DEBUG) << "R3BXBallv0: Crystal C   : " << gMC->VolId("crystalLogNAJC");
+  LOG(DEBUG) << "R3BXBallv0: Crystal D   : " << gMC->VolId("crystalLogNAJD");
   
   // Crystals type ID
   //  type   ID
@@ -240,7 +240,7 @@ TClonesArray* R3BXBallv0::GetCollection(Int_t iColl) const {
 void R3BXBallv0::Print() const
 {
   Int_t nHits = fXBallCollection->GetEntriesFast();
-  LOG(INFO) << "R3BXBallv0: " << nHits << " points registered in this event" << FairLogger::endl;
+  LOG(INFO) << "R3BXBallv0: " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
@@ -260,7 +260,7 @@ void R3BXBallv0::Reset()
 void R3BXBallv0::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
   Int_t nEntries = cl1->GetEntriesFast();
-  LOG(INFO) << "R3BXBallv0: " << nEntries << " entries to add" << FairLogger::endl;
+  LOG(INFO) << "R3BXBallv0: " << nEntries << " entries to add";
   TClonesArray& clref = *cl2;
   R3BXBallPoint* oldpoint = NULL;
   for (Int_t i=0; i<nEntries; i++) {
@@ -270,7 +270,7 @@ void R3BXBallv0::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
     new (clref[fPosIndex]) R3BXBallPoint(*oldpoint);
     fPosIndex++;
   }
-  LOG(INFO) << "R3BXBallv0: " << cl2->GetEntriesFast() << " merged entries" << FairLogger::endl;
+  LOG(INFO) << "R3BXBallv0: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 
@@ -286,7 +286,7 @@ R3BXBallPoint* R3BXBallv0::AddHit(Int_t trackID, Int_t detID, Int_t type, Int_t 
   if (fVerboseLevel>1)
     LOG(INFO) << "R3BXBallv0: Adding Point at (" << posIn.X() << ", " << posIn.Y()
     << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
-    << trackID << ", energy loss " << eLoss*1e06 << " keV" << FairLogger::endl;
+    << trackID << ", energy loss " << eLoss*1e06 << " keV";
   return new(clref[size]) R3BXBallPoint(trackID, detID, type, cp , posIn, posOut,
                                         momIn, momOut, time, length, eLoss);
 }
@@ -300,13 +300,13 @@ void R3BXBallv0::ConstructGeometry() {
 void R3BXBallv0::ConstructGeometry2(){
   
   LOG(INFO) << "##################################################################"
-  << FairLogger::endl
+ 
   << "*     -I- R3BXBallv0 R3BXBallv0::ConstructGeometry()                     *"
-  <<  FairLogger::endl
+ 
   << "*        Darmstadt-Heidelberg Crystal Ball - CAVE C Setup        *"
-  <<  FairLogger::endl
+ 
   << "##################################################################"
-  << FairLogger::endl;
+ ;
   
   // out-of-file geometry definition
   Double_t dx,dy,dz;
@@ -2807,8 +2807,8 @@ void R3BXBallv0::ConstructGeometry2(){
 // -----   Public method ConstructGeometry   ----------------------------------
 void R3BXBallv0::ConstructGeometry1()
 {
-  LOG(ERROR) << "R3BXBallv0 Dummy function called !!! " << FairLogger::endl;
-  LOG(ERROR) << "no Crystal geometry will be created ... " << FairLogger::endl;
+  LOG(ERROR) << "R3BXBallv0 Dummy function called !!! ";
+  LOG(ERROR) << "no Crystal geometry will be created ... ";
   return;
 }
 

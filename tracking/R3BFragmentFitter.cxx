@@ -94,7 +94,7 @@ double Chi2(const double *xx)
         //if(kAfterGlad == det->section)
         {
             chi2 += TMath::Power((x_l - det->hit_x) / det->res_x, 2);
-            //LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x) << FairLogger::endl;
+            //LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
             nchi2 += 1;
         }
         
@@ -143,7 +143,7 @@ double Chi2Backward(const double *xx)
             
             LOG(DEBUG2) << " at " << det->GetDetectorName() << ", momentum:"
             << gCandidate->GetMomentum().X() << "," << gCandidate->GetMomentum().Y()
-            << gCandidate->GetMomentum().Z() << FairLogger::endl;
+            << gCandidate->GetMomentum().Z();
         }
         
         if(gEnergyLoss)
@@ -163,7 +163,7 @@ double Chi2Backward(const double *xx)
         //if(kAfterGlad == det->section)
         {
             chi2 += TMath::Power((x_l - det->hit_x) / det->res_x, 2);
-            //LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x) << FairLogger::endl;
+            //LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
             nchi2 += 1;
         }
         
@@ -245,7 +245,7 @@ InitStatus R3BFragmentFitter::Init()
     fArrayMCTracks = (TClonesArray*)man->GetObject("MCTrack");
     if (NULL == fArrayMCTracks)
     {
-        LOG(ERROR) << "No MC Track array found in input file." << FairLogger::endl;
+        LOG(ERROR) << "No MC Track array found in input file.";
         return kERROR;
     }
 
@@ -383,8 +383,8 @@ void R3BFragmentFitter::Exec(const Option_t*)
                                                             ion->GetPz(),
                                                             beta,
                                                             ion->GetMass());
-    // LOG(INFO) << "MC mass " << ion->GetMass() << FairLogger::endl;
-    // LOG(INFO) << "MC beta " << beta << FairLogger::endl;
+    // LOG(INFO) << "MC mass " << ion->GetMass();
+    // LOG(INFO) << "MC beta " << beta;
 
     fh_mult_psp->Fill(psp->hits.size());
     fh_mult_fi4->Fill(fi4->hits.size());
@@ -534,20 +534,20 @@ void R3BFragmentFitter::Exec(const Option_t*)
         }
 
         Double_t momentum0 = candidate->GetStartMomentum().Mag();
-        LOG(DEBUG1) << FairLogger::endl << FairLogger::endl << FairLogger::endl;
-        LOG(DEBUG1) << "RESULT : " << momentum0 << FairLogger::endl;
-        LOG(DEBUG1) << "TRUTH  : " << particle->GetMomentum().Mag() << FairLogger::endl;
+        LOG(DEBUG1);
+        LOG(DEBUG1) << "RESULT : " << momentum0;
+        LOG(DEBUG1) << "TRUTH  : " << particle->GetMomentum().Mag();
         LOG(DEBUG1) << "Resolution: " << (momentum0 - particle->GetMomentum().Mag()) / particle->GetMomentum().Mag()
-                    << FairLogger::endl;
-        LOG(DEBUG1) << "Mass   : " << candidate->GetMass() << FairLogger::endl;
-        LOG(DEBUG1) << "Truth  : " << particle->GetMass() << FairLogger::endl;
+                   ;
+        LOG(DEBUG1) << "Mass   : " << candidate->GetMass();
+        LOG(DEBUG1) << "Truth  : " << particle->GetMass();
         LOG(DEBUG1) << "Mass resolution : " << (candidate->GetMass() - particle->GetMass()) / particle->GetMass()
-                    << FairLogger::endl;
-        LOG(DEBUG1) << "Beta   : " << candidate->GetStartBeta() << FairLogger::endl;
-        LOG(DEBUG1) << "Truth  : " << particle->GetStartBeta() << FairLogger::endl;
+                   ;
+        LOG(DEBUG1) << "Beta   : " << candidate->GetStartBeta();
+        LOG(DEBUG1) << "Truth  : " << particle->GetStartBeta();
         LOG(DEBUG1) << "Beta resolution : "
                     << (candidate->GetStartBeta() - particle->GetStartBeta()) / particle->GetStartBeta()
-                    << FairLogger::endl;
+                   ;
 
         fh_mom_res->Fill((momentum0 - particle->GetStartMomentum().Mag()) / particle->GetStartMomentum().Mag());
         fh_chi2->Fill(candidate->GetChi2());
@@ -555,7 +555,7 @@ void R3BFragmentFitter::Exec(const Option_t*)
         fh_mass_res->Fill((candidate->GetMass() - particle->GetMass()) / particle->GetMass());
         fh_vz_res->Fill(candidate->GetStartPosition().X() - particle->GetStartPosition().X());
         //candidate->GetStartPosition().Print();
-        //LOG(INFO) << (candidate->GetMass() / 0.9314940954) << FairLogger::endl;
+        //LOG(INFO) << (candidate->GetMass() / 0.9314940954);
 
         Double_t x_l = 0.;
         Double_t y_l = 0.;
@@ -565,7 +565,7 @@ void R3BFragmentFitter::Exec(const Option_t*)
         {
             if(kTarget != det->section)
             {
-                LOG(DEBUG2) << "Propagate to " << det->GetDetectorName() << FairLogger::endl;
+                LOG(DEBUG2) << "Propagate to " << det->GetDetectorName();
                 fPropagator->PropagateToDetector(candidate, det);
             }
             
@@ -605,7 +605,7 @@ void R3BFragmentFitter::Exec(const Option_t*)
 
     if (0 == (fNEvents % 10))
     {
-        LOG(INFO) << "Event: " << fNEvents << FairLogger::endl;
+        LOG(INFO) << "Event: " << fNEvents;
     }
 
     fNEvents += 1;
@@ -723,7 +723,7 @@ Int_t R3BFragmentFitter::FitFragmentBackward(R3BTrackingParticle* candidate)
     }
     
     //LOG(INFO) << "1 Start beta:" << gCandidate->GetStartBeta()
-    //<< ",  Beta:" << gCandidate->GetBeta() << FairLogger::endl;
+    //<< ",  Beta:" << gCandidate->GetBeta();
     
     gCandidate->SetStartBeta(gCandidate->GetBeta());
     gCandidate->SetCharge(-1. * gCandidate->GetCharge());
@@ -731,7 +731,7 @@ Int_t R3BFragmentFitter::FitFragmentBackward(R3BTrackingParticle* candidate)
     
     //Double_t chi2 = Chi2Backward(variable);
     
-    //LOG(INFO) << "2 chi2 = " << chi2 << FairLogger::endl;
+    //LOG(INFO) << "2 chi2 = " << chi2;
     
     //return 0;
 
@@ -822,7 +822,7 @@ void R3BFragmentFitter::FitFragment(R3BTrackingParticle* candidate)
     for (Int_t i = 0; i < maxIter; i++)
     {
         LOG(DEBUG1) << "Starting iteration " << (i + 1) << "   mass = " << mass << "   beta = " << beta
-                    << FairLogger::endl;
+                   ;
 
         // Always start an iteration from the target
         candidate->Reset();
@@ -832,7 +832,7 @@ void R3BFragmentFitter::FitFragment(R3BTrackingParticle* candidate)
         // Calculate deviation of track from a measured TOF hit
         sdev = TrackFragment(candidate, kTRUE, devTof, time, chi2);
 
-        LOG(DEBUG1) << sdev << "  " << (time - tof->hit_time) << "  chi2=" << chi2 << FairLogger::endl;
+        LOG(DEBUG1) << sdev << "  " << (time - tof->hit_time) << "  chi2=" << chi2;
 
         stopHere = kTRUE;
 
@@ -916,8 +916,8 @@ Double_t R3BFragmentFitter::TrackFragment(R3BTrackingParticle* particle,
     // Propagate through the setup, defined by array of detectors
     for (auto const& det : fDetectors->GetArray())
     {
-        LOG(DEBUG2) << FairLogger::endl;
-        LOG(DEBUG2) << "Propagating to z=" << det->pos0.Z() << FairLogger::endl;
+        LOG(DEBUG2);
+        LOG(DEBUG2) << "Propagating to z=" << det->pos0.Z();
 
         if(kTarget != det->section)
         {
@@ -966,17 +966,17 @@ Double_t R3BFragmentFitter::TrackFragment(R3BTrackingParticle* particle,
 
         chi2 += TMath::Power((x_l - det->hit_x) / det->res_x, 2);
 
-        LOG(DEBUG2) << "Track length " << particle->GetLength() << " cm" << FairLogger::endl;
+        LOG(DEBUG2) << "Track length " << particle->GetLength() << " cm";
     }
 
     sdev /= 2;
     
     chi2 /= (fDetectors->GetArray().size() - 2);
 
-    LOG(DEBUG2) << "Deviation at TOF wall : " << sdev << FairLogger::endl;
-    LOG(DEBUG2) << "                 chi2 : " << chi2 << FairLogger::endl;
-    LOG(DEBUG2) << "                 time : " << time << FairLogger::endl;
-    LOG(DEBUG2) << "Track length " << particle->GetLength() << " cm" << FairLogger::endl;
+    LOG(DEBUG2) << "Deviation at TOF wall : " << sdev;
+    LOG(DEBUG2) << "                 chi2 : " << chi2;
+    LOG(DEBUG2) << "                 time : " << time;
+    LOG(DEBUG2) << "Track length " << particle->GetLength() << " cm";
 
     return sdev;
 }
@@ -997,7 +997,7 @@ Double_t R3BFragmentFitter::Velocity(R3BTrackingParticle* candidate)
     fPropagator->PropagateToDetector(candidate, tof);
     // TrackFragment(candidate);
     Double_t beta = candidate->GetLength() / (tof->hit_time - target->hit_time) / SPEED_OF_LIGHT;
-    LOG(INFO) << "Velocity estimation (TOF) " << beta << "   length = " << candidate->GetLength() << FairLogger::endl;
+    LOG(INFO) << "Velocity estimation (TOF) " << beta << "   length = " << candidate->GetLength();
 
     return beta;
 }
@@ -1013,12 +1013,12 @@ Double_t R3BFragmentFitter::DbetaDx(R3BTrackingParticle* candidate)
     Double_t time;
     Double_t chi2;
     Double_t beta1 = candidate->GetStartBeta();
-    LOG(DEBUG1) << "beta1 = " << beta1 << FairLogger::endl;
+    LOG(DEBUG1) << "beta1 = " << beta1;
     Double_t dev1 = TrackFragment(candidate, kTRUE, devTof, time, chi2);
 
     Double_t dbeta = 0.001;
     Double_t beta2 = beta1 + dbeta;
-    LOG(DEBUG1) << "beta2 = " << beta2 << FairLogger::endl;
+    LOG(DEBUG1) << "beta2 = " << beta2;
 
     candidate->SetStartBeta(beta2);
     candidate->UpdateMomentum();
@@ -1028,7 +1028,7 @@ Double_t R3BFragmentFitter::DbetaDx(R3BTrackingParticle* candidate)
 
     Double_t dbetadx = dbeta / (dev2 - dev1);
 
-    LOG(DEBUG1) << "dbeta/dx = " << dbetadx << " 1/cm" << FairLogger::endl << FairLogger::endl;
+    LOG(DEBUG1) << "dbeta/dx = " << dbetadx << " 1/cm";
 
     return dbetadx;
 }
@@ -1041,12 +1041,12 @@ Double_t R3BFragmentFitter::DbetaChi2(R3BTrackingParticle* candidate)
     Double_t time;
     Double_t chi2_1, chi2_2;
     Double_t beta1 = candidate->GetStartBeta();
-    LOG(DEBUG1) << "beta1 = " << beta1 << FairLogger::endl;
+    LOG(DEBUG1) << "beta1 = " << beta1;
     TrackFragment(candidate, kTRUE, devTof, time, chi2_1);
 
     Double_t dbeta = 0.001;
     Double_t beta2 = beta1 + dbeta;
-    LOG(DEBUG1) << "beta2 = " << beta2 << FairLogger::endl;
+    LOG(DEBUG1) << "beta2 = " << beta2;
 
     candidate->SetStartBeta(beta2);
     candidate->UpdateMomentum();
@@ -1056,7 +1056,7 @@ Double_t R3BFragmentFitter::DbetaChi2(R3BTrackingParticle* candidate)
 
     Double_t dbetachi2 = dbeta / (chi2_2 - chi2_1);
 
-    LOG(DEBUG1) << "dbeta/dchi2 = " << dbetachi2 << " 1/cm" << FairLogger::endl << FairLogger::endl;
+    LOG(DEBUG1) << "dbeta/dchi2 = " << dbetachi2 << " 1/cm";
 
     return dbetachi2;
 }
@@ -1069,12 +1069,12 @@ Double_t R3BFragmentFitter::DbetaDt(R3BTrackingParticle* candidate)
     Double_t time1, time2;
     Double_t chi2;
     Double_t beta1 = candidate->GetStartBeta();
-    LOG(DEBUG1) << "beta1 = " << beta1 << FairLogger::endl;
+    LOG(DEBUG1) << "beta1 = " << beta1;
     TrackFragment(candidate, kTRUE, devTof, time1, chi2);
 
     Double_t dbeta = 0.001;
     Double_t beta2 = beta1 + dbeta;
-    LOG(DEBUG1) << "beta2 = " << beta2 << FairLogger::endl;
+    LOG(DEBUG1) << "beta2 = " << beta2;
 
     candidate->SetStartBeta(beta2);
     candidate->UpdateMomentum();
@@ -1084,7 +1084,7 @@ Double_t R3BFragmentFitter::DbetaDt(R3BTrackingParticle* candidate)
 
     Double_t dbetadt = dbeta / (time2 - time1);
 
-    LOG(DEBUG1) << "dbeta/dt = " << dbetadt << " 1/ns" << FairLogger::endl << FairLogger::endl;
+    LOG(DEBUG1) << "dbeta/dt = " << dbetadt << " 1/ns";
 
     return dbetadt;
 }
@@ -1100,12 +1100,12 @@ Double_t R3BFragmentFitter::DmDx(R3BTrackingParticle* candidate, Bool_t energy_l
     Double_t time;
     Double_t chi2;
     Double_t m1 = candidate->GetMass();
-    LOG(DEBUG1) << "m1 = " << m1 << FairLogger::endl;
+    LOG(DEBUG1) << "m1 = " << m1;
     Double_t dev1 = TrackFragment(candidate, energy_loss, devTof, time, chi2);
 
     Double_t dm = 0.01;
     Double_t m2 = m1 + dm;
-    LOG(DEBUG1) << "m2 = " << m2 << FairLogger::endl;
+    LOG(DEBUG1) << "m2 = " << m2;
 
     candidate->SetMass(m2);
     candidate->UpdateMomentum();
@@ -1115,7 +1115,7 @@ Double_t R3BFragmentFitter::DmDx(R3BTrackingParticle* candidate, Bool_t energy_l
 
     Double_t dmdx = dm / (dev2 - dev1);
 
-    LOG(DEBUG1) << "dm/dx = " << dmdx << " GeV/cm" << FairLogger::endl << FairLogger::endl;
+    LOG(DEBUG1) << "dm/dx = " << dmdx << " GeV/cm";
 
     return dmdx;
 }
@@ -1131,12 +1131,12 @@ Double_t R3BFragmentFitter::DmDxTof(R3BTrackingParticle* candidate, Bool_t energ
     Double_t time;
     Double_t chi2;
     Double_t m1 = candidate->GetMass();
-    LOG(DEBUG1) << "m1 = " << m1 << FairLogger::endl;
+    LOG(DEBUG1) << "m1 = " << m1;
     TrackFragment(candidate, energy_loss, devTof1, time, chi2);
 
     Double_t dm = 0.5;
     Double_t m2 = m1 + dm;
-    LOG(DEBUG1) << "m2 = " << m2 << FairLogger::endl;
+    LOG(DEBUG1) << "m2 = " << m2;
 
     candidate->SetMass(m2);
     candidate->UpdateMomentum();
@@ -1146,7 +1146,7 @@ Double_t R3BFragmentFitter::DmDxTof(R3BTrackingParticle* candidate, Bool_t energ
 
     Double_t dmdx = dm / (devTof2 - devTof1);
 
-    LOG(DEBUG1) << "dm/dx = " << dmdx << " GeV/cm" << FairLogger::endl << FairLogger::endl;
+    LOG(DEBUG1) << "dm/dx = " << dmdx << " GeV/cm";
 
     return dmdx;
 }
@@ -1163,12 +1163,12 @@ Double_t R3BFragmentFitter::DmDt(R3BTrackingParticle* candidate, Bool_t energy_l
     Double_t time2;
     Double_t chi2;
     Double_t m1 = candidate->GetMass();
-    LOG(DEBUG1) << "m1 = " << m1 << FairLogger::endl;
+    LOG(DEBUG1) << "m1 = " << m1;
     TrackFragment(candidate, energy_loss, devTof, time1, chi2);
 
     Double_t dm = 0.5;
     Double_t m2 = m1 + dm;
-    LOG(DEBUG1) << "m2 = " << m2 << FairLogger::endl;
+    LOG(DEBUG1) << "m2 = " << m2;
 
     candidate->SetMass(m2);
     candidate->UpdateMomentum();
@@ -1178,7 +1178,7 @@ Double_t R3BFragmentFitter::DmDt(R3BTrackingParticle* candidate, Bool_t energy_l
 
     Double_t dmdt = dm / (time2 - time1);
 
-    LOG(DEBUG1) << "dm/dt = " << dmdt << " GeV/ns" << FairLogger::endl << FairLogger::endl;
+    LOG(DEBUG1) << "dm/dt = " << dmdt << " GeV/ns";
 
     return dmdt;
 }
@@ -1255,7 +1255,7 @@ void R3BFragmentFitter::Finish()
         Int_t bin2 = fh_A_reco2->FindLastBinAbove(fh_A_reco2->GetMaximum() / 2.);
         Double_t fwhm = fh_A_reco2->GetBinCenter(bin2) - fh_A_reco2->GetBinCenter(bin1);
 
-        LOG(INFO) << fwhm / fh_A_reco2->GetMean() << FairLogger::endl;
+        LOG(INFO) << fwhm / fh_A_reco2->GetMean();
 
         new TCanvas("c7", "", 500, 600, 500, 500);
         fh_chi2->Draw();
@@ -1305,7 +1305,7 @@ Bool_t R3BFragmentFitter::InitPropagator()
     }
     else
     {
-        LOG(ERROR) << "Unsupported type of field." << FairLogger::endl;
+        LOG(ERROR) << "Unsupported type of field.";
         return kFALSE;
     }
     return kTRUE;

@@ -97,7 +97,7 @@ InitStatus R3BGlobalAnalysisS454::Init()
     std::srand(std::time(0)); //use current time as seed for random generator
 
 
-    LOG(INFO) << "R3BGlobalAnalysisS454::Init " << FairLogger::endl;
+    LOG(INFO) << "R3BGlobalAnalysisS454::Init ";
 
     // try to get a handle on the EventHeader. EventHeader may not be 
     // present though and hence may be null. Take care when using.

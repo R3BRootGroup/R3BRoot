@@ -92,9 +92,9 @@ void R3BTra::Initialize()
 {
   FairDetector::Initialize();
 
-   LOG(INFO) << FairLogger::endl;
-   LOG(INFO) << "-I- R3BTra: initialisation" << FairLogger::endl;
-   LOG(INFO) << "-I- R3BTra: Sens. Vol. (McId) " << gMC->VolId("TraLog")<< FairLogger::endl;
+   LOG(INFO);
+   LOG(INFO) << "-I- R3BTra: initialisation";
+   LOG(INFO) << "-I- R3BTra: Sens. Vol. (McId) " << gMC->VolId("TraLog");
 
 }
 
@@ -103,14 +103,14 @@ void R3BTra::Initialize()
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BTra::ProcessHits(FairVolume* vol) {
 
-//      LOG(INFO) << " -I process hit called for:" <<  vol->GetName() << FairLogger::endl;
+//      LOG(INFO) << " -I process hit called for:" <<  vol->GetName();
 // Set parameters at entrance of volume. Reset ELoss.
 
 //    if ( vol ) {
 //        LOG(INFO) << " Name Id:copy "
-//            << vol->getName() << " : " << vol->getMCid() << " : " << vol->getCopyNo() << FairLogger::endl;
+//            << vol->getName() << " : " << vol->getMCid() << " : " << vol->getCopyNo();
 //        Int_t copyNo=0;
-//        LOG(INFO) << " Geant: " << gMC->CurrentVolID(copyNo) << ":" << copyNo << FairLogger::endl;
+//        LOG(INFO) << " Geant: " << gMC->CurrentVolID(copyNo) << ":" << copyNo;
 //    }
 
 
@@ -123,13 +123,13 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
     fLength = gMC->TrackLength();
     gMC->TrackPosition(fPosIn);
     gMC->TrackMomentum(fMomIn);
-    //LOG(INFO) << "X,Y,X tracker=" << fPosIn(0) << " " << fPosIn(1) << " " << fPosIn(2) << FairLogger::endl;
-    //LOG(INFO) << "track length=" << fLength << FairLogger::endl;
+    //LOG(INFO) << "X,Y,X tracker=" << fPosIn(0) << " " << fPosIn(1) << " " << fPosIn(2);
+    //LOG(INFO) << "track length=" << fLength;
   }
 
   // Sum energy loss for all steps in the active volume
       fELoss += gMC->Edep();
-    //LOG(INFO) << "Tracker Eloss=" << fELoss << "  " << gMC->Edep() << FairLogger::endl;
+    //LOG(INFO) << "Tracker Eloss=" << fELoss << "  " << gMC->Edep();
 
   // Set additional parameters at exit of active volume. Create R3BTraPoint.
   if ( gMC->IsTrackExiting()    ||
@@ -153,7 +153,7 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
       oldpos = gGeoManager->GetCurrentPoint();
       olddirection = gGeoManager->GetCurrentDirection();
       
-//       LOG(INFO) << "1st direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] << FairLogger::endl;
+//       LOG(INFO) << "1st direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2];
 
       for (Int_t i=0; i<3; i++){
 	newdirection[i] = -1*olddirection[i];
@@ -172,9 +172,9 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
 
       if ( fPosIn.Z() < 30. && newpos[2] > 30.02 ) {
 	cerr << "2nd direction: " << olddirection[0] << "," << olddirection[1] << "," << olddirection[2] 
-	     << " with safety = " << safety << FairLogger::endl;
-	cerr << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2] << FairLogger::endl;
-	cerr << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2] << FairLogger::endl;
+	     << " with safety = " << safety;
+	cerr << "oldpos = " << oldpos[0] << "," << oldpos[1] << "," << oldpos[2];
+	cerr << "newpos = " << newpos[0] << "," << newpos[1] << "," << newpos[2];
       }
 
       fPosOut.SetX(newpos[0]);
@@ -201,13 +201,13 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
 // ----------------------------------------------------------------------------
 //void R3BTra::SaveGeoParams(){
 //
-//  LOG(INFO) << " -I Save STS geo params " << FairLogger::endl;
+//  LOG(INFO) << " -I Save STS geo params ";
 //
 //  TFolder *mf = (TFolder*) gDirectory->FindObjectAny("cbmroot");
-//  LOG(INFO) << " mf: " << mf << FairLogger::endl;
+//  LOG(INFO) << " mf: " << mf;
 //  TFolder *stsf = NULL;
 //  if (mf ) stsf = (TFolder*) mf->FindObjectAny(GetName());
-//  LOG(INFO) << " stsf: " << stsf << FairLogger::endl;
+//  LOG(INFO) << " stsf: " << stsf;
 //  if (stsf) stsf->Add( flGeoPar0 ) ;
  //  FairRootManager::Instance()->WriteFolder();
 //  mf->Write("cbmroot",TObject::kWriteDelete);
@@ -217,19 +217,19 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol) {
 // -----   Public method EndOfEvent   -----------------------------------------
 void R3BTra::BeginEvent() {
 
-//  LOG(INFO) << "-I- begin tracker event called ##########" << FairLogger::endl;
+//  LOG(INFO) << "-I- begin tracker event called ##########";
 
   if(gGeoManager){
     TGeoVolume * vol=gGeoManager->FindVolumeFast("TraLog");
   
     if(vol){
-       //    LOG(INFO) << "id tracker serial number : " << vol->GetNumber() << FairLogger::endl;
+       //    LOG(INFO) << "id tracker serial number : " << vol->GetNumber();
     }
   }
 
 //  if (! kGeoSaved ) {
 //      SaveGeoParams();
-//  LOG(INFO) << "-I STS geometry parameters saved " << FairLogger::endl;
+//  LOG(INFO) << "-I STS geometry parameters saved ";
 //  kGeoSaved = kTRUE;
 //  }
 
@@ -267,7 +267,7 @@ TClonesArray* R3BTra::GetCollection(Int_t iColl) const {
 void R3BTra::Print() const {
   Int_t nHits = fTraCollection->GetEntriesFast();
   LOG(INFO) << "-I- R3BTra: " << nHits << " points registered in this event." 
-       << FairLogger::endl;
+      ;
 }
 // ----------------------------------------------------------------------------
 
@@ -285,7 +285,7 @@ void R3BTra::Reset() {
 // -----   Public method CopyClones   -----------------------------------------
 void R3BTra::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
   Int_t nEntries = cl1->GetEntriesFast();
-  LOG(INFO) << "-I- R3BTra: " << nEntries << " entries to add." << FairLogger::endl;
+  LOG(INFO) << "-I- R3BTra: " << nEntries << " entries to add.";
   TClonesArray& clref = *cl2;
   R3BTraPoint* oldpoint = NULL;
    for (Int_t i=0; i<nEntries; i++) {
@@ -296,7 +296,7 @@ void R3BTra::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset) {
     fPosIndex++;
   }
    LOG(INFO) << " -I- R3BTra: " << cl2->GetEntriesFast() << " merged entries."
-       << FairLogger::endl;
+      ;
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -309,7 +309,7 @@ R3BTraPoint* R3BTra::AddHit(Int_t trackID, Int_t detID, Int_t detCopyID, TVector
   if (fVerboseLevel>1) 
     LOG(INFO) << "-I- R3BTra: Adding Point at (" << posIn.X() << ", " << posIn.Y() 
 	 << ", " << posIn.Z() << ") cm,  detector " << detID << ", track "
-	 << trackID << ", energy loss " << eLoss*1e06 << " keV" << FairLogger::endl;
+	 << trackID << ", energy loss " << eLoss*1e06 << " keV";
   return new(clref[size]) R3BTraPoint(trackID, detID, detCopyID, posIn, posOut,
 				      momIn, momOut, time, length, eLoss); // detCopy added by Marc
 }
@@ -512,7 +512,7 @@ void R3BTra::ConstructGeometry() {
 	// Material: Gold
 	TGeoMedium * pMed79=NULL;
 	if (gGeoManager->GetMedium("Gold") ){
-		LOG(INFO) << "-I- TGeoManager: Gold Medium already defined " << FairLogger::endl;
+		LOG(INFO) << "-I- TGeoManager: Gold Medium already defined ";
 		pMed79 = gGeoManager->GetMedium("Gold");
 	}else{
 		// Material definition

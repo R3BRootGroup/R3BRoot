@@ -56,11 +56,11 @@ InitStatus R3BNeulandMapped2Cal::Init()
 
     if (fNofTcalPars == 0)
     {
-        LOG(ERROR) << "There are no TCal parameters in container LandTCalPar" << FairLogger::endl;
+        LOG(ERROR) << "There are no TCal parameters in container LandTCalPar";
         return kFATAL;
     }
 
-    LOG(INFO) << "R3BNeulandMapped2Cal::Init : read " << fNofTcalPars << " calibrated modules" << FairLogger::endl;
+    LOG(INFO) << "R3BNeulandMapped2Cal::Init : read " << fNofTcalPars << " calibrated modules";
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
@@ -96,7 +96,7 @@ void R3BNeulandMapped2Cal::SetParContainers()
 
     if (!fTcalPar)
     {
-        LOG(ERROR) << "Could not get access to LandTCalPar-Container." << FairLogger::endl;
+        LOG(ERROR) << "Could not get access to LandTCalPar-Container.";
         fNofTcalPars = 0;
         return;
     }
@@ -172,12 +172,12 @@ void R3BNeulandMapped2Cal::MakeCal()
 
         if ((iPlane < 1) || (iPlane > fNofPlanes))
         {
-            LOG(INFO) << "R3BNeulandMapped2TCal::Exec : Plane number out of range: " << iPlane << FairLogger::endl;
+            LOG(INFO) << "R3BNeulandMapped2TCal::Exec : Plane number out of range: " << iPlane;
             continue;
         }
         if ((iBar < 1) || (iBar > fNofBarsPerPlane))
         {
-            LOG(INFO) << "R3BNeulandMapped2TCal::Exec : Bar number out of range: " << iBar << FairLogger::endl;
+            LOG(INFO) << "R3BNeulandMapped2TCal::Exec : Bar number out of range: " << iBar;
             continue;
         }
 
@@ -187,7 +187,7 @@ void R3BNeulandMapped2Cal::MakeCal()
         if (!(par = fTcalPar->GetModuleParAt(iPlane, iBar, edge)))
         {
             LOG(DEBUG) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide
-                       << FairLogger::endl;
+                      ;
             continue;
         }
 
@@ -198,7 +198,7 @@ void R3BNeulandMapped2Cal::MakeCal()
         if (!(par = fTcalPar->GetModuleParAt(iPlane, iBar, edge + 1)))
         {
             LOG(DEBUG) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide
-                       << FairLogger::endl;
+                      ;
             continue;
         }
 
@@ -209,7 +209,7 @@ void R3BNeulandMapped2Cal::MakeCal()
         {
             LOG(ERROR) << "R3BNeulandMapped2Tcal::Exec : error in time calibration: ch= " << iPlane << iBar << iSide
                        << ", tdc= " << tdc << ", time leading edge = " << timeLE << ", time trailing edge = " << timeTE
-                       << FairLogger::endl;
+                      ;
             continue;
         }
 
@@ -263,7 +263,7 @@ void R3BNeulandMapped2Cal::FinishEvent()
 {
     if (fVerbose && 0 == (fNEvents % 1000))
     {
-        LOG(INFO) << "R3BNeulandMapped2Cal::Exec : event=" << fNEvents << " nPMTs=" << fNPmt << FairLogger::endl;
+        LOG(INFO) << "R3BNeulandMapped2Cal::Exec : event=" << fNEvents << " nPMTs=" << fNPmt;
     }
 
     if (fPmt)

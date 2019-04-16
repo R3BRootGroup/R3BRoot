@@ -108,8 +108,8 @@ void R3BDch2pDigitizer::SetParContainers() {
   fDch2pDigiPar = (R3BDch2pDigiPar*)(rtdb->getContainer("R3BDch2pDigiPar"));
 
   if ( fDch2pDigiPar ) {
-    LOG(INFO) << "R3BDch2pDigitizer::SetParContainers() "<< FairLogger::endl;
-    LOG(INFO) << "Container R3BDch2pDigiPar  loaded " << FairLogger::endl;
+    LOG(INFO) << "R3BDch2pDigitizer::SetParContainers() ";
+    LOG(INFO) << "Container R3BDch2pDigiPar  loaded ";
   }
 
 }

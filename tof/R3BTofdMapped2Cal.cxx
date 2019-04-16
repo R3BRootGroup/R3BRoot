@@ -86,11 +86,11 @@ InitStatus R3BTofdMapped2Cal::Init()
 {
   fNofTcalPars = fTcalPar->GetNumModulePar();
   if (fNofTcalPars == 0) {
-    LOG(ERROR) << "There are no TCal parameters in container TofdTCalPar" << FairLogger::endl;
+    LOG(ERROR) << "There are no TCal parameters in container TofdTCalPar";
     return kFATAL;
   }
 
-  LOG(INFO) << "R3BTofdMapped2Cal::Init : read " << fNofTcalPars << " modules" << FairLogger::endl;
+  LOG(INFO) << "R3BTofdMapped2Cal::Init : read " << fNofTcalPars << " modules";
 
   // try to get a handle on the EventHeader. EventHeader may not be
   // present though and hence may be null. Take care when using.
@@ -114,7 +114,7 @@ void R3BTofdMapped2Cal::SetParContainers()
 {
   fTcalPar = (R3BTCalPar *)FairRuntimeDb::instance()->getContainer("TofdTCalPar");
   if (!fTcalPar) {
-    LOG(ERROR) << "Could not get access to TofdTCalPar-Container." << FairLogger::endl;
+    LOG(ERROR) << "Could not get access to TofdTCalPar-Container.";
     fNofTcalPars = 0;
   }
 }
@@ -154,12 +154,12 @@ void R3BTofdMapped2Cal::Exec(Option_t *option)
 
     if ((mapped->GetDetectorId()<1) || (mapped->GetDetectorId()>fNofPlanes)) {
       LOG(DEBUG) << "R3BTofdMapped2Cal::Exec : Plane number out of range: " <<
-        mapped->GetDetectorId() << FairLogger::endl;
+        mapped->GetDetectorId();
       continue;
     }
     if ((mapped->GetBarId()<1) || (mapped->GetBarId()>fPaddlesPerPlane)) {
       LOG(DEBUG) << "R3BTofdMapped2Cal::Exec : Bar number out of range: " <<
-        mapped->GetBarId() << ", "<<fPaddlesPerPlane<<FairLogger::endl;
+        mapped->GetBarId() << ", "<<fPaddlesPerPlane;
       continue;
     }
 
@@ -169,8 +169,7 @@ void R3BTofdMapped2Cal::Exec(Option_t *option)
     if (!par) {
       LOG(INFO) << "R3BTofdMapped2Cal::Exec : Tcal par not found, Plane: " <<
         mapped->GetDetectorId() << ", Bar: " << mapped->GetBarId() << ", Side: " <<
-        mapped->GetSideId() << ", Edge: " << mapped->GetEdgeId() <<
-        FairLogger::endl;
+        mapped->GetSideId() << ", Edge: " << mapped->GetEdgeId();
       continue;
     }
 

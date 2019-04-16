@@ -67,7 +67,7 @@ R3BStartrackMapped2CalPar::~R3BStartrackMapped2CalPar()
 InitStatus R3BStartrackMapped2CalPar::Init()
 {	
      
-  LOG(DEBUG) << "Registering" << FairLogger::endl;
+  LOG(DEBUG) << "Registering";
   FairRootManager* fMan = FairRootManager::Instance();
   if(!fMan) {
     LOG(fatal) << "Init: No FairRootManager";
@@ -84,7 +84,7 @@ InitStatus R3BStartrackMapped2CalPar::Init()
     fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofdTCalPar");
 	if (!fCal_Par)
 	{
-		LOG(ERROR) << "R3BTofdMapped2TCalPar::Init() Couldn't get handle on TofdTCalPar. " << FairLogger::endl;
+		LOG(ERROR) << "R3BTofdMapped2TCalPar::Init() Couldn't get handle on TofdTCalPar. ";
         return kFATAL;
 		
 	}
@@ -93,7 +93,7 @@ InitStatus R3BStartrackMapped2CalPar::Init()
 
     if (!fNofModules)
     {
-		LOG(ERROR) << "R3BTofdMapped2TCalPar::Init() Number of modules not set. " << FairLogger::endl;
+		LOG(ERROR) << "R3BTofdMapped2TCalPar::Init() Number of modules not set. ";
         return kFATAL;
     }
     
@@ -108,7 +108,7 @@ void R3BStartrackMapped2CalPar::Exec(Option_t* option)
 {
 
    if(++NEvents % 10000 == 0)
-      LOG(INFO) << NEvents << FairLogger::endl;
+      LOG(INFO) << NEvents;
 
 
     Int_t nHits = fStartrackMappedDataCA->GetEntries();
@@ -127,7 +127,7 @@ void R3BStartrackMapped2CalPar::Exec(Option_t* option)
         
         if (iLadder>=(fNofInLadder+fNofOutLadder)) // this also errors for iDetector==0
         {
-            LOG(ERROR) << "R3BStartrackMapped2CalPar::Exec() : more Ladders than expected! Det: " << iLadder << " allowed are 1.." << fNofInLadder+fNofOutLadder << FairLogger::endl;
+            LOG(ERROR) << "R3BStartrackMapped2CalPar::Exec() : more Ladders than expected! Det: " << iLadder << " allowed are 1.." << fNofInLadder+fNofOutLadder;
             continue;
         }
 

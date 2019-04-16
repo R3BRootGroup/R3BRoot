@@ -25,7 +25,7 @@ Bool_t R3BBunchedFiberReader::Init()
         if (fChannelNum[side_i] != ch._MI_len) {
           LOG(FATAL) << "Multi-hit array sizes mismatch (fChannelNum[" <<
               side_i << "]=" << fChannelNum[side_i] << " != MI-len=" <<
-              ch._MI_len << ")." << FairLogger::endl;
+              ch._MI_len << ").";
           return kFALSE;
         }
       }
@@ -41,7 +41,7 @@ Bool_t R3BBunchedFiberReader::Init()
 
 Bool_t R3BBunchedFiberReader::Read()
 {
-	//LOG(ERROR) << "R3BBunchedFiberReader::Read BEGIN" << FairLogger::endl;
+	//LOG(ERROR) << "R3BBunchedFiberReader::Read BEGIN";
   for (size_t side_i = 0; side_i < 2; ++side_i) {
     for (size_t edge_i = 0; edge_i < 2; ++edge_i) {
       auto const &e = fMHL[side_i][edge_i];
@@ -55,7 +55,7 @@ Bool_t R3BBunchedFiberReader::Read()
       if (c_M != f_M || c_ != f_) {
         LOG(WARNING) << "Coarse and fine multi-hit list counts mismatch "
             "(edge=" << edge_i << ";M{c=" << c_M << ",f=" << f_M << "};_{c="
-            << c_ << ",f=" << f_ << "})." << FairLogger::endl;
+            << c_ << ",f=" << f_ << "}).";
         return kFALSE;
       }
       if (c_M > e[0]._MI_len ||
@@ -64,7 +64,7 @@ Bool_t R3BBunchedFiberReader::Read()
         LOG(WARNING) << "Multi-hit indexing out of range "
             "(edge=" << edge_i << ";(M=" << c_M << ")>=(MI=" << e[0]._MI_len
             << ",ME=" << e[0]._ME_len <<");(_=" << c_ << ")>=(v=" <<
-            e[0]._v_len << "))." << FairLogger::endl;
+            e[0]._v_len << ")).";
         return kFALSE;
       }
 
@@ -81,7 +81,7 @@ Bool_t R3BBunchedFiberReader::Read()
         if (c_MI != f_MI || c_ME != f_ME) {
           LOG(WARNING) << "Coarse and fine multi-hit data mismatch "
               "(edge=" << edge_i << ";MI{c=" << c_MI << ",f=" << f_MI <<
-              "};ME{c=" << c_ME << ",f=" << f_ME << "})." << FairLogger::endl;
+              "};ME{c=" << c_ME << ",f=" << f_ME << "}).";
           return kFALSE;
         }
         for (; cur_entry < c_ME; cur_entry++) {
@@ -146,7 +146,7 @@ if (0) {
   }
 }
 
-  //LOG(ERROR) << "R3BBunchedFiberReader::Read END" << FairLogger::endl;
+  //LOG(ERROR) << "R3BBunchedFiberReader::Read END";
   return kTRUE;
 }
 

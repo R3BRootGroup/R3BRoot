@@ -53,8 +53,8 @@ void R3BTraFraDigitizer::SetParContainers() {
   fTraFraDigiPar = (R3BTraFraDigiPar*)(rtdb->getContainer("R3BTraFraDigiPar"));
 
   if ( fTraFraDigiPar ) {
-      LOG(INFO) << "-I- R3BTraFraDigitizer::SetParContainers() "<< FairLogger::endl;
-      LOG(INFO) << "-I- Container R3BTraFraDigiPar  loaded " << FairLogger::endl;
+      LOG(INFO) << "-I- R3BTraFraDigitizer::SetParContainers() ";
+      LOG(INFO) << "-I- Container R3BTraFraDigiPar  loaded ";
   }
 
 }
@@ -64,7 +64,7 @@ void R3BTraFraDigitizer::SetParContainers() {
 
 InitStatus R3BTraFraDigitizer::Init() {
 
-//  LOG(INFO)<<"Init "<<FairLogger::endl;
+//  LOG(INFO)<<"Init ";
   // Get input array 
   FairRootManager* ioman = FairRootManager::Instance();
   if ( ! ioman ) LOG(fatal) << "Init: No FairRootManager";
@@ -91,7 +91,7 @@ void R3BTraFraDigitizer::Exec(Option_t* opt) {
 
    Reset();
    eventNoTra+=1;
-//     if(eventNoTra/1000. == (int)eventNoTra/1000.) LOG(INFO)<<"Event #: "<<eventNoTra-1<<FairLogger::endl;
+//     if(eventNoTra/1000. == (int)eventNoTra/1000.) LOG(INFO)<<"Event #: "<<eventNoTra-1;
      
      Int_t nentriesTra = fTraFraPoints->GetEntries();
      //Int_t nentries = fMCTrack->GetEntries();
@@ -131,7 +131,7 @@ void R3BTraFraDigitizer::Exec(Option_t* opt) {
 
 
    for (Int_t l=0;l<nentriesTra;l++){
-//   LOG(INFO)<<"entries "<<l<<FairLogger::endl;
+//   LOG(INFO)<<"entries "<<l;
      
      R3BTraPoint *TraFra_obj = (R3BTraPoint*) fTraFraPoints->At(l);
 
@@ -174,7 +174,7 @@ void R3BTraFraDigitizer::Exec(Option_t* opt) {
 	ss03_kbw_f = 2;   //kpos for 1 SST swop (with 3.9936-) - requirement for tracker
 	ss03_karea_f = 0;
 	ss03_keta_f = 0;
-//	LOG(INFO)<<"ss03_se_f "<<ss03_se_f<<FairLogger::endl;   
+//	LOG(INFO)<<"ss03_se_f "<<ss03_se_f;   
       }     
       //if (DetID==16)
       //if (DetID==22)
@@ -217,7 +217,7 @@ ss06_ke_f,ss06_kpos_f,ss06_kbw_f,ss06_karea_f,ss06_keta_f);
 
 void R3BTraFraDigitizer::Reset(){
 // Clear the structure
-//   LOG(INFO) << " -I- Digit Reset() called " << FairLogger::endl;
+//   LOG(INFO) << " -I- Digit Reset() called ";
 
    
  if (fTraFraDigi ) fTraFraDigi->Clear();

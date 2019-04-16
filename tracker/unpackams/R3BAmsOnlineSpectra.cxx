@@ -63,7 +63,7 @@ R3BAmsOnlineSpectra::~R3BAmsOnlineSpectra() {
 
 InitStatus R3BAmsOnlineSpectra::Init() {
   
-  LOG(INFO) << "R3BAmsOnlineSpectra::Init " << FairLogger::endl;
+  LOG(INFO) << "R3BAmsOnlineSpectra::Init ";
   
   // try to get a handle on the EventHeader. EventHeader may not be 
   // present though and hence may be null. Take care when using.
@@ -217,7 +217,7 @@ InitStatus R3BAmsOnlineSpectra::Init() {
 
 void R3BAmsOnlineSpectra::Reset_AMS_Histo()
 {
-    LOG(INFO) << "R3BAmsOnlineSpectra::Reset_AMS_Histo" << FairLogger::endl;
+    LOG(INFO) << "R3BAmsOnlineSpectra::Reset_AMS_Histo";
 
     //Mapped data
     for(Int_t i=0;i<fNbDet;i++){
@@ -246,7 +246,7 @@ void R3BAmsOnlineSpectra::Exec(Option_t* option) {
   
   FairRootManager* mgr = FairRootManager::Instance();
   if (NULL == mgr)
-    LOG(FATAL) << "R3BAmsOnlineSpectra::Exec FairRootManager not found" << FairLogger::endl;
+    LOG(FATAL) << "R3BAmsOnlineSpectra::Exec FairRootManager not found";
 
   //Fill mapped data
   if(fMappedItemsAms && fMappedItemsAms->GetEntriesFast()){

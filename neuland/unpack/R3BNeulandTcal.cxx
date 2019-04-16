@@ -62,7 +62,7 @@ R3BNeulandTcal::~R3BNeulandTcal()
 InitStatus R3BNeulandTcal::Init()
 {
     LOG(INFO) << "R3BNeulandTcal::Init : read " << fTcalPar->GetNumModulePar() << " calibrated modules"
-              << FairLogger::endl;
+             ;
     // fTcalPar->printParams();
 
     FairRootManager* mgr = FairRootManager::Instance();
@@ -151,7 +151,7 @@ void R3BNeulandTcal::Exec(Option_t*)
             if (!(par = fTcalPar->GetModuleParAt(iPlane, iBar, iSide)))
             {
                 LOG(DEBUG) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide
-                           << FairLogger::endl;
+                          ;
                 continue;
             }
 
@@ -161,7 +161,7 @@ void R3BNeulandTcal::Exec(Option_t*)
             if (!(par = fTcalPar->GetModuleParAt(iPlane, iBar, iSide + 2)))
             {
                 LOG(DEBUG) << "R3BNeulandTcal::Exec : Tcal par not found, barId: " << iBar << ", side: " << iSide
-                           << FairLogger::endl;
+                          ;
                 continue;
             }
 
@@ -178,7 +178,7 @@ void R3BNeulandTcal::Exec(Option_t*)
             {
                 LOG(ERROR) << "R3BNeulandTcal::Exec : error in time calibration: ch= " << channel << ", tdc= " << tdc
                            << ", time leading edge = " << timeLE << ", time trailing edge = " << timeTE
-                           << FairLogger::endl;
+                          ;
                 continue;
             }
 
@@ -195,7 +195,7 @@ void R3BNeulandTcal::FinishEvent()
 {
     if (fVerbose && 0 == (fNEvents % 1))
     {
-        LOG(INFO) << "R3BNeulandTcal::Exec : event=" << fNEvents << " nPMTs=" << fNPmt << FairLogger::endl;
+        LOG(INFO) << "R3BNeulandTcal::Exec : event=" << fNEvents << " nPMTs=" << fNPmt;
     }
 
     if (fPmt)

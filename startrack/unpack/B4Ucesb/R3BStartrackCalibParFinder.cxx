@@ -56,8 +56,8 @@ void R3BStartrackCalibParFinder::SetParContainers()
   fStartrackCalibPar = (R3BStartrackCalibPar*)(rtdb->getContainer("R3BStartrackCalibPar"));
   
   if ( fVerbose && fStartrackCalibPar ) {
-    LOG(INFO) << "R3BStartrackCalibParFinder::SetParContainers() "<< FairLogger::endl;
-    LOG(INFO) << "Container R3BStartrackCalibPar loaded " << FairLogger::endl;
+    LOG(INFO) << "R3BStartrackCalibParFinder::SetParContainers() ";
+    LOG(INFO) << "Container R3BStartrackCalibPar loaded ";
   }
 }
 
@@ -65,7 +65,7 @@ void R3BStartrackCalibParFinder::SetParContainers()
 //Register: Protected method
 void R3BStartrackCalibParFinder::Register()
 {
-  LOG(DEBUG) << "Registering" << FairLogger::endl;
+  LOG(DEBUG) << "Registering";
   FairRootManager* fMan = FairRootManager::Instance();
   if(!fMan) {
     LOG(fatal) << "Init: No FairRootManager";

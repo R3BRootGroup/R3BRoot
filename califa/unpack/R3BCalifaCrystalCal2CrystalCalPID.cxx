@@ -58,7 +58,7 @@ R3BCalifaCrystalCal2CrystalCalPID::R3BCalifaCrystalCal2CrystalCalPID() : FairTas
 //Virtual R3BCalifaCrystalCal2CrystalCalPID: Public method
 R3BCalifaCrystalCal2CrystalCalPID::~R3BCalifaCrystalCal2CrystalCalPID()
 {
-  LOG(INFO) << "R3BCalifaCrystalCal2CrystalCalPID: Delete instance" << FairLogger::endl;
+  LOG(INFO) << "R3BCalifaCrystalCal2CrystalCalPID: Delete instance";
   delete fCrystalCalDataCA;
 }
 
@@ -81,8 +81,8 @@ void R3BCalifaCrystalCal2CrystalCalPID::SetParContainers()
     //  if (!rtdb) LOG(fatal) << "R3BCalifaCrystalCal2CrystalCalPID::SetParContainers: No runtime database";
 //  
 //  if ( fVerbose && fCaloCalPar ) {
-//    LOG(INFO) << "R3BCalifaCrystalCal2CrystalCalPID::SetParContainers() "<< FairLogger::endl;
-//    LOG(INFO) << "Container R3BCalifaCrystalCal2CrystalCalPIDPar loaded " << FairLogger::endl;
+//    LOG(INFO) << "R3BCalifaCrystalCal2CrystalCalPID::SetParContainers() ";
+//    LOG(INFO) << "Container R3BCalifaCrystalCal2CrystalCalPIDPar loaded ";
 //  }  
 }
 
@@ -90,7 +90,7 @@ void R3BCalifaCrystalCal2CrystalCalPID::SetParContainers()
 //Register: Protected method
 void R3BCalifaCrystalCal2CrystalCalPID::Register()
 {
-  LOG(DEBUG) << "Registering" << FairLogger::endl;
+  LOG(DEBUG) << "Registering";
   FairRootManager *fMan = FairRootManager::Instance();
   if(! fMan) { 
       LOG(fatal) << "Init: No FairRootManager";
@@ -113,10 +113,10 @@ InitStatus R3BCalifaCrystalCal2CrystalCalPID::ReInit()
 //DoCalib: Public method
 void R3BCalifaCrystalCal2CrystalCalPID::Exec(Option_t* option)
 {
-  LOG(DEBUG) << "Calibrating CALIFA PID Data" << FairLogger::endl;
+  LOG(DEBUG) << "Calibrating CALIFA PID Data";
  
   if(++nEvents % 10000 == 0)
-     LOG(INFO) << nEvents << FairLogger::endl;
+     LOG(INFO) << nEvents;
 
   R3BCalifaCrystalCalData*  hit;
   int ch;
@@ -152,7 +152,7 @@ void R3BCalifaCrystalCal2CrystalCalPID::Finish()
 //Reset: Public method
 void R3BCalifaCrystalCal2CrystalCalPID::Reset()
 {
-  LOG(DEBUG) << "Clearing CalifaCrystalCal Data Structure" << FairLogger::endl;
+  LOG(DEBUG) << "Clearing CalifaCrystalCal Data Structure";
   if(fCrystalCalDataCA)fCrystalCalDataCA->Clear();
 }
 

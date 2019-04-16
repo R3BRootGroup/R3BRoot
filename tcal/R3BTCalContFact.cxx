@@ -82,7 +82,7 @@ FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
 
     const char* name = c->GetName();
     LOG(INFO) << "R3BTCalContFact::createContainer : " << name
-        << FairLogger::endl;
+       ;
 
     vector<const char *> containerNames;
     containerNames.push_back("LandTCalPar");

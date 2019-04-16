@@ -102,12 +102,12 @@ void R3BStartrackMapped2Cal::SetParContainers()
      * Initialize/Reads parameter file for conversion.
      */
 
-    LOG(INFO) << "R3BStartrackMapped2Cal :: SetParContainers() " << FairLogger::endl;
+    LOG(INFO) << "R3BStartrackMapped2Cal :: SetParContainers() ";
 
     fStartrackCalPar = (R3BStartrackMapped2CalPar*)FairRuntimeDb::instance()->getContainer("StartrackCalPar");
     if (!fStartrackCalPar)
     {
-		LOG(ERROR) << "Could not get access to StartrackCalPar-Container." << FairLogger::endl;
+		LOG(ERROR) << "Could not get access to StartrackCalPar-Container.";
 		fNofCalPars=0;
 		return;
     }
@@ -117,7 +117,7 @@ void R3BStartrackMapped2Cal::SetParContainers()
 
 InitStatus R3BStartrackMapped2Cal::ReInit()
 {
-    LOG(INFO) << " R3BStartrackMapped2Cal :: ReInit() " << FairLogger::endl;
+    LOG(INFO) << " R3BStartrackMapped2Cal :: ReInit() ";
 
     SetParContainers();
 
@@ -133,7 +133,7 @@ InitStatus R3BStartrackMapped2Cal::ReInit()
 void R3BStartrackMapped2Cal::Exec(Option_t* option)
 {
 
-  LOG(DEBUG) << "Calibrating StarTrack Mapped Data" << FairLogger::endl;
+  LOG(DEBUG) << "Calibrating StarTrack Mapped Data";
 
     if (!fMappedItemsCA)
     {

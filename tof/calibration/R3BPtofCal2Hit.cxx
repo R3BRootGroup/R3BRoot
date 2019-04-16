@@ -79,7 +79,7 @@ void R3BPtofCal2Hit::SetParameter(){
     fZScale[paddle] = fHitPar->GetZScaletAt(paddle+1);
     fVEff[paddle] = fHitPar->GetVEfftAt(paddle+1);
     LOG(ERROR)<< "Offset1: "<< fTOffset1[paddle] << "  offset2: "<<fTOffset2[paddle]<< 
-    "  ZScale: "<< fZScale[paddle] << "  Veff: "<< fVEff[paddle]  << FairLogger::endl;
+    "  ZScale: "<< fZScale[paddle] << "  Veff: "<< fVEff[paddle] ;
 
   }
 }
@@ -149,16 +149,16 @@ void R3BPtofCal2Hit::Exec(Option_t* option){
 		}
    
 		if(iBar+1==40){
-			LOG(ERROR) << "cal2hit: Plane: "<<iPlane+1<<"  Bar: "<<iBar+1<<"  t1= "<<t1<<"  t2= "<<t2 << FairLogger::endl;
-			LOG(ERROR) << "cal2hit: xx: "<< xx[iPlane][iBar]<< "  charge: "<<charge[iPlane][iBar]<<FairLogger::endl;
+			LOG(ERROR) << "cal2hit: Plane: "<<iPlane+1<<"  Bar: "<<iBar+1<<"  t1= "<<t1<<"  t2= "<<t2;
+			LOG(ERROR) << "cal2hit: xx: "<< xx[iPlane][iBar]<< "  charge: "<<charge[iPlane][iBar];
 		}
    
 //		new ((*fHitItems)[nHitData++]) R3BPtofHit(id+1, charge, time, xx, yy, zz);
 	}
 	for(Int_t iBar=0;iBar<PtofPaddlesPerPlane;iBar++){
 		if(iBar+1==40){
-			LOG(ERROR)<<"Planne 1  Bar: "<<iBar+1<<"  charge: "<<charge[0][iBar]<<"  x: "<<xx[0][iBar]<< FairLogger::endl;
-			LOG(ERROR)<<"Planne 2  Bar: "<<iBar+1<<"  charge: "<<charge[1][iBar]<<"  x: "<<xx[1][iBar]<< FairLogger::endl;
+			LOG(ERROR)<<"Planne 1  Bar: "<<iBar+1<<"  charge: "<<charge[0][iBar]<<"  x: "<<xx[0][iBar];
+			LOG(ERROR)<<"Planne 2  Bar: "<<iBar+1<<"  charge: "<<charge[1][iBar]<<"  x: "<<xx[1][iBar];
 		}
 /*
 		if(time[0][iBar]>0. && time[1][iBar]>0.){
@@ -168,7 +168,7 @@ void R3BPtofCal2Hit::Exec(Option_t* option){
 			Double_t yy_avg = (yy[0][iBar] + yy[1][iBar])/2.;
 			Double_t zz_avg = (zz[0][iBar] + zz[1][iBar])/2.;
 		
-//			LOG(ERROR)<<"Bar: "<<iBar+1<<"  charge: "<<charge_avg<<"  time: "<<time_avg<<"  x: "<<xx_avg<< FairLogger::endl;
+//			LOG(ERROR)<<"Bar: "<<iBar+1<<"  charge: "<<charge_avg<<"  time: "<<time_avg<<"  x: "<<xx_avg;
 
 			new ((*fHitItems)[nHitData++]) R3BPtofHit(iBar+1, charge_avg, time_avg, xx_avg, yy_avg, zz_avg);
 		}
@@ -198,7 +198,7 @@ void R3BPtofCal2Hit::Exec(Option_t* option){
 				Double_t zz_avg = zz[1][iBar];
 		
 //		    	if (iBar==4 && fNEvents>500000)
-//				LOG(ERROR)<<"Event: "<<fNEvents<<"  Bar: "<<iBar+1<<"  time1: "<<time[0][iBar]<<"  time: "<<time[1][iBar]<< FairLogger::endl;
+//				LOG(ERROR)<<"Event: "<<fNEvents<<"  Bar: "<<iBar+1<<"  time1: "<<time[0][iBar]<<"  time: "<<time[1][iBar];
 
 				new ((*fHitItems)[nHitData++]) R3BPtofHit(iBar+1, charge_avg, time_avg, xx_avg, yy_avg, zz_avg);
 			}

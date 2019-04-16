@@ -69,13 +69,13 @@ R3BPspxOnlineSpectra::~R3BPspxOnlineSpectra()
 
 InitStatus R3BPspxOnlineSpectra::Init()
 {
-    LOG(INFO) << "R3BPspxOnlineSpectra::Init " << FairLogger::endl;
+    LOG(INFO) << "R3BPspxOnlineSpectra::Init ";
     // try to get a handle on the EventHeader. EventHeader may not be 
     // present though and hence may be null. Take care when using.
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-      LOG(fatal)<<"FairRootManager not found"<< FairLogger::endl;
+      LOG(fatal)<<"FairRootManager not found";
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
     FairRunOnline *run = FairRunOnline::Instance();
@@ -113,7 +113,7 @@ InitStatus R3BPspxOnlineSpectra::Init()
 
     if (fMappedItemsPspx)
     {
-        // LOG(INFO) << "Init MappedPspx" << FairLogger::endl;
+        // LOG(INFO) << "Init MappedPspx";
 
         for (UInt_t i = 0; i < N_PSPX; i++)
         {
@@ -384,7 +384,7 @@ void R3BPspxOnlineSpectra::Exec(Option_t* option)
 {
   FairRootManager* mgr = FairRootManager::Instance();
   if (NULL == mgr)
-    LOG(FATAL) << "R3BPspxOnlineSpectra::Exec FairRootManager not found" << FairLogger::endl;
+    LOG(FATAL) << "R3BPspxOnlineSpectra::Exec FairRootManager not found";
   // check for requested trigger (Todo: should be done globablly / somewhere else)
   if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
     return;
@@ -429,7 +429,7 @@ void R3BPspxOnlineSpectra::Exec(Option_t* option)
                     mappedData->GetChannel() < N_STRIPS_PSPX * 4 + 1)
                 {
                     // LOG(INFO) << "Test1 " << i << " " << mappedData->GetDetector() << " " <<
-                    // mappedData->GetChannel()<< FairLogger::endl;
+                    // mappedData->GetChannel();
                     channel_y[i][mult_y[i]] = mappedData->GetChannel();
                     mult_y[i]++;
                 }
@@ -437,7 +437,7 @@ void R3BPspxOnlineSpectra::Exec(Option_t* option)
                          mappedData->GetChannel() < N_STRIPS_PSPX * 2 + 1)
                 {
                     // LOG(INFO) << "Test2 " << i << " " << mappedData->GetDetector() << " " <<
-                    // mappedData->GetChannel()<< FairLogger::endl;
+                    // mappedData->GetChannel();
                     channel_x[i][mult_x[i]] = mappedData->GetChannel();
                     mult_x[i]++;
                 }
@@ -446,10 +446,10 @@ void R3BPspxOnlineSpectra::Exec(Option_t* option)
 
         for (UInt_t i = 0; i < N_PSPX; i++)
         {
-            // LOG(INFO) << "Test3 " << i << " " << mult_x[i] << " " << mult_y[i] << FairLogger::endl;
+            // LOG(INFO) << "Test3 " << i << " " << mult_x[i] << " " << mult_y[i];
             fh_pspx_multiplicity_x[i]->Fill(mult_x[i]);
             fh_pspx_multiplicity_y[i]->Fill(mult_y[i]);
-            // LOG(INFO) << "Test4 " << fh_pspx_multiplicity_x[i]->GetBinContent(1) << FairLogger::endl;
+            // LOG(INFO) << "Test4 " << fh_pspx_multiplicity_x[i]->GetBinContent(1);
 
 	std:: vector<int> v_ch_x, v_ch_y;
           for(Int_t j = 0; j < mult_x[i]; j++){
@@ -524,7 +524,7 @@ void R3BPspxOnlineSpectra::Exec(Option_t* option)
 
         for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
         {
-            // LOG(INFO) << "Test " << i << " " << energy_front[i] << " " << energy_back[i] << FairLogger::endl;
+            // LOG(INFO) << "Test " << i << " " << energy_front[i] << " " << energy_back[i];
             fh_pspx_cal_energy_frontback[i]->Fill(energy_front[i], energy_back[i]);
         }
     }
@@ -575,7 +575,7 @@ void R3BPspxOnlineSpectra::FinishTask()
 
     if (fMappedItemsPspx)
     {
-        // LOG(INFO) << "Finish MappedPspx" << FairLogger::endl;
+        // LOG(INFO) << "Finish MappedPspx";
 
         for (UInt_t i = 0; i < N_PSPX; i++)
         {

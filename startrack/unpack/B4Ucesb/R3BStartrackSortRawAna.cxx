@@ -153,7 +153,7 @@ void R3BStartrackSortRawAna::CreateSortTree()
 
 void R3BStartrackSortRawAna::WriteSortTree()
 {
- LOG(INFO) << "R3BStartrackSortRawAna ---  writed to the Root File ..." << FairLogger::endl; 
+ LOG(INFO) << "R3BStartrackSortRawAna ---  writed to the Root File ..."; 
 
 }
 

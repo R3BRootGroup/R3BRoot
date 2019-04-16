@@ -60,7 +60,7 @@ R3BAmsHitData::~R3BAmsHitData()
 void R3BAmsHitData::Print(const Option_t* opt) const {
   LOG(INFO) << "-I- R3BAmsHitData: a HitData in detector " << fDetId 
        << " number of hit " << fNumHit 
-       << " position [X,Y] = " << fX <<", " << fY << FairLogger::endl;
-  LOG(INFO) << " Energy [X,Y] = " << fEnergyX << " , " << fEnergyY << " (GeV in sim)" << FairLogger::endl;
+       << " position [X,Y] = " << fX <<", " << fY;
+  LOG(INFO) << " Energy [X,Y] = " << fEnergyX << " , " << fEnergyY << " (GeV in sim)";
 }
 // -------------------------------------------------------------------------

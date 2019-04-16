@@ -44,7 +44,7 @@ Bool_t R3BGammaGenerator::ReadEvent(FairPrimaryGenerator *primGen)
 
   if(lvlSrc == -1)
   {
-    LOG(ERROR) << "R3BGammaGenerator: Could not pick initial level" << FairLogger::endl;
+    LOG(ERROR) << "R3BGammaGenerator: Could not pick initial level";
     return kFALSE;
   }
 
@@ -75,7 +75,7 @@ Bool_t R3BGammaGenerator::ReadEvent(FairPrimaryGenerator *primGen)
     }
     if(lvlDst == -1)
     {
-      LOG(ERROR) << "R3BGammaGenerator: Could not pick final level from initial level " << lvlSrc << FairLogger::endl;
+      LOG(ERROR) << "R3BGammaGenerator: Could not pick final level from initial level " << lvlSrc;
       break;
     }
 
@@ -83,7 +83,7 @@ Bool_t R3BGammaGenerator::ReadEvent(FairPrimaryGenerator *primGen)
     {
       LOG(DEBUG) << "R3BGammaGenerator: Generating transition from level " << lvlSrc
         << " (" << (fEnergyLevels[lvlSrc] * 1000.) << " MeV) to level " << lvlDst
-        << " (" << (fEnergyLevels[lvlDst] * 1000.) << " MeV)" << FairLogger::endl;
+        << " (" << (fEnergyLevels[lvlDst] * 1000.) << " MeV)";
 
       GenerateGamma(fEnergyLevels[lvlSrc] - fEnergyLevels[lvlDst], primGen);
     }
@@ -97,7 +97,7 @@ void R3BGammaGenerator::GenerateGamma(double E, FairPrimaryGenerator *primGen)
 {
   if(E <= 0)
   {
-    LOG(ERROR) << "R3BGammaGenerator: E < 0!" << FairLogger::endl;
+    LOG(ERROR) << "R3BGammaGenerator: E < 0!";
     return;
   }
 
@@ -111,7 +111,7 @@ void R3BGammaGenerator::GenerateGamma(double E, FairPrimaryGenerator *primGen)
   TLorentzVector vGamma(vMomentum, E);
   vGamma.Boost(fBeta);
 
-  LOG(DEBUG) << "R3BGammaGenerator: Sending gamma: E_rest = " << (1000.*E) << " MeV, E_lab = " << (1000.*vGamma.E()) << " MeV, Theta_lab = " << (vGamma.Theta()*180./TMath::Pi()) << " deg" << FairLogger::endl;
+  LOG(DEBUG) << "R3BGammaGenerator: Sending gamma: E_rest = " << (1000.*E) << " MeV, E_lab = " << (1000.*vGamma.E()) << " MeV, Theta_lab = " << (vGamma.Theta()*180./TMath::Pi()) << " deg";
 
   primGen->AddTrack(22, vGamma.Px(), vGamma.Py(), vGamma.Pz(), 0, 0, 0);
 }

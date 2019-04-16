@@ -21,7 +21,7 @@ void R3BPhaseSpaceGenerator::AddParticle(const Int_t PDGCode)
     auto particle = TDatabasePDG::Instance()->GetParticle(PDGCode);
     if (particle == nullptr)
     {
-        LOG(FATAL) << "R3BPhaseSpaceGenerator::AddParticle: No such particle: " << PDGCode << FairLogger::endl;
+        LOG(FATAL) << "R3BPhaseSpaceGenerator::AddParticle: No such particle: " << PDGCode;
         return;
     }
     fMasses.push_back(particle->Mass());
@@ -33,7 +33,7 @@ void R3BPhaseSpaceGenerator::AddHeavyIon(const FairIon& ion)
     auto run = FairRunSim::Instance();
     if (run == nullptr)
     {
-        LOG(WARNING) << "R3BPhaseSpaceGenerator::AddIon: No FairRunSim" << FairLogger::endl;
+        LOG(WARNING) << "R3BPhaseSpaceGenerator::AddIon: No FairRunSim";
     }
     else
     {
@@ -54,7 +54,7 @@ void R3BPhaseSpaceGenerator::SetBeamEnergyAMeV(const Double_t EBeam_AMeV)
 
 void R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV(const std::function<Double_t(Double_t)> dist, Double_t minE, const Double_t maxE, const int samples){
     if(minE < 0 || maxE < 0)
-        LOG(fatal) << "R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV:  Lower or upper boundery is negative for a distribution passed via lambda expression! " << FairLogger::endl;
+        LOG(fatal) << "R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV:  Lower or upper boundery is negative for a distribution passed via lambda expression! ";
     fBeamEnergyLookup = SetupLookupGraph(dist, minE, maxE, samples);
     fConstBeamEnergy = kFALSE;                                
 }
@@ -64,13 +64,13 @@ void R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV(const TGraph& dist, Double_t 
     dist.ComputeRange(xmin, ymin, xmax, ymax);
     if(minE > 0.){
         if(minE < xmin){
-            LOG(fatal) << "R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV:  Lower boundery is smaller than the smallest value inside Graph!" << FairLogger::endl;
+            LOG(fatal) << "R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV:  Lower boundery is smaller than the smallest value inside Graph!";
         }
         xmin = minE;
     }
     if(maxE > 0.){
         if(maxE < xmax){
-            LOG(fatal) << "R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV:  Upper boundery is bigger than the biggest value inside Graph!" << FairLogger::endl;
+            LOG(fatal) << "R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV:  Upper boundery is bigger than the biggest value inside Graph!";
         }
         xmax = maxE;
     }
@@ -84,13 +84,13 @@ void R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV(const TF1& dist, Double_t min
     dist.GetRange(xmin, xmax);
     if(minE > 0.){
         if(minE < xmin){
-            LOG(fatal) << "R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV:  Lower boundery is outside the range of the TF1!" << FairLogger::endl;
+            LOG(fatal) << "R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV:  Lower boundery is outside the range of the TF1!";
         }
         xmin = minE;
     }
     if(maxE > 0.){
         if(maxE < xmax){
-            LOG(fatal) << "R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV:  Upper boundery is outside the range of the TF1!" << FairLogger::endl;
+            LOG(fatal) << "R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV:  Upper boundery is outside the range of the TF1!";
         }
         xmax = maxE;
     }
@@ -108,7 +108,7 @@ void R3BPhaseSpaceGenerator::SetErelkeV(const Double_t Erel_keV){
 
 void R3BPhaseSpaceGenerator::SetErelDistkeV(const std::function<Double_t(Double_t)> dist, const Double_t minE, const Double_t maxE, const int samples){
     if(minE < 0 || maxE < 0)
-       LOG(fatal) << "R3BPhaseSpaceGenerator::SetErelDistkeV:  Lower or upper boundery is negative for a distribution passed via lambda expression! " << FairLogger::endl;
+       LOG(fatal) << "R3BPhaseSpaceGenerator::SetErelDistkeV:  Lower or upper boundery is negative for a distribution passed via lambda expression! ";
     fErelLookup = SetupLookupGraph(dist, minE, maxE, samples);
     fConstErel = kFALSE;
 }
@@ -118,13 +118,13 @@ void R3BPhaseSpaceGenerator::SetErelDistkeV(const TGraph& dist, const Double_t m
     dist.ComputeRange(xmin, ymin, xmax, ymax);
     if(minE > 0.){
         if(minE < xmin){
-            LOG(fatal) << "R3BPhaseSpaceGenerator::SetErelDistkeV:  Lower boundery is smaller than the smallest value inside Graph!" << FairLogger::endl;
+            LOG(fatal) << "R3BPhaseSpaceGenerator::SetErelDistkeV:  Lower boundery is smaller than the smallest value inside Graph!";
         }
         xmin = minE;
     }
     if(maxE > 0.){
         if(maxE < xmax){
-            LOG(fatal) << "R3BPhaseSpaceGenerator::SetErelDistkeV:  Upper boundery is bigger than the biggest value inside Graph!" << FairLogger::endl;
+            LOG(fatal) << "R3BPhaseSpaceGenerator::SetErelDistkeV:  Upper boundery is bigger than the biggest value inside Graph!";
         }
         xmax = maxE;
     }
@@ -138,13 +138,13 @@ void R3BPhaseSpaceGenerator::SetErelDistkeV(const TF1& dist, const Double_t minE
     dist.GetRange(xmin, xmax);
     if(minE > 0.){
         if(minE < xmin){
-            LOG(fatal) << "R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV:  Lower boundery is outside the range of the TF1!" << FairLogger::endl;
+            LOG(fatal) << "R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV:  Lower boundery is outside the range of the TF1!";
         }
         xmin = minE;
     }
     if(maxE > 0.){
         if(maxE < xmax){
-            LOG(fatal) << "R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV:  Upper boundery is outside the range of the TF1!" << FairLogger::endl;
+            LOG(fatal) << "R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV:  Upper boundery is outside the range of the TF1!";
         }
         xmax = maxE;
     }

@@ -79,7 +79,7 @@ R3BAmsMapped2StripCalPar::~R3BAmsMapped2StripCalPar() {
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BAmsMapped2StripCalPar::Init() {
 
-  LOG(INFO) << "R3BAmsMapped2StripCalPar: Init" << FairLogger::endl;
+  LOG(INFO) << "R3BAmsMapped2StripCalPar: Init";
 
   char name[100];
   
@@ -100,7 +100,7 @@ InitStatus R3BAmsMapped2StripCalPar::Init() {
   
   fStrip_Par=(R3BAmsStripCalPar*)rtdb->getContainer("amsStripCalPar");
   if (!fStrip_Par) {
-    LOG(ERROR)<<"R3BAmsMapped2StripCalPar::Init() Couldn't get handle on amsStripCalPar container"<<FairLogger::endl;
+    LOG(ERROR)<<"R3BAmsMapped2StripCalPar::Init() Couldn't get handle on amsStripCalPar container";
     return kFATAL;
   }
   
@@ -154,7 +154,7 @@ void R3BAmsMapped2StripCalPar::FinishTask() {
 //------------------
 void R3BAmsMapped2StripCalPar::PrintParamsDaq(){
 
-  LOG(INFO) << "R3BAmsMapped2StripCalPar: Print parameters for DAQ" << FairLogger::endl;
+  LOG(INFO) << "R3BAmsMapped2StripCalPar: Print parameters for DAQ";
 
   FILE *fOut1=fopen("sidped.txt","wt");
   FILE *fOut2=fopen("sidsig_r.txt","wt");
@@ -200,7 +200,7 @@ void R3BAmsMapped2StripCalPar::PrintParamsDaq(){
 //------------------
 void R3BAmsMapped2StripCalPar::SearchPedestals(){
 
-  LOG(INFO) << "R3BAmsMapped2StripCalPar: Search pedestals" << FairLogger::endl;
+  LOG(INFO) << "R3BAmsMapped2StripCalPar: Search pedestals";
 
   Int_t numPars =3;// by default number of parameters=3
   
@@ -253,14 +253,14 @@ void R3BAmsMapped2StripCalPar::SearchPedestals(){
       }else{
        fStrip_Par->SetStripCalParams(-1,nbstrip+1);//dead strip
        fStrip_Par->SetStripCalParams(0,nbstrip+2);
-       //LOG(WARNING)<<"Dead strip, detector: " << d+1 << ", strip: "<< i+1 <<", "<< f1->GetParameter(2) <<FairLogger::endl;
+       //LOG(WARNING)<<"Dead strip, detector: " << d+1 << ", strip: "<< i+1 <<", "<< f1->GetParameter(2);
       }
       
 
     }else {
       fStrip_Par->SetStripCalParams(-1,nbstrip+1);//dead strip
       fStrip_Par->SetStripCalParams(0,nbstrip+2);
-      LOG(WARNING)<<"Histogram NO Fitted, detector: " << d+1 << ", strip: "<< i+1 <<FairLogger::endl;
+      LOG(WARNING)<<"Histogram NO Fitted, detector: " << d+1 << ", strip: "<< i+1;
     }
    }
   //Draw sigma for pedestals

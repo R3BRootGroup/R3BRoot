@@ -37,7 +37,7 @@ R3BCalifaUnpack::R3BCalifaUnpack(char *strCalDir,
     fMappedData(new TClonesArray("R3BCalifaMappedData")),
     fNHits(0),fCalifaMappedPar(0), nEvents(0)
 {
-   LOG(DEBUG2) << "R3BCalifaUnpack::ctor()" << FairLogger::endl;
+   LOG(DEBUG2) << "R3BCalifaUnpack::ctor()";
 }
 
 
@@ -50,7 +50,7 @@ R3BCalifaUnpack::R3BCalifaUnpack(char *strCalDir,
  */
 R3BCalifaUnpack::~R3BCalifaUnpack()
 {
-  LOG(DEBUG2) << "R3BCalifaUnpack: Delete instance" << FairLogger::endl;
+  LOG(DEBUG2) << "R3BCalifaUnpack: Delete instance";
   delete fMappedData;
 }
 
@@ -84,8 +84,8 @@ void R3BCalifaUnpack::SetParContainers() {
   fCalifaMappedPar = (R3BCalifaMappedPar*)(rtdb->getContainer("R3BCalifaMappedPar"));
   
   if ( fCalifaMappedPar ) {
-    LOG(INFO) << "R3BCalifaUnpack::SetParContainers() "<< FairLogger::endl;
-    LOG(INFO) << "Container R3BCalifaMappedPar loaded " << FairLogger::endl;
+    LOG(INFO) << "R3BCalifaUnpack::SetParContainers() ";
+    LOG(INFO) << "Container R3BCalifaMappedPar loaded ";
   }  
 }
 
@@ -95,7 +95,7 @@ void R3BCalifaUnpack::SetParContainers() {
  * 
  */
 void R3BCalifaUnpack::Register() {
-  LOG(DEBUG) << "Registering" << FairLogger::endl;
+  LOG(DEBUG) << "Registering";
   FairRootManager *fMan = FairRootManager::Instance();
   if(! fMan) {
     return;
@@ -113,7 +113,7 @@ void R3BCalifaUnpack::Register() {
  */
 Bool_t R3BCalifaUnpack::DoUnpack(Int_t *data, Int_t size) {
 
-  LOG(DEBUG2) << "R3BCalifaUnpack::DoUnpack()" << FairLogger::endl;
+  LOG(DEBUG2) << "R3BCalifaUnpack::DoUnpack()";
 
   UInt_t *pl_data = (UInt_t*) data;
   UInt_t l_s = 0; // skip over timerabit header
@@ -137,8 +137,8 @@ Bool_t R3BCalifaUnpack::DoUnpack(Int_t *data, Int_t size) {
   check1 = ( data[l_s] >> 16 ) & 0xffff;  rabbit4 =  data[l_s++] & 0xffff;
   
   ULong64_t rabbitStamp = (rabbit4 << 48) | (rabbit3 << 32) | ( rabbit2 << 16 ) | rabbit1; 
- /* LOG(DEBUG) << "-------- EVENT ----------" << FairLogger::endl;
-  LOG(DEBUG) << "whiteRabbit:" << rabbitStamp << FairLogger::endl;
+ /* LOG(DEBUG) << "-------- EVENT ----------";
+  LOG(DEBUG) << "whiteRabbit:" << rabbitStamp;
  */ 
   //---------- hit data ---------
   
@@ -146,7 +146,7 @@ Bool_t R3BCalifaUnpack::DoUnpack(Int_t *data, Int_t size) {
   // there are two possible formats (old and new), a magic number defines version is being used. 
   // In the new format, each hit can be followed by optional extra data for time-over-threshold or trace
   
-  LOG(DEBUG) << "Unpacking" << FairLogger::endl;
+  LOG(DEBUG) << "Unpacking";
 
   while(l_s < size) {
 
@@ -172,16 +172,16 @@ Bool_t R3BCalifaUnpack::DoUnpack(Int_t *data, Int_t size) {
     data_size = pl_data[l_s++];
     
     
-//     LOG(INFO) << "========== gosip sub " << FairLogger::endl
-//      << "     header_size " << header_size << FairLogger::endl
-//      << "         trigger " << trigger << FairLogger::endl
-//      << "            card " << card << FairLogger::endl
-//      << "         channel " << channel << FairLogger::endl
-//      << "       data_size " << data_size << FairLogger::endl;
+//     LOG(INFO) << "========== gosip sub "
+//      << "     header_size " << header_size
+//      << "         trigger " << trigger
+//      << "            card " << card
+//      << "         channel " << channel
+//      << "       data_size " << data_size;
 
     
     if(header_size != 0x34) {
-      LOG(WARNING) << "Wrong header size ( is " << header_size << ")" << FairLogger::endl;
+      LOG(WARNING) << "Wrong header size ( is " << header_size << ")";
       break;
     }
     
@@ -267,7 +267,7 @@ Bool_t R3BCalifaUnpack::DoUnpack(Int_t *data, Int_t size) {
         
         // checks if optional time-over-threshold payload present (recognized by 0xBEEF as first word) 
         if ( (evsize > 4 * (l_s - start))   && ( ((pl_data[l_s] >> 16) & 0xffff) == 0xBEEF) ) {
-          LOG(DEBUG) << "TOT payload present" << FairLogger::endl;
+          LOG(DEBUG) << "TOT payload present";
           tot = pl_data[l_s++] & 0xffff;
           tot_samples[0] = pl_data[l_s] & 0xffff;
           tot_samples[1] = (pl_data[l_s++] >> 16) & 0xffff;
@@ -276,17 +276,17 @@ Bool_t R3BCalifaUnpack::DoUnpack(Int_t *data, Int_t size) {
         }
           
         // checks if traces are present --------------
-        //LOG(INFO) << evsize << " " << l_s - start << FairLogger::endl;
+        //LOG(INFO) << evsize << " " << l_s - start;
         
         if (evsize > 4 * (l_s - start) ) {  // there is still traces in the 
-          //LOG(DEBUG) << "TRACE payload present" << FairLogger::endl;
+          //LOG(DEBUG) << "TRACE payload present";
           l_s = start + (evsize / 4); // skip the traces
         }
         
         break;
                                     
       default:
-        LOG(WARNING) << "Invalid event magic number:" << magic << "Discarding event..." << FairLogger::endl; 
+        LOG(WARNING) << "Invalid event magic number:" << magic << "Discarding event..."; 
         l_s = start + (evsize / 4); // skip the traces
         break;
             
@@ -321,15 +321,15 @@ Bool_t R3BCalifaUnpack::DoUnpack(Int_t *data, Int_t size) {
        new ((*fMappedData)[fNHits]) R3BCalifaMappedData(crystal_id, energy, n_f, n_s, rabbitStamp, error, tot);
        fNHits++;
 
-       LOG(DEBUG2) << "R3BCalifaUnpack::DoUnpack(): New Hit: Crystal Id: " << crystal_id << ", fNHits: " << fNHits << FairLogger::endl;
+       LOG(DEBUG2) << "R3BCalifaUnpack::DoUnpack(): New Hit: Crystal Id: " << crystal_id << ", fNHits: " << fNHits;
      }
   
   } // while
 
   if(fNHits && ++nEvents % 1000 == 0)
   {
-     LOG(INFO) << "nEvents: " << nEvents << " (Last multiplicity: " << fNHits << ")" << FairLogger::endl;
-//     LOG(INFO) << "  Last WR Timestamp: 0x" << rabbitStamp << FairLogger::endl;
+     LOG(INFO) << "nEvents: " << nEvents << " (Last multiplicity: " << fNHits << ")";
+//     LOG(INFO) << "  Last WR Timestamp: 0x" << rabbitStamp;
   }
 
   return kTRUE;
@@ -343,7 +343,7 @@ Bool_t R3BCalifaUnpack::DoUnpack(Int_t *data, Int_t size) {
  * 
  */
 void R3BCalifaUnpack::Reset() {
-  LOG(DEBUG2) << "Clearing Data Structure" << FairLogger::endl;
+  LOG(DEBUG2) << "Clearing Data Structure";
   fMappedData->Clear();
   fNHits = 0;
 }

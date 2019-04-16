@@ -76,7 +76,7 @@ InitStatus R3BTrackingDetector::Init()
         fArrayHits = (TClonesArray*)FairRootManager::Instance()->GetObject(fDataName);
         if (NULL == fArrayHits)
         {
-            LOG(ERROR) << "No " << fDataName << " array found in input file." << FairLogger::endl;
+            LOG(ERROR) << "No " << fDataName << " array found in input file.";
             return kERROR;
         }
     }

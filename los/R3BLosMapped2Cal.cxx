@@ -77,11 +77,11 @@ InitStatus R3BLosMapped2Cal::Init()
 	fNofTcalPars = fTcalPar->GetNumModulePar();
 	if (fNofTcalPars==0)
 	{
-		LOG(ERROR) << "There are no TCal parameters in container LosTCalPar" << FairLogger::endl;
+		LOG(ERROR) << "There are no TCal parameters in container LosTCalPar";
 		return kFATAL;
 	}
 
-    LOG(INFO) << "R3BLosMapped2Cal::Init : read " << fNofModules << " modules" << FairLogger::endl;
+    LOG(INFO) << "R3BLosMapped2Cal::Init : read " << fNofModules << " modules";
     
 	// try to get a handle on the EventHeader. EventHeader may not be 
 	// present though and hence may be null. Take care when using.
@@ -90,7 +90,7 @@ InitStatus R3BLosMapped2Cal::Init()
 
     {
       //  FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
-     LOG(ERROR) << "FairRootManager not found" << FairLogger::endl;
+     LOG(ERROR) << "FairRootManager not found";
      return kFATAL;
     }  
         
@@ -103,7 +103,7 @@ InitStatus R3BLosMapped2Cal::Init()
     
     if (NULL == fMappedItems){
       //  FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "Branch LosMapped not found");
-      LOG(ERROR) << "Branch LosMapped not found" << FairLogger::endl;
+      LOG(ERROR) << "Branch LosMapped not found";
       return kFATAL;
      }
 
@@ -122,7 +122,7 @@ void R3BLosMapped2Cal::SetParContainers()
     fTcalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LosTCalPar");
     if (!fTcalPar)
     {
-		LOG(ERROR) << "Could not get access to LosTCalPar-Container." << FairLogger::endl;
+		LOG(ERROR) << "Could not get access to LosTCalPar-Container.";
 		fNofTcalPars=0;
 		return;
     }
@@ -169,7 +169,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 		if ((iDet<1) || (iDet>fNofDetectors))
 		{
 			LOG(INFO) << "R3BLosMapped2Cal::Exec : Detector number out of range: " << 
-				iDet << FairLogger::endl;
+				iDet;
 			continue;
 		}
 
@@ -181,7 +181,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 		if (!par)
 		{
 			LOG(INFO) << "R3BLosMapped2Cal::Exec : Tcal par not found, Detector: " << 
-				iDet << ", Channel: " << iCha << ", Type: "<<iType<< FairLogger::endl;
+				iDet << ", Channel: " << iCha << ", Type: "<<iType;
 			continue;
 		}
 
@@ -197,7 +197,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 				", ch= " << iCha << 
 				", type= "<< iType <<
 				", time in channels = " << hit->GetTimeFine() <<
-				", time in ns = " << times_raw_ns  << FairLogger::endl;
+				", time in ns = " << times_raw_ns ;
 			continue;
 		}
 
@@ -349,7 +349,7 @@ skip_event_pileup:
 					<< " iType: " << iType
 					<< " iCal: " << iCal
 					<< " Skip event because of pileup."
-					<< FairLogger::endl;
+					;
 	
 	}
   	

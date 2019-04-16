@@ -130,7 +130,7 @@ void R3BNeulandHitHist::Exec(Option_t* option)
             {
                 LOG(INFO) << ",  mean time=" << (tmean / (Double_t)count);
             }
-            LOG(INFO) << FairLogger::endl;
+            LOG(INFO);
         }
     }
 }

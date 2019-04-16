@@ -128,7 +128,7 @@ void R3BAladinFieldMap::Init() {
     sprintf(str, "R3BAladinFieldMap ---> %d: cos %7.4f sin %7.4f",
             i,gCoords[i].fCosa,gCoords[i].fSina);
     
-    LOG(INFO) << str << FairLogger::endl;
+    LOG(INFO) << str;
   }
   
   
@@ -156,12 +156,12 @@ void R3BAladinFieldMap::Init() {
     TString mapName(filename);
     TString dir = getenv("VMCWORKDIR");
     TString fMapFileName = dir + "/field/magField/Aladin/newmap/" + mapName;
-    LOG(INFO) << "R3BAladinFieldMap opening Field Map file : " << fMapFileName << FairLogger::endl;
+    LOG(INFO) << "R3BAladinFieldMap opening Field Map file : " << fMapFileName;
     
     fin = fopen(fMapFileName,"r");
     
     if (!fin) {
-      LOG(ERROR) << "Failure opening field map : " << fMapFileName << FairLogger::endl;
+      LOG(ERROR) << "Failure opening field map : " << fMapFileName;
     }
     
     // free(fMapFileName.Data());
@@ -194,15 +194,15 @@ void R3BAladinFieldMap::Init() {
       
       if (n != 9)
 	      LOG(ERROR) << "Failure parsing field from map: " << filename <<  " @ line: % "
-        << line << FairLogger::endl;
+        << line;
       
       if (I != measured_I[i])
 	      LOG(ERROR) << "Wrong current " << I << " when parsing field from map " << filename
-        << " @ line: " << line << FairLogger::endl;
+        << " @ line: " << line;
       
       if (rl != 0 && rl != 1)
 	      LOG(ERROR) << "Wrong box " << rl << " when parsing field from map "
-        << filename << " @line: " << line << FairLogger::endl;
+        << filename << " @line: " << line;
       
       
       for (int j = 0; j < 3; j++)
@@ -214,7 +214,7 @@ void R3BAladinFieldMap::Init() {
           sprintf(str, "Wrong coordinate(%d) (%d -> %d) >= %d when parsing field from map %s, line? %d.",
                  j,ixyz[j]+off[rl][j],ixyz[j],field->f[rl][0]._np[j],
                  filename,line);
-          LOG(ERROR) << str << FairLogger::endl;
+          LOG(ERROR) << str;
         }
 	    }
       
@@ -237,7 +237,7 @@ void R3BAladinFieldMap::Init() {
     
     gMapIFieldOrig.insert(map_fields_ALADiN::value_type(measured_I[i],field));
     
-    LOG(INFO) << "R3BAladinFieldMap: Reading field map: " << filename << FairLogger::endl;
+    LOG(INFO) << "R3BAladinFieldMap: Reading field map: " << filename;
   }
   
   // Has to ben changed somehow using
@@ -259,7 +259,7 @@ void R3BAladinFieldMap::Init() {
                           -1.* DistanceFromtargetToAladinCenter
                           );
   
-  LOG(INFO) << "R3BAladinFieldMap::Init() called" << FairLogger::endl;
+  LOG(INFO) << "R3BAladinFieldMap::Init() called";
   InitField();
   
   //Init has been called
@@ -325,13 +325,13 @@ void R3BAladinFieldMap::CalcFieldDiv(R3BFieldInterp f[3],double d[3])
           divF_var += dFa_da_var;
         }
 	      if (divF == 0) {
-          LOG(DEBUG) << "  0   " << FairLogger::endl;
+          LOG(DEBUG) << "  0   ";
         } else {
           sprintf (str, "%5.2f ",divF / sqrt(divF_var));
           LOG(DEBUG) << str;
         }
 	    }
-      LOG(DEBUG) << FairLogger::endl;
+      LOG(DEBUG);
     }
   }
 }
@@ -384,7 +384,7 @@ void R3BAladinFieldMap::InitField()
   if (iter2 == gMapIFieldOrig.begin())
   {
     LOG(ERROR) << "R3BAladinFieldMap: Cannot interpolate ALADiN field for current " << current
-    << " A, too low." << FairLogger::endl;
+    << " A, too low.";
     
   }
   --iter1;
@@ -395,7 +395,7 @@ void R3BAladinFieldMap::InitField()
   fCurField = new fields_ALADiN;
   
   if (!fCurField)
-    LOG(DEBUG) << "R3BAladinFieldMap: ALADiN field interpolation, memory allocation failure." << FairLogger::endl;
+    LOG(DEBUG) << "R3BAladinFieldMap: ALADiN field interpolation, memory allocation failure.";
   
   double w2 = (current - iter1->first) / (iter2->first - iter1->first);
   double w1 = 1 - w2;

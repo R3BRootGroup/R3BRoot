@@ -61,7 +61,7 @@ R3BAmsMapped2StripCal::R3BAmsMapped2StripCal(const char* name, Int_t iVerbose) :
 //Virtual R3BAmsMapped2StripCal: Destructor
 R3BAmsMapped2StripCal::~R3BAmsMapped2StripCal()
 {
-  LOG(INFO) << "R3BAmsMapped2StripCal: Delete instance" << FairLogger::endl;
+  LOG(INFO) << "R3BAmsMapped2StripCal: Delete instance";
 }
 
 
@@ -71,15 +71,15 @@ void R3BAmsMapped2StripCal::SetParContainers() {
   //Reading amsStripCalPar from FairRuntimeDb
   FairRuntimeDb* rtdb = FairRuntimeDb::instance();
   if (!rtdb) { 
-    LOG(ERROR)<<"FairRuntimeDb not opened!"<<FairLogger::endl;
+    LOG(ERROR)<<"FairRuntimeDb not opened!";
   }
   
   fCal_Par=(R3BAmsStripCalPar*)rtdb->getContainer("amsStripCalPar");
   if (!fCal_Par) {
-    LOG(ERROR)<<"R3BAmsMapped2StripCalPar::Init() Couldn't get handle on amsStripCalPar container"<<FairLogger::endl;
+    LOG(ERROR)<<"R3BAmsMapped2StripCalPar::Init() Couldn't get handle on amsStripCalPar container";
   }
   else{
-    LOG(INFO)<<"R3BAmsMapped2StripCalPar:: amsStripCalPar container open"<<FairLogger::endl;
+    LOG(INFO)<<"R3BAmsMapped2StripCalPar:: amsStripCalPar container open";
   }
 }
 
@@ -93,11 +93,11 @@ void R3BAmsMapped2StripCal::SetParameter(){
   NumStripsK=fCal_Par->GetNumStripsK();//Number of Strips K-side
   NumParams=fCal_Par->GetNumParametersFit();//Number of Parameters
 
-  LOG(INFO)<<"R3BAmsMapped2StripCal: Nb detectors: "<< NumDets <<FairLogger::endl;
-  LOG(INFO)<<"R3BAmsMapped2StripCal: Nb strips: "<< NumStrips <<FairLogger::endl;
-  LOG(INFO)<<"R3BAmsMapped2StripCal: Nb strips S-side: "<< NumStripsS <<FairLogger::endl;
-  LOG(INFO)<<"R3BAmsMapped2StripCal: Nb strips K-side: "<< NumStripsK <<FairLogger::endl;
-  LOG(INFO)<<"R3BAmsMapped2StripCal: Nb parameters from pedestal fit: "<< NumParams <<FairLogger::endl;
+  LOG(INFO)<<"R3BAmsMapped2StripCal: Nb detectors: "<< NumDets;
+  LOG(INFO)<<"R3BAmsMapped2StripCal: Nb strips: "<< NumStrips;
+  LOG(INFO)<<"R3BAmsMapped2StripCal: Nb strips S-side: "<< NumStripsS;
+  LOG(INFO)<<"R3BAmsMapped2StripCal: Nb strips K-side: "<< NumStripsK;
+  LOG(INFO)<<"R3BAmsMapped2StripCal: Nb parameters from pedestal fit: "<< NumParams;
   
   CalParams= new TArrayF();
   Int_t array_size = NumDets*NumStrips*NumParams;
@@ -108,16 +108,16 @@ void R3BAmsMapped2StripCal::SetParameter(){
   for(Int_t d = 0; d < NumDets; d++){
   Int_t numdeadstrips=0;
   for(Int_t i = 0; i < NumStrips; i++){if(CalParams->GetAt(NumParams*i+1+NumStrips*d*NumParams)==-1)numdeadstrips++;
-  //LOG(INFO)<<"Nb detectors: "<< d<<", strip: "<<i<<" : " << CalParams->GetAt(NumParams*i+1+NumStrips*d*NumParams)<<" : " << CalParams->GetAt(NumParams*i+2+NumStrips*d*NumParams)<<FairLogger::endl;
+  //LOG(INFO)<<"Nb detectors: "<< d<<", strip: "<<i<<" : " << CalParams->GetAt(NumParams*i+1+NumStrips*d*NumParams)<<" : " << CalParams->GetAt(NumParams*i+2+NumStrips*d*NumParams);
    }
-  LOG(INFO)<<"R3BAmsMapped2StripCal: Nb of dead strips in AMS detector " <<d<< ": "<< numdeadstrips <<FairLogger::endl;
+  LOG(INFO)<<"R3BAmsMapped2StripCal: Nb of dead strips in AMS detector " <<d<< ": "<< numdeadstrips;
   }
 }
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BAmsMapped2StripCal::Init()
 {
-  LOG(INFO) << "R3BAmsMapped2StripCal: Init" << FairLogger::endl;
+  LOG(INFO) << "R3BAmsMapped2StripCal: Init";
 
   //INPUT DATA
   FairRootManager* rootManager = FairRootManager::Instance();
@@ -152,18 +152,18 @@ void R3BAmsMapped2StripCal::Exec(Option_t* option)
 {
   
   //if(++nEvents % 10000 == 0)
-  //LOG(INFO) << nEvents << FairLogger::endl;
+  //LOG(INFO) << nEvents;
   
   //Reset entries in output arrays, local arrays
   Reset();
   
   if (!fCal_Par) {
-    LOG(ERROR)<<"NO Container Parameter!!"<<FairLogger::endl;
+    LOG(ERROR)<<"NO Container Parameter!!";
   }  
   
   //Reading the Input -- Mapped Data --
   Int_t nHits = fAmsMappedDataCA->GetEntries();
-  if(nHits!=NumStrips*NumDets && nHits>0)LOG(WARNING) << "R3BAmsMapped2StripCal: nHits!=NumStrips*NumDets"<<FairLogger::endl;
+  if(nHits!=NumStrips*NumDets && nHits>0)LOG(WARNING) << "R3BAmsMapped2StripCal: nHits!=NumStrips*NumDets";
   if(!nHits) return;
   
   R3BAmsMappedData** mappedData;
@@ -194,7 +194,7 @@ void R3BAmsMapped2StripCal::Exec(Option_t* option)
     sigma=CalParams->GetAt(NumParams*stripId+2);
     energy  = mappedData[i]->GetEnergy()-pedestal;
 
-//LOG(WARNING)<<  pedestal << " "<<  sigma << " " <<  energy << " "<<nbadc<<FairLogger::endl;
+//LOG(WARNING)<<  pedestal << " "<<  sigma << " " <<  energy << " "<<nbadc;
 
     if(energy<sigma*3. && i<64*(nbadc+1)){
      if(pedestal>-1){
@@ -209,7 +209,7 @@ void R3BAmsMapped2StripCal::Exec(Option_t* option)
      }
     }else{
      SynAdcs[nbadc]=0.;
-     LOG(WARNING) << "R3BAmsMapped2StripCal: NO baseline found for ADC "<<nbadc<<FairLogger::endl;
+     LOG(WARNING) << "R3BAmsMapped2StripCal: NO baseline found for ADC "<<nbadc;
      nbadc++;
     }
   }
@@ -254,7 +254,7 @@ void R3BAmsMapped2StripCal::Finish()
 // -----   Public method Reset   ------------------------------------------------
 void R3BAmsMapped2StripCal::Reset()
 {
-  LOG(DEBUG) << "Clearing StripCalData Structure" << FairLogger::endl;
+  LOG(DEBUG) << "Clearing StripCalData Structure";
   if(fAmsStripCalDataCA)fAmsStripCalDataCA->Clear();
 }
 

@@ -93,7 +93,7 @@ void R3BNeulandTcalFill::Exec(Option_t*)
        }*/
 
     Int_t nHits = fHits->GetEntries();
-    //    LOG(INFO) << "number of hits:" << nHits << "   "  << FairLogger::endl;
+    //    LOG(INFO) << "number of hits:" << nHits << "   " ;
 
     /*
         if (nHits > (fNofPMTs / 2))
@@ -121,12 +121,12 @@ void R3BNeulandTcalFill::Exec(Option_t*)
         if (iPlane > fNofPlanes)
         {
             LOG(ERROR) << "R3BNeulandTcalFill::Exec() : more planes then expected! Plane: " << iPlane
-                       << FairLogger::endl;
+                      ;
             continue;
         }
         if (iBar > fNofBars)
         {
-            LOG(ERROR) << "R3BNeulandTcalFill::Exec() : more bars then expected! Plane: " << iBar << FairLogger::endl;
+            LOG(ERROR) << "R3BNeulandTcalFill::Exec() : more bars then expected! Plane: " << iBar;
             continue;
         }
 
@@ -141,7 +141,7 @@ void R3BNeulandTcalFill::Exec(Option_t*)
         // iSide = hit->GetSide();
 
         //            LOG(INFO) << "Plane: " << iPlane << " Bar: " << iBar << " Side: " << iSide << " Cal channel: " <<
-        //            channel << "   "  << FairLogger::endl;
+        //            channel << "   " ;
 
         //        }
 

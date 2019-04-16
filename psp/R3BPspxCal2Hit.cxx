@@ -87,13 +87,13 @@ InitStatus R3BPspxCal2Hit::Init()
         }
         start_detector = start_detector + 2 + 3 * offset[i].size();
     }
-    LOG(INFO) << "R3BPspxCal2Hit :: Init() " << FairLogger::endl;
+    LOG(INFO) << "R3BPspxCal2Hit :: Init() ";
     for (Int_t i = 0; i < fHitPar->GetPspxParDetector(); i++)
     {
         for (Int_t j = 0; j < offset[i].size(); j++)
         {
-            LOG(INFO) << "offset[" << i << "][" << j << "]=" << offset[i][j] << FairLogger::endl;
-            LOG(INFO) << "slope[" << i << "][" << j << "]=" << slope[i][j] << FairLogger::endl;
+            LOG(INFO) << "offset[" << i << "][" << j << "]=" << offset[i][j];
+            LOG(INFO) << "slope[" << i << "][" << j << "]=" << slope[i][j];
         }
     }
     // remain from initcalibration
@@ -111,10 +111,10 @@ InitStatus R3BPspxCal2Hit::Init()
 
     for (Int_t i = 0; i < fHitPar->GetPspxParDetector(); i++)
     {
-        LOG(INFO) << "sign_pos_x[" << i << "]=" << sign_pos_x[i] << FairLogger::endl;
-        LOG(INFO) << "sign_pos_y[" << i << "]=" << sign_pos_y[i] << FairLogger::endl;
-        LOG(INFO) << "sign_strip_x[" << i << "]=" << sign_strip_x[i] << FairLogger::endl;
-        LOG(INFO) << "sign_strip_y[" << i << "]=" << sign_strip_y[i] << FairLogger::endl;
+        LOG(INFO) << "sign_pos_x[" << i << "]=" << sign_pos_x[i];
+        LOG(INFO) << "sign_pos_y[" << i << "]=" << sign_pos_y[i];
+        LOG(INFO) << "sign_strip_x[" << i << "]=" << sign_strip_x[i];
+        LOG(INFO) << "sign_strip_y[" << i << "]=" << sign_strip_y[i];
     }
 
     return kSUCCESS;
@@ -126,7 +126,7 @@ void R3BPspxCal2Hit::SetParContainers()
     /**
      * Initialize/Reads parameter file for conversion.
      */
-    LOG(INFO) << "R3BPspxCal2Hit :: SetParContainers() " << FairLogger::endl;
+    LOG(INFO) << "R3BPspxCal2Hit :: SetParContainers() ";
 
     fHitPar = (R3BPspxHitPar*)FairRuntimeDb::instance()->getContainer("R3BPspxHitPar");
 
@@ -138,7 +138,7 @@ void R3BPspxCal2Hit::SetParContainers()
 
     if (!fHitPar)
     {
-        LOG(ERROR) << "Could not get access to R3BPspxHitPar-Container." << FairLogger::endl;
+        LOG(ERROR) << "Could not get access to R3BPspxHitPar-Container.";
         return;
     }
 
@@ -153,7 +153,7 @@ InitStatus R3BPspxCal2Hit::ReInit()
      * Initialize/Reads parameter file for conversion.
      */
 
-    LOG(INFO) << " R3BPspxCal2Hit :: ReInit() " << FairLogger::endl;
+    LOG(INFO) << " R3BPspxCal2Hit :: ReInit() ";
 
     // FairRunAna* ana = FairRunAna::Instance();
     // FairRuntimeDb* rtdb=ana->GetRuntimeDb();
@@ -164,7 +164,7 @@ InitStatus R3BPspxCal2Hit::ReInit()
 
     if (!fHitPar)
     {
-        LOG(ERROR) << "Could not get access to R3BPspxHitPar-Container." << FairLogger::endl;
+        LOG(ERROR) << "Could not get access to R3BPspxHitPar-Container.";
         return kFATAL;
     }
 
@@ -317,19 +317,19 @@ void R3BPspxCal2Hit::Exec(Option_t* option)
                  rangeE * energy_x[detector])) // energy on front and back have the same energy
             {
                 // LOG(INFO) << "R3BPspxCal2Hit " << detector << " " << -energy_x[detector] << " " << energy_y[detector]
-                // << FairLogger::endl;
+                //;
                 energy = (-energy_x[detector] + energy_y[detector]) / 2.;
             }
             else
             {
                 LOG(WARNING) << "R3BPspxCal2Hit: Energy on front (" << energy_y[detector] << ") and back ("
-                             << -energy_x[detector] << ") don't match." << FairLogger::endl;
+                             << -energy_x[detector] << ") don't match.";
                 continue;
             }
         }
         else
         {
-            //LOG(ERROR) << "R3BPspxCal2Hit: Something went terribly wrong... or its just noise?" << FairLogger::endl;
+            //LOG(ERROR) << "R3BPspxCal2Hit: Something went terribly wrong... or its just noise?";
             continue;
         }
 

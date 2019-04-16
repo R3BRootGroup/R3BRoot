@@ -70,13 +70,13 @@ void R3BTra::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BTra: initialisation" << FairLogger::endl;
-    LOG(DEBUG) << "R3BTra: Sens. Vol. (McId) " << gMC->VolId("TraLog") << FairLogger::endl;
+    LOG(INFO) << "R3BTra: initialisation";
+    LOG(DEBUG) << "R3BTra: Sens. Vol. (McId) " << gMC->VolId("TraLog");
 }
 
 void R3BTra::SetSpecialPhysicsCuts()
 {
-    LOG(INFO) << "-I- R3BTra: Adding customized Physics cut ... " << FairLogger::endl;
+    LOG(INFO) << "-I- R3BTra: Adding customized Physics cut ... ";
 
     if (gGeoManager)
     {
@@ -101,7 +101,7 @@ void R3BTra::SetSpecialPhysicsCuts()
             Double_t cutE = fCutE; // GeV-> 1 keV
 
             LOG(INFO) << "-I- R3BTra: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV"
-                      << FairLogger::endl;
+                     ;
 
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -241,7 +241,7 @@ TClonesArray* R3BTra::GetCollection(Int_t iColl) const
 void R3BTra::Print(Option_t* option) const
 {
     Int_t nHits = fTraCollection->GetEntriesFast();
-    LOG(INFO) << "R3BTra: " << nHits << " points registered in this event" << FairLogger::endl;
+    LOG(INFO) << "R3BTra: " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
@@ -257,7 +257,7 @@ void R3BTra::Reset()
 void R3BTra::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BTra: " << nEntries << " entries to add" << FairLogger::endl;
+    LOG(INFO) << "R3BTra: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
     R3BTraPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
@@ -268,7 +268,7 @@ void R3BTra::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
         new (clref[fPosIndex]) R3BTraPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BTra: " << cl2->GetEntriesFast() << " merged entries" << FairLogger::endl;
+    LOG(INFO) << "R3BTra: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 // -----   Private method AddHit   --------------------------------------------
@@ -288,7 +288,7 @@ R3BTraPoint* R3BTra::AddHit(Int_t trackID,
     if (fVerboseLevel > 1)
         LOG(INFO) << "R3BTra: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV"
-                  << FairLogger::endl;
+                 ;
     return new (clref[size]) R3BTraPoint(trackID,
                                          detID,
                                          detCopyID,

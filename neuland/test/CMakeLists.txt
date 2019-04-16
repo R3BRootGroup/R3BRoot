@@ -24,6 +24,7 @@ set(TEST_DEPENDENCIES
     ${GTEST_BOTH_LIBRARIES}
     ${ROOT_LIBRARIES}
     FairLogger::FairLogger
+    FairTools
     R3Bbase
     R3BData
     R3BNeulandShared
