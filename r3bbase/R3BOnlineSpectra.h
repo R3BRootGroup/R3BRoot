@@ -9,7 +9,7 @@
 #define N_PLANE_MAX_TOFD 4
 #define N_PADDLE_MAX_TOFD 50
 #define N_PADDLE_MAX_PTOF 100
-#define N_PSPX 4 // max value 4 at the moment
+#define N_PSPX 6
 #define N_STRIPS_PSPX 32
 
 #include "FairTask.h"
@@ -315,7 +315,7 @@ class R3BOnlineSpectra : public FairTask
     TH2F* fh_pspx_hit_position[(N_PSPX + 1) / 2]; /**< PSPX 2D position on hit level */
 
     TH1F* fh_pspx_hit_energy[(N_PSPX + 1) / 2];           /**< PSPX energy on hit level */
-    TH2F* fh_pspx_cal_energy_frontback[(N_PSPX + 1) / 2]; /**< PSPX energy front vs back on cal level */
+    TH2F* fh_pspx_cal_energy_frontback[N_PSPX]; /**< PSPX energy front vs back on cal level */
 
   public:
     ClassDef(R3BOnlineSpectra, 2)

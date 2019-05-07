@@ -49,14 +49,14 @@ InitStatus R3BPspxCal2Hit::Init()
 
     FairRootManager* fMan = FairRootManager::Instance();
     fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
-    fCalItems = (TClonesArray*)fMan->GetObject("PspxCalData"); // = branch name in TTree
+    fCalItems = (TClonesArray*)fMan->GetObject("PspxCal"); // = branch name in TTree
     if (!fCalItems)
     {
         printf("Couldnt get handle on PSPX cal items\n");
         return kFATAL;
     }
-    // fHitItems = (TClonesArray*)fMan->GetObject("R3BPspxHitData");
-    FairRootManager::Instance()->Register("PspxHitData", "Pspx", fHitItems, kTRUE);
+    // fHitItems = (TClonesArray*)fMan->GetObject("R3BPspxHit");
+    FairRootManager::Instance()->Register("PspxHit", "Pspx", fHitItems, kTRUE);
 
     // fHitPar->printparams();
 
@@ -329,7 +329,7 @@ void R3BPspxCal2Hit::Exec(Option_t* option)
         }
         else
         {
-            LOG(ERROR) << "R3BPspxCal2Hit: Something went terribly wrong... or its just noise?" << FairLogger::endl;
+            //LOG(ERROR) << "R3BPspxCal2Hit: Something went terribly wrong... or its just noise?" << FairLogger::endl;
             continue;
         }
 

@@ -15,6 +15,8 @@ extern "C" {
 //#include "ext_h101.h"
 }
 
+#define LENGTH(x) (sizeof x / sizeof *x)
+
 R3BPspxReader::R3BPspxReader(EXT_STR_h101_PSP* data, UInt_t offset)
     : R3BReader("R3BPspxReader")
     , fData(data)
@@ -51,7 +53,7 @@ Bool_t R3BPspxReader::Init(ext_data_struct_info* a_struct_info)
     }
 
     // Register output array in tree
-    FairRootManager::Instance()->Register("PspxMappedData", "Pspx", fMappedItems, kTRUE);
+    FairRootManager::Instance()->Register("PspxMapped", "Pspx", fMappedItems, kTRUE);
 
     return kTRUE;
 }
@@ -158,7 +160,7 @@ Bool_t R3BPspxReader::Read()
     */
 
     // loop over all detectors
-    for (int d = 0; d < fNbDetectors; d++)
+    for (int d = 0; d < LENGTH(data->PSPX); d++)
     {
        // if (fMappedPar->GetPspxParStrip().At(d) == 0)
          //   continue; // skip PSPs that are read out with other electronics (e.g. MADC32)

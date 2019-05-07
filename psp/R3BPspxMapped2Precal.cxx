@@ -47,15 +47,15 @@ InitStatus R3BPspxMapped2Precal::Init()
     // LOG(INFO) << "R3BPspxMapped2Precal :: Init() " << FairLogger::endl;
     FairRootManager* fMan = FairRootManager::Instance();
     fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
-    fMappedItems = (TClonesArray*)fMan->GetObject("PspxMappedData"); // = branch name in TTree
+    fMappedItems = (TClonesArray*)fMan->GetObject("PspxMapped"); // = branch name in TTree
     if (!fMappedItems)
     {
         printf("Couldn't get handle on PSPX mapped items\n");
         return kFATAL;
     }
 
-    // fPrecalItems = (TClonesArray*)fMan->GetObject("R3BPspxPrecalData");
-    FairRootManager::Instance()->Register("PspxPrecalData", "Pspx", fPrecalItems, kTRUE);
+    // fPrecalItems = (TClonesArray*)fMan->GetObject"R3BPspxPrecal");
+    FairRootManager::Instance()->Register("PspxPrecal", "Pspx", fPrecalItems, kTRUE);
 
     // fPrecalPar->printparams();
 

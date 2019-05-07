@@ -9,7 +9,7 @@
 #define N_PLANE_MAX_TOFD 4
 #define N_PADDLE_MAX_TOFD 50
 #define N_PADDLE_MAX_PTOF 100
-#define N_PSPX 4
+#define N_PSPX 6
 
 #include "FairTask.h"
 #include <sstream>

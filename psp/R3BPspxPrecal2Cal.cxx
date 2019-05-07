@@ -46,15 +46,15 @@ InitStatus R3BPspxPrecal2Cal::Init()
 
     FairRootManager* fMan = FairRootManager::Instance();
     fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
-    fPrecalItems = (TClonesArray*)fMan->GetObject("PspxPrecalData"); // = branch name in TTree
+    fPrecalItems = (TClonesArray*)fMan->GetObject("PspxPrecal"); // = branch name in TTree
     if (!fPrecalItems)
     {
         printf("Couldn't get handle on PSPX precal items\n");
         return kFATAL;
     }
 
-    // fCalItems = (TClonesArray*)fMan->GetObject("R3BPspxCalData");
-    FairRootManager::Instance()->Register("PspxCalData", "Pspx", fCalItems, kTRUE);
+    // fCalItems = (TClonesArray*)fMan->GetObject("R3BPspxCal");
+    FairRootManager::Instance()->Register("PspxCal", "Pspx", fCalItems, kTRUE);
 
     // fCalPar->printparams();
 
