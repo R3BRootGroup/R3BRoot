@@ -240,10 +240,11 @@ class R3BLosCal2Hit : public FairTask
     TH2F* fhTreswcTvsIcount;
     TH2F* fhTresTvsIcount;
     TH2F* fh_los_dt_hits_ToT_corr;
+    TH2F* fh_los_ihit_ToTcorr;    
     TH2F* fhQvsdt[8];
     TH2F* fhQcorrvsIcount[8];
     TH2F* fhQvsIcount[8];
-    TH2F* fh_los_ihit_ToTcorr;
+
 
 
     Int_t Icount=0;

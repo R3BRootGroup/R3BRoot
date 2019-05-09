@@ -122,7 +122,9 @@ class R3BOnlineSpectra : public FairTask
     /**
      * Methods for setting reset and readout times for Bmon
      */
+
     inline void SetBmon(Int_t time_range, Double_t time_step, Int_t sens_SEE, Int_t sens_IC)
+
     {
         reset_time = time_range;
         read_time = time_step;
@@ -138,7 +140,7 @@ class R3BOnlineSpectra : public FairTask
         fNofPlanes = planes;
         fPaddlesPerPlane = ppp;
     }
-
+    void Reset_ROLU_Histo();
     void Reset_LOS_Histo();
     void Reset_SCI8_Histo();
     void Reset_BMON_Histo();
@@ -256,7 +258,9 @@ class R3BOnlineSpectra : public FairTask
     unsigned long ic_mem=0, see_mem = 0,  tofdor_mem = 0;
     unsigned long ic_start=0, see_start = 0,  tofdor_start = 0;
     unsigned long long time_spill_start=0, time_spill_end=0;
+
     unsigned long long time_previous_event=0;    
+
     Double_t time_clear = -1.;
     Double_t tdiff = 0.;
     Double_t fNorm = 1.;
@@ -278,9 +282,11 @@ class R3BOnlineSpectra : public FairTask
     TH1F *fh_IC;
     TH1F *fh_SEE;
     TH1F *fh_TOFDOR;
-   // TH1F *h3;
-    TH1F *fh_TimePreviousEvent;
+    TH2F *fh_IC_cal;
+    TH2F *fh_SEE_cal;
    
+    TH2F *fh_rolu_tot;
+    TH1F *fh_rolu_channels;
     
     TH1F *fh_sci8_channels;    
     TH1F *fh_sci8_tres_MCFD;
@@ -334,6 +340,7 @@ class R3BOnlineSpectra : public FairTask
     TH2F *fh_tofd_ToF[N_PLANE_MAX_TOFD];
     TH2F* fh_tofd_TotPm[N_PLANE_MAX_TOFD]; 
     TH2F* fh_tofd_dt[3];
+    TH1F* fh_TimePreviousEvent;
 
     TH1F* fh_ptof_channels;
     TH1F* fh_ptof_channels_cut;
@@ -352,7 +359,7 @@ class R3BOnlineSpectra : public FairTask
 
     TH1F* fh_pspx_hit_energy[(N_PSPX + 1) / 2];           /**< PSPX energy on hit level */
     TH2F* fh_pspx_cal_energy_frontback[N_PSPX]; /**< PSPX energy front vs back on cal level */
-
+    TH2F* fh_pspx_hit_multi[(N_PSPX + 1) / 2];
   public:
     ClassDef(R3BOnlineSpectra, 2)
 };

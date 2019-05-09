@@ -75,8 +75,6 @@ Bool_t R3BBeamMonitorReader::Read()
   // Convert plain raw data to multi-dimensional array
     EXT_STR_h101_BMON_onion *data = (EXT_STR_h101_BMON_onion *)fData; 
 
-
-
         new ((*fArray)[fArray->GetEntriesFast()])
           R3BBeamMonitorMappedData(
               data->IC,

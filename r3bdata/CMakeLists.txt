@@ -22,6 +22,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/lumonData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData  
 ${R3BROOT_SOURCE_DIR}/r3bdata/startrackData  
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData  
+${R3BROOT_SOURCE_DIR}/r3bdata/roluData
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/mfiData
@@ -111,6 +112,9 @@ pspData/R3BPspxHitData.cxx
 losData/R3BLosMappedData.cxx
 losData/R3BLosCalData.cxx
 losData/R3BLosHitData.cxx
+roluData/R3BRoluMappedData.cxx
+roluData/R3BRoluCalData.cxx
+roluData/R3BRoluHitData.cxx
 sci8Data/R3BSci8MappedData.cxx
 sci8Data/R3BSci8CalData.cxx
 sci8Data/R3BSci8HitData.cxx
@@ -136,9 +140,6 @@ fibData/R3BFibPoint.cxx
 amsData/R3BAmsMappedData.cxx
 amsData/R3BAmsStripCalData.cxx
 amsData/R3BAmsHitData.cxx
-sci8Data/R3BSci8MappedData.cxx
-sci8Data/R3BSci8CalData.cxx
-sci8Data/R3BSci8HitData.cxx
 beammonitorData/R3BBeamMonitorMappedData.cxx
 )
 

@@ -1,4 +1,4 @@
-#include "R3BFi1Reader.h"
+#include "R3BFi1bReader.h"
 #include "FairLogger.h"
 
 extern "C" {

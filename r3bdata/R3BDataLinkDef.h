@@ -80,6 +80,9 @@
 #pragma link C++ class R3BLosMappedData+;
 #pragma link C++ class R3BLosCalData+;
 #pragma link C++ class R3BLosHitData+;
+#pragma link C++ class R3BRoluMappedData+;
+#pragma link C++ class R3BRoluCalData+;
+#pragma link C++ class R3BRoluHitData+;
 #pragma link C++ class R3BSci8MappedData+;
 #pragma link C++ class R3BSci8CalData+;
 #pragma link C++ class R3BSci8HitData+;

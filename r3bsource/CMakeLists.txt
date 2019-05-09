@@ -18,6 +18,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
 ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
+${R3BROOT_SOURCE_DIR}/r3bdata/roluData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
@@ -51,8 +52,8 @@ R3BPspxReader.cxx
 R3BBunchedFiberReader.cxx
 R3BBeamMonitorReader.cxx
 R3BFi0Reader.cxx
-#R3BFi1aReader.cxx
-#R3BFi1bReader.cxx
+R3BFi1aReader.cxx
+R3BFi1bReader.cxx
 #R3BFi2aReader.cxx
 #R3BFi2bReader.cxx
 R3BFi3aReader.cxx
@@ -68,6 +69,7 @@ R3BFi11Reader.cxx
 R3BFi12Reader.cxx
 R3BFi13Reader.cxx
 R3BLosReader.cxx
+R3BRoluReader.cxx
 R3BSci8Reader.cxx
 R3BTofdReader.cxx
 R3BCalifaFebexReader.cxx
@@ -90,8 +92,8 @@ ext_h101_tpat.h
 ext_h101_timestamp_master.h
 ext_h101_bmon.h
 ext_h101_fibzero.h
-#ext_h101_fibonea.h
-#ext_h101_fiboneb.h
+ext_h101_fibonea.h
+ext_h101_fiboneb.h
 #ext_h101_fibtwoa.h
 #ext_h101_fibtwob.h
 ext_h101_fibthreea.h
@@ -107,6 +109,7 @@ ext_h101_fibeleven.h
 ext_h101_fibtwelve.h
 ext_h101_fibthirteen.h
 ext_h101_los_tamex.h
+ext_h101_rolu.h
 ext_h101_sci8.h
 ext_h101_tofd.h
 ext_h101_ptof.h

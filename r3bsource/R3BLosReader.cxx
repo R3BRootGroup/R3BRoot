@@ -124,6 +124,10 @@ Bool_t R3BLosReader::Read()
   
 
   for (uint32_t d = 0; d < NUM_LOS_DETECTORS; d++) {
+	  
+	  
+	//  cout<<"FINE: "<<data->LOS[d].VTF<<", "<<data->LOS[d].TTFL<<", "<<data->LOS[d].TTFT<<endl;
+	//  cout<<"COARSE: "<<data->LOS[d].VTC<<", "<<data->LOS[d].TTCL<<", "<<data->LOS[d].TTCT<<endl;
 
 /*
     if(data->LOS[d].VTF != data->LOS[d].VTC) return kFALSE;
@@ -181,6 +185,9 @@ Bool_t R3BLosReader::Read()
               data->LOS[d].VTFv[j], // VFTX fine time
               coarse_vftx           // VFTX coarse time
               );
+      
+   //   cout<<"VFTX: "<<data->LOS[d].VTFv[j]<<", "<<coarse_vftx <<endl;
+      
       }
       curChannelStart = nextChannelStart;
     }
@@ -195,7 +202,7 @@ Bool_t R3BLosReader::Read()
 
     numData = data->LOS[d].TTCL;
     numChannels = data->LOS[d].TTCLM;
-    for (uint32_t i = 0; i < numData; i++) {
+    for (uint32_t i = 0; i < numData; i++) {			
       uint32_t coarse_leading = data->LOS[d].TTCLv[i];
       if (coarse_leading > 3 * c_tamex3_range / 4) {
         do_increment = true;
@@ -233,6 +240,8 @@ Bool_t R3BLosReader::Read()
               data->LOS[d].TTFLv[j],
               coarse_leading
               );
+              
+   //    cout<<"TAMEX leading: "<< data->LOS[d].TTFLv[j]<<", "<<  coarse_leading<<endl;    
 
       }
       curChannelStart = nextChannelStart;
@@ -276,6 +285,9 @@ Bool_t R3BLosReader::Read()
                     data->LOS[d].TTFTv[j],
                     coarse_trailing
                     );
+                    
+         //     cout<<"TAMEX trailing: "<< data->LOS[d].TTFTv[j]<<", "<< coarse_trailing<<endl;    
+                    
               break;
             }
           }

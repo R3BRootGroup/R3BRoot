@@ -11,7 +11,7 @@ set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase 
 ${R3BROOT_SOURCE_DIR}/passive
-${R3BROOT_SOURCE_DIR}/sci8
+${R3BROOT_SOURCE_DIR}/rolu
 ${R3BROOT_SOURCE_DIR}/r3bdata/
 ${R3BROOT_SOURCE_DIR}/r3bdata/calData
 ${R3BROOT_SOURCE_DIR}/r3bdata/dchData
@@ -20,7 +20,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
-${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
+${R3BROOT_SOURCE_DIR}/r3bdata/roluData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
 ${R3BROOT_SOURCE_DIR}/tcal
 )
@@ -36,17 +36,17 @@ ${FAIRROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
-R3BSci8Mapped2Cal.cxx
-R3BSci8Mapped2CalPar.cxx
-R3BSci8Cal2Hit.cxx
+R3BRoluMapped2Cal.cxx
+R3BRoluMapped2CalPar.cxx
+R3BRoluCal2Hit.cxx
 )
 
 # fill list of header files from list of source files
 # by exchanging the file extension
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
-Set(LINKDEF Sci8LinkDef.h)
-Set(LIBRARY_NAME R3BSci8)
+Set(LINKDEF RoluLinkDef.h)
+Set(LIBRARY_NAME R3BRolu)
 Set(DEPENDENCIES
     R3Bbase R3BData R3BPassive R3BTCal)
 

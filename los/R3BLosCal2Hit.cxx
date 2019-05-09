@@ -52,7 +52,6 @@ R3BLosCal2Hit::R3BLosCal2Hit()
 	fhTres_T = NULL;	
 	fhTres_T_corr = NULL;	
 	fhTres_M_corr = NULL;
-	fhTres_MT_corr = NULL;	
 	fhQ_L = NULL;
 	fhQ_B = NULL;
 	fhQ_R = NULL;
@@ -70,6 +69,7 @@ R3BLosCal2Hit::R3BLosCal2Hit()
 	fhQ_RB_corr = NULL;
 	fhQ_RT_corr = NULL;
 	fhQ = NULL;
+	fhQtest = NULL;
 	fhQ_vs_X = NULL;
 	fhQ_vs_Y = NULL;	
 	fhQ_vs_X_corr = NULL;
@@ -91,7 +91,6 @@ R3BLosCal2Hit::R3BLosCal2Hit()
 	fhQ3_vs_Q7_corr = NULL;
 	fhQ4_vs_Q8 = NULL;	
 	fhQ4_vs_Q8_corr = NULL;
-	fhQtest = NULL;
 	fhTresX_M = NULL;
 	fhTresY_M = NULL;
 	fhTresX_M_corr= NULL;
@@ -139,8 +138,7 @@ R3BLosCal2Hit::R3BLosCal2Hit(const char* name, Int_t iVerbose)
 	fhTres_M = NULL;
 	fhTres_T = NULL;	
 	fhTres_T_corr = NULL;	
-	fhTres_M_corr = NULL;
-	fhTres_MT_corr = NULL;	
+	fhTres_M_corr = NULL;	
 	fhQ_L = NULL;
 	fhQ_B = NULL;
 	fhQ_R = NULL;
@@ -208,7 +206,6 @@ R3BLosCal2Hit::~R3BLosCal2Hit()
 	if(fhTres_T) delete(fhTres_T) ;	
 	if(fhTres_T_corr) delete(fhTres_T_corr) ;	
 	if(fhTres_M_corr) delete(fhTres_M_corr) ;
-	if(fhTres_MT_corr) delete(fhTres_MT_corr);	
 	if(fhQ_L) delete(fhQ_L) ;
 	if(fhQ_B) delete(fhQ_B) ;
 	if(fhQ_R) delete(fhQ_R) ;
@@ -257,17 +254,18 @@ R3BLosCal2Hit::~R3BLosCal2Hit()
 	if(fhTresX_T_corr) delete(fhTresX_T_corr) ;
 	if(fhTresY_T_corr) delete(fhTresY_T_corr) ;	
 	if(fh_los_ihit_ToTcorr) delete(fh_los_ihit_ToTcorr);
+	if(fhTresMvsIcount) delete(fhTresMvsIcount) ;	
+	if(fhTresTvsIcount) delete(fhTresTvsIcount) ;	
+	if(fhTreswcMvsIcount) delete(fhTreswcMvsIcount) ;	
+	if(fhTreswcTvsIcount) delete(fhTreswcTvsIcount) ;		
+	if(fh_los_dt_hits_ToT_corr) delete(fh_los_dt_hits_ToT_corr);	
 	for (Int_t j = 0; j < 8; j++)
 	{	
       if(fhQvsdt[j]) delete(fhQvsdt[j]); 
       if(fhQcorrvsIcount[j]) delete(fhQcorrvsIcount[j]);
       if(fhQvsIcount[j]) delete(fhQvsIcount[j]);
 	 }	
-	if(fhTresMvsIcount) delete(fhTresMvsIcount) ;	
-	if(fhTresTvsIcount) delete(fhTresTvsIcount) ;	
-	if(fhTreswcMvsIcount) delete(fhTreswcMvsIcount) ;	
-	if(fhTreswcTvsIcount) delete(fhTreswcTvsIcount) ;		
-	if(fh_los_dt_hits_ToT_corr) delete(fh_los_dt_hits_ToT_corr);
+
     if (fHitItems)
     {
         delete fHitItems;
@@ -378,6 +376,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 
  // ofstream myFile("data_s473_run197.dat",ios_base::out|ios_base::app);
      
+     
   // check for requested trigger (Todo: should be done globablly / somewhere else)
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
      return;
@@ -390,6 +389,8 @@ void R3BLosCal2Hit::Exec(Option_t* option)
        Int_t tpatvalue = (itpat & (1 << fTpat_bit)) >> fTpat_bit;
        if((header) && (tpatvalue == 0)) return;
       } 
+      
+      
 
      Int_t nHits = fCalItems->GetEntries(); 
       
@@ -428,8 +429,8 @@ void R3BLosCal2Hit::Exec(Option_t* option)
        Double_t x_cm[nHits];
        Double_t y_cm[nHits];      
        Double_t Z[nHits];     
-       Double_t t_hit[nHits]; // NAN
-
+       Double_t t_hit[nHits]; // NAN    	  
+       
        memset(time_V, 0./0., nHits*8*sizeof(Double_t));
        memset(time_V_temp, 0./0., nHits*8*sizeof(Double_t));
        memset(time_L, 0./0., nHits*8*sizeof(Double_t));
@@ -466,8 +467,6 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 	// if OptHisto = true histograms are created     
 	   if(OptHisto) CreateHisto();	     
          	     
-	  
-
        
      for (Int_t ihit = 0; ihit < nHits; ihit++)  
      {   	
@@ -568,7 +567,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 	          nPMT = nPMT +1;
 	          tot[ihit][ipm] = time_T[ihit][ipm] - time_L[ihit][ipm];
 	     
-	        }
+	        }  
 
 	       if(tot[ihit][ipm] != 0. && !(IS_NAN(tot[ihit][ipm]))) totsum[ihit] += tot[ihit][ipm];
 
@@ -667,23 +666,21 @@ void R3BLosCal2Hit::Exec(Option_t* option)
           t_hit[ihit] = timeLosM_corr[ihit]; 
                            
       
-       if(OptHisto && nPMV == 8 && nPMT == 8){
+       if(OptHisto && nPMV == 8 && nPMT == 8 && Igood_event){
 		   // MCFD times:    
           fhTres_M->Fill(LosTresM[ihit]);                         
          // fhTresMvsIcount->Fill(Icount,LosTresM[ihit]);
           fhTresMvsIcount->Fill(ihit+1,LosTresM[ihit]);
   // MCFD walk corrected times:			 
           fhTres_M_corr->Fill(LosTresM_corr[ihit]);		  	
-          fhTreswcMvsIcount->Fill(Icount,LosTresM_corr[ihit]);          
+          if(ihit > 0) fhTreswcMvsIcount->Fill(timeLosM[ihit]-timeLosM[ihit-1],LosTresM[ihit]);          
    // TAMEX times:       
 	      fhTres_T->Fill(LosTresT[ihit]);                
          // fhTresTvsIcount->Fill(Icount,LosTresT[ihit]);
           fhTresTvsIcount->Fill(ihit+1,LosTresT[ihit]);
   // TAMEX walk corrected times:			 
           fhTres_T_corr->Fill(LosTresT_corr[ihit]);		  
-          fhTreswcTvsIcount->Fill(Icount,LosTresT_corr[ihit]);          
-   // dt combined:
-          fhTres_MT_corr->Fill((LosTresM_corr[ihit]+LosTresT_corr[ihit])/2.);	                            	                   
+          if(ihit > 0) fhTreswcTvsIcount->Fill(timeLosM[ihit]-timeLosM[ihit-1],LosTresT_corr[ihit]);          	                            	                   
   // x,y from MCFD:          
           fhXY->Fill(xV_cm[ihit],yV_cm[ihit]);
   // x,y from TAMEX:	                     
@@ -705,11 +702,12 @@ void R3BLosCal2Hit::Exec(Option_t* option)
          	
       for(int ipm=0; ipm<8; ipm++)
 	  { 
-        fhQcorrvsIcount[ipm]->Fill(Icount,tot_corr[ihit][ipm]);
+      //  fhQcorrvsIcount[ipm]->Fill(Icount,tot_corr[ihit][ipm]);
         fhQvsIcount[ipm]->Fill(Icount,tot[ihit][ipm]);
 	    if(ihit > 0){ 
          fh_los_dt_hits_ToT_corr->Fill(time_V[ihit][ipm]-time_V[ihit-1][ipm],tot_corr[ihit][ipm]); 
          fhQvsdt[ipm]->Fill(time_V[ihit][ipm]-time_V[ihit-1][ipm],tot[ihit][ipm]);
+         fhQcorrvsIcount[ipm]->Fill(time_V[ihit][ipm]-time_V[ihit-1][ipm],tot_corr[ihit][ipm]);
 	    }
 	  }  
 		  		  
@@ -781,11 +779,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
         //cout << "R3BLosCal2Hit::Exec END: " << Icount << endl;
 }
 
-void R3BLosCal2Hit::FillHisto()
-{
-         		  	
-		  	
-}	
+
 
 
 void R3BLosCal2Hit::CreateHisto()
@@ -796,7 +790,7 @@ void R3BLosCal2Hit::CreateHisto()
      // min,max,Nbins for time spectra  
        Double_t fhTmin = -5.; //-5.; //-10
        Double_t fhTmax = 5.; //5.;  // 10
-       Int_t    fhTbin = 20000; //10000; // 20000
+       Int_t    fhTbin = 10000; //10000; // 20000
      // min,max,Nbins for ToT spectra        
        Double_t fhQmin = 0.;
        Double_t fhQmax = 200; //300.; //150
@@ -838,12 +832,6 @@ void R3BLosCal2Hit::CreateHisto()
               fhTres_T_corr = new TH1F(strName, "", fhTbin, fhTmin, fhTmax);              
           }         
           
-          if (NULL == fhTres_MT_corr )
-          {
-              char strName[255];
-              sprintf(strName, "LOS_dt_MCFD_TAMEX_wc");
-              fhTres_MT_corr = new TH1F(strName, "", fhTbin, fhTmin, fhTmax);              
-          }
           
           if (NULL == fhQ_L )
           {
@@ -1193,8 +1181,8 @@ void R3BLosCal2Hit::CreateHisto()
 	     if(NULL == fhQcorrvsIcount[j])
          {
               char strName[255];
-              sprintf(strName, "Qcorr_vs_Icount_ch%d",j+1);
-              fhQcorrvsIcount[j] = new TH2F(strName, "",10000,0,10000000,fhQbin, fhQmin, fhQmax);  
+              sprintf(strName, "Qcorr_vs_dt_ch%d",j+1);
+              fhQcorrvsIcount[j] = new TH2F(strName, "",6000,0,3000,fhQbin, fhQmin, fhQmax);  
               fhQcorrvsIcount[j]->GetXaxis()->SetTitle("Event number");
               char strYname[255];
               sprintf(strYname,"ToTcorr / ns of ch. %d",j+1);
@@ -1225,29 +1213,37 @@ void R3BLosCal2Hit::CreateHisto()
          if(NULL == fhTresMvsIcount)
          {
               char strName[255];
-              sprintf(strName, "TresM_vs_Icount");
-              fhTresMvsIcount = new TH2F(strName, "",10,0,10,fhTbin, fhTmin, fhTmax);  			 
+              sprintf(strName, "TresM_vs_ihit");
+              fhTresMvsIcount = new TH2F(strName, "",10,0,10,fhTbin, fhTmin, fhTmax); 
+              fhTresMvsIcount ->GetXaxis()->SetTitle("hit number");
+              fhTresMvsIcount ->GetYaxis()->SetTitle("MCFD time precision / ns"); 			 
 	     }	         
 	                           
 	     if(NULL == fhTreswcMvsIcount)
          {
               char strName[255];
-              sprintf(strName, "TreswcM_vs_Icount");
-              fhTreswcMvsIcount = new TH2F(strName, "",10000,0,10000000,fhTbin, fhTmin, fhTmax);  			 
+              sprintf(strName, "TreswcM_vs_dt");
+              fhTreswcMvsIcount = new TH2F(strName, "",6000,0,3000,fhTbin, fhTmin, fhTmax); 
+              fhTreswcMvsIcount ->GetXaxis()->SetTitle("time between two hits / ns");
+              fhTreswcMvsIcount ->GetYaxis()->SetTitle("MCFD time precision / ns");  			 
 	     }
 	     	     
          if(NULL == fhTresTvsIcount)
          {
               char strName[255];
-              sprintf(strName, "TresT_vs_Icount");
-              fhTresTvsIcount = new TH2F(strName, "",10,0,10,fhTbin, fhTmin, fhTmax);  			 
+              sprintf(strName, "TresT_vs_ihit");
+              fhTresTvsIcount = new TH2F(strName, "",10,0,10,fhTbin, fhTmin, fhTmax); 
+              fhTresTvsIcount ->GetXaxis()->SetTitle("hit number");
+              fhTresTvsIcount ->GetYaxis()->SetTitle("MCFD time precision / ns");  			 
 	     }
 	     	     
          if(NULL == fhTreswcTvsIcount)
          {
               char strName[255];
-              sprintf(strName, "TreswcT_vs_Icount");
-              fhTreswcTvsIcount = new TH2F(strName, "",10000,0,10000000,fhTbin, fhTmin, fhTmax);  			 
+              sprintf(strName, "TreswcT_vs_dt");
+              fhTreswcTvsIcount = new TH2F(strName, "",6000,0,3000,fhTbin, fhTmin, fhTmax); 
+              fhTreswcMvsIcount ->GetXaxis()->SetTitle("time between two hits / ns");
+              fhTreswcMvsIcount ->GetYaxis()->SetTitle("MCFD time precision / ns");   			 
 	     }
 	     	     
          if(NULL == fh_los_dt_hits_ToT_corr)
@@ -1277,6 +1273,7 @@ void R3BLosCal2Hit::FinishTask()
 	if(fhTres_M) fhTres_M->Write() ;
 	if(fhTres_T) fhTres_T->Write() ;	
 	if(fhQ) fhQ->Write() ;
+	if(fhQtest) fhQtest->Write() ;
 	if(fhQ_vs_X) fhQ_vs_X->Write() ;
 	if(fhQ_vs_Y) fhQ_vs_Y->Write();	
 	if(fhTM_vs_Q) fhTM_vs_Q->Write() ;
@@ -1296,8 +1293,7 @@ void R3BLosCal2Hit::FinishTask()
 	if(fhTresY_T) fhTresY_T->Write() ;		
 	if(fhTres_T_corr) fhTres_T_corr->Write() ;	
 	if(fhTres_M_corr) fhTres_M_corr->Write() ;
-	if(fhTres_MT_corr) fhTres_MT_corr->Write();
-	if(fhQ_L) fhQ_L->Write() ;
+    if(fhQ_L) fhQ_L->Write() ;
 	if(fhQ_B) fhQ_B->Write() ;
 	if(fhQ_R) fhQ_R->Write() ;
 	if(fhQ_T) fhQ_T->Write() ;	
@@ -1321,23 +1317,27 @@ void R3BLosCal2Hit::FinishTask()
 	if(fhQ2_vs_Q6_corr) fhQ2_vs_Q6_corr->Write() ;
 	if(fhQ3_vs_Q7_corr) fhQ3_vs_Q7_corr->Write() ;	
 	if(fhQ4_vs_Q8_corr) fhQ4_vs_Q8_corr->Write() ;
-	if(fhQtest) fhQtest->Write() ;
+	
 	if(fhTresX_M_corr) fhTresX_M_corr->Write() ;
 	if(fhTresY_M_corr) fhTresY_M_corr->Write() ;	
 	if(fhTresX_T_corr) fhTresX_T_corr->Write() ;
 	if(fhTresY_T_corr) fhTresY_T_corr->Write() ;
+	
+	if(fhTresMvsIcount) fhTresMvsIcount->Write() ;	
+	if(fhTresTvsIcount) fhTresTvsIcount->Write() ;	
+	if(fhTreswcMvsIcount) fhTreswcMvsIcount->Write() ;	
+	if(fhTreswcTvsIcount) fhTreswcTvsIcount->Write() ;	
+	
 	if(fh_los_ihit_ToTcorr) fh_los_ihit_ToTcorr->Write();	
+	if(fh_los_dt_hits_ToT_corr) fh_los_dt_hits_ToT_corr->Write();
+ 
     for (Int_t j = 0; j < 8; j++)
 	{	
          if(fhQvsdt[j]) fhQvsdt[j]->Write(); 
          if(fhQcorrvsIcount[j]) fhQcorrvsIcount[j]->Write();
          if(fhQvsIcount[j]) fhQvsIcount[j]->Write();
 	 }
-	if(fhTresMvsIcount) fhTresMvsIcount->Write() ;	
-	if(fhTresTvsIcount) fhTresTvsIcount->Write() ;	
-	if(fhTreswcMvsIcount) fhTreswcMvsIcount->Write() ;	
-	if(fhTreswcTvsIcount) fhTreswcTvsIcount->Write() ;	
-	if(fh_los_dt_hits_ToT_corr) fh_los_dt_hits_ToT_corr->Write();	
+	
    }
 		
 }

@@ -162,7 +162,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
  //   cout<<"R3BLosMapped2Cal: Channel "<<iCha<<", type "<<iType<<", nHits "<<nHits<<", ihit "<<ihit<<", timeFine "<<hit->GetTimeFine()<<endl;
          
 
-       if(nHits%8 != 0) return;
+    //   if(nHits%8 != 0) return;
 
      //  if(nHits != 24) return;
        
@@ -264,42 +264,42 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 				switch (iCha)
 				{
 
-					case 1 : {
+					case 1 : {    // change to 1
 							 if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(0)))  goto skip_event_pileup;
 							 if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(0)))  goto skip_event_pileup;
 							 if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(0)))  goto skip_event_pileup;
 						 } break;
-					case 3 : {
+					case 3 : {    // change to 3
 							 if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(2)))  goto skip_event_pileup;
 							 if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(2)))  goto skip_event_pileup;
 							 if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(2)))  goto skip_event_pileup;
 						 } break;
-					case 5 : {
+					case 5 : {    // change to 5
 							 if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(4)))  goto skip_event_pileup;
 							 if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(4)))  goto skip_event_pileup;
 							 if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(4)))  goto skip_event_pileup;
 						 } break;
-					case 7 : {
+					case 7 : {    // change to 7
 							 if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(6))) goto skip_event_pileup;
 							 if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(6))) goto skip_event_pileup;
 							 if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(6))) goto skip_event_pileup;
 						 } break;        				   
-					case 2 : {
+					case 2 : {    // change to 2
 							 if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(1)))  goto skip_event_pileup;
 							 if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(1)))  goto skip_event_pileup;
 							 if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(1)))  goto skip_event_pileup;
 						 } break;
-					case 4 : {
+					case 4 : {    // change to 4
 							 if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(3)))  goto skip_event_pileup;
 							 if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(3)))  goto skip_event_pileup;
 							 if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(3)))  goto skip_event_pileup;
 						 } break;
-					case 6 : {
+					case 6 : {   // change to 6
 							 if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(5)))  goto skip_event_pileup;
 							 if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(5)))  goto skip_event_pileup;
 							 if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(5)))  goto skip_event_pileup;
 						 } break;
-					case 8 : {
+					case 8 : {   // change to 8
 							 if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(7)))  goto skip_event_pileup;
 							 if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(7)))  goto skip_event_pileup;
 							 if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(7)))  goto skip_event_pileup;
@@ -318,8 +318,6 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 			//fNofCalItems += 1;
 		}
 		// set the time to the correct cal item       
-
-		 
 
 			if(iType == 0) {
 				calItem->fTimeV_ns[iCha-1]   = times_ns;

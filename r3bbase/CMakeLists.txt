@@ -18,6 +18,8 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
 ${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
 ${R3BROOT_SOURCE_DIR}/los
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
+${R3BROOT_SOURCE_DIR}/rolu
+${R3BROOT_SOURCE_DIR}/r3bdata/roluData
 ${R3BROOT_SOURCE_DIR}/sci8
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData

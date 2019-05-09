@@ -17,6 +17,8 @@
 #pragma link C++ class R3BPspxReader+;
 #pragma link C++ class R3BBunchedFiberReader+;
 #pragma link C++ class R3BFi0Reader+;
+#pragma link C++ class R3BFi1aReader+;
+#pragma link C++ class R3BFi1bReader+;
 #pragma link C++ class R3BFi3aReader+;
 #pragma link C++ class R3BFi3bReader+;
 #pragma link C++ class R3BFi4Reader+;
@@ -29,6 +31,7 @@
 #pragma link C++ class R3BFi12Reader+;
 #pragma link C++ class R3BFi13Reader+;
 #pragma link C++ class R3BLosReader+;
+#pragma link C++ class R3BRoluReader+;
 #pragma link C++ class R3BSci8Reader+;
 #pragma link C++ class R3BTofdReader+;
 #pragma link C++ class R3BCalifaFebexReader+;
@@ -47,6 +50,8 @@
 #pragma link C++ class EXT_STR_h101_BMON_onion_t;
 //#pragma link C++ class EXT_STR_h101_raw_nnp_onion_t;
 #pragma link C++ class EXT_STR_h101_FIBZERO_onion_t;
+#pragma link C++ class EXT_STR_h101_FIBONEA_onion_t;
+#pragma link C++ class EXT_STR_h101_FIBONEB_onion_t;
 #pragma link C++ class EXT_STR_h101_FIBTHREEA_onion_t;
 #pragma link C++ class EXT_STR_h101_FIBTHREEB_onion_t;
 #pragma link C++ class EXT_STR_h101_FIBFOUR_onion_t;
@@ -61,6 +66,7 @@
 #pragma link C++ class EXT_STR_h101_FIBTHIRTEEN_onion_t;
 #pragma link C++ class EXT_STR_h101_SCI8_onion_t;
 #pragma link C++ class EXT_STR_h101_LOS_TAMEX_onion_t;
+#pragma link C++ class EXT_STR_h101_ROLU_onion_t;
 #pragma link C++ class EXT_STR_h101_TOFD_onion_t;
 #pragma link C++ class EXT_STR_h101_PTOF_onion_t;
 #pragma link C++ class EXT_STR_h101_PSP_onion_t;

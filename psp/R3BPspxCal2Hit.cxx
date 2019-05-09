@@ -319,6 +319,7 @@ void R3BPspxCal2Hit::Exec(Option_t* option)
                 // LOG(INFO) << "R3BPspxCal2Hit " << detector << " " << -energy_x[detector] << " " << energy_y[detector]
                 //;
                 energy = (-energy_x[detector] + energy_y[detector]) / 2.;
+
             }
             else
             {
@@ -513,6 +514,9 @@ void R3BPspxCal2Hit::Exec(Option_t* option)
                            mult_x[detector] + mult_y[detector] + mult_e[detector],
                            mult_x[detector],
                            mult_y[detector]);
+                           
+         //   std::cout<<"PsP Hit: "<<detector<<"; "<< mult_x[detector]<<", "<< mult_y[detector]<<", "<<energy<<std::endl;              
+                           
     }
 }
 

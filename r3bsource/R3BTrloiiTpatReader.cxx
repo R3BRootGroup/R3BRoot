@@ -34,6 +34,7 @@ Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info *a_struct_info)
 		perror("ext_data_struct_info_item");
 		LOG(error) << "Failed to setup structure information.";
 		return kFALSE;
+
 	}
 
 	auto mgr = FairRootManager::Instance();
@@ -44,7 +45,9 @@ Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info *a_struct_info)
 
 Bool_t R3BTrloiiTpatReader::Read()
 {
+
 	LOG(info) << "TrloiiTpatReader::Read BEGIN";
+
 
 	if (nullptr != fEventHeader) {
 		fEventHeader->SetTpat(fData->TPATv[0]);
@@ -54,6 +57,7 @@ Bool_t R3BTrloiiTpatReader::Read()
 	}
 
 	if (0 == (fNEvent % 1000)) {
+
 		LOG(DEBUG1) << "R3BTrloiiTpatReader : event : " << fNEvent
 		   ;
 	}
@@ -66,6 +70,7 @@ Bool_t R3BTrloiiTpatReader::Read()
   //  cout<<"TPAT: "<<fData->TPATv[0]<<endl;
 
 	LOG(info) << "TrloiiTpatReader::Read END";
+
         return kTRUE;
 }
 

@@ -13,6 +13,9 @@
 #include "R3BLosMappedData.h"
 #include "R3BOnlineSpectra.h"
 
+#include "R3BRoluCalData.h"
+#include "R3BRoluMappedData.h"
+
 #include "R3BSci8CalData.h"
 #include "R3BSci8MappedData.h"
 
@@ -121,8 +124,8 @@ InitStatus R3BOnlineSpectra::Init()
 
 	run->GetHttpServer()->Register("/Tasks", this);
 	
-   
-        // Get objects for detectors on all levels
+    // Get objects for detectors on all levels
+
         assert(DET_MAX + 1 == sizeof(fDetectorNames)/sizeof(fDetectorNames[0]));
         printf("Have %d fiber detectors.\n", NOF_FIB_DET);
         for (int det = 0; det < DET_MAX; det++)
@@ -139,9 +142,46 @@ InitStatus R3BOnlineSpectra::Init()
 	//------------------------------------------------------------------------ 
 	// create histograms of all detectors  
 	//------------------------------------------------------------------------ 
+    
+    // Trigger and Tpat
+        TCanvas *cTrigg = new TCanvas("Trigg", "Triggers", 10, 10, 650, 350);
+        fhTpat = new TH1F("Tpat", "Tpat", 20, 0, 20);
+        fhTpat->GetXaxis()->SetTitle("Tpat value");
+        
+        fhTrigger = new TH1F("Trigger", "Trigger all", 20, 0, 20);
+        fhTrigger->GetXaxis()->SetTitle("Trigger value");
 
+        cTrigg->Divide(2,1);
+        cTrigg->cd(1);gPad->SetLogy();
+        fhTrigger->Draw();
+        cTrigg->cd(2);gPad->SetLogy();
+        fhTpat->Draw();
+        cTrigg->cd(0);
+        
+	//------------------------------------------------------------------------ 
+	// Rolu detector
 
+ 	if(fMappedItems.at(DET_ROLU)){
+		TCanvas *cRolu = new TCanvas("Rolu", "Rolu", 10, 10, 800, 400);
+        
+        fh_rolu_tot = new TH2F("Rolu_tot", "ROLU ToT",10, 0, 10, 3000, 0, 300);
+        fh_rolu_tot->GetXaxis()->SetTitle("Channel number");
+        fh_rolu_tot->GetYaxis()->SetTitle("ToT / ns");
+        
+        fh_rolu_channels = new TH1F("Rolu_channels", "ROLU channels",10, 0, 10);
+        fh_rolu_channels->GetXaxis()->SetTitle("Channel number");
+        fh_rolu_channels->GetYaxis()->SetTitle("Counts");
+        
+        cRolu->Divide(2,1);
+        cRolu->cd(1);gPad->SetLogy();
+        fh_rolu_channels->Draw();
+        cRolu->cd(2);gPad->SetLogz();
+        fh_rolu_tot->Draw("colz");
+        cRolu->cd(0);
+        run->AddObject(cRolu);
 
+		run->GetHttpServer()->RegisterCommand("Reset_ROLU", Form("/Tasks/%s/->Reset_ROLU_Histo()", GetName())); 
+    }   
 	//------------------------------------------------------------------------ 
 	// Sci8 detector
 
@@ -204,14 +244,9 @@ InitStatus R3BOnlineSpectra::Init()
  
 	}	
 
-	if(fMappedItems.at(DET_BMON)){	
-		
-		
-		
-        fh_TimePreviousEvent = new TH1F("TimePreviousEvent", "Time between 2 particles ", 300000, -3000, 3000);
-        fh_TimePreviousEvent->GetXaxis()->SetTitle("time / µsec");
-        fh_TimePreviousEvent->GetYaxis()->SetTitle("counts");
-		
+
+	if(fMappedItems.at(DET_BMON)){			
+	
     // get the theoretical calib factors for SEETRAM
         Double_t fexp = float(fsens_SEE+9);
         Double_t fpow = float(pow(10.,fexp));
@@ -241,7 +276,7 @@ InitStatus R3BOnlineSpectra::Init()
         fh_TOFDOR = new TH1F("TOFDOR", "TOFDOR ", Nbin_bmon, 0, reset_time);
         fh_TOFDOR->GetXaxis()->SetTitle("time / sec");
         fh_TOFDOR->GetYaxis()->SetTitle("TOFDOR counts");
-       
+
         fh_IC_spill = new TH1F("IC_spill", "IC rate in kHz ", Nbin_bmon, 0, reset_time);
         fh_IC_spill->GetXaxis()->SetTitle("time / sec");
         fh_IC_spill->GetYaxis()->SetTitle("IC rate / kHz");
@@ -301,11 +336,11 @@ InitStatus R3BOnlineSpectra::Init()
         fh_los_pos_ToT = new TH2F("los_pos_ToT", "LOS ToT Position ", 1000, -5., 5.,1000, -5., 5.);
 		fh_los_pos_ToT->GetXaxis()->SetTitle("X position / cm");
 		fh_los_pos_ToT->GetYaxis()->SetTitle("Y position / cm");
-		fh_los_dt_hits_ToT= new TH2F("los_dt_ToT", "LOS ToT dt ",5000,0,3000,500,0,200.); 
-		fh_los_dt_hits_ToT->GetXaxis()->SetTitle("dt between two hits / ns");
-		fh_los_dt_hits_ToT->GetYaxis()->SetTitle("ToT / ns");
-		fh_los_dt_first_ToT= new TH2F("los_dt_events_ToT", "LOS ToT dtevents ",5000,0,150000,500,0,200.); 
-		fh_los_dt_first_ToT->GetXaxis()->SetTitle("dt between two events / ns");
+		fh_los_dt_hits_ToT= new TH2F("los_dt_ToT", "LOS ToT dt ",6000,0,3000,2000,0,200.); //6000,0,3000,2000,0,200.
+		fh_los_dt_hits_ToT->GetXaxis()->SetTitle("dt between two hits / usec");//dt between two hits / ns
+		fh_los_dt_hits_ToT->GetYaxis()->SetTitle("ToT / ns");//ToT / ns
+		fh_los_dt_first_ToT= new TH2F("los_dt_events_ToT", "LOS ToT dtevents ",5000,0,50000,500,0,200.); 
+		fh_los_dt_first_ToT->GetXaxis()->SetTitle("dt between two events / usec");
 		fh_los_dt_first_ToT->GetYaxis()->SetTitle("ToT / ns");
 
 
@@ -561,6 +596,10 @@ InitStatus R3BOnlineSpectra::Init()
 		TCanvas *cTofd_planes = new TCanvas("TOFD_planes", "TOFD planes", 10, 10, 1100, 1000);
 		cTofd_planes->Divide(5, 4);
 
+        fh_TimePreviousEvent = new TH1F("TimePreviousEvent", "Time between 2 particles ", 300000, -3000, 3000);
+        fh_TimePreviousEvent->GetXaxis()->SetTitle("time / µsec");
+        fh_TimePreviousEvent->GetYaxis()->SetTitle("counts");
+        
 		for (Int_t j = 0; j < 4; j++)
 		{
 			char strName1[255];
@@ -662,10 +701,11 @@ InitStatus R3BOnlineSpectra::Init()
     //------------------------------------------------------------------------
     // PSPX detector
     // get access to data
-    TCanvas* cPspx_comp = new TCanvas("Pspx_comp", "Pspx Comparison", 10, 10, 1100, 1000);
-    cPspx_comp->Divide(N_PSPX, 3);
-
-    Int_t Emax = 1000000;
+    
+       TCanvas* cPspx_comp = new TCanvas("Pspx_comp", "Pspx Comparison", 10, 10, 1100, 1000);
+       cPspx_comp->Divide(N_PSPX, 3);
+   
+       Int_t Emax = 1000000;
 
     if (fMappedItems.at(DET_PSPX))
     {
@@ -807,9 +847,10 @@ InitStatus R3BOnlineSpectra::Init()
     if (fCalItems.at(DET_PSPX))
     {
         UInt_t nbins = 200;
-
+      
         for (UInt_t i = 0; i < N_PSPX ; i++)
         {
+			
           if(i % 2 == 0 )
           {
             fh_pspx_cal_energy_frontback[i] =
@@ -817,10 +858,10 @@ InitStatus R3BOnlineSpectra::Init()
                          Form("Pspx %d Energy Back vs Front;Front Energy / arb.u.;Back Energy / arb.u.", i/2 + 1),
                          nbins,
                          0,
-                         Emax,
+                         Emax, 
                          nbins,
                          -Emax,
-                         0);
+                         0 );
           }
           else
           {
@@ -829,31 +870,21 @@ InitStatus R3BOnlineSpectra::Init()
                          Form("Pspx %d Energy Back vs Front;Front Energy / arb.u.;Back Energy / arb.u.", i/2 + 1),
                          nbins,
                          0,
-                         Emax/4,
+                         Emax,
                          nbins,
-                         -Emax/4,
+                         -Emax,
                          0);
           
           }
         }
-
-	/*fh_pspx_cal_energy_corr[i] =
-                new TH2F("pspx_%d_energy_corr",
-                         "Pspx %d Energy PSP2 vs. PSP3;PSP2 Energy / arb.u.;PSP3 Energy / arb.u.",
-                         nbins,
-                         0,
-                         Emax,
-                         nbins,
-                         0,
-                         Emax);
-*/
-
+        
         // Fill cPspx_comp with Cal level data
         for (UInt_t i = 0; i < N_PSPX; i++)
         {
+			
             cPspx_comp->cd(i + 1 + N_PSPX); //i*2
             fh_pspx_cal_energy_frontback[i]->Draw("colz");
-        }
+        } 
     }
 
     if (fHitItems.at(DET_PSPX))
@@ -865,27 +896,42 @@ InitStatus R3BOnlineSpectra::Init()
         {
             fh_pspx_hit_position[i] = new TH2F(Form("pspx_%d_position_cm", i),
                                                Form("Pspx %d Position;x Position / cm; y Position / cm", i + 1),
-                                               nbins,
-                                               -length / 4.,
-                                               length / 4.,
-                                               nbins,
-                                               -length / 4.,
-                                               length / 4.);
+                                               nbins*10,
+                                               -length / 2.,
+                                               length / 2.,
+                                               nbins*10,
+                                               -length / 2.,
+                                               length / 2.);
 
             fh_pspx_hit_energy[i] = new TH1F(
-                Form("pspx_%d_energy", i), Form("Pspx %d Energy;Energy / arb.u.; Counts", i + 1), nbins, -Emax, Emax);
+                Form("pspx_%d_energy", i), Form("Pspx %d Energy;Energy / arb.u.; Counts", i + 1), nbins*10, 0, 2*Emax);
+        
+           fh_pspx_hit_multi[i] = new TH2F(
+                Form("pspx_%d_multi", i), 
+                Form("Pspx %d Multi;x Multi ; y Multi", i + 1), 
+                20,
+                0,
+                20,
+                20,
+                0,
+                20);
+        
         }
 
         TCanvas* cPspx_hit = new TCanvas("Pspx_hit", "Pspx Hit", 10, 10, 1100, 1000);
-        cPspx_hit->Divide((N_PSPX + 1) / 2, 2);
+        cPspx_hit->Divide((N_PSPX + 1) / 2, 3);
 
         for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
         {
-            cPspx_hit->cd(i + 1);
+            cPspx_hit->cd(i + 1);gPad->SetLogz();
             fh_pspx_hit_position[i]->Draw("colz");
 
-            cPspx_hit->cd(i + 1 + (N_PSPX + 1) / 2);
+            cPspx_hit->cd(i + 1 + (N_PSPX + 1) / 2);gPad->SetLogy();
             fh_pspx_hit_energy[i]->Draw();
+            
+            cPspx_hit->cd(i + 1 + (N_PSPX + 1) / 2 + 3);gPad->SetLogz();
+            fh_pspx_hit_multi[i]->Draw("colz");
+            
         }
 
         run->AddObject(cPspx_hit);
@@ -919,11 +965,18 @@ void R3BOnlineSpectra::Reset_LOS_Histo()
     fh_los_tot_mean->Reset();
     fh_los_pos_MCFD->Reset();
     fh_los_pos_TAMEX->Reset();    
-    fh_los_dt_hits->Reset();
+    fh_los_dt_hits_ToT->Reset();
     fh_los_multihit->Reset();
     fh_los_ihit_ToT->Reset();
+    fh_los_dt_first_ToT->Reset();
 }
 
+void R3BOnlineSpectra::Reset_ROLU_Histo()
+{
+    fh_rolu_channels->Reset();
+    fh_rolu_tot->Reset();
+}		
+			
 void R3BOnlineSpectra::Reset_BMON_Histo()
 {
     fhTrigger->Reset();
@@ -1031,40 +1084,32 @@ void R3BOnlineSpectra::Exec(Option_t* option)
      time_start = time;
      fNEvents_start = fNEvents;
   }
-      Bool_t spectra_clear = false; 
-      Double_t xtime = double(time-time_start)/1.e9; 
-  // for reseting spectra	  
-	  Int_t icount = iclear_count*reset_time; // reset after reset_time (sec) 	 
-	  if(time_clear < 0. && int(xtime)%icount == 0 && xtime > 1.){
-		 time_clear = xtime;
-	     spectra_clear = true;
-	  }
+
+   time = header->GetTimeStamp(); 
+   //time = 0;
   
-  if(header->GetTrigger() == 12) time_spill_start =  header->GetTimeStamp();    // spill start in nsec   
-  if(header->GetTrigger() == 13)   time_spill_end =  header->GetTimeStamp();    // spill end  in nsec
+  if(time_start == 0 && time > 0){
+     time_start = time;
+     fNEvents_start = fNEvents;
+  }
+ 
+  
+  if(header->GetTrigger() == 12)   time_spill_start =  time; //header->GetTimeStamp();    // spill start in nsec
+  if(header->GetTrigger() == 13)   time_spill_end =  time; // header->GetTimeStamp();    // spill end  in nsec
   
   if(header->GetTrigger() == 12)   cout<<"Spill start: "<<double(time_spill_start-time_start)/1.e9<<" sec" <<endl;
   if(header->GetTrigger() == 13)   cout<<"Spill stop: "<<double(time_spill_end-time_start)/1.e9<<" sec" <<endl;
   
- if(fMappedItems.at(DET_BMON)){ 
   fhTrigger->Fill(header->GetTrigger());
- }
-  
- 
-//   check for requested trigger (Todo: should be done globablly / somewhere else)
+
   if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
-    return;   
+    return; 
     
-
-
-
- if(fMappedItems.at(DET_BMON)){ 
  Int_t tpatbin; 
  for(int i = 0; i < 16; i++){  
   tpatbin = (header->GetTpat() & (1 << i));
   if(tpatbin != 0) fhTpat->Fill(i+1);
  }  
-}
  
  // fTpat = 1-16; fTpat_bit = 0-15
  Int_t fTpat_bit = fTpat - 1; 
@@ -1075,14 +1120,23 @@ void R3BOnlineSpectra::Exec(Option_t* option)
    itpat = header->GetTpat(); 
    tpatvalue = (itpat && (1 << fTpat_bit)) >> fTpat_bit;
    if( (tpatvalue == 0)) return;
-  }
-  
-   
-  if(fMappedItems.at(DET_BMON)){
-  unsigned long IC ; 
-  unsigned long SEETRAM, SEETRAM_raw ;  
-  unsigned long TOFDOR ; 
+  }    
+     
  
+   
+  if(fMappedItems.at(DET_BMON)){      
+	  
+	  Bool_t spectra_clear = false; 
+      Double_t xtime = double(time-time_start)/1.e9; 
+  // for reseting spectra	  
+	  Int_t icount = iclear_count*reset_time; // reset after reset_time (sec) 	 
+	  if(time_clear < 0. && int(xtime)%icount == 0 && xtime > 1.){
+		 time_clear = xtime;
+	     spectra_clear = true;
+	  }
+  unsigned long IC ; 
+  unsigned long SEETRAM ;  
+  unsigned long TOFDOR ; 
   Bool_t bmon_read = false;
   	
 	auto det = fMappedItems.at(DET_BMON);
@@ -1094,9 +1148,11 @@ void R3BOnlineSpectra::Exec(Option_t* option)
       if (!hit) continue;
 
       IC = hit->GetIC(); // negative values if offset not high enough
-      SEETRAM_raw = hit->GetSEETRAM();  // raw counts
+      SEETRAM = hit->GetSEETRAM();  // negative values if offset not high enough
       TOFDOR = hit->GetTOFDOR(); // only positive values possible
-      SEETRAM = SEETRAM_raw * calib_SEE; // calibrated SEETRAM counts
+      
+      
+ //     unsigned long long time = header->GetTimeStamp();
       
       if(fNEvents == fNEvents_start ) {
           see_mem = SEETRAM;
@@ -1110,9 +1166,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
        }  
        
       if( time > 0 ){	  
- 	       
- 	      // cout<<SEETRAM_raw<<"; "<<see_offset<<"; "<<calib_SEE<<", "<<SEETRAM<<", "<<see_mem<<endl;
- 	       
+
       fh_spill_length->Fill((time-time_mem)/1e9); 
       
   // Spectra below are filled every read_time (secs)
@@ -1136,6 +1190,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
    // SEETRAM:   
       Int_t ySEE = SEETRAM-see_start;    
       fh_SEE->Fill(tdiff,ySEE);
+
       Double_t ySEE_part = (SEETRAM-see_mem)*fNorm*1.e+3-see_offset*calib_SEE;
       fh_SEE_spill->Fill(tdiff,ySEE_part);
       see_mem = SEETRAM; 
@@ -1174,6 +1229,91 @@ void R3BOnlineSpectra::Exec(Option_t* option)
     }
 
  }
+
+// **************   ROLU *************************************
+  
+  if(fMappedItems.at(DET_ROLU))
+  {
+    auto det = fMappedItems.at(DET_ROLU);
+    Int_t nHits = det->GetEntriesFast();
+
+    for (Int_t ihit = 0; ihit < nHits; ihit++)
+    {
+      R3BRoluMappedData* hit = (R3BRoluMappedData*)det->At(ihit);
+      if (!hit) continue;
+
+      // channel numbers are stored 1-based (1..n)
+      Int_t iDet = hit->GetDetector(); // 1..
+      Int_t iCha = hit->GetChannel();  // 1..
+      
+      if(iDet < 2) fh_rolu_channels->Fill(iCha);	// ROLU 1
+      if(iDet > 1) fh_rolu_channels->Fill(iCha+4);	// ROLU 2			         
+    }
+  }
+
+  Int_t nParts;   
+  if(fCalItems.at(DET_ROLU))
+  {
+
+    auto det = fCalItems.at(DET_ROLU);
+    nParts = det->GetEntriesFast(); 
+  
+    if(nParts < 1) return;
+  
+    Int_t iDet = 0;   
+    Double_t timeRolu_L[nParts][2][4] = {0.0/0.0};
+    Double_t timeRolu_T[nParts][2][4] = {0.0/0.0};
+    Double_t totRolu[nParts][2][4] = {0.0/0.0};
+    
+    for (Int_t iPart = 0; iPart < nParts; iPart++) 
+   {
+      /* 
+       * nParts is the number of particle passing through detector in one event
+       */ 
+      R3BRoluCalData *calData = (R3BRoluCalData*)det->At(iPart);
+      iDet=calData->GetDetector();
+           
+     for(Int_t iCha = 0; iCha < 4; iCha++){
+	  	  
+	  if(!(IS_NAN(calData->GetTimeL_ns(iCha)))){   // TAMEX leading
+		timeRolu_L[iPart][iDet-1][iCha]=calData->GetTimeL_ns(iCha);
+	  }	
+	  if(!(IS_NAN(calData->GetTimeT_ns(iCha)))){   // TAMEX trailing
+		timeRolu_T[iPart][iDet-1][iCha]=calData->GetTimeT_ns(iCha); 
+	  }
+	  
+	//  cout<<"ROLU: "<<iPart<<", "<<iCha<<"; "<<timeRolu_L[iPart][iCha]<<", "<<timeRolu_T[iPart][iCha]<<endl;
+      
+              
+      if(timeRolu_T[iPart][iDet-1][iCha] > 0. &&  timeRolu_L[iPart][iDet-1][iCha] > 0. && !(IS_NAN(timeRolu_T[iPart][iDet-1][iCha])) && 
+	       !(IS_NAN(timeRolu_L[iPart][iDet-1][iCha]))) 
+	    {     
+	      while(timeRolu_T[iPart][iDet-1][iCha] - timeRolu_L[iPart][iDet-1][iCha] <= 0.) 
+	      {
+		    timeRolu_T[iPart][iDet-1][iCha] = timeRolu_T[iPart][iDet-1][iCha] + 2048.*fClockFreq; 
+	      }
+
+
+	      totRolu[iPart][iDet-1][iCha] = timeRolu_T[iPart][iDet-1][iCha] - timeRolu_L[iPart][iDet-1][iCha];
+	      
+	      
+	    }
+
+	    if(iDet > 1) cout<<iCha<<"; "<<totRolu[iPart][iDet-1][iCha]<<endl;     
+	   if(iDet < 2) fh_rolu_tot->Fill(iCha+1,totRolu[iPart][iDet-1][iCha]);
+	   if(iDet > 1) fh_rolu_tot->Fill(iCha+5,totRolu[iPart][iDet-1][iCha]);
+     }
+     
+     if (!calData) 
+         {
+		   cout<<"Rolu !calData"<<endl;	 
+           continue; // can this happen?
+         }
+    } 
+        
+  }	
+
+
    
    //----------------------------------------------------------------------
   // LOS detector
@@ -1260,6 +1400,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 	  if(!(IS_NAN(calData->GetTimeL_ns(iCha)))){   // TAMEX leading
 		time_L[iPart][iCha]=calData->GetTimeL_ns(iCha);
 	  }	
+	   
 	  time_T[iPart][iCha] = 0./0.;
 	  if(!(IS_NAN(calData->GetTimeT_ns(iCha)))){   // TAMEX trailing
 		time_T[iPart][iCha]=calData->GetTimeT_ns(iCha); 
@@ -1286,9 +1427,9 @@ void R3BOnlineSpectra::Exec(Option_t* option)
                 :  ((rhs[0] < lhs[0]) ? 1 : 0);
         });
 // End sorting      
-    double_t time_first=-1.;
-    double_t time1=-1.;
-    
+     
+    signed long long time_first = -1;  
+
     for (Int_t iPart = 0; iPart < nPart; iPart++)     
     {
 		   
@@ -1337,7 +1478,8 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 	  for(int ipm=0; ipm<8; ipm++)
 	  { 
 		  		  	  
-		tot[iPart][ipm] = 0./0.;      
+		tot[iPart][ipm] = 0./0.;  
+			    
 	    if(time_T[iPart][ipm] > 0. &&  time_L[iPart][ipm] > 0. && !(IS_NAN(time_T[iPart][ipm])) && !(IS_NAN(time_L[iPart][ipm]))) 
 	    {     
 	      while(time_T[iPart][ipm] - time_L[iPart][ipm] <= 0.) 
@@ -1399,40 +1541,23 @@ void R3BOnlineSpectra::Exec(Option_t* option)
       xToT_cm[iPart] = (xToT_cm[iPart]-flosOffsetXQ)*flosVeffXQ;
       yToT_cm[iPart] = (yToT_cm[iPart]-flosOffsetYQ)*flosVeffYQ;
 	 	 
-  
-     if(nPMV == 8 && nPMT == 8 ){
+          
+     if(1 == 1){ 
 		 
      fh_los_tot_mean->Fill(totsum[iPart]);
      
-     if(time_first<0) time_first=timeLosM[iPart];
-     if(iPart < 1 ) {
-			Double_t timediff=float(header->GetTimeStamp()-time_V_mem);
-			fh_los_dt_first_ToT->Fill(timediff/1.e3,totsum[iPart]);
-	 }			 
-	 
-     
-     
-     double_t time2=0.;
-     if (time1<0 ) time1 = timeLosM[iPart];
-     time2 = timeLosM[iPart] ;
-     if(time1>0. && time2>0. && time2>time1){
-//        cout<<"Time Test "<<time1<< "   "<< time2 <<"  " <<endl;
-		fh_los_dt_hits->Fill(time2-time1);
-            time1=time2;
-     }
-     
-     
-	 fh_los_dt_hits_ToT->Fill((header->GetTimeStamp()-time_V_mem+timeLosM[iPart]-time_first)/1000.,totsum[iPart]);
-	 time_V_mem= header->GetTimeStamp()+timeLosM[iPart]-time_first;
-     
+
+     if(time_first < 0) time_first = timeLosM[iPart];
+     Double_t timediff = time+(timeLosM[iPart]-time_first) - time_V_mem;
+     if(iPart < 1) fh_los_dt_first_ToT->Fill(timediff/1.e3,totsum[iPart]);
+     if(iPart == nPart-1) time_V_mem = time+timeLosM[iPart]-time_first;
+     if(iPart > 0) fh_los_dt_hits_ToT->Fill((timeLosM[iPart]-timeLosM[iPart-1])/1.e3,totsum[iPart]);
 
       for(int ipm=0; ipm<8; ipm++)
 	  {
 	    fh_los_tot->Fill(ipm+1,tot[iPart][ipm]);
-	    	    	
-	      
-	   }
-	     
+	    	    		      
+	   }   
       	  	 		 
 	  fh_los_tres_MCFD->Fill(LosTresM[iPart]);
 	  fh_los_tres_TAMEX->Fill(LosTresT[iPart]);
@@ -1444,9 +1569,6 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 	 
      }  
 	}     
-
-//     if(iPart == nPart-1)  time_V_mem = header->GetTimeStamp();  // memorize time of the last hit
-
       } 
       else 
       {
@@ -1789,7 +1911,9 @@ void R3BOnlineSpectra::Exec(Option_t* option)
                     }
                     
                     if(ifibcount==4 || ifibcount==5 ){
+
                         fh_ToT_single_Fib[ifibcount]->Fill((iFib-1)%2+1,hit->GetSPMTToT_ns());
+
                     }
                 }  
             }  // end for(ihit)
@@ -2223,16 +2347,20 @@ void R3BOnlineSpectra::Exec(Option_t* option)
                 
                 //std::cout << "x: " << mult_x[i] << ", " << (channel_x[i][0]+1)/2 << endl;
                 //std::cout << "y: " << mult_y[i] << ", " << -((int)channel_y[i][0]+1)/2 + 3 * N_STRIPS_PSPX + 1<< endl;
-                
-            for (Int_t j = 0; j < mult_x[i]; j++)
+          
+           for (Int_t j = 0; j < mult_x[i]; j++)
             {
                 fh_pspx_channel_x[i]->Fill(channel_x[i][j]);
+                
             }
 
             for (Int_t j = 0; j < mult_y[i]; j++)
             {
                 fh_pspx_channel_y[i]->Fill(channel_y[i][j]);
+                   
             }
+            
+            
         }
     }
 
@@ -2240,11 +2368,16 @@ void R3BOnlineSpectra::Exec(Option_t* option)
     {
         Int_t energy_front[N_PSPX];
         Int_t energy_back[N_PSPX];
+        Int_t mult_front[N_PSPX] ;
+        Int_t mult_back[N_PSPX] ;
+        Int_t num_strip[50][N_PSPX];
 
         for (UInt_t i = 0; i < N_PSPX; i++)
         {
             energy_front[i] = 0;
             energy_back[i] = 0;
+            mult_front[i] = 0;
+            mult_back[i] = 0;
         }
 
         Int_t nHits = fCalItems.at(DET_PSPX)->GetEntriesFast();
@@ -2254,33 +2387,51 @@ void R3BOnlineSpectra::Exec(Option_t* option)
             for (UInt_t i = 0; i < N_PSPX; i++)
             {
                 R3BPspxCalData* calData = (R3BPspxCalData*)fCalItems.at(DET_PSPX)->At(ihit);
+                
+                num_strip[ihit][i] = calData->GetStrip();
+                
                 if (calData->GetDetector() == i + 1 && calData->GetStrip() > N_STRIPS_PSPX &&
                     calData->GetStrip() < N_STRIPS_PSPX * 2 + 1)
                 {
                     energy_back[i] += (calData->GetEnergy1() + calData->GetEnergy2());
+                    mult_back[i]++;
                 }
                 else if (calData->GetDetector() == i + 1 && calData->GetStrip() > 0 &&
                          calData->GetStrip() < N_STRIPS_PSPX + 1)
                 {
                     energy_front[i] += (calData->GetEnergy1() + calData->GetEnergy2());
+                    mult_front[i]++;
                 }
+            
+       //     cout<<"Num strips: "<<nHits<<", "<<ihit<<", "<<i<<", "<<calData->GetStrip()<<", "<<energy_back[i]<<endl;
+            
             }
         }
+        
+      // if(mult_front[1] > 0) cout<<"PSPx mult: "<<num_strip[0]<<"; "<<num_strip[1]<<endl;
+   // Interstrip position of PSP1
+       if ( ((mult_back[0] == 2 && mult_front[0] == 1) && abs(energy_back[0]) < 380000 ) || 
+            ((mult_back[0] == 1 && mult_front[0] == 2) && abs(energy_front[0])< 380000 )) {
+		 
+	     
+        }
+        
 
         for (UInt_t i = 0; i < N_PSPX; i++)
         {
-            // LOG(INFO) << "Test " << i << " " << energy_front[i] << " " << energy_back[i];
+
           if (i !=2 && i !=3)
           {
             fh_pspx_cal_energy_frontback[i]->Fill(energy_front[i], energy_back[i]);
           }
           else
           {
-            fh_pspx_cal_energy_frontback[i]->Fill(-energy_front[i], -energy_back[i]); //s444: psp 2 is read out with Munich cards, inverts polarity
+            fh_pspx_cal_energy_frontback[i]->Fill(-energy_front[i], -energy_back[i]); 
           }
+           
         }
     }
-
+    Int_t etrue[3];
     if (fHitItems.at(DET_PSPX))
     {
         Int_t nHits = fHitItems.at(DET_PSPX)->GetEntriesFast();
@@ -2291,10 +2442,31 @@ void R3BOnlineSpectra::Exec(Option_t* option)
             {
                 R3BPspxHitData* hitData = (R3BPspxHitData*)fHitItems.at(DET_PSPX)->At(ihit);
 
-                if (hitData->GetDetector() == i * 2 + 1)
+                if (hitData->GetDetector() == i * 2 + 1 )
                 {
-                    fh_pspx_hit_energy[i]->Fill(hitData->GetEnergy());
+					etrue[i] = 0;
+                    if (i == 0 && hitData->GetEnergy() >  250000 && hitData->GetEnergy() < 271000 ) etrue[0] = 1;
+                    if (i == 1 && hitData->GetEnergy() >  380000 && hitData->GetEnergy() < 405000 ) etrue[1] = 1;
+                    if (i == 2 && hitData->GetEnergy() >  380000 && hitData->GetEnergy() < 405000 ) etrue[2] = 1;
+					
+				  etrue[i] = 1;
+				  if(etrue[i] == 1){	
+                    fh_pspx_hit_multi[i]->Fill(hitData->GetXMultiplicity(),hitData->GetYMultiplicity());
+                    fh_pspx_hit_energy[i]->Fill(hitData->GetEnergy());    
+                    
+                  if((hitData->GetXMultiplicity() == 4 && hitData->GetYMultiplicity() == 2) || 
+                   (hitData->GetXMultiplicity() == 2 && hitData->GetYMultiplicity() == 4)){
+						 
                     fh_pspx_hit_position[i]->Fill(hitData->GetX(), hitData->GetY());
+                    
+                   /*if(hitData->GetDetector() == 1 ){//&& hitData->GetX() > -5 && hitData->GetX() < 5){ 
+ 	                
+	                fh_los_pos_MCFD->Fill(xV_cm[0],yV_cm[0]);
+	                fh_los_pos_TAMEX->Fill(xT_cm[0],yT_cm[0]);   
+	                fh_los_pos_ToT->Fill(xToT_cm[0],yToT_cm[0]);
+	               }*/
+	              }
+			     } 
                 }
             }
         }
@@ -2322,7 +2494,13 @@ void R3BOnlineSpectra::FinishEvent()
 
 void R3BOnlineSpectra::FinishTask()
 {    
-	
+
+ 
+ if(fMappedItems.at(DET_ROLU)){
+    fh_rolu_channels->Write();
+    fh_rolu_tot->Write();
+  }
+  
   if(fMappedItems.at(DET_LOS)){
     fh_los_channels->Write();
     fh_los_tot->Write();
@@ -2341,7 +2519,6 @@ void R3BOnlineSpectra::FinishTask()
     fh_IC_spill->Write();
     fh_SEE_spill->Write();
     fh_TOFDOR_spill->Write();
-    
 }  
 
   if(fCalItems.at(DET_TOFD))
