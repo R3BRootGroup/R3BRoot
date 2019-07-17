@@ -31,8 +31,8 @@
 #define IS_NAN(x) TMath::IsNaN(x)
 
 namespace {
-  double const c_acceptance_ns = 200;
-}
+  double const c_range_ns = 2048 * 5;
+};
 
 R3BTofdMapped2Cal::R3BTofdMapped2Cal()
   : FairTask("R3BTofdMapped2Cal", 1)
@@ -72,8 +72,9 @@ R3BTofdMapped2Cal::~R3BTofdMapped2Cal()
 size_t R3BTofdMapped2Cal::GetCalLookupIndex(R3BTofdMappedData const &a_mapped)
   const
 {
-  size_t i = (a_mapped.GetDetectorId() - 1) * fPaddlesPerPlane +
-      (a_mapped.GetBarId() - 1);
+  size_t i = ((a_mapped.GetDetectorId() - 1) * fPaddlesPerPlane +
+      (a_mapped.GetBarId() - 1)) * 2 +
+      (a_mapped.GetSideId() - 1);
       
   //  cout<<i<<";"<<fCalLookup.size()<<"; "<<a_mapped.GetDetectorId()<<"; "<<a_mapped.GetBarId()<<endl   ;   
       
@@ -137,6 +138,17 @@ void R3BTofdMapped2Cal::Exec(Option_t *option)
   }
 
   Int_t mapped_num = fMappedItems->GetEntriesFast();
+
+  // Calibrate time to nanoseconds.
+  struct Cal {
+    Cal(R3BTofdMappedData const *a_mapped, double a_time_ns):
+      mapped(a_mapped),
+      time_ns(a_time_ns)
+    {}
+    R3BTofdMappedData const *mapped;
+    double time_ns;
+  };
+  std::vector<std::vector<Cal>> cal_vec(fNofPlanes * fPaddlesPerPlane * 2);
   for (Int_t mapped_i = 0; mapped_i < mapped_num; mapped_i++) {
     auto mapped = (R3BTofdMappedData const *)fMappedItems->At(mapped_i);
 
@@ -167,27 +179,53 @@ void R3BTofdMapped2Cal::Exec(Option_t *option)
     // ... and subtract it from the next clock cycle.
     time_ns = (mapped->GetTimeCoarse() + 1) * fClockFreq - time_ns;
 
-    R3BTofdCalData *cal = nullptr;
-    size_t i = mapped->GetSideId() * 2 + mapped->GetEdgeId() - 3;
+    auto &entry = cal_vec.at(((mapped->GetDetectorId() - 1) * fPaddlesPerPlane + mapped->GetBarId() - 1) * 2 + mapped->GetSideId() - 1);
+    entry.push_back(Cal(mapped, time_ns));
+  }
 
-    // Look for coincident CalDatum.
-    auto idx = GetCalLookupIndex(*mapped);
-    auto &vec = fCalLookup.at(idx);
-    for (auto it = vec.begin(); vec.end() != it; ++it) {
-      cal = *it;
-      assert(cal->GetDetectorId() == mapped->GetDetectorId());
-      assert(cal->GetBarId() == mapped->GetBarId());
-
-      if (cal->SetTime_ns(i, time_ns, c_acceptance_ns)) {
+  // Iterate through calibrated times and match leading/trailing pairs.
+  // Note that the reader saves all leading edges first, then appends the trailing.
+  //
+  // TODO: This algo would not properly handle e.g. double leading before a trailing,
+  //       should be fixed to be future proof!
+  //
+  for (auto it = cal_vec.begin(); cal_vec.end() != it; ++it) {
+    auto &ch = *it;
+    if (ch.empty()) continue;
+//for (auto it2 = ch.begin(); ch.end() != it2; ++it2) {
+//std::cout << it2->mapped->GetEdgeId() << ": " << it2->time_ns << '\n';
+//}
+    size_t lead_i = 0;
+    size_t trail_i;
+    for (trail_i = 0; trail_i < ch.size() && 2 != ch.at(trail_i).mapped->GetEdgeId(); ++trail_i);
+//std::cout << "Trail=" << trail_i << '\n';
+    for (;;) {
+      for (; trail_i < ch.size(); ++trail_i) {
+        auto dt = ch.at(trail_i).time_ns - ch.at(lead_i).time_ns;
+        if (dt < -c_range_ns/2) {
+          // Wrap-around.
+          break;
+        }
+        if (dt > c_range_ns/2) {
+          //std::cout << lead_i << ' ' << trail_i << ": " << ch.at(lead_i).time_ns << ' ' <<  ch.at(trail_i).time_ns << '\n';
+          // Missing leading edge with wrap-around at the same time.
+          continue;
+        }
+        if (dt > 0) {
+          break;
+        }
+      }
+      if (trail_i == ch.size() || 1 != ch.at(lead_i).mapped->GetEdgeId()) {
         break;
       }
-    }
-    if (!cal) {
-      // Nothing coincident found, make a new datum.
-      cal = new ((*fCalItems)[fNofCalItems++])
-          R3BTofdCalData(mapped->GetDetectorId(), mapped->GetBarId());
-      cal->SetTime_ns(i, time_ns, c_acceptance_ns);
-      fCalLookup.at(idx).push_back(cal);
+
+      auto lead = ch.at(lead_i).mapped;
+      auto cal = new ((*fCalItems)[fNofCalItems++])
+        R3BTofdCalData(lead->GetDetectorId(), lead->GetBarId(), lead->GetSideId(),
+            ch.at(lead_i).time_ns, ch.at(trail_i).time_ns);
+
+      ++lead_i;
+      ++trail_i;
     }
   }
 }
@@ -208,8 +246,9 @@ void R3BTofdMapped2Cal::SetNofModules(Int_t planes, Int_t ppp)
 {
   fNofPlanes       = planes;
   fPaddlesPerPlane = ppp;
-  // #planes * #bars, each entry is a full bar, i.e. merged sides + edges.
-  fCalLookup.resize(planes * ppp);
+  // #planes * #bars * 2, each entry pair is a full bar, i.e. merged sides +
+  // edges.
+  fCalLookup.resize(planes * ppp * 2);
 }
 
 ClassImp(R3BTofdMapped2Cal)

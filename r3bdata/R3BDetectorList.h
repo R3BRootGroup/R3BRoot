@@ -81,6 +81,8 @@ enum fDetectorType
     kFI5Point,
     kFI10Point,
     kFI11Point,
+    kFI12Point,
+    kFI13Point,
     kSFIPoint
 #ifdef SOFIA
     ,kSOFSCIPoint

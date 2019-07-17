@@ -93,14 +93,14 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
   // ToT MAPMT:  
   chistName=fName+"_ToT_MAPMT";
   chistTitle=fName+" ToT of fibers";
-  fh_ToT_MA_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 2100, 0., 2100., 400, 0., 200.);   	   
+  fh_ToT_MA_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 2100, 0., 2100., 200, 0., 200.);   	   
   fh_ToT_MA_Fib->GetXaxis()->SetTitle("Fiber number");
   fh_ToT_MA_Fib->GetYaxis()->SetTitle("ToT / ns");
 
   // ToT single PMT:  
   chistName=fName+"_ToT_SAPMT";
   chistTitle=fName+" ToT of fibers";
-  fh_ToT_Single_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 2100, 0., 2100., 400, 0., 200.);   	   
+  fh_ToT_Single_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 2100, 0., 2100., 200, 0., 200.);   	   
   fh_ToT_Single_Fib->GetXaxis()->SetTitle("Fiber number");
   fh_ToT_Single_Fib->GetYaxis()->SetTitle("ToT / ns");
 
@@ -110,7 +110,7 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     sprintf(number, "%d", i);
     chistName=fName+"_ToT_SAPMT"+number;
     chistTitle=fName+" ToT of single PMTs "+number;
-    fh_ToT_s_Fib[i] = new TH2F(chistName.Data(), chistTitle.Data(), 2100, 0., 2100., 400, 0., 200.);   	   
+    fh_ToT_s_Fib[i] = new TH2F(chistName.Data(), chistTitle.Data(), 2100, 0., 2100., 200, 0., 200.);   	   
     fh_ToT_s_Fib[i]->GetXaxis()->SetTitle("Fiber number");
     fh_ToT_s_Fib[i]->GetYaxis()->SetTitle("ToT / ns");
   }
@@ -360,7 +360,7 @@ void R3BBunchedFiberCal2Hit::FinishTask()
         if(j==2){
           // could not find maximum
         }
-        if(proj->GetBinContent(j)>10 ){
+        if(proj->GetBinContent(j)>proj->GetMaximum()/10. ){
           R3BBunchedFiberHitModulePar* par = fCalPar->GetModuleParAt(i);
                   par->SetGainMA(proj->GetBinCenter(j));
           //        cout<<"MA fiber: "<< i<<" par: "<<proj->GetBinCenter(j)<<endl;
@@ -378,7 +378,7 @@ void R3BBunchedFiberCal2Hit::FinishTask()
           // could not find maximum
         }
 
-        if(proj->GetBinContent(j)>10 ){
+        if(proj->GetBinContent(j)>proj->GetMaximum()/10. ){
           R3BBunchedFiberHitModulePar* par = fCalPar->GetModuleParAt(i);
                   par->SetGainS(proj->GetBinCenter(j));
           //      cout<<"S fiber: "<< i<<" par: "<<proj->GetBinCenter(j)<<endl;

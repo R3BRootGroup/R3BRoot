@@ -297,7 +297,7 @@ R3BFibPoint* R3BFi11::AddHit(Int_t trackID,
 Bool_t R3BFi11::CheckIfSensitive(std::string name)
 {
 	//printf("FI11 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> %s\n", name.c_str());
-    if (TString(name).Contains("FI111Log") )
+    if (TString(name).Contains("FI11LogActive") )
     {
         return kTRUE;
     }

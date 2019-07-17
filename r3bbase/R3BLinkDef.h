@@ -9,5 +9,6 @@
 #pragma link C++ class R3BEventHeader+;
 #pragma link C++ class R3BOnlineSpectra+;
 #pragma link C++ class R3BGlobalAnalysis+;
+#pragma link C++ class R3BGlobalAnalysisS454+;
 
 #endif

@@ -79,7 +79,7 @@ void R3BFi10::SetSpecialPhysicsCuts()
     if (gGeoManager)
     {
         TGeoMedium* pSi = gGeoManager->GetMedium("silicon");
-        if (pSi)
+        if (kFALSE)
         {
             // Setting processes for Si only
             gMC->Gstpar(pSi->GetId(), "LOSS", 3);
@@ -141,6 +141,7 @@ Bool_t R3BFi10::ProcessHits(FairVolume* vol)
     // Sum energy loss for all steps in the active volume
     fELoss += gMC->Edep();
 
+    
     // Set additional parameters at exit of active volume. Create R3BFi10Point.
     if (gMC->IsTrackExiting() || gMC->IsTrackStop() || gMC->IsTrackDisappeared())
     {
@@ -148,13 +149,14 @@ Bool_t R3BFi10::ProcessHits(FairVolume* vol)
         fVolumeID = vol-> getMotherCopyNo();	
         gMC->TrackPosition(fPosOut);
         gMC->TrackMomentum(fMomOut);
-        if (fELoss == 0.)
-            return kFALSE;
+        //if (fELoss == 0.)
+        //    return kFALSE;
 
         fTime_out = gMC->TrackTime() * 1.0e09; // also in case particle is stopped in detector, or decays...
         fLength_out = gMC->TrackLength();
         fTime = (fTime_out + fTime_in) / 2.;
         fLength = (fLength_out + fLength_in) / 2.;
+
 
         if (gMC->IsTrackExiting())
         {
@@ -187,6 +189,7 @@ Bool_t R3BFi10::ProcessHits(FairVolume* vol)
             fPosOut.SetX(newpos[0]);
             fPosOut.SetY(newpos[1]);
             fPosOut.SetZ(newpos[2]);
+
         }
 
         AddHit(fTrackID,
@@ -297,7 +300,7 @@ R3BFibPoint* R3BFi10::AddHit(Int_t trackID,
 
 Bool_t R3BFi10::CheckIfSensitive(std::string name)
 {
-    if (TString(name).Contains("FI101Log") )
+    if (TString(name).Contains("FI10LogActive") )
     {
         return kTRUE;
     }

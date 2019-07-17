@@ -1,5 +1,5 @@
 // ------------------------------------------------------------
-// -----                  R3BGlobalAnalysis                -----
+// -----                  R3BGlobalAnalysisS454                -----
 // -----          Created April 13th 2016 by M.Heil       -----
 // ------------------------------------------------------------
 
@@ -13,7 +13,7 @@
 #include "R3BLosMappedData.h"
 #include "R3BLosHitData.h"
 
-#include "R3BGlobalAnalysis.h"
+#include "R3BGlobalAnalysisS454.h"
 
 #include "R3BSci8CalData.h"
 #include "R3BSci8MappedData.h"
@@ -57,13 +57,14 @@
 #define IS_NAN(x) TMath::IsNaN(x)
 using namespace std;
 
-R3BGlobalAnalysis::R3BGlobalAnalysis()
-    : R3BGlobalAnalysis("GlobalAnalysis", 1)
+R3BGlobalAnalysisS454::R3BGlobalAnalysisS454()
+    : R3BGlobalAnalysisS454("GlobalAnalysis", 1)
 {}
 
-R3BGlobalAnalysis::R3BGlobalAnalysis(const char* name, Int_t iVerbose)
+R3BGlobalAnalysisS454::R3BGlobalAnalysisS454(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fTrigger(-1)
+    , fTpat(-1)
     , fNofPlanes(N_PLANE_MAX_TOFD)  
     , fPaddlesPerPlane(N_PADDLE_MAX_TOFD) 
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
@@ -72,7 +73,7 @@ R3BGlobalAnalysis::R3BGlobalAnalysis(const char* name, Int_t iVerbose)
 {
 }
 
-R3BGlobalAnalysis::~R3BGlobalAnalysis()
+R3BGlobalAnalysisS454::~R3BGlobalAnalysisS454()
 {
    for(int i = 0; i < NOF_FIB_DET; i++) {   
      delete fh_channels_Fib[i];
@@ -89,14 +90,14 @@ R3BGlobalAnalysis::~R3BGlobalAnalysis()
    } 
 }
 
-InitStatus R3BGlobalAnalysis::Init()
+InitStatus R3BGlobalAnalysisS454::Init()
 {
 
     // Initialize random number:
     std::srand(std::time(0)); //use current time as seed for random generator
 
 
-    LOG(INFO) << "R3BGlobalAnalysis::Init " << FairLogger::endl;
+    LOG(INFO) << "R3BGlobalAnalysisS454::Init " << FairLogger::endl;
 
     // try to get a handle on the EventHeader. EventHeader may not be 
     // present though and hence may be null. Take care when using.
@@ -106,6 +107,9 @@ InitStatus R3BGlobalAnalysis::Init()
         LOG(fatal) << "FairRootManager not found";
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     FairRunOnline *run = FairRunOnline::Instance();
+
+		fhTpat = new TH1F("Tpat", "Tpat", 20, 0, 20);
+        fhTpat->GetXaxis()->SetTitle("Tpat value");
 
         // Get objects for detectors on all levels
         assert(DET_MAX + 1 == sizeof(fDetectorNames)/sizeof(fDetectorNames[0]));
@@ -222,7 +226,7 @@ InitStatus R3BGlobalAnalysis::Init()
             fh_multihit_s_Fib[ifibcount]->GetYaxis()->SetTitle("Multihit");
 
             // ToT MAPMT:  
-			fh_ToT_m_Fib[ifibcount] = new TH2F(Form("%s_tot_m",detName), Form("%s ToT of MAPMT",detName), N_FIBER_PLOT, 0., N_FIBER_PLOT, 400, 0., 200.);   	   
+			fh_ToT_m_Fib[ifibcount] = new TH2F(Form("%s_tot_m",detName), Form("%s ToT of MAPMT",detName), N_FIBER_PLOT, 0., N_FIBER_PLOT, 400, 0., 400.);   	   
             fh_ToT_m_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
             fh_ToT_m_Fib[ifibcount]->GetYaxis()->SetTitle("ToT / ns");
 
@@ -410,7 +414,7 @@ InitStatus R3BGlobalAnalysis::Init()
 }
 
 
-void R3BGlobalAnalysis::Exec(Option_t* option)
+void R3BGlobalAnalysisS454::Exec(Option_t* option)
 {
     if(fNEvents/1000000.==(int)fNEvents/1000000) cout<<"Events: "<<fNEvents<<flush<<'\r';
 
@@ -421,6 +425,23 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
     // check for requested trigger (Todo: should be done globablly / somewhere else)
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
     return;
+
+	Int_t tpatbin; 
+	for(int i = 0; i < 16; i++){  
+		tpatbin = (header->GetTpat() & (1 << i));
+		if(tpatbin != 0) fhTpat->Fill(i+1);
+	}  
+ 
+	// fTpat = 1-16; fTpat_bit = 0-15
+	Int_t fTpat_bit = fTpat - 1; 
+	Int_t itpat;
+	Int_t tpatvalue;
+	if(fTpat_bit >= 0) {                    
+		itpat = header->GetTpat(); 
+		tpatvalue = (itpat && (1 << fTpat_bit)) >> fTpat_bit;
+		if( (tpatvalue == 0)) return;
+	}
+ 
 
     //----------------------------------------------------------------------
     // LOS detector
@@ -455,7 +476,7 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
     Double_t qTofd[16] = {0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.};
     Double_t TofdQ=0.;
     Double_t TofdX=0.;
-
+	Double_t timeTofd0=0;
 
     if(fHitItems.at(DET_TOFD))
     {
@@ -480,10 +501,12 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
             xTofd[ihit] = hit->GetX();
             yTofd[ihit] = hit->GetY();
             qTofd[ihit] = hit->GetEloss();
-            if(qTofd[ihit] > TofdQ) {
-				TofdQ = qTofd[ihit];
+            if(qTofd[ihit] > 1 && qTofd[ihit] < 4) {
+				TofdQ = 2.;
 				TofdX = xTofd[ihit];
+				timeTofd0 = timeTofd[ihit];
 			}
+			
 //		    cout<<"ToFD: "<<ihit<<" x: "<< xTofd[ihit] << " y: " << yTofd[ihit] 
 //		        << " q: "<< qTofd[ihit] << " t: "<< timeTofd[ihit] << endl;
 
@@ -595,9 +618,9 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
             Double_t mapmtMax;
             Double_t tofMax;
             Double_t y;
-            Double_t tof[14] = {0.,0.,0.,0.,60.,60.,0.,0.,0.,140.,140.,0.,140.,140.};
-            Double_t z[14] = {-51.,-49.,0.,0.,45.,50.,0.,0.,0.,700.,670.,0.,630.,600.};
-            Double_t x[14] = {0.,0.,0.,0.,0.,0.,0.,0.,0.,-200.,-180.,0.,-150.,-130.};
+            Double_t tof[16] = {0.,0.,0.,0.,-20.,-20.,0.,0.,0.,0.,0.,0.,85.,60.,80.,65.};
+            Double_t z[16] = {-51.,-49.,0.,0.,45.,50.,0.,0.,0.,0.,0.,0.,700.,670.,630.,600.};
+            Double_t x[16] = {0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,-200.,-180.,-150.,-130.};
     
     
             if(counter==0 && nHits>0){
@@ -636,14 +659,14 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
                 }           
         
                 // "Push" the Fib times in the same cycle with Tofd:
-                if(timeTofd[0]>0. && !(IS_NAN(timeTofd[0])))
+                if(timeTofd0>0. && !(IS_NAN(timeTofd0)))
                 {
-                    while(tSPMT - timeTofd[0] < -1024.)
+                    while(tSPMT - timeTofd0 < -1024.)
                     {
                         tMAPMT = tMAPMT + 2048.; 
                         tSPMT = tSPMT + 2048.;         
                     }       
-                    while(tSPMT - timeTofd[0] > 1024.)
+                    while(tSPMT - timeTofd0 > 1024.)
                     {
                         tMAPMT = tMAPMT - 2048.; 
                         tSPMT = tSPMT - 2048.;         
@@ -660,8 +683,8 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
                 // Not-calibrated ToF:   
         //      tfib = (tMAPMT + tSPMT) / 2.;
                 tfib = tSPMT;
-                if(tfib > 0. && !(IS_NAN(tfib)) && timeTofd[0]>0. && !(IS_NAN(timeTofd[0]))) tof_fib_s = tfib - timeTofd[0];   
-                if(tMAPMT > 0. && !(IS_NAN(tMAPMT)) && timeTofd[0]>0. && !(IS_NAN(timeTofd[0]))) tof_fib_m = tMAPMT - timeTofd[0]; 
+                if(tfib > 0. && !(IS_NAN(tfib)) && timeTofd0>0. && !(IS_NAN(timeTofd0))) tof_fib_s = tfib - timeTofd0;   
+                if(tMAPMT > 0. && !(IS_NAN(tMAPMT)) && timeTofd0>0. && !(IS_NAN(timeTofd0))) tof_fib_m = tMAPMT - timeTofd0; 
                     
         
         
@@ -675,8 +698,8 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
         <<" tof: "<<tof_fib_s << " tM: "<<tof_fib_m << endl;
     }       
         
-//                if(ToT>totMax && abs(tof_fib_s-tof[ifibcount])<20. && ToT<1000.) {
-                if(ToT>totMax && ToT<1000.) {
+				if(abs(tof_fib_s-tof[ifibcount])<20. && ToT<1000.) {
+//                if(ToT>totMax && ToT<1000.) {
                     totMax=ToT;
                     iFibMax=iFib;
                     spmtMax=hit->GetSPMTToT_ns();
@@ -694,14 +717,32 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
                     totMax_MA=ToT_MA;
                     iFibMax_MA=iFib;
                 }   
+
+				if(abs(tof_fib_s-tof[ifibcount])<20. && TofdQ>0 && TofdQ<200.01) {
+					fh_Fibs_vs_Tofd[ifibcount]->Fill(TofdX,iFib);
+					//cout<<"test "<<TofdX<<"  "<<iFibMax<<endl;
+                    fh_fibers_Fib[ifibcount]->Fill(iFibMax);  
+                    fh_fiber_Fib[ifibcount]->Fill(iFibMax);  
+                    fh_ToT_s_Fib[ifibcount]->Fill(iFibMax,spmtMax);
+                    fh_ToT_m_Fib[ifibcount]->Fill(iFibMax,mapmtMax);
+                    fh_time_Fib[ifibcount]->Fill(iFibMax,yposfib);
+                    fh_Fib_ToF[ifibcount]->Fill(iFibMax,tofMax);
+                    fh_xpos_Fib[ifibcount]->Fill(xposfib);  
+                    fh_ypos_Fib[ifibcount]->Fill(yposfib);  
+                    fh_Fibs_vs_Events[ifibcount]->Fill(fFibEvents,iFibMax); 
+                    fh_Fib_vs_Events[ifibcount]->Fill(fFibEvents,iFibMax_MA);  
+                    fh_ToF_vs_events[ifibcount]->Fill(fFibEvents, tofMax); 
+                    FibMax[ifibcount]=iFibMax;
+				}
     
             }  // end for(ihit)
     
           
     //      if(abs(tof_fib_s-tof[ifibcount])<20.) 
+/*
             if(totMax>0) 
             {
-				if(TofdQ>2. && TofdQ<3.) {
+				if(TofdQ>1. && TofdQ<4.) {
                     fh_fibers_Fib[ifibcount]->Fill(iFibMax);  
                     fh_fiber_Fib[ifibcount]->Fill(iFibMax);  
                     fh_ToT_s_Fib[ifibcount]->Fill(iFibMax,spmtMax);
@@ -716,13 +757,9 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
                     FibMax[ifibcount]=iFibMax;
 			    }
             }
-
+*/
             if (nHits>0) fh_mult_Fib[ifibcount]->Fill(nHits);      
             
-            if(TofdQ>2. && TofdQ<3.) {
-                fh_Fibs_vs_Tofd[ifibcount]->Fill(TofdX,iFibMax);
-                //cout<<"test "<<TofdX<<"  "<<iFibMax<<endl;
-			}
             fh_Cave_position->Fill(z[ifibcount],x[ifibcount]+xposfib);
 
 
@@ -755,7 +792,7 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
 
 }
 
-void R3BGlobalAnalysis::FinishEvent()
+void R3BGlobalAnalysisS454::FinishEvent()
 {
 
   for(Int_t det = 0; det < DET_MAX; det++) {
@@ -771,8 +808,9 @@ void R3BGlobalAnalysis::FinishEvent()
   }       
 }
 
-void R3BGlobalAnalysis::FinishTask()
+void R3BGlobalAnalysisS454::FinishTask()
 {    
+	fhTpat->Write();
 	fh_Cave_position->Write();
     if(fMappedItems.at(DET_LOS)){
       fhChargeLosTofD->Write();
@@ -821,4 +859,4 @@ void R3BGlobalAnalysis::FinishTask()
       
 }
 
-ClassImp(R3BGlobalAnalysis)
+ClassImp(R3BGlobalAnalysisS454)

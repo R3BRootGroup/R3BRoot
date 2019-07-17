@@ -1,15 +1,15 @@
 // ------------------------------------------------------------
-// -----                  R3BGlobalAnalysis                -----
+// -----                  R3BGlobalAnalysisS454                -----
 // -----            Created 13-04-2016 by M.Heil          -----
 // -----               Fill online histograms             -----
 // ------------------------------------------------------------
 
-#ifndef R3BGLOBALANALYSIS
-#define R3BGLOBALANALYSIS
+#ifndef R3BGLOBALANALYSISS454
+#define R3BGLOBALANALYSISS454
 #define N_PLANE_MAX_TOFD 4
 #define N_PADDLE_MAX_TOFD 50
 #define N_PADDLE_MAX_PTOF 100
-#define N_PSPX 6
+#define N_PSPX 4
 #define N_FIBER_PLOT 1050 // range to plot
 
 #include "FairTask.h"
@@ -31,7 +31,7 @@ class R3BEventHeader;
  * This taks reads all detector data items and plots histograms 
  * for online checks. 
  */
-class R3BGlobalAnalysis : public FairTask
+class R3BGlobalAnalysisS454 : public FairTask
 {
 
   public:
@@ -39,7 +39,7 @@ class R3BGlobalAnalysis : public FairTask
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BGlobalAnalysis();
+    R3BGlobalAnalysisS454();
 
     /**
      * Standard constructor.
@@ -47,13 +47,13 @@ class R3BGlobalAnalysis : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BGlobalAnalysis(const char* name, Int_t iVerbose = 1);
+    R3BGlobalAnalysisS454(const char* name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BGlobalAnalysis();
+    virtual ~R3BGlobalAnalysisS454();
 
     /**
      * Method for task initialization.
@@ -91,6 +91,7 @@ class R3BGlobalAnalysis : public FairTask
     {
         fTrigger = trigger;
     }
+    inline void SetTpat(Int_t tpat) { fTpat = tpat; }
     
     /**
      * Methods for setting number of planes and paddles
@@ -189,11 +190,14 @@ class R3BGlobalAnalysis : public FairTask
 	// check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header;                     /**< Event header. */
     Int_t fTrigger;                             /**< Trigger value. */
+    Int_t fTpat;
     Double_t fClockFreq;     /**< Clock cycle in [ns]. */
     UInt_t fNofPlanes;  
     UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */    
     unsigned long long t0_prev=0;
     Double_t time_previous_event=0;    
+
+    TH1F *fhTpat;
 
     Int_t fNEvents = 0;         /**< Event counter. */
     Int_t fFibEvents = 0;         /**< Event counter. */
@@ -259,7 +263,7 @@ class R3BGlobalAnalysis : public FairTask
  
   
   public:
-    ClassDef(R3BGlobalAnalysis, 1)
+    ClassDef(R3BGlobalAnalysisS454, 1)
 };
 
 #endif

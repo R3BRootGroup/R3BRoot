@@ -191,7 +191,7 @@ Bool_t R3BFi13::ProcessHits(FairVolume* vol)
 
         AddHit(fTrackID,
                /*fVolumeID*//*copyNo*/planeNr,
-               planeNr,
+               /*fVolumeID*/planeNr,
                TVector3(fPosIn.X(), fPosIn.Y(), fPosIn.Z()),
                TVector3(fPosOut.X(), fPosOut.Y(), fPosOut.Z()),
                TVector3(fMomIn.Px(), fMomIn.Py(), fMomIn.Pz()),
@@ -297,7 +297,7 @@ R3BFibPoint* R3BFi13::AddHit(Int_t trackID,
 
 Bool_t R3BFi13::CheckIfSensitive(std::string name)
 {
-    if (TString(name).Contains("FI131Log") )
+    if (TString(name).Contains("FI13LogActive") )
     {
         return kTRUE;
     }

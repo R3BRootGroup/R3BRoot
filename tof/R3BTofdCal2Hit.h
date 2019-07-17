@@ -86,6 +86,8 @@ class R3BTofdCal2Hit : public FairTask
 
     virtual void SetParContainers();
 
+    virtual void CreateHistograms(Int_t iPlane, Int_t iBar);
+
     /**
      * Method for setting the nuclear charge of main beam
      */
@@ -146,6 +148,12 @@ class R3BTofdCal2Hit : public FairTask
     TH2F* fhQPm2[N_TOFD_HIT_PLANE_MAX]; 
     TH2F* fhQ[N_TOFD_HIT_PLANE_MAX];   
 
+    TH2F* fhTof[N_TOFD_HIT_PLANE_MAX]; 
+
+
+    TH2F* fhTdiff[N_TOFD_HIT_PLANE_MAX]; 
+    TH2F* fhSync[N_TOFD_HIT_PLANE_MAX]; 
+   
 /*
     TH2F* fhTotPm1vsTotPm2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
     TH2F* fhTotPm1satvsTotPm2sat[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   

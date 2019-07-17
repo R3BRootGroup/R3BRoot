@@ -206,6 +206,12 @@ InitStatus R3BOnlineSpectra::Init()
 
 	if(fMappedItems.at(DET_BMON)){	
 		
+		
+		
+        fh_TimePreviousEvent = new TH1F("TimePreviousEvent", "Time between 2 particles ", 300000, -3000, 3000);
+        fh_TimePreviousEvent->GetXaxis()->SetTitle("time / µsec");
+        fh_TimePreviousEvent->GetYaxis()->SetTitle("counts");
+		
     // get the theoretical calib factors for SEETRAM
         Double_t fexp = float(fsens_SEE+9);
         Double_t fpow = float(pow(10.,fexp));
@@ -257,7 +263,8 @@ InitStatus R3BOnlineSpectra::Init()
 		fh_spill_length->Draw();
 		cbmon->cd(4);
 		fh_IC->Draw("hist");
-		cbmon->cd(5);
+//        fh_TimePreviousEvent->Draw("hist");
+        cbmon->cd(5);
 		fh_SEE ->Draw("hist");
 		cbmon->cd(6);
 		fh_TOFDOR->Draw("hist");	
@@ -300,6 +307,12 @@ InitStatus R3BOnlineSpectra::Init()
 		fh_los_dt_first_ToT= new TH2F("los_dt_events_ToT", "LOS ToT dtevents ",5000,0,150000,500,0,200.); 
 		fh_los_dt_first_ToT->GetXaxis()->SetTitle("dt between two events / ns");
 		fh_los_dt_first_ToT->GetYaxis()->SetTitle("ToT / ns");
+
+
+		fh_los_dt_hits= new TH1F("los_dt_hits", "LOS dt hits",100000,0,10000); 
+		fh_los_dt_hits->GetXaxis()->SetTitle("dt between two hits / micros");
+		fh_los_dt_hits->GetYaxis()->SetTitle("Counts");
+
 		
 		fh_los_tres_MCFD = new TH1F("los_time_res_MCFD", "LOS MCFD Time resolution - raw", 4000, -4., 4.);
 		fh_los_tres_MCFD->GetXaxis()->SetTitle("Time MCFD / ns");
@@ -907,8 +920,6 @@ void R3BOnlineSpectra::Reset_LOS_Histo()
     fh_los_pos_MCFD->Reset();
     fh_los_pos_TAMEX->Reset();    
     fh_los_dt_hits->Reset();
-    fh_los_dt_hits_l->Reset();
-    fh_los_dt_hits_t->Reset();
     fh_los_multihit->Reset();
     fh_los_ihit_ToT->Reset();
 }
@@ -1006,15 +1017,16 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 {
 //  cout << "fNEvents " << fNEvents << endl;
 
-	  FairRootManager* mgr = FairRootManager::Instance();
-  if (NULL == mgr){
-    //FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
-    LOG(ERROR) <<  "FairRootManager not found" <<FairLogger::endl;
-   return;
-  }
+    FairRootManager* mgr = FairRootManager::Instance();
+    if (NULL == mgr){
+        //FairLogger::GetLogger()->Fatal(MESSAGE_ORIGIN, "FairRootManager not found");
+        LOG(ERROR) <<  "FairRootManager not found" <<FairLogger::endl;
+        return;
+    }
 
-   time = header->GetTimeStamp(); 
-  
+   
+  time=header->GetTimeStamp();
+   
   if(time_start == 0 && time > 0){
      time_start = time;
      fNEvents_start = fNEvents;
@@ -1274,7 +1286,9 @@ void R3BOnlineSpectra::Exec(Option_t* option)
                 :  ((rhs[0] < lhs[0]) ? 1 : 0);
         });
 // End sorting      
-     
+    double_t time_first=-1.;
+    double_t time1=-1.;
+    
     for (Int_t iPart = 0; iPart < nPart; iPart++)     
     {
 		   
@@ -1390,12 +1404,27 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 		 
      fh_los_tot_mean->Fill(totsum[iPart]);
      
+     if(time_first<0) time_first=timeLosM[iPart];
      if(iPart < 1 ) {
 			Double_t timediff=float(header->GetTimeStamp()-time_V_mem);
 			fh_los_dt_first_ToT->Fill(timediff/1.e3,totsum[iPart]);
 	 }			 
 	 
-	 if(iPart > 0) fh_los_dt_hits_ToT->Fill(timeLosM[iPart]-timeLosM[iPart-1],totsum[iPart]);
+     
+     
+     double_t time2=0.;
+     if (time1<0 ) time1 = timeLosM[iPart];
+     time2 = timeLosM[iPart] ;
+     if(time1>0. && time2>0. && time2>time1){
+//        cout<<"Time Test "<<time1<< "   "<< time2 <<"  " <<endl;
+		fh_los_dt_hits->Fill(time2-time1);
+            time1=time2;
+     }
+     
+     
+	 fh_los_dt_hits_ToT->Fill((header->GetTimeStamp()-time_V_mem+timeLosM[iPart]-time_first)/1000.,totsum[iPart]);
+	 time_V_mem= header->GetTimeStamp()+timeLosM[iPart]-time_first;
+     
 
       for(int ipm=0; ipm<8; ipm++)
 	  {
@@ -1416,7 +1445,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
      }  
 	}     
 
-     if(iPart == nPart-1)  time_V_mem = header->GetTimeStamp();  // memorize time of the last hit
+//     if(iPart == nPart-1)  time_V_mem = header->GetTimeStamp();  // memorize time of the last hit
 
       } 
       else 
@@ -1829,6 +1858,9 @@ void R3BOnlineSpectra::Exec(Option_t* option)
     Int_t iBarMem = 0;
     Int_t jmult[N_PLANE_MAX_TOFD][N_PADDLE_MAX_TOFD] = {0};
 
+    unsigned long long time0 = header->GetTimeStamp(); 
+    double_t time1=-1.;
+
     for (Int_t ical = 0; ical < nCals; ical++)     
     {
       auto cal = (R3BTofdCalData const *)det->At(ical);
@@ -1836,6 +1868,10 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 
       Int_t const iPlane  = cal->GetDetectorId();    // 1..n
       Int_t const iBar  = cal->GetBarId();    // 1..n
+
+
+
+
 
 //      std::cout << iPlane << ' ' << iBar <<
 //          ',' << cal->GetTimeBL_ns() <<
@@ -1875,14 +1911,23 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 
 
 		Int_t jm = jmult[iPlane-1][iBar-1];
-		if (!IS_NAN(cal->GetTimeBL_ns())) t1l[jm][iPlane-1][iBar-1] = cal->GetTimeBL_ns();
+/*		if (!IS_NAN(cal->GetTimeBL_ns())) t1l[jm][iPlane-1][iBar-1] = cal->GetTimeBL_ns();
 		if (!IS_NAN(cal->GetTimeBT_ns())) t1t[jm][iPlane-1][iBar-1] = cal->GetTimeBT_ns();
 		if (!IS_NAN(cal->GetTimeTL_ns())) t2l[jm][iPlane-1][iBar-1] = cal->GetTimeTL_ns();
-		if (!IS_NAN(cal->GetTimeTT_ns())) t2t[jm][iPlane-1][iBar-1] = cal->GetTimeTT_ns();
+		if (!IS_NAN(cal->GetTimeTT_ns())) t2t[jm][iPlane-1][iBar-1] = cal->GetTimeTT_ns();*/
 		Bar_present[jm][iPlane-1][iBar-1] = true;
 		jmult[iPlane-1][iBar-1] = jmult[iPlane-1][iBar-1] + 1;
 
+        double_t time2=0.;
+        if (time1<0 && iPlane==2) time1 = (t1l[jm][iPlane-1][iBar-1] + t2l[jm][iPlane-1][iBar-1])/2.;
+        if (iPlane==2) time2 = (t1l[jm][iPlane-1][iBar-1] + t2l[jm][iPlane-1][iBar-1])/2.;
+        if(time1>0. && time2>0. && time2>time1){
+            //cout<<"Time Test "<<time0<<"  "<<time1<< "   "<< time2 <<"  " <<time_previous_event <<endl;
+            fh_TimePreviousEvent->Fill(time2-time1);
+            time2=time1;
+        }
     }
+
 
     /*      		
 			for (Int_t ipl = 0; ipl < N_PLANE_MAX_TOFD; ipl++)
@@ -2260,7 +2305,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 
 void R3BOnlineSpectra::FinishEvent()
 {
-   
+
   for(Int_t det = 0; det < DET_MAX; det++) {
     if(fMappedItems.at(det)) {
       fMappedItems.at(det)->Clear(); 
@@ -2271,16 +2316,19 @@ void R3BOnlineSpectra::FinishEvent()
     if(fHitItems.at(det)) {
       fHitItems.at(det)->Clear(); 
     }
-  }  	  
+  }  
+	  
 }
 
 void R3BOnlineSpectra::FinishTask()
 {    
+	
   if(fMappedItems.at(DET_LOS)){
     fh_los_channels->Write();
     fh_los_tot->Write();
     fh_los_dt_hits_ToT->Write();
     fh_los_ihit_ToT->Write();
+    fh_los_dt_hits->Write();
   }
  
  if(fMappedItems.at(DET_BMON)){ 
@@ -2293,9 +2341,13 @@ void R3BOnlineSpectra::FinishTask()
     fh_IC_spill->Write();
     fh_SEE_spill->Write();
     fh_TOFDOR_spill->Write();
+    
 }  
+
   if(fCalItems.at(DET_TOFD))
   {
+    fh_TimePreviousEvent->Write();
+
       for(Int_t i; i<4;i++){
          fh_tofd_TotPm[i]->Write();
       }

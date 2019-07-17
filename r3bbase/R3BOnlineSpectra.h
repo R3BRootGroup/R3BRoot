@@ -256,6 +256,7 @@ class R3BOnlineSpectra : public FairTask
     unsigned long ic_mem=0, see_mem = 0,  tofdor_mem = 0;
     unsigned long ic_start=0, see_start = 0,  tofdor_start = 0;
     unsigned long long time_spill_start=0, time_spill_end=0;
+    unsigned long long time_previous_event=0;    
     Double_t time_clear = -1.;
     Double_t tdiff = 0.;
     Double_t fNorm = 1.;
@@ -278,6 +279,8 @@ class R3BOnlineSpectra : public FairTask
     TH1F *fh_SEE;
     TH1F *fh_TOFDOR;
    // TH1F *h3;
+    TH1F *fh_TimePreviousEvent;
+   
     
     TH1F *fh_sci8_channels;    
     TH1F *fh_sci8_tres_MCFD;
@@ -299,8 +302,6 @@ class R3BOnlineSpectra : public FairTask
     TH1F *fh_los_tot_mean;
     TH2F *fh_los_tot;
     TH1F *fh_los_dt_hits;
-    TH1F *fh_los_dt_hits_l;
-    TH1F *fh_los_dt_hits_t;
     TH1F *fh_los_multihit;
     TH2F *fh_los_multihitVFTX;
     TH2F *fh_los_multihitLEAD;

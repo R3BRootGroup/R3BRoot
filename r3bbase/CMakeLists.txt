@@ -46,6 +46,7 @@ R3BDetector.cxx
 R3BEventHeader.cxx
 R3BOnlineSpectra.cxx
 R3BGlobalAnalysis.cxx
+R3BGlobalAnalysisS454.cxx
 )
 
 # fill list of header files from list of source files

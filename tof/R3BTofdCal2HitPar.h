@@ -147,6 +147,10 @@ class R3BTofdCal2HitPar : public FairTask
     virtual Double_t walk(Double_t Q);
 
 
+    virtual void CreateHistograms(Int_t iPlane, Int_t iBar);
+
+
+
     /**
      * Method for calculation of saturation.
      */
@@ -194,10 +198,10 @@ class R3BTofdCal2HitPar : public FairTask
     TString fParaFile;
 
 // arrays of control histograms
-    TH1F* fhTdiff[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX]; 
+    TH2F* fhTdiff[N_TOFD_HIT_PLANE_MAX]; 
     TH1F* fhTotPm1[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX]; 
     TH1F* fhTotPm2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX]; 
-    TH1F* fhTsync[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX]; 
+    TH2F* fhTsync[N_TOFD_HIT_PLANE_MAX]; 
 
     TH2F* fhTot1vsTot2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX]; 
     TH2F* fhTot1vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
