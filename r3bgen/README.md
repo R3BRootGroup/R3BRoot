@@ -1,106 +1,47 @@
 ## R3BPhaseSpaceGenerator and Energy Distributions
 You can run a simulation with beam and relative energy distributions using R3BPhaseSpaceGenerator.
 
-There are 4 possibilities for setting the energies:
-- constant number  
-  The Generator will always use the passed number as the energy
-- passing a lambda expression  
-  Most convenient for constant or linear distributions
-- passing a TF1  
-  Most convenient for default distributions like gaussian etc
-- passing a TGraph  
-  Most convenient for distributions obtained from theory simulations
-  
+You can change the vertex, beamspread and energy distrubutions via the respective setter methodes (e.g. "SetBeamEnergyDistribution_AMeV").
+Those Methodes take objects of the template type R3BDistribution as an argument.
 
-The beam energy and the relative energy are setup with different functions, but besides this behave absolutely the same.
-Use 'SetBeamEnergyAMeV' and 'SetBeamEnergyDistAMeV' for the beam Energy and 'SetErelkeV' and 'SetErelDistkeV' for the relative Energy.
+You can assaign distributions using R3BDistribution1D, R3BDistribution2D or R3BDistribution3D.
 
-### Note
-The beam energy should be given in MeV while the realtive energy should be given in keV
-### Constant Number
-Pass the wanted energy to the functions:
+### Examples
+
+#### Delta Distribution
+The following code will result in a fixed Beam Energy of 500 AMev:
 ```c++
-r3bgen->SetBeamEnergyAMeV(400);
-r3bgen->SetErelkeV(100);
-```
-The code above will result in a beam energy of 400 AMeV and 100 keV relative energy.
+    r3bgen->SetBeamEnergyDistribution_AMeV(R3BDistribution1D::Delta(500));
+``` 
 
-### Lambda Expression
-To use lambda expressions just call the 'Dist' functions like this:
+#### Flat Distribution
+The following code will result in a flat Beam Energy distribution between 400 and 600 AMeV:
 ```c++
-r3bgen->SetBeamEnergyDistAMeV([](Double_t energy){ return energy*energy; }, 350, 360);
-```
-This code example will use a x^2 distribution from 350 AMeV to 360 AMeV.
+    r3bgen->SetBeamEnergyDistribution_AMeV(R3BDistribution1D::Flat(400, 600));
+``` 
 
-### TF1
-Just create the TF1 with the desired distribution and pass it to the 'Dist' functions.
+#### Custom Distribution
+The following code will result in a x² distributed Beam Energy between 400 and 600 AMeV:
 ```c++
-TF1 gausDist("gausDist","gaus(0)",0,100)
-gausDist.SetParameter(0, 1); // the amplitude does not matter
-gausDist.SetParameter(1, 50); // the mean value
-gausDist.SetParameter(2, 10); // sigma
-r3bgen->SetErelDistkeV(gausDist);
-```
-This code example will use a gaus distribution from 0 keV to 100 keV with a mean of 50 keV and sigma = 10 keV.
-If you want other boundaries, call the functions with the lower and upper boundary:
-```c++
-SetErelDistkeV(gausDist, minE, maxE);
-```
-If you pass a negative number as the upper or lower limit,
-the program will find the limit of the distribution and use it instead.
-### TGraph
-You have to fill a TGraph with your distribution.
-If you received  table-like data from your theory colleague like for example this:
-```
-energy1 value1
-energy2 value2
-...
-energyn valuen
-```
-you can directly load the data into the TGraph:
-```c++
-TGraph ereldist("/path/to/distribution.dat");
-```
+    constexpr Double_t Sqr(const Double_t val){
+        return val*val;
+    }
+    [...]
+    r3bgen->SetBeamEnergyDistribution_AMeV(R3BDistribution1D::Function(Sqr, 400, 600));
+``` 
 
-Afterwards you have to pass the TGraph to R3BPhaseSpaceGenerator:
+#### Multi-Dim Distribution
+You can combine 1d-distributions to gain higher dimensional distributions:
 ```c++
-r3bgen->SetErelDistkeV(ereldist);
-```
+    r3bgen->SetVertexDistribution_cm({R3BDistribution1D::Delta(0.),
+                                      R3BDistribution1D::Data(myHisto),
+                                      R3BDistribution1D::Gaussian(0., 1.)});
+``` 
 
-If you want to only simulate between two certain energies you can pass them as well:
-```c++
-r3bgen->SetErelDistkeV(ereldist, emin, emax);
-```
-If you pass a negative number as the upper or lower limit,
-the program will find the limit of the distribution and use it instead.
-
-If your data is in MeV instead of keV (or any other unit), you can use this few lines to change it to change is quickly:
-```c++
-TGraph ereldist("/path/to/distribution\_in\_MeV.dat");
-Int_t nPoints = ereldist.GetN();
-for(Int_t i = 0; i < nPoints; ++i)
-    ereldist.GetX()[i] *= 1000; // 1 MeV = 1000 keV
-```
-
-### Obtaining the random Energies
-
+### Obtaining the random Numbers
 You can store the generated energies inside the tree using:
 ```c++
-auto ebeam = r3bgen->GetBeamEnergyAMeV();
-auto erel = r3bgen->GetErelkeV();
-auto beambeta = r3bgen->GetBeamBeta();
-auto beamgamma = r3bgen->GetBeamGamma();
-FairRootManager::Instance()->RegisterAny("Sim_BeamE_AMeV", ebeam, kTRUE);
-FairRootManager::Instance()->RegisterAny("Sim_Erel_keV", erel, kTRUE);
-FairRootManager::Instance()->RegisterAny("Sim_BeamBeta", beambeta, kTRUE);
-FairRootManager::Instance()->RegisterAny("Sim_BeamGamma", beamgamma, kTRUE);
-```
-
-### Note
-The Distribution will be sampled with a certain number of points (1000 by default) between the maximum and minimum energy.
-Between the data points the energy will be linearly interpolated. 
-This should be enough for almost every case.
-If you have a strongly fluctuating distribution, you can increase the number of samples:
-```c++
-r3bgen->SetErelDistkeV(ereldist, -1, -1, nsamples);
+    auto beamEDist = R3BDistribution1D::Delta(500.);
+    auto beamE = beamEDist.GetValueAddresses()[0]; // GetValueAddresses will return an array
+    FairRootManager::Instance()->RegisterAny("Sim_BeamE_AMeV", beamE, kTRUE);
 ```

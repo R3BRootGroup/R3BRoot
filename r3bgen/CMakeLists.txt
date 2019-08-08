@@ -67,6 +67,9 @@ R3BCALIFATestGenerator.cxx
 R3BIonGenerator.cxx
 R3BGammaGenerator.cxx
 R3BPhaseSpaceGenerator.cxx
+R3BDistribution1D.cxx
+R3BDistribution2D.cxx
+R3BDistribution3D.cxx
 R3Bp2pevtGenerator.cxx
 )
 
@@ -86,9 +89,3 @@ enable_testing()
 Set(GTEST_ROOT ${SIMPATH})
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
-
-Set(EXE_NAME testR3BPhaseSpaceGenerator)
-Set(SRCS testR3BPhaseSpaceGenerator.cxx)
-Set(DEPENDENCIES ${GTEST_BOTH_LIBRARIES} ${ROOT_LIBRARIES} FairLogger::FairLogger Alignment ParBase R3BGen)
-GENERATE_EXECUTABLE()
-add_test(R3BPhaseSpaceGeneratorUnitTest ${EXECUTABLE_OUTPUT_PATH}/testR3BPhaseSpaceGenerator)

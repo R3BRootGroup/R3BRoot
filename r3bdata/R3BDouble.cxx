@@ -2,7 +2,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-R3BDouble::R3BDouble(Double_t value) : _value(value) {
+R3BDouble::R3BDouble(Double_t value) : fValue(value) {
 
 }
 

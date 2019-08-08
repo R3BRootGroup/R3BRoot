@@ -21,5 +21,9 @@
 #pragma link C++ class  R3BGammaGenerator+;
 #pragma link C++ class  R3BPhaseSpaceGenerator+;
 #pragma link C++ class 	R3Bp2pevtGenerator+;
+#pragma link C++ class 	R3BDistribution1D+;
+#pragma link C++ class 	R3BDistribution2D+;
+#pragma link C++ class 	R3BDistribution3D+;
+
 
 #endif

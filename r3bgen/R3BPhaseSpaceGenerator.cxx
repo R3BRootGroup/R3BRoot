@@ -1,232 +1,78 @@
 #include "R3BPhaseSpaceGenerator.h"
+#include "R3BDistribution1D.h"
+#include "R3BDistribution2D.h"
+#include "R3BDistribution3D.h"
+
 #include "FairLogger.h"
 #include "FairPrimaryGenerator.h"
 #include "FairRunSim.h"
-#include "TDatabasePDG.h"
-#include <numeric>
-#include "FairRootManager.h"
 
-R3BPhaseSpaceGenerator::R3BPhaseSpaceGenerator()
-    : fGamma(1.)
-    , fBeta(0.)
-    , fBeamEnergy_AMeV(0.)
-    , fErel_keV(0.)
-    , fConstBeamEnergy(kTRUE)
-    , fConstErel(kTRUE)
+#include "TDatabasePDG.h"
+#include "TLorentzVector.h"
+#include "TVector3.h"
+
+#include <numeric>
+
+R3BPhaseSpaceGenerator::R3BPhaseSpaceGenerator(UInt_t seed) 
+    : fVertex_cm(R3BDistribution3D::Delta(0, 0, 0))
+    , fBeamSpread_mRad({R3BDistribution1D::Delta(0), R3BDistribution1D::Flat(0, 2*TMath::Pi()*1e3)})
+    , fBeamEnergy_AMeV(R3BDistribution1D::Delta(500))
+    , fErel_keV(R3BDistribution1D::Delta(100))    
+    , fRngGen(seed)
 {
 }
 
-void R3BPhaseSpaceGenerator::AddParticle(const Int_t PDGCode)
-{
+void R3BPhaseSpaceGenerator::AddParticle(const Int_t PDGCode){
     auto particle = TDatabasePDG::Instance()->GetParticle(PDGCode);
-    if (particle == nullptr)
-    {
-        LOG(FATAL) << "R3BPhaseSpaceGenerator::AddParticle: No such particle: " << PDGCode;
+    if (particle == nullptr){
+        LOG(FATAL) << __func__ << ": No such particle: " << PDGCode;
         return;
     }
     fMasses.push_back(particle->Mass());
     fPDGCodes.push_back(particle->PdgCode());
 }
 
-void R3BPhaseSpaceGenerator::AddHeavyIon(const FairIon& ion)
-{
+void R3BPhaseSpaceGenerator::AddHeavyIon(const FairIon& ion){
     auto run = FairRunSim::Instance();
-    if (run == nullptr)
-    {
-        LOG(WARNING) << "R3BPhaseSpaceGenerator::AddIon: No FairRunSim";
+    if (run == nullptr){
+        LOG(WARNING) << __func__ << ": No FairRunSim";
     }
-    else
-    {
+    else{
         run->AddNewIon((FairIon*)ion.Clone());
     }
     fMasses.push_back(ion.GetMass());
     fPDGCodes.push_back(1000000000 + 10 * 1000 * ion.GetZ() + 10 * ion.GetA());
 }
 
+Bool_t R3BPhaseSpaceGenerator::Init(){
+    fTotMass = std::accumulate(fMasses.begin(), fMasses.end(), 0.);
 
-// ########################## BeamEnergy ##########################
-
-void R3BPhaseSpaceGenerator::SetBeamEnergyAMeV(const Double_t EBeam_AMeV)
-{
-    fBeamEnergy_AMeV = EBeam_AMeV;
-    fConstBeamEnergy = kTRUE;
+    return kTRUE;
 }
 
-void R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV(const std::function<Double_t(Double_t)> dist, Double_t minE, const Double_t maxE, const int samples){
-    if(minE < 0 || maxE < 0)
-        LOG(fatal) << "R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV:  Lower or upper boundery is negative for a distribution passed via lambda expression! ";
-    fBeamEnergyLookup = SetupLookupGraph(dist, minE, maxE, samples);
-    fConstBeamEnergy = kFALSE;                                
-}
+Bool_t R3BPhaseSpaceGenerator::ReadEvent(FairPrimaryGenerator* primGen){  
+    const auto pos_cm = fVertex_cm.GetRandomValues({fRngGen.Rndm(), fRngGen.Rndm(), fRngGen.Rndm()});
+    const auto spread_mRad = fBeamSpread_mRad.GetRandomValues({fRngGen.Rndm(), fRngGen.Rndm()});
+    const auto beamEnergy_GeV = fBeamEnergy_AMeV.GetRandomValues({fRngGen.Rndm()})[0] * 1e-3;
+    const auto erel_GeV = fErel_keV.GetRandomValues({fRngGen.Rndm()})[0] * (1e-6);
 
-void R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV(const TGraph& dist, Double_t minE, const Double_t maxE, const int samples){
-    Double_t xmin, xmax, ymin, ymax;
-    dist.ComputeRange(xmin, ymin, xmax, ymax);
-    if(minE > 0.){
-        if(minE < xmin){
-            LOG(fatal) << "R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV:  Lower boundery is smaller than the smallest value inside Graph!";
-        }
-        xmin = minE;
-    }
-    if(maxE > 0.){
-        if(maxE < xmax){
-            LOG(fatal) << "R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV:  Upper boundery is bigger than the biggest value inside Graph!";
-        }
-        xmax = maxE;
-    }
-
-    fBeamEnergyLookup = SetupLookupGraph([&dist](Double_t E){return dist.Eval(E);}, xmin, xmax, samples);
-    fConstBeamEnergy = kFALSE;                                
-}
-
-void R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV(const TF1& dist, Double_t minE, const Double_t maxE, const int samples){
-    Double_t xmin, xmax;
-    dist.GetRange(xmin, xmax);
-    if(minE > 0.){
-        if(minE < xmin){
-            LOG(fatal) << "R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV:  Lower boundery is outside the range of the TF1!";
-        }
-        xmin = minE;
-    }
-    if(maxE > 0.){
-        if(maxE < xmax){
-            LOG(fatal) << "R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV:  Upper boundery is outside the range of the TF1!";
-        }
-        xmax = maxE;
-    }
-
-    fBeamEnergyLookup = SetupLookupGraph([&dist](Double_t E){return dist.Eval(E);}, xmin, xmax, samples);
-    fConstBeamEnergy = kFALSE;                                
-}
-
-// ########################## Erel ##########################
-
-void R3BPhaseSpaceGenerator::SetErelkeV(const Double_t Erel_keV){ 
-    fErel_keV = Erel_keV;
-    fConstErel = kTRUE;
-}
-
-void R3BPhaseSpaceGenerator::SetErelDistkeV(const std::function<Double_t(Double_t)> dist, const Double_t minE, const Double_t maxE, const int samples){
-    if(minE < 0 || maxE < 0)
-       LOG(fatal) << "R3BPhaseSpaceGenerator::SetErelDistkeV:  Lower or upper boundery is negative for a distribution passed via lambda expression! ";
-    fErelLookup = SetupLookupGraph(dist, minE, maxE, samples);
-    fConstErel = kFALSE;
-}
-
-void R3BPhaseSpaceGenerator::SetErelDistkeV(const TGraph& dist, const Double_t minE, const Double_t maxE, const int samples){
-    Double_t xmin, xmax, ymin, ymax;
-    dist.ComputeRange(xmin, ymin, xmax, ymax);
-    if(minE > 0.){
-        if(minE < xmin){
-            LOG(fatal) << "R3BPhaseSpaceGenerator::SetErelDistkeV:  Lower boundery is smaller than the smallest value inside Graph!";
-        }
-        xmin = minE;
-    }
-    if(maxE > 0.){
-        if(maxE < xmax){
-            LOG(fatal) << "R3BPhaseSpaceGenerator::SetErelDistkeV:  Upper boundery is bigger than the biggest value inside Graph!";
-        }
-        xmax = maxE;
-    }
-    
-    fErelLookup = SetupLookupGraph([&dist](Double_t E){return dist.Eval(E);}, xmin, xmax, samples);
-    fConstErel = kFALSE;
-}
-
-void R3BPhaseSpaceGenerator::SetErelDistkeV(const TF1& dist, const Double_t minE, const Double_t maxE, const int samples){
-    Double_t xmin, xmax;
-    dist.GetRange(xmin, xmax);
-    if(minE > 0.){
-        if(minE < xmin){
-            LOG(fatal) << "R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV:  Lower boundery is outside the range of the TF1!";
-        }
-        xmin = minE;
-    }
-    if(maxE > 0.){
-        if(maxE < xmax){
-            LOG(fatal) << "R3BPhaseSpaceGenerator::SetBeamEnergyDistAMeV:  Upper boundery is outside the range of the TF1!";
-        }
-        xmax = maxE;
-    }
-    
-    fErelLookup = SetupLookupGraph([&dist](Double_t E){return dist.Eval(E);}, xmin, xmax, samples);
-    fConstErel = kFALSE;
-}
-
-// ########################## Others ##########################
-
-Bool_t R3BPhaseSpaceGenerator::Init()
-{
-    if(fConstErel){
-        const Double_t TotE_GeV = fErel_keV / (1000. * 1000.) + std::accumulate(fMasses.begin(), fMasses.end(), 0.);
-        TLorentzVector Init(0.0, 0.0, 0.0, TotE_GeV);
-        fPhaseSpace.SetDecay(Init, fMasses.size(), fMasses.data());
-    }
-    if(fConstBeamEnergy){
-        fGamma = 1 + (fBeamEnergy_AMeV / 1000.) / 0.931494028; // MeV/A -> GeV/A
-        fBeta = std::sqrt(1 - 1 / std::pow(fGamma, 2));
-    }
-    return true;
-}
-
-Bool_t R3BPhaseSpaceGenerator::ReadEvent(FairPrimaryGenerator* primGen)
-{  
-    if(!fConstErel){
-        fErel_keV = fErelLookup.Eval(fRngGen.Rndm());   
-        const Double_t TotE_GeV = fErel_keV / (1000. * 1000.) + std::accumulate(fMasses.begin(), fMasses.end(), 0.);
-        TLorentzVector Init(0.0, 0.0, 0.0, TotE_GeV);
-        fPhaseSpace.SetDecay(Init, fMasses.size(), fMasses.data());
-    }
+    const auto TotE_GeV = erel_GeV + fTotMass;
+    const auto gamma = 1 + beamEnergy_GeV / 0.931494028;
+    const auto beta = std::sqrt(1 - 1/(gamma*gamma));
+    TLorentzVector Init(0.0, 0.0, 0.0, TotE_GeV);
+    fPhaseSpace.SetDecay(Init, fMasses.size(), fMasses.data());
     fPhaseSpace.Generate();
 
-    if(!fConstBeamEnergy){
-        fBeamEnergy_AMeV = fBeamEnergyLookup.Eval(fRngGen.Rndm());
-        fGamma = 1 + (fBeamEnergy_AMeV / 1000.) / 0.931494028; // MeV/A -> GeV/A
-        fBeta = std::sqrt(1 - 1 / std::pow(fGamma, 2));
-    }
-
     const size_t nParticles = fPDGCodes.size();
-    for (size_t i = 0; i < nParticles; i++)
-    {
-        const TLorentzVector* p = fPhaseSpace.GetDecay(i);
 
-        // Apply boost
-        const Double_t pz = fBeta * fGamma * p->E() + fGamma * p->Pz();
+    TVector3 beam(0, 0, beta);
+    beam.RotateX(spread_mRad[0]*1e-3);
+    beam.RotateZ(spread_mRad[1]*1e-3);
 
-        primGen->AddTrack(fPDGCodes.at(i), p->Px(), p->Py(), pz, 0., 0., 0.);
+    for (size_t i = 0; i < nParticles; i++){
+        TLorentzVector* p = fPhaseSpace.GetDecay(i);
+        p->Boost(beam);
+        primGen->AddTrack(fPDGCodes.at(i), p->Px(), p->Py(), p->Pz(), pos_cm[0], pos_cm[1], pos_cm[2]);
     }
     return true;
-}
-
-TGraph R3BPhaseSpaceGenerator::SetupLookupGraph(std::function<Double_t(Double_t)> dist, const Double_t minE, const Double_t maxE, const Int_t samples){    
-    Double_t stepE = (maxE-minE)/samples, x, y;
-    TGraph steppingGraph, integralGraph;
-    
-    for(int i = 0; i <= samples; ++i){
-        x = minE + i*stepE;
-        y = dist(x);
-        steppingGraph.SetPoint(steppingGraph.GetN(), x, y);
-    }
-    steppingGraph.SetPoint(steppingGraph.GetN(), maxE, 0);
-    
-    Double_t invInt = 1.0/steppingGraph.Integral();
-    
-    integralGraph.SetPoint(integralGraph.GetN(),minE,0);
-    for(int i = 1; i < steppingGraph.GetN()-1; ++i){
-        
-        steppingGraph.GetPoint(i+1,x,y);
-        steppingGraph.SetPoint(i+1,x,0);
-
-        integralGraph.SetPoint(integralGraph.GetN(),(x-stepE), steppingGraph.Integral(0,i+1)*invInt);
-        steppingGraph.SetPoint(i+1,x,y);
-    }
-    integralGraph.SetPoint(integralGraph.GetN(), maxE, 1);
-
-    TGraph targetG;
-    for(int i = 0; i < integralGraph.GetN(); ++i){
-        integralGraph.GetPoint(i,x,y);
-        targetG.SetPoint(i,y,x);
-    }
-    
-    return targetG;
 }

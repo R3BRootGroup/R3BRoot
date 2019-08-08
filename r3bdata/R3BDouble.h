@@ -8,20 +8,21 @@
 class R3BDouble {
 public:
 
-  R3BDouble() : _value(0) {}
+  R3BDouble() : fValue(0) {}
   R3BDouble(Double_t value);
-  R3BDouble(const R3BDouble& other) : _value(other._value) {}
+  R3BDouble(const R3BDouble& other) : fValue(other.fValue) {}
   virtual ~R3BDouble() {}
 
   inline operator Double_t() const { 
-    return _value ; 
+    return fValue; 
   }
   R3BDouble& operator=(Double_t value) { 
-    _value = value ; return *this ; 
+    fValue = value; 
+    return *this; 
   }
 
 protected:
-  Double_t _value ; // Value payload
+  Double_t fValue; // Value payload
 };
 
 #endif
