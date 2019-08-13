@@ -31,12 +31,12 @@ before_script:
  -  echo "echo 'export LINUX_FLAVOUR=Ubuntu-16.04\n\\" >> Dockerfile
  -  echo "export FAIRSOFT_VERSION=may18p1\n\\" >> Dockerfile
  -  echo "export FAIRROOT_VERSION=v18.0.6\n\\" >> Dockerfile
- -  echo "export SIMPATH=$HOME/FairSoft/may18p1/build\n\\" >> Dockerfile
- -  echo "export FAIRROOTPATH=$HOME/FairRoot/v18.0.6/install\n\\" >> Dockerfile
+ -  echo "export SIMPATH=/root/FairSoft/may18p1/build\n\\" >> Dockerfile
+ -  echo "export FAIRROOTPATH=/root/FairRoot/v18.0.6/install\n\\" >> Dockerfile
  -  echo "export GIT_BRANCH=${TRAVIS_COMMIT}\n\\" >> Dockerfile
  -  echo "export BUILDDIR=/tmp/r3broot/build_r3b_experimental_${FAIRSOFT_VERSION}_${FAIRROOT_VERSION}\n\\" >> Dockerfile
- -  echo "export SOURCEDIR=$HOME/R3BRoot\n\\" >> Dockerfile
- -  echo "export PATH=$HOME/FairSoft/may18p1/build/bin:$PATH' > Dart.cfg && \\" >> Dockerfile
+ -  echo "export SOURCEDIR=/root/R3BRoot\n\\" >> Dockerfile
+ -  echo "export PATH=/root/FairSoft/may18p1/build/bin:$PATH' > Dart.cfg && \\" >> Dockerfile
  -  echo "/root/R3BRoot/Dart.sh Experimental /root/Dart.cfg" >> Dockerfile
  - docker build -t r3broot:${TRAVIS_COMMIT} .
 
