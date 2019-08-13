@@ -7,59 +7,46 @@ env:
     - GCC_VERSION=5
 #    - GCC_VERSION=7
 #    - GCC_VERSION=8
+services:
+  - docker
 
 before_install:
     - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y;
     - sudo apt-get update -q;
-    - sudo apt-get install -y cmake cmake-data g++ gcc gfortran build-essential make patch sed
-                            libx11-dev libxft-dev libxext-dev libxpm-dev libxmu-dev libglu1-mesa-dev libgl1-mesa-dev
-                            ncurses-dev libcurl4-openssl-dev curl bzip2 gzip unzip tar subversion git xutils-dev flex
-                            bison lsb-release python-dev libc6-dev-i386 libxml2-dev wget libssl-dev
-                            automake autoconf libtool;
+    - sudo apt-get install -y wget;
     - 'if [ "$GCC_VERSION" -ne "5" ]; then
         sudo apt-get install -y gcc-$GCC_VERSION gfortran-$GCC_VERSION g++-$GCC_VERSION;
       fi'
-    - wget https://www.r3broot.gsi.de/system/files/R3BRootBase_gcc$GCC_VERSION.deb;
-    - sudo dpkg -i R3BRootBase_gcc$GCC_VERSION.deb;
+    - wget https://www.r3broot.gsi.de/system/files/fairroot_18.0.6_may18p1_ubuntu.tar.gz;
+    - gunzip fairroot_18.0.6_may18p1_ubuntu.tar.gz;
+    - docker load --input fairroot_18.0.6_may18p1_ubuntu.tar;
 
 install:
 
 before_script:
-    - 'if [ "$GCC_VERSION" -eq "5" ]; then
-        export CC=gcc;
-        export CXX=g++;
-      else
-        export CC=gcc-$GCC_VERSION;
-        export CXX=g++-$GCC_VERSION;
-      fi'
-    - $CXX --version
-    - cmake --version
-    - echo "export LINUX_FLAVOUR=Ubuntu16.04" > Dart.cfg;
-    - echo "export EXTRA_FLAGS=\"-DCMAKE_CXX_COMPILER=$CXX;-DCMAKE_C_COMPILER=$CC;-DUSE_DIFFERENT_COMPILER=TRUE\" " >> Dart.cfg;
-    - source /opt/R3BRootBase/versions.sh;
-    - echo "export FAIRSOFT_VERSION=${FAIRSOFT_VERSION}" >> Dart.cfg;
-    - echo "export FAIRROOT_VERSION=${FAIRROOT_VERSION}" >> Dart.cfg;
-    - echo "export GIT_BRANCH=${TRAVIS_COMMIT}" >> Dart.cfg;
-    - echo "export SIMPATH=/opt/R3BRootBase/build_FairSoft" >> Dart.cfg;
-    - echo "export FAIRROOTPATH=/opt/R3BRootBase/install_FairRoot" >> Dart.cfg;
-    - echo "export UCESB_DIR=/opt/R3BRootBase/ucesb" >> Dart.cfg;
-    - echo "export BUILDDIR=/tmp/r3broot/build_r3broot" >> Dart.cfg;
-    - echo "export SOURCEDIR=$PWD" >> Dart.cfg;
-    - echo "export SITE=\"Travis CI - ${TRAVIS_PULL_REQUEST} - gcc-${GCC_VERSION}\"" >> Dart.cfg;
-    - echo $PWD
-    - cat Dart.cfg
-    - git clone https://github.com/R3BRootGroup/macros.git
-    - cd macros
-    - git checkout dev
-    - cd ..
+ -  echo "FROM fairroot:18.0.6_may18p1_ubuntu" > Dockerfile
+ -  echo "MAINTAINER Dmytro Kresan <d.kresan@gsi.de>" >> Dockerfile
+ -  echo "ENTRYPOINT cd /root && git clone https://github.com/${TRAVIS_REPO_SLUG} && cd R3BRoot && \\" >> Dockerfile
+ -  echo "git checkout ${TRAVIS_COMMIT} && git clone https://github.com/R3BRootGroup/macros.git && cd macros && git checkout dev && cd ../../ && \\" >> Dockerfile
+ -  echo "echo 'export LINUX_FLAVOUR=Ubuntu-16.04\n\\" >> Dockerfile
+ -  echo "export FAIRSOFT_VERSION=may18p1\n\\" >> Dockerfile
+ -  echo "export FAIRROOT_VERSION=v18.0.6\n\\" >> Dockerfile
+ -  echo "export SIMPATH=$HOME/FairSoft/may18p1/build\n\\" >> Dockerfile
+ -  echo "export FAIRROOTPATH=$HOME/FairRoot/v18.0.6/install\n\\" >> Dockerfile
+ -  echo "export GIT_BRANCH=${TRAVIS_COMMIT}\n\\" >> Dockerfile
+ -  echo "export BUILDDIR=/tmp/r3broot/build_r3b_experimental_${FAIRSOFT_VERSION}_${FAIRROOT_VERSION}\n\\" >> Dockerfile
+ -  echo "export SOURCEDIR=$HOME/R3BRoot\n\\" >> Dockerfile
+ -  echo "export PATH=$HOME/FairSoft/may18p1/build/bin:$PATH' > Dart.cfg && \\" >> Dockerfile
+ -  echo "/root/R3BRoot/Dart.sh Experimental /root/Dart.cfg" >> Dockerfile
+ - docker build -t r3broot:${TRAVIS_COMMIT} .
 
 script:
-    - ./Dart.sh Experimental Dart.cfg
+    - docker run r3broot:${TRAVIS_COMMIT}
 
 notifications:
     email:
         recipients:
-            - Va.Wagner@gsi.de
+#            - Va.Wagner@gsi.de
             - D.Kresan@gsi.de
         on_success: always
         on_failure: always
