@@ -502,6 +502,58 @@ void R3BGladFieldMap::ReadAsciiFile(const char* fileName) {
           {
               continue;
           }
+
+          if(x < 1e-6 && y < 1e-6)
+          {
+              Int_t index1 = Int_t((x + fXmax)/fXstep)*2*fNy*fNz + Int_t((y + fYmax)/fYstep)*fNz + Int_t((z-fZmin)/fZstep);
+              TVector3 B1(bx, by, bz);
+              B1.RotateY(fYAngle*TMath::DegToRad());
+              fBx->AddAt(factor*B1.X(), index1);
+              fBy->AddAt(factor*B1.Y(), index1);
+              fBz->AddAt(factor*B1.Z(), index1);
+              continue;
+          }
+          else if(x < 1e-6)
+          {
+              Int_t index1 = Int_t((x + fXmax)/fXstep)*2*fNy*fNz + Int_t((y + fYmax)/fYstep)*fNz + Int_t((z-fZmin)/fZstep);
+
+              Int_t index4 = Int_t((x + fXmax)/fXstep)*2*fNy*fNz + Int_t((-y + fYmax)/fYstep)*fNz + Int_t((z-fZmin)/fZstep);
+
+              TVector3 B1(bx, by, bz);
+              B1.RotateY(fYAngle*TMath::DegToRad());
+
+              TVector3 B4(-bx, by, -bz);
+              B4.RotateY(fYAngle*TMath::DegToRad());
+
+              fBx->AddAt(factor*B1.X(), index1);
+              fBy->AddAt(factor*B1.Y(), index1);
+              fBz->AddAt(factor*B1.Z(), index1);
+
+              fBx->AddAt(factor*B4.X(), index4);
+              fBy->AddAt(factor*B4.Y(), index4);
+              fBz->AddAt(factor*B4.Z(), index4);
+          }
+          else if(y < 1e-6)
+          {
+              Int_t index1 = Int_t((x + fXmax)/fXstep)*2*fNy*fNz + Int_t((y + fYmax)/fYstep)*fNz + Int_t((z-fZmin)/fZstep);
+
+              Int_t index2 = Int_t((-x + fXmax)/fXstep)*2*fNy*fNz + Int_t((y + fYmax)/fYstep)*fNz + Int_t((z-fZmin)/fZstep);
+
+              TVector3 B1(bx, by, bz);
+              B1.RotateY(fYAngle*TMath::DegToRad());
+
+              TVector3 B2(-bx, by, bz);
+              B2.RotateY(fYAngle*TMath::DegToRad());
+
+              fBx->AddAt(factor*B1.X(), index1);
+              fBy->AddAt(factor*B1.Y(), index1);
+              fBz->AddAt(factor*B1.Z(), index1);
+
+              fBx->AddAt(factor*B2.X(), index2);
+              fBy->AddAt(factor*B2.Y(), index2);
+              fBz->AddAt(factor*B2.Z(), index2);
+          }
+
           Int_t index1 = Int_t((x + fXmax)/fXstep)*2*fNy*fNz + Int_t((y + fYmax)/fYstep)*fNz + Int_t((z-fZmin)/fZstep);
           Int_t index2 = Int_t((-x + fXmax)/fXstep)*2*fNy*fNz + Int_t((y + fYmax)/fYstep)*fNz + Int_t((z-fZmin)/fZstep);
           Int_t index3 = Int_t((-x + fXmax)/fXstep)*2*fNy*fNz + Int_t((-y + fYmax)/fYstep)*fNz + Int_t((z-fZmin)/fZstep);
