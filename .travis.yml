@@ -26,17 +26,17 @@ install:
 before_script:
  -  echo "FROM fairroot:${FAIRROOT_VERSION}_${FAIRSOFT_VERSION}_ubuntu" > Dockerfile
  -  echo "MAINTAINER Dmytro Kresan <d.kresan@gsi.de>" >> Dockerfile
- -  echo "RUN cd /root && echo '#!/bin/bash \\" >> Dockerfile
- -  echo "COMMIT=${TRAVIS_COMMIT}; \\" >> Dockerfile
- -  echo "SLUG=${TRAVIS_REPO_SLUG}; \\" >> Dockerfile
- -  echo "if [ \"${TRAVIS_PULL_REQUEST}\" = \"true\" ] ; then \\" >> Dockerfile
- -  echo "  COMMIT=${TRAVIS_PULL_REQUEST_SHA}; \\" >> Dockerfile
- -  echo "  SLUG=${TRAVIS_PULL_REQUEST_SLUG}; \\" >> Dockerfile
- -  echo "fi \\" >> Dockerfile
- -  echo "echo \${SLUG} \${COMMIT} \\" >> Dockerfile
- -  echo "cd /root && git clone https://github.com/\${SLUG} && cd R3BRoot && \\" >> Dockerfile
- -  echo "git checkout \${COMMIT} && git clone https://github.com/R3BRootGroup/macros.git && cd macros && git checkout dev' > clone.sh" >> Dockerfile
- -  echo "ENTRYPOINT cd /root && . ./clone.sh && cd /root &&\\" >> Dockerfile
+ -  echo "ENTRYPOINT cd /root && echo '#!/bin/bash\n \\" >> Dockerfile
+ -  echo "COMMIT=${TRAVIS_COMMIT};\n \\" >> Dockerfile
+ -  echo "SLUG=${TRAVIS_REPO_SLUG};\n \\" >> Dockerfile
+ -  echo "if [ \"${TRAVIS_PULL_REQUEST}\" = \"true\" ] ; then\n \\" >> Dockerfile
+ -  echo "  COMMIT=${TRAVIS_PULL_REQUEST_SHA};\n \\" >> Dockerfile
+ -  echo "  SLUG=${TRAVIS_PULL_REQUEST_SLUG};\n \\" >> Dockerfile
+ -  echo "fi\n \\" >> Dockerfile
+ -  echo "echo \${SLUG} \${COMMIT}\n \\" >> Dockerfile
+ -  echo "cd /root && git clone https://github.com/\${SLUG} && cd R3BRoot &&\n \\" >> Dockerfile
+ -  echo "git checkout \${COMMIT} && git clone https://github.com/R3BRootGroup/macros.git && cd macros && git checkout dev' > clone.sh && \\" >> Dockerfile
+ -  echo "cd /root && chmod +x clone.sh && ./clone.sh && cd /root &&\\" >> Dockerfile
  -  echo "echo 'export LINUX_FLAVOUR=Ubuntu-16.04\n\\" >> Dockerfile
  -  echo "export FAIRSOFT_VERSION=${FAIRSOFT_VERSION}\n\\" >> Dockerfile
  -  echo "export FAIRROOT_VERSION=v${FAIRROOT_VERSION}\n\\" >> Dockerfile
