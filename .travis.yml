@@ -33,20 +33,20 @@ before_script:
  -  echo "  COMMIT=${TRAVIS_PULL_REQUEST_SHA}; \\" >> Dockerfile
  -  echo "  SLUG=${TRAVIS_PULL_REQUEST_SLUG}; \\" >> Dockerfile
  -  echo "fi \\" >> Dockerfile
- -  echo "echo ${SLUG} ${COMMIT} \\" >> Dockerfile
- -  echo "cd /root && git clone https://github.com/${SLUG} && cd R3BRoot && \\" >> Dockerfile
- -  echo "git checkout ${COMMIT} && git clone https://github.com/R3BRootGroup/macros.git && cd macros && git checkout dev' > clone.sh" >> Dockerfile
+ -  echo "echo \${SLUG} \${COMMIT} \\" >> Dockerfile
+ -  echo "cd /root && git clone https://github.com/\${SLUG} && cd R3BRoot && \\" >> Dockerfile
+ -  echo "git checkout \${COMMIT} && git clone https://github.com/R3BRootGroup/macros.git && cd macros && git checkout dev' > clone.sh" >> Dockerfile
  -  echo "ENTRYPOINT cd /root && . ./clone.sh && cd /root &&\\" >> Dockerfile
  -  echo "echo 'export LINUX_FLAVOUR=Ubuntu-16.04\n\\" >> Dockerfile
  -  echo "export FAIRSOFT_VERSION=${FAIRSOFT_VERSION}\n\\" >> Dockerfile
  -  echo "export FAIRROOT_VERSION=v${FAIRROOT_VERSION}\n\\" >> Dockerfile
- -  echo "export SIMPATH=/root/FairSoft/${FAIRSOFT_VERSION}/build\n\\" >> Dockerfile
- -  echo "export FAIRROOTPATH=/root/FairRoot/v${FAIRROOT_VERSION}/install\n\\" >> Dockerfile
+ -  echo "export SIMPATH=/root/FairSoft/\${FAIRSOFT_VERSION}/build\n\\" >> Dockerfile
+ -  echo "export FAIRROOTPATH=/root/FairRoot/\${FAIRROOT_VERSION}/install\n\\" >> Dockerfile
  -  echo "export GIT_BRANCH=${TRAVIS_COMMIT}\n\\" >> Dockerfile
- -  echo "export BUILDDIR=/tmp/r3broot/build_r3b_experimental_${FAIRSOFT_VERSION}_${FAIRROOT_VERSION}\n\\" >> Dockerfile
+ -  echo "export BUILDDIR=/tmp/r3broot/build_r3b_experimental_\${FAIRSOFT_VERSION}_\${FAIRROOT_VERSION}\n\\" >> Dockerfile
  -  echo "export SOURCEDIR=/root/R3BRoot\n\\" >> Dockerfile
  -  echo "export UCESB_DIR=/root/Ucesb/ucesb\n\\" >> Dockerfile
- -  echo "export PATH=/root/FairSoft/${FAIRSOFT_VERSION}/build/bin:$PATH' > Dart.cfg && \\" >> Dockerfile
+ -  echo "export PATH=/root/FairSoft/\${FAIRSOFT_VERSION}/build/bin:$PATH' > Dart.cfg && \\" >> Dockerfile
  -  echo "/root/R3BRoot/Dart.sh Experimental /root/Dart.cfg" >> Dockerfile
  - cat Dockerfile
  - docker build -t r3broot:${TRAVIS_COMMIT} .
