@@ -27,13 +27,14 @@ before_script:
  -  echo "FROM fairroot:${FAIRROOT_VERSION}_${FAIRSOFT_VERSION}_ubuntu" > Dockerfile
  -  echo "MAINTAINER Dmytro Kresan <d.kresan@gsi.de>" >> Dockerfile
  -  echo "RUN cd /root && echo '#!/bin/bash \\" >> Dockerfile
- -  echo "if [ -z \"${TRAVIS_PULL_REQUEST}\" ] ; then \\" >> Dockerfile
+ -  echo "if [ \"${TRAVIS_PULL_REQUEST}\" = \"false\" ] ; then \\" >> Dockerfile
  -  echo "  COMMIT=${TRAVIS_COMMIT}; \\" >> Dockerfile
  -  echo "  SLUG=${TRAVIS_REPO_SLUG}; \\" >> Dockerfile
  -  echo "else \\" >> Dockerfile
  -  echo "  COMMIT=${TRAVIS_PULL_REQUEST_SHA}; \\" >> Dockerfile
  -  echo "  SLUG=${TRAVIS_PULL_REQUEST_SLUG}; \\" >> Dockerfile
  -  echo "fi \\" >> Dockerfile
+ -  echo "echo ${SLUG} ${COMMIT} \\" >> Dockerfile
  -  echo "cd /root && git clone https://github.com/${SLUG} && cd R3BRoot && \\" >> Dockerfile
  -  echo "git checkout ${COMMIT} && git clone https://github.com/R3BRootGroup/macros.git && cd macros && git checkout dev' > clone.sh" >> Dockerfile
  -  echo "ENTRYPOINT cd /root && . ./clone.sh && cd /root &&\\" >> Dockerfile
