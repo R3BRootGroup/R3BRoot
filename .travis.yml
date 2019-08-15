@@ -7,6 +7,8 @@ env:
     - GCC_VERSION=5
 #    - GCC_VERSION=7
 #    - GCC_VERSION=8
+    - FAIRSOFT_VERSION=may18p1
+    - FAIRROOT_VERSION=18.0.6
 services:
   - docker
 
@@ -17,28 +19,38 @@ before_install:
     - 'if [ "$GCC_VERSION" -ne "5" ]; then
         sudo apt-get install -y gcc-$GCC_VERSION gfortran-$GCC_VERSION g++-$GCC_VERSION;
       fi'
-    - wget https://www.r3broot.gsi.de/system/files/fairroot_18.2.0_jun19p1_ubuntu.tar.gz;
-    - gunzip fairroot_18.2.0_jun19p1_ubuntu.tar.gz;
-    - docker load --input fairroot_18.2.0_jun19p1_ubuntu.tar;
+    - wget https://www.r3broot.gsi.de/system/files/fairroot_${FAIRROOT_VERSION}_${FAIRSOFT_VERSION}_ubuntu.tar.gz;
+    - gunzip fairroot_${FAIRROOT_VERSION}_${FAIRSOFT_VERSION}_ubuntu.tar.gz;
+    - docker load --input fairroot_${FAIRROOT_VERSION}_${FAIRSOFT_VERSION}_ubuntu.tar;
 
 install:
 
 before_script:
- -  echo "FROM fairroot:18.2.0_jun19p1_ubuntu" > Dockerfile
+ -  echo "FROM fairroot:${FAIRROOT_VERSION}_${FAIRSOFT_VERSION}_ubuntu" > Dockerfile
  -  echo "MAINTAINER Dmytro Kresan <d.kresan@gsi.de>" >> Dockerfile
- -  echo "ENTRYPOINT cd /root && git clone https://github.com/${TRAVIS_REPO_SLUG} && cd R3BRoot && \\" >> Dockerfile
- -  echo "git checkout ${TRAVIS_COMMIT} && git clone https://github.com/R3BRootGroup/macros.git && cd macros && git checkout dev && cd ../../ && \\" >> Dockerfile
+ -  echo "RUN cd /root && echo '#!/bin/bash \\" >> Dockerfile
+ -  echo "if [[{TRAVIS_PULL_REQUEST}]] ; then \\" >> Dockerfile
+ -  echo "  COMMIT=${TRAVIS_PULL_REQUEST_SHA}; \\" >> Dockerfile
+ -  echo "  SLUG=${TRAVIS_PULL_REQUEST_SLUG}; \\" >> Dockerfile
+ -  echo "else \\" >> Dockerfile
+ -  echo "  COMMIT=${TRAVIS_COMMIT}; \\" >> Dockerfile
+ -  echo "  SLUG=${TRAVIS_REPO_SLUG}; \\" >> Dockerfile
+ -  echo "fi \\" >> Dockerfile
+ -  echo "cd /root && git clone https://github.com/${SLUG} && cd R3BRoot && \\" >> Dockerfile
+ -  echo "git checkout ${COMMIT} && git clone https://github.com/R3BRootGroup/macros.git && cd macros && git checkout dev' > clone.sh" >> Dockerfile
+ -  echo "ENTRYPOINT cd /root && . ./clone.sh && cd /root &&\\" >> Dockerfile
  -  echo "echo 'export LINUX_FLAVOUR=Ubuntu-16.04\n\\" >> Dockerfile
- -  echo "export FAIRSOFT_VERSION=jun19p1\n\\" >> Dockerfile
- -  echo "export FAIRROOT_VERSION=v18.2.0\n\\" >> Dockerfile
- -  echo "export SIMPATH=/root/FairSoft/jun19p1/build\n\\" >> Dockerfile
- -  echo "export FAIRROOTPATH=/root/FairRoot/v18.2.0/install\n\\" >> Dockerfile
+ -  echo "export FAIRSOFT_VERSION=${FAIRSOFT_VERSION}\n\\" >> Dockerfile
+ -  echo "export FAIRROOT_VERSION=v${FAIRROOT_VERSION}\n\\" >> Dockerfile
+ -  echo "export SIMPATH=/root/FairSoft/${FAIRSOFT_VERSION}/build\n\\" >> Dockerfile
+ -  echo "export FAIRROOTPATH=/root/FairRoot/v${FAIRROOT_VERSION}/install\n\\" >> Dockerfile
  -  echo "export GIT_BRANCH=${TRAVIS_COMMIT}\n\\" >> Dockerfile
  -  echo "export BUILDDIR=/tmp/r3broot/build_r3b_experimental_${FAIRSOFT_VERSION}_${FAIRROOT_VERSION}\n\\" >> Dockerfile
  -  echo "export SOURCEDIR=/root/R3BRoot\n\\" >> Dockerfile
  -  echo "export UCESB_DIR=/root/Ucesb/ucesb\n\\" >> Dockerfile
- -  echo "export PATH=/root/FairSoft/jun19p1/build/bin:$PATH' > Dart.cfg && \\" >> Dockerfile
+ -  echo "export PATH=/root/FairSoft/${FAIRSOFT_VERSION}/build/bin:$PATH' > Dart.cfg && \\" >> Dockerfile
  -  echo "/root/R3BRoot/Dart.sh Experimental /root/Dart.cfg" >> Dockerfile
+ - cat Dockerfile
  - docker build -t r3broot:${TRAVIS_COMMIT} .
 
 script:
