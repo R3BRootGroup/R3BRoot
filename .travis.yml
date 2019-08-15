@@ -27,7 +27,7 @@ before_script:
  -  echo "FROM fairroot:${FAIRROOT_VERSION}_${FAIRSOFT_VERSION}_ubuntu" > Dockerfile
  -  echo "MAINTAINER Dmytro Kresan <d.kresan@gsi.de>" >> Dockerfile
  -  echo "RUN cd /root && echo '#!/bin/bash \\" >> Dockerfile
- -  echo "if [[{TRAVIS_PULL_REQUEST}]] ; then \\" >> Dockerfile
+ -  echo "if [[${TRAVIS_PULL_REQUEST}]] ; then \\" >> Dockerfile
  -  echo "  COMMIT=${TRAVIS_PULL_REQUEST_SHA}; \\" >> Dockerfile
  -  echo "  SLUG=${TRAVIS_PULL_REQUEST_SLUG}; \\" >> Dockerfile
  -  echo "else \\" >> Dockerfile
