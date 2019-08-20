@@ -37,7 +37,9 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
-${R3BROOT_SOURCE_DIR}/r3bdata/ptofData  )
+${R3BROOT_SOURCE_DIR}/r3bdata/ptofData  
+${R3BROOT_SOURCE_DIR}/tracking
+)
 
 include_directories( ${INCLUDE_DIRECTORIES})
 include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
@@ -63,9 +65,13 @@ R3BTof2pDigitizer.cxx
 R3BTofdMapped2Cal.cxx
 R3BTofdMapped2CalPar.cxx
 R3BTofdCal2HitPar.cxx
+R3BTofdCal2Histo.cxx
+R3BTofdCal2HistoPar.cxx
+R3BTofdChangePar.cxx
 R3BTofdCal2Hit.cxx
 R3BTofdHitModulePar.cxx
 R3BTofdHitPar.cxx
+R3BTofdDigitizer.cxx
 R3BPtofMapped2CalPar.cxx
 R3BPtofMapped2Cal.cxx
 calibration/R3BPtofCal2HitPar.cxx

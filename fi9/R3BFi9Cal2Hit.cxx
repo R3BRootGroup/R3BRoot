@@ -14,7 +14,7 @@
 #include "R3BFi9Cal2Hit.h"
 
 R3BFi9Cal2Hit::R3BFi9Cal2Hit(Bool_t a_is_calibrator, Int_t a_verbose)
-    : R3BBunchedFiberCal2Hit("Fi9", a_verbose, VERTICAL, 2, 256, 1, a_is_calibrator)
+    : R3BBunchedFiberCal2Hit("Fi9", a_verbose, R3BTCalEngine::CTDC_8_12_FWD_250, VERTICAL, 2, 256, 1, a_is_calibrator)
 {
 }
 

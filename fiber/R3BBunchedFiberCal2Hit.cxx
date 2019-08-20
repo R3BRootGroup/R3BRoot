@@ -38,6 +38,7 @@ R3BBunchedFiberCal2Hit::ToT::ToT(R3BBunchedFiberCalData const* a_lead,
 
 R3BBunchedFiberCal2Hit::R3BBunchedFiberCal2Hit(const char* a_name,
                                                Int_t a_verbose,
+                                               enum R3BTCalEngine::CTDCVariant a_ctdc_variant,
                                                Direction a_direction,
                                                UInt_t a_sub_num,
                                                UInt_t a_mapmt_per_sub,
@@ -45,6 +46,7 @@ R3BBunchedFiberCal2Hit::R3BBunchedFiberCal2Hit(const char* a_name,
                                                Bool_t a_is_calibrator)
     : FairTask(TString("R3B") + a_name + "Cal2Hit", a_verbose)
     , fName(a_name)
+    , fClockFreq(R3BTCalEngine::CTDC_16_BWD_150 == a_ctdc_variant ? 150 : 250)
     , fDirection(a_direction)
     , fSubNum(a_sub_num)
     , fIsCalibrator(a_is_calibrator)
@@ -59,6 +61,9 @@ R3BBunchedFiberCal2Hit::R3BBunchedFiberCal2Hit(const char* a_name,
     , fh_ToT_Single_Fib()
     , fh_ToT_s_Fib()
     , fh_ToT_ToT()
+    , fh_dt_Fib()
+    , fnEvents(0)
+
 {
     fChPerSub[0] = a_mapmt_per_sub;
     fChPerSub[1] = a_spmt_per_sub;
@@ -85,6 +90,8 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
         LOG(ERROR) << "Branch " << name << " not found.";
         return kERROR;
     }
+    maxevent = mgr->CheckMaxEventNo();
+
     mgr->Register(fName + "Hit", "Land", fHitItems, kTRUE);
     // Resize per-channel info arrays.
     for (auto side_i = 0; side_i < 2; ++side_i)
@@ -119,14 +126,14 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     // ToT MAPMT:
     chistName = fName + "_ToT_MAPMT";
     chistTitle = fName + " ToT of fibers";
-    fh_ToT_MA_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 2100, 0., 2100., 200, 0., 200.);
+    fh_ToT_MA_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 2100, 0., 2100., 100, 0., 41.666667);
     fh_ToT_MA_Fib->GetXaxis()->SetTitle("Fiber number");
     fh_ToT_MA_Fib->GetYaxis()->SetTitle("ToT / ns");
 
     // ToT single PMT:
     chistName = fName + "_ToT_SAPMT";
     chistTitle = fName + " ToT of fibers";
-    fh_ToT_Single_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 2100, 0., 2100., 200, 0., 200.);
+    fh_ToT_Single_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 2100, 0., 2100., 100, 0., 100.);
     fh_ToT_Single_Fib->GetXaxis()->SetTitle("Fiber number");
     fh_ToT_Single_Fib->GetYaxis()->SetTitle("ToT / ns");
 
@@ -137,7 +144,7 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
         snprintf(number, sizeof(number), "%d", i);
         chistName = fName + "_ToT_SAPMT" + number;
         chistTitle = fName + " ToT of single PMTs " + number;
-        fh_ToT_s_Fib[i] = new TH2F(chistName.Data(), chistTitle.Data(), 2100, 0., 2100., 200, 0., 200.);
+        fh_ToT_s_Fib[i] = new TH2F(chistName.Data(), chistTitle.Data(), 2100, 0., 2100., 100, 0., 100.);
         fh_ToT_s_Fib[i]->GetXaxis()->SetTitle("Fiber number");
         fh_ToT_s_Fib[i]->GetYaxis()->SetTitle("ToT / ns");
     }
@@ -148,6 +155,14 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
     fh_ToT_ToT = new TH2F(chistName.Data(), chistTitle.Data(), 1000, 0., 100., 1000, 0., 100.);
     fh_ToT_ToT->GetXaxis()->SetTitle("SPMT 1");
     fh_ToT_ToT->GetYaxis()->SetTitle("SPMT 2");
+
+    // time difference SPMT - MAPMT:
+    chistName = fName + "_dt";
+    chistTitle = fName + " dt of fibers";
+    fh_dt_Fib = new TH2F(chistName.Data(), chistTitle.Data(), 2100, 0., 2100., 1200, -600., 600.);
+    fh_dt_Fib->GetXaxis()->SetTitle("Fiber number");
+    fh_dt_Fib->GetYaxis()->SetTitle("dt / ns");
+
     return kSUCCESS;
 }
 
@@ -166,6 +181,11 @@ void R3BBunchedFiberCal2Hit::SetParContainers()
 
 void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
 {
+    // cout<<"in exec"<<endl;
+    //	if(fnEvents/10000.==(int)fnEvents/10000) cout<<"Events: "<<fnEvents<<"         \r"<<std::flush;
+    if (fnEvents / 100000. == (int)fnEvents / 100000)
+        std::cout << "\rEvents: " << fnEvents << " / " << maxevent << " (" << (int)(fnEvents * 100. / maxevent)
+                  << " %) " << std::flush;
     for (auto side_i = 0; side_i < 2; ++side_i)
     {
         // Clear local helper containers.
@@ -177,7 +197,9 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
         }
     }
 
-    auto const c_period = 4096e3 / CLOCK_TDC_MHZ;
+    // cout<<"multihit"<<endl;
+
+    auto const c_period = 4096e3 / fClockFreq;
     size_t cal_num = fCalItems->GetEntriesFast();
 
     // Find multi-hit ToT for every channel.
@@ -227,24 +249,28 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
             auto tot = fmod(cur_cal->GetTime_ns() - lead->GetTime_ns() + c_period, c_period);
             if (tot < 1000)
             {
-                if (side_i == 0)
-                    tot -= 9.;
+                // if (side_i==0) tot -= 9.;//taken out for the moment MH
+
                 channel.tot_list.push_back(ToT(lead, cur_cal, tot));
                 channel.lead_list.pop_front();
             }
         }
     }
 
-    double s1 = 99;
-    double s2 = 99;
-    double s3 = 99;
-    double s4 = 99;
+    // cout<<"finished list"<<endl;
+
+    double s1 = 99.;
+    double s2 = 99.;
+    double s3 = 99.;
+    double s4 = 99.;
     int single = 0;
 
     double tot_mapmt_max = -1;
     double tot_spmt_max = -1;
     int tot_mapmt_max_fiber_id = 0;
     int tot_spmt_max_fiber_id = 0;
+
+    // cout<<"permutations"<<endl;
 
     // Make every permutation to create fibers.
     auto const& mapmt_array = fChannelArray[0];
@@ -290,9 +316,9 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                     single = spmt_tot.lead->GetChannel();
 
                     /*
-                           cout<<"MA Fiber ch: "<<mapmt_tot.lead->GetChannel()<<" Fiber: "<< fiber_id<<" ToT: "<<
-                       mapmt_tot.tot<<endl; cout<<"S channels: "<<spmt_tot.lead->GetChannel()<<" ToT: "<<spmt_tot.tot<<"
-                       mult: "<<s_mult<<endl;
+                    cout<<"MA Fiber ch: "<<mapmt_tot.lead->GetChannel()<<" Fiber: "<< fiber_id<<" ToT: "<<
+                    mapmt_tot.tot<<endl; cout<<"S channels: "<<spmt_tot.lead->GetChannel()<<" ToT: "<<spmt_tot.tot<<"
+                    mult: "<<s_mult<<endl;
                     */
                     // TODO: Use it_sub->direction to find real life coordinates.
 
@@ -302,10 +328,36 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                     // Calibrate hit fiber.
                     auto tot_mapmt = mapmt_tot.tot;
                     auto tot_spmt = spmt_tot.tot;
+                    Double_t t_mapmt = mapmt_tot.lead->GetTime_ns();
+                    Double_t t_spmt = spmt_tot.lead->GetTime_ns();
+
+                    // "Push" two times in the same clock cycle:
+                    // MAPMT coarse counter has 4096 channels with 1000/150=6.67 ns or 4 ns each
+                    // SPMT coarse counter has 2048 channels with 5 ns each
+                    Double_t dtime = t_spmt - t_mapmt;
+                    while (dtime > 256. / 2. * 1000. / fClockFreq)
+                    {
+                        t_mapmt += 256. * 1000. / fClockFreq;
+                        dtime = t_spmt - t_mapmt;
+                        // cout<<"dtime1 "<<dtime<<endl;
+                    }
+                    while (dtime < -256. / 2. * 1000. / fClockFreq)
+                    {
+                        t_mapmt -= 256. * 1000. / fClockFreq;
+                        dtime = t_spmt - t_mapmt;
+                        // cout<<"dtime2 "<<dtime<<endl;
+                    }
+
+                    // histogram for offset determination
+                    if (fIsCalibrator)
+                        fh_dt_Fib->Fill(fiber_id, t_spmt - t_mapmt);
 
                     // Apply calibration.
-                    Double_t gainMA = 100;
-                    Double_t gainS = 100;
+                    Double_t gainMA = 10.;
+                    Double_t gainS = 10.;
+                    Double_t offset1 = 0.;
+                    Double_t offset2 = 0.;
+
                     if (!fIsCalibrator && fHitPar)
                     {
                         R3BBunchedFiberHitModulePar* par = fHitPar->GetModuleParAt(fiber_id);
@@ -313,10 +365,22 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                         {
                             gainMA = par->GetGainMA();
                             gainS = par->GetGainS();
+                            offset1 = par->GetOffset1();
+                            offset2 = par->GetOffset2();
                         }
                     }
-                    tot_mapmt *= 100 / gainMA;
-                    tot_spmt *= 100 / gainS;
+                    // cout<<"offset "<<offset1<<"  "<<offset2<<endl;
+                    // cout<<"before "<<t_spmt<<"  "<<t_mapmt<<endl;
+
+                    tot_mapmt *= 10. / gainMA;
+                    tot_spmt *= 10. / gainS;
+                    t_mapmt += offset1;
+                    t_spmt += offset2;
+
+                    // cout<<"after "<<t_spmt<<"  "<<t_mapmt<<endl;
+
+                    if (!fIsCalibrator)
+                        fh_dt_Fib->Fill(fiber_id, t_spmt - t_mapmt);
 
                     /*
                     if (tot_mapmt > tot_mapmt_max) {
@@ -342,40 +406,68 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                         fh_ToT_Single_Fib->Fill(fiber_id, tot_spmt);
                         fh_ToT_s_Fib[single - 1]->Fill(fiber_id, tot_spmt);
                     }
-                    /*
-                    if(fiber_id==300){
 
-                              if (spmt_tot.lead->GetChannel() == 1 && s1 == 99) s1 = tot_spmt;
-                              if (spmt_tot.lead->GetChannel() == 2 && s2 == 99) s2 = tot_spmt;
-                              if (spmt_tot.lead->GetChannel() == 3 && s3 == 99) s3 = tot_spmt;
-                              if (spmt_tot.lead->GetChannel() == 4 && s4 == 99) s4 = tot_spmt;
-                              cout<<"s1234: "<<s1<<"  "<<s2<<"  "<<s3<<"  "<<s4<<endl;
+                    Int_t numFibs = fSubNum * fChPerSub[0] * fChPerSub[1];
+                    Double_t x = -10000.;
+                    Double_t y = -10000.;
+
+                    if (fName == "Fi10" || fName == "Fi11" || fName == "Fi12" || fName == "Fi13")
+                    {
+                        if (fDirection == VERTICAL)
+                        {
+                            x = ((double)fiber_id - (double)numFibs / 2) * 0.05; // in cm
+                            y = (t_spmt - t_mapmt) * 3.;
+                        }
+                        else
+                        {
+                            x = (t_spmt - t_mapmt) * 3.;
+                            y = ((double)fiber_id - (double)numFibs / 2) * 0.05; // in cm
+                        }
                     }
-                    */
-                    new ((*fHitItems)[fNofHitItems++]) R3BBunchedFiberHitData(
-                        fiber_id, mapmt_tot.lead->GetTime_ns(), spmt_tot.lead->GetTime_ns(), tot_mapmt, tot_spmt);
+                    if (fName == "Fi1a" || fName == "Fi1b" || fName == "Fi2a" || fName == "Fi2b" || fName == "Fi3a" ||
+                        fName == "Fi3b")
+                    {
+                        if (fDirection == VERTICAL)
+                        {
+                            x = ((double)fiber_id - (double)numFibs / 2) * 0.021; // in cm
+                            y = (t_spmt - t_mapmt) * 3.;
+                        }
+                        else
+                        {
+                            x = (t_spmt - t_mapmt) * 3.;
+                            y = ((double)fiber_id - (double)numFibs / 2) * 0.021; // in cm
+                        }
+                    }
+                    Double_t eloss = sqrt(tot_mapmt * tot_spmt);
+                    Double_t t = (t_mapmt + t_spmt) / 2.;
+
+                    // cout<<"FiberID: "<<fiber_id << "  "<<(double)fiber_id - (double)numFibs<<endl;
+                    // cout<<fName<<" x: "<< x << " y: "<< y << " eloss: " << eloss << " t: " << t << endl;
+
+                    if (!fIsCalibrator)
+                        new ((*fHitItems)[fNofHitItems++])
+                            R3BBunchedFiberHitData(0, x, y, eloss, t, fiber_id, t_mapmt, t_spmt, tot_mapmt, tot_spmt);
                 }
             }
         }
     }
     fh_ToT_ToT->Fill(s1, s2);
+    fnEvents++;
 
-    // Fill histograms for gain match, and for debugging.
-    // if (-1 != tot_mapmt_max) fh_ToT_m_Fib->Fill(tot_mapmt_max_fiber_id, tot_mapmt_max);
-    // if (-1 != tot_spmt_max) fh_ToT_s_Fib->Fill(tot_spmt_max_fiber_id, tot_spmt_max);
+    // cout<<"end exec"<<endl;
 }
 
 void R3BBunchedFiberCal2Hit::FinishEvent()
 {
     fHitItems->Clear();
     fNofHitItems = 0;
-    //  cout<<"next event"<<endl;
 }
 
 void R3BBunchedFiberCal2Hit::FinishTask()
 {
     fh_ToT_MA_Fib->Write();
     fh_ToT_Single_Fib->Write();
+    fh_dt_Fib->Write();
 
     for (Int_t i = 0; i < 4; i++)
     {
@@ -398,6 +490,17 @@ void R3BBunchedFiberCal2Hit::FinishTask()
             fCalPar->AddModulePar(mpar);
         }
 
+        // time offset
+        for (UInt_t i = 1; i <= max; i++)
+        {
+            TH1D* proj = fh_dt_Fib->ProjectionY("", i + 1, i + 1, 0);
+            R3BBunchedFiberHitModulePar* par = fCalPar->GetModuleParAt(i);
+            par->SetOffset1(0.5 * proj->GetBinCenter(proj->GetMaximumBin()));
+            par->SetOffset2(-0.5 * proj->GetBinCenter(proj->GetMaximumBin()));
+
+            cout << "MA fiber: " << i << " offset: " << 0.5 * proj->GetBinCenter(proj->GetMaximumBin()) << endl;
+        }
+
         for (UInt_t i = 1; i <= max; i++)
         {
             TH1D* proj = fh_ToT_MA_Fib->ProjectionY("", i + 1, i + 1, 0);
@@ -407,11 +510,11 @@ void R3BBunchedFiberCal2Hit::FinishTask()
                 {
                     // could not find maximum
                 }
-                if (proj->GetBinContent(j) > proj->GetMaximum() / 10.)
+                if (proj->GetBinContent(j) > proj->GetMaximum() / 100.)
                 {
                     R3BBunchedFiberHitModulePar* par = fCalPar->GetModuleParAt(i);
                     par->SetGainMA(proj->GetBinCenter(j));
-                    //        cout<<"MA fiber: "<< i<<" par: "<<proj->GetBinCenter(j)<<endl;
+                    // cout<<"MA fiber: "<< i<<" par: "<<proj->GetBinCenter(j)<<endl;
                     // par->SetGainMA(j - 1);
                     cout << "MA fiber: " << i << " par: " << proj->GetBinCenter(j) << endl;
                     break;
@@ -433,7 +536,7 @@ void R3BBunchedFiberCal2Hit::FinishTask()
                 {
                     R3BBunchedFiberHitModulePar* par = fCalPar->GetModuleParAt(i);
                     par->SetGainS(proj->GetBinCenter(j));
-                    //      cout<<"S fiber: "<< i<<" par: "<<proj->GetBinCenter(j)<<endl;
+                    // cout<<"S fiber: "<< i<<" par: "<<proj->GetBinCenter(j)<<endl;
                     // par->SetGainS(j - 1);
                     cout << "S fiber: " << i << " par: " << proj->GetBinCenter(j) << endl;
                     break;

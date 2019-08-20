@@ -19,7 +19,7 @@
 class R3BFi3aMapped2Cal : public R3BBunchedFiberMapped2Cal
 {
   public:
-    R3BFi3aMapped2Cal(Int_t = 1);
+    R3BFi3aMapped2Cal(Int_t, enum R3BTCalEngine::CTDCVariant);
     virtual ~R3BFi3aMapped2Cal();
 
     ClassDef(R3BFi3aMapped2Cal, 1)

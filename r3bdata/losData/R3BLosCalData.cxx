@@ -78,6 +78,7 @@ void R3BLosCalData::Reset()
         fTimeV_ns[j] = 0.0 / 0.0;
         fTimeL_ns[j] = 0.0 / 0.0;
         fTimeT_ns[j] = 0.0 / 0.0;
+        fTimeM_ns[j] = 0.0 / 0.0;
     }
 }
 
@@ -97,7 +98,12 @@ Double_t R3BLosCalData::GetTimeT_ns(UInt_t chann) const
 {
     ASSERT(chann, <, LENGTH(fTimeT_ns));
     return fTimeT_ns[chann];
-    ;
+}
+
+Double_t R3BLosCalData::GetTimeM_ns(UInt_t chann) const
+{
+    ASSERT(chann, <, LENGTH(fTimeM_ns));
+    return fTimeM_ns[chann];
 }
 
 /*
@@ -295,6 +301,22 @@ Double_t R3BLosCalData::GetMeanTimeVFTX()
 
     return num_times ? mean / num_times : NAN;
 }
+
+Double_t R3BLosCalData::GetMeanTimeMTDC32()
+{
+    Double_t mean = 0;
+    Int_t num_times = 0;
+    for (Int_t i = 0; i < 8; i++)
+    {
+        if (!std::isnan(fTimeM_ns[i]))
+        {
+            mean += fTimeM_ns[i];
+            num_times++;
+        }
+    }
+    return num_times ? mean / num_times : NAN;
+}
+
 UInt_t R3BLosCalData::GetVFTXNcha()
 {
     Int_t num_times = 0;
@@ -306,6 +328,18 @@ UInt_t R3BLosCalData::GetVFTXNcha()
         }
     }
 
+    return num_times;
+}
+UInt_t R3BLosCalData::GetMTDC32Ncha()
+{
+    Int_t num_times = 0;
+    for (Int_t i = 0; i < 8; i++)
+    {
+        if (!std::isnan(fTimeM_ns[i]))
+        {
+            num_times++;
+        }
+    }
     return num_times;
 }
 

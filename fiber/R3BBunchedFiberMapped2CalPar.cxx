@@ -23,11 +23,13 @@
 R3BBunchedFiberMapped2CalPar::R3BBunchedFiberMapped2CalPar(const char* a_name,
                                                            Int_t a_verbose,
                                                            enum Electronics a_spmt_electronics,
+                                                           enum R3BTCalEngine::CTDCVariant a_ctdc_variant,
                                                            Int_t a_update_rate,
                                                            Int_t a_min_stats)
     : FairTask(TString("R3B") + a_name + "Mapped2CalPar", a_verbose)
     , fName(a_name)
     , fSPMTElectronics(a_spmt_electronics)
+    , fCTDCVariant(a_ctdc_variant)
     , fUpdateRate(a_update_rate)
     , fMinStats(a_min_stats)
 {
@@ -99,11 +101,11 @@ void R3BBunchedFiberMapped2CalPar::FinishEvent() {}
 
 void R3BBunchedFiberMapped2CalPar::FinishTask()
 {
-    fMAPMTEngine->CalculateParamClockTDC();
+    fMAPMTEngine->CalculateParamClockTDC(fCTDCVariant);
     switch (fSPMTElectronics)
     {
         case CTDC:
-            fSPMTEngine->CalculateParamClockTDC();
+            fSPMTEngine->CalculateParamClockTDC(fCTDCVariant);
             break;
         case TAMEX:
             fSPMTEngine->CalculateParamVFTX();

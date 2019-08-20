@@ -15,6 +15,8 @@
 #define R3BBUNCHEDFIBERCAL2HIT
 
 #include "FairTask.h"
+#include <R3BTCalEngine.h>
+
 class TH1F;
 class TH2F;
 
@@ -62,7 +64,14 @@ class R3BBunchedFiberCal2Hit : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BBunchedFiberCal2Hit(const char*, Int_t, Direction, UInt_t, UInt_t, UInt_t, Bool_t);
+    R3BBunchedFiberCal2Hit(const char*,
+                           Int_t,
+                           enum R3BTCalEngine::CTDCVariant,
+                           Direction,
+                           UInt_t,
+                           UInt_t,
+                           UInt_t,
+                           Bool_t);
 
     /**
      * Destructor.
@@ -116,6 +125,10 @@ class R3BBunchedFiberCal2Hit : public FairTask
 
   private:
     TString fName;
+    Int_t fnEvents;
+    Int_t maxevent;
+
+    double fClockFreq;
     Direction fDirection;
     UInt_t fSubNum;
     UInt_t fChPerSub[2];
@@ -133,8 +146,8 @@ class R3BBunchedFiberCal2Hit : public FairTask
     TH2F* fh_ToT_MA_Fib;
     TH2F* fh_ToT_Single_Fib;
     TH2F* fh_ToT_s_Fib[4];
-
     TH2F* fh_ToT_ToT;
+    TH2F* fh_dt_Fib;
 
   public:
     ClassDef(R3BBunchedFiberCal2Hit, 3)

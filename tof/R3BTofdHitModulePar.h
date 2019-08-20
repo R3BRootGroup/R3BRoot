@@ -1,16 +1,3 @@
-/******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
- *                                                                            *
- *             This software is distributed under the terms of the            *
- *                 GNU General Public Licence (GPL) version 3,                *
- *                    copied verbatim in the file "LICENSE".                  *
- *                                                                            *
- * In applying this license GSI does not waive the privileges and immunities  *
- * granted to it by virtue of its status as an Intergovernmental Organization *
- * or submit itself to any jurisdiction.                                      *
- ******************************************************************************/
-
 #ifndef R3BTOFDHITMODULEPAR_H
 #define R3BTOFDHITMODULEPAR_H
 
@@ -90,7 +77,14 @@ class R3BTofdHitModulePar : public FairParGenericSet
     Double_t GetPar2b() const { return fPar2b; }
     Double_t GetPar2c() const { return fPar2c; }
     Double_t GetPar2d() const { return fPar2d; }
-
+    Double_t GetPar1za() const { return fPar1za; }
+    Double_t GetPar1zb() const { return fPar1zb; }
+    Double_t GetPar1zc() const { return fPar1zc; }
+    Double_t GetPar1walk() const { return fPar1walk; }
+    Double_t GetPar2walk() const { return fPar2walk; }
+    Double_t GetPar3walk() const { return fPar3walk; }
+    Double_t GetPar4walk() const { return fPar4walk; }
+    Double_t GetPar5walk() const { return fPar5walk; }
     void SetPlane(Int_t i) { fPlane = i; }
     void SetPaddle(Int_t i) { fPaddle = i; }
     void SetSync(Double_t t) { fSync = t; }
@@ -104,6 +98,14 @@ class R3BTofdHitModulePar : public FairParGenericSet
     void SetPar2b(Double_t par2b) { fPar2b = par2b; }
     void SetPar2c(Double_t par2c) { fPar2c = par2c; }
     void SetPar2d(Double_t par2d) { fPar2d = par2d; }
+    void SetPar1za(Double_t par1za) { fPar1za = par1za; }
+    void SetPar1zb(Double_t par1zb) { fPar1zb = par1zb; }
+    void SetPar1zc(Double_t par1zc) { fPar1zc = par1zc; }
+    void SetPar1walk(Double_t par1walk) { fPar1walk = par1walk; }
+    void SetPar2walk(Double_t par2walk) { fPar2walk = par2walk; }
+    void SetPar3walk(Double_t par3walk) { fPar3walk = par3walk; }
+    void SetPar4walk(Double_t par4walk) { fPar4walk = par4walk; }
+    void SetPar5walk(Double_t par5walk) { fPar5walk = par5walk; }
     void SetVeff(Double_t v) { fVeff = v; }
 
   private:
@@ -115,6 +117,8 @@ class R3BTofdHitModulePar : public FairParGenericSet
     Double_t fSync;    /**< time offset between paddles */
     Double_t fPar1a, fPar1b, fPar1c, fPar1d;
     Double_t fPar2a, fPar2b, fPar2c, fPar2d;
+    Double_t fPar1za, fPar1zb, fPar1zc, fPar1zd;
+    Double_t fPar1walk, fPar2walk, fPar3walk, fPar4walk, fPar5walk;
 
     ClassDef(R3BTofdHitModulePar, 1);
 };

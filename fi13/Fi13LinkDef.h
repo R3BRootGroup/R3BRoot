@@ -22,6 +22,7 @@
 #pragma link C++ class R3BFi13+;
 #pragma link C++ class R3BFi13Cal2Hit+;
 #pragma link C++ class R3BFi13Mapped2Cal+;
-#pragma link C++ class R3BFi13ContFact;
+#pragma link C++ class R3BFi13ContFact+;
+#pragma link C++ class R3BFi13Digitizer+;
 
 #endif

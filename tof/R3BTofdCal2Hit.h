@@ -1,16 +1,3 @@
-/******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
- *                                                                            *
- *             This software is distributed under the terms of the            *
- *                 GNU General Public Licence (GPL) version 3,                *
- *                    copied verbatim in the file "LICENSE".                  *
- *                                                                            *
- * In applying this license GSI does not waive the privileges and immunities  *
- * granted to it by virtue of its status as an Intergovernmental Organization *
- * or submit itself to any jurisdiction.                                      *
- ******************************************************************************/
-
 // ------------------------------------------------------------------
 // -----                  R3BTofdCal2Hit                         -----
 // -----            Created May 30th 2016 by M.Heil           -----
@@ -30,6 +17,7 @@
 class TClonesArray;
 class R3BTofdHitModulePar;
 class R3BTofdHitPar;
+class R3BEventHeader;
 class TH1F;
 class TH2F;
 
@@ -113,11 +101,25 @@ class R3BTofdCal2Hit : public FairTask
      * Method for beta correction.
      */
     virtual Double_t betaCorr(Double_t delta);
-
+    /**
+     * Method for Eloss correction.
+     */
+    virtual Double_t Eloss(Double_t Q);
     /**
      * Method for calculation of saturation.
      */
     virtual Double_t saturation(Double_t x);
+    /**
+     * Method for insert.
+     */
+    virtual Double_t* insertX(Int_t n, Double_t arr[], Double_t x, Int_t pos);
+
+    /**
+     * Method for selecting events with certain trigger value.
+     * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
+     */
+    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
+    inline void SetTpat(Int_t tpat) { fTpat = tpat; }
     /**
      * Methods for setting number of planes and paddles
      */
@@ -135,12 +137,15 @@ class R3BTofdCal2Hit : public FairTask
     UInt_t fNofHitItems;        /**< Number of hit items for cur event. */
     R3BTofdHitPar* fHitPar;     /**< Hit parameter container. */
     UInt_t fNofHitPars;         /**< Number of modules in parameter file. */
+    R3BEventHeader* header;     /**< Event header - input data. */
     Double_t fClockFreq;        /**< Clock cycle in [ns]. */
     Int_t fTrigger;             /**< Trigger value. */
+    Int_t fTpat;
     Double_t fTofdQ;
     UInt_t fnEvents;
     UInt_t fNofPlanes;
     UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */
+    Int_t maxevent;
 
     // arrays of control histograms
     TH2F* fhQ1vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
@@ -151,15 +156,18 @@ class R3BTofdCal2Hit : public FairTask
     TH2F* fhQvsQ[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX * 2 + 1];
     TH2F* fhQvsTof[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhSqrtQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
-
+    TH2F* fhQvsTofw[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhQPm1[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhQPm2[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhQ[N_TOFD_HIT_PLANE_MAX];
-
+    TH2F* fhQM[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhMvsQ[N_TOFD_HIT_PLANE_MAX];
+    // TH2F* fhQvsTp[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX*2+1];
     TH2F* fhTof[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhTdvsQ[N_TOFD_HIT_PLANE_MAX];
 
     TH2F* fhTdiff[N_TOFD_HIT_PLANE_MAX];
-    TH2F* fhSync[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhTsync[N_TOFD_HIT_PLANE_MAX];
 
     /*
         TH2F* fhTotPm1vsTotPm2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
@@ -175,10 +183,13 @@ class R3BTofdCal2Hit : public FairTask
 
     TH2F* fhxy;
     TH1F* fhCharge;
+    TH1F* fhTimePB[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX * 2 + 1];
+    TH1F* fhTimeP;
     TH2F* fhChargevsTof;
     TH2F* fhChargevsPos;
     TH2F* fhQp12;
     TH2F* fhQp34;
+    TH2F* fhQp12vsTdiff[N_TOFD_HIT_PADDLE_MAX * 2 + 1];
 
     //    TH2F* fhSaturation1;
     //    TH2F* fhSaturation2;

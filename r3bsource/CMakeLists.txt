@@ -32,6 +32,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
 ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/roluData
+${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
@@ -40,6 +41,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
 ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
+${R3BROOT_SOURCE_DIR}/r3bdata/sampData
 )
 
 set(LINK_DIRECTORIES
@@ -61,6 +63,7 @@ R3BWhiterabbitMasterReader.cxx
 R3BWhiterabbitCalifaReader.cxx
 R3BWhiterabbitAmsReader.cxx
 R3BTrloiiTpatReader.cxx
+R3BTrloiiSampReader.cxx
 R3BTimestampMasterReader.cxx
 R3BPspxReader.cxx
 R3BBunchedFiberReader.cxx
@@ -84,6 +87,7 @@ R3BFi12Reader.cxx
 R3BFi13Reader.cxx
 R3BLosReader.cxx
 R3BRoluReader.cxx
+R3BSci2Reader.cxx
 R3BSci8Reader.cxx
 R3BTofdReader.cxx
 R3BCalifaFebexReader.cxx
@@ -123,8 +127,10 @@ ext_h101_fibten.h
 ext_h101_fibeleven.h
 ext_h101_fibtwelve.h
 ext_h101_fibthirteen.h
-ext_h101_los_tamex.h
+#ext_h101_los_tamex.h
+ext_h101_los_dez19.h
 ext_h101_rolu.h
+ext_h101_sci2.h
 ext_h101_sci8.h
 ext_h101_tofd.h
 ext_h101_ptof.h
@@ -137,6 +143,7 @@ ext_h101_star.h
 ext_h101_fibfour.h
 ext_h101_ams.h
 ext_h101_music.h
+ext_h101_samp.h
 )
 
 # fill list of header files from list of source files

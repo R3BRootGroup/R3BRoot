@@ -81,6 +81,12 @@ class R3BIonGenerator : public FairGenerator
         fBeamSpotIsSet = kTRUE;
     }
 
+    void SetBeamParameter(Double32_t sigmaP = 0, Double32_t angle = 0)
+    {
+        fSigmaP = sigmaP;
+        fAngle = angle;
+    }
+
     /** Method ReadEvent
      ** Generates <mult> of the specified ions and hands hem to the
      ** FairPrimaryGenerator.
@@ -95,6 +101,7 @@ class R3BIonGenerator : public FairGenerator
     Double_t fVx, fVy, fVz;     // Vertex coordinates [cm]
     FairIon* fIon;              // Pointer to the FairIon to be generated
     Int_t fQ;                   // Electric charge [e]
+    Double32_t fSigmaP, fAngle; // beam variation in momentum, angle of emittance
 
     Bool_t fBeamSpotIsSet; // True if point beamspot is set
 

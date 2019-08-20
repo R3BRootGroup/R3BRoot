@@ -1,16 +1,3 @@
-/******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
- *                                                                            *
- *             This software is distributed under the terms of the            *
- *                 GNU General Public Licence (GPL) version 3,                *
- *                    copied verbatim in the file "LICENSE".                  *
- *                                                                            *
- * In applying this license GSI does not waive the privileges and immunities  *
- * granted to it by virtue of its status as an Intergovernmental Organization *
- * or submit itself to any jurisdiction.                                      *
- ******************************************************************************/
-
 // ------------------------------------------------------------
 // -----                  R3BLosMapped2Cal                -----
 // -----          Created Feb 4th 2016 by R.Plag          -----
@@ -44,8 +31,10 @@
 #include "TClonesArray.h"
 #include "TMath.h"
 
-#define LOS_COINC_WINDOW_V_NS 200
-#define LOS_COINC_WINDOW_T_NS 190 // Same as VFTX, as leading and trailing times are separately treated
+#define LOS_COINC_WINDOW_V_NS 200;
+#define LOS_COINC_WINDOW_TL_NS 200;  // leading
+#define LOS_COINC_WINDOW_TT_NS 1000; // trailing, longer because of pileup
+#define LOS_COINC_WINDOW_M_NS 400;   // 200  // ???
 #define IS_NAN(x) TMath::IsNaN(x)
 
 R3BLosMapped2Cal::R3BLosMapped2Cal()
@@ -54,7 +43,6 @@ R3BLosMapped2Cal::R3BLosMapped2Cal()
     , fCalItems(new TClonesArray("R3BLosCalData"))
     , fNofCalItems(0)
     , fNofTcalPars(0)
-    , fNofModules(0)
     , fTcalPar(NULL)
     , fTrigger(-1)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
@@ -68,7 +56,6 @@ R3BLosMapped2Cal::R3BLosMapped2Cal(const char* name, Int_t iVerbose)
     , fCalItems(new TClonesArray("R3BLosCalData"))
     , fNofCalItems(0)
     , fNofTcalPars(0)
-    , fNofModules(0)
     , fTcalPar(NULL)
     , fTrigger(1) // trigger 1 - onspill, 2 - offspill, -1 - all events
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
@@ -86,8 +73,6 @@ InitStatus R3BLosMapped2Cal::Init()
         LOG(ERROR) << "There are no TCal parameters in container LosTCalPar";
         return kFATAL;
     }
-
-    LOG(INFO) << "R3BLosMapped2Cal::Init : read " << fNofModules << " modules";
 
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
@@ -146,6 +131,8 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 
     Int_t nHits = fMappedItems->GetEntriesFast();
 
+    // if(nHits >0) cout<<"Mapped hits: "<<nHits<<", No det.: "<<fNofDetectors<<endl;
+
     for (Int_t ihit = 0; ihit < nHits; ihit++) // nHits = Nchannel_LOS * NTypes = 4 or 8 * 3
     {
         Double_t times_ns = 0. / 0.;
@@ -158,7 +145,9 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
         // channel numbers are stored 1-based (1..n)
         UInt_t iDet = hit->GetDetector(); // 1..
         UInt_t iCha = hit->GetChannel();  // 1..
-        UInt_t iType = hit->GetType();    // 0,1,2
+        UInt_t iType = hit->GetType();    // 0,1,2,3
+
+        //   cout<<"Mapped info: "<<ihit<<"; "<<iDet<<", "<<iCha<<"; "<<iType<<", timeFine "<<hit->GetTimeFine()<<endl;
 
         // if(fNEvent == 273 || fNEvent == 362 || fNEvent == 554)
         //   cout<<"R3BLosMapped2Cal: Channel "<<iCha<<", type "<<iType<<", nHits "<<nHits<<", ihit "<<ihit<<", timeFine
@@ -166,7 +155,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 
         //   if(nHits%8 != 0) return;
 
-        //  if(nHits != 24) return;
+        //   if(nHits != 24) return;
 
         if ((iDet < 1) || (iDet > fNofDetectors))
         {
@@ -177,33 +166,41 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
         // Fetch calib data for current channel
         // new:
 
-        R3BTCalModulePar* par = fTcalPar->GetModuleParAt(iDet, iCha, iType + 1);
-
-        if (!par)
+        if (iType < 3)
         {
-            LOG(INFO) << "R3BLosMapped2Cal::Exec : Tcal par not found, Detector: " << iDet << ", Channel: " << iCha
-                      << ", Type: " << iType;
-            continue;
+            R3BTCalModulePar* par = fTcalPar->GetModuleParAt(iDet, iCha, iType + 1);
+
+            if (!par)
+            {
+                LOG(INFO) << "R3BLosMapped2Cal::Exec : Tcal par not found, Detector: " << iDet << ", Channel: " << iCha
+                          << ", Type: " << iType;
+                continue;
+            }
+
+            // Convert TDC to [ns] ...
+
+            times_raw_ns = par->GetTimeVFTX(hit->GetTimeFine());
+
+            if (times_raw_ns < 0. || times_raw_ns > fClockFreq || IS_NAN(times_raw_ns))
+            {
+
+                LOG(INFO) << "R3BLosMapped2Cal::Exec : Bad time in ns: det= " << iDet << ", ch= " << iCha
+                          << ", type= " << iType << ", time in channels = " << hit->GetTimeFine()
+                          << ", time in ns = " << times_raw_ns;
+                continue;
+            }
+
+            // ... and add clock time
+            times_ns = fClockFreq - times_raw_ns + hit->GetTimeCoarse() * fClockFreq;
+        }
+        else
+        {
+            // MTDC32 time need only a factor
+            times_ns = hit->GetTimeFine() / 7.8 / 1000.; // range MTDC 3->7.8ps
         }
 
-        // Convert TDC to [ns] ...
-
-        times_raw_ns = par->GetTimeVFTX(hit->GetTimeFine());
-
-        if (times_raw_ns < 0. || times_raw_ns > fClockFreq || IS_NAN(times_raw_ns))
-        {
-
-            LOG(INFO) << "R3BLosMapped2Cal::Exec : Bad time in ns: det= " << iDet << ", ch= " << iCha
-                      << ", type= " << iType << ", time in channels = " << hit->GetTimeFine()
-                      << ", time in ns = " << times_raw_ns;
-            continue;
-        }
-
-        // ... and add clock time
-        times_ns = fClockFreq - times_raw_ns + hit->GetTimeCoarse() * fClockFreq;
-
-        // if(fNEvent == 2387) cout<<"Mapped2Cal bef "<<fNEvent<<"; "<<fNofCalItems<<", "<<nHits<<", "<<iCha<<",
-        // "<<iType<<", "<<times_ns<<", "<<hit->GetTimeFine()<<", "<<hit->GetTimeCoarse()<<endl;
+        // cout<<"Mapped2Cal :"<<ihit<<"; "<<iDet<<", "<<iCha<<", "<<iType<<", "<<times_ns<<",
+        // "<<hit->GetTimeFine()<<endl;
 
         /* Note: we have multi-hit data...
          *
@@ -230,6 +227,8 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
         {
             R3BLosCalData* aCalItem = (R3BLosCalData*)fCalItems->At(iCal);
 
+            //       cout<<"aCalItem->GetDetector() "<<aCalItem->GetDetector()<<"; "<<iDet<<endl;
+
             if (aCalItem->GetDetector() != iDet)
             {
                 // Do not consider an item for another detector.
@@ -246,24 +245,34 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
                 Tdev = fabs(aCalItem->GetMeanTimeVFTX() - times_ns);
                 if (Tdev < LOS_COINC_WINDOW_NS)
                     LOS_COINC = true;
+                //	if(nHits%48 != 0 ) cout<<"Tdev VFTX: "<<Tdev<<", "<<aCalItem->GetMeanTimeVFTX()<<endl;
             }
             if (iType == 1)
             {
-                LOS_COINC_WINDOW_NS = LOS_COINC_WINDOW_T_NS;
+                LOS_COINC_WINDOW_NS = LOS_COINC_WINDOW_TL_NS;
                 Tdev = fabs(aCalItem->GetMeanTimeTAMEXL() - times_ns);
                 if (Tdev < LOS_COINC_WINDOW_NS && aCalItem->GetTAMEXLNcha() > 0)
                     LOS_COINC = true;
-                if (IS_NAN(Tdev) && aCalItem->GetTAMEXLNcha() == 0)
+                if (IS_NAN(Tdev) && aCalItem->GetTAMEXLNcha() == 0 && aCalItem->GetVFTXNcha() == 8)
                     LOS_COINC = true; // First Tamex leading time
             }
             if (iType == 2)
             {
-                LOS_COINC_WINDOW_NS = LOS_COINC_WINDOW_T_NS;
+                LOS_COINC_WINDOW_NS = LOS_COINC_WINDOW_TT_NS;
                 Tdev = fabs(aCalItem->GetMeanTimeTAMEXT() - times_ns);
                 if (Tdev < LOS_COINC_WINDOW_NS && aCalItem->GetTAMEXTNcha() > 0)
                     LOS_COINC = true;
-                if (IS_NAN(Tdev) && aCalItem->GetTAMEXTNcha() == 0)
+                if (IS_NAN(Tdev) && aCalItem->GetTAMEXTNcha() == 0 && aCalItem->GetVFTXNcha() == 8)
                     LOS_COINC = true; // First Tamex trailing time
+            }
+            if (iType == 3)
+            {
+                LOS_COINC_WINDOW_NS = LOS_COINC_WINDOW_M_NS;
+                Tdev = fabs(aCalItem->GetMeanTimeMTDC32() - times_ns);
+                if (Tdev < LOS_COINC_WINDOW_NS && aCalItem->GetMTDC32Ncha() > 0)
+                    LOS_COINC = true;
+                if (IS_NAN(Tdev) && aCalItem->GetMTDC32Ncha() == 0)
+                    LOS_COINC = true; // First MTDC time
             }
 
             if (LOS_COINC)
@@ -386,6 +395,14 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
             calItem->fTimeT_ns[iCha - 1] = times_ns;
             if (calItem->fTimeT_ns[iCha - 1] < 0. || IS_NAN(calItem->fTimeT_ns[iCha - 1]))
                 LOG(INFO) << "Problem with  fTimeT_ns: " << calItem->fTimeT_ns[iCha - 1] << " " << times_ns << " "
+                          << endl;
+        }
+
+        if (iType == 3)
+        {
+            calItem->fTimeM_ns[iCha - 1] = times_ns;
+            if (calItem->fTimeM_ns[iCha - 1] < 0. || IS_NAN(calItem->fTimeM_ns[iCha - 1]))
+                LOG(INFO) << "Problem with  fTimeM_ns: " << calItem->fTimeM_ns[iCha - 1] << " " << times_ns << " "
                           << endl;
         }
 

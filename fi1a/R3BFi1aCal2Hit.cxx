@@ -13,8 +13,11 @@
 
 #include "R3BFi1aCal2Hit.h"
 
-R3BFi1aCal2Hit::R3BFi1aCal2Hit(Direction a_direction, Bool_t a_is_calibrator, Int_t a_verbose)
-    : R3BBunchedFiberCal2Hit("Fi1a", a_verbose, a_direction, 1, 256, 1, a_is_calibrator)
+R3BFi1aCal2Hit::R3BFi1aCal2Hit(enum R3BTCalEngine::CTDCVariant a_variant,
+                               Direction a_direction,
+                               Bool_t a_is_calibrator,
+                               Int_t a_verbose)
+    : R3BBunchedFiberCal2Hit("Fi1a", a_verbose, a_variant, a_direction, 1, 256, 1, a_is_calibrator)
 {
 }
 

@@ -160,8 +160,8 @@ Bool_t R3BFi11::ProcessHits(FairVolume* vol)
         fVolumeID = vol->getMotherCopyNo();
         gMC->TrackPosition(fPosOut);
         gMC->TrackMomentum(fMomOut);
-        if (fELoss == 0.)
-            return kFALSE;
+        // if (fELoss == 0.)
+        //    return kFALSE;
 
         fTime_out = gMC->TrackTime() * 1.0e09; // also in case particle is stopped in detector, or decays...
         fLength_out = gMC->TrackLength();

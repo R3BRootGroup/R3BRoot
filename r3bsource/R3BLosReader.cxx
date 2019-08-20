@@ -1,16 +1,3 @@
-/******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
- *                                                                            *
- *             This software is distributed under the terms of the            *
- *                 GNU General Public Licence (GPL) version 3,                *
- *                    copied verbatim in the file "LICENSE".                  *
- *                                                                            *
- * In applying this license GSI does not waive the privileges and immunities  *
- * granted to it by virtue of its status as an Intergovernmental Organization *
- * or submit itself to any jurisdiction.                                      *
- ******************************************************************************/
-
 #include "R3BLosReader.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
@@ -20,17 +7,19 @@
 extern "C"
 {
 #include "ext_data_client.h"
-#include "ext_h101_los_tamex.h"
+#include "ext_h101_los_dez19.h"
+    //#include "ext_h101_los.h"
 }
 #include "TMath.h"
 #define IS_NAN(x) TMath::IsNaN(x)
-#define NUM_LOS_DETECTORS 1
+//#define NUM_LOS_DETECTORS 1
+#define NUM_LOS_DETECTORS (sizeof data->LOS / sizeof data->LOS[0])
 #define NUM_LOS_CHANNELS 8
 #include <iostream>
 
 using namespace std;
 
-R3BLosReader::R3BLosReader(EXT_STR_h101_LOS_TAMEX* data, UInt_t offset)
+R3BLosReader::R3BLosReader(EXT_STR_h101_LOS* data, UInt_t offset)
     : R3BReader("R3BLosReader")
     , fData(data)
     , fOffset(offset)
@@ -61,7 +50,7 @@ Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
 
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
-    EXT_STR_h101_LOS_TAMEX_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_LOS_TAMEX, 0);
+    EXT_STR_h101_LOS_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_LOS, 0);
     if (!ok)
     {
         perror("ext_data_struct_info_item");
@@ -82,7 +71,7 @@ Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
 
     // clear struct_writer's output struct. Seems ucesb doesn't do that
     // for channels that are unknown to the current ucesb config.
-    EXT_STR_h101_LOS_TAMEX_onion* data = (EXT_STR_h101_LOS_TAMEX_onion*)fData;
+    EXT_STR_h101_LOS_onion* data = (EXT_STR_h101_LOS_onion*)fData;
     for (uint32_t d = 0; d < NUM_LOS_DETECTORS; d++)
     {
         data->LOS[d].VTFM = 0;
@@ -91,6 +80,7 @@ Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
         data->LOS[d].TTFTM = 0;
         data->LOS[d].TTCLM = 0;
         data->LOS[d].TTCTM = 0;
+        data->LOS[d].MTM = 0;
     }
     return kTRUE;
 }
@@ -99,10 +89,10 @@ Bool_t R3BLosReader::Read()
 {
 
     // Convert plain raw data to multi-dimensional array
-    EXT_STR_h101_LOS_TAMEX_onion* data = (EXT_STR_h101_LOS_TAMEX_onion*)fData;
+    EXT_STR_h101_LOS_onion* data = (EXT_STR_h101_LOS_onion*)fData;
 
     /*
-     * For variable definition, see structure EXT_STR_h101_LOS_TAMEX_onion_t
+     * For variable definition, see structure EXT_STR_h101_LOS_onion_t
      * in ext_str_h101_los_tamex.h
      *** VFTX DATA ***
      * VTF = Size of the array TFv contaning fine VFTX times
@@ -135,13 +125,21 @@ Bool_t R3BLosReader::Read()
      */
 
     // loop over all detectors
+    //  cout<<"*************** READER START ******************"<<endl;
+    //  cout<<"LOS READER: "<<NUM_LOS_DETECTORS<<endl;
 
     for (uint32_t d = 0; d < NUM_LOS_DETECTORS; d++)
     {
 
-        //  cout<<"FINE: "<<data->LOS[d].VTF<<", "<<data->LOS[d].TTFL<<", "<<data->LOS[d].TTFT<<endl;
-        //  cout<<"COARSE: "<<data->LOS[d].VTC<<", "<<data->LOS[d].TTCL<<", "<<data->LOS[d].TTCT<<endl;
+        Int_t nsumv = 0, nsuml = 0, nsumt = 0;
 
+        if (data->LOS[d].VTF > 0)
+        {
+            //  cout<<"FINE: iDet "<<d+1<<", "<<data->LOS[d].VTF<<", "<<data->LOS[d].TTFL<<",
+            //  "<<data->LOS[d].TTFT<<endl;
+            // cout<<"COARSE: iDet "<<d+1<<", "<<data->LOS[d].VTC<<", "<<data->LOS[d].TTCL<<",
+            // "<<data->LOS[d].TTCT<<endl;
+        }
         /*
             if(data->LOS[d].VTF != data->LOS[d].VTC) return kFALSE;
             if(data->LOS[d].TTFL != data->LOS[d].TTCL) return kFALSE;
@@ -169,7 +167,8 @@ Bool_t R3BLosReader::Read()
         bool do_increment = false;
         for (uint32_t i = 0; i < numData; i++)
         {
-            uint32_t coarse_vftx = data->LOS[d].VTCv[i];
+            uint32_t coarse_vftx = 0. / 0.;
+            coarse_vftx = data->LOS[d].VTCv[i];
             if (coarse_vftx > 3 * c_vftx2_range / 4)
             {
                 do_increment = true;
@@ -202,7 +201,8 @@ Bool_t R3BLosReader::Read()
                                      coarse_vftx           // VFTX coarse time
                     );
 
-                //   cout<<"VFTX: "<<data->LOS[d].VTFv[j]<<", "<<coarse_vftx <<endl;
+                //    cout<<"Reader VFTX: "<<d+1<<", "<<channel<<"; "<<data->LOS[d].VTFv[j]<<", "<<coarse_vftx <<endl;
+                nsumv += 1;
             }
             curChannelStart = nextChannelStart;
         }
@@ -258,7 +258,9 @@ Bool_t R3BLosReader::Read()
                 new ((*fArray)[fArray->GetEntriesFast()])
                     R3BLosMappedData(d + 1, channel, 1, data->LOS[d].TTFLv[j], coarse_leading);
 
-                //    cout<<"TAMEX leading: "<< data->LOS[d].TTFLv[j]<<", "<<  coarse_leading<<endl;
+                //    cout<<"Reader TAMEX leading: "<<d + 1<<", "<<channel<<", "<< data->LOS[d].TTFLv[j]<<", "<<
+                //    coarse_leading<<endl;
+                nsuml += 1;
             }
             curChannelStart = nextChannelStart;
         }
@@ -297,12 +299,13 @@ Bool_t R3BLosReader::Read()
                         uint32_t coarse_leading = hit->GetTimeCoarse();
                         int32_t tot = coarse_trailing - coarse_leading;
                         // 30 units -> 30 * 5 = 150 ns.
-                        if ((tot <= 35) && (tot >= 0))
-                        {
+                        if ((tot >= 0))
+                        { // tot <= 135) &&
                             new ((*fArray)[fArray->GetEntriesFast()])
                                 R3BLosMappedData(d + 1, channel, 2, data->LOS[d].TTFTv[j], coarse_trailing);
-
-                            //     cout<<"TAMEX trailing: "<< data->LOS[d].TTFTv[j]<<", "<< coarse_trailing<<endl;
+                            nsumt += 1;
+                            //     cout<<"Reader TAMEX trailing: "<<d + 1<<", "<<channel<<", "<<
+                            //     data->LOS[d].TTFTv[j]<<", "<< coarse_trailing<<endl;
 
                             break;
                         }
@@ -310,6 +313,39 @@ Bool_t R3BLosReader::Read()
                 }
             }
             curChannelStart = nextChannelStart;
+        }
+
+        //
+        // MTDC32
+        //
+
+        numChannels = data->LOS[d].MTM;
+        curChannelStart = 0;
+        // cout<<data->LOS[d].MTM<<endl;
+        for (uint32_t i = 0; i < numChannels; i++)
+        {
+            uint32_t channel = data->LOS[d].MTMI[i]; // = 1..8
+            uint32_t nextChannelStart = data->LOS[d].MTME[i];
+            /*   for (uint32_t j = curChannelStart; j < nextChannelStart; j++) {
+                 new ((*fArray)[fArray->GetEntriesFast()])
+                     R3BLosMappedData(
+                         d + 1,               // detector number
+                         channel,             // channel number: 1-8
+                         3,                   // VFTX (0),TAMEX leading (1), TAMEX trailing (2), MTDC32 (3)
+                         data->LOS[d].MTv[j], // MTDC32 time
+                         0
+                         );
+
+                   cout<<"MTDC: "<<channel<<", "<<data->LOS[d].MTv[j] <<endl;
+
+               }*/
+            curChannelStart = nextChannelStart;
+        }
+        if (data->LOS[d].VTF > 0)
+        {
+            // cout<<"nsumv & data->LOS[d].VTF "<<d+1<<"; "<<nsumv<<"; "<< data->LOS[d].VTF<<endl;
+            // cout<<"nsumt & data->LOS[d].TTFL "<<d+1<<"; "<<nsuml<<"; "<< data->LOS[d].TTFL<<endl;
+            // cout<<"nsumt & data->LOS[d].TTFT "<<d+1<<"; "<<nsumt<<"; "<< data->LOS[d].TTFT<<endl;
         }
     }
 

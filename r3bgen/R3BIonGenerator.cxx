@@ -50,6 +50,8 @@ R3BIonGenerator::R3BIonGenerator()
     , fR(0.)
     , fz(0.)
     , fOffset(0.)
+    , fSigmaP(0.)
+    , fAngle(0.)
     , fVx(0.)
     , fVy(0.)
     , fVz(0.)
@@ -70,6 +72,8 @@ R3BIonGenerator::R3BIonGenerator(const Char_t* ionName, Int_t mult, Double_t px,
     , fR(0.)
     , fz(0.)
     , fOffset(0.)
+    , fSigmaP(0.)
+    , fAngle(0.)
     , fVx(0.)
     , fVy(0.)
     , fVz(0.)
@@ -128,6 +132,8 @@ R3BIonGenerator::R3BIonGenerator(Int_t z, Int_t a, Int_t q, Int_t mult, Double_t
     , fR(0.)
     , fz(0.)
     , fOffset(0.)
+    , fSigmaP(0.)
+    , fAngle(0.)
     , fVx(0.)
     , fVy(0.)
     , fVz(0.)
@@ -164,6 +170,8 @@ R3BIonGenerator::R3BIonGenerator(const R3BIonGenerator& right)
     , fR(right.fR)
     , fz(right.fz)
     , fOffset(right.fOffset)
+    , fSigmaP(right.fSigmaP)
+    , fAngle(right.fAngle)
     , fVx(right.fVx)
     , fVy(right.fVy)
     , fVz(right.fVz)
@@ -215,8 +223,9 @@ Bool_t R3BIonGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 
     if (fBeamSpotIsSet)
     {
-        fVx = SpotR * cos(Phi);           // gRandom->Uniform(-fx,fx);
-        fVy = fOffset + SpotR * sin(Phi); // gRandom->Uniform(-fy,fy);
+        fVx = fOffset + SpotR * cos(Phi); // gRandom->Uniform(-fx,fx);
+        fVy = SpotR * sin(Phi);           // gRandom->Uniform(-fy,fy);
+        //    fVy   = 0.;
         fVz = fz;
     }
     else
@@ -226,13 +235,37 @@ Bool_t R3BIonGenerator::ReadEvent(FairPrimaryGenerator* primGen)
         fVz = 0.0;
     }
 
-    cout << "-I- FairIonGenerator: Generating " << fMult << " ions of type " << fIon->GetName() << " (PDG code "
-         << pdgType << ")" << endl;
-    cout << "    Momentum (" << fPx << ", " << fPy << ", " << fPz << ") Gev from vertex (" << fVx << ", " << fVy << ", "
-         << fVz << ") cm" << endl;
+    if (fSigmaP > 0.)
+    {
+        Double_t p0 = gRandom->Uniform(fPz - fSigmaP, fPz + fSigmaP);
+        fPz = p0;
+    }
 
+    if (fAngle > 0.)
+    {
+        Double_t p = sqrt(fPx * fPx + fPy * fPy + fPz * fPz);
+        Double_t thetaX = gRandom->Uniform(-fAngle, fAngle); // max angle in mrad
+        fPx = tan(thetaX) * fPz;
+
+        Double_t thetaY = gRandom->Uniform(-fAngle, fAngle); // max angle in mrad
+        fPy = tan(thetaY) * fPz;
+
+        fPz = sqrt(p * p - fPx * fPx - fPy * fPy);
+
+        //    cout<< " theta "<< thetaX << "  " << thetaY << "  "<<endl;
+        //	cout << "p alt: "<< p << " p neu: " << sqrt(fPx*fPx+fPy*fPy+fPz*fPz) << endl;
+    }
+    /*
+      cout << "-I- FairIonGenerator: Generating " << fMult << " ions of type "
+           << fIon->GetName() << " (PDG code " << pdgType << ")" << endl;
+      cout << "    Momentum (" << fPx << ", " << fPy << ", " << fPz
+           << ") Gev from vertex (" << fVx << ", " << fVy
+           << ", " << fVz << ") cm" << endl;
+    */
     for (Int_t i = 0; i < fMult; i++)
         primGen->AddTrack(pdgType, fPx, fPy, fPz, fVx, fVy, fVz);
+
+    return kTRUE;
 
     return kTRUE;
 }

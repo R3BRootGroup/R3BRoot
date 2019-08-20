@@ -13,8 +13,8 @@
 
 #include "R3BFi12Cal2Hit.h"
 
-R3BFi12Cal2Hit::R3BFi12Cal2Hit(Bool_t a_is_calibrator, Int_t a_verbose)
-    : R3BBunchedFiberCal2Hit("Fi12", a_verbose, VERTICAL, 2, 256, 2, a_is_calibrator)
+R3BFi12Cal2Hit::R3BFi12Cal2Hit(enum R3BTCalEngine::CTDCVariant a_variant, Bool_t a_is_calibrator, Int_t a_verbose)
+    : R3BBunchedFiberCal2Hit("Fi12", a_verbose, a_variant, VERTICAL, 2, 256, 2, a_is_calibrator)
 {
 }
 

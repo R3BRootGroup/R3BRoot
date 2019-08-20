@@ -82,7 +82,7 @@ void R3BFi3a::Initialize()
     FairDetector::Initialize();
 
     LOG(INFO) << "R3BFi3a: initialisation";
-    LOG(DEBUG) << "R3BFi3a: Vol. (McId) " << gMC->VolId("FI3a1Log");
+    LOG(DEBUG) << "R3BFi3a: Vol. (McId) " << gMC->VolId("FI3aLog");
 }
 
 void R3BFi3a::SetSpecialPhysicsCuts()
@@ -160,8 +160,8 @@ Bool_t R3BFi3a::ProcessHits(FairVolume* vol)
         fVolumeID = vol->getMotherCopyNo();
         gMC->TrackPosition(fPosOut);
         gMC->TrackMomentum(fMomOut);
-        if (fELoss == 0.)
-            return kFALSE;
+        // if (fELoss == 0.)
+        //    return kFALSE;
 
         fTime_out = gMC->TrackTime() * 1.0e09; // also in case particle is stopped in detector, or decays...
         fLength_out = gMC->TrackLength();
@@ -308,7 +308,7 @@ R3BFibPoint* R3BFi3a::AddHit(Int_t trackID,
 
 Bool_t R3BFi3a::CheckIfSensitive(std::string name)
 {
-    if (TString(name).Contains("FI3A1Log"))
+    if (TString(name).Contains("FI3ALogActive"))
     {
         return kTRUE;
     }

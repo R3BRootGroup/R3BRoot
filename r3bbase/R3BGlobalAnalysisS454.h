@@ -96,6 +96,8 @@ class R3BGlobalAnalysisS454 : public FairTask
      */
     virtual void FinishTask();
 
+    virtual void Output(Double_t tracker[6], Double_t chi2[2]);
+
     /**
      * Method for setting the trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
@@ -104,90 +106,83 @@ class R3BGlobalAnalysisS454 : public FairTask
     inline void SetTpat(Int_t tpat) { fTpat = tpat; }
 
     /**
-     * Methods for setting number of planes and paddles
+     * Methods for setting reset and readout times for Bmon
      */
-    inline void SetNofModules(Int_t planes, Int_t ppp)
+    inline void SetBmon(Int_t sens_SEE, Int_t sens_IC)
     {
-        fNofPlanes = planes;
-        fPaddlesPerPlane = ppp;
+        fsens_SEE = sens_SEE;
+        fsens_IC = sens_IC;
     }
-
-    //   virtual void SetParContainers();
 
   private:
     std::vector<TClonesArray*> fMappedItems;
     std::vector<TClonesArray*> fCalItems;
     std::vector<TClonesArray*> fHitItems;
+    TClonesArray* fMCTrack;
 
     enum DetectorInstances
     {
-        DET_AMS,
         DET_CALIFA,
+        DET_BMON,
+        DET_ROLU,
         DET_FI_FIRST,
-        DET_FI1A = DET_FI_FIRST,
-        DET_FI1B,
-        DET_FI2A,
-        DET_FI2B,
-        DET_FI3A,
+        DET_FI3A = DET_FI_FIRST,
         DET_FI3B,
-        DET_FI4,
-        DET_FI5,
-        DET_FI6,
-        DET_FI7,
-        DET_FI8,
-        DET_FI9,
         DET_FI10,
         DET_FI11,
         DET_FI12,
         DET_FI13,
         DET_FI_LAST = DET_FI13,
-        DET_L3T,
-        DET_LOS,
-        DET_MUSIC,
-        DET_NEULAND,
-        DET_PSPX,
-        DET_PTOF,
-        DET_ROLU,
-        DET_SCI8,
-        DET_STRAW,
         DET_TOFD,
         DET_MAX
     };
 
 #define NOF_FIB_DET (DET_FI_LAST - DET_FI_FIRST + 1)
 
-    const char* fDetectorNames[DET_MAX + 1] = { "Ams",  "Califa", "Fi1a",  "Fi1b", "Fi2a",  "Fi2b",    "Fi3a", "Fi3b",
-                                                "Fi4",  "Fi5",    "Fi6",   "Fi7",  "Fi8",   "Fi9",     "Fi10", "Fi11",
-                                                "Fi12", "Fi13",   "L3t",   "Los",  "Music", "Neuland", "Pspx", "Ptof",
-                                                "Rolu", "Sci8",   "Straw", "Tofd", NULL };
+    const char* fDetectorNames[DET_MAX + 1] = { "Califa", "BeamMonitor", "Rolu", "Fi3a", "Fi3b", "Fi10",
+                                                "Fi11",   "Fi12",        "Fi13", "Tofd", NULL };
 
     // If FiberI is present or not:
     Int_t ifibdet;
     // Number of fibers per detector
-    Double_t n_fiber[NOF_FIB_DET] = { 256.,  256.,  256., 256., 512., 512.,  2048.,
-                                      2048., 1024., 512., 512., 512., 1024., 1024. };
+    Double_t n_fiber[NOF_FIB_DET] = { 512., 512., 2048., 2048., 2048., 2048. };
 
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger;         /**< Trigger value. */
     Int_t fTpat;
-    Double_t fClockFreq; /**< Clock cycle in [ns]. */
-    UInt_t fNofPlanes;
-    UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */
-    unsigned long long t0_prev = 0;
-    Double_t time_previous_event = 0;
 
-    TH1F* fhTpat;
+    unsigned long long time_start = 0, time = 0;
+    unsigned long ic_start = 0, see_start = 0, tofdor_start = 0;
+    unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
 
-    Int_t fNEvents = 0;   /**< Event counter. */
-    Int_t fFibEvents = 0; /**< Event counter. */
-    Double_t max_values[NOF_FIB_DET][2048];
-    Int_t FibMax[NOF_FIB_DET];
+    Int_t maxevent;
 
-    TH2F* fhChargeLosTofD;
-    TH2F* fh_los_pos;
+    Int_t fsens_SEE, fsens_IC; // SEETRAM and IC sensitivity, between -4 and -10
+    Double_t calib_SEE = 1.;   // SEETRAM calibration factor
+    Double_t see_offset = 7.1; // SEETRAM offset in kHz
+    Double_t counts_SEE = 0;
+    Double_t counts_IC = 0;
+    Double_t counts_TofD = 0;
 
-    TH1F* fh_channels_Fib[NOF_FIB_DET];
+    Double_t Pxf = 0.;
+    Double_t Pyf = 0.;
+    Double_t Pzf = 0.;
+    Double_t Xf = 0.;
+    Double_t Yf = 0.;
+    Double_t Zf = 0.;
+    Double_t Tf = 0.;
+    Double_t Pf_tot = 0.;
+
+    UInt_t num_spills = 0;
+
+    TH1F* fh_Tpat;
+    TH1F* fh_Trigger;
+    TH1F* fh_IC;
+    TH1F* fh_SEE;
+    TH1F* fh_TOFDOR;
+
+    TH2F* fh_xy_Fib[NOF_FIB_DET];
     TH1F* fh_fibers_Fib[NOF_FIB_DET];
     TH1F* fh_fiber_Fib[NOF_FIB_DET];
     TH1F* fh_mult_Fib[NOF_FIB_DET];
@@ -209,33 +204,31 @@ class R3BGlobalAnalysisS454 : public FairTask
 
     TH2F* fh_Cave_position;
 
-    TH2F* fh_tofd_pos;
+    TH2F* fh_xy_tofd;
     TH1F* fh_tofd_charge;
     TH1F* fh_TimePreviousEvent;
     TH1F* fh_tofd_mult;
 
-    TH1F* fh_ptof_channels;
-    TH1F* fh_ptof_channels_cut;
-    TH1F* fh_ptof_test1;
-    TH1F* fh_ptof_test2;
-    TH1F* fh_ptof_TotPm1[N_PADDLE_MAX_PTOF];
-    TH1F* fh_ptof_TotPm2[N_PADDLE_MAX_PTOF];
-
-    TH1F* fh_pspx_strips_psp[N_PSPX_S454];
-    TH1F* fh_pspx_energy_psp[N_PSPX_S454];
-    TH1F* fh_pspx_multiplicity_psp[N_PSPX_S454];
-
-    TH2F* fh_pspx_pos1_strips;
-    TH2F* fh_pspx_pos2_strips;
-    TH2F* fh_pspx_pos1_energy;
-    TH2F* fh_pspx_pos2_energy;
-
-    TH2F* fh_pspx_cor_x_strips;
-    TH2F* fh_pspx_cor_y_strips;
-    TH2F* fh_pspx_cor_x_energy;
-    TH2F* fh_pspx_cor_y_energy;
-
     TH2F* fh_ToF_vs_events[NOF_FIB_DET];
+
+    TH2F* fh_target_xy;
+    TH1F* fh_target_px;
+    TH1F* fh_target_py;
+    TH1F* fh_target_pz;
+
+    TH1F* fh_dx;
+    TH1F* fh_dy;
+    TH1F* fh_dz;
+    TH1F* fh_dpx;
+    TH1F* fh_dpy;
+    TH1F* fh_dpz;
+    TH1F* fh_dp;
+    TH2F* fh_thetax_dpx;
+    TH2F* fh_thetay_dpy;
+    TH2F* fh_x_dpx;
+    TH2F* fh_y_dpy;
+    TH2F* fh_thetax_dpy;
+    TH2F* fh_thetay_dpx;
 
   public:
     ClassDef(R3BGlobalAnalysisS454, 1)

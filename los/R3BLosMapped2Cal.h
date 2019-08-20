@@ -1,16 +1,3 @@
-/******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
- *                                                                            *
- *             This software is distributed under the terms of the            *
- *                 GNU General Public Licence (GPL) version 3,                *
- *                    copied verbatim in the file "LICENSE".                  *
- *                                                                            *
- * In applying this license GSI does not waive the privileges and immunities  *
- * granted to it by virtue of its status as an Intergovernmental Organization *
- * or submit itself to any jurisdiction.                                      *
- ******************************************************************************/
-
 // ------------------------------------------------------------
 // -----                  R3BLosMapped2Cal                -----
 // -----            Created 4-02-2016 by R.Plag           -----
@@ -121,8 +108,6 @@ class R3BLosMapped2Cal : public FairTask
     {
         fNofDetectors = nDets;
         fNofChannels = nChs; //=4 or 8  or 16
-        fNofTypes = 3;
-        fNofModules = nChs * nDets * 3; // 4 or 8 los signals * 3 times per channel in total 12 or 24
     }
 
   private:
@@ -142,16 +127,14 @@ class R3BLosMapped2Cal : public FairTask
 
     UInt_t fNofDetectors; /**< Number of detectors. */
     UInt_t fNofChannels;  /**< Number of channels per detector. */
-    UInt_t fNofTypes;
-    UInt_t fNofModules;  /**< Total number of channels. */
-    Double_t fClockFreq; /**< Clock cycle in [ns]. */
+    Double_t fClockFreq;  /**< Clock cycle in [ns]. */
     UInt_t fNEvent;
 
     // Fast lookup for matching mapped data.
     std::vector<std::vector<R3BLosCalData*>> fCalLookup;
 
   public:
-    ClassDef(R3BLosMapped2Cal, 1)
+    ClassDef(R3BLosMapped2Cal, 2)
 };
 
 #endif

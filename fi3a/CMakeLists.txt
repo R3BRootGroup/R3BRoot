@@ -44,7 +44,9 @@ set(SRCS
 R3BFi3aCal2Hit.cxx
 R3BFi3aMapped2Cal.cxx
 R3BFi3a.cxx  
-R3BFi3aContFact.cxx)
+R3BFi3aContFact.cxx
+R3BFi3aDigitizer.cxx
+)
 
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 

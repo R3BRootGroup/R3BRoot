@@ -81,9 +81,19 @@ void R3BTCalEngine::Fill(Int_t plane, Int_t paddle, Int_t side, Int_t tdc)
     //  - 1]->GetEntries();
 }
 
-void R3BTCalEngine::CalculateParamClockTDC()
+void R3BTCalEngine::CalculateParamClockTDC(enum CTDCVariant a_variant)
 {
-    fClockFreq = 1. / CLOCK_TDC_MHZ * 1000.;
+    switch (a_variant)
+    {
+        case CTDC_8_12_FWD_250:
+            fClockFreq = 1000. / 250;
+            break;
+        case CTDC_16_BWD_150:
+            fClockFreq = 1000. / 150;
+            break;
+        default:
+            assert(0 && "Invalid CTDC variant!");
+    }
 
     for (Int_t i = 0; i < N_PLANE_MAX; i++)
     {

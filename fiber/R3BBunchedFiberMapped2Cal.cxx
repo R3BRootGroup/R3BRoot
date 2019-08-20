@@ -25,7 +25,10 @@
 #include "TClonesArray.h"
 #include <cassert>
 
-R3BBunchedFiberMapped2Cal::R3BBunchedFiberMapped2Cal(const char* a_name, Int_t a_verbose, Bool_t a_skip_spmt)
+R3BBunchedFiberMapped2Cal::R3BBunchedFiberMapped2Cal(const char* a_name,
+                                                     Int_t a_verbose,
+                                                     enum R3BTCalEngine::CTDCVariant a_variant,
+                                                     Bool_t a_skip_spmt)
     : FairTask(TString("R3B") + a_name + "Mapped2Cal", a_verbose)
     , fName(a_name)
     , fSkipSPMT(a_skip_spmt)
@@ -34,7 +37,7 @@ R3BBunchedFiberMapped2Cal::R3BBunchedFiberMapped2Cal(const char* a_name, Int_t a
     , fMappedItems(nullptr)
     , fCalItems(new TClonesArray("R3BBunchedFiberCalData"))
     , fNofCalItems(0)
-    , fClockFreq(1000. / CLOCK_TDC_MHZ)
+    , fClockFreq(1000. / (R3BTCalEngine::CTDC_16_BWD_150 == a_variant ? 150 : 250))
     , fTamexFreq(1000. / VFTX_CLOCK_MHZ)
 {
 }
@@ -140,7 +143,11 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
             }
 
             // Calculate final time with clock cycles.
-            time_ns = mapped->GetCoarse() * fClockFreq + (mapped->IsLeading() ? -fine_ns : fine_ns);
+            //		time_ns = mapped->GetCoarse() * fClockFreq +
+            //		(mapped->IsLeading() ? -fine_ns : fine_ns);
+            // new clock TDC firmware need here a minus
+            time_ns = mapped->GetCoarse() * fClockFreq - fine_ns;
+
             LOG(DEBUG) << " R3BBunchedFiberMapped2Cal::Exec (" << fName << "): Channel=" << channel
                        << ": Time=" << time_ns << "ns.";
         }
@@ -154,7 +161,11 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
             }
 
             // Calculate final time with clock cycles.
-            time_ns = mapped->GetCoarse() * fTamexFreq + (mapped->IsLeading() ? -fine_ns : fine_ns);
+            //		time_ns = mapped->GetCoarse() * fTamexFreq +
+            //		(mapped->IsLeading() ? -fine_ns : fine_ns);
+            // new clock TDC firmware need here a minus
+            time_ns = mapped->GetCoarse() * fTamexFreq - fine_ns;
+
             LOG(DEBUG) << " R3BBunchedFiberMapped2Cal::Exec:Channel=" << channel << ": Time=" << time_ns << "ns.";
         }
         new ((*fCalItems)[fNofCalItems++])

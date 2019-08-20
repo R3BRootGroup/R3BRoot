@@ -20,7 +20,7 @@
 cmake_minimum_required(VERSION 3.11.0 FATAL_ERROR)
 
 # Set name of our project to "R3BROOT". Has to be done after check of cmake version
-project(R3BROOT)
+project(R3BROOT C CXX Fortran)
 
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
     message(FATAL_ERROR
@@ -285,6 +285,7 @@ if(NOT MODULE)
     add_subdirectory(neuland)
     add_subdirectory(los)
     add_subdirectory(rolu)
+    add_subdirectory(sci2)
     add_subdirectory(sci8)
     add_subdirectory(mtof)
     add_subdirectory(dtof)
@@ -305,6 +306,7 @@ if(NOT MODULE)
     add_subdirectory(compilehelper)
     add_subdirectory(tcal)
     add_subdirectory(tracking)
+    add_subdirectory(tracker_rene)
     if(GARFIELD_FOUND)
         add_subdirectory(actar)
         set(LD_LIBRARY_PATH ${GARFIELD_LIBRARY_DIR} ${LD_LIBRARY_PATH})

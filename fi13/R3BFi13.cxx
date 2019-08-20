@@ -82,7 +82,7 @@ void R3BFi13::Initialize()
     FairDetector::Initialize();
 
     LOG(INFO) << "R3BFi13: initialisation";
-    LOG(DEBUG) << "R3BFi13: Vol. (McId) " << gMC->VolId("FI131Log");
+    LOG(DEBUG) << "R3BFi13: Vol. (McId) " << gMC->VolId("FI13Log");
 }
 
 void R3BFi13::SetSpecialPhysicsCuts()
@@ -160,8 +160,8 @@ Bool_t R3BFi13::ProcessHits(FairVolume* vol)
         fVolumeID = vol->getMotherCopyNo();
         gMC->TrackPosition(fPosOut);
         gMC->TrackMomentum(fMomOut);
-        if (fELoss == 0.)
-            return kFALSE;
+        // if (fELoss == 0.)
+        //    return kFALSE;
 
         fTime_out = gMC->TrackTime() * 1.0e09; // also in case particle is stopped in detector, or decays...
         fLength_out = gMC->TrackLength();

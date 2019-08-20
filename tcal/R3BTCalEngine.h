@@ -19,9 +19,8 @@
 #define MAX_TACQUILA_MODULE 20 // 0 .. 20
 #define TACQUILA_NUM_GEOM ((MAX_TACQUILA_SAM + 1) * (MAX_TACQUILA_GTB + 1) * (MAX_TACQUILA_MODULE + 1))
 
-#define CLOCK_TDC_MHZ 250
 #define TACQUILA_CLOCK_MHZ 40.002903
-#define VFTX_CLOCK_MHZ 200
+#define VFTX_CLOCK_MHZ 200  
 
 #include "R3BTCalPar.h"
 #include "TObject.h"
@@ -41,6 +40,20 @@ class TH1F;
 class R3BTCalEngine : public TObject
 {
   public:
+    // CTDC variants.
+    enum CTDCVariant {
+	  // To make sure the user doesn't just put a 0...
+	  CTDC_INVALID = 0,
+	  // 8..12 bins for fine time.
+	  // Fine time forwards from last cycle.
+	  // 250 Mhz.
+	  CTDC_8_12_FWD_250,
+	  // 16 bins for fine time.
+	  // Fine time backwards from last cycle.
+	  // 150 Mhz.
+	  CTDC_16_BWD_150
+	};
+
     /**
      * Standard constructor.
      * Creates instance of TCAL engine. To be used in
@@ -70,7 +83,7 @@ class R3BTCalEngine : public TObject
      * electronics. Parameters will be automatically stored.
      * To be called from FinishTask() method of an analysis task.
      */
-    void CalculateParamClockTDC();
+    void CalculateParamClockTDC(enum CTDCVariant);
 
     /**
      * A method to calculate calibration parameters for Tacquila

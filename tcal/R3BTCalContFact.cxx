@@ -58,7 +58,8 @@ void R3BTCalContFact::setAllContainers()
      *  them to the list of containers.*/
     addContainer("LandTCalPar", "NeuLAND TCAL Calibration Parameters");
     addContainer("LosTCalPar", "LOS TCAL Calibration Parameters");
-    addContainer("RoluTCalPar", "LOS TCAL Calibration Parameters");
+    addContainer("RoluTCalPar", "ROLU TCAL Calibration Parameters");
+    addContainer("Sci2TCalPar", "SCI2 TCAL Calibration Parameters");
     addContainer("Sci8TCalPar", "SCI8 TCAL Calibration Parameters");
     addContainer("TofdTCalPar", "TOFD TCAL Calibration Parameters");
     addContainer("StrawtubesTCalPar", "Strawtubes TCAL Calibration Parameters");
@@ -86,6 +87,7 @@ void R3BTCalContFact::setAllContainers()
     ADD_FIBER(Fi12, FI12);
     ADD_FIBER(Fi13, FI13);
     addContainer("PtofTCalPar", "PTOF TCAL Calibration Parameters");
+    addContainer("Sci2TCalPar", "S2 TCAL Calibration Parameters");
     addContainer("Sci8TCalPar", "S8 TCAL Calibration Parameters");
 }
 
@@ -102,6 +104,7 @@ FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
     containerNames.push_back("LandTCalPar");
     containerNames.push_back("LosTCalPar");
     containerNames.push_back("RoluTCalPar");
+    containerNames.push_back("Sci2TCalPar");
     containerNames.push_back("Sci8TCalPar");
     containerNames.push_back("TofdTCalPar");
     containerNames.push_back("StrawtubesTCalPar");
@@ -129,6 +132,7 @@ FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
     PUSH_FIBER(Fi12);
     PUSH_FIBER(Fi13);
     containerNames.push_back("PtofTCalPar");
+    containerNames.push_back("Sci2TCalPar");
     containerNames.push_back("Sci8TCalPar");
 
     bool found = false;

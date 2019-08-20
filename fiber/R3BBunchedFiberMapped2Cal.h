@@ -21,6 +21,7 @@
 #define R3BBUNCHEDFIBERMAPPED2CAL
 
 #include "FairTask.h"
+#include <R3BTCalEngine.h>
 
 class R3BTCalPar;
 
@@ -39,8 +40,10 @@ class R3BBunchedFiberMapped2Cal : public FairTask
      * Creates an instance of the task.
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
+     * @param a_variant CTDC firmware variant, see R3BTCalEngine.
+     * @param a_skip_spmt Don't process SPMT side for pure MAPMT tests.
      */
-    R3BBunchedFiberMapped2Cal(const char*, Int_t, Bool_t = false);
+    R3BBunchedFiberMapped2Cal(const char*, Int_t, enum R3BTCalEngine::CTDCVariant, Bool_t = false);
 
     /**
      * Destructor.
@@ -101,7 +104,7 @@ class R3BBunchedFiberMapped2Cal : public FairTask
     Double_t fTamexFreq;
 
   public:
-    ClassDef(R3BBunchedFiberMapped2Cal, 1)
+    ClassDef(R3BBunchedFiberMapped2Cal, 2)
 };
 
 #endif

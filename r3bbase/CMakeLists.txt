@@ -33,6 +33,8 @@ ${R3BROOT_SOURCE_DIR}/los
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/rolu
 ${R3BROOT_SOURCE_DIR}/r3bdata/roluData
+${R3BROOT_SOURCE_DIR}/sci2
+${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
 ${R3BROOT_SOURCE_DIR}/sci8
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
@@ -43,6 +45,8 @@ ${R3BROOT_SOURCE_DIR}/tcal
 ${R3BROOT_SOURCE_DIR}/r3bdata/ptofData
 ${R3BROOT_SOURCE_DIR}/fiber
 ${R3BROOT_SOURCE_DIR}/r3bdata
+${R3BROOT_SOURCE_DIR}/r3bdata/sampData
+${R3BROOT_SOURCE_DIR}/tracker_rene
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -55,6 +59,7 @@ R3BModule.cxx
 R3BDetector.cxx 
 R3BEventHeader.cxx
 R3BOnlineSpectra.cxx
+R3BOnlineSpectraDec2019.cxx
 R3BGlobalAnalysis.cxx
 R3BGlobalAnalysisS454.cxx
 )
@@ -66,7 +71,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF R3BLinkDef.h)
 
 Set(DEPENDENCIES
-    GeoBase ParBase MbsAPI Base FairTools R3BData Core Geom GenVector Physics Matrix MathCore)
+    GeoBase ParBase MbsAPI Base FairTools R3BData Core Geom GenVector Physics Matrix MathCore R3BTraRene)
 
 Set(LIBRARY_NAME R3Bbase)
 

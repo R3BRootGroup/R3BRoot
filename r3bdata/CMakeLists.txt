@@ -37,6 +37,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
 ${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/roluData
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
+${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/mfiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
@@ -46,8 +47,10 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/actarData
 ${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
 ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 ${R3BROOT_SOURCE_DIR}/r3bdata/ptofData
+${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
+${R3BROOT_SOURCE_DIR}/r3bdata/sampData
 )
 
 include_directories(${INCLUDE_DIRECTORIES})
@@ -127,6 +130,9 @@ losData/R3BLosHitData.cxx
 roluData/R3BRoluMappedData.cxx
 roluData/R3BRoluCalData.cxx
 roluData/R3BRoluHitData.cxx
+sci2Data/R3BSci2MappedData.cxx
+sci2Data/R3BSci2CalData.cxx
+sci2Data/R3BSci2HitData.cxx
 sci8Data/R3BSci8MappedData.cxx
 sci8Data/R3BSci8CalData.cxx
 sci8Data/R3BSci8HitData.cxx
@@ -157,6 +163,7 @@ musicData/R3BMusicPoint.cxx
 musicData/R3BMusicMappedData.cxx
 musicData/R3BMusicCalData.cxx
 musicData/R3BMusicHitData.cxx
+sampData/R3BSamplerMappedData.cxx
 )
 
 # fill list of header files from list of source files by exchanging the file extension

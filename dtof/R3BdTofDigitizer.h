@@ -13,8 +13,8 @@
 
 // dTofDigitzer 07 aug 2017 created by Alicia Wongel
 
-#ifndef R3BDTOFDDIGITISER_H
-#define R3BDTOFDDIGITISER_H 1
+#ifndef R3BDTOFDIGITIZER_H
+#define R3BDTOFDIGITIZER_H 1
 
 #include "FairTask.h"
 #include "R3BTofdHitData.h"
@@ -62,6 +62,17 @@ class R3BdTofDigitizer : public FairTask
     Float_t fsigma_y;
     Float_t fsigma_t;
     Float_t fsigma_ELoss;
+
+    // detector parameter
+    Int_t number_layers = 2;
+    Int_t number_paddles = 44; // per layer
+    Float_t paddle_width = 2.70000;
+    Float_t paddle_thickness = 0.50000; 
+    Float_t air_gap_paddles = 0.04;
+    Float_t air_gap_layer = 5.;
+
+    Float_t detector_width = number_paddles*paddle_width+(number_paddles-1)*air_gap_paddles+paddle_width;
+    Float_t detector_thickness = (number_layers-1)*air_gap_layer+number_layers*paddle_thickness;
 
     ClassDef(R3BdTofDigitizer, 1);
 };

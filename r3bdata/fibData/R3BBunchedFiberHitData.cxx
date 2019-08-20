@@ -23,12 +23,18 @@ R3BBunchedFiberHitData::R3BBunchedFiberHitData()
 {
 }
 
-R3BBunchedFiberHitData::R3BBunchedFiberHitData(Int_t a_fiber_id,
+R3BBunchedFiberHitData::R3BBunchedFiberHitData(Int_t ID,
+                                               Double_t x,
+                                               Double_t y,
+                                               Double_t eloss,
+                                               Double_t time,
+                                               Int_t a_fiber_id,
                                                Double_t a_mapmt_time_ns,
                                                Double_t a_spmt_time_ns,
                                                Double_t a_mapmt_tot_ns,
                                                Double_t a_spmt_tot_ns)
-    : fFiberId(a_fiber_id)
+    : R3BHit(ID, x, y, eloss, time)
+    , fFiberId(a_fiber_id)
     , fMAPMTTime_ns(a_mapmt_time_ns)
     , fSPMTTime_ns(a_spmt_time_ns)
     , fTime_ns((a_mapmt_time_ns + a_spmt_time_ns) / 2)

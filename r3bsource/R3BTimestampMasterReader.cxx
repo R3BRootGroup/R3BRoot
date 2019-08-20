@@ -23,4 +23,6 @@ extern "C"
 #include "ext_h101_timestamp_master.h"
 }
 
-R3B_WHITERABBIT_READER_IMPL(TimestampMaster, timestamp_master, 0x100);
+R3B_WHITERABBIT_READER_IMPL(TimestampMaster, timestamp_master, 0x300);
+// 0x300 for dec2019
+// 0x100 for data before dec2019

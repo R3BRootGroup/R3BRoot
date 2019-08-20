@@ -19,11 +19,11 @@
 #define R3BBUNCHEDFIBERMAPPED2CALPAR_H
 
 #include "FairTask.h"
+#include <R3BTCalEngine.h>
 
 class TClonesArray;
 class R3BTCalPar;
 class R3BEventHeader;
-class R3BTCalEngine;
 
 class R3BBunchedFiberMapped2CalPar : public FairTask
 {
@@ -42,7 +42,12 @@ class R3BBunchedFiberMapped2CalPar : public FairTask
      * @param a_update_rate a update rate for online histograms.
      * @param a_min_stats a minimum statistics for calibration.
      */
-    R3BBunchedFiberMapped2CalPar(const char*, Int_t, enum Electronics = TAMEX, Int_t = 1e6, Int_t = 1e5);
+    R3BBunchedFiberMapped2CalPar(const char*,
+                                 Int_t,
+                                 enum Electronics = TAMEX,
+                                 enum R3BTCalEngine::CTDCVariant = R3BTCalEngine::CTDC_16_BWD_150,
+                                 Int_t = 1e6,
+                                 Int_t = 1e5);
 
     /**
      * Destructor.
@@ -96,6 +101,7 @@ class R3BBunchedFiberMapped2CalPar : public FairTask
   private:
     TString fName;
     enum Electronics fSPMTElectronics;
+    enum R3BTCalEngine::CTDCVariant fCTDCVariant;
     TClonesArray* fMapped;
     R3BTCalPar* fMAPMTTCalPar;
     R3BTCalEngine* fMAPMTEngine;
@@ -105,7 +111,7 @@ class R3BBunchedFiberMapped2CalPar : public FairTask
     Int_t fMinStats;
 
   public:
-    ClassDef(R3BBunchedFiberMapped2CalPar, 1)
+    ClassDef(R3BBunchedFiberMapped2CalPar, 2)
 };
 
 #endif
