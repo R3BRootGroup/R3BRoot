@@ -43,8 +43,8 @@ find_package(FairRoot)
 execute_process(COMMAND ${FAIRROOTPATH}/bin/fairroot-config --major_version OUTPUT_VARIABLE FR_MAJOR_VERSION)
 execute_process(COMMAND ${FAIRROOTPATH}/bin/fairroot-config --minor_version OUTPUT_VARIABLE FR_MINOR_VERSION)
 execute_process(COMMAND ${FAIRROOTPATH}/bin/fairroot-config --patch_version OUTPUT_VARIABLE FR_PATCH_VERSION)
-if(${FR_MAJOR_VERSION} LESS 18 OR ${FR_MINOR_VERSION} LESS 2)
-  Message(FATAL_ERROR "Incompatible FairRoot version detected. R3BRoot requires FairRoot v18.2.0")
+if(${FR_MAJOR_VERSION} LESS 18 OR ${FR_MINOR_VERSION} LESS 2 OR ${FR_PATCH_VERSION} LESS 1)
+  Message(FATAL_ERROR "Incompatible FairRoot version detected. R3BRoot requires FairRoot v18.2.1")
 endif()
 
 # added a variable to point to r3broot path in the system

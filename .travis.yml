@@ -4,7 +4,7 @@ compiler: gcc
 dist: xenial
 sudo: required
 env: 
-    - GCC_VERSION=5 FAIRSOFT_VERSION=jun19p1 FAIRROOT_VERSION=18.2.0
+    - GCC_VERSION=5 FAIRSOFT_VERSION=jun19p1 FAIRROOT_VERSION=18.2.1
 #    - GCC_VERSION=7
 #    - GCC_VERSION=8
 services:
