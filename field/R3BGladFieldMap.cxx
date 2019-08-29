@@ -145,14 +145,14 @@ Double_t R3BGladFieldMap::GetBx(Double_t x, Double_t y, Double_t z) {
   if ( IsInside(localPoint.X(), localPoint.Y(), localPoint.Z(), ix, iy, iz, dx, dy, dz) ) {
 
   // Get Bx field values at grid cell corners
-  fHa[0][0][0] = fBx->At(ix    *2*fNy*fNz + iy    *fNz + iz);
-  fHa[1][0][0] = fBx->At((ix+1)*2*fNy*fNz + iy    *fNz + iz);
-  fHa[0][1][0] = fBx->At(ix    *2*fNy*fNz + (iy+1)*fNz + iz);
-  fHa[1][1][0] = fBx->At((ix+1)*2*fNy*fNz + (iy+1)*fNz + iz);
-  fHa[0][0][1] = fBx->At(ix    *2*fNy*fNz + iy    *fNz + (iz+1));
-  fHa[1][0][1] = fBx->At((ix+1)*2*fNy*fNz + iy    *fNz + (iz+1));
-  fHa[0][1][1] = fBx->At(ix    *2*fNy*fNz + (iy+1)*fNz + (iz+1));
-  fHa[1][1][1] = fBx->At((ix+1)*2*fNy*fNz + (iy+1)*fNz + (iz+1));
+  fHa[0][0][0] = fBx->At(ix    *fNy*fNz + iy    *fNz + iz);
+  fHa[1][0][0] = fBx->At((ix+1)*fNy*fNz + iy    *fNz + iz);
+  fHa[0][1][0] = fBx->At(ix    *fNy*fNz + (iy+1)*fNz + iz);
+  fHa[1][1][0] = fBx->At((ix+1)*fNy*fNz + (iy+1)*fNz + iz);
+  fHa[0][0][1] = fBx->At(ix    *fNy*fNz + iy    *fNz + (iz+1));
+  fHa[1][0][1] = fBx->At((ix+1)*fNy*fNz + iy    *fNz + (iz+1));
+  fHa[0][1][1] = fBx->At(ix    *fNy*fNz + (iy+1)*fNz + (iz+1));
+  fHa[1][1][1] = fBx->At((ix+1)*fNy*fNz + (iy+1)*fNz + (iz+1));
 
   // Return interpolated field value
   Double_t val = Interpolate(dx, dy, dz);
@@ -186,14 +186,14 @@ Double_t R3BGladFieldMap::GetBy(Double_t x, Double_t y, Double_t z) {
   if ( IsInside(localPoint.X(), localPoint.Y(), localPoint.Z(), ix, iy, iz, dx, dy, dz) ) {
 
   // Get By field values at grid cell corners
-  fHa[0][0][0] = fBy->At(ix    *2*fNy*fNz + iy    *fNz + iz);
-  fHa[1][0][0] = fBy->At((ix+1)*2*fNy*fNz + iy    *fNz + iz);
-  fHa[0][1][0] = fBy->At(ix    *2*fNy*fNz + (iy+1)*fNz + iz);
-  fHa[1][1][0] = fBy->At((ix+1)*2*fNy*fNz + (iy+1)*fNz + iz);
-  fHa[0][0][1] = fBy->At(ix    *2*fNy*fNz + iy    *fNz + (iz+1));
-  fHa[1][0][1] = fBy->At((ix+1)*2*fNy*fNz + iy    *fNz + (iz+1));
-  fHa[0][1][1] = fBy->At(ix    *2*fNy*fNz + (iy+1)*fNz + (iz+1));
-  fHa[1][1][1] = fBy->At((ix+1)*2*fNy*fNz + (iy+1)*fNz + (iz+1));
+  fHa[0][0][0] = fBy->At(ix    *fNy*fNz + iy    *fNz + iz);
+  fHa[1][0][0] = fBy->At((ix+1)*fNy*fNz + iy    *fNz + iz);
+  fHa[0][1][0] = fBy->At(ix    *fNy*fNz + (iy+1)*fNz + iz);
+  fHa[1][1][0] = fBy->At((ix+1)*fNy*fNz + (iy+1)*fNz + iz);
+  fHa[0][0][1] = fBy->At(ix    *fNy*fNz + iy    *fNz + (iz+1));
+  fHa[1][0][1] = fBy->At((ix+1)*fNy*fNz + iy    *fNz + (iz+1));
+  fHa[0][1][1] = fBy->At(ix    *fNy*fNz + (iy+1)*fNz + (iz+1));
+  fHa[1][1][1] = fBy->At((ix+1)*fNy*fNz + (iy+1)*fNz + (iz+1));
 
   // Return interpolated field value
   Double_t val = Interpolate(dx, dy, dz);
@@ -230,14 +230,14 @@ Double_t R3BGladFieldMap::GetBz(Double_t x, Double_t y, Double_t z) {
   if ( IsInside(localPoint.X(), localPoint.Y(), localPoint.Z(), ix, iy, iz, dx, dy, dz) ) {
 
   // Get Bz field values at grid cell corners
-  fHa[0][0][0] = fBz->At(ix    *2*fNy*fNz + iy    *fNz + iz);
-  fHa[1][0][0] = fBz->At((ix+1)*2*fNy*fNz + iy    *fNz + iz);
-  fHa[0][1][0] = fBz->At(ix    *2*fNy*fNz + (iy+1)*fNz + iz);
-  fHa[1][1][0] = fBz->At((ix+1)*2*fNy*fNz + (iy+1)*fNz + iz);
-  fHa[0][0][1] = fBz->At(ix    *2*fNy*fNz + iy    *fNz + (iz+1));
-  fHa[1][0][1] = fBz->At((ix+1)*2*fNy*fNz + iy    *fNz + (iz+1));
-  fHa[0][1][1] = fBz->At(ix    *2*fNy*fNz + (iy+1)*fNz + (iz+1));
-  fHa[1][1][1] = fBz->At((ix+1)*2*fNy*fNz + (iy+1)*fNz + (iz+1));
+  fHa[0][0][0] = fBz->At(ix    *fNy*fNz + iy    *fNz + iz);
+  fHa[1][0][0] = fBz->At((ix+1)*fNy*fNz + iy    *fNz + iz);
+  fHa[0][1][0] = fBz->At(ix    *fNy*fNz + (iy+1)*fNz + iz);
+  fHa[1][1][0] = fBz->At((ix+1)*fNy*fNz + (iy+1)*fNz + iz);
+  fHa[0][0][1] = fBz->At(ix    *fNy*fNz + iy    *fNz + (iz+1));
+  fHa[1][0][1] = fBz->At((ix+1)*fNy*fNz + iy    *fNz + (iz+1));
+  fHa[0][1][1] = fBz->At(ix    *fNy*fNz + (iy+1)*fNz + (iz+1));
+  fHa[1][1][1] = fBz->At((ix+1)*fNy*fNz + (iy+1)*fNz + (iz+1));
 
   // Return interpolated field value
   Double_t val = Interpolate(dx, dy, dz);
@@ -263,7 +263,7 @@ Bool_t R3BGladFieldMap::IsInside(Double_t x, Double_t y, Double_t z,
   Double_t zl = z;
 
   // ---  Check for being outside the map range
-  if ( ! ( xl > -fXmax && xl < fXmax && yl > -fYmax && yl < fYmax &&
+  if ( ! ( xl >= fXmin && xl < fXmax && yl >= fYmin && yl < fYmax &&
 	   zl >= fZmin && zl < fZmax ) ) {
     ix = iy = iz = 0;
     dx = dy = dz = 0.;
@@ -272,14 +272,14 @@ Bool_t R3BGladFieldMap::IsInside(Double_t x, Double_t y, Double_t z,
 
 
   // --- Determine grid cell
-  ix = Int_t( (xl+fXmax) / fXstep );
-  iy = Int_t( (yl+fYmax) / fYstep );
+  ix = Int_t( (xl-fXmin) / fXstep );
+  iy = Int_t( (yl-fYmin) / fYstep );
   iz = Int_t( (zl-fZmin) / fZstep );
 
 
   // Relative distance from grid point (in units of cell size)
-  dx = (xl+fXmax) / fXstep - Double_t(ix);
-  dy = (yl+fYmax) / fYstep - Double_t(iy);
+  dx = (xl-fXmin) / fXstep - Double_t(ix);
+  dy = (yl-fYmin) / fYstep - Double_t(iy);
   dz = (zl-fZmin) / fZstep - Double_t(iz);
 
   //cout << "-I- isInside true " << endl;
@@ -467,9 +467,9 @@ void R3BGladFieldMap::ReadAsciiFile(const char* fileName) {
     fNx += 1;
     fNy += 1;
     fNz += 1;
-  fBx = new TArrayF(2*fNx * 2*fNy * fNz);
-  fBy = new TArrayF(2*fNx * 2*fNy * fNz);
-  fBz = new TArrayF(2*fNx * 2*fNy * fNz);
+  fBx = new TArrayF(fNx * fNy * fNz);
+  fBy = new TArrayF(fNx * fNy * fNz);
+  fBz = new TArrayF(fNx * fNy * fNz);
 
   // Read the field values
   Double_t factor = fScale * 10.;   // Factor 10 for T -> kG
@@ -498,42 +498,15 @@ void R3BGladFieldMap::ReadAsciiFile(const char* fileName) {
           Double_t x = ax;
           Double_t y = ay;
           Double_t z = az;
-          if(x < 0 || y < 0)
-          {
-              continue;
-          }
-          Int_t index1 = Int_t((x + fXmax)/fXstep)*2*fNy*fNz + Int_t((y + fYmax)/fYstep)*fNz + Int_t((z-fZmin)/fZstep);
-          Int_t index2 = Int_t((-x + fXmax)/fXstep)*2*fNy*fNz + Int_t((y + fYmax)/fYstep)*fNz + Int_t((z-fZmin)/fZstep);
-          Int_t index3 = Int_t((-x + fXmax)/fXstep)*2*fNy*fNz + Int_t((-y + fYmax)/fYstep)*fNz + Int_t((z-fZmin)/fZstep);
-          Int_t index4 = Int_t((x + fXmax)/fXstep)*2*fNy*fNz + Int_t((-y + fYmax)/fYstep)*fNz + Int_t((z-fZmin)/fZstep);
+          
+          Int_t index1 = Int_t((x-fXmin)/fXstep)*fNy*fNz + Int_t((y-fYmin)/fYstep)*fNz + Int_t((z-fZmin)/fZstep);
 
-          TVector3 B1(bx, by, bz);
-          B1.RotateY(fYAngle*TMath::DegToRad());
+          TVector3 B(bx, by, bz);
+          //B.RotateY(fYAngle*TMath::DegToRad());
 
-          TVector3 B2(-bx, by, bz);
-          B2.RotateY(fYAngle*TMath::DegToRad());
-
-          TVector3 B3(bx, by, -bz);
-          B3.RotateY(fYAngle*TMath::DegToRad());
-
-          TVector3 B4(-bx, by, -bz);
-          B4.RotateY(fYAngle*TMath::DegToRad());
-
-          fBx->AddAt(factor*B1.X(), index1);
-          fBy->AddAt(factor*B1.Y(), index1);
-          fBz->AddAt(factor*B1.Z(), index1);
-
-          fBx->AddAt(factor*B2.X(), index2);
-          fBy->AddAt(factor*B2.Y(), index2);
-          fBz->AddAt(factor*B2.Z(), index2);
-
-          fBx->AddAt(factor*B3.X(), index3);
-          fBy->AddAt(factor*B3.Y(), index3);
-          fBz->AddAt(factor*B3.Z(), index3);
-
-          fBx->AddAt(factor*B4.X(), index4);
-          fBy->AddAt(factor*B4.Y(), index4);
-          fBz->AddAt(factor*B4.Z(), index4);
+          fBx->AddAt(factor*B.X(), index1);
+          fBy->AddAt(factor*B.Y(), index1);
+          fBz->AddAt(factor*B.Z(), index1);
           // ------------------------------------------------------------------------------------------
 
       //  cout << "-I- " << bx << " : " << by << " : "  << bz  << " : " << endl;
