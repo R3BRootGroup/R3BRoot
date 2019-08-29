@@ -19,7 +19,7 @@ constexpr Double_t Sqr(const Double_t val){
   return val*val;
 }
 
-constexpr Double_t Sin2(const Double_t val){
+Double_t Sin2(const Double_t val){
   return Sqr(sin(val));
 }
 
