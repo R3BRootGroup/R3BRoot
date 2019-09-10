@@ -502,7 +502,7 @@ void R3BGladFieldMap::ReadAsciiFile(const char* fileName) {
           Int_t index1 = Int_t((x-fXmin)/fXstep)*fNy*fNz + Int_t((y-fYmin)/fYstep)*fNz + Int_t((z-fZmin)/fZstep);
 
           TVector3 B(bx, by, bz);
-          //B.RotateY(fYAngle*TMath::DegToRad());
+          B.RotateY(fYAngle*TMath::DegToRad());
 
           fBx->AddAt(factor*B.X(), index1);
           fBy->AddAt(factor*B.Y(), index1);
