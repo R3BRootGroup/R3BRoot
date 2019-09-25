@@ -30,7 +30,8 @@ InitStatus R3BNeulandClusterFinder::Init()
 
 void R3BNeulandClusterFinder::Exec(Option_t*)
 {
-    // Get the vector of digis for this Event
+    fClusters.Reset();
+
     auto digis = fDigis.RetrieveObjects();
     const auto nDigis = digis.size();
 
@@ -38,16 +39,12 @@ void R3BNeulandClusterFinder::Exec(Option_t*)
     auto clusteredDigis = fClusteringEngine.Clusterize(digis);
     const auto nClusters = clusteredDigis.size();
 
-    // Convert to cluster type vector of vector of digis -> vector of clusters and store
-    std::vector<R3BNeulandCluster> clusters;
-    clusters.reserve(nClusters);
-    std::transform(
-        clusteredDigis.begin(), clusteredDigis.end(), std::back_inserter(clusters), [](std::vector<R3BNeulandHit>& v) {
-            return R3BNeulandCluster(std::move(v));
-        });
-    fClusters.Store(clusters);
+    LOG(DEBUG) << "R3BNeulandClusterFinder - nDigis nCluster:" << nDigis << " " << nClusters;
 
-    LOG(DEBUG) << "R3BNeulandClusterFinder - nDigis nCluster:" << nDigis << " " << clusters.size();
+    for (auto& cluster : clusteredDigis)
+    {
+        fClusters.Insert(R3BNeulandCluster{ std::move(cluster) });
+    }
 }
 
 ClassImp(R3BNeulandClusterFinder);

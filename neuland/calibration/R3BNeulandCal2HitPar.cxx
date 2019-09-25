@@ -1006,8 +1006,8 @@ void R3BNeulandCal2HitPar::FinishTask()
         for (Int_t pdl1 = 0; pdl1 < fPaddles; pdl1++)
             for (Int_t pdl2 = 0; pdl2 < fPaddles; pdl2++)
             {
-                LOG(DEBUG) << "================== mean: (" << pl << "," << pdl1 << ")-(" << pl + 1 << "," << pdl2 << ")"
-                          ;
+                LOG(DEBUG) << "================== mean: (" << pl << "," << pdl1 << ")-(" << pl + 1 << "," << pdl2
+                           << ")";
                 _collect_mean_cross[pl][pdl1][pdl2].analyse_history(_bad_fit_idents);
             }
 
@@ -1045,8 +1045,8 @@ void R3BNeulandCal2HitPar::FinishTask()
         for (Int_t pdl1 = 0; pdl1 < fPaddles; pdl1++)
             for (Int_t pdl2 = 0; pdl2 < fPaddles; pdl2++)
             {
-                LOG(DEBUG) << "================== mean: (" << pl << "," << pdl1 << ")-(" << pl + 1 << "," << pdl2 << ")"
-                          ;
+                LOG(DEBUG) << "================== mean: (" << pl << "," << pdl1 << ")-(" << pl + 1 << "," << pdl2
+                           << ")";
                 _collect_mean_cross[pl][pdl1][pdl2].calc_params(_bad_fit_idents, mean_diff_cross_t[pl][pdl1][pdl2]);
             }
 

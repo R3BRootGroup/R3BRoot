@@ -34,15 +34,13 @@ class TCAInputConnector
         fTCA = (TClonesArray*)ioman->GetObject(fBranchName);
         if (fTCA == nullptr)
         {
-            throw std::runtime_error(TString("TCAInputConnector: No TClonesArray called " + fBranchName +
-                                             " could be obtained from the FairRootManager")
-                                         .Data());
+            throw std::runtime_error("TCAInputConnector: No TClonesArray called " + fBranchName +
+                                     " could be obtained from the FairRootManager");
         }
         if (!TString(fTCA->GetClass()->GetName()).EqualTo(fClassName))
         {
-            throw std::runtime_error(TString("TCAInputConnector: TClonesArray " + fBranchName +
-                                             " does not contain elements of type " + fClassName)
-                                         .Data());
+            throw std::runtime_error("TCAInputConnector: TClonesArray " + fBranchName +
+                                     " does not contain elements of type " + fClassName);
         }
     }
 
@@ -51,7 +49,8 @@ class TCAInputConnector
         std::vector<T*> fV;
         if (fTCA == nullptr)
         {
-            throw std::runtime_error("TCAInputConnector: TClonesArray not available");
+            throw std::runtime_error("TCAInputConnector: TClonesArray " + fBranchName + " of " + fClassName +
+                                     "s not available");
         }
 
         const Int_t n = fTCA->GetEntries();
@@ -68,7 +67,8 @@ class TCAInputConnector
         std::vector<T> fV;
         if (fTCA == nullptr)
         {
-            throw std::runtime_error("TCAInputConnector: TClonesArray not available");
+            throw std::runtime_error("TCAInputConnector: TClonesArray " + fBranchName + " of " + fClassName +
+                                     "s not available");
         }
 
         const Int_t n = fTCA->GetEntries();
@@ -107,9 +107,8 @@ class TCAOptionalInputConnector
         fTCA = (TClonesArray*)ioman->GetObject(fBranchName);
         if (fTCA != nullptr && !TString(fTCA->GetClass()->GetName()).EqualTo(fClassName))
         {
-            throw std::runtime_error(TString("TCAInputConnector: TClonesArray " + fBranchName +
-                                             " does not contain elements of type " + fClassName)
-                                         .Data());
+            throw std::runtime_error("TCAInputConnector: TClonesArray " + fBranchName +
+                                     " does not contain elements of type " + fClassName);
         }
     }
 
@@ -172,22 +171,68 @@ class TCAOutputConnector
             throw std::runtime_error("TCAOutputConnector: No FairRootManager");
         }
         fTCA = ioman->Register(fBranchName, fClassName, "", kTRUE);
+
+        if (fTCA == nullptr)
+        {
+            throw std::runtime_error("TCAOutputConnector: TClonesArray " + fBranchName + " of " + fClassName +
+                                     "s could not be provided by the FairRootManager");
+        }
     }
 
-    void Store(std::vector<T>& v)
+    void Reset()
     {
         if (fTCA == nullptr)
         {
-            throw std::runtime_error("TCAOutputConnector: TClonesArray not available");
+            throw std::runtime_error("TCAOutputConnector: TClonesArray " + fBranchName + " of " + fClassName +
+                                     "s not available");
         }
+        fTCA->Clear("C");
+    }
 
-        fTCA->Clear();
+    Int_t Size()
+    {
+        if (fTCA == nullptr)
+        {
+            throw std::runtime_error("TCAOutputConnector: TClonesArray " + fBranchName + " of " + fClassName +
+                                     "s not available");
+        }
+        return fTCA->GetEntries();
+    }
 
+    void Insert(T t)
+    {
+        if (fTCA == nullptr)
+        {
+            throw std::runtime_error("TCAOutputConnector: TClonesArray " + fBranchName + " of " + fClassName +
+                                     "s not available");
+        }
+        new ((*fTCA)[fTCA->GetEntries()]) T(std::move(t));
+    }
+
+    void Insert(T* t)
+    {
+        if (fTCA == nullptr)
+        {
+            throw std::runtime_error("TCAOutputConnector: TClonesArray " + fBranchName + " of " + fClassName +
+                                     "s not available");
+        }
+        if (t != nullptr)
+        {
+            new ((*fTCA)[fTCA->GetEntries()]) T(*t);
+        }
+    }
+
+    void Insert(std::vector<T>& v)
+    {
+        if (fTCA == nullptr)
+        {
+            throw std::runtime_error("TCAOutputConnector: TClonesArray " + fBranchName + " of " + fClassName +
+                                     "s not available");
+        }
         for (auto& o : v)
         {
             new ((*fTCA)[fTCA->GetEntries()]) T(std::move(o));
         }
-
         v.clear();
     }
 };

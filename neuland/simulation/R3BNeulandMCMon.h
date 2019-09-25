@@ -57,7 +57,7 @@ class R3BNeulandMCMon : public FairTask
     Bool_t fIs3DTrackEnabled;
     Bool_t fIsFullSimAnaEnabled;
 
-    TCAInputConnector<FairMCPoint> fPrimaryNeutronInteractionPoints;
+    TCAInputConnector<R3BNeulandPoint> fPrimaryNeutronInteractionPoints;
     TCAInputConnector<R3BMCTrack> fMCTracks;
     TCAInputConnector<R3BNeulandPoint> fNeulandPoints;
 

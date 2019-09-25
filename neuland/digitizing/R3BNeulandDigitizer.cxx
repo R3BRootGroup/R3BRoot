@@ -69,6 +69,8 @@ InitStatus R3BNeulandDigitizer::Init()
 
 void R3BNeulandDigitizer::Exec(Option_t*)
 {
+    fHits.Reset();
+
     std::map<UInt_t, Double_t> paddleEnergyDeposit;
     // Look at each Land Point, if it deposited energy in the scintillator, store it with reference to the bar
     for (const auto& point : fPoints.Retrieve())
@@ -81,8 +83,7 @@ void R3BNeulandDigitizer::Exec(Option_t*)
             const TVector3 position = point->GetPosition();
             const TVector3 converted_position = fNeulandGeoPar->ConvertToLocalCoordinates(position, paddleID);
             LOG(DEBUG) << "NeulandDigitizer: Point in paddle " << paddleID
-                       << " with global position XYZ: " << position.X() << " " << position.Y() << " " << position.Z()
-                      ;
+                       << " with global position XYZ: " << position.X() << " " << position.Y() << " " << position.Z();
             LOG(DEBUG) << "NeulandDigitizer: Converted to local position XYZ: " << converted_position.X() << " "
                        << converted_position.Y() << " " << converted_position.Z();
 
@@ -123,8 +124,6 @@ void R3BNeulandDigitizer::Exec(Option_t*)
     }
 
     // Create Hits
-    std::vector<R3BNeulandHit> hits;
-    hits.reserve(paddles.size());
     for (const auto& kv : paddles)
     {
         const Int_t paddleID = kv.first;
@@ -151,12 +150,11 @@ void R3BNeulandDigitizer::Exec(Option_t*)
 
         if (fHitFilters.IsValid(hit))
         {
-            hits.push_back(hit);
+            fHits.Insert(std::move(hit));
         }
     } // loop over paddles
 
-    LOG(DEBUG) << "R3BNeulandDigitizer: produced " << hits.size() << " hits";
-    fHits.Store(hits);
+    LOG(DEBUG) << "R3BNeulandDigitizer: produced " << fHits.Size() << " hits";
 }
 
 void R3BNeulandDigitizer::Finish()

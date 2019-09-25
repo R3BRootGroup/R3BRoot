@@ -14,6 +14,5 @@
 #pragma link C++ class R3BNeulandNeutronReconstruction+;
 #pragma link C++ class R3BNeulandNeutronReconstructionMon+;
 #pragma link C++ class R3BNeulandNeutronReconstructionStatistics+;
-#pragma link C++ class R3BNeulandNeutronClusters+;
 
 #endif

@@ -7,5 +7,7 @@
 
 #pragma link C++ class R3BNeuland+;
 #pragma link C++ class R3BNeulandMCMon+;
+#pragma link C++ class R3BNeulandPrimaryClusterFinder+;
+#pragma link C++ class R3BNeulandPrimaryInteractionFinder+;
 
 #endif

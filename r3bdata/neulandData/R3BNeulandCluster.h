@@ -24,6 +24,12 @@ class R3BNeulandCluster : public TObject
     {
     }
 
+    void Clear(Option_t*) override
+    {
+        fHits.clear();
+        fHits.shrink_to_fit();
+    }
+
     const std::vector<R3BNeulandHit>& GetHits() const { return fHits; }
     R3BNeulandHit GetFirstHit() const;
     R3BNeulandHit GetLastHit() const;

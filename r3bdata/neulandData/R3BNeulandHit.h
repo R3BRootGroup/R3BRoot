@@ -36,8 +36,8 @@ class R3BNeulandHit : public TObject
 
     bool operator==(const R3BNeulandHit& b) const
     {
-        return this->GetPaddle() == b.GetPaddle() && this->GetT() == b.GetT() && this->GetE() == b.GetE() &&
-               this->GetPosition() == b.GetPosition();
+        // TODO: Change this if multi-hit capability is introduced
+        return this->GetPaddle() == b.GetPaddle();
     }
 
   private:

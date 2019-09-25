@@ -1,15 +1,12 @@
 #include "R3BNeuland.h"
-#include "FairMCPoint.h"
 #include "FairRun.h"
 #include "FairRuntimeDb.h"
 #include "R3BMCStack.h"
 #include "R3BNeulandGeoPar.h"
-#include "R3BNeulandNeutron.h"
 #include "R3BNeulandPoint.h"
 #include "TClonesArray.h"
 #include "TGeoBBox.h"
 #include "TGeoManager.h"
-#include "TObjArray.h"
 #include "TParticle.h"
 #include "TVirtualMC.h"
 
@@ -35,7 +32,7 @@ inline Double_t GetLightYield(const Int_t charge, const Double_t length, const D
         Double_t lightYield = edep / (1. + birkC1Mod * dedxcm + BirkC2 * dedxcm * dedxcm);
         return lightYield;
     }
-    return 0.;
+    return edep; // Rarely very small energy depositions have no length?
 }
 
 R3BNeuland::R3BNeuland()
@@ -51,8 +48,6 @@ R3BNeuland::R3BNeuland(const TString& geoFile, const TGeoTranslation& trans, con
 R3BNeuland::R3BNeuland(const TString& geoFile, const TGeoCombiTrans& combi)
     : R3BDetector("R3BNeuland", kNEULAND, geoFile, combi)
     , fNeulandPoints(new TClonesArray("R3BNeulandPoint"))
-    , fNeulandPrimaryNeutronInteractionPoints(new TClonesArray("FairMCPoint"))
-    , fNeulandPrimaryNeutrons(new TClonesArray("R3BNeulandNeutron"))
 {
 }
 
@@ -72,16 +67,6 @@ R3BNeuland::~R3BNeuland()
     {
         fNeulandPoints->Delete();
         delete fNeulandPoints;
-    }
-    if (fNeulandPrimaryNeutronInteractionPoints)
-    {
-        fNeulandPrimaryNeutronInteractionPoints->Delete();
-        delete fNeulandPrimaryNeutronInteractionPoints;
-    }
-    if (fNeulandPrimaryNeutrons)
-    {
-        fNeulandPrimaryNeutrons->Delete();
-        delete fNeulandPrimaryNeutrons;
     }
 }
 
@@ -123,12 +108,11 @@ Bool_t R3BNeuland::ProcessHits(FairVolume*)
     // Set additional parameters at exit of active volume. Create R3BNeulandPoint.
     if (gMC->IsTrackExiting() || gMC->IsTrackStop() || gMC->IsTrackDisappeared())
     {
-
         // Do not save a hit if no energy deposited
-        if (fELoss == 0.)
+        if (fELoss < 1e-20 || fLightYield < 1e-20)
         {
             ResetValues();
-            return kFALSE;
+            return kTRUE;
         }
 
         fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
@@ -160,47 +144,6 @@ Bool_t R3BNeuland::ProcessHits(FairVolume*)
     return kTRUE;
 }
 
-void R3BNeuland::PostTrack()
-{
-    // Do NOT use FinishPrimary() -> different track numbering!
-    // Look for primary neutron
-    if (gMC->GetStack()->GetCurrentParentTrackNumber() == -1 &&
-        gMC->GetStack()->GetCurrentTrack()->GetPdgCode() == 2112)
-    {
-
-        // Check if the primary neutron track ended in a volume of NeuLAND
-        auto volName = std::string(gMC->CurrentVolName());
-        if (volName == "volBC408" || volName == "volAlWrapping" || volName == "volTapeWrapping")
-        {
-            TLorentzVector pos;
-            gMC->TrackPosition(pos);
-            TLorentzVector mom;
-            gMC->TrackMomentum(mom);
-            Int_t paddleID;
-            gMC->CurrentVolOffID(1, paddleID);
-
-            LOG(DEBUG) << "R3BNeuland::PostTrack()"
-                       << " TrackNumber: " << ((R3BStack*)gMC->GetStack())->GetCurrentTrackNumber() << " XYZTE "
-                       << pos.X() << " " << pos.Y() << " " << pos.Z() << " " << pos.T() << " " << mom.E()
-                       << " VolName: " << gMC->CurrentVolName() << " PaddleID: " << paddleID;
-
-            Int_t size = fNeulandPrimaryNeutronInteractionPoints->GetEntriesFast();
-            new ((*fNeulandPrimaryNeutronInteractionPoints)[size]) FairMCPoint(gMC->GetStack()->GetCurrentTrackNumber(),
-                                                                               paddleID,
-                                                                               pos.Vect(),
-                                                                               mom.Vect(),
-                                                                               pos.T() * 1.0e09,
-                                                                               gMC->TrackLength(),
-                                                                               mom.E() - gMC->ParticleMass(2112),
-                                                                               gMC->CurrentEvent());
-
-            const TVector3 pixel = fNeulandGeoPar->ConvertGlobalToPixel(pos.Vect());
-            new ((*fNeulandPrimaryNeutrons)[fNeulandPrimaryNeutrons->GetEntries()])
-                R3BNeulandNeutron(paddleID, pos.T() * 1.0e09, pos.Vect(), pixel);
-        }
-    }
-}
-
 Bool_t R3BNeuland::CheckIfSensitive(std::string name) { return name == "volBC408"; }
 
 void R3BNeuland::EndOfEvent()
@@ -224,24 +167,16 @@ TClonesArray* R3BNeuland::GetCollection(Int_t iColl) const
 void R3BNeuland::Register()
 {
     FairRootManager::Instance()->Register("NeulandPoints", GetName(), fNeulandPoints, kTRUE);
-    FairRootManager::Instance()->Register(
-        "NeulandPrimaryNeutronInteractionPoints", GetName(), fNeulandPrimaryNeutronInteractionPoints, kTRUE);
-    FairRootManager::Instance()->Register("NeulandPrimaryNeutrons", GetName(), fNeulandPrimaryNeutrons, kTRUE);
 }
 
 void R3BNeuland::Print(Option_t*) const
 {
-    LOG(INFO) << "R3BNeuland: " << fNeulandPoints->GetEntries() << " Neuland Points registered in this event"
-             ;
-    LOG(INFO) << "R3BNeuland: " << fNeulandPrimaryNeutronInteractionPoints->GetEntries()
-              << " Neuland Primary Neutron Interaction Points registered in this event";
+    LOG(INFO) << "R3BNeuland: " << fNeulandPoints->GetEntries() << " Neuland Points registered in this event";
 }
 
 void R3BNeuland::Reset()
 {
     fNeulandPoints->Clear();
-    fNeulandPrimaryNeutronInteractionPoints->Clear();
-    fNeulandPrimaryNeutrons->Clear();
     ResetValues();
 }
 
@@ -259,7 +194,6 @@ void R3BNeuland::ResetValues()
 
 void R3BNeuland::WriteParameterFile()
 {
-
     FairRuntimeDb* rtdb = FairRun::Instance()->GetRuntimeDb();
     fNeulandGeoPar = (R3BNeulandGeoPar*)rtdb->getContainer("R3BNeulandGeoPar");
 

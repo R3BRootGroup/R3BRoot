@@ -92,7 +92,7 @@ namespace Neuland
         auto clusters = new TClonesArray("R3BNeulandCluster");
         branch->SetAddress(&clusters);
 
-        TBranch* branch2 = tree->GetBranch("NeulandPrimaryNeutronInteractionPoints");
+        TBranch* branch2 = tree->GetBranch("NeulandPrimaryPoints");
         auto npnips = new TClonesArray("FairMCPoint");
         branch2->SetAddress(&npnips);
 
@@ -191,8 +191,16 @@ namespace Neuland
         TCutG* cut = fCuts[nNeutrons];
         cut->SetPoint(0, -1, y0);
         cut->SetPoint(1, x1, -1);
-        cut->SetPoint(2, x2, -1);
-        cut->SetPoint(3, -1, y3);
+        if (nNeutrons == fNMax)
+        {
+            cut->SetPoint(2, 100000, -1);
+            cut->SetPoint(3, -1, 100000);
+        }
+        else
+        {
+            cut->SetPoint(2, x2, -1);
+            cut->SetPoint(3, -1, y3);
+        }
         return cut;
     }
 

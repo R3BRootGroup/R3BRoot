@@ -22,9 +22,10 @@ InitStatus R3BNeulandNeutronReconstruction::Init()
 
 void R3BNeulandNeutronReconstruction::Exec(Option_t*)
 {
+    fNeutrons.Reset();
     auto clusters = fClusters.Retrieve();
     auto neutrons = fEngine->GetNeutrons(clusters);
-    fNeutrons.Store(neutrons);
+    fNeutrons.Insert(neutrons);
 }
 
 ClassImp(R3BNeulandNeutronReconstruction)

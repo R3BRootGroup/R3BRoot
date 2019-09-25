@@ -85,8 +85,7 @@ R3BNeulandTacquilaMapped2Cal::~R3BNeulandTacquilaMapped2Cal()
 
 InitStatus R3BNeulandTacquilaMapped2Cal::Init()
 {
-    LOG(INFO) << "R3BNeulandTacquilaMapped2Cal::Init : read " << fTcalPar->GetNumModulePar() << " calibrated modules"
-             ;
+    LOG(INFO) << "R3BNeulandTacquilaMapped2Cal::Init : read " << fTcalPar->GetNumModulePar() << " calibrated modules";
     // fTcalPar->printParams();
 
     FairRootManager* mgr = FairRootManager::Instance();
@@ -285,8 +284,7 @@ void R3BNeulandTacquilaMapped2Cal::FinishEvent()
 {
     if (fVerbose && 0 == (fNEvents % 1000))
     {
-        LOG(INFO) << "R3BNeulandTacquilaMapped2Cal::Exec : event=" << fNEvents << " nPMTs=" << fNPmt
-                 ;
+        LOG(INFO) << "R3BNeulandTacquilaMapped2Cal::Exec : event=" << fNEvents << " nPMTs=" << fNPmt;
     }
 
     if (fPmt)

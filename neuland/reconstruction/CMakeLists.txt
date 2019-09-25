@@ -10,7 +10,6 @@ set(SRCS
     R3BNeulandNeutronReconstruction.cxx
     R3BNeulandNeutronReconstructionMon.cxx
     R3BNeulandNeutronReconstructionStatistics.cxx
-    R3BNeulandNeutronClusters.cxx
     ReconstructionEngine.cxx
     ClusterScoring.cxx
     RecoTDR.cxx

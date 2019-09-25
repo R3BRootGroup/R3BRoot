@@ -32,4 +32,5 @@ message Event {
     optional int32 eventID = 2;
     repeated Hit neutrons = 3;
     repeated Cluster clusters = 4;
+    optional int32 nIn = 5;
 }

@@ -16,8 +16,6 @@ class R3BNeulandGeoPar;
  * @since 12.01.2016
  * For each simulated event, TClonesArrays are filled:
  * - NeulandPoints (R3BNeulandPoint), each representing energy deposition and light yield of a track in a paddle
- * - NeulandPrimaryNeutronInteractionPoints (FairMCPoint), each representing the first interaction points of
- *   primary neutrons.
  * Suitable geometry files require proper naming of the active volume (see CheckIfSensitive) and copy numbers.
  */
 
@@ -66,8 +64,6 @@ class R3BNeuland : public R3BDetector
 
     void Reset() override;
 
-    void PostTrack() override;
-
     Bool_t CheckIfSensitive(std::string name) override;
 
     // No copy and no move is allowed (Rule of three/five)
@@ -77,10 +73,7 @@ class R3BNeuland : public R3BDetector
     R3BNeuland& operator=(R3BNeuland&&) = delete;      // move assignment
 
   private:
-    TClonesArray* fNeulandPoints;                          //!
-    TClonesArray* fNeulandPrimaryNeutronInteractionPoints; //!
-    TClonesArray* fNeulandPrimaryNeutrons;                 //!
-
+    TClonesArray* fNeulandPoints; //!
     R3BNeulandGeoPar* fNeulandGeoPar; //!
 
     /** Track information to be stored until the track leaves the active volume. */

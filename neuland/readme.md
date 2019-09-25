@@ -1,17 +1,21 @@
 # NeuLAND module for r3broot
 
-## Components
+## Overview
 Code for the NeuLAND Detector is split into different components:
 
-- simulation
+- [simulation](simulation/readme.md)
 - [digitizing](digitizing/readme.md)
 - clustering
 - reconstruction
 - test
 - unpack
 - shared
+- neulandData (in `../r3bdata/neulandData`).
 
 Note that in contrast to the old NeuLAND and LAND code in the /land/ directory, the spelling in e.g. class names is "Neuland", with a small "l".
+
+The components fill storage containers for each event, which flow into other components: 
+![Neuland Flowchart](shared/neulandflow.svg)
 
 
 ### Tasks
@@ -23,8 +27,7 @@ These tasks are derived from FairTask and used in the steering macros.
 - `R3BNeulandHitMon`: Control histograms for digitized data (NeulandHits)
 - [`R3BNeulandClusterFinder`](#clustering): Clustering of digitized data, NeulandHits -> NeulandClusters
 - `R3BNeulandClusterMon`: ControlHistograms for clusters (NeulandClusters)
-- [`R3BNeulandNeutronReconstruction`](#event-reconstruction): Determination of Neutron first interaction points, NeulandClusters -> NeulandNeutrons
-- `R3BNeulandNeutronReconstructionEvaluation`: Comparison of reconstructed with actual neutron interaction points.
+
 
 ### Data Storage
 
@@ -47,16 +50,6 @@ Note that the classes indented for storing data (derived from TObject for usage 
 - `R3BNeulandContFact`: Container Factory for the configuration storage classes (pure boilerplate)
 - `R3BNeulandVisualizer`: 3D display of events, prepared by the `-Mon` tasks. (Work in progress)
 - [`Neuland::Neutron2DCalibr`](#calibration): Calibration of cuts for the 2D neutron multiplicity method
-
-
-## Detector Class
-`R3BNeuland` is the main class derived from `R3BDetector` for use in simulations. Note that it does not include the geometry itself, but takes `neuland_v2_` geometry files from `/geometry/`. Suitable geometry files require proper naming of the active volume and copy numbers. See [Geometry](#geometry)
-
-It fills to main outputs for each simulated event:
-- NeulandPoints (`R3BNeulandPoint`), each representing energy deposition and light yield of a track in a paddle.
-- NeulandPrimaryNeutronInteractionPoints (`FairMCPoint`), each representing the first interaction points of primary neutrons for later comparison to the reconstructed neutrons.
-
-Control histograms are extracted to `R3BNeulandMCMon`.
 
 
 ## Digitizing

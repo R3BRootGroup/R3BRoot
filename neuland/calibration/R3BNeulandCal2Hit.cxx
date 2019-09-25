@@ -54,8 +54,7 @@ void R3BNeulandCal2Hit::SetParameter()
         tempMapEGain[id] = fModulePar->GetEnergieGain();
     }
 
-    LOG(INFO) << "R3BNeulandCal2Hit::SetParameter : Number of Parameters: " << fPar->GetNumModulePar()
-             ;
+    LOG(INFO) << "R3BNeulandCal2Hit::SetParameter : Number of Parameters: " << fPar->GetNumModulePar();
 
     fMapIsSet = tempMapIsSet;
     fMapVeff = tempMapVeff;
@@ -72,6 +71,8 @@ InitStatus R3BNeulandCal2Hit::ReInit()
 
 void R3BNeulandCal2Hit::Exec(Option_t*)
 {
+    fHits.Reset();
+
     Int_t id = 0;
     if (fFirstPlaneHorizontal)
     {
@@ -87,7 +88,6 @@ void R3BNeulandCal2Hit::Exec(Option_t*)
     const auto endSide1StartSide2 =
         std::partition(calData.begin(), calData.end(), [](const R3BNeulandCalData* c) { return c->GetSide() == 1; });
 
-    std::vector<R3BNeulandHit> hits;
     // Loop over side 1
     for (auto c1 = calData.begin(); c1 != endSide1StartSide2; c1++)
     {
@@ -152,9 +152,8 @@ void R3BNeulandCal2Hit::Exec(Option_t*)
         z = (plane - 0.5) * 5. + fDistanceToTarget;
         zz = plane - 1;
 
-        hits.emplace_back(R3BNeulandHit{ barId, tdcL, tdcR, tdc, qdcL, qdcR, qdc, { x, y, z }, { xx, yy, zz } });
+        fHits.Insert({ barId, tdcL, tdcR, tdc, qdcL, qdcR, qdc, { x, y, z }, { xx, yy, zz } });
     }
-    fHits.Store(hits);
 }
 
 double R3BNeulandCal2Hit::GetTstart() const

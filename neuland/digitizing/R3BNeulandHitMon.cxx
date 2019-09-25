@@ -45,7 +45,7 @@ InitStatus R3BNeulandHitMon::Init()
 
     hTime = new TH1D("hTime", "Hit time", 30000, -1000, 1000);
     hTimeAdj = new TH1D("hTimeAdj", "Hit Time adjusted for flight path", 30000, -1000, 1000);
-    hMult = new TH1D("hMult", "Hit Multiplicity", 30, -0.5, 29.5);
+    hMult = new TH1D("hMult", "Hit Multiplicity", 200, 0, 200);
     hDepth = new TH1D("hDepth", "Maxial penetration depth", 60, 1400, 1700);
     hForemostEnergy = new TH1D("hForemostEnergy", "Foremost energy deposition", 100, 0, 100);
     hSternmostEnergy = new TH1D("hSternmostEnergy", "Sternmost energy deposition", 100, 0, 100);
