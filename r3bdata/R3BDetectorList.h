@@ -26,7 +26,6 @@ enum DetectorId
     kSTARTRACK,
     kLUMON,
     kNEULAND,
-//    kACTAR,
     kFI3a,
     kFI3b,
     kFI4,
