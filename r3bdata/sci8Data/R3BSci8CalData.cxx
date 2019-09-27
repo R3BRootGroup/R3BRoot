@@ -1,10 +1,13 @@
 
 #include "R3BSci8CalData.h"
 #include "math.h"
+#include <iostream>
 #include "FairLogger.h"
+
+using namespace std;
+
 /* for the data analysis of Sci8 detector.  
  */
-
 
 R3BSci8CalData::R3BSci8CalData()
     : fDetector(0)
