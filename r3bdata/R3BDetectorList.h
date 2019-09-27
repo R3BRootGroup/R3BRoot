@@ -26,7 +26,6 @@ enum DetectorId
     kSTARTRACK,
     kLUMON,
     kNEULAND,
-//    kACTAR,
     kFI3a,
     kFI3b,
     kFI4,
@@ -39,7 +38,6 @@ enum DetectorId
     kFI12,
     kFI13,
     kSFI,
-#ifdef SOFIA
     kSOFSCI,
     kSOFAT,
     kSOFTRIM,
@@ -47,10 +45,7 @@ enum DetectorId
     kSOFTWIM,
     kSOFMWPC2,
     kSOFTofWall,
-#endif
-#ifdef GTPC
     kGTPC,
-#endif
     kLAST
 };
 /** Unique identifier for all R3B Point and Hit types **/
@@ -83,19 +78,15 @@ enum fDetectorType
     kFI11Point,
     kFI12Point,
     kFI13Point,
-    kSFIPoint
-#ifdef SOFIA
-    ,kSOFSCIPoint
-    ,kSOFATPoint
-    ,kSOFTRIMPoint
-    ,kSOFMWPC1Point
-    ,kSOFTWIMPoint
-    ,kSOFMWPC2Point
-    ,kSOFTofWallPoint
-#endif
-#ifdef GTPC
-    ,kGTPCPoint
-#endif
+    kSFIPoint,
+    kSOFSCIPoint,
+    kSOFATPoint,
+    kSOFTRIMPoint,
+    kSOFMWPC1Point,
+    kSOFTWIMPoint,
+    kSOFMWPC2Point,
+    kSOFTofWallPoint,
+    kGTPCPoint
 };
 
 enum SensorSide

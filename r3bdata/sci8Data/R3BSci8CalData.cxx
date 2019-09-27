@@ -5,6 +5,7 @@
 /* for the data analysis of Sci8 detector.  
  */
 
+using namespace std;
 
 R3BSci8CalData::R3BSci8CalData()
     : fDetector(0)
