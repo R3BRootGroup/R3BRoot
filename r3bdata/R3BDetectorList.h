@@ -54,7 +54,7 @@ enum DetectorId
 /** Unique identifier for all R3B Point and Hit types **/
 enum fDetectorType
 {
-    kUnknown,
+    kUnknownDetector,
     kDchPoint,
     kCalPoint,
     kLandPoint,
@@ -90,6 +90,9 @@ enum fDetectorType
     ,kSOFTofWallPoint
 #endif
 #ifdef GTPC
+    /* note that the value of kGTPCPoint will depend on
+     * whether SOFIA is defined. --pklenze
+     */
     ,kGTPCPoint
 #endif
 };
