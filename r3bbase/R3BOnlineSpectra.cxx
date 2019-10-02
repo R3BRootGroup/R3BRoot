@@ -1119,7 +1119,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
  {                    
    itpat = header->GetTpat(); 
    tpatvalue = (itpat && (1 << fTpat_bit)) >> fTpat_bit;
-   if( (tpatvalue == 0)) return;
+   if( tpatvalue == 0 ) return;
   }    
      
  
@@ -1261,9 +1261,21 @@ void R3BOnlineSpectra::Exec(Option_t* option)
     if(nParts < 1) return;
   
     Int_t iDet = 0;   
-    Double_t timeRolu_L[nParts][2][4] = {0.0/0.0};
-    Double_t timeRolu_T[nParts][2][4] = {0.0/0.0};
-    Double_t totRolu[nParts][2][4] = {0.0/0.0};
+    Double_t timeRolu_L[nParts][2][4];
+    Double_t timeRolu_T[nParts][2][4];
+    Double_t totRolu[nParts][2][4];
+    for (Int_t iPart = 0; iPart < nParts; iPart++)
+    {
+        for(Int_t kDet = 0; kDet < 2; kDet++)
+        {
+            for(Int_t iCha = 0; iCha < 4; iCha++)
+            {
+                timeRolu_L[iPart][kDet][iCha] = 0./0.;
+                timeRolu_T[iPart][kDet][iCha] = 0./0.;
+                totRolu[iPart][kDet][iCha] = 0./0.;
+            }
+        }
+    }
     
     for (Int_t iPart = 0; iPart < nParts; iPart++) 
    {

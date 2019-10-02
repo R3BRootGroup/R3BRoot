@@ -144,10 +144,19 @@ void R3BRoluCal2Hit::Exec(Option_t* option)
  // missing times are NAN, hence other times will also
  // be NAN if one time is missing.
  // R=0, O=1, L=2, U=3      
-    Double_t time_L[nPart][4] = {0.0/0.0};
-    Double_t time_T[nPart][4] = {0.0/0.0};          
-    Double_t tot[nPart][4] = {0.0/0.0};
-	
+    Double_t time_L[nPart][4];
+    Double_t time_T[nPart][4];          
+    Double_t tot[nPart][4];
+    for(Int_t iPart = 0; iPart < nPart; iPart++)
+    {
+        for(Int_t ipm = 0; ipm < 4; ipm++)
+        {
+            time_L[iPart][ipm] = 0.0/0.0;
+            time_T[iPart][ipm] = 0.0/0.0;
+            tot[iPart][ipm] = 0.0/0.0;
+        }
+    }
+    
 	 
     Int_t nDet = 0;  
                             
