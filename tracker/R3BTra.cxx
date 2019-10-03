@@ -72,6 +72,7 @@ void R3BTra::Initialize()
 
     LOG(INFO) << "R3BTra: initialisation";
     LOG(DEBUG) << "R3BTra: Sens. Vol. (McId) " << gMC->VolId("TraLog");
+    LOG(DEBUG) << "R3BTra: Sens. Vol. (McId) " << gMC->VolId("Strip");
 }
 
 void R3BTra::SetSpecialPhysicsCuts()
@@ -303,8 +304,9 @@ R3BTraPoint* R3BTra::AddHit(Int_t trackID,
 
 Bool_t R3BTra::CheckIfSensitive(std::string name)
 {
-    if (TString(name).Contains("TraLog"))
+    if (TString(name).Contains("TraLog") || TString(name).Contains("Strip"))
     {
+        //LOG(INFO) << "Found TRA geometry from ROOT file: " << name;
         return kTRUE;
     }
     return kFALSE;
