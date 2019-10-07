@@ -9,7 +9,7 @@
 #define N_PLANE_MAX_TOFD 4
 #define N_PADDLE_MAX_TOFD 50
 #define N_PADDLE_MAX_PTOF 100
-#define N_PSPX 4
+#define N_PSPX_S454 4
 #define N_FIBER_PLOT 1050 // range to plot
 
 #include "FairTask.h"
@@ -242,9 +242,9 @@ class R3BGlobalAnalysisS454 : public FairTask
     TH1F* fh_ptof_TotPm2[N_PADDLE_MAX_PTOF]; 
 
     
-    TH1F *fh_pspx_strips_psp[N_PSPX];
-    TH1F *fh_pspx_energy_psp[N_PSPX];
-    TH1F *fh_pspx_multiplicity_psp[N_PSPX];
+    TH1F *fh_pspx_strips_psp[N_PSPX_S454];
+    TH1F *fh_pspx_energy_psp[N_PSPX_S454];
+    TH1F *fh_pspx_multiplicity_psp[N_PSPX_S454];
     
     TH2F *fh_pspx_pos1_strips;
     TH2F *fh_pspx_pos2_strips;

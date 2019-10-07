@@ -270,7 +270,7 @@ InitStatus R3BGlobalAnalysis::Init()
             for(Int_t j = ifibcount+1; j < NOF_FIB_DET; j++){
 				detName2 = fDetectorNames[DET_FI_FIRST + j];
 	     	    fh_Fib_vs_Fib[ifibcount][j] = new TH2F(Form("fib%s_vs_fib%s",detName,detName2), 
-	     	        Form("Fiber %s vs. Fiber %",detName,detName2), 110,0,1100,110, 0., 1100.);    
+	     	        Form("Fiber %s vs. Fiber %s",detName,detName2), 110,0,1100,110, 0., 1100.);    
                 fh_Fib_vs_Fib[ifibcount][j]->GetYaxis()->SetTitle(Form("Fiber%s",detName2));
                 fh_Fib_vs_Fib[ifibcount][j]->GetXaxis()->SetTitle(Form("Fiber%s",detName));;
 		    }
@@ -279,7 +279,7 @@ InitStatus R3BGlobalAnalysis::Init()
             for(Int_t j = ifibcount+1; j < NOF_FIB_DET; j++){
 				detName2 = fDetectorNames[DET_FI_FIRST + j];
 	     	    fh_Fib_dx[ifibcount][j] = new TH2F(Form("fib%s_fib%s_dx",detName,detName2), 
-	     	        Form("dx of Fiber %s and Fiber %",detName2,detName), 1100,0,1100,1000, -500., 500.);    
+	     	        Form("dx of Fiber %s and Fiber %s",detName2,detName), 1100,0,1100,1000, -500., 500.);    
                 fh_Fib_dx[ifibcount][j]->GetYaxis()->SetTitle("dx");
                 fh_Fib_dx[ifibcount][j]->GetXaxis()->SetTitle(Form("Fiber%s",detName));;
 		    }
