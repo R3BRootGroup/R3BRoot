@@ -63,7 +63,7 @@ private:
 
   Double_t fPDGMass;             // Particle mass [GeV]
 
-  ClassDef(R3BCosmicGenerator,1);
+  ClassDefOverride(R3BCosmicGenerator,2)
 };
 
 
