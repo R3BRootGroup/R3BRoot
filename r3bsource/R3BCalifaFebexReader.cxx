@@ -59,9 +59,9 @@ Bool_t R3BCalifaFebexReader::Read() {
   for (int crystal = 0; crystal < fData->CALIFA_ENE; ++crystal) {
 
     UShort_t channelNumber = fData->CALIFA_ENEI[crystal];
-    uint16_t energy = fData->CALIFA_ENEv[crystal];
-    uint16_t nf = fData->CALIFA_NFv[crystal];
-    uint16_t ns = fData->CALIFA_NSv[crystal];
+    int16_t energy = fData->CALIFA_ENEv[crystal];
+    int16_t nf = fData->CALIFA_NFv[crystal];
+    int16_t ns = fData->CALIFA_NSv[crystal];
     uint64_t timestamp = ((uint64_t) fData->CALIFA_TSMSBv[crystal] << 32)
       | (uint64_t) fData->CALIFA_TSLSBv[crystal];
     uint32_t tot = 0; //not decoded yet
