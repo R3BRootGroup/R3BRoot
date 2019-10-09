@@ -34,6 +34,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
 ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 ${R3BROOT_SOURCE_DIR}/r3bdata/ptofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
+${R3BROOT_SOURCE_DIR}/r3bdata/musicData
 )
 
 include_directories(${INCLUDE_DIRECTORIES})
@@ -141,6 +142,7 @@ amsData/R3BAmsMappedData.cxx
 amsData/R3BAmsStripCalData.cxx
 amsData/R3BAmsHitData.cxx
 beammonitorData/R3BBeamMonitorMappedData.cxx
+musicData/R3BMusicPoint.cxx
 )
 
 # fill list of header files from list of source files by exchanging the file extension
