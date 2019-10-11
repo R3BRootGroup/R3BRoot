@@ -92,10 +92,16 @@ R3BCalifaGeometry::R3BCalifaGeometry(int version)  : fGeometryVersion(version), 
   fNavigator = new TGeoNavigator(gGeoManager);
 }
 
-void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t* polar,
-				 Double_t* azimuthal, Double_t* rho)
+const TVector3& R3BCalifaGeometry::GetAngles(Int_t iD)
 {
-
+  /*
+   * People use this on a per hit base, so we should do something quicker than
+   * string building and TDirectory lookup. 
+   */
+  static std::map<int, TVector3> cache;
+  if (cache.count(iD))
+    return cache[iD];
+  const static TVector3 invalid(NAN, NAN, NAN);
   Double_t local[3]={0,0,0};
   Double_t master[3];
   Int_t crystalType = 0;
@@ -106,6 +112,8 @@ void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t* polar,
   //SOLUTION FOR S444 - REDO AFTER EXPERIMENTS
   if(iD>5000 && iD<6952) iD = iD - 5000; //for double reading crystals
 
+  // the following is horrible, I'm not touching it. --pklenze
+  // also, if you want your indices to start at 1, go use FORTRAN.
  if (fGeometryVersion==16) {
     //The present scheme here done works with 8.11
     // crystalType = alveolus type (from 1 to 16) [Alveolus number]
@@ -196,9 +204,8 @@ void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t* polar,
 
       if(gGeoManager->CheckPath(nameVolume)) gGeoManager->cd(nameVolume);
       else {
-	LOG(ERROR) << "R3BCalifaCrysta2Hit: Invalid crystal path: " << nameVolume
-		  ;
-	return;
+	LOG(ERROR) << "R3BCalifaCrysta2Hit: Invalid crystal path: " << nameVolume;
+	return cache[iD]=invalid;
       }
       gGeoManager->LocalToMaster(local, master);
 
@@ -223,12 +230,12 @@ void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t* polar,
   {
     const char *nameVolume = GetCrystalVolumePath(iD);
     if(!nameVolume)
-      return;
+      return cache[iD]=invalid;
 
     if(!gGeoManager->cd(nameVolume))
     {
       LOG(ERROR) << "R3BCalifaGeometry: Invalid volume path: " << nameVolume;
-      return;
+      return cache[iD]=invalid;
     }
 
     // TGeoManager::LocalToMaster does the whole magic:
@@ -240,12 +247,15 @@ void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t* polar,
  else
  {
    LOG(ERROR) << "R3BCalifaGeometry: Geometry version not available in R3BCalifaGeometry::GetAngles(). ";
-   return;
+   return cache[iD]=invalid;
  }
 
+  return cache[iD]=master;
+}
 
-  TVector3 masterV(master[0],master[1],master[2]);
-  //masterV.Print();
+void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t *polar, Double_t *azimuthal, Double_t* rho)
+{
+  auto& masterV=this->GetAngles(iD);
   *polar=masterV.Theta();
   *azimuthal=masterV.Phi();
   *rho=masterV.Mag();

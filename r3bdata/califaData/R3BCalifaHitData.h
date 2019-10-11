@@ -17,7 +17,7 @@
 #include "TObject.h"
 
 #include "FairMultiLinkedData.h"
-
+#include "R3BCalifaCrystalCalData.h"
 
 class R3BCalifaHitData : public FairMultiLinkedData 
 {
@@ -35,13 +35,28 @@ public:
 	 **/
 	R3BCalifaHitData(UInt_t Nb, Double_t ene, Double_t nf, Double_t ns,
 		   Double_t theta, Double_t phi, ULong64_t time);
-	
-	
+  R3BCalifaHitData& operator+=( R3BCalifaCrystalCalData& cH)
+  {
+    this->fEnergy += cH.GetEnergy();
+    this->fNf     += cH.GetNf();
+    this->fNs     += cH.GetNs();
+    this->fNbOfCrystalHits++;
+    cH.SetClusterId(this->fClusterId);
+    return *this;
+  }
+  
+  R3BCalifaHitData(uint64_t time, double theta, double phi, uint32_t clusterId):
+    fTime(time), fTheta(theta), fPhi(phi), fClusterId(clusterId),
+    fEnergy(0.), fNf(0.), fNs(0), fNbOfCrystalHits(0)
+  {
+  }
+
+  
 	/** Copy constructor **/
 	R3BCalifaHitData(const R3BCalifaHitData&);
 
-	R3BCalifaHitData& operator=(const R3BCalifaHitData&) { return *this; }
-	
+  
+  //R3BCalifaHitData& operator=(const R3BCalifaHitData&) { return *this; }
 	
 	/** Destructor **/
 	virtual ~R3BCalifaHitData();
@@ -77,9 +92,10 @@ protected:
 	Double_t fNs;            //total Ns deposited
 	Double_t fTheta;         //reconstructed theta
 	Double_t fPhi;           //reconstructed phi
+        uint32_t fClusterId;
         ULong64_t fTime;         //WR time stamp
 	
-	ClassDef(R3BCalifaHitData,2)
+	ClassDef(R3BCalifaHitData,3)
 	
 };
 

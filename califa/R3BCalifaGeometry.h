@@ -31,13 +31,25 @@ public:
   /**
    * Gets position in polar coordinates of crystal with given ID.
    *
+   * On error, the x,y and z component of the TVector3 are set to NAN.
+   * 
+   * @param iD crystal ID (depending on geometry version)
+   */
+  const TVector3& GetAngles(Int_t iD);
+
+  /**
+   * Legacy: Gets position in polar coordinates of crystal with given ID.
+   *
+   * Before this comment, the last three parameters were untouched on error. 
+   * Now, they should be set to NAN;
+   *
    * @param iD crystal ID (depending on geometry version)
    * @param polar [out] Will be filled with polar angle (radians) of crystal center
    * @param azimuthal [out] Will be filled with azimuthal angle (radians) of crystal center
    * @param rho [out] Will be filled with distance (cm) of crystal center to target position (0,0,0)
    */
   void GetAngles(Int_t iD, Double_t *polar, Double_t *azimuthal, Double_t* rho);
-
+  
   /**
    * Gets volume path of crystal with given ID.
    *
@@ -83,7 +95,7 @@ public:
    */
   static R3BCalifaGeometry *Instance(int version);
 
-  ClassDef(R3BCalifaGeometry, 4);
+  ClassDef(R3BCalifaGeometry, 5);
 };
 
 #endif

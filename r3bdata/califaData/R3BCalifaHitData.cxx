@@ -15,7 +15,7 @@ using std::flush;
 // -----   Default constructor   -------------------------------------------
 R3BCalifaHitData::R3BCalifaHitData()
   : FairMultiLinkedData(),
-    fNbOfCrystalHits(0), fEnergy(-1.), fTheta(-1.), fPhi(-1.), fTime(0)
+    fNbOfCrystalHits(0), fEnergy(NAN), fTheta(NAN), fPhi(NAN), fTime(0)
 {
 }
 // -------------------------------------------------------------------------

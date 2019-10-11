@@ -1,7 +1,7 @@
 // -----------------------------------------------------------------------------
 // -----                R3BCalifaCrystalCal2Hit source file                -----
 // -----                  Created 27/08/10  by H.Alvarez                   -----
-// -----                Last modification 19/12/16 by P.Cabanelas          -----
+// -----                Last modification: try "man git-log"               -----
 // -----------------------------------------------------------------------------
 #include "R3BCalifaCrystalCal2Hit.h"
 #include "TMath.h"
@@ -21,61 +21,33 @@
 #include "R3BCalifaGeometry.h"
 #include "R3BCalifaCrystalCalData.h"
 #include "R3BCalifaCrystalCalDataSim.h"
+#include <vector>
 
+#include "ROOT_template_hacks.h"
+using roothacks::TCAHelper;
+using roothacks::TypedCollection;
 using std::cout;
 using std::cerr;
 using std::endl;
 
-
 R3BCalifaCrystalCal2Hit::R3BCalifaCrystalCal2Hit() : 
-  FairTask("R3B CALIFA CrystalCal to Hit Finder"),
-  fCrystalHitCA(NULL),
-  fCalifaHitCA(NULL),
-  fOnline(kFALSE)
-{
-  fGeometryVersion=17; //default version 8.11 BARREL
-  fThreshold=0.;     //no threshold
-  fDRThreshold=15000; //in keV, for real data
-  fCrystalResolution=0.; //perfect crystals
-  fComponentResolution=0.; //perfect crystals
-  fLaBrResolution=0;
-  fLaClResolution=0;
-  fDeltaPolar=0.25;
-  fDeltaAzimuthal=0.25;
-  fDeltaAngleClust=0;
-  fClusteringAlgorithmSelector=1;
-  fParCluster1=0;
-  kSimulation = false;
-  nEvents=0;
-  fGeo=0;
-  //fCalifaHitFinderPar=0;
-}
+  FairTask("R3B CALIFA CrystalCal to Hit Finder")
+{}
 
 
 R3BCalifaCrystalCal2Hit::~R3BCalifaCrystalCal2Hit()
 {
   LOG(INFO) << "R3BCalifaCrystalCal2Hit: Delete instance";
-  delete fCrystalHitCA;
-  delete fCalifaHitCA;
+  //delete fCrystalHitCA; // Just no. We do not own that! --pklenze
+  if (fCalifaHitCA)
+    delete fCalifaHitCA;
 }
 
 
 
 void R3BCalifaCrystalCal2Hit::SetParContainers()
 {
-  // // Get run and runtime database
-  // FairRunAna* run = FairRunAna::Instance();
-    // if (!run) LOG(fatal) << "R3BCalifaCrystalCal2Hit::SetParContainers: No analysis run";
-
-  // FairRuntimeDb* rtdb = run->GetRuntimeDb();
-    // if (!rtdb) LOG(fatal) << "R3BCalifaCrystalCal2Hit::SetParContainers: No runtime database";
-
-  // fCalifaHitFinderPar = (R3BCalifaCrystalCal2HitPar*)(rtdb->getContainer("R3BCalifaCrystalCal2HitPar"));
-  // if ( fVerbose && fCalifaHitFinderPar ) {
-  //   LOG(INFO) << "R3BCalifaCrystalCal2Hit::SetParContainers() ";
-  //   LOG(INFO) << "Container R3BCalifaCrystalCal2HitPar loaded ";
-  // }
-
+  //commented-out stuff deleted. Look it up if you need it. --pklenze
 }
 
 
@@ -83,12 +55,13 @@ void R3BCalifaCrystalCal2Hit::SetParContainers()
 InitStatus R3BCalifaCrystalCal2Hit::Init()
 {
   LOG(INFO) << "R3BCalifaCrystalCal2Hit::Init ";
+  assert(!fCalifaHitCA); // in case someone calls Init() twice. 
   FairRootManager* ioManager = FairRootManager::Instance();
     if ( !ioManager ) LOG(fatal) << "Init: No FairRootManager";
   if( !ioManager->GetObject("CalifaCrystalCalDataSim") ) {
-     fCrystalHitCA = (TClonesArray*) ioManager->GetObject("CalifaCrystalCalData");
+    fCrystalHitCA = dynamic_cast<TClonesArray*>(ioManager->GetObject("CalifaCrystalCalData"));
   } else {
-     fCrystalHitCA = (TClonesArray*) ioManager->GetObject("CalifaCrystalCalDataSim");
+    fCrystalHitCA = dynamic_cast<TClonesArray*>(ioManager->GetObject("CalifaCrystalCalDataSim"));
      kSimulation = true;
   }
 
@@ -122,10 +95,92 @@ InitStatus R3BCalifaCrystalCal2Hit::Init()
 }
 
 
-// -----   Public method ReInit   --------------------------------------------
-InitStatus R3BCalifaCrystalCal2Hit::ReInit()
+
+void R3BCalifaCrystalCal2Hit::SmearAllCrystalHits()
 {
-  return kSUCCESS;
+  //is cal2hit the correct place for this? --pklenze
+  
+  // Apply resolution smearing for simulation
+  if(!kSimulation)
+    return;
+  for (auto h: TypedCollection<R3BCalifaCrystalCalData>::cast(fCrystalHitCA))
+    {
+      h.SetEnergy(ExpResSmearing(h.GetEnergy()));
+      h.SetNf(CompSmearing(h.GetNf()));
+      h.SetNs(CompSmearing(h.GetNs()));
+    }
+}
+
+
+bool R3BCalifaCrystalCal2Hit::Match(R3BCalifaCrystalCalData *ref, R3BCalifaCrystalCalData *hit)
+{
+  if (ref==hit)
+    return 1;
+  
+  auto circleAbs=[](double dphi) {double d=fmod(fabs(dphi), 2*M_PI); return d<M_PI?d:2*M_PI-d;};
+  // Clusterization: you want to put a condition on the angle between the highest
+  // energy crystal and the others. This is done by using the TVector3 classes and
+  // not with different DeltaAngle on theta and phi, to get a proper solid angle
+  // and not a "square" one.                    Enrico Fiori
+  TVector3 vref=this->GetAnglesVector(ref->GetCrystalId());
+  TVector3 vhit=this->GetAnglesVector(hit->GetCrystalId());
+  bool takeCrystalInCluster=false;
+  
+  // Check if the angle between the two vectors is less than the reference angle.
+  switch (clusterAlg) {
+  case RECT: {  //rectangular window
+    if (TMath::Abs(vref.Theta()- vhit.Theta()) < fDeltaPolar &&
+	circleAbs(vref.Phi()-vhit.Phi())  < fDeltaAzimuthal ){
+      takeCrystalInCluster = true;
+    }
+    break;
+  }
+  case ALL:
+    takeCrystalInCluster = true;
+    break;
+  case NONE:
+    break;
+  case ROUND:  //round window
+    // The angle is scaled to a reference distance (e.g. here is
+    // set to 35 cm) to take into account Califa's non-spherical
+    // geometry. The reference angle will then have to be defined
+    // in relation to this reference distance: for example, 10° at
+    // 35 cm corresponds to ~6cm, setting a fDeltaAngleClust=10
+    // means that the gamma rays will be allowed to travel 6 cm in
+    // the CsI, no matter the position of the crystal they hit.
+    if ( ((vref.Angle(vhit))*((vref.Mag()+vhit.Mag())/(35.*2.))) <
+	 fDeltaAngleClust )  {
+      takeCrystalInCluster = true;
+    }
+    break;
+  case ROUND_SCALED:  //round window scaled with energy
+    // The same as before but the angular window is scaled
+    // according to the energy of the hit in the higher energy
+    // crystal. It needs a parameter that should be calibrated.
+    {
+      Double_t fDeltaAngleClustScaled = fDeltaAngleClust *
+	(ref->GetEnergy()*energyFactor);
+      if ( ((vref.Angle(vhit))*((vref.Mag()+vhit.Mag())/(35.*2.))) <
+	   fDeltaAngleClustScaled )  {
+	takeCrystalInCluster = true;
+      }}
+    break;
+  case CONE:
+    takeCrystalInCluster = vref.Angle(vhit)<fDeltaAngleClust;
+    break;
+  case PETAL:
+    takeCrystalInCluster=AngleToPetalId(vref)==AngleToPetalId(vhit);
+  case INVALID:
+  default:
+    throw std::runtime_error("R3BCalifaCrystalCal2Hit: no clustering"
+			     " algorithm selected.");
+    break;
+  }
+  LOG(DEBUG)<< "returning R3BCalifaCrystalCal2Hit::Match("
+	    << ref->GetCrystalId()<<", "<<hit->GetCrystalId()
+	    << ")=" << takeCrystalInCluster<<" with alg "<<clusterAlg;
+  
+  return takeCrystalInCluster;
 }
 
 
@@ -133,223 +188,94 @@ InitStatus R3BCalifaCrystalCal2Hit::ReInit()
 void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
 {
   
-  //if(++nEvents % 10000 == 0)
-  //LOG(INFO) << nEvents;
-  
-  // Reset entries in output arrays, local arrays
   Reset();
-  
-  
+  SmearAllCrystalHits();
   //ALGORITHMS FOR HIT FINDING
   
-  ULong64_t hitTime=0;
-  Double_t energy=0.;       // caloHits energy
-  Double_t Nf=0.;           // caloHits Nf
-  Double_t Ns=0.;           // caloHits Ns
-  Double_t polarAngle=0.;     // caloHits reconstructed polar angle
-  Double_t azimuthalAngle=0.;   // caloHits reconstructed azimuthal angle
-  Double_t rhoAngle=0.;   // caloHits reconstructed rho
-  Double_t angle1,angle2;
-  Double_t eInc=0.;       // total incident energy (only for simulation)
+  // Nb of CrystalHits in current event
+  const int numCrystalHits = fCrystalHitCA->GetEntries();
+  LOG(DEBUG)<<"R3BCalifaCrystalCal2Hit::Exec(): crystal hits at start: "
+	    << numCrystalHits <<"  ********************************";
+
   
-  bool* usedCrystalHits=NULL; //array to control the CrystalHits
-  Int_t crystalsInHit=0;  //used crystals in each CalifaHitData
-  Double_t testPolar=0 ;
-  Double_t testAzimuthal=0 ;
-  Double_t testRho =0 ;
-  bool takeCrystalInCluster;
-  
-  R3BCalifaCrystalCalData**    crystalHit = NULL;
-  
-  Int_t crystalHits;        // Nb of CrystalHits in current event
-  crystalHits = fCrystalHitCA->GetEntries();
-  
-  if (crystalHits == 0)
-    return;
-  
-  crystalHit = new R3BCalifaCrystalCalData*[crystalHits];
-  usedCrystalHits = new bool[crystalHits];
-  for (Int_t i=0; i<crystalHits; i++) {
-    crystalHit[i] = (R3BCalifaCrystalCalData*) fCrystalHitCA->At(i);
-    if(kSimulation){
-      // Apply resolution smearing for simulation
-      crystalHit[i]->SetEnergy(ExpResSmearing(crystalHit[i]->GetEnergy()));
-      crystalHit[i]->SetNf(CompSmearing(crystalHit[i]->GetNf()));
-      crystalHit[i]->SetNs(CompSmearing(crystalHit[i]->GetNs()));
+  if (numCrystalHits)
+    {
+      auto h=dynamic_cast<R3BCalifaCrystalCalData*>((*fCrystalHitCA)[0]);
+      // printf("id=%d\n", h->GetCrystalId());
     }
-    usedCrystalHits[i] = 0;
-  }
-  
-  //For the moment a simple analysis... more to come
-  Int_t crystalWithHigherEnergy = 0;
-  Int_t unusedCrystals = crystalHits;
-  
-  //removing those crystals with energy below the threshold
-  for (Int_t i=0; i<crystalHits; i++) {
-    if (crystalHit[i]->GetEnergy()<fThreshold) {
-      usedCrystalHits[i] = 1;
-      unusedCrystals--;
-    }
-  }
-  
-  //S444 for crystals with double reading!!
-  //taking only the proton branch in the cluster
-  for (Int_t i=0; i<crystalHits; i++) {
-    for (Int_t j=i; j<crystalHits; j++) {
-      if (abs(crystalHit[i]->GetCrystalId()-crystalHit[j]->GetCrystalId()) == 5000) {
-        if(crystalHit[i]->GetCrystalId() > crystalHit[j]->GetCrystalId()){ //i is protonbranch
-          if(crystalHit[i]->GetEnergy()<fDRThreshold) { //take j, the gammabranch
-            usedCrystalHits[i] = 1;
-            unusedCrystals--;
-          } else{ //take i, the protonbranch
-            usedCrystalHits[j] = 1;
-            unusedCrystals--;
-          }
-	} else{//j is protonbranch
-	  if(crystalHit[i]->GetEnergy()<fDRThreshold) { //take i, the gammabranch
-            usedCrystalHits[j] = 1;
-            unusedCrystals--;
-          } else{ //take j, the protonbranch
-            usedCrystalHits[i] = 1;
-            unusedCrystals--;
-          }
+  std::list<R3BCalifaCrystalCalData*> unusedCrystalHits;
+  auto addHit=[&](R3BCalifaCrystalCalData* h)
+    {
+      if (h->GetEnergy()>fThreshold)
+	  unusedCrystalHits.push_back(h);
+      else
+	  LOG(DEBUG)<<"R3BCalifaCrystalCal2Hit::Exec(): rejected hit in "
+		    << h->GetCrystalId()  <<" because of low energy (E="
+		    <<h->GetEnergy() <<"<="<<fThreshold<<"=E_threshold";
+
+    };
+
+
+  // get rid if redundant (dual range) crystals
+  { 
+    std::map<uint32_t, R3BCalifaCrystalCalData*> crystalId2Pos;
+    for (auto& h: TypedCollection<R3BCalifaCrystalCalData>::cast(fCrystalHitCA))
+      crystalId2Pos[h.GetCrystalId()]=&h;
+
+    LOG(DEBUG)<<"R3BCalifaCrystalCal2Hit::Exec():  crystalId2Pos.size()="
+	      << crystalId2Pos.size();
+
+    for (auto& k1: crystalId2Pos) // k1: lower id, gamma branch?
+      if (crystalId2Pos.count(k1.first+5000))
+	{
+	  auto proton=*crystalId2Pos.find(k1.first+5000);
+	  //k2: higher id, proton branch
+	  if (proton.second->GetEnergy()<fDRThreshold)
+	    addHit(k1.second); // gamma
+	  else
+	    addHit(proton.second);
 	}
-      }
-    }
+      else if (!crystalId2Pos.count(k1.first-5000))
+	// not a hit where two ranges were hit
+	addHit(k1.second);
   }
+  LOG(DEBUG)<<"R3BCalifaCrystalCal2Hit::Exec(): after uniquifying, we have "
+	    <<unusedCrystalHits.size()<<" crystal hits.";
   
-  //  int n_clusters = 0;
-  
-  while (unusedCrystals>0) {
-    // First, finding the crystal with higher energy from the unused crystalHits
-    for (Int_t i=1; i<crystalHits; i++) {
-      if (!usedCrystalHits[i] && crystalHit[i]->GetEnergy() >
-	  crystalHit[crystalWithHigherEnergy]->GetEnergy())
-	crystalWithHigherEnergy = i;
+  unusedCrystalHits.sort([](R3BCalifaCrystalCalData* lhs,
+			    R3BCalifaCrystalCalData* rhs)
+			 {return lhs->GetEnergy()>rhs->GetEnergy();});
+  uint32_t clusterId=0;
+  while (!unusedCrystalHits.empty())
+    {
+      auto highest=unusedCrystalHits.front();
+      LOG(DEBUG)<<"R3BCalifaCrystalCal2Hit::Exec(): starting cluster at "
+		<<"crystal "<<highest->GetCrystalId()<<", E="
+		<<highest->GetEnergy();
+
+      // Note: we do not remove highest, but process it like any others
+      uint64_t time=highest->GetTime();
+      auto vhighest=GetAnglesVector(highest->GetCrystalId());
+      auto clusterHit=TCAHelper<R3BCalifaHitData>::AddNew(*fCalifaHitCA,
+							  time,
+							  vhighest.Theta(),
+							  vhighest.Phi(),
+							  clusterId);
+      
+      // loop through remaining crystals, remove matches from list.
+      auto i=unusedCrystalHits.begin();
+      while (i != unusedCrystalHits.end())
+	if (this->Match(highest, *i))
+	  {
+	    LOG(DEBUG)<<"R3BCalifaCrystalCal2Hit::Exec(): adding  "
+		      <<"crystal "<<(*i)->GetCrystalId()<<", E="
+		      <<(*i)->GetEnergy();
+
+	    *clusterHit+=**i;
+	    i=unusedCrystalHits.erase(i);
+	  } else ++i;
+      ++clusterId;
     }
-    
-    usedCrystalHits[crystalWithHigherEnergy] = 1;
-    unusedCrystals--; crystalsInHit++;
-    
-    // Second, energy and angles come from the crystal with the higher energy
-    hitTime = crystalHit[crystalWithHigherEnergy]->GetTime();
-    energy = crystalHit[crystalWithHigherEnergy]->GetEnergy();
-    Nf = crystalHit[crystalWithHigherEnergy]->GetNf();
-    Ns = crystalHit[crystalWithHigherEnergy]->GetNs();
-    GetAngles(crystalHit[crystalWithHigherEnergy]->GetCrystalId(),
-	      &polarAngle,&azimuthalAngle,&rhoAngle);
-    
-    // Third, finding closest hits and adding their energy
-    // Clusterization: you want to put a condition on the angle between the highest
-    // energy crystal and the others. This is done by using the TVector3 classes and
-    // not with different DeltaAngle on theta and phi, to get a proper solid angle
-    // and not a "square" one.                    Enrico Fiori
-    TVector3 refAngle(1,0,0);     // EF
-    refAngle.SetTheta(polarAngle);
-    refAngle.SetPhi(azimuthalAngle);
-    for (Int_t i=0; i<crystalHits; i++) {
-      if (!usedCrystalHits[i] ) {
-          GetAngles(crystalHit[i]->GetCrystalId(), &testPolar,
-		    &testAzimuthal, &testRho);
-
-        //if(kSimulation) eInc += crystalHitSim[i]->GetEinc();
-
-        takeCrystalInCluster = false;
-
-        TVector3 testAngle(1,0,0);       //EF
-        testAngle.SetTheta(testPolar);
-        testAngle.SetPhi(testAzimuthal);
-        // Check if the angle between the two vectors is less than the reference angle.
-        switch (fClusteringAlgorithmSelector) {
-        case 1: {  //square window
-          //Dealing with the particular definition of azimuthal
-	  //angles (discontinuity in pi and -pi)
-          if (azimuthalAngle + fDeltaAzimuthal > TMath::Pi()) {
-            angle1 = azimuthalAngle-TMath::Pi();
-	    angle2 = testAzimuthal-TMath::Pi();
-          } else if (azimuthalAngle - fDeltaAzimuthal < -TMath::Pi()) {
-            angle1 = azimuthalAngle+TMath::Pi();
-	    angle2 = testAzimuthal+TMath::Pi();
-          } else {
-            angle1 = azimuthalAngle; angle2 = testAzimuthal;
-          }
-          if (TMath::Abs(polarAngle - testPolar) < fDeltaPolar &&
-              TMath::Abs(angle1 - angle2) < fDeltaAzimuthal ){
-                 takeCrystalInCluster = true;
-          }
-          break;
-        }
-        case 2:  //round window
-          // The angle is scaled to a reference distance (e.g. here is
-	  // set to 35 cm) to take into account Califa's non-spherical
-	  // geometry. The reference angle will then have to be defined
-	  // in relation to this reference distance: for example, 10° at
-	  // 35 cm corresponds to ~6cm, setting a fDeltaAngleClust=10
-	  // means that the gamma rays will be allowed to travel 6 cm in
-	  // the CsI, no matter the position of the crystal they hit.
-          if ( ((refAngle.Angle(testAngle))*((testRho+rhoAngle)/(35.*2.))) <
-	       fDeltaAngleClust )  {
-                  takeCrystalInCluster = true;
-          }
-          break ;
-        case 3: {  //round window scaled with energy
-          // The same as before but the angular window is scaled
-	  // according to the energy of the hit in the higher energy
-	  // crystal. It needs a parameter that should be calibrated.
-            Double_t fDeltaAngleClustScaled = fDeltaAngleClust *
-	      (crystalHit[crystalWithHigherEnergy]->GetEnergy()*fParCluster1);
-            if ( ((refAngle.Angle(testAngle))*((testRho+rhoAngle)/(35.*2.))) <
-		 fDeltaAngleClustScaled )  {
-                  takeCrystalInCluster = true;
-            }
-          break;
-        }
-        case 4: // round window scaled with the energy of the _two_ hits
-	  //(to be tested and implemented!!)
-          // More advanced: the condition on the distance between the
-	  //two hits is function of the energy of both hits
-          break;
-        }
-
-        if(takeCrystalInCluster)
-        {
-              energy += crystalHit[i]->GetEnergy();
-  	      Nf += crystalHit[i]->GetNf();
-	      Ns += crystalHit[i]->GetNs();
-              usedCrystalHits[i] = 1; unusedCrystals--; crystalsInHit++;
-
-              if(kSimulation)
-                  eInc += dynamic_cast<R3BCalifaCrystalCalDataSim*>(crystalHit[i])->GetEinc();
-        }
-      }
-    }
-
-
-    if(kSimulation) {
-      AddHitSim(crystalsInHit, energy, Nf, Ns, polarAngle, azimuthalAngle, eInc);
-    } else {
-      AddHit(crystalsInHit, energy, Nf, Ns, polarAngle, azimuthalAngle, hitTime);
-//      n_clusters++;
-    }
-
-    crystalsInHit = 0; //reset for next CalifaHitData
-
-    //Finally, setting crystalWithHigherEnergy to the first unused
-    //crystalHit (for the next iteration)
-    for (Int_t i=0; i<crystalHits; i++) {
-      if (!usedCrystalHits[i]) {
-        crystalWithHigherEnergy = i;
-        break;
-      }
-    }
-  }
-
-//  std::cout << "# " << n_clusters << "\n--------\n";
-
-  if(crystalHit)
-     delete[] crystalHit;
-  if(usedCrystalHits)
-     delete[] usedCrystalHits;
 }
 
 
@@ -360,15 +286,6 @@ void R3BCalifaCrystalCal2Hit::Reset()
   LOG(DEBUG) << "Clearing CalifaHitData Structure";
   if (fCalifaHitCA) fCalifaHitCA->Clear();
 }
-
-
-
-
-// ---- Public method Finish   --------------------------------------------------
-void R3BCalifaCrystalCal2Hit::Finish()
-{
-}
-
 
 // -----  Public method SelectGeometryVersion  ----------------------------------
 void R3BCalifaCrystalCal2Hit::SelectGeometryVersion(Int_t version)
@@ -395,12 +312,14 @@ void R3BCalifaCrystalCal2Hit::SetComponentResolution(Double_t componentRes)
 }
 
 // -----  Public method SetExperimentalResolution  ----------------------------------
-void R3BCalifaCrystalCal2Hit::SetPhoswichResolution(Double_t LaBr, Double_t LaCl)
+void R3BCalifaCrystalCal2Hit::SetPhoswichResolution(Double_t LaBr,
+						    Double_t LaCl)
 {
   fLaBrResolution = LaBr;
   fLaClResolution = LaCl;
   LOG(INFO) << "R3BCalifaCrystalCal2Hit::SetPhoswichResolution to "
-	    << fLaBrResolution << "% @ 1 MeV (LaBr) and to " << fLaClResolution << "% @ 1 MeV (LaCl)";
+	    << fLaBrResolution << "% @ 1 MeV (LaBr) and to "
+	    << fLaClResolution << "% @ 1 MeV (LaCl)";
 }
 
 // -----  Public method SetDetectionThreshold  ----------------------------------
@@ -426,41 +345,11 @@ void R3BCalifaCrystalCal2Hit::SetDRThreshold(Double_t DRthresholdEne)
 }
 
 
-// ---- Public method GetAngles   --------------------------------------------------
-void R3BCalifaCrystalCal2Hit::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal)
+
+TVector3 R3BCalifaCrystalCal2Hit::GetAnglesVector(int id)
 {
-	//Old GetAngles with two arguments...
-	Double_t rho=0;
-	GetAngles(iD, polar, azimuthal, &rho);
+  return fGeo->GetAngles(id);
 }
-
-
-// ---- Public method GetAngles   --------------------------------------------------
-void R3BCalifaCrystalCal2Hit::GetAngles(Int_t iD, Double_t* polar,
-				 Double_t* azimuthal, Double_t* rho)
-{
-  Double_t local[3]={0,0,0};
-  Double_t master[3];
-  Int_t crystalType = 0;
-  Int_t crystalCopy = 0;
-  Int_t alveolusCopy =0;
-  Int_t crystalInAlveolus=0;
-
-  if (fGeometryVersion>=16) {
-    // Use new R3BCalifaGeometry class to get geometrical information
-    fGeo->GetAngles(iD, polar, azimuthal, rho);
-    return;
-  } else LOG(ERROR) << "R3BCalifaCrystalCal2Hit: Geometry version not available in R3BCalifa::ProcessHits(). ";
-
-
-  //TVector3 masterV(master[0],master[1],master[2]);
-  //masterV.Print();
-  //*polar=masterV.Theta();
-  //*azimuthal=masterV.Phi();
-  //*rho=masterV.Mag();
-}
-
-
 
 // -----   Private method ExpResSmearing  --------------------------------------------
 Double_t R3BCalifaCrystalCal2Hit::ExpResSmearing(Double_t inputEnergy)
@@ -515,7 +404,7 @@ Double_t R3BCalifaCrystalCal2Hit::PhoswichSmearing(Double_t inputEnergy, bool is
 }
 
 // -----   Private method isPhoswich  --------------------------------------------
-bool R3BCalifaCrystalCal2Hit::isPhoswich(Int_t crystalid)
+bool R3BCalifaCrystalCal2Hit::IsPhoswich(Int_t crystalid)
 {
   // Smears the LaBr and LaCl according to fLaBr Resolution and fLaCl Resolution
   //
@@ -525,71 +414,6 @@ bool R3BCalifaCrystalCal2Hit::isPhoswich(Int_t crystalid)
     return false;
 }
 
-
-// -----   Public method SetClusteringAlgorithm  --------------------------------------------
-void R3BCalifaCrystalCal2Hit::SetClusteringAlgorithm(Int_t ClusteringAlgorithmSelector, Double_t ParCluster1)
-{
-  // Select the clustering algorithm and the parameters of some of them
-  // ClusteringAlgorithmSelector = 1  ->  square window
-  // ClusteringAlgorithmSelector = 2  ->  round window
-  // ClusteringAlgorithmSelector = 3  ->  advanced round window with opening proportional to the
-  //                                     energy of the hit, need ParCluster1
-  // ClusteringAlgorithmSelector = 4  ->  advanced round window with opening proportional to the
-  //                                     energy of the two hit, need ParCluster1 NOT YET IMPLEMENTED!
-  fClusteringAlgorithmSelector = ClusteringAlgorithmSelector ;
-  fParCluster1 = ParCluster1 ;
-}
-
-// -----   Public method SetAngularWindow  --------------------------------------------
-void R3BCalifaCrystalCal2Hit::SetAngularWindow(Double_t deltaPolar, Double_t deltaAzimuthal, Double_t DeltaAngleClust)
-{
-  //
-  // Set the angular window open around the crystal with the largest energy
-  // to search for additional crystal hits and addback to the same cal hit
-  // [0.25 around 14.3 degrees, 3.2 for the complete calorimeter]
-  fDeltaPolar = deltaPolar;
-  fDeltaAzimuthal = deltaAzimuthal;
-  fDeltaAngleClust = DeltaAngleClust;
-
-}
-
-
-// -----   Private method AddHit  --------------------------------------------
-R3BCalifaHitData* R3BCalifaCrystalCal2Hit::AddHit(UInt_t Nbcrystals,Double_t ene,Double_t Nf,Double_t Ns,Double_t pAngle,Double_t aAngle, ULong64_t time)
-{
-//std::cout << "Ncrystals = " << Nbcrystals << endl;
-  // It fills the R3BCalifaHitData array
-  TClonesArray& clref = *fCalifaHitCA;
-  Int_t size = clref.GetEntriesFast();
-  return new(clref[size]) R3BCalifaHitData(Nbcrystals, ene, Nf, Ns, pAngle, aAngle, time);
-}
-
-// -----   Private method AddHitSim  --------------------------------------------
-R3BCalifaHitDataSim* R3BCalifaCrystalCal2Hit::AddHitSim(UInt_t Nbcrystals,Double_t ene,Double_t Nf,Double_t Ns,Double_t pAngle,Double_t aAngle, Double_t einc)
-{
-  // It fills the R3BCalifaHitDataSim array
-  TClonesArray& clref = *fCalifaHitCA;
-  Int_t size = clref.GetEntriesFast();
-  return new(clref[size]) R3BCalifaHitDataSim(Nbcrystals, ene, Nf, Ns, pAngle, aAngle, einc);
-}
-
-/*
-
- Double_t GetCMEnergy(Double_t theta, Double_t energy){
- //
- // Calculating the CM energy from the lab energy and the polar angle
- //
- Double_t beta = 0.8197505718204776;  //beta is 0.8197505718204776
- Double_t gamma = 1/sqrt(1-beta*beta);
- //Lorenzt boost correction
- //E' = gamma E + beta gamma P|| = gamma E + beta gamma P cos(theta)
- //In photons E=P
- Double_t energyCorrect = gamma*energy - beta*gamma*energy*cos(theta);
-
- return energyCorrect;
- }
-
-*/
 
 
 ClassImp(R3BCalifaCrystalCal2Hit)

@@ -8,7 +8,7 @@
 #ifndef R3BCALIFAMAPPEDDATA_H
 #define R3BCALIFAMAPPEDDATA_H
 #include "TObject.h"
-
+#include <stdint.h>
 class R3BCalifaMappedData : public TObject {
 
   
@@ -34,7 +34,7 @@ public:
   inline const Int_t&    GetEnergy()    const { return fEnergy;    }
   inline const Int_t&    GetNf()        const { return fNf;        }
   inline const Int_t&    GetNs()        const { return fNs;        }
-  inline const ULong_t&  GetTime()      const { return fTime;      }
+  inline const uint64_t& GetTime()      const { return fTime;      }
   inline const UChar_t&  GetError()     const { return fError;     }	
   inline const UShort_t& GetTot()       const { return fTot;       }  
   
@@ -43,12 +43,12 @@ protected:
   Int_t    fEnergy;    // total energy in the crystal
   Int_t    fNf;        // total fast amplitude in the crystal
   Int_t    fNs;        // total slow amplitude in the crystal
-  ULong_t  fTime;      // time-stamp (common to all the hits in the event)
+  uint64_t fTime;      // time-stamp (common to all the hits in the event)
   UChar_t  fError;     // bit coded error flag
   UShort_t fTot;       // time-over-treshold
    
 public:
-  ClassDef(R3BCalifaMappedData,1)
+  ClassDef(R3BCalifaMappedData,2)
 };
 
 #endif

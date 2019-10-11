@@ -110,6 +110,8 @@ find_package(HEPMC)
 # Check the compiler and set the compile and link flags
 check_compiler()
 
+#set(CMAKE_CXX_FLAGS -std=c++14)
+
 set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
 set(INCLUDE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/include")

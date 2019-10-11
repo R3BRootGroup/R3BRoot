@@ -1,10 +1,21 @@
 
 #include "R3BSci8CalData.h"
-#include "math.h"
+#include <cmath>
 #include <iostream>
 #include "FairLogger.h"
 
-using namespace std;
+/* Re isnan:
+ * std::isnan is defined as an overloaded function in cmath
+ * the macro isnan is defined in math.h
+ * if you include math.h and do using namespace std;, my 
+ * compiler will complain about ambiguous definition of isnan 
+ * because cmath seems to get pulled in as a dependency. 
+ * 
+ * Solution: we explicitly include cmath and do not commit
+ * what has been described as the 
+ * "environmental crime of namespace pollution", 
+ * in case anyone includes math.h for some reason. 
+ */
 
 /* for the data analysis of Sci8 detector.  
  */
@@ -29,12 +40,12 @@ Double_t R3BSci8CalData::GetMeanTime()
 {
 	Double_t mean=0;
 	Int_t num_times=0;
-	if (!isnan(fTimeV_r_ns)) {mean+=fTimeV_r_ns;num_times++;}
-	if (!isnan(fTimeV_l_ns)) {mean+=fTimeV_l_ns;num_times++;}
-	if (!isnan(fTimeL_r_ns)) {mean+=fTimeL_r_ns;num_times++;}
-	if (!isnan(fTimeL_l_ns)) {mean+=fTimeL_l_ns;num_times++;}
-	if (!isnan(fTimeT_r_ns)) {mean+=fTimeT_r_ns;num_times++;}
-	if (!isnan(fTimeT_l_ns)) {mean+=fTimeT_l_ns;num_times++;}	
+	if (!std::isnan(fTimeV_r_ns)) {mean+=fTimeV_r_ns;num_times++;}
+	if (!std::isnan(fTimeV_l_ns)) {mean+=fTimeV_l_ns;num_times++;}
+	if (!std::isnan(fTimeL_r_ns)) {mean+=fTimeL_r_ns;num_times++;}
+	if (!std::isnan(fTimeL_l_ns)) {mean+=fTimeL_l_ns;num_times++;}
+	if (!std::isnan(fTimeT_r_ns)) {mean+=fTimeT_r_ns;num_times++;}
+	if (!std::isnan(fTimeT_l_ns)) {mean+=fTimeT_l_ns;num_times++;}	
 		
 	return num_times ? mean/num_times : NAN;
 }
@@ -42,8 +53,8 @@ Double_t R3BSci8CalData::GetMeanTimeTAMEXL()
 {
 	Double_t mean=0;
 	Int_t num_times=0;
-	if (!isnan(fTimeL_r_ns)) {mean+=fTimeL_r_ns;num_times++;}
-	if (!isnan(fTimeL_l_ns)) {mean+=fTimeL_l_ns;num_times++;}
+	if (!std::isnan(fTimeL_r_ns)) {mean+=fTimeL_r_ns;num_times++;}
+	if (!std::isnan(fTimeL_l_ns)) {mean+=fTimeL_l_ns;num_times++;}
 		
 	return num_times ? mean/num_times : NAN;
 }
@@ -52,8 +63,8 @@ Double_t R3BSci8CalData::GetMeanTimeTAMEXT()
 {
 	Double_t mean=0;
 	Int_t num_times=0;
-	if (!isnan(fTimeT_r_ns)) {mean+=fTimeT_r_ns;num_times++;}
-	if (!isnan(fTimeT_l_ns)) {mean+=fTimeT_l_ns;num_times++;}
+	if (!std::isnan(fTimeT_r_ns)) {mean+=fTimeT_r_ns;num_times++;}
+	if (!std::isnan(fTimeT_l_ns)) {mean+=fTimeT_l_ns;num_times++;}
 		
 	return num_times ? mean/num_times : NAN;
 }
@@ -62,8 +73,8 @@ Double_t R3BSci8CalData::GetMeanTimeTAMEXT()
 UInt_t R3BSci8CalData::GetTAMEXLNcha()
 {
 	Int_t num_times=0;
-	if (!isnan(fTimeL_r_ns)) {num_times++;}
-	if (!isnan(fTimeL_l_ns)) {num_times++;}
+	if (!std::isnan(fTimeL_r_ns)) {num_times++;}
+	if (!std::isnan(fTimeL_l_ns)) {num_times++;}
 		
 	return num_times ;
 }
@@ -71,8 +82,8 @@ UInt_t R3BSci8CalData::GetTAMEXLNcha()
 UInt_t R3BSci8CalData::GetTAMEXTNcha()
 {
 	Int_t num_times=0;
-	if (!isnan(fTimeT_r_ns)) {num_times++;}
-	if (!isnan(fTimeT_l_ns)) {num_times++;}
+	if (!std::isnan(fTimeT_r_ns)) {num_times++;}
+	if (!std::isnan(fTimeT_l_ns)) {num_times++;}
 		
 	return num_times ;
 }
@@ -82,8 +93,8 @@ Double_t R3BSci8CalData::GetMeanTimeVFTX()
 {
 	Double_t mean=0;
 	Int_t num_times=0;
-	if (!isnan(fTimeV_r_ns)) {mean+=fTimeV_r_ns;num_times++;}
-	if (!isnan(fTimeV_l_ns)) {mean+=fTimeV_l_ns;num_times++;}
+	if (!std::isnan(fTimeV_r_ns)) {mean+=fTimeV_r_ns;num_times++;}
+	if (!std::isnan(fTimeV_l_ns)) {mean+=fTimeV_l_ns;num_times++;}
 		
 		
 	return num_times ? mean/num_times : NAN;
@@ -91,8 +102,8 @@ Double_t R3BSci8CalData::GetMeanTimeVFTX()
 UInt_t R3BSci8CalData::GetVFTXNcha()
 {
 	Int_t num_times=0;
-	if (!isnan(fTimeV_r_ns)) {num_times++;}
-	if (!isnan(fTimeV_l_ns)) {num_times++;}
+	if (!std::isnan(fTimeV_r_ns)) {num_times++;}
+	if (!std::isnan(fTimeV_l_ns)) {num_times++;}
 		
 	return num_times ;
 }

@@ -14,6 +14,7 @@
 
 #include "TObject.h"
 #include "FairMultiLinkedData.h"
+#include <stdint.h>
 
 class R3BCalifaCrystalCalData : public FairMultiLinkedData 
 {
@@ -57,6 +58,11 @@ public:
   void SetNs(Double32_t Ns){fNs = Ns;}
   void SetTime(ULong64_t time){fTime = time;}
 
+  // set by cal2hit so the resulting clustering decisions can be examined
+  // -1: not part of any cluster
+  uint32_t GetClusterId() { return this->fClusterId; }
+  void SetClusterId(uint32_t newid) { this->fClusterId=newid; }
+
   /** Output to screen **/
   virtual void Print(const Option_t* opt) const;
 
@@ -67,8 +73,8 @@ protected:
   Double32_t fToT_Energy;//total energy in the crystal from ToT
   ULong64_t fTime;      //time of the interaction
   Int_t fCrystalId;      //crystal unique identifier
-
-  ClassDef(R3BCalifaCrystalCalData,1)
+  uint32_t fClusterId{0xffffffff};
+  ClassDef(R3BCalifaCrystalCalData,2)
 
 };
 
