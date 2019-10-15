@@ -143,6 +143,9 @@ amsData/R3BAmsStripCalData.cxx
 amsData/R3BAmsHitData.cxx
 beammonitorData/R3BBeamMonitorMappedData.cxx
 musicData/R3BMusicPoint.cxx
+musicData/R3BMusicMappedData.cxx
+musicData/R3BMusicCalData.cxx
+musicData/R3BMusicHitData.cxx
 )
 
 # fill list of header files from list of source files by exchanging the file extension
