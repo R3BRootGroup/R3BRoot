@@ -38,7 +38,7 @@ class R3BAmsOnlineSpectra : public FairTask {
    * @param name a name of the task.
    * @param iVerbose a verbosity level.
    */
-  R3BAmsOnlineSpectra(const char* name, Int_t iVerbose = 1);
+  R3BAmsOnlineSpectra(const TString& name, Int_t iVerbose = 1);
   
   /**
    * Destructor.

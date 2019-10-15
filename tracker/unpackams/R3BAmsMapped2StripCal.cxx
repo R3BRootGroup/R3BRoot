@@ -16,7 +16,7 @@
 
 #include <iomanip>
 
-//Califa headers
+//AMS headers
 #include "R3BAmsStripCalData.h"
 #include "R3BAmsMappedData.h"
 #include "R3BAmsMapped2StripCal.h"
@@ -41,7 +41,7 @@ R3BAmsMapped2StripCal::R3BAmsMapped2StripCal() :
 }
 
 //R3BAmsMapped2StripCalPar: Standard Constructor --------------------------
-R3BAmsMapped2StripCal::R3BAmsMapped2StripCal(const char* name, Int_t iVerbose) :
+R3BAmsMapped2StripCal::R3BAmsMapped2StripCal(const TString& name, Int_t iVerbose) :
   FairTask(name, iVerbose),
   NumDets(0),
   NumStrips(0),
@@ -62,6 +62,8 @@ R3BAmsMapped2StripCal::R3BAmsMapped2StripCal(const char* name, Int_t iVerbose) :
 R3BAmsMapped2StripCal::~R3BAmsMapped2StripCal()
 {
   LOG(INFO) << "R3BAmsMapped2StripCal: Delete instance";
+  if(fAmsMappedDataCA) delete fAmsMappedDataCA;
+  if(fAmsStripCalDataCA) delete fAmsStripCalDataCA;
 }
 
 
@@ -150,10 +152,6 @@ InitStatus R3BAmsMapped2StripCal::ReInit()
 // -----   Public method Execution   --------------------------------------------
 void R3BAmsMapped2StripCal::Exec(Option_t* option)
 {
-  
-  //if(++nEvents % 10000 == 0)
-  //LOG(INFO) << nEvents;
-  
   //Reset entries in output arrays, local arrays
   Reset();
   

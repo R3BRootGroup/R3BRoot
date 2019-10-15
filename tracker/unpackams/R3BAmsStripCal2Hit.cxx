@@ -37,7 +37,7 @@ R3BAmsStripCal2Hit::R3BAmsStripCal2Hit() :
 }
 
 //R3BAmsStripCal2HitPar: Standard Constructor --------------------------
-R3BAmsStripCal2Hit::R3BAmsStripCal2Hit(const char* name, Int_t iVerbose) :
+R3BAmsStripCal2Hit::R3BAmsStripCal2Hit(const TString& name, Int_t iVerbose) :
   FairTask(name, iVerbose),
   fPitchK(104.),
   fPitchS(110.),
@@ -53,6 +53,8 @@ R3BAmsStripCal2Hit::R3BAmsStripCal2Hit(const char* name, Int_t iVerbose) :
 R3BAmsStripCal2Hit::~R3BAmsStripCal2Hit()
 {
   LOG(INFO) << "R3BAmsStripCal2Hit: Delete instance";
+  if(fAmsStripCalDataCA) delete fAmsStripCalDataCA;
+  if(fAmsHitDataCA) delete fAmsHitDataCA;
 }
 
 // -----   Public method Init   --------------------------------------------
