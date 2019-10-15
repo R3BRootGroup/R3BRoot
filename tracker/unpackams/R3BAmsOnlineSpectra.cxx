@@ -48,7 +48,7 @@ R3BAmsOnlineSpectra::R3BAmsOnlineSpectra()
   , fNbDet(4) {
 }
 
-R3BAmsOnlineSpectra::R3BAmsOnlineSpectra(const char* name, Int_t iVerbose)
+R3BAmsOnlineSpectra::R3BAmsOnlineSpectra(const TString& name, Int_t iVerbose)
   : FairTask(name, iVerbose)
   , fMappedItemsAms(NULL)
   , fCalItemsAms(NULL)
@@ -58,7 +58,12 @@ R3BAmsOnlineSpectra::R3BAmsOnlineSpectra(const char* name, Int_t iVerbose)
   , fNbDet(4) {
 }
 
-R3BAmsOnlineSpectra::~R3BAmsOnlineSpectra() {
+R3BAmsOnlineSpectra::~R3BAmsOnlineSpectra()
+{
+  LOG(INFO) << "R3BAmsOnlineSpectra: Delete instance";
+  if(fMappedItemsAms) delete fMappedItemsAms;
+  if(fCalItemsAms) delete fCalItemsAms;
+  if(fHitItemsAms) delete fHitItemsAms;
 }
 
 InitStatus R3BAmsOnlineSpectra::Init() {
@@ -71,7 +76,7 @@ InitStatus R3BAmsOnlineSpectra::Init() {
   FairRootManager* mgr = FairRootManager::Instance();
   if (NULL == mgr)
     LOG(fatal) << "R3BAmsOnlineSpectra::Init FairRootManager not found";
-  header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
+  //header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
   FairRunOnline *run = FairRunOnline::Instance();
   run->GetHttpServer()->Register("",this);
@@ -241,7 +246,6 @@ void R3BAmsOnlineSpectra::Reset_AMS_Histo()
 
 }
 
-
 void R3BAmsOnlineSpectra::Exec(Option_t* option) {
   
   FairRootManager* mgr = FairRootManager::Instance();
@@ -301,7 +305,6 @@ void R3BAmsOnlineSpectra::Exec(Option_t* option) {
   fNEvents += 1;
 }
 
-
 void R3BAmsOnlineSpectra::FinishEvent() {
 
     if (fMappedItemsAms)
@@ -317,7 +320,6 @@ void R3BAmsOnlineSpectra::FinishEvent() {
         fHitItemsAms->Clear();
     }
 }
-
 
 void R3BAmsOnlineSpectra::FinishTask() {
 

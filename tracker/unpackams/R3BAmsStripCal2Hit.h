@@ -23,7 +23,7 @@ class R3BAmsStripCal2Hit : public FairTask {
   R3BAmsStripCal2Hit();
 
   /** Standard constructor **/
-  R3BAmsStripCal2Hit(const char* name, Int_t iVerbose=1);
+  R3BAmsStripCal2Hit(const TString& name, Int_t iVerbose=1);
   
   /** Destructor **/
   virtual ~R3BAmsStripCal2Hit();

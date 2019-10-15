@@ -24,7 +24,7 @@ class R3BAmsMapped2StripCal : public FairTask {
   R3BAmsMapped2StripCal();
 
   /** Standard constructor **/
-  R3BAmsMapped2StripCal(const char* name, Int_t iVerbose=1);
+  R3BAmsMapped2StripCal(const TString& name, Int_t iVerbose=1);
   
   /** Destructor **/
   virtual ~R3BAmsMapped2StripCal();
@@ -70,8 +70,8 @@ class R3BAmsMapped2StripCal : public FairTask {
   Bool_t fOnline;//Don't store data for online
   
   R3BAmsStripCalPar* fCal_Par;       /**< Parameter container. >*/ 
-  TClonesArray* fAmsMappedDataCA;    /**< Array with AMS Mapped- input data. >*/
-  TClonesArray* fAmsStripCalDataCA;  /**< Array with AMS Cal- output data. >*/
+  TClonesArray* fAmsMappedDataCA;    /**< Array with AMS Mapped input data. >*/
+  TClonesArray* fAmsStripCalDataCA;  /**< Array with AMS Cal output data. >*/
   
   /** Private method AddCalData **/
   //** Adds a AmsStripCalData to the StripCalCollection

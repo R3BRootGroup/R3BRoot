@@ -56,7 +56,7 @@ R3BAmsCalifaCorrelatedOnlineSpectra::R3BAmsCalifaCorrelatedOnlineSpectra()
   , fNbDet(4) {
 }
 
-R3BAmsCalifaCorrelatedOnlineSpectra::R3BAmsCalifaCorrelatedOnlineSpectra(const char* name, Int_t iVerbose)
+R3BAmsCalifaCorrelatedOnlineSpectra::R3BAmsCalifaCorrelatedOnlineSpectra(const TString& name, Int_t iVerbose)
   : FairTask(name, iVerbose)
   , fHitItemsAms(NULL)
   , fHitItemsCalifa(NULL)

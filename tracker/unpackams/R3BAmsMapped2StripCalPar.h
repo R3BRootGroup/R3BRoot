@@ -21,7 +21,7 @@ class R3BAmsMapped2StripCalPar : public FairTask {
   R3BAmsMapped2StripCalPar();
   
   /** Standard constructor **/
-  R3BAmsMapped2StripCalPar(const char* name, Int_t iVerbose=1);
+  R3BAmsMapped2StripCalPar(const TString& name, Int_t iVerbose=1);
   
   /** Destructor **/
   virtual ~R3BAmsMapped2StripCalPar();
@@ -98,7 +98,7 @@ class R3BAmsMapped2StripCalPar : public FairTask {
   Bool_t fPrint;
 
   R3BAmsStripCalPar* fStrip_Par;  /**< Parameter container. >*/ 
-  TClonesArray* fAmsMappedDataCA; /**< Array with AMS Mapped- input data. >*/
+  TClonesArray* fAmsMappedDataCA; /**< Array with AMS Mapped input data. >*/
   
   TH1F** fh_Map_energy_strip;
   char *fOutputFile;

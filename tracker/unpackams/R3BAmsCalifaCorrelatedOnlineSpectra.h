@@ -39,7 +39,7 @@ class R3BAmsCalifaCorrelatedOnlineSpectra : public FairTask {
    * @param name a name of the task.
    * @param iVerbose a verbosity level.
    */
-  R3BAmsCalifaCorrelatedOnlineSpectra(const char* name, Int_t iVerbose = 1);
+  R3BAmsCalifaCorrelatedOnlineSpectra(const TString& name, Int_t iVerbose = 1);
   
   /**
    * Destructor.

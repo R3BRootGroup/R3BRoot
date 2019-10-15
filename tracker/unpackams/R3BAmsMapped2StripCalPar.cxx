@@ -51,7 +51,7 @@ R3BAmsMapped2StripCalPar::R3BAmsMapped2StripCalPar() :
 }
 
 //R3BAmsMapped2StripCalPar: Standard Constructor --------------------------
-R3BAmsMapped2StripCalPar::R3BAmsMapped2StripCalPar(const char* name, Int_t iVerbose) :
+R3BAmsMapped2StripCalPar::R3BAmsMapped2StripCalPar(const TString& name, Int_t iVerbose) :
   FairTask(name, iVerbose),
   fStrip_Par(NULL),
   fAmsMappedDataCA(NULL),
@@ -73,7 +73,8 @@ R3BAmsMapped2StripCalPar::R3BAmsMapped2StripCalPar(const char* name, Int_t iVerb
 
 //R3BAmsMapped2StripCalPar: Destructor ----------------------------------------
 R3BAmsMapped2StripCalPar::~R3BAmsMapped2StripCalPar() {
-  
+  LOG(INFO) << "R3BAmsMapped2StripCalPar: Delete instance";
+  if(fAmsMappedDataCA) delete fAmsMappedDataCA;
 }
 
 // -----   Public method Init   --------------------------------------------
