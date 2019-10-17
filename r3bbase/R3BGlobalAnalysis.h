@@ -199,6 +199,7 @@ class R3BGlobalAnalysis : public FairTask
     TH2F* fh_Fib_vs_Events[NOF_FIB_DET];
     TH2F* fh_Fibs_vs_Events[NOF_FIB_DET];
     TH2F* fh_Fibs_vs_Tofd[NOF_FIB_DET];
+    TH2F* fh_Fibs_vs_Tofd_y[NOF_FIB_DET];
 
     TH2F* fh_Fib_vs_Fib[NOF_FIB_DET][NOF_FIB_DET];
     TH2F* fh_Fib_dx[NOF_FIB_DET][NOF_FIB_DET];

@@ -11,12 +11,12 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 // ------------------------------------------------------------
-// -----                  R3BTofdCal2Hit                  -----
+// -----                  R3BTofdCal2HitS454                  -----
 // -----            Created May 2016 by M.Heil            -----
 // -----           Modified Dec 2019 by L.Bott            -----
 // ------------------------------------------------------------
 
-#include "R3BTofdCal2Hit.h"
+#include "R3BTofdCal2HitS454.h"
 #include "R3BEventHeader.h"
 #include "R3BLosCalData.h"
 #include "R3BLosHitData.h"
@@ -34,9 +34,6 @@
 
 #include "TClonesArray.h"
 #include "TMath.h"
-
-#include <iostream>
-
 using namespace std;
 #define IS_NAN(x) TMath::IsNaN(x)
 
@@ -49,7 +46,7 @@ namespace
     double c_bar_coincidence_ns = 20; // nanoseconds.
 } // namespace
 
-R3BTofdCal2Hit::R3BTofdCal2Hit()
+R3BTofdCal2HitS454::R3BTofdCal2HitS454()
     : FairTask("TofdCal2Hit", 1)
     , fCalItems(NULL)
     , fCalItemsLos(NULL)
@@ -63,47 +60,69 @@ R3BTofdCal2Hit::R3BTofdCal2Hit()
     , fNofPlanes(5)
     , fPaddlesPerPlane(6)
     , fTofdQ(1)
-    , fTofdHisto(false)
     , fnEvents(0)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , maxevent(0)
 {
+    fhxy = NULL;
+    fhCharge = NULL;
+    fhTimeP = NULL;
+    fhChargevsTof = NULL;
+    fhChargevsPos = NULL;
+    fhQp12 = NULL;
+    fhQp34 = NULL;
+    //    fhSaturation1 = NULL;
+    //    fhSaturation2 = NULL;
     fhLosXYP = NULL;
     fhChargeLosTofD = NULL;
     fh_los_pos = NULL;
-    if (fTofdHisto)
+    for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
     {
-        fhxy = NULL;
-        fhxytot = NULL;
-        fhCharge = NULL;
-        //    fhChargevsTof = NULL;
-        //    fhChargevsPos = NULL;
-        //    fhQp12 = NULL;
-        //    fhQp34 = NULL;
-        for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
+        /*
+                fhPos[i] = NULL;
+                fhTotPm1[i] = NULL;
+                fhTotPm2[i] = NULL;
+                fhTotPm1Sat[i] = NULL;
+                fhTotPm2Sat[i] = NULL;
+        */
+        // fhQPm1[i] = NULL;
+        // fhQPm2[i] = NULL;
+        fhQ[i] = NULL;
+        fhQM[i] = NULL;
+        fhMvsQ[i] = NULL;
+        // fhTdiff[i] = NULL;
+        // fhTsync[i] = NULL;
+        // fhTof[i] = NULL;
+        fhTdvsQ[i] = NULL;
+        for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
-            fhQ[i] = NULL;
-            fhQM[i] = NULL;
-            fhMvsQ[i] = NULL;
-            // fhTdiff[i] = NULL;
-            // fhTsync[i] = NULL;
-            // fhTof[i] = NULL;
-            for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
-            {
-                fhQvsPos[i][j] = NULL;
-                fhTdiffvsQ[i][2 * j] = NULL;
-                fhTdiffvsQ[i][2 * j + 1] = NULL;
-                fhQvsQ[i][2 * j] = NULL;
-                fhQvsQ[i][2 * j + 1] = NULL;
-                fhQvsTof[i][j] = NULL;
-                fhTvsTof[i][j] = NULL;
-                fhQvsTofw[i][j] = NULL;
-            }
+            fhQvsPos[i][j] = NULL;
+            // fhQvsTp[i][2*j] = NULL;
+            // fhQvsTp[i][2*j+1] = NULL;
+            /*
+                        fhQ1vsPos[i][j] = NULL;
+                        fhQ2vsPos[i][j] = NULL;
+            */
+            // fhSqrtQvsPos[i][j] = NULL;
+            /*
+                        fhTotPm1vsTotPm2[i][j] = NULL;
+                        fhTotPm1satvsTotPm2sat[i][j] = NULL;
+                        fhTot1vsPos[i][j] = NULL;
+                        fhTot2vsPos[i][j] = NULL;
+            */
+            fhTdiffvsQ[i][2 * j] = NULL;
+            fhTdiffvsQ[i][2 * j + 1] = NULL;
+            fhQp12vsTdiff[2 * j] = NULL;
+            fhQp12vsTdiff[2 * j + 1] = NULL;
+            fhQvsQ[i][2 * j] = NULL;
+            fhQvsQ[i][2 * j + 1] = NULL;
+            // fhQvsTof[i][j] = NULL;
+            // fhQvsTofw[i][j] = NULL;
         }
     }
 }
 
-R3BTofdCal2Hit::R3BTofdCal2Hit(const char* name, Int_t iVerbose)
+R3BTofdCal2HitS454::R3BTofdCal2HitS454(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fCalItems(NULL)
     , fCalItemsLos(NULL)
@@ -117,96 +136,145 @@ R3BTofdCal2Hit::R3BTofdCal2Hit(const char* name, Int_t iVerbose)
     , fNofPlanes(5)
     , fPaddlesPerPlane(6)
     , fTofdQ(1)
-    , fTofdHisto(false)
     , fnEvents(0)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
 {
+    fhxy = NULL;
+    fhCharge = NULL;
+    fhTimeP = NULL;
+    fhChargevsTof = NULL;
+    fhChargevsPos = NULL;
+    fhQp12 = NULL;
+    fhQp34 = NULL;
+
+    //    fhSaturation1 = NULL;
+    //    fhSaturation2 = NULL;
     fhLosXYP = NULL;
     fhChargeLosTofD = NULL;
     fh_los_pos = NULL;
-    if (fTofdHisto)
+    for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
     {
-        fhxy = NULL;
-        fhxytot = NULL;
-        fhCharge = NULL;
-        //    fhChargevsTof = NULL;
-        //    fhChargevsPos = NULL;
-        //    fhQp12 = NULL;
-        //    fhQp34 = NULL;
-        for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
+        /*
+                fhPos[i] = NULL;
+                fhTotPm1[i] = NULL;
+                fhTotPm2[i] = NULL;
+                fhTotPm1Sat[i] = NULL;
+                fhTotPm2Sat[i] = NULL;
+        */
+        // fhQPm1[i] = NULL;
+        // fhQPm2[i] = NULL;
+        fhQ[i] = NULL;
+        fhQM[i] = NULL;
+        fhMvsQ[i] = NULL;
+        // fhTdiff[i] = NULL;
+        // fhTsync[i] = NULL;
+        // fhTof[i] = NULL;
+        fhTdvsQ[i] = NULL;
+        for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
-            fhQ[i] = NULL;
-            fhQM[i] = NULL;
-            fhMvsQ[i] = NULL;
-            // fhTdiff[i] = NULL;
-            // fhTsync[i] = NULL;
-            // fhTof[i] = NULL;
-            for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
-            {
-                fhQvsPos[i][j] = NULL;
-                fhTdiffvsQ[i][2 * j] = NULL;
-                fhTdiffvsQ[i][2 * j + 1] = NULL;
-                fhQvsQ[i][2 * j] = NULL;
-                fhQvsQ[i][2 * j + 1] = NULL;
-                fhQvsTof[i][j] = NULL;
-                fhTvsTof[i][j] = NULL;
-                fhQvsTofw[i][j] = NULL;
-            }
+            fhQvsPos[i][j] = NULL;
+            // fhQvsTp[i][2*j] = NULL;
+            // fhQvsTp[i][2*j+1] = NULL;
+            /*
+                        fhQ1vsPos[i][j] = NULL;
+                        fhQ2vsPos[i][j] = NULL;
+            */
+            // fhSqrtQvsPos[i][j] = NULL;
+            /*
+                        fhTotPm1vsTotPm2[i][j] = NULL;
+                        fhTotPm1satvsTotPm2sat[i][j] = NULL;
+                        fhTot1vsPos[i][j] = NULL;
+                        fhTot2vsPos[i][j] = NULL;
+            */
+            fhTdiffvsQ[i][2 * j] = NULL;
+            fhTdiffvsQ[i][2 * j + 1] = NULL;
+            fhQp12vsTdiff[2 * j] = NULL;
+            fhQp12vsTdiff[2 * j + 1] = NULL;
+            fhQvsQ[i][2 * j] = NULL;
+            fhQvsQ[i][2 * j + 1] = NULL;
+            // fhQvsTof[i][j] = NULL;
+            // fhQvsTofw[i][j] = NULL;
         }
     }
 }
 
-R3BTofdCal2Hit::~R3BTofdCal2Hit()
+R3BTofdCal2HitS454::~R3BTofdCal2HitS454()
 {
+    if (fhxy)
+        delete fhxy;
+    if (fhChargevsTof)
+        delete fhChargevsTof;
+    if (fhChargevsPos)
+        delete fhChargevsPos;
+    if (fhQp12)
+        delete fhQp12;
+    if (fhQp34)
+        delete fhQp34;
+    if (fhCharge)
+        delete fhCharge;
+    if (fhTimeP)
+        delete fhTimeP;
+    //    if (fhSaturation1) delete fhSaturation1;
+    //    if (fhSaturation2) delete fhSaturation2;
     if (fhLosXYP)
         delete fhLosXYP;
     if (fhChargeLosTofD)
         delete fhChargeLosTofD;
     if (fh_los_pos)
         delete fh_los_pos;
-    if (fTofdHisto)
+    for (Int_t i = 0; i < fNofPlanes; i++)
     {
-        if (fhxy)
-            delete fhxy;
-        if (fhxytot)
-            delete fhxytot;
-        //    if (fhChargevsTof) delete  fhChargevsTof;
-        //    if (fhChargevsPos) delete  fhChargevsPos;
-        //    if (fhQp12) delete fhQp12;
-        //    if (fhQp34) delete fhQp34;
-        if (fhCharge)
-            delete fhCharge;
-        for (Int_t i = 0; i < fNofPlanes; i++)
+        /*
+                if (fhPos[i]) delete fhPos[i];
+                if (fhTotPm1[i]) delete fhTotPm1[i];
+                if (fhTotPm2[i]) delete fhTotPm2[i];
+                if (fhTotPm1Sat[i]) delete fhTotPm1[i];
+                if (fhTotPm2Sat[i]) delete fhTotPm2[i];
+        */
+        // if (fhQPm1[i]) delete fhQPm1[i];
+        // if (fhQPm2[i]) delete fhQPm2[i];
+        if (fhQ[i])
+            delete fhQ[i];
+        if (fhQM[i])
+            delete fhQM[i];
+        if (fhMvsQ[i])
+            delete fhMvsQ[i];
+        // if (fhTdiff[i]) delete fhTdiff[i];
+        // if (fhTsync[i]) delete fhTsync[i];
+        // if (fhTof[i]) delete fhTof[i];
+        if (fhTdvsQ[i])
+            delete fhTdvsQ[i];
+        for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
-            if (fhQ[i])
-                delete fhQ[i];
-            if (fhQM[i])
-                delete fhQM[i];
-            if (fhMvsQ[i])
-                delete fhMvsQ[i];
-            // if (fhTdiff[i]) delete fhTdiff[i];
-            // if (fhTsync[i]) delete fhTsync[i];
-            // if (fhTof[i]) delete fhTof[i];
-            for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
-            {
-                if (fhQvsPos[i][j])
-                    delete fhQvsPos[i][j];
-                if (fhTdiffvsQ[i][2 * j])
-                    delete fhTdiffvsQ[i][2 * j];
-                if (fhTdiffvsQ[i][2 * j + 1])
-                    delete fhTdiffvsQ[i][2 * j + 1];
-                if (fhQvsQ[i][2 * j])
-                    delete fhQvsQ[i][2 * j];
-                if (fhQvsQ[i][2 * j + 1])
-                    delete fhQvsQ[i][2 * j + 1];
-
-                if (fhQvsTof[i][j])
-                    delete fhQvsTof[i][j];
-                if (fhTvsTof[i][j])
-                    delete fhTvsTof[i][j];
-                if (fhQvsTofw[i][j])
-                    delete fhQvsTof[i][j];
-            }
+            if (fhQvsPos[i][j])
+                delete fhQvsPos[i][j];
+            // if (fhQvsTp[i][2*j]) delete fhQvsTp[i][2*j];
+            // if (fhQvsTp[i][2*j+1]) delete fhQvsTp[i][2*j+1];
+            /*
+                        if (fhQ1vsPos[i][j]) delete fhQ1vsPos[i][j];
+                        if (fhQ2vsPos[i][j]) delete fhQ2vsPos[i][j];
+            */
+            // if (fhSqrtQvsPos[i][j]) delete fhSqrtQvsPos[i][j];
+            if (fhTdiffvsQ[i][2 * j])
+                delete fhTdiffvsQ[i][2 * j];
+            if (fhTdiffvsQ[i][2 * j + 1])
+                delete fhTdiffvsQ[i][2 * j + 1];
+            if (fhQp12vsTdiff[2 * j])
+                delete fhQp12vsTdiff[2 * j];
+            if (fhQp12vsTdiff[2 * j + 1])
+                delete fhQp12vsTdiff[2 * j + 1];
+            /*
+                        if (fhTotPm1vsTotPm2[i][j]) delete fhTotPm1vsTotPm2[i][j];
+                        if (fhTotPm1satvsTotPm2sat[i][j]) delete fhTotPm1satvsTotPm2sat[i][j];
+                        if (fhTot1vsPos[i][j]) delete fhTot1vsPos[i][j];
+                        if (fhTot2vsPos[i][j]) delete fhTot2vsPos[i][j];
+            */
+            if (fhQvsQ[i][2 * j])
+                delete fhQvsQ[i][2 * j];
+            if (fhQvsQ[i][2 * j + 1])
+                delete fhQvsQ[i][2 * j + 1];
+            // if (fhQvsTof[i][j]) delete fhQvsTof[i][j];
+            // if (fhQvsTofw[i][j]) delete fhQvsTof[i][j];
         }
     }
     if (fHitItems)
@@ -216,7 +284,7 @@ R3BTofdCal2Hit::~R3BTofdCal2Hit()
     }
 }
 
-InitStatus R3BTofdCal2Hit::Init()
+InitStatus R3BTofdCal2HitS454::Init()
 {
     fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
     if (!fHitPar)
@@ -252,7 +320,7 @@ InitStatus R3BTofdCal2Hit::Init()
 }
 
 // Note that the container may still be empty at this point.
-void R3BTofdCal2Hit::SetParContainers()
+void R3BTofdCal2HitS454::SetParContainers()
 {
     fHitPar = (R3BTofdHitPar*)FairRuntimeDb::instance()->getContainer("TofdHitPar");
     if (!fHitPar)
@@ -263,13 +331,13 @@ void R3BTofdCal2Hit::SetParContainers()
     }
 }
 
-InitStatus R3BTofdCal2Hit::ReInit()
+InitStatus R3BTofdCal2HitS454::ReInit()
 {
     SetParContainers();
     return kSUCCESS;
 }
 
-void R3BTofdCal2Hit::Exec(Option_t* option)
+void R3BTofdCal2HitS454::Exec(Option_t* option)
 {
     if (fnEvents / 100000. == (int)fnEvents / 100000)
         std::cout << "\rEvents: " << fnEvents << " / " << maxevent << " (" << (int)(fnEvents * 100. / maxevent)
@@ -299,7 +367,6 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
     std::vector<std::vector<std::vector<Double_t>>> tof;
     std::vector<std::vector<std::vector<Double_t>>> x;
     std::vector<std::vector<std::vector<Double_t>>> y;
-    std::vector<std::vector<std::vector<Double_t>>> yToT;
     UInt_t vmultihits[N_PLANE_MAX + 1][N_TOFD_HIT_PADDLE_MAX * 2 + 1];
     for (Int_t i = 0; i <= fNofPlanes; i++)
     {
@@ -307,7 +374,6 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
         tof.push_back(std::vector<std::vector<Double_t>>());
         x.push_back(std::vector<std::vector<Double_t>>());
         y.push_back(std::vector<std::vector<Double_t>>());
-        yToT.push_back(std::vector<std::vector<Double_t>>());
         for (Int_t j = 0; j <= 2 * N_TOFD_HIT_PADDLE_MAX; j++)
         {
             vmultihits[i][j] = 0;
@@ -315,7 +381,6 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
             tof[i].push_back(std::vector<Double_t>());
             x[i].push_back(std::vector<Double_t>());
             y[i].push_back(std::vector<Double_t>());
-            yToT[i].push_back(std::vector<Double_t>());
         }
     }
     if (fHitItemsLos)
@@ -327,9 +392,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
             R3BLosHitData* hitData = (R3BLosHitData*)fHitItemsLos->At(ihit);
             if (ihit == 0)
                 timeLos = hitData->fTime_ns;
-            LOG(WARNING) << "LOS Time " << timeLos;
-            if (std::isnan(timeLos))
-                return; /// in s444 run2930 Event 22333208
+
             if (NULL == fh_los_pos)
             {
                 char strName[255];
@@ -449,13 +512,13 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 Int_t iBar = top->GetBarId();        // 1..n
                 if (iPlane > fNofPlanes)             // this also errors for iDetector==0
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitPar::Exec() : more detectors than expected! Det: " << iPlane
+                    LOG(ERROR) << "R3BTofdCal2HitS454Par::Exec() : more detectors than expected! Det: " << iPlane
                                << " allowed are 1.." << fNofPlanes;
                     continue;
                 }
                 if (iBar > fPaddlesPerPlane) // same here
                 {
-                    LOG(ERROR) << "R3BTofdCal2HitPar::Exec() : more bars then expected! Det: " << iBar
+                    LOG(ERROR) << "R3BTofdCal2HitS454Par::Exec() : more bars then expected! Det: " << iBar
                                << " allowed are 1.." << fPaddlesPerPlane;
                     continue;
                 }
@@ -473,13 +536,14 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 vmultihits[iPlane][iBar * 2 - 1] += 1;
 
                 nHitsEvent += 1;
+
                 // walk corrections
                 bot_ns = bot_ns - walk(bot_tot);
                 top_ns = top_ns - walk(top_tot);
                 R3BTofdHitModulePar* par = fHitPar->GetModuleParAt(iPlane, iBar);
                 if (!par)
                 {
-                    LOG(INFO) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                    LOG(INFO) << "R3BTofdCal2HitS454::Exec : Hit par not found, Plane: " << top->GetDetectorId()
                               << ", Bar: " << top->GetBarId();
                     continue;
                 }
@@ -489,65 +553,43 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 // calculate time-of-flight
                 if (timeLos == 0)
                     LOG(WARNING) << "Los Time is zero! ";
-                Double_t ToF = (bot_ns + top_ns) / 2. - timeLos - par->GetSync();
-                if (std::isnan(ToF))
-                {
-                    LOG(FATAL) << "ToFD ToF not found";
-                }
+                auto ToF = (bot_ns + top_ns) / 2. - timeLos - par->GetSync();
                 if (timeP0 == 0.)
                     timeP0 = ToF;
 
-                if (timeLos == 0)
-                { // no LOS in s454
-                    /// What to do here:
-                    /// check if all ToF in one event are in a range of 3000ns (readout window) and shift times
-                    /// according to that
-                    ///
-                    ///       this is the first hit
-                    ///       I
-                    /// e.g. 171; 9439; 179; 1117; 175 -->> 171+c_range_ns; 9439; 179+c_range_ns; 1117+c_range_ns;
-                    /// 175+c_range_ns
-                    ///             I
-                    ///             this should be the first hit -> counter resets -> other hits follow
-                    if (ToF - timeP0 < -3000.)
-                    {
-                        ToF += c_range_ns;
-                    }
-                    if (ToF - timeP0 > 3000.)
-                    {
-                        timeP0 = ToF;
-                        it = bar_map.begin();
-                        for (Int_t i = 0; i <= fNofPlanes; i++)
-                        {
-                            for (Int_t j = 0; j <= 2 * N_TOFD_HIT_PADDLE_MAX; j++)
-                            {
-                                tof[i][j].clear();
-                                x[i][j].clear();
-                                y[i][j].clear();
-                                yToT[i][j].clear();
-                                q[i][j].clear();
-                                vmultihits[i][j] = 0;
-                                nHitsEvent = 0;
-                            }
-                        }
-                        LOG(WARNING) << "Found new first hit -> will reset";
-                        goto reset; /// TODO: how to do without goto?
-                    }
-                }
-                if (timeLos != 0)
+                // Find first hit timeP0
+                /// What to do here:
+                /// check if all ToF in one event are in a range of 3000ns (readout window) and shift times according to
+                /// that
+                ///
+                ///       this is the first hit
+                ///       I
+                /// e.g. 171; 9439; 179; 1117; 175 -->> 171+c_range_ns; 9439; 179+c_range_ns; 1117+c_range_ns;
+                /// 175+c_range_ns
+                ///             I
+                ///             this should be the first hit -> counter resets -> other hits follow
+                if (ToF - timeP0 < -3000.)
                 {
-                    LOG(DEBUG) << "Found LOS detector";
-                    LOG(DEBUG) << "check for coincidence range: TOF: " << ToF << " c_range: " << c_range_ns << "\n";
-                    while (ToF < -c_range_ns / 2)
+                    ToF += c_range_ns;
+                }
+                if (ToF - timeP0 > 3000.)
+                {
+                    timeP0 = ToF;
+                    it = bar_map.begin();
+                    for (Int_t i = 0; i <= fNofPlanes; i++)
                     {
-                        ToF += c_range_ns;
-                        LOG(DEBUG) << "Shift up\n";
+                        for (Int_t j = 0; j <= 2 * N_TOFD_HIT_PADDLE_MAX; j++)
+                        {
+                            tof[i][j].clear();
+                            x[i][j].clear();
+                            y[i][j].clear();
+                            q[i][j].clear();
+                            vmultihits[i][j] = 0;
+                            nHitsEvent = 0;
+                        }
                     }
-                    while (ToF > c_range_ns / 2)
-                    {
-                        ToF -= c_range_ns;
-                        LOG(DEBUG) << "Shift down\n";
-                    }
+                    LOG(WARNING) << "Found new first hit -> will reset";
+                    goto reset; /// TODO: how to do without goto?
                 }
 
                 // we increase the number of bars by a factor of 2 in order to compare planes with half bar width
@@ -560,7 +602,6 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 
                 // calculate y-position
                 auto pos = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
-
                 // we increase the number of bars by a factor of 2 in order to compare planes with half bar width
                 // overlap
                 if (iPlane == 1 || iPlane == 3)
@@ -568,14 +609,6 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 if (iPlane == 2 || iPlane == 4)
                     y[iPlane][iBar * 2].push_back(pos);
                 y[iPlane][iBar * 2 - 1].push_back(pos);
-
-                // calculate y-position from ToT
-                auto posToT = ((bot_tot - top_tot) / ((bot_tot + top_tot) / 2.)) * par->GetVeff() * 10.;
-                if (iPlane == 1 || iPlane == 3)
-                    yToT[iPlane][iBar * 2 - 2].push_back(posToT);
-                if (iPlane == 2 || iPlane == 4)
-                    yToT[iPlane][iBar * 2].push_back(posToT);
-                yToT[iPlane][iBar * 2 - 1].push_back(posToT);
 
                 // calculate x-position
                 randx = (std::rand() / (float)RAND_MAX);
@@ -606,9 +639,14 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 parz[2] = par->GetPar1zc();
 
                 /*
-                if(parz[0]>0 && parz[2]>0) std::cout<<"Charges in this event
-                "<<parz[0]*TMath::Power((q1+q2)/2.,parz[2])+parz[1]<<" plane "<<iPlane<<" ibar "<<iBar<<"\n"; else
-                std::cout<<"Charges in this event "<<(q1+q2)/2.<<" plane "<<iPlane<<" ibar "<<iBar<<"\n";
+                if(parz[0]>0 && parz[2]>0){
+                    std::cout<<"Charges in this event "<<parz[0]*TMath::Power((q1+q2)/2.,parz[2])+parz[1]<<" plane
+                "<<iPlane<<" ibar "<<iBar<<"\n";
+                }
+                else{
+                                        std::cout<<"Charges in this event "<<(q1+q2)/2.<<" plane "<<iPlane<<" ibar
+                "<<iBar<<"\n";
+                }
                 std::cout<<"Times in this event "<<ToF<<" plane "<<iPlane<<" ibar "<<iBar<<endl;
                 if(iPlane==1 || iPlane==3)std::cout<<"x in this event "<<iBar*2.8-21.*2.8-1.4-1.4*randx<<" plane
                 "<<iPlane<<" ibar "<<iBar<<" vbars "<<iBar*2-2<<" "<<iBar*2-1<<"\n"; if(iPlane==2 ||
@@ -636,20 +674,23 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                     q[iPlane][iBar * 2 - 1].push_back((q1 + q2) / 2.);
                 }
 
-                if (fTofdHisto)
-                {
-                    // fill control histograms
-                    CreateHistograms(iPlane, iBar);
-                    // fhTof[iPlane-1]->Fill(iBar,ToF);
-                    // fhTdiff[iPlane-1]->Fill(iBar,tdiff);
-                    // fhTsync[iPlane-1]->Fill(iBar,ToF);
-                    fhQvsPos[iPlane - 1][iBar - 1]->Fill(
-                        pos, parz[0] * TMath::Power((q1 + q2) / 2., parz[2]) + parz[1]); //(q1 + q2)/2.);
-                    fhQvsTof[iPlane - 1][iBar - 1]->Fill((q1 + q2) / 2., ToF);           //(q1 + q2) / 2.);
-                    fhTvsTof[iPlane - 1][iBar - 1]->Fill(dt_mod, ToF);                   //(q1 + q2) / 2.);
-                    fhQvsTofw[iPlane - 1][iBar - 1]->Fill((bot_tot + top_tot) / 2.,
-                                                          ToF); // needed to get TOF w/o walk correction
-                }
+                // fill control histograms
+                CreateHistograms(iPlane, iBar);
+                //                fhTof[iPlane-1]->Fill(iBar,ToF);
+                //                fhTdiff[iPlane-1]->Fill(iBar,tdiff);
+                //                fhTsync[iPlane-1]->Fill(iBar,ToF);
+                //                fhQPm1[iPlane-1]->Fill(iBar,parz[0]*TMath::Power(q1,parz[2])+parz[1]);//q1);
+                //                fhQPm2[iPlane-1]->Fill(iBar,parz[0]*TMath::Power(q2,parz[2])+parz[1]);//q2);
+                //                fhQ1vsPos[iPlane-1][iBar-1]->Fill(pos, q1);
+                //                fhQ2vsPos[iPlane-1][iBar-1]->Fill(pos, q2);
+                fhQvsPos[iPlane - 1][iBar - 1]->Fill(
+                    pos, parz[0] * TMath::Power((q1 + q2) / 2., parz[2]) + parz[1]); //(q1 + q2)/2.);
+                //                fhSqrtQvsPos[iPlane-1][iBar-1]->Fill(pos, sqrt(tot1*tot2));
+                //                fhTot1vsPos[iPlane-1][iBar-1]->Fill(pos, tot1);
+                //                fhTot2vsPos[iPlane-1][iBar-1]->Fill(pos, tot2);
+                //                fhQvsTof[iPlane-1][iBar-1]->Fill(ToF,parz[0]*TMath::Power((q1+q2)/2.,parz[2])+parz[1]);//(q1
+                //                + q2) / 2.); fhQvsTofw[iPlane-1][iBar-1]->Fill((bot_tot + top_tot) / 2.,ToF); //needed
+                //                to get TOF w/o walk correction
 
                 // Time reference in case on has the master signal in one of the TDC channels.
                 // Not used at the moment.
@@ -677,23 +718,13 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
     LOG(DEBUG) << "Hits in this event: " << nHitsEvent;
 
     // init arrays to store hits
-    Double_t tArrQ[2 * nHitsEvent + 1];
-    Double_t tArrT[2 * nHitsEvent + 1];
-    Double_t tArrX[2 * nHitsEvent + 1];
-    Double_t tArrY[2 * nHitsEvent + 1];
-    Double_t tArrP[2 * nHitsEvent + 1];
-    Double_t tArrB[2 * nHitsEvent + 1];
-    Bool_t tArrU[2 * nHitsEvent + 1];
-    for (int i = 0; i < (2 * nHitsEvent + 1); i++)
-    {
-        tArrQ[i] = -1.;
-        tArrT[i] = -1.;
-        tArrX[i] = -1.;
-        tArrY[i] = -1.;
-        tArrP[i] = -1.;
-        tArrB[i] = -1.;
-        tArrU[i] = kFALSE;
-    }
+    Double_t tArrQ[2 * nHitsEvent + 1] = { -1. };
+    Double_t tArrT[2 * nHitsEvent + 1] = { -1. };
+    Double_t tArrX[2 * nHitsEvent + 1] = { -1. };
+    Double_t tArrY[2 * nHitsEvent + 1] = { -1. };
+    Double_t tArrP[2 * nHitsEvent + 1] = { -1. };
+    Double_t tArrB[2 * nHitsEvent + 1] = { -1. };
+    Bool_t tArrU[2 * nHitsEvent + 1] = { false };
 
     // order events for time
     for (Int_t i = 1; i <= fNofPlanes; i++)
@@ -712,7 +743,6 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                         tArrT[0] = tof[i][j].at(m);
                         tArrX[0] = x[i][j].at(m);
                         tArrY[0] = y[i][j].at(m);
-                        tArrYT[0] = yToT[i][j].at(m);
                         tArrP[0] = i;
                         tArrB[0] = j;
                     }
@@ -725,7 +755,6 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                             insertX(2 * nHitsEvent, tArrT, tof[i][j].at(m), 1);
                             insertX(2 * nHitsEvent, tArrX, x[i][j].at(m), 1);
                             insertX(2 * nHitsEvent, tArrY, y[i][j].at(m), 1);
-                            insertX(2 * nHitsEvent, tArrYT, yToT[i][j].at(m), 1);
                             insertX(2 * nHitsEvent, tArrP, i, 1);
                             insertX(2 * nHitsEvent, tArrB, j, 1);
                         }
@@ -742,7 +771,6 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                                 insertX(2 * nHitsEvent, tArrT, tof[i][j].at(m), p + 1);
                                 insertX(2 * nHitsEvent, tArrX, x[i][j].at(m), p + 1);
                                 insertX(2 * nHitsEvent, tArrY, y[i][j].at(m), p + 1);
-                                insertX(2 * nHitsEvent, tArrYT, yToT[i][j].at(m), p + 1);
                                 insertX(2 * nHitsEvent, tArrP, i, p + 1);
                                 insertX(2 * nHitsEvent, tArrB, j, p + 1);
                             }
@@ -755,7 +783,6 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                                     insertX(2 * nHitsEvent, tArrT, tof[i][j].at(m), p + 2);
                                     insertX(2 * nHitsEvent, tArrX, x[i][j].at(m), p + 2);
                                     insertX(2 * nHitsEvent, tArrY, y[i][j].at(m), p + 2);
-                                    insertX(2 * nHitsEvent, tArrYT, yToT[i][j].at(m), p + 2);
                                     insertX(2 * nHitsEvent, tArrP, i, p + 2);
                                     insertX(2 * nHitsEvent, tArrB, j, p + 2);
                                 }
@@ -793,12 +820,9 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 
     // Now we can analyze the hits in this event
 
-    if (fTofdHisto)
-    {
-        for (Int_t a = 0; a < 2 * nHitsEvent; a++)
-        {                                                         // loop over all hits
-            fhQ[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrQ[a]); // charge per plane
-        }
+    for (Int_t a = 0; a < 2 * nHitsEvent; a++)
+    {                                                         // loop over all hits
+        fhQ[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrQ[a]); // charge per plane
     }
 
     // select events with feasible times
@@ -806,221 +830,119 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 
     for (Int_t ihit = 0; ihit < 2 * nHitsEvent;)
     { // loop over all hits in this event
-        LOG(WARNING) << "\nSet new coincidence window: " << tArrP[ihit] << " " << tArrB[ihit] << " " << tArrT[ihit]
-                     << " " << tArrQ[ihit];
+        LOG(WARNING) << "Set new coincidence window: " << tArrP[ihit] << " " << tArrB[ihit] << " " << tArrT[ihit] << " "
+                     << tArrQ[ihit] << endl;
         time0 = tArrT[ihit];            // time of first hit in coincidence window
         Double_t charge0 = tArrQ[ihit]; // charge of first hit in coincidence window
-        Double_t plane0 = tArrP[ihit];  // plane of first hit in coincidence window
         Int_t hitscoinc = 0;
-        Int_t nAverage = 0;
-        Int_t nAverage12 = 0;
-        Int_t nAverage34 = 0;
-        Double_t sumQ12 = 0;
-        Double_t sumQ34 = 0;
+        Int_t noaverage = 0;
+        Double_t sumQ = 0;
 
         while (tArrT[ihit] < time0 + hit_coinc)
         { // check if in coincidence window
 
-            /*
-            std::cout<<"Used up hits in this coincidence window:\n";
-            for(Int_t a=0; a<2*nHitsEvent; a++)
+            std::cout << "Used up hits in this coincidence window:\n";
+            for (Int_t a = 0; a < 2 * nHitsEvent; a++)
                 std::cout << tArrP[a] << " ";
             std::cout << "\n";
-            for(Int_t a=0; a<2*nHitsEvent; a++)
+            for (Int_t a = 0; a < 2 * nHitsEvent; a++)
                 std::cout << tArrB[a] << " ";
             std::cout << "\n";
-            for(Int_t a=0; a<2*nHitsEvent; a++)
+            for (Int_t a = 0; a < 2 * nHitsEvent; a++)
                 std::cout << tArrU[a] << " ";
             std::cout << "\n";
-            */
 
             hitscoinc++; // number of hits in coincidence
 
-            if (fTofdHisto)
-            {
-                if (tArrP[ihit] == plane0 && charge0 != tArrQ[ihit])
-                {
-                    fhQM[(Int_t)tArrP[ihit]]->Fill(charge0, tArrQ[ihit]);
-                }
-            }
+            if (tArrP[ihit] == 1 && charge0 != tArrQ[ihit])
+                fhQM[0]->Fill(charge0, tArrQ[ihit]);
+            if (tArrP[ihit] == 2 && charge0 != tArrQ[ihit])
+                fhQM[1]->Fill(charge0, tArrQ[ihit]);
 
             LOG(DEBUG) << "Hit in coincidence window: " << tArrP[ihit] << " " << tArrB[ihit] << " " << tArrT[ihit]
                        << " " << tArrQ[ihit];
 
+            /// TODO: Modify this for 4 planes
             // try to average plane 1&2
-            for (Int_t i = 1; i < hitscoinc; i++)
+            for (Int_t i = hitscoinc; i-- > 1;)
             { // loop over hits in coincidence
-                if (tArrP[ihit] <= 2 && tArrP[ihit - i] <= 2)
-                {
-                    // std::cout<<i<<" "<<tArrP[ihit]<<" "<<tArrB[ihit]<<" "<<tArrP[ihit-i]<<" "<<tArrB[ihit-i]<<"\n";
-                    if (hitscoinc > 0 && (Int_t)(tArrP[ihit] - tArrP[ihit - i]) != 0)
-                    { // check if planes differ
-                        /// find overlapping virtualbars         similar charge in both planes?               bar wasn't
-                        /// used for other average?
-                        if (tArrB[ihit - i] == tArrB[ihit] && abs(tArrQ[ihit - i] - tArrQ[ihit]) < maxChargeDiff &&
-                            tArrU[ihit] == false && tArrU[ihit - i] == false)
-                        {
+                if (hitscoinc > 0 && tArrP[ihit] != tArrP[ihit - i])
+                { // check if planes differ
 
-                            LOG(WARNING) << "Try to average " << tArrQ[ihit] << " " << tArrP[ihit] << " " << tArrB[ihit]
-                                         << " and " << tArrQ[ihit - i] << " " << tArrP[ihit - i] << " "
-                                         << tArrB[ihit - i];
+                    /// find overlapping virtualbars         similar charge in both planes?               bar wasn't
+                    /// used for other average?
+                    if (tArrB[ihit - i] == tArrB[ihit] && abs(tArrQ[ihit - i] - tArrQ[ihit]) < maxChargeDiff &&
+                        tArrU[ihit] == false && tArrU[ihit - i] == false)
+                    { /// s454
+                        LOG(DEBUG) << "Try to average " << tArrQ[ihit] << " " << tArrP[ihit] << " " << tArrB[ihit]
+                                   << " and " << tArrQ[ihit - i] << " " << tArrP[ihit - i] << " " << tArrB[ihit - i];
 
-                            nAverage12++; // number of averaged hits in this coincidence window
-                            sumQ12 += (tArrQ[ihit] + tArrQ[ihit - i]) / 2.; // average charges and add to sum
+                        noaverage++; // number of averaged hits in this coincidence window
 
-                            tArrU[ihit] = tArrU[ihit - i] = true; // set involved bars as used
+                        sumQ += (tArrQ[ihit] + tArrQ[ihit - i]) / 2.; // average charges and add to sum
 
-                            if ((ihit - i) % 2 != 0)
-                                tArrU[ihit - (i + 1)] =
-                                    true; // set the associated virtual bars of the used bars as used
-                            else
-                                tArrU[ihit - (i - 1)] = true;
-                            if ((ihit - i) % 2 != 0)
-                                tArrU[ihit + 1] = true;
-                            else
-                                tArrU[ihit - 1] = true;
+                        tArrU[ihit] = tArrU[ihit - i] = true; // set involved bars as used
+                        if ((ihit - i) % 2 != 0)
+                            tArrU[ihit - (i + 1)] = true; // set the associated virtual bars of the used bars as used
+                        else
+                            tArrU[ihit - (i - 1)] = true;
+                        if ((ihit - i) % 2 != 0)
+                            tArrU[ihit + 1] = true;
+                        else
+                            tArrU[ihit - 1] = true;
 
-                            if (fTofdHisto)
-                            {
-                                fhCharge->Fill((tArrQ[ihit] + tArrQ[ihit - i]) / 2.); // Fill charge histogram
-
-                                if (((Int_t)tArrP[ihit]) == 2)
-                                {
-                                    fhQvsQ[((Int_t)tArrP[ihit]) - 1][((Int_t)tArrB[ihit]) - 1]->Fill(
-                                        tArrQ[ihit - i], tArrQ[ihit]); // Fill charge vs charge histogram
-                                    fhTdiffvsQ[((Int_t)tArrP[ihit]) - 2][((Int_t)tArrB[ihit]) - 1]->Fill(
-                                        tArrT[ihit] - tArrT[ihit - i],
-                                        (tArrQ[ihit] + tArrQ[ihit - i]) / 2.); // Fill tdiff planes histogram
-                                }
-                                else
-                                {
-                                    fhQvsQ[((Int_t)tArrP[ihit]) - 1][((Int_t)tArrB[ihit]) - 1]->Fill(tArrQ[ihit],
-                                                                                                     tArrQ[ihit - i]);
-                                    if ((Int_t)tArrP[ihit] == 1)
-                                        fhTdiffvsQ[((Int_t)tArrP[ihit]) - 1][((Int_t)tArrB[ihit]) - 1]->Fill(
-                                            -(tArrT[ihit] - tArrT[ihit - i]),
-                                            (tArrQ[ihit] + tArrQ[ihit - i]) / 2.); // Fill tdiff planes histogram
-                                }
-
-                                fhxy->Fill((tArrX[ihit] + tArrX[ihit - i]) / 2.,
-                                           (tArrY[ihit] + tArrY[ihit - i]) / 2.); // Fill average xy histogram
-                                fhxytot->Fill((tArrX[ihit] + tArrX[ihit - i]) / 2.,
-                                              (tArrYT[ihit] + tArrYT[ihit - i]) / 2.); // Fill average xy histogram
-                            }
-
-                            // store average
-                            new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData((tArrT[ihit] + tArrT[ihit - i]) / 2.,
-                                                                              (tArrX[ihit] + tArrX[ihit - i]) / 2.,
-                                                                              (tArrY[ihit] + tArrY[ihit - i]) / 2.,
-                                                                              (tArrQ[ihit] + tArrQ[ihit - i]) / 2.,
-                                                                              abs(tArrT[ihit] - tArrT[ihit - i]),
-                                                                              (tArrQ[ihit] + tArrQ[ihit - i]) / 2.,
-                                                                              12);
+                        fhCharge->Fill((tArrQ[ihit] + tArrQ[ihit - i]) / 2.); // Fill charge histogram
+                        if (((Int_t)tArrP[ihit]) == fNofPlanes)
+                        { /// TODO: howto get first plane here?
+                            /// This does not work like intended if more than 2 planes!
+                            fhQvsQ[((Int_t)tArrP[ihit]) - 1][((Int_t)tArrB[ihit]) - 1]->Fill(
+                                tArrQ[ihit - i], tArrQ[ihit]); // Fill charge vs charge histogram
+                            /// TODO: fhTdiffvsQ if last plane
                         }
-                        /*
-                        std::cout<<"Used up averaged hits in this coincidence window:\n";
-                        for(Int_t a=0; a<2*nHitsEvent; a++)
-                            std::cout << tArrU[a] << " ";
-                        std::cout << "\n";
-                        */
-                    }
-                }
-            }
-            // try to average plane 3&4
-            for (Int_t i = 1; i < hitscoinc; i++)
-            { // loop over hits in coincidence
-                if (tArrP[ihit] >= 3 && tArrP[ihit - i] >= 3)
-                {
-                    // std::cout<<i<<" "<<tArrP[ihit]<<" "<<tArrB[ihit]<<" "<<tArrP[ihit-i]<<" "<<tArrB[ihit-i]<<"\n";
-                    if (hitscoinc > 0 && (Int_t)(tArrP[ihit] - tArrP[ihit - i]) != 0)
-                    { // check if planes differ
-                        /// find overlapping virtualbars         similar charge in both planes?               bar wasn't
-                        /// used for other average?
-                        if (tArrB[ihit - i] == tArrB[ihit] && abs(tArrQ[ihit - i] - tArrQ[ihit]) < maxChargeDiff &&
-                            tArrU[ihit] == false && tArrU[ihit - i] == false)
+                        else
                         {
-
-                            LOG(WARNING) << "Try to average " << tArrQ[ihit] << " " << tArrP[ihit] << " " << tArrB[ihit]
-                                         << " and " << tArrQ[ihit - i] << " " << tArrP[ihit - i] << " "
-                                         << tArrB[ihit - i];
-
-                            nAverage34++; // number of averaged hits in this coincidence window
-                            sumQ34 += (tArrQ[ihit] + tArrQ[ihit - i]) / 2.; // average charges and add to sum
-
-                            tArrU[ihit] = tArrU[ihit - i] = true; // set involved bars as used
-
-                            if ((ihit - i) % 2 != 0)
-                                tArrU[ihit - (i + 1)] =
-                                    true; // set the associated virtual bars of the used bars as used
-                            else
-                                tArrU[ihit - (i - 1)] = true;
-                            if ((ihit - i) % 2 != 0)
-                                tArrU[ihit + 1] = true;
-                            else
-                                tArrU[ihit - 1] = true;
-
-                            if (fTofdHisto)
-                            {
-                                fhCharge->Fill((tArrQ[ihit] + tArrQ[ihit - i]) / 2.); // Fill charge histogram
-
-                                if (((Int_t)tArrP[ihit]) == fNofPlanes)
-                                { /// TODO: maybe get first plane here?
-                                    fhQvsQ[((Int_t)tArrP[ihit]) - 1][((Int_t)tArrB[ihit]) - 1]->Fill(
-                                        tArrQ[ihit - i], tArrQ[ihit]); // Fill charge vs charge histogram
-                                    fhTdiffvsQ[((Int_t)tArrP[ihit]) - 2][((Int_t)tArrB[ihit]) - 1]->Fill(
-                                        tArrT[ihit] - tArrT[ihit - i],
-                                        (tArrQ[ihit] + tArrQ[ihit - i]) / 2.); // Fill tdiff planes histogram
-                                }
-                                else
-                                {
-                                    fhQvsQ[((Int_t)tArrP[ihit]) - 1][((Int_t)tArrB[ihit]) - 1]->Fill(tArrQ[ihit],
-                                                                                                     tArrQ[ihit - i]);
-                                    if ((Int_t)tArrP[ihit] == 3)
-                                        fhTdiffvsQ[((Int_t)tArrP[ihit]) - 1][((Int_t)tArrB[ihit]) - 1]->Fill(
-                                            -(tArrT[ihit] - tArrT[ihit - i]),
-                                            (tArrQ[ihit] + tArrQ[ihit - i]) / 2.); // Fill tdiff planes histogram
-                                }
-
-                                fhxy->Fill((tArrX[ihit] + tArrX[ihit - i]) / 2.,
-                                           (tArrY[ihit] + tArrY[ihit - i]) / 2.); // Fill average xy histogram
-                                fhxytot->Fill((tArrX[ihit] + tArrX[ihit - i]) / 2.,
-                                              (tArrYT[ihit] + tArrYT[ihit - i]) / 2.); // Fill average xy histogram
-                            }
-
-                            // store average
-                            new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData((tArrT[ihit] + tArrT[ihit - i]) / 2.,
-                                                                              (tArrX[ihit] + tArrX[ihit - i]) / 2.,
-                                                                              (tArrY[ihit] + tArrY[ihit - i]) / 2.,
-                                                                              (tArrQ[ihit] + tArrQ[ihit - i]) / 2.,
-                                                                              abs(tArrT[ihit] - tArrT[ihit - i]),
-                                                                              (tArrQ[ihit] + tArrQ[ihit - i]) / 2.,
-                                                                              34);
+                            fhQvsQ[((Int_t)tArrP[ihit]) - 1][((Int_t)tArrB[ihit]) - 1]->Fill(tArrQ[ihit],
+                                                                                             tArrQ[ihit - i]);
+                            if ((Int_t)tArrP[ihit] == 1)
+                                fhTdiffvsQ[((Int_t)tArrP[ihit]) - 1][((Int_t)tArrB[ihit]) - 1]->Fill(
+                                    -(tArrT[ihit] - tArrT[ihit - i]),
+                                    (tArrQ[ihit] + tArrQ[ihit - i]) / 2.); // Fill tdiff planes histogram
+                            if ((Int_t)tArrP[ihit] == 2)
+                                fhTdiffvsQ[((Int_t)tArrP[ihit]) - 2][((Int_t)tArrB[ihit]) - 1]->Fill(
+                                    tArrT[ihit] - tArrT[ihit - i],
+                                    (tArrQ[ihit] + tArrQ[ihit - i]) / 2.); // Fill tdiff planes histogram
                         }
-                        /*
-                        std::cout<<"Used up averaged hits in this coincidence window:\n";
-                        for(Int_t a=0; a<2*nHitsEvent; a++)
-                            std::cout << tArrU[a] << " ";
-                        std::cout << "\n";
-                        */
+                        fhxy->Fill((tArrX[ihit] + tArrX[ihit - i]) / 2.,
+                                   (tArrY[ihit] + tArrY[ihit - i]) / 2.); // Fill average xy histogram
+
+                        // store average
+                        new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData((tArrT[ihit] + tArrT[ihit - i]) / 2.,
+                                                                          (tArrX[ihit] + tArrX[ihit - i]) / 2.,
+                                                                          (tArrY[ihit] + tArrY[ihit - i]) / 2.,
+                                                                          (tArrQ[ihit] + tArrQ[ihit - i]) / 2.,
+                                                                          abs(tArrT[ihit] - tArrT[ihit - i]),
+                                                                          (tArrQ[ihit] + tArrQ[ihit - i]) / 2.,
+                                                                          12);
                     }
+
+                    /*
+                    std::cout<<"Used up averaged hits in this coincidence window:\n";
+                    for(Int_t a=0; a<2*nHitsEvent; a++)
+                        std::cout << tArrU[a] << " ";
+                    std::cout << "\n";
+                    */
                 }
             }
             ihit++;
             if (ihit >= 2 * nHitsEvent)
                 break;
         }
-        nAverage = nAverage12 + nAverage34;
-        if (fTofdHisto)
+        if (noaverage > 0)
         {
-            if (nAverage > 0)
-            {
-                // std::cout<<nAverage12<<"/"<<nAverage34<<" Events in coincidence window averaged\nCombined Charge
-                // "<<sumQ12<<"/"<<sumQ34<<"\n";
-                if (nAverage12 > 0)
-                    fhMvsQ[0]->Fill(sumQ12, nAverage12); // Fill histogram number of averaged hits vs summed up charge
-                if (nAverage34 > 0)
-                    fhMvsQ[2]->Fill(sumQ34, nAverage34); // Fill histogram number of averaged hits vs summed up charge
-            }
+            std::cout << noaverage << " Events in coincidence window averaged\nCombined Charge: " << sumQ << "\n";
+            std::cout << noaverage << " Events in coincidence window averaged\nCombined Charge: " << sumQ / noaverage
+                      << "\n";
+            fhMvsQ[0]->Fill(sumQ, noaverage); // Fill histogram number of averaged hits vs summed up charge
         }
     }
     for (Int_t hit = 0; hit < 2 * nHitsEvent; hit++)
@@ -1050,7 +972,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
     fnEvents++;
 }
 
-void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
+void R3BTofdCal2HitS454::CreateHistograms(Int_t iPlane, Int_t iBar)
 {
     Double_t max_charge = 80.;
     // create histograms if not already existing
@@ -1086,31 +1008,126 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhTof[iPlane - 1]->GetYaxis()->SetTitle("ToF in ns");
     }
     */
+
+    if (NULL == fhTdvsQ[iPlane - 1])
+    {
+        char strName[255];
+        sprintf(strName, "Tdiff_vs_Q_Plane_%d", iPlane);
+        fhTdvsQ[iPlane - 1] = new TH2F(strName, "", 30000, 0, 3000, max_charge * 10, 0, max_charge);
+        fhTdvsQ[iPlane - 1]->GetXaxis()->SetTitle("Tdiff particles in ns");
+        fhTdvsQ[iPlane - 1]->GetYaxis()->SetTitle("Charge");
+    }
+
+    /*
+    if (NULL == fhPos[iPlane - 1])
+    {
+        char strName1[255];
+        sprintf(strName1, "PositionPlane_%d", iPlane);
+        char strName2[255];
+        sprintf(strName2, "Positions Plane %d", iPlane);
+        fhPos[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 200, -100., 100.);
+    }
+    if (NULL == fhTotPm1[iPlane - 1])
+    {
+        char strName1[255];
+        sprintf(strName1, "ToT_Plane_%d_PM_1", iPlane);
+        char strName2[255];
+        sprintf(strName2, "ToT Plane %d PM1", iPlane);
+        fhTotPm1[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 500, 0., 500.);
+    }
+    if (NULL == fhTotPm2[iPlane - 1])
+    {
+        char strName1[255];
+        sprintf(strName1, "ToT_Plane_%d_PM_2", iPlane);
+        char strName2[255];
+        sprintf(strName2, "ToT Plane %d PM2", iPlane);
+        fhTotPm2[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 500, 0., 500.);
+    }
+    if (NULL == fhTotPm1Sat[iPlane - 1])
+    {
+        char strName1[255];
+        sprintf(strName1, "ToT_Plane_%d_PM_1_after_saturation", iPlane);
+        char strName2[255];
+        sprintf(strName2, "ToT Plane %d PM1 after saturation", iPlane);
+        fhTotPm1Sat[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 500, 0., 500.);
+    }
+    if (NULL == fhTotPm2Sat[iPlane - 1])
+    {
+        char strName1[255];
+        sprintf(strName1, "ToT_Plane_%d_PM_2_after_saturation", iPlane);
+        char strName2[255];
+        sprintf(strName2, "ToT Plane %d PM2 after saturation", iPlane);
+        fhTotPm2Sat[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 500, 0., 500.);
+    }
+    if (NULL == fhTotPm1vsTotPm2[iPlane - 1][iBar - 1])
+    {
+        char strName[255];
+        sprintf(strName, "Tot_PM1_vs_Tot_PM2_Plane_%d_Bar_%d", iPlane, iBar);
+        fhTotPm1vsTotPm2[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, 0, 200, 200, 0., 200.);
+    }
+    if (NULL == fhTotPm1satvsTotPm2sat[iPlane - 1][iBar - 1])
+    {
+        char strName[255];
+        sprintf(strName, "Tot_PM1_vs_Tot_PM2_Plane_%d_Bar_%d_after_saturation", iPlane, iBar);
+        fhTotPm1satvsTotPm2sat[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, 0, 200, 200, 0., 200.);
+    }
+    if (NULL == fhTot1vsPos[iPlane - 1][iBar - 1])
+    {
+        char strName[255];
+        sprintf(strName, "Tot1_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
+        fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 200, 0., 200.);
+    }
+    if (NULL == fhTot2vsPos[iPlane - 1][iBar - 1])
+    {
+        char strName[255];
+        sprintf(strName, "Tot2_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
+        fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 200, 0., 200.);
+    }
+    */
+    /*
+    if (NULL == fhQPm1[iPlane - 1])
+    {
+        char strName1[255];
+        sprintf(strName1, "Q_Plane_%d_PM_1", iPlane);
+        char strName2[255];
+        sprintf(strName2, "Q_Plane %d PM1", iPlane);
+        fhQPm1[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, max_charge*10, 0., max_charge);
+        fhQPm1[iPlane - 1]->GetYaxis()->SetTitle("Charge PM1");
+        fhQPm1[iPlane - 1]->GetXaxis()->SetTitle("Paddle number");
+    }
+    */
+    /*
+    if (NULL == fhQPm2[iPlane - 1])
+    {
+        char strName1[255];
+        sprintf(strName1, "Q_Plane_%d_PM_2", iPlane);
+        char strName2[255];
+        sprintf(strName2, "Q_Plane %d PM2", iPlane);
+        fhQPm2[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, max_charge*10, 0., max_charge);
+        fhQPm2[iPlane - 1]->GetYaxis()->SetTitle("Charge PM2");
+        fhQPm2[iPlane - 1]->GetXaxis()->SetTitle("Paddle number");
+    }
+    */
+    /*
     if (NULL == fhQvsTof[iPlane - 1][iBar - 1])
     {
         char strName[255];
         sprintf(strName, "Q_vs_ToF_Plane_%d_Bar_%d", iPlane, iBar);
-        fhQvsTof[iPlane - 1][iBar - 1] = new TH2F(strName, "", 1000, 0., max_charge, 1000, -10, 40);
-        fhQvsTof[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToF in ns");
-        fhQvsTof[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Charge");
+        fhQvsTof[iPlane - 1][iBar - 1] = new TH2F(strName, "", 1000, -10, 40 , 1000, 0., max_charge);
+        fhQvsTof[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToF in ns");
+        fhQvsTof[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Charge");
     }
-    if (NULL == fhTvsTof[iPlane - 1][iBar - 1])
-    {
-        char strName[255];
-        sprintf(strName, "T_vs_ToF_Plane_%d_Bar_%d", iPlane, iBar);
-        fhTvsTof[iPlane - 1][iBar - 1] = new TH2F(strName, "", 625, -25, 25, 1000, -10, 40);
-        fhTvsTof[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToF in ns");
-        fhTvsTof[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("T1-T2 in ns");
-    }
-
+    */
+    /*
     if (NULL == fhQvsTofw[iPlane - 1][iBar - 1])
     {
         char strName[255];
         sprintf(strName, "Q_vs_ToF_Plane_%d_Bar_%d_w", iPlane, iBar);
         fhQvsTofw[iPlane - 1][iBar - 1] = new TH2F(strName, "", 1000, 0., 200, 1000, -10, 40);
-        fhQvsTofw[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToT in ns");
+        fhQvsTofw[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Charge");
         fhQvsTofw[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToF in ns");
     }
+    */
 
     if (NULL == fhQvsPos[iPlane - 1][iBar - 1])
     {
@@ -1120,7 +1137,6 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhQvsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Charge");
         fhQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position in cm");
     }
-
     if (NULL == fhQ[iPlane - 1])
     {
         char strName1[255];
@@ -1143,31 +1159,89 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhQM[iPlane - 1]->GetYaxis()->SetTitle("Charge particle i");
         fhQM[iPlane - 1]->GetXaxis()->SetTitle("Charge first particle");
     }
-    if (iPlane == 1 || iPlane == 3)
+    if (NULL == fhMvsQ[iPlane - 1])
     {
-        if (NULL == fhMvsQ[iPlane - 1])
+        char strName1[255];
+        sprintf(strName1, "QvsHits_Plane_%d", iPlane);
+        char strName2[255];
+        sprintf(strName2, "Q vs Hit # Plane %d ", iPlane);
+        fhMvsQ[iPlane - 1] = new TH2F(strName1, strName2, max_charge * 10, 0., max_charge, 20, 0., 20);
+        fhMvsQ[iPlane - 1]->GetYaxis()->SetTitle("Hits in both planes in coincidence window");
+        fhMvsQ[iPlane - 1]->GetXaxis()->SetTitle("#sum Charge");
+    }
+
+    /*
+    if (NULL == fhQvsTp[iPlane - 1][2*iBar - 2])
+    {
+        char strName[255];
+        sprintf(strName, "Q_vs_Tdiff_MultHit_Plane_%d_Bar_%d", iPlane, iBar*2-1);
+        fhQvsTp[iPlane - 1][iBar*2 - 2] = new TH2F(strName, "", 10240, 0., 10240/3.2, 500, 0., max_charge/2);
+        fhQvsTp[iPlane - 1][iBar*2 - 2]->GetYaxis()->SetTitle("Charge");
+        fhQvsTp[iPlane - 1][iBar*2 - 2]->GetXaxis()->SetTitle("dt in ns");
+    }
+    if(iPlane == 1 || iPlane == 3){
+        if (NULL == fhQvsTp[iPlane - 1][2*iBar - 3])
         {
-            char strName1[255];
-            sprintf(strName1, "QvsHits_Plane_%d", iPlane);
-            char strName2[255];
-            sprintf(strName2, "Q vs Hit # Plane %d ", iPlane);
-            char strName3[255];
-            sprintf(strName3, "Hits in planes %d %d in coincidence window", iPlane, iPlane + 1);
-            fhMvsQ[iPlane - 1] = new TH2F(strName1, strName2, max_charge * 10, 0., max_charge, 20, 0., 20);
-            fhMvsQ[iPlane - 1]->GetYaxis()->SetTitle(strName3);
-            fhMvsQ[iPlane - 1]->GetXaxis()->SetTitle("#sum Charge");
+            char strName[255];
+            sprintf(strName, "Q_vs_Tdiff_MultHit_Plane_%d_Bar_%d", iPlane, iBar*2-2);
+            fhQvsTp[iPlane - 1][iBar*2 - 3] = new TH2F(strName, "", 10240, 0., 10240/3.2, 500, 0., max_charge/2);
+            fhQvsTp[iPlane - 1][iBar*2 - 3]->GetYaxis()->SetTitle("Charge");
+            fhQvsTp[iPlane - 1][iBar*2 - 3]->GetXaxis()->SetTitle("dt in ns");
+    //            cout<<"register plane "<<iPlane - 1<<" Bar "<<iBar*2 - 2<<endl;
         }
+    }
+    if(iPlane == 2 || iPlane == 4){
+        if (NULL == fhQvsTp[iPlane - 1][2*iBar - 1])
+        {
+            char strName[255];
+            sprintf(strName, "Q_vs_Tdiff_MultHit_Plane_%d_Bar_%d", iPlane, iBar*2);
+            fhQvsTp[iPlane - 1][iBar*2 - 1] = new TH2F(strName, "", 10240, 0., 10240/3.2, 500, 0., max_charge/2);
+            fhQvsTp[iPlane - 1][iBar*2 - 1]->GetYaxis()->SetTitle("Charge");
+            fhQvsTp[iPlane - 1][iBar*2 - 1]->GetXaxis()->SetTitle("dt in ns");
+    //            cout<<"register plane "<<iPlane - 1<<" Bar "<<iBar*2 <<endl;
+        }
+    }
+    */
+    /*
+    if (NULL == fhQ1vsPos[iPlane - 1][iBar - 1])
+    {
+        char strName[255];
+        sprintf(strName, "Q1_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
+        fhQ1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 200, 0., max_charge);
+        fhQ1vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Charge PM1");
+        fhQ1vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position in cm");
+    }
+    if (NULL == fhQ2vsPos[iPlane - 1][iBar - 1])
+    {
+        char strName[255];
+        sprintf(strName, "Q2_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
+        fhQ2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 200, 0., max_charge);
+        fhQ2vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Charge PM2");
+        fhQ2vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position in cm");
+    }
+    */
+    /*
+    if (NULL == fhSqrtQvsPos[iPlane - 1][iBar - 1])
+    {
+        char strName[255];
+        sprintf(strName, "SqrtQ_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
+        fhSqrtQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 500, 0., max_charge);
+        fhSqrtQvsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("sqrt(PM1*PM2)");
+        fhSqrtQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position in cm");
+    }
+    */
+
+    if (NULL == fhTdiffvsQ[iPlane - 1][2 * iBar - 2])
+    {
+        char strName[255];
+        sprintf(strName, "Tdiff_Plane_%dand%d_Bar_%dvsQ", iPlane, iPlane + 1, iBar * 2 - 1);
+        fhTdiffvsQ[iPlane - 1][iBar * 2 - 2] = new TH2F(strName, "", 1000, -10, 10, 1200, 0., 60.);
+        fhTdiffvsQ[iPlane - 1][iBar * 2 - 2]->GetYaxis()->SetTitle("charge");
+        fhTdiffvsQ[iPlane - 1][iBar * 2 - 2]->GetXaxis()->SetTitle("dt in ns");
+        //            cout<<"register plane "<<iPlane - 1<<" Bar "<<iBar*2 - 1<<endl;
     }
     if (iPlane == 1 || iPlane == 3)
     {
-        if (NULL == fhTdiffvsQ[iPlane - 1][2 * iBar - 2])
-        {
-            char strName[255];
-            sprintf(strName, "Tdiff_Plane_%dand%d_Bar_%dvsQ", iPlane, iPlane + 1, iBar * 2 - 1);
-            fhTdiffvsQ[iPlane - 1][iBar * 2 - 2] = new TH2F(strName, "", 1000, -10, 10, 1200, 0., 60.);
-            fhTdiffvsQ[iPlane - 1][iBar * 2 - 2]->GetYaxis()->SetTitle("charge");
-            fhTdiffvsQ[iPlane - 1][iBar * 2 - 2]->GetXaxis()->SetTitle("dt in ns");
-        }
         if (NULL == fhTdiffvsQ[iPlane - 1][2 * iBar - 3])
         {
             char strName[255];
@@ -1175,6 +1249,41 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
             fhTdiffvsQ[iPlane - 1][iBar * 2 - 3] = new TH2F(strName, "", 1000, -10, 10, 1200, 0., 60.);
             fhTdiffvsQ[iPlane - 1][iBar * 2 - 3]->GetYaxis()->SetTitle("charge");
             fhTdiffvsQ[iPlane - 1][iBar * 2 - 3]->GetXaxis()->SetTitle("dt in ns");
+            //            cout<<"register plane "<<iPlane - 1<<" Bar "<<iBar*2 - 2<<endl;
+        }
+    }
+    if (iPlane == 2 || iPlane == 4)
+    {
+        if (NULL == fhTdiffvsQ[iPlane - 1][2 * iBar - 1])
+        {
+            char strName[255];
+            sprintf(strName, "Tdiff_Plane_%dand%d_Bar_%dvsQ", iPlane, iPlane + 1, iBar * 2);
+            fhTdiffvsQ[iPlane - 1][iBar * 2 - 1] = new TH2F(strName, "", 1000, -10, 10, 1200, 0., 60.);
+            fhTdiffvsQ[iPlane - 1][iBar * 2 - 1]->GetYaxis()->SetTitle("charge");
+            fhTdiffvsQ[iPlane - 1][iBar * 2 - 1]->GetXaxis()->SetTitle("dt in ns");
+            //            cout<<"register plane "<<iPlane - 1<<" Bar "<<iBar*2 <<endl;
+        }
+    }
+
+    if (iPlane == 1)
+    {
+        if (NULL == fhQp12vsTdiff[2 * iBar - 2])
+        {
+            char strName[255];
+            sprintf(strName, "Tdiff_Bar_%dvsQ", iBar * 2 - 1);
+            fhQp12vsTdiff[iBar * 2 - 2] = new TH2F(strName, "", 1000, -10, 10, 1200, 0., 60.);
+            fhQp12vsTdiff[iBar * 2 - 2]->GetYaxis()->SetTitle("charge");
+            fhQp12vsTdiff[iBar * 2 - 2]->GetXaxis()->SetTitle("dt in ns");
+            // cout<<"register Bar "<<iBar*2-1 <<endl;
+        }
+        if (NULL == fhQp12vsTdiff[2 * iBar - 3])
+        {
+            char strName[255];
+            sprintf(strName, "Tdiff_Bar_%dvsQ", iBar * 2 - 2);
+            fhQp12vsTdiff[iBar * 2 - 3] = new TH2F(strName, "", 1000, -10, 10, 1200, 0., 60.);
+            fhQp12vsTdiff[iBar * 2 - 3]->GetYaxis()->SetTitle("charge");
+            fhQp12vsTdiff[iBar * 2 - 3]->GetXaxis()->SetTitle("dt in ns");
+            // cout<<"register Bar "<<iBar*2-2 <<endl;
         }
     }
     if (NULL == fhQvsQ[iPlane - 1][iBar * 2 - 2])
@@ -1183,17 +1292,16 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         sprintf(strName, "Q_vs_Q_Plane_%d_Bar_%d", iPlane, iBar * 2 - 1);
         fhQvsQ[iPlane - 1][iBar * 2 - 2] = new TH2F(strName, "", 1000, 0, max_charge, 1000, 0., max_charge);
         char strNamex[255];
-        char strNamey[255];
-        if (iPlane % 2 == 0)
+        if (iPlane == fNofPlanes)
         {
-            sprintf(strNamex, "Charge plane %d", iPlane);
-            sprintf(strNamey, "Charge plane %d", iPlane + 1);
+            sprintf(strNamex, "Charge plane %d", 1);
         }
         else
         {
             sprintf(strNamex, "Charge plane %d", iPlane + 1);
-            sprintf(strNamey, "Charge plane %d", iPlane);
         }
+        char strNamey[255];
+        sprintf(strNamey, "Charge plane %d", iPlane);
         fhQvsQ[iPlane - 1][iBar * 2 - 2]->GetYaxis()->SetTitle(strNamey);
         fhQvsQ[iPlane - 1][iBar * 2 - 2]->GetXaxis()->SetTitle(strNamex);
     }
@@ -1205,17 +1313,16 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
             sprintf(strName, "Q_vs_Q_Plane_%d_Bar_%d", iPlane, iBar * 2 - 2);
             fhQvsQ[iPlane - 1][iBar * 2 - 3] = new TH2F(strName, "", 1000, 0, max_charge, 1000, 0., max_charge);
             char strNamex[255];
-            char strNamey[255];
-            if (iPlane % 2 == 0)
+            if (iPlane == fNofPlanes)
             {
-                sprintf(strNamex, "Charge plane %d", iPlane);
-                sprintf(strNamey, "Charge plane %d", iPlane + 1);
+                sprintf(strNamex, "Charge plane %d", 1);
             }
             else
             {
                 sprintf(strNamex, "Charge plane %d", iPlane + 1);
-                sprintf(strNamey, "Charge plane %d", iPlane);
             }
+            char strNamey[255];
+            sprintf(strNamey, "Charge plane %d", iPlane);
             fhQvsQ[iPlane - 1][iBar * 2 - 3]->GetYaxis()->SetTitle(strNamey);
             fhQvsQ[iPlane - 1][iBar * 2 - 3]->GetXaxis()->SetTitle(strNamex);
         }
@@ -1228,17 +1335,16 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
             sprintf(strName, "Q_vs_Q_Plane_%d_Bar_%d", iPlane, iBar * 2);
             fhQvsQ[iPlane - 1][iBar * 2 - 1] = new TH2F(strName, "", 1000, 0, max_charge, 1000, 0., max_charge);
             char strNamex[255];
-            char strNamey[255];
-            if (iPlane % 2 == 0)
+            if (iPlane == fNofPlanes)
             {
-                sprintf(strNamex, "Charge plane %d", iPlane);
-                sprintf(strNamey, "Charge plane %d", iPlane + 1);
+                sprintf(strNamex, "Charge plane %d", 1);
             }
             else
             {
                 sprintf(strNamex, "Charge plane %d", iPlane + 1);
-                sprintf(strNamey, "Charge plane %d", iPlane);
             }
+            char strNamey[255];
+            sprintf(strNamey, "Charge plane %d", iPlane);
             fhQvsQ[iPlane - 1][iBar * 2 - 1]->GetYaxis()->SetTitle(strNamey);
             fhQvsQ[iPlane - 1][iBar * 2 - 1]->GetXaxis()->SetTitle(strNamex);
         }
@@ -1251,14 +1357,6 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhxy->GetYaxis()->SetTitle("y-position in cm");
         fhxy->GetXaxis()->SetTitle("x-position in cm");
     }
-    if (NULL == fhxytot)
-    {
-        char strName[255];
-        sprintf(strName, "xyToT_of_ToFD");
-        fhxytot = new TH2F(strName, "", 200, -100, 100, 200, -100., 100.);
-        fhxytot->GetYaxis()->SetTitle("y-position in cm");
-        fhxytot->GetXaxis()->SetTitle("x-position in cm");
-    }
     if (NULL == fhCharge)
     {
         char strName[255];
@@ -1267,17 +1365,22 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhCharge->GetYaxis()->SetTitle("Counts");
         fhCharge->GetXaxis()->SetTitle("Charge");
     }
-    /*
+    if (NULL == fhTimeP)
+    {
+        char strName[255];
+        sprintf(strName, "Time_particles_TofD");
+        fhTimeP = new TH1F(strName, "Time hit - Time0", 5500000, 0., 11000);
+        fhTimeP->GetYaxis()->SetTitle("counts");
+        fhTimeP->GetXaxis()->SetTitle("time in ns");
+    }
     if (NULL == fhChargevsTof)
     {
         char strName[255];
         sprintf(strName, "Charge_vs_Tof_of_TofD");
-        fhChargevsTof = new TH2F(strName, "",  2000, -10., 40.,1000, 0, 100);
+        fhChargevsTof = new TH2F(strName, "", 2000, -10., 40., 1000, 0, 100);
         fhChargevsTof->GetXaxis()->SetTitle("ToF in ns");
         fhChargevsTof->GetYaxis()->SetTitle("Charge");
     }
-    */
-    /*
     if (NULL == fhChargevsPos)
     {
         char strName[255];
@@ -1286,8 +1389,6 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhChargevsPos->GetYaxis()->SetTitle("Charge");
         fhChargevsPos->GetXaxis()->SetTitle("Bar number");
     }
-    */
-    /*
     if (NULL == fhQp12)
     {
         char strName[255];
@@ -1296,8 +1397,6 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhQp12->GetYaxis()->SetTitle("Average charge of plane 1 and 2");
         fhQp12->GetXaxis()->SetTitle("Bar number");
     }
-    */
-    /*
     if (NULL == fhQp34)
     {
         char strName[255];
@@ -1306,9 +1405,8 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhQp34->GetYaxis()->SetTitle("Average charge of plane 3 and 4");
         fhQp34->GetXaxis()->SetTitle("Bar number");
     }
-    */
 }
-void R3BTofdCal2Hit::FinishEvent()
+void R3BTofdCal2HitS454::FinishEvent()
 {
     if (fHitItems)
     {
@@ -1325,62 +1423,81 @@ void R3BTofdCal2Hit::FinishEvent()
     }
 }
 
-void R3BTofdCal2Hit::FinishTask()
+void R3BTofdCal2HitS454::FinishTask()
 {
+    for (Int_t i = 0; i < fNofPlanes; i++)
+    {
+        /*
+                if (fhPos[i]) fhPos[i]->Write();
+                if (fhTotPm1[i]) fhTotPm1[i]->Write();
+                if (fhTotPm2[i]) fhTotPm2[i]->Write();
+                if (fhTotPm1Sat[i]) fhTotPm1Sat[i]->Write();
+                if (fhTotPm2Sat[i]) fhTotPm2Sat[i]->Write();
+        */
+        // if (fhQPm1[i]) fhQPm1[i]->Write();
+        // if (fhQPm2[i]) fhQPm2[i]->Write();
+        if (fhQ[i])
+            fhQ[i]->Write();
+        if (fhQM[i])
+            fhQM[i]->Write();
+        if (fhMvsQ[i])
+            fhMvsQ[i]->Write();
+        // if (fhTof[i]) fhTof[i]->Write();
+        // if (fhTdvsQ[i]) fhTdvsQ[i]->Write();
+        // if (fhTdiff[i]) fhTdiff[i]->Write();
+        // if (fhTsync[i]) fhTsync[i]->Write();
+        for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
+        {
+
+            // control histogram time particles
+            // if (fhQvsPos[i][j]) fhQvsPos[i][j]->Write();
+            // if (fhQvsTp[i][2*j]) fhQvsTp[i][2*j]->Write();
+            // if (fhQvsTp[i][2*j+1]) fhQvsTp[i][2*j+1]->Write();
+            /*
+                        if (fhQ1vsPos[i][j]) fhQ1vsPos[i][j]->Write();
+                        if (fhQ2vsPos[i][j]) fhQ2vsPos[i][j]->Write();
+            */
+            // if (fhSqrtQvsPos[i][j]) fhSqrtQvsPos[i][j]->Write();
+            /*
+                        if (fhTotPm1vsTotPm2[i][j]) fhTotPm1vsTotPm2[i][j]->Write();
+                        if (fhTotPm1satvsTotPm2sat[i][j]) fhTotPm1satvsTotPm2sat[i][j]->Write();
+                        if (fhTot1vsPos[i][j]) fhTot1vsPos[i][j]->Write();
+                        if (fhTot2vsPos[i][j]) fhTot2vsPos[i][j]->Write();
+            */
+            if (fhTdiffvsQ[i][2 * j])
+                fhTdiffvsQ[i][2 * j]->Write();
+            if (fhTdiffvsQ[i][2 * j + 1])
+                fhTdiffvsQ[i][2 * j + 1]->Write();
+            // if (fhQp12vsTdiff[2*j]) fhQp12vsTdiff[2*j]->Write();
+            // if (fhQp12vsTdiff[2*j+1]) fhQp12vsTdiff[2*j+1]->Write();
+
+            if (fhQvsQ[i][2 * j])
+                fhQvsQ[i][2 * j]->Write();
+            if (fhQvsQ[i][2 * j + 1])
+                fhQvsQ[i][2 * j + 1]->Write();
+            // if (fhQvsTof[i][j]) fhQvsTof[i][j]->Write();
+            // if (fhQvsTofw[i][j]) fhQvsTofw[i][j]->Write();
+        }
+    }
+    // if (fhxy) fhxy->Write();
+    if (fhCharge)
+        fhCharge->Write();
+    // if (fhTimeP) fhTimeP->Write();
+    // if (fhChargevsTof) fhChargevsTof->Write();
+    // if (fhChargevsPos) fhChargevsPos->Write();
+    // if (fhQp12) fhQp12->Write();
+    // if (fhQp34) fhQp34->Write();
+    //  if (fhSaturation1) fhSaturation1->Write();
+    //  if (fhSaturation2) fhSaturation2->Write();
     if (fhLosXYP)
         fhLosXYP->Write();
-    // if (fhChargeLosTofD) fhChargeLosTofD->Write();
+    if (fhChargeLosTofD)
+        fhChargeLosTofD->Write();
     if (fh_los_pos)
         fh_los_pos->Write();
-    if (fTofdHisto)
-    {
-        for (Int_t i = 0; i < fNofPlanes; i++)
-        {
-            if (fhQ[i])
-                fhQ[i]->Write();
-            if (fhQM[i])
-                fhQM[i]->Write();
-            if (fhMvsQ[i])
-                fhMvsQ[i]->Write();
-            // if (fhTof[i]) fhTof[i]->Write();
-            // if (fhTdiff[i]) fhTdiff[i]->Write();
-            // if (fhTsync[i]) fhTsync[i]->Write();
-            for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
-            {
-
-                // control histogram time particles
-                if (fhQvsPos[i][j])
-                    fhQvsPos[i][j]->Write();
-                if (fhTdiffvsQ[i][2 * j])
-                    fhTdiffvsQ[i][2 * j]->Write();
-                if (fhTdiffvsQ[i][2 * j + 1])
-                    fhTdiffvsQ[i][2 * j + 1]->Write();
-                if (fhQvsQ[i][2 * j])
-                    fhQvsQ[i][2 * j]->Write();
-                if (fhQvsQ[i][2 * j + 1])
-                    fhQvsQ[i][2 * j + 1]->Write();
-                if (fhQvsTof[i][j])
-                    fhQvsTof[i][j]->Write();
-                if (fhTvsTof[i][j])
-                    fhTvsTof[i][j]->Write();
-                if (fhQvsTofw[i][j])
-                    fhQvsTofw[i][j]->Write();
-            }
-        }
-        if (fhxy)
-            fhxy->Write();
-        if (fhxytot)
-            fhxytot->Write();
-        if (fhCharge)
-            fhCharge->Write();
-        // if (fhChargevsTof) fhChargevsTof->Write();
-        // if (fhChargevsPos) fhChargevsPos->Write();
-        // if (fhQp12) fhQp12->Write();
-        // if (fhQp34) fhQp34->Write();
-    }
 }
 
-Double_t R3BTofdCal2Hit::betaCorr(Double_t delta)
+Double_t R3BTofdCal2HitS454::betaCorr(Double_t delta)
 {
     //    Double_t corr=-3.*delta;  //correction for Ag
 
@@ -1389,7 +1506,7 @@ Double_t R3BTofdCal2Hit::betaCorr(Double_t delta)
     return corr;
 }
 
-Double_t R3BTofdCal2Hit::walk(Double_t q)
+Double_t R3BTofdCal2HitS454::walk(Double_t q)
 {
     Double_t y;
     /*
@@ -1429,7 +1546,19 @@ Double_t R3BTofdCal2Hit::walk(Double_t q)
     return y;
 }
 
-Double_t R3BTofdCal2Hit::saturation(Double_t x)
+/// obsolete
+Double_t R3BTofdCal2HitS454::Eloss(Double_t q)
+{
+    Double_t y;
+    Double_t par0, par1, par2;
+    par0 = 0.770316;  // 0.762793;
+    par1 = -0.867169; //-0.992662;
+    par2 = 1.13888;   // 1.1524;
+    y = par0 * TMath::Power(q, par2) + par1;
+    return y;
+}
+
+Double_t R3BTofdCal2HitS454::saturation(Double_t x)
 {
     Double_t kor;
     Int_t voltage = 600;
@@ -1482,7 +1611,7 @@ Double_t R3BTofdCal2Hit::saturation(Double_t x)
     return kor;
 }
 
-Double_t* R3BTofdCal2Hit::insertX(Int_t n, Double_t arr[], Double_t x, Int_t pos)
+Double_t* R3BTofdCal2HitS454::insertX(Int_t n, Double_t arr[], Double_t x, Int_t pos)
 {
     Int_t i;
 
@@ -1499,4 +1628,4 @@ Double_t* R3BTofdCal2Hit::insertX(Int_t n, Double_t arr[], Double_t x, Int_t pos
     return arr;
 }
 
-ClassImp(R3BTofdCal2Hit)
+ClassImp(R3BTofdCal2HitS454)
