@@ -86,7 +86,7 @@ R3BTofdCal2Histo::R3BTofdCal2Histo(const char* name, Int_t iVerbose)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fTofdY(0.)
     , fTofdQ(0.)
-    , fTofdZ(0.)
+    , fTofdZ(false)
     , fParaFile("")
     , maxevent(0)
 {
