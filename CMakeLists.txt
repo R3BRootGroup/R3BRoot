@@ -85,7 +85,7 @@ find_package2(PUBLIC Geant3)
 if(Geant3_FOUND)
   Set(Geant3_LIBRARY_DIR ${Geant3_DIR}/${Geant3_CMAKE_INSTALL_LIBDIR})
   FIND_PATH(Geant3_SYSTEM_DIR NAMES data PATHS
-           ${Geant3_DIR}/../../share/geant3
+      ${Geant3_DIR}/../../share/Geant3-${Geant3_VERSION}
            NO_DEFAULT_PATH)
 endif()
 
