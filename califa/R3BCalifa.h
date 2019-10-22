@@ -161,8 +161,6 @@ class R3BCalifa : public R3BDetector
     //    TF1 *tf_g_dNs;    //!
     //    TF1 *tf_g_dNf;    //!
 
-    TF1* tf_dNf_dE; //!
-    TF1* tf_dNs_dE; //!
 
     // Selecting the geometry of the CALIFA calorimeter
     Int_t fGeometryVersion;
@@ -225,7 +223,7 @@ class R3BCalifa : public R3BDetector
 
     Bool_t GetCrystalInfo(sCrystalInfo& info);
 
-    ClassDef(R3BCalifa, 6);
+    ClassDef(R3BCalifa, 7);
 };
 
 inline void R3BCalifa::ResetParameters()

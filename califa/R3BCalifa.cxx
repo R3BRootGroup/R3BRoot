@@ -201,11 +201,6 @@ R3BCalifa::R3BCalifa(const TString& geoFile, const TGeoCombiTrans& combi)
     //  tf_g_dNs->SetParameter(2, tf_p_dNs->GetParameter(2));
     //  tf_g_dNf->SetParameter(2, tf_p_dNf->GetParameter(2));
 
-    tf_dNf_dE = new TF1("tf_dNf_dE", "1./([0]+[1]*(x^[2])+[3]/(x^[4]))");
-    tf_dNs_dE = new TF1("tf_dNs_dE", "1./([0]+[1]*(x^[2])+[3]/(x^[4]))");
-
-    tf_dNf_dE->SetParameters(-1.79, 1.36e-2, 7.84e-1, 4.97, 1.75e-1);
-    tf_dNs_dE->SetParameters(-1.24e2, 6.3e-3, 1.27, 1.262e2, 2.3e-3);
 }
 
 R3BCalifa::~R3BCalifa()
@@ -229,8 +224,6 @@ R3BCalifa::~R3BCalifa()
     //  delete tf_p_dNf;
     //  delete tf_g_dNs;
     //  delete tf_g_dNf;
-    delete tf_dNf_dE;
-    delete tf_dNs_dE;
 }
 
 void R3BCalifa::Initialize()
@@ -247,6 +240,19 @@ void R3BCalifa::Initialize()
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
 {
+  // Note: TF1s and friends are evil, because they will generally break the
+  // stack when they crash (e.g. because of SIGFPE, which GEANT4 helpfully
+  // activates on Tuesdays and Debug builds (->G4FPE_DEBUG).
+  
+    auto makeCompFun=[](std::array<double, 5> p)
+      {
+	return [p](double x){
+	  return (x>0.0)?1./(p[0]+p[1]*pow(x,p[2])+p[3]/pow(x,p[4])):0.0;
+	};
+      };
+    auto tf_dNf_dE=makeCompFun({-1.79, 1.36e-2, 7.84e-1, 4.97, 1.75e-1});
+    auto tf_dNs_dE=makeCompFun({-1.24e2, 6.3e-3, 1.27, 1.262e2, 2.3e-3});
+
     // While tracking a single particle within a crystal (volume)
     // we can rely on the latest crystal information for each step
     if (gMC->IsTrackEntering() || fCrystal == NULL)
@@ -402,9 +408,8 @@ Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
                 fNs += (dE_e * scaling / (1. / slope_e + 1)) / 1000.;
                 dE -= dE_e;
             }
-
-            fNf += tf_dNf_dE->Eval(dE / dx) * dE / 1000.;
-            fNs += tf_dNs_dE->Eval(dE / dx) * dE / 1000.;
+            fNf += tf_dNf_dE(dE / dx) * dE / 1000.;
+            fNs += tf_dNs_dE(dE / dx) * dE / 1000.;
         }
         else
         {

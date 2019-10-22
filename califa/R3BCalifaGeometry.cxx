@@ -12,7 +12,8 @@
 #include <FairLogger.h>
 
 #include "R3BCalifaGeometry.h"
-
+#include <stdexcept>
+#include <cmath>
 R3BCalifaGeometry* R3BCalifaGeometry::inst = NULL;
 
 R3BCalifaGeometry* R3BCalifaGeometry::Instance(int version)
@@ -259,6 +260,8 @@ void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t *polar, Double_t *azimuthal
   *polar=masterV.Theta();
   *azimuthal=masterV.Phi();
   *rho=masterV.Mag();
+  if (std::isnan(*polar) || std::isnan(*azimuthal) || std::isnan(*rho))
+    LOG(ERROR) <<  "R3BCalifaGeometry::GetAngles("<<iD<<",...) returns NaN";
 }
 
 const char * R3BCalifaGeometry::GetCrystalVolumePath(int iD)

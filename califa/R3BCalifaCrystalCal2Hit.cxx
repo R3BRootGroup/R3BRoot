@@ -32,7 +32,9 @@ using std::endl;
 
 R3BCalifaCrystalCal2Hit::R3BCalifaCrystalCal2Hit() : 
   FairTask("R3B CALIFA CrystalCal to Hit Finder")
-{}
+{
+  this->SetConeAlg(); //stop macros from causing exceptions
+}
 
 
 R3BCalifaCrystalCal2Hit::~R3BCalifaCrystalCal2Hit()
