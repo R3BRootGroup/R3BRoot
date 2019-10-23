@@ -35,7 +35,11 @@
 #include "TClonesArray.h"
 #include "TMath.h"
 
-#define Rolu_COINC_WINDOW_T_NS 190
+#include <iostream>
+
+
+
+#define Rolu_COINC_WINDOW_T_NS 190    
 #define IS_NAN(x) TMath::IsNaN(x)
 
 R3BRoluMapped2Cal::R3BRoluMapped2Cal()

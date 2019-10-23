@@ -32,10 +32,8 @@ using namespace std;
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TTree.h"
-#include <vector>
 
 #include "TString.h"
-#include <bitset>
 
 #include "R3BStartrackRawHit.h"
 
@@ -46,6 +44,10 @@ using namespace std;
 #include "FairRuntimeDb.h"
 
 #include "FairRunOnline.h"
+
+#include <bitset>
+#include <iostream>
+#include <vector>
 
 // Default constructor
 R3BStartrackOrderTS::R3BStartrackOrderTS()

@@ -16,6 +16,7 @@
 #include "FairRootManager.h"
 #include "R3BNeulandHit.h"
 #include "TDirectory.h"
+#include <TFile.h>
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TH3D.h"

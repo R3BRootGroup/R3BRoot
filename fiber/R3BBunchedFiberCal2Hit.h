@@ -15,7 +15,8 @@
 #define R3BBUNCHEDFIBERCAL2HIT
 
 #include "FairTask.h"
-#include <R3BTCalEngine.h>
+
+#include <list>
 
 class TH1F;
 class TH2F;
