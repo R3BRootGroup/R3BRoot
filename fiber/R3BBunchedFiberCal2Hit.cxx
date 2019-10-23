@@ -14,6 +14,8 @@
 #include "FairRtdbRun.h"
 #include "FairLogger.h"
 
+#include <iostream>
+
 R3BBunchedFiberCal2Hit::ToT::ToT(R3BBunchedFiberCalData const *a_lead,
     R3BBunchedFiberCalData const *a_trail, Double_t a_tot)
   : lead(a_lead)

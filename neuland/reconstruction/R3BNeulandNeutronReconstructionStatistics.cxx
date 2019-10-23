@@ -1,5 +1,6 @@
 #include "R3BNeulandNeutronReconstructionStatistics.h"
 #include "FairLogger.h"
+#include <TFile.h>
 #include <iostream>
 #include <numeric>
 

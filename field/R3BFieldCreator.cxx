@@ -7,6 +7,8 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 
+#include <iostream>
+
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -19,9 +21,11 @@ R3BFieldCreator::R3BFieldCreator()
 	fCreator=this;
         fFieldPar=0;
 }
+
 R3BFieldCreator::~R3BFieldCreator()
 {
 }
+
 void R3BFieldCreator::SetParm()
 {
   FairRunAna *Run = FairRunAna::Instance();
@@ -31,7 +35,7 @@ void R3BFieldCreator::SetParm()
 }
 
 FairField* R3BFieldCreator::createFairField()
-{ 
+{
   FairField *fMagneticField=0;
 
   if ( ! fFieldPar ) {

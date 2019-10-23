@@ -1,6 +1,7 @@
 #include "R3BNeulandOnlineSpectra.h"
 #include "FairRunOnline.h"
 #include "TCanvas.h"
+#include <TFile.h>
 #include "TH1D.h"
 #include "TH2D.h"
 #include "THttpServer.h"

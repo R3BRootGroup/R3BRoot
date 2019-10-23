@@ -4,6 +4,7 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include <TFile.h>
 #include "TGeoManager.h"
 #include "TGeoNode.h"
 #include "TH1F.h"
