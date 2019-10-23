@@ -48,8 +48,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
 Set(CheckSrcDir "${FAIRROOTPATH}/share/fairbase/cmake/checks")
 
 # set cmake policies
-include(FairRootCmakePolicies)
-set_fairroot_cmake_policies()
+cmake_policy(VERSION 3.11...3.14)
 
 find_package(FairRoot)
 
