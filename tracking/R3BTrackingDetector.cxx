@@ -30,14 +30,6 @@ R3BTrackingDetector::R3BTrackingDetector(const char* detectorName, EDetectorType
 
 R3BTrackingDetector::~R3BTrackingDetector() {}
 
-void R3BTrackingDetector::SetHit(Double_t x, Double_t y)
-{
-    hit_x = x;
-    hit_y = y;
-}
-
-void R3BTrackingDetector::SetHitTime(Double_t time) { hit_time = time; }
-
 InitStatus R3BTrackingDetector::Init()
 {
     Double_t offset_z = 0.;
@@ -94,6 +86,7 @@ void R3BTrackingDetector::CopyHits()
     for (Int_t i = 0; i < fArrayHits->GetEntriesFast(); i++)
     {
         R3BHit* hit = (R3BHit*)fArrayHits->At(i);
+        hit->SetHitId(i);
         hits.push_back(hit);
     }
 }

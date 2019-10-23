@@ -23,8 +23,6 @@ class R3BTrackingDetector : public TObject
   public:
     R3BTrackingDetector(const char* detectorName, EDetectorType type, const char* geoParName, const char* hitArray = NULL);
     virtual ~R3BTrackingDetector();
-    void SetHit(Double_t x, Double_t y);
-    void SetHitTime(Double_t time);
 
     void SetParContainers();
 
@@ -73,15 +71,15 @@ class R3BTrackingDetector : public TObject
     std::vector<R3BHit*> hits; // not used directly by the fitter
     TClonesArray* fArrayHits;
 
-    Double_t hit_x; // local coordinates (on the detector plane)
-    Double_t hit_y;
-    TVector3 hit_xyz; // same in global coordinates
-    Double_t hit_time;
+    //Double_t hit_x; // local coordinates (on the detector plane)
+    //Double_t hit_y;
+    //TVector3 hit_xyz; // same in global coordinates
+    //Double_t hit_time;
     // we could store a time here as well. Maybe later.
 
-    Double_t track_x; // local coordinates (on the detector plane)
-    Double_t track_y;
-    TVector3 track_xyz; // same in global coordinates
+    //Double_t track_x; // local coordinates (on the detector plane)
+    //Double_t track_y;
+    //TVector3 track_xyz; // same in global coordinates
 
   public:
     ClassDef(R3BTrackingDetector, 0)

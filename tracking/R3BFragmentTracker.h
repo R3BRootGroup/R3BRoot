@@ -1,16 +1,11 @@
 
-#ifndef R3B_FRAGMENTFITTER_H
-#define R3B_FRAGMENTFITTER_H
+#ifndef R3B_FRAGMENTTRACKER_H
+#define R3B_FRAGMENTTRACKER_H
 
 #include "FairTask.h"
 
 #include <vector>
 #include <string>
-
-#include "Math/Minimizer.h"
-#include "Math/Factory.h"
-#include "Math/Functor.h"
-#include "Minuit2/Minuit2Minimizer.h"
 
 class TClonesArray;
 class R3BFieldPar;
@@ -18,14 +13,15 @@ class R3BTPropagator;
 class R3BTrackingDetector;
 class R3BTrackingParticle;
 class R3BTrackingSetup;
+class R3BFragmentFitterGeneric;
 
 class TH1F;
 
-class R3BFragmentFitter : public FairTask
+class R3BFragmentTracker : public FairTask
 {
   public:
-    R3BFragmentFitter(const char* name, Bool_t vis = kFALSE, Int_t verbose = 1);
-    virtual ~R3BFragmentFitter();
+    R3BFragmentTracker(const char* name, Bool_t vis = kFALSE, Int_t verbose = 1);
+    virtual ~R3BFragmentTracker();
 
     virtual InitStatus Init();
     virtual InitStatus ReInit();
@@ -35,29 +31,12 @@ class R3BFragmentFitter : public FairTask
     virtual void Exec(const Option_t* = "");
 
     virtual void Finish();
-
-    Int_t FitFragment(R3BTrackingParticle* particle);
     
-    Int_t FitFragmentBackward(R3BTrackingParticle* particle);
-
-    Double_t TrackFragment(R3BTrackingParticle* particle,
-                           Bool_t energyLoss,
-                           Double_t& devTof,
-                           Double_t& time,
-                           Double_t& chi2);
-
-    Double_t DbetaDx(R3BTrackingParticle* candidate);
-    Double_t DbetaChi2(R3BTrackingParticle* candidate);
-    Double_t DbetaDt(R3BTrackingParticle* candidate);
-    Double_t DmDx(R3BTrackingParticle* candidate, Bool_t energy_loss);
-    Double_t DmDxTof(R3BTrackingParticle* candidate, Bool_t energy_loss);
-    Double_t DmDt(R3BTrackingParticle* candidate, Bool_t energy_loss);
-    Double_t Velocity(R3BTrackingParticle* candidate);
+    void SetFragmentFitter(R3BFragmentFitterGeneric* fitter) { fFitter = fitter; }
+    void SetEnergyLoss(Bool_t energyLoss) { fEnergyLoss = energyLoss; }
 
   private:
     Bool_t InitPropagator();
-    
-    ROOT::Math::Minimizer* fMinimum;
 
     R3BFieldPar* fFieldPar;
     R3BTPropagator* fPropagator;
@@ -67,6 +46,9 @@ class R3BFragmentFitter : public FairTask
     TClonesArray* fArrayFragments;
     Int_t fNEvents;
     Bool_t fVis;
+    
+    R3BFragmentFitterGeneric* fFitter;
+    Bool_t fEnergyLoss;
     
     Double_t fAfterGladResolution;
 
@@ -88,7 +70,7 @@ class R3BFragmentFitter : public FairTask
     TH1F* fh_chi2;
     TH1F* fh_vz_res;
 
-    ClassDef(R3BFragmentFitter, 1)
+    ClassDef(R3BFragmentTracker, 1)
 };
 
 #endif

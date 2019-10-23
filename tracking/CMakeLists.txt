@@ -30,7 +30,9 @@ link_directories( ${LINK_DIRECTORIES})
 set(SRCS
 R3BTPropagator.cxx
 R3BTGeoPar.cxx
-R3BFragmentFitter.cxx
+R3BFragmentTracker.cxx
+R3BFragmentFitterGeneric.cxx
+R3BFragmentFitterChi2.cxx
 R3BTrackingDetector.cxx
 R3BTrackingParticle.cxx
 R3BTrackingSetup.cxx

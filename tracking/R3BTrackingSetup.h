@@ -29,7 +29,9 @@ class R3BTrackingSetup
     void CopyHits();
 
     std::vector<R3BTrackingDetector*>& GetArray() { return fDetectors; }
-    
+
+    R3BHit* GetHit(const std::string& detName, const Int_t& hitId) { return GetByName(detName)->hits[hitId]; }
+
     Double_t GetAfterGladResolution();
 
   private:
