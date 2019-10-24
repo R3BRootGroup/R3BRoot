@@ -106,8 +106,8 @@ InitStatus R3BBunchedFiberCal2Hit::Init()
 
   // ToT SAPMT:  
   for(Int_t i=0;i<4;i++){
-    char number[1];
-    sprintf(number, "%d", i);
+    char number[15];
+    snprintf(number, sizeof(number), "%d", i);
     chistName=fName+"_ToT_SAPMT"+number;
     chistTitle=fName+" ToT of single PMTs "+number;
     fh_ToT_s_Fib[i] = new TH2F(chistName.Data(), chistTitle.Data(), 2100, 0., 2100., 200, 0., 200.);   	   
