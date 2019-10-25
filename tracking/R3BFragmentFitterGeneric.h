@@ -11,7 +11,7 @@ class R3BFragmentFitterGeneric
 {
 public:
     R3BFragmentFitterGeneric();
-    ~R3BFragmentFitterGeneric();
+    virtual ~R3BFragmentFitterGeneric();
     
     virtual void Init(R3BTPropagator* prop = nullptr, Bool_t energyLoss = kTRUE) = 0;
     
