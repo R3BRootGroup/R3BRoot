@@ -38,7 +38,7 @@ R3BMCTrack::R3BMCTrack(Int_t pdgCode,
                        Double_t y,
                        Double_t z,
                        Double_t t,
-                       std::array<int, kLAST+1> nPoints)
+                       std::array<int, kLAST + 1> nPoints)
     : fPdgCode(pdgCode)
     , fMotherId(motherId)
     , fPx(px)
@@ -99,9 +99,7 @@ R3BMCTrack::R3BMCTrack(TParticle* part, Int_t fMC)
 // -------------------------------------------------------------------------
 
 // -----   Destructor   ----------------------------------------------------
-R3BMCTrack::~R3BMCTrack()
-{
-}
+R3BMCTrack::~R3BMCTrack() {}
 // -------------------------------------------------------------------------
 
 // -----   Public method Print   -------------------------------------------
@@ -116,7 +114,9 @@ void R3BMCTrack::Print(Option_t* option) const
          << ", VETO " << GetNPoints(kVETO) << ", STARTRACK " << GetNPoints(kSTARTRACK) << ", LUMON "
          << GetNPoints(kLUMON) << ", NeuLAND " << GetNPoints(kNEULAND) << endl;
 #ifdef SOFIA
-    cout << ", SCI " << GetNPoints(kSOFSCI) << ", AT " << GetNPoints(kSOFAT) << ", TRIM " << GetNPoints(kSOFTRIM) << ", MWPC1 " << GetNPoints(kSOFMWPC1) << ", TWIM " << GetNPoints(kSOFTWIM) << ", MWPC2 " << GetNPoints(kSOFMWPC2) << ", SOF ToF Wall " << GetNPoints(kSOFTofWall) << endl;
+    cout << ", SCI " << GetNPoints(kSOFSCI) << ", AT " << GetNPoints(kSOFAT) << ", TRIM " << GetNPoints(kSOFTRIM)
+         << ", MWPC1 " << GetNPoints(kSOFMWPC1) << ", TWIM " << GetNPoints(kSOFTWIM) << ", MWPC2 "
+         << GetNPoints(kSOFMWPC2) << ", SOF ToF Wall " << GetNPoints(kSOFTofWall) << endl;
 #endif
 #ifdef GTPC
     cout << ", GTPC " << GetNPoints(kGTPC) << endl;
@@ -149,7 +149,7 @@ Double_t R3BMCTrack::GetRapidity() const
 // -----   Public method GetNPoints   --------------------------------------
 Int_t R3BMCTrack::GetNPoints(DetectorId detId) const
 {
-    if(detId < 0 || detId >= fNPoints.size())
+    if (detId < 0 || detId >= fNPoints.size())
     {
         LOG(ERROR) << "Unknown detector ID " << detId;
         return 0;
@@ -161,7 +161,7 @@ Int_t R3BMCTrack::GetNPoints(DetectorId detId) const
 // -----   Public method SetNPoints   --------------------------------------
 void R3BMCTrack::SetNPoints(Int_t iDet, Int_t nP)
 {
-    if(iDet < 0 || iDet >= fNPoints.size())
+    if (iDet < 0 || iDet >= fNPoints.size())
     {
         LOG(ERROR) << "Unknown detector ID " << iDet;
         return;

@@ -5,15 +5,17 @@
 
 class FairContainer;
 
-class R3BCalifaContFact : public FairContFact {
- private:
-  void setAllContainers();
- public:
-  R3BCalifaContFact();
-  ~R3BCalifaContFact() {}
-  FairParSet* createContainer(FairContainer*);
-  void  activateParIo(FairParIo* io);
-  ClassDef( R3BCalifaContFact,0) // Factory for all CALIFA parameter containers
-    };
+class R3BCalifaContFact : public FairContFact
+{
+  private:
+    void setAllContainers();
 
-#endif  /* !R3BCALIFACONTFACT_H */
+  public:
+    R3BCalifaContFact();
+    ~R3BCalifaContFact() {}
+    FairParSet* createContainer(FairContainer*);
+    void activateParIo(FairParIo* io);
+    ClassDef(R3BCalifaContFact, 0) // Factory for all CALIFA parameter containers
+};
+
+#endif /* !R3BCALIFACONTFACT_H */

@@ -7,21 +7,21 @@
 set(SYSTEM_INCLUDE_DIRECTORIES ${SYSTEM_INCLUDE_DIRECTORIES} ${BASE_INCLUDE_DIRECTORIES})
 
 set(INCLUDE_DIRECTORIES
-${R3BROOT_SOURCE_DIR}/r3bdata  
-${R3BROOT_SOURCE_DIR}/r3bdata/xballData  
+${R3BROOT_SOURCE_DIR}/r3bdata
+${R3BROOT_SOURCE_DIR}/r3bdata/xballData
 ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
 ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
 ${R3BROOT_SOURCE_DIR}/r3bdata/beammonitorData
-${R3BROOT_SOURCE_DIR}/r3bdata/dhcData  
-${R3BROOT_SOURCE_DIR}/r3bdata/gfiData  
-${R3BROOT_SOURCE_DIR}/r3bdata/mtofData  
-${R3BROOT_SOURCE_DIR}/r3bdata/dtofData  
-${R3BROOT_SOURCE_DIR}/r3bdata/tofData  
-${R3BROOT_SOURCE_DIR}/r3bdata/vetoData  
-${R3BROOT_SOURCE_DIR}/r3bdata/lumonData  
-${R3BROOT_SOURCE_DIR}/r3bdata/trackerData  
-${R3BROOT_SOURCE_DIR}/r3bdata/startrackData  
-${R3BROOT_SOURCE_DIR}/r3bdata/landData  
+${R3BROOT_SOURCE_DIR}/r3bdata/dhcData
+${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
+${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
+${R3BROOT_SOURCE_DIR}/r3bdata/dtofData
+${R3BROOT_SOURCE_DIR}/r3bdata/tofData
+${R3BROOT_SOURCE_DIR}/r3bdata/vetoData
+${R3BROOT_SOURCE_DIR}/r3bdata/lumonData
+${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
+${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
+${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/roluData
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
@@ -56,10 +56,8 @@ xballData/R3BXBallPoint.cxx
 xballData/R3BXBallCrystalHit.cxx
 xballData/R3BXBallCrystalHitSim.cxx
 califaData/R3BCalifaCrystalCalData.cxx
-califaData/R3BCalifaCrystalCalDataSim.cxx
 califaData/R3BCalifaMappedData.cxx
 califaData/R3BCalifaHitData.cxx
-califaData/R3BCalifaHitDataSim.cxx
 califaData/R3BCalifaPoint.cxx
 dchData/R3BDchPoint.cxx
 dchData/R3BDchFullPoint.cxx

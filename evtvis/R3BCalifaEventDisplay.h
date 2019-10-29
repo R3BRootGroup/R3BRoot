@@ -6,16 +6,16 @@
 #ifndef R3BCALIFAEVENTDISPLAY_H
 #define R3BCALIFAEVENTDISPLAY_H
 
-#include "FairTask.h"
 #include "FairMCTracks.h"
+#include "FairTask.h"
 
-#include "TEveProjections.h"
-#include "TEveProjectionManager.h"
 #include "TEveCalo.h"
 #include "TEveCaloData.h"
-#include "TEveWindow.h"
-#include "TEveViewer.h"
+#include "TEveProjectionManager.h"
+#include "TEveProjections.h"
 #include "TEveScene.h"
+#include "TEveViewer.h"
+#include "TEveWindow.h"
 
 class TClonesArray;
 class FairEventManager;
@@ -23,10 +23,9 @@ class FairRootManager;
 
 class TH2F;
 
-class R3BCalifaEventDisplay : public FairTask 
+class R3BCalifaEventDisplay : public FairTask
 {
   public:
-
     /** Default constructor **/
     R3BCalifaEventDisplay();
 
@@ -56,56 +55,48 @@ class R3BCalifaEventDisplay : public FairTask
      **/
     void SelectGeometryVersion(Int_t version);
 
-
     /** Accessors **/
 
   protected:
-
     /** Virtual method ReInit **/
     virtual InitStatus ReInit();
 
-    TClonesArray*     fCrystalHitCA;
+    TClonesArray* fCrystalHitCA;
 
     FairEventManager* fEventManager;
-    FairRootManager*  fManager;
+    FairRootManager* fManager;
 
     // Selecting the geometry of the CALIFA calorimeter
     Int_t fGeometryVersion;
-    
+
     TEveCaloDataHist* fDataHist;
-    TEveCalo3D*       fCalo3d;
-    TEveCalo2D*       fCalo2d;
-    TEveCaloLego*     fLego;
+    TEveCalo3D* fCalo3d;
+    TEveCalo2D* fCalo2d;
+    TEveCaloLego* fLego;
 
-    TEveWindowSlot*   slotLeftTop;
-    TEveWindowSlot*   slotLeftBottom;
-    TEveWindowSlot*   slotRightTop;
-    TEveWindowSlot*   slotRightBottom;
-    TEveViewer*       viewerLeftTop;
-    TEveScene*        sceneLeftTop;
-    TEveViewer*       viewerRightTop;
-    TEveScene*        sceneRightTop;
-    TEveViewer*       viewerLeftBottom;
-    TEveScene*        sceneLeftBottom;
-    TEveViewer*       viewerRightBottom;
-    TEveScene*        sceneRightBottom;
-    TEveWindowSlot*   legoSlot;
-    TEveScene*        legoScene;
-    TEveViewer*       legoViewer;
+    TEveWindowSlot* slotLeftTop;
+    TEveWindowSlot* slotLeftBottom;
+    TEveWindowSlot* slotRightTop;
+    TEveWindowSlot* slotRightBottom;
+    TEveViewer* viewerLeftTop;
+    TEveScene* sceneLeftTop;
+    TEveViewer* viewerRightTop;
+    TEveScene* sceneRightTop;
+    TEveViewer* viewerLeftBottom;
+    TEveScene* sceneLeftBottom;
+    TEveViewer* viewerRightBottom;
+    TEveScene* sceneRightBottom;
+    TEveWindowSlot* legoSlot;
+    TEveScene* legoScene;
+    TEveViewer* legoViewer;
 
-    TEveProjectionManager*   fProjManager1;
-    TEveProjectionManager*   fProjManager2;
-	
-    // Flag for simulation
-    Bool_t kSimulation;
-
+    TEveProjectionManager* fProjManager1;
+    TEveProjectionManager* fProjManager2;
 
   private:
-
     /** Data members **/
 
     TH2F* hcalo;
-
 
     /** Private Methods **/
 
@@ -115,9 +106,7 @@ class R3BCalifaEventDisplay : public FairTask
 
     void GetAngles(Int_t geoVersion, Int_t iD, Double_t* polar, Double_t* azimuthal, Double_t* rho);
 
-
-    ClassDef(R3BCalifaEventDisplay,2);
-
+    ClassDef(R3BCalifaEventDisplay, 2);
 };
 
 #endif

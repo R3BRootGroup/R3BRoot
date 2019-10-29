@@ -1,488 +1,284 @@
-#include <vector>
-
-#include <TString.h>
-#include <TSystem.h>
 #include <TFile.h>
 #include <TGeoManager.h>
+#include <TGeoNavigator.h>
 #include <TGeoVolume.h>
 #include <TMath.h>
+#include <TString.h>
+#include <TSystem.h>
 #include <TVector3.h>
-#include <TGeoNavigator.h>
+#include <vector>
 
 #include <FairLogger.h>
 
 #include "R3BCalifaGeometry.h"
-#include <stdexcept>
-#include <cmath>
+
+#include <iostream>
+#include <stdlib.h>
+
+using std::cerr;
+using std::cout;
+using std::endl;
+
 R3BCalifaGeometry* R3BCalifaGeometry::inst = NULL;
 
 R3BCalifaGeometry* R3BCalifaGeometry::Instance(int version)
 {
-  LOG(INFO) << "R3BCalifaGeometry::Init ";
-  if(!inst)
-    inst = new R3BCalifaGeometry(version);
-  else if(inst->fGeometryVersion != version)
-  {
-    LOG(ERROR) << "R3BCalifaGeometry::Instance(): Existing instance with different geometry version than requested. "
-              << "Undefined beheaviour possible!";
+    LOG(DEBUG) << "R3BCalifaGeometry::Instance ";
+    if (!inst)
+        inst = new R3BCalifaGeometry(version);
+    else if (inst->fGeometryVersion != version)
+    {
+        LOG(ERROR)
+            << "R3BCalifaGeometry::Instance(): Existing instance with different geometry version than requested. "
+            << "Undefined beheaviour possible!";
 
-    inst = new R3BCalifaGeometry(version);
-  }
-
-  return inst;
+        inst = new R3BCalifaGeometry(version);
+    }
+    return inst;
 }
 
-R3BCalifaGeometry::R3BCalifaGeometry(int version)  : fGeometryVersion(version), fNavigator(NULL)
+R3BCalifaGeometry::R3BCalifaGeometry()
+    : R3BCalifaGeometry(2020)
 {
-  LOG(DEBUG) << "Creating new R3BCalifaGeometry for version " << version;
-
-  TString geoPath = gSystem->Getenv("VMCWORKDIR");
-  geoPath += "/geometry/";
-
-  switch(version)
-  {
-  case 16:
-    // Barrel 8.11 with displaced crystal centers
-    geoPath += "califa_16_v8.11_cc0.2.geo.root";
-    break;
-
-  case 17:
-    // Barrel 8.11 with crystal centers at (0,0,0) in local system
-    geoPath += "califa_17_v8.11_cc0.2.geo.root";
-    break;
-
-  case 0x438b:
-    // s438b geometry (subset of 8.11 Barrel + rotation)
-    geoPath += "califa_demo.geo.root";
-    break;
-
-  case 444:
-    // s444 geometry
-    geoPath += "califa_s444.geo.root";
-    break;
-
-  default:
-    LOG(ERROR) << "R3BCalifaGeometry: Unsupported geometry version: " << version;
-    return;
-  }
-
-  LOG(INFO) << "R3BCalifaGeometry::Geometry file " <<geoPath;
-
-  if(gGeoManager && strcmp(gGeoManager->GetTopVolume()->GetName(), "cave") == 0)
-  {
-    // Already set up (MC mode)
-    LOG(DEBUG) << "R3BCalifaGeometry: Using existing geometry";
-    return;
-  }
-
-  // Stand alone mode
-  LOG(DEBUG) << "R3BCalifaGeometry: Creating new geometry";
-  TFile *f = new TFile(geoPath, "READ");
-  TGeoVolume *v = dynamic_cast<TGeoVolume*>(f->Get("TOP"));
-  if(!v)
-  {
-    LOG(ERROR) << "R3BCalifaGeometry: Could not open CALIFA geometry file: No TOP volume";
-    return;
-  }
-
-  v->SetName("cave");
-  if(!gGeoManager)
-    gGeoManager = new TGeoManager();
-  gGeoManager->SetTopVolume(v);
-
-  fNavigator = new TGeoNavigator(gGeoManager);
 }
+
+R3BCalifaGeometry::R3BCalifaGeometry(int version)
+    : fGeometryVersion(version)
+{
+    LOG(DEBUG) << "Creating new R3BCalifaGeometry for version " << version;
+
+    TString geoPath = gSystem->Getenv("VMCWORKDIR");
+    geoPath += "/geometry/";
+
+    switch (version)
+    {
+        case 2020:
+            // Full BARREL+iPhos version
+            geoPath += "califa_2020.geo.root";
+            break;
+
+        default:
+            LOG(ERROR) << "R3BCalifaGeometry: Unsupported geometry version: " << version;
+            return;
+    }
+
+    LOG(INFO) << "R3BCalifaGeometry::Geometry file " << geoPath;
+
+    if (gGeoManager && strcmp(gGeoManager->GetTopVolume()->GetName(), "cave") == 0)
+    {
+        // Already set up (MC mode)
+        LOG(DEBUG) << "R3BCalifaGeometry: Using existing geometry";
+        return;
+    }
+
+    // Stand alone mode
+    LOG(DEBUG) << "R3BCalifaGeometry: Creating new geometry";
+    TFile* f = new TFile(geoPath, "READ");
+    TGeoVolume* v = dynamic_cast<TGeoVolume*>(f->Get("TOP"));
+    if (!v)
+    {
+        LOG(ERROR) << "R3BCalifaGeometry: Could not open CALIFA geometry file: No TOP volume";
+        return;
+    }
+
+    v->SetName("cave");
+    if (!gGeoManager)
+        gGeoManager = new TGeoManager();
+    gGeoManager->SetTopVolume(v);
+}
+
+R3BCalifaGeometry::~R3BCalifaGeometry() {}
 
 const TVector3& R3BCalifaGeometry::GetAngles(Int_t iD)
 {
-  /*
-   * People use this on a per hit base, so we should do something quicker than
-   * string building and TDirectory lookup. 
-   */
-  static std::map<int, TVector3> cache;
-  if (cache.count(iD))
-    return cache[iD];
-  const static TVector3 invalid(NAN, NAN, NAN);
-  Double_t local[3]={0,0,0};
-  Double_t master[3];
-  Int_t crystalType = 0;
-  Int_t crystalCopy = 0;
-  Int_t alveolusCopy =0;
-  Int_t crystalInAlveolus=0;
+    Double_t local[3] = { 0, 0, 0 };
+    Double_t master[3];
+    const static TVector3 invalid(NAN, NAN, NAN);
+    TVector3 res;
+    const char* nameVolume;
 
-  //SOLUTION FOR S444 - REDO AFTER EXPERIMENTS
-  if(iD>5000 && iD<6952) iD = iD - 5000; //for double reading crystals
-
-  // the following is horrible, I'm not touching it. --pklenze
-  // also, if you want your indices to start at 1, go use FORTRAN.
- if (fGeometryVersion==16) {
-    //The present scheme here done works with 8.11
-    // crystalType = alveolus type (from 1 to 16) [Alveolus number]
-    // crystalCopy = alveolus copy * 4 + crystals copy +1 (from 1 to 128)
-    // crystalId = 1 to 32 for the first 32 crystals
-    //                     (single crystal in each alveoli)
-    // or 32 + (alveolus type-2)*128 + (alvelous copy)*4 + (crystal copy) + 1
-    //                     (from 1 to 1952)
-    //
-    Char_t nameVolume[200];
-    if (iD<3000) {
-      if(iD<33) crystalType = 1;  //Alv type 1
-      else crystalType = (Int_t)((iD-33)/128) + 2;  //Alv type (2 to 16)
-      if(iD<33) crystalCopy = iD;     //for Alv type 1
-      else crystalCopy = ((iD-33)%128) + 1;         //CrystalCopy (1 to 128)
-      if(iD<33) alveolusCopy = iD;    //Alv type 1
-      else alveolusCopy =(Int_t)(((iD-33)%128)/4) +1; //Alveolus copy (1 to 32)
-      if(iD<33) crystalInAlveolus =1;          //Alv type 1
-      else crystalInAlveolus = (iD-33)%4 + 1;//Crystal number in alveolus (1 to 4)
-
-      Int_t alveoliType[16]={1,2,2,2,2,3,3,4,4,4,5,5,5,6,6,6};
-
-      sprintf(nameVolume,
-	      "/cave_1/CalifaWorld_0/Alveolus_%i_%i/AlveolusInner_%i_1/CrystalWithWrapping_%i_%i_%i/Crystal_%i_%i_1",
-	      crystalType, alveolusCopy-1,
-	      crystalType, alveoliType[crystalType-1],
-	      crystalInAlveolus, crystalInAlveolus-1,
-	      alveoliType[crystalType-1], crystalInAlveolus);
-
-      // The definition of the crystals is different in this particular EndCap design:
-      // the origin for each crystal is the alveoli corner
-      if (crystalType==1) {
-	local[0]=27.108/8; local[1]=-28.0483/8; local[2]=0;
-      } else if (crystalType==2 || crystalType==3 ||
-		 crystalType==4 || crystalType==5) {
-	if(crystalInAlveolus==1){
-	  local[0]=37.4639/8; local[1]=-8.57573/8; local[2]=0;
-	} else if(crystalInAlveolus==2) {
-	  local[0]=37.4639/8; local[1]=-31.1043/8; local[2]=0;
-	} else if(crystalInAlveolus==3) {
-	  local[0]=9.52012/8; local[1]=-8.57573/8; local[2]=0;
-	} else if(crystalInAlveolus==4){
-	  local[0]=9.52012/8; local[1]=-31.1043/8; local[2]=0;
-	}
-      } else if (crystalType==6 || crystalType==7) {
-	if(crystalInAlveolus==1){
-	  local[0]=38.3282/8; local[1]=-5.49819/8; local[2]=0;
-	} else if(crystalInAlveolus==2) {
-	  local[0]=38.3282/8; local[1]=-23.0538/8; local[2]=0;
-	} else if(crystalInAlveolus==3) {
-	  local[0]=8.66384/8; local[1]=-5.49819/8; local[2]=0;
-	} else if(crystalInAlveolus==4){
-	  local[0]=8.66384/8; local[1]=-23.0538/8; local[2]=0;
-	}
-      } else if (crystalType==8 || crystalType==9 || crystalType==10) {
-	if(crystalInAlveolus==1){
-	  local[0]=38.3683/8; local[1]=-4.71618/8; local[2]=0;
-	} else if(crystalInAlveolus==2) {
-	  local[0]=38.3683/8; local[1]=-19.8438/8; local[2]=0;
-	} else if(crystalInAlveolus==3) {
-	  local[0]=8.43569/8; local[1]=-4.71618/8; local[2]=0;
-	} else if(crystalInAlveolus==4){
-	  local[0]=8.43569/8; local[1]=-19.8438/8; local[2]=0;
-	}
-      } else if (crystalType==11 || crystalType==12 || crystalType==13) {
-	if(crystalInAlveolus==1){
-	  local[0]=38.3495/8; local[1]=-4.70373/8; local[2]=0;
-	} else if(crystalInAlveolus==2) {
-	  local[0]=38.3495/8; local[1]=-19.8403/8; local[2]=0;
-	} else if(crystalInAlveolus==3) {
-	  local[0]=8.66654/8; local[1]=-4.70373/8; local[2]=0;
-	} else if(crystalInAlveolus==4){
-	  local[0]=8.66654/8; local[1]=-19.8403/8; local[2]=0;
-	}
-      } else if (crystalType==14 || crystalType==15 || crystalType==16) {
-	if(crystalInAlveolus==1){
-	  local[0]=37.9075/8; local[1]=-4.66458/8; local[2]=0;
-	} else if(crystalInAlveolus==2) {
-	  local[0]=37.9075/8; local[1]=-19.8474/8; local[2]=0;
-	} else if(crystalInAlveolus==3) {
-	  local[0]=9.07247/8; local[1]=-19.8474/8; local[2]=0;
-	} else if(crystalInAlveolus==4){
-	  local[0]=9.07247/8; local[1]=-4.66458/8; local[2]=0;
-	}
-      }
-
-      gGeoManager->CdTop();
-
-      if(gGeoManager->CheckPath(nameVolume)) gGeoManager->cd(nameVolume);
-      else {
-	LOG(ERROR) << "R3BCalifaCrysta2Hit: Invalid crystal path: " << nameVolume;
-	return cache[iD]=invalid;
-      }
-      gGeoManager->LocalToMaster(local, master);
-
-    } else{
-      //For CC iPhos+phoswich endcap
-      crystalType = ((iD - 3000) % 24) + 1;
-      crystalCopy = (iD-3000 - crystalType + 1) / 24 + 1;
-      Int_t alveoliType[24]={1,1,2,2,3,3,4,4,5,6,7,8,9,9,10,10,11,11,12,12,13,13,14,14};
-      //Int_t alveoliType[24]={1,2,3,4,0,0,0,0,5,6,7,8,9,9,10,10,11,11,12,12,13,13,14,14};
-      Int_t wrappingType[24]={1,1,2,2,3,3,4,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
-      //Char_t nameVolume[200];
-
-      sprintf(nameVolume, "/cave_1/CalifaWorld_0/Alveolus_EC_%i_%i/CrystalWithWrapping_%i_1/Crystal_%i_1",
-              alveoliType[crystalType-1], crystalCopy-1, wrappingType[crystalType-1], crystalType);
-      gGeoManager->cd(nameVolume);
-      gGeoManager->LocalToMaster(local, master);
-    }
-  }
-  else if(fGeometryVersion == 17 ||
-          fGeometryVersion == 0x438b ||
-          fGeometryVersion == 444)
-  {
-    const char *nameVolume = GetCrystalVolumePath(iD);
-    if(!nameVolume)
-      return cache[iD]=invalid;
-
-    if(!gGeoManager->cd(nameVolume))
+    if (iD >= 1 && iD <= 2432)
     {
-      LOG(ERROR) << "R3BCalifaGeometry: Invalid volume path: " << nameVolume;
-      return cache[iD]=invalid;
-    }
+        nameVolume = GetCrystalVolumePath(iD);
 
-    // TGeoManager::LocalToMaster does the whole magic:
-    // Local to Master transformation along the whole geometry tree up to the top volume
-    // Note: Requires the crystal centers (reference point) to be at (0,0,0) in local coordinates
-    gGeoManager->LocalToMaster(local, master);
+        gGeoManager->CdTop();
 
-  }
- else
- {
-   LOG(ERROR) << "R3BCalifaGeometry: Geometry version not available in R3BCalifaGeometry::GetAngles(). ";
-   return cache[iD]=invalid;
- }
-
-  return cache[iD]=master;
-}
-
-void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t *polar, Double_t *azimuthal, Double_t* rho)
-{
-  auto& masterV=this->GetAngles(iD);
-  *polar=masterV.Theta();
-  *azimuthal=masterV.Phi();
-  *rho=masterV.Mag();
-  if (std::isnan(*polar) || std::isnan(*azimuthal) || std::isnan(*rho))
-    LOG(ERROR) <<  "R3BCalifaGeometry::GetAngles("<<iD<<",...) returns NaN";
-}
-
-const char * R3BCalifaGeometry::GetCrystalVolumePath(int iD)
-{
-  // Must be static since function returns string
-  // owned by nameVolume, wich must not be destroyed
-  static TString nameVolume;
-
-  Int_t crystalType = 0;
-  Int_t crystalCopy = 0;
-  Int_t alveolusCopy =0;
-  Int_t crystalInAlveolus=0;
-
-
-  switch(fGeometryVersion)
-  {
-    case 16:
-    case 17:
-    case 0x438b:
-    case 444:
-    if (iD >= 1 && iD <= 1952)
-    {
-      // Barrel
-      if(iD<33)
-      {
-        // First ring (single crystals)
-        crystalType = 1;  //Alv type 1
-        crystalCopy = iD;     //for Alv type 1
-        alveolusCopy = iD;    //Alv type 1
-        crystalInAlveolus =1;          //Alv type 1
-      }
-      else
-      {
-        // Ring 2 - 16: 2x2 crystals
-        crystalType = (Int_t)((iD-33)/128) + 2;  //Alv type (2 to 16)
-        crystalCopy = ((iD-33)%128) + 1;         //CrystalCopy (1 to 128)
-        alveolusCopy =(Int_t)(((iD-33)%128)/4) +1; //Alveolus copy (1 to 32)
-        crystalInAlveolus = (iD-33)%4 + 1;//Crystal number in alveolus (1 to 4)
-      }
-      Int_t alveoliType[16]={1,2,2,2,2,3,3,4,4,4,5,5,5,6,6,6};
-
-      nameVolume = TString::Format(
-	      "/cave_1/CalifaWorld_0/Alveolus_%i_%i/AlveolusInner_%i_1/CrystalWithWrapping_%i_%i_%i/Crystal_%i_%i_1",
-	      crystalType, alveolusCopy-1,
-	      crystalType, alveoliType[crystalType-1],
-	      crystalInAlveolus, crystalInAlveolus-1,
-	      alveoliType[crystalType-1], crystalInAlveolus);
-    }
-    else if(iD >= 3000)
-    {
-      //For CC iPhos+phoswich endcap
-      crystalType = ((iD - 3000) % 24) + 1;
-      crystalCopy = (iD-3000 - crystalType + 1) / 24 + 1;
-      Int_t alveoliType[24]={1,1,2,2,3,3,4,4,5,6,7,8,9,9,10,10,11,11,12,12,13,13,14,14};
-      //Int_t alveoliType[24]={1,2,3,4,0,0,0,0,5,6,7,8,9,9,10,10,11,11,12,12,13,13,14,14};
-      Int_t wrappingType[24]={1,1,2,2,3,3,4,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
-      //Char_t nameVolume[200];
-
-      nameVolume = TString::Format("/cave_1/CalifaWorld_0/Alveolus_EC_%i_%i/CrystalWithWrapping_%i_1/Crystal_%i_1",
-              alveoliType[crystalType-1], crystalCopy-1, wrappingType[crystalType-1], crystalType);
-
+        if (gGeoManager->CheckPath(nameVolume))
+            gGeoManager->cd(nameVolume);
+        else
+        {
+            LOG(ERROR) << "R3BCalifaGeometry: Invalid crystal path: " << nameVolume;
+            return invalid;
+        }
+        gGeoManager->LocalToMaster(local, master);
     }
     else
     {
-      LOG(ERROR) << "R3BCalifaGeometry: Invalid crystal ID " << iD << " for geometry version 17";
-      return NULL;
+        LOG(ERROR) << "R3BCalifaGeometry: Invalid crystalId: " << iD;
+        return invalid;
     }
-    break;
 
-    default:
-      LOG(ERROR) << "R3BCalifaGeometry: Invalid geometry version for GetCrystalVolumePath()";
-      return NULL;
-  }
-
-  return nameVolume.Data();
+    return res = master;
 }
 
-double R3BCalifaGeometry::GetDistanceThroughCrystals(TVector3 &startVertex, TVector3 &direction, TVector3 *hitPos, int *numCrystals, int *crystalIds)
+void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal, Double_t* rho)
 {
-  int maxNumCrystals = 0;
-
-  if(numCrystals != NULL && crystalIds != NULL)
-  {
-    maxNumCrystals = *numCrystals;
-    *numCrystals = 0;
-  }
-
-  TGeoNode *n;
-
-  gGeoManager->InitTrack(startVertex.X(), startVertex.Y(), startVertex.Z(),
-      direction.X()/direction.Mag(), direction.Y()/direction.Mag(), direction.Z()/direction.Mag());
-
-  double distance = 0;
-  const Double_t *pos;
-  bool inCrystal = false, wasInCrystal = false;
-  TString nodeName;
-
-  while((n = gGeoManager->FindNextBoundaryAndStep()))
-  {
-    nodeName = n->GetName();
-
-    if(inCrystal)
-      distance += gGeoManager->GetStep();
-
-    inCrystal = nodeName.BeginsWith("Crystal_");
-
-    if(inCrystal && maxNumCrystals != 0)
-    {
-      int cid = GetCrystalId(gGeoManager->GetPath());
-      if(cid != -1 && (*numCrystals == 0 || cid != crystalIds[(*numCrystals)-1]))
-      {
-        crystalIds[(*numCrystals)++] = cid;
-        maxNumCrystals--;
-      }
-    }
-
-    if(hitPos != NULL && inCrystal && !wasInCrystal)
-    {
-      pos = gGeoManager->GetCurrentPoint();
-      hitPos->SetXYZ(pos[0], pos[1], pos[2]);
-      wasInCrystal = true;
-    }
-  }
-
-  return distance;
+    auto& masterV = this->GetAngles(iD);
+    *polar = masterV.Theta();
+    *azimuthal = masterV.Phi();
+    *rho = masterV.Mag();
+    if (std::isnan(*polar) || std::isnan(*azimuthal) || std::isnan(*rho))
+        LOG(ERROR) << "R3BCalifaGeometry::GetAngles(" << iD << ",...) returns NaN";
 }
 
-int R3BCalifaGeometry::GetCrystalId(const char *volumePath)
+const char* R3BCalifaGeometry::GetCrystalVolumePath(int iD)
 {
-  std::vector<const char*> volumeNames;
-  std::vector<int> nodeCopies;
-  TGeoNode *n;
 
-  int crystalId = -1;
+    Int_t alveolusCopy = -1;
+    Int_t alvType = -1;
+    Int_t cryType = -1;
 
-  for(fNavigator->cd(volumePath); (n = fNavigator->GetCurrentNode()) != NULL; fNavigator->CdUp())
-  {
-    volumeNames.push_back(n->GetName());
-    nodeCopies.push_back(n->GetNumber());
-  }
+    // SOLUTION FOR DOUBLE READING CHANNELS
+    if (iD > 5000 && iD < 7432)
+        iD = iD - 5000; // for double reading crystals (crystals from 1 to 2432)
 
-  if (fGeometryVersion==16 || fGeometryVersion==17 || fGeometryVersion==0x438b) {
-    //RESERVED FOR CALIFA 8.11 BARREL + CC 0.2
+    static char nameVolume[200];
 
-    if(volumeNames.size() < 4)
+    if (iD >= 1 && iD <= 2432)
     {
-      LOG(ERROR) << "R3BCalifaGeometry::GetCrystalId(): Invalid path: " << volumePath;
-      return -1;
-    }
-
-    int cp1 = nodeCopies[0];
-    int cpCry = nodeCopies[1];
-    int cpAlv = nodeCopies[2];
-    int cpSupAlv = nodeCopies[3];
-
-    int crystalType, crystalCopy;
-
-    const char *alveolusECPrefix = "Alveolus_EC";
-    const char *alveolusPrefix = "Alveolus";
-    const char *volumeName = volumeNames[3];
-    const char *volumeNameCrystal ="";
-
-    // Workaround to fix the hierarchy difference between Barrel and Endcap
-    if (strncmp("CalifaWorld", volumeName,10) == 0) {
-      volumeName = volumeNames[2];
-      volumeNameCrystal = volumeNames[0];
-    }
-    if (strncmp(alveolusECPrefix, volumeName, 11) == 0) {
-      crystalType = atoi(volumeNameCrystal+8);     //converting to int the crystal index
-      crystalCopy = cpAlv+1;
-
-      if(crystalType < 9 && crystalType%2 == 0) {
-	  crystalType -= 1;
-      }
-      crystalId = 3000 + cpAlv*24 + (crystalType-1);
-
-      if (crystalType>24 || crystalType<1 ||
-	  crystalCopy>32 || crystalCopy<1 ||
-          crystalId<3000 || crystalId>4800)
-      {
-	LOG(ERROR) << "R3BCalifaGeometry: Wrong crystal number in geometryVersion 16+ (CC). "
-		  ;
-        return -1;
-      }
-    //if BARREL
-    } else if (strncmp(alveolusPrefix, volumeName,8) == 0) {
-
-      crystalType = atoi(volumeName+9);//converting to int the alveolus index
-      if (crystalType==1) {
-	//only one crystal per alveoli in this ring, running from 1 to 32
-        crystalCopy = cpSupAlv+1;
-        crystalId = cpSupAlv+1;
-      } else if (crystalType>1 && crystalType<17) {
-	//running from 0*4+0+1=1 to 31*4+3+1=128
-        crystalCopy = cpSupAlv*4+cpCry+1;
-	//running from 32+0*128+0*4+0+1=1 to 32+14*128+31*4+3+1=1952
-        crystalId = 32+(crystalType-2)*128+cpSupAlv*4+cpCry+1;
-      }
-      if (crystalType>16 || crystalType<1 || crystalCopy>128 ||
-	  crystalCopy<1 || crystalId>1952 || crystalId<1)
-      {
-        LOG(ERROR) << "R3BCalifaGeometry: Wrong crystal number in geometryVersion 16+ (BARREL)."
-		  ;
-        return -1;
-      }
+        if (iD < 33)
+        {                          // First ring in BARREL (single crystal per alveolus)
+            alvType = 1;           // Alveolus type 1
+            alveolusCopy = iD - 1; // copy from 0 to 31
+            cryType = 1;           // Only one crystal type (1)
+        }
+        else if (iD < 2337)
+        {                                                                // All 4-crystals alveoli in BARREL and iPhos
+            alvType = (Int_t)((iD - 33) / 128) + 2;                      // Alveolus type (2, ..., 19)
+            alveolusCopy = (Int_t)((iD - 33 - (alvType - 2) * 128) / 4); // copy from 0 to 31
+            cryType = iD - 33 - (alvType - 2) * 128 - alveolusCopy * 4 + 1; // Four crystal types (1,2,3,4)
+        }
+        else
+        {                                                                     // 3-crystals alveoli in iPhos
+            alvType = (Int_t)((iD - 2337) / 24) + 20;                         // Alveolus type (20, 21, 22, 23)
+            alveolusCopy = (Int_t)((iD - 2337 - (alvType - 20) * 24) / 3);    // copy from 0 to 7
+            cryType = iD - 2337 - (alvType - 20) * 24 - alveolusCopy * 3 + 1; // Three crystal types (1,2,3)
+        }
+        char name_Alv[23][3] = { "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12",
+                                 "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23" };
+        sprintf(nameVolume,
+                "/cave_1/CalifaWorld_0/Alveolus_%s_%i/InnerAlv_%s_0/WrapCry_%s_%i_0/Crystal_%s_%i_0",
+                name_Alv[alvType - 1],
+                alveolusCopy,
+                name_Alv[alvType - 1],
+                name_Alv[alvType - 1],
+                cryType,
+                name_Alv[alvType - 1],
+                cryType);
     }
     else
     {
-      LOG(ERROR) << "R3BCalifaGeometry: Impossible crystalType for geometryVersion 16+."
-		     ;
-      return -1;
+        LOG(ERROR) << "R3BCalifaGeometry: Invalid crystalId: " << iD;
     }
-  }
-  else
-  {
-    LOG(ERROR) << "R3BCalifaGeometry: Geometry version not available in R3BCalifaGeometry::GetCrystalId(). "
-		   ;
-    return -1;
-  }
 
-  return crystalId;
+    return nameVolume;
+}
+
+double R3BCalifaGeometry::GetDistanceThroughCrystals(TVector3& startVertex,
+                                                     TVector3& direction,
+                                                     TVector3* hitPos,
+                                                     int* numCrystals,
+                                                     int* crystalIds)
+{
+    int maxNumCrystals = 0;
+
+    if (numCrystals != NULL && crystalIds != NULL)
+    {
+        maxNumCrystals = *numCrystals;
+        *numCrystals = 0;
+    }
+
+    TGeoNode* n;
+
+    gGeoManager->InitTrack(startVertex.X(),
+                           startVertex.Y(),
+                           startVertex.Z(),
+                           direction.X() / direction.Mag(),
+                           direction.Y() / direction.Mag(),
+                           direction.Z() / direction.Mag());
+
+    double distance = 0;
+    const Double_t* pos;
+    bool inCrystal = false, wasInCrystal = false;
+    TString nodeName;
+
+    // find the distance to the next boundary and then extrapolate the current point/direction
+    // with this distance making sure that the boundary was crossed. Finally the goal would be to find the next state
+    // after crossing the boundary
+    while ((n = gGeoManager->FindNextBoundaryAndStep()))
+    {
+        nodeName = n->GetName();
+
+        if (inCrystal)
+            distance += gGeoManager->GetStep();
+
+        // inCrystal = nodeName.BeginsWith("Crystal_");
+        inCrystal = nodeName.BeginsWith("WrapCry_"); // can't enter to Crystal volume
+
+        if (inCrystal && maxNumCrystals != 0)
+        {
+            int cid = GetCrystalId(gGeoManager->GetPath());
+            if (cid != -1 && (*numCrystals == 0 || cid != crystalIds[(*numCrystals) - 1]))
+            {
+                crystalIds[(*numCrystals)++] = cid;
+                maxNumCrystals--;
+            }
+        }
+
+        if (hitPos != NULL && inCrystal && !wasInCrystal)
+        {
+            pos = gGeoManager->GetCurrentPoint();
+            hitPos->SetXYZ(pos[0], pos[1], pos[2]);
+            wasInCrystal = true;
+        }
+    }
+
+    return distance;
+}
+
+int R3BCalifaGeometry::GetCrystalId(const char* volumePath)
+{
+    Int_t crystalId;
+    Int_t cryType = 0;
+    Int_t alvType = atoi(volumePath + 31);      // converting to int the alveolus type
+    Int_t alveolusCopy = atoi(volumePath + 34); // converting to int the alveolus copy
+    if (alveolusCopy < 10)
+        cryType = atoi(volumePath + 76); // converting to int the crystal type
+    else
+        cryType = atoi(volumePath + 77); // converting to int the crystal type
+
+    if (cryType < 1 || cryType > 4 || alvType < 1 || alvType > 23)
+    { // cryType runs from 1 to 4 while alvType runs from 1 to 23
+        LOG(ERROR) << "R3BCalifaGeometry: Wrong crystal numbers (1)";
+        cout << "---- cryType: " << cryType << "   alvType: " << alvType << endl;
+        return 0;
+    }
+
+    if (alvType == 1)
+        crystalId = 1 + alveolusCopy; // first alveoli ring, one crystal per alveolus
+    else if (alvType < 20)
+        crystalId = 33 + (alvType - 2) * 128 + alveolusCopy * 4 + (cryType - 1); // four crystal per alveolus
+    else
+        crystalId = 2337 + (alvType - 20) * 24 + alveolusCopy * 3 + (cryType - 1); // three crystal per alveolus
+
+    if (crystalId < 1 || crystalId > 3432)
+    { // crystalId runs from 1 to 3432
+        LOG(ERROR) << "R3BCalifaGeometry: Wrong crystal numbers (2)";
+        cout << "---- crystalId: " << crystalId << endl;
+        return 0;
+    }
+
+    return crystalId;
 }
 
 ClassImp(R3BCalifaGeometry);
