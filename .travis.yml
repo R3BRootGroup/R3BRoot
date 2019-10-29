@@ -1,58 +1,41 @@
-language: cpp
-os: linux
-compiler: gcc
-dist: xenial
-sudo: required
-env: 
-    - GCC_VERSION=5 FAIRSOFT_VERSION=jun19p1 FAIRROOT_VERSION=18.2.1
-#    - GCC_VERSION=7
-#    - GCC_VERSION=8
-services:
-  - docker
+jobs:
+  include:
+    - name: Code Formatting
+      os: linux
+      dist: xenial
+      language: minimal
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-xenial-8
+          packages:
+            - clang-format-8
+      script:
+        - ./travis-clang-format-check.sh clang-format-8
 
-before_install:
-    - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y;
-    - sudo apt-get update -q;
-    - sudo apt-get install -y wget;
-    - 'if [ "$GCC_VERSION" -ne "5" ]; then
-        sudo apt-get install -y gcc-$GCC_VERSION gfortran-$GCC_VERSION g++-$GCC_VERSION;
-      fi'
-    - wget https://www.r3broot.gsi.de/system/files/fairroot_${FAIRROOT_VERSION}_${FAIRSOFT_VERSION}_ubuntu.tar.gz;
-    - gunzip fairroot_${FAIRROOT_VERSION}_${FAIRSOFT_VERSION}_ubuntu.tar.gz;
-    - docker load --input fairroot_${FAIRROOT_VERSION}_${FAIRSOFT_VERSION}_ubuntu.tar;
-
-install:
-
-before_script:
- -  cd $HOME
- -  mkdir container
- -  cd container
- -  echo "FROM fairroot:${FAIRROOT_VERSION}_${FAIRSOFT_VERSION}_ubuntu" > Dockerfile
- -  echo "MAINTAINER Dmytro Kresan <d.kresan@gsi.de>" >> Dockerfile
- -  echo "ENTRYPOINT cd /root/R3BRoot && git clone https://github.com/R3BRootGroup/macros.git && \\" >> Dockerfile
- -  echo "cd macros && git checkout dev && cd /root && \\" >> Dockerfile
- -  echo "echo 'export LINUX_FLAVOUR=Ubuntu-16.04\n\\" >> Dockerfile
- -  echo "export FAIRSOFT_VERSION=${FAIRSOFT_VERSION}\n\\" >> Dockerfile
- -  echo "export FAIRROOT_VERSION=v${FAIRROOT_VERSION}\n\\" >> Dockerfile
- -  echo "export SIMPATH=/root/FairSoft/\${FAIRSOFT_VERSION}/build\n\\" >> Dockerfile
- -  echo "export FAIRROOTPATH=/root/FairRoot/\${FAIRROOT_VERSION}/install\n\\" >> Dockerfile
- -  echo "export GIT_BRANCH=${TRAVIS_COMMIT}\n\\" >> Dockerfile
- -  echo "export BUILDDIR=/tmp/r3broot/build_r3b_experimental_\${FAIRSOFT_VERSION}_\${FAIRROOT_VERSION}\n\\" >> Dockerfile
- -  echo "export SOURCEDIR=/root/R3BRoot\n\\" >> Dockerfile
- -  echo "export UCESB_DIR=/root/Ucesb/ucesb\n\\" >> Dockerfile
- -  echo "export PATH=/root/FairSoft/\${FAIRSOFT_VERSION}/build/bin:$PATH' > Dart.cfg && \\" >> Dockerfile
- -  echo "/root/R3BRoot/Dart.sh Experimental /root/Dart.cfg" >> Dockerfile
- - cat Dockerfile
- - docker build -t r3broot:${TRAVIS_COMMIT} .
- - cd $HOME
-
-script:
-    - docker run -v $HOME/build/R3BRootGroup/R3BRoot:/root/R3BRoot r3broot:${TRAVIS_COMMIT}
+    - name: Build and Test
+      os: linux
+      dist: xenial
+      language: minimal
+      services:
+        - docker
+      env:
+        - FAIRSOFT_VERSION=jun19p1
+        - FAIRROOT_VERSION=18.2.1
+      before_install:
+        - curl -O https://www.r3broot.gsi.de/system/files/fairroot_${FAIRROOT_VERSION}_${FAIRSOFT_VERSION}_ubuntu.tar.gz
+        - docker load --input fairroot_${FAIRROOT_VERSION}_${FAIRSOFT_VERSION}_ubuntu.tar.gz
+      before_script:
+        - cd $HOME && mkdir container && cd container
+        - ${TRAVIS_BUILD_DIR}/travis-generate-dockerfile.sh | tee Dockerfile
+        - docker build -t r3broot:${TRAVIS_COMMIT} .
+        - cd $HOME
+      script:
+        - docker run -v $HOME/build/R3BRootGroup/R3BRoot:/root/R3BRoot r3broot:${TRAVIS_COMMIT}
 
 notifications:
-    email:
-        recipients:
-#            - Va.Wagner@gsi.de
-            - D.Kresan@gsi.de
-        on_success: always
-        on_failure: always
+  email:
+    recipients:
+      - D.Kresan@gsi.de
+    on_success: always
+    on_failure: always
