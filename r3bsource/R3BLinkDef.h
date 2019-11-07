@@ -41,6 +41,7 @@
 #pragma link C++ class R3BStrawtubesReader+;
 #pragma link C++ class R3BStartrackReader+;
 #pragma link C++ class R3BAmsReader+;
+#pragma link C++ class R3BMusicReader+;
 //#pragma link C++ class R3BFib4Reader+;
 
 #pragma link C++ class EXT_STR_h101_unpack_t;
@@ -78,4 +79,5 @@
 #pragma link C++ class EXT_STR_h101_WRMASTER_onion_t;
 #pragma link C++ class EXT_STR_h101_WRCALIFA_onion_t;
 #pragma link C++ class EXT_STR_h101_WRAMS_onion_t;
+#pragma link C++ class EXT_STR_h101_MUSIC_onion_t;
 #endif

@@ -26,6 +26,7 @@ ${R3BROOT_SOURCE_DIR}/psp/par
 ${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
 ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
+${R3BROOT_SOURCE_DIR}/r3bdata/musicData
 )
 
 set(LINK_DIRECTORIES
@@ -79,6 +80,7 @@ R3BNeulandTacquilaReader.cxx
 R3BStrawtubesReader.cxx
 R3BStartrackReader.cxx
 R3BAmsReader.cxx
+R3BMusicReader.cxx
 #R3BFib4Reader.cxx
 )
 
@@ -121,6 +123,7 @@ ext_h101_strawtubes.h
 ext_h101_star.h
 ext_h101_fibfour.h
 ext_h101_ams.h
+ext_h101_music.h
 )
 
 # fill list of header files from list of source files
