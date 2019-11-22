@@ -2,12 +2,12 @@
 #define R3BMUSICREADER_H
 
 #include "R3BReader.h"
-#include "TClonesArray.h"
 
-#define NUM_MUSIC_ANODES 9
+class TClonesArray;
 
-// anodes 1 to 8 : energy and time
-// anode 9 : reference time
+#define NUM_MUSIC_ANODES 10
+// anodes 0 to 7 : energy and time
+// anode 8 and 9 : reference times
 
 struct EXT_STR_h101_MUSIC_t;
 typedef struct EXT_STR_h101_MUSIC_t EXT_STR_h101_MUSIC;
@@ -26,12 +26,15 @@ class R3BMusicReader : public R3BReader
     Bool_t Read();
     void Reset();
 
+    /** Accessor to select online mode **/
+    void SetOnline(Bool_t option) { fOnline = option; }
+
+  private:
+    Bool_t ReadData201911();
     uint32_t multPerAnode[NUM_MUSIC_ANODES];
 
-  private:
-    Bool_t ReadData(EXT_STR_h101_MUSIC_onion*);
-
-  private:
+    // Don't store data for online
+    Bool_t fOnline;
     /* Reader specific data structure from ucesb */
     EXT_STR_h101_MUSIC* fData;
     /* Data offset */

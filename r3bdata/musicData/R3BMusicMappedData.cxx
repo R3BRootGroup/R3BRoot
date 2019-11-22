@@ -14,7 +14,7 @@ R3BMusicMappedData::R3BMusicMappedData()
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-R3BMusicMappedData::R3BMusicMappedData(UChar_t anodeID, UShort_t time, UShort_t energy)
+R3BMusicMappedData::R3BMusicMappedData(UShort_t anodeID, UShort_t time, UShort_t energy)
     : fAnodeID(anodeID)
     , fTime(time)
     , fEnergy(energy)
