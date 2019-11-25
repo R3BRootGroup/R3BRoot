@@ -232,12 +232,26 @@ InitStatus R3BMusicOnlineSpectra::Init()
     fh2_Musmap_multhit->GetYaxis()->SetTitleSize(0.045);
     fh2_Musmap_multhit->Draw("col");
 
+    TCanvas* cMus_TRef_TTrigger = new TCanvas("Mus_DRefTrigger", "MUSIC: TRef-TTrigger", 10, 10, 800, 700);
+    fh1_Mus_treftrigger = new TH1F("fh1_Mus_tref-ttrigger", "Music: TRef-TTrigger", 1000, -30000, 30000);
+    fh1_Mus_treftrigger->GetXaxis()->SetTitle("Anode");
+    fh1_Mus_treftrigger->GetYaxis()->SetTitle("Counts");
+    fh1_Mus_treftrigger->GetYaxis()->SetTitleOffset(1.1);
+    fh1_Mus_treftrigger->GetXaxis()->CenterTitle(true);
+    fh1_Mus_treftrigger->GetYaxis()->CenterTitle(true);
+    fh1_Mus_treftrigger->GetXaxis()->SetLabelSize(0.045);
+    fh1_Mus_treftrigger->GetXaxis()->SetTitleSize(0.045);
+    fh1_Mus_treftrigger->GetYaxis()->SetLabelSize(0.045);
+    fh1_Mus_treftrigger->GetYaxis()->SetTitleSize(0.045);
+    fh1_Mus_treftrigger->Draw("");
+
     // MAIN FOLDER-Music
     TFolder* mainfolMus = new TFolder("MUSIC", "MUSIC info");
     mainfolMus->Add(cMusMap_E);
     mainfolMus->Add(cMusMap_DT);
     mainfolMus->Add(cMus_Mult);
     mainfolMus->Add(cMus_Multhit);
+    mainfolMus->Add(cMus_TRef_TTrigger);
     mainfolMus->Add(cMusMap_ESum);
     mainfolMus->Add(cMusMap_ESum1);
     mainfolMus->Add(cMusMap_ESum2);
@@ -265,6 +279,7 @@ void R3BMusicOnlineSpectra::Reset_Histo()
     fh1_Mus_ESum[2]->Reset();
     fh2_Mus_ESum->Reset();
     fh1_Musmap_mult->Reset();
+    fh1_Mus_treftrigger->Reset();
     fh2_Musmap_multhit->Reset();
 }
 
@@ -277,15 +292,13 @@ void R3BMusicOnlineSpectra::Exec(Option_t* option)
     // Fill mapped data
     if (fMappedItemsMus && fMappedItemsMus->GetEntriesFast())
     {
-        Double_t e1 = 0., e2 = 0., E[NbAnodesMus];
+        Double_t e1 = 0., e2 = 0.;
         Double_t n1 = 0., n2 = 0.;
         for (Int_t i = 0; i < NbAnodesMus; i++)
-            E[i] = 0.; // mult=1 !!!
-        Double_t DT[NbAnodesMus + 2];
-        Int_t multhit[NbAnodesMus + 2];
-        for (Int_t i = 0; i < NbAnodesMus + 1; i++)
+            fE[i] = 0.; // mult=1 !!!
+        for (Int_t i = 0; i < NbAnodesMus + 2; i++)
         {
-            DT[i] = 0.; // mult=1 !!!
+            fT[i] = 0.; // mult=1 !!!
             multhit[i] = 0;
         }
         Int_t nHits = fMappedItemsMus->GetEntriesFast();
@@ -298,38 +311,42 @@ void R3BMusicOnlineSpectra::Exec(Option_t* option)
             if (hit->GetAnodeID() < NbAnodesMus)
                 fh1_Musmap_E[hit->GetAnodeID()]->Fill(hit->GetEnergy());
             fh1_Musmap_mult->Fill(hit->GetAnodeID());
-            if (E[hit->GetAnodeID()] == 0)
-                E[hit->GetAnodeID()] = hit->GetEnergy(); // mult=1 !!!
-            if (DT[hit->GetAnodeID()] == 0)
-                DT[hit->GetAnodeID()] = hit->GetTime(); // mult=1 !!!
+            if (fE[hit->GetAnodeID()] == 0)
+                fE[hit->GetAnodeID()] = hit->GetEnergy(); // mult=1 !!!
+            if (fT[hit->GetAnodeID()] == 0)
+                fT[hit->GetAnodeID()] = hit->GetTime(); // mult=1 !!!
 
-            if (hit->GetAnodeID() < 4)
+            if (hit->GetAnodeID() < NbAnodesMus / 2)
             {
                 e1 = e1 + hit->GetEnergy();
                 n1++;
             }
-            else
+            else if (hit->GetAnodeID() < NbAnodesMus)
             {
                 e2 = e2 + hit->GetEnergy();
                 n2++;
             }
         }
 
-        for (Int_t i = 0; i < NbAnodesMus; i++)
-        {
-            fh1_Musmap_DT[i]->Fill(DT[i] - DT[NbAnodesMus]);
-            if (i < 4)
-                fh2_Mus_EneRawVsDriftTime[i]->Fill(E[i], DT[i] - DT[NbAnodesMus]);
-            else
-                fh2_Mus_EneRawVsDriftTime[i]->Fill(E[i], DT[i] - DT[NbAnodesMus + 1]);
-        }
+        fh1_Mus_treftrigger->Fill(fT[NbAnodesMus] - fT[NbAnodesMus + 1]);
+
         for (Int_t i = 0; i < NbAnodesMus + 2; i++)
             fh2_Musmap_multhit->Fill(i, multhit[i]);
 
-        fh1_Mus_ESum[0]->Fill(e1 / n1);
-        fh1_Mus_ESum[1]->Fill(e2 / n2);
-        fh1_Mus_ESum[2]->Fill((e1 + e2) / (n1 + n2));
-        fh2_Mus_ESum->Fill(e1 / n1, e2 / n2);
+        // Fill data only if there are trigger and TREF signal
+        if (multhit[NbAnodesMus] == 1 && multhit[NbAnodesMus + 1] == 1)
+        {
+            for (Int_t i = 0; i < NbAnodesMus; i++)
+            {
+                fh1_Musmap_DT[i]->Fill(fT[i] - fT[NbAnodesMus]);
+                fh2_Mus_EneRawVsDriftTime[i]->Fill(fE[i], fT[i] - fT[NbAnodesMus]);
+            }
+
+            fh1_Mus_ESum[0]->Fill(e1 / n1);
+            fh1_Mus_ESum[1]->Fill(e2 / n2);
+            fh1_Mus_ESum[2]->Fill((e1 + e2) / (n1 + n2));
+            fh2_Mus_ESum->Fill(e1 / n1, e2 / n2);
+        }
     }
 
     fNEvents += 1;
@@ -356,6 +373,7 @@ void R3BMusicOnlineSpectra::FinishTask()
         fh1_Mus_ESum[2]->Write();
         fh2_Mus_ESum->Write();
         fh1_Musmap_mult->Write();
+        fh1_Mus_treftrigger->Write();
         fh2_Musmap_multhit->Write();
     }
 }

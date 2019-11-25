@@ -89,6 +89,8 @@ class R3BMusicOnlineSpectra : public FairTask
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header.      */
     Int_t fNEvents;         /**< Event counter.     */
+    Double_t fE[NbAnodesMus], fT[NbAnodesMus + 2];
+    Int_t multhit[NbAnodesMus + 2];
 
     // Canvas
     TCanvas* cMusMap_E;
@@ -99,6 +101,7 @@ class R3BMusicOnlineSpectra : public FairTask
     // Histograms for Mapped data
     TH1F* fh1_Musmap_mult;
     TH2F* fh2_Musmap_multhit;
+    TH1F* fh1_Mus_treftrigger;
     TH1F* fh1_Musmap_E[NbAnodesMus];
     TH1F* fh1_Musmap_DT[NbAnodesMus];
     TH1F* fh1_Mus_ESum[3];
