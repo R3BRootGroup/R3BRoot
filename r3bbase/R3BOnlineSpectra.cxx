@@ -1,3 +1,4 @@
+
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -2462,24 +2463,19 @@ void R3BOnlineSpectra::Exec(Option_t* option)
     {
         UInt_t mult_x[N_PSPX];
         UInt_t mult_y[N_PSPX];
-
         UInt_t channel_x[N_PSPX][N_STRIPS_PSPX * 2];
         UInt_t channel_y[N_PSPX][N_STRIPS_PSPX * 2];
-
         for (UInt_t i = 0; i < N_PSPX; i++)
         {
             mult_x[i] = 0;
             mult_y[i] = 0;
-
             for (UInt_t j = 0; j < N_STRIPS_PSPX * 2; j++)
             {
                 channel_x[i][j] = 0;
                 channel_y[i][j] = 0;
             }
         }
-
         Int_t nHits = fMappedItems.at(DET_PSPX)->GetEntriesFast();
-
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             R3BPspxMappedData* mappedData = (R3BPspxMappedData*)fMappedItems.at(DET_PSPX)->At(ihit);
@@ -2499,14 +2495,12 @@ void R3BOnlineSpectra::Exec(Option_t* option)
                 mult_x[i]++;
             }
         }
-
         for (UInt_t i = 0; i < N_PSPX; i++)
         {
             // LOG(INFO) << "Test3 " << i << " " << mult_x[i] << " " << mult_y[i];
             fh_pspx_multiplicity_x[i]->Fill(mult_x[i]);
             fh_pspx_multiplicity_y[i]->Fill(mult_y[i]);
             // LOG(INFO) << "Test4 " << fh_pspx_multiplicity_x[i]->GetBinContent(1);
-
             std::vector<int> v_ch_x, v_ch_y;
             for (Int_t j = 0; j < mult_x[i]; j++)
             {
@@ -2533,22 +2527,18 @@ void R3BOnlineSpectra::Exec(Option_t* option)
                     // //without inverted axis => wrong orientation y axis
                 }
             }
-
             // std::cout << "x: " << mult_x[i] << ", " << (channel_x[i][0]+1)/2 << endl;
             // std::cout << "y: " << mult_y[i] << ", " << -((int)channel_y[i][0]+1)/2 + 3 * N_STRIPS_PSPX + 1<< endl;
-
             for (Int_t j = 0; j < mult_x[i]; j++)
             {
                 fh_pspx_channel_x[i]->Fill(channel_x[i][j]);
             }
-
             for (Int_t j = 0; j < mult_y[i]; j++)
             {
                 fh_pspx_channel_y[i]->Fill(channel_y[i][j]);
             }
         }
     }
-
     if (fCalItems.at(DET_PSPX))
     {
         Int_t energy_front[N_PSPX];
@@ -2556,7 +2546,6 @@ void R3BOnlineSpectra::Exec(Option_t* option)
         Int_t mult_front[N_PSPX];
         Int_t mult_back[N_PSPX];
         Int_t num_strip[50][N_PSPX];
-
         for (UInt_t i = 0; i < N_PSPX; i++)
         {
             energy_front[i] = 0;
@@ -2564,17 +2553,13 @@ void R3BOnlineSpectra::Exec(Option_t* option)
             mult_front[i] = 0;
             mult_back[i] = 0;
         }
-
         Int_t nHits = fCalItems.at(DET_PSPX)->GetEntriesFast();
-
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             for (UInt_t i = 0; i < N_PSPX; i++)
             {
                 R3BPspxCalData* calData = (R3BPspxCalData*)fCalItems.at(DET_PSPX)->At(ihit);
-
                 num_strip[ihit][i] = calData->GetStrip();
-
                 if (calData->GetDetector() == i + 1 && calData->GetStrip() > N_STRIPS_PSPX &&
                     calData->GetStrip() < N_STRIPS_PSPX * 2 + 1)
                 {
@@ -2587,22 +2572,18 @@ void R3BOnlineSpectra::Exec(Option_t* option)
                     energy_front[i] += (calData->GetEnergy1() + calData->GetEnergy2());
                     mult_front[i]++;
                 }
-
                 //     cout<<"Num strips: "<<nHits<<", "<<ihit<<", "<<i<<", "<<calData->GetStrip()<<",
                 //     "<<energy_back[i]<<endl;
             }
         }
-
         // if(mult_front[1] > 0) cout<<"PSPx mult: "<<num_strip[0]<<"; "<<num_strip[1]<<endl;
         // Interstrip position of PSP1
         if (((mult_back[0] == 2 && mult_front[0] == 1) && abs(energy_back[0]) < 380000) ||
             ((mult_back[0] == 1 && mult_front[0] == 2) && abs(energy_front[0]) < 380000))
         {
         }
-
         for (UInt_t i = 0; i < N_PSPX; i++)
         {
-
             if (i != 2 && i != 3)
             {
                 fh_pspx_cal_energy_frontback[i]->Fill(energy_front[i], energy_back[i]);
@@ -2617,13 +2598,11 @@ void R3BOnlineSpectra::Exec(Option_t* option)
     if (fHitItems.at(DET_PSPX))
     {
         Int_t nHits = fHitItems.at(DET_PSPX)->GetEntriesFast();
-
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
             {
                 R3BPspxHitData* hitData = (R3BPspxHitData*)fHitItems.at(DET_PSPX)->At(ihit);
-
                 if (hitData->GetDetector() == i * 2 + 1)
                 {
                     etrue[i] = 0;
@@ -2633,21 +2612,16 @@ void R3BOnlineSpectra::Exec(Option_t* option)
                         etrue[1] = 1;
                     if (i == 2 && hitData->GetEnergy() > 380000 && hitData->GetEnergy() < 405000)
                         etrue[2] = 1;
-
                     etrue[i] = 1;
                     if (etrue[i] == 1)
                     {
                         fh_pspx_hit_multi[i]->Fill(hitData->GetXMultiplicity(), hitData->GetYMultiplicity());
                         fh_pspx_hit_energy[i]->Fill(hitData->GetEnergy());
-
                         if ((hitData->GetXMultiplicity() == 4 && hitData->GetYMultiplicity() == 2) ||
                             (hitData->GetXMultiplicity() == 2 && hitData->GetYMultiplicity() == 4))
                         {
-
                             fh_pspx_hit_position[i]->Fill(hitData->GetX(), hitData->GetY());
-
                             if(hitData->GetDetector() == 1 ){//&& hitData->GetX() > -5 && hitData->GetX() < 5){
-
                              fh_los_pos_MCFD->Fill(xV_cm[0],yV_cm[0]);
                              fh_los_pos_TAMEX->Fill(xT_cm[0],yT_cm[0]);
                              fh_los_pos_ToT->Fill(xToT_cm[0],yToT_cm[0]);
@@ -2771,5 +2745,3 @@ void R3BOnlineSpectra::FinishTask()
         }
     }
 }
-
-ClassImp(R3BOnlineSpectra)

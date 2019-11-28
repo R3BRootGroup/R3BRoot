@@ -34,6 +34,8 @@ class TH1F;
 class TH2F;
 class R3BEventHeader;
 
+#define N_PSPX 6
+
 /**
  * This taks reads all detector data items and plots histograms
  * for online checks.
