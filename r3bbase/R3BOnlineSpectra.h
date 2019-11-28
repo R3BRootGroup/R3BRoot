@@ -22,9 +22,10 @@
 #define N_PLANE_MAX_TOFD 4
 #define N_PADDLE_MAX_TOFD 50
 #define N_PADDLE_MAX_PTOF 100
-#define N_PSPX 6
+#define N_PSPX 2
 #define N_STRIPS_PSPX 32
 #define N_FIBER_PLOT 1050 // range to plot
+#define PSPX_SPLITTER 0 //sstorck: set this variable to 1 if signals are split into energy and position readout
 
 #include "FairTask.h"
 #include <array>
@@ -336,11 +337,16 @@ class R3BOnlineSpectra : public FairTask
     TH1F* fh_pspx_channel_y[N_PSPX];      /**< PSPX y channel profile on mapped level */
     TH1F* fh_pspx_multiplicity_x[N_PSPX]; /**< PSPX x multiplicity on mapped level */
     TH1F* fh_pspx_multiplicity_y[N_PSPX]; /**< PSPX y multiplicity on mapped level */
+    TH1F* fh_pspx_mapped_energy[N_PSPX];  /**< PSPX energy on mapped level as first check */
 
     TH2F* fh_pspx_strips_position[N_PSPX];        /**< PSPX 2D position on mapped level */
-    TH2F* fh_pspx_hit_position[(N_PSPX + 1) / 2]; /**< PSPX 2D position on hit level */
+    TH2F* fh_pspx_hit_position[N_PSPX]; /**< PSPX 2D position on hit level */
+    TH2F* fh_pspx12_strips_position_corr_x; // correlation between x1 vs x2 
+    TH2F* fh_pspx12_strips_position_corr_y; // and y1 vs y2, ONLY valid for 2 detectors at the moment
+    TH2F* fh_pspx12_cal_energy_corr; // correlation between en1 und en2
 
-    TH1F* fh_pspx_hit_energy[(N_PSPX + 1) / 2]; /**< PSPX energy on hit level */
+    TH1F* fh_pspx_hit_energy[N_PSPX];           /**< PSPX energy on hit level */
+
     TH2F* fh_pspx_cal_energy_frontback[N_PSPX]; /**< PSPX energy front vs back on cal level */
     TH2F* fh_pspx_hit_multi[(N_PSPX + 1) / 2];
 

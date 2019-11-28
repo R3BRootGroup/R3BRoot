@@ -22,8 +22,8 @@
 #define N_PLANE_MAX_TOFD 4
 #define N_PADDLE_MAX_TOFD 50
 #define N_PADDLE_MAX_PTOF 100
-#define N_PSPX 6
 #define N_FIBER_PLOT 1050 // range to plot
+#define N_PSPX 2 
 
 #include "FairTask.h"
 #include <array>

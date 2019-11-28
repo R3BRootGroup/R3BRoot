@@ -58,9 +58,10 @@ using namespace std;
 
 R3BPspxOnlineSpectra::R3BPspxOnlineSpectra()
     : FairTask("PspOnlineSpectra", 1)
-    , fPrecalItemsPspx()
-    , fHitItemsPspx()
     , fMappedItemsPspx()
+    , fPrecalItemsPspx()
+    , fCalItemsPspx()
+    , fHitItemsPspx()
     , fTrigger(-1)
     , fNEvents(0)
 {
@@ -68,8 +69,9 @@ R3BPspxOnlineSpectra::R3BPspxOnlineSpectra()
 
 R3BPspxOnlineSpectra::R3BPspxOnlineSpectra(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fCalItemsPspx()
+    , fMappedItemsPspx()
     , fPrecalItemsPspx()
+    , fCalItemsPspx()
     , fHitItemsPspx()
     , fTrigger(-1)
     , fNEvents(0)
@@ -96,30 +98,32 @@ InitStatus R3BPspxOnlineSpectra::Init()
     //
     // PSPX detector
     // get access to data
-    for (Int_t d = 0;; d++)
+    const char c_xy[2] = { 'x', 'y' }; // orientation of detector face
+    // LOG(INFO) << "TEST ---- " << N_PSPX;
+
+    for (Int_t d = 0; d < N_PSPX; d++)
     {
         for (Int_t f = 0; f < 2; f++)
         {
-            fMappedItemsPspx.push_back((TClonesArray*)mgr->GetObject(Form("Pspx%d_%dMapped", d + 1, f + 1)));
-            fPrecalItemsPspx.push_back((TClonesArray*)mgr->GetObject(Form("Pspx%d_%dPrecal", d + 1, f + 1)));
-            fCalItemsPspx.push_back((TClonesArray*)mgr->GetObject(Form("Pspx%d_%dCal", d + 1, f + 1)));
-            fHitItemsPspx.push_back((TClonesArray*)mgr->GetObject(Form("Pspx%d_%dHit", d + 1, f + 1)));
+            fMappedItemsPspx.push_back((TClonesArray*)mgr->GetObject(Form("Pspx%d_%cMapped", d + 1, c_xy[f])));
+            fPrecalItemsPspx.push_back((TClonesArray*)mgr->GetObject(Form("Pspx%d_%cPrecal", d + 1, c_xy[f])));
+            fCalItemsPspx.push_back((TClonesArray*)mgr->GetObject(Form("Pspx%d_%cCal", d + 1, c_xy[f])));
+            fHitItemsPspx.push_back((TClonesArray*)mgr->GetObject(Form("Pspx%d_%cHit", d + 1, c_xy[f])));
         }
 
         if (fMappedItemsPspx[0] == NULL)
         {
-            printf("Couldn't get handle on PSPX mapped items\n");
+            printf("R3BPspxOnlineSpectra: Couldn't get handle on PSPX mapped items\n");
             return kFATAL;
         }
     }
     Int_t mappedSize = fMappedItemsPspx.size();
+    // LOG(INFO) << "TEST 2 ---- " << fMappedItemsPspx.size();
     Int_t precalSize = fPrecalItemsPspx.size();
     Int_t calSize = fCalItemsPspx.size();
     Int_t hitSize = fHitItemsPspx.size();
 
     Int_t Emax = 500000;
-
-    // LOG(INFO) << "Init MappedPspx";
 
     std::string xy[2] = { "x", "y" };
     // std::string ep[2] = {"Energy","Position"};
@@ -130,8 +134,13 @@ InitStatus R3BPspxOnlineSpectra::Init()
     fh_pspx_strip_2.resize(mappedSize);
     fh_pspx_energy_strip_2.resize(mappedSize);
 
+    fh_pspx_cal_strip_frontback.resize(calSize);
+    fh_pspx_cal_pos_frontback.resize(calSize);
+    fh_pspx_cal_energy_frontback.resize(calSize);
+
     // Create histograms
     // Mapped level
+
     for (UInt_t i = 0; i < mappedSize; i++)
     {
         histoName = "pspx_" + std::to_string((i / 2) + 1) + "_" + xy[i % 2] + "_multiplicity";
@@ -156,7 +165,7 @@ InitStatus R3BPspxOnlineSpectra::Init()
     }
 
     // Cal level
-    for (UInt_t i = 0; i < calSize / 4; i++)
+    for (UInt_t i = 0; i < calSize / 2; i++)
     {
         histoName = "pspx_" + std::to_string(i + 1) + "_cal_strip_frontback";
         histoTitle = "Pspx " + std::to_string(i + 1) + ": " + xy[i % 2] + " Cal Strip;XStrip;YStrip";
@@ -226,7 +235,7 @@ InitStatus R3BPspxOnlineSpectra::Init()
 
 void R3BPspxOnlineSpectra::Reset_PSPX_Histo()
 {
-    for (UInt_t i = 0; i < fMappedItemsPspx.size(); i++)
+    for (UInt_t i = 0; i < N_PSPX; i++)
     {
         fh_pspx_multiplicity[i]->Reset();
         fh_pspx_strip_1[i]->Reset();
@@ -256,7 +265,7 @@ void R3BPspxOnlineSpectra::Exec(Option_t* option)
     // PSPX
     //----------------------------------------------------------------------
 
-    for (UInt_t d = 0; d < fMappedItemsPspx.size(); d++)
+    for (UInt_t d = 0; d < N_PSPX; d++)
     {
         Int_t nHits = fMappedItemsPspx[d]->GetEntriesFast();
         fh_pspx_multiplicity[d]->Fill(nHits);
@@ -301,7 +310,8 @@ void R3BPspxOnlineSpectra::FinishTask()
 
     // LOG(INFO) << "Finish MappedPspx";
 
-    for (UInt_t i = 0; i < fMappedItemsPspx.size(); i++)
+    // for (UInt_t i = 0; i < fMappedItemsPspx.size(); i++)
+    for (UInt_t i = 0; i < N_PSPX; i++)
     {
         fh_pspx_multiplicity[i]->Write();
         fh_pspx_strip_1[i]->Write();

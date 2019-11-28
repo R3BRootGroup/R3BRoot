@@ -104,7 +104,7 @@ InitStatus R3BPspxCal2Hit::Init()
 
         for (Int_t f = 0; f < 2; f++)
         {
-            tmp[f] = (TClonesArray*)fMan->GetObject(Form("Pspx%d_%dCal", d + 1, xy[f])); // = branch name in TTree
+            tmp[f] = (TClonesArray*)fMan->GetObject(Form("Pspx%d_%cCal", d + 1, xy[f])); // = branch name in TTree
         }
         if (tmp[0] == NULL && tmp[1] == NULL)
         {
@@ -120,7 +120,7 @@ InitStatus R3BPspxCal2Hit::Init()
             fCalItems.push_back(tmp[f]);
             fHitItems.push_back(new TClonesArray("R3BPspxHitData"));
             FairRootManager::Instance()->Register(
-                Form("Pspx%d_%dHit", d + 1, xy[f]), Form("Pspx%d_%d", d + 1, xy[f]), fHitItems.back(), kTRUE);
+                Form("Pspx%d_%cHit", d + 1, xy[f]), Form("Pspx%d_%c", d + 1, xy[f]), fHitItems.back(), kTRUE);
         }
     }
 
@@ -166,11 +166,15 @@ InitStatus R3BPspxCal2Hit::ReInit()
 
 void R3BPspxCal2Hit::Exec(Option_t* option)
 {
+    const char xy[2] = { 'x', 'y' }; // orientation of detector face
     for (Int_t d = 0; d < fCalItems.size(); d++)
     {
         if (!fCalItems[d])
         {
-            printf("Cannot access PSPX%d_%d cal items\n", (d / 2) + 1, (d % 2) + 1);
+            for (Int_t f = 0; f < 2; f++)
+            {
+                printf("Cannot access PSPX%d_%c cal items\n", (d / 2) + 1, xy[f]);
+            }
             return;
         }
         Int_t nCal = fCalItems[d]->GetEntries();

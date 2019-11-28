@@ -89,7 +89,7 @@ InitStatus R3BPspxPrecal2Cal::Init()
 
         for (Int_t f = 0; f < 2; f++)
         {
-            tmp[f] = (TClonesArray*)fMan->GetObject(Form("Pspx%d_%dPrecal", d + 1, xy[f])); // = branch name in TTree
+            tmp[f] = (TClonesArray*)fMan->GetObject(Form("Pspx%d_%cPrecal", d + 1, xy[f])); // = branch name in TTree
         }
         if (tmp[0] == NULL && tmp[1] == NULL)
         {
@@ -105,7 +105,7 @@ InitStatus R3BPspxPrecal2Cal::Init()
             fPrecalItems.push_back(tmp[f]);
             fCalItems.push_back(new TClonesArray("R3BPspxCalData"));
             FairRootManager::Instance()->Register(
-                Form("Pspx%d_%dCal", d + 1, xy[f]), Form("Pspx%d_%d", d + 1, xy[f]), fCalItems.back(), kTRUE);
+                Form("Pspx%d_%cCal", d + 1, xy[f]), Form("Pspx%d_%c", d + 1, xy[f]), fCalItems.back(), kTRUE);
         }
     }
 
@@ -159,11 +159,16 @@ void R3BPspxPrecal2Cal::Exec(Option_t* option)
      * Applies (strip specific) gains to the energy entries of every strip. This is necessary
      * for energy calibration.
      */
+    const char xy[2] = { 'x', 'y' }; // orientation of detector face
     for (Int_t d = 0; d < fPrecalItems.size(); d++)
     {
         if (!fPrecalItems[d])
         {
-            printf("Cannot access PSPX%d_%d precal items\n", (d / 2) + 1, (d % 2) + 1);
+            // printf("Cannot access PSPX%d_%d precal items\n", (d / 2) + 1, (d % 2) + 1);
+            for (Int_t f = 0; f < 2; f++)
+            {
+                printf("Cannot access PSPX%d_%c precal items\n", (d / 2) + 1, xy[f]);
+            }
             return;
         }
         if (fCalPar->GetNumStrips().At(d) == 0)
