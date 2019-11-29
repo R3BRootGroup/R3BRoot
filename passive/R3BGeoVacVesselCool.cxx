@@ -25,11 +25,12 @@
 
 ClassImp(R3BGeoVacVesselCool)
 
-R3BGeoVacVesselCool::R3BGeoVacVesselCool() {
-  // Constructor
-  fName="VacVesselcool";
-  strcpy(modName,"v");
-  strcpy(eleName,"v");
-  maxSectors=0;
-  maxModules=1;
+    R3BGeoVacVesselCool::R3BGeoVacVesselCool()
+{
+    // Constructor
+    fName = "VacVesselcool";
+    strcpy(modName, "v");
+    strcpy(eleName, "v");
+    maxSectors = 0;
+    maxModules = 1;
 }

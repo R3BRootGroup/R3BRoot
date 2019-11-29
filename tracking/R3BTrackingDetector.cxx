@@ -11,24 +11,24 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-
-
-#include "R3BHit.h"
 #include "R3BTrackingDetector.h"
+#include "R3BHit.h"
 #include "R3BTGeoPar.h"
 
-#include "FairRuntimeDb.h"
-#include "FairRootManager.h"
 #include "FairLogger.h"
+#include "FairRootManager.h"
+#include "FairRuntimeDb.h"
 
 #include "TClonesArray.h"
-#include "TMath.h"
 #include "TLine.h"
+#include "TMath.h"
 
 using namespace std;
 
-R3BTrackingDetector::R3BTrackingDetector(const char* detectorName, EDetectorType type,
-                                         const char* geoParName, const char* hitArray)
+R3BTrackingDetector::R3BTrackingDetector(const char* detectorName,
+                                         EDetectorType type,
+                                         const char* geoParName,
+                                         const char* hitArray)
     : fDetectorName(detectorName)
     , fGeoParName(geoParName)
     , fDataName(hitArray)
@@ -56,7 +56,7 @@ InitStatus R3BTrackingDetector::Init()
     {
         offset_z = -0.25;
     }
-    
+
     fGeo->printParams();
 
     pos0 = TVector3(0., 0., offset_z);
@@ -91,7 +91,7 @@ InitStatus R3BTrackingDetector::Init()
 
 void R3BTrackingDetector::CopyHits()
 {
-    if(NULL == fArrayHits)
+    if (NULL == fArrayHits)
     {
         return;
     }
@@ -122,7 +122,7 @@ void R3BTrackingDetector::LocalToGlobal(TVector3& posGlobal, Double_t x_local, D
 Double_t R3BTrackingDetector::GetEnergyLoss(const R3BTrackingParticle* particle)
 {
     TVector3 mom_track = particle->GetMomentum().Unit();
-    
+
     Double_t Z2 = fGeo->GetZ();
     Double_t A2 = fGeo->GetA();
     Double_t density = fGeo->GetDensity();
@@ -136,10 +136,10 @@ Double_t R3BTrackingDetector::GetEnergyLoss(const R3BTrackingParticle* particle)
     Double_t Tmax = 2 * me * TMath::Power(beta * gamma, 2);
     Double_t h_omega = 28.816 * 1e-6 * TMath::Sqrt(density * Z2 / A2);
     Double_t eloss = dx * K * TMath::Power(Z1, 2) * Z2 / A2 / TMath::Power(beta, 2) *
-    (0.5 * TMath::Log(2 * me * beta * beta * gamma * gamma * Tmax / (I * I)) - beta * beta -
-     (TMath::Log(h_omega / I) + TMath::Log(beta * gamma) - 0.5));
-//    Double_t eloss = dx * K * TMath::Power(Z1,2) * Z2/A2 / TMath::Power(beta,2) *
-//    (0.5*TMath::Log(2*me*beta*beta*gamma*gamma*Tmax/(I*I)) - beta*beta);
+                     (0.5 * TMath::Log(2 * me * beta * beta * gamma * gamma * Tmax / (I * I)) - beta * beta -
+                      (TMath::Log(h_omega / I) + TMath::Log(beta * gamma) - 0.5));
+    //    Double_t eloss = dx * K * TMath::Power(Z1,2) * Z2/A2 / TMath::Power(beta,2) *
+    //    (0.5*TMath::Log(2*me*beta*beta*gamma*gamma*Tmax/(I*I)) - beta*beta);
 
     //    if(fGeoParName.EqualTo("TargetGeoPar"))
     //    {

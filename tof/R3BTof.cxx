@@ -311,8 +311,7 @@ R3BTofPoint* R3BTof::AddHit(Int_t trackID,
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
         LOG(INFO) << "R3BTof: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
-                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV"
-                 ;
+                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     return new (clref[size]) R3BTofPoint(trackID, detID, posIn, posOut, momIn, momOut, time, length, eLoss);
 }
 

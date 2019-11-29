@@ -29,36 +29,33 @@ class TClonesArray;
 class TH1F;
 class TH2F;
 
-class R3BCalifaMappedDataAnalysis : public FairTask {
-public:
-  R3BCalifaMappedDataAnalysis();
-  virtual ~R3BCalifaMappedDataAnalysis();
-  
-  virtual InitStatus Init();
-  
-  virtual void Exec(Option_t *option);
-  
-  virtual void FinishTask();
-   
-private:
-  Int_t fnEvents;
-  
-  TClonesArray *fRawData;
-  
-  TH1F *thc;
-  TH1F *the;
-  TH1F *tht;
-  
-  void CreateHistos();
-  
-  void WriteHistos();
-  
-public:
-  
-  ClassDef(R3BCalifaMappedDataAnalysis, 1)
+class R3BCalifaMappedDataAnalysis : public FairTask
+{
+  public:
+    R3BCalifaMappedDataAnalysis();
+    virtual ~R3BCalifaMappedDataAnalysis();
+
+    virtual InitStatus Init();
+
+    virtual void Exec(Option_t* option);
+
+    virtual void FinishTask();
+
+  private:
+    Int_t fnEvents;
+
+    TClonesArray* fRawData;
+
+    TH1F* thc;
+    TH1F* the;
+    TH1F* tht;
+
+    void CreateHistos();
+
+    void WriteHistos();
+
+  public:
+    ClassDef(R3BCalifaMappedDataAnalysis, 1)
 };
 
-
 #endif
-
-

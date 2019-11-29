@@ -16,7 +16,7 @@
 
 #include "R3BBunchedFiberCal2Hit.h"
 
-class R3BFi2bCal2Hit: public R3BBunchedFiberCal2Hit
+class R3BFi2bCal2Hit : public R3BBunchedFiberCal2Hit
 {
   public:
     R3BFi2bCal2Hit(Direction, Bool_t, Int_t = 1);

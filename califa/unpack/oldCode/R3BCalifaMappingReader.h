@@ -21,26 +21,22 @@
 
 class TClonesArray;
 
-class R3BCalifaMappingReader: public FairTask
+class R3BCalifaMappingReader : public FairTask
 {
-public:
+  public:
+    R3BCalifaMappingReader(const char* filename);
 
-  R3BCalifaMappingReader(const char *filename);
+    virtual void Exec(Option_t* option);
 
-  virtual void Exec(Option_t* option);
+  protected:
+    virtual InitStatus Init();
 
-protected:
+    std::string fname;
+    TClonesArray* fCrystalCalDataCA;
+    std::map<int, int> channelMap;
 
-  virtual InitStatus Init();
-
-  std::string fname;
-  TClonesArray *fCrystalCalDataCA;
-  std::map<int,int> channelMap;
-
-public:
-  ClassDef(R3BCalifaMappingReader, 0)
-
+  public:
+    ClassDef(R3BCalifaMappingReader, 0)
 };
 
 #endif
-

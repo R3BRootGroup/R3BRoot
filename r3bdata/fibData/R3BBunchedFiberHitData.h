@@ -20,7 +20,7 @@
 
 #include "TObject.h"
 
-class R3BBunchedFiberHitData: public TObject
+class R3BBunchedFiberHitData : public TObject
 {
   public:
     R3BBunchedFiberHitData();

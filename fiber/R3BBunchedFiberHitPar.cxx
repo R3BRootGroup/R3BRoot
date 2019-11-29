@@ -57,9 +57,7 @@ Bool_t R3BBunchedFiberHitPar::getParams(FairParamList* list)
     return kTRUE;
 }
 
-void R3BBunchedFiberHitPar::clear()
-{
-}
+void R3BBunchedFiberHitPar::clear() {}
 
 void R3BBunchedFiberHitPar::printParams()
 {
@@ -94,17 +92,15 @@ R3BBunchedFiberHitModulePar* R3BBunchedFiberHitPar::GetModuleParAt(Int_t fiber)
                 continue;
             }
             tFiber = par->GetFiber();
-            if (tFiber < 1 || tFiber > N_FIBER_MAX )
+            if (tFiber < 1 || tFiber > N_FIBER_MAX)
             {
-                LOG(ERROR) << "R3BBunchedFiberHitPar::GetModuleParAt : error in fiber indexing. " << tFiber 
-                          ;
+                LOG(ERROR) << "R3BBunchedFiberHitPar::GetModuleParAt : error in fiber indexing. " << tFiber;
                 continue;
             }
             index = tFiber - 1;
             if (fIndexMap.find(index) != fIndexMap.end())
             {
-                LOG(ERROR) << "R3BBunchedFiberHitPar::GetModuleParAt : parameter found more than once. " << tFiber
-                          ;
+                LOG(ERROR) << "R3BBunchedFiberHitPar::GetModuleParAt : parameter found more than once. " << tFiber;
                 continue;
             }
             fIndexMap[index] = i;
@@ -112,7 +108,7 @@ R3BBunchedFiberHitModulePar* R3BBunchedFiberHitPar::GetModuleParAt(Int_t fiber)
         fMapInit = kTRUE;
     }
 
-    if (fiber < 1 || fiber > N_FIBER_MAX )
+    if (fiber < 1 || fiber > N_FIBER_MAX)
     {
         LOG(ERROR) << "R3BBunchedFiberHitPar::GetModuleParAt : error in fiber indexing. " << fiber;
         return NULL;

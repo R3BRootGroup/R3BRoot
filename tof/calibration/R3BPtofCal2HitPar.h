@@ -73,39 +73,34 @@ class R3BPtofCal2HitPar : public FairTask
      * Is called by the framework after processing the event loop.
      */
     virtual void FinishTask();
-    
+
     /**
      * Method for setting the beam charge
      * @param charge the charge in terms of e
      */
-    void SetBeamCharge(Int_t charge){
-     fBeamCharge = charge; 
-    }
-    
+    void SetBeamCharge(Int_t charge) { fBeamCharge = charge; }
+
     /**
      * Method for setting the y-position of the sweep.
      * If y != 0 this run will determine veff.
      * @param yPositon the y-position of the sweep
      */
-    void SetYPosition(Double_t yPosition){
-      fYPosition = yPosition;
-    }
+    void SetYPosition(Double_t yPosition) { fYPosition = yPosition; }
 
   private:
     Int_t fBeamCharge;
     Int_t fYPosition;
-    
-    TH1D* fZScaleHistos[2*PtofPaddlesPerPlane];
-    TH1D* fTOffsetHistos[2*PtofPaddlesPerPlane];
-    
+
+    TH1D* fZScaleHistos[2 * PtofPaddlesPerPlane];
+    TH1D* fTOffsetHistos[2 * PtofPaddlesPerPlane];
+
     R3BPtofHitPar* fPar;
-    
-    Int_t fNEvents;         	/**< Event counter. */
-    TClonesArray* fCalData;  	/**< Array with cal data - input data. */
+
+    Int_t fNEvents;         /**< Event counter. */
+    TClonesArray* fCalData; /**< Array with cal data - input data. */
 
   public:
     ClassDef(R3BPtofCal2HitPar, 1)
 };
 
 #endif
-

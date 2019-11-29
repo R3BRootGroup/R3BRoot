@@ -21,78 +21,78 @@
 #define R3BAmsMapped2StripCal_H
 
 #include "FairTask.h"
-#include "TH1F.h"
 #include "R3BAmsMapped2StripCalPar.h"
-#include "R3BAmsStripCalData.h"
 #include "R3BAmsMappedData.h"
+#include "R3BAmsStripCalData.h"
+#include "TH1F.h"
 #include <TRandom.h>
 
 class TClonesArray;
 class R3BAmsStripCalPar;
 
-class R3BAmsMapped2StripCal : public FairTask {
-  
- public:
-  /** Default constructor **/
-  R3BAmsMapped2StripCal();
+class R3BAmsMapped2StripCal : public FairTask
+{
 
-  /** Standard constructor **/
-  R3BAmsMapped2StripCal(const TString& name, Int_t iVerbose=1);
-  
-  /** Destructor **/
-  virtual ~R3BAmsMapped2StripCal();
-  
-  /** Virtual method Exec **/
-  virtual void Exec(Option_t* option);
-  
-  /** Virtual method Reset **/
-  virtual void Reset();
-  
-  virtual void SetParContainers();
-  
-  //Fair specific
-  /** Virtual method Init **/
-  virtual InitStatus Init();
-  
-  /** Virtual method ReInit **/
-  virtual InitStatus ReInit();
-  
-  /** Virtual method Finish **/
-  virtual void Finish();
+  public:
+    /** Default constructor **/
+    R3BAmsMapped2StripCal();
 
-  void SetOnline(Bool_t option){fOnline=option;}
+    /** Standard constructor **/
+    R3BAmsMapped2StripCal(const TString& name, Int_t iVerbose = 1);
 
-  /**
-   * Method for setting the thresholds: Signal>sigma_strip*ThresSigma
-   */ 
-  void SetThresholdSigma(Double_t th){ThresSigma=th;}
-  
- private:
-  
-  void SetParameter();
+    /** Destructor **/
+    virtual ~R3BAmsMapped2StripCal();
 
-  Int_t NumDets;  
-  Int_t NumStrips;
-  Int_t NumStripsS;
-  Int_t NumStripsK;
-  Int_t NumParams;
-  Int_t MaxSigma;
-  Double_t ThresSigma;
-  TArrayF* CalParams;
+    /** Virtual method Exec **/
+    virtual void Exec(Option_t* option);
 
-  Bool_t fOnline;//Don't store data for online
-  
-  R3BAmsStripCalPar* fCal_Par;       /**< Parameter container. >*/ 
-  TClonesArray* fAmsMappedDataCA;    /**< Array with AMS Mapped input data. >*/
-  TClonesArray* fAmsStripCalDataCA;  /**< Array with AMS Cal output data. >*/
-  
-  /** Private method AddCalData **/
-  //** Adds a AmsStripCalData to the StripCalCollection
-  R3BAmsStripCalData* AddCalData(Int_t detid, Int_t sideid, Int_t stripid, Double_t energy);
+    /** Virtual method Reset **/
+    virtual void Reset();
 
- public:
-  //Class definition
-  ClassDef(R3BAmsMapped2StripCal, 1)
-    };
+    virtual void SetParContainers();
+
+    // Fair specific
+    /** Virtual method Init **/
+    virtual InitStatus Init();
+
+    /** Virtual method ReInit **/
+    virtual InitStatus ReInit();
+
+    /** Virtual method Finish **/
+    virtual void Finish();
+
+    void SetOnline(Bool_t option) { fOnline = option; }
+
+    /**
+     * Method for setting the thresholds: Signal>sigma_strip*ThresSigma
+     */
+    void SetThresholdSigma(Double_t th) { ThresSigma = th; }
+
+  private:
+    void SetParameter();
+
+    Int_t NumDets;
+    Int_t NumStrips;
+    Int_t NumStripsS;
+    Int_t NumStripsK;
+    Int_t NumParams;
+    Int_t MaxSigma;
+    Double_t ThresSigma;
+    TArrayF* CalParams;
+
+    Bool_t fOnline; // Don't store data for online
+
+    R3BAmsStripCalPar* fCal_Par;      /**< Parameter container. >*/
+    TClonesArray* fAmsMappedDataCA;   /**< Array with AMS Mapped input data. >*/
+    TClonesArray* fAmsStripCalDataCA; /**< Array with AMS Cal output data. >*/
+
+    /** Private method AddCalData **/
+    //** Adds a AmsStripCalData to the StripCalCollection
+    R3BAmsStripCalData* AddCalData(Int_t detid, Int_t sideid, Int_t stripid, Double_t energy);
+
+  public:
+    // Class definition
+    ClassDef(R3BAmsMapped2StripCal, 1)
+};
 
 #endif

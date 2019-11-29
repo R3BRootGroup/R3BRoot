@@ -16,7 +16,7 @@
 
 #include "TObject.h"
 
-class R3BStrawtubesCalData: public TObject
+class R3BStrawtubesCalData : public TObject
 {
   public:
     R3BStrawtubesCalData(UChar_t, UChar_t);
@@ -36,5 +36,3 @@ class R3BStrawtubesCalData: public TObject
 };
 
 #endif
-
-

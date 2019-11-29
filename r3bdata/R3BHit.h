@@ -21,32 +21,33 @@
 
 #include "TObject.h"
 
-class R3BHit : public TObject {
-public:
+class R3BHit : public TObject
+{
+  public:
     R3BHit();
     R3BHit(Int_t detId, Double_t x, Double_t y, Double_t eloss, Double_t time, Int_t hitId = -1);
     virtual ~R3BHit();
-    
+
     inline const Int_t& GetDetId() const { return fDetId; }
     inline const Double_t& GetX() const { return fX; }
     inline const Double_t& GetY() const { return fY; }
     inline const Double_t& GetEloss() const { return fEloss; }
     inline const Double_t& GetTime() const { return fTime; }
     inline const Int_t& GetHitId() const { return fHitId; }
-    
+
     inline void SetEloss(const Double_t& eloss) { fEloss = eloss; }
     inline void SetTime(const Double_t& time) { fTime = time; }
     inline void SetHitId(const Int_t& hitId) { fHitId = hitId; }
-    
-protected:
+
+  protected:
     Int_t fDetId;
     Double_t fX;
     Double_t fY;
     Double_t fEloss;
     Double_t fTime;
     Int_t fHitId;
-    
-public:
+
+  public:
     ClassDef(R3BHit, 1)
 };
 

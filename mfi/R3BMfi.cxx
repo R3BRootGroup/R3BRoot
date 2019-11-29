@@ -260,8 +260,7 @@ R3BMfiPoint* R3BMfi::AddHit(Int_t trackID,
     if (fVerboseLevel > 1)
     {
         LOG(INFO) << "R3BMfi: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
-                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV"
-                 ;
+                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     }
     return new (clref[size]) R3BMfiPoint(trackID, detID, plane, posIn, posOut, momIn, momOut, time, length, eLoss);
 }

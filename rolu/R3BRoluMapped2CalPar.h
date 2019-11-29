@@ -91,10 +91,7 @@ class R3BRoluMapped2CalPar : public FairTask
      * Method for setting the update rate for control histograms
      * @param rate an update rate value (events).
      */
-    inline void SetUpdateRate(Int_t rate)
-    {
-        fUpdateRate = rate;
-    }
+    inline void SetUpdateRate(Int_t rate) { fUpdateRate = rate; }
 
     /**
      * Method for setting minimum required statistics per module.
@@ -103,19 +100,13 @@ class R3BRoluMapped2CalPar : public FairTask
      * calibrated.
      * @param minStats a value of minimum statistics required.
      */
-    inline void SetMinStats(Int_t minStats)
-    {
-        fMinStats = minStats;
-    }
+    inline void SetMinStats(Int_t minStats) { fMinStats = minStats; }
 
     /**
      * Method for selecting events with certain trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
-    inline void SetTrigger(Int_t trigger)
-    {
-        fTrigger = trigger;
-    }
+    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
 
     /**
      * Method for setting number of Rolu detectors and channels.
@@ -124,21 +115,21 @@ class R3BRoluMapped2CalPar : public FairTask
      */
     inline void SetNofModules(Int_t nDets, Int_t nCh)
     {
-        fNofDetectors = nDets;		
-        fNofChannels  = nCh;  // = 4
-        fNofTypes     = 2;
-        fNofModules   = nDets * nCh * 2 ; 
+        fNofDetectors = nDets;
+        fNofChannels = nCh; // = 4
+        fNofTypes = 2;
+        fNofModules = nDets * nCh * 2;
     }
 
   private:
     Int_t fUpdateRate; /**< An update rate. */
     Int_t fMinStats;   /**< Minimum statistics required per module. */
     Int_t fTrigger;    /**< Trigger value. */
-    
-    UInt_t fNofDetectors;   /**< Number of detectors. */
-    UInt_t fNofChannels;    /**< Number of channels per detector. */
-    UInt_t fNofTypes = 2;       /**< Number of time-types per channel ( TAMEX leading/trailing). */
-    UInt_t fNofModules;     /**< Total number of modules (=edges) to calibrate */
+
+    UInt_t fNofDetectors; /**< Number of detectors. */
+    UInt_t fNofChannels;  /**< Number of channels per detector. */
+    UInt_t fNofTypes = 2; /**< Number of time-types per channel ( TAMEX leading/trailing). */
+    UInt_t fNofModules;   /**< Total number of modules (=edges) to calibrate */
 
     Int_t fNEvents;         /**< Event counter. */
     R3BTCalPar* fCal_Par;   /**< Parameter container. */
@@ -152,4 +143,3 @@ class R3BRoluMapped2CalPar : public FairTask
 };
 
 #endif
-

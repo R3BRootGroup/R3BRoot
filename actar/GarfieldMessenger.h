@@ -24,7 +24,7 @@
 //-------------------------------------------------
 
 /// \file  Garfield/geant4/include/GarfieldMessenger.h
-/// \brief Definition of the GarfieldMessengerclass 
+/// \brief Definition of the GarfieldMessengerclass
 ///
 /// Garfield garfieldpp example adapted to Virtual Monte Carlo.
 /// This class is imported from garfieldpp example.
@@ -41,22 +41,21 @@ class G4UIcommand;
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-class GarfieldMessenger: public G4UImessenger {
-public:
+class GarfieldMessenger : public G4UImessenger
+{
+  public:
+    GarfieldMessenger();
+    ~GarfieldMessenger();
 
-	GarfieldMessenger();
-	~GarfieldMessenger();
+    virtual void SetNewValue(G4UIcommand*, G4String);
 
-	virtual void SetNewValue(G4UIcommand*, G4String);
-
-private:
-	G4UIdirectory*  fExampleDir;
-	G4UIdirectory*  fGarfieldPhysicsDir;
-	G4UIcommand*    fIonizationModelCmd;
-	G4UIcommand*    fGarfieldParticleCmd;
+  private:
+    G4UIdirectory* fExampleDir;
+    G4UIdirectory* fGarfieldPhysicsDir;
+    G4UIcommand* fIonizationModelCmd;
+    G4UIcommand* fGarfieldParticleCmd;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#endif //GARFIELDMESSENGER_H
-
+#endif // GARFIELDMESSENGER_H

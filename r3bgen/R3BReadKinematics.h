@@ -21,7 +21,7 @@
 //
 // --------------------------------------------------------------
 // Comments:
-// 
+//
 // --------------------------------------------------------------
 //
 /////////////////////////////////////////////////////////////////
@@ -38,18 +38,17 @@ class R3BReadKinematics : public TObject
 {
   public:
     R3BReadKinematics();
-   ~R3BReadKinematics();
-   
+    ~R3BReadKinematics();
+
   public:
-//    File *pFile;
-		Double_t LabAngle[1000];
-		Double_t LabEnergy[1000];
-			Double_t T_xsec[5000];
-			Double_t CrossSection_t[5000];
-			//Integrated matrix (cross section) 
-      Double_t Icross_section[5000];
+    //    File *pFile;
+    Double_t LabAngle[1000];
+    Double_t LabEnergy[1000];
+    Double_t T_xsec[5000];
+    Double_t CrossSection_t[5000];
+    // Integrated matrix (cross section)
+    Double_t Icross_section[5000];
 
-  ClassDef(R3BReadKinematics,1) //ROOT CINT
-
+    ClassDef(R3BReadKinematics, 1) // ROOT CINT
 };
 #endif

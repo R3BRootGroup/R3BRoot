@@ -50,7 +50,7 @@ class R3BTofdMapped2CalPar : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BTofdMapped2CalPar(const char *, Int_t = 1);
+    R3BTofdMapped2CalPar(const char*, Int_t = 1);
 
     /**
      * Destructor.
@@ -71,7 +71,7 @@ class R3BTofdMapped2CalPar : public FairTask
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    void Exec(Option_t *);
+    void Exec(Option_t*);
 
     /**
      * A method for finish of processing of an event.
@@ -112,14 +112,14 @@ class R3BTofdMapped2CalPar : public FairTask
     Int_t fUpdateRate; /**< An update rate. */
     Int_t fMinStats;   /**< Minimum statistics required per module. */
 
-    UInt_t fNofPlanes;      /**< Number of planes. */
-    UInt_t fPaddlesPerPlane;/**< Number of bars per plane. */
-    UInt_t fNofModules;     /**< Total number of modules (=edges) to calibrate */
+    UInt_t fNofPlanes;       /**< Number of planes. */
+    UInt_t fPaddlesPerPlane; /**< Number of bars per plane. */
+    UInt_t fNofModules;      /**< Total number of modules (=edges) to calibrate */
 
-    R3BTCalPar *fCalPar;    /**< Parameter container. */
-    TClonesArray *fMapped;  /**< Array with mapped data - input data. */
+    R3BTCalPar* fCalPar;   /**< Parameter container. */
+    TClonesArray* fMapped; /**< Array with mapped data - input data. */
 
-    R3BTCalEngine *fEngine; /**< Instance of the TCAL engine. */
+    R3BTCalEngine* fEngine; /**< Instance of the TCAL engine. */
 
   public:
     ClassDef(R3BTofdMapped2CalPar, 1)

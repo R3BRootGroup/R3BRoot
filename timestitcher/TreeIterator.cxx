@@ -19,49 +19,50 @@ using namespace std;
 
 namespace R3BCalifaTimestitcher
 {
-   TreeIterator::TreeIterator(vector<TreeWrapper*> &_trees) : trees(_trees)
-   {
-   }
+    TreeIterator::TreeIterator(vector<TreeWrapper*>& _trees)
+        : trees(_trees)
+    {
+    }
 
-   TreeWrapper* TreeIterator::first()
-   {
-      TreeWrapper *t_min = NULL;
-      uint64_t ts_min = 0, cts;
+    TreeWrapper* TreeIterator::first()
+    {
+        TreeWrapper* t_min = NULL;
+        uint64_t ts_min = 0, cts;
 
-      for(unsigned int i = 0; i < trees.size(); i++)
-      {
-         if(!trees[i]->next())
+        for (unsigned int i = 0; i < trees.size(); i++)
+        {
+            if (!trees[i]->next())
+                return NULL;
+
+            cts = trees[i]->getTS();
+            if (ts_min == 0 || cts < ts_min)
+            {
+                ts_min = cts;
+                t_min = trees[i];
+            }
+        }
+
+        return t_min;
+    }
+
+    TreeWrapper* TreeIterator::next()
+    {
+        TreeWrapper* t_min = NULL;
+        uint64_t ts_min = 0, cts;
+
+        for (unsigned int i = 0; i < trees.size(); i++)
+        {
+            cts = trees[i]->getTS();
+            if (ts_min == 0 || cts < ts_min)
+            {
+                ts_min = cts;
+                t_min = trees[i];
+            }
+        }
+
+        if (!t_min || !t_min->next())
             return NULL;
 
-         cts = trees[i]->getTS();
-         if(ts_min == 0 || cts < ts_min)
-         {
-            ts_min = cts;
-            t_min = trees[i];
-         }
-      }
-
-      return t_min;
-   }
-
-   TreeWrapper* TreeIterator::next()
-   {
-      TreeWrapper *t_min = NULL;
-      uint64_t ts_min = 0, cts;
-
-      for(unsigned int i = 0; i < trees.size(); i++)
-      {
-         cts = trees[i]->getTS();
-         if(ts_min == 0 || cts < ts_min)
-         {
-            ts_min = cts;
-            t_min = trees[i];
-         }
-      }
-
-      if(!t_min || !t_min->next())
-         return NULL;
-
-      return t_min;
-   }
-}
+        return t_min;
+    }
+} // namespace R3BCalifaTimestitcher

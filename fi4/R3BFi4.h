@@ -123,8 +123,8 @@ class R3BFi4 : public R3BDetector
     TClonesArray* fFi4Collection;   //!  The hit collection
     Bool_t kGeoSaved;               //!
     TList* flGeoPar;                //!
-    
-    R3BTGeoPar* fTGeoPar;           //!
+
+    R3BTGeoPar* fTGeoPar; //!
 
     /** Private method AddHit
      **

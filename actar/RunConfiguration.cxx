@@ -21,7 +21,7 @@
 //-------------------------------------------------
 
 /// \file Garfield/geant4/src/RunConfiguration.cxx
-/// \brief Implementation of the Garfield::RunConfiguration class 
+/// \brief Implementation of the Garfield::RunConfiguration class
 ///
 /// Garfield garfieldpp example adapted to Virtual Monte Carlo.
 ///
@@ -33,40 +33,40 @@
 
 namespace VMC
 {
-namespace Garfield
-{
+    namespace Garfield
+    {
 
-//_____________________________________________________________________________
-RunConfiguration::RunConfiguration(const TString& geometry,
-    	                           const TString& physicsList,
-                                   const TString& specialProcess)
-  : TG4RunConfiguration(geometry, physicsList, specialProcess, false, false)
-{
-/// Standard constructor
-/// \param geometry        Selection of geometry option
-/// \param physicsList     Selection of physics
-/// \param specialProcess  Selection of the special processes
-}
+        //_____________________________________________________________________________
+        RunConfiguration::RunConfiguration(const TString& geometry,
+                                           const TString& physicsList,
+                                           const TString& specialProcess)
+            : TG4RunConfiguration(geometry, physicsList, specialProcess, false, false)
+        {
+            /// Standard constructor
+            /// \param geometry        Selection of geometry option
+            /// \param physicsList     Selection of physics
+            /// \param specialProcess  Selection of the special processes
+        }
 
-//_____________________________________________________________________________
-RunConfiguration::~RunConfiguration()
-{
-/// Destructor
-}
+        //_____________________________________________________________________________
+        RunConfiguration::~RunConfiguration()
+        {
+            /// Destructor
+        }
 
-//
-// protected methods
-//
+        //
+        // protected methods
+        //
 
-//_____________________________________________________________________________
-TG4VUserFastSimulation*  RunConfiguration::CreateUserFastSimulation()
-{
-/// Create Garfield fast simulation model
+        //_____________________________________________________________________________
+        TG4VUserFastSimulation* RunConfiguration::CreateUserFastSimulation()
+        {
+            /// Create Garfield fast simulation model
 
-  G4cout << "Going to create FastSimulation" << G4endl;
+            G4cout << "Going to create FastSimulation" << G4endl;
 
-  return new FastSimulation();
-}
+            return new FastSimulation();
+        }
 
-}
-}
+    } // namespace Garfield
+} // namespace VMC

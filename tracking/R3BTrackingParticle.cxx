@@ -11,10 +11,9 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-
 #include "R3BTrackingParticle.h"
-#include "R3BTrackingDetector.h"
 #include "FairLogger.h"
+#include "R3BTrackingDetector.h"
 
 R3BTrackingParticle::R3BTrackingParticle()
     : fCharge(0.)

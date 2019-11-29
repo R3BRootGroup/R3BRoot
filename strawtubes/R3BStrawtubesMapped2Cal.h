@@ -18,12 +18,12 @@
 
 class R3BTCalPar;
 
-class R3BStrawtubesMapped2Cal: public FairTask
+class R3BStrawtubesMapped2Cal : public FairTask
 {
   public:
-    R3BStrawtubesMapped2Cal(const char * = "StrawtubesTcal", Int_t = 1);
+    R3BStrawtubesMapped2Cal(const char* = "StrawtubesTcal", Int_t = 1);
     virtual ~R3BStrawtubesMapped2Cal();
-    virtual void Exec(Option_t *);
+    virtual void Exec(Option_t*);
     virtual void FinishEvent();
     virtual void FinishTask();
     virtual InitStatus Init();

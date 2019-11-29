@@ -335,8 +335,7 @@ R3BGfiPoint* R3BGfi::AddHit(Int_t trackID,
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
         LOG(INFO) << "R3BGfi: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
-                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV"
-                 ;
+                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     return new (clref[size]) R3BGfiPoint(trackID, detID, plane, posIn, posOut, momIn, momOut, time, length, eLoss);
 }
 
@@ -354,13 +353,12 @@ void R3BGfi::ConstructGeometry()
         TGeoNode* node = gfi_node->GetVolume()->GetNode("GFILogWorld_0");
         TGeoCombiTrans* combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
         TGeoTranslation* tr1 = new TGeoTranslation(fPos1.X(), fPos1.Y(), fPos1.Z());
-        *combtrans = {*tr1, *fRot1};
+        *combtrans = { *tr1, *fRot1 };
 
         node = gfi_node->GetVolume()->GetNode("GFILogWorld_1");
         combtrans = (TGeoCombiTrans*)((TGeoNodeMatrix*)node)->GetMatrix();
         TGeoTranslation* tr2 = new TGeoTranslation(fPos2.X(), fPos2.Y(), fPos2.Z());
-        *combtrans = {*tr2, *fRot2};
-
+        *combtrans = { *tr2, *fRot2 };
     }
     else
     {

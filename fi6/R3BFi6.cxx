@@ -110,8 +110,7 @@ void R3BFi6::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Si Only
             Double_t cutE = fCutE; // GeV-> 1 keV
 
-            LOG(INFO) << "-I- R3BFi6: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV"
-                     ;
+            LOG(INFO) << "-I- R3BFi6: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -157,7 +156,7 @@ Bool_t R3BFi6::ProcessHits(FairVolume* vol)
     if (gMC->IsTrackExiting() || gMC->IsTrackStop() || gMC->IsTrackDisappeared())
     {
         fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
-        fVolumeID = vol-> getMotherCopyNo();	
+        fVolumeID = vol->getMotherCopyNo();
         gMC->TrackPosition(fPosOut);
         gMC->TrackMomentum(fMomOut);
         if (fELoss == 0.)
@@ -202,7 +201,7 @@ Bool_t R3BFi6::ProcessHits(FairVolume* vol)
         }
 
         AddHit(fTrackID,
-               /*fVolumeID*//*copyNo*/planeNr,
+               /*fVolumeID*/ /*copyNo*/ planeNr,
                planeNr,
                TVector3(fPosIn.X(), fPosIn.Y(), fPosIn.Z()),
                TVector3(fPosOut.X(), fPosOut.Y(), fPosOut.Z()),
@@ -301,15 +300,14 @@ R3BFibPoint* R3BFi6::AddHit(Int_t trackID,
     if (fVerboseLevel > 1)
     {
         LOG(INFO) << "R3BFi6: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
-                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV"
-                 ;
+                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     }
     return new (clref[size]) R3BFibPoint(trackID, detID, plane, posIn, posOut, momIn, momOut, time, length, eLoss);
 }
 
 Bool_t R3BFi6::CheckIfSensitive(std::string name)
 {
-    if (TString(name).Contains("FI61Log") )
+    if (TString(name).Contains("FI61Log"))
     {
         return kTRUE;
     }

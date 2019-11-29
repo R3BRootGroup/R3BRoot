@@ -35,43 +35,30 @@ class R3BPhaseSpaceGenerator : public FairGenerator
     void AddParticle(const Int_t PDGCode);
     void AddHeavyIon(const FairIon& ion);
 
-    void SetVertexDistribution_cm(R3BDistribution<3> vertexDistribution){
-      fVertex_cm = vertexDistribution;
-    }
-    R3BDistribution<3>& GetVertexDistribution_cm(){
-      return fVertex_cm;
-    }
+    void SetVertexDistribution_cm(R3BDistribution<3> vertexDistribution) { fVertex_cm = vertexDistribution; }
+    R3BDistribution<3>& GetVertexDistribution_cm() { return fVertex_cm; }
 
-    void SetBeamSpread_mRad(R3BDistribution<2> beamSpreadDistribution){
-      fBeamSpread_mRad = beamSpreadDistribution;
-    }
-    R3BDistribution<2>& GetBeamSpread_mRad(){
-      return fBeamSpread_mRad;
-    }
+    void SetBeamSpread_mRad(R3BDistribution<2> beamSpreadDistribution) { fBeamSpread_mRad = beamSpreadDistribution; }
+    R3BDistribution<2>& GetBeamSpread_mRad() { return fBeamSpread_mRad; }
 
-    void SetBeamEnergyDistribution_AMeV(R3BDistribution<1> beamEnergyDistribution){
-      fBeamEnergy_AMeV = beamEnergyDistribution;
+    void SetBeamEnergyDistribution_AMeV(R3BDistribution<1> beamEnergyDistribution)
+    {
+        fBeamEnergy_AMeV = beamEnergyDistribution;
     }
-    R3BDistribution<1>& GetBeamEnergyDistribution_AMeV(){
-      return fBeamEnergy_AMeV;
-    }
+    R3BDistribution<1>& GetBeamEnergyDistribution_AMeV() { return fBeamEnergy_AMeV; }
 
-    void SetErelDistribution_keV(R3BDistribution<1> ErelDistribution){
-      fErel_keV = ErelDistribution;
-    }
-    R3BDistribution<1>& GetErelDistribution_keV(){
-      return fErel_keV;
-    }
-    
+    void SetErelDistribution_keV(R3BDistribution<1> ErelDistribution) { fErel_keV = ErelDistribution; }
+    R3BDistribution<1>& GetErelDistribution_keV() { return fErel_keV; }
+
     Bool_t Init() override;
     Bool_t ReadEvent(FairPrimaryGenerator* primGen) override;
     // FairGenerator* CloneGenerator() const override;
 
   private:
-    R3BDistribution<3> fVertex_cm;        //!
-    R3BDistribution<2> fBeamSpread_mRad;  //!
-    R3BDistribution<1> fBeamEnergy_AMeV;  //!
-    R3BDistribution<1> fErel_keV;         //!
+    R3BDistribution<3> fVertex_cm;       //!
+    R3BDistribution<2> fBeamSpread_mRad; //!
+    R3BDistribution<1> fBeamEnergy_AMeV; //!
+    R3BDistribution<1> fErel_keV;        //!
 
     Double_t fTotMass;
     TRandom3 fRngGen;

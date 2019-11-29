@@ -16,16 +16,16 @@
 
 #include "TObject.h"
 
-class R3BStrawtubesMappedData: public TObject
+class R3BStrawtubesMappedData : public TObject
 {
   public:
     R3BStrawtubesMappedData(UChar_t, UChar_t, UChar_t, UInt_t, UInt_t);
     virtual ~R3BStrawtubesMappedData();
-    UChar_t GetPlane() const      { return fPlane; }
-    UChar_t GetSide() const       { return fSide; }
-    UChar_t GetStraw() const      { return fStraw; }
-    UInt_t  GetTimeCoarse() const { return fTimeCoarse; }
-    UInt_t  GetTimeFine() const   { return fTimeFine; }
+    UChar_t GetPlane() const { return fPlane; }
+    UChar_t GetSide() const { return fSide; }
+    UChar_t GetStraw() const { return fStraw; }
+    UInt_t GetTimeCoarse() const { return fTimeCoarse; }
+    UInt_t GetTimeFine() const { return fTimeFine; }
 
   private:
     UChar_t fPlane;

@@ -22,8 +22,8 @@
 #define N_TOFD_HIT_PLANE_MAX 4
 #define N_TOFD_HIT_PADDLE_MAX 44
 
-#include "R3BTCalEngine.h"
 #include "FairTask.h"
+#include "R3BTCalEngine.h"
 #include "TObject.h"
 
 class R3BTofdHitPar;
@@ -34,10 +34,10 @@ class TH2F;
 
 /**
  * An analysis task for position and Z calibration of Tofd data.
- * This class fills time differences of the 2 PMTs of every paddle 
+ * This class fills time differences of the 2 PMTs of every paddle
  * and calculates the calibration parameters.
  * M.Heil in May 2016
- */#pragma link C++ class R3BTofdHitModulePar+;
+ */ #pragma link C++ class R3BTofdHitModulePar + ;
 class R3BTofdCal2HitPar : public FairTask
 {
 
@@ -69,7 +69,7 @@ class R3BTofdCal2HitPar : public FairTask
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
     virtual InitStatus Init();
-    
+
     virtual void SetParContainers();
 
     /**
@@ -96,10 +96,7 @@ class R3BTofdCal2HitPar : public FairTask
      * Method for setting the update rate for control histograms
      * @param rate an update rate value (events).
      */
-    inline void SetUpdateRate(Int_t rate)
-    {
-        fUpdateRate = rate;
-    }
+    inline void SetUpdateRate(Int_t rate) { fUpdateRate = rate; }
 
     /**
      * Method for setting minimum required statistics per module.
@@ -108,19 +105,13 @@ class R3BTofdCal2HitPar : public FairTask
      * calibrated.
      * @param minStats a value of minimum statistics required.
      */
-    inline void SetMinStats(Int_t minStats)
-    {
-        fMinStats = minStats;
-    }
+    inline void SetMinStats(Int_t minStats) { fMinStats = minStats; }
 
     /**
      * Method for selecting events with certain trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
-    inline void SetTrigger(Int_t trigger)
-    {
-        fTrigger = trigger;
-    }
+    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
 
     /**
      * Method for setting number of LOS detectors and channels.
@@ -129,46 +120,33 @@ class R3BTofdCal2HitPar : public FairTask
      */
     inline void SetNofModules(Int_t nDets, Int_t nCh)
     {
-        fNofPlanes = nDets;		
-        fPaddlesPerPlane  = nCh;
-        fNofModules   = nDets * nCh * 1; // 1 edge per channel
+        fNofPlanes = nDets;
+        fPaddlesPerPlane = nCh;
+        fNofModules = nDets * nCh * 1; // 1 edge per channel
     }
     /**
      * Method for setting the y-position of a horizonzal sweep run for calibration of effective velocity of light
      */
-    inline void SetTofdPos(Double_t Y)
-    {
-        fTofdY = Y;
-    }
+    inline void SetTofdPos(Double_t Y) { fTofdY = Y; }
     /**
      * Method for setting the nuclear charge of main beam
      */
-    inline void SetTofdQ(Double_t Q)
-    {
-        fTofdQ = Q;
-    }
+    inline void SetTofdQ(Double_t Q) { fTofdQ = Q; }
     /**
      * Method for setting the y-position of a horizonzal sweep run for calibration of effective velocity of light
      */
-    inline void ReadParaFile(TString file)
-    {
-        fParaFile = file;
-    }
+    inline void ReadParaFile(TString file) { fParaFile = file; }
     /**
      * Method for walk calculation.
      */
     virtual Double_t walk(Double_t Q);
 
-
     virtual void CreateHistograms(Int_t iPlane, Int_t iBar);
-
-
 
     /**
      * Method for calculation of saturation.
      */
     virtual Double_t saturation(Double_t x);
-
 
     /**
      * Method for calculation of offset.
@@ -183,46 +161,45 @@ class R3BTofdCal2HitPar : public FairTask
     /**
      * Method for calculation of position dependence of scintillator.
      */
-    virtual void doubleExp(TH2F *histo, Double_t min,Double_t max, Double_t *);
-//    virtual void doubleExp2(TH2F *histo, Double_t min,Double_t max, Double_t *);
+    virtual void doubleExp(TH2F* histo, Double_t min, Double_t max, Double_t*);
+    //    virtual void doubleExp2(TH2F *histo, Double_t min,Double_t max, Double_t *);
 
     /**
      * Method for calculation of sync offset between paddles.
      */
     virtual void calcSync();
- 
+
   private:
     Int_t fUpdateRate; /**< An update rate. */
     Int_t fMinStats;   /**< Minimum statistics required per module. */
     Int_t fTrigger;    /**< Trigger value. */
 
-    UInt_t fNofPlanes;      /**< Number of planes. */
-    UInt_t fPaddlesPerPlane;/**< Number of bars per plane. */
-    UInt_t fNofModules;     /**< Total number of modules (=edges) to calibrate */
+    UInt_t fNofPlanes;       /**< Number of planes. */
+    UInt_t fPaddlesPerPlane; /**< Number of bars per plane. */
+    UInt_t fNofModules;      /**< Total number of modules (=edges) to calibrate */
 
-    Int_t fNEvents;         /**< Event counter. */
-    R3BTofdHitPar* fCal_Par;   /**< Parameter container. */
-    TClonesArray* fCalItemsLos;                    /**< Array with cal items. */
-    TClonesArray* fCalData;  /**< Array with mapped data - input data. */
-    R3BEventHeader* header; /**< Event header - input data. */
-    Double_t fClockFreq;     /**< Clock cycle in [ns]. */
+    Int_t fNEvents;             /**< Event counter. */
+    R3BTofdHitPar* fCal_Par;    /**< Parameter container. */
+    TClonesArray* fCalItemsLos; /**< Array with cal items. */
+    TClonesArray* fCalData;     /**< Array with mapped data - input data. */
+    R3BEventHeader* header;     /**< Event header - input data. */
+    Double_t fClockFreq;        /**< Clock cycle in [ns]. */
     Double_t fTofdY;
     Double_t fTofdQ;
     TString fParaFile;
 
-// arrays of control histograms
-    TH2F* fhTdiff[N_TOFD_HIT_PLANE_MAX]; 
-    TH1F* fhTotPm1[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX]; 
-    TH1F* fhTotPm2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX]; 
-    TH2F* fhTsync[N_TOFD_HIT_PLANE_MAX]; 
+    // arrays of control histograms
+    TH2F* fhTdiff[N_TOFD_HIT_PLANE_MAX];
+    TH1F* fhTotPm1[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH1F* fhTotPm2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fhTsync[N_TOFD_HIT_PLANE_MAX];
 
-    TH2F* fhTot1vsTot2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX]; 
-    TH2F* fhTot1vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
-    TH2F* fhTot2vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
+    TH2F* fhTot1vsTot2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fhTot1vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fhTot2vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
 
   public:
     ClassDef(R3BTofdCal2HitPar, 1)
 };
 
 #endif
-

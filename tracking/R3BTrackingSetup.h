@@ -11,14 +11,13 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-
 #ifndef R3B_TRACKING_SETUP
 #define R3B_TRACKING_SETUP
 
-#include <vector>
+#include "R3BTrackingDetector.h"
 #include <map>
 #include <string>
-#include "R3BTrackingDetector.h"
+#include <vector>
 
 class R3BTrackingSetup
 {
@@ -32,7 +31,7 @@ class R3BTrackingSetup
                      const std::string& dataName = "");
 
     R3BTrackingDetector* GetByName(const std::string& name);
-    
+
     R3BTrackingDetector* GetFirstByType(const EDetectorType& type);
 
     void Init();

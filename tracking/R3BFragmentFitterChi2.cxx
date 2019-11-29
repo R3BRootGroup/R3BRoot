@@ -11,12 +11,11 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-
+#include "FairLogger.h"
+#include "R3BHit.h"
+#include "R3BTPropagator.h"
 #include "R3BTrackingParticle.h"
 #include "R3BTrackingSetup.h"
-#include "R3BTPropagator.h"
-#include "R3BHit.h"
-#include "FairLogger.h"
 
 #include "R3BFragmentFitterChi2.h"
 
@@ -28,9 +27,9 @@ R3BTPropagator* gProp;
 
 Bool_t gEnergyLoss;
 
-double Chi2(const double *xx)
+double Chi2(const double* xx)
 {
-    //Bool_t result = kFALSE;
+    // Bool_t result = kFALSE;
     Double_t sdev = 0.;
     Double_t x_l = 0.;
     Double_t y_l = 0.;
@@ -47,20 +46,20 @@ double Chi2(const double *xx)
     // Propagate through the setup, defined by array of detectors
     for (auto const& det : gSetup->GetArray())
     {
-        if(kTarget != det->section)
+        if (kTarget != det->section)
         {
-            /*result = */gProp->PropagateToDetector(gCandidate, det);
-            
+            /*result = */ gProp->PropagateToDetector(gCandidate, det);
+
             time += (gCandidate->GetLength() - prev_l) / (gCandidate->GetBeta() * SPEED_OF_LIGHT);
             prev_l = gCandidate->GetLength();
         }
 
-        if(gEnergyLoss)
+        if (gEnergyLoss)
         {
             if (kTof != det->section)
             {
                 Double_t weight = 1.;
-                if(kTarget == det->section)
+                if (kTarget == det->section)
                 {
                     weight = 0.5;
                 }
@@ -70,9 +69,9 @@ double Chi2(const double *xx)
 
         // Convert global track coordinates into local on the det plane
         det->GlobalToLocal(gCandidate->GetPosition(), x_l, y_l);
-        
-        R3BHit* hit = gSetup->GetHit(det->GetDetectorName().Data(),
-                                     gCandidate->GetHitIndexByName(det->GetDetectorName().Data()));
+
+        R3BHit* hit =
+            gSetup->GetHit(det->GetDetectorName().Data(), gCandidate->GetHitIndexByName(det->GetDetectorName().Data()));
 
         // X deviation at the last detector
         if (kAfterGlad == det->section)
@@ -80,149 +79,145 @@ double Chi2(const double *xx)
             sdev += TMath::Power(x_l - hit->GetX(), 2);
         }
 
-        //if(kTarget != det->section)
-        //if(kAfterGlad == det->section)
+        // if(kTarget != det->section)
+        // if(kAfterGlad == det->section)
         {
             chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
-            //LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
+            // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
             nchi2 += 1;
         }
-        
-        if(kTof == det->section)
+
+        if (kTof == det->section)
         {
             chi2 += TMath::Power((time - hit->GetTime()) / det->res_t, 2);
         }
     }
 
-    //sdev /= 2;
-    //sdev = TMath::Sqrt(sdev);
+    // sdev /= 2;
+    // sdev = TMath::Sqrt(sdev);
 
-    //chi2 /= nchi2;
+    // chi2 /= nchi2;
     gCandidate->SetChi2(chi2);
 
     return chi2;
 }
 
-double Chi2Backward(const double *xx)
+double Chi2Backward(const double* xx)
 {
-    //Bool_t result = kFALSE;
-    //Double_t sdev = 0.;
+    // Bool_t result = kFALSE;
+    // Double_t sdev = 0.;
     Double_t x_l = 0.;
     Double_t y_l = 0.;
-    //Double_t prev_l = 0.;
-    //Double_t time = 0.;
+    // Double_t prev_l = 0.;
+    // Double_t time = 0.;
     Double_t chi2 = 0.;
     Int_t nchi2 = 0;
-    
+
     gCandidate->SetMass(xx[0]);
     gCandidate->UpdateMomentum();
-    
+
     gCandidate->Reset();
 
     // Propagate through the setup, defined by array of detectors
     for (Int_t i = (gSetup->GetArray().size() - 2); i >= 0; i--)
     {
         auto det = gSetup->GetArray().at(i);
-        
-        if(i < (gSetup->GetArray().size() - 2))
+
+        if (i < (gSetup->GetArray().size() - 2))
         {
-            /*result = */gProp->PropagateToDetectorBackward(gCandidate, det);
-            
-            //time += (gCandidate->GetLength() - prev_l) / (gCandidate->GetBeta() * SPEED_OF_LIGHT);
-            //prev_l = gCandidate->GetLength();
-            
-            LOG(DEBUG2) << " at " << det->GetDetectorName() << ", momentum:"
-            << gCandidate->GetMomentum().X() << "," << gCandidate->GetMomentum().Y()
-            << gCandidate->GetMomentum().Z();
+            /*result = */ gProp->PropagateToDetectorBackward(gCandidate, det);
+
+            // time += (gCandidate->GetLength() - prev_l) / (gCandidate->GetBeta() * SPEED_OF_LIGHT);
+            // prev_l = gCandidate->GetLength();
+
+            LOG(DEBUG2) << " at " << det->GetDetectorName() << ", momentum:" << gCandidate->GetMomentum().X() << ","
+                        << gCandidate->GetMomentum().Y() << gCandidate->GetMomentum().Z();
         }
-        
-        if(gEnergyLoss)
+
+        if (gEnergyLoss)
         {
             Double_t weight = 1.;
-            if(kTarget == det->section)
+            if (kTarget == det->section)
             {
                 weight = 0.5;
             }
             gCandidate->PassThroughDetectorBackward(det, weight);
         }
-        
+
         // Convert global track coordinates into local on the det plane
         det->GlobalToLocal(gCandidate->GetPosition(), x_l, y_l);
-        
-        R3BHit* hit = gSetup->GetHit(det->GetDetectorName().Data(),
-                                     gCandidate->GetHitIndexByName(det->GetDetectorName().Data()));
-        
-        //if(kTarget != det->section)
-        //if(kAfterGlad == det->section)
+
+        R3BHit* hit =
+            gSetup->GetHit(det->GetDetectorName().Data(), gCandidate->GetHitIndexByName(det->GetDetectorName().Data()));
+
+        // if(kTarget != det->section)
+        // if(kAfterGlad == det->section)
         {
             chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
-            //LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
+            // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
             nchi2 += 1;
         }
-        
-//        if(kTof == det->section)
-//        {
-//            chi2 += TMath::Power((time - hit->GetTime()) / det->res_t, 2);
-//        }
+
+        //        if(kTof == det->section)
+        //        {
+        //            chi2 += TMath::Power((time - hit->GetTime()) / det->res_t, 2);
+        //        }
     }
-    
-    //sdev /= 2;
-    //sdev = TMath::Sqrt(sdev);
-    
-    //chi2 /= nchi2;
+
+    // sdev /= 2;
+    // sdev = TMath::Sqrt(sdev);
+
+    // chi2 /= nchi2;
     gCandidate->SetChi2(chi2);
-    
+
     return chi2;
 }
 
-R3BFragmentFitterChi2::R3BFragmentFitterChi2()
-{
-}
+R3BFragmentFitterChi2::R3BFragmentFitterChi2() {}
 
-R3BFragmentFitterChi2::~R3BFragmentFitterChi2()
-{
-}
+R3BFragmentFitterChi2::~R3BFragmentFitterChi2() {}
 
 void R3BFragmentFitterChi2::Init(R3BTPropagator* prop, Bool_t energyLoss)
 {
     fPropagator = prop;
     gProp = prop;
     gEnergyLoss = energyLoss;
-    
+
     fMinimum = ROOT::Math::Factory::CreateMinimizer("Minuit2", "");
-    
+
     // set tolerance , etc...
     fMinimum->SetMaxFunctionCalls(1000000); // for Minuit/Minuit2
-    fMinimum->SetMaxIterations(10000);  // for GSL
+    fMinimum->SetMaxIterations(10000);      // for GSL
     fMinimum->SetTolerance(10.);
     fMinimum->SetPrintLevel(0);
     fMinimum->SetStrategy(0);
-    
+
     // create funciton wrapper for minmizer
     // a IMultiGenFunction type
     ROOT::Math::Functor* f = new ROOT::Math::Functor(&Chi2Backward, 1);
-    
+
     fMinimum->SetFunction(*f);
 }
 
-Int_t R3BFragmentFitterChi2::FitTrack(R3BTrackingParticle* particle, R3BTrackingSetup *setup)
+Int_t R3BFragmentFitterChi2::FitTrack(R3BTrackingParticle* particle, R3BTrackingSetup* setup)
 {
     gCandidate = particle;
-    
-    ROOT::Math::Minimizer* minimum =
-    ROOT::Math::Factory::CreateMinimizer("Minuit2", "Combined");
+
+    ROOT::Math::Minimizer* minimum = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Combined");
 
     // set tolerance , etc...
     minimum->SetMaxFunctionCalls(1000000); // for Minuit/Minuit2
-    minimum->SetMaxIterations(10000);  // for GSL
+    minimum->SetMaxIterations(10000);      // for GSL
     minimum->SetTolerance(0.001);
     minimum->SetPrintLevel(0);
 
     // create funciton wrapper for minmizer
     // a IMultiGenFunction type
     ROOT::Math::Functor f(&Chi2, 1);
-    double variable[1] = {particle->GetMass()};
-    double step[1] = {0.001,};
+    double variable[1] = { particle->GetMass() };
+    double step[1] = {
+        0.001,
+    };
 
     minimum->SetFunction(f);
 
@@ -233,11 +228,11 @@ Int_t R3BFragmentFitterChi2::FitTrack(R3BTrackingParticle* particle, R3BTracking
 
     // do the minimization
     gEnergyLoss = kTRUE;
-    
+
     minimum->Minimize();
-    
+
     status = minimum->Status();
-    if(0 != status)
+    if (0 != status)
     {
         return status;
     }
@@ -248,28 +243,28 @@ Int_t R3BFragmentFitterChi2::FitTrack(R3BTrackingParticle* particle, R3BTracking
     particle->Reset();
 
     delete minimum;
-    
+
     return status;
 }
 
-Int_t R3BFragmentFitterChi2::FitTrackBackward(R3BTrackingParticle* particle, R3BTrackingSetup *setup)
+Int_t R3BFragmentFitterChi2::FitTrackBackward(R3BTrackingParticle* particle, R3BTrackingSetup* setup)
 {
-    //fPropagator->SetVis(kTRUE);
-    
+    // fPropagator->SetVis(kTRUE);
+
     gCandidate = particle;
     gSetup = setup;
-    
+
     auto fi4 = gSetup->GetByName("fi4");
     auto fi5 = gSetup->GetByName("fi5");
     auto fi6 = gSetup->GetByName("fi6");
-    //auto tof = gSetup->GetFirstByType(kTof);
-    
-    double variable[1] = {132.*0.9314940954};
-    double step[1] = {0.01};
-    
+    // auto tof = gSetup->GetFirstByType(kTof);
+
+    double variable[1] = { 132. * 0.9314940954 };
+    double step[1] = { 0.01 };
+
     // Set the free variables to be minimized!
-    fMinimum->SetLimitedVariable(0, "m", variable[0], step[0], 125.*0.9314940954, 133.*0.9314940954);
-    
+    fMinimum->SetLimitedVariable(0, "m", variable[0], step[0], 125. * 0.9314940954, 133. * 0.9314940954);
+
     TVector3 pos1;
     TVector3 pos2;
     TVector3 pos3;
@@ -286,67 +281,67 @@ Int_t R3BFragmentFitterChi2::FitTrackBackward(R3BTrackingParticle* particle, R3B
     f1->SetParameters(-1., 0.);
     gr->Fit(f1, "QN");
     f2->SetParameters(1./f1->GetParameter(0), -1.*f1->GetParameter(1)/f1->GetParameter(0));
-    TVector3 direction0 = ( TVector3(fi5->hit_x, 0., f1->Eval(fi5->hit_x)) - TVector3(fi6->hit_x, 0., f1->Eval(fi6->hit_x)) ).Unit();
-    TVector3 pos0(f2->Eval(fi6->pos0.Z()), 0., fi6->pos0.Z());*/
+    TVector3 direction0 = ( TVector3(fi5->hit_x, 0., f1->Eval(fi5->hit_x)) - TVector3(fi6->hit_x, 0.,
+    f1->Eval(fi6->hit_x)) ).Unit(); TVector3 pos0(f2->Eval(fi6->pos0.Z()), 0., fi6->pos0.Z());*/
     TVector3 direction0 = (pos2 - pos3).Unit();
     TVector3 pos0 = pos3;
     Double_t mom = gCandidate->GetMass() * gCandidate->GetStartBeta() * gCandidate->GetStartGamma();
-    TVector3 startMomentum(mom*direction0.X(), mom*direction0.Y(), mom*direction0.Z());
+    TVector3 startMomentum(mom * direction0.X(), mom * direction0.Y(), mom * direction0.Z());
     gCandidate->SetStartPosition(pos0);
     gCandidate->SetStartMomentum(startMomentum);
     gCandidate->Reset();
-    
-    //pos1.Print();
-    //startMomentum.Print();
-    
+
+    // pos1.Print();
+    // startMomentum.Print();
+
     for (Int_t i = 0; i <= (gSetup->GetArray().size() - 2); i++)
     {
         auto det = gSetup->GetArray().at(i);
-        
-        if(gEnergyLoss)
+
+        if (gEnergyLoss)
         {
             Double_t weight = 1.;
-            if(kTarget == det->section)
+            if (kTarget == det->section)
             {
                 weight = 0.5;
             }
             gCandidate->PassThroughDetector(det, weight);
         }
     }
-    
-    //LOG(INFO) << "1 Start beta:" << gCandidate->GetStartBeta()
+
+    // LOG(INFO) << "1 Start beta:" << gCandidate->GetStartBeta()
     //<< ",  Beta:" << gCandidate->GetBeta();
-    
+
     gCandidate->SetStartBeta(gCandidate->GetBeta());
     gCandidate->SetCharge(-1. * gCandidate->GetCharge());
     gCandidate->UpdateMomentum();
-    
-    //Double_t chi2 = Chi2Backward(variable);
-    
-    //LOG(INFO) << "2 chi2 = " << chi2;
-    
-    //return 0;
+
+    // Double_t chi2 = Chi2Backward(variable);
+
+    // LOG(INFO) << "2 chi2 = " << chi2;
+
+    // return 0;
 
     Int_t status = 0;
-    
+
     // do the minimization
     fMinimum->Minimize();
-    
+
     gCandidate->SetCharge(-1. * gCandidate->GetCharge());
-    
+
     status = fMinimum->Status();
-    if(0 != status)
+    if (0 != status)
     {
         return status;
     }
 
     particle->SetMass(fMinimum->X()[0]);
     particle->UpdateMomentum();
-    
+
     fMinimum->Clear();
-    
-    //candidate->Reset();
-    
+
+    // candidate->Reset();
+
     return status;
 }
 
@@ -357,88 +352,89 @@ Int_t R3BFragmentFitterChi2::FitTrackBackward(R3BTrackingParticle* particle, R3B
  * All required information is in fArrayDetectors and in the parameters
  */
 Double_t R3BFragmentFitterChi2::TrackFragment(R3BTrackingParticle* particle,
-                                          Bool_t energyLoss,
-                                          Double_t& devTof,
-                                          Double_t& time,
-                                          Double_t& chi2)
+                                              Bool_t energyLoss,
+                                              Double_t& devTof,
+                                              Double_t& time,
+                                              Double_t& chi2)
 {
-/*    Bool_t result = kFALSE;
-    Double_t sdev = 0.;
-    Double_t x_l = 0.;
-    Double_t y_l = 0.;
-    devTof = 0.;
-    time = 0.;
-    chi2 = 0.;
-    Double_t prev_l = 0.;
+    /*    Bool_t result = kFALSE;
+        Double_t sdev = 0.;
+        Double_t x_l = 0.;
+        Double_t y_l = 0.;
+        devTof = 0.;
+        time = 0.;
+        chi2 = 0.;
+        Double_t prev_l = 0.;
 
-    // Propagate through the setup, defined by array of detectors
-    for (auto const& det : fDetectors->GetArray())
-    {
-        LOG(DEBUG2);
-        LOG(DEBUG2) << "Propagating to z=" << det->pos0.Z();
-
-        if(kTarget != det->section)
+        // Propagate through the setup, defined by array of detectors
+        for (auto const& det : fDetectors->GetArray())
         {
-            result = fPropagator->PropagateToDetector(particle, det);
-            
-            time += (particle->GetLength() - prev_l) / (particle->GetBeta() * SPEED_OF_LIGHT);
-            prev_l = particle->GetLength();
-        }
+            LOG(DEBUG2);
+            LOG(DEBUG2) << "Propagating to z=" << det->pos0.Z();
 
-        if (energyLoss && kTof != det->section)
-        {
-            Double_t weight = 1.;
-            if(kTarget == det->section)
+            if(kTarget != det->section)
             {
-                weight = 0.5;
+                result = fPropagator->PropagateToDetector(particle, det);
+
+                time += (particle->GetLength() - prev_l) / (particle->GetBeta() * SPEED_OF_LIGHT);
+                prev_l = particle->GetLength();
             }
-            particle->PassThroughDetector(det, weight);
+
+            if (energyLoss && kTof != det->section)
+            {
+                Double_t weight = 1.;
+                if(kTarget == det->section)
+                {
+                    weight = 0.5;
+                }
+                particle->PassThroughDetector(det, weight);
+            }
+
+            if (det->GetDetectorName().EqualTo("psp"))
+            { // PSP
+                Double_t eloss = det->GetEnergyLoss(particle);
+                fh_eloss_psp->Fill(eloss);
+            }
+
+            if (det->GetDetectorName().EqualTo("fi4"))
+            {                                                        // Fi4
+                Double_t eloss = 0.5 * det->GetEnergyLoss(particle); // 0.5 because of 2 layers !!!
+                fh_eloss_fi4->Fill(eloss);
+            }
+
+            // Convert global track coordinates into local on the det plane
+            det->GlobalToLocal(particle->GetPosition(), x_l, y_l);
+
+            R3BHit* hit = fDetectors->GetHit(det->GetDetectorName().Data(),
+       particle->GetHitIndexByName(det->GetDetectorName().Data()));
+
+            // X deviation at the last detector
+            if (kAfterGlad == det->section)
+            {
+                sdev += x_l - hit->GetX();
+            }
+
+            // X deviation at the last detector
+            if (kTof == det->section)
+            {
+                devTof = x_l - hit->GetX();
+            }
+
+            chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
+
+            LOG(DEBUG2) << "Track length " << particle->GetLength() << " cm";
         }
 
-        if (det->GetDetectorName().EqualTo("psp"))
-        { // PSP
-            Double_t eloss = det->GetEnergyLoss(particle);
-            fh_eloss_psp->Fill(eloss);
-        }
+        sdev /= 2;
 
-        if (det->GetDetectorName().EqualTo("fi4"))
-        {                                                        // Fi4
-            Double_t eloss = 0.5 * det->GetEnergyLoss(particle); // 0.5 because of 2 layers !!!
-            fh_eloss_fi4->Fill(eloss);
-        }
+        chi2 /= (fDetectors->GetArray().size() - 2);
 
-        // Convert global track coordinates into local on the det plane
-        det->GlobalToLocal(particle->GetPosition(), x_l, y_l);
-        
-        R3BHit* hit = fDetectors->GetHit(det->GetDetectorName().Data(), particle->GetHitIndexByName(det->GetDetectorName().Data()));
-
-        // X deviation at the last detector
-        if (kAfterGlad == det->section)
-        {
-            sdev += x_l - hit->GetX();
-        }
-
-        // X deviation at the last detector
-        if (kTof == det->section)
-        {
-            devTof = x_l - hit->GetX();
-        }
-
-        chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
-
+        LOG(DEBUG2) << "Deviation at TOF wall : " << sdev;
+        LOG(DEBUG2) << "                 chi2 : " << chi2;
+        LOG(DEBUG2) << "                 time : " << time;
         LOG(DEBUG2) << "Track length " << particle->GetLength() << " cm";
-    }
 
-    sdev /= 2;
-    
-    chi2 /= (fDetectors->GetArray().size() - 2);
-
-    LOG(DEBUG2) << "Deviation at TOF wall : " << sdev;
-    LOG(DEBUG2) << "                 chi2 : " << chi2;
-    LOG(DEBUG2) << "                 time : " << time;
-    LOG(DEBUG2) << "Track length " << particle->GetLength() << " cm";
-
-    return sdev;*/
+        return sdev;*/
     return 0.;
 }
 
@@ -451,15 +447,17 @@ Double_t R3BFragmentFitterChi2::TrackFragment(R3BTrackingParticle* particle,
  */
 Double_t R3BFragmentFitterChi2::Velocity(R3BTrackingParticle* candidate)
 {
-/*    fPropagator->SetVis(kFALSE);
-    R3BTrackingDetector* tof = fDetectors->GetByName("tofd");
+    /*    fPropagator->SetVis(kFALSE);
+        R3BTrackingDetector* tof = fDetectors->GetByName("tofd");
 
-    fPropagator->PropagateToDetector(candidate, tof);
-    // TrackFragment(candidate);
-    Double_t beta = candidate->GetLength() / (fDetectors->GetHit("tofd", candidate->GetHitIndexByName("tofd"))->GetTime() - fDetectors->GetHit("target", candidate->GetHitIndexByName("target"))->GetTime()) / SPEED_OF_LIGHT;
-    LOG(INFO) << "Velocity estimation (TOF) " << beta << "   length = " << candidate->GetLength();
+        fPropagator->PropagateToDetector(candidate, tof);
+        // TrackFragment(candidate);
+        Double_t beta = candidate->GetLength() / (fDetectors->GetHit("tofd",
+       candidate->GetHitIndexByName("tofd"))->GetTime() - fDetectors->GetHit("target",
+       candidate->GetHitIndexByName("target"))->GetTime()) / SPEED_OF_LIGHT; LOG(INFO) << "Velocity estimation (TOF) "
+       << beta << "   length = " << candidate->GetLength();
 
-    return beta;*/
+        return beta;*/
     return 0.;
 }
 

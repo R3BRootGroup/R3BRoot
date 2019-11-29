@@ -50,9 +50,9 @@ class R3BTofdHitPar : public FairParGenericSet
      * @param own class ownership, if flag is kTRUE FairDB has the par.
      */
     R3BTofdHitPar(const char* name = "TofdHitPar",
-               const char* title = "TOFd HIT calibration",
-               const char* context = "TestDefaultContext",
-               Bool_t own = kTRUE);
+                  const char* title = "TOFd HIT calibration",
+                  const char* context = "TestDefaultContext",
+                  Bool_t own = kTRUE);
     /**
      * Destructor. Cleares the memory used by the object.
      */
@@ -112,19 +112,13 @@ class R3BTofdHitPar : public FairParGenericSet
      * Method to retrieve the arrray with module containers.
      * @return an array with parameter containers of type R3BTCalModulePar.
      */
-    TObjArray* GetListOfModulePar()
-    {
-        return fHitParams;
-    }
+    TObjArray* GetListOfModulePar() { return fHitParams; }
 
     /**
      * Method to get number of modules storred in array.
      * @return size of array.
      */
-    Int_t GetNumModulePar()
-    {
-        return fHitParams->GetEntries();
-    }
+    Int_t GetNumModulePar() { return fHitParams->GetEntries(); }
 
     /**
      * Method to get single parameter container for a specific module.

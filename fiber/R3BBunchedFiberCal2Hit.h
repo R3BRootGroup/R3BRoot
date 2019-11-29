@@ -35,23 +35,25 @@ class R3BBunchedFiberHitModulePar;
  * This class will then figure out how to map the actual fibers (except for
  * non-ambiguous sorting errors).
  */
-class R3BBunchedFiberCal2Hit: public FairTask
+class R3BBunchedFiberCal2Hit : public FairTask
 {
   public:
-    enum Direction {
-      HORIZONTAL,
-      VERTICAL
+    enum Direction
+    {
+        HORIZONTAL,
+        VERTICAL
     };
-    struct ToT {
-      ToT(R3BBunchedFiberCalData const *, R3BBunchedFiberCalData const *,
-          Double_t);
-      R3BBunchedFiberCalData const *lead;
-      R3BBunchedFiberCalData const *trail;
-      Double_t tot;
+    struct ToT
+    {
+        ToT(R3BBunchedFiberCalData const*, R3BBunchedFiberCalData const*, Double_t);
+        R3BBunchedFiberCalData const* lead;
+        R3BBunchedFiberCalData const* trail;
+        Double_t tot;
     };
-    struct Channel {
-      std::list<R3BBunchedFiberCalData const *> lead_list;
-      std::list<ToT> tot_list;
+    struct Channel
+    {
+        std::list<R3BBunchedFiberCalData const*> lead_list;
+        std::list<ToT> tot_list;
     };
 
     /**
@@ -60,7 +62,7 @@ class R3BBunchedFiberCal2Hit: public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BBunchedFiberCal2Hit(const char *, Int_t, Direction, UInt_t, UInt_t, UInt_t, Bool_t);
+    R3BBunchedFiberCal2Hit(const char*, Int_t, Direction, UInt_t, UInt_t, UInt_t, Bool_t);
 
     /**
      * Destructor.
@@ -83,14 +85,13 @@ class R3BBunchedFiberCal2Hit: public FairTask
     virtual InitStatus ReInit();
 
     virtual void SetParContainers();
- 
 
     /**
      * Method for event loop implementation.
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Exec(Option_t *);
+    virtual void Exec(Option_t*);
 
     /**
      * A method for finish of processing of an event.
@@ -108,9 +109,9 @@ class R3BBunchedFiberCal2Hit: public FairTask
     R3BBunchedFiberHitModulePar* GetModuleParAt(Int_t fiber);
 
     /**
-      * Getting all fibers correct is difficult, this function lets us fix that
-      * per detector.
-      */
+     * Getting all fibers correct is difficult, this function lets us fix that
+     * per detector.
+     */
     virtual UInt_t FixMistake(UInt_t) = 0;
 
   private:
@@ -119,20 +120,20 @@ class R3BBunchedFiberCal2Hit: public FairTask
     UInt_t fSubNum;
     UInt_t fChPerSub[2];
     Bool_t fIsCalibrator;
-    TClonesArray *fCalItems;
-    TClonesArray *fHitItems;
-    R3BBunchedFiberHitPar* fCalPar;   /**< Parameter container. */
-    R3BBunchedFiberHitPar* fHitPar;   /**< Hit parameter container. */
-    Int_t fNofHitPars;                /**< Number of modules in parameter file. */
+    TClonesArray* fCalItems;
+    TClonesArray* fHitItems;
+    R3BBunchedFiberHitPar* fCalPar; /**< Parameter container. */
+    R3BBunchedFiberHitPar* fHitPar; /**< Hit parameter container. */
+    Int_t fNofHitPars;              /**< Number of modules in parameter file. */
     Int_t fNofHitItems;
     // [0=MAPMT,1=SPMT][Channel].
     std::vector<Channel> fChannelArray[2];
 
-	// histograms for gain matching
-    TH2F* fh_ToT_MA_Fib;   
-    TH2F* fh_ToT_Single_Fib;   
-    TH2F* fh_ToT_s_Fib[4];   
-    
+    // histograms for gain matching
+    TH2F* fh_ToT_MA_Fib;
+    TH2F* fh_ToT_Single_Fib;
+    TH2F* fh_ToT_s_Fib[4];
+
     TH2F* fh_ToT_ToT;
 
   public:

@@ -35,9 +35,7 @@ R3BTCalModulePar::R3BTCalModulePar(const char* name, const char* title, const ch
     clear();
 }
 
-R3BTCalModulePar::~R3BTCalModulePar()
-{
-}
+R3BTCalModulePar::~R3BTCalModulePar() {}
 
 void R3BTCalModulePar::putParams(FairParamList* list)
 {
@@ -140,7 +138,7 @@ Double_t R3BTCalModulePar::GetTimeClockTDC(Int_t tdc)
 
 Double_t R3BTCalModulePar::GetTimeTacquila(Int_t tdc)
 {
-	tdc = tdc + 1;
+    tdc = tdc + 1;
     for (Int_t i = 0; i < fNofChannels; i++)
     {
         if (tdc >= fBinLow[i] && tdc <= fBinUp[i])

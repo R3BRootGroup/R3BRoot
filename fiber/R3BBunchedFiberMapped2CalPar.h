@@ -25,12 +25,13 @@ class R3BTCalPar;
 class R3BEventHeader;
 class R3BTCalEngine;
 
-class R3BBunchedFiberMapped2CalPar: public FairTask
+class R3BBunchedFiberMapped2CalPar : public FairTask
 {
   public:
-    enum Electronics {
-      CTDC,
-      TAMEX
+    enum Electronics
+    {
+        CTDC,
+        TAMEX
     };
 
     /**
@@ -41,7 +42,7 @@ class R3BBunchedFiberMapped2CalPar: public FairTask
      * @param a_update_rate a update rate for online histograms.
      * @param a_min_stats a minimum statistics for calibration.
      */
-    R3BBunchedFiberMapped2CalPar(const char *, Int_t, enum Electronics = TAMEX, Int_t = 1e6, Int_t = 1e5);
+    R3BBunchedFiberMapped2CalPar(const char*, Int_t, enum Electronics = TAMEX, Int_t = 1e6, Int_t = 1e5);
 
     /**
      * Destructor.
@@ -62,7 +63,7 @@ class R3BBunchedFiberMapped2CalPar: public FairTask
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Exec(Option_t *);
+    virtual void Exec(Option_t*);
 
     /**
      * A method for finish of processing of an event.
@@ -95,11 +96,11 @@ class R3BBunchedFiberMapped2CalPar: public FairTask
   private:
     TString fName;
     enum Electronics fSPMTElectronics;
-    TClonesArray *fMapped;
-    R3BTCalPar    *fMAPMTTCalPar;
-    R3BTCalEngine *fMAPMTEngine;
-    R3BTCalPar    *fSPMTTCalPar;
-    R3BTCalEngine *fSPMTEngine;
+    TClonesArray* fMapped;
+    R3BTCalPar* fMAPMTTCalPar;
+    R3BTCalEngine* fMAPMTEngine;
+    R3BTCalPar* fSPMTTCalPar;
+    R3BTCalEngine* fSPMTEngine;
     Int_t fUpdateRate;
     Int_t fMinStats;
 

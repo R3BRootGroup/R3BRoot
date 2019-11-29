@@ -23,8 +23,8 @@
 // Contact: root-vmc@cern.ch
 //-------------------------------------------------
 
-/// \file Garfield/geant4/include/FastSimulation.h 
-/// \brief Definition of the Garfield::FastSimulation class 
+/// \file Garfield/geant4/include/FastSimulation.h
+/// \brief Definition of the Garfield::FastSimulation class
 ///
 /// Garfield garfieldpp example adapted to Virtual Monte Carlo.
 ///
@@ -37,29 +37,28 @@ class GarfieldMessenger;
 
 namespace VMC
 {
-namespace Garfield
-{
+    namespace Garfield
+    {
 
-/// \ingroup Garfield
-/// \brief Special class for definition of fast simulation models
-///
-/// \author I. Hrivnacova; IPN, Orsay
+        /// \ingroup Garfield
+        /// \brief Special class for definition of fast simulation models
+        ///
+        /// \author I. Hrivnacova; IPN, Orsay
 
-class FastSimulation : public TG4VUserFastSimulation
-{
-  public:
-    FastSimulation();
-    virtual ~FastSimulation();
+        class FastSimulation : public TG4VUserFastSimulation
+        {
+          public:
+            FastSimulation();
+            virtual ~FastSimulation();
 
-    // methods
-    virtual void Construct();
+            // methods
+            virtual void Construct();
 
-  private:
-  	GarfieldMessenger* fMessenger;
-};
+          private:
+            GarfieldMessenger* fMessenger;
+        };
 
-}
-}
+    } // namespace Garfield
+} // namespace VMC
 
-#endif //GFLASH_FAST_SIMULATION_H
-
+#endif // GFLASH_FAST_SIMULATION_H

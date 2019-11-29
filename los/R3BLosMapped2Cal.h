@@ -17,8 +17,6 @@
 // ----- Convert mapped data to time calibrated data      -----
 // ------------------------------------------------------------
 
-
-
 #ifndef R3BLOSMAPPED2CAL
 #define R3BLOSMAPPED2CAL
 
@@ -92,7 +90,7 @@ class R3BLosMapped2Cal : public FairTask
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    void Exec(Option_t *);
+    void Exec(Option_t*);
 
     /**
      * A method for finish of processing of an event.
@@ -107,54 +105,51 @@ class R3BLosMapped2Cal : public FairTask
      */
     void FinishTask();
 
-    /** 
+    /**
      * Method for setting the trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
-    inline void SetTrigger(Int_t trigger)
-    {
-        fTrigger = trigger;
-    }
+    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
 
     /**
      * Method for setting the number of NeuLAND modules.
      * @param nPMTs a number of photomultipliers.
      * @param n17 a number of channels with stop signal (17-th channel).
      */
-     
+
     inline void SetNofModules(Int_t nDets, Int_t nChs)
     {
         fNofDetectors = nDets;
-        fNofChannels = nChs;  //=4 or 8  or 16    
-        fNofTypes     = 3;
-        fNofModules  = nChs * nDets * 3 ; // 4 or 8 los signals * 3 times per channel in total 12 or 24
+        fNofChannels = nChs; //=4 or 8  or 16
+        fNofTypes = 3;
+        fNofModules = nChs * nDets * 3; // 4 or 8 los signals * 3 times per channel in total 12 or 24
     }
 
   private:
-    size_t GetCalLookupIndex(R3BLosMappedData const &) const;
-    
-    TClonesArray *fMappedItems;                 /**< Array with mapped items - input data. */
-    TClonesArray *fCalItems;                    /**< Array with cal items - output data. */
+    size_t GetCalLookupIndex(R3BLosMappedData const&) const;
 
-    Int_t fNofCalItems;                         /**< Number of produced time items per event. */
+    TClonesArray* fMappedItems; /**< Array with mapped items - input data. */
+    TClonesArray* fCalItems;    /**< Array with cal items - output data. */
 
-    R3BTCalPar *fTcalPar;                       /**< TCAL parameter container. */
-    UInt_t fNofTcalPars;                        /**< Number of modules in parameter file. */
+    Int_t fNofCalItems; /**< Number of produced time items per event. */
 
-	// check for trigger should be done globablly (somewhere else)
-    R3BEventHeader* header;                     /**< Event header. */
-    Int_t fTrigger;                             /**< Trigger value. */
+    R3BTCalPar* fTcalPar; /**< TCAL parameter container. */
+    UInt_t fNofTcalPars;  /**< Number of modules in parameter file. */
 
-    UInt_t fNofDetectors;  /**< Number of detectors. */
-    UInt_t fNofChannels;   /**< Number of channels per detector. */
-    UInt_t fNofTypes;    
-	UInt_t fNofModules;    /**< Total number of channels. */
-    Double_t fClockFreq;   /**< Clock cycle in [ns]. */
+    // check for trigger should be done globablly (somewhere else)
+    R3BEventHeader* header; /**< Event header. */
+    Int_t fTrigger;         /**< Trigger value. */
+
+    UInt_t fNofDetectors; /**< Number of detectors. */
+    UInt_t fNofChannels;  /**< Number of channels per detector. */
+    UInt_t fNofTypes;
+    UInt_t fNofModules;  /**< Total number of channels. */
+    Double_t fClockFreq; /**< Clock cycle in [ns]. */
     UInt_t fNEvent;
 
-// Fast lookup for matching mapped data.
-    std::vector<std::vector<R3BLosCalData *>> fCalLookup;
-    
+    // Fast lookup for matching mapped data.
+    std::vector<std::vector<R3BLosCalData*>> fCalLookup;
+
   public:
     ClassDef(R3BLosMapped2Cal, 1)
 };

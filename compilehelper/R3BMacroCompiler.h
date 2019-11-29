@@ -16,9 +16,8 @@
 
 class R3BMacroCompiler
 {
-public:
-  static void SetIncludeDirectories();
+  public:
+    static void SetIncludeDirectories();
 };
 
 #endif
-

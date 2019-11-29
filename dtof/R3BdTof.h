@@ -54,7 +54,7 @@ class R3BdTof : public R3BDetector
     virtual Bool_t ProcessHits(FairVolume* vol = 0);
 
     /** Virtual method BeginEvent
-     ** 
+     **
      ** If verbosity level is set, print hit collection at the
      ** end of the event and resets it afterwards.
      **/
@@ -124,7 +124,7 @@ class R3BdTof : public R3BDetector
     TClonesArray* fdTofCollection; //!  The hit collection
     Bool_t kGeoSaved;              //!
     TList* flGeoPar;               //!
-    
+
     R3BTGeoPar* fTGeoPar;  //!
     R3BTGeoPar* fTGeoPar2; //!
 

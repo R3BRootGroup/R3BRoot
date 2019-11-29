@@ -11,14 +11,13 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-
 #ifndef R3B_FRAGMENTTRACKER_H
 #define R3B_FRAGMENTTRACKER_H
 
 #include "FairTask.h"
 
-#include <vector>
 #include <string>
+#include <vector>
 
 class TClonesArray;
 class R3BFieldPar;
@@ -44,7 +43,7 @@ class R3BFragmentTracker : public FairTask
     virtual void Exec(const Option_t* = "");
 
     virtual void Finish();
-    
+
     void SetFragmentFitter(R3BFragmentFitterGeneric* fitter) { fFitter = fitter; }
     void SetEnergyLoss(Bool_t energyLoss) { fEnergyLoss = energyLoss; }
 
@@ -59,10 +58,10 @@ class R3BFragmentTracker : public FairTask
     TClonesArray* fArrayFragments;
     Int_t fNEvents;
     Bool_t fVis;
-    
+
     R3BFragmentFitterGeneric* fFitter;
     Bool_t fEnergyLoss;
-    
+
     Double_t fAfterGladResolution;
 
     TH1F* fh_mult_psp;

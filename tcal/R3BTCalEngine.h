@@ -11,7 +11,6 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-
 #ifndef _R3BTCAL_ENGINE_
 #define _R3BTCAL_ENGINE_
 
@@ -50,7 +49,7 @@ class R3BTCalEngine : public TObject
      * @param nModules a number of detector modules.
      * @param minStats a minimum number of entries per module.
      */
-    R3BTCalEngine(R3BTCalPar *param, Int_t minStats = 10000);
+    R3BTCalEngine(R3BTCalPar* param, Int_t minStats = 10000);
 
     /**
      * Destructor.

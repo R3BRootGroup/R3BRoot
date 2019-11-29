@@ -20,52 +20,49 @@
 
 #include "R3BPrimPart.h"
 
-
-
 ClassImp(R3BPrimPart)
 
-
-
-// -----------------------------------------------------------------------------
-R3BPrimPart::R3BPrimPart()
+    // -----------------------------------------------------------------------------
+    R3BPrimPart::R3BPrimPart()
 {
-  fPdg = 0;
-  fPx = 0.;
-  fPy = 0.;
-  fPz = 0.;
-  fX = 0.;
-  fY = 0.;
-  fZ = 0.;
-  fT = 0.;
-  fA = 0.;
-  fM = 0.;
+    fPdg = 0;
+    fPx = 0.;
+    fPy = 0.;
+    fPz = 0.;
+    fX = 0.;
+    fY = 0.;
+    fZ = 0.;
+    fT = 0.;
+    fA = 0.;
+    fM = 0.;
 }
 // -----------------------------------------------------------------------------
 
-
-
 // -----------------------------------------------------------------------------
-R3BPrimPart::R3BPrimPart(Int_t pdg, Double_t px, Double_t py, Double_t pz,
-			 Double_t x, Double_t y, Double_t z, Double_t t,
-			 Double_t A, Double_t M)
+R3BPrimPart::R3BPrimPart(Int_t pdg,
+                         Double_t px,
+                         Double_t py,
+                         Double_t pz,
+                         Double_t x,
+                         Double_t y,
+                         Double_t z,
+                         Double_t t,
+                         Double_t A,
+                         Double_t M)
 {
-  fPdg = pdg;
-  fPx = px;
-  fPy = py;
-  fPz = pz;
-  fX = x;
-  fY = y;
-  fZ = z;
-  fT = t;
-  fA = A;
-  fM = M;
+    fPdg = pdg;
+    fPx = px;
+    fPy = py;
+    fPz = pz;
+    fX = x;
+    fY = y;
+    fZ = z;
+    fT = t;
+    fA = A;
+    fM = M;
 }
 // -----------------------------------------------------------------------------
 
-
-
 // -----------------------------------------------------------------------------
-R3BPrimPart::~R3BPrimPart()
-{
-}
+R3BPrimPart::~R3BPrimPart() {}
 // -----------------------------------------------------------------------------

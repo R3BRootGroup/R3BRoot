@@ -26,10 +26,10 @@
 #define N_FIBER_PLOT 1050 // range to plot
 
 #include "FairTask.h"
-#include <sstream>
+#include <array>
 #include <fstream>
 #include <iostream>
-#include <array>
+#include <sstream>
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -39,10 +39,10 @@ class TClonesArray;
 class TH1F;
 class TH2F;
 class R3BEventHeader;
- 
+
 /**
- * This taks reads all detector data items and plots histograms 
- * for online checks. 
+ * This taks reads all detector data items and plots histograms
+ * for online checks.
  */
 class R3BGlobalAnalysis : public FairTask
 {
@@ -100,177 +100,139 @@ class R3BGlobalAnalysis : public FairTask
      * Method for setting the trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
-    inline void SetTrigger(Int_t trigger)
-    {
-        fTrigger = trigger;
-    }
-    
+    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
+
     /**
      * Methods for setting number of planes and paddles
      */
     inline void SetNofModules(Int_t planes, Int_t ppp)
     {
-        fNofPlanes   = planes;
-        fPaddlesPerPlane  = ppp;
+        fNofPlanes = planes;
+        fPaddlesPerPlane = ppp;
     }
 
-//   virtual void SetParContainers();
+    //   virtual void SetParContainers();
 
-    
- 
   private:
-    std::vector<TClonesArray *> fMappedItems;
-    std::vector<TClonesArray *> fCalItems;
-    std::vector<TClonesArray *> fHitItems;
+    std::vector<TClonesArray*> fMappedItems;
+    std::vector<TClonesArray*> fCalItems;
+    std::vector<TClonesArray*> fHitItems;
 
     enum DetectorInstances
     {
-      DET_AMS,
-      DET_CALIFA,
-      DET_FI_FIRST,
-      DET_FI1A = DET_FI_FIRST,
-      DET_FI1B,
-      DET_FI2A,
-      DET_FI2B,
-      DET_FI3A,
-      DET_FI3B,
-      DET_FI4,
-      DET_FI5,
-      DET_FI6,
-      DET_FI7,
-      DET_FI8,
-      DET_FI9,
-      DET_FI10,
-      DET_FI11,
-      DET_FI12,
-      DET_FI13,
-      DET_FI_LAST = DET_FI13,
-      DET_L3T,
-      DET_LOS,
-      DET_MUSIC,
-      DET_NEULAND,
-      DET_PSPX,
-      DET_PTOF,
-      DET_ROLU,
-      DET_SCI8,
-      DET_STRAW,
-      DET_TOFD,
-      DET_MAX
+        DET_AMS,
+        DET_CALIFA,
+        DET_FI_FIRST,
+        DET_FI1A = DET_FI_FIRST,
+        DET_FI1B,
+        DET_FI2A,
+        DET_FI2B,
+        DET_FI3A,
+        DET_FI3B,
+        DET_FI4,
+        DET_FI5,
+        DET_FI6,
+        DET_FI7,
+        DET_FI8,
+        DET_FI9,
+        DET_FI10,
+        DET_FI11,
+        DET_FI12,
+        DET_FI13,
+        DET_FI_LAST = DET_FI13,
+        DET_L3T,
+        DET_LOS,
+        DET_MUSIC,
+        DET_NEULAND,
+        DET_PSPX,
+        DET_PTOF,
+        DET_ROLU,
+        DET_SCI8,
+        DET_STRAW,
+        DET_TOFD,
+        DET_MAX
     };
- 
+
 #define NOF_FIB_DET (DET_FI_LAST - DET_FI_FIRST + 1)
 
-    const char *fDetectorNames[DET_MAX + 1] =
-    {
-      "Ams",
-      "Califa",
-      "Fi1a",
-      "Fi1b",
-      "Fi2a",
-      "Fi2b",
-      "Fi3a",
-      "Fi3b",
-      "Fi4",
-      "Fi5",
-      "Fi6",
-      "Fi7",
-      "Fi8",
-      "Fi9",
-      "Fi10",
-      "Fi11",
-      "Fi12",
-      "Fi13",
-      "L3t",
-      "Los",
-      "Music",
-      "Neuland",
-      "Pspx",
-      "Ptof",
-      "Rolu",
-      "Sci8",
-      "Straw",
-      "Tofd",
-      NULL
-   };
+    const char* fDetectorNames[DET_MAX + 1] = { "Ams",  "Califa", "Fi1a",  "Fi1b", "Fi2a",  "Fi2b",    "Fi3a", "Fi3b",
+                                                "Fi4",  "Fi5",    "Fi6",   "Fi7",  "Fi8",   "Fi9",     "Fi10", "Fi11",
+                                                "Fi12", "Fi13",   "L3t",   "Los",  "Music", "Neuland", "Pspx", "Ptof",
+                                                "Rolu", "Sci8",   "Straw", "Tofd", NULL };
 
     // If FiberI is present or not:
-    Int_t  ifibdet;           
+    Int_t ifibdet;
     // Number of fibers per detector
-    Double_t n_fiber[NOF_FIB_DET]={256.,256.,256.,256.,512.,512.,2048.,2048.,1024.,512.,512.,512.,1024.,1024.};    
-    
-   
-	// check for trigger should be done globablly (somewhere else)
-    R3BEventHeader* header;                     /**< Event header. */
-    Int_t fTrigger;                             /**< Trigger value. */
-    Double_t fClockFreq;     /**< Clock cycle in [ns]. */
-    UInt_t fNofPlanes;  
-    UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */    
-    unsigned long long t0_prev=0;
-    Double_t time_previous_event=0;    
+    Double_t n_fiber[NOF_FIB_DET] = { 256.,  256.,  256., 256., 512., 512.,  2048.,
+                                      2048., 1024., 512., 512., 512., 1024., 1024. };
 
-    Int_t fNEvents = 0;         /**< Event counter. */
-    Int_t fFibEvents = 0;         /**< Event counter. */
+    // check for trigger should be done globablly (somewhere else)
+    R3BEventHeader* header; /**< Event header. */
+    Int_t fTrigger;         /**< Trigger value. */
+    Double_t fClockFreq;    /**< Clock cycle in [ns]. */
+    UInt_t fNofPlanes;
+    UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */
+    unsigned long long t0_prev = 0;
+    Double_t time_previous_event = 0;
+
+    Int_t fNEvents = 0;   /**< Event counter. */
+    Int_t fFibEvents = 0; /**< Event counter. */
     Double_t max_values[NOF_FIB_DET][2048];
-    Int_t FibMax[NOF_FIB_DET];   
-     
-    TH2F *fhChargeLosTofD;
-    TH2F *fh_los_pos;
-    
-    TH1F *fh_channels_Fib[NOF_FIB_DET];
-    TH1F *fh_fibers_Fib[NOF_FIB_DET];
-    TH1F *fh_fiber_Fib[NOF_FIB_DET];
-    TH1F *fh_mult_Fib[NOF_FIB_DET];
-    TH2F *fh_Fib_ToF[NOF_FIB_DET];
-    TH1F *fh_xpos_Fib[NOF_FIB_DET];
-    TH1F *fh_ypos_Fib[NOF_FIB_DET];
-    
-    TH2F *fh_time_Fib[NOF_FIB_DET];
-    TH2F *fh_multihit_m_Fib[NOF_FIB_DET];   
-    TH2F *fh_multihit_s_Fib[NOF_FIB_DET];
-    TH2F *fh_ToT_m_Fib[NOF_FIB_DET];
-    TH2F *fh_ToT_s_Fib[NOF_FIB_DET];
-    TH2F *fh_Fib_vs_Events[NOF_FIB_DET];
-    TH2F *fh_Fibs_vs_Events[NOF_FIB_DET];
-    TH2F *fh_Fibs_vs_Tofd[NOF_FIB_DET];
+    Int_t FibMax[NOF_FIB_DET];
 
-    TH2F *fh_Fib_vs_Fib[NOF_FIB_DET][NOF_FIB_DET];
-    TH2F *fh_Fib_dx[NOF_FIB_DET][NOF_FIB_DET];
-    
-    TH2F *fh_Cave_position;
-    
+    TH2F* fhChargeLosTofD;
+    TH2F* fh_los_pos;
+
+    TH1F* fh_channels_Fib[NOF_FIB_DET];
+    TH1F* fh_fibers_Fib[NOF_FIB_DET];
+    TH1F* fh_fiber_Fib[NOF_FIB_DET];
+    TH1F* fh_mult_Fib[NOF_FIB_DET];
+    TH2F* fh_Fib_ToF[NOF_FIB_DET];
+    TH1F* fh_xpos_Fib[NOF_FIB_DET];
+    TH1F* fh_ypos_Fib[NOF_FIB_DET];
+
+    TH2F* fh_time_Fib[NOF_FIB_DET];
+    TH2F* fh_multihit_m_Fib[NOF_FIB_DET];
+    TH2F* fh_multihit_s_Fib[NOF_FIB_DET];
+    TH2F* fh_ToT_m_Fib[NOF_FIB_DET];
+    TH2F* fh_ToT_s_Fib[NOF_FIB_DET];
+    TH2F* fh_Fib_vs_Events[NOF_FIB_DET];
+    TH2F* fh_Fibs_vs_Events[NOF_FIB_DET];
+    TH2F* fh_Fibs_vs_Tofd[NOF_FIB_DET];
+
+    TH2F* fh_Fib_vs_Fib[NOF_FIB_DET][NOF_FIB_DET];
+    TH2F* fh_Fib_dx[NOF_FIB_DET][NOF_FIB_DET];
+
+    TH2F* fh_Cave_position;
+
     TH2F* fh_tofd_pos;
-    TH1F* fh_tofd_charge;    
-    TH1F *fh_TimePreviousEvent;
-    TH1F* fh_tofd_mult;    
-   
-    TH1F *fh_ptof_channels; 
-    TH1F *fh_ptof_channels_cut; 
-    TH1F *fh_ptof_test1;   
-    TH1F *fh_ptof_test2;   
-    TH1F* fh_ptof_TotPm1[N_PADDLE_MAX_PTOF]; 
-    TH1F* fh_ptof_TotPm2[N_PADDLE_MAX_PTOF]; 
+    TH1F* fh_tofd_charge;
+    TH1F* fh_TimePreviousEvent;
+    TH1F* fh_tofd_mult;
 
-    
-    TH1F *fh_pspx_strips_psp[N_PSPX];
-    TH1F *fh_pspx_energy_psp[N_PSPX];
-    TH1F *fh_pspx_multiplicity_psp[N_PSPX];
-    
-    TH2F *fh_pspx_pos1_strips;
-    TH2F *fh_pspx_pos2_strips;
-    TH2F *fh_pspx_pos1_energy;
-    TH2F *fh_pspx_pos2_energy;
-    
-    TH2F *fh_pspx_cor_x_strips;
-    TH2F *fh_pspx_cor_y_strips;
-    TH2F *fh_pspx_cor_x_energy;
-    TH2F *fh_pspx_cor_y_energy;
-    
-    TH2F *fh_ToF_vs_events[NOF_FIB_DET];
+    TH1F* fh_ptof_channels;
+    TH1F* fh_ptof_channels_cut;
+    TH1F* fh_ptof_test1;
+    TH1F* fh_ptof_test2;
+    TH1F* fh_ptof_TotPm1[N_PADDLE_MAX_PTOF];
+    TH1F* fh_ptof_TotPm2[N_PADDLE_MAX_PTOF];
 
+    TH1F* fh_pspx_strips_psp[N_PSPX];
+    TH1F* fh_pspx_energy_psp[N_PSPX];
+    TH1F* fh_pspx_multiplicity_psp[N_PSPX];
 
-    
- 
-  
+    TH2F* fh_pspx_pos1_strips;
+    TH2F* fh_pspx_pos2_strips;
+    TH2F* fh_pspx_pos1_energy;
+    TH2F* fh_pspx_pos2_energy;
+
+    TH2F* fh_pspx_cor_x_strips;
+    TH2F* fh_pspx_cor_y_strips;
+    TH2F* fh_pspx_cor_x_energy;
+    TH2F* fh_pspx_cor_y_energy;
+
+    TH2F* fh_ToF_vs_events[NOF_FIB_DET];
+
   public:
     ClassDef(R3BGlobalAnalysis, 1)
 };

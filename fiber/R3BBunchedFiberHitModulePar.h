@@ -36,9 +36,9 @@ class R3BBunchedFiberHitModulePar : public FairParGenericSet
      * @param own class ownership, if flag is kTRUE FairDB has the par.
      */
     R3BBunchedFiberHitModulePar(const char* name = "BunchedFiberHitModulePar",
-                     const char* title = "Fiber hit calibration of a module",
-                     const char* context = "TestDefaultContext",
-                     Bool_t own = kTRUE);
+                                const char* title = "Fiber hit calibration of a module",
+                                const char* context = "TestDefaultContext",
+                                Bool_t own = kTRUE);
 
     /**
      * Destructor.
@@ -76,73 +76,30 @@ class R3BBunchedFiberHitModulePar : public FairParGenericSet
     void DrawParams();
 
     /** Accessor functions **/
-    Int_t GetFiber() const
-    {
-        return fFiber;
-    }
-    Double_t GetSync() const
-    {
-        return fSync;
-    }
-    Double_t GetOffset1() const
-    {
-        return fOffset1;
-    }
-    Double_t GetOffset2() const
-    {
-        return fOffset2;
-    }
-    Double_t GetVeff() const
-    {
-        return fVeff;
-    }
-    Double_t GetGainMA() const
-    {
-	return fGainMA;
-    }
-    Double_t GetGainS() const
-    {
-	return fGainS;
-    }
+    Int_t GetFiber() const { return fFiber; }
+    Double_t GetSync() const { return fSync; }
+    Double_t GetOffset1() const { return fOffset1; }
+    Double_t GetOffset2() const { return fOffset2; }
+    Double_t GetVeff() const { return fVeff; }
+    Double_t GetGainMA() const { return fGainMA; }
+    Double_t GetGainS() const { return fGainS; }
 
-    void SetFiber(Int_t i)
-    {
-        fFiber = i;
-    }
-    void SetSync(Double_t t) 
-    {
-        fSync = t;
-    }
-    void SetOffset1(Double_t t)
-    {
-        fOffset1 = t;
-    }
-    void SetOffset2(Double_t t)
-    {
-        fOffset2 = t;
-    }
-    void SetGainMA(Double_t gainMA)
-    {
-        fGainMA = gainMA;
-    }
-    void SetGainS(Double_t gainS)
-    {
-        fGainS = gainS;
-    }
-    void SetVeff(Double_t v)
-    {
-        fVeff = v;
-    }
+    void SetFiber(Int_t i) { fFiber = i; }
+    void SetSync(Double_t t) { fSync = t; }
+    void SetOffset1(Double_t t) { fOffset1 = t; }
+    void SetOffset2(Double_t t) { fOffset2 = t; }
+    void SetGainMA(Double_t gainMA) { fGainMA = gainMA; }
+    void SetGainS(Double_t gainS) { fGainS = gainS; }
+    void SetVeff(Double_t v) { fVeff = v; }
 
   private:
-    Int_t fFiber;            /**< Index of a fiber. */
-    Double_t fOffset1;            /**< time offset of PM1 */
-    Double_t fOffset2;            /**< time offset of PM2 */
-    Double_t fVeff;           /**< effective velocity of light in paddle for position determination */
-    Double_t fSync;           /**< time offset between paddles */
+    Int_t fFiber;      /**< Index of a fiber. */
+    Double_t fOffset1; /**< time offset of PM1 */
+    Double_t fOffset2; /**< time offset of PM2 */
+    Double_t fVeff;    /**< effective velocity of light in paddle for position determination */
+    Double_t fSync;    /**< time offset between paddles */
     Double_t fGainMA;
     Double_t fGainS;
-    
 
     ClassDef(R3BBunchedFiberHitModulePar, 1);
 };

@@ -11,7 +11,6 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-
 #include "R3BTrackingSetup.h"
 
 #include "FairLogger.h"
@@ -62,23 +61,23 @@ R3BTrackingDetector* R3BTrackingSetup::GetByName(const string& name)
 
 R3BTrackingDetector* R3BTrackingSetup::GetFirstByType(const EDetectorType& type)
 {
-    for(auto const& x : fDetectors)
+    for (auto const& x : fDetectors)
     {
-        if(type == x->section)
+        if (type == x->section)
         {
             return x;
         }
     }
-    
+
     return nullptr;
 }
 
 Double_t R3BTrackingSetup::GetAfterGladResolution()
 {
     Double_t res = 0.;
-    for(auto const& x : fDetectors)
+    for (auto const& x : fDetectors)
     {
-        if(kAfterGlad == x->section)
+        if (kAfterGlad == x->section)
         {
             res += pow(x->res_x, 2);
         }

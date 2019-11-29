@@ -25,9 +25,9 @@
 #include "TMath.h"
 
 // Fair headers
+#include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRunOnline.h"
-#include "FairLogger.h"
 
 // Land headers
 #include "R3BMfiRawHit.h"
@@ -74,36 +74,36 @@ Bool_t R3BMfiUnpack::DoUnpack(Int_t* data, Int_t size)
     LOG(DEBUG) << "R3BMfiUnpack : Unpacking... size = " << size;
 
     UInt_t l_i = 0;
-    while((data[l_i] & 0xfff00000) == 0xadd00000)
+    while ((data[l_i] & 0xfff00000) == 0xadd00000)
     {
         l_i += 1;
     }
-    
+
     std::map<Int_t, Int_t> index;
     Int_t id;
-    
+
     while (l_i < size)
     {
         // Read packet header
         UInt_t* p1 = (UInt_t*)(data + l_i);
-        UInt_t nxtId   = (p1[0] & 0xff000000) >> 24;
+        UInt_t nxtId = (p1[0] & 0xff000000) >> 24;
         UInt_t gemexId = (p1[0] & 0x00ff0000) >> 16;
         UInt_t trigger = (p1[0] & 0x0000ff00) >> 8;
-        //UInt_t da_size = (p1[1] & 0xffffffff);
+        // UInt_t da_size = (p1[1] & 0xffffffff);
         l_i += 3;
         p1 = (UInt_t*)(data + l_i);
         ULong_t trgTs = (p1[0] & 0x0000ffff);
         ULong_t triggerTs = (trgTs << 32) | (ULong_t)p1[1];
         l_i += 2;
-    
+
         // Read packet data
         p1 = (UInt_t*)(data + l_i);
-        for(Int_t i = 0; i < 5001; i+=2)
+        for (Int_t i = 0; i < 5001; i += 2)
         {
             // Check if end of packet data reached
-            UInt_t control1 =   (p1[i] & 0xff000000);
-            UInt_t control2 = (p1[i+1] & 0xff000000);
-            if(control1 == 0xee000000 && control2 == 0xbb000000)
+            UInt_t control1 = (p1[i] & 0xff000000);
+            UInt_t control2 = (p1[i + 1] & 0xff000000);
+            if (control1 == 0xee000000 && control2 == 0xbb000000)
             {
                 l_i += 2;
                 break;
@@ -112,23 +112,23 @@ Bool_t R3BMfiUnpack::DoUnpack(Int_t* data, Int_t size)
             // Read a hit
             UInt_t adc = (p1[i] & 0x0fff0000) >> 16;
             UInt_t nxtTs = (p1[i] & 0x00003fff);
-            UInt_t chId = (p1[i+1] & 0x7f000000) >> 24;
-            UInt_t epoch = (p1[i+1] & 0x00ffffff);
+            UInt_t chId = (p1[i + 1] & 0x7f000000) >> 24;
+            UInt_t epoch = (p1[i + 1] & 0x00ffffff);
             l_i += 2;
-            
+
             // Internal indexing
-            id = 10000*nxtId + 1000*gemexId + chId;
-            
+            id = 10000 * nxtId + 1000 * gemexId + chId;
+
             // Create MFI hit
-            new ((*fRawData)[fNHits]) R3BMfiRawHit(nxtId, gemexId, trigger, triggerTs, adc, chId, nxtTs, epoch, index[id]);
+            new ((*fRawData)[fNHits])
+                R3BMfiRawHit(nxtId, gemexId, trigger, triggerTs, adc, chId, nxtTs, epoch, index[id]);
             fNHits++;
             index[id] += 1;
-            
-            LOG(DEBUG) << nxtId << "  " << gemexId << "  " << trigger << " tot=" << size
-            << "   " << triggerTs;
+
+            LOG(DEBUG) << nxtId << "  " << gemexId << "  " << trigger << " tot=" << size << "   " << triggerTs;
         }
     }
-    
+
     LOG(INFO) << "R3BMfiUnpack : Number of hits in MFI: " << fNHits;
     return kTRUE;
 }

@@ -31,7 +31,15 @@ R3BMfiRawHit::R3BMfiRawHit()
 {
 }
 
-R3BMfiRawHit::R3BMfiRawHit(UInt_t nxtId, UInt_t gemexId, UInt_t trigger, ULong_t triggerTs, UInt_t adc, UInt_t channelId, UInt_t nxtTs, UInt_t epoch, UInt_t index)
+R3BMfiRawHit::R3BMfiRawHit(UInt_t nxtId,
+                           UInt_t gemexId,
+                           UInt_t trigger,
+                           ULong_t triggerTs,
+                           UInt_t adc,
+                           UInt_t channelId,
+                           UInt_t nxtTs,
+                           UInt_t epoch,
+                           UInt_t index)
     : fNxtId(nxtId)
     , fGemexId(gemexId)
     , fTrigger(trigger)

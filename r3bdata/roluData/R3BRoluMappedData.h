@@ -27,11 +27,11 @@ class R3BRoluMappedData : public TObject
     // Standard Constructor
     R3BRoluMappedData(UInt_t, UInt_t, UInt_t, UInt_t, UInt_t);
 
-    UInt_t GetDetector()   const ;
-    UInt_t GetChannel()    const ;
-    UInt_t GetType()       const ;
-    UInt_t GetTimeFine()   const ;
-    UInt_t GetTimeCoarse() const ;
+    UInt_t GetDetector() const;
+    UInt_t GetChannel() const;
+    UInt_t GetType() const;
+    UInt_t GetTimeFine() const;
+    UInt_t GetTimeCoarse() const;
 
   public:
     UInt_t fDetector; // 1..n
@@ -41,7 +41,7 @@ class R3BRoluMappedData : public TObject
     UInt_t fTimeFine;
 
   public:
-    ClassDef(R3BRoluMappedData, 1) 
+    ClassDef(R3BRoluMappedData, 1)
 };
 
 #endif

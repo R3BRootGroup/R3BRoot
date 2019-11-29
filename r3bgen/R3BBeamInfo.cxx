@@ -11,50 +11,48 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-
 #include "R3BBeamInfo.h"
 
-
 R3BBeamInfo::R3BBeamInfo()
-  : theta(0.), phi(0.),
-    xPos(0.), yPos(0.), zPos(0.)
+    : theta(0.)
+    , phi(0.)
+    , xPos(0.)
+    , yPos(0.)
+    , zPos(0.)
 {
 }
-
 
 R3BBeamInfo::~R3BBeamInfo()
 {
-  //
-  // Destructor. Makes nothing
-  //
+    //
+    // Destructor. Makes nothing
+    //
 }
-
 
 void R3BBeamInfo::print(void)
 {
-  //
-  // Prints info
-  //
+    //
+    // Prints info
+    //
 }
 
-
-void R3BBeamInfo::SetVertexPosition(Double_t x, Double_t y, Double_t z) {
-  //
-  // Sets the position of the vertex (origin of the primary particle)
-  //
-  xPos = x;
-  yPos = y;
-  zPos = z;
+void R3BBeamInfo::SetVertexPosition(Double_t x, Double_t y, Double_t z)
+{
+    //
+    // Sets the position of the vertex (origin of the primary particle)
+    //
+    xPos = x;
+    yPos = y;
+    zPos = z;
 }
 
-
-void R3BBeamInfo::SetAngles(Double_t angleTheta, Double_t anglePhi){
-  //
-  // Sets the 4momentum
-  //
-  theta = angleTheta;
-  phi = anglePhi;
+void R3BBeamInfo::SetAngles(Double_t angleTheta, Double_t anglePhi)
+{
+    //
+    // Sets the 4momentum
+    //
+    theta = angleTheta;
+    phi = anglePhi;
 }
-
 
 ClassImp(R3BBeamInfo)

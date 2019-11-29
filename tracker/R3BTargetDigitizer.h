@@ -14,72 +14,74 @@
 #ifndef R3BTARGETDIGITIZER_H
 #define R3BTARGETDDIGITISER_H 1
 
-
 #include "FairTask.h"
+#include "R3BTargetDigi.h"
+#include "R3BTargetDigiPar.h"
 #include <map>
 #include <string>
-#include "R3BTargetDigiPar.h"
-#include "R3BTargetDigi.h"
 
 class TClonesArray;
 class TObjectArray;
 class TH1F;
 class TH2F;
 
-
-
 class R3BTargetDigitizer : public FairTask
 {
 
- public:
+  public:
+    /** Default constructor **/
+    R3BTargetDigitizer();
 
-  /** Default constructor **/  
-  R3BTargetDigitizer();
+    /** Destructor **/
+    ~R3BTargetDigitizer();
 
+    /** Virtual method Init **/
+    virtual InitStatus Init();
 
-  /** Destructor **/
-  ~R3BTargetDigitizer();
+    /** Virtual method Exec **/
+    virtual void Exec(Option_t* opt);
 
+    virtual void Finish();
+    virtual void Reset();
 
-  /** Virtual method Init **/
-  virtual InitStatus Init();
-
-
-  /** Virtual method Exec **/
-  virtual void Exec(Option_t* opt);
-
-  virtual void Finish();
-  virtual void Reset();
-
-
-  R3BTargetDigi* AddHit(Double_t ss03_smul,Double_t ss03_kmul,Double_t ss06_smul,Double_t ss06_kmul,
-  Double_t x0,Double_t y0,Double_t t0,Double_t estar,Double_t Pxf,Double_t Pyf,Double_t Pzf,Double_t Pf_tot,Double_t f_beta,
-Double_t Pxp1,Double_t Pyp1,Double_t Pzp1,Double_t Pp1_tot,Double_t p1_beta);
-
+    R3BTargetDigi* AddHit(Double_t ss03_smul,
+                          Double_t ss03_kmul,
+                          Double_t ss06_smul,
+                          Double_t ss06_kmul,
+                          Double_t x0,
+                          Double_t y0,
+                          Double_t t0,
+                          Double_t estar,
+                          Double_t Pxf,
+                          Double_t Pyf,
+                          Double_t Pzf,
+                          Double_t Pf_tot,
+                          Double_t f_beta,
+                          Double_t Pxp1,
+                          Double_t Pyp1,
+                          Double_t Pzp1,
+                          Double_t Pp1_tot,
+                          Double_t p1_beta);
 
   protected:
-  TClonesArray* fTargetPoints;
-  TClonesArray* fTargetMCTrack; 
-  TClonesArray* fTargetDigi;
-  TClonesArray* fMCTrack;
+    TClonesArray* fTargetPoints;
+    TClonesArray* fTargetMCTrack;
+    TClonesArray* fTargetDigi;
+    TClonesArray* fMCTrack;
 
-  // Parameter class
-  R3BTargetDigiPar* fTargetDigiPar;
+    // Parameter class
+    R3BTargetDigiPar* fTargetDigiPar;
 
-  //- Control Hitograms
-  
-  TH1F * ExEnIn_his;
- 
-  Int_t eventNoTra;
-  
-  
-  
+    //- Control Hitograms
+
+    TH1F* ExEnIn_his;
+
+    Int_t eventNoTra;
+
   private:
-  virtual void SetParContainers();
+    virtual void SetParContainers();
 
- 
-  ClassDef(R3BTargetDigitizer,1);
-  
+    ClassDef(R3BTargetDigitizer, 1);
 };
 
 #endif

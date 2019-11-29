@@ -11,15 +11,14 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-
 #ifndef R3B_TRACKING_PARTICLE
 #define R3B_TRACKING_PARTICLE
 
+#include "TMath.h"
 #include "TObject.h"
 #include "TVector3.h"
-#include "TMath.h"
-#include <vector>
 #include <utility>
+#include <vector>
 
 class R3BTrackingDetector;
 
@@ -106,18 +105,36 @@ class R3BTrackingParticle : public TObject
     Double_t DeltaEToDeltaBeta(Double_t eloss);
 
     void Reset();
-    
-    void AddHit(const std::string& detName, const Int_t& hitId) { std::pair<std::string, Int_t> index(detName, hitId); fHits.push_back(index); }
-    
+
+    void AddHit(const std::string& detName, const Int_t& hitId)
+    {
+        std::pair<std::string, Int_t> index(detName, hitId);
+        fHits.push_back(index);
+    }
+
     const Int_t GetSize() const { return fHits.size(); }
-    
-    void GetHit(const Int_t& index, std::string& detName, Int_t& hitId) { detName = fHits[index].first; hitId = fHits[index].second; }
-    
-    const Int_t GetHitIndexByName(const std::string& detName) { for(auto x : fHits) { if(0 == x.first.compare(detName)) { return x.second; } } return -1 ; }
+
+    void GetHit(const Int_t& index, std::string& detName, Int_t& hitId)
+    {
+        detName = fHits[index].first;
+        hitId = fHits[index].second;
+    }
+
+    const Int_t GetHitIndexByName(const std::string& detName)
+    {
+        for (auto x : fHits)
+        {
+            if (0 == x.first.compare(detName))
+            {
+                return x.second;
+            }
+        }
+        return -1;
+    }
 
   private:
     std::vector<std::pair<std::string, Int_t>> fHits;
-    
+
     Double_t fCharge;
     TVector3 fStartPosition;
     TVector3 fStartMomentum;

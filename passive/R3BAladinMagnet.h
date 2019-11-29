@@ -29,7 +29,7 @@ class R3BAladinMagnet : public R3BModule
     R3BAladinMagnet(const TString& geoFile);
 
     void SetPosition(const TGeoTranslation&); // override;
-    void SetRotation(const TGeoRotation&); // override;
+    void SetRotation(const TGeoRotation&);    // override;
 
   private:
     ClassDef(R3BAladinMagnet, 3)

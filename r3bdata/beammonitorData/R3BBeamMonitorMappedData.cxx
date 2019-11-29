@@ -11,7 +11,6 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-
 #include "R3BBeamMonitorMappedData.h"
 #include "FairLogger.h"
 #include "TMath.h"
@@ -20,40 +19,28 @@
 
 using namespace std;
 
-
 R3BBeamMonitorMappedData::R3BBeamMonitorMappedData()
-    : fIC(-1)           // IC
-    , fSEETRAM(-1)      // SEETRAM
-    , fTOFDOR(-1)       // TOFD or
+    : fIC(-1)      // IC
+    , fSEETRAM(-1) // SEETRAM
+    , fTOFDOR(-1)  // TOFD or
 {
 }
 
-R3BBeamMonitorMappedData::R3BBeamMonitorMappedData(	UInt_t IC,
-									UInt_t SEETRAM,
-									UInt_t TOFDOR)
+R3BBeamMonitorMappedData::R3BBeamMonitorMappedData(UInt_t IC, UInt_t SEETRAM, UInt_t TOFDOR)
     : fIC(IC)
     , fSEETRAM(SEETRAM)
     , fTOFDOR(TOFDOR)
 {
-/* 
- LOG(INFO)<<"LosBeamMonitorData: "<<IC<<",  "<<SEETRAM<<", "<<TOFDOR;
- 
-*/	 
-}    
-    
-UInt_t R3BBeamMonitorMappedData::GetIC() const
-{
-  return fIC;
+    /*
+     LOG(INFO)<<"LosBeamMonitorData: "<<IC<<",  "<<SEETRAM<<", "<<TOFDOR;
+
+    */
 }
 
-UInt_t R3BBeamMonitorMappedData::GetSEETRAM() const
-{
-  return fSEETRAM;
-}
+UInt_t R3BBeamMonitorMappedData::GetIC() const { return fIC; }
 
-UInt_t R3BBeamMonitorMappedData::GetTOFDOR() const
-{
-  return fTOFDOR;
-}
+UInt_t R3BBeamMonitorMappedData::GetSEETRAM() const { return fSEETRAM; }
+
+UInt_t R3BBeamMonitorMappedData::GetTOFDOR() const { return fTOFDOR; }
 
 ClassImp(R3BBeamMonitorMappedData)

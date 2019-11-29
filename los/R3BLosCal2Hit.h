@@ -17,8 +17,6 @@
 // ----- Convert time calibrated data to hit level (single time) ----
 // ------------------------------------------------------------------
 
-
-
 #ifndef R3BLOSCAL2HIT
 #define R3BLOSCAL2HIT
 
@@ -90,20 +88,18 @@ class R3BLosCal2Hit : public FairTask
      * the tasks.
      */
     virtual void FinishEvent();
-    
+
     /**
      * A method to create histograms
      **/
     void CreateHisto();
-    
-    
+
     /**
      * A method to fill histograms
      **/
     void FillHisto();
-    
-    
-     /**
+
+    /**
      * Methods for setting position offset and effective velocity of light
      */
     inline void SetLosParamMCFD(Double_t offsetX, Double_t offsetY, Double_t veffX, Double_t veffY)
@@ -111,54 +107,52 @@ class R3BLosCal2Hit : public FairTask
         flosOffsetX = offsetX;
         flosOffsetY = offsetY;
         flosVeffX = veffX;
-        flosVeffY = veffY;      
-    }    
-        
-    
+        flosVeffY = veffY;
+    }
+
     inline void SetLosParamToT(Double_t offsetXQ, Double_t offsetYQ, Double_t veffXQ, Double_t veffYQ)
     {
         flosOffsetXQ = offsetXQ;
         flosOffsetYQ = offsetYQ;
         flosVeffXQ = veffXQ;
-        flosVeffYQ = veffYQ;     
-    }    
-    
+        flosVeffYQ = veffYQ;
+    }
 
     inline void SetLosParamTAMEX(Double_t offsetXT, Double_t offsetYT, Double_t veffXT, Double_t veffYT)
     {
         flosOffsetXT = offsetXT;
         flosOffsetYT = offsetYT;
         flosVeffXT = veffXT;
-        flosVeffYT = veffYT;       
-    }     
-    
+        flosVeffYT = veffYT;
+    }
+
     /**
      * Methods for setting input files
-     */    
-     inline void SetLosInput(Int_t iOptHisto, std::string const &walk_param_file, std::string const &tot_param_file )
-     {
-	   	OptHisto = iOptHisto;
-	   	fwalk_param_file = walk_param_file; 
-	   	ftot_param_file = tot_param_file;
-     }		 
+     */
+    inline void SetLosInput(Int_t iOptHisto, std::string const& walk_param_file, std::string const& tot_param_file)
+    {
+        OptHisto = iOptHisto;
+        fwalk_param_file = walk_param_file;
+        ftot_param_file = tot_param_file;
+    }
 
-     /**
+    /**
      * Method for setting the trigger value.
      * @param trigger 1 - physics, 2 - offspill, -1 - all events.
      */
     inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
     inline void SetTpat(Int_t tpat) { fTpat = tpat; }
-    
+
     /**
      * Method for walk calculation.
      */
     virtual Double_t walk(Int_t inum, Double_t tot);
-    
-       /**
+
+    /**
      * Method for saturation correction.
      */
     virtual Double_t satu(Int_t inum, Double_t tot, Double_t dt);
-    
+
     /**
      * Method for finish of the task execution.
      * Is called by the framework after processing the event loop.
@@ -169,44 +163,44 @@ class R3BLosCal2Hit : public FairTask
     TClonesArray* fCalItems; /**< Array with Cal items - input data. */
     TClonesArray* fHitItems; /**< Array with Hit items - output data. */
 
-	// check for trigger 
-    R3BEventHeader* header;                     /**< Event header. */
-    Int_t fTrigger;                             /**< Trigger value. */
+    // check for trigger
+    R3BEventHeader* header; /**< Event header. */
+    Int_t fTrigger;         /**< Trigger value. */
     Int_t fTpat;
 
-    UInt_t fNofHitItems;     /**< Number of hit items for cur event. */
-    Double_t fClockFreq;     /**< Clock cycle in [ns]. */
-    Double_t flosVeffX;   
+    UInt_t fNofHitItems; /**< Number of hit items for cur event. */
+    Double_t fClockFreq; /**< Clock cycle in [ns]. */
+    Double_t flosVeffX;
     Double_t flosVeffY;
     Double_t flosOffsetX;
     Double_t flosOffsetY;
-    Double_t flosVeffXQ;   
+    Double_t flosVeffXQ;
     Double_t flosVeffYQ;
     Double_t flosOffsetXQ;
     Double_t flosOffsetYQ;
-    Double_t flosVeffXT;   
+    Double_t flosVeffXT;
     Double_t flosVeffYT;
     Double_t flosOffsetXT;
-    Double_t flosOffsetYT; 
+    Double_t flosOffsetYT;
     Double_t walk_par[16][11]{}; // Array containing walk parameters: x=PM, y=min,max,p0...p9; MCFD and TAMEX considered
-    Double_t tot_par[8][4]{}; // Array containing walk parameters: x=PM, y=p0...p3;
-    Int_t    OptHisto;
+    Double_t tot_par[8][4]{};    // Array containing walk parameters: x=PM, y=p0...p3;
+    Int_t OptHisto;
     std::string fwalk_param_file;
     std::string ftot_param_file;
-    
-    TClonesArray* fMapped;  /**< Array with mapped data - input data. */
 
-    TH1F* fhTres_M; 
+    TClonesArray* fMapped; /**< Array with mapped data - input data. */
+
+    TH1F* fhTres_M;
     TH1F* fhTres_T;
-    TH1F* fhTres_M_corr;    
-    TH1F* fhTres_T_corr;  
-    TH1F* fhTres_MT_corr;  
+    TH1F* fhTres_M_corr;
+    TH1F* fhTres_T_corr;
+    TH1F* fhTres_MT_corr;
     TH1F* fhQ;
-    TH1F* fhQtest;	    
+    TH1F* fhQtest;
     TH2F* fhQ_L;
     TH2F* fhQ_T;
     TH2F* fhQ_R;
-    TH2F* fhQ_B;    
+    TH2F* fhQ_B;
     TH2F* fhQ_L_corr;
     TH2F* fhQ_T_corr;
     TH2F* fhQ_R_corr;
@@ -214,58 +208,55 @@ class R3BLosCal2Hit : public FairTask
     TH2F* fhQ_LB;
     TH2F* fhQ_LT;
     TH2F* fhQ_RT;
-    TH2F* fhQ_RB;     
+    TH2F* fhQ_RB;
     TH2F* fhQ_LB_corr;
     TH2F* fhQ_LT_corr;
     TH2F* fhQ_RT_corr;
-    TH2F* fhQ_RB_corr;    
+    TH2F* fhQ_RB_corr;
     TH2F* fhQ_vs_X;
-    TH2F* fhQ_vs_Y;    
+    TH2F* fhQ_vs_Y;
     TH2F* fhQ_vs_X_corr;
     TH2F* fhQ_vs_Y_corr;
     TH2F* fhTM_vs_Q;
     TH2F* fhTT_vs_Q;
     TH2F* fhTM_vs_Q_corr;
-    TH2F* fhTT_vs_Q_corr;    
-    TH2F* fhXY;    
-    TH2F* fhXYT;  
-    TH2F* fhXYmean;   
-    TH2F* fhXY_ToT;   
+    TH2F* fhTT_vs_Q_corr;
+    TH2F* fhXY;
+    TH2F* fhXYT;
+    TH2F* fhXYmean;
+    TH2F* fhXY_ToT;
     TH2F* fhXYproj;
-    TH2F* fhQ1_vs_Q5;    
+    TH2F* fhQ1_vs_Q5;
     TH2F* fhQ1_vs_Q5_corr;
-    TH2F* fhQ2_vs_Q6;  
-    TH2F* fhQ2_vs_Q6_corr;  
-    TH2F* fhQ3_vs_Q7;      
-    TH2F* fhQ3_vs_Q7_corr;  
+    TH2F* fhQ2_vs_Q6;
+    TH2F* fhQ2_vs_Q6_corr;
+    TH2F* fhQ3_vs_Q7;
+    TH2F* fhQ3_vs_Q7_corr;
     TH2F* fhQ4_vs_Q8;
-    TH2F* fhQ4_vs_Q8_corr;;
+    TH2F* fhQ4_vs_Q8_corr;
+    ;
     TH2F* fhTresX_M;
-    TH2F* fhTresY_M;    
+    TH2F* fhTresY_M;
     TH2F* fhTresX_T;
     TH2F* fhTresY_T;
     TH2F* fhTresX_M_corr;
-    TH2F* fhTresY_M_corr;    
+    TH2F* fhTresY_M_corr;
     TH2F* fhTresX_T_corr;
-    TH2F* fhTresY_T_corr;        
-    TH2F* fhTresMvsIcount;    
-    TH2F* fhTreswcMvsIcount;    
+    TH2F* fhTresY_T_corr;
+    TH2F* fhTresMvsIcount;
+    TH2F* fhTreswcMvsIcount;
     TH2F* fhTreswcTvsIcount;
     TH2F* fhTresTvsIcount;
     TH2F* fh_los_dt_hits_ToT_corr;
-    TH2F* fh_los_ihit_ToTcorr;    
+    TH2F* fh_los_ihit_ToTcorr;
     TH2F* fhQvsdt[8];
     TH2F* fhQcorrvsIcount[8];
     TH2F* fhQvsIcount[8];
 
+    Int_t Icount = 0;
 
-
-    Int_t Icount=0;
-       
-    
   public:
     ClassDef(R3BLosCal2Hit, 1)
 };
 
 #endif
-

@@ -16,22 +16,22 @@
 
 #include "TObject.h"
 
-class R3BTofdCalData: public TObject
+class R3BTofdCalData : public TObject
 {
   public:
     R3BTofdCalData();
     R3BTofdCalData(UInt_t, UInt_t, UInt_t, Double_t, Double_t);
 
-    UInt_t GetDetectorId()        const;
-    UInt_t GetBarId()             const;
-    UInt_t GetSideId()            const;
-    Double_t GetTimeLeading_ns()  const;
+    UInt_t GetDetectorId() const;
+    UInt_t GetBarId() const;
+    UInt_t GetSideId() const;
+    Double_t GetTimeLeading_ns() const;
     Double_t GetTimeTrailing_ns() const;
 
   private:
-    UInt_t fDetector;       // 1..4
-    UInt_t fBar;            // 1..44
-    UInt_t fSide;           // 1..2
+    UInt_t fDetector; // 1..4
+    UInt_t fBar;      // 1..44
+    UInt_t fSide;     // 1..2
     Double_t fLeading_ns;
     Double_t fTrailing_ns;
 

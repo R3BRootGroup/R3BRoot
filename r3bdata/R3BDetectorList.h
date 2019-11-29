@@ -101,21 +101,23 @@ enum fDetectorType
     kSFIPoint,
     kMUSICPoint
 #ifdef SOFIA
-    ,kSOFSCIPoint
-    ,kSOFATPoint
-    ,kSOFTRIMPoint
-    ,kSOFMWPC0Point
-    ,kSOFMWPC1Point
-    ,kSOFTWIMPoint
-    ,kSOFMWPC2Point
-    ,kSOFMWPC3Point
-    ,kSOFTofWallPoint
+    ,
+    kSOFSCIPoint,
+    kSOFATPoint,
+    kSOFTRIMPoint,
+    kSOFMWPC0Point,
+    kSOFMWPC1Point,
+    kSOFTWIMPoint,
+    kSOFMWPC2Point,
+    kSOFMWPC3Point,
+    kSOFTofWallPoint
 #endif
 #ifdef GTPC
     /* note that the value of kGTPCPoint will depend on
      * whether SOFIA is defined. --pklenze
      */
-    ,kGTPCPoint
+    ,
+    kGTPCPoint
 #endif
 };
 

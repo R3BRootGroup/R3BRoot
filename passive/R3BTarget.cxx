@@ -37,13 +37,8 @@ R3BTarget::R3BTarget(const TString& name, const TString& geoFile, const TGeoComb
 {
 }
 
-void R3BTarget::ConstructGeometry()
-{
-    R3BModule::ConstructGeometry();
-}
+void R3BTarget::ConstructGeometry() { R3BModule::ConstructGeometry(); }
 
-void R3BTarget::SetParContainers()
-{
-}
+void R3BTarget::SetParContainers() {}
 
 ClassImp(R3BTarget)

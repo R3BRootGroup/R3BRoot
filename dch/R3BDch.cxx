@@ -168,8 +168,7 @@ void R3BDch::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Drift chamber Gas Only
             Double_t cutE = fCutE; // GeV-> 1 keV
 
-            LOG(INFO) << "-I- R3BDch: DCHgas Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV"
-                     ;
+            LOG(INFO) << "-I- R3BDch: DCHgas Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/

@@ -191,7 +191,7 @@ Bool_t R3BdTof::ProcessHits(FairVolume* vol)
             gGeoManager->SetCurrentDirection(-newdirection[0], -newdirection[1], -newdirection[2]);
 
             for (Int_t i = 0; i < 3; i++)
-             {
+            {
                 newpos[i] = oldpos[i] - (3 * safety * olddirection[i]);
             }
 
@@ -319,8 +319,7 @@ R3BdTofPoint* R3BdTof::AddHit(Int_t trackID,
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
         LOG(INFO) << "R3BdTof: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
-                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV"
-                 ;
+                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     return new (clref[size]) R3BdTofPoint(trackID, detID, posIn, posOut, momIn, momOut, time, length, eLoss);
 }
 

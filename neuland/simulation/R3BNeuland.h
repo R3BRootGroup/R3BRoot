@@ -86,7 +86,7 @@ class R3BNeuland : public R3BDetector
     R3BNeuland& operator=(R3BNeuland&&) = delete;      // move assignment
 
   private:
-    TClonesArray* fNeulandPoints; //!
+    TClonesArray* fNeulandPoints;     //!
     R3BNeulandGeoPar* fNeulandGeoPar; //!
 
     /** Track information to be stored until the track leaves the active volume. */

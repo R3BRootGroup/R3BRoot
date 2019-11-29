@@ -18,10 +18,10 @@
 
 class R3BStrawtubesCalData;
 
-class R3BStrawtubesHitData: public TObject
+class R3BStrawtubesHitData : public TObject
 {
   public:
-    R3BStrawtubesHitData(R3BStrawtubesCalData const &); 
+    R3BStrawtubesHitData(R3BStrawtubesCalData const&);
     virtual ~R3BStrawtubesHitData();
 
   private:

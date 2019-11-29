@@ -104,70 +104,22 @@ class R3BTCalModulePar : public FairParGenericSet
     Double_t GetTimeVFTX(Int_t tdc);
 
     /** Accessor functions **/
-    Int_t GetPlane() const
-    {
-        return fPlane;
-    }
-    Int_t GetPaddle() const
-    {
-        return fPaddle;
-    }
-    Int_t GetSide() const
-    {
-        return fSide;
-    }
-    Int_t GetNofChannels() const
-    {
-        return fNofChannels;
-    }
-    Double_t GetSlopeAt(Int_t i) const
-    {
-        return fSlope[i];
-    }
-    Double_t GetOffsetAt(Int_t i) const
-    {
-        return fOffset[i];
-    }
-    Int_t GetBinLowAt(Int_t i) const
-    {
-        return fBinLow[i];
-    }
-    Int_t GetBinUpAt(Int_t i) const
-    {
-        return fBinUp[i];
-    }
-    void SetPlane(Int_t i)
-    {
-        fPlane = i;
-    }
-    void SetPaddle(Int_t i)
-    {
-        fPaddle = i;
-    }
-    void SetSide(Int_t i)
-    {
-        fSide = i;
-    }
-    void IncrementNofChannels()
-    {
-        fNofChannels += 1;
-    }
-    void SetBinLowAt(Int_t ch, Int_t i)
-    {
-        fBinLow[i] = ch;
-    }
-    void SetBinUpAt(Int_t ch, Int_t i)
-    {
-        fBinUp[i] = ch;
-    }
-    void SetSlopeAt(Double_t slope, Int_t i)
-    {
-        fSlope[i] = slope;
-    }
-    void SetOffsetAt(Double_t offset, Int_t i)
-    {
-        fOffset[i] = offset;
-    }
+    Int_t GetPlane() const { return fPlane; }
+    Int_t GetPaddle() const { return fPaddle; }
+    Int_t GetSide() const { return fSide; }
+    Int_t GetNofChannels() const { return fNofChannels; }
+    Double_t GetSlopeAt(Int_t i) const { return fSlope[i]; }
+    Double_t GetOffsetAt(Int_t i) const { return fOffset[i]; }
+    Int_t GetBinLowAt(Int_t i) const { return fBinLow[i]; }
+    Int_t GetBinUpAt(Int_t i) const { return fBinUp[i]; }
+    void SetPlane(Int_t i) { fPlane = i; }
+    void SetPaddle(Int_t i) { fPaddle = i; }
+    void SetSide(Int_t i) { fSide = i; }
+    void IncrementNofChannels() { fNofChannels += 1; }
+    void SetBinLowAt(Int_t ch, Int_t i) { fBinLow[i] = ch; }
+    void SetBinUpAt(Int_t ch, Int_t i) { fBinUp[i] = ch; }
+    void SetSlopeAt(Double_t slope, Int_t i) { fSlope[i] = slope; }
+    void SetOffsetAt(Double_t offset, Int_t i) { fOffset[i] = offset; }
 
   private:
     Int_t fPlane;             /**< Index of a plane. */

@@ -36,23 +36,22 @@
 #include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
 #include "TCanvas.h"
+#include "TFolder.h"
 #include "TGaxis.h"
 #include "TH1F.h"
 #include "TH2F.h"
-#include "TFolder.h"
 
 #include "THttpServer.h"
 
 #include "TClonesArray.h"
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <cstdlib>
-#include <fstream>
-#include <ctime>
-#include <array>
 #include "TMath.h"
 #include "TVector3.h"
+#include <array>
+#include <cstdlib>
+#include <ctime>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -76,22 +75,20 @@ R3BPspxOnlineSpectra::R3BPspxOnlineSpectra(const char* name, Int_t iVerbose)
 {
 }
 
-R3BPspxOnlineSpectra::~R3BPspxOnlineSpectra()
-{
-}
+R3BPspxOnlineSpectra::~R3BPspxOnlineSpectra() {}
 
 InitStatus R3BPspxOnlineSpectra::Init()
 {
     LOG(INFO) << "R3BPspxOnlineSpectra::Init ";
-    // try to get a handle on the EventHeader. EventHeader may not be 
+    // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-      LOG(fatal)<<"FairRootManager not found";
+        LOG(fatal) << "FairRootManager not found";
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
-    FairRunOnline *run = FairRunOnline::Instance();
+    FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
     // create histograms of all detectors
@@ -103,11 +100,10 @@ InitStatus R3BPspxOnlineSpectra::Init()
     fCalItemsPspx = (TClonesArray*)mgr->GetObject("PspxCalData");
     fHitItemsPspx = (TClonesArray*)mgr->GetObject("PspxHitData");
 
-
-    //MAIN FOLDER-AMS
-    TFolder* mainfolPspx = new TFolder("PSPX","PSPX info");
+    // MAIN FOLDER-AMS
+    TFolder* mainfolPspx = new TFolder("PSPX", "PSPX info");
     TCanvas* cMap = new TCanvas("Map_PSPX", "Pspx Map", 10, 10, 1100, 1000);
-    fh_pspx_map = new TH2F("PSPX_map","PSPX_map",5008,0.5,1028.5,300,-5.,20.5);
+    fh_pspx_map = new TH2F("PSPX_map", "PSPX_map", 5008, 0.5, 1028.5, 300, -5., 20.5);
     fh_pspx_map->GetXaxis()->SetTitle("Strip number [1-128]");
     fh_pspx_map->GetYaxis()->SetTitle("Detector number [1-3]");
     fh_pspx_map->GetXaxis()->CenterTitle(true);
@@ -117,7 +113,6 @@ InitStatus R3BPspxOnlineSpectra::Init()
     cMap->cd();
     fh_pspx_map->Draw("colz");
     mainfolPspx->Add(cMap);
-
 
     TCanvas* cPspx_comp = new TCanvas("Pspx_comp", "Pspx Comparison", 10, 10, 1100, 1000);
     cPspx_comp->Divide(6, 3);
@@ -225,16 +220,22 @@ InitStatus R3BPspxOnlineSpectra::Init()
 
         for (UInt_t i = 0; i < 3; i++)
         {
-          fh_pspx_energy_strip[i] = new TH2F(Form("PSPX_%d_energy_strips", i+1), Form("PSPX %d Energy vs Strip number", i +1),
-                                     N_STRIPS_PSPX*4,1, N_STRIPS_PSPX*4 + 1, 32500, 0, 65535);
-          fh_pspx_energy_strip[i]->GetXaxis()->SetTitle("Strip number[1-128]");
-          fh_pspx_energy_strip[i]->GetYaxis()->SetTitle("Energy [0-65535]");
-          fh_pspx_energy_strip[i]->GetXaxis()->CenterTitle(true);
-          fh_pspx_energy_strip[i]->GetYaxis()->CenterTitle(true);
-          fh_pspx_energy_strip[i]->GetYaxis()->SetTitleOffset(1.5);
-          fh_pspx_energy_strip[i]->GetXaxis()->SetTitleOffset(1.1);
-          cPspx_energy_strips->cd(i+1);
-          fh_pspx_energy_strip[i]->Draw("colz");
+            fh_pspx_energy_strip[i] = new TH2F(Form("PSPX_%d_energy_strips", i + 1),
+                                               Form("PSPX %d Energy vs Strip number", i + 1),
+                                               N_STRIPS_PSPX * 4,
+                                               1,
+                                               N_STRIPS_PSPX * 4 + 1,
+                                               32500,
+                                               0,
+                                               65535);
+            fh_pspx_energy_strip[i]->GetXaxis()->SetTitle("Strip number[1-128]");
+            fh_pspx_energy_strip[i]->GetYaxis()->SetTitle("Energy [0-65535]");
+            fh_pspx_energy_strip[i]->GetXaxis()->CenterTitle(true);
+            fh_pspx_energy_strip[i]->GetYaxis()->CenterTitle(true);
+            fh_pspx_energy_strip[i]->GetYaxis()->SetTitleOffset(1.5);
+            fh_pspx_energy_strip[i]->GetXaxis()->SetTitleOffset(1.1);
+            cPspx_energy_strips->cd(i + 1);
+            fh_pspx_energy_strip[i]->Draw("colz");
         }
         mainfolPspx->Add(cPspx_energy_strips);
 
@@ -299,7 +300,7 @@ InitStatus R3BPspxOnlineSpectra::Init()
         // Fill cPspx_comp with Cal level data
         for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
         {
-            cPspx_comp->cd(i + 1 + N_PSPX); //i*2
+            cPspx_comp->cd(i + 1 + N_PSPX); // i*2
             fh_pspx_cal_energy_frontback[i]->Draw("colz");
         }
     }
@@ -348,17 +349,15 @@ InitStatus R3BPspxOnlineSpectra::Init()
         }
     }
 
-
     mainfolPspx->Add(cPspx_comp);
     run->AddObject(mainfolPspx);
 
     run->GetHttpServer()->RegisterCommand("Reset_PSPX", Form("/Objects/%s/->Reset_PSPX_Histo()", GetName()));
-    
+
     // -------------------------------------------------------------------------
 
     return kSUCCESS;
 }
-
 
 void R3BPspxOnlineSpectra::Reset_PSPX_Histo()
 {
@@ -395,13 +394,12 @@ void R3BPspxOnlineSpectra::Reset_PSPX_Histo()
 
 void R3BPspxOnlineSpectra::Exec(Option_t* option)
 {
-  FairRootManager* mgr = FairRootManager::Instance();
-  if (NULL == mgr)
-    LOG(FATAL) << "R3BPspxOnlineSpectra::Exec FairRootManager not found";
-  // check for requested trigger (Todo: should be done globablly / somewhere else)
-  if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
-    return;
-
+    FairRootManager* mgr = FairRootManager::Instance();
+    if (NULL == mgr)
+        LOG(FATAL) << "R3BPspxOnlineSpectra::Exec FairRootManager not found";
+    // check for requested trigger (Todo: should be done globablly / somewhere else)
+    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
+        return;
 
     //----------------------------------------------------------------------
     // PSPX
@@ -433,28 +431,25 @@ void R3BPspxOnlineSpectra::Exec(Option_t* option)
             R3BPspxMappedData* mappedData = (R3BPspxMappedData*)fMappedItemsPspx->At(ihit);
             UInt_t i = mappedData->GetDetector() - 1;
 
-                //std::cout <<i<<" "<<mappedData->GetChannel()<<" "<<mappedData->GetEnergy()<< std::endl;
-                fh_pspx_energy_strip[int(i/N_PSPX)]->Fill(mappedData->GetChannel(),mappedData->GetEnergy());
+            // std::cout <<i<<" "<<mappedData->GetChannel()<<" "<<mappedData->GetEnergy()<< std::endl;
+            fh_pspx_energy_strip[int(i / N_PSPX)]->Fill(mappedData->GetChannel(), mappedData->GetEnergy());
 
-                fh_pspx_map->Fill(mappedData->GetChannel(),i);
+            fh_pspx_map->Fill(mappedData->GetChannel(), i);
 
-                if (mappedData->GetChannel() > N_STRIPS_PSPX * 2 &&
-                    mappedData->GetChannel() < N_STRIPS_PSPX * 4 + 1)
-                {
-                    // LOG(INFO) << "Test1 " << i << " " << mappedData->GetDetector() << " " <<
-                    // mappedData->GetChannel();
-                    channel_y[i][mult_y[i]] = mappedData->GetChannel();
-                    mult_y[i]++;
-                }
-                else if (mappedData->GetChannel() > 0 &&
-                         mappedData->GetChannel() < N_STRIPS_PSPX * 2 + 1)
-                {
-                    // LOG(INFO) << "Test2 " << i << " " << mappedData->GetDetector() << " " <<
-                    // mappedData->GetChannel();
-                    channel_x[i][mult_x[i]] = mappedData->GetChannel();
-                    mult_x[i]++;
-                }
-            
+            if (mappedData->GetChannel() > N_STRIPS_PSPX * 2 && mappedData->GetChannel() < N_STRIPS_PSPX * 4 + 1)
+            {
+                // LOG(INFO) << "Test1 " << i << " " << mappedData->GetDetector() << " " <<
+                // mappedData->GetChannel();
+                channel_y[i][mult_y[i]] = mappedData->GetChannel();
+                mult_y[i]++;
+            }
+            else if (mappedData->GetChannel() > 0 && mappedData->GetChannel() < N_STRIPS_PSPX * 2 + 1)
+            {
+                // LOG(INFO) << "Test2 " << i << " " << mappedData->GetDetector() << " " <<
+                // mappedData->GetChannel();
+                channel_x[i][mult_x[i]] = mappedData->GetChannel();
+                mult_x[i]++;
+            }
         }
 
         for (UInt_t i = 0; i < N_PSPX; i++)
@@ -464,34 +459,36 @@ void R3BPspxOnlineSpectra::Exec(Option_t* option)
             fh_pspx_multiplicity_y[i]->Fill(mult_y[i]);
             // LOG(INFO) << "Test4 " << fh_pspx_multiplicity_x[i]->GetBinContent(1);
 
-	std:: vector<int> v_ch_x, v_ch_y;
-          for(Int_t j = 0; j < mult_x[i]; j++){
-            if ((channel_x[i][j] + 1)/2 == (channel_x[i][j+1] + 1)/2)
+            std::vector<int> v_ch_x, v_ch_y;
+            for (Int_t j = 0; j < mult_x[i]; j++)
             {
-			v_ch_x.push_back((channel_x[i][j]+1)/2);
+                if ((channel_x[i][j] + 1) / 2 == (channel_x[i][j + 1] + 1) / 2)
+                {
+                    v_ch_x.push_back((channel_x[i][j] + 1) / 2);
+                }
             }
-	   }
-	  for(Int_t j = 0; j < mult_y[i]; j++){
-            if ((channel_y[i][j] + 1)/2 == (channel_y[i][j+1] + 1)/2)
+            for (Int_t j = 0; j < mult_y[i]; j++)
             {
-			v_ch_y.push_back((channel_y[i][j]+1)/2);
+                if ((channel_y[i][j] + 1) / 2 == (channel_y[i][j + 1] + 1) / 2)
+                {
+                    v_ch_y.push_back((channel_y[i][j] + 1) / 2);
+                }
             }
-	   }
-	   for (auto it_x = v_ch_x.begin(); v_ch_x.end() != it_x; ++it_x)
-	   {
-	     for (auto it_y = v_ch_y.begin(); v_ch_y.end() != it_y; ++it_y)
-	     {
-	                   fh_pspx_strips_position[i]->Fill(*it_x,
-                                                 -*it_y + 3 * N_STRIPS_PSPX +
-                                                     1); // with inverted axis to account for orientation
-                // fh_pspx_strips_position[i]->Fill((channel_x[i][0] + 1) / 2, ((channel_y[i][0] + 1) / 2)); //without
-                // inverted axis => wrong orientation y axis
+            for (auto it_x = v_ch_x.begin(); v_ch_x.end() != it_x; ++it_x)
+            {
+                for (auto it_y = v_ch_y.begin(); v_ch_y.end() != it_y; ++it_y)
+                {
+                    fh_pspx_strips_position[i]->Fill(
+                        *it_x,
+                        -*it_y + 3 * N_STRIPS_PSPX + 1); // with inverted axis to account for orientation
+                    // fh_pspx_strips_position[i]->Fill((channel_x[i][0] + 1) / 2, ((channel_y[i][0] + 1) / 2));
+                    // //without inverted axis => wrong orientation y axis
                 }
-                }
-                
-                //std::cout << "x: " << mult_x[i] << ", " << (channel_x[i][0]+1)/2 << endl;
-                //std::cout << "y: " << mult_y[i] << ", " << -((int)channel_y[i][0]+1)/2 + 3 * N_STRIPS_PSPX + 1<< endl;
-                
+            }
+
+            // std::cout << "x: " << mult_x[i] << ", " << (channel_x[i][0]+1)/2 << endl;
+            // std::cout << "y: " << mult_y[i] << ", " << -((int)channel_y[i][0]+1)/2 + 3 * N_STRIPS_PSPX + 1<< endl;
+
             for (Int_t j = 0; j < mult_x[i]; j++)
             {
                 fh_pspx_channel_x[i]->Fill(channel_x[i][j]);

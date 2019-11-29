@@ -16,8 +16,6 @@
 // -----            Created May 30th 2016 by M.Heil           -----
 // ------------------------------------------------------------------
 
-
-
 #ifndef R3BTOFDCAL2HIT
 #define R3BTOFDCAL2HIT
 
@@ -34,11 +32,11 @@ class R3BTofdHitModulePar;
 class R3BTofdHitPar;
 class TH1F;
 class TH2F;
- 
+
 /**
  * An analysis task to apply HIT calibration for ToFd.
  * it also applies walk corrections and Z-calibration
-*/
+ */
 class R3BTofdCal2Hit : public FairTask
 {
 
@@ -104,10 +102,7 @@ class R3BTofdCal2Hit : public FairTask
     /**
      * Method for setting the nuclear charge of main beam
      */
-    inline void SetTofdQ(Double_t Q)
-    {
-        fTofdQ = Q;
-    }
+    inline void SetTofdQ(Double_t Q) { fTofdQ = Q; }
 
     /**
      * Method for walk calculation.
@@ -128,77 +123,73 @@ class R3BTofdCal2Hit : public FairTask
      */
     inline void SetNofModules(Int_t planes, Int_t ppp)
     {
-        fNofPlanes   = planes;
-        fPaddlesPerPlane  = ppp;
+        fNofPlanes = planes;
+        fPaddlesPerPlane = ppp;
     }
 
   private:
-    TClonesArray* fCalItems; /**< Array with Cal items - input data. */
-    TClonesArray* fHitItems; /**< Array with Hit items - output data. */
-    TClonesArray* fCalItemsLos;                    /**< Array with cal items. */
-    TClonesArray* fHitItemsLos;                    /**< Array with cal items. */
-    UInt_t fNofHitItems;     /**< Number of hit items for cur event. */
-    R3BTofdHitPar* fHitPar;                       /**< Hit parameter container. */
-    UInt_t fNofHitPars;                        /**< Number of modules in parameter file. */
-    Double_t fClockFreq;     /**< Clock cycle in [ns]. */
-    Int_t fTrigger;                             /**< Trigger value. */
+    TClonesArray* fCalItems;    /**< Array with Cal items - input data. */
+    TClonesArray* fHitItems;    /**< Array with Hit items - output data. */
+    TClonesArray* fCalItemsLos; /**< Array with cal items. */
+    TClonesArray* fHitItemsLos; /**< Array with cal items. */
+    UInt_t fNofHitItems;        /**< Number of hit items for cur event. */
+    R3BTofdHitPar* fHitPar;     /**< Hit parameter container. */
+    UInt_t fNofHitPars;         /**< Number of modules in parameter file. */
+    Double_t fClockFreq;        /**< Clock cycle in [ns]. */
+    Int_t fTrigger;             /**< Trigger value. */
     Double_t fTofdQ;
     UInt_t fnEvents;
-    UInt_t fNofPlanes;  
-    UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */    
+    UInt_t fNofPlanes;
+    UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */
 
-// arrays of control histograms
-    TH2F* fhQ1vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
-    TH2F* fhQ2vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
-    TH2F* fhQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
-    TH2F* fhTdiffvsQ[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX*2+1];   
-//	THnSparse* fhQvsQ[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX*2+1]; 
-    TH2F* fhQvsQ[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX*2+1];   
-    TH2F* fhQvsTof[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
-    TH2F* fhSqrtQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
-    
-    TH2F* fhQPm1[N_TOFD_HIT_PLANE_MAX]; 
-    TH2F* fhQPm2[N_TOFD_HIT_PLANE_MAX]; 
-    TH2F* fhQ[N_TOFD_HIT_PLANE_MAX];   
+    // arrays of control histograms
+    TH2F* fhQ1vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fhQ2vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fhQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fhTdiffvsQ[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX * 2 + 1];
+    //	THnSparse* fhQvsQ[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX*2+1];
+    TH2F* fhQvsQ[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX * 2 + 1];
+    TH2F* fhQvsTof[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fhSqrtQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
 
-    TH2F* fhTof[N_TOFD_HIT_PLANE_MAX]; 
+    TH2F* fhQPm1[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhQPm2[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhQ[N_TOFD_HIT_PLANE_MAX];
 
+    TH2F* fhTof[N_TOFD_HIT_PLANE_MAX];
 
-    TH2F* fhTdiff[N_TOFD_HIT_PLANE_MAX]; 
-    TH2F* fhSync[N_TOFD_HIT_PLANE_MAX]; 
-   
-/*
-    TH2F* fhTotPm1vsTotPm2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
-    TH2F* fhTotPm1satvsTotPm2sat[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
-    TH2F* fhTot1vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
-    TH2F* fhTot2vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];   
-    TH2F* fhPos[N_TOFD_HIT_PLANE_MAX]; 
-    TH2F* fhTotPm1[N_TOFD_HIT_PLANE_MAX]; 
-    TH2F* fhTotPm2[N_TOFD_HIT_PLANE_MAX]; 
-    TH2F* fhTotPm1Sat[N_TOFD_HIT_PLANE_MAX]; 
-    TH2F* fhTotPm2Sat[N_TOFD_HIT_PLANE_MAX];     
-*/
+    TH2F* fhTdiff[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhSync[N_TOFD_HIT_PLANE_MAX];
 
-    TH2F* fhxy;   
-    TH1F* fhCharge; 
+    /*
+        TH2F* fhTotPm1vsTotPm2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+        TH2F* fhTotPm1satvsTotPm2sat[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+        TH2F* fhTot1vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+        TH2F* fhTot2vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+        TH2F* fhPos[N_TOFD_HIT_PLANE_MAX];
+        TH2F* fhTotPm1[N_TOFD_HIT_PLANE_MAX];
+        TH2F* fhTotPm2[N_TOFD_HIT_PLANE_MAX];
+        TH2F* fhTotPm1Sat[N_TOFD_HIT_PLANE_MAX];
+        TH2F* fhTotPm2Sat[N_TOFD_HIT_PLANE_MAX];
+    */
+
+    TH2F* fhxy;
+    TH1F* fhCharge;
     TH2F* fhChargevsTof;
     TH2F* fhChargevsPos;
-	TH2F* fhQp12;
-	TH2F* fhQp34;
-	
-    
-//    TH2F* fhSaturation1;     
-//    TH2F* fhSaturation2;
+    TH2F* fhQp12;
+    TH2F* fhQp34;
 
-	TH2F* fhChargeLosTofD;
+    //    TH2F* fhSaturation1;
+    //    TH2F* fhSaturation2;
+
+    TH2F* fhChargeLosTofD;
 
     TH2F* fhLosXYP;
     TH2F* fh_los_pos;
-    
-       
+
   public:
     ClassDef(R3BTofdCal2Hit, 1)
 };
 
 #endif
-

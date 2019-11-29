@@ -22,9 +22,9 @@
 
 #include "R3BPtofHitPar.h"
 
+#include "FairLogger.h"
 #include "FairParSet.h"    // for FairParSet
 #include "FairRuntimeDb.h" // for FairRuntimeDb
-#include "FairLogger.h"
 
 #include "TList.h"   // for TList
 #include "TString.h" // for TString
@@ -68,7 +68,7 @@ FairParSet* R3BPtofParFact::createContainer(FairContainer* c)
     {
         p = new R3BPtofHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    
+
     return p;
 }
 

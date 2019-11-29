@@ -22,7 +22,7 @@
 
 #include "TObject.h"
 
-class R3BBunchedFiberCalData: public TObject
+class R3BBunchedFiberCalData : public TObject
 {
   public:
     R3BBunchedFiberCalData();

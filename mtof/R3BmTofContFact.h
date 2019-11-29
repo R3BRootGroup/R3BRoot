@@ -18,15 +18,17 @@
 
 class FairContainer;
 
-class R3BmTofContFact : public FairContFact {
-private:
-  void setAllContainers();
-public:
-  R3BmTofContFact();
-  ~R3BmTofContFact() {}
-  FairParSet* createContainer(FairContainer*);
-  void  activateParIo(FairParIo* io);
-  ClassDef( R3BmTofContFact,0) // Factory for all MTOF parameter containers
+class R3BmTofContFact : public FairContFact
+{
+  private:
+    void setAllContainers();
+
+  public:
+    R3BmTofContFact();
+    ~R3BmTofContFact() {}
+    FairParSet* createContainer(FairContainer*);
+    void activateParIo(FairParIo* io);
+    ClassDef(R3BmTofContFact, 0) // Factory for all MTOF parameter containers
 };
 
-#endif  /* !R3BMTOFCONTFACT_H */
+#endif /* !R3BMTOFCONTFACT_H */

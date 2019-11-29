@@ -101,17 +101,15 @@ class R3BPspxOnlineSpectra : public FairTask
     void Reset_PSPX_Histo();
 
   private:
-
     TClonesArray* fMappedItemsPspx; /**< Array with Mapped items for Pspx. */
     TClonesArray* fPrecalItemsPspx; /**< Array with Precal items for Pspx. */
     TClonesArray* fCalItemsPspx;    /**< Array with Cal items for Pspx. */
     TClonesArray* fHitItemsPspx;    /**< Array with Hit items for Pspx. */
 
     // check for trigger should be done globablly (somewhere else)
-    R3BEventHeader* header;            /**< Event header. */
-    Int_t fTrigger;                    /**< Trigger value. */
-    Int_t fNEvents;        	     /**< Event counter. */
-
+    R3BEventHeader* header; /**< Event header. */
+    Int_t fTrigger;         /**< Trigger value. */
+    Int_t fNEvents;         /**< Event counter. */
 
     TH1F* fh_pspx_channel_x[N_PSPX];      /**< PSPX x channel profile on mapped level */
     TH1F* fh_pspx_channel_y[N_PSPX];      /**< PSPX y channel profile on mapped level */
@@ -123,7 +121,7 @@ class R3BPspxOnlineSpectra : public FairTask
 
     TH1F* fh_pspx_hit_energy[(N_PSPX + 1) / 2];           /**< PSPX energy on hit level */
     TH2F* fh_pspx_cal_energy_frontback[(N_PSPX + 1) / 2]; /**< PSPX energy front vs back on cal level */
-    TH2F* fh_pspx_energy_strip[3],*fh_pspx_map;
+    TH2F *fh_pspx_energy_strip[3], *fh_pspx_map;
 
   public:
     ClassDef(R3BPspxOnlineSpectra, 1)

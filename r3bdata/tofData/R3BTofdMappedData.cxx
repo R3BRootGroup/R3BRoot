@@ -23,11 +23,11 @@ R3BTofdMappedData::R3BTofdMappedData()
 }
 
 R3BTofdMappedData::R3BTofdMappedData(UInt_t detector,
-    UInt_t side,
-    UInt_t channel,
-    UInt_t edge,
-    UInt_t timeCoarse,
-    UInt_t timeFine)
+                                     UInt_t side,
+                                     UInt_t channel,
+                                     UInt_t edge,
+                                     UInt_t timeCoarse,
+                                     UInt_t timeFine)
     : fDetector(detector)
     , fSide(side)
     , fBar(channel)
@@ -37,34 +37,16 @@ R3BTofdMappedData::R3BTofdMappedData(UInt_t detector,
 {
 }
 
-UInt_t R3BTofdMappedData::GetDetectorId() const
-{
-  return fDetector;
-}
+UInt_t R3BTofdMappedData::GetDetectorId() const { return fDetector; }
 
-UInt_t R3BTofdMappedData::GetSideId() const
-{
-  return fSide;
-}
+UInt_t R3BTofdMappedData::GetSideId() const { return fSide; }
 
-UInt_t R3BTofdMappedData::GetBarId() const
-{
-  return fBar;
-}
+UInt_t R3BTofdMappedData::GetBarId() const { return fBar; }
 
-UInt_t R3BTofdMappedData::GetEdgeId() const
-{
-  return fEdge;
-}
+UInt_t R3BTofdMappedData::GetEdgeId() const { return fEdge; }
 
-UInt_t R3BTofdMappedData::GetTimeCoarse() const
-{
-  return fTimeCoarse;
-}
+UInt_t R3BTofdMappedData::GetTimeCoarse() const { return fTimeCoarse; }
 
-UInt_t R3BTofdMappedData::GetTimeFine() const
-{
-  return fTimeFine;
-}
+UInt_t R3BTofdMappedData::GetTimeFine() const { return fTimeFine; }
 
 ClassImp(R3BTofdMappedData)

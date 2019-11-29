@@ -21,26 +21,27 @@
 
 namespace R3BCalifaTimestitcher
 {
-   class R3BTreeWrapper : public TreeWrapper
-   {
-   protected:
-      enum ArrayType
-      {
-         CalifaMappedData, CalifaCrystalCalData, CalifaHitData
-      };
+    class R3BTreeWrapper : public TreeWrapper
+    {
+      protected:
+        enum ArrayType
+        {
+            CalifaMappedData,
+            CalifaCrystalCalData,
+            CalifaHitData
+        };
 
-      TObjArray *ptrObjArr;
-      ArrayType type;
+        TObjArray* ptrObjArr;
+        ArrayType type;
 
-      virtual bool isGood();
-      Int_t *ptrN;
+        virtual bool isGood();
+        Int_t* ptrN;
 
-   public:
-      R3BTreeWrapper(TTree *tree, branchptrmap_t &branchmap, uint32_t id);
+      public:
+        R3BTreeWrapper(TTree* tree, branchptrmap_t& branchmap, uint32_t id);
 
-      virtual uint64_t getTS();
-   };
-}
+        virtual uint64_t getTS();
+    };
+} // namespace R3BCalifaTimestitcher
 
 #endif
-

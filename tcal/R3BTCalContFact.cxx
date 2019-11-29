@@ -20,10 +20,10 @@
 /////////////////////////////////////////////////////////////
 #include "R3BTCalContFact.h"
 
-#include "R3BTCalPar.h"    // for R3BLandGeometryPar
+#include "FairLogger.h"
 #include "FairParSet.h"    // for FairParSet
 #include "FairRuntimeDb.h" // for FairRuntimeDb
-#include "FairLogger.h"
+#include "R3BTCalPar.h"    // for R3BLandGeometryPar
 
 #include "TList.h"   // for TList
 #include "TString.h" // for TString
@@ -47,10 +47,9 @@ R3BTCalContFact::R3BTCalContFact()
 
 void R3BTCalContFact::addContainer(TString name, TString description)
 {
-	auto container = new FairContainer(name, description,
-	    "TestDefaultContext");
-	container->addContext("TestNonDefaultContext");
-	containers->Add(container);
+    auto container = new FairContainer(name, description, "TestDefaultContext");
+    container->addContext("TestNonDefaultContext");
+    containers->Add(container);
 }
 
 void R3BTCalContFact::setAllContainers()
@@ -63,10 +62,12 @@ void R3BTCalContFact::setAllContainers()
     addContainer("Sci8TCalPar", "SCI8 TCAL Calibration Parameters");
     addContainer("TofdTCalPar", "TOFD TCAL Calibration Parameters");
     addContainer("StrawtubesTCalPar", "Strawtubes TCAL Calibration Parameters");
-#define ADD_FIBER(Name, NAME) do {\
-    addContainer(#Name"MAPMTTCalPar", #NAME" MAPMT TCAL Calibration Parameters");\
-    addContainer(#Name"SPMTTCalPar", #NAME" SPMT TCAL Calibration Parameters");\
-} while (0)
+#define ADD_FIBER(Name, NAME)                                                           \
+    do                                                                                  \
+    {                                                                                   \
+        addContainer(#Name "MAPMTTCalPar", #NAME " MAPMT TCAL Calibration Parameters"); \
+        addContainer(#Name "SPMTTCalPar", #NAME " SPMT TCAL Calibration Parameters");   \
+    } while (0)
     ADD_FIBER(Fi0, FI0);
     ADD_FIBER(Fi1a, FI1a);
     ADD_FIBER(Fi1b, FI1b);
@@ -95,20 +96,21 @@ FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
      * of this container, the name is concatinated with the context. */
 
     const char* name = c->GetName();
-    LOG(INFO) << "R3BTCalContFact::createContainer : " << name
-       ;
+    LOG(INFO) << "R3BTCalContFact::createContainer : " << name;
 
-    vector<const char *> containerNames;
+    vector<const char*> containerNames;
     containerNames.push_back("LandTCalPar");
     containerNames.push_back("LosTCalPar");
     containerNames.push_back("RoluTCalPar");
     containerNames.push_back("Sci8TCalPar");
     containerNames.push_back("TofdTCalPar");
     containerNames.push_back("StrawtubesTCalPar");
-#define PUSH_FIBER(Name) do {\
-    containerNames.push_back(#Name"MAPMTTCalPar");\
-    containerNames.push_back(#Name"SPMTTCalPar");\
-} while (0)
+#define PUSH_FIBER(Name)                                \
+    do                                                  \
+    {                                                   \
+        containerNames.push_back(#Name "MAPMTTCalPar"); \
+        containerNames.push_back(#Name "SPMTTCalPar");  \
+    } while (0)
     PUSH_FIBER(Fi0);
     PUSH_FIBER(Fi1a);
     PUSH_FIBER(Fi1b);
@@ -130,17 +132,21 @@ FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
     containerNames.push_back("Sci8TCalPar");
 
     bool found = false;
-    for (auto containerName : containerNames) {
-        if (strncmp(name, containerName, strlen(containerName)) == 0) {
+    for (auto containerName : containerNames)
+    {
+        if (strncmp(name, containerName, strlen(containerName)) == 0)
+        {
             found = true;
             break;
         }
     }
 
-    if (found == true) {
-        return new R3BTCalPar(c->getConcatName().Data(), c->GetTitle(),
-            c->getContext());
-    } else {
+    if (found == true)
+    {
+        return new R3BTCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
+    else
+    {
         return nullptr;
     }
 }

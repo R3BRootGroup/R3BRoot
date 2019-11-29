@@ -21,7 +21,6 @@
 
 #include "FairTask.h"
 
-
 class TClonesArray;
 class R3BTCalEngine;
 
@@ -57,7 +56,7 @@ class R3BStartrackMapped2CalPar : public FairTask
      */
     virtual ~R3BStartrackMapped2CalPar();
 
-    void SetOutputFile(const char *outFile);
+    void SetOutputFile(const char* outFile);
 
     /**
      * Method for task initialization.
@@ -91,10 +90,7 @@ class R3BStartrackMapped2CalPar : public FairTask
      * Method for setting the update rate for control histograms
      * @param rate an update rate value (events).
      */
-    inline void SetUpdateRate(Int_t rate)
-    {
-        fUpdateRate = rate;
-    }
+    inline void SetUpdateRate(Int_t rate) { fUpdateRate = rate; }
 
     /**
      * Method for setting minimum required statistics per module.
@@ -103,19 +99,13 @@ class R3BStartrackMapped2CalPar : public FairTask
      * calibrated.
      * @param minStats a value of minimum statistics required.
      */
-    inline void SetMinStats(Int_t minStats)
-    {
-        fMinStats = minStats;
-    }
+    inline void SetMinStats(Int_t minStats) { fMinStats = minStats; }
 
     /**
      * Method for selecting events with certain trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
-    inline void SetTrigger(Int_t trigger)
-    {
-        fTrigger = trigger;
-    }
+    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
 
     /**
      * Method for setting number of LOS detectors and channels.
@@ -124,34 +114,31 @@ class R3BStartrackMapped2CalPar : public FairTask
      */
     inline void SetNofLadder(Int_t nDetsIn, Int_t nDetsOut)
     {
-       fNofInLadder = nDetsIn;		
-       fNofOutLadder = nDetsOut;
-       fNofStrips= (nDetsIn*12*128*2)+(nDetsOut*16*128*2);
+        fNofInLadder = nDetsIn;
+        fNofOutLadder = nDetsOut;
+        fNofStrips = (nDetsIn * 12 * 128 * 2) + (nDetsOut * 16 * 128 * 2);
     }
 
   private:
-    
     Int_t fUpdateRate; /**< An update rate. */
     Int_t fMinStats;   /**< Minimum statistics required per module. */
     Int_t fTrigger;    /**< Trigger value. */
 
-    UInt_t fNofInLadder;      /**< Total number of inner ladders to calibrate */
-    UInt_t fNofOutLadder;     /**< Total number of outer ladders to calibrate */
-    UInt_t fNofStrips;        /**< Total number of Strips to calibrate */
+    UInt_t fNofInLadder;  /**< Total number of inner ladders to calibrate */
+    UInt_t fNofOutLadder; /**< Total number of outer ladders to calibrate */
+    UInt_t fNofStrips;    /**< Total number of Strips to calibrate */
 
+    UInt_t* fNumEvents;
+    UInt_t NEvents; /**< Event counter. */
 
-    UInt_t *fNumEvents;     
-    UInt_t NEvents;         /**< Event counter. */
-
-    TClonesArray* fStartrackMappedDataCA;  /**< Array with mapped data - input data. */
+    TClonesArray* fStartrackMappedDataCA; /**< Array with mapped data - input data. */
 
     R3BTCalEngine* fEngine;
 
-    char *fOutputFile;
+    char* fOutputFile;
 
   public:
     ClassDef(R3BStartrackMapped2CalPar, 1)
 };
 
 #endif
-

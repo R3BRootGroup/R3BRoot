@@ -30,7 +30,7 @@ class R3BStartrackMappedData : public TObject
     R3BStartrackMappedData();
 
     // Standard Constructor
-     
+
     R3BStartrackMappedData( Int_t ladderId,
                               Int_t side,
                               Int_t asicId,
@@ -38,7 +38,7 @@ class R3BStartrackMappedData : public TObject
                               Double_t edep,
                               Double_t timestp);
     R3BStartrackMappedData(const R3BStartrackMappedData&);
-   
+
     // Destructor
     virtual ~R3BStartrackMappedData()
     {
@@ -73,12 +73,12 @@ class R3BStartrackMappedData : public TObject
 
   protected:
     Int_t fLadder;     //... number of ladder 1..n
-    Int_t fSide;       //... Ladder Side 
+    Int_t fSide;       //... Ladder Side
     Int_t fAsic;       //... Asic Id: 1 to 12(inner layer) or 16(outer layer)
     Int_t fStrip;      //... Strip Id: 1 to 128
     Double_t fEdep;       //... Energy deposited in the ladder
-    Double_t fTimeStp;  //... Time stamp information    
-    
+    Double_t fTimeStp;  //... Time stamp information
+
 
   public:
     ClassDef(R3BStartrackMappedData, 1)
@@ -93,37 +93,24 @@ class R3BStartrackMappedData : public TObject
     R3BStartrackMappedData();
 
     // Standard Constructor
-     
-    R3BStartrackMappedData( Int_t data);
+
+    R3BStartrackMappedData(Int_t data);
     R3BStartrackMappedData(const R3BStartrackMappedData&); // read only 1 32 bit word at time
-    R3BStartrackMappedData(const R3BStartrackMappedData&, const R3BStartrackMappedData&);  // read 2 32-bit words each time
+    R3BStartrackMappedData(const R3BStartrackMappedData&,
+                           const R3BStartrackMappedData&); // read 2 32-bit words each time
 
-
-
-   
     // Destructor
-    virtual ~R3BStartrackMappedData()
-    {
-    }
+    virtual ~R3BStartrackMappedData() {}
 
     // Getters
-    inline const Int_t& GetData() const
-    {
-        return fData;
-    }
-    inline const Int_t& GetData2() const
-    {
-        return fData2;
-    }
-
+    inline const Int_t& GetData() const { return fData; }
+    inline const Int_t& GetData2() const { return fData2; }
 
   protected:
-    Int_t fData;     //... number of ladder 1..n
-    Int_t fData2;     //... number of ladder 1..n
-
+    Int_t fData;  //... number of ladder 1..n
+    Int_t fData2; //... number of ladder 1..n
 
   public:
     ClassDef(R3BStartrackMappedData, 1)
 };
 #endif
-

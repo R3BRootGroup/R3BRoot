@@ -21,14 +21,14 @@
 #include "R3BWRAmsData.h"
 
 R3BWRAmsData::R3BWRAmsData()
-  : fTimeStamp(0)
+    : fTimeStamp(0)
 {
 }
 
 //------------------------------
 
 R3BWRAmsData::R3BWRAmsData(uint64_t timestamp)
-  : fTimeStamp(timestamp)
+    : fTimeStamp(timestamp)
 {
 }
 

@@ -11,13 +11,14 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
+#include "R3BTimestampMasterReader.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "R3BEventHeader.h"
 #include "R3BWhiterabbitReaderImpl.h"
-#include "R3BTimestampMasterReader.h"
 
-extern "C" {
+extern "C"
+{
 #include "ext_data_client.h"
 #include "ext_h101_timestamp_master.h"
 }

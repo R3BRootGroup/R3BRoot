@@ -25,11 +25,12 @@
 
 ClassImp(R3BGeoMagnet)
 
-R3BGeoMagnet::R3BGeoMagnet() {
-  // Constructor
-  fName="magnet";
-  maxSectors=0;
-  maxModules=1;
-  strcpy(modName,"m");
-  strcpy(eleName,"m");
+    R3BGeoMagnet::R3BGeoMagnet()
+{
+    // Constructor
+    fName = "magnet";
+    maxSectors = 0;
+    maxModules = 1;
+    strcpy(modName, "m");
+    strcpy(eleName, "m");
 }

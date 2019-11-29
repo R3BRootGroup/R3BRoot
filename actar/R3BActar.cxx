@@ -99,8 +99,7 @@ void R3BActar::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Si Only
             Double_t cutE = fCutE; // GeV-> 1 keV
 
-            LOG(INFO) << "R3BActar: helium Medium Id " << pHe->GetId() << " Energy Cut-Off : " << cutE << " GeV"
-                     ;
+            LOG(INFO) << "R3BActar: helium Medium Id " << pHe->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Si
             gMC->Gstpar(pHe->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -305,8 +304,7 @@ R3BActarPoint* R3BActar::AddHit(Int_t trackID,
     if (fVerboseLevel > 1)
     {
         LOG(INFO) << "R3BActar: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
-                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV"
-                 ;
+                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     }
     return new (clref[size]) R3BActarPoint(trackID, detID, plane, posIn, posOut, momIn, momOut, time, length, eLoss);
 }

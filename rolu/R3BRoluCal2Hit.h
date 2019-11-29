@@ -18,8 +18,6 @@
 // ----- Following R3BLosCal2Hit
 // ------------------------------------------------------------------
 
-
-
 #ifndef R3BRoluCAL2HIT
 #define R3BRoluCAL2HIT
 
@@ -88,8 +86,8 @@ class R3BRoluCal2Hit : public FairTask
      * Is called by the framework for each event after executing
      * the tasks.
      */
-    virtual void FinishEvent();   
- 
+    virtual void FinishEvent();
+
     /*
      * Method for finish of the task execution.
      * Is called by the framework after processing the event loop.
@@ -101,21 +99,18 @@ class R3BRoluCal2Hit : public FairTask
     TClonesArray* fHitItems; /* < Array with Hit items - output data. */
     UInt_t fNofHitItems;     /* < Number of hit items for cur event. */
     Double_t fClockFreq;     /* < Clock cycle in [ns]. */
-   
-   
-    TClonesArray* fMapped;  /* < Array with mapped data - input data. */
+
+    TClonesArray* fMapped; /* < Array with mapped data - input data. */
 
     TH1F* fhQ_R;
     TH1F* fhQ_O;
     TH1F* fhQ_L;
     TH1F* fhQ_U;
 
-    Int_t Icount=0;
-       
-    
+    Int_t Icount = 0;
+
   public:
     ClassDef(R3BRoluCal2Hit, 1)
 };
 
 #endif
-

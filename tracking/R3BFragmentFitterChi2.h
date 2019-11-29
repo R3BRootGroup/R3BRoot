@@ -16,23 +16,23 @@
 
 #include "R3BFragmentFitterGeneric.h"
 
-#include "Math/Minimizer.h"
 #include "Math/Factory.h"
 #include "Math/Functor.h"
+#include "Math/Minimizer.h"
 #include "Minuit2/Minuit2Minimizer.h"
 
 class R3BFragmentFitterChi2 : public R3BFragmentFitterGeneric
 {
-public:
+  public:
     R3BFragmentFitterChi2();
     ~R3BFragmentFitterChi2();
-    
+
     void Init(R3BTPropagator* prop = nullptr, Bool_t energyLoss = kTRUE);
-    
+
     Int_t FitTrack(R3BTrackingParticle*, R3BTrackingSetup*);
-    
+
     Int_t FitTrackBackward(R3BTrackingParticle*, R3BTrackingSetup*);
-    
+
     Double_t TrackFragment(R3BTrackingParticle* particle,
                            Bool_t energyLoss,
                            Double_t& devTof,
@@ -46,12 +46,11 @@ public:
     Double_t DmDt(R3BTrackingParticle* candidate, Bool_t energy_loss);
     Double_t Velocity(R3BTrackingParticle* candidate);
 
-private:
+  private:
     ROOT::Math::Minimizer* fMinimum;
     R3BTPropagator* fPropagator;
-    
+
     ClassDef(R3BFragmentFitterChi2, 1)
 };
 
 #endif
-

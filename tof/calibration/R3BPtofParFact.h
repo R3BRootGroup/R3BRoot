@@ -27,14 +27,12 @@ class R3BPtofParFact : public FairContFact
      * Default constructor.
      */
     R3BPtofParFact();
-    
+
     /**
      * Destructor.
      */
-    ~R3BPtofParFact()
-    {
-    }
-    
+    ~R3BPtofParFact() {}
+
     /**
      * Method to create a parameter container.
      * Called by FairRuntimeDB singleton class.

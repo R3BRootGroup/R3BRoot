@@ -349,13 +349,11 @@ void R3BPspxMapped2Precal::Exec(Option_t* option)
                     }
                 }
             }
-            
-				
+
             new ((*fPrecalItems)[fPrecalItems->GetEntriesFast()])
                 R3BPspxPrecalData(detector1, strip1, energy1, energy2);
-                
-                
-           // std::cout<< detector1<<" "<< strip1<<" "<< energy1<<" "<< energy2<<std::endl;   
+
+            // std::cout<< detector1<<" "<< strip1<<" "<< energy1<<" "<< energy2<<std::endl;
         }
     }
 }

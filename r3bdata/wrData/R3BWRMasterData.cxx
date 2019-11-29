@@ -21,14 +21,14 @@
 #include "R3BWRMasterData.h"
 
 R3BWRMasterData::R3BWRMasterData()
-  : fTimeStamp(0)
+    : fTimeStamp(0)
 {
 }
 
 //------------------------------
 
 R3BWRMasterData::R3BWRMasterData(uint64_t timestamp)
-  : fTimeStamp(timestamp)
+    : fTimeStamp(timestamp)
 {
 }
 

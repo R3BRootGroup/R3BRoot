@@ -43,7 +43,7 @@ class R3BPspxMappedData : public TObject
   private:
     UShort_t fDetector; /**< Detector number, counting from 1 */
     UShort_t fChannel;  /**< Channel number, counting from 1 */
-    Int_t fEnergy;     /**< Energy/Collected charge */
+    Int_t fEnergy;      /**< Energy/Collected charge */
 
   public:
     ClassDef(R3BPspxMappedData, 3)

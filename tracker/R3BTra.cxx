@@ -114,8 +114,7 @@ void R3BTra::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Si Only
             Double_t cutE = fCutE; // GeV-> 1 keV
 
-            LOG(INFO) << "-I- R3BTra: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV"
-                     ;
+            LOG(INFO) << "-I- R3BTra: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -211,7 +210,8 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol)
                TVector3(fMomOut.Px(), fMomOut.Py(), fMomOut.Pz()),
                fTime,
                fLength,
-               fELoss, gMC->TrackPid());
+               fELoss,
+               gMC->TrackPid());
 
         // Increment number of TraPoints for this track
         R3BStack* stack = (R3BStack*)gMC->GetStack();
@@ -295,14 +295,14 @@ R3BTraPoint* R3BTra::AddHit(Int_t trackID,
                             TVector3 momOut,
                             Double_t time,
                             Double_t length,
-                            Double_t eLoss, Int_t pdgcode)
+                            Double_t eLoss,
+                            Int_t pdgcode)
 {
     TClonesArray& clref = *fTraCollection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
         LOG(INFO) << "R3BTra: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
-                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV"
-                 ;
+                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     return new (clref[size]) R3BTraPoint(trackID,
                                          detID,
                                          detCopyID,
@@ -312,14 +312,15 @@ R3BTraPoint* R3BTra::AddHit(Int_t trackID,
                                          momOut,
                                          time,
                                          length,
-                                         eLoss,pdgcode);
+                                         eLoss,
+                                         pdgcode);
 }
 
 Bool_t R3BTra::CheckIfSensitive(std::string name)
 {
     if (TString(name).Contains("TraLog") || TString(name).Contains("Strip"))
     {
-        //LOG(INFO) << "Found TRA geometry from ROOT file: " << name;
+        // LOG(INFO) << "Found TRA geometry from ROOT file: " << name;
         return kTRUE;
     }
     return kFALSE;

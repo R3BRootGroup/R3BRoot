@@ -21,30 +21,25 @@
 
 #include "TNamed.h"
 
-class R3BIonName: public TNamed
+class R3BIonName : public TNamed
 {
   public:
-
     /** Default constructor **/
     R3BIonName();
-
 
     /** Destructor **/
     virtual ~R3BIonName();
 
-
     /** Accessors **/
     /**
-    * Return the ion name if exists
-    */
-    Bool_t GetIonName(Int_t element, Char_t *name);
+     * Return the ion name if exists
+     */
+    Bool_t GetIonName(Int_t element, Char_t* name);
 
   private:
-
     /** Data members **/
 
-    ClassDef(R3BIonName,1);
-
+    ClassDef(R3BIonName, 1);
 };
 
 #endif

@@ -126,15 +126,15 @@ class R3BStartrack : public R3BDetector
      ** Adds a TraPoint to the HitCollection
      **/
     R3BStartrackPoint* AddHit(Int_t trackID,
-                            Int_t detID,
-                            Int_t detCopyID, // Int_t detCopyID added by Marc
-                            TVector3 posIn,
-                            TVector3 pos_out,
-                            TVector3 momIn,
-                            TVector3 momOut,
-                            Double_t time,
-                            Double_t length,
-                            Double_t eLoss);
+                              Int_t detID,
+                              Int_t detCopyID, // Int_t detCopyID added by Marc
+                              TVector3 posIn,
+                              TVector3 pos_out,
+                              TVector3 momIn,
+                              TVector3 momOut,
+                              Double_t time,
+                              Double_t length,
+                              Double_t eLoss);
 
     /** Private method ResetParameters
      **

@@ -15,10 +15,8 @@
 
 ClassImp(R3BFragmentFitterGeneric)
 
-R3BFragmentFitterGeneric::R3BFragmentFitterGeneric()
+    R3BFragmentFitterGeneric::R3BFragmentFitterGeneric()
 {
 }
 
-R3BFragmentFitterGeneric::~R3BFragmentFitterGeneric()
-{
-}
+R3BFragmentFitterGeneric::~R3BFragmentFitterGeneric() {}

@@ -27,7 +27,10 @@ R3BCollimator::R3BCollimator(const TString& name)
 {
 }
 
-R3BCollimator::R3BCollimator(const TString& name, const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot)
+R3BCollimator::R3BCollimator(const TString& name,
+                             const TString& geoFile,
+                             const TGeoTranslation& trans,
+                             const TGeoRotation& rot)
     : R3BCollimator(name, geoFile, { trans, rot })
 {
 }
@@ -37,13 +40,8 @@ R3BCollimator::R3BCollimator(const TString& name, const TString& geoFile, const 
 {
 }
 
-void R3BCollimator::ConstructGeometry()
-{
-    R3BModule::ConstructGeometry();
-}
+void R3BCollimator::ConstructGeometry() { R3BModule::ConstructGeometry(); }
 
-void R3BCollimator::SetParContainers()
-{
-}
+void R3BCollimator::SetParContainers() {}
 
 ClassImp(R3BCollimator)

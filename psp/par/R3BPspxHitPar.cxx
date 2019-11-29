@@ -81,8 +81,7 @@ void R3BPspxHitPar::printparams()
     LOG(INFO) << "pspxhitparlength size: " << size;
 
     LOG(INFO) << "Detectorno.: No. of Strips, Orientation of Strips, Orientation X Position, Orientation Y Position, "
-                 "Orientation X Strips, Orientation Y Strips, Length of Detector"
-             ;
+                 "Orientation X Strips, Orientation Y Strips, Length of Detector";
     for (Int_t i = 0; i < size; i++)
     {
         LOG(INFO) << i << " :" << pspxhitparstrip.GetAt(i) << ", " << pspxhitparorientation.GetAt(i) << ", "

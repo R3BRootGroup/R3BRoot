@@ -31,7 +31,7 @@ class R3BTCalPar;
  * calibration parameters, which are produced in a separate
  * analysis run containing R3BBunchedFiberMapped2CalPar task.
  */
-class R3BBunchedFiberMapped2Cal: public FairTask
+class R3BBunchedFiberMapped2Cal : public FairTask
 {
   public:
     /**
@@ -40,7 +40,7 @@ class R3BBunchedFiberMapped2Cal: public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BBunchedFiberMapped2Cal(const char *, Int_t, Bool_t = false);
+    R3BBunchedFiberMapped2Cal(const char*, Int_t, Bool_t = false);
 
     /**
      * Destructor.
@@ -92,10 +92,10 @@ class R3BBunchedFiberMapped2Cal: public FairTask
     TString fName;
     UInt_t fSideNum[2];
     Bool_t fSkipSPMT;
-    R3BTCalPar *fMAPMTTCalPar;
-    R3BTCalPar *fSPMTTCalPar;
-    TClonesArray *fMappedItems;
-    TClonesArray *fCalItems;
+    R3BTCalPar* fMAPMTTCalPar;
+    R3BTCalPar* fSPMTTCalPar;
+    TClonesArray* fMappedItems;
+    TClonesArray* fCalItems;
     Int_t fNofCalItems;
     Double_t fClockFreq;
     Double_t fTamexFreq;

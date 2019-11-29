@@ -124,7 +124,7 @@ class R3BFi7 : public R3BDetector
     Bool_t kGeoSaved;               //!
     TList* flGeoPar;                //!
 
-    R3BTGeoPar* fTGeoPar;           //!
+    R3BTGeoPar* fTGeoPar; //!
 
     /** Private method AddHit
      **

@@ -34,11 +34,10 @@ class R3BTarget : public R3BModule
 
     virtual void ConstructGeometry();
 
-    ClassDef(R3BTarget, 3)
-    void SetParContainers();
-  
-protected:
-    R3BTGeoPar *fTGeoPar; //!
+    ClassDef(R3BTarget, 3) void SetParContainers();
+
+  protected:
+    R3BTGeoPar* fTGeoPar; //!
 };
 
 #endif // R3BTARGET_H

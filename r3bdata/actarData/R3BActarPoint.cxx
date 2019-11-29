@@ -57,19 +57,17 @@ R3BActarPoint::R3BActarPoint(Int_t trackID,
 // -------------------------------------------------------------------------
 
 // -----   Destructor   ----------------------------------------------------
-R3BActarPoint::~R3BActarPoint()
-{
-}
+R3BActarPoint::~R3BActarPoint() {}
 // -------------------------------------------------------------------------
 
 // -----   Public method Print   -------------------------------------------
 void R3BActarPoint::Print(const Option_t* opt) const
 {
-    LOG(INFO) << "R3BActarPoint: STS Point for track " << fTrackID << " in detector " << fDetectorID
-              << "    Position (" << fX << ", " << fY << ", " << fZ << ") cm"
+    LOG(INFO) << "R3BActarPoint: STS Point for track " << fTrackID << " in detector " << fDetectorID << "    Position ("
+              << fX << ", " << fY << ", " << fZ << ") cm"
               << "    Momentum (" << fPx << ", " << fPy << ", " << fPz << ") GeV"
-              << "    Time " << fTime << " ns,  Length " << fLength << " cm,  Energy loss " << fELoss * 1.0e06 << " keV"
-             ;
+              << "    Time " << fTime << " ns,  Length " << fLength << " cm,  Energy loss " << fELoss * 1.0e06
+              << " keV";
 }
 // -------------------------------------------------------------------------
 

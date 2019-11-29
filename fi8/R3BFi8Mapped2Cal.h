@@ -16,7 +16,7 @@
 
 #include "R3BBunchedFiberMapped2Cal.h"
 
-class R3BFi8Mapped2Cal: public R3BBunchedFiberMapped2Cal
+class R3BFi8Mapped2Cal : public R3BBunchedFiberMapped2Cal
 {
   public:
     R3BFi8Mapped2Cal(Int_t = 1);

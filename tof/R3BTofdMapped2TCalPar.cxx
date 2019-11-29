@@ -35,20 +35,20 @@
  */
 
 #include "R3BTofdMapped2TCalPar.h"
-#include "R3BPaddleTamexMappedData.h"
 #include "R3BEventHeader.h"
-#include "R3BTCalPar.h"
+#include "R3BPaddleTamexMappedData.h"
 #include "R3BTCalEngine.h"
+#include "R3BTCalPar.h"
 
-#include "FairRootManager.h"
-#include "FairRuntimeDb.h"
-#include "FairRunIdGenerator.h"
-#include "FairRtdbRun.h"
 #include "FairLogger.h"
+#include "FairRootManager.h"
+#include "FairRtdbRun.h"
+#include "FairRunIdGenerator.h"
+#include "FairRuntimeDb.h"
 
 #include "TClonesArray.h"
-#include "TH1F.h"
 #include "TF1.h"
+#include "TH1F.h"
 
 #include <iostream>
 #include <stdlib.h>
@@ -56,119 +56,126 @@
 using namespace std;
 
 R3BTofdMapped2TCalPar::R3BTofdMapped2TCalPar()
-  : FairTask("R3BTofdMapped2TCalPar", 1)
-  , fUpdateRate(1000000)
-  , fMinStats(100000)
-  , fTrigger(-1)
-  , fNofPlanes(0)
-  , fPaddlesPerPlane(0)
-  , fNofModules(0)
-  , fNEvents(0)
-  , fCal_Par(nullptr)
-  , fMapped(nullptr)
-  , header(nullptr)
-  , fEngine(nullptr)
+    : FairTask("R3BTofdMapped2TCalPar", 1)
+    , fUpdateRate(1000000)
+    , fMinStats(100000)
+    , fTrigger(-1)
+    , fNofPlanes(0)
+    , fPaddlesPerPlane(0)
+    , fNofModules(0)
+    , fNEvents(0)
+    , fCal_Par(nullptr)
+    , fMapped(nullptr)
+    , header(nullptr)
+    , fEngine(nullptr)
 {
 }
 
 R3BTofdMapped2TCalPar::R3BTofdMapped2TCalPar(const char* name, Int_t iVerbose)
-  : FairTask(name, iVerbose)
-  , fUpdateRate(1000000)
-  , fMinStats(100000)
-  , fTrigger(-1)
-  , fNofPlanes(0)
-  , fPaddlesPerPlane(0)
-  , fNofModules(0)
-  , fNEvents(0)
-  , fCal_Par(nullptr)
-  , fMapped(nullptr)
-  , header(nullptr)
-  , fEngine(nullptr)
+    : FairTask(name, iVerbose)
+    , fUpdateRate(1000000)
+    , fMinStats(100000)
+    , fTrigger(-1)
+    , fNofPlanes(0)
+    , fPaddlesPerPlane(0)
+    , fNofModules(0)
+    , fNEvents(0)
+    , fCal_Par(nullptr)
+    , fMapped(nullptr)
+    , header(nullptr)
+    , fEngine(nullptr)
 {
 }
 
 R3BTofdMapped2TCalPar::~R3BTofdMapped2TCalPar()
 {
-  delete fCal_Par;
-  delete fEngine;
+    delete fCal_Par;
+    delete fEngine;
 }
 
 InitStatus R3BTofdMapped2TCalPar::Init()
 {
-  FairRootManager* rm = FairRootManager::Instance();
-  if (!rm) {
-    return kFATAL;
-  }
+    FairRootManager* rm = FairRootManager::Instance();
+    if (!rm)
+    {
+        return kFATAL;
+    }
 
-  header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
-  // may be = NULL!
+    header = (R3BEventHeader*)rm->GetObject("R3BEventHeader");
+    // may be = NULL!
 
-  fMapped = (TClonesArray*)rm->GetObject("TofdMapped");
-  if (!fMapped) {
-    return kFATAL;
-  }
+    fMapped = (TClonesArray*)rm->GetObject("TofdMapped");
+    if (!fMapped)
+    {
+        return kFATAL;
+    }
 
-  // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
-  // to be set as dependency in CMakelists.txt (in this case in the tof directory)
-  fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofdTCalPar");
-  if (!fCal_Par) {
-    LOG(ERROR) << "R3BTofdMapped2TCalPar::Init() Couldn't get handle on TofdTCalPar. ";
-    return kFATAL;
-  }
+    // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
+    // to be set as dependency in CMakelists.txt (in this case in the tof directory)
+    fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("TofdTCalPar");
+    if (!fCal_Par)
+    {
+        LOG(ERROR) << "R3BTofdMapped2TCalPar::Init() Couldn't get handle on TofdTCalPar. ";
+        return kFATAL;
+    }
 
-  fCal_Par->setChanged();
+    fCal_Par->setChanged();
 
-  if (!fNofModules) {
-    LOG(ERROR) << "R3BTofdMapped2TCalPar::Init() Number of modules not set. ";
-    return kFATAL;
-  }
+    if (!fNofModules)
+    {
+        LOG(ERROR) << "R3BTofdMapped2TCalPar::Init() Number of modules not set. ";
+        return kFATAL;
+    }
 
-  fEngine = new R3BTCalEngine(fCal_Par, fMinStats);
+    fEngine = new R3BTCalEngine(fCal_Par, fMinStats);
 
-  return kSUCCESS;
+    return kSUCCESS;
 }
 
 void R3BTofdMapped2TCalPar::Exec(Option_t* option)
 {
-  // test for requested trigger (if possible)
-  if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
-    return;
+    // test for requested trigger (if possible)
+    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
+        return;
 
-  Int_t nHits = fMapped->GetEntries();
+    Int_t nHits = fMapped->GetEntries();
 
-  // Loop over mapped hits
-  for (Int_t i = 0; i < nHits; i++) {
-    R3BTofdMappedData* hit = (R3BTofdMappedData*)fMapped->At(i);
+    // Loop over mapped hits
+    for (Int_t i = 0; i < nHits; i++)
+    {
+        R3BTofdMappedData* hit = (R3BTofdMappedData*)fMapped->At(i);
 
-    Int_t iDetector = hit->GetDetector(); // 1..n
-    Int_t iSide     = hit->GetSide();     // 1/2
-    Int_t iChannel  = hit->GetChannel();  // 1..n
-    Int_t iEdge     = hit->GetEdge();     // 1/2
+        Int_t iDetector = hit->GetDetector(); // 1..n
+        Int_t iSide = hit->GetSide();         // 1/2
+        Int_t iChannel = hit->GetChannel();   // 1..n
+        Int_t iEdge = hit->GetEdge();         // 1/2
 
-    if (iPlane>fNofPlanes) {
-      LOG(ERROR) << "R3BTofdMapped2TCalPar::Exec() : more planes than expected! Plane: " << iPlane << " allowed are 1.." << fNofPlanes;
-      continue;
+        if (iPlane > fNofPlanes)
+        {
+            LOG(ERROR) << "R3BTofdMapped2TCalPar::Exec() : more planes than expected! Plane: " << iPlane
+                       << " allowed are 1.." << fNofPlanes;
+            continue;
+        }
+        if (iBar > fPaddlesPerPlane)
+        {
+            LOG(ERROR) << "R3BTofdMapped2TCalPar::Exec() : more bars then expected! Det: " << iBar << " allowed are 1.."
+                       << fPaddlesPerPlane;
+            continue;
+        }
+
+        Int_t edge = iSide * 2 + iEdge - 2; // 1..4
+        fEngine->Fill(iDetector, iChannel, edge, hit->GetCoarseTime());
     }
-    if (iBar>fPaddlesPerPlane) {
-      LOG(ERROR) << "R3BTofdMapped2TCalPar::Exec() : more bars then expected! Det: " << iBar << " allowed are 1.." << fPaddlesPerPlane;
-      continue;
-    }
 
-    Int_t edge = iSide * 2 + iEdge - 2; // 1..4
-    fEngine->Fill(iDetector, iChannel, edge, hit->GetCoarseTime());
-  }
-
-  ++fNEvents;
+    ++fNEvents;
 }
 
-void R3BTofdMapped2TCalPar::FinishEvent()
-{
-}
+void R3BTofdMapped2TCalPar::FinishEvent() {}
 
 void R3BTofdMapped2TCalPar::FinishTask()
 {
-  fEngine->CalculateParamVFTX();
-  fCal_Par->printParams();
+    fEngine->CalculateParamVFTX();
+    fCal_Par->printParams();
 }
 
 ClassImp(R3BTofdMapped2TCalPar)

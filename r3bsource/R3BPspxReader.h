@@ -41,16 +41,16 @@ class R3BPspxReader : public R3BReader
     void SetParContainers();
     Bool_t Read();
     /** Accessor to select online mode **/
-    void SetOnline(Bool_t option){fOnline=option;} 
+    void SetOnline(Bool_t option) { fOnline = option; }
     void Reset(); /**< Reset the output array **/
 
   private:
-    EXT_STR_h101_PSP* fData;    /**< Reader specific data structure from ucesb */
-    UInt_t fOffset;             /**< Data Offset */
-    FairLogger* fLogger;        /**< FairLogger */
-    //Don't store data for online
+    EXT_STR_h101_PSP* fData; /**< Reader specific data structure from ucesb */
+    UInt_t fOffset;          /**< Data Offset */
+    FairLogger* fLogger;     /**< FairLogger */
+    // Don't store data for online
     Bool_t fOnline;
-    Int_t fNbDetectors;         //Number of detectors
+    Int_t fNbDetectors;         // Number of detectors
     TClonesArray* fMappedItems; /**< Array holding output (Mapped) data */
 
     R3BPspxMappedPar* fMappedPar; /**< Parameter instance holding number of detectors & strips. */

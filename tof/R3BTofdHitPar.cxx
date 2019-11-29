@@ -57,9 +57,7 @@ Bool_t R3BTofdHitPar::getParams(FairParamList* list)
     return kTRUE;
 }
 
-void R3BTofdHitPar::clear()
-{
-}
+void R3BTofdHitPar::clear() {}
 
 void R3BTofdHitPar::printParams()
 {

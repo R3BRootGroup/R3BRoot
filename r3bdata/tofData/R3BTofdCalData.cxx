@@ -12,10 +12,10 @@
  ******************************************************************************/
 
 #include "R3BTofdCalData.h"
+#include "FairLogger.h"
+#include "TMath.h"
 #include <cmath>
 #include <iostream>
-#include "TMath.h"
-#include "FairLogger.h"
 
 R3BTofdCalData::R3BTofdCalData()
     : fDetector(-1)
@@ -32,32 +32,17 @@ R3BTofdCalData::R3BTofdCalData(UInt_t detector, UInt_t channel, UInt_t side, Dou
     , fSide(side)
     , fLeading_ns(lead)
     , fTrailing_ns(trail)
-{	 
+{
 }
 
-UInt_t R3BTofdCalData::GetDetectorId() const
-{
-  return fDetector;
-}
+UInt_t R3BTofdCalData::GetDetectorId() const { return fDetector; }
 
-UInt_t R3BTofdCalData::GetBarId() const
-{
-  return fBar;
-}
+UInt_t R3BTofdCalData::GetBarId() const { return fBar; }
 
-UInt_t R3BTofdCalData::GetSideId() const
-{
-  return fSide;
-}
+UInt_t R3BTofdCalData::GetSideId() const { return fSide; }
 
-Double_t R3BTofdCalData::GetTimeLeading_ns() const
-{
-  return fLeading_ns;
-}
+Double_t R3BTofdCalData::GetTimeLeading_ns() const { return fLeading_ns; }
 
-Double_t R3BTofdCalData::GetTimeTrailing_ns() const
-{
-  return fTrailing_ns;
-}
+Double_t R3BTofdCalData::GetTimeTrailing_ns() const { return fTrailing_ns; }
 
 ClassImp(R3BTofdCalData)

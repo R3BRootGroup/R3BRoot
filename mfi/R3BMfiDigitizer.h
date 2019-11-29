@@ -14,98 +14,81 @@
 #ifndef R3BMFIDIGITIZER_H
 #define R3BMFIDDIGITISER_H 1
 
-
 #include "FairTask.h"
+#include "R3BMfiDigi.h"
+#include "R3BMfiDigiPar.h"
 #include <map>
 #include <string>
-#include "R3BMfiDigiPar.h"
-#include "R3BMfiDigi.h"
 
 #include "TRandom.h"
 
 #include "R3BKeepEventProbabilityMfi.h"
-
 
 class TClonesArray;
 class TObjectArray;
 class TH1F;
 class TH2F;
 
-
-
 class R3BMfiDigitizer : public FairTask
 {
 
- public:
+  public:
+    /** Default constructor **/
+    R3BMfiDigitizer();
 
-  /** Default constructor **/  
-  R3BMfiDigitizer();
+    /** Special constructor with random number generator **/
+    R3BMfiDigitizer(TRandom* rndm, std::string file);
+    //   TRandom* fRndm; //todo: make this guy private!!!
 
-  /** Special constructor with random number generator **/  
-  R3BMfiDigitizer(TRandom* rndm, std::string file);
-//   TRandom* fRndm; //todo: make this guy private!!!
+    /** Destructor **/
+    ~R3BMfiDigitizer();
 
+    /** Virtual method Init **/
+    virtual InitStatus Init();
 
-  /** Destructor **/
-  ~R3BMfiDigitizer();
+    /** Virtual method Exec **/
+    virtual void Exec(Option_t* opt);
 
+    virtual void Finish();
+    virtual void Reset();
 
-  /** Virtual method Init **/
-  virtual InitStatus Init();
+    R3BMfiDigi* AddHit(Int_t mf1mul, Double_t mf1x, Int_t fiber);
 
+    void SetFilenameMfiProb(std::string _file);
+    std::string GetFilenameMfiProb();
 
-  /** Virtual method Exec **/
-  virtual void Exec(Option_t* opt);
+    void SetRandomizer(TRandom* _rndm);
+    TRandom* GetRandomizer();
 
-  virtual void Finish();
-  virtual void Reset();
+    void SetDoMfiProb(Bool_t _do);
+    Bool_t GetDoMfiProb();
 
+    void SetDataPointerMfiProb(R3BKeepEventProbabilityMfi* _fiberProb);
+    R3BKeepEventProbabilityMfi* GetDataPointerMfiProb();
 
-  R3BMfiDigi* AddHit(Int_t mf1mul,Double_t mf1x, Int_t fiber);
-  
-  void SetFilenameMfiProb(std::string _file);
-  std::string GetFilenameMfiProb();
-  
-  void SetRandomizer(TRandom* _rndm);
-  TRandom* GetRandomizer();
+    //   void InitMfiProb();
 
-  void SetDoMfiProb(Bool_t _do);
-  Bool_t GetDoMfiProb();
-
-  void SetDataPointerMfiProb(R3BKeepEventProbabilityMfi* _fiberProb);
-  R3BKeepEventProbabilityMfi* GetDataPointerMfiProb();
-  
-//   void InitMfiProb();
-
-
- 
- 
   protected:
-  TClonesArray* fMfiPoints;
-  TClonesArray* fMfiMCTrack; 
-  TClonesArray* fMfiDigi;
-  
-  std::string fFilenameMfiProb;
-  TRandom* fRndm; 
-  Bool_t fDoMfiProb;
-  R3BKeepEventProbabilityMfi* fFiberProb;
+    TClonesArray* fMfiPoints;
+    TClonesArray* fMfiMCTrack;
+    TClonesArray* fMfiDigi;
 
-  // Parameter class
-  R3BMfiDigiPar* fMfiDigiPar;
+    std::string fFilenameMfiProb;
+    TRandom* fRndm;
+    Bool_t fDoMfiProb;
+    R3BKeepEventProbabilityMfi* fFiberProb;
 
-  //- Control Hitograms
+    // Parameter class
+    R3BMfiDigiPar* fMfiDigiPar;
 
-  
-  Int_t eventNoMfi;
-  
-  
+    //- Control Hitograms
+
+    Int_t eventNoMfi;
+
   private:
-  virtual void SetParContainers();
-  
+    virtual void SetParContainers();
 
- 
-  ClassDef(R3BMfiDigitizer,1);
-  
+    ClassDef(R3BMfiDigitizer, 1);
 };
 
 #endif

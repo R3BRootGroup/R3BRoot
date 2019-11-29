@@ -20,11 +20,10 @@ class R3BTCalEngine;
 class R3BTCalPar;
 class TClonesArray;
 
-class R3BStrawtubesMapped2CalPar: public FairTask
+class R3BStrawtubesMapped2CalPar : public FairTask
 {
   public:
-    R3BStrawtubesMapped2CalPar(const char * = "R3BStrawtubesMapped2CalPar",
-        Int_t = 1);
+    R3BStrawtubesMapped2CalPar(const char* = "R3BStrawtubesMapped2CalPar", Int_t = 1);
     virtual ~R3BStrawtubesMapped2CalPar();
     virtual void Exec(Option_t* option);
     virtual void FinishEvent();
@@ -43,4 +42,3 @@ class R3BStrawtubesMapped2CalPar: public FairTask
 };
 
 #endif
-

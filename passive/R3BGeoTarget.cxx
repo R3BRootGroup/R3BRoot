@@ -25,11 +25,12 @@
 
 ClassImp(R3BGeoTarget)
 
-R3BGeoTarget::R3BGeoTarget() {
-  // Constructor
-  fName="target";
-  strcpy(modName,"t");
-  strcpy(eleName,"t");
-  maxSectors=0;
-  maxModules=1;
+    R3BGeoTarget::R3BGeoTarget()
+{
+    // Constructor
+    fName = "target";
+    strcpy(modName, "t");
+    strcpy(eleName, "t");
+    maxSectors = 0;
+    maxModules = 1;
 }

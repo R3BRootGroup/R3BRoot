@@ -26,19 +26,18 @@ class R3BCollimator : public R3BModule
     R3BCollimator(const TString& name);
 
     R3BCollimator(const TString& name,
-              const TString& geoFile,
-              const TGeoTranslation& trans,
-              const TGeoRotation& rot = TGeoRotation());
+                  const TString& geoFile,
+                  const TGeoTranslation& trans,
+                  const TGeoRotation& rot = TGeoRotation());
 
     R3BCollimator(const TString& name, const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
 
     virtual void ConstructGeometry();
 
-    ClassDef(R3BCollimator, 1)
-    void SetParContainers();
-  
-protected:
-    R3BTGeoPar *fTGeoPar; //!
+    ClassDef(R3BCollimator, 1) void SetParContainers();
+
+  protected:
+    R3BTGeoPar* fTGeoPar; //!
 };
 
 #endif // R3BCOLLIMATOR_H

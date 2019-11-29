@@ -26,7 +26,7 @@
 
 #include "TObject.h"
 
-class R3BBunchedFiberMappedData: public TObject
+class R3BBunchedFiberMappedData : public TObject
 {
   public:
     R3BBunchedFiberMappedData();

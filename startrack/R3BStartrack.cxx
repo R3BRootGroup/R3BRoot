@@ -72,7 +72,7 @@ void R3BStartrack::Initialize()
     FairDetector::Initialize();
 
     LOG(INFO) << "R3BStartrack: initialisation";
-//    LOG(DEBUG) << "R3BStartrack: Sens. Vol. (McId) " << gMC->VolId("StartrackLog1");
+    //    LOG(DEBUG) << "R3BStartrack: Sens. Vol. (McId) " << gMC->VolId("StartrackLog1");
     LOG(DEBUG) << "R3BStartrack: Sens. Vol. (McId) " << gMC->VolId("STaRTraLog1");
 }
 
@@ -224,7 +224,10 @@ void R3BStartrack::EndOfEvent()
 // ----------------------------------------------------------------------------
 
 // -----   Public method Register   -------------------------------------------
-void R3BStartrack::Register() { FairRootManager::Instance()->Register("StartrackPoint", GetName(), fTraCollection, kTRUE); }
+void R3BStartrack::Register()
+{
+    FairRootManager::Instance()->Register("StartrackPoint", GetName(), fTraCollection, kTRUE);
+}
 // ----------------------------------------------------------------------------
 
 // -----   Public method GetCollection   --------------------------------------
@@ -273,29 +276,28 @@ void R3BStartrack::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset
 
 // -----   Private method AddHit   --------------------------------------------
 R3BStartrackPoint* R3BStartrack::AddHit(Int_t trackID,
-                                    Int_t detID,
-                                    Int_t detCopyID,
-                                    TVector3 posIn, // Int_t detCopyID added by Marc
-                                    TVector3 posOut,
-                                    TVector3 momIn,
-                                    TVector3 momOut,
-                                    Double_t time,
-                                    Double_t length,
-                                    Double_t eLoss)
+                                        Int_t detID,
+                                        Int_t detCopyID,
+                                        TVector3 posIn, // Int_t detCopyID added by Marc
+                                        TVector3 posOut,
+                                        TVector3 momIn,
+                                        TVector3 momOut,
+                                        Double_t time,
+                                        Double_t length,
+                                        Double_t eLoss)
 {
     TClonesArray& clref = *fTraCollection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
         LOG(INFO) << "R3BStartrack: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
-                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV"
-                 ;
+                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     return new (clref[size]) R3BStartrackPoint(
         trackID, detID, detCopyID, posIn, posOut, momIn, momOut, time, length, eLoss); // detCopy added by Marc
 }
 
 Bool_t R3BStartrack::CheckIfSensitive(std::string name)
 {
-//    if (TString(name).Contains("StartrackLog"))
+    //    if (TString(name).Contains("StartrackLog"))
     if (TString(name).Contains("STaRTraLog"))
     {
         return kTRUE;

@@ -25,39 +25,37 @@ class TClonesArray;
 class TH1F;
 class TH2F;
 
-
 class R3BNeutronCalibr2D : public FairTask
 {
- public:
-  /** Default constructor **/  
-  R3BNeutronCalibr2D();
-  
-  /** Destructor **/
-  ~R3BNeutronCalibr2D();
+  public:
+    /** Default constructor **/
+    R3BNeutronCalibr2D();
 
-  /** Virtual method Init **/
-  virtual InitStatus Init();
+    /** Destructor **/
+    ~R3BNeutronCalibr2D();
 
-  /** Virtual method Exec **/
-  virtual void Exec(Option_t* opt);
+    /** Virtual method Init **/
+    virtual InitStatus Init();
 
-  virtual void Finish();
+    /** Virtual method Exec **/
+    virtual void Exec(Option_t* opt);
 
-  inline void UseBeam(Int_t beamEnergy) { fBeamEnergy = beamEnergy; }
+    virtual void Finish();
 
- private:
-  Int_t         fEventNo;
-  Int_t         fBeamEnergy;
-  TClonesArray *fArrayDigi;
-  TClonesArray *fArrayCluster;
-  TH1F         *fh_etot;
-  TH2F         *fh_ncl_etot;
+    inline void UseBeam(Int_t beamEnergy) { fBeamEnergy = beamEnergy; }
 
-  void CreateHistograms();
+  private:
+    Int_t fEventNo;
+    Int_t fBeamEnergy;
+    TClonesArray* fArrayDigi;
+    TClonesArray* fArrayCluster;
+    TH1F* fh_etot;
+    TH2F* fh_ncl_etot;
 
- public: 
-  ClassDef(R3BNeutronCalibr2D,1)  
+    void CreateHistograms();
+
+  public:
+    ClassDef(R3BNeutronCalibr2D, 1)
 };
-
 
 #endif

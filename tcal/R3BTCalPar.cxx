@@ -165,8 +165,7 @@ Bool_t R3BTCalPar::SetModuleParValue(Int_t plane, Int_t paddle, Int_t side, Int_
     {
         if (par->GetSlopeAt(0) > 0)
         {
-            LOG(ERROR) << "R3BTCalPar::SetModuleParValue : this function does not support Tacquila."
-                      ;
+            LOG(ERROR) << "R3BTCalPar::SetModuleParValue : this function does not support Tacquila.";
             return kFALSE;
         }
         Int_t i = 0;
@@ -195,12 +194,10 @@ void R3BTCalPar::SavePar(TString runNumber)
     FairParVersion* ver = r1->getParVersion(GetName());
     if (NULL == ver)
     {
-        LOG(ERROR) << "Parameter container " << GetName() << " does not exist in parameter file! Aborting."
-                  ;
+        LOG(ERROR) << "Parameter container " << GetName() << " does not exist in parameter file! Aborting.";
         return;
     }
     ver->setRootVersion(ver->getRootVersion() + 1);
     r1->Write();
-    LOG(INFO) << "Container " << GetName() << " is written to ROOT file. Version: " << ver->getRootVersion()
-             ;
+    LOG(INFO) << "Container " << GetName() << " is written to ROOT file. Version: " << ver->getRootVersion();
 }

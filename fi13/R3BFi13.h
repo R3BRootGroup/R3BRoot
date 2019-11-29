@@ -120,11 +120,11 @@ class R3BFi13 : public R3BDetector
     Double32_t fLength;             //!  length
     Double32_t fELoss;              //!  energy loss
     Int_t fPosIndex;                //!
-    TClonesArray* fFi13Collection;   //!  The hit collection
+    TClonesArray* fFi13Collection;  //!  The hit collection
     Bool_t kGeoSaved;               //!
     TList* flGeoPar;                //!
 
-    R3BTGeoPar* fTGeoPar;           //!
+    R3BTGeoPar* fTGeoPar; //!
 
     /** Private method AddHit
      **

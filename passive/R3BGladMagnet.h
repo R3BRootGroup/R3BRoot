@@ -29,7 +29,7 @@ class R3BGladMagnet : public R3BModule
     R3BGladMagnet(const TString& geoFile);
 
     void SetPosition(const TGeoTranslation&); // override;
-    void SetRotation(const TGeoRotation&); // override;
+    void SetRotation(const TGeoRotation&);    // override;
 
   private:
     ClassDef(R3BGladMagnet, 3)

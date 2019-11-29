@@ -16,7 +16,6 @@
 
 #include "TObject.h"
 
-
 class R3BBeamMonitorMappedData : public TObject
 {
   public:
@@ -26,17 +25,17 @@ class R3BBeamMonitorMappedData : public TObject
     // Standard Constructor
     R3BBeamMonitorMappedData(UInt_t, UInt_t, UInt_t);
 
-    UInt_t GetIC()   const ;
-    UInt_t GetSEETRAM()    const ;
-    UInt_t GetTOFDOR()       const ;
+    UInt_t GetIC() const;
+    UInt_t GetSEETRAM() const;
+    UInt_t GetTOFDOR() const;
 
   public:
     UInt_t fIC;
-    UInt_t fSEETRAM; 
-    UInt_t fTOFDOR; 
+    UInt_t fSEETRAM;
+    UInt_t fTOFDOR;
 
   public:
-    ClassDef(R3BBeamMonitorMappedData, 1) 
+    ClassDef(R3BBeamMonitorMappedData, 1)
 };
 
 #endif

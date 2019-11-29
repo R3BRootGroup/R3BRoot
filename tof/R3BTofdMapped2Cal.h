@@ -52,7 +52,7 @@ class R3BTofdMapped2Cal : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BTofdMapped2Cal(const char *, Int_t = 1);
+    R3BTofdMapped2Cal(const char*, Int_t = 1);
 
     /**
      * Destructor.
@@ -85,7 +85,7 @@ class R3BTofdMapped2Cal : public FairTask
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    void Exec(Option_t *);
+    void Exec(Option_t*);
 
     /**
      * A method for finish of processing of an event.
@@ -104,10 +104,7 @@ class R3BTofdMapped2Cal : public FairTask
      * Method for setting the trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
-    inline void SetTrigger(Int_t trigger)
-    {
-        fTrigger = trigger;
-    }
+    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
 
     /**
      * Method for setting the number of NeuLAND modules.
@@ -117,25 +114,25 @@ class R3BTofdMapped2Cal : public FairTask
     void SetNofModules(Int_t, Int_t);
 
   private:
-    size_t GetCalLookupIndex(R3BTofdMappedData const &) const;
+    size_t GetCalLookupIndex(R3BTofdMappedData const&) const;
 
-    TClonesArray *fMappedItems;                 /**< Array with mapped items - input data. */
-    TClonesArray *fCalItems;                    /**< Array with cal items - output data. */
-    Int_t fNofCalItems;                         /**< Number of produced time items per event. */
+    TClonesArray* fMappedItems; /**< Array with mapped items - input data. */
+    TClonesArray* fCalItems;    /**< Array with cal items - output data. */
+    Int_t fNofCalItems;         /**< Number of produced time items per event. */
 
-    R3BTCalPar *fTcalPar;                       /**< TCAL parameter container. */
-    UInt_t fNofTcalPars;                        /**< Number of modules in parameter file. */
+    R3BTCalPar* fTcalPar; /**< TCAL parameter container. */
+    UInt_t fNofTcalPars;  /**< Number of modules in parameter file. */
 
-    UInt_t fNofPlanes;  
-    UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */    
+    UInt_t fNofPlanes;
+    UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */
     Double_t fClockFreq;     /**< Clock cycle in [ns]. */
 
-	// check for trigger should be done globablly (somewhere else)
-    R3BEventHeader* header;                     /**< Event header. */
-    Int_t fTrigger;                             /**< Trigger value. */
+    // check for trigger should be done globablly (somewhere else)
+    R3BEventHeader* header; /**< Event header. */
+    Int_t fTrigger;         /**< Trigger value. */
 
     // Fast lookup for matching mapped data.
-    std::vector<std::vector<R3BTofdCalData *>> fCalLookup;
+    std::vector<std::vector<R3BTofdCalData*>> fCalLookup;
 
   public:
     ClassDef(R3BTofdMapped2Cal, 1)

@@ -124,8 +124,7 @@ void R3BPsp::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Si Only
             Double_t cutE = fCutE; // GeV-> 1 keV
 
-            LOG(INFO) << "-I- R3BPsp: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV"
-                     ;
+            LOG(INFO) << "-I- R3BPsp: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -315,8 +314,7 @@ R3BPspPoint* R3BPsp::AddHit(Int_t trackID,
     if (fVerboseLevel > 1)
     {
         LOG(INFO) << "R3BPsp: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
-                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV"
-                 ;
+                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     }
     return new (clref[size]) R3BPspPoint(trackID, detID, plane, posIn, posOut, momIn, momOut, time, length, eLoss);
 }

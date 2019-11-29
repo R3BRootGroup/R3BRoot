@@ -11,13 +11,12 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-
 #ifndef R3B_T_PROPAGATOR
 #define R3B_T_PROPAGATOR
 
+#include "TCanvas.h"
 #include "TObject.h"
 #include "TVector3.h"
-#include "TCanvas.h"
 
 class R3BGladFieldMap;
 class FairRKPropagator;
@@ -35,17 +34,12 @@ class R3BTPropagator : public TObject
 
     inline void SetmTofGeo(R3BTGeoPar* geo) { fmTofGeo = geo; }
 
-    Bool_t PropagateToDetector(R3BTrackingParticle* particle,
-                               R3BTrackingDetector* detector);
-    
-    Bool_t PropagateToDetectorBackward(R3BTrackingParticle* particle,
-                                       R3BTrackingDetector* detector);
+    Bool_t PropagateToDetector(R3BTrackingParticle* particle, R3BTrackingDetector* detector);
 
-    Bool_t PropagateToPlane(R3BTrackingParticle* particle,
-                            const TVector3& v1,
-                            const TVector3& v2,
-                            const TVector3& v3);
-    
+    Bool_t PropagateToDetectorBackward(R3BTrackingParticle* particle, R3BTrackingDetector* detector);
+
+    Bool_t PropagateToPlane(R3BTrackingParticle* particle, const TVector3& v1, const TVector3& v2, const TVector3& v3);
+
     Bool_t PropagateToPlaneBackward(R3BTrackingParticle* particle,
                                     const TVector3& v1,
                                     const TVector3& v2,
@@ -61,7 +55,7 @@ class R3BTPropagator : public TObject
                               const TVector3& v1,
                               const TVector3& normal,
                               TVector3& intersect);
-    
+
     void SetVis(Bool_t vis = kTRUE) { fVis = vis; }
 
   private:

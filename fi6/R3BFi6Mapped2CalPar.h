@@ -25,8 +25,6 @@ class TClonesArray;
 class R3BEventHeader;
 class R3BTCalEngine;
 
-
-
 class R3BFi6Mapped2CalPar : public FairTask
 {
 
@@ -83,10 +81,7 @@ class R3BFi6Mapped2CalPar : public FairTask
      * Method for setting the update rate for control histograms
      * @param rate an update rate value (events).
      */
-    inline void SetUpdateRate(Int_t rate)
-    {
-        fUpdateRate = rate;
-    }
+    inline void SetUpdateRate(Int_t rate) { fUpdateRate = rate; }
 
     /**
      * Method for setting minimum required statistics per module.
@@ -95,18 +90,14 @@ class R3BFi6Mapped2CalPar : public FairTask
      * calibrated.
      * @param minStats a value of minimum statistics required.
      */
-    inline void SetMinStats(Int_t minStats)
-    {
-        fMinStats = minStats;
-    }
-
+    inline void SetMinStats(Int_t minStats) { fMinStats = minStats; }
 
   private:
     Int_t fUpdateRate; /**< An update rate. */
     Int_t fMinStats;   /**< Minimum statistics required per module. */
 
-    R3BTCalPar* fCal_Par;   /**< Parameter container. */
-    TClonesArray* fMapped;  /**< Array with mapped data - input data. */
+    R3BTCalPar* fCal_Par;  /**< Parameter container. */
+    TClonesArray* fMapped; /**< Array with mapped data - input data. */
 
     R3BTCalEngine* fEngine; /**< Instance of the TCAL engine. */
 
@@ -115,4 +106,3 @@ class R3BFi6Mapped2CalPar : public FairTask
 };
 
 #endif
-

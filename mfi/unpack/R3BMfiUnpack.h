@@ -27,7 +27,11 @@ class R3BMfiUnpack : public FairUnpack
 {
   public:
     // Constructor
-    R3BMfiUnpack(Short_t type = 97, Short_t subType = 9700, Short_t procId = 1, Short_t subCrate = 0, Short_t control = 9);
+    R3BMfiUnpack(Short_t type = 97,
+                 Short_t subType = 9700,
+                 Short_t procId = 1,
+                 Short_t subCrate = 0,
+                 Short_t control = 9);
 
     // Destructor
     virtual ~R3BMfiUnpack();

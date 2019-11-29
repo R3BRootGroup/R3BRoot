@@ -72,10 +72,10 @@ class R3BPspxHitData : public TObject
                         channels (X5).*/
     UShort_t fMultiplicity;  /**< Multiplicity for whole detector: Number of channels on Precal level (after applying
                               threshold) with an energy entry */
-    UShort_t fMultiplicityX; /**< Multiplicity for side of the detector providing x position: Number of channels on Precal
-                              level (after applying threshold) with an energy entry */
-    UShort_t fMultiplicityY; /**< Multiplicity for side of the detector providing y position: Number of channels on Precal
-                              level (after applying threshold) with an energy entry */
+    UShort_t fMultiplicityX; /**< Multiplicity for side of the detector providing x position: Number of channels on
+                              Precal level (after applying threshold) with an energy entry */
+    UShort_t fMultiplicityY; /**< Multiplicity for side of the detector providing y position: Number of channels on
+                              Precal level (after applying threshold) with an energy entry */
 
   public:
     ClassDef(R3BPspxHitData, 6)

@@ -18,8 +18,6 @@
 // ----- Following R3BLosMapped2Cal                          -----
 // ---------------------------------------------------------------
 
-
-
 #ifndef R3BROLUMAPPED2CAL
 #define R3BROLUMAPPED2CAL
 
@@ -106,14 +104,11 @@ class R3BRoluMapped2Cal : public FairTask
      */
     virtual void FinishTask();
 
-    /** 
+    /**
      * Method for setting the trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
-    inline void SetTrigger(Int_t trigger)
-    {
-        fTrigger = trigger;
-    }
+    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
 
     /**
      * Method for setting the number of modules.
@@ -122,29 +117,29 @@ class R3BRoluMapped2Cal : public FairTask
     inline void SetNofModules(Int_t nDets, Int_t nChs)
     {
         fNofDetectors = nDets;
-        fNofChannels = nChs;  //=4   
-        fNofTypes     = 2;    // leading, trailing
-        fNofModules  = nChs * nDets * 2 ; 
+        fNofChannels = nChs; //=4
+        fNofTypes = 2;       // leading, trailing
+        fNofModules = nChs * nDets * 2;
     }
 
   private:
-    //std::map<Int_t, R3BTCalModulePar*> fMapPar; /**< Map for matching mdoule ID with parameter container. */
-    TClonesArray* fMappedItems;                 /**< Array with mapped items - input data. */
-    TClonesArray* fCalItems;                    /**< Array with cal items - output data. */
-    Int_t fNofCalItems;                         /**< Number of produced time items per event. */
+    // std::map<Int_t, R3BTCalModulePar*> fMapPar; /**< Map for matching mdoule ID with parameter container. */
+    TClonesArray* fMappedItems; /**< Array with mapped items - input data. */
+    TClonesArray* fCalItems;    /**< Array with cal items - output data. */
+    Int_t fNofCalItems;         /**< Number of produced time items per event. */
 
-    R3BTCalPar* fTcalPar;                       /**< TCAL parameter container. */
-    UInt_t fNofTcalPars;                        /**< Number of modules in parameter file. */
+    R3BTCalPar* fTcalPar; /**< TCAL parameter container. */
+    UInt_t fNofTcalPars;  /**< Number of modules in parameter file. */
 
-	// check for trigger should be done globablly (somewhere else)
-    R3BEventHeader* header;                     /**< Event header. */
-    Int_t fTrigger;                             /**< Trigger value. */
+    // check for trigger should be done globablly (somewhere else)
+    R3BEventHeader* header; /**< Event header. */
+    Int_t fTrigger;         /**< Trigger value. */
 
-    UInt_t fNofDetectors;  /**< Number of detectors. */
-    UInt_t fNofChannels;   /**< Number of channels per detector. */
-    UInt_t fNofTypes = 2;    
-	UInt_t fNofModules;    /**< Total number of channels. */
-    Double_t fClockFreq;   /**< Clock cycle in [ns]. */
+    UInt_t fNofDetectors; /**< Number of detectors. */
+    UInt_t fNofChannels;  /**< Number of channels per detector. */
+    UInt_t fNofTypes = 2;
+    UInt_t fNofModules;  /**< Total number of channels. */
+    Double_t fClockFreq; /**< Clock cycle in [ns]. */
     UInt_t fNEvent;
 
   public:

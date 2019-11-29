@@ -39,7 +39,7 @@ class R3BModule : public FairModule
               const TGeoCombiTrans& combi = TGeoCombiTrans());
 
     /** Construct geometry from root files */
-    virtual void ConstructGeometry(); // override;
+    virtual void ConstructGeometry();     // override;
     virtual void ConstructRootGeometry(); // override;
 
     /** Method to setup the position of the detector-origin. */

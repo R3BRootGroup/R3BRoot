@@ -60,8 +60,7 @@ void R3BPspxPrecalPar::printparams()
     LOG(INFO) << "Detectorno.: No. of Strips, Orientation of strips";
     for (Int_t i = 0; i < size; i++)
     {
-        LOG(INFO) << i << " :" << pspxprecalparstrip.GetAt(i) << ", " << pspxprecalparorientation.GetAt(i)
-                 ;
+        LOG(INFO) << i << " :" << pspxprecalparstrip.GetAt(i) << ", " << pspxprecalparorientation.GetAt(i);
     }
 
     size = pspxprecalpargain.GetSize();

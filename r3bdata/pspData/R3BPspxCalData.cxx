@@ -11,7 +11,6 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-
 #include "R3BPspxCalData.h"
 
 R3BPspxCalData::R3BPspxCalData()

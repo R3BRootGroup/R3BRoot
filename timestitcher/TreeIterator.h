@@ -21,19 +21,17 @@
 namespace R3BCalifaTimestitcher
 {
 
-   class TreeIterator
-   {
-   protected:
-      std::vector<TreeWrapper*> &trees;
+    class TreeIterator
+    {
+      protected:
+        std::vector<TreeWrapper*>& trees;
 
-   public:
-      TreeIterator(std::vector<TreeWrapper*> &trees);
-      TreeWrapper *first();
-      TreeWrapper* next();
+      public:
+        TreeIterator(std::vector<TreeWrapper*>& trees);
+        TreeWrapper* first();
+        TreeWrapper* next();
+    };
 
-   };
-
-}
+} // namespace R3BCalifaTimestitcher
 
 #endif
-

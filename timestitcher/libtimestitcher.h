@@ -14,21 +14,20 @@
 #ifndef LIBTIMESTITCHER_H_
 #define LIBTIMESTITCHER_H_
 
-#include <string>
 #include <map>
+#include <string>
 
 #include <TTree.h>
 
 namespace R3BCalifaTimestitcher
 {
-   typedef std::map<std::string, void*> branchptrmap_t;
+    typedef std::map<std::string, void*> branchptrmap_t;
 
-   void prefixString(std::string& s0, const std::string& prefix);
-   int fillClonesArray();
-   void addTreeBranches(TTree* merged, TTree* input, std::string prefix, branchptrmap_t &branchmap);
-   TTree* findTree(std::string name);
-//   int cloneTreeBranches();
-}
+    void prefixString(std::string& s0, const std::string& prefix);
+    int fillClonesArray();
+    void addTreeBranches(TTree* merged, TTree* input, std::string prefix, branchptrmap_t& branchmap);
+    TTree* findTree(std::string name);
+    //   int cloneTreeBranches();
+} // namespace R3BCalifaTimestitcher
 
 #endif
-

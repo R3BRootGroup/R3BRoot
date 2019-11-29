@@ -35,14 +35,12 @@ class R3BTCalContFact : public FairContFact
      * Default constructor.
      */
     R3BTCalContFact();
-    
+
     /**
      * Destructor.
      */
-    ~R3BTCalContFact()
-    {
-    }
-    
+    ~R3BTCalContFact() {}
+
     /**
      * Method to create a parameter container.
      * Called by FairRuntimeDB singleton class.

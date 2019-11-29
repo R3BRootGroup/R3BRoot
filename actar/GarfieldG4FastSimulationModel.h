@@ -24,7 +24,7 @@
 //-------------------------------------------------
 
 /// \file  Garfield/geant4/include/GarfieldG4FastSimulationModel.h
-/// \brief Definition of the GarfieldG4FastSimulationModel class 
+/// \brief Definition of the GarfieldG4FastSimulationModel class
 ///
 /// Garfield garfieldpp example adapted to Virtual Monte Carlo.
 /// This class is imported from garfieldpp example.
@@ -48,28 +48,24 @@ class G4VPhysicalVolume;
 
 class GarfieldG4FastSimulationModel : public G4VFastSimulationModel
 {
-public:
-  //-------------------------
-  // Constructor, destructor
-  //-------------------------
-	GarfieldG4FastSimulationModel (G4String, G4Region*);
-	GarfieldG4FastSimulationModel (G4String);
-  ~GarfieldG4FastSimulationModel ();
+  public:
+    //-------------------------
+    // Constructor, destructor
+    //-------------------------
+    GarfieldG4FastSimulationModel(G4String, G4Region*);
+    GarfieldG4FastSimulationModel(G4String);
+    ~GarfieldG4FastSimulationModel();
 
-  void SetPhysics(GarfieldPhysics* fGarfieldPhysics);
-  // I.H. make this optional
-  // void WriteGeometryToGDML(G4VPhysicalVolume* physicalVolume);
+    void SetPhysics(GarfieldPhysics* fGarfieldPhysics);
+    // I.H. make this optional
+    // void WriteGeometryToGDML(G4VPhysicalVolume* physicalVolume);
 
-  virtual G4bool IsApplicable(const G4ParticleDefinition&);
-  virtual G4bool ModelTrigger(const G4FastTrack &);
-  virtual void DoIt(const G4FastTrack&, G4FastStep&);
+    virtual G4bool IsApplicable(const G4ParticleDefinition&);
+    virtual G4bool ModelTrigger(const G4FastTrack&);
+    virtual void DoIt(const G4FastTrack&, G4FastStep&);
 
-
-
-private:
-
-   GarfieldPhysics* fGarfieldPhysics;
+  private:
+    GarfieldPhysics* fGarfieldPhysics;
 };
-
 
 #endif /* GARFIELDMODEL_H_ */

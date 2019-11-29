@@ -55,67 +55,25 @@ class R3BActarPoint : public FairMCPoint
                   Double_t eLoss);
 
     /** Copy constructor **/
-    R3BActarPoint(const R3BActarPoint& point)
-    {
-        *this = point;
-    };
+    R3BActarPoint(const R3BActarPoint& point) { *this = point; };
 
     /** Destructor **/
     virtual ~R3BActarPoint();
 
     /** Accessors **/
-    Int_t GetModule() const
-    {
-        return fModule;
-    }
-    Double_t GetXIn() const
-    {
-        return fX;
-    }
-    Double_t GetYIn() const
-    {
-        return fY;
-    }
-    Double_t GetZIn() const
-    {
-        return fZ;
-    }
-    Double_t GetXOut() const
-    {
-        return fX_out;
-    }
-    Double_t GetYOut() const
-    {
-        return fY_out;
-    }
-    Double_t GetZOut() const
-    {
-        return fZ_out;
-    }
-    Double_t GetPxOut() const
-    {
-        return fPx_out;
-    }
-    Double_t GetPyOut() const
-    {
-        return fPy_out;
-    }
-    Double_t GetPzOut() const
-    {
-        return fPz_out;
-    }
-    void PositionIn(TVector3& pos)
-    {
-        pos.SetXYZ(fX, fY, fZ);
-    }
-    void PositionOut(TVector3& pos)
-    {
-        pos.SetXYZ(fX_out, fY_out, fZ_out);
-    }
-    void MomentumOut(TVector3& mom)
-    {
-        mom.SetXYZ(fPx_out, fPy_out, fPz_out);
-    }
+    Int_t GetModule() const { return fModule; }
+    Double_t GetXIn() const { return fX; }
+    Double_t GetYIn() const { return fY; }
+    Double_t GetZIn() const { return fZ; }
+    Double_t GetXOut() const { return fX_out; }
+    Double_t GetYOut() const { return fY_out; }
+    Double_t GetZOut() const { return fZ_out; }
+    Double_t GetPxOut() const { return fPx_out; }
+    Double_t GetPyOut() const { return fPy_out; }
+    Double_t GetPzOut() const { return fPz_out; }
+    void PositionIn(TVector3& pos) { pos.SetXYZ(fX, fY, fZ); }
+    void PositionOut(TVector3& pos) { pos.SetXYZ(fX_out, fY_out, fZ_out); }
+    void MomentumOut(TVector3& mom) { mom.SetXYZ(fPx_out, fPy_out, fPz_out); }
 
     /** Point coordinates at given z from linear extrapolation **/
     Double_t GetX(Double_t z) const;

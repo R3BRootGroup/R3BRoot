@@ -18,15 +18,17 @@
 
 class FairContainer;
 
-class R3BLandContFact : public FairContFact {
-private:
-  void setAllContainers();
-public:
-  R3BLandContFact();
-  ~R3BLandContFact() {}
-  FairParSet* createContainer(FairContainer*);
-  void  activateParIo(FairParIo* io);
-  ClassDef( R3BLandContFact,0) // Factory for all LAND parameter containers
+class R3BLandContFact : public FairContFact
+{
+  private:
+    void setAllContainers();
+
+  public:
+    R3BLandContFact();
+    ~R3BLandContFact() {}
+    FairParSet* createContainer(FairContainer*);
+    void activateParIo(FairParIo* io);
+    ClassDef(R3BLandContFact, 0) // Factory for all LAND parameter containers
 };
 
-#endif  /* !R3BLANDCONTFACT_H */
+#endif /* !R3BLANDCONTFACT_H */

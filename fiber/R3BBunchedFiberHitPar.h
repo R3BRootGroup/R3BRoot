@@ -48,9 +48,9 @@ class R3BBunchedFiberHitPar : public FairParGenericSet
      * @param own class ownership, if flag is kTRUE FairDB has the par.
      */
     R3BBunchedFiberHitPar(const char* name = "BunchedFiberHitPar",
-               const char* title = "fiber HIT calibration",
-               const char* context = "TestDefaultContext",
-               Bool_t own = kTRUE);
+                          const char* title = "fiber HIT calibration",
+                          const char* context = "TestDefaultContext",
+                          Bool_t own = kTRUE);
     /**
      * Destructor. Cleares the memory used by the object.
      */
@@ -110,19 +110,13 @@ class R3BBunchedFiberHitPar : public FairParGenericSet
      * Method to retrieve the arrray with module containers.
      * @return an array with parameter containers of type R3BTCalModulePar.
      */
-    TObjArray* GetListOfModulePar()
-    {
-        return fHitParams;
-    }
+    TObjArray* GetListOfModulePar() { return fHitParams; }
 
     /**
      * Method to get number of modules storred in array.
      * @return size of array.
      */
-    Int_t GetNumModulePar()
-    {
-        return fHitParams->GetEntries();
-    }
+    Int_t GetNumModulePar() { return fHitParams->GetEntries(); }
 
     /**
      * Method to get single parameter container for a specific module.

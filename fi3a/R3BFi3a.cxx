@@ -111,8 +111,7 @@ void R3BFi3a::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Si Only
             Double_t cutE = fCutE; // GeV-> 1 keV
 
-            LOG(INFO) << "-I- R3BFi3a: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV"
-                     ;
+            LOG(INFO) << "-I- R3BFi3a: silicon Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE << " GeV";
 
             // Si
             gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
@@ -158,7 +157,7 @@ Bool_t R3BFi3a::ProcessHits(FairVolume* vol)
     if (gMC->IsTrackExiting() || gMC->IsTrackStop() || gMC->IsTrackDisappeared())
     {
         fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
-        fVolumeID = vol-> getMotherCopyNo();	
+        fVolumeID = vol->getMotherCopyNo();
         gMC->TrackPosition(fPosOut);
         gMC->TrackMomentum(fMomOut);
         if (fELoss == 0.)
@@ -203,7 +202,7 @@ Bool_t R3BFi3a::ProcessHits(FairVolume* vol)
         }
 
         AddHit(fTrackID,
-               /*fVolumeID*//*copyNo*/planeNr,
+               /*fVolumeID*/ /*copyNo*/ planeNr,
                planeNr,
                TVector3(fPosIn.X(), fPosIn.Y(), fPosIn.Z()),
                TVector3(fPosOut.X(), fPosOut.Y(), fPosOut.Z()),
@@ -287,30 +286,29 @@ void R3BFi3a::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 
 // -----   Private method AddHit   --------------------------------------------
 R3BFibPoint* R3BFi3a::AddHit(Int_t trackID,
-                            Int_t detID,
-                            Int_t plane,
-                            TVector3 posIn,
-                            TVector3 posOut,
-                            TVector3 momIn,
-                            TVector3 momOut,
-                            Double_t time,
-                            Double_t length,
-                            Double_t eLoss)
+                             Int_t detID,
+                             Int_t plane,
+                             TVector3 posIn,
+                             TVector3 posOut,
+                             TVector3 momIn,
+                             TVector3 momOut,
+                             Double_t time,
+                             Double_t length,
+                             Double_t eLoss)
 {
     TClonesArray& clref = *fFi3aCollection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
     {
         LOG(INFO) << "R3BFi3a: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
-                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV"
-                 ;
+                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
     }
     return new (clref[size]) R3BFibPoint(trackID, detID, plane, posIn, posOut, momIn, momOut, time, length, eLoss);
 }
 
 Bool_t R3BFi3a::CheckIfSensitive(std::string name)
 {
-    if (TString(name).Contains("FI3A1Log") )
+    if (TString(name).Contains("FI3A1Log"))
     {
         return kTRUE;
     }

@@ -44,8 +44,8 @@
 #include "TVirtualMC.h"
 #include <iostream>
 
-using std::cout;
 using std::cerr;
+using std::cout;
 using std::endl;
 
 R3BLand::R3BLand()
@@ -429,8 +429,7 @@ R3BLandPoint* R3BLand::AddHit(Int_t trackID,
     if (fVerboseLevel > 1)
     {
         LOG(INFO) << "R3BLand: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
-                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss << " GeV"
-                 ;
+                  << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss << " GeV";
     }
     return new (clref[size])
         R3BLandPoint(trackID, detID, box, id1, id2, posIn, posOut, momIn, momOut, time, length, eLoss, lightYield);
@@ -620,8 +619,7 @@ void R3BLand::StepHistory()
 
             if (proc.At(i) != 22 && proc.At(i) != 23 && proc.At(i) != 31 && proc.At(i) != 43 && proc.At(i) != 13)
             {
-                LOG(INFO) << "new primary neutron interaction: " << proc.At(i) << "  " << TMCProcessName[proc.At(i)]
-                         ;
+                LOG(INFO) << "new primary neutron interaction: " << proc.At(i) << "  " << TMCProcessName[proc.At(i)];
             }
 
             // make histogram with first interaction

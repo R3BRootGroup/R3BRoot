@@ -11,19 +11,25 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-
 #ifndef R3B_TRACKING_DETECTOR
 #define R3B_TRACKING_DETECTOR
 
 #include <vector>
 
-#include "TObject.h"
-#include "TVector3.h"
 #include "FairTask.h"
-#include "TString.h"
 #include "R3BTrackingParticle.h"
+#include "TObject.h"
+#include "TString.h"
+#include "TVector3.h"
 
-enum EDetectorType { kBeforeTarget, kTarget, kTargetGlad, kAfterGlad, kTof };
+enum EDetectorType
+{
+    kBeforeTarget,
+    kTarget,
+    kTargetGlad,
+    kAfterGlad,
+    kTof
+};
 
 class R3BHit;
 class TClonesArray;
@@ -34,7 +40,10 @@ class R3BTGeoPar;
 class R3BTrackingDetector : public TObject
 {
   public:
-    R3BTrackingDetector(const char* detectorName, EDetectorType type, const char* geoParName, const char* hitArray = NULL);
+    R3BTrackingDetector(const char* detectorName,
+                        EDetectorType type,
+                        const char* geoParName,
+                        const char* hitArray = NULL);
     virtual ~R3BTrackingDetector();
 
     void SetParContainers();
@@ -84,15 +93,15 @@ class R3BTrackingDetector : public TObject
     std::vector<R3BHit*> hits; // not used directly by the fitter
     TClonesArray* fArrayHits;
 
-    //Double_t hit_x; // local coordinates (on the detector plane)
-    //Double_t hit_y;
-    //TVector3 hit_xyz; // same in global coordinates
-    //Double_t hit_time;
+    // Double_t hit_x; // local coordinates (on the detector plane)
+    // Double_t hit_y;
+    // TVector3 hit_xyz; // same in global coordinates
+    // Double_t hit_time;
     // we could store a time here as well. Maybe later.
 
-    //Double_t track_x; // local coordinates (on the detector plane)
-    //Double_t track_y;
-    //TVector3 track_xyz; // same in global coordinates
+    // Double_t track_x; // local coordinates (on the detector plane)
+    // Double_t track_y;
+    // TVector3 track_xyz; // same in global coordinates
 
   public:
     ClassDef(R3BTrackingDetector, 0)

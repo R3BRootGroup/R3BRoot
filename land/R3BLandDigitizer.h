@@ -14,10 +14,9 @@
 #ifndef R3BLANDDIGITIZER_H
 #define R3BLANDDIGITIZER_H 1
 
-
 #include "FairTask.h"
-#include "R3BLandDigiPar.h"
 #include "R3BLandDigi.h"
+#include "R3BLandDigiPar.h"
 
 class TClonesArray;
 class TObjectArray;
@@ -26,103 +25,110 @@ class TH2F;
 class TF1;
 class TRandom3;
 
-
 struct PM_RES
 {
-  Double_t Ltime,Rtime,LlightCFD,RlightCFD,LlightQDC,RlightQDC,Lenergy,Renergy;
+    Double_t Ltime, Rtime, LlightCFD, RlightCFD, LlightQDC, RlightQDC, Lenergy, Renergy;
 };
 
+class R3BLandDigitizer : public FairTask
+{
 
-class R3BLandDigitizer : public FairTask {
+  public:
+    /** Default constructor **/
+    R3BLandDigitizer();
 
-public:
-  /** Default constructor **/
-  R3BLandDigitizer();
+    /** Constructor **/
+    R3BLandDigitizer(Int_t verbose);
 
-  /** Constructor **/
-  R3BLandDigitizer(Int_t verbose);
+    /** Destructor **/
+    ~R3BLandDigitizer();
 
-  /** Destructor **/
-  ~R3BLandDigitizer();
+    /** Virtual method Init **/
+    virtual InitStatus Init();
 
-  /** Virtual method Init **/
-  virtual InitStatus Init();
+    /** Virtual method Exec **/
+    virtual void Exec(Option_t* opt);
 
-  /** Virtual method Exec **/
-  virtual void Exec(Option_t* opt);
+    virtual void Finish();
 
-  virtual void Finish();
+    virtual void Reset();
 
-  virtual void Reset();
+    // Allow change of the PMT Saturation at runtime. R3BLandDigitizer is initialized with the default value
+    inline void SetSaturationCoefficient(const Double_t& saturationCoefficient)
+    {
+        fSaturationCoefficient = saturationCoefficient;
+    }
+    inline Double_t GetSaturationCoefficient() const { return fSaturationCoefficient; }
 
-  // Allow change of the PMT Saturation at runtime. R3BLandDigitizer is initialized with the default value
-  inline void SetSaturationCoefficient(const Double_t& saturationCoefficient) {  fSaturationCoefficient = saturationCoefficient;  }
-  inline Double_t GetSaturationCoefficient() const  {  return fSaturationCoefficient;  }
+    // Allow change of length of time gate for QDC ("Integration time") at runtime
+    inline void SetTOFRange(const Double_t& TOFRange) { fTOFRange = TOFRange; }
+    inline Double_t GetTOFRange() const { return fTOFRange; }
 
-  // Allow change of length of time gate for QDC ("Integration time") at runtime
-  inline void SetTOFRange(const Double_t& TOFRange) {  fTOFRange = TOFRange;  }
-  inline Double_t GetTOFRange() const  {  return fTOFRange;  }
+    Double_t BuildTOFRangeFromBeamEnergy(const Double_t& e);
+    // Compatibility to not break existing code
+    inline void UseBeam(const Double_t& beamEnergy) { fBeamEnergy = beamEnergy; }
 
-  Double_t BuildTOFRangeFromBeamEnergy(const Double_t &e);
-  // Compatibility to not break existing code
-  inline void UseBeam(const Double_t& beamEnergy) { fBeamEnergy = beamEnergy; }
+    inline void UseThresholds(const char* fileName, const Int_t nChannels)
+    {
+        fThreshFileName = TString(fileName);
+        fNChannels = nChannels;
+    }
 
+    R3BLandDigi* AddHit(Int_t paddleNr,
+                        Double_t tdcL,
+                        Double_t tdcR,
+                        Double_t tdc,
+                        Double_t qdcL,
+                        Double_t qdcR,
+                        Double_t qdc,
+                        Double_t xx,
+                        Double_t yy,
+                        Double_t zz);
 
-  inline void UseThresholds(const char *fileName, const Int_t nChannels)
-  { fThreshFileName = TString(fileName);  fNChannels = nChannels; }
+  protected:
+    TF1* f1;
+    TRandom3* fRnd;
 
-  R3BLandDigi* AddHit(Int_t paddleNr, Double_t tdcL, Double_t tdcR, Double_t tdc,
-                      Double_t qdcL, Double_t qdcR, Double_t qdc,
-                      Double_t xx,Double_t yy, Double_t zz );
+    TString fThreshFileName;
+    Int_t fNChannels;
 
+    TClonesArray* fLandPoints;
+    TClonesArray* fLandMCTrack;
+    TClonesArray* fLandDigi;
 
-protected:
+    // Parameter class
+    R3BLandDigiPar* fLandDigiPar;
 
-  TF1 *f1;
-  TRandom3 *fRnd;
+    // Control Hitograms
+    TH1F* hPMl;
+    TH1F* hPMr;
+    TH1F* hMult1;
+    TH1F* hMult2;
+    TH1F* hRLTimeToTrig;
 
-  TString fThreshFileName;
-  Int_t fNChannels;
+    Double_t threshL[5000];
+    Double_t threshR[5000];
 
-  TClonesArray *fLandPoints;
-  TClonesArray *fLandMCTrack;
-  TClonesArray *fLandDigi;
+    Int_t eventNo;
+    Int_t npaddles;
+    Int_t nplanes;
+    Int_t paddle_per_plane;
+    Double_t plength; // half length of paddle
+    Double_t att;     // light attenuation factor [1/cm]
+    Double_t c;
+    Double_t cMedia; // speed of light in material in cm/ns
+    Double_t fBeamEnergy;
+    PM_RES** PM_res;
 
-  // Parameter class
-  R3BLandDigiPar *fLandDigiPar;
+    static const Double_t DEFAULT_SATURATION_COEFFICIENT;
+    Double_t fSaturationCoefficient;
 
-  // Control Hitograms
-  TH1F *hPMl;
-  TH1F *hPMr;
-  TH1F *hMult1;
-  TH1F *hMult2;
-  TH1F *hRLTimeToTrig;
+    Double_t fTOFRange;
 
-  Double_t threshL[5000];
-  Double_t threshR[5000];
+  private:
+    virtual void SetParContainers();
 
-  Int_t eventNo;
-  Int_t npaddles;
-  Int_t nplanes;
-  Int_t paddle_per_plane;
-  Double_t plength; // half length of paddle
-  Double_t att; // light attenuation factor [1/cm]
-  Double_t c;
-  Double_t cMedia; // speed of light in material in cm/ns
-  Double_t fBeamEnergy;
-  PM_RES **PM_res;
-
-  static const Double_t DEFAULT_SATURATION_COEFFICIENT;
-  Double_t fSaturationCoefficient;
-  
-  Double_t fTOFRange;
-
-private:
-
-  virtual void SetParContainers();
-
-
-  ClassDef(R3BLandDigitizer,1)
+    ClassDef(R3BLandDigitizer, 1)
 };
 
 #endif

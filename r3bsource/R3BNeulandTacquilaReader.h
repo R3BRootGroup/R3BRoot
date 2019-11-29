@@ -11,7 +11,6 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-
 #ifndef R3BNEULANDTACQUILAREADER_H
 #define R3BNEULANDTACQUILAREADER_H
 

@@ -14,32 +14,30 @@
 #ifndef R3BGFIDIGIPAR_H
 #define R3BGFIDIGIPAR_H 1
 
-#include <TVector3.h>
 #include <TObjString.h>
+#include <TVector3.h>
 
 #include "FairParGenericSet.h"
 #include "FairParamList.h"
 
 class R3BGfiDigiPar : public FairParGenericSet
 {
-    public :
-	R3BGfiDigiPar (const char* name="R3BGfiDigiParTest",
-			const char* title="Tutorial  parameter",
-			const char* context="TestDefaultContext");
-	~R3BGfiDigiPar(void){};
-	void clear(void){};
-	void putParams(FairParamList* list);
-	Bool_t getParams(FairParamList* list);
+  public:
+    R3BGfiDigiPar(const char* name = "R3BGfiDigiParTest",
+                  const char* title = "Tutorial  parameter",
+                  const char* context = "TestDefaultContext");
+    ~R3BGfiDigiPar(void){};
+    void clear(void){};
+    void putParams(FairParamList* list);
+    Bool_t getParams(FairParamList* list);
 
-	virtual void Print(Option_t *option="") const;
-	/** Accessor functions **/
+    virtual void Print(Option_t* option = "") const;
+    /** Accessor functions **/
 
   private:
-  // Digi. Parameters
+    // Digi. Parameters
 
-
-   ClassDef(R3BGfiDigiPar,1); //
+    ClassDef(R3BGfiDigiPar, 1); //
 };
 
 #endif /* !R3BGFIDIGIPAR_H*/
-

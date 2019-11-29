@@ -45,8 +45,8 @@
 #include <iostream>
 #include <stdlib.h>
 
-using std::cout;
 using std::cerr;
+using std::cout;
 using std::endl;
 
 ELILuMon::ELILuMon()

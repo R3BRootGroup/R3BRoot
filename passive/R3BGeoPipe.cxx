@@ -22,31 +22,31 @@
 /////////////////////////////////////////////////////////////
 
 #include "R3BGeoPipe.h"
-#include "FairGeoLoader.h"
 #include "FairGeoInterface.h"
-    
+#include "FairGeoLoader.h"
+
 ClassImp(R3BGeoPipe)
 
-R3BGeoPipe::R3BGeoPipe() {
-  // Constructor
-  fName="pipe";
-  strcpy(modName,"p");
-  strcpy(eleName,"p");
-  maxSectors=0;
-  maxModules=1;
+    R3BGeoPipe::R3BGeoPipe()
+{
+    // Constructor
+    fName = "pipe";
+    strcpy(modName, "p");
+    strcpy(eleName, "p");
+    maxSectors = 0;
+    maxModules = 1;
 }
-Bool_t  R3BGeoPipe::create ( FairGeoBuilder * build ) {
-    Bool_t rc = FairGeoSet::create( build );
-    if ( rc ) {
-	FairGeoLoader *loader=FairGeoLoader::Instance();
-	FairGeoInterface *GeoInterface =loader->getGeoInterface();
-	
-	GeoInterface->getMasterNodes()->Add( (TObject*)  getVolume("pipeCentral") );
+Bool_t R3BGeoPipe::create(FairGeoBuilder* build)
+{
+    Bool_t rc = FairGeoSet::create(build);
+    if (rc)
+    {
+        FairGeoLoader* loader = FairGeoLoader::Instance();
+        FairGeoInterface* GeoInterface = loader->getGeoInterface();
+
+        GeoInterface->getMasterNodes()->Add((TObject*)getVolume("pipeCentral"));
     }
- return rc;
+    return rc;
 }
 
-R3BGeoPipe::~R3BGeoPipe() {
-
-}
-
+R3BGeoPipe::~R3BGeoPipe() {}

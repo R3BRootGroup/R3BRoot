@@ -90,10 +90,7 @@ class R3BLosMapped2CalPar : public FairTask
      * Method for setting the update rate for control histograms
      * @param rate an update rate value (events).
      */
-    inline void SetUpdateRate(Int_t rate)
-    {
-        fUpdateRate = rate;
-    }
+    inline void SetUpdateRate(Int_t rate) { fUpdateRate = rate; }
 
     /**
      * Method for setting minimum required statistics per module.
@@ -102,19 +99,13 @@ class R3BLosMapped2CalPar : public FairTask
      * calibrated.
      * @param minStats a value of minimum statistics required.
      */
-    inline void SetMinStats(Int_t minStats)
-    {
-        fMinStats = minStats;
-    }
+    inline void SetMinStats(Int_t minStats) { fMinStats = minStats; }
 
     /**
      * Method for selecting events with certain trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
-    inline void SetTrigger(Int_t trigger)
-    {
-        fTrigger = trigger;
-    }
+    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
 
     /**
      * Method for setting number of LOS detectors and channels.
@@ -123,10 +114,10 @@ class R3BLosMapped2CalPar : public FairTask
      */
     inline void SetNofModules(Int_t nDets, Int_t nCh)
     {
-        fNofDetectors = nDets;		
-        fNofChannels  = nCh;  // = 4 or 8 or 16
-        fNofTypes     = 3;
-        fNofModules   = nDets * nCh * 3 ; // 4 or 8 los signals *3 times per channel 12 or 24 in total
+        fNofDetectors = nDets;
+        fNofChannels = nCh; // = 4 or 8 or 16
+        fNofTypes = 3;
+        fNofModules = nDets * nCh * 3; // 4 or 8 los signals *3 times per channel 12 or 24 in total
     }
 
   private:
@@ -137,11 +128,11 @@ class R3BLosMapped2CalPar : public FairTask
     Int_t Icounts2 = 0;
     Int_t Icounts3 = 0;
     Int_t Icount[16][3]{};
-    
-    UInt_t fNofDetectors;   /**< Number of LOS detectors. */
-    UInt_t fNofChannels;    /**< Number of channels per detector. */
-    UInt_t fNofTypes = 3;       /**< Number of time-types per channel (VFTX, TAMEX leading/trailing). */
-    UInt_t fNofModules;     /**< Total number of modules (=edges) to calibrate */
+
+    UInt_t fNofDetectors; /**< Number of LOS detectors. */
+    UInt_t fNofChannels;  /**< Number of channels per detector. */
+    UInt_t fNofTypes = 3; /**< Number of time-types per channel (VFTX, TAMEX leading/trailing). */
+    UInt_t fNofModules;   /**< Total number of modules (=edges) to calibrate */
 
     Int_t fNEvents;         /**< Event counter. */
     R3BTCalPar* fCal_Par;   /**< Parameter container. */
@@ -155,4 +146,3 @@ class R3BLosMapped2CalPar : public FairTask
 };
 
 #endif
-

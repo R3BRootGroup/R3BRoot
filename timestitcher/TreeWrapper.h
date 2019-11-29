@@ -23,30 +23,29 @@ using namespace std;
 namespace R3BCalifaTimestitcher
 {
 
-   class TreeWrapper
-   {
-   protected:
-      TTree *tree;
-      uint64_t idx;
-      uint64_t nEntries;
-      uint64_t *ptrTS;
+    class TreeWrapper
+    {
+      protected:
+        TTree* tree;
+        uint64_t idx;
+        uint64_t nEntries;
+        uint64_t* ptrTS;
 
-      uint32_t id;
+        uint32_t id;
 
-      TreeWrapper(TTree *tree, uint32_t id);
+        TreeWrapper(TTree* tree, uint32_t id);
 
-      virtual bool isGood() = 0;
+        virtual bool isGood() = 0;
 
-   public:
-      virtual uint64_t getTS();
-      virtual bool next();
+      public:
+        virtual uint64_t getTS();
+        virtual bool next();
 
-      virtual uint32_t getId();
+        virtual uint32_t getId();
 
-      virtual ~TreeWrapper() {};
-   };
+        virtual ~TreeWrapper(){};
+    };
 
-}
+} // namespace R3BCalifaTimestitcher
 
 #endif
-
