@@ -1,3 +1,16 @@
+##############################################################################
+#   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
+#   Copyright (C) 2019 Members of R3B Collaboration                          #
+#                                                                            #
+#             This software is distributed under the terms of the            #
+#                 GNU General Public Licence (GPL) version 3,                #
+#                    copied verbatim in the file "LICENSE".                  #
+#                                                                            #
+# In applying this license GSI does not waive the privileges and immunities  #
+# granted to it by virtue of its status as an Intergovernmental Organization #
+# or submit itself to any jurisdiction.                                      #
+##############################################################################
+
 # The name of our project is “R3BBROOT”.  CMakeLists files in this project can refer to the root
 # source directory of the project as ${R3BROOT_SOURCE_DIR} or as ${CMAKE_SOURCE_DIR} and to the root
 # binary directory of the project as ${R3BROOT_BINARY_DIR} or ${CMAKE_BINARY_DIR}. This difference
