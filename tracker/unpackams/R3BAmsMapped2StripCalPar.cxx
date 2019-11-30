@@ -47,7 +47,7 @@ R3BAmsMapped2StripCalPar::R3BAmsMapped2StripCalPar()
     : FairTask("R3B AMS Pedestal Finder ", 1)
     , fStrip_Par(NULL)
     , fAmsMappedDataCA(NULL)
-    , fNumDets(4)
+    , fNumDets(6)
     , fNumStrips(1024)
     , fNumStripsS(640)
     , fNumStripsK(384)
@@ -68,7 +68,7 @@ R3BAmsMapped2StripCalPar::R3BAmsMapped2StripCalPar(const TString& name, Int_t iV
     : FairTask(name, iVerbose)
     , fStrip_Par(NULL)
     , fAmsMappedDataCA(NULL)
-    , fNumDets(4)
+    , fNumDets(6)
     , fNumStrips(1024)
     , fNumStripsS(640)
     , fNumStripsK(384)
@@ -192,29 +192,21 @@ void R3BAmsMapped2StripCalPar::PrintParamsDaq()
     FILE* fOut2 = fopen("sidsig_r.txt", "wt");
     FILE* fOut3 = fopen("sidsig.txt", "wt");
 
-    // Values taken from /u/land/.old/siderem
-    // This was implemented for the experiment s444
+    // Values taken from /upexps/201911_eng2/201911.spec
+    // This was implemented for the experiments s455 and 467
     // For other experiments one should revise the numbers
     Double_t cn_limit = 15.;
     Float_t threshold1 = 4.0;
     Float_t threshold2 = 2.;
 
+    // sam+gtb+siderem+20000
+    Int_t detID[fNumDets] = { 40120000, 40220000, 41120000, 50120000, 50220000, 51120000 };
+
     for (Int_t d = 0; d < fNumDets; d++)
     {
-        if (d < 2)
-        {
-            fprintf(fOut1, "50%i20000\n", d + 1); // sam+gtb+siderem+20000
-            fprintf(fOut2, "50%i20000\n", d + 1);
-            fprintf(fOut3, "50%i20000\n", d + 1);
-            // std::cout << "50"<< d+1<<"20000\n"<< std::endl;
-        }
-        else
-        {
-            fprintf(fOut1, "51%i20000\n", d - 1); // sam+gtb+siderem+20000
-            fprintf(fOut2, "51%i20000\n", d - 1);
-            fprintf(fOut3, "51%i20000\n", d - 1);
-            // std::cout << "51"<< d-1<<"20000\n"<< std::endl;
-        }
+        fprintf(fOut1, "%i\n", detID[d]);
+        fprintf(fOut2, "%i\n", detID[d]);
+        fprintf(fOut3, "%i\n", detID[d]);
         for (Int_t i = 1; i <= fNumStrips; i++)
         {
             fprintf(fOut1, "%4x ", int(8. * parameters[d * fNumStrips + i - 1][0]));

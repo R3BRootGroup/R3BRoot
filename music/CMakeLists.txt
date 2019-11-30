@@ -39,6 +39,7 @@ R3BMusicCalPar.cxx
 R3BMusicHitPar.cxx
 R3BMusicContFact.cxx
 R3BMusicMapped2Cal.cxx
+R3BMusicCal2Hit.cxx
 R3BMusicOnlineSpectra.cxx
 )
 

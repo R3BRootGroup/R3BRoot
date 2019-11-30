@@ -109,12 +109,12 @@ class R3BAmsOnlineSpectra : public FairTask
     TCanvas* cCal;
     TCanvas* cHit[4];
 
-    TH2F* fh_Ams_energy_allStrips[4];
-    TH2F* fh_Ams_energy_allCalStrips[8];
-    TH2F* fh_Ams_hit_Pos[4];
-    TH2F* fh_Ams_hit_E[4];
-    TH2F* fh_Ams_hit_E_theta[4];
-    TH1F* fh_Ams_hit_Mul[4];
+    TH2F* fh_Ams_energy_allStrips[6];
+    TH2F* fh_Ams_energy_allCalStrips[12];
+    TH2F* fh_Ams_hit_Pos[6];
+    TH2F* fh_Ams_hit_E[6];
+    TH2F* fh_Ams_hit_E_theta[6];
+    TH1F* fh_Ams_hit_Mul[6];
 
     // TString fAmsFile;        	      /**< Config file name. */
     Int_t fNbDet; /**< Number of AMS detectors. */
