@@ -1,3 +1,16 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
 // -------------------------------------------------------------
 // -----                                                   -----
 // -----             R3BMusicCal2Hit                       -----
@@ -55,8 +68,8 @@ class R3BMusicCal2Hit : public FairTask
     Int_t fNumAnodes;
     Int_t fNumParams;
     TArrayF* CalParams;
-
-    Bool_t fOnline; // Don't store data for online
+    Int_t StatusAnodes[8]; // Status anodes
+    Bool_t fOnline;        // Don't store data for online
 
     R3BMusicHitPar* fCal_Par;      /**< Parameter container. >*/
     TClonesArray* fMusicCalDataCA; /**< Array with Music Cal-input data. >*/

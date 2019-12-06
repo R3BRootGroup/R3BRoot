@@ -218,8 +218,8 @@ void R3BMusicMapped2Cal::Exec(Option_t* option)
         }
     }
 
-    // The first part: anodes from 0 to 3
-    for (Int_t i = 0; i < fNumAnodes / 2; i++)
+    // The first part: anodes from 0 to 7
+    for (Int_t i = 0; i < fNumAnodes; i++)
     {
         for (Int_t j = 0; j < mulanode[fNumAnodes]; j++)
             for (Int_t k = 0; k < mulanode[i]; k++)
@@ -228,17 +228,6 @@ void R3BMusicMapped2Cal::Exec(Option_t* option)
                     AddCalData(i, dtime[k][i] - dtime[j][fNumAnodes], energy[k][i]);
             }
     }
-    // The second part: anodes from 4 to 7
-    for (Int_t i = fNumAnodes / 2; i < fNumAnodes; i++)
-    {
-        for (Int_t j = 0; j < mulanode[fNumAnodes + 1]; j++)
-            for (Int_t k = 0; k < mulanode[i]; k++)
-            {
-                if (energy[k][i] > 0.)
-                    AddCalData(i, dtime[k][i] - dtime[j][fNumAnodes + 1], energy[k][i]);
-            }
-    }
-
     if (mappedData)
         delete mappedData;
     return;

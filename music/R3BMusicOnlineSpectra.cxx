@@ -23,6 +23,7 @@
 
 #include "R3BMusicOnlineSpectra.h"
 #include "R3BEventHeader.h"
+#include "R3BMusicHitData.h"
 #include "R3BMusicMappedData.h"
 #include "THttpServer.h"
 
@@ -54,6 +55,7 @@ using namespace std;
 R3BMusicOnlineSpectra::R3BMusicOnlineSpectra()
     : FairTask("R3BMusicOnlineSpectra", 1)
     , fMappedItemsMus(NULL)
+    , fHitItemsMus(NULL)
     , fNEvents(0)
 {
 }
@@ -61,6 +63,7 @@ R3BMusicOnlineSpectra::R3BMusicOnlineSpectra()
 R3BMusicOnlineSpectra::R3BMusicOnlineSpectra(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fMappedItemsMus(NULL)
+    , fHitItemsMus(NULL)
     , fNEvents(0)
 {
 }
@@ -70,6 +73,8 @@ R3BMusicOnlineSpectra::~R3BMusicOnlineSpectra()
     LOG(INFO) << "R3BMusicOnlineSpectra::Delete instance";
     if (fMappedItemsMus)
         delete fMappedItemsMus;
+    if (fHitItemsMus)
+        delete fHitItemsMus;
 }
 
 InitStatus R3BMusicOnlineSpectra::Init()
@@ -94,6 +99,11 @@ InitStatus R3BMusicOnlineSpectra::Init()
     {
         return kFATAL;
     }
+
+    // get access to hit data of the MUSIC
+    fHitItemsMus = (TClonesArray*)mgr->GetObject("MusicHitData");
+    if (!fHitItemsMus)
+        LOG(WARNING) << "R3BMusicOnlineSpectra: MusicHitData not found";
 
     // Create histograms for detectors
     char Name1[255];
@@ -143,6 +153,20 @@ InitStatus R3BMusicOnlineSpectra::Init()
         fh2_Mus_EneRawVsDriftTime[j]->Draw("col");
     }
 
+    cMus_EsumvsDT = new TCanvas("Mus_EsumvsDT6", "Music: Esum vs DT-anode 6", 10, 10, 800, 700);
+    fh2_Mus_ESum_vs_DT =
+        new TH2F("fh2_Mus_EsumVsDT6", "Esum versus Drift Time anode 6", 3000, 5000, 25000, 4100, 0, 8192);
+    fh2_Mus_ESum_vs_DT->GetXaxis()->SetTitle("Drift time [channels]");
+    fh2_Mus_ESum_vs_DT->GetYaxis()->SetTitle("Energy [channels]");
+    fh2_Mus_ESum_vs_DT->GetYaxis()->SetTitleOffset(1.1);
+    fh2_Mus_ESum_vs_DT->GetXaxis()->CenterTitle(true);
+    fh2_Mus_ESum_vs_DT->GetYaxis()->CenterTitle(true);
+    fh2_Mus_ESum_vs_DT->GetXaxis()->SetLabelSize(0.045);
+    fh2_Mus_ESum_vs_DT->GetXaxis()->SetTitleSize(0.045);
+    fh2_Mus_ESum_vs_DT->GetYaxis()->SetLabelSize(0.045);
+    fh2_Mus_ESum_vs_DT->GetYaxis()->SetTitleSize(0.045);
+    fh2_Mus_ESum_vs_DT->Draw("col");
+
     // Drift-times
     cMusMap_DT = new TCanvas("Mus_DTmap", "", 10, 10, 800, 700);
     cMusMap_DT->Divide(2, 4);
@@ -165,10 +189,36 @@ InitStatus R3BMusicOnlineSpectra::Init()
         fh1_Musmap_DT[j]->Draw("");
     }
 
+    // Comparison of drift-times
+    char NamAnode1[255];
+    char NamAnode2[255];
+    cMusMap_DTvsDT = new TCanvas("Mus_DTvsDT", "Mus_DTvsDT", 10, 10, 800, 700);
+    cMusMap_DTvsDT->Divide(2, 4);
+    for (Int_t j = 0; j < NbAnodesMus - 1; j++)
+    {
+        sprintf(Name1, "fh2_Mus_DTvsDT_a%dvs%d", j + 1, j + 2);
+        sprintf(Name2, "Anode-%d vs Anode-%d", j + 1, j + 2);
+        fh2_Mus_DTvsDT[j] = new TH2F(Name1, Name2, 1000, 0, 30000, 1000, 0, 30000);
+        sprintf(NamAnode1, "Drift time %d [channels]", j + 1);
+        sprintf(NamAnode2, "Drift time %d [channels]", j + 2);
+        fh2_Mus_DTvsDT[j]->GetXaxis()->SetTitle(NamAnode1);
+        fh2_Mus_DTvsDT[j]->GetYaxis()->SetTitle(NamAnode2);
+        fh2_Mus_DTvsDT[j]->GetYaxis()->SetTitleOffset(1.1);
+        fh2_Mus_DTvsDT[j]->GetXaxis()->CenterTitle(true);
+        fh2_Mus_DTvsDT[j]->GetYaxis()->CenterTitle(true);
+        fh2_Mus_DTvsDT[j]->GetXaxis()->SetLabelSize(0.045);
+        fh2_Mus_DTvsDT[j]->GetXaxis()->SetTitleSize(0.045);
+        fh2_Mus_DTvsDT[j]->GetYaxis()->SetLabelSize(0.045);
+        fh2_Mus_DTvsDT[j]->GetYaxis()->SetTitleSize(0.045);
+        cMusMap_DTvsDT->cd(j + 1);
+        fh2_Mus_DTvsDT[j]->Draw("col");
+    }
+
+    // Sum of energies in the anodes
     cMusMap_ESum = new TCanvas("Mus_ESum_1,2", "Mus_ESum_1,2", 10, 10, 800, 700);
     cMusMap_ESum->Divide(1, 2);
     cMusMap_ESum->cd(1);
-    fh1_Mus_ESum[0] = new TH1F("fh1_Mus_ESum1", "Mus:ESum:first", 8192, 0, 8192);
+    fh1_Mus_ESum[0] = new TH1F("fh1_Mus_ESum1", "Music:ESum:first", 8192, 0, 8192);
     fh1_Mus_ESum[0]->GetXaxis()->SetTitle("Energy [channels]");
     fh1_Mus_ESum[0]->GetYaxis()->SetTitle("Counts");
     fh1_Mus_ESum[0]->GetYaxis()->SetTitleOffset(1.1);
@@ -180,7 +230,7 @@ InitStatus R3BMusicOnlineSpectra::Init()
     fh1_Mus_ESum[0]->GetYaxis()->SetTitleSize(0.045);
     fh1_Mus_ESum[0]->Draw("");
     cMusMap_ESum->cd(2);
-    fh1_Mus_ESum[1] = new TH1F("fh1_Mus_ESum2", "Mus:ESum:Second", 8192, 0, 8192);
+    fh1_Mus_ESum[1] = new TH1F("fh1_Mus_ESum2", "Music:ESum:Second", 8192, 0, 8192);
     fh1_Mus_ESum[1]->GetXaxis()->SetTitle("Energy [channels]");
     fh1_Mus_ESum[1]->GetYaxis()->SetTitle("Counts");
     fh1_Mus_ESum[1]->GetYaxis()->SetTitleOffset(1.1);
@@ -193,7 +243,7 @@ InitStatus R3BMusicOnlineSpectra::Init()
     fh1_Mus_ESum[1]->Draw("");
 
     cMusMap_ESum1 = new TCanvas("Mus_ESum", "Mus_ESum", 10, 10, 800, 700);
-    fh1_Mus_ESum[2] = new TH1F("fh1_tMus_ESum", "Mus:ESum", 8192, 0, 8192);
+    fh1_Mus_ESum[2] = new TH1F("fh1_tMus_ESum", "Music: ESum", 8192, 0, 8192);
     fh1_Mus_ESum[2]->GetXaxis()->SetTitle("Energy [channels]");
     fh1_Mus_ESum[2]->GetYaxis()->SetTitle("Counts");
     fh1_Mus_ESum[2]->GetYaxis()->SetTitleOffset(1.1);
@@ -206,7 +256,7 @@ InitStatus R3BMusicOnlineSpectra::Init()
     fh1_Mus_ESum[2]->Draw("");
 
     cMusMap_ESum2 = new TCanvas("Mus_E1vsE2", "Mus_E1vsE2", 10, 10, 800, 700);
-    fh2_Mus_ESum = new TH2F("fh2_Mus_ESum", "Mus: ESum1 vs Esum2", 2192, 0, 8192, 2192, 0, 8192);
+    fh2_Mus_ESum = new TH2F("fh2_Mus_ESum", "Music: ESum1 vs Esum2", 2192, 0, 8192, 2192, 0, 8192);
     fh2_Mus_ESum->GetXaxis()->SetTitle("Energy1 [channels]");
     fh2_Mus_ESum->GetYaxis()->SetTitle("Energy2 [channels]");
     fh2_Mus_ESum->GetYaxis()->SetTitleOffset(1.1);
@@ -218,8 +268,8 @@ InitStatus R3BMusicOnlineSpectra::Init()
     fh2_Mus_ESum->GetYaxis()->SetTitleSize(0.045);
     fh2_Mus_ESum->Draw("col");
 
-    TCanvas* cMus_Mult = new TCanvas("Mus_multiplicity", "MUSIC: Multiplicity per anode", 10, 10, 800, 700);
-    fh1_Musmap_mult = new TH1F("fh1_Mus_mult", "Music:Multiplicity per anode", NbAnodesMus + 2, 0, NbAnodesMus + 2);
+    TCanvas* cMus_Mult = new TCanvas("Mus_multiplicity", "Music: Multiplicity per anode", 10, 10, 800, 700);
+    fh1_Musmap_mult = new TH1F("fh1_Mus_mult", "Music: Multiplicity per anode", NbAnodesMus + 2, 0, NbAnodesMus + 2);
     fh1_Musmap_mult->GetXaxis()->SetTitle("Anode");
     fh1_Musmap_mult->GetYaxis()->SetTitle("Counts");
     fh1_Musmap_mult->GetYaxis()->SetTitleOffset(1.1);
@@ -231,9 +281,9 @@ InitStatus R3BMusicOnlineSpectra::Init()
     fh1_Musmap_mult->GetYaxis()->SetTitleSize(0.045);
     fh1_Musmap_mult->Draw("");
 
-    TCanvas* cMus_Multhit = new TCanvas("Mus_hit_multiplicity", "MUSIC: Hit-multiplicity per anode", 10, 10, 800, 700);
-    fh2_Musmap_multhit =
-        new TH2F("fh2_Mus_multhit", "Music:Hit-Multiplicity per anode", NbAnodesMus + 2, 0, NbAnodesMus + 2, 10, 0, 10);
+    TCanvas* cMus_Multhit = new TCanvas("Mus_hit_multiplicity", "Music: Hit-multiplicity per anode", 10, 10, 800, 700);
+    fh2_Musmap_multhit = new TH2F(
+        "fh2_Mus_multhit", "Music: Hit-Multiplicity per anode", NbAnodesMus + 2, 0, NbAnodesMus + 2, 10, 0, 10);
     fh2_Musmap_multhit->GetXaxis()->SetTitle("Anode");
     fh2_Musmap_multhit->GetYaxis()->SetTitle("Number of hits");
     fh2_Musmap_multhit->GetYaxis()->SetTitleOffset(1.1);
@@ -258,6 +308,20 @@ InitStatus R3BMusicOnlineSpectra::Init()
     fh1_Mus_treftrigger->GetYaxis()->SetTitleSize(0.045);
     fh1_Mus_treftrigger->Draw("");
 
+    // Hit data
+    TCanvas* cMus_Z = new TCanvas("Mus_charge_z", "Mus: Charge Z", 10, 10, 800, 700);
+    fh1_Mushit_z = new TH1F("fh1_Mus_charge_z", "Music: Charge Z", 960, 0, 40);
+    fh1_Mushit_z->GetXaxis()->SetTitle("Charge (Z)");
+    fh1_Mushit_z->GetYaxis()->SetTitle("Counts");
+    fh1_Mushit_z->GetYaxis()->SetTitleOffset(1.1);
+    fh1_Mushit_z->GetXaxis()->CenterTitle(true);
+    fh1_Mushit_z->GetYaxis()->CenterTitle(true);
+    fh1_Mushit_z->GetXaxis()->SetLabelSize(0.045);
+    fh1_Mushit_z->GetXaxis()->SetTitleSize(0.045);
+    fh1_Mushit_z->GetYaxis()->SetLabelSize(0.045);
+    fh1_Mushit_z->GetYaxis()->SetTitleSize(0.045);
+    fh1_Mushit_z->Draw("");
+
     // MAIN FOLDER-Music
     TFolder* mainfolMus = new TFolder("MUSIC", "MUSIC info");
     mainfolMus->Add(cMusMap_E);
@@ -269,6 +333,10 @@ InitStatus R3BMusicOnlineSpectra::Init()
     mainfolMus->Add(cMusMap_ESum1);
     mainfolMus->Add(cMusMap_ESum2);
     mainfolMus->Add(cMusMap_EvsDT);
+    mainfolMus->Add(cMusMap_DTvsDT);
+    mainfolMus->Add(cMus_EsumvsDT);
+    if (fHitItemsMus)
+        mainfolMus->Add(cMus_Z);
     run->AddObject(mainfolMus);
 
     // Register command to reset histograms
@@ -287,6 +355,11 @@ void R3BMusicOnlineSpectra::Reset_Histo()
         fh1_Musmap_DT[j]->Reset();
         fh2_Mus_EneRawVsDriftTime[j]->Reset();
     }
+    for (Int_t j = 0; j < NbAnodesMus - 1; j++)
+    {
+        fh2_Mus_DTvsDT[j]->Reset();
+    }
+    fh2_Mus_ESum_vs_DT->Reset();
     fh1_Mus_ESum[0]->Reset();
     fh1_Mus_ESum[1]->Reset();
     fh1_Mus_ESum[2]->Reset();
@@ -294,6 +367,8 @@ void R3BMusicOnlineSpectra::Reset_Histo()
     fh1_Musmap_mult->Reset();
     fh1_Mus_treftrigger->Reset();
     fh2_Musmap_multhit->Reset();
+    if (fHitItemsMus)
+        fh1_Mushit_z->Reset();
 }
 
 void R3BMusicOnlineSpectra::Exec(Option_t* option)
@@ -351,14 +426,45 @@ void R3BMusicOnlineSpectra::Exec(Option_t* option)
         {
             for (Int_t i = 0; i < NbAnodesMus; i++)
             {
-                fh1_Musmap_DT[i]->Fill(fT[i] - fT[NbAnodesMus]);
-                fh2_Mus_EneRawVsDriftTime[i]->Fill(fE[i], fT[i] - fT[NbAnodesMus]);
+                if (multhit[i] == 1)
+                {
+                    fh1_Musmap_DT[i]->Fill(fT[i] - fT[NbAnodesMus]);
+                    fh2_Mus_EneRawVsDriftTime[i]->Fill(fE[i], fT[i] - fT[NbAnodesMus]);
+                    if (i < NbAnodesMus / 2)
+                    {
+                        e1 = e1 + fE[i];
+                        n1++;
+                    }
+                    else if (i < NbAnodesMus)
+                    {
+                        e2 = e2 + fE[i];
+                        n2++;
+                    }
+                }
             }
+
+            for (Int_t i = 0; i < NbAnodesMus - 1; i++)
+                if (multhit[i] == 1 && multhit[i + 1] == 1)
+                    fh2_Mus_DTvsDT[i]->Fill(fT[i] - fT[NbAnodesMus], fT[i + 1] - fT[NbAnodesMus]);
 
             fh1_Mus_ESum[0]->Fill(e1 / n1);
             fh1_Mus_ESum[1]->Fill(e2 / n2);
             fh1_Mus_ESum[2]->Fill((e1 + e2) / (n1 + n2));
             fh2_Mus_ESum->Fill(e1 / n1, e2 / n2);
+            fh2_Mus_ESum_vs_DT->Fill(fT[5] - fT[NbAnodesMus], (e1 + e2) / (n1 + n2));
+        }
+    }
+
+    // Fill hit data
+    if (fHitItemsMus && fHitItemsMus->GetEntriesFast() > 0)
+    {
+        Int_t nHits = fHitItemsMus->GetEntriesFast();
+        for (Int_t ihit = 0; ihit < nHits; ihit++)
+        {
+            R3BMusicHitData* hit = (R3BMusicHitData*)fHitItemsMus->At(ihit);
+            if (!hit)
+                continue;
+            fh1_Mushit_z->Fill(hit->GetZcharge());
         }
     }
 
@@ -371,6 +477,10 @@ void R3BMusicOnlineSpectra::FinishEvent()
     {
         fMappedItemsMus->Clear();
     }
+    if (fHitItemsMus)
+    {
+        fHitItemsMus->Clear();
+    }
 }
 
 void R3BMusicOnlineSpectra::FinishTask()
@@ -380,7 +490,9 @@ void R3BMusicOnlineSpectra::FinishTask()
     {
         cMusMap_E->Write();
         cMusMap_DT->Write();
+        cMusMap_DTvsDT->Write();
         cMusMap_EvsDT->Write();
+        cMus_EsumvsDT->Write();
         fh1_Mus_ESum[0]->Write();
         fh1_Mus_ESum[1]->Write();
         fh1_Mus_ESum[2]->Write();
@@ -388,6 +500,11 @@ void R3BMusicOnlineSpectra::FinishTask()
         fh1_Musmap_mult->Write();
         fh1_Mus_treftrigger->Write();
         fh2_Musmap_multhit->Write();
+    }
+
+    if (fHitItemsMus)
+    {
+        fh1_Mushit_z->Write();
     }
 }
 
