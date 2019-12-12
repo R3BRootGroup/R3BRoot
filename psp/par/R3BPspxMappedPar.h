@@ -10,18 +10,11 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
-
-/********************************************************************************
- *    Copyright (C) 2014 GSI Helmholtzzentrum fuer Schwerionenforschung GmbH    *
- *                                                                              *
- *              This software is distributed under the terms of the             *
- *         GNU Lesser General Public Licence version 3 (LGPL) version 3,        *
- *                  copied verbatim in the file "LICENSE"                       *
- ********************************************************************************/
-// -------------------------------------------------------------------------
-// -----               R3BPspxMappedPar header file                   -----
-// -----                 Created 16/05/12  by I.Syndikus               -----
-// -------------------------------------------------------------------------
+// -----------------------------------------------------------------
+// -----           R3BPspxMappedPar header file                -----
+// -----           Created 16/05/12  by I.Syndikus             -----
+// -----           Modified Dec 2019 by M. Holl                -----
+// -----------------------------------------------------------------
 
 #ifndef R3BPSPXMAPPEDPAR_H
 #define R3BPSPXMAPPEDPAR_H
@@ -40,6 +33,7 @@ class FairParamList;
  * Class for Parameters for unpacking with PspxReader for PSPX detector data.
  * @author Ina Syndikus
  * @since May 12, 2016
+ * Modified Dec 2019 by M. Holl
  */
 
 class R3BPspxMappedPar : public FairParGenericSet
@@ -58,14 +52,6 @@ class R3BPspxMappedPar : public FairParGenericSet
     inline const Int_t& GetPspxParDetector() const { return pspxmappedpardetector; }
     inline const TArrayI& GetPspxParStrip() const { return pspxmappedparstrip; }
 
-    // Initialisation from input device
-    // virtual Bool_t init(FairParIo* input);
-
-    // Output to file
-    //  virtual Int_t write(FairParIo* output);
-
-    //  virtual void print();
-
     /** Print parameters **/
     virtual void printparams();
 
@@ -76,8 +62,8 @@ class R3BPspxMappedPar : public FairParGenericSet
     Bool_t getParams(FairParamList*);
 
   private:
-    TArrayI pspxmappedparstrip;  //
-    Int_t pspxmappedpardetector; //
+    TArrayI pspxmappedparstrip;  // Number of strips per detector
+    Int_t pspxmappedpardetector; // Number of detectors
 
     R3BPspxMappedPar(const R3BPspxMappedPar&);
     R3BPspxMappedPar& operator=(const R3BPspxMappedPar&);

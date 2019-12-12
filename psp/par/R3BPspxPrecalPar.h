@@ -10,18 +10,11 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
-
-/********************************************************************************
- *    Copyright (C) 2014 GSI Helmholtzzentrum fuer Schwerionenforschung GmbH    *
- *                                                                              *
- *              This software is distributed under the terms of the             *
- *         GNU Lesser General Public Licence version 3 (LGPL) version 3,        *
- *                  copied verbatim in the file "LICENSE"                       *
- ********************************************************************************/
-// -------------------------------------------------------------------------
-// -----                R3BPspxPrecalPar header file                   -----
-// -----                 Created 17/03/13  by I.Syndikus               -----
-// -------------------------------------------------------------------------
+// ------------------------------------------------------------
+// -----           R3BPspxPrecalPar header file           -----
+// -----           Created 17/03/13  by I.Syndikus        -----
+// -----           Modified Dec 2019 by M. Holl           -----
+// ------------------------------------------------------------
 
 #ifndef R3BPSPXPRECALPAR_H
 #define R3BPSPXPRECALPAR_H
@@ -40,6 +33,7 @@ class FairParamList;
  * Class for Parameters for Mapped2Precal Conversion for PSPX detector data.
  * @author Ina Syndikus
  * @since March 13, 2017
+ * Modified Dec 2019 by M. Holl
  */
 
 class R3BPspxPrecalPar : public FairParGenericSet
@@ -55,22 +49,12 @@ class R3BPspxPrecalPar : public FairParGenericSet
     virtual ~R3BPspxPrecalPar();
 
     // Getter & Setter
-    inline const Int_t& GetPspxParDetector() const { return pspxprecalpardetector; }
-    inline const TArrayI& GetPspxParStrip() const { return pspxprecalparstrip; }
-    inline const TArrayI& GetPspxParOrientation() const { return pspxprecalparorientation; }
-    inline const TArrayF& GetPspxParGain() const { return pspxprecalpargain; }
-    inline const TArrayI& GetPspxParEnergyThreshold() const { return pspxprecalparenergythreshold; }
-
-    // Initialisation from input device
-    // virtual Bool_t init(FairParIo* input);
-
-    // Output to file
-    //  virtual Int_t write(FairParIo* output);
-
-    //  virtual void print();
-
+    inline const Int_t& GetNumDetectors() const { return fNumDetectors; }
+    inline const TArrayI& GetNumStrips() const { return fNumStrips; }
+    inline const TArrayF& GetPrecalPar() const { return fPrecalPar; }
+    
     /** Print parameters **/
-    virtual void printparams();
+    virtual void printParams();
 
     /** Reset all parameters **/
     virtual void clear();
@@ -79,16 +63,14 @@ class R3BPspxPrecalPar : public FairParGenericSet
     Bool_t getParams(FairParamList*);
 
   private:
-    Int_t pspxprecalpardetector;          //
-    TArrayI pspxprecalparstrip;           //
-    TArrayI pspxprecalparorientation;     //
-    TArrayF pspxprecalpargain;            //
-    TArrayI pspxprecalparenergythreshold; //
+    Int_t fNumDetectors;    // number of detectors
+    TArrayI fNumStrips;     // number of strips per detector
+    TArrayF fPrecalPar;     // calibration parameters for each strip
 
     R3BPspxPrecalPar(const R3BPspxPrecalPar&);
     R3BPspxPrecalPar& operator=(const R3BPspxPrecalPar&);
 
-    ClassDef(R3BPspxPrecalPar, 2);
+    ClassDef(R3BPspxPrecalPar, 3);
 };
 
 #endif

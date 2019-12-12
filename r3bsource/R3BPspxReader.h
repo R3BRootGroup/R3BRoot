@@ -19,13 +19,13 @@
 struct EXT_STR_h101_PSP_t;
 typedef struct EXT_STR_h101_PSP_t EXT_STR_h101_PSP;
 class FairLogger;
-class R3BPspxMappedPar;
 class TClonesArray;
 
 /**
  * Class to unpack (with ucesb) to Mapped data for PSPX detector data.
  * This includes: Checking for error messages.
  * @author Ralf Plag (?), Bastian Loeher(?), Ina Syndikus
+ * Modified by M. Holl, Dec 2019
  */
 
 class R3BPspxReader : public R3BReader
@@ -37,8 +37,6 @@ class R3BPspxReader : public R3BReader
     ~R3BPspxReader();
 
     Bool_t Init(ext_data_struct_info*);
-    Bool_t ReInit();
-    void SetParContainers();
     Bool_t Read();
     /** Accessor to select online mode **/
     void SetOnline(Bool_t option) { fOnline = option; }
@@ -50,13 +48,10 @@ class R3BPspxReader : public R3BReader
     FairLogger* fLogger;     /**< FairLogger */
     // Don't store data for online
     Bool_t fOnline;
-    Int_t fNbDetectors;         // Number of detectors
-    TClonesArray* fMappedItems; /**< Array holding output (Mapped) data */
-
-    R3BPspxMappedPar* fMappedPar; /**< Parameter instance holding number of detectors & strips. */
+    std::vector<TClonesArray*> fMappedItems; /**< Array holding output (Mapped) data */
 
   public:
-    ClassDef(R3BPspxReader, 3);
+    ClassDef(R3BPspxReader, 4);
 };
 
 #endif

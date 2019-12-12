@@ -18,9 +18,9 @@
 
 /**
  * Class containing PSPX detector data on Cal level.
- * Originally, this class was introduced for the analysis of s438b, but it should also work for later experiments.
  * @author Ralf Plag, Ina Syndikus
  * @since January 2016
+ * Modified Dec 2019 by M. Holl
  */
 
 class R3BPspxCalData : public TObject
@@ -30,27 +30,23 @@ class R3BPspxCalData : public TObject
     R3BPspxCalData();
 
     /** Standard Constructor **/
-    R3BPspxCalData(UShort_t detector, UShort_t strip, Float_t energy1, Float_t energy2);
+    R3BPspxCalData(Int_t strip, Float_t energy, Float_t pos);
 
     /** Destructor **/
     virtual ~R3BPspxCalData() {}
 
     // Getters
-    inline const UShort_t& GetDetector() const { return fDetector; }
-    inline const UShort_t& GetStrip() const { return fStrip; }
-    inline const Float_t& GetEnergy1() const { return fEnergy1; }
-    inline const Float_t& GetEnergy2() const { return fEnergy2; }
+    inline const Int_t& GetStrip() const { return fStrip; }
+    inline const Float_t& GetEnergy() const { return fEnergy; }
+    inline const Float_t& GetPos() const { return fPos; }
 
   private:
-    UShort_t fDetector; /**< Detector number, counting from 1 */
-    UShort_t fStrip;    /**< Strip number, counting from 1 */
-    Float_t fEnergy1;   /**< Energy/Collected charge for odd channel corresponding to the strip. This value is gain
-                         corrected (Precal2Cal Energy Calibration). */
-    Float_t fEnergy2;   /**< Energy/Collected charge for even channel corresponding to the strip. This value is gain
-                         corrected (Precal2Cal Energy Calibration). */
+    Int_t fStrip;       // Strip number, counting from 1
+    Float_t fEnergy;    // Total energy/collected charge from both sides of hit strip. This value is gainmatched.
+    Float_t fPos;       // Position calculated from energy difference from both sides. Internal coordinates from -1 to +1
 
   public:
-    ClassDef(R3BPspxCalData, 5)
+    ClassDef(R3BPspxCalData, 7)
 };
 
 #endif

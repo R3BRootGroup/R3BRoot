@@ -14,17 +14,21 @@
 #include "R3BPspxMappedData.h"
 
 R3BPspxMappedData::R3BPspxMappedData()
-    : fDetector(0)
-    , fChannel(0)
-    , fEnergy(0)
+    : fStrip{-1,-1}
+    , fEnergy{-1,-1}
 {
 }
 
-R3BPspxMappedData::R3BPspxMappedData(UShort_t detector, UShort_t channel, Int_t energy)
-    : fDetector(detector)
-    , fChannel(channel)
-    , fEnergy(energy)
+R3BPspxMappedData::R3BPspxMappedData(Int_t strip1, Int_t strip2, Int_t energy1, Int_t energy2)
+    : fStrip{strip1,strip2}
+    , fEnergy{energy1,energy2}
 {
+}
+
+void R3BPspxMappedData::SetValue(Int_t side, Int_t strip, Int_t energy)
+{
+    fStrip[side]=strip;
+    fEnergy[side]=energy;
 }
 
 ClassImp(R3BPspxMappedData)

@@ -10,18 +10,11 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
-
-/********************************************************************************
- *    Copyright (C) 2014 GSI Helmholtzzentrum fuer Schwerionenforschung GmbH    *
- *                                                                              *
- *              This software is distributed under the terms of the             *
- *         GNU Lesser General Public Licence version 3 (LGPL) version 3,        *
- *                  copied verbatim in the file "LICENSE"                       *
- ********************************************************************************/
-// -------------------------------------------------------------------------
-// -----               R3BPspxMappedPar source file                   -----
-// -----                 Created 16/05/12  by I.Syndikus               -----
-// -------------------------------------------------------------------------
+// -----------------------------------------------------------------
+// -----           R3BPspxMappedPar header file                -----
+// -----           Created 16/05/12  by I.Syndikus             -----
+// -----           Modified Dec 2019 by M. Holl                -----
+// -----------------------------------------------------------------
 
 #include "R3BPspxMappedPar.h"
 
@@ -48,8 +41,7 @@ void R3BPspxMappedPar::clear()
     resetInputVersions();
 }
 
-void R3BPspxMappedPar::printparams()
-{
+void R3BPspxMappedPar::printparams(){
 
     LOG(INFO) << "Print";
     LOG(INFO) << "pspxmappedpardetector: " << pspxmappedpardetector;
@@ -61,35 +53,29 @@ void R3BPspxMappedPar::printparams()
     }
 }
 
-void R3BPspxMappedPar::putParams(FairParamList* l)
-{
-    //   print();
+void R3BPspxMappedPar::putParams(FairParamList* l){
+    
     LOG(INFO) << "I am in R3BPspxMappedPar::putParams ";
-    if (!l)
-    {
+    if (!l){
         return;
     }
     l->add("R3BPspxMappedDetectors", pspxmappedpardetector);
     l->add("R3BPspxMappedStripsPerDetector", pspxmappedparstrip);
 }
 
-Bool_t R3BPspxMappedPar::getParams(FairParamList* l)
-{
-    // print();
+Bool_t R3BPspxMappedPar::getParams(FairParamList* l){
+    
     LOG(INFO) << "I am in R3BPspxMappedPar::getParams ";
 
-    if (!l)
-    {
+    if (!l){
         return kFALSE;
     }
-    if (!l->fill("R3BPspxMappedDetectors", &pspxmappedpardetector))
-    {
+    if (!l->fill("R3BPspxMappedDetectors", &pspxmappedpardetector)){
         return kFALSE;
     }
     pspxmappedparstrip.Set(pspxmappedpardetector);
 
-    if (!l->fill("R3BPspxMappedStripsPerDetector", &pspxmappedparstrip))
-    {
+    if (!l->fill("R3BPspxMappedStripsPerDetector", &pspxmappedparstrip)){
         return kFALSE;
     }
 

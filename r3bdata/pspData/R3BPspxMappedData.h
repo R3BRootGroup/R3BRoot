@@ -18,9 +18,9 @@
 
 /**
  * Class containing PSPX detector data on Mapped level.
- * Originally, this class was introduced for the analysis of s438b, but it also works for later experiments.
  * @author Ralf Plag, Ina Syndikus
  * @since January 2016
+ * Modified Dec 2019 by M. Holl
  */
 
 class R3BPspxMappedData : public TObject
@@ -30,23 +30,24 @@ class R3BPspxMappedData : public TObject
     R3BPspxMappedData();
 
     /** Standard Constructor **/
-    R3BPspxMappedData(UShort_t detector, UShort_t channel, Int_t energy);
+    R3BPspxMappedData(Int_t strip1, Int_t strip2, Int_t energy1, Int_t energy2);
 
     /** Destructor **/
     virtual ~R3BPspxMappedData() {}
 
+    void SetValue(Int_t,Int_t,Int_t);
     // Getters
-    inline const UShort_t& GetDetector() const { return fDetector; }
-    inline const UShort_t& GetChannel() const { return fChannel; }
-    inline const Int_t& GetEnergy() const { return fEnergy; }
+    inline const Int_t& GetStrip1()  const { return fStrip [0]; }
+    inline const Int_t& GetStrip2()  const { return fStrip [1]; }
+    inline const Int_t& GetEnergy1() const { return fEnergy[0]; }
+    inline const Int_t& GetEnergy2() const { return fEnergy[1]; }
 
   private:
-    UShort_t fDetector; /**< Detector number, counting from 1 */
-    UShort_t fChannel;  /**< Channel number, counting from 1 */
-    Int_t fEnergy;      /**< Energy/Collected charge */
-
+    Int_t fStrip[2];    // Channel number, counting from 1, one entry for each side of each strip
+    Int_t fEnergy[2];   // Energy/Collected charge, one entry for each side of each strip
+    
   public:
-    ClassDef(R3BPspxMappedData, 3)
+    ClassDef(R3BPspxMappedData, 5)
 };
 
 #endif

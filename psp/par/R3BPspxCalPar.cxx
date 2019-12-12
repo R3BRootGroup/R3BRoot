@@ -10,18 +10,11 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
-
-/********************************************************************************
- *    Copyright (C) 2014 GSI Helmholtzzentrum fuer Schwerionenforschung GmbH    *
- *                                                                              *
- *              This software is distributed under the terms of the             *
- *         GNU Lesser General Public Licence version 3 (LGPL) version 3,        *
- *                  copied verbatim in the file "LICENSE"                       *
- ********************************************************************************/
-// -------------------------------------------------------------------------
-// -----               R3BPspxCalPar source file                   -----
-// -----                 Created 16/05/12  by I.Syndikus               -----
-// -------------------------------------------------------------------------
+// -----------------------------------------------------------------
+// -----           R3BPspxMappedPar header file                -----
+// -----           Created 16/05/12  by I.Syndikus             -----
+// -----           Modified Dec 2019 by M. Holl                -----
+// -----------------------------------------------------------------
 
 #include "R3BPspxCalPar.h"
 
@@ -34,10 +27,9 @@
 
 R3BPspxCalPar::R3BPspxCalPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
-    , pspxcalparstrip()
-    , pspxcalpardetector(-1)
-    , pspxcalparorientation(-1)
-    , pspxcalpargain(-1)
+    , fNumDetectors(-1)
+    , fNumStrips()
+    , fCalPar()
 {
     detName = "Pspx";
 }
@@ -50,111 +42,67 @@ void R3BPspxCalPar::clear()
     resetInputVersions();
 }
 
-void R3BPspxCalPar::printparams()
+void R3BPspxCalPar::printParams()
 {
-    LOG(INFO) << "Print";
-    LOG(INFO) << "pspxcalpardetector: " << pspxcalpardetector;
-    Int_t size = pspxcalparstrip.GetSize();
-    LOG(INFO) << "pspxcalparstrip size: " << size;
-    LOG(INFO) << "Detectorno.: No. of Strips, Orientation of strips";
-    for (Int_t i = 0; i < size; i++)
-    {
-        LOG(INFO) << i << " :" << pspxcalparstrip.GetAt(i) << ", " << pspxcalparorientation.GetAt(i);
+    
+    LOG(INFO) << "R3BPspxCalPar::printParams";
+    LOG(INFO) << "fNumDetectors: " << fNumDetectors;
+    Int_t size = fNumStrips.GetSize();
+    LOG(INFO) << "fNumStrips size: " << size;
+    LOG(INFO) << "Detectorno.: No. of Strips";
+    for (Int_t i = 0; i < size; i++){
+        LOG(INFO) << i << " :" << fNumStrips.GetAt(i);
     }
 
-    size = pspxcalpargain.GetSize();
-    LOG(INFO) << "pspxcalpargain size: " << size;
-    for (Int_t i = 0; i < size; i++)
-    {
-        LOG(INFO) << i << " :" << pspxcalpargain.GetAt(i);
+    size = fCalPar.GetSize();
+    LOG(INFO) << "fCalPar size: " << size;
+    for (Int_t i = 0; i < size; i++){
+        LOG(INFO) << i << " :" << fCalPar.GetAt(i);
     }
 }
 
 void R3BPspxCalPar::putParams(FairParamList* l)
 {
-    //   print();
     LOG(INFO) << "I am in R3BPspxCalPar::putParams ";
-    if (!l)
-    {
-        return;
-    }
-    l->add("R3BPspxCalDetectors", pspxcalpardetector);
-    l->add("R3BPspxCalStripsPerDetector", pspxcalparstrip);
-    l->add("R3BPspxCalOrientationOfDetector", pspxcalparorientation);
+    if(!l) return;
+    l->add("R3BPspxCalDetectors", fNumDetectors);
+    l->add("R3BPspxCalStrips", fNumStrips);
 
     Int_t count_strips = 0;
-    for (Int_t i = 0; i < pspxcalpardetector; i++)
-    {
-        if (pspxcalparorientation[i] == 1 || pspxcalparorientation[i] == 2)
-        {
-            count_strips += pspxcalparstrip[i];
-        }
-        else if (pspxcalparorientation[i] == 3)
-        {
-            count_strips += pspxcalparstrip[i] * 2;
-        }
-        else
-        {
-            LOG(ERROR) << "R3BPspxCalPar::putParams: Orientation of Detector not valid! ";
-        }
+    for (Int_t i = 0; i < fNumDetectors; i++){
+        count_strips += fNumStrips[i];
     }
-    // count all entries: lines with strip info + lines with detector info
-    Int_t array_size = (count_strips * 2 + pspxcalpardetector * 2);
-    LOG(INFO) << "R3BPspxCalGainForStrips Array Size: " << array_size;
-    pspxcalpargain.Set(array_size);
-    l->add("R3BPspxCalGainForStrips", pspxcalpargain);
+
+    // count all entries: lines with strip info (2 entries) + lines with detector info (3 entries)
+    Int_t array_size = (count_strips * 2 + fNumDetectors * 3);
+    LOG(INFO) << "R3BPspxCalPar Array Size: " << array_size;
+    fCalPar.Set(array_size);
+    l->add("R3BPspxCalPar", fCalPar);
 }
 
 Bool_t R3BPspxCalPar::getParams(FairParamList* l)
 {
-    // print();
     LOG(INFO) << "I am in R3BPspxCalPar::getParams ";
 
-    if (!l)
-    {
-        return kFALSE;
-    }
-    if (!l->fill("R3BPspxCalDetectors", &pspxcalpardetector))
-    {
-        return kFALSE;
-    }
-    pspxcalparstrip.Set(pspxcalpardetector);
-    pspxcalparorientation.Set(pspxcalpardetector);
+    if(!l) return kFALSE;
+    if(!l->fill("R3BPspxCalDetectors", &fNumDetectors)) return kFALSE;
+    
+    fNumStrips.Set(fNumDetectors);
 
-    if (!l->fill("R3BPspxCalStripsPerDetector", &pspxcalparstrip))
-    {
-        return kFALSE;
-    }
-    if (!l->fill("R3BPspxCalOrientationOfDetector", &pspxcalparorientation))
-    {
-        return kFALSE;
-    }
+    if(!l->fill("R3BPspxCalStrips", &fNumStrips)) return kFALSE;
 
     Int_t count_strips = 0;
-    for (Int_t i = 0; i < pspxcalpardetector; i++)
-    {
-        if (pspxcalparorientation[i] == 1 || pspxcalparorientation[i] == 2)
-        {
-            count_strips += pspxcalparstrip[i];
-        }
-        else if (pspxcalparorientation[i] == 3)
-        {
-            count_strips += pspxcalparstrip[i] * 2;
-        }
-        else
-        {
-            LOG(ERROR) << "R3BPspxCalPar::getParams: Orientation of Detector not valid! ";
-            return kFALSE;
-        }
+    for (Int_t i = 0; i < fNumDetectors; i++){
+        count_strips += fNumStrips[i];
     }
     LOG(INFO) << "Total number of strips: " << count_strips;
-    // count all entries: lines with strip info + lines with detector info
-    Int_t array_size = (count_strips * 2 + pspxcalpardetector * 2);
-    LOG(INFO) << "R3BPspxCalGainForStrips Array Size: " << array_size;
-    pspxcalpargain.Set(array_size);
-    if (!(l->fill("R3BPspxCalGainForStrips", &pspxcalpargain)))
-    {
-        LOG(WARNING) << "Could not initialize R3BPspxCalGainForStrips";
+    
+    // count all entries: lines with strip info (2 entries) + lines with detector info (3 entries)
+    Int_t array_size = (count_strips * 2 + fNumDetectors * 3);
+    LOG(INFO) << "R3BPspxCalPar Array Size: " << array_size;
+    fCalPar.Set(array_size);
+    if (!(l->fill("R3BPspxCalPar", &fCalPar))){
+        LOG(WARNING) << "Could not initialize R3BPspxCalPar";
         return kFALSE;
     }
 

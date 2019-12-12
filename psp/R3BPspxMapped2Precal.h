@@ -10,13 +10,11 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
-
-// -----------------------------------------------------------------------------
-// -----                                                                   -----
-// -----                           R3BPspxMapped2Precal                    -----
-// -----                    Created 13-03-2017 by I. Syndikus		           -----
-// -----                                                                   -----
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------
+// -----                   R3BPspxMapped2Precal               -----
+// -----            Created  13-03-2017 by I. Syndikus		  -----
+// -----              Modified  Dec 2019  by M. Holl		  -----
+// ----------------------------------------------------------------
 
 #ifndef R3BPSPXMAPPED2PRECAL_H
 #define R3BPSPXMAPPED2PRECAL_H
@@ -29,9 +27,11 @@ class R3BPspxPrecalPar;
 
 /**
  * Class to convert Mapped data to Precal data for PSPX detector data.
- * This means: Apply thresholds to every channel & gains for position calibration of eachs trip.
+ * Thresholds are applied to signal from both sides of each strip
+ * Signal from side 2 of each strip is multiplied by gain for position calibration
  * @author Ina Syndikus
  * @since March 13, 2016
+ * Modified Dec 2019 by M.Holl
  */
 
 class R3BPspxMapped2Precal : public FairTask
@@ -47,6 +47,7 @@ class R3BPspxMapped2Precal : public FairTask
     virtual InitStatus Init();
     InitStatus ReInit();
     void SetParContainers();
+    void SetParameters();
 
     virtual void Exec(Option_t* option);
 
@@ -55,18 +56,16 @@ class R3BPspxMapped2Precal : public FairTask
 
   private:
     R3BEventHeader* fHeader;    // do we need that?
-    TClonesArray* fMappedItems; /**< Array holding input (Mapped) data */
-    TClonesArray* fPrecalItems; /**< Array holding output (Precal) data */
-
+    std::vector<TClonesArray*> fMappedItems; /**< Arrays holding input (Mapped) data */
+    std::vector<TClonesArray*> fPrecalItems; /**< Arrays holding output (Precal) data */
+    
     R3BPspxPrecalPar* fPrecalPar; /**< Parameter instance holding thresholds and gains for position correction */
     std::vector<std::vector<Float_t>> gain;
-    std::vector<std::vector<Int_t>> energythreshold;
-
-    // void CreateHistos();
-    // void WriteHistos();
+    std::vector<std::vector<Int_t>> threshold1;
+    std::vector<std::vector<Int_t>> threshold2;
 
   public:
-    ClassDef(R3BPspxMapped2Precal, 2)
+    ClassDef(R3BPspxMapped2Precal, 3)
 };
 
 #endif

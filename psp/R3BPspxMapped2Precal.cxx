@@ -10,13 +10,11 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
-
-// -----------------------------------------------------------------------------
-// -----                                                                   -----
-// -----                           R3BPspxMapped2Precal                    -----
-// -----                    Created  13-03-2017 by I. Syndikus		   -----
-// -----                                                                   -----
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------
+// -----                   R3BPspxMapped2Precal               -----
+// -----            Created  13-03-2017 by I. Syndikus		  -----
+// -----              Modified  Dec 2019  by M. Holl		  -----
+// ----------------------------------------------------------------
 
 #include <iostream>
 #include <limits>
@@ -35,19 +33,44 @@
 #include "R3BPspxPrecalPar.h"
 
 R3BPspxMapped2Precal::R3BPspxMapped2Precal()
-    : fMappedItems(NULL)
-    , fPrecalItems(new TClonesArray("R3BPspxPrecalData"))
+    : fMappedItems()
+    , fPrecalItems()
 {
 }
 
 R3BPspxMapped2Precal::R3BPspxMapped2Precal(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fMappedItems(NULL)
-    , fPrecalItems(new TClonesArray("R3BPspxPrecalData"))
+    , fMappedItems()
+    , fPrecalItems()
 {
 }
 
 R3BPspxMapped2Precal::~R3BPspxMapped2Precal() {}
+
+void R3BPspxMapped2Precal::SetParameters(){
+
+    LOG(INFO) << "In R3BPspxMapped2Precal::SetParameters()" << FairLogger::endl;
+    //--- Parameter Container ---
+    Int_t nDet=fPrecalPar->GetNumDetectors();//Number of Detectors/Faces
+    gain.resize(nDet);
+    threshold1.resize(nDet);
+    threshold2.resize(nDet);
+    for(Int_t d=0; d<nDet; d++){
+        Int_t nStrips=fPrecalPar->GetNumStrips().At(d);//Number of Strips
+        gain[d].resize(nStrips);
+        threshold1[d].resize(nStrips);
+        threshold2[d].resize(nStrips);
+        Int_t parOffset = d*nStrips*4 + (d+1)*3; // Position in parameter list. 4 parameters per strip + 3 "header" parameters per detector.
+        for(Int_t s=0; s<nStrips; s++){
+            TArrayF par = fPrecalPar->GetPrecalPar();//Array with the parameters
+            gain[d][s]=par.At(parOffset+1);
+            threshold1[d][s]=par.At(parOffset+2);
+            threshold2[d][s]=par.At(parOffset+3);
+            parOffset += 4; // move to next line in parameter file.
+            LOG(INFO)<< "Det: " << d <<"\tstr: " << s << "\tgain: " << gain[d][s] << "\tthr1: " << threshold1[d][s] << "\tthr2: " << threshold2[d][s] <<FairLogger::endl;
+        }
+    }
+}
 
 InitStatus R3BPspxMapped2Precal::Init()
 {
@@ -57,82 +80,33 @@ InitStatus R3BPspxMapped2Precal::Init()
      * Print parameters, if verbosity is set to INFO.
      */
 
-    // LOG(INFO) << "R3BPspxMapped2Precal :: Init() ";
+    LOG(INFO) << "R3BPspxMapped2Precal :: Init() " << FairLogger::endl;
     FairRootManager* fMan = FairRootManager::Instance();
     fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
-    fMappedItems = (TClonesArray*)fMan->GetObject("PspxMapped"); // = branch name in TTree
-    if (!fMappedItems)
-    {
-        printf("Couldn't get handle on PSPX mapped items\n");
-        return kFATAL;
-    }
+    const char xy[2] = {'x','y'}; // orientation of detector face
+    // Figure out how many detectors were registered by the reader
+    for(Int_t d = 0; ; d++){
+        TClonesArray* tmp[2];
 
-    // fPrecalItems = (TClonesArray*)fMan->GetObject"R3BPspxPrecal");
-    FairRootManager::Instance()->Register("PspxPrecal", "Pspx", fPrecalItems, kTRUE);
-
-    // fPrecalPar->printparams();
-
-    // Initialisation of gain parameters
-    gain.resize(fPrecalPar->GetPspxParDetector());
-    for (Int_t i = 0; i < fPrecalPar->GetPspxParDetector(); i++)
-    {
-        if (fPrecalPar->GetPspxParOrientation().At(i) == 1 || fPrecalPar->GetPspxParOrientation().At(i) == 2)
-        { // strips on 1 side
-            gain[i].resize(fPrecalPar->GetPspxParStrip().At(i));
+        for(Int_t f = 0; f<2; f++){
+            tmp[f] = (TClonesArray*)fMan->GetObject(Form("Pspx%d_%cMapped",d+1,xy[f])); // = branch name in TTree
         }
-        else if (fPrecalPar->GetPspxParOrientation().At(i) == 3)
-        { // strips on 2 sides
-            gain[i].resize(fPrecalPar->GetPspxParStrip().At(i) * 2);
+        if(tmp[0]==NULL&&tmp[1]==NULL){
+            if (d==0)
+            {
+                printf("Couldn't get handle on PSPX mapped items\n");
+                return kFATAL;
+            }
+            break;
         }
-    }
-    Int_t start_detector = 0; // entries, not lines
-    for (Int_t i = 0; i < gain.size(); i++)
-    { // detectors
-        for (Int_t j = 0; j < gain[i].size(); j++)
-        { // strips
-            gain[i][j] = fPrecalPar->GetPspxParGain().At(start_detector + 3 + j * 2);
-        }
-        start_detector = start_detector + 2 + 2 * gain[i].size();
-    }
-    LOG(INFO) << "R3BPspxMapped2Precal :: Init() ";
-    for (Int_t i = 0; i < fPrecalPar->GetPspxParDetector(); i++)
-    {
-        for (Int_t j = 0; j < gain[i].size(); j++)
-        {
-            LOG(INFO) << "gain[" << i << "][" << j << "]=" << gain[i][j];
+        for(Int_t f = 0; f<2; f++){
+            fMappedItems.push_back(tmp[f]);
+            fPrecalItems.push_back(new TClonesArray("R3BPspxPrecalData"));
+            FairRootManager::Instance()->Register(Form("Pspx%d_%cPrecal",d+1,xy[f]), Form("Pspx%d_%c",d+1,xy[f]), fPrecalItems.back(), kTRUE);
         }
     }
 
-    // Initialisation of energy threshold parameters
-    energythreshold.resize(fPrecalPar->GetPspxParDetector());
-    for (Int_t i = 0; i < fPrecalPar->GetPspxParDetector(); i++)
-    {
-        if (fPrecalPar->GetPspxParOrientation().At(i) == 1 || fPrecalPar->GetPspxParOrientation().At(i) == 2)
-        { // cathode cannel available
-            energythreshold[i].resize(fPrecalPar->GetPspxParStrip().At(i) * 2 + 1);
-        }
-        else if (fPrecalPar->GetPspxParOrientation().At(i) == 3)
-        {
-            energythreshold[i].resize(fPrecalPar->GetPspxParStrip().At(i) * 4);
-        }
-    }
-    start_detector = 0; // entries, not lines
-    for (Int_t i = 0; i < energythreshold.size(); i++)
-    { // detectors
-        for (Int_t j = 0; j < energythreshold[i].size(); j++)
-        { // channels
-            energythreshold[i][j] = fPrecalPar->GetPspxParEnergyThreshold().At(start_detector + 3 + j * 2);
-        }
-        start_detector = start_detector + 2 + 2 * energythreshold[i].size();
-    }
-    for (Int_t i = 0; i < fPrecalPar->GetPspxParDetector(); i++)
-    {
-        for (Int_t j = 0; j < energythreshold[i].size(); j++)
-        {
-            LOG(INFO) << "energythreshold[" << i << "][" << j << "]=" << energythreshold[i][j];
-        }
-    }
-
+    SetParameters();
     return kSUCCESS;
 }
 
@@ -145,20 +119,13 @@ void R3BPspxMapped2Precal::SetParContainers()
     LOG(INFO) << "R3BPspxMapped2Precal :: SetParContainers() ";
 
     fPrecalPar = (R3BPspxPrecalPar*)FairRuntimeDb::instance()->getContainer("R3BPspxPrecalPar");
-
-    // Get Base Container
-    // FairRunAna* ana = FairRunAna::Instance();
-    // FairRuntimeDb* rtdb=ana->GetRuntimeDb();
-
-    // fPrecalPar = (R3BPspxPrecalPar*) (rtdb->getContainer("R3BPspxPrecalPar"));
-
     if (!fPrecalPar)
     {
         LOG(ERROR) << "Could not get access to R3BPspxPrecalPar-Container.";
         return;
     }
 
-    fPrecalPar->printparams();
+    fPrecalPar->printParams();
 }
 
 InitStatus R3BPspxMapped2Precal::ReInit()
@@ -168,11 +135,6 @@ InitStatus R3BPspxMapped2Precal::ReInit()
      */
 
     LOG(INFO) << " R3BPspxMapped2Precal :: ReInit() ";
-
-    // FairRunAna* ana = FairRunAna::Instance();
-    // FairRuntimeDb* rtdb=ana->GetRuntimeDb();
-
-    // fPrecalPar = (R3BPspxPrecalPar*) (rtdb->getContainer("R3BPspxPrecalPar"));
 
     fPrecalPar = (R3BPspxPrecalPar*)FairRuntimeDb::instance()->getContainer("R3BPspxPrecalPar");
 
@@ -190,178 +152,48 @@ void R3BPspxMapped2Precal::Exec(Option_t* option)
     /**
      * Does the conversion from Mapped to Precal level. It is called for every event.
      * Energies, which are below a channel specific threshold, will be ignored.
-     * Applies (strip specific) gains to the energy entries of even channels. This is
+     * Applies (strip specific) gains to the energy entries of side 2 of the strip. This is
      * the first calibration step for the position reconstruction.
      */
-
-    if (!fMappedItems)
-    {
-        printf("Cannot access PSPX mapped items\n");
-        return;
-    }
-
-    UShort_t detector1;
-    UShort_t detector2;
-    UShort_t strip1;
-    UShort_t strip2;
-    Float_t energy1;
-    Float_t energy2;
-
-    Int_t nMapped = fMappedItems->GetEntries();
-
-    // Temp array to avoid double counting
-    Bool_t used[nMapped];
-    for (Int_t k = 0; k < nMapped; k++)
-    {
-        used[k] = false;
-    }
-
-    // Calculating strip and energys
-    for (Int_t i = 0; i < nMapped; i++)
-    {
-        detector1 = std::numeric_limits<UShort_t>::quiet_NaN();
-        detector2 = std::numeric_limits<UShort_t>::quiet_NaN();
-        strip1 = std::numeric_limits<UShort_t>::quiet_NaN();
-        strip2 = std::numeric_limits<UShort_t>::quiet_NaN();
-        energy1 = std::numeric_limits<Float_t>::quiet_NaN();
-        energy2 = std::numeric_limits<Float_t>::quiet_NaN();
-
-        R3BPspxMappedData* mItem1 = (R3BPspxMappedData*)fMappedItems->At(i);
-        detector1 = mItem1->GetDetector();
-        if (fPrecalPar->GetPspxParStrip().At(detector1 - 1) == 0)
-            continue;
-
-        // get rif of error message from Febex
-        if (mItem1->GetEnergy() == -3075811 || mItem1->GetEnergy() == -3075810)
-            continue;
-
-        // calculating stripnumber, only for valid channel number
-        if (mItem1->GetChannel() > 0 && mItem1->GetChannel() < fPrecalPar->GetPspxParStrip().At(detector1 - 1) * 4 + 1)
-        { // strips
-            strip1 = (mItem1->GetChannel() + 1) / 2;
+    for (Int_t d = 0; d<fMappedItems.size(); d++){
+        if (!fMappedItems[d]){
+            printf("Cannot access PSPX%d_%d mapped items\n",(d/2)+1,(d%2)+1);
+            return;
         }
-        else if (mItem1->GetChannel() == fPrecalPar->GetPspxParStrip().At(detector1 - 1) * 4 + 1)
-        { // cathode
-            strip1 = fPrecalPar->GetPspxParStrip().At(detector1 - 1) * 2 + 1;
-        }
+        if (fPrecalPar->GetNumStrips().At(d) == 0) continue;
 
-        // setting energy(s) for strips
-        if (strip1 > 0 && strip1 < fPrecalPar->GetPspxParStrip().At(detector1 - 1) * 2 + 2 && used[i] == false)
-        {
-            if (strip1 == fPrecalPar->GetPspxParStrip().At(detector1 - 1) * 2 + 1)
-            { // cathode
-                if (TMath::Abs(mItem1->GetEnergy()) <
-                    energythreshold[detector1 - 1][fPrecalPar->GetPspxParStrip().At(detector1 - 1) * 2])
-                    continue;
-                energy1 = mItem1->GetEnergy();
-                energy2 = std::numeric_limits<Float_t>::quiet_NaN();
-            }
-            else
-            { // strips
-                if (fPrecalPar->GetPspxParOrientation().At(detector1 - 1) == 1 ||
-                    fPrecalPar->GetPspxParOrientation().At(detector1 - 1) == 3)
-                { // vertical strips or strips in both directions
-                    if (TMath::Abs(mItem1->GetEnergy()) < energythreshold[detector1 - 1][mItem1->GetChannel() - 1])
-                        continue;
-                }
-                else if (fPrecalPar->GetPspxParOrientation().At(detector1 - 1) == 2)
-                { // horizontal strips
-                    if (TMath::Abs(mItem1->GetEnergy()) <
-                        energythreshold[detector1 - 1]
-                                       [mItem1->GetChannel() - 1 - 2 * fPrecalPar->GetPspxParStrip().At(detector1 - 1)])
-                        continue; // different counting of array and in root file + counting from #Strips+1 to #Strips*2
-                                  // for horizontal strips
-                }
-                if (mItem1->GetChannel() % 2 == 1)
-                {
-                    energy1 = mItem1->GetEnergy();
-                    energy2 = std::numeric_limits<Float_t>::quiet_NaN();
-                }
-                else
-                {
-                    energy1 = std::numeric_limits<Float_t>::quiet_NaN();
-                    energy2 = mItem1->GetEnergy();
-                }
+        Int_t nMapped = fMappedItems[d]->GetEntries();
+ 
+        for (Int_t i = 0; i < nMapped; i++){
+            
+            R3BPspxMappedData* mappedData = (R3BPspxMappedData*)fMappedItems[d]->At(i);
 
-                // searching for second entry of strip
-                for (Int_t j = i + 1; j < nMapped; j++)
-                {
-                    R3BPspxMappedData* mItem2 = (R3BPspxMappedData*)fMappedItems->At(j);
-                    detector2 = mItem2->GetDetector();
-                    if (fPrecalPar->GetPspxParStrip().At(detector2 - 1) == 0)
-                        continue;
+            // get rid of error message from Febex (GSI firmware)
+            if (mappedData->GetEnergy1() == 3075811 || mappedData->GetEnergy1() == 3075810) continue;
+            if (mappedData->GetEnergy2() == 3075811 || mappedData->GetEnergy2() == 3075810) continue;
 
-                    // get rif of error message from Febex
-                    if (mItem2->GetEnergy() == -3075811 || mItem2->GetEnergy() == -3075810)
-                        continue;
-
-                    // calculating stripnumber
-                    if (mItem2->GetChannel() > 0 &&
-                        mItem2->GetChannel() < fPrecalPar->GetPspxParStrip().At(detector2 - 1) * 4 + 1)
-                    { // strips
-                        strip2 = (mItem2->GetChannel() + 1) / 2;
-                    }
-                    else if (mItem2->GetChannel() == fPrecalPar->GetPspxParStrip().At(detector2 - 1) * 4 + 1)
-                    { // cathode
-                        strip2 = fPrecalPar->GetPspxParStrip().At(detector2 - 1) * 2 + 1;
-                    }
-
-                    if (detector1 == detector2 && strip1 == strip2)
-                    {
-                        used[j] = true; // to avoid that the same entry is read a second time in loop i
-                        if (fPrecalPar->GetPspxParOrientation().At(detector2 - 1) == 1 ||
-                            fPrecalPar->GetPspxParOrientation().At(detector1 - 1) == 3)
-                        { // vertical strips or strips in both directions
-                            if (TMath::Abs(mItem2->GetEnergy()) <
-                                energythreshold[detector2 - 1][mItem2->GetChannel() - 1])
-                                continue;
-                        }
-                        else if (fPrecalPar->GetPspxParOrientation().At(detector2 - 1) == 2)
-                        { // horizontal strips
-                            if (TMath::Abs(mItem2->GetEnergy()) <
-                                energythreshold[detector2 - 1][mItem2->GetChannel() - 1 -
-                                                               2 * fPrecalPar->GetPspxParStrip().At(detector1 - 1)])
-                                continue; // different counting of array and in root file + counting from #Strips+1 to
-                                          // #Strips*2 for horizontal strips
-                        }
-                        if (mItem2->GetChannel() % 2 == 0 && mItem1->GetChannel() % 2 == 1)
-                        {
-                            energy2 = mItem2->GetEnergy();
-                        }
-                        else
-                        {
-                            energy1 = mItem2->GetEnergy();
-                        }
-                        if (fPrecalPar->GetPspxParOrientation().At(detector1 - 1) == 1 ||
-                            fPrecalPar->GetPspxParOrientation().At(detector1 - 1) == 3)
-                        { // vertical strips or strips in both directions
-                            energy2 = energy2 *
-                                      gain[detector1 - 1][strip1 - 1]; // different counting of array and in root file
-                        }
-                        else if (fPrecalPar->GetPspxParOrientation().At(detector1 - 1) == 2)
-                        { // horizontal strips
-                            energy2 = energy2 *
-                                      gain[detector1 - 1]
-                                          [strip1 - 1 -
-                                           fPrecalPar->GetPspxParStrip().At(detector1 - 1)]; // different counting
-                            // of array and in root file + counting from #Strips+1 to #Strips*2 for horizontal strips
-                        }
-                    }
+            if (mappedData->GetStrip1() == mappedData->GetStrip2()){
+                Int_t strip = mappedData->GetStrip1();
+                if(TMath::Abs(mappedData->GetEnergy1())>threshold1[d][strip-1] &&
+                        TMath::Abs(mappedData->GetEnergy2())>threshold2[d][strip-1]){ // strips
+                    Float_t energy1 = mappedData->GetEnergy1();
+                    Float_t energy2 = mappedData->GetEnergy2() * gain[d][strip-1];
+                    new ((*fPrecalItems[d])[fPrecalItems[d]->GetEntriesFast()])R3BPspxPrecalData(strip, energy1, energy2);
                 }
             }
-
-            new ((*fPrecalItems)[fPrecalItems->GetEntriesFast()])
-                R3BPspxPrecalData(detector1, strip1, energy1, energy2);
-
-            // std::cout<< detector1<<" "<< strip1<<" "<< energy1<<" "<< energy2<<std::endl;
         }
+    }   
+}
+
+void R3BPspxMapped2Precal::FinishEvent() {
+    for(Int_t i = 0; i<fMappedItems.size() ; i++){
+        fMappedItems[i]->Clear(); 
+    }
+    for(Int_t i = 0; i<fPrecalItems.size() ; i++){
+        fPrecalItems[i]->Clear(); 
     }
 }
 
-void R3BPspxMapped2Precal::FinishEvent() { fPrecalItems->Clear(); }
-
 void R3BPspxMapped2Precal::FinishTask() {}
-
-// void R3BPspxMapped2Precal::WriteHistos() {}
 
 ClassImp(R3BPspxMapped2Precal)

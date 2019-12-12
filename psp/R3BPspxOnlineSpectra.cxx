@@ -14,6 +14,7 @@
 // ------------------------------------------------------------
 // -----                  R3BPspxOnlineSpectra            -----
 // -----          Created Feb 23th 2019 by J.L. Rodriguez -----
+// -----              Modified Dec 2019 by M. Holl        -----
 // ------------------------------------------------------------
 
 /*
@@ -57,9 +58,9 @@ using namespace std;
 
 R3BPspxOnlineSpectra::R3BPspxOnlineSpectra()
     : FairTask("PspOnlineSpectra", 1)
-    , fPrecalItemsPspx(NULL)
-    , fHitItemsPspx(NULL)
-    , fMappedItemsPspx(NULL)
+    , fPrecalItemsPspx()
+    , fHitItemsPspx()
+    , fMappedItemsPspx()
     , fTrigger(-1)
     , fNEvents(0)
 {
@@ -67,9 +68,9 @@ R3BPspxOnlineSpectra::R3BPspxOnlineSpectra()
 
 R3BPspxOnlineSpectra::R3BPspxOnlineSpectra(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fCalItemsPspx(NULL)
-    , fPrecalItemsPspx(NULL)
-    , fHitItemsPspx(NULL)
+    , fCalItemsPspx()
+    , fPrecalItemsPspx()
+    , fHitItemsPspx()
     , fTrigger(-1)
     , fNEvents(0)
 {
@@ -85,7 +86,7 @@ InitStatus R3BPspxOnlineSpectra::Init()
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(fatal) << "FairRootManager not found";
+        LOG(fatal)<<"FairRootManager not found"<< FairLogger::endl;
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
     FairRunOnline* run = FairRunOnline::Instance();
@@ -95,261 +96,117 @@ InitStatus R3BPspxOnlineSpectra::Init()
     //
     // PSPX detector
     // get access to data
-    fMappedItemsPspx = (TClonesArray*)mgr->GetObject("PspxMappedData");
-    fPrecalItemsPspx = (TClonesArray*)mgr->GetObject("PspxPrecalData");
-    fCalItemsPspx = (TClonesArray*)mgr->GetObject("PspxCalData");
-    fHitItemsPspx = (TClonesArray*)mgr->GetObject("PspxHitData");
+    for(Int_t d = 0; ; d++){
+        for(Int_t f = 0; f<2; f++){
+            fMappedItemsPspx.push_back((TClonesArray*)mgr->GetObject(Form("Pspx%d_%dMapped",d+1,f+1)));
+            fPrecalItemsPspx.push_back((TClonesArray*)mgr->GetObject(Form("Pspx%d_%dPrecal",d+1,f+1)));
+            fCalItemsPspx.push_back((TClonesArray*)mgr->GetObject(Form("Pspx%d_%dCal",d+1,f+1)));
+            fHitItemsPspx.push_back((TClonesArray*)mgr->GetObject(Form("Pspx%d_%dHit",d+1,f+1)));
+        }
 
-    // MAIN FOLDER-AMS
-    TFolder* mainfolPspx = new TFolder("PSPX", "PSPX info");
-    TCanvas* cMap = new TCanvas("Map_PSPX", "Pspx Map", 10, 10, 1100, 1000);
-    fh_pspx_map = new TH2F("PSPX_map", "PSPX_map", 5008, 0.5, 1028.5, 300, -5., 20.5);
-    fh_pspx_map->GetXaxis()->SetTitle("Strip number [1-128]");
-    fh_pspx_map->GetYaxis()->SetTitle("Detector number [1-3]");
-    fh_pspx_map->GetXaxis()->CenterTitle(true);
-    fh_pspx_map->GetYaxis()->CenterTitle(true);
-    fh_pspx_map->GetYaxis()->SetTitleOffset(1.5);
-    fh_pspx_map->GetXaxis()->SetTitleOffset(1.1);
-    cMap->cd();
-    fh_pspx_map->Draw("colz");
-    mainfolPspx->Add(cMap);
-
-    TCanvas* cPspx_comp = new TCanvas("Pspx_comp", "Pspx Comparison", 10, 10, 1100, 1000);
-    cPspx_comp->Divide(6, 3);
+        if(fMappedItemsPspx[0]==NULL){
+            printf("Couldn't get handle on PSPX mapped items\n");
+            return kFATAL;
+        }
+    }
+    Int_t mappedSize = fMappedItemsPspx.size();
+    Int_t precalSize = fPrecalItemsPspx.size();
+    Int_t calSize = fCalItemsPspx.size();
+    Int_t hitSize = fHitItemsPspx.size();
 
     Int_t Emax = 500000;
 
-    if (fMappedItemsPspx)
-    {
-        // LOG(INFO) << "Init MappedPspx";
+    // LOG(INFO) << "Init MappedPspx" << FairLogger::endl;
 
-        for (UInt_t i = 0; i < N_PSPX; i++)
-        {
-            if (i % 2 == 0)
-            { // even numbers = read out with energy filter
-                fh_pspx_channel_x[i] =
-                    new TH1F(Form("pspx_%d_energyreadout_channel_x", i / 2),
-                             Form("Pspx %d Energy Readout: x Channel;x Position / Channel;Counts", i / 2 + 1),
-                             2 * N_STRIPS_PSPX,
-                             1,
-                             2 * N_STRIPS_PSPX + 1);
-                fh_pspx_channel_y[i] =
-                    new TH1F(Form("pspx_%d_energyreadout_channel_y", i / 2),
-                             Form("Pspx %d Energy Readout: y Channel;y Position / Channel;Counts", i / 2 + 1),
-                             2 * N_STRIPS_PSPX,
-                             2 * N_STRIPS_PSPX + 1,
-                             4 * N_STRIPS_PSPX + 1);
+    std::string xy[2] = {"x","y"};
+    //std::string ep[2] = {"Energy","Position"};
+    std::string histoName, histoTitle;
+    fh_pspx_multiplicity.resize(mappedSize);
+    fh_pspx_strip_1.resize(mappedSize);
+    fh_pspx_energy_strip_1.resize(mappedSize);
+    fh_pspx_strip_2.resize(mappedSize);
+    fh_pspx_energy_strip_2.resize(mappedSize);
 
-                fh_pspx_multiplicity_x[i] =
-                    new TH1F(Form("pspx_%d_energyreadout_multiplicity_x", i / 2),
-                             Form("Pspx %d Energy Readout: x Multiplicity;Multiplicity;Counts", i / 2 + 1),
-                             10,
-                             0,
-                             10);
-                fh_pspx_multiplicity_y[i] =
-                    new TH1F(Form("pspx_%d_energyreadout_multiplicity_y", i / 2),
-                             Form("Pspx %d Energy Readout: y Multiplicity;Multiplicity;Counts", i / 2 + 1),
-                             10,
-                             0,
-                             10);
-                fh_pspx_strips_position[i] = new TH2F(
-                    Form("pspx_%d_energyreadout_strips", i),
-                    Form("Pspx %d Energy Readout Position;x Position / Strips; y Position / Strips", i / 2 + 1),
-                    N_STRIPS_PSPX,
-                    1,
-                    N_STRIPS_PSPX + 1,
-                    N_STRIPS_PSPX,
-                    N_STRIPS_PSPX + 1,
-                    2 * N_STRIPS_PSPX + 1);
-            }
-            else
-            { // odd numbers = read out with position filter
-                fh_pspx_channel_x[i] =
-                    new TH1F(Form("pspx_%d_positionreadout_channel_x", i / 2),
-                             Form("Pspx %d Position Readout: x Channel;x Position / Channel;Counts", i / 2 + 1),
-                             2 * N_STRIPS_PSPX,
-                             1,
-                             2 * N_STRIPS_PSPX + 1);
-                fh_pspx_channel_y[i] =
-                    new TH1F(Form("pspx_%d_positionreadout_channel_y", i / 2),
-                             Form("Pspx %d Position Readout: y Channel;y Position / Channel;Counts", i / 2 + 1),
-                             2 * N_STRIPS_PSPX,
-                             2 * N_STRIPS_PSPX + 1,
-                             4 * N_STRIPS_PSPX + 1);
+    // Create histograms
+    // Mapped level
+    for (UInt_t i = 0; i < mappedSize; i++){
+        histoName = "pspx_" + std::to_string((i/2)+1) + "_" + xy[i%2] + "_multiplicity";
+        histoTitle = "Pspx " + std::to_string((i/2)+1) + ": " + xy[i%2] + " Multiplicity;Multiplicity;Counts";
+        fh_pspx_multiplicity[i] = new TH1F(histoName.data(),histoTitle.data(),10,0,10);
 
-                fh_pspx_multiplicity_x[i] =
-                    new TH1F(Form("pspx_%d_positionreadout_multiplicity_x", i / 2),
-                             Form("Pspx %d Position Readout: x Multiplicity;Multiplicity;Counts", i / 2 + 1),
-                             10,
-                             0,
-                             10);
-                fh_pspx_multiplicity_y[i] =
-                    new TH1F(Form("pspx_%d_positionreadout_multiplicity_y", i / 2),
-                             Form("Pspx %d Position Readout: y Multiplicity;Multiplicity;Counts", i / 2 + 1),
-                             10,
-                             0,
-                             10);
-                fh_pspx_strips_position[i] = new TH2F(
-                    Form("pspx_%d_positionreadout_strips", i),
-                    Form("Pspx %d Position Readout Position;x Position / Strips; y Position / Strips", i / 2 + 1),
-                    N_STRIPS_PSPX,
-                    1,
-                    N_STRIPS_PSPX + 1,
-                    N_STRIPS_PSPX,
-                    N_STRIPS_PSPX + 1,
-                    2 * N_STRIPS_PSPX + 1);
-            }
-        }
+        histoName = "pspx_" + std::to_string((i/2)+1) + "_" + xy[i%2] + "_strip_1";
+        histoTitle = "Pspx " + std::to_string((i/2)+1) + ": " + xy[i%2] + " Strip Side 1;Strip;Counts";
+        fh_pspx_strip_1[i] = new TH1F(histoName.data(),histoTitle.data(),32,1,33);
 
-        TCanvas* cPspx_strips = new TCanvas("Pspx_strips", "Pspx Strips", 10, 10, 1100, 1000);
-        cPspx_strips->Divide(N_PSPX, 2);
+        histoName = "pspx_" + std::to_string((i/2)+1) + "_" + xy[i%2] + "_energy_strip_1";
+        histoTitle = "Pspx " + std::to_string((i/2)+1) + ": " + xy[i%2] + " Energy vs Strip Side 1;Strip;Energy";
+        fh_pspx_energy_strip_1[i] = new TH2F(histoName.data(),histoTitle.data(),32,1,33,1000,0,1e6);
 
-        TCanvas* cPspx_energy_strips = new TCanvas("Pspx_energy_vs_strip", "Pspx energy vs Strips", 10, 10, 1100, 1000);
-        cPspx_energy_strips->Divide(3, 1);
+        histoName = "pspx_" + std::to_string((i/2)+1) + "_" + xy[i%2] + "_strip_2";
+        histoTitle = "Pspx " + std::to_string((i/2)+1) + ": " + xy[i%2] + " Strip Side 2;Strip;Counts";
+        fh_pspx_strip_2[i] = new TH1F(histoName.data(),histoTitle.data(),32,1,33);
 
-        for (UInt_t i = 0; i < N_PSPX; i++)
-        {
-            cPspx_strips->cd(i + 1);
-            fh_pspx_channel_x[i]->Draw();
-
-            cPspx_strips->cd(i + 1 + N_PSPX);
-            fh_pspx_channel_y[i]->Draw();
-        }
-
-        mainfolPspx->Add(cPspx_strips);
-
-        for (UInt_t i = 0; i < 3; i++)
-        {
-            fh_pspx_energy_strip[i] = new TH2F(Form("PSPX_%d_energy_strips", i + 1),
-                                               Form("PSPX %d Energy vs Strip number", i + 1),
-                                               N_STRIPS_PSPX * 4,
-                                               1,
-                                               N_STRIPS_PSPX * 4 + 1,
-                                               32500,
-                                               0,
-                                               65535);
-            fh_pspx_energy_strip[i]->GetXaxis()->SetTitle("Strip number[1-128]");
-            fh_pspx_energy_strip[i]->GetYaxis()->SetTitle("Energy [0-65535]");
-            fh_pspx_energy_strip[i]->GetXaxis()->CenterTitle(true);
-            fh_pspx_energy_strip[i]->GetYaxis()->CenterTitle(true);
-            fh_pspx_energy_strip[i]->GetYaxis()->SetTitleOffset(1.5);
-            fh_pspx_energy_strip[i]->GetXaxis()->SetTitleOffset(1.1);
-            cPspx_energy_strips->cd(i + 1);
-            fh_pspx_energy_strip[i]->Draw("colz");
-        }
-        mainfolPspx->Add(cPspx_energy_strips);
-
-        TCanvas* cPspx_multiplicity = new TCanvas("Pspx_multiplicity", "Pspx Multiplicity", 10, 10, 1100, 1000);
-        cPspx_multiplicity->Divide(N_PSPX, 2);
-
-        for (UInt_t i = 0; i < N_PSPX; i++)
-        {
-            cPspx_multiplicity->cd(i + 1);
-            fh_pspx_multiplicity_x[i]->Draw();
-
-            cPspx_multiplicity->cd(i + 1 + N_PSPX);
-            fh_pspx_multiplicity_y[i]->Draw();
-        }
-
-        mainfolPspx->Add(cPspx_multiplicity);
-
-        // Fill cPspx_comp with Mapped level data
-        for (UInt_t i = 0; i < N_PSPX; i++)
-        {
-            cPspx_comp->cd(i + 1);
-            fh_pspx_strips_position[i]->Draw("colz");
-
-            // Remove the current axis
-            fh_pspx_strips_position[i]->GetYaxis()->SetLabelOffset(999);
-            fh_pspx_strips_position[i]->GetYaxis()->SetTickLength(0);
-
-            // Redraw the new inverted axis
-            gPad->Update();
-            TGaxis* newaxis = new TGaxis(gPad->GetUxmin(),
-                                         gPad->GetUymax(),
-                                         gPad->GetUxmin() - 0.001,
-                                         gPad->GetUymin(),
-                                         fh_pspx_strips_position[i]->GetYaxis()->GetXmin(),
-                                         fh_pspx_strips_position[i]->GetYaxis()->GetXmax(),
-                                         510,
-                                         "+");
-            newaxis->SetLabelOffset(0.003);
-            newaxis->SetLabelSize(0.03);
-            newaxis->SetTickLength(0.025);
-            newaxis->Draw();
-        }
+        histoName = "pspx_" + std::to_string((i/2)+1) + "_" + xy[i%2] + "_energy_strip_2";
+        histoTitle = "Pspx " + std::to_string((i/2)+1) + ": " + xy[i%2] + " Energy vs Strip Side 2;Strip;Energy";
+        fh_pspx_energy_strip_2[i] = new TH2F(histoName.data(),histoTitle.data(),32,1,33,1000,0,1e6);
     }
 
-    if (fCalItemsPspx)
+    // Cal level
+    for (UInt_t i = 0; i < calSize/4; i++)
     {
-        UInt_t nbins = 200;
-
-        for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
-        {
-            fh_pspx_cal_energy_frontback[i] =
-                new TH2F(Form("pspx_%d_energy_frontback", i),
-                         Form("Pspx %d Energy Back vs Front;Front Energy / arb.u.;Back Energy / arb.u.", i + 1),
-                         nbins,
-                         0,
-                         Emax,
-                         nbins,
-                         -Emax,
-                         0);
-        }
-
-        // Fill cPspx_comp with Cal level data
-        for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
-        {
-            cPspx_comp->cd(i + 1 + N_PSPX); // i*2
-            fh_pspx_cal_energy_frontback[i]->Draw("colz");
-        }
+        histoName = "pspx_" + std::to_string(i+1) + "_cal_strip_frontback";
+        histoTitle = "Pspx " + std::to_string(i+1) + ": " + xy[i%2] + " Cal Strip;XStrip;YStrip";
+        fh_pspx_cal_strip_frontback[i] = new TH2F(histoName.data(),histoTitle.data(),32,1,33,32,1,33);
+        histoName = "pspx_" + std::to_string(i+1) + "_cal_pos_frontback";
+        histoTitle = "Pspx " + std::to_string(i+1) + ": " + xy[i%2] + " Cal Pos;XPos;YPos";
+        fh_pspx_cal_pos_frontback[i] = new TH2F(histoName.data(),histoTitle.data(),200,-1,1,200,-1,1);
+        histoName = "pspx_" + std::to_string(i+1) + "_cal_energy_frontback";
+        histoTitle = "Pspx " + std::to_string(i+1) + ": " + xy[i%2] + " Cal Energy;XEnergy;YEnergy";
+        fh_pspx_cal_energy_frontback[i] = new TH2F(histoName.data(),histoTitle.data(),1e3,0,1e5,1e3,0,1e5);
     }
 
-    if (fHitItemsPspx)
-    {
-        UInt_t nbins = 100;
-        UInt_t length = 10; // detector length, range of histogram
+    // Create canvasses 
+    TFolder* mainfolPspx = new TFolder("PSPX","PSPX info");
+    TCanvas* cPspx_strips = new TCanvas("Pspx_strips", "Pspx Strips", 10, 10, 1100, 1000);
+    cPspx_strips->Divide(mappedSize/2, 4);
+    for (UInt_t i = 0; i < mappedSize; i++){
+        cPspx_strips->cd(2*i+1);
+        fh_pspx_strip_1[i]->Draw();
+        cPspx_strips->cd(2*i+2);
+        fh_pspx_strip_2[i]->Draw();
+    }
+    mainfolPspx->Add(cPspx_strips);
 
-        for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
-        {
-            fh_pspx_hit_position[i] = new TH2F(Form("pspx_%d_position_cm", i),
-                                               Form("Pspx %d Position;x Position / cm; y Position / cm", i + 1),
-                                               nbins,
-                                               -length / 2.,
-                                               length / 2.,
-                                               nbins,
-                                               -length / 2.,
-                                               length / 2.);
+    TCanvas* cPspx_multiplicity = new TCanvas("Pspx_multiplicity", "Pspx Multiplicity", 10, 10, 1100, 1000);
+    cPspx_multiplicity->Divide(mappedSize/2, 2);
+    for (UInt_t i = 0; i < mappedSize; i++){
+        cPspx_multiplicity->cd(2*i+1);
+        fh_pspx_multiplicity[i]->Draw();
+    }
+    mainfolPspx->Add(cPspx_multiplicity);
 
-            fh_pspx_hit_energy[i] = new TH1F(
-                Form("pspx_%d_energy", i), Form("Pspx %d Energy;Energy / arb.u.; Counts", i + 1), nbins, 0, Emax);
-        }
+    TCanvas* cPspx_energy_strips = new TCanvas("Pspx_energy_vs_strip", "Pspx Energy vs Strips", 10, 10, 1100, 1000);
+    cPspx_energy_strips->Divide(mappedSize/2,4);
+    for (UInt_t i = 0; i < mappedSize; i++){
+        cPspx_energy_strips->cd(2*i+1);
+        fh_pspx_energy_strip_1[i]->Draw("colz");
+        cPspx_energy_strips->cd(2*i+2);
+        fh_pspx_energy_strip_2[i]->Draw("colz");
+    }
+    mainfolPspx->Add(cPspx_energy_strips);
 
-        TCanvas* cPspx_hit = new TCanvas("Pspx_hit", "Pspx Hit", 10, 10, 1100, 1000);
-        cPspx_hit->Divide((N_PSPX + 1) / 2, 2);
-
-        for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
-        {
-            cPspx_hit->cd(i + 1);
-            fh_pspx_hit_position[i]->Draw("colz");
-
-            cPspx_hit->cd(i + 1 + (N_PSPX + 1) / 2);
-            fh_pspx_hit_energy[i]->Draw();
-        }
-
-        mainfolPspx->Add(cPspx_hit);
-
-        // Fill cPspx_comp with Hit level data-((channel_y[i][0] + 1) / 2) + 3 * N_STRIPS_PSPX + 1)
-        for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
-        {
-            cPspx_comp->cd(i * 2 + 2 * N_PSPX + 1); // supposed to be +2 if
-                                                    // energy and position
-                                                    // readout is used
-            fh_pspx_hit_position[i]->Draw("colz");
-        }
+    TCanvas* cPspx_cal = new TCanvas("Pspx_cal", "Pspx Cal Level front vs back", 10, 10, 1100, 1000);
+    cPspx_cal->Divide(calSize/2,4);
+    for (UInt_t i = 0; i < calSize/2; i++){
+        cPspx_cal->cd(i+1); //i*2
+        fh_pspx_cal_strip_frontback[i]->Draw("colz");
+        cPspx_cal->cd(i+2); //i*2
+        fh_pspx_cal_pos_frontback[i]->Draw("colz");
+        cPspx_cal->cd(i+3); //i*2
+        fh_pspx_cal_energy_frontback[i]->Draw("colz");
     }
 
-    mainfolPspx->Add(cPspx_comp);
+    mainfolPspx->Add(cPspx_cal);
     run->AddObject(mainfolPspx);
 
     run->GetHttpServer()->RegisterCommand("Reset_PSPX", Form("/Objects/%s/->Reset_PSPX_Histo()", GetName()));
@@ -361,34 +218,20 @@ InitStatus R3BPspxOnlineSpectra::Init()
 
 void R3BPspxOnlineSpectra::Reset_PSPX_Histo()
 {
-    if (fMappedItemsPspx)
+    for (UInt_t i = 0; i < fMappedItemsPspx.size(); i++)
     {
-        for (UInt_t i = 0; i < N_PSPX; i++)
-        {
-            fh_pspx_channel_x[i]->Reset();
-            fh_pspx_channel_y[i]->Reset();
-            fh_pspx_multiplicity_x[i]->Reset();
-            fh_pspx_multiplicity_y[i]->Reset();
-            fh_pspx_strips_position[i]->Reset();
-        }
-        fh_pspx_map->Reset();
-        for (UInt_t i = 0; i < 3; i++)
-            fh_pspx_energy_strip[i]->Reset();
+        fh_pspx_multiplicity[i]->Reset();
+        fh_pspx_strip_1[i]->Reset();
+        fh_pspx_strip_2[i]->Reset();
+        fh_pspx_energy_strip_1[i]->Reset();
+        fh_pspx_energy_strip_2[i]->Reset();
     }
-    if (fCalItemsPspx)
+
+    for (UInt_t i = 0; i <  fCalItemsPspx.size() / 2; i++)
     {
-        for (UInt_t i = 0; i < N_PSPX / 2; i++)
-        {
-            fh_pspx_cal_energy_frontback[i]->Reset();
-        }
-    }
-    if (fHitItemsPspx)
-    {
-        for (UInt_t i = 0; i < N_PSPX / 2; i++)
-        {
-            fh_pspx_hit_position[i]->Reset();
-            fh_pspx_hit_energy[i]->Reset();
-        }
+        fh_pspx_cal_strip_frontback[i]->Reset();
+        fh_pspx_cal_pos_frontback[i]->Reset();
+        fh_pspx_cal_energy_frontback[i]->Reset();
     }
 }
 
@@ -396,7 +239,7 @@ void R3BPspxOnlineSpectra::Exec(Option_t* option)
 {
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3BPspxOnlineSpectra::Exec FairRootManager not found";
+        LOG(FATAL) << "R3BPspxOnlineSpectra::Exec FairRootManager not found" << FairLogger::endl;
     // check for requested trigger (Todo: should be done globablly / somewhere else)
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
         return;
@@ -404,157 +247,34 @@ void R3BPspxOnlineSpectra::Exec(Option_t* option)
     //----------------------------------------------------------------------
     // PSPX
     //----------------------------------------------------------------------
-    if (fMappedItemsPspx)
+
+    for (UInt_t d = 0; d < fMappedItemsPspx.size(); d++)
     {
-        UInt_t mult_x[N_PSPX];
-        UInt_t mult_y[N_PSPX];
-
-        UInt_t channel_x[N_PSPX][N_STRIPS_PSPX * 2];
-        UInt_t channel_y[N_PSPX][N_STRIPS_PSPX * 2];
-
-        for (UInt_t i = 0; i < N_PSPX; i++)
-        {
-            mult_x[i] = 0;
-            mult_y[i] = 0;
-
-            for (UInt_t j = 0; j < N_STRIPS_PSPX * 2; j++)
-            {
-                channel_x[i][j] = 0;
-                channel_y[i][j] = 0;
-            }
-        }
-
-        Int_t nHits = fMappedItemsPspx->GetEntriesFast();
-
+        Int_t nHits = fMappedItemsPspx[d]->GetEntriesFast();
+        fh_pspx_multiplicity[d]->Fill(nHits);
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BPspxMappedData* mappedData = (R3BPspxMappedData*)fMappedItemsPspx->At(ihit);
-            UInt_t i = mappedData->GetDetector() - 1;
+            R3BPspxMappedData* mappedData = (R3BPspxMappedData*)fMappedItemsPspx[d]->At(ihit);
 
-            // std::cout <<i<<" "<<mappedData->GetChannel()<<" "<<mappedData->GetEnergy()<< std::endl;
-            fh_pspx_energy_strip[int(i / N_PSPX)]->Fill(mappedData->GetChannel(), mappedData->GetEnergy());
-
-            fh_pspx_map->Fill(mappedData->GetChannel(), i);
-
-            if (mappedData->GetChannel() > N_STRIPS_PSPX * 2 && mappedData->GetChannel() < N_STRIPS_PSPX * 4 + 1)
-            {
-                // LOG(INFO) << "Test1 " << i << " " << mappedData->GetDetector() << " " <<
-                // mappedData->GetChannel();
-                channel_y[i][mult_y[i]] = mappedData->GetChannel();
-                mult_y[i]++;
-            }
-            else if (mappedData->GetChannel() > 0 && mappedData->GetChannel() < N_STRIPS_PSPX * 2 + 1)
-            {
-                // LOG(INFO) << "Test2 " << i << " " << mappedData->GetDetector() << " " <<
-                // mappedData->GetChannel();
-                channel_x[i][mult_x[i]] = mappedData->GetChannel();
-                mult_x[i]++;
-            }
-        }
-
-        for (UInt_t i = 0; i < N_PSPX; i++)
-        {
-            // LOG(INFO) << "Test3 " << i << " " << mult_x[i] << " " << mult_y[i];
-            fh_pspx_multiplicity_x[i]->Fill(mult_x[i]);
-            fh_pspx_multiplicity_y[i]->Fill(mult_y[i]);
-            // LOG(INFO) << "Test4 " << fh_pspx_multiplicity_x[i]->GetBinContent(1);
-
-            std::vector<int> v_ch_x, v_ch_y;
-            for (Int_t j = 0; j < mult_x[i]; j++)
-            {
-                if ((channel_x[i][j] + 1) / 2 == (channel_x[i][j + 1] + 1) / 2)
-                {
-                    v_ch_x.push_back((channel_x[i][j] + 1) / 2);
-                }
-            }
-            for (Int_t j = 0; j < mult_y[i]; j++)
-            {
-                if ((channel_y[i][j] + 1) / 2 == (channel_y[i][j + 1] + 1) / 2)
-                {
-                    v_ch_y.push_back((channel_y[i][j] + 1) / 2);
-                }
-            }
-            for (auto it_x = v_ch_x.begin(); v_ch_x.end() != it_x; ++it_x)
-            {
-                for (auto it_y = v_ch_y.begin(); v_ch_y.end() != it_y; ++it_y)
-                {
-                    fh_pspx_strips_position[i]->Fill(
-                        *it_x,
-                        -*it_y + 3 * N_STRIPS_PSPX + 1); // with inverted axis to account for orientation
-                    // fh_pspx_strips_position[i]->Fill((channel_x[i][0] + 1) / 2, ((channel_y[i][0] + 1) / 2));
-                    // //without inverted axis => wrong orientation y axis
-                }
-            }
-
-            // std::cout << "x: " << mult_x[i] << ", " << (channel_x[i][0]+1)/2 << endl;
-            // std::cout << "y: " << mult_y[i] << ", " << -((int)channel_y[i][0]+1)/2 + 3 * N_STRIPS_PSPX + 1<< endl;
-
-            for (Int_t j = 0; j < mult_x[i]; j++)
-            {
-                fh_pspx_channel_x[i]->Fill(channel_x[i][j]);
-            }
-
-            for (Int_t j = 0; j < mult_y[i]; j++)
-            {
-                fh_pspx_channel_y[i]->Fill(channel_y[i][j]);
-            }
+            fh_pspx_strip_1[d]->Fill(mappedData->GetStrip1());
+            fh_pspx_strip_2[d]->Fill(mappedData->GetStrip2());
+            fh_pspx_energy_strip_1[d]->Fill(mappedData->GetStrip1(),mappedData->GetEnergy1());
+            fh_pspx_energy_strip_2[d]->Fill(mappedData->GetStrip2(),mappedData->GetEnergy2());
         }
     }
-
-    if (fCalItemsPspx)
+    for (UInt_t d = 0; d < fCalItemsPspx.size()/2; d++)
     {
-        Int_t energy_front[N_PSPX];
-        Int_t energy_back[N_PSPX];
-
-        for (UInt_t i = 0; i < N_PSPX; i++)
-        {
-            energy_front[i] = 0;
-            energy_back[i] = 0;
-        }
-
-        Int_t nHits = fCalItemsPspx->GetEntriesFast();
+        Int_t nHits1 = fCalItemsPspx[2*d]->GetEntriesFast();
+        Int_t nHits2 = fCalItemsPspx[2*d+1]->GetEntriesFast();
+        Int_t nHits = (nHits1<nHits2) ? nHits1 : nHits2;
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            for (UInt_t i = 0; i < N_PSPX; i++)
-            {
-                R3BPspxCalData* calData = (R3BPspxCalData*)fCalItemsPspx->At(ihit);
-                if (calData->GetDetector() == i + 1 && calData->GetStrip() > N_STRIPS_PSPX &&
-                    calData->GetStrip() < N_STRIPS_PSPX * 2 + 1)
-                {
-                    energy_back[i] += (calData->GetEnergy1() + calData->GetEnergy2());
-                }
-                else if (calData->GetDetector() == i + 1 && calData->GetStrip() > 0 &&
-                         calData->GetStrip() < N_STRIPS_PSPX + 1)
-                {
-                    energy_front[i] += (calData->GetEnergy1() + calData->GetEnergy2());
-                }
-            }
-        }
-
-        for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
-        {
-            // LOG(INFO) << "Test " << i << " " << energy_front[i] << " " << energy_back[i];
-            fh_pspx_cal_energy_frontback[i]->Fill(energy_front[i], energy_back[i]);
-        }
-    }
-
-    if (fHitItemsPspx)
-    {
-        Int_t nHits = fHitItemsPspx->GetEntriesFast();
-
-        for (Int_t ihit = 0; ihit < nHits; ihit++)
-        {
-            for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
-            {
-                R3BPspxHitData* hitData = (R3BPspxHitData*)fHitItemsPspx->At(ihit);
-
-                if (hitData->GetDetector() == i * 2 + 1)
-                {
-                    fh_pspx_hit_energy[i]->Fill(hitData->GetEnergy());
-                    fh_pspx_hit_position[i]->Fill(hitData->GetX(), hitData->GetY());
-                }
-            }
+            R3BPspxCalData* calData1 = (R3BPspxCalData*)fCalItemsPspx[2*d]->At(ihit);
+            R3BPspxCalData* calData2 = (R3BPspxCalData*)fCalItemsPspx[2*d+1]->At(ihit);
+            fh_pspx_cal_strip_frontback[d]->Fill(calData1->GetStrip(),calData2->GetStrip());
+            fh_pspx_cal_pos_frontback[d]->Fill(calData1->GetPos(),calData2->GetPos());
+            fh_pspx_cal_energy_frontback[d]->Fill(calData1->GetEnergy(),calData2->GetEnergy());
         }
     }
     fNEvents += 1;
@@ -562,57 +282,32 @@ void R3BPspxOnlineSpectra::Exec(Option_t* option)
 
 void R3BPspxOnlineSpectra::FinishEvent()
 {
-    if (fMappedItemsPspx)
-    {
-        fMappedItemsPspx->Clear();
-    }
-    if (fPrecalItemsPspx)
-    {
-        fPrecalItemsPspx->Clear();
-    }
-    if (fCalItemsPspx)
-    {
-        fCalItemsPspx->Clear();
-    }
-    if (fHitItemsPspx)
-    {
-        fHitItemsPspx->Clear();
-    }
+    fMappedItemsPspx.clear();
+    fPrecalItemsPspx.clear();
+    fCalItemsPspx.clear();
+    fHitItemsPspx.clear();
 }
 
 void R3BPspxOnlineSpectra::FinishTask()
 {
 
-    if (fMappedItemsPspx)
-    {
-        // LOG(INFO) << "Finish MappedPspx";
+    // LOG(INFO) << "Finish MappedPspx" << FairLogger::endl;
 
-        for (UInt_t i = 0; i < N_PSPX; i++)
-        {
-            fh_pspx_channel_x[i]->Write();
-            fh_pspx_channel_y[i]->Write();
-            fh_pspx_multiplicity_x[i]->Write();
-            fh_pspx_multiplicity_y[i]->Write();
-            fh_pspx_strips_position[i]->Write();
-        }
-        for (UInt_t i = 0; i < 3; i++)
-            fh_pspx_energy_strip[i]->Write();
-    }
-    if (fCalItemsPspx)
+    for (UInt_t i = 0; i < fMappedItemsPspx.size(); i++)
     {
-        for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
-        {
-            fh_pspx_cal_energy_frontback[i]->Write();
-        }
+        fh_pspx_multiplicity[i]->Write();
+        fh_pspx_strip_1[i]->Write();
+        fh_pspx_strip_2[i]->Write();
+        fh_pspx_energy_strip_1[i]->Write();
+        fh_pspx_energy_strip_2[i]->Write();
     }
-    if (fHitItemsPspx)
+    for (UInt_t i = 0; i < fCalItemsPspx.size()/2; i++)
     {
-        for (UInt_t i = 0; i < (N_PSPX + 1) / 2; i++)
-        {
-            fh_pspx_hit_energy[i]->Write();
-            fh_pspx_hit_position[i]->Write();
-        }
+        fh_pspx_cal_strip_frontback[i]->Write();
+        fh_pspx_cal_pos_frontback[i]->Write();
+        fh_pspx_cal_energy_frontback[i]->Write();
     }
+    
 }
 
 ClassImp(R3BPspxOnlineSpectra)

@@ -2433,7 +2433,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
     //----------------------------------------------------------------------
     // PSPX
     //----------------------------------------------------------------------
-    if (fMappedItems.at(DET_PSPX))
+    /*if (fMappedItems.at(DET_PSPX))
     {
         UInt_t mult_x[N_PSPX];
         UInt_t mult_y[N_PSPX];
@@ -2619,21 +2619,21 @@ void R3BOnlineSpectra::Exec(Option_t* option)
                             (hitData->GetXMultiplicity() == 2 && hitData->GetYMultiplicity() == 4))
                         {
 
-                            fh_pspx_hit_position[i]->Fill(hitData->GetX(), hitData->GetY());
+                            // fh_pspx_hit_position[i]->Fill(hitData->GetX(), hitData->GetY());
 
-                            /*if(hitData->GetDetector() == 1 ){//&& hitData->GetX() > -5 && hitData->GetX() < 5){
+                            // if(hitData->GetDetector() == 1 ){//&& hitData->GetX() > -5 && hitData->GetX() < 5){
 
-                             fh_los_pos_MCFD->Fill(xV_cm[0],yV_cm[0]);
-                             fh_los_pos_TAMEX->Fill(xT_cm[0],yT_cm[0]);
-                             fh_los_pos_ToT->Fill(xToT_cm[0],yToT_cm[0]);
-                            }*/
+                            //  fh_los_pos_MCFD->Fill(xV_cm[0],yV_cm[0]);
+                            //  fh_los_pos_TAMEX->Fill(xT_cm[0],yT_cm[0]);
+                            //  fh_los_pos_ToT->Fill(xToT_cm[0],yToT_cm[0]);
+                            // }
                         }
                     }
                 }
             }
         }
     }
-
+*/
     fNEvents += 1;
 }
 

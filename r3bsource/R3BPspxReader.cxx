@@ -21,12 +21,9 @@
 #include "R3BPspxReader.h"
 #include "TClonesArray.h"
 
-extern "C"
-{
-#include "ext_data_client.h"
-#include "ext_h101_psp.h"
-    //#include "ext_h101_psp_jun16.h"
-    //#include "ext_h101.h"
+extern "C" {
+    #include "ext_data_client.h"
+    #include "ext_h101_psp.h"
 }
 
 #define LENGTH(x) (sizeof x / sizeof *x)
@@ -36,17 +33,22 @@ R3BPspxReader::R3BPspxReader(EXT_STR_h101_PSP* data, UInt_t offset)
     , fData(data)
     , fOffset(offset)
     , fOnline(kFALSE)
-    , fNbDetectors(6)
     , fLogger(FairLogger::GetLogger())
-    , fMappedItems(new TClonesArray("R3BPspxMappedData"))
+    , fMappedItems(2*LENGTH(((EXT_STR_h101_PSP_onion*)data)->PSPX)) // number of faces of detectors
 {
+    EXT_STR_h101_PSP_onion* data_o = (EXT_STR_h101_PSP_onion*)fData;
+    for (Int_t d = 0; d < 2*LENGTH(data_o->PSPX); d++){
+        fMappedItems[d] = new TClonesArray("R3BPspxMappedData");
+    }
+    printf("Length: %d\n", LENGTH(data_o->PSPX));
+    LOG(INFO) << "R3BPspxReader: Created " << 2*LENGTH(data_o->PSPX) << " detectors." << FairLogger::endl;
 }
 
 R3BPspxReader::~R3BPspxReader()
 {
-    if (fMappedItems)
-    {
-        delete fMappedItems;
+    EXT_STR_h101_PSP_onion* data = (EXT_STR_h101_PSP_onion*)fData;
+    for (Int_t d = 0; d < 2*LENGTH(data->PSPX); d++){
+        delete fMappedItems[d];
     }
 }
 
@@ -55,9 +57,8 @@ R3BPspxReader::~R3BPspxReader()
  */
 Bool_t R3BPspxReader::Init(ext_data_struct_info* a_struct_info)
 {
-
     Int_t ok;
-    LOG(INFO) << "R3BPspxReader::Init";
+    LOG(INFO) << "R3BPspxReader::Init" << FairLogger::endl;
     EXT_STR_h101_PSP_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_PSP, 0);
 
     if (!ok)
@@ -66,163 +67,78 @@ Bool_t R3BPspxReader::Init(ext_data_struct_info* a_struct_info)
         LOG(error) << "Failed to setup structure information.";
         return kFALSE;
     }
-
+    const char xy[2] = {'x','y'}; // orientation of detector face
     // Register output array in tree
-    FairRootManager::Instance()->Register("PspxMapped", "Pspx", fMappedItems, kTRUE);
-
+    EXT_STR_h101_PSP_onion* data = (EXT_STR_h101_PSP_onion*)fData;
+    for (Int_t d = 0; d < LENGTH(data->PSPX); d++){
+        for(Int_t f = 0; f < 2; f++){
+            FairRootManager::Instance()->Register(Form("Pspx%d_%cMapped",d+1,xy[f]), Form("Pspx%d_%c",d+1,xy[f]), fMappedItems[2*d+f], kTRUE);
+            LOG(INFO) << "Registered Pspx" << d+1 << "_" << xy[f] << FairLogger::endl;
+        }
+    }
     return kTRUE;
 }
 
-// ----  Initialisation  ----------------------------------------------
 /**
- * Initialize/Reads parameter file for conversion.
- */
-void R3BPspxReader::SetParContainers()
-{
-    LOG(INFO) << "R3BPspxReader :: SetParContainers() ";
-
-    fMappedPar = (R3BPspxMappedPar*)FairRuntimeDb::instance()->getContainer("R3BPspxMappedPar");
-
-    // Get Base Container
-    // FairRunAna* ana = FairRunAna::Instance();
-    // FairRuntimeDb* rtdb=ana->GetRuntimeDb();
-
-    // fMappedPar = (R3BPspxMappedPar*) (rtdb->getContainer("R3BPspxMappedPar"));
-    /*
-        if (!fMappedPar)
-        {
-            LOG(ERROR) << "Could not get access to R3BPspxMappedPar-Container.";
-            return;
-        }
-
-        fMappedPar->printparams();
-
-    */
-}
-
-// ---- ReInit  -------------------------------------------------------
-/**
- * Initialize/Reads parameter file for conversion.
- */
-Bool_t R3BPspxReader::ReInit()
-{
-    LOG(INFO) << " R3BPspxReader :: ReInit() ";
-
-    // FairRunAna* ana = FairRunAna::Instance();
-    // FairRuntimeDb* rtdb=ana->GetRuntimeDb();
-
-    // fMappedPar = (R3BPspxMappedPar*) (rtdb->getContainer("R3BPspxMappedPar"));
-    /*
-        fMappedPar = (R3BPspxMappedPar*)FairRuntimeDb::instance()->getContainer("R3BPspxMappedPar");
-
-        if (!fMappedPar)
-        {
-            LOG(ERROR) << "Could not get access to R3BPspxMappedPar-Container.";
-            return kFALSE;
-        }
-    */
-    return kTRUE;
-}
-
-// --------------------------------------------------------------------
-/**
- * Does the unpacking to Mapped level. It is called for every event.
- * Converts plain raw data to multi-dimensional array.
- * Ignores energies with an error message.
- * Although, ucesb is multi-hit capable, only the first entry is used for the PSPX detectors.
- */
+  * Does the unpacking to Mapped level. It is called for every event.
+  * Converts plain raw data to multi-dimensional array.
+  * Ignores energies with an error message.
+  */
 Bool_t R3BPspxReader::Read()
 {
     EXT_STR_h101_PSP_onion* data = (EXT_STR_h101_PSP_onion*)fData;
 
-    // Display data
-    // LOG(info) << "  Event data:";
-
-    /*
-      // this is the data structure we have to read:
+#if 0
+    // this is the data structure we have to read:
+    struct {
       struct {
-        uint32_t M;                 // number of channels with data
-        uint32_t MI[65 / * M * /];  // channel number
-        uint32_t ME[65 / * M * /];  // offset in v array for that channel
-        uint32_t _;                 // num items in v
-        uint32_t v[650 / * _ * /];  // the energy data
-      } PSPX[5];
+        struct {
+          uint32_t E;
+          uint32_t EI[32 /* E */];
+          uint32_t Ev[32 /* E */];
+        } S[2];
+      } F[2];
+    } PSPX[N];
 
-    * More info on the data format at:
-    * https://forum.gsi.de/index.php?t=msg&th=4798&start=0&
-    *
-    * At the moment there are 2 types of detectors: X1 (strips on one side) & X5 (strips on both sides).
-    * Each X1 (X5) detector has 65 (128) channels:
-    * 16 (32) * 2 channels for vertical strips
-    * 16 (32)* 2 channels for horizontal strips
-    * 1 channel for the cathode (only X1)
-    *
-    * If one detector (e.g. X1) has either vertical OR horizontal strips, 32 channels are empty.
-    *
-    * Example:
-    * Channel numbers:
-    * 1) v1_bottom
-    * 2) v1_top
-    * 3) v2_bottom
-    * 4) v2_top
-    * ...
-    * 33) h1_right
-    * 34) h1_left
-    * 35) h2_right
-    * 36) h2_left
-    * ...
-    * 65) cathode
-    */
-
+    F = Face (front/back of detector)
+    S = Side (end of strip)
+#endif
+    
     // loop over all detectors
-    for (int d = 0; d < LENGTH(data->PSPX); d++)
+    for (Int_t d = 0; d < LENGTH(data->PSPX); d++)
     {
-        // if (fMappedPar->GetPspxParStrip().At(d) == 0)
-        //   continue; // skip PSPs that are read out with other electronics (e.g. MADC32)
-
-        uint32_t numChannels = data->PSPX[d].M; // not necessarly number of hits! (b/c multi hit)
-
-        // loop over channels
-        uint32_t curChannelStart = 0; // index in v for first item of current channel
-        for (int i = 0; i < numChannels; i++)
+        // loop over faces
+        for (Int_t f = 0; f < 2; f++)
         {
-            uint32_t channel = data->PSPX[d].MI[i]; // counting from 1 to max number of channels for an detector
-            uint32_t nextChannelStart = data->PSPX[d].ME[i]; // index in v for first item of next channel
+            std::vector<R3BPspxMappedData*> datas(LENGTH(data->PSPX[0].F[0].S[0].EI));
+            // loop over strip sides
+            for (Int_t s = 0; s < 2; s++)
+            {
+                auto const & dfs =  data->PSPX[d].F[f].S[s];
+                uint32_t numChannels = dfs.E; 
+                // loop over channels
+                for (Int_t i = 0; i < numChannels; i++)
+                {
+                    int32_t strip = dfs.EI[i];          // counting from 1 to max number of channels for an detector
+                    int32_t energy = dfs.Ev[i];
+                    if(energy<0) energy = -1.*energy;  // make sure energy values are positive. Necessary for compatibilty with GSI Febex firmware
 
-            // if we had multi hit data, we would need to read
-            // j=curChannelStart; j < nextChannelStart; j++.
-            // For the PSPs, however, we take the first hit only:
-            int32_t energy = data->PSPX[d].v[curChannelStart];
-
-            // For certain (old) unpackers: The first 22 bits are energy. Bit 23 should be 0. Bit 24 is sign.
-            // comment from old s438b reader:  0xfff is energy data, Anything in 0xfffff000 indicates an error or
-            // overflow. still usefull?
-
-            // if (energy == 0xEEEEEE) continue; // get rid of error message code: only valid for certain ucesb
-            // unpackers
-
-            //	    if (energy == -3075811 || energy == -3075810) {
-            //		LOG(ERROR)<< "R3BPspxReader::Read(): Error Code from Febex Unpacker";
-            //		continue; // get rid of error message code: -3075810 = 0xeeeeee2, -3075811 = 0xeeeee3
-            //	    }
-
-            // if ((energy & 0x800000))
-            //    energy = -1*(energy - 0x800000); // subtracting the sign bit (set to 1 for negative values) and
-            //    multiplying with -1 to get negative energy value, only possible for certain ucesb unpackers
-
-            if (TMath::Abs(energy) < 4194303)
-            { // = 2^22 -1 max value possible for Febex wtih 22 bits for enery entry + additional sign bit #24
-                new ((*fMappedItems)[fMappedItems->GetEntriesFast()]) R3BPspxMappedData(
-                    d + 1, channel, energy); // det,channel,energy counting from 1 for detectors and channels
+                    //if (!datas[strip-1]) datas[strip-1] = new ((*fMappedItems[d])[fMappedItems[d]->GetEntriesFast()]) R3BPspxMappedData(f+1,strip); 
+                    if (!datas[strip-1]) datas[strip-1] = new ((*fMappedItems[2*d+f])[fMappedItems[2*d+f]->GetEntriesFast()]) R3BPspxMappedData(); 
+                    // assert(-1 == datas[strip-1]->GetEnergy(s));
+                    datas[strip-1]->SetValue(s,strip,energy);
+	            }
             }
-
-            curChannelStart = nextChannelStart;
         }
     }
-
     return kTRUE;
 }
 
-void R3BPspxReader::Reset() { fMappedItems->Clear(); }
+void R3BPspxReader::Reset() { 
+    EXT_STR_h101_PSP_onion* data = (EXT_STR_h101_PSP_onion*)fData;
+    for (Int_t d = 0; d < 2*LENGTH(data->PSPX); d++){
+        fMappedItems[d]->Clear(); 
+    }
+}
 
 ClassImp(R3BPspxReader)

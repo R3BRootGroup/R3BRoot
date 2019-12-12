@@ -14,13 +14,11 @@
 // ------------------------------------------------------------
 // -----                  R3BPspxOnlineSpectra            -----
 // -----          Created Feb 23th 2019 by J.L. Rodriguez -----
+// -----              Modified Dec 2019 by M. Holl        -----
 // ------------------------------------------------------------
 
 #ifndef R3BPspxOnlineSpectra_H
 #define R3BPspxOnlineSpectra_H
-
-#define N_PSPX 6 // max value 6 at the moment
-#define N_STRIPS_PSPX 32
 
 #include "FairTask.h"
 #include <array>
@@ -101,30 +99,29 @@ class R3BPspxOnlineSpectra : public FairTask
     void Reset_PSPX_Histo();
 
   private:
-    TClonesArray* fMappedItemsPspx; /**< Array with Mapped items for Pspx. */
-    TClonesArray* fPrecalItemsPspx; /**< Array with Precal items for Pspx. */
-    TClonesArray* fCalItemsPspx;    /**< Array with Cal items for Pspx. */
-    TClonesArray* fHitItemsPspx;    /**< Array with Hit items for Pspx. */
+
+    std::vector<TClonesArray*> fMappedItemsPspx; /**< Array with Mapped items for Pspx. */
+    std::vector<TClonesArray*> fPrecalItemsPspx; /**< Array with Precal items for Pspx. */
+    std::vector<TClonesArray*> fCalItemsPspx;    /**< Array with Cal items for Pspx. */
+    std::vector<TClonesArray*> fHitItemsPspx;    /**< Array with Hit items for Pspx. */
 
     // check for trigger should be done globablly (somewhere else)
-    R3BEventHeader* header; /**< Event header. */
-    Int_t fTrigger;         /**< Trigger value. */
-    Int_t fNEvents;         /**< Event counter. */
+    R3BEventHeader* header;            /**< Event header. */
+    Int_t fTrigger;                    /**< Trigger value. */
+    Int_t fNEvents;        	     /**< Event counter. */
 
-    TH1F* fh_pspx_channel_x[N_PSPX];      /**< PSPX x channel profile on mapped level */
-    TH1F* fh_pspx_channel_y[N_PSPX];      /**< PSPX y channel profile on mapped level */
-    TH1F* fh_pspx_multiplicity_x[N_PSPX]; /**< PSPX x multiplicity on mapped level */
-    TH1F* fh_pspx_multiplicity_y[N_PSPX]; /**< PSPX y multiplicity on mapped level */
-
-    TH2F* fh_pspx_strips_position[N_PSPX];        /**< PSPX 2D position on mapped level */
-    TH2F* fh_pspx_hit_position[(N_PSPX + 1) / 2]; /**< PSPX 2D position on hit level */
-
-    TH1F* fh_pspx_hit_energy[(N_PSPX + 1) / 2];           /**< PSPX energy on hit level */
-    TH2F* fh_pspx_cal_energy_frontback[(N_PSPX + 1) / 2]; /**< PSPX energy front vs back on cal level */
-    TH2F *fh_pspx_energy_strip[3], *fh_pspx_map;
-
+    std::vector<TH1F*> fh_pspx_multiplicity; /**< PSPX multiplicity on mapped level */
+    std::vector<TH1F*> fh_pspx_strip_1;      /**< PSPX channel profile on mapped level */
+    std::vector<TH1F*> fh_pspx_strip_2;      /**< PSPX channel profile on mapped level */
+    std::vector<TH2F*> fh_pspx_energy_strip_1;        /**< PSPX energy vs strip on mapped level */
+    std::vector<TH2F*> fh_pspx_energy_strip_2;        /**< PSPX energy vs strip on mapped level */
+    
+    std::vector<TH2F*> fh_pspx_cal_strip_frontback; /**< PSPX strip front vs back on cal level */
+    std::vector<TH2F*> fh_pspx_cal_pos_frontback; /**< PSPX position front vs back on cal level */
+    std::vector<TH2F*> fh_pspx_cal_energy_frontback; /**< PSPX energy front vs back on cal level */
+  
   public:
-    ClassDef(R3BPspxOnlineSpectra, 1)
+    ClassDef(R3BPspxOnlineSpectra, 2)
 };
 
 #endif

@@ -10,13 +10,11 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
-
-// -----------------------------------------------------------------------------
-// -----                                                                   -----
-// -----                           R3BPspxPrecal2Cal                       -----
-// -----                    Created  20-03-2017 by I. Syndikus		   -----
-// -----                                                                   -----
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------
+// -----                    R3BPspxPrecal2Cal                 -----
+// -----            Created  20-03-2017 by I. Syndikus		  -----
+// -----              Modified  Dec 2019  by M. Holl		  -----
+// ----------------------------------------------------------------
 
 #ifndef R3BPSPXPRECAL2CAL_H
 #define R3BPSPXPRECAL2CAL_H
@@ -29,9 +27,11 @@ class R3BPspxCalPar;
 
 /**
  * Class to convert Precal data to Cal data for PSPX detector data.
- * This means: Apply gain for energy matching of all strips.
+ * Gains for energy matching of all strips are applied
+ * Total deposited energt and position in internal coordinates is calculated
  * @author Ina Syndikus
  * @since March 20, 2016
+ * Modified Dec 2019 by M.Holl
  */
 
 class R3BPspxPrecal2Cal : public FairTask
@@ -47,6 +47,7 @@ class R3BPspxPrecal2Cal : public FairTask
     virtual InitStatus Init();
     InitStatus ReInit();
     void SetParContainers();
+    void SetParameters();
 
     virtual void Exec(Option_t* option);
 
@@ -55,17 +56,14 @@ class R3BPspxPrecal2Cal : public FairTask
 
   private:
     R3BEventHeader* fHeader;    // do we need that?
-    TClonesArray* fPrecalItems; /**< Array holding input (Precal) data */
-    TClonesArray* fCalItems;    /**< Array holding output (Cal) data */
+    std::vector<TClonesArray*> fPrecalItems; /**< Arrays holding input (Precal) data */
+    std::vector<TClonesArray*> fCalItems;    /**< Arrays holding output (Cal) data */
 
     R3BPspxCalPar* fCalPar; /**< Parameter instance holding gain for energy correction */
     std::vector<std::vector<Float_t>> gain;
 
-    // void CreateHistos();
-    // void WriteHistos();
-
   public:
-    ClassDef(R3BPspxPrecal2Cal, 3)
+    ClassDef(R3BPspxPrecal2Cal, 4)
 };
 
 #endif
