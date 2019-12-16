@@ -47,27 +47,33 @@ R3BPspxMapped2Precal::R3BPspxMapped2Precal(const char* name, Int_t iVerbose)
 
 R3BPspxMapped2Precal::~R3BPspxMapped2Precal() {}
 
-void R3BPspxMapped2Precal::SetParameters(){
+void R3BPspxMapped2Precal::SetParameters()
+{
 
     LOG(INFO) << "In R3BPspxMapped2Precal::SetParameters()" << FairLogger::endl;
     //--- Parameter Container ---
-    Int_t nDet=fPrecalPar->GetNumDetectors();//Number of Detectors/Faces
+    Int_t nDet = fPrecalPar->GetNumDetectors(); // Number of Detectors/Faces
     gain.resize(nDet);
     threshold1.resize(nDet);
     threshold2.resize(nDet);
-    for(Int_t d=0; d<nDet; d++){
-        Int_t nStrips=fPrecalPar->GetNumStrips().At(d);//Number of Strips
+    for (Int_t d = 0; d < nDet; d++)
+    {
+        Int_t nStrips = fPrecalPar->GetNumStrips().At(d); // Number of Strips
         gain[d].resize(nStrips);
         threshold1[d].resize(nStrips);
         threshold2[d].resize(nStrips);
-        Int_t parOffset = d*nStrips*4 + (d+1)*3; // Position in parameter list. 4 parameters per strip + 3 "header" parameters per detector.
-        for(Int_t s=0; s<nStrips; s++){
-            TArrayF par = fPrecalPar->GetPrecalPar();//Array with the parameters
-            gain[d][s]=par.At(parOffset+1);
-            threshold1[d][s]=par.At(parOffset+2);
-            threshold2[d][s]=par.At(parOffset+3);
+        Int_t parOffset =
+            d * nStrips * 4 +
+            (d + 1) * 3; // Position in parameter list. 4 parameters per strip + 3 "header" parameters per detector.
+        for (Int_t s = 0; s < nStrips; s++)
+        {
+            TArrayF par = fPrecalPar->GetPrecalPar(); // Array with the parameters
+            gain[d][s] = par.At(parOffset + 1);
+            threshold1[d][s] = par.At(parOffset + 2);
+            threshold2[d][s] = par.At(parOffset + 3);
             parOffset += 4; // move to next line in parameter file.
-            LOG(INFO)<< "Det: " << d <<"\tstr: " << s << "\tgain: " << gain[d][s] << "\tthr1: " << threshold1[d][s] << "\tthr2: " << threshold2[d][s] <<FairLogger::endl;
+            LOG(INFO) << "Det: " << d << "\tstr: " << s << "\tgain: " << gain[d][s] << "\tthr1: " << threshold1[d][s]
+                      << "\tthr2: " << threshold2[d][s] << FairLogger::endl;
         }
     }
 }
@@ -83,26 +89,31 @@ InitStatus R3BPspxMapped2Precal::Init()
     LOG(INFO) << "R3BPspxMapped2Precal :: Init() " << FairLogger::endl;
     FairRootManager* fMan = FairRootManager::Instance();
     fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
-    const char xy[2] = {'x','y'}; // orientation of detector face
+    const char xy[2] = { 'x', 'y' }; // orientation of detector face
     // Figure out how many detectors were registered by the reader
-    for(Int_t d = 0; ; d++){
+    for (Int_t d = 0;; d++)
+    {
         TClonesArray* tmp[2];
 
-        for(Int_t f = 0; f<2; f++){
-            tmp[f] = (TClonesArray*)fMan->GetObject(Form("Pspx%d_%cMapped",d+1,xy[f])); // = branch name in TTree
+        for (Int_t f = 0; f < 2; f++)
+        {
+            tmp[f] = (TClonesArray*)fMan->GetObject(Form("Pspx%d_%cMapped", d + 1, xy[f])); // = branch name in TTree
         }
-        if(tmp[0]==NULL&&tmp[1]==NULL){
-            if (d==0)
+        if (tmp[0] == NULL && tmp[1] == NULL)
+        {
+            if (d == 0)
             {
                 printf("Couldn't get handle on PSPX mapped items\n");
                 return kFATAL;
             }
             break;
         }
-        for(Int_t f = 0; f<2; f++){
+        for (Int_t f = 0; f < 2; f++)
+        {
             fMappedItems.push_back(tmp[f]);
             fPrecalItems.push_back(new TClonesArray("R3BPspxPrecalData"));
-            FairRootManager::Instance()->Register(Form("Pspx%d_%cPrecal",d+1,xy[f]), Form("Pspx%d_%c",d+1,xy[f]), fPrecalItems.back(), kTRUE);
+            FairRootManager::Instance()->Register(
+                Form("Pspx%d_%cPrecal", d + 1, xy[f]), Form("Pspx%d_%c", d + 1, xy[f]), fPrecalItems.back(), kTRUE);
         }
     }
 
@@ -155,42 +166,54 @@ void R3BPspxMapped2Precal::Exec(Option_t* option)
      * Applies (strip specific) gains to the energy entries of side 2 of the strip. This is
      * the first calibration step for the position reconstruction.
      */
-    for (Int_t d = 0; d<fMappedItems.size(); d++){
-        if (!fMappedItems[d]){
-            printf("Cannot access PSPX%d_%d mapped items\n",(d/2)+1,(d%2)+1);
+    for (Int_t d = 0; d < fMappedItems.size(); d++)
+    {
+        if (!fMappedItems[d])
+        {
+            printf("Cannot access PSPX%d_%d mapped items\n", (d / 2) + 1, (d % 2) + 1);
             return;
         }
-        if (fPrecalPar->GetNumStrips().At(d) == 0) continue;
+        if (fPrecalPar->GetNumStrips().At(d) == 0)
+            continue;
 
         Int_t nMapped = fMappedItems[d]->GetEntries();
- 
-        for (Int_t i = 0; i < nMapped; i++){
-            
+
+        for (Int_t i = 0; i < nMapped; i++)
+        {
+
             R3BPspxMappedData* mappedData = (R3BPspxMappedData*)fMappedItems[d]->At(i);
 
             // get rid of error message from Febex (GSI firmware)
-            if (mappedData->GetEnergy1() == 3075811 || mappedData->GetEnergy1() == 3075810) continue;
-            if (mappedData->GetEnergy2() == 3075811 || mappedData->GetEnergy2() == 3075810) continue;
+            if (mappedData->GetEnergy1() == 3075811 || mappedData->GetEnergy1() == 3075810)
+                continue;
+            if (mappedData->GetEnergy2() == 3075811 || mappedData->GetEnergy2() == 3075810)
+                continue;
 
-            if (mappedData->GetStrip1() == mappedData->GetStrip2()){
+            if (mappedData->GetStrip1() == mappedData->GetStrip2())
+            {
                 Int_t strip = mappedData->GetStrip1();
-                if(TMath::Abs(mappedData->GetEnergy1())>threshold1[d][strip-1] &&
-                        TMath::Abs(mappedData->GetEnergy2())>threshold2[d][strip-1]){ // strips
+                if (TMath::Abs(mappedData->GetEnergy1()) > threshold1[d][strip - 1] &&
+                    TMath::Abs(mappedData->GetEnergy2()) > threshold2[d][strip - 1])
+                { // strips
                     Float_t energy1 = mappedData->GetEnergy1();
-                    Float_t energy2 = mappedData->GetEnergy2() * gain[d][strip-1];
-                    new ((*fPrecalItems[d])[fPrecalItems[d]->GetEntriesFast()])R3BPspxPrecalData(strip, energy1, energy2);
+                    Float_t energy2 = mappedData->GetEnergy2() * gain[d][strip - 1];
+                    new ((*fPrecalItems[d])[fPrecalItems[d]->GetEntriesFast()])
+                        R3BPspxPrecalData(strip, energy1, energy2);
                 }
             }
         }
-    }   
+    }
 }
 
-void R3BPspxMapped2Precal::FinishEvent() {
-    for(Int_t i = 0; i<fMappedItems.size() ; i++){
-        fMappedItems[i]->Clear(); 
+void R3BPspxMapped2Precal::FinishEvent()
+{
+    for (Int_t i = 0; i < fMappedItems.size(); i++)
+    {
+        fMappedItems[i]->Clear();
     }
-    for(Int_t i = 0; i<fPrecalItems.size() ; i++){
-        fPrecalItems[i]->Clear(); 
+    for (Int_t i = 0; i < fPrecalItems.size(); i++)
+    {
+        fPrecalItems[i]->Clear();
     }
 }
 

@@ -55,10 +55,10 @@ class R3BPspxMapped2Precal : public FairTask
     virtual void FinishTask();
 
   private:
-    R3BEventHeader* fHeader;    // do we need that?
+    R3BEventHeader* fHeader;                 // do we need that?
     std::vector<TClonesArray*> fMappedItems; /**< Arrays holding input (Mapped) data */
     std::vector<TClonesArray*> fPrecalItems; /**< Arrays holding output (Precal) data */
-    
+
     R3BPspxPrecalPar* fPrecalPar; /**< Parameter instance holding thresholds and gains for position correction */
     std::vector<std::vector<Float_t>> gain;
     std::vector<std::vector<Int_t>> threshold1;

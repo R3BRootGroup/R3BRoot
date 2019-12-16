@@ -21,9 +21,10 @@
 #include "R3BPspxReader.h"
 #include "TClonesArray.h"
 
-extern "C" {
-    #include "ext_data_client.h"
-    #include "ext_h101_psp.h"
+extern "C"
+{
+#include "ext_data_client.h"
+#include "ext_h101_psp.h"
 }
 
 #define LENGTH(x) (sizeof x / sizeof *x)
@@ -34,20 +35,22 @@ R3BPspxReader::R3BPspxReader(EXT_STR_h101_PSP* data, UInt_t offset)
     , fOffset(offset)
     , fOnline(kFALSE)
     , fLogger(FairLogger::GetLogger())
-    , fMappedItems(2*LENGTH(((EXT_STR_h101_PSP_onion*)data)->PSPX)) // number of faces of detectors
+    , fMappedItems(2 * LENGTH(((EXT_STR_h101_PSP_onion*)data)->PSPX)) // number of faces of detectors
 {
     EXT_STR_h101_PSP_onion* data_o = (EXT_STR_h101_PSP_onion*)fData;
-    for (Int_t d = 0; d < 2*LENGTH(data_o->PSPX); d++){
+    for (Int_t d = 0; d < 2 * LENGTH(data_o->PSPX); d++)
+    {
         fMappedItems[d] = new TClonesArray("R3BPspxMappedData");
     }
     printf("Length: %d\n", LENGTH(data_o->PSPX));
-    LOG(INFO) << "R3BPspxReader: Created " << 2*LENGTH(data_o->PSPX) << " detectors." << FairLogger::endl;
+    LOG(INFO) << "R3BPspxReader: Created " << 2 * LENGTH(data_o->PSPX) << " detectors." << FairLogger::endl;
 }
 
 R3BPspxReader::~R3BPspxReader()
 {
     EXT_STR_h101_PSP_onion* data = (EXT_STR_h101_PSP_onion*)fData;
-    for (Int_t d = 0; d < 2*LENGTH(data->PSPX); d++){
+    for (Int_t d = 0; d < 2 * LENGTH(data->PSPX); d++)
+    {
         delete fMappedItems[d];
     }
 }
@@ -67,23 +70,26 @@ Bool_t R3BPspxReader::Init(ext_data_struct_info* a_struct_info)
         LOG(error) << "Failed to setup structure information.";
         return kFALSE;
     }
-    const char xy[2] = {'x','y'}; // orientation of detector face
+    const char xy[2] = { 'x', 'y' }; // orientation of detector face
     // Register output array in tree
     EXT_STR_h101_PSP_onion* data = (EXT_STR_h101_PSP_onion*)fData;
-    for (Int_t d = 0; d < LENGTH(data->PSPX); d++){
-        for(Int_t f = 0; f < 2; f++){
-            FairRootManager::Instance()->Register(Form("Pspx%d_%cMapped",d+1,xy[f]), Form("Pspx%d_%c",d+1,xy[f]), fMappedItems[2*d+f], kTRUE);
-            LOG(INFO) << "Registered Pspx" << d+1 << "_" << xy[f] << FairLogger::endl;
+    for (Int_t d = 0; d < LENGTH(data->PSPX); d++)
+    {
+        for (Int_t f = 0; f < 2; f++)
+        {
+            FairRootManager::Instance()->Register(
+                Form("Pspx%d_%cMapped", d + 1, xy[f]), Form("Pspx%d_%c", d + 1, xy[f]), fMappedItems[2 * d + f], kTRUE);
+            LOG(INFO) << "Registered Pspx" << d + 1 << "_" << xy[f] << FairLogger::endl;
         }
     }
     return kTRUE;
 }
 
 /**
-  * Does the unpacking to Mapped level. It is called for every event.
-  * Converts plain raw data to multi-dimensional array.
-  * Ignores energies with an error message.
-  */
+ * Does the unpacking to Mapped level. It is called for every event.
+ * Converts plain raw data to multi-dimensional array.
+ * Ignores energies with an error message.
+ */
 Bool_t R3BPspxReader::Read()
 {
     EXT_STR_h101_PSP_onion* data = (EXT_STR_h101_PSP_onion*)fData;
@@ -103,7 +109,7 @@ Bool_t R3BPspxReader::Read()
     F = Face (front/back of detector)
     S = Side (end of strip)
 #endif
-    
+
     // loop over all detectors
     for (Int_t d = 0; d < LENGTH(data->PSPX); d++)
     {
@@ -114,30 +120,37 @@ Bool_t R3BPspxReader::Read()
             // loop over strip sides
             for (Int_t s = 0; s < 2; s++)
             {
-                auto const & dfs =  data->PSPX[d].F[f].S[s];
-                uint32_t numChannels = dfs.E; 
+                auto const& dfs = data->PSPX[d].F[f].S[s];
+                uint32_t numChannels = dfs.E;
                 // loop over channels
                 for (Int_t i = 0; i < numChannels; i++)
                 {
-                    int32_t strip = dfs.EI[i];          // counting from 1 to max number of channels for an detector
+                    int32_t strip = dfs.EI[i]; // counting from 1 to max number of channels for an detector
                     int32_t energy = dfs.Ev[i];
-                    if(energy<0) energy = -1.*energy;  // make sure energy values are positive. Necessary for compatibilty with GSI Febex firmware
+                    if (energy < 0)
+                        energy = -1. * energy; // make sure energy values are positive. Necessary for compatibilty with
+                                               // GSI Febex firmware
 
-                    //if (!datas[strip-1]) datas[strip-1] = new ((*fMappedItems[d])[fMappedItems[d]->GetEntriesFast()]) R3BPspxMappedData(f+1,strip); 
-                    if (!datas[strip-1]) datas[strip-1] = new ((*fMappedItems[2*d+f])[fMappedItems[2*d+f]->GetEntriesFast()]) R3BPspxMappedData(); 
+                    // if (!datas[strip-1]) datas[strip-1] = new ((*fMappedItems[d])[fMappedItems[d]->GetEntriesFast()])
+                    // R3BPspxMappedData(f+1,strip);
+                    if (!datas[strip - 1])
+                        datas[strip - 1] = new ((*fMappedItems[2 * d + f])[fMappedItems[2 * d + f]->GetEntriesFast()])
+                            R3BPspxMappedData();
                     // assert(-1 == datas[strip-1]->GetEnergy(s));
-                    datas[strip-1]->SetValue(s,strip,energy);
-	            }
+                    datas[strip - 1]->SetValue(s, strip, energy);
+                }
             }
         }
     }
     return kTRUE;
 }
 
-void R3BPspxReader::Reset() { 
+void R3BPspxReader::Reset()
+{
     EXT_STR_h101_PSP_onion* data = (EXT_STR_h101_PSP_onion*)fData;
-    for (Int_t d = 0; d < 2*LENGTH(data->PSPX); d++){
-        fMappedItems[d]->Clear(); 
+    for (Int_t d = 0; d < 2 * LENGTH(data->PSPX); d++)
+    {
+        fMappedItems[d]->Clear();
     }
 }
 

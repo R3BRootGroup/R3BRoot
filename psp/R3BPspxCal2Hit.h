@@ -57,7 +57,7 @@ class R3BPspxCal2Hit : public FairTask
     virtual void FinishTask();
 
   private:
-    R3BEventHeader* fHeader; // do we need that?
+    R3BEventHeader* fHeader;              // do we need that?
     std::vector<TClonesArray*> fCalItems; /**< Array holding input (Cal) data */
     std::vector<TClonesArray*> fHitItems; /**< Array holding output (Hit) data */
 
@@ -69,7 +69,7 @@ class R3BPspxCal2Hit : public FairTask
     std::vector<Float_t> eOffset;
     std::vector<Float_t> eGain;
     std::vector<Float_t> eRange;
-  
+
   public:
     ClassDef(R3BPspxCal2Hit, 4)
 };

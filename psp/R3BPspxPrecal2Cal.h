@@ -55,7 +55,7 @@ class R3BPspxPrecal2Cal : public FairTask
     virtual void FinishTask();
 
   private:
-    R3BEventHeader* fHeader;    // do we need that?
+    R3BEventHeader* fHeader;                 // do we need that?
     std::vector<TClonesArray*> fPrecalItems; /**< Arrays holding input (Precal) data */
     std::vector<TClonesArray*> fCalItems;    /**< Arrays holding output (Cal) data */
 

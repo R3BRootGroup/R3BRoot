@@ -35,17 +35,17 @@ class R3BPspxMappedData : public TObject
     /** Destructor **/
     virtual ~R3BPspxMappedData() {}
 
-    void SetValue(Int_t,Int_t,Int_t);
+    void SetValue(Int_t, Int_t, Int_t);
     // Getters
-    inline const Int_t& GetStrip1()  const { return fStrip [0]; }
-    inline const Int_t& GetStrip2()  const { return fStrip [1]; }
+    inline const Int_t& GetStrip1() const { return fStrip[0]; }
+    inline const Int_t& GetStrip2() const { return fStrip[1]; }
     inline const Int_t& GetEnergy1() const { return fEnergy[0]; }
     inline const Int_t& GetEnergy2() const { return fEnergy[1]; }
 
   private:
-    Int_t fStrip[2];    // Channel number, counting from 1, one entry for each side of each strip
-    Int_t fEnergy[2];   // Energy/Collected charge, one entry for each side of each strip
-    
+    Int_t fStrip[2];  // Channel number, counting from 1, one entry for each side of each strip
+    Int_t fEnergy[2]; // Energy/Collected charge, one entry for each side of each strip
+
   public:
     ClassDef(R3BPspxMappedData, 5)
 };

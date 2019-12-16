@@ -65,16 +65,18 @@ void R3BPspxPrecalPar::printParams()
 void R3BPspxPrecalPar::putParams(FairParamList* l)
 {
     LOG(INFO) << "I am in R3BPspxPrecalPar::putParams ";
-    if(!l) return; 
+    if (!l)
+        return;
 
     l->add("R3BPspxPrecalDetectors", fNumDetectors);
     l->add("R3BPspxPrecalStrips", fNumStrips);
 
     Int_t count_strips = 0;
-    for (Int_t i = 0; i < fNumDetectors; i++){
+    for (Int_t i = 0; i < fNumDetectors; i++)
+    {
         count_strips += fNumStrips[i];
     }
-    
+
     // count all entries: lines with strip info (4 entries) + lines with detector info (3 entries)
     Int_t array_size = (count_strips * 4 + fNumDetectors * 3);
     LOG(INFO) << "R3BPspxPrecalPar Array Size: " << array_size;
@@ -87,24 +89,35 @@ Bool_t R3BPspxPrecalPar::getParams(FairParamList* l)
     // print();
     LOG(INFO) << "I am in R3BPspxPrecalPar::getParams ";
 
-    if (!l){ return kFALSE; }
-        
+    if (!l)
+    {
+        return kFALSE;
+    }
+
     fNumStrips.Set(fNumDetectors);
 
-    if (!l->fill("R3BPspxPrecalDetectors", &fNumDetectors)){ return kFALSE; }
-    if (!l->fill("R3BPspxPrecalStrips", &fNumStrips)){ return kFALSE; }
+    if (!l->fill("R3BPspxPrecalDetectors", &fNumDetectors))
+    {
+        return kFALSE;
+    }
+    if (!l->fill("R3BPspxPrecalStrips", &fNumStrips))
+    {
+        return kFALSE;
+    }
 
     Int_t count_strips = 0;
-    for (Int_t i = 0; i < fNumDetectors; i++){
+    for (Int_t i = 0; i < fNumDetectors; i++)
+    {
         count_strips += fNumStrips[i];
     }
-    
+
     LOG(INFO) << "Total number of strips: " << count_strips;
     // count all entries: lines with strip info (4 entries) + lines with detector info (3 entries)
     Int_t array_size = (count_strips * 4 + fNumDetectors * 3);
     LOG(INFO) << "R3BPspxPrecalPar Array Size: " << array_size;
     fPrecalPar.Set(array_size);
-    if (!(l->fill("R3BPspxPrecalPar", &fPrecalPar))){
+    if (!(l->fill("R3BPspxPrecalPar", &fPrecalPar)))
+    {
         LOG(WARNING) << "Could not initialize R3BPspxPrecalPar";
         return kFALSE;
     }

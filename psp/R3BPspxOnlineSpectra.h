@@ -99,27 +99,26 @@ class R3BPspxOnlineSpectra : public FairTask
     void Reset_PSPX_Histo();
 
   private:
-
     std::vector<TClonesArray*> fMappedItemsPspx; /**< Array with Mapped items for Pspx. */
     std::vector<TClonesArray*> fPrecalItemsPspx; /**< Array with Precal items for Pspx. */
     std::vector<TClonesArray*> fCalItemsPspx;    /**< Array with Cal items for Pspx. */
     std::vector<TClonesArray*> fHitItemsPspx;    /**< Array with Hit items for Pspx. */
 
     // check for trigger should be done globablly (somewhere else)
-    R3BEventHeader* header;            /**< Event header. */
-    Int_t fTrigger;                    /**< Trigger value. */
-    Int_t fNEvents;        	     /**< Event counter. */
+    R3BEventHeader* header; /**< Event header. */
+    Int_t fTrigger;         /**< Trigger value. */
+    Int_t fNEvents;         /**< Event counter. */
 
-    std::vector<TH1F*> fh_pspx_multiplicity; /**< PSPX multiplicity on mapped level */
-    std::vector<TH1F*> fh_pspx_strip_1;      /**< PSPX channel profile on mapped level */
-    std::vector<TH1F*> fh_pspx_strip_2;      /**< PSPX channel profile on mapped level */
-    std::vector<TH2F*> fh_pspx_energy_strip_1;        /**< PSPX energy vs strip on mapped level */
-    std::vector<TH2F*> fh_pspx_energy_strip_2;        /**< PSPX energy vs strip on mapped level */
-    
-    std::vector<TH2F*> fh_pspx_cal_strip_frontback; /**< PSPX strip front vs back on cal level */
-    std::vector<TH2F*> fh_pspx_cal_pos_frontback; /**< PSPX position front vs back on cal level */
+    std::vector<TH1F*> fh_pspx_multiplicity;   /**< PSPX multiplicity on mapped level */
+    std::vector<TH1F*> fh_pspx_strip_1;        /**< PSPX channel profile on mapped level */
+    std::vector<TH1F*> fh_pspx_strip_2;        /**< PSPX channel profile on mapped level */
+    std::vector<TH2F*> fh_pspx_energy_strip_1; /**< PSPX energy vs strip on mapped level */
+    std::vector<TH2F*> fh_pspx_energy_strip_2; /**< PSPX energy vs strip on mapped level */
+
+    std::vector<TH2F*> fh_pspx_cal_strip_frontback;  /**< PSPX strip front vs back on cal level */
+    std::vector<TH2F*> fh_pspx_cal_pos_frontback;    /**< PSPX position front vs back on cal level */
     std::vector<TH2F*> fh_pspx_cal_energy_frontback; /**< PSPX energy front vs back on cal level */
-  
+
   public:
     ClassDef(R3BPspxOnlineSpectra, 2)
 };

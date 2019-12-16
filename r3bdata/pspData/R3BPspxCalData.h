@@ -41,9 +41,9 @@ class R3BPspxCalData : public TObject
     inline const Float_t& GetPos() const { return fPos; }
 
   private:
-    Int_t fStrip;       // Strip number, counting from 1
-    Float_t fEnergy;    // Total energy/collected charge from both sides of hit strip. This value is gainmatched.
-    Float_t fPos;       // Position calculated from energy difference from both sides. Internal coordinates from -1 to +1
+    Int_t fStrip;    // Strip number, counting from 1
+    Float_t fEnergy; // Total energy/collected charge from both sides of hit strip. This value is gainmatched.
+    Float_t fPos;    // Position calculated from energy difference from both sides. Internal coordinates from -1 to +1
 
   public:
     ClassDef(R3BPspxCalData, 7)

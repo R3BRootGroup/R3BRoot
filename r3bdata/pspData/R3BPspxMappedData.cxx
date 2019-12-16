@@ -14,21 +14,21 @@
 #include "R3BPspxMappedData.h"
 
 R3BPspxMappedData::R3BPspxMappedData()
-    : fStrip{-1,-1}
-    , fEnergy{-1,-1}
+    : fStrip{ -1, -1 }
+    , fEnergy{ -1, -1 }
 {
 }
 
 R3BPspxMappedData::R3BPspxMappedData(Int_t strip1, Int_t strip2, Int_t energy1, Int_t energy2)
-    : fStrip{strip1,strip2}
-    , fEnergy{energy1,energy2}
+    : fStrip{ strip1, strip2 }
+    , fEnergy{ energy1, energy2 }
 {
 }
 
 void R3BPspxMappedData::SetValue(Int_t side, Int_t strip, Int_t energy)
 {
-    fStrip[side]=strip;
-    fEnergy[side]=energy;
+    fStrip[side] = strip;
+    fEnergy[side] = energy;
 }
 
 ClassImp(R3BPspxMappedData)

@@ -40,9 +40,9 @@ class R3BPspxHitData : public TObject
     inline const Float_t& GetPos() const { return fPos; }
 
   private:
-    Float_t fEnergy;    // Energy/Collected charge in MeV
-    Float_t fPos;       // Position in x cm in the range [-l/2:l/2]
-  
+    Float_t fEnergy; // Energy/Collected charge in MeV
+    Float_t fPos;    // Position in x cm in the range [-l/2:l/2]
+
   public:
     ClassDef(R3BPspxHitData, 7)
 };

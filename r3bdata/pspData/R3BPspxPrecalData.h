@@ -41,9 +41,11 @@ class R3BPspxPrecalData : public TObject
     inline const Float_t& GetEnergy2() const { return fEnergy2; }
 
   private:
-    Int_t fStrip;       // Strip number, counting from 1 */
-    Float_t fEnergy1;   //Energy/Collected charge for side 1 of the strip. This value needs no gain correction (Mapped2Precal Position Calibration).
-    Float_t fEnergy2;   //Energy/Collected charge for side 2 of  the strip. This value is gain corrected (Mapped2Precal Position Calibration).
+    Int_t fStrip;     // Strip number, counting from 1 */
+    Float_t fEnergy1; // Energy/Collected charge for side 1 of the strip. This value needs no gain correction
+                      // (Mapped2Precal Position Calibration).
+    Float_t fEnergy2; // Energy/Collected charge for side 2 of  the strip. This value is gain corrected (Mapped2Precal
+                      // Position Calibration).
 
   public:
     ClassDef(R3BPspxPrecalData, 3)

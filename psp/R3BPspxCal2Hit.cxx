@@ -49,39 +49,44 @@ R3BPspxCal2Hit::~R3BPspxCal2Hit() {}
 
 // -- SetParameters
 // -- Read calibration parameters
-void R3BPspxCal2Hit::SetParameters(){
+void R3BPspxCal2Hit::SetParameters()
+{
 
     LOG(INFO) << "In R3BPspxCal2Hit::SetParameters()" << FairLogger::endl;
     //--- Parameter Container ---
-    Int_t nDet=fHitPar->GetNumDetectors();//Number of Detectors/Faces
+    Int_t nDet = fHitPar->GetNumDetectors(); // Number of Detectors/Faces
     orientation.resize(nDet);
     detSize.resize(nDet);
     posOffset.resize(nDet);
     posSlope.resize(nDet);
     LOG(INFO) << "Position Parameters" << FairLogger::endl;
-    for(Int_t d=0; d<nDet; d++){
-        Int_t parOffset = 1; // 1 "header" parameter.
-        TArrayF par = fHitPar->GetHitPosPar();//Array with the parameters
-        orientation[d]=par.At(parOffset+2);
-        detSize[d]=par.At(parOffset+3);
-        posOffset[d]=par.At(parOffset+4);
-        posSlope[d]=par.At(parOffset+5);
+    for (Int_t d = 0; d < nDet; d++)
+    {
+        Int_t parOffset = 1;                   // 1 "header" parameter.
+        TArrayF par = fHitPar->GetHitPosPar(); // Array with the parameters
+        orientation[d] = par.At(parOffset + 2);
+        detSize[d] = par.At(parOffset + 3);
+        posOffset[d] = par.At(parOffset + 4);
+        posSlope[d] = par.At(parOffset + 5);
         parOffset += 6; // move to next line in parameter file.
-        LOG(INFO) << "Det: " << d << "\torientation: " << orientation[d] << "\tdetSize: " << detSize[d] <<"\toffset: " << posOffset[d] << "\tslope: " << posSlope[d] << FairLogger::endl;
+        LOG(INFO) << "Det: " << d << "\torientation: " << orientation[d] << "\tdetSize: " << detSize[d]
+                  << "\toffset: " << posOffset[d] << "\tslope: " << posSlope[d] << FairLogger::endl;
     }
-    
+
     eOffset.resize(nDet);
     eGain.resize(nDet);
     eRange.resize(nDet);
     LOG(INFO) << "Energy Parameters" << FairLogger::endl;
-    for(Int_t d=0; d<nDet; d++){
-        Int_t parOffset = 1; // 1 "header" parameter.
-        TArrayF par = fHitPar->GetHitEPar();//Array with the parameters
-        eOffset[d]=par.At(parOffset+2);
-        eGain[d]=par.At(parOffset+3);
-        eRange[d]=par.At(parOffset+4);
+    for (Int_t d = 0; d < nDet; d++)
+    {
+        Int_t parOffset = 1;                 // 1 "header" parameter.
+        TArrayF par = fHitPar->GetHitEPar(); // Array with the parameters
+        eOffset[d] = par.At(parOffset + 2);
+        eGain[d] = par.At(parOffset + 3);
+        eRange[d] = par.At(parOffset + 4);
         parOffset += 5; // move to next line in parameter file.
-        LOG(INFO) << "Det: " << d << "\toffset: " << eOffset[d] << "\tslope: " << eGain[d] << "\trange: " << eRange[d] << FairLogger::endl;
+        LOG(INFO) << "Det: " << d << "\toffset: " << eOffset[d] << "\tslope: " << eGain[d] << "\trange: " << eRange[d]
+                  << FairLogger::endl;
     }
 }
 
@@ -91,27 +96,32 @@ InitStatus R3BPspxCal2Hit::Init()
 {
     FairRootManager* fMan = FairRootManager::Instance();
     fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
-    
-    const char xy[2] = {'x','y'}; // orientation of detector face
+
+    const char xy[2] = { 'x', 'y' }; // orientation of detector face
     // Figure out how many detectors were registered by the reader
-    for(Int_t d = 0; ; d++){
+    for (Int_t d = 0;; d++)
+    {
         TClonesArray* tmp[2];
 
-        for(Int_t f = 0; f<2; f++){
-            tmp[f] = (TClonesArray*)fMan->GetObject(Form("Pspx%d_%dCal",d+1,xy[f])); // = branch name in TTree
+        for (Int_t f = 0; f < 2; f++)
+        {
+            tmp[f] = (TClonesArray*)fMan->GetObject(Form("Pspx%d_%dCal", d + 1, xy[f])); // = branch name in TTree
         }
-        if(tmp[0]==NULL&&tmp[1]==NULL){
-            if (d==0)
+        if (tmp[0] == NULL && tmp[1] == NULL)
+        {
+            if (d == 0)
             {
                 printf("Couldn't get handle on PSPX cal items\n");
                 return kFATAL;
             }
             break;
         }
-        for(Int_t f = 0; f<2; f++){
+        for (Int_t f = 0; f < 2; f++)
+        {
             fCalItems.push_back(tmp[f]);
             fHitItems.push_back(new TClonesArray("R3BPspxHitData"));
-            FairRootManager::Instance()->Register(Form("Pspx%d_%dHit",d+1,xy[f]), Form("Pspx%d_%d",d+1,xy[f]), fHitItems.back(), kTRUE);
+            FairRootManager::Instance()->Register(
+                Form("Pspx%d_%dHit", d + 1, xy[f]), Form("Pspx%d_%d", d + 1, xy[f]), fHitItems.back(), kTRUE);
         }
     }
 
@@ -119,7 +129,6 @@ InitStatus R3BPspxCal2Hit::Init()
 
     return kSUCCESS;
 }
-
 
 // -- Initialisation
 // -- Initialize/Read parameter file for conversion.
@@ -129,7 +138,8 @@ void R3BPspxCal2Hit::SetParContainers()
 
     fHitPar = (R3BPspxHitPar*)FairRuntimeDb::instance()->getContainer("R3BPspxHitPar");
 
-    if (!fHitPar){
+    if (!fHitPar)
+    {
         LOG(ERROR) << "Could not get access to R3BPspxHitPar-Container." << FairLogger::endl;
         return;
     }
@@ -146,7 +156,8 @@ InitStatus R3BPspxCal2Hit::ReInit()
 
     fHitPar = (R3BPspxHitPar*)FairRuntimeDb::instance()->getContainer("R3BPspxHitPar");
 
-    if(!fHitPar){
+    if (!fHitPar)
+    {
         LOG(ERROR) << "Could not get access to R3BPspxHitPar-Container." << FairLogger::endl;
         return kFATAL;
     }
@@ -156,31 +167,39 @@ InitStatus R3BPspxCal2Hit::ReInit()
 
 void R3BPspxCal2Hit::Exec(Option_t* option)
 {
-    for (Int_t d = 0; d<fCalItems.size(); d++){
-        if (!fCalItems[d]){
-            printf("Cannot access PSPX%d_%d cal items\n",(d/2)+1,(d%2)+1);
+    for (Int_t d = 0; d < fCalItems.size(); d++)
+    {
+        if (!fCalItems[d])
+        {
+            printf("Cannot access PSPX%d_%d cal items\n", (d / 2) + 1, (d % 2) + 1);
             return;
         }
         Int_t nCal = fCalItems[d]->GetEntries();
-        
-        for (Int_t i = 0; i < nCal; i++){
+
+        for (Int_t i = 0; i < nCal; i++)
+        {
 
             R3BPspxCalData* calData = (R3BPspxCalData*)fCalItems[d]->At(i); // get cal level event
 
             Float_t energy = calData->GetEnergy() * eGain[d] + eOffset[d]; // convert energy to MeV
-            Float_t pos = calData->GetPos()*orientation[d]*detSize[d]; // convert position to mm, flip axis if necessary
-            pos = pos * posSlope[d] + posOffset[d]; // correct position for detector offset and tilt
-            new ((*fHitItems[d])[fHitItems[d]->GetEntriesFast()])R3BPspxHitData(energy, pos); // register hit level event
+            Float_t pos =
+                calData->GetPos() * orientation[d] * detSize[d]; // convert position to mm, flip axis if necessary
+            pos = pos * posSlope[d] + posOffset[d];              // correct position for detector offset and tilt
+            new ((*fHitItems[d])[fHitItems[d]->GetEntriesFast()])
+                R3BPspxHitData(energy, pos); // register hit level event
         }
     }
 }
 
-void R3BPspxCal2Hit::FinishEvent() {
-    for(Int_t i = 0; i<fCalItems.size() ; i++){
-        fCalItems[i]->Clear(); 
+void R3BPspxCal2Hit::FinishEvent()
+{
+    for (Int_t i = 0; i < fCalItems.size(); i++)
+    {
+        fCalItems[i]->Clear();
     }
-    for(Int_t i = 0; i<fHitItems.size() ; i++){
-        fHitItems[i]->Clear(); 
+    for (Int_t i = 0; i < fHitItems.size(); i++)
+    {
+        fHitItems[i]->Clear();
     }
 }
 

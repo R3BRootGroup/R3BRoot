@@ -41,7 +41,8 @@ void R3BPspxMappedPar::clear()
     resetInputVersions();
 }
 
-void R3BPspxMappedPar::printparams(){
+void R3BPspxMappedPar::printparams()
+{
 
     LOG(INFO) << "Print";
     LOG(INFO) << "pspxmappedpardetector: " << pspxmappedpardetector;
@@ -53,29 +54,35 @@ void R3BPspxMappedPar::printparams(){
     }
 }
 
-void R3BPspxMappedPar::putParams(FairParamList* l){
-    
+void R3BPspxMappedPar::putParams(FairParamList* l)
+{
+
     LOG(INFO) << "I am in R3BPspxMappedPar::putParams ";
-    if (!l){
+    if (!l)
+    {
         return;
     }
     l->add("R3BPspxMappedDetectors", pspxmappedpardetector);
     l->add("R3BPspxMappedStripsPerDetector", pspxmappedparstrip);
 }
 
-Bool_t R3BPspxMappedPar::getParams(FairParamList* l){
-    
+Bool_t R3BPspxMappedPar::getParams(FairParamList* l)
+{
+
     LOG(INFO) << "I am in R3BPspxMappedPar::getParams ";
 
-    if (!l){
+    if (!l)
+    {
         return kFALSE;
     }
-    if (!l->fill("R3BPspxMappedDetectors", &pspxmappedpardetector)){
+    if (!l->fill("R3BPspxMappedDetectors", &pspxmappedpardetector))
+    {
         return kFALSE;
     }
     pspxmappedparstrip.Set(pspxmappedpardetector);
 
-    if (!l->fill("R3BPspxMappedStripsPerDetector", &pspxmappedparstrip)){
+    if (!l->fill("R3BPspxMappedStripsPerDetector", &pspxmappedparstrip))
+    {
         return kFALSE;
     }
 

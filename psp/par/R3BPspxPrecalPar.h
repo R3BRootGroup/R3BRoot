@@ -52,7 +52,7 @@ class R3BPspxPrecalPar : public FairParGenericSet
     inline const Int_t& GetNumDetectors() const { return fNumDetectors; }
     inline const TArrayI& GetNumStrips() const { return fNumStrips; }
     inline const TArrayF& GetPrecalPar() const { return fPrecalPar; }
-    
+
     /** Print parameters **/
     virtual void printParams();
 
@@ -63,9 +63,9 @@ class R3BPspxPrecalPar : public FairParGenericSet
     Bool_t getParams(FairParamList*);
 
   private:
-    Int_t fNumDetectors;    // number of detectors
-    TArrayI fNumStrips;     // number of strips per detector
-    TArrayF fPrecalPar;     // calibration parameters for each strip
+    Int_t fNumDetectors; // number of detectors
+    TArrayI fNumStrips;  // number of strips per detector
+    TArrayF fPrecalPar;  // calibration parameters for each strip
 
     R3BPspxPrecalPar(const R3BPspxPrecalPar&);
     R3BPspxPrecalPar& operator=(const R3BPspxPrecalPar&);
