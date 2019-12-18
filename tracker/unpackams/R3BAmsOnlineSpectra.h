@@ -106,8 +106,8 @@ class R3BAmsOnlineSpectra : public FairTask
     Int_t fNEvents;         /**< Event counter. */
 
     TCanvas* cMap;
-    TCanvas* cCal;
-    TCanvas* cHit[4];
+    TCanvas *cCalL, *cCalR;
+    TCanvas* cHit[6];
 
     TH2F* fh_Ams_energy_allStrips[6];
     TH2F* fh_Ams_energy_allCalStrips[12];
