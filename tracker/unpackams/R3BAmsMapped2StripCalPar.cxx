@@ -200,7 +200,8 @@ void R3BAmsMapped2StripCalPar::PrintParamsDaq()
     Float_t threshold2 = 2.;
 
     // sam+gtb+siderem+20000
-    Int_t detID[fNumDets] = { 40120000, 40220000, 41120000, 50120000, 50220000, 51120000 };
+    // Int_t detID[fNumDets] = { 40120000, 40220000, 41120000, 50120000, 50220000, 51120000 };
+    Int_t detID[fNumDets] = { 51120000, 50120000, 50220000, 41120000, 40120000, 40220000 };
 
     for (Int_t d = 0; d < fNumDets; d++)
     {
@@ -244,7 +245,7 @@ void R3BAmsMapped2StripCalPar::SearchPedestals()
     TCanvas* cPar = new TCanvas("AMS", "", 0, 0, 800, 1000);
     ;
     char Name[255];
-    cPar->Divide(2, 2);
+    cPar->Divide(2, fNumDets / 2);
 
     Int_t nbstrip = 0;
     for (Int_t d = 0; d < fNumDets * fNumStrips; d++)

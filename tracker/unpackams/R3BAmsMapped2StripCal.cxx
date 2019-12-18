@@ -267,10 +267,11 @@ void R3BAmsMapped2StripCal::Exec(Option_t* option)
             sideId = 1;
             stripId = stripId - NumStripsS;
         }
-        if (i % 63 == 0 && i > 0)
-        {
-            nbadc++;
-        }
+        /*        if (i % 63 == 0 && i > 0)
+                {
+                    nbadc++;
+                }
+        */
         energy = mappedData[i]->GetEnergy() - pedestal; //-SynAdcs[nbadc];
 
         // We accept the hit if the energy is larger than 5 times the sigma of the pedestal

@@ -41,7 +41,7 @@ R3BAmsStripCal2Hit::R3BAmsStripCal2Hit()
     : FairTask("R3B Hit-AMS Calibrator", 1)
     , fPitchK(104.)
     , fPitchS(110.)
-    , fMaxNumDet(4)
+    , fMaxNumDet(6)
     , // Max number of AMS detectors set to 4, experiment s444
     fMaxNumClusters(3)
     , // Max number of clusters per ams detector set to 3, experiment s444
@@ -56,7 +56,7 @@ R3BAmsStripCal2Hit::R3BAmsStripCal2Hit(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fPitchK(104.)
     , fPitchS(110.)
-    , fMaxNumDet(4)
+    , fMaxNumDet(6)
     , // Max number of AMS detectors set to 4, experiment s444
     fMaxNumClusters(3)
     , // Max number of clusters per ams detector set to 3, experiment s444
@@ -177,30 +177,31 @@ void R3BAmsStripCal2Hit::Exec(Option_t* option)
         {
             for (Int_t mul = 0; mul < std::min(std::min(nfoundK, nfoundS), fMaxNumClusters); mul++)
             {
-                if (i == 0)
-                {                               // top
-                    z = 14. + clusterS[mul][1]; // FIXME:Fix offsets for s444
-                    y = 20. + 1.;
-                    x = 20. - clusterK[mul][1];
-                }
-                else if (i == 1)
-                { // right
-                    z = 14. + clusterS[mul][1];
-                    x = -20. - 1.;
-                    y = 20. - 1. * clusterK[mul][1];
-                }
-                else if (i == 2)
-                { // bottom
-                    z = 14. + clusterS[mul][1];
-                    y = -20. - 1.;
-                    x = clusterK[mul][1] - 20.;
-                }
-                else if (i == 3)
-                { // left
-                    z = 14. + clusterS[mul][1];
-                    x = 20. + 1.;
-                    y = clusterK[mul][1] - 20.;
-                }
+                /*   if (i == 0)
+                   {                               // top
+                       z = 14. + clusterS[mul][1]; // FIXME:Fix offsets for s444
+                       y = 20. + 1.;
+                       x = 20. - clusterK[mul][1];
+                   }
+                   else if (i == 1)
+                   { // right
+                       z = 14. + clusterS[mul][1];
+                       x = -20. - 1.;
+                       y = 20. - 1. * clusterK[mul][1];
+                   }
+                   else if (i == 2)
+                   { // bottom
+                       z = 14. + clusterS[mul][1];
+                       y = -20. - 1.;
+                       x = clusterK[mul][1] - 20.;
+                   }
+                   else if (i == 3)
+                   { // left
+                       z = 14. + clusterS[mul][1];
+                       x = 20. + 1.;
+                       y = clusterK[mul][1] - 20.;
+                   }
+   */
                 TVector3 master(x, y, z);
                 AddHitData(i, mul, clusterS[mul][1], clusterK[mul][1], master, clusterS[mul][0], clusterK[mul][0]);
             }
