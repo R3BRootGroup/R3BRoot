@@ -50,7 +50,7 @@ R3BPspxPrecal2Cal::~R3BPspxPrecal2Cal() {}
 void R3BPspxPrecal2Cal::SetParameters()
 {
 
-    LOG(INFO) << "In R3BPspxPrecal2Cal::SetParameters()" << FairLogger::endl;
+    LOG(INFO) << "In R3BPspxPrecal2Cal::SetParameters()";
     //--- Parameter Container ---
     Int_t nDet = fCalPar->GetNumDetectors(); // Number of Detectors/Faces
     gain.resize(nDet);
@@ -66,7 +66,7 @@ void R3BPspxPrecal2Cal::SetParameters()
             TArrayF par = fCalPar->GetCalPar(); // Array with the parameters
             gain[d][s] = par.At(parOffset + 1);
             parOffset += 2; // move to next line in parameter file.
-            LOG(INFO) << "Det: " << d << "\tstr: " << s << "\tgain: " << gain[d][s] << FairLogger::endl;
+            LOG(INFO) << "Det: " << d << "\tstr: " << s << "\tgain: " << gain[d][s];
         }
     }
 }
@@ -126,7 +126,7 @@ void R3BPspxPrecal2Cal::SetParContainers()
 
     if (!fCalPar)
     {
-        LOG(ERROR) << "Could not get access to R3BPspxCalPar-Container." << FairLogger::endl;
+        LOG(ERROR) << "Could not get access to R3BPspxCalPar-Container.";
         return;
     }
 
@@ -145,7 +145,7 @@ InitStatus R3BPspxPrecal2Cal::ReInit()
 
     if (!fCalPar)
     {
-        LOG(ERROR) << "Could not get access to R3BPspxCalPar-Container." << FairLogger::endl;
+        LOG(ERROR) << "Could not get access to R3BPspxCalPar-Container.";
         return kFATAL;
     }
 

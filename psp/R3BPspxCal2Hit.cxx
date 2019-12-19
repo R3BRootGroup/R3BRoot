@@ -52,14 +52,14 @@ R3BPspxCal2Hit::~R3BPspxCal2Hit() {}
 void R3BPspxCal2Hit::SetParameters()
 {
 
-    LOG(INFO) << "In R3BPspxCal2Hit::SetParameters()" << FairLogger::endl;
+    LOG(INFO) << "In R3BPspxCal2Hit::SetParameters()";
     //--- Parameter Container ---
     Int_t nDet = fHitPar->GetNumDetectors(); // Number of Detectors/Faces
     orientation.resize(nDet);
     detSize.resize(nDet);
     posOffset.resize(nDet);
     posSlope.resize(nDet);
-    LOG(INFO) << "Position Parameters" << FairLogger::endl;
+    LOG(INFO) << "Position Parameters";
     for (Int_t d = 0; d < nDet; d++)
     {
         Int_t parOffset = 1;                   // 1 "header" parameter.
@@ -70,13 +70,13 @@ void R3BPspxCal2Hit::SetParameters()
         posSlope[d] = par.At(parOffset + 5);
         parOffset += 6; // move to next line in parameter file.
         LOG(INFO) << "Det: " << d << "\torientation: " << orientation[d] << "\tdetSize: " << detSize[d]
-                  << "\toffset: " << posOffset[d] << "\tslope: " << posSlope[d] << FairLogger::endl;
+                  << "\toffset: " << posOffset[d] << "\tslope: " << posSlope[d];
     }
 
     eOffset.resize(nDet);
     eGain.resize(nDet);
     eRange.resize(nDet);
-    LOG(INFO) << "Energy Parameters" << FairLogger::endl;
+    LOG(INFO) << "Energy Parameters";
     for (Int_t d = 0; d < nDet; d++)
     {
         Int_t parOffset = 1;                 // 1 "header" parameter.
@@ -85,8 +85,7 @@ void R3BPspxCal2Hit::SetParameters()
         eGain[d] = par.At(parOffset + 3);
         eRange[d] = par.At(parOffset + 4);
         parOffset += 5; // move to next line in parameter file.
-        LOG(INFO) << "Det: " << d << "\toffset: " << eOffset[d] << "\tslope: " << eGain[d] << "\trange: " << eRange[d]
-                  << FairLogger::endl;
+        LOG(INFO) << "Det: " << d << "\toffset: " << eOffset[d] << "\tslope: " << eGain[d] << "\trange: " << eRange[d];
     }
 }
 
@@ -134,13 +133,13 @@ InitStatus R3BPspxCal2Hit::Init()
 // -- Initialize/Read parameter file for conversion.
 void R3BPspxCal2Hit::SetParContainers()
 {
-    LOG(INFO) << "R3BPspxCal2Hit :: SetParContainers() " << FairLogger::endl;
+    LOG(INFO) << "R3BPspxCal2Hit :: SetParContainers() ";
 
     fHitPar = (R3BPspxHitPar*)FairRuntimeDb::instance()->getContainer("R3BPspxHitPar");
 
     if (!fHitPar)
     {
-        LOG(ERROR) << "Could not get access to R3BPspxHitPar-Container." << FairLogger::endl;
+        LOG(ERROR) << "Could not get access to R3BPspxHitPar-Container.";
         return;
     }
 
@@ -152,13 +151,13 @@ void R3BPspxCal2Hit::SetParContainers()
 // -- Initialize/Read parameter file for conversion.
 InitStatus R3BPspxCal2Hit::ReInit()
 {
-    LOG(INFO) << " R3BPspxCal2Hit :: ReInit() " << FairLogger::endl;
+    LOG(INFO) << " R3BPspxCal2Hit :: ReInit() ";
 
     fHitPar = (R3BPspxHitPar*)FairRuntimeDb::instance()->getContainer("R3BPspxHitPar");
 
     if (!fHitPar)
     {
-        LOG(ERROR) << "Could not get access to R3BPspxHitPar-Container." << FairLogger::endl;
+        LOG(ERROR) << "Could not get access to R3BPspxHitPar-Container.";
         return kFATAL;
     }
 

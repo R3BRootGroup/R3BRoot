@@ -201,7 +201,13 @@ void R3BAmsMapped2StripCalPar::PrintParamsDaq()
 
     // sam+gtb+siderem+20000
     // Int_t detID[fNumDets] = { 40120000, 40220000, 41120000, 50120000, 50220000, 51120000 };
-    Int_t detID[fNumDets] = { 51120000, 50120000, 50220000, 41120000, 40120000, 40220000 };
+    Int_t detID[fNumDets];
+    detID[0] = 51120000;
+    detID[1] = 50120000;
+    detID[2] = 50220000;
+    detID[3] = 41120000;
+    detID[4] = 40120000;
+    detID[5] = 40220000;
 
     for (Int_t d = 0; d < fNumDets; d++)
     {

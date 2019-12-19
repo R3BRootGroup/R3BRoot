@@ -50,7 +50,7 @@ R3BPspxMapped2Precal::~R3BPspxMapped2Precal() {}
 void R3BPspxMapped2Precal::SetParameters()
 {
 
-    LOG(INFO) << "In R3BPspxMapped2Precal::SetParameters()" << FairLogger::endl;
+    LOG(INFO) << "In R3BPspxMapped2Precal::SetParameters()";
     //--- Parameter Container ---
     Int_t nDet = fPrecalPar->GetNumDetectors(); // Number of Detectors/Faces
     gain.resize(nDet);
@@ -73,7 +73,7 @@ void R3BPspxMapped2Precal::SetParameters()
             threshold2[d][s] = par.At(parOffset + 3);
             parOffset += 4; // move to next line in parameter file.
             LOG(INFO) << "Det: " << d << "\tstr: " << s << "\tgain: " << gain[d][s] << "\tthr1: " << threshold1[d][s]
-                      << "\tthr2: " << threshold2[d][s] << FairLogger::endl;
+                      << "\tthr2: " << threshold2[d][s];
         }
     }
 }
@@ -86,7 +86,7 @@ InitStatus R3BPspxMapped2Precal::Init()
      * Print parameters, if verbosity is set to INFO.
      */
 
-    LOG(INFO) << "R3BPspxMapped2Precal :: Init() " << FairLogger::endl;
+    LOG(INFO) << "R3BPspxMapped2Precal :: Init() ";
     FairRootManager* fMan = FairRootManager::Instance();
     fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
     const char xy[2] = { 'x', 'y' }; // orientation of detector face

@@ -86,7 +86,7 @@ InitStatus R3BPspxOnlineSpectra::Init()
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(fatal) << "FairRootManager not found" << FairLogger::endl;
+        LOG(fatal) << "FairRootManager not found";
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
     FairRunOnline* run = FairRunOnline::Instance();
@@ -119,7 +119,7 @@ InitStatus R3BPspxOnlineSpectra::Init()
 
     Int_t Emax = 500000;
 
-    // LOG(INFO) << "Init MappedPspx" << FairLogger::endl;
+    // LOG(INFO) << "Init MappedPspx";
 
     std::string xy[2] = { "x", "y" };
     // std::string ep[2] = {"Energy","Position"};
@@ -247,7 +247,7 @@ void R3BPspxOnlineSpectra::Exec(Option_t* option)
 {
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
-        LOG(FATAL) << "R3BPspxOnlineSpectra::Exec FairRootManager not found" << FairLogger::endl;
+        LOG(FATAL) << "R3BPspxOnlineSpectra::Exec FairRootManager not found";
     // check for requested trigger (Todo: should be done globablly / somewhere else)
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
         return;
@@ -299,7 +299,7 @@ void R3BPspxOnlineSpectra::FinishEvent()
 void R3BPspxOnlineSpectra::FinishTask()
 {
 
-    // LOG(INFO) << "Finish MappedPspx" << FairLogger::endl;
+    // LOG(INFO) << "Finish MappedPspx";
 
     for (UInt_t i = 0; i < fMappedItemsPspx.size(); i++)
     {
