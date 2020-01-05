@@ -308,6 +308,21 @@ InitStatus R3BMusicOnlineSpectra::Init()
     fh1_Mus_treftrigger->GetYaxis()->SetTitleSize(0.045);
     fh1_Mus_treftrigger->Draw("");
 
+    // Esum vs difference DT7 - DT1
+    cMusMap_ESum_vs_diffDT = new TCanvas("Mus_ESum_vs_diffDT", "MUSIC: ESum vs. diff-DT (7-1)", 10, 10, 800, 700);
+    fh2_Mus_ESum_vs_diffDT =
+        new TH2F("fh2_Mus_ESum_vs_diff_DT", "Music:ESum vs: diff-DT", 2000, -2000, 2000, 2000, 0, 8000);
+    fh2_Mus_ESum_vs_diffDT->GetXaxis()->SetTitle("Difference DT (7-1)");
+    fh2_Mus_ESum_vs_diffDT->GetYaxis()->SetTitle("Energy Sum [channels]");
+    fh2_Mus_ESum_vs_diffDT->GetYaxis()->SetTitleOffset(1.1);
+    fh2_Mus_ESum_vs_diffDT->GetXaxis()->CenterTitle(true);
+    fh2_Mus_ESum_vs_diffDT->GetYaxis()->CenterTitle(true);
+    fh2_Mus_ESum_vs_diffDT->GetXaxis()->SetLabelSize(0.045);
+    fh2_Mus_ESum_vs_diffDT->GetXaxis()->SetTitleSize(0.045);
+    fh2_Mus_ESum_vs_diffDT->GetYaxis()->SetLabelSize(0.045);
+    fh2_Mus_ESum_vs_diffDT->GetYaxis()->SetTitleSize(0.045);
+    fh2_Mus_ESum_vs_diffDT->Draw("col");
+
     // Hit data
     TCanvas* cMus_Z = new TCanvas("Mus_charge_z", "Mus: Charge Z", 10, 10, 800, 700);
     fh1_Mushit_z = new TH1F("fh1_Mus_charge_z", "Music: Charge Z", 960, 0, 40);
@@ -335,6 +350,7 @@ InitStatus R3BMusicOnlineSpectra::Init()
     mainfolMus->Add(cMusMap_EvsDT);
     mainfolMus->Add(cMusMap_DTvsDT);
     mainfolMus->Add(cMus_EsumvsDT);
+    mainfolMus->Add(cMusMap_ESum_vs_diffDT);
     if (fHitItemsMus)
         mainfolMus->Add(cMus_Z);
     run->AddObject(mainfolMus);
@@ -367,6 +383,7 @@ void R3BMusicOnlineSpectra::Reset_Histo()
     fh1_Musmap_mult->Reset();
     fh1_Mus_treftrigger->Reset();
     fh2_Musmap_multhit->Reset();
+    fh2_Mus_ESum_vs_diffDT->Reset();
     if (fHitItemsMus)
         fh1_Mushit_z->Reset();
 }
@@ -452,6 +469,7 @@ void R3BMusicOnlineSpectra::Exec(Option_t* option)
             fh1_Mus_ESum[2]->Fill((e1 + e2) / (n1 + n2));
             fh2_Mus_ESum->Fill(e1 / n1, e2 / n2);
             fh2_Mus_ESum_vs_DT->Fill(fT[5] - fT[NbAnodesMus], (e1 + e2) / (n1 + n2));
+            fh2_Mus_ESum_vs_diffDT->Fill((fT[6] - fT[NbAnodesMus]) - (fT[0] - fT[NbAnodesMus]), (e1 + e2) / (n1 + n2));
         }
     }
 
@@ -493,6 +511,7 @@ void R3BMusicOnlineSpectra::FinishTask()
         cMusMap_DTvsDT->Write();
         cMusMap_EvsDT->Write();
         cMus_EsumvsDT->Write();
+        cMusMap_ESum_vs_diffDT->Write();
         fh1_Mus_ESum[0]->Write();
         fh1_Mus_ESum[1]->Write();
         fh1_Mus_ESum[2]->Write();

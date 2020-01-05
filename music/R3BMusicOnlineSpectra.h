@@ -111,6 +111,7 @@ class R3BMusicOnlineSpectra : public FairTask
     TCanvas* cMusMap_EvsDT;
     TCanvas* cMusMap_DT;
     TCanvas *cMusMap_ESum, *cMus_EsumvsDT, *cMusMap_ESum1, *cMusMap_ESum2, *cMusMap_DTvsDT;
+    TCanvas* cMusMap_ESum_vs_diffDT;
 
     // Histograms for Mapped data
     TH1F* fh1_Musmap_mult;
@@ -120,9 +121,10 @@ class R3BMusicOnlineSpectra : public FairTask
     TH1F* fh1_Musmap_DT[NbAnodesMus];
     TH1F* fh1_Mus_ESum[3];
     TH2F* fh2_Mus_ESum;
-    TH2F* fh2_Mus_EneRawVsDriftTime[NbAnodesMus];
     TH2F* fh2_Mus_ESum_vs_DT;
-    TH2F* fh2_Mus_DTvsDT[NbAnodesMus];
+    TH2F* fh2_Mus_EneRawVsDriftTime[NbAnodesMus];
+    TH2F* fh2_Mus_DTvsDT[NbAnodesMus - 1];
+    TH2F* fh2_Mus_ESum_vs_diffDT;
     // Histograms for Cal data
 
     // Histograms for Hit data
