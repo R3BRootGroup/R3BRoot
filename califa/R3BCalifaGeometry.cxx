@@ -110,8 +110,8 @@ const TVector3& R3BCalifaGeometry::GetAngles(Int_t iD)
     const static TVector3 invalid(NAN, NAN, NAN);
     const char* nameVolume;
     if (cache.count(iD))
-      return cache[iD];
-    
+        return cache[iD];
+
     if (iD >= 1 && iD <= 2432)
     {
         nameVolume = GetCrystalVolumePath(iD);
@@ -132,7 +132,7 @@ const TVector3& R3BCalifaGeometry::GetAngles(Int_t iD)
         LOG(ERROR) << "R3BCalifaGeometry: Invalid crystalId: " << iD;
         return invalid;
     }
-    return cache[iD]=master;
+    return cache[iD] = master;
 }
 
 void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal, Double_t* rho)
