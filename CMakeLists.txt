@@ -226,6 +226,8 @@ if(EPICS_FOUND)
   set(LD_LIBRARY_PATH ${EPICS_LIBRARY_DIR} ${LD_LIBRARY_PATH})
 endif(EPICS_FOUND)
 
+find_package(Atima)
+
 find_package(Garfield)
 
 r3b_generate_version_info()
@@ -257,6 +259,9 @@ if(NOT MODULE)
     if (WITH_EPICS)
       add_subdirectory (epics)
     endif (WITH_EPICS)
+    if (Atima_FOUND)
+      add_subdirectory (atima)
+    endif (Atima_FOUND)
     add_subdirectory(passive)
     add_subdirectory(califa)
     add_subdirectory(xball)

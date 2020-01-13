@@ -42,6 +42,7 @@ input/
 macros/
 
 .idea/
+.vscode/
 build-r3broot.sh
 cmake-build-debug/
 
