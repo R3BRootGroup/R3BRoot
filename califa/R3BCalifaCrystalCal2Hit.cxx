@@ -42,18 +42,19 @@ R3BCalifaCrystalCal2Hit::R3BCalifaCrystalCal2Hit()
     : FairTask("R3B CALIFA CrystalCal to Hit Finder")
     , fCrystalHitCA(NULL)
     , fCalifaHitCA(NULL)
+    , fGeometryVersion(2020) // BARREL+iPhos
+    , fThreshold(0.)         // no threshold
+    , fDRThreshold(15000)    // in keV, for real data (15000 = 15MeV)
+    , fDeltaPolar(0.25)
+    , fDeltaAzimuthal(0.25)
+    , fDeltaAngleClust(0)
+    , fClusterAlgorithmSelector(RECT)
+    , fParCluster1(0)
+    , fCalifaGeo(NULL)
+    , fNbCrystalsGammaRange(2432) // during 2019 it was 5000
     , fOnline(kFALSE)
 {
-    fGeometryVersion = 2020; // BARREL+iPhos
-    fThreshold = 0.;         // no threshold
-    fDRThreshold = 15000;    // in keV, for real data (15000 = 15MeV)
-    fDeltaPolar = 0.25;
-    fDeltaAzimuthal = 0.25;
-    fDeltaAngleClust = 0;
-    fClusterAlgorithmSelector = RECT;
-    fParCluster1 = 0;
-    fCalifaGeo = NULL;
-    SetSquareWindowAlg(0.25, 0.25);
+    SetSquareWindowAlg(fDeltaPolar, fDeltaAzimuthal);
 }
 
 R3BCalifaCrystalCal2Hit::~R3BCalifaCrystalCal2Hit()
@@ -209,16 +210,16 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
         LOG(DEBUG) << "R3BCalifaCrystalCal2Hit::Exec():  crystalId2Pos.size()=" << crystalId2Pos.size();
 
         for (auto& k1 : crystalId2Pos) // k1: lower id, gamma branch?
-            if (crystalId2Pos.count(k1.first + 5000))
+            if (crystalId2Pos.count(k1.first + fNbCrystalsGammaRange))
             {
-                auto proton = *crystalId2Pos.find(k1.first + 5000);
+                auto proton = *crystalId2Pos.find(k1.first + fNbCrystalsGammaRange);
                 // k2: higher id, proton branch
                 if (proton.second->GetEnergy() < fDRThreshold)
                     addHit(k1.second); // gamma
                 else
                     addHit(proton.second);
             }
-            else if (!crystalId2Pos.count(k1.first - 5000))
+            else if (!crystalId2Pos.count(k1.first - fNbCrystalsGammaRange))
                 // not a hit where two ranges were hit
                 addHit(k1.second);
     }

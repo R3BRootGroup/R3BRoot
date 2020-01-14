@@ -57,12 +57,13 @@ R3BCalifaHitPar.cxx
 R3BCalifaMappingPar.cxx
 R3BCalifaContFact.cxx
 R3BCalifaDigitizer.cxx
+R3BCalifaOnlineSpectra.cxx
 unpack/R3BCalifaMapped2CrystalCal.cxx
 unpack/R3BCalifaCrystalCalDataAnalysis.cxx
 unpack/R3BCalifaMapped2CrystalCalPar.cxx
 unpack/R3BCalifaCrystalCal2CrystalCalPID.cxx
 unpack/R3BCalifaCrystalCalPar.cxx
-unpack/R3BCalifaOnlineSpectra.cxx
+unpack/R3BCalifaDemoOnlineSpectra.cxx
 #unpack/R3BCalifaDUCalPar.cxx
 )
 

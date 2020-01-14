@@ -13,8 +13,6 @@
 
 #ifndef R3BCALIFAONLINESPECTRA
 #define R3BCALIFAONLINESPECTRA
-#define N_MAX_CRY 64
-#define N_MAX_PETALS 8
 
 #include "FairTask.h"
 #include "TCanvas.h"
@@ -25,7 +23,13 @@
 #include <iostream>
 #include <sstream>
 
+#define Nb_Sides 2
+#define Nb_Rings 5
+#define Nb_Preamps 16
+#define Nb_PreampCh 16
+
 class TClonesArray;
+class R3BCalifaMappingPar;
 class TH1F;
 class TH2F;
 class R3BEventHeader;
@@ -49,13 +53,16 @@ class R3BCalifaOnlineSpectra : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BCalifaOnlineSpectra(const char* name, Int_t iVerbose = 1);
+    R3BCalifaOnlineSpectra(const TString& name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
     virtual ~R3BCalifaOnlineSpectra();
+
+    /** Virtual method SetParContainers **/
+    virtual void SetParContainers();
 
     /**
      * Method for task initialization.
@@ -64,6 +71,9 @@ class R3BCalifaOnlineSpectra : public FairTask
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
     virtual InitStatus Init();
+
+    /** Virtual method ReInit **/
+    virtual InitStatus ReInit();
 
     /**
      * Method for event loop implementation.
@@ -86,9 +96,19 @@ class R3BCalifaOnlineSpectra : public FairTask
     virtual void FinishTask();
 
     /**
-     * Method for setting number of petals
+     * Method for setting number of rings
      */
-    inline void SetPetals(Int_t petals) { fCalifaNumPetals = petals; }
+    inline void SetRings(Int_t rings) { fNumRings = rings; }
+
+    /**
+     * Method for setting max. energy per crystal in MeV for Barrel histograms at CAL level
+     */
+    inline void SetMaxEnergyperCrystalBarrel(Int_t maxenergy) { fMaxEnergyBarrel = maxenergy; }
+
+    /**
+     * Method for setting max. energy per crystal in MeV for Iphos histograms at CAL level
+     */
+    inline void SetMaxEnergyperCrystalIphos(Int_t maxenergy) { fMaxEnergyIphos = maxenergy; }
 
     /**
      * Method for setting the configuration parameters file
@@ -98,8 +118,18 @@ class R3BCalifaOnlineSpectra : public FairTask
     /**
      * Method to select binning and max range
      */
-    void SetRange_bins(Int_t Histos_bins) { fMapHistos_bins = Histos_bins; }
-    void SetRange_max(Int_t Histos_max) { fMapHistos_max = Histos_max; }
+    inline void SetRange_bins(Int_t Histos_bins) { fMapHistos_bins = Histos_bins; }
+    inline void SetRange_max(Int_t Histos_max) { fMapHistos_max = Histos_max; }
+
+    /**
+     * Method for setting the number of bins of Febex histograms
+     */
+    inline void SetBinChannelFebex(Int_t bin) { fBinsChannelFebex = bin; }
+
+    /**
+     * Method for setting max range of Febex histograms
+     */
+    inline void SetMaxBinFebex(Int_t max) { fMaxBinChannelFebex = max; }
 
     /**
      * Method to reset histograms
@@ -121,76 +151,66 @@ class R3BCalifaOnlineSpectra : public FairTask
      */
     void Febex2Preamp_CALIFA_Histo();
 
-    /**
-     * Mapping s444 crystals
-     */
-    Int_t Map_For_s444(Int_t val);
-
   private:
+    void SetParameter();
+
     Int_t fMapHistos_max;
     Int_t fMapHistos_bins;
 
+    R3BCalifaMappingPar* fMap_Par;    /**< Container with mapping parameters. >*/
     TClonesArray* fMappedItemsCalifa; /**< Array with mapped items.    */
     TClonesArray* fCalItemsCalifa;    /**< Array with cal items.       */
     TClonesArray* fHitItemsCalifa;    /**< Array with hit items.       */
-    TClonesArray* fWRItemsCalifa;     /**< Array with WR-Califa items. */
-    TClonesArray* fWRItemsMaster;     /**< Array with WR-Master items. */
 
     // Check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header.  */
-    Int_t fTrigger;         /**< Trigger value. */
     Int_t fNEvents;         /**< Event counter. */
 
-    Int_t fCalifaNumPetals;      /**< Number of Petals.   */
-    Int_t fNumCrystalPetal;      /**< Crystals per Petal. */
-    Int_t fOrderFebexPreamp[16]; /**< Selector for febex or preamp sequence. */
+    Int_t fNbCalifaCrystals;              /**< Number of Crystals in Califa. */
+    Int_t fNumSides;                      /**< Number of Sides, left and right.   */
+    Int_t fNumRings;                      /**< Number of Rings.   */
+    Int_t fNumPreamps;                    /**< Number of Preamps per ring.   */
+    Int_t fNumCrystalPreamp;              /**< Number of Crystals/Channels per Preamp. */
+    Int_t fBinsChannelFebex;              /**< Number of Bins per Febex channel. */
+    Int_t fMaxBinChannelFebex;            /**< Maximum bin for Febex histograms. */
+    Int_t fOrderFebexPreamp[Nb_PreampCh]; /**< Selector for febex or preamp sequence. */
 
-    // Multiplicities
-    TH1F* fh_Califa_Mult[N_MAX_PETALS + 1];
-    TH1F* fh_Califa_MultHit[N_MAX_PETALS + 1];
+    TString fCalifaFile;    /**< Config file name. */
+    Bool_t fCalON;          /**< Cal selector. */
+    Int_t fMaxEnergyBarrel; /**< Max. energy for Barrel histograms at CAL level. */
+    Int_t fMaxEnergyIphos;  /**< Max. energy for Iphos histograms at CAL level. */
+    Bool_t fLogScale;       /**< Selecting scale. */
+    Bool_t fRaw2Cal;        /**< Mapped or Cal selector. */
+    Bool_t fFebex2Preamp;   /**< Febex or Preamp selector. */
 
-    // WR data
-    TH1F* fh_Califa_wr;
-
-    // Raw data
-    TH2F* fh_Califa_cryId_petal;
-    TH1F* fh_Califa_energy_per_petal[N_MAX_PETALS + 1]; //+1 for proton range:s444
-    TH1F* fh_Califa_crystals[N_MAX_PETALS][N_MAX_CRY];
-    TH2F* fh_Califa_cryId_energy;
-    TH2F* fh_Califa_coinc_petal1;
-    TH2F* fh_Califa_coinc_petal2;
-    TH2F* fh_Califa_coinc_petal3;
-
-    // Cal data
-    TH2F* fh_Califa_cryId_energy_cal;
-    TH1F* fh_Califa_energy_per_petal_cal[N_MAX_PETALS + 1]; //+1 for proton range:s444
-    TH1F* fh_Califa_crystals_cal[N_MAX_PETALS][N_MAX_CRY];
-
-    // Hit data
-    TH2F* fh_Califa_theta_phi;
-    TH2F* fh_Califa_theta_energy[N_MAX_PETALS];
-    TH1F* fh_Califa_total_energy;
-
-    TString fCalifaFile;  /**< Config file name. */
-    Bool_t fCalON;        /**< Cal selector. */
-    Bool_t fLogScale;     /**< Selecting scale. */
-    Bool_t fRaw2Cal;      /**< Mapped or Cal selector. */
-    Bool_t fFebex2Preamp; /**< Febex or Preamp selector. */
-
-    TCanvas* cMap;
-    TCanvas* cCalifa_wr;
-    TCanvas* cCalifa1;
-    TCanvas* cCalifa2;
-    TCanvas* cCalifa3;
-    TCanvas* cCalifa3b; // proton range
-    TCanvas* cCalifa4[N_MAX_PETALS][4];
-    TCanvas* cCalifa5;
-    TCanvas* cCalifa6;
-    TCanvas* cCalifa7;
-    TCanvas* cCalifa8;
-    TCanvas* cCalifa_hitpetal[N_MAX_PETALS];
-    TCanvas* cCalifa10;
+    // Canvas
+    TCanvas* cCalifaMult;
+    TCanvas* cCalifa_cry_energy;
+    TCanvas* cCalifa_cry_energy_cal;
+    TCanvas* cMap_RingR[Nb_Rings];
+    TCanvas* cMap_RingL[Nb_Rings];
+    TCanvas* cMapCry[Nb_Sides][Nb_Rings][Nb_Preamps];
+    TCanvas* cMapCryCal[Nb_Sides][Nb_Rings][Nb_Preamps];
+    TCanvas* cMapCryP[Nb_Sides][Nb_Rings][Nb_Preamps];
+    TCanvas* cMapCryPCal[Nb_Sides][Nb_Rings][Nb_Preamps];
+    TCanvas* cCalifa_angles;
+    TCanvas* cCalifa_theta_energy;
     TCanvas* cCalifa_hitenergy;
+
+    // Histograms
+    TH1F* fh1_Califa_Mult;
+    TH1F* fh1_Califa_MultHit;
+    TH2F* fh2_Califa_cryId_energy;
+    TH2F* fh2_Preamp_vs_ch_R[Nb_Rings];
+    TH2F* fh2_Preamp_vs_ch_L[Nb_Rings];
+    TH1F* fh1_crystals[Nb_Sides][Nb_Rings][Nb_Preamps][Nb_PreampCh];
+    TH1F* fh1_crystals_p[Nb_Sides][Nb_Rings][Nb_Preamps][Nb_PreampCh];
+    TH2F* fh2_Califa_cryId_energy_cal;
+    TH1F* fh1_crystals_cal[Nb_Sides][Nb_Rings][Nb_Preamps][Nb_PreampCh];
+    TH1F* fh1_crystals_p_cal[Nb_Sides][Nb_Rings][Nb_Preamps][Nb_PreampCh];
+    TH2F* fh2_Califa_theta_phi;
+    TH2F* fh2_Califa_theta_energy;
+    TH1F* fh1_Califa_total_energy;
 
   public:
     ClassDef(R3BCalifaOnlineSpectra, 1)

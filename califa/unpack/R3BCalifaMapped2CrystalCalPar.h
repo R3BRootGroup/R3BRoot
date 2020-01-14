@@ -18,6 +18,7 @@
 #include "TH1F.h"
 
 class TClonesArray;
+class R3BCalifaMappingPar;
 class R3BCalifaCrystalCalPar;
 class R3BEventHeader;
 
@@ -55,10 +56,8 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     /** Virtual method Search peaks and calibrate **/
     virtual void SearchPeaks();
 
-    /** Method to Search for preamp ranges **/
-    bool Searchrange(Int_t val);
-
-    void SetOutputFile(const char* outFile);
+    /** Virtual method SetParContainers **/
+    virtual void SetParContainers();
 
     /** Accessor functions **/
     const Int_t GetNumCrystals() { return fNumCrystals; }
@@ -95,6 +94,8 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     }
 
   protected:
+    void SetParameter();
+    Int_t fDebugMode;
     Int_t fNumCrystals;
     Int_t fMapHistos_left; // gamma range
     Int_t fMapHistos_right;
@@ -113,13 +114,11 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
     TArrayF* fEnergyPeaks;
     Double_t* fChannelPeaks;
 
-    Int_t fDebugMode;
-
-    R3BCalifaCrystalCalPar* fCal_Par;  /**< Parameter container. >*/
-    TClonesArray* fCalifaMappedDataCA; /**< Array with CALIFA Mapped- input data. >*/
+    R3BCalifaMappingPar* fMap_Par;     /**< Parameter container with mapping. >*/
+    R3BCalifaCrystalCalPar* fCal_Par;  /**< Container for Cal parameters. >*/
+    TClonesArray* fCalifaMappedDataCA; /**< Array with CALIFA Mapped-input data. >*/
 
     TH1F** fh_Map_energy_crystal;
-    char* fOutputFile;
 
   public:
     ClassDef(R3BCalifaMapped2CrystalCalPar, 2);

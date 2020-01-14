@@ -34,7 +34,7 @@ using std::endl;
 
 R3BCalifaGeometry* R3BCalifaGeometry::inst = NULL;
 
-R3BCalifaGeometry* R3BCalifaGeometry::Instance(int version)
+R3BCalifaGeometry* R3BCalifaGeometry::Instance(Int_t version)
 {
     LOG(DEBUG) << "R3BCalifaGeometry::Instance ";
     if (!inst)
@@ -55,7 +55,7 @@ R3BCalifaGeometry::R3BCalifaGeometry()
 {
 }
 
-R3BCalifaGeometry::R3BCalifaGeometry(int version)
+R3BCalifaGeometry::R3BCalifaGeometry(Int_t version)
     : fGeometryVersion(version)
 {
     LOG(DEBUG) << "Creating new R3BCalifaGeometry for version " << version;
@@ -65,9 +65,16 @@ R3BCalifaGeometry::R3BCalifaGeometry(int version)
 
     switch (version)
     {
+        case 2019:
+            // BARREL: demonstrator from 2019
+            geoPath += "califa_s444.geo.root";
+            fNumCrystals = 10000;
+            break;
+
         case 2020:
             // Full BARREL+iPhos version
             geoPath += "califa_2020.geo.root";
+            fNumCrystals = 4864;
             break;
 
         default:
@@ -112,6 +119,10 @@ const TVector3& R3BCalifaGeometry::GetAngles(Int_t iD)
     if (cache.count(iD))
         return cache[iD];
 
+    // SOLUTION FOR DOUBLE READING CHANNELS
+    if (iD > fNumCrystals / 2 && iD <= fNumCrystals)
+        iD = iD - fNumCrystals / 2; // for double reading crystals (crystals from 1 to 2432)
+
     if (iD >= 1 && iD <= 2432)
     {
         nameVolume = GetCrystalVolumePath(iD);
@@ -145,16 +156,15 @@ void R3BCalifaGeometry::GetAngles(Int_t iD, Double_t* polar, Double_t* azimuthal
         LOG(ERROR) << "R3BCalifaGeometry::GetAngles(" << iD << ",...) returns NaN";
 }
 
-const char* R3BCalifaGeometry::GetCrystalVolumePath(int iD)
+const char* R3BCalifaGeometry::GetCrystalVolumePath(Int_t iD)
 {
-
     Int_t alveolusCopy = -1;
     Int_t alvType = -1;
     Int_t cryType = -1;
 
     // SOLUTION FOR DOUBLE READING CHANNELS
-    if (iD > 5000 && iD < 7432)
-        iD = iD - 5000; // for double reading crystals (crystals from 1 to 2432)
+    if (iD > fNumCrystals / 2 && iD <= fNumCrystals)
+        iD = iD - fNumCrystals / 2; // for double reading crystals (crystals from 1 to 2432)
 
     static char nameVolume[200];
 
@@ -201,10 +211,10 @@ const char* R3BCalifaGeometry::GetCrystalVolumePath(int iD)
 double R3BCalifaGeometry::GetDistanceThroughCrystals(TVector3& startVertex,
                                                      TVector3& direction,
                                                      TVector3* hitPos,
-                                                     int* numCrystals,
-                                                     int* crystalIds)
+                                                     Int_t* numCrystals,
+                                                     Int_t* crystalIds)
 {
-    int maxNumCrystals = 0;
+    Int_t maxNumCrystals = 0;
 
     if (numCrystals != NULL && crystalIds != NULL)
     {
@@ -221,7 +231,7 @@ double R3BCalifaGeometry::GetDistanceThroughCrystals(TVector3& startVertex,
                            direction.Y() / direction.Mag(),
                            direction.Z() / direction.Mag());
 
-    double distance = 0;
+    Double_t distance = 0.;
     const Double_t* pos;
     bool inCrystal = false, wasInCrystal = false;
     TString nodeName;
@@ -241,7 +251,7 @@ double R3BCalifaGeometry::GetDistanceThroughCrystals(TVector3& startVertex,
 
         if (inCrystal && maxNumCrystals != 0)
         {
-            int cid = GetCrystalId(gGeoManager->GetPath());
+            Int_t cid = GetCrystalId(gGeoManager->GetPath());
             if (cid != -1 && (*numCrystals == 0 || cid != crystalIds[(*numCrystals) - 1]))
             {
                 crystalIds[(*numCrystals)++] = cid;

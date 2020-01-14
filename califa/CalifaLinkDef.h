@@ -29,6 +29,7 @@
 #pragma link C++ class R3BCalifaCrystalCal2CrystalCalPID+;
 #pragma link C++ class R3BCalifaCrystalCalPar+;
 #pragma link C++ class R3BCalifaOnlineSpectra+;
+#pragma link C++ class R3BCalifaDemoOnlineSpectra+;
 #pragma link C++ class R3BCalifaDigitizer+;
 //#pragma link C++ class R3BCalifaDUCalPar+;
 

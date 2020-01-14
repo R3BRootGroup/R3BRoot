@@ -31,7 +31,7 @@ class R3BCalifaGeometry : public TObject
     /** Standard constructor.
      *@param version geonetry version
      */
-    R3BCalifaGeometry(int version);
+    R3BCalifaGeometry(Int_t version);
 
     /** Destructor **/
     ~R3BCalifaGeometry();
@@ -62,7 +62,7 @@ class R3BCalifaGeometry : public TObject
      * @param iD crystal ID (depending on geometry version)
      * @return Volume path
      */
-    const char* GetCrystalVolumePath(int iD);
+    const char* GetCrystalVolumePath(Int_t iD);
 
     /**
      * Gets crystal ID for given volume path.
@@ -95,8 +95,8 @@ class R3BCalifaGeometry : public TObject
     double GetDistanceThroughCrystals(TVector3& startVertex,
                                       TVector3& direction,
                                       TVector3* hitPos = NULL,
-                                      int* numCrystals = NULL,
-                                      int* crystalIds = NULL);
+                                      Int_t* numCrystals = NULL,
+                                      Int_t* crystalIds = NULL);
 
     /**
      * Returns singleton instance of R3BCalifaGeometry for given geometry version.
@@ -105,10 +105,11 @@ class R3BCalifaGeometry : public TObject
      * @param version Geometry version to use. If in doubt, use 2020.
      * @return Instance of R3BCalifaGeometry
      */
-    static R3BCalifaGeometry* Instance(int version);
+    static R3BCalifaGeometry* Instance(Int_t version);
 
   private:
-    int fGeometryVersion;
+    Int_t fGeometryVersion;
+    Int_t fNumCrystals;
     static R3BCalifaGeometry* inst;
 
     ClassDef(R3BCalifaGeometry, 5);
