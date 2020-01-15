@@ -554,8 +554,8 @@ InitStatus R3BOnlineSpectraDec2019::Init()
             fh_channels_single_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
 
             // Fibers:
-            fh_fibers_Fib[ifibcount] =
-                new TH1F(Form("%s_fibers", detName), Form("%s fibers", detName), N_FIBER_PLOT, 0., N_FIBER_PLOT);
+            fh_fibers_Fib[ifibcount] = new TH1F(
+                Form("%s_fibers", detName), Form("%s fibers", detName), N_FIBER_PLOT_2019, 0., N_FIBER_PLOT_2019);
             fh_fibers_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
             fh_fibers_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
 
@@ -579,9 +579,9 @@ InitStatus R3BOnlineSpectraDec2019::Init()
             // ToT MAPMT:
             fh_ToT_m_Fib[ifibcount] = new TH2F(Form("%s_tot_m", detName),
                                                Form("%s ToT of MAPMT", detName),
-                                               N_FIBER_PLOT,
+                                               N_FIBER_PLOT_2019,
                                                0.,
-                                               N_FIBER_PLOT,
+                                               N_FIBER_PLOT_2019,
                                                100,
                                                0.,
                                                41.666667);
@@ -591,9 +591,9 @@ InitStatus R3BOnlineSpectraDec2019::Init()
             // ToT SAPMT:
             fh_ToT_s_Fib[ifibcount] = new TH2F(Form("%s_tot_s", detName),
                                                Form("%s ToT of single PMT", detName),
-                                               N_FIBER_PLOT,
+                                               N_FIBER_PLOT_2019,
                                                0.,
-                                               N_FIBER_PLOT,
+                                               N_FIBER_PLOT_2019,
                                                2000,
                                                0.,
                                                200.);
@@ -603,9 +603,9 @@ InitStatus R3BOnlineSpectraDec2019::Init()
             // Time of fiber:
             fh_time_Fib[ifibcount] = new TH2F(Form("%s_TimevsFiber", detName),
                                               Form("%s Time vs Fiber", detName),
-                                              N_FIBER_PLOT,
+                                              N_FIBER_PLOT_2019,
                                               0.,
-                                              N_FIBER_PLOT,
+                                              N_FIBER_PLOT_2019,
                                               2048,
                                               -1024.,
                                               1024.);
@@ -615,9 +615,9 @@ InitStatus R3BOnlineSpectraDec2019::Init()
             // ToF LOS -> Fiber:
             fh_Fib_ToF[ifibcount] = new TH2F(Form("%s_tof", detName),
                                              Form("%s ToF LOS to Fiber", detName),
-                                             N_FIBER_PLOT,
+                                             N_FIBER_PLOT_2019,
                                              0.,
-                                             N_FIBER_PLOT,
+                                             N_FIBER_PLOT_2019,
                                              1200,
                                              -6000.,
                                              6000.);
@@ -1429,7 +1429,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
     {
         itpat = header->GetTpat();
         tpatvalue = (itpat && (1 << fTpat_bit)) >> fTpat_bit;
-        if ((tpatvalue == 0))
+        if (tpatvalue == 0)
             return;
     }
 
@@ -1551,9 +1551,21 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
             return;
 
         Int_t iDet = 0;
-        Double_t timeRolu_L[nParts][2][4] = { 0.0 / 0.0 };
-        Double_t timeRolu_T[nParts][2][4] = { 0.0 / 0.0 };
-        Double_t totRolu[nParts][2][4] = { 0.0 / 0.0 };
+        Double_t timeRolu_L[nParts][2][4];
+        Double_t timeRolu_T[nParts][2][4];
+        Double_t totRolu[nParts][2][4];
+        for (int i = 0; i < nParts; i++)
+        {
+            for (int j = 0; j < 2; j++)
+            {
+                for (int k = 0; k < 4; k++)
+                {
+                    timeRolu_L[i][j][k] = 0. / 0.;
+                    timeRolu_T[i][j][k] = 0. / 0.;
+                    totRolu[i][j][k] = 0. / 0.;
+                }
+            }
+        }
 
         for (Int_t iPart = 0; iPart < nParts; iPart++)
         {
@@ -1615,27 +1627,53 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
     //   rb\ /b
 
     Double_t timeTofd = 0;
-    Double_t time_V[fNofLosDetectors][32][8] = { 0.0 / 0.0 }; // [det][multihit][pm]
-    Double_t time_L[fNofLosDetectors][32][8] = { 0.0 / 0.0 };
-    Double_t time_T[fNofLosDetectors][32][8] = { 0.0 / 0.0 };
+    Double_t time_V[fNofLosDetectors][32][8]; // [det][multihit][pm]
+    Double_t time_L[fNofLosDetectors][32][8];
+    Double_t time_T[fNofLosDetectors][32][8];
 
     Double_t time_MTDC[32][8] = { 0.0 / 0.0 };
     Double_t LosTresMTDC[32] = { 0.0 / 0.0 };
 
-    Double_t timeLosV[fNofLosDetectors][32] = { 0.0 };
-    Double_t LosTresV[fNofLosDetectors][32] = { 0.0 / 0.0 };
-    Double_t timeLosT[fNofLosDetectors][32] = { 0.0 };
-    Double_t LosTresT[fNofLosDetectors][32] = { 0.0 / 0.0 };
-    Double_t timeLos[fNofLosDetectors][32] = { 0.0 };
-    Double_t totsum[fNofLosDetectors][32] = { 0.0 };
-    Double_t tot[fNofLosDetectors][32][8] = { 0.0 / 0.0 };
-    Double_t xT_cm[fNofLosDetectors][32] = { 0.0 / 0.0 };
-    Double_t yT_cm[fNofLosDetectors][32] = { 0.0 / 0.0 };
-    Double_t xToT_cm[fNofLosDetectors][32] = { 0.0 / 0.0 };
-    Double_t yToT_cm[fNofLosDetectors][32] = { 0.0 / 0.0 };
-    Double_t xV_cm[fNofLosDetectors][32] = { 0.0 / 0.0 };
-    Double_t yV_cm[fNofLosDetectors][32] = { 0.0 / 0.0 };
-    Double_t time_V_temp[32][8] = { 0.0 / 0.0 };
+    Double_t timeLosV[fNofLosDetectors][32];
+    Double_t LosTresV[fNofLosDetectors][32];
+    Double_t timeLosT[fNofLosDetectors][32];
+    Double_t LosTresT[fNofLosDetectors][32];
+    Double_t timeLos[fNofLosDetectors][32];
+    Double_t totsum[fNofLosDetectors][32];
+    Double_t tot[fNofLosDetectors][32][8];
+    Double_t xT_cm[fNofLosDetectors][32];
+    Double_t yT_cm[fNofLosDetectors][32];
+    Double_t xToT_cm[fNofLosDetectors][32];
+    Double_t yToT_cm[fNofLosDetectors][32];
+    Double_t xV_cm[fNofLosDetectors][32];
+    Double_t yV_cm[fNofLosDetectors][32];
+    Double_t time_V_temp[32][8] = { 0. / 0. };
+
+    for (int i = 0; i < fNofLosDetectors; i++)
+    {
+        for (int j = 0; j < 32; j++)
+        {
+            timeLosV[i][j] = 0.;
+            LosTresV[i][j] = 0. / 0.;
+            timeLosT[i][j] = 0.;
+            LosTresT[i][j] = 0. / 0.;
+            timeLos[i][j] = 0.;
+            totsum[i][j] = 0.;
+            xT_cm[i][j] = 0. / 0.;
+            yT_cm[i][j] = 0. / 0.;
+            xToT_cm[i][j] = 0. / 0.;
+            yToT_cm[i][j] = 0. / 0.;
+            xV_cm[i][j] = 0. / 0.;
+            yV_cm[i][j] = 0. / 0.;
+            for (int k = 0; k < 8; k++)
+            {
+                time_V[i][j][k] = 0. / 0.;
+                time_L[i][j][k] = 0. / 0.;
+                time_T[i][j][k] = 0. / 0.;
+                tot[i][j][k] = 0. / 0.;
+            }
+        }
+    }
 
     Int_t Multip;
 
@@ -1666,7 +1704,11 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
     }
 
     Int_t nPart;
-    Int_t nPartLos[fNofLosDetectors] = { 0 };
+    Int_t nPartLos[fNofLosDetectors];
+    for (int i = 0; i < fNofLosDetectors; i++)
+    {
+        nPartLos[i] = 0;
+    }
 
     if (fCalItems.at(DET_LOS))
     {

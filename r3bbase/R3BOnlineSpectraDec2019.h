@@ -11,7 +11,7 @@
 #define N_PADDLE_MAX_PTOF 100
 #define N_PSPX 6
 #define N_STRIPS_PSPX 32
-#define N_FIBER_PLOT 520 // range to plot
+#define N_FIBER_PLOT_2019 520 // range to plot
 
 #include "FairTask.h"
 #include <array>

@@ -701,13 +701,23 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
     LOG(DEBUG) << "Hits in this event: " << nHitsEvent;
 
     // init arrays to store hits
-    Double_t tArrQ[2 * nHitsEvent + 1] = { -1. };
-    Double_t tArrT[2 * nHitsEvent + 1] = { -1. };
-    Double_t tArrX[2 * nHitsEvent + 1] = { -1. };
-    Double_t tArrY[2 * nHitsEvent + 1] = { -1. };
-    Double_t tArrP[2 * nHitsEvent + 1] = { -1. };
-    Double_t tArrB[2 * nHitsEvent + 1] = { -1. };
-    Bool_t tArrU[2 * nHitsEvent + 1] = { false };
+    Double_t tArrQ[2 * nHitsEvent + 1];
+    Double_t tArrT[2 * nHitsEvent + 1];
+    Double_t tArrX[2 * nHitsEvent + 1];
+    Double_t tArrY[2 * nHitsEvent + 1];
+    Double_t tArrP[2 * nHitsEvent + 1];
+    Double_t tArrB[2 * nHitsEvent + 1];
+    Bool_t tArrU[2 * nHitsEvent + 1];
+    for (int i = 0; i < (2 * nHitsEvent + 1); i++)
+    {
+        tArrQ[i] = -1.;
+        tArrT[i] = -1.;
+        tArrX[i] = -1.;
+        tArrY[i] = -1.;
+        tArrP[i] = -1.;
+        tArrB[i] = -1.;
+        tArrU[i] = kFALSE;
+    }
 
     // order events for time
     for (Int_t i = 1; i <= fNofPlanes; i++)

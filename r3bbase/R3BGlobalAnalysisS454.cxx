@@ -553,7 +553,7 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
         {
             itpat = header->GetTpat();
             tpatvalue = (itpat && (1 << fTpat_bit)) >> fTpat_bit;
-            if ((tpatvalue == 0))
+            if (tpatvalue == 0)
                 return;
         }
 
@@ -683,13 +683,23 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
     }
 
     Int_t n_det = 8;
-    Double_t x[n_det] = { 0. };
-    Double_t y[n_det] = { 0. };
-    Double_t z[n_det] = { 0. };
-    Double_t q[n_det] = { 0. };
-    Double_t t[n_det] = { 0. };
-    Bool_t ptn[n_det] = { 0. };
+    Double_t x[n_det];
+    Double_t y[n_det];
+    Double_t z[n_det];
+    Double_t q[n_det];
+    Double_t t[n_det];
+    Bool_t ptn[n_det];
     Int_t det;
+
+    for (int i = 0; i < n_det; i++)
+    {
+        x[i] = 0.;
+        y[i] = 0.;
+        z[i] = 0.;
+        q[i] = 0.;
+        t[i] = 0.;
+        ptn[i] = kFALSE;
+    }
 
     // is also number of ifibcount
     Int_t fi3a = 0;
