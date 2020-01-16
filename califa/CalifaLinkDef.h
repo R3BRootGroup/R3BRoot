@@ -34,5 +34,6 @@
 
 #pragma link C++ class R3BCalifaCrystalCal2Hit+;
 #pragma link C++ class R3BCalifaHitPar+;
+#pragma link C++ class R3BCalifaMappingPar+;
 
 #endif

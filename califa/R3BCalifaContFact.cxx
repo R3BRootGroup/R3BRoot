@@ -18,6 +18,7 @@
 #include "FairParRootFileIo.h"
 #include "FairRuntimeDb.h"
 #include "R3BCalifaCrystalCalPar.h"
+#include "R3BCalifaMappingPar.h"
 
 #include "TClass.h"
 
@@ -51,6 +52,11 @@ void R3BCalifaContFact::setAllContainers()
     p1->addContext("CalifaCalParContext");
 
     containers->Add(p1);
+
+    FairContainer* p2 = new FairContainer("califaMappingPar", "Califa Mapping Parameters", "CalifaMappingContext");
+    p2->addContext("CalifaMappingContext");
+
+    containers->Add(p2);
 }
 
 FairParSet* R3BCalifaContFact::createContainer(FairContainer* c)
@@ -66,6 +72,10 @@ FairParSet* R3BCalifaContFact::createContainer(FairContainer* c)
     if (strcmp(name, "califaCrystalCalPar") == 0)
     {
         p = new R3BCalifaCrystalCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
+    if (strcmp(name, "califaMappingPar") == 0)
+    {
+        p = new R3BCalifaMappingPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
     return p;
 }
