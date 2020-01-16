@@ -120,7 +120,7 @@ void R3BLandDigitizerQA::Exec(Option_t* option)
     Int_t nDigis = fDigis->GetEntriesFast();
     R3BLandDigi* digi;
     Double_t qdc;
-    Double_t tdc;
+    Double_t tdc = nan("");
     Double_t x, y, z;
     Double_t beta;
     Double_t tdc_first = 1e10;

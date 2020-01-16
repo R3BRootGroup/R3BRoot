@@ -118,7 +118,7 @@ void R3BmTofDigitizer::Exec(Option_t* opt)
     Double_t ntfx;
     Double_t ntfy;
     Double_t ntft;
-    Double_t ntfpath;
+    Double_t ntfpath = nan("");
     Double_t ntfpx;
     Double_t ntfpy;
     Double_t ntfpz;

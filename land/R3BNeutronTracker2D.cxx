@@ -41,6 +41,8 @@
 #include "R3BNeutHit.h"
 #include "R3BNeutronTracker2D.h"
 
+#include <assert.h>
+
 using std::cout;
 using std::endl;
 using std::ifstream;
@@ -920,7 +922,7 @@ void R3BNeutronTracker2D::CalculateMassInv()
         R3BLandPoint* point;
         TVector3 posPoint;
         Double_t d;
-        Int_t index;
+        Int_t index = -1;
         Double_t dmin = 1e6;
         for (Int_t ip = 0; ip < fLandPoints->GetEntriesFast(); ip++)
         {
@@ -934,6 +936,7 @@ void R3BNeutronTracker2D::CalculateMassInv()
                 index = ip;
             }
         }
+        assert(index != -1);
         point = (R3BLandPoint*)fLandPoints->At(index);
         Int_t trackID = point->GetTrackID();
         R3BMCTrack* track = (R3BMCTrack*)fLandMCTrack->At(trackID);

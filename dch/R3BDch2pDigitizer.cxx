@@ -313,8 +313,9 @@ void R3BDch2pDigitizer::Exec(Option_t* opt)
             }
 
             if (DetID == 1 && l == 1)
-            { //Check tilt direction, positive or negative angle?! Make it consistent with rotations in R3BDch.cxx !!!\
-     //using this manual calculation (based on the manual offsets above), a consistency with the s318 tracker is achieved. F. Wamers.
+            { // Check tilt direction, positive or negative angle?! Make it consistent with rotations in R3BDch.cxx !!!
+                // using this manual calculation (based on the manual offsets above), a consistency with the s318
+                // tracker is achieved. F. Wamers.
                 // fX_Local	= (fX_Global-PDC2_X0)*cos(PDC2_Atilt*TMath::Pi()/180.)/cos(PDC2_Aparm*TMath::Pi()/180.) -
                 // (fY_Global-PDC2_Y0)*sin(PDC2_Atilt*TMath::Pi()/180.); fY_Local	=
                 // (fX_Global-PDC2_X0)*sin(PDC2_Atilt*TMath::Pi()/180.)/cos(PDC2_Aparm*TMath::Pi()/180.) +

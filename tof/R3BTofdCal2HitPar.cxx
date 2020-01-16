@@ -195,7 +195,8 @@ void R3BTofdCal2HitPar::Exec(Option_t* option)
         return;
 
     Double_t timeLos = 0;
-    Double_t time_r_V, time_t_V, time_l_V, time_b_V, time_rt_V, time_lt_V, time_lb_V, time_rb_V;
+    Double_t time_r_V = nan(""), time_t_V = nan(""), time_l_V = nan(""), time_b_V = nan(""), time_rt_V = nan(""),
+             time_lt_V = nan(""), time_lb_V = nan(""), time_rb_V = nan("");
 
     // Los detector
     if (fCalItemsLos)

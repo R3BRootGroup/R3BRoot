@@ -37,7 +37,11 @@ class TH2F;
  * This class fills time differences of the 2 PMTs of every paddle
  * and calculates the calibration parameters.
  * M.Heil in May 2016
- */ #pragma link C++ class R3BTofdHitModulePar + ;
+ */
+#ifdef __CINT__
+// strange place for cint stuff, but whatever
+#pragma link C++ class R3BTofdHitModulePar + ;
+#endif 
 class R3BTofdCal2HitPar : public FairTask
 {
 

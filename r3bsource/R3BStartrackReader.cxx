@@ -89,13 +89,13 @@ Bool_t R3BStartrackReader::Read()
     //    UInt_t WRvhb=0;
     //    UInt_t WRhb=0;
     //    UInt_t WRlb=0;
-    uint64_t TS;
-    uint64_t TSExt;
+    uint64_t TS = -1;
+    uint64_t TSExt = -1;
     //    UInt_t ts_vhb=0.; // replaced by fts_vhb
     //    UInt_t ts_hb=0.;  // replaced by fts_hb
     UInt_t ts_lb = 0;
-    UInt_t tsExt_vhb = 0.;
-    UInt_t tsExt_hb = 0.;
+    UInt_t tsExt_vhb = 0;
+    UInt_t tsExt_hb = 0;
     UInt_t tsExt_lb = 0;
 
     uint32_t starN = data->sit_n; // not necessarly number of hits! (b/c multi hit)  = block size
@@ -147,6 +147,9 @@ Bool_t R3BStartrackReader::Read()
                     TSExt = ((uint64_t)tsExt_hb << 28) |
                             tsExt_lb; // Reconstructed timestamp from MSB (most significant bits) and sLSB (slightly
                                       // lower significant bits) for a startrack signal
+                // so, if either tsExt_vhb, tsExt_hb or tsExt_lb happen to be zero, TSExt will not be intialized.
+                // Otherwise, tsExt_vhb is ignored for the TS.
+                // if this is working as intended, I do not want to know anything more about it.
 
                 // Case of wordtype=3:
             }

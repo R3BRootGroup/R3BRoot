@@ -122,7 +122,15 @@ find_package(HEPMC)
 # Check the compiler and set the compile and link flags
 check_compiler()
 
-#set(CMAKE_CXX_FLAGS -std=c++14)
+if(DEFINED $ENV{WERROR} AND $ENV{WERROR})
+  message(STATUS "Will compile with -Werror. ")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wno-error=sign-compare -Wno-error=reorder -Wno-error=unused-variable -Wno-error=unused-but-set-variable")
+else()
+  if (NOT APPLE)
+    message(STATUS "Set env WERROR to 1 to enable -Werror. If origin/dev compiles on your platform with that option, it is definitly a good idea to do that.")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-sign-compare -Wno-reorder -Wno-unused-variable -Wno-unused-but-set-variable")
+  endif()
+endif()
 
 set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
@@ -217,6 +225,9 @@ find_package(ucesb)
 if(ucesb_FOUND)
     set(WITH_UCESB true)
     set(LD_LIBRARY_PATH ${ucesb_LIBRARY_DIR} ${LD_LIBRARY_PATH})
+else()
+  message(WARNING "${BMagenta}No UCESB configured. You will not be able to unpack lmd files. Set UCESB_DIR"
+    " to a ucesb installation to fix this.${CR}")
 endif(ucesb_FOUND)
 
 find_package(EPICS)

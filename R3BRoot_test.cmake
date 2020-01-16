@@ -8,7 +8,8 @@ Set(CTEST_PROJECT_NAME "R3BRoot")
 Find_Program(CTEST_GIT_COMMAND NAMES git)
 Set(CTEST_UPDATE_COMMAND "${CTEST_GIT_COMMAND}")
 
-Set(BUILD_COMMAND "make")
+Set(BUILD_COMMAND "make -k")
+
 Set(CTEST_BUILD_COMMAND "${BUILD_COMMAND} -j$ENV{number_of_processors}")
 
 Set(EXTRA_FLAGS $ENV{EXTRA_FLAGS})
@@ -48,16 +49,28 @@ EndIf()
 Ctest_Configure(BUILD "${CTEST_BINARY_DIRECTORY}"
                 OPTIONS "${configure_options}"
                )
-Ctest_Build(BUILD "${CTEST_BINARY_DIRECTORY}")
-Ctest_Test(BUILD "${CTEST_BINARY_DIRECTORY}" 
-           PARALLEL_LEVEL $ENV{number_of_processors}
-           RETURN_VALUE _ctest_test_ret_val
-          )
-If(GCOV_COMMAND)
-  Ctest_Coverage(BUILD "${CTEST_BINARY_DIRECTORY}")
-EndIf()
-Ctest_Submit()
- 
-if (_ctest_test_ret_val)
-    Message(FATAL_ERROR "Some tests failed.")
+Ctest_Build(BUILD "${CTEST_BINARY_DIRECTORY}"
+  RETURN_VALUE _ctest_build_ret_val
+  )
+if (_ctest_build_ret_val)
+  Message(WARNING "Build failed. Will paste the build log now."
+    "\n---------------------------------------------------\n\n")
+  Execute_process(COMMAND "find" "${CTEST_BINARY_DIRECTORY}" "-iname" "LastBuild_*.log" "-exec" cat "{}" ";")
+  Message(FATAL_ERROR "\n---------------------------------------------------\n"
+    "Ctest Failed: Build failed. (make output is above.)")
 endif()
+
+if (NOT DEFINED ENV{BUILDONLY} OR NOT $ENV{BUILDONLY})
+  Ctest_Test(BUILD "${CTEST_BINARY_DIRECTORY}" 
+    PARALLEL_LEVEL $ENV{number_of_processors}
+    RETURN_VALUE _ctest_test_ret_val
+    )
+  If(GCOV_COMMAND)
+    Ctest_Coverage(BUILD "${CTEST_BINARY_DIRECTORY}")
+  EndIf()
+  Ctest_Submit()
+  
+  if (_ctest_test_ret_val)
+    Message(FATAL_ERROR "Some tests failed.")
+  endif()
+endif()# not buildonly

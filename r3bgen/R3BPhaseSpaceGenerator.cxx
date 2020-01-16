@@ -79,8 +79,8 @@ Bool_t R3BPhaseSpaceGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     const auto TotE_GeV = erel_GeV + fTotMass;
     const auto gamma = 1 + beamEnergy_GeV / 0.931494028;
     const auto beta = std::sqrt(1 - 1 / (gamma * gamma));
-    TLorentzVector Init(0.0, 0.0, 0.0, TotE_GeV);
-    fPhaseSpace.SetDecay(Init, fMasses.size(), fMasses.data());
+    TLorentzVector InitVec(0.0, 0.0, 0.0, TotE_GeV);
+    fPhaseSpace.SetDecay(InitVec, fMasses.size(), fMasses.data());
     fPhaseSpace.Generate();
 
     const size_t nParticles = fPDGCodes.size();

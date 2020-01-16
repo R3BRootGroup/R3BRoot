@@ -76,6 +76,22 @@
 #include <sstream>
 #include <vector>
 #define IS_NAN(x) TMath::IsNaN(x)
+
+#include <boost/multi_array.hpp>
+#include <cassert>
+#include <cmath> // NAN
+
+template <class T>
+static void init_array(T& array, double init)
+{
+    // boost::multi_array prefers cascaded for loops over index sets
+    // (e.g. python's dict().keys())
+    // thus we can not really use a range based for loop
+    // and instead wrangle pointers like it is 1980 again.
+    for (double* e = array.origin(); e < array.origin() + array.num_elements(); ++e)
+        *e = init;
+}
+
 using namespace std;
 
 R3BOnlineSpectra::R3BOnlineSpectra()
@@ -1357,9 +1373,19 @@ void R3BOnlineSpectra::Exec(Option_t* option)
             return;
 
         Int_t iDet = 0;
-        Double_t timeRolu_L[nParts][2][4] = { 0.0 / 0.0 };
-        Double_t timeRolu_T[nParts][2][4] = { 0.0 / 0.0 };
-        Double_t totRolu[nParts][2][4] = { 0.0 / 0.0 };
+        /*
+         * Note: double x[nParts][2][4]={NAN};
+         * will initialize everything other than x[0][0][0] to 0.0.
+         * (and also not compile with our ancient gcc 4.8.5.)
+         */
+        using A = boost::multi_array<double, 3>;
+        auto dims = boost::extents[nParts][2][4];
+        A timeRolu_L(dims);
+        init_array(timeRolu_L, NAN);
+        A timeRolu_T(dims);
+        init_array(timeRolu_T, NAN);
+        A totRolu(dims);
+        init_array(totRolu, NAN);
 
         for (Int_t iPart = 0; iPart < nParts; iPart++)
         {
@@ -1709,7 +1735,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
     Double_t totsumS8[10] = { 0.0 };
     Double_t totS8[10][8] = { 0.0 / 0.0 };
 
-    Int_t MultipS8;
+    Int_t MultipS8 = -1;
 
     if (fMappedItems.at(DET_SCI8))
     {
@@ -1731,6 +1757,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
             fh_sci8_channels->Fill(iCha);
         }
     }
+    assert(MultipS8 != -1);
 
     Int_t nPartS8;
 
@@ -2619,7 +2646,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 
                             fh_pspx_hit_position[i]->Fill(hitData->GetX(), hitData->GetY());
 
-                            /*if(hitData->GetDetector() == 1 ){//&& hitData->GetX() > -5 && hitData->GetX() < 5){
+                            if(hitData->GetDetector() == 1 ){//&& hitData->GetX() > -5 && hitData->GetX() < 5){
 
                              fh_los_pos_MCFD->Fill(xV_cm[0],yV_cm[0]);
                              fh_los_pos_TAMEX->Fill(xT_cm[0],yT_cm[0]);
@@ -2691,7 +2718,7 @@ void R3BOnlineSpectra::FinishTask()
     {
         fh_TimePreviousEvent->Write();
 
-        for (Int_t i; i < 4; i++)
+        for (Int_t i = 0; i < 4; i++)
         {
             fh_tofd_TotPm[i]->Write();
         }

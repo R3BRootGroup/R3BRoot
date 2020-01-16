@@ -105,53 +105,53 @@ void R3BTraDigitizer::Exec(Option_t* opt)
     Int_t TrackIdTra = 0;
     //     Int_t TrackId=0;
 
-    Double_t ss03_se_f;
-    Double_t ss03_spos_f;
-    Double_t ss03_sbw_f;
-    Double_t ss03_sarea_f;
-    Double_t ss03_seta_f;
+    Double_t ss03_se_f = nan("");
+    Double_t ss03_spos_f = nan("");
+    Double_t ss03_sbw_f = nan("");
+    Double_t ss03_sarea_f = nan("");
+    Double_t ss03_seta_f = nan("");
 
-    Double_t ss03_ke_f;
-    Double_t ss03_kpos_f;
-    Double_t ss03_kbw_f;
-    Double_t ss03_karea_f;
-    Double_t ss03_keta_f;
+    Double_t ss03_ke_f = nan("");
+    Double_t ss03_kpos_f = nan("");
+    Double_t ss03_kbw_f = nan("");
+    Double_t ss03_karea_f = nan("");
+    Double_t ss03_keta_f = nan("");
 
-    Double_t ss06_se_f;
-    Double_t ss06_spos_f;
-    Double_t ss06_sbw_f;
-    Double_t ss06_sarea_f;
-    Double_t ss06_seta_f;
+    Double_t ss06_se_f = nan("");
+    Double_t ss06_spos_f = nan("");
+    Double_t ss06_sbw_f = nan("");
+    Double_t ss06_sarea_f = nan("");
+    Double_t ss06_seta_f = nan("");
 
-    Double_t ss06_ke_f;
-    Double_t ss06_kpos_f;
-    Double_t ss06_kbw_f;
-    Double_t ss06_karea_f;
-    Double_t ss06_keta_f;
+    Double_t ss06_ke_f = nan("");
+    Double_t ss06_kpos_f = nan("");
+    Double_t ss06_kbw_f = nan("");
+    Double_t ss06_karea_f = nan("");
+    Double_t ss06_keta_f = nan("");
 
-    Double_t ss03_se_p1;
-    Double_t ss03_spos_p1;
-    Double_t ss03_sbw_p1;
-    Double_t ss03_sarea_p1;
-    Double_t ss03_seta_p1;
+    Double_t ss03_se_p1 = nan("");
+    Double_t ss03_spos_p1 = nan("");
+    Double_t ss03_sbw_p1 = nan("");
+    Double_t ss03_sarea_p1 = nan("");
+    Double_t ss03_seta_p1 = nan("");
 
-    Double_t ss03_ke_p1;
-    Double_t ss03_kpos_p1;
-    Double_t ss03_kbw_p1;
-    Double_t ss03_karea_p1;
-    Double_t ss03_keta_p1;
+    Double_t ss03_ke_p1 = nan("");
+    Double_t ss03_kpos_p1 = nan("");
+    Double_t ss03_kbw_p1 = nan("");
+    Double_t ss03_karea_p1 = nan("");
+    Double_t ss03_keta_p1 = nan("");
 
-    Double_t ss06_se_p1;
-    Double_t ss06_spos_p1;
-    Double_t ss06_sbw_p1;
-    Double_t ss06_sarea_p1;
-    Double_t ss06_seta_p1;
+    Double_t ss06_se_p1 = nan("");
+    Double_t ss06_spos_p1 = nan("");
+    Double_t ss06_sbw_p1 = nan("");
+    Double_t ss06_sarea_p1 = nan("");
+    Double_t ss06_seta_p1 = nan("");
 
-    Double_t ss06_ke_p1;
-    Double_t ss06_kpos_p1;
-    Double_t ss06_kbw_p1;
-    Double_t ss06_karea_p1;
-    Double_t ss06_keta_p1;
+    Double_t ss06_ke_p1 = nan("");
+    Double_t ss06_kpos_p1 = nan("");
+    Double_t ss06_kbw_p1 = nan("");
+    Double_t ss06_karea_p1 = nan("");
+    Double_t ss06_keta_p1 = nan("");
 
     //******************** SSTs **************************//
 

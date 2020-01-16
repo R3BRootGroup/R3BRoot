@@ -685,9 +685,9 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
             Double_t totMax_MA = 0.;
             Int_t iFibMax_MA = 0;
 
-            Double_t spmtMax;
-            Double_t mapmtMax;
-            Double_t tofMax;
+            Double_t spmtMax = nan("");
+            Double_t mapmtMax = nan("");
+            Double_t tofMax = nan("");
             Double_t y;
             Double_t tof[14] = { 0., 0., 0., 0., 60., 60., 0., 0., 0., 140., 140., 0., 140., 140. };
             Double_t z[14] = { -51., -49., 0., 0., 45., 50., 0., 0., 0., 700., 670., 0., 630., 600. };

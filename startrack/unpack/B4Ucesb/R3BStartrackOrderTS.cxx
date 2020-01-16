@@ -228,7 +228,7 @@ void R3BStartrackOrderTS::Exec(Option_t* option)
     R3BStartrackRawHit* item;
     R3BStartrackRawHit* item2;
 
-    int difflb, diff45, diff78;
+    int difflb = 0, diff45, diff78;
 
     Int_t nItems = fRawData->GetEntriesFast(); // returns the number of hits in the block
 

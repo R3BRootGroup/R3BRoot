@@ -85,7 +85,7 @@ void R3BTraHitFinder::Exec(Option_t* opt)
     Int_t strip = 0;
     Int_t StripA_Id = 0;
     Int_t StripB_Id = 0;
-    Double_t SlopA, SlopB, OffsetA, OffsetB;
+    Double_t SlopA, SlopB, OffsetA = nan(""), OffsetB = nan("");
 
     // Middle layer
     Double_t Length2 = 30.06;                      // cm
@@ -1011,22 +1011,7 @@ Double_t R3BTraHitFinder::GetThetaScatZero(Double_t X, Double_t Y, Double_t Z)
 }
 
 // -----   Private method GetPhiScatZero  --------------------------------------------
-Double_t R3BTraHitFinder::GetPhiScatZero(Double_t X, Double_t Y, Double_t Z)
-{
-
-    Double_t Phi;
-
-    if (X > 0 && Y > 0)
-        Phi = atan(Y / X);
-    if (X < 0 && Y >= 0)
-        Phi = TMath::Pi() + atan(Y / X);
-    if (X < 0 && Y < 0)
-        Phi = -TMath::Pi() + atan(Y / X);
-    if (X > 0 && Y <= 0)
-        Phi = atan(Y / X);
-
-    return Phi;
-}
+Double_t R3BTraHitFinder::GetPhiScatZero(Double_t X, Double_t Y, Double_t Z) { return atan2(Y, X); }
 
 // -----   Private method AddHit  --------------------------------------------
 R3BTrackerHit* R3BTraHitFinder::AddHit(Double_t ene,

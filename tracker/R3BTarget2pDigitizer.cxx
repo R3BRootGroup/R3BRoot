@@ -121,9 +121,9 @@ void R3BTarget2pDigitizer::Exec(Option_t* opt)
     Int_t TrackIdTra = 0;
     //     Int_t TrackId=0;
 
-    Double_t x0;
-    Double_t y0;
-    Double_t t0;
+    Double_t x0 = nan("");
+    Double_t y0 = nan("");
+    Double_t t0 = nan("");
 
     Int_t ss03_smul;
     Int_t ss03_kmul;
@@ -142,17 +142,17 @@ void R3BTarget2pDigitizer::Exec(Option_t* opt)
     Double_t Pyp2 = 0;
     Double_t Pzp2 = 0;
 
-    Double_t Pf_tot;
-    Double_t Pp1_tot;
-    Double_t Pp2_tot;
+    Double_t Pf_tot = nan("");
+    Double_t Pp1_tot = nan("");
+    Double_t Pp2_tot = nan("");
 
-    Double_t f_beta;
-    Double_t p1_beta;
-    Double_t p2_beta;
+    Double_t f_beta = nan("");
+    Double_t p1_beta = nan("");
+    Double_t p2_beta = nan("");
 
-    Double_t p2;
-    Double_t E2;
-    Double_t estar;
+    Double_t p2 = nan("");
+    Double_t E2 = nan("");
+    Double_t estar = nan("");
 
     // Todo: do those properly, maybe 15O+2p mass
     Double_t in_beta = 0.7579865;
