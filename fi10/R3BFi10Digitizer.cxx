@@ -164,6 +164,7 @@ void R3BFi10Digitizer::Exec(Option_t* opt)
 
             if (Hit.Time - time[fiberID].back() < 30)
             {
+
                 energy[fiberID].back() += Hit.Energy;
 
                 y[fiberID].back() = (time[fiberID].back() > Hit.Time) ? Hit.Y : y[fiberID].back();
@@ -186,7 +187,6 @@ void R3BFi10Digitizer::Exec(Option_t* opt)
             {
                 if (energyl > 0.0001)
                 {
-
                     Float_t xpos =
                         -detector_width / 2. + fiber_thickness / 2. + (i + (i * air_layer)) * fiber_thickness;
                     cout << "Test: Det = 10"

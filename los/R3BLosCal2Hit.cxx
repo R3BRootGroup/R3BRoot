@@ -742,7 +742,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
                 // MCFD times:
                 fhTres_M->Fill(LosTresM[ihit]);
                 // fhTresMvsIcount->Fill(Icount,LosTresM[ihit]);
-                fhTresMvsIcount->Fill(ihit + 1, LosTresM[ihit]);
+                fhTresMvsIcount->Fill(Icount, LosTresM[ihit]);
                 // MCFD walk corrected times:
                 fhTres_M_corr->Fill(LosTresM_corr[ihit]);
                 if (ihit > 0)
@@ -750,7 +750,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
                 // TAMEX times:
                 fhTres_T->Fill(LosTresT[ihit]);
                 // fhTresTvsIcount->Fill(Icount,LosTresT[ihit]);
-                fhTresTvsIcount->Fill(ihit + 1, LosTresT[ihit]);
+                fhTresTvsIcount->Fill(Icount, LosTresT[ihit]);
                 // TAMEX walk corrected times:
                 fhTres_T_corr->Fill(LosTresT_corr[ihit]);
                 if (ihit > 0)
@@ -1277,9 +1277,9 @@ void R3BLosCal2Hit::CreateHisto()
     if (NULL == fhTresMvsIcount)
     {
         char strName[255];
-        sprintf(strName, "TresM_vs_ihit");
-        fhTresMvsIcount = new TH2F(strName, "", 10, 0, 10, fhTbin, fhTmin, fhTmax);
-        fhTresMvsIcount->GetXaxis()->SetTitle("hit number");
+        sprintf(strName, "TresM_vs_Icount");
+        fhTresMvsIcount = new TH2F(strName, "", 10000, 0, 10000000, fhTbin, fhTmin, fhTmax);
+        fhTresMvsIcount->GetXaxis()->SetTitle("Event number");
         fhTresMvsIcount->GetYaxis()->SetTitle("MCFD time precision / ns");
     }
 
@@ -1295,9 +1295,9 @@ void R3BLosCal2Hit::CreateHisto()
     if (NULL == fhTresTvsIcount)
     {
         char strName[255];
-        sprintf(strName, "TresT_vs_ihit");
-        fhTresTvsIcount = new TH2F(strName, "", 10, 0, 10, fhTbin, fhTmin, fhTmax);
-        fhTresTvsIcount->GetXaxis()->SetTitle("hit number");
+        sprintf(strName, "TresT_vs_Icount");
+        fhTresTvsIcount = new TH2F(strName, "", 10000, 0, 10000000, fhTbin, fhTmin, fhTmax);
+        fhTresTvsIcount->GetXaxis()->SetTitle("Event number");
         fhTresTvsIcount->GetYaxis()->SetTitle("MCFD time precision / ns");
     }
 

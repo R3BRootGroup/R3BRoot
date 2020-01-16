@@ -20,6 +20,7 @@ ${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
 ${ucesb_INCLUDE_DIR}
 )
+Set(R3BSOF_SOURCE_DIR ${R3BROOT_SOURCE_DIR}/sofia)
 
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
@@ -42,6 +43,9 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sampData
+${R3BSOF_SOURCE_DIR}/sofdata/twimData
+${R3BSOF_SOURCE_DIR}/twim
+${R3BSOF_SOURCE_DIR}/sofsource
 )
 
 set(LINK_DIRECTORIES
@@ -98,7 +102,6 @@ R3BStrawtubesReader.cxx
 R3BStartrackReader.cxx
 R3BAmsReader.cxx
 R3BMusicReader.cxx
-#R3BFib4Reader.cxx
 )
 
 Set(STRUCT_HEADERS
@@ -127,7 +130,6 @@ ext_h101_fibten.h
 ext_h101_fibeleven.h
 ext_h101_fibtwelve.h
 ext_h101_fibthirteen.h
-#ext_h101_los_tamex.h
 ext_h101_los_dez19.h
 ext_h101_rolu.h
 ext_h101_sci2.h

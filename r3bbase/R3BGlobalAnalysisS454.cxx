@@ -88,6 +88,7 @@ R3BGlobalAnalysisS454::R3BGlobalAnalysisS454(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fTrigger(-1)
     , fTpat(-1)
+    , fCuts(0)
     , fNEvents(0)
 {
 }
@@ -97,16 +98,8 @@ R3BGlobalAnalysisS454::~R3BGlobalAnalysisS454()
     for (int i = 0; i < NOF_FIB_DET; i++)
     {
         delete fh_xy_Fib[i];
-        delete fh_fibers_Fib[i];
-        delete fh_fiber_Fib[i];
         delete fh_mult_Fib[i];
-        delete fh_time_Fib[i];
-        delete fh_xpos_Fib[i];
-        delete fh_ypos_Fib[i];
-        delete fh_multihit_m_Fib[i];
-        delete fh_multihit_s_Fib[i];
-        delete fh_ToT_m_Fib[i];
-        delete fh_ToT_s_Fib[i];
+        delete fh_ToT_Fib[i];
     }
 }
 
@@ -218,9 +211,17 @@ InitStatus R3BGlobalAnalysisS454::Init()
     fh_target_pz->GetXaxis()->SetTitle("pz / MeV/c");
     fh_target_pz->GetYaxis()->SetTitle("counts");
 
-    fh_target_xy = new TH2F("target_xy", "target xy ", 1000, -5, 5, 1000, -5., 5.);
+    fh_target_p = new TH1F("target_p", "target p ", 30000, 0., 30000.);
+    fh_target_p->GetXaxis()->SetTitle("pz / MeV/c");
+    fh_target_p->GetYaxis()->SetTitle("counts");
+
+    fh_target_xy = new TH2F("target_xy", "target xy ", 1000, -0.5, 0.5, 1000, -0.5, 0.5);
     fh_target_xy->GetXaxis()->SetTitle("x / cm");
     fh_target_xy->GetYaxis()->SetTitle("y / cm");
+
+    fh_chi2 = new TH1F("chi2", "chi2 ", 1000, 0., 100);
+    fh_chi2->GetXaxis()->SetTitle("Chi2");
+    fh_chi2->GetYaxis()->SetTitle("counts");
 
     fh_dx = new TH1F("tracker_dx", "tracker dx ", 2000, -5., 5);
     fh_dx->GetXaxis()->SetTitle("dx / cm");
@@ -254,6 +255,10 @@ InitStatus R3BGlobalAnalysisS454::Init()
     fh_thetax_dpx->GetXaxis()->SetTitle("dpx / percent");
     fh_thetax_dpx->GetYaxis()->SetTitle("theta_x / mrad");
 
+    fh_dpy_dpx = new TH2F("tracker_dpy_dpx", "tracker dpy vs dpx ", 200, -100, 100, 200, -100., 100.);
+    fh_dpy_dpx->GetXaxis()->SetTitle("dpx / percent");
+    fh_dpy_dpx->GetYaxis()->SetTitle("dpy / percent");
+
     fh_thetay_dpy = new TH2F("tracker_thethay_dpy", "tracker theta_y vs dpy ", 1000, -50, 50, 200, -100., 100.);
     fh_thetay_dpy->GetXaxis()->SetTitle("dpy / percent");
     fh_thetay_dpy->GetYaxis()->SetTitle("theta_y / mrad");
@@ -265,6 +270,11 @@ InitStatus R3BGlobalAnalysisS454::Init()
     fh_thetay_dpx = new TH2F("tracker_thethay_dpx", "tracker theta_y vs dpx ", 1000, -50, 50, 200, -100., 100.);
     fh_thetay_dpx->GetXaxis()->SetTitle("dpx / percent");
     fh_thetay_dpx->GetYaxis()->SetTitle("theta_y / mrad");
+
+    fh_thetax_dpx_abs =
+        new TH2F("tracker_thethax_dpx_abs", "tracker theta_x vs dpx abs ", 1000, -50, 50, 200, -100., 100.);
+    fh_thetax_dpx_abs->GetXaxis()->SetTitle("dpx");
+    fh_thetax_dpx_abs->GetYaxis()->SetTitle("theta_x / mrad");
 
     fh_x_dpx = new TH2F("tracker_x_dpx", "tracker x vs dpx ", 1000, -50, 50, 200, -10., 10.);
     fh_x_dpx->GetXaxis()->SetTitle("dpx / percent");
@@ -278,7 +288,7 @@ InitStatus R3BGlobalAnalysisS454::Init()
     // Fiber Detectors 1-NOF_FIB_DET
 
     char canvName[255];
-
+    UInt_t Nmax = 1e7;
     for (Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)
     {
 
@@ -293,122 +303,104 @@ InitStatus R3BGlobalAnalysisS454::Init()
 
             // xy:
             fh_xy_Fib[ifibcount] =
-                new TH2F(Form("%s_xy", detName), Form("%s xy", detName), 1000, -50., 50., 1000, -50., 50.);
+                new TH2F(Form("%s_xy", detName), Form("%s xy", detName), 1000, -50., 50., 2000, -1000., 1000.);
             fh_xy_Fib[ifibcount]->GetXaxis()->SetTitle("x / cm ");
             fh_xy_Fib[ifibcount]->GetYaxis()->SetTitle("y / cm");
 
-            // Fibers:
-            fh_fibers_Fib[ifibcount] =
-                new TH1F(Form("%s_fibers", detName), Form("%s fibers", detName), N_FIBER_PLOT, 0., N_FIBER_PLOT);
-            fh_fibers_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
-            fh_fibers_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
-
-            // Fiber:
-            fh_fiber_Fib[ifibcount] =
-                new TH1F(Form("%s_fiber", detName), Form("%s fiber", detName), N_FIBER_PLOT, 0., N_FIBER_PLOT);
-            fh_fiber_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
-            fh_fiber_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
+            fh_xy_Fib_ac[ifibcount] = new TH2F(
+                Form("%s_xy_ac", detName), Form("%s xy after cuts", detName), 1000, -50., 50., 2000, -100., 100.);
+            fh_xy_Fib_ac[ifibcount]->GetXaxis()->SetTitle("x / cm ");
+            fh_xy_Fib_ac[ifibcount]->GetYaxis()->SetTitle("y / cm");
 
             // Multiplicity (number of hit fibers):
             fh_mult_Fib[ifibcount] = new TH1F(Form("%s_mult", detName), Form("%s # of fibers", detName), 500, 0., 500.);
             fh_mult_Fib[ifibcount]->GetXaxis()->SetTitle("Multiplicity");
             fh_mult_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
 
-            // Multihit MAPMT:
-            fh_multihit_m_Fib[ifibcount] = new TH2F(
-                Form("%s_multihit_m", detName), Form("%s multihits MAPMT", detName), 520, 0., 520., 20, 0., 20.);
-            fh_multihit_m_Fib[ifibcount]->GetXaxis()->SetTitle("MAPMT channel");
-            fh_multihit_m_Fib[ifibcount]->GetYaxis()->SetTitle("Multihit");
-
-            // Multihit SAPMT:
-            fh_multihit_s_Fib[ifibcount] = new TH2F(
-                Form("%s_multihit_s", detName), Form("%s multihits single PMT", detName), 16, 0., 16., 20, 0., 20.);
-            fh_multihit_s_Fib[ifibcount]->GetXaxis()->SetTitle("SAPMT channel");
-            fh_multihit_s_Fib[ifibcount]->GetYaxis()->SetTitle("Multihit");
+            fh_mult_Fib_ac[ifibcount] =
+                new TH1F(Form("%s_mult_ac", detName), Form("%s # of fibers after cuts", detName), 500, 0., 500.);
+            fh_mult_Fib_ac[ifibcount]->GetXaxis()->SetTitle("Multiplicity");
+            fh_mult_Fib_ac[ifibcount]->GetYaxis()->SetTitle("Counts");
 
             // ToT MAPMT:
-            fh_ToT_m_Fib[ifibcount] = new TH2F(Form("%s_tot_m", detName),
-                                               Form("%s ToT of MAPMT", detName),
-                                               N_FIBER_PLOT,
-                                               0.,
-                                               N_FIBER_PLOT,
-                                               400,
-                                               0.,
-                                               400.);
-            fh_ToT_m_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
-            fh_ToT_m_Fib[ifibcount]->GetYaxis()->SetTitle("ToT / ns");
+            fh_ToT_Fib[ifibcount] =
+                new TH2F(Form("%s_tot_m", detName), Form("%s ToT of MAPMT", detName), 1000, -50., 50, 4000, 0., 400.);
+            fh_ToT_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber x / cm");
+            fh_ToT_Fib[ifibcount]->GetYaxis()->SetTitle("ToT / ns");
 
-            // ToT SAPMT:
-            fh_ToT_s_Fib[ifibcount] = new TH2F(Form("%s_tot_s", detName),
-                                               Form("%s ToT of single PMT", detName),
-                                               N_FIBER_PLOT,
-                                               0.,
-                                               N_FIBER_PLOT,
-                                               400,
-                                               0.,
-                                               400.);
-            fh_ToT_s_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
-            fh_ToT_s_Fib[ifibcount]->GetYaxis()->SetTitle("ToT / ns");
-
-            // Time of fiber:
-            fh_time_Fib[ifibcount] = new TH2F(Form("%s_TimevsFiber", detName),
-                                              Form("%s Time vs Fiber", detName),
-                                              N_FIBER_PLOT,
-                                              0.,
-                                              N_FIBER_PLOT,
-                                              20000,
-                                              -1024.,
-                                              1024.);
-            fh_time_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
-            fh_time_Fib[ifibcount]->GetYaxis()->SetTitle("tMAPMT-tSPMT");
+            fh_ToT_Fib_ac[ifibcount] = new TH2F(Form("%s_tot_m_ac", detName),
+                                                Form("%s ToT of MAPMT after cuts", detName),
+                                                1000,
+                                                -50.,
+                                                50,
+                                                4000,
+                                                0.,
+                                                400.);
+            fh_ToT_Fib_ac[ifibcount]->GetXaxis()->SetTitle("Fiber x / cm");
+            fh_ToT_Fib_ac[ifibcount]->GetYaxis()->SetTitle("ToT / ns");
 
             // ToF Tofd -> Fiber:
             fh_Fib_ToF[ifibcount] = new TH2F(
-                Form("%s_tof", detName), Form("%s ToF Tofd to Fiber", detName), 600, -30., 30, 10000, -50000., 50000.);
+                Form("%s_tof", detName), Form("%s ToF Tofd to Fiber", detName), 600, -30., 30, 10000, -1000., 1000.);
             fh_Fib_ToF[ifibcount]->GetYaxis()->SetTitle("ToF / ns");
             fh_Fib_ToF[ifibcount]->GetXaxis()->SetTitle("x / cm");
 
-            // ToF Tofd -> Fiber vs. event number:
-            fh_ToF_vs_events[ifibcount] = new TH2F(Form("%s_tof_vs_events", detName),
-                                                   Form("%s ToF Tofd to Fiber vs event number", detName),
-                                                   1000,
-                                                   0,
-                                                   5e6,
-                                                   2200,
-                                                   -1100,
-                                                   1100);
-            fh_ToF_vs_events[ifibcount]->GetYaxis()->SetTitle("ToF / ns");
-            fh_ToF_vs_events[ifibcount]->GetXaxis()->SetTitle("event number");
+            fh_Fib_ToF_ac[ifibcount] = new TH2F(Form("%s_tof_ac", detName),
+                                                Form("%s ToF Tofd to Fiber after cuts", detName),
+                                                600,
+                                                -30.,
+                                                30,
+                                                10000,
+                                                -1000.,
+                                                1000.);
+            fh_Fib_ToF_ac[ifibcount]->GetYaxis()->SetTitle("ToF / ns");
+            fh_Fib_ToF_ac[ifibcount]->GetXaxis()->SetTitle("x / cm");
 
-            // x position:
-            fh_xpos_Fib[ifibcount] =
-                new TH1F(Form("%s_xpos", detName), Form("%s x position", detName), 1000, -50., 50.);
-            fh_xpos_Fib[ifibcount]->GetXaxis()->SetTitle("x / cm");
-            fh_xpos_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
+            // ToF Tofd -> Fiber vs. event number:
+            fh_ToF_vs_Events[ifibcount] = new TH2F(Form("%s_tof_vs_events", detName),
+                                                   Form("%s ToF Tofd to Fiber vs event number", detName),
+                                                   10000,
+                                                   0,
+                                                   Nmax,
+                                                   2200,
+                                                   -5100,
+                                                   5100);
+            fh_ToF_vs_Events[ifibcount]->GetYaxis()->SetTitle("ToF / ns");
+            fh_ToF_vs_Events[ifibcount]->GetXaxis()->SetTitle("event number");
+
+            fh_ToF_vs_Events_ac[ifibcount] = new TH2F(Form("%s_tof_vs_events_ac", detName),
+                                                      Form("%s ToF Tofd to Fiber vs event number after cuts", detName),
+                                                      10000,
+                                                      0,
+                                                      Nmax,
+                                                      2200,
+                                                      -5100,
+                                                      5100);
+            fh_ToF_vs_Events_ac[ifibcount]->GetYaxis()->SetTitle("ToF / ns");
+            fh_ToF_vs_Events_ac[ifibcount]->GetXaxis()->SetTitle("event number");
 
             // hit fiber number vs. event number:
             fh_Fib_vs_Events[ifibcount] = new TH2F(Form("%s_fib_vs_event", detName),
                                                    Form("%s Fiber # vs. Event #", detName),
-                                                   1000,
+                                                   10000,
                                                    0,
-                                                   5e6,
-                                                   1100,
-                                                   0.,
-                                                   1100.);
-            fh_Fib_vs_Events[ifibcount]->GetYaxis()->SetTitle("Fiber number");
+                                                   Nmax,
+                                                   200,
+                                                   -100.,
+                                                   100.);
+            fh_Fib_vs_Events[ifibcount]->GetYaxis()->SetTitle("Fiber x / cm");
             fh_Fib_vs_Events[ifibcount]->GetXaxis()->SetTitle("Event number");
 
-            // hit MA number vs. event number:
-            fh_Fibs_vs_Events[ifibcount] = new TH2F(Form("%s_fibs_vs_event", detName),
-                                                    Form("%s Fiber # vs. Event #", detName),
-                                                    1000,
-                                                    0,
-                                                    5e6,
-                                                    1100,
-                                                    0.,
-                                                    1100.);
-            fh_Fibs_vs_Events[ifibcount]->GetYaxis()->SetTitle("Fiber number");
-            fh_Fibs_vs_Events[ifibcount]->GetXaxis()->SetTitle("Event number");
+            fh_Fib_vs_Events_ac[ifibcount] = new TH2F(Form("%s_fib_vs_event_ac", detName),
+                                                      Form("%s Fiber # vs. Event # after cuts", detName),
+                                                      10000,
+                                                      0,
+                                                      Nmax,
+                                                      200,
+                                                      -100.,
+                                                      100.);
+            fh_Fib_vs_Events_ac[ifibcount]->GetYaxis()->SetTitle("Fiber x / cm");
+            fh_Fib_vs_Events_ac[ifibcount]->GetXaxis()->SetTitle("Event number");
 
             // hit fiber number vs. TofD position:
             fh_Fibs_vs_Tofd[ifibcount] = new TH2F(Form("%s_fib_vs_TofdX", detName),
@@ -416,11 +408,22 @@ InitStatus R3BGlobalAnalysisS454::Init()
                                                   200,
                                                   -100,
                                                   100,
-                                                  1100,
-                                                  0.,
-                                                  1100.);
-            fh_Fibs_vs_Tofd[ifibcount]->GetYaxis()->SetTitle("Fiber number");
-            fh_Fibs_vs_Tofd[ifibcount]->GetXaxis()->SetTitle("Tofd x-pos number");
+                                                  200,
+                                                  -100.,
+                                                  100.);
+            fh_Fibs_vs_Tofd[ifibcount]->GetYaxis()->SetTitle("Fiber x / cm");
+            fh_Fibs_vs_Tofd[ifibcount]->GetXaxis()->SetTitle("Tofd x / cm");
+
+            fh_Fibs_vs_Tofd_ac[ifibcount] = new TH2F(Form("%s_fib_vs_TofdX_ac", detName),
+                                                     Form("%s Fiber # vs. Tofd x-pos after cuts", detName),
+                                                     200,
+                                                     -100,
+                                                     100,
+                                                     200,
+                                                     -100.,
+                                                     100.);
+            fh_Fibs_vs_Tofd_ac[ifibcount]->GetYaxis()->SetTitle("Fiber x / cm");
+            fh_Fibs_vs_Tofd_ac[ifibcount]->GetXaxis()->SetTitle("Tofd x / cm");
 
             // hit fiber number vs. TofD position:
             for (Int_t j = ifibcount + 1; j < NOF_FIB_DET; j++)
@@ -428,14 +431,27 @@ InitStatus R3BGlobalAnalysisS454::Init()
                 detName2 = fDetectorNames[DET_FI_FIRST + j];
                 fh_Fib_vs_Fib[ifibcount][j] = new TH2F(Form("fib%s_vs_fib%s", detName, detName2),
                                                        Form("Fiber %s vs. Fiber %s", detName, detName2),
-                                                       110,
-                                                       0,
-                                                       1100,
-                                                       110,
-                                                       0.,
-                                                       1100.);
+                                                       1000,
+                                                       -50,
+                                                       50,
+                                                       1000,
+                                                       -50.,
+                                                       50.);
                 fh_Fib_vs_Fib[ifibcount][j]->GetYaxis()->SetTitle(Form("Fiber%s", detName2));
                 fh_Fib_vs_Fib[ifibcount][j]->GetXaxis()->SetTitle(Form("Fiber%s", detName));
+                ;
+
+                detName2 = fDetectorNames[DET_FI_FIRST + j];
+                fh_Fib_vs_Fib_ac[ifibcount][j] = new TH2F(Form("fib%s_vs_fib%s_ac", detName, detName2),
+                                                          Form("Fiber %s vs. Fiber %s after cuts", detName, detName2),
+                                                          1000,
+                                                          -50,
+                                                          50,
+                                                          1000,
+                                                          -50.,
+                                                          50.);
+                fh_Fib_vs_Fib_ac[ifibcount][j]->GetYaxis()->SetTitle(Form("Fiber%s", detName2));
+                fh_Fib_vs_Fib_ac[ifibcount][j]->GetXaxis()->SetTitle(Form("Fiber%s", detName));
                 ;
             }
 
@@ -445,22 +461,29 @@ InitStatus R3BGlobalAnalysisS454::Init()
                 detName2 = fDetectorNames[DET_FI_FIRST + j];
                 fh_Fib_dx[ifibcount][j] = new TH2F(Form("fib%s_fib%s_dx", detName, detName2),
                                                    Form("dx of Fiber %s and Fiber %s", detName2, detName),
-                                                   1100,
-                                                   0,
-                                                   1100,
                                                    1000,
-                                                   -500.,
-                                                   500.);
+                                                   -50,
+                                                   50,
+                                                   1000,
+                                                   -50.,
+                                                   50.);
                 fh_Fib_dx[ifibcount][j]->GetYaxis()->SetTitle("dx");
-                fh_Fib_dx[ifibcount][j]->GetXaxis()->SetTitle(Form("Fiber%s", detName));
+                fh_Fib_dx[ifibcount][j]->GetXaxis()->SetTitle(Form("x %s / cm", detName));
+                ;
+
+                detName2 = fDetectorNames[DET_FI_FIRST + j];
+                fh_Fib_dx_ac[ifibcount][j] = new TH2F(Form("fib%s_fib%s_dx_ac", detName, detName2),
+                                                      Form("dx of Fiber %s and Fiber %s after cuts", detName2, detName),
+                                                      1000,
+                                                      -50,
+                                                      50,
+                                                      1000,
+                                                      -50.,
+                                                      50.);
+                fh_Fib_dx_ac[ifibcount][j]->GetYaxis()->SetTitle("dx");
+                fh_Fib_dx_ac[ifibcount][j]->GetXaxis()->SetTitle(Form("x %s / cm", detName));
                 ;
             }
-
-            // y position:
-            fh_ypos_Fib[ifibcount] =
-                new TH1F(Form("%s_ypos", detName), Form("%s y position", detName), 1000, -50., 50.);
-            fh_ypos_Fib[ifibcount]->GetXaxis()->SetTitle("y / cm");
-            fh_ypos_Fib[ifibcount]->GetYaxis()->SetTitle("Counts");
 
         } // end if(Mapped)
 
@@ -477,23 +500,36 @@ InitStatus R3BGlobalAnalysisS454::Init()
         fh_xy_tofd->GetXaxis()->SetTitle("x / cm ");
         fh_xy_tofd->GetYaxis()->SetTitle("y / cm");
 
+        fh_xy_tofd_ac = new TH2F("tofd_xy_ac", "tofd xy after cuts", 2000, -100., 100., 2000, -100., 100.);
+        fh_xy_tofd_ac->GetXaxis()->SetTitle("x / cm ");
+        fh_xy_tofd_ac->GetYaxis()->SetTitle("y / cm");
+
         fh_tofd_charge = new TH1F("tofd_Q", "Charge of Tofd", 200, 0., 20.);
         fh_tofd_charge->GetXaxis()->SetTitle("x / cm ");
         fh_tofd_charge->GetYaxis()->SetTitle("y / cm");
 
-        fh_TimePreviousEvent = new TH1F("TimePreviousEvent", "Time between 2 particles ", 300000, 0, 3000);
-        fh_TimePreviousEvent->GetXaxis()->SetTitle("time / ns");
-        fh_TimePreviousEvent->GetYaxis()->SetTitle("counts");
+        fh_tofd_charge_ac = new TH1F("tofd_Q_ac", "Charge of Tofd after cuts", 200, 0., 20.);
+        fh_tofd_charge_ac->GetXaxis()->SetTitle("x / cm ");
+        fh_tofd_charge_ac->GetYaxis()->SetTitle("y / cm");
 
         fh_tofd_mult = new TH1F("tofd_mult", "ToFD multiplicits ", 100, 0, 100);
         fh_tofd_mult->GetXaxis()->SetTitle("multiplicity");
         fh_tofd_mult->GetYaxis()->SetTitle("counts");
+
+        fh_tofd_mult_ac = new TH1F("tofd_mult_ac", "ToFD multiplicits after cuts", 100, 0, 100);
+        fh_tofd_mult_ac->GetXaxis()->SetTitle("multiplicity");
+        fh_tofd_mult_ac->GetYaxis()->SetTitle("counts");
+
+        fh_TimePreviousEvent = new TH1F("TimePreviousEvent", "Time between 2 particles ", 300000, 0, 3000);
+        fh_TimePreviousEvent->GetXaxis()->SetTitle("time / ns");
+        fh_TimePreviousEvent->GetYaxis()->SetTitle("counts");
     }
 
     // -------------------------------------------------------------------------
     // Rene's tracker.
 
-    init_from_cpp_();
+    if (tracker)
+        init_from_cpp_();
 
     return kSUCCESS;
 }
@@ -504,7 +540,7 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
         std::cout << "\rEvents: " << fNEvents << " / " << maxevent << " (" << (int)(fNEvents * 100. / maxevent)
                   << " %) " << std::flush;
 
-    // cout << "New event" << endl;
+    // cout << "New event ******************************" << endl;
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
@@ -651,7 +687,7 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
         // read in Monte Carlo Track parameter
 
         Int_t nHitsMCTrack = fMCTrack->GetEntriesFast();
-        cout << "MCTrack hits: " << nHitsMCTrack << endl;
+        // cout << "MCTrack hits: " << nHitsMCTrack << endl;
 
         for (Int_t l = 0; l < nHitsMCTrack; l++)
         {
@@ -691,6 +727,13 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
     Bool_t ptn[n_det];
     Int_t det;
 
+    Double_t track_parameter[6];        // x,y,z, px, py, pz
+    Double_t chi_single_parameter[2];   // chi2, chi2_red
+    Double_t track_parameter_best_l[6]; // x,y,z, px, py, pz
+    Double_t track_parameter_best_r[6]; // x,y,z, px, py, pz
+    Double_t chi2Minl[2];
+    Double_t chi2Minr[2];
+
     for (int i = 0; i < n_det; i++)
     {
         x[i] = 0.;
@@ -712,6 +755,14 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
     Int_t tofdl = 7;
 
     Double_t tof = 0.;
+    Double_t qMax10 = -1;
+    Double_t iMax10 = -1;
+    Double_t qMax11 = -1;
+    Double_t iMax11 = -1;
+    Double_t qMax12 = -1;
+    Double_t iMax12 = -1;
+    Double_t qMax13 = -1;
+    Double_t iMax13 = -1;
 
     auto detTofd = fHitItems.at(DET_TOFD);
     Int_t nHits = detTofd->GetEntriesFast();
@@ -720,54 +771,62 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
     if (nHits > 0)
         fh_tofd_mult->Fill(nHits);
 
+    if (nHits > 2)
+        return;
+
     // loop over ToFD
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
         R3BTofdHitData* hitTofd = (R3BTofdHitData*)detTofd->At(ihit);
         if (!hitTofd)
             continue; // should not happen
-        if (ihit > 15)
-        {
-            cout << "Error, more than 16 hits" << endl;
-            continue;
-        }
         if (hitTofd->GetX() / 100. <= -0.007)
         {
             // tof rechts
             det = tofdr;
             ptn[tofdl] = false;
+            chi2Minr[0] = 1000.;
         }
         else
         {
             // tof links
             det = tofdl;
             ptn[tofdr] = false;
+            chi2Minl[0] = 1000.;
         }
         x[det] = hitTofd->GetX() / 100.;
         y[det] = hitTofd->GetY() / 100.;
         z[det] = 0.;
         q[det] = hitTofd->GetEloss();
         t[det] = hitTofd->GetTime();
+        Int_t id = hitTofd->GetDetId();
+        // get ID for hit 1= hit in plane 1, 2= hit in plane 2, 12 = hit in both
+
+        LOG(DEBUG) << "ToFD: " << ihit << " x: " << x[det] << " y: " << y[det] << " q: " << q[det] << " t: " << t[det]
+                   << endl;
+
+        fh_xy_tofd->Fill(x[det] * 100., y[det] * 100.);
+        fh_tofd_charge->Fill(q[det]);
 
         // Cuts on TofD
-        if (q[det] > 8.5)
+        //        if (fCuts && id != 12)
+        //            continue;
+        if (fCuts && q[det] > 12.)
             continue;
-        if (q[det] < 7.5)
+        if (fCuts && q[det] < 5.)
             continue;
-        if (t[det] < 0. || t[det] > 8192. * 5.)
+        if (fCuts && (t[det] < 0. || t[det] > 8192. * 5.))
             continue;
         if (IS_NAN(t[det]))
             continue;
 
         ptn[det] = true;
 
-        LOG(DEBUG) << "ToFD: " << ihit << " x: " << x[det] << " y: " << y[det] << " q: " << q[det] << " t: " << t[det]
-                   << endl;
-
         // fill histograms for ToFD
-        fh_xy_tofd->Fill(x[det] * 100., y[det] * 100.);
+        fh_tofd_mult_ac->Fill(nHits);
+        fh_xy_tofd_ac->Fill(x[det] * 100., y[det] * 100.);
+        fh_tofd_charge_ac->Fill(q[det]);
         fh_Cave_position->Fill(1000., x[det] * 100.);
-        fh_tofd_charge->Fill(q[det]);
 
         // differ between left and right half of ToFD
         if (ptn[tofdr])
@@ -778,6 +837,7 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
             auto detHit3a = fHitItems.at(DET_FI3A);
             Int_t nHits3a = detHit3a->GetEntriesFast();
             LOG(DEBUG) << "Fi3a hits: " << nHits3a << endl;
+            Int_t mult3a = 0;
             fh_mult_Fib[fi3a]->Fill(nHits3a);
             for (Int_t ihit3a = 0; ihit3a <= nHits3a; ihit3a++)
             {
@@ -821,9 +881,33 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
                     }
 
                     tof = t[tofdr] - t[det];
+
+                    // Fill histograms before cuts
                     fh_Fib_ToF[det]->Fill(x[det] * 100., tof);
                     fh_xy_Fib[det]->Fill(x[det] * 100., y[det] * 100.);
+                    fh_mult_Fib[det]->Fill(nHits3a);
+                    fh_ToT_Fib[det]->Fill(x[det] * 100., q[det]);
+                    fh_Fibs_vs_Tofd[det]->Fill(x[tofdr] * 100., x[det] * 100.);
+                    fh_Fib_vs_Events[det]->Fill(fNEvents, x[det] * 100.);
+                    fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
+
                     // Cuts on Fi3a
+                    if (fCuts && q[det] < 1.)
+                        continue;
+
+                    mult3a++;
+
+                    //                    if (fCuts && mult3a > 50)
+                    //                        continue;
+
+                    // Fill histograms
+                    fh_Fib_ToF_ac[det]->Fill(x[det] * 100., tof);
+                    fh_xy_Fib_ac[det]->Fill(x[det] * 100., y[det] * 100.);
+                    fh_mult_Fib_ac[det]->Fill(mult3a);
+                    fh_ToT_Fib_ac[det]->Fill(x[det] * 100., q[det]);
+                    fh_Fibs_vs_Tofd_ac[det]->Fill(x[tofdr] * 100., x[det] * 100.);
+                    fh_Fib_vs_Events_ac[det]->Fill(fNEvents, x[det] * 100.);
+                    fh_ToF_vs_Events_ac[det]->Fill(fNEvents, tof);
 
                     ptn[det] = true;
                     LOG(DEBUG) << "Fi3a: " << ihit3a << " x: " << x[det] << " y: " << y[det] << " q: " << q[det]
@@ -833,7 +917,22 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
                 auto detHit11 = fHitItems.at(DET_FI11);
                 Int_t nHits11 = detHit11->GetEntriesFast();
                 // cout<<"Fi11 hits: "<<nHits11<<endl;
-                fh_mult_Fib[fi11]->Fill(nHits11);
+                Int_t mult11 = 0;
+                qMax11 = -1;
+                iMax11 = -1;
+                for (Int_t ihit11 = 0; ihit11 < nHits11; ihit11++)
+                {
+                    R3BBunchedFiberHitData* hit11 = (R3BBunchedFiberHitData*)detHit11->At(ihit11);
+                    if (!hit11)
+                        continue;
+                    // find maximum light output
+                    Double_t qq = hit11->GetEloss();
+                    if (qq > qMax11)
+                    {
+                        qMax11 = qq;
+                        iMax11 = ihit11;
+                    }
+                }
                 for (Int_t ihit11 = 0; ihit11 < nHits11; ihit11++)
                 {
                     R3BBunchedFiberHitData* hit11 = (R3BBunchedFiberHitData*)detHit11->At(ihit11);
@@ -859,9 +958,45 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
                     }
 
                     tof = t[tofdr] - t[det];
+
+                    // Fill histograms before cuts
                     fh_Fib_ToF[det]->Fill(x[det] * 100., tof);
                     fh_xy_Fib[det]->Fill(x[det] * 100., y[det] * 100);
+                    fh_mult_Fib[det]->Fill(nHits11);
+                    fh_ToT_Fib[det]->Fill(x[det] * 100., q[det]);
+                    fh_Fibs_vs_Tofd[det]->Fill(x[tofdr] * 100., x[det] * 100.);
+                    fh_Fib_vs_Events[det]->Fill(fNEvents, x[det] * 100.);
+                    fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
+                    fh_Fib_vs_Fib[fi3a][fi11]->Fill(x[fi3a] * 100., x[fi11] * 100.);
+                    fh_Fib_dx[fi3a][fi11]->Fill(x[fi3a] * 100., x[fi11] * 100. - x[fi3a] * 100.);
+
                     // Cuts on Fi11
+                    if (fCuts && ihit11 != iMax11)
+                        continue;
+                    if (fCuts && y[det] * 100. > 50.)
+                        continue;
+                    if (fCuts && y[det] * 100. < -50.)
+                        continue;
+                    if (fCuts && q[det] < 1)
+                        continue;
+                    if (fCuts && (tof < -300 || tof > 0))
+                        continue;
+
+                    mult11++;
+
+                    //                    if (fCuts && mult11 > 50)
+                    //                        continue;
+
+                    // Fill histograms
+                    fh_Fib_ToF_ac[det]->Fill(x[det] * 100., tof);
+                    fh_xy_Fib_ac[det]->Fill(x[det] * 100., y[det] * 100);
+                    fh_mult_Fib_ac[det]->Fill(mult11);
+                    fh_ToT_Fib_ac[det]->Fill(x[det] * 100., q[det]);
+                    fh_Fibs_vs_Tofd_ac[det]->Fill(x[tofdr] * 100., x[det] * 100.);
+                    fh_Fib_vs_Events_ac[det]->Fill(fNEvents, x[det] * 100.);
+                    fh_ToF_vs_Events_ac[det]->Fill(fNEvents, tof);
+                    fh_Fib_vs_Fib_ac[fi3a][fi11]->Fill(x[fi3a] * 100., x[fi11] * 100.);
+                    fh_Fib_dx_ac[fi3a][fi11]->Fill(x[fi3a] * 100., x[fi11] * 100. - x[fi3a] * 100.);
 
                     ptn[det] = true;
                     LOG(DEBUG) << "Fi11: " << ihit11 << " x: " << x[det] << " y: " << y[det] << " q: " << q[det]
@@ -871,7 +1006,22 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
                     auto detHit13 = fHitItems.at(DET_FI13);
                     Int_t nHits13 = detHit13->GetEntriesFast();
                     // cout<<"Fi13 hits: "<<nHits13<<endl;
-                    fh_mult_Fib[fi13]->Fill(nHits13);
+                    Int_t mult13 = 0;
+                    qMax13 = -1;
+                    iMax13 = -1;
+                    for (Int_t ihit13 = 0; ihit13 < nHits13; ihit13++)
+                    {
+                        R3BBunchedFiberHitData* hit13 = (R3BBunchedFiberHitData*)detHit13->At(ihit13);
+                        if (!hit13)
+                            continue;
+                        // find maximum light output
+                        Double_t qq = hit13->GetEloss();
+                        if (qq > qMax13)
+                        {
+                            qMax13 = qq;
+                            iMax13 = ihit13;
+                        }
+                    }
                     for (Int_t ihit13 = 0; ihit13 < nHits13; ihit13++)
                     {
                         R3BBunchedFiberHitData* hit13 = (R3BBunchedFiberHitData*)detHit13->At(ihit13);
@@ -897,9 +1047,45 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
                         }
 
                         tof = t[tofdr] - t[det];
+
+                        // Fill histograms before cuts
                         fh_Fib_ToF[det]->Fill(x[det] * 100., tof);
                         fh_xy_Fib[det]->Fill(x[det] * 100., y[det] * 100.);
+                        fh_mult_Fib[det]->Fill(nHits13);
+                        fh_ToT_Fib[det]->Fill(x[det] * 100., q[det]);
+                        fh_Fibs_vs_Tofd[det]->Fill(x[tofdr] * 100., x[det] * 100.);
+                        fh_Fib_vs_Events[det]->Fill(fNEvents, x[det] * 100.);
+                        fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
+                        fh_Fib_vs_Fib[fi11][fi13]->Fill(x[fi11] * 100., x[fi13] * 100.);
+                        fh_Fib_dx[fi11][fi13]->Fill(x[fi11] * 100., x[fi13] * 100. - x[fi11] * 100.);
+
                         // Cuts on Fi13
+                        if (fCuts && ihit13 != iMax13)
+                            continue;
+                        if (fCuts && y[det] * 100. > 50.)
+                            continue;
+                        if (fCuts && y[det] * 100. < -50.)
+                            continue;
+                        if (fCuts && q[det] < 1)
+                            continue;
+                        if (fCuts && (tof < -200 || tof > 0))
+                            continue;
+
+                        mult13++;
+
+                        //						if (fCuts && mult13 > 50)
+                        //							continue;
+
+                        // Fill histograms
+                        fh_Fib_ToF_ac[det]->Fill(x[det] * 100., tof);
+                        fh_xy_Fib_ac[det]->Fill(x[det] * 100., y[det] * 100.);
+                        fh_mult_Fib_ac[det]->Fill(mult13);
+                        fh_ToT_Fib_ac[det]->Fill(x[det] * 100., q[det]);
+                        fh_Fibs_vs_Tofd_ac[det]->Fill(x[tofdr] * 100., x[det] * 100.);
+                        fh_Fib_vs_Events_ac[det]->Fill(fNEvents, x[det] * 100.);
+                        fh_ToF_vs_Events_ac[det]->Fill(fNEvents, tof);
+                        fh_Fib_vs_Fib_ac[fi11][fi13]->Fill(x[fi11] * 100., x[fi13] * 100.);
+                        fh_Fib_dx_ac[fi11][fi13]->Fill(x[fi11] * 100., x[fi13] * 100. - x[fi11] * 100.);
 
                         ptn[det] = true;
 
@@ -907,19 +1093,29 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
                                    << " t: " << t[det] << endl;
 
                         Bool_t det_coord = true;
-                        Double_t track_parameter[6];      // x,y,z, px, py, pz
-                        Double_t chi_single_parameter[2]; // chi2, chi2_red
 
                         ptn[1] = false;
                         ptn[2] = false;
                         ptn[4] = false;
 
                         // here call tracker
-                        single_track_from_cpp_(&n_det, &det_coord, x, y, z, ptn, track_parameter, chi_single_parameter);
-
-                        // make output
-                        if (chi_single_parameter[1] < 10.)
-                            Output(track_parameter, chi_single_parameter);
+                        if (tracker)
+                        {
+                            single_track_from_cpp_(
+                                &n_det, &det_coord, x, y, z, ptn, track_parameter, chi_single_parameter);
+                            // make output
+                            if (chi_single_parameter[0] < chi2Minr[0])
+                            {
+                                chi2Minr[0] = chi_single_parameter[0];
+                                for (Int_t i = 0; i < 6; i++)
+                                {
+                                    track_parameter_best_r[i] = track_parameter[i];
+                                }
+                            }
+                            cout << "chi2 " << chi_single_parameter[0] << "  " << chi_single_parameter[1] << endl;
+                            //                            if (chi_single_parameter[0] < 1.)
+                            //                                Output(track_parameter, chi_single_parameter);
+                        }
 
                     } // end of loop Fi13
 
@@ -934,7 +1130,7 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
             auto detHit3b = fHitItems.at(DET_FI3B);
             Int_t nHits3b = detHit3b->GetEntriesFast();
             // cout<<"Fi3b hits: "<<nHits3b<<endl;
-            fh_mult_Fib[fi3b]->Fill(nHits3b);
+            Int_t mult3b = 0;
             for (Int_t ihit3b = 0; ihit3b <= nHits3b; ihit3b++)
             {
                 if (nHits3b == 0)
@@ -973,9 +1169,33 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
                     }
 
                     tof = t[tofdl] - t[det];
+
+                    // Fill histograms before cuts
                     fh_Fib_ToF[det]->Fill(x[det] * 100., tof);
                     fh_xy_Fib[det]->Fill(x[det] * 100., y[det] * 100.);
+                    fh_mult_Fib[det]->Fill(nHits3b);
+                    fh_ToT_Fib[det]->Fill(x[det] * 100., q[det]);
+                    fh_Fibs_vs_Tofd[det]->Fill(x[tofdl] * 100., x[det] * 100.);
+                    fh_Fib_vs_Events[det]->Fill(fNEvents, x[det] * 100.);
+                    fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
+
                     // Cuts on Fi3b
+                    if (fCuts && q[det] < 1)
+                        continue;
+
+                    mult3b++;
+
+                    //                    if (fCuts && mult3b > 50)
+                    //                        continue;
+
+                    // Fill histograms
+                    fh_Fib_ToF_ac[det]->Fill(x[det] * 100., tof);
+                    fh_xy_Fib_ac[det]->Fill(x[det] * 100., y[det] * 100.);
+                    fh_mult_Fib_ac[det]->Fill(mult3b);
+                    fh_ToT_Fib_ac[det]->Fill(x[det] * 100., q[det]);
+                    fh_Fibs_vs_Tofd_ac[det]->Fill(x[tofdl] * 100., x[det] * 100.);
+                    fh_Fib_vs_Events_ac[det]->Fill(fNEvents, x[det] * 100.);
+                    fh_ToF_vs_Events_ac[det]->Fill(fNEvents, tof);
 
                     LOG(DEBUG) << "Fi3b: " << ihit3b << " x: " << x[det] << " y: " << y[det] << " q: " << q[det]
                                << " t: " << t[det] << endl;
@@ -986,7 +1206,22 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
                 auto detHit12 = fHitItems.at(DET_FI12);
                 Int_t nHits12 = detHit12->GetEntriesFast();
                 // cout<<"Fi12 hits: "<<nHits12<<endl;
-                fh_mult_Fib[fi12]->Fill(nHits12);
+                Int_t mult12 = 0;
+                qMax12 = -1;
+                iMax12 = -1;
+                for (Int_t ihit12 = 0; ihit12 < nHits12; ihit12++)
+                {
+                    R3BBunchedFiberHitData* hit12 = (R3BBunchedFiberHitData*)detHit12->At(ihit12);
+                    if (!hit12)
+                        continue;
+                    // find maximum light output
+                    Double_t qq = hit12->GetEloss();
+                    if (qq > qMax12)
+                    {
+                        qMax12 = qq;
+                        iMax12 = ihit12;
+                    }
+                }
                 for (Int_t ihit12 = 0; ihit12 < nHits12; ihit12++)
                 {
                     R3BBunchedFiberHitData* hit12 = (R3BBunchedFiberHitData*)detHit12->At(ihit12);
@@ -1012,9 +1247,45 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
                     }
 
                     tof = t[tofdl] - t[det];
+
+                    // Fill histograms before cuts
                     fh_Fib_ToF[det]->Fill(x[det] * 100., tof);
                     fh_xy_Fib[det]->Fill(x[det] * 100., y[det] * 100.);
+                    fh_mult_Fib[det]->Fill(nHits12);
+                    fh_ToT_Fib[det]->Fill(x[det] * 100., q[det]);
+                    fh_Fibs_vs_Tofd[det]->Fill(x[tofdl] * 100., x[det] * 100.);
+                    fh_Fib_vs_Events[det]->Fill(fNEvents, x[det] * 100.);
+                    fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
+                    fh_Fib_vs_Fib[fi3b][fi12]->Fill(x[fi3b] * 100., x[fi12] * 100.);
+                    fh_Fib_dx[fi3b][fi12]->Fill(x[fi3b] * 100., x[fi12] * 100. - x[fi3b] * 100.);
+
                     // Cuts on Fi12
+                    if (fCuts && ihit12 != iMax12)
+                        continue;
+                    if (fCuts && q[det] < 1)
+                        continue;
+                    if (fCuts && y[det] * 100. > 50.)
+                        continue;
+                    if (fCuts && y[det] * 100. < -50.)
+                        continue;
+                    if (fCuts && (tof < -100 || tof > 0))
+                        continue;
+
+                    mult12++;
+
+                    //                    if (fCuts && mult12 > 50)
+                    //                        continue;
+
+                    // Fill histograms
+                    fh_Fib_ToF_ac[det]->Fill(x[det] * 100., tof);
+                    fh_xy_Fib_ac[det]->Fill(x[det] * 100., y[det] * 100.);
+                    fh_mult_Fib_ac[det]->Fill(mult12);
+                    fh_ToT_Fib_ac[det]->Fill(x[det] * 100., q[det]);
+                    fh_Fibs_vs_Tofd_ac[det]->Fill(x[tofdl] * 100., x[det] * 100.);
+                    fh_Fib_vs_Events_ac[det]->Fill(fNEvents, x[det] * 100.);
+                    fh_ToF_vs_Events_ac[det]->Fill(fNEvents, tof);
+                    fh_Fib_vs_Fib_ac[fi3b][fi12]->Fill(x[fi3b] * 100., x[fi12] * 100.);
+                    fh_Fib_dx_ac[fi3b][fi12]->Fill(x[fi3b] * 100., x[fi12] * 100. - x[fi3b] * 100.);
 
                     LOG(DEBUG) << "Fi12: " << ihit12 << " x: " << x[det] << " y: " << y[det] << " q: " << q[det]
                                << " t: " << t[det] << endl;
@@ -1024,7 +1295,22 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
                     auto detHit10 = fHitItems.at(DET_FI10);
                     Int_t nHits10 = detHit10->GetEntriesFast();
                     // cout<<"Fi10 hits: "<<nHits10<<endl;
-                    fh_mult_Fib[fi10]->Fill(nHits10);
+                    Int_t mult10 = 0;
+                    qMax10 = -1;
+                    iMax10 = -1;
+                    for (Int_t ihit10 = 0; ihit10 < nHits10; ihit10++)
+                    {
+                        R3BBunchedFiberHitData* hit10 = (R3BBunchedFiberHitData*)detHit10->At(ihit10);
+                        if (!hit10)
+                            continue;
+                        // find maximum light output
+                        Double_t qq = hit10->GetEloss();
+                        if (qq > qMax10)
+                        {
+                            qMax10 = qq;
+                            iMax10 = ihit10;
+                        }
+                    }
                     for (Int_t ihit10 = 0; ihit10 < nHits10; ihit10++)
                     {
                         R3BBunchedFiberHitData* hit10 = (R3BBunchedFiberHitData*)detHit10->At(ihit10);
@@ -1050,9 +1336,45 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
                         }
 
                         tof = t[tofdl] - t[det];
+
+                        // Fill histograms before cuts
                         fh_Fib_ToF[det]->Fill(x[det] * 100., tof);
                         fh_xy_Fib[det]->Fill(x[det] * 100., y[det] * 100.);
+                        fh_mult_Fib[det]->Fill(nHits10);
+                        fh_ToT_Fib[det]->Fill(x[det] * 100., q[det]);
+                        fh_Fibs_vs_Tofd[det]->Fill(x[tofdl] * 100., x[det] * 100.);
+                        fh_Fib_vs_Events[det]->Fill(fNEvents, x[det] * 100.);
+                        fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
+                        fh_Fib_vs_Fib[fi10][fi12]->Fill(x[fi12] * 100., x[fi10] * 100.);
+                        fh_Fib_dx[fi10][fi12]->Fill(x[fi12] * 100., x[fi10] * 100. - x[fi12] * 100.);
+
                         // Cuts on Fi10
+                        if (fCuts && ihit10 != iMax10)
+                            continue;
+                        if (fCuts && q[det] < 1)
+                            continue;
+                        if (fCuts && y[det] * 100. > 50.)
+                            continue;
+                        if (fCuts && y[det] * 100. < -50.)
+                            continue;
+                        if (fCuts && (tof < -100 || tof > 0))
+                            continue;
+
+                        mult10++;
+
+                        //						if (fCuts && mult10 > 50)
+                        //							continue;
+
+                        // Fill histograms
+                        fh_Fib_ToF_ac[det]->Fill(x[det] * 100., tof);
+                        fh_xy_Fib_ac[det]->Fill(x[det] * 100., y[det] * 100.);
+                        fh_mult_Fib_ac[det]->Fill(mult10);
+                        fh_ToT_Fib_ac[det]->Fill(x[det] * 100., q[det]);
+                        fh_Fibs_vs_Tofd_ac[det]->Fill(x[tofdl] * 100., x[det] * 100.);
+                        fh_Fib_vs_Events_ac[det]->Fill(fNEvents, x[det] * 100.);
+                        fh_ToF_vs_Events_ac[det]->Fill(fNEvents, tof);
+                        fh_Fib_vs_Fib_ac[fi10][fi12]->Fill(x[fi12] * 100., x[fi10] * 100.);
+                        fh_Fib_dx_ac[fi10][fi12]->Fill(x[fi12] * 100., x[fi10] * 100. - x[fi12] * 100.);
 
                         LOG(DEBUG) << "Fi10: " << ihit10 << " x: " << x[det] << " y: " << y[det] << " q: " << q[det]
                                    << " t: " << t[det] << endl;
@@ -1060,17 +1382,30 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
 
                         // here call tracker
                         Bool_t det_coord = true;
-                        Double_t track_parameter[6];      // x,y,z, px, py, pz
-                        Double_t chi_single_parameter[2]; // chi2, chi2_red
 
                         ptn[0] = false;
                         ptn[3] = false;
                         ptn[5] = false;
 
                         // here call tracker
-                        single_track_from_cpp_(&n_det, &det_coord, x, y, z, ptn, track_parameter, chi_single_parameter);
-                        if (chi_single_parameter[1] < 10.)
-                            Output(track_parameter, chi_single_parameter);
+                        if (tracker)
+                        {
+                            single_track_from_cpp_(
+                                &n_det, &det_coord, x, y, z, ptn, track_parameter, chi_single_parameter);
+                            if (chi_single_parameter[0] < chi2Minl[0])
+                            {
+                                chi2Minl[0] = chi_single_parameter[0];
+                                chi2Minl[1] = chi_single_parameter[1];
+                                for (Int_t i = 0; i < 6; i++)
+                                {
+                                    track_parameter_best_l[i] = track_parameter[i];
+                                }
+                            }
+                            cout << "chi2 " << chi_single_parameter[0] << "  " << chi_single_parameter[1] << endl;
+
+                            //                            if (chi_single_parameter[0] < 1.)
+                            //                                Output(track_parameter, chi_single_parameter);
+                        }
 
                     } // end of loop Fi13
 
@@ -1078,6 +1413,11 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
             }     // end of loop Fi3a
 
         } // end if left half
+
+        if (ptn[tofdl] && chi2Minl[0] < 10.)
+            Output(track_parameter_best_l, chi2Minl);
+        if (ptn[tofdr] && chi2Minr[0] < 10.)
+            Output(track_parameter_best_r, chi2Minr);
 
     } // end loop over ToFD
 
@@ -1101,12 +1441,16 @@ void R3BGlobalAnalysisS454::Output(Double_t track_parameter[6], Double_t chi_sin
     fh_target_px->Fill(track_parameter[3] * q);
     fh_target_py->Fill(track_parameter[4] * q);
     fh_target_pz->Fill(track_parameter[5] * q);
+    fh_target_p->Fill(p_tot);
+    fh_chi2->Fill(chi_single_parameter[0]);
 
     fh_thetax_dpx->Fill((Pxf - track_parameter[3] * q) / Pxf * 100., thetax_simu);
+    fh_thetax_dpx_abs->Fill((Pxf - track_parameter[3] * q), thetax_simu);
     fh_thetay_dpy->Fill((Pyf - track_parameter[4] * q) / Pyf * 100., thetay_simu);
 
     fh_thetax_dpy->Fill((Pyf - track_parameter[4] * q) / Pyf * 100., thetax_simu);
     fh_thetay_dpx->Fill((Pxf - track_parameter[3] * q) / Pxf * 100., thetay_simu);
+    fh_dpy_dpx->Fill((Pxf - track_parameter[3] * q) / Pxf * 100., (Pyf - track_parameter[4] * q) / Pyf * 100.);
 
     fh_x_dpx->Fill((Pxf - track_parameter[3] * q) / Pxf * 100., Xf);
     fh_y_dpy->Fill((Pyf - track_parameter[4] * q) / Pyf * 100., Yf);
@@ -1151,6 +1495,8 @@ void R3BGlobalAnalysisS454::FinishTask()
     fh_target_px->Write();
     fh_target_py->Write();
     fh_target_pz->Write();
+    fh_target_p->Write();
+    fh_chi2->Write();
 
     fh_dx->Write();
     fh_dy->Write();
@@ -1160,18 +1506,23 @@ void R3BGlobalAnalysisS454::FinishTask()
     fh_dpz->Write();
     fh_dp->Write();
     fh_thetax_dpx->Write();
+    fh_thetax_dpx_abs->Write();
     fh_thetay_dpy->Write();
     fh_thetax_dpy->Write();
     fh_thetay_dpx->Write();
     fh_x_dpx->Write();
     fh_y_dpy->Write();
+    fh_dpy_dpx->Write();
 
     if (fHitItems.at(DET_TOFD))
     {
         fh_xy_tofd->Write();
+        fh_xy_tofd_ac->Write();
         fh_tofd_charge->Write();
+        fh_tofd_charge_ac->Write();
         fh_TimePreviousEvent->Write();
         fh_tofd_mult->Write();
+        fh_tofd_mult_ac->Write();
     }
 
     for (Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)
@@ -1179,21 +1530,19 @@ void R3BGlobalAnalysisS454::FinishTask()
         if (fMappedItems.at(ifibcount + DET_FI_FIRST))
         {
             fh_xy_Fib[ifibcount]->Write();
-            fh_fibers_Fib[ifibcount]->Write();
-            fh_fiber_Fib[ifibcount]->Write();
+            fh_xy_Fib_ac[ifibcount]->Write();
             fh_mult_Fib[ifibcount]->Write();
-            fh_time_Fib[ifibcount]->Write();
-            fh_xpos_Fib[ifibcount]->Write();
-            fh_ypos_Fib[ifibcount]->Write();
-            fh_multihit_m_Fib[ifibcount]->Write();
-            fh_multihit_s_Fib[ifibcount]->Write();
-            fh_ToT_m_Fib[ifibcount]->Write();
-            fh_ToT_s_Fib[ifibcount]->Write();
+            fh_mult_Fib_ac[ifibcount]->Write();
+            fh_ToT_Fib[ifibcount]->Write();
+            fh_ToT_Fib_ac[ifibcount]->Write();
             fh_Fib_vs_Events[ifibcount]->Write();
-            fh_Fibs_vs_Events[ifibcount]->Write();
+            fh_Fib_vs_Events_ac[ifibcount]->Write();
             fh_Fibs_vs_Tofd[ifibcount]->Write();
+            fh_Fibs_vs_Tofd_ac[ifibcount]->Write();
             fh_Fib_ToF[ifibcount]->Write();
-            fh_ToF_vs_events[ifibcount]->Write();
+            fh_Fib_ToF_ac[ifibcount]->Write();
+            fh_ToF_vs_Events[ifibcount]->Write();
+            fh_ToF_vs_Events_ac[ifibcount]->Write();
         }
     }
 
@@ -1204,7 +1553,9 @@ void R3BGlobalAnalysisS454::FinishTask()
             if (fHitItems.at(i + DET_FI_FIRST) && fHitItems.at(j + DET_FI_FIRST))
             {
                 fh_Fib_vs_Fib[i][j]->Write();
+                fh_Fib_vs_Fib_ac[i][j]->Write();
                 fh_Fib_dx[i][j]->Write();
+                fh_Fib_dx_ac[i][j]->Write();
             }
         }
     }

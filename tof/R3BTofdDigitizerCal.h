@@ -11,13 +11,14 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-// dTofDigitzer 07 aug 2017 created by Alicia Wongel
-
-#ifndef R3BDTOFDIGITIZER_H
-#define R3BDTOFDIGITIZER_H 1
+#ifndef R3BTOFDDIGITIZERCAL_H
+#define R3BTOFDDIGITIZERCAL_H 1
 
 #include "FairTask.h"
-#include "R3BTofdHitData.h"
+#include "R3BTofdCalData.h"
+#include "R3BTofdDigi.h"
+#include "R3BTofdDigiPar.h"
+#include "R3BTofdPoint.h"
 #include <map>
 #include <string>
 
@@ -26,15 +27,15 @@ class TH1F;
 class TH2F;
 class TRandom3;
 
-class R3BdTofDigitizer : public FairTask
+class R3BTofdDigitizerCal : public FairTask
 {
 
   public:
     /** Default constructor **/
-    R3BdTofDigitizer();
+    R3BTofdDigitizerCal();
 
     /** Destructor **/
-    ~R3BdTofDigitizer();
+    ~R3BTofdDigitizerCal();
 
     /** Virtual method Init **/
     virtual InitStatus Init();
@@ -46,26 +47,26 @@ class R3BdTofDigitizer : public FairTask
     virtual void Reset();
 
     /** Setters for sigmas **/
-    void SetSigma_y(Float_t sigma_y) { fsigma_y = sigma_y; }
-    void SetSigma_t(Float_t sigma_t) { fsigma_t = sigma_t; }
-    void SetSigma_ELoss(Float_t sigma_ELoss) { fsigma_ELoss = sigma_ELoss; }
+    void SetSigma_y(Float_t sigma_y) { ysigma = sigma_y; }
+    void SetSigma_t(Float_t sigma_t) { tsigma = sigma_t; }
+    void SetSigma_ELoss(Float_t sigma_ELoss) { esigma = sigma_ELoss; }
 
   protected:
-    TClonesArray* fdTofPoints;
+    TClonesArray* fTofdPoints;
     TClonesArray* fMCTrack;
-    TClonesArray* fdTofHits;
-    TRandom3* fRnd;
-    TH1F* fHist1;
-    TH1F* fHist2;
-    TH1F* fHist3;
-
-    Float_t fsigma_y;
-    Float_t fsigma_t;
-    Float_t fsigma_ELoss;
+    TClonesArray* fTofdCals;
+    
+  private:  
+    TRandom3* prnd;
+    Float_t ysigma;
+    Float_t tsigma;
+    Float_t esigma;
 
     // detector parameter
     Int_t number_layers = 2;
     Int_t number_paddles = 44; // per layer
+    Int_t number_sides = 2;
+    Int_t number_channels = number_layers*100+50;
     Float_t paddle_width = 2.70000;
     Float_t paddle_thickness = 0.50000; 
     Float_t air_gap_paddles = 0.04;
@@ -74,7 +75,7 @@ class R3BdTofDigitizer : public FairTask
     Float_t detector_width = number_paddles*paddle_width+(number_paddles-1)*air_gap_paddles+paddle_width;
     Float_t detector_thickness = (number_layers-1)*air_gap_layer+number_layers*paddle_thickness;
 
-    ClassDef(R3BdTofDigitizer, 1);
+    ClassDef(R3BTofdDigitizerCal, 1);
 };
 
 #endif

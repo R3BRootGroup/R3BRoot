@@ -26,5 +26,7 @@
 #pragma link C++ class R3BOnlineSpectraDec2019+;
 #pragma link C++ class R3BGlobalAnalysis+;
 #pragma link C++ class R3BGlobalAnalysisS454+;
+//#pragma link C++ class R3BOnlineSpectraLosTest+;
+
 
 #endif

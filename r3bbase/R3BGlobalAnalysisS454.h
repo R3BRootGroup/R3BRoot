@@ -23,7 +23,6 @@
 #define N_PADDLE_MAX_TOFD 50
 #define N_PADDLE_MAX_PTOF 100
 #define N_PSPX_S454 4
-#define N_FIBER_PLOT 1050 // range to plot
 
 #include "FairTask.h"
 #include <array>
@@ -114,6 +113,14 @@ class R3BGlobalAnalysisS454 : public FairTask
         fsens_IC = sens_IC;
     }
 
+    /**
+     * Methods for setting cuts
+     */
+    inline void SetCuts(Bool_t cuts)
+    {
+        fCuts = cuts;
+    }
+
   private:
     std::vector<TClonesArray*> fMappedItems;
     std::vector<TClonesArray*> fCalItems;
@@ -151,7 +158,9 @@ class R3BGlobalAnalysisS454 : public FairTask
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger;         /**< Trigger value. */
     Int_t fTpat;
-
+	Bool_t fCuts;
+	Bool_t tracker = true;
+	
     unsigned long long time_start = 0, time = 0;
     unsigned long ic_start = 0, see_start = 0, tofdor_start = 0;
     unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
@@ -183,38 +192,43 @@ class R3BGlobalAnalysisS454 : public FairTask
     TH1F* fh_TOFDOR;
 
     TH2F* fh_xy_Fib[NOF_FIB_DET];
-    TH1F* fh_fibers_Fib[NOF_FIB_DET];
-    TH1F* fh_fiber_Fib[NOF_FIB_DET];
+    TH2F* fh_xy_Fib_ac[NOF_FIB_DET];
     TH1F* fh_mult_Fib[NOF_FIB_DET];
+    TH1F* fh_mult_Fib_ac[NOF_FIB_DET];
     TH2F* fh_Fib_ToF[NOF_FIB_DET];
-    TH1F* fh_xpos_Fib[NOF_FIB_DET];
-    TH1F* fh_ypos_Fib[NOF_FIB_DET];
-
-    TH2F* fh_time_Fib[NOF_FIB_DET];
-    TH2F* fh_multihit_m_Fib[NOF_FIB_DET];
-    TH2F* fh_multihit_s_Fib[NOF_FIB_DET];
-    TH2F* fh_ToT_m_Fib[NOF_FIB_DET];
-    TH2F* fh_ToT_s_Fib[NOF_FIB_DET];
+    TH2F* fh_Fib_ToF_ac[NOF_FIB_DET];
+    TH2F* fh_ToT_Fib[NOF_FIB_DET];
+    TH2F* fh_ToT_Fib_ac[NOF_FIB_DET];
     TH2F* fh_Fib_vs_Events[NOF_FIB_DET];
-    TH2F* fh_Fibs_vs_Events[NOF_FIB_DET];
+    TH2F* fh_Fib_vs_Events_ac[NOF_FIB_DET];
     TH2F* fh_Fibs_vs_Tofd[NOF_FIB_DET];
+    TH2F* fh_Fibs_vs_Tofd_ac[NOF_FIB_DET];
+    TH2F* fh_ToF_vs_Events[NOF_FIB_DET];
+    TH2F* fh_ToF_vs_Events_ac[NOF_FIB_DET];
 
     TH2F* fh_Fib_vs_Fib[NOF_FIB_DET][NOF_FIB_DET];
+    TH2F* fh_Fib_vs_Fib_ac[NOF_FIB_DET][NOF_FIB_DET];
     TH2F* fh_Fib_dx[NOF_FIB_DET][NOF_FIB_DET];
+    TH2F* fh_Fib_dx_ac[NOF_FIB_DET][NOF_FIB_DET];
 
     TH2F* fh_Cave_position;
 
     TH2F* fh_xy_tofd;
+    TH2F* fh_xy_tofd_ac;
     TH1F* fh_tofd_charge;
+    TH1F* fh_tofd_charge_ac;
     TH1F* fh_TimePreviousEvent;
     TH1F* fh_tofd_mult;
+    TH1F* fh_tofd_mult_ac;
 
-    TH2F* fh_ToF_vs_events[NOF_FIB_DET];
 
     TH2F* fh_target_xy;
     TH1F* fh_target_px;
     TH1F* fh_target_py;
     TH1F* fh_target_pz;
+    TH1F* fh_target_p;
+    TH1F* fh_chi2;
+    
 
     TH1F* fh_dx;
     TH1F* fh_dy;
@@ -224,11 +238,13 @@ class R3BGlobalAnalysisS454 : public FairTask
     TH1F* fh_dpz;
     TH1F* fh_dp;
     TH2F* fh_thetax_dpx;
+    TH2F* fh_thetax_dpx_abs;
     TH2F* fh_thetay_dpy;
     TH2F* fh_x_dpx;
     TH2F* fh_y_dpy;
     TH2F* fh_thetax_dpy;
     TH2F* fh_thetay_dpx;
+    TH2F* fh_dpy_dpx;
 
   public:
     ClassDef(R3BGlobalAnalysisS454, 1)

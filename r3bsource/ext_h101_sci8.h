@@ -62,6 +62,7 @@ typedef struct EXT_STR_h101_SCI8_t
 
 typedef struct EXT_STR_h101_SCI8_onion_t
 {
+  /* RAW */
   uint32_t SCIEIGHT_VTFM;
   uint32_t SCIEIGHT_VTFMI[8 /* SCIEIGHT_VTFM */];
   uint32_t SCIEIGHT_VTFME[8 /* SCIEIGHT_VTFM */];

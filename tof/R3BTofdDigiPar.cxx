@@ -11,54 +11,42 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-//*-- AUTHOR : D. Kresan
-//*-- Created : 18/05/2015
-
-#include "R3BGeodTofPar.h"
-
-#include "FairParamList.h"
-
-#include "TObjArray.h"
-
-#include <iomanip>
+#include "R3BTofdDigiPar.h"
+#include "TMath.h"
 #include <iostream>
 
-ClassImp(R3BGeodTofPar)
-
-    R3BGeodTofPar::R3BGeodTofPar(const char* name, const char* title, const char* context)
+R3BTofdDigiPar::R3BTofdDigiPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
 {
-
-    fGeoSensNodes = new TObjArray();
-    fGeoPassNodes = new TObjArray();
+    clear();
 }
 
-R3BGeodTofPar::~R3BGeodTofPar(void) {}
-
-void R3BGeodTofPar::clear(void)
+void R3BTofdDigiPar::putParams(FairParamList* list)
 {
-    if (fGeoSensNodes)
-        delete fGeoSensNodes;
-    if (fGeoPassNodes)
-        delete fGeoPassNodes;
-}
-
-void R3BGeodTofPar::putParams(FairParamList* l)
-{
-    if (!l)
+    std::cout << "-I- R3BTofdDigiPar::putParams() called" << std::endl;
+    if (!list)
         return;
-    l->addObject("FairGeoNodes Sensitive List", fGeoSensNodes);
-    l->addObject("FairGeoNodes Passive List", fGeoPassNodes);
+    //  list->add("max_paddle", (Int_t)nMaxPaddle);
+    //  list->add("max_plane", (Int_t)nMaxPlane);
 }
 
-Bool_t R3BGeodTofPar::getParams(FairParamList* l)
+Bool_t R3BTofdDigiPar::getParams(FairParamList* list)
 {
-    if (!l)
+    std::cout << "-I- R3BTofdDigiPar::getParams() called" << std::endl;
+    if (!list)
         return kFALSE;
-    if (!l->fillObject("FairGeoNodes Sensitive List", fGeoSensNodes))
-        return kFALSE;
-    if (!l->fillObject("FairGeoNodes Passive List", fGeoPassNodes))
-        return kFALSE;
+    std::cout << "-I- R3BTofdDigiPar::getParams() 1 ";
 
+    //  if (!list->fill("max_paddle", &nMaxPaddle)) return kFALSE;
+    //  if (!list->fill("max_plane", &nMaxPlane)) return kFALSE;
     return kTRUE;
 }
+
+void R3BTofdDigiPar::Print(Option_t* option) const
+{
+    std::cout << "-I- Tofd Digi Parameters:" << std::endl;
+    //    std::cout<<"   Max Paddle   = "<<nMaxPaddle<<std::endl;
+    //    std::cout<<"   Max Plane   = "<<nMaxPlane<<std::endl;
+}
+
+ClassImp(R3BTofdDigiPar);

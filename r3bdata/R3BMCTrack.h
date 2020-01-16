@@ -123,7 +123,7 @@ class R3BMCTrack : public TObject
     // case of HIons
     Double32_t fMass;
 
-    ClassDef(R3BMCTrack, 1);
+    ClassDef(R3BMCTrack, 2);
 };
 
 // ==========   Inline functions   ========================================

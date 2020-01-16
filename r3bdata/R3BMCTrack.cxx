@@ -121,11 +121,10 @@ void R3BMCTrack::Print(Option_t* option) const
     cout << "Track " << option << ", mother : " << fMotherId << ", Type " << fPdgCode << ", momentum (" << fPx << ", "
          << fPy << ", " << fPz << ") GeV" << endl;
     cout << "       Ref " << GetNPoints(kREF) << ", DCH " << GetNPoints(kDCH) << ", CAL " << GetNPoints(kCAL)
-         << ", LAND " << GetNPoints(kLAND) << ", GFI " << GetNPoints(kGFI) << ", mTOF " << GetNPoints(kMTOF)
-         << ", dTOF " << GetNPoints(kDTOF) << ", TOF " << GetNPoints(kTOF) << ", TRACKER " << GetNPoints(kTRA)
-         << ", CALIFA " << GetNPoints(kCALIFA) << ", MFI " << GetNPoints(kMFI) << ", PSP " << GetNPoints(kPSP)
-         << ", VETO " << GetNPoints(kVETO) << ", STARTRACK " << GetNPoints(kSTARTRACK) << ", LUMON "
-         << GetNPoints(kLUMON) << ", NeuLAND " << GetNPoints(kNEULAND) << endl;
+         << ", LAND " << GetNPoints(kLAND) << ", GFI " << GetNPoints(kGFI) << ", TOFd " << GetNPoints(kTOFD) << ", TOF "
+         << GetNPoints(kTOF) << ", TRACKER " << GetNPoints(kTRA) << ", CALIFA " << GetNPoints(kCALIFA) << ", MFI "
+         << GetNPoints(kMFI) << ", PSP " << GetNPoints(kPSP) << ", VETO " << GetNPoints(kVETO) << ", STARTRACK "
+         << GetNPoints(kSTARTRACK) << ", LUMON " << GetNPoints(kLUMON) << ", NeuLAND " << GetNPoints(kNEULAND) << endl;
 #ifdef SOFIA
     cout << ", SCI " << GetNPoints(kSOFSCI) << ", AT " << GetNPoints(kSOFAT) << ", TRIM " << GetNPoints(kSOFTRIM)
          << ", MWPC1 " << GetNPoints(kSOFMWPC1) << ", TWIM " << GetNPoints(kSOFTWIM) << ", MWPC2 "

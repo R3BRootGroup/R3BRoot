@@ -11,7 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BdTof.h"
+#include "R3BTofd.h"
 #include "FairGeoInterface.h"
 #include "FairGeoLoader.h"
 #include "FairGeoNode.h"
@@ -20,11 +20,11 @@
 #include "FairRun.h"
 #include "FairRuntimeDb.h"
 #include "FairVolume.h"
-#include "R3BGeodTof.h"
-#include "R3BGeodTofPar.h"
+#include "R3BGeoTofd.h"
+#include "R3BGeoTofdPar.h"
 #include "R3BMCStack.h"
 #include "R3BTGeoPar.h"
-#include "R3BdTofPoint.h"
+#include "R3BTofdPoint.h"
 #include "TClonesArray.h"
 #include "TGeoArb8.h"
 #include "TGeoBBox.h"
@@ -44,19 +44,19 @@
 #include "TVirtualMC.h"
 #include <stdlib.h>
 
-R3BdTof::R3BdTof()
-    : R3BdTof("")
+R3BTofd::R3BTofd()
+    : R3BTofd("")
 {
 }
 
-R3BdTof::R3BdTof(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot)
-    : R3BdTof(geoFile, { trans, rot })
+R3BTofd::R3BTofd(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot)
+    : R3BTofd(geoFile, { trans, rot })
 {
 }
 
-R3BdTof::R3BdTof(const TString& geoFile, const TGeoCombiTrans& combi)
-    : R3BDetector("R3BdTof", kDTOF, geoFile, combi)
-    , fdTofCollection(new TClonesArray("R3BdTofPoint"))
+R3BTofd::R3BTofd(const TString& geoFile, const TGeoCombiTrans& combi)
+    : R3BDetector("R3BTofd", kTOFD, geoFile, combi)
+    , fTofdCollection(new TClonesArray("R3BTofdPoint"))
     , fPosIndex(0)
     , kGeoSaved(kFALSE)
     , flGeoPar(new TList())
@@ -65,30 +65,30 @@ R3BdTof::R3BdTof(const TString& geoFile, const TGeoCombiTrans& combi)
     ResetParameters();
 }
 
-R3BdTof::~R3BdTof()
+R3BTofd::~R3BTofd()
 {
     if (flGeoPar)
     {
         delete flGeoPar;
     }
-    if (fdTofCollection)
+    if (fTofdCollection)
     {
-        fdTofCollection->Delete();
-        delete fdTofCollection;
+        fTofdCollection->Delete();
+        delete fTofdCollection;
     }
 }
 
-void R3BdTof::Initialize()
+void R3BTofd::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(INFO) << "R3BdTof: initialisation";
-    LOG(DEBUG) << "R3BdTof: Sci. Vol. (McId) " << gMC->VolId("dTOFLog");
+    LOG(INFO) << "R3BTofd: initialisation";
+    LOG(DEBUG) << "R3BTofd: Sci. Vol. (McId0) " << gMC->VolId("TOFdLog101");
 }
 
-void R3BdTof::SetSpecialPhysicsCuts()
+void R3BTofd::SetSpecialPhysicsCuts()
 {
-    LOG(INFO) << "-I- R3BdTof: Adding customized Physics cut ... ";
+    LOG(INFO) << "-I- R3BTofd: Adding customized Physics cut ... ";
 
     if (gGeoManager)
     {
@@ -112,27 +112,26 @@ void R3BdTof::SetSpecialPhysicsCuts()
             // Setting Energy-CutOff for Si Only
             Double_t cutE = fCutE; // GeV-> 1 keV
 
-            LOG(INFO) << "-I- R3BdTof: plasticFormTOF Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE
+            LOG(INFO) << "-I- R3BTofd: plasticFormTOF Medium Id " << pSi->GetId() << " Energy Cut-Off : " << cutE
                       << " GeV";
             // Si
-            gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE); /** gammas (GeV)*/
-            gMC->Gstpar(pSi->GetId(), "CUTELE", cutE); /** electrons (GeV)*/
-            gMC->Gstpar(pSi->GetId(), "CUTNEU", cutE); /** neutral hadrons (GeV)*/
-            gMC->Gstpar(pSi->GetId(), "CUTHAD", cutE); /** charged hadrons (GeV)*/
-            gMC->Gstpar(pSi->GetId(), "CUTMUO", cutE); /** muons (GeV)*/
-            gMC->Gstpar(pSi->GetId(), "BCUTE", cutE);  /** electron bremsstrahlung (GeV)*/
-            gMC->Gstpar(pSi->GetId(), "BCUTM", cutE);  /** muon and hadron bremsstrahlung(GeV)*/
-            gMC->Gstpar(pSi->GetId(), "DCUTE", cutE);  /** delta-rays by electrons (GeV)*/
-            gMC->Gstpar(pSi->GetId(), "DCUTM", cutE);  /** delta-rays by muons (GeV)*/
-            gMC->Gstpar(pSi->GetId(), "PPCUTM", -1.);  /** direct pair production by muons (GeV)*/
+            gMC->Gstpar(pSi->GetId(), "CUTGAM", cutE);
+            gMC->Gstpar(pSi->GetId(), "CUTELE", cutE);
+            gMC->Gstpar(pSi->GetId(), "CUTNEU", cutE);
+            gMC->Gstpar(pSi->GetId(), "CUTHAD", cutE);
+            gMC->Gstpar(pSi->GetId(), "CUTMUO", cutE);
+            gMC->Gstpar(pSi->GetId(), "BCUTE", cutE);
+            gMC->Gstpar(pSi->GetId(), "BCUTM", cutE);
+            gMC->Gstpar(pSi->GetId(), "DCUTE", cutE);
+            gMC->Gstpar(pSi->GetId(), "DCUTM", cutE);
+            gMC->Gstpar(pSi->GetId(), "PPCUTM", -1.);
         }
     } //! gGeoManager
 }
 
 // -----   Public method ProcessHits  --------------------------------------
-Bool_t R3BdTof::ProcessHits(FairVolume* vol)
+Bool_t R3BTofd::ProcessHits(FairVolume* vol)
 {
-
     // Simple Det plane
 
     if (gMC->IsTrackEntering())
@@ -149,7 +148,7 @@ Bool_t R3BdTof::ProcessHits(FairVolume* vol)
     // Sum energy loss for all steps in the active volume
     fELoss += gMC->Edep();
 
-    // Set additional parameters at exit of active volume. Create R3BdTofPoint.
+    // Set additional parameters at exit of active volume. Create R3BTofdPoint.
     if (gMC->IsTrackExiting() || gMC->IsTrackStop() || gMC->IsTrackDisappeared())
     {
         fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
@@ -210,9 +209,9 @@ Bool_t R3BdTof::ProcessHits(FairVolume* vol)
                fLength,
                fELoss);
 
-        // Increment number of mTofPoints for this track
+        // Increment number of TofdPoints for this track
         R3BStack* stack = (R3BStack*)gMC->GetStack();
-        stack->AddPoint(kMTOF);
+        stack->AddPoint(kTOFD);
 
         ResetParameters();
     }
@@ -221,7 +220,7 @@ Bool_t R3BdTof::ProcessHits(FairVolume* vol)
 }
 
 // ----------------------------------------------------------------------------
-// void R3BdTof::SaveGeoParams(){
+// void R3BTofd::SaveGeoParams(){
 //
 //  cout << " -I Save STS geo params " << endl;
 //
@@ -236,7 +235,7 @@ Bool_t R3BdTof::ProcessHits(FairVolume* vol)
 //}
 
 // -----   Public method EndOfEvent   -----------------------------------------
-void R3BdTof::BeginEvent()
+void R3BTofd::BeginEvent()
 {
     //  if (! kGeoSaved ) {
     //      SaveGeoParams();
@@ -246,66 +245,66 @@ void R3BdTof::BeginEvent()
 }
 
 // -----   Public method EndOfEvent   -----------------------------------------
-void R3BdTof::EndOfEvent()
+void R3BTofd::EndOfEvent()
 {
     if (fVerboseLevel)
         Print();
-    fdTofCollection->Clear();
+    fTofdCollection->Clear();
 
     ResetParameters();
 }
 // ----------------------------------------------------------------------------
 
 // -----   Public method Register   -------------------------------------------
-void R3BdTof::Register() { FairRootManager::Instance()->Register("dTOFPoint", GetName(), fdTofCollection, kTRUE); }
+void R3BTofd::Register() { FairRootManager::Instance()->Register("TOFdPoint", GetName(), fTofdCollection, kTRUE); }
 // ----------------------------------------------------------------------------
 
 // -----   Public method GetCollection   --------------------------------------
-TClonesArray* R3BdTof::GetCollection(Int_t iColl) const
+TClonesArray* R3BTofd::GetCollection(Int_t iColl) const
 {
     if (iColl == 0)
-        return fdTofCollection;
+        return fTofdCollection;
     else
         return NULL;
 }
 // ----------------------------------------------------------------------------
 
 // -----   Public method Print   ----------------------------------------------
-void R3BdTof::Print(Option_t* option) const
+void R3BTofd::Print(Option_t* option) const
 {
-    Int_t nHits = fdTofCollection->GetEntriesFast();
-    LOG(INFO) << "R3BdTof: " << nHits << " points registered in this event";
+    Int_t nHits = fTofdCollection->GetEntriesFast();
+    LOG(INFO) << "R3BTofd: " << nHits << " points registered in this event";
 }
 // ----------------------------------------------------------------------------
 
 // -----   Public method Reset   ----------------------------------------------
-void R3BdTof::Reset()
+void R3BTofd::Reset()
 {
-    fdTofCollection->Clear();
+    fTofdCollection->Clear();
     ResetParameters();
 }
 // ----------------------------------------------------------------------------
 
 // -----   Public method CopyClones   -----------------------------------------
-void R3BdTof::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
+void R3BTofd::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
 {
     Int_t nEntries = cl1->GetEntriesFast();
-    LOG(INFO) << "R3BdTof: " << nEntries << " entries to add";
+    LOG(INFO) << "R3BTofd: " << nEntries << " entries to add";
     TClonesArray& clref = *cl2;
-    R3BdTofPoint* oldpoint = NULL;
+    R3BTofdPoint* oldpoint = NULL;
     for (Int_t i = 0; i < nEntries; i++)
     {
-        oldpoint = (R3BdTofPoint*)cl1->At(i);
+        oldpoint = (R3BTofdPoint*)cl1->At(i);
         Int_t index = oldpoint->GetTrackID() + offset;
         oldpoint->SetTrackID(index);
-        new (clref[fPosIndex]) R3BdTofPoint(*oldpoint);
+        new (clref[fPosIndex]) R3BTofdPoint(*oldpoint);
         fPosIndex++;
     }
-    LOG(INFO) << "R3BdTof: " << cl2->GetEntriesFast() << " merged entries";
+    LOG(INFO) << "R3BTofd: " << cl2->GetEntriesFast() << " merged entries";
 }
 
 // -----   Private method AddHit   --------------------------------------------
-R3BdTofPoint* R3BdTof::AddHit(Int_t trackID,
+R3BTofdPoint* R3BTofd::AddHit(Int_t trackID,
                               Int_t detID,
                               TVector3 posIn,
                               TVector3 posOut,
@@ -315,21 +314,21 @@ R3BdTofPoint* R3BdTof::AddHit(Int_t trackID,
                               Double_t length,
                               Double_t eLoss)
 {
-    TClonesArray& clref = *fdTofCollection;
+    TClonesArray& clref = *fTofdCollection;
     Int_t size = clref.GetEntriesFast();
     if (fVerboseLevel > 1)
-        LOG(INFO) << "R3BdTof: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
+        LOG(INFO) << "R3BTofd: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
-    return new (clref[size]) R3BdTofPoint(trackID, detID, posIn, posOut, momIn, momOut, time, length, eLoss);
+    return new (clref[size]) R3BTofdPoint(trackID, detID, posIn, posOut, momIn, momOut, time, length, eLoss);
 }
 
-Bool_t R3BdTof::CheckIfSensitive(std::string name)
+Bool_t R3BTofd::CheckIfSensitive(std::string name)
 {
-    if (TString(name).Contains("dTOFLog"))
+    if (TString(name).Contains("TOFdLog"))
     {
         return kTRUE;
     }
     return kFALSE;
 }
 
-ClassImp(R3BdTof)
+ClassImp(R3BTofd)

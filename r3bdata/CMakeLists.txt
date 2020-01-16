@@ -28,7 +28,6 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/beammonitorData
 ${R3BROOT_SOURCE_DIR}/r3bdata/dhcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
-${R3BROOT_SOURCE_DIR}/r3bdata/dtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/vetoData
 ${R3BROOT_SOURCE_DIR}/r3bdata/lumonData
@@ -46,7 +45,6 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 ${R3BROOT_SOURCE_DIR}/r3bdata/actarData
 ${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
 ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
-${R3BROOT_SOURCE_DIR}/r3bdata/ptofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
@@ -79,7 +77,7 @@ dchData/R3BDchPoint.cxx
 dchData/R3BDchFullPoint.cxx
 gfiData/R3BGfiPoint.cxx
 mtofData/R3BmTofPoint.cxx
-dtofData/R3BdTofPoint.cxx
+mtofData/R3BmTofDigi.cxx
 tofData/R3BTofPoint.cxx
 vetoData/R3BVetoPoint.cxx
 lumonData/ELILuMonPoint.cxx
@@ -103,7 +101,6 @@ dchData/R3BDchDigi.cxx
 dchData/R3BDch2pDigi.cxx
 tofData/R3BTofDigi.cxx
 tofData/R3BTof2pDigi.cxx
-mtofData/R3BmTofDigi.cxx
 gfiData/R3BGfiDigi.cxx
 trackerData/R3BTraDigi.cxx
 trackerData/R3BTra2pDigi.cxx
@@ -145,7 +142,9 @@ tofData/R3BTofdMappedData.cxx
 tofData/R3BTofdCalData.cxx
 tofData/R3BTofdHitData.cxx
 tofData/R3BPaddleCalData.cxx
-ptofData/R3BPtofHit.cxx
+tofData/R3BTofdPoint.cxx
+tofData/R3BTofdDigi.cxx
+tofData/R3BPtofHit.cxx
 fibData/R3BBunchedFiberCalData.cxx
 fibData/R3BBunchedFiberHitData.cxx
 fibData/R3BBunchedFiberMappedData.cxx

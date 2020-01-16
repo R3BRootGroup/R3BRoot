@@ -79,7 +79,7 @@ InitStatus R3BTofDigitizer::Init()
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
         LOG(fatal) << "Init: No FairRootManager";
-    fTofPoints = (TClonesArray*)ioman->GetObject("dTOFPoint");
+    fTofPoints = (TClonesArray*)ioman->GetObject("TOFPoint");
     fTofMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
 
     // Register output array TofDigi

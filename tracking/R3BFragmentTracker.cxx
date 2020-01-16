@@ -27,10 +27,10 @@
 #include "R3BPspPoint.h"
 #include "R3BTGeoPar.h"
 #include "R3BTPropagator.h"
+#include "R3BTofdPoint.h"
 #include "R3BTrackingDetector.h"
 #include "R3BTrackingParticle.h"
 #include "R3BTrackingSetup.h"
-#include "R3BdTofPoint.h"
 
 #include "FairLogger.h"
 #include "FairRootManager.h"

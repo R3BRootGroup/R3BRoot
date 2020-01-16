@@ -40,7 +40,8 @@ R3BLosMappedData::R3BLosMappedData(UInt_t detector, UInt_t channel, UInt_t type,
     , fTimeFine(timeFine)
     , fTimeCoarse(timeCoarse)
 {
-    // cout<<"R3BLosMappedData: chann. "<< channel <<", type "<<type<<", fine/coarse Times: "<<timeFine<<", "
+    // cout<<"R3BLosMappedData: det. "<< detector<<", chann. "<< channel <<", type "<<type<<", fine/coarse Times:
+    // "<<timeFine<<", "
     //<<timeCoarse<<endl;
     /* Everything fine here!
 

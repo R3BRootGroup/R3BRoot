@@ -24,5 +24,6 @@
 #pragma link C++ class R3BFi13Mapped2Cal+;
 #pragma link C++ class R3BFi13ContFact+;
 #pragma link C++ class R3BFi13Digitizer+;
+#pragma link C++ class R3BFi13DigitizerCal+;
 
 #endif

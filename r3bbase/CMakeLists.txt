@@ -19,6 +19,7 @@ Set(SYSTEM_INCLUDE_DIRECTORIES
 ${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
 )
+Set(R3BSOF_SOURCE_DIR ${R3BROOT_SOURCE_DIR}/sofia)
 
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
@@ -37,8 +38,9 @@ ${R3BROOT_SOURCE_DIR}/sci2
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
 ${R3BROOT_SOURCE_DIR}/sci8
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
+${R3BROOT_SOURCE_DIR}/tof
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
-${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
+#${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
 ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
 ${R3BROOT_SOURCE_DIR}/tcal
@@ -62,6 +64,7 @@ R3BOnlineSpectra.cxx
 R3BOnlineSpectraDec2019.cxx
 R3BGlobalAnalysis.cxx
 R3BGlobalAnalysisS454.cxx
+#R3BOnlineSpectraLosTest.cxx
 )
 
 # fill list of header files from list of source files

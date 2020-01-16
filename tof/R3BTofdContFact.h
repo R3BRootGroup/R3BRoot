@@ -11,30 +11,24 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BGEODTOFPAR_H
-#define R3BGEODTOFPAR_H
+#ifndef R3BTOFDCONTFACT_H
+#define R3BTOFDCONTFACT_H
 
-#include "FairParGenericSet.h"
+#include "FairContFact.h"
 
-#include "TH1F.h"
+class FairContainer;
 
-class R3BGeodTofPar : public FairParGenericSet
+class R3BTofdContFact : public FairContFact
 {
+  private:
+    void setAllContainers();
+
   public:
-    TObjArray* fGeoSensNodes; // List of FairGeoNodes for sensitive volumes
-    TObjArray* fGeoPassNodes; // List of FairGeoNodes for sensitive volumes
-
-    R3BGeodTofPar(const char* name = "R3BGeodTofPar",
-                  const char* title = "mTof Geometry Parameters",
-                  const char* context = "TestDefaultContext");
-    ~R3BGeodTofPar(void);
-    void clear(void);
-    void putParams(FairParamList*);
-    Bool_t getParams(FairParamList*);
-    TObjArray* GetGeoSensitiveNodes() { return fGeoSensNodes; }
-    TObjArray* GetGeoPassiveNodes() { return fGeoPassNodes; }
-
-    ClassDef(R3BGeodTofPar, 1)
+    R3BTofdContFact();
+    ~R3BTofdContFact() {}
+    FairParSet* createContainer(FairContainer*);
+    void activateParIo(FairParIo* io);
+    ClassDef(R3BTofdContFact, 0) // Factory for all Tofd parameter containers
 };
 
-#endif /* !R3BGEODTOFPAR_H */
+#endif /* !R3BTOFDCONTFACT_H */

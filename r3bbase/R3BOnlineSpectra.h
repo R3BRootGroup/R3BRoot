@@ -288,6 +288,7 @@ class R3BOnlineSpectra : public FairTask
     TH1F* fh_los_channels;
     TH1F* fh_los_tres_MCFD;
     TH1F* fh_los_tres_TAMEX;
+    TH1F* fh_los_tres_MTDC;
     TH1F* fh_los_tot_mean;
     TH2F* fh_los_tot;
     TH1F* fh_los_dt_hits;

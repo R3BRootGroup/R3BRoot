@@ -11,29 +11,48 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BGEODTOF_H
-#define R3BGEODTOF_H
+/////////////////////////////////////////////////////////////
+// R3BGeoTofd
+//
+// Class for geometry of R3BCAL
+//
+/////////////////////////////////////////////////////////////
+#include "R3BGeoTofd.h"
+#include "FairGeoNode.h"
 
-#include "FairGeoSet.h"
+#include <iostream>
 
-class R3BGeodTof : public FairGeoSet
+using std::cout;
+using std::endl;
+
+ClassImp(R3BGeoTofd)
+
+    R3BGeoTofd::R3BGeoTofd()
 {
-  protected:
-    char modName[20]; // name of module
-    char eleName[20]; // substring for elements in module
-  public:
-    R3BGeodTof();
-    ~R3BGeodTof() {}
-    const char* getModuleName(Int_t);
-    const char* getEleName(Int_t);
-    inline Int_t getModNumInMod(const TString&);
-    ClassDef(R3BGeodTof, 0) // Class for STS
-};
-
-inline Int_t R3BGeodTof::getModNumInMod(const TString& name)
-{
-    // returns the module index from module name
-    return (Int_t)(name[3] - '0') - 1;
+    // Constructor
+    fName = "sts";
+    maxSectors = 0;
+    maxModules = 99;
 }
 
-#endif /* !R3BGEODTOF_H */
+const char* R3BGeoTofd::getModuleName(Int_t m)
+{
+    // Returns the module name of sts number m
+    if (m < 0)
+    {
+        cout << "-E- R3BGeoTofd::getModuleName:: Module number " << m << " not known!" << endl;
+        return "";
+    }
+    if (m < 9)
+        sprintf(modName, "calstation0%i", m + 1);
+    else
+        sprintf(modName, "calstation%i", m + 1);
+    return modName;
+}
+
+const char* R3BGeoTofd::getEleName(Int_t m)
+{
+    // Returns the element name of sts number m
+    sprintf(eleName, "cal%i", m + 1);
+    return eleName;
+}

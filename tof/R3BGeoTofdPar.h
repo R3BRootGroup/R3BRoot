@@ -11,48 +11,30 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-/////////////////////////////////////////////////////////////
-// R3BGeomTof
-//
-// Class for geometry of R3BCAL
-//
-/////////////////////////////////////////////////////////////
-#include "R3BGeodTof.h"
-#include "FairGeoNode.h"
+#ifndef R3BGEOTOFDPAR_H
+#define R3BGEOTOFDPAR_H
 
-#include <iostream>
+#include "FairParGenericSet.h"
 
-using std::cout;
-using std::endl;
+#include "TH1F.h"
 
-ClassImp(R3BGeodTof)
-
-    R3BGeodTof::R3BGeodTof()
+class R3BGeoTofdPar : public FairParGenericSet
 {
-    // Constructor
-    fName = "sts";
-    maxSectors = 0;
-    maxModules = 99;
-}
+  public:
+    TObjArray* fGeoSensNodes; // List of FairGeoNodes for sensitive volumes
+    TObjArray* fGeoPassNodes; // List of FairGeoNodes for sensitive volumes
 
-const char* R3BGeodTof::getModuleName(Int_t m)
-{
-    // Returns the module name of sts number m
-    if (m < 0)
-    {
-        cout << "-E- R3BGeodTof::getModuleName:: Module number " << m << " not known!" << endl;
-        return "";
-    }
-    if (m < 9)
-        sprintf(modName, "calstation0%i", m + 1);
-    else
-        sprintf(modName, "calstation%i", m + 1);
-    return modName;
-}
+    R3BGeoTofdPar(const char* name = "R3BGeoTofdPar",
+                  const char* title = "Tofd Geometry Parameters",
+                  const char* context = "TestDefaultContext");
+    ~R3BGeoTofdPar(void);
+    void clear(void);
+    void putParams(FairParamList*);
+    Bool_t getParams(FairParamList*);
+    TObjArray* GetGeoSensitiveNodes() { return fGeoSensNodes; }
+    TObjArray* GetGeoPassiveNodes() { return fGeoPassNodes; }
 
-const char* R3BGeodTof::getEleName(Int_t m)
-{
-    // Returns the element name of sts number m
-    sprintf(eleName, "cal%i", m + 1);
-    return eleName;
-}
+    ClassDef(R3BGeoTofdPar, 1)
+};
+
+#endif /* !R3BGEOTOFDPAR_H */

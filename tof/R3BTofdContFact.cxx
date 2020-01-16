@@ -16,24 +16,20 @@
 
 /////////////////////////////////////////////////////////////
 //
-//  R3BdTofContFact
+//  R3BTofdContFact
 //
-//  Factory for the parameter containers in libR3BmTof
+//  Factory for the parameter containers in libR3BTofd
 //
 /////////////////////////////////////////////////////////////
 
-#include "R3BdTofContFact.h"
+#include "R3BTofdContFact.h"
 
-//#include "R3BmTofParRootFileIo.h"
-//#include "R3BmTofParAsciiFileIo.h"
-#include "R3BGeodTofPar.h"
-//#include "R3BmTofDigiPar.h"
+#include "R3BGeoTofdPar.h"
 #include "R3BTGeoPar.h"
 
-#include "FairRuntimeDb.h"
-//#include "CbmParTest.h"
 #include "FairParAsciiFileIo.h"
 #include "FairParRootFileIo.h"
+#include "FairRuntimeDb.h"
 
 #include "TClass.h"
 
@@ -43,25 +39,25 @@
 using std::cout;
 using std::endl;
 
-ClassImp(R3BdTofContFact)
+ClassImp(R3BTofdContFact)
 
-    static R3BdTofContFact gR3BdTofContFact;
+    static R3BTofdContFact gR3BTofdContFact;
 
-R3BdTofContFact::R3BdTofContFact()
+R3BTofdContFact::R3BTofdContFact()
 {
     // Constructor (called when the library is loaded)
-    fName = "R3BdTofContFact";
-    fTitle = "Factory for parameter containers in libR3BdTof";
+    fName = "R3BTofdContFact";
+    fTitle = "Factory for parameter containers in libR3BTofd";
     setAllContainers();
     FairRuntimeDb::instance()->addContFactory(this);
 }
 
-void R3BdTofContFact::setAllContainers()
+void R3BTofdContFact::setAllContainers()
 {
     /** Creates the Container objects with all accepted contexts and adds them to
      *  the list of containers for the STS library.*/
     /*
-     FairContainer* p1= new FairContainer("R3BmTofDigiPar",
+     FairContainer* p1= new FairContainer("R3BTofdDigiPar",
                                            "Sts Digitisation Parameters",
                                            "TestDefaultContext");
      p1->addContext("TestNonDefaultContext");
@@ -80,17 +76,17 @@ void R3BdTofContFact::setAllContainers()
     containers->Add(p2);
 }
 
-FairParSet* R3BdTofContFact::createContainer(FairContainer* c)
+FairParSet* R3BTofdContFact::createContainer(FairContainer* c)
 {
-    /** mTofls the constructor of the corresponding parameter container.
+    /** Tofdls the constructor of the corresponding parameter container.
      * For an actual context, which is not an empty string and not the default context
      * of this container, the name is concatinated with the context. */
 
     const char* name = c->GetName();
     cout << " -I container name " << name << endl;
     FairParSet* p = 0;
-    /*if (strcmp(name,"R3BmTofDigiPar")==0) {
-      p=new R3BmTofDigiPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
+    /*if (strcmp(name,"R3BTofdDigiPar")==0) {
+      p=new R3BTofdDigiPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
     }
     if (strcmp(name,"CbmGeoStsPar")==0) {
       p=new CbmGeoStsPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
@@ -104,17 +100,17 @@ FairParSet* R3BdTofContFact::createContainer(FairContainer* c)
     return p;
 }
 
-void R3BdTofContFact::activateParIo(FairParIo* io)
+void R3BTofdContFact::activateParIo(FairParIo* io)
 {
     // activates the input/output class for the parameters
     // needed by the Sts
     /*
     if (strcmp(io->IsA()->GetName(),"FairParRootFileIo")==0) {
-      R3BmTofParRootFileIo* p=new R3BmTofParRootFileIo(((FairParRootFileIo*)io)->getParRootFile());
+      R3BTofdParRootFileIo* p=new R3BTofdParRootFileIo(((FairParRootFileIo*)io)->getParRootFile());
       io->setDetParIo(p);
     }
     if (strcmp(io->IsA()->GetName(),"FairParAsciiFileIo")==0) {
-      R3BmTofParAsciiFileIo* p=new R3BmTofParAsciiFileIo(((FairParAsciiFileIo*)io)->getFile());
+      R3BTofdParAsciiFileIo* p=new R3BTofdParAsciiFileIo(((FairParAsciiFileIo*)io)->getFile());
       io->setDetParIo(p);
       }
     */

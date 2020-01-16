@@ -11,43 +11,43 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BDTOF_H
-#define R3BDTOF_H
+#ifndef R3BTOFD_H
+#define R3BTOFD_H
 
 #include "R3BDetector.h"
 #include "TLorentzVector.h"
 
 class TClonesArray;
-class R3BdTofPoint;
+class R3BTofdPoint;
 class FairVolume;
 class R3BTGeoPar;
 
-class R3BdTof : public R3BDetector
+class R3BTofd : public R3BDetector
 {
   public:
     /** Default constructor **/
-    R3BdTof();
+    R3BTofd();
 
     /** Standard constructor.
      *@param geoFile name of the ROOT geometry file
      *@param trans   position
      *@param rot     rotation
      */
-    R3BdTof(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot = TGeoRotation());
+    R3BTofd(const TString& geoFile, const TGeoTranslation& trans, const TGeoRotation& rot = TGeoRotation());
 
     /** Standard constructor.
      *@param geoFile name of the ROOT geometry file
      *@param combi   position + rotation
      */
-    R3BdTof(const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
+    R3BTofd(const TString& geoFile, const TGeoCombiTrans& combi = TGeoCombiTrans());
 
     /** Destructor **/
-    ~R3BdTof();
+    ~R3BTofd();
 
     /** Virtual method ProcessHits
      **
      ** Defines the action to be taken when a step is inside the
-     ** active volume. Creates a R3BdTofPoint and adds it to the
+     ** active volume. Creates a R3BTofdPoint and adds it to the
      ** collection.
      *@param vol  Pointer to the active volume
      **/
@@ -121,7 +121,7 @@ class R3BdTof : public R3BDetector
     Double32_t fELoss;              //!  energy loss
 
     Int_t fPosIndex;               //!
-    TClonesArray* fdTofCollection; //!  The hit collection
+    TClonesArray* fTofdCollection; //!  The hit collection
     Bool_t kGeoSaved;              //!
     TList* flGeoPar;               //!
 
@@ -130,9 +130,9 @@ class R3BdTof : public R3BDetector
 
     /** Private method AddHit
      **
-     ** Adds a mTofPoint to the HitCollection
+     ** Adds a TofdPoint to the HitCollection
      **/
-    R3BdTofPoint* AddHit(Int_t trackID,
+    R3BTofdPoint* AddHit(Int_t trackID,
                          Int_t detID,
                          TVector3 posIn,
                          TVector3 pos_out,
@@ -148,10 +148,10 @@ class R3BdTof : public R3BDetector
      **/
     void ResetParameters();
 
-    ClassDef(R3BdTof, 2);
+    ClassDef(R3BTofd, 2);
 };
 
-inline void R3BdTof::ResetParameters()
+inline void R3BTofd::ResetParameters()
 {
     fTrackID = fVolumeID = 0;
     fPosIn.SetXYZM(0.0, 0.0, 0.0, 0.0);

@@ -11,33 +11,29 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BDTOFDIGIPAR_H
-#define R3BDTOFDIGIPAR_H 1
+#ifndef R3BGEOTOFD_H
+#define R3BGEOTOFD_H
 
-#include <TObjString.h>
-#include <TVector3.h>
+#include "FairGeoSet.h"
 
-#include "FairParGenericSet.h"
-#include "FairParamList.h"
-
-class R3BdTofDigiPar : public FairParGenericSet
+class R3BGeoTofd : public FairGeoSet
 {
+  protected:
+    char modName[20]; // name of module
+    char eleName[20]; // substring for elements in module
   public:
-    R3BdTofDigiPar(const char* name = "R3BdTofDigiParTest",
-                   const char* title = "Tutorial  parameter",
-                   const char* context = "TestDefaultContext");
-    ~R3BdTofDigiPar(void){};
-    void clear(void){};
-    void putParams(FairParamList* list);
-    Bool_t getParams(FairParamList* list);
-
-    virtual void Print(Option_t* option = "") const;
-    /** Accessor functions **/
-
-  private:
-    // Digi. Parameters
-
-    ClassDef(R3BdTofDigiPar, 1); //
+    R3BGeoTofd();
+    ~R3BGeoTofd() {}
+    const char* getModuleName(Int_t);
+    const char* getEleName(Int_t);
+    inline Int_t getModNumInMod(const TString&);
+    ClassDef(R3BGeoTofd, 0) // Class for STS
 };
 
-#endif /* !R3BDTOFDIGIPAR_H*/
+inline Int_t R3BGeoTofd::getModNumInMod(const TString& name)
+{
+    // returns the module index from module name
+    return (Int_t)(name[3] - '0') - 1;
+}
+
+#endif /* !R3BGEOTOFD_H */

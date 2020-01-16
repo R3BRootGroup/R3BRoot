@@ -12,10 +12,10 @@
  ******************************************************************************/
 
 // -------------------------------------------------------------------------
-// -----                      R3BdTofPoint source file                 -----
+// -----                      R3BTofdPoint source file                 -----
 // -------------------------------------------------------------------------
 
-#include "R3BdTofPoint.h"
+#include "R3BTofdPoint.h"
 
 #include <iostream>
 
@@ -24,7 +24,7 @@ using std::endl;
 using std::flush;
 
 // -----   Default constructor   -------------------------------------------
-R3BdTofPoint::R3BdTofPoint()
+R3BTofdPoint::R3BTofdPoint()
     : FairMCPoint()
 {
     fX_out = fY_out = fZ_out = 0.;
@@ -33,7 +33,7 @@ R3BdTofPoint::R3BdTofPoint()
 // -------------------------------------------------------------------------
 
 // -----   Standard constructor   ------------------------------------------
-R3BdTofPoint::R3BdTofPoint(Int_t trackID,
+R3BTofdPoint::R3BTofdPoint(Int_t trackID,
                            Int_t detID,
                            TVector3 posIn,
                            TVector3 posOut,
@@ -54,13 +54,13 @@ R3BdTofPoint::R3BdTofPoint(Int_t trackID,
 // -------------------------------------------------------------------------
 
 // -----   Destructor   ----------------------------------------------------
-R3BdTofPoint::~R3BdTofPoint() {}
+R3BTofdPoint::~R3BTofdPoint() {}
 // -------------------------------------------------------------------------
 
 // -----   Public method Print   -------------------------------------------
-void R3BdTofPoint::Print(const Option_t* opt) const
+void R3BTofdPoint::Print(const Option_t* opt) const
 {
-    cout << "-I- R3BdTofPoint: STS Point for track " << fTrackID << " in detector " << fDetectorID << endl;
+    cout << "-I- R3BTofdPoint: STS Point for track " << fTrackID << " in detector " << fDetectorID << endl;
     cout << "    Position (" << fX << ", " << fY << ", " << fZ << ") cm" << endl;
     cout << "    Momentum (" << fPx << ", " << fPy << ", " << fPz << ") GeV" << endl;
     cout << "    Time " << fTime << " ns,  Length " << fLength << " cm,  Energy loss " << fELoss * 1.0e06 << " keV"
@@ -69,7 +69,7 @@ void R3BdTofPoint::Print(const Option_t* opt) const
 // -------------------------------------------------------------------------
 
 // -----   Point x coordinate from linear extrapolation   ------------------
-Double_t R3BdTofPoint::GetX(Double_t z) const
+Double_t R3BTofdPoint::GetX(Double_t z) const
 {
     //  cout << fZ << " " << z << " " << fZ_out << endl;
     if ((fZ_out - z) * (fZ - z) >= 0.)
@@ -80,7 +80,7 @@ Double_t R3BdTofPoint::GetX(Double_t z) const
 // -------------------------------------------------------------------------
 
 // -----   Point y coordinate from linear extrapolation   ------------------
-Double_t R3BdTofPoint::GetY(Double_t z) const
+Double_t R3BTofdPoint::GetY(Double_t z) const
 {
     if ((fZ_out - z) * (fZ - z) >= 0.)
         return (fY_out + fY) / 2.;
@@ -91,7 +91,7 @@ Double_t R3BdTofPoint::GetY(Double_t z) const
 // -------------------------------------------------------------------------
 
 // -----   Public method IsUsable   ----------------------------------------
-Bool_t R3BdTofPoint::IsUsable() const
+Bool_t R3BTofdPoint::IsUsable() const
 {
     Double_t dz = fZ_out - fZ;
     if (TMath::Abs(dz) < 1.e-4)
@@ -100,4 +100,4 @@ Bool_t R3BdTofPoint::IsUsable() const
 }
 // -------------------------------------------------------------------------
 
-ClassImp(R3BdTofPoint)
+ClassImp(R3BTofdPoint)

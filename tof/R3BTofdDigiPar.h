@@ -1,5 +1,3 @@
-// clang-format off
-
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -13,18 +11,33 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifdef __CINT__
+#ifndef R3BTOFDDIGIPAR_H
+#define R3BTOFDDIGIPAR_H 1
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
- 
-#pragma link C++ class R3BGeodTof+;
-#pragma link C++ class R3BGeodTofPar;
-#pragma link C++ class R3BdTof+;
-#pragma link C++ class R3BdTofDigiPar+;
-#pragma link C++ class R3BdTofContFact;
-#pragma link C++ class R3BdTofDigitizer+;
+#include <TObjString.h>
+#include <TVector3.h>
 
-#endif
+#include "FairParGenericSet.h"
+#include "FairParamList.h"
 
+class R3BTofdDigiPar : public FairParGenericSet
+{
+  public:
+    R3BTofdDigiPar(const char* name = "R3BTofdDigiParTest",
+                   const char* title = "Tutorial  parameter",
+                   const char* context = "TestDefaultContext");
+    ~R3BTofdDigiPar(void){};
+    void clear(void){};
+    void putParams(FairParamList* list);
+    Bool_t getParams(FairParamList* list);
+
+    virtual void Print(Option_t* option = "") const;
+    /** Accessor functions **/
+
+  private:
+    // Digi. Parameters
+
+    ClassDef(R3BTofdDigiPar, 1); //
+};
+
+#endif /* !R3BTOFDDIGIPAR_H*/

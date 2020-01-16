@@ -121,13 +121,6 @@ InitStatus R3BLosMapped2CalPar::Init()
 
     fCal_Par = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer("LosTCalPar");
     fCal_Par->setChanged();
-
-    if (!fNofModules)
-    {
-        LOG(ERROR) << "R3BLosMapped2CalPar::Init() Number of modules not set. ";
-        return kFATAL;
-    }
-
     fEngine = new R3BTCalEngine(fCal_Par, fMinStats);
     //    fEngine = new R3BTCalEngine(fCal_Par, fNofModules, fMinStats);
 
@@ -158,43 +151,45 @@ void R3BLosMapped2CalPar::Exec(Option_t* option)
         // channel numbers are supposed to be 1-based (1..n)
         UInt_t iDetector = hit->GetDetector() - 1; // now 0..n-1
         UInt_t iChannel = hit->GetChannel() - 1;   // now 0..n-1
-        UInt_t iType = hit->GetType();             // 0,1,2
+        UInt_t iType = hit->GetType();             // 0,1,2,3
 
         // cout<<"Mapped2CalPar "<<iDetector<<", "<<iChannel<<", "<<iType<<endl;
-
-        if (iDetector > (fNofDetectors - 1))
+        if (iType < 3)
         {
-            LOG(ERROR) << "R3BLosMapped2CalPar::Exec() : more detectors than expected! Det: " << (iDetector + 1)
-                       << " allowed are 1.." << fNofDetectors;
-            continue;
+            if (iDetector > (fNofDetectors - 1))
+            {
+                LOG(ERROR) << "R3BLosMapped2CalPar::Exec() : more detectors than expected! Det: " << (iDetector + 1)
+                           << " allowed are 1.." << fNofDetectors;
+                continue;
+            }
+            if (iChannel > (fNofChannels - 1))
+            {
+                LOG(ERROR) << "R3BLosMapped2CalPar::Exec() : more channels than expected! Channel: " << (iChannel + 1)
+                           << " allowed are 1.." << fNofChannels;
+                continue;
+            }
+
+            if (iType > 3)
+            {
+                LOG(ERROR) << "R3BLosMapped2CalPar::Exec() : more time-types than expected! Type: " << iType
+                           << " allowed are 0..3";
+                continue;
+            }
+
+            // Fill TAC histogram for VFTX and TAMEX
+            // fEngine->Fill(iModule, hit->GetTimeFine());
+            // void Fill(Int_t plane, Int_t paddle, Int_t side, Int_t tdc); see R3BRoot/tcal/R3BTcalEngine.h
+            // *** new ***
+
+            //     if(isnan(hit->GetTimeFine())) cout << "Fine Time = nan" <<endl;
+
+            //  if(hit->GetTimeFine() <= 0) cout<<"time<=0 for"<< iChannel<<", "<<iType<<endl;
+
+            Icount[iChannel][iType]++;
+
+            // cout<<"Mapped2CalPar "<< iDetector<<", "<<iType<<", "<<  hit->GetTimeFine()<<endl;
+            fEngine->Fill(iDetector + 1, iChannel + 1, iType + 1, hit->GetTimeFine());
         }
-        if (iChannel > (fNofChannels - 1))
-        {
-            LOG(ERROR) << "R3BLosMapped2CalPar::Exec() : more channels than expected! Channel: " << (iChannel + 1)
-                       << " allowed are 1.." << fNofChannels;
-            continue;
-        }
-
-        if (iType > (fNofTypes - 1))
-        {
-            LOG(ERROR) << "R3BLosMapped2CalPar::Exec() : more time-types than expected! Type: " << iType
-                       << " allowed are 0.." << (fNofTypes - 1);
-            continue;
-        }
-
-        // Fill TAC histogram for VFTX and TAMEX
-        // fEngine->Fill(iModule, hit->GetTimeFine());
-        // void Fill(Int_t plane, Int_t paddle, Int_t side, Int_t tdc); see R3BRoot/tcal/R3BTcalEngine.h
-        // *** new ***
-
-        //     if(isnan(hit->GetTimeFine())) cout << "Fine Time = nan" <<endl;
-
-        //  if(hit->GetTimeFine() <= 0) cout<<"time<=0 for"<< iChannel<<", "<<iType<<endl;
-
-        Icount[iChannel][iType]++;
-
-        // cout<<"Mapped2CalPar "<< iDetector<<", "<<iType<<", "<<  hit->GetTimeFine()<<endl;
-        fEngine->Fill(iDetector + 1, iChannel + 1, iType + 1, hit->GetTimeFine());
     }
 
     // Increment events
@@ -209,15 +204,18 @@ void R3BLosMapped2CalPar::FinishTask()
 
     fCal_Par->printParams();
 
-    for (UInt_t i = 0; i < 16; i++)
+    //    for (Int_t id = 0; id < 2; id++)
+    //    {
+    for (Int_t i = 0; i < 16; i++)
     {
-        for (UInt_t k = 0; k < 3; k++)
+        for (Int_t k = 0; k < 3; k++)
         {
             if (Icount[i][k] > 0)
                 cout << "R3BLosMapped2CalPar::FinishTask  Channel: " << i << ", Type: " << k
                      << ", Count: " << Icount[i][k] << endl;
         }
     }
+    //    }
 }
 
 ClassImp(R3BLosMapped2CalPar)
