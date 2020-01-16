@@ -10,10 +10,11 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
-// ------------------------------------------------------------------
-// -----                  R3BTofdCal2Hit                         -----
-// -----            Created May 30th 2016 by M.Heil           -----
-// ------------------------------------------------------------------
+// ------------------------------------------------------------
+// -----                R3BTofdCal2Hit                    -----
+// -----         Created May 30th 2016 by M.Heil          -----
+// -----           Modified Dec 2019 by L.Bott            -----
+// ------------------------------------------------------------
 
 #ifndef R3BTOFDCAL2HIT
 #define R3BTOFDCAL2HIT
@@ -103,10 +104,15 @@ class R3BTofdCal2Hit : public FairTask
      * Method for setting the nuclear charge of main beam
      */
     inline void SetTofdQ(Double_t Q) { fTofdQ = Q; }
+   
     /**
      * Method for setting histograms
      */
     inline void SetTofdHisto(Bool_t Histo) { fTofdHisto = Histo; }
+    /**
+     * Method for setting y calculation via ToT instead of tdiff
+     */
+    inline void SetTofdTotPos(Bool_t ToTy) { fTofdTotPos = ToTy; }
 
     /**
      * Method for walk calculation.
@@ -155,6 +161,7 @@ class R3BTofdCal2Hit : public FairTask
     Int_t fTpat;
     Double_t fTofdQ;
     Bool_t fTofdHisto;
+    Bool_t fTofdTotPos;
     UInt_t fnEvents;
     UInt_t fNofPlanes;
     UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */

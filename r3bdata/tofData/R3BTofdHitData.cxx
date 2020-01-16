@@ -25,7 +25,7 @@ R3BTofdHitData::R3BTofdHitData(Double_t t,
                                Double_t tdiff,
                                Double_t ELoss,
                                Double_t ID)
-    : R3BHit(ID, x, y, ELoss, tdiff)
+    : R3BHit(ID, x, y, ELoss, t)
 {
 }
 

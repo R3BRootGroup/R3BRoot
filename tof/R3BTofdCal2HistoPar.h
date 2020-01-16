@@ -1,6 +1,19 @@
-// ----------------------------------------------------------
-// -----        Create hit parameters for TOFD        -----
-// ----------------------------------------------------------
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+// ----------------------------------------------------
+// -----      Create hit parameters for TOFD      -----
+// -----        Created Jul 2019 by L.Bott        -----
+// ----------------------------------------------------
 
 #ifndef R3BTOFDCAL2HISTOPAR_H
 #define R3BTOFDCAL2HISTOPAR_H
@@ -131,6 +144,11 @@ class R3BTofdCal2HistoPar : public FairTask
     virtual void calcOffset();
 
     /**
+     * Method for calculation of ToT offset.
+     */
+    virtual void calcToTOffset();
+
+    /**
      * Method for calculation of sync offset between paddles.
      */
     virtual void calcSync();
@@ -139,6 +157,11 @@ class R3BTofdCal2HistoPar : public FairTask
      * Method for calculation of effective speed of light.
      */
     virtual void calcVeff();
+
+    /**
+     * Method for calculation of light attenuation factor.
+     */
+    virtual void calcLambda();
 
     /**
      * Method for calculation of position dependence of scintillator.

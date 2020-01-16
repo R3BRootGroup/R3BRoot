@@ -63,7 +63,8 @@ R3BTofdCal2Hit::R3BTofdCal2Hit()
     , fNofPlanes(5)
     , fPaddlesPerPlane(6)
     , fTofdQ(1)
-    , fTofdHisto(false)
+    , fTofdHisto(true)
+    , fTofdTotPos(true)
     , fnEvents(0)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , maxevent(0)
@@ -117,7 +118,8 @@ R3BTofdCal2Hit::R3BTofdCal2Hit(const char* name, Int_t iVerbose)
     , fNofPlanes(5)
     , fPaddlesPerPlane(6)
     , fTofdQ(1)
-    , fTofdHisto(false)
+    , fTofdHisto(true)
+    , fTofdTotPos(true)
     , fnEvents(0)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
 {
@@ -568,14 +570,21 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 if (iPlane == 2 || iPlane == 4)
                     y[iPlane][iBar * 2].push_back(pos);
                 y[iPlane][iBar * 2 - 1].push_back(pos);
+                // std::cout<<"Tdiff position "<<pos;
 
                 // calculate y-position from ToT
-                auto posToT = ((bot_tot - top_tot) / ((bot_tot + top_tot) / 2.)) * par->GetVeff() * 10.;
+                auto posToT =
+                    par->GetLambda() / 2. * log((top_tot * par->GetToTOffset2()) / (bot_tot * par->GetToTOffset1()));
                 if (iPlane == 1 || iPlane == 3)
                     yToT[iPlane][iBar * 2 - 2].push_back(posToT);
                 if (iPlane == 2 || iPlane == 4)
                     yToT[iPlane][iBar * 2].push_back(posToT);
                 yToT[iPlane][iBar * 2 - 1].push_back(posToT);
+                // std::cout<<" ToT position "<<posToT<<" ToT "<<top_tot<<"/"<<bot_tot<<" Parameter
+                // "<<par->GetLambda()<<" "<<par->GetToTOffset2()<<"/"<<par-> GetToTOffset1()<<"\n";
+
+                if (fTofdTotPos)
+                    pos = posToT;
 
                 // calculate x-position
                 randx = (std::rand() / (float)RAND_MAX);
@@ -634,6 +643,9 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                     if (iPlane == 2 || iPlane == 4)
                         q[iPlane][iBar * 2].push_back((q1 + q2) / 2.);
                     q[iPlane][iBar * 2 - 1].push_back((q1 + q2) / 2.);
+                    parz[0] = 1.;
+                    parz[1] = 0.;
+                    parz[2] = 1.;
                 }
 
                 if (fTofdHisto)
@@ -643,10 +655,10 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                     // fhTof[iPlane-1]->Fill(iBar,ToF);
                     // fhTdiff[iPlane-1]->Fill(iBar,tdiff);
                     // fhTsync[iPlane-1]->Fill(iBar,ToF);
-                    fhQvsPos[iPlane - 1][iBar - 1]->Fill(
-                        pos, parz[0] * TMath::Power((q1 + q2) / 2., parz[2]) + parz[1]); //(q1 + q2)/2.);
-                    fhQvsTof[iPlane - 1][iBar - 1]->Fill((q1 + q2) / 2., ToF);           //(q1 + q2) / 2.);
-                    fhTvsTof[iPlane - 1][iBar - 1]->Fill(dt_mod, ToF);                   //(q1 + q2) / 2.);
+                    fhQvsPos[iPlane - 1][iBar - 1]->Fill(posToT,
+                                                         parz[0] * TMath::Power((q1 + q2) / 2., parz[2]) + parz[1]);
+                    fhQvsTof[iPlane - 1][iBar - 1]->Fill((q1 + q2) / 2., ToF);
+                    fhTvsTof[iPlane - 1][iBar - 1]->Fill(dt_mod, ToF);
                     fhQvsTofw[iPlane - 1][iBar - 1]->Fill((bot_tot + top_tot) / 2.,
                                                           ToF); // needed to get TOF w/o walk correction
                 }
@@ -671,8 +683,8 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 
     // Now all hits in this event are analyzed
 
-    Double_t hit_coinc = 5.;      // coincidence window for hits in one event in ns. physics says max 250 ps
-    Double_t maxChargeDiff = 80.; // maximum charge difference between two planes for averaged hits
+    Double_t hit_coinc = 5.;     // coincidence window for hits in one event in ns. physics says max 250 ps
+    Double_t maxChargeDiff = 1.; // maximum charge difference between two planes for averaged hits
 
     LOG(DEBUG) << "Hits in this event: " << nHitsEvent;
 
@@ -681,6 +693,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
     Double_t tArrT[2 * nHitsEvent + 1];
     Double_t tArrX[2 * nHitsEvent + 1];
     Double_t tArrY[2 * nHitsEvent + 1];
+    Double_t tArrYT[2 * nHitsEvent + 1];
     Double_t tArrP[2 * nHitsEvent + 1];
     Double_t tArrB[2 * nHitsEvent + 1];
     Bool_t tArrU[2 * nHitsEvent + 1];
@@ -690,6 +703,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
         tArrT[i] = -1.;
         tArrX[i] = -1.;
         tArrY[i] = -1.;
+        tArrYT[i] = -1.;
         tArrP[i] = -1.;
         tArrB[i] = -1.;
         tArrU[i] = kFALSE;
@@ -707,7 +721,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                     Int_t p = 0;
                     if (tArrT[0] == -1.)
                     { // first entry
-                        LOG(DEBUG) << "First entry " << i << " " << j;
+                        LOG(DEBUG) << "First entry plane/bar " << i << "/" << j;
                         tArrQ[0] = q[i][j].at(m);
                         tArrT[0] = tof[i][j].at(m);
                         tArrX[0] = x[i][j].at(m);
@@ -731,8 +745,12 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                         }
                         else
                         {
-                            while (tof[i][j].at(m) > tArrT[p] && tArrT[p] != 0.)
+                            while (tof[i][j].at(m) > tArrT[p] && tArrT[p] != -1.)
+                            {
                                 p++; // find insert position
+                                if (p > 2 * nHitsEvent + 1)
+                                    LOG(FATAL) << "Insert position oor"; // should not happen
+                            }
 
                             LOG(DEBUG) << "Will insert at " << p;
                             if (p > 0 && tof[i][j].at(m) > tArrT[p - 1] && tof[i][j].at(m) != tArrT[p])
@@ -792,15 +810,15 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
     */
 
     // Now we can analyze the hits in this event
-
-    if (fTofdHisto)
-    {
-        for (Int_t a = 0; a < 2 * nHitsEvent; a++)
-        {                                                         // loop over all hits
-            fhQ[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrQ[a]); // charge per plane
+    /*
+        if (fTofdHisto)
+        {
+            for (Int_t a = 0; a < 2 * nHitsEvent; a++)
+            {                                                         // loop over all hits
+                fhQ[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrQ[a]); // charge per plane
+            }
         }
-    }
-
+    */
     // select events with feasible times
     Double_t time0;
 
@@ -840,7 +858,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
             {
                 if (tArrP[ihit] == plane0 && charge0 != tArrQ[ihit])
                 {
-                    fhQM[(Int_t)tArrP[ihit]]->Fill(charge0, tArrQ[ihit]);
+                    fhQM[(Int_t)tArrP[ihit] - 1]->Fill(charge0, tArrQ[ihit]);
                 }
             }
 
@@ -909,13 +927,27 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                             }
 
                             // store average
-                            new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData((tArrT[ihit] + tArrT[ihit - i]) / 2.,
-                                                                              (tArrX[ihit] + tArrX[ihit - i]) / 2.,
-                                                                              (tArrY[ihit] + tArrY[ihit - i]) / 2.,
-                                                                              (tArrQ[ihit] + tArrQ[ihit - i]) / 2.,
-                                                                              abs(tArrT[ihit] - tArrT[ihit - i]),
-                                                                              (tArrQ[ihit] + tArrQ[ihit - i]) / 2.,
-                                                                              12);
+                            if (fTofdTotPos)
+                            {
+                                new ((*fHitItems)[fNofHitItems++])
+                                    R3BTofdHitData((tArrT[ihit] + tArrT[ihit - i]) / 2.,
+                                                   (tArrX[ihit] + tArrX[ihit - i]) / 2.,
+                                                   (tArrYT[ihit] + tArrYT[ihit - i]) / 2.,
+                                                   (tArrQ[ihit] + tArrQ[ihit - i]) / 2.,
+                                                   abs(tArrT[ihit] - tArrT[ihit - i]),
+                                                   (tArrQ[ihit] + tArrQ[ihit - i]) / 2.,
+                                                   12);
+                            }
+                            else
+                            {
+                                new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData((tArrT[ihit] + tArrT[ihit - i]) / 2.,
+                                                                                  (tArrX[ihit] + tArrX[ihit - i]) / 2.,
+                                                                                  (tArrY[ihit] + tArrY[ihit - i]) / 2.,
+                                                                                  (tArrQ[ihit] + tArrQ[ihit - i]) / 2.,
+                                                                                  abs(tArrT[ihit] - tArrT[ihit - i]),
+                                                                                  (tArrQ[ihit] + tArrQ[ihit - i]) / 2.,
+                                                                                  12);
+                            }
                         }
                         /*
                         std::cout<<"Used up averaged hits in this coincidence window:\n";
@@ -988,13 +1020,27 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                             }
 
                             // store average
-                            new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData((tArrT[ihit] + tArrT[ihit - i]) / 2.,
-                                                                              (tArrX[ihit] + tArrX[ihit - i]) / 2.,
-                                                                              (tArrY[ihit] + tArrY[ihit - i]) / 2.,
-                                                                              (tArrQ[ihit] + tArrQ[ihit - i]) / 2.,
-                                                                              abs(tArrT[ihit] - tArrT[ihit - i]),
-                                                                              (tArrQ[ihit] + tArrQ[ihit - i]) / 2.,
-                                                                              34);
+                            if (fTofdTotPos)
+                            {
+                                new ((*fHitItems)[fNofHitItems++])
+                                    R3BTofdHitData((tArrT[ihit] + tArrT[ihit - i]) / 2.,
+                                                   (tArrX[ihit] + tArrX[ihit - i]) / 2.,
+                                                   (tArrYT[ihit] + tArrYT[ihit - i]) / 2.,
+                                                   (tArrQ[ihit] + tArrQ[ihit - i]) / 2.,
+                                                   abs(tArrT[ihit] - tArrT[ihit - i]),
+                                                   (tArrQ[ihit] + tArrQ[ihit - i]) / 2.,
+                                                   34);
+                            }
+                            else
+                            {
+                                new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData((tArrT[ihit] + tArrT[ihit - i]) / 2.,
+                                                                                  (tArrX[ihit] + tArrX[ihit - i]) / 2.,
+                                                                                  (tArrY[ihit] + tArrY[ihit - i]) / 2.,
+                                                                                  (tArrQ[ihit] + tArrQ[ihit - i]) / 2.,
+                                                                                  abs(tArrT[ihit] - tArrT[ihit - i]),
+                                                                                  (tArrQ[ihit] + tArrQ[ihit - i]) / 2.,
+                                                                                  34);
+                            }
                         }
                         /*
                         std::cout<<"Used up averaged hits in this coincidence window:\n";
@@ -1030,8 +1076,26 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
             LOG(DEBUG) << "Single Hit for Plane " << tArrP[hit] << " " << tArrB[hit];
             tArrU[hit] = tArrU[hit + 1] = true;
             // store single hits only seen in planes
-            new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData(
-                tArrT[hit], (tArrX[hit] + tArrX[hit]) / 2., tArrY[hit], tArrQ[hit], 0., tArrQ[hit], tArrP[hit]);
+            if (fTofdTotPos)
+            {
+                new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData(tArrT[hit],
+                                                                  (tArrX[hit] + tArrX[hit + 1]) / 2.,
+                                                                  tArrYT[hit],
+                                                                  tArrQ[hit],
+                                                                  -1.,
+                                                                  tArrQ[hit],
+                                                                  tArrP[hit]);
+            }
+            else
+            {
+                new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData(tArrT[hit],
+                                                                  (tArrX[hit] + tArrX[hit + 1]) / 2.,
+                                                                  tArrY[hit],
+                                                                  tArrQ[hit],
+                                                                  -1.,
+                                                                  tArrQ[hit],
+                                                                  tArrP[hit]);
+            }
             hit++;
         }
     }

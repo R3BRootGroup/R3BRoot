@@ -344,19 +344,19 @@ InitStatus R3BGlobalAnalysis::Init()
                                                   0.,
                                                   1100.);
             fh_Fibs_vs_Tofd[ifibcount]->GetYaxis()->SetTitle("Fiber number");
-            fh_Fibs_vs_Tofd[ifibcount]->GetXaxis()->SetTitle("Tofd x-pos number");
+            fh_Fibs_vs_Tofd[ifibcount]->GetXaxis()->SetTitle("Tofd x-pos in cm");
 
             // hit fiber number vs. TofD y-position:
             fh_Fibs_vs_Tofd_y[ifibcount] = new TH2F(Form("%s_fib_vs_TofdY", detName),
                                                     Form("%s Fiber # vs. Tofd y-pos", detName),
-                                                    200,
+                                                    800,
                                                     -100,
                                                     100,
                                                     1100,
                                                     0.,
                                                     1100.);
             fh_Fibs_vs_Tofd_y[ifibcount]->GetYaxis()->SetTitle("Fiber number");
-            fh_Fibs_vs_Tofd_y[ifibcount]->GetXaxis()->SetTitle("Tofd y-pos number");
+            fh_Fibs_vs_Tofd_y[ifibcount]->GetXaxis()->SetTitle("Tofd y-pos in cm");
 
             // hit fiber number vs. fiber number:
             for (Int_t j = ifibcount + 1; j < NOF_FIB_DET; j++)
@@ -580,7 +580,7 @@ void R3BGlobalAnalysis::Exec(Option_t* option)
                     continue; // should not happen
                 if (ihit > 15)
                 {
-                    cout << "Error, more than 16 hits" << endl;
+                    // cout << "Error, more than 16 hits" << endl;
                     continue;
                 }
                 timeTofd[ihit] = hit->GetTime();
@@ -901,7 +901,7 @@ void R3BGlobalAnalysis::FinishTask()
     }
     if (fHitItems.at(DET_TOFD))
     {
-        //      fh_tofd_pos->Write();
+        fh_tofd_pos->Write();
         fh_tofd_charge->Write();
         fh_TimePreviousEvent->Write();
         fh_tofd_mult->Write();

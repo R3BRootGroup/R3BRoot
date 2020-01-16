@@ -1,10 +1,23 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
 // -----------------------------------------------------
-// -----            R3BTofdCal2HistoPar             -----
+// -----            R3BTofdCal2HistoPar            -----
+// -----         Created Jul 2019 by L.Bott        -----
 // -----------------------------------------------------
 
 /* Some notes:
- *
- *
+ * In order to generate input for this run:
+ * TofdCal2Histo
  */
 
 #include "R3BTofdCal2HistoPar.h"
@@ -153,6 +166,9 @@ void R3BTofdCal2HistoPar::FinishTask()
         // Half of the offset is added to PM1 and half to PM2.
         LOG(WARNING) << "Calling function calcOffset";
         calcOffset();
+        // Determine ToT offset between top and bottom PMT
+        LOG(WARNING) << "Calling function calcToTOffset";
+        calcToTOffset();
         // Determine sync offset between paddles
         LOG(WARNING) << "Calling function calcSync";
         calcSync();
@@ -163,6 +179,9 @@ void R3BTofdCal2HistoPar::FinishTask()
         // Determine effective speed of light in [cm/s] for each paddle
         LOG(WARNING) << "Calling function calcVeff";
         calcVeff();
+        // Determine light attenuation lambda for each paddle
+        LOG(WARNING) << "Calling function calcLambda";
+        calcLambda();
     }
 
     if (fParameter == 3)
@@ -234,7 +253,7 @@ void R3BTofdCal2HistoPar::FinishTask()
                     para[5] = par->GetPar2b();
                     para[6] = par->GetPar2c();
                     para[7] = par->GetPar2d();
-                    cout << "Write parameter: " << pars[0] << " " << pars[1] << " " << pars[2] << endl;
+                    std::cout << "Write parameter: " << pars[0] << " " << pars[1] << " " << pars[2] << "\n";
                     par->SetPar1za(pars[0]);
                     par->SetPar1zb(pars[1]);
                     par->SetPar1zc(pars[2]);
@@ -263,7 +282,6 @@ void R3BTofdCal2HistoPar::calcOffset()
                 cOffset->cd(i + 1);
                 h->Draw("colz");
                 TH1F* histo_py = (TH1F*)h->ProjectionY("histo_py", j + 2, j + 2, "");
-                Double_t veff = mpar->GetVeff();
                 Int_t binmax = histo_py->GetMaximumBin();
                 Double_t Max = histo_py->GetXaxis()->GetBinCenter(binmax);
                 TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 0.3, Max + 0.3);
@@ -274,9 +292,44 @@ void R3BTofdCal2HistoPar::calcOffset()
                 mpar->SetPaddle(j + 1);
                 mpar->SetOffset1(-offset / 2.);
                 mpar->SetOffset2(offset / 2.);
-                // mpar->SetVeff(veff);
                 fCal_Par->AddModulePar(mpar);
             }
+        }
+    }
+    fCal_Par->setChanged();
+}
+
+void R3BTofdCal2HistoPar::calcToTOffset()
+{
+    TCanvas* cToTOffset = new TCanvas("cToTOffset", "cToTOffset", 10, 10, 1000, 900);
+    cToTOffset->Divide(2, 2);
+    for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
+    {
+        for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
+        {
+            Double_t tot1 = 0.;
+            Double_t tot2 = 0.;
+            R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
+            for (Int_t p = 0; p < 2; p++)
+            {
+                if (hfilename->Get(Form("ToT_Plane_%i_Bar_%i_PM_%i", i + 1, j + 1, p + 1)))
+                {
+                    LOG(WARNING) << "Found histo Plane_" << i + 1 << "_Bar_" << j + 1 << "_PM_" << p + 1;
+                    auto* h = (TH1F*)hfilename->Get(Form("ToT_Plane_%i_Bar_%i_PM_%i", i + 1, j + 1, p + 1))->Clone();
+                    h->Draw();
+                    Int_t binmax = h->GetMaximumBin();
+                    Double_t Max = h->GetXaxis()->GetBinCenter(binmax);
+                    TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 10, Max + 10);
+                    h->Fit("fgaus", "QR0");
+                    if (p == 0)
+                        tot1 = fgaus->GetParameter(1);
+                    if (p == 1)
+                        tot2 = fgaus->GetParameter(1);
+                }
+            }
+            LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << sqrt(tot2 / tot1);
+            par->SetToTOffset1(sqrt(tot2 / tot1));
+            par->SetToTOffset2(1. / sqrt(tot2 / tot1));
         }
     }
     fCal_Par->setChanged();
@@ -298,8 +351,6 @@ void R3BTofdCal2HistoPar::calcSync()
                 h->Draw("colz");
                 auto* histo_py = (TH1F*)h->ProjectionY("histo_py", j + 2, j + 2, "");
                 R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
-                Double_t offset1 = par->GetOffset1();
-                Double_t offset2 = par->GetOffset2();
                 Int_t binmax = histo_py->GetMaximumBin();
                 Double_t Max = histo_py->GetXaxis()->GetBinCenter(binmax);
                 Double_t MaxEntry = histo_py->GetBinContent(binmax);
@@ -307,8 +358,6 @@ void R3BTofdCal2HistoPar::calcSync()
                 fgaus->SetParameters(MaxEntry, Max, 20);
                 histo_py->Fit("fgaus", "QR0");
                 Double_t sync = fgaus->GetParameter(1); // histo_py->GetXaxis()->GetBinCenter(binmax);
-                par->SetOffset1(offset1);
-                par->SetOffset2(offset2);
                 par->SetSync(sync);
                 LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " Sync  " << sync;
             }
@@ -362,6 +411,54 @@ void R3BTofdCal2HistoPar::calcVeff()
     fCal_Par->setChanged();
 }
 
+void R3BTofdCal2HistoPar::calcLambda()
+{
+    TCanvas* cLambda = new TCanvas("cLambda", "cLambda", 10, 10, 1000, 900);
+    cLambda->Divide(2, 2);
+    for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
+    {
+        for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
+        {
+            R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
+            if (!par)
+            {
+                LOG(INFO) << "Hit par not found, Plane: " << i + 1 << ", Bar: " << j + 1;
+                continue;
+            }
+            Double_t max = 0.;
+            Double_t lambda = 7.;
+            Double_t tot1 = 0.;
+            Double_t tot2 = 0.;
+            for (Int_t p = 0; p < 2; p++)
+            {
+                if (hfilename->Get(Form("ToT_Plane_%i_Bar_%i_PM_%i", i + 1, j + 1, p + 1))) // y via ToT method
+                {
+                    LOG(WARNING) << "Found histo Time_Diff_Plane_" << i + 1;
+                    auto* h = (TH2F*)hfilename->Get(Form("ToT_Plane_%i_Bar_%i_PM_%i", i + 1, j + 1, p + 1))->Clone();
+                    h->Draw();
+                    Int_t binmax = h->GetMaximumBin();
+                    max = h->GetXaxis()->GetBinCenter(binmax);
+                    Double_t maxEntry = h->GetBinContent(binmax);
+                    auto* fgaus = new TF1("fgaus", "gaus(0)", max - 10, max + 10);
+                    fgaus->SetParameters(maxEntry, max, 20);
+                    h->Fit("fgaus", "QR0");
+                    if (p == 0)
+                        tot1 = fgaus->GetParameter(1);
+                    if (p == 1)
+                        tot2 = fgaus->GetParameter(1);
+                }
+            }
+            Double_t toffset1 = par->GetToTOffset1();
+            Double_t toffset2 = par->GetToTOffset2();
+            lambda = 2. * fTofdY / log((tot2 * toffset2) / (tot1 * toffset1)); // light attenuation
+            LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << par->GetToTOffset2();
+            LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " lambda  " << lambda;
+            par->SetLambda(lambda);
+        }
+    }
+    fCal_Par->setChanged();
+}
+
 void R3BTofdCal2HistoPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Double_t* para)
 {
     // This fits the exponential decay of the light in a paddle. The 2 PMTs are fit with the same function but one
@@ -407,7 +504,7 @@ void R3BTofdCal2HistoPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Dou
     for (Int_t j = 0; j <= 3; j++)
     {
         para[j] = f1->GetParameter(j);
-        cout << "Parameter: " << para[j] << endl;
+        std::cout << "Parameter: " << para[j] << "\n";
     }
     // fit again but with more information and better cuts
     n = 0;
@@ -436,7 +533,7 @@ void R3BTofdCal2HistoPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Dou
     for (Int_t j = 0; j <= 3; j++)
     {
         para[j] = f2->GetParameter(j);
-        cout << "Parameter: " << para[j] << endl;
+        std::cout << "Parameter: " << para[j] << "\n";
     }
     cfit_exp->Update();
     // gPad->WaitPrimitive();
@@ -515,7 +612,7 @@ void R3BTofdCal2HistoPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
                 continue;
             x[nfp] = (Double_t)z;
             zpeaks[nfp] = peaks[i];
-            // cout<<"z real " << x[nfp] << " z found " << zpeaks[nfp] <<endl;
+            // std::cout<<"z real " << x[nfp] << " z found " << zpeaks[nfp] <<"\n";
             nfp++;
         }
         std::cout << "Do again? (y/n) ";
