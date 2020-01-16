@@ -196,7 +196,7 @@ void R3BNeulandTacquilaMapped2Cal::Exec(Option_t* option)
     if (fPulserMode)
     {
         R3BNeulandCalData* pmt1;
-        Double_t time1;
+        Double_t time1 = nan("");
         for (Int_t i = 0; i < fNPmt; i++)
         {
             pmt1 = (R3BNeulandCalData*)fPmt->At(i);

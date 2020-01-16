@@ -144,7 +144,7 @@ void R3BPtofCal2Hit::Exec(Option_t* option)
         R3BPaddleCalData* caldata = (R3BPaddleCalData*)fCalItems->At(i);
         Int_t iPlane = caldata->GetPlane() - 1;
         Int_t iBar = caldata->GetBar() - 1;
-
+        assert(iBar >= 0 && iBar < PtofPaddlesPerPlane);
         Int_t id = iPlane * PtofPaddlesPerPlane + iBar;
 
         Double_t t1 = caldata->fTime1L_ns + fTOffset1[id];
@@ -167,7 +167,7 @@ void R3BPtofCal2Hit::Exec(Option_t* option)
             zz[iPlane][iBar] = 10.;
         }
 
-        if (iBar + 1 == 40)
+        if (PtofPaddlesPerPlane >= 40 && iBar + 1 == 40)
         {
             LOG(ERROR) << "cal2hit: Plane: " << iPlane + 1 << "  Bar: " << iBar + 1 << "  t1= " << t1 << "  t2= " << t2;
             LOG(ERROR) << "cal2hit: xx: " << xx[iPlane][iBar] << "  charge: " << charge[iPlane][iBar];
@@ -177,7 +177,7 @@ void R3BPtofCal2Hit::Exec(Option_t* option)
     }
     for (Int_t iBar = 0; iBar < PtofPaddlesPerPlane; iBar++)
     {
-        if (iBar + 1 == 40)
+        if (PtofPaddlesPerPlane >= 40 && iBar + 1 == 40)
         {
             LOG(ERROR) << "Planne 1  Bar: " << iBar + 1 << "  charge: " << charge[0][iBar] << "  x: " << xx[0][iBar];
             LOG(ERROR) << "Planne 2  Bar: " << iBar + 1 << "  charge: " << charge[1][iBar] << "  x: " << xx[1][iBar];

@@ -65,6 +65,8 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+
+#include <assert.h>
 #define IS_NAN(x) TMath::IsNaN(x)
 using namespace std;
 
@@ -1428,7 +1430,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
     if (fTpat_bit >= 0)
     {
         itpat = header->GetTpat();
-        tpatvalue = (itpat && (1 << fTpat_bit)) >> fTpat_bit;
+        tpatvalue = (itpat & (1 << fTpat_bit)) >> fTpat_bit;
         if (tpatvalue == 0)
             return;
     }
@@ -2144,7 +2146,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
     Double_t totsumS8[10] = { 0.0 };
     Double_t totS8[10][8] = { 0.0 / 0.0 };
 
-    Int_t MultipS8;
+    Int_t MultipS8 = -1;
 
     if (fMappedItems.at(DET_SCI8))
     {
@@ -2166,6 +2168,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
             fh_sci8_channels->Fill(iCha);
         }
     }
+    assert(MultipS8 != -1);
 
     Int_t nPartS8;
 
@@ -3032,7 +3035,7 @@ void R3BOnlineSpectraDec2019::FinishTask()
     {
         fh_TimePreviousEvent->Write();
 
-        for (Int_t i; i < 4; i++)
+        for (Int_t i = 0; i < 4; i++)
         {
             fh_tofd_TotPm[i]->Write();
         }

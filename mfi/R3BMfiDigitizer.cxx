@@ -153,7 +153,7 @@ void R3BMfiDigitizer::Exec(Option_t* opt)
     Int_t fiber;
 
     // mfi fiber determing variables
-    Double_t fib;
+    Double_t fib = nan("");
     Double_t fib_coverage = 0.8828;
     Bool_t fib_hit = false;
     Double_t _rndm;

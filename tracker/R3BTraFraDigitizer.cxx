@@ -107,25 +107,25 @@ void R3BTraFraDigitizer::Exec(Option_t* opt)
     // Int_t TrackId=0;
 
     Double_t ss03_se_f;
-    Double_t ss03_spos_f;
+    Double_t ss03_spos_f = nan("");
     Double_t ss03_sbw_f;
     Double_t ss03_sarea_f;
     Double_t ss03_seta_f;
 
     Double_t ss03_ke_f;
-    Double_t ss03_kpos_f;
+    Double_t ss03_kpos_f = nan("");
     Double_t ss03_kbw_f;
     Double_t ss03_karea_f;
     Double_t ss03_keta_f;
 
     Double_t ss06_se_f;
-    Double_t ss06_spos_f;
+    Double_t ss06_spos_f = nan("");
     Double_t ss06_sbw_f;
     Double_t ss06_sarea_f;
     Double_t ss06_seta_f;
 
     Double_t ss06_ke_f;
-    Double_t ss06_kpos_f;
+    Double_t ss06_kpos_f = nan("");
     Double_t ss06_kbw_f;
     Double_t ss06_karea_f;
     Double_t ss06_keta_f;

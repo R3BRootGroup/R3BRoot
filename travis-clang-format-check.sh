@@ -1,4 +1,5 @@
 #! /bin/bash
+test "$1" == "--autofix" && AUTOFIX=1 && shift
 
 CLANG_FORMAT=${1:-clang-format}
 
@@ -21,11 +22,17 @@ fi
 
 filesToCheck="$(git diff --name-only ${base_commit} | grep -e '.(\.C\|\.cpp\|\.cxx\|\.h)$' || true)"
 for f in $filesToCheck; do
-    echo "  Checking: ${f}"
-    d=$(diff -u "$f" <($CLANG_FORMAT -style=file "$f") || true)
-    if ! [ -z "$d" ]; then
-        echo "$d"
-        fail=1
+    if test -n "$AUTOFIX"
+    then
+	echo "fixing $f, if needed." 
+	$CLANG_FORMAT -i -style=file "$f"
+    else
+	echo "  Checking: ${f}"
+	d=$(diff -u "$f" <($CLANG_FORMAT -style=file "$f") || true)
+	if ! [ -z "$d" ]; then
+            echo "$d"
+            fail=1
+	fi
     fi
 done
 

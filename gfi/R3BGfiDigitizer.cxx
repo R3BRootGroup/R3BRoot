@@ -106,8 +106,8 @@ void R3BGfiDigitizer::Exec(Option_t* opt)
 
     Int_t gf1mul;
     Int_t gf2mul;
-    Double_t gf1_01x;
-    Double_t gf2_01x;
+    Double_t gf1_01x = nan("");
+    Double_t gf2_01x = nan("");
 
     //******************** GFI **************************//
     gf1mul = 0;
