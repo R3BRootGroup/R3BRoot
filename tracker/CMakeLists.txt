@@ -68,6 +68,7 @@ R3BTarget2pDigiPar.cxx
 R3BTarget2pDigitizer.cxx   
 R3BTraHitFinder.cxx
 unpackams/R3BAmsStripCalPar.cxx
+unpackams/R3BAmsMappingPar.cxx
 unpackams/R3BAmsMapped2StripCalPar.cxx
 unpackams/R3BAmsMapped2StripCal.cxx
 unpackams/R3BAmsStripCal2Hit.cxx

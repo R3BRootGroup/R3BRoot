@@ -37,7 +37,7 @@ class R3BAmsMappedData : public TObject
     R3BAmsMappedData(Int_t detId, Int_t stripId, Int_t energy);
 
     // Destructor
-    ~R3BAmsMappedData() {}
+    virtual ~R3BAmsMappedData() {}
 
     // Getters
     inline const Int_t& GetDetectorId() const { return fDetId; }

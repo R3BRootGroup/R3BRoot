@@ -15,17 +15,8 @@
 // -----         R3BAmsMapped2StripCalPar source file                  -----
 // -----             Created 29/05/18  by J.L. Rodriguez-Sanchez       -----
 // -------------------------------------------------------------------------
-#include "R3BAmsMapped2StripCalPar.h"
-#include "R3BAmsMappedData.h"
-#include "R3BAmsStripCalPar.h"
-#include "R3BEventHeader.h"
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunAna.h"
-#include "FairRuntimeDb.h"
-#include "TGeoManager.h"
-
+// ROOT headers
 #include "TCanvas.h"
 #include "TClonesArray.h"
 #include "TF1.h"
@@ -36,15 +27,29 @@
 #include "TObjArray.h"
 #include "TRandom.h"
 #include "TVector3.h"
-
 #include <iostream>
 #include <stdlib.h>
+
+// Fair headers
+#include "FairLogger.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
+#include "TGeoManager.h"
+
+// R3B headers
+#include "R3BAmsMapped2StripCalPar.h"
+#include "R3BAmsMappedData.h"
+#include "R3BAmsMappingPar.h"
+#include "R3BAmsStripCalPar.h"
+#include "R3BEventHeader.h"
 
 using namespace std;
 
 // R3BAmsMapped2StripCalPar: Default Constructor --------------------------
 R3BAmsMapped2StripCalPar::R3BAmsMapped2StripCalPar()
-    : FairTask("R3B AMS Pedestal Finder ", 1)
+    : FairTask("R3B AMS Pedestal Finder", 1)
+    , fMap_Par(NULL)
     , fStrip_Par(NULL)
     , fAmsMappedDataCA(NULL)
     , fNumDets(6)
@@ -59,13 +64,13 @@ R3BAmsMapped2StripCalPar::R3BAmsMapped2StripCalPar()
     , fSigma(0)
     , fMean(0)
     , fPrint(kFALSE)
-    , fOutputFile(NULL)
 {
 }
 
 // R3BAmsMapped2StripCalPar: Standard Constructor --------------------------
 R3BAmsMapped2StripCalPar::R3BAmsMapped2StripCalPar(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
+    , fMap_Par(NULL)
     , fStrip_Par(NULL)
     , fAmsMappedDataCA(NULL)
     , fNumDets(6)
@@ -80,7 +85,6 @@ R3BAmsMapped2StripCalPar::R3BAmsMapped2StripCalPar(const TString& name, Int_t iV
     , fSigma(0)
     , fMean(0)
     , fPrint(kFALSE)
-    , fOutputFile(NULL)
 {
 }
 
@@ -92,20 +96,44 @@ R3BAmsMapped2StripCalPar::~R3BAmsMapped2StripCalPar()
         delete fAmsMappedDataCA;
 }
 
+void R3BAmsMapped2StripCalPar::SetParContainers()
+{
+    // Parameter Container
+    // Reading amsMappingPar from FairRuntimeDb
+    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
+    if (!rtdb)
+    {
+        LOG(ERROR) << "FairRuntimeDb not opened!";
+    }
+
+    fMap_Par = (R3BAmsMappingPar*)rtdb->getContainer("amsMappingPar");
+    if (!fMap_Par)
+    {
+        LOG(ERROR) << "R3BAmsMapped2StripCalPar::Init() Couldn't get handle on amsMappingPar container";
+    }
+    else
+    {
+        LOG(INFO) << "R3BAmsMapped2StripCalPar:: amsMappingPar container open";
+    }
+}
+
+void R3BAmsMapped2StripCalPar::SetParameter()
+{
+    if (!fMap_Par)
+    {
+        LOG(WARNING) << "R3BAmsMapped2StripCalPar::Container amsMappingPar not found.";
+    }
+    //--- Parameter Container ---
+    fNumDets = fMap_Par->GetNumDets(); // Number of ams detectors
+    LOG(INFO) << "R3BAmsMapped2StripCalPar::NumDet " << fNumDets;
+    fMap_Par->printParams();
+}
+
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BAmsMapped2StripCalPar::Init()
 {
 
     LOG(INFO) << "R3BAmsMapped2StripCalPar: Init";
-
-    char name[100];
-
-    fh_Map_energy_strip = new TH1F*[fNumStrips * fNumDets];
-    for (Int_t i = 0; i < fNumStrips * fNumDets; i++)
-    {
-        sprintf(name, "fh_Map_energy_strip_%i", i + 1);
-        fh_Map_energy_strip[i] = new TH1F(name, name, fMapHistos_bins, fMapHistos_left, fMapHistos_right);
-    }
 
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
@@ -132,16 +160,25 @@ InitStatus R3BAmsMapped2StripCalPar::Init()
         return kFATAL;
     }
 
+    // Set container with mapping parameters
+    SetParameter();
+
+    char name[100];
+
+    fh_Map_energy_strip = new TH1F*[fNumStrips * fNumDets];
+    for (Int_t i = 0; i < fNumStrips * fNumDets; i++)
+    {
+        sprintf(name, "fh_Map_energy_strip_%i", i + 1);
+        fh_Map_energy_strip[i] = new TH1F(name, name, fMapHistos_bins, fMapHistos_left, fMapHistos_right);
+    }
+
     return kSUCCESS;
 }
 
 // -----   Public method ReInit   --------------------------------------------
 InitStatus R3BAmsMapped2StripCalPar::ReInit()
 {
-
-    // MOVE PAR SETTINGS IN INIT TO SETPARCONTAINERS AND CALL ALSO IT HERE
-    // SetParContainers();
-
+    SetParContainers();
     return kSUCCESS;
 }
 
@@ -186,34 +223,27 @@ void R3BAmsMapped2StripCalPar::FinishTask()
 void R3BAmsMapped2StripCalPar::PrintParamsDaq()
 {
 
-    LOG(INFO) << "R3BAmsMapped2StripCalPar: Print parameters for DAQ";
+    LOG(INFO) << "R3BAmsMapped2StripCalPar: Printing parameters for DAQ";
 
     FILE* fOut1 = fopen("sidped.txt", "wt");
     FILE* fOut2 = fopen("sidsig_r.txt", "wt");
     FILE* fOut3 = fopen("sidsig.txt", "wt");
 
-    // Values taken from /upexps/201911_eng2/201911.spec
-    // This was implemented for the experiments s455 and 467
-    // For other experiments one should revise the numbers
     Double_t cn_limit = 15.;
     Float_t threshold1 = 4.0;
     Float_t threshold2 = 2.;
 
-    // sam+gtb+siderem+20000
-    // Int_t detID[fNumDets] = { 40120000, 40220000, 41120000, 50120000, 50220000, 51120000 };
     Int_t detID[fNumDets];
-    detID[0] = 51120000;
-    detID[1] = 50120000;
-    detID[2] = 50220000;
-    detID[3] = 41120000;
-    detID[4] = 40120000;
-    detID[5] = 40220000;
 
     for (Int_t d = 0; d < fNumDets; d++)
     {
-        fprintf(fOut1, "%i\n", detID[d]);
-        fprintf(fOut2, "%i\n", detID[d]);
-        fprintf(fOut3, "%i\n", detID[d]);
+        // sam+gtb+siderem+20000
+        detID[d] =
+            fMap_Par->GetSam(d + 1) * 1000 + fMap_Par->GetGtb(d + 1) * 100 + fMap_Par->GetSiderem(d + 1) * 10 + 2;
+
+        fprintf(fOut1, "%i\n", detID[d] * 10000);
+        fprintf(fOut2, "%i\n", detID[d] * 10000);
+        fprintf(fOut3, "%i\n", detID[d] * 10000);
         for (Int_t i = 1; i <= fNumStrips; i++)
         {
             fprintf(fOut1, "%4x ", int(8. * parameters[d * fNumStrips + i - 1][0]));

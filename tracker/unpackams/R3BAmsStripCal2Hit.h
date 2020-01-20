@@ -27,6 +27,7 @@
 #include "TVector3.h"
 
 class TClonesArray;
+class R3BAmsMappingPar;
 
 class R3BAmsStripCal2Hit : public FairTask
 {
@@ -57,19 +58,31 @@ class R3BAmsStripCal2Hit : public FairTask
     /** Virtual method Finish **/
     virtual void Finish();
 
-    virtual void DefineClusters(Int_t* nfound, Double_t fPitch, Double_t* fChannels, TH1F* hsst, Double_t cluster[][2]);
+    /** Virtual method SetParContainers **/
+    virtual void SetParContainers();
 
+    /** Accessor for selecting online mode **/
     void SetOnline(Bool_t option) { fOnline = option; }
-    void SetMaxNumDet(Int_t NbDet) { fMaxNumDet = NbDet; }
+
+    /** Accessor for selecting max. number of clusters per ams detector **/
     void SetMaxNumClusters(Int_t max) { fMaxNumClusters = max; }
 
+    /** Accessor to set up the threshold for the cluster energy sum **/
+    void SetClusterEnergy(Float_t thsum) { fThSum = thsum; }
+
   private:
+    void SetParameter();
+    virtual void DefineClusters(Int_t* nfound, Double_t fPitch, Double_t* fChannels, TH1F* hsst, Double_t cluster[][2]);
+
     Double_t fPitchK, fPitchS;
+    Double_t fScen, fKcen;
+    Float_t fThSum;
     Int_t fMaxNumDet, fMaxNumClusters;
     TH1F* hams[16];
 
-    TClonesArray* fAmsStripCalDataCA; /**< Array with AMS Cal- input data. >*/
-    TClonesArray* fAmsHitDataCA;      /**< Array with AMS Hit- output data. >*/
+    R3BAmsMappingPar* fMap_Par;       /**< Parameter container with mapping. >*/
+    TClonesArray* fAmsStripCalDataCA; /**< Array with AMS Cal-input data. >*/
+    TClonesArray* fAmsHitDataCA;      /**< Array with AMS Hit-output data. >*/
 
     Bool_t fOnline; // Don't store data for online
     Double_t* fChannelPeaks;

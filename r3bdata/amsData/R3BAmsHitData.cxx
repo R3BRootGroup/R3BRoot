@@ -47,10 +47,9 @@ R3BAmsHitData::R3BAmsHitData(Int_t detid,
     , fNumHit(numhit)
     , fX(x)
     , fY(y)
-    ,
-    // fTheta(theta),
-    // fPhi(phi),
-    fmaster(master)
+    , fTheta(master.Theta())
+    , fPhi(master.Phi())
+    , fmaster(master)
     , fEnergyX(energy_x)
     , fEnergyY(energy_y)
 {
@@ -63,10 +62,9 @@ R3BAmsHitData::R3BAmsHitData(const R3BAmsHitData& right)
     , fNumHit(right.fNumHit)
     , fX(right.fX)
     , fY(right.fY)
-    ,
-    // fTheta(right.fTheta),
-    // fPhi(right.fPhi),
-    fmaster(right.fmaster)
+    , fTheta(right.fmaster.Theta())
+    , fPhi(right.fmaster.Phi())
+    , fmaster(right.fmaster)
     , fEnergyX(right.fEnergyX)
     , fEnergyY(right.fEnergyY)
 {

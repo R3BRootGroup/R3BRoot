@@ -22,6 +22,7 @@
 #include "TH1F.h"
 #include "TMath.h"
 #include "TSpectrum.h"
+#include <iomanip>
 
 // Fair headers
 #include "FairLogger.h"
@@ -29,10 +30,9 @@
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 
-#include <iomanip>
-
-// Califa headers
+// AMS headers
 #include "R3BAmsHitData.h"
+#include "R3BAmsMappingPar.h"
 #include "R3BAmsStripCal2Hit.h"
 #include "R3BAmsStripCalData.h"
 
@@ -41,12 +41,14 @@ R3BAmsStripCal2Hit::R3BAmsStripCal2Hit()
     : FairTask("R3B Hit-AMS Calibrator", 1)
     , fPitchK(104.)
     , fPitchS(110.)
+    , fScen(35.2)
+    , fKcen(19.96)
+    , fThSum(50.)
     , fMaxNumDet(6)
-    , // Max number of AMS detectors set to 4, experiment s444
-    fMaxNumClusters(3)
-    , // Max number of clusters per ams detector set to 3, experiment s444
-    fAmsStripCalDataCA(NULL)
+    , fMaxNumClusters(3) // Max number of clusters per ams detector set to 3
+    , fAmsStripCalDataCA(NULL)
     , fAmsHitDataCA(NULL)
+    , fMap_Par(NULL)
     , fOnline(kFALSE)
 {
 }
@@ -56,12 +58,14 @@ R3BAmsStripCal2Hit::R3BAmsStripCal2Hit(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fPitchK(104.)
     , fPitchS(110.)
+    , fScen(35.2)
+    , fKcen(19.96)
+    , fThSum(50.)
     , fMaxNumDet(6)
-    , // Max number of AMS detectors set to 4, experiment s444
-    fMaxNumClusters(3)
-    , // Max number of clusters per ams detector set to 3, experiment s444
-    fAmsStripCalDataCA(NULL)
+    , fMaxNumClusters(3) // Max number of clusters per ams detector set to 3
+    , fAmsStripCalDataCA(NULL)
     , fAmsHitDataCA(NULL)
+    , fMap_Par(NULL)
     , fOnline(kFALSE)
 {
 }
@@ -74,6 +78,39 @@ R3BAmsStripCal2Hit::~R3BAmsStripCal2Hit()
         delete fAmsStripCalDataCA;
     if (fAmsHitDataCA)
         delete fAmsHitDataCA;
+}
+
+void R3BAmsStripCal2Hit::SetParContainers()
+{
+    // Parameter Container
+    // Reading amsMappingPar from FairRuntimeDb
+    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
+    if (!rtdb)
+    {
+        LOG(ERROR) << "FairRuntimeDb not opened!";
+    }
+
+    fMap_Par = (R3BAmsMappingPar*)rtdb->getContainer("amsMappingPar");
+    if (!fMap_Par)
+    {
+        LOG(ERROR) << "R3BAmsStripCal2Hit::Init() Couldn't get handle on amsMappingPar container";
+    }
+    else
+    {
+        LOG(INFO) << "R3BAmsStripCal2Hit:: amsMappingPar container open";
+    }
+}
+
+void R3BAmsStripCal2Hit::SetParameter()
+{
+    if (!fMap_Par)
+    {
+        LOG(WARNING) << "R3BAmsMapped2StripCalPar::Container amsMappingPar not found.";
+    }
+    //--- Parameter Container ---
+    fMaxNumDet = fMap_Par->GetNumDets(); // Number of ams detectors
+    LOG(INFO) << "R3BAmsStripCal2Hit::NumDet from mapping " << fMaxNumDet;
+    fMap_Par->printParams();
 }
 
 // -----   Public method Init   --------------------------------------------
@@ -94,9 +131,12 @@ InitStatus R3BAmsStripCal2Hit::Init()
         return kFATAL;
     }
 
+    // Set container with mapping parameters
+    SetParameter();
+
     // OUTPUT DATA
     // Hit data
-    fAmsHitDataCA = new TClonesArray("R3BAmsHitData", 10);
+    fAmsHitDataCA = new TClonesArray("R3BAmsHitData", fMaxNumDet * fMaxNumClusters);
 
     if (!fOnline)
     {
@@ -118,7 +158,11 @@ InitStatus R3BAmsStripCal2Hit::Init()
 }
 
 // -----   Public method ReInit   ----------------------------------------------
-InitStatus R3BAmsStripCal2Hit::ReInit() { return kSUCCESS; }
+InitStatus R3BAmsStripCal2Hit::ReInit()
+{
+    SetParContainers();
+    return kSUCCESS;
+}
 
 // -----   Public method Execution   --------------------------------------------
 void R3BAmsStripCal2Hit::Exec(Option_t* option)
@@ -177,31 +221,60 @@ void R3BAmsStripCal2Hit::Exec(Option_t* option)
         {
             for (Int_t mul = 0; mul < std::min(std::min(nfoundK, nfoundS), fMaxNumClusters); mul++)
             {
-                /*   if (i == 0)
-                   {                               // top
-                       z = 14. + clusterS[mul][1]; // FIXME:Fix offsets for s444
-                       y = 20. + 1.;
-                       x = 20. - clusterK[mul][1];
-                   }
-                   else if (i == 1)
-                   { // right
-                       z = 14. + clusterS[mul][1];
-                       x = -20. - 1.;
-                       y = 20. - 1. * clusterK[mul][1];
-                   }
-                   else if (i == 2)
-                   { // bottom
-                       z = 14. + clusterS[mul][1];
-                       y = -20. - 1.;
-                       x = clusterK[mul][1] - 20.;
-                   }
-                   else if (i == 3)
-                   { // left
-                       z = 14. + clusterS[mul][1];
-                       x = 20. + 1.;
-                       y = clusterK[mul][1] - 20.;
-                   }
-   */
+                if (fMap_Par->GetGeometry() == 2019)
+                {
+                    if (i == 0)
+                    {                               // top
+                        z = 14. + clusterS[mul][1]; // FIXME:Fix offsets for s444_2019
+                        y = fKcen + 1.;
+                        x = fKcen - clusterK[mul][1];
+                    }
+                    else if (i == 1)
+                    { // right
+                        z = 14. + clusterS[mul][1];
+                        x = -1. * (fKcen + 1.);
+                        y = fKcen - 1. * clusterK[mul][1];
+                    }
+                    else if (i == 2)
+                    { // bottom
+                        z = 14. + clusterS[mul][1];
+                        y = -1. * (fKcen + 1.);
+                        x = clusterK[mul][1] - fKcen;
+                    }
+                    else if (i == 3)
+                    { // left
+                        z = 14. + clusterS[mul][1];
+                        x = fKcen + 1.;
+                        y = clusterK[mul][1] - fKcen;
+                    }
+                }
+                else if (fMap_Par->GetGeometry() == 2020)
+                {
+
+                    if (i == 0 || i == 1 || i == 4)
+                    {
+                        x = fMap_Par->GetDist2target(i + 1) *
+                                TMath::Sin(fMap_Par->GetAngleTheta(i + 1) * TMath::DegToRad()) -
+                            (clusterS[mul][1] - fScen) * TMath::Cos(fMap_Par->GetAngleTheta(i + 1) * TMath::DegToRad());
+                        y = clusterK[mul][1] - fKcen + fMap_Par->GetOffsetY(i + 1);
+                        z = fMap_Par->GetDist2target(i + 1) *
+                                TMath::Cos(fMap_Par->GetAngleTheta(i + 1) * TMath::DegToRad()) +
+                            (clusterS[mul][1] - fScen) * TMath::Sin(fMap_Par->GetAngleTheta(i + 1) * TMath::DegToRad());
+                    }
+                    else
+                    {
+                        x = fMap_Par->GetDist2target(i + 1) *
+                                TMath::Sin(fMap_Par->GetAngleTheta(i + 1) * TMath::DegToRad()) +
+                            (clusterS[mul][1] - fScen) * TMath::Cos(fMap_Par->GetAngleTheta(i + 1) * TMath::DegToRad());
+                        y = fKcen - 1. * clusterK[mul][1] + fMap_Par->GetOffsetY(i + 1);
+                        z = fMap_Par->GetDist2target(i + 1) *
+                                TMath::Cos(fMap_Par->GetAngleTheta(i + 1) * TMath::DegToRad()) -
+                            (clusterS[mul][1] - fScen) * TMath::Sin(fMap_Par->GetAngleTheta(i + 1) * TMath::DegToRad());
+                        if (i == 5)
+                            std::cout << x << " " << y << " " << z << std::endl;
+                    }
+                }
+
                 TVector3 master(x, y, z);
                 AddHitData(i, mul, clusterS[mul][1], clusterK[mul][1], master, clusterS[mul][0], clusterK[mul][0]);
             }
@@ -273,7 +346,7 @@ void R3BAmsStripCal2Hit::DefineClusters(Int_t* nfoundhits,
     Int_t v = 0;
     for (Int_t j = 0; j < nfound; j++)
     {
-        if (SumEnergy[j] > 50.)
+        if (SumEnergy[j] > fThSum)
         {
             cluster[v][0] = SumEnergy[j];
             cluster[v][1] = Position[j];

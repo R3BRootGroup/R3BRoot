@@ -23,6 +23,7 @@
 #include "TH1F.h"
 
 class TClonesArray;
+class R3BAmsMappingPar;
 class R3BAmsStripCalPar;
 class R3BEventHeader;
 
@@ -63,7 +64,8 @@ class R3BAmsMapped2StripCalPar : public FairTask
     /** Virtual method to print parameters **/
     virtual void PrintParamsDaq();
 
-    void SetOutputFile(const char* outFile);
+    /** Virtual method SetParContainers **/
+    virtual void SetParContainers();
 
     void SetPrintParamsDaq(Bool_t print) { fPrint = print; }
 
@@ -93,6 +95,7 @@ class R3BAmsMapped2StripCalPar : public FairTask
     void SetMaxSigma(Double_t sigma) { fMaxSigma = sigma; }
 
   protected:
+    void SetParameter();
     // Number of histograms, limits and bining
     Int_t fNumDets;
     Int_t fNumStrips;
@@ -110,14 +113,14 @@ class R3BAmsMapped2StripCalPar : public FairTask
     Double_t fMean;
     Bool_t fPrint;
 
+    R3BAmsMappingPar* fMap_Par;     /**< Parameter container with mapping. >*/
     R3BAmsStripCalPar* fStrip_Par;  /**< Parameter container. >*/
     TClonesArray* fAmsMappedDataCA; /**< Array with AMS Mapped input data. >*/
 
     TH1F** fh_Map_energy_strip;
-    char* fOutputFile;
 
   public:
-    ClassDef(R3BAmsMapped2StripCalPar, 0);
+    ClassDef(R3BAmsMapped2StripCalPar, 1);
 };
 
 #endif

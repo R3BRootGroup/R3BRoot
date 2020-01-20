@@ -36,6 +36,7 @@
 #pragma link C++ class R3BTraHitFinder+;
 
 #pragma link C++ class R3BAmsStripCalPar+;
+#pragma link C++ class R3BAmsMappingPar+;
 #pragma link C++ class R3BAmsMapped2StripCalPar+;
 #pragma link C++ class R3BAmsMapped2StripCal+;
 #pragma link C++ class R3BAmsStripCal2Hit+;

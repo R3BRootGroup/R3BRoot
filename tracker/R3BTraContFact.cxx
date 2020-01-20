@@ -36,6 +36,7 @@
 #include "FairParAsciiFileIo.h"
 #include "FairParRootFileIo.h"
 
+#include "R3BAmsMappingPar.h"
 #include "R3BAmsStripCalPar.h"
 
 #include "TClass.h"
@@ -74,6 +75,11 @@ void R3BTraContFact::setAllContainers()
     p1->addContext("AMSCalParContext");
 
     containers->Add(p1);
+
+    FairContainer* p2 = new FairContainer("amsMappingPar", "AMS Mapping Parameters", "AmsMappingContext");
+    p2->addContext("AmsMappingContext");
+
+    containers->Add(p2);
 }
 
 FairParSet* R3BTraContFact::createContainer(FairContainer* c)
@@ -100,6 +106,10 @@ FairParSet* R3BTraContFact::createContainer(FairContainer* c)
     if (strcmp(name, "amsStripCalPar") == 0)
     {
         p = new R3BAmsStripCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
+    else if (strcmp(name, "amsMappingPar") == 0)
+    {
+        p = new R3BAmsMappingPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
     return p;
 

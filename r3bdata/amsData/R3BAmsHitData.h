@@ -37,10 +37,10 @@ class R3BAmsHitData : public FairMultiLinkedData
     /** Constructor with arguments
      *@param fDetId     Detector unique identifier
      *@param fNumHit    Number of hits
-     *@param fX         Position X [mm]
-     *@param fY         Position Y [mm]
-     *@param fTheta     Angle theta [rad]
-     *@param fPhi       Angle Phi [rad]
+     *@param fX         Position X [mm] local coordinate (detector frame)
+     *@param fY         Position Y [mm] local coordinate (detector frame)
+     *@param fTheta     Angle theta [rad] (lab frame)
+     *@param fPhi       Angle Phi [rad] (lab frame)
      *@param fEnergyX   Total energy deposited in X direction by hit ([GeV] in sim)
      *@param fEnergyY   Total energy deposited in Y direction by hit ([GeV] in sim)
      **/
@@ -61,15 +61,15 @@ class R3BAmsHitData : public FairMultiLinkedData
     virtual ~R3BAmsHitData();
 
     /** Accessors **/
-    Int_t GetDetId() const { return fDetId; }
-    Int_t GetNumHit() const { return fNumHit; }
-    Double_t GetX() const { return fX; }
-    Double_t GetY() const { return fY; }
-    Double_t GetTheta() const { return fmaster.Theta(); }
-    Double_t GetPhi() const { return fmaster.Phi(); }
-    TVector3 GetPosLab() const { return fmaster; }
-    Double_t GetEnergyX() const { return fEnergyX; }
-    Double_t GetEnergyY() const { return fEnergyY; }
+    inline const Int_t& GetDetId() const { return fDetId; }
+    inline const Int_t& GetNumHit() const { return fNumHit; }
+    inline const Double_t& GetX() const { return fX; }
+    inline const Double_t& GetY() const { return fY; }
+    inline const Double_t& GetTheta() const { return fTheta; }
+    inline const Double_t& GetPhi() const { return fPhi; }
+    inline const TVector3 GetPosLab() const { return fmaster; }
+    inline const Double_t& GetEnergyX() const { return fEnergyX; }
+    inline const Double_t& GetEnergyY() const { return fEnergyY; }
 
     /** Modifiers **/
     void SetDetId(Int_t detid) { fDetId = detid; }

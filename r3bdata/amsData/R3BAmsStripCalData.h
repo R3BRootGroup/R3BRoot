@@ -50,10 +50,10 @@ class R3BAmsStripCalData : public FairMultiLinkedData
     virtual ~R3BAmsStripCalData();
 
     /** Accessors **/
-    Int_t GetDetId() const { return fDetId; }
-    Int_t GetSideId() const { return fSideId; }
-    Int_t GetStripId() const { return fStripId; }
-    Double_t GetEnergy() const { return fEnergy; }
+    inline const Int_t& GetDetId() const { return fDetId; }
+    inline const Int_t& GetSideId() const { return fSideId; }
+    inline const Int_t& GetStripId() const { return fStripId; }
+    inline const Double_t& GetEnergy() const { return fEnergy; }
 
     /** Modifiers **/
     void SetDetId(Int_t detid) { fDetId = detid; }
