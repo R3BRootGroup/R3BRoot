@@ -39,6 +39,8 @@ R3BBunchedFiberMapped2CalPar::~R3BBunchedFiberMapped2CalPar()
 {
     delete fMAPMTTCalPar;
     delete fMAPMTEngine;
+    delete fMAPMTTrigTCalPar;
+    delete fMAPMTTrigEngine;
     delete fSPMTTCalPar;
     delete fSPMTEngine;
 }
@@ -74,6 +76,7 @@ InitStatus R3BBunchedFiberMapped2CalPar::Init()
         f##NAME##Engine = new R3BTCalEngine(f##NAME##TCalPar, fMinStats);              \
     } while (0)
     GET_TCALPAR(MAPMT);
+    GET_TCALPAR(MAPMTTrig);
     GET_TCALPAR(SPMT);
 
     return kSUCCESS;
@@ -90,9 +93,13 @@ void R3BBunchedFiberMapped2CalPar::Exec(Option_t* option)
         {
             fMAPMTEngine->Fill(1, mapped->GetChannel() * 2 - (mapped->IsLeading() ? 1 : 0), 1, mapped->GetFine());
         }
-        else
+        else if (mapped->IsSPMT())
         {
             fSPMTEngine->Fill(1, mapped->GetChannel() * 2 - (mapped->IsLeading() ? 1 : 0), 1, mapped->GetFine());
+        }
+        else if (mapped->IsMAPMTTrigger())
+        {
+            fMAPMTTrigEngine->Fill(1, mapped->GetChannel(), 1, mapped->GetFine());
         }
     }
 }
@@ -102,6 +109,7 @@ void R3BBunchedFiberMapped2CalPar::FinishEvent() {}
 void R3BBunchedFiberMapped2CalPar::FinishTask()
 {
     fMAPMTEngine->CalculateParamClockTDC(fCTDCVariant);
+    fMAPMTTrigEngine->CalculateParamClockTDC(fCTDCVariant);
     switch (fSPMTElectronics)
     {
         case CTDC:
@@ -114,6 +122,7 @@ void R3BBunchedFiberMapped2CalPar::FinishTask()
             assert(0 && "This should not happen!");
     }
     fMAPMTTCalPar->printParams();
+    fMAPMTTrigTCalPar->printParams();
     fSPMTTCalPar->printParams();
 }
 

@@ -26,6 +26,6 @@ R3BFi3bReader::R3BFi3bReader(EXT_STR_h101_FIBTHREEB* a_data, UInt_t a_offset)
 {
 }
 
-Bool_t R3BFi3bReader::Init(ext_data_struct_info* a_struct_info) { R3B_BUNCHED_FIBER_INIT(FIBTHREEB, fData); }
+Bool_t R3BFi3bReader::Init(ext_data_struct_info* a_struct_info) { R3B_BUNCHED_FIBER_INIT_MAPMT_TRIG(FIBTHREEB, fData); }
 
 ClassImp(R3BFi3bReader)

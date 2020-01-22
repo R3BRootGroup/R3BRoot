@@ -26,24 +26,26 @@ class R3BBunchedFiberCalData : public TObject
 {
   public:
     R3BBunchedFiberCalData();
-    R3BBunchedFiberCalData(Bool_t, Int_t, Bool_t, Double_t);
+    R3BBunchedFiberCalData(Int_t, Int_t, Bool_t, Double_t);
     virtual ~R3BBunchedFiberCalData();
 
     Int_t GetChannel() const;
     Double_t GetTime_ns() const;
     Bool_t IsMAPMT() const;
     Bool_t IsSPMT() const;
+    Bool_t IsMAPMTTrigger() const;
+    Bool_t IsSPMTTrigger() const;
     Bool_t IsLeading() const;
     Bool_t IsSortable() const;
     Bool_t IsTrailing() const;
 
   private:
-    Bool_t fIsMAPMT;
+    Int_t fSide;
     Int_t fChannel;
     Bool_t fIsLeading;
     Double_t fTime_ns;
 
-    ClassDef(R3BBunchedFiberCalData, 1)
+    ClassDef(R3BBunchedFiberCalData, 2)
 };
 
 #endif

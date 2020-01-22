@@ -173,18 +173,18 @@ class R3BTofdCal2Hit : public FairTask
     UInt_t wrongtrigger;
     UInt_t wrongtpat;
     UInt_t headertpat;
-    UInt_t calhit;
-    UInt_t countmap;
-    UInt_t countpmthit;
+    UInt_t events_in_cal_level;
     UInt_t inbarcoincidence;
     UInt_t countreset;
-    UInt_t pmtbeforereset;
     UInt_t hitsbeforereset;
     UInt_t eventstore;
     UInt_t incoincidence;
     UInt_t inaverage12;
     UInt_t inaverage34;
     UInt_t singlehit;
+    UInt_t multihit;
+    UInt_t bars_with_multihit;
+    UInt_t events_wo_tofd_hits;
 
     // arrays of control histograms
     TH2F* fhTdiffvsQ[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX * 2 + 1];

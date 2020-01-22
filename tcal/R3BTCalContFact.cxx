@@ -63,11 +63,12 @@ void R3BTCalContFact::setAllContainers()
     addContainer("Sci8TCalPar", "SCI8 TCAL Calibration Parameters");
     addContainer("TofdTCalPar", "TOFD TCAL Calibration Parameters");
     addContainer("StrawtubesTCalPar", "Strawtubes TCAL Calibration Parameters");
-#define ADD_FIBER(Name, NAME)                                                           \
-    do                                                                                  \
-    {                                                                                   \
-        addContainer(#Name "MAPMTTCalPar", #NAME " MAPMT TCAL Calibration Parameters"); \
-        addContainer(#Name "SPMTTCalPar", #NAME " SPMT TCAL Calibration Parameters");   \
+#define ADD_FIBER(Name, NAME)                                                              \
+    do                                                                                     \
+    {                                                                                      \
+        addContainer(#Name "MAPMTTCalPar", #NAME " MAPMT TCAL Calibration Parameters");    \
+        addContainer(#Name "SPMTTCalPar", #NAME " SPMT TCAL Calibration Parameters");      \
+        addContainer(#Name "MAPMTTrigTCalPar", #NAME " SPMT TCAL Calibration Parameters"); \
     } while (0)
     ADD_FIBER(Fi0, FI0);
     ADD_FIBER(Fi1a, FI1a);
@@ -108,11 +109,12 @@ FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
     containerNames.push_back("Sci8TCalPar");
     containerNames.push_back("TofdTCalPar");
     containerNames.push_back("StrawtubesTCalPar");
-#define PUSH_FIBER(Name)                                \
-    do                                                  \
-    {                                                   \
-        containerNames.push_back(#Name "MAPMTTCalPar"); \
-        containerNames.push_back(#Name "SPMTTCalPar");  \
+#define PUSH_FIBER(Name)                                    \
+    do                                                      \
+    {                                                       \
+        containerNames.push_back(#Name "MAPMTTCalPar");     \
+        containerNames.push_back(#Name "SPMTTCalPar");      \
+        containerNames.push_back(#Name "MAPMTTrigTCalPar"); \
     } while (0)
     PUSH_FIBER(Fi0);
     PUSH_FIBER(Fi1a);

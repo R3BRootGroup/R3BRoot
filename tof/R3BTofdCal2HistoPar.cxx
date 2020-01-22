@@ -286,7 +286,12 @@ void R3BTofdCal2HistoPar::FinishTask()
             {
                 if (hfilename->Get(Form("Q_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)))
                 {
+                    if (i + 1 == 1)
+                        continue;
+                    if (j + 1 != 32)
+                        continue;
                     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
+                    std::cout << "Calling Plane: " << i + 1 << " Bar " << j + 1 << "\n";
                     zcorr((TH2F*)hfilename->Get(Form("Q_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)), min, max, pars);
                     Double_t offset1 = par->GetOffset1();
                     Double_t offset2 = par->GetOffset2();
@@ -364,10 +369,12 @@ void R3BTofdCal2HistoPar::calcToTOffset(Double_t totLow, Double_t totHigh)
                 h->Draw("colz");
                 auto* histo_py = (TH2F*)h->ProjectionX("histo_py", totLow, totHigh, "");
                 cToTOffset->cd(2);
+                histo_py->Rebin(3);
                 histo_py->Draw();
                 Int_t binmax = histo_py->GetMaximumBin();
                 Double_t Max = histo_py->GetXaxis()->GetBinCenter(binmax);
-                TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 0.06, Max + 0.06);
+                TF1* fgaus = new TF1(
+                    "fgaus", "gaus(0)", Max - 0.2, Max + 0.2); // new TF1("fgaus", "gaus(0)", Max - 0.06, Max + 0.06);
                 histo_py->Fit("fgaus", "QR0");
                 offset = fgaus->GetParameter(1);
                 fgaus->Draw("SAME");
@@ -796,7 +803,7 @@ void R3BTofdCal2HistoPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
     gr1->Fit("fitz", "Q", "", min, max);
     // write parameters
     std::cout << "Optimise the fit, double click to finish\n";
-    gPad->WaitPrimitive();
+    // gPad->WaitPrimitive();
     auto* fitzr = gr1->GetFunction("fitz");
     for (Int_t j = 0; j < 3; j++)
     {
@@ -804,7 +811,7 @@ void R3BTofdCal2HistoPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
         // std::cout<<Form("par%i= ",j)<<pars[j]<<"\n";
     }
     // gPad->WaitPrimitive();
-    gSystem->Sleep(3000);
+    // gSystem->Sleep(3000);
     delete s;
     delete gr1;
     delete c1;

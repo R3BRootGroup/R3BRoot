@@ -27,6 +27,9 @@ class R3BBunchedFiberCalData;
 class R3BBunchedFiberHitPar;
 class R3BBunchedFiberHitModulePar;
 
+#define BUNCHED_FIBER_TRIGGER_MAP_SET(array) \
+  MAPMTTriggerMapSet(array, sizeof array)
+
 /**
  * Transforms bunched fiber Cal level data to Hit level.
  *
@@ -50,10 +53,10 @@ class R3BBunchedFiberCal2Hit : public FairTask
     };
     struct ToT
     {
-        ToT(R3BBunchedFiberCalData const*, R3BBunchedFiberCalData const*, Double_t);
+        ToT(R3BBunchedFiberCalData const*, R3BBunchedFiberCalData const*, Double_t, Double_t, Double_t);
         R3BBunchedFiberCalData const* lead;
         R3BBunchedFiberCalData const* trail;
-        Double_t tot;
+        Double_t lead_ns, tail_ns, tot_ns;
     };
     struct Channel
     {
@@ -74,7 +77,9 @@ class R3BBunchedFiberCal2Hit : public FairTask
                            UInt_t,
                            UInt_t,
                            UInt_t,
-                           Bool_t);
+                           Bool_t,   // is calib
+                           Bool_t,   // is gain
+                           Bool_t);  // is tsync
 
     /**
      * Destructor.
@@ -95,6 +100,7 @@ class R3BBunchedFiberCal2Hit : public FairTask
      * in case the Run ID has changed.
      */
     virtual InitStatus ReInit();
+
 
     virtual void SetParContainers();
 
@@ -126,18 +132,38 @@ class R3BBunchedFiberCal2Hit : public FairTask
      */
     virtual UInt_t FixMistake(UInt_t) = 0;
 
+    /**
+     * Can provide an array that lists for every channel (i.e. fiber bunch, not
+     * fiber!) the entry in the <name>TriggerCal TClonesArray for trigger
+     * times.
+     */
+    void MAPMTTriggerMapSet(unsigned const *, size_t);
+
   private:
     TString fName;
     Int_t fnEvents;
     Int_t maxevent;
+    Int_t fnEventsfill = 0;
+
+	Int_t multi=0;
+	Double_t energy[2048];
+	Int_t counts[2048];
+	Double_t tsync_temp[2048]={0};
+	Double_t  gain_temp[2048]={10};
+    Bool_t tofdin;
 
     double fClockFreq;
     Direction fDirection;
     UInt_t fSubNum;
     UInt_t fChPerSub[2];
     Bool_t fIsCalibrator;
+    Bool_t fIsGain;
+    Bool_t fIsTsync;
     TClonesArray* fCalItems;
+    TClonesArray* fCalTriggerItems;
     TClonesArray* fHitItems;
+    TClonesArray* fTofdHitItems;
+    unsigned const *fMAPMTTriggerMap;
     R3BBunchedFiberHitPar* fCalPar; /**< Parameter container. */
     R3BBunchedFiberHitPar* fHitPar; /**< Hit parameter container. */
     Int_t fNofHitPars;              /**< Number of modules in parameter file. */
@@ -151,6 +177,33 @@ class R3BBunchedFiberCal2Hit : public FairTask
     TH2F* fh_ToT_s_Fib[4];
     TH2F* fh_ToT_ToT;
     TH2F* fh_dt_Fib;
+    TH2F* fh_Fib_ToF;
+    TH2F* fh_Test;
+    TH1F* fh_multi;
+    
+    TH2F* fh_69_70;
+    TH2F* fh_69_59;
+    TH2F* fh_69_37;
+    TH2F* fh_69_45;
+    TH2F* fh_69_77;
+    TH2F* fh_69_109;
+    TH2F* fh_69_101;
+    TH2F* fh_69_123;
+    TH2F* fh_69_91;
+    TH2F* fh_69_49;
+    TH2F* fh_69_71;
+
+    TH2F* fh_69_60;
+    TH2F* fh_69_38;
+    TH2F* fh_69_46;
+    TH2F* fh_69_78;
+    TH2F* fh_69_110;
+    TH2F* fh_69_102;
+    TH2F* fh_69_124;
+    TH2F* fh_69_92;
+    TH2F* fh_69_50;
+    
+    
 
   public:
     ClassDef(R3BBunchedFiberCal2Hit, 3)

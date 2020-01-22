@@ -51,8 +51,9 @@ namespace
 R3BTofdMapped2Cal::R3BTofdMapped2Cal()
     : FairTask("R3BTofdMapped2Cal", 1)
     , fMappedItems(nullptr)
+    , fMappedTriggerItems(nullptr)
     , fCalItems(new TClonesArray("R3BTofdCalData"))
-    , fNofCalItems(0)
+    , fCalTriggerItems(new TClonesArray("R3BTofdCalData"))
     , fTcalPar(0)
     , fNofTcalPars(0)
     , fNofPlanes(0)
@@ -66,8 +67,9 @@ R3BTofdMapped2Cal::R3BTofdMapped2Cal()
 R3BTofdMapped2Cal::R3BTofdMapped2Cal(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fMappedItems(nullptr)
+    , fMappedTriggerItems(nullptr)
     , fCalItems(new TClonesArray("R3BTofdCalData"))
-    , fNofCalItems(0)
+    , fCalTriggerItems(new TClonesArray("R3BTofdCalData"))
     , fTcalPar(0)
     , fNofTcalPars(0)
     , fNofPlanes(0)
@@ -78,7 +80,11 @@ R3BTofdMapped2Cal::R3BTofdMapped2Cal(const char* name, Int_t iVerbose)
 {
 }
 
-R3BTofdMapped2Cal::~R3BTofdMapped2Cal() { delete fCalItems; }
+R3BTofdMapped2Cal::~R3BTofdMapped2Cal()
+{
+    delete fCalItems;
+    delete fCalTriggerItems;
+}
 
 size_t R3BTofdMapped2Cal::GetCalLookupIndex(R3BTofdMappedData const& a_mapped) const
 {
@@ -112,9 +118,13 @@ InitStatus R3BTofdMapped2Cal::Init()
     fMappedItems = (TClonesArray*)mgr->GetObject("TofdMapped");
     if (NULL == fMappedItems)
         LOG(fatal) << "Branch TofdMapped not found";
+    fMappedTriggerItems = (TClonesArray*)mgr->GetObject("TofdTriggerMapped");
+    if (NULL == fMappedTriggerItems)
+        LOG(fatal) << "Branch TofdTriggerMapped not found";
 
     // request storage of Cal data in output tree
     mgr->Register("TofdCal", "Land", fCalItems, kTRUE);
+    mgr->Register("TofdTriggerCal", "Land", fCalTriggerItems, kTRUE);
 
     return kSUCCESS;
 }
@@ -246,15 +256,45 @@ void R3BTofdMapped2Cal::Exec(Option_t* option)
             }
 
             auto lead = ch.at(lead_i).mapped;
-            auto cal = new ((*fCalItems)[fNofCalItems++]) R3BTofdCalData(lead->GetDetectorId(),
-                                                                         lead->GetBarId(),
-                                                                         lead->GetSideId(),
-                                                                         ch.at(lead_i).time_ns,
-                                                                         ch.at(trail_i).time_ns);
+            auto cal = new ((*fCalItems)[fCalItems->GetEntriesFast()]) R3BTofdCalData(lead->GetDetectorId(),
+                                                                                      lead->GetBarId(),
+                                                                                      lead->GetSideId(),
+                                                                                      ch.at(lead_i).time_ns,
+                                                                                      ch.at(trail_i).time_ns);
 
             ++lead_i;
             ++trail_i;
         }
+    }
+
+    // Calibrate trigger channels.
+    mapped_num = fMappedTriggerItems->GetEntriesFast();
+    for (Int_t mapped_i = 0; mapped_i < mapped_num; mapped_i++)
+    {
+        auto mapped = (R3BTofdMappedData const*)fMappedTriggerItems->At(mapped_i);
+
+        if (mapped->GetDetectorId() != fNofPlanes + 1)
+        {
+            LOG(DEBUG) << "R3BTofdMapped2Cal::Exec : Trigger plane number out of range: " << mapped->GetDetectorId();
+            continue;
+        }
+
+        // Tcal parameters.
+        auto* par = fTcalPar->GetModuleParAt(mapped->GetDetectorId(), mapped->GetBarId(), 1);
+        if (!par)
+        {
+            LOG(INFO) << "R3BTofdMapped2Cal::Exec : Trigger Tcal par not found, Plane: " << mapped->GetDetectorId()
+                      << ", Bar: " << mapped->GetBarId();
+            continue;
+        }
+
+        // Convert TDC to [ns] ...
+        Double_t time_ns = par->GetTimeVFTX(mapped->GetTimeFine());
+        // ... and subtract it from the next clock cycle.
+        time_ns = (mapped->GetTimeCoarse() + 1) * fClockFreq - time_ns;
+
+        new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+            R3BTofdCalData(mapped->GetDetectorId(), mapped->GetBarId(), 1, time_ns, 0);
     }
 }
 
@@ -263,7 +303,10 @@ void R3BTofdMapped2Cal::FinishEvent()
     if (fCalItems)
     {
         fCalItems->Clear();
-        fNofCalItems = 0;
+    }
+    if (fCalTriggerItems)
+    {
+        fCalTriggerItems->Clear();
     }
 }
 

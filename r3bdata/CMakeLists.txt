@@ -65,6 +65,7 @@ wrData/R3BWRMasterData.cxx
 wrData/R3BWRCalifaData.cxx
 wrData/R3BWRAmsData.cxx
 R3BHit.cxx
+R3BTrack.cxx
 R3BDouble.cxx
 xballData/R3BXBallPoint.cxx
 xballData/R3BXBallCrystalHit.cxx

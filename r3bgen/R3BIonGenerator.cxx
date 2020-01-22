@@ -219,7 +219,7 @@ Bool_t R3BIonGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     // cout << "fR=" << fR << " fz=" << fz <<endl;
 
     Phi = gRandom->Uniform(0, 360) * TMath::DegToRad();
-    SpotR = gRandom->Uniform(0, fR);
+    SpotR = sqrt(gRandom->Uniform(0, fR * fR));
 
     if (fBeamSpotIsSet)
     {

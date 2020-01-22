@@ -12,19 +12,24 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------
-// -----                  R3BGlobalAnalysisS454                -----
+// -----                  R3BTrackS454                -----
 // -----            Created 13-04-2016 by M.Heil          -----
 // -----               Fill online histograms             -----
 // ------------------------------------------------------------
 
-#ifndef R3BGLOBALANALYSISS454
-#define R3BGLOBALANALYSISS454
+#ifndef R3BTRACKS454
+#define R3BTRACKS454
+#define N_PLANE_MAX_TOFD 4
+#define N_PADDLE_MAX_TOFD 50
+#define N_PADDLE_MAX_PTOF 100
+#define N_PSPX_S454 4
 
 #include "FairTask.h"
 #include <array>
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include "TCutG.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -39,7 +44,7 @@ class R3BEventHeader;
  * This taks reads all detector data items and plots histograms
  * for online checks.
  */
-class R3BGlobalAnalysisS454 : public FairTask
+class R3BTrackS454 : public FairTask
 {
 
   public:
@@ -47,7 +52,7 @@ class R3BGlobalAnalysisS454 : public FairTask
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BGlobalAnalysisS454();
+    R3BTrackS454();
 
     /**
      * Standard constructor.
@@ -55,13 +60,13 @@ class R3BGlobalAnalysisS454 : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BGlobalAnalysisS454(const char* name, Int_t iVerbose = 1);
+    R3BTrackS454(const char* name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BGlobalAnalysisS454();
+    virtual ~R3BTrackS454();
 
     /**
      * Method for task initialization.
@@ -118,6 +123,11 @@ class R3BGlobalAnalysisS454 : public FairTask
         fCuts = cuts;
     }
 
+    inline void SetGraphicalCuts(Bool_t graphCuts)
+    {
+        fGraphCuts = graphCuts;
+    }
+
     inline void SetGhost(Bool_t ghost)
     {
         fGhost = ghost;
@@ -138,7 +148,8 @@ class R3BGlobalAnalysisS454 : public FairTask
     std::vector<TClonesArray*> fCalItems;
     std::vector<TClonesArray*> fHitItems;
     TClonesArray* fMCTrack;
-    TClonesArray* fTrack;
+    TClonesArray* fTrackItems;
+    Int_t fNofTrackItems;
 
 
     enum DetectorInstances
@@ -175,8 +186,12 @@ class R3BGlobalAnalysisS454 : public FairTask
 	Bool_t fCuts;
 	Bool_t fGhost;
 	Bool_t fPairs;
+	Bool_t fGraphCuts;
 	Int_t fB;
 	Bool_t tracker = true;
+
+	TCutG *cut_Fi10vsTofd;
+	TCutG *cut_Fi13vsTofd;
 	
     unsigned long long time_start = 0, time = 0;
     unsigned long ic_start = 0, see_start = 0, tofdor_start = 0;
@@ -191,16 +206,16 @@ class R3BGlobalAnalysisS454 : public FairTask
     Double_t counts_IC = 0;
     Double_t counts_TofD = 0;
 
-	Double_t XHe, YHe, ZHe, XC, YC, ZC;	
+	Double_t XHes, YHes, ZHes, XCs, YCs, ZCs, THes, TCs;
+	Double_t pHexs, pHeys, pHezs, pCxs, pCys, pCzs, pHes, pCs;
+	
+	Double_t amu = 931.49410242;
 	Double_t pHex, pHey, pHez, pCx, pCy, pCz;
 	Double_t Pxf, Pyf, Pzf, Xf, Yf, Zf, Pf_tot;
-	Double_t amu = 931.49410242;
 //	Double_t mHe = 4.00260325413*amu;
 //	Double_t mC = 12. * amu;
 	Double_t mHe = 3727.409;
 	Double_t mC = 11174.950;
-	Double_t mO = 16. * amu;
-	
 	
 	Int_t Q = 0;
 	Double_t tPrev[10];
@@ -214,6 +229,8 @@ class R3BGlobalAnalysisS454 : public FairTask
 	
     UInt_t num_spills = 0;
 
+	Int_t ndet = 9;
+	
     TH1F* fh_Tpat;
     TH1F* fh_Trigger;
     TH1F* fh_IC;
@@ -243,6 +260,15 @@ class R3BGlobalAnalysisS454 : public FairTask
 	TH2F* fh_Fib10_vs_Fib12_dx;
 	TH2F* fh_Fib12_vs_Fib3b;
 	TH2F* fh_Fib12_vs_Fib3b_dx;
+
+	TH2F* fh_Fib13_vs_Fib11_back;
+	TH2F* fh_Fib13_vs_Fib11_dx_back;
+	TH2F* fh_Fib11_vs_Fib3a_back;
+	TH2F* fh_Fib11_vs_Fib3a_dx_back;
+	TH2F* fh_Fib10_vs_Fib12_back;
+	TH2F* fh_Fib10_vs_Fib12_dx_back;
+	TH2F* fh_Fib12_vs_Fib3b_back;
+	TH2F* fh_Fib12_vs_Fib3b_dx_back;
 
     TH2F* fh_Cave_position;
 
@@ -293,24 +319,17 @@ class R3BGlobalAnalysisS454 : public FairTask
 	TH1F* fh_theta26_simu;
 	TH1F* fh_Erel_simu;
 	TH1F* fh_theta26;
-	TH1F* fh_theta_16O;	
-	TH1F* fh_theta26_cm;	
-	TH1F* fh_phi26_cm;
-	TH1F* fh_theta_4He_cm;
-	TH1F* fh_phi_4He_cm;
-	TH1F* fh_theta_12C_cm;
-	TH1F* fh_phi_12C_cm;
-	TH1F* fh_theta_16O_cm;
-	TH1F* fh_phi_16O_cm;
 	TH1F* fh_Erel;
-	TH1F* fh_ErelL;
-	TH1F* fh_ErelR;
 
 	TH2F* fh_dErel_vs_x;
 	TH2F* fh_dErel_vs_y;
 	
+	TH2F* fh_xy[9];
+	TH2F* fh_p_vs_x[9];
+	TH2F* fh_p_vs_x_test[9];
+	
   public:
-    ClassDef(R3BGlobalAnalysisS454, 1)
+    ClassDef(R3BTrackS454, 1)
 };
 
 #endif

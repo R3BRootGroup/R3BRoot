@@ -26,6 +26,9 @@ R3BFi13Reader::R3BFi13Reader(EXT_STR_h101_FIBTHIRTEEN* a_data, UInt_t a_offset)
 {
 }
 
-Bool_t R3BFi13Reader::Init(ext_data_struct_info* a_struct_info) { R3B_BUNCHED_FIBER_INIT(FIBTHIRTEEN, fData); }
+Bool_t R3BFi13Reader::Init(ext_data_struct_info* a_struct_info)
+{
+    R3B_BUNCHED_FIBER_INIT_MAPMT_TRIG(FIBTHIRTEEN, fData);
+}
 
 ClassImp(R3BFi13Reader)

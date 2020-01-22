@@ -96,15 +96,17 @@ class R3BBunchedFiberMapped2Cal : public FairTask
     UInt_t fSideNum[2];
     Bool_t fSkipSPMT;
     R3BTCalPar* fMAPMTTCalPar;
+    R3BTCalPar* fMAPMTTrigTCalPar;
     R3BTCalPar* fSPMTTCalPar;
     TClonesArray* fMappedItems;
     TClonesArray* fCalItems;
-    Int_t fNofCalItems;
+    TClonesArray* fCalTriggerItems;
     Double_t fClockFreq;
     Double_t fTamexFreq;
+    Int_t fnEvents;
 
   public:
-    ClassDef(R3BBunchedFiberMapped2Cal, 2)
+    ClassDef(R3BBunchedFiberMapped2Cal, 3)
 };
 
 #endif

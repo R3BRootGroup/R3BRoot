@@ -13,8 +13,17 @@
 
 #include "R3BFi5Cal2Hit.h"
 
-R3BFi5Cal2Hit::R3BFi5Cal2Hit(Bool_t a_is_calibrator, Int_t a_verbose)
-    : R3BBunchedFiberCal2Hit("Fi5", a_verbose, R3BTCalEngine::CTDC_8_12_FWD_250, VERTICAL, 2, 256, 4, a_is_calibrator)
+R3BFi5Cal2Hit::R3BFi5Cal2Hit(Bool_t a_is_calibrator, Bool_t a_is_gain, Bool_t a_is_tsync, Int_t a_verbose)
+    : R3BBunchedFiberCal2Hit("Fi5",
+                             a_verbose,
+                             R3BTCalEngine::CTDC_8_12_FWD_250,
+                             VERTICAL,
+                             2,
+                             256,
+                             4,
+                             a_is_calibrator,
+                             a_is_gain,
+                             a_is_tsync)
 {
 }
 
