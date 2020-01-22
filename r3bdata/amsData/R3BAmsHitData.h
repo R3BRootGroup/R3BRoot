@@ -37,12 +37,12 @@ class R3BAmsHitData : public FairMultiLinkedData
     /** Constructor with arguments
      *@param fDetId     Detector unique identifier
      *@param fNumHit    Number of hits
-     *@param fX         Position X [mm] local coordinate (detector frame)
-     *@param fY         Position Y [mm] local coordinate (detector frame)
+     *@param fX         Position X (S-Side) [mm] local coordinate (detector frame)
+     *@param fY         Position Y (K-Side) [mm] local coordinate (detector frame)
      *@param fTheta     Angle theta [rad] (lab frame)
      *@param fPhi       Angle Phi [rad] (lab frame)
-     *@param fEnergyX   Total energy deposited in X direction by hit ([GeV] in sim)
-     *@param fEnergyY   Total energy deposited in Y direction by hit ([GeV] in sim)
+     *@param fEnergyS   Total energy deposited on S-side by hit ([GeV] in sim)
+     *@param fEnergyK   Total energy deposited on K-side by hit ([GeV] in sim)
      **/
     R3BAmsHitData(Int_t detid,
                   Int_t numhit,
@@ -65,22 +65,13 @@ class R3BAmsHitData : public FairMultiLinkedData
     inline const Int_t& GetNumHit() const { return fNumHit; }
     inline const Double_t& GetX() const { return fX; }
     inline const Double_t& GetY() const { return fY; }
+    inline const Double_t& GetPos_S() const { return fX; }
+    inline const Double_t& GetPos_K() const { return fY; }
     inline const Double_t& GetTheta() const { return fTheta; }
     inline const Double_t& GetPhi() const { return fPhi; }
     inline const TVector3 GetPosLab() const { return fmaster; }
-    inline const Double_t& GetEnergyX() const { return fEnergyX; }
-    inline const Double_t& GetEnergyY() const { return fEnergyY; }
-
-    /** Modifiers **/
-    void SetDetId(Int_t detid) { fDetId = detid; }
-    void SetNumHit(Int_t numhit) { fNumHit = numhit; }
-    void SetX(Double_t x) { fX = x; }
-    void SetY(Double_t y) { fY = y; }
-    void SetTheta(Double_t theta) { fmaster.SetTheta(theta); }
-    void SetPhi(Double_t phi) { fmaster.SetPhi(phi); }
-    void SetPosLab(TVector3 v) { fmaster = v; }
-    void SetEnergyX(Double_t energy) { fEnergyX = energy; }
-    void SetEnergyY(Double_t energy) { fEnergyY = energy; }
+    inline const Double_t& GetEnergyS() const { return fEnergyS; }
+    inline const Double_t& GetEnergyK() const { return fEnergyK; }
 
     /** Output to screen **/
     virtual void Print(const Option_t* opt) const;
@@ -90,7 +81,7 @@ class R3BAmsHitData : public FairMultiLinkedData
     Int_t fNumHit;
     Double_t fX, fY, fTheta, fPhi;
     TVector3 fmaster;
-    Double_t fEnergyX, fEnergyY;
+    Double_t fEnergyS, fEnergyK;
 
     ClassDef(R3BAmsHitData, 1)
 };

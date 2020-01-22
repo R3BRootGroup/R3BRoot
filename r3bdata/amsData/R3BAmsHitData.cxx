@@ -29,8 +29,8 @@ R3BAmsHitData::R3BAmsHitData()
     , fTheta(0)
     , fPhi(0)
     , fmaster(0, 0, 0)
-    , fEnergyX(0)
-    , fEnergyY(0)
+    , fEnergyS(0)
+    , fEnergyK(0)
 {
 }
 
@@ -40,8 +40,8 @@ R3BAmsHitData::R3BAmsHitData(Int_t detid,
                              Double_t x,
                              Double_t y,
                              TVector3 master,
-                             Double_t energy_x,
-                             Double_t energy_y)
+                             Double_t energy_s,
+                             Double_t energy_k)
     : FairMultiLinkedData()
     , fDetId(detid)
     , fNumHit(numhit)
@@ -50,8 +50,8 @@ R3BAmsHitData::R3BAmsHitData(Int_t detid,
     , fTheta(master.Theta())
     , fPhi(master.Phi())
     , fmaster(master)
-    , fEnergyX(energy_x)
-    , fEnergyY(energy_y)
+    , fEnergyS(energy_s)
+    , fEnergyK(energy_k)
 {
 }
 // -------------------------------------------------------------------------
@@ -65,8 +65,8 @@ R3BAmsHitData::R3BAmsHitData(const R3BAmsHitData& right)
     , fTheta(right.fmaster.Theta())
     , fPhi(right.fmaster.Phi())
     , fmaster(right.fmaster)
-    , fEnergyX(right.fEnergyX)
-    , fEnergyY(right.fEnergyY)
+    , fEnergyS(right.fEnergyS)
+    , fEnergyK(right.fEnergyK)
 {
 }
 
@@ -77,7 +77,7 @@ R3BAmsHitData::~R3BAmsHitData() {}
 void R3BAmsHitData::Print(const Option_t* opt) const
 {
     LOG(INFO) << "-I- R3BAmsHitData: a HitData in detector " << fDetId << " number of hit " << fNumHit
-              << " position [X,Y] = " << fX << ", " << fY;
-    LOG(INFO) << " Energy [X,Y] = " << fEnergyX << " , " << fEnergyY << " (GeV in sim)";
+              << " position [S,K] = " << fX << ", " << fY;
+    LOG(INFO) << " Energy [S,K] = " << fEnergyS << " , " << fEnergyK << " (GeV in sim)";
 }
 // -------------------------------------------------------------------------

@@ -134,22 +134,36 @@ InitStatus R3BAmsOnlineSpectra::Init()
     cCalL = new TCanvas("AMS_cal_Left", "Cal info left-side", 10, 10, 500, 500);
     cCalL->Divide(2, fNbDet / 2);
 
-    // cHit = new TCanvas("AMS_hit", "Hit info", 10, 10, 500, 500);
-    // cHit->Divide(fNbDet/2, 2);
-
     //  CANVAS 3  -------------------------------
-    cHit[2] = new TCanvas("AMS_hit_right_plane1", "Hit info", 10, 10, 500, 500);
-    cHit[2]->Divide(2, 1);
-    cHit[1] = new TCanvas("AMS_hit_right_plane2_top", "Hit info", 10, 10, 500, 500);
-    cHit[1]->Divide(2, 1);
-    cHit[0] = new TCanvas("AMS_hit_right_plane2_bottom", "Hit info", 10, 10, 500, 500);
-    cHit[0]->Divide(2, 1);
-    cHit[3] = new TCanvas("AMS_hit_left_plane1", "Hit info", 10, 10, 500, 500);
-    cHit[3]->Divide(2, 1);
-    cHit[4] = new TCanvas("AMS_hit_left_plane2_top", "Hit info", 10, 10, 500, 500);
-    cHit[4]->Divide(2, 1);
-    cHit[5] = new TCanvas("AMS_hit_left_plane2_bottom", "Hit info", 10, 10, 500, 500);
-    cHit[5]->Divide(2, 1);
+    cHit[0] = new TCanvas("AMS_hit_right_layer1", "Hit info", 10, 10, 500, 500);
+    cHit[0]->Divide(2, 2);
+    cHit[1] = new TCanvas("AMS_hit_right_layer2_top", "Hit info", 10, 10, 500, 500);
+    cHit[1]->Divide(2, 2);
+    cHit[2] = new TCanvas("AMS_hit_right_layer2_bottom", "Hit info", 10, 10, 500, 500);
+    cHit[2]->Divide(2, 2);
+    cHit[3] = new TCanvas("AMS_hit_left_layer1", "Hit info", 10, 10, 500, 500);
+    cHit[3]->Divide(2, 2);
+    cHit[4] = new TCanvas("AMS_hit_left_layer2_top", "Hit info", 10, 10, 500, 500);
+    cHit[4]->Divide(2, 2);
+    cHit[5] = new TCanvas("AMS_hit_left_layer2_bottom", "Hit info", 10, 10, 500, 500);
+    cHit[5]->Divide(2, 2);
+
+    //  CANVAS 4  -------------------------------
+    cHitAngles = new TCanvas("AMS_Theta_vs_Phi", "Theta vs Phi per layer", 10, 10, 500, 500);
+    cHitAngles->Divide(2, 1);
+
+    //  CANVAS 5  -------------------------------
+    cHitEnergyCor = new TCanvas("AMS_E-inner_vs_E-outer", "Energy-inner vs Energy-outer per side", 10, 10, 500, 500);
+    cHitEnergyCor->Divide(2, 1);
+
+    //  CANVAS 6  -------------------------------
+    cHitThetaCor =
+        new TCanvas("AMS_Theta-inner_vs_Theta-outer", "Theta-inner vs Theta-outer per side", 10, 10, 500, 500);
+    cHitThetaCor->Divide(2, 1);
+
+    //  CANVAS 7  -------------------------------
+    cHitPhiCor = new TCanvas("AMS_Phi-inner_vs_Phi-outer", "Phi-inner vs Phi-outer per side", 10, 10, 500, 500);
+    cHitPhiCor->Divide(2, 1);
 
     char Name1[255];
     char Name2[255];
@@ -170,19 +184,25 @@ InitStatus R3BAmsOnlineSpectra::Init()
     }
 
     // Cal data right
+    char Side[255];
     for (Int_t i = 0; i < fNbDet / 2; i++)
     { // two histo per detector
         for (Int_t j = 0; j < 2; j++)
         {
+            if (j == 0)
+                sprintf(Side, "S");
+            else
+                sprintf(Side, "K");
             sprintf(Name1, "fh_Ams_energy_allCalStrips_%d", i * 2 + j);
-            sprintf(Name2, "Cal_Energy vs strip number for AMS Det: %d and Side: %d", i + 1, j);
+            sprintf(Name2, "Cal_Energy vs strip number for AMS Det %d and Side-%s", i + 1, Side);
             if (j == 0)
                 fh_Ams_energy_allCalStrips[i * 2 + j] = new TH2F(Name1, Name2, 640, 0, 640, bins, minE, maxE);
             else
                 fh_Ams_energy_allCalStrips[i * 2 + j] = new TH2F(Name1, Name2, 384, 0, 384, bins, minE, maxE);
             fh_Ams_energy_allCalStrips[i * 2 + j]->GetXaxis()->SetTitle("Strip number");
             fh_Ams_energy_allCalStrips[i * 2 + j]->GetYaxis()->SetTitle("Energy [channels]");
-            fh_Ams_energy_allCalStrips[i * 2 + j]->GetYaxis()->SetTitleOffset(1.4);
+            fh_Ams_energy_allCalStrips[i * 2 + j]->GetYaxis()->SetTitleSize(0.06);
+            fh_Ams_energy_allCalStrips[i * 2 + j]->GetYaxis()->SetTitleOffset(0.85);
             fh_Ams_energy_allCalStrips[i * 2 + j]->GetXaxis()->CenterTitle(true);
             fh_Ams_energy_allCalStrips[i * 2 + j]->GetYaxis()->CenterTitle(true);
             cCalR->cd(i * 2 + 1 + j);
@@ -195,15 +215,20 @@ InitStatus R3BAmsOnlineSpectra::Init()
     { // two histo per detector
         for (Int_t j = 0; j < 2; j++)
         {
+            if (j == 0)
+                sprintf(Side, "S");
+            else
+                sprintf(Side, "K");
             sprintf(Name1, "fh_Ams_energy_allCalStrips_%d", i * 2 + j);
-            sprintf(Name2, "Cal_Energy vs strip number for AMS Det: %d and Side: %d", i + 1, j);
+            sprintf(Name2, "Cal_Energy vs strip number for AMS Det %d and Side-%s", i + 1, Side);
             if (j == 0)
                 fh_Ams_energy_allCalStrips[i * 2 + j] = new TH2F(Name1, Name2, 640, 0, 640, bins, minE, maxE);
             else
                 fh_Ams_energy_allCalStrips[i * 2 + j] = new TH2F(Name1, Name2, 384, 0, 384, bins, minE, maxE);
             fh_Ams_energy_allCalStrips[i * 2 + j]->GetXaxis()->SetTitle("Strip number");
             fh_Ams_energy_allCalStrips[i * 2 + j]->GetYaxis()->SetTitle("Energy [channels]");
-            fh_Ams_energy_allCalStrips[i * 2 + j]->GetYaxis()->SetTitleOffset(1.4);
+            fh_Ams_energy_allCalStrips[i * 2 + j]->GetYaxis()->SetTitleSize(0.06);
+            fh_Ams_energy_allCalStrips[i * 2 + j]->GetYaxis()->SetTitleOffset(0.85);
             fh_Ams_energy_allCalStrips[i * 2 + j]->GetXaxis()->CenterTitle(true);
             fh_Ams_energy_allCalStrips[i * 2 + j]->GetYaxis()->CenterTitle(true);
             cCalL->cd((i - fNbDet / 2) * 2 + 1 + j);
@@ -215,7 +240,7 @@ InitStatus R3BAmsOnlineSpectra::Init()
     for (Int_t i = 0; i < fNbDet; i++)
     { // one histo per detector
         sprintf(Name1, "fh_Ams_hit_Mul_%d", i + 1);
-        sprintf(Name2, "Multiplicity Det: %d", i + 1);
+        sprintf(Name2, "Multiplicity Det %d", i + 1);
         fh_Ams_hit_Mul[i] = new TH1F(Name1, Name2, 10, -0.5, 9.5);
         fh_Ams_hit_Mul[i]->GetXaxis()->SetTitle("Multiplicity");
         fh_Ams_hit_Mul[i]->GetYaxis()->SetTitle("Counts");
@@ -225,56 +250,166 @@ InitStatus R3BAmsOnlineSpectra::Init()
         fh_Ams_hit_Mul[i]->GetXaxis()->SetTitleOffset(1.1);
         cHit[i]->cd(1);
         fh_Ams_hit_Mul[i]->Draw("");
-        /*
-                 sprintf(Name1, "fh_Ams_hit_Pos_%d", i+1);
-                 sprintf(Name2, "Y vs Z for AMS Det: %d", i+1);
-                 fh_Ams_hit_Pos[i] = new TH2F(Name1, Name2, 350, 0, 70., 200, 0, 40.);
-                 fh_Ams_hit_Pos[i]->GetXaxis()->SetTitle("Z [mm]");
-                 fh_Ams_hit_Pos[i]->GetYaxis()->SetTitle("XorY [mm]");
-                 fh_Ams_hit_Pos[i]->GetXaxis()->CenterTitle(true);
-                 fh_Ams_hit_Pos[i]->GetYaxis()->CenterTitle(true);
-                 fh_Ams_hit_Pos[i]->GetYaxis()->SetTitleOffset(1.1);
-                 fh_Ams_hit_Pos[i]->GetXaxis()->SetTitleOffset(1.1);
-                 cHit[i]->cd(2);
-                 fh_Ams_hit_Pos[i]->Draw("col");
-        */
-        sprintf(Name1, "fh_Ams_hit_E_%d", i + 1);
-        sprintf(Name2, "Energy_Y vs Energy_X for AMS Det: %d", i + 1);
-        fh_Ams_hit_E[i] = new TH2F(Name1, Name2, 2000, 0, 6000., 2000, 0, 6000.);
-        fh_Ams_hit_E[i]->GetXaxis()->SetTitle("Energy_X [ADC units]");
-        fh_Ams_hit_E[i]->GetYaxis()->SetTitle("Energy_Y [ADC units]");
+
+        sprintf(Name1, "fh_Ams_hit_Pos_%d", i + 1);
+        sprintf(Name2, "S-side vs K-side for AMS Det %d", i + 1);
+        fh_Ams_hit_Pos[i] = new TH2F(Name1, Name2, 350, 0, 70., 200, 0, 40.);
+        fh_Ams_hit_Pos[i]->GetXaxis()->SetTitle("S-side [mm]");
+        fh_Ams_hit_Pos[i]->GetYaxis()->SetTitle("K-side [mm]");
+        fh_Ams_hit_Pos[i]->GetXaxis()->CenterTitle(true);
+        fh_Ams_hit_Pos[i]->GetYaxis()->CenterTitle(true);
+        fh_Ams_hit_Pos[i]->GetYaxis()->SetTitleOffset(1.1);
+        fh_Ams_hit_Pos[i]->GetXaxis()->SetTitleOffset(1.1);
+        cHit[i]->cd(2);
+        fh_Ams_hit_Pos[i]->Draw("col");
+
+        sprintf(Name1, "fh_Ams_hit_Energies_%d", i + 1);
+        sprintf(Name2, "Energy_S vs Energy_K for AMS Det %d", i + 1);
+        fh_Ams_hit_E[i] = new TH2F(Name1, Name2, 2000, 0, 1000., 2000, 0, 1000.);
+        fh_Ams_hit_E[i]->GetXaxis()->SetTitle("Energy_S [ADC units]");
+        fh_Ams_hit_E[i]->GetYaxis()->SetTitle("Energy_K [ADC units]");
         fh_Ams_hit_E[i]->GetXaxis()->CenterTitle(true);
         fh_Ams_hit_E[i]->GetYaxis()->CenterTitle(true);
         fh_Ams_hit_E[i]->GetYaxis()->SetTitleOffset(1.2);
         fh_Ams_hit_E[i]->GetXaxis()->SetTitleOffset(1.1);
-        cHit[i]->cd(2);
+        cHit[i]->cd(3);
         fh_Ams_hit_E[i]->Draw("col");
-        /*
-                 sprintf(Name1, "fh_Ams_hit_E_theta_%d", i+1);
-                 sprintf(Name2, "Energy_Z vs Theta for AMS Det: %d", i+1);
-                 fh_Ams_hit_E_theta[i] = new TH2F(Name1, Name2, 500, 0, 90., 500, 0., 6000.);
-                 fh_Ams_hit_E_theta[i]->GetXaxis()->SetTitle("Theta [degrees]");
-                 fh_Ams_hit_E_theta[i]->GetYaxis()->SetTitle("Energy_Z [ADC units]");
-                 fh_Ams_hit_E_theta[i]->GetXaxis()->CenterTitle(true);
-                 fh_Ams_hit_E_theta[i]->GetYaxis()->CenterTitle(true);
-                 fh_Ams_hit_E_theta[i]->GetYaxis()->SetTitleOffset(1.1);
-                 fh_Ams_hit_E_theta[i]->GetXaxis()->SetTitleOffset(1.1);
-                 cHit[i]->cd(4);
-                 fh_Ams_hit_E_theta[i]->Draw("col");
-        */
+
+        sprintf(Name1, "fh_Ams_hit_Energy_vs_theta_%d", i + 1);
+        sprintf(Name2, "Energy_S vs Theta for AMS Det %d", i + 1);
+        fh_Ams_hit_E_theta[i] = new TH2F(Name1, Name2, 300, 0., 90., 500, 0., 1000.);
+        fh_Ams_hit_E_theta[i]->GetXaxis()->SetTitle("Theta [degrees]");
+        fh_Ams_hit_E_theta[i]->GetYaxis()->SetTitle("Energy_S [ADC units]");
+        fh_Ams_hit_E_theta[i]->GetXaxis()->CenterTitle(true);
+        fh_Ams_hit_E_theta[i]->GetYaxis()->CenterTitle(true);
+        fh_Ams_hit_E_theta[i]->GetYaxis()->SetTitleOffset(1.1);
+        fh_Ams_hit_E_theta[i]->GetXaxis()->SetTitleOffset(1.1);
+        cHit[i]->cd(4);
+        fh_Ams_hit_E_theta[i]->Draw("col");
+    }
+
+    for (Int_t i = 0; i < 2; i++) // two layers: inner (1) and outer (2)
+    {
+        if (i == 0)
+        {
+            sprintf(Name1, "fh2_Ams_theta_vs_phi_layer_%d", i + 1);
+            sprintf(Name2, "AMS: theta vs phi for layer %d (inner)", i + 1);
+        }
+        else
+        {
+            sprintf(Name1, "fh2_Ams_theta_vs_phi_layer_%d", i + 1);
+            sprintf(Name2, "AMS: theta vs phi for layer %d (outer)", i + 1);
+        }
+        fh2_ams_theta_phi[i] = new TH2F(Name1, Name2, 90, 0., 90., 180, -180., 180.);
+        fh2_ams_theta_phi[i]->GetXaxis()->SetTitle("Theta [degrees]");
+        fh2_ams_theta_phi[i]->GetYaxis()->SetTitle("Phi [degrees]");
+        fh2_ams_theta_phi[i]->GetXaxis()->SetTitleOffset(1.1);
+        fh2_ams_theta_phi[i]->GetYaxis()->SetTitleOffset(1.1);
+        fh2_ams_theta_phi[i]->GetXaxis()->CenterTitle(true);
+        fh2_ams_theta_phi[i]->GetYaxis()->CenterTitle(true);
+        cHitAngles->cd(i + 1);
+        fh2_ams_theta_phi[i]->Draw("COLZ");
+    }
+
+    for (Int_t i = 0; i < 2; i++) // two sides: right (1) and left (2)
+    {
+        // Energy correlations per side
+        if (i == 0)
+        {
+            sprintf(Name1, "fh2_Ams_Einner_vs_Eouter_right");
+            sprintf(Name2, "AMS: E-inner vs E-outer for right side");
+        }
+        else
+        {
+            sprintf(Name1, "fh2_Ams_Einner_vs_Eouter_left");
+            sprintf(Name2, "AMS: E-inner vs E-outer for left side");
+        }
+        fh2_ams_e1_e2[i] = new TH2F(Name1, Name2, 500, 0., 1000., 500, 0., 1000.);
+        fh2_ams_e1_e2[i]->GetXaxis()->SetTitle("E-inner [ADC units]");
+        fh2_ams_e1_e2[i]->GetYaxis()->SetTitle("E-outer [ADC units]");
+        fh2_ams_e1_e2[i]->GetXaxis()->SetTitleOffset(1.1);
+        fh2_ams_e1_e2[i]->GetYaxis()->SetTitleOffset(1.4);
+        fh2_ams_e1_e2[i]->GetXaxis()->CenterTitle(true);
+        fh2_ams_e1_e2[i]->GetYaxis()->CenterTitle(true);
+        cHitEnergyCor->cd(i + 1);
+        fh2_ams_e1_e2[i]->Draw("COLZ");
+
+        // Theta correlations per side
+        if (i == 0)
+        {
+            sprintf(Name1, "fh2_Ams_#thetainner_vs_#thetaouter_right");
+            sprintf(Name2, "AMS: #theta-inner vs #theta-outer for right side");
+        }
+        else
+        {
+            sprintf(Name1, "fh2_Ams_#thetainner_vs_#thetaouter_left");
+            sprintf(Name2, "AMS: #theta-inner vs #theta-outer for left side");
+        }
+        fh2_ams_theta1_theta2[i] = new TH2F(Name1, Name2, 90, 0., 90., 90, 0., 90.);
+        fh2_ams_theta1_theta2[i]->GetXaxis()->SetTitle("#theta-inner [degrees]");
+        fh2_ams_theta1_theta2[i]->GetYaxis()->SetTitle("#theta-outer [degrees]");
+        fh2_ams_theta1_theta2[i]->GetXaxis()->SetTitleOffset(1.);
+        fh2_ams_theta1_theta2[i]->GetYaxis()->SetTitleOffset(1.5);
+        fh2_ams_theta1_theta2[i]->GetXaxis()->CenterTitle(true);
+        fh2_ams_theta1_theta2[i]->GetYaxis()->CenterTitle(true);
+        cHitThetaCor->cd(i + 1);
+        fh2_ams_theta1_theta2[i]->Draw("COLZ");
+
+        // Phi correlations per side
+        if (i == 0)
+        {
+            sprintf(Name1, "fh2_Ams_#phiinner_vs_#phiouter_right");
+            sprintf(Name2, "AMS: #phi-inner vs #phi-outer for right side");
+            fh2_ams_phi1_phi2[i] = new TH2F(Name1, Name2, 180, 90., 270., 180, 90., 270.);
+        }
+        else
+        {
+            sprintf(Name1, "fh2_Ams_#phiinner_vs_#phiouter_left");
+            sprintf(Name2, "AMS: #phi-inner vs #phi-outer for left side");
+            fh2_ams_phi1_phi2[i] = new TH2F(Name1, Name2, 180, -180., 180., 180, -180., 180.);
+        }
+        fh2_ams_phi1_phi2[i]->GetXaxis()->SetTitle("#phi-inner [degrees]");
+        fh2_ams_phi1_phi2[i]->GetYaxis()->SetTitle("#phi-outer [degrees]");
+        fh2_ams_phi1_phi2[i]->GetXaxis()->SetTitleOffset(1.);
+        fh2_ams_phi1_phi2[i]->GetYaxis()->SetTitleOffset(1.5);
+        fh2_ams_phi1_phi2[i]->GetXaxis()->CenterTitle(true);
+        fh2_ams_phi1_phi2[i]->GetYaxis()->CenterTitle(true);
+        cHitPhiCor->cd(i + 1);
+        fh2_ams_phi1_phi2[i]->Draw("COLZ");
     }
 
     // MAIN FOLDER-AMS
     TFolder* mainfolAms = new TFolder("AMS", "AMS info");
-    mainfolAms->Add(cMap);
+
+    // Folder for mapped data
+    TFolder* mapfolAms = new TFolder("Map", "Map AMS info");
+    mapfolAms->Add(cMap);
+    mainfolAms->Add(mapfolAms);
+
+    // Folder for cal data
     if (fCalItemsAms)
     {
-        mainfolAms->Add(cCalL);
-        mainfolAms->Add(cCalR);
+        TFolder* calfolAms = new TFolder("Cal", "Cal AMS info");
+        calfolAms->Add(cCalL);
+        calfolAms->Add(cCalR);
+        mainfolAms->Add(calfolAms);
     }
+
+    // Folder for hit data
     if (fHitItemsAms)
+    {
+        TFolder* hitfolAms = new TFolder("Hit", "Hit AMS info");
         for (Int_t i = 0; i < fNbDet; i++)
-            mainfolAms->Add(cHit[i]);
+            hitfolAms->Add(cHit[i]);
+        mainfolAms->Add(hitfolAms);
+
+        TFolder* CorSidefolAms = new TFolder("Correlations_per_side", "Hit AMS info for correlations per side");
+        CorSidefolAms->Add(cHitAngles);
+        CorSidefolAms->Add(cHitThetaCor);
+        CorSidefolAms->Add(cHitPhiCor);
+        CorSidefolAms->Add(cHitEnergyCor);
+        mainfolAms->Add(CorSidefolAms);
+    }
     run->AddObject(mainfolAms);
 
     // Register command to reset histograms
@@ -294,21 +429,33 @@ void R3BAmsOnlineSpectra::Reset_AMS_Histo()
     }
 
     // Cal data
-    for (Int_t i = 0; i < fNbDet; i++)
-    {
-        for (Int_t j = 0; j < 2; j++)
+    if (fCalItemsAms)
+        for (Int_t i = 0; i < fNbDet; i++)
         {
-            fh_Ams_energy_allCalStrips[i * 2 + j]->Reset();
+            for (Int_t j = 0; j < 2; j++)
+            {
+                fh_Ams_energy_allCalStrips[i * 2 + j]->Reset();
+            }
         }
-    }
 
     // Hit data
-    for (Int_t i = 0; i < fNbDet; i++)
+    if (fHitItemsAms)
     {
-        fh_Ams_hit_Mul[i]->Reset();
-        // fh_Ams_hit_Pos[i]->Reset();
-        fh_Ams_hit_E[i]->Reset();
-        // fh_Ams_hit_E_theta[i]->Reset();
+        for (Int_t i = 0; i < fNbDet; i++)
+        {
+            fh_Ams_hit_Mul[i]->Reset();
+            fh_Ams_hit_Pos[i]->Reset();
+            fh_Ams_hit_E[i]->Reset();
+            fh_Ams_hit_E_theta[i]->Reset();
+        }
+
+        for (Int_t i = 0; i < 2; i++)
+        {
+            fh2_ams_theta_phi[i]->Reset();
+            fh2_ams_theta1_theta2[i]->Reset();
+            fh2_ams_phi1_phi2[i]->Reset();
+            fh2_ams_e1_e2[i]->Reset();
+        }
     }
 }
 
@@ -320,10 +467,10 @@ void R3BAmsOnlineSpectra::Exec(Option_t* option)
         LOG(FATAL) << "R3BAmsOnlineSpectra::Exec FairRootManager not found";
 
     // Fill mapped data
-    if (fMappedItemsAms && fMappedItemsAms->GetEntriesFast())
+    if (fMappedItemsAms && fMappedItemsAms->GetEntriesFast() > 0)
     {
         Int_t nHits = fMappedItemsAms->GetEntriesFast();
-
+        // std::cout << "hit:"<<nHits << std::endl;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             R3BAmsMappedData* hit = (R3BAmsMappedData*)fMappedItemsAms->At(ihit);
@@ -334,7 +481,7 @@ void R3BAmsOnlineSpectra::Exec(Option_t* option)
     }
 
     // Fill cal data
-    if (fCalItemsAms && fCalItemsAms->GetEntriesFast())
+    if (fCalItemsAms && fCalItemsAms->GetEntriesFast() > 0)
     {
         Int_t nHits = fCalItemsAms->GetEntriesFast();
         // std::cout << "hit:"<<nHits << std::endl;
@@ -343,37 +490,91 @@ void R3BAmsOnlineSpectra::Exec(Option_t* option)
             R3BAmsStripCalData* hit = (R3BAmsStripCalData*)fCalItemsAms->At(ihit);
             if (!hit)
                 continue;
-            // std::cout << "hit:"<<hit->GetDetId() << " " << hit->GetSideId()<<" "<<hit->GetStripId()<<" "<<
-            // hit->GetEnergy() << std::endl;
             fh_Ams_energy_allCalStrips[hit->GetDetId() * 2 + hit->GetSideId()]->Fill(hit->GetStripId(),
                                                                                      hit->GetEnergy());
         }
     }
 
-    // TVector3 master[1000][fNbDet];
-    //  Int_t mulhit[fNbDet];
-    // for(Int_t i=0;i<fNbDet;i++)mulhit[i]=0;
     // Fill hit data
-    if (fHitItemsAms && fHitItemsAms->GetEntriesFast())
+    if (fHitItemsAms && fHitItemsAms->GetEntriesFast() > 0)
     {
+        Int_t mulhit[fNbDet];
+        for (Int_t i = 0; i < fNbDet; i++)
+            mulhit[i] = 0;
+
+        Float_t Emaxhit[fNbDet]; // just look for the max. energy per detector
+        Float_t Thetamaxhit[fNbDet];
+        Float_t Phimaxhit[fNbDet];
+        for (Int_t i = 0; i < fNbDet; i++)
+        {
+            Emaxhit[i] = 0.;
+            Thetamaxhit[i] = 0.; // at 0 degrees we have nothing!
+            Phimaxhit[i] = 90.;  // at 90 degrees we have nothing!
+        }
+
         Int_t nHits = fHitItemsAms->GetEntriesFast();
+        Int_t DetId = -1;
         // std::cout << nHits << std::endl;
-        // std::cout << "Ev:" << std::endl;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             R3BAmsHitData* hit = (R3BAmsHitData*)fHitItemsAms->At(ihit);
             if (!hit)
                 continue;
-            // fh_Ams_hit_Pos[hit->GetDetId()]->Fill(hit->GetX(),hit->GetY());
-            fh_Ams_hit_E[hit->GetDetId()]->Fill(hit->GetEnergyX(), hit->GetEnergyY());
-            // fh_Ams_hit_E_theta[hit->GetDetId()]->Fill(hit->GetTheta()/TMath::Pi()*180.,hit->GetEnergyX());
-            // if(mulhit[hit->GetDetId()]<1000){
-            // master[mulhit[hit->GetDetId()]][hit->GetDetId()].SetMagThetaPhi(1.,hit->GetTheta(),hit->GetPhi());
-            // std::cout << hit->GetDetId() << std::endl;
-            //}
-            // mulhit[hit->GetDetId()]++;
+            DetId = hit->GetDetId();
+            fh_Ams_hit_Pos[DetId]->Fill(hit->GetPos_S(), hit->GetPos_K());
+            fh_Ams_hit_E[DetId]->Fill(hit->GetEnergyS(), hit->GetEnergyK());
+            fh_Ams_hit_E_theta[DetId]->Fill(hit->GetTheta() * TMath::RadToDeg(), hit->GetEnergyS());
+            mulhit[DetId]++;
+            if (DetId == 0 || DetId == 3) // inner detectors, layer 1
+                fh2_ams_theta_phi[0]->Fill(hit->GetTheta() * TMath::RadToDeg(), hit->GetPhi() * TMath::RadToDeg());
+            else // outer detectors, layer 2
+                fh2_ams_theta_phi[1]->Fill(hit->GetTheta() * TMath::RadToDeg(), hit->GetPhi() * TMath::RadToDeg());
+            // look for the max. energy per AMS detector
+            if (Emaxhit[DetId] < hit->GetEnergyS())
+            {
+                Emaxhit[DetId] = hit->GetEnergyS();
+                Thetamaxhit[DetId] = hit->GetTheta() * TMath::RadToDeg();
+                if (DetId > 2)
+                    Phimaxhit[DetId] = hit->GetPhi() * TMath::RadToDeg();
+                else
+                {
+                    if (hit->GetPhi() < 0.)
+                        Phimaxhit[DetId] = (TMath::Pi() + hit->GetPhi()) * TMath::RadToDeg() + 180.;
+                    else
+                        Phimaxhit[DetId] = hit->GetPhi() * TMath::RadToDeg();
+                }
+            }
         }
-        // for(Int_t i=0;i<fNbDet;i++)fh_Ams_hit_Mul[i]->Fill(mulhit[i]);
+        for (Int_t i = 0; i < fNbDet; i++)
+            fh_Ams_hit_Mul[i]->Fill(mulhit[i]);
+        if (Emaxhit[0] > 0. && (Emaxhit[1] > 0. || Emaxhit[2] > 0.))
+        {
+            fh2_ams_e1_e2[0]->Fill(Emaxhit[0], TMath::Max(Emaxhit[1], Emaxhit[2]));
+            if (Emaxhit[1] > Emaxhit[2])
+            {
+                fh2_ams_theta1_theta2[0]->Fill(Thetamaxhit[0], Thetamaxhit[1]);
+                fh2_ams_phi1_phi2[0]->Fill(Phimaxhit[0], Phimaxhit[1]);
+            }
+            else if (Emaxhit[2] > Emaxhit[1])
+            {
+                fh2_ams_theta1_theta2[0]->Fill(Thetamaxhit[0], Thetamaxhit[2]);
+                fh2_ams_phi1_phi2[0]->Fill(Phimaxhit[0], Phimaxhit[2]);
+            }
+        }
+        if (Emaxhit[3] > 0. && (Emaxhit[4] > 0. || Emaxhit[5] > 0.))
+        {
+            fh2_ams_e1_e2[1]->Fill(Emaxhit[3], TMath::Max(Emaxhit[4], Emaxhit[5]));
+            if (Emaxhit[4] > Emaxhit[5])
+            {
+                fh2_ams_theta1_theta2[1]->Fill(Thetamaxhit[3], Thetamaxhit[4]);
+                fh2_ams_phi1_phi2[1]->Fill(Phimaxhit[3], Phimaxhit[4]);
+            }
+            else if (Emaxhit[5] > Emaxhit[4])
+            {
+                fh2_ams_theta1_theta2[1]->Fill(Thetamaxhit[3], Thetamaxhit[5]);
+                fh2_ams_phi1_phi2[1]->Fill(Phimaxhit[3], Phimaxhit[5]);
+            }
+        }
     }
 
     fNEvents += 1;
@@ -412,6 +613,10 @@ void R3BAmsOnlineSpectra::FinishTask()
     {
         for (Int_t i = 0; i < fNbDet; i++)
             cHit[i]->Write();
+        cHitAngles->Write();
+        cHitThetaCor->Write();
+        cHitPhiCor->Write();
+        cHitEnergyCor->Write();
     }
 }
 

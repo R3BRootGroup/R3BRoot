@@ -270,8 +270,6 @@ void R3BAmsStripCal2Hit::Exec(Option_t* option)
                         z = fMap_Par->GetDist2target(i + 1) *
                                 TMath::Cos(fMap_Par->GetAngleTheta(i + 1) * TMath::DegToRad()) -
                             (clusterS[mul][1] - fScen) * TMath::Sin(fMap_Par->GetAngleTheta(i + 1) * TMath::DegToRad());
-                        if (i == 5)
-                            std::cout << x << " " << y << " " << z << std::endl;
                     }
                 }
 
@@ -368,16 +366,16 @@ void R3BAmsStripCal2Hit::Reset()
 // -----   Private method AddHitData  --------------------------------------------
 R3BAmsHitData* R3BAmsStripCal2Hit::AddHitData(Int_t detid,
                                               Int_t numhit,
-                                              Double_t x,
-                                              Double_t y,
+                                              Double_t s,
+                                              Double_t k,
                                               TVector3 master,
-                                              Double_t energy_x,
-                                              Double_t energy_y)
+                                              Double_t energy_s,
+                                              Double_t energy_k)
 {
     // It fills the R3BAmsHitData
     TClonesArray& clref = *fAmsHitDataCA;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BAmsHitData(detid, numhit, x, y, master, energy_x, energy_y);
+    return new (clref[size]) R3BAmsHitData(detid, numhit, s, k, master, energy_s, energy_k);
 }
 
 ClassImp(R3BAmsStripCal2Hit)

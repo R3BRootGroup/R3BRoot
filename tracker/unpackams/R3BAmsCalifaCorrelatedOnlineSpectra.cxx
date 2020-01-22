@@ -582,8 +582,8 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option)
             R3BAmsHitData* hit = (R3BAmsHitData*)fHitItemsAms->At(ihit);
             if (!hit)
                 continue;
-            if (hit->GetEnergyX() < 80 || hit->GetEnergyY() < 80 || hit->GetEnergyX() > 8500 ||
-                hit->GetEnergyY() > 8500)
+            if (hit->GetEnergyS() < 80 || hit->GetEnergyK() < 80 || hit->GetEnergyS() > 8500 ||
+                hit->GetEnergyK() > 8500)
                 continue;
 
             if (mulhit[hit->GetDetId()] < 1000)
@@ -606,7 +606,7 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option)
                 TVector3 ams = hit->GetPosLab() - PosBeam;
 
                 hitams[nbhitams[1]][1] = ams.Theta() / TMath::Pi() * 180.;
-                hitamse[nbhitams[1]][1] = hit->GetEnergyX() + hit->GetEnergyY();
+                hitamse[nbhitams[1]][1] = hit->GetEnergyS() + hit->GetEnergyK();
                 nbhitams[1]++;
             }
             else
@@ -615,7 +615,7 @@ void R3BAmsCalifaCorrelatedOnlineSpectra::Exec(Option_t* option)
                 TVector3 ams = hit->GetPosLab() - PosBeam;
 
                 hitams[nbhitams[0]][0] = ams.Theta() / TMath::Pi() * 180.;
-                hitamse[nbhitams[0]][0] = hit->GetEnergyX() + hit->GetEnergyY();
+                hitamse[nbhitams[0]][0] = hit->GetEnergyS() + hit->GetEnergyK();
                 nbhitams[0]++;
             }
         }

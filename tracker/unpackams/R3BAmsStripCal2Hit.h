@@ -91,11 +91,11 @@ class R3BAmsStripCal2Hit : public FairTask
     //** Adds a AmsHitData to the HitCollection
     R3BAmsHitData* AddHitData(Int_t detid,
                               Int_t numhit,
-                              Double_t x,
-                              Double_t y,
+                              Double_t s,
+                              Double_t k,
                               TVector3 master,
-                              Double_t energy_x,
-                              Double_t energy_y);
+                              Double_t energy_s,
+                              Double_t energy_k);
 
   public:
     // Class definition

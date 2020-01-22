@@ -88,11 +88,6 @@ class R3BAmsOnlineSpectra : public FairTask
      */
     virtual void FinishTask();
 
-    /**
-     * Method for setting the number of AMS detectors
-     */
-    void SetNumDet(Int_t NbDet) { fNbDet = NbDet; }
-
     void Reset_AMS_Histo();
 
   private:
@@ -108,6 +103,10 @@ class R3BAmsOnlineSpectra : public FairTask
     TCanvas* cMap;
     TCanvas *cCalL, *cCalR;
     TCanvas* cHit[6];
+    TCanvas* cHitAngles;
+    TCanvas* cHitEnergyCor;
+    TCanvas* cHitThetaCor;
+    TCanvas* cHitPhiCor;
 
     TH2F* fh_Ams_energy_allStrips[6];
     TH2F* fh_Ams_energy_allCalStrips[12];
@@ -115,6 +114,10 @@ class R3BAmsOnlineSpectra : public FairTask
     TH2F* fh_Ams_hit_E[6];
     TH2F* fh_Ams_hit_E_theta[6];
     TH1F* fh_Ams_hit_Mul[6];
+    TH2F* fh2_ams_theta_phi[2];
+    TH2F* fh2_ams_e1_e2[2];
+    TH2F* fh2_ams_theta1_theta2[2];
+    TH2F* fh2_ams_phi1_phi2[2];
 
     // TString fAmsFile;        	      /**< Config file name. */
     Int_t fNbDet; /**< Number of AMS detectors. */
