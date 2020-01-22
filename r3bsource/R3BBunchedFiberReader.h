@@ -70,6 +70,7 @@ class TClonesArray;
     do                                                                           \
     {                                                                            \
         R3B_BUNCHED_FIBER_INIT_BEGIN_(NAME);                                     \
+        memset(data, 0, sizeof *data);                                           \
         R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][0][0], data->NAME##_TMLC); \
         R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][0][1], data->NAME##_TMLF); \
         R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][1][0], data->NAME##_TMTC); \
@@ -84,6 +85,7 @@ class TClonesArray;
     do                                                                           \
     {                                                                            \
         R3B_BUNCHED_FIBER_INIT_BEGIN_(NAME);                                     \
+        memset(data, 0, sizeof *data);                                           \
         R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][0][0], data->NAME##_TMLC); \
         R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][0][1], data->NAME##_TMLF); \
         R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][1][0], data->NAME##_TMTC); \

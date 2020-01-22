@@ -55,7 +55,8 @@ class R3BTofdDigitizerCal : public FairTask
     TClonesArray* fTofdPoints;
     TClonesArray* fMCTrack;
     TClonesArray* fTofdCals;
-    
+    TClonesArray* fCalTriggerItems;
+      
   private:  
     TRandom3* prnd;
     Float_t ysigma;

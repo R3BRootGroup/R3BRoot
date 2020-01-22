@@ -102,6 +102,7 @@ class R3BBunchedFiberMapped2Cal : public FairTask
     Int_t fNofCalItems;
     Double_t fClockFreq;
     Double_t fTamexFreq;
+    Int_t fnEvents;
 
   public:
     ClassDef(R3BBunchedFiberMapped2Cal, 2)

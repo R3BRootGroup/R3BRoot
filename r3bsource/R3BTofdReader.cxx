@@ -23,7 +23,7 @@ extern "C"
 #include "ext_h101_tofd.h"
 }
 
-//#define MAX_TOFD_PLANES   6
+#define MAX_TOFD_CARDS (sizeof data->TOFD_TRIGCLI / sizeof data->TOFD_TRIGCLI[0])
 #define MAX_TOFD_PLANES (sizeof data->TOFD_P / sizeof data->TOFD_P[0])
 
 R3BTofdReader::R3BTofdReader(EXT_STR_h101_TOFD* data, UInt_t offset)
@@ -32,6 +32,7 @@ R3BTofdReader::R3BTofdReader(EXT_STR_h101_TOFD* data, UInt_t offset)
     , fOffset(offset)
     , fLogger(FairLogger::GetLogger())
     , fArray(new TClonesArray("R3BTofdMappedData"))
+    , fArrayTrigger(new TClonesArray("R3BTofdMappedData"))
 {
 }
 
@@ -52,6 +53,7 @@ Bool_t R3BTofdReader::Init(ext_data_struct_info* a_struct_info)
 
     // Register output array in tree
     FairRootManager::Instance()->Register("TofdMapped", "Land", fArray, kTRUE);
+    FairRootManager::Instance()->Register("TofdTriggerMapped", "Land", fArrayTrigger, kTRUE);
 
     // initial clear (set number of hits to 0)
     EXT_STR_h101_TOFD_onion* data = (EXT_STR_h101_TOFD_onion*)fData;
@@ -115,6 +117,24 @@ Bool_t R3BTofdReader::Read()
         } // for side
     }     // for planes
 
+    // Leading TAMEX trigger times.
+    {
+        auto numChannels = data->TOFD_TRIGFL;
+        for (uint32_t i = 0; i < numChannels; i++)
+        {
+            uint32_t channel = data->TOFD_TRIGFLI[i];
+            new ((*fArrayTrigger)[fArrayTrigger->GetEntriesFast()])
+                R3BTofdMappedData(MAX_TOFD_PLANES + 1, 1, channel, 1, data->TOFD_TRIGCLv[i], data->TOFD_TRIGFLv[i]);
+        }
+    }
+
+    //  uint32_t TOFD_TRIGFL /* [0,24] */;
+    //  uint32_t TOFD_TRIGFLI[24 EXT_STRUCT_CTRL(TOFD_TRIGFL)] /* [1,24] */;
+    //  uint32_t TOFD_TRIGFLv[24 EXT_STRUCT_CTRL(TOFD_TRIGFL)] /* [0,65535] */;
+    //  uint32_t TOFD_TRIGCL /* [0,24] */;
+    //  uint32_t TOFD_TRIGCLI[24 EXT_STRUCT_CTRL(TOFD_TRIGCL)] /* [1,24] */;
+    //  uint32_t TOFD_TRIGCLv[24 EXT_STRUCT_CTRL(TOFD_TRIGCL)] /* [0,65535] */;
+
     return kTRUE;
 }
 
@@ -122,6 +142,7 @@ void R3BTofdReader::Reset()
 {
     // Reset the output array
     fArray->Clear();
+    fArrayTrigger->Clear();
 }
 
 ClassImp(R3BTofdReader)

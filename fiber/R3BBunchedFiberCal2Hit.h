@@ -131,6 +131,11 @@ class R3BBunchedFiberCal2Hit : public FairTask
     Int_t fnEvents;
     Int_t maxevent;
 
+	Int_t multi=0;
+	Double_t energy[1025];
+	Int_t counts[1025];
+    Bool_t tofdin;
+
     double fClockFreq;
     Direction fDirection;
     UInt_t fSubNum;
@@ -138,6 +143,7 @@ class R3BBunchedFiberCal2Hit : public FairTask
     Bool_t fIsCalibrator;
     TClonesArray* fCalItems;
     TClonesArray* fHitItems;
+    TClonesArray* fTofdHitItems;
     R3BBunchedFiberHitPar* fCalPar; /**< Parameter container. */
     R3BBunchedFiberHitPar* fHitPar; /**< Hit parameter container. */
     Int_t fNofHitPars;              /**< Number of modules in parameter file. */
@@ -151,6 +157,32 @@ class R3BBunchedFiberCal2Hit : public FairTask
     TH2F* fh_ToT_s_Fib[4];
     TH2F* fh_ToT_ToT;
     TH2F* fh_dt_Fib;
+    TH2F* fh_Fib_ToF;
+    TH1F* fh_multi;
+    
+    TH2F* fh_69_70;
+    TH2F* fh_69_59;
+    TH2F* fh_69_37;
+    TH2F* fh_69_45;
+    TH2F* fh_69_77;
+    TH2F* fh_69_109;
+    TH2F* fh_69_101;
+    TH2F* fh_69_123;
+    TH2F* fh_69_91;
+    TH2F* fh_69_49;
+    TH2F* fh_69_71;
+
+    TH2F* fh_69_60;
+    TH2F* fh_69_38;
+    TH2F* fh_69_46;
+    TH2F* fh_69_78;
+    TH2F* fh_69_110;
+    TH2F* fh_69_102;
+    TH2F* fh_69_124;
+    TH2F* fh_69_92;
+    TH2F* fh_69_50;
+    
+    
 
   public:
     ClassDef(R3BBunchedFiberCal2Hit, 3)

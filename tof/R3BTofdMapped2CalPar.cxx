@@ -36,6 +36,7 @@ R3BTofdMapped2CalPar::R3BTofdMapped2CalPar()
     , fNofModules(0)
     , fCalPar(nullptr)
     , fMapped(nullptr)
+    , fMappedTrigger(nullptr)
     , fEngine(nullptr)
 {
 }
@@ -48,7 +49,7 @@ R3BTofdMapped2CalPar::R3BTofdMapped2CalPar(const char* name, Int_t iVerbose)
     , fPaddlesPerPlane(0)
     , fNofModules(0)
     , fCalPar(nullptr)
-    , fMapped(nullptr)
+    , fMappedTrigger(nullptr)
     , fEngine(nullptr)
 {
 }
@@ -68,6 +69,11 @@ InitStatus R3BTofdMapped2CalPar::Init()
     }
 
     fMapped = (TClonesArray*)rm->GetObject("TofdMapped");
+    if (!fMapped)
+    {
+        return kFATAL;
+    }
+    fMappedTrigger = (TClonesArray*)rm->GetObject("TofdTriggerMapped");
     if (!fMapped)
     {
         return kFATAL;
@@ -119,6 +125,23 @@ void R3BTofdMapped2CalPar::Exec(Option_t* option)
 
         Int_t edge = mapped->GetSideId() * 2 + mapped->GetEdgeId() - 2; // 1..4
         fEngine->Fill(mapped->GetDetectorId(), mapped->GetBarId(), edge, mapped->GetTimeFine());
+    }
+
+    nHits = fMappedTrigger->GetEntries();
+
+    // Loop over mapped triggers
+    for (Int_t i = 0; i < nHits; i++)
+    {
+        auto mapped = (R3BTofdMappedData const*)fMappedTrigger->At(i);
+
+        if (mapped->GetDetectorId() != fNofPlanes + 1)
+        {
+            LOG(ERROR) << "R3BTofdMapped2CalPar::Exec() : trigger plane incorrect! Plane: " << mapped->GetDetectorId()
+                       << " not " << fNofPlanes + 1;
+            continue;
+        }
+
+        fEngine->Fill(mapped->GetDetectorId(), mapped->GetBarId(), 1, mapped->GetTimeFine());
     }
 }
 

@@ -39,6 +39,7 @@ R3BBunchedFiberMapped2Cal::R3BBunchedFiberMapped2Cal(const char* a_name,
     , fNofCalItems(0)
     , fClockFreq(1000. / (R3BTCalEngine::CTDC_16_BWD_150 == a_variant ? 150 : 250))
     , fTamexFreq(1000. / VFTX_CLOCK_MHZ)
+    , fnEvents(0)
 {
 }
 
@@ -168,9 +169,11 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
 
             LOG(DEBUG) << " R3BBunchedFiberMapped2Cal::Exec:Channel=" << channel << ": Time=" << time_ns << "ns.";
         }
+
         new ((*fCalItems)[fNofCalItems++])
             R3BBunchedFiberCalData(mapped->IsMAPMT(), channel, mapped->IsLeading(), time_ns);
     }
+    fnEvents++;
 }
 
 void R3BBunchedFiberMapped2Cal::FinishEvent()

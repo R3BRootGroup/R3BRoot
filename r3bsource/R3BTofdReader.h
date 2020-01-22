@@ -39,6 +39,7 @@ class R3BTofdReader : public R3BReader
     FairLogger* fLogger;
     /* the structs of type R3BTofdxMappedItem */
     TClonesArray* fArray; /**< Output array. */
+    TClonesArray* fArrayTrigger; /**< Output array for triggers. */
 
   public:
     ClassDef(R3BTofdReader, 0);

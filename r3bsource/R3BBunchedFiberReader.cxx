@@ -17,6 +17,8 @@
 #include "R3BBunchedFiberMappedData.h"
 #include "TClonesArray.h"
 
+std::map<TString, int> counter;
+
 R3BBunchedFiberReader::R3BBunchedFiberReader(char const* a_name,
                                              UInt_t a_offset,
                                              UInt_t a_sub_num,
@@ -29,6 +31,7 @@ R3BBunchedFiberReader::R3BBunchedFiberReader(char const* a_name,
 {
     fChannelNum[0] = a_sub_num * a_mapmt_channel_num;
     fChannelNum[1] = a_sub_num * a_spmt_channel_num;
+    counter.insert(std::make_pair(fShortName, 0));
 }
 
 Bool_t R3BBunchedFiberReader::Init()
@@ -59,6 +62,7 @@ Bool_t R3BBunchedFiberReader::Init()
 
 Bool_t R3BBunchedFiberReader::Read()
 {
+    auto it = counter.find(fShortName);
     // LOG(ERROR) << "R3BBunchedFiberReader::Read BEGIN";
     for (size_t side_i = 0; side_i < 2; ++side_i)
     {
@@ -71,6 +75,7 @@ Bool_t R3BBunchedFiberReader::Read()
             uint32_t f_M = *e[1]._M;
             uint32_t c_ = *e[0]._;
             uint32_t f_ = *e[1]._;
+
 
             if (c_M != f_M || c_ != f_)
             {
@@ -176,6 +181,7 @@ Bool_t R3BBunchedFiberReader::Read()
             ++ti;
         }
     }
+    ++it->second;
 
     // LOG(ERROR) << "R3BBunchedFiberReader::Read END";
     return kTRUE;

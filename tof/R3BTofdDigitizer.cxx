@@ -54,9 +54,9 @@ R3BTofdDigitizer::R3BTofdDigitizer()
 {
 
     // set default values for smearing
-    fsigma_y = 10.;
-    fsigma_t = 1.;
-    fsigma_ELoss = 0.1;
+    fsigma_y = 0.001;
+    fsigma_t = 0.001;
+    fsigma_ELoss = 0.001;
 }
 
 R3BTofdDigitizer::~R3BTofdDigitizer() {}
@@ -97,10 +97,10 @@ void R3BTofdDigitizer::Exec(Option_t* opt)
     Int_t n_entries = fTofdPoints->GetEntries();
     Bool_t ChannelFired[1000] = { kFALSE };
 
-    Float_t X_Pos[1000] = { 0 };
-    Float_t Y_Pos[1000] = { 0 };
-    Float_t Time[1000] = { 0 };
-    Float_t Energy_Loss[1000] = { 0 };
+    Float_t X_Pos[10000] = { 0 };
+    Float_t Y_Pos[10000] = { 0 };
+    Float_t Time[10000] = { 0 };
+    Float_t Energy_Loss[10000] = { 0 };
     Int_t number_paddles_hit = 0;
 
     for (Int_t entry = 0; entry < n_entries; entry++)
@@ -112,7 +112,7 @@ void R3BTofdDigitizer::Exec(Option_t* opt)
         Double_t energy_loss = data_element->GetEnergyLoss();
 
         // discard all hits with an energy loss < cut
-        if (energy_loss < 0.01)
+        if (energy_loss < 0.0000001)
             continue;
 
         // add hits to vector
@@ -137,7 +137,7 @@ void R3BTofdDigitizer::Exec(Option_t* opt)
             {
 
                 // energy threshold
-                if (vPoints[channel].at(point)->GetEnergyLoss() < 0.01)
+                if (vPoints[channel].at(point)->GetEnergyLoss() < 0.0000001)
                     continue;
                 fHist1->Fill(vPoints[channel].at(point)->GetEnergyLoss());
 
@@ -163,24 +163,42 @@ void R3BTofdDigitizer::Exec(Option_t* opt)
                     //                    X_Pos[channel] =
                     //                        -detector_width + paddle_width * (1 + layer_label) + paddle_number *
                     //                        (paddle_width * 2 + 0.05);
+                    // cout << "Test1: " << X_Pos[channel] << endl;
+                    // X_Pos[channel] = (vPoints[channel].at(point)->GetXIn() + 136.8) * 1.049690808 ;
+                    // cout << "Test2: " << X_Pos[channel] << endl;
+
                     Y_Pos[channel] = vPoints[channel].at(point)->GetYIn(); // get y-position //local
                     Time[channel] = vPoints[channel].at(point)->GetTime();
                     Energy_Loss[channel] = vPoints[channel].at(point)->GetEnergyLoss();
+
+                    if (Energy_Loss[channel] < 0.03)
+                    {
+                        Energy_Loss[channel] = 2.;
+                    }
+                    else if (Energy_Loss[channel] < 0.08)
+                    {
+                        Energy_Loss[channel] = 6.;
+                    }
+                    else
+                    {
+                        Energy_Loss[channel] = 8.;
+                    }
 
                     // add to HitData and introduce smearing of y-position, time and energy loss
                     cout << "Hit Tofd: ch = " << channel << " paddle = " << paddle_number << " x = " << X_Pos[channel]
                          << " y = " << Y_Pos[channel] << " t = " << Time[channel] << " eloss = " << Energy_Loss[channel]
                          << endl;
 
+                    //                    if(channel < 200)
                     MapOfHits.insert(pair<Int_t, R3BTofdHitData*>(
                         channel,
                         new R3BTofdHitData(0.,
                                            // fRnd->Uniform((X_Pos[channel] - 1.35), (X_Pos[channel] + 1.35)),
                                            X_Pos[channel],
-                                           fRnd->Gaus(Y_Pos[channel], fsigma_y),
+                                           Y_Pos[channel],
                                            0.,
-                                           fRnd->Gaus(Time[channel], fsigma_t),
-                                           fRnd->Gaus(Energy_Loss[channel], fsigma_ELoss),
+                                           Time[channel],
+                                           Energy_Loss[channel],
                                            channel)));
                 }
 

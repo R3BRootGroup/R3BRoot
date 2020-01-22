@@ -25,6 +25,7 @@
 #pragma link C++ class R3BMCTrack+;
 #pragma link C++ class R3BHit+;
 #pragma link C++ class R3BDouble+;
+#pragma link C++ class R3BTrack+;
 
 #pragma link C++ class R3BXBallPoint+;
 #pragma link C++ class R3BXBallCrystalHit+;
