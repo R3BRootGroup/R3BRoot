@@ -155,7 +155,7 @@ void R3BFi10Digitizer::Exec(Option_t* opt)
 
         for (TempHit& Hit : TempHits)
         {
-            if (Hit.Energy < 0.0001)
+            if (Hit.Energy < 0.0000001)
             {
                 continue;
             }
@@ -185,7 +185,7 @@ void R3BFi10Digitizer::Exec(Option_t* opt)
         {
             for (Double_t& energyl : energy[i])
             {
-                if (energyl > 0.0001)
+                if (energyl > 0.0000001)
                 {
                     Float_t xpos =
                         -detector_width / 2. + fiber_thickness / 2. + (i + (i * air_layer)) * fiber_thickness;

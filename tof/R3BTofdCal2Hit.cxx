@@ -73,18 +73,18 @@ R3BTofdCal2Hit::R3BTofdCal2Hit()
     , wrongtrigger(0)
     , wrongtpat(0)
     , headertpat(0)
-    , calhit(0)
-    , countmap(0)
-    , countpmthit(0)
+    , events_in_cal_level(0)
     , inbarcoincidence(0)
     , countreset(0)
     , hitsbeforereset(0)
-    , pmtbeforereset(0)
     , eventstore(0)
     , incoincidence(0)
     , inaverage12(0)
     , inaverage34(0)
     , singlehit(0)
+    , multihit(0)
+    , bars_with_multihit(0)
+    , events_wo_tofd_hits(0)
 {
     fhLosXYP = NULL;
     fhChargeLosTofD = NULL;
@@ -148,18 +148,18 @@ R3BTofdCal2Hit::R3BTofdCal2Hit(const char* name, Int_t iVerbose)
     , wrongtrigger(0)
     , wrongtpat(0)
     , headertpat(0)
-    , calhit(0)
-    , countmap(0)
-    , countpmthit(0)
+    , events_in_cal_level(0)
     , inbarcoincidence(0)
     , countreset(0)
     , hitsbeforereset(0)
-    , pmtbeforereset(0)
     , eventstore(0)
     , incoincidence(0)
     , inaverage12(0)
     , inaverage34(0)
     , singlehit(0)
+    , multihit(0)
+    , bars_with_multihit(0)
+    , events_wo_tofd_hits(0)
 {
     fhLosXYP = NULL;
     fhChargeLosTofD = NULL;
@@ -463,31 +463,28 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
         auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
         auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;
         vec.push_back(hit);
-        calhit++;
+        events_in_cal_level++;
     }
 
     // Find coincident PMT hits.
     // std::cout << "Print:\n";
-    Int_t oldcpmt = countpmthit;
     for (auto it = bar_map.begin(); bar_map.end() != it; ++it)
     {
     reset:
-        countmap++;
         // for (auto it2 = it->second.top.begin(); it->second.top.end() != it2; ++it2) {
         // std::cout << "Top: " << (*it2)->GetDetectorId() << ' ' << (*it2)->GetBarId() << ' ' <<
         // (*it2)->GetTimeLeading_ns() << '\n';
-        //}
+        // }
         // for (auto it2 = it->second.bot.begin(); it->second.bot.end() != it2; ++it2) {
         // std::cout << "Bot: " << (*it2)->GetDetectorId() << ' ' << (*it2)->GetBarId() << ' ' <<
         // (*it2)->GetTimeLeading_ns() << '\n';
-        //}
+        // }
         auto const& top_vec = it->second.top;
         auto const& bot_vec = it->second.bot;
         size_t top_i = 0;
         size_t bot_i = 0;
         for (; top_i < top_vec.size() && bot_i < bot_vec.size();)
         {
-            countpmthit++;
             auto top = top_vec.at(top_i);
             auto bot = bot_vec.at(bot_i);
             auto top_ns = top->GetTimeLeading_ns();
@@ -597,7 +594,6 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                         it = bar_map.begin();
                         countreset++;
                         hitsbeforereset += nHitsEvent;
-                        pmtbeforereset += countpmthit - oldcpmt;
                         for (Int_t i = 0; i <= fNofPlanes; i++)
                         {
                             for (Int_t j = 0; j <= 2 * N_TOFD_HIT_PADDLE_MAX; j++)
@@ -615,6 +611,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                         goto reset; /// TODO: how to do without goto?
                     }
                 }
+
                 if (timeLos != 0)
                 {
                     LOG(DEBUG) << "Found LOS detector";
@@ -765,10 +762,12 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
             else if (dt < 0 && dt > -c_range_ns / 2)
             {
                 ++top_i;
+                LOG(WARNING) << "Not in bar coincidence increase top counter";
             }
             else
             {
                 ++bot_i;
+                LOG(WARNING) << "Not in bar coincidence increase bot counter";
             }
         }
     }
@@ -779,6 +778,8 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
     Double_t maxChargeDiff = 1.; // maximum charge difference between two planes for averaged hits
 
     LOG(DEBUG) << "Hits in this event: " << nHitsEvent;
+    if (nHitsEvent == 0)
+        events_wo_tofd_hits++;
 
     // init arrays to store hits
     Double_t tArrQ[2 * nHitsEvent + 1];
@@ -799,6 +800,18 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
         tArrP[i] = -1.;
         tArrB[i] = -1.;
         tArrU[i] = kFALSE;
+    }
+
+    for (Int_t i = 1; i <= fNofPlanes; i++)
+    {
+        for (Int_t j = 0; j < fPaddlesPerPlane * 2 + 1; j++)
+        {
+            if (vmultihits[i][j] > 1)
+            {
+                bars_with_multihit++;
+                multihit += vmultihits[i][j] - 1;
+            }
+        }
     }
 
     // order events for time
@@ -1621,15 +1634,16 @@ void R3BTofdCal2Hit::FinishTask()
               << "Events skipped due to trigger   " << wrongtrigger << "\n"
               << "Events skipped due to tpat      " << wrongtpat << "\n"
               << "Events with correct header&tpat " << headertpat << "\n"
-              << "Events in cal level             " << calhit << "\n"
-              << "Events with map hit             " << countmap << "\n"
-              << "Events with pmt hits            " << countpmthit << "\n"
-              << "Events in bar coincidence       " << inbarcoincidence << "\n"
+              << "Events without ToFd hits        " << events_wo_tofd_hits << "\n"
+              << "Events in cal level             " << events_in_cal_level << "\n"
+              << "Hits in bar coincidence         " << inbarcoincidence << "\n"
               << "Number of resets                " << countreset << "\n"
               << "Hits before reset               " << hitsbeforereset << "\n"
-              << "PMT before reset                " << pmtbeforereset << "\n"
+              << "Bars with multihits             " << bars_with_multihit << "\n"
+              << "Multihits                       " << multihit << "\n"
               << "Events stored                   " << eventstore / 2 << " <-> " << inbarcoincidence - hitsbeforereset
-              << " = " << inbarcoincidence << " - " << hitsbeforereset << "\n"
+              << " = " << inbarcoincidence << " - " << hitsbeforereset
+              << " (Events in bar coincidence - Hits before reset)\n"
               << "Events in coincidence window    " << incoincidence / 2 << "\n"
               << "Events in average p1&2          " << inaverage12 * 2 << "\n"
               << "Events in average p3&4          " << inaverage34 * 2 << "\n"

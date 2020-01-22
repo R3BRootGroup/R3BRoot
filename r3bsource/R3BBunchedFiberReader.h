@@ -70,6 +70,7 @@ class TClonesArray;
     do                                                                           \
     {                                                                            \
         R3B_BUNCHED_FIBER_INIT_BEGIN_(NAME);                                     \
+        memset(data, 0, sizeof *data);                                           \
         R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][0][0], data->NAME##_TMLC); \
         R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][0][1], data->NAME##_TMLF); \
         R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][1][0], data->NAME##_TMTC); \
@@ -84,11 +85,43 @@ class TClonesArray;
     do                                                                           \
     {                                                                            \
         R3B_BUNCHED_FIBER_INIT_BEGIN_(NAME);                                     \
+        memset(data, 0, sizeof *data);                                           \
         R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][0][0], data->NAME##_TMLC); \
         R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][0][1], data->NAME##_TMLF); \
         R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][1][0], data->NAME##_TMTC); \
         R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][1][1], data->NAME##_TMTF); \
         R3B_BUNCHED_FIBER_INIT_END_;                                             \
+    } while (0)
+#define R3B_BUNCHED_FIBER_INIT_MAPMT_TRIG(NAME, data)                            \
+    do                                                                           \
+    {                                                                            \
+        R3B_BUNCHED_FIBER_INIT_BEGIN_(NAME);                                     \
+        memset(data, 0, sizeof *data);                                           \
+        R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][0][0], data->NAME##_TMLC); \
+        R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][0][1], data->NAME##_TMLF); \
+        R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][1][0], data->NAME##_TMTC); \
+        R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[0][1][1], data->NAME##_TMTF); \
+        R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[1][0][0], data->NAME##_TSLC); \
+        R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[1][0][1], data->NAME##_TSLF); \
+        R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[1][1][0], data->NAME##_TSTC); \
+        R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(fMHL[1][1][1], data->NAME##_TSTF); \
+        R3B_BUNCHED_FIBER_UCESB_LINK(fMHL[2][0][0], data->NAME##_TRIGMLC);       \
+        R3B_BUNCHED_FIBER_UCESB_LINK(fMHL[2][0][1], data->NAME##_TRIGMLF);       \
+        R3B_BUNCHED_FIBER_INIT_END_;                                             \
+    } while (0)
+#define R3B_BUNCHED_FIBER_UCESB_LINK(dst, src)             \
+    do                                                     \
+    {                                                      \
+        dst._ = &src;                                      \
+        dst._MI = src##I;                                  \
+        dst._MI_len = LENGTH(src##I);                      \
+        dst._v = src##v;                                   \
+        dst._v_len = LENGTH(src##v);                       \
+        if (dst._MI_len != dst._v_len)                     \
+        {                                                  \
+            LOG(ERROR) << "UCESB single-hit array error."; \
+            exit(EXIT_FAILURE);                            \
+        }                                                  \
     } while (0)
 #define R3B_BUNCHED_FIBER_UCESB_LINK_MULTIHIT(dst, src)   \
     do                                                    \
@@ -130,8 +163,8 @@ class R3BBunchedFiberReader : public R3BReader
 
   protected:
     UInt_t fOffset;
-    // [0=MAPMT,1=SPMT][0=leading,1=trailing][0=coarse,1=fine].
-    UCESBMultiHitLink fMHL[2][2][2];
+    // [0=MAPMT,1=MAPMT-trig,1=SPMT][0=leading,1=trailing][0=coarse,1=fine].
+    UCESBMultiHitLink fMHL[3][2][2];
 
   private:
     TString fShortName; // e.g. "Fi1a", "Fi2", ...

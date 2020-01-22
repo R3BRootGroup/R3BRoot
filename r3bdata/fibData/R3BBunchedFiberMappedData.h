@@ -30,26 +30,29 @@ class R3BBunchedFiberMappedData : public TObject
 {
   public:
     R3BBunchedFiberMappedData();
-    R3BBunchedFiberMappedData(Bool_t, Int_t, Bool_t, Int_t, Int_t);
+    R3BBunchedFiberMappedData(Int_t, Int_t, Bool_t, Int_t, Int_t);
     virtual ~R3BBunchedFiberMappedData();
 
     Int_t GetChannel() const;
     Int_t GetCoarse() const;
     Int_t GetFine() const;
+    Int_t GetSide() const;
     Bool_t IsMAPMT() const;
     Bool_t IsSPMT() const;
+    Bool_t IsMAPMTTrigger() const;
+    Bool_t IsSPMTTrigger() const;
     Bool_t IsLeading() const;
     Bool_t IsTrailing() const;
 
   protected:
-    Bool_t fIsMAPMT;
+    Int_t fSide;       // 0 = MAPMT, 1 = SPMT, 2 = MAPMT trigger, 3 = SPMT trigger.
     Int_t fChannel;
     Bool_t fIsLeading;
     Int_t fCoarse;
     Int_t fFine;
 
   public:
-    ClassDef(R3BBunchedFiberMappedData, 1)
+    ClassDef(R3BBunchedFiberMappedData, 2)
 };
 
 #endif

@@ -118,6 +118,7 @@ class R3BTofdMapped2CalPar : public FairTask
 
     R3BTCalPar* fCalPar;   /**< Parameter container. */
     TClonesArray* fMapped; /**< Array with mapped data - input data. */
+    TClonesArray* fMappedTrigger; /**< Array with mapped trigger data - input data. */
 
     R3BTCalEngine* fEngine; /**< Instance of the TCAL engine. */
 

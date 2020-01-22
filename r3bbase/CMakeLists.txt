@@ -64,7 +64,7 @@ R3BOnlineSpectra.cxx
 R3BOnlineSpectraDec2019.cxx
 R3BGlobalAnalysis.cxx
 R3BGlobalAnalysisS454.cxx
-#R3BOnlineSpectraLosTest.cxx
+R3BTrackS454.cxx
 )
 
 # fill list of header files from list of source files

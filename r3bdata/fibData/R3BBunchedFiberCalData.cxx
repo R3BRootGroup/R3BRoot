@@ -14,18 +14,15 @@
 #include "R3BBunchedFiberCalData.h"
 
 R3BBunchedFiberCalData::R3BBunchedFiberCalData()
-    : fIsMAPMT()
+    : fSide(-1)
     , fChannel(-1)
     , fIsLeading()
     , fTime_ns(-1)
 {
 }
 
-R3BBunchedFiberCalData::R3BBunchedFiberCalData(Bool_t a_is_mapmt,
-                                               Int_t a_channel,
-                                               Bool_t a_is_leading,
-                                               Double_t a_time_ns)
-    : fIsMAPMT(a_is_mapmt)
+R3BBunchedFiberCalData::R3BBunchedFiberCalData(Int_t a_side, Int_t a_channel, Bool_t a_is_leading, Double_t a_time_ns)
+    : fSide(a_side)
     , fChannel(a_channel)
     , fIsLeading(a_is_leading)
     , fTime_ns(a_time_ns)
@@ -38,9 +35,13 @@ Int_t R3BBunchedFiberCalData::GetChannel() const { return fChannel; }
 
 Double_t R3BBunchedFiberCalData::GetTime_ns() const { return fTime_ns; }
 
-Bool_t R3BBunchedFiberCalData::IsMAPMT() const { return fIsMAPMT; }
+Bool_t R3BBunchedFiberCalData::IsMAPMT() const { return 0 == fSide; }
 
-Bool_t R3BBunchedFiberCalData::IsSPMT() const { return !fIsMAPMT; }
+Bool_t R3BBunchedFiberCalData::IsSPMT() const { return 1 == fSide; }
+
+Bool_t R3BBunchedFiberCalData::IsMAPMTTrigger() const { return 2 == fSide; }
+
+Bool_t R3BBunchedFiberCalData::IsSPMTTrigger() const { return 3 == fSide; }
 
 Bool_t R3BBunchedFiberCalData::IsLeading() const { return fIsLeading; }
 

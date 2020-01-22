@@ -17,6 +17,8 @@
 #include "R3BBunchedFiberMappedData.h"
 #include "TClonesArray.h"
 
+std::map<TString, int> counter;
+
 R3BBunchedFiberReader::R3BBunchedFiberReader(char const* a_name,
                                              UInt_t a_offset,
                                              UInt_t a_sub_num,
@@ -29,6 +31,7 @@ R3BBunchedFiberReader::R3BBunchedFiberReader(char const* a_name,
 {
     fChannelNum[0] = a_sub_num * a_mapmt_channel_num;
     fChannelNum[1] = a_sub_num * a_spmt_channel_num;
+    counter.insert(std::make_pair(fShortName, 0));
 }
 
 Bool_t R3BBunchedFiberReader::Init()
@@ -59,6 +62,7 @@ Bool_t R3BBunchedFiberReader::Init()
 
 Bool_t R3BBunchedFiberReader::Read()
 {
+    auto it = counter.find(fShortName);
     // LOG(ERROR) << "R3BBunchedFiberReader::Read BEGIN";
     for (size_t side_i = 0; side_i < 2; ++side_i)
     {
@@ -109,14 +113,44 @@ Bool_t R3BBunchedFiberReader::Read()
                 }
                 for (; cur_entry < c_ME; cur_entry++)
                 {
-                    new ((*fMappedArray)[fMappedArray->GetEntriesFast()]) R3BBunchedFiberMappedData(
-                        0 == side_i, c_MI, 0 == edge_i, e[0]._v[cur_entry], e[1]._v[cur_entry]);
+                    new ((*fMappedArray)[fMappedArray->GetEntriesFast()])
+                        R3BBunchedFiberMappedData(side_i, c_MI, 0 == edge_i, e[0]._v[cur_entry], e[1]._v[cur_entry]);
                 }
             }
         }
         if (0 == fChannelNum[1])
         {
             break;
+        }
+    }
+
+    // MAPMT trigger times.
+    {
+        auto const& e = fMHL[2][0];
+
+        // Check that coarse and fine list are the same size.
+        uint32_t c_MI = *e[0]._MI;
+        uint32_t f_MI = *e[1]._MI;
+        uint32_t c_ = *e[0]._;
+        uint32_t f_ = *e[1]._;
+
+        if (c_ != f_)
+        {
+            LOG(WARNING) << "Coarse and fine single-hit list counts mismatch "
+                            "(_{c="
+                         << c_ << ",f=" << f_ << "}).";
+            return kFALSE;
+        }
+
+        // Simply dump edges, can only be sorted perfectly after calibration,
+        // and hits should be somewhat sorted already, that helps many sorting
+        // algos.
+        uint32_t cur_entry = 0;
+        for (uint32_t i = 0; i < c_; i++)
+        {
+            auto channel = e[0]._MI[i];
+            new ((*fMappedArray)[fMappedArray->GetEntriesFast()])
+                R3BBunchedFiberMappedData(2, channel, true, e[0]._v[i], e[1]._v[i]);
         }
     }
 
@@ -176,6 +210,7 @@ Bool_t R3BBunchedFiberReader::Read()
             ++ti;
         }
     }
+    ++it->second;
 
     // LOG(ERROR) << "R3BBunchedFiberReader::Read END";
     return kTRUE;

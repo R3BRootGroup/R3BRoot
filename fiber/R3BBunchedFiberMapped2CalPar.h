@@ -105,13 +105,15 @@ class R3BBunchedFiberMapped2CalPar : public FairTask
     TClonesArray* fMapped;
     R3BTCalPar* fMAPMTTCalPar;
     R3BTCalEngine* fMAPMTEngine;
+    R3BTCalPar* fMAPMTTrigTCalPar;
+    R3BTCalEngine* fMAPMTTrigEngine;
     R3BTCalPar* fSPMTTCalPar;
     R3BTCalEngine* fSPMTEngine;
     Int_t fUpdateRate;
     Int_t fMinStats;
 
   public:
-    ClassDef(R3BBunchedFiberMapped2CalPar, 2)
+    ClassDef(R3BBunchedFiberMapped2CalPar, 3)
 };
 
 #endif

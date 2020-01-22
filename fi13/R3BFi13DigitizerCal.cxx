@@ -247,6 +247,16 @@ void R3BFi13DigitizerCal::Exec(Option_t* opt)
         delete[] y;
     };
 
+    /*
+            if (2 == mapped->GetSide()) {
+              new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                  R3BBunchedFiberCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
+            } else {
+              new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                  R3BBunchedFiberCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
+            }
+    */
+
     // running the digitizer for the Fi detectors
 
     if (fFi13Points)

@@ -67,6 +67,9 @@ InitStatus R3BTofdDigitizerCal::Init()
     fTofdCals = new TClonesArray("R3BTofdCalData", 1000);
     ioman->Register("TofdCal", "Digital response in Tofd", fTofdCals, kTRUE);
 
+    fCalTriggerItems = new TClonesArray("R3BTofdCalData", 1000);
+    ioman->Register("TofdTriggerCal", "Land", fCalTriggerItems, kTRUE);
+
     // Get random number for smearing in y, t, ELoss
     prnd = new TRandom3();
 
@@ -81,7 +84,7 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
 
     //    cout<<"R3BTofdDigitizerCal Exec Before Digitize"<<endl;
 
-    auto Digitize = [this](TClonesArray* Points, TClonesArray* Hits, Int_t NumOfChannels) {
+    auto Digitize = [this](TClonesArray* Points, TClonesArray* Hits, TClonesArray* Trigger, Int_t NumOfChannels) {
         Int_t entryNum = Points->GetEntries();
 
         if (!entryNum)
@@ -144,7 +147,7 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
         {
 
             // discard all hits with an energy loss < cut
-            if (Hit.Energy < 0.0001 || Hit.Time > 1.e9)
+            if (Hit.Energy < 0.000001 || Hit.Time > 1.e9)
                 continue;
 
             Int_t ChannelID = Hit.ChannelID;
@@ -208,8 +211,8 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
                     yrnd = prnd->Gaus((y[i].at(&energyl - energy[i].data())), ysigma);
                     ernd = prnd->Gaus(energyl, esigma) * 1000.; // GeV->MeV
                     ToT_up =
-                        ernd * exp(yrnd / 100.) * 10.; // *10 just to come to the tot region we measure in experiment
-                    ToT_down = ernd * exp(-yrnd / 100.) * 10.;
+                        ernd * exp(-(50. - yrnd) / 100.); // *10 just to come to the tot region we measure in experiment
+                    ToT_down = ernd * exp(-(50 + yrnd) / 100.);
 
                     /* Now, make from ToT and time leading and trailing times:
                      * time=(timeL_up+timeL_down)/2, and timeL_up-timeL_down=y => timeL_up, timeL_down
@@ -217,8 +220,10 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
                      */
                     timernd = prnd->Gaus(time[i].at(&energyl - energy[i].data()),
                                          tsigma); //*3. just to get some larger values
-                    timeL_up = (2. * timernd + yrnd) / 2.;
-                    timeL_down = 2. * timernd - timeL_up;
+                    Double_t veff = 12.;
+                    timeL_up = timernd - 50. / veff + (50 - yrnd) / veff;
+                    timeL_down = timernd - 50. / veff + (50 + yrnd) / veff;
+
                     timeT_up = timeL_up + ToT_up;
                     timeT_down = timeL_down + ToT_down;
 
@@ -238,6 +243,12 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
 
                     new ((*Hits)[Hits->GetEntries()])
                         R3BTofdCalData(layer_label + 1, paddle_number + 1, 2, timeL_down, timeT_down);
+
+                    // Int_t card = (int)paddle_number/8.+layer_label*6;
+                    for (Int_t i = 0; i < 12; i++)
+                    {
+                        new ((*Trigger)[Trigger->GetEntriesFast()]) R3BTofdCalData(5, i + 1, 1, 0., 0.);
+                    }
                 }
             }
         }
@@ -251,7 +262,7 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
 
     if (fTofdPoints)
     {
-        Digitize(fTofdPoints, fTofdCals, number_channels);
+        Digitize(fTofdPoints, fTofdCals, fCalTriggerItems, number_channels);
     }
 }
 
@@ -264,6 +275,8 @@ void R3BTofdDigitizerCal::Reset()
 
     if (fTofdCals)
         fTofdCals->Clear();
+    if (fCalTriggerItems)
+        fCalTriggerItems->Clear();
 }
 
 void R3BTofdDigitizerCal::Finish() {}

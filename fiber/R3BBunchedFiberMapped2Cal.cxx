@@ -33,16 +33,22 @@ R3BBunchedFiberMapped2Cal::R3BBunchedFiberMapped2Cal(const char* a_name,
     , fName(a_name)
     , fSkipSPMT(a_skip_spmt)
     , fMAPMTTCalPar(nullptr)
+    , fMAPMTTrigTCalPar(nullptr)
     , fSPMTTCalPar(nullptr)
     , fMappedItems(nullptr)
     , fCalItems(new TClonesArray("R3BBunchedFiberCalData"))
-    , fNofCalItems(0)
+    , fCalTriggerItems(new TClonesArray("R3BBunchedFiberCalData"))
     , fClockFreq(1000. / (R3BTCalEngine::CTDC_16_BWD_150 == a_variant ? 150 : 250))
     , fTamexFreq(1000. / VFTX_CLOCK_MHZ)
+    , fnEvents(0)
 {
 }
 
-R3BBunchedFiberMapped2Cal::~R3BBunchedFiberMapped2Cal() { delete fCalItems; }
+R3BBunchedFiberMapped2Cal::~R3BBunchedFiberMapped2Cal()
+{
+    delete fCalItems;
+    delete fCalTriggerItems;
+}
 
 InitStatus R3BBunchedFiberMapped2Cal::Init()
 {
@@ -72,6 +78,7 @@ InitStatus R3BBunchedFiberMapped2Cal::Init()
         return kERROR;
     }
     mgr->Register(fName + "Cal", "Land", fCalItems, kTRUE);
+    mgr->Register(fName + "TriggerCal", "Land", fCalTriggerItems, kTRUE);
     return kSUCCESS;
 }
 
@@ -88,6 +95,7 @@ void R3BBunchedFiberMapped2Cal::SetParContainers()
         }                                                                              \
     } while (0)
     GET_TCALPAR(MAPMT);
+    GET_TCALPAR(MAPMTTrig);
     GET_TCALPAR(SPMT);
 }
 
@@ -111,9 +119,17 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
                    << ":Edge=" << (mapped->IsLeading() ? "Leading" : "Trailing") << '.';
 
         // Fetch tcal parameters.
-        auto tcal_channel_i = channel * 2 - (mapped->IsLeading() ? 1 : 0);
-        auto par = mapped->IsMAPMT() ? fMAPMTTCalPar->GetModuleParAt(1, tcal_channel_i, 1)
-                                     : fSPMTTCalPar->GetModuleParAt(1, tcal_channel_i, 1);
+        R3BTCalModulePar* par;
+        if (mapped->IsMAPMTTrigger())
+        {
+            par = fMAPMTTrigTCalPar->GetModuleParAt(1, channel, 1);
+        }
+        else
+        {
+            auto tcal_channel_i = channel * 2 - (mapped->IsLeading() ? 1 : 0);
+            par = mapped->IsMAPMT() ? fMAPMTTCalPar->GetModuleParAt(1, tcal_channel_i, 1)
+                                    : fSPMTTCalPar->GetModuleParAt(1, tcal_channel_i, 1);
+        }
         if (!par)
         {
             LOG(WARNING) << "R3BBunchedFiberMapped2Cal::Exec (" << fName << "): Channel=" << channel
@@ -133,7 +149,7 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
 
         // we have to differ between single PMT which is on Tamex and MAPMT which is on clock TDC
         Double_t time_ns = -1;
-        if (mapped->IsMAPMT())
+        if (mapped->IsMAPMT() || mapped->IsMAPMTTrigger())
         {
             if (fine_ns < 0. || fine_ns >= fClockFreq)
             {
@@ -168,15 +184,24 @@ void R3BBunchedFiberMapped2Cal::Exec(Option_t* option)
 
             LOG(DEBUG) << " R3BBunchedFiberMapped2Cal::Exec:Channel=" << channel << ": Time=" << time_ns << "ns.";
         }
-        new ((*fCalItems)[fNofCalItems++])
-            R3BBunchedFiberCalData(mapped->IsMAPMT(), channel, mapped->IsLeading(), time_ns);
+        if (2 == mapped->GetSide())
+        {
+            new ((*fCalTriggerItems)[fCalTriggerItems->GetEntriesFast()])
+                R3BBunchedFiberCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
+        }
+        else
+        {
+            new ((*fCalItems)[fCalItems->GetEntriesFast()])
+                R3BBunchedFiberCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
+        }
     }
+    fnEvents++;
 }
 
 void R3BBunchedFiberMapped2Cal::FinishEvent()
 {
     fCalItems->Clear();
-    fNofCalItems = 0;
+    fCalTriggerItems->Clear();
 }
 
 void R3BBunchedFiberMapped2Cal::FinishTask() {}

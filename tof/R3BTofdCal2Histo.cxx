@@ -47,8 +47,8 @@ using namespace std;
 
 namespace
 {
-    double c_range_ns = 2048 * 5;
-    double c_bar_coincidence_ns = 20; // nanoseconds.
+    double c_range_ns = 2048. * 5.;
+    double c_bar_coincidence_ns = 20.; // nanoseconds.
 } // namespace
 
 R3BTofdCal2Histo::R3BTofdCal2Histo()
@@ -429,8 +429,10 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                                            para->GetPar4Walk(),
                                            para->GetPar5Walk());
 
-                    auto posToT =
-                        para->GetLambda() * log((top_tot + para->GetToTOffset2()) / (bot_tot + para->GetToTOffset1()));
+                    // auto posToT =
+                    //    para->GetLambda() * log((top_tot + para->GetToTOffset2()) / (bot_tot +
+                    //    para->GetToTOffset1()));
+                    auto posToT = log((top_tot + para->GetToTOffset2()) / (bot_tot + para->GetToTOffset1()));
 
                     // create histograms
                     CreateHistograms(iPlane, iBar);
@@ -621,7 +623,7 @@ void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
         char strName[255];
         sprintf(strName, "SqrtQ_vs_PosToT_Plane_%d_Bar_%d", iPlane, iBar);
         fhSqrtQvsPosToT[iPlane - 1][iBar - 1] =
-            new TH2F(strName, "", 20000, -100, 100, max_charge * 4, 0., max_charge * 4);
+            new TH2F(strName, "", 2000, -2, 2, max_charge * 4, 0., max_charge * 4); // 20000 -100 100
         fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("sqrt(PM1*PM2)");
         fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position from ToT in cm");
     }
@@ -637,7 +639,7 @@ void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
     {
         char strName[255];
         sprintf(strName, "Q_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-        fhQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, max_charge * 2, 0., max_charge);
+        fhQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 20000, -100, 100, max_charge * 10, 0., max_charge);
         fhQvsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Charge");
         fhQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position in cm");
     }

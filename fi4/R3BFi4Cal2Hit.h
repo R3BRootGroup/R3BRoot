@@ -19,7 +19,7 @@
 class R3BFi4Cal2Hit : public R3BBunchedFiberCal2Hit
 {
   public:
-    R3BFi4Cal2Hit(Bool_t, Int_t = 1);
+    R3BFi4Cal2Hit(Bool_t, Bool_t, Bool_t, Int_t = 1);
     virtual ~R3BFi4Cal2Hit();
     UInt_t FixMistake(UInt_t);
 
