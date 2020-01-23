@@ -1,7 +1,19 @@
-// ----------------------------------------------------------
-// ----- Change hit parameters for TOFD        -----
-// -----                         -----
-// ---------------------------------------------------------
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+// ------------------------------------------------------
+// -----       Change hit parameters for TOFD       -----
+// -----         Created Sep 2019 by L.Bott         -----
+// ------------------------------------------------------
 
 #ifndef R3BTOFDCHANGEPAR_H
 #define R3BTOFDCHANGEPAR_H
@@ -120,20 +132,21 @@ class R3BTofdChangePar : public FairTask
      */
     virtual void changeAll0(Int_t plane, Int_t bar, Int_t pm, Double_t*);
     virtual void changeOffset(Int_t plane, Int_t bar, Int_t pm, Double_t*);
+    virtual void changeToTOffset(Int_t plane, Int_t bar, Int_t pm, Double_t*);
     virtual void changeSync(Int_t plane, Int_t bar, Int_t pm, Double_t*);
     virtual void changeVeff(Int_t plane, Int_t bar, Int_t pm, Double_t*);
+    virtual void changeLambda(Int_t plane, Int_t bar, Int_t pm, Double_t*);
     virtual void changeDoubleExp(Int_t plane, Int_t bar, Int_t pm, Double_t*);
     virtual void changeZ(Int_t plane, Int_t bar, Int_t pm, Double_t*);
+    virtual void changeWalk(Int_t plane, Int_t bar, Int_t pm, Double_t*);
 
   private:
     Int_t fUpdateRate; /**< An update rate. */
     Int_t fMinStats;   /**< Minimum statistics required per module. */
     Int_t fTrigger;    /**< Trigger value. */
-
     UInt_t fNofPlanes;       /**< Number of planes. */
     UInt_t fPaddlesPerPlane; /**< Number of bars per plane. */
     UInt_t fNofModules;      /**< Total number of modules (=edges) to calibrate */
-
     Int_t fNEvents;             /**< Event counter. */
     R3BTofdHitPar* fCal_Par;    /**< Parameter container. */
     TClonesArray* fCalItemsLos; /**< Array with cal items. */

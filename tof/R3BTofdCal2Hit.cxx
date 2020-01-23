@@ -11,7 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 // ------------------------------------------------------------
-// -----                  R3BTofdCal2Hit                  -----
+// -----                 R3BTofdCal2Hit                   -----
 // -----            Created May 2016 by M.Heil            -----
 // -----           Modified Dec 2019 by L.Bott            -----
 // ------------------------------------------------------------
@@ -201,7 +201,6 @@ R3BTofdCal2Hit::~R3BTofdCal2Hit()
                     delete fhQvsQ[i][2 * j];
                 if (fhQvsQ[i][2 * j + 1])
                     delete fhQvsQ[i][2 * j + 1];
-
                 if (fhQvsTof[i][j])
                     delete fhQvsTof[i][j];
                 if (fhTvsTof[i][j])
