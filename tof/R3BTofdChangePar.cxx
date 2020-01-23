@@ -1,7 +1,19 @@
-// ----------------------------------------------------------------
-// -----            R3BTofdChangePar             -----
-// -----       							           -----
-// ----------------------------------------------------------------
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+// --------------------------------------------------
+// -----            R3BTofdChangePar            -----
+// -----       Created Sep 2019 by L.Bott       -----
+// --------------------------------------------------
 
 /* Some notes:
  *
@@ -103,11 +115,6 @@ InitStatus R3BTofdChangePar::Init()
         LOG(ERROR) << "R3BTofdChangePar::Init() Number of modules not set. ";
         return kFATAL;
     }
-    /*
-    fCalItemsLos = (TClonesArray*)rm->GetObject("LosCal");
-    if (NULL == fCalItemsLos)
-        LOG(fatal) << "Branch LosCal not found";
-    */
 
     return kSUCCESS;
 }
@@ -131,7 +138,7 @@ void R3BTofdChangePar::FinishEvent() {}
 void R3BTofdChangePar::FinishTask()
 {
     // set new parameters
-    Double_t pars[4];
+    Double_t pars[5];
     Double_t parameter;
     Int_t plane, pplane, bar, pbar, pm, ppm, p, pp, i;
     if (fParaFile != "")
@@ -145,7 +152,7 @@ void R3BTofdChangePar::FinishTask()
         i = 0;
         while (a_file.good())
         {
-            for (Int_t a = 0; a < 4; a++)
+            for (Int_t a = 0; a < 5; a++)
             {
                 pars[a] = 0.;
             }
@@ -168,13 +175,19 @@ void R3BTofdChangePar::FinishTask()
             if (p == 1)
                 changeOffset(plane, bar, pm, pars);
             if (p == 2)
-                changeSync(plane, bar, pm, pars);
+                changeToTOffset(plane, bar, pm, pars);
             if (p == 3)
-                changeVeff(plane, bar, pm, pars);
+                changeSync(plane, bar, pm, pars);
             if (p == 4)
-                changeDoubleExp(plane, bar, pm, pars);
+                changeVeff(plane, bar, pm, pars);
             if (p == 5)
+                changeLambda(plane, bar, pm, pars);
+            if (p == 6)
+                changeDoubleExp(plane, bar, pm, pars);
+            if (p == 7)
                 changeZ(plane, bar, pm, pars);
+            if (p == 8)
+                changeWalk(plane, bar, pm, pars);
         }
         a_file.close();
     }
@@ -186,8 +199,11 @@ void R3BTofdChangePar::changeAll0(Int_t plane, Int_t bar, Int_t pm, Double_t* pa
     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(plane, bar);
     par->SetOffset1(0.);
     par->SetOffset2(0.);
-    par->SetVeff(0.);
+    par->SetToTOffset1(0.);
+    par->SetToTOffset2(0.);
     par->SetSync(0.);
+    par->SetVeff(0.);
+    par->SetLambda(0.);
     par->SetPar1a(0.);
     par->SetPar1b(0.);
     par->SetPar1c(0.);
@@ -202,12 +218,18 @@ void R3BTofdChangePar::changeAll0(Int_t plane, Int_t bar, Int_t pm, Double_t* pa
     par->SetPar1za(0.);
     par->SetPar1zb(0.);
     par->SetPar1zc(0.);
+    par->SetPar1Walk(0.);
+    par->SetPar2Walk(0.);
+    par->SetPar3Walk(0.);
+    par->SetPar4Walk(0.);
+    par->SetPar5Walk(0.);
 }
 
 void R3BTofdChangePar::changeOffset(Int_t plane, Int_t bar, Int_t pm, Double_t* pars)
 {
     Double_t para1[4];
     Double_t para2[3];
+    Double_t para3[5];
     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(plane, bar);
     if (pm == 1)
     {
@@ -221,17 +243,17 @@ void R3BTofdChangePar::changeOffset(Int_t plane, Int_t bar, Int_t pm, Double_t* 
             pars[0] = par->GetOffset2();
         par->SetOffset2(pars[0]);
     }
-    Double_t veff = par->GetVeff();
+    Double_t ToTOffset1 = par->GetToTOffset1();
+    Double_t ToTOffset2 = par->GetToTOffset2();
     Double_t sync = par->GetSync();
+    Double_t veff = par->GetVeff();
+    Double_t lambda = par->GetLambda();
     if (pm == 1)
     {
         para1[0] = par->GetPar1a();
         para1[1] = par->GetPar1b();
         para1[2] = par->GetPar1c();
         para1[3] = par->GetPar1d();
-        para2[0] = par->GetPar1za();
-        para2[1] = par->GetPar1zb();
-        para2[2] = par->GetPar1zc();
     }
     else
     {
@@ -239,32 +261,85 @@ void R3BTofdChangePar::changeOffset(Int_t plane, Int_t bar, Int_t pm, Double_t* 
         para1[1] = par->GetPar2b();
         para1[2] = par->GetPar2c();
         para1[3] = par->GetPar2d();
-        para2[0] = par->GetPar1za();
-        para2[1] = par->GetPar1zb();
-        para2[2] = par->GetPar1zc();
     }
+    para2[0] = par->GetPar1za();
+    para2[1] = par->GetPar1zb();
+    para2[2] = par->GetPar1zc();
+    para3[0] = par->GetPar1Walk();
+    para3[1] = par->GetPar2Walk();
+    para3[2] = par->GetPar3Walk();
+    para3[3] = par->GetPar4Walk();
+    para3[4] = par->GetPar5Walk();
+}
+
+void R3BTofdChangePar::changeToTOffset(Int_t plane, Int_t bar, Int_t pm, Double_t* pars)
+{
+    Double_t para1[4];
+    Double_t para2[3];
+    Double_t para3[5];
+    R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(plane, bar);
+    Double_t offset1 = par->GetOffset1();
+    Double_t offset2 = par->GetOffset2();
+    if (pm == 1)
+    {
+        if (pars[0] == 0.)
+            pars[0] = par->GetToTOffset1();
+        par->SetToTOffset1(pars[0]);
+    }
+    if (pm == 2)
+    {
+        if (pars[0] == 0.)
+            pars[0] = par->GetToTOffset2();
+        par->SetToTOffset2(pars[0]);
+    }
+    Double_t sync = par->GetSync();
+    Double_t veff = par->GetVeff();
+    Double_t lambda = par->GetLambda();
+    if (pm == 1)
+    {
+        para1[0] = par->GetPar1a();
+        para1[1] = par->GetPar1b();
+        para1[2] = par->GetPar1c();
+        para1[3] = par->GetPar1d();
+    }
+    else
+    {
+        para1[0] = par->GetPar2a();
+        para1[1] = par->GetPar2b();
+        para1[2] = par->GetPar2c();
+        para1[3] = par->GetPar2d();
+    }
+    para2[0] = par->GetPar1za();
+    para2[1] = par->GetPar1zb();
+    para2[2] = par->GetPar1zc();
+    para3[0] = par->GetPar1Walk();
+    para3[1] = par->GetPar2Walk();
+    para3[2] = par->GetPar3Walk();
+    para3[3] = par->GetPar4Walk();
+    para3[4] = par->GetPar5Walk();
 }
 
 void R3BTofdChangePar::changeSync(Int_t plane, Int_t bar, Int_t pm, Double_t* pars)
 {
     Double_t para1[4];
     Double_t para2[3];
+    Double_t para3[5];
     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(plane, bar);
     Double_t offset1 = par->GetOffset1();
     Double_t offset2 = par->GetOffset2();
-    Double_t veff = par->GetVeff();
+    Double_t ToTOffset1 = par->GetToTOffset1();
+    Double_t ToTOffset2 = par->GetToTOffset2();
     if (pars[0] == 0.)
         pars[0] = par->GetSync();
     par->SetSync(pars[0]);
+    Double_t veff = par->GetVeff();
+    Double_t lambda = par->GetLambda();
     if (pm == 1)
     {
         para1[0] = par->GetPar1a();
         para1[1] = par->GetPar1b();
         para1[2] = par->GetPar1c();
         para1[3] = par->GetPar1d();
-        para2[0] = par->GetPar1za();
-        para2[1] = par->GetPar1zb();
-        para2[2] = par->GetPar1zc();
     }
     else
     {
@@ -272,31 +347,38 @@ void R3BTofdChangePar::changeSync(Int_t plane, Int_t bar, Int_t pm, Double_t* pa
         para1[1] = par->GetPar2b();
         para1[2] = par->GetPar2c();
         para1[3] = par->GetPar2d();
-        para2[0] = par->GetPar1za();
-        para2[1] = par->GetPar1zb();
-        para2[2] = par->GetPar1zc();
     }
+    para2[0] = par->GetPar1za();
+    para2[1] = par->GetPar1zb();
+    para2[2] = par->GetPar1zc();
+    para3[0] = par->GetPar1Walk();
+    para3[1] = par->GetPar2Walk();
+    para3[2] = par->GetPar3Walk();
+    para3[3] = par->GetPar4Walk();
+    para3[4] = par->GetPar5Walk();
 }
+
 void R3BTofdChangePar::changeVeff(Int_t plane, Int_t bar, Int_t pm, Double_t* pars)
 {
     Double_t para1[4];
     Double_t para2[3];
+    Double_t para3[5];
     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(plane, bar);
     Double_t offset1 = par->GetOffset1();
     Double_t offset2 = par->GetOffset2();
+    Double_t ToTOffset1 = par->GetToTOffset1();
+    Double_t ToTOffset2 = par->GetToTOffset2();
+    Double_t sync = par->GetSync();
     if (pars[0] == 0.)
         pars[0] = par->GetVeff();
     par->SetVeff(pars[0]);
-    Double_t sync = par->GetSync();
+    Double_t lambda = par->GetLambda();
     if (pm == 1)
     {
         para1[0] = par->GetPar1a();
         para1[1] = par->GetPar1b();
         para1[2] = par->GetPar1c();
         para1[3] = par->GetPar1d();
-        para2[0] = par->GetPar1za();
-        para2[1] = par->GetPar1zb();
-        para2[2] = par->GetPar1zc();
     }
     else
     {
@@ -304,19 +386,68 @@ void R3BTofdChangePar::changeVeff(Int_t plane, Int_t bar, Int_t pm, Double_t* pa
         para1[1] = par->GetPar2b();
         para1[2] = par->GetPar2c();
         para1[3] = par->GetPar2d();
-        para2[0] = par->GetPar1za();
-        para2[1] = par->GetPar1zb();
-        para2[2] = par->GetPar1zc();
     }
+    para2[0] = par->GetPar1za();
+    para2[1] = par->GetPar1zb();
+    para2[2] = par->GetPar1zc();
+    para3[0] = par->GetPar1Walk();
+    para3[1] = par->GetPar2Walk();
+    para3[2] = par->GetPar3Walk();
+    para3[3] = par->GetPar4Walk();
+    para3[4] = par->GetPar5Walk();
 }
-void R3BTofdChangePar::changeDoubleExp(Int_t plane, Int_t bar, Int_t pm, Double_t* pars)
+
+void R3BTofdChangePar::changeLambda(Int_t plane, Int_t bar, Int_t pm, Double_t* pars)
 {
-    Double_t para[3];
+    Double_t para1[4];
+    Double_t para2[3];
+    Double_t para3[5];
     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(plane, bar);
     Double_t offset1 = par->GetOffset1();
     Double_t offset2 = par->GetOffset2();
-    Double_t veff = par->GetVeff();
+    Double_t ToTOffset1 = par->GetToTOffset1();
+    Double_t ToTOffset2 = par->GetToTOffset2();
     Double_t sync = par->GetSync();
+    Double_t veff = par->GetVeff();
+    if (pars[0] == 0.)
+        pars[0] = par->GetLambda();
+    par->SetLambda(pars[0]);
+    if (pm == 1)
+    {
+        para1[0] = par->GetPar1a();
+        para1[1] = par->GetPar1b();
+        para1[2] = par->GetPar1c();
+        para1[3] = par->GetPar1d();
+    }
+    else
+    {
+        para1[0] = par->GetPar2a();
+        para1[1] = par->GetPar2b();
+        para1[2] = par->GetPar2c();
+        para1[3] = par->GetPar2d();
+    }
+    para2[0] = par->GetPar1za();
+    para2[1] = par->GetPar1zb();
+    para2[2] = par->GetPar1zc();
+    para3[0] = par->GetPar1Walk();
+    para3[1] = par->GetPar2Walk();
+    para3[2] = par->GetPar3Walk();
+    para3[3] = par->GetPar4Walk();
+    para3[4] = par->GetPar5Walk();
+}
+
+void R3BTofdChangePar::changeDoubleExp(Int_t plane, Int_t bar, Int_t pm, Double_t* pars)
+{
+    Double_t para1[3];
+    Double_t para2[5];
+    R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(plane, bar);
+    Double_t offset1 = par->GetOffset1();
+    Double_t offset2 = par->GetOffset2();
+    Double_t ToTOffset1 = par->GetToTOffset1();
+    Double_t ToTOffset2 = par->GetToTOffset2();
+    Double_t sync = par->GetSync();
+    Double_t veff = par->GetVeff();
+    Double_t lambda = par->GetLambda();
     if (pars[0] == 0.)
         pars[0] = par->GetPar1a();
     if (pars[1] == 0.)
@@ -331,9 +462,6 @@ void R3BTofdChangePar::changeDoubleExp(Int_t plane, Int_t bar, Int_t pm, Double_
         par->SetPar1b(pars[1]);
         par->SetPar1c(pars[2]);
         par->SetPar1d(pars[3]);
-        para[0] = par->GetPar1za();
-        para[1] = par->GetPar1zb();
-        para[2] = par->GetPar1zc();
     }
     else
     {
@@ -341,32 +469,93 @@ void R3BTofdChangePar::changeDoubleExp(Int_t plane, Int_t bar, Int_t pm, Double_
         par->SetPar2b(pars[1]);
         par->SetPar2c(pars[2]);
         par->SetPar2d(pars[3]);
-        para[0] = par->GetPar1za();
-        para[1] = par->GetPar1zb();
-        para[2] = par->GetPar1zc();
     }
+    para1[0] = par->GetPar1za();
+    para1[1] = par->GetPar1zb();
+    para1[2] = par->GetPar1zc();
+    para2[0] = par->GetPar1Walk();
+    para2[1] = par->GetPar2Walk();
+    para2[2] = par->GetPar3Walk();
+    para2[3] = par->GetPar4Walk();
+    para2[4] = par->GetPar5Walk();
 }
+
 void R3BTofdChangePar::changeZ(Int_t plane, Int_t bar, Int_t pm, Double_t* pars)
 {
-    Double_t para[4];
+    Double_t para1[4];
+    Double_t para2[5];
     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(plane, bar);
     Double_t offset1 = par->GetOffset1();
     Double_t offset2 = par->GetOffset2();
-    Double_t veff = par->GetVeff();
+    Double_t ToTOffset1 = par->GetToTOffset1();
+    Double_t ToTOffset2 = par->GetToTOffset2();
     Double_t sync = par->GetSync();
+    Double_t veff = par->GetVeff();
+    Double_t lambda = par->GetLambda();
     if (pars[0] == 0.)
         pars[0] = par->GetPar1za();
     if (pars[1] == 0.)
         pars[1] = par->GetPar1zb();
     if (pars[2] == 0.)
         pars[2] = par->GetPar1zc();
-    para[0] = par->GetPar1a();
-    para[1] = par->GetPar1b();
-    para[2] = par->GetPar1c();
-    para[3] = par->GetPar1d();
+    para1[0] = par->GetPar1a();
+    para1[1] = par->GetPar1b();
+    para1[2] = par->GetPar1c();
+    para1[3] = par->GetPar1d();
     par->SetPar1za(pars[0]);
     par->SetPar1zb(pars[1]);
     par->SetPar1zc(pars[2]);
+    para2[0] = par->GetPar1Walk();
+    para2[1] = par->GetPar2Walk();
+    para2[2] = par->GetPar3Walk();
+    para2[3] = par->GetPar4Walk();
+    para2[4] = par->GetPar5Walk();
+}
+
+void R3BTofdChangePar::changeWalk(Int_t plane, Int_t bar, Int_t pm, Double_t* pars)
+{
+    Double_t para1[4];
+    Double_t para2[3];
+    R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(plane, bar);
+    Double_t offset1 = par->GetOffset1();
+    Double_t offset2 = par->GetOffset2();
+    Double_t ToTOffset1 = par->GetToTOffset1();
+    Double_t ToTOffset2 = par->GetToTOffset2();
+    Double_t sync = par->GetSync();
+    Double_t veff = par->GetVeff();
+    Double_t lambda = par->GetLambda();
+    if (pm == 1)
+    {
+        para1[0] = par->GetPar1a();
+        para1[1] = par->GetPar1b();
+        para1[2] = par->GetPar1c();
+        para1[3] = par->GetPar1d();
+    }
+    else
+    {
+        para1[0] = par->GetPar2a();
+        para1[1] = par->GetPar2b();
+        para1[2] = par->GetPar2c();
+        para1[3] = par->GetPar2d();
+    }
+    para2[0] = par->GetPar1za();
+    para2[1] = par->GetPar1zb();
+    para2[2] = par->GetPar1zc();
+    if (pars[0] == 0.)
+        pars[0] = par->GetPar1Walk();
+    if (pars[1] == 0.)
+        pars[1] = par->GetPar2Walk();
+    if (pars[2] == 0.)
+        pars[2] = par->GetPar3Walk();
+    if (pars[3] == 0.)
+        pars[3] = par->GetPar4Walk();
+    if (pars[4] == 0.)
+        pars[4] = par->GetPar5Walk();
+    par->SetPar1Walk(pars[0]);
+    par->SetPar2Walk(pars[1]);
+    par->SetPar3Walk(pars[2]);
+    par->SetPar4Walk(pars[3]);
+    par->SetPar5Walk(pars[4]);
 }
 
 ClassImp(R3BTofdChangePar)
