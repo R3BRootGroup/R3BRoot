@@ -14,6 +14,7 @@
 // ----------------------------------------------------------------
 // -----        R3BAmsMappingPar source file                  -----
 // -----    Created 20/01/20  by J.L. Rodriguez-Sanchez       -----
+// -----    for the info from the lookup table		      -----
 // ----------------------------------------------------------------
 
 #include "R3BAmsMappingPar.h"

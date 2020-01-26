@@ -104,10 +104,9 @@ class R3BCalifaDemoOnlineSpectra : public FairTask
     /**
      * Method to reset histograms
      */
-    void Reset_CALIFA_Histo();
+    void Reset_CALIFA_DEMO_Histo();
 
   private:
-
     /**
      * Method to change histogram scales
      */
@@ -127,7 +126,6 @@ class R3BCalifaDemoOnlineSpectra : public FairTask
      * Mapping s444 crystals
      */
     Int_t Map_For_s444(Int_t val);
-
 
     Int_t fMapHistos_max;
     Int_t fMapHistos_bins;

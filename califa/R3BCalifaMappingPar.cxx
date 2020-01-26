@@ -21,48 +21,60 @@
 
 #include <iostream>
 
-using std::cout;
-using std::endl;
-
 R3BCalifaMappingPar::R3BCalifaMappingPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
+    , fNumCrystals(4864)
 {
-    fNumCrystals = 4864;
-    fHalf = new TArrayI(4864);
-    fRing = new TArrayI(4864);
-    fPreamp = new TArrayI(4864);
-    fChannel = new TArrayI(4864);
-    fCrystal_type = new TArrayI(4864);
-    fApd_number = new TArrayI(4864);
-    fVoltage = new TArrayF(4864);
-    fFebex_slot = new TArrayI(4864);
-    fFebex_mod = new TArrayI(4864);
-    fFebex_channel = new TArrayI(4864);
-    fLab = new TArrayI(4864);
-    fMrcc_module = new TArrayI(4864);
-    fMrcc_bus = new TArrayI(4864);
-    fMrcc_preamp = new TArrayI(4864);
-    fIn_use = new TArrayI(4864);
+    fHalf = new TArrayI(fNumCrystals);
+    fRing = new TArrayI(fNumCrystals);
+    fPreamp = new TArrayI(fNumCrystals);
+    fChannel = new TArrayI(fNumCrystals);
+    fCrystal_type = new TArrayI(fNumCrystals);
+    fApd_number = new TArrayI(fNumCrystals);
+    fVoltage = new TArrayF(fNumCrystals);
+    fFebex_slot = new TArrayI(fNumCrystals);
+    fFebex_mod = new TArrayI(fNumCrystals);
+    fFebex_channel = new TArrayI(fNumCrystals);
+    fLab = new TArrayI(fNumCrystals);
+    fMrcc_module = new TArrayI(fNumCrystals);
+    fMrcc_bus = new TArrayI(fNumCrystals);
+    fMrcc_preamp = new TArrayI(fNumCrystals);
+    fIn_use = new TArrayI(fNumCrystals);
 }
 
 R3BCalifaMappingPar::~R3BCalifaMappingPar()
 {
     clear();
-    delete fHalf;
-    delete fRing;
-    delete fPreamp;
-    delete fChannel;
-    delete fCrystal_type;
-    delete fApd_number;
-    delete fVoltage;
-    delete fFebex_slot;
-    delete fFebex_mod;
-    delete fFebex_channel;
-    delete fLab;
-    delete fMrcc_module;
-    delete fMrcc_bus;
-    delete fMrcc_preamp;
-    delete fIn_use;
+    if (fHalf)
+        delete fHalf;
+    if (fRing)
+        delete fRing;
+    if (fPreamp)
+        delete fPreamp;
+    if (fChannel)
+        delete fChannel;
+    if (fCrystal_type)
+        delete fCrystal_type;
+    if (fApd_number)
+        delete fApd_number;
+    if (fVoltage)
+        delete fVoltage;
+    if (fFebex_slot)
+        delete fFebex_slot;
+    if (fFebex_mod)
+        delete fFebex_mod;
+    if (fFebex_channel)
+        delete fFebex_channel;
+    if (fLab)
+        delete fLab;
+    if (fMrcc_module)
+        delete fMrcc_module;
+    if (fMrcc_bus)
+        delete fMrcc_bus;
+    if (fMrcc_preamp)
+        delete fMrcc_preamp;
+    if (fIn_use)
+        delete fIn_use;
 }
 
 void R3BCalifaMappingPar::clear()
@@ -220,44 +232,44 @@ void R3BCalifaMappingPar::printParams()
 {
     LOG(INFO) << "R3BCalifaMappingPar: Califa Mapping Parameters: ";
 
-    cout << "crystal_id"
-         << " "
-         << "half"
-         << " "
-         << "ring"
-         << " "
-         << "preamp"
-         << " "
-         << "channel"
-         << " "
-         << "crystal_type"
-         << " "
-         << "apd_number"
-         << " "
-         << "voltage"
-         << " "
-         << "febex_slot"
-         << " "
-         << "febex_mod"
-         << " "
-         << "febex_channel"
-         << " "
-         << "lab"
-         << " "
-         << "mrcc_module"
-         << " "
-         << "mrcc_bus"
-         << " "
-         << "mrcc_preamp"
-         << " "
-         << "in_use" << endl;
+    LOG(INFO) << "crystal_id"
+              << " "
+              << "half"
+              << " "
+              << "ring"
+              << " "
+              << "preamp"
+              << " "
+              << "channel"
+              << " "
+              << "crystal_type"
+              << " "
+              << "apd_number"
+              << " "
+              << "voltage"
+              << " "
+              << "febex_slot"
+              << " "
+              << "febex_mod"
+              << " "
+              << "febex_channel"
+              << " "
+              << "lab"
+              << " "
+              << "mrcc_module"
+              << " "
+              << "mrcc_bus"
+              << " "
+              << "mrcc_preamp"
+              << " "
+              << "in_use";
     for (Int_t i = 0; i < fNumCrystals; i++)
     {
-        cout << i + 1 << " " << fHalf->GetAt(i) << " " << fRing->GetAt(i) << " " << fPreamp->GetAt(i) << " "
-             << fChannel->GetAt(i) << " " << fCrystal_type->GetAt(i) << " " << fApd_number->GetAt(i) << " "
-             << fVoltage->GetAt(i) << " " << fFebex_slot->GetAt(i) << " " << fFebex_mod->GetAt(i) << " "
-             << fFebex_channel->GetAt(i) << " " << fLab->GetAt(i) << " " << fMrcc_module->GetAt(i) << " "
-             << fMrcc_bus->GetAt(i) << " " << fMrcc_preamp->GetAt(i) << " " << fIn_use->GetAt(i) << endl;
+        LOG(INFO) << i + 1 << " " << fHalf->GetAt(i) << " " << fRing->GetAt(i) << " " << fPreamp->GetAt(i) << " "
+                  << fChannel->GetAt(i) << " " << fCrystal_type->GetAt(i) << " " << fApd_number->GetAt(i) << " "
+                  << fVoltage->GetAt(i) << " " << fFebex_slot->GetAt(i) << " " << fFebex_mod->GetAt(i) << " "
+                  << fFebex_channel->GetAt(i) << " " << fLab->GetAt(i) << " " << fMrcc_module->GetAt(i) << " "
+                  << fMrcc_bus->GetAt(i) << " " << fMrcc_preamp->GetAt(i) << " " << fIn_use->GetAt(i);
     }
 }
 

@@ -176,7 +176,6 @@ class R3BCalifaOnlineSpectra : public FairTask
     Int_t fOrderFebexPreamp[Nb_PreampCh]; /**< Selector for febex or preamp sequence. */
 
     TString fCalifaFile;    /**< Config file name. */
-    Bool_t fCalON;          /**< Cal selector. */
     Int_t fMaxEnergyBarrel; /**< Max. energy for Barrel histograms at CAL level. */
     Int_t fMaxEnergyIphos;  /**< Max. energy for Iphos histograms at CAL level. */
     Bool_t fLogScale;       /**< Selecting scale. */

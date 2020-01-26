@@ -21,21 +21,19 @@
 
 #include <iostream>
 
-using std::cout;
-using std::endl;
-
 R3BCalifaCrystalCalPar::R3BCalifaCrystalCalPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
+    , fNumCrystals(4864)
+    , fNumParamsFit(2) // pol1
 {
-    fCryCalParams = new TArrayF(1030); // 512crystals*2CalibrationParameters
-    fNumCrystals = 515;
-    fNumParamsFit = 2; // pol1
+    fCryCalParams = new TArrayF(fNumCrystals * fNumParamsFit);
 }
 
 R3BCalifaCrystalCalPar::~R3BCalifaCrystalCalPar()
 {
     clear();
-    delete fCryCalParams;
+    if (fCryCalParams)
+        delete fCryCalParams;
 }
 
 void R3BCalifaCrystalCalPar::clear()
@@ -100,10 +98,10 @@ void R3BCalifaCrystalCalPar::printParams()
 
     for (Int_t i = 0; i < fNumCrystals; i++)
     {
-        cout << "Califa Crystal number: " << i + 1 << endl;
+        LOG(INFO) << "Califa Crystal number: " << i + 1;
         for (Int_t j = 0; j < fNumParamsFit; j++)
         {
-            cout << "FitParam(" << j << ") = " << fCryCalParams->GetAt(i * fNumParamsFit + j) << endl;
+            LOG(INFO) << "FitParam(" << j << ") = " << fCryCalParams->GetAt(i * fNumParamsFit + j);
         }
     }
 }

@@ -596,7 +596,7 @@ InitStatus R3BCalifaDemoOnlineSpectra::Init()
     run->AddObject(mainfolCalifa);
 
     // Register command to reset histograms
-    run->GetHttpServer()->RegisterCommand("Reset_Califa", Form("/Objects/%s/->Reset_CALIFA_Histo()", GetName()));
+    run->GetHttpServer()->RegisterCommand("Reset_Califa", Form("/Objects/%s/->Reset_CALIFA_DEMO_Histo()", GetName()));
     // Register command to change the histogram scales (Log/Lineal)
     run->GetHttpServer()->RegisterCommand("Log_Califa", Form("/Objects/%s/->Log_CALIFA_Histo()", GetName()));
     // Register command for moving between Febex and Preamp channels
@@ -612,7 +612,7 @@ InitStatus R3BCalifaDemoOnlineSpectra::Init()
     return kSUCCESS;
 }
 
-void R3BCalifaDemoOnlineSpectra::Reset_CALIFA_Histo()
+void R3BCalifaDemoOnlineSpectra::Reset_CALIFA_DEMO_Histo()
 {
     LOG(INFO) << "R3BCalifaDemoOnlineSpectra::Reset_CALIFA_Histo";
 
