@@ -181,6 +181,8 @@ class R3BCalifaOnlineSpectra : public FairTask
     Bool_t fLogScale;       /**< Selecting scale. */
     Bool_t fRaw2Cal;        /**< Mapped or Cal selector. */
     Bool_t fFebex2Preamp;   /**< Febex or Preamp selector. */
+    Int_t fFebexInfo[Nb_Sides][Nb_Rings][Nb_Preamps]
+                    [4]; /**< Febex slot and module info: 0 slot and 1 module, (PR) 2 slot and 3 module. */
 
     // Canvas
     TCanvas* cCalifaMult;

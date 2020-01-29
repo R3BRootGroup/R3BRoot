@@ -18,8 +18,11 @@
 
 // ROOT headers
 #include "TClonesArray.h"
+#include "TDecompSVD.h"
 #include "TMath.h"
+#include "TMatrixD.h"
 #include "TRandom.h"
+#include "TVectorD.h"
 
 // Fair headers
 #include "FairLogger.h"
@@ -39,11 +42,15 @@
 R3BMusicCal2Hit::R3BMusicCal2Hit()
     : FairTask("R3B Music Hit Calibrator", 1)
     , fNumAnodes(8)
+    , fNumAnodesAngleFit(0)
     , fNumParams(2)
-    , CalParams(NULL)
+    , CalZParams(NULL)
     , fCal_Par(NULL)
     , fMusicHitDataCA(NULL)
     , fMusicCalDataCA(NULL)
+    , fZ0(0)
+    , fZ1(0)
+    , fZ2(0)
     , fOnline(kFALSE)
 {
 }
@@ -52,11 +59,15 @@ R3BMusicCal2Hit::R3BMusicCal2Hit()
 R3BMusicCal2Hit::R3BMusicCal2Hit(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fNumAnodes(8)
+    , fNumAnodesAngleFit(0)
     , fNumParams(2)
-    , CalParams(NULL)
+    , CalZParams(NULL)
     , fCal_Par(NULL)
     , fMusicHitDataCA(NULL)
     , fMusicCalDataCA(NULL)
+    , fZ0(0)
+    , fZ1(0)
+    , fZ2(0)
     , fOnline(kFALSE)
 {
 }
@@ -73,7 +84,6 @@ R3BMusicCal2Hit::~R3BMusicCal2Hit()
 
 void R3BMusicCal2Hit::SetParContainers()
 {
-
     // Parameter Container
     // Reading MusicCalPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
@@ -95,25 +105,40 @@ void R3BMusicCal2Hit::SetParContainers()
 
 void R3BMusicCal2Hit::SetParameter()
 {
-
     //--- Parameter Container ---
-    fNumParams = fCal_Par->GetNumParametersFit(); // Number of Parameters
+    fNumAnodes = fCal_Par->GetNumAnodes(); // Number of anodes
 
-    LOG(INFO) << "R3BMusicCal2Hit: Nb parameters from pedestal fit: " << fNumParams;
+    // Anodes that don't work set to zero
+    for (Int_t i = 0; i < fNumAnodes; i++)
+    {
+        fStatusAnodes[i] = fCal_Par->GetInUse(i + 1);
+    }
 
-    for (Int_t i = 0; i < 8; i++)
-        StatusAnodes[i] = 1;
-    // Anodes that don't work
-    StatusAnodes[3] = 0;
-    StatusAnodes[7] = 0;
-
-    CalParams = new TArrayF();
-    Int_t array_size = fNumParams;
-    CalParams->Set(array_size);
-    CalParams = fCal_Par->GetDetectorHitParams(); // Array with the Cal parameters
+    fNumParams = fCal_Par->GetNumParZFit(); // Number of Parameters
+    LOG(INFO) << "R3BMusicCal2Hit: Nb parameters for charge-Z: " << fNumParams;
+    CalZParams = new TArrayF();
+    CalZParams->Set(fNumParams);
+    CalZParams = fCal_Par->GetZHitPar(); // Array with the Cal parameters
 
     // Parameters detector
-    LOG(INFO) << "R3BMusicCal2Hit Parameters:" << CalParams->GetAt(0) << " : " << CalParams->GetAt(1);
+    if (fNumParams == 2)
+    {
+        LOG(INFO) << "R3BMusicCal2Hit parameters for charge-Z:" << CalZParams->GetAt(0) << " : "
+                  << CalZParams->GetAt(1);
+        fZ0 = CalZParams->GetAt(0);
+        fZ1 = CalZParams->GetAt(1);
+    }
+    else if (fNumParams == 3)
+    {
+        LOG(INFO) << "R3BMusicCal2Hit parameters for charge-Z:" << CalZParams->GetAt(0) << " : " << CalZParams->GetAt(1)
+                  << " : " << CalZParams->GetAt(2);
+        fZ0 = CalZParams->GetAt(0);
+        fZ1 = CalZParams->GetAt(1);
+        fZ2 = CalZParams->GetAt(2);
+    }
+    else
+        LOG(INFO) << "R3BMusicCal2Hit parameters for charge-Z cannot be used here, number of parameters: "
+                  << fNumParams;
 }
 
 // -----   Public method Init   --------------------------------------------
@@ -175,36 +200,60 @@ void R3BMusicCal2Hit::Exec(Option_t* option)
     R3BMusicCalData** CalDat = new R3BMusicCalData*[nHits];
 
     Int_t secId, anodeId;
-    Double_t energyperanode[fNumAnodes];
+    Double_t energyperanode[fNumAnodes], dt[fNumAnodes], good_dt[fNumAnodes];
     Int_t nbdet = 0;
 
     for (Int_t j = 0; j < fNumAnodes; j++)
-        energyperanode[j] = 0;
+    {
+        energyperanode[j] = 0.;
+        dt[j] = 0.;
+    }
+
+    for (Int_t j = 0; j < fNumAnodes; j++)
+    {
+        good_dt[j] = 0.;
+    }
 
     for (Int_t i = 0; i < nHits; i++)
     {
         CalDat[i] = (R3BMusicCalData*)(fMusicCalDataCA->At(i));
         anodeId = CalDat[i]->GetAnodeID();
         energyperanode[anodeId] = CalDat[i]->GetEnergy();
+        dt[anodeId] = CalDat[i]->GetDTime();
     }
 
-    Double_t nba = 0, a0 = 0., a1 = 0., theta = 0., Esum = 0.;
-
+    Double_t nba = 0., theta = 0., Esum = 0.;
     // calculate truncated dE from 8 anodes, MUSIC
+    fNumAnodesAngleFit = 0;
     for (Int_t j = 0; j < fNumAnodes; j++)
     {
-        if (energyperanode[j] > 0. && StatusAnodes[j] == 1)
+        if (energyperanode[j] > 0. && fStatusAnodes[j] == 1)
         {
             Esum = Esum + energyperanode[j];
+            good_dt[fNumAnodesAngleFit] = dt[j];
+            fPosAnodes[fNumAnodesAngleFit] = fCal_Par->GetAnodePos(j + 1);
+            fNumAnodesAngleFit++;
             nba++;
         }
     }
 
-    if (nba > 0 && Esum / nba > 0.)
+    // if(nba!=fNumAnodesAngleFit)LOG(ERROR) << "R3BMusicCal2Hit::nba("<< nba<<") and
+    // fNumAnodesAngleFit("<<fNumAnodesAngleFit <<") are different";
+
+    if (fNumAnodesAngleFit > 2 && Esum / nba > 0.)
     {
-        a0 = CalParams->GetAt(0);
-        a1 = CalParams->GetAt(1);
-        Double_t zhit = a0 + a1 * TMath::Sqrt(Esum / nba);
+        fPosZ.Use(fNumAnodesAngleFit, fPosAnodes);
+        TMatrixD A(fNumAnodesAngleFit, 2);
+        TMatrixDColumn(A, 0) = 1.0;
+        TMatrixDColumn(A, 1) = fPosZ;
+        TDecompSVD svd(A);
+        Bool_t ok;
+        TVectorD dt_r;
+        dt_r.Use(fNumAnodesAngleFit, good_dt);
+        TVectorD c_svd_r = svd.Solve(dt_r, ok);
+        theta = c_svd_r[1];
+
+        Double_t zhit = fZ0 + fZ1 * TMath::Sqrt(Esum / nba) + fZ2 * TMath::Sqrt(Esum / nba) * TMath::Sqrt(Esum / nba);
         if (zhit > 0)
             AddHitData(theta, zhit);
     }

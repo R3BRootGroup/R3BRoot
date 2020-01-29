@@ -22,6 +22,7 @@
 #include "FairParGenericSet.h" // for FairParGenericSet
 
 #include "TArrayF.h"
+#include "TArrayI.h"
 #include "TObjArray.h"
 #include "TObject.h"
 #include <TObjString.h>
@@ -53,18 +54,26 @@ class R3BMusicHitPar : public FairParGenericSet
     void printParams();
 
     /** Accessor functions **/
-    const Double_t GetNumParametersFit() { return fNumParamsFit; }
-    TArrayF* GetDetectorHitParams() { return fDetHitParams; }
+    const Int_t GetNumParZFit() { return fNumParamsZFit; }
+    const Int_t GetNumAnodes() { return fNumAnodes; }
+    const Int_t GetInUse(Int_t anode) { return fIn_use->GetAt(anode - 1); }
+    const Float_t GetAnodePos(Int_t anode) { return fAnode_pos->GetAt(anode - 1); }
+    TArrayF* GetZHitPar() { return fDetZHitParams; }
 
-    void SetNumParametersFit(Int_t numberParams) { fNumParamsFit = numberParams; }
-    void SetDetectorHitParams(Double_t cc, Int_t ii) { fDetHitParams->AddAt(cc, ii); }
+    void SetNumParZFit(Int_t nbParams) { fNumParamsZFit = nbParams; }
+    void SetNumAnodes(Int_t nbAnodes) { fNumAnodes = nbAnodes; }
+    void SetInUse(Int_t value, Int_t anode) { fIn_use->AddAt(value, anode - 1); }
+    void SetZHitPar(Double_t cc, Int_t ii) { fDetZHitParams->AddAt(cc, ii); }
+    void SetAnodePos(Float_t value, Int_t anode) { fAnode_pos->AddAt(value, anode - 1); }
 
     // Create more Methods if you need them!
 
   private:
-    TArrayF* fDetHitParams; // Calibration Parameters for detector
-    Int_t fNumParamsFit;    /* number of cal parameters in the fit
-                               gaus: A_fit & B_fit & C_fit*/
+    TArrayF* fDetZHitParams; // Calibration Parameters for charge Z
+    TArrayI* fIn_use;        // 1: anode ready, 0:otherwise
+    TArrayF* fAnode_pos;     // Position of each anode along the beam direction
+    Int_t fNumAnodes;        // Number of anodes
+    Int_t fNumParamsZFit;    // number of hit parameters in the fit for charge Z
 
     const R3BMusicHitPar& operator=(const R3BMusicHitPar&); /*< an assignment operator>*/
 

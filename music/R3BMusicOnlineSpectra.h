@@ -55,7 +55,7 @@ class R3BMusicOnlineSpectra : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BMusicOnlineSpectra(const char* name, Int_t iVerbose = 1);
+    R3BMusicOnlineSpectra(const TString& name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
@@ -98,6 +98,7 @@ class R3BMusicOnlineSpectra : public FairTask
 
   private:
     TClonesArray* fMappedItemsMus; /**< Array with mapped items. */
+    TClonesArray* fCalItemsMus;    /**< Array with cal items. */
     TClonesArray* fHitItemsMus;    /**< Array with hit items. */
 
     // check for trigger should be done globablly (somewhere else)
@@ -110,6 +111,7 @@ class R3BMusicOnlineSpectra : public FairTask
     TCanvas* cMusMap_E;
     TCanvas* cMusMap_EvsDT;
     TCanvas* cMusMap_DT;
+    TCanvas* cMusCal_Pos;
     TCanvas *cMusMap_ESum, *cMus_EsumvsDT, *cMusMap_ESum1, *cMusMap_ESum2, *cMusMap_DTvsDT;
     TCanvas* cMusMap_ESum_vs_diffDT;
 
@@ -125,10 +127,14 @@ class R3BMusicOnlineSpectra : public FairTask
     TH2F* fh2_Mus_EneRawVsDriftTime[NbAnodesMus];
     TH2F* fh2_Mus_DTvsDT[NbAnodesMus - 1];
     TH2F* fh2_Mus_ESum_vs_diffDT;
+
     // Histograms for Cal data
+    TH1F* fh1_Muscal_Pos[NbAnodesMus];
 
     // Histograms for Hit data
     TH1F* fh1_Mushit_z;
+    TH1F* fh1_Mushit_theta;
+    TH2F* fh2_Mushit_zvstheta;
 
   public:
     ClassDef(R3BMusicOnlineSpectra, 1)

@@ -23,6 +23,7 @@
 #include "FairTask.h"
 #include "R3BMusicHitData.h"
 #include "TH1F.h"
+#include "TVectorD.h"
 #include <TRandom.h>
 
 class TClonesArray;
@@ -66,10 +67,14 @@ class R3BMusicCal2Hit : public FairTask
     void SetParameter();
 
     Int_t fNumAnodes;
+    Int_t fNumAnodesAngleFit;
     Int_t fNumParams;
-    TArrayF* CalParams;
-    Int_t StatusAnodes[8]; // Status anodes
-    Bool_t fOnline;        // Don't store data for online
+    Float_t fZ0, fZ1, fZ2;
+    TArrayF* CalZParams;
+    Int_t fStatusAnodes[8]; // Status anodes
+    Double_t fPosAnodes[8]; // Position-Z of each anode
+    TVectorD fPosZ;
+    Bool_t fOnline; // Don't store data for online
 
     R3BMusicHitPar* fCal_Par;      /**< Parameter container. >*/
     TClonesArray* fMusicCalDataCA; /**< Array with Music Cal-input data. >*/

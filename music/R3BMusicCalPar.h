@@ -22,6 +22,7 @@
 #include "FairParGenericSet.h" // for FairParGenericSet
 
 #include "TArrayF.h"
+#include "TArrayI.h"
 #include "TObjArray.h"
 #include "TObject.h"
 #include <TObjString.h>
@@ -53,21 +54,30 @@ class R3BMusicCalPar : public FairParGenericSet
     void printParams();
 
     /** Accessor functions **/
-    const Double_t GetNumAnodes() { return fNumAnodes; }
-    const Double_t GetNumParametersFit() { return fNumParamsFit; }
+    const Int_t GetNumAnodes() { return fNumAnodes; }
+    const Int_t GetNumParamsEFit() { return fNumParamsEFit; }
+    const Int_t GetNumParamsPosFit() { return fNumParamsPosFit; }
+    const Int_t GetInUse(Int_t anode) { return fIn_use->GetAt(anode - 1); }
     TArrayF* GetAnodeCalParams() { return fAnodeCalParams; }
+    TArrayF* GetPosParams() { return fPosParams; }
 
     void SetNumAnodes(Int_t numberAnodes) { fNumAnodes = numberAnodes; }
-    void SetNumParametersFit(Int_t numberParams) { fNumParamsFit = numberParams; }
-    void SetAnodeCalParams(Double_t cc, Int_t ii) { fAnodeCalParams->AddAt(cc, ii); }
+    void SetNumParamsEFit(Int_t numberParams) { fNumParamsEFit = numberParams; }
+    void SetNumParamsPosFit(Int_t numberParams) { fNumParamsPosFit = numberParams; }
+    void SetInUse(Int_t value, Int_t anode) { fIn_use->AddAt(value, anode - 1); }
+    void SetAnodeCalParams(Float_t cc, Int_t ii) { fAnodeCalParams->AddAt(cc, ii); }
+    void SetPosParams(Float_t cc, Int_t ii) { fPosParams->AddAt(cc, ii); }
 
     // Create more Methods if you need them!
 
   private:
-    TArrayF* fAnodeCalParams; // Calibration Parameters for anodes
+    TArrayF* fAnodeCalParams; // Energy calibration parameters for anodes
+    TArrayF* fPosParams;      // Position calibration parameters for anodes
+    TArrayI* fIn_use;         // 1: anode ready, 0:otherwise
     Int_t fNumAnodes;         // number of anodes
-    Int_t fNumParamsFit;      /* number of cal parameters in the fit
-                                 gaus: A_fit & B_fit & C_fit*/
+    Int_t fNumParamsEFit;     /* number of cal parameters in the fit
+                                gaus: A_fit & B_fit & C_fit*/
+    Int_t fNumParamsPosFit;   // number of parameters for position calibration
 
     const R3BMusicCalPar& operator=(const R3BMusicCalPar&); /*< an assignment operator>*/
 

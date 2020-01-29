@@ -30,16 +30,24 @@
 // ---- Standard Constructor ---------------------------------------------------
 R3BMusicHitPar::R3BMusicHitPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
+    , fNumParamsZFit(2)
+    , fNumAnodes(8)
 {
-    fDetHitParams = new TArrayF(4); // 2 Parameters for Z and angle (Linear fits)
-    fNumParamsFit = 4;              // 1st order for both, Z and angle
+    fDetZHitParams = new TArrayF(fNumParamsZFit); // 2 Parameters for Z (Linear fits)
+    fIn_use = new TArrayI(fNumAnodes);
+    fAnode_pos = new TArrayF(fNumAnodes);
 }
 
 // ----  Destructor ------------------------------------------------------------
 R3BMusicHitPar::~R3BMusicHitPar()
 {
     clear();
-    delete fDetHitParams;
+    if (fIn_use)
+        delete fIn_use;
+    if (fAnode_pos)
+        delete fAnode_pos;
+    if (fDetZHitParams)
+        delete fDetZHitParams;
 }
 
 // ----  Method clear ----------------------------------------------------------
@@ -58,13 +66,20 @@ void R3BMusicHitPar::putParams(FairParamList* list)
         return;
     }
 
-    Int_t array_size = fNumParamsFit;
-    LOG(INFO) << "Array Size: " << array_size;
+    list->add("musicAnodeNumberPar", fNumAnodes);
+    Int_t array_anodes = fNumAnodes;
+    LOG(INFO) << "Array Size Anodes: " << array_anodes;
+    fIn_use->Set(array_anodes);
+    list->add("musicInUsePar", *fIn_use);
 
-    fDetHitParams->Set(array_size);
+    fAnode_pos->Set(array_anodes);
+    list->add("musicAnodePosPar", *fAnode_pos);
 
-    list->add("musicHitPar", *fDetHitParams);
-    list->add("musicHitParamsFitPar", fNumParamsFit);
+    list->add("musicZHitParamsFitPar", fNumParamsZFit);
+    Int_t array_size = fNumParamsZFit;
+    LOG(INFO) << "Number of parameters for charge-Z: " << array_size;
+    fDetZHitParams->Set(array_size);
+    list->add("musicZHitPar", *fDetZHitParams);
 }
 
 // ----  Method getParams ------------------------------------------------------
@@ -76,18 +91,36 @@ Bool_t R3BMusicHitPar::getParams(FairParamList* list)
         return kFALSE;
     }
 
-    if (!list->fill("musicHitParamsFitPar", &fNumParamsFit))
+    if (!list->fill("musicAnodeNumberPar", &fNumAnodes))
     {
         return kFALSE;
     }
-
-    Int_t array_size = fNumParamsFit;
-    LOG(INFO) << "Array Size: " << array_size;
-    fDetHitParams->Set(array_size);
-
-    if (!(list->fill("musicHitPar", fDetHitParams)))
+    Int_t array_anode = fNumAnodes;
+    LOG(INFO) << "Array Size: " << array_anode;
+    fIn_use->Set(array_anode);
+    if (!(list->fill("musicInUsePar", fIn_use)))
     {
-        LOG(INFO) << "---Could not initialize musicHitPar";
+        LOG(INFO) << "---Could not initialize musicInUsePar";
+        return kFALSE;
+    }
+
+    fAnode_pos->Set(array_anode);
+    if (!(list->fill("musicAnodePosPar", fAnode_pos)))
+    {
+        LOG(INFO) << "---Could not initialize musicAnodePosPar";
+        return kFALSE;
+    }
+
+    if (!list->fill("musicZHitParamsFitPar", &fNumParamsZFit))
+    {
+        return kFALSE;
+    }
+    Int_t array_size = fNumParamsZFit;
+    LOG(INFO) << "Array Size: " << array_size;
+    fDetZHitParams->Set(array_size);
+    if (!(list->fill("musicZHitPar", fDetZHitParams)))
+    {
+        LOG(INFO) << "---Could not initialize musicZHitPar";
         return kFALSE;
     }
 
@@ -97,11 +130,16 @@ Bool_t R3BMusicHitPar::getParams(FairParamList* list)
 // ----  Method printParams ----------------------------------------------------
 void R3BMusicHitPar::printParams()
 {
-    LOG(INFO) << "R3BMusicHitPar: music detector Parameters: ";
-    Int_t array_size = fNumParamsFit;
-
-    for (Int_t j = 0; j < fNumParamsFit; j++)
+    LOG(INFO) << "R3BMusicHitPar: music detector Parameters";
+    LOG(INFO) << "R3BMusicHitPar: music anodes in use: ";
+    for (Int_t j = 0; j < fNumAnodes; j++)
     {
-        LOG(INFO) << "FitParam(" << j << ") = " << fDetHitParams->GetAt(j);
+        LOG(INFO) << "Anode " << j + 1 << " in use " << fIn_use->GetAt(j) << ", Position-Z: " << fAnode_pos->GetAt(j);
+    }
+
+    LOG(INFO) << "FitParam for charge-Z: " << fNumParamsZFit;
+    for (Int_t j = 0; j < fNumParamsZFit; j++)
+    {
+        LOG(INFO) << "FitParam (" << j + 1 << ") = " << fDetZHitParams->GetAt(j);
     }
 }

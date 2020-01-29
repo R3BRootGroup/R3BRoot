@@ -80,6 +80,12 @@ R3BCalifaOnlineSpectra::R3BCalifaOnlineSpectra()
     fOrderFebexPreamp[13] = 11;
     fOrderFebexPreamp[14] = 10;
     fOrderFebexPreamp[15] = 9;
+
+    for (Int_t s = 0; s < fNumSides; s++)
+        for (Int_t r = 0; r < fNumRings; r++)
+            for (Int_t p = 0; p < fNumPreamps; p++)
+                for (Int_t i = 0; i < 4; i++)
+                    fFebexInfo[s][r][p][i] = -1;
 }
 
 R3BCalifaOnlineSpectra::R3BCalifaOnlineSpectra(const TString& name, Int_t iVerbose)
@@ -121,6 +127,12 @@ R3BCalifaOnlineSpectra::R3BCalifaOnlineSpectra(const TString& name, Int_t iVerbo
     fOrderFebexPreamp[13] = 11;
     fOrderFebexPreamp[14] = 10;
     fOrderFebexPreamp[15] = 9;
+
+    for (Int_t s = 0; s < fNumSides; s++)
+        for (Int_t r = 0; r < fNumRings; r++)
+            for (Int_t p = 0; p < fNumPreamps; p++)
+                for (Int_t i = 0; i < 4; i++)
+                    fFebexInfo[s][r][p][i] = -1;
 }
 
 R3BCalifaOnlineSpectra::~R3BCalifaOnlineSpectra()
@@ -162,9 +174,28 @@ void R3BCalifaOnlineSpectra::SetParameter()
         LOG(ERROR) << "R3BCalifaOnlineSpectra::CalifaMappingPar container not found";
     }
     //--- Parameter Container ---
-    fNbCalifaCrystals = fMap_Par->GetNumCrystals(); // Number of crystals x 2
+    fNbCalifaCrystals = fMap_Par->GetNumCrystals(); // Number of crystals
     LOG(INFO) << "R3BCalifaOnlineSpectra::NumCry " << fNbCalifaCrystals;
     // fMap_Par->printParams();
+
+    for (Int_t c = 1; c <= fNbCalifaCrystals; c++)
+    {
+
+        if (c <= fNbCalifaCrystals / 2)
+        {
+            fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][0] =
+                fMap_Par->GetFebexSlot(c);
+            fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][1] =
+                fMap_Par->GetFebexMod(c);
+        }
+        else
+        {
+            fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][2] =
+                fMap_Par->GetFebexSlot(c);
+            fFebexInfo[fMap_Par->GetHalf(c) - 1][fMap_Par->GetRing(c) - 1][fMap_Par->GetPreamp(c) - 1][3] =
+                fMap_Par->GetFebexMod(c);
+        }
+    }
 }
 
 InitStatus R3BCalifaOnlineSpectra::Init()
@@ -782,10 +813,11 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
                         cMapCry[s][r][p]->cd(fOrderFebexPreamp[j] + 1);
                         fh1_crystals[s][r][p][j]->SetFillColor(kGreen);
                         sprintf(Name,
-                                "Map level, Side %s Ring %d, Preamp %d, Febex ch. %d",
+                                "Map level, Side %s Ring %d, Slot %d, Febex %d, ch. %d",
                                 Side,
                                 r + 1,
-                                p + 1,
+                                fFebexInfo[s][r][p][0],
+                                fFebexInfo[s][r][p][1],
                                 fOrderFebexPreamp[j]);
                         fh1_crystals[s][r][p][j]->SetTitle(Name);
                         fh1_crystals[s][r][p][j]->Draw();
@@ -795,10 +827,11 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
                             cMapCryP[s][r][p]->cd(fOrderFebexPreamp[j] + 1);
                             fh1_crystals_p[s][r][p][j]->SetFillColor(kGreen);
                             sprintf(Name,
-                                    "Map level (PR), Side %s Ring %d, Preamp %d, Febex ch. %d",
+                                    "Map level (PR), Side %s Ring %d, Slot %d, Febex %d, ch. %d",
                                     Side,
                                     r + 1,
-                                    p + 1,
+                                    fFebexInfo[s][r][p][2],
+                                    fFebexInfo[s][r][p][3],
                                     fOrderFebexPreamp[j]);
                             fh1_crystals_p[s][r][p][j]->SetTitle(Name);
                             fh1_crystals_p[s][r][p][j]->Draw();
@@ -809,10 +842,11 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
                             cMapCryCal[s][r][p]->cd(fOrderFebexPreamp[j] + 1);
                             fh1_crystals_cal[s][r][p][j]->SetFillColor(kGreen);
                             sprintf(Name,
-                                    "Cal level, Side %s Ring %d, Preamp %d, Febex ch. %d",
+                                    "Cal level, Side %s Ring %d, Slot %d, Febex %d, ch. %d",
                                     Side,
                                     r + 1,
-                                    p + 1,
+                                    fFebexInfo[s][r][p][0],
+                                    fFebexInfo[s][r][p][1],
                                     fOrderFebexPreamp[j]);
                             fh1_crystals_cal[s][r][p][j]->SetTitle(Name);
                             fh1_crystals_cal[s][r][p][j]->Draw();
@@ -822,10 +856,11 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
                                 cMapCryPCal[s][r][p]->cd(fOrderFebexPreamp[j] + 1);
                                 fh1_crystals_p_cal[s][r][p][j]->SetFillColor(kGreen);
                                 sprintf(Name,
-                                        "Cal level (PR), Side %s Ring %d, Preamp %d, Febex ch. %d",
+                                        "Cal level (PR), Side %s Ring %d, Slot %d, Febex %d, ch. %d",
                                         Side,
                                         r + 1,
-                                        p + 1,
+                                        fFebexInfo[s][r][p][2],
+                                        fFebexInfo[s][r][p][3],
                                         fOrderFebexPreamp[j]);
                                 fh1_crystals_p_cal[s][r][p][j]->SetTitle(Name);
                                 fh1_crystals_p_cal[s][r][p][j]->Draw();

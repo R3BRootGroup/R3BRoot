@@ -39,11 +39,13 @@
 R3BMusicMapped2Cal::R3BMusicMapped2Cal()
     : FairTask("R3B Music Calibrator", 1)
     , fNumAnodes(MAX_NB_MUSICANODE)   // 8 anodes
-    , fNumAnodesRef(MAX_NB_MUSICTREF) // 1 anode for TREF
+    , fNumAnodesRef(MAX_NB_MUSICTREF) // 1 anode for TREF + 1 for trigger
     , fMaxMult(MAX_MULT_MUSIC_CAL)
-    , fNumParams(2)
+    , fNumParams(3)
+    , fNumPosParams(2)
     , fMaxSigma(200)
     , CalParams(NULL)
+    , PosParams(NULL)
     , fCal_Par(NULL)
     , fMusicMappedDataCA(NULL)
     , fMusicCalDataCA(NULL)
@@ -55,11 +57,13 @@ R3BMusicMapped2Cal::R3BMusicMapped2Cal()
 R3BMusicMapped2Cal::R3BMusicMapped2Cal(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fNumAnodes(MAX_NB_MUSICANODE)   // 8 anodes
-    , fNumAnodesRef(MAX_NB_MUSICTREF) // 1 anode for TREF
+    , fNumAnodesRef(MAX_NB_MUSICTREF) // 1 anode for TREF + 1 for trigger
     , fMaxMult(MAX_MULT_MUSIC_CAL)
-    , fNumParams(2)
+    , fNumParams(3)
+    , fNumPosParams(2)
     , fMaxSigma(200)
     , CalParams(NULL)
+    , PosParams(NULL)
     , fCal_Par(NULL)
     , fMusicMappedDataCA(NULL)
     , fMusicCalDataCA(NULL)
@@ -79,7 +83,6 @@ R3BMusicMapped2Cal::~R3BMusicMapped2Cal()
 
 void R3BMusicMapped2Cal::SetParContainers()
 {
-
     // Parameter Container
     // Reading musicCalPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
@@ -101,10 +104,10 @@ void R3BMusicMapped2Cal::SetParContainers()
 
 void R3BMusicMapped2Cal::SetParameter()
 {
-
     //--- Parameter Container ---
-    fNumAnodes = fCal_Par->GetNumAnodes();        // Number of anodes
-    fNumParams = fCal_Par->GetNumParametersFit(); // Number of Parameters
+    fNumAnodes = fCal_Par->GetNumAnodes();          // Number of anodes
+    fNumParams = fCal_Par->GetNumParamsEFit();      // Number of Parameters
+    fNumPosParams = fCal_Par->GetNumParamsPosFit(); // Number of Parameters
 
     LOG(INFO) << "R3BMusicMapped2Cal: Nb anodes: " << fNumAnodes;
     LOG(INFO) << "R3BMusicMapped2Cal: Nb parameters from pedestal fit: " << fNumParams;
@@ -113,6 +116,12 @@ void R3BMusicMapped2Cal::SetParameter()
     Int_t array_size = fNumAnodes * fNumParams;
     CalParams->Set(array_size);
     CalParams = fCal_Par->GetAnodeCalParams(); // Array with the Cal parameters
+
+    LOG(INFO) << "R3BMusicMapped2Cal: Nb parameters for position fit: " << fNumPosParams;
+    PosParams = new TArrayF();
+    Int_t array_pos = fNumAnodes * fNumPosParams;
+    PosParams->Set(array_pos);
+    PosParams = fCal_Par->GetPosParams(); // Array with the Cal parameters
 
     // Count the number of dead anodes
     Int_t numdeadanodes = 0;
@@ -201,7 +210,7 @@ void R3BMusicMapped2Cal::Exec(Option_t* option)
         mappedData[i] = (R3BMusicMappedData*)(fMusicMappedDataCA->At(i));
         anodeId = mappedData[i]->GetAnodeID();
 
-        if (pedestal != -1 && anodeId < fNumAnodes)
+        if (anodeId < fNumAnodes && fCal_Par->GetInUse(anodeId + 1) == 1)
         {
             pedestal = CalParams->GetAt(fNumParams * anodeId + 1);
             // sigma=CalParams->GetAt(fNumParams*anodeId+2);
@@ -210,7 +219,7 @@ void R3BMusicMapped2Cal::Exec(Option_t* option)
             dtime[mulanode[anodeId]][anodeId] = mappedData[i]->GetTime();
             mulanode[anodeId]++;
         }
-        else
+        else if (anodeId >= fNumAnodes)
         {
             // LOG(INFO) <<"a="<< anodeId<<" e="<< mappedData[i]->GetEnergy()<< "  t=" << mappedData[i]->GetTime();
             dtime[mulanode[anodeId]][anodeId] = mappedData[i]->GetTime(); // Ref. Time
@@ -218,15 +227,20 @@ void R3BMusicMapped2Cal::Exec(Option_t* option)
         }
     }
 
-    // The first part: anodes from 0 to 7
-    for (Int_t i = 0; i < fNumAnodes; i++)
+    // Fill data only if there are trigger and TREF signals
+    if (mulanode[fNumAnodes] == 1 && mulanode[fNumAnodes + 1] == 1)
     {
-        for (Int_t j = 0; j < mulanode[fNumAnodes]; j++)
-            for (Int_t k = 0; k < mulanode[i]; k++)
-            {
-                if (energy[k][i] > 0.)
-                    AddCalData(i, dtime[k][i] - dtime[j][fNumAnodes], energy[k][i]);
-            }
+        for (Int_t i = 0; i < fNumAnodes; i++)
+        {
+            Float_t a0 = PosParams->GetAt(fNumPosParams * i);
+            Float_t a1 = PosParams->GetAt(fNumPosParams * i + 1);
+            for (Int_t j = 0; j < mulanode[fNumAnodes]; j++)
+                for (Int_t k = 0; k < mulanode[i]; k++)
+                {
+                    if (energy[k][i] > 0.)
+                        AddCalData(i, a0 + a1 * (dtime[k][i] - dtime[j][fNumAnodes]), energy[k][i]);
+                }
+        }
     }
     if (mappedData)
         delete mappedData;

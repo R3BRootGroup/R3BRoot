@@ -13,89 +13,105 @@
 
 // -----------------------------------------------------------------
 // -----                                                       -----
-// -----                R3BMusicMapped2Cal                     -----
-// -----        Created 24/11/19  by J.L. Rodriguez-Sanchez    -----
+// -----                R3BMusicMapped2CalPar                  -----
+// -----        Created 29/01/20  by J.L. Rodriguez-Sanchez    -----
 // -----------------------------------------------------------------
 
-#ifndef R3BMusicMapped2Cal_H
-#define R3BMusicMapped2Cal_H
+#ifndef R3BMusicMapped2CalPar_H
+#define R3BMusicMapped2CalPar_H
 
 #include "FairTask.h"
-#include "R3BMusicCalData.h"
+#include "R3BMusicMapped2Cal.h"
 #include "R3BMusicMappedData.h"
+#include "TGraph.h"
 #include "TH1F.h"
-#include <TRandom.h>
-
-#define MAX_MULT_MUSIC_CAL 10
-#define MAX_NB_MUSICANODE 8
-#define MAX_NB_MUSICTREF 2
 
 class TClonesArray;
 class R3BMusicCalPar;
 
-class R3BMusicMapped2Cal : public FairTask
+class R3BMusicMapped2CalPar : public FairTask
 {
 
   public:
     /** Default constructor **/
-    R3BMusicMapped2Cal();
+    R3BMusicMapped2CalPar();
 
     /** Standard constructor **/
-    R3BMusicMapped2Cal(const char* name, Int_t iVerbose = 1);
+    R3BMusicMapped2CalPar(const TString& name,
+                          Int_t iVerbose = 1,
+                          const TString& namedeta = "Mwpc0",
+                          const TString& namedetb = "Mwpc2");
 
     /** Destructor **/
-    virtual ~R3BMusicMapped2Cal();
+    virtual ~R3BMusicMapped2CalPar();
 
     /** Virtual method Exec **/
     virtual void Exec(Option_t* option);
 
+    /** Virtual method FinishEvent **/
+    virtual void FinishEvent();
+
+    /** Virtual method FinishTask **/
+    virtual void FinishTask();
+
     /** Virtual method Reset **/
     virtual void Reset();
 
-    virtual void SetParContainers();
-
-    // Fair specific
     /** Virtual method Init **/
     virtual InitStatus Init();
 
     /** Virtual method ReInit **/
     virtual InitStatus ReInit();
 
-    /** Virtual method Finish **/
-    virtual void Finish();
+    /** Method to set up the position of MwpcA **/
+    void SetPosMwpcA(Float_t pos) { fPosMwpcA = pos; }
 
-    /** Accessor to select online mode **/
-    void SetOnline(Bool_t option) { fOnline = option; }
+    /** Method to set up the position of MwpcB **/
+    void SetPosMwpcB(Float_t pos) { fPosMwpcB = pos; }
+
+    /** Method to set up the position of Music **/
+    void SetPosMusic(Float_t pos) { fPosMusic = pos; }
+
+    /** Method to set up the limits for fit **/
+    void SetFitLimits(Int_t left, Int_t right)
+    {
+        fLimit_left = left;
+        fLimit_right = right;
+    }
 
   private:
-    void SetParameter();
-
     Int_t fNumAnodes;
     Int_t fMaxMult;
+    Int_t fMinStadistics;
     Int_t fNumParams;
     Int_t fNumPosParams;
     Int_t fNumAnodesRef;
+    Int_t fLimit_left;
+    Int_t fLimit_right;
     Int_t fMaxSigma;
     TArrayF* CalParams;
     TArrayF* PosParams;
+
+    TString fNameDetA;
+    Float_t fPosMwpcA; // Position in the beam direction in mm
+    TString fNameDetB;
+    Float_t fPosMwpcB; // Position in the beam direction in mm
+    Float_t fPosMusic; // Position in the beam direction in mm
 
     Int_t mulanode[MAX_NB_MUSICANODE + MAX_NB_MUSICTREF];
     Double_t energy[MAX_MULT_MUSIC_CAL][MAX_NB_MUSICANODE + MAX_NB_MUSICTREF];
     Double_t dtime[MAX_MULT_MUSIC_CAL][MAX_NB_MUSICANODE + MAX_NB_MUSICTREF];
 
-    Bool_t fOnline; // Don't store data for online
-
     R3BMusicCalPar* fCal_Par;         /**< Parameter container. >*/
     TClonesArray* fMusicMappedDataCA; /**< Array with Music Mapped-input data. >*/
-    TClonesArray* fMusicCalDataCA;    /**< Array with Music Cal-output data. >*/
+    TClonesArray* fHitItemsMwpcA;     /**< Array with hit items. */
+    TClonesArray* fHitItemsMwpcB;     /**< Array with hit items. */
 
-    /** Private method AddCalData **/
-    //** Adds a MusicCalData to the anodeCalCollection
-    R3BMusicCalData* AddCalData(UShort_t anodeid, Double_t dtime, Double_t energy);
+    TGraph** fg_anode;
 
   public:
     // Class definition
-    ClassDef(R3BMusicMapped2Cal, 1)
+    ClassDef(R3BMusicMapped2CalPar, 1)
 };
 
 #endif

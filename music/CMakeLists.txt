@@ -17,6 +17,10 @@
 
 Set(SYSTEM_INCLUDE_DIRECTORIES ${SYSTEM_INCLUDE_DIRECTORIES} ${BASE_INCLUDE_DIRECTORIES} )
 
+if(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
+set(WITH_SOFIA true)
+endif(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
+
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase
@@ -24,6 +28,13 @@ ${R3BROOT_SOURCE_DIR}/music
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
 )
+
+if(WITH_SOFIA)
+set(INCLUDE_DIRECTORIES
+${INCLUDE_DIRECTORIES}
+${R3BROOT_SOURCE_DIR}/sofia/sofdata/mwpcData
+)
+endif(WITH_SOFIA)
 
 include_directories( ${INCLUDE_DIRECTORIES})
 include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
@@ -42,6 +53,13 @@ R3BMusicMapped2Cal.cxx
 R3BMusicCal2Hit.cxx
 R3BMusicOnlineSpectra.cxx
 )
+
+if(WITH_SOFIA)
+set(SRCS
+${SRCS}
+R3BMusicMapped2CalPar.cxx
+)
+endif(WITH_SOFIA)
 
 # fill list of header files from list of source files
 # by exchanging the file extension
