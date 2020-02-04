@@ -142,11 +142,6 @@ class R3BCalifaOnlineSpectra : public FairTask
     void Log_CALIFA_Histo();
 
     /**
-     * Method for setting the Data Level (Mapped or Cal)
-     */
-    void Map2Cal_CALIFA_Histo();
-
-    /**
      * Method for setting histogram sequence (Febex or Preamp. channels)
      */
     void Febex2Preamp_CALIFA_Histo();
@@ -194,6 +189,9 @@ class R3BCalifaOnlineSpectra : public FairTask
     TCanvas* cMapCryCal[Nb_Sides][Nb_Rings][Nb_Preamps];
     TCanvas* cMapCryP[Nb_Sides][Nb_Rings][Nb_Preamps];
     TCanvas* cMapCryPCal[Nb_Sides][Nb_Rings][Nb_Preamps];
+    TCanvas* cCalifaCoinE;
+    TCanvas* cCalifaCoinPhi;
+    TCanvas* cCalifaCoinTheta;
     TCanvas* cCalifa_angles;
     TCanvas* cCalifa_theta_energy;
     TCanvas* cCalifa_hitenergy;
@@ -209,6 +207,9 @@ class R3BCalifaOnlineSpectra : public FairTask
     TH2F* fh2_Califa_cryId_energy_cal;
     TH1F* fh1_crystals_cal[Nb_Sides][Nb_Rings][Nb_Preamps][Nb_PreampCh];
     TH1F* fh1_crystals_p_cal[Nb_Sides][Nb_Rings][Nb_Preamps][Nb_PreampCh];
+    TH2F* fh2_Califa_coinE;
+    TH2F* fh2_Califa_coinTheta;
+    TH2F* fh2_Califa_coinPhi;
     TH2F* fh2_Califa_theta_phi;
     TH2F* fh2_Califa_theta_energy;
     TH1F* fh1_Califa_total_energy;

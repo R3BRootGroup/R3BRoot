@@ -202,16 +202,20 @@ void R3BCalifaMapped2CrystalCalPar::Exec(Option_t* opt)
     if (!nHits)
         return;
 
-    R3BCalifaMappedData* MapHit;
-    Int_t crystalId;
+    R3BCalifaMappedData** MapHit = new R3BCalifaMappedData*[nHits];
+    Int_t crystalId = 0;
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        MapHit = (R3BCalifaMappedData*)(fCalifaMappedDataCA->At(i));
-        crystalId = MapHit->GetCrystalId();
+        MapHit[i] = (R3BCalifaMappedData*)(fCalifaMappedDataCA->At(i));
+        crystalId = MapHit[i]->GetCrystalId();
         // Fill histograms
-        fh_Map_energy_crystal[crystalId - 1]->Fill(MapHit->GetEnergy());
+        fh_Map_energy_crystal[crystalId - 1]->Fill(MapHit[i]->GetEnergy());
     }
+
+    if (MapHit)
+        delete MapHit;
+    return;
 }
 
 void R3BCalifaMapped2CrystalCalPar::Reset() {}
@@ -223,6 +227,10 @@ void R3BCalifaMapped2CrystalCalPar::FinishTask()
     // Look for the peaks in each spectrum
     SearchPeaks();
     // fCal_Par->printParams();
+    if (fDebugMode)
+        for (Int_t i = 0; i < fNumCrystals; i++)
+            if (fMap_Par->GetInUse(i + 1) == 1 && fh_Map_energy_crystal[i]->GetEntries() > fMinStadistics)
+                fh_Map_energy_crystal[i]->Write();
 }
 
 void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
@@ -328,9 +336,6 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
                 {
                     fCal_Par->SetCryCalParams(f1->GetParameter(h), numPars * i + h);
                 }
-
-                if (fDebugMode)
-                    fh_Map_energy_crystal[i]->Write();
             }
             else
             {
