@@ -30,7 +30,7 @@ R3BCalifaMappedData::R3BCalifaMappedData(UShort_t crystalId,
                                          Int_t ns,
                                          uint64_t time,
                                          UChar_t error,
-                                         UShort_t tot)
+                                         Int_t tot)
     : fCrystalId(crystalId)
     , fEnergy(energy)
     , fNf(nf)

@@ -85,7 +85,7 @@ Bool_t R3BCalifaFebexReader::Read()
         int16_t nf = fData->CALIFA_NFv[crystal];
         int16_t ns = fData->CALIFA_NSv[crystal];
         uint64_t timestamp = ((uint64_t)fData->CALIFA_TSMSBv[crystal] << 32) | (uint64_t)fData->CALIFA_TSLSBv[crystal];
-        uint32_t tot = 0;  // not decoded yet
+        int16_t tot = fData->CALIFA_TOTv[crystal];
         UChar_t error = 0; //??
 
         new ((*fArray)[fArray->GetEntriesFast()])

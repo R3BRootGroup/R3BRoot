@@ -57,8 +57,6 @@ R3BCalifaCrystalCalData::R3BCalifaCrystalCalData(const R3BCalifaCrystalCalData& 
 {
 }
 
-R3BCalifaCrystalCalData::~R3BCalifaCrystalCalData() {}
-
 void R3BCalifaCrystalCalData::Print(const Option_t* opt) const
 {
     cout << "-I- R3BCalifaCrystalCalData: a crystalCalData level hit in crystal identifier " << fCrystalId << endl;

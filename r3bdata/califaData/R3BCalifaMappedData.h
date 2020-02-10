@@ -31,16 +31,10 @@ class R3BCalifaMappedData : public TObject
      *@param time        Time since event start [ns]
      *@param tot         Time over threshold
      **/
-    R3BCalifaMappedData(UShort_t crystalId,
-                        Int_t energy,
-                        Int_t nf,
-                        Int_t ns,
-                        uint64_t time,
-                        UChar_t error,
-                        UShort_t tot);
+    R3BCalifaMappedData(UShort_t crystalId, Int_t energy, Int_t nf, Int_t ns, uint64_t time, UChar_t error, Int_t tot);
 
     // Destructor
-    ~R3BCalifaMappedData() {}
+    virtual ~R3BCalifaMappedData() {}
 
     // Getters
     inline const UShort_t& GetCrystalId() const { return fCrystalId; }
@@ -49,7 +43,7 @@ class R3BCalifaMappedData : public TObject
     inline const Int_t& GetNs() const { return fNs; }
     inline const uint64_t& GetTime() const { return fTime; }
     inline const UChar_t& GetError() const { return fError; }
-    inline const UShort_t& GetTot() const { return fTot; }
+    inline const Int_t& GetTot() const { return fTot; }
 
   protected:
     UShort_t fCrystalId; // crystal unique identifier
@@ -58,7 +52,7 @@ class R3BCalifaMappedData : public TObject
     Int_t fNs;           // total slow amplitude in the crystal
     uint64_t fTime;      // time-stamp (common to all the hits in the event)
     UChar_t fError;      // bit coded error flag
-    UShort_t fTot;       // time-over-treshold
+    Int_t fTot;          // time-over-treshold
 
   public:
     ClassDef(R3BCalifaMappedData, 2)

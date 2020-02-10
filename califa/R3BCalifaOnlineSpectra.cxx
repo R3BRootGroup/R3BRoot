@@ -367,6 +367,11 @@ InitStatus R3BCalifaOnlineSpectra::Init()
                     sprintf(Name2, "Ring %d, %s side, Preamp %d", r + 1, Side, p + 1);
                     cMapCry[s][r][p] = new TCanvas(Name1, Name2, 10, 10, 500, 500);
                     cMapCry[s][r][p]->Divide(4, 4);
+                    // for TOT correlations
+                    sprintf(Name1, "Ring_%d_%s_Preamp_%d_tot", r + 1, Side, p + 1);
+                    sprintf(Name2, "Ring %d, %s side, Preamp %d", r + 1, Side, p + 1);
+                    cMapCryTot[s][r][p] = new TCanvas(Name1, Name2, 10, 10, 500, 500);
+                    cMapCryTot[s][r][p]->Divide(4, 4);
                 }
                 if (fFebexInfo[s][r][p][2] != -1)
                 {
@@ -374,6 +379,11 @@ InitStatus R3BCalifaOnlineSpectra::Init()
                     sprintf(Name2, "Ring %d, %s side, Preamp %d for PR", r + 1, Side, p + 1);
                     cMapCryP[s][r][p] = new TCanvas(Name1, Name2, 10, 10, 500, 500);
                     cMapCryP[s][r][p]->Divide(4, 4);
+                    // for TOT correlations
+                    sprintf(Name1, "Ring_%d_%s_Preamp_%d_tot_pr", r + 1, Side, p + 1);
+                    sprintf(Name2, "Ring %d, %s side, Preamp %d for PR", r + 1, Side, p + 1);
+                    cMapCryPTot[s][r][p] = new TCanvas(Name1, Name2, 10, 10, 500, 500);
+                    cMapCryPTot[s][r][p]->Divide(4, 4);
                 }
                 for (Int_t j = 0; j < fNumCrystalPreamp; j++)
                 { // Channel
@@ -397,10 +407,34 @@ InitStatus R3BCalifaOnlineSpectra::Init()
                         cMapCry[s][r][p]->cd(j + 1);
                         gPad->SetLogy();
                         fh1_crystals[s][r][p][j]->Draw();
+
+                        // for TOT correlations
+                        sprintf(Name1, "fh2_Map_Side_%s_Ring_%d_Preamp_%d_Ch_%d_evstot", Side, r + 1, p + 1, j + 1);
+                        sprintf(Name2, "Map level, Side %s Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
+
+                        fh2_crystalsETot[s][r][p][j] = new TH2F(Name1,
+                                                                Name2,
+                                                                fBinsChannelFebex,
+                                                                0,
+                                                                fMaxBinChannelFebex,
+                                                                fBinsChannelFebex,
+                                                                0,
+                                                                fMaxBinChannelFebex);
+                        fh2_crystalsETot[s][r][p][j]->SetTitleSize(1.6, "t");
+                        fh2_crystalsETot[s][r][p][j]->GetXaxis()->SetTitle(Xaxis);
+                        fh2_crystalsETot[s][r][p][j]->GetYaxis()->SetTitle("Tot");
+                        fh2_crystalsETot[s][r][p][j]->GetXaxis()->SetLabelSize(0.06);
+                        fh2_crystalsETot[s][r][p][j]->GetYaxis()->SetLabelSize(0.06);
+                        fh2_crystalsETot[s][r][p][j]->GetXaxis()->SetTitleSize(0.05);
+                        fh2_crystalsETot[s][r][p][j]->GetXaxis()->CenterTitle(true);
+                        fh2_crystalsETot[s][r][p][j]->GetYaxis()->CenterTitle(true);
+                        fh2_crystalsETot[s][r][p][j]->GetXaxis()->SetTitleOffset(1.);
+                        cMapCryTot[s][r][p]->cd(j + 1);
+                        fh2_crystalsETot[s][r][p][j]->Draw();
                     }
                     if (fFebexInfo[s][r][p][2] != -1)
                     {
-                        //{ // histograms for proton range
+                        // histograms for proton range
                         sprintf(Name1, "fh1_Map_Side_%s_Ring_%d_Preamp_%d_Ch_%d_energy_pr", Side, r + 1, p + 1, j + 1);
                         sprintf(Name2, "Map level (PR), Side %s Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
                         fh1_crystals_p[s][r][p][j] = new TH1F(Name1, Name2, fBinsChannelFebex, 0, fMaxBinChannelFebex);
@@ -416,6 +450,29 @@ InitStatus R3BCalifaOnlineSpectra::Init()
                         cMapCryP[s][r][p]->cd(j + 1);
                         gPad->SetLogy();
                         fh1_crystals_p[s][r][p][j]->Draw();
+
+                        // for TOT correlations
+                        sprintf(Name1, "fh2_Map_Side_%s_Ring_%d_Preamp_%d_Ch_%d_pr_evstot", Side, r + 1, p + 1, j + 1);
+                        sprintf(Name2, "Map level (PR), Side %s Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
+                        fh2_crystalsETot_p[s][r][p][j] = new TH2F(Name1,
+                                                                  Name2,
+                                                                  fBinsChannelFebex,
+                                                                  0,
+                                                                  fMaxBinChannelFebex,
+                                                                  fBinsChannelFebex,
+                                                                  0,
+                                                                  fMaxBinChannelFebex);
+                        fh2_crystalsETot_p[s][r][p][j]->SetTitleSize(1.6, "t");
+                        fh2_crystalsETot_p[s][r][p][j]->GetXaxis()->SetTitle(Xaxis);
+                        fh2_crystalsETot_p[s][r][p][j]->GetYaxis()->SetTitle("Tot");
+                        fh2_crystalsETot_p[s][r][p][j]->GetXaxis()->SetLabelSize(0.06);
+                        fh2_crystalsETot_p[s][r][p][j]->GetYaxis()->SetLabelSize(0.06);
+                        fh2_crystalsETot_p[s][r][p][j]->GetXaxis()->SetTitleSize(0.05);
+                        fh2_crystalsETot_p[s][r][p][j]->GetXaxis()->CenterTitle(true);
+                        fh2_crystalsETot_p[s][r][p][j]->GetYaxis()->CenterTitle(true);
+                        fh2_crystalsETot_p[s][r][p][j]->GetXaxis()->SetTitleOffset(1.);
+                        cMapCryPTot[s][r][p]->cd(j + 1);
+                        fh2_crystalsETot_p[s][r][p][j]->Draw();
                     }
                 }
             }
@@ -592,51 +649,77 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     }
 
     TFolder* folder_el = new TFolder("Energy_Map_per_crystal_Left", "Energy per crystal, left side info");
-    for (Int_t r = 0; r < fNumRings; r++) // FIXME in the future
+    for (Int_t r = 0; r < fNumRings; r++)
         for (Int_t p = 0; p < fNumPreamps; p++)
             if (fFebexInfo[1][r][p][0] != -1)
                 folder_el->Add(cMapCry[1][r][p]);
 
+    TFolder* folder_etotl = new TFolder("Energy_Tot_per_crystal_Left", "Energy vs Tot per crystal, left side info");
+    for (Int_t r = 0; r < fNumRings; r++)
+        for (Int_t p = 0; p < fNumPreamps; p++)
+            if (fFebexInfo[1][r][p][0] != -1)
+                folder_etotl->Add(cMapCryTot[1][r][p]);
+
     TFolder* folder_eprl = new TFolder("Energy_Map_per_crystal_Left_PR", "Energy per crystal, left side info for PR");
-    for (Int_t r = 0; r < fNumRings; r++) // FIXME in the future
+    for (Int_t r = 0; r < fNumRings; r++)
         for (Int_t p = 0; p < fNumPreamps; p++)
             if (fFebexInfo[1][r][p][2] != -1)
                 folder_eprl->Add(cMapCryP[1][r][p]);
 
+    TFolder* folder_eprtotl =
+        new TFolder("Energy_Tot_per_crystal_Left_PR", "Energy vs Tot per crystal, left side info for PR");
+    for (Int_t r = 0; r < fNumRings; r++)
+        for (Int_t p = 0; p < fNumPreamps; p++)
+            if (fFebexInfo[1][r][p][2] != -1)
+                folder_eprtotl->Add(cMapCryPTot[1][r][p]);
+
     TFolder* folder_er = new TFolder("Energy_Map_per_crystal_Right", "Energy per crystal, right side info");
-    for (Int_t r = 0; r < fNumRings; r++) // FIXME in the future
+    for (Int_t r = 0; r < fNumRings; r++)
         for (Int_t p = 0; p < fNumPreamps; p++)
             if (fFebexInfo[0][r][p][0] != -1)
                 folder_er->Add(cMapCry[0][r][p]);
 
+    TFolder* folder_etotr = new TFolder("Energy_Tot_per_crystal_Right", "Energy vs Tot per crystal, right side info");
+    for (Int_t r = 0; r < fNumRings; r++)
+        for (Int_t p = 0; p < fNumPreamps; p++)
+            if (fFebexInfo[0][r][p][0] != -1)
+                folder_etotr->Add(cMapCryTot[0][r][p]);
+
     TFolder* folder_eprr = new TFolder("Energy_Map_per_crystal_Right_PR", "Energy per crystal, right side info for PR");
-    for (Int_t r = 0; r < fNumRings; r++) // FIXME in the future
+    for (Int_t r = 0; r < fNumRings; r++)
         for (Int_t p = 0; p < fNumPreamps; p++)
             if (fFebexInfo[0][r][p][2] != -1)
                 folder_eprr->Add(cMapCryP[0][r][p]);
 
+    TFolder* folder_eprtotr =
+        new TFolder("Energy_Tot_per_crystal_Right_PR", "Energy vs Tot per crystal, right side info for PR");
+    for (Int_t r = 0; r < fNumRings; r++)
+        for (Int_t p = 0; p < fNumPreamps; p++)
+            if (fFebexInfo[0][r][p][2] != -1)
+                folder_eprtotr->Add(cMapCryPTot[0][r][p]);
+
     TFolder* folder_ecall = new TFolder("Energy_Cal_per_crystal_Left", "Energy Cal per crystal, left side info");
-    for (Int_t r = 0; r < fNumRings; r++) // FIXME in the future
+    for (Int_t r = 0; r < fNumRings; r++)
         for (Int_t p = 0; p < fNumPreamps; p++)
             if (fFebexInfo[1][r][p][0] != -1)
                 folder_ecall->Add(cMapCryCal[1][r][p]);
 
     TFolder* folder_eprcall =
         new TFolder("Energy_Cal_per_crystal_Left_PR", "Energy Cal per crystal, left side info for PR");
-    for (Int_t r = 0; r < fNumRings; r++) // FIXME in the future
+    for (Int_t r = 0; r < fNumRings; r++)
         for (Int_t p = 0; p < fNumPreamps; p++)
             if (fFebexInfo[1][r][p][2] != -1)
                 folder_eprcall->Add(cMapCryPCal[1][r][p]);
 
     TFolder* folder_ecalr = new TFolder("Energy_Cal_per_crystal_Right", "Energy Cal per crystal, right side info");
-    for (Int_t r = 0; r < fNumRings; r++) // FIXME in the future
+    for (Int_t r = 0; r < fNumRings; r++)
         for (Int_t p = 0; p < fNumPreamps; p++)
             if (fFebexInfo[0][r][p][0] != -1)
                 folder_ecalr->Add(cMapCryCal[0][r][p]);
 
     TFolder* folder_eprcalr =
         new TFolder("Energy_Cal_per_crystal_Right_PR", "Energy Cal per crystal, right side info for PR");
-    for (Int_t r = 0; r < fNumRings; r++) // FIXME in the future
+    for (Int_t r = 0; r < fNumRings; r++)
         for (Int_t p = 0; p < fNumPreamps; p++)
             if (fFebexInfo[0][r][p][2] != -1)
                 folder_eprcalr->Add(cMapCryPCal[0][r][p]);
@@ -650,6 +733,12 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     mainfolCalifa->Add(folder_eprl);
     mainfolCalifa->Add(folder_er);
     mainfolCalifa->Add(folder_eprr);
+
+    mainfolCalifa->Add(folder_etotl);
+    mainfolCalifa->Add(folder_eprtotl);
+    mainfolCalifa->Add(folder_etotr);
+    mainfolCalifa->Add(folder_eprtotr);
+
     if (fCalItemsCalifa)
     {
         mainfolCalifa->Add(cCalifa_cry_energy_cal);
@@ -706,9 +795,15 @@ void R3BCalifaOnlineSpectra::Reset_CALIFA_Histo()
                     for (Int_t ch = 0; ch < fNumCrystalPreamp; ch++)
                     {
                         if (fFebexInfo[s][r][p][0] != -1)
+                        {
                             fh1_crystals[s][r][p][ch]->Reset();
+                            fh2_crystalsETot[s][r][p][ch]->Reset();
+                        }
                         if (fFebexInfo[s][r][p][2] != -1)
+                        {
                             fh1_crystals_p[s][r][p][ch]->Reset();
+                            fh2_crystalsETot_p[s][r][p][ch]->Reset();
+                        }
                     }
     }
 
@@ -895,6 +990,17 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
                                     fOrderFebexPreamp[j]);
                             fh1_crystals[s][r][p][j]->SetTitle(Name);
                             fh1_crystals[s][r][p][j]->Draw();
+
+                            cMapCryTot[s][r][p]->cd(fOrderFebexPreamp[j] + 1);
+                            sprintf(Name,
+                                    "Map level, Side %s Ring %d, Slot %d, Febex %d, ch. %d",
+                                    Side,
+                                    r + 1,
+                                    fFebexInfo[s][r][p][0],
+                                    fFebexInfo[s][r][p][1],
+                                    fOrderFebexPreamp[j]);
+                            fh2_crystalsETot[s][r][p][j]->SetTitle(Name);
+                            fh2_crystalsETot[s][r][p][j]->Draw();
                         }
                         if (fFebexInfo[s][r][p][2] != -1)
                         {
@@ -909,6 +1015,17 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
                                     fOrderFebexPreamp[j]);
                             fh1_crystals_p[s][r][p][j]->SetTitle(Name);
                             fh1_crystals_p[s][r][p][j]->Draw();
+
+                            cMapCryPTot[s][r][p]->cd(fOrderFebexPreamp[j] + 1);
+                            sprintf(Name,
+                                    "Map level (PR), Side %s Ring %d, Slot %d, Febex %d, ch. %d",
+                                    Side,
+                                    r + 1,
+                                    fFebexInfo[s][r][p][2],
+                                    fFebexInfo[s][r][p][3],
+                                    fOrderFebexPreamp[j]);
+                            fh2_crystalsETot_p[s][r][p][j]->SetTitle(Name);
+                            fh2_crystalsETot_p[s][r][p][j]->Draw();
                         }
 
                         if (fCalItemsCalifa)
@@ -969,6 +1086,11 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
                             sprintf(Name, "Map level, Side %s Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
                             fh1_crystals[s][r][p][j]->SetTitle(Name);
                             fh1_crystals[s][r][p][j]->Draw();
+
+                            cMapCryTot[s][r][p]->cd(j + 1);
+                            sprintf(Name, "Map level, Side %s Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
+                            fh2_crystalsETot[s][r][p][j]->SetTitle(Name);
+                            fh2_crystalsETot[s][r][p][j]->Draw();
                         }
                         if (fFebexInfo[s][r][p][2] != -1)
                         {
@@ -978,6 +1100,12 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
                                 Name, "Map level (PR), Side %s Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
                             fh1_crystals_p[s][r][p][j]->SetTitle(Name);
                             fh1_crystals_p[s][r][p][j]->Draw();
+
+                            cMapCryPTot[s][r][p]->cd(j + 1);
+                            sprintf(
+                                Name, "Map level (PR), Side %s Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
+                            fh2_crystalsETot_p[s][r][p][j]->SetTitle(Name);
+                            fh2_crystalsETot_p[s][r][p][j]->Draw();
                         }
 
                         if (fCalItemsCalifa)
@@ -1047,14 +1175,24 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
                                                                        fMap_Par->GetChannel(cryId));
 
             if (fMap_Par->GetInUse(cryId) == 1 && cryId <= fNbCalifaCrystals / 2)
+            {
                 fh1_crystals[fMap_Par->GetHalf(cryId) - 1][fMap_Par->GetRing(cryId) - 1][fMap_Par->GetPreamp(cryId) - 1]
                             [fMap_Par->GetChannel(cryId) - 1]
                                 ->Fill(hit->GetEnergy());
+                fh2_crystalsETot[fMap_Par->GetHalf(cryId) - 1][fMap_Par->GetRing(cryId) - 1]
+                                [fMap_Par->GetPreamp(cryId) - 1][fMap_Par->GetChannel(cryId) - 1]
+                                    ->Fill(hit->GetEnergy(), hit->GetTot());
+            }
 
             else if (fMap_Par->GetInUse(cryId) == 1 && cryId > fNbCalifaCrystals / 2)
+            {
                 fh1_crystals_p[fMap_Par->GetHalf(cryId) - 1][fMap_Par->GetRing(cryId) - 1]
                               [fMap_Par->GetPreamp(cryId) - 1][fMap_Par->GetChannel(cryId) - 1]
                                   ->Fill(hit->GetEnergy());
+                fh2_crystalsETot_p[fMap_Par->GetHalf(cryId) - 1][fMap_Par->GetRing(cryId) - 1]
+                                  [fMap_Par->GetPreamp(cryId) - 1][fMap_Par->GetChannel(cryId) - 1]
+                                      ->Fill(hit->GetEnergy(), hit->GetTot());
+            }
         }
         fh1_Califa_Mult->Fill(Crymult);
     }

@@ -44,15 +44,15 @@ class R3BCalifaCrystalCalData : public FairMultiLinkedData
     R3BCalifaCrystalCalData& operator=(const R3BCalifaCrystalCalData&) { return *this; }
 
     /** Destructor **/
-    virtual ~R3BCalifaCrystalCalData();
+    virtual ~R3BCalifaCrystalCalData() {}
 
     /** Accessors **/
-    Int_t GetCrystalId() const { return fCrystalId; }
-    Double_t GetEnergy() const { return fEnergy; }
-    Double_t GetToT_Energy() const { return fToT_Energy; }
-    Double_t GetNf() const { return fNf; }
-    Double_t GetNs() const { return fNs; }
-    ULong64_t GetTime() const { return fTime; }
+    inline const Int_t& GetCrystalId() const { return fCrystalId; }
+    inline const Double_t& GetEnergy() const { return fEnergy; }
+    inline const Double_t& GetToT_Energy() const { return fToT_Energy; }
+    inline const Double_t& GetNf() const { return fNf; }
+    inline const Double_t& GetNs() const { return fNs; }
+    inline const ULong64_t& GetTime() const { return fTime; }
 
     /** Modifiers **/
     void SetCrystalId(Int_t ident) { fCrystalId = ident; }
@@ -75,6 +75,7 @@ class R3BCalifaCrystalCalData : public FairMultiLinkedData
     ULong64_t fTime;        // time of the interaction
     Int_t fCrystalId;       // crystal unique identifier
 
+  public:
     ClassDef(R3BCalifaCrystalCalData, 1)
 };
 

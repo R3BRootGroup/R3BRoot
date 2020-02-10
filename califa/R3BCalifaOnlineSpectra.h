@@ -186,8 +186,10 @@ class R3BCalifaOnlineSpectra : public FairTask
     TCanvas* cMap_RingR[Nb_Rings];
     TCanvas* cMap_RingL[Nb_Rings];
     TCanvas* cMapCry[Nb_Sides][Nb_Rings][Nb_Preamps];
+    TCanvas* cMapCryTot[Nb_Sides][Nb_Rings][Nb_Preamps];
     TCanvas* cMapCryCal[Nb_Sides][Nb_Rings][Nb_Preamps];
     TCanvas* cMapCryP[Nb_Sides][Nb_Rings][Nb_Preamps];
+    TCanvas* cMapCryPTot[Nb_Sides][Nb_Rings][Nb_Preamps];
     TCanvas* cMapCryPCal[Nb_Sides][Nb_Rings][Nb_Preamps];
     TCanvas* cCalifaCoinE;
     TCanvas* cCalifaCoinPhi;
@@ -203,7 +205,9 @@ class R3BCalifaOnlineSpectra : public FairTask
     TH2F* fh2_Preamp_vs_ch_R[Nb_Rings];
     TH2F* fh2_Preamp_vs_ch_L[Nb_Rings];
     TH1F* fh1_crystals[Nb_Sides][Nb_Rings][Nb_Preamps][Nb_PreampCh];
+    TH2F* fh2_crystalsETot[Nb_Sides][Nb_Rings][Nb_Preamps][Nb_PreampCh];
     TH1F* fh1_crystals_p[Nb_Sides][Nb_Rings][Nb_Preamps][Nb_PreampCh];
+    TH2F* fh2_crystalsETot_p[Nb_Sides][Nb_Rings][Nb_Preamps][Nb_PreampCh];
     TH2F* fh2_Califa_cryId_energy_cal;
     TH1F* fh1_crystals_cal[Nb_Sides][Nb_Rings][Nb_Preamps][Nb_PreampCh];
     TH1F* fh1_crystals_p_cal[Nb_Sides][Nb_Rings][Nb_Preamps][Nb_PreampCh];
