@@ -16,6 +16,8 @@
 
 #include "FairTask.h"
 
+#include <R3BTCalEngine.h>
+
 #include <list>
 
 class TH1F;
