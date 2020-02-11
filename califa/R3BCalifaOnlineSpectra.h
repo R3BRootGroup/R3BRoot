@@ -156,6 +156,8 @@ class R3BCalifaOnlineSpectra : public FairTask
     TClonesArray* fMappedItemsCalifa; /**< Array with mapped items.    */
     TClonesArray* fCalItemsCalifa;    /**< Array with cal items.       */
     TClonesArray* fHitItemsCalifa;    /**< Array with hit items.       */
+    TClonesArray* fWRItemsCalifa;     /**< Array with WR-Califa items. */
+    TClonesArray* fWRItemsMaster;     /**< Array with WR-Master items. */
 
     // Check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header.  */
@@ -197,6 +199,12 @@ class R3BCalifaOnlineSpectra : public FairTask
     TCanvas* cCalifa_angles;
     TCanvas* cCalifa_theta_energy;
     TCanvas* cCalifa_hitenergy;
+
+    // WR data
+    TCanvas* cCalifa_wr;
+    TH1F* fh1_Califa_wr;
+    TCanvas* cWrs;
+    TH1F* fh1_wrs[2];
 
     // Histograms
     TH1F* fh1_Califa_Mult;

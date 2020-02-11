@@ -25,7 +25,7 @@ class R3BEventHeader;
 class R3BWhiterabbitCalifaReader : public R3BReader
 {
   public:
-    R3BWhiterabbitCalifaReader(EXT_STR_h101_WRCALIFA*, UInt_t, UInt_t);
+    R3BWhiterabbitCalifaReader(EXT_STR_h101_WRCALIFA*, UInt_t, UInt_t, UInt_t);
     ~R3BWhiterabbitCalifaReader();
 
     Bool_t Init(ext_data_struct_info*);
@@ -45,7 +45,8 @@ class R3BWhiterabbitCalifaReader : public R3BReader
     /* FairLogger */
     FairLogger* fLogger;
     /* The whiterabbit subsystem ID */
-    UInt_t fWhiterabbitId;
+    UInt_t fWhiterabbitId1;
+    UInt_t fWhiterabbitId2;
     /* A pointer to the R3BEventHeader structure */
     R3BEventHeader* fEventHeader;
     // Don't store data for online

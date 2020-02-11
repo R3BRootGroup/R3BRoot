@@ -17,6 +17,8 @@
 #include "R3BCalifaMappedData.h"
 #include "R3BCalifaMappingPar.h"
 #include "R3BEventHeader.h"
+#include "R3BWRCalifaData.h"
+#include "R3BWRMasterData.h"
 #include "THttpServer.h"
 
 #include "FairLogger.h"
@@ -46,6 +48,8 @@ R3BCalifaOnlineSpectra::R3BCalifaOnlineSpectra()
     , fMappedItemsCalifa(NULL)
     , fCalItemsCalifa(NULL)
     , fHitItemsCalifa(NULL)
+    , fWRItemsCalifa(NULL)
+    , fWRItemsMaster(NULL)
     , fMap_Par(NULL)
     , fNEvents(0)
     , fNbCalifaCrystals(4864)
@@ -93,6 +97,8 @@ R3BCalifaOnlineSpectra::R3BCalifaOnlineSpectra(const TString& name, Int_t iVerbo
     , fMappedItemsCalifa(NULL)
     , fCalItemsCalifa(NULL)
     , fHitItemsCalifa(NULL)
+    , fWRItemsCalifa(NULL)
+    , fWRItemsMaster(NULL)
     , fMap_Par(NULL)
     , fNEvents(0)
     , fNbCalifaCrystals(4864)
@@ -144,6 +150,10 @@ R3BCalifaOnlineSpectra::~R3BCalifaOnlineSpectra()
         delete fCalItemsCalifa;
     if (fHitItemsCalifa)
         delete fHitItemsCalifa;
+    if (fWRItemsCalifa)
+        delete fWRItemsCalifa;
+    if (fWRItemsMaster)
+        delete fWRItemsMaster;
 }
 
 void R3BCalifaOnlineSpectra::SetParContainers()
@@ -233,6 +243,20 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     if (!fHitItemsCalifa)
     {
         LOG(WARNING) << "R3BCalifaOnlineSpectra::CalifaHitData not found";
+    }
+
+    // get access to WR-Califa data
+    fWRItemsCalifa = (TClonesArray*)mgr->GetObject("WRCalifaData");
+    if (!fWRItemsCalifa)
+    {
+        LOG(WARNING) << "R3BCalifaOnlineSpectra::WRCalifaData not found";
+    }
+
+    // get access to WR-Master data
+    fWRItemsMaster = (TClonesArray*)mgr->GetObject("WRMasterData");
+    if (!fWRItemsMaster)
+    {
+        LOG(WARNING) << "R3BCalifaOnlineSpectra::WRMasterData not found";
     }
 
     SetParameter();
@@ -640,6 +664,41 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     fh1_Califa_total_energy->Draw("");
     gPad->SetLogy();
 
+    // Difference between Califa WRs
+    sprintf(Name1, "WR_Califa");
+    sprintf(Name2, "fh1_WR_Califa");
+    sprintf(Name3, "WR-Wixhausen - WR-Messel");
+    cCalifa_wr = new TCanvas(Name1, Name1, 10, 10, 500, 500);
+    fh1_Califa_wr = new TH1F(Name2, Name3, 1200, -4100, 4100);
+    fh1_Califa_wr->GetXaxis()->SetTitle("Difference of Califa WRs");
+    fh1_Califa_wr->GetYaxis()->SetTitle("Counts");
+    fh1_Califa_wr->GetYaxis()->SetTitleOffset(1.3);
+    fh1_Califa_wr->GetXaxis()->CenterTitle(true);
+    fh1_Califa_wr->GetYaxis()->CenterTitle(true);
+    fh1_Califa_wr->SetFillColor(29);
+    fh1_Califa_wr->SetLineColor(1);
+    fh1_Califa_wr->SetLineWidth(2);
+    fh1_Califa_wr->Draw("");
+
+    // Difference between Califa-Master WRs
+    sprintf(Name1, "WR_Master_Califa");
+    cWrs = new TCanvas(Name1, Name1, 10, 10, 500, 500);
+    sprintf(Name2, "fh1_WR_Master_Califa");
+    sprintf(Name3, "WR-Master - WR-Califa: Messel (blue), Wixhausen (red)");
+    fh1_wrs[0] = new TH1F(Name2, Name3, 1200, -4100, 4100);
+    fh1_wrs[0]->GetXaxis()->SetTitle("WRs difference");
+    fh1_wrs[0]->GetYaxis()->SetTitle("Counts");
+    fh1_wrs[0]->GetYaxis()->SetTitleOffset(1.3);
+    fh1_wrs[0]->GetXaxis()->CenterTitle(true);
+    fh1_wrs[0]->GetYaxis()->CenterTitle(true);
+    fh1_wrs[0]->SetLineColor(4);
+    fh1_wrs[0]->SetLineWidth(3);
+    fh1_wrs[0]->Draw("");
+    fh1_wrs[1] = new TH1F("fh1_WR_Master_Califa_Messel", "", 1200, -4100, 4100);
+    fh1_wrs[1]->SetLineColor(2);
+    fh1_wrs[1]->SetLineWidth(3);
+    fh1_wrs[1]->Draw("same");
+
     // FOLDERS for Califa
     TFolder* folder_sta = new TFolder("Statistics_per_ring", "Statistics info");
     for (Int_t i = 2; i < fNumRings; i++)
@@ -726,6 +785,10 @@ InitStatus R3BCalifaOnlineSpectra::Init()
 
     // MAIN FOLDER-Califa
     TFolder* mainfolCalifa = new TFolder("CALIFA", "CALIFA info");
+    if (fWRItemsCalifa)
+        mainfolCalifa->Add(cCalifa_wr);
+    if (fWRItemsCalifa && fWRItemsMaster)
+        mainfolCalifa->Add(cWrs);
     mainfolCalifa->Add(cCalifaMult);
     mainfolCalifa->Add(cCalifa_cry_energy);
     mainfolCalifa->Add(folder_sta);
@@ -779,6 +842,15 @@ InitStatus R3BCalifaOnlineSpectra::ReInit()
 void R3BCalifaOnlineSpectra::Reset_CALIFA_Histo()
 {
     LOG(INFO) << "R3BCalifaOnlineSpectra::Reset_CALIFA_Histo";
+
+    if (fWRItemsCalifa)
+        fh1_Califa_wr->Reset();
+
+    if (fWRItemsCalifa && fWRItemsMaster)
+    {
+        fh1_wrs[0]->Reset();
+        fh1_wrs[1]->Reset();
+    }
 
     if (fMappedItemsCalifa)
     {
@@ -1148,6 +1220,39 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
     if (NULL == mgr)
         LOG(FATAL) << "R3BCalifaOnlineSpectra::Exec FairRootManager not found";
 
+    // WR data
+    if (fWRItemsCalifa && fWRItemsCalifa->GetEntriesFast() > 0)
+    {
+        // Califa
+        Int_t nHits = fWRItemsCalifa->GetEntriesFast();
+        int64_t wr[nHits];
+        for (Int_t ihit = 0; ihit < nHits; ihit++)
+        {
+            R3BWRCalifaData* hit = (R3BWRCalifaData*)fWRItemsCalifa->At(ihit);
+            if (!hit)
+                continue;
+            wr[ihit] = hit->GetTimeStamp();
+        }
+        if (nHits == 2)
+            fh1_Califa_wr->Fill(wr[1] - wr[0]);
+
+        // Master from SOFIA (exp. 2020)
+        if (fWRItemsMaster && fWRItemsMaster->GetEntriesFast() > 0)
+        {
+            nHits = fWRItemsMaster->GetEntriesFast();
+            int64_t wrm;
+            for (Int_t ihit = 0; ihit < nHits; ihit++)
+            {
+                R3BWRMasterData* hit = (R3BWRMasterData*)fWRItemsMaster->At(ihit);
+                if (!hit)
+                    continue;
+                wrm = hit->GetTimeStamp();
+            }
+            fh1_wrs[0]->Fill(wrm - wr[0]); // messel
+            fh1_wrs[1]->Fill(wrm - wr[1]); // wixhausen
+        }
+    }
+
     // Mapped data
     if (fMappedItemsCalifa && fMappedItemsCalifa->GetEntriesFast() > 0)
     {
@@ -1281,10 +1386,30 @@ void R3BCalifaOnlineSpectra::FinishEvent()
     {
         fHitItemsCalifa->Clear();
     }
+    if (fWRItemsCalifa)
+    {
+        fWRItemsCalifa->Clear();
+    }
+    if (fWRItemsMaster)
+    {
+        fWRItemsMaster->Clear();
+    }
 }
 
 void R3BCalifaOnlineSpectra::FinishTask()
 {
+    // Write canvas for Califa WR data
+    if (fWRItemsCalifa)
+    {
+        cCalifa_wr->Write();
+    }
+
+    // Write canvas for Master-Califa WR data
+    if (fWRItemsMaster && fWRItemsCalifa)
+    {
+        cWrs->Write();
+    }
+
     // Write canvas for Mapped data
     if (fMappedItemsCalifa)
     {

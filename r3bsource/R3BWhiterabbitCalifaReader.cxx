@@ -26,14 +26,16 @@ extern "C"
 
 R3BWhiterabbitCalifaReader::R3BWhiterabbitCalifaReader(EXT_STR_h101_WRCALIFA* data,
                                                        UInt_t offset,
-                                                       UInt_t whiterabbit_id)
+                                                       UInt_t whiterabbit_id1,
+                                                       UInt_t whiterabbit_id2)
     : R3BReader("R3BWhiterabbitCalifaReader")
     , fNEvent(0)
     , fData(data)
     , fOffset(offset)
     , fOnline(kFALSE)
     , fLogger(FairLogger::GetLogger())
-    , fWhiterabbitId(whiterabbit_id)
+    , fWhiterabbitId1(whiterabbit_id1)
+    , fWhiterabbitId2(whiterabbit_id2)
     , fEventHeader(nullptr)
     , fArray(new TClonesArray("R3BWRCalifaData"))
 {
@@ -72,13 +74,14 @@ Bool_t R3BWhiterabbitCalifaReader::Init(ext_data_struct_info* a_struct_info)
         FairRootManager::Instance()->Register("WRCalifaData", "WRCalifa", fArray, kFALSE);
     }
 
-    fData->TIMESTAMP_CALIFA_ID = 0;
+    fData->TIMESTAMP_CALIFA1ID = 0;
+    fData->TIMESTAMP_CALIFA2ID = 0;
     return kTRUE;
 }
 
 Bool_t R3BWhiterabbitCalifaReader::Read()
 {
-    if (!fData->TIMESTAMP_CALIFA_ID)
+    if (!fData->TIMESTAMP_CALIFA1ID || !fData->TIMESTAMP_CALIFA2ID)
     {
         return kTRUE;
     }
@@ -87,34 +90,52 @@ Bool_t R3BWhiterabbitCalifaReader::Read()
     fData->TIMESTAMP_CALIFA_WR_T4, fData->TIMESTAMP_CALIFA_WR_T3,
     fData->TIMESTAMP_CALIFA_WR_T2, fData->TIMESTAMP_CALIFA_WR_T1);*/
 
-    if (fWhiterabbitId != fData->TIMESTAMP_CALIFA_ID)
+    if (fWhiterabbitId1 != fData->TIMESTAMP_CALIFA1ID)
     {
         char strMessage[1000];
         snprintf(strMessage,
                  sizeof strMessage,
                  "Event %u: Whiterabbit ID mismatch: expected %u, got %u.\n",
                  fEventHeader->GetEventno(),
-                 fWhiterabbitId,
-                 fData->TIMESTAMP_CALIFA_ID);
+                 fWhiterabbitId1,
+                 fData->TIMESTAMP_CALIFA1ID);
+        LOG(error) << strMessage;
+    }
+
+    if (fWhiterabbitId2 != fData->TIMESTAMP_CALIFA2ID)
+    {
+        char strMessage[1000];
+        snprintf(strMessage,
+                 sizeof strMessage,
+                 "Event %u: Whiterabbit ID mismatch: expected %u, got %u.\n",
+                 fEventHeader->GetEventno(),
+                 fWhiterabbitId2,
+                 fData->TIMESTAMP_CALIFA2ID);
         LOG(error) << strMessage;
     }
 
     if (fEventHeader != nullptr)
     {
-        uint64_t timestamp = ((uint64_t)fData->TIMESTAMP_CALIFA_WR_T4 << 48) |
-                             ((uint64_t)fData->TIMESTAMP_CALIFA_WR_T3 << 32) |
-                             ((uint64_t)fData->TIMESTAMP_CALIFA_WR_T2 << 16) | (uint64_t)fData->TIMESTAMP_CALIFA_WR_T1;
+        uint64_t timestamp1 = ((uint64_t)fData->TIMESTAMP_CALIFA1WR_T4 << 48) |
+                              ((uint64_t)fData->TIMESTAMP_CALIFA1WR_T3 << 32) |
+                              ((uint64_t)fData->TIMESTAMP_CALIFA1WR_T2 << 16) | (uint64_t)fData->TIMESTAMP_CALIFA1WR_T1;
 
         // fEventHeader->SetTimeStamp(timestamp);
         fNEvent = fEventHeader->GetEventno();
-        new ((*fArray)[fArray->GetEntriesFast()]) R3BWRCalifaData(timestamp);
+        new ((*fArray)[fArray->GetEntriesFast()]) R3BWRCalifaData(timestamp1);
+
+        uint64_t timestamp2 = ((uint64_t)fData->TIMESTAMP_CALIFA2WR_T4 << 48) |
+                              ((uint64_t)fData->TIMESTAMP_CALIFA2WR_T3 << 32) |
+                              ((uint64_t)fData->TIMESTAMP_CALIFA2WR_T2 << 16) | (uint64_t)fData->TIMESTAMP_CALIFA2WR_T1;
+        new ((*fArray)[fArray->GetEntriesFast()]) R3BWRCalifaData(timestamp2);
     }
     else
     {
         fNEvent++;
     }
 
-    fData->TIMESTAMP_CALIFA_ID = 0;
+    fData->TIMESTAMP_CALIFA1ID = 0;
+    fData->TIMESTAMP_CALIFA2ID = 0;
     return kTRUE;
 }
 

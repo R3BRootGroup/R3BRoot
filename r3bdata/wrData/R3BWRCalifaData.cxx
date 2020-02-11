@@ -21,7 +21,7 @@
 #include "R3BWRCalifaData.h"
 
 R3BWRCalifaData::R3BWRCalifaData()
-    : fTimeStamp(0)
+    : fTimeStamp(0.)
 {
 }
 

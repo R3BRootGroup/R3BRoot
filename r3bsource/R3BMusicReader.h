@@ -18,7 +18,7 @@
 
 class TClonesArray;
 
-#define NUM_MUSIC_ANODES 10
+#define NUM_MUSIC_ANODES 100
 // anodes 0 to 7 : energy and time
 // anode 8 and 9 : reference times
 

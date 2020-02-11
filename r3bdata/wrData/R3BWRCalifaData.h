@@ -35,7 +35,7 @@ class R3BWRCalifaData : public TObject
     R3BWRCalifaData(uint64_t timestamp);
 
     // Destructor
-    ~R3BWRCalifaData() {}
+    virtual ~R3BWRCalifaData() {}
 
     // Getters
     inline const uint64_t GetTimeStamp() const { return fTimeStamp; }

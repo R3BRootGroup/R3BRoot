@@ -26,7 +26,7 @@
 #include "TH1F.h"
 #include <TRandom.h>
 
-#define MAX_MULT_MUSIC_CAL 10
+#define MAX_MULT_MUSIC_CAL 100
 #define MAX_NB_MUSICANODE 8
 #define MAX_NB_MUSICTREF 2
 
