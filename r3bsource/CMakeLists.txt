@@ -66,6 +66,8 @@ R3BUnpackReader.cxx
 R3BWhiterabbitMasterReader.cxx
 R3BWhiterabbitCalifaReader.cxx
 R3BWhiterabbitAmsReader.cxx
+R3BWhiterabbitS2Reader.cxx
+R3BWhiterabbitS8Reader.cxx
 R3BTrloiiTpatReader.cxx
 R3BTrloiiSampReader.cxx
 R3BTimestampMasterReader.cxx
@@ -110,6 +112,8 @@ ext_h101_whiterabbit.h
 ext_h101_wrmaster.h
 ext_h101_wrcalifa.h
 ext_h101_wrams.h
+ext_h101_wrs2.h
+ext_h101_wrs8.h
 ext_h101_tpat.h
 ext_h101_timestamp_master.h
 ext_h101_bmon.h

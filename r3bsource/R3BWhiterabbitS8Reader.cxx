@@ -11,64 +11,77 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BWhiterabbitReader.h"
+#include "R3BWhiterabbitS8Reader.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "R3BEventHeader.h"
+#include "R3BWRMasterData.h"
+#include "TClonesArray.h"
 
 extern "C"
 {
 #include "ext_data_client.h"
-#include "ext_h101_whiterabbit.h"
+#include "ext_h101_wrs8.h"
 }
 
-R3BWhiterabbitReader::R3BWhiterabbitReader(EXT_STR_h101_whiterabbit* data, UInt_t offset, UInt_t whiterabbit_id)
-    : R3BReader("R3BWhiterabbitReader")
+R3BWhiterabbitS8Reader::R3BWhiterabbitS8Reader(EXT_STR_h101_WRS8* data, UInt_t offset, UInt_t whiterabbit_id)
+    : R3BReader("R3BWhiterabbitS8Reader")
     , fNEvent(0)
     , fData(data)
     , fOffset(offset)
+    , fOnline(kFALSE)
     , fLogger(FairLogger::GetLogger())
     , fWhiterabbitId(whiterabbit_id)
     , fEventHeader(nullptr)
+    , fArray(new TClonesArray("R3BWRMasterData"))
 {
 }
 
-R3BWhiterabbitReader::~R3BWhiterabbitReader() {}
-
-Bool_t R3BWhiterabbitReader::Init(ext_data_struct_info* a_struct_info)
+R3BWhiterabbitS8Reader::~R3BWhiterabbitS8Reader()
 {
-    int ok;
+    if (fArray)
+    {
+        delete fArray;
+    }
+}
 
-    EXT_STR_h101_whiterabbit_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_whiterabbit, 0);
+Bool_t R3BWhiterabbitS8Reader::Init(ext_data_struct_info* a_struct_info)
+{
+    Int_t ok;
+    LOG(INFO) << "R3BWhiterabbitS8Reader::Init";
+    EXT_STR_h101_WRS8_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_WRS8, 0);
 
     if (!ok)
     {
-        perror("ext_data_struct_info_item");
-        LOG(error) << "Failed to setup structure information.";
+        LOG(ERROR) << "R3BWhiterabbitS8Reader::Failed to setup structure information.";
         return kFALSE;
     }
 
     FairRootManager* mgr = FairRootManager::Instance();
     fEventHeader = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
 
-    fData->TIMESTAMP_MASTER_ID = 0;
+    // Register output array in tree
+    if (!fOnline)
+    {
+        FairRootManager::Instance()->Register("S8WRData", "S8WR", fArray, kTRUE);
+    }
+    else
+    {
+        FairRootManager::Instance()->Register("S8WRData", "S8WR", fArray, kFALSE);
+    }
 
+    fData->TIMESTAMP_SCIEIGHT_ID = 0;
     return kTRUE;
 }
 
-Bool_t R3BWhiterabbitReader::Read()
+Bool_t R3BWhiterabbitS8Reader::Read()
 {
-    if (!fData->TIMESTAMP_MASTER_ID)
+    if (!fData->TIMESTAMP_SCIEIGHT_ID)
     {
         return kTRUE;
     }
-    printf("%08x %08x %08x %08x %08x \n",
-           fData->TIMESTAMP_MASTER_ID,
-           fData->TIMESTAMP_MASTER_WR_T4,
-           fData->TIMESTAMP_MASTER_WR_T3,
-           fData->TIMESTAMP_MASTER_WR_T2,
-           fData->TIMESTAMP_MASTER_WR_T1);
-    if (fWhiterabbitId != fData->TIMESTAMP_MASTER_ID)
+
+    if (fWhiterabbitId != fData->TIMESTAMP_SCIEIGHT_ID)
     {
         char strMessage[1000];
         snprintf(strMessage,
@@ -76,28 +89,34 @@ Bool_t R3BWhiterabbitReader::Read()
                  "Event %u: Whiterabbit ID mismatch: expected 0x%x, got 0x%x.\n",
                  fEventHeader->GetEventno(),
                  fWhiterabbitId,
-                 fData->TIMESTAMP_MASTER_ID);
+                 fData->TIMESTAMP_SCIEIGHT_ID);
         LOG(error) << strMessage;
     }
 
     if (fEventHeader != nullptr)
     {
-        uint64_t timestamp = ((uint64_t)fData->TIMESTAMP_MASTER_WR_T4 << 48) |
-                             ((uint64_t)fData->TIMESTAMP_MASTER_WR_T3 << 32) |
-                             ((uint64_t)fData->TIMESTAMP_MASTER_WR_T2 << 16) | (uint64_t)fData->TIMESTAMP_MASTER_WR_T1;
+        uint64_t timestamp =
+            ((uint64_t)fData->TIMESTAMP_SCIEIGHT_WR_T4 << 48) | ((uint64_t)fData->TIMESTAMP_SCIEIGHT_WR_T3 << 32) |
+            ((uint64_t)fData->TIMESTAMP_SCIEIGHT_WR_T2 << 16) | (uint64_t)fData->TIMESTAMP_SCIEIGHT_WR_T1;
 
-        fEventHeader->SetTimeStamp(timestamp);
+        // fEventHeader->SetTimeStamp(timestamp);
         fNEvent = fEventHeader->GetEventno();
+        new ((*fArray)[fArray->GetEntriesFast()]) R3BWRMasterData(timestamp);
     }
     else
     {
         fNEvent++;
     }
 
-    fData->TIMESTAMP_MASTER_ID = 0;
+    fData->TIMESTAMP_SCIEIGHT_ID = 0;
     return kTRUE;
 }
 
-void R3BWhiterabbitReader::Reset() { fNEvent = 0; }
+void R3BWhiterabbitS8Reader::Reset()
+{
+    // Reset the output array
+    fArray->Clear();
+    fNEvent = 0;
+}
 
-ClassImp(R3BWhiterabbitReader)
+ClassImp(R3BWhiterabbitS8Reader)

@@ -91,7 +91,7 @@ Bool_t R3BWhiterabbitAmsReader::Read()
         char strMessage[1000];
         snprintf(strMessage,
                  sizeof strMessage,
-                 "Event %u: Whiterabbit ID mismatch: expected %u, got %u.\n",
+                 "Event %u: Whiterabbit ID mismatch: expected 0x%x, got 0x%x.\n",
                  fEventHeader->GetEventno(),
                  fWhiterabbitId,
                  fData->TIMESTAMP_AMS_ID);

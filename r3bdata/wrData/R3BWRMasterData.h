@@ -35,7 +35,7 @@ class R3BWRMasterData : public TObject
     R3BWRMasterData(uint64_t timestamp);
 
     // Destructor
-    ~R3BWRMasterData() {}
+    virtual ~R3BWRMasterData() {}
 
     // Getters
     inline const uint64_t GetTimeStamp() const { return fTimeStamp; }
