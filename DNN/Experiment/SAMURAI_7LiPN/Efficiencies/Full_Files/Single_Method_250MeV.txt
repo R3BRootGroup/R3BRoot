@@ -1,0 +1,92 @@
+This file contains the computed efficiencies of the E*=0
+cross section in 7Li(p,n)7Be at a proton beam energy of 252.7 MeV
+measured with SAMURAI & 4dp NeuLAND at 1093.5 cm distance.
+5 bins of 1.0 degrees.
+
+IonCL++ Training & IonCL++ Validation:
+0.348138 0.00323817
+0.348067 0.00315783
+0.348364 0.00318104
+0.348026 0.0043704
+0.308457 0.0408793
+
+IonCL++ Training & IonCL++ Validation (second round):
+0.35058 0.00374399
+0.350531 0.00367727
+0.35039 0.00371031
+0.350093 0.00509596
+0.289157 0.0408085
+
+IonCL++ Training & Bertini Validation:
+0.311931 0.00317319
+0.311498 0.00309173
+0.311577 0.00309424
+0.311452 0.00427028
+0.266428 0.03401
+
+Bertini Training & IonCL++ Validation:
+0.349618 0.00323184
+0.349933 0.00316768
+0.349446 0.00317797
+0.347948 0.00437203
+0.276964 0.0351392
+
+Bertini Training & Bertini Validation:
+0.310595 0.00313844
+0.310793 0.0030699
+0.310177 0.00310243
+0.309771 0.00426999
+0.286308 0.041261
+
+Physics List (without second 2x INCL++ run):
+Average efficiency = 
+0.3300705   
+0.3300728   
+0.3298910  
+0.3292992  
+0.2845393   
+Max. Deviation from average = 
+0.019547
+0.019860
+0.019555
+0.018727
+0.023918
+
+Difference between first & second INCL++ run:
+0.0024420
+0.0024640
+0.0020260
+0.0020670
+0.0193000
+
+Max. of the 5 errors in efficiency:
+0.0037440
+0.0036773
+0.0037103
+0.0050960
+0.0412610
+
+Adding both stat. errors in quadrature:
+0.0044700
+0.0044265
+0.0042274
+0.0054992
+0.0455517
+
+Hence, the proper efficiency file is (first stat. error, then phys. list error):
+0.3300705 0.0044700 0.019547
+0.3300728 0.0044265 0.019860
+0.3298910 0.0042274 0.019555
+0.3292992 0.0054992 0.018727
+0.2845393 0.0455517 0.023918
+
+Which takes physics list errors & statistical errors
+in the network training into account. Event generator
+errors are skipped, because they do not exist for this 
+experiment.
+
+NOTE: for the 1n-->1n detecion efficiency for perfect reconstruction,
+we always assumed a 0.1% error, due to this being sqrt(1e6), which
+is the total number of simulated events in the validation.
+   
+   

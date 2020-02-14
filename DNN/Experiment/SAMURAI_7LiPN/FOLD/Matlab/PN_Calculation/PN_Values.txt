@@ -1,0 +1,45 @@
+Ebeam = 252.7 MeV & A = 7:
+
+Proton Optical potential:
+VR = 15.765 MeV
+rR = 1.1433 fm
+aR = 0.6799 fm
+VI = 13.179 MeV
+rI = rR
+aI = aR
+Ws = -0.028163 MeV
+rC = 1.3325 fm
+
+Neutron Optical potential:
+VR = 25.065 MeV
+rR = 1.1544 fm
+aR = 0.6877 fm
+VI = 10.621 MeV
+rI = rR
+aI = aR
+Ws = 0.0046714 MeV
+rC = 0 (neutron has no Coulomb)
+
+
+
+Ebeam = 109.1 MeV & A = 7:
+
+Proton Optical Potential:
+VR = 26.052 MeV
+rR = 1.1433 fm
+aR = 0.6799 fm
+VI = 10.536 MeV
+rI = rR
+aI = aR
+Ws = 0.41704 MeV
+rC = 1.3325 fm
+
+Neutron Optical Potential:
+VR = 25.541 MeV
+rR = 1.1544 fm
+aR = 0.6877 fm
+VI = 8.7195 MeV
+rI = rR
+aI = aR
+Ws = 0.68711 MeV
+rC = 0 (neutron has no Coulomb)

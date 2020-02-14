@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd">
+
+  <define/>
+
+  <materials>
+    <isotope N="1" Z="1" name="H10x1576f70">
+      <atom unit="g/mole" value="1.00782503081372"/>
+    </isotope>
+    <isotope N="2" Z="1" name="H20x1577020">
+      <atom unit="g/mole" value="2.01410199966617"/>
+    </isotope>
+    <element name="H0x1576d10">
+      <fraction n="0.999885" ref="H10x1576f70"/>
+      <fraction n="0.000115" ref="H20x1577020"/>
+    </element>
+    <material name="G4_Galactic0x1576c20" state="gas">
+      <T unit="K" value="2.73"/>
+      <P unit="pascal" value="3e-18"/>
+      <MEE unit="eV" value="21.8"/>
+      <D unit="g/cm3" value="1e-25"/>
+      <fraction n="1" ref="H0x1576d10"/>
+    </material>
+    <isotope N="54" Z="26" name="Fe540x1582020">
+      <atom unit="g/mole" value="53.9396"/>
+    </isotope>
+    <isotope N="56" Z="26" name="Fe560x15820c0">
+      <atom unit="g/mole" value="55.9349"/>
+    </isotope>
+    <isotope N="57" Z="26" name="Fe570x1582130">
+      <atom unit="g/mole" value="56.9354"/>
+    </isotope>
+    <isotope N="58" Z="26" name="Fe580x15821a0">
+      <atom unit="g/mole" value="57.9333"/>
+    </isotope>
+    <element name="Fe0x1581dc0">
+      <fraction n="0.05845" ref="Fe540x1582020"/>
+      <fraction n="0.91754" ref="Fe560x15820c0"/>
+      <fraction n="0.02119" ref="Fe570x1582130"/>
+      <fraction n="0.00282" ref="Fe580x15821a0"/>
+    </element>
+    <material name="G4_Fe0x1581cd0" state="solid">
+      <T unit="K" value="293.15"/>
+      <MEE unit="eV" value="286"/>
+      <D unit="g/cm3" value="7.874"/>
+      <fraction n="1" ref="Fe0x1581dc0"/>
+    </material>
+    <material Z="13" name="G4_Al0x15842c0" state="solid">
+      <T unit="K" value="293.15"/>
+      <MEE unit="eV" value="166"/>
+      <D unit="g/cm3" value="2.699"/>
+      <atom unit="g/mole" value="26.9815"/>
+    </material>
+    <isotope N="12" Z="6" name="C120x1585570">
+      <atom unit="g/mole" value="12"/>
+    </isotope>
+    <isotope N="13" Z="6" name="C130x15855e0">
+      <atom unit="g/mole" value="13.0034"/>
+    </isotope>
+    <element name="C0x15857d0">
+      <fraction n="0.9893" ref="C120x1585570"/>
+      <fraction n="0.0107" ref="C130x15855e0"/>
+    </element>
+    <material name="G4_PLASTIC_SC_VINYLTOLUENE0x15856e0" state="solid">
+      <T unit="K" value="293.15"/>
+      <MEE unit="eV" value="64.7"/>
+      <D unit="g/cm3" value="1.032"/>
+      <fraction n="0.914708531800025" ref="C0x15857d0"/>
+      <fraction n="0.0852914681999746" ref="H0x1576d10"/>
+    </material>
+  </materials>
+
+  <solids>
+    <box lunit="mm" name="vchamber_box0x173e410" x="3240" y="800" z="3500"/>
+    <trap alpha1="0" alpha2="0" aunit="deg" lunit="mm" name="vchamber_trap0x1737fa0" phi="0" theta="0" x1="3240" x2="5140" x3="3240" x4="5140" y1="1128.8463" y2="1128.8463" z="800"/>
+    <union name="vchamber_sol0x1737e10">
+      <first ref="vchamber_box0x173e410"/>
+      <second ref="vchamber_trap0x1737fa0"/>
+      <position name="vchamber_sol0x1737e10_pos" unit="mm" x="0" y="0" z="1185.57685"/>
+      <rotation name="vchamber_sol0x1737e10_rot" unit="deg" x="90" y="0" z="0"/>
+    </union>
+    <box lunit="mm" name="yoke_box0x173e910" x="6700" y="4640" z="3500"/>
+    <box lunit="mm" name="fdc1c_box0x173d660" x="310" y="170" z="140"/>
+    <box lunit="mm" name="fdc1enc_box0x173dc00" x="1000" y="669" z="336"/>
+    <box lunit="mm" name="vacuum_box0x173e320" x="1200" y="1000" z="5000"/>
+    <subtraction name="vacuum_upstream0x17399b0">
+      <first ref="vacuum_box0x173e320"/>
+      <second ref="yoke_box0x173e910"/>
+      <position name="vacuum_upstream0x17399b0_pos" unit="mm" x="0" y="0" z="2500"/>
+      <rotation name="vacuum_upstream0x17399b0_rot" unit="deg" x="0" y="-30" z="0"/>
+    </subtraction>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="target_box0x1739be0" rmax="20" rmin="0" startphi="0" z="150"/>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="MINOSduct00x1739f30" rmax="38" rmin="36" startphi="0" z="403"/>
+    <tube aunit="deg" deltaphi="360" lunit="mm" name="MINOSduct10x173a040" rmax="37" rmin="29.75" startphi="0" z="33"/>
+    <union name="MINOSduct0x173a630">
+      <first ref="MINOSduct00x1739f30"/>
+      <second ref="MINOSduct10x173a040"/>
+      <position name="MINOSduct0x173a630_pos" unit="mm" x="0" y="0" z="218"/>
+    </union>
+    <box lunit="mm" name="fdc2c_box0x173d5a0" x="2296" y="836" z="634.64"/>
+    <box lunit="mm" name="fdc2enc_box0x173d600" x="2616" y="1156" z="876"/>
+    <box lunit="mm" name="windowc2_flange_box0x173c800" x="3340" y="1200" z="30"/>
+    <box lunit="mm" name="windowc2_tubeholder_box0x173c670" x="3340" y="130" z="130"/>
+    <union name="windowc2_flng_hldr0x173c400">
+      <first ref="windowc2_flange_box0x173c800"/>
+      <second ref="windowc2_tubeholder_box0x173c670"/>
+      <position name="windowc2_flng_hldr0x173c400_pos" unit="mm" x="0" y="465" z="80"/>
+    </union>
+    <union name="windowc2_flng_hldr20x173c700">
+      <first ref="windowc2_flng_hldr0x173c400"/>
+      <second ref="windowc2_tubeholder_box0x173c670"/>
+      <position name="windowc2_flng_hldr20x173c700_pos" unit="mm" x="0" y="-465" z="80"/>
+    </union>
+    <box lunit="mm" name="windowc2_hole_box0x173c140" x="2940" y="800" z="30"/>
+    <subtraction name="windowc2_flng_hldr2_hole0x173c890">
+      <first ref="windowc2_flng_hldr20x173c700"/>
+      <second ref="windowc2_hole_box0x173c140"/>
+    </subtraction>
+    <box lunit="mm" name="vacuum_box0x173bef0" x="3000" y="800" z="2000"/>
+    <subtraction name="vacuum_upstream0x173e380">
+      <first ref="vacuum_box0x173bef0"/>
+      <second ref="yoke_box0x173e910"/>
+      <position name="vacuum_upstream0x173e380_pos" unit="mm" x="-170.51" y="0" z="-2172.46"/>
+      <rotation name="vacuum_upstream0x173e380_rot" unit="deg" x="0" y="29.91" z="0"/>
+    </subtraction>
+    <box lunit="mm" name="subt20x173b3d0" x="1800" y="1200" z="4000"/>
+    <subtraction name="vacuum_upstream0x173e9a0">
+      <first ref="vacuum_upstream0x173e380"/>
+      <second ref="subt20x173b3d0"/>
+      <position name="vacuum_upstream0x173e9a0_pos" unit="mm" x="1950" y="0" z="0"/>
+      <rotation name="vacuum_upstream0x173e9a0_rot" unit="deg" x="0" y="29.91" z="0"/>
+    </subtraction>
+    <box lunit="mm" name="hod_box0x173b290" x="100" y="1200" z="10"/>
+    <box lunit="mm" name="hod2c_box0x173b330" x="2400" y="1200" z="10"/>
+    <box lunit="mm" name="NeutronWindow0x17396f0" x="2430" y="800" z="3"/>
+    <box lunit="mm" name="Flange0x173abe0" x="2730" y="1150" z="30"/>
+    <box lunit="mm" name="WindowBox0x173a730" x="2490" y="860" z="130"/>
+    <union name="Flange+WindowBox0x173c1d0">
+      <first ref="Flange0x173abe0"/>
+      <second ref="WindowBox0x173a730"/>
+      <position name="Flange+WindowBox0x173c1d0_pos" unit="mm" x="-25" y="0" z="80"/>
+    </union>
+    <box lunit="mm" name="WindowHole0x173a5a0" x="2430" y="800" z="400"/>
+    <subtraction name="ExitWindowN0x1e5f430">
+      <first ref="Flange+WindowBox0x173c1d0"/>
+      <second ref="WindowHole0x173a5a0"/>
+      <position name="ExitWindowN0x1e5f430_pos" unit="mm" x="-25" y="0" z="0"/>
+    </subtraction>
+    <box lunit="mm" name="NeutronDetector0x1e582e0" x="120" y="1800" z="120"/>
+    <box lunit="mm" name="VetoDetector0x1e53760" x="320" y="1900" z="10"/>
+    <box lunit="mm" name="VetoDetector0x1e58890" x="320" y="1900" z="10"/>
+    <box lunit="mm" name="expHall_box0x173ea60" x="12000" y="12000" z="35000"/>
+  </solids>
+
+  <structure>
+    <volume name="vchamber_log0x17383a0">
+      <materialref ref="G4_Galactic0x1576c20"/>
+      <solidref ref="vchamber_sol0x1737e10"/>
+    </volume>
+    <volume name="yoke_log0x172d2b0">
+      <materialref ref="G4_Fe0x1581cd0"/>
+      <solidref ref="yoke_box0x173e910"/>
+      <physvol name="vchamber0x173b390">
+        <volumeref ref="vchamber_log0x17383a0"/>
+      </physvol>
+    </volume>
+    <volume name="FDC1Active_log0x173ada0">
+      <materialref ref="G4_Galactic0x1576c20"/>
+      <solidref ref="fdc1c_box0x173d660"/>
+    </volume>
+    <volume name="fdc1enc_log0x173ac40">
+      <materialref ref="G4_Galactic0x1576c20"/>
+      <solidref ref="fdc1enc_box0x173dc00"/>
+      <physvol name="FDC10x173c490">
+        <volumeref ref="FDC1Active_log0x173ada0"/>
+      </physvol>
+    </volume>
+    <volume name="vacuum_upstream_log0x1739cf0">
+      <materialref ref="G4_Galactic0x1576c20"/>
+      <solidref ref="vacuum_upstream0x17399b0"/>
+      <physvol name="fdc1enc0x173ba10">
+        <volumeref ref="fdc1enc_log0x173ac40"/>
+        <position name="fdc1enc0x173ba10_pos" unit="mm" x="0" y="0" z="-220.971"/>
+      </physvol>
+    </volume>
+    <volume name="target_log0x173a380">
+      <materialref ref="G4_Galactic0x1576c20"/>
+      <solidref ref="target_box0x1739be0"/>
+    </volume>
+    <volume name="target_chamber_log0x173a7c0">
+      <materialref ref="G4_Al0x15842c0"/>
+      <solidref ref="MINOSduct0x173a630"/>
+    </volume>
+    <volume name="FDC2Active_log0x173ba50">
+      <materialref ref="G4_Galactic0x1576c20"/>
+      <solidref ref="fdc2c_box0x173d5a0"/>
+    </volume>
+    <volume name="fdc2enc_log0x173b940">
+      <materialref ref="G4_Galactic0x1576c20"/>
+      <solidref ref="fdc2enc_box0x173d600"/>
+      <physvol name="FDC20x173b9d0">
+        <volumeref ref="FDC2Active_log0x173ba50"/>
+      </physvol>
+    </volume>
+    <volume name="ExitWindowC2_log0x173db00">
+      <materialref ref="G4_Fe0x1581cd0"/>
+      <solidref ref="windowc2_flng_hldr2_hole0x173c890"/>
+    </volume>
+    <volume name="ExitWindowC2Hole_log0x173dc90">
+      <materialref ref="G4_Galactic0x1576c20"/>
+      <solidref ref="windowc2_hole_box0x173c140"/>
+    </volume>
+    <volume name="vacuum_upstream_log0x1739780">
+      <materialref ref="G4_Galactic0x1576c20"/>
+      <solidref ref="vacuum_upstream0x173e9a0"/>
+    </volume>
+    <volume name="HODScinti_log0x173b670">
+      <materialref ref="G4_Galactic0x1576c20"/>
+      <solidref ref="hod_box0x173b290"/>
+    </volume>
+    <volume name="hodenc_log0x173b470">
+      <materialref ref="G4_Galactic0x1576c20"/>
+      <solidref ref="hod2c_box0x173b330"/>
+      <replicavol number="24">
+        <volumeref ref="HODScinti_log0x173b670"/>
+        <replicate_along_axis>
+          <direction x="1"/>
+          <width unit="mm" value="100"/>
+          <offset unit="mm" value="0"/>
+        </replicate_along_axis>
+      </replicavol>
+    </volume>
+    <volume name="NeutronWindow0x1e5f950">
+      <materialref ref="G4_Fe0x1581cd0"/>
+      <solidref ref="NeutronWindow0x17396f0"/>
+    </volume>
+    <volume name="NeutronWindowFlange0x1e5f730">
+      <materialref ref="G4_Fe0x1581cd0"/>
+      <solidref ref="ExitWindowN0x1e5f430"/>
+    </volume>
+    <volume name="NeutronDetector0x172d340">
+      <materialref ref="G4_PLASTIC_SC_VINYLTOLUENE0x15856e0"/>
+      <solidref ref="NeutronDetector0x1e582e0"/>
+    </volume>
+    <volume name="VetoDetector0x1e55b20">
+      <materialref ref="G4_PLASTIC_SC_VINYLTOLUENE0x15856e0"/>
+      <solidref ref="VetoDetector0x1e53760"/>
+    </volume>
+    <volume name="VetoDetector0x1e593c0">
+      <materialref ref="G4_PLASTIC_SC_VINYLTOLUENE0x15856e0"/>
+      <solidref ref="VetoDetector0x1e58890"/>
+    </volume>
+    <assembly name="assemblyVol">
+      <physvol name="yoke0x173b2f0">
+        <volumeref ref="yoke_log0x172d2b0"/>
+        <rotation name="yoke0x173b2f0_rot" unit="deg" x="0" y="30" z="0"/>
+      </physvol>
+      <physvol name="vacuum_upstream0x173e6f0">
+        <volumeref ref="vacuum_upstream_log0x1739cf0"/>
+        <position name="vacuum_upstream0x173e6f0_pos" unit="mm" x="0" y="0" z="-2500"/>
+      </physvol>
+      <physvol name="Target0x173e0e0">
+        <volumeref ref="target_log0x173a380"/>
+        <position name="Target0x173e0e0_pos" unit="mm" x="0" y="0" z="-4367"/>
+      </physvol>
+      <physvol name="MINOSTargetChamber0x173c920">
+        <volumeref ref="target_chamber_log0x173a7c0"/>
+        <position name="MINOSTargetChamber0x173c920_pos" unit="mm" x="0" y="0" z="-4208.5"/>
+      </physvol>
+      <physvol name="fdc2enc0x173ae30">
+        <volumeref ref="fdc2enc_log0x173b940"/>
+        <position name="fdc2enc0x173ae30_pos" unit="mm" x="-3323.08874946972" y="0" z="2499.63078569071"/>
+        <rotation name="fdc2enc0x173ae30_rot" unit="deg" x="0" y="59.91" z="0"/>
+      </physvol>
+      <physvol name="WinC20x173dea0">
+        <volumeref ref="ExitWindowC2_log0x173db00"/>
+        <position name="WinC20x173dea0_pos" unit="mm" x="-2672.42765589103" y="0" z="1745.59598296077"/>
+        <rotation name="WinC20x173dea0_rot" unit="deg" x="0" y="59.91" z="0"/>
+      </physvol>
+      <physvol name="WinC2_Hole0x173de00">
+        <volumeref ref="ExitWindowC2Hole_log0x173dc90"/>
+        <position name="WinC2_Hole0x173de00_pos" unit="mm" x="-2672.42765589103" y="0" z="1745.59598296077"/>
+        <rotation name="WinC2_Hole0x173de00_rot" unit="deg" x="0" y="59.91" z="0"/>
+      </physvol>
+      <physvol name="vacuum_downstream0x173bc10">
+        <volumeref ref="vacuum_upstream_log0x1739780"/>
+        <position name="vacuum_downstream0x173bc10_pos" unit="mm" x="-1794.21013429988" y="0" z="1236.71585486546"/>
+        <rotation name="vacuum_downstream0x173bc10_rot" unit="deg" x="0" y="59.91" z="0"/>
+      </physvol>
+      <physvol name="hodenc0x173aea0">
+        <volumeref ref="hodenc_log0x173b470"/>
+        <position name="hodenc0x173aea0_pos" unit="mm" x="-3961.63508536555" y="0" z="2869.63426799055"/>
+        <rotation name="hodenc0x173aea0_rot" unit="deg" x="0" y="59.91" z="0"/>
+      </physvol>
+      <physvol name="WinN0x1739e60">
+        <volumeref ref="NeutronWindow0x1e5f950"/>
+        <position name="WinN0x1739e60_pos" unit="mm" x="160.77800506031" y="0" z="2434.90432649598"/>
+        <rotation name="WinN0x1739e60_rot" unit="deg" x="0" y="30" z="0"/>
+      </physvol>
+      <physvol name="WinN_flange0x1739b20">
+        <volumeref ref="NeutronWindowFlange0x1e5f730"/>
+        <position name="WinN_flange0x1739b20_pos" unit="mm" x="254.928640154921" y="0" z="2321.83064294723"/>
+        <rotation name="WinN_flange0x1739b20_rot" unit="deg" x="0" y="30" z="0"/>
+      </physvol>
+    </assembly>
+    <volume name="expHall_log0x173d390">
+      <materialref ref="G4_Galactic0x1576c20"/>
+      <solidref ref="expHall_box0x173ea60"/>
+      <physvol>
+        <volumeref ref="assemblyVol"/>
+      </physvol>
+    </volume>
+  </structure>
+
+  <setup name="Default" version="1.0">
+    <world ref="assemblyVol"/>
+  </setup>
+
+</gdml>

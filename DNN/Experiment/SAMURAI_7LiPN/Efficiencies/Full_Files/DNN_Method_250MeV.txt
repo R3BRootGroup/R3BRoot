@@ -1,0 +1,90 @@
+This file contains the computed efficiencies of the E*=0
+cross section in 7Li(p,n)7Be at a proton beam energy of 252.7 MeV
+measured with SAMURAI & 4dp NeuLAND at 1093.5 cm distance.
+5 bins of 1.0 degrees.
+
+IonCL++ Training & IonCL++ Validation:
+0.281939 0.00277077
+0.289169 0.00275261
+0.293654 0.00280242
+0.297155 0.00388749
+0.285137 0.0381876
+
+IonCL++ Training & IonCL++ Validation (second round):
+0.286317 0.00322361
+0.289712 0.00319375
+0.291863 0.00324085
+0.290988 0.00444513
+0.265994 0.038137
+
+IonCL++ Training & Bertini Validation:
+0.254867 0.00273299
+0.264066 0.0027353
+0.267457 0.00276274
+0.27145 0.00385635
+0.255801 0.0337634
+
+Bertini Training & IonCL++ Validation:
+0.228389 0.0023725
+0.238731 0.0023971
+0.241834 0.00242953
+0.242487 0.0033613
+0.226725 0.0301329
+
+Bertini Training & Bertini Validation:
+0.211636 0.00237375
+0.220357 0.00238786
+0.220342 0.00241662
+0.223185 0.0033611
+0.228444 0.0341131
+
+Physics List (without second 2x INCL++ run):
+Average efficiency = 
+0.2442078
+0.2530808
+0.2558218
+0.2585693
+0.2490267
+Max. Deviation from average = 
+0.037731
+0.036088
+0.037832
+0.038586
+0.036110
+
+Difference between first & second INCL++ run:
+0.004378
+0.000543
+0.001791
+0.006167
+0.019143
+
+Max. of the 5 errors in efficiency:
+0.0032236
+0.0031937
+0.0032408
+0.0044451
+0.0381876
+
+Adding both stat. errors in quadrature:
+0.0054368
+0.0032395
+0.0037028
+0.0076020
+0.0427171
+
+Hence, the proper efficiency file is (first stat. error, then phys. list error):
+0.2442078 0.0054368 0.037731
+0.2530808 0.0032395 0.036088
+0.2558218 0.0037028 0.037832
+0.2585693 0.0076020 0.038586
+0.2490267 0.0427171 0.036110
+
+Which takes physics list errors & statistical errors
+in the network training into account. Event generator
+errors are skipped, because they do not exist for this 
+experiment.
+
+NOTE: for the 1n-->1n detecion efficiency for perfect reconstruction,
+we always assumed a 0.1% error, due to this being sqrt(1e6), which
+is the total number of simulated events in the validation.

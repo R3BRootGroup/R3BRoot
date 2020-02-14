@@ -1,0 +1,90 @@
+This file contains the computed efficiencies of the E*=0
+cross section in 7Li(p,n)7Be at a proton beam energy of 109.1 MeV
+measured with SAMURAI & 4dp NeuLAND at 1093.5 cm distance.
+5 bins of 1.0 degrees.
+
+IonCL++ Training & IonCL++ Validation:
+0.333027 0.00392819 0
+0.340757 0.00393826 0
+0.344046 0.00405767 0
+0.346454 0.00606114 0
+0.346703 0.03542130 0
+
+IonCL++ Training & IonCL++ Validation (second round):
+0.334675 0.00395724 0
+0.339180 0.00395685 0
+0.339677 0.00406906 0
+0.342646 0.00586557 0
+0.360100 0.03862000 0
+
+IonCL++ Training & Bertini Validation:
+0.292907 0.00398690 0
+0.301231 0.00407284 0
+0.304904 0.00408328 0
+0.303079 0.00620677 0
+0.307071 0.03489130 0
+
+Bertini Training & IonCL++ Validation:
+0.320394 0.00381507 0
+0.327860 0.00384161 0
+0.329365 0.00390745 0
+0.330337 0.00583579 0
+0.344346 0.23387100 0
+
+Bertini Training & Bertini Validation:
+0.278268 0.00385254 0
+0.286325 0.00397892 0
+0.293050 0.00418073 0
+0.297355 0.00590782 0
+0.302487 0.03033680 0
+
+Physics List (without second 2x INCL++ run):
+Average efficiency = 
+0.30615
+0.31404
+0.31784
+0.31931
+0.32515
+Max. Deviation from average = 
+0.027881
+0.027718
+0.026205
+0.027148
+0.022665
+
+Difference between first & second INCL++ run:
+0.001648
+0.001577
+0.004369
+0.003808
+0.013397
+
+Max. of the 5 errors in efficiency:
+0.0039869
+0.0040728
+0.0041807
+0.0062068
+0.2338710
+
+Adding both stat. errors in quadrature:
+0.0043141
+0.0043675
+0.0060470
+0.0072818
+0.2342544
+
+Hence, the proper efficiency file is (first stat. error, then phys. list error):
+0.30615 0.0043141 0.027881
+0.31404 0.0043675 0.027718
+0.31784 0.0060470 0.026205
+0.31931 0.0072818 0.027148
+0.32515 0.2342544 0.022665
+
+Which takes physics list errors & statistical errors
+in the network training into account. Event generator
+errors are skipped, because they do not exist for this 
+experiment.
+
+NOTE: for the 1n-->1n detecion efficiency for perfect reconstruction,
+we always assumed a 0.1% error, due to this being sqrt(1e6), which
+is the total number of simulated events in the validation.
