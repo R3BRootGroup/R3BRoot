@@ -205,6 +205,7 @@ class R3BCalifaOnlineSpectra : public FairTask
     TH1F* fh1_Califa_wr;
     TCanvas* cWrs;
     TH1F* fh1_wrs[2];
+    TCanvas* cCalifa_wr_energy;
 
     // Histograms
     TH1F* fh1_Califa_Mult;
@@ -225,6 +226,8 @@ class R3BCalifaOnlineSpectra : public FairTask
     TH2F* fh2_Califa_theta_phi;
     TH2F* fh2_Califa_theta_energy;
     TH1F* fh1_Califa_total_energy;
+    TH2F* fh2_Cal_wr_energy_l;
+    TH2F* fh2_Cal_wr_energy_r;
 
   public:
     ClassDef(R3BCalifaOnlineSpectra, 1)

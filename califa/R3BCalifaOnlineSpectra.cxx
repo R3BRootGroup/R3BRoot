@@ -699,6 +699,31 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     fh1_wrs[1]->SetLineWidth(3);
     fh1_wrs[1]->Draw("same");
 
+    // CANVAS energy vs wrs
+    sprintf(Name1, "Califa_wr_vs_energy");
+    sprintf(Name2, "fh2_wr_vs_energy_left");
+    sprintf(Name3, "Califa WR vs hit-energy left side");
+    cCalifa_wr_energy = new TCanvas(Name1, Name1, 10, 10, 500, 500);
+    cCalifa_wr_energy->Divide(1, 2);
+    fh2_Cal_wr_energy_l = new TH2F(Name2, Name3, 700, -4100, 4100, bins, minE, maxE);
+    fh2_Cal_wr_energy_l->GetXaxis()->SetTitle("WR difference (Master-Califa)");
+    fh2_Cal_wr_energy_l->GetYaxis()->SetTitle("Energy [keV]");
+    fh2_Cal_wr_energy_l->GetYaxis()->SetTitleOffset(1.4);
+    fh2_Cal_wr_energy_l->GetXaxis()->CenterTitle(true);
+    fh2_Cal_wr_energy_l->GetYaxis()->CenterTitle(true);
+    cCalifa_wr_energy->cd(1);
+    fh2_Cal_wr_energy_l->Draw("COLZ");
+    sprintf(Name2, "fh2_wr_vs_energy_right");
+    sprintf(Name3, "Califa WR vs hit-energy right side");
+    fh2_Cal_wr_energy_r = new TH2F(Name2, Name3, 700, -4100, 4100, bins, minE, maxE);
+    fh2_Cal_wr_energy_r->GetXaxis()->SetTitle("WR difference (Master-Califa)");
+    fh2_Cal_wr_energy_r->GetYaxis()->SetTitle("Energy [keV]");
+    fh2_Cal_wr_energy_r->GetYaxis()->SetTitleOffset(1.4);
+    fh2_Cal_wr_energy_r->GetXaxis()->CenterTitle(true);
+    fh2_Cal_wr_energy_r->GetYaxis()->CenterTitle(true);
+    cCalifa_wr_energy->cd(2);
+    fh2_Cal_wr_energy_r->Draw("COLZ");
+
     // FOLDERS for Califa
     TFolder* folder_sta = new TFolder("Statistics_per_ring", "Statistics info");
     for (Int_t i = 2; i < fNumRings; i++)
@@ -818,6 +843,8 @@ InitStatus R3BCalifaOnlineSpectra::Init()
         mainfolCalifa->Add(cCalifa_angles);
         mainfolCalifa->Add(cCalifa_theta_energy);
         mainfolCalifa->Add(cCalifa_hitenergy);
+        if (fWRItemsCalifa && fWRItemsMaster)
+            mainfolCalifa->Add(cCalifa_wr_energy);
     }
     run->AddObject(mainfolCalifa);
 
@@ -850,6 +877,11 @@ void R3BCalifaOnlineSpectra::Reset_CALIFA_Histo()
     {
         fh1_wrs[0]->Reset();
         fh1_wrs[1]->Reset();
+        if (fHitItemsCalifa)
+        {
+            fh2_Cal_wr_energy_r->Reset();
+            fh2_Cal_wr_energy_l->Reset();
+        }
     }
 
     if (fMappedItemsCalifa)
@@ -1220,6 +1252,8 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
     if (NULL == mgr)
         LOG(FATAL) << "R3BCalifaOnlineSpectra::Exec FairRootManager not found";
 
+    int64_t wrdif[fNumSides];
+    Int_t wrdifinUse = 0;
     // WR data
     if (fWRItemsCalifa && fWRItemsCalifa->GetEntriesFast() > 0)
     {
@@ -1236,7 +1270,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
         if (nHits == 2)
             fh1_Califa_wr->Fill(wr[1] - wr[0]);
 
-        // Master from SOFIA (exp. 2020)
+        // Master Ref. (exp. 2020)
         if (fWRItemsMaster && fWRItemsMaster->GetEntriesFast() > 0)
         {
             nHits = fWRItemsMaster->GetEntriesFast();
@@ -1250,6 +1284,9 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
             }
             fh1_wrs[0]->Fill(wrm - wr[0]); // messel
             fh1_wrs[1]->Fill(wrm - wr[1]); // wixhausen
+            wrdif[0] = wrm - wr[0];
+            wrdif[1] = wrm - wr[1];
+            wrdifinUse = 1;
         }
     }
 
@@ -1354,6 +1391,15 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
         }
         // Comparison of hits to get energy, theta and phi correlations between them
         for (Int_t i1 = 0; i1 < nHits; i1++)
+        {
+
+            if (wrdifinUse == 1)
+            {
+                if (TMath::Abs(califa_phi[i1]) > 90.)
+                    fh2_Cal_wr_energy_r->Fill(wrdif[1], califa_e[i1]); // wixhausen
+                else
+                    fh2_Cal_wr_energy_l->Fill(wrdif[0], califa_e[i1]); // messel
+            }
             for (Int_t i2 = i1 + 1; i2 < nHits; i2++)
                 if (gRandom->Uniform(0., 1.) < 0.5)
                 {
@@ -1367,6 +1413,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
                     fh2_Califa_coinTheta->Fill(califa_theta[i2], califa_theta[i1]);
                     fh2_Califa_coinPhi->Fill(califa_phi[i2], califa_phi[i1]);
                 }
+        }
     }
 
     fNEvents += 1;
@@ -1408,6 +1455,8 @@ void R3BCalifaOnlineSpectra::FinishTask()
     if (fWRItemsMaster && fWRItemsCalifa)
     {
         cWrs->Write();
+        if (fHitItemsCalifa)
+            cCalifa_wr_energy->Write();
     }
 
     // Write canvas for Mapped data
