@@ -1,4 +1,4 @@
-/******************************************************************************
+/************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
  *                                                                            *
@@ -100,6 +100,8 @@ class R3BMusicOnlineSpectra : public FairTask
     TClonesArray* fMappedItemsMus; /**< Array with mapped items. */
     TClonesArray* fCalItemsMus;    /**< Array with cal items. */
     TClonesArray* fHitItemsMus;    /**< Array with hit items. */
+    TClonesArray* fCalItemsMwpc0;
+    TClonesArray* fHitItemsMwpc0;
 
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header.      */
@@ -114,6 +116,8 @@ class R3BMusicOnlineSpectra : public FairTask
     TCanvas* cMusCal_Pos;
     TCanvas *cMusMap_ESum, *cMus_EsumvsDT, *cMusMap_ESum1, *cMusMap_ESum2, *cMusMap_DTvsDT;
     TCanvas* cMusMap_ESum_vs_diffDT;
+    TCanvas* cMusECorMwpc0;
+    TCanvas* cMusDTCorMwpc0;
 
     // Histograms for Mapped data
     TH1F* fh1_Musmap_mult;
@@ -127,7 +131,9 @@ class R3BMusicOnlineSpectra : public FairTask
     TH2F* fh2_Mus_EneRawVsDriftTime[NbAnodesMus];
     TH2F* fh2_Mus_DTvsDT[NbAnodesMus - 1];
     TH2F* fh2_Mus_ESum_vs_diffDT;
-
+    TH2F* fh2_MusCorMwpc0_EsumVsX0mm;
+    TH2F* fh2_MusCorMwpc0_EsumVsY0mm;
+    TH2F* fh2_MusCorMwpc0_DTvsX0[NbAnodesMus]; 
     // Histograms for Cal data
     TH1F* fh1_Muscal_Pos[NbAnodesMus];
 
