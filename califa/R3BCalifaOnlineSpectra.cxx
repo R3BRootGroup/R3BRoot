@@ -30,6 +30,7 @@
 #include "TFolder.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TVector3.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -63,6 +64,7 @@ R3BCalifaOnlineSpectra::R3BCalifaOnlineSpectra()
     , fMaxBinChannelFebex(65535)
     , fMaxEnergyBarrel(10)
     , fMaxEnergyIphos(30)
+    , fMinProtonE(50000.)
     , fRaw2Cal(kFALSE)
     , fLogScale(kTRUE)
     , fFebex2Preamp(kTRUE)
@@ -112,6 +114,7 @@ R3BCalifaOnlineSpectra::R3BCalifaOnlineSpectra(const TString& name, Int_t iVerbo
     , fMaxBinChannelFebex(65535)
     , fMaxEnergyBarrel(10)
     , fMaxEnergyIphos(30)
+    , fMinProtonE(50000.)
     , fRaw2Cal(kFALSE)
     , fLogScale(kTRUE)
     , fFebex2Preamp(kTRUE)
@@ -664,6 +667,23 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     fh1_Califa_total_energy->Draw("");
     gPad->SetLogy();
 
+    // CANVAS opening angle
+    sprintf(Name1, "Califa_opening_angle_hit");
+    sprintf(Name2, "fh1_Califa_opening");
+    sprintf(Name3, "Califa opening angle");
+    cCalifa_opening = new TCanvas(Name1, Name1, 10, 10, 500, 500);
+    fh1_openangle = new TH1F(Name2, Name3, 160, 10, 170);
+    fh1_openangle->GetXaxis()->SetTitle("Opening angle [degrees]");
+    fh1_openangle->GetYaxis()->SetTitle("Counts");
+    fh1_openangle->GetXaxis()->CenterTitle(true);
+    fh1_openangle->GetYaxis()->CenterTitle(true);
+    fh1_openangle->GetYaxis()->SetTitleOffset(1.2);
+    fh1_openangle->GetXaxis()->SetTitleOffset(1.2);
+    fh1_openangle->SetFillColor(8);
+    fh1_openangle->SetLineColor(1);
+    fh1_openangle->SetLineWidth(2);
+    fh1_openangle->Draw("");
+
     // Difference between Califa WRs
     sprintf(Name1, "WR_Califa");
     sprintf(Name2, "fh1_WR_Califa");
@@ -841,6 +861,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
         mainfolCalifa->Add(cCalifaCoinTheta);
         mainfolCalifa->Add(cCalifaCoinPhi);
         mainfolCalifa->Add(cCalifa_angles);
+        mainfolCalifa->Add(cCalifa_opening);
         mainfolCalifa->Add(cCalifa_theta_energy);
         mainfolCalifa->Add(cCalifa_hitenergy);
         if (fWRItemsCalifa && fWRItemsMaster)
@@ -935,6 +956,7 @@ void R3BCalifaOnlineSpectra::Reset_CALIFA_Histo()
         fh2_Califa_theta_phi->Reset();
         fh2_Califa_theta_energy->Reset();
         fh1_Califa_total_energy->Reset();
+        fh1_openangle->Reset();
     }
 }
 
@@ -1389,10 +1411,31 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
             fh2_Califa_theta_energy->Fill(theta + gRandom->Uniform(-1.5, 1.5), hit->GetEnergy());
             fh1_Califa_total_energy->Fill(hit->GetEnergy());
         }
-        // Comparison of hits to get energy, theta and phi correlations between them
+
+        TVector3 master[2];
+        Double_t maxEL = 0., maxER = 0.;
         for (Int_t i1 = 0; i1 < nHits; i1++)
         {
 
+            if (califa_e[i1] > maxER && TMath::Abs(califa_phi[i1]) > 150.) // wixhausen
+            {
+                master[0].SetMagThetaPhi(1., califa_theta[i1] * TMath::DegToRad(), califa_phi[i1] * TMath::DegToRad());
+                maxER = califa_e[i1];
+            }
+            if (califa_e[i1] > maxEL && TMath::Abs(califa_phi[i1]) < 60.)
+            { // messel
+                master[1].SetMagThetaPhi(1., califa_theta[i1] * TMath::DegToRad(), califa_phi[i1] * TMath::DegToRad());
+                maxEL = califa_e[i1];
+            }
+        }
+        if (maxEL > fMinProtonE && maxER > fMinProtonE)
+        {
+            fh1_openangle->Fill(master[0].Angle(master[1]) * TMath::RadToDeg());
+        }
+
+        // Comparison of hits to get energy, theta and phi correlations between them
+        for (Int_t i1 = 0; i1 < nHits; i1++)
+        {
             if (wrdifinUse == 1)
             {
                 if (TMath::Abs(califa_phi[i1]) > 90.)
@@ -1401,6 +1444,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
                     fh2_Cal_wr_energy_l->Fill(wrdif[0], califa_e[i1]); // messel
             }
             for (Int_t i2 = i1 + 1; i2 < nHits; i2++)
+            {
                 if (gRandom->Uniform(0., 1.) < 0.5)
                 {
                     fh2_Califa_coinE->Fill(califa_e[i1], califa_e[i2]);
@@ -1413,6 +1457,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
                     fh2_Califa_coinTheta->Fill(califa_theta[i2], califa_theta[i1]);
                     fh2_Califa_coinPhi->Fill(califa_phi[i2], califa_phi[i1]);
                 }
+            }
         }
     }
 
@@ -1504,6 +1549,7 @@ void R3BCalifaOnlineSpectra::FinishTask()
         cCalifa_angles->Write();
         cCalifa_theta_energy->Write();
         cCalifa_hitenergy->Write();
+        cCalifa_opening->Write();
     }
 }
 

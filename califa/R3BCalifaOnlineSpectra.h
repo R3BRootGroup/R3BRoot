@@ -132,6 +132,11 @@ class R3BCalifaOnlineSpectra : public FairTask
     inline void SetMaxBinFebex(Int_t max) { fMaxBinChannelFebex = max; }
 
     /**
+     * Method for setting min proton energy (in keV) for opening angle histogram
+     */
+    inline void SetMinProtonEnergyForOpening(Float_t min) { fMinProtonE = min; }
+
+    /**
      * Method to reset histograms
      */
     void Reset_CALIFA_Histo();
@@ -171,6 +176,7 @@ class R3BCalifaOnlineSpectra : public FairTask
     Int_t fBinsChannelFebex;              /**< Number of Bins per Febex channel. */
     Int_t fMaxBinChannelFebex;            /**< Maximum bin for Febex histograms. */
     Int_t fOrderFebexPreamp[Nb_PreampCh]; /**< Selector for febex or preamp sequence. */
+    Float_t fMinProtonE;                  /**< Min proton energy (in keV) to calculate the opening angle */
 
     TString fCalifaFile;    /**< Config file name. */
     Int_t fMaxEnergyBarrel; /**< Max. energy for Barrel histograms at CAL level. */
@@ -199,6 +205,7 @@ class R3BCalifaOnlineSpectra : public FairTask
     TCanvas* cCalifa_angles;
     TCanvas* cCalifa_theta_energy;
     TCanvas* cCalifa_hitenergy;
+    TCanvas* cCalifa_opening;
 
     // WR data
     TCanvas* cCalifa_wr;
@@ -226,6 +233,7 @@ class R3BCalifaOnlineSpectra : public FairTask
     TH2F* fh2_Califa_theta_phi;
     TH2F* fh2_Califa_theta_energy;
     TH1F* fh1_Califa_total_energy;
+    TH1F* fh1_openangle;
     TH2F* fh2_Cal_wr_energy_l;
     TH2F* fh2_Cal_wr_energy_r;
 
