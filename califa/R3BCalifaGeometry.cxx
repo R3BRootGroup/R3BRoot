@@ -28,6 +28,8 @@
 #include <iostream>
 #include <stdlib.h>
 
+#include <boost/regex.hpp>
+
 using std::cerr;
 using std::cout;
 using std::endl;
@@ -270,21 +272,46 @@ double R3BCalifaGeometry::GetDistanceThroughCrystals(TVector3& startVertex,
     return distance;
 }
 
+// ROOT (or pyroot) is unable to automatically load dependencies of so's for whatever reason.
+// so we try to force loading the lib during var initialisation.
+// yes, this is ugly.
+static bool _dummy_load_libboost_regex = []() {
+    char buf[100];
+    snprintf(buf, 100, "%s/lib/libboost_regex.so", getenv("SIMPATH"));
+    return gSystem->Load(buf);
+}();
+
 int R3BCalifaGeometry::GetCrystalId(const char* volumePath)
-{
+{ /*
+   * Yes, regex matching in the stepping action is probably slow.
+   * But if we cared about speed, we would not use string processing here
+   * in the first place.
+   * At least, this way we have well defined behaviour if something fails,
+   * instead of possible out of bounds access consequences (nasal demons etc).
+   * Also, it hopefully works with the 2019/s444 geo file too, now.
+   */
+    static auto restr = "Alveolus_([0-9]+)_([0-9]+).*Crystal_[^_]+_([0-9]+)_";
+    static auto re = boost::regex(restr, boost::regex::extended);
+    boost::cmatch m;
+    if (!boost::regex_search(volumePath, m, re))
+    {
+        LOG(ERROR) << "R3BCalifaGeometry::GetCrystalId: \"" << volumePath
+                   << "\"\n"
+                      "does not match RE \""
+                   << restr << "\".\n";
+        return 0;
+    }
+
     Int_t crystalId;
-    Int_t cryType = 0;
-    Int_t alvType = atoi(volumePath + 31);      // converting to int the alveolus type
-    Int_t alveolusCopy = atoi(volumePath + 34); // converting to int the alveolus copy
-    if (alveolusCopy < 10)
-        cryType = atoi(volumePath + 76); // converting to int the crystal type
-    else
-        cryType = atoi(volumePath + 77); // converting to int the crystal type
+    Int_t alvType = std::stoi(m[1].str());      // converting to int the alveolus type
+    Int_t alveolusCopy = std::stoi(m[2].str()); // converting to int the alveolus copy
+    Int_t cryType = std::stoi(m[3].str());      // converting to int the crystal type
 
     if (cryType < 1 || cryType > 4 || alvType < 1 || alvType > 23)
     { // cryType runs from 1 to 4 while alvType runs from 1 to 23
         LOG(ERROR) << "R3BCalifaGeometry: Wrong crystal numbers (1)";
         cout << "---- cryType: " << cryType << "   alvType: " << alvType << endl;
+        std::cout << "path=" << volumePath << "\n";
         return 0;
     }
 
