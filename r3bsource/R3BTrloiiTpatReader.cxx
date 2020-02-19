@@ -57,7 +57,7 @@ Bool_t R3BTrloiiTpatReader::Init(ext_data_struct_info* a_struct_info)
 Bool_t R3BTrloiiTpatReader::Read()
 {
 
-    LOG(info) << "TrloiiTpatReader::Read BEGIN";
+    // LOG(info) << "TrloiiTpatReader::Read BEGIN";
 
     if (nullptr != fEventHeader)
     {
@@ -69,20 +69,20 @@ Bool_t R3BTrloiiTpatReader::Read()
         fNEvent++;
     }
 
-    if (0 == (fNEvent % 1000))
+    if (0 == (fNEvent % 1000000))
     {
 
         LOG(DEBUG1) << "R3BTrloiiTpatReader : event : " << fNEvent;
     }
 
     /* Display data */
-    char str[256];
-    sprintf(str, "  Trlo II Tpat = 0x%04x.", fData->TPATv[0]);
-    LOG(info) << str;
+    // char str[256];
+    // sprintf(str, "  Trlo II Tpat = 0x%04x.", fData->TPATv[0]);
+    // LOG(info) << str;
 
     //  cout<<"TPAT: "<<fData->TPATv[0]<<endl;
 
-    LOG(info) << "TrloiiTpatReader::Read END";
+    // LOG(info) << "TrloiiTpatReader::Read END";
 
     return kTRUE;
 }
