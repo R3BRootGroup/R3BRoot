@@ -18,24 +18,21 @@
 Set(SYSTEM_INCLUDE_DIRECTORIES
 ${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
+${Boost_INCLUDE_DIR}
 )
 
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/passive
-${R3BROOT_SOURCE_DIR}/xball
 ${R3BROOT_SOURCE_DIR}/califa
 ${R3BROOT_SOURCE_DIR}/califa/unpack
+${R3BROOT_SOURCE_DIR}/califa/ana
+${R3BROOT_SOURCE_DIR}/califa/pars
+${R3BROOT_SOURCE_DIR}/califa/sim
+${R3BROOT_SOURCE_DIR}/r3bdata/califaData
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
-${R3BROOT_SOURCE_DIR}/r3bdata/califaData
-${R3BROOT_SOURCE_DIR}/r3bdata/dchData
-${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
-${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
-${R3BROOT_SOURCE_DIR}/r3bdata/tofData
-${R3BROOT_SOURCE_DIR}/r3bdata/landData
-${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -50,21 +47,20 @@ link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
 #Put here your sourcefiles
-R3BCalifa.cxx
-R3BCalifaGeometry.cxx
-R3BCalifaCrystalCal2Hit.cxx
-R3BCalifaHitPar.cxx
-R3BCalifaMappingPar.cxx
-R3BCalifaContFact.cxx
-R3BCalifaDigitizer.cxx
-R3BCalifaOnlineSpectra.cxx
-unpack/R3BCalifaMapped2CrystalCal.cxx
-unpack/R3BCalifaCrystalCalDataAnalysis.cxx
-unpack/R3BCalifaMapped2CrystalCalPar.cxx
-unpack/R3BCalifaCrystalCal2CrystalCalPID.cxx
-unpack/R3BCalifaCrystalCalPar.cxx
-unpack/R3BCalifaDemoOnlineSpectra.cxx
-#unpack/R3BCalifaDUCalPar.cxx
+./sim/R3BCalifa.cxx
+./sim/R3BCalifaDigitizer.cxx
+./unpack/R3BCalifaCrystalCal2CrystalCalPID.cxx
+./unpack/R3BCalifaMapped2CrystalCal.cxx
+./R3BCalifaCrystalCal2Hit.cxx
+./R3BCalifaGeometry.cxx
+./ana/R3BCalifaOnlineSpectra.cxx
+./ana/R3BCalifaDemoOnlineSpectra.cxx
+./ana/R3BCalifaCrystalCalDataAnalysis.cxx
+./ana/R3BCalifaMapped2CrystalCalPar.cxx
+./pars/R3BCalifaHitPar.cxx
+./pars/R3BCalifaMappingPar.cxx
+./pars/R3BCalifaCrystalCalPar.cxx
+./pars/R3BCalifaContFact.cxx
 )
 
 # fill list of header files from list of source files
@@ -73,8 +69,9 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
 set(LINKDEF CalifaLinkDef.h)
 set(LIBRARY_NAME R3BCalifa)
+
 set(DEPENDENCIES
-    Spectrum R3Bbase R3BData R3BPassive R3BXBall)
+  Spectrum R3Bbase R3BData R3BPassive  ${Boost_REGEX_LIBRARY})
 
 if(FAIRDB_FOUND)
 set(DEPENDENCIES

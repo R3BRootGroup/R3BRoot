@@ -181,7 +181,7 @@ find_package2(PUBLIC Boost
 regex serialization log log_setup atomic date_time signals ${FairMQ_Boost_COMPONENTS}
 )
 if(Boost_FOUND)
-    set(Boost_Avail 1)
+  set(Boost_Avail 1)
 else(Boost_FOUND)
     set(Boost_Avail 0)
 endif(Boost_FOUND)
