@@ -63,11 +63,11 @@ Bool_t R3BWhiterabbitS2Reader::Init(ext_data_struct_info* a_struct_info)
     // Register output array in tree
     if (!fOnline)
     {
-        FairRootManager::Instance()->Register("S2WRData", "S2WR", fArray, kTRUE);
+        FairRootManager::Instance()->Register("WRS2Data", "WRS2", fArray, kTRUE);
     }
     else
     {
-        FairRootManager::Instance()->Register("S2WRData", "S2WR", fArray, kFALSE);
+        FairRootManager::Instance()->Register("WRS2Data", "WRS2", fArray, kFALSE);
     }
 
     fData->TIMESTAMP_SCITWO_ID = 0;

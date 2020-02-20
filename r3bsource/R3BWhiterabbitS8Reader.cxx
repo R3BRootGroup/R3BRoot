@@ -63,11 +63,11 @@ Bool_t R3BWhiterabbitS8Reader::Init(ext_data_struct_info* a_struct_info)
     // Register output array in tree
     if (!fOnline)
     {
-        FairRootManager::Instance()->Register("S8WRData", "S8WR", fArray, kTRUE);
+        FairRootManager::Instance()->Register("WRS8Data", "WRS8", fArray, kTRUE);
     }
     else
     {
-        FairRootManager::Instance()->Register("S8WRData", "S8WR", fArray, kFALSE);
+        FairRootManager::Instance()->Register("WRS8Data", "WRS8", fArray, kFALSE);
     }
 
     fData->TIMESTAMP_SCIEIGHT_ID = 0;

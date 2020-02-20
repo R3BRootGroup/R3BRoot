@@ -61,7 +61,7 @@ Bool_t R3BTrloiiTpatReader::Read()
 
     if (nullptr != fEventHeader)
     {
-        fEventHeader->SetTpat(fData->TPATv[0]);
+        fEventHeader->SetTpat(fData->TPATv[2]);
         fNEvent = fEventHeader->GetEventno();
     }
     else

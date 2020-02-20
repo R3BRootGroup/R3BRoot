@@ -364,7 +364,7 @@ InitStatus R3BMusicOnlineSpectra::Init()
 
     // Hit data
     TCanvas* cMus_Z = new TCanvas("Mus_charge_z", "Mus: Charge Z", 10, 10, 800, 700);
-    fh1_Mushit_z = new TH1F("fh1_Mus_charge_z", "Music: Charge Z", 900, 2, 28);
+    fh1_Mushit_z = new TH1F("fh1_Mus_charge_z", "Music: Charge Z", 1000, 6, 38);
     fh1_Mushit_z->GetXaxis()->SetTitle("Charge (Z)");
     fh1_Mushit_z->GetYaxis()->SetTitle("Counts");
     fh1_Mushit_z->GetYaxis()->SetTitleOffset(1.1);
@@ -395,7 +395,7 @@ InitStatus R3BMusicOnlineSpectra::Init()
 
     TCanvas* cMus_zvstheta = new TCanvas("Mus_charge_vs_theta", "Mus: Charge Z vs #theta_{XZ}", 10, 10, 800, 700);
     fh2_Mushit_zvstheta =
-        new TH2F("fh2_Mus_Charge_Z_vs_theta", "Music: Charge Z vs #theta_{XZ}", 900, -40, 40, 900, 2, 28);
+        new TH2F("fh2_Mus_Charge_Z_vs_theta", "Music: Charge Z vs #theta_{XZ}", 900, -40, 40, 1000, 6, 38);
     fh2_Mushit_zvstheta->GetXaxis()->SetTitle("#theta_{XZ} [mrad]");
     fh2_Mushit_zvstheta->GetYaxis()->SetTitle("Charge (Z)");
     fh2_Mushit_zvstheta->GetYaxis()->SetTitleOffset(1.1);
