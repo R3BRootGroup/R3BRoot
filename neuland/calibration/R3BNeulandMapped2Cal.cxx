@@ -271,7 +271,7 @@ void R3BNeulandMapped2Cal::MakeCal()
 
 void R3BNeulandMapped2Cal::FinishEvent()
 {
-    if (fVerbose && 0 == (fNEvents % 1000))
+    if (fVerbose && 0 == (fNEvents % 100000))
     {
         LOG(INFO) << "R3BNeulandMapped2Cal::Exec : event=" << fNEvents << " nPMTs=" << fNPmt;
     }

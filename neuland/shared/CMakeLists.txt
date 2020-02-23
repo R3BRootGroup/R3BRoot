@@ -16,7 +16,6 @@ set(LINKDEF NeulandSharedLinkDef.h)
 
 set(DEPENDENCIES R3BData)
 
-set(INCLUDE_DIRECTORIES ${INCLUDE_DIRECTORIES} ${R3BROOT_SOURCE_DIR}/r3bdata/losData)
 include_directories(${INCLUDE_DIRECTORIES})
 
 set(SRCS
@@ -25,8 +24,6 @@ set(SRCS
     R3BNeulandNeutron2DPar.cxx
     R3BNeulandGeoPar.cxx
     R3BNeulandContFact.cxx
-    R3BNeulandOnlineReconstruction.cxx
-    R3BNeulandOnlineSpectra.cxx
     R3BNeulandVisualizer.cxx)
 
 set(HEADERS
@@ -39,8 +36,6 @@ set(HEADERS
     R3BNeulandNeutron2DPar.h
     R3BNeulandGeoPar.h
     R3BNeulandContFact.h
-    R3BNeulandOnlineReconstruction.h
-    R3BNeulandOnlineSpectra.h
     R3BNeulandVisualizer.h)
 
 generate_library()

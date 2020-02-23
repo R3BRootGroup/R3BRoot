@@ -11,25 +11,24 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wformat-security -march=native")
+set(LIBRARY_NAME R3BNeulandOnline)
+set(LINKDEF NeulandOnlineLinkDef.h)
 
-set(SYSTEM_INCLUDE_DIRECTORIES ${SYSTEM_INCLUDE_DIRECTORIES} ${BASE_INCLUDE_DIRECTORIES})
-include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
+set(DEPENDENCIES R3BData)
 
-set(INCLUDE_DIRECTORIES ${R3BROOT_SOURCE_DIR}/r3bdata ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
-                        ${R3BROOT_SOURCE_DIR}/r3bbase ${R3BROOT_SOURCE_DIR}/neuland/shared)
+if(WITH_SOFIA)
+    set(INCLUDE_DIRECTORIES ${INCLUDE_DIRECTORIES} ${R3BROOT_SOURCE_DIR}/sofia/sofdata/sciData
+                            ${R3BROOT_SOURCE_DIR}/sofia/input)
+    set(DEFINITIONS ${DEFINITIONS} -DSOFIA)
+endif(WITH_SOFIA)
 
-link_directories(${ROOT_LIBRARY_DIR} ${Boost_LIBRARY_DIRS} ${FAIRROOT_LIBRARY_DIR})
+set(INCLUDE_DIRECTORIES
+    ${INCLUDE_DIRECTORIES} ${R3BROOT_SOURCE_DIR}/neuland/online
+    ${R3BROOT_SOURCE_DIR}/r3bdata/losData ${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data)
+include_directories(${INCLUDE_DIRECTORIES})
 
-add_subdirectory(calibration)
-add_subdirectory(clustering)
-add_subdirectory(digitizing)
-add_subdirectory(online)
-if(WITH_EPICS)
-    add_subdirectory(preexp)
-endif(WITH_EPICS)
-add_subdirectory(reconstruction)
-add_subdirectory(shared)
-add_subdirectory(simulation)
-add_subdirectory(test)
-add_subdirectory(unpack)
+set(SRCS R3BNeulandOnlineReconstruction.cxx R3BNeulandOnlineSpectra.cxx)
+
+set(HEADERS R3BNeulandOnlineReconstruction.h R3BNeulandOnlineSpectra.h)
+
+generate_library()

@@ -30,6 +30,7 @@ class TCanvas;
 class TGraph;
 class TF1;
 class TH1F;
+class R3BEventHeader;
 
 typedef std::set<UInt_t> ident_no_set;
 typedef std::pair<Float_t, Int_t> pair_value;
@@ -99,8 +100,6 @@ class R3BNeulandCal2HitPar : public FairTask
 
     virtual void Exec(Option_t* option);
 
-    virtual void FinishEvent();
-
     virtual void FinishTask();
 
     inline void SetPlanes(Int_t planes) { fPlanes = planes; }
@@ -115,6 +114,8 @@ class R3BNeulandCal2HitPar : public FairTask
     inline void SetMinEventQDC(Int_t i) { fMinEventQDC = i; }
 
   private:
+    bool IsCosmicEvent();
+
     Int_t fPlanes = 60;
     Int_t fPaddles = 50;
     Float_t fDeviationTH = 20.0;
@@ -124,7 +125,7 @@ class R3BNeulandCal2HitPar : public FairTask
     TClonesArray* fLandPmt;
     R3BNeulandHitPar* fPar;
 
-    TClonesArray* fMappedLos;
+    R3BEventHeader* fEventHeader;
 
     std::vector<std::vector<bar*>> bars;
     TGraph* x_plot;

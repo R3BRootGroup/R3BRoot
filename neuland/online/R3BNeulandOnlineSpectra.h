@@ -19,6 +19,9 @@
 #include "R3BNeulandCalData.h"
 #include "R3BNeulandHit.h"
 #include "R3BPaddleTamexMappedData.h"
+#ifdef SOFIA
+#include "R3BSofSciTcalData.h"
+#endif // SOFIA
 #include "TCAConnector.h"
 #include <array>
 
@@ -47,7 +50,10 @@ class R3BNeulandOnlineSpectra : public FairTask
     TCAInputConnector<R3BPaddleTamexMappedData> fNeulandMappedData;
     TCAInputConnector<R3BNeulandCalData> fNeulandCalData;
     TCAInputConnector<R3BNeulandHit> fNeulandHits;
-    TCAInputConnector<R3BLosCalData> fLosCalData;
+    TCAOptionalInputConnector<R3BLosCalData> fLosCalData;
+#ifdef SOFIA
+    TCAInputConnector<R3BSofSciTcalData> fSofSciCalData;
+#endif // SOFIA
 
     TH1D* hTstart;
     TH1D* hNstart;
@@ -66,17 +72,32 @@ class R3BNeulandOnlineSpectra : public FairTask
     TH2D* hToFvsBar;
     TH2D* hTofvsEhit;
 
+    TH2D* hToFcvsBar;
+    TH2D* hTofcvsEhit;
+
+    TH2D* hTofvsX;
+    TH2D* hTofcvsX;
+    TH2D* hTofvsY;
+    TH2D* hTofcvsY;
+
     TH2D* hTdiffvsBarCosmics;
     TH2D* hDT375;
     TH2D* hDT425;
 
     std::array<TH2D*, fNPlanes> ahXYperPlane;
 
+    TH1D* hSofiaTime;
+    TH2D* hNeuLANDvsSOFIA;
+
     double fDistanceToTarget;
 
   private:
     bool IsBeam() const;
     double GetTstart() const;
+    double GetLosTstart() const;
+#ifdef SOFIA
+    double GetSofTstart() const;
+#endif // SOFIA
 
     ClassDefOverride(R3BNeulandOnlineSpectra, 0)
 };

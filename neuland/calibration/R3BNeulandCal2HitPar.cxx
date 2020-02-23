@@ -19,6 +19,7 @@
 #include "R3BNeulandCal2HitPar.h"
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
+#include "R3BEventHeader.h"
 #include "R3BLandCosmic1Util.h"
 #include "R3BNeulandCalData.h"
 #include "R3BNeulandHitModulePar.h"
@@ -264,7 +265,7 @@ R3BNeulandCal2HitPar::R3BNeulandCal2HitPar()
     : FairTask("R3BNeulandCal2HitPar")
     , fPar(NULL)
     , fLandPmt(NULL)
-    , fMappedLos(NULL)
+    , fEventHeader(nullptr)
 {
 }
 
@@ -272,7 +273,7 @@ R3BNeulandCal2HitPar::R3BNeulandCal2HitPar(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fPar(NULL)
     , fLandPmt(NULL)
-    , fMappedLos(NULL)
+    , fEventHeader(nullptr)
 {
 }
 
@@ -312,11 +313,11 @@ InitStatus R3BNeulandCal2HitPar::Init()
         return kFATAL;
     }
 
-    fMappedLos = (TClonesArray*)fMan->GetObject("LosMapped");
-
-    if (NULL == fMappedLos)
+    fEventHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
+    if (fEventHeader == nullptr)
     {
-        LOG(info) << "Branch LosMapped not found, its ok";
+        LOG(FATAL) << "Branch R3BEventHeader not found";
+        return kFATAL;
     }
 
     fLandPmt = (TClonesArray*)fMan->GetObject("NeulandCalData");
@@ -370,9 +371,11 @@ InitStatus R3BNeulandCal2HitPar::Init()
 
 void R3BNeulandCal2HitPar::Exec(Option_t* option)
 {
-
-    if (fMappedLos && fMappedLos->GetEntriesFast() > 0)
+    // Skip if this is not a pure cosmic event
+    if (!IsCosmicEvent())
+    {
         return;
+    }
 
     if (++fEventNumber % 100000 == 0)
     {
@@ -986,8 +989,6 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option)
     }
 }
 
-void R3BNeulandCal2HitPar::FinishEvent() {}
-
 void R3BNeulandCal2HitPar::FinishTask()
 {
     LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << nData << " Events registered.";
@@ -1316,5 +1317,7 @@ void R3BNeulandCal2HitPar::FinishTask()
     LOG(INFO) << "R3BNeulandCal2HitPar::FinishTask : " << fPar->GetNumModulePar() << "/" << fPlanes * fPaddles * 2
               << " PMTs calibrated!";
 }
+
+bool R3BNeulandCal2HitPar::IsCosmicEvent() { return ((fEventHeader->GetTpat() & 0x200) == 0x200); }
 
 ClassImp(R3BNeulandCal2HitPar)
