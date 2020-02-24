@@ -79,6 +79,8 @@ class R3BNeulandOnlineSpectra : public FairTask
     TH2D* hTofcvsX;
     TH2D* hTofvsY;
     TH2D* hTofcvsY;
+    TH2D* hTofvsZ;
+    TH2D* hTofcvsZ;
 
     TH2D* hTdiffvsBarCosmics;
     TH2D* hDT375;
@@ -88,8 +90,11 @@ class R3BNeulandOnlineSpectra : public FairTask
 
     TH1D* hSofiaTime;
     TH2D* hNeuLANDvsSOFIA;
+    TH1D* hTOF;
 
     double fDistanceToTarget;
+
+    bool fIsOnline;
 
   private:
     bool IsBeam() const;

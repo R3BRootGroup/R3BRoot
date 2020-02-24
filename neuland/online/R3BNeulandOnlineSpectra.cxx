@@ -30,6 +30,7 @@ R3BNeulandOnlineSpectra::R3BNeulandOnlineSpectra()
 #ifdef SOFIA
     , fSofSciCalData("SofSciTcalData")
 #endif // SOFIA
+    , fIsOnline(false)
 {
 }
 
@@ -39,7 +40,12 @@ InitStatus R3BNeulandOnlineSpectra::Init()
     std::srand(std::time(0)); // use current time as seed for random generator
 
     auto run = FairRunOnline::Instance();
-    if (run)
+    if (run != nullptr && run->GetHttpServer() != nullptr)
+    {
+        fIsOnline = true;
+    }
+
+    if (fIsOnline)
     {
         run->GetHttpServer()->Register("/Tasks", this);
         run->GetHttpServer()->RegisterCommand("Reset_Neuland", Form("/Tasks/%s/->ResetHistos()", GetName()));
@@ -85,7 +91,7 @@ InitStatus R3BNeulandOnlineSpectra::Init()
     ahMappedBar2[3]->Draw("same");
 
     canvasMapped->cd(0);
-    if (run)
+    if (fIsOnline)
     {
         run->AddObject(canvasMapped);
     }
@@ -120,7 +126,7 @@ InitStatus R3BNeulandOnlineSpectra::Init()
     ahCalEvsBar[1]->Draw("colz");
 
     canvasCal->cd(0);
-    if (run)
+    if (fIsOnline)
     {
         run->AddObject(canvasCal);
     }
@@ -146,13 +152,8 @@ InitStatus R3BNeulandOnlineSpectra::Init()
     canvasHit->cd(4);
     hTofcvsEhit->Draw("colz");
 
-    hTofvsX = new TH2D("hTofvsX", "Tof vs X", 3000, -200., 200., 6000, 0, 300);
-    hTofcvsX = new TH2D("hTofcvsX", "Tofc vs X", 3000, -200., 200., 6000, 0, 300);
-    hTofvsY = new TH2D("hTofvsY", "Tof vs Y", 3000, -200., 200., 6000, 0, 300);
-    hTofcvsY = new TH2D("hTofcvsY", "Tofc vs Y", 3000, -200., 200., 6000, 0, 300);
-
     canvasHit->cd(0);
-    if (run)
+    if (fIsOnline)
     {
         run->AddObject(canvasHit);
     }
@@ -179,7 +180,7 @@ InitStatus R3BNeulandOnlineSpectra::Init()
     hDT425->Draw("colz");
 
     canvasHitCosmics->cd(0);
-    if (run)
+    if (fIsOnline)
     {
         run->AddObject(canvasHitCosmics);
     }
@@ -200,21 +201,45 @@ InitStatus R3BNeulandOnlineSpectra::Init()
         ahXYperPlane[i]->Draw("colz");
     }
     canvasPlaneXY->cd(0);
-    if (run)
+    if (fIsOnline)
     {
         run->AddObject(canvasPlaneXY);
     }
 
     auto canvasPlaneSofia = new TCanvas("Timing!", "Timing!", 10, 10, 850, 850);
     canvasPlaneSofia->Divide(2, 2);
+    hTofvsX = new TH2D("hTofvsX", "Tof vs X", 3000, -200., 200., 6000, 0, 300);
+    hTofcvsX = new TH2D("hTofcvsX", "Tofc vs X", 1000, -200., 200., 3000, 0, 300);
+    hTofvsY = new TH2D("hTofvsY", "Tof vs Y", 3000, -200., 200., 6000, 0, 300);
+    hTofcvsY = new TH2D("hTofcvsY", "Tofc vs Y", 3000, -200., 200., 6000, 0, 300);
+    hTofvsZ = new TH2D("hTofvsZ", "Tof vs Z", 15, 0, 15, 3000, 0, 300);
+    hTofcvsZ = new TH2D("hTofcvsZ", "Tofc vs Z", 15, 0, 15, 3000, 0, 300);
 
     hSofiaTime = new TH1D("hSofiaTime", "hSofiaTime", 50000, 0, 50000);
-    canvasPlaneSofia->cd(1);
-    hSofiaTime->Draw();
+    // canvasPlaneSofia->cd(1);
+    // hSofiaTime->Draw();
 
     hNeuLANDvsSOFIA = new TH2D("hNeuLANDvsSOFIA", "hNeuLANDvsSOFIA", 4000, 0, 40000, 1050, 0, 10500);
-    canvasPlaneSofia->cd(2);
+    canvasPlaneSofia->cd(1);
     hNeuLANDvsSOFIA->Draw("colz");
+
+    hTOF = new TH1D("hTOF", "hTOF", 5000, -100, 400);
+    canvasPlaneSofia->cd(2);
+    hTOF->Draw();
+
+    canvasPlaneSofia->cd(3);
+    gPad->SetLogz();
+    hTofcvsX->Draw("colz");
+
+    canvasPlaneSofia->cd(4);
+    gPad->SetLogz();
+    hTofcvsZ->Draw("colz");
+
+    canvasPlaneSofia->cd(0);
+    if (fIsOnline)
+    {
+        run->AddObject(canvasPlaneSofia);
+    }
 
     return kSUCCESS;
 }
@@ -284,6 +309,7 @@ void R3BNeulandOnlineSpectra::Exec(Option_t*)
             { // 7.
                 hToFvsBar->Fill(bar, tadj);
                 hToFcvsBar->Fill(bar, tcorr);
+                hTOF->Fill(tcorr);
             }
 
             hTofvsEhit->Fill(hit->GetE(), tadj);
@@ -298,6 +324,8 @@ void R3BNeulandOnlineSpectra::Exec(Option_t*)
             hTofcvsX->Fill(hit->GetPosition().X() + (plane % 2) * 5. * (randx - 0.5), tcorr);
             hTofvsY->Fill(hit->GetPosition().Y() + ((plane + 1) % 2) * 5. * (randx - 0.5), tadj);
             hTofcvsY->Fill(hit->GetPosition().Y() + ((plane + 1) % 2) * 5. * (randx - 0.5), tcorr);
+            hTofvsZ->Fill(plane, tadj);
+            hTofcvsZ->Fill(plane, tcorr);
         }
         else
         {
@@ -356,6 +384,8 @@ void R3BNeulandOnlineSpectra::FinishTask()
     hTofcvsX->Write();
     hTofvsY->Write();
     hTofcvsY->Write();
+    hTofvsZ->Write();
+    hTofcvsZ->Write();
 
     hTdiffvsBarCosmics->Write();
 
@@ -366,6 +396,7 @@ void R3BNeulandOnlineSpectra::FinishTask()
 
     hSofiaTime->Write();
     hNeuLANDvsSOFIA->Write();
+    hTOF->Write();
 
     gDirectory = tmp;
 }
@@ -403,6 +434,8 @@ void R3BNeulandOnlineSpectra::ResetHistos()
     hTofcvsX->Reset();
     hTofvsY->Reset();
     hTofcvsY->Reset();
+    hTofvsZ->Reset();
+    hTofcvsZ->Reset();
 
     hTdiffvsBarCosmics->Reset();
 
@@ -413,6 +446,7 @@ void R3BNeulandOnlineSpectra::ResetHistos()
 
     hSofiaTime->Reset();
     hNeuLANDvsSOFIA->Reset();
+    hTOF->Reset();
 }
 
 void R3BNeulandOnlineSpectra::ResetHistosMapped()
