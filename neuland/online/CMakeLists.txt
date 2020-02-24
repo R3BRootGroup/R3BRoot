@@ -16,15 +16,7 @@ set(LINKDEF NeulandOnlineLinkDef.h)
 
 set(DEPENDENCIES R3BData)
 
-if(WITH_SOFIA)
-    set(INCLUDE_DIRECTORIES ${INCLUDE_DIRECTORIES} ${R3BROOT_SOURCE_DIR}/sofia/sofdata/sciData
-                            ${R3BROOT_SOURCE_DIR}/sofia/input)
-    set(DEFINITIONS ${DEFINITIONS} -DSOFIA)
-endif(WITH_SOFIA)
-
-set(INCLUDE_DIRECTORIES
-    ${INCLUDE_DIRECTORIES} ${R3BROOT_SOURCE_DIR}/neuland/online
-    ${R3BROOT_SOURCE_DIR}/r3bdata/losData ${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data)
+set(INCLUDE_DIRECTORIES ${INCLUDE_DIRECTORIES} ${R3BROOT_SOURCE_DIR}/neuland/online)
 include_directories(${INCLUDE_DIRECTORIES})
 
 set(SRCS R3BNeulandOnlineReconstruction.cxx R3BNeulandOnlineSpectra.cxx)

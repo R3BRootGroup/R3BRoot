@@ -15,13 +15,13 @@
 #define R3BNEULANDCAL2HIT_H
 
 #include "FairTask.h"
-#include "R3BLosCalData.h"
 #include "R3BNeulandCalData.h"
 #include "R3BNeulandHit.h"
 #include "TCAConnector.h"
 #include <map>
 
 class R3BNeulandHitPar;
+class R3BEventHeader;
 
 class R3BNeulandCal2Hit : public FairTask
 {
@@ -44,11 +44,11 @@ class R3BNeulandCal2Hit : public FairTask
 
   private:
     void SetParameter();
-    double GetTstart() const;
+
+    R3BEventHeader* fEventHeader;
 
     TCAInputConnector<R3BNeulandCalData> fCalData;
     TCAOutputConnector<R3BNeulandHit> fHits;
-    TCAOptionalInputConnector<R3BLosCalData> fLosCalData;
 
     R3BNeulandHitPar* fPar;
 

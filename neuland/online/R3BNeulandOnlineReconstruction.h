@@ -15,7 +15,6 @@
 #define R3BROOT_R3BNEULANDONLINERECONSTRUCTION_H
 
 #include "FairTask.h"
-#include "R3BLosCalData.h"
 #include "R3BNeulandCluster.h"
 #include "R3BNeulandHit.h"
 #include "TCAConnector.h"
@@ -23,6 +22,7 @@
 class TH1D;
 class TH2D;
 class TH3D;
+class R3BEventHeader;
 
 class R3BNeulandOnlineReconstruction : public FairTask
 {
@@ -37,9 +37,10 @@ class R3BNeulandOnlineReconstruction : public FairTask
     void SetDistanceToTarget(double x) { fDistanceToTarget = x; }
 
   private:
+    R3BEventHeader* fEventHeader;
+
     TCAInputConnector<R3BNeulandHit> fNeulandHits;
     TCAInputConnector<R3BNeulandCluster> fNeulandClusters;
-    TCAInputConnector<R3BLosCalData> fLosCalData;
 
     TH1D* hHitX;
     TH1D* hHitY;

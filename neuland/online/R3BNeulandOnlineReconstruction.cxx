@@ -13,14 +13,15 @@
 
 #include "R3BNeulandOnlineReconstruction.h"
 #include "FairRunOnline.h"
+#include "R3BEventHeader.h"
 #include "TCanvas.h"
 #include "TF1.h"
+#include "TFile.h"
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TH3D.h"
 #include "THttpServer.h"
 #include "TStyle.h"
-#include <TFile.h>
 #include <numeric>
 
 /* This function is required to suppress boxes for empty bins - make them transparent.*/
@@ -35,9 +36,9 @@ static Double_t gEmptyBinSupressor(const Double_t* x, const Double_t*)
 
 R3BNeulandOnlineReconstruction::R3BNeulandOnlineReconstruction()
     : FairTask("R3BNeulandOnlineReconstruction", 0)
+    , fEventHeader(nullptr)
     , fNeulandHits("NeulandHits")
     , fNeulandClusters("NeulandClusters")
-    , fLosCalData("LosCal")
 {
 }
 
@@ -50,9 +51,20 @@ InitStatus R3BNeulandOnlineReconstruction::Init()
         run->GetHttpServer()->RegisterCommand("Reset_Neuland_Reco", Form("/Tasks/%s/->ResetHistos()", GetName()));
     }
 
+    auto ioman = FairRootManager::Instance();
+    if (ioman == nullptr)
+    {
+        throw std::runtime_error("R3BNeulandOnlineReconstruction: No FairRootManager");
+    }
+
+    fEventHeader = (R3BEventHeader*)ioman->GetObject("R3BEventHeader");
+    if (fEventHeader == nullptr)
+    {
+        throw std::runtime_error("R3BNeulandOnlineReconstruction: No R3BEventHeader");
+    }
+
     fNeulandHits.Init();
     fNeulandClusters.Init();
-    fLosCalData.Init();
 
     gStyle->SetCanvasPreferGL(kTRUE);
     gStyle->SetPalette(kViridis);
@@ -141,7 +153,7 @@ InitStatus R3BNeulandOnlineReconstruction::Init()
 
 void R3BNeulandOnlineReconstruction::Exec(Option_t*)
 {
-    if (fLosCalData.Retrieve().empty())
+    if (std::isnan(fEventHeader->GetTStart()))
     {
         return;
     }

@@ -15,19 +15,16 @@
 #define R3BROOT_R3BNEULANDONLINESPECTRA_H
 
 #include "FairTask.h"
-#include "R3BLosCalData.h"
 #include "R3BNeulandCalData.h"
 #include "R3BNeulandHit.h"
 #include "R3BPaddleTamexMappedData.h"
-#ifdef SOFIA
-#include "R3BSofSciTcalData.h"
-#endif // SOFIA
 #include "TCAConnector.h"
 #include <array>
 
 class TCanvas;
 class TH1D;
 class TH2D;
+class R3BEventHeader;
 
 class R3BNeulandOnlineSpectra : public FairTask
 {
@@ -47,13 +44,11 @@ class R3BNeulandOnlineSpectra : public FairTask
     static const unsigned int fNPlanes = 16;
     static const unsigned int fNBars = fNPlanes * 50;
 
+    R3BEventHeader* fEventHeader;
+
     TCAInputConnector<R3BPaddleTamexMappedData> fNeulandMappedData;
     TCAInputConnector<R3BNeulandCalData> fNeulandCalData;
     TCAInputConnector<R3BNeulandHit> fNeulandHits;
-    TCAOptionalInputConnector<R3BLosCalData> fLosCalData;
-#ifdef SOFIA
-    TCAInputConnector<R3BSofSciTcalData> fSofSciCalData;
-#endif // SOFIA
 
     TH1D* hTstart;
     TH1D* hNstart;
@@ -79,6 +74,8 @@ class R3BNeulandOnlineSpectra : public FairTask
     TH2D* hTofcvsX;
     TH2D* hTofvsY;
     TH2D* hTofcvsY;
+    TH2D* hTofvsZ;
+    TH2D* hTofcvsZ;
 
     TH2D* hTdiffvsBarCosmics;
     TH2D* hDT375;
@@ -88,16 +85,14 @@ class R3BNeulandOnlineSpectra : public FairTask
 
     TH1D* hSofiaTime;
     TH2D* hNeuLANDvsSOFIA;
+    TH1D* hTOF;
 
     double fDistanceToTarget;
 
+    bool fIsOnline;
+
   private:
     bool IsBeam() const;
-    double GetTstart() const;
-    double GetLosTstart() const;
-#ifdef SOFIA
-    double GetSofTstart() const;
-#endif // SOFIA
 
     ClassDefOverride(R3BNeulandOnlineSpectra, 0)
 };

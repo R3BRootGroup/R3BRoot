@@ -16,6 +16,7 @@
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
+#include "R3BEventHeader.h"
 #include "R3BNeulandHitPar.h"
 #include "R3BTCalPar.h"
 #include "TCanvas.h"
@@ -28,18 +29,29 @@
 
 R3BNeulandCal2Hit::R3BNeulandCal2Hit()
     : FairTask("R3BNeulandCal2Hit", 0)
+    , fEventHeader(nullptr)
     , fCalData("NeulandCalData")
     , fHits("NeulandHits")
-    , fLosCalData("LosCal")
     , fFirstPlaneHorizontal(true)
 {
 }
 
 InitStatus R3BNeulandCal2Hit::Init()
 {
+    auto ioman = FairRootManager::Instance();
+    if (ioman == nullptr)
+    {
+        throw std::runtime_error("R3BNeulandCal2Hit: No FairRootManager");
+    }
+
+    fEventHeader = (R3BEventHeader*)ioman->GetObject("R3BEventHeader");
+    if (fEventHeader == nullptr)
+    {
+        throw std::runtime_error("R3BNeulandCal2Hit: No R3BEventHeader");
+    }
+
     fCalData.Init();
     fHits.Init();
-    fLosCalData.Init();
 
     SetParameter();
     return kSUCCESS;
@@ -62,7 +74,8 @@ void R3BNeulandCal2Hit::SetParameter()
         R3BNeulandHitModulePar* fModulePar = fPar->GetModuleParAt(i);
         Int_t id = fModulePar->GetModuleId() * 2 + fModulePar->GetSide() - 3;
         tempMapIsSet[id] = kTRUE;
-        tempMapVeff[id] = std::abs(fModulePar->GetEffectiveSpeed());
+        // ig tempMapVeff[id] = std::abs(fModulePar->GetEffectiveSpeed());
+        tempMapVeff[id] = fModulePar->GetEffectiveSpeed();
         tempMapTSync[id] = fModulePar->GetTimeOffset() + fPar->GetGlobalTimeOffset();
         tempMapEGain[id] = fModulePar->GetEnergieGain();
     }
@@ -94,12 +107,14 @@ void R3BNeulandCal2Hit::Exec(Option_t*)
 
     auto calData = fCalData.Retrieve();
 
-    const auto start = GetTstart();
+    const auto start = fEventHeader->GetTStart();
     const bool beam = !std::isnan(start);
 
     // Sides 1 and two mixed in container. Group side 1 and side 2 together, get iterator to first side 2 data
     const auto endSide1StartSide2 =
         std::partition(calData.begin(), calData.end(), [](const R3BNeulandCalData* c) { return c->GetSide() == 1; });
+
+    Int_t bar_fired[801] = { 0 };
 
     // Loop over side 1
     for (auto c1 = calData.begin(); c1 != endSide1StartSide2; c1++)
@@ -113,72 +128,91 @@ void R3BNeulandCal2Hit::Exec(Option_t*)
         }
 
         // Find matching side 2
-        auto c2 = std::find_if(
-            endSide1StartSide2, calData.end(), [&](const R3BNeulandCalData* c) { return c->GetBarId() == barId; });
-        if (c2 == calData.end())
+        // ig auto c2 = std::find_if(
+        // ig     endSide1StartSide2, calData.end(), [&](const R3BNeulandCalData* c) { return c->GetBarId() == barId;
+        // }); ig if (c2 == calData.end()) ig {
+        // No matching side 2 found
+        // ig    continue;
+        // ig}
+
+        // igconst auto pmt2 = *c2;
+
+        Int_t skip = 0;
+
+        for (auto c2 = endSide1StartSide2; c2 != calData.end(); c2++) // ig
         {
-            // No matching side 2 found
-            continue;
+            const auto pmt2 = *c2;
+            if (pmt2->GetBarId() != barId)
+            {
+                continue;
+            }
+            // skip .....
+            if (skip < bar_fired[barId])
+            {
+                skip++;
+                continue;
+            }
+
+            bar_fired[barId]++;
+
+            // According to the NeuLAND nomenclature sheet, 1 -> Right, 2 -> Left
+            // TODO: Check everywhere
+            // ig instead checking everywhere keep labels 1 and 2 (labels R and L
+            // anyhow don't apply for up and down PMTs
+            const Double_t qdc1 = pmt1->GetQdc() * fMapEGain[barId * 2 - 2];
+            const Double_t qdc2 = pmt2->GetQdc() * fMapEGain[barId * 2 - 1];
+            const Double_t qdc = TMath::Sqrt(qdc1 * qdc2);
+
+            Double_t tdc1 = pmt1->GetTime() + fMapTSync[barId * 2 - 2];
+            Double_t tdc2 = pmt2->GetTime() + fMapTSync[barId * 2 - 1];
+
+            if (tdc1 - tdc2 < -0.5 * 5. * 2048)
+                tdc2 = tdc2 - 5. * 2048;
+            if (tdc1 - tdc2 > 0.5 * 5. * 2048)
+                tdc1 = tdc1 - 5. * 2048;
+
+            Double_t tdc = (tdc1 + tdc2) / 2. - fGlobalTimeOffset;
+
+            if (beam)
+            {
+                // the shift is to get fmod to work as indented: 4 peaks -> 1 peak w/o stray data (e.g. at 5 * 2048)
+                // tdc = fmod(tdc - start - 3000, 5 * 2048) + 3000;
+                tdc = remainder(tdc - start - 3000, 5 * 2048) + 3000; // fmod 3000
+            }
+            else
+            {
+                tdc = std::numeric_limits<double>::quiet_NaN();
+            }
+
+            const Double_t veff = fMapVeff[(barId - 1) * 2];
+
+            const Int_t plane = ((barId - 1) / 50) + 1;
+            const Int_t normalizedBarID = barId % 50 + 1; // ig
+
+            Double_t x, y, z;
+            Double_t xx, yy, zz;
+            if (id == plane % 2)
+            {
+                x = veff * (tdc2 - tdc1);
+                xx = std::min(std::max(0., x / 5. + 25), 49.); // [-:+] -> [0:49]
+
+                y = normalizedBarID * 5. - 127.5; // [1:50] -> [-122.5:122.5]
+                yy = normalizedBarID - 1;         // [1:50] -> [0:49]
+            }
+            else
+            {
+                x = normalizedBarID * 5. - 127.5; // [1:50] -> [-122.5:122.5]
+                xx = normalizedBarID - 1;         // [1:50] -> [0:49]
+
+                y = veff * (tdc2 - tdc1);
+                yy = std::min(std::max(0., y / 5. + 25), 49.); // [-:+] -> [0:49]
+            }
+            z = (plane - 0.5) * 5. + fDistanceToTarget;
+            zz = plane - 1;
+
+            fHits.Insert({ barId, tdc1, tdc2, tdc, qdc1, qdc2, qdc, { x, y, z }, { xx, yy, zz } });
         }
-
-        const auto pmt2 = *c2;
-
-        // According to the NeuLAND nomenclature sheet, 1 -> Right, 2 -> Left
-        // TODO: Check everywhere
-        const Double_t qdcR = pmt1->GetQdc() * fMapEGain[barId * 2 - 2];
-        const Double_t qdcL = pmt2->GetQdc() * fMapEGain[barId * 2 - 1];
-        const Double_t qdc = TMath::Sqrt(qdcL * qdcR);
-
-        const Double_t tdcR = pmt1->GetTime() + fMapTSync[barId * 2 - 2];
-        const Double_t tdcL = pmt2->GetTime() + fMapTSync[barId * 2 - 1];
-        Double_t tdc = (tdcL + tdcR) / 2. - fGlobalTimeOffset;
-
-        if (beam)
-        {
-            // the shift is to get fmod to work as indented: 4 peaks -> 1 peak w/o stray data (e.g. at 5 * 2048)
-            tdc = fmod(tdc - start - 3000, 5 * 2048) + 3000;
-        }
-
-        const Double_t veff = fMapVeff[(barId - 1) * 2];
-
-        const Int_t plane = ((barId - 1) / 50) + 1;
-        const Int_t normalizedBarID = barId % 50;
-
-        Double_t x, y, z;
-        Double_t xx, yy, zz;
-        if (id == plane % 2)
-        {
-            x = veff * (tdcR - tdcL);
-            xx = std::min(std::max(0., x / 5. + 25), 49.); // [-:+] -> [0:49]
-
-            y = normalizedBarID * 5. - 127.5; // [1:50] -> [-122.5:122.5]
-            yy = normalizedBarID - 1;         // [1:50] -> [0:49]
-        }
-        else
-        {
-            x = normalizedBarID * 5. - 127.5; // [1:50] -> [-122.5:122.5]
-            xx = normalizedBarID - 1;         // [1:50] -> [0:49]
-
-            y = veff * (tdcR - tdcL);
-            yy = std::min(std::max(0., y / 5. + 25), 49.); // [-:+] -> [0:49]
-        }
-        z = (plane - 0.5) * 5. + fDistanceToTarget;
-        zz = plane - 1;
-
-        fHits.Insert({ barId, tdcL, tdcR, tdc, qdcL, qdcR, qdc, { x, y, z }, { xx, yy, zz } });
     }
-}
-
-double R3BNeulandCal2Hit::GetTstart() const
-{
-    const auto losCalData = fLosCalData.Retrieve();
-
-    if (losCalData.empty())
-    {
-        return std::numeric_limits<double>::quiet_NaN();
-    }
-
-    return losCalData.back()->GetMeanTimeVFTX();
 }
 
 ClassImp(R3BNeulandCal2Hit)

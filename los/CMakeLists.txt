@@ -35,6 +35,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
 ${R3BROOT_SOURCE_DIR}/tcal
+${R3BROOT_SOURCE_DIR}/neuland/shared
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -51,6 +52,7 @@ set(SRCS
 R3BLosMapped2Cal.cxx
 R3BLosMapped2CalPar.cxx
 R3BLosCal2Hit.cxx
+R3BLosProvideTStart.cxx
 )
 
 # fill list of header files from list of source files

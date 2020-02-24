@@ -1,5 +1,3 @@
-// clang-format off
-
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -13,16 +11,31 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifdef __CINT__
+#ifndef R3BROOT_R3BLOSPROVIDETSTART_H
+#define R3BROOT_R3BLOSPROVIDETSTART_H
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
- 
-#pragma link C++ class R3BLosMapped2Cal+;
-#pragma link C++ class R3BLosMapped2CalPar+;
-#pragma link C++ class R3BLosCal2Hit+;
-#pragma link C++ class R3BLosProvideTStart+;
+#include "FairTask.h"
+#include "R3BLosCalData.h"
+#include "TCAConnector.h"
 
-#endif
+class R3BEventHeader;
 
+class R3BLosProvideTStart : public FairTask
+{
+  public:
+    R3BLosProvideTStart();
+
+    InitStatus Init() override;
+    void Exec(Option_t*) override;
+
+  private:
+    TCAOptionalInputConnector<R3BLosCalData> fLosCalData;
+    R3BEventHeader* fEventHeader;
+
+    bool IsBeam() const;
+    Double_t GetTStart() const;
+
+    ClassDefOverride(R3BLosProvideTStart, 0)
+};
+
+#endif // R3BROOT_R3BLOSPROVIDETSTART_H
