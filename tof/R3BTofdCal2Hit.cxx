@@ -74,8 +74,10 @@ R3BTofdCal2Hit::R3BTofdCal2Hit()
     fh_los_pos = NULL;
     if (fTofdHisto)
     {
-        fhxy = NULL;
-        fhxytot = NULL;
+        fhxy12 = NULL;
+        fhxy12tot = NULL;
+        fhxy34 = NULL;
+        fhxy34tot = NULL;
         fhCharge = NULL;
         //    fhChargevsTof = NULL;
         //    fhChargevsPos = NULL;
@@ -84,6 +86,8 @@ R3BTofdCal2Hit::R3BTofdCal2Hit()
         for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
         {
             fhQ[i] = NULL;
+            fhxy[i] = NULL;
+            fhQvsEvent[i] = NULL;
             fhQM[i] = NULL;
             fhMvsQ[i] = NULL;
             // fhTdiff[i] = NULL;
@@ -98,7 +102,7 @@ R3BTofdCal2Hit::R3BTofdCal2Hit()
                 fhQvsQ[i][2 * j + 1] = NULL;
                 fhQvsTof[i][j] = NULL;
                 fhTvsTof[i][j] = NULL;
-                fhQvsTofw[i][j] = NULL;
+                fhToTvsTofw[i][j] = NULL;
             }
         }
     }
@@ -128,8 +132,10 @@ R3BTofdCal2Hit::R3BTofdCal2Hit(const char* name, Int_t iVerbose)
     fh_los_pos = NULL;
     if (fTofdHisto)
     {
-        fhxy = NULL;
-        fhxytot = NULL;
+        fhxy12 = NULL;
+        fhxy12tot = NULL;
+        fhxy34 = NULL;
+        fhxy34tot = NULL;
         fhCharge = NULL;
         //    fhChargevsTof = NULL;
         //    fhChargevsPos = NULL;
@@ -138,6 +144,8 @@ R3BTofdCal2Hit::R3BTofdCal2Hit(const char* name, Int_t iVerbose)
         for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
         {
             fhQ[i] = NULL;
+            fhxy[i] = NULL;
+            fhQvsEvent[i] = NULL;
             fhQM[i] = NULL;
             fhMvsQ[i] = NULL;
             // fhTdiff[i] = NULL;
@@ -152,7 +160,7 @@ R3BTofdCal2Hit::R3BTofdCal2Hit(const char* name, Int_t iVerbose)
                 fhQvsQ[i][2 * j + 1] = NULL;
                 fhQvsTof[i][j] = NULL;
                 fhTvsTof[i][j] = NULL;
-                fhQvsTofw[i][j] = NULL;
+                fhToTvsTofw[i][j] = NULL;
             }
         }
     }
@@ -168,10 +176,14 @@ R3BTofdCal2Hit::~R3BTofdCal2Hit()
         delete fh_los_pos;
     if (fTofdHisto)
     {
-        if (fhxy)
-            delete fhxy;
-        if (fhxytot)
-            delete fhxytot;
+        if (fhxy12)
+            delete fhxy12;
+        if (fhxy12tot)
+            delete fhxy12tot;
+        if (fhxy34)
+            delete fhxy34;
+        if (fhxy34tot)
+            delete fhxy34tot;
         //    if (fhChargevsTof) delete  fhChargevsTof;
         //    if (fhChargevsPos) delete  fhChargevsPos;
         //    if (fhQp12) delete fhQp12;
@@ -182,6 +194,10 @@ R3BTofdCal2Hit::~R3BTofdCal2Hit()
         {
             if (fhQ[i])
                 delete fhQ[i];
+            if (fhxy[i])
+                delete fhxy[i];
+            if (fhQvsEvent[i])
+                delete fhQvsEvent[i];
             if (fhQM[i])
                 delete fhQM[i];
             if (fhMvsQ[i])
@@ -205,7 +221,7 @@ R3BTofdCal2Hit::~R3BTofdCal2Hit()
                     delete fhQvsTof[i][j];
                 if (fhTvsTof[i][j])
                     delete fhTvsTof[i][j];
-                if (fhQvsTofw[i][j])
+                if (fhToTvsTofw[i][j])
                     delete fhQvsTof[i][j];
             }
         }
@@ -474,9 +490,6 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 vmultihits[iPlane][iBar * 2 - 1] += 1;
 
                 nHitsEvent += 1;
-                // walk corrections
-                bot_ns = bot_ns - walk(bot_tot);
-                top_ns = top_ns - walk(top_tot);
                 R3BTofdHitModulePar* par = fHitPar->GetModuleParAt(iPlane, iBar);
                 if (!par)
                 {
@@ -484,6 +497,22 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                               << ", Bar: " << top->GetBarId();
                     continue;
                 }
+                // walk corrections
+                if (par->GetPar1Walk() == 0. || par->GetPar2Walk() == 0. || par->GetPar3Walk() == 0. ||
+                    par->GetPar4Walk() == 0. || par->GetPar5Walk() == 0.)
+                    LOG(FATAL) << "Walk correction not found!";
+                bot_ns = bot_ns - walk(bot_tot,
+                                       par->GetPar1Walk(),
+                                       par->GetPar2Walk(),
+                                       par->GetPar3Walk(),
+                                       par->GetPar4Walk(),
+                                       par->GetPar5Walk());
+                top_ns = top_ns - walk(top_tot,
+                                       par->GetPar1Walk(),
+                                       par->GetPar2Walk(),
+                                       par->GetPar3Walk(),
+                                       par->GetPar4Walk(),
+                                       par->GetPar5Walk());
                 // calculate tdiff
                 auto tdiff = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2()));
 
@@ -654,12 +683,12 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                     // fhTof[iPlane-1]->Fill(iBar,ToF);
                     // fhTdiff[iPlane-1]->Fill(iBar,tdiff);
                     // fhTsync[iPlane-1]->Fill(iBar,ToF);
-                    fhQvsPos[iPlane - 1][iBar - 1]->Fill(posToT,
+                    fhQvsPos[iPlane - 1][iBar - 1]->Fill(pos,
                                                          parz[0] * TMath::Power((q1 + q2) / 2., parz[2]) + parz[1]);
                     fhQvsTof[iPlane - 1][iBar - 1]->Fill((q1 + q2) / 2., ToF);
                     fhTvsTof[iPlane - 1][iBar - 1]->Fill(dt_mod, ToF);
-                    fhQvsTofw[iPlane - 1][iBar - 1]->Fill((bot_tot + top_tot) / 2.,
-                                                          ToF); // needed to get TOF w/o walk correction
+                    fhToTvsTofw[iPlane - 1][iBar - 1]->Fill((bot_tot + top_tot) / 2.,
+                                                            ToF); // needed to get TOF w/o walk correction
                 }
 
                 // Time reference in case on has the master signal in one of the TDC channels.
@@ -809,15 +838,28 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
     */
 
     // Now we can analyze the hits in this event
-    /*
-        if (fTofdHisto)
-        {
-            for (Int_t a = 0; a < 2 * nHitsEvent; a++)
-            {                                                         // loop over all hits
-                fhQ[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrQ[a]); // charge per plane
+
+    if (fTofdHisto)
+    {
+        for (Int_t a = 0; a < 2 * nHitsEvent; a++)
+        { // loop over all hits
+            // fhQ[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrQ[a]); // charge per plane
+            if (tArrQ[a] > 7.5 && tArrQ[a] < 8.5)
+            {
+                fhQ[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrQ[a]);        // charge per plane
+                fhQvsEvent[((Int_t)tArrP[a]) - 1]->Fill(fnEvents, tArrQ[a]); // charge vs event #
+                if (fTofdTotPos)
+                {
+                    fhxy[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrYT[a]); // xy of plane
+                }
+                else
+                {
+                    fhxy[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrY[a]); // xy of plane
+                }
             }
         }
-    */
+    }
+
     // select events with feasible times
     Double_t time0;
 
@@ -919,10 +961,11 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                                             (tArrQ[ihit] + tArrQ[ihit - i]) / 2.); // Fill tdiff planes histogram
                                 }
 
-                                fhxy->Fill((tArrX[ihit] + tArrX[ihit - i]) / 2.,
-                                           (tArrY[ihit] + tArrY[ihit - i]) / 2.); // Fill average xy histogram
-                                fhxytot->Fill((tArrX[ihit] + tArrX[ihit - i]) / 2.,
-                                              (tArrYT[ihit] + tArrYT[ihit - i]) / 2.); // Fill average xy histogram
+                                if ((tArrQ[ihit] || tArrQ[ihit - i] > 7.5) && (tArrQ[ihit] || tArrQ[ihit - i] < 8.5))
+                                    fhxy12->Fill((tArrX[ihit] + tArrX[ihit - i]) / 2.,
+                                                 (tArrY[ihit] + tArrY[ihit - i]) / 2.); // Fill average xy histogram
+                                fhxy12tot->Fill((tArrX[ihit] + tArrX[ihit - i]) / 2.,
+                                                (tArrYT[ihit] + tArrYT[ihit - i]) / 2.); // Fill average xy histogram
                             }
 
                             // store average
@@ -1012,10 +1055,10 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                                             (tArrQ[ihit] + tArrQ[ihit - i]) / 2.); // Fill tdiff planes histogram
                                 }
 
-                                fhxy->Fill((tArrX[ihit] + tArrX[ihit - i]) / 2.,
-                                           (tArrY[ihit] + tArrY[ihit - i]) / 2.); // Fill average xy histogram
-                                fhxytot->Fill((tArrX[ihit] + tArrX[ihit - i]) / 2.,
-                                              (tArrYT[ihit] + tArrYT[ihit - i]) / 2.); // Fill average xy histogram
+                                fhxy34->Fill((tArrX[ihit] + tArrX[ihit - i]) / 2.,
+                                             (tArrY[ihit] + tArrY[ihit - i]) / 2.); // Fill average xy histogram
+                                fhxy34tot->Fill((tArrX[ihit] + tArrX[ihit - i]) / 2.,
+                                                (tArrYT[ihit] + tArrYT[ihit - i]) / 2.); // Fill average xy histogram
                             }
 
                             // store average
@@ -1166,13 +1209,13 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhTvsTof[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("T1-T2 in ns");
     }
 
-    if (NULL == fhQvsTofw[iPlane - 1][iBar - 1])
+    if (NULL == fhToTvsTofw[iPlane - 1][iBar - 1])
     {
         char strName[255];
-        sprintf(strName, "Q_vs_ToF_Plane_%d_Bar_%d_w", iPlane, iBar);
-        fhQvsTofw[iPlane - 1][iBar - 1] = new TH2F(strName, "", 1000, 0., 200, 1000, -10, 40);
-        fhQvsTofw[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToT in ns");
-        fhQvsTofw[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToF in ns");
+        sprintf(strName, "ToT_vs_ToF_Plane_%d_Bar_%d_w", iPlane, iBar);
+        fhToTvsTofw[iPlane - 1][iBar - 1] = new TH2F(strName, "", 1000, 0., 200, 1000, -10, 40);
+        fhToTvsTofw[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToT in ns");
+        fhToTvsTofw[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToF in ns");
     }
 
     if (NULL == fhQvsPos[iPlane - 1][iBar - 1])
@@ -1194,6 +1237,38 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhQ[iPlane - 1]->GetYaxis()->SetTitle("Charge");
         fhQ[iPlane - 1]->GetXaxis()->SetTitle("Paddle number");
     }
+    /*
+    if (NULL == fhxy[iPlane - 1])
+    {
+        char strName1[255];
+        sprintf(strName1, "xy_Plane_%d", iPlane);
+        char strName2[255];
+        sprintf(strName2, "xy of Plane %d ", iPlane);
+        fhxy[iPlane - 1] = new TH2F(strName1, strName2, 160, -80, 80, 400, -100., 100.);
+        fhxy[iPlane - 1]->GetYaxis()->SetTitle("y-position in cm");
+        fhxy[iPlane - 1]->GetXaxis()->SetTitle("x-position in cm");
+    }
+    */
+    if (NULL == fhxy[iPlane - 1])
+    {
+        char strName1[255];
+        sprintf(strName1, "xy_Plane_%d", iPlane);
+        char strName2[255];
+        sprintf(strName2, "xy of Plane %d ", iPlane);
+        fhxy[iPlane - 1] = new TH2F(strName1, strName2, 90, 0, 90, 400, -100., 100.);
+        fhxy[iPlane - 1]->GetYaxis()->SetTitle("y-position in cm");
+        fhxy[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
+    }
+    if (NULL == fhQvsEvent[iPlane - 1])
+    {
+        char strName1[255];
+        sprintf(strName1, "QvsEvent_Plane_%d", iPlane);
+        char strName2[255];
+        sprintf(strName2, "Charge vs Event # Plane %d ", iPlane);
+        fhQvsEvent[iPlane - 1] = new TH2F(strName1, strName2, 1e5, 0, 2e9, max_charge * 10, 0., max_charge);
+        fhQvsEvent[iPlane - 1]->GetYaxis()->SetTitle("Charge");
+        fhQvsEvent[iPlane - 1]->GetXaxis()->SetTitle("Event #");
+    }
     // Multiplicity
     if (NULL == fhQM[iPlane - 1])
     {
@@ -1206,6 +1281,7 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhQM[iPlane - 1]->GetYaxis()->SetTitle("Charge particle i");
         fhQM[iPlane - 1]->GetXaxis()->SetTitle("Charge first particle");
     }
+
     if (iPlane == 1 || iPlane == 3)
     {
         if (NULL == fhMvsQ[iPlane - 1])
@@ -1221,6 +1297,7 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
             fhMvsQ[iPlane - 1]->GetXaxis()->SetTitle("#sum Charge");
         }
     }
+
     if (iPlane == 1 || iPlane == 3)
     {
         if (NULL == fhTdiffvsQ[iPlane - 1][2 * iBar - 2])
@@ -1240,6 +1317,7 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
             fhTdiffvsQ[iPlane - 1][iBar * 2 - 3]->GetXaxis()->SetTitle("dt in ns");
         }
     }
+
     if (NULL == fhQvsQ[iPlane - 1][iBar * 2 - 2])
     {
         char strName[255];
@@ -1260,6 +1338,7 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhQvsQ[iPlane - 1][iBar * 2 - 2]->GetYaxis()->SetTitle(strNamey);
         fhQvsQ[iPlane - 1][iBar * 2 - 2]->GetXaxis()->SetTitle(strNamex);
     }
+
     if (iPlane == 1 || iPlane == 3)
     {
         if (NULL == fhQvsQ[iPlane - 1][iBar * 2 - 3])
@@ -1283,6 +1362,7 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
             fhQvsQ[iPlane - 1][iBar * 2 - 3]->GetXaxis()->SetTitle(strNamex);
         }
     }
+
     if (iPlane == 2 || iPlane == 4)
     {
         if (NULL == fhQvsQ[iPlane - 1][iBar * 2 - 1])
@@ -1306,22 +1386,43 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
             fhQvsQ[iPlane - 1][iBar * 2 - 1]->GetXaxis()->SetTitle(strNamex);
         }
     }
-    if (NULL == fhxy)
+
+    if (NULL == fhxy12)
     {
         char strName[255];
-        sprintf(strName, "xy_of_ToFD");
-        fhxy = new TH2F(strName, "", 200, -100, 100, 200, -100., 100.);
-        fhxy->GetYaxis()->SetTitle("y-position in cm");
-        fhxy->GetXaxis()->SetTitle("x-position in cm");
+        sprintf(strName, "xy_of_ToFD_plane_12");
+        fhxy12 = new TH2F(strName, "", 200, -100, 100, 200, -100., 100.);
+        fhxy12->GetYaxis()->SetTitle("y-position in cm");
+        fhxy12->GetXaxis()->SetTitle("x-position in cm");
     }
-    if (NULL == fhxytot)
+
+    if (NULL == fhxy12tot)
     {
         char strName[255];
-        sprintf(strName, "xyToT_of_ToFD");
-        fhxytot = new TH2F(strName, "", 200, -100, 100, 200, -100., 100.);
-        fhxytot->GetYaxis()->SetTitle("y-position in cm");
-        fhxytot->GetXaxis()->SetTitle("x-position in cm");
+        sprintf(strName, "xyToT_of_ToFD_plane_12");
+        fhxy12tot = new TH2F(strName, "", 200, -100, 100, 200, -100., 100.);
+        fhxy12tot->GetYaxis()->SetTitle("y-position in cm");
+        fhxy12tot->GetXaxis()->SetTitle("x-position in cm");
     }
+
+    if (NULL == fhxy34)
+    {
+        char strName[255];
+        sprintf(strName, "xy_of_ToFD_plane_34");
+        fhxy34 = new TH2F(strName, "", 200, -100, 100, 200, -100., 100.);
+        fhxy34->GetYaxis()->SetTitle("y-position in cm");
+        fhxy34->GetXaxis()->SetTitle("x-position in cm");
+    }
+
+    if (NULL == fhxy34tot)
+    {
+        char strName[255];
+        sprintf(strName, "xyToT_of_ToFD_plane_34");
+        fhxy34tot = new TH2F(strName, "", 200, -100, 100, 200, -100., 100.);
+        fhxy34tot->GetYaxis()->SetTitle("y-position in cm");
+        fhxy34tot->GetXaxis()->SetTitle("x-position in cm");
+    }
+
     if (NULL == fhCharge)
     {
         char strName[255];
@@ -1401,6 +1502,10 @@ void R3BTofdCal2Hit::FinishTask()
         {
             if (fhQ[i])
                 fhQ[i]->Write();
+            if (fhxy[i])
+                fhxy[i]->Write();
+            if (fhQvsEvent[i])
+                fhQvsEvent[i]->Write();
             if (fhQM[i])
                 fhQM[i]->Write();
             if (fhMvsQ[i])
@@ -1426,14 +1531,18 @@ void R3BTofdCal2Hit::FinishTask()
                     fhQvsTof[i][j]->Write();
                 if (fhTvsTof[i][j])
                     fhTvsTof[i][j]->Write();
-                if (fhQvsTofw[i][j])
-                    fhQvsTofw[i][j]->Write();
+                if (fhToTvsTofw[i][j])
+                    fhToTvsTofw[i][j]->Write();
             }
         }
-        if (fhxy)
-            fhxy->Write();
-        if (fhxytot)
-            fhxytot->Write();
+        if (fhxy12)
+            fhxy12->Write();
+        if (fhxy12tot)
+            fhxy12tot->Write();
+        if (fhxy34)
+            fhxy34->Write();
+        if (fhxy34tot)
+            fhxy34tot->Write();
         if (fhCharge)
             fhCharge->Write();
         // if (fhChargevsTof) fhChargevsTof->Write();
@@ -1451,16 +1560,16 @@ Double_t R3BTofdCal2Hit::betaCorr(Double_t delta)
     corr = 0.;
     return corr;
 }
-
+/* old method
 Double_t R3BTofdCal2Hit::walk(Double_t q)
 {
     Double_t y;
-    /*
-        Double_t p0 = 18.;
-        Double_t p1 = -0.5;
+    //
+    //   Double_t p0 = 18.;
+    //    Double_t p1 = -0.5;
+    //
+    //    y = p0 * TMath::Power(q,p1);
 
-        y = p0 * TMath::Power(q,p1);
-    */
     Double_t par1, par2, par3, par4, par5;
     Int_t voltage = 444;
 
@@ -1491,7 +1600,18 @@ Double_t R3BTofdCal2Hit::walk(Double_t q)
     y = -30.2 + par1 * TMath::Power(q, par2) + par3 / q + par4 * q + par5 * q * q;
     return y;
 }
-
+*/
+Double_t R3BTofdCal2Hit::walk(Double_t Q,
+                              Double_t par1,
+                              Double_t par2,
+                              Double_t par3,
+                              Double_t par4,
+                              Double_t par5) // new method
+{
+    Double_t y = 0;
+    y = -30.2 + par1 * TMath::Power(Q, par2) + par3 / Q + par4 * Q + par5 * Q * Q;
+    return y;
+}
 Double_t R3BTofdCal2Hit::saturation(Double_t x)
 {
     Double_t kor;

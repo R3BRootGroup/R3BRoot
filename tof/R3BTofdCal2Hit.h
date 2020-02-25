@@ -115,10 +115,13 @@ class R3BTofdCal2Hit : public FairTask
     inline void SetTofdTotPos(Bool_t ToTy) { fTofdTotPos = ToTy; }
 
     /**
-     * Method for walk calculation.
+     * Old Method for walk calculation.
      */
-    virtual Double_t walk(Double_t Q);
-
+    ///virtual Double_t walk(Double_t Q);
+    /**
+     * new Method for walk calculation.
+     */
+    virtual Double_t walk(Double_t Q, Double_t par1, Double_t par2, Double_t par3, Double_t par4, Double_t par5);
     /**
      * Method for beta correction.
      */
@@ -173,15 +176,19 @@ class R3BTofdCal2Hit : public FairTask
     TH2F* fhQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhQvsTof[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhTvsTof[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
-    TH2F* fhQvsTofw[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fhToTvsTofw[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhQ[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhQM[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhMvsQ[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhxy[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhQvsEvent[N_TOFD_HIT_PLANE_MAX];
     //TH2F* fhTof[N_TOFD_HIT_PLANE_MAX];
     //TH2F* fhTdiff[N_TOFD_HIT_PLANE_MAX];
     //TH2F* fhTsync[N_TOFD_HIT_PLANE_MAX];
-    TH2F* fhxy;
-    TH2F* fhxytot;
+    TH2F* fhxy12;
+    TH2F* fhxy34;
+    TH2F* fhxy12tot;
+    TH2F* fhxy34tot;
     TH1F* fhCharge;
     //TH2F* fhChargevsTof;
     //TH2F* fhChargevsPos;

@@ -129,6 +129,10 @@ class R3BTofdCal2Histo : public FairTask
      */
     inline void SetTofdQ(Double_t Q) { fTofdQ = Q; }
     /**
+     * Method for setting walk correction
+     */
+    inline void SetWalk(Bool_t Walk) { fwalk = Walk; }
+    /**
      * Method for setting charge correction
      */
     inline void SetTofdZ(Bool_t Z) { fTofdZ = Z; }
@@ -137,10 +141,13 @@ class R3BTofdCal2Histo : public FairTask
      */
     inline void ReadParaFile(TString file) { fParaFile = file; }
     /**
-     * Method for walk calculation.
+     * old Method for walk calculation.
      */
-    virtual Double_t walk(Double_t Q);
-
+    ///virtual Double_t walk(Double_t Q);
+    /**
+     * new Method for walk calculation.
+     */
+    virtual Double_t walk(Double_t Q, Double_t par1, Double_t par2, Double_t par3, Double_t par4, Double_t par5);
     /**
      * Method for creating histograms.
      */
@@ -161,7 +168,7 @@ class R3BTofdCal2Histo : public FairTask
     UInt_t fPaddlesPerPlane; /**< Number of bars per plane. */
     UInt_t fNofModules;      /**< Total number of modules (=edges) to calibrate */
 
-    Int_t fNEvents;             /**< Event counter. */
+    UInt_t fNEvents;             /**< Event counter. */
     R3BTofdHitPar* fCal_Par;    /**< Parameter container. */
     TClonesArray* fCalItemsLos; /**< Array with cal items. */
     TClonesArray* fCalData;     /**< Array with mapped data - input data. */
@@ -169,9 +176,10 @@ class R3BTofdCal2Histo : public FairTask
     Double_t fClockFreq;        /**< Clock cycle in [ns]. */
     Double_t fTofdY;
     Double_t fTofdQ;
+    Bool_t fwalk;
     Bool_t fTofdZ;
     TString fParaFile;
-    Int_t maxevent;
+    UInt_t maxevent;
 
     // arrays of control histograms
     TH2F* fh_tofd_TotPm[N_TOFD_HIT_PLANE_MAX];
@@ -186,6 +194,7 @@ class R3BTofdCal2Histo : public FairTask
     TH2F* fhTot2vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhSqrtQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fhToTvsTofw[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
 
   public:
     ClassDef(R3BTofdCal2Histo, 1)
