@@ -127,9 +127,9 @@ InitStatus R3BTofdCal2HistoPar::Init()
         LOG(ERROR) << "R3BTofdCal2HistoPar::Init() Number of modules not set. ";
         return kFATAL;
     }
-    fCalItemsLos = (TClonesArray*)rm->GetObject("LosCal");
-    if (NULL == fCalItemsLos)
-        LOG(fatal) << "Branch LosCal not found";
+    // fCalItemsLos = (TClonesArray*)rm->GetObject("LosCal");
+    // if (NULL == fCalItemsLos)
+    //    LOG(fatal) << "Branch LosCal not found";
     LOG(INFO) << "Histo filename: " << fHistoFile;
     hfilename = TFile::Open(fHistoFile);
     if (hfilename == 0)
@@ -172,6 +172,7 @@ void R3BTofdCal2HistoPar::FinishTask()
         // Determine sync offset between paddles
         LOG(WARNING) << "Calling function calcSync";
         calcSync();
+        LOG(ERROR) << "Call walk correction before next step!";
     }
 
     if (fParameter == 2)
@@ -191,9 +192,9 @@ void R3BTofdCal2HistoPar::FinishTask()
         Double_t para[4];
         Double_t min = -40.; // effective bar length
         Double_t max = 40.;  // effective bar length = 80 cm
-        for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
+        for (Int_t i = 0; i < fNofPlanes; i++)
         {
-            for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
+            for (Int_t j = 0; j < fPaddlesPerPlane; j++)
             {
                 if (hfilename->Get(Form("Tot1_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)))
                 {
@@ -233,9 +234,9 @@ void R3BTofdCal2HistoPar::FinishTask()
         Double_t para[8];
         Double_t pars[3];
         Int_t min = 1, max = 15; // select range for peak search
-        for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
+        for (Int_t i = 0; i < fNofPlanes; i++)
         {
-            for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
+            for (Int_t j = 0; j < fPaddlesPerPlane; j++)
             {
                 if (hfilename->Get(Form("Q_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)))
                 {
@@ -269,19 +270,20 @@ void R3BTofdCal2HistoPar::calcOffset()
     TCanvas* cOffset = new TCanvas("cOffset", "cOffset", 10, 10, 1000, 900);
     cOffset->Divide(2, 2);
     R3BTofdHitModulePar* mpar;
-    for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
+    for (Int_t i = 0; i < fNofPlanes; i++)
     {
         if (hfilename->Get(Form("Time_Diff_Plane_%i", i + 1)))
         {
             LOG(WARNING) << "Found histo Time_Diff_Plane_" << i + 1;
             auto* h = (TH2F*)hfilename->Get(Form("Time_Diff_Plane_%i", i + 1))->Clone();
-            for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
+            for (Int_t j = 0; j < fPaddlesPerPlane; j++)
             {
                 mpar = new R3BTofdHitModulePar();
                 Double_t offset = 0.;
                 cOffset->cd(i + 1);
                 h->Draw("colz");
                 TH1F* histo_py = (TH1F*)h->ProjectionY("histo_py", j + 2, j + 2, "");
+                histo_py->Rebin(4);
                 Int_t binmax = histo_py->GetMaximumBin();
                 Double_t Max = histo_py->GetXaxis()->GetBinCenter(binmax);
                 TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 0.3, Max + 0.3);
@@ -303,9 +305,9 @@ void R3BTofdCal2HistoPar::calcToTOffset()
 {
     TCanvas* cToTOffset = new TCanvas("cToTOffset", "cToTOffset", 10, 10, 1000, 900);
     cToTOffset->Divide(2, 2);
-    for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
+    for (Int_t i = 0; i < fNofPlanes; i++)
     {
-        for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
+        for (Int_t j = 0; j < fPaddlesPerPlane; j++)
         {
             Double_t tot1 = 0.;
             Double_t tot2 = 0.;
@@ -339,13 +341,13 @@ void R3BTofdCal2HistoPar::calcSync()
 {
     TCanvas* cSync = new TCanvas("cSync", "cSync", 10, 10, 1000, 900);
     cSync->Divide(2, 2);
-    for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
+    for (Int_t i = 0; i < fNofPlanes; i++)
     {
         if (hfilename->Get(Form("Time_Sync_Plane_%i", i + 1)))
         {
             LOG(WARNING) << "Found histo Time_Sync_Plane_" << i + 1;
             auto* h = (TH2F*)hfilename->Get(Form("Time_Sync_Plane_%i", i + 1))->Clone();
-            for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
+            for (Int_t j = 0; j < fPaddlesPerPlane; j++)
             {
                 cSync->cd(i + 1);
                 h->Draw("colz");
@@ -370,9 +372,9 @@ void R3BTofdCal2HistoPar::calcVeff()
 {
     TCanvas* cVeff = new TCanvas("cVeff", "cVeff", 10, 10, 1000, 900);
     cVeff->Divide(2, 2);
-    for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
+    for (Int_t i = 0; i < fNofPlanes; i++)
     {
-        for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
+        for (Int_t j = 0; j < fPaddlesPerPlane; j++)
         {
             Double_t max = 0.;
             Double_t veff = 7.;
@@ -415,9 +417,9 @@ void R3BTofdCal2HistoPar::calcLambda()
 {
     TCanvas* cLambda = new TCanvas("cLambda", "cLambda", 10, 10, 1000, 900);
     cLambda->Divide(2, 2);
-    for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
+    for (Int_t i = 0; i < fNofPlanes; i++)
     {
-        for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
+        for (Int_t j = 0; j < fPaddlesPerPlane; j++)
         {
             R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
             if (!par)
