@@ -90,7 +90,7 @@ R3BTofdCal2Hit::R3BTofdCal2Hit()
             fhQvsEvent[i] = NULL;
             fhQM[i] = NULL;
             fhMvsQ[i] = NULL;
-            // fhTdiff[i] = NULL;
+            fhTdiff[i] = NULL;
             // fhTsync[i] = NULL;
             // fhTof[i] = NULL;
             for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
@@ -148,7 +148,7 @@ R3BTofdCal2Hit::R3BTofdCal2Hit(const char* name, Int_t iVerbose)
             fhQvsEvent[i] = NULL;
             fhQM[i] = NULL;
             fhMvsQ[i] = NULL;
-            // fhTdiff[i] = NULL;
+            fhTdiff[i] = NULL;
             // fhTsync[i] = NULL;
             // fhTof[i] = NULL;
             for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
@@ -202,7 +202,8 @@ R3BTofdCal2Hit::~R3BTofdCal2Hit()
                 delete fhQM[i];
             if (fhMvsQ[i])
                 delete fhMvsQ[i];
-            // if (fhTdiff[i]) delete fhTdiff[i];
+            if (fhTdiff[i])
+                delete fhTdiff[i];
             // if (fhTsync[i]) delete fhTsync[i];
             // if (fhTof[i]) delete fhTof[i];
             for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
@@ -500,19 +501,19 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 // walk corrections
                 if (par->GetPar1Walk() == 0. || par->GetPar2Walk() == 0. || par->GetPar3Walk() == 0. ||
                     par->GetPar4Walk() == 0. || par->GetPar5Walk() == 0.)
-                    LOG(FATAL) << "Walk correction not found!";
-                bot_ns = bot_ns - walk(bot_tot,
-                                       par->GetPar1Walk(),
-                                       par->GetPar2Walk(),
-                                       par->GetPar3Walk(),
-                                       par->GetPar4Walk(),
-                                       par->GetPar5Walk());
-                top_ns = top_ns - walk(top_tot,
-                                       par->GetPar1Walk(),
-                                       par->GetPar2Walk(),
-                                       par->GetPar3Walk(),
-                                       par->GetPar4Walk(),
-                                       par->GetPar5Walk());
+                    LOG(INFO) << "Walk correction not found!";
+                auto bot_ns_walk = bot_ns - walk(bot_tot,
+                                                 par->GetPar1Walk(),
+                                                 par->GetPar2Walk(),
+                                                 par->GetPar3Walk(),
+                                                 par->GetPar4Walk(),
+                                                 par->GetPar5Walk());
+                auto top_ns_walk = top_ns - walk(top_tot,
+                                                 par->GetPar1Walk(),
+                                                 par->GetPar2Walk(),
+                                                 par->GetPar3Walk(),
+                                                 par->GetPar4Walk(),
+                                                 par->GetPar5Walk());
                 // calculate tdiff
                 auto tdiff = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2()));
 
@@ -602,7 +603,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 
                 // calculate y-position from ToT
                 auto posToT =
-                    par->GetLambda() / 2. * log((top_tot * par->GetToTOffset2()) / (bot_tot * par->GetToTOffset1()));
+                    par->GetLambda() * log((top_tot * par->GetToTOffset2()) / (bot_tot * par->GetToTOffset1()));
                 if (iPlane == 1 || iPlane == 3)
                     yToT[iPlane][iBar * 2 - 2].push_back(posToT);
                 if (iPlane == 2 || iPlane == 4)
@@ -681,7 +682,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                     // fill control histograms
                     CreateHistograms(iPlane, iBar);
                     // fhTof[iPlane-1]->Fill(iBar,ToF);
-                    // fhTdiff[iPlane-1]->Fill(iBar,tdiff);
+                    fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
                     // fhTsync[iPlane-1]->Fill(iBar,ToF);
                     fhQvsPos[iPlane - 1][iBar - 1]->Fill(pos,
                                                          parz[0] * TMath::Power((q1 + q2) / 2., parz[2]) + parz[1]);
@@ -813,6 +814,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
         }
     }
 
+    // print time sorted events
     /*
     if(tArrT[0]!=-1.){
 
@@ -843,26 +845,25 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
     {
         for (Int_t a = 0; a < 2 * nHitsEvent; a++)
         { // loop over all hits
-            // fhQ[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrQ[a]); // charge per plane
-            if (tArrQ[a] > 7.5 && tArrQ[a] < 8.5)
+          // fhQ[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrQ[a]); // charge per plane
+          // if (tArrQ[a] > 7.5 && tArrQ[a] < 8.5)
+          //{
+            fhQ[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrQ[a]);        // charge per plane
+            fhQvsEvent[((Int_t)tArrP[a]) - 1]->Fill(fnEvents, tArrQ[a]); // charge vs event #
+            if (fTofdTotPos)
             {
-                fhQ[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrQ[a]);        // charge per plane
-                fhQvsEvent[((Int_t)tArrP[a]) - 1]->Fill(fnEvents, tArrQ[a]); // charge vs event #
-                if (fTofdTotPos)
-                {
-                    fhxy[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrYT[a]); // xy of plane
-                }
-                else
-                {
-                    fhxy[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrY[a]); // xy of plane
-                }
+                fhxy[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrYT[a]); // xy of plane
             }
+            else
+            {
+                fhxy[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrY[a]); // xy of plane
+            }
+            //}
         }
     }
 
     // select events with feasible times
     Double_t time0;
-
     for (Int_t ihit = 0; ihit < 2 * nHitsEvent;)
     { // loop over all hits in this event
         LOG(WARNING) << "\nSet new coincidence window: " << tArrP[ihit] << " " << tArrB[ihit] << " " << tArrT[ihit]
@@ -1160,18 +1161,18 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
 {
     Double_t max_charge = 80.;
     // create histograms if not already existing
-    /*
+
     if (NULL == fhTdiff[iPlane - 1])
     {
         char strName1[255];
         char strName2[255];
         sprintf(strName1, "Time_Diff_Plane_%d", iPlane);
         sprintf(strName2, "Time Diff Plane %d", iPlane);
-        fhTdiff[iPlane - 1] = new TH2F(strName1, strName2, 50,0,50,400, -8., 8.);
+        fhTdiff[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 400, -8., 8.);
         fhTdiff[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
         fhTdiff[iPlane - 1]->GetYaxis()->SetTitle("Time difference (PM1 - PM2) in ns");
     }
-    */
+
     /*
     if (NULL == fhTsync[iPlane - 1])
     {
@@ -1265,7 +1266,7 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         sprintf(strName1, "QvsEvent_Plane_%d", iPlane);
         char strName2[255];
         sprintf(strName2, "Charge vs Event # Plane %d ", iPlane);
-        fhQvsEvent[iPlane - 1] = new TH2F(strName1, strName2, 1e5, 0, 2e9, max_charge * 10, 0., max_charge);
+        fhQvsEvent[iPlane - 1] = new TH2F(strName1, strName2, 2e4, 0, 2e9, max_charge * 10, 0., max_charge);
         fhQvsEvent[iPlane - 1]->GetYaxis()->SetTitle("Charge");
         fhQvsEvent[iPlane - 1]->GetXaxis()->SetTitle("Event #");
     }
@@ -1511,7 +1512,8 @@ void R3BTofdCal2Hit::FinishTask()
             if (fhMvsQ[i])
                 fhMvsQ[i]->Write();
             // if (fhTof[i]) fhTof[i]->Write();
-            // if (fhTdiff[i]) fhTdiff[i]->Write();
+            if (fhTdiff[i])
+                fhTdiff[i]->Write();
             // if (fhTsync[i]) fhTsync[i]->Write();
             for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
             {

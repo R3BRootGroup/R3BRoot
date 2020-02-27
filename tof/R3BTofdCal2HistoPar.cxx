@@ -76,6 +76,8 @@ R3BTofdCal2HistoPar::R3BTofdCal2HistoPar()
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fTofdY(0.)
     , fTofdQ(0.)
+    , fTofdTotLow(0.)
+    , fTofdTotHigh(0.)
     , fParaFile("")
     , fHistoFile("")
 {
@@ -95,6 +97,8 @@ R3BTofdCal2HistoPar::R3BTofdCal2HistoPar(const char* name, Int_t iVerbose)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fTofdY(0.)
     , fTofdQ(0.)
+    , fTofdTotLow(0.)
+    , fTofdTotHigh(0.)
     , fParaFile("")
     , fHistoFile("")
 {
@@ -168,7 +172,7 @@ void R3BTofdCal2HistoPar::FinishTask()
         calcOffset();
         // Determine ToT offset between top and bottom PMT
         LOG(WARNING) << "Calling function calcToTOffset";
-        calcToTOffset();
+        calcToTOffset(fTofdTotLow, fTofdTotHigh);
         // Determine sync offset between paddles
         LOG(WARNING) << "Calling function calcSync";
         calcSync();
@@ -182,7 +186,7 @@ void R3BTofdCal2HistoPar::FinishTask()
         calcVeff();
         // Determine light attenuation lambda for each paddle
         LOG(WARNING) << "Calling function calcLambda";
-        calcLambda();
+        calcLambda(fTofdTotLow, fTofdTotHigh);
     }
 
     if (fParameter == 3)
@@ -300,7 +304,8 @@ void R3BTofdCal2HistoPar::calcOffset()
     }
     fCal_Par->setChanged();
 }
-
+/*
+// old method
 void R3BTofdCal2HistoPar::calcToTOffset()
 {
     TCanvas* cToTOffset = new TCanvas("cToTOffset", "cToTOffset", 10, 10, 1000, 900);
@@ -332,6 +337,47 @@ void R3BTofdCal2HistoPar::calcToTOffset()
             LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << sqrt(tot2 / tot1);
             par->SetToTOffset1(sqrt(tot2 / tot1));
             par->SetToTOffset2(1. / sqrt(tot2 / tot1));
+        }
+    }
+    fCal_Par->setChanged();
+}
+*/
+void R3BTofdCal2HistoPar::calcToTOffset(Double_t totLow, Double_t totHigh)
+{
+    TCanvas* cToTOffset = new TCanvas("cToTOffset", "cToTOffset", 10, 10, 1000, 900);
+    cToTOffset->Divide(1, 2);
+    for (Int_t i = 0; i < fNofPlanes; i++)
+    {
+        for (Int_t j = 0; j < fPaddlesPerPlane; j++)
+        {
+            Double_t offset = 0.;
+            R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
+            if (hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)))
+            {
+                LOG(WARNING) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
+                auto* h = (TH2F*)hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))->Clone();
+                cToTOffset->cd(1);
+                h->Draw("colz");
+                auto* histo_py = (TH2F*)h->ProjectionX("histo_py", totLow, totHigh, "");
+                cToTOffset->cd(2);
+                histo_py->Draw();
+                Int_t binmax = histo_py->GetMaximumBin();
+                Double_t Max = histo_py->GetXaxis()->GetBinCenter(binmax);
+                TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 0.06, Max + 0.06);
+                histo_py->Fit("fgaus", "QR0");
+                offset = fgaus->GetParameter(1);
+                fgaus->Draw("SAME");
+                histo_py->SetAxisRange(Max - .5, Max + .5, "X");
+                h->SetAxisRange(Max - .5, Max + .5, "X");
+                h->SetAxisRange(totLow, totHigh, "Y");
+                cToTOffset->Update();
+                delete fgaus;
+                delete h;
+                delete histo_py;
+            }
+            LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << offset << "\n";
+            par->SetToTOffset1(sqrt(exp(offset)));
+            par->SetToTOffset2(1. / sqrt(exp(offset)));
         }
     }
     fCal_Par->setChanged();
@@ -412,7 +458,8 @@ void R3BTofdCal2HistoPar::calcVeff()
     }
     fCal_Par->setChanged();
 }
-
+/*
+// old method
 void R3BTofdCal2HistoPar::calcLambda()
 {
     TCanvas* cLambda = new TCanvas("cLambda", "cLambda", 10, 10, 1000, 900);
@@ -452,7 +499,7 @@ void R3BTofdCal2HistoPar::calcLambda()
             }
             Double_t toffset1 = par->GetToTOffset1();
             Double_t toffset2 = par->GetToTOffset2();
-            lambda = 2. * fTofdY / log((tot2 * toffset2) / (tot1 * toffset1)); // light attenuation
+            lambda = fTofdY / log((tot2 * toffset2) / (tot1 * toffset1)); // light attenuation / 2.
             LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << par->GetToTOffset2();
             LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " lambda  " << lambda;
             par->SetLambda(lambda);
@@ -460,7 +507,50 @@ void R3BTofdCal2HistoPar::calcLambda()
     }
     fCal_Par->setChanged();
 }
-
+*/
+void R3BTofdCal2HistoPar::calcLambda(Double_t totLow, Double_t totHigh)
+{
+    TCanvas* cToTOffset = new TCanvas("cLambda", "cLambda", 10, 10, 1000, 900);
+    cToTOffset->Divide(1, 2);
+    for (Int_t i = 0; i < fNofPlanes; i++)
+    {
+        for (Int_t j = 0; j < fPaddlesPerPlane; j++)
+        {
+            Double_t offset = 0.;
+            R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
+            if (hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)))
+            {
+                LOG(WARNING) << "Found histo SqrtQ_vs_PosToT_Plane_" << i + 1 << "_Bar_" << j + 1;
+                auto* h = (TH2F*)hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1))->Clone();
+                cToTOffset->cd(1);
+                h->Draw("colz");
+                auto* histo_py = (TH2F*)h->ProjectionX("histo_py", totLow, totHigh, "");
+                cToTOffset->cd(2);
+                histo_py->Draw();
+                Int_t binmax = histo_py->GetMaximumBin();
+                Double_t Max = histo_py->GetXaxis()->GetBinCenter(binmax);
+                TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 0.06, Max + 0.06);
+                histo_py->Fit("fgaus", "QR0");
+                offset = fgaus->GetParameter(1);
+                fgaus->Draw("SAME");
+                histo_py->SetAxisRange(Max - .5, Max + .5, "X");
+                h->SetAxisRange(Max - .5, Max + .5, "X");
+                h->SetAxisRange(totLow, totHigh, "Y");
+                cToTOffset->Update();
+                delete fgaus;
+                delete h;
+                delete histo_py;
+            }
+            else
+                LOG(FATAL) << "Missing histo plane " << i + 1 << " bar " << j + 1;
+            Double_t lambda = fTofdY / offset;
+            LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << offset << " Lambda " << lambda
+                         << "\n";
+            par->SetLambda(lambda);
+        }
+    }
+    fCal_Par->setChanged();
+}
 void R3BTofdCal2HistoPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Double_t* para)
 {
     // This fits the exponential decay of the light in a paddle. The 2 PMTs are fit with the same function but one

@@ -183,7 +183,7 @@ class R3BTofdCal2Hit : public FairTask
     TH2F* fhxy[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhQvsEvent[N_TOFD_HIT_PLANE_MAX];
     //TH2F* fhTof[N_TOFD_HIT_PLANE_MAX];
-    //TH2F* fhTdiff[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhTdiff[N_TOFD_HIT_PLANE_MAX];
     //TH2F* fhTsync[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhxy12;
     TH2F* fhxy34;

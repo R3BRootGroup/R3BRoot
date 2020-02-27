@@ -130,6 +130,14 @@ class R3BTofdCal2HistoPar : public FairTask
      */
     inline void SetTofdQ(Double_t Q) { fTofdQ = Q; }
     /**
+     * Method for setting the lower range of ToT for offset calibration
+     */
+    inline void SetTofdTotLow(Double_t TotLow) { fTofdTotLow = TotLow; }
+    /**
+     * Method for setting the upper range of ToT for offset calibration
+     */
+    inline void SetTofdTotHigh(Double_t TotHigh) { fTofdTotHigh = TotHigh; }
+    /**
      *
      */
     inline void ReadParaFile(TString file) { fParaFile = file; }
@@ -146,7 +154,7 @@ class R3BTofdCal2HistoPar : public FairTask
     /**
      * Method for calculation of ToT offset.
      */
-    virtual void calcToTOffset();
+    virtual void calcToTOffset(Double_t TotLow, Double_t TotHigh);
 
     /**
      * Method for calculation of sync offset between paddles.
@@ -161,7 +169,7 @@ class R3BTofdCal2HistoPar : public FairTask
     /**
      * Method for calculation of light attenuation factor.
      */
-    virtual void calcLambda();
+    virtual void calcLambda(Double_t TotLow, Double_t TotHigh);
 
     /**
      * Method for calculation of position dependence of scintillator.
@@ -191,6 +199,8 @@ class R3BTofdCal2HistoPar : public FairTask
     Double_t fClockFreq;        /**< Clock cycle in [ns]. */
     Double_t fTofdY;
     Double_t fTofdQ;
+    Double_t fTofdTotLow;
+    Double_t fTofdTotHigh;
     TString fParaFile;
     TString fHistoFile;
 
