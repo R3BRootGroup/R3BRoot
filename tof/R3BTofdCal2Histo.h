@@ -184,6 +184,7 @@ class R3BTofdCal2Histo : public FairTask
     // arrays of control histograms
     TH2F* fh_tofd_TotPm[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhTdiff[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhPosToT[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhTsync[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhQPm1[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhQPm2[N_TOFD_HIT_PLANE_MAX];
@@ -193,6 +194,7 @@ class R3BTofdCal2Histo : public FairTask
     TH2F* fhTot1vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhTot2vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhSqrtQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fhSqrtQvsPosToT[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhToTvsTofw[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
 

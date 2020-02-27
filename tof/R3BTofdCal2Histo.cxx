@@ -73,6 +73,7 @@ R3BTofdCal2Histo::R3BTofdCal2Histo()
     {
         fh_tofd_TotPm[i] = NULL;
         fhTdiff[i] = NULL;
+        fhPosToT[i] = NULL;
         fhTsync[i] = NULL;
         fhQPm1[i] = NULL;
         fhQPm2[i] = NULL;
@@ -84,6 +85,7 @@ R3BTofdCal2Histo::R3BTofdCal2Histo()
             fhTot1vsPos[i][j] = NULL;
             fhTot2vsPos[i][j] = NULL;
             fhSqrtQvsPos[i][j] = NULL;
+            fhSqrtQvsPosToT[i][j] = NULL;
             fhQvsPos[i][j] = NULL;
             fhToTvsTofw[i][j] = NULL;
         }
@@ -113,6 +115,7 @@ R3BTofdCal2Histo::R3BTofdCal2Histo(const char* name, Int_t iVerbose)
     {
         fh_tofd_TotPm[i] = NULL;
         fhTdiff[i] = NULL;
+        fhPosToT[i] = NULL;
         fhTsync[i] = NULL;
         fhQPm1[i] = NULL;
         fhQPm2[i] = NULL;
@@ -124,6 +127,7 @@ R3BTofdCal2Histo::R3BTofdCal2Histo(const char* name, Int_t iVerbose)
             fhTot1vsPos[i][j] = NULL;
             fhTot2vsPos[i][j] = NULL;
             fhSqrtQvsPos[i][j] = NULL;
+            fhSqrtQvsPosToT[i][j] = NULL;
             fhQvsPos[i][j] = NULL;
             fhToTvsTofw[i][j] = NULL;
         }
@@ -138,6 +142,8 @@ R3BTofdCal2Histo::~R3BTofdCal2Histo()
             delete fh_tofd_TotPm[i];
         if (fhTdiff[i])
             delete fhTdiff[i];
+        if (fhPosToT[i])
+            delete fhPosToT[i];
         if (fhTsync[i])
             delete fhTsync[i];
         if (fhQPm1[i])
@@ -158,6 +164,8 @@ R3BTofdCal2Histo::~R3BTofdCal2Histo()
                 delete fhTot2vsPos[i][j];
             if (fhSqrtQvsPos[i][j])
                 delete fhSqrtQvsPos[i][j];
+            if (fhSqrtQvsPosToT[i][j])
+                delete fhSqrtQvsPosToT[i][j];
             if (fhQvsPos[i][j])
                 delete fhQvsPos[i][j];
             if (fhToTvsTofw[i][j])
@@ -362,20 +370,30 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                 {
                     // calculate tdiff
                     auto tdiff = bot_ns - top_ns;
-                    // walk corrections
-                    // bot_ns = bot_ns - walk(bot_tot);
-                    // top_ns = top_ns - walk(top_tot);
+
                     // create histograms
                     CreateHistograms(iPlane, iBar);
+
                     // fill control histograms
                     fhTotPm1[iPlane - 1][iBar - 1]->Fill(bot_tot);
                     fhTotPm2[iPlane - 1][iBar - 1]->Fill(top_tot);
                     fhTot1vsTot2[iPlane - 1][iBar - 1]->Fill(top_tot, bot_tot);
                     fh_tofd_TotPm[iPlane - 1]->Fill(iBar, top_tot);
                     fh_tofd_TotPm[iPlane - 1]->Fill(-iBar - 1, bot_tot);
+
                     // Time differences of one paddle; offset  histo
-                    if (top_tot > 80. && bot_tot > 80.)
-                        fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
+                    fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
+
+                    // offset histo via ToT
+                    R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
+                    auto pos = tdiff;
+                    auto posToT = log(top_tot / bot_tot);
+                    fhSqrtQvsPos[iPlane - 1][iBar - 1]->Fill(pos, sqrt(top_tot * bot_tot));
+                    fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->Fill(posToT, sqrt(top_tot * bot_tot));
+                    fhPosToT[iPlane - 1]->Fill(iBar, posToT);
+                    fhTot1vsPos[iPlane - 1][iBar - 1]->Fill(posToT, bot_tot);
+                    fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(posToT, top_tot);
+
                     // ToF
                     auto ToF = (top_ns + bot_ns) / 2 - timeLos;
                     while (ToF < -c_range_ns / 2)
@@ -383,7 +401,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                     while (ToF > c_range_ns / 2)
                         ToF -= c_range_ns;
                     fhTsync[iPlane - 1]->Fill(iBar, ToF);
-                    if (fwalk == true)
+                    if (fwalk)
                     {
                         // get sync parameter
                         R3BTofdHitModulePar* para = fCal_Par->GetModuleParAt(iPlane, iBar);
@@ -412,12 +430,14 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                                   << ", Bar: " << top->GetBarId();
                         continue;
                     }
+
                     // calculate tdiff with offest
                     auto tdiff = (bot_ns + para->GetOffset1()) - (top_ns + para->GetOffset2());
+
                     // walk corrections
                     if (para->GetPar1Walk() == 0. || para->GetPar2Walk() == 0. || para->GetPar3Walk() == 0. ||
                         para->GetPar4Walk() == 0. || para->GetPar5Walk() == 0.)
-                        LOG(FATAL) << "Walk correction not found!";
+                        LOG(INFO) << "Walk correction not found!";
                     bot_ns = bot_ns - walk(bot_tot,
                                            para->GetPar1Walk(),
                                            para->GetPar2Walk(),
@@ -430,25 +450,39 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                                            para->GetPar3Walk(),
                                            para->GetPar4Walk(),
                                            para->GetPar5Walk());
+
+                    auto pos = ((bot_ns + para->GetOffset1()) - (top_ns + para->GetOffset2())) * para->GetVeff();
+                    auto posToT =
+                        para->GetLambda() * log((top_tot + para->GetToTOffset2()) / (bot_tot + para->GetToTOffset1()));
+
                     // create histograms
                     CreateHistograms(iPlane, iBar);
+
                     // fill control histograms
                     fhTotPm1[iPlane - 1][iBar - 1]->Fill(bot_tot);
                     fhTotPm2[iPlane - 1][iBar - 1]->Fill(top_tot);
                     fhTot1vsTot2[iPlane - 1][iBar - 1]->Fill(top_tot, bot_tot);
+                    fhSqrtQvsPos[iPlane - 1][iBar - 1]->Fill(pos, sqrt(top_tot * bot_tot));
+                    fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->Fill(posToT, sqrt(top_tot * bot_tot));
+                    fhPosToT[iPlane - 1]->Fill(iBar, posToT);
+
                     // Time differences of one paddle
                     fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
+
                     // calculate time-of-flight
                     auto ToF = (bot_ns + top_ns) / 2. - timeLos - para->GetSync();
                     while (ToF < -c_range_ns / 2)
                         ToF += c_range_ns;
                     while (ToF > c_range_ns / 2)
                         ToF -= c_range_ns;
+
                     // Sync of one plane
                     fhTsync[iPlane - 1]->Fill(iBar, ToF);
-                    // control histogram for walk
+
+                    // control histogram for corrected walk
                     fhToTvsTofw[iPlane - 1][iBar - 1]->Fill((bot_tot + top_tot) / 2., ToF);
                 }
+
                 // prepare double exponential fit
                 if (fTofdQ != 0 && fTofdZ == false)
                 {
@@ -459,16 +493,21 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                                   << ", Bar: " << top->GetBarId();
                         continue;
                     }
+
                     // calculate y position
-                    Double_t Pos = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
+                    auto pos = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
+                    auto posToT =
+                        par->GetLambda() * log((top_tot * par->GetToTOffset2()) / (bot_tot * par->GetToTOffset1()));
+
                     // fill fitting histograms and smiley histogram
-                    fhTot1vsPos[iPlane - 1][iBar - 1]->Fill(Pos, bot_tot);
-                    fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(Pos, top_tot);
-                    fhSqrtQvsPos[iPlane - 1][iBar - 1]->Fill(Pos, sqrt(top_tot * bot_tot));
+                    fhTot1vsPos[iPlane - 1][iBar - 1]->Fill(pos, bot_tot);
+                    fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(pos, top_tot);
                 }
+
                 // prepare charge fit
                 if (fTofdZ == true)
                 {
+
                     // get parameter
                     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!par)
@@ -479,6 +518,9 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                     }
                     // calculate y position
                     auto pos = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
+                    auto posToT =
+                        par->GetLambda() * log((top_tot * par->GetToTOffset2()) / (bot_tot * par->GetToTOffset1()));
+
                     // calculate position independent charge
                     Double_t parq[4];
                     parq[0] = par->GetPar1a();
@@ -495,8 +537,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                         top_tot / (parq[0] * (exp(-parq[1] * (pos + 100.)) + exp(-parq[2] * (pos + 100.))) + parq[3]);
                     q1 = q1 * fTofdQ;
                     q2 = q2 * fTofdQ;
-                    // fill smiley histogram
-                    fhSqrtQvsPos[iPlane - 1][iBar - 1]->Fill(pos, sqrt(top_tot * bot_tot));
+
                     // fill control histograms and Q vs Pos without multihits
                     if (multihits[iPlane - 1][iBar - 1] < 2 && (q1 > 0. && q2 > 0.))
                     {
@@ -505,8 +546,10 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                         fhQPm2[iPlane - 1]->Fill(iBar, q2);
                     }
                 }
+
                 ++top_i;
                 ++bot_i;
+
                 // Increment events
                 fNEvents += 1;
             }
@@ -534,6 +577,16 @@ void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhTdiff[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 4000, -20., 20.);
         fhTdiff[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
         fhTdiff[iPlane - 1]->GetYaxis()->SetTitle("Time difference (PM1 - PM2) in ns");
+    }
+    if (NULL == fhPosToT[iPlane - 1])
+    {
+        char strName1[255];
+        char strName2[255];
+        sprintf(strName1, "Pos_ToT_Plane_%d", iPlane);
+        sprintf(strName2, "Position from ToT Plane %d", iPlane);
+        fhPosToT[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 1, -100., 100.);
+        fhPosToT[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
+        fhPosToT[iPlane - 1]->GetYaxis()->SetTitle("Pos from ToT");
     }
     if (NULL == fhTsync[iPlane - 1])
     {
@@ -603,15 +656,24 @@ void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
     {
         char strName[255];
         sprintf(strName, "SqrtQ_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-        fhSqrtQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, max_charge * 10, 0., max_charge);
+        fhSqrtQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 2000, -100, 100, max_charge * 4, 0., max_charge * 4);
         fhSqrtQvsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("sqrt(PM1*PM2)");
-        fhSqrtQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position in cm");
+        fhSqrtQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position from tdiff in cm");
+    }
+    if (NULL == fhSqrtQvsPosToT[iPlane - 1][iBar - 1])
+    {
+        char strName[255];
+        sprintf(strName, "SqrtQ_vs_PosToT_Plane_%d_Bar_%d", iPlane, iBar);
+        fhSqrtQvsPosToT[iPlane - 1][iBar - 1] =
+            new TH2F(strName, "", 20000, -100, 100, max_charge * 4, 0., max_charge * 4);
+        fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("sqrt(PM1*PM2)");
+        fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position from ToT in cm");
     }
     if (NULL == fhQvsPos[iPlane - 1][iBar - 1])
     {
         char strName[255];
         sprintf(strName, "Q_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-        fhQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, max_charge * 50, 0., max_charge);
+        fhQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, max_charge * 10, 0., max_charge);
         fhQvsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Charge");
         fhQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position in cm");
     }
@@ -621,7 +683,7 @@ void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
         sprintf(strName1, "Q_Plane_%d_PM_1", iPlane);
         char strName2[255];
         sprintf(strName2, "Q Plane %d PM1", iPlane);
-        fhQPm1[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, max_charge * 50, 0., max_charge);
+        fhQPm1[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, max_charge * 10, 0., max_charge);
         fhQPm1[iPlane - 1]->GetYaxis()->SetTitle("Charge PM1");
         fhQPm1[iPlane - 1]->GetXaxis()->SetTitle("Paddle number");
     }
@@ -631,7 +693,7 @@ void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
         sprintf(strName1, "Q_Plane_%d_PM_2", iPlane);
         char strName2[255];
         sprintf(strName2, "Q Plane %d PM2", iPlane);
-        fhQPm2[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, max_charge * 50, 0., max_charge);
+        fhQPm2[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, max_charge * 10, 0., max_charge);
         fhQPm2[iPlane - 1]->GetYaxis()->SetTitle("Charge PM2");
         fhQPm2[iPlane - 1]->GetXaxis()->SetTitle("Paddle number");
     }
@@ -663,6 +725,8 @@ void R3BTofdCal2Histo::FinishTask()
             fhTsync[i]->Write(); // histogram for sync calculation
         if (fhTdiff[i])
             fhTdiff[i]->Write(); // histogram for offset and veff calculation
+        if (fhPosToT[i])
+            fhPosToT[i]->Write(); // histogram for offset ToT and lambda calculation
         if (fhQPm1[i])
             fhQPm1[i]->Write(); // histogram for charge fit PM1
         if (fhQPm2[i])
@@ -677,6 +741,8 @@ void R3BTofdCal2Histo::FinishTask()
                 fhTot1vsTot2[i][j]->Write(); // control histogram ToT Pm1 vs ToT Pm2
             if (fhSqrtQvsPos[i][j])
                 fhSqrtQvsPos[i][j]->Write(); // control histogram for charge correction
+            if (fhSqrtQvsPosToT[i][j])
+                fhSqrtQvsPosToT[i][j]->Write(); // histogram for ToT offset calculation
             if (fhTot1vsPos[i][j])
                 fhTot1vsPos[i][j]->Write(); // histogram for position dependence of charge 1
             if (fhTot2vsPos[i][j])
