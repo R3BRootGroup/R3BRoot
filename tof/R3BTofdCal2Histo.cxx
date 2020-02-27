@@ -584,7 +584,7 @@ void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
         char strName2[255];
         sprintf(strName1, "Pos_ToT_Plane_%d", iPlane);
         sprintf(strName2, "Position from ToT Plane %d", iPlane);
-        fhPosToT[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 1, -100., 100.);
+        fhPosToT[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 2000, -100., 100.);
         fhPosToT[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
         fhPosToT[iPlane - 1]->GetYaxis()->SetTitle("Pos from ToT");
     }
@@ -640,8 +640,8 @@ void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
             fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
         if (iPlane > 2)
             fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
-        fhTot1vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToT of PM2 in ns");
-        fhTot1vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Tot of PM1 in ns");
+        fhTot1vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
+        fhTot1vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM1 in ns");
     }
     if (NULL == fhTot2vsPos[iPlane - 1][iBar - 1])
     {
@@ -651,12 +651,15 @@ void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
             fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
         if (iPlane > 2)
             fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
+        fhTot2vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
+        fhTot2vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM2 in ns");
     }
     if (NULL == fhSqrtQvsPos[iPlane - 1][iBar - 1])
     {
         char strName[255];
         sprintf(strName, "SqrtQ_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-        fhSqrtQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 2000, -100, 100, max_charge * 4, 0., max_charge * 4);
+        fhSqrtQvsPos[iPlane - 1][iBar - 1] =
+            new TH2F(strName, "", 20000, -100, 100, max_charge * 4, 0., max_charge * 4);
         fhSqrtQvsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("sqrt(PM1*PM2)");
         fhSqrtQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position from tdiff in cm");
     }
