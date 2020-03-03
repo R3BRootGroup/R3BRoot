@@ -28,6 +28,7 @@
 
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
+#include "TF1.h"
 #include "TH1F.h"
 #include "TH2F.h"
 #include "THnSparse.h"
@@ -68,6 +69,22 @@ R3BTofdCal2Hit::R3BTofdCal2Hit()
     , fnEvents(0)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , maxevent(0)
+    , countloshit(0)
+    , wrongtrigger(0)
+    , wrongtpat(0)
+    , headertpat(0)
+    , calhit(0)
+    , countmap(0)
+    , countpmthit(0)
+    , inbarcoincidence(0)
+    , countreset(0)
+    , hitsbeforereset(0)
+    , pmtbeforereset(0)
+    , eventstore(0)
+    , incoincidence(0)
+    , inaverage12(0)
+    , inaverage34(0)
+    , singlehit(0)
 {
     fhLosXYP = NULL;
     fhChargeLosTofD = NULL;
@@ -126,6 +143,23 @@ R3BTofdCal2Hit::R3BTofdCal2Hit(const char* name, Int_t iVerbose)
     , fTofdTotPos(true)
     , fnEvents(0)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
+    , maxevent(0)
+    , countloshit(0)
+    , wrongtrigger(0)
+    , wrongtpat(0)
+    , headertpat(0)
+    , calhit(0)
+    , countmap(0)
+    , countpmthit(0)
+    , inbarcoincidence(0)
+    , countreset(0)
+    , hitsbeforereset(0)
+    , pmtbeforereset(0)
+    , eventstore(0)
+    , incoincidence(0)
+    , inaverage12(0)
+    , inaverage34(0)
+    , singlehit(0)
 {
     fhLosXYP = NULL;
     fhChargeLosTofD = NULL;
@@ -295,7 +329,10 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 
     // test for requested trigger (if possible)
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
+    {
+        wrongtrigger++;
         return;
+    }
     // fTpat = 1-16; fTpat_bit = 0-15
     Int_t fTpat_bit = fTpat - 1;
     if (fTpat_bit >= 0)
@@ -303,8 +340,12 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
         Int_t itpat = header->GetTpat();
         Int_t tpatvalue = (itpat & (1 << fTpat_bit)) >> fTpat_bit;
         if ((header) && (tpatvalue == 0))
+        {
+            wrongtpat++;
             return;
+        }
     }
+    headertpat++;
     Double_t timeRef = 0.;
     Double_t timeLos = 0;
     Double_t timeP0 = 0.;
@@ -341,6 +382,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
         Int_t nHits = fHitItemsLos->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
+            countloshit++;
             LOG(WARNING) << "LOS Ihit  " << ihit << " " << nHits;
             R3BLosHitData* hitData = (R3BLosHitData*)fHitItemsLos->At(ihit);
             if (ihit == 0)
@@ -421,13 +463,16 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
         auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
         auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;
         vec.push_back(hit);
+        calhit++;
     }
 
     // Find coincident PMT hits.
     // std::cout << "Print:\n";
+    Int_t oldcpmt = countpmthit;
     for (auto it = bar_map.begin(); bar_map.end() != it; ++it)
     {
     reset:
+        countmap++;
         // for (auto it2 = it->second.top.begin(); it->second.top.end() != it2; ++it2) {
         // std::cout << "Top: " << (*it2)->GetDetectorId() << ' ' << (*it2)->GetBarId() << ' ' <<
         // (*it2)->GetTimeLeading_ns() << '\n';
@@ -442,6 +487,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
         size_t bot_i = 0;
         for (; top_i < top_vec.size() && bot_i < bot_vec.size();)
         {
+            countpmthit++;
             auto top = top_vec.at(top_i);
             auto bot = bot_vec.at(bot_i);
             auto top_ns = top->GetTimeLeading_ns();
@@ -461,6 +507,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
             // std::abs(dt_mod) << '\n';
             if (std::abs(dt_mod) < c_bar_coincidence_ns)
             {
+                inbarcoincidence++;
                 // Hit!
                 // std::cout << "Hit!\n";
                 Int_t iPlane = top->GetDetectorId(); // 1..n
@@ -548,6 +595,9 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                     {
                         timeP0 = ToF;
                         it = bar_map.begin();
+                        countreset++;
+                        hitsbeforereset += nHitsEvent;
+                        pmtbeforereset += countpmthit - oldcpmt;
                         for (Int_t i = 0; i <= fNofPlanes; i++)
                         {
                             for (Int_t j = 0; j <= 2 * N_TOFD_HIT_PADDLE_MAX; j++)
@@ -630,6 +680,15 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 para[1] = par->GetPar1b();
                 para[2] = par->GetPar1c();
                 para[3] = par->GetPar1d();
+
+                // auto *smiley = new TF1("smiley", "pol3",-50,50);
+                // smiley->SetParameters(para[0], para[1], para[2], para[3]);
+                // Double_t qb = sqrt(top_tot * bot_tot) / smiley->Eval(pos);
+                Double_t qb =
+                    sqrt(top_tot * bot_tot) / (para[0] + para[1] * pos + para[2] * pow(pos, 2) + para[3] * pow(pos, 3));
+                qb = qb * fTofdQ;
+                /*
+                // via double exponential:
                 auto q1 = bot_tot / (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
                 para[0] = par->GetPar2a();
                 para[1] = par->GetPar2b();
@@ -638,6 +697,9 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 auto q2 = top_tot / (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
                 q1 = q1 * fTofdQ;
                 q2 = q2 * fTofdQ;
+                Double_t qb = (q1 + q2) / 2.;
+                */
+
                 Double_t parz[3];
                 parz[0] = par->GetPar1za();
                 parz[1] = par->GetPar1zb();
@@ -660,18 +722,18 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 if (parz[0] > 0 && parz[2] > 0)
                 {
                     if (iPlane == 1 || iPlane == 3)
-                        q[iPlane][iBar * 2 - 2].push_back(parz[0] * TMath::Power((q1 + q2) / 2., parz[2]) + parz[1]);
+                        q[iPlane][iBar * 2 - 2].push_back(parz[0] * TMath::Power(qb, parz[2]) + parz[1]);
                     if (iPlane == 2 || iPlane == 4)
-                        q[iPlane][iBar * 2].push_back(parz[0] * TMath::Power((q1 + q2) / 2., parz[2]) + parz[1]);
-                    q[iPlane][iBar * 2 - 1].push_back(parz[0] * TMath::Power((q1 + q2) / 2., parz[2]) + parz[1]);
+                        q[iPlane][iBar * 2].push_back(parz[0] * TMath::Power(qb, parz[2]) + parz[1]);
+                    q[iPlane][iBar * 2 - 1].push_back(parz[0] * TMath::Power(qb, parz[2]) + parz[1]);
                 }
                 else
                 {
                     if (iPlane == 1 || iPlane == 3)
-                        q[iPlane][iBar * 2 - 2].push_back((q1 + q2) / 2.);
+                        q[iPlane][iBar * 2 - 2].push_back(qb);
                     if (iPlane == 2 || iPlane == 4)
-                        q[iPlane][iBar * 2].push_back((q1 + q2) / 2.);
-                    q[iPlane][iBar * 2 - 1].push_back((q1 + q2) / 2.);
+                        q[iPlane][iBar * 2].push_back(qb);
+                    q[iPlane][iBar * 2 - 1].push_back(qb);
                     parz[0] = 1.;
                     parz[1] = 0.;
                     parz[2] = 1.;
@@ -684,9 +746,8 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                     // fhTof[iPlane-1]->Fill(iBar,ToF);
                     fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
                     // fhTsync[iPlane-1]->Fill(iBar,ToF);
-                    fhQvsPos[iPlane - 1][iBar - 1]->Fill(pos,
-                                                         parz[0] * TMath::Power((q1 + q2) / 2., parz[2]) + parz[1]);
-                    fhQvsTof[iPlane - 1][iBar - 1]->Fill((q1 + q2) / 2., ToF);
+                    fhQvsPos[iPlane - 1][iBar - 1]->Fill(pos, parz[0] * TMath::Power(qb, parz[2]) + parz[1]);
+                    fhQvsTof[iPlane - 1][iBar - 1]->Fill(qb, ToF);
                     fhTvsTof[iPlane - 1][iBar - 1]->Fill(dt_mod, ToF);
                     fhToTvsTofw[iPlane - 1][iBar - 1]->Fill((bot_tot + top_tot) / 2.,
                                                             ToF); // needed to get TOF w/o walk correction
@@ -845,9 +906,10 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
     {
         for (Int_t a = 0; a < 2 * nHitsEvent; a++)
         { // loop over all hits
-          // fhQ[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrQ[a]); // charge per plane
-          // if (tArrQ[a] > 7.5 && tArrQ[a] < 8.5)
-          //{
+            eventstore++;
+            // fhQ[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrQ[a]); // charge per plane
+            // if (tArrQ[a] > 7.5 && tArrQ[a] < 8.5)
+            //{
             fhQ[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrQ[a]);        // charge per plane
             fhQvsEvent[((Int_t)tArrP[a]) - 1]->Fill(fnEvents, tArrQ[a]); // charge vs event #
             if (fTofdTotPos)
@@ -880,7 +942,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 
         while (tArrT[ihit] < time0 + hit_coinc)
         { // check if in coincidence window
-
+            incoincidence++;
             /*
             std::cout<<"Used up hits in this coincidence window:\n";
             for(Int_t a=0; a<2*nHitsEvent; a++)
@@ -915,12 +977,12 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                     // std::cout<<i<<" "<<tArrP[ihit]<<" "<<tArrB[ihit]<<" "<<tArrP[ihit-i]<<" "<<tArrB[ihit-i]<<"\n";
                     if (hitscoinc > 0 && (Int_t)(tArrP[ihit] - tArrP[ihit - i]) != 0)
                     { // check if planes differ
-                        /// find overlapping virtualbars         similar charge in both planes?               bar wasn't
-                        /// used for other average?
+                        /// find overlapping virtualbars && similar charge in both planes? && bar wasn't used for other
+                        /// average?
                         if (tArrB[ihit - i] == tArrB[ihit] && abs(tArrQ[ihit - i] - tArrQ[ihit]) < maxChargeDiff &&
                             tArrU[ihit] == false && tArrU[ihit - i] == false)
                         {
-
+                            inaverage12++;
                             LOG(WARNING) << "Try to average " << tArrQ[ihit] << " " << tArrP[ihit] << " " << tArrB[ihit]
                                          << " and " << tArrQ[ihit - i] << " " << tArrP[ihit - i] << " "
                                          << tArrB[ihit - i];
@@ -992,15 +1054,15 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                                                                                   12);
                             }
                         }
-                        /*
-                        std::cout<<"Used up averaged hits in this coincidence window:\n";
-                        for(Int_t a=0; a<2*nHitsEvent; a++)
-                            std::cout << tArrU[a] << " ";
-                        std::cout << "\n";
-                        */
+
+                        // std::cout<<"Used up averaged hits in this coincidence window:\n";
+                        // for(Int_t a=0; a<2*nHitsEvent; a++)
+                        //    std::cout << tArrU[a] << " ";
+                        // std::cout << "\n";
                     }
                 }
             }
+
             // try to average plane 3&4
             for (Int_t i = 1; i < hitscoinc; i++)
             { // loop over hits in coincidence
@@ -1014,7 +1076,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                         if (tArrB[ihit - i] == tArrB[ihit] && abs(tArrQ[ihit - i] - tArrQ[ihit]) < maxChargeDiff &&
                             tArrU[ihit] == false && tArrU[ihit - i] == false)
                         {
-
+                            inaverage34++;
                             LOG(WARNING) << "Try to average " << tArrQ[ihit] << " " << tArrP[ihit] << " " << tArrB[ihit]
                                          << " and " << tArrQ[ihit - i] << " " << tArrP[ihit - i] << " "
                                          << tArrB[ihit - i];
@@ -1085,15 +1147,15 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                                                                                   34);
                             }
                         }
-                        /*
-                        std::cout<<"Used up averaged hits in this coincidence window:\n";
-                        for(Int_t a=0; a<2*nHitsEvent; a++)
-                            std::cout << tArrU[a] << " ";
-                        std::cout << "\n";
-                        */
+
+                        // std::cout<<"Used up averaged hits in this coincidence window:\n";
+                        // for(Int_t a=0; a<2*nHitsEvent; a++)
+                        //    std::cout << tArrU[a] << " ";
+                        // std::cout << "\n";
                     }
                 }
             }
+
             ihit++;
             if (ihit >= 2 * nHitsEvent)
                 break;
@@ -1119,6 +1181,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
             LOG(DEBUG) << "Single Hit for Plane " << tArrP[hit] << " " << tArrB[hit];
             tArrU[hit] = tArrU[hit + 1] = true;
             // store single hits only seen in planes
+            singlehit++;
             if (fTofdTotPos)
             {
                 new ((*fHitItems)[fNofHitItems++]) R3BTofdHitData(tArrT[hit],
@@ -1266,7 +1329,7 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         sprintf(strName1, "QvsEvent_Plane_%d", iPlane);
         char strName2[255];
         sprintf(strName2, "Charge vs Event # Plane %d ", iPlane);
-        fhQvsEvent[iPlane - 1] = new TH2F(strName1, strName2, 2e4, 0, 2e9, max_charge * 10, 0., max_charge);
+        fhQvsEvent[iPlane - 1] = new TH2F(strName1, strName2, 2e2, 0, 2e9, max_charge * 10, 0., max_charge); // 2e4 2e9
         fhQvsEvent[iPlane - 1]->GetYaxis()->SetTitle("Charge");
         fhQvsEvent[iPlane - 1]->GetXaxis()->SetTitle("Event #");
     }
@@ -1552,6 +1615,29 @@ void R3BTofdCal2Hit::FinishTask()
         // if (fhQp12) fhQp12->Write();
         // if (fhQp34) fhQp34->Write();
     }
+    std::cout << "\n\nSome statistics:\n"
+              << "Total number of events in tree  " << maxevent << "\n"
+              << "Events in LOS                   " << countloshit << "\n"
+              << "Max Event analyzed              " << fnEvents + wrongtrigger + wrongtpat << "\n"
+              << "Events skipped due to trigger   " << wrongtrigger << "\n"
+              << "Events skipped due to tpat      " << wrongtpat << "\n"
+              << "Events with correct header&tpat " << headertpat << "\n"
+              << "Events in cal level             " << calhit << "\n"
+              << "Events with map hit             " << countmap << "\n"
+              << "Events with pmt hits            " << countpmthit << "\n"
+              << "Events in bar coincidence       " << inbarcoincidence << "\n"
+              << "Number of resets                " << countreset << "\n"
+              << "Hits before reset               " << hitsbeforereset << "\n"
+              << "PMT before reset                " << pmtbeforereset << "\n"
+              << "Events stored                   " << eventstore / 2 << " <-> " << inbarcoincidence - hitsbeforereset
+              << " = " << inbarcoincidence << " - " << hitsbeforereset << "\n"
+              << "Events in coincidence window    " << incoincidence / 2 << "\n"
+              << "Events in average p1&2          " << inaverage12 * 2 << "\n"
+              << "Events in average p3&4          " << inaverage34 * 2 << "\n"
+              << "Events in single planes         " << singlehit << "\n"
+              << "Good events in total            " << eventstore / 2 << " <-> "
+              << inaverage12 * 2 + inaverage34 * 2 + singlehit << " = " << inaverage12 * 2 << " + " << inaverage34 * 2
+              << " + " << singlehit << "\n";
 }
 
 Double_t R3BTofdCal2Hit::betaCorr(Double_t delta)

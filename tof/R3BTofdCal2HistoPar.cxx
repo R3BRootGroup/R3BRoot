@@ -40,6 +40,8 @@
 #include "TGraph.h"
 #include "TH1F.h"
 #include "TH2F.h"
+#include "TLegend.h"
+#include "TLine.h"
 #include "TMath.h"
 #include "TProfile.h"
 #include "TSpectrum.h"
@@ -192,10 +194,12 @@ void R3BTofdCal2HistoPar::FinishTask()
     if (fParameter == 3)
     {
         // calculation of position dependend charge
+        /*
         LOG(WARNING) << "Calling function doubleExp";
         Double_t para[4];
         Double_t min = -40.; // effective bar length
         Double_t max = 40.;  // effective bar length = 80 cm
+
         for (Int_t i = 0; i < fNofPlanes; i++)
         {
             for (Int_t j = 0; j < fPaddlesPerPlane; j++)
@@ -225,6 +229,36 @@ void R3BTofdCal2HistoPar::FinishTask()
                     par->SetPar2b(para[1]);
                     par->SetPar2c(para[2]);
                     par->SetPar2d(para[3]);
+                }
+            }
+        }
+        */
+        // fCal_Par->setChanged();
+
+        LOG(WARNING) << "Calling function smiley";
+        Double_t para2[4];
+        Double_t min2 = -40.; // effective bar length
+        Double_t max2 = 40.;  // effective bar length = 80 cm
+        for (Int_t i = 0; i < fNofPlanes; i++)
+        {
+            for (Int_t j = 0; j < fPaddlesPerPlane; j++)
+            {
+                if (hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)))
+                {
+                    LOG(WARNING) << "Calling Plane " << i + 1 << " Bar " << j + 1;
+                    R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
+                    smiley((TH2F*)hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)),
+                           min2,
+                           max2,
+                           para2);
+                    Double_t offset1 = par->GetOffset1();
+                    Double_t offset2 = par->GetOffset2();
+                    Double_t veff = par->GetVeff();
+                    Double_t sync = par->GetSync();
+                    par->SetPar1a(para2[0]);
+                    par->SetPar1b(para2[1]);
+                    par->SetPar1c(para2[2]);
+                    par->SetPar1d(para2[3]);
                 }
             }
         }
@@ -635,7 +669,122 @@ void R3BTofdCal2HistoPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Dou
     delete f1;
     delete f2;
 }
+void R3BTofdCal2HistoPar::smiley(TH2F* histo, Double_t min, Double_t max, Double_t* para)
+{
+    // This fits the smiley: Sqrt(q1*q2) returns position dependent charge, we fit that via pol3 and try to correct
+    Double_t y[1000], x[1000];
+    Int_t n = 0;
+    for (Int_t j = 0; j <= 3; j++)
+    {
+        para[j] = 0;
+    }
+    TGraph* gr1 = new TGraph();
+    TGraph* gr2 = new TGraph();
+    TCanvas* cfit_smiley = new TCanvas("cfit_smiley", "fit smiley", 100, 100, 800, 800);
+    cfit_smiley->Clear();
+    cfit_smiley->Divide(1, 4);
+    cfit_smiley->cd(1);
+    TH2F* histo1 = (TH2F*)histo->Clone();
+    histo1->Draw("colz");
+    TH2F* histo2 = (TH2F*)histo->Clone();
+    histo2->RebinX(50);
+    histo2->GetYaxis()->SetRangeUser(fTofdTotLow, fTofdTotHigh);
+    // histo2->SetAxisRange(fTofdTotLow,fTofdTotHigh,"Y");
+    cfit_smiley->cd(2);
+    histo2->Draw("colz");
+    std::cout << "Searching for points to fit...\n";
+    for (Int_t i = 1; i < histo2->GetNbinsX(); i++)
+    {
+        // std::cout<<"Bin "<<i<<" of "<<histo2->GetNbinsX()<<" with cut: "<<fTofdTotLow<<" < sqrt(q1*q2) <
+        // "<<fTofdTotHigh<<"\n";
+        cfit_smiley->cd(2);
+        TLine* l = new TLine(
+            histo2->GetXaxis()->GetBinCenter(i), fTofdTotLow, histo2->GetXaxis()->GetBinCenter(i), fTofdTotHigh);
+        l->SetLineColor(kRed);
+        l->SetLineWidth(2.);
+        l->Draw();
+        cfit_smiley->cd(3);
+        TH1F* histo_py = (TH1F*)histo2->ProjectionY("histo_py", i, i, "");
+        histo_py->Draw();
+        // cfit_smiley->Update();
+        x[n] = histo2->GetXaxis()->GetBinCenter(i);
+        Int_t binmax = histo_py->GetMaximumBin();
+        y[n] = histo_py->GetXaxis()->GetBinCenter(binmax);
 
+        if ((x[n] < -40. || x[n] > 40.) || (y[n] < fTofdTotLow || y[n] > fTofdTotHigh))
+        {
+            delete histo_py;
+            continue;
+        }
+        if (histo_py->GetMaximum() > 5)
+        {
+            n++;
+            delete l;
+        }
+        delete histo_py;
+    }
+    gr1 = new TGraph(n, x, y);
+    gr1->SetTitle("Points found for fitting;x position in cm;sqrt(q1*q2)");
+    gr1->Draw("A*");
+    std::cout << "Start fitting\n";
+    TF1* f1 = new TF1("f1", "pol3", min, max);
+    f1->SetLineColor(2);
+    gr1->Fit("f1", "Q", "", min, max);
+    for (Int_t j = 0; j <= 3; j++)
+    {
+        para[j] = f1->GetParameter(j);
+        std::cout << "Parameter: " << para[j] << "\n";
+    }
+    // fit again but with more information and better cuts
+    std::cout << "Fit again with more information\n";
+    n = 0;
+    cfit_smiley->cd(4);
+    for (Int_t i = 1; i < histo2->GetNbinsX(); i++)
+    {
+        Double_t pos = histo2->GetXaxis()->GetBinCenter(i);
+        Double_t ymean = f1->Eval(pos);
+        histo2->SetAxisRange(ymean - 5., ymean + 5., "Y");
+        histo2->Draw("colz");
+        TH1F* histo_py = (TH1F*)histo2->ProjectionY("histo_py", i, i, "");
+        histo_py->Draw();
+        x[n] = histo2->GetXaxis()->GetBinCenter(i);
+        Int_t binmax = histo_py->GetMaximumBin();
+        y[n] = histo_py->GetXaxis()->GetBinCenter(binmax);
+        if (histo_py->GetMaximum() > 2)
+            n++;
+        delete histo_py;
+    }
+    gr2 = new TGraph(n, x, y);
+    gr2->SetTitle("More information;x position in cm;sqrt(q1*q2)");
+    gr2->Draw("A*");
+    f1->DrawCopy("SAME");
+    TF1* f2 = new TF1("f2", "pol3", min, max);
+    f2->SetParameters(para[0], para[1], para[2], para[3]);
+    f2->SetLineColor(3);
+    gr2->Fit("f2", "0Q", "", min, max);
+    f2->Draw("SAME");
+    std::cout << "Will write:\n";
+    for (Int_t j = 0; j <= 3; j++)
+    {
+        para[j] = f2->GetParameter(j);
+        std::cout << "Parameter: " << para[j] << "\n";
+    }
+    histo2->GetYaxis()->SetRangeUser(fTofdTotLow, fTofdTotHigh);
+    auto legend = new TLegend(.9, 0.7, .99, 0.9);
+    legend->AddEntry("f1", "First Fit", "l");
+    legend->AddEntry("f2", "Second Fit", "l");
+    legend->Draw();
+    cfit_smiley->Update();
+    // gPad->WaitPrimitive();
+    gSystem->Sleep(3000);
+    delete histo1;
+    delete histo2;
+    delete gr1;
+    delete gr2;
+    delete f1;
+    delete f2;
+    delete cfit_smiley;
+}
 void R3BTofdCal2HistoPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* pars)
 {
     Double_t par[3000] = { 0 };
