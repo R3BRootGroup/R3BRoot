@@ -172,10 +172,15 @@ class R3BTofdCal2HistoPar : public FairTask
     virtual void calcLambda(Double_t TotLow, Double_t TotHigh);
 
     /**
-     * Method for calculation of position dependence of scintillator.
+     * Method for calculation of position dependence charge of scintillator.
      */
     virtual void doubleExp(TH2F* histo, Double_t min, Double_t max, Double_t*);
 
+    /**
+     * Method for calculation of position dependent charge of scintillator.
+     */
+    virtual void smiley(TH2F* histo, Double_t min, Double_t max, Double_t*);
+    
     /**
      * Method for calculation of z correction.
      */

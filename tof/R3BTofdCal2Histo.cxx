@@ -82,6 +82,7 @@ R3BTofdCal2Histo::R3BTofdCal2Histo()
             fhTotPm1[i][j] = NULL;
             fhTotPm2[i][j] = NULL;
             fhTot1vsTot2[i][j] = NULL;
+            fhLogTot1vsLogTot2[i][j] = NULL;
             fhTot1vsPos[i][j] = NULL;
             fhTot2vsPos[i][j] = NULL;
             fhSqrtQvsPos[i][j] = NULL;
@@ -124,6 +125,7 @@ R3BTofdCal2Histo::R3BTofdCal2Histo(const char* name, Int_t iVerbose)
             fhTotPm1[i][j] = NULL;
             fhTotPm2[i][j] = NULL;
             fhTot1vsTot2[i][j] = NULL;
+            fhLogTot1vsLogTot2[i][j] = NULL;
             fhTot1vsPos[i][j] = NULL;
             fhTot2vsPos[i][j] = NULL;
             fhSqrtQvsPos[i][j] = NULL;
@@ -158,6 +160,8 @@ R3BTofdCal2Histo::~R3BTofdCal2Histo()
                 delete fhTotPm2[i][j];
             if (fhTot1vsTot2[i][j])
                 delete fhTot1vsTot2[i][j];
+            if (fhLogTot1vsLogTot2[i][j])
+                delete fhLogTot1vsLogTot2[i][j];
             if (fhTot1vsPos[i][j])
                 delete fhTot1vsPos[i][j];
             if (fhTot2vsPos[i][j])
@@ -202,9 +206,9 @@ InitStatus R3BTofdCal2Histo::Init()
         LOG(ERROR) << "R3BTofdCal2Histo::Init() Number of modules not set. ";
         return kFATAL;
     }
-    fCalItemsLos = (TClonesArray*)rm->GetObject("LosCal");
-    if (NULL == fCalItemsLos)
-        LOG(fatal) << "Branch LosCal not found";
+    // fCalItemsLos = (TClonesArray*)rm->GetObject("LosCal");
+    // if (NULL == fCalItemsLos)
+    //    LOG(fatal) << "Branch LosCal not found";
     return kSUCCESS;
 }
 
@@ -365,6 +369,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                 }
                 std::cout<<'\n';
                 */
+
                 // prepare offset and sync calculation
                 if (fTofdQ < 0.1)
                 {
@@ -378,6 +383,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                     fhTotPm1[iPlane - 1][iBar - 1]->Fill(bot_tot);
                     fhTotPm2[iPlane - 1][iBar - 1]->Fill(top_tot);
                     fhTot1vsTot2[iPlane - 1][iBar - 1]->Fill(top_tot, bot_tot);
+                    fhLogTot1vsLogTot2[iPlane - 1][iBar - 1]->Fill(log(top_tot), log(bot_tot));
                     fh_tofd_TotPm[iPlane - 1]->Fill(iBar, top_tot);
                     fh_tofd_TotPm[iPlane - 1]->Fill(-iBar - 1, bot_tot);
 
@@ -385,7 +391,6 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                     fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
 
                     // offset histo via ToT
-                    R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                     auto pos = tdiff;
                     auto posToT = log(top_tot / bot_tot);
                     fhSqrtQvsPos[iPlane - 1][iBar - 1]->Fill(pos, sqrt(top_tot * bot_tot));
@@ -401,6 +406,8 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                     while (ToF > c_range_ns / 2)
                         ToF -= c_range_ns;
                     fhTsync[iPlane - 1]->Fill(iBar, ToF);
+
+                    // prepare histo for walk correction
                     if (fwalk)
                     {
                         // get sync parameter
@@ -418,7 +425,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                             ToF -= c_range_ns;
                     }
                     fhToTvsTofw[iPlane - 1][iBar - 1]->Fill((bot_tot + top_tot) / 2.,
-                                                            ToF); // needed to get TOF w/o walk correction
+                                                            ToF); // histo for walk correction
                 }
                 else
                 {
@@ -632,6 +639,14 @@ void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhTot1vsTot2[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToT of PM2 in ns");
         fhTot1vsTot2[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM1 in ns");
     }
+    if (NULL == fhLogTot1vsLogTot2[iPlane - 1][iBar - 1])
+    {
+        char strName[255];
+        sprintf(strName, "Plane_%d_Bar_%d_LogToT1vsLogToT2", iPlane, iBar);
+        fhLogTot1vsLogTot2[iPlane - 1][iBar - 1] = new TH2F(strName, "", 600, 0., 6., 600, 0., 6.);
+        fhLogTot1vsLogTot2[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Log(ToT) of PM2");
+        fhLogTot1vsLogTot2[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Log(ToT) of PM1");
+    }
     if (NULL == fhTot1vsPos[iPlane - 1][iBar - 1])
     {
         char strName[255];
@@ -742,6 +757,8 @@ void R3BTofdCal2Histo::FinishTask()
                 fhTotPm2[i][j]->Write(); // control histogram ToT Pm2
             if (fhTot1vsTot2[i][j])
                 fhTot1vsTot2[i][j]->Write(); // control histogram ToT Pm1 vs ToT Pm2
+            if (fhLogTot1vsLogTot2[i][j])
+                fhLogTot1vsLogTot2[i][j]->Write(); // control histogram Log(ToT) Pm1 vs Log(ToT) Pm2
             if (fhSqrtQvsPos[i][j])
                 fhSqrtQvsPos[i][j]->Write(); // control histogram for charge correction
             if (fhSqrtQvsPosToT[i][j])
