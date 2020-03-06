@@ -12,7 +12,7 @@
  ******************************************************************************/
 // ----------------------------------------------------------
 // ----- Create histograms for parameters for TOFD      -----
-// -----      July 2019 from Lukas Bott                 -----
+// -----     Created July 2019 by L.Bott                -----
 // ----------------------------------------------------------
 
 #ifndef R3BTOFDCAL2HISTO_H
@@ -184,20 +184,14 @@ class R3BTofdCal2Histo : public FairTask
     // arrays of control histograms
     TH2F* fh_tofd_TotPm[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhTdiff[N_TOFD_HIT_PLANE_MAX];
-    TH2F* fhPosToT[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhTsync[N_TOFD_HIT_PLANE_MAX];
-    TH2F* fhQPm1[N_TOFD_HIT_PLANE_MAX];
-    TH2F* fhQPm2[N_TOFD_HIT_PLANE_MAX];
-    TH1F* fhTotPm1[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
-    TH1F* fhTotPm2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
-    TH2F* fhTot1vsTot2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhLogTot1vsLogTot2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
-    TH2F* fhTot1vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
-    TH2F* fhTot2vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
-    TH2F* fhSqrtQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhSqrtQvsPosToT[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhToTvsTofw[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    //TH2F* fhTot1vsTot2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    //TH2F* fhTot1vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    //TH2F* fhTot2vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
 
   public:
     ClassDef(R3BTofdCal2Histo, 1)

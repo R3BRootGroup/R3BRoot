@@ -12,7 +12,7 @@
  ******************************************************************************/
 // ----------------------------------------------------------
 // ----- Create histograms for parameters for TOFD      -----
-// -----      July 2019 from Lukas Bott                 -----
+// -----     Created July 2019 by L.Bott                -----
 // ----------------------------------------------------------
 #include "R3BTofdCal2Histo.h"
 #include "R3BEventHeader.h"
@@ -73,22 +73,16 @@ R3BTofdCal2Histo::R3BTofdCal2Histo()
     {
         fh_tofd_TotPm[i] = NULL;
         fhTdiff[i] = NULL;
-        fhPosToT[i] = NULL;
         fhTsync[i] = NULL;
-        fhQPm1[i] = NULL;
-        fhQPm2[i] = NULL;
         for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
-            fhTotPm1[i][j] = NULL;
-            fhTotPm2[i][j] = NULL;
-            fhTot1vsTot2[i][j] = NULL;
             fhLogTot1vsLogTot2[i][j] = NULL;
-            fhTot1vsPos[i][j] = NULL;
-            fhTot2vsPos[i][j] = NULL;
-            fhSqrtQvsPos[i][j] = NULL;
             fhSqrtQvsPosToT[i][j] = NULL;
             fhQvsPos[i][j] = NULL;
             fhToTvsTofw[i][j] = NULL;
+            // fhTot1vsTot2[i][j] = NULL;
+            // fhTot1vsPos[i][j] = NULL;
+            // fhTot2vsPos[i][j] = NULL;
         }
     }
 }
@@ -116,22 +110,16 @@ R3BTofdCal2Histo::R3BTofdCal2Histo(const char* name, Int_t iVerbose)
     {
         fh_tofd_TotPm[i] = NULL;
         fhTdiff[i] = NULL;
-        fhPosToT[i] = NULL;
         fhTsync[i] = NULL;
-        fhQPm1[i] = NULL;
-        fhQPm2[i] = NULL;
         for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
-            fhTotPm1[i][j] = NULL;
-            fhTotPm2[i][j] = NULL;
-            fhTot1vsTot2[i][j] = NULL;
             fhLogTot1vsLogTot2[i][j] = NULL;
-            fhTot1vsPos[i][j] = NULL;
-            fhTot2vsPos[i][j] = NULL;
-            fhSqrtQvsPos[i][j] = NULL;
             fhSqrtQvsPosToT[i][j] = NULL;
             fhQvsPos[i][j] = NULL;
             fhToTvsTofw[i][j] = NULL;
+            // fhTot1vsTot2[i][j] = NULL;
+            // fhTot1vsPos[i][j] = NULL;
+            // fhTot2vsPos[i][j] = NULL;
         }
     }
 }
@@ -144,36 +132,30 @@ R3BTofdCal2Histo::~R3BTofdCal2Histo()
             delete fh_tofd_TotPm[i];
         if (fhTdiff[i])
             delete fhTdiff[i];
-        if (fhPosToT[i])
-            delete fhPosToT[i];
         if (fhTsync[i])
             delete fhTsync[i];
-        if (fhQPm1[i])
-            delete fhQPm1[i];
-        if (fhQPm2[i])
-            delete fhQPm2[i];
         for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
-            if (fhTotPm1[i][j])
-                delete fhTotPm1[i][j];
-            if (fhTotPm2[i][j])
-                delete fhTotPm2[i][j];
-            if (fhTot1vsTot2[i][j])
-                delete fhTot1vsTot2[i][j];
             if (fhLogTot1vsLogTot2[i][j])
                 delete fhLogTot1vsLogTot2[i][j];
-            if (fhTot1vsPos[i][j])
-                delete fhTot1vsPos[i][j];
-            if (fhTot2vsPos[i][j])
-                delete fhTot2vsPos[i][j];
-            if (fhSqrtQvsPos[i][j])
-                delete fhSqrtQvsPos[i][j];
             if (fhSqrtQvsPosToT[i][j])
                 delete fhSqrtQvsPosToT[i][j];
             if (fhQvsPos[i][j])
                 delete fhQvsPos[i][j];
             if (fhToTvsTofw[i][j])
                 delete fhToTvsTofw[i][j];
+            /*
+            if (fhTot1vsTot2[i][j])
+                delete fhTot1vsTot2[i][j];
+            */
+            /*
+            if (fhTot1vsPos[i][j])
+                delete fhTot1vsPos[i][j];
+            */
+            /*
+            if (fhTot2vsPos[i][j])
+                delete fhTot2vsPos[i][j];
+            */
         }
     }
     if (fCal_Par)
@@ -226,8 +208,8 @@ void R3BTofdCal2Histo::SetParContainers()
 
 void R3BTofdCal2Histo::Exec(Option_t* option)
 {
-    if (fNEvents / 100000. == (long)fNEvents / 100000)
-        std::cout << "Events: " << fNEvents << " / " << maxevent << " (" << (long)(fNEvents * 100. / maxevent)
+    if (fNEvents / 10000. == fNEvents / 10000)
+        std::cout << "Events: " << fNEvents << " / " << maxevent << " (" << (Int_t)(fNEvents * 100. / maxevent)
                   << " %)             \r" << std::flush;
 
     // test for requested trigger (if possible)
@@ -360,19 +342,11 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                 auto bot_tot = fmod(bot->GetTimeTrailing_ns() - bot->GetTimeLeading_ns() + c_range_ns, c_range_ns);
                 // register multi hits
                 multihits[iPlane - 1][iBar - 1] += 1;
-                /*
-                for(int i=0; i<multihits.size(); i++){
-                    for(int p=0; p<multihits[i].size(); p++){
-                        std::cout << multihits[i][p] << " ";
-                    }
-                    std::cout<<'\n';
-                }
-                std::cout<<'\n';
-                */
 
                 // prepare offset and sync calculation
                 if (fTofdQ < 0.1)
                 {
+                    LOG(DEBUG) << "Fill histo for offset and sync calculation plane " << iPlane << " bar " << iBar;
                     // calculate tdiff
                     auto tdiff = bot_ns - top_ns;
 
@@ -380,10 +354,8 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                     CreateHistograms(iPlane, iBar);
 
                     // fill control histograms
-                    fhTotPm1[iPlane - 1][iBar - 1]->Fill(bot_tot);
-                    fhTotPm2[iPlane - 1][iBar - 1]->Fill(top_tot);
-                    fhTot1vsTot2[iPlane - 1][iBar - 1]->Fill(top_tot, bot_tot);
-                    fhLogTot1vsLogTot2[iPlane - 1][iBar - 1]->Fill(log(top_tot), log(bot_tot));
+                    // fhTot1vsTot2[iPlane - 1][iBar - 1]->Fill(top_tot, bot_tot);
+                    fhLogTot1vsLogTot2[iPlane - 1][iBar - 1]->Fill(TMath::Log(top_tot), TMath::Log(bot_tot));
                     fh_tofd_TotPm[iPlane - 1]->Fill(iBar, top_tot);
                     fh_tofd_TotPm[iPlane - 1]->Fill(-iBar - 1, bot_tot);
 
@@ -391,13 +363,10 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                     fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
 
                     // offset histo via ToT
-                    auto pos = tdiff;
-                    auto posToT = log(top_tot / bot_tot);
-                    fhSqrtQvsPos[iPlane - 1][iBar - 1]->Fill(pos, sqrt(top_tot * bot_tot));
+                    auto posToT = TMath::Log(top_tot / bot_tot);
                     fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->Fill(posToT, sqrt(top_tot * bot_tot));
-                    fhPosToT[iPlane - 1]->Fill(iBar, posToT);
-                    fhTot1vsPos[iPlane - 1][iBar - 1]->Fill(posToT, bot_tot);
-                    fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(posToT, top_tot);
+                    // fhTot1vsPos[iPlane - 1][iBar - 1]->Fill(posToT, bot_tot);
+                    // fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(posToT, top_tot);
 
                     // ToF
                     auto ToF = (top_ns + bot_ns) / 2 - timeLos;
@@ -458,7 +427,6 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                                            para->GetPar4Walk(),
                                            para->GetPar5Walk());
 
-                    auto pos = ((bot_ns + para->GetOffset1()) - (top_ns + para->GetOffset2())) * para->GetVeff();
                     auto posToT =
                         para->GetLambda() * log((top_tot + para->GetToTOffset2()) / (bot_tot + para->GetToTOffset1()));
 
@@ -466,12 +434,8 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                     CreateHistograms(iPlane, iBar);
 
                     // fill control histograms
-                    fhTotPm1[iPlane - 1][iBar - 1]->Fill(bot_tot);
-                    fhTotPm2[iPlane - 1][iBar - 1]->Fill(top_tot);
-                    fhTot1vsTot2[iPlane - 1][iBar - 1]->Fill(top_tot, bot_tot);
-                    fhSqrtQvsPos[iPlane - 1][iBar - 1]->Fill(pos, sqrt(top_tot * bot_tot));
+                    // fhTot1vsTot2[iPlane - 1][iBar - 1]->Fill(top_tot, bot_tot);
                     fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->Fill(posToT, sqrt(top_tot * bot_tot));
-                    fhPosToT[iPlane - 1]->Fill(iBar, posToT);
 
                     // Time differences of one paddle
                     fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
@@ -491,8 +455,11 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                 }
 
                 // prepare double exponential fit
+                /// obsolete?
+                /*
                 if (fTofdQ != 0 && fTofdZ == false)
                 {
+                    LOG(DEBUG)<<"Prepare histo for double exponential fit";
                     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!par)
                     {
@@ -507,14 +474,14 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                         par->GetLambda() * log((top_tot * par->GetToTOffset2()) / (bot_tot * par->GetToTOffset1()));
 
                     // fill fitting histograms and smiley histogram
-                    fhTot1vsPos[iPlane - 1][iBar - 1]->Fill(pos, bot_tot);
-                    fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(pos, top_tot);
+                    //fhTot1vsPos[iPlane - 1][iBar - 1]->Fill(pos, bot_tot);
+                    //fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(pos, top_tot);
                 }
-
-                // prepare charge fit
+                */
+                // prepare charge fit / quench correction
                 if (fTofdZ == true)
                 {
-
+                    LOG(DEBUG) << "Prepare histo for quenching correction";
                     // get parameter
                     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!par)
@@ -523,17 +490,25 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                                   << ", Bar: " << top->GetBarId();
                         continue;
                     }
+
                     // calculate y position
-                    auto pos = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
                     auto posToT =
                         par->GetLambda() * log((top_tot * par->GetToTOffset2()) / (bot_tot * par->GetToTOffset1()));
 
-                    // calculate position independent charge
                     Double_t parq[4];
                     parq[0] = par->GetPar1a();
                     parq[1] = par->GetPar1b();
                     parq[2] = par->GetPar1c();
                     parq[3] = par->GetPar1d();
+
+                    // calculate charge new method
+                    auto qb = TMath::Sqrt(top_tot * bot_tot) /
+                              (parq[0] + parq[1] * posToT + parq[2] * pow(posToT, 2) + parq[3] * pow(posToT, 3));
+                    qb = TMath::Sqrt(qb) * fTofdQ; // dE propto Z^2
+
+                    /*
+                    // calculate position independent charge old method (double exponential)
+                    auto pos = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
                     auto q1 =
                         bot_tot / (parq[0] * (exp(-parq[1] * (pos + 100.)) + exp(-parq[2] * (pos + 100.))) + parq[3]);
                     parq[0] = par->GetPar2a();
@@ -544,13 +519,13 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                         top_tot / (parq[0] * (exp(-parq[1] * (pos + 100.)) + exp(-parq[2] * (pos + 100.))) + parq[3]);
                     q1 = q1 * fTofdQ;
                     q2 = q2 * fTofdQ;
+                    auto qb = (q1+q2)/2.;
+                    */
 
                     // fill control histograms and Q vs Pos without multihits
-                    if (multihits[iPlane - 1][iBar - 1] < 2 && (q1 > 0. && q2 > 0.))
+                    if (multihits[iPlane - 1][iBar - 1] < 2 && (qb > 0.))
                     {
-                        fhQvsPos[iPlane - 1][iBar - 1]->Fill(pos, (q1 + q2) / 2.);
-                        fhQPm1[iPlane - 1]->Fill(iBar, q1);
-                        fhQPm2[iPlane - 1]->Fill(iBar, q2);
+                        fhQvsPos[iPlane - 1][iBar - 1]->Fill(posToT, qb);
                     }
                 }
 
@@ -574,7 +549,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
 
 void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
 {
-    Double_t max_charge = 80.;
+    Double_t max_charge = 50.;
     if (NULL == fhTdiff[iPlane - 1])
     {
         char strName1[255];
@@ -584,16 +559,6 @@ void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhTdiff[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 4000, -20., 20.);
         fhTdiff[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
         fhTdiff[iPlane - 1]->GetYaxis()->SetTitle("Time difference (PM1 - PM2) in ns");
-    }
-    if (NULL == fhPosToT[iPlane - 1])
-    {
-        char strName1[255];
-        char strName2[255];
-        sprintf(strName1, "Pos_ToT_Plane_%d", iPlane);
-        sprintf(strName2, "Position from ToT Plane %d", iPlane);
-        fhPosToT[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 2000, -100., 100.);
-        fhPosToT[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
-        fhPosToT[iPlane - 1]->GetYaxis()->SetTitle("Pos from ToT");
     }
     if (NULL == fhTsync[iPlane - 1])
     {
@@ -611,26 +576,44 @@ void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
         sprintf(strName, "Tofd_ToT_plane_%d", iPlane);
         char strName2[255];
         sprintf(strName2, "Tofd ToT plane %d", iPlane);
-        fh_tofd_TotPm[iPlane - 1] = new TH2F(strName, strName2, 90, -45, 45, 3000, 0., 300.);
+        fh_tofd_TotPm[iPlane - 1] = new TH2F(strName, strName2, 90, -45, 45, 300, 0., 300.);
         fh_tofd_TotPm[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
         fh_tofd_TotPm[iPlane - 1]->GetYaxis()->SetTitle("ToT / ns");
     }
-    if (NULL == fhTotPm1[iPlane - 1][iBar - 1])
+    if (NULL == fhLogTot1vsLogTot2[iPlane - 1][iBar - 1])
     {
         char strName[255];
-        sprintf(strName, "ToT_Plane_%d_Bar_%d_PM_1", iPlane, iBar);
-        fhTotPm1[iPlane - 1][iBar - 1] = new TH1F(strName, "", 300, 0., 300.);
-        fhTotPm1[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToT of PM1 in ns");
-        fhTotPm1[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Counts");
+        sprintf(strName, "Plane_%d_Bar_%d_LogToT1vsLogToT2", iPlane, iBar);
+        fhLogTot1vsLogTot2[iPlane - 1][iBar - 1] = new TH2F(strName, "", 400, 2., 6., 400, 2., 6.);
+        fhLogTot1vsLogTot2[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Log(ToT) of PM2");
+        fhLogTot1vsLogTot2[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Log(ToT) of PM1");
     }
-    if (NULL == fhTotPm2[iPlane - 1][iBar - 1])
+    if (NULL == fhSqrtQvsPosToT[iPlane - 1][iBar - 1])
     {
         char strName[255];
-        sprintf(strName, "ToT_Plane_%d_Bar_%d_PM_2", iPlane, iBar);
-        fhTotPm2[iPlane - 1][iBar - 1] = new TH1F(strName, "", 300, 0., 300.);
-        fhTotPm2[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToT of PM2 in ns");
-        fhTotPm2[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Counts");
+        sprintf(strName, "SqrtQ_vs_PosToT_Plane_%d_Bar_%d", iPlane, iBar);
+        fhSqrtQvsPosToT[iPlane - 1][iBar - 1] =
+            new TH2F(strName, "", 20000, -100, 100, max_charge * 4, 0., max_charge * 4);
+        fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("sqrt(PM1*PM2)");
+        fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position from ToT in cm");
     }
+    if (NULL == fhToTvsTofw[iPlane - 1][iBar - 1])
+    {
+        char strName[255];
+        sprintf(strName, "Q_vs_ToF_Plane_%d_Bar_%d_w", iPlane, iBar);
+        fhToTvsTofw[iPlane - 1][iBar - 1] = new TH2F(strName, "", 1000, 0., 200, 1000, -10, 40);
+        fhToTvsTofw[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToT in ns");
+        fhToTvsTofw[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToF in ns");
+    }
+    if (NULL == fhQvsPos[iPlane - 1][iBar - 1])
+    {
+        char strName[255];
+        sprintf(strName, "Q_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
+        fhQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, max_charge * 2, 0., max_charge);
+        fhQvsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Charge");
+        fhQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position in cm");
+    }
+    /*
     if (NULL == fhTot1vsTot2[iPlane - 1][iBar - 1])
     {
         char strName[255];
@@ -639,14 +622,8 @@ void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhTot1vsTot2[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToT of PM2 in ns");
         fhTot1vsTot2[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM1 in ns");
     }
-    if (NULL == fhLogTot1vsLogTot2[iPlane - 1][iBar - 1])
-    {
-        char strName[255];
-        sprintf(strName, "Plane_%d_Bar_%d_LogToT1vsLogToT2", iPlane, iBar);
-        fhLogTot1vsLogTot2[iPlane - 1][iBar - 1] = new TH2F(strName, "", 600, 0., 6., 600, 0., 6.);
-        fhLogTot1vsLogTot2[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Log(ToT) of PM2");
-        fhLogTot1vsLogTot2[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Log(ToT) of PM1");
-    }
+    */
+    /*
     if (NULL == fhTot1vsPos[iPlane - 1][iBar - 1])
     {
         char strName[255];
@@ -658,6 +635,8 @@ void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhTot1vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
         fhTot1vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM1 in ns");
     }
+    */
+    /*
     if (NULL == fhTot2vsPos[iPlane - 1][iBar - 1])
     {
         char strName[255];
@@ -669,60 +648,7 @@ void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhTot2vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
         fhTot2vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM2 in ns");
     }
-    if (NULL == fhSqrtQvsPos[iPlane - 1][iBar - 1])
-    {
-        char strName[255];
-        sprintf(strName, "SqrtQ_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-        fhSqrtQvsPos[iPlane - 1][iBar - 1] =
-            new TH2F(strName, "", 20000, -100, 100, max_charge * 4, 0., max_charge * 4);
-        fhSqrtQvsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("sqrt(PM1*PM2)");
-        fhSqrtQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position from tdiff in cm");
-    }
-    if (NULL == fhSqrtQvsPosToT[iPlane - 1][iBar - 1])
-    {
-        char strName[255];
-        sprintf(strName, "SqrtQ_vs_PosToT_Plane_%d_Bar_%d", iPlane, iBar);
-        fhSqrtQvsPosToT[iPlane - 1][iBar - 1] =
-            new TH2F(strName, "", 20000, -100, 100, max_charge * 4, 0., max_charge * 4);
-        fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("sqrt(PM1*PM2)");
-        fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position from ToT in cm");
-    }
-    if (NULL == fhQvsPos[iPlane - 1][iBar - 1])
-    {
-        char strName[255];
-        sprintf(strName, "Q_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-        fhQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, max_charge * 10, 0., max_charge);
-        fhQvsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Charge");
-        fhQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position in cm");
-    }
-    if (NULL == fhQPm1[iPlane - 1])
-    {
-        char strName1[255];
-        sprintf(strName1, "Q_Plane_%d_PM_1", iPlane);
-        char strName2[255];
-        sprintf(strName2, "Q Plane %d PM1", iPlane);
-        fhQPm1[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, max_charge * 10, 0., max_charge);
-        fhQPm1[iPlane - 1]->GetYaxis()->SetTitle("Charge PM1");
-        fhQPm1[iPlane - 1]->GetXaxis()->SetTitle("Paddle number");
-    }
-    if (NULL == fhQPm2[iPlane - 1])
-    {
-        char strName1[255];
-        sprintf(strName1, "Q_Plane_%d_PM_2", iPlane);
-        char strName2[255];
-        sprintf(strName2, "Q Plane %d PM2", iPlane);
-        fhQPm2[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, max_charge * 10, 0., max_charge);
-        fhQPm2[iPlane - 1]->GetYaxis()->SetTitle("Charge PM2");
-        fhQPm2[iPlane - 1]->GetXaxis()->SetTitle("Paddle number");
-    }
-    if (NULL == fhToTvsTofw[iPlane - 1][iBar - 1])
-    {
-        char strName[255];
-        sprintf(strName, "Q_vs_ToF_Plane_%d_Bar_%d_w", iPlane, iBar);
-        fhToTvsTofw[iPlane - 1][iBar - 1] = new TH2F(strName, "", 1000, 0., 200, 1000, -10, 40);
-        fhToTvsTofw[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToT in ns");
-        fhToTvsTofw[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToF in ns");
-    }
+    */
 }
 
 void R3BTofdCal2Histo::FinishEvent()
@@ -743,86 +669,33 @@ void R3BTofdCal2Histo::FinishTask()
             fhTsync[i]->Write(); // histogram for sync calculation
         if (fhTdiff[i])
             fhTdiff[i]->Write(); // histogram for offset and veff calculation
-        if (fhPosToT[i])
-            fhPosToT[i]->Write(); // histogram for offset ToT and lambda calculation
-        if (fhQPm1[i])
-            fhQPm1[i]->Write(); // histogram for charge fit PM1
-        if (fhQPm2[i])
-            fhQPm2[i]->Write(); // histogram for charge fit PM2
         for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
-            if (fhTotPm1[i][j])
-                fhTotPm1[i][j]->Write(); // control histogram ToT Pm1
-            if (fhTotPm2[i][j])
-                fhTotPm2[i][j]->Write(); // control histogram ToT Pm2
-            if (fhTot1vsTot2[i][j])
-                fhTot1vsTot2[i][j]->Write(); // control histogram ToT Pm1 vs ToT Pm2
             if (fhLogTot1vsLogTot2[i][j])
                 fhLogTot1vsLogTot2[i][j]->Write(); // control histogram Log(ToT) Pm1 vs Log(ToT) Pm2
-            if (fhSqrtQvsPos[i][j])
-                fhSqrtQvsPos[i][j]->Write(); // control histogram for charge correction
             if (fhSqrtQvsPosToT[i][j])
                 fhSqrtQvsPosToT[i][j]->Write(); // histogram for ToT offset calculation
-            if (fhTot1vsPos[i][j])
-                fhTot1vsPos[i][j]->Write(); // histogram for position dependence of charge 1
-            if (fhTot2vsPos[i][j])
-                fhTot2vsPos[i][j]->Write(); // histogram for position dependence of charge 2
-            if (fhQvsPos[i][j])
-                fhQvsPos[i][j]->Write(); // histogram for charge fit
             if (fhToTvsTofw[i][j])
                 fhToTvsTofw[i][j]->Write(); // histogram for walk fit
+            if (fhQvsPos[i][j])
+                fhQvsPos[i][j]->Write(); // histogram for charge fit
+            /*
+            if (fhTot1vsPos[i][j])
+                fhTot1vsPos[i][j]->Write(); // histogram for position dependence of charge 1
+            */
+            /*
+            if (fhTot2vsPos[i][j])
+                fhTot2vsPos[i][j]->Write(); // histogram for position dependence of charge 2
+            */
+            /*
+            if (fhTot1vsTot2[i][j])
+                fhTot1vsTot2[i][j]->Write(); // control histogram ToT Pm1 vs ToT Pm2
+            */
         }
     }
 }
 
-/* // old method
-Double_t R3BTofdCal2Histo::walk(Double_t Q)
-{
-    Double_t y = 0;
-    Double_t par1, par2, par3, par4, par5;
-    Int_t voltage = 444;
-    //if(voltage==444){ // old value
-    //     par1= 1.179535e+01 ;
-    //     par2= 3.030475e-01 ;
-    //     par3= 3.213015e+02 ;
-    //     par4=-2.125546e-01 ;
-    //     par5= 3.812241e-04 ;
-    //}
-    if (voltage == 444)
-    {
-        par1 = 2.178871e+01;
-        par2 = -3.565959e-03;
-        par3 = 5.713045e+01;
-        par4 = 4.007571e-02;
-        par5 = -9.537515e-05;
-    }
-    if (voltage == 500)
-    {
-        par1 = 1.64344e+01;
-        par2 = 2.84000e-01;
-        par3 = 3.47659e+02;
-        par4 = -2.70050e-01;
-        par5 = 3.61515e-04;
-    }
-    if (voltage == 600)
-    {
-        par1 = 1.22606e+01;
-        par2 = 3.12697e-01;
-        par3 = 4.40109e+02;
-        par4 = -1.86328e-01;
-        par5 = 1.49519e-04;
-    }
-    y = -30.2 + par1 * TMath::Power(Q, par2) + par3 / Q + par4 * Q + par5 * Q * Q;
-    return y;
-}
-*/
-
-Double_t R3BTofdCal2Histo::walk(Double_t Q,
-                                Double_t par1,
-                                Double_t par2,
-                                Double_t par3,
-                                Double_t par4,
-                                Double_t par5) // new method
+Double_t R3BTofdCal2Histo::walk(Double_t Q, Double_t par1, Double_t par2, Double_t par3, Double_t par4, Double_t par5)
 {
     Double_t y = 0;
     y = -30.2 + par1 * TMath::Power(Q, par2) + par3 / Q + par4 * Q + par5 * Q * Q;

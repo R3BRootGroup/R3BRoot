@@ -683,10 +683,10 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 
                 // auto *smiley = new TF1("smiley", "pol3",-50,50);
                 // smiley->SetParameters(para[0], para[1], para[2], para[3]);
-                // Double_t qb = sqrt(top_tot * bot_tot) / smiley->Eval(pos);
-                Double_t qb =
-                    sqrt(top_tot * bot_tot) / (para[0] + para[1] * pos + para[2] * pow(pos, 2) + para[3] * pow(pos, 3));
-                qb = qb * fTofdQ;
+                // Double_t qb = TMath::Sqrt(top_tot * bot_tot) / smiley->Eval(pos);
+                Double_t qb = TMath::Sqrt(top_tot * bot_tot) /
+                              (para[0] + para[1] * pos + para[2] * pow(pos, 2) + para[3] * pow(pos, 3));
+                qb = TMath::Sqrt(qb) * fTofdQ;
                 /*
                 // via double exponential:
                 auto q1 = bot_tot / (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
@@ -1617,8 +1617,8 @@ void R3BTofdCal2Hit::FinishTask()
     }
     std::cout << "\n\nSome statistics:\n"
               << "Total number of events in tree  " << maxevent << "\n"
-              << "Events in LOS                   " << countloshit << "\n"
               << "Max Event analyzed              " << fnEvents + wrongtrigger + wrongtpat << "\n"
+              << "Events in LOS                   " << countloshit << "\n"
               << "Events skipped due to trigger   " << wrongtrigger << "\n"
               << "Events skipped due to tpat      " << wrongtpat << "\n"
               << "Events with correct header&tpat " << headertpat << "\n"
