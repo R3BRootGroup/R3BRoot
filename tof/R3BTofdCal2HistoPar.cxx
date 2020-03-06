@@ -338,44 +338,6 @@ void R3BTofdCal2HistoPar::calcOffset()
     }
     fCal_Par->setChanged();
 }
-/*
-// old method
-void R3BTofdCal2HistoPar::calcToTOffset()
-{
-    TCanvas* cToTOffset = new TCanvas("cToTOffset", "cToTOffset", 10, 10, 1000, 900);
-    cToTOffset->Divide(2, 2);
-    for (Int_t i = 0; i < fNofPlanes; i++)
-    {
-        for (Int_t j = 0; j < fPaddlesPerPlane; j++)
-        {
-            Double_t tot1 = 0.;
-            Double_t tot2 = 0.;
-            R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
-            for (Int_t p = 0; p < 2; p++)
-            {
-                if (hfilename->Get(Form("ToT_Plane_%i_Bar_%i_PM_%i", i + 1, j + 1, p + 1)))
-                {
-                    LOG(WARNING) << "Found histo Plane_" << i + 1 << "_Bar_" << j + 1 << "_PM_" << p + 1;
-                    auto* h = (TH1F*)hfilename->Get(Form("ToT_Plane_%i_Bar_%i_PM_%i", i + 1, j + 1, p + 1))->Clone();
-                    h->Draw();
-                    Int_t binmax = h->GetMaximumBin();
-                    Double_t Max = h->GetXaxis()->GetBinCenter(binmax);
-                    TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 10, Max + 10);
-                    h->Fit("fgaus", "QR0");
-                    if (p == 0)
-                        tot1 = fgaus->GetParameter(1);
-                    if (p == 1)
-                        tot2 = fgaus->GetParameter(1);
-                }
-            }
-            LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << sqrt(tot2 / tot1);
-            par->SetToTOffset1(sqrt(tot2 / tot1));
-            par->SetToTOffset2(1. / sqrt(tot2 / tot1));
-        }
-    }
-    fCal_Par->setChanged();
-}
-*/
 void R3BTofdCal2HistoPar::calcToTOffset(Double_t totLow, Double_t totHigh)
 {
     TCanvas* cToTOffset = new TCanvas("cToTOffset", "cToTOffset", 10, 10, 1000, 900);
@@ -492,56 +454,6 @@ void R3BTofdCal2HistoPar::calcVeff()
     }
     fCal_Par->setChanged();
 }
-/*
-// old method
-void R3BTofdCal2HistoPar::calcLambda()
-{
-    TCanvas* cLambda = new TCanvas("cLambda", "cLambda", 10, 10, 1000, 900);
-    cLambda->Divide(2, 2);
-    for (Int_t i = 0; i < fNofPlanes; i++)
-    {
-        for (Int_t j = 0; j < fPaddlesPerPlane; j++)
-        {
-            R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
-            if (!par)
-            {
-                LOG(INFO) << "Hit par not found, Plane: " << i + 1 << ", Bar: " << j + 1;
-                continue;
-            }
-            Double_t max = 0.;
-            Double_t lambda = 7.;
-            Double_t tot1 = 0.;
-            Double_t tot2 = 0.;
-            for (Int_t p = 0; p < 2; p++)
-            {
-                if (hfilename->Get(Form("ToT_Plane_%i_Bar_%i_PM_%i", i + 1, j + 1, p + 1))) // y via ToT method
-                {
-                    LOG(WARNING) << "Found histo Time_Diff_Plane_" << i + 1;
-                    auto* h = (TH2F*)hfilename->Get(Form("ToT_Plane_%i_Bar_%i_PM_%i", i + 1, j + 1, p + 1))->Clone();
-                    h->Draw();
-                    Int_t binmax = h->GetMaximumBin();
-                    max = h->GetXaxis()->GetBinCenter(binmax);
-                    Double_t maxEntry = h->GetBinContent(binmax);
-                    auto* fgaus = new TF1("fgaus", "gaus(0)", max - 10, max + 10);
-                    fgaus->SetParameters(maxEntry, max, 20);
-                    h->Fit("fgaus", "QR0");
-                    if (p == 0)
-                        tot1 = fgaus->GetParameter(1);
-                    if (p == 1)
-                        tot2 = fgaus->GetParameter(1);
-                }
-            }
-            Double_t toffset1 = par->GetToTOffset1();
-            Double_t toffset2 = par->GetToTOffset2();
-            lambda = fTofdY / log((tot2 * toffset2) / (tot1 * toffset1)); // light attenuation / 2.
-            LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << par->GetToTOffset2();
-            LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " lambda  " << lambda;
-            par->SetLambda(lambda);
-        }
-    }
-    fCal_Par->setChanged();
-}
-*/
 void R3BTofdCal2HistoPar::calcLambda(Double_t totLow, Double_t totHigh)
 {
     TCanvas* cToTOffset = new TCanvas("cLambda", "cLambda", 10, 10, 1000, 900);
