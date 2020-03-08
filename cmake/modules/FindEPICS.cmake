@@ -2,7 +2,7 @@
 # Plox to install EPICS base and set EPICS_BASE and EPICS_HOST_ARCH.
 #
 
-message(STATUS "Looking for EPICS (base)...")
+# message(STATUS "Looking for EPICS (base)...")
 
 find_path(EPICS_INCLUDE_DIR
           NAMES cadef.h
@@ -43,14 +43,14 @@ else(EPICS_INCLUDE_DIR AND EPICS_OS_INCLUDE_DIR AND EPICS_LIBRARY_DIR)
     set(EPICS_FOUND false)
 endif(EPICS_INCLUDE_DIR AND EPICS_OS_INCLUDE_DIR AND EPICS_LIBRARY_DIR)
 
-message("    - EPICS_BASE = $ENV{EPICS_BASE}")
-message("    - EPICS_INCLUDE_DIR   = ${EPICS_INCLUDE_DIR}")
-message("    - EPICS_OSINCLUDE_DIR = ${EPICS_OS_INCLUDE_DIR}")
-message("    - EPICS_LIBRARY_DIR   = ${EPICS_LIBRARY_DIR}")
+# message("    - EPICS_BASE = $ENV{EPICS_BASE}")
+# message("    - EPICS_INCLUDE_DIR   = ${EPICS_INCLUDE_DIR}")
+# message("    - EPICS_OSINCLUDE_DIR = ${EPICS_OS_INCLUDE_DIR}")
+# message("    - EPICS_LIBRARY_DIR   = ${EPICS_LIBRARY_DIR}")
 
 if(EPICS_FOUND)
     add_definitions(-DWITH_EPICS)
-    message("-- Looking for EPICS... - FOUND")
+    # message("-- Looking for EPICS... - FOUND")
 else(EPICS_FOUND)
-    message("-- Looking for EPICS... - MISSING")
+    # message("-- Looking for EPICS... - MISSING")
 endif(EPICS_FOUND)
