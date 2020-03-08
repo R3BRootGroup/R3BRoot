@@ -1,56 +1,76 @@
-# Remove trailing slash from a path passed as argument
-Macro(Remove_Trailing_Slash _variable)
-  String(FIND ${_variable} "/" _pos_last_slash REVERSE)
-  STRING(LENGTH ${_variable} _length)
-  Math(EXPR _last_pos ${_pos_last_slash}+1)
-  If(${_last_pos} EQUAL ${_length})  
-    String(SUBSTRING ${_variable} 0 ${_pos_last_slash} _ret_val)
-  Else()
-    Set(_ret_val ${_variable})
-  EndIf()
-EndMacro()
+##############################################################################
+#   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
+#   Copyright (C) 2019 Members of R3B Collaboration                          #
+#                                                                            #
+#             This software is distributed under the terms of the            #
+#                 GNU General Public Licence (GPL) version 3,                #
+#                    copied verbatim in the file "LICENSE".                  #
+#                                                                            #
+# In applying this license GSI does not waive the privileges and immunities  #
+# granted to it by virtue of its status as an Intergovernmental Organization #
+# or submit itself to any jurisdiction.                                      #
+##############################################################################
 
+include(FairRootSummary)
+include(FairRootTargetRootDictionary)
+include(FairRootUtils)
 
-MACRO (ROOT_GENERATE_DICTIONARY_OLD_EXTRA INFILES LINKDEF_FILE OUTFILE INCLUDE_DIRS_IN)
+macro(r3broot_summary)
+  fairroot_summary_spacer()
+  fairroot_summary_global_cxx_flags()
+  fairroot_summary_spacer()
+  fairroot_summary_cxx_standard()
+  fairroot_summary_spacer()
+  fairroot_summary_package_dependencies()
+  fairroot_summary_spacer()
+  fairroot_summary_build_types()
+  fairroot_summary_spacer()
+  fairroot_summary_install_prefix()
+  fairroot_summary_spacer()
+endmacro()
 
-  set(INCLUDE_DIRS)
+macro(r3broot_add_library target)
+  cmake_parse_arguments(PARSE_ARGV 1 ARGS
+                        "NO_GUESS_HEADERS"
+                        "LINKDEF"
+                        "HEADERS;SOURCES;LINKS")
+  if(NOT ARGS_NO_GUESS_HEADERS)
+    fairroot_change_extensions_if_exists(.cxx .h
+      FILES "${ARGS_SOURCES}" OUTVAR headers)
+    set(headers ${headers} ${ARGS_HEADERS})
+    list(REMOVE_DUPLICATES ${headers})
+  else()
+    set(headers ${ARGS_HEADERS})
+  endif()
 
-  foreach (_current_FILE ${INCLUDE_DIRS_IN})
-    set(INCLUDE_DIRS ${INCLUDE_DIRS} -I${_current_FILE})
-  endforeach (_current_FILE ${INCLUDE_DIRS_IN})
+  add_library(${target} ${ARGS_SOURCES} ${headers} ${ARGS_HEADERS})
+  add_library(${PROJECT_NAME_LOWER}::${target} ALIAS ${target})
+  set_target_properties(${target} PROPERTIES ${PROJECT_LIBRARY_PROPERTIES})
 
-#  Message("Definitions: ${DEFINITIONS}")
-#  MESSAGE("INFILES: ${INFILES}")
-#  MESSAGE("OutFILE: ${OUTFILE}")
-#  MESSAGE("LINKDEF_FILE: ${LINKDEF_FILE}")
-#  MESSAGE("INCLUDE_DIRS: ${INCLUDE_DIRS}")
+  target_include_directories(${target} PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:${PROJECT_INSTALL_INCDIR}>)
 
-  STRING(REGEX REPLACE "^(.*)\\.(.*)$" "\\1.h" bla "${OUTFILE}")
-#  MESSAGE("BLA: ${bla}")
-  SET (OUTFILES ${OUTFILE} ${bla})
+  if(ARGS_LINKS)
+    target_link_libraries(${target} ${ARGS_LINKS})
+  endif()
 
-  if (CMAKE_SYSTEM_NAME MATCHES Linux)
-    ADD_CUSTOM_COMMAND(OUTPUT ${OUTFILES}
-       COMMAND LD_LIBRARY_PATH=${ROOT_LIBRARY_DIR}:${_intel_lib_dirs} ROOTSYS=${ROOTSYS} ${ROOT_CINT_EXECUTABLE}
-       ARGS -f ${OUTFILE} -c -p -DHAVE_CONFIG_H ${INCLUDE_DIRS} ${INFILES} ${LINKDEF_FILE} DEPENDS ${INFILES} ${LINKDEF_FILE})
-  else (CMAKE_SYSTEM_NAME MATCHES Linux)
-    if (CMAKE_SYSTEM_NAME MATCHES Darwin)
-      ADD_CUSTOM_COMMAND(OUTPUT ${OUTFILES}
-       COMMAND DYLD_LIBRARY_PATH=${ROOT_LIBRARY_DIR} ROOTSYS=${ROOTSYS} ${ROOT_CINT_EXECUTABLE}
-       ARGS -f ${OUTFILE} -c -p -DHAVE_CONFIG_H ${INCLUDE_DIRS} ${INFILES} ${LINKDEF_FILE} DEPENDS ${INFILES} ${LINKDEF_FILE})
-    endif (CMAKE_SYSTEM_NAME MATCHES Darwin)
-  endif (CMAKE_SYSTEM_NAME MATCHES Linux)
+  if(ARGS_LINKDEF)
+    if(headers)
+      fairroot_target_root_dictionary(${target}
+        HEADERS ${headers}
+        LINKDEF R3BLinkDef.h)
+    else()
+      fairroot_target_root_dictionary(${target}
+        LINKDEF R3BLinkDef.h)
+    endif()
+  endif()
 
-ENDMACRO (ROOT_GENERATE_DICTIONARY_OLD_EXTRA)
-
-
-Macro (R3B_Generate_Version_Info)
-  Add_Custom_Target(svnheader ALL)
-
-  Add_Custom_Command(TARGET svnheader
-                     COMMAND ${CMAKE_COMMAND} -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
-                     -DBINARY_DIR=${CMAKE_BINARY_DIR}
-                     -DINCLUDE_OUTPUT_DIRECTORY=${INCLUDE_OUTPUT_DIRECTORY}
-                     -P ${CMAKE_SOURCE_DIR}/cmake/modules/R3BGenerateVersionInfo.cmake
-                    )
-EndMacro (R3B_Generate_Version_Info)
+  install(TARGETS ${target}
+    EXPORT ${PROJECT_EXPORT_SET}
+    LIBRARY DESTINATION ${PROJECT_INSTALL_LIBDIR})
+  if(headers)
+    install(FILES ${headers}
+      DESTINATION ${PROJECT_INSTALL_INCDIR})
+  endif()
+endmacro()

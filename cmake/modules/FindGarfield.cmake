@@ -1,8 +1,8 @@
  ################################################################################
  #    Copyright (C) 2014 GSI Helmholtzzentrum fuer Schwerionenforschung GmbH    #
  #                                                                              #
- #              This software is distributed under the terms of the             # 
- #         GNU Lesser General Public Licence version 3 (LGPL) version 3,        #  
+ #              This software is distributed under the terms of the             #
+ #         GNU Lesser General Public Licence version 3 (LGPL) version 3,        #
  #                  copied verbatim in the file "LICENSE"                       #
  ################################################################################
 
@@ -20,7 +20,7 @@
  # More information: http://fy.chalmers.se/~f96hajo/ucesb/
  ################################################################
 
-message(STATUS "Looking for Garfield++...")
+# message(STATUS "Looking for Garfield++...")
 
 find_path(GARFIELD_INCLUDE_DIR NAMES Sensor.hh
   PATHS $ENV{GARFIELD_HOME}/Include
@@ -46,12 +46,12 @@ endif(GARFIELD_INCLUDE_DIR
       AND GARFIELD_LIBRARY_DIR
 )
 
-message("    - GARFIELD_INCLUDE_DIR = ${GARFIELD_INCLUDE_DIR}")
-message("    - GARFIELD_LIBRARY_DIR = ${GARFIELD_LIBRARY_DIR}")
+# message("    - GARFIELD_INCLUDE_DIR = ${GARFIELD_INCLUDE_DIR}")
+# message("    - GARFIELD_LIBRARY_DIR = ${GARFIELD_LIBRARY_DIR}")
 
 if(GARFIELD_FOUND)
-  message(STATUS "Garfield++ was found.")
+  # message(STATUS "Garfield++ was found.")
 else(GARFIELD_FOUND)
-  message(STATUS "Could not find package Garfield++")
+  # message(STATUS "Could not find package Garfield++")
 endif(GARFIELD_FOUND)
 
