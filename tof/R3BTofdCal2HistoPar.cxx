@@ -80,6 +80,7 @@ R3BTofdCal2HistoPar::R3BTofdCal2HistoPar()
     , fTofdQ(0.)
     , fTofdTotLow(0.)
     , fTofdTotHigh(0.)
+    , fTofdSmiley(true)
     , fParaFile("")
     , fHistoFile("")
 {
@@ -101,6 +102,7 @@ R3BTofdCal2HistoPar::R3BTofdCal2HistoPar(const char* name, Int_t iVerbose)
     , fTofdQ(0.)
     , fTofdTotLow(0.)
     , fTofdTotHigh(0.)
+    , fTofdSmiley(true)
     , fParaFile("")
     , fHistoFile("")
 {
@@ -194,75 +196,81 @@ void R3BTofdCal2HistoPar::FinishTask()
     if (fParameter == 3)
     {
         // calculation of position dependend charge
-        /*
-        LOG(WARNING) << "Calling function doubleExp";
-        Double_t para[4];
-        Double_t min = -40.; // effective bar length
-        Double_t max = 40.;  // effective bar length = 80 cm
-
-        for (Int_t i = 0; i < fNofPlanes; i++)
+        if (fTofdSmiley)
         {
-            for (Int_t j = 0; j < fPaddlesPerPlane; j++)
+            LOG(WARNING) << "Calling function smiley";
+            Double_t para2[4];
+            Double_t min2 = -50.; // -40 effective bar length
+            Double_t max2 = 50.;  // 40 effective bar length = 80 cm
+                                  // we will use 50 here for some fit safety margin
+            for (Int_t i = 0; i < fNofPlanes; i++)
             {
-                if (hfilename->Get(Form("Tot1_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)))
+                for (Int_t j = 0; j < fPaddlesPerPlane; j++)
                 {
-                    R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
-                    doubleExp((TH2F*)hfilename->Get(Form("Tot1_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)), min, max, para);
-                    Double_t offset1 = par->GetOffset1();
-                    Double_t offset2 = par->GetOffset2();
-                    Double_t veff = par->GetVeff();
-                    Double_t sync = par->GetSync();
-                    par->SetPar1a(para[0]);
-                    par->SetPar1b(para[1]);
-                    par->SetPar1c(para[2]);
-                    par->SetPar1d(para[3]);
-                }
-                if (hfilename->Get(Form("Tot2_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)))
-                {
-                    R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
-                    doubleExp((TH2F*)hfilename->Get(Form("Tot2_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)), min, max, para);
-                    Double_t offset1 = par->GetOffset1();
-                    Double_t offset2 = par->GetOffset2();
-                    Double_t veff = par->GetVeff();
-                    Double_t sync = par->GetSync();
-                    par->SetPar2a(para[0]);
-                    par->SetPar2b(para[1]);
-                    par->SetPar2c(para[2]);
-                    par->SetPar2d(para[3]);
+                    if (hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)))
+                    {
+                        LOG(WARNING) << "Calling Plane " << i + 1 << " Bar " << j + 1;
+                        R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
+                        smiley((TH2F*)hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)),
+                               min2,
+                               max2,
+                               para2);
+                        Double_t offset1 = par->GetOffset1();
+                        Double_t offset2 = par->GetOffset2();
+                        Double_t veff = par->GetVeff();
+                        Double_t sync = par->GetSync();
+                        par->SetPar1a(para2[0]);
+                        par->SetPar1b(para2[1]);
+                        par->SetPar1c(para2[2]);
+                        par->SetPar1d(para2[3]);
+                    }
                 }
             }
+            fCal_Par->setChanged();
         }
-        */
-        // fCal_Par->setChanged();
-
-        LOG(WARNING) << "Calling function smiley";
-        Double_t para2[4];
-        Double_t min2 = -40.; // effective bar length
-        Double_t max2 = 40.;  // effective bar length = 80 cm
-        for (Int_t i = 0; i < fNofPlanes; i++)
+        else
         {
-            for (Int_t j = 0; j < fPaddlesPerPlane; j++)
+            LOG(WARNING) << "Calling function doubleExp";
+            Double_t para[4];
+            Double_t min = -40.; // effective bar length
+            Double_t max = 40.;  // effective bar length = 80 cm
+
+            for (Int_t i = 0; i < fNofPlanes; i++)
             {
-                if (hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)))
+                for (Int_t j = 0; j < fPaddlesPerPlane; j++)
                 {
-                    LOG(WARNING) << "Calling Plane " << i + 1 << " Bar " << j + 1;
-                    R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
-                    smiley((TH2F*)hfilename->Get(Form("SqrtQ_vs_PosToT_Plane_%i_Bar_%i", i + 1, j + 1)),
-                           min2,
-                           max2,
-                           para2);
-                    Double_t offset1 = par->GetOffset1();
-                    Double_t offset2 = par->GetOffset2();
-                    Double_t veff = par->GetVeff();
-                    Double_t sync = par->GetSync();
-                    par->SetPar1a(para2[0]);
-                    par->SetPar1b(para2[1]);
-                    par->SetPar1c(para2[2]);
-                    par->SetPar1d(para2[3]);
+                    if (hfilename->Get(Form("Tot1_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)))
+                    {
+                        R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
+                        doubleExp(
+                            (TH2F*)hfilename->Get(Form("Tot1_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)), min, max, para);
+                        Double_t offset1 = par->GetOffset1();
+                        Double_t offset2 = par->GetOffset2();
+                        Double_t veff = par->GetVeff();
+                        Double_t sync = par->GetSync();
+                        par->SetPar1a(para[0]);
+                        par->SetPar1b(para[1]);
+                        par->SetPar1c(para[2]);
+                        par->SetPar1d(para[3]);
+                    }
+                    if (hfilename->Get(Form("Tot2_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)))
+                    {
+                        R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
+                        doubleExp(
+                            (TH2F*)hfilename->Get(Form("Tot2_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)), min, max, para);
+                        Double_t offset1 = par->GetOffset1();
+                        Double_t offset2 = par->GetOffset2();
+                        Double_t veff = par->GetVeff();
+                        Double_t sync = par->GetSync();
+                        par->SetPar2a(para[0]);
+                        par->SetPar2b(para[1]);
+                        par->SetPar2c(para[2]);
+                        par->SetPar2d(para[3]);
+                    }
                 }
             }
+            fCal_Par->setChanged();
         }
-        fCal_Par->setChanged();
     }
 
     if (fParameter == 4)
@@ -575,7 +583,7 @@ void R3BTofdCal2HistoPar::doubleExp(TH2F* histo, Double_t min, Double_t max, Dou
     }
     cfit_exp->Update();
     // gPad->WaitPrimitive();
-    // gSystem->Sleep(3000);
+    gSystem->Sleep(3000);
     delete gr1;
     delete gr2;
     delete f1;
@@ -623,7 +631,7 @@ void R3BTofdCal2HistoPar::smiley(TH2F* histo, Double_t min, Double_t max, Double
         Int_t binmax = histo_py->GetMaximumBin();
         y[n] = histo_py->GetXaxis()->GetBinCenter(binmax);
 
-        if ((x[n] < -40. || x[n] > 40.) || (y[n] < fTofdTotLow || y[n] > fTofdTotHigh))
+        if ((x[n] < min || x[n] > max) || (y[n] < fTofdTotLow || y[n] > fTofdTotHigh))
         {
             delete histo_py;
             continue;
@@ -636,7 +644,7 @@ void R3BTofdCal2HistoPar::smiley(TH2F* histo, Double_t min, Double_t max, Double
         delete histo_py;
     }
     gr1 = new TGraph(n, x, y);
-    gr1->SetTitle("Points found for fitting;x position in cm;sqrt(q1*q2)");
+    gr1->SetTitle("Points found for fitting; x position in cm; sqrt(tot1*tot2)");
     gr1->Draw("A*");
     std::cout << "Start fitting\n";
     TF1* f1 = new TF1("f1", "pol3", min, max);

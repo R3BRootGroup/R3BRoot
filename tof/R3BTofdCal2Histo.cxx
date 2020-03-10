@@ -66,6 +66,7 @@ R3BTofdCal2Histo::R3BTofdCal2Histo()
     , fTofdY(0.)
     , fTofdQ(0.)
     , fwalk(false)
+    , fTofdSmiley(true)
     , fTofdZ(false)
     , fParaFile("")
 {
@@ -80,9 +81,11 @@ R3BTofdCal2Histo::R3BTofdCal2Histo()
             fhSqrtQvsPosToT[i][j] = NULL;
             fhQvsPos[i][j] = NULL;
             fhToTvsTofw[i][j] = NULL;
+            if (!fTofdSmiley)
+                fhTot1vsPos[i][j] = NULL;
+            if (!fTofdSmiley)
+                fhTot2vsPos[i][j] = NULL;
             // fhTot1vsTot2[i][j] = NULL;
-            // fhTot1vsPos[i][j] = NULL;
-            // fhTot2vsPos[i][j] = NULL;
         }
     }
 }
@@ -102,6 +105,7 @@ R3BTofdCal2Histo::R3BTofdCal2Histo(const char* name, Int_t iVerbose)
     , fTofdY(0.)
     , fTofdQ(0.)
     , fwalk(false)
+    , fTofdSmiley(true)
     , fTofdZ(false)
     , fParaFile("")
     , maxevent(0)
@@ -117,9 +121,11 @@ R3BTofdCal2Histo::R3BTofdCal2Histo(const char* name, Int_t iVerbose)
             fhSqrtQvsPosToT[i][j] = NULL;
             fhQvsPos[i][j] = NULL;
             fhToTvsTofw[i][j] = NULL;
+            if (!fTofdSmiley)
+                fhTot1vsPos[i][j] = NULL;
+            if (!fTofdSmiley)
+                fhTot2vsPos[i][j] = NULL;
             // fhTot1vsTot2[i][j] = NULL;
-            // fhTot1vsPos[i][j] = NULL;
-            // fhTot2vsPos[i][j] = NULL;
         }
     }
 }
@@ -144,17 +150,13 @@ R3BTofdCal2Histo::~R3BTofdCal2Histo()
                 delete fhQvsPos[i][j];
             if (fhToTvsTofw[i][j])
                 delete fhToTvsTofw[i][j];
+            if (fhTot1vsPos[i][j])
+                delete fhTot1vsPos[i][j];
+            if (fhTot2vsPos[i][j])
+                delete fhTot2vsPos[i][j];
             /*
             if (fhTot1vsTot2[i][j])
                 delete fhTot1vsTot2[i][j];
-            */
-            /*
-            if (fhTot1vsPos[i][j])
-                delete fhTot1vsPos[i][j];
-            */
-            /*
-            if (fhTot2vsPos[i][j])
-                delete fhTot2vsPos[i][j];
             */
         }
     }
@@ -188,9 +190,9 @@ InitStatus R3BTofdCal2Histo::Init()
         LOG(ERROR) << "R3BTofdCal2Histo::Init() Number of modules not set. ";
         return kFATAL;
     }
-    // fCalItemsLos = (TClonesArray*)rm->GetObject("LosCal");
-    // if (NULL == fCalItemsLos)
-    //    LOG(fatal) << "Branch LosCal not found";
+    fCalItemsLos = (TClonesArray*)rm->GetObject("LosCal");
+    if (NULL == fCalItemsLos)
+        LOG(ERROR) << "Branch LosCal not found";
     return kSUCCESS;
 }
 
@@ -455,11 +457,33 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                 }
 
                 // prepare double exponential fit
-                /// obsolete?
-                /*
-                if (fTofdQ != 0 && fTofdZ == false)
+                if (!fTofdSmiley)
                 {
-                    LOG(DEBUG)<<"Prepare histo for double exponential fit";
+                    if (NULL == fhTot1vsPos[iPlane - 1][iBar - 1])
+                    {
+
+                        char strName[255];
+                        sprintf(strName, "Tot1_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
+                        if (iPlane < 3)
+                            fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
+                        if (iPlane > 2)
+                            fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
+                        fhTot1vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
+                        fhTot1vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM1 in ns");
+                    }
+                    if (NULL == fhTot2vsPos[iPlane - 1][iBar - 1])
+                    {
+                        char strName[255];
+                        sprintf(strName, "Tot2_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
+                        if (iPlane < 3)
+                            fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
+                        if (iPlane > 2)
+                            fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
+                        fhTot2vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
+                        fhTot2vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM2 in ns");
+                    }
+
+                    LOG(DEBUG) << "Prepare histo for double exponential fit";
                     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!par)
                     {
@@ -470,14 +494,12 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
 
                     // calculate y position
                     auto pos = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
-                    auto posToT =
-                        par->GetLambda() * log((top_tot * par->GetToTOffset2()) / (bot_tot * par->GetToTOffset1()));
 
                     // fill fitting histograms and smiley histogram
-                    //fhTot1vsPos[iPlane - 1][iBar - 1]->Fill(pos, bot_tot);
-                    //fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(pos, top_tot);
+                    fhTot1vsPos[iPlane - 1][iBar - 1]->Fill(pos, bot_tot);
+                    fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(pos, top_tot);
                 }
-                */
+
                 // prepare charge fit / quench correction
                 if (fTofdZ == true)
                 {
@@ -501,26 +523,32 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                     parq[2] = par->GetPar1c();
                     parq[3] = par->GetPar1d();
 
-                    // calculate charge new method
-                    auto qb = TMath::Sqrt(top_tot * bot_tot) /
-                              (parq[0] + parq[1] * posToT + parq[2] * pow(posToT, 2) + parq[3] * pow(posToT, 3));
-                    qb = TMath::Sqrt(qb) * fTofdQ; // dE propto Z^2
-
-                    /*
-                    // calculate position independent charge old method (double exponential)
-                    auto pos = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
-                    auto q1 =
-                        bot_tot / (parq[0] * (exp(-parq[1] * (pos + 100.)) + exp(-parq[2] * (pos + 100.))) + parq[3]);
-                    parq[0] = par->GetPar2a();
-                    parq[1] = par->GetPar2b();
-                    parq[2] = par->GetPar2c();
-                    parq[3] = par->GetPar2d();
-                    auto q2 =
-                        top_tot / (parq[0] * (exp(-parq[1] * (pos + 100.)) + exp(-parq[2] * (pos + 100.))) + parq[3]);
-                    q1 = q1 * fTofdQ;
-                    q2 = q2 * fTofdQ;
-                    auto qb = (q1+q2)/2.;
-                    */
+                    // calculate charge
+                    Double_t qb = 0.;
+                    if (fTofdSmiley)
+                    {
+                        qb = TMath::Sqrt(top_tot * bot_tot) /
+                             (parq[0] + parq[1] * posToT + parq[2] * pow(posToT, 2) + parq[3] * pow(posToT, 3));
+                        qb = qb *
+                             fTofdQ; // theory says: dE ~ Z^2 but we see quenching -> just use linear and fit the rest
+                    }
+                    else
+                    {
+                        // double exponential
+                        auto pos = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
+                        auto q1 = bot_tot /
+                                  (parq[0] * (exp(-parq[1] * (pos + 100.)) + exp(-parq[2] * (pos + 100.))) + parq[3]);
+                        parq[0] = par->GetPar2a();
+                        parq[1] = par->GetPar2b();
+                        parq[2] = par->GetPar2c();
+                        parq[3] = par->GetPar2d();
+                        auto q2 = top_tot /
+                                  (parq[0] * (exp(-parq[1] * (pos + 100.)) + exp(-parq[2] * (pos + 100.))) + parq[3]);
+                        q1 = q1 *
+                             fTofdQ; // theory says: dE ~ Z^2 but we see quenching -> just use linear and fit the rest
+                        q2 = q2 * fTofdQ;
+                        qb = (q1 + q2) / 2.;
+                    }
 
                     // fill control histograms and Q vs Pos without multihits
                     if (multihits[iPlane - 1][iBar - 1] < 2 && (qb > 0.))
@@ -623,32 +651,6 @@ void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhTot1vsTot2[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM1 in ns");
     }
     */
-    /*
-    if (NULL == fhTot1vsPos[iPlane - 1][iBar - 1])
-    {
-        char strName[255];
-        sprintf(strName, "Tot1_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-        if (iPlane < 3)
-            fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
-        if (iPlane > 2)
-            fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
-        fhTot1vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
-        fhTot1vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM1 in ns");
-    }
-    */
-    /*
-    if (NULL == fhTot2vsPos[iPlane - 1][iBar - 1])
-    {
-        char strName[255];
-        sprintf(strName, "Tot2_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-        if (iPlane < 3)
-            fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
-        if (iPlane > 2)
-            fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
-        fhTot2vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
-        fhTot2vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM2 in ns");
-    }
-    */
 }
 
 void R3BTofdCal2Histo::FinishEvent()
@@ -679,14 +681,13 @@ void R3BTofdCal2Histo::FinishTask()
                 fhToTvsTofw[i][j]->Write(); // histogram for walk fit
             if (fhQvsPos[i][j])
                 fhQvsPos[i][j]->Write(); // histogram for charge fit
-            /*
-            if (fhTot1vsPos[i][j])
-                fhTot1vsPos[i][j]->Write(); // histogram for position dependence of charge 1
-            */
-            /*
-            if (fhTot2vsPos[i][j])
-                fhTot2vsPos[i][j]->Write(); // histogram for position dependence of charge 2
-            */
+            if (!fTofdSmiley)
+            {
+                if (fhTot1vsPos[i][j])
+                    fhTot1vsPos[i][j]->Write(); // histogram for position dependence of charge 1
+                if (fhTot2vsPos[i][j])
+                    fhTot2vsPos[i][j]->Write(); // histogram for position dependence of charge 2
+            }
             /*
             if (fhTot1vsTot2[i][j])
                 fhTot1vsTot2[i][j]->Write(); // control histogram ToT Pm1 vs ToT Pm2

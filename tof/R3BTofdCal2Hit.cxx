@@ -649,7 +649,6 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 if (iPlane == 2 || iPlane == 4)
                     y[iPlane][iBar * 2].push_back(pos);
                 y[iPlane][iBar * 2 - 1].push_back(pos);
-                // std::cout<<"Tdiff position "<<pos;
 
                 // calculate y-position from ToT
                 auto posToT =
@@ -659,8 +658,6 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 if (iPlane == 2 || iPlane == 4)
                     yToT[iPlane][iBar * 2].push_back(posToT);
                 yToT[iPlane][iBar * 2 - 1].push_back(posToT);
-                // std::cout<<" ToT position "<<posToT<<" ToT "<<top_tot<<"/"<<bot_tot<<" Parameter
-                // "<<par->GetLambda()<<" "<<par->GetToTOffset2()<<"/"<<par-> GetToTOffset1()<<"\n";
 
                 if (fTofdTotPos)
                     pos = posToT;
@@ -681,24 +678,29 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 para[2] = par->GetPar1c();
                 para[3] = par->GetPar1d();
 
-                // auto *smiley = new TF1("smiley", "pol3",-50,50);
-                // smiley->SetParameters(para[0], para[1], para[2], para[3]);
-                // Double_t qb = TMath::Sqrt(top_tot * bot_tot) / smiley->Eval(pos);
-                Double_t qb = TMath::Sqrt(top_tot * bot_tot) /
-                              (para[0] + para[1] * pos + para[2] * pow(pos, 2) + para[3] * pow(pos, 3));
-                qb = TMath::Sqrt(qb) * fTofdQ;
-                /*
-                // via double exponential:
-                auto q1 = bot_tot / (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
-                para[0] = par->GetPar2a();
-                para[1] = par->GetPar2b();
-                para[2] = par->GetPar2c();
-                para[3] = par->GetPar2d();
-                auto q2 = top_tot / (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
-                q1 = q1 * fTofdQ;
-                q2 = q2 * fTofdQ;
-                Double_t qb = (q1 + q2) / 2.;
-                */
+                Double_t qb = 0.;
+                if (fTofdTotPos)
+                {
+                    // via pol3
+                    qb = TMath::Sqrt(top_tot * bot_tot) /
+                         (para[0] + para[1] * pos + para[2] * pow(pos, 2) + para[3] * pow(pos, 3));
+                    qb = qb * fTofdQ;
+                }
+                else
+                {
+                    // via double exponential:
+                    auto q1 =
+                        bot_tot / (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
+                    para[0] = par->GetPar2a();
+                    para[1] = par->GetPar2b();
+                    para[2] = par->GetPar2c();
+                    para[3] = par->GetPar2d();
+                    auto q2 =
+                        top_tot / (para[0] * (exp(-para[1] * (pos + 100.)) + exp(-para[2] * (pos + 100.))) + para[3]);
+                    q1 = q1 * fTofdQ;
+                    q2 = q2 * fTofdQ;
+                    qb = (q1 + q2) / 2.;
+                }
 
                 Double_t parz[3];
                 parz[0] = par->GetPar1za();
@@ -744,8 +746,8 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                     // fill control histograms
                     CreateHistograms(iPlane, iBar);
                     // fhTof[iPlane-1]->Fill(iBar,ToF);
-                    fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
                     // fhTsync[iPlane-1]->Fill(iBar,ToF);
+                    fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
                     fhQvsPos[iPlane - 1][iBar - 1]->Fill(pos, parz[0] * TMath::Power(qb, parz[2]) + parz[1]);
                     fhQvsTof[iPlane - 1][iBar - 1]->Fill(qb, ToF);
                     fhTvsTof[iPlane - 1][iBar - 1]->Fill(dt_mod, ToF);
@@ -907,9 +909,6 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
         for (Int_t a = 0; a < 2 * nHitsEvent; a++)
         { // loop over all hits
             eventstore++;
-            // fhQ[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrQ[a]); // charge per plane
-            // if (tArrQ[a] > 7.5 && tArrQ[a] < 8.5)
-            //{
             fhQ[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrQ[a]);        // charge per plane
             fhQvsEvent[((Int_t)tArrP[a]) - 1]->Fill(fnEvents, tArrQ[a]); // charge vs event #
             if (fTofdTotPos)
@@ -920,7 +919,6 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
             {
                 fhxy[((Int_t)tArrP[a]) - 1]->Fill(tArrB[a], tArrY[a]); // xy of plane
             }
-            //}
         }
     }
 
@@ -1225,17 +1223,6 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
     Double_t max_charge = 80.;
     // create histograms if not already existing
 
-    if (NULL == fhTdiff[iPlane - 1])
-    {
-        char strName1[255];
-        char strName2[255];
-        sprintf(strName1, "Time_Diff_Plane_%d", iPlane);
-        sprintf(strName2, "Time Diff Plane %d", iPlane);
-        fhTdiff[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 400, -8., 8.);
-        fhTdiff[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
-        fhTdiff[iPlane - 1]->GetYaxis()->SetTitle("Time difference (PM1 - PM2) in ns");
-    }
-
     /*
     if (NULL == fhTsync[iPlane - 1])
     {
@@ -1256,6 +1243,17 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhTof[iPlane - 1]->GetYaxis()->SetTitle("ToF in ns");
     }
     */
+    if (NULL == fhTdiff[iPlane - 1])
+    {
+        char strName1[255];
+        char strName2[255];
+        sprintf(strName1, "Time_Diff_Plane_%d", iPlane);
+        sprintf(strName2, "Time Diff Plane %d", iPlane);
+        fhTdiff[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 400, -8., 8.);
+        fhTdiff[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
+        fhTdiff[iPlane - 1]->GetYaxis()->SetTitle("Time difference (PM1 - PM2) in ns");
+    }
+
     if (NULL == fhQvsTof[iPlane - 1][iBar - 1])
     {
         char strName[255];
@@ -1264,6 +1262,7 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhQvsTof[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToF in ns");
         fhQvsTof[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Charge");
     }
+
     if (NULL == fhTvsTof[iPlane - 1][iBar - 1])
     {
         char strName[255];

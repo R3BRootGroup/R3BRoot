@@ -137,7 +137,11 @@ class R3BTofdCal2Histo : public FairTask
      */
     inline void SetTofdZ(Bool_t Z) { fTofdZ = Z; }
     /**
-     * Method for setting the y-position of a horizonzal sweep run for calibration of effective velocity of light
+     * Method for using smiley or double exponential charge correction
+     */
+    inline void SetTofdSmiley(Bool_t Smiley) { fTofdSmiley = Smiley; }
+    /**
+     * 
      */
     inline void ReadParaFile(TString file) { fParaFile = file; }
     /**
@@ -177,6 +181,7 @@ class R3BTofdCal2Histo : public FairTask
     Double_t fTofdY;
     Double_t fTofdQ;
     Bool_t fwalk;
+    Bool_t fTofdSmiley;
     Bool_t fTofdZ;
     TString fParaFile;
     UInt_t maxevent;
@@ -190,8 +195,8 @@ class R3BTofdCal2Histo : public FairTask
     TH2F* fhQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhToTvsTofw[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     //TH2F* fhTot1vsTot2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
-    //TH2F* fhTot1vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
-    //TH2F* fhTot2vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fhTot1vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fhTot2vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
 
   public:
     ClassDef(R3BTofdCal2Histo, 1)
