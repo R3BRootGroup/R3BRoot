@@ -138,6 +138,10 @@ class R3BTofdCal2HistoPar : public FairTask
      */
     inline void SetTofdTotHigh(Double_t TotHigh) { fTofdTotHigh = TotHigh; }
     /**
+     * Method for using smiley or double exponential charge correction
+     */
+    inline void SetTofdSmiley(Bool_t Smiley) { fTofdSmiley = Smiley; }
+    /**
      *
      */
     inline void ReadParaFile(TString file) { fParaFile = file; }
@@ -206,6 +210,7 @@ class R3BTofdCal2HistoPar : public FairTask
     Double_t fTofdQ;
     Double_t fTofdTotLow;
     Double_t fTofdTotHigh;
+    Bool_t fTofdSmiley;
     TString fParaFile;
     TString fHistoFile;
 
