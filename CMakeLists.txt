@@ -28,6 +28,12 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
            )
 endif(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
 
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/NeuLAND_DNN")
+    message(FATAL_ERROR
+            "\nNeuLAND DNN repository is missing in the R3BRoot source directory\ncd ../R3BRoot\ngit clone https://github.com/R3BRootGroup/NeuLAND_DNN.git"
+           )
+endif(NOT EXISTS "${PROJECT_SOURCE_DIR}/NeuLAND_DNN")
+
 # Check for needed environment variables
 IF(NOT DEFINED ENV{FAIRROOTPATH})
   MESSAGE(FATAL_ERROR "You did not define the environment variable FAIRROOTPATH which is needed to find FairRoot. Please set this variable and execute cmake again.")
@@ -338,6 +344,7 @@ if(NOT MODULE)
     add_subdirectory(lumon)
     add_subdirectory(evtvis)
     add_subdirectory(mfi)
+    add_subdirectory(NeuLAND_DNN)
     add_subdirectory(psp)
     add_subdirectory(timestitcher)
     add_subdirectory(compilehelper)
