@@ -41,7 +41,8 @@ set(TEST_DEPENDENCIES
     R3Bbase
     R3BData
     R3BNeulandShared
-    R3BNeulandReconstruction)
+    R3BNeulandReconstruction
+    Alignment)
 
 add_executable(${PROJECT_TEST_NAME} ${TEST_SRC_FILES})
 target_link_libraries(${PROJECT_TEST_NAME} ${TEST_DEPENDENCIES})

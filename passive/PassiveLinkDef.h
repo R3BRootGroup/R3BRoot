@@ -27,7 +27,7 @@
 #pragma link C++ class R3BPipe+;
 #pragma link C++ class R3BVacVesselCool+;
 #pragma link C++ class R3BCave+;
-
+#pragma link C++ class R3BNeutronWindowAndSomeAir+;
 #pragma link C++ class R3BGeoCave;
 #pragma link C++ class R3BGeoGDML+;
 #pragma link C++ class R3BGeoPipe;

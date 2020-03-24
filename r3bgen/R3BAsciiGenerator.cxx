@@ -16,15 +16,20 @@
 #include "FairLogger.h"
 #include "FairPrimaryGenerator.h"
 #include "FairRunSim.h"
-#include "TDatabasePDG.h"
-#include "TParticlePDG.h"
+#include "G4NistManager.hh"
 #include "TRandom.h"
+#include <boost/filesystem.hpp>
+//#include <boost/iostreams/filter/bzip2.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+#include <map>
+
+int GetIonPdg(int z, int a) { return 1000000000 + 10 * 1000 * z + 10 * a; }
 
 R3BAsciiGenerator::R3BAsciiGenerator()
-    : fInputFile()
-    , fFileName()
-    , fPDG(nullptr)
-    , fIonMap()
+    : fFileName()
+    , fFile()
+    , fBuf()
+    , fInput(&fBuf)
     , fX(0.)
     , fY(0.)
     , fZ(0.)
@@ -37,10 +42,10 @@ R3BAsciiGenerator::R3BAsciiGenerator()
 }
 
 R3BAsciiGenerator::R3BAsciiGenerator(std::string fileName)
-    : fInputFile()
-    , fFileName(std::move(fileName))
-    , fPDG(TDatabasePDG::Instance())
-    , fIonMap()
+    : fFileName(std::move(fileName))
+    , fFile()
+    , fBuf()
+    , fInput(&fBuf)
     , fX(0.)
     , fY(0.)
     , fZ(0.)
@@ -50,9 +55,7 @@ R3BAsciiGenerator::R3BAsciiGenerator(std::string fileName)
     , fDZ(0.)
     , fBoxVtxIsSet(false)
 {
-    LOG(INFO) << "R3BAsciiGenerator: Looking for ions...";
-    const int nIons = RegisterIons();
-    LOG(INFO) << "R3BAsciiGenerator: " << nIons << " ions registered.";
+    RegisterIons();
 }
 
 R3BAsciiGenerator::R3BAsciiGenerator(const TString& fileName)
@@ -65,170 +68,140 @@ R3BAsciiGenerator::R3BAsciiGenerator(const char* fileName)
 {
 }
 
-R3BAsciiGenerator::~R3BAsciiGenerator() { fInputFile.close(); }
+R3BAsciiGenerator::~R3BAsciiGenerator() {}
 
 bool R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 {
-    CheckAndOpen();
+    // Event variable to be read from file
+    int eventId = -1;
+    int nTracks = -1;
+    // Track variables to be read from file
+    int iPid = -1;
+    int iZ = 0;
+    int iA = 0;
+    double px = 0.;
+    double py = 0.;
+    double pz = 0.;
+    double vx = 0.;
+    double vy = 0.;
+    double vz = 0.;
 
-    // Define event variable to be read from file
-    Int_t eventId = -1;
-    Int_t nTracks = -1;
-    Double_t pBeam = 0.;
-    Double_t b = 0.;
+    OpenOrRewindFile();
 
-    // Define track variables to be read from file
-    Int_t iPid = -1;
-    Int_t iA = 0;
-    Int_t iZ = 0;
-    Double_t px = 0.;
-    Double_t py = 0.;
-    Double_t pz = 0.;
-    Double_t vx = 0.;
-    Double_t vy = 0.;
-    Double_t vz = 0.;
-    Double_t iMass = 0.;
-
-    // Read event header line from input file
-    fInputFile >> eventId >> nTracks >> pBeam >> b;
-
-    // Can happen at the end of the file (empty line)
-    // Note: This is not really resilient to ill-formed files
-    if (fInputFile.fail())
+    // Read event number and number of primary particles.
+    if (!(fInput >> eventId >> nTracks))
     {
-        CheckAndOpen();
-        fInputFile >> eventId >> nTracks >> pBeam >> b;
+        // That might fail for the newline at the end of the file - that's ok - just reopen & try again
+        if (fInput.eof())
+        {
+            return ReadEvent(primGen);
+        }
+        // Throw error if its somewhere in the file
+        LOG(FATAL) << "R3BAsciiGenerator: Could not read event header " << eventId << "\t" << nTracks;
     }
-
-    LOG(INFO) << "R3BAsciiGenerator: Reading Event: " << eventId << ",  pBeam = " << pBeam << "GeV, b = " << b
-              << " fm, multiplicity " << nTracks;
+    // Ignore the other stuff that might still be on that line
+    fInput.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    LOG(DEBUG) << "R3BAsciiGenerator: Event " << eventId << " nTracks " << nTracks;
 
     // Loop over tracks in the current event
     for (int itrack = 0; itrack < nTracks; itrack++)
     {
-        if (fInputFile.eof())
+        if (!(fInput >> iPid >> iZ >> iA >> px >> py >> pz >> vx >> vy >> vz))
         {
-            // Failsafe
-            continue;
+            LOG(FATAL) << "R3BAsciiGenerator: Error while reading particles for event" << eventId;
         }
-        fInputFile >> iPid >> iZ >> iA >> px >> py >> pz >> vx >> vy >> vz >> iMass;
+        // Ignore the other stuff that might still be on that line
+        fInput.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-        Int_t pdgType = 0;
-
-        // Ion case ( iPid = -1 )
-        if (iPid < 0)
-        {
-            TString ionName;
-            if (1 == iZ && 2 == iA)
-            {
-                ionName = "Deuteron";
-            }
-            else if (1 == iZ && 3 == iA)
-            {
-                ionName = "Triton";
-            }
-            else if (2 == iZ && 3 == iA)
-            {
-                ionName = "HE3";
-            }
-            else if (2 == iZ && 4 == iA)
-            {
-                ionName = "Alpha";
-            }
-            else
-            {
-                ionName = TString::Format("Ion_%d_%d", iA, iZ);
-            }
-            TParticlePDG* part = fPDG->GetParticle(ionName);
-            if (!part)
-            {
-                LOG(WARNING) << "R3BAsciiGenerator::ReadEvent: Cannot find " << ionName << " in database!";
-                continue;
-            }
-            pdgType = part->PdgCode();
-        }
-        // else pdgType = iPid;  // "normal" particle
-        else
-        {
-            pdgType = iA; // "normal" particle
-        }
+        // Ions: -1, Particles +1
+        int pdg = iPid < 0 ? GetIonPdg(iZ, iA) : iA;
 
         if (fPointVtxIsSet)
         {
-            vx = fX;
-            vy = fY;
-            vz = fZ;
             if (fBoxVtxIsSet)
             {
                 vx = gRandom->Gaus(fX, fDX);
                 vy = gRandom->Gaus(fY, fDY);
                 vz = gRandom->Gaus(fZ, fDZ);
             }
+            else
+            {
+                vx = fX;
+                vy = fY;
+                vz = fZ;
+            }
         }
 
-        primGen->AddTrack(pdgType, px, py, pz, vx, vy, vz);
+        LOG(DEBUG) << "R3BAsciiGenerator: Adding track " << iPid << "\t" << iZ << "\t" << iA << "\t" << px << "\t" << py
+                   << "" << pz << "\t" << vx << "\t" << vy << "" << vz;
+        primGen->AddTrack(pdg, px, py, pz, vx, vy, vz);
 
     } //! tracks
 
     return true;
 }
 
-int R3BAsciiGenerator::RegisterIons()
+void R3BAsciiGenerator::RegisterIons()
 {
-    CheckAndOpen();
+    LOG(INFO) << "R3BAsciiGenerator: Looking for ions ...";
 
-    Int_t nIons = 0;
-    Int_t eventId, nTracks;
-    Double_t pBeam, b;
+    //  Event variable to be read from file
+    int eventId = -1;
+    int nTracks = -1;
+    // Track variables to be read from file
+    int iPid = -1;
+    int iZ = 0;
+    int iA = 0;
+    // Keep a list of ions to register
+    std::map<int, FairIon*> ions;
 
-    // Define track variables to be read from file
-    Int_t iPid = -1;
-    Int_t iA = 0;
-    Int_t iZ = 0;
-    Double_t px = 0.;
-    Double_t py = 0.;
-    Double_t pz = 0.;
-    Double_t vx = 0.;
-    Double_t vy = 0.;
-    Double_t vz = 0.;
-    Double_t iMass = 0.;
-
-    fIonMap.clear();
-
-    TString ionName;
-
-    while (!fInputFile.eof())
+    OpenOrRewindFile();
+    while (!fInput.eof())
     {
-        fInputFile >> eventId >> nTracks >> pBeam >> b;
-
-        for (Int_t iTrack = 0; iTrack < nTracks; iTrack++)
+        // Read event number and number of primary particles.
+        if (!(fInput >> eventId >> nTracks))
         {
-            fInputFile >> iPid >> iZ >> iA >> px >> py >> pz >> vx >> vy >> vz >> iMass;
+            // That might fail for the newline at the end of the file - that's ok - we're done here
+            if (fInput.eof())
+            {
+                break;
+            }
+            // Throw error if its somewhere in the file
+            LOG(FATAL) << "R3BAsciiGenerator: Could not read event header " << eventId << "\t" << nTracks;
+        }
+        // Ignore the other stuff that might still be on that line
+        fInput.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        LOG(DEBUG) << "R3BAsciiGenerator: Event " << eventId << " nTracks " << nTracks;
 
-            // Ion Case
+        for (int iTrack = 0; iTrack < nTracks; iTrack++)
+        {
+            if (!(fInput >> iPid >> iZ >> iA))
+            {
+                LOG(FATAL) << "R3BAsciiGenerator: Error while reading particles for event" << eventId;
+            }
+            // Ignore the other stuff that might still be on that line
+            fInput.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
             if (iPid < 0)
             {
-                ionName = TString::Format("Ion_%d_%d", iA, iZ);
-                if (fIonMap.find(ionName) == fIonMap.end())
+                const int pdg = GetIonPdg(iZ, iA);
+                if (ions.find(pdg) == ions.end())
                 {
-                    auto ion = new FairIon(ionName, iZ, iA, iZ, 0., iMass);
-                    fIonMap[ionName] = ion;
-                    nIons++;
-                } // new ion
-            }     // ion
-        }         // !tracks
-
-    } //! events
-
-    FairRunSim* run = FairRunSim::Instance();
-    for (const auto& mapIt : fIonMap)
-    {
-        run->AddNewIon(mapIt.second);
+                    const double mass = G4NistManager::Instance()->GetIsotopeMass(iZ, iA) / CLHEP::GeV;
+                    LOG(DEBUG) << "R3BAsciiGenerator: New ion " << iZ << "\t" << iA << "\t" << mass;
+                    ions[pdg] = new FairIon(TString::Format("Ion_%d_%d", iA, iZ), iZ, iA, iZ, 0., mass);
+                }
+            }
+        }
     }
 
-    fInputFile.close();
+    for (const auto& kv : ions)
+    {
+        // Note: FairRoot will not register ions known to TDatabasePDG (e.g. alphas)
+        FairRunSim::Instance()->AddNewIon(kv.second);
+    }
 
-    return nIons;
+    LOG(INFO) << "R3BAsciiGenerator: " << ions.size() << " ions registered.";
 }
 
 void R3BAsciiGenerator::SetXYZ(Double32_t x, Double32_t y, Double32_t z)
@@ -247,18 +220,36 @@ void R3BAsciiGenerator::SetDxDyDz(Double32_t sx, Double32_t sy, Double32_t sz)
     fBoxVtxIsSet = kTRUE;
 }
 
-void R3BAsciiGenerator::CheckAndOpen()
+void R3BAsciiGenerator::OpenOrRewindFile()
 {
-    // Open file or re-open if end reached
-    if (fInputFile.eof() || !fInputFile.is_open())
+    // Rewind
+    if (fInput.eof())
+    {
+        fFile.close();
+        fBuf.reset();
+        fInput.clear();
+    }
+
+    if (!fFile.is_open())
     {
         LOG(INFO) << "R3BAsciiGenerator: Reading input file " << fFileName;
-        fInputFile.close();
-        fInputFile.open(fFileName);
+        fFile.open(fFileName);
+        const std::string extension = boost::filesystem::extension(fFileName);
+        if (extension == ".gz")
+        {
+            LOG(DEBUG) << "R3BAsciiGenerator: Using gzip";
+            fBuf.push(boost::iostreams::gzip_decompressor());
+        }
+        // if (extension == ".bz2")
+        //{
+        //    LOG(DEBUG) << "R3BAsciiGenerator: Using bzip2";
+        //    fBuf.push(boost::iostreams::bzip2_decompressor());
+        //}
+        fBuf.push(fFile);
     }
 
     // Check for input file
-    if (!fInputFile.is_open())
+    if (!fFile.is_open())
     {
         LOG(FATAL) << "R3BAsciiGenerator: Input file not open!";
     }

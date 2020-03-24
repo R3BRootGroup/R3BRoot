@@ -177,7 +177,7 @@ unset(Boost_INCLUDE_DIR CACHE)
 unset(Boost_LIBRARY_DIRS CACHE)
 find_package2(PUBLIC Boost
   VERSION 1.67 ${FairMQ_Boost_VERSION}
-  COMPONENTS thread system timer program_options random filesystem chrono exception 
+  COMPONENTS thread system timer program_options random filesystem chrono exception iostreams
 regex serialization log log_setup atomic date_time signals ${FairMQ_Boost_COMPONENTS}
 )
 if(Boost_FOUND)

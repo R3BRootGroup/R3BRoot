@@ -15,8 +15,8 @@
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRun.h"
+#include "Math/Vector4D.h"
 #include "TDirectory.h"
-#include <TFile.h>
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TH3D.h"
@@ -136,7 +136,9 @@ InitStatus R3BNeulandMCMon::Init()
                      -4000,
                      4000);
     fhEPrimarys = new TH1D("hE_primarys", "Energy of primary particles", 10000, 0, 10000);
+    fhEPrimarys2 = new TH1D("hE_primarys2", "Tot. Energy of primary particles", 100000, 0, 100000);
     fhEPrimaryNeutrons = new TH1D("hE_primary_neutrons", "Energy of primary Neutrons", 10000, 0, 10000);
+    fhErelMC = new TH1D("hErelMC", "Erel", 5000, 0, 5000);
     fhEtotPrim = new TH1D("hE_tot_prim",
                           "Total Light Yield of non-neutron LandPoints created by primary neutron interaction(s)",
                           6000,
@@ -145,7 +147,7 @@ InitStatus R3BNeulandMCMon::Init()
     fhEtot = new TH1D("hE_tot", "Total Light Yield of non-neutron LandPoints", 6000, 0, 6000);
     fhESecondaryNeutrons = new TH1D(
         "hE_secondary_neutrons", "Energy of neutron tracks created by primary neutron interaction", 6000, 0, 6000);
-    fhMotherIDs = new TH1D("hmotherIDs", "MotherIDs", 6001, -1, 6000);
+    fhMotherIDs = new TH1D("hmotherIDs", "MotherIDs", 6010, -10, 6000);
     fhPrimaryDaughterIDs = new TH1D("hprimary_daughter_IDs", "IDs of tracks with a primary mother", 6001, -1, 6000);
     fhMCToF = new TH1D("fhMCToF", "Energy of primary Neutron - ToF Energy from PNIPS", 2001, -1000, 1000);
 
@@ -245,6 +247,7 @@ void R3BNeulandMCMon::Exec(Option_t*)
         if (mcTrack->GetMotherId() == -1)
         {
             fhEPrimarys->Fill(GetKineticEnergy(mcTrack));
+            fhEPrimarys2->Fill(mcTrack->GetEnergy() * 1000.);
         }
 
         // Energy of primary Neutrons
@@ -534,6 +537,21 @@ void R3BNeulandMCMon::Exec(Option_t*)
         }
     }
 
+    {
+        ROOT::Math::PxPyPzEVector p4;
+        double m0 = 0;
+        for (const auto track : mcTracks)
+        {
+            if (track->GetMotherId() != -1)
+            {
+                break;
+            }
+            p4 += track->GetFourMomentum();
+            m0 += track->GetMass();
+        }
+        fhErelMC->Fill((p4.M() - m0) * 1e6);
+    }
+
     if (fIs3DTrackEnabled)
     {
         fh3->Reset("ICES");
@@ -564,7 +582,9 @@ void R3BNeulandMCMon::Finish()
 
     fhPDG->Write();
     fhEPrimarys->Write();
+    fhEPrimarys2->Write();
     fhEPrimaryNeutrons->Write();
+    fhErelMC->Write();
     fhEtot->Write();
     fhEtotPrim->Write();
     fhESecondaryNeutrons->Write();
