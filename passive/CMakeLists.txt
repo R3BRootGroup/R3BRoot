@@ -47,6 +47,7 @@ R3BGeoVacVesselCool.cxx
 R3BGeoTarget.cxx
 R3BAladinMagnet.cxx
 R3BGladMagnet.cxx
+R3BNeutronWindowAndSomeAir.cxx
 R3BPassiveContFact.cxx
 R3BPipe.cxx
 R3BVacVesselCool.cxx

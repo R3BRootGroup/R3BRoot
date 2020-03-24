@@ -16,24 +16,21 @@
 
 // Wrapper for TGenPhaseSpace
 
-#include <string>
-#include <vector>
-
-#include "TGenPhaseSpace.h"
-#include "TRandom3.h"
-
 #include "FairGenerator.h"
 #include "FairIon.h"
-
 #include "R3BDistribution.h"
+#include "TGenPhaseSpace.h"
+#include "TRandom3.h"
+#include <string>
+#include <vector>
 
 class R3BPhaseSpaceGenerator : public FairGenerator
 {
   public:
-    R3BPhaseSpaceGenerator(UInt_t seed = 0);
+    R3BPhaseSpaceGenerator(unsigned int seed = 0);
 
-    void AddParticle(const Int_t PDGCode);
-    void AddHeavyIon(const FairIon& ion);
+    void AddParticle(int PDGCode);
+    void AddHeavyIon(int z, int a);
 
     void SetVertexDistribution_cm(R3BDistribution<3> vertexDistribution) { fVertex_cm = vertexDistribution; }
     R3BDistribution<3>& GetVertexDistribution_cm() { return fVertex_cm; }
@@ -50,9 +47,8 @@ class R3BPhaseSpaceGenerator : public FairGenerator
     void SetErelDistribution_keV(R3BDistribution<1> ErelDistribution) { fErel_keV = ErelDistribution; }
     R3BDistribution<1>& GetErelDistribution_keV() { return fErel_keV; }
 
-    Bool_t Init() override;
-    Bool_t ReadEvent(FairPrimaryGenerator* primGen) override;
-    // FairGenerator* CloneGenerator() const override;
+    bool Init() override;
+    bool ReadEvent(FairPrimaryGenerator* primGen) override;
 
   private:
     R3BDistribution<3> fVertex_cm;       //!
@@ -60,13 +56,13 @@ class R3BPhaseSpaceGenerator : public FairGenerator
     R3BDistribution<1> fBeamEnergy_AMeV; //!
     R3BDistribution<1> fErel_keV;        //!
 
-    Double_t fTotMass;
+    double fTotMass;
     TRandom3 fRngGen;
     TGenPhaseSpace fPhaseSpace;
-    std::vector<Int_t> fPDGCodes;
-    std::vector<Double_t> fMasses;
+    std::vector<int> fPDGCodes;
+    std::vector<double> fMasses;
 
-    ClassDefOverride(R3BPhaseSpaceGenerator, 2);
+    ClassDefOverride(R3BPhaseSpaceGenerator, 3);
 };
 
 #endif // R3BROOT_R3BPHASESPACEGENERATOR_H

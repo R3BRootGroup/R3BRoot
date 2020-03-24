@@ -78,7 +78,9 @@ class R3BNeulandMCMon : public FairTask
 
     TH1D* fhPDG;
     TH1D* fhEPrimarys;
+    TH1D* fhEPrimarys2;
     TH1D* fhEPrimaryNeutrons;
+    TH1D* fhErelMC;
     TH1D* fhEtot;
     TH1D* fhEtotPrim;
     TH1D* fhESecondaryNeutrons;

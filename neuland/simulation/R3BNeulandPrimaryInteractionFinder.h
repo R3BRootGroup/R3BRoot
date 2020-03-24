@@ -28,7 +28,8 @@ class R3BNeulandPrimaryInteractionFinder : public FairTask
     explicit R3BNeulandPrimaryInteractionFinder(TString pointsIn = "NeulandPoints",
                                                 TString hitsIn = "NeulandHits",
                                                 TString pointsOut = "NeulandPrimaryPoints",
-                                                TString hitsOut = "NeulandPrimaryHits");
+                                                TString hitsOut = "NeulandPrimaryHits",
+                                                TString tracksOut = "NeulandPrimaryTracks");
 
     ~R3BNeulandPrimaryInteractionFinder() override = default;
 
@@ -46,10 +47,11 @@ class R3BNeulandPrimaryInteractionFinder : public FairTask
     void Exec(Option_t*) override;
 
   private:
-    TCAInputConnector<R3BMCTrack> fTracks;
+    TCAInputConnector<R3BMCTrack> fTracksIn;
     TCAInputConnector<R3BNeulandPoint> fPointsIn;
     TCAInputConnector<R3BNeulandHit> fHitsIn;
 
+    TCAOutputConnector<R3BMCTrack> fTracksOut;
     TCAOutputConnector<R3BNeulandPoint> fPointsOut;
     TCAOutputConnector<R3BNeulandHit> fHitsOut;
 

@@ -16,13 +16,13 @@
 
 #include "FairGenerator.h"
 #include "TString.h"
+#include <boost/iostreams/filtering_streambuf.hpp>
 #include <fstream>
-#include <map>
+#include <iostream>
+#include <sstream>
 #include <string>
 
-class TDatabasePDG;
 class FairPrimaryGenerator;
-class FairIon;
 
 class R3BAsciiGenerator : public FairGenerator
 {
@@ -51,25 +51,23 @@ class R3BAsciiGenerator : public FairGenerator
     void SetDxDyDz(Double32_t sx = 0, Double32_t sy = 0, Double32_t sz = 0);
 
   private:
-    std::ifstream fInputFile;    //! Input file stream
-    const std::string fFileName; //! Input file Name
-    TDatabasePDG* fPDG;          //!  PDG database (non-owning)
+    const std::string fFileName;                                         //! Input file name
+    std::ifstream fFile;                                                 //! Input file handle
+    boost::iostreams::filtering_streambuf<boost::iostreams::input> fBuf; //! Streambuf for decompression
+    std::istream fInput;                                                 //! Input stream
 
     /** Private method RegisterIons. Goes through the input file and registers
-     ** any ion needed. **/
-    int RegisterIons();
+     ** any ion needed. TODO: Should not be needed by FairRoot. **/
+    void RegisterIons();
 
-    void CheckAndOpen();
-
-    /** STL map from ion name to FairIon **/
-    std::map<TString, FairIon*> fIonMap; //!
+    void OpenOrRewindFile();
 
     Double32_t fX, fY, fZ;    // Point vertex coordinates [cm]
     bool fPointVtxIsSet;      // True if point vertex is set
     Double32_t fDX, fDY, fDZ; // Point vertex coordinates [cm]
     bool fBoxVtxIsSet;        // True if point vertex is set
 
-    ClassDefOverride(R3BAsciiGenerator, 1);
+    ClassDefOverride(R3BAsciiGenerator, 0);
 };
 
 #endif

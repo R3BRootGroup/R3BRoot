@@ -277,11 +277,8 @@ void R3BStack::FillTrackArray()
 
         if (store)
         {
-            R3BMCTrack* track = new ((*fTracks)[fNTracks]) R3BMCTrack(GetParticle(iPart), fMC);
+            new ((*fTracks)[fNTracks]) R3BMCTrack(GetParticle(iPart), fPointsMap[iPart], fMC);
             fIndexMap[iPart] = fNTracks;
-            // --> Set the number of points in the detectors for this track
-            track->SetNPoints(fPointsMap[iPart]);
-
             fNTracks++;
             // cout << "-I- TParticle time " << GetParticle(iPart)->T() << endl;
             // cout << "-I- MC Track time " << track->GetStartT() << endl;

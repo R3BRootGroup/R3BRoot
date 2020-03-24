@@ -116,11 +116,13 @@ R3BNeulandHit* FindFirstHit(const R3BMCTrack* track,
 R3BNeulandPrimaryInteractionFinder::R3BNeulandPrimaryInteractionFinder(TString pointsIn,
                                                                        TString hitsIn,
                                                                        TString pointsOut,
-                                                                       TString hitsOut)
+                                                                       TString hitsOut,
+                                                                       TString tracksOut)
     : FairTask("R3BNeulandPrimaryInteractionFinder")
-    , fTracks("MCTrack")
+    , fTracksIn("MCTrack")
     , fPointsIn(std::move(pointsIn))
     , fHitsIn(std::move(hitsIn))
+    , fTracksOut(std::move(tracksOut))
     , fPointsOut(std::move(pointsOut))
     , fHitsOut(std::move(hitsOut))
     , fhDistance(new TH1D("fhDistance", "Distance firstPoint to firstHit", 10000, 0, 1000))
@@ -137,9 +139,10 @@ R3BNeulandPrimaryInteractionFinder::R3BNeulandPrimaryInteractionFinder(TString p
 
 InitStatus R3BNeulandPrimaryInteractionFinder::Init()
 {
-    fTracks.Init();
+    fTracksIn.Init();
     fPointsIn.Init();
     fHitsIn.Init();
+    fTracksOut.Init();
     fPointsOut.Init();
     fHitsOut.Init();
     return kSUCCESS;
@@ -147,9 +150,10 @@ InitStatus R3BNeulandPrimaryInteractionFinder::Init()
 
 void R3BNeulandPrimaryInteractionFinder::Exec(Option_t*)
 {
-    const auto tracks = fTracks.Retrieve();
+    const auto tracks = fTracksIn.Retrieve();
     const auto points = fPointsIn.Retrieve();
     const auto hits = fHitsIn.Retrieve();
+    fTracksOut.Reset();
     fPointsOut.Reset();
     fHitsOut.Reset();
 
@@ -174,6 +178,8 @@ void R3BNeulandPrimaryInteractionFinder::Exec(Option_t*)
     {
         if (IsPrimaryTrack(track))
         {
+            fTracksOut.Insert(track);
+
             const auto firstPoint = FindFirstPoint(track, p2t);
             const auto firstHit = FindFirstHit(track, p2t, p2h);
 
