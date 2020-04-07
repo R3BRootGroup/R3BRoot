@@ -275,8 +275,9 @@ InitStatus R3BTofdCal2HitS454::ReInit()
     return kSUCCESS;
 }
 
-namespace {
-  uint64_t n1, n2;
+namespace
+{
+    uint64_t n1, n2;
 };
 
 void R3BTofdCal2HitS454::Exec(Option_t* option)
@@ -452,32 +453,35 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
             auto top_trig_i = g_tofd_trig_map[top->GetDetectorId() - 1][top->GetSideId() - 1][top->GetBarId() - 1];
             auto bot_trig_i = g_tofd_trig_map[bot->GetDetectorId() - 1][bot->GetSideId() - 1][bot->GetBarId() - 1];
             Double_t top_trig_ns = 0, bot_trig_ns = 0;
-            if (top_trig_i < trig_num || bot_trig_i < trig_num) {
-              auto top_trig = (R3BTofdCalData const*)fCalTriggerItems->At(top_trig_i);
-              auto bot_trig = (R3BTofdCalData const*)fCalTriggerItems->At(bot_trig_i);
-              top_trig_ns = top_trig->GetTimeLeading_ns();
-              bot_trig_ns = bot_trig->GetTimeLeading_ns();
-              // std::cout << "Top: " << top->GetDetectorId() << ' ' << top->GetSideId() << ' ' << top->GetBarId() << ' '
-              // << top_trig_i << ' ' << top_trig->GetTimeLeading_ns() << std::endl; std::cout << "Bot: " <<
-              // bot->GetDetectorId() << ' ' << bot->GetSideId() << ' ' << bot->GetBarId() << ' ' << bot_trig_i << ' ' <<
-              // bot_trig->GetTimeLeading_ns() << std::endl;
-              ++n1;
-            } else {
-              if (!s_was_trig_missing) {
-                LOG(ERROR) << "R3BTofdCal2HitS454Par::Exec() : Missing trigger information!";
-                s_was_trig_missing = true;
-              }
-              ++n2;
+            if (top_trig_i < trig_num || bot_trig_i < trig_num)
+            {
+                auto top_trig = (R3BTofdCalData const*)fCalTriggerItems->At(top_trig_i);
+                auto bot_trig = (R3BTofdCalData const*)fCalTriggerItems->At(bot_trig_i);
+                top_trig_ns = top_trig->GetTimeLeading_ns();
+                bot_trig_ns = bot_trig->GetTimeLeading_ns();
+                // std::cout << "Top: " << top->GetDetectorId() << ' ' << top->GetSideId() << ' ' << top->GetBarId() <<
+                // ' '
+                // << top_trig_i << ' ' << top_trig->GetTimeLeading_ns() << std::endl; std::cout << "Bot: " <<
+                // bot->GetDetectorId() << ' ' << bot->GetSideId() << ' ' << bot->GetBarId() << ' ' << bot_trig_i << ' '
+                // << bot_trig->GetTimeLeading_ns() << std::endl;
+                ++n1;
+            }
+            else
+            {
+                if (!s_was_trig_missing)
+                {
+                    LOG(ERROR) << "R3BTofdCal2HitS454Par::Exec() : Missing trigger information!";
+                    s_was_trig_missing = true;
+                }
+                ++n2;
             }
 
             // Shift the cyclic difference window by half a window-length and move it back,
             // this way the trigger time will be at 0.
-            auto top_ns = fmod(top->GetTimeLeading_ns() - top_trig_ns + c_range_ns + c_range_ns / 2,
-                               c_range_ns) -
-                          c_range_ns / 2;
-            auto bot_ns = fmod(bot->GetTimeLeading_ns() - bot_trig_ns + c_range_ns + c_range_ns / 2,
-                               c_range_ns) -
-                          c_range_ns / 2;
+            auto top_ns =
+                fmod(top->GetTimeLeading_ns() - top_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) - c_range_ns / 2;
+            auto bot_ns =
+                fmod(bot->GetTimeLeading_ns() - bot_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) - c_range_ns / 2;
             // std::cout << top->GetTimeLeading_ns() << ' ' << top_trig->GetTimeLeading_ns() << ' ' << top_ns <<
             // std::endl; std::cout << bot->GetTimeLeading_ns() << ' ' << bot_trig->GetTimeLeading_ns() << ' ' << bot_ns
             // << std::endl;

@@ -76,7 +76,6 @@ Bool_t R3BBunchedFiberReader::Read()
             uint32_t c_ = *e[0]._;
             uint32_t f_ = *e[1]._;
 
-
             if (c_M != f_M || c_ != f_)
             {
                 LOG(WARNING) << "Coarse and fine multi-hit list counts mismatch "
