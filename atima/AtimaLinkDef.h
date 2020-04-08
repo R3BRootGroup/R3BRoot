@@ -21,5 +21,7 @@
 
 #pragma link C++ class R3BAtima+;
 #pragma link C++ class R3BAtimaCache+;
+#pragma link C++ class R3BAtimaTargetMaterial+;
+#pragma link C++ class R3BAtimaMaterialCompound+;
 
 #endif

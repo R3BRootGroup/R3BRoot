@@ -21,7 +21,7 @@
 
 struct R3BAtimaMaterialCompound
 {
-    R3BAtimaMaterialCompound(const Double_t mass_u, const Double_t charge_e)
+    R3BAtimaMaterialCompound(const Double_t mass_u = 1, const Double_t charge_e = 1)
         : Mass_u(mass_u)
         , Charge_e(charge_e)
         , Ratio(1.)
