@@ -82,7 +82,7 @@ R3BAtimaTransportResult R3BAtima::Calculate(Double_t projMass_u,
     Double_t density = targetMaterial.Density;
     Int_t tGas = 0;
     if (targetMaterial.IsGas)
-        ++tGas;
+        tGas = 1;
 
     calculate_(proj,
                &pn,
@@ -108,6 +108,7 @@ R3BAtimaTransportResult R3BAtima::Calculate(Double_t projMass_u,
     res.EStrag_AMeV *= res.dEdXOut_MeVcm2_per_mg;
     res.ELoss_AMeV = res.EnergyIn_AMeV - res.EnergyOut_AMeV;
     res.AngStrag_mrad *= 1e3;
-
+    res.dEdXIn_MeVcm2_per_mg *= projMass_u;
+    res.dEdXOut_MeVcm2_per_mg *= projMass_u;
     return res;
 }
