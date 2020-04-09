@@ -1109,7 +1109,7 @@ subroutine calc
    print*,'Simulation    1 : ', real(x1_local)
    print*,'Linearisation 1 : ', real(x_track1)
    print*,'chi2-single     : ', real(chi2_single)
-   print*,
+   print*
 !  
    call get_single_track_data
    track_hit_pattern = det_hit  
@@ -1184,7 +1184,7 @@ subroutine calc
      print*,'Multi         2 : ',real(track_parameter_out(7:12) *e/c*1.d6 )
      print*,'Chi2            : ',real(chi_parameter_out ),real(chi_parameter_out(5)+chi_parameter_out(6) )
    
-     print*,
+     print*
    end do                              
 !
    ch_dpx    = int(1.d3*(x_track1(4)-x_reference_step(4))/x_reference_step(4)  )+ nbr_channels_2d_spectra/2  ! dpx/px, 0.1% / channel, 0 at center
