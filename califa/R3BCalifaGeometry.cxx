@@ -322,8 +322,8 @@ int R3BCalifaGeometry::GetCrystalId(const char* volumePath)
     else
         crystalId = 2337 + (alvType - 20) * 24 + alveolusCopy * 3 + (cryType - 1); // three crystal per alveolus
 
-    if (crystalId < 1 || crystalId > 3432)
-    { // crystalId runs from 1 to 3432
+    if (crystalId < 1 || crystalId > 2432)
+    { // crystalId runs from 1 to 2432
         LOG(ERROR) << "R3BCalifaGeometry: Wrong crystal numbers (2)";
         cout << "---- crystalId: " << crystalId << endl;
         return 0;
