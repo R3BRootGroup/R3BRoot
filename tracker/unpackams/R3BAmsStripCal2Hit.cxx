@@ -274,7 +274,15 @@ void R3BAmsStripCal2Hit::Exec(Option_t* option)
                 }
 
                 TVector3 master(x, y, z);
-                AddHitData(i, mul, clusterS[mul][1], clusterK[mul][1], master, clusterS[mul][0], clusterK[mul][0]);
+                AddHitData(i,
+                           mul,
+                           clusterS[mul][1],
+                           clusterK[mul][1],
+                           master,
+                           clusterS[mul][0],
+                           clusterK[mul][0],
+                           nfoundS,
+                           nfoundK);
             }
         }
     }
@@ -370,12 +378,14 @@ R3BAmsHitData* R3BAmsStripCal2Hit::AddHitData(Int_t detid,
                                               Double_t k,
                                               TVector3 master,
                                               Double_t energy_s,
-                                              Double_t energy_k)
+                                              Double_t energy_k,
+                                              Int_t mulS,
+                                              Int_t mulK)
 {
     // It fills the R3BAmsHitData
     TClonesArray& clref = *fAmsHitDataCA;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BAmsHitData(detid, numhit, s, k, master, energy_s, energy_k);
+    return new (clref[size]) R3BAmsHitData(detid, numhit, s, k, master, energy_s, energy_k, mulS, mulK);
 }
 
 ClassImp(R3BAmsStripCal2Hit)

@@ -95,7 +95,9 @@ class R3BAmsStripCal2Hit : public FairTask
                               Double_t k,
                               TVector3 master,
                               Double_t energy_s,
-                              Double_t energy_k);
+                              Double_t energy_k,
+                              Int_t mulS,
+                              Int_t mulK);
 
   public:
     // Class definition

@@ -240,16 +240,20 @@ InitStatus R3BAmsOnlineSpectra::Init()
     for (Int_t i = 0; i < fNbDet; i++)
     { // one histo per detector
         sprintf(Name1, "fh_Ams_hit_Mul_%d", i + 1);
-        sprintf(Name2, "Multiplicity Det %d", i + 1);
-        fh_Ams_hit_Mul[i] = new TH1F(Name1, Name2, 10, -0.5, 9.5);
-        fh_Ams_hit_Mul[i]->GetXaxis()->SetTitle("Multiplicity");
-        fh_Ams_hit_Mul[i]->GetYaxis()->SetTitle("Counts");
-        fh_Ams_hit_Mul[i]->GetXaxis()->CenterTitle(true);
-        fh_Ams_hit_Mul[i]->GetYaxis()->CenterTitle(true);
-        fh_Ams_hit_Mul[i]->GetYaxis()->SetTitleOffset(1.1);
-        fh_Ams_hit_Mul[i]->GetXaxis()->SetTitleOffset(1.1);
+        sprintf(Name2, "Multiplicity Det %d (blue: S-side, red: K-side)", i + 1);
+        fh_Ams_hit_Mul[i][0] = new TH1F(Name1, Name2, 30, -0.5, 29.5);
+        fh_Ams_hit_Mul[i][0]->GetXaxis()->SetTitle("Multiplicity");
+        fh_Ams_hit_Mul[i][0]->GetYaxis()->SetTitle("Counts");
+        fh_Ams_hit_Mul[i][0]->GetXaxis()->CenterTitle(true);
+        fh_Ams_hit_Mul[i][0]->GetYaxis()->CenterTitle(true);
+        fh_Ams_hit_Mul[i][0]->GetYaxis()->SetTitleOffset(1.1);
+        fh_Ams_hit_Mul[i][0]->GetXaxis()->SetTitleOffset(1.1);
         cHit[i]->cd(1);
-        fh_Ams_hit_Mul[i]->Draw("");
+        fh_Ams_hit_Mul[i][0]->Draw("");
+        sprintf(Name1, "fh_Ams_hit_MulK_%d", i + 1);
+        fh_Ams_hit_Mul[i][1] = new TH1F(Name1, "", 30, -0.5, 29.5);
+        fh_Ams_hit_Mul[i][1]->SetLineColor(2);
+        fh_Ams_hit_Mul[i][1]->Draw("same");
 
         sprintf(Name1, "fh_Ams_hit_Pos_%d", i + 1);
         sprintf(Name2, "S-side vs K-side for AMS Det %d", i + 1);
@@ -443,7 +447,8 @@ void R3BAmsOnlineSpectra::Reset_AMS_Histo()
     {
         for (Int_t i = 0; i < fNbDet; i++)
         {
-            fh_Ams_hit_Mul[i]->Reset();
+            fh_Ams_hit_Mul[i][0]->Reset();
+            fh_Ams_hit_Mul[i][1]->Reset();
             fh_Ams_hit_Pos[i]->Reset();
             fh_Ams_hit_E[i]->Reset();
             fh_Ams_hit_E_theta[i]->Reset();
@@ -498,9 +503,10 @@ void R3BAmsOnlineSpectra::Exec(Option_t* option)
     // Fill hit data
     if (fHitItemsAms && fHitItemsAms->GetEntriesFast() > 0)
     {
-        Int_t mulhit[fNbDet];
+        Int_t mulhit[fNbDet][2];
         for (Int_t i = 0; i < fNbDet; i++)
-            mulhit[i] = 0;
+            for (Int_t j = 0; j < 2; j++)
+                mulhit[i][j] = 0;
 
         Float_t Emaxhit[fNbDet]; // just look for the max. energy per detector
         Float_t Thetamaxhit[fNbDet];
@@ -524,7 +530,8 @@ void R3BAmsOnlineSpectra::Exec(Option_t* option)
             fh_Ams_hit_Pos[DetId]->Fill(hit->GetPos_S(), hit->GetPos_K());
             fh_Ams_hit_E[DetId]->Fill(hit->GetEnergyS(), hit->GetEnergyK());
             fh_Ams_hit_E_theta[DetId]->Fill(hit->GetTheta() * TMath::RadToDeg(), hit->GetEnergyS());
-            mulhit[DetId]++;
+            mulhit[DetId][0] = hit->GetMulS();
+            mulhit[DetId][1] = hit->GetMulK();
             if (DetId == 0 || DetId == 3) // inner detectors, layer 1
                 fh2_ams_theta_phi[0]->Fill(hit->GetTheta() * TMath::RadToDeg(), hit->GetPhi() * TMath::RadToDeg());
             else // outer detectors, layer 2
@@ -546,7 +553,10 @@ void R3BAmsOnlineSpectra::Exec(Option_t* option)
             }
         }
         for (Int_t i = 0; i < fNbDet; i++)
-            fh_Ams_hit_Mul[i]->Fill(mulhit[i]);
+        {
+            fh_Ams_hit_Mul[i][0]->Fill(mulhit[i][0]);
+            fh_Ams_hit_Mul[i][1]->Fill(mulhit[i][1]);
+        }
         if (Emaxhit[0] > 0. && (Emaxhit[1] > 0. || Emaxhit[2] > 0.))
         {
             fh2_ams_e1_e2[0]->Fill(Emaxhit[0], TMath::Max(Emaxhit[1], Emaxhit[2]));

@@ -67,7 +67,6 @@ class R3BTraPoint : public FairMCPoint
     /** Accessors **/
     Int_t GetDetCopyID() const { return fDetCopyID; }
     Double_t GetXIn() const { return fX; }
-    Double_t GetEloss() const { return fEloss; }
     Double_t GetYIn() const { return fY; }
     Int_t GetPid() const { return fPid; }
     Double_t GetZIn() const { return fZ; }
@@ -77,6 +76,18 @@ class R3BTraPoint : public FairMCPoint
     Double_t GetPxOut() const { return fPx_out; }
     Double_t GetPyOut() const { return fPy_out; }
     Double_t GetPzOut() const { return fPz_out; }
+    inline Double_t GetTheta() const
+    {
+        TVector3 v;
+        v.SetXYZ(fX, fY, fZ);
+        return v.Theta();
+    }
+    inline Double_t GetPhi() const
+    {
+        TVector3 v;
+        v.SetXYZ(fX, fY, fZ);
+        return v.Phi();
+    }
 
     void PositionIn(TVector3& pos) { pos.SetXYZ(fX, fY, fZ); }
     void PositionOut(TVector3& pos) { pos.SetXYZ(fX_out, fY_out, fZ_out); }

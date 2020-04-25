@@ -24,6 +24,8 @@ R3BAmsHitData::R3BAmsHitData()
     : FairMultiLinkedData()
     , fDetId(-1)
     , fNumHit(0)
+    , fMulS(0)
+    , fMulK(0)
     , fX(0)
     , fY(0)
     , fTheta(0)
@@ -41,10 +43,14 @@ R3BAmsHitData::R3BAmsHitData(Int_t detid,
                              Double_t y,
                              TVector3 master,
                              Double_t energy_s,
-                             Double_t energy_k)
+                             Double_t energy_k,
+                             Int_t mulS,
+                             Int_t mulK)
     : FairMultiLinkedData()
     , fDetId(detid)
     , fNumHit(numhit)
+    , fMulS(mulS)
+    , fMulK(mulK)
     , fX(x)
     , fY(y)
     , fTheta(master.Theta())
@@ -60,6 +66,8 @@ R3BAmsHitData::R3BAmsHitData(const R3BAmsHitData& right)
     : FairMultiLinkedData(right)
     , fDetId(right.fDetId)
     , fNumHit(right.fNumHit)
+    , fMulS(right.fMulS)
+    , fMulK(right.fMulK)
     , fX(right.fX)
     , fY(right.fY)
     , fTheta(right.fmaster.Theta())
