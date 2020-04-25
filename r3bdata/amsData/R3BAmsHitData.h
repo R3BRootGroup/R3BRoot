@@ -50,7 +50,9 @@ class R3BAmsHitData : public FairMultiLinkedData
                   Double_t y,
                   TVector3 master,
                   Double_t energy_x,
-                  Double_t energy_y);
+                  Double_t energy_y,
+                  Int_t mulS = 0,
+                  Int_t mulK = 0);
 
     /** Copy constructor **/
     R3BAmsHitData(const R3BAmsHitData&);
@@ -63,6 +65,8 @@ class R3BAmsHitData : public FairMultiLinkedData
     /** Accessors **/
     inline const Int_t& GetDetId() const { return fDetId; }
     inline const Int_t& GetNumHit() const { return fNumHit; }
+    inline const Int_t& GetMulS() const { return fMulS; }
+    inline const Int_t& GetMulK() const { return fMulK; }
     inline const Double_t& GetX() const { return fX; }
     inline const Double_t& GetY() const { return fY; }
     inline const Double_t& GetPos_S() const { return fX; }
@@ -79,6 +83,7 @@ class R3BAmsHitData : public FairMultiLinkedData
   protected:
     Int_t fDetId;
     Int_t fNumHit;
+    Int_t fMulS, fMulK;
     Double_t fX, fY, fTheta, fPhi;
     TVector3 fmaster;
     Double_t fEnergyS, fEnergyK;

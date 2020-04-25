@@ -113,7 +113,7 @@ class R3BAmsOnlineSpectra : public FairTask
     TH2F* fh_Ams_hit_Pos[6];
     TH2F* fh_Ams_hit_E[6];
     TH2F* fh_Ams_hit_E_theta[6];
-    TH1F* fh_Ams_hit_Mul[6];
+    TH1F* fh_Ams_hit_Mul[6][2];
     TH2F* fh2_ams_theta_phi[2];
     TH2F* fh2_ams_e1_e2[2];
     TH2F* fh2_ams_theta1_theta2[2];
