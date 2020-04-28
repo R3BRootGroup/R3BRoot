@@ -74,6 +74,7 @@ R3BTrloiiSampReader.cxx
 R3BTimestampMasterReader.cxx
 R3BPspxReader.cxx
 R3BBunchedFiberReader.cxx
+R3BBunchedFiberSPMTTrigReader.cxx
 R3BBeamMonitorReader.cxx
 R3BFi0Reader.cxx
 R3BFi1aReader.cxx

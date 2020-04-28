@@ -2168,7 +2168,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
             fh_sci8_channels->Fill(iCha);
         }
     }
-    assert(MultipS8 != -1);
+    // assert(MultipS8 != -1);
 
     Int_t nPartS8;
 

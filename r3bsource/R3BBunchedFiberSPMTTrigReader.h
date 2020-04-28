@@ -11,21 +11,36 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BFi1aReader.h"
-#include "FairLogger.h"
+//
+// SPMT trigger reader, since many fiber detectors share TAMEX cards and we
+// don't want to recalibrate channels in many places.
+//
 
-extern "C"
+#ifndef R3BBUNCHEDFIBERSPMTTRIGREADER_H
+#define R3BBUNCHEDFIBERSPMTTRIGREADER_H
+
+#include "R3BReader.h"
+#include "TString.h"
+
+struct EXT_STR_h101_FIB_t;
+typedef struct EXT_STR_h101_FIB_t EXT_STR_h101_FIB;
+class TClonesArray;
+
+class R3BBunchedFiberSPMTTrigReader : public R3BReader
 {
-#include "ext_data_client.h"
-#include "ext_h101_fibonea.h"
-}
+  public:
+    R3BBunchedFiberSPMTTrigReader(EXT_STR_h101_FIB *, UInt_t);
+    Bool_t Init(ext_data_struct_info *);
+    Bool_t Read();
+    void Reset();
 
-R3BFi1aReader::R3BFi1aReader(EXT_STR_h101_FIBONEA* a_data, UInt_t a_offset)
-    : R3BBunchedFiberReader("Fi1a", a_offset, 1, 256, 1)
-    , fData((EXT_STR_h101_FIBONEA_onion*)a_data)
-{
-}
+  private:
+    EXT_STR_h101_FIB *fData;
+    UInt_t fOffset;
+    TClonesArray* fMappedArray;
 
-Bool_t R3BFi1aReader::Init(ext_data_struct_info* a_struct_info) { R3B_BUNCHED_FIBER_INIT_MAPMT_TRIG(FIBONEA, fData); }
+  public:
+    ClassDef(R3BBunchedFiberSPMTTrigReader, 0);
+};
 
-ClassImp(R3BFi1aReader)
+#endif

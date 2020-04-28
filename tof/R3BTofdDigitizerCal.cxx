@@ -61,7 +61,9 @@ InitStatus R3BTofdDigitizerCal::Init()
     if (!ioman)
         LOG(fatal) << "Init: No FairRootManager";
     fTofdPoints = (TClonesArray*)ioman->GetObject("TOFdPoint");
+
     fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
+    ioman->Register("MCTrack", "Monte Carlo data", fMCTrack, kTRUE);
 
     // Register output array fTofdCals
     fTofdCals = new TClonesArray("R3BTofdCalData", 1000);
@@ -245,9 +247,9 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
                         R3BTofdCalData(layer_label + 1, paddle_number + 1, 2, timeL_down, timeT_down);
 
                     // Int_t card = (int)paddle_number/8.+layer_label*6;
-                    for (Int_t i = 0; i < 12; i++)
+                    for (Int_t j = 0; j < 12; j++)
                     {
-                        new ((*Trigger)[Trigger->GetEntriesFast()]) R3BTofdCalData(5, i + 1, 1, 0., 0.);
+                        new ((*Trigger)[Trigger->GetEntriesFast()]) R3BTofdCalData(5, j + 1, 1, 0., 0.);
                     }
                 }
             }

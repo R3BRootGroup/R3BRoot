@@ -67,6 +67,7 @@ class R3BFi3aDigitizerCal : public FairTask
     TClonesArray* fMCTrack;
 
     TClonesArray* fFi3aCals;
+    TClonesArray* fFi3aTriggerCals;
 
   private:
     TRandom3* prnd;

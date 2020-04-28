@@ -22,7 +22,7 @@ R3BFi13Cal2Hit::R3BFi13Cal2Hit(enum R3BTCalEngine::CTDCVariant a_variant,
     : R3BBunchedFiberCal2Hit("Fi13", a_verbose, a_variant, VERTICAL, 2, 256, 2, a_is_calibrator, a_is_gain, a_is_tsync)
 {
     fib13_trig_map_setup();
-    BUNCHED_FIBER_TRIGGER_MAP_SET(g_fib13m_trig_map);
+    BUNCHED_FIBER_TRIGGER_MAP_SET(g_fib13m_trig_map, g_fib13s_trig_map);
 }
 
 R3BFi13Cal2Hit::~R3BFi13Cal2Hit() {}

@@ -36,6 +36,7 @@ void SetCuts()
 	gMC->SetProcess("MULS",1); // Multiple scattering
 	gMC->SetProcess("RAYL",1); // Rayleigh scattering
 
+
 /*
 	gMC->SetProcess("DCAY",0); // Particle decay
 	gMC->SetProcess("PAIR",0); // Pair production
@@ -49,7 +50,7 @@ void SetCuts()
 	gMC->SetProcess("CKOV",0); // Cerenkov production
 	gMC->SetProcess("HADR",0); // Hadronic interactions
 	gMC->SetProcess("LOSS",1); // Energy loss (2=complete fluct.)
-	gMC->SetProcess("MULS",0); // Multiple scattering
+	gMC->SetProcess("MULS",1); // Multiple scattering
 	gMC->SetProcess("RAYL",0); // Rayleigh scattering
 */
     cout << "[SetCuts]: Setting Cuts ..." << endl;

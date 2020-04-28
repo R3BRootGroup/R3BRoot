@@ -190,6 +190,7 @@ void R3BTofdDigitizer::Exec(Option_t* opt)
                          << endl;
 
                     //                    if(channel < 200)
+
                     MapOfHits.insert(pair<Int_t, R3BTofdHitData*>(
                         channel,
                         new R3BTofdHitData(0.,
@@ -199,7 +200,7 @@ void R3BTofdDigitizer::Exec(Option_t* opt)
                                            0.,
                                            Time[channel],
                                            Energy_Loss[channel],
-                                           channel)));
+                                           layer_label + 1)));
                 }
 
                 else

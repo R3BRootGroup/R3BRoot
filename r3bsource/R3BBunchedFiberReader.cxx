@@ -129,8 +129,8 @@ Bool_t R3BBunchedFiberReader::Read()
         auto const& e = fMHL[2][0];
 
         // Check that coarse and fine list are the same size.
-        uint32_t c_MI = *e[0]._MI;
-        uint32_t f_MI = *e[1]._MI;
+        uint32_t c_M = *e[0]._M;
+        uint32_t f_M = *e[1]._M;
         uint32_t c_ = *e[0]._;
         uint32_t f_ = *e[1]._;
 
@@ -146,11 +146,20 @@ Bool_t R3BBunchedFiberReader::Read()
         // and hits should be somewhat sorted already, that helps many sorting
         // algos.
         uint32_t cur_entry = 0;
-        for (uint32_t i = 0; i < c_; i++)
+        for (uint32_t i = 0; i < c_M; i++)
         {
-            auto channel = e[0]._MI[i];
-            new ((*fMappedArray)[fMappedArray->GetEntriesFast()])
-                R3BBunchedFiberMappedData(2, channel, true, e[0]._v[i], e[1]._v[i]);
+            uint32_t c_MI = e[0]._MI[i];
+            uint32_t f_MI = e[1]._MI[i];
+            uint32_t c_ME = e[0]._ME[i];
+            uint32_t f_ME = e[1]._ME[i];
+            // Only take the first hit per trigger channel, seems like it can
+            // have multi-hits.
+            if (cur_entry < c_ME)
+            {
+                new ((*fMappedArray)[fMappedArray->GetEntriesFast()])
+                    R3BBunchedFiberMappedData(2, c_MI, true, e[0]._v[cur_entry], e[1]._v[cur_entry]);
+            }
+            cur_entry = c_ME;
         }
     }
 

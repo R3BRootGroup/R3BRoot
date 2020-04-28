@@ -27,8 +27,9 @@ class R3BBunchedFiberCalData;
 class R3BBunchedFiberHitPar;
 class R3BBunchedFiberHitModulePar;
 
-#define BUNCHED_FIBER_TRIGGER_MAP_SET(array) \
-  MAPMTTriggerMapSet(array, sizeof array)
+#define BUNCHED_FIBER_TRIGGER_MAP_SET(mapmt_arr, spmt_arr) \
+  MAPMTTriggerMapSet(mapmt_arr, sizeof mapmt_arr);\
+  SPMTTriggerMapSet(spmt_arr, sizeof spmt_arr)
 
 /**
  * Transforms bunched fiber Cal level data to Hit level.
@@ -138,6 +139,7 @@ class R3BBunchedFiberCal2Hit : public FairTask
      * times.
      */
     void MAPMTTriggerMapSet(unsigned const *, size_t);
+    void SPMTTriggerMapSet(unsigned const *, size_t);
 
   private:
     TString fName;
@@ -160,10 +162,12 @@ class R3BBunchedFiberCal2Hit : public FairTask
     Bool_t fIsGain;
     Bool_t fIsTsync;
     TClonesArray* fCalItems;
-    TClonesArray* fCalTriggerItems;
+    TClonesArray* fMAPMTCalTriggerItems;
+    TClonesArray* fSPMTCalTriggerItems;
     TClonesArray* fHitItems;
     TClonesArray* fTofdHitItems;
     unsigned const *fMAPMTTriggerMap;
+    unsigned const *fSPMTTriggerMap;
     R3BBunchedFiberHitPar* fCalPar; /**< Parameter container. */
     R3BBunchedFiberHitPar* fHitPar; /**< Hit parameter container. */
     Int_t fNofHitPars;              /**< Number of modules in parameter file. */
@@ -175,34 +179,13 @@ class R3BBunchedFiberCal2Hit : public FairTask
     TH2F* fh_ToT_MA_Fib;
     TH2F* fh_ToT_Single_Fib;
     TH2F* fh_ToT_s_Fib[4];
+    TH2F* fh_time_s_Fib;
     TH2F* fh_ToT_ToT;
     TH2F* fh_dt_Fib;
     TH2F* fh_Fib_ToF;
     TH2F* fh_Test;
     TH1F* fh_multi;
-    
-    TH2F* fh_69_70;
-    TH2F* fh_69_59;
-    TH2F* fh_69_37;
-    TH2F* fh_69_45;
-    TH2F* fh_69_77;
-    TH2F* fh_69_109;
-    TH2F* fh_69_101;
-    TH2F* fh_69_123;
-    TH2F* fh_69_91;
-    TH2F* fh_69_49;
-    TH2F* fh_69_71;
-
-    TH2F* fh_69_60;
-    TH2F* fh_69_38;
-    TH2F* fh_69_46;
-    TH2F* fh_69_78;
-    TH2F* fh_69_110;
-    TH2F* fh_69_102;
-    TH2F* fh_69_124;
-    TH2F* fh_69_92;
-    TH2F* fh_69_50;
-    
+    TH2F* fh_time_Fib;
     
 
   public:

@@ -32,7 +32,7 @@ R3BFi3bCal2Hit::R3BFi3bCal2Hit(enum R3BTCalEngine::CTDCVariant a_variant,
                              a_is_tsync)
 {
     fib3b_trig_map_setup();
-    BUNCHED_FIBER_TRIGGER_MAP_SET(g_fib3bm_trig_map);
+    BUNCHED_FIBER_TRIGGER_MAP_SET(g_fib3bm_trig_map, g_fib3bs_trig_map);
 }
 
 R3BFi3bCal2Hit::~R3BFi3bCal2Hit() {}

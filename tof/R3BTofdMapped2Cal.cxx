@@ -215,6 +215,8 @@ void R3BTofdMapped2Cal::Exec(Option_t* option)
     // TODO: This algo would not properly handle e.g. double leading before a trailing,
     //       should be fixed to be future proof!
     //
+    // puts("---");
+    // puts("Event");
     for (auto it = cal_vec.begin(); cal_vec.end() != it; ++it)
     {
         auto& ch = *it;
@@ -232,10 +234,19 @@ void R3BTofdMapped2Cal::Exec(Option_t* option)
         {
             for (; trail_i < ch.size(); ++trail_i)
             {
+                /*
+                                cout << "lead: " << lead_i << " trail: " << trail_i << endl;
+                                cout << "data in Det:" << ch.at(trail_i).mapped->GetDetectorId() << " Bar: " <<
+                   ch.at(trail_i).mapped->GetBarId()
+                                 << " Side: " << ch.at(trail_i).mapped->GetSideId() <<" lead: " << ch.at(lead_i).time_ns
+                                 << " trail: " << ch.at(trail_i).time_ns
+                                 << " ToT: " << ch.at(trail_i).time_ns - ch.at(lead_i).time_ns << endl;
+                */
                 auto dt = ch.at(trail_i).time_ns - ch.at(lead_i).time_ns;
                 if (dt < -c_range_ns / 2)
                 {
                     // Wrap-around.
+                    // cout << "wrap-around"<<endl;
                     break;
                 }
                 if (dt > c_range_ns / 2)
@@ -243,6 +254,7 @@ void R3BTofdMapped2Cal::Exec(Option_t* option)
                     // std::cout << lead_i << ' ' << trail_i << ": " << ch.at(lead_i).time_ns << ' ' <<
                     // ch.at(trail_i).time_ns << '\n';
                     // Missing leading edge with wrap-around at the same time.
+                    // cout << "Missing leading edge with wrap-around at the same time." << endl;
                     continue;
                 }
                 if (dt > 0)
@@ -261,7 +273,12 @@ void R3BTofdMapped2Cal::Exec(Option_t* option)
                                                                                       lead->GetSideId(),
                                                                                       ch.at(lead_i).time_ns,
                                                                                       ch.at(trail_i).time_ns);
-
+            /*
+                        cout << "stored Det:" << lead->GetDetectorId() << " Bar: " << lead->GetBarId()
+                             << " Side: " << lead->GetSideId() <<" lead: " << ch.at(lead_i).time_ns
+                             << " trail: " << ch.at(trail_i).time_ns
+                             << " ToT: " << ch.at(trail_i).time_ns - ch.at(lead_i).time_ns << endl;
+            */
             ++lead_i;
             ++trail_i;
         }

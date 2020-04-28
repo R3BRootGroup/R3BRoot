@@ -12,6 +12,7 @@
  ******************************************************************************/
 
 #include "R3BFi1aCal2Hit.h"
+#include "mapping_fib1a_trig.hh"
 
 R3BFi1aCal2Hit::R3BFi1aCal2Hit(enum R3BTCalEngine::CTDCVariant a_variant,
                                Direction a_direction,
@@ -30,6 +31,8 @@ R3BFi1aCal2Hit::R3BFi1aCal2Hit(enum R3BTCalEngine::CTDCVariant a_variant,
                              a_is_gain,
                              a_is_tsync)
 {
+    fib1a_trig_map_setup();
+    BUNCHED_FIBER_TRIGGER_MAP_SET(g_fib1am_trig_map, g_fib1as_trig_map);
 }
 
 R3BFi1aCal2Hit::~R3BFi1aCal2Hit() {}

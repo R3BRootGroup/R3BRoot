@@ -63,12 +63,13 @@ void R3BTCalContFact::setAllContainers()
     addContainer("Sci8TCalPar", "SCI8 TCAL Calibration Parameters");
     addContainer("TofdTCalPar", "TOFD TCAL Calibration Parameters");
     addContainer("StrawtubesTCalPar", "Strawtubes TCAL Calibration Parameters");
-#define ADD_FIBER(Name, NAME)                                                              \
-    do                                                                                     \
-    {                                                                                      \
-        addContainer(#Name "MAPMTTCalPar", #NAME " MAPMT TCAL Calibration Parameters");    \
-        addContainer(#Name "SPMTTCalPar", #NAME " SPMT TCAL Calibration Parameters");      \
-        addContainer(#Name "MAPMTTrigTCalPar", #NAME " SPMT TCAL Calibration Parameters"); \
+    addContainer("BunchedFiberSPMTTrigTCalPar", "Bunched Fiber SPMT Trigger TCAL Calibration Parameters");
+#define ADD_FIBER(Name, NAME)                                                                       \
+    do                                                                                              \
+    {                                                                                               \
+        addContainer(#Name "MAPMTTCalPar", #NAME " MAPMT TCAL Calibration Parameters");             \
+        addContainer(#Name "SPMTTCalPar", #NAME " SPMT TCAL Calibration Parameters");               \
+        addContainer(#Name "MAPMTTrigTCalPar", #NAME " MAPMT Trigger TCAL Calibration Parameters"); \
     } while (0)
     ADD_FIBER(Fi0, FI0);
     ADD_FIBER(Fi1a, FI1a);
@@ -109,6 +110,7 @@ FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
     containerNames.push_back("Sci8TCalPar");
     containerNames.push_back("TofdTCalPar");
     containerNames.push_back("StrawtubesTCalPar");
+    containerNames.push_back("BunchedFiberSPMTTrigTCalPar");
 #define PUSH_FIBER(Name)                                    \
     do                                                      \
     {                                                       \

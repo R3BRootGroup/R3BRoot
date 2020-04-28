@@ -37,6 +37,8 @@
 #include "TMath.h"
 
 #include <iostream>
+#include <sstream>
+#include <string>
 
 #include "mapping_tofd_trig.hh"
 
@@ -49,7 +51,7 @@ using namespace std;
 namespace
 {
     double c_range_ns = 2048 * 5;
-    double c_bar_coincidence_ns = 200000; // nanoseconds.
+    double c_bar_coincidence_ns = 20; // nanoseconds.
 } // namespace
 
 R3BTofdCal2HitS454::R3BTofdCal2HitS454()
@@ -415,12 +417,17 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
         std::vector<R3BTofdCalData*> bot;
     };
     std::map<size_t, Entry> bar_map;
+    // puts("Event");
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
         auto* hit = (R3BTofdCalData*)fCalItems->At(ihit);
         size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
-        // std::cout << "Hits: " << hit->GetDetectorId() << ' ' << hit->GetBarId() << ' ' << hit->GetSideId() << ' '
-        //          << hit->GetTimeLeading_ns() << ' ' << hit->GetTimeTrailing_ns() << '\n';
+        /*
+                std::cout << "Hits: " << hit->GetDetectorId() << ' ' << hit->GetBarId() << ' ' << hit->GetSideId() << '
+           '
+                          << hit->GetTimeLeading_ns() << ' ' << hit->GetTimeTrailing_ns()
+                          << ' ' << hit->GetTimeTrailing_ns() - hit->GetTimeLeading_ns() << '\n';
+        */
         auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
         auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;
         vec.push_back(hit);
@@ -433,7 +440,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
     // std::cout << "Print:\n";
     for (auto it = bar_map.begin(); bar_map.end() != it; ++it)
     {
-    reset:
+        //    reset:
         // for (auto it2 = it->second.top.begin(); it->second.top.end() != it2; ++it2) {
         // std::cout << "Top: " << (*it2)->GetDetectorId() << ' ' << (*it2)->GetBarId() << ' ' <<
         // (*it2)->GetTimeLeading_ns() << '\n';
@@ -459,11 +466,15 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                 auto bot_trig = (R3BTofdCalData const*)fCalTriggerItems->At(bot_trig_i);
                 top_trig_ns = top_trig->GetTimeLeading_ns();
                 bot_trig_ns = bot_trig->GetTimeLeading_ns();
-                // std::cout << "Top: " << top->GetDetectorId() << ' ' << top->GetSideId() << ' ' << top->GetBarId() <<
-                // ' '
-                // << top_trig_i << ' ' << top_trig->GetTimeLeading_ns() << std::endl; std::cout << "Bot: " <<
-                // bot->GetDetectorId() << ' ' << bot->GetSideId() << ' ' << bot->GetBarId() << ' ' << bot_trig_i << ' '
-                // << bot_trig->GetTimeLeading_ns() << std::endl;
+                /*
+                                std::cout << "Top: " << top->GetDetectorId() << ' ' << top->GetSideId() << ' ' <<
+                   top->GetBarId() << ' '
+                                << top_trig_i << ' ' << top_trig->GetTimeLeading_ns() << std::endl;
+                                std::cout << "Bot: " <<
+                                bot->GetDetectorId() << ' ' << bot->GetSideId() << ' ' << bot->GetBarId() << ' ' <<
+                   bot_trig_i << ' '
+                                << bot_trig->GetTimeLeading_ns() << std::endl;
+                */
                 ++n1;
             }
             else
@@ -482,9 +493,12 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                 fmod(top->GetTimeLeading_ns() - top_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) - c_range_ns / 2;
             auto bot_ns =
                 fmod(bot->GetTimeLeading_ns() - bot_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) - c_range_ns / 2;
-            // std::cout << top->GetTimeLeading_ns() << ' ' << top_trig->GetTimeLeading_ns() << ' ' << top_ns <<
-            // std::endl; std::cout << bot->GetTimeLeading_ns() << ' ' << bot_trig->GetTimeLeading_ns() << ' ' << bot_ns
-            // << std::endl;
+            /*
+                        if(top_ns>2000 || bot_ns>2000){
+                            std::cout << top->GetTimeLeading_ns() << ' ' << top_trig_ns << ' ' << top_ns << std::endl;
+                            std::cout << bot->GetTimeLeading_ns() << ' ' << bot_trig_ns << ' ' << bot_ns << std::endl;
+                        }
+            */
             auto dt = top_ns - bot_ns;
             // Handle wrap-around.
             auto dt_mod = fmod(dt + c_range_ns, c_range_ns);
@@ -566,42 +580,44 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
 
                 if (timeLos == 0)
                 { // no LOS in s454
-                    /// What to do here:
-                    /// check if all ToF in one event are in a range of 3000ns (readout window) and shift times
-                    /// according to that
-                    ///
-                    ///       this is the first hit
-                    ///       I
-                    /// e.g. 171; 9439; 179; 1117; 175 -->> 171+c_range_ns; 9439; 179+c_range_ns; 1117+c_range_ns;
-                    /// 175+c_range_ns
-                    ///             I
-                    ///             this should be the first hit -> counter resets -> other hits follow
-                    if (ToF - timeP0 < -3000.)
-                    {
-                        ToF += c_range_ns;
-                    }
-                    if (ToF - timeP0 > 3000.)
-                    {
-                        timeP0 = ToF;
-                        it = bar_map.begin();
-                        countreset++;
-                        hitsbeforereset += nHitsEvent;
-                        for (Int_t i = 0; i <= fNofPlanes; i++)
-                        {
-                            for (Int_t j = 0; j <= N_TOFD_HIT_PADDLE_MAX; j++)
-                            {
-                                tof[i][j].clear();
-                                x[i][j].clear();
-                                y[i][j].clear();
-                                yToT[i][j].clear();
-                                q[i][j].clear();
-                                vmultihits[i][j] = 0;
-                                nHitsEvent = 0;
-                            }
-                        }
-                        LOG(WARNING) << "Found new first hit -> will reset";
-                        goto reset; /// TODO: how to do without goto?
-                    }
+                  /// What to do here:
+                  /// check if all ToF in one event are in a range of 3000ns (readout window) and shift times
+                  /// according to that
+                  ///
+                  ///       this is the first hit
+                  ///       I
+                  /// e.g. 171; 9439; 179; 1117; 175 -->> 171+c_range_ns; 9439; 179+c_range_ns; 1117+c_range_ns;
+                  /// 175+c_range_ns
+                  ///             I
+                  ///             this should be the first hit -> counter resets -> other hits follow
+                    /*
+                                        if (ToF - timeP0 < -3000.)
+                                        {
+                                            ToF += c_range_ns;
+                                        }
+                                        if (ToF - timeP0 > 3000.)
+                                        {
+                                            timeP0 = ToF;
+                                            it = bar_map.begin();
+                                            countreset++;
+                                            hitsbeforereset += nHitsEvent;
+                                            for (Int_t i = 0; i <= fNofPlanes; i++)
+                                            {
+                                                for (Int_t j = 0; j <= N_TOFD_HIT_PADDLE_MAX; j++)
+                                                {
+                                                    tof[i][j].clear();
+                                                    x[i][j].clear();
+                                                    y[i][j].clear();
+                                                    yToT[i][j].clear();
+                                                    q[i][j].clear();
+                                                    vmultihits[i][j] = 0;
+                                                    nHitsEvent = 0;
+                                                }
+                                            }
+                                            LOG(WARNING) << "Found new first hit -> will reset";
+                                            goto reset; /// TODO: how to do without goto?
+                                        }
+                    */
                 }
 
                 if (timeLos != 0)
@@ -634,11 +650,33 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                 if (fTofdTotPos)
                     pos = posToT;
 
+                Float_t paddle_width = 2.70000;
+                Float_t paddle_thickness = 0.50000;
+                Float_t air_gap_paddles = 0.04;
+                Float_t air_gap_layer = 5.;
+                // define number of layers and paddles with sizes of the detector
+                Int_t number_layers = 2;   // number of layers
+                Int_t number_paddles = 44; // number of paddles per layer
+                Float_t detector_width =
+                    number_paddles * paddle_width + (number_paddles - 1) * air_gap_paddles + paddle_width;
+                Float_t detector_thickness = (number_layers - 1) * air_gap_layer + number_layers * paddle_thickness;
+
                 // calculate x-position
                 if (iPlane == 1 || iPlane == 3)
-                    x[iPlane][iBar].push_back(iBar * 2.8 - 23. * 2.8);
+                {
+                    // x[iPlane][iBar].push_back(iBar * 2.8 - 23. * 2.8);
+                    x[iPlane][iBar].push_back(-detector_width / 2 + (paddle_width + air_gap_paddles) / 2 +
+                                              (iBar - 1) * (paddle_width + air_gap_paddles) - 0.04);
+                    //					cout << "Test: " << iBar * 2.8 - 23. * 2.8 << "  " <<
+                    //					-detector_width/2 + (paddle_width+air_gap_paddles)/2 +
+                    //(iBar-1)*(paddle_width+air_gap_paddles) - 0.04<<endl;
+                }
                 if (iPlane == 2 || iPlane == 4)
-                    x[iPlane][iBar].push_back(iBar * 2.8 - 23. * 2.8 + 1.4);
+                {
+                    // x[iPlane][iBar].push_back(iBar * 2.8 - 23. * 2.8 + 1.4);
+                    x[iPlane][iBar].push_back(-detector_width / 2 + (paddle_width + air_gap_paddles) +
+                                              (iBar - 1) * (paddle_width + air_gap_paddles) - 0.04);
+                }
                 Double_t para[4];
                 para[0] = par->GetPar1a();
                 para[1] = par->GetPar1b();
@@ -674,18 +712,23 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                 parz[1] = par->GetPar1zb();
                 parz[2] = par->GetPar1zc();
 
-                /*
-                if(parz[0]>0 && parz[2]>0) std::cout<<"Charges in this event "
-                                                    <<parz[0]*TMath::Power(qb,parz[2])+parz[1]
-                                                    <<" plane "<<iPlane<<" ibar "<<iBar<<"\n";
-                else std::cout<<"Charges in this event "<<qb<<" plane "<<iPlane<<" ibar "<<iBar<<"\n";
-                std::cout<<"Times in this event "<<ToF<<" plane "<<iPlane<<" ibar "<<iBar<<endl;
-                if(iPlane==1 || iPlane==3)std::cout<<"x in this event "<<iBar * 2.8 - 23. * 2.8<<" plane "
-                                                   <<iPlane<<" ibar "<<iBar<<"\n";
-                if(iPlane==2 || iPlane==4)std::cout<<"x in this event "<<iBar * 2.8 - 23. * 2.8 + 1.4<<" plane "
-                                                   <<iPlane<<" ibar "<<iBar<<"\n";
-                std::cout<<"y in this event "<<pos<<" plane "<<iPlane<<" ibar "<<iBar<<endl<<endl;
-                */
+                if (parz[0] > 0 && parz[2] > 0)
+                    LOG(DEBUG) << "Charges in this event " << parz[0] * TMath::Power(qb, parz[2]) + parz[1] << " plane "
+                               << iPlane << " ibar " << iBar;
+                else
+                    LOG(DEBUG) << "Charges in this event " << qb << " plane " << iPlane << " ibar " << iBar;
+                LOG(DEBUG) << "Times in this event " << ToF << " plane " << iPlane << " ibar " << iBar;
+                if (iPlane == 1 || iPlane == 3)
+                    LOG(DEBUG) << "x in this event "
+                               << -detector_width / 2 + (paddle_width + air_gap_paddles) / 2 +
+                                      (iBar - 1) * (paddle_width + air_gap_paddles) - 0.04
+                               << " ibar " << iBar;
+                if (iPlane == 2 || iPlane == 4)
+                    LOG(DEBUG) << "x in this event "
+                               << -detector_width / 2 + (paddle_width + air_gap_paddles) +
+                                      (iBar - 1) * (paddle_width + air_gap_paddles) - 0.04
+                               << " plane " << iPlane << " ibar " << iBar;
+                LOG(DEBUG) << "y in this event " << pos << " plane " << iPlane << " ibar " << iBar << "\n";
 
                 if (parz[0] > 0 && parz[2] > 0)
                 {
@@ -771,7 +814,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
         }
     }
 
-    // order hits for time
+    // sort hits for time
     for (Int_t i = 1; i <= fNofPlanes; i++)
     { // loop over planes i
         for (Int_t j = 1; j < fPaddlesPerPlane + 1; j++)
@@ -796,7 +839,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                     {
                         if (tof[i][j].at(m) < tArrT[0])
                         { // new first entry with smaller time
-                            LOG(DEBUG) << "Insert new first " << i << " " << j;
+                            LOG(DEBUG) << "Insert new first " << i << "/" << j;
                             insertX(nHitsEvent, tArrQ, q[i][j].at(m), 1);
                             insertX(nHitsEvent, tArrT, tof[i][j].at(m), 1);
                             insertX(nHitsEvent, tArrX, x[i][j].at(m), 1);
@@ -817,7 +860,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                             LOG(DEBUG) << "Will insert at " << p;
                             if (p > 0 && tof[i][j].at(m) > tArrT[p - 1] && tof[i][j].at(m) != tArrT[p])
                             { // insert at right position
-                                LOG(DEBUG) << "Insert at " << p << " " << i << " " << j;
+                                LOG(DEBUG) << "Insert at " << p << " " << i << "/" << j;
                                 insertX(nHitsEvent, tArrQ, q[i][j].at(m), p + 1);
                                 insertX(nHitsEvent, tArrT, tof[i][j].at(m), p + 1);
                                 insertX(nHitsEvent, tArrX, x[i][j].at(m), p + 1);
@@ -829,7 +872,16 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                             else
                             {
 
-                                LOG(ERROR) << "Order events for time borked! Event:" << fnEvents;
+                                LOG(ERROR) << "Insert event with exact same time " << fnEvents;
+                                p = p + 1;
+                                LOG(DEBUG) << "Insert at " << p << " " << i << "/" << j;
+                                insertX(nHitsEvent, tArrQ, q[i][j].at(m), p + 1);
+                                insertX(nHitsEvent, tArrT, tof[i][j].at(m), p + 1);
+                                insertX(nHitsEvent, tArrX, x[i][j].at(m), p + 1);
+                                insertX(nHitsEvent, tArrY, y[i][j].at(m), p + 1);
+                                insertX(nHitsEvent, tArrYT, yToT[i][j].at(m), p + 1);
+                                insertX(nHitsEvent, tArrP, i, p + 1);
+                                insertX(nHitsEvent, tArrB, j, p + 1);
                             }
                         }
                     }
@@ -838,36 +890,37 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
         }
     }
 
-    if (fnEvents == 220743271)
-    {
-        // fnEvents++;
-        goto jumps;
-    }
-    // Now we have all hits in this event time ordered
-    // print events
-    /*
-    if(tArrT[0]!=-1.){
+    // Now we have all hits in this event time sorted
 
-            for (Int_t a = 0; a < nHitsEvent; a++)
-                std::cout << tArrQ[a] << " ";
-            std::cout << "\n";
-            for (Int_t a = 0; a < nHitsEvent; a++)
-                std::cout << tArrT[a] << " ";
-            std::cout << "\n";
-            for (Int_t a = 0; a < nHitsEvent; a++)
-                std::cout << tArrX[a] << " ";
-            std::cout << "\n";
-            for (Int_t a = 0; a < nHitsEvent; a++)
-                std::cout << tArrY[a] << " ";
-            std::cout << "\n";
-            for (Int_t a = 0; a < nHitsEvent; a++)
-                std::cout << tArrP[a] << " ";
-            std::cout << "\n";
-            for (Int_t a = 0; a < nHitsEvent; a++)
-                std::cout << tArrB[a] << " ";
-            std::cout << "\n";
+    // print events
+    std::stringstream ss;
+    ss << "Time sorted hits:\n [CHARGE] ";
+    if (tArrT[0] != -1.)
+    {
+        for (Int_t a = 0; a < nHitsEvent; a++)
+            ss << tArrQ[a] << " ";
+        ss << "\n [TIME] ";
+        for (Int_t a = 0; a < nHitsEvent; a++)
+            ss << tArrT[a] << " ";
+        ss << "\n [XPOS] ";
+        for (Int_t a = 0; a < nHitsEvent; a++)
+            ss << tArrX[a] << " ";
+        ss << "\n [YPOS] ";
+        for (Int_t a = 0; a < nHitsEvent; a++)
+        {
+            if (fTofdTotPos)
+                ss << tArrYT[a] << " ";
+            else
+                ss << tArrY[a] << " ";
+        }
+        ss << "\n [PLANE] ";
+        for (Int_t a = 0; a < nHitsEvent; a++)
+            ss << tArrP[a] << " ";
+        ss << "\n [BAR] ";
+        for (Int_t a = 0; a < nHitsEvent; a++)
+            ss << tArrB[a] << " ";
     }
-    */
+    LOG(DEBUG) << ss.str() << "\n";
 
     // Now we can analyze the hits in this event
 
@@ -897,7 +950,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
         {
             LOG(DEBUG) << "Single Hit for Plane " << tArrP[hit] << " " << tArrB[hit];
             tArrU[hit] = true;
-            // store single hits only seen in planes
+            // store single hits
             singlehit++;
             if (fTofdTotPos)
             {
@@ -915,13 +968,12 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
     LOG(DEBUG) << "Used up hits in this event:";
     for (Int_t a = 0; a < nHitsEvent; a++)
     {
-        LOG(DEBUG) << tArrU[a] << " ";
+        LOG(DEBUG) << "Event " << a << " " << tArrU[a] << " ";
         if (tArrU[a] != true)
             LOG(FATAL) << "Not all events analyzed!";
     }
 
     LOG(DEBUG) << "------------------------------------------------------\n";
-jumps:
     fnEvents++;
 }
 

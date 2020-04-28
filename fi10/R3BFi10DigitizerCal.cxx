@@ -75,6 +75,9 @@ InitStatus R3BFi10DigitizerCal::Init()
     fFi10Cals = new TClonesArray("R3BBunchedFiberCalData", 1000);
     ioman->Register("Fi10Cal", "Digital response in Fi10", fFi10Cals, kTRUE);
 
+    fFi10TriggerCals = new TClonesArray("R3BBunchedFiberCalData", 1000);
+    ioman->Register("Fi10TriggerCal", "Digital response in Fi10", fFi10TriggerCals, kTRUE);
+
     // for sigmas
     prnd = new TRandom3();
 
@@ -85,7 +88,7 @@ void R3BFi10DigitizerCal::Exec(Option_t* opt)
 {
     Reset();
 
-    auto Digitize = [this](TClonesArray* Points, TClonesArray* Hits, Int_t NumOfFibers) {
+    auto Digitize = [this](TClonesArray* Points, TClonesArray* Hits, TClonesArray* TriggerHits, Int_t NumOfFibers) {
         Int_t entryNum = Points->GetEntries();
 
         if (!entryNum)
@@ -171,7 +174,7 @@ void R3BFi10DigitizerCal::Exec(Option_t* opt)
         Int_t ichanMA = -10, ichanSA = -10;
         Double_t yrnd, yns, ToT_MA, ToT_SA, ernd, ens, timernd, timeMA_lead = -1., timeMA_trail = -1.,
                                                                 timeSA_lead = -1., timeSA_trail = -1.;
-
+        Bool_t first = true;
         for (Int_t i = 0; i < NumOfFibers; ++i)
         {
             for (Double_t& energyl : energy[i])
@@ -203,20 +206,21 @@ void R3BFi10DigitizerCal::Exec(Option_t* opt)
                      *
                      */
                     yrnd = prnd->Gaus((y[i].at(&energyl - energy[i].data())), ysigma);
-                    ernd = prnd->Gaus(energyl, esigma) * 1000.; // GeV->MeV
+                    ernd = prnd->Gaus(energyl, esigma) * 1000. * 2.; // GeV->MeV
                     ToT_MA =
-                        ernd * exp(yrnd / 100.) * 10.; // *10 just to come to the tot region we measure in experiment
-                    ToT_SA = ernd * exp(-yrnd / 100.) * 10.;
+                        ernd * exp(-(25. - yrnd) / 100.); // just to come to the tot region we measure in experiment
+                    ToT_SA = ernd * exp(-(25. + yrnd) / 100.);
                     ens = sqrt(ToT_MA * ToT_SA);
 
                     /* Now, make from ToT and time leading and trailing times:
                      * time=(timeMA_lead+timeSA_lead)/2, and timeMA_lead-timeSA_lead=y => timeMA_lead, timeSA_lead
                      * time_trail = time_lead+ToT
                      */
-                    timernd = prnd->Gaus(time[i].at(&energyl - energy[i].data()), tsigma) *
-                              3.; //*3. just to get some larger values
-                    timeMA_lead = (2. * timernd + yrnd) / 2.;
-                    timeSA_lead = 2. * timernd - timeMA_lead;
+                    timernd = prnd->Gaus(time[i].at(&energyl - energy[i].data()),
+                                         tsigma); //*3. just to get some larger values
+                    Double_t veff = 12.;
+                    timeMA_lead = timernd - 25. / veff + (25. - yrnd) / veff;
+                    timeSA_lead = timernd - 25. / veff + (25. + yrnd) / veff;
                     timeMA_trail = timeMA_lead + ToT_MA;
                     timeSA_trail = timeSA_lead + ToT_SA;
 
@@ -228,16 +232,24 @@ void R3BFi10DigitizerCal::Exec(Option_t* opt)
                     */
 
                     new ((*Hits)[Hits->GetEntries()]) // MAPMT leading
-                        R3BBunchedFiberCalData(1, ichanMA, 1, timeMA_lead);
+                        R3BBunchedFiberCalData(0, ichanMA, 1, timeMA_lead);
 
                     new ((*Hits)[Hits->GetEntries()]) // MAPMT trailing
-                        R3BBunchedFiberCalData(1, ichanMA, 0, timeMA_trail);
+                        R3BBunchedFiberCalData(0, ichanMA, 0, timeMA_trail);
 
                     new ((*Hits)[Hits->GetEntries()]) // SAPMT leading
-                        R3BBunchedFiberCalData(0, ichanSA, 1, timeSA_lead);
+                        R3BBunchedFiberCalData(1, ichanSA, 1, timeSA_lead);
 
                     new ((*Hits)[Hits->GetEntries()]) // SAPMT trailing
-                        R3BBunchedFiberCalData(0, ichanSA, 0, timeSA_trail);
+                        R3BBunchedFiberCalData(1, ichanSA, 0, timeSA_trail);
+                    if (first)
+                    {
+                        for (Int_t j = 0; j < 4; j++)
+                        {
+                            new ((*TriggerHits)[TriggerHits->GetEntries()]) R3BBunchedFiberCalData(2, j + 1, 1, 0.);
+                        }
+                        first = false;
+                    }
                 }
             }
         }
@@ -251,7 +263,7 @@ void R3BFi10DigitizerCal::Exec(Option_t* opt)
 
     if (fFi10Points)
     {
-        Digitize(fFi10Points, fFi10Cals, fiber_nbr);
+        Digitize(fFi10Points, fFi10Cals, fFi10TriggerCals, fiber_nbr);
     }
 }
 // -------------------------------------------------------------------------
@@ -260,6 +272,8 @@ void R3BFi10DigitizerCal::Reset()
 {
     if (fFi10Cals)
         fFi10Cals->Clear();
+    if (fFi10TriggerCals)
+        fFi10TriggerCals->Clear();
 }
 
 void R3BFi10DigitizerCal::Finish() {}

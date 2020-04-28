@@ -11,21 +11,51 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BFi1aReader.h"
-#include "FairLogger.h"
+// R3BBunchedFiberSPMTTrigDigitizerCal.h
 
-extern "C"
+#ifndef R3BBunchedFiberSPMTTrigDigitizerCal_H
+#define R3BBunchedFiberSPMTTrigDigitizerCal_H 1
+
+#include "FairTask.h"
+#include "R3BBunchedFiberCalData.h"
+#include <TRandom3.h>
+#include <map>
+#include <string>
+
+class TClonesArray;
+class TH1F;
+class TH2F;
+
+class R3BBunchedFiberSPMTTrigDigitizerCal : public FairTask
 {
-#include "ext_data_client.h"
-#include "ext_h101_fibonea.h"
-}
 
-R3BFi1aReader::R3BFi1aReader(EXT_STR_h101_FIBONEA* a_data, UInt_t a_offset)
-    : R3BBunchedFiberReader("Fi1a", a_offset, 1, 256, 1)
-    , fData((EXT_STR_h101_FIBONEA_onion*)a_data)
-{
-}
+  public:
+    /** Default constructor **/
+    R3BBunchedFiberSPMTTrigDigitizerCal();
 
-Bool_t R3BFi1aReader::Init(ext_data_struct_info* a_struct_info) { R3B_BUNCHED_FIBER_INIT_MAPMT_TRIG(FIBONEA, fData); }
+    R3BBunchedFiberSPMTTrigDigitizerCal(const char* name, Int_t iVerbose = 1);
+   
+    /** Destructor **/
+   virtual  ~R3BBunchedFiberSPMTTrigDigitizerCal();
 
-ClassImp(R3BFi1aReader)
+    /** Virtual method Init **/
+    virtual InitStatus Init();
+
+    /** Virtual method Exec **/
+    virtual void Exec(Option_t* opt);
+
+    virtual void Finish();
+    
+    virtual void Reset();
+
+
+  protected:
+    TClonesArray* fFiberTriggerSingleCals;
+    TClonesArray* fMCTrack;
+
+  private:
+
+    ClassDef(R3BBunchedFiberSPMTTrigDigitizerCal, 1);
+};
+
+#endif

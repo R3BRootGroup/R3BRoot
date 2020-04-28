@@ -142,6 +142,10 @@ class R3BTrackS454 : public FairTask
     {
         fB = B;
     }
+    inline void SetSimu(Int_t simu)
+    {
+        fSimu = simu;
+    }
 
   private:
     std::vector<TClonesArray*> fMappedItems;
@@ -187,6 +191,7 @@ class R3BTrackS454 : public FairTask
 	Bool_t fGhost;
 	Bool_t fPairs;
 	Bool_t fGraphCuts;
+	Bool_t fSimu;
 	Int_t fB;
 	Bool_t tracker = true;
 
@@ -225,11 +230,20 @@ class R3BTrackS454 : public FairTask
 	Int_t counter2 = 0;
 	Int_t counter3 = 0;
 	Int_t counter4 = 0;
+	Int_t counterTofd = 0;
+	Int_t counterTofdMulti = 0;
+	Int_t counterCalifa = 0;
+	Int_t counterWrongTpat = 0;
+	Int_t counterWrongTrigger = 0;
+	Int_t counterRolu = 0;
+	Int_t counterTracker = 0;
 	Int_t countdet;
-	
+
+    Bool_t writeFile = false;
+
     UInt_t num_spills = 0;
 
-	Int_t ndet = 9;
+	Int_t ndet = 10;
 	
     TH1F* fh_Tpat;
     TH1F* fh_Trigger;
@@ -237,12 +251,16 @@ class R3BTrackS454 : public FairTask
     TH1F* fh_SEE;
     TH1F* fh_TOFDOR;
 
+    TH2F* fh_califa_energy;
+	
     TH2F* fh_xy_Fib[NOF_FIB_DET];
     TH2F* fh_xy_Fib_ac[NOF_FIB_DET];
     TH1F* fh_mult_Fib[NOF_FIB_DET];
     TH1F* fh_mult_Fib_ac[NOF_FIB_DET];
     TH2F* fh_Fib_ToF[NOF_FIB_DET];
     TH2F* fh_Fib_ToF_ac[NOF_FIB_DET];
+    TH2F* fh_Fib_Time[NOF_FIB_DET];
+    TH2F* fh_Fib_Time_ac[NOF_FIB_DET];
     TH2F* fh_ToT_Fib[NOF_FIB_DET];
     TH2F* fh_ToT_Fib_ac[NOF_FIB_DET];
     TH2F* fh_Fib_vs_Events[NOF_FIB_DET];
@@ -276,6 +294,8 @@ class R3BTrackS454 : public FairTask
     TH2F* fh_xy_tofd_ac;
     TH1F* fh_tofd_charge;
     TH1F* fh_tofd_charge_ac;
+    TH1F* fh_tofd_time;
+    TH1F* fh_tofd_time_ac;
     TH1F* fh_TimePreviousEvent;
     TH1F* fh_tofd_mult;
     TH1F* fh_tofd_mult_ac;
@@ -324,9 +344,9 @@ class R3BTrackS454 : public FairTask
 	TH2F* fh_dErel_vs_x;
 	TH2F* fh_dErel_vs_y;
 	
-	TH2F* fh_xy[9];
-	TH2F* fh_p_vs_x[9];
-	TH2F* fh_p_vs_x_test[9];
+	TH2F* fh_xy[10];
+	TH2F* fh_p_vs_x[10];
+	TH2F* fh_p_vs_x_test[10];
 	
   public:
     ClassDef(R3BTrackS454, 1)
