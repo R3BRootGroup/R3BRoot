@@ -53,10 +53,7 @@ R3BBunchedFiberSPMTTrigDigitizerCal::R3BBunchedFiberSPMTTrigDigitizerCal()
 {
 }
 
-R3BBunchedFiberSPMTTrigDigitizerCal::~R3BBunchedFiberSPMTTrigDigitizerCal() 
-{
-    delete fFiberTriggerSingleCals;
-}
+R3BBunchedFiberSPMTTrigDigitizerCal::~R3BBunchedFiberSPMTTrigDigitizerCal() { delete fFiberTriggerSingleCals; }
 
 InitStatus R3BBunchedFiberSPMTTrigDigitizerCal::Init()
 {
@@ -68,9 +65,9 @@ InitStatus R3BBunchedFiberSPMTTrigDigitizerCal::Init()
     if (NULL == fMCTrack)
         LOG(fatal) << "Branch MCTrack not found";
 
-    // Register output array 
-    ioman->Register("BunchedFiberSPMTTrigCal", "Digital response of single PMT of fiber", 
-    fFiberTriggerSingleCals, kTRUE);
+    // Register output array
+    ioman->Register(
+        "BunchedFiberSPMTTrigCal", "Digital response of single PMT of fiber", fFiberTriggerSingleCals, kTRUE);
 
     return kSUCCESS;
 }
@@ -79,13 +76,13 @@ void R3BBunchedFiberSPMTTrigDigitizerCal::Exec(Option_t* opt)
 {
 
     Reset();
-	
-	for(Int_t j = 0; j< 3; j++){
+
+    for (Int_t j = 0; j < 3; j++)
+    {
 
         new ((*fFiberTriggerSingleCals)[fFiberTriggerSingleCals->GetEntriesFast()])
-          R3BBunchedFiberCalData(1, j+1, 1, 0.);
-	}
-	
+            R3BBunchedFiberCalData(1, j + 1, 1, 0.);
+    }
 }
 // -------------------------------------------------------------------------
 

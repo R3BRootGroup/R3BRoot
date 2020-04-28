@@ -23,8 +23,7 @@ extern "C"
 #include "ext_h101_fib.h"
 }
 
-R3BBunchedFiberSPMTTrigReader::R3BBunchedFiberSPMTTrigReader(
-    EXT_STR_h101_FIB *a_data, UInt_t a_offset)
+R3BBunchedFiberSPMTTrigReader::R3BBunchedFiberSPMTTrigReader(EXT_STR_h101_FIB* a_data, UInt_t a_offset)
     : R3BReader("R3BBunchedFiberSPMTTrigReader")
     , fData(a_data)
     , fOffset(a_offset)
@@ -32,7 +31,7 @@ R3BBunchedFiberSPMTTrigReader::R3BBunchedFiberSPMTTrigReader(
 {
 }
 
-Bool_t R3BBunchedFiberSPMTTrigReader::Init(ext_data_struct_info *a_struct_info)
+Bool_t R3BBunchedFiberSPMTTrigReader::Init(ext_data_struct_info* a_struct_info)
 {
     int ok;
 
@@ -60,9 +59,9 @@ Bool_t R3BBunchedFiberSPMTTrigReader::Read()
     auto numChannels = data->FIB_TRIGSLF;
     for (uint32_t i = 0; i < numChannels; i++)
     {
-      uint32_t channel = data->FIB_TRIGSLFI[i];
-      new ((*fMappedArray)[fMappedArray->GetEntriesFast()])
-        R3BBunchedFiberMappedData(3, channel, true, data->FIB_TRIGSLCv[i], data->FIB_TRIGSLFv[i]);
+        uint32_t channel = data->FIB_TRIGSLFI[i];
+        new ((*fMappedArray)[fMappedArray->GetEntriesFast()])
+            R3BBunchedFiberMappedData(3, channel, true, data->FIB_TRIGSLCv[i], data->FIB_TRIGSLFv[i]);
     }
 
     return kTRUE;

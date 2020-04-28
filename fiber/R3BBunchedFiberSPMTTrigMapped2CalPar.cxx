@@ -20,10 +20,9 @@
 #include "TClonesArray.h"
 #include <cassert>
 
-R3BBunchedFiberSPMTTrigMapped2CalPar::R3BBunchedFiberSPMTTrigMapped2CalPar(
-    Int_t a_verbose,
-    Int_t a_update_rate,
-    Int_t a_min_stats)
+R3BBunchedFiberSPMTTrigMapped2CalPar::R3BBunchedFiberSPMTTrigMapped2CalPar(Int_t a_verbose,
+                                                                           Int_t a_update_rate,
+                                                                           Int_t a_min_stats)
     : FairTask("R3BBunchedFiberSMPTTrigMapped2CalPar", a_verbose)
     , fUpdateRate(a_update_rate)
     , fMinStats(a_min_stats)
@@ -52,13 +51,13 @@ InitStatus R3BBunchedFiberSPMTTrigMapped2CalPar::Init()
 
     // container needs to be created in tcal/R3BTCalContFact.cxx AND R3BTCal needs
     // to be set as dependency in CMakeLists.txt in the detector directory.
-    auto name =  "BunchedFiberSPMTTrigTCalPar";
+    auto name = "BunchedFiberSPMTTrigTCalPar";
     fTCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name);
     if (!fTCalPar)
     {
-      LOG(ERROR) << "Could not get " << name << '.';
-      abort();
-      return kFATAL;
+        LOG(ERROR) << "Could not get " << name << '.';
+        abort();
+        return kFATAL;
     }
     fTCalPar->setChanged();
     fEngine = new R3BTCalEngine(fTCalPar, fMinStats);

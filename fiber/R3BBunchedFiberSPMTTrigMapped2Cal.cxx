@@ -33,10 +33,7 @@ R3BBunchedFiberSPMTTrigMapped2Cal::R3BBunchedFiberSPMTTrigMapped2Cal(Int_t a_ver
 {
 }
 
-R3BBunchedFiberSPMTTrigMapped2Cal::~R3BBunchedFiberSPMTTrigMapped2Cal()
-{
-    delete fCalItems;
-}
+R3BBunchedFiberSPMTTrigMapped2Cal::~R3BBunchedFiberSPMTTrigMapped2Cal() { delete fCalItems; }
 
 InitStatus R3BBunchedFiberSPMTTrigMapped2Cal::Init()
 {
@@ -70,12 +67,12 @@ InitStatus R3BBunchedFiberSPMTTrigMapped2Cal::Init()
 
 void R3BBunchedFiberSPMTTrigMapped2Cal::SetParContainers()
 {
-  auto name = "BunchedFiberSPMTTrigTCalPar";
-  fTCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name);
-  if (!fTCalPar)
-  {
-    LOG(ERROR) << "Could not get access to " << name << " container.";
-  }
+    auto name = "BunchedFiberSPMTTrigTCalPar";
+    fTCalPar = (R3BTCalPar*)FairRuntimeDb::instance()->getContainer(name);
+    if (!fTCalPar)
+    {
+        LOG(ERROR) << "Could not get access to " << name << " container.";
+    }
 }
 
 InitStatus R3BBunchedFiberSPMTTrigMapped2Cal::ReInit()
@@ -92,7 +89,7 @@ void R3BBunchedFiberSPMTTrigMapped2Cal::Exec(Option_t* option)
     {
         auto mapped = (R3BBunchedFiberMappedData*)fMappedItems->At(i);
         auto channel = mapped->GetChannel();
-        auto par = (R3BTCalModulePar *)fTCalPar->GetModuleParAt(1, channel, 1);
+        auto par = (R3BTCalModulePar*)fTCalPar->GetModuleParAt(1, channel, 1);
         if (!par)
         {
             LOG(WARNING) << "R3BBunchedFiberSPMTTrigMapped2Cal::Exec (" << fName << "): Channel=" << channel
@@ -112,9 +109,9 @@ void R3BBunchedFiberSPMTTrigMapped2Cal::Exec(Option_t* option)
 
         if (fine_ns < 0. || fine_ns >= 5)
         {
-          LOG(ERROR) << "R3BBunchedFiberSPMTTrigMapped2Cal::Exec (" << fName << "): Channel=" << channel
-            << ": Bad Tamex fine time (raw=" << fine_raw << ",ns=" << fine_ns << ").";
-          continue;
+            LOG(ERROR) << "R3BBunchedFiberSPMTTrigMapped2Cal::Exec (" << fName << "): Channel=" << channel
+                       << ": Bad Tamex fine time (raw=" << fine_raw << ",ns=" << fine_ns << ").";
+            continue;
         }
 
         // Calculate final time with clock cycles.
@@ -125,14 +122,11 @@ void R3BBunchedFiberSPMTTrigMapped2Cal::Exec(Option_t* option)
 
         LOG(DEBUG) << " R3BBunchedFiberSPMTTrigMapped2Cal::Exec:Channel=" << channel << ": Time=" << time_ns << "ns.";
         new ((*fCalItems)[fCalItems->GetEntriesFast()])
-          R3BBunchedFiberCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
+            R3BBunchedFiberCalData(mapped->GetSide(), channel, mapped->IsLeading(), time_ns);
     }
 }
 
-void R3BBunchedFiberSPMTTrigMapped2Cal::FinishEvent()
-{
-    fCalItems->Clear();
-}
+void R3BBunchedFiberSPMTTrigMapped2Cal::FinishEvent() { fCalItems->Clear(); }
 
 void R3BBunchedFiberSPMTTrigMapped2Cal::FinishTask() {}
 
