@@ -161,6 +161,7 @@ void R3BCalifaDigitizer::Exec(Option_t* option)
         if (temp < fThreshold)
         {
             fCalifaCryCalDataCA->RemoveAt(i); // remove from CalData those below threshold
+            nCrystalCals--;
             continue;
         }
         if (fResolution > 0)
