@@ -97,7 +97,13 @@ Bool_t R3BUcesbSource::InitUnpackers()
     }
 
     /* Setup client */
+#ifdef EXT_DATA_ITEM_MAP_MATCH
+    /* this is the version for ucesb setup with extended mapping info */
+    uint32_t struct_map_success = 0;
+    Bool_t status = fClient.setup(NULL, 0, &fStructInfo, &struct_map_success, fEventSize);
+#else
     Bool_t status = fClient.setup(NULL, 0, &fStructInfo, fEventSize);
+#endif
     if (status != 0)
     {
         perror("ext_data_clnt::setup()");
@@ -105,6 +111,22 @@ Bool_t R3BUcesbSource::InitUnpackers()
         LOG(fatal) << "ucesb: %s" << fClient.last_error();
         return kFALSE;
     }
+#ifdef EXT_DATA_ITEM_MAP_MATCH
+    /*
+     * It is not needed, that *all* items are matched.
+     * However, mapping should fail, if items are requested that don't exist
+     * on the server, or if items are requested with wrong parameters.
+     * See ucesb/hbook/ext_data_client.h for more information.
+     */
+    uint32_t map_ok = EXT_DATA_ITEM_MAP_OK | EXT_DATA_ITEM_MAP_NO_DEST;
+    if (struct_map_success & ~(map_ok))
+    {
+        perror("ext_data_clnt::setup()");
+        LOG(error) << "ext_data_clnt::setup() failed";
+        ext_data_struct_info_print_map_success(fStructInfo, stderr, map_ok);
+        return kFALSE;
+    }
+#endif
 
     return kTRUE;
 }
