@@ -50,6 +50,7 @@ set(SRCS
     R3BBackTrackingStorageState.cxx
     R3BAsciiGenerator.cxx
     R3BCosmicGenerator.cxx
+    R3BCryAsciiGenerator.cxx
     R3Bp2pGenerator.cxx
     R3BLandGenerator.cxx
     R3BCALIFATestGenerator.cxx

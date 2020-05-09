@@ -272,11 +272,11 @@ void R3BAmsMapped2StripCal::Exec(Option_t* option)
                     nbadc++;
                 }
         */
-        energy = mappedData[i]->GetEnergy() - pedestal; //-SynAdcs[nbadc];
+        energy = mappedData[i]->GetEnergy() - pedestal - fTimesSigma * sigma; //-SynAdcs[nbadc];
 
         // We accept the hit if the energy is larger than 5 times the sigma of the pedestal
         // and the strip is not dead
-        if (energy > fTimesSigma * sigma && pedestal != -1)
+        if (energy > 0. && pedestal != -1)
         {
             AddCalData(detId, sideId, stripId, energy);
         }
