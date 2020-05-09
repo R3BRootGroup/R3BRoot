@@ -272,6 +272,34 @@ void R3BAmsStripCal2Hit::Exec(Option_t* option)
                             (clusterS[mul][1] - fScen) * TMath::Sin(fMap_Par->GetAngleTheta(i + 1) * TMath::DegToRad());
                     }
                 }
+                else if (fMap_Par->GetGeometry() == 202011)
+                {
+
+                    if (i == 0 || i == 4)
+                    {
+                        x = 1.0 * clusterS[mul][1] - fScen;
+                        y = 1.0 * clusterK[mul][1] - fKcen;
+                        z = fMap_Par->GetDist2target(i + 1);
+                    }
+                    else if (i == 1 || i == 2)
+                    {
+                        x = -1. * (1.0 * clusterS[mul][1] - fScen);
+                        y = -1. * (1.0 * clusterK[mul][1] - fKcen);
+                        z = fMap_Par->GetDist2target(i + 1);
+                    }
+                    else if (i == 3)
+                    {
+                        x = -1. * (1.0 * clusterS[mul][1] - fScen);
+                        y = (1.0 * clusterK[mul][1] - fKcen);
+                        z = fMap_Par->GetDist2target(i + 1);
+                    }
+                    else
+                    {
+                        x = 1.0 * clusterS[mul][1] - fScen;
+                        y = -1. * (1.0 * clusterK[mul][1] - fKcen);
+                        z = fMap_Par->GetDist2target(i + 1);
+                    }
+                }
 
                 TVector3 master(x, y, z);
                 AddHitData(i,

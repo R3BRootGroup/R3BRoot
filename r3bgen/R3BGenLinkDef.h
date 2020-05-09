@@ -31,6 +31,7 @@
 #pragma link C++ class  R3BLandGenerator+;
 #pragma link C++ class  R3BCALIFATestGenerator+;
 #pragma link C++ class  R3BCosmicGenerator+;
+#pragma link C++ class  R3BCryAsciiGenerator+;
 #pragma link C++ class  R3Bp2pGenerator+;
 #pragma link C++ class  R3BParticleGenerator+;
 #pragma link C++ class  R3BIonGenerator+;
