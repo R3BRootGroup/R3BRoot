@@ -154,8 +154,6 @@ class R3BTofdCal2HitS454 : public FairTask
     TClonesArray* fCalItems;    /**< Array with Cal items - input data. */
     TClonesArray* fCalTriggerItems;    /**< Array with trigger Cal items - input data. */
     TClonesArray* fHitItems;    /**< Array with Hit items - output data. */
-    TClonesArray* fCalItemsLos; /**< Array with cal items. */
-    TClonesArray* fHitItemsLos; /**< Array with cal items. */
     UInt_t fNofHitItems;        /**< Number of hit items for cur event. */
     R3BTofdHitPar* fHitPar;     /**< Hit parameter container. */
     UInt_t fNofHitPars;         /**< Number of modules in parameter file. */
@@ -170,34 +168,26 @@ class R3BTofdCal2HitS454 : public FairTask
     UInt_t fNofPlanes;
     UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */
     UInt_t maxevent;
-    UInt_t countloshit;
     UInt_t wrongtrigger;
     UInt_t wrongtpat;
     UInt_t headertpat;
     UInt_t events_in_cal_level;
     UInt_t inbarcoincidence;
-    UInt_t countreset;
-    UInt_t hitsbeforereset;
     UInt_t eventstore;
     UInt_t singlehit;
     UInt_t multihit;
     UInt_t bars_with_multihit;
     UInt_t events_wo_tofd_hits;
-
+    
     // arrays of control histograms
     TH2F* fhQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
-    //TH2F* fhQvsTof[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
-    //TH2F* fhTvsTof[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
-    //TH2F* fhToTvsTofw[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    //TH2F* fhQvsTHit[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    //TH2F* fhTvsTHit[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhQ[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhxy[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhQvsEvent[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhTdiff[N_TOFD_HIT_PLANE_MAX];
-    //TH2F* fhTof[N_TOFD_HIT_PLANE_MAX];
-    //TH2F* fhTsync[N_TOFD_HIT_PLANE_MAX];
-    TH2F* fhChargeLosTofD;
-    TH2F* fhLosXYP;
-    TH2F* fh_los_pos;
+    TH2F* fhTsync[N_TOFD_HIT_PLANE_MAX];
 
   public:
     ClassDef(R3BTofdCal2HitS454, 1)

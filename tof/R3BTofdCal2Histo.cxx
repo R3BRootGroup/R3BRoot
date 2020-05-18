@@ -16,9 +16,8 @@
 // ----------------------------------------------------------
 #include "R3BTofdCal2Histo.h"
 #include "R3BEventHeader.h"
-#include "R3BLosCalData.h"
-#include "R3BLosMappedData.h"
 #include "R3BTofdCalData.h"
+#include "R3BTofdHitModulePar.h"
 #include "R3BTofdHitPar.h"
 
 #include "FairLogger.h"
@@ -42,6 +41,8 @@
 #include <iostream>
 #include <stdlib.h>
 
+#include "mapping_tofd_trig.hh"
+
 #define IS_NAN(x) TMath::IsNaN(x)
 using namespace std;
 
@@ -53,7 +54,7 @@ namespace
 
 R3BTofdCal2Histo::R3BTofdCal2Histo()
     : FairTask("R3BTofdCal2Histo", 1)
-    , fCalItemsLos(NULL)
+    , fCalTriggerItems(NULL)
     , fUpdateRate(1000000)
     , fMinStats(100000)
     , fTrigger(-1)
@@ -65,7 +66,6 @@ R3BTofdCal2Histo::R3BTofdCal2Histo()
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fTofdY(0.)
     , fTofdQ(0.)
-    , fwalk(false)
     , fTofdSmiley(true)
     , fTofdZ(false)
     , fParaFile("")
@@ -80,7 +80,6 @@ R3BTofdCal2Histo::R3BTofdCal2Histo()
             fhLogTot1vsLogTot2[i][j] = NULL;
             fhSqrtQvsPosToT[i][j] = NULL;
             fhQvsPos[i][j] = NULL;
-            fhToTvsTofw[i][j] = NULL;
             if (!fTofdSmiley)
                 fhTot1vsPos[i][j] = NULL;
             if (!fTofdSmiley)
@@ -92,7 +91,7 @@ R3BTofdCal2Histo::R3BTofdCal2Histo()
 
 R3BTofdCal2Histo::R3BTofdCal2Histo(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fCalItemsLos(NULL)
+    , fCalTriggerItems(NULL)
     , fUpdateRate(1000000)
     , fMinStats(100000)
     , fTrigger(-1)
@@ -104,7 +103,6 @@ R3BTofdCal2Histo::R3BTofdCal2Histo(const char* name, Int_t iVerbose)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fTofdY(0.)
     , fTofdQ(0.)
-    , fwalk(false)
     , fTofdSmiley(true)
     , fTofdZ(false)
     , fParaFile("")
@@ -120,7 +118,6 @@ R3BTofdCal2Histo::R3BTofdCal2Histo(const char* name, Int_t iVerbose)
             fhLogTot1vsLogTot2[i][j] = NULL;
             fhSqrtQvsPosToT[i][j] = NULL;
             fhQvsPos[i][j] = NULL;
-            fhToTvsTofw[i][j] = NULL;
             if (!fTofdSmiley)
                 fhTot1vsPos[i][j] = NULL;
             if (!fTofdSmiley)
@@ -148,8 +145,6 @@ R3BTofdCal2Histo::~R3BTofdCal2Histo()
                 delete fhSqrtQvsPosToT[i][j];
             if (fhQvsPos[i][j])
                 delete fhQvsPos[i][j];
-            if (fhToTvsTofw[i][j])
-                delete fhToTvsTofw[i][j];
             if (fhTot1vsPos[i][j])
                 delete fhTot1vsPos[i][j];
             if (fhTot2vsPos[i][j])
@@ -178,11 +173,14 @@ InitStatus R3BTofdCal2Histo::Init()
     // may be = NULL!
 
     fCalData = (TClonesArray*)rm->GetObject("TofdCal");
-    if (!fCalData)
+    if (NULL == fCalData)
     {
-        return kFATAL;
         LOG(fatal) << "Branch TofdCal not found";
     }
+    fCalTriggerItems = (TClonesArray*)rm->GetObject("TofdTriggerCal");
+    if (NULL == fCalTriggerItems)
+        LOG(fatal) << "Branch TofdTriggerCal not found";
+
     maxevent = rm->CheckMaxEventNo();
 
     if (!fNofModules)
@@ -190,9 +188,9 @@ InitStatus R3BTofdCal2Histo::Init()
         LOG(ERROR) << "R3BTofdCal2Histo::Init() Number of modules not set. ";
         return kFATAL;
     }
-    fCalItemsLos = (TClonesArray*)rm->GetObject("LosCal");
-    if (NULL == fCalItemsLos)
-        LOG(ERROR) << "Branch LosCal not found";
+
+    tofd_trig_map_setup();
+
     return kSUCCESS;
 }
 
@@ -207,6 +205,11 @@ void R3BTofdCal2Histo::SetParContainers()
     }
     //    fCal_Par->setChanged();
 }
+
+namespace
+{
+    uint64_t n1, n2;
+};
 
 void R3BTofdCal2Histo::Exec(Option_t* option)
 {
@@ -226,45 +229,6 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
         Int_t tpatvalue = (itpat & (1 << fTpat_bit)) >> fTpat_bit;
         if ((header) && (tpatvalue == 0))
             return;
-    }
-
-    Double_t timeLos = 0.;
-    Double_t time_r_V = 0.;
-    Double_t time_t_V = 0.;
-    Double_t time_l_V = 0.;
-    Double_t time_b_V = 0.;
-    Double_t time_rt_V = 0.;
-    Double_t time_lt_V = 0.;
-    Double_t time_lb_V = 0.;
-    Double_t time_rb_V = 0.;
-
-    // Los detector
-    if (fCalItemsLos)
-    {
-        Int_t nHits = fCalItemsLos->GetEntriesFast();
-        for (Int_t ihit = 0; ihit < nHits; ihit++)
-        {
-            R3BLosCalData* calData = (R3BLosCalData*)fCalItemsLos->At(ihit);
-            Int_t iDet = calData->GetDetector();
-            // Int_t iCha=calData->GetChannel();
-            if (!(IS_NAN(calData->GetTimeV_ns(5))))
-                time_r_V = calData->GetTimeV_ns(5);
-            if (!(IS_NAN(calData->GetTimeV_ns(7))))
-                time_t_V = calData->GetTimeV_ns(7);
-            if (!(IS_NAN(calData->GetTimeV_ns(1))))
-                time_l_V = calData->GetTimeV_ns(1);
-            if (!(IS_NAN(calData->GetTimeV_ns(3))))
-                time_b_V = calData->GetTimeV_ns(3);
-            if (!(IS_NAN(calData->GetTimeV_ns(6))))
-                time_rt_V = calData->GetTimeV_ns(6);
-            if (!(IS_NAN(calData->GetTimeV_ns(0))))
-                time_lt_V = calData->GetTimeV_ns(0);
-            if (!(IS_NAN(calData->GetTimeV_ns(2))))
-                time_lb_V = calData->GetTimeV_ns(2);
-            if (!(IS_NAN(calData->GetTimeV_ns(4))))
-                time_rb_V = calData->GetTimeV_ns(4);
-        }
-        timeLos = (time_r_V + time_t_V + time_l_V + time_b_V + time_rt_V + time_lt_V + time_lb_V + time_rb_V) / 8.;
     }
 
     // ToFD detector
@@ -287,6 +251,9 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
         auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;
         vec.push_back(hit);
     }
+
+    static bool s_was_trig_missing = false;
+    auto trig_num = fCalTriggerItems->GetEntries();
     // Find coincident PMT hits.
     // std::cout << "Print:\n";
     for (auto it = bar_map.begin(); bar_map.end() != it; ++it)
@@ -307,8 +274,48 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
         {
             auto top = top_vec.at(top_i);
             auto bot = bot_vec.at(bot_i);
-            auto top_ns = top->GetTimeLeading_ns();
-            auto bot_ns = bot->GetTimeLeading_ns();
+            auto top_trig_i = g_tofd_trig_map[top->GetDetectorId() - 1][top->GetSideId() - 1][top->GetBarId() - 1];
+            auto bot_trig_i = g_tofd_trig_map[bot->GetDetectorId() - 1][bot->GetSideId() - 1][bot->GetBarId() - 1];
+            Double_t top_trig_ns = 0, bot_trig_ns = 0;
+            if (top_trig_i < trig_num && bot_trig_i < trig_num)
+            {
+                auto top_trig = (R3BTofdCalData const*)fCalTriggerItems->At(top_trig_i);
+                auto bot_trig = (R3BTofdCalData const*)fCalTriggerItems->At(bot_trig_i);
+                top_trig_ns = top_trig->GetTimeLeading_ns();
+                bot_trig_ns = bot_trig->GetTimeLeading_ns();
+                /*
+                                std::cout << "Top: " << top->GetDetectorId() << ' ' << top->GetSideId() << ' ' <<
+                   top->GetBarId() << ' '
+                                << top_trig_i << ' ' << top_trig->GetTimeLeading_ns() << std::endl;
+                                std::cout << "Bot: " <<
+                                bot->GetDetectorId() << ' ' << bot->GetSideId() << ' ' << bot->GetBarId() << ' ' <<
+                   bot_trig_i << ' '
+                                << bot_trig->GetTimeLeading_ns() << std::endl;
+                */
+                ++n1;
+            }
+            else
+            {
+                if (!s_was_trig_missing)
+                {
+                    LOG(ERROR) << "R3BTofdCal2HitS454Par::Exec() : Missing trigger information!";
+                    s_was_trig_missing = true;
+                }
+                ++n2;
+            }
+
+            // Shift the cyclic difference window by half a window-length and move it back,
+            // this way the trigger time will be at 0.
+            auto top_ns =
+                fmod(top->GetTimeLeading_ns() - top_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) - c_range_ns / 2;
+            auto bot_ns =
+                fmod(bot->GetTimeLeading_ns() - bot_trig_ns + c_range_ns + c_range_ns / 2, c_range_ns) - c_range_ns / 2;
+            /*
+                        if(top_ns>2000 || bot_ns>2000){
+                            std::cout << top->GetTimeLeading_ns() << ' ' << top_trig_ns << ' ' << top_ns << std::endl;
+                            std::cout << bot->GetTimeLeading_ns() << ' ' << bot_trig_ns << ' ' << bot_ns << std::endl;
+                        }
+            */
             auto dt = top_ns - bot_ns;
             // Handle wrap-around.
             auto dt_mod = fmod(dt + c_range_ns, c_range_ns);
@@ -365,38 +372,27 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                     fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
 
                     // offset histo via ToT
-                    auto posToT = TMath::Log(top_tot / bot_tot);
+                    auto posToT = 0.;
+                    if (fTofdY == 0.)
+                        posToT = TMath::Log(top_tot / bot_tot);
+                    else
+                    {
+                        R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(iPlane, iBar);
+                        if (!par)
+                        {
+                            LOG(ERROR) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                                       << ", Bar: " << top->GetBarId();
+                            continue;
+                        }
+                        posToT = log((top_tot + par->GetToTOffset2()) / (bot_tot + par->GetToTOffset1()));
+                    }
                     fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->Fill(posToT, sqrt(top_tot * bot_tot));
                     // fhTot1vsPos[iPlane - 1][iBar - 1]->Fill(posToT, bot_tot);
                     // fhTot2vsPos[iPlane - 1][iBar - 1]->Fill(posToT, top_tot);
 
-                    // ToF
-                    auto ToF = (top_ns + bot_ns) / 2 - timeLos;
-                    while (ToF < -c_range_ns / 2)
-                        ToF += c_range_ns;
-                    while (ToF > c_range_ns / 2)
-                        ToF -= c_range_ns;
-                    fhTsync[iPlane - 1]->Fill(iBar, ToF);
-
-                    // prepare histo for walk correction
-                    if (fwalk)
-                    {
-                        // get sync parameter
-                        R3BTofdHitModulePar* para = fCal_Par->GetModuleParAt(iPlane, iBar);
-                        if (!para)
-                        {
-                            LOG(INFO) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
-                                      << ", Bar: " << top->GetBarId();
-                            continue;
-                        }
-                        ToF = (bot_ns + top_ns) / 2. - timeLos - para->GetSync();
-                        while (ToF < -c_range_ns / 2)
-                            ToF += c_range_ns;
-                        while (ToF > c_range_ns / 2)
-                            ToF -= c_range_ns;
-                    }
-                    fhToTvsTofw[iPlane - 1][iBar - 1]->Fill((bot_tot + top_tot) / 2.,
-                                                            ToF); // histo for walk correction
+                    // Time of hit
+                    auto THit = (top_ns + bot_ns) / 2.;
+                    fhTsync[iPlane - 1]->Fill(iBar, THit);
                 }
                 else
                 {
@@ -404,8 +400,8 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                     R3BTofdHitModulePar* para = fCal_Par->GetModuleParAt(iPlane, iBar);
                     if (!para)
                     {
-                        LOG(INFO) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
-                                  << ", Bar: " << top->GetBarId();
+                        LOG(ERROR) << "R3BTofdCal2Hit::Exec : Hit par not found, Plane: " << top->GetDetectorId()
+                                   << ", Bar: " << top->GetBarId();
                         continue;
                     }
 
@@ -429,10 +425,8 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                                            para->GetPar4Walk(),
                                            para->GetPar5Walk());
 
-                    // auto posToT =
-                    //    para->GetLambda() * log((top_tot + para->GetToTOffset2()) / (bot_tot +
-                    //    para->GetToTOffset1()));
-                    auto posToT = log((top_tot + para->GetToTOffset2()) / (bot_tot + para->GetToTOffset1()));
+                    auto posToT =
+                        para->GetLambda() * log((top_tot + para->GetToTOffset2()) / (bot_tot + para->GetToTOffset1()));
 
                     // create histograms
                     CreateHistograms(iPlane, iBar);
@@ -444,18 +438,11 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
                     // Time differences of one paddle
                     fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
 
-                    // calculate time-of-flight
-                    auto ToF = (bot_ns + top_ns) / 2. - timeLos - para->GetSync();
-                    while (ToF < -c_range_ns / 2)
-                        ToF += c_range_ns;
-                    while (ToF > c_range_ns / 2)
-                        ToF -= c_range_ns;
+                    // Time of hit
+                    auto THit = (bot_ns + top_ns) / 2. - para->GetSync();
 
                     // Sync of one plane
-                    fhTsync[iPlane - 1]->Fill(iBar, ToF);
-
-                    // control histogram for corrected walk
-                    fhToTvsTofw[iPlane - 1][iBar - 1]->Fill((bot_tot + top_tot) / 2., ToF);
+                    fhTsync[iPlane - 1]->Fill(iBar, THit);
                 }
 
                 // prepare double exponential fit
@@ -596,9 +583,9 @@ void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
         char strName2[255];
         sprintf(strName, "Time_Sync_Plane_%d", iPlane);
         sprintf(strName2, "Time Sync Plane %d", iPlane);
-        fhTsync[iPlane - 1] = new TH2F(strName, strName2, 50, 0, 50, 10000, -10, 90.);
+        fhTsync[iPlane - 1] = new TH2F(strName, strName2, 50, 0, 50, 10000, -2000, 2000.);
         fhTsync[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
-        fhTsync[iPlane - 1]->GetYaxis()->SetTitle("ToF in ns");
+        fhTsync[iPlane - 1]->GetYaxis()->SetTitle("THit in ns");
     }
     if (NULL == fh_tofd_TotPm[iPlane - 1])
     {
@@ -623,17 +610,9 @@ void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
         char strName[255];
         sprintf(strName, "SqrtQ_vs_PosToT_Plane_%d_Bar_%d", iPlane, iBar);
         fhSqrtQvsPosToT[iPlane - 1][iBar - 1] =
-            new TH2F(strName, "", 2000, -2, 2, max_charge * 4, 0., max_charge * 4); // 20000 -100 100
+            new TH2F(strName, "", 20000, -100, 100, max_charge * 4, 0., max_charge * 4);
         fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("sqrt(PM1*PM2)");
         fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position from ToT in cm");
-    }
-    if (NULL == fhToTvsTofw[iPlane - 1][iBar - 1])
-    {
-        char strName[255];
-        sprintf(strName, "Q_vs_ToF_Plane_%d_Bar_%d_w", iPlane, iBar);
-        fhToTvsTofw[iPlane - 1][iBar - 1] = new TH2F(strName, "", 1000, 0., 200, 1000, -10, 40);
-        fhToTvsTofw[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToT in ns");
-        fhToTvsTofw[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToF in ns");
     }
     if (NULL == fhQvsPos[iPlane - 1][iBar - 1])
     {
@@ -655,13 +634,7 @@ void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
     */
 }
 
-void R3BTofdCal2Histo::FinishEvent()
-{
-    if (fCalItemsLos)
-    {
-        fCalItemsLos->Clear();
-    }
-}
+void R3BTofdCal2Histo::FinishEvent() {}
 
 void R3BTofdCal2Histo::FinishTask()
 {
@@ -679,8 +652,6 @@ void R3BTofdCal2Histo::FinishTask()
                 fhLogTot1vsLogTot2[i][j]->Write(); // control histogram Log(ToT) Pm1 vs Log(ToT) Pm2
             if (fhSqrtQvsPosToT[i][j])
                 fhSqrtQvsPosToT[i][j]->Write(); // histogram for ToT offset calculation
-            if (fhToTvsTofw[i][j])
-                fhToTvsTofw[i][j]->Write(); // histogram for walk fit
             if (fhQvsPos[i][j])
                 fhQvsPos[i][j]->Write(); // histogram for charge fit
             if (!fTofdSmiley)

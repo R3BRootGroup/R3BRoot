@@ -18,8 +18,6 @@
 
 #include "R3BTofdCal2HitS454.h"
 #include "R3BEventHeader.h"
-#include "R3BLosCalData.h"
-#include "R3BLosHitData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTofdCalData.h"
 #include "R3BTofdHitData.h"
@@ -40,7 +38,13 @@
 #include <sstream>
 #include <string>
 
-#include "mapping_tofd_trig.hh"
+// This header is included in several places, and would re-define the mapping
+// table every time -> linker nor happy.
+// So do some forward declaration for now, and keep the include in just one
+// place, for now R3BTofdCal2Histo.cxx.
+//#include "mapping_tofd_trig.hh"
+extern unsigned g_tofd_trig_map[4][2][48];
+void tofd_trig_map_setup();
 
 using namespace std;
 #define IS_NAN(x) TMath::IsNaN(x)
@@ -58,8 +62,6 @@ R3BTofdCal2HitS454::R3BTofdCal2HitS454()
     : FairTask("TofdCal2Hit", 1)
     , fCalItems(NULL)
     , fCalTriggerItems(NULL)
-    , fCalItemsLos(NULL)
-    , fHitItemsLos(NULL)
     , fHitItems(new TClonesArray("R3BTofdHitData"))
     , fNofHitItems(0)
     , fNofHitPars(0)
@@ -74,23 +76,17 @@ R3BTofdCal2HitS454::R3BTofdCal2HitS454()
     , fnEvents(0)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , maxevent(0)
-    , countloshit(0)
     , wrongtrigger(0)
     , wrongtpat(0)
     , headertpat(0)
     , events_in_cal_level(0)
     , inbarcoincidence(0)
-    , countreset(0)
-    , hitsbeforereset(0)
     , eventstore(0)
     , singlehit(0)
     , multihit(0)
     , bars_with_multihit(0)
     , events_wo_tofd_hits(0)
 {
-    fhLosXYP = NULL;
-    fhChargeLosTofD = NULL;
-    fh_los_pos = NULL;
     if (fTofdHisto)
     {
         for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
@@ -99,14 +95,12 @@ R3BTofdCal2HitS454::R3BTofdCal2HitS454()
             fhxy[i] = NULL;
             fhQvsEvent[i] = NULL;
             fhTdiff[i] = NULL;
-            // fhTsync[i] = NULL;
-            // fhTof[i] = NULL;
+            fhTsync[i] = NULL;
             for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
             {
                 fhQvsPos[i][j] = NULL;
-                // fhQvsTof[i][j] = NULL;
-                // fhTvsTof[i][j] = NULL;
-                // fhToTvsTofw[i][j] = NULL;
+                // fhQvsTHit[i][j] = NULL;
+                // fhTvsTHit[i][j] = NULL;
             }
         }
     }
@@ -116,8 +110,6 @@ R3BTofdCal2HitS454::R3BTofdCal2HitS454(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fCalItems(NULL)
     , fCalTriggerItems(NULL)
-    , fCalItemsLos(NULL)
-    , fHitItemsLos(NULL)
     , fHitItems(new TClonesArray("R3BTofdHitData"))
     , fNofHitItems(0)
     , fNofHitPars(0)
@@ -132,23 +124,17 @@ R3BTofdCal2HitS454::R3BTofdCal2HitS454(const char* name, Int_t iVerbose)
     , fnEvents(0)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , maxevent(0)
-    , countloshit(0)
     , wrongtrigger(0)
     , wrongtpat(0)
     , headertpat(0)
     , events_in_cal_level(0)
     , inbarcoincidence(0)
-    , countreset(0)
-    , hitsbeforereset(0)
     , eventstore(0)
     , singlehit(0)
     , multihit(0)
     , bars_with_multihit(0)
     , events_wo_tofd_hits(0)
 {
-    fhLosXYP = NULL;
-    fhChargeLosTofD = NULL;
-    fh_los_pos = NULL;
     if (fTofdHisto)
     {
         for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
@@ -157,14 +143,12 @@ R3BTofdCal2HitS454::R3BTofdCal2HitS454(const char* name, Int_t iVerbose)
             fhxy[i] = NULL;
             fhQvsEvent[i] = NULL;
             fhTdiff[i] = NULL;
-            // fhTsync[i] = NULL;
-            // fhTof[i] = NULL;
+            fhTsync[i] = NULL;
             for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
             {
                 fhQvsPos[i][j] = NULL;
-                // fhQvsTof[i][j] = NULL;
-                // fhTvsTof[i][j] = NULL;
-                // fhToTvsTofw[i][j] = NULL;
+                // fhQvsTHit[i][j] = NULL;
+                // fhTvsTHit[i][j] = NULL;
             }
         }
     }
@@ -172,12 +156,6 @@ R3BTofdCal2HitS454::R3BTofdCal2HitS454(const char* name, Int_t iVerbose)
 
 R3BTofdCal2HitS454::~R3BTofdCal2HitS454()
 {
-    if (fhLosXYP)
-        delete fhLosXYP;
-    if (fhChargeLosTofD)
-        delete fhChargeLosTofD;
-    if (fh_los_pos)
-        delete fh_los_pos;
     if (fTofdHisto)
     {
         for (Int_t i = 0; i < fNofPlanes; i++)
@@ -190,23 +168,19 @@ R3BTofdCal2HitS454::~R3BTofdCal2HitS454()
                 delete fhQvsEvent[i];
             if (fhTdiff[i])
                 delete fhTdiff[i];
-            // if (fhTsync[i]) delete fhTsync[i];
-            // if (fhTof[i]) delete fhTof[i];
+            if (fhTsync[i])
+                delete fhTsync[i];
             for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
             {
                 if (fhQvsPos[i][j])
                     delete fhQvsPos[i][j];
                 /*
-                if (fhQvsTof[i][j])
-                    delete fhQvsTof[i][j];
+                if (fhQvsTHit[i][j])
+                    delete fhQvsTHit[i][j];
                 */
                 /*
-                if (fhTvsTof[i][j])
-                    delete fhTvsTof[i][j];
-                */
-                /*
-                if (fhToTvsTofw[i][j])
-                    delete fhToTvsTofw[i][j];
+                if (fhTvsTHit[i][j])
+                    delete fhTvsTHit[i][j];
                 */
             }
         }
@@ -233,6 +207,7 @@ InitStatus R3BTofdCal2HitS454::Init()
         LOG(ERROR) << "There are no Hit parameters in container TofdHitPar";
         return kFATAL;
     }
+
     // get access to Cal data
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
@@ -245,12 +220,7 @@ InitStatus R3BTofdCal2HitS454::Init()
     if (NULL == fCalTriggerItems)
         LOG(fatal) << "Branch TofdTriggerCal not found";
     maxevent = mgr->CheckMaxEventNo();
-    fCalItemsLos = (TClonesArray*)mgr->GetObject("LosCal");
-    if (NULL == fCalItemsLos)
-        LOG(WARNING) << "Branch LosCal not found";
-    fHitItemsLos = (TClonesArray*)mgr->GetObject("LosHit");
-    if (NULL == fHitItemsLos)
-        LOG(WARNING) << "Branch LosHit not found";
+
     // request storage of Hit data in output tree
     mgr->Register("TofdHit", "Land", fHitItems, kTRUE);
 
@@ -285,7 +255,7 @@ namespace
 void R3BTofdCal2HitS454::Exec(Option_t* option)
 {
     static uint32_t counter = 0;
-    if (0 == counter % 1000)
+    if (0 == counter % 10000)
         std::cout << "\rEvents: " << counter << " / " << maxevent << " (" << (int)(counter * 100. / maxevent) << " %) "
                   << std::flush;
     ++counter;
@@ -309,16 +279,10 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
         }
     }
     headertpat++;
-    Double_t timeRef = 0.;
-    Double_t timeLos = 0;
     Double_t timeP0 = 0.;
-    Double_t LosTresM = 0;
-    Double_t LosQ = 0;
-    Double_t xLosP = 1000;
-    Double_t yLosP = 1000;
     Double_t randx;
     std::vector<std::vector<std::vector<Double_t>>> q;
-    std::vector<std::vector<std::vector<Double_t>>> tof;
+    std::vector<std::vector<std::vector<Double_t>>> thit;
     std::vector<std::vector<std::vector<Double_t>>> x;
     std::vector<std::vector<std::vector<Double_t>>> y;
     std::vector<std::vector<std::vector<Double_t>>> yToT;
@@ -326,7 +290,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
     for (Int_t i = 0; i <= fNofPlanes; i++)
     {
         q.push_back(std::vector<std::vector<Double_t>>());
-        tof.push_back(std::vector<std::vector<Double_t>>());
+        thit.push_back(std::vector<std::vector<Double_t>>());
         x.push_back(std::vector<std::vector<Double_t>>());
         y.push_back(std::vector<std::vector<Double_t>>());
         yToT.push_back(std::vector<std::vector<Double_t>>());
@@ -334,77 +298,12 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
         {
             vmultihits[i][j] = 0;
             q[i].push_back(std::vector<Double_t>());
-            tof[i].push_back(std::vector<Double_t>());
+            thit[i].push_back(std::vector<Double_t>());
             x[i].push_back(std::vector<Double_t>());
             y[i].push_back(std::vector<Double_t>());
             yToT[i].push_back(std::vector<Double_t>());
         }
     }
-    if (fHitItemsLos)
-    {
-        Int_t nHits = fHitItemsLos->GetEntriesFast();
-        for (Int_t ihit = 0; ihit < nHits; ihit++)
-        {
-            countloshit++;
-            LOG(WARNING) << "LOS Ihit  " << ihit << " " << nHits;
-            R3BLosHitData* hitData = (R3BLosHitData*)fHitItemsLos->At(ihit);
-            if (ihit == 0)
-                timeLos = hitData->fTime_ns;
-            LOG(WARNING) << "LOS Time " << timeLos;
-            if (std::isnan(timeLos))
-                return; /// in s444 run2930 Event 22333208
-            if (NULL == fh_los_pos)
-            {
-                char strName[255];
-                sprintf(strName, "LOS_X_vs_Y_MCFD");
-                //     fh_los_pos = new TH2F(strName, "", 2000, -10., 10., 2000, -10., 10.);
-                fh_los_pos = new TH2F(strName, "", 2000, -10., 10., 2000, -10., 10.);
-            }
-            fh_los_pos->Fill(hitData->fX_cm, hitData->fY_cm);
-
-            if (ihit == 0)
-                LosQ = hitData->fZ;
-            if (NULL == fhChargeLosTofD)
-            {
-                char strName[255];
-                sprintf(strName, "LosQ_vs_TofdQ");
-                fhChargeLosTofD = new TH2F(strName, "", 400, 0., 100., 800, 0., 200.);
-                fhChargeLosTofD->GetYaxis()->SetTitle("Charge LOS");
-                fhChargeLosTofD->GetXaxis()->SetTitle("Charge ToFD");
-            }
-        }
-    }
-    /*
-        if(fCalItemsLos)
-        {
-            Int_t nHits = fCalItemsLos->GetEntriesFast();
-            for (Int_t ihit = 0; ihit < nHits; ihit++)
-            {
-                LOG(WARNING) << "LOS Ihit  "<< ihit<<" "<<nHits<<FairLogger::endl;
-                R3BLosCalData *calData = (R3BLosCalData*)fCalItemsLos->At(ihit);
-                timeLos=(calData->fTimeV_r_ns+calData->fTimeV_l_ns+calData->fTimeV_t_ns+calData->fTimeV_b_ns)/4.;
-                LosTresM=(calData->fTimeV_r_ns+calData->fTimeV_l_ns)/2.-(calData->fTimeV_t_ns+calData->fTimeV_b_ns)/2.;
-                LOG(WARNING) << "LOS MCFD  "<< LosTresM<<" "<<timeLos<<FairLogger::endl;
-                if (NULL == fh_los_pos)
-                {
-                    char strName[255];
-                    sprintf(strName, "LOS_X_vs_Y_MCFD");
-                    //     fh_los_pos = new TH2F(strName, "", 2000, -10., 10., 2000, -10., 10.);
-                    fh_los_pos = new TH2F(strName, "", 2000, -100., 100., 2000, -100., 100.);
-                }
-                fh_los_pos->Fill((calData->fTimeV_r_ns-calData->fTimeV_l_ns+2.15)*5.3,
-                                 (calData->fTimeV_b_ns-calData->fTimeV_t_ns+1.28)*5.2);   // Xe: (2.15,5.3), (1.28,5.2)
-                if (NULL == fhLosTimeM )
-                {
-                    char strName[255];
-                    sprintf(strName, "LOS_Time_Resolution_MCFD");
-                    //     fhLosTimeM = new TH1F(strName, "", 4000, -2., 2.);
-                    fhLosTimeM = new TH1F(strName, "", 4000, -2000., 2000.);
-                }
-                fhLosTimeM->Fill(LosTresM);
-            }
-        }
-    */
 
     //    std::cout<<"new event!*************************************\n";
 
@@ -567,76 +466,16 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                 // calculate tdiff
                 auto tdiff = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2()));
 
-                // calculate time-of-flight
-                if (timeLos == 0)
-                    LOG(WARNING) << "Los Time is zero! ";
-                Double_t ToF = (bot_ns + top_ns) / 2. - timeLos - par->GetSync();
-                if (std::isnan(ToF))
+                // calculate time of hit
+                Double_t THit = (bot_ns + top_ns) / 2. - par->GetSync();
+                if (std::isnan(THit))
                 {
-                    LOG(FATAL) << "ToFD ToF not found";
+                    LOG(FATAL) << "ToFD THit not found";
                 }
                 if (timeP0 == 0.)
-                    timeP0 = ToF;
+                    timeP0 = THit;
 
-                if (timeLos == 0)
-                { // no LOS in s454
-                  /// What to do here:
-                  /// check if all ToF in one event are in a range of 3000ns (readout window) and shift times
-                  /// according to that
-                  ///
-                  ///       this is the first hit
-                  ///       I
-                  /// e.g. 171; 9439; 179; 1117; 175 -->> 171+c_range_ns; 9439; 179+c_range_ns; 1117+c_range_ns;
-                  /// 175+c_range_ns
-                  ///             I
-                  ///             this should be the first hit -> counter resets -> other hits follow
-                    /*
-                                        if (ToF - timeP0 < -3000.)
-                                        {
-                                            ToF += c_range_ns;
-                                        }
-                                        if (ToF - timeP0 > 3000.)
-                                        {
-                                            timeP0 = ToF;
-                                            it = bar_map.begin();
-                                            countreset++;
-                                            hitsbeforereset += nHitsEvent;
-                                            for (Int_t i = 0; i <= fNofPlanes; i++)
-                                            {
-                                                for (Int_t j = 0; j <= N_TOFD_HIT_PADDLE_MAX; j++)
-                                                {
-                                                    tof[i][j].clear();
-                                                    x[i][j].clear();
-                                                    y[i][j].clear();
-                                                    yToT[i][j].clear();
-                                                    q[i][j].clear();
-                                                    vmultihits[i][j] = 0;
-                                                    nHitsEvent = 0;
-                                                }
-                                            }
-                                            LOG(WARNING) << "Found new first hit -> will reset";
-                                            goto reset; /// TODO: how to do without goto?
-                                        }
-                    */
-                }
-
-                if (timeLos != 0)
-                {
-                    LOG(DEBUG) << "Found LOS detector";
-                    LOG(DEBUG) << "check for coincidence range: TOF: " << ToF << " c_range: " << c_range_ns << "\n";
-                    while (ToF < -c_range_ns / 2)
-                    {
-                        ToF += c_range_ns;
-                        LOG(DEBUG) << "Shift up\n";
-                    }
-                    while (ToF > c_range_ns / 2)
-                    {
-                        ToF -= c_range_ns;
-                        LOG(DEBUG) << "Shift down\n";
-                    }
-                }
-
-                tof[iPlane][iBar].push_back(ToF);
+                thit[iPlane][iBar].push_back(THit);
 
                 // calculate y-position
                 auto pos = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
@@ -717,7 +556,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                                << iPlane << " ibar " << iBar;
                 else
                     LOG(DEBUG) << "Charges in this event " << qb << " plane " << iPlane << " ibar " << iBar;
-                LOG(DEBUG) << "Times in this event " << ToF << " plane " << iPlane << " ibar " << iBar;
+                LOG(DEBUG) << "Times in this event " << THit << " plane " << iPlane << " ibar " << iBar;
                 if (iPlane == 1 || iPlane == 3)
                     LOG(DEBUG) << "x in this event "
                                << -detector_width / 2 + (paddle_width + air_gap_paddles) / 2 +
@@ -746,18 +585,12 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                 {
                     // fill control histograms
                     CreateHistograms(iPlane, iBar);
-                    // fhTof[iPlane-1]->Fill(iBar,ToF);
-                    // fhTsync[iPlane-1]->Fill(iBar,ToF);
+                    fhTsync[iPlane - 1]->Fill(iBar, THit);
                     fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
                     fhQvsPos[iPlane - 1][iBar - 1]->Fill(pos, parz[0] * TMath::Power(qb, parz[2]) + parz[1]);
-                    // fhQvsTof[iPlane - 1][iBar - 1]->Fill(qb, ToF);
-                    // fhTvsTof[iPlane - 1][iBar - 1]->Fill(dt_mod, ToF);
-                    // fhToTvsTofw[iPlane - 1][iBar - 1]->Fill((bot_tot + top_tot) / 2., ToF); // for walk correction
+                    // fhQvsTHit[iPlane - 1][iBar - 1]->Fill(qb, THit);
+                    // fhTvsTHit[iPlane - 1][iBar - 1]->Fill(dt_mod, THit);
                 }
-
-                // Time reference in case on has the master signal in one of the TDC channels.
-                // Not used at the moment.
-                timeRef = 0;
 
                 ++top_i;
                 ++bot_i;
@@ -819,16 +652,16 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
     { // loop over planes i
         for (Int_t j = 1; j < fPaddlesPerPlane + 1; j++)
         { // loop over virtual paddles j
-            if (tof[i][j].empty() == false)
+            if (thit[i][j].empty() == false)
             { // check paddle for entries
-                for (Int_t m = 0; m < tof[i][j].size(); m++)
+                for (Int_t m = 0; m < thit[i][j].size(); m++)
                 { // loop over multihits m
                     Int_t p = 0;
                     if (tArrT[0] == -1.)
                     { // first entry
                         LOG(DEBUG) << "First entry plane/bar " << i << "/" << j;
                         tArrQ[0] = q[i][j].at(m);
-                        tArrT[0] = tof[i][j].at(m);
+                        tArrT[0] = thit[i][j].at(m);
                         tArrX[0] = x[i][j].at(m);
                         tArrY[0] = y[i][j].at(m);
                         tArrYT[0] = yToT[i][j].at(m);
@@ -837,11 +670,11 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                     }
                     else
                     {
-                        if (tof[i][j].at(m) < tArrT[0])
+                        if (thit[i][j].at(m) < tArrT[0])
                         { // new first entry with smaller time
                             LOG(DEBUG) << "Insert new first " << i << "/" << j;
                             insertX(nHitsEvent, tArrQ, q[i][j].at(m), 1);
-                            insertX(nHitsEvent, tArrT, tof[i][j].at(m), 1);
+                            insertX(nHitsEvent, tArrT, thit[i][j].at(m), 1);
                             insertX(nHitsEvent, tArrX, x[i][j].at(m), 1);
                             insertX(nHitsEvent, tArrY, y[i][j].at(m), 1);
                             insertX(nHitsEvent, tArrYT, yToT[i][j].at(m), 1);
@@ -850,7 +683,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                         }
                         else
                         {
-                            while (tof[i][j].at(m) > tArrT[p] && tArrT[p] != -1.)
+                            while (thit[i][j].at(m) > tArrT[p] && tArrT[p] != -1.)
                             {
                                 p++; // find insert position
                                 if (p > nHitsEvent + 1)
@@ -858,11 +691,11 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                             }
 
                             LOG(DEBUG) << "Will insert at " << p;
-                            if (p > 0 && tof[i][j].at(m) > tArrT[p - 1] && tof[i][j].at(m) != tArrT[p])
+                            if (p > 0 && thit[i][j].at(m) > tArrT[p - 1] && thit[i][j].at(m) != tArrT[p])
                             { // insert at right position
                                 LOG(DEBUG) << "Insert at " << p << " " << i << "/" << j;
                                 insertX(nHitsEvent, tArrQ, q[i][j].at(m), p + 1);
-                                insertX(nHitsEvent, tArrT, tof[i][j].at(m), p + 1);
+                                insertX(nHitsEvent, tArrT, thit[i][j].at(m), p + 1);
                                 insertX(nHitsEvent, tArrX, x[i][j].at(m), p + 1);
                                 insertX(nHitsEvent, tArrY, y[i][j].at(m), p + 1);
                                 insertX(nHitsEvent, tArrYT, yToT[i][j].at(m), p + 1);
@@ -876,7 +709,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
                                 p = p + 1;
                                 LOG(DEBUG) << "Insert at " << p << " " << i << "/" << j;
                                 insertX(nHitsEvent, tArrQ, q[i][j].at(m), p + 1);
-                                insertX(nHitsEvent, tArrT, tof[i][j].at(m), p + 1);
+                                insertX(nHitsEvent, tArrT, thit[i][j].at(m), p + 1);
                                 insertX(nHitsEvent, tArrX, x[i][j].at(m), p + 1);
                                 insertX(nHitsEvent, tArrY, y[i][j].at(m), p + 1);
                                 insertX(nHitsEvent, tArrYT, yToT[i][j].at(m), p + 1);
@@ -982,26 +815,15 @@ void R3BTofdCal2HitS454::CreateHistograms(Int_t iPlane, Int_t iBar)
     Double_t max_charge = 80.;
     // create histograms if not already existing
 
-    /*
     if (NULL == fhTsync[iPlane - 1])
     {
         char strName[255];
         sprintf(strName, "Time_Sync_Plane_%d", iPlane);
-        fhTsync[iPlane - 1] = new TH2F(strName, "", 50,0,50,10000, -10, 90.);
+        fhTsync[iPlane - 1] = new TH2F(strName, "", 50, 0, 50, 10000, -2000., 2000.);
         fhTsync[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
-        fhTsync[iPlane - 1]->GetYaxis()->SetTitle("ToF in ns");
+        fhTsync[iPlane - 1]->GetYaxis()->SetTitle("THit in ns");
     }
-    */
-    /*
-    if (NULL == fhTof[iPlane - 1])
-    {
-        char strName[255];
-        sprintf(strName, "ToF_Plane_%d", iPlane);
-        fhTof[iPlane - 1] = new TH2F(strName, "", 50,0,50,40000, -200, 200.);
-        fhTof[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
-        fhTof[iPlane - 1]->GetYaxis()->SetTitle("ToF in ns");
-    }
-    */
+
     if (NULL == fhTdiff[iPlane - 1])
     {
         char strName1[255];
@@ -1022,33 +844,23 @@ void R3BTofdCal2HitS454::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position in cm");
     }
     /*
-    if (NULL == fhQvsTof[iPlane - 1][iBar - 1])
+    if (NULL == fhQvsTHit[iPlane - 1][iBar - 1])
     {
         char strName[255];
-        sprintf(strName, "Q_vs_ToF_Plane_%d_Bar_%d", iPlane, iBar);
-        fhQvsTof[iPlane - 1][iBar - 1] = new TH2F(strName, "", 1000, 0., max_charge, 1000, -10, 40);
-        fhQvsTof[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToF in ns");
-        fhQvsTof[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Charge");
+        sprintf(strName, "Q_vs_THit_Plane_%d_Bar_%d", iPlane, iBar);
+        fhQvsTHit[iPlane - 1][iBar - 1] = new TH2F(strName, "", 1000, 0., max_charge, 1000, -10, 40);
+        fhQvsTHit[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("THit in ns");
+        fhQvsTHit[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Charge");
     }
     */
     /*
-    if (NULL == fhTvsTof[iPlane - 1][iBar - 1])
+    if (NULL == fhTvsTHit[iPlane - 1][iBar - 1])
     {
         char strName[255];
         sprintf(strName, "T_vs_ToF_Plane_%d_Bar_%d", iPlane, iBar);
-        fhTvsTof[iPlane - 1][iBar - 1] = new TH2F(strName, "", 625, -25, 25, 1000, -10, 40);
-        fhTvsTof[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToF in ns");
-        fhTvsTof[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("T1-T2 in ns");
-    }
-    */
-    /*
-    if (NULL == fhToTvsTofw[iPlane - 1][iBar - 1])
-    {
-        char strName[255];
-        sprintf(strName, "ToT_vs_ToF_Plane_%d_Bar_%d_w", iPlane, iBar);
-        fhToTvsTofw[iPlane - 1][iBar - 1] = new TH2F(strName, "", 1000, 0., 200, 1000, -10, 40);
-        fhToTvsTofw[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToT in ns");
-        fhToTvsTofw[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToF in ns");
+        fhTvsTHit[iPlane - 1][iBar - 1] = new TH2F(strName, "", 625, -25, 25, 1000, -10, 40);
+        fhTvsTHit[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("THit in ns");
+        fhTvsTHit[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("T1-T2 in ns");
     }
     */
     if (NULL == fhQ[iPlane - 1])
@@ -1106,11 +918,6 @@ void R3BTofdCal2HitS454::FinishEvent()
 
 void R3BTofdCal2HitS454::FinishTask()
 {
-    if (fhLosXYP)
-        fhLosXYP->Write();
-    // if (fhChargeLosTofD) fhChargeLosTofD->Write();
-    if (fh_los_pos)
-        fh_los_pos->Write();
     if (fTofdHisto)
     {
         for (Int_t i = 0; i < fNofPlanes; i++)
@@ -1121,10 +928,10 @@ void R3BTofdCal2HitS454::FinishTask()
                 fhxy[i]->Write();
             if (fhQvsEvent[i])
                 fhQvsEvent[i]->Write();
-            // if (fhTof[i]) fhTof[i]->Write();
             if (fhTdiff[i])
                 fhTdiff[i]->Write();
-            // if (fhTsync[i]) fhTsync[i]->Write();
+            if (fhTsync[i])
+                fhTsync[i]->Write();
             for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
             {
 
@@ -1132,16 +939,12 @@ void R3BTofdCal2HitS454::FinishTask()
                 if (fhQvsPos[i][j])
                     fhQvsPos[i][j]->Write();
                 /*
-                if (fhQvsTof[i][j])
-                    fhQvsTof[i][j]->Write();
+                if (fhQvsTHit[i][j])
+                    fhQvsTHit[i][j]->Write();
                 */
                 /*
-                if (fhTvsTof[i][j])
-                    fhTvsTof[i][j]->Write();
-                */
-                /*
-                if (fhToTvsTofw[i][j])
-                    fhToTvsTofw[i][j]->Write();
+                if (fhTvsTHit[i][j])
+                    fhTvsTHit[i][j]->Write();
                 */
             }
         }
@@ -1149,20 +952,16 @@ void R3BTofdCal2HitS454::FinishTask()
     std::cout << "\n\nSome statistics:\n"
               << "Total number of events in tree   " << maxevent << "\n"
               << "Max Event analyzed               " << fnEvents + wrongtrigger + wrongtpat << "\n"
-              << "Events in LOS                    " << countloshit << "\n"
               << "Events skipped due to trigger    " << wrongtrigger << "\n"
               << "Events skipped due to tpat       " << wrongtpat << "\n"
               << "Events with correct header&tpat  " << headertpat << "\n"
               << "Events without ToFd hits         " << events_wo_tofd_hits << "\n"
               << "Events in cal level              " << events_in_cal_level << "\n"
-              << "Hits in bar coincidence w resets " << inbarcoincidence << "\n"
-              << "Number of resets                 " << countreset << "\n"
-              << "Hits before reset                " << hitsbeforereset << "\n"
+              << "Hits in bar coincidence          " << inbarcoincidence << "\n"
               << "Bars with multihits              " << bars_with_multihit << "\n"
               << "Multihits                        " << multihit << "\n"
-              << "Events stored                    " << eventstore << " <-> " << inbarcoincidence - hitsbeforereset
-              << " = " << inbarcoincidence << " - " << hitsbeforereset
-              << " (Events in bar coincidence - Hits before reset)\n"
+              << "Events stored                    " << eventstore << " <-> " << inbarcoincidence
+              << " (Events in bar coincidence)\n"
               << "Events in single planes          " << singlehit << "\n"
               << "Good events in total             " << eventstore << " <-> " << singlehit << " = singlehit \n";
 

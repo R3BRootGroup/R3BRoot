@@ -21,6 +21,8 @@
 #define N_TOFD_HIT_PLANE_MAX 4
 #define N_TOFD_HIT_PADDLE_MAX 44
 
+#include <map>
+
 #include "FairTask.h"
 #include "R3BTCalEngine.h"
 #include "TObject.h"
@@ -33,6 +35,7 @@ class TH2F;
 #ifdef __CINT__
 #pragma link C++ class R3BTofdHitModulePar + ;
 #endif
+
 class R3BTofdCal2Histo : public FairTask
 {
 
@@ -129,10 +132,6 @@ class R3BTofdCal2Histo : public FairTask
      */
     inline void SetTofdQ(Double_t Q) { fTofdQ = Q; }
     /**
-     * Method for setting walk correction
-     */
-    inline void SetWalk(Bool_t Walk) { fwalk = Walk; }
-    /**
      * Method for setting charge correction
      */
     inline void SetTofdZ(Bool_t Z) { fTofdZ = Z; }
@@ -174,13 +173,12 @@ class R3BTofdCal2Histo : public FairTask
 
     UInt_t fNEvents;             /**< Event counter. */
     R3BTofdHitPar* fCal_Par;    /**< Parameter container. */
-    TClonesArray* fCalItemsLos; /**< Array with cal items. */
     TClonesArray* fCalData;     /**< Array with mapped data - input data. */
+    TClonesArray* fCalTriggerItems;    /**< Array with trigger Cal items - input data. */
     R3BEventHeader* header;     /**< Event header - input data. */
     Double_t fClockFreq;        /**< Clock cycle in [ns]. */
     Double_t fTofdY;
     Double_t fTofdQ;
-    Bool_t fwalk;
     Bool_t fTofdSmiley;
     Bool_t fTofdZ;
     TString fParaFile;
@@ -193,7 +191,6 @@ class R3BTofdCal2Histo : public FairTask
     TH2F* fhLogTot1vsLogTot2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhSqrtQvsPosToT[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
-    TH2F* fhToTvsTofw[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     //TH2F* fhTot1vsTot2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhTot1vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhTot2vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];

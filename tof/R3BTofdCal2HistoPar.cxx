@@ -279,17 +279,13 @@ void R3BTofdCal2HistoPar::FinishTask()
         LOG(WARNING) << "Calling function zcorr";
         Double_t para[8];
         Double_t pars[3];
-        Int_t min = 1, max = 15; // select range for peak search
+        Int_t min = 0.1, max = 15; // select range for peak search
         for (Int_t i = 0; i < fNofPlanes; i++)
         {
             for (Int_t j = 0; j < fPaddlesPerPlane; j++)
             {
                 if (hfilename->Get(Form("Q_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)))
                 {
-                    if (i + 1 == 1)
-                        continue;
-                    if (j + 1 != 32)
-                        continue;
                     R3BTofdHitModulePar* par = fCal_Par->GetModuleParAt(i + 1, j + 1);
                     std::cout << "Calling Plane: " << i + 1 << " Bar " << j + 1 << "\n";
                     zcorr((TH2F*)hfilename->Get(Form("Q_vs_Pos_Plane_%i_Bar_%i", i + 1, j + 1)), min, max, pars);
@@ -369,7 +365,7 @@ void R3BTofdCal2HistoPar::calcToTOffset(Double_t totLow, Double_t totHigh)
                 h->Draw("colz");
                 auto* histo_py = (TH2F*)h->ProjectionX("histo_py", totLow, totHigh, "");
                 cToTOffset->cd(2);
-                histo_py->Rebin(3);
+                histo_py->Rebin(2);
                 histo_py->Draw();
                 Int_t binmax = histo_py->GetMaximumBin();
                 Double_t Max = histo_py->GetXaxis()->GetBinCenter(binmax);
@@ -413,7 +409,7 @@ void R3BTofdCal2HistoPar::calcSync()
                 Int_t binmax = histo_py->GetMaximumBin();
                 Double_t Max = histo_py->GetXaxis()->GetBinCenter(binmax);
                 Double_t MaxEntry = histo_py->GetBinContent(binmax);
-                TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 0.3, Max + 0.3);
+                TF1* fgaus = new TF1("fgaus", "gaus(0)", Max - 10., Max + 10.);
                 fgaus->SetParameters(MaxEntry, Max, 20);
                 histo_py->Fit("fgaus", "QR0");
                 Double_t sync = fgaus->GetParameter(1); // histo_py->GetXaxis()->GetBinCenter(binmax);
@@ -451,7 +447,7 @@ void R3BTofdCal2HistoPar::calcVeff()
                 Int_t binmax = histo_py->GetMaximumBin();
                 max = histo_py->GetXaxis()->GetBinCenter(binmax);
                 Double_t maxEntry = histo_py->GetBinContent(binmax);
-                auto* fgaus = new TF1("fgaus", "gaus(0)", max - 0.3, max + 0.3);
+                auto* fgaus = new TF1("fgaus", "gaus(0)", max - 0.3, max + 0.3); /// TODO: find best range
                 fgaus->SetParameters(maxEntry, max, 20);
                 histo_py->Fit("fgaus", "QR0");
                 Double_t offset1 = par->GetOffset1();
@@ -503,7 +499,7 @@ void R3BTofdCal2HistoPar::calcLambda(Double_t totLow, Double_t totHigh)
                 delete histo_py;
             }
             else
-                LOG(FATAL) << "Missing histo plane " << i + 1 << " bar " << j + 1;
+                LOG(ERROR) << "Missing histo plane " << i + 1 << " bar " << j + 1;
             Double_t lambda = fTofdY / offset;
             LOG(WARNING) << " Plane  " << i + 1 << " Bar " << j + 1 << " ToT Offset  " << offset << " Lambda " << lambda
                          << "\n";
@@ -811,7 +807,7 @@ void R3BTofdCal2HistoPar::zcorr(TH2F* histo, Int_t min, Int_t max, Double_t* par
         // std::cout<<Form("par%i= ",j)<<pars[j]<<"\n";
     }
     // gPad->WaitPrimitive();
-    // gSystem->Sleep(3000);
+    gSystem->Sleep(3000);
     delete s;
     delete gr1;
     delete c1;
