@@ -6,7 +6,7 @@ Code for the NeuLAND Detector is split into different components:
 - [simulation](simulation/readme.md)
 - [digitizing](digitizing/readme.md)
 - clustering
-- reconstruction
+- [reconstruction](reconstruction/readme.md)
 - test
 - unpack
 - shared
@@ -14,24 +14,28 @@ Code for the NeuLAND Detector is split into different components:
 
 Note that in contrast to the old NeuLAND and LAND code in the /land/ directory, the spelling in e.g. class names is "Neuland", with a small "l".
 
-The components fill storage containers for each event, which flow into other components: 
+The components fill storage containers for each event, which flow into other components:
 ![Neuland Flowchart](shared/neulandflow.svg)
 
 
 ### Tasks
 
 These tasks are derived from FairTask and used in the steering macros.
+Task ending on a process usually apply a transformation to data, and take the input and output branch names as attributes, e.g.:
+
+- [`R3BNeulandDigitizer`](#digitizing): Detector response, NeulandPoints -> NeulandHits
+- [`R3BNeulandClusterFinder`](#clustering): Clustering of digitized data, NeulandHits -> NeulandClusters
+
+Task ending on `mon` create control histograms, and might be quite messy. They take the input branch and output folder names as arguments. Examples:
 
 - `R3BNeulandMCMon`: Control histograms for MonteCarlo data (NeulandPoints)
-- [`R3BNeulandDigitizer`](#digitizing): Detector response, NeulandPoints -> NeulandHits
 - `R3BNeulandHitMon`: Control histograms for digitized data (NeulandHits)
-- [`R3BNeulandClusterFinder`](#clustering): Clustering of digitized data, NeulandHits -> NeulandClusters
 - `R3BNeulandClusterMon`: ControlHistograms for clusters (NeulandClusters)
 
 
 ### Data Storage
 
-Note that the classes indented for storing data (derived from TObject for usage with TClonesArray) are located in `r3bdata/neulandData`. 
+Note that the classes indented for storing data (derived from TObject for usage with TClonesArray) are located in `r3bdata/neulandData`.
 
 - `R3BNeulandPoint`: Basic MonteCarlo energy depositions and light yield, see, [Detector Class](#detector-class)
 - `R3BNeulandHit`: Combined NeulandPoints, digitized with detector response, see [Digitizing](#digitizing). Also indented for mapped and calibrated experimental data.
@@ -42,7 +46,7 @@ Note that the classes indented for storing data (derived from TObject for usage 
 ### Configuration Storage
 
 - `R3BNeulandGeoPar`: The complete NeuLAND GeoNode used in the Simulation
-- `R3BNeulandNeutron2DPar`: Cuts used for the [2D Method](#the-2d-method-for-neutron-multiplicity-determination) to determine neutron multiplicities.
+- `R3BNeulandMultiplicityCalorimetricPar`: Cuts used for the [2D Method](#the-2d-method-for-neutron-multiplicity-determination) to determine neutron multiplicities.
 
 
 ### Auxiliary Classes
@@ -54,7 +58,7 @@ Note that the classes indented for storing data (derived from TObject for usage 
 
 ## Digitizing
 
-The Digitizing task `R3BNeulandDigitizer` handles the Input and Output of data while invoking the `Neuland::DigitizingEngine` for the actual processing. 
+The Digitizing task `R3BNeulandDigitizer` handles the Input and Output of data while invoking the `Neuland::DigitizingEngine` for the actual processing.
 
 See [digitizing/](digitizing/readme.md) for more details.
 
@@ -62,7 +66,7 @@ See [digitizing/](digitizing/readme.md) for more details.
 
 ## Clustering
 
-Clustering is the process of grouping Objects together by a specified condition. 
+Clustering is the process of grouping Objects together by a specified condition.
 
 The task `R3BNeulandClusterFinder` uses the  implementation in `Neuland::ClusteringEngine` of what can be called *handshake-chain clustering*, where a cluster is finished if all of the Digis in it have no neighbor that is not in the cluster.
 
@@ -135,33 +139,3 @@ In this example, the result is:
 
 	{ 28, 29, 30 }, { 22, 23, 24, 25, 26 }, { 4, 3 }, { 10, 11, 12, 13 }, { 8 }, { 19, 18, 17, 16, 15 }, { 6 }
 
-
-## The 2D-method for neutron multiplicity determination
-
-It was found that plotting the number of clusters vs the total energy is an acceptable way of determining the neutron multiplicities, at least for large numbers of planes.
-
-
-### Calibration
-
-This method needs to be calibrated. In this process, the cuts applied to the 2D histogram need to be created and adjusted such that the "best" result is obtained. This is handled by the `Neuland::Neutron2DCalibr` class, which is not a task as specifically set inputs are needed (events have different numbers of primary neutrons). Cuts created by this process are stored in `R3BNeulandNeutron2DPar`.
-
-![Example of 2D Cuts](docs/1400cm_30dp.neutroncuts.png "2D neutron cuts example for 30 double planes")
-
-At this point, efficiency matrices can already be created for the calibration dataset, e.g.:
-
-| 600 MeV |  1n       |  2n       |  3n       |  4n       |
-|--------:|-----------|-----------|-----------|-----------|
-| **0n**  |  0.06     |  0        |  0        |  0        |
-| **1n**  |  **0.90** |  0.16     |  0.01     |  0        |
-| **2n**  |  0.04     |  **0.76** |  0.23     |  0.04     |
-| **3n**  |  0        |  0.07     |  **0.68** |  0.32     |
-| **4n**  |  0        |  0        |  0.08     |  **0.56** |
-
-With the number of generated neutrons on the columns and the detected neutron multiplicity in the rows. Note that in this example, the chance to detect no neutron whatsoever is only 6% in the case of one incident neutron. In any other case, the total detection efficiency is 100%.
-
-The cuts are saved in the parameter file via `R3BNeulandNeutron2DPar`. Provided with the total energy and number of clusters, this class then can return the neutron multiplicity.
-
-
-### Event Reconstruction
-
-Provided with the neutron multiplicity parameter *nN*, the task `R3BNeulandNeutronReconstruction` can try to find the neutron interaction points from the TClonesArray NeulandClusters (`R3BNeulandCluster`). Currently, `RecoTDR` and `ClusterScoring` are available. These positions are then saved to the TClonesArray NeulandNeutrons (`R3BNeulandNeutron`).

@@ -22,9 +22,9 @@
 
 #include "TClonesArray.h"
 #include "TDirectory.h"
-#include <TFile.h>
 #include "TH1D.h"
 #include "TH2D.h"
+#include <TFile.h>
 
 #include "FairLogger.h"
 #include "FairMCPoint.h"
@@ -34,6 +34,7 @@
 
 #include "R3BMCTrack.h"
 #include "R3BNeulandNeutron.h"
+#include "R3BNeulandPoint.h"
 
 static const Double_t c2 = 898.75517873681758374; // cm²/ns²
 static const Double_t massNeutron = 939.565379;   // MeV/c²
@@ -122,19 +123,19 @@ InitStatus R3BNeulandNeutronReconstructionMon::Init()
     fReconstructedNeutrons = (TClonesArray*)ioman->GetObject(fInput);
 
     // Set Input: TClonesArray of FairMCPoints
-    if ((TClonesArray*)ioman->GetObject("NeulandPrimaryNeutronInteractionPoints") == nullptr)
+    if ((TClonesArray*)ioman->GetObject("NeulandPrimaryPoints") == nullptr)
     {
-        LOG(FATAL) << "R3BNeulandNeutronReconstructionMon::Init No NeulandPrimaryNeutronInteractionPoints!";
+        LOG(FATAL) << "R3BNeulandNeutronReconstructionMon::Init No NeulandPrimaryPoints!";
         return kFATAL;
     }
-    if (!TString(((TClonesArray*)ioman->GetObject("NeulandPrimaryNeutronInteractionPoints"))->GetClass()->GetName())
-             .EqualTo("FairMCPoint"))
+    if (!TString(((TClonesArray*)ioman->GetObject("NeulandPrimaryPoints"))->GetClass()->GetName())
+             .EqualTo("R3BNeulandPoint"))
     {
-        LOG(FATAL) << "R3BNeulandNeutronReconstructionMon::Init Branch NeulandPrimaryNeutronInteractionPoints "
-                      "does not contain FairMCPoints!";
+        LOG(FATAL) << "R3BNeulandNeutronReconstructionMon::Init Branch NeulandPrimaryPoints "
+                      "does not contain R3BNeulandPoint!";
         return kFATAL;
     }
-    fPrimaryNeutronInteractionPoints = (TClonesArray*)ioman->GetObject("NeulandPrimaryNeutronInteractionPoints");
+    fPrimaryNeutronInteractionPoints = (TClonesArray*)ioman->GetObject("NeulandPrimaryPoints");
 
     // Set Input: TClonesArray of R3BMCTrack
     if ((TClonesArray*)ioman->GetObject("MCTrack") == nullptr)
@@ -182,11 +183,11 @@ void R3BNeulandNeutronReconstructionMon::Exec(Option_t*)
     }
 
     const Int_t nNPNIPS = fPrimaryNeutronInteractionPoints->GetEntries();
-    std::vector<FairMCPoint> npnips;
+    std::vector<R3BNeulandPoint> npnips;
     npnips.reserve(nReconstructedNeutrons);
     for (Int_t i = 0; i < nNPNIPS; i++)
     {
-        npnips.push_back(*((FairMCPoint*)fPrimaryNeutronInteractionPoints->At(i)));
+        npnips.push_back(*((R3BNeulandPoint*)fPrimaryNeutronInteractionPoints->At(i)));
     }
     fhCountN->Fill(nReconstructedNeutrons);
     fhCountNdiff->Fill((Int_t)nNPNIPS - (Int_t)nReconstructedNeutrons);
@@ -268,7 +269,8 @@ void R3BNeulandNeutronReconstructionMon::Exec(Option_t*)
             // thus we can stop once the Mother Id != -1
             if (MCTrack->GetMotherId() != -1)
             {
-                break;
+                // break;
+                continue;
             }
 
             // For E_rel with reconstructed neutrons, only sum up non-neutron primary particles

@@ -99,6 +99,8 @@ Double_t R3BNeulandCluster::GetRCluster(Double_t beta) const
     return std::abs(beta - GetBeta()) / GetE();
 }
 
+Double_t R3BNeulandCluster::GetRECluster(Double_t ekin) const { return std::abs(ekin - GetEToF()) / GetE(); }
+
 std::ostream& operator<<(std::ostream& os, const R3BNeulandCluster& cluster)
 {
     os << "R3BNeulandCluster: NeuLAND Cluster with size " << cluster.GetSize() << std::endl;

@@ -43,7 +43,8 @@ Double_t R3BNeulandHit::GetEToF(const Double_t mass) const
 {
     const Double_t v2 = GetPosition().Mag2() / std::pow(GetT(), 2); // cm²/ns²
     const Double_t gamma = 1. / std::sqrt(1. - (v2 / c2));
-    return (gamma - 1.) * mass;
+    const auto etof = (gamma - 1.) * mass;
+    return 1.81522 + 0.984612 * etof; // TODO: EToF is ever so slightly off. Maybe some rounding/mass error?
 }
 
 std::ostream& operator<<(std::ostream& os, const R3BNeulandHit& hit)

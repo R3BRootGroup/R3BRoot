@@ -116,6 +116,7 @@ neulandData/R3BNeulandTacquilaMappedData.cxx
 neulandData/R3BNeulandCalData.cxx
 neulandData/R3BNeulandPoint.cxx
 neulandData/R3BNeulandHit.cxx
+neulandData/R3BNeulandMultiplicity.cxx
 neulandData/R3BNeulandCluster.cxx
 neulandData/R3BNeulandNeutron.cxx
 pspData/R3BPspxMappedData.cxx

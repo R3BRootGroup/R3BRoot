@@ -11,22 +11,35 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef NEULANDRECONSTRUCTIONENGINEH
-#define NEULANDRECONSTRUCTIONENGINEH
-
-#include "R3BNeulandCluster.h"
-#include "R3BNeulandNeutron.h"
-#include <vector>
-
-namespace Neuland
+// Note: Just to check if tasks are working. Will not produce reasonably trained models with few events.
+void testNeulandTrain()
 {
-    class ReconstructionEngine
-    {
-      public:
-        virtual ~ReconstructionEngine() = default; // FIXME: Root doesn't like = 0?
-        virtual void Init() {}
-        virtual std::vector<R3BNeulandNeutron> GetNeutrons(const std::vector<R3BNeulandCluster*>&) const = 0;
-    };
-} // namespace Neuland
+    TStopwatch timer;
+    timer.Start();
 
-#endif // NEULANDRECONSTRUCTIONENGINEH
+    FairLogger::GetLogger()->SetLogScreenLevel("DEBUG");
+
+    FairRunAna run;
+    run.SetSource(new FairFileSource("test.digi.root"));
+    run.SetSink(new FairRootFileSink("test.train.root"));
+
+    auto rtdb = run.GetRuntimeDb();
+    auto io = new FairParRootFileIo(true);
+    io->open("test.neul.root");
+    rtdb->setOutput(io);
+
+    run.AddTask(new R3BNeulandMultiplicityBayesTrain());
+    run.AddTask(new R3BNeulandMultiplicityCalorimetricTrain());
+
+    run.Init();
+    run.Run(0, 0);
+    rtdb->writeContainers();
+    rtdb->writeVersions();
+    rtdb->saveOutput();
+    rtdb->print();
+    rtdb->closeOutput();
+
+    timer.Stop();
+    cout << "Macro finished successfully." << endl;
+    cout << "Real time: " << timer.RealTime() << "s, CPU time: " << timer.CpuTime() << "s" << endl;
+}

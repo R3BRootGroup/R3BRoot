@@ -11,25 +11,32 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-void testNeulandDigitizer()
+void testNeulandReconstruction()
 {
     TStopwatch timer;
     timer.Start();
 
-    FairLogger::GetLogger()->SetLogScreenLevel("WARNING");
+    FairLogger::GetLogger()->SetLogScreenLevel("DEBUG");
 
     FairRunAna run;
-    run.SetSource(new FairFileSource("test.simu.root"));
-    run.SetSink(new FairRootFileSink("test.digi.root"));
+    run.SetSource(new FairFileSource("test.digi.root"));
+    run.SetSink(new FairRootFileSink("test.reco.root"));
 
     auto io = new FairParRootFileIo();
-    io->open("test.para.root");
+    io->open("test.neul.root");
     run.GetRuntimeDb()->setFirstInput(io);
 
-    run.AddTask(new R3BNeulandDigitizer());
-    run.AddTask(new R3BNeulandClusterFinder());
-    run.AddTask(new R3BNeulandPrimaryInteractionFinder());
-    run.AddTask(new R3BNeulandPrimaryClusterFinder());
+    // Perfect Reco
+    run.AddTask(new R3BNeulandMultiplicityCheat("NeulandPrimaryHits", "NeulandMultiplicityCheat"));
+    run.AddTask(new R3BNeulandNeutronsCheat("NeulandMultiplicityCheat", "NeulandPrimaryHits", "NeulandNeutronsCheat"));
+
+    // Calorimetric Reco
+     run.AddTask(new R3BNeulandMultiplicityCalorimetric("NeulandClusters", "NeulandMultiplicityCalorimetric"));
+     run.AddTask(new R3BNeulandNeutronsRValue(600, "NeulandMultiplicityCalorimetric", "NeulandClusters", "NeulandNeutronsCalorimetric"));
+
+    // Bayes Multiplicity
+    run.AddTask(new R3BNeulandMultiplicityBayes("NeulandClusters", "NeulandMultiplicityBayes"));
+    run.AddTask(new R3BNeulandNeutronsRValue(600, "NeulandMultiplicityBayes", "NeulandClusters", "NeulandNeutronsBayes"));
 
     run.Init();
     run.Run(0, 0);

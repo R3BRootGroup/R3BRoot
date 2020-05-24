@@ -20,14 +20,20 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class Neuland::ReconstructionEngine+;
-#pragma link C++ class Neuland::ClusterScoring+;
-#pragma link C++ class Neuland::RecoTDR+;
-//#pragma link C++ class Neuland::RecoBayes+;
-//#pragma link C++ class Neuland::Likelihood+;
-#pragma link C++ class Neuland::Neutron2DCalibr+;
-#pragma link C++ class R3BNeulandNeutronReconstruction+;
+#pragma link C++ class R3BNeulandReconstructionContFact+;
 #pragma link C++ class R3BNeulandNeutronReconstructionMon+;
 #pragma link C++ class R3BNeulandNeutronReconstructionStatistics+;
+#pragma link C++ class R3BNeulandMultiplicityBayes+;
+#pragma link C++ class R3BNeulandMultiplicityBayesPar+;
+#pragma link C++ class R3BNeulandMultiplicityBayesTrain+;
+#pragma link C++ class R3BNeulandMultiplicityCalorimetric+;
+#pragma link C++ class R3BNeulandMultiplicityCalorimetricPar+;
+#pragma link C++ class R3BNeulandMultiplicityCalorimetricTrain+;
+#pragma link C++ class R3BNeulandMultiplicityCheat+;
+#pragma link C++ class R3BNeulandMultiplicityFixed+;
+//#pragma link C++ class R3BNeulandMultiplicityScikit+;
+#pragma link C++ class R3BNeulandNeutronsCheat+;
+#pragma link C++ class R3BNeulandNeutronsRValue+;
+//#pragma link C++ class R3BNeulandNeutronsScikit+;
 
 #endif

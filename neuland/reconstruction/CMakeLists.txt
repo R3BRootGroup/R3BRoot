@@ -14,22 +14,31 @@
 set(LIBRARY_NAME R3BNeulandReconstruction)
 set(LINKDEF NeulandReconstructionLinkDef.h)
 
+# set(DEPENDENCIES R3BNeulandShared R3BData PyROOT)
 set(DEPENDENCIES R3BNeulandShared R3BData)
 
-set(INCLUDE_DIRECTORIES ${INCLUDE_DIRECTORIES} ${R3BROOT_SOURCE_DIR}/neuland/reconstruction)
+set(INCLUDE_DIRECTORIES
+    ${INCLUDE_DIRECTORIES} ${R3BROOT_SOURCE_DIR}/neuland/reconstruction
+    ${R3BROOT_SOURCE_DIR}/neuland/reconstruction/multiplicity
+    ${R3BROOT_SOURCE_DIR}/neuland/reconstruction/neutrons)
 include_directories(${INCLUDE_DIRECTORIES})
 
 set(SRCS
-    R3BNeulandNeutronReconstruction.cxx
+    multiplicity/R3BNeulandMultiplicityBayes.cxx
+    multiplicity/R3BNeulandMultiplicityBayesPar.cxx
+    multiplicity/R3BNeulandMultiplicityBayesTrain.cxx
+    multiplicity/R3BNeulandMultiplicityCalorimetric.cxx
+    multiplicity/R3BNeulandMultiplicityCalorimetricPar.cxx
+    multiplicity/R3BNeulandMultiplicityCalorimetricTrain.cxx
+    multiplicity/R3BNeulandMultiplicityCheat.cxx
+    multiplicity/R3BNeulandMultiplicityFixed.cxx
+    # multiplicity/R3BNeulandMultiplicityScikit.cxx
+    neutrons/R3BNeulandNeutronsCheat.cxx
+    neutrons/R3BNeulandNeutronsRValue.cxx
+    # neutrons/R3BNeulandNeutronsScikit.cxx
+    R3BNeulandReconstructionContFact.cxx
     R3BNeulandNeutronReconstructionMon.cxx
-    R3BNeulandNeutronReconstructionStatistics.cxx
-    ReconstructionEngine.cxx
-    ClusterScoring.cxx
-    RecoTDR.cxx
-    Neutron2DCalibr.cxx
-    RecoBayes.cxx
-    RecoBayesWCP.cxx
-    Likelihood.cxx)
+    R3BNeulandNeutronReconstructionStatistics.cxx)
 change_file_extension(*.cxx *.h HEADERS "${SRCS}")
 
 generate_library()

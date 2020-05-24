@@ -11,26 +11,26 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BNeulandNeutron2DPar.h"
-#include "FairParamList.h"
+#include "R3BNeulandMultiplicityCalorimetricPar.h"
+#include "FairLogger.h"
 #include "TObjString.h"
-#include <iostream>
-#include <stdexcept>
 
-R3BNeulandNeutron2DPar::R3BNeulandNeutron2DPar(const char* name, const char* title, const char* context)
+R3BNeulandMultiplicityCalorimetricPar::R3BNeulandMultiplicityCalorimetricPar(const char* name,
+                                                                             const char* title,
+                                                                             const char* context)
     : FairParGenericSet(name, title, context)
     , fNeutronCuts(nullptr)
 {
 }
 
-R3BNeulandNeutron2DPar::~R3BNeulandNeutron2DPar()
+R3BNeulandMultiplicityCalorimetricPar::~R3BNeulandMultiplicityCalorimetricPar()
 {
     // Note: Deleting stuff here or in clear() causes segfaults?
 }
 
-void R3BNeulandNeutron2DPar::clear() {}
+void R3BNeulandMultiplicityCalorimetricPar::clear() {}
 
-void R3BNeulandNeutron2DPar::putParams(FairParamList* l)
+void R3BNeulandMultiplicityCalorimetricPar::putParams(FairParamList* l)
 {
     if (!l)
     {
@@ -39,7 +39,7 @@ void R3BNeulandNeutron2DPar::putParams(FairParamList* l)
     l->addObject("NeulandNeutronCuts", fNeutronCuts);
 }
 
-Bool_t R3BNeulandNeutron2DPar::getParams(FairParamList* l)
+Bool_t R3BNeulandMultiplicityCalorimetricPar::getParams(FairParamList* l)
 {
     if (!l)
     {
@@ -52,32 +52,32 @@ Bool_t R3BNeulandNeutron2DPar::getParams(FairParamList* l)
     return kTRUE;
 }
 
-void R3BNeulandNeutron2DPar::printParams()
+void R3BNeulandMultiplicityCalorimetricPar::printParams()
 {
-    std::cout << "R3BNeulandNeutron2DPar: Neuland Neutron Cuts ..." << std::endl;
+    LOG(INFO) << "R3BNeulandMultiplicityCalorimetricPar: Neuland Neutron Cuts ...";
     for (const auto& nc : GetNeutronCuts())
     {
-        std::cout << nc.first << std::endl;
+        LOG(INFO) << nc.first;
         nc.second->Print();
     }
 }
 
-void R3BNeulandNeutron2DPar::SetNeutronCuts(const std::map<UInt_t, TCutG*>& cuts)
+void R3BNeulandMultiplicityCalorimetricPar::SetNeutronCuts(const std::map<UInt_t, TCutG*>& cuts)
 {
     fNeutronCuts = new TMap();
     fNeutronCuts->SetOwner(kTRUE);
     for (const auto& nc : cuts)
     {
-        TObjString* key = new TObjString(TString::Itoa(nc.first, 10));
+        auto key = new TObjString(TString::Itoa(nc.first, 10));
         fNeutronCuts->Add(key, nc.second->Clone());
     }
 }
 
-std::map<UInt_t, TCutG*> R3BNeulandNeutron2DPar::GetNeutronCuts() const
+std::map<UInt_t, TCutG*> R3BNeulandMultiplicityCalorimetricPar::GetNeutronCuts() const
 {
     if (fNeutronCuts == nullptr)
     {
-        throw std::runtime_error("R3BNeulandNeutron2DPar: NeutronCuts not set!");
+        LOG(FATAL) << "R3BNeulandMultiplicityCalorimetricPar: NeutronCuts not set!";
     }
 
     std::map<UInt_t, TCutG*> map;
@@ -93,14 +93,20 @@ std::map<UInt_t, TCutG*> R3BNeulandNeutron2DPar::GetNeutronCuts() const
     return map;
 }
 
-TCutG* R3BNeulandNeutron2DPar::GetNeutronCut(const Int_t n) const { return GetNeutronCuts().at(n); }
+TCutG* R3BNeulandMultiplicityCalorimetricPar::GetNeutronCut(const Int_t n) const { return GetNeutronCuts().at(n); }
 
-UInt_t R3BNeulandNeutron2DPar::GetNeutronMultiplicity(const Double_t energy, const Double_t nClusters) const
+UInt_t R3BNeulandMultiplicityCalorimetricPar::GetNeutronMultiplicity(const Double_t energy,
+                                                                     const Double_t nClusters) const
 {
     // Note: it might be better to implement std::map as a member and sync between the tmap for this type of usage.
     if (fNeutronCuts == nullptr)
     {
-        throw std::runtime_error("R3BNeulandNeutron2DPar: NeutronCuts not set!");
+        LOG(FATAL) << "R3BNeulandMultiplicityCalorimetricPar: NeutronCuts not set!";
+    }
+
+    if (nClusters < 1)
+    {
+        return 0;
     }
 
     TObjString* key;
@@ -113,9 +119,8 @@ UInt_t R3BNeulandNeutron2DPar::GetNeutronMultiplicity(const Double_t energy, con
             return (UInt_t)key->GetString().Atoi();
         }
     }
-    // The list of cuts does contain a cut for multiplicity 0, so if no match is found, the neutron multiplicity must be
-    // higher than the highest saved cut.
+    // Assume if no match is found, the neutron multiplicity must be higher than the highest saved cut.
     return GetNeutronCuts().rbegin()->first + 1;
 }
 
-ClassImp(R3BNeulandNeutron2DPar);
+ClassImp(R3BNeulandMultiplicityCalorimetricPar);

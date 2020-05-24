@@ -57,6 +57,7 @@ class R3BNeulandCluster : public TObject
     TVector3 GetEnergyCentroid() const;
     Double_t GetEnergyMoment() const;
     Double_t GetRCluster(Double_t beta) const;
+    Double_t GetRECluster(Double_t ekin) const;
 
     void Print(const Option_t*) const override;
 

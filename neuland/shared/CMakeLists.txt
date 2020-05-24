@@ -21,7 +21,6 @@ include_directories(${INCLUDE_DIRECTORIES})
 set(SRCS
     ElasticScattering.cxx
     IsElastic.cxx
-    R3BNeulandNeutron2DPar.cxx
     R3BNeulandGeoPar.cxx
     R3BNeulandContFact.cxx
     R3BNeulandVisualizer.cxx)
@@ -33,7 +32,6 @@ set(HEADERS
     TCAConnector.h
     Validated.h
     IsElastic.h
-    R3BNeulandNeutron2DPar.h
     R3BNeulandGeoPar.h
     R3BNeulandContFact.h
     R3BNeulandVisualizer.h)

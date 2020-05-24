@@ -11,26 +11,26 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BNeulandNeutron2DPar.h"
+#include "R3BNeulandMultiplicityCalorimetricPar.h"
 #include "TCutG.h"
 #include "gtest/gtest.h"
 #include <map>
 
 namespace
 {
-    TEST(testNeutron2DPar, HandlesConversionBetweenMaps)
+    TEST(testNMultiplicityCalorimetricPar, HandlesConversionBetweenMaps)
     {
         std::map<UInt_t, TCutG*> m;
         m[1] = new TCutG("cut1", 4);
         m[2] = new TCutG("cut2", 4);
 
-        R3BNeulandNeutron2DPar par;
+        R3BNeulandMultiplicityCalorimetricPar par;
         par.SetNeutronCuts(m);
 
         EXPECT_STREQ(par.GetNeutronCuts().at(2)->GetName(), "cut2");
     }
 
-    TEST(testNeutron2DPar, GetNeutronMultiplicity)
+    TEST(testMultiplicityCalorimetricPar, GetNeutronMultiplicity)
     {
         std::map<UInt_t, TCutG*> m;
         m[0] = new TCutG("cut0", 4);
@@ -49,7 +49,7 @@ namespace
         m[2]->SetPoint(2, 30, 0);
         m[2]->SetPoint(3, 20, 0);
 
-        R3BNeulandNeutron2DPar par;
+        R3BNeulandMultiplicityCalorimetricPar par;
         par.SetNeutronCuts(m);
 
         EXPECT_EQ(par.GetNeutronMultiplicity(4, 4), 0u);

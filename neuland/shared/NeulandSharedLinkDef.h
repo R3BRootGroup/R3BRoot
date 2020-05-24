@@ -24,7 +24,7 @@
 #pragma link C++ class Filterable<R3BNeulandCluster*>+;
 #pragma link C++ defined_in "ElasticScattering.h";
 #pragma link C++ defined_in "IsElastic.h";
-#pragma link C++ class R3BNeulandNeutron2DPar+;
+
 #pragma link C++ class R3BNeulandGeoPar+;
 #pragma link C++ class R3BNeulandContFact+;
 #pragma link C++ class R3BNeulandVisualizer+;

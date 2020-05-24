@@ -43,7 +43,7 @@ class R3BNeulandHit : public TObject
     TVector3 GetPixel() const { return fPixel; }
 
     Double_t GetBeta() const;
-    Double_t GetEToF(Double_t mass = 939.565379) const;
+    Double_t GetEToF(Double_t mass = 939.565) const; // 939.565379
 
     void Print(const Option_t*) const override;
 

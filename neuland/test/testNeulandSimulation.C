@@ -11,15 +11,15 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-void testNeulandSimulation(const UInt_t particleID = 2112,
-                           const UInt_t nParticles = 4,
-                           const Double_t momentum = 0.7,
-                           const UInt_t nEvents = 10,
-                           const TString basePath = ".",
-                           const TString baseName = "test")
+void testNeulandSimulation()
 {
+    // Timer
     TStopwatch timer;
     timer.Start();
+
+    // Logging
+    FairLogger::GetLogger()->SetLogVerbosityLevel("LOW");
+    FairLogger::GetLogger()->SetLogScreenLevel("WARNING");
 
     // System paths
     const TString workDirectory = getenv("VMCWORKDIR");
@@ -27,14 +27,25 @@ void testNeulandSimulation(const UInt_t particleID = 2112,
     gSystem->Setenv("CONFIG_DIR", workDirectory + "/gconfig");
 
     // Output files
-    const TString outFile = basePath + "/" + baseName + ".sim.root";
-    const TString parFile = basePath + "/" + baseName + ".par.root";
+    const TString simufile = "test.simu.root";
+    const TString parafile = "test.para.root";
 
     // Basic simulation setup
     auto run = new FairRunSim();
     run->SetName("TGeant4");
-    run->SetOutputFile(outFile);
+    run->SetStoreTraj(false);
     run->SetMaterials("media_r3b.geo");
+    run->SetSink(new FairRootFileSink(simufile));
+
+    // Primary particle generator
+    auto boxGen = new FairBoxGenerator(2112, 4);
+    boxGen->SetXYZ(0, 0, 0.);
+    boxGen->SetThetaRange(0., 3.);
+    boxGen->SetPhiRange(0., 360.);
+    boxGen->SetEkinRange(0.6, 0.6);
+    auto primGen = new FairPrimaryGenerator();
+    primGen->AddGenerator(boxGen);
+    run->SetGenerator(primGen);
 
     // Geometry: Cave
     auto cave = new R3BCave("CAVE");
@@ -42,38 +53,23 @@ void testNeulandSimulation(const UInt_t particleID = 2112,
     run->AddModule(cave);
 
     // Geometry: Neuland
-    run->AddModule(new R3BNeuland("neuland_demo_11m.geo.root"));
+    run->AddModule(new R3BNeuland(30, { 0., 0., 1650. }));
 
-    // Primary particle generator
-    auto boxGen = new FairBoxGenerator(particleID, nParticles);
-    boxGen->SetXYZ(0, 0, 0.);
-    boxGen->SetThetaRange(0., 3.);
-    boxGen->SetPhiRange(0., 360.);
-    boxGen->SetPRange(momentum, momentum);
-    auto primGen = new FairPrimaryGenerator();
-    primGen->AddGenerator(boxGen);
-    run->SetGenerator(primGen);
-
-    // Further setup options and initialization
-    FairLogger::GetLogger()->SetLogVerbosityLevel("LOW");
-    FairLogger::GetLogger()->SetLogScreenLevel("WARNING");
-    run->SetStoreTraj(kTRUE);
+    // Init
     run->Init();
 
     // Connect runtime parameter file
-    auto parFileIO = new FairParRootFileIo(kTRUE);
-    parFileIO->open(parFile);
+    auto parFileIO = new FairParRootFileIo(true);
+    parFileIO->open(parafile);
     auto rtdb = run->GetRuntimeDb();
     rtdb->setOutput(parFileIO);
     rtdb->saveOutput();
 
     // Simulate
-    run->Run(nEvents);
+    run->Run(100);
 
     // Report
     timer.Stop();
-    cout << "Macro finished succesfully." << endl;
-    cout << "Output file is " << outFile << endl;
-    cout << "Parameter file is " << parFile << endl;
-    cout << "Real time " << timer.RealTime() << " s, CPU time " << timer.CpuTime() << "s" << endl << endl;
+    cout << "Macro finished successfully." << endl;
+    cout << "Real time: " << timer.RealTime() << "s, CPU time: " << timer.CpuTime() << "s" << endl;
 }

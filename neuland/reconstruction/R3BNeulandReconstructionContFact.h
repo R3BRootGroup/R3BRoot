@@ -11,34 +11,30 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BNeulandNeutronReconstruction.h"
-#include "FairLogger.h"
+#ifndef R3BNEULANDRECONSTRUCTIONCONTFACT_H
+#define R3BNEULANDRECONSTRUCTIONCONTFACT_H
 
-R3BNeulandNeutronReconstruction::R3BNeulandNeutronReconstruction(Neuland::ReconstructionEngine* engine,
-                                                                 TString input,
-                                                                 TString output)
-    : FairTask("R3B Neuland Neutron Reconstruction")
-    , fEngine(engine)
-    , fClusters(input)
-    , fNeutrons(output)
+#include "FairContFact.h"
+
+class FairContainer;
+
+/**
+ * NeuLAND reconstruction parameter container factory
+ * @author Jan Mayer
+ *
+ * Lots of super brittle boilerplate code that should really not be necessary
+ * TODO: Make FairRoot better so all of this can be deleted.
+ */
+
+class R3BNeulandReconstructionContFact : public FairContFact
 {
-    LOG(INFO) << "Using R3B Neuland Neutron Reconstruction";
-}
+  private:
+    void setAllContainers();
 
-InitStatus R3BNeulandNeutronReconstruction::Init()
-{
-    fEngine->Init();
-    fClusters.Init();
-    fNeutrons.Init();
-    return kSUCCESS;
-}
+  public:
+    R3BNeulandReconstructionContFact();
+    FairParSet* createContainer(FairContainer*) override;
+    ClassDefOverride(R3BNeulandReconstructionContFact, 0)
+};
 
-void R3BNeulandNeutronReconstruction::Exec(Option_t*)
-{
-    fNeutrons.Reset();
-    auto clusters = fClusters.Retrieve();
-    auto neutrons = fEngine->GetNeutrons(clusters);
-    fNeutrons.Insert(neutrons);
-}
-
-ClassImp(R3BNeulandNeutronReconstruction)
+#endif // R3BNEULANDRECONSTRUCTIONCONTFACT_H
