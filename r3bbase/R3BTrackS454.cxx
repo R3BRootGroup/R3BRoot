@@ -183,12 +183,20 @@ InitStatus R3BTrackS454::Init()
     //------------------------------------------------------------------------
     if (fGraphCuts)
     {
-        cut_Fi13vsTofd = NULL;
-        cut_Fi10vsTofd = NULL;
+        cut_fi11_fi3a = NULL;
+        cut_fi12_fi3b = NULL;
+        cut_Fi13vsFi11 = NULL;
+        cut_Fi10vsFi12 = NULL;
 
-        TFile* f = TFile::Open("myCuts.root", "read");
-        cut_Fi13vsTofd = dynamic_cast<TCutG*>(f->Get("Fi13vsTofd"));
-        cut_Fi10vsTofd = dynamic_cast<TCutG*>(f->Get("Fi10vsTofd"));
+        TFile* f = TFile::Open("fiberCuts.root", "read");
+        cut_Fi13vsFi11 = dynamic_cast<TCutG*>(f->Get("cut_dx_Fi13_Fi11"));
+        cut_Fi10vsFi12 = dynamic_cast<TCutG*>(f->Get("cut_dx_Fi10_Fi12"));
+
+        TFile* f3a = TFile::Open("myCutsFi3a.root", "read");
+        cut_fi11_fi3a = dynamic_cast<TCutG*>(f3a->Get("cut_fi11_fi3a"));
+
+        TFile* f3b = TFile::Open("myCutsFi3b.root", "read");
+        cut_fi12_fi3b = dynamic_cast<TCutG*>(f3b->Get("cut_fi12_fi3b"));
     }
     //------------------------------------------------------------------------
     // create histograms of all detectors
@@ -264,7 +272,7 @@ InitStatus R3BTrackS454::Init()
     fh_px_C->GetXaxis()->SetTitle("px / MeV/c");
     fh_px_C->GetYaxis()->SetTitle("counts");
 
-    fh_py_C = new TH1F("py_c", " py C", 2000, -500., 500);
+    fh_py_C = new TH1F("py_C", " py C", 2000, -500., 500);
     fh_py_C->GetXaxis()->SetTitle("py / MeV/c");
     fh_py_C->GetYaxis()->SetTitle("counts");
 
@@ -495,9 +503,9 @@ InitStatus R3BTrackS454::Init()
                                                   200,
                                                   -100,
                                                   100,
-                                                  200,
-                                                  -100.,
-                                                  100.);
+                                                  600,
+                                                  -30.,
+                                                  30.);
             fh_Fibs_vs_Tofd[ifibcount]->GetYaxis()->SetTitle("Fiber x / cm");
             fh_Fibs_vs_Tofd[ifibcount]->GetXaxis()->SetTitle("Tofd x / cm");
 
@@ -506,9 +514,9 @@ InitStatus R3BTrackS454::Init()
                                                      200,
                                                      -100,
                                                      100,
-                                                     200,
-                                                     -100.,
-                                                     100.);
+                                                     600,
+                                                     -30.,
+                                                     30.);
             fh_Fibs_vs_Tofd_ac[ifibcount]->GetYaxis()->SetTitle("Fiber x / cm");
             fh_Fibs_vs_Tofd_ac[ifibcount]->GetXaxis()->SetTitle("Tofd x / cm");
 
@@ -696,9 +704,6 @@ void R3BTrackS454::Exec(Option_t* option)
                   << " Tofd: " << counterTofd << " tracked: " << counter2 << " chix: " << counter3
                   << " chiy: " << counter4 << std::flush;
     fNEvents += 1;
-
-    // ofstream myfile;
-    // myfile.open("events3.dat", ios::out | ios::app);
 
     // cout << "New event ******************************" << endl;
 
@@ -955,7 +960,39 @@ void R3BTrackS454::Exec(Option_t* option)
     Double_t xdet[max];
     Double_t ydet[max];
     Double_t zdet[max];
-    Int_t qdet[max];
+    Int_t qdet[max + 2];
+    qdet[max] = 2;
+    qdet[max + 1] = 6;
+    Double_t xFi13[max];
+    Double_t yFi13[max];
+    Double_t qFi13[max];
+    Double_t tFi13[max];
+    Bool_t fFi13[max] = { false };
+    Double_t xFi12[max];
+    Double_t yFi12[max];
+    Double_t qFi12[max];
+    Double_t tFi12[max];
+    Bool_t fFi12[max] = { false };
+    Double_t xFi11[max];
+    Double_t yFi11[max];
+    Double_t qFi11[max];
+    Double_t tFi11[max];
+    Bool_t fFi11[max] = { false };
+    Double_t xFi10[max];
+    Double_t yFi10[max];
+    Double_t qFi10[max];
+    Double_t tFi10[max];
+    Bool_t fFi10[max] = { false };
+    Double_t xFi3a[max];
+    Double_t yFi3a[max];
+    Double_t qFi3a[max];
+    Double_t tFi3a[max];
+    Bool_t fFi3a[max] = { false };
+    Double_t xFi3b[max];
+    Double_t yFi3b[max];
+    Double_t qFi3b[max];
+    Double_t tFi3b[max];
+    Bool_t fFi3b[max] = { false };
 
     countdet = 0;
 
@@ -1101,23 +1138,24 @@ void R3BTrackS454::Exec(Option_t* option)
 
         if (IS_NAN(hitTofd->GetTime()))
             continue;
-        /*
-                cout << "Hit " << ihit << " of " << nHits << endl;
-                cout << "charge " << hitTofd->GetEloss() <<
-                        " time " << hitTofd->GetTime() << endl;
-        */
+
+        cout << "Hit " << ihit << " of " << nHits << " charge " << hitTofd->GetEloss() << " time " << hitTofd->GetTime()
+             << endl;
+
         Double_t ttt = hitTofd->GetTime();
         fh_tofd_time->Fill(ttt);
-        if (fCuts && (ttt < -400. || ttt > -250.) && !fSimu) // trigger window -1500, 1500
+        if (fCuts && (ttt < -100. || ttt > 100.) && !fSimu) // trigger window -1500, 1500
             continue;
 
-        Double_t qqq = hitTofd->GetEloss();
+        Double_t qqq = hitTofd->GetEloss(); // / 1.132;
         fh_tofd_charge->Fill(qqq);
 
         Double_t xxx = hitTofd->GetX();
         Double_t yyy = hitTofd->GetY();
         Double_t y_corr = 0.;
-        fh_xy_tofd->Fill(xxx, yyy);
+        Double_t randx;
+        randx = (std::rand() / (float)RAND_MAX) * 2.8 - 1.4;
+        fh_xy_tofd->Fill(xxx + randx, yyy);
         // first looking for the right charge
         if (fB == -1102 && !fSimu)
         {
@@ -1235,13 +1273,18 @@ void R3BTrackS454::Exec(Option_t* option)
                 det2 = tofd2l;
             }
         }
+
         x2[det2] = hitTofd->GetX() / 100.;
         y2[det2] = hitTofd->GetY() / 100. + y_corr;
-        fh_xy_tofd_ac->Fill(x2[det2] * 100., y2[det2] * 100.);
+        if (y2[det] < -0.4 || y2[det] > 0.4)
+            continue;
+
+        fh_xy_tofd_ac->Fill(x2[det2] * 100. + randx, y2[det2] * 100.);
+
         //        cout << "Test "<< hitTofd->GetY() / 100. << "  corr  " << y_corr << endl;
         //        if(fB != - 1672) y2[det2] = 0.;
         z2[det2] = 0.;
-        q2[det2] = hitTofd->GetEloss();
+        q2[det2] = hitTofd->GetEloss(); // / 1.132;
         fh_tofd_charge_ac->Fill(q2[det2]);
         // Achtung, ändern
         if (!fPairs)
@@ -1249,16 +1292,12 @@ void R3BTrackS454::Exec(Option_t* option)
         t2[det2] = hitTofd->GetTime();
         fh_tofd_time_ac->Fill(t2[det2]);
 
-        /*
-                cout << "ihit: " << ihit << endl;
-                cout << "ToFD Hit"
-                            << " x: " << x2[det2] << " y: " << y2[det2] << " q: " << q2[det2] << " t: " << t2[det2] << "
-           ID "
-                            << id2 << endl;
-        */
+        cout << "ToFD Hit"
+             << " x: " << x2[det2] << " y: " << y2[det2] << " q: " << q2[det2] << " t: " << t2[det2] << " ID " << id2
+             << endl;
 
         // register hits for tracker as long a time is in the coincidence window
-        if ((abs(t2[det2] - t1[det1]) < 2.) || first)
+        if ((abs(t2[det2] - t1[det1]) < 5.) || first)
         {
 
             // register point for tracker
@@ -1268,20 +1307,26 @@ void R3BTrackS454::Exec(Option_t* option)
             zdet[countdet] = z2[det2];
             qdet[countdet] = (int)(q2[det2] + 0.5);
             if (abs(qdet[countdet] - 2.) < 0.5)
+            {
                 alpha = true;
+                cout << "alpha: " << alpha << endl;
+                cout << "registered"
+                     << " x: " << x2[det2] << " y: " << y2[det2] << " q: " << q2[det2] << " t: " << t2[det2] << " ID "
+                     << id2 << endl;
+            }
             if (abs(qdet[countdet] - 6.) < 0.5)
+            {
                 carbon = true;
+                cout << "carbon: " << carbon << endl;
+                cout << "registered"
+                     << " x: " << x2[det2] << " y: " << y2[det2] << " q: " << q2[det2] << " t: " << t2[det2] << " ID "
+                     << id2 << endl;
+            }
             countdet++;
             single = true;
             first = false;
             tStart = t2[det2];
-            /*
-                        cout << "alpha: " << alpha << " carbon: " << carbon << endl;
-                        cout << "registered"
-                                    << " x: " << x2[det2] << " y: " << y2[det2] << " q: " << q2[det2] << " t: " <<
-               t2[det2]
-                                    << " ID " << id2 << endl;
-            */
+
             det1 = det2;
             x1[det1] = x2[det2];
             y1[det1] = y2[det2];
@@ -1302,7 +1347,8 @@ void R3BTrackS454::Exec(Option_t* option)
             continue;
         alpha = false;
         carbon = false;
-        // cout << "next event!!!!!! " << endl;
+        cout << "Found pair!!!!!! " << endl;
+
         single = false;
         first = true;
 
@@ -1320,8 +1366,13 @@ void R3BTrackS454::Exec(Option_t* option)
         multTofd++;
 
         counterTofdMulti++;
-        // cut in ToT for Fibers
+
+        // only consider fiber with maximum energy deposit
         Bool_t maxWerte = false;
+        if (!fPairs && fB != -1672)
+            maxWerte = true;
+
+        // cut in ToT for Fibers
         Double_t cutQ = 0.;
         if (!fPairs || fB != -1672)
             cutQ = 4.;
@@ -1337,18 +1388,16 @@ void R3BTrackS454::Exec(Option_t* option)
             det = fi13;
             R3BBunchedFiberHitData* hit13 = (R3BBunchedFiberHitData*)detHit13->At(ihit13);
             x1[det] = hit13->GetX() / 100.;
-            y1[det] = 0.; // hit13->GetY() / 100.;
+            y1[det] = hit13->GetY() / 100.;
             z1[det] = 0.;
             q1[det] = hit13->GetEloss();
-            t1[det] = hit13->GetTime();
-
             if (q1[det] > 9.)
                 q1[det] = 8.;
             else if (q1[det] > 4.)
                 q1[det] = 6.;
             else if (q1[det] > 0.)
                 q1[det] = 2.;
-
+            t1[det] = hit13->GetTime();
             tof = tStart - t1[det];
 
             // Fill histograms before cuts
@@ -1356,7 +1405,7 @@ void R3BTrackS454::Exec(Option_t* option)
             fh_xy_Fib[det]->Fill(x1[det] * 100., y1[det] * 100.);
             fh_mult_Fib[det]->Fill(nHits13);
             fh_ToT_Fib[det]->Fill(x1[det] * 100., q1[det]);
-            fh_Fibs_vs_Tofd[det]->Fill(x1[tofd1r] * 100., x1[det] * 100.);
+            fh_Fibs_vs_Tofd[det]->Fill(x1[tofd1r] * 100. + randx, x1[det] * 100.);
             fh_Fib_vs_Events[det]->Fill(fNEvents, x1[det] * 100.);
             fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
             fh_Fib_Time[det]->Fill(x1[det] * 100., t1[det]);
@@ -1365,19 +1414,23 @@ void R3BTrackS454::Exec(Option_t* option)
                         << " t1: " << t1[det] << endl;
 
             // Cuts on Fi13
-            //            if (fCuts && x1[det] * 100. < -24.5)
-            //                continue;
-            //            if (fCuts && y1[det] * 100. < -100.)
-            //                continue;
+            if (fCuts && x1[det] * 100. < -24.5)
+                continue;
+            if (fCuts && (y1[det] < -0.4 || y1[det] > 0.4))
+                continue;
             if (fCuts && !fPairs && q1[det] < cutQ)
                 continue;
-            if (fCuts && (tof < -40 || tof > 20))
+            if (fCuts && (tof < -15 || tof > 15) && !fSimu)
                 continue;
-            if (fGraphCuts && !cut_Fi13vsTofd->IsInside(x1[tofd1r] * 100., x1[det] * 100.))
-                continue;
+            //            if (fGraphCuts && !cut_Fi13vsTofd->IsInside(x1[tofd1r] * 100., x1[det] * 100.))
+            //                continue;
 
+            xFi13[mult13] = x1[det];
+            yFi13[mult13] = y1[det];
+            qFi13[mult13] = q1[det];
+            tFi13[mult13] = tof;
             mult13++;
-            if (mult13 > 10)
+            if (mult13 > 100)
                 continue;
 
             if (q1[det] > qMax[det])
@@ -1394,22 +1447,24 @@ void R3BTrackS454::Exec(Option_t* option)
             fh_xy_Fib_ac[det]->Fill(x1[det] * 100., y1[det] * 100.);
             fh_mult_Fib_ac[det]->Fill(mult13);
             fh_ToT_Fib_ac[det]->Fill(x1[det] * 100., q1[det]);
-            fh_Fibs_vs_Tofd_ac[det]->Fill(x1[tofd1r] * 100., x1[det] * 100.);
+            fh_Fibs_vs_Tofd_ac[det]->Fill(x1[tofd1r] * 100. + randx, x1[det] * 100.);
             fh_Fib_vs_Events_ac[det]->Fill(fNEvents, x1[det] * 100.);
             fh_ToF_vs_Events_ac[det]->Fill(fNEvents, tof);
             fh_Fib_Time_ac[det]->Fill(x1[det] * 100., t1[det]);
 
             LOG(DEBUG2) << "Fi13: " << ihit13 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
                         << " t1: " << t1[det] << endl;
-            if (!maxWerte)
-            {
-                detector[countdet] = det;
-                xdet[countdet] = x1[det];
-                ydet[countdet] = y1[det];
-                zdet[countdet] = z1[det];
-                qdet[countdet] = 0;
-                countdet++;
-            }
+            /*
+                        if (!maxWerte)
+                        {
+                            detector[countdet] = det;
+                            xdet[countdet] = x1[det];
+                            ydet[countdet] = y1[det];
+                            zdet[countdet] = z1[det];
+                            qdet[countdet] = 0;
+                            countdet++;
+                        }
+            */
         }
 
         if (mult13 > 0 && maxWerte)
@@ -1432,18 +1487,16 @@ void R3BTrackS454::Exec(Option_t* option)
             det = fi11;
             R3BBunchedFiberHitData* hit11 = (R3BBunchedFiberHitData*)detHit11->At(ihit11);
             x1[det] = hit11->GetX() / 100.;
-            y1[det] = 0.; // hit11->GetY() / 100.;
+            y1[det] = hit11->GetY() / 100.;
             z1[det] = 0.;
             q1[det] = hit11->GetEloss();
-            t1[det] = hit11->GetTime();
-
             if (q1[det] > 9.)
                 q1[det] = 8.;
             else if (q1[det] > 4.)
                 q1[det] = 6.;
             else if (q1[det] > 0.)
                 q1[det] = 2.;
-
+            t1[det] = hit11->GetTime();
             tof = tStart - t1[det];
 
             // Fill histograms before cuts
@@ -1451,7 +1504,7 @@ void R3BTrackS454::Exec(Option_t* option)
             fh_xy_Fib[det]->Fill(x1[det] * 100., y1[det] * 100);
             fh_mult_Fib[det]->Fill(nHits11);
             fh_ToT_Fib[det]->Fill(x1[det] * 100., q1[det]);
-            fh_Fibs_vs_Tofd[det]->Fill(x1[tofd1r] * 100., x1[det] * 100.);
+            fh_Fibs_vs_Tofd[det]->Fill(x1[tofd1r] * 100. + randx, x1[det] * 100.);
             fh_Fib_vs_Events[det]->Fill(fNEvents, x1[det] * 100.);
             fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
             fh_Fib_Time[det]->Fill(x1[det] * 100., t1[det]);
@@ -1460,17 +1513,23 @@ void R3BTrackS454::Exec(Option_t* option)
                         << " t1: " << t1[det] << endl;
 
             // Cuts on Fi11
-            //            if (fCuts && x1[det] * 100. <- 24.4)
-            //                continue;
-            //            if (fCuts && y1[det] * 100. < -100.)
-            //                continue;
+            if (fCuts && x1[det] * 100. < -24.4)
+                continue;
             if (fCuts && !fPairs && q1[det] < cutQ)
                 continue;
-            if (fCuts && (tof < -40 || tof > 20))
+            if (fCuts && (y1[det] < -0.4 || y1[det] > 0.4))
                 continue;
+            if (fCuts && (tof < -15 || tof > 15) && !fSimu)
+                continue;
+            //            if (fGraphCuts && !cut_Fi13vsTofd->IsInside(x1[tofd1r] * 100., x1[det] * 100.))
+            //                continue;
 
+            xFi11[mult11] = x1[det];
+            yFi11[mult11] = y1[det];
+            qFi11[mult11] = q1[det];
+            tFi11[mult11] = tof;
             mult11++;
-            if (mult11 > 10)
+            if (mult11 > 100)
                 continue;
 
             if (q1[det] > qMax[det])
@@ -1487,23 +1546,24 @@ void R3BTrackS454::Exec(Option_t* option)
             fh_xy_Fib_ac[det]->Fill(x1[det] * 100., y1[det] * 100);
             fh_mult_Fib_ac[det]->Fill(mult11);
             fh_ToT_Fib_ac[det]->Fill(x1[det] * 100., q1[det]);
-            fh_Fibs_vs_Tofd_ac[det]->Fill(x1[tofd1r] * 100., x1[det] * 100.);
+            fh_Fibs_vs_Tofd_ac[det]->Fill(x1[tofd1r] * 100. + randx, x1[det] * 100.);
             fh_Fib_vs_Events_ac[det]->Fill(fNEvents, x1[det] * 100.);
             fh_ToF_vs_Events_ac[det]->Fill(fNEvents, tof);
             fh_Fib_Time_ac[det]->Fill(x1[det] * 100., t1[det]);
 
             LOG(DEBUG2) << "Fi11: " << ihit11 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
                         << " t1: " << t1[det] << endl;
-
-            if (!maxWerte)
-            {
-                detector[countdet] = det;
-                xdet[countdet] = x1[det];
-                ydet[countdet] = y1[det];
-                zdet[countdet] = z1[det];
-                qdet[countdet] = 0;
-                countdet++;
-            }
+            /*
+                        if (!maxWerte)
+                        {
+                            detector[countdet] = det;
+                            xdet[countdet] = x1[det];
+                            ydet[countdet] = y1[det];
+                            zdet[countdet] = z1[det];
+                            qdet[countdet] = 0;
+                            countdet++;
+                        }
+            */
         }
 
         if (mult11 > 0 && maxWerte)
@@ -1526,18 +1586,16 @@ void R3BTrackS454::Exec(Option_t* option)
             det = fi10;
             R3BBunchedFiberHitData* hit10 = (R3BBunchedFiberHitData*)detHit10->At(ihit10);
             x1[det] = hit10->GetX() / 100.;
-            y1[det] = 0.; // hit10->GetY() / 100.;
+            y1[det] = hit10->GetY() / 100.;
             z1[det] = 0.;
             q1[det] = hit10->GetEloss();
-            t1[det] = hit10->GetTime();
-
             if (q1[det] > 9.)
                 q1[det] = 8.;
             else if (q1[det] > 4.)
                 q1[det] = 6.;
             else if (q1[det] > 0.)
                 q1[det] = 2.;
-
+            t1[det] = hit10->GetTime();
             tof = tStart - t1[det];
 
             // Fill histograms before cuts
@@ -1545,7 +1603,7 @@ void R3BTrackS454::Exec(Option_t* option)
             fh_xy_Fib[det]->Fill(x1[det] * 100., y1[det] * 100.);
             fh_mult_Fib[det]->Fill(nHits10);
             fh_ToT_Fib[det]->Fill(x1[det] * 100., q1[det]);
-            fh_Fibs_vs_Tofd[det]->Fill(x1[tofd1l] * 100., x1[det] * 100.);
+            fh_Fibs_vs_Tofd[det]->Fill(x1[tofd1l] * 100. + randx, x1[det] * 100.);
             fh_Fib_vs_Events[det]->Fill(fNEvents, x1[det] * 100.);
             fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
             fh_Fib_Time[det]->Fill(x1[det] * 100., t1[det]);
@@ -1553,15 +1611,19 @@ void R3BTrackS454::Exec(Option_t* option)
             // Cuts on Fi10
             if (fCuts && !fPairs && q1[det] < cutQ)
                 continue;
-            //            if (fCuts && x1[det] * 100. < -24.1)
-            //                continue;
-            //            if (fCuts && y1[det] * 100. < -100.)
-            //                continue;
-            if (fCuts && (tof < -40 || tof > 20))
+            if (fCuts && x1[det] * 100. < -24.1)
+                continue;
+            if (fCuts && (y1[det] < -0.4 || y1[det] > 0.4))
+                continue;
+            if (fCuts && (tof < -15 || tof > 15) && !fSimu)
                 continue;
 
+            xFi10[mult10] = x1[det];
+            yFi10[mult10] = y1[det];
+            qFi10[mult10] = q1[det];
+            tFi10[mult10] = tof;
             mult10++;
-            if (mult10 > 10)
+            if (mult10 > 100)
                 continue;
 
             if (q1[det] > qMax[det])
@@ -1578,23 +1640,24 @@ void R3BTrackS454::Exec(Option_t* option)
             fh_xy_Fib_ac[det]->Fill(x1[det] * 100., y1[det] * 100.);
             fh_mult_Fib_ac[det]->Fill(mult10);
             fh_ToT_Fib_ac[det]->Fill(x1[det] * 100., q1[det]);
-            fh_Fibs_vs_Tofd_ac[det]->Fill(x1[tofd1l] * 100., x1[det] * 100.);
+            fh_Fibs_vs_Tofd_ac[det]->Fill(x1[tofd1l] * 100. + randx, x1[det] * 100.);
             fh_Fib_vs_Events_ac[det]->Fill(fNEvents, x1[det] * 100.);
             fh_ToF_vs_Events_ac[det]->Fill(fNEvents, tof);
             fh_Fib_Time_ac[det]->Fill(x1[det] * 100., t1[det]);
 
             LOG(DEBUG2) << "Fi10: " << ihit10 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
                         << " t1: " << t1[det] << endl;
-
-            if (!maxWerte)
-            {
-                detector[countdet] = det;
-                xdet[countdet] = x1[det];
-                ydet[countdet] = y1[det];
-                zdet[countdet] = z1[det];
-                qdet[countdet] = 0;
-                countdet++;
-            }
+            /*
+                        if (!maxWerte)
+                        {
+                            detector[countdet] = det;
+                            xdet[countdet] = x1[det];
+                            ydet[countdet] = y1[det];
+                            zdet[countdet] = z1[det];
+                            qdet[countdet] = 0;
+                            countdet++;
+                        }
+            */
         }
 
         if (mult10 > 0 && maxWerte)
@@ -1617,18 +1680,16 @@ void R3BTrackS454::Exec(Option_t* option)
             det = fi12;
             R3BBunchedFiberHitData* hit12 = (R3BBunchedFiberHitData*)detHit12->At(ihit12);
             x1[det] = hit12->GetX() / 100.;
-            y1[det] = 0.; // hit12->GetY() / 100.;
+            y1[det] = hit12->GetY() / 100.;
             z1[det] = 0.;
             q1[det] = hit12->GetEloss();
-            t1[det] = hit12->GetTime();
-
             if (q1[det] > 9.)
                 q1[det] = 8.;
             else if (q1[det] > 4.)
                 q1[det] = 6.;
             else if (q1[det] > 0.)
                 q1[det] = 2.;
-
+            t1[det] = hit12->GetTime();
             tof = tStart - t1[det];
 
             // Fill histograms before cuts
@@ -1636,7 +1697,7 @@ void R3BTrackS454::Exec(Option_t* option)
             fh_xy_Fib[det]->Fill(x1[det] * 100., y1[det] * 100.);
             fh_mult_Fib[det]->Fill(nHits12);
             fh_ToT_Fib[det]->Fill(x1[det] * 100., q1[det]);
-            fh_Fibs_vs_Tofd[det]->Fill(x1[tofd1l] * 100., x1[det] * 100.);
+            fh_Fibs_vs_Tofd[det]->Fill(x1[tofd1l] * 100. + randx, x1[det] * 100.);
             fh_Fib_vs_Events[det]->Fill(fNEvents, x1[det] * 100.);
             fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
             fh_Fib_Time[det]->Fill(x1[det] * 100., t1[det]);
@@ -1644,15 +1705,19 @@ void R3BTrackS454::Exec(Option_t* option)
             // Cuts on Fi12
             if (fCuts && !fPairs && q1[det] < cutQ)
                 continue;
-            //            if (fCuts && x1[det] * 100. < -24.4)
-            //                continue;
-            //            if (fCuts && y1[det] * 100. < -100.)
-            //                continue;
-            if (fCuts && (tof < -40 || tof > 20))
+            if (fCuts && x1[det] * 100. < -24.4)
+                continue;
+            if (fCuts && (y1[det] < -0.4 || y1[det] > 0.4))
+                continue;
+            if (fCuts && (tof < -15 || tof > 15) && !fSimu)
                 continue;
 
+            xFi12[mult12] = x1[det];
+            yFi12[mult12] = y1[det];
+            qFi12[mult12] = q1[det];
+            tFi12[mult12] = tof;
             mult12++;
-            if (mult12 > 10)
+            if (mult12 > 100)
                 continue;
 
             if (q1[det] > qMax[det])
@@ -1669,23 +1734,24 @@ void R3BTrackS454::Exec(Option_t* option)
             fh_xy_Fib_ac[det]->Fill(x1[det] * 100., y1[det] * 100.);
             fh_mult_Fib_ac[det]->Fill(mult12);
             fh_ToT_Fib_ac[det]->Fill(x1[det] * 100., q1[det]);
-            fh_Fibs_vs_Tofd_ac[det]->Fill(x1[tofd1l] * 100., x1[det] * 100.);
+            fh_Fibs_vs_Tofd_ac[det]->Fill(x1[tofd1l] * 100. + randx, x1[det] * 100.);
             fh_Fib_vs_Events_ac[det]->Fill(fNEvents, x1[det] * 100.);
             fh_ToF_vs_Events_ac[det]->Fill(fNEvents, tof);
             fh_Fib_Time_ac[det]->Fill(x1[det] * 100., t1[det]);
 
             LOG(DEBUG2) << "Fi12: " << ihit12 << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
                         << " t1: " << t1[det] << endl;
-
-            if (!maxWerte)
-            {
-                detector[countdet] = det;
-                xdet[countdet] = x1[det];
-                ydet[countdet] = y1[det];
-                zdet[countdet] = z1[det];
-                qdet[countdet] = 0;
-                countdet++;
-            }
+            /*
+                        if (!maxWerte)
+                        {
+                            detector[countdet] = det;
+                            xdet[countdet] = x1[det];
+                            ydet[countdet] = y1[det];
+                            zdet[countdet] = z1[det];
+                            qdet[countdet] = 0;
+                            countdet++;
+                        }
+            */
         }
 
         if (mult12 > 0 && maxWerte)
@@ -1709,18 +1775,16 @@ void R3BTrackS454::Exec(Option_t* option)
             det = fi3a;
             R3BBunchedFiberHitData* hit3a = (R3BBunchedFiberHitData*)detHit3a->At(ihit3a);
             x1[det] = hit3a->GetX() / 100.;
-            y1[det] = 0.; // hit3a->GetY() / 100.;
+            y1[det] = hit3a->GetY() / 100.;
             z1[det] = 0.;
             q1[det] = hit3a->GetEloss();
-            t1[det] = hit3a->GetTime();
-
             if (q1[det] > 5.)
                 q1[det] = 8.;
             else if (q1[det] > 2.)
                 q1[det] = 6.;
             else if (q1[det] > 0.)
                 q1[det] = 2.;
-
+            t1[det] = hit3a->GetTime();
             tof = tStart - t1[det];
 
             // Fill histograms before cuts
@@ -1728,7 +1792,7 @@ void R3BTrackS454::Exec(Option_t* option)
             fh_xy_Fib[det]->Fill(x1[det] * 100., y1[det] * 100.);
             fh_mult_Fib[det]->Fill(nHits3a);
             fh_ToT_Fib[det]->Fill(x1[det] * 100., q1[det]);
-            fh_Fibs_vs_Tofd[det]->Fill(x1[tofd1r] * 100., x1[det] * 100.);
+            fh_Fibs_vs_Tofd[det]->Fill(x1[tofd1r] * 100. + randx, x1[det] * 100.);
             fh_Fib_vs_Events[det]->Fill(fNEvents, x1[det] * 100.);
             fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
             fh_Fib_Time[det]->Fill(x1[det] * 100., t1[det]);
@@ -1738,13 +1802,19 @@ void R3BTrackS454::Exec(Option_t* option)
             //                continue;
             //            if (fCuts && y1[det] *100. < -50.)
             //                continue;
-            if (fCuts && !fPairs && q1[det] < cutQ)
+            // if (fCuts && !fPairs && q1[det] < cutQ)
+            // continue;
+            if (fCuts && (y1[det] < -0.2 || y1[det] > 0.2))
                 continue;
-            if (fCuts && (tof < -40 || tof > 20))
+            if (fCuts && (tof < -20 || tof > 20) && !fSimu)
                 continue;
 
+            xFi3a[mult3a] = x1[det];
+            yFi3a[mult3a] = y1[det];
+            qFi3a[mult3a] = q1[det];
+            tFi3a[mult3a] = tof;
             mult3a++;
-            if (mult3a > 10)
+            if (mult3a > 100)
                 continue;
 
             if (q1[det] > qMax[det])
@@ -1761,23 +1831,24 @@ void R3BTrackS454::Exec(Option_t* option)
             fh_xy_Fib_ac[det]->Fill(x1[det] * 100., y1[det] * 100.);
             fh_mult_Fib_ac[det]->Fill(mult3a);
             fh_ToT_Fib_ac[det]->Fill(x1[det] * 100., q1[det]);
-            fh_Fibs_vs_Tofd_ac[det]->Fill(x1[tofd1r] * 100., x1[det] * 100.);
+            fh_Fibs_vs_Tofd_ac[det]->Fill(x1[tofd1r] * 100. + randx, x1[det] * 100.);
             fh_Fib_vs_Events_ac[det]->Fill(fNEvents, x1[det] * 100.);
             fh_ToF_vs_Events_ac[det]->Fill(fNEvents, tof);
             fh_Fib_Time_ac[det]->Fill(x1[det] * 100., t1[det]);
 
             LOG(DEBUG2) << "Fi3a " << ihit3a << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
                         << " t1: " << tof << endl;
-
-            if (!maxWerte)
-            {
-                detector[countdet] = det;
-                xdet[countdet] = x1[det];
-                ydet[countdet] = y1[det];
-                zdet[countdet] = z1[det];
-                qdet[countdet] = 0;
-                countdet++;
-            }
+            /*
+                        if (!maxWerte)
+                        {
+                            detector[countdet] = det;
+                            xdet[countdet] = x1[det];
+                            ydet[countdet] = y1[det];
+                            zdet[countdet] = z1[det];
+                            qdet[countdet] = 0;
+                            countdet++;
+                        }
+            */
         }
 
         if (mult3a > 0 && maxWerte)
@@ -1802,18 +1873,16 @@ void R3BTrackS454::Exec(Option_t* option)
             det = fi3b;
             R3BBunchedFiberHitData* hit3b = (R3BBunchedFiberHitData*)detHit3b->At(ihit3b);
             x1[det] = hit3b->GetX() / 100.;
-            y1[det] = 0.; // hit3b->GetY() / 100.;
+            y1[det] = hit3b->GetY() / 100.;
             z1[det] = 0.;
             q1[det] = hit3b->GetEloss();
-            t1[det] = hit3b->GetTime();
-
             if (q1[det] > 5.)
                 q1[det] = 8.;
             else if (q1[det] > 2.)
                 q1[det] = 6.;
             else if (q1[det] > 0.)
                 q1[det] = 2.;
-
+            t1[det] = hit3b->GetTime();
             tof = tStart - t1[det];
 
             // Fill histograms before cuts
@@ -1821,7 +1890,7 @@ void R3BTrackS454::Exec(Option_t* option)
             fh_xy_Fib[det]->Fill(x1[det] * 100., y1[det] * 100.);
             fh_mult_Fib[det]->Fill(nHits3b);
             fh_ToT_Fib[det]->Fill(x1[det] * 100., q1[det]);
-            fh_Fibs_vs_Tofd[det]->Fill(x1[tofd1l] * 100., x1[det] * 100.);
+            fh_Fibs_vs_Tofd[det]->Fill(x1[tofd1l] * 100. + randx, x1[det] * 100.);
             fh_Fib_vs_Events[det]->Fill(fNEvents, x1[det] * 100.);
             fh_ToF_vs_Events[det]->Fill(fNEvents, tof);
             fh_Fib_Time[det]->Fill(x1[det] * 100., t1[det]);
@@ -1831,13 +1900,19 @@ void R3BTrackS454::Exec(Option_t* option)
             //                continue;
             //            if (fCuts && y1[det] * 100. < -50.)
             //                continue;
-            if (fCuts && !fPairs && q1[det] < cutQ)
+            // if (fCuts && !fPairs && q1[det] < cutQ)
+            // continue;
+            if (fCuts && (y1[det] < -0.2 || y1[det] > 0.2))
                 continue;
-            if (fCuts && (tof < -40 || tof > 20))
+            if (fCuts && (tof < -20 || tof > 20) && !fSimu)
                 continue;
 
+            xFi3b[mult3b] = x1[det];
+            yFi3b[mult3b] = y1[det];
+            qFi3b[mult3b] = q1[det];
+            tFi3b[mult3b] = tof;
             mult3b++;
-            if (mult3b > 10)
+            if (mult3b > 100)
                 continue;
 
             if (q1[det] > qMax[det])
@@ -1854,23 +1929,24 @@ void R3BTrackS454::Exec(Option_t* option)
             fh_xy_Fib_ac[det]->Fill(x1[det] * 100., y1[det] * 100.);
             fh_mult_Fib_ac[det]->Fill(mult3b);
             fh_ToT_Fib_ac[det]->Fill(x1[det] * 100., q1[det]);
-            fh_Fibs_vs_Tofd_ac[det]->Fill(x1[tofd1l] * 100., x1[det] * 100.);
+            fh_Fibs_vs_Tofd_ac[det]->Fill(x1[tofd1l] * 100. + randx, x1[det] * 100.);
             fh_Fib_vs_Events_ac[det]->Fill(fNEvents, x1[det] * 100.);
             fh_ToF_vs_Events_ac[det]->Fill(fNEvents, tof);
             fh_Fib_Time_ac[det]->Fill(x1[det] * 100., t1[det]);
 
             LOG(DEBUG2) << "Fi3b " << ihit3b << " x1: " << x1[det] << " y1: " << y1[det] << " q1: " << q1[det]
                         << " t1: " << tof << endl;
-
-            if (!maxWerte)
-            {
-                detector[countdet] = det;
-                xdet[countdet] = x1[det];
-                ydet[countdet] = y1[det];
-                zdet[countdet] = z1[det];
-                qdet[countdet] = 0;
-                countdet++;
-            }
+            /*
+                        if (!maxWerte)
+                        {
+                            detector[countdet] = det;
+                            xdet[countdet] = x1[det];
+                            ydet[countdet] = y1[det];
+                            zdet[countdet] = z1[det];
+                            qdet[countdet] = 0;
+                            countdet++;
+                        }
+            */
         }
 
         if (mult3b > 0 && maxWerte)
@@ -1883,59 +1959,152 @@ void R3BTrackS454::Exec(Option_t* option)
             countdet++;
         }
 
-        if (fGhost && (mult3a + mult3b) < 2)
+        if (fGhost && (mult3a + mult3b) < 1)
         {
             det = ghost;
             detector[countdet] = det;
             xdet[countdet] = 0.;
             ydet[countdet] = 0.;
             zdet[countdet] = 0.;
-            qdet[countdet] = 6;
+            qdet[countdet] = 0;
             countdet++;
         }
-        // Plots of correlations of Fiber detectors
 
-        if (xMax[fi11] > -100 && xMax[fi13] > -100)
+        // Plots of correlations of Fiber detectors and register events for tracker
+        for (Int_t i = 0; i < mult11; i++)
         {
-            fh_Fib13_vs_Fib11->Fill(xMax[fi11] * 100., xMax[fi13] * 100.);
-            fh_Fib13_vs_Fib11_dx->Fill(xMax[fi11] * 100., xMax[fi13] * 100. - xMax[fi11] * 100.);
+            for (Int_t j = 0; j < mult13; j++)
+            {
+                if (xFi11[i] > -100 && xFi13[j] > -100)
+                {
+                    fh_Fib13_vs_Fib11->Fill(xFi11[i] * 100., xFi13[j] * 100.);
+                    fh_Fib13_vs_Fib11_dx->Fill(xFi11[i] * 100., xFi13[j] * 100. - xFi11[i] * 100.);
+                    if (!maxWerte)
+                    {
+                        if (!fFi11[i])
+                        {
+                            detector[countdet] = fi11;
+                            xdet[countdet] = xFi11[i];
+                            ydet[countdet] = yFi11[i];
+                            zdet[countdet] = 0.;
+                            qdet[countdet] = qFi11[i];
+                            countdet++;
+                            fFi11[i] = true;
+                        }
+                        if (!fFi13[j])
+                        {
+                            detector[countdet] = fi13;
+                            xdet[countdet] = xFi13[j];
+                            ydet[countdet] = yFi13[j];
+                            zdet[countdet] = 0.;
+                            qdet[countdet] = qFi13[j];
+                            countdet++;
+                            fFi13[j] = true;
+                        }
+                    }
+                }
+            }
+            for (Int_t j = 0; j < mult3a; j++)
+            {
+                if (xFi3a[j] > -100 && xFi11[i] > -100)
+                {
+                    if (fGraphCuts && !cut_fi11_fi3a->IsInside(xFi3a[j] * 100., xFi11[i] * 100.))
+                        continue;
+                    fh_Fib11_vs_Fib3a->Fill(xFi3a[j] * 100., xFi11[i] * 100.);
+                    fh_Fib11_vs_Fib3a_dx->Fill(xFi3a[j] * 100., xFi11[i] * 100. - xFi3a[j] * 100.);
+                    if (!maxWerte)
+                    {
+                        if (!fFi3a[j])
+                        {
+                            detector[countdet] = fi3a;
+                            xdet[countdet] = xFi3a[j];
+                            ydet[countdet] = yFi3a[j];
+                            zdet[countdet] = 0.;
+                            qdet[countdet] = qFi3a[j];
+                            countdet++;
+                            fFi3a[j] = true;
+                        }
+                    }
+                }
+            }
         }
-        if (xMax[fi3a] > -100 && xMax[fi11] > -100)
+
+        for (Int_t i = 0; i < mult12; i++)
         {
-            fh_Fib11_vs_Fib3a->Fill(xMax[fi3a] * 100., xMax[fi11] * 100.);
-            fh_Fib11_vs_Fib3a_dx->Fill(xMax[fi3a] * 100., xMax[fi11] * 100. - xMax[fi3a] * 100.);
+            for (Int_t j = 0; j < mult10; j++)
+            {
+                if (xFi12[i] > -100 && xFi10[j] > -100)
+                {
+                    fh_Fib10_vs_Fib12->Fill(xFi12[i] * 100., xFi10[j] * 100.);
+                    fh_Fib10_vs_Fib12_dx->Fill(xFi12[i] * 100., xFi10[j] * 100. - xFi12[i] * 100.);
+                    if (!maxWerte)
+                    {
+                        if (!fFi12[i])
+                        {
+                            detector[countdet] = fi12;
+                            xdet[countdet] = xFi12[i];
+                            ydet[countdet] = yFi12[i];
+                            zdet[countdet] = 0.;
+                            qdet[countdet] = qFi12[i];
+                            countdet++;
+                            fFi12[i] = true;
+                        }
+                        if (!fFi10[j])
+                        {
+                            detector[countdet] = fi10;
+                            xdet[countdet] = xFi10[j];
+                            ydet[countdet] = yFi10[j];
+                            zdet[countdet] = 0.;
+                            qdet[countdet] = qFi10[j];
+                            countdet++;
+                            fFi10[j] = true;
+                        }
+                    }
+                }
+            }
+            for (Int_t j = 0; j < mult3b; j++)
+            {
+                if (xFi3b[j] > -100 && xFi12[i] > -100)
+                {
+                    if (fGraphCuts && !cut_fi12_fi3b->IsInside(xFi3b[j] * 100., xFi12[i] * 100.))
+                        continue;
+                    fh_Fib12_vs_Fib3b->Fill(xFi3b[j] * 100., xFi12[i] * 100.);
+                    fh_Fib12_vs_Fib3b_dx->Fill(xFi3b[j] * 100., xFi12[i] * 100. - xFi3b[j] * 100.);
+                    if (!maxWerte)
+                    {
+                        if (!fFi3b[j])
+                        {
+                            detector[countdet] = fi3b;
+                            xdet[countdet] = xFi3b[j];
+                            ydet[countdet] = yFi3b[j];
+                            zdet[countdet] = 0.;
+                            qdet[countdet] = qFi3b[j];
+                            countdet++;
+                            fFi3b[j] = true;
+                        }
+                    }
+                }
+            }
         }
-        if (xMax[fi12] > -100 && xMax[fi10] > -100)
+
+        if (countdet > 50)
         {
-            fh_Fib10_vs_Fib12->Fill(xMax[fi12] * 100., xMax[fi10] * 100.);
-            fh_Fib10_vs_Fib12_dx->Fill(xMax[fi12] * 100., xMax[fi10] * 100. - xMax[fi12] * 100.);
-        }
-        if (xMax[fi3b] > -100 && xMax[fi12] > -100)
-        {
-            fh_Fib12_vs_Fib3b->Fill(xMax[fi3b] * 100., xMax[fi12] * 100.);
-            fh_Fib12_vs_Fib3b_dx->Fill(xMax[fi3b] * 100., xMax[fi12] * 100. - xMax[fi3b] * 100.);
+            cout << "Too many hits!!!" << endl;
+            continue;
         }
 
         // here call tracker
         chi2 = 1.E100;
-        counter2++;
-        //        if (tracker && ((mult10 > 0 && mult12 > 0) || (mult11 > 0 && mult13 > 0)))
-        if (tracker)
+        Bool_t debug = true;
+        if (debug && ((mult10 > 0 && mult12 > 0 && mult3b > 0) || (mult11 > 0 && mult13 > 0 && mult3a > 0)))
         {
-            /*
-                        if (mult3a > 20 || mult3b > 20 || mult10 > 20 || mult11 > 20 ||
-                            mult12 >20 || mult13 > 20) {
-                            cout << "Too many hits!!!!!!!!!!!!!!!!!!!!" << endl;
-                            continue;
-                        }
-            */
-            Double_t test[9];
-
-            // cout << "# of points" << countdet << endl;
+            cout << "# of points" << countdet << endl;
             for (Int_t i = 0; i < countdet; i++)
             {
-                // cout << "#" << i << " Det: " << detector[i] << " x: " << xdet[i] << " y: " << ydet[i]
-                //           << " q: " << qdet[i] << endl;
+                cout << "#" << i << " Det: " << detector[i] << " x: " << xdet[i] << " y: " << ydet[i]
+                     << " q: " << qdet[i] << endl;
+                if (detector[i] < 6)
+                    qdet[i] = 0;
             }
 
             for (Int_t i = 0; i < ndet; i++)
@@ -1943,54 +2112,165 @@ void R3BTrackS454::Exec(Option_t* option)
                 LOG(DEBUG2) << "Max Det: " << i << " max x: " << xMax[i] << " max y: " << yMax[i]
                             << " max q: " << qMax[i] << endl;
             }
+        }
 
-            /*
-                            if (counter1 < 200000 && ((mult10 > 0 && mult12 > 0) || (mult11 > 0 && mult13 > 0)))
-                            {
-                                counter1++;
-                                cout << "Counter: " << counter1 << endl;
-                                myfile << countdet << "  \n";
-                                for (Int_t i = 0; i < countdet; i++)
-                                {
+        for (Int_t i = 0; i < countdet; i++)
+        {
+            if (detector[i] < 6)
+                qdet[i] = 0;
+        }
 
-                                    myfile << detector[i] << "    " << xdet[i] << "    " << ydet[i] << " \n";
-                                }
-                            }
-            */
-            Bool_t det_coord = true;
-            if (fPairs)
+        Bool_t writeFile = false;
+        if (writeFile && counter1 < 200000 &&
+            ((mult10 > 0 && mult12 > 0 && mult3b > 0) || (mult11 > 0 && mult13 > 0 && mult3a > 0)))
+        {
+            ofstream myfile;
+            myfile.open("events_v35.dat", ios::out | ios::app);
+            counter1++;
+            cout << "Counter: " << counter1 << endl;
+            myfile << countdet << "  \n";
+            for (Int_t i = 0; i < countdet; i++)
             {
-                // double track
-                Bool_t st = true;
-                // multi_track_from_cpp_(
-                //    &max, &countdet, &det_coord, &st, target, detector, qdet, xdet, ydet, zdet, track, chi);
 
-                multi_track_extended_output_from_cpp_(
-                    &max, &countdet, &det_coord, &st, target, detector, qdet, xdet, ydet, zdet, track, chi, pat1, pat2);
+                myfile << detector[i] << "    " << xdet[i] << "    " << ydet[i] << " \n";
+            }
+            myfile.close();
+        }
+        // here call tracker
+        chi2 = 1.E100;
+        counter2++;
+        if (tracker && fPairs && ((mult10 > 0 && mult12 > 0 && mult3b > 0) || (mult11 > 0 && mult13 > 0 && mult3a > 0)))
+        {
+            // double track
+            counter2++;
+            Bool_t det_coord = true;
+            Bool_t st = true;
+            multi_track_extended_output_from_cpp_(
+                &max, &countdet, &det_coord, &st, target, detector, qdet, xdet, ydet, zdet, track, chi, pat1, pat2);
 
-                chi2 = chi[4] + chi[5];
-                fh_chiy_vs_chix->Fill(chi[0], chi[1]);
-                fh_chiy_vs_chix->Fill(chi[2], chi[3]);
-                fh_chi2->Fill(chi2);
+            chi2 = chi[4] + chi[5];
+            fh_chiy_vs_chix->Fill(chi[0], chi[1]);
+            fh_chiy_vs_chix->Fill(chi[2], chi[3]);
+            fh_chi2->Fill(chi2);
 
+            if (debug)
+            {
+                cout << "track1: " << track[0] << "  " << track[1] << "  " << track[2] << "  " << track[3] << "  "
+                     << track[4] << "  " << track[5] << endl;
+                cout << "track2: " << track[6] << "  " << track[7] << "  " << track[8] << "  " << track[9] << "  "
+                     << track[10] << "  " << track[11] << endl;
+
+                cout << "chi: " << chi[0] << "  " << chi[1] << "  " << chi[2] << "  " << chi[3] << "  " << chi[4]
+                     << "  " << chi[5] << endl;
+
+                cout << "******************************************" << endl;
+                cout << "Track In 4He"
+                     << "x " << XHes << " y " << YHes << " z " << ZHes << endl;
+                cout << "px " << pHexs << " py " << pHeys << " z " << pHezs << endl;
+
+                cout << "Track In 12C"
+                     << "x " << XCs << " y " << YCs << " z " << ZCs << endl;
+                cout << "px " << pCxs << " py " << pCys << " z " << pCzs << endl;
+            }
+
+            if (chi[0] < 1e10)
+                counter3++;
+            if (chi[1] < 1e10)
+                counter4++;
+
+            if (chi[0] < 1e10 && chi[1] < 1e10)
+            {
+                counterTracker++;
+                Output1(track, chi);
+            }
+            // we have a hit
+            for (Int_t i = 0; i < ndet; i++)
+            {
+                xTrack[i] = -1000.;
+                yTrack[i] = -1000.;
+                zTrack[i] = -1000.;
+                qTrack[i] = -1000.;
+            }
+            Int_t charge = 0;
+            if (debug)
+                cout << "# of points back" << countdet << endl;
+            for (Int_t i = 0; i < countdet; i++)
+            {
+
+                if (debug)
+                {
+                    cout << "back #" << i << " Det: " << detector[i] << " x: " << xdet[i] << " y: " << ydet[i]
+                         << " q: " << qdet[i] << endl;
+                }
+                if (qdet[i] == 2)
+                {
+                    xTrack[detector[i]] = xdet[i];
+                    yTrack[detector[i]] = ydet[i];
+                    zTrack[detector[i]] = zdet[i];
+                    qTrack[detector[i]] = qdet[i];
+                }
+                // plot hits of the track
+                if (detector[i] != ghost)
+                {
+                    fh_xy[detector[i]]->Fill(xdet[i] * 100., ydet[i] * 100.);
+                    fh_p_vs_x[detector[i]]->Fill(xdet[i] * 100. + randx, track[5]);
+                    fh_p_vs_x_test[detector[i]]->Fill(
+                        xdet[i] * 100., sqrt(track[3] * track[3] + track[4] * track[4] + track[5] * track[5]));
+                }
+            }
+            // Plots of correlations of Fiber detectors
+
+            fh_Fib13_vs_Fib11_back->Fill(xTrack[3] * 100., xTrack[5] * 100.);
+            fh_Fib13_vs_Fib11_dx_back->Fill(xTrack[3] * 100., xTrack[5] * 100. - xTrack[3] * 100.);
+            fh_Fib11_vs_Fib3a_back->Fill(xTrack[0] * 100., xTrack[3] * 100.);
+            fh_Fib11_vs_Fib3a_dx_back->Fill(xTrack[0] * 100., xTrack[3] * 100. - xTrack[0] * 100.);
+            fh_Fib10_vs_Fib12_back->Fill(xTrack[4] * 100., xTrack[2] * 100.);
+            fh_Fib10_vs_Fib12_dx_back->Fill(xTrack[4] * 100., xTrack[2] * 100. - xTrack[4] * 100.);
+            fh_Fib12_vs_Fib3b_back->Fill(xTrack[1] * 100., xTrack[4] * 100.);
+            fh_Fib12_vs_Fib3b_dx_back->Fill(xTrack[1] * 100., xTrack[4] * 100. - xTrack[1] * 100.);
+
+            if (chi[0] < 1e10 && chi[1] < 1e10)
+            {
+                // sorted, lowest Charge first
+                new ((*fTrackItems)[fNofTrackItems++])
+                    R3BTrack(track[0], track[1], track[2], track[3], track[4], track[5], 2, 2, chi[0], chi[1], 0);
+                new ((*fTrackItems)[fNofTrackItems++])
+                    R3BTrack(track[6], track[7], track[8], track[9], track[10], track[11], 6, 2, chi[2], chi[3], 0);
+            }
+        }
+        if (tracker && !fPairs && ((mult10 > 0 && mult12 > 0) || (mult11 > 0 && mult13 > 0)))
+        {
+            // single track
+            counter2++;
+            Bool_t det_coord = true;
+            Bool_t st = false;
+            // multi_track_from_cpp_(
+            //    &max, &countdet, &det_coord, &st, target, detector, qdet, xdet, ydet, zdet, track, chi);
+
+            multi_track_extended_output_from_cpp_(
+                &max, &countdet, &det_coord, &st, target, detector, qdet, xdet, ydet, zdet, track, chi, pat1, pat2);
+            chi2 = chi[0] + chi[1];
+            fh_chiy_vs_chix->Fill(chi[0], chi[1]);
+            fh_chi2->Fill(chi2);
+
+            if (chi[0] < 1.e10)
+                counter3++;
+            if (chi[1] < 1.e10)
+                counter4++;
+            if (chi[0] < 1.e10 && chi[1] < 1.e10)
+            {
+                // fill histograms
+                Output2(track, chi);
+            }
+
+            if (chi[0] < 1.e10 && chi[1] < 1.e10)
+            {
+                counterTracker++;
                 // cout << "track1: " << track[0] << "  " << track[1] << "  " << track[2] << endl;
                 // cout << "track1: " << track[3] << "  " << track[4] << "  " << track[5] << endl;
-                // cout << "track2: " << track[6] << "  " << track[7] << "  " << track[8] << endl;
-                // cout << "track2: " << track[9] << "  " << track[10] << "  " << track[11] << endl;
+                // cout << "chi: " << chi[0] << "  " << chi[1] << "  " << chi[2] << "  " << chi[3] << "  "
+                //     << chi[4] << "  " << chi[5] << endl;
 
-                // cout << "chi: " << chi[0] << "  " << chi[1] << "  " << chi[2] << "  " << chi[3] << "  " << chi[4]
-                //           << "  " << chi[5] << endl;
-
-                if (chi[0] < 100.)
-                    counter3++;
-                if (chi[1] < 100.)
-                    counter4++;
-
-                if (chi[0] < 100. && chi[1] < 100.)
-                {
-                    counterTracker++;
-                    Output1(track, chi);
-                }
                 // we have a hit
                 for (Int_t i = 0; i < ndet; i++)
                 {
@@ -2000,28 +2280,26 @@ void R3BTrackS454::Exec(Option_t* option)
                     qTrack[i] = -1000.;
                 }
                 Int_t charge = 0;
-                // cout << "# of points back" << countdet << endl;
+                LOG(DEBUG2) << "# of points back" << countdet << endl;
                 for (Int_t i = 0; i < countdet; i++)
                 {
 
-                    // cout << "back #" << i << " Det: " << detector[i] << " x: " << xdet[i] << " y: " << ydet[i]
-                    //           << " q: " << qdet[i] << endl;
-                    // cout<<"Test: "<<ndet<<endl;
-                    if (qdet[i] == 2)
-                    {
-                        xTrack[detector[i]] = xdet[i];
-                        yTrack[detector[i]] = ydet[i];
-                        zTrack[detector[i]] = zdet[i];
-                        qTrack[detector[i]] = qdet[i];
-                    }
-                    // plot hits of the track
-                    if (detector[i] != ghost)
-                    {
-                        fh_xy[detector[i]]->Fill(xdet[i] * 100., ydet[i] * 100.);
-                        fh_p_vs_x[detector[i]]->Fill(xdet[i] * 100., track[5]);
-                        fh_p_vs_x_test[detector[i]]->Fill(
-                            xdet[i] * 100., sqrt(track[3] * track[3] + track[4] * track[4] + track[5] * track[5]));
-                    }
+                    // cout << "back #" << i << " Det: " << detector[i] << " x: " << xdet[i]
+                    //     << " y: " << ydet[i] << " q: " << qdet[i] << endl;
+                    xTrack[detector[i]] = xdet[i];
+                    yTrack[detector[i]] = ydet[i];
+                    zTrack[detector[i]] = zdet[i];
+                    qTrack[detector[i]] = qdet[i];
+                    if (qdet[i] > charge)
+                        charge = qdet[i];
+                }
+                // plot hits of the track
+                for (Int_t i = 0; i < ndet; i++)
+                {
+                    fh_xy[i]->Fill(xTrack[i] * 100., yTrack[i] * 100.);
+                    fh_p_vs_x[i]->Fill(xTrack[i] * 100., track[5]);
+                    fh_p_vs_x_test[i]->Fill(xTrack[i] * 100.,
+                                            sqrt(track[3] * track[3] + track[4] * track[4] + track[5] * track[5]));
                 }
                 // Plots of correlations of Fiber detectors
 
@@ -2034,96 +2312,10 @@ void R3BTrackS454::Exec(Option_t* option)
                 fh_Fib12_vs_Fib3b_back->Fill(xTrack[1] * 100., xTrack[4] * 100.);
                 fh_Fib12_vs_Fib3b_dx_back->Fill(xTrack[1] * 100., xTrack[4] * 100. - xTrack[1] * 100.);
 
-                if (chi[0] < 1e10 && chi[1] < 1e10)
-                {
-                    // sorted, lowest Charge first
-                    new ((*fTrackItems)[fNofTrackItems++])
-                        R3BTrack(track[0], track[1], track[2], track[3], track[4], track[5], 2, 2, chi[0], chi[1], 0);
-                    new ((*fTrackItems)[fNofTrackItems++])
-                        R3BTrack(track[6], track[7], track[8], track[9], track[10], track[11], 6, 2, chi[2], chi[3], 0);
-                }
+                // store hits in track level
+                new ((*fTrackItems)[fNofTrackItems++])
+                    R3BTrack(track[0], track[1], track[2], track[3], track[4], track[5], charge, 2, chi[0], chi[1], 0);
             }
-            else
-            {
-                // single track
-                Bool_t st = false;
-                // multi_track_from_cpp_(
-                //    &max, &countdet, &det_coord, &st, target, detector, qdet, xdet, ydet, zdet, track, chi);
-
-                multi_track_extended_output_from_cpp_(
-                    &max, &countdet, &det_coord, &st, target, detector, qdet, xdet, ydet, zdet, track, chi, pat1, pat2);
-
-                chi2 = chi[0] + chi[1];
-                fh_chiy_vs_chix->Fill(chi[0], chi[1]);
-                fh_chi2->Fill(chi2);
-
-                if (chi[0] < 1.e10)
-                    counter3++;
-                if (chi[1] < 1.e10)
-                    counter4++;
-                if (chi[0] < 1.e10 && chi[1] < 1.e10)
-                {
-                    // fill histograms
-                    Output2(track, chi);
-                }
-
-                if (chi[0] < 1.e10 && chi[1] < 1.e10)
-                {
-                    counterTracker++;
-                    LOG(DEBUG) << "track1: " << track[0] << "  " << track[1] << "  " << track[2] << endl;
-                    LOG(DEBUG) << "track1: " << track[3] << "  " << track[4] << "  " << track[5] << endl;
-                    LOG(DEBUG) << "chi: " << chi[0] << "  " << chi[1] << "  " << chi[2] << "  " << chi[3] << "  "
-                               << chi[4] << "  " << chi[5] << endl;
-
-                    // we have a hit
-                    for (Int_t i = 0; i < ndet; i++)
-                    {
-                        xTrack[i] = -1000.;
-                        yTrack[i] = -1000.;
-                        zTrack[i] = -1000.;
-                        qTrack[i] = -1000.;
-                    }
-                    Int_t charge = 0;
-                    LOG(DEBUG2) << "# of points back" << countdet << endl;
-                    for (Int_t i = 0; i < countdet; i++)
-                    {
-
-                        LOG(DEBUG2) << "back #" << i << " Det: " << detector[i] << " x: " << xdet[i]
-                                    << " y: " << ydet[i] << " q: " << qdet[i] << endl;
-                        xTrack[detector[i]] = xdet[i];
-                        yTrack[detector[i]] = ydet[i];
-                        zTrack[detector[i]] = zdet[i];
-                        qTrack[detector[i]] = qdet[i];
-                        if (qdet[i] > charge)
-                            charge = qdet[i];
-                    }
-                    // plot hits of the track
-                    for (Int_t i = 0; i < ndet; i++)
-                    {
-                        fh_xy[i]->Fill(xTrack[i] * 100., yTrack[i] * 100.);
-                        fh_p_vs_x[i]->Fill(xTrack[i] * 100., track[5]);
-                        fh_p_vs_x_test[i]->Fill(xTrack[i] * 100.,
-                                                sqrt(track[3] * track[3] + track[4] * track[4] + track[5] * track[5]));
-                    }
-                    // Plots of correlations of Fiber detectors
-
-                    fh_Fib13_vs_Fib11_back->Fill(xTrack[3] * 100., xTrack[5] * 100.);
-                    fh_Fib13_vs_Fib11_dx_back->Fill(xTrack[3] * 100., xTrack[5] * 100. - xTrack[3] * 100.);
-                    fh_Fib11_vs_Fib3a_back->Fill(xTrack[0] * 100., xTrack[3] * 100.);
-                    fh_Fib11_vs_Fib3a_dx_back->Fill(xTrack[0] * 100., xTrack[3] * 100. - xTrack[0] * 100.);
-                    fh_Fib10_vs_Fib12_back->Fill(xTrack[4] * 100., xTrack[2] * 100.);
-                    fh_Fib10_vs_Fib12_dx_back->Fill(xTrack[4] * 100., xTrack[2] * 100. - xTrack[4] * 100.);
-                    fh_Fib12_vs_Fib3b_back->Fill(xTrack[1] * 100., xTrack[4] * 100.);
-                    fh_Fib12_vs_Fib3b_dx_back->Fill(xTrack[1] * 100., xTrack[4] * 100. - xTrack[1] * 100.);
-
-                    // store hits in track level
-                    new ((*fTrackItems)[fNofTrackItems++]) R3BTrack(
-                        track[0], track[1], track[2], track[3], track[4], track[5], charge, 2, chi[0], chi[1], 0);
-                }
-            }
-            // for (int i = 0; i < 2 * n_det; i++)	{
-            // LOG(DEBUG) << "Pattern1: " << pat1[i] << " Patern2: " << pat2[i] << endl;
-            // }
         }
         chi2_best = 1.E10;
         pHex = 0.;
@@ -2168,8 +2360,6 @@ void R3BTrackS454::Exec(Option_t* option)
 
     if (multTofd > 0)
         fh_tofd_mult_ac->Fill(multTofd);
-
-    // myfile.close();
 }
 void R3BTrackS454::Output1(Double_t track[12], Double_t chi[6])
 {

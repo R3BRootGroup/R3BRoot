@@ -276,68 +276,100 @@ InitStatus R3BGlobalAnalysisS454::Init()
     fh_y_dpy->GetXaxis()->SetTitle("dpy / percent");
     fh_y_dpy->GetYaxis()->SetTitle("y / cm");
 
-    // Analysis
-    fh_chiy_vs_chix = new TH2F("chiy_vs_chix", "chi y vs. q1", 500, 0., 500., 500, 0., 500.);
-    fh_chiy_vs_chix->GetXaxis()->SetTitle("chi x");
-    fh_chiy_vs_chix->GetYaxis()->SetTitle("chi y");
+    fh_px_px = new TH2F("px_px", "px He vs. px C", 1000, -1000, 1000, 1000, -1000., 1000.);
+    fh_px_px->GetXaxis()->SetTitle("px / MeV/c");
+    fh_px_px->GetYaxis()->SetTitle("px / MeV/c");
 
-    fh_theta26 = new TH1F("theta26", "theta 26 ", 500, 0., 5);
+    fh_py_py = new TH2F("py_py", "py He vs. py C", 1000, -1000, 1000, 1000, -1000., 1000.);
+    fh_py_py->GetXaxis()->SetTitle("py / MeV/c");
+    fh_py_py->GetYaxis()->SetTitle("py / MeV/c");
+
+    fh_pz_pz = new TH2F("pz_pz", "pz He vs. pz C", 1000, 0, 10000, 2000, 0., 20000.);
+    fh_pz_pz->GetXaxis()->SetTitle("pz / MeV/c");
+    fh_pz_pz->GetYaxis()->SetTitle("pz / MeV/c");
+
+    fh_px_px_cm = new TH2F("px_px_cm", "px He vs. px C", 1000, -1000, 1000, 1000, -1000., 1000.);
+    fh_px_px_cm->GetXaxis()->SetTitle("px / MeV/c");
+    fh_px_px_cm->GetYaxis()->SetTitle("px / MeV/c");
+
+    fh_py_py_cm = new TH2F("py_py_cm", "py He vs. py C", 1000, -1000, 1000, 1000, -1000., 1000.);
+    fh_py_py_cm->GetXaxis()->SetTitle("py / MeV/c");
+    fh_py_py_cm->GetYaxis()->SetTitle("py / MeV/c");
+
+    fh_pz_pz_cm = new TH2F("pz_pz_cm", "pz He vs. pz C", 1000, -1000, 1000, 1000, -1000., 1000.);
+    fh_pz_pz_cm->GetXaxis()->SetTitle("pz / MeV/c");
+    fh_pz_pz_cm->GetYaxis()->SetTitle("pz / MeV/c");
+
+    // Analysis
+    fh_chiy_vs_chix_He = new TH2F("chiy_vs_chix_He", "chi y vs. chi x for He", 500, 0., 500., 500, 0., 500.);
+    fh_chiy_vs_chix_He->GetXaxis()->SetTitle("chi x");
+    fh_chiy_vs_chix_He->GetYaxis()->SetTitle("chi y");
+
+    fh_chiy_vs_chix_C = new TH2F("chiy_vs_chix_C", "chi y vs. chi x for C", 500, 0., 500., 500, 0., 500.);
+    fh_chiy_vs_chix_C->GetXaxis()->SetTitle("chi x");
+    fh_chiy_vs_chix_C->GetYaxis()->SetTitle("chi y");
+
+    fh_theta26 = new TH1F("theta26", "theta between alpha and carbon ", 500, 0., 5);
     fh_theta26->GetXaxis()->SetTitle("angle / degree");
     fh_theta26->GetYaxis()->SetTitle("counts");
 
-    fh_theta_16O = new TH1F("theta_16O", "theta 16O ", 500, 0., 5);
+    fh_theta_16O = new TH1F("theta_16O", "theta of excited 16O ", 500, 0., 5);
     fh_theta_16O->GetXaxis()->SetTitle("angle / degree");
     fh_theta_16O->GetYaxis()->SetTitle("counts");
 
-    fh_theta26_cm = new TH1F("theta26_cm", "theta 26 cm ", 180, -90., 90.);
+    fh_phi_16O = new TH1F("phi_16O", "phi of excited 16O ", 360, 0., 360);
+    fh_phi_16O->GetXaxis()->SetTitle("angle / degree");
+    fh_phi_16O->GetYaxis()->SetTitle("counts");
+
+    fh_theta26_cm = new TH1F("theta26_cm", "theta between alpha and carbon in cm-system ", 360, 0, 360.);
     fh_theta26_cm->GetXaxis()->SetTitle("angle / degree");
     fh_theta26_cm->GetYaxis()->SetTitle("counts");
 
-    fh_phi26_cm = new TH1F("phi26_cm", "phi 26 cm", 360, 0., 360.);
+    fh_phi26_cm = new TH1F("phi26_cm", "phi between alpha and carbon in cm-system", 360, 0., 360.);
     fh_phi26_cm->GetXaxis()->SetTitle("angle / degree");
     fh_phi26_cm->GetYaxis()->SetTitle("counts");
 
-    fh_theta_4He_cm = new TH1F("theta_4He_cm", "Theta 4He cm", 180, 0., 180.);
+    fh_theta_4He_cm = new TH1F("theta_4He_cm", "Theta 4He in cm-system", 180, 0., 180.);
     fh_theta_4He_cm->GetXaxis()->SetTitle("angle / degree");
     fh_theta_4He_cm->GetYaxis()->SetTitle("counts");
 
-    fh_phi_4He_cm = new TH1F("phi_4He_cm", "phi 4He cm", 360, 0., 360.);
+    fh_phi_4He_cm = new TH1F("phi_4He_cm", "phi 4He in cm-system", 360, 0., 360.);
     fh_phi_4He_cm->GetXaxis()->SetTitle("angle / degree");
     fh_phi_4He_cm->GetYaxis()->SetTitle("counts");
 
-    fh_theta_12C_cm = new TH1F("theta_12C_cm", "Theta 12C cm", 180, 0., 180.);
+    fh_theta_bc_cm = new TH1F("theta_bc_cm", "Theta bc in cm-system", 180, 0., 180.);
+    fh_theta_bc_cm->GetXaxis()->SetTitle("angle / degree");
+    fh_theta_bc_cm->GetYaxis()->SetTitle("counts");
+
+    fh_phi_bc_cm = new TH1F("phi_bc_cm", "phi bc in cm-system", 360, 0., 360.);
+    fh_phi_bc_cm->GetXaxis()->SetTitle("angle / degree");
+    fh_phi_bc_cm->GetYaxis()->SetTitle("counts");
+
+    fh_theta_12C_cm = new TH1F("theta_12C_cm", "Theta 12C in cm-system", 180, 0., 180.);
     fh_theta_12C_cm->GetXaxis()->SetTitle("angle / degree");
     fh_theta_12C_cm->GetYaxis()->SetTitle("counts");
 
-    fh_phi_12C_cm = new TH1F("phi_12C_cm", "phi 12C cm", 360, 0., 360.);
+    fh_phi_12C_cm = new TH1F("phi_12C_cm", "phi 12C in cm-system", 360, 0., 360.);
     fh_phi_12C_cm->GetXaxis()->SetTitle("angle / degree");
     fh_phi_12C_cm->GetYaxis()->SetTitle("counts");
-
-    fh_theta_16O_cm = new TH1F("theta_16O_cm", "Theta 16O cm", 180, 0., 180.);
-    fh_theta_16O_cm->GetXaxis()->SetTitle("angle / degree");
-    fh_theta_16O_cm->GetYaxis()->SetTitle("counts");
-
-    fh_phi_16O_cm = new TH1F("phi_16O_cm", "phi 16O cm", 360, 0., 360.);
-    fh_phi_16O_cm->GetXaxis()->SetTitle("angle / degree");
-    fh_phi_16O_cm->GetYaxis()->SetTitle("counts");
 
     fh_theta26_simu = new TH1F("theta26_simu", "theta 26 simulation", 500, 0., 5);
     fh_theta26_simu->GetXaxis()->SetTitle("angle / degree");
     fh_theta26_simu->GetYaxis()->SetTitle("counts");
 
-    fh_Erel = new TH1F("Erel", "Erel ", 1000, 0., 100);
+    fh_Erel = new TH1F("Erel", "Erel ", 5000, 0., 100);
     fh_Erel->GetXaxis()->SetTitle("Erel / MeV");
     fh_Erel->GetYaxis()->SetTitle("counts");
 
-    fh_ErelL = new TH1F("ErelL", "Erel links", 1000, 0., 100);
+    fh_ErelL = new TH1F("ErelL", "Erel links", 5000, 0., 100);
     fh_ErelL->GetXaxis()->SetTitle("Erel / MeV");
     fh_ErelL->GetYaxis()->SetTitle("counts");
 
-    fh_ErelR = new TH1F("ErelR", "Erel rechts ", 1000, 0., 100);
+    fh_ErelR = new TH1F("ErelR", "Erel rechts ", 5000, 0., 100);
     fh_ErelR->GetXaxis()->SetTitle("Erel / MeV");
     fh_ErelR->GetYaxis()->SetTitle("counts");
 
-    fh_ErelB = new TH1F("ErelB", "Erel both sides ", 1000, 0., 100);
+    fh_ErelB = new TH1F("ErelB", "Erel both sides ", 5000, 0., 100);
     fh_ErelB->GetXaxis()->SetTitle("Erel / MeV");
     fh_ErelB->GetYaxis()->SetTitle("counts");
 
@@ -385,17 +417,18 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
     Double_t costh26;
     Double_t chiHex, chiHey, chiCx, chiCy;
 
-    Bool_t alpha = false;
-    Bool_t carbon = false;
-    Bool_t alphas = false;
-    Bool_t carbons = false;
+    Bool_t is_alpha = false;
+    Bool_t is_carbon = false;
 
-    if (fTrack)
+    // Choose original MC data or exp. data
+    Bool_t simData = false;
+
+    if (fTrack && !simData)
     {
 
         // read in Track parameter
         Int_t nHitsTrack = fTrack->GetEntriesFast();
-        // cout << "Track hits: " << nHitsTrack << endl;
+        // if(nHitsTrack>0) cout << "Track hits: " << nHitsTrack << endl;
         for (Int_t l = 0; l < nHitsTrack; l++)
         {
             R3BTrack* aTrack = (R3BTrack*)fTrack->At(l);
@@ -416,12 +449,13 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
                 chiHex = aTrack->GetChix();
                 chiHey = aTrack->GetChiy();
 
-                alpha = true;
+                is_alpha = true;
+                alpha.SetPxPyPzE(pHex, pHey, pHez, sqrt(pow(pHex, 2) + pow(pHey, 2) + pow(pHez, 2) + pow(mHe, 2)));
 
-                LOG(DEBUG) << "******************************************" << endl;
-                LOG(DEBUG) << "Track In 4He"
-                           << "x " << XHe << " y " << YHe << " z " << ZHe << endl;
-                LOG(DEBUG) << "px " << pHex << " py " << pHey << " z " << pHez << endl;
+                // cout << "******************************************" << endl;
+                // cout << "Track In 4He"
+                //           << "x " << XHe << " y " << YHe << " z " << ZHe << endl;
+                // cout << "px " << pHex << " py " << pHey << " z " << pHez << endl;
             }
             if (aTrack->GetQ() == 6)
             {
@@ -437,12 +471,13 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
                 chiCx = aTrack->GetChix();
                 chiCy = aTrack->GetChiy();
 
-                carbon = true;
+                is_carbon = true;
+                carbon.SetPxPyPzE(pCx, pCy, pCz, sqrt(pow(pCx, 2) + pow(pCy, 2) + pow(pCz, 2) + pow(mC, 2)));
 
-                LOG(DEBUG) << "******************************************" << endl;
-                LOG(DEBUG) << "Track In 12C"
-                           << "x " << XC << " y " << YC << " z " << ZC << endl;
-                LOG(DEBUG) << "px " << pCx << " py " << pCy << " z " << pCz << endl;
+                // cout << "******************************************" << endl;
+                // cout << "Track In 12C"
+                //           << "x " << XC << " y " << YC << " z " << ZC << endl;
+                // cout << "px " << pCx << " py " << pCy << " z " << pCz << endl;
             }
             if (aTrack->GetQ() == 8)
             {
@@ -455,14 +490,14 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
                 Pyf = aTrack->GetPy();
                 Pzf = aTrack->GetPz();
 
-                LOG(DEBUG) << "******************************************" << endl;
-                LOG(DEBUG) << "Track In 16O"
-                           << "x " << Xf << " y " << Yf << " z " << Zf << endl;
-                LOG(DEBUG) << "px " << Pxf << " py " << Pyf << " z " << Pzf << endl;
+                // cout << "******************************************" << endl;
+                // cout << "Track In 16O"
+                //           << "x " << Xf << " y " << Yf << " z " << Zf << endl;
+                // cout << "px " << Pxf << " py " << Pyf << " z " << Pzf << endl;
             }
         }
     }
-    if (fMCTrack)
+    if (fMCTrack && simData)
     {
         // read in Monte Carlo Track parameter
 
@@ -471,6 +506,7 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
 
         for (Int_t l = 0; l < nHitsMCTrack; l++)
         {
+            // cout << "Original MC Data is analyzed" << endl;
             R3BMCTrack* aTrack = (R3BMCTrack*)fMCTrack->At(l);
 
             Int_t PID = aTrack->GetPdgCode();
@@ -481,46 +517,46 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
                 if (PID == 1000020040)
                 {
                     // 4He
-                    XHes = aTrack->GetStartX();
-                    YHes = aTrack->GetStartY();
-                    ZHes = aTrack->GetStartZ();
-                    THes = aTrack->GetStartT();
+                    XHe = aTrack->GetStartX();
+                    YHe = aTrack->GetStartY();
+                    ZHe = aTrack->GetStartZ();
+                    THe = aTrack->GetStartT();
 
-                    pHexs = aTrack->GetPx() * 1000.;
-                    pHeys = aTrack->GetPy() * 1000.;
-                    pHezs = aTrack->GetPz() * 1000.;
-                    pHes = sqrt((pHexs * pHexs) + (pHeys * pHeys) + (pHezs * pHezs));
+                    pHex = aTrack->GetPx() * 1000.;
+                    pHey = aTrack->GetPy() * 1000.;
+                    pHez = aTrack->GetPz() * 1000.;
 
-                    alphas = true;
+                    is_alpha = true;
+                    alpha.SetPxPyPzE(pHex, pHey, pHez, sqrt(pow(pHex, 2) + pow(pHey, 2) + pow(pHez, 2) + pow(mHe, 2)));
 
                     LOG(DEBUG) << "******************************************" << endl;
-                    cout << "Track In 4He"
-                         << "x " << XHes << " y " << YHes << " z " << ZHes << endl;
-                    cout << "px " << pHexs << " py " << pHeys << " z " << pHezs << endl;
+                    LOG(DEBUG) << "Track In 4He"
+                               << "x " << XHe << " y " << YHe << " z " << ZHe << endl;
+                    LOG(DEBUG) << "px " << pHex << " py " << pHey << " pz " << pHez << endl;
                 }
                 if (PID == 1000060120)
                 {
                     // 12C
-                    XCs = aTrack->GetStartX();
-                    YCs = aTrack->GetStartY();
-                    ZCs = aTrack->GetStartZ();
-                    TCs = aTrack->GetStartT();
+                    XC = aTrack->GetStartX();
+                    YC = aTrack->GetStartY();
+                    ZC = aTrack->GetStartZ();
+                    TC = aTrack->GetStartT();
 
-                    pCxs = aTrack->GetPx() * 1000.;
-                    pCys = aTrack->GetPy() * 1000.;
-                    pCzs = aTrack->GetPz() * 1000.;
-                    pCs = sqrt((pCxs * pCxs) + (pCys * pCys) + (pCzs * pCzs));
+                    pCx = aTrack->GetPx() * 1000.;
+                    pCy = aTrack->GetPy() * 1000.;
+                    pCz = aTrack->GetPz() * 1000.;
 
-                    carbons = true;
+                    is_carbon = true;
+                    carbon.SetPxPyPzE(pCx, pCy, pCz, sqrt(pow(pCx, 2) + pow(pCy, 2) + pow(pCz, 2) + pow(mC, 2)));
 
                     LOG(DEBUG) << "******************************************" << endl;
-                    cout << "Track In 12C"
-                         << "x " << XCs << " y " << YCs << " z " << ZCs << endl;
-                    cout << "px " << pCxs << " py " << pCys << " z " << pCzs << endl;
+                    LOG(DEBUG) << "Track In 12C"
+                               << "x " << XC << " y " << YC << " z " << ZC << endl;
+                    LOG(DEBUG) << "px " << pCx << " py " << pCy << " pz " << pCz << endl;
                 }
                 if (PID == 1000080160)
                 {
-                    // 12C
+                    // 16O
                     Xf = aTrack->GetStartX();
                     Yf = aTrack->GetStartY();
                     Zf = aTrack->GetStartZ();
@@ -538,39 +574,135 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
             }
         }
     }
-    // Choose original MC data or exp. data
-    Bool_t simData = true;
-    if (simData)
+
+    // new version of analysis
+    if (is_carbon && is_alpha)
     {
-        XHe = XHes;
-        YHe = YHes;
-        ZHe = ZHes;
-        XC = XCs;
-        YC = YCs;
-        ZC = ZCs;
-        pHex = pHexs;
-        pHey = pHeys;
-        pHez = pHezs;
-        // pHe = pHes;
-        pCx = pCxs;
-        pCy = pCys;
-        pCz = pCzs;
-        // pC = pCs;
+        fh_chiy_vs_chix_He->Fill(chiHex, chiHey);
+        fh_chiy_vs_chix_C->Fill(chiCx, chiCy);
+        Double_t cut_chi = 1.e10;
+        if (chiHex < cut_chi && chiHey < cut_chi && chiCx < cut_chi && chiCy < cut_chi)
+        {
+            fh_target_xy->Fill(XHe * 100., YHe * 100.);
 
-        chiHex = 1.;
-        chiHey = 1.;
-        chiCx = 1.;
-        chiCy = 1.;
-        carbon = carbons;
-        alpha = alphas;
-    }
+            fh_px_He->Fill(alpha.Px());
+            fh_py_He->Fill(alpha.Py());
+            fh_pz_He->Fill(alpha.Pz());
 
-    if (carbon && alpha)
+            fh_px_C->Fill(carbon.Px());
+            fh_py_C->Fill(carbon.Py());
+            fh_pz_C->Fill(carbon.Pz());
+
+            fh_px_px->Fill(alpha.Px(), carbon.Px());
+            fh_py_py->Fill(alpha.Py(), carbon.Py());
+            fh_pz_pz->Fill(alpha.Pz(), carbon.Pz());
+
+            TVector3 pa = alpha.Vect();
+            fh_p_He->Fill(pa.Mag());
+            TVector3 pc = carbon.Vect();
+            fh_p_C->Fill(pc.Mag());
+
+            // Calculate angle between alphs and C
+            if (alpha.Pz() == 0 || carbon.Pz() == 0)
+                return;
+
+            theta_26 = alpha.Angle(carbon.Vect()) * TMath::RadToDeg(); /// angle alpha carbon (theta)
+            fh_theta26->Fill(theta_26);
+
+            /** Calculate invariant mass and relative energy **/
+            Double_t m_inva = (alpha + carbon).M(); // invariant mass
+            Double_t Erel = m_inva - mHe - mC;      // relative Energy
+            fh_Erel->Fill(Erel);                    // relative Energy plot
+
+            if (alpha.Px() < 0. && carbon.Px() < 0.)
+                fh_ErelR->Fill(Erel);
+            if (alpha.Px() > 0. && carbon.Px() > 0.)
+                fh_ErelL->Fill(Erel);
+            if ((alpha.Px() > 0. && carbon.Px() < 0.) || (alpha.Px() < 0. && carbon.Px() > 0.))
+                fh_ErelB->Fill(Erel);
+
+            /** transfer to cm system and rotate **/
+
+            oxygen = alpha + carbon; // excited oxygen
+            // cout<<"gamma "<<oxygen.Gamma()<<endl;
+            Double_t theta_16O = oxygen.Theta() * TMath::RadToDeg();
+            fh_theta_16O->Fill(theta_16O); // theta oxygen
+            Double_t phi_16O = oxygen.Phi() * TMath::RadToDeg();
+            fh_phi_16O->Fill(phi_16O);
+
+            // transfer to cm system and make some rotations
+            // boost them to centre of mass
+            alpha_cm = alpha;
+            carbon_cm = carbon;
+            oxygen_cm = oxygen;
+            alpha_cm.Boost(-oxygen.BoostVector());
+            carbon_cm.Boost(-oxygen.BoostVector());
+            oxygen_cm.Boost(-oxygen.BoostVector());
+            /*
+                        cout << "lab " << alpha.Px() << "  " << alpha.Py() << "  " << alpha.Pz() << endl;
+                        cout << "lab " << carbon.Px() << "  " << carbon.Py() << "  " << carbon.Pz() << endl;
+                        cout << "lab " << oxygen.Px() << "  " << oxygen.Py() << "  " << oxygen.Pz() << endl;
+
+                        cout << "cm " << alpha_cm.Px() << "  " << alpha_cm.Py() << "  " << alpha_cm.Pz() << endl;
+                        cout << "cm " << carbon_cm.Px() << "  " << carbon_cm.Py() << "  " << carbon_cm.Pz() << endl;
+                        cout << "cm " << oxygen_cm.Px() << "  " << oxygen_cm.Py() << "  " << oxygen_cm.Pz() << endl;
+            */
+
+            Double_t phi = (alpha_cm.Phi() - carbon_cm.Phi()) * TMath::RadToDeg();
+            fh_phi26_cm->Fill(phi); // phi between alpha + carbon in cm
+            Double_t theta = alpha_cm.Angle(carbon_cm.Vect()) * TMath::RadToDeg();
+            fh_theta26_cm->Fill(theta); // angle between alpha + carbon in cm
+
+            fh_theta_4He_cm->Fill(alpha_cm.Theta() * TMath::RadToDeg());
+            fh_phi_4He_cm->Fill(alpha_cm.Phi() * TMath::RadToDeg());
+            fh_theta_12C_cm->Fill(carbon_cm.Theta() * TMath::RadToDeg());
+            fh_phi_12C_cm->Fill(carbon_cm.Phi() * TMath::RadToDeg());
+
+            fh_theta_bc_cm->Fill(alpha_cm.Theta() * TMath::RadToDeg());
+            Double_t phi_bc_cm = (oxygen.Phi() - alpha_cm.Phi()) * TMath::RadToDeg();
+            if (phi_bc_cm < 0)
+                phi_bc_cm += 360.;
+            fh_phi_bc_cm->Fill(phi_bc_cm);
+            /*
+                        // rotation in oxygen direction
+                        //TLorentzRotation transform;
+                        //transform.RotateX(oxygen.Px()).RotateY(oxygen.Py()).RotateZ(0.);
+                        TVector3 transform = oxygen.Vect(); /// TODO: check if it needs to be normed
+                        alpha *= transform; // apply transformation vector
+                        carbon *= transform;
+
+                        if(abs(alpha.Phi()*TMath::RadToDeg()) > 88 && abs(alpha.Phi()*TMath::RadToDeg()) < 92)
+                        {
+                        fh_target_xy->Fill(XHe * 100., YHe * 100.);
+
+                        fh_px_He->Fill(pHex);
+                        fh_py_He->Fill(pHey);
+                        fh_pz_He->Fill(pHez);
+
+                        fh_px_C->Fill(pCx);
+                        fh_py_C->Fill(pCy);
+                        fh_pz_C->Fill(pCz);
+
+                            fh_theta26->Fill(theta26); ///angle alpha carbon (theta)
+                            fh_theta_16O->Fill(theta16O); // theta oxygen
+
+
+                            fh_Erel->Fill(Erel); // relative Energy plot
+                        fh_cs_cd->Fill(Erel,Erel);
+
+
+            */
+
+        } // end if chi2
+    }     // end if trackHits>1
+
+    // second, old version of analysis
+    if (is_carbon && is_alpha && 1 == 0)
     {
-        fh_chiy_vs_chix->Fill(chiHex, chiHey);
-        fh_chiy_vs_chix->Fill(chiCx, chiCy);
+        fh_chiy_vs_chix_He->Fill(chiHex, chiHey);
+        fh_chiy_vs_chix_C->Fill(chiCx, chiCy);
 
-        if (chiHex < 10 && chiHey < 10 && chiCx < 10 && chiCy < 10)
+        if (chiHex < 1e10 && chiHey < 1e10 && chiCx < 1e10 && chiCy < 1e10)
         {
             fh_target_xy->Fill(XHe * 100., YHe * 100.);
 
@@ -581,6 +713,10 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
             fh_px_C->Fill(pCx);
             fh_py_C->Fill(pCy);
             fh_pz_C->Fill(pCz);
+
+            fh_px_px->Fill(pHex, pCx);
+            fh_py_py->Fill(pHey, pCy);
+            fh_pz_pz->Fill(pHez, pCz);
 
             // Calculate angle between alphs and C
             if (pCz == 0 || pHez == 0)
@@ -670,8 +806,8 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
             }
             phcm = phcm * 3.14159265 / 180.;
 
-            fh_theta_16O_cm->Fill(thcm);
-            fh_phi_16O_cm->Fill(phcm);
+            //            fh_theta_16O_cm->Fill(thcm);
+            //            fh_phi_16O_cm->Fill(phcm);
 
             n2[1] = px / ptota;
             n2[2] = py / ptota;
@@ -945,6 +1081,10 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
             fh_theta26_cm->Fill(theta_cm_26);
             fh_phi26_cm->Fill(phi_cm_26);
 
+            fh_px_px_cm->Fill(pHex_cm, pCx_cm);
+            fh_py_py_cm->Fill(pHey_cm, pCy_cm);
+            fh_pz_pz_cm->Fill(pHez_cm, pCz_cm);
+
         } // end if chi2
     }     // end if trackHits>1
 
@@ -1005,21 +1145,29 @@ void R3BGlobalAnalysisS454::FinishTask()
     fh_theta26->Write();
     fh_theta26_cm->Write();
     fh_theta_16O->Write();
+    fh_phi_16O->Write();
     fh_phi26_cm->Write();
     fh_theta_4He_cm->Write();
     fh_phi_4He_cm->Write();
+    fh_theta_bc_cm->Write();
+    fh_phi_bc_cm->Write();
     fh_theta_12C_cm->Write();
     fh_phi_12C_cm->Write();
-    fh_theta_16O_cm->Write();
-    fh_phi_16O_cm->Write();
     fh_Erel->Write();
     fh_ErelB->Write();
     fh_ErelR->Write();
     fh_ErelL->Write();
     fh_theta26_simu->Write();
     fh_Erel_simu->Write();
-    fh_chiy_vs_chix->Write();
+    fh_chiy_vs_chix_He->Write();
+    fh_chiy_vs_chix_C->Write();
     fh_dErel_vs_x->Write();
     fh_dErel_vs_y->Write();
+    fh_px_px->Write();
+    fh_py_py->Write();
+    fh_pz_pz->Write();
+    fh_px_px_cm->Write();
+    fh_py_py_cm->Write();
+    fh_pz_pz_cm->Write();
 }
 ClassImp(R3BGlobalAnalysisS454)

@@ -7,6 +7,7 @@ module vars
  logical            :: get_new_derivatives                        ! determines if the derivatives have to be freshly calculated
  logical            :: get_new_y_corrections=.true.                ! determines if the y_corrections have to be freshly calculated
  logical            :: calibration_mode=.false.                    ! program is generally in calibration mode rather than production / tracking  mode
+ logical            :: acknowledge_event=.true.
  logical,parameter  :: derivative_ini_from_file=.false.            ! determines if the derivatives ar freshly calculated with track data from file, special use
  logical, allocatable  :: det_hit(:)                            ! .true. if detector was hit during current track
  logical, allocatable  :: det_passed(:)                            ! .true. if xy-plane of detector was hit during current track
@@ -23,7 +24,7 @@ module vars
  character(LEN=length_ch_trigger_logic) :: ch_trigger_logic
  integer, parameter  :: output_unit_log = 75                        ! output unit for log file. 
  integer output_unit
- character(LEN=256), parameter :: tracker_log_file='tracker_output.log'
+ character(LEN=256)  :: tracker_log_file
  character(LEN=256)  :: calib_file='calibration.ini'
  character(LEN=256), parameter :: track_debug_file='single_track.dat'
  character(LEN=256), parameter :: track_debug_file_d1='double_track1.dat'
@@ -172,6 +173,7 @@ module calib
  integer, parameter              :: nbr_dimensions_optimize = 3          ! number of dimensions to optimize. for the moment 3 - x,y,z
  logical                          :: write_to_calib_histos = .true.         ! if true, data will be written into position calibration spectra
  logical                         :: momentum_optimization                 ! if true, all optimizations will be done according to the initial momentum rather than chi2 deviations from a reference track        
+ logical                         :: lab_coordinates = .false.            ! data are provided in lab coordinates rather than detector coordinates
  double precision                :: p_incoming(3)                         ! incoming momentum assuming scattering
  double precision                :: m_b , m_t                             ! mass of moving particle, mass of target particle
  double precision                :: chi_treshold                         ! chi2-cut off to be counted as good event
@@ -219,7 +221,8 @@ subroutine multi_track_extended_output_from_cpp(array_size,n_points,det_coordina
  logical (kind=1) track1_hit_pattern_out(2*nbr_detectors),track2_hit_pattern_out(2*nbr_detectors)                            ! true, if detector was used for track (detector_ID) 
  integer n_points, array_size
  logical (kind=1) det_coordinates, double_track
- integer detector_id_in(array_size), charge_in(array_size)
+ integer detector_id_in(array_size)
+ integer charge_in(array_size+2)   ! last 2 are requests for track1 and track2
  double precision x_positions_in(array_size)
  double precision y_positions_in(array_size)
  double precision z_positions_in(array_size)
@@ -238,9 +241,10 @@ subroutine multi_track_extended_output_from_cpp(array_size,n_points,det_coordina
    track2_hit_pattern_out(i) = track2_hit_pattern_used(i)  
  end do
 ! 
- if (debug_track) then
-   write(*,*) 'Acknowledge to start next event'
+ if (debug_track .and. acknowledge_event) then
+   write(*,*) 'Acknowledge to start next event (g ....go on for ever) '
    read(*,*) c1
+   if (c1 .eq. 'g' .or. c1 .eq. 'G') acknowledge_event = .false.
  end if
 end
 
@@ -256,7 +260,8 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
  logical (kind=1) det_coordinates, double_track,  left, right, new_combination
  logical all_done, all_done1, all_done2, skip_combination, skip
  logical track_ok,track1_ok,track2_ok
- integer detector_id_in(array_size), charge_in(array_size)
+ integer detector_id_in(array_size)
+ integer charge_in(array_size+2)   ! last 2 are requests for track1 and track2
  double precision x_positions_in(array_size)
  double precision y_positions_in(array_size)
  double precision z_positions_in(array_size)
@@ -274,6 +279,8 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
    write(output_unit,*) 'multi: sorted events'
    write(output_unit,*) 'array_size',array_size
    write(output_unit,*) 'n_points',n_points
+   write(output_unit,*) 'Desired charge for track 1 (0 ..undecided)',charge_in(array_size+1)
+   write(output_unit,*) 'Desired charge for track 2 (0 ..undecided)',charge_in(array_size+2)
  end if
 !
  if (constrain_target_x) then
@@ -332,7 +339,7 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
  if (debug_track) then
    write(output_unit,*) 'multi: sorted events'
    do d=1,nbr_detectors 
-     print*
+     write(output_unit,*)
      write(output_unit,*) detector_name(d)
      do i=1,nbr_hits_per_detector(d)
        write(output_unit,*) track_points_charge(d,i), track_points_det_frame(d,i,:)
@@ -365,7 +372,7 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
 !  check, if track CAN make sense (no crossings...)
 !
      n_det_track1 = 0
-     charge1 = 0
+     charge1 = charge_in(array_size+1)
      if (track1_ok) then
        left  = .true.
        right = .true.
@@ -415,7 +422,7 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
 !  check, if track CAN make sense (no crossings...)
 !
          n_det_track2 = 0
-         charge2 = 0
+         charge2 = charge_in(array_size+2)
          if (track2_ok) then
            counter(3) = counter(3) + 1                                                            
            left  = .true.
@@ -630,7 +637,7 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
 !  check, if track CAN make sense (no crossings...)
 !
    n_det_track = 0
-   charge = 0
+   charge = charge_in(array_size+1)
    if (track_ok) then
      left  = .true.
      right = .true.
@@ -1698,13 +1705,13 @@ subroutine get_double_track_parameter_var5  ! determines 2x(theta_xz, p) + x for
  call get_double_chi2
 ! 
  if (debug_track) then
-   print*
+   write(output_unit,*)
    write(output_unit,*) 'p_vector:               ',real(p_vector_x5)
-   print*
+   write(output_unit,*)
    write(output_unit,*) 'reference track  params: ',real(x_reference)
    write(output_unit,*) '      new track1 params: ',real(x_track1)
    write(output_unit,*) '      new track2 params: ',real(x_track2)
-   print*
+   write(output_unit,*)
    if (grafical_output) then
      track_out = .true.
      x_start = x_track1
@@ -1719,7 +1726,7 @@ subroutine get_double_track_parameter_var5  ! determines 2x(theta_xz, p) + x for
      call make_double_track_pic
      track_out = .false.
    end if  
-   print*
+   write(output_unit,*)
    x_start = x_reference
  end if   
 end
@@ -1893,35 +1900,37 @@ subroutine get_single_track_parameter_var3  ! determines theta_xz, p, x for the 
  if (constrain_target_x) then
    b_vector(n_var_local) = b_vector(n_var_local) + pos_target(1)/sigma_target2(1)
    p_vector_x3 = matmul(t3_matrix_inv_array(pattern_id,:,:),b_vector)
+   if (.not.t3_matrix_inv_ok(pattern_id)) write(output_unit,*) 't3_matrix not available'
  else
    p_vector_x3 = matmul(a3_matrix_inv_array(pattern_id,:,:),b_vector)  
+   if (.not.a3_matrix_inv_ok(pattern_id)) write(output_unit,*) 'a3_matrix not available'
  end if  
 !
- if (.not.a3_matrix_inv_ok(pattern_id)) write(output_unit,*) 'a3_matrix not available'
+ 
  if (p_vector_x3(2) .eq. -1.d0)  then
    p_vector_x3(2) = -0.9999999
-   write(output_unit,*) 'p_vector_x3 corrected', p_vector_x3
+   if (debug_track) write(output_unit,*) 'p_vector_x3 corrected', p_vector_x3
  end if  
- if (dabs(p_vector_x3(1)) .le. 1.d-5)  then
-   write(output_unit,*) 'p_vector_x3(1) = 0', p_vector_x3
-   write(output_unit,*) 'b_vector', b_vector
-   write(output_unit,*) 
-   write(output_unit,*) track_hit_pattern
-   write(output_unit,*) det_consider(:,1)
-   write(output_unit,*) real(track_det_frame_y_corrected(:,1))
-   write(output_unit,*) 'pos_target:'
-   write(output_unit,*) pos_target
-   write(output_unit,*) 'pos_target(1)/sigma_target2(1):'
-   write(output_unit,*) pos_target(1)/sigma_target2(1)
-   write(output_unit,*) 'b-Vektor:'
-   write(output_unit,*) b_vector
-   write(output_unit,*) 'Inverted Matrix:'
-   do i=1,3
-     write(output_unit,*) (a3_matrix_inv_array(pattern_id,i,:))
-   end do
-   write(output_unit,*) 'continue with any key'
-   read(*,*)
- end if  
+! if (dabs(p_vector_x3(1)) .le. 1.d-5 )  then
+!   write(output_unit,*) 'p_vector_x3(1) = 0', p_vector_x3
+!   write(output_unit,*) 'b_vector', b_vector
+!   write(output_unit,*) 
+!   write(output_unit,*) track_hit_pattern
+!   write(output_unit,*) det_consider(:,1)
+!   write(output_unit,*) real(track_det_frame_y_corrected(:,1))
+!   write(output_unit,*) 'pos_target:'
+!   write(output_unit,*) pos_target
+!   write(output_unit,*) 'pos_target(1)/sigma_target2(1):'
+!   write(output_unit,*) pos_target(1)/sigma_target2(1)
+!   write(output_unit,*) 'b-Vektor:'
+!   write(output_unit,*) b_vector
+!   write(output_unit,*) 'Inverted Matrix:'
+!   do i=1,3
+!     write(output_unit,*) (a3_matrix_inv_array(pattern_id,i,:))
+!   end do
+!   write(output_unit,*) 'continue with any key'
+   ! read(*,*)
+! end if  
 !
 ! dtheta
 !
@@ -1943,13 +1952,13 @@ subroutine get_single_track_parameter_var3  ! determines theta_xz, p, x for the 
  call get_single_chi2
 ! 
  if (debug_track) then
-   print*
+   write(output_unit,*)
    write(output_unit,*) 'p_vector:               ',(p_vector_x3)
    write(output_unit,*) 'b_vector:               ',(b_vector)
-   print*
+   write(output_unit,*)
    write(output_unit,*) 'reference track params: ',real(x_reference)
    write(output_unit,*) '    new s-track params: ',real(x_track1)
-   print*
+   write(output_unit,*)
    write(output_unit,*) 'track_hit_pattern: ',track_hit_pattern
    write(output_unit,*) 'Matrix-invesrion results: ' ,a3_matrix_inv_ok(pattern_id),t3_matrix_inv_ok(pattern_id)
    write(output_unit,*) a3_matrix_inv_array(pattern_id,:,:)
@@ -1975,7 +1984,7 @@ subroutine get_single_track_parameter_var3  ! determines theta_xz, p, x for the 
    write(output_unit,*) 'R-K-track points   : ',real(detector_track_interactions_det_frame(:,1))
    write(output_unit,*) 'diff to det values:  ',real(track_det_frame(:,1)-detector_track_interactions_det_frame(:,1))
    write(output_unit,*) 'diff to linear track:',real(v1-detector_track_interactions_det_frame(:,1))
-   print*
+   write(output_unit,*)
    detector_track_interactions_det_frame(:,1) = v1
    x_start = x_reference
  end if   
@@ -3243,13 +3252,6 @@ subroutine init
 !
  call getarg(buffer_counter,BUFFER)
 !
- if (screen_output) then 
-   output_unit = 6
- else
-   output_unit = output_unit_log
-   open (unit=output_unit_log, file=tracker_log_file)
- end if  
-!
  if (buffer.eq.'-') then     
      unit_read = 5
      print*,'Kein ini file!'
@@ -3262,27 +3264,21 @@ subroutine init
    else
      ini_file=buffer(1:len_trim(buffer))
    end if
-   if (.not. calibration_mode) write(output_unit,*) 'Init file: ',ini_file(1:40)
    unit_read = 8
    open (unit=unit_read, file=ini_file , status='old')
  end if      
 !
  read(unit_read,*) geometry_file  
- if (.not. calibration_mode) write(output_unit,*) 'Geometry definition: ',trim(geometry_file)
 !
  read(unit_read,*) derivative_file  
  get_new_derivatives = (trim(derivative_file) == '')
  if (calibration_mode) get_new_derivatives = .true.
  if (get_new_derivatives) then
    derivative_file = 'derivatives.out'
-   if (.not. calibration_mode) write(output_unit,*) 'NEW derivatives will be stored in: ',trim(derivative_file)
- else
-   if (.not. calibration_mode) write(output_unit,*) 'Derivatives definition: ',trim(derivative_file)
  end if 
 !
  do i=1,3
    read(unit_read,*) x_start(i) , sigma_target(i)
-   if (.not. calibration_mode) write(output_unit,*) 'Start location: ',real(x_start(i)), ' +- ',real(sigma_target(i))
  end do  
  sigma_target2       = sigma_target
  pos_target          = x_start(1:3)
@@ -3298,18 +3294,13 @@ subroutine init
    if (eastat /= 0) then
      p_start(i) = 0.d0
    end if  
-   if (.not. calibration_mode) write(output_unit,*) 'Start momentum (MeV/c/u)',p_start(i)
-   if (.not. calibration_mode) write(output_unit,*) 'Deviation of tracking momentum from start momentum (MeV/c/u)',p_start(i)
  end do  
 !
  read(unit_read,*) a_over_q     ! this is now a/q
- if (.not. calibration_mode) write(output_unit,*) 'A/Z (AMU/e): ',a_over_q
  m = a_over_q * amu
- if (.not. calibration_mode) write(output_unit,*) 'Mass of particle (MeV/c2): ',m/e*c2/1d6
 !  
 ! read(unit_read,*) q_e  
  q_e = 1.d0                              ! calculate always with q == 1
- if (.not. calibration_mode) write(output_unit,*) 'Charge of particle (e): ',q_e
  q = q_e * e
 !
  x_start(4:6)           = p_start(1:3)*e/c*1.d6*a_over_q
@@ -3318,42 +3309,69 @@ subroutine init
  x_reference = x_start
 !
  read(unit_read,*) spatial_resolution  
- if (.not. calibration_mode) write(output_unit,*) 'Spatial resolution (m): ',spatial_resolution
 !
  read(unit_read,*) constrain_target_x  
- if (constrain_target_x) then
-   if (.not. calibration_mode) write(output_unit,*) 'Constrain x-position on target: yes'
- else
-   if (.not. calibration_mode) write(output_unit,*) 'Constrain x-position on target: no'
- end if  
 !
  read(unit_read,*) constrain_target_y  
- if (constrain_target_x) then
-   if (.not. calibration_mode) write(output_unit,*) 'Constrain y-position on target: yes'
- else
-   if (.not. calibration_mode) write(output_unit,*) 'Constrain y-position on target: no'
- end if  
 !
  read(unit_read,*) debug_track  
- if (debug_track) then
-!   screen_output = .true.
-   if (.not. calibration_mode) write(output_unit,*) 'Debugging mode: yes'
- else
-   if (.not. calibration_mode) write(output_unit,*) 'Debugging mode: no'
- end if  
 !
  read(unit_read,*) grafical_output  
  read(unit_read,*) output_file(1)  
- if (.not. calibration_mode) write(output_unit,*) 'Root of output file: ',trim(output_file(1))
- output_file(2) = trim(output_file(1)) // '.dat'
- output_file(3) = trim(output_file(1)) // '.gle'
-! 
- if (grafical_output) then
-   if (.not. calibration_mode) write(output_unit,*) 'Grafical output: yes'
 !
+ output_file(2)   = trim(output_file(1)) // '.dat'
+ output_file(3)   = trim(output_file(1)) // '.gle'
+ tracker_log_file = trim(output_file(1)) // '.log'
+! 
+ if (screen_output) then 
+   output_unit = 6
  else
-   if (.not. calibration_mode) write(output_unit,*) 'Grafical output: no' 
- end if
+   output_unit = output_unit_log
+   open (unit=output_unit_log, file=tracker_log_file)
+ end if  
+!
+ if (.not. calibration_mode) then
+   write(output_unit,*) 'Init file: ',ini_file(1:40)
+   write(output_unit,*) 'Geometry definition: ',trim(geometry_file)
+   if (get_new_derivatives) then
+     write(output_unit,*) 'NEW derivatives will be stored in: ',trim(derivative_file)
+   else
+     write(output_unit,*) 'Derivatives definition: ',trim(derivative_file)
+   end if 
+   do i=1,3
+     write(output_unit,*) 'Start location: ',real(x_start(i)), ' +- ',real(sigma_target(i))
+   end do  
+   do i=1,3
+     write(output_unit,*) 'Start momentum (MeV/c/u)',p_start(i)
+     write(output_unit,*) 'Deviation of tracking momentum from start momentum (MeV/c/u)',p_start(i)
+   end do  
+   write(output_unit,*) 'A/Z (AMU/e): ',a_over_q
+   write(output_unit,*) 'Mass of particle (MeV/c2): ',m/e*c2/1d6
+   write(output_unit,*) 'Charge of particle (e): ',q_e
+   write(output_unit,*) 'Spatial resolution (m): ',spatial_resolution
+   if (constrain_target_x) then
+     write(output_unit,*) 'Constrain x-position on target: yes'
+   else
+     write(output_unit,*) 'Constrain x-position on target: no'
+   end if  
+   if (constrain_target_y) then
+     write(output_unit,*) 'Constrain y-position on target: yes'
+   else
+     write(output_unit,*) 'Constrain y-position on target: no'
+   end if  
+   if (debug_track) then
+     write(output_unit,*) 'Debugging mode: yes'
+   else
+     write(output_unit,*) 'Debugging mode: no'
+   end if  
+   write(output_unit,*) 'Root of output file: ',trim(output_file(1))
+   if (grafical_output) then
+     write(output_unit,*) 'Grafical output: yes'
+   else
+     write(output_unit,*) 'Grafical output: no' 
+   end if
+ end if  
+
 !
 ! if (calibration_mode) write(output_unit,*) 'calibration of geometry with data from: ', trim(calibration_data_file)
  if (unit_read .eq. 8) close(8)
@@ -5165,7 +5183,9 @@ subroutine make_event_sweep_detektor_position_calibration
    chi_treshold= 5.d1 
  end if
 ! 
+ print*,'call calculate_quadratic_deviations'
  call calculate_quadratic_deviations(qs_vary,sum_vary)
+ print*,'go into  chi2-loop '
  
 ! stop
  
@@ -5203,7 +5223,7 @@ subroutine make_event_sweep_detektor_position_calibration
    if (qs_0 > 1.d30) sum_0 = 0
    do 
      all_detectors_done = .true.
-     write(output_unit,*) qs_0, sum_0
+     write(output_unit,*) qs_0, sum_0, counter_max(:,1)
    !!  write(output_unit,'(A1)',advance='no') ' '
      do d=1,nbr_detectors !!! loop over d 
        if ( optimize_detector(d) .and. detector_free(d) ) then
@@ -5433,7 +5453,11 @@ subroutine calculate_quadratic_deviations(qs_event_by_event,sum_hits)
              track_det_frame(d,:) = track_points_det_frame(d,track_hit_numbers(d),:)
            end do
            call calculate_scatter_track
+!           track_hit_pattern(2) = .false.  ! test
            call get_single_track_parameter_var5
+!           print*,track_hit_pattern
+!           print*,'tracked   ',x_track1(4:6)
+!           print*,'reference ',x_reference(4:6)
          else
            do d=1,nbr_detectors
              if (track_hit_pattern(d) ) then
@@ -5512,8 +5536,13 @@ subroutine calculate_quadratic_deviations(qs_event_by_event,sum_hits)
            chi_parameter_out(1) = chi_parameter_out(1) + (track_parameter_out(2)-x_start(2))**2/sigma_target2(2)**2
          end if
          chi_parameter_out(1) = dsqrt(chi_parameter_out(1))
-  !     print*,chi_parameter_out(1)
-  !     call get_incoming_momentum(x_track1(4:6))
+!         print*,',chi2                 :   ', chi_parameter_out(1)
+!         print*,',p_incoming           :   ', p_incoming
+!         print*,',track_parameter_out  :   ', track_parameter_out
+!         print*,',x_reference          :   ', x_reference
+!         read(*,*)
+         
+         
 
        end if
 
@@ -5753,7 +5782,7 @@ subroutine get_incoming_momentum(p3_lab)
    p_incoming(3) = (g*p_i+g*b*e1/c)/m_b*a_over_q
  else
    print*,'p_incoming fail'
-   print*,'counter_local,b ',counter_local,b
+   print*,'counter_local,b, p3_lab_local ',counter_local,b,p3_lab_local
  end if  
 end
 
@@ -5766,10 +5795,9 @@ subroutine read_calibration_events
  integer :: eastat, run, nbr_hits, nbr_hits_run, hit, d
  character(LEN=256) event_file
  double precision x_local_lab(3), x_local_det(3)
- logical lab_coordinates
 !
- lab_coordinates = .true.
- lab_coordinates = .false.
+! lab_coordinates = .true.
+! lab_coordinates = .false.
  nbr_events_in_run = 0
  current_event     = 0
  nbr_hits_in_event = 0
@@ -5780,7 +5808,7 @@ subroutine read_calibration_events
      if (sweep_calibration) then
        read(unit_read1,*,iostat=eastat) b_field_sweep(run),event_file
      else  
-       read(unit_read1,*,iostat=eastat) masses(run,1),masses(run,2),event_file
+       read(unit_read1,*,iostat=eastat) masses(run,1),masses(run,2),lab_coordinates,event_file
      end if     
      open (unit=unit_read2, file=event_file , status='old')
        read(unit_read2,*,iostat=eastat) nbr_hits
@@ -5800,6 +5828,7 @@ subroutine read_calibration_events
              print*,d-1,d,x_local_lab,x_local_det
              x_pos(run,nbr_hits_run) = x_local_det(1)
              y_pos(run,nbr_hits_run) = x_local_det(2)
+  !           if (d==1) x_pos(run,nbr_hits_run) = x_local_det(1) + 1e-3   !! this is only for testing purposes!!
            else
 !           
 !  in case of det-coordinates
@@ -5810,7 +5839,11 @@ subroutine read_calibration_events
            event_id(run,nbr_hits_run) = nbr_events_in_run(run)
            call store_det_pos(detector_id(run,nbr_hits_run)+1,run,x_pos(run,nbr_hits_run))
          end do
-         read(unit_read2,*,iostat=eastat) nbr_hits
+!         if (nbr_hits > 5 .or. nbr_hits < 4) then   ! skip event if more than 5 dets fired ... this is for test purposes
+!           nbr_hits_run           = nbr_hits_run - nbr_hits
+!           nbr_events_in_run(run) = nbr_events_in_run(run) - 1
+!         end if 
+        read(unit_read2,*,iostat=eastat) nbr_hits
        end do
      close(unit_read2)
      if (sweep_calibration) then

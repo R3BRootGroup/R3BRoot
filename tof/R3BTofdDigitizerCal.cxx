@@ -49,6 +49,7 @@ using std::endl;
 
 R3BTofdDigitizerCal::R3BTofdDigitizerCal()
     : FairTask("R3B Tofd Digitization scheme ")
+    , fTofdPoints(NULL)
 {
 }
 
@@ -60,6 +61,7 @@ InitStatus R3BTofdDigitizerCal::Init()
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
         LOG(fatal) << "Init: No FairRootManager";
+
     fTofdPoints = (TClonesArray*)ioman->GetObject("TOFdPoint");
 
     fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
@@ -68,6 +70,7 @@ InitStatus R3BTofdDigitizerCal::Init()
     // Register output array fTofdCals
     fTofdCals = new TClonesArray("R3BTofdCalData", 1000);
     ioman->Register("TofdCal", "Digital response in Tofd", fTofdCals, kTRUE);
+    maxevent = ioman->CheckMaxEventNo();
 
     fCalTriggerItems = new TClonesArray("R3BTofdCalData", 1000);
     ioman->Register("TofdTriggerCal", "Land", fCalTriggerItems, kTRUE);
@@ -81,6 +84,10 @@ InitStatus R3BTofdDigitizerCal::Init()
 void R3BTofdDigitizerCal::Exec(Option_t* opt)
 {
     //	cout<<"R3BTofdDigitizerCal Exec Entry"<<endl;
+    if (counter / 10000. == (int)counter / 10000)
+        std::cout << "\rEvents: " << counter << " / " << maxevent << " (" << (int)(counter * 100. / maxevent) << " %) "
+                  << std::flush;
+    counter += 1;
 
     Reset();
 
@@ -229,10 +236,10 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
                     timeT_up = timeL_up + ToT_up;
                     timeT_down = timeL_down + ToT_down;
 
-                    //    cout<<"layer= "<<layer_label<<", paddle= "<<paddle_number<<", elos= "<<ernd<<", time=
-                    //    "<<timernd<< "tL_up= "<<timeL_up<<", tT_up= "<<timeT_up<<"tL_down= "<<timeL_down<<", tT_down=
-                    //    "<<timeT_down<<endl;
-
+                    /*cout<<"layer= "<<layer_label<<" paddle= "<<paddle_number<<" elos= "<<ernd<<"  time= "
+                        <<timernd<< " tL_up= "<<timeL_up<<" tT_up= "<<timeT_up<<" tL_down= "<<timeL_down
+                        <<" tT_down= "<<timeT_down<<endl;
+                    */
                     /*   CalData format:      --> in Tree:
                         fPlane(detector) 1-4  --> TofdCal.fDetector
                       , fBar(channel)    1-44 --> TofdCal.fBar
@@ -249,7 +256,7 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
                     // Int_t card = (int)paddle_number/8.+layer_label*6;
                     for (Int_t j = 0; j < 12; j++)
                     {
-                        new ((*Trigger)[Trigger->GetEntriesFast()]) R3BTofdCalData(5, j + 1, 1, 0., 0.);
+                        new ((*Trigger)[Trigger->GetEntries()]) R3BTofdCalData(5, j + 1, 1, 0., 0.);
                     }
                 }
             }

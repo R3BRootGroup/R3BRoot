@@ -63,6 +63,8 @@ class R3BTofdDigitizerCal : public FairTask
     Float_t tsigma;
     Float_t esigma;
 
+    Int_t maxevent;
+    Int_t counter = 0;
     // detector parameter
     Int_t number_layers = 2;
     Int_t number_paddles = 44; // per layer

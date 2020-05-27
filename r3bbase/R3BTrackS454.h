@@ -195,8 +195,10 @@ class R3BTrackS454 : public FairTask
 	Int_t fB;
 	Bool_t tracker = true;
 
-	TCutG *cut_Fi10vsTofd;
-	TCutG *cut_Fi13vsTofd;
+	TCutG *cut_fi11_fi3a;
+	TCutG *cut_fi12_fi3b;
+	TCutG *cut_Fi13vsFi11;
+	TCutG *cut_Fi10vsFi12;
 	
     unsigned long long time_start = 0, time = 0;
     unsigned long ic_start = 0, see_start = 0, tofdor_start = 0;
@@ -238,8 +240,6 @@ class R3BTrackS454 : public FairTask
 	Int_t counterRolu = 0;
 	Int_t counterTracker = 0;
 	Int_t countdet;
-
-    Bool_t writeFile = false;
 
     UInt_t num_spills = 0;
 

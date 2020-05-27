@@ -518,6 +518,24 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                     Double_t t_spmt = spmt_tot.lead_ns;
 
                     // only accept hits which are at the right time:
+                    Bool_t simu = true;
+                    if (!simu)
+                    {
+                        if (fName == "Fi3a" || fName == "Fi3b")
+                        {
+                            if (t_spmt < -400 || t_spmt > -270)
+                                continue;
+                            if (t_mapmt < -550 || t_mapmt > -350)
+                                continue;
+                        }
+                        if (fName == "Fi10" || fName == "Fi11" || fName == "Fi12" || fName == "Fi13")
+                        {
+                            if (t_spmt < -300 || t_spmt > -160)
+                                continue;
+                            if (t_mapmt < -500 || t_mapmt > -300)
+                                continue;
+                        }
+                    }
 
                     fh_time_Fib->Fill(fiber_id, t_mapmt);
                     fh_time_s_Fib->Fill(single, t_spmt);
@@ -541,7 +559,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                         {
                             gainMA = par->GetGainMA();
                             tsync = par->GetSync();
-                            gainS = par->GetGainS();
+                            // gainS = par->GetGainS();
                             offset1 = par->GetOffset1();
                             offset2 = par->GetOffset2();
                         }
@@ -553,7 +571,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                     t_mapmt += offset1;
                     t_spmt += offset2;
                     tof = (t_mapmt + t_spmt) / 2.;
-                    tof += tsync;
+                    tof -= tsync;
 
                     // histogram for offset determination
                     fh_dt_Fib->Fill(fiber_id, t_spmt - t_mapmt);
@@ -594,7 +612,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                             y = -detector_width / 2. + fiber_thickness / 2. +
                                 ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
                         }
-                        // cout << "fiber_id " << fiber_id << " pos " << x << endl;
+                        // if(fiber_id>256) cout << "fiber_id " << fiber_id << " x " << x << " y " << y << endl;
                     }
                     if (fName == "Fi1a" || fName == "Fi1b" || fName == "Fi2a" || fName == "Fi2b" || fName == "Fi3a" ||
                         fName == "Fi3b")
@@ -618,9 +636,13 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                         }
                     }
                     // cout<<"Fiber y " << y << endl;
-                    if (y < -100 || y > 100)
+                    if (y < -60 || y > 60)
                     {
-                        continue;
+                        // continue;
+                    }
+                    if (tof < -20 || tof > 20)
+                    {
+                        // continue;
                     }
                     // Double_t eloss = sqrt(tot_mapmt * tot_spmt);
                     Double_t eloss = tot_mapmt;
@@ -632,6 +654,8 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                     energy[fiber_id] = eloss;
                     counts[fiber_id] = counts[fiber_id] + 1;
                     multi++;
+
+                    // if(fiber_id>256) cout << "save fiber_id " << fiber_id << " pos " << x << endl;
 
                     if (!fIsCalibrator)
                         new ((*fHitItems)[fNofHitItems++])

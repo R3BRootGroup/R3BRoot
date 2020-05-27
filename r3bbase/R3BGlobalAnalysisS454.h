@@ -28,6 +28,7 @@
 
 #include "TClonesArray.h"
 #include "TMath.h"
+#include <TLorentzVector.h>
 #include <cstdlib>
 
 class TClonesArray;
@@ -162,20 +163,20 @@ class R3BGlobalAnalysisS454 : public FairTask
     Double_t counts_IC = 0;
     Double_t counts_TofD = 0;
 
-	Double_t XHe, YHe, ZHe, XC, YC, ZC;	
+	Double_t XHe, YHe, ZHe, XC, YC, ZC, THe, TC;	
 	Double_t pHex, pHey, pHez, pCx, pCy, pCz;
 	Double_t Pxf, Pyf, Pzf, Xf, Yf, Zf, Pf_tot;
-	Double_t XHes, YHes, ZHes, XCs, YCs, ZCs, THes, TCs;
-	Double_t pHexs, pHeys, pHezs, pCxs, pCys, pCzs, pHes, pCs;
 
 	Double_t amu = 931.49410242;
 //	Double_t mHe = 4.00260325413*amu;
 //	Double_t mC = 12. * amu;
 	Double_t mHe = 3727.409;
 	Double_t mC = 11174.950;
-	Double_t mO = 16. * amu;
+	Double_t mO = 15.99065084 * amu;
 	
-	
+    TLorentzVector alpha, carbon, oxygen;
+    TLorentzVector alpha_cm, carbon_cm, oxygen_cm;
+
 	Int_t Q = 0;
 	Double_t tPrev[10];
 	Int_t detPrev[10];
@@ -209,7 +210,8 @@ class R3BGlobalAnalysisS454 : public FairTask
     TH1F* fh_pz_C;
     TH1F* fh_p_C;
 
-    TH2F* fh_chiy_vs_chix;
+    TH2F* fh_chiy_vs_chix_He;
+    TH2F* fh_chiy_vs_chix_C;
     
 
     TH1F* fh_dx;
@@ -227,19 +229,27 @@ class R3BGlobalAnalysisS454 : public FairTask
     TH2F* fh_thetax_dpy;
     TH2F* fh_thetay_dpx;
     TH2F* fh_dpy_dpx;
+    TH2F* fh_px_px_cm;
+    TH2F* fh_py_py_cm;
+    TH2F* fh_pz_pz_cm;
+    TH2F* fh_px_px;
+    TH2F* fh_py_py;
+    TH2F* fh_pz_pz;
+    
 
 	TH1F* fh_theta26_simu;
 	TH1F* fh_Erel_simu;
 	TH1F* fh_theta26;
 	TH1F* fh_theta_16O;	
+	TH1F* fh_phi_16O;	
 	TH1F* fh_theta26_cm;	
 	TH1F* fh_phi26_cm;
 	TH1F* fh_theta_4He_cm;
 	TH1F* fh_phi_4He_cm;
+	TH1F* fh_phi_bc_cm;
+	TH1F* fh_theta_bc_cm;
 	TH1F* fh_theta_12C_cm;
 	TH1F* fh_phi_12C_cm;
-	TH1F* fh_theta_16O_cm;
-	TH1F* fh_phi_16O_cm;
 	TH1F* fh_Erel;
 	TH1F* fh_ErelL;
 	TH1F* fh_ErelR;

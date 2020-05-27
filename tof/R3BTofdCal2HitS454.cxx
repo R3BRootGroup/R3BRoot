@@ -321,12 +321,11 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
     {
         auto* hit = (R3BTofdCalData*)fCalItems->At(ihit);
         size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
-        /*
-                std::cout << "Hits: " << hit->GetDetectorId() << ' ' << hit->GetBarId() << ' ' << hit->GetSideId() << '
-           '
-                          << hit->GetTimeLeading_ns() << ' ' << hit->GetTimeTrailing_ns()
-                          << ' ' << hit->GetTimeTrailing_ns() - hit->GetTimeLeading_ns() << '\n';
-        */
+
+        std::cout << "Hits: " << hit->GetDetectorId() << ' ' << hit->GetBarId() << ' ' << hit->GetSideId() << '  '
+                  << hit->GetTimeLeading_ns() << ' ' << hit->GetTimeTrailing_ns() << ' '
+                  << hit->GetTimeTrailing_ns() - hit->GetTimeLeading_ns() << '\n';
+
         auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
         auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;
         vec.push_back(hit);
@@ -781,7 +780,8 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
     { // loop over hits
         if (tArrU[hit] == false)
         {
-            LOG(DEBUG) << "Single Hit for Plane " << tArrP[hit] << " " << tArrB[hit];
+            cout << "Single Hit for Plane " << tArrP[hit] << " " << tArrB[hit] << endl;
+            ;
             tArrU[hit] = true;
             // store single hits
             singlehit++;
