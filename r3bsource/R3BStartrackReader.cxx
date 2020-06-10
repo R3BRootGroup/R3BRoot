@@ -159,7 +159,7 @@ Bool_t R3BStartrackReader::Read()
                 // Decoding the first 32bit word:
                 wordtype = (starWord1 >> 30) & 0x3; // bit 31:30
                 if (wordtype != 3)
-                    cout << wordtype << endl;
+                    LOG(info) << wordtype;
 
                 hitbit = (starWord1 >> 29) & 0x01;
 

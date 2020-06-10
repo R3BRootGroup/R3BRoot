@@ -13,6 +13,7 @@
 
 #include "R3BNeulandPrimaryInteractionFinder.h"
 #include "FairLogger.h"
+#include "TFile.h"
 #include <utility>
 #include <vector>
 
