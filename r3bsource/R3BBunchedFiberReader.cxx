@@ -207,10 +207,10 @@ Bool_t R3BBunchedFiberReader::Read()
                 {
                     if (!has_header)
                     {
-                        std::cout << "Event\n";
+                        LOG(info) << "Event\n";
                         has_header = true;
                     }
-                    std::cout << lc << ": " << d << '\n';
+                    LOG(info) << lc << ": " << d << '\n';
                 }
                 ++lj;
                 ++tj;

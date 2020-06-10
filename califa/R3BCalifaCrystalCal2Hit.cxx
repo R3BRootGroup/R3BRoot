@@ -28,6 +28,7 @@
 
 #include "R3BCalifaCrystalCalData.h"
 #include "R3BCalifaGeometry.h"
+#include <list>
 #include <vector>
 
 #include "ROOT_template_hacks.h"
