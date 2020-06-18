@@ -32,6 +32,7 @@ class R3BMusicHitData : public TObject
      *@param z        Atomic number Z in charge units
      **/
     R3BMusicHitData(Double_t theta, Double_t z);
+    R3BMusicHitData(Double_t theta, Double_t z, Double_t ene);
 
     /** Destructor **/
     virtual ~R3BMusicHitData() {}
@@ -39,13 +40,15 @@ class R3BMusicHitData : public TObject
     /** Accessors **/
     inline const Double_t& GetTheta() const { return fTheta; }
     inline const Double_t& GetZcharge() const { return fZ; }
+    inline const Double_t& GetEave() const { return fE; }
 
     /** Modifiers **/
     void SetTheta(Double_t theta) { fTheta = theta; };
     void SetZcharge(Double_t z) { fZ = z; };
+    void SetEave(Double_t ene) { fE = ene; };
 
   protected:
-    Double_t fTheta, fZ;
+    Double_t fTheta, fZ, fE;
 
     ClassDef(R3BMusicHitData, 1)
 };

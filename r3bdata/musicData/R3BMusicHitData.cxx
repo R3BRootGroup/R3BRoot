@@ -33,4 +33,13 @@ R3BMusicHitData::R3BMusicHitData(Double_t theta, Double_t z)
 }
 // -------------------------------------------------------------------------
 
+// -----   For later analysis with reconstructed beta   --------------------
+R3BMusicHitData::R3BMusicHitData(Double_t theta, Double_t z, Double_t ene)
+    : fTheta(theta)
+    , fZ(z)
+    , fE(ene)
+{
+}
+// -------------------------------------------------------------------------
+
 ClassImp(R3BMusicHitData)
