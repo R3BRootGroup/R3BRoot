@@ -33,6 +33,7 @@ R3BCalifaDigitizer::R3BCalifaDigitizer()
     , fCalifaPointDataCA(NULL)
     , fCalifaCryCalDataCA(NULL)
     , fNonUniformity(0)
+    , fRealConfig(0)
 {
     fNonUniformity = 0.; // perfect crystals
     fResolution = 0.;    // perfect crystals
@@ -45,6 +46,7 @@ R3BCalifaDigitizer::R3BCalifaDigitizer(const TString& geoFile)
     , fCalifaPointDataCA(NULL)
     , fCalifaCryCalDataCA(NULL)
     , fNonUniformity(0)
+    , fRealConfig(0)
 {
     fNonUniformity = 0.; // perfect crystals
     fResolution = 0.;    // perfect crystals
@@ -68,6 +70,46 @@ R3BCalifaDigitizer::~R3BCalifaDigitizer()
     }
 }
 
+
+
+void R3BCalifaDigitizer::SetParContainers()
+{
+  if(fRealConfig) {
+
+  FairRuntimeDb* rtdb = FairRuntimeDb::instance();
+  if (!rtdb)
+  {
+      LOG(ERROR) << "R3BCalifaDigitizer:: FairRuntimeDb not opened!";
+  }
+
+  fSim_Par = (R3BCalifaCrystalPars4Sim*)rtdb->getContainer("califaCrystalPars4Sim");
+  if (!fSim_Par)
+  {
+      LOG(ERROR) << "R3BCalifaDigitizer::Init() Couldn't get handle on califaCrystalPars4Sim container";
+  }
+  if (fSim_Par)
+   {
+      LOG(INFO) << "R3BCalifaDigitizer:: califaCrystalPars4Sim container opened";
+   }
+
+ }
+}
+
+void R3BCalifaDigitizer::SetParameter()
+{
+    if (fRealConfig) {
+    //--- Parameter Container ---
+    fNumCrystals = fSim_Par->GetNumCrystals();    // Number of Crystals
+    fNumberOfParams = fSim_Par->GetNumParameters4Sim(); // Number of Parameters
+
+    fSim_Par->printParams();
+
+    LOG(INFO) << "R3BCalifaDigitizer:: Max Crystal ID " << fNumCrystals;
+    LOG(INFO) << "R3BCalifaDigitizer:: Nb of parameters used in the Simulation " << fNumberOfParams;
+  }
+}
+
+
 InitStatus R3BCalifaDigitizer::Init()
 {
     LOG(INFO) << "R3BCalifaDigitizer::Init ";
@@ -86,6 +128,7 @@ InitStatus R3BCalifaDigitizer::Init()
     fCalifaCryCalDataCA = new TClonesArray("R3BCalifaCrystalCalData", 10);
     rootManager->Register("CalifaCrystalCalData", "CALIFA Crystal Cal", fCalifaCryCalDataCA, kTRUE);
 
+    SetParameter();
     return kSUCCESS;
 }
 
@@ -153,18 +196,33 @@ void R3BCalifaDigitizer::Exec(Option_t* option)
     if (nCrystalCals == 0)
         return;
 
+
     Double_t temp = 0;
+    Int_t tempCryID,parThres;
+    Bool_t inUse;
+    Int_t tempIndex;
+    Float_t parReso;
 
     for (Int_t i = 0; i < nCrystalCals; i++)
     {
+
+        tempCryID = ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->GetCrystalId();
+
+
+        if (!fRealConfig) {
+
         temp = ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->GetEnergy();
         if (temp < fThreshold)
         {
-            fCalifaCryCalDataCA->RemoveAt(i); // remove from CalData those below threshold
+            fCalifaCryCalDataCA->RemoveAt(i);
+            fCalifaCryCalDataCA->Compress();
+            nCrystalCals--; // remove from CalData those below threshold
             continue;
         }
+
+
         if (fResolution > 0)
-            ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->SetEnergy(ExpResSmearing(temp));
+            ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->SetEnergy(ExpResSmearing(temp,fResolution));
         if (fComponentRes > 0)
         {
             temp = ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->GetNf();
@@ -172,8 +230,51 @@ void R3BCalifaDigitizer::Exec(Option_t* option)
             temp = ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->GetNs();
             ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->SetNs(CompSmearing(temp));
         }
+      }
+
+      /* ----- Setting Real Config ----- */
+
+      else {
+
+        temp      = ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->GetEnergy();
+
+        inUse     = fSim_Par->GetInUse(tempCryID-1);
+        parReso   = fSim_Par->GetResolution(tempCryID-1);
+        parThres  = fSim_Par->GetThreshold(tempCryID-1);
+
+
+        if (inUse  &&  parThres < temp*1000000){  // Thresholds are in KeV!!
+
+
+
+          ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->SetEnergy(ExpResSmearing(temp,parReso));
+
+          if (fComponentRes > 0)
+          {
+              temp = ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->GetNf();
+              ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->SetNf(CompSmearing(temp));
+              temp = ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->GetNs();
+              ((R3BCalifaCrystalCalData*)(fCalifaCryCalDataCA->At(i)))->SetNs(CompSmearing(temp));
+          }
+
+        }
+
+          else {
+
+              fCalifaCryCalDataCA->RemoveAt(i); // remove from CalData those below threshold
+              fCalifaCryCalDataCA->Compress();
+              nCrystalCals--;
+              continue;
+
+          }
+
+
+
     }
+  }
 }
+
+
 
 // -----   Public method EndOfEvent   -----------------------------------------
 void R3BCalifaDigitizer::EndOfEvent()
@@ -206,6 +307,17 @@ void R3BCalifaDigitizer::SetDetectionThreshold(Double_t thresholdEne)
     LOG(INFO) << "R3BCalifaDigitizer::SetDetectionThreshold to " << fThreshold << " GeV.";
 }
 
+
+void R3BCalifaDigitizer::SetRealConfig(Bool_t isRealSet)
+{
+    fRealConfig = isRealSet;
+    LOG(INFO) << "R3BCalifaDigitizer::SetRealConfig to " << isRealSet;
+}
+
+
+
+
+
 R3BCalifaCrystalCalData* R3BCalifaDigitizer::AddCrystalCal(Int_t ident,
                                                            Double_t energy,
                                                            Double_t Nf,
@@ -235,6 +347,9 @@ void R3BCalifaDigitizer::SetComponentRes(Double_t componentRes)
     LOG(INFO) << "R3BCalifaDigitizer::SetComponentRes to " << fComponentRes;
 }
 
+
+
+
 Double_t R3BCalifaDigitizer::NUSmearing(Double_t inputEnergy)
 {
     // Very simple preliminary scheme where the NU is introduced as a flat random
@@ -250,7 +365,7 @@ void R3BCalifaDigitizer::SetNonUniformity(Double_t nonU)
     LOG(INFO) << "R3BCalifaDigitizer::SetNonUniformity to " << fNonUniformity << " %";
 }
 
-Double_t R3BCalifaDigitizer::ExpResSmearing(Double_t inputEnergy)
+Double_t R3BCalifaDigitizer::ExpResSmearing(Double_t inputEnergy, Float_t fReso)
 {
     // Smears the energy according to some Experimental Resolution distribution
     // Very simple  scheme where the Experimental Resolution
@@ -261,14 +376,15 @@ Double_t R3BCalifaDigitizer::ExpResSmearing(Double_t inputEnergy)
     //  ( % * energy ) / sqrt( energy )
     // and then the % is given at 1 MeV!!
     //
-    if (fResolution == 0)
+    if (fReso == 0)
         return inputEnergy;
     else
     {
         // Energy in MeV, that is the reason for the factor 1000...
-        Double_t randomIs = gRandom->Gaus(0, inputEnergy * fResolution * 1000 / (235 * sqrt(inputEnergy * 1000)));
+        Double_t randomIs = gRandom->Gaus(0, inputEnergy * fReso * 1000 / (235 * sqrt(inputEnergy * 1000)));
         return inputEnergy + randomIs / 1000;
     }
+
 }
 
 Double_t R3BCalifaDigitizer::CompSmearing(Double_t inputComponent)

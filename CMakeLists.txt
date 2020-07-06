@@ -150,7 +150,7 @@ if(USE_PATH_INFO)
 endif(USE_PATH_INFO)
 
 # Check if the user wants to build the project in the source directory
-check_out_of_source_build()
+#check_out_of_source_build()
 
 # Check if we are on an UNIX system. If not stop with an error message
 if(NOT UNIX)
@@ -532,5 +532,3 @@ endif()
 message(STATUS "  ")
 
    ################################################################################
-
-

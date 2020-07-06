@@ -20,6 +20,7 @@
 #include "R3BCalifaPoint.h"
 #include "TClonesArray.h"
 #include "string"
+#include "R3BCalifaCrystalPars4Sim.h"
 
 class R3BCalifaDigitizer : public FairTask
 {
@@ -52,9 +53,20 @@ class R3BCalifaDigitizer : public FairTask
     /** Virtual method FinishEvent **/
     virtual void FinishEvent();
 
+    virtual void SetParContainers();
+
+
+
+    /** Public method SetRealConfig
+     **
+     ** Defines the REAL experimental resolution and Thresholds of the CsI(Tl) Crystals
+     *@param isRealSet  Bool parameter used to set the experimental Resolution and Thresholds
+     **/
+    void SetRealConfig(Bool_t isRealSet);
+
     /** Public method SetExpEnergyRes
      **
-     ** Sets the experimentl energy resolution of the CsI crystals
+     ** Sets the experimental energy resolution of the CsI crystals
      **/
     void SetExpEnergyRes(Double_t crystalRes);
 
@@ -79,6 +91,7 @@ class R3BCalifaDigitizer : public FairTask
      **/
     void SetNonUniformity(Double_t nonU);
 
+
     inline void ResetParameters(){};
 
     /** Private method AddCrystalCal
@@ -93,6 +106,10 @@ class R3BCalifaDigitizer : public FairTask
                                            Double_t tot_energy = 0.);
 
   private:
+
+    void SetParameter();
+
+
     TClonesArray* fCalifaPointDataCA;  //!  The crystal hit collection
     TClonesArray* fCalifaCryCalDataCA; /**< Array with CALIFA Cal- output data. >*/
 
@@ -100,6 +117,11 @@ class R3BCalifaDigitizer : public FairTask
     Double_t fResolution;    // Experimental resolution @ 1 MeV
     Double_t fComponentRes;  // Experimental resolution for Nf and Ns
     Double_t fThreshold;     // Minimum energy requested to create a Cal
+    Bool_t   fRealConfig;    // Real Configuration in CALIFA
+    Int_t fNumberOfParams = 0;
+    Int_t fNumCrystals =0;
+
+    R3BCalifaCrystalPars4Sim *fSim_Par; // Parameter Container for a Realistic Simulation
 
     /** Private method NUSmearing
      **
@@ -116,7 +138,7 @@ class R3BCalifaDigitizer : public FairTask
      ** is introduced as a gaus random distribution with a width given by the
      ** parameter fCrystalResolution(in % @ MeV). Scales according to 1/sqrt(E)
      **/
-    Double_t ExpResSmearing(Double_t inputEnergy);
+    Double_t ExpResSmearing(Double_t inputEnergy,Float_t fReso);
 
     /** Private method CompSmearing
      **
