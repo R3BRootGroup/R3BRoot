@@ -261,9 +261,11 @@ void R3BCalifaDigitizer::Exec(Option_t* option)
 
           else {
 
+
               fCalifaCryCalDataCA->RemoveAt(i); // remove from CalData those below threshold
               fCalifaCryCalDataCA->Compress();
               nCrystalCals--;
+              i--;
               continue;
 
           }
