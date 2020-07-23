@@ -59,13 +59,14 @@ Bool_t R3BTrloiiTpatReader::Read()
 
     // LOG(info) << "TrloiiTpatReader::Read BEGIN";
 
-    if (nullptr != fEventHeader)
+    if (nullptr != fEventHeader && fData->TPAT != 0)
     {
         fEventHeader->SetTpat(fData->TPATv[0]);
         fNEvent = fEventHeader->GetEventno();
     }
     else
     {
+        fEventHeader->SetTpat(0);
         fNEvent++;
     }
 
@@ -80,13 +81,16 @@ Bool_t R3BTrloiiTpatReader::Read()
     // sprintf(str, "  Trlo II Tpat = 0x%04x.", fData->TPATv[0]);
     // LOG(info) << str;
 
-    //  cout<<"TPAT: "<<fData->TPATv[0]<<endl;
+    // cout<<"TPAT: "<<fData->TPATv[0]<<" "<<fData->TPAT<<endl;
 
     // LOG(info) << "TrloiiTpatReader::Read END";
 
     return kTRUE;
 }
 
-void R3BTrloiiTpatReader::Reset() { fNEvent = 0; }
+void R3BTrloiiTpatReader::Reset() {
+  fNEvent = 0;
+  fEventHeader->SetTpat(0);
+}
 
 ClassImp(R3BTrloiiTpatReader)
