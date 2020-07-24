@@ -55,6 +55,7 @@
 #pragma link C++ class R3BSci2Reader+;
 #pragma link C++ class R3BSci8Reader+;
 #pragma link C++ class R3BTofdReader+;
+#pragma link C++ class R3BPdcReader+;
 #pragma link C++ class R3BCalifaFebexReader+;
 #pragma link C++ class R3BPtofReader+;
 #pragma link C++ class R3BNeulandTamexReader+;
@@ -105,4 +106,5 @@
 #pragma link C++ class EXT_STR_h101_WRS8_onion_t;
 #pragma link C++ class EXT_STR_h101_MUSIC_onion_t;
 #pragma link C++ class EXT_STR_h101_SAMP_onion_t;
+#pragma link C++ class EXT_STR_h101_PDC_onion_t;
 #endif

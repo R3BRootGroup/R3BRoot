@@ -389,8 +389,10 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
            if (track_points_charge(d,track_hit_numbers1(d)) /= 0) then
              if (charge1>0 .and. charge1 /=track_points_charge(d,track_hit_numbers1(d))) then
                track1_ok = .false.
-               write(output_unit,*) 'Multi hit routine, doube track 1, charge missmatch!',&
-               charge1,track_points_charge(d,track_hit_numbers1(d))
+               if (debug_track) then
+                 write(output_unit,*) 'Multi hit routine, doube track 1, charge missmatch!',&
+                 charge1,track_points_charge(d,track_hit_numbers1(d))
+               end if  
              end if
              charge1=track_points_charge(d,track_hit_numbers1(d))
            end if  

@@ -11,18 +11,31 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BTimestampMasterReader.h"
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "R3BEventHeader.h"
-#include "R3BWhiterabbitReaderImpl.h"
+#ifndef R3BPDCHITDATA_H
+#define R3BPDCHITDATA_H
 
-extern "C"
+#include "R3BHit.h"
+
+// for the data analysis of the Pdc detectors.
+// Introduced by M.Heil, June 2020
+
+class R3BPdcHitData : public R3BHit
 {
-#include "ext_data_client.h"
-#include "ext_h101_timestamp_master.h"
-}
+  public:
+    // Default Constructor
+    R3BPdcHitData();
 
-R3B_WHITERABBIT_READER_IMPL(TimestampMaster, timestamp_master, 0x100);
-// 0x300 for dec2019
-// 0x100 for data before dec2019
+    // Standard Constructor
+    R3BPdcHitData(Double_t t, Double_t x, Double_t y, Double_t ELoss = 0, Double_t ID = 0, Int_t wire = 0);
+
+    // Destructor
+    virtual ~R3BPdcHitData() {}
+    Int_t GetWireId() const;
+
+	private:
+    Int_t fWireId;
+
+    ClassDef(R3BPdcHitData, 2)
+};
+
+#endif

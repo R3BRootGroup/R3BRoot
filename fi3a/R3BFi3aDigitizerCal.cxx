@@ -86,6 +86,8 @@ InitStatus R3BFi3aDigitizerCal::Init()
 
 void R3BFi3aDigitizerCal::Exec(Option_t* opt)
 {
+    // cout << "New event!" << endl;
+
     Reset();
 
     auto Digitize = [this](TClonesArray* Points, TClonesArray* Hits, TClonesArray* TriggerHits, Int_t NumOfFibers) {
@@ -130,7 +132,7 @@ void R3BFi3aDigitizerCal::Exec(Option_t* opt)
         for (Int_t i = 0; i < entryNum; ++i)
         {
             R3BFibPoint* data_element = (R3BFibPoint*)Points->At(i);
-
+            // cout << "Hit: " << data_element->GetDetectorID() << endl;
             TempHits.push_back(TempHit(data_element->GetDetectorID(), // fiber nummer
                                        data_element->GetEnergyLoss(),
                                        data_element->GetTime(),
@@ -231,6 +233,7 @@ void R3BFi3aDigitizerCal::Exec(Option_t* opt)
                        ,fTime_ns(a_time_ns)                 --> FibXY.fTime_ns
                     */
 
+                    // cout << "Registered " << ichanMA << endl;
                     new ((*Hits)[Hits->GetEntries()]) // MAPMT leading
                         R3BBunchedFiberCalData(0, ichanMA, 1, timeMA_lead);
 

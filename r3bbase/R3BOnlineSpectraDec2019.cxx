@@ -586,7 +586,7 @@ InitStatus R3BOnlineSpectraDec2019::Init()
                                                N_FIBER_PLOT_2019,
                                                100,
                                                0.,
-                                               41.666667);
+                                               200);
             fh_ToT_m_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
             fh_ToT_m_Fib[ifibcount]->GetYaxis()->SetTitle("ToT / ns");
 
@@ -1259,24 +1259,24 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
         LOG(ERROR) << "FairRootManager not found";
         return;
     }
-    // cout<<"next event"<<endl;
-    time = header->GetTimeStamp(); // /1.6; // divided by 1.6 for stand alone daq with Vulom generating time stamps
-    if (time_begin == 0)
-        time_begin = time;
-    time -= time_begin;
+    /*
+        time = header->GetTimeStamp(); // /1.6; // divided by 1.6 for stand alone daq with Vulom generating time stamps
+        if (time_begin == 0)
+            time_begin = time;
+        time -= time_begin;
 
-    if (time_start == 0 && time > 0)
-    {
-        time_start = time;
-        fNEvents_start = fNEvents;
-    }
+        if (time_start == 0 && time > 0)
+        {
+            time_start = time;
+            fNEvents_start = fNEvents;
+        }
 
-    if (header->GetTrigger() == 12)
-    {
-        spill_on = true;
-        spill_on_sampler = true;
-    }
-
+        if (header->GetTrigger() == 12)
+        {
+            spill_on = true;
+            spill_on_sampler = true;
+        }
+    */
     if (fMappedItems.at(DET_SAMPLER))
     {
         // cout << "Samples:\n";
@@ -2029,14 +2029,13 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
                         // cout<<"iDet "<<iDet<<" iPart "<<iPart<<"  "<<nPMV<<endl;
                         if (nPMV == 8)
                         {
-
                             // time difference between two hits
                             if (time0[iDet - 1] < 0)
                             {
                                 time0[iDet - 1] = timeLosV[iDet - 1][iPart];
                                 Double_t tt = (time0[iDet - 1] + time - time_spill_start) / 1.e9;
-                                if (iDet == 1)
-                                    fh_spill_times_daq_first->Fill(tt);
+                                // if (iDet == 1)
+                                // fh_spill_times_daq_first->Fill(tt);
                             }
                             time1[iDet - 1] = timeLosV[iDet - 1][iPart];
                             time_abs[iDet - 1] =
@@ -2057,7 +2056,7 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
                             // Plot Events over one spill
                             Double_t tt =
                                 (time1[iDet - 1] - time0[iDet - 1] + (double)(time - time_spill_start)) / 1.e9;
-                            fh_spill_times_daq->Fill(tt);
+                            //                            fh_spill_times_daq->Fill(tt);
 
                             // MH
                             /*
@@ -2420,7 +2419,6 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
         if (detHit)
         {
             Int_t nHits = detHit->GetEntriesFast();
-
             Double_t xpos = 0. / 0.;
             Double_t ypos = 0. / 0.;
             Double_t totMax = 0.;
@@ -2450,116 +2448,90 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
                 tSPMT = hit->GetSPMTTime_ns();
 
                 // if not both times present, go to next
-                if (!(tMAPMT > 0.) || !(tSPMT > 0.))
-                    continue;
+                //                if (!(tMAPMT > 0.) || !(tSPMT > 0.))
+                //                    continue;
 
                 // loop over all hits of LOS1:
-                for (Int_t lhit = 0; lhit < nPartLos[1]; lhit++)
+                //                for (Int_t lhit = 0; lhit < nPartLos[1]; lhit++)
+                //                {
+                //                    if (IS_NAN(timeLos[1][lhit]))
+                //                        continue;
+
+                /*
+                                    // if not multiplicity 8 or pile-up, go to next event
+                                    Bool_t pileup = false;
+                                    Int_t nPMT = 0;
+                                    for (int ipm = 0; ipm < 8; ipm++)
+                                    {
+                                        if (tot[1][iLosHit][ipm] > 0. && !(IS_NAN(tot[1][iLosHit][ipm])))
+                                            nPMT++;
+                                        if (tot[1][iLosHit][ipm] > 100.)
+                                            pileup = true;
+                                    }
+                                    if (pileup || nPMT != 8)
+                                        continue;
+                */
+                dtime = tMAPMT - tSPMT;
+
+                // Not-calibrated ToF:
+                tfib = (tMAPMT + tSPMT) / 2.;
+                // tfib = tSPMT;
+                // tfib = tMAPMT;
+                //                    if (tfib > 0. && !(IS_NAN(tfib)) && timeLos[1][lhit] > 0. &&
+                //                    !(IS_NAN(timeLos[1][lhit])))
+                //                        tof_fib = tfib - timeLos[1][lhit];
+
+                //					cout<<"Test "<<tof_fib<<"  "<<tfib<<"  "<<hit->GetMAPMTToT_ns()<<"
+                //"<<hit->GetSPMTToT_ns()<< 						  "  "<<lhit<<"  "<<timeLos[1][lhit]<< endl;
+
+                // if ToF between LOS1 and fiber is not okay, go to next
+                //                    if (tof_fib < tof_fiber[ifibcount] - 10. || tof_fib > tof_fiber[ifibcount] + 10.)
+                //                        continue;
+
+                // Not-calibrated position:
+                randx = (std::rand() / (float)RAND_MAX);
+                //                if(iFib > 0) xpos = ((-n_fiber[ifibcount]/2.+iFib+(0.5-randx)))*0.21;
+                xpos = iFib;
+                ypos = dtime;
+
+                // if not resonable y-position, go to next
+                //                    if (ypos < 70. || ypos > 100.)
+                //                        continue;
+
+                // find fiber with most light which has resonable ToF and y-position
+                Double_t ToT_MA = hit->GetMAPMTToT_ns();
+                if (ToT_MA > totMax_MA)
                 {
-                    if (IS_NAN(timeLos[1][lhit]))
-                        continue;
+                    totMax_MA = ToT_MA;
+                    iFibMax_MA = iFib;
+                    totMax_S = hit->GetSPMTToT_ns();
+                    yposMax = ypos;
+                    tof_fibMax = tof_fib;
+                    //                        iLosHit = lhit;
+                    // cout<<"new imax "<<iFibMax_MA<<" max "<<totMax_MA<<endl;
+                }
 
-                    // if not multiplicity 8 or pile-up, go to next event
-                    Bool_t pileup = false;
-                    Int_t nPMT = 0;
-                    for (int ipm = 0; ipm < 8; ipm++)
-                    {
-                        if (tot[1][iLosHit][ipm] > 0. && !(IS_NAN(tot[1][iLosHit][ipm])))
-                            nPMT++;
-                        if (tot[1][iLosHit][ipm] > 100.)
-                            pileup = true;
-                    }
-                    if (pileup || nPMT != 8)
-                        continue;
+                fh_fibers_Fib[ifibcount]->Fill(iFib);
+                fh_ToT_s_Fib[ifibcount]->Fill(iFib, hit->GetSPMTToT_ns());
+                fh_ToT_m_Fib[ifibcount]->Fill(iFib, hit->GetMAPMTToT_ns());
+                fh_time_Fib[ifibcount]->Fill(iFib, tMAPMT - tSPMT);
+                fh_Fib_ToF[ifibcount]->Fill(iFib, tof_fib);
+                fh_Fib_pos_xy[ifibcount]->Fill(xpos, ypos);
+                fh_Fib_vs_Events[ifibcount]->Fill(fNEvents, iFib);
+                fh_ToT_single_Fib[ifibcount]->Fill(1, hit->GetSPMTToT_ns());
 
-                    // "Push" the Fib times in the same cycle with LOS:
-                    // Los coarse counter has 8192 channels with 5 ns each
-                    // SPMT coarse counter has 2048 channels with 5 ns each
-                    if (timeLos[1][lhit] > 0. && timeLos[1][lhit] < 8192. * 5. && !(IS_NAN(timeLos[1][lhit])))
-                    {
-                        while (tSPMT - timeLos[1][lhit] < 2048. * 5. / 2.)
-                        {
-                            tSPMT = tSPMT + 2048. * 5.;
-                        }
-                        while (tSPMT - timeLos[1][lhit] > 2048. * 5. / 2.)
-                        {
-                            tSPMT = tSPMT - 2048. * 5.;
-                        }
-                    }
-
-                    // "Push" two times in the same clock cycle:
-                    // MAPMT coarse counter has 4096 channels with 1000/150=6.67 ns each
-                    // SPMT coarse counter has 2048 channels with 5 ns each
-                    dtime = tMAPMT - tSPMT;
-                    while (dtime > 1024. / 2. * 1000. / 150.)
-                    {
-                        tMAPMT = tMAPMT - 1024. * 1000. / 150.;
-                        dtime = tMAPMT - tSPMT;
-                    }
-                    while (dtime < -1024. / 2. * 1000. / 150.)
-                    {
-                        tMAPMT = tMAPMT + 1024. * 1000. / 150.;
-                        dtime = tMAPMT - tSPMT;
-                    }
-
-                    // Not-calibrated ToF:
-                    tfib = (tMAPMT + tSPMT) / 2.;
-                    // tfib = tSPMT;
-                    // tfib = tMAPMT;
-                    if (tfib > 0. && !(IS_NAN(tfib)) && timeLos[1][lhit] > 0. && !(IS_NAN(timeLos[1][lhit])))
-                        tof_fib = tfib - timeLos[1][lhit];
-
-                    //					cout<<"Test "<<tof_fib<<"  "<<tfib<<"  "<<hit->GetMAPMTToT_ns()<<"
-                    //"<<hit->GetSPMTToT_ns()<< 						  "  "<<lhit<<"  "<<timeLos[1][lhit]<< endl;
-
-                    // if ToF between LOS1 and fiber is not okay, go to next
-                    if (tof_fib < tof_fiber[ifibcount] - 10. || tof_fib > tof_fiber[ifibcount] + 10.)
-                        continue;
-
-                    // Not-calibrated position:
-                    randx = (std::rand() / (float)RAND_MAX);
-                    //                if(iFib > 0) xpos = ((-n_fiber[ifibcount]/2.+iFib+(0.5-randx)))*0.21;
-                    xpos = iFib;
-                    ypos = dtime;
-
-                    // if not resonable y-position, go to next
-                    if (ypos < 70. || ypos > 100.)
-                        continue;
-
-                    // find fiber with most light which has resonable ToF and y-position
-                    Double_t ToT_MA = hit->GetMAPMTToT_ns();
-                    if (ToT_MA > totMax_MA)
-                    {
-                        totMax_MA = ToT_MA;
-                        iFibMax_MA = iFib;
-                        totMax_S = hit->GetSPMTToT_ns();
-                        yposMax = ypos;
-                        tof_fibMax = tof_fib;
-                        iLosHit = lhit;
-                        // cout<<"new imax "<<iFibMax_MA<<" max "<<totMax_MA<<endl;
-                    }
-                    /*
-                                        fh_fibers_Fib[ifibcount]->Fill(iFib);
-                                        fh_ToT_s_Fib[ifibcount]->Fill(iFib,hit->GetSPMTToT_ns());
-                                        fh_ToT_m_Fib[ifibcount]->Fill(iFib,hit->GetMAPMTToT_ns());
-                                        fh_time_Fib[ifibcount]->Fill(iFib,tMAPMT-tSPMT);
-                                        fh_Fib_ToF[ifibcount]->Fill(iFib,tof_fib);
-                                        fh_Fib_pos_xy[ifibcount]->Fill(xpos,ypos);
-                                        fh_Fib_vs_Events[ifibcount]->Fill(fNEvents,iFib);
-                                        fh_ToT_single_Fib[ifibcount]->Fill(1,hit->GetSPMTToT_ns());
-                    */
-                } // end for (lhit)
-            }     // end for(ihit)
-
-            fh_fibers_Fib[ifibcount]->Fill(iFibMax_MA);
-            fh_ToT_s_Fib[ifibcount]->Fill(iFibMax_MA, totMax_S);
-            fh_ToT_m_Fib[ifibcount]->Fill(iFibMax_MA, totMax_MA);
-            fh_time_Fib[ifibcount]->Fill(iFibMax_MA, yposMax);
-            fh_Fib_ToF[ifibcount]->Fill(iFibMax_MA, tof_fibMax);
-            fh_Fib_pos_xy[ifibcount]->Fill(xpos, ypos);
-            fh_Fib_vs_Events[ifibcount]->Fill(fNEvents, iFibMax_MA);
-            fh_ToT_single_Fib[ifibcount]->Fill(1, totMax_S);
-
+                //                } // end for (lhit)
+            } // end for(ihit)
+              /*
+                          fh_fibers_Fib[ifibcount]->Fill(iFibMax_MA);
+                          fh_ToT_s_Fib[ifibcount]->Fill(iFibMax_MA, totMax_S);
+                          fh_ToT_m_Fib[ifibcount]->Fill(iFibMax_MA, totMax_MA);
+                          fh_time_Fib[ifibcount]->Fill(iFibMax_MA, yposMax);
+                          fh_Fib_ToF[ifibcount]->Fill(iFibMax_MA, tof_fibMax);
+                          fh_Fib_pos_xy[ifibcount]->Fill(xpos, ypos);
+                          fh_Fib_vs_Events[ifibcount]->Fill(fNEvents, iFibMax_MA);
+                          fh_ToT_single_Fib[ifibcount]->Fill(1, totMax_S);
+              */
             if (ifibcount == 0 && iFibMax_MA > 120 && iFibMax_MA < 136)
             {
                 fib1a_cut = true;

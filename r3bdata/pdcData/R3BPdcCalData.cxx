@@ -11,18 +11,33 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BTimestampMasterReader.h"
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "R3BEventHeader.h"
-#include "R3BWhiterabbitReaderImpl.h"
+#include "R3BPdcCalData.h"
 
-extern "C"
+R3BPdcCalData::R3BPdcCalData()
+    : fPlane(-1)
+    , fWire(-1)
+    , fEdge(-1)
+    , fTime_ns(-1)
 {
-#include "ext_data_client.h"
-#include "ext_h101_timestamp_master.h"
 }
 
-R3B_WHITERABBIT_READER_IMPL(TimestampMaster, timestamp_master, 0x100);
-// 0x300 for dec2019
-// 0x100 for data before dec2019
+R3BPdcCalData::R3BPdcCalData(UInt_t plane,
+                                     UInt_t wire,
+                                     UInt_t edge,
+                                     Double_t time_ns)
+    : fPlane(plane)
+    , fWire(wire)
+    , fEdge(edge)
+    , fTime_ns(time_ns)
+{
+}
+
+UInt_t R3BPdcCalData::GetPlaneId() const { return fPlane; }
+
+UInt_t R3BPdcCalData::GetWireId() const { return fWire; }
+
+UInt_t R3BPdcCalData::GetEdgeId() const { return fEdge; }
+
+Double_t R3BPdcCalData::GetTime_ns() const { return fTime_ns; }
+
+ClassImp(R3BPdcCalData)

@@ -176,6 +176,7 @@ class R3BGlobalAnalysisS454 : public FairTask
 	
     TLorentzVector alpha, carbon, oxygen;
     TLorentzVector alpha_cm, carbon_cm, oxygen_cm;
+    TLorentzVector photon;
 
 	Int_t Q = 0;
 	Double_t tPrev[10];
@@ -254,6 +255,7 @@ class R3BGlobalAnalysisS454 : public FairTask
 	TH1F* fh_ErelL;
 	TH1F* fh_ErelR;
 	TH1F* fh_ErelB;
+	TH2F* fh_phi_bc_cm_polar;
 
 	TH2F* fh_dErel_vs_x;
 	TH2F* fh_dErel_vs_y;

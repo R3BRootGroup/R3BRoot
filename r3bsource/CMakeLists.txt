@@ -36,6 +36,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/roluData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
+${R3BROOT_SOURCE_DIR}/r3bdata/pdcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
 ${R3BROOT_SOURCE_DIR}/psp/par
 ${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
@@ -98,6 +99,7 @@ R3BRoluReader.cxx
 R3BSci2Reader.cxx
 R3BSci8Reader.cxx
 R3BTofdReader.cxx
+R3BPdcReader.cxx
 R3BCalifaFebexReader.cxx
 R3BPtofReader.cxx
 R3BNeulandTamexReader.cxx
@@ -153,6 +155,7 @@ ext_h101_fibfour.h
 ext_h101_ams.h
 ext_h101_music.h
 ext_h101_samp.h
+ext_h101_pdc.h
 )
 
 # fill list of header files from list of source files

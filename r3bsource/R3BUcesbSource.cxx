@@ -18,6 +18,8 @@
 #include "FairLogger.h"
 #include "R3BUcesbSource.h"
 
+#include "ext_data_client.h"
+
 R3BUcesbSource::R3BUcesbSource(const TString& FileName,
                                const TString& NtupleOptions,
                                const TString& UcesbPath,

@@ -103,18 +103,18 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
         std::vector<Double_t>* energy = new std::vector<Double_t>[NumOfChannels];
         std::vector<Double_t>* time = new std::vector<Double_t>[NumOfChannels];
         std::vector<Double_t>* y = new std::vector<Double_t>[NumOfChannels];
-        std::vector<Double_t>* energy_temp = new std::vector<Double_t>[NumOfChannels];
-        std::vector<Double_t>* time_temp = new std::vector<Double_t>[NumOfChannels];
-        std::vector<Double_t>* y_temp = new std::vector<Double_t>[NumOfChannels];
+        // std::vector<Double_t>* energy_temp = new std::vector<Double_t>[NumOfChannels];
+        // std::vector<Double_t>* time_temp = new std::vector<Double_t>[NumOfChannels];
+        // std::vector<Double_t>* y_temp = new std::vector<Double_t>[NumOfChannels];
 
         for (Int_t i = 0; i < NumOfChannels; ++i)
         {
             time[i].push_back(-99999);
             energy[i].push_back(0);
             y[i].push_back(0);
-            time_temp[i].push_back(-99999);
-            energy_temp[i].push_back(0);
-            y_temp[i].push_back(0);
+            // time_temp[i].push_back(-99999);
+            // energy_temp[i].push_back(0);
+            // y_temp[i].push_back(0);
         }
         // Sim data:
         struct TempHit

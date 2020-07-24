@@ -11,18 +11,24 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BTimestampMasterReader.h"
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "R3BEventHeader.h"
-#include "R3BWhiterabbitReaderImpl.h"
+#include "R3BPdcHitData.h"
 
-extern "C"
+// for the data analysis of the Pdc detector.
+// Introduced by M.Heil, June 2020
+
+R3BPdcHitData::R3BPdcHitData() {}
+
+R3BPdcHitData::R3BPdcHitData(Double_t t,
+                               Double_t x,
+                               Double_t y,
+                               Double_t ELoss,
+                               Double_t ID,
+                               Int_t wire)
+    : R3BHit(ID, x, y, ELoss, t)
+	, fWireId(wire)
+
 {
-#include "ext_data_client.h"
-#include "ext_h101_timestamp_master.h"
 }
+Int_t R3BPdcHitData::GetWireId() const { return fWireId; }
 
-R3B_WHITERABBIT_READER_IMPL(TimestampMaster, timestamp_master, 0x100);
-// 0x300 for dec2019
-// 0x100 for data before dec2019
+ClassImp(R3BPdcHitData)

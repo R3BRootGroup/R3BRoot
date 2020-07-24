@@ -20,7 +20,8 @@
 #define TACQUILA_NUM_GEOM ((MAX_TACQUILA_SAM + 1) * (MAX_TACQUILA_GTB + 1) * (MAX_TACQUILA_MODULE + 1))
 
 #define TACQUILA_CLOCK_MHZ 40.002903
-#define VFTX_CLOCK_MHZ 200  
+#define VFTX_CLOCK_MHZ 200
+#define CTDC_16_CLOCK_MHZ 150
 
 #include "R3BTCalPar.h"
 #include "TObject.h"

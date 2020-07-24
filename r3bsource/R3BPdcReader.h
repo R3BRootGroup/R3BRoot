@@ -11,18 +11,34 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BTimestampMasterReader.h"
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "R3BEventHeader.h"
-#include "R3BWhiterabbitReaderImpl.h"
 
-extern "C"
+#ifndef R3BPDCREADER_H
+#define R3BPDCREADER_H
+
+#include "R3BReader.h"
+struct EXT_STR_h101_PDC_t;
+typedef struct EXT_STR_h101_PDC_t EXT_STR_h101_PDC;
+
+class R3BPdcReader : public R3BReader
 {
-#include "ext_data_client.h"
-#include "ext_h101_timestamp_master.h"
-}
+  public:
+    R3BPdcReader(EXT_STR_h101_PDC*, UInt_t);
+    ~R3BPdcReader();
 
-R3B_WHITERABBIT_READER_IMPL(TimestampMaster, timestamp_master, 0x100);
-// 0x300 for dec2019
-// 0x100 for data before dec2019
+    Bool_t Init(ext_data_struct_info*);
+    Bool_t Read();
+    void Reset();
+
+  private:
+    /* Reader specific data structure from ucesb */
+    EXT_STR_h101_PDC* fData;
+    /* Data offset */
+    UInt_t fOffset;
+
+    TClonesArray* fMappedArray;
+  public:
+    ClassDef(R3BPdcReader, 1);
+};
+
+#endif
+

@@ -97,6 +97,7 @@ R3BBunchedFiberCal2Hit::~R3BBunchedFiberCal2Hit()
 
 InitStatus R3BBunchedFiberCal2Hit::Init()
 {
+    cout << "Init:R3BBunchedFiberCal2Hit" << endl;
     auto mgr = FairRootManager::Instance();
     if (!mgr)
     {
@@ -281,6 +282,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
     if (fnEvents / 100000. == (int)fnEvents / 100000)
         std::cout << "\rEvents: " << fnEvents << " / " << maxevent << " (" << (int)(fnEvents * 100. / maxevent)
                   << " %) " << std::flush;
+
     for (auto side_i = 0; side_i < 2; ++side_i)
     {
         // Clear local helper containers.
@@ -359,6 +361,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
     //
     // puts("Event");
     // bool do_print = false;
+
     for (size_t j = 0; j < cal_num; ++j)
     {
         auto cur_cal = (R3BBunchedFiberCalData const*)fCalItems->At(j);
@@ -471,198 +474,207 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
              ++it_mapmt_tot) // over ihit(fiber)
         {
             auto const& mapmt_tot = *it_mapmt_tot;
-            for (auto it_spmt = spmt_array.begin(); spmt_array.end() != it_spmt; ++it_spmt)
+            // s             for (auto it_spmt = spmt_array.begin(); spmt_array.end() != it_spmt; ++it_spmt)
+            // s             {
+            // s                auto const& spmt = *it_spmt;
+            // s                for (auto it_spmt_tot = spmt.tot_list.begin(); spmt.tot_list.end() != it_spmt_tot;
+            // ++it_spmt_tot) s                { s                    auto const& spmt_tot = *it_spmt_tot;
+
+            // Check that the combo is inside one sub-det.
+            auto mapmt_sub_id = (mapmt_tot.lead->GetChannel() - 1) / fChPerSub[0];
+            // s                    auto spmt_sub_id = (spmt_tot.lead->GetChannel() - 1) / fChPerSub[1];
+            // s                    if (mapmt_sub_id != spmt_sub_id)
+            // s                    {
+            // s                        continue;
+            // s                    }
+
+            /*
+             * How to get a fiber ID for a fiber detector defined as:
+             *  SubNum = 2
+             *  MAPMT = 256
+             *  SPMT = 2
+             * This means we'll receive 512 MAPMT channels as 1..512, and 4 SPMT
+             * channels, but the first half (sub-detector) is completely
+             * decoupled from the second half. The sequence of all fibers in
+             * order is then, as (MAPMT,SPMT)-pairs:
+             *  (1,1), (1,2), (2,1), ... (256,1), (256,2),
+             *  (257,3), (257,4), (258,3), ... (512,3), (512,4)
+             */
+
+            auto fiber_id = mapmt_tot.lead->GetChannel();
+            // s					auto fiber_id = (mapmt_tot.lead->GetChannel() - 1) * fChPerSub[1]
+            // s                                                + ((spmt_tot.lead->GetChannel() - 1) % fChPerSub[1]) +
+            // 1;
+
+            // auto fiber_id_ch = (mapmt_tot.lead->GetChannel() - 1) * fChPerSub[1] + 1;
+            // s                    single = spmt_tot.lead->GetChannel();
+
+            // TODO: Use it_sub->direction to find real life coordinates.
+
+            // Fix fiber installation mistakes.
+            fiber_id = FixMistake(fiber_id);
+
+            // Calibrate hit fiber.
+            auto tot_mapmt = mapmt_tot.tot_ns;
+            // s                    auto tot_spmt = spmt_tot.tot_ns;
+            Double_t t_mapmt = mapmt_tot.lead_ns;
+            // s                    Double_t t_spmt = spmt_tot.lead_ns;
+
+            // only accept hits which are at the right time:
+            Bool_t simu = true;
+            if (!simu)
             {
-                auto const& spmt = *it_spmt;
-                for (auto it_spmt_tot = spmt.tot_list.begin(); spmt.tot_list.end() != it_spmt_tot; ++it_spmt_tot)
+                if (fName == "Fi3a" || fName == "Fi3b")
                 {
-                    auto const& spmt_tot = *it_spmt_tot;
-
-                    // Check that the combo is inside one sub-det.
-                    auto mapmt_sub_id = (mapmt_tot.lead->GetChannel() - 1) / fChPerSub[0];
-                    auto spmt_sub_id = (spmt_tot.lead->GetChannel() - 1) / fChPerSub[1];
-                    if (mapmt_sub_id != spmt_sub_id)
-                    {
+                    // s                            if (t_spmt < -400 || t_spmt > -270)
+                    // s                                continue;
+                    if (t_mapmt < -550 || t_mapmt > -350)
                         continue;
-                    }
-
-                    /*
-                     * How to get a fiber ID for a fiber detector defined as:
-                     *  SubNum = 2
-                     *  MAPMT = 256
-                     *  SPMT = 2
-                     * This means we'll receive 512 MAPMT channels as 1..512, and 4 SPMT
-                     * channels, but the first half (sub-detector) is completely
-                     * decoupled from the second half. The sequence of all fibers in
-                     * order is then, as (MAPMT,SPMT)-pairs:
-                     *  (1,1), (1,2), (2,1), ... (256,1), (256,2),
-                     *  (257,3), (257,4), (258,3), ... (512,3), (512,4)
-                     */
-
-                    // auto fiber_id = mapmt_tot.lead->GetChannel();
-                    auto fiber_id = (mapmt_tot.lead->GetChannel() - 1) * fChPerSub[1] +
-                                    ((spmt_tot.lead->GetChannel() - 1) % fChPerSub[1]) + 1;
-
-                    auto fiber_id_ch = (mapmt_tot.lead->GetChannel() - 1) * fChPerSub[1] + 1;
-                    single = spmt_tot.lead->GetChannel();
-
-                    // TODO: Use it_sub->direction to find real life coordinates.
-
-                    // Fix fiber installation mistakes.
-                    fiber_id = FixMistake(fiber_id);
-
-                    // Calibrate hit fiber.
-                    auto tot_mapmt = mapmt_tot.tot_ns;
-                    auto tot_spmt = spmt_tot.tot_ns;
-                    Double_t t_mapmt = mapmt_tot.lead_ns;
-                    Double_t t_spmt = spmt_tot.lead_ns;
-
-                    // only accept hits which are at the right time:
-                    Bool_t simu = true;
-                    if (!simu)
-                    {
-                        if (fName == "Fi3a" || fName == "Fi3b")
-                        {
-                            if (t_spmt < -400 || t_spmt > -270)
-                                continue;
-                            if (t_mapmt < -550 || t_mapmt > -350)
-                                continue;
-                        }
-                        if (fName == "Fi10" || fName == "Fi11" || fName == "Fi12" || fName == "Fi13")
-                        {
-                            if (t_spmt < -300 || t_spmt > -160)
-                                continue;
-                            if (t_mapmt < -500 || t_mapmt > -300)
-                                continue;
-                        }
-                    }
-
-                    fh_time_Fib->Fill(fiber_id, t_mapmt);
-                    fh_time_s_Fib->Fill(single, t_spmt);
-
-                    // cout << fName << " tS " << t_spmt << " tM: " << t_mapmt << " totS: " <<
-                    //	tot_spmt << " totM: " << tot_mapmt << endl;
-
-                    // Apply calibration.
-                    Double_t gainMA = gain_temp[fiber_id - 1]; // 10.;
-                    Double_t gainS = 10.;
-                    Double_t offset1 = 0.;
-                    Double_t offset2 = 0.;
-                    Double_t tsync = tsync_temp[fiber_id - 1]; // 0.;
-
-                    //  cout<<"before "<<fiber_id<<", "<<tsync<<"  "<<gainMA<<", "<<endl;
-
-                    if (!fIsCalibrator && fHitPar)
-                    {
-                        R3BBunchedFiberHitModulePar* par = fHitPar->GetModuleParAt(fiber_id);
-                        if (par)
-                        {
-                            gainMA = par->GetGainMA();
-                            tsync = par->GetSync();
-                            // gainS = par->GetGainS();
-                            offset1 = par->GetOffset1();
-                            offset2 = par->GetOffset2();
-                        }
-                    }
-                    // cout<<"offset "<<offset1<<"  "<<offset2<<endl;
-
-                    tot_mapmt *= 10. / gainMA;
-                    tot_spmt *= 10. / gainS;
-                    t_mapmt += offset1;
-                    t_spmt += offset2;
-                    tof = (t_mapmt + t_spmt) / 2.;
-                    tof -= tsync;
-
-                    // histogram for offset determination
-                    fh_dt_Fib->Fill(fiber_id, t_spmt - t_mapmt);
-
-                    // Fill histograms for gain match, and for debugging.
-                    fh_Fib_ToF->Fill(fiber_id, tof);
-                    fh_ToT_MA_Fib->Fill(fiber_id, tot_mapmt);
-                    if (s_mult > 0)
-                    {
-                        fh_ToT_Single_Fib->Fill(fiber_id, tot_spmt);
-                        fh_ToT_s_Fib[single - 1]->Fill(fiber_id, tot_spmt);
-                    }
-
-                    // Int_t numFibs = fSubNum * fChPerSub[0];
-                    Int_t numFibs = fSubNum * fChPerSub[0] * fChPerSub[1];
-                    Double_t x = -10000.;
-                    Double_t y = -10000.;
-                    Double_t randx;
-                    Double_t randy;
-
-                    if (fName == "Fi10" || fName == "Fi11" || fName == "Fi12" || fName == "Fi13")
-                    {
-                        Float_t fiber_thickness = 0.050000; // MH remove *2 when taking SPMT into analysis
-                        Int_t fiber_nbr = 1024;             // MH remove /2 when taking SPMT into analysis
-                        Float_t dead_layer = 0.9;
-                        Float_t air_layer = 0.01; // relative to fiber_thickness
-                        Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
-
-                        if (fDirection == VERTICAL)
-                        {
-                            x = -detector_width / 2. + fiber_thickness / 2. +
-                                ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
-                            y = (t_spmt - t_mapmt) * 3.;
-                        }
-                        else
-                        {
-                            x = (t_spmt - t_mapmt) * 3.;
-                            y = -detector_width / 2. + fiber_thickness / 2. +
-                                ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
-                        }
-                        // if(fiber_id>256) cout << "fiber_id " << fiber_id << " x " << x << " y " << y << endl;
-                    }
-                    if (fName == "Fi1a" || fName == "Fi1b" || fName == "Fi2a" || fName == "Fi2b" || fName == "Fi3a" ||
-                        fName == "Fi3b")
-                    {
-                        Float_t fiber_thickness = 0.021000; // MH remove *2 when taking SPMT into analysis
-                        Int_t fiber_nbr = 512;              // MH remove /2 when taking SPMT into analysis
-                        Float_t dead_layer = 0.9;
-                        Float_t air_layer = 0.01; // relative to fiber_thickness
-                        Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
-                        if (fDirection == VERTICAL)
-                        {
-                            x = -detector_width / 2. + fiber_thickness / 2. +
-                                ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
-                            y = (t_spmt - t_mapmt) * 3.;
-                        }
-                        else
-                        {
-                            x = (t_spmt - t_mapmt) * 3.;
-                            y = -detector_width / 2. + fiber_thickness / 2. +
-                                ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
-                        }
-                    }
-                    // cout<<"Fiber y " << y << endl;
-                    if (y < -60 || y > 60)
-                    {
-                        // continue;
-                    }
-                    if (tof < -20 || tof > 20)
-                    {
-                        // continue;
-                    }
-                    // Double_t eloss = sqrt(tot_mapmt * tot_spmt);
-                    Double_t eloss = tot_mapmt;
-                    // Double_t t = (t_mapmt + t_spmt) / 2.;
-                    // Double_t t = t_spmt;
-                    // Double_t t = t_mapmt;
-                    Double_t t = tof;
-
-                    energy[fiber_id] = eloss;
-                    counts[fiber_id] = counts[fiber_id] + 1;
-                    multi++;
-
-                    // if(fiber_id>256) cout << "save fiber_id " << fiber_id << " pos " << x << endl;
-
-                    if (!fIsCalibrator)
-                        new ((*fHitItems)[fNofHitItems++])
-                            R3BBunchedFiberHitData(0, x, y, eloss, t, fiber_id, t_mapmt, t_spmt, tot_mapmt, tot_spmt);
-                    // R3BBunchedFiberHitData(0, x, y, eloss, t, fiber_id, t_mapmt, 0., tot_mapmt, 0.);
+                }
+                if (fName == "Fi10" || fName == "Fi11" || fName == "Fi12" || fName == "Fi13")
+                {
+                    // s                            if (t_spmt < -300 || t_spmt > -160)
+                    // s                                continue;
+                    if (t_mapmt < -500 || t_mapmt > -300)
+                        continue;
                 }
             }
+
+            fh_time_Fib->Fill(fiber_id, t_mapmt);
+            // s                    fh_time_s_Fib->Fill(single, t_spmt);
+
+            // cout << fName << " tS " << t_spmt << " tM: " << t_mapmt << " totS: " <<
+            //	tot_spmt << " totM: " << tot_mapmt << endl;
+
+            // Apply calibration.
+            Double_t gainMA = gain_temp[fiber_id - 1]; // 10.;
+            Double_t gainS = 10.;
+            Double_t offset1 = 0.;
+            Double_t offset2 = 0.;
+            Double_t tsync = tsync_temp[fiber_id - 1]; // 0.;
+
+            //  cout<<"before "<<fiber_id<<", "<<tsync<<"  "<<gainMA<<", "<<endl;
+
+            if (!fIsCalibrator && fHitPar)
+            {
+                R3BBunchedFiberHitModulePar* par = fHitPar->GetModuleParAt(fiber_id);
+                if (par)
+                {
+                    gainMA = par->GetGainMA();
+                    tsync = par->GetSync();
+                    // gainS = par->GetGainS();
+                    offset1 = par->GetOffset1();
+                    offset2 = par->GetOffset2();
+                }
+            }
+            // cout<<"offset "<<offset1<<"  "<<offset2<<endl;
+            // s we do not use single PMT, therefore no offset needed
+            offset1 = 0.;
+            offset2 = 0.;
+
+            tot_mapmt *= 10. / gainMA;
+            // s                    tot_spmt *= 10. / gainS;
+            t_mapmt += offset1;
+            // s                    t_spmt += offset2;
+            // s                    tof = (t_mapmt + t_spmt) / 2.;
+            tof = t_mapmt;
+            tof -= tsync;
+
+            // histogram for offset determination
+            // s                    fh_dt_Fib->Fill(fiber_id, t_spmt - t_mapmt);
+
+            // Fill histograms for gain match, and for debugging.
+            fh_Fib_ToF->Fill(fiber_id, tof);
+            fh_ToT_MA_Fib->Fill(fiber_id, tot_mapmt);
+            // s                    if (s_mult > 0)
+            // s                    {
+            // s                        fh_ToT_Single_Fib->Fill(fiber_id, tot_spmt);
+            // s                        fh_ToT_s_Fib[single - 1]->Fill(fiber_id, tot_spmt);
+            // s                    }
+
+            // Int_t numFibs = fSubNum * fChPerSub[0];
+            Int_t numFibs = fSubNum * fChPerSub[0] * fChPerSub[1];
+            Double_t x = -10000.;
+            Double_t y = -10000.;
+            Double_t randx;
+            Double_t randy;
+
+            if (fName == "Fi10" || fName == "Fi11" || fName == "Fi12" || fName == "Fi13")
+            {
+                Float_t fiber_thickness = 0.050000 * 2.; // s remove *2 when taking SPMT into analysis
+                Int_t fiber_nbr = 1024 / 2;              // s remove /2 when taking SPMT into analysis
+                Float_t dead_layer = 0.9;
+                Float_t air_layer = 0.01; // relative to fiber_thickness
+                Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
+
+                if (fDirection == VERTICAL)
+                {
+                    x = -detector_width / 2. + fiber_thickness / 2. +
+                        ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
+                    // s                            y = (t_spmt - t_mapmt) * 3.;
+                    y = 0.;
+                }
+                else
+                {
+                    // S                            x = (t_spmt - t_mapmt) * 3.;
+                    x = 0.;
+                    y = -detector_width / 2. + fiber_thickness / 2. +
+                        ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
+                }
+                if (x > 26.)
+                    cout << "fiber_id " << fiber_id << " x " << x << " y " << y << endl;
+            }
+            if (fName == "Fi1a" || fName == "Fi1b" || fName == "Fi2a" || fName == "Fi2b" || fName == "Fi3a" ||
+                fName == "Fi3b")
+            {
+                Float_t fiber_thickness = 0.021000 * 2.; // s remove *2 when taking SPMT into analysis
+                Int_t fiber_nbr = 512 / 2;               // s remove /2 when taking SPMT into analysis
+                Float_t dead_layer = 0.9;
+                Float_t air_layer = 0.01; // relative to fiber_thickness
+                Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
+                if (fDirection == VERTICAL)
+                {
+                    x = -detector_width / 2. + fiber_thickness / 2. +
+                        ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
+                    // s                            y = (t_spmt - t_mapmt) * 3.;
+                    y = 0.;
+                }
+                else
+                {
+                    // s                            x = (t_spmt - t_mapmt) * 3.;
+                    x = 0.;
+                    y = -detector_width / 2. + fiber_thickness / 2. +
+                        ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
+                }
+            }
+            // cout<<"Fiber y " << y << endl;
+            if (y < -60 || y > 60)
+            {
+                // continue;
+            }
+            if (tof < -20 || tof > 20)
+            {
+                // continue;
+            }
+            // Double_t eloss = sqrt(tot_mapmt * tot_spmt);
+            Double_t eloss = tot_mapmt;
+            // Double_t t = (t_mapmt + t_spmt) / 2.;
+            // Double_t t = t_spmt;
+            // Double_t t = t_mapmt;
+            Double_t t = tof;
+
+            energy[fiber_id] = eloss;
+            counts[fiber_id] = counts[fiber_id] + 1;
+            multi++;
+
+            // if(fiber_id>256) cout << "save fiber_id " << fiber_id << " pos " << x << endl;
+            if (!fIsCalibrator)
+                new ((*fHitItems)[fNofHitItems++])
+                    // s                            R3BBunchedFiberHitData(0, x, y, eloss, t, fiber_id, t_mapmt, t_spmt,
+                    // tot_mapmt, tot_spmt);
+                    R3BBunchedFiberHitData(0, x, y, eloss, t, fiber_id, t_mapmt, 0., tot_mapmt, 0.);
+            // s                }
+            // s            }
         }
     }
     fh_ToT_ToT->Fill(s1, s2);

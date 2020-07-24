@@ -11,75 +11,56 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# Create a library called "libR3B" which includes the source files given in
+# Create a library called "libR3BCal" which includes the source files given in
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 
-Set(SYSTEM_INCLUDE_DIRECTORIES 
+set(SYSTEM_INCLUDE_DIRECTORIES
 ${SYSTEM_INCLUDE_DIRECTORIES}
 ${BASE_INCLUDE_DIRECTORIES}
+${ucesb_INCLUDE_DIR}
 )
-Set(R3BSOF_SOURCE_DIR ${R3BROOT_SOURCE_DIR}/sofia)
 
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase 
 ${R3BROOT_SOURCE_DIR}/passive
-${R3BROOT_SOURCE_DIR}/r3bdata/landData
-${R3BROOT_SOURCE_DIR}/r3bdata/beammonitorData
-${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
-${R3BROOT_SOURCE_DIR}/r3bdata/califaData
-${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
-${R3BROOT_SOURCE_DIR}/los
-${R3BROOT_SOURCE_DIR}/r3bdata/losData
-${R3BROOT_SOURCE_DIR}/rolu
-${R3BROOT_SOURCE_DIR}/r3bdata/roluData
-${R3BROOT_SOURCE_DIR}/sci2
-${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
-${R3BROOT_SOURCE_DIR}/sci8
-${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
-${R3BROOT_SOURCE_DIR}/tof
-${R3BROOT_SOURCE_DIR}/r3bdata/tofData
-${R3BROOT_SOURCE_DIR}/r3bdata/pdcData
-${R3BROOT_SOURCE_DIR}/r3bdata/pspData
-${R3BROOT_SOURCE_DIR}/r3bdata/fibData
+${R3BROOT_SOURCE_DIR}/pdc
 ${R3BROOT_SOURCE_DIR}/tcal
-${R3BROOT_SOURCE_DIR}/r3bdata/ptofData
-${R3BROOT_SOURCE_DIR}/fiber
 ${R3BROOT_SOURCE_DIR}/r3bdata
-${R3BROOT_SOURCE_DIR}/r3bdata/sampData
-${R3BROOT_SOURCE_DIR}/tracker_rene
+${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
+${R3BROOT_SOURCE_DIR}/r3bdata/pdcData
+${R3BROOT_SOURCE_DIR}/tracking
+${R3BROOT_SOURCE_DIR}/r3bsource
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
 include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 
-link_directories(${FAIRROOT_LIBRARY_DIR} ${ROOT_LIBRARY_DIR})
+set(LINK_DIRECTORIES
+${ROOT_LIBRARY_DIR}
+${FAIRROOT_LIBRARY_DIR}
+) 
+
+link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
-R3BModule.cxx 
-R3BDetector.cxx 
-R3BEventHeader.cxx
-R3BOnlineSpectra.cxx
-R3BOnlineSpectraDec2019.cxx
-R3BOnlineSpectraPdc.cxx
-R3BGlobalAnalysis.cxx
-R3BGlobalAnalysisS454.cxx
-R3BTrackS454.cxx
-R3BTrackerTestS454.cxx
-R3BOnlineSpillAnalysis.cxx
+#Put here your sourcefiles
+
+R3BGeoPdcPar.cxx   
+R3BPdcContFact.cxx
+R3BPdcMapped2CalPar.cxx
+R3BPdcMapped2Cal.cxx
+R3BPdcCal2Hit.cxx
 )
 
 # fill list of header files from list of source files
 # by exchanging the file extension
 CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 
-Set(LINKDEF R3BLinkDef.h)
-
-Set(DEPENDENCIES
-    GeoBase ParBase MbsAPI Base FairTools R3BData Core Geom GenVector Physics Matrix MathCore R3BTraRene)
-
-Set(LIBRARY_NAME R3Bbase)
-
+set(LINKDEF PdcLinkDef.h)
+set(LIBRARY_NAME R3BPdc)
+set(DEPENDENCIES
+    Spectrum R3Bbase R3BPassive R3BTracking R3BData R3BTCal)
+    
 GENERATE_LIBRARY()
-

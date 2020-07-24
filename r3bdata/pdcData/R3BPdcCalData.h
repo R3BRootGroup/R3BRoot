@@ -11,18 +11,30 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BTimestampMasterReader.h"
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "R3BEventHeader.h"
-#include "R3BWhiterabbitReaderImpl.h"
+#ifndef R3BPDCCALITEM_H
+#define R3BPDCCALITEM_H
 
-extern "C"
+#include "TObject.h"
+
+class R3BPdcCalData : public TObject
 {
-#include "ext_data_client.h"
-#include "ext_h101_timestamp_master.h"
-}
+  public:
+    R3BPdcCalData();
+    R3BPdcCalData(UInt_t, UInt_t, UInt_t, Double_t);
 
-R3B_WHITERABBIT_READER_IMPL(TimestampMaster, timestamp_master, 0x100);
-// 0x300 for dec2019
-// 0x100 for data before dec2019
+    UInt_t GetPlaneId() const;
+    UInt_t GetWireId() const;
+    UInt_t GetEdgeId() const;
+    Double_t GetTime_ns() const;
+
+  private:
+    UInt_t fPlane;      // 1..n
+    UInt_t fWire;       // 1..n
+    UInt_t fEdge;       // 1 = leading, 2 = trailing
+    Double_t fTime_ns;
+
+  public:
+    ClassDef(R3BPdcCalData, 1)
+};
+
+#endif

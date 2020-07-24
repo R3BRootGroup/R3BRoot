@@ -29,6 +29,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/dhcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
+${R3BROOT_SOURCE_DIR}/r3bdata/pdcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/vetoData
 ${R3BROOT_SOURCE_DIR}/r3bdata/lumonData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
@@ -147,6 +148,9 @@ tofData/R3BPaddleCalData.cxx
 tofData/R3BTofdPoint.cxx
 tofData/R3BTofdDigi.cxx
 tofData/R3BPtofHit.cxx
+pdcData/R3BPdcMappedData.cxx
+pdcData/R3BPdcCalData.cxx
+pdcData/R3BPdcHitData.cxx
 fibData/R3BBunchedFiberCalData.cxx
 fibData/R3BBunchedFiberHitData.cxx
 fibData/R3BBunchedFiberMappedData.cxx

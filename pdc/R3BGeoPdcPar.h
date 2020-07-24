@@ -11,18 +11,30 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BTimestampMasterReader.h"
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "R3BEventHeader.h"
-#include "R3BWhiterabbitReaderImpl.h"
+#ifndef R3BGEOPDCPAR_H
+#define R3BGEOPDCPAR_H
 
-extern "C"
+#include "FairParGenericSet.h"
+
+#include "TH1F.h"
+
+class R3BGeoPdcPar : public FairParGenericSet
 {
-#include "ext_data_client.h"
-#include "ext_h101_timestamp_master.h"
-}
+  public:
+    TObjArray* fGeoSensNodes; // List of FairGeoNodes for sensitive volumes
+    TObjArray* fGeoPassNodes; // List of FairGeoNodes for sensitive volumes
 
-R3B_WHITERABBIT_READER_IMPL(TimestampMaster, timestamp_master, 0x100);
-// 0x300 for dec2019
-// 0x100 for data before dec2019
+    R3BGeoPdcPar(const char* name = "R3BGeoPdcPar",
+                  const char* title = "Pdc Geometry Parameters",
+                  const char* context = "TestDefaultContext");
+    ~R3BGeoPdcPar(void);
+    void clear(void);
+    void putParams(FairParamList*);
+    Bool_t getParams(FairParamList*);
+    TObjArray* GetGeoSensitiveNodes() { return fGeoSensNodes; }
+    TObjArray* GetGeoPassiveNodes() { return fGeoPassNodes; }
+
+    ClassDef(R3BGeoPdcPar, 1)
+};
+
+#endif /* !R3BGEOPDCPAR_H */

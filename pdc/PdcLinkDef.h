@@ -1,3 +1,5 @@
+// clang-format off
+
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -11,18 +13,18 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BTimestampMasterReader.h"
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "R3BEventHeader.h"
-#include "R3BWhiterabbitReaderImpl.h"
+#ifdef __CINT__
 
-extern "C"
-{
-#include "ext_data_client.h"
-#include "ext_h101_timestamp_master.h"
-}
+#pragma link off all globals;
+#pragma link off all classes;
+#pragma link off all functions;
+ 
+#pragma link C++ class R3BGeoPdcPar;
+#pragma link C++ class R3BPdcMapped2CalPar+;
+#pragma link C++ class R3BPdcMapped2Cal+;
+#pragma link C++ class R3BPdcCal2Hit+;
+#pragma link C++ class R3BPdcContFact+;
 
-R3B_WHITERABBIT_READER_IMPL(TimestampMaster, timestamp_master, 0x100);
-// 0x300 for dec2019
-// 0x100 for data before dec2019
+
+#endif
+

@@ -89,7 +89,7 @@ void R3BTCalEngine::CalculateParamClockTDC(enum CTDCVariant a_variant)
             fClockFreq = 1000. / 250;
             break;
         case CTDC_16_BWD_150:
-            fClockFreq = 1000. / 150;
+            fClockFreq = 1000. / CTDC_16_CLOCK_MHZ;
             break;
         default:
             assert(0 && "Invalid CTDC variant!");

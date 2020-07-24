@@ -11,18 +11,24 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BTimestampMasterReader.h"
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "R3BEventHeader.h"
-#include "R3BWhiterabbitReaderImpl.h"
+#ifndef R3BPDCCONTFACT_H
+#define R3BPDCCONTFACT_H
 
-extern "C"
+#include "FairContFact.h"
+
+class FairContainer;
+
+class R3BPdcContFact : public FairContFact
 {
-#include "ext_data_client.h"
-#include "ext_h101_timestamp_master.h"
-}
+  private:
+    void setAllContainers();
 
-R3B_WHITERABBIT_READER_IMPL(TimestampMaster, timestamp_master, 0x100);
-// 0x300 for dec2019
-// 0x100 for data before dec2019
+  public:
+    R3BPdcContFact();
+    ~R3BPdcContFact() {}
+    FairParSet* createContainer(FairContainer*);
+    void activateParIo(FairParIo* io);
+    ClassDef(R3BPdcContFact, 0) // Factory for all Pdc parameter containers
+};
+
+#endif /* !R3BPDCCONTFACT_H */

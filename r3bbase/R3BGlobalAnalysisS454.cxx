@@ -345,6 +345,10 @@ InitStatus R3BGlobalAnalysisS454::Init()
     fh_phi_bc_cm->GetXaxis()->SetTitle("angle / degree");
     fh_phi_bc_cm->GetYaxis()->SetTitle("counts");
 
+    fh_phi_bc_cm_polar = new TH2F("phi_bc_cm_polar", "phi_bc_cm_polar", 360, 0., 360., 100, 0., 1000.);
+    fh_phi_bc_cm_polar->GetXaxis()->SetTitle("angle / degree");
+    fh_phi_bc_cm_polar->GetYaxis()->SetTitle("counts");
+
     fh_theta_12C_cm = new TH1F("theta_12C_cm", "Theta 12C in cm-system", 180, 0., 180.);
     fh_theta_12C_cm->GetXaxis()->SetTitle("angle / degree");
     fh_theta_12C_cm->GetYaxis()->SetTitle("counts");
@@ -421,7 +425,7 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
     Bool_t is_carbon = false;
 
     // Choose original MC data or exp. data
-    Bool_t simData = false;
+    Bool_t simData = true;
 
     if (fTrack && !simData)
     {
@@ -580,8 +584,9 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
     {
         fh_chiy_vs_chix_He->Fill(chiHex, chiHey);
         fh_chiy_vs_chix_C->Fill(chiCx, chiCy);
-        Double_t cut_chi = 1.e10;
+        Double_t cut_chi = 100;
         if (chiHex < cut_chi && chiHey < cut_chi && chiCx < cut_chi && chiCy < cut_chi)
+        //			&&((alpha.Px() > 0 && carbon.Px() < 0) || (alpha.Px() < 0 && carbon.Px() > 0)))
         {
             fh_target_xy->Fill(XHe * 100., YHe * 100.);
 
@@ -602,7 +607,7 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
             TVector3 pc = carbon.Vect();
             fh_p_C->Fill(pc.Mag());
 
-            // Calculate angle between alphs and C
+            // Calculate angle between alpha and C
             if (alpha.Pz() == 0 || carbon.Pz() == 0)
                 return;
 
@@ -628,7 +633,11 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
             Double_t theta_16O = oxygen.Theta() * TMath::RadToDeg();
             fh_theta_16O->Fill(theta_16O); // theta oxygen
             Double_t phi_16O = oxygen.Phi() * TMath::RadToDeg();
+            if (phi_16O < 0)
+                phi_16O += 360.;
             fh_phi_16O->Fill(phi_16O);
+
+            // photon.SetPxPyPzE(oxygen.Px, oxygen.Py, 0., sqrt(pow(oxygen.Px, 2) + pow(oxygen.Py, 2)));
 
             // transfer to cm system and make some rotations
             // boost them to centre of mass
@@ -638,6 +647,8 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
             alpha_cm.Boost(-oxygen.BoostVector());
             carbon_cm.Boost(-oxygen.BoostVector());
             oxygen_cm.Boost(-oxygen.BoostVector());
+            cout << " px: " << alpha_cm.Px() + carbon_cm.Px() << "  py:  " << alpha_cm.Py() + carbon_cm.Py()
+                 << "  pz:  " << alpha_cm.Pz() + carbon_cm.Pz() << endl;
             /*
                         cout << "lab " << alpha.Px() << "  " << alpha.Py() << "  " << alpha.Pz() << endl;
                         cout << "lab " << carbon.Px() << "  " << carbon.Py() << "  " << carbon.Pz() << endl;
@@ -663,6 +674,8 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
             if (phi_bc_cm < 0)
                 phi_bc_cm += 360.;
             fh_phi_bc_cm->Fill(phi_bc_cm);
+            fh_phi_bc_cm_polar->Fill(phi_bc_cm, 1);
+
             /*
                         // rotation in oxygen direction
                         //TLorentzRotation transform;
@@ -1151,6 +1164,7 @@ void R3BGlobalAnalysisS454::FinishTask()
     fh_phi_4He_cm->Write();
     fh_theta_bc_cm->Write();
     fh_phi_bc_cm->Write();
+    fh_phi_bc_cm_polar->Write();
     fh_theta_12C_cm->Write();
     fh_phi_12C_cm->Write();
     fh_Erel->Write();

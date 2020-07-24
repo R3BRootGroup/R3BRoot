@@ -11,18 +11,38 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BTimestampMasterReader.h"
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "R3BEventHeader.h"
-#include "R3BWhiterabbitReaderImpl.h"
+#include "R3BPdcMappedData.h"
 
-extern "C"
+R3BPdcMappedData::R3BPdcMappedData()
+    : fPlane(-1)
+    , fWire(-1)
+    , fEdge(-1)
+    , fTimeFine(-1)
+    , fTimeCoarse(-1)
 {
-#include "ext_data_client.h"
-#include "ext_h101_timestamp_master.h"
 }
 
-R3B_WHITERABBIT_READER_IMPL(TimestampMaster, timestamp_master, 0x100);
-// 0x300 for dec2019
-// 0x100 for data before dec2019
+R3BPdcMappedData::R3BPdcMappedData(UInt_t plane,
+                                     UInt_t wire,
+                                     UInt_t edge,
+                                     UInt_t timeCoarse,
+                                     UInt_t timeFine)
+    : fPlane(plane)
+    , fWire(wire)
+    , fEdge(edge)
+    , fTimeCoarse(timeCoarse)
+    , fTimeFine(timeFine)
+{
+}
+
+UInt_t R3BPdcMappedData::GetPlaneId() const { return fPlane; }
+
+UInt_t R3BPdcMappedData::GetWireId() const { return fWire; }
+
+UInt_t R3BPdcMappedData::GetEdgeId() const { return fEdge; }
+
+UInt_t R3BPdcMappedData::GetTimeCoarse() const { return fTimeCoarse; }
+
+UInt_t R3BPdcMappedData::GetTimeFine() const { return fTimeFine; }
+
+ClassImp(R3BPdcMappedData)

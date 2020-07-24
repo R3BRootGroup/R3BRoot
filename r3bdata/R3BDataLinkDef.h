@@ -113,6 +113,9 @@
 #pragma link C++ class R3BTofdMappedData+;
 #pragma link C++ class R3BTofdCalData+;
 #pragma link C++ class R3BTofdHitData+;
+#pragma link C++ class R3BPdcMappedData+;
+#pragma link C++ class R3BPdcCalData+;
+#pragma link C++ class R3BPdcHitData+;
 #pragma link C++ class R3BNeulandCalData+;
 #pragma link C++ class R3BActarPoint+;
 #pragma link C++ class R3BStrawtubesMappedData+;

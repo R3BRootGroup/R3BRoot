@@ -308,6 +308,9 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
     //    std::cout<<"new event!*************************************\n";
 
     Int_t nHits = fCalItems->GetEntries();
+    if (nHits == 0)
+        events_wo_tofd_hits++;
+
     Int_t nHitsEvent = 0;
     // Organize cals into bars.
     struct Entry
@@ -322,10 +325,10 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
         auto* hit = (R3BTofdCalData*)fCalItems->At(ihit);
         size_t idx = hit->GetDetectorId() * fPaddlesPerPlane * hit->GetBarId();
 
-        std::cout << "Hits: " << hit->GetDetectorId() << ' ' << hit->GetBarId() << ' ' << hit->GetSideId() << '  '
+        /*std::cout << "Hits: " << hit->GetDetectorId() << ' ' << hit->GetBarId() << ' ' << hit->GetSideId() << '  '
                   << hit->GetTimeLeading_ns() << ' ' << hit->GetTimeTrailing_ns() << ' '
                   << hit->GetTimeTrailing_ns() - hit->GetTimeLeading_ns() << '\n';
-
+        */
         auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
         auto& vec = 1 == hit->GetSideId() ? ret.first->second.top : ret.first->second.bot;
         vec.push_back(hit);
@@ -610,8 +613,8 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
     // Now all hits in this event are analyzed
 
     LOG(DEBUG) << "Hits in this event: " << nHitsEvent;
-    if (nHitsEvent == 0)
-        events_wo_tofd_hits++;
+    //    if (nHitsEvent == 0)
+    //        events_wo_tofd_hits++;
 
     // init arrays to store hits
     Double_t tArrQ[nHitsEvent + 1];
@@ -780,7 +783,7 @@ void R3BTofdCal2HitS454::Exec(Option_t* option)
     { // loop over hits
         if (tArrU[hit] == false)
         {
-            cout << "Single Hit for Plane " << tArrP[hit] << " " << tArrB[hit] << endl;
+            // cout << "Single Hit for Plane " << tArrP[hit] << " " << tArrB[hit] << endl;
             ;
             tArrU[hit] = true;
             // store single hits

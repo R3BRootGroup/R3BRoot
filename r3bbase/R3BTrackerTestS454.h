@@ -12,17 +12,13 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------
-// -----                  R3BTrackS454                -----
-// -----            Created 13-04-2016 by M.Heil          -----
-// -----               Fill online histograms             -----
+// -----                  R3BTrackerTestS454                -----
+// -----            Created 28-05-2020 by M.Heil          -----
+// -----               Test Tracker with simulation             -----
 // ------------------------------------------------------------
 
-#ifndef R3BTRACKS454
-#define R3BTRACKS454
-#define N_PLANE_MAX_TOFD 4
-#define N_PADDLE_MAX_TOFD 50
-#define N_PADDLE_MAX_PTOF 100
-#define N_PSPX_S454 4
+#ifndef R3BTRACKERTESTS454
+#define R3BTRACKERTESTS454
 
 #include "FairTask.h"
 #include <array>
@@ -44,7 +40,7 @@ class R3BEventHeader;
  * This taks reads all detector data items and plots histograms
  * for online checks.
  */
-class R3BTrackS454 : public FairTask
+class R3BTrackerTestS454 : public FairTask
 {
 
   public:
@@ -52,7 +48,7 @@ class R3BTrackS454 : public FairTask
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BTrackS454();
+    R3BTrackerTestS454();
 
     /**
      * Standard constructor.
@@ -60,13 +56,13 @@ class R3BTrackS454 : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BTrackS454(const char* name, Int_t iVerbose = 1);
+    R3BTrackerTestS454(const char* name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BTrackS454();
+    virtual ~R3BTrackerTestS454();
 
     /**
      * Method for task initialization.
@@ -99,21 +95,10 @@ class R3BTrackS454 : public FairTask
     virtual void Output1(Double_t tracker[6], Double_t chi2[2]);
     virtual void Output2(Double_t tracker[6], Double_t chi2[2]);
 
-    /**
-     * Method for setting the trigger value.
-     * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
-     */
-    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
-    inline void SetTpat(Int_t tpat) { fTpat = tpat; }
 
     /**
      * Methods for setting reset and readout times for Bmon
      */
-    inline void SetBmon(Int_t sens_SEE, Int_t sens_IC)
-    {
-        fsens_SEE = sens_SEE;
-        fsens_IC = sens_IC;
-    }
 
     /**
      * Methods for setting cuts
@@ -148,10 +133,14 @@ class R3BTrackS454 : public FairTask
     }
 
   private:
-    std::vector<TClonesArray*> fMappedItems;
-    std::vector<TClonesArray*> fCalItems;
-    std::vector<TClonesArray*> fHitItems;
     TClonesArray* fMCTrack;
+    TClonesArray* fTofdPoints;
+    TClonesArray* fFi3aPoints;
+    TClonesArray* fFi3bPoints;
+    TClonesArray* fFi10Points;
+    TClonesArray* fFi11Points;
+    TClonesArray* fFi12Points;
+    TClonesArray* fFi13Points;
     TClonesArray* fTrackItems;
     Int_t fNofTrackItems;
 
@@ -194,7 +183,6 @@ class R3BTrackS454 : public FairTask
 	Bool_t fSimu;
 	Int_t fB;
 	Bool_t tracker = true;
-	Double_t delta;
 
 	TCutG *cut_fi11_fi3a;
 	TCutG *cut_fi12_fi3b;
@@ -202,7 +190,7 @@ class R3BTrackS454 : public FairTask
 	TCutG *cut_Fi10vsFi12;
 	
     unsigned long long time_start = 0, time = 0;
-    unsigned long long ic_start = 0, see_start = 0, tofdor_start = 0;
+    unsigned long ic_start = 0, see_start = 0, tofdor_start = 0;
     unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
 
     Int_t maxevent;
@@ -241,15 +229,7 @@ class R3BTrackS454 : public FairTask
 	Int_t counterRolu = 0;
 	Int_t counterTracker = 0;
 	Int_t countdet;
-	Double_t hits1 = 0;
-	Double_t hits10 = 0;
-	Double_t hits10bc = 0;
-	Double_t hits11 = 0;
-	Double_t hits11bc = 0;
-	Double_t hits12 = 0;
-	Double_t hits12bc = 0;
-	Double_t hits13 = 0;
-	Double_t hits13bc = 0;
+	Double_t delta;
 
     UInt_t num_spills = 0;
 
@@ -357,9 +337,10 @@ class R3BTrackS454 : public FairTask
 	TH2F* fh_xy[10];
 	TH2F* fh_p_vs_x[10];
 	TH2F* fh_p_vs_x_test[10];
+	TH2F* fh_Erel_vs_xfh_Erel_vs_x;
 	
   public:
-    ClassDef(R3BTrackS454, 1)
+    ClassDef(R3BTrackerTestS454, 1)
 };
 
 #endif
