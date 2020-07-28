@@ -255,8 +255,8 @@ void R3BMusicCal2Hit::Exec(Option_t* option)
 
         Double_t zhit = fZ0 + fZ1 * TMath::Sqrt(Esum / nba) + fZ2 * TMath::Sqrt(Esum / nba) * TMath::Sqrt(Esum / nba);
         if (zhit > 0)
-	  //AddHitData(theta, zhit);
-	  AddHitData(theta, zhit, Esum / nba);
+            // AddHitData(theta, zhit);
+            AddHitData(theta, zhit, Esum / nba);
     }
 
     if (CalDat)
