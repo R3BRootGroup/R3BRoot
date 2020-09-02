@@ -4,10 +4,10 @@
 #include "FairParamList.h"
 
 #include "TMath.h"
+
 #include "TString.h"
 
 #include <iostream>
-
 
 R3BCalifaCrystalPars4Sim::R3BCalifaCrystalPars4Sim(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
@@ -15,13 +15,10 @@ R3BCalifaCrystalPars4Sim::R3BCalifaCrystalPars4Sim(const char* name, const char*
     , fNumParams4Sim(3) /* Crystal ID & Reso & Threshold */
 {
 
-    fCrystalIDArray  = new TArrayI(fNumCrystals);
-    fThresholdArray  = new TArrayI(fNumCrystals);
+    fCrystalIDArray = new TArrayI(fNumCrystals);
+    fThresholdArray = new TArrayI(fNumCrystals);
     fResolutionArray = new TArrayF(fNumCrystals);
-
-
 }
-
 
 R3BCalifaCrystalPars4Sim::~R3BCalifaCrystalPars4Sim()
 {
@@ -34,13 +31,11 @@ R3BCalifaCrystalPars4Sim::~R3BCalifaCrystalPars4Sim()
         delete fResolutionArray;
 }
 
-
 void R3BCalifaCrystalPars4Sim::clear()
 {
     status = kFALSE;
     resetInputVersions();
 }
-
 
 void R3BCalifaCrystalPars4Sim::putParams(FairParamList* list)
 {
@@ -61,10 +56,7 @@ void R3BCalifaCrystalPars4Sim::putParams(FairParamList* list)
 
     list->add("califaCrystalNumberPar", fNumCrystals);
     list->add("califaNumPars4SimPar", fNumParams4Sim);
-
-
 }
-
 
 Bool_t R3BCalifaCrystalPars4Sim::getParams(FairParamList* list)
 {
@@ -83,7 +75,6 @@ Bool_t R3BCalifaCrystalPars4Sim::getParams(FairParamList* list)
     {
         return kFALSE;
     }
-
 
     fCrystalIDArray->Set(fNumCrystals);
     if (!(list->fill("califaCrystalIDPar", fCrystalIDArray)))
@@ -109,8 +100,6 @@ Bool_t R3BCalifaCrystalPars4Sim::getParams(FairParamList* list)
     return kTRUE;
 }
 
-
-
 void R3BCalifaCrystalPars4Sim::printParams()
 {
     LOG(INFO) << "R3BCalifaCrystalPars4Sim: Califa Crystal Simulation Parameters: ";
@@ -121,13 +110,10 @@ void R3BCalifaCrystalPars4Sim::printParams()
               << " "
               << "Resolution";
 
-
     for (Int_t i = 0; i < fNumCrystals; i++)
 
-      {
-          LOG(INFO) <<i+1<<" "<< fCrystalIDArray->GetAt(i) << " " << fThresholdArray->GetAt(i) << " " << fResolutionArray->GetAt(i);
-
-              }
-
-
+    {
+        LOG(INFO) << i + 1 << " " << fCrystalIDArray->GetAt(i) << " " << fThresholdArray->GetAt(i) << " "
+                  << fResolutionArray->GetAt(i);
+    }
 }
