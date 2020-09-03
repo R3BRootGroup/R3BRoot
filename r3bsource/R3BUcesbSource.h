@@ -28,6 +28,7 @@
 
 /* External data client interface (ucesb) */
 #include "ext_data_clnt.hh"
+#include "ext_data_client.h"
 #include "ext_data_struct_info.hh"
 
 /* External data structure
