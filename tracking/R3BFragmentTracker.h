@@ -87,6 +87,7 @@ class R3BFragmentTracker : public FairTask
     TH1F* fh_mass_res;
     TH1F* fh_chi2;
     TH1F* fh_vz_res;
+    TH1F* fh_beta_res;
 
     ClassDef(R3BFragmentTracker, 1)
 };

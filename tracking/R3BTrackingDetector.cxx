@@ -47,9 +47,9 @@ InitStatus R3BTrackingDetector::Init()
 {
     Double_t offset_z = 0.;
 
-    if (GetDetectorName().EqualTo("fi4"))
+    if (GetDetectorName().Contains("fi"))
     {
-        offset_z = 0.; //-0.01;
+        offset_z = 0.1;
     }
 
     if (GetDetectorName().EqualTo("tofd"))

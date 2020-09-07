@@ -48,6 +48,8 @@
 using namespace std;
 
 #define SPEED_OF_LIGHT 29.9792458 // cm/ns
+#define Amu 0.938272
+#define Fair_Amu 0.931494028
 
 R3BFragmentTracker::R3BFragmentTracker(const char* name, Bool_t vis, Int_t verbose)
     : FairTask(name, verbose)
@@ -141,15 +143,16 @@ InitStatus R3BFragmentTracker::Init()
     fh_A_reco1 = new TH1F("h_A_reco1", "Reconstructed mass, step 1", 200., 120., 140.);
     fh_A_reco2 = new TH1F("h_A_reco2", "Reconstructed mass, step 2", 200., 120., 140.);
     fh_mom_res = new TH1F("h_mom_res", "Momentum resolution", 500, -0.05, 0.05);
-    fh_mass_res = new TH1F("h_mass_res", "Mass resolution", 500, -0.05, 0.05);
+    fh_mass_res = new TH1F("h_mass_res", "Mass resolution", 10, -5.5, 4.5);
     fh_chi2 = new TH1F("h_chi2", "Chi2", 100, 0., 10.);
     fh_vz_res = new TH1F("h_vz_res", "vz - vz_mc", 200, -1., 1.);
+    fh_beta_res = new TH1F("h_beta_res", "beta - beta_mc", 200, -0.1, 0.1);
 
     Double_t ranges[] = { 1., 1., 1., 1., 1., 10. };
     for (Int_t i = 0; i < 6; i++)
     {
         fh_x_res[i] = new TH1F(Form("h_x_res%d", i), Form("x residual %d", i), 200, -ranges[i], ranges[i]);
-        fh_x_pull[i] = new TH1F(Form("h_x_pull%d", i), Form("x pull %d", i), 200, -10., 10.);
+        fh_x_pull[i] = new TH1F(Form("h_x_pull%d", i), Form("x pull %d", i), 40, -10., 10.);
     }
 
     fFitter->Init(fPropagator, fEnergyLoss);
@@ -268,7 +271,7 @@ void R3BFragmentTracker::Exec(const Option_t*)
 
     {
         target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
-        target->res_x = 0.1000;
+        target->res_x = 1.0000;
 
         for (auto const& xpsp : psp->hits)
         {
@@ -276,35 +279,32 @@ void R3BFragmentTracker::Exec(const Option_t*)
             {
                 continue;
             }
-            psp->res_x = 0.0200;
+            psp->res_x = 0.0010;
             fh_eloss_psp_mc->Fill(xpsp->GetEloss()); // MeV
 
             for (auto const& xfi4 : fi4->hits)
             {
                 fh_eloss_fi4_mc->Fill(xfi4->GetEloss()); // MeV
-                cout << "Eloss Fiber 4: " << xfi4->GetEloss() << endl;
-                fi4->res_x = 0.0200;
+                fi4->res_x = 0.0020;
 
                 for (auto const& xfi5 : fi5->hits)
                 {
-                    fh_eloss_fi5_mc->Fill(xfi5->GetEloss()); // MeV
-                    fi5->res_x = 0.0400;
+                    fi5->res_x = 0.0050;
 
                     for (auto const& xfi6 : fi6->hits)
                     {
-                        fh_eloss_fi6_mc->Fill(xfi6->GetEloss()); // MeV
-                        fi6->res_x = 0.0500;
+                        fi6->res_x = 0.0020;
 
                         for (auto const& xtof : tof->hits)
                         {
                             tof->res_x = 2.7;
                             tof->res_t = 0.03;
 
-                            Double_t velocity0 = 0.841188;
+                            Double_t velocity0 = 0.8328 + 0.0003;
 
                             // Create object for particle which will be fitted
                             R3BTrackingParticle* candidate = new R3BTrackingParticle(
-                                particle->GetCharge(), 0., 0., 0., 0., 0., 0., velocity0, 132. * amu);
+                                particle->GetCharge(), 0., 0., 0., 0., 0., 0., velocity0, 132. * Amu);
 
                             candidate->AddHit("target", 0);
                             candidate->AddHit("psp", xpsp->GetHitId());
@@ -315,7 +315,7 @@ void R3BFragmentTracker::Exec(const Option_t*)
 
                             // find momentum
                             // momin is only a first guess
-                            Int_t status = fFitter->FitTrackBackward(candidate, fDetectors);
+                            Int_t status = fFitter->FitTrackBackward2D(candidate, fDetectors);
 
                             nCand += 1;
 
@@ -329,7 +329,8 @@ void R3BFragmentTracker::Exec(const Option_t*)
                             {
                                 candidate->SetStartPosition(candidate->GetPosition());
                                 candidate->SetStartMomentum(-1. * candidate->GetMomentum());
-                                candidate->SetStartBeta(0.841188);
+                                // candidate->SetStartBeta(0.8328);
+                                candidate->SetStartBeta(velocity0);
                                 candidate->UpdateMomentum();
                                 candidate->Reset();
 
@@ -379,6 +380,11 @@ void R3BFragmentTracker::Exec(const Option_t*)
             }
         }
 
+        fh_A_reco2->Fill(candidate->GetMass() / Fair_Amu);
+        candidate->SetMass(TMath::Nint(candidate->GetMass() / Fair_Amu) * Fair_Amu);
+        candidate->UpdateMomentum();
+        fFitter->FitTrackBeta(candidate, fDetectors);
+
         Double_t momentum0 = candidate->GetStartMomentum().Mag();
         LOG(DEBUG1);
         LOG(DEBUG1) << "RESULT : " << momentum0;
@@ -394,9 +400,11 @@ void R3BFragmentTracker::Exec(const Option_t*)
 
         fh_mom_res->Fill((momentum0 - particle->GetStartMomentum().Mag()) / particle->GetStartMomentum().Mag());
         fh_chi2->Fill(candidate->GetChi2());
-        fh_A_reco2->Fill(candidate->GetMass() / amu);
-        fh_mass_res->Fill((candidate->GetMass() - particle->GetMass()) / particle->GetMass());
+        int imass = TMath::Nint(candidate->GetMass() / amu);
+        int imass_mc = TMath::Nint(particle->GetMass() / amu);
+        fh_mass_res->Fill(imass - imass_mc);
         fh_vz_res->Fill(candidate->GetStartPosition().X() - particle->GetStartPosition().X());
+        fh_beta_res->Fill((candidate->GetStartBeta() - particle->GetStartBeta()) / particle->GetStartBeta());
         // candidate->GetStartPosition().Print();
         // LOG(INFO) << (candidate->GetMass() / amu);
 
@@ -416,6 +424,12 @@ void R3BFragmentTracker::Exec(const Option_t*)
             { // PSP
                 Double_t eloss = det->GetEnergyLoss(candidate);
                 fh_eloss_psp->Fill(eloss);
+            }
+
+            if (det->GetDetectorName().EqualTo("fi4"))
+            { // Fi4
+                Double_t eloss = det->GetEnergyLoss(candidate);
+                fh_eloss_fi4->Fill(eloss);
             }
 
             if (det->GetDetectorName().EqualTo("fi4"))
@@ -507,6 +521,7 @@ void R3BFragmentTracker::Finish()
         fh_x_pull[i]->Write();
     }
     fh_vz_res->Write();
+    fh_beta_res->Write();
 
     if (fVis)
     {
@@ -585,6 +600,9 @@ void R3BFragmentTracker::Finish()
 
         new TCanvas("c12", "", 600, 10, 500, 500);
         fh_ncand->Draw();
+
+        new TCanvas("c12", "", 10, 10, 500, 500);
+        fh_beta_res->Draw();
     }
 }
 
