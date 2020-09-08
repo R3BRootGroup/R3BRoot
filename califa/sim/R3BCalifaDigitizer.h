@@ -17,6 +17,7 @@
 #include "FairTask.h"
 #include "R3BCalifa.h"
 #include "R3BCalifaCrystalCalData.h"
+#include "R3BCalifaCrystalPars4Sim.h"
 #include "R3BCalifaPoint.h"
 #include "TClonesArray.h"
 #include "string"
@@ -52,22 +53,35 @@ class R3BCalifaDigitizer : public FairTask
     /** Virtual method FinishEvent **/
     virtual void FinishEvent();
 
+    virtual void SetParContainers();
+
+    /** Public method SetRealConfig
+     **
+     ** Defines the REAL experimental resolution and Thresholds of the CsI(Tl)
+     *Crystals
+     *@param isRealSet  Bool parameter used to set the experimental Resolution and
+     *Thresholds
+     **/
+    void SetRealConfig(Bool_t isRealSet);
+
     /** Public method SetExpEnergyRes
      **
-     ** Sets the experimentl energy resolution of the CsI crystals
+     ** Sets the experimental energy resolution of the CsI crystals
      **/
     void SetExpEnergyRes(Double_t crystalRes);
 
     /** Public method SetComponentRes
      **
      ** Defines the experimental resolution of the CsI(Tl) components.
-     *@param componentRes  Double parameter used to set the experimental resolution in MeV
+     *@param componentRes  Double parameter used to set the experimental
+     *resolution in MeV
      **/
     void SetComponentRes(Double_t componentRes);
 
     /** Public method SetDetectionThreshold
      **
-     ** Defines the minimum energy requested in a crystal to be included as a CrystalCal
+     ** Defines the minimum energy requested in a crystal to be included as a
+     *CrystalCal
      *@param thresholdEne  Double parameter used to set the threshold (in GeV)
      **/
     void SetDetectionThreshold(Double_t thresholdEne);
@@ -93,6 +107,8 @@ class R3BCalifaDigitizer : public FairTask
                                            Double_t tot_energy = 0.);
 
   private:
+    void SetParameter();
+
     TClonesArray* fCalifaPointDataCA;  //!  The crystal hit collection
     TClonesArray* fCalifaCryCalDataCA; /**< Array with CALIFA Cal- output data. >*/
 
@@ -100,6 +116,11 @@ class R3BCalifaDigitizer : public FairTask
     Double_t fResolution;    // Experimental resolution @ 1 MeV
     Double_t fComponentRes;  // Experimental resolution for Nf and Ns
     Double_t fThreshold;     // Minimum energy requested to create a Cal
+    Bool_t fRealConfig;      // Real Configuration in CALIFA
+    Int_t fNumberOfParams = 0;
+    Int_t fNumCrystals = 0;
+
+    R3BCalifaCrystalPars4Sim* fSim_Par; // Parameter Container for a Realistic Simulation
 
     /** Private method NUSmearing
      **

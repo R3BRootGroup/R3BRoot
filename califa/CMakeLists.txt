@@ -61,6 +61,7 @@ set(SRCS
 ./pars/R3BCalifaMappingPar.cxx
 ./pars/R3BCalifaCrystalCalPar.cxx
 ./pars/R3BCalifaContFact.cxx
+./pars/R3BCalifaCrystalPars4Sim.cxx
 )
 
 # fill list of header files from list of source files
