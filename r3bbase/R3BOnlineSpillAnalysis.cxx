@@ -1211,8 +1211,8 @@ void R3BOnlineSpillAnalysis::Exec(Option_t* option)
                     dt += 1073741823.;
                 /**Only for the LaserRUN!!!!!!*/ // if(dt==11.){ ///Only for the Laser Run! There seems to be some
                                                  // Reflection-effect for the Laser, so that
-                ///														Very repeatedly a Hit occurs after 110ns. Filter out
-                ///these hits.
+                ///														Very repeatedly a Hit occurs after 110ns. Filter
+                /// out these hits.
 
                 // continue;
                 //}
