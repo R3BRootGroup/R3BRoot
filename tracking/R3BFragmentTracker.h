@@ -58,6 +58,8 @@ class R3BFragmentTracker : public FairTask
     TClonesArray* fArrayFragments;
     Int_t fNEvents;
     Bool_t fVis;
+//   	Double_t amu = 0.93149410242;
+   	Double_t amu = 0.938272;
 
     R3BFragmentFitterGeneric* fFitter;
     Bool_t fEnergyLoss;
@@ -72,6 +74,10 @@ class R3BFragmentTracker : public FairTask
     TH1F* fh_eloss_psp;
     TH1F* fh_eloss_fi4_mc;
     TH1F* fh_eloss_fi4;
+    TH1F* fh_eloss_fi5_mc;
+    TH1F* fh_eloss_fi5;
+    TH1F* fh_eloss_fi6_mc;
+    TH1F* fh_eloss_fi6;
     TH1F* fh_ncand;
     TH1F* fh_x_res[6];
     TH1F* fh_x_pull[6];

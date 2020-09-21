@@ -27,7 +27,7 @@ extern "C"
 
 R3BPdcReader::R3BPdcReader(EXT_STR_h101_PDC* data, UInt_t a_offset)
     : R3BReader("R3BPdcReader")
-    , fData(data)    
+    , fData(data)
     , fOffset(a_offset)
     , fMappedArray(new TClonesArray("R3BPdcMappedData"))
 {
@@ -50,7 +50,7 @@ Bool_t R3BPdcReader::Init(ext_data_struct_info* a_struct_info)
 
     FairRootManager::Instance()->Register("PdcMapped", "Land", fMappedArray, kTRUE);
 
-    auto data = (EXT_STR_h101_PDC_onion *)fData;
+    auto data = (EXT_STR_h101_PDC_onion*)fData;
     memset(data, 0, sizeof *data);
     return kTRUE;
 }
@@ -63,43 +63,42 @@ Bool_t R3BPdcReader::Read()
     // puts("Event");
     for (uint32_t p = 0; p < LENGTH(data->PDC_P); p++)
     {
-      auto const& side = data->PDC_P[p];
+        auto const& side = data->PDC_P[p];
 
-      //
-      // ctdc.
-      //
+        //
+        // ctdc.
+        //
 
-      auto numChannels = side.TLCM;
-      uint32_t curChannelStart = 0;
-      for (uint32_t i = 0; i < numChannels; i++)
-      {
-        uint32_t channel = side.TLCMI[i];
-        uint32_t nextChannelStart = side.TLCME[i];
-        for (uint32_t j = curChannelStart; j < nextChannelStart; j++)
+        auto numChannels = side.TLCM;
+        uint32_t curChannelStart = 0;
+        for (uint32_t i = 0; i < numChannels; i++)
         {
-			//cout << "p: " << p+1 << "  channel: " << channel << "  edge: 1   coarse: " <<   side.TLCv[j] << endl;
-          new ((*fMappedArray)[fMappedArray->GetEntriesFast()])
-            R3BPdcMappedData(p + 1, channel, 1, side.TLCv[j], side.TLFv[j]);
+            uint32_t channel = side.TLCMI[i];
+            uint32_t nextChannelStart = side.TLCME[i];
+            for (uint32_t j = curChannelStart; j < nextChannelStart; j++)
+            {
+                // cout << "p: " << p+1 << "  channel: " << channel << "  edge: 1   coarse: " <<   side.TLCv[j] << endl;
+                new ((*fMappedArray)[fMappedArray->GetEntriesFast()])
+                    R3BPdcMappedData(p + 1, channel, 1, side.TLCv[j], side.TLFv[j]);
+            }
+            curChannelStart = nextChannelStart;
         }
-        curChannelStart = nextChannelStart;
-      }
 
-      // Trailing.
-      numChannels = side.TTCM;
-      curChannelStart = 0;
-      for (uint32_t i = 0; i < numChannels; i++)
-      {
-        uint32_t channel = side.TTCMI[i];
-        uint32_t nextChannelStart = side.TTCME[i];
-        for (uint32_t j = curChannelStart; j < nextChannelStart; j++)
+        // Trailing.
+        numChannels = side.TTCM;
+        curChannelStart = 0;
+        for (uint32_t i = 0; i < numChannels; i++)
         {
-		  //cout << "p: " << p+1 << "  channel: " << channel << "  edge: 2   coarse: " <<   side.TTCv[j] << endl;
-          new ((*fMappedArray)[fMappedArray->GetEntriesFast()])
-            R3BPdcMappedData(p + 1, channel, 2, side.TTCv[j], side.TTFv[j]);
+            uint32_t channel = side.TTCMI[i];
+            uint32_t nextChannelStart = side.TTCME[i];
+            for (uint32_t j = curChannelStart; j < nextChannelStart; j++)
+            {
+                // cout << "p: " << p+1 << "  channel: " << channel << "  edge: 2   coarse: " <<   side.TTCv[j] << endl;
+                new ((*fMappedArray)[fMappedArray->GetEntriesFast()])
+                    R3BPdcMappedData(p + 1, channel, 2, side.TTCv[j], side.TTFv[j]);
+            }
+            curChannelStart = nextChannelStart;
         }
-        curChannelStart = nextChannelStart;
-      }
-
     }
 
     // Leading ctdc trigger times.
@@ -108,17 +107,14 @@ Bool_t R3BPdcReader::Read()
         for (uint32_t i = 0; i < numChannels; i++)
         {
             uint32_t channel = data->PDC_TRIGLCI[i];
-			new ((*fMappedArray)[fMappedArray->GetEntriesFast()])
-				R3BPdcMappedData(LENGTH(data->PDC_P) + 1, channel, 1, data->PDC_TRIGLCv[i], data->PDC_TRIGLFv[i]);
+            new ((*fMappedArray)[fMappedArray->GetEntriesFast()])
+                R3BPdcMappedData(LENGTH(data->PDC_P) + 1, channel, 1, data->PDC_TRIGLCv[i], data->PDC_TRIGLFv[i]);
         }
     }
 
     return kTRUE;
 }
 
-void R3BPdcReader::Reset()
-{
-  fMappedArray->Clear();
-}
+void R3BPdcReader::Reset() { fMappedArray->Clear(); }
 
 ClassImp(R3BPdcReader)

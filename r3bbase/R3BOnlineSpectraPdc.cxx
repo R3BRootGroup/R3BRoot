@@ -12,8 +12,8 @@
 #include "R3BOnlineSpectraPdc.h"
 
 #include "R3BPdcCalData.h"
-#include "R3BPdcMappedData.h"
 #include "R3BPdcHitData.h"
+#include "R3BPdcMappedData.h"
 
 #include "R3BEventHeader.h"
 #include "R3BTCalEngine.h"
@@ -71,12 +71,12 @@ R3BOnlineSpectraPdc::~R3BOnlineSpectraPdc()
 
     for (int i = 0; i < N_PLANE_MAX_PDC; i++)
     {
-		delete fh_Pdc_Wire[i];
-		delete fh_Pdc_Tot[i];
-		delete fh_Pdc_ToF[i];
-		delete fh_Pdc_xy[i];
-		delete fh_Pdc_Time[i];
-		delete fh_Pdc_Wire_vs_Events[i];
+        delete fh_Pdc_Wire[i];
+        delete fh_Pdc_Tot[i];
+        delete fh_Pdc_ToF[i];
+        delete fh_Pdc_xy[i];
+        delete fh_Pdc_Time[i];
+        delete fh_Pdc_Wire_vs_Events[i];
     }
 }
 
@@ -134,7 +134,6 @@ InitStatus R3BOnlineSpectraPdc::Init()
     fhTpat->Draw();
     cTrigg->cd(0);
 
-
     //---------------------------------------------------------------------------------------------------
     // PDC detector
 
@@ -173,7 +172,7 @@ InitStatus R3BOnlineSpectraPdc::Init()
             sprintf(strName7, "pdc_time_plane_%d", j + 1);
             char strName8[255];
             sprintf(strName8, "PDC Time-trigger time plane %d", j + 1);
-            fh_Pdc_Time[j] = new TH2F(strName7, strName8, 150, 0, 150, 1000,-1000, 1000);
+            fh_Pdc_Time[j] = new TH2F(strName7, strName8, 150, 0, 150, 1000, -1000, 1000);
             fh_Pdc_Time[j]->GetXaxis()->SetTitle("Wire");
             fh_Pdc_Time[j]->GetYaxis()->SetTitle("Time / ns");
 
@@ -184,39 +183,38 @@ InitStatus R3BOnlineSpectraPdc::Init()
             fh_Pdc_xy[j] = new TH2F(strName9, strName10, 1500, 0, 150, 1000, 0, 100);
             fh_Pdc_xy[j]->GetXaxis()->SetTitle("x in cm");
             fh_Pdc_xy[j]->GetYaxis()->SetTitle("y in cm");
-            
-/*
-            char strName9[255];
-            sprintf(strName9, "tofd_multihit_plane_%d", j + 1);
-            char strName10[255];
-            sprintf(strName10, "Tofd multihit plane %d", j + 1);
-            fh_tofd_multihit[j] = new TH2F(strName9, strName10, 45, 0., 45., 10, 0, 10);
-            fh_tofd_multihit[j]->GetXaxis()->SetTitle("Bar number");
-            fh_tofd_multihit[j]->GetYaxis()->SetTitle("Multihit");
-*/
+
+            /*
+                        char strName9[255];
+                        sprintf(strName9, "tofd_multihit_plane_%d", j + 1);
+                        char strName10[255];
+                        sprintf(strName10, "Tofd multihit plane %d", j + 1);
+                        fh_tofd_multihit[j] = new TH2F(strName9, strName10, 45, 0., 45., 10, 0, 10);
+                        fh_tofd_multihit[j]->GetXaxis()->SetTitle("Bar number");
+                        fh_tofd_multihit[j]->GetYaxis()->SetTitle("Multihit");
+            */
         }
 
         for (Int_t j = 0; j < N_PLANE_MAX_PDC; j++)
         {
-			cPdc_planes->cd(j*N_PLANE_MAX_PDC+1);
-			fh_Pdc_Wire[j]->Draw();
-			cPdc_planes->cd(j*N_PLANE_MAX_PDC+2);
-			//gPad->SetLogz();
-			fh_Pdc_Tot[j]->Draw("colz");
-			cPdc_planes->cd(j*N_PLANE_MAX_PDC+3);
-			//gPad->SetLogz();
-			fh_Pdc_Time[j]->Draw("colz");
-			cPdc_planes->cd(j*N_PLANE_MAX_PDC+4);
-			//gPad->SetLogz();
-			fh_Pdc_xy[j]->Draw("colz");
-		}
+            cPdc_planes->cd(j * N_PLANE_MAX_PDC + 1);
+            fh_Pdc_Wire[j]->Draw();
+            cPdc_planes->cd(j * N_PLANE_MAX_PDC + 2);
+            // gPad->SetLogz();
+            fh_Pdc_Tot[j]->Draw("colz");
+            cPdc_planes->cd(j * N_PLANE_MAX_PDC + 3);
+            // gPad->SetLogz();
+            fh_Pdc_Time[j]->Draw("colz");
+            cPdc_planes->cd(j * N_PLANE_MAX_PDC + 4);
+            // gPad->SetLogz();
+            fh_Pdc_xy[j]->Draw("colz");
+        }
 
         cPdc_planes->cd(0);
         run->AddObject(cPdc_planes);
 
         run->GetHttpServer()->RegisterCommand("Reset_PDC", Form("/Tasks/%s/->Reset_PDC_Histo()", GetName()));
     }
-
 
     return kSUCCESS;
 }
@@ -242,46 +240,46 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
         LOG(ERROR) << "FairRootManager not found";
         return;
     }
-/*
-    if (fMappedItems)
-    {
-        fhTrigger->Fill(header->GetTrigger());
-    }
-
-    //   check for requested trigger (Todo: should be done globablly / somewhere else)
-    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
-        return;
-
-    if (fMappedItems)
-    {
-        Int_t tpatbin;
-        for (int i = 0; i < 16; i++)
+    /*
+        if (fMappedItems)
         {
-            tpatbin = (header->GetTpat() & (1 << i));
-            if (tpatbin != 0)
-                fhTpat->Fill(i + 1);
+            fhTrigger->Fill(header->GetTrigger());
         }
-    }
 
-    // fTpat = 1-16; fTpat_bit = 0-15
-    Int_t fTpat_bit = fTpat - 1;
-    Int_t itpat;
-    Int_t tpatvalue;
-    if (fTpat_bit >= 0)
-    {
-        itpat = header->GetTpat();
-        tpatvalue = (itpat & (1 << fTpat_bit)) >> fTpat_bit;
-        if (tpatvalue == 0)
+        //   check for requested trigger (Todo: should be done globablly / somewhere else)
+        if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
             return;
-    }
-*/
+
+        if (fMappedItems)
+        {
+            Int_t tpatbin;
+            for (int i = 0; i < 16; i++)
+            {
+                tpatbin = (header->GetTpat() & (1 << i));
+                if (tpatbin != 0)
+                    fhTpat->Fill(i + 1);
+            }
+        }
+
+        // fTpat = 1-16; fTpat_bit = 0-15
+        Int_t fTpat_bit = fTpat - 1;
+        Int_t itpat;
+        Int_t tpatvalue;
+        if (fTpat_bit >= 0)
+        {
+            itpat = header->GetTpat();
+            tpatvalue = (itpat & (1 << fTpat_bit)) >> fTpat_bit;
+            if (tpatvalue == 0)
+                return;
+        }
+    */
     //----------------------------------------------------------------------
     // PDC
     //----------------------------------------------------------------------
 
     if (fMappedItems)
     {
-		//cout << "MappedItems" << endl;
+        // cout << "MappedItems" << endl;
         auto det = fMappedItems;
         Int_t nMapped = det->GetEntriesFast();
         for (Int_t imapped = 0; imapped < nMapped; imapped++)
@@ -291,19 +289,19 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
                 continue; // should not happen
 
             Int_t const iPlane = mapped->GetPlaneId(); // 1..n
-            Int_t const iWire = mapped->GetWireId();        // 1..n
+            Int_t const iWire = mapped->GetWireId();   // 1..n
             Int_t const iEdge = mapped->GetEdgeId();
-			//cout << "Plane: " << iPlane << " Wire: " << iWire << endl;
-			if(iPlane <= N_PLANE_MAX_PDC)
-			{
-				fh_Pdc_Wire[iPlane - 1]->Fill(iWire);
-			}
+            // cout << "Plane: " << iPlane << " Wire: " << iWire << endl;
+            if (iPlane <= N_PLANE_MAX_PDC)
+            {
+                fh_Pdc_Wire[iPlane - 1]->Fill(iWire);
+            }
         }
     }
 
     if (fCalItems)
     {
-		//cout << "CalItems" << endl;
+        // cout << "CalItems" << endl;
         auto det = fCalItems;
         Int_t nCals = det->GetEntriesFast();
 
@@ -313,73 +311,76 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
             if (!cal)
                 continue; // should not happen
 
-            Int_t plane = cal->GetPlaneId(); 
-            Double_t wire = cal->GetWireId();  
-            Double_t edge = cal->GetEdgeId();  
-            Double_t t = cal->GetTime_ns();  
+            Int_t plane = cal->GetPlaneId();
+            Double_t wire = cal->GetWireId();
+            Double_t edge = cal->GetEdgeId();
+            Double_t t = cal->GetTime_ns();
 
-			//cout << "Plane: " << plane << " Wire: " << wire << endl;
-			//fh_Pdc_Time[plane-1]->Fill(wire,t);
+            // cout << "Plane: " << plane << " Wire: " << wire << endl;
+            // fh_Pdc_Time[plane-1]->Fill(wire,t);
         }
     }
 
     if (fHitItems)
     {
-		//cout << "HitItems" << endl;		
+        // cout << "HitItems" << endl;
         auto det = fHitItems;
         Int_t nHits = det->GetEntriesFast();
-		Double_t t0 = -10000.;		
-		Int_t plane = 0;
-		Int_t wire = 0;
-		Double_t x[4], y[4], eloss[4], t[4];  
-		for(Int_t i = 0 ; i < 5 ; i++){
-			x[i] = -10000.;  
-			y[i] = -10000;  
-			eloss[i] = 0.;  
-			t[i] = -10000.;  
-		}
-		
+        Double_t t0 = -10000.;
+        Int_t plane = 0;
+        Int_t wire = 0;
+        Double_t x[4], y[4], eloss[4], t[4];
+        for (Int_t i = 0; i < 5; i++)
+        {
+            x[i] = -10000.;
+            y[i] = -10000;
+            eloss[i] = 0.;
+            t[i] = -10000.;
+        }
+
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             auto hit = (R3BPdcHitData const*)det->At(ihit);
             if (!hit)
                 continue; // should not happen
-			if(t0 == -10000.) t0 = hit->GetTime();
-			
-			if(abs(hit->GetTime() - t0) < 20)
-			{ 
-				plane = hit->GetDetId();
-				wire = hit->GetWireId();
-				x[plane] = hit->GetX();  
-				y[plane] = hit->GetY();  
-				eloss[plane] = hit->GetEloss();  
-				t[plane] = hit->GetTime();  
-				//cout << "Hit plane: " << plane << " x: " << x[plane] << " y: " 
-				//     << y[plane] << " t: " << t[plane] << " ToT: " << eloss[plane] << endl;
-				if(plane&1)
-				{
-					fh_Pdc_Tot[plane-1]->Fill(x[plane],eloss[plane]);
-				}
-				else
-				{
-					fh_Pdc_Tot[plane-1]->Fill(y[plane],eloss[plane]);					
-				}
-				fh_Pdc_Time[plane-1]->Fill(wire,t[plane]);
-			}
-			else {
-				// Draw histograms
-/*
-				for(Int_t i = 0 ; i < 5 ; i++){
-					//fh_Pdc_ToF[i]->Fill();
-					if(i == 0) fh_Pdc_xy[i]->Fill(x[1],y[2]);
-					if(i == 2) fh_Pdc_xy[i]->Fill(x[3],y[4]);
-					fh_Pdc_Tot[i]->Fill(x[i+1],eloss[i+1]);
-					//fh_Pdc_Wire_vs_Events[i]->Write();
-				}
-*/
-				t0 = hit->GetTime();
-				ihit--; 
-			}
+            if (t0 == -10000.)
+                t0 = hit->GetTime();
+
+            if (abs(hit->GetTime() - t0) < 20)
+            {
+                plane = hit->GetDetId();
+                wire = hit->GetWireId();
+                x[plane] = hit->GetX();
+                y[plane] = hit->GetY();
+                eloss[plane] = hit->GetEloss();
+                t[plane] = hit->GetTime();
+                // cout << "Hit plane: " << plane << " x: " << x[plane] << " y: "
+                //     << y[plane] << " t: " << t[plane] << " ToT: " << eloss[plane] << endl;
+                if (plane & 1)
+                {
+                    fh_Pdc_Tot[plane - 1]->Fill(x[plane], eloss[plane]);
+                }
+                else
+                {
+                    fh_Pdc_Tot[plane - 1]->Fill(y[plane], eloss[plane]);
+                }
+                fh_Pdc_Time[plane - 1]->Fill(wire, t[plane]);
+            }
+            else
+            {
+                // Draw histograms
+                /*
+                                for(Int_t i = 0 ; i < 5 ; i++){
+                                    //fh_Pdc_ToF[i]->Fill();
+                                    if(i == 0) fh_Pdc_xy[i]->Fill(x[1],y[2]);
+                                    if(i == 2) fh_Pdc_xy[i]->Fill(x[3],y[4]);
+                                    fh_Pdc_Tot[i]->Fill(x[i+1],eloss[i+1]);
+                                    //fh_Pdc_Wire_vs_Events[i]->Write();
+                                }
+                */
+                t0 = hit->GetTime();
+                ihit--;
+            }
         }
     }
     fNEvents += 1;
@@ -387,9 +388,9 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
 
 void R3BOnlineSpectraPdc::FinishEvent()
 {
-	fMappedItems->Clear();
-	fCalItems->Clear();
-	fHitItems->Clear();
+    fMappedItems->Clear();
+    fCalItems->Clear();
+    fHitItems->Clear();
 }
 
 void R3BOnlineSpectraPdc::FinishTask()
@@ -398,16 +399,15 @@ void R3BOnlineSpectraPdc::FinishTask()
     {
         for (Int_t i = 0; i < 4; i++)
         {
-            //fh_Pdc_ToF[i]->Write();
-            //fh_Pdc_xy[i]->Write();
-			fh_Pdc_Wire[i]->Write();
-			fh_Pdc_Tot[i]->Write();
-			fh_Pdc_Time[i]->Write();
-			//fh_Pdc_Wire_vs_Events[i]->Write();
+            // fh_Pdc_ToF[i]->Write();
+            // fh_Pdc_xy[i]->Write();
+            fh_Pdc_Wire[i]->Write();
+            fh_Pdc_Tot[i]->Write();
+            fh_Pdc_Time[i]->Write();
+            // fh_Pdc_Wire_vs_Events[i]->Write();
         }
     }
-puts("4");
-    
+    puts("4");
 }
 
 ClassImp(R3BOnlineSpectraPdc)

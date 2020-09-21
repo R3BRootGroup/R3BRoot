@@ -518,8 +518,10 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
             auto tot_mapmt = mapmt_tot.tot_ns;
             // s                    auto tot_spmt = spmt_tot.tot_ns;
             Double_t t_mapmt = mapmt_tot.lead_ns;
-            // s                    Double_t t_spmt = spmt_tot.lead_ns;
 
+            Double_t t_mapmt1 = mapmt_tot.lead->GetTime_ns(); // MAPMT time without subtraction of trigger time
+
+            // s                    Double_t t_spmt = spmt_tot.lead_ns;
             // only accept hits which are at the right time:
             Bool_t simu = true;
             if (!simu)
@@ -672,7 +674,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                 new ((*fHitItems)[fNofHitItems++])
                     // s                            R3BBunchedFiberHitData(0, x, y, eloss, t, fiber_id, t_mapmt, t_spmt,
                     // tot_mapmt, tot_spmt);
-                    R3BBunchedFiberHitData(0, x, y, eloss, t, fiber_id, t_mapmt, 0., tot_mapmt, 0.);
+                    R3BBunchedFiberHitData(0, x, y, eloss, t, fiber_id, t_mapmt1, 0., tot_mapmt, 0.);
             // s                }
             // s            }
         }

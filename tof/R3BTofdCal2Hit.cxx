@@ -96,6 +96,7 @@ R3BTofdCal2Hit::R3BTofdCal2Hit()
         fhxy34 = NULL;
         fhxy34tot = NULL;
         fhCharge = NULL;
+        fhAverageCharge = NULL;
         //    fhChargevsTof = NULL;
         //    fhChargevsPos = NULL;
         //    fhQp12 = NULL;
@@ -171,6 +172,7 @@ R3BTofdCal2Hit::R3BTofdCal2Hit(const char* name, Int_t iVerbose)
         fhxy34 = NULL;
         fhxy34tot = NULL;
         fhCharge = NULL;
+        fhAverageCharge = NULL;
         //    fhChargevsTof = NULL;
         //    fhChargevsPos = NULL;
         //    fhQp12 = NULL;
@@ -218,6 +220,8 @@ R3BTofdCal2Hit::~R3BTofdCal2Hit()
             delete fhxy34;
         if (fhxy34tot)
             delete fhxy34tot;
+        if (fhAverageCharge)
+            delete fhAverageCharge;
         //    if (fhChargevsTof) delete  fhChargevsTof;
         //    if (fhChargevsPos) delete  fhChargevsPos;
         //    if (fhQp12) delete fhQp12;
@@ -443,7 +447,7 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
         }
     */
 
-    //    std::cout<<"new event!*************************************\n";
+    // std::cout<<"new event!*************************************\n";
 
     Int_t nHits = fCalItems->GetEntries();
     Int_t nHitsEvent = 0;
@@ -774,8 +778,8 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
 
     // Now all hits in this event are analyzed
 
-    Double_t hit_coinc = 5.;     // coincidence window for hits in one event in ns. physics says max 250 ps
-    Double_t maxChargeDiff = 1.; // maximum charge difference between two planes for averaged hits
+    Double_t hit_coinc = 5000000.; // coincidence window for hits in one event in ns. physics says max 250 ps
+    Double_t maxChargeDiff = 1.;   // maximum charge difference between two planes for averaged hits
 
     LOG(DEBUG) << "Hits in this event: " << nHitsEvent;
     if (nHitsEvent == 0)
@@ -948,8 +952,10 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
         Int_t nAverage = 0;
         Int_t nAverage12 = 0;
         Int_t nAverage34 = 0;
+        Int_t nAverage14[100] = { 0 };
         Double_t sumQ12 = 0;
         Double_t sumQ34 = 0;
+        Double_t sumQ14[100] = { 0. };
 
         while (tArrT[ihit] < time0 + hit_coinc)
         { // check if in coincidence window
@@ -985,7 +991,8 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
             { // loop over hits in coincidence
                 if (tArrP[ihit] <= 2 && tArrP[ihit - i] <= 2)
                 {
-                    // std::cout<<i<<" "<<tArrP[ihit]<<" "<<tArrB[ihit]<<" "<<tArrP[ihit-i]<<" "<<tArrB[ihit-i]<<"\n";
+                    // cout << i << "  " << tArrP[ihit] << "  " << tArrB[ihit] << " "
+                    // << tArrP[ihit-i] << "  " << tArrB[ihit-i] << endl;
                     if (hitscoinc > 0 && (Int_t)(tArrP[ihit] - tArrP[ihit - i]) != 0)
                     { // check if planes differ
                         /// find overlapping virtualbars && similar charge in both planes? && bar wasn't used for other
@@ -994,9 +1001,10 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                             tArrU[ihit] == false && tArrU[ihit - i] == false)
                         {
                             inaverage12++;
-                            LOG(WARNING) << "Try to average " << tArrQ[ihit] << " " << tArrP[ihit] << " " << tArrB[ihit]
-                                         << " and " << tArrQ[ihit - i] << " " << tArrP[ihit - i] << " "
-                                         << tArrB[ihit - i];
+                            // cout << "Try to average " << tArrQ[ihit] << " plane: " << tArrP[ihit] << " Bar: " <<
+                            // tArrB[ihit]
+                            //             << " and " << tArrQ[ihit - i] << " plane: " << tArrP[ihit - i] << " Bar: "
+                            //             << tArrB[ihit - i] << endl;
 
                             nAverage12++; // number of averaged hits in this coincidence window
                             sumQ12 += (tArrQ[ihit] + tArrQ[ihit - i]) / 2.; // average charges and add to sum
@@ -1167,6 +1175,33 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 }
             }
 
+            // try to average all 4 planes
+            if (hitscoinc > 0)
+            { // loop over hits in coincidence
+
+                Int_t bar = tArrB[ihit];
+                if (bar > 27 && bar < 41)
+                {
+                    // cout << "ihit: " << ihit << " plane: " << tArrP[ihit] << " bar: " << tArrB[ihit]
+                    // 	<< "  Q: " << tArrQ[ihit] << endl;
+
+                    // cout << "so far: " << nAverage14[bar] << " Q: " << sumQ14[bar] / nAverage14[bar] << endl;
+                    if (abs(tArrQ[ihit] - sumQ14[bar] / nAverage14[bar]) < maxChargeDiff || nAverage14[bar] == 0)
+                    {
+
+                        // cout << "Average " << nAverage14[bar] << " Try to average "  << sumQ14[bar] / nAverage14[bar]
+                        // << " with " << tArrQ[ihit] << " plane: " << tArrP[ihit] << " Bar: " << tArrB[ihit] << endl;
+
+                        nAverage14[bar]++;          // number of averaged hits in this coincidence window
+                        sumQ14[bar] += tArrQ[ihit]; // average charges and add to sum
+                    }
+                }
+                if (fTofdHisto && nAverage14[bar] == 4)
+                {
+                    fhAverageCharge->Fill(bar, sumQ14[bar] / nAverage14[bar]);
+                }
+            }
+
             ihit++;
             if (ihit >= 2 * nHitsEvent)
                 break;
@@ -1176,8 +1211,8 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
         {
             if (nAverage > 0)
             {
-                // std::cout<<nAverage12<<"/"<<nAverage34<<" Events in coincidence window averaged\nCombined Charge
-                // "<<sumQ12<<"/"<<sumQ34<<"\n";
+                // std::cout<<nAverage12<<"/"<<nAverage34<<" Events in coincidence window averaged\nCombined Charge"
+                // <<sumQ12<<"/"<<sumQ34<<"\n";
                 if (nAverage12 > 0)
                     fhMvsQ[0]->Fill(sumQ12, nAverage12); // Fill histogram number of averaged hits vs summed up charge
                 if (nAverage34 > 0)
@@ -1507,6 +1542,16 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhCharge->GetYaxis()->SetTitle("Counts");
         fhCharge->GetXaxis()->SetTitle("Charge");
     }
+
+    if (NULL == fhAverageCharge)
+    {
+        char strName[255];
+        sprintf(strName, "Average_Charge");
+        fhAverageCharge = new TH2F(strName, "", 90, 0, 90, 1200, 0., 60.);
+        fhAverageCharge->GetYaxis()->SetTitle("Q");
+        fhAverageCharge->GetXaxis()->SetTitle("Bar #");
+    }
+
     /*
     if (NULL == fhChargevsTof)
     {
@@ -1622,6 +1667,8 @@ void R3BTofdCal2Hit::FinishTask()
             fhxy34tot->Write();
         if (fhCharge)
             fhCharge->Write();
+        if (fhAverageCharge)
+            fhAverageCharge->Write();
         // if (fhChargevsTof) fhChargevsTof->Write();
         // if (fhChargevsPos) fhChargevsPos->Write();
         // if (fhQp12) fhQp12->Write();

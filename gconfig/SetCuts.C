@@ -49,8 +49,8 @@ void SetCuts()
 	gMC->SetProcess("MUNU",0); // Muon nuclear interactions
 	gMC->SetProcess("CKOV",0); // Cerenkov production
 	gMC->SetProcess("HADR",0); // Hadronic interactions
-	gMC->SetProcess("LOSS",1); // Energy loss (2=complete fluct.)
-	gMC->SetProcess("MULS",1); // Multiple scattering
+	gMC->SetProcess("LOSS",4); // Energy loss (2=complete fluct.)
+	gMC->SetProcess("MULS",0); // Multiple scattering
 	gMC->SetProcess("RAYL",0); // Rayleigh scattering
 */
     cout << "[SetCuts]: Setting Cuts ..." << endl;

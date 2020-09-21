@@ -21,10 +21,7 @@ R3BPdcCalData::R3BPdcCalData()
 {
 }
 
-R3BPdcCalData::R3BPdcCalData(UInt_t plane,
-                                     UInt_t wire,
-                                     UInt_t edge,
-                                     Double_t time_ns)
+R3BPdcCalData::R3BPdcCalData(UInt_t plane, UInt_t wire, UInt_t edge, Double_t time_ns)
     : fPlane(plane)
     , fWire(wire)
     , fEdge(edge)

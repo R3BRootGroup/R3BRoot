@@ -279,6 +279,16 @@ void R3BFi4Digitizer::Exec(Option_t* opt)
                                     if (std::fabs(time_l[i].at(&energyl - energy_l[i].data()) -
                                                   time_r[j].at(&energyr - energy_r[j].data())) < 30)
                                     {
+
+                                        Double_t x = (i * 4 + j + .5 - 4) * ((Detector == 6) ? 0.05 : 0.02) *
+                                                         ((Detector == 5) ? 1 : .5) -
+                                                     ((Detector == 6) ? 25. : 20.);
+                                        Double_t y = prnd->Gaus((y_l[i].at(&energyl - energy_l[i].data()) +
+                                                                 y_r[j].at(&energyr - energy_r[j].data())) /
+                                                                    2,
+                                                                ysigma);
+                                        cout << "Detector: " << Detector << " x: " << x << " y: " << endl;
+
                                         new ((*Hits)[Hits->GetEntries()]) R3BFi4HitItem(
                                             (UInt_t)Detector,
                                             (UInt_t)i * 4 + j - 4,
@@ -290,8 +300,8 @@ void R3BFi4Digitizer::Exec(Option_t* opt)
                                                            2,
                                                        ysigma),
                                             0,
-                                            prnd->Gaus(energyl, esigma),
-                                            prnd->Gaus(energyr, esigma),
+                                            prnd->Gaus(energyl * 1000., esigma),
+                                            prnd->Gaus(energyr * 1000., esigma),
                                             prnd->Gaus(time_l[i].at(&energyl - energy_l[i].data()), tsigma),
                                             prnd->Gaus(time_r[j].at(&energyr - energy_r[j].data()), tsigma));
                                     }

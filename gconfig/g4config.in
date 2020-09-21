@@ -16,9 +16,9 @@
 #/mcTracking/saveSecondaries true
 
 
-#/mcPhysics/setSpecialCuts true
+/mcPhysics/setSpecialCuts true
 #/mcPhysics/rangeCuts 0.1 mm
-/mcPhysics/rangeCutForElectron 0.1 mm
+#/mcPhysics/rangeCutForElectron 0.1 mm
 #/mcPhysics/printGeneralCuts true
 
 

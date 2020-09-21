@@ -18,14 +18,9 @@
 
 R3BPdcHitData::R3BPdcHitData() {}
 
-R3BPdcHitData::R3BPdcHitData(Double_t t,
-                               Double_t x,
-                               Double_t y,
-                               Double_t ELoss,
-                               Double_t ID,
-                               Int_t wire)
+R3BPdcHitData::R3BPdcHitData(Double_t t, Double_t x, Double_t y, Double_t ELoss, Double_t ID, Int_t wire)
     : R3BHit(ID, x, y, ELoss, t)
-	, fWireId(wire)
+    , fWireId(wire)
 
 {
 }

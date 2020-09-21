@@ -155,8 +155,8 @@ void R3BPspDigitizer::Exec(Option_t* opt)
         }     // PID
     }
 
-    psp3x = gRandom->Gaus(psp3x, 0.0200);
-    psp3y = gRandom->Gaus(psp3y, 0.0200);
+    // psp3x = gRandom->Gaus(psp3x, 0.0200);
+    // psp3y = gRandom->Gaus(psp3y, 0.0200);
 
     AddHit(psp3mul, psp3x, psp3y, psp3e);
 }

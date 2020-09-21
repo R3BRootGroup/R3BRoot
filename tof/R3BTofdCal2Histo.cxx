@@ -566,7 +566,7 @@ void R3BTofdCal2Histo::Exec(Option_t* option)
 
 void R3BTofdCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
 {
-    Double_t max_charge = 50.;
+    Double_t max_charge = 60.;
     if (NULL == fhTdiff[iPlane - 1])
     {
         char strName1[255];

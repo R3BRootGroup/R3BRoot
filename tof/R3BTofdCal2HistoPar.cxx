@@ -200,8 +200,8 @@ void R3BTofdCal2HistoPar::FinishTask()
         {
             LOG(WARNING) << "Calling function smiley";
             Double_t para2[4];
-            Double_t min2 = -50.; // -40 effective bar length
-            Double_t max2 = 50.;  // 40 effective bar length = 80 cm
+            Double_t min2 = -40.; // -40 effective bar length
+            Double_t max2 = 40.;  // 40 effective bar length = 80 cm
                                   // we will use 50 here for some fit safety margin
             for (Int_t i = 0; i < fNofPlanes; i++)
             {
@@ -279,7 +279,7 @@ void R3BTofdCal2HistoPar::FinishTask()
         LOG(WARNING) << "Calling function zcorr";
         Double_t para[8];
         Double_t pars[3];
-        Int_t min = 0.1, max = 15; // select range for peak search
+        Int_t min = 10, max = 60; // select range for peak search
         for (Int_t i = 0; i < fNofPlanes; i++)
         {
             for (Int_t j = 0; j < fPaddlesPerPlane; j++)

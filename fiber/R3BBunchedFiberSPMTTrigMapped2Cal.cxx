@@ -107,7 +107,7 @@ void R3BBunchedFiberSPMTTrigMapped2Cal::Exec(Option_t* option)
         auto fine_ns = par->GetTimeClockTDC(fine_raw);
         LOG(DEBUG) << " R3BBunchedFiberSPMTTrigMapped2Cal::Exec: Fine raw=" << fine_raw << " -> ns=" << fine_ns << '.';
 
-        if (fine_ns < 0. || fine_ns >= 5)
+        if (fine_ns < 0. || fine_ns > 5)
         {
             LOG(ERROR) << "R3BBunchedFiberSPMTTrigMapped2Cal::Exec (" << fName << "): Channel=" << channel
                        << ": Bad Tamex fine time (raw=" << fine_raw << ",ns=" << fine_ns << ").";

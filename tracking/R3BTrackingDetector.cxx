@@ -49,12 +49,12 @@ InitStatus R3BTrackingDetector::Init()
 
     if (GetDetectorName().EqualTo("fi4"))
     {
-        offset_z = -0.01;
+        offset_z = 0.; //-0.01;
     }
 
     if (GetDetectorName().EqualTo("tofd"))
     {
-        offset_z = -0.25;
+        offset_z = 0.; //-0.25;
     }
 
     fGeo->printParams();
@@ -117,6 +117,8 @@ void R3BTrackingDetector::LocalToGlobal(TVector3& posGlobal, Double_t x_local, D
     posGlobal = TVector3(x_local, y_local, 0.);
     posGlobal.RotateY(fGeo->GetRotY() * TMath::DegToRad());
     posGlobal = posGlobal + pos0;
+    cout << "Local x: " << x_local << " y: " << y_local << endl;
+    cout << "global x: " << posGlobal.X() << " y: " << posGlobal.Y() << " z: " << posGlobal.Z() << endl;
 }
 
 Double_t R3BTrackingDetector::GetEnergyLoss(const R3BTrackingParticle* particle)
@@ -127,17 +129,28 @@ Double_t R3BTrackingDetector::GetEnergyLoss(const R3BTrackingParticle* particle)
     Double_t A2 = fGeo->GetA();
     Double_t density = fGeo->GetDensity();
     Double_t I = fGeo->GetI();
+    // cout << "Ionization: " << I << endl;
     Double_t Z1 = particle->GetCharge();
     const Double_t K = 0.307075;
     const Double_t me = 0.5109989461;
     Double_t beta = particle->GetBeta();
     Double_t gamma = particle->GetGamma();
+    Double_t m = particle->GetMass() * 1000.;
     Double_t dx = 2. * fGeo->GetDimZ() * density;
-    Double_t Tmax = 2 * me * TMath::Power(beta * gamma, 2);
+    //    Double_t Tmax = 2. * me * TMath::Power(beta * gamma, 2);
+    Double_t Tmax = 2. * me * TMath::Power(beta * gamma, 2) / (1. + (2. * gamma * me) / m + TMath::Power(me / m, 2));
+    // cout << "Test: " << Tmax << endl;
     Double_t h_omega = 28.816 * 1e-6 * TMath::Sqrt(density * Z2 / A2);
+    /*
+        Double_t eloss = dx * K * TMath::Power(Z1, 2) * Z2 / A2 / TMath::Power(beta, 2) *
+                         (0.5 * TMath::Log(2 * me * beta * beta * gamma * gamma * Tmax / (I * I)) - beta * beta -
+                          (TMath::Log(h_omega / I) + TMath::Log(beta * gamma) - 0.5));
+    */
     Double_t eloss = dx * K * TMath::Power(Z1, 2) * Z2 / A2 / TMath::Power(beta, 2) *
-                     (0.5 * TMath::Log(2 * me * beta * beta * gamma * gamma * Tmax / (I * I)) - beta * beta -
-                      (TMath::Log(h_omega / I) + TMath::Log(beta * gamma) - 0.5));
+                     (0.5 * TMath::Log(2 * me * beta * beta * gamma * gamma * Tmax / (I * I)) - beta * beta);
+
+    // cout << "Eloss: " << eloss << endl;
+
     //    Double_t eloss = dx * K * TMath::Power(Z1,2) * Z2/A2 / TMath::Power(beta,2) *
     //    (0.5*TMath::Log(2*me*beta*beta*gamma*gamma*Tmax/(I*I)) - beta*beta);
 
@@ -153,6 +166,7 @@ Double_t R3BTrackingDetector::GetEnergyLoss(const R3BTrackingParticle* particle)
     //        (TMath::Log(2*me*beta*beta*gamma*gamma/I) - beta*beta - (TMath::Log(h_omega/I) + TMath::Log(beta*gamma) -
     //        0.5));
     //    }
+
     return eloss;
 }
 

@@ -36,7 +36,7 @@ R3BFi4HitItem::R3BFi4HitItem(UInt_t detector,
                              Float_t energy_bottom,
                              Float_t time_top,
                              Float_t time_bottom)
-    : R3BHit(0, xpos, ypos, 0., 0.)
+    : R3BHit(0, xpos, ypos, (energy_top + energy_bottom) / 2., 0.)
     , fDetector(detector)
     , fFiber_n(fiber)
     , fEnergy_top(energy_top)

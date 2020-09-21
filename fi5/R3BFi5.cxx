@@ -92,7 +92,7 @@ void R3BFi5::SetSpecialPhysicsCuts()
     if (gGeoManager)
     {
         TGeoMedium* pSi = gGeoManager->GetMedium("silicon");
-        if (pSi)
+        if (pSi && 1 == 0)
         {
             // Setting processes for Si only
             gMC->Gstpar(pSi->GetId(), "LOSS", 3);

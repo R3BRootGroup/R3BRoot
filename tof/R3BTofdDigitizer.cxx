@@ -170,20 +170,20 @@ void R3BTofdDigitizer::Exec(Option_t* opt)
                     Y_Pos[channel] = vPoints[channel].at(point)->GetYIn(); // get y-position //local
                     Time[channel] = vPoints[channel].at(point)->GetTime();
                     Energy_Loss[channel] = vPoints[channel].at(point)->GetEnergyLoss();
-
-                    if (Energy_Loss[channel] < 0.03)
-                    {
-                        Energy_Loss[channel] = 2.;
-                    }
-                    else if (Energy_Loss[channel] < 0.08)
-                    {
-                        Energy_Loss[channel] = 6.;
-                    }
-                    else
-                    {
-                        Energy_Loss[channel] = 8.;
-                    }
-
+                    /*
+                                        if (Energy_Loss[channel] < 0.03)
+                                        {
+                                            Energy_Loss[channel] = 2.;
+                                        }
+                                        else if (Energy_Loss[channel] < 0.08)
+                                        {
+                                            Energy_Loss[channel] = 6.;
+                                        }
+                                        else
+                                        {
+                                            Energy_Loss[channel] = 8.;
+                                        }
+                    */
                     // add to HitData and introduce smearing of y-position, time and energy loss
                     cout << "Hit Tofd: ch = " << channel << " paddle = " << paddle_number << " x = " << X_Pos[channel]
                          << " y = " << Y_Pos[channel] << " t = " << Time[channel] << " eloss = " << Energy_Loss[channel]

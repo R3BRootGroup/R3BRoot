@@ -52,7 +52,7 @@ void Config()
     }
 
     auto runConfiguration =
-        new TG4RunConfiguration("geomRoot", physicsList, "stepLimiter+specialCuts" /*+specialControls"*/);
+        new TG4RunConfiguration("geomRoot", physicsList, "stepLimiter+specialCuts+specialControls");
     auto geant4 = new TGeant4("TGeant4", "The Geant4 Monte Carlo", runConfiguration);
 
     auto stack = new R3BStack(1000);

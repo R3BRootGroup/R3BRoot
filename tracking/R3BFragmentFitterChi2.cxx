@@ -130,8 +130,8 @@ double Chi2Backward(const double* xx)
             // time += (gCandidate->GetLength() - prev_l) / (gCandidate->GetBeta() * SPEED_OF_LIGHT);
             // prev_l = gCandidate->GetLength();
 
-            LOG(DEBUG2) << " at " << det->GetDetectorName() << ", momentum:" << gCandidate->GetMomentum().X() << ","
-                        << gCandidate->GetMomentum().Y() << gCandidate->GetMomentum().Z();
+            LOG(DEBUG2) << " at " << det->GetDetectorName() << ", momentum:" << gCandidate->GetMomentum().X() << ", "
+                        << gCandidate->GetMomentum().Y() << ", " << gCandidate->GetMomentum().Z();
         }
 
         if (gEnergyLoss)
@@ -183,7 +183,7 @@ void R3BFragmentFitterChi2::Init(R3BTPropagator* prop, Bool_t energyLoss)
     gProp = prop;
     gEnergyLoss = energyLoss;
 
-    fMinimum = ROOT::Math::Factory::CreateMinimizer("Minuit2", "");
+    fMinimum = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
 
     // set tolerance , etc...
     fMinimum->SetMaxFunctionCalls(1000000); // for Minuit/Minuit2
@@ -203,12 +203,12 @@ Int_t R3BFragmentFitterChi2::FitTrack(R3BTrackingParticle* particle, R3BTracking
 {
     gCandidate = particle;
 
-    ROOT::Math::Minimizer* minimum = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Combined");
+    ROOT::Math::Minimizer* minimum = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
 
     // set tolerance , etc...
     minimum->SetMaxFunctionCalls(1000000); // for Minuit/Minuit2
     minimum->SetMaxIterations(10000);      // for GSL
-    minimum->SetTolerance(0.001);
+    minimum->SetTolerance(0.0001);
     minimum->SetPrintLevel(0);
 
     // create funciton wrapper for minmizer
@@ -259,11 +259,11 @@ Int_t R3BFragmentFitterChi2::FitTrackBackward(R3BTrackingParticle* particle, R3B
     auto fi6 = gSetup->GetByName("fi6");
     // auto tof = gSetup->GetFirstByType(kTof);
 
-    double variable[1] = { 132. * 0.9314940954 };
+    double variable[1] = { 132. * amu };
     double step[1] = { 0.01 };
 
     // Set the free variables to be minimized!
-    fMinimum->SetLimitedVariable(0, "m", variable[0], step[0], 125. * 0.9314940954, 133. * 0.9314940954);
+    fMinimum->SetLimitedVariable(0, "m", variable[0], step[0], 125. * amu, 133. * amu);
 
     TVector3 pos1;
     TVector3 pos2;

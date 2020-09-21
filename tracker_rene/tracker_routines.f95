@@ -16,7 +16,7 @@ module vars
  logical, allocatable  :: trigger_matrix(:)                     ! true, if a certain pattern ID is allowed for a given track
  logical, allocatable  :: trigger_always_together(:,:)            ! true, if 2 detectors have to be hit together for a given track
  logical, allocatable  :: trigger_never_together(:,:)            ! true, if 2 detectors are never hit together for a given track
- logical               :: screen_output=.false.                        ! if true, standard output is screen, otherwise logfile
+ logical               :: screen_output=.true.                        ! if true, standard output is screen, otherwise logfile
  logical               :: calibration_event_by_event                ! true is calibration is done with events from experiment rather than average interception points
  logical               :: sweep_calibration                      ! true if calibration is done with magnetic sweep runs, .false. if done with scatter data
  character(LEN=256) :: ini_file, output_file(3), geometry_file,magnetic_field_file, derivative_file, calibration_data_file
@@ -231,7 +231,7 @@ subroutine multi_track_extended_output_from_cpp(array_size,n_points,det_coordina
  integer i
  character(LEN=1) c1
 !
- 
+! print*,'entered tracker'
  call multi_track_from_cpp(array_size,n_points,det_coordinates,double_track, local_target_position, &
                                 detector_id_in, charge_in, x_positions_in,y_positions_in,z_positions_in, &
                                  track_parameter_out, chi_parameter_out)
@@ -246,6 +246,8 @@ subroutine multi_track_extended_output_from_cpp(array_size,n_points,det_coordina
    read(*,*) c1
    if (c1 .eq. 'g' .or. c1 .eq. 'G') acknowledge_event = .false.
  end if
+! print*,'left tracker'
+
 end
 
 subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track, local_target_position, &

@@ -22,11 +22,7 @@ R3BPdcMappedData::R3BPdcMappedData()
 {
 }
 
-R3BPdcMappedData::R3BPdcMappedData(UInt_t plane,
-                                     UInt_t wire,
-                                     UInt_t edge,
-                                     UInt_t timeCoarse,
-                                     UInt_t timeFine)
+R3BPdcMappedData::R3BPdcMappedData(UInt_t plane, UInt_t wire, UInt_t edge, UInt_t timeCoarse, UInt_t timeFine)
     : fPlane(plane)
     , fWire(wire)
     , fEdge(edge)

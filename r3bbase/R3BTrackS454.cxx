@@ -2358,6 +2358,9 @@ void R3BTrackS454::Exec(Option_t* option)
             //    &max, &countdet, &det_coord, &st, target, detector, qdet, xdet, ydet, zdet, track, chi);
             multi_track_extended_output_from_cpp_(
                 &max, &countdet, &det_coord, &st, target, detector, qdet, xdet, ydet, zdet, track, chi, pat1, pat2);
+
+            cout << "back from tracker!" << endl;
+
             chi2 = chi[0] + chi[1];
             fh_chiy_vs_chix->Fill(chi[0], chi[1]);
             fh_chi2->Fill(chi2);

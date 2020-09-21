@@ -213,7 +213,7 @@ class R3BTofdCal2Hit : public FairTask
     //TH2F* fhChargevsPos;
     //TH2F* fhQp12;
     //TH2F* fhQp34;
-
+	TH2F* fhAverageCharge;
   public:
     ClassDef(R3BTofdCal2Hit, 1)
 };

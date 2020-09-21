@@ -23,9 +23,9 @@
 #include "FairLogger.h"
 #include "FairRuntimeDb.h"
 
+#include "R3BPdcMappedData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
-#include "R3BPdcMappedData.h"
 
 R3BPdcMapped2CalPar::R3BPdcMapped2CalPar()
     : FairTask("R3BPdcMapped2CalPar", 1)
@@ -93,7 +93,6 @@ void R3BPdcMapped2CalPar::Exec(Option_t* option)
 
         fEngine->Fill(mapped->GetPlaneId(), mapped->GetWireId(), mapped->GetEdgeId(), mapped->GetTimeFine());
     }
-
 }
 
 void R3BPdcMapped2CalPar::FinishEvent() {}

@@ -11,7 +11,6 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-
 #include "R3BGeoPdcPar.h"
 
 #include "FairParamList.h"
