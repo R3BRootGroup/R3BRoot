@@ -970,32 +970,41 @@ void R3BTrackS454::Exec(Option_t* option)
     Double_t yFi13[max];
     Double_t qFi13[max];
     Double_t tFi13[max];
-    Bool_t fFi13[max] = { false };
+    Bool_t fFi13[max];
     Double_t xFi12[max];
     Double_t yFi12[max];
     Double_t qFi12[max];
     Double_t tFi12[max];
-    Bool_t fFi12[max] = { false };
+    Bool_t fFi12[max];
     Double_t xFi11[max];
     Double_t yFi11[max];
     Double_t qFi11[max];
     Double_t tFi11[max];
-    Bool_t fFi11[max] = { false };
+    Bool_t fFi11[max];
     Double_t xFi10[max];
     Double_t yFi10[max];
     Double_t qFi10[max];
     Double_t tFi10[max];
-    Bool_t fFi10[max] = { false };
+    Bool_t fFi10[max];
     Double_t xFi3a[max];
     Double_t yFi3a[max];
     Double_t qFi3a[max];
     Double_t tFi3a[max];
-    Bool_t fFi3a[max] = { false };
+    Bool_t fFi3a[max];
     Double_t xFi3b[max];
     Double_t yFi3b[max];
     Double_t qFi3b[max];
     Double_t tFi3b[max];
-    Bool_t fFi3b[max] = { false };
+    Bool_t fFi3b[max];
+    for (int i = 0; i < max; i++)
+    {
+        fFi13[i] = false;
+        fFi12[i] = false;
+        fFi11[i] = false;
+        fFi10[i] = false;
+        fFi3a[i] = false;
+        fFi3b[i] = false;
+    }
 
     countdet = 0;
 
