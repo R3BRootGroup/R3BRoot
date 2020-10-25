@@ -27,48 +27,48 @@ TGraph createLookupGraph(std::function<Double_t(Double_t)> distribution,
 {
     const Double_t step = (upper_bound - lower_bound) / samples;
 
-    Double_t x, y;
-    TGraph steppingGraph, integralGraph;
-
-    steppingGraph.SetPoint(0, lower_bound, 0);
-
+    TGraph steppingGraph;
+    steppingGraph.Expand(samples + 2);
+    steppingGraph.SetPoint(steppingGraph.GetN(), lower_bound, 0);
     for (int i = 0; i <= samples; ++i)
     {
-        x = lower_bound + i * step;
-        y = distribution(x);
-        if (y < 0)
+        const auto x = lower_bound + i * step;
+        const auto y = distribution(x);
+        if (y < 0.)
             throw std::underflow_error("Found negative value inside data!");
 
         steppingGraph.SetPoint(steppingGraph.GetN(), x, y);
     }
     steppingGraph.SetPoint(steppingGraph.GetN(), upper_bound, 0);
 
-    const auto invInt = 1.0 / steppingGraph.Integral();
+    const auto invInt = 1. / steppingGraph.Integral();
 
-    integralGraph.SetPoint(integralGraph.GetN(), lower_bound, 0);
-    for (int i = 1; i < steppingGraph.GetN() - 1; ++i)
+    TGraph integralGraph;
+    integralGraph.Expand(samples);
+    for (int i = 1; i < steppingGraph.GetN() - 2; ++i)
     {
+        Double_t x, y;
         steppingGraph.GetPoint(i + 1, x, y);
-        steppingGraph.SetPoint(i + 1, x, 0); // For Integral Method
+        steppingGraph.SetPoint(i + 1, x - step, 0.); // For Integral Method
 
         integralGraph.SetPoint(integralGraph.GetN(), x - step, steppingGraph.Integral(0, i + 1) * invInt);
         steppingGraph.SetPoint(i + 1, x, y); // Reset
     }
     integralGraph.SetPoint(integralGraph.GetN(), upper_bound, 1);
 
-    TGraph targetG;
+    // inverse Graph
+    auto x = integralGraph.GetX();
+    auto y = integralGraph.GetY();
     for (int i = 0; i < integralGraph.GetN(); ++i)
-    {
-        integralGraph.GetPoint(i, x, y);
-        targetG.SetPoint(i, y, x);
-    }
+        integralGraph.SetPoint(i, y[i], x[i]);
 
-    return targetG;
+    return integralGraph;
 }
 
 TGraph createLookupGraph(const TH1& distribution, const Double_t lower_bound, const Double_t upper_bound)
 {
     TGraph integralGraph;
+    integralGraph.Expand(distribution.GetNbinsX() + 1);
     Double_t integral = 0;
     integralGraph.SetPoint(integralGraph.GetN(), lower_bound, 0);
     Int_t startbin = distribution.GetXaxis()->FindBin(lower_bound),
@@ -204,7 +204,7 @@ R3BDistribution<Dim> R3BDistribution1D::Data(const TF1& data)
 R3BDistribution<Dim> R3BDistribution1D::Data(const TF1& data, const Double_t lower_bound, const Double_t upper_bound)
 {
     if (lower_bound < data.GetXmin() || upper_bound > data.GetXmax())
-        throw std::range_error(std::string(__func__) + " : bounds outsie of data-range");
+        throw std::range_error(std::string(__func__) + " : bounds outside of data-range");
 
     auto g = createLookupGraph([&data](Double_t val) { return data.Eval(val); }, lower_bound, upper_bound);
     return R3BDistribution<1>([g](Arr values) -> Arr { return { g.Eval(values[0]) }; });

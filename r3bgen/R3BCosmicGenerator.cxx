@@ -25,6 +25,7 @@
 
 #include <vector>
 
+// Data from doi.org/10.1016/0029-554X(81)91039-9
 const std::vector<Double_t> _Distribution_EnergyValues = { .004, .01, .02, .04, .1,  .2,  .4,
                                                            1.,   2.,  4.,  10., 20., 40., 100. };
 const std::vector<Double_t> _Distribution_PropabilityValues = { 5.89E-7, 1.05E-6, 1.63E-6, 2.34E-6, 3.13E-6,
