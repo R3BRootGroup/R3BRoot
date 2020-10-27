@@ -19,59 +19,61 @@
 
 #include "R3BAtima.h"
 
-class R3BAtimaCache
+namespace R3BAtima
 {
-  public:
-    struct RangeSelector
+    class Cache
     {
-        // RangeSelector(const Double_t min, const Double_t max, const Int_t steps) : MinValue(min), MaxValue(max),
-        // Steps(steps){}
-
-        bool operator==(const RangeSelector& other) const
+      public:
+        struct RangeSelector
         {
-            return (MinValue == other.MinValue && MaxValue == other.MaxValue && Steps == other.Steps);
-        }
-        bool operator!=(const RangeSelector& other) const { return !(*this == other); }
+            // RangeSelector(const Double_t min, const Double_t max, const Int_t steps) : MinValue(min), MaxValue(max),
+            // Steps(steps){}
 
-        Double_t MinValue;
-        Double_t MaxValue;
-        Int_t Steps;
+            bool operator==(const RangeSelector& other) const
+            {
+                return (MinValue == other.MinValue && MaxValue == other.MaxValue && Steps == other.Steps);
+            }
+            bool operator!=(const RangeSelector& other) const { return !(*this == other); }
+
+            Double_t MinValue;
+            Double_t MaxValue;
+            Int_t Steps;
+        };
+
+        Cache(const Double_t pMass_u,
+              const Double_t pCharge_e,
+              const RangeSelector& energies_MeV_per_u,
+              const TargetMaterial& targetMaterial,
+              const RangeSelector& distances_mm);
+        Cache(const Double_t pMass_u,
+              const Double_t pCharge_e,
+              const RangeSelector& energies_MeV_per_u,
+              const TargetMaterial& targetMaterial,
+              const RangeSelector& distances_mm,
+              const TString& path);
+
+        TransportResult operator()(const Double_t energy_MeV_per_u, const Double_t distance_mm) const;
+
+      private:
+        Bool_t read(const TString& path);
+        void write(const TString& path) const;
+        void calculate();
+
+        Double_t fProjMass;
+        Double_t fProjCharge;
+        RangeSelector fEnergies;
+        TargetMaterial fTargetMaterial; //!
+        RangeSelector fDistances;
+
+        mutable TGraph2D fG_ELoss;
+        mutable TGraph2D fG_EStrag;
+        mutable TGraph2D fG_AngStrag;
+        mutable TGraph2D fG_Range;
+        mutable TGraph2D fG_RemainigRange;
+        mutable TGraph2D fG_dEdXIn;
+        mutable TGraph2D fG_dEdXOut;
+        mutable TGraph2D fG_ToF;
+        mutable TGraph2D fG_InterpolatedTargetThickness;
     };
-
-    R3BAtimaCache(const Double_t pMass_u,
-                  const Double_t pCharge_e,
-                  const RangeSelector& energies_MeV,
-                  const R3BAtimaTargetMaterial& targetMaterial,
-                  const RangeSelector& distances_mm);
-    R3BAtimaCache(const Double_t pMass_u,
-                  const Double_t pCharge_e,
-                  const RangeSelector& energies_MeV,
-                  const R3BAtimaTargetMaterial& targetMaterial,
-                  const RangeSelector& distances_mm,
-                  const TString& path);
-
-    R3BAtimaTransportResult operator()(const Double_t energy_AMeV, const Double_t distance_mm) const;
-
-  private:
-    Bool_t read(const TString& path);
-    void write(const TString& path) const;
-    void calculate();
-
-    Double_t fProjMass;
-    Double_t fProjCharge;
-    RangeSelector fEnergies;
-    R3BAtimaTargetMaterial fTargetMaterial; //!
-    RangeSelector fDistances;
-
-    mutable TGraph2D fG_ELoss;
-    mutable TGraph2D fG_EStrag;
-    mutable TGraph2D fG_AngStrag;
-    mutable TGraph2D fG_Range;
-    mutable TGraph2D fG_RemainigRange;
-    mutable TGraph2D fG_dEdXIn;
-    mutable TGraph2D fG_dEdXOut;
-    mutable TGraph2D fG_ToF;
-    mutable TGraph2D fG_InterpolatedTargetThickness;
-};
-
+} // namespace R3BAtima
 #endif
