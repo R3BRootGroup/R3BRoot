@@ -22,31 +22,31 @@ namespace
     TEST(testR3BAtima, basicCalculation)
     {
         // Eloss of 100 MeV Protons in 1cm LH2
-        const auto eloss = R3BAtima::Calculate_mm(1., 1., 100., R3BAtimaTargetMaterial::LH2, 10).ELoss_AMeV;
+        const auto eloss = R3BAtima::Calculate_mm(1., 1., 100., R3BAtima::TargetMaterial::LH2, 10).ELoss_MeV_per_u;
 
         EXPECT_NEAR(eloss, ELOSS_Prot100, 0.01);
     }
 
     TEST(testR3BAtima, cacheCalculation)
     {
-        const auto cache = R3BAtimaCache(1., 1., { 100., 200., 10 }, R3BAtimaTargetMaterial::LH2, { 10., 50., 4 });
-        EXPECT_GT(cache(100., 18.).ELoss_AMeV, ELOSS_Prot100);
-        EXPECT_LT(cache(107., 10.).ELoss_AMeV, ELOSS_Prot100);
+        const auto cache = R3BAtima::Cache(1., 1., { 100., 200., 10 }, R3BAtima::TargetMaterial::LH2, { 10., 50., 4 });
+        EXPECT_GT(cache(100., 18.).ELoss_MeV_per_u, ELOSS_Prot100);
+        EXPECT_LT(cache(107., 10.).ELoss_MeV_per_u, ELOSS_Prot100);
     }
 
     TEST(testR3BAtima, writeReadCache)
     {
         {
             // create cache file
-            const auto cache1 =
-                R3BAtimaCache(1., 1., { 100., 200., 10 }, R3BAtimaTargetMaterial::LH2, { 10., 50., 4 }, "test.atima");
+            const auto cache1 = R3BAtima::Cache(
+                1., 1., { 100., 200., 10 }, R3BAtima::TargetMaterial::LH2, { 10., 50., 4 }, "test.atima");
         }
         // read cache file
         const auto cache1 =
-            R3BAtimaCache(1., 1., { 100., 200., 10 }, R3BAtimaTargetMaterial::LH2, { 10., 50., 4 }, "test.atima");
+            R3BAtima::Cache(1., 1., { 100., 200., 10 }, R3BAtima::TargetMaterial::LH2, { 10., 50., 4 }, "test.atima");
         // calculate without cache file
-        const auto cache2 = R3BAtimaCache(1., 1., { 100., 200., 10 }, R3BAtimaTargetMaterial::LH2, { 10., 50., 4 });
-        EXPECT_EQ(cache1(100., 20.).ELoss_AMeV, cache2(100., 20.).ELoss_AMeV);
+        const auto cache2 = R3BAtima::Cache(1., 1., { 100., 200., 10 }, R3BAtima::TargetMaterial::LH2, { 10., 50., 4 });
+        EXPECT_EQ(cache1(100., 20.).ELoss_MeV_per_u, cache2(100., 20.).ELoss_MeV_per_u);
     }
 
 } // namespace
