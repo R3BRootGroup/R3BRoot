@@ -188,7 +188,8 @@ void R3BAsciiGenerator::RegisterIons()
                 if (ions.find(pdg) == ions.end())
                 {
                     const double mass = G4NistManager::Instance()->GetIsotopeMass(iZ, iA) / CLHEP::GeV;
-                    LOG(DEBUG) << "R3BAsciiGenerator: New ion " << iZ << "\t" << iA << "\t" << mass;
+                    LOG(INFO) << "Test " << mass / 0.931494028;
+                    LOG(INFO) << "R3BAsciiGenerator: New ion " << iZ << "\t" << iA << "\t" << mass;
                     ions[pdg] = new FairIon(TString::Format("Ion_%d_%d", iA, iZ), iZ, iA, iZ, 0., mass);
                 }
             }

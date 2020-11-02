@@ -19,6 +19,8 @@
  ******************************************************************************/
 
 #include "R3BFragmentTracker.h"
+#include "FairIon.h"
+#include "G4NistManager.hh"
 #include "R3BFi4HitItem.h"
 #include "R3BFragmentFitterGeneric.h"
 #include "R3BGladFieldMap.h"
@@ -48,8 +50,8 @@
 using namespace std;
 
 #define SPEED_OF_LIGHT 29.9792458 // cm/ns
-#define Amu 0.938272
-#define Fair_Amu 0.931494028
+//#define Amu 0.938272
+//#define Fair_Amu 0.931494028
 
 R3BFragmentTracker::R3BFragmentTracker(const char* name, Bool_t vis, Int_t verbose)
     : FairTask(name, verbose)
@@ -236,8 +238,11 @@ void R3BFragmentTracker::Exec(const Option_t*)
                                                             ion->GetPz(),
                                                             beta,
                                                             ion->GetMass());
-    // LOG(INFO) << "MC mass " << ion->GetMass();
-    // LOG(INFO) << "MC beta " << beta;
+    LOG(INFO) << "MC mass " << ion->GetMass() / amu;
+    LOG(INFO) << "MC momentum "
+              << sqrt(ion->GetPx() * ion->GetPx() + ion->GetPy() * ion->GetPy() + ion->GetPz() * ion->GetPz()) /
+                     ion->GetMass() / amu;
+    LOG(INFO) << "MC beta " << beta;
 
     fh_mult_psp->Fill(psp->hits.size());
     fh_mult_fi4->Fill(fi4->hits.size());
@@ -297,7 +302,7 @@ void R3BFragmentTracker::Exec(const Option_t*)
 
                             // Create object for particle which will be fitted
                             R3BTrackingParticle* candidate = new R3BTrackingParticle(
-                                particle->GetCharge(), 0., 0., 0., 0., 0., 0., velocity0, 132. * Amu);
+                                particle->GetCharge(), 0., 0., 0., 0., 0., 0., velocity0, 128. * amu);
 
                             candidate->AddHit("target", 0);
                             if (ipsp >= 0)
@@ -339,7 +344,7 @@ void R3BFragmentTracker::Exec(const Option_t*)
 
                                 // candidate->GetStartPosition().Print();
                                 // candidate->GetStartMomentum().Print();
-                                // cout << "chi2: " << candidate->GetChi2() << endl;
+                                cout << "chi2: " << candidate->GetChi2() << endl;
                                 // status = FitFragment(candidate);
 
                                 if (0 == status)
@@ -385,21 +390,40 @@ void R3BFragmentTracker::Exec(const Option_t*)
             {
                 candidate = x;
                 minChi2 = x->GetChi2();
+                cout << "New min chi2: " << minChi2 << endl;
+                cout << "Corresponding Mass   : " << x->GetMass() << endl;
+                cout << "Corresponding Mass   : " << candidate->GetMass() << endl;
             }
         }
 
-        fh_A_reco2->Fill(candidate->GetMass() / Fair_Amu);
-        candidate->SetMass(TMath::Nint(candidate->GetMass() / Fair_Amu) * Fair_Amu);
+        // Find out the mass
+        const double mass =
+            G4NistManager::Instance()->GetIsotopeMass(candidate->GetCharge(), TMath::Nint(candidate->GetMass() / amu)) /
+            CLHEP::GeV;
+        cout << "Test: " << candidate->GetCharge() << "  " << TMath::Nint(candidate->GetMass() / amu) << "  " << mass
+             << endl;
+
+        // fh_A_reco2->Fill(candidate->GetMass() / Fair_Amu);
+        fh_A_reco2->Fill(candidate->GetMass() / amu);
+        // candidate->SetMass(TMath::Nint(candidate->GetMass() / Fair_Amu) * Fair_Amu);
+        cout << "Set integer mass: " << TMath::Nint(candidate->GetMass() / amu)
+             << " before: " << candidate->GetMass() / amu << endl;
+
+        // candidate->SetMass(TMath::Nint(candidate->GetMass() / amu) * amu);
+        // candidate->SetMass(mass);
+
         candidate->UpdateMomentum();
+        cout << "Fit Beta, start: " << candidate->GetStartBeta() << endl;
         fFitter->FitTrackBeta(candidate, fDetectors);
+        cout << "Fit Beta, end: " << candidate->GetStartBeta() << endl;
 
         Double_t momentum0 = candidate->GetStartMomentum().Mag();
         LOG(DEBUG1);
-        LOG(DEBUG1) << "RESULT : " << momentum0;
-        LOG(DEBUG1) << "TRUTH  : " << particle->GetMomentum().Mag();
+        LOG(DEBUG1) << "Momentum : " << momentum0;
+        LOG(DEBUG1) << "Truth  : " << particle->GetMomentum().Mag();
         LOG(DEBUG1) << "Resolution: " << (momentum0 - particle->GetMomentum().Mag()) / particle->GetMomentum().Mag();
-        LOG(DEBUG1) << "Mass   : " << candidate->GetMass() / amu;
-        LOG(DEBUG1) << "Truth  : " << particle->GetMass() / amu;
+        LOG(DEBUG1) << "Mass   : " << candidate->GetMass();
+        LOG(DEBUG1) << "Truth  : " << particle->GetMass();
         LOG(DEBUG1) << "Mass resolution : " << (candidate->GetMass() - particle->GetMass()) / particle->GetMass();
         LOG(DEBUG1) << "Beta   : " << candidate->GetStartBeta();
         LOG(DEBUG1) << "Truth  : " << particle->GetStartBeta();
@@ -408,6 +432,7 @@ void R3BFragmentTracker::Exec(const Option_t*)
 
         fh_mom_res->Fill((momentum0 - particle->GetStartMomentum().Mag()) / particle->GetStartMomentum().Mag());
         fh_chi2->Fill(candidate->GetChi2());
+        cout << "chi2: " << candidate->GetChi2() << endl;
         int imass = TMath::Nint(candidate->GetMass() / amu);
         int imass_mc = TMath::Nint(particle->GetMass() / amu);
         fh_mass_res->Fill(imass - imass_mc);

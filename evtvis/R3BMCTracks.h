@@ -27,6 +27,6 @@ class R3BMCTracks : public FairMCTracks
     virtual InitStatus Init();
     virtual void Exec(Option_t* option);
 
-    ClassDef(R3BMCTracks, 1);
+    ClassDef(R3BMCTracks, 4);
 };
 #endif

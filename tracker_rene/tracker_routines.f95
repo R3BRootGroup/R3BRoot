@@ -231,7 +231,7 @@ subroutine multi_track_extended_output_from_cpp(array_size,n_points,det_coordina
  integer i
  character(LEN=1) c1
 !
-! print*,'entered tracker'
+ 
  call multi_track_from_cpp(array_size,n_points,det_coordinates,double_track, local_target_position, &
                                 detector_id_in, charge_in, x_positions_in,y_positions_in,z_positions_in, &
                                  track_parameter_out, chi_parameter_out)
@@ -246,8 +246,6 @@ subroutine multi_track_extended_output_from_cpp(array_size,n_points,det_coordina
    read(*,*) c1
    if (c1 .eq. 'g' .or. c1 .eq. 'G') acknowledge_event = .false.
  end if
-! print*,'left tracker'
-
 end
 
 subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track, local_target_position, &
@@ -392,7 +390,7 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
              if (charge1>0 .and. charge1 /=track_points_charge(d,track_hit_numbers1(d))) then
                track1_ok = .false.
                if (debug_track) then
-                 write(output_unit,*) 'Multi hit routine, doube track 1, charge missmatch!',&
+                 write(output_unit,*) 'Multi hit routine, double track 1, charge missmatch!',&
                  charge1,track_points_charge(d,track_hit_numbers1(d))
                end if  
              end if
@@ -405,7 +403,7 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
      track_hit_numbers2 = 0
       
      if (track1_ok) then
-       counter(1) = counter(1) + 1                                                                ! counter for all double track1 candidates
+       counter(2) = counter(2) + 1                                                                ! counter for all double track1 candidates
        all_done2 = .false.
 !
        do
@@ -455,20 +453,32 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
          end if  
          if (track2_ok) then
            counter(4) = counter(4) + 1                                                            
+! 
+! check crossing of tracks
+! 
            right = .true.
+           left  = .true.
            do d=1,nbr_detectors
-             if (track_hit_pattern2(d) .and.track_hit_pattern1(d) ) then
+             if (track_hit_pattern2(d) .and. track_hit_pattern1(d) ) then
                right = right .and. (track_hit_numbers2(d) > track_hit_numbers1(d))                        ! interception point is right of track1
+               left  = left  .and. (track_hit_numbers2(d) < track_hit_numbers1(d))                        ! interception point is right of track1
              end if
-             track2_ok  = track2_ok .and. right                                                                            ! all interception points are right
+             track2_ok  = track2_ok .and. (right .or. left)                                               ! all interception points are all right or all left
              if (.not. track2_ok) then
+               if (debug_track) then
+                 write(output_unit,*) '  tracks are crossing!!!! Detector', detector_name(d)
+               end if  
                exit
+               track2_ok = .true.   ! overrule crossing check for now
              end if  
            end do
          end if  
+!
+
+
 !         
          if (track2_ok) then    ! let's track...
-           counter(2) = counter(2)+1
+           counter(5) = counter(5)+1
 !
            call get_double_track_parameter_var8
 !
@@ -604,7 +614,7 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
          all_done1 = (d1 == nbr_detectors)
        end if
      end do
-     counter(5) = counter(5)+1
+     counter(1) = counter(1)+1
      if (all_done1) exit
 !       write(output_unit,*) 'multi: track_hit_numbers1', track_hit_numbers1,' *** ',nbr_hits_per_detector
 !       write(output_unit,*) 'multi-counter', counter
@@ -829,7 +839,17 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
 !
  if (debug_track) then
    write(output_unit,*)  'Multi: number of data points:',n_points
-   write(output_unit,*)  'Multi: some counting of events:',counter
+   if (double_track) then
+     write(output_unit,*)  'Multi (double track) - number of T1 candidates                                   :',counter(1)
+     write(output_unit,*)  'Multi (double track) - number of T2 candidates                                   :',counter(6)
+     write(output_unit,*)  'Multi (double track) - number of T1 fulfilling Logik string                      :',counter(2)
+     write(output_unit,*)  'Multi (double track) - number of T1 & T2 fulfilling Logik string                 :',counter(3)
+     write(output_unit,*)  'Multi (double track) - number of T1 & T2 - Logik & no reference X-ing            :',counter(4)
+     write(output_unit,*)  'Multi (double track) - number of T1 & T2 - Logik & no reference & no track X-ing :',counter(5)
+   else
+     write(output_unit,*)  'Multi (single track) - number of combinations                :',counter(1),counter(6)
+     write(output_unit,*)  'Multi (single track) - number of good tracks sent to tracking:',counter(2)
+   end if  
  end if  
 
 

@@ -42,6 +42,7 @@ set(SRCS
 R3BBunchedFiberMapped2CalPar.cxx
 R3BBunchedFiberMapped2Cal.cxx
 R3BBunchedFiberCal2Hit.cxx
+R3BBunchedFiberCal2Hit_s494.cxx
 R3BBunchedFiberHitModulePar.cxx
 R3BBunchedFiberHitPar.cxx
 R3BFiberContFact.cxx

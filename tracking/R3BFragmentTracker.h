@@ -59,7 +59,8 @@ class R3BFragmentTracker : public FairTask
     Int_t fNEvents;
     Bool_t fVis;
 //   	Double_t amu = 0.93149410242;
-   	Double_t amu = 0.938272;
+   	Double_t amu = 0.931494028;   // Gev/c**2
+   	//0.938272;
 
     R3BFragmentFitterGeneric* fFitter;
     Bool_t fEnergyLoss;

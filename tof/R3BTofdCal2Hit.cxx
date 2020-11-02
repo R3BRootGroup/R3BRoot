@@ -1183,22 +1183,23 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 if (bar > 27 && bar < 41)
                 {
                     // cout << "ihit: " << ihit << " plane: " << tArrP[ihit] << " bar: " << tArrB[ihit]
-                    // 	<< "  Q: " << tArrQ[ihit] << endl;
+                    //	<< "  Q: " << tArrQ[ihit] << endl;
 
                     // cout << "so far: " << nAverage14[bar] << " Q: " << sumQ14[bar] / nAverage14[bar] << endl;
-                    if (abs(tArrQ[ihit] - sumQ14[bar] / nAverage14[bar]) < maxChargeDiff || nAverage14[bar] == 0)
+                    if (tArrP[ihit] > 0)
                     {
+                        if (abs(tArrQ[ihit] - sumQ14[bar] / nAverage14[bar]) < maxChargeDiff || nAverage14[bar] == 0)
+                        {
 
-                        // cout << "Average " << nAverage14[bar] << " Try to average "  << sumQ14[bar] / nAverage14[bar]
-                        // << " with " << tArrQ[ihit] << " plane: " << tArrP[ihit] << " Bar: " << tArrB[ihit] << endl;
+                            // cout << "Average " << nAverage14[bar] << " Try to average "  << sumQ14[bar] /
+                            // nAverage14[bar]
+                            // << " with " << tArrQ[ihit] << " plane: " << tArrP[ihit] << " Bar: " << tArrB[ihit] <<
+                            // endl;
 
-                        nAverage14[bar]++;          // number of averaged hits in this coincidence window
-                        sumQ14[bar] += tArrQ[ihit]; // average charges and add to sum
+                            nAverage14[bar]++;          // number of averaged hits in this coincidence window
+                            sumQ14[bar] += tArrQ[ihit]; // average charges and add to sum
+                        }
                     }
-                }
-                if (fTofdHisto && nAverage14[bar] == 4)
-                {
-                    fhAverageCharge->Fill(bar, sumQ14[bar] / nAverage14[bar]);
                 }
             }
 
@@ -1219,6 +1220,11 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                     fhMvsQ[2]->Fill(sumQ34, nAverage34); // Fill histogram number of averaged hits vs summed up charge
             }
         }
+        for (Int_t b = 0; b < 45; b++)
+            if (fTofdHisto && nAverage14[b] > 0)
+            {
+                fhAverageCharge->Fill(b, sumQ14[b] / nAverage14[b]);
+            }
     }
     for (Int_t hit = 0; hit < 2 * nHitsEvent; hit++)
     { // loop over not averaged hits

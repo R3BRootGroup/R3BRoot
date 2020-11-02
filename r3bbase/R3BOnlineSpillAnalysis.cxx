@@ -147,7 +147,7 @@ InitStatus R3BOnlineSpillAnalysis::Init()
         fCalItems.push_back((TClonesArray*)mgr->GetObject(Form("%sCal", fDetectorNames[det])));
         fHitItems.push_back((TClonesArray*)mgr->GetObject(Form("%sHit", fDetectorNames[det])));
     }
-
+    puts("1111111111111111111111111111111111111111111111111111111111");
     //------------------------------------------------------------------------
     // create histograms of all detectors
     //------------------------------------------------------------------------
@@ -986,7 +986,7 @@ InitStatus R3BOnlineSpillAnalysis::Init()
     run->AddObject(cDutyF);
     // gPad->SetLogy(); gStyle->SetOptFit(1111);
     // run->GetHttpServer()->RegisterCommand("Reset_POIS", Form("/Tasks/%s/->Reset_SPILLMON_Histo()", GetName()));
-
+    puts("9999999999999999999999999999999999999999999999999999999");
     return kSUCCESS;
 }
 
@@ -1100,7 +1100,7 @@ void R3BOnlineSpillAnalysis::Reset_FIBERS_Histo()
 void R3BOnlineSpillAnalysis::Exec(Option_t* option)
 {
 
-    //  cout << "fNEvents " << fNEvents << endl;
+    cout << "fNEvents " << fNEvents << endl;
 
     FairRootManager* mgr = FairRootManager::Instance();
     if (NULL == mgr)
@@ -3067,7 +3067,7 @@ void R3BOnlineSpillAnalysis::Exec(Option_t* option)
     }
 
     fNEvents += 1;
-    // cout<<"fNEvents: "<<fNEvents<<endl;
+    cout << "fNEvents end: " << fNEvents << endl;
 }
 
 void R3BOnlineSpillAnalysis::FinishEvent()

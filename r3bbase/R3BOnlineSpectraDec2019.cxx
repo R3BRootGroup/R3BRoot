@@ -584,9 +584,9 @@ InitStatus R3BOnlineSpectraDec2019::Init()
                                                N_FIBER_PLOT_2019,
                                                0.,
                                                N_FIBER_PLOT_2019,
-                                               2000,
+                                               500,
                                                0.,
-                                               200);
+                                               50);
             fh_ToT_m_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
             fh_ToT_m_Fib[ifibcount]->GetYaxis()->SetTitle("ToT / ns");
 
@@ -596,9 +596,9 @@ InitStatus R3BOnlineSpectraDec2019::Init()
                                                N_FIBER_PLOT_2019,
                                                0.,
                                                N_FIBER_PLOT_2019,
-                                               2000,
+                                               500,
                                                0.,
-                                               200.);
+                                               50.);
             fh_ToT_s_Fib[ifibcount]->GetXaxis()->SetTitle("Fiber number");
             fh_ToT_s_Fib[ifibcount]->GetYaxis()->SetTitle("ToT / ns");
 
@@ -2452,6 +2452,19 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
                 //                if (!(tMAPMT > 0.) || !(tSPMT > 0.))
                 //                    continue;
 
+                dtime = tMAPMT - tSPMT;
+
+                xpos = iFib;
+                ypos = dtime;
+
+                fh_fibers_Fib[ifibcount]->Fill(iFib);
+                fh_ToT_s_Fib[ifibcount]->Fill(iFib, hit->GetSPMTToT_ns());
+                fh_ToT_m_Fib[ifibcount]->Fill(iFib, hit->GetMAPMTToT_ns());
+                fh_time_Fib[ifibcount]->Fill(iFib, tMAPMT - tSPMT);
+                fh_Fib_pos_xy[ifibcount]->Fill(xpos, ypos);
+                fh_Fib_vs_Events[ifibcount]->Fill(fNEvents, iFib);
+                fh_ToT_single_Fib[ifibcount]->Fill(1, hit->GetSPMTToT_ns());
+
                 // loop over all hits of LOS1:
                 for (Int_t lhit = 0; lhit < nPartLos[0]; lhit++)
                 {
@@ -2472,8 +2485,6 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
                     if (pileup)
                         continue;
 
-                    dtime = tMAPMT - tSPMT;
-
                     // Not-calibrated ToF:
                     // tfib = (tMAPMT + tSPMT) / 2.;
                     // tfib = tSPMT;
@@ -2489,8 +2500,8 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
                     {
                         tof_fib -= 2048 * 1000. / 150.;
                     }
-                    cout << "Test " << tof_fib << "  " << tfib << "  " << hit->GetMAPMTToT_ns() << "  "
-                         << hit->GetSPMTToT_ns() << "  " << lhit << "  " << timeLos[0][lhit] << endl;
+                    // cout << "Test " << tof_fib << "  " << tfib << "  " << hit->GetMAPMTToT_ns() << "  "
+                    //     << hit->GetSPMTToT_ns() << "  " << lhit << "  " << timeLos[0][lhit] << endl;
 
                     // if ToF between LOS1 and fiber is not okay, go to next
                     //                    if (tof_fib < tof_fiber[ifibcount] - 10. || tof_fib > tof_fiber[ifibcount]
@@ -2500,8 +2511,6 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
                     // Not-calibrated position:
                     randx = (std::rand() / (float)RAND_MAX);
                     //                if(iFib > 0) xpos = ((-n_fiber[ifibcount]/2.+iFib+(0.5-randx)))*0.21;
-                    xpos = iFib;
-                    ypos = dtime;
 
                     // if not resonable y-position, go to next
                     //                    if (ypos < 70. || ypos > 100.)
@@ -2520,15 +2529,8 @@ void R3BOnlineSpectraDec2019::Exec(Option_t* option)
                         // cout<<"new imax "<<iFibMax_MA<<" max "<<totMax_MA<<endl;
                     }
 
-                    fh_fibers_Fib[ifibcount]->Fill(iFib);
-                    fh_ToT_s_Fib[ifibcount]->Fill(iFib, hit->GetSPMTToT_ns());
-                    fh_ToT_m_Fib[ifibcount]->Fill(iFib, hit->GetMAPMTToT_ns());
-                    fh_time_Fib[ifibcount]->Fill(iFib, tMAPMT - tSPMT);
-                    cout << "Result " << iFib << "  " << tof_fib << endl;
+                    // cout << "Result " << iFib << "  " << tof_fib << endl;
                     fh_Fib_ToF[ifibcount]->Fill(iFib, tof_fib);
-                    fh_Fib_pos_xy[ifibcount]->Fill(xpos, ypos);
-                    fh_Fib_vs_Events[ifibcount]->Fill(fNEvents, iFib);
-                    fh_ToT_single_Fib[ifibcount]->Fill(1, hit->GetSPMTToT_ns());
 
                 } // end for (lhit)
             }     // end for(ihit)

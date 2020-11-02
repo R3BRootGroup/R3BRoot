@@ -93,7 +93,7 @@ Bool_t R3BLosReader::Init(ext_data_struct_info* a_struct_info)
         data->LOS[d].TTFTM = 0;
         data->LOS[d].TTCLM = 0;
         data->LOS[d].TTCTM = 0;
-        data->LOS[d].MTM = 0;
+        // data->LOS[d].MTM = 0;
     }
     return kTRUE;
 }
@@ -331,7 +331,7 @@ Bool_t R3BLosReader::Read()
         //
         // MTDC32
         //
-
+#if 0
         numChannels = data->LOS[d].MTM;
         curChannelStart = 0;
         // cout<<data->LOS[d].MTM<<endl;
@@ -354,6 +354,7 @@ Bool_t R3BLosReader::Read()
                }*/
             curChannelStart = nextChannelStart;
         }
+#endif
         if (data->LOS[d].VTF > 0)
         {
             // cout<<"nsumv & data->LOS[d].VTF "<<d+1<<"; "<<nsumv<<"; "<< data->LOS[d].VTF<<endl;

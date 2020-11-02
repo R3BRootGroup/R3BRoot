@@ -53,7 +53,8 @@ class R3BFragmentFitterChi2 : public R3BFragmentFitterGeneric
   private:
     ROOT::Math::Minimizer* fMinimum;
     R3BTPropagator* fPropagator;
-   	Double_t amu = 0.938272;
+   	//Double_t amu = 0.938272;
+   	Double_t amu = 0.931494028;   // Gev/c**2
 
     ClassDef(R3BFragmentFitterChi2, 1)
 };

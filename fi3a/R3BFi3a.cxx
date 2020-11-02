@@ -200,6 +200,7 @@ Bool_t R3BFi3a::ProcessHits(FairVolume* vol)
             fPosOut.SetY(newpos[1]);
             fPosOut.SetZ(newpos[2]);
         }
+        cout << "Test Fi3a" << endl;
 
         AddHit(fTrackID,
                /*fVolumeID*/ /*copyNo*/ planeNr,

@@ -241,6 +241,8 @@ class R3BTrackS454 : public FairTask
 	Int_t counterRolu = 0;
 	Int_t counterTracker = 0;
 	Int_t countdet;
+	Int_t countdet_s;
+	
 	Double_t hits1 = 0;
 	Double_t hits10 = 0;
 	Double_t hits10bc = 0;

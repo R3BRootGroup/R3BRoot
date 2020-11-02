@@ -384,9 +384,10 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
             {
                 auto cur_cal_trig_i = fMAPMTTriggerMap[ch_i];
                 auto lead_trig_i = fMAPMTTriggerMap[lead->GetChannel() - 1];
-                // if(fName=="Fi3a") printf("3a trig curr %8u %8u lead %8u %8u  %8u\n", ch_i, cur_cal_trig_i,
-                // lead->GetChannel() - 1, lead_trig_i, mapmt_trig_table.size()); if(fName=="Fi3b") printf("3b trig curr
-                // %8u %8u lead %8u %8u\n", ch_i, cur_cal_trig_i, lead->GetChannel() - 1, lead_trig_i);
+                // if(fName=="Fi30") printf("30 trig curr %8u %8u lead %8u %8u  %8u\n", ch_i, cur_cal_trig_i,
+                //  lead->GetChannel() - 1, lead_trig_i, mapmt_trig_table.size());
+                // if(fName=="Fi30") printf("30 trig curr %8u %8u lead %8u %8u\n", ch_i, cur_cal_trig_i,
+                // lead->GetChannel() - 1, lead_trig_i);
                 if (cur_cal_trig_i < mapmt_trig_table.size() && lead_trig_i < mapmt_trig_table.size())
                 {
                     auto cur_cal_trig = mapmt_trig_table.at(cur_cal_trig_i);
@@ -648,6 +649,53 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                     y = -detector_width / 2. + fiber_thickness / 2. +
                         ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
                 }
+            }
+            if (fName == "Fi23a" || fName == "Fi23b")
+            {
+                Float_t fiber_thickness = 0.021000 * 2.; // s remove *2 when taking SPMT into analysis
+                Int_t fiber_nbr = 512 / 2;               // s remove /2 when taking SPMT into analysis
+                Float_t dead_layer = 0.9;
+                Float_t air_layer = 0.01; // relative to fiber_thickness
+                Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
+                if (fDirection == VERTICAL)
+                {
+                    x = -detector_width / 2. + fiber_thickness / 2. +
+                        ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
+                    // s                            y = (t_spmt - t_mapmt) * 3.;
+                    y = 0.;
+                }
+                else
+                {
+                    // s                            x = (t_spmt - t_mapmt) * 3.;
+                    x = 0.;
+                    y = -detector_width / 2. + fiber_thickness / 2. +
+                        ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
+                }
+            }
+            if (fName == "Fi30" || fName == "Fi31" || fName == "Fi32" || fName == "Fi33")
+            {
+                Float_t fiber_thickness = 0.10000;
+                Int_t fiber_nbr = 512;
+                Float_t dead_layer = 0.9;
+                Float_t air_layer = 0.01; // relative to fiber_thickness
+                Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
+
+                if (fDirection == VERTICAL)
+                {
+                    x = -detector_width / 2. + fiber_thickness / 2. +
+                        ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
+                    // s                            y = (t_spmt - t_mapmt) * 3.;
+                    y = 0.;
+                }
+                else
+                {
+                    // S                            x = (t_spmt - t_mapmt) * 3.;
+                    x = 0.;
+                    y = -detector_width / 2. + fiber_thickness / 2. +
+                        ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
+                }
+                if (x > 26.)
+                    cout << "fiber_id " << fiber_id << " x " << x << " y " << y << endl;
             }
             // cout<<"Fiber y " << y << endl;
             if (y < -60 || y > 60)

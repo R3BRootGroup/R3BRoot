@@ -30,6 +30,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
 ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
+${Geant4_INCLUDE_DIRS}
 )
 
 include_directories( ${INCLUDE_DIRECTORIES})
@@ -46,8 +47,10 @@ set(SRCS
 R3BTPropagator.cxx
 R3BTGeoPar.cxx
 R3BFragmentTracker.cxx
+R3BFragmentTrackerS494.cxx
 R3BFragmentFitterGeneric.cxx
-R3BFragmentFitterChi2.cxx
+#R3BFragmentFitterChi2.cxx
+R3BFragmentFitterChi2S494.cxx
 R3BTrackingDetector.cxx
 R3BTrackingParticle.cxx
 R3BTrackingSetup.cxx

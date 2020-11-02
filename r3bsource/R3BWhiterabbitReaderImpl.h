@@ -47,7 +47,8 @@
                                                                                                                     \
     Bool_t R3B##ClassName##Reader::Read()                                                                           \
     {                                                                                                               \
-        if (fData->TIMESTAMP_MASTER_ID != 0 && fWhiterabbitId != fData->TIMESTAMP_MASTER_ID)                        \
+		/* The unpacker checks this, R3BRoot shouldn't have to. */                                                  \
+        if (0 && fData->TIMESTAMP_MASTER_ID != 0 && fWhiterabbitId != fData->TIMESTAMP_MASTER_ID)                   \
         {                                                                                                           \
             LOG(ERROR) << "Event " << fEventHeader->GetEventno()                                                    \
                        << ": "                                                                                      \

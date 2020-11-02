@@ -54,6 +54,12 @@ enum DetectorId
     kFI11,
     kFI12,
     kFI13,
+    kFI23a,
+    kFI23b,
+    kFI30,
+    kFI31,
+    kFI32,
+    kFI33,
     kSFI,
     kMUSIC,
 #ifdef SOFIA
@@ -106,6 +112,12 @@ enum fDetectorType
     kFI11Point,
     kFI12Point,
     kFI13Point,
+    kFI23aPoint,
+    kFI23bPoint,
+    kFI30Point,
+    kFI31Point,
+    kFI32Point,
+    kFI33Point,
     kSFIPoint,
     kMUSICPoint
 #ifdef SOFIA

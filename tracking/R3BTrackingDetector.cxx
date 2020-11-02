@@ -122,8 +122,8 @@ void R3BTrackingDetector::LocalToGlobal(TVector3& posGlobal, Double_t x_local, D
     posGlobal = TVector3(x_local, y_local, 0.);
     posGlobal.RotateY(fGeo->GetRotY() * TMath::DegToRad());
     posGlobal = posGlobal + pos0;
-    std::cout << "Local x: " << x_local << " y: " << y_local << std::endl;
-    std::cout << "global x: " << posGlobal.X() << " y: " << posGlobal.Y() << " z: " << posGlobal.Z() << std::endl;
+    // cout << "Local x: " << x_local << " y: " << y_local << endl;
+    // cout << "global x: " << posGlobal.X() << " y: " << posGlobal.Y() << " z: " << posGlobal.Z() << endl;
 }
 
 Double_t R3BTrackingDetector::GetEnergyLoss(const R3BTrackingParticle* particle)
