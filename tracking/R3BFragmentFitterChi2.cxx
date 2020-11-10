@@ -245,6 +245,11 @@ double Chi2Backward(const double* xx)
 
 double Chi2Backward2D(const double* xx)
 {
+    // Require Fi5 to have hit
+    // for the initial position and direction
+    if(-1 == gCandidate->GetHitIndexByName("fi5"))
+        return 1e10;
+    
     // Bool_t result = kFALSE;
     // Double_t sdev = 0.;
     Double_t x_l = 0.;
@@ -260,14 +265,11 @@ double Chi2Backward2D(const double* xx)
     gCandidate->SetMass(mass);
     gCandidate->UpdateMomentum();
 
-    auto fi4 = gSetup->GetByName("fi4");
     auto fi5 = gSetup->GetByName("fi5");
     auto fi6 = gSetup->GetByName("fi6");
 
-    TVector3 pos1;
     TVector3 pos2;
     TVector3 pos3;
-    fi4->LocalToGlobal(pos1, gSetup->GetHit("fi4", gCandidate->GetHitIndexByName("fi4"))->GetX(), 0.);
     fi5->LocalToGlobal(pos2, gSetup->GetHit("fi5", gCandidate->GetHitIndexByName("fi5"))->GetX(), 0.);
     fi6->LocalToGlobal(pos3, x_fi6, 0.);
 
@@ -308,27 +310,20 @@ double Chi2Backward2D(const double* xx)
         // Convert global track coordinates into local on the det plane
         det->GlobalToLocal(gCandidate->GetPosition(), x_l, y_l);
 
-        R3BHit* hit =
-            gSetup->GetHit(det->GetDetectorName().Data(), gCandidate->GetHitIndexByName(det->GetDetectorName().Data()));
+        R3BHit* hit = nullptr;
+        Int_t hitIndex = gCandidate->GetHitIndexByName(det->GetDetectorName().Data());
+        if(-1 != hitIndex)
+            hit = gSetup->GetHit(det->GetDetectorName().Data(), hitIndex);
 
-        // if(kTarget != det->section)
-        // if(kAfterGlad == det->section)
+        // Take into chi2 only if there is a hit and user specified SigmaX > 0.
+        if(hit && det->res_x > 1e-6)
         {
             chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
             // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
             nchi2 += 1;
         }
-
-        //        if(kTof == det->section)
-        //        {
-        //            chi2 += TMath::Power((time - hit->GetTime()) / det->res_t, 2);
-        //        }
     }
 
-    // sdev /= 2;
-    // sdev = TMath::Sqrt(sdev);
-
-    // chi2 /= nchi2;
     gCandidate->SetChi2(chi2);
 
     return chi2;
@@ -555,14 +550,18 @@ Int_t R3BFragmentFitterChi2::FitTrackBackward(R3BTrackingParticle* particle, R3B
 Int_t R3BFragmentFitterChi2::FitTrackBackward2D(R3BTrackingParticle* particle, R3BTrackingSetup* setup)
 {
     // fPropagator->SetVis(kTRUE);
+    
+    // Require Fi5 and Fi6 to have hits
+    // for the initial position and direction
+    if(-1 == particle->GetHitIndexByName("fi5") ||
+       -1 == particle->GetHitIndexByName("fi6"))
+        return 10;
 
     gCandidate = particle;
     gSetup = setup;
 
-    auto fi4 = gSetup->GetByName("fi4");
     auto fi5 = gSetup->GetByName("fi5");
     auto fi6 = gSetup->GetByName("fi6");
-    // auto tof = gSetup->GetFirstByType(kTof);
 
     double variable[2] = { 132. * amu, gSetup->GetHit("fi6", particle->GetHitIndexByName("fi6"))->GetX() };
     double step[2] = { 0.01, 0.001 };
@@ -571,24 +570,12 @@ Int_t R3BFragmentFitterChi2::FitTrackBackward2D(R3BTrackingParticle* particle, R
     fMinimum->SetLimitedVariable(0, "m", variable[0], step[0], 125. * amu, 133. * amu);
     fMinimum->SetLimitedVariable(1, "xfi6", variable[1], step[1], -100., 100.);
 
-    TVector3 pos1;
     TVector3 pos2;
     TVector3 pos3;
-    fi4->LocalToGlobal(pos1, gSetup->GetHit("fi4", particle->GetHitIndexByName("fi4"))->GetX(), 0.);
+
     fi5->LocalToGlobal(pos2, gSetup->GetHit("fi5", particle->GetHitIndexByName("fi5"))->GetX(), 0.);
     fi6->LocalToGlobal(pos3, gSetup->GetHit("fi6", particle->GetHitIndexByName("fi6"))->GetX(), 0.);
-    /*Int_t np = 3;
-    Double_t x[] = {pos1.X(), pos2.X(), pos3.X()};
-    Double_t xe[] = {fi4->res_x, fi5->res_x, fi6->res_x};
-    Double_t z[] = {pos1.Z(), pos2.Z(), pos3.Z()};
-    TGraphErrors* gr = new TGraphErrors(np, x, z, xe, 0);
-    TF1* f1 = new TF1("f1", "[0]*x + [1]", -500., 500.);
-    TF1* f2 = new TF1("f1", "[0]*x + [1]", 0., 1000.);
-    f1->SetParameters(-1., 0.);
-    gr->Fit(f1, "QN");
-    f2->SetParameters(1./f1->GetParameter(0), -1.*f1->GetParameter(1)/f1->GetParameter(0));
-    TVector3 direction0 = ( TVector3(fi5->hit_x, 0., f1->Eval(fi5->hit_x)) - TVector3(fi6->hit_x, 0.,
-    f1->Eval(fi6->hit_x)) ).Unit(); TVector3 pos0(f2->Eval(fi6->pos0.Z()), 0., fi6->pos0.Z());*/
+    
     TVector3 direction0 = (pos2 - pos3).Unit();
     TVector3 pos0 = pos3;
     Double_t mom = gCandidate->GetMass() * gCandidate->GetStartBeta() * gCandidate->GetStartGamma();

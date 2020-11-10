@@ -30,6 +30,8 @@ R3BTGeoPar::R3BTGeoPar(const char* name, const char* title, const char* context,
     , fDimX(0.)
     , fDimY(0.)
     , fDimZ(0.)
+    , fSigmaX(0.)
+    , fSigmaY(0.)
     , fZ(0.)
     , fA(0.)
     , fDensity(0.)
@@ -55,6 +57,8 @@ void R3BTGeoPar::putParams(FairParamList* list)
     list->add("DimensionX", fDimX);
     list->add("DimensionY", fDimY);
     list->add("DimensionZ", fDimZ);
+    list->add("SigmaX", fSigmaX);
+    list->add("SigmaY", fSigmaY);
     list->add("Z", fZ);
     list->add("A", fA);
     list->add("Density", fDensity);
@@ -103,6 +107,14 @@ Bool_t R3BTGeoPar::getParams(FairParamList* list)
     {
         return kFALSE;
     }
+    if (!list->fill("SigmaX", &fSigmaX))
+    {
+	return kFALSE;
+    }
+    if (!list->fill("SigmaY", &fSigmaY))
+    {
+	return kFALSE;
+    }
     if (!list->fill("Z", &fZ))
     {
         return kFALSE;
@@ -138,6 +150,7 @@ void R3BTGeoPar::printParams()
     LOG(INFO) << " Position in cave: " << fPosX << " " << fPosY << " " << fPosZ;
     LOG(INFO) << " Rotation in deg: " << fRotX << " " << fRotY << " " << fRotZ;
     LOG(INFO) << " Dimensions: " << fDimX << " " << fDimY << " " << fDimZ;
+    LOG(INFO) << " SigmaXY: " << fSigmaX << " " << fSigmaY;
     LOG(INFO) << " Z=" << fZ << " A=" << fA << " Density=" << fDensity << " Ionisation=" << fI;
     LOG(INFO) << " ------------------------------------------------------------------  ";
 }

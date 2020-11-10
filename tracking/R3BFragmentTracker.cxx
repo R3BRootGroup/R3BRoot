@@ -208,22 +208,11 @@ void R3BFragmentTracker::Exec(const Option_t*)
     R3BTrackingDetector* fi5 = fDetectors->GetByName("fi5");
     R3BTrackingDetector* fi6 = fDetectors->GetByName("fi6");
     R3BTrackingDetector* tof = fDetectors->GetByName("tofd");
+    
+    target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
 
     // cout << "Hits: " << psp->hits.size() << "  " << fi4->hits.size() << "  "
     // << fi5->hits.size() << "  " << fi6->hits.size() << "  " << tof->hits.size() << endl;
-
-    // remember: in this test, target hast no data
-    // if (target->hits->GetEntriesFast()==0) return; // no error, can always happen
-    if (psp->hits.size() == 0)
-        return; // no error, can always happen
-    if (fi4->hits.size() == 0)
-        return; // no error, can always happen
-    if (fi5->hits.size() == 0)
-        return; // no error, can always happen
-    if (fi6->hits.size() == 0)
-        return; // no error, can always happen
-    if (tof->hits.size() == 0)
-        return; // no error, can always happen
 
     // fetch start pos, default momentum and charge from the simulation
     // (just for this test!)
@@ -268,36 +257,40 @@ void R3BFragmentTracker::Exec(const Option_t*)
     fPropagator->SetVis(kFALSE);
 
     Int_t nCand = 0;
+    
+    Int_t ipsp = 0;
+    Int_t ifi4 = 0;
+    Int_t ifi5 = 0;
+    Int_t ifi6 = 0;
+    Int_t itof = 0;
+    if(0 == psp->hits.size())
+        ipsp = -1;
+    if(0 == fi4->hits.size())
+        ifi4 = -1;
+    if(0 == fi5->hits.size())
+        ifi5 = -1;
+    if(0 == fi6->hits.size())
+        ifi6 = -1;
+    if(0 == tof->hits.size())
+        itof = -1;
 
     {
-        target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
-        target->res_x = 1.0000;
-
-        for (auto const& xpsp : psp->hits)
+        do
         {
-            if (xpsp->GetEloss() < 30.)
-            {
-                continue;
-            }
-            psp->res_x = 0.0010;
-            fh_eloss_psp_mc->Fill(xpsp->GetEloss()); // MeV
+            if(ipsp >= 0)
+                fh_eloss_psp_mc->Fill(psp->hits.at(ipsp)->GetEloss()); // MeV
 
-            for (auto const& xfi4 : fi4->hits)
+            do
             {
-                fh_eloss_fi4_mc->Fill(xfi4->GetEloss()); // MeV
-                fi4->res_x = 0.0020;
+                if(ifi4 >= 0)
+                    fh_eloss_fi4_mc->Fill(fi4->hits.at(ifi4)->GetEloss()); // MeV
 
-                for (auto const& xfi5 : fi5->hits)
+                do
                 {
-                    fi5->res_x = 0.0050;
-
-                    for (auto const& xfi6 : fi6->hits)
+                    do
                     {
-                        fi6->res_x = 0.0020;
-
-                        for (auto const& xtof : tof->hits)
+                        do
                         {
-                            tof->res_x = 2.7;
                             tof->res_t = 0.03;
 
                             Double_t velocity0 = 0.8328 + 0.0003;
@@ -307,11 +300,21 @@ void R3BFragmentTracker::Exec(const Option_t*)
                                 particle->GetCharge(), 0., 0., 0., 0., 0., 0., velocity0, 132. * Amu);
 
                             candidate->AddHit("target", 0);
-                            candidate->AddHit("psp", xpsp->GetHitId());
-                            candidate->AddHit("fi4", xfi4->GetHitId());
-                            candidate->AddHit("fi5", xfi5->GetHitId());
-                            candidate->AddHit("fi6", xfi6->GetHitId());
-                            candidate->AddHit("tofd", xtof->GetHitId());
+                            if(ipsp >= 0)
+                            {
+                                if(psp->hits.at(ipsp)->GetEloss() > 30.)
+                                    candidate->AddHit("psp", ipsp);
+                                else
+                                    candidate->AddHit("psp", -1);
+                            }
+                            else
+                            {
+                                candidate->AddHit("psp", -1);
+                            }
+                            candidate->AddHit("fi4", ifi4);
+                            candidate->AddHit("fi5", ifi5);
+                            candidate->AddHit("fi6", ifi6);
+                            candidate->AddHit("tofd", itof);
 
                             // find momentum
                             // momin is only a first guess
@@ -357,11 +360,16 @@ void R3BFragmentTracker::Exec(const Option_t*)
                             }
 
                             // return;
-                        }
-                    }
-                }
-            }
-        }
+                            itof += 1;
+                        } while(itof < tof->hits.size());
+                        ifi6 += 1;
+                    } while(ifi6 < fi6->hits.size());
+                    ifi5 += 1;
+                } while(ifi5 < fi5->hits.size());
+                ifi4 += 1;
+            } while(ifi4 < fi4->hits.size());
+            ipsp += 1;
+        } while (ipsp < psp->hits.size());
     }
 
     fh_ncand->Fill(nCand);

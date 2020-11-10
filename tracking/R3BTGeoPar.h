@@ -81,6 +81,9 @@ class R3BTGeoPar : public FairParGenericSet
     inline const Double_t& GetDimY() const { return fDimY; }
     inline const Double_t& GetDimZ() const { return fDimZ; }
 
+    inline const Double_t& GetSigmaX() const { return fSigmaX; }
+    inline const Double_t& GetSigmaY() const { return fSigmaY; }
+
     inline void SetPosXYZ(const Double_t& posX, const Double_t& posY, const Double_t& posZ)
     {
         fPosX = posX;
@@ -98,6 +101,12 @@ class R3BTGeoPar : public FairParGenericSet
         fDimX = dimX;
         fDimY = dimY;
         fDimZ = dimZ;
+    }
+
+    inline void SetSigmaXY(const Double_t& sigmaX, const Double_t& sigmaY)
+    {
+	fSigmaX = sigmaX;
+	fSigmaY = sigmaY;
     }
 
     void SetMaterial(const Double_t& Z, const Double_t& A, const Double_t& density, const Double_t& I);
@@ -122,6 +131,9 @@ class R3BTGeoPar : public FairParGenericSet
     Double_t fDimX;
     Double_t fDimY;
     Double_t fDimZ;
+
+    Double_t fSigmaX;
+    Double_t fSigmaY;
 
     Double_t fZ;
     Double_t fA;
