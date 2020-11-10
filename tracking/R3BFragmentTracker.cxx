@@ -208,7 +208,7 @@ void R3BFragmentTracker::Exec(const Option_t*)
     R3BTrackingDetector* fi5 = fDetectors->GetByName("fi5");
     R3BTrackingDetector* fi6 = fDetectors->GetByName("fi6");
     R3BTrackingDetector* tof = fDetectors->GetByName("tofd");
-    
+
     target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
 
     // cout << "Hits: " << psp->hits.size() << "  " << fi4->hits.size() << "  "
@@ -257,32 +257,32 @@ void R3BFragmentTracker::Exec(const Option_t*)
     fPropagator->SetVis(kFALSE);
 
     Int_t nCand = 0;
-    
+
     Int_t ipsp = 0;
     Int_t ifi4 = 0;
     Int_t ifi5 = 0;
     Int_t ifi6 = 0;
     Int_t itof = 0;
-    if(0 == psp->hits.size())
+    if (0 == psp->hits.size())
         ipsp = -1;
-    if(0 == fi4->hits.size())
+    if (0 == fi4->hits.size())
         ifi4 = -1;
-    if(0 == fi5->hits.size())
+    if (0 == fi5->hits.size())
         ifi5 = -1;
-    if(0 == fi6->hits.size())
+    if (0 == fi6->hits.size())
         ifi6 = -1;
-    if(0 == tof->hits.size())
+    if (0 == tof->hits.size())
         itof = -1;
 
     {
         do
         {
-            if(ipsp >= 0)
+            if (ipsp >= 0)
                 fh_eloss_psp_mc->Fill(psp->hits.at(ipsp)->GetEloss()); // MeV
 
             do
             {
-                if(ifi4 >= 0)
+                if (ifi4 >= 0)
                     fh_eloss_fi4_mc->Fill(fi4->hits.at(ifi4)->GetEloss()); // MeV
 
                 do
@@ -300,9 +300,9 @@ void R3BFragmentTracker::Exec(const Option_t*)
                                 particle->GetCharge(), 0., 0., 0., 0., 0., 0., velocity0, 132. * Amu);
 
                             candidate->AddHit("target", 0);
-                            if(ipsp >= 0)
+                            if (ipsp >= 0)
                             {
-                                if(psp->hits.at(ipsp)->GetEloss() > 30.)
+                                if (psp->hits.at(ipsp)->GetEloss() > 30.)
                                     candidate->AddHit("psp", ipsp);
                                 else
                                     candidate->AddHit("psp", -1);
@@ -361,13 +361,13 @@ void R3BFragmentTracker::Exec(const Option_t*)
 
                             // return;
                             itof += 1;
-                        } while(itof < tof->hits.size());
+                        } while (itof < tof->hits.size());
                         ifi6 += 1;
-                    } while(ifi6 < fi6->hits.size());
+                    } while (ifi6 < fi6->hits.size());
                     ifi5 += 1;
-                } while(ifi5 < fi5->hits.size());
+                } while (ifi5 < fi5->hits.size());
                 ifi4 += 1;
-            } while(ifi4 < fi4->hits.size());
+            } while (ifi4 < fi4->hits.size());
             ipsp += 1;
         } while (ipsp < psp->hits.size());
     }

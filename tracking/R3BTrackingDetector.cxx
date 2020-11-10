@@ -74,7 +74,7 @@ InitStatus R3BTrackingDetector::Init()
     pos2 += trans;
 
     norm = ((pos1 - pos0).Cross(pos2 - pos0)).Unit();
-    
+
     res_x = fGeo->GetSigmaX();
     res_y = fGeo->GetSigmaY();
 

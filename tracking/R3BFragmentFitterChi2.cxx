@@ -247,9 +247,9 @@ double Chi2Backward2D(const double* xx)
 {
     // Require Fi5 to have hit
     // for the initial position and direction
-    if(-1 == gCandidate->GetHitIndexByName("fi5"))
+    if (-1 == gCandidate->GetHitIndexByName("fi5"))
         return 1e10;
-    
+
     // Bool_t result = kFALSE;
     // Double_t sdev = 0.;
     Double_t x_l = 0.;
@@ -312,11 +312,11 @@ double Chi2Backward2D(const double* xx)
 
         R3BHit* hit = nullptr;
         Int_t hitIndex = gCandidate->GetHitIndexByName(det->GetDetectorName().Data());
-        if(-1 != hitIndex)
+        if (-1 != hitIndex)
             hit = gSetup->GetHit(det->GetDetectorName().Data(), hitIndex);
 
         // Take into chi2 only if there is a hit and user specified SigmaX > 0.
-        if(hit && det->res_x > 1e-6)
+        if (hit && det->res_x > 1e-6)
         {
             chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
             // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
@@ -550,11 +550,10 @@ Int_t R3BFragmentFitterChi2::FitTrackBackward(R3BTrackingParticle* particle, R3B
 Int_t R3BFragmentFitterChi2::FitTrackBackward2D(R3BTrackingParticle* particle, R3BTrackingSetup* setup)
 {
     // fPropagator->SetVis(kTRUE);
-    
+
     // Require Fi5 and Fi6 to have hits
     // for the initial position and direction
-    if(-1 == particle->GetHitIndexByName("fi5") ||
-       -1 == particle->GetHitIndexByName("fi6"))
+    if (-1 == particle->GetHitIndexByName("fi5") || -1 == particle->GetHitIndexByName("fi6"))
         return 10;
 
     gCandidate = particle;
@@ -575,7 +574,7 @@ Int_t R3BFragmentFitterChi2::FitTrackBackward2D(R3BTrackingParticle* particle, R
 
     fi5->LocalToGlobal(pos2, gSetup->GetHit("fi5", particle->GetHitIndexByName("fi5"))->GetX(), 0.);
     fi6->LocalToGlobal(pos3, gSetup->GetHit("fi6", particle->GetHitIndexByName("fi6"))->GetX(), 0.);
-    
+
     TVector3 direction0 = (pos2 - pos3).Unit();
     TVector3 pos0 = pos3;
     Double_t mom = gCandidate->GetMass() * gCandidate->GetStartBeta() * gCandidate->GetStartGamma();

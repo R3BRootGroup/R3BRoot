@@ -109,11 +109,11 @@ Bool_t R3BTGeoPar::getParams(FairParamList* list)
     }
     if (!list->fill("SigmaX", &fSigmaX))
     {
-	return kFALSE;
+        return kFALSE;
     }
     if (!list->fill("SigmaY", &fSigmaY))
     {
-	return kFALSE;
+        return kFALSE;
     }
     if (!list->fill("Z", &fZ))
     {
