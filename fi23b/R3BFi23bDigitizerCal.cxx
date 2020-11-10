@@ -180,7 +180,7 @@ void R3BFi23bDigitizerCal::Exec(Option_t* opt)
         {
             for (Double_t& energyl : energy[i])
             {
-                if (energyl > 0.0001)
+                if (energyl > 0.000001)
                 {
 
                     /* ifib num -> ichan num: Based on what Hans did in BunchedFiberCal2Hit:

@@ -464,6 +464,7 @@ void R3BBunchedFiberCal2Hit_s494::Exec(Option_t* option)
     double t_tofd;
     // cout<<"permutations"<<endl;
 
+    cout << "new Event ********************* " << fName << endl;
     // Make every permutation to create fibers.
     auto const& mapmt_array = fChannelArray[0];
     auto const& spmt_array = fChannelArray[1];
@@ -510,6 +511,8 @@ void R3BBunchedFiberCal2Hit_s494::Exec(Option_t* option)
                     auto fiber_id_ch = (mapmt_tot.lead->GetChannel() - 1) * fChPerSub[1] + 1;
                     single = spmt_tot.lead->GetChannel();
 
+                    cout << "mapmt: " << mapmt_tot.lead->GetChannel() << " single: " << single << " fiber: " << fiber_id
+                         << endl;
                     // TODO: Use it_sub->direction to find real life coordinates.
 
                     // Fix fiber installation mistakes.
@@ -648,7 +651,7 @@ void R3BBunchedFiberCal2Hit_s494::Exec(Option_t* option)
                     }
                     if (fName == "Fi23a" || fName == "Fi23b")
                     {
-                        Float_t fiber_thickness = 0.021000;
+                        Float_t fiber_thickness = 0.025000;
                         Int_t fiber_nbr = 512;
                         Float_t dead_layer = 0.9;
                         Float_t air_layer = 0.01; // relative to fiber_thickness

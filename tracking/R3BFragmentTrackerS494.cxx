@@ -240,6 +240,12 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
     // Important: Set charge and initial position and momentum of the particle
     Double_t beta = 1. / TMath::Sqrt(1 + TMath::Power(ion->GetMass() / ion->GetP(), 2));
+
+    Double_t px0 = ion->GetPx();
+    Double_t py0 = ion->GetPy();
+    Double_t pz0 = ion->GetPz();
+    Double_t mass0 = ion->GetMass();
+
     R3BTrackingParticle* particle = new R3BTrackingParticle(8.,
                                                             ion->GetStartX(),
                                                             ion->GetStartY(),
@@ -249,7 +255,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                                             ion->GetPz(),
                                                             beta,
                                                             ion->GetMass());
-    LOG(INFO) << "MC mass " << ion->GetMass() / amu;
+    LOG(INFO) << "MC mass " << ion->GetMass();
     LOG(INFO) << "MC momentum "
               << sqrt(ion->GetPx() * ion->GetPx() + ion->GetPy() * ion->GetPy() + ion->GetPz() * ion->GetPz()) /
                      ion->GetMass() / amu;
@@ -280,6 +286,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     {
         target->hits.push_back(new R3BHit(0, 0., 0., 0., 0., 0));
         target->res_x = 0.1000;
+        target->res_y = 0.1000;
 
         for (auto const& xfi23a : fi23a->hits)
         {
@@ -287,9 +294,10 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             {
                 continue;
             }
-            fi23a->res_x = 0.0100;
+            fi23a->res_x = 0.02500 / sqrt(12.);
+            fi23a->res_y = 0.02500 / sqrt(12.);
             fh_eloss_fi23a_mc->Fill(xfi23a->GetEloss()); // MeV
-
+            cout << "Eloss MC fi23a: " << xfi23a->GetEloss() << endl;
             // for (auto const& xfi23b : fi23b->hits)
             //{
             // fh_eloss_fi23b_mc->Fill(xfi23b->GetEloss()); // MeV
@@ -297,22 +305,27 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
             for (auto const& xfi32 : fi32->hits)
             {
-                fi32->res_x = 0.0500;
+                fi32->res_x = 0.100 / sqrt(12.);
+                fi32->res_y = 0.;
+                cout << "Eloss MC fi32: " << xfi32->GetEloss() << endl;
 
                 for (auto const& xfi30 : fi30->hits)
                 {
-                    fi30->res_x = 0.0500;
+                    fi30->res_x = 0.100 / sqrt(12.);
+                    fi30->res_y = 0.;
+                    cout << "Eloss MC fi30: " << xfi30->GetEloss() << endl;
 
                     for (auto const& xtof : tof->hits)
                     {
-                        tof->res_x = 2.7;
+                        tof->res_x = 2.7 / sqrt(12.);
+                        tof->res_y = 1. / sqrt(12.);
                         tof->res_t = 0.03;
 
-                        Double_t velocity0 = 0.65;
+                        Double_t velocity0 = 0.66;
 
                         // Create object for particle which will be fitted
-                        R3BTrackingParticle* candidate = new R3BTrackingParticle(
-                            particle->GetCharge(), 0., 0., 0., 0.3, 0., 0.8, velocity0, 16. * amu);
+                        R3BTrackingParticle* candidate =
+                            new R3BTrackingParticle(8, 0., 0., 0., px0, py0, pz0, velocity0, mass0);
 
                         candidate->AddHit("target", 0);
                         candidate->AddHit("fi23a", xfi23a->GetHitId());
@@ -406,7 +419,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
              << " before: " << candidate->GetMass() / amu << endl;
 
         // candidate->SetMass(TMath::Nint(candidate->GetMass() / amu) * amu);
-        // candidate->SetMass(mass);
+        // candidate->SetMass(mass0);
 
         candidate->UpdateMomentum();
         cout << "Fit Beta, start: " << candidate->GetStartBeta() << endl;
@@ -416,10 +429,18 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
         Double_t momentum0 = candidate->GetStartMomentum().Mag();
         LOG(DEBUG1);
         LOG(DEBUG1) << "Momentum : " << momentum0;
+        LOG(DEBUG1) << "Momentum px: " << candidate->GetStartMomentum().X();
+        LOG(DEBUG1) << "Momentum py: " << candidate->GetStartMomentum().Y();
+        LOG(DEBUG1) << "Momentum pz: " << candidate->GetStartMomentum().Z();
+
         LOG(DEBUG1) << "Truth  : " << particle->GetMomentum().Mag();
+        LOG(DEBUG1) << "Truth px: " << px0;
+        LOG(DEBUG1) << "Truth py: " << py0;
+        LOG(DEBUG1) << "Truth pz: " << pz0;
+
         LOG(DEBUG1) << "Resolution: " << (momentum0 - particle->GetMomentum().Mag()) / particle->GetMomentum().Mag();
         LOG(DEBUG1) << "Mass   : " << candidate->GetMass();
-        LOG(DEBUG1) << "Truth  : " << particle->GetMass();
+        LOG(DEBUG1) << "Truth  : " << particle->GetMass() << "  " << mass0;
         LOG(DEBUG1) << "Mass resolution : " << (candidate->GetMass() - particle->GetMass()) / particle->GetMass();
         LOG(DEBUG1) << "Beta   : " << candidate->GetStartBeta();
         LOG(DEBUG1) << "Truth  : " << particle->GetStartBeta();
@@ -428,7 +449,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
         fh_mom_res->Fill((momentum0 - particle->GetStartMomentum().Mag()) / particle->GetStartMomentum().Mag());
         fh_chi2->Fill(candidate->GetChi2());
-        cout << "chi2: " << candidate->GetChi2() << endl;
+        cout << "chi2: " << minChi2 << endl;
         int imass = TMath::Nint(candidate->GetMass() / amu);
         int imass_mc = TMath::Nint(particle->GetMass() / amu);
         fh_mass_res->Fill(imass - imass_mc);
@@ -453,6 +474,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             { // fi23a
                 Double_t eloss = det->GetEnergyLoss(candidate);
                 fh_eloss_fi23a->Fill(eloss);
+                cout << "Eloss fi23a: " << eloss << endl;
             }
 
             if (det->GetDetectorName().EqualTo("fi23b"))

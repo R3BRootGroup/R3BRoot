@@ -76,7 +76,7 @@ class R3BFi23bDigitizerCal : public FairTask
     Double_t ysigma;
 
    Float_t detector_height = 10.000000;
-    Float_t fiber_thickness = 0.021000;
+    Float_t fiber_thickness = 0.025000;
     Int_t fiber_nbr = 512;
     Float_t dead_layer = 0.9;
     Float_t air_layer = 0.01; // relative to fiber_thickness

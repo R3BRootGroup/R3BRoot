@@ -884,11 +884,14 @@ void R3BTrackerTestS494::Exec(Option_t* option)
     {
         R3BTofdPoint* hit = (R3BTofdPoint*)fTofdPoints->At(i);
         Int_t ID = hit->GetDetectorID();
+        //		if ((ID == 122 || ID == 123 || ID == 124 || ID == 222 || ID == 223))
+        //			&& TMath::Abs((hit->GetYIn() + hit->GetYOut()) / 2.) < 5.)
+        //			continue;
         if (ID <= 122)
         {
             detector[countdet] = 6;
         }
-        if (ID > 122 && ID < 145)
+        if (ID >= 122 && ID < 145)
         {
             detector[countdet] = 7;
         }
@@ -960,6 +963,12 @@ void R3BTrackerTestS494::Exec(Option_t* option)
         if (qqq > 6)
             qqq = 8;
         // if(qqq<2) continue;
+        /*
+                Double_t ddd = sqrt((hit->GetXIn() + hit->GetXOut()) / 2. * (hit->GetXIn() + hit->GetXOut()) / 2. +
+                    (hit->GetYIn() + hit->GetYOut()) / 2.*(hit->GetYIn() + hit->GetYOut()) / 2.);
+                if(ddd < 0.3)
+                    continue;
+        */
         detector[countdet] = 0;
         xdet[countdet] = (hit->GetXIn() + hit->GetXOut()) / 2. / 100.;
         ydet[countdet] = (hit->GetYIn() + hit->GetYOut()) / 2. / 100.;

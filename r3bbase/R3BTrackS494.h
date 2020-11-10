@@ -242,6 +242,7 @@ class R3BTrackS494 : public FairTask
 	Int_t counterTracker = 0;
 	Int_t countdet;
 	Int_t countdet_s;
+	Int_t countdet_ss;
 	Double_t hits1 = 0;
 	Double_t hits30 = 0;
 	Double_t hits30bc = 0;

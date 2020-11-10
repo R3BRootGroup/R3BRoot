@@ -425,7 +425,7 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
     Bool_t is_carbon = false;
 
     // Choose original MC data or exp. data
-    Bool_t simData = true;
+    Bool_t simData = false;
 
     if (fTrack && !simData)
     {
@@ -647,8 +647,8 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
             alpha_cm.Boost(-oxygen.BoostVector());
             carbon_cm.Boost(-oxygen.BoostVector());
             oxygen_cm.Boost(-oxygen.BoostVector());
-            cout << " px: " << alpha_cm.Px() + carbon_cm.Px() << "  py:  " << alpha_cm.Py() + carbon_cm.Py()
-                 << "  pz:  " << alpha_cm.Pz() + carbon_cm.Pz() << endl;
+            // cout << " px: " << alpha_cm.Px() + carbon_cm.Px() << "  py:  " << alpha_cm.Py() + carbon_cm.Py()
+            //     << "  pz:  " << alpha_cm.Pz() + carbon_cm.Pz() << endl;
             /*
                         cout << "lab " << alpha.Px() << "  " << alpha.Py() << "  " << alpha.Pz() << endl;
                         cout << "lab " << carbon.Px() << "  " << carbon.Py() << "  " << carbon.Pz() << endl;

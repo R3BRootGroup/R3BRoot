@@ -131,8 +131,6 @@ void R3BFi23a::SetSpecialPhysicsCuts()
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BFi23a::ProcessHits(FairVolume* vol)
 {
-    // 2 Simple Det PLane
-    // get Info from DCH planes
     Int_t copyNo = -1;
     Int_t planeNr = -1;
     // Get the Geo info from MC Point
@@ -200,7 +198,6 @@ Bool_t R3BFi23a::ProcessHits(FairVolume* vol)
             fPosOut.SetY(newpos[1]);
             fPosOut.SetZ(newpos[2]);
         }
-        cout << "Test Fi23a" << endl;
         AddHit(fTrackID,
                /*fVolumeID*/ /*copyNo*/ planeNr,
                planeNr,

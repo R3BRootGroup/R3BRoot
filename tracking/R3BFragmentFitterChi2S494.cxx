@@ -108,7 +108,7 @@ double Chi2(const double* xx)
 
 double Chi2Beta(const double* xx)
 {
-    cout << " in function Chi2Beta" << endl;
+    // cout << " in function Chi2Beta" << endl;
     // Bool_t result = kFALSE;
     // Double_t sdev = 0.;
     Double_t x_l = 0.;
@@ -124,8 +124,10 @@ double Chi2Beta(const double* xx)
     gCandidate->Reset();
 
     // Propagate through the setup, defined by array of detectors
-    for (auto const& det : gSetup->GetArray())
+    // for (auto const& det : gSetup->GetArray())
+    for (Int_t i = 0; i < (gSetup->GetArray().size() - 1); i++)
     {
+        auto det = gSetup->GetArray().at(i);
         if (kTarget != det->section)
         {
             /*result = */ gProp->PropagateToDetector(gCandidate, det);
@@ -155,12 +157,24 @@ double Chi2Beta(const double* xx)
 
         // if(kTarget != det->section)
         // if(kAfterGlad == det->section)
+        if (det->res_x > 0.)
         {
             chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
             // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
+            cout << "Testbeta: " << det->GetDetectorName().Data() << "  " << chi2 << " Position: " << x_l
+                 << " now: " << hit->GetX() << ",  dev: " << (x_l - hit->GetX()) << " res: " << det->res_x << endl;
             nchi2 += 1;
         }
-
+        /*
+                if(det->res_y > 0.)
+                {
+                    chi2 += TMath::Power((y_l - hit->GetY()) / det->res_y, 2);
+                    cout << "Calculate chi2 for y: " <<  det->GetDetectorName().Data() << "  " << chi2 <<
+                    " Position: " << y_l << " now: " << hit->GetY() << ",  dev: " << (y_l - hit->GetY()) <<
+                    " res: " << det->res_y << endl;
+                    nchi2 += 1;
+                }
+        */
         //        if(kTof == det->section)
         //        {
         //            chi2 += TMath::Power((time - hit->GetTime()) / det->res_t, 2);
@@ -171,6 +185,7 @@ double Chi2Beta(const double* xx)
     // sdev = TMath::Sqrt(sdev);
 
     // chi2 /= nchi2;
+    cout << "chi2beta: " << chi2 << endl;
     gCandidate->SetChi2(chi2);
 
     return chi2;
@@ -251,7 +266,7 @@ double Chi2Backward(const double* xx)
 
 double Chi2Backward2D(const double* xx)
 {
-    cout << "in function Chi2Backward2D" << endl;
+    // cout << "in function Chi2Backward2D" << endl;
 
     // Bool_t result = kFALSE;
     // Double_t sdev = 0.;
@@ -263,7 +278,8 @@ double Chi2Backward2D(const double* xx)
     Int_t nchi2 = 0;
 
     double mass = xx[0];
-    double x_fi30 = xx[1];
+    // double x_fi32 = xx[1];
+    // double x_fi32 = xx[2];
 
     gCandidate->SetMass(mass);
     gCandidate->UpdateMomentum();
@@ -277,7 +293,11 @@ double Chi2Backward2D(const double* xx)
     TVector3 pos3;
     // fi4->LocalToGlobal(pos1, gSetup->GetHit("fi4", gCandidate->GetHitIndexByName("fi4"))->GetX(), 0.);
     fi32->LocalToGlobal(pos2, gSetup->GetHit("fi32", gCandidate->GetHitIndexByName("fi32"))->GetX(), 0.);
-    fi30->LocalToGlobal(pos3, x_fi30, 0.);
+    // fi30->LocalToGlobal(pos3, x_fi30, 0.);
+
+    // fi32->LocalToGlobal(pos2, x_fi32, 0.);
+    // fi30->LocalToGlobal(pos3, x_fi30, 0.);
+    fi30->LocalToGlobal(pos3, gSetup->GetHit("fi30", gCandidate->GetHitIndexByName("fi30"))->GetX(), 0.);
 
     TVector3 direction0 = (pos2 - pos3).Unit();
     TVector3 pos0 = pos3;
@@ -321,15 +341,18 @@ double Chi2Backward2D(const double* xx)
 
         // Convert global track coordinates into local on the det plane
         det->GlobalToLocal(gCandidate->GetPosition(), x_l, y_l);
-
+        cout << "Candidate position: " << x_l << endl;
         R3BHit* hit =
             gSetup->GetHit(det->GetDetectorName().Data(), gCandidate->GetHitIndexByName(det->GetDetectorName().Data()));
 
+        cout << "Detector: " << det->GetDetectorName().Data() << " Position on detector: " << hit->GetX() << endl;
+        // cout << "Start chi2:" << chi2 << endl;
         // if(kTarget != det->section)
         // if(kAfterGlad == det->section)
         {
             chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
-            // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
+            cout << "Test: " << nchi2 << "  " << chi2 << ",  dev: " << (x_l - hit->GetX()) << " res: " << det->res_x
+                 << endl;
             nchi2 += 1;
         }
 
@@ -343,6 +366,7 @@ double Chi2Backward2D(const double* xx)
     // sdev = TMath::Sqrt(sdev);
 
     // chi2 /= nchi2;
+    cout << "chi2: " << chi2 << endl;
     gCandidate->SetChi2(chi2);
 
     return chi2;
@@ -440,7 +464,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrackBeta(R3BTrackingParticle* particle, R3B
     // a IMultiGenFunction type
     ROOT::Math::Functor f(&Chi2Beta, 1);
     double variable[1] = { particle->GetStartBeta() };
-    double step[1] = { 0.0001 };
+    double step[1] = { 0.01 };
 
     minimum->SetFunction(f);
 
@@ -455,6 +479,8 @@ Int_t R3BFragmentFitterChi2S494::FitTrackBeta(R3BTrackingParticle* particle, R3B
     minimum->Minimize();
 
     status = minimum->Status();
+
+    cout << "status beta: " << status << endl;
     if (0 != status)
     {
         return status;
@@ -473,7 +499,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrackBeta(R3BTrackingParticle* particle, R3B
 Int_t R3BFragmentFitterChi2S494::FitTrackBackward(R3BTrackingParticle* particle, R3BTrackingSetup* setup)
 {
     // fPropagator->SetVis(kTRUE);
-    cout << "in FitTrackBackward" << endl;
+    // cout << "in FitTrackBackward" << endl;
 
     gCandidate = particle;
     gSetup = setup;
@@ -483,7 +509,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrackBackward(R3BTrackingParticle* particle,
     auto fi30 = gSetup->GetByName("fi30");
     // auto tof = gSetup->GetFirstByType(kTof);
 
-    double variable[1] = { 132. * amu };
+    double variable[1] = { 16. * amu };
     double step[1] = { 0.01 };
 
     // Set the free variables to be minimized!
@@ -517,7 +543,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrackBackward(R3BTrackingParticle* particle,
             {
                 weight = 0.5;
             }
-            gCandidate->PassThroughDetector(det, weight);
+            gCandidate->PassThroughDetector(det, weight); // MH Backward?
         }
     }
 
@@ -560,7 +586,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrackBackward(R3BTrackingParticle* particle,
 Int_t R3BFragmentFitterChi2S494::FitTrackBackward2D(R3BTrackingParticle* particle, R3BTrackingSetup* setup)
 {
     // fPropagator->SetVis(kTRUE);
-    cout << "in FitTrackBackward2D" << endl;
+    // cout << "in FitTrackBackward2D" << endl;
     gCandidate = particle;
     gSetup = setup;
 
@@ -569,12 +595,23 @@ Int_t R3BFragmentFitterChi2S494::FitTrackBackward2D(R3BTrackingParticle* particl
     auto fi30 = gSetup->GetByName("fi30");
     // auto tof = gSetup->GetFirstByType(kTof);
 
-    double variable[2] = { 16. * amu, gSetup->GetHit("fi30", particle->GetHitIndexByName("fi30"))->GetX() };
-    double step[2] = { 0.01, 0.001 };
+    double variable[1] = { 16. * amu };
+    double step[1] = { 0.01 };
 
+    /*
+        double variable[2] = { 16. * amu, gSetup->GetHit("fi32", particle->GetHitIndexByName("fi32"))->GetX() };
+        double step[2] = { 0.01, 0.001 };
+    */
+    /*
+        double variable[3] = { 16. * amu,
+             gSetup->GetHit("fi30", particle->GetHitIndexByName("fi30"))->GetX(),
+             gSetup->GetHit("fi32", particle->GetHitIndexByName("fi32"))->GetX()};
+        double step[3] = { 0.01, 0.001, 0.001 };
+    */
     // Set the free variables to be minimized!
-    fMinimum->SetLimitedVariable(0, "m", variable[0], step[0], 10. * amu, 20. * amu);
-    fMinimum->SetLimitedVariable(1, "xfi30", variable[1], step[1], -100., 100.);
+    fMinimum->SetLimitedVariable(0, "m", variable[0], step[0], 1. * amu, 50. * amu);
+    // fMinimum->SetLimitedVariable(1, "xfi30", variable[1], step[1], -1000., 1000.);
+    // fMinimum->SetLimitedVariable(2, "xfi32", variable[2], step[2], -1000., 1000.);
 
     TVector3 pos1;
     TVector3 pos2;

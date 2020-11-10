@@ -247,6 +247,7 @@ Bool_t R3BTPropagator::PropagateToPlaneBackward(R3BTrackingParticle* particle,
                 TLine* l1 = new TLine(-tpos.X(), tpos.Z(), -particle->GetX(), particle->GetZ());
                 l1->Draw();
             }
+            LOG(DEBUG2) << particle->GetX() << ", " << particle->GetY() << ", " << particle->GetZ();
             return result;
         }
         LOG(DEBUG2) << "Propagating to entrance of magnetic field.";
@@ -257,6 +258,7 @@ Bool_t R3BTPropagator::PropagateToPlaneBackward(R3BTrackingParticle* particle,
             TLine* l1 = new TLine(-tpos.X(), tpos.Z(), -particle->GetX(), particle->GetZ());
             l1->Draw();
         }
+        LOG(DEBUG2) << particle->GetX() << ", " << particle->GetY() << ", " << particle->GetZ();
         if (!result)
         {
             return result;
@@ -298,10 +300,13 @@ Bool_t R3BTPropagator::PropagateToPlaneRK(R3BTrackingParticle* particle,
     particle->GetCosines(&vecRKIn[3]);
 
     TVector3 norm = ((v2 - v1).Cross(v3 - v1)).Unit();
-    TVector3 intersect;
+    TVector3 dist = particle->GetPosition() - v1;
+    Double_t diff = dist.Dot(norm);
 
-    Double_t step = (v1 - particle->GetPosition()).Mag() * 0.99;
+    Double_t step = TMath::Abs(diff);
     Double_t length = 0.;
+    Double_t res = 100.;
+    Double_t res_old = 100.;
 
     while (kTRUE)
     {
@@ -317,24 +322,19 @@ Bool_t R3BTPropagator::PropagateToPlaneRK(R3BTrackingParticle* particle,
         particle->AddStep(length);
 
         nStep += 1;
-        if (LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), v1, norm, intersect))
+
+        dist = particle->GetPosition() - v1;
+        Double_t distance = (TVector3(dist.X() * norm.X(), dist.Y() * norm.Y(), dist.Z() * norm.Z())).Mag();
+        res = TMath::Abs(distance / diff);
+
+        if (res < 0.001 || res > res_old)
         {
-            for (Int_t ii = 0; ii < 7; ii++)
-            {
-                vecTemp[ii] = vecOut[ii];
-            }
-            step = (intersect - TVector3(vecTemp[0], vecTemp[1], vecTemp[2])).Mag() * 0.99;
-            length = fFairProp->OneStepRungeKutta(particle->GetCharge(), step, vecTemp, vecOut);
-            particle->SetPosition(vecOut);
-            particle->SetCosines(&vecOut[3]);
-            particle->AddStep(length);
             break;
         }
-
-        step = (v1 - particle->GetPosition()).Mag();
-        if (step < 1e-5)
+        else
         {
-            break;
+            res_old = res;
+            step = distance;
         }
 
         if (nStep > 1000)

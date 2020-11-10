@@ -529,6 +529,10 @@ InitStatus R3BTrackS454::Init()
     fh_Fib13_vs_Fib11->GetYaxis()->SetTitle("Fiber13");
     fh_Fib13_vs_Fib11->GetXaxis()->SetTitle("Fiber11");
 
+    fh_Fiber13_vs_Fiber11 = new TH2F("fiber13_vs_fiber11", "Fiber 13 vs. Fiber 11", 1024, 0, 1024, 1024, 0., 1024.);
+    fh_Fiber13_vs_Fiber11->GetYaxis()->SetTitle("Fiber13");
+    fh_Fiber13_vs_Fiber11->GetXaxis()->SetTitle("Fiber11");
+
     fh_Fib11_vs_Fib3a = new TH2F("fib11_vs_fib3a", "Fiber 11 vs. Fiber 3a", 1000, -50, 50, 1000, -50., 50.);
     fh_Fib11_vs_Fib3a->GetYaxis()->SetTitle("Fiber11");
     fh_Fib11_vs_Fib3a->GetXaxis()->SetTitle("Fiber3a");
@@ -961,14 +965,19 @@ void R3BTrackS454::Exec(Option_t* option)
     Int_t max = 10000;
     Int_t detector[max];
     Int_t detector_s[max];
+    Int_t detector_ss[max];
     Double_t xdet[max];
     Double_t xdet_s[max];
+    Double_t xdet_ss[max];
     Double_t ydet[max];
     Double_t ydet_s[max];
+    Double_t ydet_ss[max];
     Double_t zdet[max];
     Double_t zdet_s[max];
+    Double_t zdet_ss[max];
     Int_t qdet[max + 2];
     Int_t qdet_s[max + 2];
+    Int_t qdet_ss[max + 2];
     qdet[max] = 2;
     qdet[max + 1] = 6;
     Double_t xFi13[max];
@@ -976,6 +985,7 @@ void R3BTrackS454::Exec(Option_t* option)
     Double_t qFi13[max];
     Double_t tFi13[max];
     Bool_t fFi13[max];
+    Int_t fibFi13[max];
     Double_t xFi12[max];
     Double_t yFi12[max];
     Double_t qFi12[max];
@@ -986,6 +996,7 @@ void R3BTrackS454::Exec(Option_t* option)
     Double_t qFi11[max];
     Double_t tFi11[max];
     Bool_t fFi11[max];
+    Int_t fibFi11[max];
     Double_t xFi10[max];
     Double_t yFi10[max];
     Double_t qFi10[max];
@@ -1013,6 +1024,7 @@ void R3BTrackS454::Exec(Option_t* option)
 
     countdet = 0;
     countdet_s = 0;
+    countdet_ss = 0;
 
     Double_t track[12];   // x,y,z, px, py, pz
     Double_t track_s[12]; // x,y,z, px, py, pz
@@ -1158,6 +1170,8 @@ void R3BTrackS454::Exec(Option_t* option)
         return;
 
     Int_t multTofd = 0;
+    Int_t multTofdr = 0;
+    Int_t multTofdl = 0;
 
     // loop over ToFD
     for (Int_t ihit = 0; ihit < nHits; ihit++)
@@ -1460,7 +1474,8 @@ void R3BTrackS454::Exec(Option_t* option)
 
         if (debug_in)
             cout << "start fiber analysis" << endl;
-
+        Int_t fiber13;
+        Int_t fiber11;
         // loop over fiber 13
         auto detHit13 = fHitItems.at(DET_FI13);
         Int_t nHits13 = detHit13->GetEntriesFast();
@@ -1475,6 +1490,7 @@ void R3BTrackS454::Exec(Option_t* option)
             y1[det] = hit13->GetY() / 100.;
             z1[det] = 0.;
             q1[det] = hit13->GetEloss();
+            fiber13 = hit13->GetFiberId();
             if (fSimu)
             {
                 if (q1[det] > 9.)
@@ -1522,6 +1538,7 @@ void R3BTrackS454::Exec(Option_t* option)
             yFi13[mult13] = y1[det];
             qFi13[mult13] = q1[det];
             tFi13[mult13] = tof;
+            fibFi13[mult13] = fiber13;
             mult13++;
             if (mult13 > 100)
                 continue;
@@ -1584,6 +1601,7 @@ void R3BTrackS454::Exec(Option_t* option)
             y1[det] = hit11->GetY() / 100.;
             z1[det] = 0.;
             q1[det] = hit11->GetEloss();
+            fiber11 = hit11->GetFiberId();
             if (fSimu)
             {
                 if (q1[det] > 9.)
@@ -1630,6 +1648,7 @@ void R3BTrackS454::Exec(Option_t* option)
             yFi11[mult11] = y1[det];
             qFi11[mult11] = q1[det];
             tFi11[mult11] = tof;
+            fibFi11[mult11] = fiber11;
             mult11++;
             if (mult11 > 100)
                 continue;
@@ -2107,6 +2126,7 @@ void R3BTrackS454::Exec(Option_t* option)
                 if (xFi11[i] > -100 && xFi13[j] > -100)
                 {
                     fh_Fib13_vs_Fib11->Fill(xFi11[i] * 100., xFi13[j] * 100.);
+                    fh_Fiber13_vs_Fiber11->Fill(fibFi11[i], fibFi13[j]);
                     fh_Fib13_vs_Fib11_dx->Fill(xFi11[i] * 100., xFi13[j] * 100. - xFi11[i] * 100.);
                     if (!maxWerte)
                     {
@@ -2224,8 +2244,8 @@ void R3BTrackS454::Exec(Option_t* option)
 
         // here call tracker
         chi2 = 1.E100;
-        Bool_t debug = true;
-        if (debug && ((mult10 > 0 && mult12 > 0 && mult3b > 0) || (mult11 > 0 && mult13 > 0 && mult3a > 0)))
+        Bool_t debug = false;
+        // if (debug && ((mult10 > 0 && mult12 > 0 && mult3b > 0) || (mult11 > 0 && mult13 > 0 && mult3a > 0)))
         {
             cout << "# of points" << countdet << endl;
             for (Int_t i = 0; i < countdet; i++)
@@ -2233,7 +2253,13 @@ void R3BTrackS454::Exec(Option_t* option)
                 cout << "#" << i << " Det: " << detector[i] << " x: " << xdet[i] << " y: " << ydet[i]
                      << " q: " << qdet[i] << endl;
                 if (detector[i] < 6)
-                    qdet[i] = 0;
+                {
+                    // qdet[i] = 0;
+                }
+                if (detector[i] == 6 || detector[i] == 8)
+                    multTofdr++;
+                if (detector[i] == 7 || detector[i] == 9)
+                    multTofdl++;
             }
 
             for (Int_t i = 0; i < ndet; i++)
@@ -2243,11 +2269,29 @@ void R3BTrackS454::Exec(Option_t* option)
             }
         }
 
+        if (multTofdr > 0 && mult3a == 0)
+            miss3a++;
+        if (multTofdr > 0 && mult11 == 0)
+            miss11++;
+        if (multTofdr > 0 && mult13 == 0)
+            miss13++;
+
+        if (multTofdl > 0 && mult3b == 0)
+            miss3b++;
+        if (multTofdl > 0 && mult10 == 0)
+            miss10++;
+        if (multTofdl > 0 && mult12 == 0)
+            miss12++;
+
+        cout << "missing 3a: " << miss3a << " missing 3b: " << miss3b << endl;
+        cout << "missing 11: " << miss11 << " missing 12: " << miss12 << endl;
+        cout << "missing 13: " << miss13 << " missing 10: " << miss10 << endl;
+
         for (Int_t i = 0; i < countdet; i++)
         {
             if (detector[i] < 6)
             {
-                // qdet[i] = 0;
+                qdet[i] = 0;
             }
             // Fill temp array
             xdet_s[i] = xdet[i];
@@ -2281,8 +2325,10 @@ void R3BTrackS454::Exec(Option_t* option)
         Bool_t twice = true;
         if (tracker && fPairs && twice &&
             ((mult10 > 0 && mult12 > 0 && mult3b > 0) || (mult11 > 0 && mult13 > 0 && mult3a > 0)))
+        //            ((mult10 > 0 && mult12 > 0 ) || (mult11 > 0 && mult13 > 0 )))
         {
             // two times single track single track
+            cout << "Track two single tracks!!!!!" << endl;
             counter2++;
             Bool_t det_coord = true;
             Bool_t st = false;
@@ -2318,6 +2364,8 @@ void R3BTrackS454::Exec(Option_t* option)
 
                 cout << "Track In 12C"
                      << "px " << pCxs << " py " << pCys << " z " << pCzs << endl;
+
+                cout << "# of points back" << countdet << endl;
             }
 
             track_s[6] = track[0];
@@ -2345,8 +2393,8 @@ void R3BTrackS454::Exec(Option_t* option)
                 for (Int_t i = 0; i < countdet; i++)
                 {
 
-                    // cout << "back #" << i << " Det: " << detector[i] << " x: " << xdet[i]
-                    //     << " y: " << ydet[i] << " q: " << qdet[i] << endl;
+                    cout << "back #" << i << " Det: " << detector[i] << " x: " << xdet[i] << " y: " << ydet[i]
+                         << " q: " << qdet[i] << endl;
                     xTrack[detector[i]] = xdet[i];
                     yTrack[detector[i]] = ydet[i];
                     zTrack[detector[i]] = zdet[i];
@@ -2378,16 +2426,41 @@ void R3BTrackS454::Exec(Option_t* option)
                     R3BTrack(track[0], track[1], track[2], track[3], track[4], track[5], charge, 2, chi[0], chi[1], 0);
             }
 
+            // remove hits which were used to track first particle
+            Bool_t used = false;
+            countdet_ss = 0;
+            for (Int_t i = 0; i < countdet_s; i++)
+            {
+                used = false;
+                for (Int_t j = 0; j < countdet; j++)
+                {
+                    //                    if(detector_s[i] == detector[j] && abs(xdet_s[i] - xdet[j]) < 0.000001 &&
+                    //                    abs(ydet_s[i] - ydet[j]) < 0.000001)
+                    if (detector_s[i] == detector[j] && abs(xdet_s[i] - xdet[j]) < 0.000001)
+                    {
+                        used = true;
+                    }
+                }
+                if (!used)
+                {
+                    xdet_ss[countdet_ss] = xdet_s[i];
+                    ydet_ss[countdet_ss] = ydet_s[i];
+                    zdet_ss[countdet_ss] = zdet_s[i];
+                    qdet_ss[countdet_ss] = qdet_s[i];
+                    detector_ss[countdet_ss] = detector_s[i];
+                    countdet_ss++;
+                }
+            }
             // now track second particle (alpha)
-            countdet = countdet_s;
+            countdet = countdet_ss;
             for (Int_t i = 0; i < countdet; i++)
             {
                 // Fill temp array
-                xdet[i] = xdet_s[i];
-                ydet[i] = ydet_s[i];
-                zdet[i] = zdet_s[i];
-                qdet[i] = qdet_s[i];
-                detector[i] = detector_s[i];
+                xdet[i] = xdet_ss[i];
+                ydet[i] = ydet_ss[i];
+                zdet[i] = zdet_ss[i];
+                qdet[i] = qdet_ss[i];
+                detector[i] = detector_ss[i];
             }
             for (Int_t i = 0; i < 12; i++)
             {
@@ -2522,6 +2595,7 @@ void R3BTrackS454::Exec(Option_t* option)
             ((mult10 > 0 && mult12 > 0 && mult3b > 0) || (mult11 > 0 && mult13 > 0 && mult3a > 0)))
         {
             // double track
+            cout << "Track double tracks!!!!!" << endl;
             counter2++;
             qdet[max] = 2;
             qdet[max + 1] = 6;
@@ -2624,6 +2698,8 @@ void R3BTrackS454::Exec(Option_t* option)
         if (tracker && !fPairs && !twice && ((mult10 > 0 && mult12 > 0) || (mult11 > 0 && mult13 > 0)))
         {
             // single track
+            cout << "Track single tracks!!!!!" << endl;
+            cout << "Combination of fibers: " << fiber11 << " and " << fiber13 << endl;
             qdet[max] = 8;
             qdet[max + 1] = 8;
             counter2++;
@@ -3005,6 +3081,7 @@ void R3BTrackS454::FinishTask()
     }
 
     fh_Fib13_vs_Fib11->Write();
+    fh_Fiber13_vs_Fiber11->Write();
     fh_Fib13_vs_Fib11_dx->Write();
     fh_Fib11_vs_Fib3a->Write();
     fh_Fib11_vs_Fib3a_dx->Write();

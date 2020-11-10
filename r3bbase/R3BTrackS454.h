@@ -242,6 +242,7 @@ class R3BTrackS454 : public FairTask
 	Int_t counterTracker = 0;
 	Int_t countdet;
 	Int_t countdet_s;
+	Int_t countdet_ss;
 	
 	Double_t hits1 = 0;
 	Double_t hits10 = 0;
@@ -252,6 +253,13 @@ class R3BTrackS454 : public FairTask
 	Double_t hits12bc = 0;
 	Double_t hits13 = 0;
 	Double_t hits13bc = 0;
+
+	Int_t miss3a = 0;
+	Int_t miss3b = 0;
+	Int_t miss10 = 0;
+	Int_t miss11 = 0;
+	Int_t miss12 = 0;
+	Int_t miss13 = 0;
 
     UInt_t num_spills = 0;
 
@@ -283,6 +291,7 @@ class R3BTrackS454 : public FairTask
     TH2F* fh_ToF_vs_Events_ac[NOF_FIB_DET];
 
 	TH2F* fh_Fib13_vs_Fib11;
+	TH2F* fh_Fiber13_vs_Fiber11;
 	TH2F* fh_Fib13_vs_Fib11_dx;
 	TH2F* fh_Fib11_vs_Fib3a;
 	TH2F* fh_Fib11_vs_Fib3a_dx;
