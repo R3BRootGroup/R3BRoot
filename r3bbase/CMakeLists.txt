@@ -48,6 +48,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/ptofData
 ${R3BROOT_SOURCE_DIR}/fiber
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/sampData
+${R3BROOT_SOURCE_DIR}/r3bdata/sfibData
 ${R3BROOT_SOURCE_DIR}/tracker_rene
 )
 
@@ -60,9 +61,11 @@ set(SRCS
 R3BModule.cxx 
 R3BDetector.cxx 
 R3BEventHeader.cxx
+R3BEventHeaderCal2Hit.cxx
 R3BOnlineSpectra.cxx
 R3BOnlineSpectraDec2019.cxx
 R3BOnlineSpectraPdc.cxx
+R3BOnlineSpectraSfib.cxx
 R3BGlobalAnalysis.cxx
 R3BGlobalAnalysisS454.cxx
 R3BTrackS454.cxx

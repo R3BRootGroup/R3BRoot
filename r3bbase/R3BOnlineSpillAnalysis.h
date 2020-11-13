@@ -177,168 +177,194 @@ class R3BOnlineSpillAnalysis : public FairTask
         fNofPlanes = planes;
         fPaddlesPerPlane = ppp;
     }
-/* Put Custom functions here*/
-		/** Function for exponential distribution*/
-	double ran_expo(double lambda){
-		double u;
+    /* Put Custom functions here*/
+    /** Function for exponential distribution*/
+    double ran_expo(double lambda)
+    {
+        double u;
 
-		u = rand() / (RAND_MAX + 1.0);
+        u = rand() / (RAND_MAX + 1.0);
 
-		return -log(1- u) / lambda;
-	}
-	
-	/** Sorting function, sorts an array and return the value of a. If a = 1 -> entries with -1.e9, these need to be sorted out later.*/
-	int sort_array(Int_t *entries, Double_t *array, Int_t *array2, Double_t *array3)
-	{	
-		//array = new double[entries];
-		bool sorted = false;
-		//Bool_t Noise = false;
-		Int_t a = 0;
-				do{
-					while(!sorted){//Bubble-Sort
-						sorted = true;
-						for(int sorting = 0;sorting<*entries-1;sorting++){
-							if(array[sorting] == -1.e9){
-								 a = 1;
-								//std::cout<<"a = "<<a<<" array[sorting]: "<<array[sorting]<<std::endl;
-							}
-							if(array[sorting]>array[sorting+1]){
-								Double_t temp = array[sorting];
-								array[sorting] = array[sorting+1];
-								array[sorting+1] = temp;
-								sorted = false;
-								/**Sort appending arrays */
-								Int_t temp2 = array2[sorting];
-								Double_t temp3 = array3[sorting];
-								array2[sorting] = array2[sorting+1];
-								array3[sorting] = array3[sorting+1];
-								array2[sorting+1] = temp2;
-								array3[sorting+1] = temp3;
-							} 
-						}	
-					}
-					
-				}while(!sorted);
-		return a;
-	}
-	/**Function to merge multihits and give out mean HitTime */
-	void merge_hits(Int_t *counter, Int_t maxEntries, Int_t *point, Double_t *array_read, Double_t *array_write)
-	{	
-		Int_t merge_counter = 0;
-		for(int i=*counter; i<maxEntries-1; i++){
-			if(array_read[i+1] - *(array_read+*counter) > 35.){
-				continue;
-			}
-			//std::cout<<"arr["<<*counter<<"]: "<<array_read[*counter]<<" arr["<<i+1<<"]: "<<array_read[i+1]<<std::endl;
-			merge_counter++;
-		}
-		if(merge_counter == 0)
-			*(array_write+*point) = *(array_read+*counter);
-		else{
-			for(int j = 0; j<merge_counter; j++){
-				*(array_write+*point) += *(array_read+*counter+j)/merge_counter;
-			}
-		}
-		*point += 1;
-		*counter += merge_counter;
-	}
+        return -log(1 - u) / lambda;
+    }
 
-		Int_t Fiber1_mapMatrix[16][16] = {	//Fiber Mapping on MAPMT
-		{ 1,17,33,49,65,81,97, 113,129,145,161,177,193,209,225,241},
-		{ 5,21,37,53,69,85,101,117,133,149,165,181,197,213,229,245},
-		{ 9,25,41,57,73,89,105,121,137,153,169,185,201,217,233,249},
-		{13,29,45,61,77,93,109,125,141,157,173,189,205,221,237,253},
-		{ 2,18,34,50,66,82, 98,114,130,146,162,178,194,210,226,242},
-		{ 6,22,38,54,70,86,102,118,134,150,166,182,198,214,230,246},
-		{10,26,42,58,74,90,106,122,138,154,170,186,202,218,234,250},
-		{14,30,46,62,78,94,110,126,142,158,174,190,206,222,238,254},
-		{ 3,19,35,51,67,83, 99,115,131,147,163,179,195,211,227,243},
-		{ 7,23,39,55,71,87,103,119,135,151,167,183,199,215,231,247},
-		{11,27,43,59,75,91,107,123,139,155,171,187,203,219,235,251},
-		{15,31,47,63,79,95,111,127,143,159,175,191,207,223,239,255},
-		{ 4,20,36,52,68,84,100,116,132,148,164,180,196,212,228,244},
-		{ 8,24,40,56,72,88,104,120,136,152,168,184,200,216,232,248},
-		{12,28,44,60,76,92,108,124,140,156,172,188,204,220,236,252},
-		{16,32,48,64,80,96,112,128,144,160,176,192,208,224,240,256} };
-		 
-		 Int_t FCTctr = 0;
-		 Int_t ACT_nctr = 0;
-		 Int_t ACT_nnctr = 0;
-		 Int_t CTctr = 0;
-	bool check_anode_CT(int fibnum1, int fibnum2){
-		
-		Int_t a = -1;
-		Int_t b = -1;
-		bool broken = false;
-		for(int i=0; i<16; i++){
-			for(int j=0; j<16; j++){
-				if(Fiber1_mapMatrix[i][j] == fibnum1){
-					a=i;
-					b=j;
-					broken = true;
-					break;
-				}
-			}
-			if(broken) break;
-		}
-		std::cout<<"AnCT"<<std::endl;	
-		std::cout<<"Fib1: "<<Fiber1_mapMatrix[a][b]<<" Fib2: "<<fibnum2<<std::endl;	
-		
-		//check neighbouring anode
-		if(Fiber1_mapMatrix[a+1][b] == fibnum2 && a+1 < 16){
-			return true;
-			ACT_nctr++;
-		}
-		else if(Fiber1_mapMatrix[a-1][b] == fibnum2 && a != 0){
-			return true;
-			ACT_nctr++;
-		}
-		else if(Fiber1_mapMatrix[a][b+1] == fibnum2 && b+1 < 16){
-			return true;
-			ACT_nctr++;
-		}
-		else if(Fiber1_mapMatrix[a][b-1] == fibnum2 && b != 0){
-			return true;
-			ACT_nctr++;
-		}
-		//check next neighbour
-		else if(Fiber1_mapMatrix[a+1][b+1] == fibnum2 && a+1 < 16 && b+1<16){
-			return true;
-			ACT_nnctr++;
-		}
-		else if(Fiber1_mapMatrix[a-1][b+1] == fibnum2 && a != 0 && b+1<16){
-			return true;
-			ACT_nnctr++;
-		}
-		else if(Fiber1_mapMatrix[a-1][b-1] == fibnum2 && a!=0 && b!=0){
-			return true;
-			ACT_nnctr++;
-		}
-		else if(Fiber1_mapMatrix[a+1][b-1] == fibnum2 && a+1<16 && b != 0){
-			return true;
-			ACT_nnctr++;
-		}
-		
-		else return false;
-	}
-	
-	bool check_fiber_CT(int fibnum1, int fibnum2){
-		std::cout<<"FiCT"<<std::endl;
-		std::cout<<"Fib1: "<<fibnum1<<" Fib2: "<<fibnum2<<std::endl;
-		if(fibnum1 - fibnum2 == 1 || fibnum2 - fibnum1 == 1)
-			return true;
-		else return false;
-		
-	}
+    /** Sorting function, sorts an array and return the value of a. If a = 1 -> entries with -1.e9, these need to be
+     * sorted out later.*/
+    int sort_array(Int_t* entries, Double_t* array, Int_t* array2, Double_t* array3)
+    {
+        // array = new double[entries];
+        bool sorted = false;
+        // Bool_t Noise = false;
+        Int_t a = 0;
+        do
+        {
+            while (!sorted)
+            { // Bubble-Sort
+                sorted = true;
+                for (int sorting = 0; sorting < *entries - 1; sorting++)
+                {
+                    if (array[sorting] == -1.e9)
+                    {
+                        a = 1;
+                        // std::cout<<"a = "<<a<<" array[sorting]: "<<array[sorting]<<std::endl;
+                    }
+                    if (array[sorting] > array[sorting + 1])
+                    {
+                        Double_t temp = array[sorting];
+                        array[sorting] = array[sorting + 1];
+                        array[sorting + 1] = temp;
+                        sorted = false;
+                        /**Sort appending arrays */
+                        Int_t temp2 = array2[sorting];
+                        Double_t temp3 = array3[sorting];
+                        array2[sorting] = array2[sorting + 1];
+                        array3[sorting] = array3[sorting + 1];
+                        array2[sorting + 1] = temp2;
+                        array3[sorting + 1] = temp3;
+                    }
+                }
+            }
 
-Double_t TotZeitEichung(double SpillLength, double pps){
-	/* Calibration parameters from known poisson distributions. Used 10,50,100,500 kHz laserpulse. */
-	Double_t DT = 18.27 * TMath::Exp(0.00319 * pps/SpillLength/1000.) + 30.47; //µs
-	return DT;
-}
+        } while (!sorted);
+        return a;
+    }
+    /**Function to merge multihits and give out mean HitTime */
+    void merge_hits(Int_t* counter, Int_t maxEntries, Int_t* point, Double_t* array_read, Double_t* array_write)
+    {
+        Int_t merge_counter = 0;
+        for (int i = *counter; i < maxEntries - 1; i++)
+        {
+            if (array_read[i + 1] - *(array_read + *counter) > 35.)
+            {
+                continue;
+            }
+            // std::cout<<"arr["<<*counter<<"]: "<<array_read[*counter]<<" arr["<<i+1<<"]:
+            // "<<array_read[i+1]<<std::endl;
+            merge_counter++;
+        }
+        if (merge_counter == 0)
+            *(array_write + *point) = *(array_read + *counter);
+        else
+        {
+            for (int j = 0; j < merge_counter; j++)
+            {
+                *(array_write + *point) += *(array_read + *counter + j) / merge_counter;
+            }
+        }
+        *point += 1;
+        *counter += merge_counter;
+    }
 
+    Int_t Fiber1_mapMatrix[16][16] = { // Fiber Mapping on MAPMT
+                                       { 1, 17, 33, 49, 65, 81, 97, 113, 129, 145, 161, 177, 193, 209, 225, 241 },
+                                       { 5, 21, 37, 53, 69, 85, 101, 117, 133, 149, 165, 181, 197, 213, 229, 245 },
+                                       { 9, 25, 41, 57, 73, 89, 105, 121, 137, 153, 169, 185, 201, 217, 233, 249 },
+                                       { 13, 29, 45, 61, 77, 93, 109, 125, 141, 157, 173, 189, 205, 221, 237, 253 },
+                                       { 2, 18, 34, 50, 66, 82, 98, 114, 130, 146, 162, 178, 194, 210, 226, 242 },
+                                       { 6, 22, 38, 54, 70, 86, 102, 118, 134, 150, 166, 182, 198, 214, 230, 246 },
+                                       { 10, 26, 42, 58, 74, 90, 106, 122, 138, 154, 170, 186, 202, 218, 234, 250 },
+                                       { 14, 30, 46, 62, 78, 94, 110, 126, 142, 158, 174, 190, 206, 222, 238, 254 },
+                                       { 3, 19, 35, 51, 67, 83, 99, 115, 131, 147, 163, 179, 195, 211, 227, 243 },
+                                       { 7, 23, 39, 55, 71, 87, 103, 119, 135, 151, 167, 183, 199, 215, 231, 247 },
+                                       { 11, 27, 43, 59, 75, 91, 107, 123, 139, 155, 171, 187, 203, 219, 235, 251 },
+                                       { 15, 31, 47, 63, 79, 95, 111, 127, 143, 159, 175, 191, 207, 223, 239, 255 },
+                                       { 4, 20, 36, 52, 68, 84, 100, 116, 132, 148, 164, 180, 196, 212, 228, 244 },
+                                       { 8, 24, 40, 56, 72, 88, 104, 120, 136, 152, 168, 184, 200, 216, 232, 248 },
+                                       { 12, 28, 44, 60, 76, 92, 108, 124, 140, 156, 172, 188, 204, 220, 236, 252 },
+                                       { 16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224, 240, 256 }
+    };
 
+    Int_t FCTctr = 0;
+    Int_t ACT_nctr = 0;
+    Int_t ACT_nnctr = 0;
+    Int_t CTctr = 0;
+    bool check_anode_CT(int fibnum1, int fibnum2)
+    {
 
+        Int_t a = -1;
+        Int_t b = -1;
+        bool broken = false;
+        for (int i = 0; i < 16; i++)
+        {
+            for (int j = 0; j < 16; j++)
+            {
+                if (Fiber1_mapMatrix[i][j] == fibnum1)
+                {
+                    a = i;
+                    b = j;
+                    broken = true;
+                    break;
+                }
+            }
+            if (broken)
+                break;
+        }
+        std::cout << "AnCT" << std::endl;
+        std::cout << "Fib1: " << Fiber1_mapMatrix[a][b] << " Fib2: " << fibnum2 << std::endl;
+
+        // check neighbouring anode
+        if (Fiber1_mapMatrix[a + 1][b] == fibnum2 && a + 1 < 16)
+        {
+            return true;
+            ACT_nctr++;
+        }
+        else if (Fiber1_mapMatrix[a - 1][b] == fibnum2 && a != 0)
+        {
+            return true;
+            ACT_nctr++;
+        }
+        else if (Fiber1_mapMatrix[a][b + 1] == fibnum2 && b + 1 < 16)
+        {
+            return true;
+            ACT_nctr++;
+        }
+        else if (Fiber1_mapMatrix[a][b - 1] == fibnum2 && b != 0)
+        {
+            return true;
+            ACT_nctr++;
+        }
+        // check next neighbour
+        else if (Fiber1_mapMatrix[a + 1][b + 1] == fibnum2 && a + 1 < 16 && b + 1 < 16)
+        {
+            return true;
+            ACT_nnctr++;
+        }
+        else if (Fiber1_mapMatrix[a - 1][b + 1] == fibnum2 && a != 0 && b + 1 < 16)
+        {
+            return true;
+            ACT_nnctr++;
+        }
+        else if (Fiber1_mapMatrix[a - 1][b - 1] == fibnum2 && a != 0 && b != 0)
+        {
+            return true;
+            ACT_nnctr++;
+        }
+        else if (Fiber1_mapMatrix[a + 1][b - 1] == fibnum2 && a + 1 < 16 && b != 0)
+        {
+            return true;
+            ACT_nnctr++;
+        }
+
+        else
+            return false;
+    }
+
+    bool check_fiber_CT(int fibnum1, int fibnum2)
+    {
+        std::cout << "FiCT" << std::endl;
+        std::cout << "Fib1: " << fibnum1 << " Fib2: " << fibnum2 << std::endl;
+        if (fibnum1 - fibnum2 == 1 || fibnum2 - fibnum1 == 1)
+            return true;
+        else
+            return false;
+    }
+
+    Double_t TotZeitEichung(double SpillLength, double pps)
+    {
+        /* Calibration parameters from known poisson distributions. Used 10,50,100,500 kHz laserpulse. */
+        Double_t DT = 18.27 * TMath::Exp(0.00319 * pps / SpillLength / 1000.) + 30.47; //µs
+        return DT;
+    }
 
     void Reset_ROLU_Histo();
     void Reset_LOS_Histo();
@@ -460,8 +486,8 @@ Double_t TotZeitEichung(double SpillLength, double pps){
     Double_t fSpillLength;
     Double_t fDAQ_dead_time;
     unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
-	
-	     // spill monitor 
+
+    // spill monitor
     Double_t fLastWindowTime[NOF_FIB_DET];
     Double_t LastWindowTime = 0.;
     Double_t tLastInWindow = 0.;
@@ -471,190 +497,189 @@ Double_t TotZeitEichung(double SpillLength, double pps){
     Double_t Schwelle = 90.;
     Double_t xmax;
     Double_t TIME_Fib_length = 0.;
-	Double_t TIME_previous_FL = 0.;
-	Double_t dtime_min = 80.;
-	Double_t dtime_max = 95.;
-	Int_t nHits_prev = 0;
-	Double_t time_tmp = 0.;
-	Int_t iFib_tmp = -1;
-	Int_t nHit_ctr = 0;
-	Int_t count_dead=0;
-	Double_t tLastPrev = 0.;
-	Double_t spill_times = 0.;
-	Double_t spill_times_first = 0.;
-	Int_t spill_ctr = 0;
-	Int_t spill_ctr_LOS = 0;
-	Int_t spill_ctr_FIB = 0;
-	Double_t dt_LOS = 0.;
-	Double_t dt_LOS_first = 0.;
-	Double_t dt_FIB_first = 0.;
-	Double_t FIB_time_spill = 0.;
-	Int_t hit_counter = 0;
-	Int_t SPILLS = 0;
-	int a_ctr = 0;
-	Int_t packagectr = 0;
-	Int_t pHits = 0;
-	Double_t F_duty = 0.;
-	Double_t F_duty_fib = 0.;
-	Double_t Hans_mean = 0.;
-	Bool_t MissedSpillEnd = false;
-	Bool_t spill_off_calc = false;
-	Int_t hans_ctr = 0;
-	Double_t Hans_check = 0.;
-	Int_t short_ctr = 0;
-	Double_t dt_prev = 0.;
-	Double_t dt_dead_mean = 0.;
-	Int_t dead_ctr = 0;
-	Double_t deadTime = fDAQ_dead_time;
-	Double_t tt_prev = 0.;
-	Bool_t skip_spill = false;
-	Double_t testcounter = 0.;
-	Int_t numHits1a = 0;
-	Int_t numHits1b = 0;
-	Bool_t first_in_spill = true;
-	Double_t CTAN = 0.;
-	Double_t CTANN = 0.;
-	Double_t CTF = 0.;
-	Int_t PPSF = 0;
-	Bool_t spillon_fib = true;
-	Double_t time_spill_on_fib = 0.;
+    Double_t TIME_previous_FL = 0.;
+    Double_t dtime_min = 80.;
+    Double_t dtime_max = 95.;
+    Int_t nHits_prev = 0;
+    Double_t time_tmp = 0.;
+    Int_t iFib_tmp = -1;
+    Int_t nHit_ctr = 0;
+    Int_t count_dead = 0;
+    Double_t tLastPrev = 0.;
+    Double_t spill_times = 0.;
+    Double_t spill_times_first = 0.;
+    Int_t spill_ctr = 0;
+    Int_t spill_ctr_LOS = 0;
+    Int_t spill_ctr_FIB = 0;
+    Double_t dt_LOS = 0.;
+    Double_t dt_LOS_first = 0.;
+    Double_t dt_FIB_first = 0.;
+    Double_t FIB_time_spill = 0.;
+    Int_t hit_counter = 0;
+    Int_t SPILLS = 0;
+    int a_ctr = 0;
+    Int_t packagectr = 0;
+    Int_t pHits = 0;
+    Double_t F_duty = 0.;
+    Double_t F_duty_fib = 0.;
+    Double_t Hans_mean = 0.;
+    Bool_t MissedSpillEnd = false;
+    Bool_t spill_off_calc = false;
+    Int_t hans_ctr = 0;
+    Double_t Hans_check = 0.;
+    Int_t short_ctr = 0;
+    Double_t dt_prev = 0.;
+    Double_t dt_dead_mean = 0.;
+    Int_t dead_ctr = 0;
+    Double_t deadTime = fDAQ_dead_time;
+    Double_t tt_prev = 0.;
+    Bool_t skip_spill = false;
+    Double_t testcounter = 0.;
+    Int_t numHits1a = 0;
+    Int_t numHits1b = 0;
+    Bool_t first_in_spill = true;
+    Double_t CTAN = 0.;
+    Double_t CTANN = 0.;
+    Double_t CTF = 0.;
+    Int_t PPSF = 0;
+    Bool_t spillon_fib = true;
+    Double_t time_spill_on_fib = 0.;
 
-	TH1F* fh_spill_times_fib_fine;
-	TH1F* fh_spill_times_fib_Coarse;
-	TH1F* fh_spill_times_fib_daq_first;
-	TH1F* fh_spill_times_FIB_pois;
-	TH1F* fh_spill_times_FIB_pois_Highstat;
-	TH1F* fh_spill_hans_fib;
-	TH1F* fh_spill_Q_E_real_fib;
-	TH1F* fh_spill_Q_E_pois_fib;
-	TH1F* fh_spill_frac_fib;
-	TH1F* fh_DutyFactor_fib;
-	TH1F* fh_DutyFactor_MtA_fib;
-	TH1F* fh_DutyFactor_fib_pois;
-	TH1F* fh_DutyFactor_MaxToAvg_fib;
-	TH1F* fh_DutyFactor_MaxRun_fib;
-	TH1F* fh_DutyFactor_AvgRun_fib;
-	TH1F* fh_rate_sum_fib;
-	TH1F* fh_rate_sum_SAMPFIB;
-	TH1F* fh_rate_sum_DTmean_fib;
-	TH1F* fh_rate_sum_DTmean_SAMPFIB;
-	TH1F* fh_spillQuality_ppt_fib;
-	TH1F* fh_spillQuality_ppt_fib_stat;
-	
-	TH1F* fh_rate_fib;
-	TH1F* fh_rate_fib_adj;
-	TH1F* fh_rate_fib_set;
-	TH1F* fh_particle_fib;          
-	TH1F* fh_particle_fib_pois;
-	
-	TH1F* fh_FIB_count_t;
-	TH1F* fh_FIB_TrgW_dt;
-	TH1F* fh_LOS_TrgW_dt;
-	TH1F* fh_SAMP_TrgW_dt;
-	TH1F* fh_FIB_TrgW_dt_coarse;
-	TH1F* fh_LOS_TrgW_dt_coarse;
-	TH1F* fh_SAMP_TrgW_dt_coarse;
-	TH1F* fh_FIB_Freq;
-	
-	TH1F* fh_FIB_tDiff_pois;
-	
+    TH1F* fh_spill_times_fib_fine;
+    TH1F* fh_spill_times_fib_Coarse;
+    TH1F* fh_spill_times_fib_daq_first;
+    TH1F* fh_spill_times_FIB_pois;
+    TH1F* fh_spill_times_FIB_pois_Highstat;
+    TH1F* fh_spill_hans_fib;
+    TH1F* fh_spill_Q_E_real_fib;
+    TH1F* fh_spill_Q_E_pois_fib;
+    TH1F* fh_spill_frac_fib;
+    TH1F* fh_DutyFactor_fib;
+    TH1F* fh_DutyFactor_MtA_fib;
+    TH1F* fh_DutyFactor_fib_pois;
+    TH1F* fh_DutyFactor_MaxToAvg_fib;
+    TH1F* fh_DutyFactor_MaxRun_fib;
+    TH1F* fh_DutyFactor_AvgRun_fib;
+    TH1F* fh_rate_sum_fib;
+    TH1F* fh_rate_sum_SAMPFIB;
+    TH1F* fh_rate_sum_DTmean_fib;
+    TH1F* fh_rate_sum_DTmean_SAMPFIB;
+    TH1F* fh_spillQuality_ppt_fib;
+    TH1F* fh_spillQuality_ppt_fib_stat;
+
+    TH1F* fh_rate_fib;
+    TH1F* fh_rate_fib_adj;
+    TH1F* fh_rate_fib_set;
+    TH1F* fh_particle_fib;
+    TH1F* fh_particle_fib_pois;
+
+    TH1F* fh_FIB_count_t;
+    TH1F* fh_FIB_TrgW_dt;
+    TH1F* fh_LOS_TrgW_dt;
+    TH1F* fh_SAMP_TrgW_dt;
+    TH1F* fh_FIB_TrgW_dt_coarse;
+    TH1F* fh_LOS_TrgW_dt_coarse;
+    TH1F* fh_SAMP_TrgW_dt_coarse;
+    TH1F* fh_FIB_Freq;
+
+    TH1F* fh_FIB_tDiff_pois;
+
     TH1F* fh_spill_hits_vs_time;
     TH1F* fh_spill_hits_vs_time_fine;
-    TH1F *fh_spill_times_fib;
-    TH1F *fh_spill_times_LOS;
-    TH1F *fh_spill_times_LOS_Fine;
-    TH1F *fh_spill_times_LOSFIB_Fine;
-    TH1F *fh_spill_times_LOSFIB_Fine_adj;
-    TH1F *fh_spill_times_LOS_Fine_adj;
-    TH1F *fh_spill_times_LOS_Coarse;
-    TH1F *fh_spill_times_LOS_pois;
-    TF1 *Pois;
-    TH1F *fh_r_pois_fib;
-    TH1F *fh_r_pois_LOS;
-    TH1F *fh_LOS_tDiff;
-    TH1F *fh_SAMPFIB_tDiff;
-    TH1F *fh_LOS_freq;
-    TH1F *fh_LOS_tDiff_pois;
-    TH1F *fh_DutyFactor_LOS;
-    TH1F *fh_DutyFactor_SAMPFIB;
-    TH1F *fh_DutyFactor_SAMPFIB_clean;
-    TH1F *fh_DutyFactor_SAMP_clean;
-    TH1F *fh_DutyFactor_MtA;
-    TH1F *fh_DutyFactor_LOS_pois;
-    TH1F *fh_DutyFactor_SAMPFIB_pois;
-    TH1F *fh_DutyFactor_MaxToAvg;
-    TH1F *fh_DutyFactor_Max;
-    TH1F *fh_DutyFactor_Max_clean;
-    TH1F *fh_DutyFactor_Max_SAMPFIB;
-    TH1F *fh_DutyFactor_Max_SAMPFIB_clean;
-    TH1F *fh_DutyFactor_Avg;
-    TH1F *fh_DutyFactor_Avg_clean;
-    TH1F *fh_DutyFactor_Avg_SAMPFIB;
-    TH1F *fh_DutyFactor_Avg_SAMPFIB_clean;
-    TH1F *fh_DutyFactor_PLD;
-    TH1F *fh_rate;
-    TH1F *fh_rate_SAMPFIB;
-    TH1F *fh_rate_adj;
-    TH1F *fh_rate_adj_SAMPFIB;
-    TH1F *fh_rate_set;
-    TH1F *fh_rate_set_SAMPFIB;
-    TH1F *fh_spill_times_daq;
-    TH1F *fh_spill_times_daq_first;
-    TH1F *fh_particle;
-    TH1F *fh_particle_pois;
-    TH1F *fh_spill_hans;
-    TH1F *fh_spill_hans_byMax;
-    TH1F *fh_spill_hans_sum_byMax;
-    TH1F *fh_spill_hans_SAMPFIB;
-    TH1F *fh_spill_hans_SAMPFIB_byMean;
-    TH1F *fh_spill_Q_E_real;
-    TH1F *fh_spill_Q_E_real_SAMPFIB;
-    TH1F *fh_spill_Q_E_pois;
-    TH1F *fh_spill_Q_E_pois_SAMPFIB;
-    TH1F *fh_spill_frac;
-    TH1F *fh_spill_frac_SAMPFIB;
-    TH1 *fh_FFT;
-    TH1 *fh_FFT_adj;
-    TH1 *fh_FFT_adj_SAMPFIB;
-    TH1 *fh_FFT_add;
-    TH1 *fh_FFT_add_SAMPFIB;
-    TH1F *fh_hans_sum;
-    TH1F *fh_hans_sum_byMax;
-    TH1F *fh_hans_SAMPFIB_sum;
-    TH1F *fh_hans_SAMPFIB_sum_byMean;
-    TH1F *fh_EL_sum;
-    TH1F *fh_EL_SAMPFIB_sum;
-    TH1F *fh_MtA_sum;
-    TH1F *fh_rate_sum;
-    TH1F *fh_rate_sum_DTmean;
-    TH1F *fh_deadTime_adj;
-    TH1F *fh_deadTime_mean;
-    TH1F *fh_deadTime_sum;
-    TH1F *fh_spillQuality_ppt;
-    TH1F *fh_spillQuality_ppt_SAMPFIB;
-    TH1F *fh_spillQuality_ppt_stat;
-    TH1F *fh_spillQuality_ppt_stat_SAMPFIB;
-    TH1F *fh_DutyFactor_MaxRun;
-    TH1F *fh_DutyFactor_AvgRun;
-    
-    TH2F *fh_spill_times_Fib1;
-	
-	
-	//------------------------------
+    TH1F* fh_spill_times_fib;
+    TH1F* fh_spill_times_LOS;
+    TH1F* fh_spill_times_LOS_Fine;
+    TH1F* fh_spill_times_LOSFIB_Fine;
+    TH1F* fh_spill_times_LOSFIB_Fine_adj;
+    TH1F* fh_spill_times_LOS_Fine_adj;
+    TH1F* fh_spill_times_LOS_Coarse;
+    TH1F* fh_spill_times_LOS_pois;
+    TF1* Pois;
+    TH1F* fh_r_pois_fib;
+    TH1F* fh_r_pois_LOS;
+    TH1F* fh_LOS_tDiff;
+    TH1F* fh_SAMPFIB_tDiff;
+    TH1F* fh_LOS_freq;
+    TH1F* fh_LOS_tDiff_pois;
+    TH1F* fh_DutyFactor_LOS;
+    TH1F* fh_DutyFactor_SAMPFIB;
+    TH1F* fh_DutyFactor_SAMPFIB_clean;
+    TH1F* fh_DutyFactor_SAMP_clean;
+    TH1F* fh_DutyFactor_MtA;
+    TH1F* fh_DutyFactor_LOS_pois;
+    TH1F* fh_DutyFactor_SAMPFIB_pois;
+    TH1F* fh_DutyFactor_MaxToAvg;
+    TH1F* fh_DutyFactor_Max;
+    TH1F* fh_DutyFactor_Max_clean;
+    TH1F* fh_DutyFactor_Max_SAMPFIB;
+    TH1F* fh_DutyFactor_Max_SAMPFIB_clean;
+    TH1F* fh_DutyFactor_Avg;
+    TH1F* fh_DutyFactor_Avg_clean;
+    TH1F* fh_DutyFactor_Avg_SAMPFIB;
+    TH1F* fh_DutyFactor_Avg_SAMPFIB_clean;
+    TH1F* fh_DutyFactor_PLD;
+    TH1F* fh_rate;
+    TH1F* fh_rate_SAMPFIB;
+    TH1F* fh_rate_adj;
+    TH1F* fh_rate_adj_SAMPFIB;
+    TH1F* fh_rate_set;
+    TH1F* fh_rate_set_SAMPFIB;
+    TH1F* fh_spill_times_daq;
+    TH1F* fh_spill_times_daq_first;
+    TH1F* fh_particle;
+    TH1F* fh_particle_pois;
+    TH1F* fh_spill_hans;
+    TH1F* fh_spill_hans_byMax;
+    TH1F* fh_spill_hans_sum_byMax;
+    TH1F* fh_spill_hans_SAMPFIB;
+    TH1F* fh_spill_hans_SAMPFIB_byMean;
+    TH1F* fh_spill_Q_E_real;
+    TH1F* fh_spill_Q_E_real_SAMPFIB;
+    TH1F* fh_spill_Q_E_pois;
+    TH1F* fh_spill_Q_E_pois_SAMPFIB;
+    TH1F* fh_spill_frac;
+    TH1F* fh_spill_frac_SAMPFIB;
+    TH1* fh_FFT;
+    TH1* fh_FFT_adj;
+    TH1* fh_FFT_adj_SAMPFIB;
+    TH1* fh_FFT_add;
+    TH1* fh_FFT_add_SAMPFIB;
+    TH1F* fh_hans_sum;
+    TH1F* fh_hans_sum_byMax;
+    TH1F* fh_hans_SAMPFIB_sum;
+    TH1F* fh_hans_SAMPFIB_sum_byMean;
+    TH1F* fh_EL_sum;
+    TH1F* fh_EL_SAMPFIB_sum;
+    TH1F* fh_MtA_sum;
+    TH1F* fh_rate_sum;
+    TH1F* fh_rate_sum_DTmean;
+    TH1F* fh_deadTime_adj;
+    TH1F* fh_deadTime_mean;
+    TH1F* fh_deadTime_sum;
+    TH1F* fh_spillQuality_ppt;
+    TH1F* fh_spillQuality_ppt_SAMPFIB;
+    TH1F* fh_spillQuality_ppt_stat;
+    TH1F* fh_spillQuality_ppt_stat_SAMPFIB;
+    TH1F* fh_DutyFactor_MaxRun;
+    TH1F* fh_DutyFactor_AvgRun;
+
+    TH2F* fh_spill_times_Fib1;
+
+    //------------------------------
     TH1F* fhTpat;
     TH1F* fh_spill_length;
     TH1F* fhTrigger;
-    //TH1F* fh_particle;
-    //TH1F* fh_particle_pois;
+    // TH1F* fh_particle;
+    // TH1F* fh_particle_pois;
     TH1F* fh_TOFDOR_spill;
     TH1F* fh_spill_times;
     TH1F* fh_spill_times_zoom;
     TH1F* fh_spill_times_pois;
-    //TH1F* fh_spill_times_daq;
-    //TH1F* fh_spill_times_daq_first;
+    // TH1F* fh_spill_times_daq;
+    // TH1F* fh_spill_times_daq_first;
     TH1F* fh_frequencies;
     TH1F* fh_TOFDOR;
-    //TH1F* fh_rate;
+    // TH1F* fh_rate;
     // TH1F *h3;
     TH1F* fh_TimePreviousEvent;
 
