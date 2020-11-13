@@ -11,26 +11,46 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BDISTRIBUTION3D_H
-#define R3BDISTRIBUTION3D_H
+#ifndef R3BPARTICLEGENERATOR_H
+#define R3BPARTICLEGENERATOR_H
 
-#include "TF3.h"
-#include "TH3.h"
-
+#include "R3BBeamProperties.h"
 #include "R3BDistribution.h"
+#include "R3BDistribution1D.h"
+#include "R3BParticleSelector.h"
 
-class R3BDistribution3D : public R3BDistribution<3>
+#include "FairGenerator.h"
+
+#include "TRandom3.h"
+
+#include <iostream>
+
+class FairPrimaryGenerator;
+
+class R3BParticleGenerator : public FairGenerator, public R3BParticleSelector
 {
-    using Arr = std::array<Double_t, 3>;
 
   public:
-    static R3BDistribution<3> Delta(const Double_t value1, const Double_t value2, const Double_t value3);
-    static R3BDistribution<3> Constant(const Arr lower_values, Arr upper_values);
-    static R3BDistribution<3> Gaussian(const Arr means, Arr sigmas);
-    static R3BDistribution<3> Cube(const Arr center, const Double_t edgeLength);
-    static R3BDistribution<3> Prism(R3BDistribution<2> xydist, R3BDistribution<1> zdist);
-    static R3BDistribution<3> Sphere(const Arr center, const Double_t radius);
-    static R3BDistribution<3> SphereSurface(const Arr center, const Double_t radius);
-    static R3BDistribution<3> Cylindric(R3BDistribution<1> rdist, R3BDistribution<1> zdist);
+    R3BParticleGenerator(int pdgCode, unsigned int seed = 0U);
+    R3BParticleGenerator(unsigned int seed = 0U);
+
+    R3BBeamProperties Beam; //!
+    bool Init() override;
+    bool ReadEvent(FairPrimaryGenerator* primGen) override;
+
+  protected:
+    void addParticle(const int pdgCode, const double mass) override;
+
+  private:
+    R3BDistribution<3> fVertex_cm;   //!
+    R3BDistribution<2> fSpread_mRad; //!
+    R3BDistribution<1> fEnergy_AMeV; //!
+
+    int fPDGCode;     // The PDG Code of the Particle
+    double fMass_GeV; // The Mass of the Particle
+    TRandom3 fRNG;      // the RNG
+
+    ClassDefOverride(R3BParticleGenerator, 1)
 };
+
 #endif

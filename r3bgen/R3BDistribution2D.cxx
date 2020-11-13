@@ -27,10 +27,7 @@ TGraph createLookupGraph(std::function<Double_t(Double_t)> distribution,
                          const Double_t upperBound,
                          const Int_t samples = 1000);
 
-R3BDistribution<Dim> R3BDistribution2D::Delta(const Double_t value1, const Double_t value2)
-{
-    return R3BDistribution<Dim>({ value1, value2 });
-}
+R3BDistribution<Dim> R3BDistribution2D::Delta(const Arr values) { return R3BDistribution<Dim>(values); }
 
 R3BDistribution<Dim> R3BDistribution2D::Flat(const Arr lower_Values, const Arr upper_Values)
 {

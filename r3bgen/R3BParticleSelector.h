@@ -11,26 +11,38 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BDISTRIBUTION3D_H
-#define R3BDISTRIBUTION3D_H
+#ifndef R3BPARTICLESELECTOR_H
+#define R3BPARTICLESELECTOR_H
 
-#include "TF3.h"
-#include "TH3.h"
+#include "Rtypes.h"
 
-#include "R3BDistribution.h"
+#include <array>
 
-class R3BDistribution3D : public R3BDistribution<3>
+class TParticle;
+class FairParticle;
+
+class R3BParticleSelector
 {
-    using Arr = std::array<Double_t, 3>;
-
   public:
-    static R3BDistribution<3> Delta(const Double_t value1, const Double_t value2, const Double_t value3);
-    static R3BDistribution<3> Constant(const Arr lower_values, Arr upper_values);
-    static R3BDistribution<3> Gaussian(const Arr means, Arr sigmas);
-    static R3BDistribution<3> Cube(const Arr center, const Double_t edgeLength);
-    static R3BDistribution<3> Prism(R3BDistribution<2> xydist, R3BDistribution<1> zdist);
-    static R3BDistribution<3> Sphere(const Arr center, const Double_t radius);
-    static R3BDistribution<3> SphereSurface(const Arr center, const Double_t radius);
-    static R3BDistribution<3> Cylindric(R3BDistribution<1> rdist, R3BDistribution<1> zdist);
+    virtual ~R3BParticleSelector() = default;
+
+    void AddProton();
+    void AddNeutron();
+    void AddParticle(FairParticle* particle);
+    void AddParticle(const char* particleName);
+    void AddParticle(const char* particleName,
+                     int z,
+                     int a,
+                     int s,
+                     double mass_GeV,
+                     int charge,
+                     bool stable,
+                     double decaytime_ns);
+    void AddParticle(int pdgCode);
+    void AddParticle(int z, int a);
+
+  protected:
+    virtual void addParticle(const int pdgCode, const double mass) = 0;
 };
+
 #endif

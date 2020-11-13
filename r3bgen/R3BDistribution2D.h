@@ -25,7 +25,8 @@ class R3BDistribution2D : public R3BDistribution<2>
     using Arr = std::array<Double_t, 2>;
 
   public:
-    static R3BDistribution<2> Delta(const Double_t value1, const Double_t value2);
+    static R3BDistribution<2> Delta(const Double_t value1, const Double_t value2) { return Delta({value1, value2}); }
+    static R3BDistribution<2> Delta(const Arr values);
     static R3BDistribution<2> Flat(const Arr lower_values, const Arr upper_values);
     static R3BDistribution<2> Gaussian(const Double_t mean, const Double_t sigma);
     static R3BDistribution<2> Gaussian(const Arr means, const Arr sigmas);

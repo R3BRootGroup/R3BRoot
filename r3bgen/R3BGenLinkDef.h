@@ -32,6 +32,7 @@
 #pragma link C++ class  R3BCALIFATestGenerator+;
 #pragma link C++ class  R3BCosmicGenerator+;
 #pragma link C++ class  R3Bp2pGenerator+;
+#pragma link C++ class  R3BParticleGenerator+;
 #pragma link C++ class  R3BIonGenerator+;
 #pragma link C++ class  R3BGammaGenerator+;
 #pragma link C++ class  R3BPhaseSpaceGenerator+;
@@ -39,6 +40,7 @@
 #pragma link C++ class 	R3BDistribution1D+;
 #pragma link C++ class 	R3BDistribution2D+;
 #pragma link C++ class 	R3BDistribution3D+;
-
+#pragma link C++ class  R3BParticleSelector+;
+#pragma link C++ class  R3BBeamProperties+;
 
 #endif

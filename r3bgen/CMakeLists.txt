@@ -53,13 +53,16 @@ set(SRCS
     R3Bp2pGenerator.cxx
     R3BLandGenerator.cxx
     R3BCALIFATestGenerator.cxx
+    R3BParticleGenerator.cxx
     R3BIonGenerator.cxx
     R3BGammaGenerator.cxx
     R3BPhaseSpaceGenerator.cxx
     R3BDistribution1D.cxx
     R3BDistribution2D.cxx
     R3BDistribution3D.cxx
-    R3Bp2pevtGenerator.cxx)
+    R3Bp2pevtGenerator.cxx
+    R3BParticleSelector.cxx
+    R3BBeamProperties.cxx)
 
 # fill list of header files from list of source files
 # by exchanging the file extension

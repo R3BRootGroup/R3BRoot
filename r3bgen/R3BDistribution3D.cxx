@@ -84,17 +84,37 @@ R3BDistribution<Dim> R3BDistribution3D::Sphere(const Arr center, const Double_t 
     });
 }
 
-R3BDistribution<Dim> R3BDistribution3D::Prism(R3BDistribution<2> xybase, Double_t zfrom, Double_t zto)
+R3BDistribution<Dim> R3BDistribution3D::SphereSurface(const Arr center, const Double_t radius)
 {
-    return R3BDistribution3D::Cylindric(xybase, R3BDistribution1D::Flat(zfrom, zto));
+    return R3BDistribution<Dim>([center, radius](Arr values) -> Arr {
+        const auto phi = 2 * TMath::Pi() * values[1];
+        const auto theta = TMath::Pi() * values[2];
+
+        const auto x = center[0] + radius * sin(theta) * cos(phi);
+        const auto y = center[1] + radius * sin(theta) * sin(phi);
+        const auto z = center[2] + radius * cos(theta);
+
+        return { x, y, z };
+    });
 }
 
-R3BDistribution<Dim> R3BDistribution3D::Cylindric(R3BDistribution<2> xydist, R3BDistribution<1> zdist)
+R3BDistribution<Dim> R3BDistribution3D::Prism(R3BDistribution<2> xydist, R3BDistribution<1> zdist)
 {
     return R3BDistribution<Dim>([xydist, zdist](const Arr values) mutable -> Arr {
         Arr ret;
         const auto xy = xydist.GetRandomValues({ values[0], values[1] });
         const auto z = zdist.GetRandomValues({ values[2] })[0];
         return { xy[0], xy[1], z };
+    });
+}
+
+R3BDistribution<Dim> R3BDistribution3D::Cylindric(R3BDistribution<1> rdist, R3BDistribution<1> zdist)
+{
+    return R3BDistribution<Dim>([rdist, zdist](const Arr values) mutable -> Arr {
+        Arr ret;
+        const auto r = rdist.GetRandomValues({ values[0] })[0];
+        const auto phi = values[1] * 2 * TMath::Pi();
+        const auto z = zdist.GetRandomValues({ values[2] })[0];
+        return { r * cos(phi), r * sin(phi), z };
     });
 }

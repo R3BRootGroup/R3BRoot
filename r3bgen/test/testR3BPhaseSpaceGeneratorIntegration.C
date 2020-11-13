@@ -25,11 +25,11 @@ void testR3BPhaseSpaceGeneratorIntegration()
     // Primaries
     auto primGen = new FairPrimaryGenerator();
     auto gen = new R3BPhaseSpaceGenerator();
-    gen->SetBeamEnergyDistribution_AMeV(R3BDistribution1D::Delta(600));
-    gen->SetErelDistribution_keV(R3BDistribution1D::Delta(100));
-    gen->AddHeavyIon(5, 17);
-    gen->AddParticle(2112);
-    gen->AddParticle(2112);
+    gen->Beam.SetEnergyDistribution(R3BDistribution1D::Delta(600));
+    gen->SetErelDistribution(R3BDistribution1D::Delta(100));
+    gen->AddParticle(5, 17);
+    gen->AddNeutron();
+    gen->AddProton();
     primGen->AddGenerator(gen);
     run.SetGenerator(primGen);
 
@@ -84,6 +84,8 @@ void testR3BPhaseSpaceGeneratorIntegration()
     }
 
     // Note: Prevent test from succeeding if macro gets dumped on error
-    cout << " Test " << "passed" << endl;
-    cout << " All " << "ok " << endl;
+    cout << " Test "
+         << "passed" << endl;
+    cout << " All "
+         << "ok " << endl;
 }
