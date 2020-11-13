@@ -31,6 +31,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
 ${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 ${R3BROOT_SOURCE_DIR}/r3bdata/pspData
 ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
+${R3BROOT_SOURCE_DIR}/r3bdata/sfibData
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/roluData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
@@ -98,6 +99,7 @@ R3BLosReader.cxx
 R3BRoluReader.cxx
 R3BSci2Reader.cxx
 R3BSci8Reader.cxx
+R3BSfibReader.cxx
 R3BTofdReader.cxx
 R3BPdcReader.cxx
 R3BCalifaFebexReader.cxx
@@ -143,6 +145,7 @@ ext_h101_los_dez19.h
 ext_h101_rolu.h
 ext_h101_sci2.h
 ext_h101_sci8.h
+ext_h101_sfib.h
 ext_h101_tofd.h
 ext_h101_ptof.h
 ext_h101_psp.h

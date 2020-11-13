@@ -1,5 +1,3 @@
-// clang-format off
-
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -13,23 +11,39 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifdef __CINT__
+#ifndef R3BSFIBREADER_H
+#define R3BSFIBREADER_H
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
+#include "R3BReader.h"
 
-#pragma link C++ class R3BModule+;
-#pragma link C++ class R3BDetector+;
-#pragma link C++ class R3BEventHeader+;
-#pragma link C++ class R3BEventHeaderCal2Hit+;
-#pragma link C++ class R3BOnlineSpectra+;
-#pragma link C++ class R3BOnlineSpectraDec2019+;
-#pragma link C++ class R3BOnlineSpectraPdc+;
-#pragma link C++ class R3BGlobalAnalysis+;
-#pragma link C++ class R3BGlobalAnalysisS454+;
-#pragma link C++ class R3BTrackS454+;
-#pragma link C++ class R3BTrackerTestS454+;
-#pragma link C++ class R3BOnlineSpillAnalysis+;
+struct EXT_STR_h101_sfib_t;
+typedef struct EXT_STR_h101_sfib_t EXT_STR_h101_sfib;
+
+class FairLogger;
+class R3BEventHeader;
+
+class R3BSfibReader : public R3BReader
+{
+  public:
+    R3BSfibReader(EXT_STR_h101_sfib*, UInt_t);
+
+    Bool_t Init(ext_data_struct_info*);
+    Bool_t Read();
+    void Reset();
+
+  private:
+    /* An event counter */
+    UInt_t fNEvent;
+    /* Reader specific data structure from ucesb */
+    EXT_STR_h101_sfib* fData;
+    /* Offset of detector specific data in full data structure */
+    UInt_t fOffset;
+    /* FairLogger */
+    FairLogger* fLogger;
+    TClonesArray* fMappedArray;
+
+  public:
+    ClassDef(R3BSfibReader, 0);
+};
 
 #endif
