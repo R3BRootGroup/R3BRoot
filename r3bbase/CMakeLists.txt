@@ -60,6 +60,7 @@ set(SRCS
 R3BModule.cxx 
 R3BDetector.cxx 
 R3BEventHeader.cxx
+R3BEventHeaderCal2Hit.cxx
 R3BOnlineSpectra.cxx
 R3BOnlineSpectraDec2019.cxx
 R3BOnlineSpectraPdc.cxx

@@ -1,5 +1,3 @@
-// clang-format off
-
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -13,23 +11,40 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifdef __CINT__
+// ----------------------------------------------------------------
+// -----              R3BSfibMappedData                -----
+// -----         Created Nov 2020 by A. Falduto        -----
+// ----------------------------------------------------------------
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
+#ifndef R3BSFIBMAPPEDDATA_H
+#define R3BSFIBMAPPEDDATA_H
 
-#pragma link C++ class R3BModule+;
-#pragma link C++ class R3BDetector+;
-#pragma link C++ class R3BEventHeader+;
-#pragma link C++ class R3BEventHeaderCal2Hit+;
-#pragma link C++ class R3BOnlineSpectra+;
-#pragma link C++ class R3BOnlineSpectraDec2019+;
-#pragma link C++ class R3BOnlineSpectraPdc+;
-#pragma link C++ class R3BGlobalAnalysis+;
-#pragma link C++ class R3BGlobalAnalysisS454+;
-#pragma link C++ class R3BTrackS454+;
-#pragma link C++ class R3BTrackerTestS454+;
-#pragma link C++ class R3BOnlineSpillAnalysis+;
+#include "TObject.h"
+
+class R3BSfibMappedData : public TObject
+{
+  public:
+    R3BSfibMappedData();
+    R3BSfibMappedData(Int_t, Int_t, Bool_t, Int_t, Int_t);
+    virtual ~R3BSfibMappedData();
+
+    Int_t GetChannel() const;
+    Int_t GetCoarse() const;
+    Int_t GetFine() const;
+    Bool_t IsTop() const;
+    Bool_t IsBottom() const;
+    Bool_t IsLeading() const;
+    Bool_t IsTrailing() const;
+
+  protected:
+    Int_t fIsBottom;
+    Int_t fChannel;
+    Bool_t fIsLeading;
+    Int_t fCoarse;
+    Int_t fFine;
+
+  public:
+    ClassDef(R3BSfibMappedData, 1)
+};
 
 #endif

@@ -1,5 +1,3 @@
-// clang-format off
-
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -13,23 +11,38 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifdef __CINT__
+// Introduced by M. Heil, Jan 2018
+//
+// This class contains calibrated data for one electronic channel in a bunched
+// fiber detector, still not one fiber!
+//
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
+#ifndef R3BSFIBCALDATA_H
+#define R3BSFIBCALDATA_H
 
-#pragma link C++ class R3BModule+;
-#pragma link C++ class R3BDetector+;
-#pragma link C++ class R3BEventHeader+;
-#pragma link C++ class R3BEventHeaderCal2Hit+;
-#pragma link C++ class R3BOnlineSpectra+;
-#pragma link C++ class R3BOnlineSpectraDec2019+;
-#pragma link C++ class R3BOnlineSpectraPdc+;
-#pragma link C++ class R3BGlobalAnalysis+;
-#pragma link C++ class R3BGlobalAnalysisS454+;
-#pragma link C++ class R3BTrackS454+;
-#pragma link C++ class R3BTrackerTestS454+;
-#pragma link C++ class R3BOnlineSpillAnalysis+;
+#include "TObject.h"
+
+class R3BSfibCalData : public TObject
+{
+  public:
+    R3BSfibCalData();
+    R3BSfibCalData(Int_t, Int_t, Bool_t, Double_t);
+    virtual ~R3BSfibCalData();
+
+    Int_t GetChannel() const;
+    Double_t GetTime_ns() const;
+    Bool_t IsTop() const;
+    Bool_t IsBot() const;
+    Bool_t IsLeading() const;
+    Bool_t IsTrailing() const;
+
+  private:
+    Int_t fSide;
+    Int_t fChannel;
+    Bool_t fIsLeading;
+    Double_t fTime_ns;
+
+    ClassDef(R3BSfibCalData, 1)
+};
 
 #endif

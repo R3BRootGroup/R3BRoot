@@ -1,5 +1,3 @@
-// clang-format off
-
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -13,23 +11,36 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifdef __CINT__
+#include "R3BSfibCalData.h"
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
+R3BSfibCalData::R3BSfibCalData()
+    : fSide(-1)
+    , fChannel(-1)
+    , fIsLeading()
+    , fTime_ns(-1)
+{
+}
 
-#pragma link C++ class R3BModule+;
-#pragma link C++ class R3BDetector+;
-#pragma link C++ class R3BEventHeader+;
-#pragma link C++ class R3BEventHeaderCal2Hit+;
-#pragma link C++ class R3BOnlineSpectra+;
-#pragma link C++ class R3BOnlineSpectraDec2019+;
-#pragma link C++ class R3BOnlineSpectraPdc+;
-#pragma link C++ class R3BGlobalAnalysis+;
-#pragma link C++ class R3BGlobalAnalysisS454+;
-#pragma link C++ class R3BTrackS454+;
-#pragma link C++ class R3BTrackerTestS454+;
-#pragma link C++ class R3BOnlineSpillAnalysis+;
+R3BSfibCalData::R3BSfibCalData(Int_t a_side, Int_t a_channel, Bool_t a_is_leading, Double_t a_time_ns)
+    : fSide(a_side)
+    , fChannel(a_channel)
+    , fIsLeading(a_is_leading)
+    , fTime_ns(a_time_ns)
+{
+}
 
-#endif
+R3BSfibCalData::~R3BSfibCalData() {}
+
+Int_t R3BSfibCalData::GetChannel() const { return fChannel; }
+
+Double_t R3BSfibCalData::GetTime_ns() const { return fTime_ns; }
+
+Bool_t R3BSfibCalData::IsTop() const { return 2 == fSide; }
+
+Bool_t R3BSfibCalData::IsBot() const { return !IsTop(); }
+
+Bool_t R3BSfibCalData::IsLeading() const { return fIsLeading; }
+
+Bool_t R3BSfibCalData::IsTrailing() const { return !fIsLeading; }
+
+ClassImp(R3BSfibCalData)
