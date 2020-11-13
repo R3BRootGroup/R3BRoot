@@ -36,6 +36,7 @@
 #pragma link C++ class R3BPspxReader+;
 #pragma link C++ class R3BBunchedFiberReader+;
 #pragma link C++ class R3BBunchedFiberSPMTTrigReader+;
+#pragma link C++ class R3BSfibReader+;
 #pragma link C++ class R3BFi0Reader+;
 #pragma link C++ class R3BFi1aReader+;
 #pragma link C++ class R3BFi1bReader+;

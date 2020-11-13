@@ -86,13 +86,18 @@ class R3BOnlineSpectraLosTest : public FairTask
      * Is called by the framework after processing the event loop.
      */
     virtual void FinishTask();
-    
-    
+
     /**
      * Methods for setting position offset and effective velocity of light
      */
-    inline void SetLosXYMCFD(Double_t offsetX1, Double_t offsetY1, Double_t veffX1, Double_t veffY1,
-                             Double_t offsetX2, Double_t offsetY2, Double_t veffX2, Double_t veffY2)
+    inline void SetLosXYMCFD(Double_t offsetX1,
+                             Double_t offsetY1,
+                             Double_t veffX1,
+                             Double_t veffY1,
+                             Double_t offsetX2,
+                             Double_t offsetY2,
+                             Double_t veffX2,
+                             Double_t veffY2)
     {
         flosOffsetXV[0] = offsetX1;
         flosOffsetYV[0] = offsetY1;
@@ -101,24 +106,36 @@ class R3BOnlineSpectraLosTest : public FairTask
         flosOffsetXV[1] = offsetX2;
         flosOffsetYV[1] = offsetY2;
         flosVeffXV[1] = veffX2;
-        flosVeffYV[1] = veffY2;     
-    }    
+        flosVeffYV[1] = veffY2;
+    }
 
-    inline void SetLosXYTAMEX(Double_t offsetXT1, Double_t offsetYT1, Double_t veffXT1, Double_t veffYT1,
-                              Double_t offsetXT2, Double_t offsetYT2, Double_t veffXT2, Double_t veffYT2)
+    inline void SetLosXYTAMEX(Double_t offsetXT1,
+                              Double_t offsetYT1,
+                              Double_t veffXT1,
+                              Double_t veffYT1,
+                              Double_t offsetXT2,
+                              Double_t offsetYT2,
+                              Double_t veffXT2,
+                              Double_t veffYT2)
     {
         flosOffsetXT[0] = offsetXT1;
         flosOffsetYT[0] = offsetYT1;
         flosVeffXT[0] = veffXT1;
-        flosVeffYT[0] = veffYT1;  
+        flosVeffYT[0] = veffYT1;
         flosOffsetXT[1] = offsetXT2;
         flosOffsetYT[1] = offsetYT2;
         flosVeffXT[1] = veffXT2;
-        flosVeffYT[1] = veffYT2;     
-    }    
-    
-    inline void SetLosXYToT(Double_t offsetXQ1, Double_t offsetYQ1, Double_t veffXQ1, Double_t veffYQ1,
-                            Double_t offsetXQ2, Double_t offsetYQ2, Double_t veffXQ2, Double_t veffYQ2)
+        flosVeffYT[1] = veffYT2;
+    }
+
+    inline void SetLosXYToT(Double_t offsetXQ1,
+                            Double_t offsetYQ1,
+                            Double_t veffXQ1,
+                            Double_t veffYQ1,
+                            Double_t offsetXQ2,
+                            Double_t offsetYQ2,
+                            Double_t veffXQ2,
+                            Double_t veffYQ2)
     {
         flosOffsetXQ[0] = offsetXQ1;
         flosOffsetYQ[0] = offsetYQ1;
@@ -127,54 +144,51 @@ class R3BOnlineSpectraLosTest : public FairTask
         flosOffsetXQ[1] = offsetXQ2;
         flosOffsetYQ[1] = offsetYQ2;
         flosVeffXQ[1] = veffXQ2;
-        flosVeffYQ[1] = veffYQ2;       
+        flosVeffYQ[1] = veffYQ2;
     }
     /* Method for setting number of LOS detectors */
     inline void SetNofLosModules(Int_t nDets)
     {
         fNofLosDetectors = nDets;
 
-	time_prev.resize(nDets);
+        time_prev.resize(nDets);
 
-	fh_los_channels.resize(nDets);    
-	fh_los_tres_MCFD.resize(nDets);
-	fh_los_tres_TAMEX.resize(nDets);
-	fh_los_tot_mean.resize(nDets);
-	fh_los_tot.resize(nDets);
-	fh_los_multihit.resize(nDets);
-	fh_los_multihitVFTX.resize(nDets);
-	fh_los_multihitLEAD.resize(nDets);
-	fh_los_multihitTRAI.resize(nDets);
-	fh_los_pos_MCFD.resize(nDets);
-	fh_los_pos_TAMEX.resize(nDets);
-	fh_los_pos_ToT.resize(nDets);
-	fh_los_ihit_ToT.resize(nDets);
-	fh_los_dt_hits_ToT.resize(nDets);   
-	fh_losToT_vs_Events.resize(nDets);
-    fh_losTAMEX_vs_Events.resize(nDets);
-    fh_losMCFD_vs_Events.resize(nDets);
-    fh_los_twin.resize(nDets);
-    fh_los_tot_mean_corr.resize(nDets);
-    fh_los_rw.resize(nDets);
-    fh_los_tot_S8.resize(nDets);
-    fh_los_vftx_tamex.resize(nDets);
-    } 
+        fh_los_channels.resize(nDets);
+        fh_los_tres_MCFD.resize(nDets);
+        fh_los_tres_TAMEX.resize(nDets);
+        fh_los_tot_mean.resize(nDets);
+        fh_los_tot.resize(nDets);
+        fh_los_multihit.resize(nDets);
+        fh_los_multihitVFTX.resize(nDets);
+        fh_los_multihitLEAD.resize(nDets);
+        fh_los_multihitTRAI.resize(nDets);
+        fh_los_pos_MCFD.resize(nDets);
+        fh_los_pos_TAMEX.resize(nDets);
+        fh_los_pos_ToT.resize(nDets);
+        fh_los_ihit_ToT.resize(nDets);
+        fh_los_dt_hits_ToT.resize(nDets);
+        fh_losToT_vs_Events.resize(nDets);
+        fh_losTAMEX_vs_Events.resize(nDets);
+        fh_losMCFD_vs_Events.resize(nDets);
+        fh_los_twin.resize(nDets);
+        fh_los_tot_mean_corr.resize(nDets);
+        fh_los_rw.resize(nDets);
+        fh_los_tot_S8.resize(nDets);
+        fh_los_vftx_tamex.resize(nDets);
+    }
     /**
      * Methods for setting condition on filling xs from LOS
      * 0 = no condition, 1 = condition from fiber
      */
-    inline void SetLosPosition(Int_t optcond)
-    {
-		foptcond = optcond;
-	} 
-          
+    inline void SetLosPosition(Int_t optcond) { foptcond = optcond; }
+
     /**
      * Method for setting the trigger value.
      * @param trigger 1 - physics, 2 - offspill, -1 - all events.
      */
     inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
     inline void SetTpat(Int_t tpat) { fTpat = tpat; }
-    
+
     /**
      * Methods for setting reset and readout times for Bmon
      */
@@ -186,7 +200,6 @@ class R3BOnlineSpectraLosTest : public FairTask
         read_time = time_step;
         fsens_SEE = sens_SEE;
         fsens_IC = sens_IC;
-        
     }
     /**
      * Methods for setting number of planes and paddles
@@ -203,224 +216,196 @@ class R3BOnlineSpectraLosTest : public FairTask
     void Reset_TOFD_Histo();
     void Reset_FIBERS_Histo();
     void Reset_TWIN_Histo();
-     
+
   private:
-    std::vector<TClonesArray *> fMappedItems;
-    std::vector<TClonesArray *> fCalItems;
-    std::vector<TClonesArray *> fHitItems;
-    
+    std::vector<TClonesArray*> fMappedItems;
+    std::vector<TClonesArray*> fCalItems;
+    std::vector<TClonesArray*> fHitItems;
+
     TClonesArray* fMappedItemsTwim; /**< Array with mapped items. */
     TClonesArray* fCalItemsTwim;    /**< Array with cal items. */
     TClonesArray* fHitItemsTwim;    /**< Array with hit items. */
 
     enum DetectorInstances
     {
-      DET_AMS,
-      DET_CALIFA,
-      DET_BMON,
-      DET_FI_FIRST,
-      DET_FI1A = DET_FI_FIRST,
-      DET_FI1B,
-      DET_FI2A,
-      DET_FI2B,
-      DET_FI3A,
-      DET_FI3B,
-      DET_FI4,
-      DET_FI5,
-      DET_FI6,
-      DET_FI7,
-      DET_FI8,
-      DET_FI9,
-      DET_FI10,
-      DET_FI11,
-      DET_FI12,
-      DET_FI13,
-      DET_FI_LAST = DET_FI13,
-      DET_L3T,
-      DET_LOS,
-      DET_MUSIC,
-      DET_NEULAND,
-      DET_PSPX,
-      DET_PTOF,
-      DET_ROLU,
-      DET_SCI8,
-      DET_STRAW,
-      DET_TOFD,
-      DET_SAMPLER,
-      DET_MAX
+        DET_AMS,
+        DET_CALIFA,
+        DET_BMON,
+        DET_FI_FIRST,
+        DET_FI1A = DET_FI_FIRST,
+        DET_FI1B,
+        DET_FI2A,
+        DET_FI2B,
+        DET_FI3A,
+        DET_FI3B,
+        DET_FI4,
+        DET_FI5,
+        DET_FI6,
+        DET_FI7,
+        DET_FI8,
+        DET_FI9,
+        DET_FI10,
+        DET_FI11,
+        DET_FI12,
+        DET_FI13,
+        DET_FI_LAST = DET_FI13,
+        DET_L3T,
+        DET_LOS,
+        DET_MUSIC,
+        DET_NEULAND,
+        DET_PSPX,
+        DET_PTOF,
+        DET_ROLU,
+        DET_SCI8,
+        DET_STRAW,
+        DET_TOFD,
+        DET_SAMPLER,
+        DET_MAX
     };
- 
+
 #define NOF_FIB_DET (DET_FI_LAST - DET_FI_FIRST + 1)
 
-    const char *fDetectorNames[DET_MAX + 1] =
-    {
-      "Ams",
-      "Califa",
-      "BeamMonitor",
-      "Fi1a",
-      "Fi1b",
-      "Fi2a",
-      "Fi2b",
-      "Fi3a",
-      "Fi3b",
-      "Fi4",
-      "Fi5",
-      "Fi6",
-      "Fi7",
-      "Fi8",
-      "Fi9",
-      "Fi10",
-      "Fi11",
-      "Fi12",
-      "Fi13",
-      "L3t",
-      "Los",
-      "Music",
-      "Neuland",
-      "Pspx",
-      "Ptof",
-      "Rolu",
-      "Sci8",
-      "Straw",
-      "Tofd",
-      "Sampler",
-      NULL
-   };
+    const char* fDetectorNames[DET_MAX + 1] = { "Ams",   "Califa",  "BeamMonitor", "Fi1a", "Fi1b", "Fi2a", "Fi2b",
+                                                "Fi3a",  "Fi3b",    "Fi4",         "Fi5",  "Fi6",  "Fi7",  "Fi8",
+                                                "Fi9",   "Fi10",    "Fi11",        "Fi12", "Fi13", "L3t",  "Los",
+                                                "Music", "Neuland", "Pspx",        "Ptof", "Rolu", "Sci8", "Straw",
+                                                "Tofd",  "Sampler", NULL };
 
     // If FiberI is present or not:
-    Int_t  ifibdet;           
+    Int_t ifibdet;
     // Number of fibers per detector
-    Double_t n_fiber[NOF_FIB_DET]={256.,256.,256.,256,512.,512.,2048.,2048.,1024.,512.,512.,512.,1024.,1024.};    
-    Double_t tof_fiber[NOF_FIB_DET]={2580.,2580.,256.,256,512.,512.,2048.,2048.,1024.,512.,512.,512.,1024.,1024.};        
-     
-	// check for trigger should be done globablly (somewhere else)
-    R3BEventHeader* header;                     /**< Event header. */
-    Int_t fTrigger;                             /**< Trigger value. */
+    Double_t n_fiber[NOF_FIB_DET] = { 256.,  256.,  256., 256,  512., 512.,  2048.,
+                                      2048., 1024., 512., 512., 512., 1024., 1024. };
+    Double_t tof_fiber[NOF_FIB_DET] = { 2580., 2580., 256., 256,  512., 512.,  2048.,
+                                        2048., 1024., 512., 512., 512., 1024., 1024. };
+
+    // check for trigger should be done globablly (somewhere else)
+    R3BEventHeader* header; /**< Event header. */
+    Int_t fTrigger;         /**< Trigger value. */
     Int_t fTpat;
     Int_t fSamp;
-    Double_t fClockFreq;     /**< Clock cycle in [ns]. */
-    UInt_t fNofPlanes;  
-    UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */    
-    
- //   TClonesArray *fbmonMappedItems;
-    Int_t fNofLosDetectors;  /**< Number of LOS detectors. */
+    Double_t fClockFreq; /**< Clock cycle in [ns]. */
+    UInt_t fNofPlanes;
+    UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */
 
-    Double_t flosVeffXV[2];   
+    //   TClonesArray *fbmonMappedItems;
+    Int_t fNofLosDetectors; /**< Number of LOS detectors. */
+
+    Double_t flosVeffXV[2];
     Double_t flosVeffYV[2];
     Double_t flosOffsetXV[2];
     Double_t flosOffsetYV[2];
-    Double_t flosVeffXT[2];   
+    Double_t flosVeffXT[2];
     Double_t flosVeffYT[2];
     Double_t flosOffsetXT[2];
     Double_t flosOffsetYT[2];
-    Double_t flosVeffXQ[2];   
+    Double_t flosVeffXQ[2];
     Double_t flosVeffYQ[2];
     Double_t flosOffsetXQ[2];
     Double_t flosOffsetYQ[2];
-    Int_t    foptcond;
+    Int_t foptcond;
 
     unsigned long long time_V_mem = 0, time_start = 0, time = 0, time_mem = 0;
     std::vector<unsigned long long> time_prev;
     unsigned long long time_prev_read = 0, time_to_read = 0;
-    unsigned long ic_mem=0, see_mem = 0,  tofdor_mem = 0;
-    unsigned long ic_start=0, see_start = 0,  tofdor_start = 0;
-    unsigned long long time_spill_start=0, time_spill_end=0;
+    unsigned long ic_mem = 0, see_mem = 0, tofdor_mem = 0;
+    unsigned long ic_start = 0, see_start = 0, tofdor_start = 0;
+    unsigned long long time_spill_start = 0, time_spill_end = 0;
     long samplerPrev = 0, samplerCurr = 0, samplerSpill = 0;
-    unsigned long long time_previous_event=0;    
+    unsigned long long time_previous_event = 0;
 
     Double_t time_clear = -1.;
     Double_t tdiff = 0.;
     Double_t fNorm = 1.;
     Int_t iclear_count = 1;
-    UInt_t reset_time ; // time after which bmon spectra are reseted
-    Double_t read_time ; // step in which scalers are read, in sec 
+    UInt_t reset_time;         // time after which bmon spectra are reseted
+    Double_t read_time;        // step in which scalers are read, in sec
     Int_t fsens_SEE, fsens_IC; // SEETRAM and IC sensitivity, between -4 and -10
-    Double_t calib_SEE = 1.; // SEETRAM calibration factor
+    Double_t calib_SEE = 1.;   // SEETRAM calibration factor
     Double_t see_offset = 7.1; // SEETRAM offset in kHz
-    
-    unsigned long fNEvents = 0, fNEvents_start = 0;         /**< Event counter. */
-    
-    TH1F *fhTpat;
-    TH1F *fh_spill_length;
-    TH1F *fhTrigger;
-    TH1F *fh_IC_spill;
-    TH1F *fh_SEE_spill;
-    TH1F *fh_TOFDOR_spill;
-    TH1F *fh_IC;
-    TH1F *fh_SEE;
-    TH1F *fh_TOFDOR;
-    TH2F *fh_IC_cal;
-    TH2F *fh_SEE_cal;
-   
-    TH2F *fh_rolu_tot;
-    TH1F *fh_rolu_channels;
-    
-    TH1F *fh_sci8_channels;    
-    TH1F *fh_sci8_tres_MCFD;
-    TH1F *fh_sci8_tres_TAMEX;
-    TH1F *fh_sci8_tot_mean;
-    TH1F *fh_tof_sci8;
-    TH2F *fh_sci8_tot;
-    TH1F *fh_sci8_dt_hits;
-    TH1F *fh_sci8_dt_hits_l;
-    TH1F *fh_sci8_dt_hits_t;
-    TH1F *fh_sci8_multihit;
-    TH2F *fh_sci8_multihitVFTX;
-    TH2F *fh_sci8_multihitLEAD;
-    TH2F *fh_sci8_multihitTRAI;   
-       
-    std::vector<TH1F *> fh_los_channels;    
-    std::vector<TH1F *> fh_los_tres_MCFD;
-    std::vector<TH1F *> fh_los_tres_TAMEX;
-    std::vector<TH1F *> fh_los_tot_mean;
-    std::vector<TH2F *> fh_los_tot;
-    std::vector<TH1F *> fh_los_multihit;
-    std::vector<TH2F *> fh_los_multihitVFTX;
-    std::vector<TH2F *> fh_los_multihitLEAD;
-    std::vector<TH2F *> fh_los_multihitTRAI;
-    std::vector<TH2F *> fh_los_pos_MCFD;
-    std::vector<TH2F *> fh_los_pos_TAMEX;
-    std::vector<TH2F *> fh_los_pos_ToT;
-    std::vector<TH2F *> fh_los_ihit_ToT;
-    std::vector<TH2F *> fh_los_dt_hits_ToT;
-    std::vector<TH2F *> fh_losToT_vs_Events;
-    std::vector<TH2F *> fh_losTAMEX_vs_Events;
-    std::vector<TH2F *> fh_losMCFD_vs_Events; 
-    std::vector<TH2F *> fh_los_twin;  
-    std::vector<TH1F *> fh_los_tot_mean_corr;
-    std::vector<TH1F *> fh_los_rw;
-    std::vector<TH2F *> fh_los_tot_S8;
-    std::vector<TH1F *> fh_los_vftx_tamex;
-    TH2F *fh_los_ToT_vs_ToT;
-    TH2F *fh_los_nPart_vs_nPart;
-    TH1F *fh_dt_los1_los2;
-    TH1F *fh_los_tres_MTDC;
-    TH2F *fh_test[8];
-    TH2F *fh_test_corr[8];
-    
+
+    unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
+
+    TH1F* fhTpat;
+    TH1F* fh_spill_length;
+    TH1F* fhTrigger;
+    TH1F* fh_IC_spill;
+    TH1F* fh_SEE_spill;
+    TH1F* fh_TOFDOR_spill;
+    TH1F* fh_IC;
+    TH1F* fh_SEE;
+    TH1F* fh_TOFDOR;
+    TH2F* fh_IC_cal;
+    TH2F* fh_SEE_cal;
+
+    TH2F* fh_rolu_tot;
+    TH1F* fh_rolu_channels;
+
+    TH1F* fh_sci8_channels;
+    TH1F* fh_sci8_tres_MCFD;
+    TH1F* fh_sci8_tres_TAMEX;
+    TH1F* fh_sci8_tot_mean;
+    TH1F* fh_tof_sci8;
+    TH2F* fh_sci8_tot;
+    TH1F* fh_sci8_dt_hits;
+    TH1F* fh_sci8_dt_hits_l;
+    TH1F* fh_sci8_dt_hits_t;
+    TH1F* fh_sci8_multihit;
+    TH2F* fh_sci8_multihitVFTX;
+    TH2F* fh_sci8_multihitLEAD;
+    TH2F* fh_sci8_multihitTRAI;
+
+    std::vector<TH1F*> fh_los_channels;
+    std::vector<TH1F*> fh_los_tres_MCFD;
+    std::vector<TH1F*> fh_los_tres_TAMEX;
+    std::vector<TH1F*> fh_los_tot_mean;
+    std::vector<TH2F*> fh_los_tot;
+    std::vector<TH1F*> fh_los_multihit;
+    std::vector<TH2F*> fh_los_multihitVFTX;
+    std::vector<TH2F*> fh_los_multihitLEAD;
+    std::vector<TH2F*> fh_los_multihitTRAI;
+    std::vector<TH2F*> fh_los_pos_MCFD;
+    std::vector<TH2F*> fh_los_pos_TAMEX;
+    std::vector<TH2F*> fh_los_pos_ToT;
+    std::vector<TH2F*> fh_los_ihit_ToT;
+    std::vector<TH2F*> fh_los_dt_hits_ToT;
+    std::vector<TH2F*> fh_losToT_vs_Events;
+    std::vector<TH2F*> fh_losTAMEX_vs_Events;
+    std::vector<TH2F*> fh_losMCFD_vs_Events;
+    std::vector<TH2F*> fh_los_twin;
+    std::vector<TH1F*> fh_los_tot_mean_corr;
+    std::vector<TH1F*> fh_los_rw;
+    std::vector<TH2F*> fh_los_tot_S8;
+    std::vector<TH1F*> fh_los_vftx_tamex;
+    TH2F* fh_los_ToT_vs_ToT;
+    TH2F* fh_los_nPart_vs_nPart;
+    TH1F* fh_dt_los1_los2;
+    TH1F* fh_los_tres_MTDC;
+    TH2F* fh_test[8];
+    TH2F* fh_test_corr[8];
+
     TH1F* fh1_Twimmap_mult;
     TH1F* fh1_twim_ESum[3];
-    TH2F* fh2_twim_ESum;    
-    
-    TH1F *fh_channels_Fib[NOF_FIB_DET];
-    TH1F *fh_channels_single_Fib[NOF_FIB_DET];
-    TH1F *fh_fibers_Fib[NOF_FIB_DET];
-    TH1F *fh_mult_Fib[NOF_FIB_DET];
-    TH2F *fh_Fib_ToF[NOF_FIB_DET];
-    TH1F *fh_Fib_pos[NOF_FIB_DET];
-    TH2F *fh_time_Fib[NOF_FIB_DET];
-    TH2F *fh_multihit_m_Fib[NOF_FIB_DET];   
-    TH2F *fh_multihit_s_Fib[NOF_FIB_DET];
-    TH2F *fh_ToT_m_Fib[NOF_FIB_DET];
-    TH2F *fh_ToT_s_Fib[NOF_FIB_DET];
-    TH2F *fh_Fib_vs_Events[NOF_FIB_DET];
-    TH2F *fh_ToT_single_Fib[NOF_FIB_DET];
-    
-    
-    TH1F *fh_tofd_channels[N_PLANE_MAX_TOFD];   
-    TH2F *fh_tofd_multihit[N_PLANE_MAX_TOFD];
-    TH2F *fh_tofd_ToF[N_PLANE_MAX_TOFD];
-    TH2F* fh_tofd_TotPm[N_PLANE_MAX_TOFD]; 
+    TH2F* fh2_twim_ESum;
+
+    TH1F* fh_channels_Fib[NOF_FIB_DET];
+    TH1F* fh_channels_single_Fib[NOF_FIB_DET];
+    TH1F* fh_fibers_Fib[NOF_FIB_DET];
+    TH1F* fh_mult_Fib[NOF_FIB_DET];
+    TH2F* fh_Fib_ToF[NOF_FIB_DET];
+    TH1F* fh_Fib_pos[NOF_FIB_DET];
+    TH2F* fh_time_Fib[NOF_FIB_DET];
+    TH2F* fh_multihit_m_Fib[NOF_FIB_DET];
+    TH2F* fh_multihit_s_Fib[NOF_FIB_DET];
+    TH2F* fh_ToT_m_Fib[NOF_FIB_DET];
+    TH2F* fh_ToT_s_Fib[NOF_FIB_DET];
+    TH2F* fh_Fib_vs_Events[NOF_FIB_DET];
+    TH2F* fh_ToT_single_Fib[NOF_FIB_DET];
+
+    TH1F* fh_tofd_channels[N_PLANE_MAX_TOFD];
+    TH2F* fh_tofd_multihit[N_PLANE_MAX_TOFD];
+    TH2F* fh_tofd_ToF[N_PLANE_MAX_TOFD];
+    TH2F* fh_tofd_TotPm[N_PLANE_MAX_TOFD];
     TH2F* fh_tofd_dt[3];
     TH1F* fh_TimePreviousEvent;
 
@@ -439,9 +424,10 @@ class R3BOnlineSpectraLosTest : public FairTask
     TH2F* fh_pspx_strips_position[N_PSPX];        /**< PSPX 2D position on mapped level */
     TH2F* fh_pspx_hit_position[(N_PSPX + 1) / 2]; /**< PSPX 2D position on hit level */
 
-    TH1F* fh_pspx_hit_energy[(N_PSPX + 1) / 2];           /**< PSPX energy on hit level */
+    TH1F* fh_pspx_hit_energy[(N_PSPX + 1) / 2]; /**< PSPX energy on hit level */
     TH2F* fh_pspx_cal_energy_frontback[N_PSPX]; /**< PSPX energy front vs back on cal level */
     TH2F* fh_pspx_hit_multi[(N_PSPX + 1) / 2];
+
   public:
     ClassDef(R3BOnlineSpectraLosTest, 2)
 };

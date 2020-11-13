@@ -1,5 +1,3 @@
-// clang-format off
-
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -13,25 +11,43 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifdef __CINT__
+//
+// This class contains hit-level data for one fiber.
+//
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
+#ifndef R3BSFIBHITDATA_H
+#define R3BSFIBHITDATA_H
 
-#pragma link C++ class R3BModule+;
-#pragma link C++ class R3BDetector+;
-#pragma link C++ class R3BEventHeader+;
-#pragma link C++ class R3BEventHeaderCal2Hit+;
-#pragma link C++ class R3BOnlineSpectra+;
-#pragma link C++ class R3BOnlineSpectraDec2019+;
-#pragma link C++ class R3BOnlineSpectraPdc+;
-#pragma link C++ class R3BOnlineSpectraSfib+;
-#pragma link C++ class R3BGlobalAnalysis+;
-#pragma link C++ class R3BGlobalAnalysisS454+;
-#pragma link C++ class R3BTrackS454+;
-#pragma link C++ class R3BTrackerTestS454+;
-#pragma link C++ class R3BOnlineSpillAnalysis+;
-#pragma link C++ class R3BOnlineSpectraFiberTofds515+;
+#include "R3BHit.h"
+
+class R3BSfibHitData: public R3BHit
+{
+  public:
+    R3BSfibHitData();
+    R3BSfibHitData(Int_t, Double_t, Double_t, Double_t, Double_t);
+    
+    virtual ~R3BSfibHitData();
+
+    Int_t GetFiberId() const;
+    Double_t GetTopTime_ns() const;
+    Double_t GetBotTime_ns() const;
+    Double_t GetTime_ns() const;
+    Double_t GetTopToT_ns() const;
+    Double_t GetBotToT_ns() const;
+
+  private:
+    Int_t fFiberId;
+    Double_t fTopTime_ns;
+    Double_t fBotTime_ns;
+    Double_t fTime_ns;
+    Double_t fTopToT_ns;
+    Double_t fBotToT_ns;
+
+    ClassDef(R3BSfibHitData, 1)
+};
 
 #endif
+
+    
+
+

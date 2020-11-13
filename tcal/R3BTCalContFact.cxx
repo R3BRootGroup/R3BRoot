@@ -65,6 +65,7 @@ void R3BTCalContFact::setAllContainers()
     addContainer("PdcTCalPar", "PDC TCAL Calibration Parameters");
     addContainer("StrawtubesTCalPar", "Strawtubes TCAL Calibration Parameters");
     addContainer("BunchedFiberSPMTTrigTCalPar", "Bunched Fiber SPMT Trigger TCAL Calibration Parameters");
+    addContainer("SfibTCalPar", "Sfib TCAL Calibration Parameters");
 #define ADD_FIBER(Name, NAME)                                                                       \
     do                                                                                              \
     {                                                                                               \
@@ -113,6 +114,7 @@ FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
     containerNames.push_back("PdcTCalPar");
     containerNames.push_back("StrawtubesTCalPar");
     containerNames.push_back("BunchedFiberSPMTTrigTCalPar");
+    containerNames.push_back("SfibTCalPar");
 #define PUSH_FIBER(Name)                                    \
     do                                                      \
     {                                                       \

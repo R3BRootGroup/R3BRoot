@@ -83,11 +83,10 @@ class R3BOnlineSpectraPdc : public FairTask
     inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
     inline void SetTpat(Int_t tpat) { fTpat = tpat; }
 
-
     void Reset_PDC_Histo();
 
   private:
-    TClonesArray* fMappedItems;    /**< Array with Cal items - input data. */
+    TClonesArray* fMappedItems; /**< Array with Cal items - input data. */
     TClonesArray* fCalItems;    /**< Array with Cal items - input data. */
     TClonesArray* fHitItems;    /**< Array with Cal items - input data. */
 
@@ -97,11 +96,11 @@ class R3BOnlineSpectraPdc : public FairTask
     Int_t fTpat;
     Int_t fSamp;
     Int_t fNEvents;
-    
+
     TH1F* fhTpat;
     TH1F* fh_spill_length;
     TH1F* fhTrigger;
-    
+
     TH1F* fh_Pdc_Wire[N_PLANE_MAX_PDC];
     TH2F* fh_Pdc_Tot[N_PLANE_MAX_PDC];
     TH2F* fh_Pdc_ToF[N_PLANE_MAX_PDC];
