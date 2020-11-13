@@ -41,7 +41,7 @@ class FairPrimaryGenerator;
 class R3BCosmicGenerator : public FairGenerator
 {
   public:
-    R3BCosmicGenerator(const Int_t pdgid = 13, const Int_t mult = 1, const UInt_t seed = 0);
+    R3BCosmicGenerator(const Int_t pdgid = 13, const Int_t mult = 1, const UInt_t seed = 0U);
 
     /** Destructor **/
     virtual ~R3BCosmicGenerator(){};

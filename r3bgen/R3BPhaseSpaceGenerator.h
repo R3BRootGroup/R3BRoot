@@ -16,45 +16,39 @@
 
 // Wrapper for TGenPhaseSpace
 
+#include "R3BDistribution.h"
+#include "R3BDistribution1D.h"
+#include "R3BParticleSelector.h"
+#include "R3BBeamProperties.h"
+
 #include "FairGenerator.h"
 #include "FairIon.h"
-#include "R3BDistribution.h"
+
 #include "TGenPhaseSpace.h"
 #include "TRandom3.h"
+
 #include <string>
 #include <vector>
 
-class R3BPhaseSpaceGenerator : public FairGenerator
+class R3BPhaseSpaceGenerator : public FairGenerator, public R3BParticleSelector
 {
   public:
-    R3BPhaseSpaceGenerator(unsigned int seed = 0);
+    R3BPhaseSpaceGenerator(unsigned int seed = 0U);
 
-    void AddParticle(int PDGCode);
-    void AddHeavyIon(int z, int a);
-
-    void SetVertexDistribution_cm(R3BDistribution<3> vertexDistribution) { fVertex_cm = vertexDistribution; }
-    R3BDistribution<3>& GetVertexDistribution_cm() { return fVertex_cm; }
-
-    void SetBeamSpread_mRad(R3BDistribution<2> beamSpreadDistribution) { fBeamSpread_mRad = beamSpreadDistribution; }
-    R3BDistribution<2>& GetBeamSpread_mRad() { return fBeamSpread_mRad; }
-
-    void SetBeamEnergyDistribution_AMeV(R3BDistribution<1> beamEnergyDistribution)
-    {
-        fBeamEnergy_AMeV = beamEnergyDistribution;
-    }
-    R3BDistribution<1>& GetBeamEnergyDistribution_AMeV() { return fBeamEnergy_AMeV; }
-
-    void SetErelDistribution_keV(R3BDistribution<1> ErelDistribution) { fErel_keV = ErelDistribution; }
-    R3BDistribution<1>& GetErelDistribution_keV() { return fErel_keV; }
+    // realtive energy distribution in keV
+    R3BDistribution<1>& GetErelDistribution() { return fErel_keV; }
+    void SetErelDistribution(R3BDistribution<1> ErelDistribution) { fErel_keV = ErelDistribution; }
 
     bool Init() override;
     bool ReadEvent(FairPrimaryGenerator* primGen) override;
 
+    R3BBeamProperties Beam;
+
+  protected:
+    void addParticle(const int pdgCode, const double mass) override;
+
   private:
-    R3BDistribution<3> fVertex_cm;       //!
-    R3BDistribution<2> fBeamSpread_mRad; //!
-    R3BDistribution<1> fBeamEnergy_AMeV; //!
-    R3BDistribution<1> fErel_keV;        //!
+    R3BDistribution<1> fErel_keV; //!
 
     double fTotMass;
     TRandom3 fRngGen;
