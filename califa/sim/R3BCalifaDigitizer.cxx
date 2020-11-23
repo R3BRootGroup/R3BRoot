@@ -377,10 +377,13 @@ Double_t R3BCalifaDigitizer::CompSmearing(Double_t inputComponent)
     //
     if (fComponentRes == 0)
         return inputComponent;
-    else
+    else if (fComponentRes != 0 && inputComponent != 0)
     {
         Double_t randomIs =
             gRandom->Gaus(0, inputComponent * fComponentRes * 1000 / (235 * sqrt(inputComponent * 1000)));
         return inputComponent + randomIs / 1000;
     }
+
+    else
+        return inputComponent;
 }
