@@ -57,9 +57,11 @@ set(SRCS
 ./ana/R3BCalifaDemoOnlineSpectra.cxx
 ./ana/R3BCalifaCrystalCalDataAnalysis.cxx
 ./ana/R3BCalifaMapped2CrystalCalPar.cxx
+./ana/R3BCalifaCrystalCal2TotCalPar.cxx
 ./pars/R3BCalifaHitPar.cxx
 ./pars/R3BCalifaMappingPar.cxx
 ./pars/R3BCalifaCrystalCalPar.cxx
+./pars/R3BCalifaTotCalPar.cxx
 ./pars/R3BCalifaContFact.cxx
 ./pars/R3BCalifaCrystalPars4Sim.cxx
 )

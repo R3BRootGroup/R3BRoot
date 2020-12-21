@@ -20,6 +20,7 @@
 #include "R3BCalifaCrystalCalPar.h"
 #include "R3BCalifaCrystalPars4Sim.h"
 #include "R3BCalifaMappingPar.h"
+#include "R3BCalifaTotCalPar.h"
 
 #include "TClass.h"
 
@@ -64,6 +65,11 @@ void R3BCalifaContFact::setAllContainers()
     p3->addContext("CalifaSimParContext");
 
     containers->Add(p3);
+
+    FairContainer* p4 = new FairContainer("CalifaTotCalPar", "Califa Tot Cal parameters", "CalifaTotCalParContext");
+    p4->addContext("CalifaTotCalParContext");
+
+    containers->Add(p4);
 }
 
 FairParSet* R3BCalifaContFact::createContainer(FairContainer* c)
@@ -89,7 +95,10 @@ FairParSet* R3BCalifaContFact::createContainer(FairContainer* c)
     {
         p = new R3BCalifaCrystalPars4Sim(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-
+    if (strcmp(name, "CalifaTotCalPar") == 0)
+    {
+        p = new R3BCalifaTotCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
     return p;
 }
 

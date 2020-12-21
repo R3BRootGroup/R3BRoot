@@ -258,7 +258,7 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
             {
 
                 if (fDebugMode)
-                    nfound = ss->Search(fh_Map_energy_crystal[i], fSigma, "", fThreshold);
+                    nfound = ss->Search(fh_Map_energy_crystal[i], fSigma, "", fThreshold); // number of peaks
                 else
                     nfound = ss->Search(fh_Map_energy_crystal[i], fSigma, "goff", fThreshold);
                 // std::cout<< i << " " << nfound <<" "<< fThreshold << std::endl;
@@ -273,7 +273,7 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
 
                 for (Int_t j = 0; j < nfound; j++)
                 {
-                    X[j] = fChannelPeaks[idx[nfound - j - 1]];
+                    X[j] = fChannelPeaks[idx[nfound - j - 1]]; // n canal del pico
                     Y[j] = fEnergyPeaks->GetAt(nfound - j - 1);
                     // std::cout<<"CrystalId="<<i+1<<" "<< j+1  <<" "<< X[j+1]  << std::endl;
                 }
@@ -334,7 +334,7 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
 
                 for (Int_t h = 0; h < numPars; h++)
                 {
-                    fCal_Par->SetCryCalParams(f1->GetParameter(h), numPars * i + h);
+                    fCal_Par->SetCryCalParams(f1->GetParameter(h), numPars * i + h); // en fCal_Par se guardan los param
                 }
             }
             else
