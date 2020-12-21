@@ -26,6 +26,7 @@ set(INCLUDE_DIRECTORIES
 ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/califa
+${R3BROOT_SOURCE_DIR}/tracking
 ${R3BROOT_SOURCE_DIR}/califa/unpack
 ${R3BROOT_SOURCE_DIR}/califa/ana
 ${R3BROOT_SOURCE_DIR}/califa/pars
@@ -57,9 +58,11 @@ set(SRCS
 ./ana/R3BCalifaDemoOnlineSpectra.cxx
 ./ana/R3BCalifaCrystalCalDataAnalysis.cxx
 ./ana/R3BCalifaMapped2CrystalCalPar.cxx
+./ana/R3BCalifaCrystalCal2TotCalPar.cxx
 ./pars/R3BCalifaHitPar.cxx
 ./pars/R3BCalifaMappingPar.cxx
 ./pars/R3BCalifaCrystalCalPar.cxx
+./pars/R3BCalifaTotCalPar.cxx
 ./pars/R3BCalifaContFact.cxx
 ./pars/R3BCalifaCrystalPars4Sim.cxx
 )
