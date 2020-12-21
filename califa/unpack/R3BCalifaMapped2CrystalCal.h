@@ -30,6 +30,7 @@
 #include "R3BCalifaMappedData.h"
 #include "TH1F.h"
 //#include "R3BCalifaCrystalCalPar.h"
+#include "R3BCalifaTotCalPar.h"
 #include <TRandom.h>
 
 class TClonesArray;
@@ -71,11 +72,14 @@ class R3BCalifaMapped2CrystalCal : public FairTask
 
     Int_t NumCrystals = 0;
     Int_t NumParams = 0;
+    Int_t NumTotParams = 0;
     TArrayF* fCalParams;
+    TArrayF* fCalTotParams;
     // Don't store data for online
     Bool_t fOnline;
 
     R3BCalifaCrystalCalPar* fCal_Par;  /**< Parameter container. >*/
+    R3BCalifaTotCalPar* fTotCal_Par;   /**< Tot Parameter container. >*/
     TClonesArray* fCalifaMappedDataCA; /**< Array with CALIFA Mapped- input data. >*/
     TClonesArray* fCalifaCryCalDataCA; /**< Array with CALIFA Cal- output data. >*/
 

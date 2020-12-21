@@ -258,7 +258,7 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
             {
 
                 if (fDebugMode)
-                    nfound = ss->Search(fh_Map_energy_crystal[i], fSigma, "", fThreshold);
+                    nfound = ss->Search(fh_Map_energy_crystal[i], fSigma, "", fThreshold); // number of peaks
                 else
                     nfound = ss->Search(fh_Map_energy_crystal[i], fSigma, "goff", fThreshold);
                 // std::cout<< i << " " << nfound <<" "<< fThreshold << std::endl;

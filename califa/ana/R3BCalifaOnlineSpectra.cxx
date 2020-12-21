@@ -378,7 +378,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
         fh2_Preamp_vs_ch_R[i]->Draw("colz");
     }
 
-    char Side[255];
+    char Side[50];
     for (Int_t s = 0; s < fNumSides; s++) // Side
     {
         if (s == 1)
@@ -419,7 +419,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
                     if (fFebexInfo[s][r][p][0] != -1)
                     {
                         sprintf(Name1, "fh1_Map_Side_%s_Ring_%d_Preamp_%d_Ch_%d_energy", Side, r + 1, p + 1, j + 1);
-                        sprintf(Name2, "Map level, Side %s Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
+                        sprintf(Name2, "Map level, Side %s, Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
 
                         fh1_crystals[s][r][p][j] = new TH1F(Name1, Name2, fBinsChannelFebex, 0, fMaxBinChannelFebex);
                         fh1_crystals[s][r][p][j]->SetTitleSize(1.6, "t");
@@ -437,7 +437,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
 
                         // for TOT correlations
                         sprintf(Name1, "fh2_Map_Side_%s_Ring_%d_Preamp_%d_Ch_%d_evstot", Side, r + 1, p + 1, j + 1);
-                        sprintf(Name2, "Map level, Side %s Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
+                        sprintf(Name2, "Map level, Side %s, Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
 
                         fh2_crystalsETot[s][r][p][j] = new TH2F(Name1,
                                                                 Name2,
@@ -463,7 +463,8 @@ InitStatus R3BCalifaOnlineSpectra::Init()
                     {
                         // histograms for proton range
                         sprintf(Name1, "fh1_Map_Side_%s_Ring_%d_Preamp_%d_Ch_%d_energy_pr", Side, r + 1, p + 1, j + 1);
-                        sprintf(Name2, "Map level (PR), Side %s Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
+                        sprintf(
+                            Name2, "Map level (PR), Side %s, Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
                         fh1_crystals_p[s][r][p][j] = new TH1F(Name1, Name2, fBinsChannelFebex, 0, fMaxBinChannelFebex);
                         fh1_crystals_p[s][r][p][j]->SetTitleSize(1.6, "t");
                         fh1_crystals_p[s][r][p][j]->GetXaxis()->SetTitle(Xaxis);
@@ -480,7 +481,8 @@ InitStatus R3BCalifaOnlineSpectra::Init()
 
                         // for TOT correlations
                         sprintf(Name1, "fh2_Map_Side_%s_Ring_%d_Preamp_%d_Ch_%d_pr_evstot", Side, r + 1, p + 1, j + 1);
-                        sprintf(Name2, "Map level (PR), Side %s Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
+                        sprintf(
+                            Name2, "Map level (PR), Side %s, Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
                         fh2_crystalsETot_p[s][r][p][j] = new TH2F(Name1,
                                                                   Name2,
                                                                   fBinsChannelFebex,
@@ -537,7 +539,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
                     if (fFebexInfo[s][r][p][0] != -1)
                     {
                         sprintf(Name1, "fh1_Cal_Side_%s_Ring_%d_Preamp_%d_Ch_%d_energy", Side, r + 1, p + 1, j + 1);
-                        sprintf(Name2, "Cal level, Side %s Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
+                        sprintf(Name2, "Cal level, Side %s, Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
 
                         fh1_crystals_cal[s][r][p][j] =
                             new TH1F(Name1, Name2, arry_bins[s][r][p][j], arry_minE[s][r][p][j], arry_maxE[s][r][p][j]);
@@ -557,7 +559,8 @@ InitStatus R3BCalifaOnlineSpectra::Init()
                     if (fFebexInfo[s][r][p][2] != -1)
                     { // histograms for proton range
                         sprintf(Name1, "fh1_Cal_Side_%s_Ring_%d_Preamp_%d_Ch_%d_energy_pr", Side, r + 1, p + 1, j + 1);
-                        sprintf(Name2, "Cal level (PR), Side %s Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
+                        sprintf(
+                            Name2, "Cal level (PR), Side %s, Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
                         fh1_crystals_p_cal[s][r][p][j] =
                             new TH1F(Name1, Name2, arry_bins[s][r][p][j], arry_minE[s][r][p][j], arry_maxE[s][r][p][j]);
                         fh1_crystals_p_cal[s][r][p][j]->SetTitleSize(1.6, "t");
@@ -1087,7 +1090,7 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
     LOG(INFO) << "R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo";
 
     char Name[255];
-    char Side[255];
+    char Side[50];
 
     if (fFebex2Preamp)
     { // Preamp to Febex sequence
@@ -1108,7 +1111,7 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
                             cMapCry[s][r][p]->cd(fOrderFebexPreamp[j] + 1);
                             fh1_crystals[s][r][p][j]->SetFillColor(kGreen);
                             sprintf(Name,
-                                    "Map level, Side %s Ring %d, Slot %d, Febex %d, ch. %d",
+                                    "Map level, Side %s, Ring %d, Slot %d, Febex %d, ch. %d",
                                     Side,
                                     r + 1,
                                     fFebexInfo[s][r][p][0],
@@ -1119,7 +1122,7 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
 
                             cMapCryTot[s][r][p]->cd(fOrderFebexPreamp[j] + 1);
                             sprintf(Name,
-                                    "Map level, Side %s Ring %d, Slot %d, Febex %d, ch. %d",
+                                    "Map level, Side %s, Ring %d, Slot %d, Febex %d, ch. %d",
                                     Side,
                                     r + 1,
                                     fFebexInfo[s][r][p][0],
@@ -1133,7 +1136,7 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
                             cMapCryP[s][r][p]->cd(fOrderFebexPreamp[j] + 1);
                             fh1_crystals_p[s][r][p][j]->SetFillColor(kGreen);
                             sprintf(Name,
-                                    "Map level (PR), Side %s Ring %d, Slot %d, Febex %d, ch. %d",
+                                    "Map level (PR), Side %s, Ring %d, Slot %d, Febex %d, ch. %d",
                                     Side,
                                     r + 1,
                                     fFebexInfo[s][r][p][2],
@@ -1144,7 +1147,7 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
 
                             cMapCryPTot[s][r][p]->cd(fOrderFebexPreamp[j] + 1);
                             sprintf(Name,
-                                    "Map level (PR), Side %s Ring %d, Slot %d, Febex %d, ch. %d",
+                                    "Map level (PR), Side %s, Ring %d, Slot %d, Febex %d, ch. %d",
                                     Side,
                                     r + 1,
                                     fFebexInfo[s][r][p][2],
@@ -1161,7 +1164,7 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
                                 cMapCryCal[s][r][p]->cd(fOrderFebexPreamp[j] + 1);
                                 fh1_crystals_cal[s][r][p][j]->SetFillColor(kGreen);
                                 sprintf(Name,
-                                        "Cal level, Side %s Ring %d, Slot %d, Febex %d, ch. %d",
+                                        "Cal level, Side %s, Ring %d, Slot %d, Febex %d, ch. %d",
                                         Side,
                                         r + 1,
                                         fFebexInfo[s][r][p][0],
@@ -1175,7 +1178,7 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
                                 cMapCryPCal[s][r][p]->cd(fOrderFebexPreamp[j] + 1);
                                 fh1_crystals_p_cal[s][r][p][j]->SetFillColor(kGreen);
                                 sprintf(Name,
-                                        "Cal level (PR), Side %s Ring %d, Slot %d, Febex %d, ch. %d",
+                                        "Cal level (PR), Side %s, Ring %d, Slot %d, Febex %d, ch. %d",
                                         Side,
                                         r + 1,
                                         fFebexInfo[s][r][p][2],
@@ -1209,12 +1212,12 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
                         {
                             cMapCry[s][r][p]->cd(j + 1);
                             fh1_crystals[s][r][p][j]->SetFillColor(45);
-                            sprintf(Name, "Map level, Side %s Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
+                            sprintf(Name, "Map level, Side %s, Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
                             fh1_crystals[s][r][p][j]->SetTitle(Name);
                             fh1_crystals[s][r][p][j]->Draw();
 
                             cMapCryTot[s][r][p]->cd(j + 1);
-                            sprintf(Name, "Map level, Side %s Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
+                            sprintf(Name, "Map level, Side %s, Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
                             fh2_crystalsETot[s][r][p][j]->SetTitle(Name);
                             fh2_crystalsETot[s][r][p][j]->Draw();
                         }
@@ -1223,13 +1226,13 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
                             cMapCryP[s][r][p]->cd(j + 1);
                             fh1_crystals_p[s][r][p][j]->SetFillColor(45);
                             sprintf(
-                                Name, "Map level (PR), Side %s Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
+                                Name, "Map level (PR), Side %s, Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
                             fh1_crystals_p[s][r][p][j]->SetTitle(Name);
                             fh1_crystals_p[s][r][p][j]->Draw();
 
                             cMapCryPTot[s][r][p]->cd(j + 1);
                             sprintf(
-                                Name, "Map level (PR), Side %s Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
+                                Name, "Map level (PR), Side %s, Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
                             fh2_crystalsETot_p[s][r][p][j]->SetTitle(Name);
                             fh2_crystalsETot_p[s][r][p][j]->Draw();
                         }
@@ -1241,7 +1244,7 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
                                 cMapCryCal[s][r][p]->cd(j + 1);
                                 fh1_crystals_cal[s][r][p][j]->SetFillColor(45);
                                 sprintf(
-                                    Name, "Cal level, Side %s Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
+                                    Name, "Cal level, Side %s, Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
                                 fh1_crystals_cal[s][r][p][j]->SetTitle(Name);
                                 fh1_crystals_cal[s][r][p][j]->Draw();
                             }
@@ -1251,7 +1254,7 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
                                 cMapCryPCal[s][r][p]->cd(j + 1);
                                 fh1_crystals_p_cal[s][r][p][j]->SetFillColor(45);
                                 sprintf(Name,
-                                        "Cal level (PR), Side %s Ring %d, Preamp %d, ch. %d",
+                                        "Cal level (PR), Side %s, Ring %d, Preamp %d, ch. %d",
                                         Side,
                                         r + 1,
                                         p + 1,

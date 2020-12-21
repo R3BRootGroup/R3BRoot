@@ -27,6 +27,7 @@
 #include "R3BCalifaCrystalCalPar.h"
 #include "R3BCalifaMapped2CrystalCal.h"
 #include "R3BCalifaMappedData.h"
+#include "R3BCalifaTotCalPar.h"
 
 // R3BCalifaMapped2CrystalCal: Constructor
 R3BCalifaMapped2CrystalCal::R3BCalifaMapped2CrystalCal()
@@ -65,9 +66,19 @@ void R3BCalifaMapped2CrystalCal::SetParContainers()
     {
         LOG(ERROR) << "R3BCalifaMapped2CrystalCal::Init() Couldn't get handle on califaCrystalCalPar container";
     }
-    if (fCal_Par)
+    else
     {
         LOG(INFO) << "R3BCalifaMapped2CrystalCal:: califaCrystalCalPar container open";
+    }
+
+    fTotCal_Par = (R3BCalifaTotCalPar*)rtdb->getContainer("CalifaTotCalPar");
+    if (!fTotCal_Par)
+    {
+        LOG(WARNING) << "R3BCalifaCrystalCal2TotCalPar::Init() Couldn't get handle on CalifaTotCalPar container";
+    }
+    if (fTotCal_Par)
+    {
+        LOG(INFO) << "R3BCalifaCrystalCal2TotCalPar:: CalifaTotCalPar container open";
     }
 }
 
@@ -83,6 +94,13 @@ void R3BCalifaMapped2CrystalCal::SetParameter()
 
     LOG(INFO) << "R3BCalifaMapped2CrystalCal:: Max Crystal ID " << NumCrystals;
     LOG(INFO) << "R3BCalifaMapped2CrystalCal:: Nb of parameters used in the fits " << NumParams;
+
+    //--- Parameter Container --- Tot
+    NumTotParams = fTotCal_Par->GetNumParametersFit(); // Number of Parameters
+
+    fCalTotParams = new TArrayF();
+    fCalTotParams = fTotCal_Par->GetCryCalParams(); // Array with the Tot Cal parameters
+    assert(fCalTotParams->GetSize() >= NumCrystals * NumTotParams);
 }
 
 InitStatus R3BCalifaMapped2CrystalCal::Init()
@@ -202,7 +220,13 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
             for (int idx; idx < 3; idx++)
                 cal[idx] = NAN;
 
-        double TotCal = Tot; // TODO
+        double TotCal = Tot;
+        if (fCalTotParams)
+        {
+            double a0 = fCalTotParams->GetAt(NumTotParams * (crystalId - 1));
+            double a1 = fCalTotParams->GetAt(NumTotParams * (crystalId - 1) + 1);
+            TotCal = a0 * TMath::Exp(Tot / a1);
+        }
         AddCalData(crystalId, cal[en], cal[Nf], cal[Ns], Time, TotCal);
     }
 
