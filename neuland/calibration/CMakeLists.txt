@@ -14,7 +14,9 @@
 set(LIBRARY_NAME R3BNeulandCalibration)
 set(LINKDEF NeulandCalibrationLinkDef.h)
 
-set(DEPENDENCIES R3Bbase R3BData R3BTCal)
+set(CMAKE_CXX_STANDARD 14)
+
+set(DEPENDENCIES R3Bbase R3BData R3BTCal R3BNeulandShared)
 
 set(INCLUDE_DIRECTORIES
     ${INCLUDE_DIRECTORIES}
@@ -34,14 +36,16 @@ set(SRCS
     R3BNeulandHitHist.cxx
     # R3BNeulandCalTest.cxx
     R3BNeulandHitPar.cxx
+    R3BNeulandCosmicTracker.cxx 
+    R3BNeulandHitCalibrationEngine.cxx
+    R3BNeulandHitCalibrationBar.cxx
+    R3BNeulandTSyncer.cxx
+    LSQR.cxx
     R3BNeulandCal2HitPar.cxx
-    R3BLandCosmic1LSQR.cxx
-    R3BLandCosmic1Util.cxx
     R3BNeulandParFact.cxx
     R3BNeulandCal2Hit.cxx
     R3BNeulandHitModulePar.cxx
     R3BNeulandQCalPar.cxx
-    R3BNeulandHitFiller.cxx
     R3BNeulandQCalFiller.cxx)
 change_file_extension(*.cxx *.h HEADERS "${SRCS}")
 

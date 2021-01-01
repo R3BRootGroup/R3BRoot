@@ -34,7 +34,8 @@ set(HEADERS
     IsElastic.h
     R3BNeulandGeoPar.h
     R3BNeulandContFact.h
-    R3BNeulandVisualizer.h)
+    R3BNeulandVisualizer.h
+    R3BNeulandCommon.h)
 
 generate_library()
 

@@ -107,14 +107,3 @@ R3BDistribution<Dim> R3BDistribution3D::Prism(R3BDistribution<2> xydist, R3BDist
         return { xy[0], xy[1], z };
     });
 }
-
-R3BDistribution<Dim> R3BDistribution3D::Cylindric(R3BDistribution<1> rdist, R3BDistribution<1> zdist)
-{
-    return R3BDistribution<Dim>([rdist, zdist](const Arr values) mutable -> Arr {
-        Arr ret;
-        const auto r = rdist.GetRandomValues({ values[0] })[0];
-        const auto phi = values[1] * 2 * TMath::Pi();
-        const auto z = zdist.GetRandomValues({ values[2] })[0];
-        return { r * cos(phi), r * sin(phi), z };
-    });
-}

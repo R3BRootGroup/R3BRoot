@@ -18,9 +18,9 @@
 #include "R3BNeulandHitModulePar.h"
 #include "TObjArray.h"
 
-class FairParamList;
+#include <array>
 
-#define NMODULEMAX 6000
+class FairParamList;
 
 class R3BNeulandHitPar : public FairParGenericSet
 {
@@ -77,31 +77,58 @@ class R3BNeulandHitPar : public FairParGenericSet
      * Method to retrieve the arrray with module containers.
      * @return an array with parameter containers of type R3BNeulandHitModulePar.
      */
-    TObjArray* GetListOfModulePar() { return fParams; }
+    TObjArray* GetListOfModulePar() const { return fParams; }
 
     /**
      * Method to get number of modules storred in array.
      * @return size of array.
      */
-    Int_t GetNumModulePar() { return fParams->GetEntriesFast(); }
+    Int_t GetNumModulePar() const { return fParams->GetEntriesFast(); }
 
     /**
      * Method to get single parameter container for a specific module.
      * @param idx an index of a module.
      * @return parameter container of this module.
      */
-    R3BNeulandHitModulePar* GetModuleParAt(Int_t idx) { return (R3BNeulandHitModulePar*)fParams->At(idx); }
+    R3BNeulandHitModulePar* GetModuleParAt(Int_t idx) const { return (R3BNeulandHitModulePar*)fParams->At(idx); }
 
     // Global time offset in ns
-    inline Double_t GetGlobalTimeOffset() { return fGlobalTimeOffset; }
-    inline void SetGlobalTimeOffset(Double_t t0) { fGlobalTimeOffset = t0; }
+    inline Double_t GetGlobalTimeOffset() const { return fGlobalTimeOffset; }
+    inline void SetGlobalTimeOffset(Double_t t0_ns) { fGlobalTimeOffset = t0_ns; }
+
+    // Distance to Target in cm
+    inline Double_t GetDistanceToTarget(Int_t plane = 0) const
+    {
+        return fDistanceToTarget + fDistancesToFirstPlane.at(plane);
+    }
+    inline void SetDistanceToTarget(Double_t distance_cm) { fDistanceToTarget = distance_cm; }
+
+    // Energy Cutoff for all Hits in MeV
+    inline Double_t GetEnergyCutoff() const { return fEnergyCut; }
+    inline void SetEnergyCutoff(Double_t energy_MeV) { fEnergyCut = energy_MeV; }
+
+    // Number of Planes
+    inline Int_t GetNumberOfPlanes() const { return fDistancesToFirstPlane.size(); }
+    inline void SetNumberOfPlanes(const Int_t nPlanes) { fDistancesToFirstPlane.resize(nPlanes); }
+
+    // Distance to first Plane in cm
+    inline Double_t GetDistanceToFirstPlane(Int_t plane) const { return fDistancesToFirstPlane.at(plane); }
+    inline void SetDistanceToFirstPlane(Int_t plane, Double_t distance_cm)
+    {
+        fDistancesToFirstPlane.at(plane) = distance_cm;
+    }
+
+    inline std::vector<Double_t> GetDistancesToFirstPlane() const { return fDistancesToFirstPlane; }
 
   private:
     TObjArray* fParams; /**< an array with parameter containers of all modules */
 
     Double_t fGlobalTimeOffset;
+    Double_t fDistanceToTarget;
+    Double_t fEnergyCut;
+    std::vector<Double_t> fDistancesToFirstPlane;
 
-    ClassDef(R3BNeulandHitPar, 2);
+    ClassDef(R3BNeulandHitPar, 3);
 };
 
 #endif /* !R3BNEULANDHITPAR_H*/

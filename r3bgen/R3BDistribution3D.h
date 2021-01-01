@@ -31,6 +31,5 @@ class R3BDistribution3D : public R3BDistribution<3>
     static R3BDistribution<3> Prism(R3BDistribution<2> xydist, R3BDistribution<1> zdist);
     static R3BDistribution<3> Sphere(const Arr center, const Double_t radius);
     static R3BDistribution<3> SphereSurface(const Arr center, const Double_t radius);
-    static R3BDistribution<3> Cylindric(R3BDistribution<1> rdist, R3BDistribution<1> zdist);
 };
 #endif

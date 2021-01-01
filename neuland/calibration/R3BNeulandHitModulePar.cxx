@@ -12,13 +12,15 @@
  ******************************************************************************/
 
 #include "R3BNeulandHitModulePar.h"
+
 #include "FairLogger.h"
 #include "FairParamList.h" // for FairParamList
+
+#include "TString.h"
 
 R3BNeulandHitModulePar::R3BNeulandHitModulePar(const char* name, const char* title, const char* context, Bool_t own)
     : FairParGenericSet(name, title, context, own)
     , fModuleId(0)
-    , fSide(0)
 {
     // Reset all parameters
     clear();
@@ -34,13 +36,18 @@ void R3BNeulandHitModulePar::putParams(FairParamList* list)
         return;
     }
     list->add("module_id", fModuleId);
-    list->add("side", fSide);
-    list->add("timeoffset", fTimeOffset);
-    list->add("timeoffset_error", fTimeOffsetError);
-    list->add("energiegain", fEnergieGain);
-    list->add("energiegain_error", fEnergieGainError);
+    list->add("tdiff", fTDiff);
+    list->add("tsync", fTSync);
+    list->add("pedestal_1", fPedestal[0]);
+    list->add("pedestal_2", fPedestal[1]);
+    list->add("energygain_1", fEnergyGain[0]);
+    list->add("energygain_2", fEnergyGain[1]);
     list->add("effectivespeed", fEffectiveSpeed);
-    list->add("effectivespeed_error", fEffectiveSpeedError);
+    list->add("lightattenuationlength", fLightAttenuationLength);
+    list->add("pmtsaturation_1", fPMTSaturation[0]);
+    list->add("pmtsaturation_2", fPMTSaturation[1]);
+    list->add("pmtthreshold_1", fPMTThreshold[0]);
+    list->add("pmtthreshold_2", fPMTThreshold[1]);
 }
 
 Bool_t R3BNeulandHitModulePar::getParams(FairParamList* list)
@@ -53,23 +60,27 @@ Bool_t R3BNeulandHitModulePar::getParams(FairParamList* list)
     {
         return kFALSE;
     }
-    if (!list->fill("side", &fSide))
+    if (!list->fill("tdiff", &fTDiff))
     {
         return kFALSE;
     }
-    if (!list->fill("timeoffset", &fTimeOffset))
+    if (!list->fill("tsync", &fTSync))
     {
         return kFALSE;
     }
-    if (!list->fill("timeoffset_error", &fTimeOffsetError))
+    if (!list->fill("pedestal_1", &fPedestal[0]))
     {
         return kFALSE;
     }
-    if (!list->fill("energiegain", &fEnergieGain))
+    if (!list->fill("pedestal_2", &fPedestal[1]))
     {
         return kFALSE;
     }
-    if (!list->fill("energiegain_error", &fEnergieGainError))
+    if (!list->fill("energygain_1", &fEnergyGain[0]))
+    {
+        return kFALSE;
+    }
+    if (!list->fill("energygain_2", &fEnergyGain[1]))
     {
         return kFALSE;
     }
@@ -77,7 +88,23 @@ Bool_t R3BNeulandHitModulePar::getParams(FairParamList* list)
     {
         return kFALSE;
     }
-    if (!list->fill("effectivespeed_error", &fEffectiveSpeedError))
+    if (!list->fill("lightattenuationlength", &fLightAttenuationLength))
+    {
+        return kFALSE;
+    }
+    if (!list->fill("pmtsaturation_1", &fPMTSaturation[0]))
+    {
+        return kFALSE;
+    }
+    if (!list->fill("pmtsaturation_2", &fPMTSaturation[1]))
+    {
+        return kFALSE;
+    }
+    if (!list->fill("pmtthreshold_1", &fPMTThreshold[0]))
+    {
+        return kFALSE;
+    }
+    if (!list->fill("pmtthreshold_2", &fPMTThreshold[1]))
     {
         return kFALSE;
     }
@@ -89,16 +116,20 @@ void R3BNeulandHitModulePar::clear() {}
 
 void R3BNeulandHitModulePar::printParams()
 {
-    LOG(INFO) << "   R3BNeulandHitModulePar: Calibration Parameters: ";
-    LOG(INFO) << "   fBarId: " << fModuleId;
-    LOG(INFO) << "   fSide: " << fSide;
-    char strMessage[1000];
-    sprintf(strMessage, "   fTimeOffset: %4.2f  ±   %4.2f\n", fTimeOffset, fTimeOffsetError);
-    LOG(info) << strMessage;
-    sprintf(strMessage, "   fEffectiveSpeed: %4.2f  ±   %4.2f\n", fEffectiveSpeed, fEffectiveSpeedError);
-    LOG(info) << strMessage;
-    sprintf(strMessage, "   fEnergieGain: %4.2f  ±   %4.2f\n", fEnergieGain, fEnergieGainError);
-    LOG(info) << strMessage;
+    LOG(INFO) << "R3BNeulandHitModulePar: Calibration Parameters:";
+    LOG(INFO) << "   Bar ID: " << fModuleId;
+    LOG(INFO) << TString::Format("   TDiff:     %4.2f", fTDiff);
+    LOG(INFO) << TString::Format("   TSync:     %4.2f", fTSync);
+    LOG(INFO) << TString::Format("   Effective Speed: %4.2f", fEffectiveSpeed);
+    LOG(INFO) << TString::Format("   Light Attenuation Length: %4.1f", fLightAttenuationLength);
+    LOG(INFO) << TString::Format("   Energy Gain R/B:    %4.2f", fEnergyGain[0]);
+    LOG(INFO) << TString::Format("   Energy Gain L/T:    %4.2f\n", fEnergyGain[1]);
+    LOG(INFO) << TString::Format("   Pedestal R/B:     %4d\n", fPedestal[0]);
+    LOG(INFO) << TString::Format("   Pedestal L/T:     %4d\n", fPedestal[1]);
+    LOG(INFO) << TString::Format("   PMT Saturation R/B:  %4.2f\n", fPMTSaturation[0]);
+    LOG(INFO) << TString::Format("   PMT Saturation L/T:  %4.2f\n", fPMTSaturation[1]);
+    LOG(INFO) << TString::Format("   PMT Threshold R/B:   %4.2f\n", fPMTThreshold[0]);
+    LOG(INFO) << TString::Format("   PMT Threshold L/T:   %4.2f\n", fPMTThreshold[1]);
 }
 
 ClassImp(R3BNeulandHitModulePar);
