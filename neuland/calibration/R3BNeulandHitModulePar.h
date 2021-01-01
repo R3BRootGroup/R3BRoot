@@ -16,7 +16,12 @@
 
 #include "FairParGenericSet.h"
 
-#define NCHMAX 5000
+#include "R3BNeulandCommon.h"
+
+#include "assert.h"
+
+// FIXME Do we need this???
+//#define NCHMAX 5000
 
 class FairParamList;
 
@@ -67,32 +72,73 @@ class R3BNeulandHitModulePar : public FairParGenericSet
 
     /** Accessor functions **/
     Int_t GetModuleId() const { return fModuleId; }
-    Int_t GetSide() const { return fSide; }
-    Double_t GetTimeOffset() const { return fTimeOffset; }
-    Double_t GetTimeOffsetError() const { return fTimeOffsetError; }
-    Double_t GetEnergieGain() const { return fEnergieGain; }
-    Double_t GetEnergieGainError() const { return fEnergieGainError; }
+    Double_t GetTDiff() const { return fTDiff; }
+    Double_t GetTSync() const { return fTSync; }
+    Double_t GetTimeOffset(const Int_t side) const
+    {
+        assert(side == 1 || side == 2);
+        return fTSync + (1.5 - side) * fTDiff;
+    }
     Double_t GetEffectiveSpeed() const { return fEffectiveSpeed; }
-    Double_t GetEffectiveSpeedError() const { return fEffectiveSpeedError; }
-    void SetModuleId(Int_t i) { fModuleId = i; }
-    void SetSide(Int_t i) { fSide = i; }
-    void SetTimeOffset(Double_t i) { fTimeOffset = i; }
-    void SetTimeOffsetError(Double_t i) { fTimeOffsetError = i; }
-    void SetEnergieGain(Double_t i) { fEnergieGain = i; }
-    void SetEnergieGainError(Double_t i) { fEnergieGainError = i; }
-    void SetEffectiveSpeed(Double_t i) { fEffectiveSpeed = i; }
-    void SetEffectiveSpeedError(Double_t i) { fEffectiveSpeedError = i; }
+    Int_t GetPedestal(const Int_t side) const
+    {
+        assert(side == 1 || side == 2);
+        return fPedestal[side - 1];
+    }
+    Double_t GetEnergyGain(const Int_t side) const
+    {
+        assert(side == 1 || side == 2);
+        return fEnergyGain[side - 1];
+    }
+    Double_t GetLightAttenuationLength() const { return fLightAttenuationLength; }
+    Double_t GetPMTSaturation(const Int_t side) const
+    {
+        assert(side == 1 || side == 2);
+        return fPMTSaturation[side - 1];
+    }
+    Double_t GetPMTThreshold(const Int_t side) const
+    {
+        assert(side == 1 || side == 2);
+        return fPMTThreshold[side - 1];
+    }
+
+    void SetModuleId(const Int_t i) { fModuleId = i; }
+    void SetTDiff(const Double_t val) { fTDiff = val; }
+    void SetTSync(const Double_t val) { fTSync = val; }
+    void SetEffectiveSpeed(const Double_t val) { fEffectiveSpeed = val; }
+    void SetPedestal(const Int_t val, const Int_t side)
+    {
+        assert(side == 1 || side == 2);
+        fPedestal[side - 1] = val;
+    }
+    void SetEnergyGain(const Double_t val, const Int_t side)
+    {
+        assert(side == 1 || side == 2);
+        fEnergyGain[side - 1] = val;
+    }
+    void SetLightAttenuationLength(const Double_t val) { fLightAttenuationLength = val; }
+    void SetPMTSaturation(const Double_t val, const Int_t side)
+    {
+        assert(side == 1 || side == 2);
+        fPMTSaturation[side - 1] = val;
+    }
+    void SetPMTThreshold(const Double_t val, const Int_t side)
+    {
+        assert(side == 1 || side == 2);
+        fPMTThreshold[side - 1] = val;
+    }
 
   private:
     Int_t fModuleId; /**< Index of a detector module. */
-    Int_t fSide;     /**< Side of a module: for NeuLAND - L/R PMT. */
-    Double_t fTimeOffset;
-    Double_t fTimeOffsetError;
-    Double_t fEnergieGain;
-    Double_t fEnergieGainError;
+    Double_t fTDiff;
+    Double_t fTSync;
     Double_t fEffectiveSpeed;
-    Double_t fEffectiveSpeedError;
-    ClassDef(R3BNeulandHitModulePar, 1);
+    Int_t fPedestal[2];      // R/B, L/T
+    Double_t fEnergyGain[2]; // R/B, L/T
+    Double_t fLightAttenuationLength;
+    Double_t fPMTSaturation[2]; // R/B, L/T
+    Double_t fPMTThreshold[2];  // R/B, L/T
+    ClassDef(R3BNeulandHitModulePar, 3);
 };
 
 #endif /* !R3BNEULANDHITMODULEPAR_H*/

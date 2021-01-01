@@ -1,18 +1,5 @@
-/******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
- *                                                                            *
- *             This software is distributed under the terms of the            *
- *                 GNU General Public Licence (GPL) version 3,                *
- *                    copied verbatim in the file "LICENSE".                  *
- *                                                                            *
- * In applying this license GSI does not waive the privileges and immunities  *
- * granted to it by virtue of its status as an Intergovernmental Organization *
- * or submit itself to any jurisdiction.                                      *
- ******************************************************************************/
-
-#ifndef R3BLANDLSQR_H
-#define R3BLANDLSQR_H
+#ifndef LSQR_H
+#define LSQR_H
 /*
  * lsqr.h
  * Contains auxiliary functions, data type definitions, and function
@@ -76,6 +63,7 @@
 /*---------------*/
 
 #include <float.h>
+#include <functional>
 #include <limits.h>
 #include <math.h>
 #include <stdio.h>
@@ -113,7 +101,7 @@
 /* Type definitions */
 /*------------------*/
 
-typedef struct LONG_VECTOR
+typedef struct LSQR_LONG_VECTOR
 {
     long length;
     long* elements;
@@ -380,11 +368,6 @@ typedef struct LSQR_WORK
  *------------------------------------------------------------------------------
  */
 
-typedef struct LSQR_FUNC
-{
-    void (*mat_vec_prod)(long, dvec*, dvec*, void*);
-} lsqr_func;
-
 /*---------------------*/
 /* Function prototypes */
 /*---------------------*/
@@ -396,8 +379,8 @@ void free_lvec(lvec*);
 dvec* alloc_dvec(long);
 void free_dvec(dvec*);
 
-void alloc_lsqr_mem(lsqr_input**, lsqr_output**, lsqr_work**, lsqr_func**, long, long);
-void free_lsqr_mem(lsqr_input*, lsqr_output*, lsqr_work*, lsqr_func*);
+void alloc_lsqr_mem(lsqr_input**, lsqr_output**, lsqr_work**, long, long);
+void free_lsqr_mem(lsqr_input*, lsqr_output*, lsqr_work*);
 
 lsqr_input* alloc_lsqr_in(long, long);
 void free_lsqr_in(lsqr_input*);
@@ -408,10 +391,7 @@ void free_lsqr_out(lsqr_output*);
 lsqr_work* alloc_lsqr_wrk(long, long);
 void free_lsqr_wrk(lsqr_work*);
 
-lsqr_func* alloc_lsqr_fnc();
-void free_lsqr_fnc(lsqr_func*);
-
-void lsqr(lsqr_input*, lsqr_output*, lsqr_work*, lsqr_func*, void*);
+void lsqr(lsqr_input*, lsqr_output*, lsqr_work*, std::function<void(long, dvec*, dvec*, void*)>, void*);
 
 double dvec_norm2(dvec*);
 void dvec_scale(double, dvec*);

@@ -12,15 +12,21 @@
  ******************************************************************************/
 
 #include "R3BNeulandHitPar.h"
+#include "R3BNeulandCommon.h"
 
 #include "FairLogger.h"
 #include "FairParamList.h" // for FairParamList
 
 R3BNeulandHitPar::R3BNeulandHitPar(const char* name, const char* title, const char* context, Bool_t own)
     : FairParGenericSet(name, title, context, own)
-    , fParams(new TObjArray(NMODULEMAX))
+    , fParams(new TObjArray(Neuland::MaxNumberOfBars))
     , fGlobalTimeOffset(0.0)
 {
+    fDistancesToFirstPlane.resize(Neuland::MaxNumberOfPlanes, 0);
+    for (int p = 1; p < Neuland::MaxNumberOfPlanes; ++p)
+    {
+        fDistancesToFirstPlane[p] = p * Neuland::BarSize_Z;
+    }
 }
 
 R3BNeulandHitPar::~R3BNeulandHitPar()

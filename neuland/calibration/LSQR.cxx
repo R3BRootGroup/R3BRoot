@@ -1,16 +1,3 @@
-/******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019 Members of R3B Collaboration                          *
- *                                                                            *
- *             This software is distributed under the terms of the            *
- *                 GNU General Public Licence (GPL) version 3,                *
- *                    copied verbatim in the file "LICENSE".                  *
- *                                                                            *
- * In applying this license GSI does not waive the privileges and immunities  *
- * granted to it by virtue of its status as an Intergovernmental Organization *
- * or submit itself to any jurisdiction.                                      *
- ******************************************************************************/
-
 /*
 * lsqr.c
 * This is a C version of LSQR derived by James W. Howse <jhowse@lanl.gov>
@@ -71,7 +58,7 @@
 * 02 Sep 2007  Macro "sqr" now defined to be "lsqr_sqr".
 */
 
-#include "R3BLandCosmic1LSQR.h"
+#include "LSQR.h"
 #include "stdlib.h"
 
 /*-------------------------------------------------------------------------*/
@@ -186,7 +173,6 @@ void free_dvec(dvec* dbl_vec)
 void alloc_lsqr_mem(lsqr_input** in_struct,
                     lsqr_output** out_struct,
                     lsqr_work** wrk_struct,
-                    lsqr_func** fnc_struct,
                     long max_num_rows,
                     long max_num_cols)
 {
@@ -210,12 +196,6 @@ void alloc_lsqr_mem(lsqr_input** in_struct,
                    "function alloc_lsqr_wrk()",
                    -1);
 
-    *fnc_struct = (lsqr_func*)alloc_lsqr_fnc();
-    if (!fnc_struct)
-        lsqr_error("lsqr: work structure allocation failure in "
-                   "function alloc_lsqr_fnc()",
-                   -1);
-
     return;
 }
 
@@ -225,13 +205,13 @@ void alloc_lsqr_mem(lsqr_input** in_struct,
 /*  created with the function 'alloc_lsqr_mem()'.                */
 /*                                                               */
 /*---------------------------------------------------------------*/
+#include <iostream>
 
-void free_lsqr_mem(lsqr_input* in_struct, lsqr_output* out_struct, lsqr_work* wrk_struct, lsqr_func* fnc_struct)
+void free_lsqr_mem(lsqr_input* in_struct, lsqr_output* out_struct, lsqr_work* wrk_struct)
 {
     free_lsqr_in(in_struct);
     free_lsqr_out(out_struct);
     free_lsqr_wrk(wrk_struct);
-    free_lsqr_fnc(fnc_struct);
     return;
 }
 
@@ -369,39 +349,6 @@ void free_lsqr_wrk(lsqr_work* wrk_struct)
     return;
 }
 
-/*---------------------------------------------------------------*/
-/*                                                               */
-/*  Define the allocation function for the structure of          */
-/*  type 'lsqr_func'.                                            */
-/*                                                               */
-/*---------------------------------------------------------------*/
-
-lsqr_func* alloc_lsqr_fnc()
-{
-    lsqr_func* fnc_struct;
-
-    fnc_struct = (lsqr_func*)malloc(sizeof(lsqr_func));
-    if (!fnc_struct)
-        lsqr_error("lsqr: function structure allocation failure in "
-                   "function alloc_lsqr_fnc()",
-                   -1);
-
-    return fnc_struct;
-}
-
-/*---------------------------------------------------------------*/
-/*                                                               */
-/*  Define the deallocation function for the structure           */
-/*  created with the function 'alloc_lsqr_fnc()'.                */
-/*                                                               */
-/*---------------------------------------------------------------*/
-
-void free_lsqr_fnc(lsqr_func* fnc_struct)
-{
-    free((lsqr_func*)(fnc_struct));
-    return;
-}
-
 /*-------------------------------------------------------------------------*/
 /*                                                                         */
 /*  Define the LSQR function.                                              */
@@ -468,7 +415,11 @@ void free_lsqr_fnc(lsqr_func* fnc_struct)
  *
  *------------------------------------------------------------------------------
  */
-void lsqr(lsqr_input* input, lsqr_output* output, lsqr_work* work, lsqr_func* func, void* prod)
+void lsqr(lsqr_input* input,
+          lsqr_output* output,
+          lsqr_work* work,
+          std::function<void(long, dvec*, dvec*, void*)> mat_vec_prod,
+          void* prod)
 {
     double dvec_norm2(dvec*);
 
@@ -543,7 +494,7 @@ void lsqr(lsqr_input* input, lsqr_output* output, lsqr_work* work, lsqr_func* fu
      */
     /* Compute b - A*x0 and store in vector u which initially held vector b */
     dvec_scale((-1.0), input->rhs_vec);
-    func->mat_vec_prod(0, input->sol_vec, input->rhs_vec, prod);
+    mat_vec_prod(0, input->sol_vec, input->rhs_vec, prod);
     dvec_scale((-1.0), input->rhs_vec);
 
     /* compute Euclidean length of u and store as BETA */
@@ -555,7 +506,7 @@ void lsqr(lsqr_input* input, lsqr_output* output, lsqr_work* work, lsqr_func* fu
         dvec_scale((1.0 / beta), input->rhs_vec);
 
         /* Compute matrix-vector product A^T*u and store it in vector v */
-        func->mat_vec_prod(1, work->bidiag_wrk_vec, input->rhs_vec, prod);
+        mat_vec_prod(1, work->bidiag_wrk_vec, input->rhs_vec, prod);
 
         /* compute Euclidean length of v and store as ALPHA */
         alpha = dvec_norm2(work->bidiag_wrk_vec);
@@ -642,7 +593,7 @@ void lsqr(lsqr_input* input, lsqr_output* output, lsqr_work* work, lsqr_func* fu
         dvec_scale((-alpha), input->rhs_vec);
 
         /* compute A*v - ALPHA*u and store in vector u */
-        func->mat_vec_prod(0, work->bidiag_wrk_vec, input->rhs_vec, prod);
+        mat_vec_prod(0, work->bidiag_wrk_vec, input->rhs_vec, prod);
 
         /* compute Euclidean length of u and store as BETA */
         beta = dvec_norm2(input->rhs_vec);
@@ -660,7 +611,7 @@ void lsqr(lsqr_input* input, lsqr_output* output, lsqr_work* work, lsqr_func* fu
             dvec_scale((-beta), work->bidiag_wrk_vec);
 
             /* compute A^T*u - BETA*v and store in vector v */
-            func->mat_vec_prod(1, work->bidiag_wrk_vec, input->rhs_vec, prod);
+            mat_vec_prod(1, work->bidiag_wrk_vec, input->rhs_vec, prod);
 
             /* compute Euclidean length of v and store as ALPHA */
             alpha = dvec_norm2(work->bidiag_wrk_vec);

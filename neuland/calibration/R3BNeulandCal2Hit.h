@@ -17,8 +17,10 @@
 #include "FairTask.h"
 #include "R3BNeulandCalData.h"
 #include "R3BNeulandHit.h"
+#include "R3BNeulandHitModulePar.h"
 #include "TCAConnector.h"
 #include <map>
+#include <vector>
 
 class R3BNeulandHitPar;
 class R3BEventHeader;
@@ -26,24 +28,20 @@ class R3BEventHeader;
 class R3BNeulandCal2Hit : public FairTask
 {
   public:
-    R3BNeulandCal2Hit();
+    R3BNeulandCal2Hit(const char* name = "R3BNeulandCal2Hit", const Int_t iVerbose = 0);
     ~R3BNeulandCal2Hit() override = default;
 
     InitStatus Init() override;
     InitStatus ReInit() override;
     void SetParContainers() override;
     void Exec(Option_t*) override;
+    void FinishTask() override;
 
     inline void SetFirstPlaneHorizontal() { fFirstPlaneHorizontal = kTRUE; }
 
-    // Distance to target in cm
-    inline void SetDistanceToTarget(Double_t d) { fDistanceToTarget = d; }
-
-    // Global time offset in ns
-    inline void SetGlobalTimeOffset(Double_t t0) { fGlobalTimeOffset = t0; }
-
   private:
     void SetParameter();
+    Double_t GetUnsaturatedEnergy(const Int_t qdc, const Double_t gain, const Double_t saturation) const;
 
     R3BEventHeader* fEventHeader;
 
@@ -53,13 +51,18 @@ class R3BNeulandCal2Hit : public FairTask
     R3BNeulandHitPar* fPar;
 
     Bool_t fFirstPlaneHorizontal;
+    Int_t fNumberOfPlanes;
     Double_t fDistanceToTarget;
+    std::vector<Double_t> fDistancesToFirstPlane;
+    std::vector<Double_t> fAttenuationValues;
     Double_t fGlobalTimeOffset;
+    Double_t fEnergyCutoff;
 
-    std::map<Int_t, Bool_t> fMapIsSet;
-    std::map<Int_t, Double_t> fMapVeff;
-    std::map<Int_t, Double_t> fMapTSync;
-    std::map<Int_t, Double_t> fMapEGain;
+    std::map<Int_t, R3BNeulandHitModulePar> fParMap;
+
+    std::map<Int_t, R3BNeulandCalData*> fHitMap;
+
+    UInt_t fEventNumber = 0;
 
   public:
     ClassDefOverride(R3BNeulandCal2Hit, 0)
