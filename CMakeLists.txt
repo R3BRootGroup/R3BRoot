@@ -178,8 +178,8 @@ unset(Boost_INCLUDE_DIR CACHE)
 unset(Boost_LIBRARY_DIRS CACHE)
 find_package2(PUBLIC Boost
   VERSION 1.67 ${FairMQ_Boost_VERSION}
-  COMPONENTS thread system timer program_options random filesystem chrono exception iostreams
-regex serialization log log_setup atomic date_time signals ${FairMQ_Boost_COMPONENTS}
+  COMPONENTS thread system timer program_options random filesystem chrono exception iostreams regex serialization log log_setup atomic date_time ${FairMQ_Boost_COMPONENTS}
+  REQUIRED
 )
 if(Boost_FOUND)
   set(Boost_Avail 1)
@@ -274,6 +274,10 @@ r3b_generate_version_info()
 
 # Recurse into the given subdirectories.  This does not actually cause another cmake executable to
 # run.  The same process will walk through the project's entire directory structure.
+
+# FIXME in FairSoft / FairRoot
+find_package(VMC QUIET)
+set (BASE_INCLUDE_DIRECTORIES ${BASE_INCLUDE_DIRECTORIES} ${VMC_INCLUDE_DIRS})
 
 if(NOT FAIRROOT_FOUND)
     add_subdirectory(fairtools)
