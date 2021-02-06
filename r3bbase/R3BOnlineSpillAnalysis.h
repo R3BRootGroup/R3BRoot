@@ -25,6 +25,7 @@
 #include <cstdlib>
 
 class TClonesArray;
+class TF1;
 class TH1F;
 class TH2F;
 class R3BEventHeader;

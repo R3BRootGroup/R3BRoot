@@ -36,10 +36,10 @@ link_directories(${GTEST_LIBS_DIR} ${ROOT_LIBRARY_DIR} ${FAIRROOT_LIBRARY_DIR}
 set(TEST_DEPENDENCIES
     ${GTEST_BOTH_LIBRARIES}
     ${ROOT_LIBRARIES}
-    FairLogger::FairLogger
     FairTools
-    R3Bbase
     R3BData
+    ParBase
+    GeoBase
     R3BNeulandShared
     R3BNeulandReconstruction
     Alignment)
