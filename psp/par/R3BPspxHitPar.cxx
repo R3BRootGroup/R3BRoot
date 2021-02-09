@@ -77,7 +77,7 @@ void R3BPspxHitPar::putParams(FairParamList* l)
     // count entries for energy calibration,
     array_size = (fNumDetectors * 5 + 1); // 5 entries per detector + 1 header word
     LOG(INFO) << "R3BPspxHitPosPar Array Size: " << array_size;
-    fHitPosPar.Set(array_size);
+    fHitEPar.Set(array_size);
     l->add("fHitEPar", fHitEPar);
 }
 
@@ -92,7 +92,7 @@ Bool_t R3BPspxHitPar::getParams(FairParamList* l)
 
     // count entries for position calibration,
     // can change when more than a linear polynomial function is used => more parameters
-    Int_t array_size = (fNumDetectors * 6 + 1); // 6 entries per detector + 1 header word
+    Int_t array_size = (fNumDetectors * 7 + 1); // 6 entries per detector + 1 header word
     LOG(INFO) << "R3BPspxHitPosPar Array Size: " << array_size;
     fHitPosPar.Set(array_size);
     if (!(l->fill("R3BPspxHitPosPar", &fHitPosPar)))
@@ -104,7 +104,7 @@ Bool_t R3BPspxHitPar::getParams(FairParamList* l)
     // count entries for energy calibration,
     array_size = (fNumDetectors * 5 + 1); // 4 entries per detector + 1 header word
     LOG(INFO) << "R3BPspxHitEPar Array Size: " << array_size;
-    fHitPosPar.Set(array_size);
+    fHitEPar.Set(array_size);
     if (!(l->fill("R3BPspxHitEPar", &fHitEPar)))
     {
         LOG(WARNING) << "Could not initialize R3BPspxHitEPar";

@@ -60,9 +60,9 @@ void R3BPspxCal2Hit::SetParameters()
     posOffset.resize(nDet);
     posSlope.resize(nDet);
     LOG(INFO) << "Position Parameters";
+    Int_t parOffset = 1; // 1 "header" parameter.
     for (Int_t d = 0; d < nDet; d++)
     {
-        Int_t parOffset = 1;                   // 1 "header" parameter.
         TArrayF par = fHitPar->GetHitPosPar(); // Array with the parameters
         orientation[d] = par.At(parOffset + 2);
         detSize[d] = par.At(parOffset + 3);
@@ -77,9 +77,9 @@ void R3BPspxCal2Hit::SetParameters()
     eGain.resize(nDet);
     eRange.resize(nDet);
     LOG(INFO) << "Energy Parameters";
+    parOffset = 1; // 1 "header" parameter.
     for (Int_t d = 0; d < nDet; d++)
     {
-        Int_t parOffset = 1;                 // 1 "header" parameter.
         TArrayF par = fHitPar->GetHitEPar(); // Array with the parameters
         eOffset[d] = par.At(parOffset + 2);
         eGain[d] = par.At(parOffset + 3);
@@ -186,8 +186,8 @@ void R3BPspxCal2Hit::Exec(Option_t* option)
 
             Float_t energy = calData->GetEnergy() * eGain[d] + eOffset[d]; // convert energy to MeV
             Float_t pos =
-                calData->GetPos() * orientation[d] * detSize[d]; // convert position to mm, flip axis if necessary
-            pos = pos * posSlope[d] + posOffset[d];              // correct position for detector offset and tilt
+                calData->GetPos() * orientation[d] /** detSize[d]*/; // convert position to mm, flip axis if necessary
+            pos = pos * posSlope[d] + posOffset[d];                  // correct position for detector offset and tilt
             new ((*fHitItems[d])[fHitItems[d]->GetEntriesFast()])
                 R3BPspxHitData(energy, pos); // register hit level event
         }
