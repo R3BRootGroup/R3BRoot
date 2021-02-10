@@ -184,7 +184,7 @@ InitStatus R3BAmsOnlineSpectra::Init()
     }
 
     // Cal data right
-    char Side[255];
+    char Side[50];
     for (Int_t i = 0; i < fNbDet / 2; i++)
     { // two histo per detector
         for (Int_t j = 0; j < 2; j++)

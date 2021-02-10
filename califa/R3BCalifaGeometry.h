@@ -29,9 +29,10 @@ class R3BCalifaGeometry : public TObject
     R3BCalifaGeometry();
 
     /** Standard constructor.
-     *@param version geonetry version
+     *@param version geometry version
+     *@param conf analysis or simulation selector
      */
-    R3BCalifaGeometry(Int_t version);
+    R3BCalifaGeometry(Int_t version, Bool_t conf = kTRUE);
 
     /** Destructor **/
     ~R3BCalifaGeometry();
@@ -99,20 +100,28 @@ class R3BCalifaGeometry : public TObject
                                       Int_t* crystalIds = NULL);
 
     /**
+     * @return if we are running the simulation or data analysis
+     */
+    const bool IsSimulation() { return fIsSimulation; }
+
+    /**
      * Returns singleton instance of R3BCalifaGeometry for given geometry version.
      * Warning: Switching the geometry version at run time will lead to undefined beheaviour!
      *
      * @param version Geometry version to use. If in doubt, use 2020.
+     * @param conf simulation or analysis selector. True for simulation.
      * @return Instance of R3BCalifaGeometry
      */
-    static R3BCalifaGeometry* Instance(Int_t version);
+    static R3BCalifaGeometry* Instance(Int_t version, Bool_t conf = kTRUE);
 
   private:
     Int_t fGeometryVersion;
     Int_t fNumCrystals;
+    Bool_t fIsSimulation;
+
     static R3BCalifaGeometry* inst;
 
-    ClassDef(R3BCalifaGeometry, 5);
+    ClassDef(R3BCalifaGeometry, 7);
 };
 
 #endif

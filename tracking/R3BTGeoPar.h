@@ -47,13 +47,13 @@ class R3BTGeoPar : public FairParGenericSet
     /**
      * Method to reset the values of parameters.
      */
-    void clear(void);
+    virtual void clear(void);
 
     /**
      * Method to store parameters using FairRuntimeDB.
      * @param list a list of parameters.
      */
-    void putParams(FairParamList* list);
+    virtual void putParams(FairParamList* list);
 
     /**
      * Method to retrieve parameters using FairRuntimeDB.
@@ -105,8 +105,8 @@ class R3BTGeoPar : public FairParGenericSet
 
     inline void SetSigmaXY(const Double_t& sigmaX, const Double_t& sigmaY)
     {
-	fSigmaX = sigmaX;
-	fSigmaY = sigmaY;
+        fSigmaX = sigmaX;
+        fSigmaY = sigmaY;
     }
 
     void SetMaterial(const Double_t& Z, const Double_t& A, const Double_t& density, const Double_t& I);

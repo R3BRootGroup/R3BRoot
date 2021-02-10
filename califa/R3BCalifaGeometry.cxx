@@ -19,46 +19,42 @@
 #include <TString.h>
 #include <TSystem.h>
 #include <TVector3.h>
+#include <iostream>
+#include <stdlib.h>
 #include <vector>
 
 #include <FairLogger.h>
 
 #include "R3BCalifaGeometry.h"
 
-#include <iostream>
-#include <stdlib.h>
-
 #include <boost/regex.hpp>
-
-using std::cerr;
-using std::cout;
-using std::endl;
 
 R3BCalifaGeometry* R3BCalifaGeometry::inst = NULL;
 
-R3BCalifaGeometry* R3BCalifaGeometry::Instance(Int_t version)
+R3BCalifaGeometry* R3BCalifaGeometry::Instance(Int_t version, Bool_t conf)
 {
     LOG(DEBUG) << "R3BCalifaGeometry::Instance ";
     if (!inst)
-        inst = new R3BCalifaGeometry(version);
+        inst = new R3BCalifaGeometry(version, conf);
     else if (inst->fGeometryVersion != version)
     {
         LOG(ERROR)
             << "R3BCalifaGeometry::Instance(): Existing instance with different geometry version than requested. "
             << "Undefined beheaviour possible!";
 
-        inst = new R3BCalifaGeometry(version);
+        inst = new R3BCalifaGeometry(version, conf);
     }
     return inst;
 }
 
 R3BCalifaGeometry::R3BCalifaGeometry()
-    : R3BCalifaGeometry(2020)
+    : R3BCalifaGeometry(2020, kTRUE)
 {
 }
 
-R3BCalifaGeometry::R3BCalifaGeometry(Int_t version)
+R3BCalifaGeometry::R3BCalifaGeometry(Int_t version, Bool_t conf)
     : fGeometryVersion(version)
+    , fIsSimulation(conf)
 {
     LOG(DEBUG) << "Creating new R3BCalifaGeometry for version " << version;
 
@@ -95,6 +91,7 @@ R3BCalifaGeometry::R3BCalifaGeometry(Int_t version)
 
     // Stand alone mode
     LOG(DEBUG) << "R3BCalifaGeometry: Creating new geometry";
+
     TFile* f = new TFile(geoPath, "READ");
     TGeoVolume* v = dynamic_cast<TGeoVolume*>(f->Get("TOP"));
     if (!v)
@@ -102,7 +99,6 @@ R3BCalifaGeometry::R3BCalifaGeometry(Int_t version)
         LOG(ERROR) << "R3BCalifaGeometry: Could not open CALIFA geometry file: No TOP volume";
         return;
     }
-
     v->SetName("cave");
     if (!gGeoManager)
         gGeoManager = new TGeoManager();
@@ -145,6 +141,7 @@ const TVector3& R3BCalifaGeometry::GetAngles(Int_t iD)
         LOG(ERROR) << "R3BCalifaGeometry: Invalid crystalId: " << iD;
         return invalid;
     }
+
     return cache[iD] = master;
 }
 
@@ -168,7 +165,7 @@ const char* R3BCalifaGeometry::GetCrystalVolumePath(Int_t iD)
     if (iD > fNumCrystals / 2 && iD <= fNumCrystals)
         iD = iD - fNumCrystals / 2; // for double reading crystals (crystals from 1 to 2432)
 
-    static char nameVolume[200];
+    static char nameVolume[400];
 
     if (iD >= 1 && iD <= 2432)
     {
@@ -310,8 +307,8 @@ int R3BCalifaGeometry::GetCrystalId(const char* volumePath)
     if (cryType < 1 || cryType > 4 || alvType < 1 || alvType > 23)
     { // cryType runs from 1 to 4 while alvType runs from 1 to 23
         LOG(ERROR) << "R3BCalifaGeometry: Wrong crystal numbers (1)";
-        cout << "---- cryType: " << cryType << "   alvType: " << alvType << endl;
-        std::cout << "path=" << volumePath << "\n";
+        LOG(INFO) << "---- cryType: " << cryType << "   alvType: " << alvType;
+        LOG(INFO) << "path=" << volumePath;
         return 0;
     }
 
@@ -325,7 +322,7 @@ int R3BCalifaGeometry::GetCrystalId(const char* volumePath)
     if (crystalId < 1 || crystalId > 2432)
     { // crystalId runs from 1 to 2432
         LOG(ERROR) << "R3BCalifaGeometry: Wrong crystal numbers (2)";
-        cout << "---- crystalId: " << crystalId << endl;
+        LOG(INFO) << "---- crystalId: " << crystalId;
         return 0;
     }
 

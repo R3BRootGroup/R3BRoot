@@ -39,7 +39,7 @@ R3BTGeoPar::R3BTGeoPar(const char* name, const char* title, const char* context,
 {
 }
 
-R3BTGeoPar::~R3BTGeoPar() {}
+R3BTGeoPar::~R3BTGeoPar() { clear(); }
 
 void R3BTGeoPar::putParams(FairParamList* list)
 {
@@ -134,7 +134,11 @@ Bool_t R3BTGeoPar::getParams(FairParamList* list)
     return kTRUE;
 }
 
-void R3BTGeoPar::clear() {}
+void R3BTGeoPar::clear()
+{
+    status = kFALSE;
+    resetInputVersions();
+}
 
 void R3BTGeoPar::SetMaterial(const Double_t& Z, const Double_t& A, const Double_t& density, const Double_t& I)
 {
