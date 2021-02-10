@@ -34,12 +34,6 @@ namespace Neuland
         return val * val;
     }
 
-    // NaN2Value maps NaNs and Infs to a finite value.
-    // Usefull if you want to fill a possible nan variable into a histogram
-    constexpr double NaN2Value(const double val, const double valIfNaN = 0.)
-    {
-        return (std::isfinite(val) ? val : valIfNaN);
-    }
 
     // Initialize variables from Birk' s Law
 

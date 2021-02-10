@@ -19,12 +19,21 @@
 
 #include "TCanvas.h"
 #include "TDirectory.h"
+#include <cmath>
 
 using DPair = std::array<Double_t, 2>;
 using CalibrationStatus = Neuland::Calibration::HitCalibrationBar::CalibrationStatus;
 
 namespace Neuland
 {
+
+    // NaN2Value maps NaNs and Infs to a finite value.
+    // Usefull if you want to fill a possible nan variable into a histogram
+    inline double NaN2Value(const double val, const double valIfNaN = 0.)
+    {
+        return (std::isfinite(val) ? val : valIfNaN);
+    }
+
     namespace Calibration
     {
         HitCalibrationEngine::HitCalibrationEngine() {}

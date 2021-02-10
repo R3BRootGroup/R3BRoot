@@ -14,7 +14,7 @@
 set(LIBRARY_NAME R3BNeulandCalibration)
 set(LINKDEF NeulandCalibrationLinkDef.h)
 
-set(CMAKE_CXX_STANDARD 14)
+#set(CMAKE_CXX_STANDARD 14)
 
 set(DEPENDENCIES R3Bbase R3BData R3BTCal R3BNeulandShared)
 
@@ -36,7 +36,7 @@ set(SRCS
     R3BNeulandHitHist.cxx
     # R3BNeulandCalTest.cxx
     R3BNeulandHitPar.cxx
-    R3BNeulandCosmicTracker.cxx 
+    R3BNeulandCosmicTracker.cxx
     R3BNeulandHitCalibrationEngine.cxx
     R3BNeulandHitCalibrationBar.cxx
     R3BNeulandTSyncer.cxx

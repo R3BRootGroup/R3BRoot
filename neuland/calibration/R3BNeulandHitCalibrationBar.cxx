@@ -67,7 +67,7 @@ namespace Neuland
         }
 
         template <Int_t iterations = 8>
-        constexpr double FastExp(const double val)
+        const double FastExp(const double val)
         {
             auto exp = 1. + val / (1 << iterations);
             for (auto i = 0; i < iterations; ++i)
@@ -77,10 +77,10 @@ namespace Neuland
             return exp;
         }
 
-        constexpr double GetLightAtPMT(const double energyLoss,
-                                       const double position,
-                                       const double invLightAttenuationLength,
-                                       const int side)
+        const double GetLightAtPMT(const double energyLoss,
+                                   const double position,
+                                   const double invLightAttenuationLength,
+                                   const int side)
         {
             return energyLoss *
                    FastExp(-invLightAttenuationLength * (TotalBarLength * 0.5 + (1 - 2 * side) * position));
@@ -113,9 +113,9 @@ namespace Neuland
 
         constexpr auto MaxNumberOfFails = 10U;
 
-        constexpr void SetStatus(Int_t& var, Int_t statusBit) { var |= (1 << statusBit); }
-        constexpr void ClearStatus(Int_t& var, Int_t statusBit) { var &= ~(1 << statusBit); }
-        constexpr bool IsStatus(Int_t var, Int_t statusBit) { return (var & (1 << statusBit)); }
+        const void SetStatus(Int_t& var, Int_t statusBit) { var |= (1 << statusBit); }
+        const void ClearStatus(Int_t& var, Int_t statusBit) { var &= ~(1 << statusBit); }
+        const bool IsStatus(Int_t var, Int_t statusBit) { return (var & (1 << statusBit)); }
 
         const char* HitCalibrationBar::CalibrationStatusDescription[] = { "No Data recorded",
                                                                           "Calibration Failed",

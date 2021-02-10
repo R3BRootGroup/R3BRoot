@@ -21,15 +21,15 @@ add_test(NeulandTcal ${R3BROOT_BINARY_DIR}/neuland/test/calibration/testNeulandT
 set_tests_properties(NeulandTcal PROPERTIES TIMEOUT "100")
 set_tests_properties(NeulandTcal PROPERTIES PASS_REGULAR_EXPRESSION "Test successful!")
 
-generate_root_test_script(${R3BROOT_SOURCE_DIR}/neuland/test/calibration/testNeulandTSyncer.C)
-add_test(NeulandTcal ${R3BROOT_BINARY_DIR}/neuland/test/calibration/testNeulandTSyncer.sh)
-set_tests_properties(NeulandTcal PROPERTIES TIMEOUT "100")
-set_tests_properties(NeulandTcal PROPERTIES PASS_REGULAR_EXPRESSION "SUCCESS")
+# generate_root_test_script(${R3BROOT_SOURCE_DIR}/neuland/test/calibration/testNeulandTSyncer.C)
+# add_test(NeulandTcal ${R3BROOT_BINARY_DIR}/neuland/test/calibration/testNeulandTSyncer.sh)
+# set_tests_properties(NeulandTcal PROPERTIES TIMEOUT "100")
+# set_tests_properties(NeulandTcal PROPERTIES PASS_REGULAR_EXPRESSION "SUCCESS")
 
-generate_root_test_script(${R3BROOT_SOURCE_DIR}/neuland/test/calibration/testNeulandBar.C)
-add_test(NeulandTcal ${R3BROOT_BINARY_DIR}/neuland/test/calibration/testNeulandBar.sh)
-set_tests_properties(NeulandTcal PROPERTIES TIMEOUT "100")
-set_tests_properties(NeulandTcal PROPERTIES PASS_REGULAR_EXPRESSION "SUCCESS")
+# generate_root_test_script(${R3BROOT_SOURCE_DIR}/neuland/test/calibration/testNeulandBar.C)
+# add_test(NeulandTcal ${R3BROOT_BINARY_DIR}/neuland/test/calibration/testNeulandBar.sh)
+# set_tests_properties(NeulandTcal PROPERTIES TIMEOUT "100")
+# set_tests_properties(NeulandTcal PROPERTIES PASS_REGULAR_EXPRESSION "SUCCESS")
 
 # generate_root_test_script(${R3BROOT_SOURCE_DIR}/neuland/test/calibration/testNeulandTracker.C)
 # add_test(NeulandTcal ${R3BROOT_BINARY_DIR}/neuland/test/calibration/testNeulandTracker.sh)
