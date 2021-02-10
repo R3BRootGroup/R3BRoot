@@ -18,15 +18,19 @@
 #include "R3BCalifaGeometry.h"
 #include "R3BCalifaHitData.h"
 
-class TClonesArray;
 #include <TVector3.h>
+
+class TClonesArray;
+class R3BTGeoPar;
 
 class R3BCalifaCrystalCal2Hit : public FairTask
 {
 
   public:
-    /** Default constructor **/
-    R3BCalifaCrystalCal2Hit();
+    /** Default constructor
+     * @param conf analysis or simulation selector. True is for simulation.
+     **/
+    R3BCalifaCrystalCal2Hit(Bool_t conf = kTRUE);
 
     /** Destructor **/
     ~R3BCalifaCrystalCal2Hit();
@@ -157,9 +161,15 @@ class R3BCalifaCrystalCal2Hit : public FairTask
 
     /** Method GetAnglesVector (calls R3BCalifaGeometry::GetAngles(id)) **/
     TVector3 GetAnglesVector(int id);
+    TVector3 fTargetPos;
+    TVector3 fCalifaPos;
+    TVector3 fCalifatoTargetPos;
 
     TClonesArray* fCrystalHitCA;
     TClonesArray* fCalifaHitCA;
+
+    R3BTGeoPar* fTargetGeoPar;
+    R3BTGeoPar* fCalifaGeoPar;
 
     Bool_t fOnline;              // Selector for online data storage
     Int_t fGeometryVersion;      // Selecting the geometry of the CALIFA calorimeter

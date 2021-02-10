@@ -12,19 +12,20 @@
  ******************************************************************************/
 
 #include "R3BCalifaCrystalCal2Hit.h"
-#include "TGeoMatrix.h"
+#include "TClonesArray.h"
 #include "TMath.h"
+#include "TObjArray.h"
+#include "TRandom.h"
 #include "TVector3.h"
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRuntimeDb.h"
-#include "TClonesArray.h"
-#include "TObjArray.h"
-#include "TRandom.h"
 
+#include "R3BTGeoPar.h"
 #include "TGeoManager.h"
+#include "TGeoMatrix.h"
 
 #include "R3BCalifaCrystalCalData.h"
 #include "R3BCalifaGeometry.h"
@@ -35,11 +36,7 @@
 using roothacks::TCAHelper;
 using roothacks::TypedCollection;
 
-using std::cerr;
-using std::cout;
-using std::endl;
-
-R3BCalifaCrystalCal2Hit::R3BCalifaCrystalCal2Hit()
+R3BCalifaCrystalCal2Hit::R3BCalifaCrystalCal2Hit(Bool_t conf)
     : FairTask("R3B CALIFA CrystalCal to Hit Finder")
     , fCrystalHitCA(NULL)
     , fCalifaHitCA(NULL)
@@ -56,6 +53,8 @@ R3BCalifaCrystalCal2Hit::R3BCalifaCrystalCal2Hit()
     , fOnline(kFALSE)
 {
     SetSquareWindowAlg(fDeltaPolar, fDeltaAzimuthal);
+    fCalifatoTargetPos.SetXYZ(0., 0., 0.);
+    fCalifaGeo = R3BCalifaGeometry::Instance(fGeometryVersion, conf);
 }
 
 R3BCalifaCrystalCal2Hit::~R3BCalifaCrystalCal2Hit()
@@ -66,11 +65,34 @@ R3BCalifaCrystalCal2Hit::~R3BCalifaCrystalCal2Hit()
     // do not delete fCalifaGeo. It's a pointer to a static instance
 }
 
-void R3BCalifaCrystalCal2Hit::SetParContainers() {}
+void R3BCalifaCrystalCal2Hit::SetParContainers()
+{
+
+    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
+
+    fCalifaGeoPar = (R3BTGeoPar*)rtdb->getContainer("CalifaGeoPar");
+    fTargetGeoPar = (R3BTGeoPar*)rtdb->getContainer("TargetGeoPar");
+    if (!fCalifaGeoPar || !fTargetGeoPar)
+    {
+        if (!fCalifaGeoPar)
+            LOG(WARNING)
+                << "R3BCalifaCrystalCal2Hit::SetParContainers() : Could not get access to CalifaGeoPar container.";
+
+        if (!fTargetGeoPar)
+            LOG(WARNING)
+                << "R3BCalifaCrystalCal2Hit::SetParContainers() : Could not get access to TargetGeoPar container.";
+        return;
+    }
+    LOG(INFO) << "R3BCalifaCrystalCal2Hit::SetParContainers() : Container CalifaGeoPar found.";
+    LOG(INFO) << "R3BCalifaCrystalCal2Hit::SetParContainers() : Container TargetGeoPar found.";
+
+    fTargetPos.SetXYZ(fTargetGeoPar->GetPosX(), fTargetGeoPar->GetPosY(), fTargetGeoPar->GetPosZ());
+    fCalifaPos.SetXYZ(fCalifaGeoPar->GetPosX(), fCalifaGeoPar->GetPosY(), fCalifaGeoPar->GetPosZ());
+}
 
 InitStatus R3BCalifaCrystalCal2Hit::Init()
 {
-    LOG(INFO) << "R3BCalifaCrystalCal2Hit::Init ";
+    LOG(INFO) << "R3BCalifaCrystalCal2Hit::Init() ";
     assert(!fCalifaHitCA); // in case someone calls Init() twice.
     FairRootManager* ioManager = FairRootManager::Instance();
     if (!ioManager)
@@ -88,15 +110,30 @@ InitStatus R3BCalifaCrystalCal2Hit::Init()
         ioManager->Register("CalifaHitData", "CALIFA Hit", fCalifaHitCA, kFALSE);
     }
 
-    fCalifaGeo = R3BCalifaGeometry::Instance(fGeometryVersion);
+    // fCalifaGeo = R3BCalifaGeometry::Instance(fGeometryVersion);
 
     // Parameter retrieval from par container
     // ...
 
+    if (fCalifaGeo->IsSimulation())
+    {
+        LOG(INFO) << "R3BCalifaCrystalCal2Hit::Init() simulation configuration.";
+        fCalifatoTargetPos = 2.0 * fTargetPos - fCalifaPos;
+    }
+    else
+    {
+        LOG(INFO) << "R3BCalifaCrystalCal2Hit::Init() analysis configuration.";
+        fCalifatoTargetPos = fTargetPos - fCalifaPos;
+    }
+
     return kSUCCESS;
 }
 
-InitStatus R3BCalifaCrystalCal2Hit::ReInit() { return kSUCCESS; }
+InitStatus R3BCalifaCrystalCal2Hit::ReInit()
+{
+    SetParContainers();
+    return kSUCCESS;
+}
 
 bool R3BCalifaCrystalCal2Hit::Match(R3BCalifaCrystalCalData* ref, R3BCalifaCrystalCalData* hit)
 {
@@ -238,7 +275,8 @@ void R3BCalifaCrystalCal2Hit::Exec(Option_t* opt)
 
         // Note: we do not remove highest, but process it like any others
         uint64_t time = highest->GetTime();
-        auto vhighest = GetAnglesVector(highest->GetCrystalId());
+        auto vhighest = GetAnglesVector(highest->GetCrystalId()) - fCalifatoTargetPos;
+
         auto clusterHit =
             TCAHelper<R3BCalifaHitData>::AddNew(*fCalifaHitCA, time, vhighest.Theta(), vhighest.Phi(), clusterId);
 
