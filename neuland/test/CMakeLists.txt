@@ -16,8 +16,9 @@ cmake_minimum_required(VERSION 3.0)
 enable_testing()
 set(PROJECT_TEST_NAME NeulandUnitTests)
 set(GTEST_ROOT ${SIMPATH})
-find_package(GTest REQUIRED)
+find_package(GTest)
 
+if(GTEST_FOUND)
 file(GLOB TEST_SRC_FILES ${PROJECT_SOURCE_DIR}/neuland/test/*.cxx)
 
 include_directories(
@@ -47,6 +48,7 @@ set(TEST_DEPENDENCIES
 add_executable(${PROJECT_TEST_NAME} ${TEST_SRC_FILES})
 target_link_libraries(${PROJECT_TEST_NAME} ${TEST_DEPENDENCIES})
 add_test(${PROJECT_TEST_NAME} ${EXECUTABLE_OUTPUT_PATH}/${PROJECT_TEST_NAME})
+endif(GTEST_FOUND)
 
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/neuland/test/testNeulandSimulation.C)
 add_test(NeulandSimulation ${R3BROOT_BINARY_DIR}/neuland/test/testNeulandSimulation.sh)
