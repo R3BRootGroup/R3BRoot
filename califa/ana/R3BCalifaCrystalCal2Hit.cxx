@@ -36,7 +36,7 @@
 using roothacks::TCAHelper;
 using roothacks::TypedCollection;
 
-R3BCalifaCrystalCal2Hit::R3BCalifaCrystalCal2Hit(Bool_t conf)
+R3BCalifaCrystalCal2Hit::R3BCalifaCrystalCal2Hit()
     : FairTask("R3B CALIFA CrystalCal to Hit Finder")
     , fCrystalHitCA(NULL)
     , fCalifaHitCA(NULL)
@@ -54,7 +54,6 @@ R3BCalifaCrystalCal2Hit::R3BCalifaCrystalCal2Hit(Bool_t conf)
 {
     SetSquareWindowAlg(fDeltaPolar, fDeltaAzimuthal);
     fCalifatoTargetPos.SetXYZ(0., 0., 0.);
-    fCalifaGeo = R3BCalifaGeometry::Instance(fGeometryVersion, conf);
 }
 
 R3BCalifaCrystalCal2Hit::~R3BCalifaCrystalCal2Hit()
@@ -67,7 +66,7 @@ R3BCalifaCrystalCal2Hit::~R3BCalifaCrystalCal2Hit()
 
 void R3BCalifaCrystalCal2Hit::SetParContainers()
 {
-
+    // Load CALIFA and target positions from containers
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
 
     fCalifaGeoPar = (R3BTGeoPar*)rtdb->getContainer("CalifaGeoPar");
@@ -110,11 +109,9 @@ InitStatus R3BCalifaCrystalCal2Hit::Init()
         ioManager->Register("CalifaHitData", "CALIFA Hit", fCalifaHitCA, kFALSE);
     }
 
-    // fCalifaGeo = R3BCalifaGeometry::Instance(fGeometryVersion);
+    fCalifaGeo = R3BCalifaGeometry::Instance(fGeometryVersion);
 
-    // Parameter retrieval from par container
-    // ...
-
+    // Determine CALIFA position with respect to target
     if (fCalifaGeo->IsSimulation())
     {
         LOG(INFO) << "R3BCalifaCrystalCal2Hit::Init() simulation configuration.";

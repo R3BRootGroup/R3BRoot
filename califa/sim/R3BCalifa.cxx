@@ -29,9 +29,9 @@
 #include <iostream>
 #include <stdlib.h>
 
-using std::cerr;
-using std::cout;
-using std::endl;
+// using std::cerr;
+// using std::cout;
+// using std::endl;
 
 #define U_MEV 931.4940954
 
@@ -85,7 +85,7 @@ void R3BCalifa::Initialize()
     TGeoVolume* vol = gGeoManager->GetVolume("CalifaWorld");
     vol->SetVisibility(kFALSE);
 
-    fCalifaGeo = R3BCalifaGeometry::Instance(fGeometryVersion);
+    // fCalifaGeo = R3BCalifaGeometry::Instance(fGeometryVersion);
 }
 
 Bool_t R3BCalifa::ProcessHits(FairVolume* vol)
