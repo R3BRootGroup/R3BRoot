@@ -27,6 +27,7 @@ ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/califa
 ${R3BROOT_SOURCE_DIR}/tracking
+${R3BROOT_SOURCE_DIR}/califa/online
 ${R3BROOT_SOURCE_DIR}/califa/unpack
 ${R3BROOT_SOURCE_DIR}/califa/ana
 ${R3BROOT_SOURCE_DIR}/califa/pars
@@ -52,10 +53,10 @@ set(SRCS
 ./sim/R3BCalifaDigitizer.cxx
 ./unpack/R3BCalifaCrystalCal2CrystalCalPID.cxx
 ./unpack/R3BCalifaMapped2CrystalCal.cxx
-./R3BCalifaCrystalCal2Hit.cxx
-./R3BCalifaGeometry.cxx
-./ana/R3BCalifaOnlineSpectra.cxx
-./ana/R3BCalifaDemoOnlineSpectra.cxx
+./ana/R3BCalifaCrystalCal2Hit.cxx
+./pars/R3BCalifaGeometry.cxx
+./online/R3BCalifaOnlineSpectra.cxx
+./online/R3BCalifaDemoOnlineSpectra.cxx
 ./ana/R3BCalifaCrystalCalDataAnalysis.cxx
 ./ana/R3BCalifaMapped2CrystalCalPar.cxx
 ./ana/R3BCalifaCrystalCal2TotCalPar.cxx
@@ -75,7 +76,7 @@ set(LINKDEF CalifaLinkDef.h)
 set(LIBRARY_NAME R3BCalifa)
 
 set(DEPENDENCIES
-  Spectrum R3Bbase R3BData R3BPassive  ${Boost_REGEX_LIBRARY})
+  Spectrum R3Bbase R3BData R3BPassive R3BTracking ${Boost_REGEX_LIBRARY})
 
 if(FAIRDB_FOUND)
 set(DEPENDENCIES

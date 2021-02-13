@@ -31,30 +31,29 @@
 
 R3BCalifaGeometry* R3BCalifaGeometry::inst = NULL;
 
-R3BCalifaGeometry* R3BCalifaGeometry::Instance(Int_t version, Bool_t conf)
+R3BCalifaGeometry* R3BCalifaGeometry::Instance(Int_t version)
 {
     LOG(DEBUG) << "R3BCalifaGeometry::Instance ";
     if (!inst)
-        inst = new R3BCalifaGeometry(version, conf);
+        inst = new R3BCalifaGeometry(version);
     else if (inst->fGeometryVersion != version)
     {
         LOG(ERROR)
             << "R3BCalifaGeometry::Instance(): Existing instance with different geometry version than requested. "
             << "Undefined beheaviour possible!";
 
-        inst = new R3BCalifaGeometry(version, conf);
+        inst = new R3BCalifaGeometry(version);
     }
     return inst;
 }
 
 R3BCalifaGeometry::R3BCalifaGeometry()
-    : R3BCalifaGeometry(2020, kTRUE)
+    : R3BCalifaGeometry(2020)
 {
 }
 
-R3BCalifaGeometry::R3BCalifaGeometry(Int_t version, Bool_t conf)
+R3BCalifaGeometry::R3BCalifaGeometry(Int_t version)
     : fGeometryVersion(version)
-    , fIsSimulation(conf)
 {
     LOG(DEBUG) << "Creating new R3BCalifaGeometry for version " << version;
 
@@ -80,19 +79,18 @@ R3BCalifaGeometry::R3BCalifaGeometry(Int_t version, Bool_t conf)
             return;
     }
 
-    LOG(INFO) << "R3BCalifaGeometry::Geometry file " << geoPath;
-
     if (gGeoManager && strcmp(gGeoManager->GetTopVolume()->GetName(), "cave") == 0)
     {
         // Already set up (MC mode)
         LOG(DEBUG) << "R3BCalifaGeometry: Using existing geometry";
+        LOG(INFO) << "R3BCalifaGeometry::Open geometry file " << geoPath;
+        fIsSimulation = kTRUE;
         return;
     }
 
     // Stand alone mode
-    LOG(DEBUG) << "R3BCalifaGeometry: Creating new geometry";
-
-    TFile* f = new TFile(geoPath, "READ");
+    LOG(INFO) << "R3BCalifaGeometry::Open geometry file " << geoPath << " for analysis.";
+    f = new TFile(geoPath, "READ");
     TGeoVolume* v = dynamic_cast<TGeoVolume*>(f->Get("TOP"));
     if (!v)
     {
@@ -103,9 +101,16 @@ R3BCalifaGeometry::R3BCalifaGeometry(Int_t version, Bool_t conf)
     if (!gGeoManager)
         gGeoManager = new TGeoManager();
     gGeoManager->SetTopVolume(v);
+    fIsSimulation = kFALSE;
 }
 
-R3BCalifaGeometry::~R3BCalifaGeometry() {}
+R3BCalifaGeometry::~R3BCalifaGeometry()
+{
+    if (gGeoManager)
+        delete gGeoManager;
+    if (f)
+        f->Close();
+}
 
 const TVector3& R3BCalifaGeometry::GetAngles(Int_t iD)
 {

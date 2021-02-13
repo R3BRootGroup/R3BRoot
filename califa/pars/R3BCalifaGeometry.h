@@ -14,6 +14,7 @@
 #ifndef R3BCALIFAGEOMETRY_H
 #define R3BCALIFAGEOMETRY_H
 
+#include <TFile.h>
 #include <TObject.h>
 
 class TVector3;
@@ -30,9 +31,8 @@ class R3BCalifaGeometry : public TObject
 
     /** Standard constructor.
      *@param version geometry version
-     *@param conf analysis or simulation selector
      */
-    R3BCalifaGeometry(Int_t version, Bool_t conf = kTRUE);
+    R3BCalifaGeometry(Int_t version);
 
     /** Destructor **/
     ~R3BCalifaGeometry();
@@ -109,19 +109,19 @@ class R3BCalifaGeometry : public TObject
      * Warning: Switching the geometry version at run time will lead to undefined beheaviour!
      *
      * @param version Geometry version to use. If in doubt, use 2020.
-     * @param conf simulation or analysis selector. True for simulation.
      * @return Instance of R3BCalifaGeometry
      */
-    static R3BCalifaGeometry* Instance(Int_t version, Bool_t conf = kTRUE);
+    static R3BCalifaGeometry* Instance(Int_t version);
 
   private:
     Int_t fGeometryVersion;
     Int_t fNumCrystals;
     Bool_t fIsSimulation;
+    TFile* f;
 
     static R3BCalifaGeometry* inst;
 
-    ClassDef(R3BCalifaGeometry, 7);
+    ClassDef(R3BCalifaGeometry, 8);
 };
 
 #endif

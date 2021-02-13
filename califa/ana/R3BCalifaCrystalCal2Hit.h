@@ -28,9 +28,8 @@ class R3BCalifaCrystalCal2Hit : public FairTask
 
   public:
     /** Default constructor
-     * @param conf analysis or simulation selector. True is for simulation.
      **/
-    R3BCalifaCrystalCal2Hit(Bool_t conf = kTRUE);
+    R3BCalifaCrystalCal2Hit();
 
     /** Destructor **/
     ~R3BCalifaCrystalCal2Hit();
