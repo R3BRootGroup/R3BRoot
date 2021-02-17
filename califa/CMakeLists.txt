@@ -28,7 +28,7 @@ ${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/califa
 ${R3BROOT_SOURCE_DIR}/tracking
 ${R3BROOT_SOURCE_DIR}/califa/online
-${R3BROOT_SOURCE_DIR}/califa/unpack
+${R3BROOT_SOURCE_DIR}/califa/calibration
 ${R3BROOT_SOURCE_DIR}/califa/ana
 ${R3BROOT_SOURCE_DIR}/califa/pars
 ${R3BROOT_SOURCE_DIR}/califa/sim
@@ -51,21 +51,21 @@ set(SRCS
 #Put here your sourcefiles
 ./sim/R3BCalifa.cxx
 ./sim/R3BCalifaDigitizer.cxx
-./unpack/R3BCalifaCrystalCal2CrystalCalPID.cxx
-./unpack/R3BCalifaMapped2CrystalCal.cxx
-./ana/R3BCalifaCrystalCal2Hit.cxx
+./pars/R3BCalifaContFact.cxx
 ./pars/R3BCalifaGeometry.cxx
-./online/R3BCalifaOnlineSpectra.cxx
-./online/R3BCalifaDemoOnlineSpectra.cxx
-./ana/R3BCalifaCrystalCalDataAnalysis.cxx
-./ana/R3BCalifaMapped2CrystalCalPar.cxx
-./ana/R3BCalifaCrystalCal2TotCalPar.cxx
-./pars/R3BCalifaHitPar.cxx
 ./pars/R3BCalifaMappingPar.cxx
 ./pars/R3BCalifaCrystalCalPar.cxx
 ./pars/R3BCalifaTotCalPar.cxx
-./pars/R3BCalifaContFact.cxx
+./pars/R3BCalifaHitPar.cxx
 ./pars/R3BCalifaCrystalPars4Sim.cxx
+./calibration/R3BCalifaMapped2CrystalCalPar.cxx
+./calibration/R3BCalifaCrystalCal2TotCalPar.cxx
+./calibration/R3BCalifaMapped2CrystalCal.cxx
+./calibration/R3BCalifaCrystalCal2Hit.cxx
+./calibration/R3BCalifaCrystalCal2CrystalCalPID.cxx
+./online/R3BCalifaOnlineSpectra.cxx
+./online/R3BCalifaDemoOnlineSpectra.cxx
+./ana/R3BCalifaCrystalCalDataAnalysis.cxx
 )
 
 # fill list of header files from list of source files
@@ -76,7 +76,8 @@ set(LINKDEF CalifaLinkDef.h)
 set(LIBRARY_NAME R3BCalifa)
 
 set(DEPENDENCIES
-  Spectrum R3Bbase R3BData R3BPassive R3BTracking ${Boost_REGEX_LIBRARY})
+  Spectrum R3Bbase R3BData R3BPassive R3BTracking Boost::regex)
+#  Spectrum R3Bbase R3BData R3BPassive R3BTracking ${Boost_REGEX_LIBRARY})
 
 if(FAIRDB_FOUND)
 set(DEPENDENCIES

@@ -13,17 +13,19 @@ Tasks will be written in double curly braces here.
 
 Tasks are:
 {{./sim/R3BCalifaDigitizer.h}}
-{{./unpack/R3BCalifaMapped2CrystalCal.h}}
-{{./unpack/R3BCalifaCrystalCal2CrystalCalPID.h}}
-{{./R3BCalifaCrystalCal2Hit.h}}
+{{./calibration/R3BCalifaMapped2CrystalCal.h}}
+{{./calibration/R3BCalifaCrystalCal2Hit.h}}
+{{./calibration/R3BCalifaCrystalCal2CrystalCalPID.h}}
 
 === Parameter containers ===
 
 These files generally hold channel-specific data used for calibration and the like.
 
-./pars/R3BCalifaHitPar.h
 ./pars/R3BCalifaMappingPar.h
 ./pars/R3BCalifaCrystalCalPar.h
+./pars/R3BCalifaTotCalPar.h
+./pars/R3BCalifaHitPar.h
+./pars/R3BCalifaGeometry.h -- helper class to fetch infos on the positions and orientation of the crystals
 ./pars/R3BCalifaContFact.h
 
 To make sure that these are impossible to create/edit/view by unauthorized programs such as
@@ -31,15 +33,19 @@ text editors or shell scripts, these classes are generally serialized to ROOT's 
 only .root format. (There exist apostate rumors of a legacy FairParAsciiFileIo format which is
 readable by both humans and 3rd party tools.)
 
+=== online FairTasks ===
+{{./online/R3BCalifaOnlineSpectra.h}}
+{{./online/R3BCalifaDemoOnlineSpectra.h}}
+
+=== calibration: optional FairTasks ===
+{{./calibration/R3BCalifaMapped2CrystalCalPar.h}} -- generate a new energy calibration file from a source run.
+{{./calibration/R3BCalifaCrystalCal2TotCalPar.h.h}} -- generate a tot energy calibration file from a source run.
+
 === ana: optional FairTasks ===
-{{./ana/R3BCalifaMapped2CrystalCalPar.h}} -- generate a new calibration file from a source run.
-{{./ana/R3BCalifaOnlineSpectra.h}}
-{{./ana/R3BCalifaDemoOnlineSpectra.h}}
 {{./ana/R3BCalifaCrystalCalDataAnalysis.h}}
 
 === other ===
 
-./R3BCalifaGeometry.h   -- helper class to fetch infos on the positions and orientation of the crystals
 ./ROOT_template_hacks.h -- helper class to wrap ROOT stuff in a std c++ way
 ./CalifaLinkDef.h       -- linking directives for CINT. 
 ../geometry/califa*.root -- 14 different ROOT-only binary files containing the material and orientation
@@ -62,9 +68,8 @@ the latter and the former.
 
 ../r3bsource/R3BCalifaFebexReader.h is involved in parsing the lmd (with help from ucesb) to generate
 [[../r3bdata/califaData/R3BCalifaMappedData.h]].
-This is then read by {{./unpack/R3BCalifaMapped2CrystalCal.h}}
-to generate [[../r3bdata/califaData/R3BCalifaCrystalCalData.h]] by applying per-channel, per-experiment
-parameters (./pars/R3BCalifaCrystalCalPar.h). 
+This is then read by {{./calibration/R3BCalifaMapped2CrystalCal.h}}
+to generate [[../r3bdata/califaData/R3BCalifaCrystalCalData.h]] by applying per-channel, per-experiment parameters (./pars/R3BCalifaCrystalCalPar.h and ./pars/R3BCalifaTotCalPar.h if Tot data are available). 
 
 === Processing to hit level aka clustering ===
 
