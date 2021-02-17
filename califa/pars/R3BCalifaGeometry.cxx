@@ -277,11 +277,11 @@ double R3BCalifaGeometry::GetDistanceThroughCrystals(TVector3& startVertex,
 // ROOT (or pyroot) is unable to automatically load dependencies of so's for whatever reason.
 // so we try to force loading the lib during var initialisation.
 // yes, this is ugly.
-static bool _dummy_load_libboost_regex = []() {
-    char buf[100];
-    snprintf(buf, 100, "%s/lib/libboost_regex.so", getenv("SIMPATH"));
-    return gSystem->Load(buf);
-}();
+// static bool _dummy_load_libboost_regex = []() {
+//    char buf[100];
+//    snprintf(buf, 100, "%s/lib/libboost_regex.so", getenv("SIMPATH"));
+//    return gSystem->Load(buf);
+//}();
 
 int R3BCalifaGeometry::GetCrystalId(const char* volumePath)
 { /*
