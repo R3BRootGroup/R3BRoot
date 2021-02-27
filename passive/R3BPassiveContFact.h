@@ -15,6 +15,8 @@
 #define R3BPASSIVECONTFACT_H
 
 #include "FairContFact.h"
+#include "FairLogger.h"
+#include "FairRuntimeDb.h"
 
 class FairContainer;
 
