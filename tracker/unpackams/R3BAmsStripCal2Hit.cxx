@@ -161,6 +161,7 @@ InitStatus R3BAmsStripCal2Hit::Init()
 InitStatus R3BAmsStripCal2Hit::ReInit()
 {
     SetParContainers();
+    SetParameter();
     return kSUCCESS;
 }
 

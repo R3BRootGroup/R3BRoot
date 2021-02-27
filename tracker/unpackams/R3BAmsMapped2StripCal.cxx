@@ -179,6 +179,7 @@ InitStatus R3BAmsMapped2StripCal::Init()
 InitStatus R3BAmsMapped2StripCal::ReInit()
 {
     SetParContainers();
+    SetParameter();
     return kSUCCESS;
 }
 

@@ -137,8 +137,9 @@ void R3BMusicCal2Hit::SetParameter()
         fZ2 = CalZParams->GetAt(2);
     }
     else
-        LOG(INFO) << "R3BMusicCal2Hit parameters for charge-Z cannot be used here, number of parameters: "
-                  << fNumParams;
+        LOG(ERROR) << "R3BMusicCal2Hit parameters for charge-Z cannot be used here, number of parameters must be < 4, "
+                      "currently it is "
+                   << fNumParams;
 }
 
 // -----   Public method Init   --------------------------------------------
@@ -178,6 +179,7 @@ InitStatus R3BMusicCal2Hit::Init()
 InitStatus R3BMusicCal2Hit::ReInit()
 {
     SetParContainers();
+    SetParameter();
     return kSUCCESS;
 }
 
@@ -258,7 +260,6 @@ void R3BMusicCal2Hit::Exec(Option_t* option)
             // AddHitData(theta, zhit);
             AddHitData(theta, zhit, Esum / nba);
     }
-
     if (CalDat)
         delete CalDat;
     return;

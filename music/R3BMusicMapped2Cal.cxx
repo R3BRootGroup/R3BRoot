@@ -169,6 +169,7 @@ InitStatus R3BMusicMapped2Cal::Init()
 InitStatus R3BMusicMapped2Cal::ReInit()
 {
     SetParContainers();
+    SetParameter();
     return kSUCCESS;
 }
 

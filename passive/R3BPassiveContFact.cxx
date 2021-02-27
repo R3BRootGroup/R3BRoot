@@ -22,19 +22,11 @@
 //
 /////////////////////////////////////////////////////////////
 
-#include <iomanip>
-#include <iostream>
-
-using namespace std;
-
-#include "FairRuntimeDb.h"
-#include "R3BGeoPassivePar.h"
 #include "R3BPassiveContFact.h"
+#include "R3BGeoPassivePar.h"
 #include "R3BTGeoPar.h"
 
-ClassImp(R3BPassiveContFact)
-
-    static R3BPassiveContFact gR3BPassiveContFact;
+static R3BPassiveContFact gR3BPassiveContFact;
 
 R3BPassiveContFact::R3BPassiveContFact()
 {
@@ -55,8 +47,8 @@ void R3BPassiveContFact::setAllContainers()
 
     containers->Add(p);
 
-    FairContainer* p2 = new FairContainer("TargetGeoPar", "Target geometry parameters", "TestDefaultContext");
-    p2->addContext("TestNonDefaultContext");
+    FairContainer* p2 = new FairContainer("TargetGeoPar", "Target geometry parameters", "GeometryParameterContext");
+    p2->addContext("GeometryParameterContext");
     containers->Add(p2);
 }
 
@@ -78,3 +70,5 @@ FairParSet* R3BPassiveContFact::createContainer(FairContainer* c)
     }
     return p;
 }
+
+ClassImp(R3BPassiveContFact)
