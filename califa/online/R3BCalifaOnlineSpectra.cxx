@@ -67,6 +67,7 @@ R3BCalifaOnlineSpectra::R3BCalifaOnlineSpectra()
     , fMinProtonE(50000.)
     , fRaw2Cal(kFALSE)
     , fLogScale(kTRUE)
+    , fTotHist(kFALSE)
     , fFebex2Preamp(kTRUE)
 {
     // Define Preamp vs Febex sequence for histograms
@@ -117,6 +118,7 @@ R3BCalifaOnlineSpectra::R3BCalifaOnlineSpectra(const TString& name, Int_t iVerbo
     , fMinProtonE(50000.)
     , fRaw2Cal(kFALSE)
     , fLogScale(kTRUE)
+    , fTotHist(kFALSE)
     , fFebex2Preamp(kTRUE)
 {
     // Define Preamp vs Febex sequence for histograms
@@ -845,10 +847,13 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     mainfolCalifa->Add(folder_er);
     mainfolCalifa->Add(folder_eprr);
 
-    mainfolCalifa->Add(folder_etotl);
-    mainfolCalifa->Add(folder_eprtotl);
-    mainfolCalifa->Add(folder_etotr);
-    mainfolCalifa->Add(folder_eprtotr);
+    if (fTotHist)
+    {
+        mainfolCalifa->Add(folder_etotl);
+        mainfolCalifa->Add(folder_eprtotl);
+        mainfolCalifa->Add(folder_etotr);
+        mainfolCalifa->Add(folder_eprtotr);
+    }
 
     if (fCalItemsCalifa)
     {
@@ -887,6 +892,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
 InitStatus R3BCalifaOnlineSpectra::ReInit()
 {
     SetParContainers();
+    SetParameter();
     return kSUCCESS;
 }
 
