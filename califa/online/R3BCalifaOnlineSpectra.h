@@ -16,6 +16,7 @@
 
 #include "FairTask.h"
 #include "TCanvas.h"
+#include "THStack.h"
 #include "TMath.h"
 #include <array>
 #include <cstdlib>
@@ -218,6 +219,7 @@ class R3BCalifaOnlineSpectra : public FairTask
     TH1F* fh1_Califa_wr;
     TCanvas* cWrs;
     TH1F* fh1_wrs[2];
+    THStack* stack_wrs;
     TCanvas* cCalifa_wr_energy;
 
     // Histograms
