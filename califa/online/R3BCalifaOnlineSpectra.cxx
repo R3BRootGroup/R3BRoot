@@ -718,11 +718,15 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     fh1_wrs[0]->GetYaxis()->CenterTitle(true);
     fh1_wrs[0]->SetLineColor(4);
     fh1_wrs[0]->SetLineWidth(3);
-    fh1_wrs[0]->Draw("");
+    // fh1_wrs[0]->Draw("");
     fh1_wrs[1] = new TH1F("fh1_WR_Master_Califa_Messel", "", 1200, -4100, 4100);
     fh1_wrs[1]->SetLineColor(2);
     fh1_wrs[1]->SetLineWidth(3);
-    fh1_wrs[1]->Draw("same");
+    // fh1_wrs[1]->Draw("same");
+    stack_wrs = new THStack("stack_wrs", Name3);
+    stack_wrs->Add(fh1_wrs[0]);
+    stack_wrs->Add(fh1_wrs[1]);
+    stack_wrs->Draw("nostack");
 
     // CANVAS energy vs wrs
     sprintf(Name1, "Califa_wr_vs_energy");
