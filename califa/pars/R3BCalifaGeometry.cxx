@@ -74,6 +74,12 @@ R3BCalifaGeometry::R3BCalifaGeometry(Int_t version)
             fNumCrystals = 4864;
             break;
 
+        case 2021:
+            // s455 Experiment: Half Barrel + Full IPHOS
+            geoPath += "califa_2021_s455.geo.root";
+            fNumCrystals = 4864;
+            break;
+
         default:
             LOG(ERROR) << "R3BCalifaGeometry: Unsupported geometry version: " << version;
             return;
