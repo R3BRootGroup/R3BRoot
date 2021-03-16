@@ -345,6 +345,17 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     gPad->SetLogz();
     fh2_Califa_cryId_energy_cal->Draw("COLZ");
 
+    cCalifa_NsNf = new TCanvas("Califa_Cal_NsNf", "Califa_Cal Ns vs Nf", 10, 10, 500, 500);
+    fh2_Califa_NsNf =
+        new TH2F("fh2_Califa_Cal_NsNf", "Califa PID: Ns vs Nf energies", bins, minE, maxE, bins, minE, maxE);
+    fh2_Califa_NsNf->GetXaxis()->SetTitle("Nf Energy [keV]");
+    fh2_Califa_NsNf->GetYaxis()->SetTitle("Ns Energy [keV]");
+    fh2_Califa_NsNf->GetYaxis()->SetTitleOffset(1.4);
+    fh2_Califa_NsNf->GetXaxis()->CenterTitle(true);
+    fh2_Califa_NsNf->GetYaxis()->CenterTitle(true);
+    gPad->SetLogz();
+    fh2_Califa_NsNf->Draw("COLZ");
+
     // Map data
     for (Int_t i = 0; i < fNumRings; i++)
     {
@@ -862,6 +873,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     if (fCalItemsCalifa)
     {
         mainfolCalifa->Add(cCalifa_cry_energy_cal);
+        mainfolCalifa->Add(cCalifa_NsNf);
         mainfolCalifa->Add(folder_ecall);
         mainfolCalifa->Add(folder_eprcall);
         mainfolCalifa->Add(folder_ecalr);
@@ -948,6 +960,7 @@ void R3BCalifaOnlineSpectra::Reset_CALIFA_Histo()
     if (fCalItemsCalifa)
     {
         fh2_Califa_cryId_energy_cal->Reset();
+        fh2_Califa_NsNf->Reset();
         for (Int_t s = 0; s < fNumSides; s++)
             for (Int_t r = 0; r < fNumRings; r++)
                 for (Int_t p = 0; p < fNumPreamps; p++)
@@ -1389,6 +1402,8 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* option)
 
             fh2_Califa_cryId_energy_cal->Fill(cryId, hit->GetEnergy());
 
+            fh2_Califa_NsNf->Fill(hit->GetNf(), hit->GetNs());
+
             if (fMap_Par->GetInUse(cryId) == 1 && cryId <= fNbCalifaCrystals / 2)
                 fh1_crystals_cal[fMap_Par->GetHalf(cryId) - 1][fMap_Par->GetRing(cryId) - 1]
                                 [fMap_Par->GetPreamp(cryId) - 1][fMap_Par->GetChannel(cryId) - 1]
@@ -1542,6 +1557,7 @@ void R3BCalifaOnlineSpectra::FinishTask()
     if (fCalItemsCalifa)
     {
         cCalifa_cry_energy_cal->Write();
+        cCalifa_NsNf->Write();
         for (Int_t s = 0; s < fNumSides; s++)
             for (Int_t r = 0; r < fNumRings; r++)
                 for (Int_t p = 0; p < fNumPreamps; p++)

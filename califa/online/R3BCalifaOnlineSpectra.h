@@ -213,6 +213,7 @@ class R3BCalifaOnlineSpectra : public FairTask
     TCanvas* cCalifa_theta_energy;
     TCanvas* cCalifa_hitenergy;
     TCanvas* cCalifa_opening;
+    TCanvas* cCalifa_NsNf;
 
     // WR data
     TCanvas* cCalifa_wr;
@@ -244,6 +245,7 @@ class R3BCalifaOnlineSpectra : public FairTask
     TH1F* fh1_openangle;
     TH2F* fh2_Cal_wr_energy_l;
     TH2F* fh2_Cal_wr_energy_r;
+    TH2F* fh2_Califa_NsNf;
 
   public:
     ClassDef(R3BCalifaOnlineSpectra, 1)

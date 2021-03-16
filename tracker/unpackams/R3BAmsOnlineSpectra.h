@@ -116,7 +116,7 @@ class R3BAmsOnlineSpectra : public FairTask
     TH1F* fh_Ams_hit_Mul[6][2];
     TH2F* fh2_ams_theta_phi[2];
     TH2F* fh2_ams_e1_e2[2];
-    TH2F* fh2_ams_theta1_theta2[2];
+    TH2F* fh2_ams_theta1_theta2[4];
     TH2F* fh2_ams_phi1_phi2[2];
 
     // TString fAmsFile;        	      /**< Config file name. */
