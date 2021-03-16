@@ -159,7 +159,7 @@ InitStatus R3BAmsOnlineSpectra::Init()
     //  CANVAS 6  -------------------------------
     cHitThetaCor =
         new TCanvas("AMS_Theta-inner_vs_Theta-outer", "Theta-inner vs Theta-outer per side", 10, 10, 500, 500);
-    cHitThetaCor->Divide(2, 1);
+    cHitThetaCor->Divide(2, 2);
 
     //  CANVAS 7  -------------------------------
     cHitPhiCor = new TCanvas("AMS_Phi-inner_vs_Phi-outer", "Phi-inner vs Phi-outer per side", 10, 10, 500, 500);
@@ -341,13 +341,13 @@ InitStatus R3BAmsOnlineSpectra::Init()
         // Theta correlations per side
         if (i == 0)
         {
-            sprintf(Name1, "fh2_Ams_#thetainner_vs_#thetaouter_right");
-            sprintf(Name2, "AMS: #theta-inner vs #theta-outer for right side");
+            sprintf(Name1, "fh2_Ams_#thetainner_vs_#thetaouterup_right");
+            sprintf(Name2, "AMS: #theta-inner vs #theta-outer-up for right side");
         }
         else
         {
-            sprintf(Name1, "fh2_Ams_#thetainner_vs_#thetaouter_left");
-            sprintf(Name2, "AMS: #theta-inner vs #theta-outer for left side");
+            sprintf(Name1, "fh2_Ams_#thetainner_vs_#thetaouterup_left");
+            sprintf(Name2, "AMS: #theta-inner vs #theta-outer-up for left side");
         }
         fh2_ams_theta1_theta2[i] = new TH2F(Name1, Name2, 90, 0., 90., 90, 0., 90.);
         fh2_ams_theta1_theta2[i]->GetXaxis()->SetTitle("#theta-inner [degrees]");
@@ -356,8 +356,29 @@ InitStatus R3BAmsOnlineSpectra::Init()
         fh2_ams_theta1_theta2[i]->GetYaxis()->SetTitleOffset(1.5);
         fh2_ams_theta1_theta2[i]->GetXaxis()->CenterTitle(true);
         fh2_ams_theta1_theta2[i]->GetYaxis()->CenterTitle(true);
-        cHitThetaCor->cd(i + 1);
+        cHitThetaCor->cd(i * 2 + 1);
         fh2_ams_theta1_theta2[i]->Draw("COLZ");
+
+        // Theta correlations per side
+        if (i == 0)
+        {
+            sprintf(Name1, "fh2_Ams_#thetainner_vs_#thetaouterdown_right");
+            sprintf(Name2, "AMS: #theta-inner vs #theta-outer-down for right side");
+        }
+        else
+        {
+            sprintf(Name1, "fh2_Ams_#thetainner_vs_#thetaouterdown_left");
+            sprintf(Name2, "AMS: #theta-inner vs #theta-outer-down for left side");
+        }
+        fh2_ams_theta1_theta2[i + 2] = new TH2F(Name1, Name2, 90, 0., 90., 90, 0., 90.);
+        fh2_ams_theta1_theta2[i + 2]->GetXaxis()->SetTitle("#theta-inner [degrees]");
+        fh2_ams_theta1_theta2[i + 2]->GetYaxis()->SetTitle("#theta-outer [degrees]");
+        fh2_ams_theta1_theta2[i + 2]->GetXaxis()->SetTitleOffset(1.);
+        fh2_ams_theta1_theta2[i + 2]->GetYaxis()->SetTitleOffset(1.5);
+        fh2_ams_theta1_theta2[i + 2]->GetXaxis()->CenterTitle(true);
+        fh2_ams_theta1_theta2[i + 2]->GetYaxis()->CenterTitle(true);
+        cHitThetaCor->cd(i * 2 + 2);
+        fh2_ams_theta1_theta2[i + 2]->Draw("COLZ");
 
         // Phi correlations per side
         if (i == 0)
@@ -457,7 +478,8 @@ void R3BAmsOnlineSpectra::Reset_AMS_Histo()
         for (Int_t i = 0; i < 2; i++)
         {
             fh2_ams_theta_phi[i]->Reset();
-            fh2_ams_theta1_theta2[i]->Reset();
+            fh2_ams_theta1_theta2[i * 2]->Reset();
+            fh2_ams_theta1_theta2[i * 2 + 1]->Reset();
             fh2_ams_phi1_phi2[i]->Reset();
             fh2_ams_e1_e2[i]->Reset();
         }
@@ -557,33 +579,33 @@ void R3BAmsOnlineSpectra::Exec(Option_t* option)
             fh_Ams_hit_Mul[i][0]->Fill(mulhit[i][0]);
             fh_Ams_hit_Mul[i][1]->Fill(mulhit[i][1]);
         }
-        if (Emaxhit[0] > 0. && (Emaxhit[1] > 0. || Emaxhit[2] > 0.))
+        // right up
+        if (Emaxhit[0] > 0. && Emaxhit[1] > 0.)
         {
             fh2_ams_e1_e2[0]->Fill(Emaxhit[0], TMath::Max(Emaxhit[1], Emaxhit[2]));
-            if (Emaxhit[1] > Emaxhit[2])
-            {
-                fh2_ams_theta1_theta2[0]->Fill(Thetamaxhit[0], Thetamaxhit[1]);
-                fh2_ams_phi1_phi2[0]->Fill(Phimaxhit[0], Phimaxhit[1]);
-            }
-            else if (Emaxhit[2] > Emaxhit[1])
-            {
-                fh2_ams_theta1_theta2[0]->Fill(Thetamaxhit[0], Thetamaxhit[2]);
-                fh2_ams_phi1_phi2[0]->Fill(Phimaxhit[0], Phimaxhit[2]);
-            }
+            fh2_ams_theta1_theta2[0]->Fill(Thetamaxhit[0], Thetamaxhit[1]);
+            fh2_ams_phi1_phi2[0]->Fill(Phimaxhit[0], Phimaxhit[1]);
         }
-        if (Emaxhit[3] > 0. && (Emaxhit[4] > 0. || Emaxhit[5] > 0.))
+        // right down
+        if (Emaxhit[0] > 0. && Emaxhit[2] > 0.)
+        {
+            fh2_ams_e1_e2[0]->Fill(Emaxhit[0], TMath::Max(Emaxhit[1], Emaxhit[2]));
+            fh2_ams_theta1_theta2[1]->Fill(Thetamaxhit[0], Thetamaxhit[2]);
+            fh2_ams_phi1_phi2[0]->Fill(Phimaxhit[0], Phimaxhit[2]);
+        }
+        // left up
+        if (Emaxhit[3] > 0. && Emaxhit[4] > 0.)
         {
             fh2_ams_e1_e2[1]->Fill(Emaxhit[3], TMath::Max(Emaxhit[4], Emaxhit[5]));
-            if (Emaxhit[4] > Emaxhit[5])
-            {
-                fh2_ams_theta1_theta2[1]->Fill(Thetamaxhit[3], Thetamaxhit[4]);
-                fh2_ams_phi1_phi2[1]->Fill(Phimaxhit[3], Phimaxhit[4]);
-            }
-            else if (Emaxhit[5] > Emaxhit[4])
-            {
-                fh2_ams_theta1_theta2[1]->Fill(Thetamaxhit[3], Thetamaxhit[5]);
-                fh2_ams_phi1_phi2[1]->Fill(Phimaxhit[3], Phimaxhit[5]);
-            }
+            fh2_ams_theta1_theta2[2]->Fill(Thetamaxhit[3], Thetamaxhit[4]);
+            fh2_ams_phi1_phi2[1]->Fill(Phimaxhit[3], Phimaxhit[4]);
+        }
+        // left down
+        if (Emaxhit[3] > 0. && Emaxhit[5] > 0.)
+        {
+            fh2_ams_e1_e2[1]->Fill(Emaxhit[3], TMath::Max(Emaxhit[4], Emaxhit[5]));
+            fh2_ams_theta1_theta2[3]->Fill(Thetamaxhit[3], Thetamaxhit[5]);
+            fh2_ams_phi1_phi2[1]->Fill(Phimaxhit[3], Phimaxhit[5]);
         }
     }
 
