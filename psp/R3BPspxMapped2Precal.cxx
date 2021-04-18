@@ -53,6 +53,7 @@ void R3BPspxMapped2Precal::SetParameters()
     LOG(INFO) << "In R3BPspxMapped2Precal::SetParameters()";
     //--- Parameter Container ---
     Int_t nDet = fPrecalPar->GetNumDetectors(); // Number of Detectors/Faces
+    LOG(INFO) << nDet;
     gain.resize(nDet);
     threshold1.resize(nDet);
     threshold2.resize(nDet);
@@ -91,7 +92,7 @@ InitStatus R3BPspxMapped2Precal::Init()
     fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
     const char xy[2] = { 'x', 'y' }; // orientation of detector face
     // Figure out how many detectors were registered by the reader
-    for (Int_t d = 0;; d++)
+    for (Int_t d = 0; d < fPrecalPar->GetNumDetectors(); d++)
     {
         TClonesArray* tmp[2];
 
