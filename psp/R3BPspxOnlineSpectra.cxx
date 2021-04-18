@@ -99,9 +99,9 @@ InitStatus R3BPspxOnlineSpectra::Init()
     // PSPX detector
     // get access to data
     const char c_xy[2] = { 'x', 'y' }; // orientation of detector face
-    // LOG(INFO) << "TEST ---- " << N_PSPX;
+    // LOG(INFO) << "TEST ---- " << PSPX;
 
-    for (Int_t d = 0; d < N_PSPX; d++)
+    for (Int_t d = 0; d < PSPX; d++)
     {
         for (Int_t f = 0; f < 2; f++)
         {
@@ -118,12 +118,12 @@ InitStatus R3BPspxOnlineSpectra::Init()
         }
     }
     Int_t mappedSize = fMappedItemsPspx.size();
-    // LOG(INFO) << "TEST 2 ---- " << fMappedItemsPspx.size();
     Int_t precalSize = fPrecalItemsPspx.size();
     Int_t calSize = fCalItemsPspx.size();
+    // LOG(INFO) << "TEST 2 ---- " << fMappedItemsPspx.size();
     Int_t hitSize = fHitItemsPspx.size();
 
-    Int_t Emax = 500000;
+    Int_t Emax = 10000;
 
     std::string xy[2] = { "x", "y" };
     // std::string ep[2] = {"Energy","Position"};
@@ -137,6 +137,8 @@ InitStatus R3BPspxOnlineSpectra::Init()
     fh_pspx_cal_strip_frontback.resize(calSize);
     fh_pspx_cal_pos_frontback.resize(calSize);
     fh_pspx_cal_energy_frontback.resize(calSize);
+
+    fh_pspx_cal_strip.resize(precalSize);
 
     // Create histograms
     // Mapped level
@@ -153,7 +155,7 @@ InitStatus R3BPspxOnlineSpectra::Init()
 
         histoName = "pspx_" + std::to_string((i / 2) + 1) + "_" + xy[i % 2] + "_energy_strip_1";
         histoTitle = "Pspx " + std::to_string((i / 2) + 1) + ": " + xy[i % 2] + " Energy vs Strip Side 1;Strip;Energy";
-        fh_pspx_energy_strip_1[i] = new TH2F(histoName.data(), histoTitle.data(), 32, 1, 33, 1000, 0, 1e6);
+        fh_pspx_energy_strip_1[i] = new TH2F(histoName.data(), histoTitle.data(), 32, 1, 33, 1000, 0, Emax);
 
         histoName = "pspx_" + std::to_string((i / 2) + 1) + "_" + xy[i % 2] + "_strip_2";
         histoTitle = "Pspx " + std::to_string((i / 2) + 1) + ": " + xy[i % 2] + " Strip Side 2;Strip;Counts";
@@ -161,7 +163,7 @@ InitStatus R3BPspxOnlineSpectra::Init()
 
         histoName = "pspx_" + std::to_string((i / 2) + 1) + "_" + xy[i % 2] + "_energy_strip_2";
         histoTitle = "Pspx " + std::to_string((i / 2) + 1) + ": " + xy[i % 2] + " Energy vs Strip Side 2;Strip;Energy";
-        fh_pspx_energy_strip_2[i] = new TH2F(histoName.data(), histoTitle.data(), 32, 1, 33, 1000, 0, 1e6);
+        fh_pspx_energy_strip_2[i] = new TH2F(histoName.data(), histoTitle.data(), 32, 1, 33, 1000, 0, Emax);
     }
 
     // Cal level
@@ -175,13 +177,19 @@ InitStatus R3BPspxOnlineSpectra::Init()
         fh_pspx_cal_pos_frontback[i] = new TH2F(histoName.data(), histoTitle.data(), 200, -1, 1, 200, -1, 1);
         histoName = "pspx_" + std::to_string(i + 1) + "_cal_energy_frontback";
         histoTitle = "Pspx " + std::to_string(i + 1) + ": " + xy[i % 2] + " Cal Energy;XEnergy;YEnergy";
-        fh_pspx_cal_energy_frontback[i] = new TH2F(histoName.data(), histoTitle.data(), 1e3, 0, 1e5, 1e3, 0, 1e5);
+        fh_pspx_cal_energy_frontback[i] = new TH2F(histoName.data(), histoTitle.data(), 1e3, 0, Emax, 1e3, 0, Emax);
+    }
+    for (UInt_t i = 0; i < precalSize; i++)
+    {
+        histoName = "pspx_" + std::to_string((i / 2) + 1) + "_cal_strip_" + xy[i % 2];
+        histoTitle = "Pspx " + std::to_string((i / 2) + 1) + ": " + xy[i % 2] + " Cal Strip;XStrip;";
+        fh_pspx_cal_strip[i] = new TH1F(histoName.data(), histoTitle.data(), 32, 1, 33);
     }
 
     // Create canvasses
     TFolder* mainfolPspx = new TFolder("PSPX", "PSPX info");
     TCanvas* cPspx_strips = new TCanvas("Pspx_strips", "Pspx Strips", 10, 10, 1100, 1000);
-    cPspx_strips->Divide(mappedSize / 2, 4);
+    cPspx_strips->Divide(4, PSPX);
     for (UInt_t i = 0; i < mappedSize; i++)
     {
         cPspx_strips->cd(2 * i + 1);
@@ -192,16 +200,16 @@ InitStatus R3BPspxOnlineSpectra::Init()
     mainfolPspx->Add(cPspx_strips);
 
     TCanvas* cPspx_multiplicity = new TCanvas("Pspx_multiplicity", "Pspx Multiplicity", 10, 10, 1100, 1000);
-    cPspx_multiplicity->Divide(mappedSize / 2, 2);
+    cPspx_multiplicity->Divide(mappedSize, 1);
     for (UInt_t i = 0; i < mappedSize; i++)
     {
-        cPspx_multiplicity->cd(2 * i + 1);
+        cPspx_multiplicity->cd(i + 1);
         fh_pspx_multiplicity[i]->Draw();
     }
     mainfolPspx->Add(cPspx_multiplicity);
 
     TCanvas* cPspx_energy_strips = new TCanvas("Pspx_energy_vs_strip", "Pspx Energy vs Strips", 10, 10, 1100, 1000);
-    cPspx_energy_strips->Divide(mappedSize / 2, 4);
+    cPspx_energy_strips->Divide(4, PSPX);
     for (UInt_t i = 0; i < mappedSize; i++)
     {
         cPspx_energy_strips->cd(2 * i + 1);
@@ -212,39 +220,51 @@ InitStatus R3BPspxOnlineSpectra::Init()
     mainfolPspx->Add(cPspx_energy_strips);
 
     TCanvas* cPspx_cal = new TCanvas("Pspx_cal", "Pspx Cal Level front vs back", 10, 10, 1100, 1000);
-    cPspx_cal->Divide(calSize / 2, 4);
-    for (UInt_t i = 0; i < calSize / 2; i++)
+    cPspx_cal->Divide(4, PSPX);
+    for (UInt_t i = 0; i < PSPX; i++)
     {
         cPspx_cal->cd(i + 1); // i*2
         fh_pspx_cal_strip_frontback[i]->Draw("colz");
-        cPspx_cal->cd(i + 2); // i*2
+        cPspx_cal->cd(i + 5); // i*2
         fh_pspx_cal_pos_frontback[i]->Draw("colz");
-        cPspx_cal->cd(i + 3); // i*2
+        cPspx_cal->cd(i + 9); // i*2
         fh_pspx_cal_energy_frontback[i]->Draw("colz");
     }
-
     mainfolPspx->Add(cPspx_cal);
+
+    TCanvas* cPspx_cal_strips = new TCanvas("Pspx_cal_strips", "Pspx Cal Strip x", 10, 10, 1100, 1000);
+    cPspx_cal_strips->Divide(2, PSPX);
+    for (UInt_t i = 0; i < 2 * PSPX; i++)
+    {
+        cPspx_cal_strips->cd(i + 1);
+        fh_pspx_cal_strip[i]->Draw();
+    }
+    mainfolPspx->Add(cPspx_cal_strips);
+
     run->AddObject(mainfolPspx);
 
     run->GetHttpServer()->RegisterCommand("Reset_PSPX", Form("/Objects/%s/->Reset_PSPX_Histo()", GetName()));
 
     // -------------------------------------------------------------------------
-
+    // LOG(INFO) << PSPX ;
+    LOG(INFO) << "END of INIT ";
     return kSUCCESS;
 }
 
 void R3BPspxOnlineSpectra::Reset_PSPX_Histo()
 {
-    for (UInt_t i = 0; i < N_PSPX; i++)
+    for (UInt_t i = 0; i < 2 * PSPX; i++)
     {
         fh_pspx_multiplicity[i]->Reset();
         fh_pspx_strip_1[i]->Reset();
         fh_pspx_strip_2[i]->Reset();
         fh_pspx_energy_strip_1[i]->Reset();
         fh_pspx_energy_strip_2[i]->Reset();
+
+        fh_pspx_cal_strip[i]->Reset();
     }
 
-    for (UInt_t i = 0; i < fCalItemsPspx.size() / 2; i++)
+    for (UInt_t i = 0; i < PSPX; i++)
     {
         fh_pspx_cal_strip_frontback[i]->Reset();
         fh_pspx_cal_pos_frontback[i]->Reset();
@@ -264,8 +284,7 @@ void R3BPspxOnlineSpectra::Exec(Option_t* option)
     //----------------------------------------------------------------------
     // PSPX
     //----------------------------------------------------------------------
-
-    for (UInt_t d = 0; d < N_PSPX; d++)
+    for (UInt_t d = 0; d < 2 * PSPX; d++)
     {
         Int_t nHits = fMappedItemsPspx[d]->GetEntriesFast();
         fh_pspx_multiplicity[d]->Fill(nHits);
@@ -294,6 +313,15 @@ void R3BPspxOnlineSpectra::Exec(Option_t* option)
             fh_pspx_cal_energy_frontback[d]->Fill(calData1->GetEnergy(), calData2->GetEnergy());
         }
     }
+    for (UInt_t d = 0; d < fPrecalItemsPspx.size(); d++)
+    {
+        Int_t nHits_cal = fPrecalItemsPspx[d]->GetEntriesFast();
+        for (Int_t ihit = 0; ihit < nHits_cal; ihit++)
+        {
+            R3BPspxPrecalData* precalData = (R3BPspxPrecalData*)fPrecalItemsPspx[d]->At(ihit);
+            fh_pspx_cal_strip[d]->Fill(precalData->GetStrip());
+        }
+    }
     fNEvents += 1;
 }
 
@@ -308,18 +336,20 @@ void R3BPspxOnlineSpectra::FinishEvent()
 void R3BPspxOnlineSpectra::FinishTask()
 {
 
-    // LOG(INFO) << "Finish MappedPspx";
+    LOG(INFO) << "Finish MappedPspx";
 
     // for (UInt_t i = 0; i < fMappedItemsPspx.size(); i++)
-    for (UInt_t i = 0; i < N_PSPX; i++)
+    for (UInt_t i = 0; i < 2 * PSPX; i++)
     {
         fh_pspx_multiplicity[i]->Write();
         fh_pspx_strip_1[i]->Write();
         fh_pspx_strip_2[i]->Write();
         fh_pspx_energy_strip_1[i]->Write();
         fh_pspx_energy_strip_2[i]->Write();
+
+        fh_pspx_cal_strip[i]->Write();
     }
-    for (UInt_t i = 0; i < fCalItemsPspx.size() / 2; i++)
+    for (UInt_t i = 0; i < PSPX; i++)
     {
         fh_pspx_cal_strip_frontback[i]->Write();
         fh_pspx_cal_pos_frontback[i]->Write();
