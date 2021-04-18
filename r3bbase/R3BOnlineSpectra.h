@@ -22,7 +22,7 @@
 #define N_PLANE_MAX_TOFD 4
 #define N_PADDLE_MAX_TOFD 50
 #define N_PADDLE_MAX_PTOF 100
-#define N_PSPX 2
+#define N_PSPX 3
 #define N_STRIPS_PSPX 32
 #define N_FIBER_PLOT 1050 // range to plot
 #define PSPX_SPLITTER 0 //sstorck: set this variable to 1 if signals are split into energy and position readout
