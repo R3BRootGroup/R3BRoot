@@ -32,6 +32,7 @@
 
 class TClonesArray;
 class R3BEventHeader;
+class R3BAmsMappingPar;
 
 /**
  * This taks reads AMS data and plots online histograms
@@ -88,12 +89,22 @@ class R3BAmsOnlineSpectra : public FairTask
      */
     virtual void FinishTask();
 
+    /** Virtual method SetParContainers **/
+    virtual void SetParContainers();
+
+    /**
+     * Method to reset histograms
+     */
     void Reset_AMS_Histo();
 
   private:
+    void SetParameter();
+
     TClonesArray* fMappedItemsAms; /**< Array with mapped items. */
     TClonesArray* fCalItemsAms;    /**< Array with cal items. */
     TClonesArray* fHitItemsAms;    /**< Array with hit items. */
+
+    R3BAmsMappingPar* fMap_Par; /**< Container with mapping parameters. >*/
 
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header. */

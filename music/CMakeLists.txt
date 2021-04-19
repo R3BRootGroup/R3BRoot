@@ -25,6 +25,7 @@ set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
 ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/music
+${R3BROOT_SOURCE_DIR}/tracking
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
 )
@@ -68,7 +69,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF MusicLinkDef.h)
 set(LIBRARY_NAME R3BMusic)
 set(DEPENDENCIES
-          R3Bbase R3BData)
+          R3Bbase R3BData R3BTracking)
 
 if(FAIRDB_FOUND)
 set(DEPENDENCIES
