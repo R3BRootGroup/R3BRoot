@@ -30,6 +30,7 @@
 
 #include "R3BMusicCalPar.h"
 #include "R3BMusicHitPar.h"
+#include "R3BTGeoPar.h"
 
 #include "TClass.h"
 
@@ -58,6 +59,11 @@ void R3BMusicContFact::setAllContainers()
     p2->addContext("MusicHitParContext");
 
     containers->Add(p2);
+
+    FairContainer* p3 = new FairContainer("MusicGeoPar", "Music geometry parameters", "GeometryParameterContext");
+    p3->addContext("GeometryParameterContext");
+
+    containers->Add(p3);
 }
 
 FairParSet* R3BMusicContFact::createContainer(FairContainer* c)
@@ -76,6 +82,10 @@ FairParSet* R3BMusicContFact::createContainer(FairContainer* c)
     if (strcmp(name, "musicHitPar") == 0)
     {
         p = new R3BMusicHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
+    if (strcmp(name, "MusicGeoPar") == 0)
+    {
+        p = new R3BTGeoPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
     return p;
 }
