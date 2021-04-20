@@ -26,10 +26,12 @@
 #pragma link C++ class R3BOnlineSpectra+;
 #pragma link C++ class R3BOnlineSpectraDec2019+;
 #pragma link C++ class R3BOnlineSpectraPdc+;
+#pragma link C++ class R3BOnlineSpectraSfib+;
 #pragma link C++ class R3BGlobalAnalysis+;
 #pragma link C++ class R3BGlobalAnalysisS454+;
 #pragma link C++ class R3BTrackS454+;
 #pragma link C++ class R3BTrackerTestS454+;
 #pragma link C++ class R3BOnlineSpillAnalysis+;
+#pragma link C++ class R3BOnlineSpectraFiberTofds515+;
 
 #endif
