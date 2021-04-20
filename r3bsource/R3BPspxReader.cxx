@@ -77,8 +77,21 @@ Bool_t R3BPspxReader::Init(ext_data_struct_info* a_struct_info)
     {
         for (Int_t f = 0; f < 2; f++)
         {
-            FairRootManager::Instance()->Register(
-                Form("Pspx%d_%cMapped", d + 1, xy[f]), Form("Pspx%d_%c", d + 1, xy[f]), fMappedItems[2 * d + f], kTRUE);
+            // Register output array in tree
+            if (!fOnline)
+            {
+                FairRootManager::Instance()->Register(Form("Pspx%d_%cMapped", d + 1, xy[f]),
+                                                      Form("Pspx%d_%c", d + 1, xy[f]),
+                                                      fMappedItems[2 * d + f],
+                                                      kTRUE);
+            }
+            else
+            {
+                FairRootManager::Instance()->Register(Form("Pspx%d_%cMapped", d + 1, xy[f]),
+                                                      Form("Pspx%d_%c", d + 1, xy[f]),
+                                                      fMappedItems[2 * d + f],
+                                                      kFALSE);
+            }
             LOG(INFO) << "Registered Pspx" << d + 1 << "_" << xy[f];
         }
     }
