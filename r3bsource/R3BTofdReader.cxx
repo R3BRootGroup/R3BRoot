@@ -30,13 +30,24 @@ R3BTofdReader::R3BTofdReader(EXT_STR_h101_TOFD* data, UInt_t offset)
     : R3BReader("R3BTofdReader")
     , fData(data)
     , fOffset(offset)
+    , fOnline(kFALSE)
     , fLogger(FairLogger::GetLogger())
     , fArray(new TClonesArray("R3BTofdMappedData"))
     , fArrayTrigger(new TClonesArray("R3BTofdMappedData"))
 {
 }
 
-R3BTofdReader::~R3BTofdReader() {}
+R3BTofdReader::~R3BTofdReader()
+{
+    if (fArray)
+    {
+        delete fArray;
+    }
+    if (fArrayTrigger)
+    {
+        delete fArrayTrigger;
+    }
+}
 
 Bool_t R3BTofdReader::Init(ext_data_struct_info* a_struct_info)
 {
@@ -52,8 +63,16 @@ Bool_t R3BTofdReader::Init(ext_data_struct_info* a_struct_info)
     }
 
     // Register output array in tree
-    FairRootManager::Instance()->Register("TofdMapped", "Land", fArray, kTRUE);
-    FairRootManager::Instance()->Register("TofdTriggerMapped", "Land", fArrayTrigger, kTRUE);
+    if (!fOnline)
+    {
+        FairRootManager::Instance()->Register("TofdMapped", "Land", fArray, kTRUE);
+        FairRootManager::Instance()->Register("TofdTriggerMapped", "Land", fArrayTrigger, kTRUE);
+    }
+    else
+    {
+        FairRootManager::Instance()->Register("TofdMapped", "Tofd", fArray, kFALSE);
+        FairRootManager::Instance()->Register("TofdTriggerMapped", "Tofd", fArrayTrigger, kFALSE);
+    }
 
     // initial clear (set number of hits to 0)
     EXT_STR_h101_TOFD_onion* data = (EXT_STR_h101_TOFD_onion*)fData;
