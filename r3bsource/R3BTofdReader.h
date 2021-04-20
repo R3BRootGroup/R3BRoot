@@ -30,15 +30,20 @@ class R3BTofdReader : public R3BReader
     Bool_t Read();
     void Reset();
 
+    /** Accessor to select online mode **/
+    void SetOnline(Bool_t option) { fOnline = option; }
+
   private:
     /* Reader specific data structure from ucesb */
     EXT_STR_h101_TOFD* fData;
     /* Data offset */
     UInt_t fOffset;
+    // Don't store data for online
+    Bool_t fOnline;
     /* FairLogger */
     FairLogger* fLogger;
     /* the structs of type R3BTofdxMappedItem */
-    TClonesArray* fArray; /**< Output array. */
+    TClonesArray* fArray;        /**< Output array. */
     TClonesArray* fArrayTrigger; /**< Output array for triggers. */
 
   public:
