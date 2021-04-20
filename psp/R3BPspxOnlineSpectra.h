@@ -121,7 +121,7 @@ class R3BPspxOnlineSpectra : public FairTask
     std::vector<TH2F*> fh_pspx_cal_pos_frontback;    /**< PSPX position front vs back on cal level */
     std::vector<TH2F*> fh_pspx_cal_energy_frontback; /**< PSPX energy front vs back on cal level */
 
-    std::vector<TH1F*> fh_pspx_cal_strip;  /**< PSPX strip*/
+    std::vector<TH1F*> fh_pspx_cal_strip; /**< PSPX strip*/
   public:
     ClassDef(R3BPspxOnlineSpectra, 2)
 };

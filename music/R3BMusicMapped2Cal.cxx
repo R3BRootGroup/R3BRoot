@@ -102,7 +102,7 @@ void R3BMusicMapped2Cal::SetParContainers()
     }
 }
 
-void R3BMusicMapped2Cal::SetParameter()
+void R3BMusicMapped2Cal::SetParameters()
 {
     //--- Parameter Container ---
     fNumAnodes = fCal_Par->GetNumAnodes();          // Number of anodes
@@ -134,18 +134,20 @@ void R3BMusicMapped2Cal::SetParameter()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BMusicMapped2Cal::Init()
 {
-    LOG(INFO) << "R3BMusicMapped2Cal: Init";
+    LOG(INFO) << "R3BMusicMapped2Cal::Init()";
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
+        LOG(ERROR) << "R3BMusicMapped2Cal::Init() Root-manager not found.";
         return kFATAL;
     }
 
     fMusicMappedDataCA = (TClonesArray*)rootManager->GetObject("MusicMappedData");
     if (!fMusicMappedDataCA)
     {
+        LOG(ERROR) << "R3BMusicMapped2Cal::Init() MusicMappedData not found.";
         return kFATAL;
     }
 
@@ -161,7 +163,7 @@ InitStatus R3BMusicMapped2Cal::Init()
         rootManager->Register("MusicCalData", "MUSIC Cal", fMusicCalDataCA, kFALSE);
     }
 
-    SetParameter();
+    SetParameters();
     return kSUCCESS;
 }
 
@@ -169,7 +171,7 @@ InitStatus R3BMusicMapped2Cal::Init()
 InitStatus R3BMusicMapped2Cal::ReInit()
 {
     SetParContainers();
-    SetParameter();
+    SetParameters();
     return kSUCCESS;
 }
 

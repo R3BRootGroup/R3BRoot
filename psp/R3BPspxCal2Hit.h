@@ -10,10 +10,11 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
+
 // ----------------------------------------------------------------
 // -----                    R3BPspxCal2Hit                    -----
-// -----	        created 09-03-2016 by I. Syndikus         -----
-// -----              Modified  Dec 2019  by M. Holl		  -----
+// -----	     created 09-03-2016 by I. Syndikus         -----
+// -----              Modified  Dec 2019  by M. Holl		 -----
 // ----------------------------------------------------------------
 
 #ifndef R3BPSPXCAL2HIT_H
@@ -32,6 +33,7 @@ class R3BPspxHitPar;
  * @author Ina Syndikus
  * @since March 9, 2016
  * Modified Dec 2019 by M.Holl
+ * Modified April 2021 by J.L.Rodriguez
  */
 
 class R3BPspxCal2Hit : public FairTask
@@ -39,27 +41,45 @@ class R3BPspxCal2Hit : public FairTask
   public:
     /** Default Constructor **/
     R3BPspxCal2Hit();
+
     /**
      * Standard Constructor
      **/
     R3BPspxCal2Hit(const char* name, Int_t iVerbose);
+
     /** Destructor **/
     virtual ~R3BPspxCal2Hit();
 
+    // Fair specific
+    /** Virtual method Init **/
     virtual InitStatus Init();
-    InitStatus ReInit();
-    void SetParContainers();
-    void SetParameters();
 
+    /** Virtual method ReInit **/
+    virtual InitStatus ReInit();
+
+    /** Virtual method Exec **/
     virtual void Exec(Option_t* option);
 
+    /** Virtual method FinishEvent **/
     virtual void FinishEvent();
+
+    /** Virtual method FinishTask **/
     virtual void FinishTask();
 
+    /** Method SetParContainers **/
+    void SetParContainers();
+
+    /** Accessor to select online mode **/
+    void SetOnline(Bool_t option) { fOnline = option; }
+
   private:
+    void SetParameters();
+
     R3BEventHeader* fHeader;              // do we need that?
     std::vector<TClonesArray*> fCalItems; /**< Array holding input (Cal) data */
     std::vector<TClonesArray*> fHitItems; /**< Array holding output (Hit) data */
+
+    Bool_t fOnline; // Don't store data for online
 
     R3BPspxHitPar* fHitPar; /**< Parameter instance holding slopes, offsets and signs */
     std::vector<Float_t> orientation;

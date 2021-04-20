@@ -10,31 +10,36 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
+
 // ----------------------------------------------------------------
 // -----                    R3BPspxCal2Hit                    -----
-// -----	        created 09-03-2016 by I. Syndikus         -----
-// -----              Modified  Dec 2019  by M. Holl		  -----
+// -----	    created 09-03-2016 by I. Syndikus          -----
+// -----             Modified  Dec 2019  by M. Holl	        -----
 // ----------------------------------------------------------------
 
-#include <cmath>
-#include <iostream>
-#include <limits>
-
+// Fair headers
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
-#include "TClonesArray.h"
 
+// PSP headers
 #include "R3BEventHeader.h"
 #include "R3BPspxCal2Hit.h"
 #include "R3BPspxCalData.h"
 #include "R3BPspxHitData.h"
 #include "R3BPspxHitPar.h"
 
+#include "TClonesArray.h"
+#include <cmath>
+#include <iostream>
+#include <limits>
+
 R3BPspxCal2Hit::R3BPspxCal2Hit()
-    : fCalItems()
+    : FairTask("PspxCal2Hit", 1)
+    , fCalItems()
     , fHitItems()
+    , fOnline(kFALSE)
 {
 }
 
@@ -42,10 +47,23 @@ R3BPspxCal2Hit::R3BPspxCal2Hit(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fCalItems()
     , fHitItems()
+    , fOnline(kFALSE)
 {
 }
 
-R3BPspxCal2Hit::~R3BPspxCal2Hit() {}
+R3BPspxCal2Hit::~R3BPspxCal2Hit()
+{
+
+    LOG(INFO) << "R3BPspxCal2Hit: Delete instance";
+    for (Int_t i = 0; i < fCalItems.size(); i++)
+    {
+        delete fCalItems[i];
+    }
+    for (Int_t i = 0; i < fHitItems.size(); i++)
+    {
+        delete fHitItems[i];
+    }
+}
 
 // -- SetParameters
 // -- Read calibration parameters
@@ -94,6 +112,13 @@ void R3BPspxCal2Hit::SetParameters()
 InitStatus R3BPspxCal2Hit::Init()
 {
     FairRootManager* fMan = FairRootManager::Instance();
+    if (!fMan)
+    {
+        LOG(ERROR) << "R3BPspxCal2Hit::Init() Root-manager not found.";
+        return kFATAL;
+    }
+
+    // R3BEventHeader for trigger information, if needed!
     fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
 
     const char xy[2] = { 'x', 'y' }; // orientation of detector face
@@ -119,13 +144,20 @@ InitStatus R3BPspxCal2Hit::Init()
         {
             fCalItems.push_back(tmp[f]);
             fHitItems.push_back(new TClonesArray("R3BPspxHitData"));
-            FairRootManager::Instance()->Register(
-                Form("Pspx%d_%cHit", d + 1, xy[f]), Form("Pspx%d_%c", d + 1, xy[f]), fHitItems.back(), kTRUE);
+            if (!fOnline)
+            {
+                fMan->Register(
+                    Form("Pspx%d_%cHit", d + 1, xy[f]), Form("Pspx%d_%c", d + 1, xy[f]), fHitItems.back(), kTRUE);
+            }
+            else
+            {
+                fMan->Register(
+                    Form("Pspx%d_%cHit", d + 1, xy[f]), Form("Pspx%d_%c", d + 1, xy[f]), fHitItems.back(), kFALSE);
+            }
         }
     }
 
     SetParameters();
-
     return kSUCCESS;
 }
 
@@ -133,13 +165,21 @@ InitStatus R3BPspxCal2Hit::Init()
 // -- Initialize/Read parameter file for conversion.
 void R3BPspxCal2Hit::SetParContainers()
 {
-    LOG(INFO) << "R3BPspxCal2Hit :: SetParContainers() ";
+    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
+    if (!rtdb)
+    {
+        LOG(ERROR) << "R3BPspxCal2Hit::FairRuntimeDb not opened!";
+        return;
+    }
+    else
+    {
+        LOG(INFO) << "R3BPspxCal2Hit::SetParContainers()";
+    }
 
-    fHitPar = (R3BPspxHitPar*)FairRuntimeDb::instance()->getContainer("R3BPspxHitPar");
-
+    fHitPar = (R3BPspxHitPar*)rtdb->getContainer("R3BPspxHitPar");
     if (!fHitPar)
     {
-        LOG(ERROR) << "Could not get access to R3BPspxHitPar-Container.";
+        LOG(ERROR) << "R3BPspxCal2Hit::Could not get access to R3BPspxHitPar-Container.";
         return;
     }
 
@@ -152,15 +192,17 @@ void R3BPspxCal2Hit::SetParContainers()
 InitStatus R3BPspxCal2Hit::ReInit()
 {
     LOG(INFO) << " R3BPspxCal2Hit :: ReInit() ";
+    /*
+        fHitPar = (R3BPspxHitPar*)FairRuntimeDb::instance()->getContainer("R3BPspxHitPar");
 
-    fHitPar = (R3BPspxHitPar*)FairRuntimeDb::instance()->getContainer("R3BPspxHitPar");
+        if (!fHitPar)
+        {
+            LOG(ERROR) << "Could not get access to R3BPspxHitPar-Container.";
+            return kFATAL;
+        }*/
 
-    if (!fHitPar)
-    {
-        LOG(ERROR) << "Could not get access to R3BPspxHitPar-Container.";
-        return kFATAL;
-    }
-
+    SetParContainers();
+    SetParameters();
     return kSUCCESS;
 }
 

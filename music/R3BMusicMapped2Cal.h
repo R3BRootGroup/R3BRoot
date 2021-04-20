@@ -68,7 +68,7 @@ class R3BMusicMapped2Cal : public FairTask
     void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
-    void SetParameter();
+    void SetParameters();
 
     Int_t fNumAnodes;
     Int_t fMaxMult;

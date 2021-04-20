@@ -10,31 +10,36 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
+
 // ----------------------------------------------------------------
 // -----                    R3BPspxPrecal2Cal                 -----
-// -----            Created  20-03-2017 by I. Syndikus		  -----
-// -----              Modified  Dec 2019  by M. Holl		  -----
+// -----            Created  20-03-2017 by I. Syndikus        -----
+// -----              Modified  Dec 2019  by M. Holl	        -----
 // ----------------------------------------------------------------
 
-#include <iostream>
-#include <limits>
-
+// Fair headers
 #include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRunAna.h"
 #include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
-#include "TClonesArray.h"
 
+// PSP headers
 #include "R3BEventHeader.h"
 #include "R3BPspxCalData.h"
 #include "R3BPspxCalPar.h"
 #include "R3BPspxPrecal2Cal.h"
 #include "R3BPspxPrecalData.h"
 
+#include "TClonesArray.h"
+#include <iostream>
+#include <limits>
+
 R3BPspxPrecal2Cal::R3BPspxPrecal2Cal()
-    : fPrecalItems()
+    : FairTask("PspxPrecal2Cal", 1)
+    , fPrecalItems()
     , fCalItems()
+    , fOnline(kFALSE)
 {
 }
 
@@ -42,15 +47,27 @@ R3BPspxPrecal2Cal::R3BPspxPrecal2Cal(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fPrecalItems()
     , fCalItems()
+    , fOnline(kFALSE)
 {
 }
 
-R3BPspxPrecal2Cal::~R3BPspxPrecal2Cal() {}
+R3BPspxPrecal2Cal::~R3BPspxPrecal2Cal()
+{
+
+    LOG(INFO) << "R3BPspxPrecal2Cal: Delete instance";
+    for (Int_t i = 0; i < fPrecalItems.size(); i++)
+    {
+        delete fPrecalItems[i];
+    }
+    for (Int_t i = 0; i < fCalItems.size(); i++)
+    {
+        delete fCalItems[i];
+    }
+}
 
 void R3BPspxPrecal2Cal::SetParameters()
 {
-
-    LOG(INFO) << "In R3BPspxPrecal2Cal::SetParameters()";
+    LOG(INFO) << "R3BPspxPrecal2Cal::SetParameters()";
     //--- Parameter Container ---
     Int_t nDet = fCalPar->GetNumDetectors(); // Number of Detectors/Faces
     gain.resize(nDet);
@@ -80,7 +97,15 @@ InitStatus R3BPspxPrecal2Cal::Init()
      */
 
     FairRootManager* fMan = FairRootManager::Instance();
+    if (!fMan)
+    {
+        LOG(ERROR) << "R3BPspxPrecal2Cal::Init() Root-manager not found.";
+        return kFATAL;
+    }
+
+    // R3BEventHeader for trigger information, if needed!
     fHeader = (R3BEventHeader*)fMan->GetObject("R3BEventHeader");
+
     // Figure out how many detectors were registered by the reader
     const char xy[2] = { 'x', 'y' }; // orientation of detector face
     for (Int_t d = 0;; d++)
@@ -95,7 +120,7 @@ InitStatus R3BPspxPrecal2Cal::Init()
         {
             if (d == 0)
             {
-                printf("Couldn't get handle on PSPX precal items\n");
+                LOG(ERROR) << "R3BPspxPrecal2Cal::Init() Couldn't get handle on PSPX-precal items.";
                 return kFATAL;
             }
             break;
@@ -104,13 +129,20 @@ InitStatus R3BPspxPrecal2Cal::Init()
         {
             fPrecalItems.push_back(tmp[f]);
             fCalItems.push_back(new TClonesArray("R3BPspxCalData"));
-            FairRootManager::Instance()->Register(
-                Form("Pspx%d_%cCal", d + 1, xy[f]), Form("Pspx%d_%c", d + 1, xy[f]), fCalItems.back(), kTRUE);
+            if (!fOnline)
+            {
+                fMan->Register(
+                    Form("Pspx%d_%cCal", d + 1, xy[f]), Form("Pspx%d_%c", d + 1, xy[f]), fCalItems.back(), kTRUE);
+            }
+            else
+            {
+                fMan->Register(
+                    Form("Pspx%d_%cCal", d + 1, xy[f]), Form("Pspx%d_%c", d + 1, xy[f]), fCalItems.back(), kFALSE);
+            }
         }
     }
 
     SetParameters();
-
     return kSUCCESS;
 }
 
@@ -120,13 +152,21 @@ void R3BPspxPrecal2Cal::SetParContainers()
      * Initialize/Reads parameter file for conversion.
      */
 
-    LOG(INFO) << "R3BPspxPrecal2Cal :: SetParContainers() ";
+    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
+    if (!rtdb)
+    {
+        LOG(ERROR) << "R3BPspxPrecal2Cal::FairRuntimeDb not opened!";
+        return;
+    }
+    else
+    {
+        LOG(INFO) << "R3BPspxPrecal2Cal::SetParContainers()";
+    }
 
-    fCalPar = (R3BPspxCalPar*)FairRuntimeDb::instance()->getContainer("R3BPspxCalPar");
-
+    fCalPar = (R3BPspxCalPar*)rtdb->getContainer("R3BPspxCalPar");
     if (!fCalPar)
     {
-        LOG(ERROR) << "Could not get access to R3BPspxCalPar-Container.";
+        LOG(ERROR) << "R3BPspxPrecal2Cal::Could not get access to R3BPspxCalPar-Container.";
         return;
     }
 
@@ -139,16 +179,18 @@ InitStatus R3BPspxPrecal2Cal::ReInit()
      * Initialize/Reads parameter file for conversion.
      */
 
-    LOG(INFO) << " R3BPspxPrecal2Cal :: ReInit() ";
+    LOG(INFO) << "R3BPspxPrecal2Cal::ReInit()";
+    /*
+        fCalPar = (R3BPspxCalPar*)FairRuntimeDb::instance()->getContainer("R3BPspxCalPar");
 
-    fCalPar = (R3BPspxCalPar*)FairRuntimeDb::instance()->getContainer("R3BPspxCalPar");
+        if (!fCalPar)
+        {
+            LOG(ERROR) << "Could not get access to R3BPspxCalPar-Container.";
+            return kFATAL;
+        }*/
 
-    if (!fCalPar)
-    {
-        LOG(ERROR) << "Could not get access to R3BPspxCalPar-Container.";
-        return kFATAL;
-    }
-
+    SetParContainers();
+    SetParameters();
     return kSUCCESS;
 }
 
