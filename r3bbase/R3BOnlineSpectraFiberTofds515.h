@@ -17,8 +17,8 @@
 // -----               Fill online histograms             -----
 // ------------------------------------------------------------
 
-#ifndef R3BONLINESPECTRA
-#define R3BONLINESPECTRA
+#ifndef R3BONLINESPECTRAFIBERTOFDS515
+#define R3BONLINESPECTRAFIBERTOFDS515
 #define N_PLANE_MAX_TOFD 4
 #define N_PADDLE_MAX_TOFD 50
 #define N_PADDLE_MAX_PTOF 100
@@ -47,7 +47,7 @@ class R3BEventHeader;
  * This taks reads all detector data items and plots histograms
  * for online checks.
  */
-class R3BOnlineSpectra : public FairTask
+class R3BOnlineSpectraFiberTofds515 : public FairTask
 {
 
   public:
@@ -55,7 +55,7 @@ class R3BOnlineSpectra : public FairTask
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BOnlineSpectra();
+    R3BOnlineSpectraFiberTofds515();
 
     /**
      * Standard constructor.
@@ -63,13 +63,13 @@ class R3BOnlineSpectra : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BOnlineSpectra(const char* name, Int_t iVerbose = 1);
+    R3BOnlineSpectraFiberTofds515(const char* name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BOnlineSpectra();
+    virtual ~R3BOnlineSpectraFiberTofds515();
 
     /**
      * Method for task initialization.
@@ -351,7 +351,7 @@ class R3BOnlineSpectra : public FairTask
     TH2F* fh_pspx_hit_multi[(N_PSPX + 1) / 2];
 
   public:
-    ClassDef(R3BOnlineSpectra, 2)
+    ClassDef(R3BOnlineSpectraFiberTofds515, 2)
 };
 
 #endif
