@@ -25,7 +25,8 @@
 
 #include "R3BLosCalData.h"
 #include "R3BLosMappedData.h"
-#include "R3BOnlineSpectra.h"
+//#include "R3BOnlineSpectra.h"
+#include "R3BOnlineSpectraFiberTofds515.h"
 
 #include "R3BRoluCalData.h"
 #include "R3BRoluMappedData.h"
@@ -95,12 +96,12 @@ static void init_array(T& array, double init)
 
 using namespace std;
 
-R3BOnlineSpectra::R3BOnlineSpectraFiberTofds515()
-    : R3BOnlineSpectra("OnlineSpectra", 1)
+R3BOnlineSpectraFiberTofds515::R3BOnlineSpectraFiberTofds515()
+    : R3BOnlineSpectraFiberTofds515("OnlineSpectraFiberTofds515", 1)
 {
 }
 
-R3BOnlineSpectra::R3BOnlineSpectra(const char* name, Int_t iVerbose)
+R3BOnlineSpectraFiberTofds515::R3BOnlineSpectraFiberTofds515(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fTrigger(-1)
     , fTpat(-1)
@@ -111,7 +112,7 @@ R3BOnlineSpectra::R3BOnlineSpectra(const char* name, Int_t iVerbose)
 {
 }
 
-R3BOnlineSpectra::~R3BOnlineSpectra()
+R3BOnlineSpectraFiberTofds515::~R3BOnlineSpectraFiberTofds515()
 {
     //	delete fhTpat ;
     //	delete fhTrigger;
@@ -132,7 +133,7 @@ R3BOnlineSpectra::~R3BOnlineSpectra()
     }
 }
 
-InitStatus R3BOnlineSpectra::Init()
+InitStatus R3BOnlineSpectraFiberTofds515::Init()
 {
 
     // Initialize random number:
@@ -1056,7 +1057,7 @@ InitStatus R3BOnlineSpectra::Init()
     return kSUCCESS;
 }
 
-void R3BOnlineSpectra::Reset_LOS_Histo()
+void R3BOnlineSpectraFiberTofds515::Reset_LOS_Histo()
 {
     fh_los_channels->Reset();
     fh_los_tres_MCFD->Reset();
@@ -1072,13 +1073,13 @@ void R3BOnlineSpectra::Reset_LOS_Histo()
     fh_los_dt_first_ToT->Reset();
 }
 
-void R3BOnlineSpectra::Reset_ROLU_Histo()
+void R3BOnlineSpectraFiberTofds515::Reset_ROLU_Histo()
 {
     fh_rolu_channels->Reset();
     fh_rolu_tot->Reset();
 }
 
-void R3BOnlineSpectra::Reset_BMON_Histo()
+void R3BOnlineSpectraFiberTofds515::Reset_BMON_Histo()
 {
     fhTrigger->Reset();
     fhTpat->Reset();
@@ -1091,7 +1092,7 @@ void R3BOnlineSpectra::Reset_BMON_Histo()
     fh_TOFDOR_spill->Reset();
 }
 
-void R3BOnlineSpectra::Reset_SCI8_Histo()
+void R3BOnlineSpectraFiberTofds515::Reset_SCI8_Histo()
 {
     fh_sci8_channels->Reset();
     fh_sci8_tres_MCFD->Reset();
@@ -1107,7 +1108,7 @@ void R3BOnlineSpectra::Reset_SCI8_Histo()
     fh_sci8_multihitTRAI->Reset();
     fh_tof_sci8->Reset();
 }
-void R3BOnlineSpectra::Reset_TOFD_Histo()
+void R3BOnlineSpectraFiberTofds515::Reset_TOFD_Histo()
 {
     for (int i = 0; i < N_PLANE_MAX_TOFD; i++)
     {
@@ -1120,7 +1121,7 @@ void R3BOnlineSpectra::Reset_TOFD_Histo()
     fh_tofd_dt[1]->Reset();
     fh_tofd_dt[2]->Reset();
 }
-void R3BOnlineSpectra::Reset_FIBERS_Histo()
+void R3BOnlineSpectraFiberTofds515::Reset_FIBERS_Histo()
 {
     if (fMappedItems.at(DET_PSPX))
     {
@@ -1168,7 +1169,7 @@ void R3BOnlineSpectra::Reset_FIBERS_Histo()
     }
 }
 
-void R3BOnlineSpectra::Exec(Option_t* option)
+void R3BOnlineSpectraFiberTofds515::Exec(Option_t* option)
 {
     //  cout << "fNEvents " << fNEvents << endl;
 
@@ -1718,207 +1719,6 @@ void R3BOnlineSpectra::Exec(Option_t* option)
             {
                 cout << "Wrong detector ID for LOS!" << endl;
             }
-        }
-    }
-
-    //----------------------------------------------------------------------
-    // SCI8 detector
-    //----------------------------------------------------------------------
-
-    Double_t timeS8_V[10][2] = { 0.0 / 0.0 }; // [multihit][pm]
-    Double_t timeS8_L[10][2] = { 0.0 / 0.0 };
-    Double_t timeS8_T[10][2] = { 0.0 / 0.0 };
-    Double_t timeSci8M[10] = { 0.0 };
-    Double_t Sci8TresM[10] = { 0.0 / 0.0 };
-    Double_t timeSci8T[10] = { 0.0 };
-    Double_t Sci8TresT[10] = { 0.0 / 0.0 };
-    Double_t timeSci8[10] = { 0.0 };
-    Double_t totsumS8[10] = { 0.0 };
-    Double_t totS8[10][8] = { 0.0 / 0.0 };
-
-    Int_t MultipS8 = -1;
-
-    if (fMappedItems.at(DET_SCI8))
-    {
-        auto det = fMappedItems.at(DET_SCI8);
-        Int_t nHits = det->GetEntriesFast();
-
-        MultipS8 = nHits;
-
-        for (Int_t ihit = 0; ihit < nHits; ihit++)
-        {
-            R3BSci8MappedData* hit = (R3BSci8MappedData*)det->At(ihit);
-            if (!hit)
-                continue;
-
-            // channel numbers are stored 1-based (1..n)
-            Int_t iDet = hit->GetDetector(); // 1..
-            Int_t iCha = hit->GetChannel();  // 1..
-
-            fh_sci8_channels->Fill(iCha);
-        }
-    }
-    assert(MultipS8 != -1);
-
-    Int_t nPartS8;
-
-    if (fCalItems.at(DET_SCI8))
-    {
-        auto det = fCalItems.at(DET_SCI8);
-        nPartS8 = det->GetEntriesFast();
-
-        fh_sci8_multihit->Fill(nPartS8);
-
-        Int_t iDet = 0;
-        Int_t nPartS8_VFTX[2] = { 0 };
-        Int_t nPartS8_LEAD[2] = { 0 };
-        Int_t nPartS8_TRAI[2] = { 0 };
-
-        for (Int_t iPart = 0; iPart < nPartS8; iPart++)
-        {
-
-            /*
-             * nPart is the number of particle passing through Sci8 detector in one event
-             */
-
-            R3BSci8CalData* calDataS8 = (R3BSci8CalData*)det->At(iPart);
-            iDet = calDataS8->GetDetector();
-
-            // VFTX Channels 1-2:
-            if (!(IS_NAN(calDataS8->fTimeV_r_ns)))
-            {
-                timeS8_V[iPart][0] = calDataS8->fTimeV_r_ns;
-                nPartS8_VFTX[0] += 1;
-            }
-            if (!(IS_NAN(calDataS8->fTimeV_l_ns)))
-            {
-                timeS8_V[iPart][1] = calDataS8->fTimeV_l_ns;
-                nPartS8_VFTX[1] += 1;
-            }
-
-            // TAMEX Channels 1-2:
-            if (!(IS_NAN(calDataS8->fTimeL_r_ns)))
-            {
-                timeS8_L[iPart][0] = calDataS8->fTimeL_r_ns;
-                nPartS8_LEAD[0] += 1;
-            }
-            if (!(IS_NAN(calDataS8->fTimeT_r_ns)))
-            {
-                timeS8_T[iPart][0] = calDataS8->fTimeT_r_ns;
-                nPartS8_TRAI[0] += 1;
-            }
-            if (!(IS_NAN(calDataS8->fTimeL_l_ns)))
-            {
-                timeS8_L[iPart][1] = calDataS8->fTimeL_l_ns;
-                nPartS8_LEAD[1] += 1;
-            }
-            if (!(IS_NAN(calDataS8->fTimeT_l_ns)))
-            {
-                timeS8_T[iPart][1] = calDataS8->fTimeT_l_ns;
-                nPartS8_TRAI[1] += 1;
-            }
-
-            if (iPart > 0 && MultipS8 % 2 == 0)
-            {
-                for (int k = 0; k < 2; k++)
-                {
-                    if (timeS8_V[iPart][k] > 0. && timeS8_V[iPart - 1][k] > 0. && !(IS_NAN(timeS8_V[iPart][k])) &&
-                        !(IS_NAN(timeS8_V[iPart - 1][k])))
-                    {
-                        fh_sci8_dt_hits->Fill(timeS8_V[iPart][k] - timeS8_V[iPart - 1][k]);
-                    }
-                    if (timeS8_L[iPart][k] > 0. && timeS8_L[iPart - 1][k] > 0. && !(IS_NAN(timeS8_L[iPart][k])) &&
-                        !(IS_NAN(timeS8_L[iPart - 1][k])))
-                    {
-                        fh_sci8_dt_hits_l->Fill(timeS8_L[iPart][k] - timeS8_L[iPart - 1][k]);
-                    }
-                    if (timeS8_T[iPart][k] > 0. && timeS8_T[iPart - 1][k] > 0. && !(IS_NAN(timeS8_T[iPart][k])) &&
-                        !(IS_NAN(timeS8_T[iPart - 1][k])))
-                    {
-                        fh_sci8_dt_hits_t->Fill(timeS8_T[iPart][k] - timeS8_T[iPart - 1][k]);
-                    }
-                }
-            }
-
-            if (iDet == 1)
-            {
-
-                // if(iPart >= 0)
-                if (1 == 1)
-                {
-                    int nPMT = 0;
-                    int nPMV = 0;
-                    int ilc = iPart;
-
-                    for (int ipm = 0; ipm < 2; ipm++)
-                    {
-
-                        if (timeS8_T[iPart][ipm] > 0. && timeS8_L[iPart][ipm] > 0. && !(IS_NAN(timeS8_T[iPart][ipm])) &&
-                            !(IS_NAN(timeS8_L[iPart][ipm])))
-                        {
-                            while (timeS8_T[iPart][ipm] - timeS8_L[iPart][ipm] < 0.)
-                            {
-                                timeS8_T[iPart][ipm] = timeS8_T[iPart][ipm] + 2048. * fClockFreq;
-                            }
-
-                            nPMT = nPMT + 1;
-                            totS8[iPart][ipm] = timeS8_T[iPart][ipm] - timeS8_L[iPart][ipm];
-                        }
-
-                        totsumS8[iPart] += totS8[iPart][ipm];
-
-                        if (totS8[iPart][ipm] != 0. && !(IS_NAN(totS8[iPart][ipm])))
-                            fh_sci8_tot->Fill(ipm + 1, totS8[iPart][ipm]);
-
-                        if (timeS8_L[iPart][ipm] > 0. && !(IS_NAN(timeS8_L[iPart][ipm])))
-                            timeSci8T[iPart] += timeS8_L[iPart][ipm];
-
-                        if (timeS8_V[iPart][ipm] > 0. && !(IS_NAN(timeS8_V[iPart][ipm])))
-                        {
-                            timeSci8M[iPart] += timeS8_V[iPart][ipm];
-                            nPMV = nPMV + 1;
-                        }
-                    }
-
-                    totsumS8[iPart] = totsumS8[iPart] / nPMT;
-                    /*
-                       if(totsum[iPart] < 88.) cout<<fNEvents<<"; "<<nPart<<"; "<<iPart<<",
-                       "<<totsum[iPart]<<tot[iPart][0]<<
-                       ", "<<tot[iPart][1]<<", " <<tot[iPart][2]<<", "<<tot[iPart][3]<<", "<<tot[iPart][4]<<", "
-                       <<tot[iPart][5]<<", "<<tot[iPart][6]<<", "<<tot[iPart][7]<<endl;
-                     */
-                    timeSci8M[iPart] = timeSci8M[iPart] / nPMV;
-                    timeSci8T[iPart] = timeSci8T[iPart] / nPMT;
-
-                    timeSci8[iPart] = timeSci8M[iPart];
-                    fh_tof_sci8->Fill(timeSci8[iPart] - timeLos[ilc]);
-
-                    // cout<<"TOF "<<timeSci8[iPart]-timeLos[ilc]<<endl;
-
-                    if (nPMV == 2)
-                        Sci8TresM[iPart] = (timeS8_V[iPart][1] - timeS8_V[iPart][0]);
-                    if (nPMT == 2)
-                        Sci8TresT[iPart] = (timeS8_L[iPart][1] - timeS8_L[iPart][0]);
-
-                    if (nPMV == 2)
-                        fh_sci8_tres_MCFD->Fill(Sci8TresM[iPart]);
-                    if (nPMT == 2)
-                        fh_sci8_tres_TAMEX->Fill(Sci8TresT[iPart]);
-                    if (nPMT == 2)
-                        fh_sci8_tot_mean->Fill(totsumS8[iPart]);
-                }
-            }
-            else
-            {
-                cout << "Wrong detector ID for Sci8!" << endl;
-            }
-        }
-
-        for (int ik = 0; ik < 2; ik++)
-        {
-            fh_sci8_multihitVFTX->Fill(ik + 1, nPartS8_VFTX[ik]);
-            fh_sci8_multihitLEAD->Fill(ik + 1, nPartS8_LEAD[ik]);
-            fh_sci8_multihitTRAI->Fill(ik + 1, nPartS8_TRAI[ik]);
         }
     }
 
@@ -2637,7 +2437,7 @@ void R3BOnlineSpectra::Exec(Option_t* option)
     fNEvents += 1;
 }
 
-void R3BOnlineSpectra::FinishEvent()
+void R3BOnlineSpectraFiberTofds515::FinishEvent()
 {
 
     for (Int_t det = 0; det < DET_MAX; det++)
@@ -2657,7 +2457,7 @@ void R3BOnlineSpectra::FinishEvent()
     }
 }
 
-void R3BOnlineSpectra::FinishTask()
+void R3BOnlineSpectraFiberTofds515::FinishTask()
 {
 
     if (fMappedItems.at(DET_ROLU))

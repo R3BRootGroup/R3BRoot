@@ -96,6 +96,8 @@ class R3BMusicOnlineSpectra : public FairTask
      */
     virtual void Reset_Histo();
 
+    void SetExpId(Int_t exp) { fExpId = exp; }
+
   private:
     TClonesArray* fMappedItemsMus; /**< Array with mapped items. */
     TClonesArray* fCalItemsMus;    /**< Array with cal items. */
@@ -104,6 +106,9 @@ class R3BMusicOnlineSpectra : public FairTask
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header.      */
     Int_t fNEvents;         /**< Event counter.     */
+    Int_t fExpId;
+    Int_t fERange;
+    Int_t fZRange;
     Double_t fE[NbAnodesMus], fT[NbAnodesMus + 2];
     Int_t multhit[NbAnodesMus + 2];
 
