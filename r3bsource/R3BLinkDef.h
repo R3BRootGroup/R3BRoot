@@ -69,7 +69,7 @@
 #pragma link C++ class EXT_STR_h101_unpack_t;
 #pragma link C++ class EXT_STR_h101_whiterabbit_onion_t;
 #pragma link C++ class EXT_STR_h101_TPAT_t;
-#pragma link C++ class EXT_STR_h101_timestamp_master_onion_t;
+#pragma link C++ class EXT_STR_h101_timestamp_master_t;
 #pragma link C++ class EXT_STR_h101_BMON_onion_t;
 //#pragma link C++ class EXT_STR_h101_raw_nnp_onion_t;
 #pragma link C++ class EXT_STR_h101_FIBZERO_onion_t;
@@ -108,4 +108,5 @@
 #pragma link C++ class EXT_STR_h101_MUSIC_onion_t;
 #pragma link C++ class EXT_STR_h101_SAMP_onion_t;
 #pragma link C++ class EXT_STR_h101_PDC_onion_t;
+#pragma link C++ class EXT_STR_h101_LOS_t;
 #endif

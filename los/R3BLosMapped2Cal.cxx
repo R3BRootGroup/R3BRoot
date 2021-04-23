@@ -1,3 +1,16 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
 // ------------------------------------------------------------
 // -----                  R3BLosMapped2Cal                -----
 // -----          Created Feb 4th 2016 by R.Plag          -----
@@ -63,7 +76,13 @@ R3BLosMapped2Cal::R3BLosMapped2Cal(const char* name, Int_t iVerbose)
 {
 }
 
-R3BLosMapped2Cal::~R3BLosMapped2Cal() { delete fCalItems; }
+R3BLosMapped2Cal::~R3BLosMapped2Cal()
+{
+    if (fMappedItems)
+        delete fMappedItems;
+    if (fCalItems)
+        delete fCalItems;
+}
 
 InitStatus R3BLosMapped2Cal::Init()
 {
@@ -98,7 +117,15 @@ InitStatus R3BLosMapped2Cal::Init()
     }
 
     // request storage of Cal data in output tree
-    mgr->Register("LosCal", "Land", fCalItems, kTRUE);
+    if (!fOnline)
+    {
+        mgr->Register("LosCal", "Land", fCalItems, kTRUE);
+    }
+    else
+    {
+        mgr->Register("LosCal", "Land", fCalItems, kFALSE);
+    }
+
     fCalItems->Clear();
 
     return kSUCCESS;

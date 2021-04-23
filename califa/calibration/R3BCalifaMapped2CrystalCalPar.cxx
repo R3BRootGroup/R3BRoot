@@ -138,18 +138,21 @@ InitStatus R3BCalifaMapped2CrystalCalPar::Init()
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
+        LOG(ERROR) << "R3BCalifaMapped2CrystalCalPar::Init() Couldn't get handle on FairRootManager.";
         return kFATAL;
     }
 
     fCalifaMappedDataCA = (TClonesArray*)rootManager->GetObject("CalifaMappedData");
     if (!fCalifaMappedDataCA)
     {
+        LOG(ERROR) << "R3BCalifaMapped2CrystalCalPar::Init() Couldn't get handle on CalifaMappedData.";
         return kFATAL;
     }
 
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
+        LOG(ERROR) << "R3BCalifaMapped2CrystalCalPar::Init() Couldn't get handle on FairRuntimeDb.";
         return kFATAL;
     }
 
@@ -193,6 +196,7 @@ InitStatus R3BCalifaMapped2CrystalCalPar::Init()
 InitStatus R3BCalifaMapped2CrystalCalPar::ReInit()
 {
     SetParContainers();
+    SetParameter();
     return kSUCCESS;
 }
 
@@ -210,7 +214,8 @@ void R3BCalifaMapped2CrystalCalPar::Exec(Option_t* opt)
         MapHit[i] = (R3BCalifaMappedData*)(fCalifaMappedDataCA->At(i));
         crystalId = MapHit[i]->GetCrystalId();
         // Fill histograms
-        fh_Map_energy_crystal[crystalId - 1]->Fill(MapHit[i]->GetEnergy());
+        if (fMap_Par->GetInUse(crystalId) == 1)
+            fh_Map_energy_crystal[crystalId - 1]->Fill(MapHit[i]->GetEnergy());
     }
 
     if (MapHit)
