@@ -1,3 +1,16 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
 // ------------------------------------------------------------
 // -----                  R3BLosMapped2Cal                -----
 // -----            Created 4-02-2016 by R.Plag           -----
@@ -110,6 +123,9 @@ class R3BLosMapped2Cal : public FairTask
         fNofChannels = nChs; //=4 or 8  or 16
     }
 
+    /** Accessor to select online mode **/
+    void SetOnline(Bool_t option) { fOnline = option; }
+
   private:
     size_t GetCalLookupIndex(R3BLosMappedData const&) const;
 
@@ -129,6 +145,8 @@ class R3BLosMapped2Cal : public FairTask
     UInt_t fNofChannels;  /**< Number of channels per detector. */
     Double_t fClockFreq;  /**< Clock cycle in [ns]. */
     UInt_t fNEvent;
+    // Don't store data for online
+    Bool_t fOnline;
 
     // Fast lookup for matching mapped data.
     std::vector<std::vector<R3BLosCalData*>> fCalLookup;
