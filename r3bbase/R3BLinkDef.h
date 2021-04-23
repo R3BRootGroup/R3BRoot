@@ -33,5 +33,6 @@
 #pragma link C++ class R3BTrackerTestS454+;
 #pragma link C++ class R3BOnlineSpillAnalysis+;
 #pragma link C++ class R3BOnlineSpectraFiberTofds515+;
+#pragma link C++ class R3BOnlineSpectraLosStandalone+;
 
 #endif
