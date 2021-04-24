@@ -350,6 +350,15 @@ class R3BOnlineSpectraFiberTofds515 : public FairTask
     TH2F* fh_pspx_cal_energy_frontback[N_PSPX]; /**< PSPX energy front vs back on cal level */
     TH2F* fh_pspx_hit_multi[(N_PSPX + 1) / 2];
 
+    TH2F* p1_tot_top;
+    TH2F* p1_tot_bot;
+    TH2F* p2_tot_top;
+    TH2F* p2_tot_bot;
+    TH2F* p3_tot_top;
+    TH2F* p3_tot_bot;
+    TH2F* p4_tot_top;
+    TH2F* p4_tot_bot;
+
   public:
     ClassDef(R3BOnlineSpectraFiberTofds515, 2)
 };

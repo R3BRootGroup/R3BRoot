@@ -688,9 +688,23 @@ InitStatus R3BOnlineSpectraFiberTofds515::Init()
         TCanvas* cTofd_planes = new TCanvas("TOFD_planes", "TOFD planes", 10, 10, 1100, 1000);
         cTofd_planes->Divide(5, 4);
 
+        TCanvas* Tofd_tot_raw = new TCanvas("Tofd_tot_raw", "Tofd_tot_raw", 10, 10, 1100, 1100);
+        Tofd_tot_raw->Divide(4, 2);
+
         fh_TimePreviousEvent = new TH1F("TimePreviousEvent", "Time between 2 particles ", 300000, -3000, 3000);
         fh_TimePreviousEvent->GetXaxis()->SetTitle("time / µsec");
         fh_TimePreviousEvent->GetYaxis()->SetTitle("counts");
+
+        /*
+        p1_tot_top=new TH2F("p1_tot_top","p1_tot_top",44,0,44,500,0,250);
+        p2_tot_top=new TH2F("p2_tot_top","p2_tot_top",44,0,44,500,0,250);
+        p3_tot_top=new TH2F("p3_tot_top","p3_tot_top",44,0,44,500,0,250);
+        p4_tot_top=new TH2F("p4_tot_top","p4_tot_top",44,0,44,500,0,250);
+        p1_tot_bot=new TH2F("p1_tot_bot","p1_tot_bot",44,0,44,500,0,250);
+        p2_tot_bot=new TH2F("p2_tot_bot","p2_tot_bot",44,0,44,500,0,250);
+        p3_tot_bot=new TH2F("p3_tot_bot","p3_tot_bot",44,0,44,500,0,250);
+        p4_tot_bot=new TH2F("p4_tot_bot","p4_tot_bot",44,0,44,500,0,250);
+        */
 
         for (Int_t j = 0; j < 4; j++)
         {
@@ -738,9 +752,28 @@ InitStatus R3BOnlineSpectraFiberTofds515::Init()
                 fh_tofd_dt[j]->GetYaxis()->SetTitle("dt / ns");
             }
         }
+        /*
+        Tofd_tot_raw->cd(1);
+        p1_tot_top->Draw("colz");
+        Tofd_tot_raw->cd(2);
+        p1_tot_bot->Draw("colz");
+        Tofd_tot_raw->cd(3);
+        p2_tot_top->Draw("colz");
+        Tofd_tot_raw->cd(4);
+        p2_tot_bot->Draw("colz");
+        Tofd_tot_raw->cd(5);
+        p3_tot_top->Draw("colz");
+        Tofd_tot_raw->cd(6);
+        p3_tot_bot->Draw("colz");
+        Tofd_tot_raw->cd(7);
+        p4_tot_top->Draw("colz");
+        Tofd_tot_raw->cd(8);
+        p4_tot_bot->Draw("colz");
+        */
 
         cTofd_planes->cd(1);
         fh_tofd_channels[0]->Draw();
+        gPad->SetLogy();
         cTofd_planes->cd(2);
         gPad->SetLogz();
         fh_tofd_TotPm[0]->Draw("colz");
@@ -753,6 +786,7 @@ InitStatus R3BOnlineSpectraFiberTofds515::Init()
 
         cTofd_planes->cd(6);
         fh_tofd_channels[1]->Draw();
+        gPad->SetLogy();
         cTofd_planes->cd(7);
         gPad->SetLogz();
         fh_tofd_TotPm[1]->Draw("colz");
@@ -768,6 +802,7 @@ InitStatus R3BOnlineSpectraFiberTofds515::Init()
 
         cTofd_planes->cd(11);
         fh_tofd_channels[2]->Draw();
+        gPad->SetLogy();
         cTofd_planes->cd(12);
         gPad->SetLogz();
         fh_tofd_TotPm[2]->Draw("colz");
@@ -783,6 +818,7 @@ InitStatus R3BOnlineSpectraFiberTofds515::Init()
 
         cTofd_planes->cd(16);
         fh_tofd_channels[3]->Draw();
+        gPad->SetLogy();
         cTofd_planes->cd(17);
         gPad->SetLogz();
         fh_tofd_TotPm[3]->Draw("colz");
@@ -1120,6 +1156,15 @@ void R3BOnlineSpectraFiberTofds515::Reset_TOFD_Histo()
     fh_tofd_dt[0]->Reset();
     fh_tofd_dt[1]->Reset();
     fh_tofd_dt[2]->Reset();
+
+    p1_tot_top->Reset();
+    p1_tot_bot->Reset();
+    p2_tot_top->Reset();
+    p2_tot_bot->Reset();
+    p3_tot_top->Reset();
+    p3_tot_bot->Reset();
+    p4_tot_top->Reset();
+    p4_tot_bot->Reset();
 }
 void R3BOnlineSpectraFiberTofds515::Reset_FIBERS_Histo()
 {
@@ -1781,6 +1826,8 @@ void R3BOnlineSpectraFiberTofds515::Exec(Option_t* option)
         {
             Int_t nHits = detHit->GetEntriesFast();
 
+            // cout << "\nGot" << nHits << "hits";
+
             Double_t posfib = 0. / 0.;
             Double_t totMax = 0.;
             Double_t tfib = 0. / 0., tof_fib = 0. / 0.;
@@ -1801,6 +1848,8 @@ void R3BOnlineSpectraFiberTofds515::Exec(Option_t* option)
                 // times
                 tMAPMT = hit->GetMAPMTTime_ns();
                 tSPMT = hit->GetSPMTTime_ns();
+
+                // cout << "T(MA)=" << tMAPMT << " T(S)=" << tSPMT;
 
                 dtime = tMAPMT - tSPMT;
 
@@ -1831,6 +1880,9 @@ void R3BOnlineSpectraFiberTofds515::Exec(Option_t* option)
                     }
                 }
 
+                // cout << "\n ToT (single)..." << hit->GetSPMTToT_ns();
+                // cout << "\n ToT (ma)..." << hit->GetMAPMTToT_ns();
+
                 // Not-calibrated ToF:
                 // tfib = (tMAPMT + tSPMT) / 2.;
                 tfib = tSPMT;
@@ -1842,42 +1894,45 @@ void R3BOnlineSpectraFiberTofds515::Exec(Option_t* option)
                 if (iFib > 0)
                     posfib = (-n_fiber[ifibcount] / 2. + iFib + (0.5 - randx));
 
-                if (hit->GetSPMTToT_ns() > 0)
+                // if (hit->GetSPMTToT_ns() > 0)
+                //{
+
+                //	cout << "\nFilling ToT...";
+
+                fh_fibers_Fib[ifibcount]->Fill(iFib);
+                fh_ToT_s_Fib[ifibcount]->Fill(iFib, hit->GetSPMTToT_ns());
+                fh_ToT_m_Fib[ifibcount]->Fill(iFib, hit->GetMAPMTToT_ns());
+                fh_time_Fib[ifibcount]->Fill(iFib, tMAPMT - tSPMT);
+                fh_Fib_ToF[ifibcount]->Fill(iFib, tof_fib);
+                fh_Fib_pos[ifibcount]->Fill(posfib);
+                fh_Fib_vs_Events[ifibcount]->Fill(fNEvents, iFib);
+                if (ifibcount == 12 || ifibcount == 13)
                 {
-                    fh_fibers_Fib[ifibcount]->Fill(iFib);
-                    fh_ToT_s_Fib[ifibcount]->Fill(iFib, hit->GetSPMTToT_ns());
-                    fh_ToT_m_Fib[ifibcount]->Fill(iFib, hit->GetMAPMTToT_ns());
-                    fh_time_Fib[ifibcount]->Fill(iFib, tMAPMT - tSPMT);
-                    fh_Fib_ToF[ifibcount]->Fill(iFib, tof_fib);
-                    fh_Fib_pos[ifibcount]->Fill(posfib);
-                    fh_Fib_vs_Events[ifibcount]->Fill(fNEvents, iFib);
-                    if (ifibcount == 12 || ifibcount == 13)
-                    {
-                        fh_ToT_single_Fib[ifibcount]->Fill((iFib - 1) % 2 + 1 + 2 * ((iFib - 1) / 512),
-                                                           hit->GetSPMTToT_ns());
-                        //                    cout<<"Test: "<<ifibcount<<" ifib: "<<iFib<<" single PMT: "<<
-                        //                    (iFib)%2+1+2*((iFib-1)/512)<<endl;
-                    }
-
-                    if (ifibcount == 14 || ifibcount == 15)
-                    {
-                        fh_ToT_single_Fib[ifibcount]->Fill((iFib - 1) % 2 + 1 + 2 * ((iFib - 1) / 512),
-                                                           hit->GetSPMTToT_ns());
-                        //                    cout<<"Test: "<<ifibcount<<" ifib: "<<iFib<<" single PMT: "<<
-                        //                    (iFib-1)%2+1+2*((iFib-1)/512)<<endl;
-                    }
-
-                    if (ifibcount == 9 || ifibcount == 10)
-                    {
-                        fh_ToT_single_Fib[ifibcount]->Fill((iFib - 1) / 256 + 1, hit->GetSPMTToT_ns());
-                    }
-
-                    if (ifibcount == 4 || ifibcount == 5)
-                    {
-
-                        fh_ToT_single_Fib[ifibcount]->Fill((iFib - 1) % 2 + 1, hit->GetSPMTToT_ns());
-                    }
+                    fh_ToT_single_Fib[ifibcount]->Fill((iFib - 1) % 2 + 1 + 2 * ((iFib - 1) / 512),
+                                                       hit->GetSPMTToT_ns());
+                    //                    cout<<"Test: "<<ifibcount<<" ifib: "<<iFib<<" single PMT: "<<
+                    //                    (iFib)%2+1+2*((iFib-1)/512)<<endl;
                 }
+
+                if (ifibcount == 14 || ifibcount == 15)
+                {
+                    fh_ToT_single_Fib[ifibcount]->Fill((iFib - 1) % 2 + 1 + 2 * ((iFib - 1) / 512),
+                                                       hit->GetSPMTToT_ns());
+                    //                    cout<<"Test: "<<ifibcount<<" ifib: "<<iFib<<" single PMT: "<<
+                    //                    (iFib-1)%2+1+2*((iFib-1)/512)<<endl;
+                }
+
+                if (ifibcount == 9 || ifibcount == 10)
+                {
+                    fh_ToT_single_Fib[ifibcount]->Fill((iFib - 1) / 256 + 1, hit->GetSPMTToT_ns());
+                }
+
+                if (ifibcount == 4 || ifibcount == 5)
+                {
+
+                    fh_ToT_single_Fib[ifibcount]->Fill((iFib - 1) % 2 + 1, hit->GetSPMTToT_ns());
+                }
+                //}
             } // end for(ihit)
 
             if (nHits > 0)
@@ -1906,6 +1961,8 @@ void R3BOnlineSpectraFiberTofds515::Exec(Option_t* option)
             Int_t const iBar = mapped->GetBarId();        // 1..n
             Int_t const iSide = mapped->GetSideId();      // 1..n
             Int_t const iEdge = mapped->GetEdgeId();
+            Float_t const tc = mapped->GetTimeCoarse();
+            Float_t const tf = mapped->GetTimeFine();
 
             if (iPlaneMem != iPlane)
                 iBarMem = 0;
