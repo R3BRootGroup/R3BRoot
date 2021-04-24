@@ -36,29 +36,29 @@ class R3BLosCalData : public TObject
     UInt_t GetTAMEXLNcha();
     UInt_t GetTAMEXTNcha();
     UInt_t GetMTDC32Ncha();
-     
-    Double_t GetTimeV_ns(UInt_t)     const;
-    Double_t GetTimeL_ns(UInt_t)     const;
-    Double_t GetTimeT_ns(UInt_t)     const;
-    Double_t GetTimeM_ns(UInt_t)     const;
+
+    Double_t GetTimeV_ns(UInt_t) const;
+    Double_t GetTimeL_ns(UInt_t) const;
+    Double_t GetTimeT_ns(UInt_t) const;
+    Double_t GetTimeM_ns(UInt_t) const;
 
     Double_t GetMeanTime();
     Double_t GetMeanTimeTAMEXL();
     Double_t GetMeanTimeTAMEXT();
     Double_t GetMeanTimeVFTX();
     Double_t GetMeanTimeMTDC32();
-   
+
   private:
     UInt_t fDetector;
     void Reset();
 
   public:
-    Double_t fTimeV_ns[8];   // VFTX
-    Double_t fTimeL_ns[8];   // TAMEX leading
-    Double_t fTimeT_ns[8];   // TAMEX trailing
-    Double_t fTimeM_ns[8];   // MTDC32
+    Double_t fTimeV_ns[8]; // VFTX
+    Double_t fTimeL_ns[8]; // TAMEX leading
+    Double_t fTimeT_ns[8]; // TAMEX trailing
+    Double_t fTimeM_ns[8]; // MTDC32
 
-    ClassDef(R3BLosCalData, 2) 
+    ClassDef(R3BLosCalData, 2)
 };
 
 #endif

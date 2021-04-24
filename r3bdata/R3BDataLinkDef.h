@@ -103,6 +103,7 @@
 #pragma link C++ class R3BRoluCalData+;
 #pragma link C++ class R3BRoluHitData+;
 #pragma link C++ class R3BSci2MappedData+;
+#pragma link C++ class R3BSci2TcalData+;
 #pragma link C++ class R3BSci2CalData+;
 #pragma link C++ class R3BSci2HitData+;
 #pragma link C++ class R3BSci8MappedData+;
@@ -131,9 +132,6 @@
 #pragma link C++ class R3BFibMappedData+;
 #pragma link C++ class R3BFibCalData+;
 #pragma link C++ class R3BFibPoint+;
-#pragma link C++ class R3BSci2MappedData+;
-#pragma link C++ class R3BSci2CalData+;
-#pragma link C++ class R3BSci2HitData+;
 #pragma link C++ class R3BSci8MappedData+;
 #pragma link C++ class R3BSci8CalData+;
 #pragma link C++ class R3BSci8HitData+;

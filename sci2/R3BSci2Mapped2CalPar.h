@@ -78,10 +78,7 @@ class R3BSci2Mapped2CalPar : public FairTask
      * Method for setting the update rate for control histograms
      * @param rate an update rate value (events).
      */
-    inline void SetUpdateRate(Int_t rate)
-    {
-        fUpdateRate = rate;
-    }
+    inline void SetUpdateRate(Int_t rate) { fUpdateRate = rate; }
 
     /**
      * Method for setting minimum required statistics per module.
@@ -90,19 +87,13 @@ class R3BSci2Mapped2CalPar : public FairTask
      * calibrated.
      * @param minStats a value of minimum statistics required.
      */
-    inline void SetMinStats(Int_t minStats)
-    {
-        fMinStats = minStats;
-    }
+    inline void SetMinStats(Int_t minStats) { fMinStats = minStats; }
 
     /**
      * Method for selecting events with certain trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
-    inline void SetTrigger(Int_t trigger)
-    {
-        fTrigger = trigger;
-    }
+    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
 
     /**
      * Method for setting number of SCI2 detectors and channels.
@@ -111,22 +102,22 @@ class R3BSci2Mapped2CalPar : public FairTask
      */
     inline void SetNofModules(Int_t nDets, Int_t nCh)
     {
-        fNofDetectors = nDets;		
-        fNofChannels  = nCh;  // = 2
-        fNofTypes     = 3;
-        fNofModules   = nDets * nCh * 3 ; 
+        fNofDetectors = nDets;
+        fNofChannels = nCh; // = 3 with Tref
+        fNofTypes = 3;
+        fNofModules = nDets * nCh * 3;
     }
 
   private:
     Int_t fUpdateRate; /**< An update rate. */
     Int_t fMinStats;   /**< Minimum statistics required per module. */
     Int_t fTrigger;    /**< Trigger value. */
-    Int_t Icount[2][3]{};
-    
-    UInt_t fNofDetectors;   /**< Number of detectors. */
-    UInt_t fNofChannels;    /**< Number of channels per detector. */
-    UInt_t fNofTypes = 3;       /**< Number of time-types per channel (VFTX, TAMEX leading/trailing). */
-    UInt_t fNofModules;     /**< Total number of modules (=edges) to calibrate */
+    Int_t Icount[3][3]{};
+
+    UInt_t fNofDetectors; /**< Number of detectors. */
+    UInt_t fNofChannels;  /**< Number of channels per detector. */
+    UInt_t fNofTypes = 3; /**< Number of time-types per channel (VFTX, TAMEX leading/trailing). */
+    UInt_t fNofModules;   /**< Total number of modules (=edges) to calibrate */
 
     Int_t fNEvents;         /**< Event counter. */
     R3BTCalPar* fCal_Par;   /**< Parameter container. */
@@ -140,4 +131,3 @@ class R3BSci2Mapped2CalPar : public FairTask
 };
 
 #endif
-

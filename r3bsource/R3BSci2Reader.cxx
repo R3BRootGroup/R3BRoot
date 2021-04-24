@@ -12,7 +12,7 @@ extern "C"
 #include "TMath.h"
 #define IS_NAN(x) TMath::IsNaN(x)
 #define NUM_SCI2_DETECTORS 1
-#define NUM_SCI2_CHANNELS 2
+#define NUM_SCI2_CHANNELS 3 // 1=RIGHT, 2=LEFT, 3=Tref
 #include <iostream>
 
 using namespace std;

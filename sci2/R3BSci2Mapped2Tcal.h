@@ -1,17 +1,11 @@
-// ---------------------------------------------------------------
-// -----                  R3BSci2Mapped2Cal                   -----
-// -----            Created August 6th 2019 by M. Heil -----
-// ----- Convert mapped data to time calibrated data         -----
-// ----- Following R3BLosMapped2Cal                          -----
-// ---------------------------------------------------------------
-
-#ifndef R3BSCI2MAPPED2CAL
-#define R3BSCI2MAPPED2CAL
+#ifndef R3BSCI2MAPPED2TCAL
+#define R3BSCI2MAPPED2TCAL
 
 #include <map>
 
 #include "FairTask.h"
-#include "R3BSci2CalData.h"
+
+#include "R3BSci2TcalData.h"
 
 class TClonesArray;
 class TH1F;
@@ -20,14 +14,7 @@ class R3BTCalModulePar;
 class R3BTCalPar;
 class R3BEventHeader;
 
-/**
- * An analysis task to apply TCAL calibration for NeuLAND.
- * This class reads NeuLAND mapped items with TDC values and
- * produces time items with time in [ns]. It requires TCAL
- * calibration parameters, which are produced in a separate
- * analysis run containing R3BSci2Mapped2CalFill task.
- */
-class R3BSci2Mapped2Cal : public FairTask
+class R3BSci2Mapped2Tcal : public FairTask
 {
 
   public:
@@ -35,7 +22,7 @@ class R3BSci2Mapped2Cal : public FairTask
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BSci2Mapped2Cal();
+    R3BSci2Mapped2Tcal();
 
     /**
      * Standard constructor.
@@ -43,13 +30,13 @@ class R3BSci2Mapped2Cal : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BSci2Mapped2Cal(const char* name, Int_t iVerbose = 1);
+    R3BSci2Mapped2Tcal(const char* name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BSci2Mapped2Cal();
+    virtual ~R3BSci2Mapped2Tcal();
 
     /**
      * Method for task initialization.
@@ -98,23 +85,19 @@ class R3BSci2Mapped2Cal : public FairTask
     inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
 
     /**
-     * Method for setting the number of NeuLAND modules.
-     * @param nPMTs a number of photomultipliers.
-     * @param n17 a number of channels with stop signal (17-th channel).
      */
     inline void SetNofModules(Int_t nDets, Int_t nChs)
     {
         fNofDetectors = nDets;
-        fNofChannels = nChs; //=2
-        fNofTypes = 3;
+        fNofChannels = nChs; //=3
         fNofModules = nChs * nDets * 3;
     }
 
   private:
     // std::map<Int_t, R3BTCalModulePar*> fMapPar; /**< Map for matching mdoule ID with parameter container. */
-    TClonesArray* fMappedItems; /**< Array with mapped items - input data. */
-    TClonesArray* fCalItems;    /**< Array with cal items - output data. */
-    Int_t fNofCalItems;         /**< Number of produced time items per event. */
+    TClonesArray* fMapped; /**< Array with mapped items - input data. */
+    TClonesArray* fTcal;   /**< Array with cal items - output data. */
+    Int_t fNofTcalItems;   /**< Number of produced time items per event. */
     Int_t Icounts_good = 0;
     Int_t Icounts_tot = 0;
 
@@ -127,13 +110,15 @@ class R3BSci2Mapped2Cal : public FairTask
 
     UInt_t fNofDetectors; /**< Number of detectors. */
     UInt_t fNofChannels;  /**< Number of channels per detector. */
-    UInt_t fNofTypes = 3;
-    UInt_t fNofModules;  /**< Total number of channels. */
-    Double_t fClockFreq; /**< Clock cycle in [ns]. */
+    UInt_t fNofModules;   /**< Total number of channels. */
+    Double_t fClockFreq;  /**< Clock cycle in [ns]. */
     UInt_t fNEvent;
 
+    // Private method to add TcalData
+    R3BSci2TcalData* AddTcalData(Int_t det, Int_t ch, Double_t tns);
+
   public:
-    ClassDef(R3BSci2Mapped2Cal, 1)
+    ClassDef(R3BSci2Mapped2Tcal, 1)
 };
 
 #endif
