@@ -174,6 +174,7 @@ class R3BOnlineSpectraLosVsSci2 : public FairTask
     void Reset_LosVsSci2_Histo();
 
     // --- hard coded calibration
+    void SetToFoffset(Double_t offset) { fToFoffset = offset; }
     void SetToFmin(Double_t t) { fToFmin = t; }
     void SetToFmax(Double_t t) { fToFmax = t; }
     void SetTof2InvV_p0(Double_t p) { fTof2InvV_p0 = p; }
@@ -207,6 +208,9 @@ class R3BOnlineSpectraLosVsSci2 : public FairTask
     Int_t fSamp;
     Double_t fClockFreq; /**< Clock cycle in [ns]. */
     Int_t nLosEvents = 0;
+    // Adjust the offset when a DAQ subsystem restarts
+    Double_t fToFoffset;
+
     //   TClonesArray *fbmonMappedItems;
     Int_t fNofLosDetectors; /**< Number of LOS detectors. */
 

@@ -565,3 +565,4 @@ void R3BOnlineSpectraSci2::FinishTask()
         }
     } // end of loop over fNbDetectors
 }
+ClassImp(R3BOnlineSpectraSci2)
