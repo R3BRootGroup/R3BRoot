@@ -36,6 +36,7 @@ ${FAIRROOT_LIBRARY_DIR}
 link_directories( ${LINK_DIRECTORIES})
 
 set(SRCS
+R3BSci2Mapped2Tcal.cxx
 R3BSci2Mapped2Cal.cxx
 R3BSci2Mapped2CalPar.cxx
 R3BSci2Cal2Hit.cxx

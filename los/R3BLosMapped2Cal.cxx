@@ -310,82 +310,82 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 
                     case 1:
                     { // change to 1
-                        if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(0)))
+                        /*if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(0)))
                             goto skip_event_pileup;
                         if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(0)))
                             goto skip_event_pileup;
                         if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(0)))
-                            goto skip_event_pileup;
+                            goto skip_event_pileup;*/
                     }
                     break;
                     case 3:
-                    { // change to 3
-                        if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(2)))
-                            goto skip_event_pileup;
-                        if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(2)))
-                            goto skip_event_pileup;
-                        if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(2)))
-                            goto skip_event_pileup;
+                    {   // change to 3
+                        /* if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(2)))
+                             goto skip_event_pileup;
+                         if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(2)))
+                             goto skip_event_pileup;
+                         if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(2)))
+                             goto skip_event_pileup;*/
                     }
                     break;
                     case 5:
-                    { // change to 5
-                        if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(4)))
-                            goto skip_event_pileup;
-                        if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(4)))
-                            goto skip_event_pileup;
-                        if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(4)))
-                            goto skip_event_pileup;
+                    {   // change to 5
+                        /* if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(4)))
+                             goto skip_event_pileup;
+                         if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(4)))
+                             goto skip_event_pileup;
+                         if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(4)))
+                             goto skip_event_pileup;*/
                     }
                     break;
                     case 7:
-                    { // change to 7
-                        if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(6)))
-                            goto skip_event_pileup;
-                        if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(6)))
-                            goto skip_event_pileup;
-                        if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(6)))
-                            goto skip_event_pileup;
+                    {   // change to 7
+                        /* if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(6)))
+                             goto skip_event_pileup;
+                         if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(6)))
+                             goto skip_event_pileup;
+                         if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(6)))
+                             goto skip_event_pileup;*/
                     }
                     break;
                     case 2:
-                    { // change to 2
-                        if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(1)))
-                            goto skip_event_pileup;
-                        if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(1)))
-                            goto skip_event_pileup;
-                        if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(1)))
-                            goto skip_event_pileup;
+                    {   // change to 2
+                        /* if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(1)))
+                             goto skip_event_pileup;
+                         if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(1)))
+                             goto skip_event_pileup;
+                         if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(1)))
+                             goto skip_event_pileup;*/
                     }
                     break;
                     case 4:
                     { // change to 4
-                        if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(3)))
+                        /*if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(3)))
                             goto skip_event_pileup;
                         if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(3)))
                             goto skip_event_pileup;
                         if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(3)))
-                            goto skip_event_pileup;
+                            goto skip_event_pileup;*/
                     }
                     break;
                     case 6:
                     { // change to 6
-                        if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(5)))
+                        /*if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(5)))
                             goto skip_event_pileup;
                         if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(5)))
                             goto skip_event_pileup;
                         if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(5)))
-                            goto skip_event_pileup;
+                            goto skip_event_pileup;*/
                     }
                     break;
                     case 8:
                     { // change to 8
-                        if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(7)))
-                            goto skip_event_pileup;
-                        if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(7)))
-                            goto skip_event_pileup;
-                        if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(7)))
-                            goto skip_event_pileup;
+                      // if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(7)))
+                      //      goto skip_event_pileup;
+                      //  if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(7)))
+                      //      goto skip_event_pileup;
+                      //  if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(7)))
+                      //    goto skip_event_pileup;
                     }
                     break;
                 }
@@ -440,9 +440,9 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
         //                            times_ns<<", "<<hit->GetTimeFine()<<", "<<hit->GetTimeCoarse()<<endl;
 
         continue;
-    skip_event_pileup:
-        LOG(WARNING) << "R3BLosMapped2Cal::Exec : " << fNEvent << " iCha: " << iCha << " iType: " << iType
-                     << " iCal: " << iCal << " Skip event because of pileup.";
+        // skip_event_pileup:
+        //   LOG(WARNING) << "R3BLosMapped2Cal::Exec : " << fNEvent << " iCha: " << iCha << " iType: " << iType
+        //              << " iCal: " << iCal << " Skip event because of pileup.";
     }
 
     ++fNEvent;

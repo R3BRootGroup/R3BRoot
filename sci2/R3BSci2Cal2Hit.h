@@ -5,8 +5,6 @@
 // ----- Following R3BLosCal2Hit
 // ------------------------------------------------------------------
 
-
-
 #ifndef R3BSCI2CAL2HIT
 #define R3BSCI2CAL2HIT
 
@@ -76,24 +74,22 @@ class R3BSci2Cal2Hit : public FairTask
      * the tasks.
      */
     virtual void FinishEvent();
-    
-     /*
+
+    /*
      * Methods for setting position offset and effective velocity of light
      */
     inline void SetSci2ParamMCFD(Double_t offsetX, Double_t veffX)
     {
         fsci2OffsetX = offsetX;
-        fsci2VeffX = veffX;  
-    }    
-        
+        fsci2VeffX = veffX;
+    }
 
     inline void SetSci2ParamTAMEX(Double_t offsetXT, Double_t veffXT)
     {
         fsci2OffsetXT = offsetXT;
         fsci2VeffXT = veffXT;
     }
-	   
- 
+
     /*
      * Method for finish of the task execution.
      * Is called by the framework after processing the event loop.
@@ -105,30 +101,26 @@ class R3BSci2Cal2Hit : public FairTask
     TClonesArray* fHitItems; /* < Array with Hit items - output data. */
     UInt_t fNofHitItems;     /* < Number of hit items for cur event. */
     Double_t fClockFreq;     /* < Clock cycle in [ns]. */
-    Double_t fsci2VeffX;   
+    Double_t fsci2VeffX;
     Double_t fsci2OffsetX;
     Double_t fsci2OffsetXT;
-    Double_t fsci2VeffXT;   
-   
-    TClonesArray* fMapped;  /* < Array with mapped data - input data. */
+    Double_t fsci2VeffXT;
 
-    TH1F* fhTres_M; 
-    TH1F* fhTres_T; 
+    TClonesArray* fMapped; /* < Array with mapped data - input data. */
+
+    TH1F* fhTres_M;
+    TH1F* fhTres_T;
     TH1F* fhQ;
-    
+
     TH2F* fhQ_L;
     TH2F* fhQ_R;
     TH2F* fhQ_vs_X;
-    TH2F* fhQ1_vs_Q2;    
+    TH2F* fhQ1_vs_Q2;
 
+    Int_t Icount = 0;
 
-
-    Int_t Icount=0;
-       
-    
   public:
     ClassDef(R3BSci2Cal2Hit, 1)
 };
 
 #endif
-

@@ -73,7 +73,7 @@ R3BSci2Mapped2CalPar::~R3BSci2Mapped2CalPar()
 InitStatus R3BSci2Mapped2CalPar::Init()
 {
 
-    for (UInt_t i = 0; i < 2; i++)
+    for (UInt_t i = 0; i < 3; i++)
     {
         for (UInt_t k = 0; k < 3; k++)
         {
@@ -171,7 +171,7 @@ void R3BSci2Mapped2CalPar::FinishTask()
 
     fCal_Par->printParams();
 
-    for (UInt_t i = 0; i < 2; i++)
+    for (UInt_t i = 0; i < 3; i++)
     {
         for (UInt_t k = 0; k < 3; k++)
         {
