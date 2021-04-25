@@ -19,7 +19,7 @@
 
 #ifndef R3BONLINESPECTRALOSSTANDALONE
 #define R3BONLINESPECTRALOSSTANDALONE
-
+ 
 #include "FairTask.h"
 #include <array>
 #include <fstream>

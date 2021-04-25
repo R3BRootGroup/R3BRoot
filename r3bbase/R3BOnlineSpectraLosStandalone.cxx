@@ -877,7 +877,7 @@ void R3BOnlineSpectraLosStandalone::FinishEvent()
             fCalItems.at(det)->Clear();
         }
     }
-}
+} 
 
 void R3BOnlineSpectraLosStandalone::FinishTask()
 {
