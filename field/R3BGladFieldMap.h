@@ -82,6 +82,8 @@ class R3BGladFieldMap : public FairField
     /** Set a global field scaling factor **/
     virtual void SetScale(Double_t factor) { fScale = factor; }
 
+    void SetTrackerCorrection(const Double_t& corr) { fTrackerCorr = corr; }
+
     /** Accessors to field parameters in local coordinate system **/
     Double_t GetXmin() const { return fXmin; }
     Double_t GetYmin() const { return fYmin; }
@@ -171,6 +173,8 @@ class R3BGladFieldMap : public FairField
      **/
     TRotation* gRot;  //!
     TVector3* gTrans; //!
+
+    Double_t fTrackerCorr;
 
     ClassDef(R3BGladFieldMap, 2)
 };

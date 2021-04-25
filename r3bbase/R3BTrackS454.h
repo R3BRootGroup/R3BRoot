@@ -200,6 +200,9 @@ class R3BTrackS454 : public FairTask
 	TCutG *cut_fi12_fi3b;
 	TCutG *cut_Fi13vsFi11;
 	TCutG *cut_Fi10vsFi12;
+	TCutG *cut_fi11_ToFD;
+	TCutG *cut_fi13_ToFD;
+	TCutG *cut_fiber11_fiber13;
 	
     unsigned long long time_start = 0, time = 0;
     unsigned long long ic_start = 0, see_start = 0, tofdor_start = 0;
@@ -308,7 +311,14 @@ class R3BTrackS454 : public FairTask
 	TH2F* fh_Fib10_vs_Fib12_dx_back;
 	TH2F* fh_Fib12_vs_Fib3b_back;
 	TH2F* fh_Fib12_vs_Fib3b_dx_back;
-
+	
+	TH1F* fh_Fib11_eff;
+	TH1F* fh_Fib13_eff;
+	TH1F* fh_Counts_Fib11;
+	TH1F* fh_Counts_Fib13;
+	TH1F* fh_Hits_Fib11;
+	TH1F* fh_Hits_Fib13;
+    
     TH2F* fh_Cave_position;
 
     TH2F* fh_xy_tofd;
@@ -364,10 +374,16 @@ class R3BTrackS454 : public FairTask
 
 	TH2F* fh_dErel_vs_x;
 	TH2F* fh_dErel_vs_y;
+
+	TH1F* fh_res_x[10];
+	TH1F* fh_res_y[10];
 	
 	TH2F* fh_xy[10];
 	TH2F* fh_p_vs_x[10];
 	TH2F* fh_p_vs_x_test[10];
+
+    TH2F* fh_px_px;
+    TH2F* fh_x4He_vs_x12C;
 	
   public:
     ClassDef(R3BTrackS454, 1)

@@ -320,13 +320,13 @@ void R3BFragmentTracker::Exec(const Option_t*)
                             candidate->AddHit("fi5", ifi5);
                             candidate->AddHit("fi6", ifi6);
                             candidate->AddHit("tofd", itof);
-
                             // find momentum
                             // momin is only a first guess
                             Int_t status = fFitter->FitTrackBackward2D(candidate, fDetectors);
 
                             nCand += 1;
 
+                            cout << "Momentum: " << candidate->GetMomentum().Z() << endl;
                             if (TMath::IsNaN(candidate->GetMomentum().Z()))
                             {
                                 delete candidate;
@@ -367,12 +367,24 @@ void R3BFragmentTracker::Exec(const Option_t*)
                             // return;
                             itof += 1;
                         } while (itof < tof->hits.size());
+                        itof = 0;
+                        if (0 == tof->hits.size())
+                            itof = -1;
                         ifi6 += 1;
                     } while (ifi6 < fi6->hits.size());
+                    ifi6 = 0;
+                    if (0 == fi6->hits.size())
+                        ifi6 = -1;
                     ifi5 += 1;
                 } while (ifi5 < fi5->hits.size());
+                ifi5 = 0;
+                if (0 == fi5->hits.size())
+                    ifi5 = -1;
                 ifi4 += 1;
             } while (ifi4 < fi4->hits.size());
+            ifi4 = 0;
+            if (0 == fi4->hits.size())
+                ifi4 = -1;
             ipsp += 1;
         } while (ipsp < psp->hits.size());
     }
@@ -501,13 +513,17 @@ void R3BFragmentTracker::Exec(const Option_t*)
 
             // Convert global track coordinates into local on the det plane
             det->GlobalToLocal(candidate->GetPosition(), x_l, y_l);
-            Double_t det_hit_x =
-                fDetectors
-                    ->GetHit(det->GetDetectorName().Data(), candidate->GetHitIndexByName(det->GetDetectorName().Data()))
-                    ->GetX();
-            fh_x_res[iDet]->Fill(x_l - det_hit_x);
-            fh_x_pull[iDet]->Fill((x_l - det_hit_x) / det->res_x);
-            iDet++;
+            R3BHit* hit = nullptr;
+            Int_t hitIndex = candidate->GetHitIndexByName(det->GetDetectorName().Data());
+            if (hitIndex >= 0)
+                hit = fDetectors->GetHit(det->GetDetectorName().Data(), hitIndex);
+            if (hit && det->res_x > 1e-6)
+            {
+                Double_t det_hit_x = hit->GetX();
+                fh_x_res[iDet]->Fill(x_l - det_hit_x);
+                fh_x_pull[iDet]->Fill((x_l - det_hit_x) / det->res_x);
+                iDet++;
+            }
         }
         candidate->Reset();
 

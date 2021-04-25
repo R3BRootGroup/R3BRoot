@@ -197,7 +197,7 @@ class R3BTrackS494 : public FairTask
 	Double_t delta;
 
 	TCutG *cut_fi31_fi23a;
-	TCutG *cut_fi32_fi23b;
+	TCutG *cut_fi30_fi23b;
 	TCutG *cut_Fi33vsFi31;
 	TCutG *cut_Fi30vsFi32;
 	
@@ -282,23 +282,28 @@ class R3BTrackS494 : public FairTask
     TH2F* fh_ToF_vs_Events[NOF_FIB_DET];
     TH2F* fh_ToF_vs_Events_ac[NOF_FIB_DET];
 
+	TH2F* fh_Fib30_vs_Fib23a;
+	TH2F* fh_Fib30_vs_Fib23a_dx;
+	TH2F* fh_Fib31_vs_Fib23b;
+	TH2F* fh_Fib31_vs_Fib23b_dx;
+
 	TH2F* fh_Fib33_vs_Fib31;
 	TH2F* fh_Fib33_vs_Fib31_dx;
 	TH2F* fh_Fib31_vs_Fib23a;
 	TH2F* fh_Fib31_vs_Fib23a_dx;
-	TH2F* fh_Fib30_vs_Fib32;
-	TH2F* fh_Fib30_vs_Fib32_dx;
-	TH2F* fh_Fib32_vs_Fib23b;
-	TH2F* fh_Fib32_vs_Fib23b_dx;
+	TH2F* fh_Fib32_vs_Fib30;
+	TH2F* fh_Fib32_vs_Fib30_dx;
+	TH2F* fh_Fib30_vs_Fib23b;
+	TH2F* fh_Fib30_vs_Fib23b_dx;
 
 	TH2F* fh_Fib33_vs_Fib31_back;
 	TH2F* fh_Fib33_vs_Fib31_dx_back;
 	TH2F* fh_Fib31_vs_Fib23a_back;
 	TH2F* fh_Fib31_vs_Fib23a_dx_back;
-	TH2F* fh_Fib30_vs_Fib32_back;
-	TH2F* fh_Fib30_vs_Fib32_dx_back;
-	TH2F* fh_Fib32_vs_Fib23b_back;
-	TH2F* fh_Fib32_vs_Fib23b_dx_back;
+	TH2F* fh_Fib32_vs_Fib30_back;
+	TH2F* fh_Fib32_vs_Fib30_dx_back;
+	TH2F* fh_Fib30_vs_Fib23b_back;
+	TH2F* fh_Fib30_vs_Fib23b_dx_back;
 
     TH2F* fh_Cave_position;
 
@@ -320,14 +325,27 @@ class R3BTrackS494 : public FairTask
     TH1F* fh_target_pz;
     TH1F* fh_target_p;
     TH1F* fh_chi2;
+    
     TH1F* fh_px_He;
     TH1F* fh_py_He;
     TH1F* fh_pz_He;
     TH1F* fh_p_He;
+    
+    TH1F* fh_dpx_He;
+    TH1F* fh_dpy_He;
+    TH1F* fh_dpz_He;
+    TH1F* fh_dp_He;
+
     TH1F* fh_px_C;
     TH1F* fh_py_C;
     TH1F* fh_pz_C;
     TH1F* fh_p_C;
+
+    TH1F* fh_dpx_C;
+    TH1F* fh_dpy_C;
+    TH1F* fh_dpz_C;
+    TH1F* fh_dp_C;
+    
 
     TH2F* fh_chiy_vs_chix;
     
@@ -347,6 +365,11 @@ class R3BTrackS494 : public FairTask
     TH2F* fh_thetax_dpy;
     TH2F* fh_thetay_dpx;
     TH2F* fh_dpy_dpx;
+    TH2F* fh_px_px;
+    TH2F* fh_p_p_simu;
+    TH1F* fh_sum_p_simu;
+    TH2F* fh_p_p;
+    TH1F* fh_sum_p;
 
 	TH1F* fh_theta26_simu;
 	TH1F* fh_Erel_simu;
@@ -359,6 +382,8 @@ class R3BTrackS494 : public FairTask
 	TH2F* fh_xy[10];
 	TH2F* fh_p_vs_x[10];
 	TH2F* fh_p_vs_x_test[10];
+	
+    TH2F* fh_x4He_vs_x12C;
 	
   public:
     ClassDef(R3BTrackS494, 1)

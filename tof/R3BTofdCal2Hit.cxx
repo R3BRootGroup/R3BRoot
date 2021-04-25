@@ -569,6 +569,51 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                 if (timeLos == 0)
                     LOG(WARNING) << "Los Time is zero! ";
                 Double_t ToF = (bot_ns + top_ns) / 2. - timeLos - par->GetSync();
+                if (iPlane == 1 && iBar == 16)
+                    ToF -= 740.;
+                if (iPlane == 1 && iBar == 17)
+                    ToF += 275.;
+                if (iPlane == 1 && iBar == 18)
+                    ToF += 950.;
+                if (iPlane == 1 && iBar == 19)
+                    ToF -= 955.;
+                if (iPlane == 1 && iBar == 25)
+                    ToF -= 1920.;
+                if (iPlane == 1 && iBar == 26)
+                    ToF -= 1820.;
+                if (iPlane == 1 && iBar == 27)
+                    ToF -= 250.;
+
+                if (iPlane == 2 && iBar == 16)
+                    ToF -= 1980.;
+                if (iPlane == 2 && iBar == 17)
+                    ToF += 995.;
+                if (iPlane == 2 && iBar == 18)
+                    ToF += 155.;
+                if (iPlane == 2 && iBar == 19)
+                    ToF -= 1195.;
+                if (iPlane == 2 && iBar == 25)
+                    ToF += 675.;
+                if (iPlane == 2 && iBar == 26)
+                    ToF += 660.;
+                if (iPlane == 2 && iBar == 27)
+                    ToF -= 940.;
+
+                if (iPlane == 3 && iBar == 25)
+                    ToF += 350.;
+                if (iPlane == 3 && iBar == 26)
+                    ToF -= 1660.;
+                if (iPlane == 3 && iBar == 27)
+                    ToF += 695.;
+                if (iPlane == 4 && iBar == 25)
+                    ToF -= 695.;
+                if (iPlane == 4 && iBar == 26)
+                    ToF += 655. + 2.3;
+                if (iPlane == 4 && iBar == 27)
+                    ToF += 3000. - 1180.;
+
+                //   				cout << "Test: " << iBar << "  " << ToF << endl;
+
                 if (std::isnan(ToF))
                 {
                     LOG(FATAL) << "ToFD ToF not found";
@@ -750,12 +795,12 @@ void R3BTofdCal2Hit::Exec(Option_t* option)
                     // fhTsync[iPlane-1]->Fill(iBar,ToF);
                     fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
                     fhQvsPos[iPlane - 1][iBar - 1]->Fill(pos, parz[0] * TMath::Power(qb, parz[2]) + parz[1]);
-                    fhQvsTof[iPlane - 1][iBar - 1]->Fill(qb, ToF);
+                    // cout << "Test: " << qb << "  " << ToF << endl;
+                    fhQvsTof[iPlane - 1][iBar - 1]->Fill(parz[0] * TMath::Power(qb, parz[2]) + parz[1], ToF);
                     fhTvsTof[iPlane - 1][iBar - 1]->Fill(dt_mod, ToF);
                     fhToTvsTofw[iPlane - 1][iBar - 1]->Fill((bot_tot + top_tot) / 2.,
                                                             ToF); // needed to get TOF w/o walk correction
                 }
-
                 // Time reference in case on has the master signal in one of the TDC channels.
                 // Not used at the moment.
                 timeRef = 0;
@@ -1312,7 +1357,7 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
     {
         char strName[255];
         sprintf(strName, "Q_vs_ToF_Plane_%d_Bar_%d", iPlane, iBar);
-        fhQvsTof[iPlane - 1][iBar - 1] = new TH2F(strName, "", 1000, 0., max_charge, 1000, -10, 40);
+        fhQvsTof[iPlane - 1][iBar - 1] = new TH2F(strName, "", 1000, 0., max_charge, 1000, -10, 20);
         fhQvsTof[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToF in ns");
         fhQvsTof[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Charge");
     }
@@ -1330,7 +1375,7 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
     {
         char strName[255];
         sprintf(strName, "ToT_vs_ToF_Plane_%d_Bar_%d_w", iPlane, iBar);
-        fhToTvsTofw[iPlane - 1][iBar - 1] = new TH2F(strName, "", 1000, 0., 200, 1000, -10, 40);
+        fhToTvsTofw[iPlane - 1][iBar - 1] = new TH2F(strName, "", 1000, 0., 200, 1000, -1000, 4000);
         fhToTvsTofw[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToT in ns");
         fhToTvsTofw[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToF in ns");
     }
@@ -1421,7 +1466,7 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         {
             char strName[255];
             sprintf(strName, "Tdiff_Plane_%dand%d_Bar_%dvsQ", iPlane, iPlane + 1, iBar * 2 - 1);
-            fhTdiffvsQ[iPlane - 1][iBar * 2 - 2] = new TH2F(strName, "", 1000, -10, 10, 1200, 0., 60.);
+            fhTdiffvsQ[iPlane - 1][iBar * 2 - 2] = new TH2F(strName, "", 2000, -10, 10, 1200, 0., 60.);
             fhTdiffvsQ[iPlane - 1][iBar * 2 - 2]->GetYaxis()->SetTitle("charge");
             fhTdiffvsQ[iPlane - 1][iBar * 2 - 2]->GetXaxis()->SetTitle("dt in ns");
         }
@@ -1429,7 +1474,7 @@ void R3BTofdCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         {
             char strName[255];
             sprintf(strName, "Tdiff_Plane_%dand%d_Bar_%dvsQ", iPlane, iPlane + 1, iBar * 2 - 2);
-            fhTdiffvsQ[iPlane - 1][iBar * 2 - 3] = new TH2F(strName, "", 1000, -10, 10, 1200, 0., 60.);
+            fhTdiffvsQ[iPlane - 1][iBar * 2 - 3] = new TH2F(strName, "", 1000, -50, 50, 1200, 0., 60.);
             fhTdiffvsQ[iPlane - 1][iBar * 2 - 3]->GetYaxis()->SetTitle("charge");
             fhTdiffvsQ[iPlane - 1][iBar * 2 - 3]->GetXaxis()->SetTitle("dt in ns");
         }

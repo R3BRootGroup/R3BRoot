@@ -396,7 +396,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                     lead_trig_ns = lead_trig->GetTime_ns();
                 }
             }
-            else if (cur_cal->IsSPMT() && fSPMTTriggerMap)
+            else if (cur_cal->IsSPMT() && fSPMTTriggerMap && 1 == 0) // Don't use this for s454
             {
                 auto cur_cal_trig_i = fSPMTTriggerMap[ch_i];
                 auto lead_trig_i = fSPMTTriggerMap[lead->GetChannel() - 1];
@@ -604,12 +604,11 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
 
             if (fName == "Fi10" || fName == "Fi11" || fName == "Fi12" || fName == "Fi13")
             {
-                Float_t fiber_thickness = 0.050000 * 2.; // s remove *2 when taking SPMT into analysis
-                Int_t fiber_nbr = 1024 / 2;              // s remove /2 when taking SPMT into analysis
+                Float_t fiber_thickness = 0.05 * 2.; // s remove *2 when taking SPMT into analysis
+                Int_t fiber_nbr = 1024 / 2;          // s remove /2 when taking SPMT into analysis
                 Float_t dead_layer = 0.9;
-                Float_t air_layer = 0.01; // relative to fiber_thickness
+                Float_t air_layer = 0.0078125; // relative to fiber_thickness
                 Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
-
                 if (fDirection == VERTICAL)
                 {
                     x = -detector_width / 2. + fiber_thickness / 2. +
@@ -624,14 +623,13 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
                     y = -detector_width / 2. + fiber_thickness / 2. +
                         ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
                 }
-                if (x > 26.)
-                    cout << "fiber_id " << fiber_id << " x " << x << " y " << y << endl;
+                // cout << "fiber_id " << fiber_id << " x " << x << " y " << y << endl;
             }
             if (fName == "Fi1a" || fName == "Fi1b" || fName == "Fi2a" || fName == "Fi2b" || fName == "Fi3a" ||
                 fName == "Fi3b")
             {
-                Float_t fiber_thickness = 0.021000 * 2.; // s remove *2 when taking SPMT into analysis
-                Int_t fiber_nbr = 512 / 2;               // s remove /2 when taking SPMT into analysis
+                Float_t fiber_thickness = 0.0185 * 2.; // s remove *2 when taking SPMT into analysis
+                Int_t fiber_nbr = 512 / 2;             // s remove /2 when taking SPMT into analysis
                 Float_t dead_layer = 0.9;
                 Float_t air_layer = 0.01; // relative to fiber_thickness
                 Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
@@ -652,7 +650,7 @@ void R3BBunchedFiberCal2Hit::Exec(Option_t* option)
             }
             if (fName == "Fi23a" || fName == "Fi23b")
             {
-                Float_t fiber_thickness = 0.021000 * 2.; // s remove *2 when taking SPMT into analysis
+                Float_t fiber_thickness = 0.025000 * 2.; // s remove *2 when taking SPMT into analysis
                 Int_t fiber_nbr = 512 / 2;               // s remove /2 when taking SPMT into analysis
                 Float_t dead_layer = 0.9;
                 Float_t air_layer = 0.01; // relative to fiber_thickness

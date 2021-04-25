@@ -68,7 +68,7 @@ class R3BFi12Digitizer : public FairTask
     Float_t fiber_thickness = 0.050000;
     Int_t fiber_nbr = 1024;
     Float_t dead_layer = 0.9;
-    Float_t air_layer = 0.01; // relative to fiber_thickness
+    Float_t air_layer = 0.0078125; // relative to fiber_thickness
     Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
 
     ClassDef(R3BFi12Digitizer, 1);

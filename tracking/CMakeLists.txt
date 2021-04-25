@@ -46,14 +46,17 @@ link_directories( ${LINK_DIRECTORIES})
 set(SRCS
 R3BTPropagator.cxx
 R3BTGeoPar.cxx
-R3BFragmentTracker.cxx
-R3BFragmentTrackerS494.cxx
 R3BFragmentFitterGeneric.cxx
+#R3BFragmentTracker.cxx
+#R3BFragmentTrackerS454.cxx
+R3BFragmentTrackerS494.cxx
 #R3BFragmentFitterChi2.cxx
+#R3BFragmentFitterChi2S454.cxx
 R3BFragmentFitterChi2S494.cxx
 R3BTrackingDetector.cxx
 R3BTrackingParticle.cxx
 R3BTrackingSetup.cxx
+#R3BOptimizeGeometryS454.cxx
 )
 
 # fill list of header files from list of source files
@@ -63,7 +66,7 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF TrackingLinkDef.h)
 Set(LIBRARY_NAME R3BTracking)
 Set(DEPENDENCIES
-    Base ParBase Minuit)
+    Base ParBase Minuit R3BData)
 
 GENERATE_LIBRARY()
 

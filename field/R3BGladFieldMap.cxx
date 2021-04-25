@@ -48,6 +48,7 @@ R3BGladFieldMap::R3BGladFieldMap()
     fName = "";
     fFileName = "";
     fType = 1;
+    fTrackerCorr = 1.;
 }
 // ------------------------------------------------------------------------
 
@@ -70,6 +71,7 @@ R3BGladFieldMap::R3BGladFieldMap(const char* mapName, const char* fileType)
     else
         fFileName += ".dat";
     fType = 1;
+    fTrackerCorr = 1.;
 }
 
 // ------------   Constructor from R3BGladFieldPar   --------------------------
@@ -103,6 +105,7 @@ R3BGladFieldMap::R3BGladFieldMap(R3BFieldPar* fieldPar)
         fFileName += ".dat";
         // fType = fieldPar->GetType();
     }
+    fTrackerCorr = 1.;
 }
 
 // ------------   Destructor   --------------------------------------------
@@ -121,7 +124,7 @@ R3BGladFieldMap::~R3BGladFieldMap()
 void R3BGladFieldMap::Init()
 {
     fPosX = 0.0;
-    fPosY = 0.0;
+    fPosY = 2.0;
     fPosZ = 163.4;
     fYAngle = -14.;
     gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
@@ -171,7 +174,7 @@ Double_t R3BGladFieldMap::GetBx(Double_t x, Double_t y, Double_t z)
         // Return interpolated field value
         Double_t val = Interpolate(dx, dy, dz);
         // cout << " (X) interpolated " << val << endl;
-        return (val);
+        return (fTrackerCorr * val);
     }
 
     return 0.;
@@ -212,7 +215,7 @@ Double_t R3BGladFieldMap::GetBy(Double_t x, Double_t y, Double_t z)
         // Return interpolated field value
         Double_t val = Interpolate(dx, dy, dz);
         // cout << " (Y) interpolated " << val << endl;
-        return (val);
+        return (fTrackerCorr * val);
     }
 
     return 0.;
@@ -253,7 +256,7 @@ Double_t R3BGladFieldMap::GetBz(Double_t x, Double_t y, Double_t z)
         // Return interpolated field value
         Double_t val = Interpolate(dx, dy, dz);
         // cout << " (Z) interpolated " << val << endl;
-        return (val);
+        return (fTrackerCorr * val);
     }
 
     return 0.;

@@ -19,6 +19,8 @@
 
 #include "R3BFragmentFitterChi2.h"
 
+using namespace std;
+
 #define SPEED_OF_LIGHT 29.9792458 // cm/ns
 #define Amu 0.938272
 
@@ -146,11 +148,14 @@ double Chi2Beta(const double* xx)
         // Convert global track coordinates into local on the det plane
         det->GlobalToLocal(gCandidate->GetPosition(), x_l, y_l);
 
-        R3BHit* hit =
-            gSetup->GetHit(det->GetDetectorName().Data(), gCandidate->GetHitIndexByName(det->GetDetectorName().Data()));
+        R3BHit* hit = nullptr;
+        Int_t hitIndex = gCandidate->GetHitIndexByName(det->GetDetectorName().Data());
+        if (hitIndex >= 0)
+            hit = gSetup->GetHit(det->GetDetectorName().Data(), hitIndex);
 
         // if(kTarget != det->section)
         // if(kAfterGlad == det->section)
+        if (hit && det->res_x > 1e-6)
         {
             chi2 += TMath::Power((x_l - hit->GetX()) / det->res_x, 2);
             // LOG(INFO) << nchi2 << "  " << chi2 << ",  dev: " << (x_l - det->hit_x);
@@ -403,6 +408,16 @@ Int_t R3BFragmentFitterChi2::FitTrack(R3BTrackingParticle* particle, R3BTracking
     return status;
 }
 
+Int_t R3BFragmentFitterChi2::FitTrackMomentumForward(R3BTrackingParticle* particle, R3BTrackingSetup* setup)
+{
+    return 0;
+}
+
+Int_t R3BFragmentFitterChi2::FitTrackMomentumBackward(R3BTrackingParticle* particle, R3BTrackingSetup* setup)
+{
+    return 0;
+}
+
 Int_t R3BFragmentFitterChi2::FitTrackBeta(R3BTrackingParticle* particle, R3BTrackingSetup* setup)
 {
     gCandidate = particle;
@@ -561,7 +576,7 @@ Int_t R3BFragmentFitterChi2::FitTrackBackward2D(R3BTrackingParticle* particle, R
 
     auto fi5 = gSetup->GetByName("fi5");
     auto fi6 = gSetup->GetByName("fi6");
-
+    LOG(info) << "Fi 6 hit index " << particle->GetHitIndexByName("fi6") << " out of " << fi6->hits.size();
     double variable[2] = { 132. * amu, gSetup->GetHit("fi6", particle->GetHitIndexByName("fi6"))->GetX() };
     double step[2] = { 0.01, 0.001 };
 

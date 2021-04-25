@@ -229,6 +229,8 @@ class R3BTrackerTestS454 : public FairTask
 	Int_t counterRolu = 0;
 	Int_t counterTracker = 0;
 	Int_t countdet;
+	Int_t countdet_s;
+	Int_t countdet_ss;
 	Double_t delta;
 
     UInt_t num_spills = 0;

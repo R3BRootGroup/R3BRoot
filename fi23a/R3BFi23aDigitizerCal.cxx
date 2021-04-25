@@ -197,12 +197,19 @@ void R3BFi23aDigitizerCal::Exec(Option_t* opt)
                      *  (1,1), (1,2), (2,1), ... (256,1), (256,2),
                      *  (257,3), (257,4), (258,3), ... (512,3), (512,4)
                      */
+                    /*
+                                        ichanMA = (i % 2 == 0) ? (i / 2 + 1) : (i + 1) / 2; // iFib = 0...., iCha=1...
+                                        if (i < 512)
+                                            ichanSA = (i % 2 == 0) ? 1 : 2;
+                                        if (i > 511)
+                                            ichanSA = (i % 2 == 0) ? 3 : 4;
+                    */
 
-                    ichanMA = (i % 2 == 0) ? (i / 2 + 1) : (i + 1) / 2; // iFib = 0...., iCha=1...
-                    if (i < 512)
-                        ichanSA = (i % 2 == 0) ? 1 : 2;
-                    if (i > 511)
-                        ichanSA = (i % 2 == 0) ? 3 : 4;
+                    ichanMA = i + 1; // iFib = 0...., iCha=1...
+                    if (i < 256)
+                        ichanSA = 1;
+                    if (i > 255)
+                        ichanSA = 2;
 
                     /* From y-position get ToT_MA and ToT_SA only considering absorption;
                      * ToT_MA = energyl*exp(-l/labs), labs assume 100cm
@@ -247,7 +254,7 @@ void R3BFi23aDigitizerCal::Exec(Option_t* opt)
                         R3BBunchedFiberCalData(1, ichanSA, 0, timeSA_trail);
                     if (first)
                     {
-                        for (Int_t j = 0; j < 2; j++)
+                        for (Int_t j = 0; j < 4; j++)
                         {
                             new ((*TriggerHits)[TriggerHits->GetEntries()]) R3BBunchedFiberCalData(2, j + 1, 1, 0.);
                         }

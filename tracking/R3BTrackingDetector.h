@@ -15,6 +15,7 @@
 #define R3B_TRACKING_DETECTOR
 
 #include <vector>
+#include <map>
 
 #include "FairTask.h"
 #include "R3BTrackingParticle.h"
@@ -51,6 +52,10 @@ class R3BTrackingDetector : public TObject
     InitStatus Init();
 
     void CopyHits();
+    
+    void CopyToBuffer();
+    
+    void TakeHitsFromBuffer(Int_t iev);
 
     void Draw(Option_t* option = "");
 
@@ -91,7 +96,10 @@ class R3BTrackingDetector : public TObject
     // In the Exec() function the user has to copy the hit position
     // of interest into the hit_# structures.
     std::vector<R3BHit*> hits; // not used directly by the fitter
+    std::map<int, bool> free_hit;
     TClonesArray* fArrayHits;
+    
+    std::vector<std::vector<R3BHit>> events;
 
     // Double_t hit_x; // local coordinates (on the detector plane)
     // Double_t hit_y;

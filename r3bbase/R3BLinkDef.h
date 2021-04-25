@@ -29,6 +29,7 @@
 #pragma link C++ class R3BOnlineSpectraSfib+;
 #pragma link C++ class R3BGlobalAnalysis+;
 #pragma link C++ class R3BGlobalAnalysisS454+;
+#pragma link C++ class R3BGlobalAnalysisS494+;
 #pragma link C++ class R3BTrackS454+;
 #pragma link C++ class R3BTrackS494+;
 #pragma link C++ class R3BTrackerTestS454+;
@@ -38,5 +39,6 @@
 #pragma link C++ class R3BOnlineSpectraLosStandalone+;
 #pragma link C++ class R3BOnlineSpectraSci2+;
 #pragma link C++ class R3BOnlineSpectraLosVsSci2+;
-
+#pragma link C++ class R3BTrackerPreparationS454+;
+#pragma link C++ class R3BTrackerPreparationS494+;
 #endif

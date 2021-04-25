@@ -134,7 +134,8 @@ void R3BFi23bDigitizerCal::Exec(Option_t* opt)
             TempHits.push_back(TempHit(data_element->GetDetectorID(), // fiber nummer
                                        data_element->GetEnergyLoss(),
                                        data_element->GetTime(),
-                                       data_element->GetYIn()));
+                                       // data_element->GetYIn())); //for vertical fibers
+                                       data_element->GetXIn())); // for horizontal fibers
         }
 
         std::sort(TempHits.begin(), TempHits.end(), [](const TempHit& lhs, const TempHit& rhs) {
@@ -175,6 +176,8 @@ void R3BFi23bDigitizerCal::Exec(Option_t* opt)
         Double_t yrnd, yns, ToT_MA, ToT_SA, ernd, ens, timernd, timeMA_lead = -1., timeMA_trail = -1.,
                                                                 timeSA_lead = -1., timeSA_trail = -1.;
 
+        // cout << "new Event ****" << endl;
+
         Bool_t first = true;
         for (Int_t i = 0; i < NumOfFibers; ++i)
         {
@@ -196,12 +199,19 @@ void R3BFi23bDigitizerCal::Exec(Option_t* opt)
                      *  (257,3), (257,4), (258,3), ... (512,3), (512,4)
                      */
 
-                    ichanMA = (i % 2 == 0) ? (i / 2 + 1) : (i + 1) / 2; // iFib = 0...., iCha=1...
-                    if (i < 512)
-                        ichanSA = (i % 2 == 0) ? 1 : 2;
-                    if (i > 511)
-                        ichanSA = (i % 2 == 0) ? 3 : 4;
+                    ichanMA = i + 1; // iFib = 0...., iCha=1...
+                    if (i < 256)
+                        ichanSA = 1;
+                    if (i > 255)
+                        ichanSA = 2;
 
+                    /*
+                                        ichanMA = (i % 2 == 0) ? (i / 2 + 1) : (i + 1) / 2; // iFib = 0...., iCha=1...
+                                        if (i < 512)
+                                            ichanSA = (i % 2 == 0) ? 1 : 2;
+                                        if (i > 511)
+                                            ichanSA = (i % 2 == 0) ? 3 : 4;
+                    */
                     /* From y-position get ToT_MA and ToT_SA only considering absorption;
                      * ToT_MA = energyl*exp(-l/labs), labs assume 100cm
                      *
@@ -224,6 +234,11 @@ void R3BFi23bDigitizerCal::Exec(Option_t* opt)
                     timeMA_trail = timeMA_lead + ToT_MA;
                     timeSA_trail = timeSA_lead + ToT_SA;
 
+                    /*cout << "Fiber: " << i << " chanMA: " << ichanMA << " chanSA: " << ichanSA <<
+                        " y: " << yrnd << " energy: " << ernd << " TotMA: " << ToT_MA << " ToTSA: " <<
+                        ToT_SA << " time: " << timernd << " time MA: " << timeMA_lead << " time AA: " <<
+                        timeSA_lead << endl;*/
+
                     /* CalData format:                      --> in Tree
                         fIsMAPMT(a_is_mapmt) 0-1            --> FibXYCal.fIsMAPMT
                        ,fChannel(a_channel)  1-SubNum*256   --> FibXYCal.fChannel
@@ -244,7 +259,7 @@ void R3BFi23bDigitizerCal::Exec(Option_t* opt)
                         R3BBunchedFiberCalData(1, ichanSA, 0, timeSA_trail);
                     if (first)
                     {
-                        for (Int_t j = 0; j < 2; j++)
+                        for (Int_t j = 0; j < 4; j++)
                         {
                             new ((*TriggerHits)[TriggerHits->GetEntries()]) R3BBunchedFiberCalData(2, j + 1, 1, 0.);
                         }

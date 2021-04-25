@@ -388,7 +388,7 @@ void R3BTofdCal2HitPar::CreateHistograms(Int_t iPlane, Int_t iBar)
         char strName2[255];
         sprintf(strName1, "Time_Diff_Plane_%d", iPlane);
         sprintf(strName2, "Time Diff Plane %d", iPlane);
-        fhTdiff[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 4000, -20., 20.);
+        fhTdiff[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 400, -20., 20.);
         fhTdiff[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
         fhTdiff[iPlane - 1]->GetYaxis()->SetTitle("Time difference (PM1 - PM2) in ns");
     }

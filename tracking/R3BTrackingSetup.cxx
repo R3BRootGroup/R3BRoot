@@ -110,4 +110,20 @@ void R3BTrackingSetup::CopyHits()
     }
 }
 
+void R3BTrackingSetup::CopyToBuffer()
+{
+    for (auto const& x : fDetectors)
+    {
+        x->CopyToBuffer();
+    }
+}
+
+void R3BTrackingSetup::TakeHitsFromBuffer(Int_t iev)
+{
+    for (auto const& x : fDetectors)
+    {
+        x->TakeHitsFromBuffer(iev);
+    }
+}
+
 ClassImp(R3BTrackingSetup)

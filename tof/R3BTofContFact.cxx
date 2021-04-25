@@ -29,6 +29,7 @@
 #include "R3BGeoTofPar.h"
 //#include "R3BTofDigiPar.h"
 #include "R3BTofdHitPar.h"
+#include "R3BTofiHitPar.h"
 
 #include "FairRuntimeDb.h"
 //#include "CbmParTest.h"
@@ -74,9 +75,14 @@ void R3BTofContFact::setAllContainers()
      containers->Add(p1);
      containers->Add(p2);
      */
+
     FairContainer* p1 = new FairContainer("TofdHitPar", "TOFd Hit Parameters", "TestDefaultContext");
     p1->addContext("TestNonDefaultContext");
     containers->Add(p1);
+
+    FairContainer* p2 = new FairContainer("TofiHitPar", "TOFi Hit Parameters", "TestDefaultContext");
+    p2->addContext("TestNonDefaultContext");
+    containers->Add(p2);
 }
 
 FairParSet* R3BTofContFact::createContainer(FairContainer* c)
@@ -95,9 +101,14 @@ FairParSet* R3BTofContFact::createContainer(FairContainer* c)
     if (strcmp(name,"CbmGeoStsPar")==0) {
       p=new CbmGeoStsPar(c->getConcatName().Data(),c->GetTitle(),c->getContext());
     }*/
+
     if (strcmp(name, "TofdHitPar") == 0)
     {
         p = new R3BTofdHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
+    if (strcmp(name, "TofiHitPar") == 0)
+    {
+        p = new R3BTofiHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
     return p;
 }

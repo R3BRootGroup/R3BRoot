@@ -154,14 +154,14 @@ void R3BTofdDigitizer::Exec(Option_t* opt)
                     if (channel < 200)
                     {
                         layer_label = 0;
-                        // paddle_number = channel - 101;
-                        paddle_number = channel;
+                        paddle_number = channel - 100;
+                        // paddle_number = channel;
                     }
                     else if (channel < 300)
                     {
                         layer_label = 1;
-                        // paddle_number = channel - 201;
-                        paddle_number = channel - 100;
+                        paddle_number = channel - 200;
+                        // paddle_number = channel - 100;
                     }
 
                     X_Pos[channel] = -detector_width / 2. + paddle_width / 2. * (1 + layer_label) +

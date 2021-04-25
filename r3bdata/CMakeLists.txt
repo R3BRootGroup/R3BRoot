@@ -147,9 +147,13 @@ neulandData/R3BPaddleTamexMappedData.cxx
 tofData/R3BTofdMappedData.cxx
 tofData/R3BTofdCalData.cxx
 tofData/R3BTofdHitData.cxx
+tofData/R3BTofiMappedData.cxx
+tofData/R3BTofiCalData.cxx
+tofData/R3BTofiHitData.cxx
 tofData/R3BPaddleCalData.cxx
 tofData/R3BTofdPoint.cxx
 tofData/R3BTofdDigi.cxx
+tofData/R3BTofiPoint.cxx
 tofData/R3BPtofHit.cxx
 pdcData/R3BPdcMappedData.cxx
 pdcData/R3BPdcCalData.cxx

@@ -230,7 +230,14 @@ class R3BTrackerTestS494 : public FairTask
 	Int_t counterTracker = 0;
 	Int_t countdet;
 	Int_t countdet_s;
+	Int_t countdet_ss;
 	Double_t delta;
+	Int_t miss23a = 0;
+	Int_t miss23b = 0;
+	Int_t miss30 = 0;
+	Int_t miss31 = 0;
+	Int_t miss32 = 0;
+	Int_t miss33 = 0;
 
     UInt_t num_spills = 0;
 
@@ -294,6 +301,7 @@ class R3BTrackerTestS494 : public FairTask
 	TH2F* fh_tofd_q2_vs_q1_ac;
 
     TH2F* fh_target_xy;
+    TH2F* fh_target_dxdy;
     TH1F* fh_target_px;
     TH1F* fh_target_py;
     TH1F* fh_target_pz;
@@ -309,8 +317,8 @@ class R3BTrackerTestS494 : public FairTask
     TH1F* fh_p_C;
 
     TH2F* fh_chiy_vs_chix;
+    TH2F* fh_chi2_vs_Erel;
     
-
     TH1F* fh_dx;
     TH1F* fh_dy;
     TH1F* fh_dz;
@@ -334,6 +342,9 @@ class R3BTrackerTestS494 : public FairTask
 
 	TH2F* fh_dErel_vs_x;
 	TH2F* fh_dErel_vs_y;
+	
+	TH1F* fh_res_x[10];
+	TH1F* fh_res_y[10];
 	
 	TH2F* fh_xy[10];
 	TH2F* fh_p_vs_x[10];

@@ -51,7 +51,7 @@ InitStatus R3BTrackingDetector::Init()
 
     if (GetDetectorName().Contains("fi"))
     {
-        offset_z = 0.1;
+        offset_z = 0.;
     }
 
     if (GetDetectorName().EqualTo("tofd"))
@@ -77,6 +77,11 @@ InitStatus R3BTrackingDetector::Init()
 
     norm = ((pos1 - pos0).Cross(pos2 - pos0)).Unit();
 
+    cout << "Test" << endl;
+    pos0.Print();
+    pos1.Print();
+    pos2.Print();
+
     res_x = fGeo->GetSigmaX();
     res_y = fGeo->GetSigmaY();
 
@@ -101,12 +106,48 @@ void R3BTrackingDetector::CopyHits()
         return;
     }
     hits.clear();
+    free_hit.clear();
     for (Int_t i = 0; i < fArrayHits->GetEntriesFast(); i++)
     {
         R3BHit* hit = (R3BHit*)fArrayHits->At(i);
         hit->SetHitId(i);
         hits.push_back(hit);
+        free_hit[i] = true;
     }
+}
+
+void R3BTrackingDetector::CopyToBuffer()
+{
+    if (NULL == fArrayHits)
+    {
+        return;
+    }
+    std::vector<R3BHit> l_hits;
+    for (Int_t i = 0; i < fArrayHits->GetEntriesFast(); i++)
+    {
+        R3BHit* hit = (R3BHit*)fArrayHits->At(i);
+        hit->SetHitId(i);
+        l_hits.push_back(*hit);
+    }
+    // LOG(info) << "####### " << l_hits.size();
+    events.push_back(l_hits);
+    // LOG(info) << "------- " << events.size();
+}
+
+void R3BTrackingDetector::TakeHitsFromBuffer(Int_t iev)
+{
+    if (iev >= events.size())
+    {
+        return;
+    }
+
+    hits.clear();
+    for (Int_t ihit = 0; ihit < events[iev].size(); ihit++)
+    {
+        hits.push_back(&events[iev].at(ihit));
+    }
+
+    // LOG(info) << "======= " << hits.size();
 }
 
 void R3BTrackingDetector::GlobalToLocal(const TVector3& posGlobal, Double_t& x_local, Double_t& y_local)
@@ -115,6 +156,9 @@ void R3BTrackingDetector::GlobalToLocal(const TVector3& posGlobal, Double_t& x_l
     local.RotateY(-fGeo->GetRotY() * TMath::DegToRad());
     x_local = local.X();
     y_local = local.Y();
+    // cout << "pos0: " << pos0.X() << "  " << pos0.Y() << "  " << pos0.Z() << endl;
+    // cout << "Local x: " << x_local << " y: " << y_local << endl;
+    // cout << "global x: " << posGlobal.X() << " y: " << posGlobal.Y() << " z: " << posGlobal.Z() << endl;
 }
 
 void R3BTrackingDetector::LocalToGlobal(TVector3& posGlobal, Double_t x_local, Double_t y_local)

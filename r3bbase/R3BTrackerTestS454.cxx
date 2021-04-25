@@ -611,10 +611,20 @@ void R3BTrackerTestS454::Exec(Option_t* option)
 
     Int_t max = 10000;
     Int_t detector[max];
+    Int_t detector_s[max];
+    Int_t detector_ss[max];
     Double_t xdet[max];
+    Double_t xdet_s[max];
+    Double_t xdet_ss[max];
     Double_t ydet[max];
+    Double_t ydet_s[max];
+    Double_t ydet_ss[max];
     Double_t zdet[max];
+    Double_t zdet_s[max];
+    Double_t zdet_ss[max];
     Int_t qdet[max + 2];
+    Int_t qdet_s[max + 2];
+    Int_t qdet_ss[max + 2];
     qdet[max] = 2;
     qdet[max + 1] = 6;
     Double_t xFi13[max];
@@ -659,12 +669,27 @@ void R3BTrackerTestS454::Exec(Option_t* option)
 
     countdet = 0;
 
-    Double_t track[12]; // x,y,z, px, py, pz
-    Double_t chi[6];    // x,y,z, px, py, pz
+    Double_t track[12];   // x,y,z, px, py, pz
+    Double_t track_s[12]; // x,y,z, px, py, pz
+    Double_t chi[6];      // x,y,z, px, py, pz
+    Double_t chi_s[6];    // x,y,z, px, py, pz
 
     Int_t n_det = 10;
     if (fGhost)
         n_det = 11;
+
+    Double_t res1_det_x[n_det];
+    Double_t res1_det_y[n_det];
+    Double_t res1_det_z[n_det];
+    Double_t res2_det_x[n_det];
+    Double_t res2_det_y[n_det];
+    Double_t res2_det_z[n_det];
+    Double_t res1_lab_x[n_det];
+    Double_t res1_lab_y[n_det];
+    Double_t res1_lab_z[n_det];
+    Double_t res2_lab_x[n_det];
+    Double_t res2_lab_y[n_det];
+    Double_t res2_lab_z[n_det];
 
     Double_t x[n_det];
     Double_t y[n_det];
@@ -1209,24 +1234,387 @@ void R3BTrackerTestS454::Exec(Option_t* option)
                         << endl;
         }
     }
-
+    // fiber detectors can't measure charge!
     for (Int_t i = 0; i < countdet; i++)
     {
         if (detector[i] < 6)
+        {
             qdet[i] = 0;
+        }
+
+        // Fill temp array
+        xdet_s[i] = xdet[i];
+        ydet_s[i] = ydet[i];
+        zdet_s[i] = zdet[i];
+        qdet_s[i] = qdet[i];
+        detector_s[i] = detector[i];
     }
+    countdet_s = countdet;
 
     // here call tracker
     chi2 = 1.E100;
     counter2++;
-    if (tracker && fPairs && countdet > 3)
+
+    Bool_t twice = true;
+    Double_t chiMax = 1.E10;
+    if (tracker && fPairs && twice)
+    {
+        // two times single track single track
+        counter2++;
+        Bool_t first = false;
+        Bool_t second = false;
+        Bool_t det_coord = false;
+        Bool_t dt = false;
+
+        // first track carbon
+        if (debug)
+        {
+            cout << "# of points first particle" << countdet << endl;
+            for (Int_t i = 0; i < countdet; i++)
+            {
+                cout << "#" << i << " Det: " << detector[i] << " x: " << xdet[i] << " y: " << ydet[i]
+                     << " z: " << zdet[i] << " q: " << qdet[i] << endl;
+            }
+        }
+        qdet[max] = 6;
+        qdet[max + 1] = 6;
+
+        multi_track_extended_output_from_cpp_(&max,
+                                              &countdet,
+                                              &det_coord,
+                                              &dt,
+                                              target,
+                                              detector,
+                                              qdet,
+                                              xdet,
+                                              ydet,
+                                              zdet,
+                                              track,
+                                              chi,
+                                              pat1,
+                                              pat2,
+                                              res1_det_x,
+                                              res1_det_y,
+                                              res1_det_z,
+                                              res2_det_x,
+                                              res2_det_y,
+                                              res2_det_z,
+                                              res1_lab_x,
+                                              res1_lab_y,
+                                              res1_lab_z,
+                                              res2_lab_x,
+                                              res2_lab_y,
+                                              res2_lab_z);
+
+        chi2 = chi[0] + chi[1];
+        fh_chiy_vs_chix->Fill(chi[0], chi[1]);
+        fh_chi2->Fill(chi2);
+
+        if (chi[0] < chiMax)
+            counter3++;
+        if (chi[1] < chiMax)
+            counter4++;
+        if (chi[0] < chiMax && chi[1] < chiMax)
+        {
+            // fill histograms
+            Output2(track, chi);
+        }
+        if (debug && chi[0] < chiMax)
+        {
+            cout << "******************************************" << endl;
+            cout << "single track #1: " << track[0] << "  " << track[1] << "  " << track[2] << "  " << track[3] << "  "
+                 << track[4] << "  " << track[5] << endl;
+
+            cout << "chi: " << chi[0] << "  " << chi[1] << "  " << chi[2] << "  " << chi[3] << "  " << chi[4] << "  "
+                 << chi[5] << endl;
+
+            cout << "Track In 12C"
+                 << "px " << pCxs << " py " << pCys << " z " << pCzs << endl;
+        }
+
+        track_s[6] = track[0];
+        track_s[7] = track[1];
+        track_s[8] = track[2];
+        track_s[9] = track[3];
+        track_s[10] = track[4];
+        track_s[11] = track[5];
+        chi_s[2] = chi[0];
+        chi_s[3] = chi[1];
+
+        if (chi[0] < chiMax && chi[1] < chiMax)
+        {
+            counterTracker++;
+            // we have a hit
+            first = true;
+            for (Int_t i = 0; i < ndet; i++)
+            {
+                xTrack[i] = -1000.;
+                yTrack[i] = -1000.;
+                zTrack[i] = -1000.;
+                qTrack[i] = -1000.;
+            }
+            Int_t charge = 0;
+            cout << "# of points back" << countdet << endl;
+            for (Int_t i = 0; i < countdet; i++)
+            {
+
+                cout << "back #" << i << " Det: " << detector[i] << " x: " << xdet[i] << " y: " << ydet[i]
+                     << " q: " << qdet[i] << endl;
+                xTrack[detector[i]] = xdet[i];
+                yTrack[detector[i]] = ydet[i];
+                zTrack[detector[i]] = zdet[i];
+                qTrack[detector[i]] = qdet[i];
+                if (qdet[i] > charge)
+                    charge = qdet[i];
+            }
+            // plot hits of the track
+            for (Int_t i = 0; i < ndet; i++)
+            {
+                fh_xy[i]->Fill(xTrack[i] * 100., yTrack[i] * 100.);
+                fh_p_vs_x[i]->Fill(xTrack[i] * 100., track[5]);
+                fh_p_vs_x_test[i]->Fill(xTrack[i] * 100.,
+                                        sqrt(track[3] * track[3] + track[4] * track[4] + track[5] * track[5]));
+            }
+            // Plots of correlations of Fiber detectors
+
+            fh_Fib13_vs_Fib11_back->Fill(xTrack[3] * 100., xTrack[5] * 100.);
+            fh_Fib13_vs_Fib11_dx_back->Fill(xTrack[3] * 100., xTrack[5] * 100. - xTrack[3] * 100.);
+            fh_Fib11_vs_Fib3a_back->Fill(xTrack[0] * 100., xTrack[3] * 100.);
+            fh_Fib11_vs_Fib3a_dx_back->Fill(xTrack[0] * 100., xTrack[3] * 100. - xTrack[0] * 100.);
+            fh_Fib10_vs_Fib12_back->Fill(xTrack[4] * 100., xTrack[2] * 100.);
+            fh_Fib10_vs_Fib12_dx_back->Fill(xTrack[4] * 100., xTrack[2] * 100. - xTrack[4] * 100.);
+            fh_Fib12_vs_Fib3b_back->Fill(xTrack[1] * 100., xTrack[4] * 100.);
+            fh_Fib12_vs_Fib3b_dx_back->Fill(xTrack[1] * 100., xTrack[4] * 100. - xTrack[1] * 100.);
+
+            // store hits in track level
+            new ((*fTrackItems)[fNofTrackItems++])
+                R3BTrack(track[0], track[1], track[2], track[3], track[4], track[5], charge, 2, chi[0], chi[1], 0);
+        }
+
+        // now track second particle (alpha)
+        // remove hits which were used to track first particle
+        Bool_t used = false;
+        countdet_ss = 0;
+        for (Int_t i = 0; i < countdet_s; i++)
+        {
+            used = false;
+            for (Int_t j = 0; j < countdet; j++)
+            {
+                //                    if(detector_s[i] == detector[j] && abs(xdet_s[i] - xdet[j]) < 0.000001 &&
+                //                    abs(ydet_s[i] - ydet[j]) < 0.000001)
+                if (detector_s[i] == detector[j] && abs(xdet_s[i] - xdet[j]) < 0.000001)
+                {
+                    used = true;
+                }
+            }
+            if (!used)
+            {
+                xdet_ss[countdet_ss] = xdet_s[i];
+                ydet_ss[countdet_ss] = ydet_s[i];
+                zdet_ss[countdet_ss] = zdet_s[i];
+                qdet_ss[countdet_ss] = qdet_s[i];
+                detector_ss[countdet_ss] = detector_s[i];
+                countdet_ss++;
+            }
+        }
+        // now track second particle (alpha)
+        countdet = countdet_ss;
+        for (Int_t i = 0; i < countdet; i++)
+        {
+            // Fill temp array
+            xdet[i] = xdet_ss[i];
+            ydet[i] = ydet_ss[i];
+            zdet[i] = zdet_ss[i];
+            qdet[i] = qdet_ss[i];
+            detector[i] = detector_ss[i];
+        }
+        for (Int_t i = 0; i < 12; i++)
+        {
+            track[i] = 0.;
+        }
+        if (debug)
+        {
+            cout << "# of points second particle" << countdet << endl;
+            for (Int_t i = 0; i < countdet; i++)
+            {
+                cout << "#" << i << " Det: " << detector[i] << " x: " << xdet[i] << " y: " << ydet[i]
+                     << " z: " << zdet[i] << " q: " << qdet[i] << endl;
+            }
+        }
+
+        qdet[max] = 2;
+        qdet[max + 1] = 2;
+
+        multi_track_extended_output_from_cpp_(&max,
+                                              &countdet,
+                                              &det_coord,
+                                              &dt,
+                                              target,
+                                              detector,
+                                              qdet,
+                                              xdet,
+                                              ydet,
+                                              zdet,
+                                              track,
+                                              chi,
+                                              pat1,
+                                              pat2,
+                                              res1_det_x,
+                                              res1_det_y,
+                                              res1_det_z,
+                                              res2_det_x,
+                                              res2_det_y,
+                                              res2_det_z,
+                                              res1_lab_x,
+                                              res1_lab_y,
+                                              res1_lab_z,
+                                              res2_lab_x,
+                                              res2_lab_y,
+                                              res2_lab_z);
+
+        chi2 = chi[0] + chi[1];
+        fh_chiy_vs_chix->Fill(chi[0], chi[1]);
+        fh_chi2->Fill(chi2);
+
+        if (chi[0] < chiMax)
+            counter3++;
+        if (chi[1] < chiMax)
+            counter4++;
+        if (chi[0] < chiMax && chi[1] < chiMax)
+        {
+            // fill histograms
+            second = true;
+            Output2(track, chi);
+        }
+
+        track_s[0] = track[0];
+        track_s[1] = track[1];
+        track_s[2] = track[2];
+        track_s[3] = track[3];
+        track_s[4] = track[4];
+        track_s[5] = track[5];
+        chi_s[0] = chi[0];
+        chi_s[1] = chi[1];
+
+        if (debug && chi[0] < chiMax)
+        {
+            cout << "******************************************" << endl;
+            cout << "single track #2: " << track[0] << "  " << track[1] << "  " << track[2] << "  " << track[3] << "  "
+                 << track[4] << "  " << track[5] << endl;
+
+            cout << "chi: " << chi[0] << "  " << chi[1] << "  " << chi[2] << "  " << chi[3] << "  " << chi[4] << "  "
+                 << chi[5] << endl;
+
+            cout << "Track In 4He"
+                 << "px " << pHexs << " py " << pHeys << " z " << pHezs << endl;
+        }
+
+        if (chi_s[0] + chi_s[0] + chi_s[0] + chi_s[0] < chiMax * 4. && first && second)
+        {
+            //			if(sqrt((track_s[0] - track_s[6]) * (track_s[0] - track_s[6]) +
+            //				(track_s[1] * track_s[7]) * (track_s[1] * track_s[7])) < 0.0005)
+            {
+                counterTracker++;
+                Output1(track_s, chi_s);
+            }
+        }
+
+        if (chi[0] < chiMax && chi[1] < chiMax)
+        {
+            counterTracker++;
+            // we have a hit
+            for (Int_t i = 0; i < ndet; i++)
+            {
+                xTrack[i] = -1000.;
+                yTrack[i] = -1000.;
+                zTrack[i] = -1000.;
+                qTrack[i] = -1000.;
+            }
+            Int_t charge = 0;
+            LOG(DEBUG2) << "# of points back" << countdet << endl;
+            for (Int_t i = 0; i < countdet; i++)
+            {
+
+                // cout << "back #" << i << " Det: " << detector[i] << " x: " << xdet[i]
+                //     << " y: " << ydet[i] << " q: " << qdet[i] << endl;
+                xTrack[detector[i]] = xdet[i];
+                yTrack[detector[i]] = ydet[i];
+                zTrack[detector[i]] = zdet[i];
+                qTrack[detector[i]] = qdet[i];
+                if (qdet[i] > charge)
+                    charge = qdet[i];
+            }
+            // plot hits of the track
+            for (Int_t i = 0; i < ndet; i++)
+            {
+                fh_xy[i]->Fill(xTrack[i] * 100., yTrack[i] * 100.);
+                fh_p_vs_x[i]->Fill(xTrack[i] * 100., track[5]);
+                fh_p_vs_x_test[i]->Fill(xTrack[i] * 100.,
+                                        sqrt(track[3] * track[3] + track[4] * track[4] + track[5] * track[5]));
+            }
+            // Plots of correlations of Fiber detectors
+
+            fh_Fib13_vs_Fib11_back->Fill(xTrack[3] * 100., xTrack[5] * 100.);
+            fh_Fib13_vs_Fib11_dx_back->Fill(xTrack[3] * 100., xTrack[5] * 100. - xTrack[3] * 100.);
+            fh_Fib11_vs_Fib3a_back->Fill(xTrack[0] * 100., xTrack[3] * 100.);
+            fh_Fib11_vs_Fib3a_dx_back->Fill(xTrack[0] * 100., xTrack[3] * 100. - xTrack[0] * 100.);
+            fh_Fib10_vs_Fib12_back->Fill(xTrack[4] * 100., xTrack[2] * 100.);
+            fh_Fib10_vs_Fib12_dx_back->Fill(xTrack[4] * 100., xTrack[2] * 100. - xTrack[4] * 100.);
+            fh_Fib12_vs_Fib3b_back->Fill(xTrack[1] * 100., xTrack[4] * 100.);
+            fh_Fib12_vs_Fib3b_dx_back->Fill(xTrack[1] * 100., xTrack[4] * 100. - xTrack[1] * 100.);
+
+            // store hits in track level
+            new ((*fTrackItems)[fNofTrackItems++])
+                R3BTrack(track[0], track[1], track[2], track[3], track[4], track[5], charge, 2, chi[0], chi[1], 0);
+        }
+        countdet = countdet_s;
+        for (Int_t i = 0; i < countdet; i++)
+        {
+            // Fill temp array
+            xdet[i] = xdet_s[i];
+            ydet[i] = ydet_s[i];
+            zdet[i] = zdet_s[i];
+            qdet[i] = qdet_s[i];
+            detector[i] = detector_s[i];
+        }
+        for (Int_t i = 0; i < 12; i++)
+        {
+            track[i] = 0.;
+        }
+    }
+
+    if (tracker && fPairs && !twice && countdet > 3)
     {
         // double track
         counter2++;
         Bool_t det_coord = false;
         Bool_t st = true;
-        multi_track_extended_output_from_cpp_(
-            &max, &countdet, &det_coord, &st, target, detector, qdet, xdet, ydet, zdet, track, chi, pat1, pat2);
+        multi_track_extended_output_from_cpp_(&max,
+                                              &countdet,
+                                              &det_coord,
+                                              &st,
+                                              target,
+                                              detector,
+                                              qdet,
+                                              xdet,
+                                              ydet,
+                                              zdet,
+                                              track,
+                                              chi,
+                                              pat1,
+                                              pat2,
+                                              res1_det_x,
+                                              res1_det_y,
+                                              res1_det_z,
+                                              res2_det_x,
+                                              res2_det_y,
+                                              res2_det_z,
+                                              res1_lab_x,
+                                              res1_lab_y,
+                                              res1_lab_z,
+                                              res2_lab_x,
+                                              res2_lab_y,
+                                              res2_lab_z);
 
         chi2 = chi[4] + chi[5];
         fh_chiy_vs_chix->Fill(chi[0], chi[1]);
@@ -1330,8 +1718,33 @@ void R3BTrackerTestS454::Exec(Option_t* option)
         // multi_track_from_cpp_(
         //    &max, &countdet, &det_coord, &st, target, detector, qdet, xdet, ydet, zdet, track, chi);
 
-        multi_track_extended_output_from_cpp_(
-            &max, &countdet, &det_coord, &st, target, detector, qdet, xdet, ydet, zdet, track, chi, pat1, pat2);
+        multi_track_extended_output_from_cpp_(&max,
+                                              &countdet,
+                                              &det_coord,
+                                              &st,
+                                              target,
+                                              detector,
+                                              qdet,
+                                              xdet,
+                                              ydet,
+                                              zdet,
+                                              track,
+                                              chi,
+                                              pat1,
+                                              pat2,
+                                              res1_det_x,
+                                              res1_det_y,
+                                              res1_det_z,
+                                              res2_det_x,
+                                              res2_det_y,
+                                              res2_det_z,
+                                              res1_lab_x,
+                                              res1_lab_y,
+                                              res1_lab_z,
+                                              res2_lab_x,
+                                              res2_lab_y,
+                                              res2_lab_z);
+
         chi2 = chi[0] + chi[1];
         fh_chiy_vs_chix->Fill(chi[0], chi[1]);
         fh_chi2->Fill(chi2);

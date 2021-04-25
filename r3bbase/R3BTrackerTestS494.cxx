@@ -207,6 +207,10 @@ InitStatus R3BTrackerTestS494::Init()
     fh_target_xy->GetXaxis()->SetTitle("x / cm");
     fh_target_xy->GetYaxis()->SetTitle("y / cm");
 
+    fh_target_dxdy = new TH2F("target_dxdy", "target dx dy ", 100, -0.5, 0.5, 100, -0.5, 0.5);
+    fh_target_dxdy->GetXaxis()->SetTitle("x / cm");
+    fh_target_dxdy->GetYaxis()->SetTitle("y / cm");
+
     fh_chi2 = new TH1F("chi2", "chi2 ", 1000, 0., 100);
     fh_chi2->GetXaxis()->SetTitle("Chi2");
     fh_chi2->GetYaxis()->SetTitle("counts");
@@ -275,6 +279,15 @@ InitStatus R3BTrackerTestS494::Init()
     // histograms for track hits
     for (Int_t i = 0; i < ndet; i++)
     {
+
+        fh_res_x[i] = new TH1F(Form("res_x_%i", i), Form("x-residuals of Det %i", i), 1000, -10, 10);
+        fh_res_x[i]->GetXaxis()->SetTitle("x-residuals / cm");
+        fh_res_x[i]->GetYaxis()->SetTitle("Counts");
+
+        fh_res_y[i] = new TH1F(Form("res_y_%i", i), Form("y-residuals of Det %i", i), 1000, -10, 10);
+        fh_res_y[i]->GetXaxis()->SetTitle("y-residuals / cm");
+        fh_res_y[i]->GetYaxis()->SetTitle("Counts");
+
         fh_xy[i] = new TH2F(Form("xy_%i", i), Form("xy of Det %i", i), 600, -30, 30, 1200, -60., 60.);
         fh_xy[i]->GetXaxis()->SetTitle("x / cm");
         fh_xy[i]->GetYaxis()->SetTitle("y / cm");
@@ -555,6 +568,10 @@ InitStatus R3BTrackerTestS494::Init()
     fh_chiy_vs_chix->GetXaxis()->SetTitle("chi x");
     fh_chiy_vs_chix->GetYaxis()->SetTitle("chi y");
 
+    fh_chi2_vs_Erel = new TH2F("chi2_vs_Erel", "Chi2 vs. Erel", 100, 0., 10., 500, 0., 500.);
+    fh_chi2_vs_Erel->GetXaxis()->SetTitle("Erel");
+    fh_chi2_vs_Erel->GetYaxis()->SetTitle("chi2");
+
     fh_theta26 = new TH1F("theta26", "theta 26 ", 500, 0., 5);
     fh_theta26->GetXaxis()->SetTitle("angle / degree");
     fh_theta26->GetYaxis()->SetTitle("counts");
@@ -604,7 +621,7 @@ void R3BTrackerTestS494::Exec(Option_t* option)
         LOG(fatal) << "FairRootManager not found";
 
     Bool_t debug = true;
-    Bool_t debug1 = true;
+    Bool_t debug1 = false;
 
     Double_t xTest = 0.;
     Double_t yTest = 0.;
@@ -612,14 +629,19 @@ void R3BTrackerTestS494::Exec(Option_t* option)
     Int_t max = 10000;
     Int_t detector[max];
     Int_t detector_s[max];
+    Int_t detector_ss[max];
     Double_t xdet[max];
     Double_t xdet_s[max];
+    Double_t xdet_ss[max];
     Double_t ydet[max];
     Double_t ydet_s[max];
+    Double_t ydet_ss[max];
     Double_t zdet[max];
     Double_t zdet_s[max];
+    Double_t zdet_ss[max];
     Int_t qdet[max + 2];
     Int_t qdet_s[max + 2];
+    Int_t qdet_ss[max + 2];
 
     if (fPairs)
     {
@@ -631,6 +653,8 @@ void R3BTrackerTestS494::Exec(Option_t* option)
         qdet[max] = 6;
         qdet[max + 1] = 6;
     }
+
+    Double_t IDdet[max];
 
     Double_t xFi33[max];
     Double_t yFi33[max];
@@ -682,6 +706,19 @@ void R3BTrackerTestS494::Exec(Option_t* option)
     Int_t n_det = 10;
     if (fGhost)
         n_det = 11;
+
+    Double_t res1_det_x[n_det];
+    Double_t res1_det_y[n_det];
+    Double_t res1_det_z[n_det];
+    Double_t res2_det_x[n_det];
+    Double_t res2_det_y[n_det];
+    Double_t res2_det_z[n_det];
+    Double_t res1_lab_x[n_det];
+    Double_t res1_lab_y[n_det];
+    Double_t res1_lab_z[n_det];
+    Double_t res2_lab_x[n_det];
+    Double_t res2_lab_y[n_det];
+    Double_t res2_lab_z[n_det];
 
     Double_t x[n_det];
     Double_t y[n_det];
@@ -880,6 +917,17 @@ void R3BTrackerTestS494::Exec(Option_t* option)
 
     Int_t nHits = fTofdPoints->GetEntriesFast();
 
+    Int_t mult23a = 0;
+    Int_t mult23b = 0;
+    Int_t mult30 = 0;
+    Int_t mult31 = 0;
+    Int_t mult32 = 0;
+    Int_t mult33 = 0;
+
+    Bool_t C_left = false;
+    Bool_t C_right = false;
+    Bool_t A_left = false;
+    Bool_t A_right = false;
     for (Int_t i = 0; i < nHits; i++)
     {
         R3BTofdPoint* hit = (R3BTofdPoint*)fTofdPoints->At(i);
@@ -887,30 +935,50 @@ void R3BTrackerTestS494::Exec(Option_t* option)
         //		if ((ID == 122 || ID == 123 || ID == 124 || ID == 222 || ID == 223))
         //			&& TMath::Abs((hit->GetYIn() + hit->GetYOut()) / 2.) < 5.)
         //			continue;
+
+        //        qqq = sqrt(hit->GetEnergyLoss()) * 23.211 + 0.5; // For 300 AMeV
+        qqq = sqrt(hit->GetEnergyLoss()) * 26.62 + 0.5; // For 500 AMeV
+
         if (ID <= 122)
         {
             detector[countdet] = 6;
+            if (qqq == 6)
+                C_right = true;
+            if (qqq == 2)
+                A_right = true;
         }
         if (ID >= 122 && ID < 145)
         {
             detector[countdet] = 7;
+            if (qqq == 6)
+                C_left = true;
+            if (qqq == 2)
+                A_left = true;
         }
         if (ID > 200 && ID <= 222)
         {
             detector[countdet] = 8;
+            if (qqq == 6)
+                C_left = true;
+            if (qqq == 2)
+                A_left = true;
         }
         if (ID > 222)
         {
             detector[countdet] = 9;
+            if (qqq == 6)
+                C_right = true;
+            if (qqq == 2)
+                A_right = true;
         }
-        qqq = sqrt(hit->GetEnergyLoss()) * 23.211 + 0.5;
+
         if (qqq < 2)
             continue;
         xdet[countdet] = (hit->GetXIn() + hit->GetXOut()) / 2. / 100.;
         ydet[countdet] = (hit->GetYIn() + hit->GetYOut()) / 2. / 100.;
         zdet[countdet] = (hit->GetZIn() + hit->GetZOut()) / 2. / 100.;
         qdet[countdet] = qqq;
-
+        IDdet[countdet] = ID;
         if (qqq == 6)
         {
             cout << "charge C: " << qqq << endl;
@@ -958,7 +1026,7 @@ void R3BTrackerTestS494::Exec(Option_t* option)
         qqq = sqrt(hit->GetEnergyLoss()) * 120.53 + 0.5;
         if (qqq >= 5)
             qqq = 6;
-        if (qqq > 1 && qqq < 5)
+        if (qqq >= 1 && qqq < 5)
             qqq = 2;
         if (qqq > 6)
             qqq = 8;
@@ -974,6 +1042,8 @@ void R3BTrackerTestS494::Exec(Option_t* option)
         ydet[countdet] = (hit->GetYIn() + hit->GetYOut()) / 2. / 100.;
         zdet[countdet] = (hit->GetZIn() + hit->GetZOut()) / 2. / 100.;
         qdet[countdet] = qqq;
+        IDdet[countdet] = ID;
+
         // xdet[countdet] = (int)(xdet[countdet] / 0.00025 ) * 0.00025;
 
         fh_xy_Fib[fi23a]->Fill(xdet[countdet], ydet[countdet]);
@@ -982,6 +1052,7 @@ void R3BTrackerTestS494::Exec(Option_t* option)
             cout << "det: " << detector[countdet] << " x: " << xdet[countdet] << " y: " << ydet[countdet]
                  << " z: " << zdet[countdet] << " q: " << qdet[countdet] << " id: " << ID << endl;
         countdet++;
+        mult23a++;
     }
 
     nHits = fFi23bPoints->GetEntriesFast();
@@ -992,7 +1063,7 @@ void R3BTrackerTestS494::Exec(Option_t* option)
         qqq = sqrt(hit->GetEnergyLoss()) * 120.53 + 0.5;
         if (qqq >= 5)
             qqq = 6;
-        if (qqq > 1 && qqq < 5)
+        if (qqq >= 1 && qqq < 5)
             qqq = 2;
         if (qqq > 6)
             qqq = 8;
@@ -1002,6 +1073,7 @@ void R3BTrackerTestS494::Exec(Option_t* option)
         ydet[countdet] = (hit->GetYIn() + hit->GetYOut()) / 2. / 100.;
         zdet[countdet] = (hit->GetZIn() + hit->GetZOut()) / 2. / 100.;
         qdet[countdet] = qqq;
+        IDdet[countdet] = ID;
         // xdet[countdet] = (int)(xdet[countdet] / 0.00025 ) * 0.00025;
 
         if (debug1)
@@ -1009,6 +1081,7 @@ void R3BTrackerTestS494::Exec(Option_t* option)
                  << " z: " << zdet[countdet] << " q: " << qdet[countdet] << " id: " << ID << endl;
 
         countdet++;
+        mult23b++;
     }
 
     nHits = fFi30Points->GetEntriesFast();
@@ -1019,7 +1092,7 @@ void R3BTrackerTestS494::Exec(Option_t* option)
         qqq = sqrt(hit->GetEnergyLoss()) * 55.12 + 0.5;
         if (qqq >= 5)
             qqq = 6;
-        if (qqq > 1 && qqq < 5)
+        if (qqq >= 1 && qqq < 5)
             qqq = 2;
         if (qqq > 6)
             qqq = 8;
@@ -1029,12 +1102,14 @@ void R3BTrackerTestS494::Exec(Option_t* option)
         ydet[countdet] = (hit->GetYIn() + hit->GetYOut()) / 2. / 100.;
         zdet[countdet] = (hit->GetZIn() + hit->GetZOut()) / 2. / 100.;
         qdet[countdet] = qqq;
+        IDdet[countdet] = ID;
         // xdet[countdet] = (int)(xdet[countdet] / 0.0005 ) * 0.0005;
 
         if (debug1)
             cout << "det: " << detector[countdet] << " x: " << xdet[countdet] << " y: " << ydet[countdet]
                  << " z: " << zdet[countdet] << " q: " << qdet[countdet] << " id: " << ID << endl;
         countdet++;
+        mult30++;
     }
 
     nHits = fFi31Points->GetEntriesFast();
@@ -1045,7 +1120,7 @@ void R3BTrackerTestS494::Exec(Option_t* option)
         qqq = sqrt(hit->GetEnergyLoss()) * 55.12 + 0.5;
         if (qqq >= 5)
             qqq = 6;
-        if (qqq > 1 && qqq < 5)
+        if (qqq >= 1 && qqq < 5)
             qqq = 2;
         if (qqq > 6)
             qqq = 8;
@@ -1055,12 +1130,14 @@ void R3BTrackerTestS494::Exec(Option_t* option)
         ydet[countdet] = (hit->GetYIn() + hit->GetYOut()) / 2. / 100.;
         zdet[countdet] = (hit->GetZIn() + hit->GetZOut()) / 2. / 100.;
         qdet[countdet] = qqq;
+        IDdet[countdet] = ID;
         // xdet[countdet] = (int)(xdet[countdet] / 0.0005 ) * 0.0005;
 
         if (debug1)
             cout << "det: " << detector[countdet] << " x: " << xdet[countdet] << " y: " << ydet[countdet]
                  << " z: " << zdet[countdet] << " q: " << qdet[countdet] << " id: " << ID << endl;
         countdet++;
+        mult31++;
     }
 
     nHits = fFi32Points->GetEntriesFast();
@@ -1071,7 +1148,7 @@ void R3BTrackerTestS494::Exec(Option_t* option)
         qqq = sqrt(hit->GetEnergyLoss()) * 55.12 + 0.5;
         if (qqq >= 5)
             qqq = 6;
-        if (qqq > 1 && qqq < 5)
+        if (qqq >= 1 && qqq < 5)
             qqq = 2;
         if (qqq > 6)
             qqq = 8;
@@ -1081,12 +1158,14 @@ void R3BTrackerTestS494::Exec(Option_t* option)
         ydet[countdet] = (hit->GetYIn() + hit->GetYOut()) / 2. / 100.;
         zdet[countdet] = (hit->GetZIn() + hit->GetZOut()) / 2. / 100.;
         qdet[countdet] = qqq;
+        IDdet[countdet] = ID;
         // xdet[countdet] = (int)(xdet[countdet] / 0.0005 ) * 0.0005;
 
         if (debug1)
             cout << "det: " << detector[countdet] << " x: " << xdet[countdet] << " y: " << ydet[countdet]
                  << " z: " << zdet[countdet] << " q: " << qdet[countdet] << " id: " << ID << endl;
         countdet++;
+        mult32++;
     }
 
     nHits = fFi33Points->GetEntriesFast();
@@ -1097,7 +1176,7 @@ void R3BTrackerTestS494::Exec(Option_t* option)
         qqq = sqrt(hit->GetEnergyLoss()) * 55.12 + 0.5;
         if (qqq >= 5)
             qqq = 6;
-        if (qqq > 1 && qqq < 5)
+        if (qqq >= 1 && qqq < 5)
             qqq = 2;
         if (qqq > 6)
             qqq = 8;
@@ -1107,12 +1186,14 @@ void R3BTrackerTestS494::Exec(Option_t* option)
         ydet[countdet] = (hit->GetYIn() + hit->GetYOut()) / 2. / 100.;
         zdet[countdet] = (hit->GetZIn() + hit->GetZOut()) / 2. / 100.;
         qdet[countdet] = qqq;
+        IDdet[countdet] = ID;
         // xdet[countdet] = (int)(xdet[countdet] / 0.0005 ) * 0.0005;
 
         if (debug1)
             cout << "det: " << detector[countdet] << " x: " << xdet[countdet] << " y: " << ydet[countdet]
                  << " z: " << zdet[countdet] << " q: " << qdet[countdet] << " id: " << ID << endl;
         countdet++;
+        mult33++;
     }
 
     /*
@@ -1242,12 +1323,29 @@ void R3BTrackerTestS494::Exec(Option_t* option)
     // here call tracker
     chi2 = 1.E100;
 
+    if (debug)
+    {
+        cout << "# of points" << countdet << endl;
+        for (Int_t i = 0; i < countdet; i++)
+        {
+            cout << "#" << i << " Det: " << detector[i] << " x: " << xdet[i] << " y: " << ydet[i] << " z: " << zdet[i]
+                 << " q: " << qdet[i] << " ID: " << IDdet[i] << endl;
+            //			if (detector[i] < 6) qdet[i] = 0;
+        }
+
+        for (Int_t i = 0; i < ndet; i++)
+        {
+            LOG(DEBUG2) << "Max Det: " << i << " max x: " << xMax[i] << " max y: " << yMax[i] << " max q: " << qMax[i]
+                        << endl;
+        }
+    }
+
     // fiber detectors can't measure charge!
     for (Int_t i = 0; i < countdet; i++)
     {
         if (detector[i] < 6)
         {
-            // qdet[i] = 0;
+            qdet[i] = 0;
         }
 
         // Fill temp array
@@ -1259,56 +1357,89 @@ void R3BTrackerTestS494::Exec(Option_t* option)
     }
     countdet_s = countdet;
 
-    if (debug && countdet > 3)
-    {
-        cout << "# of points" << countdet << endl;
-        for (Int_t i = 0; i < countdet; i++)
-        {
-            cout << "#" << i << " Det: " << detector[i] << " x: " << xdet[i] << " y: " << ydet[i] << " z: " << zdet[i]
-                 << " q: " << qdet[i] << endl;
-            //			if (detector[i] < 6) qdet[i] = 0;
-        }
+    if (C_right && mult23a == 0)
+        miss23a++;
+    if (C_right && mult31 == 0)
+        miss31++;
+    if (C_right && mult33 == 0)
+        miss33++;
 
-        for (Int_t i = 0; i < ndet; i++)
-        {
-            LOG(DEBUG2) << "Max Det: " << i << " max x: " << xMax[i] << " max y: " << yMax[i] << " max q: " << qMax[i]
-                        << endl;
-        }
-    }
+    if (C_left > 0 && mult23b == 0)
+        miss23b++;
+    if (C_left > 0 && mult30 == 0)
+        miss30++;
+    if (C_left > 0 && mult32 == 0)
+        miss32++;
 
     // here call tracker
     chi2 = 1.E100;
     counter2++;
 
     Bool_t twice = true;
+    Double_t chiMax = 1.E10;
     if (tracker && fPairs && twice)
     {
         // two times single track single track
         counter2++;
+        Bool_t first = false;
+        Bool_t second = false;
         Bool_t det_coord = false;
-        Bool_t st = false;
+        Bool_t dt = false;
 
         // first track carbon
+        if (debug)
+        {
+            cout << "# of points first particle" << countdet << endl;
+            for (Int_t i = 0; i < countdet; i++)
+            {
+                cout << "#" << i << " Det: " << detector[i] << " x: " << xdet[i] << " y: " << ydet[i]
+                     << " z: " << zdet[i] << " q: " << qdet[i] << endl;
+            }
+        }
         qdet[max] = 6;
         qdet[max + 1] = 6;
 
-        multi_track_extended_output_from_cpp_(
-            &max, &countdet, &det_coord, &st, target, detector, qdet, xdet, ydet, zdet, track, chi, pat1, pat2);
+        multi_track_extended_output_from_cpp_(&max,
+                                              &countdet,
+                                              &det_coord,
+                                              &dt,
+                                              target,
+                                              detector,
+                                              qdet,
+                                              xdet,
+                                              ydet,
+                                              zdet,
+                                              track,
+                                              chi,
+                                              pat1,
+                                              pat2,
+                                              res1_det_x,
+                                              res1_det_y,
+                                              res1_det_z,
+                                              res2_det_x,
+                                              res2_det_y,
+                                              res2_det_z,
+                                              res1_lab_x,
+                                              res1_lab_y,
+                                              res1_lab_z,
+                                              res2_lab_x,
+                                              res2_lab_y,
+                                              res2_lab_z);
 
         chi2 = chi[0] + chi[1];
         fh_chiy_vs_chix->Fill(chi[0], chi[1]);
         fh_chi2->Fill(chi2);
 
-        if (chi[0] < 1.e10)
+        if (chi[0] < chiMax)
             counter3++;
-        if (chi[1] < 1.e10)
+        if (chi[1] < chiMax)
             counter4++;
-        if (chi[0] < 1.e10 && chi[1] < 1.e10)
+        if (chi[0] < chiMax && chi[1] < chiMax)
         {
             // fill histograms
             Output2(track, chi);
         }
-        if (debug && chi[0] < 1.e10)
+        if (debug && chi[0] < chiMax)
         {
             cout << "******************************************" << endl;
             cout << "single track #1: " << track[0] << "  " << track[1] << "  " << track[2] << "  " << track[3] << "  "
@@ -1330,10 +1461,11 @@ void R3BTrackerTestS494::Exec(Option_t* option)
         chi_s[2] = chi[0];
         chi_s[3] = chi[1];
 
-        if (chi[0] < 1.e10 && chi[1] < 1.e10)
+        if (chi[0] < chiMax && chi[1] < chiMax)
         {
             counterTracker++;
             // we have a hit
+            first = true;
             for (Int_t i = 0; i < ndet; i++)
             {
                 xTrack[i] = -1000.;
@@ -1342,12 +1474,12 @@ void R3BTrackerTestS494::Exec(Option_t* option)
                 qTrack[i] = -1000.;
             }
             Int_t charge = 0;
-            LOG(DEBUG2) << "# of points back" << countdet << endl;
+            cout << "# of points back" << countdet << endl;
             for (Int_t i = 0; i < countdet; i++)
             {
 
-                // cout << "back #" << i << " Det: " << detector[i] << " x: " << xdet[i]
-                //     << " y: " << ydet[i] << " q: " << qdet[i] << endl;
+                cout << "back #" << i << " Det: " << detector[i] << " x: " << xdet[i] << " y: " << ydet[i]
+                     << " q: " << qdet[i] << endl;
                 xTrack[detector[i]] = xdet[i];
                 yTrack[detector[i]] = ydet[i];
                 zTrack[detector[i]] = zdet[i];
@@ -1358,6 +1490,8 @@ void R3BTrackerTestS494::Exec(Option_t* option)
             // plot hits of the track
             for (Int_t i = 0; i < ndet; i++)
             {
+                fh_res_x[i]->Fill(res1_det_x[i] * 100.);
+                fh_res_y[i]->Fill(res1_det_y[i] * 100.);
                 fh_xy[i]->Fill(xTrack[i] * 100., yTrack[i] * 100.);
                 fh_p_vs_x[i]->Fill(xTrack[i] * 100., track[5]);
                 fh_p_vs_x_test[i]->Fill(xTrack[i] * 100.,
@@ -1380,45 +1514,98 @@ void R3BTrackerTestS494::Exec(Option_t* option)
         }
 
         // now track second particle (alpha)
-        countdet = countdet_s;
+        // remove hits which were used to track first particle
+        Bool_t used = false;
+        countdet_ss = 0;
+        for (Int_t i = 0; i < countdet_s; i++)
+        {
+            used = false;
+            for (Int_t j = 0; j < countdet; j++)
+            {
+                //                    if(detector_s[i] == detector[j] && abs(xdet_s[i] - xdet[j]) < 0.000001 &&
+                //                    abs(ydet_s[i] - ydet[j]) < 0.000001)
+                if (detector_s[i] == detector[j] && abs(xdet_s[i] - xdet[j]) < 0.000001)
+                {
+                    used = true;
+                }
+            }
+            if (!used)
+            {
+                xdet_ss[countdet_ss] = xdet_s[i];
+                ydet_ss[countdet_ss] = ydet_s[i];
+                zdet_ss[countdet_ss] = zdet_s[i];
+                qdet_ss[countdet_ss] = qdet_s[i];
+                detector_ss[countdet_ss] = detector_s[i];
+                countdet_ss++;
+            }
+        }
+        // now track second particle (alpha)
+        countdet = countdet_ss;
         for (Int_t i = 0; i < countdet; i++)
         {
             // Fill temp array
-            xdet[i] = xdet_s[i];
-            ydet[i] = ydet_s[i];
-            zdet[i] = zdet_s[i];
-            qdet[i] = qdet_s[i];
-            detector[i] = detector_s[i];
+            xdet[i] = xdet_ss[i];
+            ydet[i] = ydet_ss[i];
+            zdet[i] = zdet_ss[i];
+            qdet[i] = qdet_ss[i];
+            detector[i] = detector_ss[i];
         }
         for (Int_t i = 0; i < 12; i++)
         {
             track[i] = 0.;
         }
-        cout << "# of points" << countdet << endl;
-        for (Int_t i = 0; i < countdet; i++)
+        if (debug)
         {
-            cout << "#" << i << " Det: " << detector[i] << " x: " << xdet[i] << " y: " << ydet[i] << " z: " << zdet[i]
-                 << " q: " << qdet[i] << endl;
-            //			if (detector[i] < 6) qdet[i] = 0;
+            cout << "# of points second particle" << countdet << endl;
+            for (Int_t i = 0; i < countdet; i++)
+            {
+                cout << "#" << i << " Det: " << detector[i] << " x: " << xdet[i] << " y: " << ydet[i]
+                     << " z: " << zdet[i] << " q: " << qdet[i] << endl;
+            }
         }
 
         qdet[max] = 2;
         qdet[max + 1] = 2;
 
-        multi_track_extended_output_from_cpp_(
-            &max, &countdet, &det_coord, &st, target, detector, qdet, xdet, ydet, zdet, track, chi, pat1, pat2);
+        multi_track_extended_output_from_cpp_(&max,
+                                              &countdet,
+                                              &det_coord,
+                                              &dt,
+                                              target,
+                                              detector,
+                                              qdet,
+                                              xdet,
+                                              ydet,
+                                              zdet,
+                                              track,
+                                              chi,
+                                              pat1,
+                                              pat2,
+                                              res1_det_x,
+                                              res1_det_y,
+                                              res1_det_z,
+                                              res2_det_x,
+                                              res2_det_y,
+                                              res2_det_z,
+                                              res1_lab_x,
+                                              res1_lab_y,
+                                              res1_lab_z,
+                                              res2_lab_x,
+                                              res2_lab_y,
+                                              res2_lab_z);
 
         chi2 = chi[0] + chi[1];
         fh_chiy_vs_chix->Fill(chi[0], chi[1]);
         fh_chi2->Fill(chi2);
 
-        if (chi[0] < 1.e10)
+        if (chi[0] < chiMax)
             counter3++;
-        if (chi[1] < 1.e10)
+        if (chi[1] < chiMax)
             counter4++;
-        if (chi[0] < 1.e10 && chi[1] < 1.e10)
+        if (chi[0] < chiMax && chi[1] < chiMax)
         {
             // fill histograms
+            second = true;
             Output2(track, chi);
         }
 
@@ -1428,10 +1615,10 @@ void R3BTrackerTestS494::Exec(Option_t* option)
         track_s[3] = track[3];
         track_s[4] = track[4];
         track_s[5] = track[5];
-        chi_s[2] = chi[0];
-        chi_s[3] = chi[1];
+        chi_s[0] = chi[0];
+        chi_s[1] = chi[1];
 
-        if (debug && chi[0] < 1.e10)
+        if (debug && chi[0] < chiMax)
         {
             cout << "******************************************" << endl;
             cout << "single track #2: " << track[0] << "  " << track[1] << "  " << track[2] << "  " << track[3] << "  "
@@ -1444,13 +1631,17 @@ void R3BTrackerTestS494::Exec(Option_t* option)
                  << "px " << pHexs << " py " << pHeys << " z " << pHezs << endl;
         }
 
-        if (chi_s[0] + chi_s[0] + chi_s[0] + chi_s[0] < 1.e10)
+        if (chi_s[0] + chi_s[0] + chi_s[0] + chi_s[0] < chiMax * 4. && first && second)
         {
-            counterTracker++;
-            Output1(track_s, chi_s);
+            //			if(sqrt((track_s[0] - track_s[6]) * (track_s[0] - track_s[6]) +
+            //				(track_s[1] * track_s[7]) * (track_s[1] * track_s[7])) < 0.0005)
+            {
+                counterTracker++;
+                Output1(track_s, chi_s);
+            }
         }
 
-        if (chi[0] < 1.e10 && chi[1] < 1.e10)
+        if (chi[0] < chiMax && chi[1] < chiMax)
         {
             counterTracker++;
             // we have a hit
@@ -1478,6 +1669,8 @@ void R3BTrackerTestS494::Exec(Option_t* option)
             // plot hits of the track
             for (Int_t i = 0; i < ndet; i++)
             {
+                // fh_res_x[i]->Fill(res1_det_x[i] * 100.);
+                // fh_res_y[i]->Fill(res1_det_y[i] * 100.);
                 fh_xy[i]->Fill(xTrack[i] * 100., yTrack[i] * 100.);
                 fh_p_vs_x[i]->Fill(xTrack[i] * 100., track[5]);
                 fh_p_vs_x_test[i]->Fill(xTrack[i] * 100.,
@@ -1514,14 +1707,38 @@ void R3BTrackerTestS494::Exec(Option_t* option)
         }
     }
 
-    if (tracker && fPairs && countdet > 3)
+    if (tracker && fPairs && !twice && countdet > 3)
     {
         // double track
         counter2++;
         Bool_t det_coord = false;
-        Bool_t st = true;
-        multi_track_extended_output_from_cpp_(
-            &max, &countdet, &det_coord, &st, target, detector, qdet, xdet, ydet, zdet, track, chi, pat1, pat2);
+        Bool_t dt = true;
+        multi_track_extended_output_from_cpp_(&max,
+                                              &countdet,
+                                              &det_coord,
+                                              &dt,
+                                              target,
+                                              detector,
+                                              qdet,
+                                              xdet,
+                                              ydet,
+                                              zdet,
+                                              track,
+                                              chi,
+                                              pat1,
+                                              pat2,
+                                              res1_det_x,
+                                              res1_det_y,
+                                              res1_det_z,
+                                              res2_det_x,
+                                              res2_det_y,
+                                              res2_det_z,
+                                              res1_lab_x,
+                                              res1_lab_y,
+                                              res1_lab_z,
+                                              res2_lab_x,
+                                              res2_lab_y,
+                                              res2_lab_z);
 
         chi2 = chi[4] + chi[5];
         fh_chiy_vs_chix->Fill(chi[0], chi[1]);
@@ -1584,6 +1801,8 @@ void R3BTrackerTestS494::Exec(Option_t* option)
             // plot hits of the track
             if (detector[i] != ghost)
             {
+                fh_res_x[i]->Fill(res1_det_x[i] * 100.);
+                fh_res_y[i]->Fill(res1_det_y[i] * 100.);
                 fh_xy[detector[i]]->Fill(xdet[i] * 100., ydet[i] * 100.);
                 fh_p_vs_x[detector[i]]->Fill(xdet[i] * 100. + randx, track[5]);
                 fh_p_vs_x_test[detector[i]]->Fill(
@@ -1621,12 +1840,37 @@ void R3BTrackerTestS494::Exec(Option_t* option)
         // single track
         counter2++;
         Bool_t det_coord = false;
-        Bool_t st = false;
+        Bool_t dt = false;
         // multi_track_from_cpp_(
-        //    &max, &countdet, &det_coord, &st, target, detector, qdet, xdet, ydet, zdet, track, chi);
+        //    &max, &countdet, &det_coord, &dt, target, detector, qdet, xdet, ydet, zdet, track, chi);
 
-        multi_track_extended_output_from_cpp_(
-            &max, &countdet, &det_coord, &st, target, detector, qdet, xdet, ydet, zdet, track, chi, pat1, pat2);
+        multi_track_extended_output_from_cpp_(&max,
+                                              &countdet,
+                                              &det_coord,
+                                              &dt,
+                                              target,
+                                              detector,
+                                              qdet,
+                                              xdet,
+                                              ydet,
+                                              zdet,
+                                              track,
+                                              chi,
+                                              pat1,
+                                              pat2,
+                                              res1_det_x,
+                                              res1_det_y,
+                                              res1_det_z,
+                                              res2_det_x,
+                                              res2_det_y,
+                                              res2_det_z,
+                                              res1_lab_x,
+                                              res1_lab_y,
+                                              res1_lab_z,
+                                              res2_lab_x,
+                                              res2_lab_y,
+                                              res2_lab_z);
+
         chi2 = chi[0] + chi[1];
         fh_chiy_vs_chix->Fill(chi[0], chi[1]);
         fh_chi2->Fill(chi2);
@@ -1687,6 +1931,8 @@ void R3BTrackerTestS494::Exec(Option_t* option)
             // plot hits of the track
             for (Int_t i = 0; i < ndet; i++)
             {
+                fh_res_x[i]->Fill(res1_det_x[i] * 100.);
+                fh_res_y[i]->Fill(res1_det_y[i] * 100.);
                 fh_xy[i]->Fill(xTrack[i] * 100., yTrack[i] * 100.);
                 fh_p_vs_x[i]->Fill(xTrack[i] * 100., track[5]);
                 fh_p_vs_x_test[i]->Fill(xTrack[i] * 100.,
@@ -1764,6 +2010,7 @@ void R3BTrackerTestS494::Output1(Double_t track[12], Double_t chi[6])
     LOG(DEBUG) << "C: " << pCx << "  " << pCy << "  " << pCz << endl;
 
     fh_target_xy->Fill(track[0] * 100., track[1] * 100.);
+    fh_target_dxdy->Fill((track[0] - track[6]) * 100., (track[1] - track[7]) * 100.);
     fh_px_He->Fill(pHex);
     fh_py_He->Fill(pHey);
     fh_pz_He->Fill(pHez);
@@ -1801,6 +2048,8 @@ void R3BTrackerTestS494::Output1(Double_t track[12], Double_t chi[6])
 
     fh_Erel->Fill(Erelb);
     fh_dErel_vs_x->Fill(delta * 100., Erela);
+    fh_chi2_vs_Erel->Fill(Erelb, chi[0] + chi[1] + chi[2] + chi[3]);
+
     //	fh_dErel_vs_y->Fill(yTest * 100., Erela - 1.);
     if (1 == 1)
     {
@@ -1869,6 +2118,9 @@ void R3BTrackerTestS494::FinishTask()
     cout << "TofD: " << counterTofd << endl;
     cout << "TofD multi: " << counterTofdMulti << endl;
     cout << "Tracker: " << counterTracker << endl;
+    cout << "missing 23a: " << miss23a << " missing 33b: " << miss23b << endl;
+    cout << "missing 31: " << miss31 << " missing 32: " << miss32 << endl;
+    cout << "missing 33: " << miss33 << " missing 30: " << miss30 << endl;
 
     fh_Tpat->Write();
     fh_Trigger->Write();
@@ -1878,6 +2130,7 @@ void R3BTrackerTestS494::FinishTask()
     fh_IC->Write();
 
     fh_target_xy->Write();
+    fh_target_dxdy->Write();
     fh_target_px->Write();
     fh_target_py->Write();
     fh_target_pz->Write();
@@ -1965,11 +2218,14 @@ void R3BTrackerTestS494::FinishTask()
     fh_theta26_simu->Write();
     fh_Erel_simu->Write();
     fh_chiy_vs_chix->Write();
+    fh_chi2_vs_Erel->Write();
     fh_dErel_vs_x->Write();
     fh_dErel_vs_y->Write();
 
     for (Int_t i = 0; i < ndet; i++)
     {
+        fh_res_x[i]->Write();
+        fh_res_y[i]->Write();
         fh_xy[i]->Write();
         fh_p_vs_x[i]->Write();
         fh_p_vs_x_test[i]->Write();

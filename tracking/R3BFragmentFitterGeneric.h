@@ -31,6 +31,10 @@ class R3BFragmentFitterGeneric
     virtual Int_t FitTrack(R3BTrackingParticle*, R3BTrackingSetup*) = 0;
     
     virtual Int_t FitTrackBeta(R3BTrackingParticle*, R3BTrackingSetup*) = 0;
+    
+    virtual Int_t FitTrackMomentumForward(R3BTrackingParticle*, R3BTrackingSetup*) = 0;
+   
+    virtual Int_t FitTrackMomentumBackward(R3BTrackingParticle*, R3BTrackingSetup*) = 0;
 
     virtual Int_t FitTrackBackward(R3BTrackingParticle*, R3BTrackingSetup*) = 0;
     

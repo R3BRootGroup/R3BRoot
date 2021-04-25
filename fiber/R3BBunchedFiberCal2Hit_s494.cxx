@@ -330,6 +330,7 @@ void R3BBunchedFiberCal2Hit_s494::Exec(Option_t* option)
     // trailing we have.
     // Not super efficient, but shouldn't crash if the data is not
     // perfect.
+
     unsigned n_lead = 0;
     unsigned n_trail = 0;
     int s_mult = 0;
@@ -380,8 +381,10 @@ void R3BBunchedFiberCal2Hit_s494::Exec(Option_t* option)
 
             Double_t cur_cal_trig_ns = 0;
             Double_t lead_trig_ns = 0;
+
             if (cur_cal->IsMAPMT() && fMAPMTTriggerMap)
             {
+
                 auto cur_cal_trig_i = fMAPMTTriggerMap[ch_i];
                 auto lead_trig_i = fMAPMTTriggerMap[lead->GetChannel() - 1];
                 // if(fName=="Fi30") printf("30 trig curr %8u %8u lead %8u %8u  %8u\n", ch_i, cur_cal_trig_i,
@@ -390,6 +393,7 @@ void R3BBunchedFiberCal2Hit_s494::Exec(Option_t* option)
                 // lead->GetChannel() - 1, lead_trig_i);
                 if (cur_cal_trig_i < mapmt_trig_table.size() && lead_trig_i < mapmt_trig_table.size())
                 {
+
                     auto cur_cal_trig = mapmt_trig_table.at(cur_cal_trig_i);
                     auto lead_trig = mapmt_trig_table.at(lead_trig_i);
                     cur_cal_trig_ns = cur_cal_trig->GetTime_ns();
@@ -511,8 +515,9 @@ void R3BBunchedFiberCal2Hit_s494::Exec(Option_t* option)
                     auto fiber_id_ch = (mapmt_tot.lead->GetChannel() - 1) * fChPerSub[1] + 1;
                     single = spmt_tot.lead->GetChannel();
 
-                    cout << "mapmt: " << mapmt_tot.lead->GetChannel() << " single: " << single << " fiber: " << fiber_id
-                         << endl;
+                    // cout << "mapmt: " << mapmt_tot.lead->GetChannel() << " single: " << single << " fiber: " <<
+                    // fiber_id
+                    //     << endl;
                     // TODO: Use it_sub->direction to find real life coordinates.
 
                     // Fix fiber installation mistakes.
@@ -524,8 +529,13 @@ void R3BBunchedFiberCal2Hit_s494::Exec(Option_t* option)
                     Double_t t_mapmt = mapmt_tot.lead_ns;
 
                     Double_t t_mapmt1 = mapmt_tot.lead->GetTime_ns(); // MAPMT time without subtraction of trigger time
+                    Double_t t_spmt1 = spmt_tot.lead->GetTime_ns();   // SAPMT time without subtraction of trigger time
 
                     Double_t t_spmt = spmt_tot.lead_ns;
+
+                    // cout << "ToT single: " << tot_spmt << "  ToT multi: " << tot_mapmt << endl;
+                    // cout << "Time single: " << t_spmt << "  Time multi: " << t_mapmt
+                    //	<< "  ts: " << t_spmt1 << " tm: " << t_mapmt1 <<  endl;
                     // only accept hits which are at the right time:
                     Bool_t simu = true;
                     if (!simu)
@@ -600,6 +610,7 @@ void R3BBunchedFiberCal2Hit_s494::Exec(Option_t* option)
                     Double_t y = -10000.;
                     Double_t randx;
                     Double_t randy;
+                    Double_t veff = 12. / 2.;
 
                     if (fName == "Fi10" || fName == "Fi11" || fName == "Fi12" || fName == "Fi13")
                     {
@@ -613,18 +624,16 @@ void R3BBunchedFiberCal2Hit_s494::Exec(Option_t* option)
                         {
                             x = -detector_width / 2. + fiber_thickness / 2. +
                                 ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
-                            y = (t_spmt - t_mapmt) * 3.;
+                            y = (t_spmt - t_mapmt) * veff;
                             // y = 0.;
                         }
                         else
                         {
-                            x = (t_spmt - t_mapmt) * 3.;
+                            x = (t_spmt - t_mapmt) * veff;
                             // x = 0.;
                             y = -detector_width / 2. + fiber_thickness / 2. +
                                 ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
                         }
-                        if (x > 26.)
-                            cout << "fiber_id " << fiber_id << " x " << x << " y " << y << endl;
                     }
                     if (fName == "Fi1a" || fName == "Fi1b" || fName == "Fi2a" || fName == "Fi2b" || fName == "Fi3a" ||
                         fName == "Fi3b")
@@ -638,12 +647,12 @@ void R3BBunchedFiberCal2Hit_s494::Exec(Option_t* option)
                         {
                             x = -detector_width / 2. + fiber_thickness / 2. +
                                 ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
-                            y = (t_spmt - t_mapmt) * 3.;
+                            y = (t_spmt - t_mapmt) * veff;
                             // y = 0.;
                         }
                         else
                         {
-                            x = (t_spmt - t_mapmt) * 3.;
+                            x = (t_spmt - t_mapmt) * veff;
                             // x = 0.;
                             y = -detector_width / 2. + fiber_thickness / 2. +
                                 ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
@@ -660,12 +669,12 @@ void R3BBunchedFiberCal2Hit_s494::Exec(Option_t* option)
                         {
                             x = -detector_width / 2. + fiber_thickness / 2. +
                                 ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
-                            y = (t_spmt - t_mapmt) * 3.;
+                            y = (t_spmt - t_mapmt) * veff;
                             // y = 0.;
                         }
                         else
                         {
-                            x = (t_spmt - t_mapmt) * 3.;
+                            x = (t_spmt - t_mapmt) * veff;
                             // x = 0.;
                             y = -detector_width / 2. + fiber_thickness / 2. +
                                 ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
@@ -683,18 +692,16 @@ void R3BBunchedFiberCal2Hit_s494::Exec(Option_t* option)
                         {
                             x = -detector_width / 2. + fiber_thickness / 2. +
                                 ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
-                            // s                            y = (t_spmt - t_mapmt) * 3.;
-                            y = 0.;
+                            y = (t_spmt - t_mapmt) * veff;
+                            // y = 0.;
                         }
                         else
                         {
-                            // S                            x = (t_spmt - t_mapmt) * 3.;
-                            x = 0.;
+                            x = (t_spmt - t_mapmt) * veff;
+                            // x = 0.;
                             y = -detector_width / 2. + fiber_thickness / 2. +
                                 ((fiber_id - 1) + ((fiber_id - 1) * air_layer)) * fiber_thickness;
                         }
-                        if (x > 26.)
-                            cout << "fiber_id " << fiber_id << " x " << x << " y " << y << endl;
                     }
                     // cout<<"Fiber y " << y << endl;
                     if (y < -60 || y > 60)
@@ -716,12 +723,16 @@ void R3BBunchedFiberCal2Hit_s494::Exec(Option_t* option)
                     counts[fiber_id] = counts[fiber_id] + 1;
                     multi++;
 
-                    // if(fiber_id>256) cout << "save fiber_id " << fiber_id << " pos " << x << endl;
+                    cout << "save fiber " << fName << "  " << fiber_id << " pos " << x << endl;
                     if (!fIsCalibrator)
+                    {
                         new ((*fHitItems)[fNofHitItems++])
                             // s                            R3BBunchedFiberHitData(0, x, y, eloss, t, fiber_id, t_mapmt,
                             // t_spmt, tot_mapmt, tot_spmt);
                             R3BBunchedFiberHitData(0, x, y, eloss, t, fiber_id, t_mapmt1, 0., tot_mapmt, 0.);
+
+                        // cout << fName << " x: " << x << " y: " << y << endl;
+                    }
                 }
             }
         }

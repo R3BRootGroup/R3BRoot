@@ -44,6 +44,8 @@
 #pragma link C++ class R3BmTofDigi+;
 #pragma link C++ class R3BTofdPoint+;
 #pragma link C++ class R3BTofdDigi+;
+#pragma link C++ class R3BTofiPoint+;
+#pragma link C++ class R3BTofiDigi+;
 #pragma link C++ class R3BTofDigi+;
 #pragma link C++ class R3BTofPoint+;
 #pragma link C++ class R3BTof2pDigi+;
@@ -114,6 +116,9 @@
 #pragma link C++ class R3BTofdMappedData+;
 #pragma link C++ class R3BTofdCalData+;
 #pragma link C++ class R3BTofdHitData+;
+#pragma link C++ class R3BTofiMappedData+;
+#pragma link C++ class R3BTofiCalData+;
+#pragma link C++ class R3BTofiHitData+;
 #pragma link C++ class R3BPdcMappedData+;
 #pragma link C++ class R3BPdcCalData+;
 #pragma link C++ class R3BPdcHitData+;

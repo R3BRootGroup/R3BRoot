@@ -16,7 +16,7 @@ module vars
  logical, allocatable  :: trigger_matrix(:)                     ! true, if a certain pattern ID is allowed for a given track
  logical, allocatable  :: trigger_always_together(:,:)            ! true, if 2 detectors have to be hit together for a given track
  logical, allocatable  :: trigger_never_together(:,:)            ! true, if 2 detectors are never hit together for a given track
- logical               :: screen_output=.true.                        ! if true, standard output is screen, otherwise logfile
+ logical               :: screen_output=.false.                        ! if true, standard output is screen, otherwise logfile
  logical               :: calibration_event_by_event                ! true is calibration is done with events from experiment rather than average interception points
  logical               :: sweep_calibration                      ! true if calibration is done with magnetic sweep runs, .false. if done with scatter data
  character(LEN=256) :: ini_file, output_file(3), geometry_file,magnetic_field_file, derivative_file, calibration_data_file
@@ -48,7 +48,7 @@ module vars
  double precision   :: b_field_borders(3,2)                     ! borders of magnetic field ((xmin,xmax),(ymin,ymax),(zmin,zmax))
  double precision   :: spatial_resolution                         ! spatial resolution of the entire geometry, given by best detector resolution...
  double precision   :: max_momentum_deviation(3)                   ! constrains the possible solutions when multiple tracks are possible
- double precision, parameter   :: crossing_resolution = 1.d-3                         ! spatial resolution allowed for crossing tracks
+ double precision,parameter,dimension(2)   :: crossing_resolution=(/5.d-3,1.d-3/)                          ! spatial resolution allowed for crossing tracks x,y direction
  double precision   :: slope_parameter(4)                         ! parameters of the linear slope describing the particle track outside the magnetic field area
  double precision,parameter,dimension(3) :: norm_x = (/1.d0,0.d0,0.d0/)  ! norm-vector in x-direction ...
  double precision,parameter,dimension(3) :: norm_y = (/0.d0,1.d0,0.d0/)  ! norm-vector in y-direction ...
@@ -72,12 +72,16 @@ module vars
  double precision, allocatable :: detector_track_interactions_path(:)        ! flightpath between starting point and intersection of track point with z=0 plane of detector 
  double precision, allocatable :: detector_track_interactions_det_frame_ref(:,:)    ! intersection of track point with z=0 plane of detector in detector coordinates (detector_ID,3) last 3: x,y,z), reference track
  double precision, allocatable :: detector_track_interactions_det_frame_ref_step(:,:)    ! intersection of track point with z=0 plane of detector in detector coordinates (detector_ID,3) last 3: x,y,z), reference during step-wise initialization 
+ double precision, allocatable :: residual_det_frame(:,:)       ! measured_position - track_position in lab/det frame (detector_ID,3) last 3: x,y,z) 
+ double precision, allocatable :: residual1_det_frame(:,:)       ! measured_position - track_position in det frame (detector_ID,3) last 3: x,y,z) 
+ double precision, allocatable :: residual2_det_frame(:,:)       ! measured_position - track_position in det frame (detector_ID,3) last 3: x,y,z) 
  double precision, allocatable :: track_lab_frame(:,:)                                ! experimental track in lab coordinates (detector_ID,3) last 3: x,y,z
  double precision, allocatable :: track_det_frame(:,:),track_det_frame1(:,:),track_det_frame2(:,:)        ! experimental track in detector coordinates (detector_ID,3) last 3: x,y,z
  double precision, allocatable :: track_det_frame_y_corrected(:,:)        ! experimental track in detector coordinates (detector_ID,3) last 3: x,y,z
  double precision, allocatable :: track_det_frame1_y_corrected(:,:),track_det_frame2_y_corrected(:,:)        ! experimental track in detector coordinates (detector_ID,3) last 3: x,y,z
  double precision, allocatable :: sigma_track(:,:)                                    ! absolute unctertainties of experimental track 
  double precision, allocatable :: sigma_track2(:,:)                                    ! square of  sigma_track
+ double precision, allocatable :: crossing_resolution_det(:,:)                          ! crossing resolution for each detector and dimension
  double precision              :: pos_target(3),sigma_target(3),sigma_target2(3), pos_target_original(3)    !  target position, absolute uncertainty and it's square (x,y,z)
  logical, allocatable          :: track_hit_pattern(:),track_hit_pattern1(:),track_hit_pattern2(:)                            ! true, if detector provided data (detector_ID) 
  logical, allocatable          :: track_hit_pattern_used(:),track1_hit_pattern_used(:),track2_hit_pattern_used(:)                            ! true, if detector provided data (detector_ID) 
@@ -150,8 +154,9 @@ module vars
  integer                        :: spectrum_dthetax_dpy(0:nbr_channels_2d_spectra,0:nbr_channels_2d_spectra)
  integer                        :: spectrum_dpy_dpx(0:nbr_channels_2d_spectra,0:nbr_channels_2d_spectra)
  logical                        :: constrain_target_x, constrain_target_y       ! true, if target position is constrained during fitting
+ integer                        :: nbr_parameters_track
 !
- integer (kind=8) counter(6)                                                           ! some global counting, different internal uses 
+ integer (kind=8) counter(6),  counter_global(20)                                                          ! some global counting, different internal uses 
  character(LEN=256), parameter :: geometry_outpout_file='geometry_position_optimized.ini'
 end module vars
 
@@ -192,6 +197,7 @@ module calib
  double precision, allocatable   :: d_coefficients_y_correction(:,:)               ! coefficients to correct y, if theta_xz is varied (nbr_detector,basic_functions_y_correction)
  double precision, allocatable   :: coefficients_y_correction_ref(:,:)               ! coefficients to correct y, if theta_xz is varied (nbr_detector,basic_functions_y_correction)
  double precision, allocatable   :: detector_position_in_lab_orig(:,:)            ! position of detector coordinate system in lab-frame (detector_ID:x,y,z,rotation_around_y-axis)
+ 
 !
 end module calib
 
@@ -211,10 +217,19 @@ subroutine init_from_cpp
  end if  
 end
 
+subroutine finish_from_cpp
+ use vars
+ implicit none
+!
+ call finish
+end
+
 
 subroutine multi_track_extended_output_from_cpp(array_size,n_points,det_coordinates,double_track, local_target_position, &
                                 detector_id_in, charge_in, x_positions_in,y_positions_in,z_positions_in, &
-                                 track_parameter_out, chi_parameter_out,track1_hit_pattern_out,track2_hit_pattern_out)
+                                 track_parameter_out, chi_parameter_out,track1_hit_pattern_out,track2_hit_pattern_out, &
+                                res1_det_x,res1_det_y,res1_det_z,res2_det_x,res2_det_y,res2_det_z,&
+                                res1_lab_x,res1_lab_y,res1_lab_z,res2_lab_x,res2_lab_y,res2_lab_z )
 !
  use vars
  implicit none
@@ -228,10 +243,16 @@ subroutine multi_track_extended_output_from_cpp(array_size,n_points,det_coordina
  double precision z_positions_in(array_size)
  double precision track_parameter_out(12), chi_parameter_out(6)
  double precision local_target_position(3)
+ double precision residual1_lab_frame(nbr_detectors,3)
+ double precision residual2_lab_frame(nbr_detectors,3)
+ double precision res1_det_x(nbr_detectors), res1_det_y(nbr_detectors), res1_det_z(nbr_detectors)
+ double precision res2_det_x(nbr_detectors), res2_det_y(nbr_detectors), res2_det_z(nbr_detectors)
+ double precision res1_lab_x(nbr_detectors), res1_lab_y(nbr_detectors), res1_lab_z(nbr_detectors)
+ double precision res2_lab_x(nbr_detectors), res2_lab_y(nbr_detectors), res2_lab_z(nbr_detectors)
  integer i
  character(LEN=1) c1
 !
- 
+ counter_global(10) = counter_global(10) + 1
  call multi_track_from_cpp(array_size,n_points,det_coordinates,double_track, local_target_position, &
                                 detector_id_in, charge_in, x_positions_in,y_positions_in,z_positions_in, &
                                  track_parameter_out, chi_parameter_out)
@@ -240,7 +261,28 @@ subroutine multi_track_extended_output_from_cpp(array_size,n_points,det_coordina
    track1_hit_pattern_out(i) = track1_hit_pattern_used(i)  
    track2_hit_pattern_out(i) = track2_hit_pattern_used(i)  
  end do
-! 
+!
+! residuals uebergeben! residual_det_frame ...
+!
+ do i=1,nbr_detectors
+   call get_lab_vector(i,residual1_det_frame(i,:), residual1_lab_frame(i,:))
+   call get_lab_vector(i,residual2_det_frame(i,:), residual2_lab_frame(i,:))
+ end do
+ res1_lab_x =residual1_lab_frame(:,1) 
+ res1_lab_y =residual1_lab_frame(:,2) 
+ res1_lab_z =residual1_lab_frame(:,3) 
+ res2_lab_x =residual2_lab_frame(:,1) 
+ res2_lab_y =residual2_lab_frame(:,2) 
+ res2_lab_z =residual2_lab_frame(:,3) 
+ res1_det_x =residual1_det_frame(:,1) 
+ res1_det_y =residual1_det_frame(:,2) 
+ res1_det_z =residual1_det_frame(:,3) 
+ res2_det_x =residual2_det_frame(:,1) 
+ res2_det_y =residual2_det_frame(:,2) 
+ res2_det_z =residual2_det_frame(:,3) 
+!
+ counter_global(1:6) = counter_global(1:6) + counter(1:6)
+!
  if (debug_track .and. acknowledge_event) then
    write(*,*) 'Acknowledge to start next event (g ....go on for ever) '
    read(*,*) c1
@@ -253,11 +295,12 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
                                  track_parameter_out, chi_parameter_out)
  use vars
  implicit none
- integer i,j, d, new_hit, det_pattern_id, pattern_id, d1, d2
+ integer i,j, d, new_hit, det_pattern_id, pattern_id, d1, d2 
+ double precision dof_track, dof_old, dof_track_no_zero
  integer n_det_track_old
  integer n_det_track, n_det_track1, n_det_track2
  integer n_points, array_size
- logical (kind=1) det_coordinates, double_track,  left, right, new_combination
+ logical (kind=1) det_coordinates, double_track,  left, right, new_combination, top, bottom
  logical all_done, all_done1, all_done2, skip_combination, skip
  logical track_ok,track1_ok,track2_ok
  integer detector_id_in(array_size)
@@ -272,9 +315,14 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
  integer track1_hit_numbers_return(nbr_detectors),track2_hit_numbers_return(nbr_detectors), track_hit_numbers_return(nbr_detectors)
  double precision track_points_det_frame(nbr_detectors,n_points,3)
  double precision track_points_lab_frame(nbr_detectors,n_points,3)
- double precision chi2_local,chi2_local_old
+ double precision chi2_local,chi2_local_old, chi2_threshold
+ double precision residual_det_frame_old(nbr_detectors,3)
+ double precision residual1_det_frame_old(nbr_detectors,3)
+ double precision residual2_det_frame_old(nbr_detectors,3)
  integer track_points_charge(nbr_detectors,n_points), charge1, charge2, charge
+ double precision dp2_old_track, dp2_old_track1, dp2_old_track2, dp(3), dp2
 !
+ counter_global(11) = counter_global(11) + 1
  if (debug_track) then
    write(output_unit,*) 'multi: sorted events'
    write(output_unit,*) 'array_size',array_size
@@ -283,26 +331,48 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
    write(output_unit,*) 'Desired charge for track 2 (0 ..undecided)',charge_in(array_size+2)
  end if
 !
+ nbr_parameters_track = 0
+ dof_old              = 0
+! 
  if (constrain_target_x) then
    pos_target(1) = local_target_position(1)
  else
    pos_target(1) = pos_target_original(1)
+   nbr_parameters_track = nbr_parameters_track + 1 
  end if    
 !
  if (constrain_target_y) then
    pos_target(2) = local_target_position(2)
  else
    pos_target(2) = pos_target_original(2)
+   nbr_parameters_track = nbr_parameters_track + 1 
  end if    
 !
+ dp2_old_track        = 0.
+ dp2_old_track1       = 0.
+ dp2_old_track2       = 0.
+ dp2                  = 0.
  nbr_hits_per_detector  = 0
  track_hit_numbers_return = 0
  track1_hit_numbers_return = 0
  track2_hit_numbers_return = 0
  n_det_track_old        = 0
+ residual_det_frame     =0.
+ residual1_det_frame    =0.
+ residual2_det_frame    =0.
  track_points_det_frame = 0.d0
  track_points_lab_frame = 0.d0
  track_points_charge    = 0
+ if (double_track) then
+   chi2_threshold       = sum(chi_parameter_out(5:6))
+   counter_global(12)   = counter_global(12) + 1
+ else
+   chi2_threshold       = sum(chi_parameter_out(1:2))
+   counter_global(13)   = counter_global(13) + 1
+ end if  
+ if (chi2_threshold > 0.d0) then
+   chi2_threshold = chi2_threshold + 1d-6   ! increase it a little bit to avoid rounding errors. 
+ end if
  chi_parameter_out      = 1.d35
  chi2_local_old         = 1.d35
  do i=1,n_points
@@ -351,7 +421,8 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
 ! 
 ! start looping & tracking
 !
- if (double_track) then
+ if (double_track) then   
+   nbr_parameters_track = nbr_parameters_track + 6 
    track_hit_numbers1 = 0
    all_done1          = .false.
    do
@@ -374,25 +445,39 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
      n_det_track1 = 0
      charge1 = charge_in(array_size+1)
      if (track1_ok) then
-       left  = .true.
-       right = .true.
+       left   = .true.
+       right  = .true.
+       top    = .true.
+       bottom = .true.
        do d=1,nbr_detectors
          if (track_hit_pattern1(d)) then
-           if (det_consider(d,1)) n_det_track1 = n_det_track1 + 1
-           delta = track_points_lab_frame(d,track_hit_numbers1(d),1) - detector_track_interactions_lab_frame_ref(d,1)
-           left  = left  .and. (delta > -crossing_resolution)                                                 ! interception point is left of reference track
-           right = right .and. (delta <  crossing_resolution)                                                                            ! interception point is right of reference track
+           if (det_consider(d,1)) then
+             n_det_track1 = n_det_track1 + 1
+             if (left .or. right) then
+               delta = track_points_lab_frame(d,track_hit_numbers1(d),1) - detector_track_interactions_lab_frame_ref(d,1)
+               left  = left  .and. (delta > -crossing_resolution_det(d,1))                                                 ! interception point is left of reference track
+               right = right .and. (delta <  crossing_resolution_det(d,1))  
+             end if   
+           end if                                                                           ! interception point is right of reference track
+           if (det_consider(d,2)) then
+             n_det_track1 = n_det_track1 + 1
+             if ((left .or. right) .and.(top .or. bottom)) then
+               delta  = track_points_lab_frame(d,track_hit_numbers1(d),2) - detector_track_interactions_lab_frame_ref(d,2)
+               top    = top  .and. (delta > -crossing_resolution_det(d,2))                                                 ! interception point is above of reference track
+               bottom = bottom .and. (delta <  crossing_resolution_det(d,2))   
+             end if  
+           end if  
          end if
-         track1_ok  = track1_ok .and. (left .or. right)                                                                ! all interception points are either left or right
+         track1_ok  = track1_ok .and. (left .or. right) .and. (top .or. bottom)                                                                ! all interception points are either left or right
          if (track_hit_pattern1(d) .and. track1_ok) then
            track_det_frame1(d,:) = track_points_det_frame(d,track_hit_numbers1(d),:)            ! store interception points for later tracking
            if (track_points_charge(d,track_hit_numbers1(d)) /= 0) then
              if (charge1>0 .and. charge1 /=track_points_charge(d,track_hit_numbers1(d))) then
                track1_ok = .false.
-               if (debug_track) then
-                 write(output_unit,*) 'Multi hit routine, double track 1, charge missmatch!',&
-                 charge1,track_points_charge(d,track_hit_numbers1(d))
-               end if  
+!               if (debug_track) then
+!                 write(output_unit,*) 'Multi hit routine, double track 1, charge missmatch!',&
+!                 charge1,track_points_charge(d,track_hit_numbers1(d))
+!               end if  
              end if
              charge1=track_points_charge(d,track_hit_numbers1(d))
            end if  
@@ -427,16 +512,30 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
          charge2 = charge_in(array_size+2)
          if (track2_ok) then
            counter(3) = counter(3) + 1                                                            
-           left  = .true.
-           right = .true.
+           left   = .true.
+           right  = .true.
+           top    = .true.
+           bottom = .true.
            do d=1,nbr_detectors
              if (track_hit_pattern2(d)) then
-               if (det_consider(d,1)) n_det_track2 = n_det_track2 + 1
-               delta = track_points_lab_frame(d,track_hit_numbers2(d),1) - detector_track_interactions_lab_frame_ref(d,1)
-               left  = left  .and. (delta > -crossing_resolution)                                                 ! interception point is left of reference track
-               right = right .and. (delta <  crossing_resolution)                                                                            ! interception point is right of reference track
+               if (det_consider(d,1)) then
+                 n_det_track2 = n_det_track2 + 1 
+                 if (left .or. right) then
+                   delta = track_points_lab_frame(d,track_hit_numbers2(d),1) - detector_track_interactions_lab_frame_ref(d,1)
+                   left  = left  .and. (delta > -crossing_resolution_det(d,1))                                                 ! interception point is left of reference track
+                   right = right .and. (delta <  crossing_resolution_det(d,1)) 
+                 end if  
+               end if                                                                             ! interception point is right of reference track
+               if (det_consider(d,2)) then
+                 n_det_track2 = n_det_track2 + 1
+                 if ((left .or. right) .and.(top .or. bottom)) then
+                   delta = track_points_lab_frame(d,track_hit_numbers2(d),2) - detector_track_interactions_lab_frame_ref(d,2)
+                   top    = top  .and. (delta > -crossing_resolution_det(d,2))                                                 ! interception point is left of reference track
+                   bottom = bottom .and. (delta <  crossing_resolution_det(d,2)) 
+                 end if  
+               end if  
              end if
-             track2_ok  = track2_ok .and. (left .or. right)                                                                ! all interception points are either left or right
+             track2_ok  = track2_ok .and. (left .or. right) .and. (top .or. bottom)                                                                ! all interception points are either left or right
              if (track_hit_pattern2(d) .and. track2_ok) then
                track_det_frame2(d,:) = track_points_det_frame(d,track_hit_numbers2(d),:)            ! store interception points for later tracking
                if (track_points_charge(d,track_hit_numbers2(d)) /= 0) then
@@ -456,20 +555,30 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
 ! 
 ! check crossing of tracks
 ! 
-           right = .true.
-           left  = .true.
+           right   = .true.
+           left    = .true.
+           top     = .true.
+           bottom  = .true.
            do d=1,nbr_detectors
-             if (track_hit_pattern2(d) .and. track_hit_pattern1(d) ) then
-               right = right .and. (track_hit_numbers2(d) > track_hit_numbers1(d))                        ! interception point is right of track1
-               left  = left  .and. (track_hit_numbers2(d) < track_hit_numbers1(d))                        ! interception point is right of track1
-             end if
-             track2_ok  = track2_ok .and. (right .or. left)                                               ! all interception points are all right or all left
-             if (.not. track2_ok) then
-               if (debug_track) then
-                 write(output_unit,*) '  tracks are crossing!!!! Detector', detector_name(d)
+             if (track_hit_pattern2(d) .and. track_hit_pattern1(d)) then
+               if (det_consider(d,1).and.(left .or. right) ) then
+                 delta = track_points_lab_frame(d,track_hit_numbers2(d),1) - track_points_lab_frame(d,track_hit_numbers1(d),1)
+                 left  = left  .and. (delta > -crossing_resolution_det(d,1))                                                 ! interception point is left of reference track
+                 right = right .and. (delta <  crossing_resolution_det(d,1)) 
                end if  
+               if (det_consider(d,2).and.(left .or. right) .and.(top .or. bottom)) then
+                 delta = track_points_lab_frame(d,track_hit_numbers2(d),2) - track_points_lab_frame(d,track_hit_numbers1(d),2)
+                 top    = top  .and. (delta > -crossing_resolution_det(d,2))                                                 ! interception point is left of reference track
+                 bottom = bottom .and. (delta <  crossing_resolution_det(d,2)) 
+               end if  
+             end if
+             track2_ok  = track2_ok .and. (right .or. left)  .and. (top .or. bottom)                                               ! all interception points are all right or all left
+             if (.not. track2_ok) then
+!               if (debug_track) then
+!                 write(output_unit,*) '  tracks are crossing!!!! Detector', detector_name(d)
+!               end if  
+!               track2_ok = .true.   ! overrule crossing check for now
                exit
-               track2_ok = .true.   ! overrule crossing check for now
              end if  
            end do
          end if  
@@ -484,9 +593,15 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
 !
            n_det_track = n_det_track1 + n_det_track2
            chi2_local  = chi2_double(5) + chi2_double(6)
-           new_combination = (n_det_track > n_det_track_old)
-           new_combination = new_combination .or. ((n_det_track == n_det_track_old) .and. chi2_local < chi2_local_old)
-
+           dof_track = dble(n_det_track - nbr_parameters_track)
+           dof_track_no_zero = dof_track
+           if (dof_track_no_zero == 0.d0) dof_track_no_zero = 1.d0
+           if (dof_track>0. .and. dof_old>0.) then
+             new_combination = (chi2_local < chi2_local_old) .and. (chi2_local > chi2_threshold)
+           else
+             new_combination = (n_det_track > n_det_track_old)
+             new_combination = new_combination .or. ((n_det_track == n_det_track_old) .and. chi2_local < chi2_local_old)
+           end if
            if (any(.not.paddle_hit_1) .or. any(.not.paddle_hit_2) ) then
              new_combination = .false.
              if (debug_track) then
@@ -520,31 +635,36 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
                track_parameter_out(4:6)   = x_track1(4:6)/e*c/1.d6*dble(charge1)        ! momentum (MeV/c)
                track_parameter_out(7:9)   = x_track2(1:3)                    ! starting position in lab frame (m)
                track_parameter_out(10:12) = x_track2(4:6)/e*c/1.d6*dble(charge2)        ! momentum (MeV/c)
-               chi_parameter_out(1:4)     = chi2_double(1:4)  
+               chi_parameter_out(1:4)     = chi2_double(1:4)  / dof_track_no_zero
                track1_hit_pattern_used(1:nbr_detectors) = track_hit_pattern1
                track2_hit_pattern_used(1:nbr_detectors) = track_hit_pattern2
                track1_hit_pattern_used(nbr_detectors+1:2*nbr_detectors) = track1_hit_pattern_from_chi2
                track2_hit_pattern_used(nbr_detectors+1:2*nbr_detectors) = track2_hit_pattern_from_chi2
                track1_hit_numbers_return                = track_hit_numbers1
                track2_hit_numbers_return                = track_hit_numbers2
+               residual1_det_frame_old                  = residual1_det_frame
+               residual2_det_frame_old                  = residual2_det_frame
              else
                track_parameter_out(1:3)   = x_track2(1:3)                    ! starting position in lab frame (m)
                track_parameter_out(4:6)   = x_track2(4:6)/e*c/1.d6*dble(charge2)        ! momentum (MeV/c)
                track_parameter_out(7:9)   = x_track1(1:3)                    ! starting position in lab frame (m)
                track_parameter_out(10:12) = x_track1(4:6)/e*c/1.d6*dble(charge1)        ! momentum (MeV/c)
-               chi_parameter_out(1:2)     = chi2_double(3:4)  
-               chi_parameter_out(3:4)     = chi2_double(1:2)  
+               chi_parameter_out(1:2)     = chi2_double(3:4)  / dof_track_no_zero
+               chi_parameter_out(3:4)     = chi2_double(1:2)  / dof_track_no_zero
                track1_hit_pattern_used(1:nbr_detectors) = track_hit_pattern2
                track2_hit_pattern_used(1:nbr_detectors) = track_hit_pattern1
                track1_hit_pattern_used(nbr_detectors+1:2*nbr_detectors) = track2_hit_pattern_from_chi2
                track2_hit_pattern_used(nbr_detectors+1:2*nbr_detectors) = track1_hit_pattern_from_chi2
                track1_hit_numbers_return                = track_hit_numbers2
                track2_hit_numbers_return                = track_hit_numbers1
+               residual2_det_frame_old                  = residual1_det_frame
+               residual1_det_frame_old                  = residual2_det_frame
              end if           
 !
-             chi_parameter_out(5:6)     = chi2_double(5:6)  
+             chi_parameter_out(5:6)     = chi2_double(5:6)  / dof_track_no_zero
              n_det_track_old            = n_det_track
              chi2_local_old             = chi2_local
+             dof_old                    = dof_track
              if (debug_track) then
                write(output_unit,*) '  new combination accepted!        '
                write(output_unit,*) '  n_det_track_old, chi2        ',n_det_track_old, chi2_double
@@ -623,6 +743,7 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
 !  single-track
 !   
  else
+  nbr_parameters_track = nbr_parameters_track + 3  
   track_hit_numbers  = 0
   all_done           = .false.
   do
@@ -653,24 +774,38 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
    n_det_track = 0
    charge = charge_in(array_size+1)
    if (track_ok) then
-     left  = .true.
-     right = .true.
+     left   = .true.
+     right  = .true.
+     top    = .true.
+     bottom = .true.
      do d=1,nbr_detectors
        if (track_hit_pattern(d)) then
+         if (det_consider(d,2)) then
+           n_det_track = n_det_track + 1
+           delta = track_points_lab_frame(d,track_hit_numbers(d),2) - detector_track_interactions_lab_frame_ref(d,2)
+           top    = top  .and. (delta > -crossing_resolution_det(d,2))                                 ! interception point is left of reference track
+           bottom = bottom .and. (delta <  crossing_resolution_det(d,2))                                  ! interception point is right of reference track
+         end if  
          if (det_consider(d,1)) then
            n_det_track = n_det_track + 1
            delta = track_points_lab_frame(d,track_hit_numbers(d),1) - detector_track_interactions_lab_frame_ref(d,1)
-           left  = left  .and. (delta > -crossing_resolution)                                 ! interception point is left of reference track
-           right = right .and. (delta <  crossing_resolution)                                  ! interception point is right of reference track
+           left  = left  .and. (delta > -crossing_resolution_det(d,1))                                 ! interception point is left of reference track
+           right = right .and. (delta <  crossing_resolution_det(d,1))                                  ! interception point is right of reference track
          end if  
          if (det_step_function(d,1)) then
 !           n_det_track = n_det_track + 1
            delta = track_points_lab_frame(d,track_hit_numbers(d),1) - detector_track_interactions_lab_frame_ref(d,1)
-           left  = left  .and. (delta > -sigma_track(d,i)-crossing_resolution)                                 ! interception point is left of reference track
-           right = right .and. (delta <  sigma_track(d,i)+crossing_resolution)                                  ! interception point is right of reference track
+           left  = left  .and. (delta > -crossing_resolution_det(d,1))                                 ! interception point is left of reference track
+           right = right .and. (delta <  crossing_resolution_det(d,1))                                  ! interception point is right of reference track
+         end if  
+         if (det_step_function(d,2)) then
+!           n_det_track = n_det_track + 1
+           delta = track_points_lab_frame(d,track_hit_numbers(d),2) - detector_track_interactions_lab_frame_ref(d,2)
+           top    = top  .and. (delta > -crossing_resolution_det(d,2))                                 ! interception point is left of reference track
+           bottom = bottom .and. (delta <  crossing_resolution_det(d,2))                                  ! interception point is right of reference track
          end if  
        end if
-  !     track_ok  = track_ok .and. (left .or. right)                                                                ! all interception points are either left or right
+       track_ok  = track_ok .and. (left .or. right) .and. (top .or. bottom)                                                                ! all interception points are either left or right
        if (.not. track_ok) then
          if (debug_track) then
            write(output_unit,*) ' left/right check failed   ',track_ok
@@ -702,9 +837,18 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
 !
      call get_single_track_parameter_var5
 !
-     new_combination = (n_det_track > n_det_track_old)
-     new_combination = new_combination .or. ((n_det_track == n_det_track_old) .and. chi2_single(1) < chi_parameter_out(1))
-     
+     dof_track         = dble(n_det_track - nbr_parameters_track)
+     dof_track_no_zero = dof_track
+     if (dof_track_no_zero == 0.d0) dof_track_no_zero = 1.d0
+     chi2_local = sum(chi2_single(1:2))
+     if (dof_track>0. .and. dof_old>0.) then
+       new_combination = (chi2_local < sum(chi_parameter_out(1:2))) .and. (chi2_local > chi2_threshold)
+     else
+       new_combination = (n_det_track > n_det_track_old)
+!       new_combination = new_combination .or. ((n_det_track == n_det_track_old) .and. chi2_single(1) < chi_parameter_out(1))
+       new_combination = new_combination .or. &
+                      ((n_det_track == n_det_track_old) .and. sum(chi2_single(1:2)) < sum(chi_parameter_out(1:2)))
+     end if
      if (any(.not.paddle_hit)) then
        new_combination = .false.
        if (debug_track) then
@@ -716,24 +860,35 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
          end do
        end if
      end if  
-     do i=1,3
-       if (max_momentum_deviation(i) > 0.d0) then
-         if (dabs(x_track1(i+3) - x_reference(i+3)) > max_momentum_deviation(i) ) new_combination = .false.
-         if (debug_track) then
-           write(output_unit,*) 'tracked momentum outside range', i, x_track1(i+3),max_momentum_deviation(i)
+     if (any(max_momentum_deviation < 0.d0)) then
+       dp  = x_track1(4:6)-x_reference(4:6)
+       dp2 = dot_product(dp,dp)
+       if (dp2_old_track > 0.d0 ) then
+         if (dp2>dp2_old_track) new_combination = .false.
+       end if  
+     else
+       do i=1,3
+         if (max_momentum_deviation(i) > 0.d0) then
+           if (dabs(x_track1(i+3) - x_reference(i+3)) > max_momentum_deviation(i) ) new_combination = .false.
+           if (debug_track) then
+             write(output_unit,*) 'tracked momentum outside range', i, x_track1(i+3),max_momentum_deviation(i)
+           end if
          end if
-       end if
-     end do
-
+       end do
+     end if  
+!
      if (new_combination) then
        track_parameter_out(1:3) = x_track1(1:3)                              ! starting position in lab frame (m)
        track_parameter_out(4:6) = x_track1(4:6)/e*c/1.d6*dble(charge)        ! momentum (MeV/c)
 !
-       chi_parameter_out(1:2)   = chi2_single   
+       chi_parameter_out(1:2)   = chi2_single /dof_track_no_zero  
        n_det_track_old          = n_det_track
+       dof_old                  = dof_track
+       dp2_old_track            = dp2
        track_hit_pattern_used(1:nbr_detectors) = track_hit_pattern
        track_hit_pattern_used(nbr_detectors+1:2*nbr_detectors) = track_hit_pattern_from_chi2
        track_hit_numbers_return                = track_hit_numbers
+       residual_det_frame_old                  = residual_det_frame
        if (debug_track) then
          write(output_unit,*) '  n_det_track_old, chi2, track_parameter_out_single   ',&
            n_det_track_old, chi2_single,track_parameter_out(1:6)
@@ -785,35 +940,58 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
  n_points     = 0
  n_det_track1 = 0 
  n_det_track2 = 0
+ if (sum(chi_parameter_out) > 1E10) counter_global(14) = counter_global(14) + 1
+ if (sum(chi_parameter_out) < 1E10) counter_global(15) = counter_global(15) + 1
+ if (sum(chi_parameter_out) < 1E7)  counter_global(16) = counter_global(16) + 1
+ if (sum(chi_parameter_out) < 1E4)  counter_global(17) = counter_global(17) + 1
+ if (sum(chi_parameter_out) < 1E2)  counter_global(18) = counter_global(18) + 1
+ if (sum(chi_parameter_out) < 1E1)  counter_global(19) = counter_global(19) + 1
+ if (sum(chi_parameter_out) < 1E0)  counter_global(20) = counter_global(20) + 1
 ! 
  if (double_track) then
+   residual1_det_frame          = residual1_det_frame_old
+   residual2_det_frame          = residual2_det_frame_old
    do d = 1, nbr_detectors
      if (track1_hit_numbers_return(d) > 0) then
        n_points                 = n_points + 1
        n_det_track1 = n_det_track1 + 1
        detector_id_in(n_points) = d - 1 ! fortran -> cpp
        charge_in(n_points)      = track_points_charge(d,track1_hit_numbers_return(d))
-       x_positions_in(n_points) = track_points_det_frame(d,track1_hit_numbers_return(d),1)
-       y_positions_in(n_points) = track_points_det_frame(d,track1_hit_numbers_return(d),2)
-       z_positions_in(n_points) = track_points_det_frame(d,track1_hit_numbers_return(d),3)
+       if (det_coordinates) then
+         x_positions_in(n_points) = track_points_det_frame(d,track1_hit_numbers_return(d),1)
+         y_positions_in(n_points) = track_points_det_frame(d,track1_hit_numbers_return(d),2)
+         z_positions_in(n_points) = track_points_det_frame(d,track1_hit_numbers_return(d),3)
+       else  
+         x_positions_in(n_points) = track_points_lab_frame(d,track1_hit_numbers_return(d),1)
+         y_positions_in(n_points) = track_points_lab_frame(d,track1_hit_numbers_return(d),2)
+         z_positions_in(n_points) = track_points_lab_frame(d,track1_hit_numbers_return(d),3)
+       end if  
      end if
    end do
    charge                       = maxval(charge_in(1:n_det_track1))
    charge_in(1:n_det_track1)    = charge
+!
    do d = 1, nbr_detectors
      if (track2_hit_numbers_return(d) > 0) then
        n_points                 = n_points + 1
        n_det_track2 = n_det_track2 + 1
        detector_id_in(n_points) = d - 1 ! fortran -> cpp
        charge_in(n_points)      = track_points_charge(d,track2_hit_numbers_return(d))
-       x_positions_in(n_points) = track_points_det_frame(d,track2_hit_numbers_return(d),1)
-       y_positions_in(n_points) = track_points_det_frame(d,track2_hit_numbers_return(d),2)
-       z_positions_in(n_points) = track_points_det_frame(d,track2_hit_numbers_return(d),3)
+       if (det_coordinates) then
+         x_positions_in(n_points) = track_points_det_frame(d,track2_hit_numbers_return(d),1)
+         y_positions_in(n_points) = track_points_det_frame(d,track2_hit_numbers_return(d),2)
+         z_positions_in(n_points) = track_points_det_frame(d,track2_hit_numbers_return(d),3)
+       else  
+         x_positions_in(n_points) = track_points_lab_frame(d,track2_hit_numbers_return(d),1)
+         y_positions_in(n_points) = track_points_lab_frame(d,track2_hit_numbers_return(d),2)
+         z_positions_in(n_points) = track_points_lab_frame(d,track2_hit_numbers_return(d),3)
+       end if  
      end if
    end do
    charge                                              = maxval(charge_in(1+n_det_track1:n_det_track1+n_det_track2))
    charge_in(1+n_det_track1:n_det_track1+n_det_track2) = charge
  else
+   residual1_det_frame          = residual_det_frame_old
    do d = 1, nbr_detectors
      if (track_hit_numbers_return(d) > 0) then
        n_points                 = n_points + 1
@@ -828,9 +1006,15 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
        end if  
        detector_id_in(n_points) = d - 1 ! fortran -> cpp
        charge_in(n_points)      = track_points_charge(d,track_hit_numbers_return(d))
-       x_positions_in(n_points) = track_points_det_frame(d,track_hit_numbers_return(d),1)
-       y_positions_in(n_points) = track_points_det_frame(d,track_hit_numbers_return(d),2)
-       z_positions_in(n_points) = track_points_det_frame(d,track_hit_numbers_return(d),3)
+       if (det_coordinates) then
+         x_positions_in(n_points) = track_points_det_frame(d,track_hit_numbers_return(d),1)
+         y_positions_in(n_points) = track_points_det_frame(d,track_hit_numbers_return(d),2)
+         z_positions_in(n_points) = track_points_det_frame(d,track_hit_numbers_return(d),3)
+       else
+         x_positions_in(n_points) = track_points_lab_frame(d,track_hit_numbers_return(d),1)
+         y_positions_in(n_points) = track_points_lab_frame(d,track_hit_numbers_return(d),2)
+         z_positions_in(n_points) = track_points_lab_frame(d,track_hit_numbers_return(d),3)
+       end if  
      end if
    end do
    charge                = maxval(charge_in(1:n_points))
@@ -839,25 +1023,26 @@ subroutine multi_track_from_cpp(array_size,n_points,det_coordinates,double_track
 !
  if (debug_track) then
    write(output_unit,*)  'Multi: number of data points:',n_points
+   write(output_unit,*)  'Multi: some counting of events:',counter
    if (double_track) then
-     write(output_unit,*)  'Multi (double track) - number of T1 candidates                                   :',counter(1)
-     write(output_unit,*)  'Multi (double track) - number of T2 candidates                                   :',counter(6)
-     write(output_unit,*)  'Multi (double track) - number of T1 fulfilling Logik string                      :',counter(2)
-     write(output_unit,*)  'Multi (double track) - number of T1 & T2 fulfilling Logik string                 :',counter(3)
-     write(output_unit,*)  'Multi (double track) - number of T1 & T2 - Logik & no reference X-ing            :',counter(4)
-     write(output_unit,*)  'Multi (double track) - number of T1 & T2 - Logik & no reference & no track X-ing :',counter(5)
+     write(output_unit,*)  'M - DT - number of T1 candidates                                   :',counter(1)
+     write(output_unit,*)  'M - DT - number of T2 candidates                                   :',counter(6)
+     write(output_unit,*)  'M - DT - number of T1 fulfilling Logik string                      :',counter(2)
+     write(output_unit,*)  'M - DT - number of T1 , T2 fulfilling Logik string                 :',counter(3)
+     write(output_unit,*)  'M - DT - number of T1 , T2 - Logik , no reference X-ing            :',counter(4)
+     write(output_unit,*)  'M - DT - number of T1 , T2 - Logik , no reference , no track X-ing :',counter(5)
    else
-     write(output_unit,*)  'Multi (single track) - number of combinations                :',counter(1),counter(6)
-     write(output_unit,*)  'Multi (single track) - number of good tracks sent to tracking:',counter(2)
+     write(output_unit,*)  'M - ST - number of combinations                :',counter(1),counter(6)
+     write(output_unit,*)  'M - ST - number of good tracks sent to tracking:',counter(2)
    end if  
  end if  
-
-
-
-
-
 ! write(output_unit,*)  'Multi: some counting of events:',counter
 end
+
+
+
+
+
 
 subroutine single_track_from_cpp(n_det,det_coordinates,local_target_position, &
                                 x_positions_in,y_positions_in,z_positions_in, hit_pattern_in, &
@@ -1093,9 +1278,9 @@ subroutine special_event
 ! call multi_track_from_cpp(array_size,n_points,det_coordinates,double_track, pos_target_original, &
 !                                detector_id_in, charge_in, x_positions_in,y_positions_in,z_positions_in, &
 !                                 track_parameter_out, chi_parameter_out)  
- call multi_track_extended_output_from_cpp(array_size,n_points,det_coordinates,double_track, pos_target_original, &
-                                detector_id_in, charge_in, x_positions_in,y_positions_in,z_positions_in, &
-                                 track_parameter_out, chi_parameter_out, hit1,hit2)  
+! call multi_track_extended_output_from_cpp(array_size,n_points,det_coordinates,double_track, pos_target_original, &
+!                                detector_id_in, charge_in, x_positions_in,y_positions_in,z_positions_in, &
+!                                 track_parameter_out, chi_parameter_out, hit1,hit2)  
  print*,'success'
  print*,'n_points:',n_points
 ! print*,'charge_in:',charge_in(1:n_points)
@@ -2035,6 +2220,7 @@ subroutine get_double_chi2
  chi2_double(1:2)             = chi2_single
  track1_hit_pattern_from_chi2 = track_hit_pattern_from_chi2
  paddle_hit_1                 = paddle_hit
+ residual1_det_frame          = residual_det_frame
 !
 !  Track 2
 !
@@ -2052,6 +2238,7 @@ subroutine get_double_chi2
  chi2_double(3:4)             = chi2_single
  track2_hit_pattern_from_chi2 = track_hit_pattern_from_chi2
  paddle_hit_2                 = paddle_hit
+ residual2_det_frame          = residual_det_frame
 !
  chi2_double(5:6) = chi2_double(1:2) + chi2_double(3:4) 
  if (constrain_target_x) then
@@ -2128,11 +2315,15 @@ subroutine get_single_chi2
  detector_track_interactions_det_frame(:,1) = offset_ave_x + d_track_x
  detector_track_interactions_det_frame(:,2) = offset_ave_y + y_correction
 !
+! x-component
+!
  do k=1,3
    detector_track_interactions_det_frame(:,1) = detector_track_interactions_det_frame(:,1) + &
                                                 derivative_variable(1:nbr_detectors,k)*p_vector_x3(k)
  end do
 ! 
+! y-component
+!
  do k=1,2
    detector_track_interactions_det_frame(:,2) = detector_track_interactions_det_frame(:,2) + &
                                                 derivative_variable(nbr_detectors+1:2*nbr_detectors,k+3)*p_vector_y2(k)
@@ -2152,6 +2343,7 @@ subroutine get_single_chi2
  chi2_single = 0.d0
  ch2_x = 0.d0
  ch2_y = 0.d0
+ residual_det_frame = 0.
  paddle_hit = .true.
  do i=1,nbr_detectors
    if (track_hit_pattern(i) ) then
@@ -2164,13 +2356,18 @@ subroutine get_single_chi2
      ! chi2
      if (det_consider(i,1) ) then
        ch2_x = v1(i,1)*v1(i,1)/sigma_track2(i,1) + ch2_x
+     ! residual
+       residual_det_frame(i,1) = -v1(i,1)
        if (debug_track) then
          write(output_unit,*) detector_name(i), ' pos-x: simu, tracker; chi2-x :', track_det_frame(i,1),&
          detector_track_interactions_det_frame(i,1),ch2_x
        end if  
      end if  
      if (det_consider(i,2) ) then
+     ! chi2
        ch2_y = v1(i,2)*v1(i,2)/sigma_track2(i,2) + ch2_y
+     ! residual
+       residual_det_frame(i,2) = -v1(i,2)
        if (debug_track) then
          write(output_unit,*) detector_name(i), ' pos-y: simu, tracker; chi2-y :', track_det_frame(i,2),&
          detector_track_interactions_det_frame(i,2),ch2_y
@@ -3193,6 +3390,9 @@ subroutine allocate_arrays
   allocate( detector_track_interactions_det_frame(nbr_detectors,3) )
   allocate( detector_track_interactions_det_frame_ref(nbr_detectors,3) )
   allocate( detector_track_interactions_det_frame_ref_step(nbr_detectors,3) )
+  allocate( residual_det_frame(nbr_detectors,3) )
+  allocate( residual1_det_frame(nbr_detectors,3) )
+  allocate( residual2_det_frame(nbr_detectors,3) )
   allocate( track_det_frame(nbr_detectors,3) )
   allocate( track_det_frame1(nbr_detectors,3) )
   allocate( track_det_frame2(nbr_detectors,3) )
@@ -3203,6 +3403,7 @@ subroutine allocate_arrays
   allocate( sigma_track(nbr_detectors,3) )
   sigma_track = 0.d0
   allocate( sigma_track2(nbr_detectors,3) )
+  allocate( crossing_resolution_det(nbr_detectors,2) )
   allocate( track_hit_pattern(nbr_detectors) )
   allocate( track_hit_pattern1(nbr_detectors) )
   allocate( track_hit_pattern2(nbr_detectors) )
@@ -3247,6 +3448,36 @@ subroutine allocate_arrays
   allocate( trigger_always_together(nbr_detectors,nbr_detectors) )
   allocate( trigger_never_together(nbr_detectors,nbr_detectors) )
 end
+
+subroutine finish
+ use vars
+ implicit none
+!
+ write(output_unit_log,*) 
+ write(output_unit_log,*) 'the end is reached, just a few more numbers...'
+ write(output_unit_log,*) 
+ write(output_unit_log,*) 'calls of multi_track_extended_output_from_cpp : ', counter_global(10)
+ write(output_unit_log,*) 'calls of multi_track_from_cpp                 : ', counter_global(11)
+ write(output_unit_log,*) 'calls of multi_track_from_cpp with DT         : ', counter_global(12)
+ write(output_unit_log,*) 'calls of multi_track_from_cpp with ST         : ', counter_global(13)
+ write(output_unit_log,*) 
+ write(output_unit_log,*) 'Events with sum(chi2) > 1E10                  : ', counter_global(14)
+ write(output_unit_log,*) 'Events with sum(chi2) < 1E10                  : ', counter_global(15)
+ write(output_unit_log,*) 'Events with sum(chi2) < 1E7                   : ', counter_global(16)
+ write(output_unit_log,*) 'Events with sum(chi2) < 1E4                   : ', counter_global(17)
+ write(output_unit_log,*) 'Events with sum(chi2) < 1E2                   : ', counter_global(18)
+ write(output_unit_log,*) 'Events with sum(chi2) < 1E1                   : ', counter_global(19)
+ write(output_unit_log,*) 'Events with sum(chi2) < 1E0                   : ', counter_global(20)
+ write(output_unit_log,*) 
+ write(output_unit,*)  'G - DT - number of T1 candidates                                   :',counter_global(1)
+ write(output_unit,*)  'G - DT - number of T2 candidates                                   :',counter_global(6)
+ write(output_unit,*)  'G - DT - number of T1 fulfilling Logik string                      :',counter_global(2)
+ write(output_unit,*)  'G - DT - number of T1 , T2 fulfilling Logik string                 :',counter_global(3)
+ write(output_unit,*)  'G - DT - number of T1 , T2 - Logik , no reference X-ing            :',counter_global(4)
+ write(output_unit,*)  'G - DT - number of T1 , T2 - Logik , no reference , no track X-ing :',counter_global(5)
+!
+ close(output_unit_log)
+end 
 
 subroutine init
  use vars
@@ -3455,8 +3686,10 @@ subroutine init
   detector_range(:,:,3) = dabs( detector_range(:,:,2) - detector_range(:,:,1) )
  read (unit_read,*) ch_trigger_logic
  close(unit_read)
- sigma_track2 = sigma_track**2
- sigma_track  = dabs(sigma_track)
+ sigma_track2            = sigma_track**2
+ sigma_track             = dabs(sigma_track)
+ crossing_resolution_det(:,1) = dsqrt(2.d0*sigma_track2(:,1) + crossing_resolution(1)**2)
+ crossing_resolution_det(:,2) = dsqrt(2.d0*sigma_track2(:,2) + crossing_resolution(2)**2)
 ! 
  if (.not. calibration_mode) write(output_unit,*) 'x-borders (m): ',master_borders(1,:) 
  if (.not. calibration_mode) write(output_unit,*) 'y-borders (m): ',master_borders(2,:) 
@@ -3470,6 +3703,7 @@ subroutine init
  write(output_unit,*) 'init done, will now do some geometry checks'
  write(output_unit,*)
  call geometry_check
+ counter_global = 0
 end
 
 subroutine geometry_check

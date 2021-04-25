@@ -39,6 +39,10 @@ class R3BTrackingSetup
     void SetParContainers();
 
     void CopyHits();
+    
+    void CopyToBuffer();
+    
+    void TakeHitsFromBuffer(Int_t iev);
 
     std::vector<R3BTrackingDetector*>& GetArray() { return fDetectors; }
 

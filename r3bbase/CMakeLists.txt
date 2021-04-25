@@ -70,12 +70,15 @@ R3BOnlineSpectraPdc.cxx
 R3BOnlineSpectraSfib.cxx
 R3BGlobalAnalysis.cxx
 R3BGlobalAnalysisS454.cxx
+R3BGlobalAnalysisS494.cxx
 R3BTrackS454.cxx
 R3BTrackS494.cxx
 R3BTrackerTestS454.cxx
 R3BTrackerTestS494.cxx
 R3BOnlineSpillAnalysis.cxx
 R3BOnlineSpectraFiberTofds515.cxx
+R3BTrackerPreparationS454.cxx
+R3BTrackerPreparationS494.cxx
 R3BOnlineSpectraLosStandalone.cxx
 R3BOnlineSpectraSci2.cxx
 R3BOnlineSpectraLosVsSci2.cxx

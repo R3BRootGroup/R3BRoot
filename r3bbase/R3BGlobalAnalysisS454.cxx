@@ -456,10 +456,10 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
                 is_alpha = true;
                 alpha.SetPxPyPzE(pHex, pHey, pHez, sqrt(pow(pHex, 2) + pow(pHey, 2) + pow(pHez, 2) + pow(mHe, 2)));
 
-                // cout << "******************************************" << endl;
-                // cout << "Track In 4He"
-                //           << "x " << XHe << " y " << YHe << " z " << ZHe << endl;
-                // cout << "px " << pHex << " py " << pHey << " z " << pHez << endl;
+                cout << "******************************************" << endl;
+                cout << "Track In 4He"
+                     << "x " << XHe << " y " << YHe << " z " << ZHe << endl;
+                cout << "px " << pHex << " py " << pHey << " z " << pHez << endl;
             }
             if (aTrack->GetQ() == 6)
             {
@@ -478,10 +478,10 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
                 is_carbon = true;
                 carbon.SetPxPyPzE(pCx, pCy, pCz, sqrt(pow(pCx, 2) + pow(pCy, 2) + pow(pCz, 2) + pow(mC, 2)));
 
-                // cout << "******************************************" << endl;
-                // cout << "Track In 12C"
-                //           << "x " << XC << " y " << YC << " z " << ZC << endl;
-                // cout << "px " << pCx << " py " << pCy << " z " << pCz << endl;
+                cout << "******************************************" << endl;
+                cout << "Track In 12C"
+                     << "x " << XC << " y " << YC << " z " << ZC << endl;
+                cout << "px " << pCx << " py " << pCy << " z " << pCz << endl;
             }
             if (aTrack->GetQ() == 8)
             {
@@ -584,7 +584,7 @@ void R3BGlobalAnalysisS454::Exec(Option_t* option)
     {
         fh_chiy_vs_chix_He->Fill(chiHex, chiHey);
         fh_chiy_vs_chix_C->Fill(chiCx, chiCy);
-        Double_t cut_chi = 100;
+        Double_t cut_chi = 100000.;
         if (chiHex < cut_chi && chiHey < cut_chi && chiCx < cut_chi && chiCy < cut_chi)
         //			&&((alpha.Px() > 0 && carbon.Px() < 0) || (alpha.Px() < 0 && carbon.Px() > 0)))
         {

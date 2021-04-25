@@ -4,10 +4,14 @@
 extern"C" {
 
 void init_from_cpp_();
+void finish_from_cpp_();
 void single_track_from_cpp_(int *n, bool *dc, double tpos[], double x[], double y[], double z[], bool pat[], double param[], double chi[]);
 void double_track_from_cpp_(int *n, bool *dc, double tpos[], double x1[], double y1[], double z1[], bool pat1[],double x2[], double y2[], double z2[], bool pat2[] , double param1[], double param2[], double chi[]);
 void multi_track_from_cpp_(int *arraysize, int *n, bool *dc, bool *sd, double tpos[], int det[], int q1[], double x1[], double y1[], double z1[], double param[], double chi[]);
-void multi_track_extended_output_from_cpp_(int *arraysize, int *n, bool *dc, bool *sd, double tpos[], int det[], int q1[], double x1[], double y1[], double z1[], double param[], double chi[], bool pat1r[], bool pat2r[]);
+void multi_track_extended_output_from_cpp_(int *arraysize, int *n, bool *dc, bool *sd, double tpos[], int det[], int q1[], 
+                                           double x1[], double y1[], double z1[], double param[], double chi[], bool pat1r[], bool pat2r[],
+                                           double res1_det_x[],double res1_det_y[],double res1_det_z[],double res2_det_x[],double res2_det_y[],double res2_det_z[],
+                                           double res1_lab_x[],double res1_lab_y[],double res1_lab_z[],double res2_lab_x[],double res2_lab_y[],double res2_lab_z[]);
 
 
 // for testing purposes
