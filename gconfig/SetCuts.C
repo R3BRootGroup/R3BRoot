@@ -20,7 +20,7 @@ void SetCuts()
 	// Please consult the file data/galice.cuts for detector
 	// specific settings, i.e. DRAY
 
-/*
+
 	gMC->SetProcess("DCAY",1); // Particle decay
 	gMC->SetProcess("PAIR",1); // Pair production
 	gMC->SetProcess("COMP",1); // Compton scattering
@@ -35,9 +35,9 @@ void SetCuts()
 	gMC->SetProcess("LOSS",2); // Energy loss (2=complete fluct.)
 	gMC->SetProcess("MULS",1); // Multiple scattering
 	gMC->SetProcess("RAYL",1); // Rayleigh scattering
-*/
 
 
+/*
 	gMC->SetProcess("DCAY",0); // Particle decay
 	gMC->SetProcess("PAIR",0); // Pair production
 	gMC->SetProcess("COMP",0); // Compton scattering
@@ -52,7 +52,7 @@ void SetCuts()
 	gMC->SetProcess("LOSS",4); // Energy loss (2=complete fluct.)
 	gMC->SetProcess("MULS",0); // Multiple scattering
 	gMC->SetProcess("RAYL",0); // Rayleigh scattering
-
+*/
 
     cout << "[SetCuts]: Setting Cuts ..." << endl;
 
