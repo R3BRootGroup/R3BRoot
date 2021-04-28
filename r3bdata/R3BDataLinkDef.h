@@ -140,5 +140,6 @@
 #pragma link C++ class R3BSfibMappedData+;
 #pragma link C++ class R3BSfibCalData+;
 #pragma link C++ class R3BSfibHitData+;
+#pragma link C++ class R3BFrsData+;
 
 #endif

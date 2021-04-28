@@ -104,7 +104,7 @@ class R3BTofdCal2HitS454 : public FairTask
      * Method for setting the nuclear charge of main beam
      */
     inline void SetTofdQ(Double_t Q) { fTofdQ = Q; }
-   
+
     /**
      * Method for setting histograms
      */
@@ -117,7 +117,7 @@ class R3BTofdCal2HitS454 : public FairTask
     /**
      * Old Method for walk calculation.
      */
-    ///virtual Double_t walk(Double_t Q);
+    /// virtual Double_t walk(Double_t Q);
     /**
      * new Method for walk calculation.
      */
@@ -151,15 +151,15 @@ class R3BTofdCal2HitS454 : public FairTask
     }
 
   private:
-    TClonesArray* fCalItems;    /**< Array with Cal items - input data. */
-    TClonesArray* fCalTriggerItems;    /**< Array with trigger Cal items - input data. */
-    TClonesArray* fHitItems;    /**< Array with Hit items - output data. */
-    UInt_t fNofHitItems;        /**< Number of hit items for cur event. */
-    R3BTofdHitPar* fHitPar;     /**< Hit parameter container. */
-    UInt_t fNofHitPars;         /**< Number of modules in parameter file. */
-    R3BEventHeader* header;     /**< Event header - input data. */
-    Double_t fClockFreq;        /**< Clock cycle in [ns]. */
-    Int_t fTrigger;             /**< Trigger value. */
+    TClonesArray* fCalItems;        /**< Array with Cal items - input data. */
+    TClonesArray* fCalTriggerItems; /**< Array with trigger Cal items - input data. */
+    TClonesArray* fHitItems;        /**< Array with Hit items - output data. */
+    UInt_t fNofHitItems;            /**< Number of hit items for cur event. */
+    R3BTofdHitPar* fHitPar;         /**< Hit parameter container. */
+    UInt_t fNofHitPars;             /**< Number of modules in parameter file. */
+    R3BEventHeader* header;         /**< Event header - input data. */
+    Double_t fClockFreq;            /**< Clock cycle in [ns]. */
+    Int_t fTrigger;                 /**< Trigger value. */
     Int_t fTpat;
     Double_t fTofdQ;
     Bool_t fTofdHisto;
@@ -178,11 +178,11 @@ class R3BTofdCal2HitS454 : public FairTask
     UInt_t multihit;
     UInt_t bars_with_multihit;
     UInt_t events_wo_tofd_hits;
-    
+
     // arrays of control histograms
     TH2F* fhQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
-    //TH2F* fhQvsTHit[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
-    //TH2F* fhTvsTHit[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    // TH2F* fhQvsTHit[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    // TH2F* fhTvsTHit[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhQ[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhxy[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhQvsEvent[N_TOFD_HIT_PLANE_MAX];

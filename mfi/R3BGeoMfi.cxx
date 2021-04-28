@@ -19,11 +19,8 @@
 /////////////////////////////////////////////////////////////
 #include "R3BGeoMfi.h"
 #include "FairGeoNode.h"
-
+#include "FairLogger.h"
 #include <iostream>
-
-using std::cout;
-using std::endl;
 
 ClassImp(R3BGeoMfi)
 
@@ -40,7 +37,7 @@ const char* R3BGeoMfi::getModuleName(Int_t m)
     // Returns the module name of sts number m
     if (m < 0)
     {
-        cout << "-E- R3BGeoMfi::getModuleName:: Module number " << m << " not known!" << endl;
+        LOG(ERROR) << "R3BGeoMfi::getModuleName:: Module number " << m << " not known!";
         return "";
     }
     if (m < 9)

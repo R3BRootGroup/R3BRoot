@@ -1,3 +1,16 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
 // ------------------------------------------------------------
 // -----                  R3BOnlineSpectra                -----
 // -----          Created April 13th 2016 by M.Heil       -----
@@ -463,7 +476,7 @@ void R3BOnlineSpectraLosStandalone::Exec(Option_t* option)
     Bool_t iLOSPileUp[fNofLosDetectors][32];
     for (Int_t idet = 0; idet < fNofLosDetectors; idet++)
     {
-        for (Int_t imult = 0; imult < 33; imult++)
+        for (Int_t imult = 0; imult < 32; imult++)
         {
             iLOSType[idet][imult] = false;
             iLOSPileUp[idet][imult] = false;

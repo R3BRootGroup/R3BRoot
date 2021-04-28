@@ -46,11 +46,11 @@
 #include "R3BTofdPoint.h"
 
 using namespace std;
-using std::cout;
-using std::endl;
 
 R3BTofdDigitizer::R3BTofdDigitizer()
     : FairTask("R3B Tofd Digitization scheme ")
+    , fTofdPoints(NULL)
+    , fTofdHits(NULL)
 {
 
     // set default values for smearing
@@ -59,7 +59,13 @@ R3BTofdDigitizer::R3BTofdDigitizer()
     fsigma_ELoss = 0.001;
 }
 
-R3BTofdDigitizer::~R3BTofdDigitizer() {}
+R3BTofdDigitizer::~R3BTofdDigitizer()
+{
+    if (fTofdPoints)
+        delete fTofdPoints;
+    if (fTofdHits)
+        delete fTofdHits;
+}
 
 InitStatus R3BTofdDigitizer::Init()
 {
@@ -143,8 +149,8 @@ void R3BTofdDigitizer::Exec(Option_t* opt)
 
                 if (0 == point || (vPoints[channel].at(point)->GetTime() - MapOfHits[channel]->GetTime()) > 30)
                 { // add new hits
-                    int layer_label;
-                    int paddle_number;
+                    int layer_label = 0;
+                    int paddle_number = 0;
                     if (channel < 200)
                     {
                         layer_label = 0;
@@ -185,9 +191,9 @@ void R3BTofdDigitizer::Exec(Option_t* opt)
                                         }
                     */
                     // add to HitData and introduce smearing of y-position, time and energy loss
-                    cout << "Hit Tofd: ch = " << channel << " paddle = " << paddle_number << " x = " << X_Pos[channel]
-                         << " y = " << Y_Pos[channel] << " t = " << Time[channel] << " eloss = " << Energy_Loss[channel]
-                         << endl;
+                    LOG(INFO) << "Hit Tofd: ch = " << channel << " paddle = " << paddle_number
+                              << " x = " << X_Pos[channel] << " y = " << Y_Pos[channel] << " t = " << Time[channel]
+                              << " eloss = " << Energy_Loss[channel];
 
                     //                    if(channel < 200)
 

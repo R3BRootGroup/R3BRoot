@@ -67,12 +67,12 @@ class R3BTofdDigitizer : public FairTask
     Int_t number_layers = 2;
     Int_t number_paddles = 44; // per layer
     Float_t paddle_width = 2.70000;
-    Float_t paddle_thickness = 0.50000; 
+    Float_t paddle_thickness = 0.50000;
     Float_t air_gap_paddles = 0.04;
     Float_t air_gap_layer = 5.;
 
-    Float_t detector_width = number_paddles*paddle_width+(number_paddles-1)*air_gap_paddles+paddle_width;
-    Float_t detector_thickness = (number_layers-1)*air_gap_layer+number_layers*paddle_thickness;
+    Float_t detector_width = number_paddles * paddle_width + (number_paddles - 1) * air_gap_paddles + paddle_width;
+    Float_t detector_thickness = (number_layers - 1) * air_gap_layer + number_layers * paddle_thickness;
 
     ClassDef(R3BTofdDigitizer, 1);
 };

@@ -44,16 +44,16 @@
 #include <string>
 #include <vector>
 
-using std::cout;
-using std::endl;
-
 R3BTofdDigitizerCal::R3BTofdDigitizerCal()
     : FairTask("R3B Tofd Digitization scheme ")
     , fTofdPoints(NULL)
 {
 }
 
-R3BTofdDigitizerCal::~R3BTofdDigitizerCal() {}
+R3BTofdDigitizerCal::~R3BTofdDigitizerCal() {
+if( fTofdPoints)
+ delete  fTofdPoints;
+}
 
 InitStatus R3BTofdDigitizerCal::Init()
 {
@@ -85,8 +85,7 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
 {
     //	cout<<"R3BTofdDigitizerCal Exec Entry"<<endl;
     if (counter / 10000. == (int)counter / 10000)
-        std::cout << "\rEvents: " << counter << " / " << maxevent << " (" << (int)(counter * 100. / maxevent) << " %) "
-                  << std::flush;
+        LOG(INFO) << "\rEvents: " << counter << " / " << maxevent << " (" << (int)(counter * 100. / maxevent) << " %) ";
     counter += 1;
 
     Reset();
@@ -182,8 +181,8 @@ void R3BTofdDigitizerCal::Exec(Option_t* opt)
 
         // creating the final hits
 
-        int layer_label;
-        int paddle_number;
+        int layer_label=0;
+        int paddle_number=0;
         Double_t yrnd, yns, ToT_up, ToT_down, ernd, ens, timernd, timeL_up = -1., timeL_down = -1., timeT_up = -1.,
                                                                   timeT_down = -1.;
 

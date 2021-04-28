@@ -116,9 +116,9 @@ class R3BTofdMapped2Cal : public FairTask
   private:
     size_t GetCalLookupIndex(R3BTofdMappedData const&) const;
 
-    TClonesArray* fMappedItems; /**< Array with mapped items - input data. */
+    TClonesArray* fMappedItems;        /**< Array with mapped items - input data. */
     TClonesArray* fMappedTriggerItems; /**< Array with mapped items - input data. */
-    TClonesArray* fCalItems;    /**< Array with cal items - output data. */
+    TClonesArray* fCalItems;           /**< Array with cal items - output data. */
     TClonesArray* fCalTriggerItems;    /**< Array with cal trigger items - output data. */
 
     R3BTCalPar* fTcalPar; /**< TCAL parameter container. */

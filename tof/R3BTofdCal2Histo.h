@@ -140,13 +140,13 @@ class R3BTofdCal2Histo : public FairTask
      */
     inline void SetTofdSmiley(Bool_t Smiley) { fTofdSmiley = Smiley; }
     /**
-     * 
+     *
      */
     inline void ReadParaFile(TString file) { fParaFile = file; }
     /**
      * old Method for walk calculation.
      */
-    ///virtual Double_t walk(Double_t Q);
+    /// virtual Double_t walk(Double_t Q);
     /**
      * new Method for walk calculation.
      */
@@ -171,12 +171,12 @@ class R3BTofdCal2Histo : public FairTask
     UInt_t fPaddlesPerPlane; /**< Number of bars per plane. */
     UInt_t fNofModules;      /**< Total number of modules (=edges) to calibrate */
 
-    UInt_t fNEvents;             /**< Event counter. */
-    R3BTofdHitPar* fCal_Par;    /**< Parameter container. */
-    TClonesArray* fCalData;     /**< Array with mapped data - input data. */
-    TClonesArray* fCalTriggerItems;    /**< Array with trigger Cal items - input data. */
-    R3BEventHeader* header;     /**< Event header - input data. */
-    Double_t fClockFreq;        /**< Clock cycle in [ns]. */
+    UInt_t fNEvents;                /**< Event counter. */
+    R3BTofdHitPar* fCal_Par;        /**< Parameter container. */
+    TClonesArray* fCalData;         /**< Array with mapped data - input data. */
+    TClonesArray* fCalTriggerItems; /**< Array with trigger Cal items - input data. */
+    R3BEventHeader* header;         /**< Event header - input data. */
+    Double_t fClockFreq;            /**< Clock cycle in [ns]. */
     Double_t fTofdY;
     Double_t fTofdQ;
     Bool_t fTofdSmiley;
@@ -191,7 +191,7 @@ class R3BTofdCal2Histo : public FairTask
     TH2F* fhLogTot1vsLogTot2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhSqrtQvsPosToT[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
-    //TH2F* fhTot1vsTot2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    // TH2F* fhTot1vsTot2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhTot1vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
     TH2F* fhTot2vsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
 

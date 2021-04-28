@@ -1,3 +1,16 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
 #ifndef R3BOnlineSpectraSci2_H
 #define R3BOnlineSpectraSci2_H
 
@@ -6,12 +19,6 @@
 #include "TH1.h"
 #include "TH2D.h"
 #include "TH2F.h"
-#include "TMath.h"
-#include <array>
-#include <cstdlib>
-#include <fstream>
-#include <iostream>
-#include <sstream>
 
 class TClonesArray;
 class R3BEventHeader;

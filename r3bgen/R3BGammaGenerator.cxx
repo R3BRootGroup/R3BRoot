@@ -33,7 +33,7 @@ Bool_t R3BGammaGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     // Pick random initial level
     double weightTotal = 0;
     int lvlSrc = -1, lvlDst = -1;
-    bool radiative;
+    bool radiative = false;
 
     if (fInitialLevelDistribution.size() == 0)
     {

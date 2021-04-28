@@ -330,7 +330,7 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
         Int_t plane = 0;
         Int_t wire = 0;
         Double_t x[4], y[4], eloss[4], t[4];
-        for (Int_t i = 0; i < 5; i++)
+        for (Int_t i = 0; i < 4; i++)
         {
             x[i] = -10000.;
             y[i] = -10000;
@@ -350,21 +350,21 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
             {
                 plane = hit->GetDetId();
                 wire = hit->GetWireId();
-                x[plane] = hit->GetX();
-                y[plane] = hit->GetY();
-                eloss[plane] = hit->GetEloss();
-                t[plane] = hit->GetTime();
+                x[plane - 1] = hit->GetX();
+                y[plane - 1] = hit->GetY();
+                eloss[plane - 1] = hit->GetEloss();
+                t[plane - 1] = hit->GetTime();
                 // cout << "Hit plane: " << plane << " x: " << x[plane] << " y: "
                 //     << y[plane] << " t: " << t[plane] << " ToT: " << eloss[plane] << endl;
                 if (plane & 1)
                 {
-                    fh_Pdc_Tot[plane - 1]->Fill(x[plane], eloss[plane]);
+                    fh_Pdc_Tot[plane - 1]->Fill(x[plane - 1], eloss[plane - 1]);
                 }
                 else
                 {
-                    fh_Pdc_Tot[plane - 1]->Fill(y[plane], eloss[plane]);
+                    fh_Pdc_Tot[plane - 1]->Fill(y[plane - 1], eloss[plane - 1]);
                 }
-                fh_Pdc_Time[plane - 1]->Fill(wire, t[plane]);
+                fh_Pdc_Time[plane - 1]->Fill(wire, t[plane - 1]);
             }
             else
             {

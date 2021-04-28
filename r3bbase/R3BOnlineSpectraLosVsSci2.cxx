@@ -1,3 +1,16 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
 // ------------------------------------------------------------
 // -----                  R3BOnlineSpectra                -----
 // -----          Created April 13th 2016 by M.Heil       -----
@@ -55,6 +68,7 @@ R3BOnlineSpectraLosVsSci2::R3BOnlineSpectraLosVsSci2()
     , fNEvents(0)
     , fTcalSci2(NULL)
     , fHitItemsMus(NULL)
+    , fFrsDataCA(NULL)
     , fToFoffset(0)
     , fToFmin(-5000)
     , fToFmax(5000)
@@ -65,6 +79,16 @@ R3BOnlineSpectraLosVsSci2::R3BOnlineSpectraLosVsSci2()
     , fPos_p1(54.7)
     , fDispersionS2(7000)
     , fBrho0_S2toCC(9.458)
+    , fP0(-2.12371e7)
+    , fP1(4.9473e7)
+    , fP2(-2.87635e7)
+    , fZprimary(50.)
+    , fZoffset(-1.3)
+    , fPos2min(-200.)
+    , fPos2max(200.)
+    , ZMUSIC_cut(50)
+    , ZMUSIC_wcut(0.5)
+    , fOnline(kFALSE)
 {
 }
 
@@ -76,6 +100,7 @@ R3BOnlineSpectraLosVsSci2::R3BOnlineSpectraLosVsSci2(const char* name, Int_t iVe
     , fNEvents(0)
     , fTcalSci2(NULL)
     , fHitItemsMus(NULL)
+    , fFrsDataCA(NULL)
     , fToFoffset(0)
     , fToFmin(-5000)
     , fToFmax(5000)
@@ -86,6 +111,14 @@ R3BOnlineSpectraLosVsSci2::R3BOnlineSpectraLosVsSci2(const char* name, Int_t iVe
     , fPos_p1(54.7)
     , fDispersionS2(7000.)
     , fBrho0_S2toCC(9.458)
+    , fP0(-2.12371e7)
+    , fP1(4.9473e7)
+    , fP2(-2.87635e7)
+    , fZprimary(50.)
+    , fZoffset(-1.3)
+    , ZMUSIC_cut(50)
+    , ZMUSIC_wcut(0.5)
+    , fOnline(kFALSE)
 {
 }
 
@@ -95,6 +128,10 @@ R3BOnlineSpectraLosVsSci2::~R3BOnlineSpectraLosVsSci2()
         delete fTcalSci2;
     if (fHitItemsMus)
         delete fHitItemsMus;
+    if (fFrsDataCA)
+    {
+        delete fFrsDataCA;
+    }
 }
 
 InitStatus R3BOnlineSpectraLosVsSci2::Init()
@@ -142,6 +179,17 @@ InitStatus R3BOnlineSpectraLosVsSci2::Init()
     if (!fHitItemsMus)
         LOG(WARNING) << "R3BOnlineSpectraLosVsSci2: MusicHitData not found";
 
+    // OUTPUT DATA
+    fFrsDataCA = new TClonesArray("R3BFrsData", 5);
+    if (!fOnline)
+    {
+        mgr->Register("FrsData", "Analysis FRS", fFrsDataCA, kTRUE);
+    }
+    else
+    {
+        mgr->Register("FrsData", "Analysis FRS", fFrsDataCA, kFALSE);
+    }
+
     // MAIN FOLDER-ID
     TFolder* mainfolId = new TFolder("FRS_ID", "FRS ID info");
 
@@ -183,11 +231,32 @@ InitStatus R3BOnlineSpectraLosVsSci2::Init()
     // run->AddObject(cTofFromS2);
 
     cTofFromS2vsZ = new TCanvas("ZvsBeta_m1", "Z vs Beta", 10, 10, 800, 700);
-    fh2_ZvsBeta_m1 = new TH2F("ZvsBeta_m1", "Z Music vs Beta", 2000, 0.75, 0.85, 2000, 42, 62);
+    fh2_ZvsBeta_m1 = new TH2F("ZvsBeta_m1", "Z Music vs Beta", 3000, 0.75, 0.9, 2000, 42, 62);
     fh2_ZvsBeta_m1->GetXaxis()->SetTitle("Beta");
     fh2_ZvsBeta_m1->GetYaxis()->SetTitle("Z-Music");
     cTofFromS2vsZ->cd();
     fh2_ZvsBeta_m1->Draw("col");
+
+    TCanvas* cTofFromS2vsZcor = new TCanvas("ZcorvsBeta_m1", "Zcor vs Beta", 10, 10, 800, 700);
+    fh2_ZcorvsBeta_m1 = new TH2F("ZcorvsBeta_m1", "Zcor Music vs Beta", 3000, 0.75, 0.9, 2000, 42, 62);
+    fh2_ZcorvsBeta_m1->GetXaxis()->SetTitle("Beta");
+    fh2_ZcorvsBeta_m1->GetYaxis()->SetTitle("Z-Music corrBeta");
+    cTofFromS2vsZcor->cd();
+    fh2_ZcorvsBeta_m1->Draw("col");
+
+    TCanvas* cZcorvsang = new TCanvas("ZcorvsAngle_m1", "Zcor vs Angle", 10, 10, 800, 700);
+    fh2_MusZcorvsAng = new TH2F("ZcorvsAngle_m1", "Zcor Music vs Angle-Music", 1500, -20., 20., 2000, 42, 62);
+    fh2_MusZcorvsAng->GetXaxis()->SetTitle("Angle [mrad]");
+    fh2_MusZcorvsAng->GetYaxis()->SetTitle("Z-Music corrBeta");
+    cZcorvsang->cd();
+    fh2_MusZcorvsAng->Draw("col");
+
+    TCanvas* cBetavsMusE = new TCanvas("BetavsMusE_m1", "MusicE vs Beta", 10, 10, 800, 700);
+    fh2_EvsBeta_m1 = new TH2F("MusEvsBeta_m1", "E Music vs Beta", 3000, 0.75, 0.9, 5000, 2000, 62000);
+    fh2_EvsBeta_m1->GetXaxis()->SetTitle("Beta");
+    fh2_EvsBeta_m1->GetYaxis()->SetTitle("E-Music");
+    cBetavsMusE->cd();
+    fh2_EvsBeta_m1->Draw("col");
 
     // R3B-Music
     TCanvas* cMus_Z = new TCanvas("R3BMus_charge_z", "Mus: Charge Z", 10, 10, 800, 700);
@@ -203,6 +272,7 @@ InitStatus R3BOnlineSpectraLosVsSci2::Init()
     fh1_Mushit_z->GetYaxis()->SetTitleSize(0.045);
     fh1_Mushit_z->SetFillColor(28);
     fh1_Mushit_z->SetLineColor(1);
+    cMus_Z->cd();
     fh1_Mushit_z->Draw("");
 
     cBeta = new TCanvas("Beta_Sci2_Los", "Beta_Sci2_Los", 10, 10, 800, 700);
@@ -239,7 +309,7 @@ InitStatus R3BOnlineSpectraLosVsSci2::Init()
     // run->AddObject(cBeta);
 
     cZvsAoQ = new TCanvas("ZvsAoQ", "ZvsAoQ", 10, 10, 800, 700);
-    fh2_ZvsAoQ_m1 = new TH2F("fh2_ZvsAoQ", "Z-Music vs AoQ with mult==1", 1600, 2.3, 2.7, 2000, 42, 62);
+    fh2_ZvsAoQ_m1 = new TH2F("fh2_ZvsAoQ", "Z-Music vs AoQ with mult==1", 1600, 2.35, 2.75, 2000, 42, 62);
     fh2_ZvsAoQ_m1->GetXaxis()->SetTitle("AoQ");
     fh2_ZvsAoQ_m1->GetYaxis()->SetTitle("Z [Charge units]");
     fh2_ZvsAoQ_m1->GetYaxis()->SetTitleOffset(1.1);
@@ -251,13 +321,105 @@ InitStatus R3BOnlineSpectraLosVsSci2::Init()
     fh2_ZvsAoQ_m1->GetYaxis()->SetTitleSize(0.045);
     fh2_ZvsAoQ_m1->Draw("colz");
 
+    TCanvas* cZvsAoQcor = new TCanvas("ZvsAoQ_cor", "ZvsAoQ", 10, 10, 800, 700);
+    fh2_ZvsAoQ_m1_cor =
+        new TH2F("fh2_ZvsAoQ_cor", "Z-Music_betaCor vs AoQ with mult==1", 1600, 2.35, 2.75, 2000, 42, 62);
+    fh2_ZvsAoQ_m1_cor->GetXaxis()->SetTitle("AoQ");
+    fh2_ZvsAoQ_m1_cor->GetYaxis()->SetTitle("Z [Charge units]");
+    fh2_ZvsAoQ_m1_cor->GetYaxis()->SetTitleOffset(1.1);
+    fh2_ZvsAoQ_m1_cor->GetXaxis()->CenterTitle(true);
+    fh2_ZvsAoQ_m1_cor->GetYaxis()->CenterTitle(true);
+    fh2_ZvsAoQ_m1_cor->GetXaxis()->SetLabelSize(0.045);
+    fh2_ZvsAoQ_m1_cor->GetXaxis()->SetTitleSize(0.045);
+    fh2_ZvsAoQ_m1_cor->GetYaxis()->SetLabelSize(0.045);
+    fh2_ZvsAoQ_m1_cor->GetYaxis()->SetTitleSize(0.045);
+    fh2_ZvsAoQ_m1_cor->Draw("colz");
+
+    TCanvas* cZvsAoQcor_tpat = new TCanvas("ZvsAoQ_cor_tpat", "ZvsAoQtpat", 10, 10, 800, 700);
+
+    fh2_ZvsAoQ_m1_cor_tpat_tofd = new TH2F("fh2_ZvsAoQ_cor_tpat_tofd",
+                                           "Z-Music_betaCor vs AoQ with mult==1 and (Tpat&2)=2",
+                                           1600,
+                                           2.35,
+                                           2.75,
+                                           2000,
+                                           42,
+                                           62);
+    fh2_ZvsAoQ_m1_cor_tpat_tofd->GetXaxis()->SetTitle("AoQ");
+    fh2_ZvsAoQ_m1_cor_tpat_tofd->GetYaxis()->SetTitle("Z [Charge units]");
+    fh2_ZvsAoQ_m1_cor_tpat_tofd->GetYaxis()->SetTitleOffset(1.1);
+    fh2_ZvsAoQ_m1_cor_tpat_tofd->GetXaxis()->CenterTitle(true);
+    fh2_ZvsAoQ_m1_cor_tpat_tofd->GetYaxis()->CenterTitle(true);
+    fh2_ZvsAoQ_m1_cor_tpat_tofd->GetXaxis()->SetLabelSize(0.045);
+    fh2_ZvsAoQ_m1_cor_tpat_tofd->GetXaxis()->SetTitleSize(0.045);
+    fh2_ZvsAoQ_m1_cor_tpat_tofd->GetYaxis()->SetLabelSize(0.045);
+    fh2_ZvsAoQ_m1_cor_tpat_tofd->GetYaxis()->SetTitleSize(0.045);
+
+    fh2_ZvsAoQ_m1_cor_tpat_islos = new TH2F(
+        "fh2_ZvsAoQ_cor_tpat_islos", "Z-Music_betaCor vs AoQ with mult==1 and Tpat==1", 1600, 2.35, 2.75, 2000, 42, 62);
+    fh2_ZvsAoQ_m1_cor_tpat_islos->GetXaxis()->SetTitle("AoQ");
+    fh2_ZvsAoQ_m1_cor_tpat_islos->GetYaxis()->SetTitle("Z [Charge units]");
+    fh2_ZvsAoQ_m1_cor_tpat_islos->GetYaxis()->SetTitleOffset(1.1);
+    fh2_ZvsAoQ_m1_cor_tpat_islos->GetXaxis()->CenterTitle(true);
+    fh2_ZvsAoQ_m1_cor_tpat_islos->GetYaxis()->CenterTitle(true);
+    fh2_ZvsAoQ_m1_cor_tpat_islos->GetXaxis()->SetLabelSize(0.045);
+    fh2_ZvsAoQ_m1_cor_tpat_islos->GetXaxis()->SetTitleSize(0.045);
+    fh2_ZvsAoQ_m1_cor_tpat_islos->GetYaxis()->SetLabelSize(0.045);
+    fh2_ZvsAoQ_m1_cor_tpat_islos->GetYaxis()->SetTitleSize(0.045);
+
+    fh2_ZvsAoQ_m1_cor_tpat_los = new TH2F("fh2_ZvsAoQ_cor_tpat_los",
+                                          "Z-Music_betaCor vs AoQ with mult==1 and (Tpat&1)=1",
+                                          1600,
+                                          2.35,
+                                          2.75,
+                                          2000,
+                                          42,
+                                          62);
+    fh2_ZvsAoQ_m1_cor_tpat_los->GetXaxis()->SetTitle("AoQ");
+    fh2_ZvsAoQ_m1_cor_tpat_los->GetYaxis()->SetTitle("Z [Charge units]");
+    fh2_ZvsAoQ_m1_cor_tpat_los->GetYaxis()->SetTitleOffset(1.1);
+    fh2_ZvsAoQ_m1_cor_tpat_los->GetXaxis()->CenterTitle(true);
+    fh2_ZvsAoQ_m1_cor_tpat_los->GetYaxis()->CenterTitle(true);
+    fh2_ZvsAoQ_m1_cor_tpat_los->GetXaxis()->SetLabelSize(0.045);
+    fh2_ZvsAoQ_m1_cor_tpat_los->GetXaxis()->SetTitleSize(0.045);
+    fh2_ZvsAoQ_m1_cor_tpat_los->GetYaxis()->SetLabelSize(0.045);
+    fh2_ZvsAoQ_m1_cor_tpat_los->GetYaxis()->SetTitleSize(0.045);
+
+    fh2_AoQ_cut = new TH1F("fh2_AoQ_cut", "fh2_AoQ_cut", 800, 2.45, 2.75);
+
+    cZvsAoQcor_tpat->Divide(2, 2);
+    cZvsAoQcor_tpat->cd(1);
+    fh2_ZvsAoQ_m1_cor_tpat_los->Draw("colz");
+    cZvsAoQcor_tpat->cd(2);
+    fh2_ZvsAoQ_m1_cor_tpat_tofd->Draw("colz");
+    cZvsAoQcor_tpat->cd(3);
+    fh2_ZvsAoQ_m1_cor_tpat_islos->Draw("colz");
+    cZvsAoQcor_tpat->cd(4);
+    fh2_AoQ_cut->Draw();
+
+    TCanvas* cAoQvsPosS2 = new TCanvas("AoQvsPosS2", "Pos-S2 vs AoQ", 10, 10, 800, 700);
+    fh2_Pos2vsAoQ_m1 = new TH2F("fh2_PosS2vsAoQ", "Pos-S2 vs AoQ with mult==1", 2000, -100, 100, 1600, 2.35, 2.75);
+    fh2_Pos2vsAoQ_m1->GetXaxis()->SetTitle("Pos-S2 [mm]");
+    fh2_Pos2vsAoQ_m1->GetYaxis()->SetTitle("AoQ");
+    fh2_Pos2vsAoQ_m1->GetYaxis()->SetTitleOffset(1.1);
+    fh2_Pos2vsAoQ_m1->GetXaxis()->CenterTitle(true);
+    fh2_Pos2vsAoQ_m1->GetYaxis()->CenterTitle(true);
+    fh2_Pos2vsAoQ_m1->GetXaxis()->SetLabelSize(0.045);
+    fh2_Pos2vsAoQ_m1->GetXaxis()->SetTitleSize(0.045);
+    fh2_Pos2vsAoQ_m1->GetYaxis()->SetLabelSize(0.045);
+    fh2_Pos2vsAoQ_m1->GetYaxis()->SetTitleSize(0.045);
+    fh2_Pos2vsAoQ_m1->Draw("colz");
+
     if (fHitItemsMus)
     {
-        // run->AddObject(cTofFromS2vsZ);
-        // run->AddObject(cZvsAoQ);
         mainfolId->Add(cMus_Z);
         mainfolId->Add(cTofFromS2vsZ);
+        mainfolId->Add(cTofFromS2vsZcor);
+        mainfolId->Add(cBetavsMusE);
+        mainfolId->Add(cZcorvsang);
         mainfolId->Add(cZvsAoQ);
+        mainfolId->Add(cZvsAoQcor);
+        mainfolId->Add(cAoQvsPosS2);
     }
     run->AddObject(mainfolId);
 
@@ -425,7 +587,7 @@ InitStatus R3BOnlineSpectraLosVsSci2::Init()
 
         run->AddObject(mainfol);
         run->GetHttpServer()->RegisterCommand("Reset_LosVsSci2",
-                                              Form("/Tasks/%s/->Reset_LosVsSci2_Histo()", GetName()));
+                                              Form("/Objects/%s/->Reset_LosVsSci2_Histo()", GetName()));
     }
 
     // -------------------------------------------------------------------------
@@ -472,7 +634,16 @@ void R3BOnlineSpectraLosVsSci2::Reset_LosVsSci2_Histo()
     {
         fh1_Mushit_z->Reset();
         fh2_ZvsAoQ_m1->Reset();
+        fh2_ZvsAoQ_m1_cor->Reset();
+        fh2_ZvsAoQ_m1_cor_tpat_tofd->Reset();
+        fh2_ZvsAoQ_m1_cor_tpat_islos->Reset();
+        fh2_ZvsAoQ_m1_cor_tpat_los->Reset();
+        fh2_AoQ_cut->Reset();
+        fh2_EvsBeta_m1->Reset();
+        fh2_MusZcorvsAng->Reset();
+        fh2_ZcorvsBeta_m1->Reset();
         fh2_ZvsBeta_m1->Reset();
+        fh2_Pos2vsAoQ_m1->Reset();
     }
 }
 
@@ -488,7 +659,7 @@ void R3BOnlineSpectraLosVsSci2::Exec(Option_t* option)
         return;
     }
 
-    double Zmusic = 0.;
+    double Zmusic = 0., Music_ang = 0.;
     if (fHitItemsMus && fHitItemsMus->GetEntriesFast() > 0)
     {
         Int_t nHits = fHitItemsMus->GetEntriesFast();
@@ -497,8 +668,9 @@ void R3BOnlineSpectraLosVsSci2::Exec(Option_t* option)
             R3BMusicHitData* hit = (R3BMusicHitData*)fHitItemsMus->At(ihit);
             if (!hit)
                 continue;
-            Zmusic = 0.927 * hit->GetZcharge() + 0.98; // quick and dirty
-            fh1_Mushit_z->Fill(Zmusic);
+            Zmusic = hit->GetZcharge();
+            Music_ang = hit->GetTheta() * 1000.;
+            // fh1_Mushit_z->Fill(Zmusic);
         }
     }
 
@@ -682,7 +854,7 @@ void R3BOnlineSpectraLosVsSci2::Exec(Option_t* option)
     Bool_t iLOSPileUp[fNofLosDetectors][32];
     for (Int_t idet = 0; idet < fNofLosDetectors; idet++)
     {
-        for (Int_t imult = 0; imult < 33; imult++)
+        for (Int_t imult = 0; imult < 32; imult++)
         {
             iLOSType[idet][imult] = false;
             iLOSPileUp[idet][imult] = false;
@@ -1116,10 +1288,39 @@ void R3BOnlineSpectraLosVsSci2::Exec(Option_t* option)
                 fh1_RawPos_m1->Fill(PosRaw_m1);
                 fh1_CalPos_m1->Fill(PosCal_m1);
                 fh1_Beta_m1->Fill(Beta_m1);
-                if (fHitItemsMus)
+                if (Zmusic > 0.)
                 {
-                    fh2_ZvsAoQ_m1->Fill(AoQ_m1, Zmusic);
+                    // fh2_ZvsAoQ_m1->Fill(AoQ_m1, Zmusic);
                     fh2_ZvsBeta_m1->Fill(Beta_m1, Zmusic);
+                    double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
+                    // double zcor= fZprimary*sqrt( Emus/(fP0+fP1*Beta_m1+fP2*Beta_m1*Beta_m1) )+fZoffset;
+                    double zcor = sqrt(Emus * Beta_m1) * 0.277;
+                    fh2_EvsBeta_m1->Fill(Beta_m1, Emus);
+                    fh1_Mushit_z->Fill(zcor);
+                    fh2_ZcorvsBeta_m1->Fill(Beta_m1, zcor);
+                    fh2_ZvsAoQ_m1->Fill(AoQ_m1, Zmusic);
+                    double x0_point = 0.;
+                    double y0_point = 50.39;
+                    double rot_ang = 0.0375;
+                    double zcorang =
+                        y0_point + (Music_ang - x0_point) * sin(rot_ang) + (zcor - y0_point) * cos(rot_ang) + 0.2;
+                    fh2_MusZcorvsAng->Fill(Music_ang, zcorang);
+                    if (PosCal_m1 > fPos2min && PosCal_m1 < fPos2max)
+                        fh2_ZvsAoQ_m1_cor->Fill(AoQ_m1, zcorang);
+                    if (PosCal_m1 > fPos2min && PosCal_m1 < fPos2max &&
+                        ((header->GetTpat() & 2) == 2 || (header->GetTpat() & 64) == 64))
+                        fh2_ZvsAoQ_m1_cor_tpat_tofd->Fill(AoQ_m1, zcorang);
+                    if (PosCal_m1 > fPos2min && PosCal_m1 < fPos2max &&
+                        ((header->GetTpat() == 1) || (header->GetTpat() == 32)))
+                        fh2_ZvsAoQ_m1_cor_tpat_islos->Fill(AoQ_m1, zcorang);
+                    if (PosCal_m1 > fPos2min && PosCal_m1 < fPos2max &&
+                        ((header->GetTpat() & 1) == 1 || ((header->GetTpat() & 32) == 32)))
+                        fh2_ZvsAoQ_m1_cor_tpat_los->Fill(AoQ_m1, zcorang);
+                    if (PosCal_m1 > fPos2min && PosCal_m1 < fPos2max && abs(zcorang - ZMUSIC_cut) < ZMUSIC_wcut)
+                        fh2_AoQ_cut->Fill(AoQ_m1);
+                    fh2_Pos2vsAoQ_m1->Fill(PosCal_m1, AoQ_m1);
+
+                    AddData(1, 2, zcorang, AoQ_m1, Beta_m1, Brho_m1, PosCal_m1, 0.);
                 }
             }
         } // for iDet
@@ -1178,13 +1379,36 @@ void R3BOnlineSpectraLosVsSci2::FinishTask()
     fh1_CalPos->Write();
     fh1_Beta->Write();
     fh1_RawTofFromS2_TcalMult1->Write();
+    fh2_EvsBeta_m1->Write();
     fh1_RawPos_m1->Write();
     fh1_CalPos_m1->Write();
     fh1_Beta_m1->Write();
     fh1_Mushit_z->Write();
+    fh2_MusZcorvsAng->Write();
     fh2_ZvsAoQ_m1->Write();
+    fh2_ZvsAoQ_m1_cor->Write();
+    fh2_ZvsAoQ_m1_cor_tpat->Write();
     fh2_ZvsBeta_m1->Write();
+    fh2_ZcorvsBeta_m1->Write();
+    fh2_Pos2vsAoQ_m1->Write();
+
     cout << "FinishTask: All events: " << fNEvents << ", LOS events: " << nLosEvents << endl;
+}
+
+// -----   Private method AddData  --------------------------------------------
+R3BFrsData* R3BOnlineSpectraLosVsSci2::AddData(Int_t StaId,
+                                               Int_t StoId,
+                                               Double_t z,
+                                               Double_t aq,
+                                               Double_t beta,
+                                               Double_t brho,
+                                               Double_t xs2,
+                                               Double_t xc)
+{
+    // It fills the R3BSofFrsData
+    TClonesArray& clref = *fFrsDataCA;
+    Int_t size = clref.GetEntriesFast();
+    return new (clref[size]) R3BFrsData(StaId, StoId, z, aq, beta, brho, xs2, xc);
 }
 
 ClassImp(R3BOnlineSpectraLosVsSci2)

@@ -123,7 +123,7 @@ void R3BAladinFieldMap::Init()
     memcpy((void*)gCoords[0].fMag_pt, (void*)af_mag[0], sizeof(af_mag[0]));
     memcpy((void*)gCoords[1].fMag_pt, (void*)af_mag[1], sizeof(af_mag[0]));
 
-    char str[100];
+    char str[500];
     for (Int_t i = 0; i < 2; i++)
     {
         // The y's are aligned

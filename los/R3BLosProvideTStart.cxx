@@ -37,6 +37,8 @@ InitStatus R3BLosProvideTStart::Init()
     {
         throw std::runtime_error("R3BLosProvideTStart: No R3BEventHeader");
     }
+
+    return kSUCCESS;
 }
 
 void R3BLosProvideTStart::Exec(Option_t*) { fEventHeader->SetTStart(GetTStart()); }

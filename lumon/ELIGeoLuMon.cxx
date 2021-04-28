@@ -19,11 +19,9 @@
 /////////////////////////////////////////////////////////////
 #include "ELIGeoLuMon.h"
 #include "FairGeoNode.h"
+#include "FairLogger.h"
 
 #include <iostream>
-
-using std::cout;
-using std::endl;
 
 ClassImp(ELIGeoLuMon)
 
@@ -40,7 +38,7 @@ const char* ELIGeoLuMon::getModuleName(Int_t m)
     // Returns the module name of sts number m
     if (m < 0)
     {
-        cout << "-E- ELIGeoLuMon::getModuleName:: Module number " << m << " not known!" << endl;
+        LOG(ERROR) << "ELIGeoLuMon::getModuleName:: Module number " << m << " not known!";
         return "";
     }
     if (m < 9)

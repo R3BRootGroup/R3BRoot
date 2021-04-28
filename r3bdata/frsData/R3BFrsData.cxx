@@ -11,29 +11,42 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BGEOMFI_H
-#define R3BGEOMFI_H
+// ---------------------------------------------------------------
+// -----                  R3BFrsData                         -----
+// -----     Created 30/04/2021 by J.L. Rodriguez            -----
+// ---------------------------------------------------------------
 
-#include "FairGeoSet.h"
+#include "R3BFrsData.h"
 
-class R3BGeoMfi : public FairGeoSet
+R3BFrsData::R3BFrsData()
+    : fStaId(0)
+    , fStoId(0)
+    , fZ(0.)
+    , fAq(0.)
+    , fBeta(0.)
+    , fBrho(0.)
+    , fxs2(0.)
+    , fxc(0.)
 {
-  protected:
-    char modName[30]; // name of module
-    char eleName[20]; // substring for elements in module
-  public:
-    R3BGeoMfi();
-    ~R3BGeoMfi() {}
-    const char* getModuleName(Int_t);
-    const char* getEleName(Int_t);
-    inline Int_t getModNumInMod(const TString&);
-    ClassDef(R3BGeoMfi, 0) // Class for STS
-};
-
-inline Int_t R3BGeoMfi::getModNumInMod(const TString& name)
-{
-    // returns the module index from module name
-    return (Int_t)(name[3] - '0') - 1;
 }
 
-#endif /* !R3BGEOGFI_H */
+R3BFrsData::R3BFrsData(Int_t StaId,
+                       Int_t StoId,
+                       Double_t z,
+                       Double_t aq,
+                       Double_t beta,
+                       Double_t brho,
+                       Double_t xs2,
+                       Double_t xc)
+    : fStaId(StaId)
+    , fStoId(StoId)
+    , fZ(z)
+    , fAq(aq)
+    , fBeta(beta)
+    , fBrho(brho)
+    , fxs2(xs2)
+    , fxc(xc)
+{
+}
+
+ClassImp(R3BFrsData)

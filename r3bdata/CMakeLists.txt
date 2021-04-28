@@ -51,6 +51,7 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/musicData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sampData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sfibData
+${R3BROOT_SOURCE_DIR}/r3bdata/frsData
 )
 
 include_directories(${INCLUDE_DIRECTORIES})
@@ -174,6 +175,7 @@ sampData/R3BSamplerMappedData.cxx
 sfibData/R3BSfibMappedData.cxx
 sfibData/R3BSfibCalData.cxx
 sfibData/R3BSfibHitData.cxx
+frsData/R3BFrsData.cxx
 )
 
 # fill list of header files from list of source files by exchanging the file extension

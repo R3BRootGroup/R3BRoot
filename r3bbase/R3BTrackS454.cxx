@@ -772,8 +772,8 @@ void R3BTrackS454::Exec(Option_t* option)
     {
         unsigned long IC;
         unsigned long SEETRAM_raw;
-        Double_t SEETRAM;
-        unsigned long TOFDOR;
+        Double_t SEETRAM = 0.;
+        unsigned long TOFDOR = 0;
 
         auto detBmon = fMappedItems.at(DET_BMON);
         Int_t nHitsbm = detBmon->GetEntriesFast();

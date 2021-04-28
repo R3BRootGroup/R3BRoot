@@ -562,9 +562,19 @@ void R3BOnlineSpectraSfib::Exec(Option_t* option)
         Int_t fib_fired[256] = { 0 };
         Int_t fib_fired_g[256] = { 0 };
 
-        Double_t sfib_tot[2] = { -100 };        // sfib_tot[i],i=0(top),1(bot)
-        Double_t sfib_tot_max[2][5] = { -100 }; // sfib_tot_ch[i][j], i=0(top),1(bot),j=1st,2nd,3rd.. largest TOT value
-        Int_t sfib_tot_ch[2][5] = { -100 };     // sfib_tot_ch[i][j], i=0(top),1(bot),j=1st,2nd,3rd.. largest channel
+        Double_t sfib_tot[2];        // sfib_tot[i],i=0(top),1(bot)
+        Double_t sfib_tot_max[2][5]; // sfib_tot_ch[i][j], i=0(top),1(bot),j=1st,2nd,3rd.. largest TOT value
+        Int_t sfib_tot_ch[2][5];     // sfib_tot_ch[i][j], i=0(top),1(bot),j=1st,2nd,3rd.. largest channel
+
+        for (int i = 0; i < 2; i++)
+        {
+            sfib_tot[2] = -100;
+            for (int j = 0; j < 5; j++)
+            {
+                sfib_tot_max[i][j] = -100.; // sfib_tot_ch[i][j], i=0(top),1(bot),j=1st,2nd,3rd.. largest TOT value
+                sfib_tot_ch[i][j] = -100;
+            }
+        }
 
         // std::ofstream run202("run202.txt",std::ios::app);
         // run202 << fNEvents;
@@ -955,8 +965,8 @@ void R3BOnlineSpectraSfib::Exec(Option_t* option)
             sfib_multi_ch[1][sfib_multi] = sfib_tot_ch[1][1];                        // SiPM ID for bot
             sfib_multi_tot[1][sfib_multi] = sfib_tot_max[1][1];                      // TOT for SiPM bot
         }
-        else
-            sfib_multi == sfib_multi;
+        // else
+        //    sfib_multi == sfib_multi;
         if ((sfib_tot_ch[0][1] / 8 == sfib_tot_ch[1][2] / 8) && sfib_tot_ch[0][1] > 0 && sfib_tot_ch[1][2] > 0)
         {
             sfib_multi++;
@@ -968,8 +978,8 @@ void R3BOnlineSpectraSfib::Exec(Option_t* option)
             sfib_multi_ch[1][sfib_multi] = sfib_tot_ch[1][2];
             sfib_multi_tot[1][sfib_multi] = sfib_tot_max[1][2];
         }
-        else
-            sfib_multi == sfib_multi;
+        // else
+        //    sfib_multi == sfib_multi;
         if ((sfib_tot_ch[0][2] / 8 == sfib_tot_ch[1][1] / 8) && sfib_tot_ch[0][2] > 0 && sfib_tot_ch[1][1] > 0)
         {
             sfib_multi++;
@@ -981,8 +991,8 @@ void R3BOnlineSpectraSfib::Exec(Option_t* option)
             sfib_multi_ch[1][sfib_multi] = sfib_tot_ch[1][1];
             sfib_multi_tot[1][sfib_multi] = sfib_tot_max[1][1];
         }
-        else
-            sfib_multi == sfib_multi;
+        // else
+        //    sfib_multi == sfib_multi;
         if ((sfib_tot_ch[0][2] / 8 == sfib_tot_ch[1][2] / 8) && sfib_tot_ch[0][2] > 0 && sfib_tot_ch[1][2] > 0)
         {
             sfib_multi++;
@@ -994,8 +1004,8 @@ void R3BOnlineSpectraSfib::Exec(Option_t* option)
             sfib_multi_ch[1][sfib_multi] = sfib_tot_ch[1][2];
             sfib_multi_tot[1][sfib_multi] = sfib_tot_max[1][2];
         }
-        else
-            sfib_multi == sfib_multi;
+        // else
+        //    sfib_multi == sfib_multi;
         if ((sfib_tot_ch[0][1] / 8 == sfib_tot_ch[1][3] / 8) && sfib_tot_ch[0][1] > 0 && sfib_tot_ch[1][3] > 0)
         {
             sfib_multi++;
@@ -1007,8 +1017,8 @@ void R3BOnlineSpectraSfib::Exec(Option_t* option)
             sfib_multi_ch[1][sfib_multi] = sfib_tot_ch[1][3];
             sfib_multi_tot[1][sfib_multi] = sfib_tot_max[1][3];
         }
-        else
-            sfib_multi == sfib_multi;
+        // else
+        //    sfib_multi == sfib_multi;
         if ((sfib_tot_ch[0][3] / 8 == sfib_tot_ch[1][1] / 8) && sfib_tot_ch[0][3] > 0 && sfib_tot_ch[1][1] > 0)
         {
             sfib_multi++;
@@ -1020,8 +1030,8 @@ void R3BOnlineSpectraSfib::Exec(Option_t* option)
             sfib_multi_ch[1][sfib_multi] = sfib_tot_ch[1][1];
             sfib_multi_tot[1][sfib_multi] = sfib_tot_max[1][1];
         }
-        else
-            sfib_multi == sfib_multi;
+        // else
+        //    sfib_multi == sfib_multi;
         if ((sfib_tot_ch[0][2] / 8 == sfib_tot_ch[1][3] / 8) && sfib_tot_ch[0][2] > 0 && sfib_tot_ch[1][3] > 0)
         {
             sfib_multi++;
@@ -1033,8 +1043,8 @@ void R3BOnlineSpectraSfib::Exec(Option_t* option)
             sfib_multi_ch[1][sfib_multi] = sfib_tot_ch[1][3];
             sfib_multi_tot[1][sfib_multi] = sfib_tot_max[1][3];
         }
-        else
-            sfib_multi == sfib_multi;
+        // else
+        // sfib_multi == sfib_multi;
         if ((sfib_tot_ch[0][3] / 8 == sfib_tot_ch[1][3] / 8) && sfib_tot_ch[0][3] > 0 && sfib_tot_ch[1][3] > 0)
         {
             sfib_multi++;
@@ -1046,8 +1056,8 @@ void R3BOnlineSpectraSfib::Exec(Option_t* option)
             sfib_multi_ch[1][sfib_multi] = sfib_tot_ch[1][3];
             sfib_multi_tot[1][sfib_multi] = sfib_tot_max[1][3];
         }
-        else
-            sfib_multi == sfib_multi;
+        // else
+        //   sfib_multi == sfib_multi;
         if ((sfib_tot_ch[0][3] / 8 == sfib_tot_ch[1][2] / 8) && sfib_tot_ch[0][3] > 0 && sfib_tot_ch[1][2] > 0)
         {
             sfib_multi++;
@@ -1059,8 +1069,8 @@ void R3BOnlineSpectraSfib::Exec(Option_t* option)
             sfib_multi_ch[1][sfib_multi] = sfib_tot_ch[1][2];
             sfib_multi_tot[1][sfib_multi] = sfib_tot_max[1][2];
         }
-        else
-            sfib_multi == sfib_multi;
+        // else
+        //   sfib_multi == sfib_multi;
         if ((sfib_tot_ch[0][1] / 8 == sfib_tot_ch[1][4] / 8) && sfib_tot_ch[0][1] > 0 && sfib_tot_ch[1][4] > 0)
         {
             sfib_multi++;
@@ -1072,8 +1082,8 @@ void R3BOnlineSpectraSfib::Exec(Option_t* option)
             sfib_multi_ch[1][sfib_multi] = sfib_tot_ch[1][4];
             sfib_multi_tot[1][sfib_multi] = sfib_tot_max[1][4];
         }
-        else
-            sfib_multi == sfib_multi;
+        // else
+        //    sfib_multi == sfib_multi;
         if ((sfib_tot_ch[0][2] / 8 == sfib_tot_ch[1][4] / 8) && sfib_tot_ch[0][2] > 0 && sfib_tot_ch[1][4] > 0)
         {
             sfib_multi++;
@@ -1085,8 +1095,8 @@ void R3BOnlineSpectraSfib::Exec(Option_t* option)
             sfib_multi_ch[1][sfib_multi] = sfib_tot_ch[1][4];
             sfib_multi_tot[1][sfib_multi] = sfib_tot_max[1][4];
         }
-        else
-            sfib_multi == sfib_multi;
+        // else
+        //    sfib_multi == sfib_multi;
         if ((sfib_tot_ch[0][3] / 8 == sfib_tot_ch[1][4] / 8) && sfib_tot_ch[0][3] > 0 && sfib_tot_ch[1][4] > 0)
         {
             sfib_multi++;
@@ -1098,8 +1108,8 @@ void R3BOnlineSpectraSfib::Exec(Option_t* option)
             sfib_multi_ch[1][sfib_multi] = sfib_tot_ch[1][4];
             sfib_multi_tot[1][sfib_multi] = sfib_tot_max[1][4];
         }
-        else
-            sfib_multi == sfib_multi;
+        // else
+        //    sfib_multi == sfib_multi;
         if ((sfib_tot_ch[0][4] / 8 == sfib_tot_ch[1][3] / 8) && sfib_tot_ch[0][4] > 0 && sfib_tot_ch[1][3] > 0)
         {
             sfib_multi++;
@@ -1111,8 +1121,8 @@ void R3BOnlineSpectraSfib::Exec(Option_t* option)
             sfib_multi_ch[1][sfib_multi] = sfib_tot_ch[1][3];
             sfib_multi_tot[1][sfib_multi] = sfib_tot_max[1][3];
         }
-        else
-            sfib_multi == sfib_multi;
+        // else
+        //    sfib_multi == sfib_multi;
         if ((sfib_tot_ch[0][4] / 8 == sfib_tot_ch[1][1] / 8) && sfib_tot_ch[0][4] > 0 && sfib_tot_ch[1][1] > 0)
         {
             sfib_multi++;
@@ -1124,8 +1134,8 @@ void R3BOnlineSpectraSfib::Exec(Option_t* option)
             sfib_multi_ch[1][sfib_multi] = sfib_tot_ch[1][1];
             sfib_multi_tot[1][sfib_multi] = sfib_tot_max[1][1];
         }
-        else
-            sfib_multi == sfib_multi;
+        // else
+        //   sfib_multi == sfib_multi;
         if ((sfib_tot_ch[0][4] / 8 == sfib_tot_ch[1][2] / 8) && sfib_tot_ch[0][4] > 0 && sfib_tot_ch[1][2] > 0)
         {
             sfib_multi++;
@@ -1137,8 +1147,8 @@ void R3BOnlineSpectraSfib::Exec(Option_t* option)
             sfib_multi_ch[1][sfib_multi] = sfib_tot_ch[1][2];
             sfib_multi_tot[1][sfib_multi] = sfib_tot_max[1][2];
         }
-        else
-            sfib_multi == sfib_multi;
+        // else
+        //    sfib_multi == sfib_multi;
         if ((sfib_tot_ch[0][4] / 8 == sfib_tot_ch[1][4] / 8) && sfib_tot_ch[0][4] > 0 && sfib_tot_ch[1][4] > 0)
         {
             sfib_multi++;
@@ -1150,8 +1160,8 @@ void R3BOnlineSpectraSfib::Exec(Option_t* option)
             sfib_multi_ch[1][sfib_multi] = sfib_tot_ch[1][4];
             sfib_multi_tot[1][sfib_multi] = sfib_tot_max[1][4];
         }
-        else
-            sfib_multi == sfib_multi;
+        // else
+        //    sfib_multi == sfib_multi;
 
         // cout << sfib_multi<<endl; //Top
         //

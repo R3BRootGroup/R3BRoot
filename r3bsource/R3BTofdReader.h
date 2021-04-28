@@ -18,7 +18,8 @@
 
 struct EXT_STR_h101_TOFD_t;
 typedef struct EXT_STR_h101_TOFD_t EXT_STR_h101_TOFD;
-class FairLogger;
+typedef struct EXT_STR_h101_TOFD_onion_t EXT_STR_h101_TOFD_onion;
+class ext_data_struct_info;
 
 class R3BTofdReader : public R3BReader
 {
@@ -40,8 +41,6 @@ class R3BTofdReader : public R3BReader
     UInt_t fOffset;
     // Don't store data for online
     Bool_t fOnline;
-    /* FairLogger */
-    FairLogger* fLogger;
     /* the structs of type R3BTofdxMappedItem */
     TClonesArray* fArray;        /**< Output array. */
     TClonesArray* fArrayTrigger; /**< Output array for triggers. */

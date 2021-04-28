@@ -16,6 +16,7 @@
 #include "FairRootManager.h"
 #include "R3BTofdMappedData.h"
 #include "TClonesArray.h"
+#include "ext_data_struct_info.hh"
 
 extern "C"
 {
@@ -23,7 +24,7 @@ extern "C"
 #include "ext_h101_tofd.h"
 }
 
-#define MAX_TOFD_CARDS (sizeof data->TOFD_TRIGCLI / sizeof data->TOFD_TRIGCLI[0])
+//#define MAX_TOFD_CARDS (sizeof data->TOFD_TRIGCLI / sizeof data->TOFD_TRIGCLI[0])
 #define MAX_TOFD_PLANES (sizeof data->TOFD_P / sizeof data->TOFD_P[0])
 
 R3BTofdReader::R3BTofdReader(EXT_STR_h101_TOFD* data, UInt_t offset)
@@ -31,7 +32,6 @@ R3BTofdReader::R3BTofdReader(EXT_STR_h101_TOFD* data, UInt_t offset)
     , fData(data)
     , fOffset(offset)
     , fOnline(kFALSE)
-    , fLogger(FairLogger::GetLogger())
     , fArray(new TClonesArray("R3BTofdMappedData"))
     , fArrayTrigger(new TClonesArray("R3BTofdMappedData"))
 {
@@ -51,8 +51,8 @@ R3BTofdReader::~R3BTofdReader()
 
 Bool_t R3BTofdReader::Init(ext_data_struct_info* a_struct_info)
 {
-    int ok;
-
+    Int_t ok;
+    LOG(INFO) << "R3BTofdReader::Init";
     EXT_STR_h101_TOFD_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_TOFD, 0);
 
     if (!ok)
@@ -90,6 +90,7 @@ Bool_t R3BTofdReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BTofdReader::Read()
 {
+    LOG(DEBUG) << "R3BTofdReader::Read() Event data.";
     // Convert plain raw data to multi-dimensional array
     EXT_STR_h101_TOFD_onion* data = (EXT_STR_h101_TOFD_onion*)fData;
 

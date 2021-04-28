@@ -128,15 +128,15 @@ class R3BTofdHitModulePar : public FairParGenericSet
     void SetPar5Walk(Double_t par5Walk) { fPar5walk = par5Walk; }
 
   private:
-    Int_t fPlane;      /**< Index of a plane. */
-    Int_t fPaddle;     /**< Index of a paddle. */
-    Double_t fOffset1; /**< time offset of PM1 */
-    Double_t fOffset2; /**< time offset of PM2 */
+    Int_t fPlane;         /**< Index of a plane. */
+    Int_t fPaddle;        /**< Index of a paddle. */
+    Double_t fOffset1;    /**< time offset of PM1 */
+    Double_t fOffset2;    /**< time offset of PM2 */
     Double_t fToTOffset1; /**< ToT offset of PM1 */
     Double_t fToTOffset2; /**< ToT offset of PM2 */
-    Double_t fVeff;    /**< effective velocity of light in paddle for position determination */
-    Double_t fLambda;  /**< light attenuation in paddle for position determination */
-    Double_t fSync;    /**< time offset between paddles */
+    Double_t fVeff;       /**< effective velocity of light in paddle for position determination */
+    Double_t fLambda;     /**< light attenuation in paddle for position determination */
+    Double_t fSync;       /**< time offset between paddles */
     Double_t fPar1a, fPar1b, fPar1c, fPar1d;
     Double_t fPar2a, fPar2b, fPar2c, fPar2d;
     Double_t fPar1za, fPar1zb, fPar1zc, fPar1zd;

@@ -12,6 +12,7 @@
  ******************************************************************************/
 
 #include "R3BEventManager.h"
+#include "FairLogger.h"
 #include "R3BIonName.h"
 #include "TDatabasePDG.h"
 #include "TEveGeoNode.h"
@@ -28,7 +29,7 @@ R3BEventManager* R3BEventManager::Instance() { return fgRinstance; }
 R3BEventManager::R3BEventManager()
     : FairEventManager()
 {
-    cout << " calling ctor Event Manager" << endl;
+    LOG(INFO) << "calling ctor Event Manager";
     fgRinstance = this;
 }
 
@@ -51,7 +52,7 @@ void R3BEventManager::AddParticlesToPdgDataBase(Int_t pdgCode)
 
         if (particleRecognised)
         {
-            char title[20];
+            char title[30];
             sprintf(title, "%s%i", name, mass);
             pdgDB->AddParticle(name, title, mass, kTRUE, 0, 0, "Ion", pdgCode);
         }

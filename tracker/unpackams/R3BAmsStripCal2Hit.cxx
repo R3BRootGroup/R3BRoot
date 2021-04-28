@@ -225,33 +225,33 @@ void R3BAmsStripCal2Hit::Exec(Option_t* option)
                 if (fMap_Par->GetGeometry() == 2019)
                 {
                     if (i == 0)
-                    {                               // top
-                        z = 14. + clusterS[mul][1]; // FIXME:Fix offsets for s444_2019
+                    {                                                           // top
+                        z = fMap_Par->GetDist2target(i + 1) + clusterS[mul][1]; // FIXME:Fix offsets for s444_2019
                         y = fKcen + 1.;
                         x = fKcen - clusterK[mul][1];
                     }
                     else if (i == 1)
                     { // right
-                        z = 14. + clusterS[mul][1];
+                        z = fMap_Par->GetDist2target(i + 1) + clusterS[mul][1];
                         x = -1. * (fKcen + 1.);
                         y = fKcen - 1. * clusterK[mul][1];
                     }
                     else if (i == 2)
                     { // bottom
-                        z = 14. + clusterS[mul][1];
+                        z = fMap_Par->GetDist2target(i + 1) + clusterS[mul][1];
                         y = -1. * (fKcen + 1.);
                         x = clusterK[mul][1] - fKcen;
                     }
                     else if (i == 3)
                     { // left
-                        z = 14. + clusterS[mul][1];
+                        z = fMap_Par->GetDist2target(i + 1) + clusterS[mul][1];
                         x = fKcen + 1.;
                         y = clusterK[mul][1] - fKcen;
                     }
                 }
                 else if (fMap_Par->GetGeometry() == 2020)
                 {
-
+                    // Experiments s455(2021) and eng.-run 2019
                     if (i == 0 || i == 1 || i == 4)
                     {
                         x = fMap_Par->GetDist2target(i + 1) *
@@ -275,7 +275,7 @@ void R3BAmsStripCal2Hit::Exec(Option_t* option)
                 }
                 else if (fMap_Par->GetGeometry() == 202011)
                 {
-
+                    // Cosmic test with 6 AMS detectors
                     if (i == 0 || i == 4)
                     {
                         x = 1.0 * clusterS[mul][1] - fScen;
@@ -299,6 +299,35 @@ void R3BAmsStripCal2Hit::Exec(Option_t* option)
                         x = 1.0 * clusterS[mul][1] - fScen;
                         y = -1. * (1.0 * clusterK[mul][1] - fKcen);
                         z = fMap_Par->GetDist2target(i + 1);
+                    }
+                }
+                if (fMap_Par->GetGeometry() == 2021)
+                {
+                    if (i == 0)
+                    {
+                        // left
+                        z = fMap_Par->GetDist2target(i + 1) + clusterS[mul][1];
+                        x = fKcen + 1.;
+                        y = clusterK[mul][1] - fKcen;
+                    }
+                    else if (i == 1)
+                    {                                                           // top
+                        z = fMap_Par->GetDist2target(i + 1) + clusterS[mul][1]; // FIXME:Fix offsets for s515_2021
+                        y = fKcen + 1.;
+                        x = fKcen - clusterK[mul][1];
+                    }
+                    else if (i == 2)
+                    { // bottom
+                        z = fMap_Par->GetDist2target(i + 1) + clusterS[mul][1];
+                        y = -1. * (fKcen + 1.);
+                        x = clusterK[mul][1] - fKcen;
+                    }
+                    else if (i == 3)
+                    {
+                        // right
+                        z = fMap_Par->GetDist2target(i + 1) + clusterS[mul][1];
+                        x = -1. * (fKcen + 1.);
+                        y = fKcen - 1. * clusterK[mul][1];
                     }
                 }
 

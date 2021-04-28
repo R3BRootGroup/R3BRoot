@@ -1,4 +1,3 @@
-
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019 Members of R3B Collaboration                          *
@@ -23,6 +22,7 @@
  *
  */
 
+#include "R3BFrsData.h"
 #include "R3BLosCalData.h"
 #include "R3BLosMappedData.h"
 //#include "R3BOnlineSpectra.h"
@@ -46,6 +46,8 @@
 #include "R3BPspxHitData.h"
 #include "R3BPspxMappedData.h"
 #include "R3BPspxPrecalData.h"
+
+#include "R3BMusicHitData.h"
 
 #include "R3BEventHeader.h"
 #include "R3BTCalEngine.h"
@@ -97,18 +99,75 @@ static void init_array(T& array, double init)
 using namespace std;
 
 R3BOnlineSpectraFiberTofds515::R3BOnlineSpectraFiberTofds515()
-    : R3BOnlineSpectraFiberTofds515("OnlineSpectraFiberTofds515", 1)
+    //	: R3BOnlineSpectraFiberTofds515("OnlineSpectraFiberTofds515", 1)
+    : FairTask("OnlineSpectraFiberTofds515", 1)
+    , fTrigger(-1)
+    , fTpat(-1)
+    , fClockFreq(5.)
+    , fNofPlanes(N_PLANE_MAX_TOFD)
+    , fPaddlesPerPlane(N_PADDLE_MAX_TOFD)
+    , fNEvents(0)
+    , fToFoffset(0)
+    , fToFmin(-5000)
+    , fToFmax(5000)
+    , fTof2InvV_p0(-7.8)
+    , fTof2InvV_p1(0.0073)
+    , fL2(137)
+    , fPos_p0(-11)
+    , fPos_p1(54.7)
+    , fDispersionS2(7000)
+    , fBrho0_S2toCC(9.458)
+    , fP0(-2.12371e7)
+    , fP1(4.9473e7)
+    , fP2(-2.87635e7)
+    , fZprimary(50.)
+    , fZoffset(-1.3)
+    , fPos2min(-200.)
+    , fPos2max(200.)
+    , fHitItemsMus(NULL)
+    , fHitItemsFrs(NULL)
+    , ZMUSIC_cut(50)
+    , ZMUSIC_wcut(0.5)
+    , AoQ_cut(2.64)
+    , AoQ_wcut(0.004)
+
 {
 }
 
 R3BOnlineSpectraFiberTofds515::R3BOnlineSpectraFiberTofds515(const char* name, Int_t iVerbose)
+
     : FairTask(name, iVerbose)
     , fTrigger(-1)
     , fTpat(-1)
+    , fClockFreq(5.)
     , fNofPlanes(N_PLANE_MAX_TOFD)
     , fPaddlesPerPlane(N_PADDLE_MAX_TOFD)
-    , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
+    //, fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , fNEvents(0)
+    //, FtCALsCI2(nULL)
+    , fToFoffset(0)
+    , fToFmin(-5000)
+    , fToFmax(5000)
+    , fTof2InvV_p0(-7.8)
+    , fTof2InvV_p1(0.0073)
+    , fL2(137)
+    , fPos_p0(-11)
+    , fPos_p1(54.7)
+    , fDispersionS2(7000)
+    , fBrho0_S2toCC(9.458)
+    , fP0(-2.12371e7)
+    , fP1(4.9473e7)
+    , fP2(-2.87635e7)
+    , fZprimary(50.)
+    , fZoffset(-1.3)
+    , fPos2min(-200.)
+    , fPos2max(200.)
+    , fHitItemsMus(NULL)
+    , fHitItemsFrs(NULL)
+    , ZMUSIC_cut(50)
+    , ZMUSIC_wcut(0.5)
+    , AoQ_cut(2.64)
+    , AoQ_wcut(0.004)
 {
 }
 
@@ -130,7 +189,17 @@ R3BOnlineSpectraFiberTofds515::~R3BOnlineSpectraFiberTofds515()
         delete fh_ToT_s_Fib[i];
         delete fh_ToT_single_Fib[i];
         delete fh_channels_single_Fib[i];
+        delete fh_Fib10_vs_Fib13;
+        delete fh_Fib11_vs_Fib12;
+        delete fh_Fib11_vs_Fib12_cut;
+        delete fh_channels_Fib11_cut;
     }
+    if (fHitItemsMus)
+        delete fHitItemsMus;
+    if (fTcalSci2)
+        delete fTcalSci2;
+    if (fHitItemsFrs)
+        delete fHitItemsFrs;
 }
 
 InitStatus R3BOnlineSpectraFiberTofds515::Init()
@@ -151,7 +220,7 @@ InitStatus R3BOnlineSpectraFiberTofds515::Init()
     header = (R3BEventHeader*)mgr->GetObject("R3BEventHeader");
     FairRunOnline* run = FairRunOnline::Instance();
 
-    run->GetHttpServer()->Register("/Tasks", this);
+    run->GetHttpServer()->Register("", this);
 
     // Get objects for detectors on all levels
 
@@ -167,6 +236,15 @@ InitStatus R3BOnlineSpectraFiberTofds515::Init()
         fCalItems.push_back((TClonesArray*)mgr->GetObject(Form("%sCal", fDetectorNames[det])));
         fHitItems.push_back((TClonesArray*)mgr->GetObject(Form("%sHit", fDetectorNames[det])));
     }
+
+    // get access to hit data of the MUSIC
+    fHitItemsMus = (TClonesArray*)mgr->GetObject("MusicHitData");
+    if (!fHitItemsMus)
+        LOG(WARNING) << "R3BOnlineSpectraLosVsSci2: MusicHitData not found";
+    // get access to hit data of FRS
+    fHitItemsFrs = (TClonesArray*)mgr->GetObject("FrsData");
+    if (!fHitItemsFrs)
+        LOG(WARNING) << "R3BOnlineSpectraLosVsSci2: FrsData not found";
 
     //------------------------------------------------------------------------
     // create histograms of all detectors
@@ -187,7 +265,7 @@ InitStatus R3BOnlineSpectraFiberTofds515::Init()
     cTrigg->cd(2);
     gPad->SetLogy();
     fhTpat->Draw();
-    cTrigg->cd(0);
+    // cTrigg->cd(0);
 
     //------------------------------------------------------------------------
     // Rolu detector
@@ -211,12 +289,12 @@ InitStatus R3BOnlineSpectraFiberTofds515::Init()
         cRolu->cd(2);
         gPad->SetLogz();
         fh_rolu_tot->Draw("colz");
-        cRolu->cd(0);
+        // cRolu->cd(0);
         run->AddObject(cRolu);
 
-        run->GetHttpServer()->RegisterCommand("Reset_ROLU", Form("/Tasks/%s/->Reset_ROLU_Histo()", GetName()));
+        run->GetHttpServer()->RegisterCommand("Reset_ROLU", Form("/Objects/%s/->Reset_ROLU_Histo()", GetName()));
     }
-    //------------------------------------------------------------------------
+    //--3BOnlineSpectraFibe---------------------------------------------------
     // Sci8 detector
 
     if (fMappedItems.at(DET_SCI8))
@@ -273,10 +351,10 @@ InitStatus R3BOnlineSpectraFiberTofds515::Init()
         cSci8->cd(7);
         fh_sci8_tot_mean->Draw();
 
-        cSci8->cd(0);
+        // cSci8->cd(0);
         run->AddObject(cSci8);
 
-        run->GetHttpServer()->RegisterCommand("Reset_SCI8", Form("/Tasks/%s/->Reset_SCI8_Histo()", GetName()));
+        run->GetHttpServer()->RegisterCommand("Reset_SCI8", Form("/Objects/%s/->Reset_SCI8_Histo()", GetName()));
     }
 
     if (fMappedItems.at(DET_BMON))
@@ -350,106 +428,112 @@ InitStatus R3BOnlineSpectraFiberTofds515::Init()
 
         run->AddObject(cbmon);
 
-        run->GetHttpServer()->RegisterCommand("Reset_BMON", Form("/Tasks/%s/->Reset_BMON_Histo()", GetName()));
+        run->GetHttpServer()->RegisterCommand("Reset_BMON", Form("/Objects/%s/->Reset_BMON_Histo()", GetName()));
     }
 
     //------------------------------------------------------------------------
     // Los detector
+    /*
+        if (fMappedItems.at(DET_LOS))
+        {
+            TCanvas* cLos = new TCanvas("Los_", "LOS", 10, 10, 910, 810);
 
-    if (fMappedItems.at(DET_LOS))
-    {
-        TCanvas* cLos = new TCanvas("Los", "LOS", 10, 10, 910, 810);
+            fh_los_channels = new TH1F("los_channels_", "LOS channels", 10, 0., 10.);
+            fh_los_channels->GetXaxis()->SetTitle("Channel number");
+            fh_los_multihit = new TH1F("los_multihitv", "LOS multihit && all 8 PMs", 10, 0., 10.);
+            fh_los_multihit->GetXaxis()->SetTitle("Multihit");
 
-        fh_los_channels = new TH1F("los_channels", "LOS channels", 10, 0., 10.);
-        fh_los_channels->GetXaxis()->SetTitle("Channel number");
-        fh_los_multihit = new TH1F("los_multihit", "LOS multihit && all 8 PMs", 10, 0., 10.);
-        fh_los_multihit->GetXaxis()->SetTitle("Multihit");
+            fh_los_pos_MCFD = new TH2F("los_pos_MCFD_", "LOS MCFD Position ", 1000, -5., 5., 1000, -5., 5.);
+            fh_los_pos_MCFD->GetXaxis()->SetTitle("X position / cm");
+            fh_los_pos_MCFD->GetYaxis()->SetTitle("Y position / cm");
+            fh_los_pos_TAMEX = new TH2F("los_pos_TAMEX_", "LOS TAMEX Position ", 1000, -5., 5., 1000, -5., 5.);
+            fh_los_pos_TAMEX->GetXaxis()->SetTitle("X position / cm");
+            fh_los_pos_TAMEX->GetYaxis()->SetTitle("Y position / cm");
+            fh_los_pos_ToT = new TH2F("los_pos_ToT_", "LOS ToT Position ", 1000, -5., 5., 1000, -5., 5.);
+            fh_los_pos_ToT->GetXaxis()->SetTitle("X position / cm");
+            fh_los_pos_ToT->GetYaxis()->SetTitle("Y position / cm");
+            fh_los_dt_hits_ToT =
+                new TH2F("los_dt_ToT_", "LOS ToT dt ", 6000, 0, 3000, 2000, 0, 200.); // 6000,0,3000,2000,0,200.
+            fh_los_dt_hits_ToT->GetXaxis()->SetTitle("dt between two hits / usec");  // dt between two hits / ns
+            fh_los_dt_hits_ToT->GetYaxis()->SetTitle("ToT / ns");                    // ToT / ns
+            fh_los_dt_first_ToT = new TH2F("los_dt_events_ToT_", "LOS ToT dtevents ", 5000, 0, 50000, 500, 0, 200.);
+            fh_los_dt_first_ToT->GetXaxis()->SetTitle("dt between two events / usec");
+            fh_los_dt_first_ToT->GetYaxis()->SetTitle("ToT / ns");
 
-        fh_los_pos_MCFD = new TH2F("los_pos_MCFD", "LOS MCFD Position ", 1000, -5., 5., 1000, -5., 5.);
-        fh_los_pos_MCFD->GetXaxis()->SetTitle("X position / cm");
-        fh_los_pos_MCFD->GetYaxis()->SetTitle("Y position / cm");
-        fh_los_pos_TAMEX = new TH2F("los_pos_TAMEX", "LOS TAMEX Position ", 1000, -5., 5., 1000, -5., 5.);
-        fh_los_pos_TAMEX->GetXaxis()->SetTitle("X position / cm");
-        fh_los_pos_TAMEX->GetYaxis()->SetTitle("Y position / cm");
-        fh_los_pos_ToT = new TH2F("los_pos_ToT", "LOS ToT Position ", 1000, -5., 5., 1000, -5., 5.);
-        fh_los_pos_ToT->GetXaxis()->SetTitle("X position / cm");
-        fh_los_pos_ToT->GetYaxis()->SetTitle("Y position / cm");
-        fh_los_dt_hits_ToT =
-            new TH2F("los_dt_ToT", "LOS ToT dt ", 6000, 0, 3000, 2000, 0, 200.); // 6000,0,3000,2000,0,200.
-        fh_los_dt_hits_ToT->GetXaxis()->SetTitle("dt between two hits / usec");  // dt between two hits / ns
-        fh_los_dt_hits_ToT->GetYaxis()->SetTitle("ToT / ns");                    // ToT / ns
-        fh_los_dt_first_ToT = new TH2F("los_dt_events_ToT", "LOS ToT dtevents ", 5000, 0, 50000, 500, 0, 200.);
-        fh_los_dt_first_ToT->GetXaxis()->SetTitle("dt between two events / usec");
-        fh_los_dt_first_ToT->GetYaxis()->SetTitle("ToT / ns");
+            fh_los_dt_hits = new TH1F("los_dt_vhits_", "LOS dt hits", 100000, 0, 10000);
+            fh_los_dt_hits->GetXaxis()->SetTitle("dt between two hits / micros");
+            fh_los_dt_hits->GetYaxis()->SetTitle("Counts");
 
-        fh_los_dt_hits = new TH1F("los_dt_hits", "LOS dt hits", 100000, 0, 10000);
-        fh_los_dt_hits->GetXaxis()->SetTitle("dt between two hits / micros");
-        fh_los_dt_hits->GetYaxis()->SetTitle("Counts");
+            fh_los_tres_MCFD = new TH1F("los_time_res_MCFD_", "LOS MCFD Time resolution - raw", 4000, -4., 4.);
+            fh_los_tres_MCFD->GetXaxis()->SetTitle("Time MCFD / ns");
+            fh_los_tres_TAMEX = new TH1F("los_time_res_TAMEX_", "LOS TAMEX Time resolution -raw ", 4000, -4., 4.);
+            fh_los_tres_TAMEX->GetXaxis()->SetTitle("Time TAMEX / ns");
+            fh_los_tres_MTDC = new TH1F("los_time_res_MTDC_", "LOS MTDC Time resolution - raw", 4000, -4., 4.);
+            fh_los_tres_MTDC->GetXaxis()->SetTitle("Time MTDC / ns");
+            fh_los_tot = new TH2F("los_tot", "LOS ToT vs PMTv", 10, 0, 10, 3000, 0., 300.);
+            fh_los_tot->GetXaxis()->SetTitle("PMT number");
+            fh_los_tot->GetYaxis()->SetTitle("ToT / ns");
+            fh_los_tot_mean = new TH1F("los_tot_mean_", "LOS mean ToT", 1500, 0., 300.);
+            fh_los_tot_mean->GetYaxis()->SetTitle("Counts");
+            fh_los_tot_mean->GetXaxis()->SetTitle("ToT / ns");
+            fh_los_ihit_ToT = new TH2F("los_tot_ihit_", "LOS ToT vs ihit", 10, 0, 10, 3100, -10., 300.);
+            fh_los_ihit_ToT->GetXaxis()->SetTitle("iHit");
+            fh_los_ihit_ToT->GetYaxis()->SetTitle("ToT / ns");
 
-        fh_los_tres_MCFD = new TH1F("los_time_res_MCFD", "LOS MCFD Time resolution - raw", 4000, -4., 4.);
-        fh_los_tres_MCFD->GetXaxis()->SetTitle("Time MCFD / ns");
-        fh_los_tres_TAMEX = new TH1F("los_time_res_TAMEX", "LOS TAMEX Time resolution -raw ", 4000, -4., 4.);
-        fh_los_tres_TAMEX->GetXaxis()->SetTitle("Time TAMEX / ns");
-        fh_los_tres_MTDC = new TH1F("los_time_res_MTDC", "LOS MTDC Time resolution - raw", 4000, -4., 4.);
-        fh_los_tres_MTDC->GetXaxis()->SetTitle("Time MTDC / ns");
-        fh_los_tot = new TH2F("los_tot", "LOS ToT vs PMT", 10, 0, 10, 3000, 0., 300.);
-        fh_los_tot->GetXaxis()->SetTitle("PMT number");
-        fh_los_tot->GetYaxis()->SetTitle("ToT / ns");
-        fh_los_tot_mean = new TH1F("los_tot_mean", "LOS mean ToT", 1500, 0., 300.);
-        fh_los_tot_mean->GetYaxis()->SetTitle("Counts");
-        fh_los_tot_mean->GetXaxis()->SetTitle("ToT / ns");
-        fh_los_ihit_ToT = new TH2F("los_tot_ihit", "LOS ToT vs ihit", 10, 0, 10, 3100, -10., 300.);
-        fh_los_ihit_ToT->GetXaxis()->SetTitle("iHit");
-        fh_los_ihit_ToT->GetYaxis()->SetTitle("ToT / ns");
+            cLos->Divide(4, 3);
+            cLos->cd(1);
+            fh_los_channels->Draw();
+            cLos->cd(2);
+            gPad->SetLogy();
+            fh_los_multihit->Draw();
+            cLos->cd(3);
+            gPad->SetLogz();
+            fh_los_tot->Draw("colz");
+            cLos->cd(4);
+            gPad->SetLogy();
+            fh_los_tot_mean->Draw();
+            cLos->cd(5);
+            gPad->SetLogz();
+            fh_los_ihit_ToT->Draw("colz");
+            cLos->cd(6);
+            gPad->SetLogz();
+            fh_los_dt_hits_ToT->Draw("colz");
+            cLos->cd(7);
+            gPad->SetLogy();
+            fh_los_tres_MTDC->Draw();
+            cLos->cd(8);
+            gPad->SetLogy();
+            fh_los_tres_MCFD->Draw();
+            cLos->cd(9);
+            gPad->SetLogy();
+            fh_los_tres_TAMEX->Draw();
+            cLos->cd(10);
+            gPad->SetLogz();
+            fh_los_pos_ToT->Draw("colz");
+            cLos->cd(11);
+            gPad->SetLogz();
+            fh_los_pos_MCFD->Draw("colz");
+            cLos->cd(12);
+            gPad->SetLogz();
+            fh_los_pos_TAMEX->Draw("colz");
+            cLos->cd(0);
+            run->AddObject(cLos);
 
-        cLos->Divide(4, 3);
-        cLos->cd(1);
-        fh_los_channels->Draw();
-        cLos->cd(2);
-        gPad->SetLogy();
-        fh_los_multihit->Draw();
-        cLos->cd(3);
-        gPad->SetLogz();
-        fh_los_tot->Draw("colz");
-        cLos->cd(4);
-        gPad->SetLogy();
-        fh_los_tot_mean->Draw();
-        cLos->cd(5);
-        gPad->SetLogz();
-        fh_los_ihit_ToT->Draw("colz");
-        cLos->cd(6);
-        gPad->SetLogz();
-        fh_los_dt_hits_ToT->Draw("colz");
-        cLos->cd(7);
-        gPad->SetLogy();
-        fh_los_tres_MTDC->Draw();
-        cLos->cd(8);
-        gPad->SetLogy();
-        fh_los_tres_MCFD->Draw();
-        cLos->cd(9);
-        gPad->SetLogy();
-        fh_los_tres_TAMEX->Draw();
-        cLos->cd(10);
-        gPad->SetLogz();
-        fh_los_pos_ToT->Draw("colz");
-        cLos->cd(11);
-        gPad->SetLogz();
-        fh_los_pos_MCFD->Draw("colz");
-        cLos->cd(12);
-        gPad->SetLogz();
-        fh_los_pos_TAMEX->Draw("colz");
-        cLos->cd(0);
-        run->AddObject(cLos);
-
-        run->GetHttpServer()->RegisterCommand("Reset_LOS", Form("/Tasks/%s/->Reset_LOS_Histo()", GetName()));
-    }
-
+            run->GetHttpServer()->RegisterCommand("Reset_LOS", Form("/Objects/%s/->Reset_LOS_Histo()", GetName()));
+        }
+    */
     //-----------------------------------------------------------------------
     // Fiber Detectors 1-NOF_FIB_DET
 
     char canvName[255];
     TCanvas* FibCanvas[NOF_FIB_DET];
 
+    // Fiber vs Fiber channels
+    fh_Fib10_vs_Fib13 = new TH2F("Fib10_vs_Fib13", "Fib10_vs_Fib13", 520, 0, 520, 520, 0, 520);
+    fh_Fib11_vs_Fib12 = new TH2F("Fib11_vs_Fib12", "Fib11_vs_Fib12", 520, 0, 520, 520, 0, 520);
+    fh_Fib11_vs_Fib12_cut =
+        new TH2F("Fib11_vs_Fib12_ZMUSIC_cut", "Fib11_vs_Fib12_ZMUSIC_cut", 520, 0, 520, 520, 0, 520);
+    fh_channels_Fib11_cut = new TH1F("Fib11_channels_ZMUSIC_cut", "Fib11_channels_ZMUSIC_cut", 520, 0, 520);
     for (Int_t ifibcount = 0; ifibcount < NOF_FIB_DET; ifibcount++)
     {
 
@@ -460,7 +544,6 @@ InitStatus R3BOnlineSpectraFiberTofds515::Init()
 
         if (fMappedItems.at(DET_FI_FIRST + ifibcount))
         {
-
             const char* chistName;
             const char* chistTitle;
             const char* detName;
@@ -620,8 +703,24 @@ InitStatus R3BOnlineSpectraFiberTofds515::Init()
         } // end if(Mapped)
 
     } // end for(ifibcount)
+    TCanvas* Fib_corr = new TCanvas("Fib_corr", "Fib_coor", 10, 10, 910, 910);
+    Fib_corr->Divide(2, 2);
+    Fib_corr->cd(1);
+    gPad->SetLogz();
+    fh_Fib10_vs_Fib13->Draw("colz");
+    Fib_corr->cd(2);
+    gPad->SetLogz();
+    fh_Fib11_vs_Fib12->Draw("colz");
+    Fib_corr->cd(3);
+    gPad->SetLogz();
+    fh_Fib11_vs_Fib12_cut->Draw("colz");
+    Fib_corr->cd(4);
+    fh_channels_Fib11_cut->SetLineColor(kRed);
+    fh_channels_Fib11_cut->Draw();
+    // fh_channels_Fib[2]->Draw("same");
+
     if (NOF_FIB_DET > 0)
-        run->GetHttpServer()->RegisterCommand("Reset_Fibers", Form("/Tasks/%s/->Reset_FIBERS_Histo()", GetName()));
+        run->GetHttpServer()->RegisterCommand("Reset_Fibers", Form("/Objects/%s/->Reset_FIBERS_Histo()", GetName()));
 
     //---------------------------------------------------------------------------------------
     // Ptof detector
@@ -688,23 +787,12 @@ InitStatus R3BOnlineSpectraFiberTofds515::Init()
         TCanvas* cTofd_planes = new TCanvas("TOFD_planes", "TOFD planes", 10, 10, 1100, 1000);
         cTofd_planes->Divide(5, 4);
 
-        TCanvas* Tofd_tot_raw = new TCanvas("Tofd_tot_raw", "Tofd_tot_raw", 10, 10, 1100, 1100);
-        Tofd_tot_raw->Divide(4, 2);
+        TCanvas* cTofd_corr = new TCanvas("Tofd_corr_raw", "Tofd_corr_raw", 10, 10, 1100, 1100);
+        cTofd_corr->Divide(2, 2);
 
         fh_TimePreviousEvent = new TH1F("TimePreviousEvent", "Time between 2 particles ", 300000, -3000, 3000);
         fh_TimePreviousEvent->GetXaxis()->SetTitle("time / µsec");
         fh_TimePreviousEvent->GetYaxis()->SetTitle("counts");
-
-        /*
-        p1_tot_top=new TH2F("p1_tot_top","p1_tot_top",44,0,44,500,0,250);
-        p2_tot_top=new TH2F("p2_tot_top","p2_tot_top",44,0,44,500,0,250);
-        p3_tot_top=new TH2F("p3_tot_top","p3_tot_top",44,0,44,500,0,250);
-        p4_tot_top=new TH2F("p4_tot_top","p4_tot_top",44,0,44,500,0,250);
-        p1_tot_bot=new TH2F("p1_tot_bot","p1_tot_bot",44,0,44,500,0,250);
-        p2_tot_bot=new TH2F("p2_tot_bot","p2_tot_bot",44,0,44,500,0,250);
-        p3_tot_bot=new TH2F("p3_tot_bot","p3_tot_bot",44,0,44,500,0,250);
-        p4_tot_bot=new TH2F("p4_tot_bot","p4_tot_bot",44,0,44,500,0,250);
-        */
 
         for (Int_t j = 0; j < 4; j++)
         {
@@ -740,6 +828,18 @@ InitStatus R3BOnlineSpectraFiberTofds515::Init()
             fh_tofd_multihit[j]->GetXaxis()->SetTitle("Bar number");
             fh_tofd_multihit[j]->GetYaxis()->SetTitle("Multihit");
 
+            char strName11[255];
+            sprintf(strName11, "tofd_side1_vs_side2_plane_%d", j + 1);
+            tofd_side1_vs_side2[j] = new TH2F(strName11, strName11, 44, 0., 44, 44, 0., 44);
+            tofd_side1_vs_side2[j]->GetXaxis()->SetTitle("Bar side1");
+            tofd_side1_vs_side2[j]->GetYaxis()->SetTitle("Bar side2");
+
+            char strName12[255];
+            sprintf(strName12, "tofd_eloss_plane_%d", j + 1);
+            fh_tofd_eloss[j] = new TH2F(strName12, strName12, 44, 0., 44, 1600, 0, 400);
+            fh_tofd_eloss[j]->GetXaxis()->SetTitle("Bar");
+            fh_tofd_eloss[j]->GetYaxis()->SetTitle("Eloss");
+
             if (j < 3)
             {
                 int jk = j + 1;
@@ -752,24 +852,15 @@ InitStatus R3BOnlineSpectraFiberTofds515::Init()
                 fh_tofd_dt[j]->GetYaxis()->SetTitle("dt / ns");
             }
         }
-        /*
-        Tofd_tot_raw->cd(1);
-        p1_tot_top->Draw("colz");
-        Tofd_tot_raw->cd(2);
-        p1_tot_bot->Draw("colz");
-        Tofd_tot_raw->cd(3);
-        p2_tot_top->Draw("colz");
-        Tofd_tot_raw->cd(4);
-        p2_tot_bot->Draw("colz");
-        Tofd_tot_raw->cd(5);
-        p3_tot_top->Draw("colz");
-        Tofd_tot_raw->cd(6);
-        p3_tot_bot->Draw("colz");
-        Tofd_tot_raw->cd(7);
-        p4_tot_top->Draw("colz");
-        Tofd_tot_raw->cd(8);
-        p4_tot_bot->Draw("colz");
-        */
+
+        cTofd_corr->cd(1);
+        tofd_side1_vs_side2[0]->Draw("colz");
+        cTofd_corr->cd(2);
+        tofd_side1_vs_side2[1]->Draw("colz");
+        cTofd_corr->cd(3);
+        tofd_side1_vs_side2[2]->Draw("colz");
+        cTofd_corr->cd(4);
+        tofd_side1_vs_side2[3]->Draw("colz");
 
         cTofd_planes->cd(1);
         fh_tofd_channels[0]->Draw();
@@ -779,7 +870,8 @@ InitStatus R3BOnlineSpectraFiberTofds515::Init()
         fh_tofd_TotPm[0]->Draw("colz");
         cTofd_planes->cd(3);
         gPad->SetLogz();
-        fh_tofd_ToF[0]->Draw("colz");
+        // fh_tofd_ToF[0]->Draw("colz");
+        fh_tofd_eloss[0]->Draw("colz");
         cTofd_planes->cd(4);
         gPad->SetLogz();
         fh_tofd_multihit[0]->Draw("colz");
@@ -792,7 +884,8 @@ InitStatus R3BOnlineSpectraFiberTofds515::Init()
         fh_tofd_TotPm[1]->Draw("colz");
         cTofd_planes->cd(8);
         gPad->SetLogz();
-        fh_tofd_ToF[1]->Draw("colz");
+        // fh_tofd_ToF[1]->Draw("colz");
+        fh_tofd_eloss[1]->Draw("colz");
         cTofd_planes->cd(9);
         gPad->SetLogz();
         fh_tofd_multihit[1]->Draw("colz");
@@ -808,7 +901,8 @@ InitStatus R3BOnlineSpectraFiberTofds515::Init()
         fh_tofd_TotPm[2]->Draw("colz");
         cTofd_planes->cd(13);
         gPad->SetLogz();
-        fh_tofd_ToF[2]->Draw("colz");
+        // fh_tofd_ToF[2]->Draw("colz");
+        fh_tofd_eloss[2]->Draw("colz");
         cTofd_planes->cd(14);
         gPad->SetLogz();
         fh_tofd_multihit[2]->Draw("colz");
@@ -824,7 +918,8 @@ InitStatus R3BOnlineSpectraFiberTofds515::Init()
         fh_tofd_TotPm[3]->Draw("colz");
         cTofd_planes->cd(18);
         gPad->SetLogz();
-        fh_tofd_ToF[3]->Draw("colz");
+        // fh_tofd_ToF[3]->Draw("colz");
+        fh_tofd_eloss[3]->Draw("colz");
         cTofd_planes->cd(19);
         gPad->SetLogz();
         fh_tofd_multihit[3]->Draw("colz");
@@ -835,7 +930,7 @@ InitStatus R3BOnlineSpectraFiberTofds515::Init()
         cTofd_planes->cd(0);
         run->AddObject(cTofd_planes);
 
-        run->GetHttpServer()->RegisterCommand("Reset_TOFD", Form("/Tasks/%s/->Reset_TOFD_Histo()", GetName()));
+        run->GetHttpServer()->RegisterCommand("Reset_TOFD", Form("/Objects/%s/->Reset_TOFD_Histo()", GetName()));
     }
 
     // -------------------------------------------------------------------------
@@ -1086,13 +1181,13 @@ InitStatus R3BOnlineSpectraFiberTofds515::Init()
 
         run->AddObject(cPspx_comp);
 
-        run->GetHttpServer()->RegisterCommand("Reset_PSPX", Form("/Tasks/%s/->Reset_PSPX_Histo()", GetName()));
+        run->GetHttpServer()->RegisterCommand("Reset_PSPX", Form("/Objects/%s/->Reset_PSPX_Histo()", GetName()));
 
         // -------------------------------------------------------------------------
     }
     return kSUCCESS;
 }
-
+/*
 void R3BOnlineSpectraFiberTofds515::Reset_LOS_Histo()
 {
     fh_los_channels->Reset();
@@ -1108,7 +1203,7 @@ void R3BOnlineSpectraFiberTofds515::Reset_LOS_Histo()
     fh_los_ihit_ToT->Reset();
     fh_los_dt_first_ToT->Reset();
 }
-
+*/
 void R3BOnlineSpectraFiberTofds515::Reset_ROLU_Histo()
 {
     fh_rolu_channels->Reset();
@@ -1152,19 +1247,12 @@ void R3BOnlineSpectraFiberTofds515::Reset_TOFD_Histo()
         fh_tofd_multihit[i]->Reset();
         fh_tofd_ToF[i]->Reset();
         fh_tofd_TotPm[i]->Reset();
+        tofd_side1_vs_side2[i]->Reset();
+        fh_tofd_eloss[i]->Reset();
     }
     fh_tofd_dt[0]->Reset();
     fh_tofd_dt[1]->Reset();
     fh_tofd_dt[2]->Reset();
-
-    p1_tot_top->Reset();
-    p1_tot_bot->Reset();
-    p2_tot_top->Reset();
-    p2_tot_bot->Reset();
-    p3_tot_top->Reset();
-    p3_tot_bot->Reset();
-    p4_tot_top->Reset();
-    p4_tot_bot->Reset();
 }
 void R3BOnlineSpectraFiberTofds515::Reset_FIBERS_Histo()
 {
@@ -1210,6 +1298,10 @@ void R3BOnlineSpectraFiberTofds515::Reset_FIBERS_Histo()
             fh_Fib_pos[ifibcount]->Reset();
             fh_Fib_vs_Events[ifibcount]->Reset();
             fh_channels_single_Fib[ifibcount]->Reset();
+            fh_Fib10_vs_Fib13->Reset();
+            fh_Fib11_vs_Fib12->Reset();
+            fh_Fib11_vs_Fib12_cut->Reset();
+            fh_channels_Fib11_cut->Reset();
         }
     }
 }
@@ -1277,114 +1369,114 @@ void R3BOnlineSpectraFiberTofds515::Exec(Option_t* option)
         if ((tpatvalue == 0))
             return;
     }
-
-    if (fMappedItems.at(DET_BMON))
-    {
-
-        Bool_t spectra_clear = false;
-        Double_t xtime = double(time - time_start) / 1.e9;
-        // for reseting spectra
-        Int_t icount = iclear_count * reset_time; // reset after reset_time (sec)
-        if (time_clear < 0. && int(xtime) % icount == 0 && xtime > 1.)
+    /*
+        if (fMappedItems.at(DET_BMON))
         {
-            time_clear = xtime;
-            spectra_clear = true;
-        }
-        unsigned long IC;
-        unsigned long SEETRAM;
-        unsigned long TOFDOR;
-        Bool_t bmon_read = false;
 
-        auto det = fMappedItems.at(DET_BMON);
-        Int_t nHitsbm = det->GetEntriesFast();
-
-        for (Int_t ihit = 0; ihit < nHitsbm; ihit++)
-        {
-            R3BBeamMonitorMappedData* hit = (R3BBeamMonitorMappedData*)det->At(ihit);
-            if (!hit)
-                continue;
-
-            IC = hit->GetIC();           // negative values if offset not high enough
-            SEETRAM = hit->GetSEETRAM(); // negative values if offset not high enough
-            TOFDOR = hit->GetTOFDOR();   // only positive values possible
-
-            //     unsigned long long time = header->GetTimeStamp();
-
-            if (fNEvents == fNEvents_start)
+            Bool_t spectra_clear = false;
+            Double_t xtime = double(time - time_start) / 1.e9;
+            // for reseting spectra
+            Int_t icount = iclear_count * reset_time; // reset after reset_time (sec)
+            if (time_clear < 0. && int(xtime) % icount == 0 && xtime > 1.)
             {
-                see_mem = SEETRAM;
-                ic_mem = IC;
-                tofdor_mem = TOFDOR;
-                time_mem = time_start;
-                see_start = SEETRAM;
-                ic_start = IC;
-                tofdor_start = TOFDOR;
-                time_prev_read = time_start;
+                time_clear = xtime;
+                spectra_clear = true;
             }
+            unsigned long IC;
+            unsigned long SEETRAM;
+            unsigned long TOFDOR;
+            Bool_t bmon_read = false;
 
-            if (time > 0)
+            auto det = fMappedItems.at(DET_BMON);
+            Int_t nHitsbm = det->GetEntriesFast();
+
+            for (Int_t ihit = 0; ihit < nHitsbm; ihit++)
             {
+                R3BBeamMonitorMappedData* hit = (R3BBeamMonitorMappedData*)det->At(ihit);
+                if (!hit)
+                    continue;
 
-                fh_spill_length->Fill((time - time_mem) / 1e9);
+                IC = hit->GetIC();           // negative values if offset not high enough
+                SEETRAM = hit->GetSEETRAM(); // negative values if offset not high enough
+                TOFDOR = hit->GetTOFDOR();   // only positive values possible
 
-                // Spectra below are filled every read_time (secs)
-                if (time_to_read == 0 && (time - time_prev_read) >= read_time * 1000000000)
+                //     unsigned long long time = header->GetTimeStamp();
+
+                if (fNEvents == fNEvents_start)
                 {
-                    time_to_read = time;
-                    bmon_read = true;
-                }
-
-                if (bmon_read)
-                {
-
-                    tdiff = double(time - time_mem) / 1.e9;
-                    fNorm = 1.e-3 / (double(time - time_prev_read) / 1.e9); // kHz
-
-                    // IC:
-                    Int_t yIC = IC - ic_start;
-                    fh_IC->Fill(tdiff, yIC);
-                    fh_IC_spill->Fill(tdiff, (IC - ic_mem) * fNorm);
-                    ic_mem = IC;
-
-                    // SEETRAM:
-                    Int_t ySEE = SEETRAM - see_start;
-                    fh_SEE->Fill(tdiff, ySEE);
-                    Double_t ySEE_part = (SEETRAM - see_mem) * fNorm * 1.e+3 - see_offset * calib_SEE;
-                    fh_SEE_spill->Fill(tdiff, ySEE_part);
                     see_mem = SEETRAM;
-
-                    // TOFDOR:
-                    Int_t yTOFDOR = TOFDOR - tofdor_start;
-                    fh_TOFDOR->Fill(tdiff, yTOFDOR);
-                    fh_TOFDOR_spill->Fill(tdiff, (TOFDOR - tofdor_mem) * fNorm);
+                    ic_mem = IC;
                     tofdor_mem = TOFDOR;
-
-                    time_to_read = 0;
-                    time_prev_read = time;
-                    bmon_read = false;
-                }
-
-                if (spectra_clear)
-                {
-                    fh_spill_length->Reset();
-                    fh_IC_spill->Reset("ICESM");
-                    fh_SEE_spill->Reset("ICESM");
-                    fh_TOFDOR_spill->Reset("ICESM");
-                    fh_IC->Reset("ICESM");
-                    fh_SEE->Reset("ICESM");
-                    fh_TOFDOR->Reset("ICESM");
-                    time_mem = time;
-                    time_clear = -1.;
-                    iclear_count = iclear_count + 1;
-                    spectra_clear = false;
+                    time_mem = time_start;
                     see_start = SEETRAM;
                     ic_start = IC;
                     tofdor_start = TOFDOR;
+                    time_prev_read = time_start;
+                }
+
+                if (time > 0)
+                {
+
+                    fh_spill_length->Fill((time - time_mem) / 1e9);
+
+                    // Spectra below are filled every read_time (secs)
+                    if (time_to_read == 0 && (time - time_prev_read) >= read_time * 1000000000)
+                    {
+                        time_to_read = time;
+                        bmon_read = true;
+                    }
+
+                    if (bmon_read)
+                    {
+
+                        tdiff = double(time - time_mem) / 1.e9;
+                        fNorm = 1.e-3 / (double(time - time_prev_read) / 1.e9); // kHz
+
+                        // IC:
+                        Int_t yIC = IC - ic_start;
+                        fh_IC->Fill(tdiff, yIC);
+                        fh_IC_spill->Fill(tdiff, (IC - ic_mem) * fNorm);
+                        ic_mem = IC;
+
+                        // SEETRAM:
+                        Int_t ySEE = SEETRAM - see_start;
+                        fh_SEE->Fill(tdiff, ySEE);
+                        Double_t ySEE_part = (SEETRAM - see_mem) * fNorm * 1.e+3 - see_offset * calib_SEE;
+                        fh_SEE_spill->Fill(tdiff, ySEE_part);
+                        see_mem = SEETRAM;
+
+                        // TOFDOR:
+                        Int_t yTOFDOR = TOFDOR - tofdor_start;
+                        fh_TOFDOR->Fill(tdiff, yTOFDOR);
+                        fh_TOFDOR_spill->Fill(tdiff, (TOFDOR - tofdor_mem) * fNorm);
+                        tofdor_mem = TOFDOR;
+
+                        time_to_read = 0;
+                        time_prev_read = time;
+                        bmon_read = false;
+                    }
+
+                    if (spectra_clear)
+                    {
+                        fh_spill_length->Reset();
+                        fh_IC_spill->Reset("ICESM");
+                        fh_SEE_spill->Reset("ICESM");
+                        fh_TOFDOR_spill->Reset("ICESM");
+                        fh_IC->Reset("ICESM");
+                        fh_SEE->Reset("ICESM");
+                        fh_TOFDOR->Reset("ICESM");
+                        time_mem = time;
+                        time_clear = -1.;
+                        iclear_count = iclear_count + 1;
+                        spectra_clear = false;
+                        see_start = SEETRAM;
+                        ic_start = IC;
+                        tofdor_start = TOFDOR;
+                    }
                 }
             }
         }
-    }
-
+    */
     // **************   ROLU *************************************
 
     if (fMappedItems.at(DET_ROLU))
@@ -1490,283 +1582,705 @@ void R3BOnlineSpectraFiberTofds515::Exec(Option_t* option)
     //   r | |lb
     //   rb\ /b
 
-    Double_t timeTofd = 0;
-    Double_t time_V[10][8] = { 0.0 / 0.0 }; // [multihit][pm]
-    Double_t time_L[10][8] = { 0.0 / 0.0 };
-    Double_t time_T[10][8] = { 0.0 / 0.0 };
+    /*
 
-    Double_t time_M[10][8] = { 0.0 / 0.0 };
-    Double_t LosTresM[10] = { 0.0 / 0.0 };
+        Int_t Multip;
 
-    Double_t timeLosV[10] = { 0.0 };
-    Double_t LosTresV[10] = { 0.0 / 0.0 };
-    Double_t timeLosT[10] = { 0.0 };
-    Double_t LosTresT[10] = { 0.0 / 0.0 };
-    Double_t timeLos[10] = { 0.0 };
-    Double_t totsum[10] = { 0.0 };
-    Double_t tot[10][8] = { 0.0 / 0.0 };
-    Double_t xT_cm[10] = { 0.0 / 0.0 };
-    Double_t yT_cm[10] = { 0.0 / 0.0 };
-    Double_t xToT_cm[10] = { 0.0 / 0.0 };
-    Double_t yToT_cm[10] = { 0.0 / 0.0 };
-    Double_t xV_cm[10] = { 0.0 / 0.0 };
-    Double_t yV_cm[10] = { 0.0 / 0.0 };
-    Double_t time_V_temp[10][8] = { 0.0 / 0.0 };
-
-    Int_t Multip;
-
-    if (fMappedItems.at(DET_LOS))
-    {
-        auto det = fMappedItems.at(DET_LOS);
-        Int_t nHits = det->GetEntriesFast();
-
-        Multip = nHits;
-
-        for (Int_t ihit = 0; ihit < nHits; ihit++)
+        if (fMappedItems.at(DET_LOS))
         {
-            R3BLosMappedData* hit = (R3BLosMappedData*)det->At(ihit);
-            if (!hit)
-                continue;
+            auto det = fMappedItems.at(DET_LOS);
+            Int_t nHits = det->GetEntriesFast();
 
-            // channel numbers are stored 1-based (1..n)
-            Int_t iDet = hit->GetDetector(); // 1..
-            Int_t iCha = hit->GetChannel();  // 1..
+            Multip = nHits;
 
-            fh_los_channels->Fill(iCha);
-        }
-    }
-
-    Int_t nPart;
-    if (fCalItems.at(DET_LOS))
-    {
-        Bool_t LOSID = false;
-
-        auto det = fCalItems.at(DET_LOS);
-        nPart = det->GetEntriesFast();
-
-        Int_t iDet = 0;
-
-        for (Int_t iPart = 0; iPart < nPart; iPart++)
-        {
-            /*
-             * nPart is the number of particle passing through LOS detector in one event
-             */
-            R3BLosCalData* calData = (R3BLosCalData*)det->At(iPart);
-            iDet = calData->GetDetector();
-
-            for (Int_t iCha = 0; iCha < 8; iCha++)
+            for (Int_t ihit = 0; ihit < nHits; ihit++)
             {
+                R3BLosMappedData* hit = (R3BLosMappedData*)det->At(ihit);
+                if (!hit)
+                    continue;
 
-                time_V[iPart][iCha] = 0. / 0.;
-                if (!(IS_NAN(calData->GetTimeV_ns(iCha))))
-                { // VFTX
-                    time_V[iPart][iCha] = calData->GetTimeV_ns(iCha);
-                }
+                // channel numbers are stored 1-based (1..n)
+                Int_t iDet = hit->GetDetector(); // 1..
+                Int_t iCha = hit->GetChannel();  // 1..
 
-                time_L[iPart][iCha] = 0. / 0.;
-                if (!(IS_NAN(calData->GetTimeL_ns(iCha))))
-                { // TAMEX leading
-                    time_L[iPart][iCha] = calData->GetTimeL_ns(iCha);
-                }
-
-                time_T[iPart][iCha] = 0. / 0.;
-                if (!(IS_NAN(calData->GetTimeT_ns(iCha))))
-                { // TAMEX trailing
-                    time_T[iPart][iCha] = calData->GetTimeT_ns(iCha);
-                }
-
-                time_M[iPart][iCha] = 0. / 0.;
-                if (!(IS_NAN(calData->GetTimeM_ns(iCha))))
-                { // MTDC
-                    time_M[iPart][iCha] = calData->GetTimeM_ns(iCha);
-                }
-            }
-
-            if (!calData)
-            {
-                cout << "LOS !calData" << endl;
-                continue; // can this happen?
+                //fh_los_channels->Fill(iCha);
             }
         }
 
-        // Sorting VFTX data:
+        Int_t nPart;
 
-        std::qsort(time_V, nPart, sizeof(*time_V), [](const void* arg1, const void* arg2) -> int {
-            double const* lhs = static_cast<double const*>(arg1);
-            double const* rhs = static_cast<double const*>(arg2);
-
-            return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
-        });
-        // End sorting
-
-        signed long long time_first = -1;
-
-        for (Int_t iPart = 0; iPart < nPart; iPart++)
+        if (fCalItems.at(DET_LOS))
         {
+            Bool_t LOSID = false;
 
-            Bool_t iLOSTypeMCFD = false;
-            Bool_t iLOSTypeTAMEX = false;
-            Bool_t iLOSType = false;
+            auto det = fCalItems.at(DET_LOS);
+            nPart = det->GetEntriesFast();
 
-            if (time_V[iPart][0] > 0. && !(IS_NAN(time_V[iPart][0])) && time_V[iPart][1] > 0. &&
-                !(IS_NAN(time_V[iPart][1])) && time_V[iPart][2] > 0. && !(IS_NAN(time_V[iPart][2])) &&
-                time_V[iPart][3] > 0. && !(IS_NAN(time_V[iPart][3])) && time_V[iPart][4] > 0. &&
-                !(IS_NAN(time_V[iPart][4])) && time_V[iPart][5] > 0. && !(IS_NAN(time_V[iPart][5])) &&
-                time_V[iPart][6] > 0. && !(IS_NAN(time_V[iPart][6])) && time_V[iPart][7] > 0. &&
-                !(IS_NAN(time_V[iPart][7])))
-            {
-                iLOSTypeMCFD = true; // all 8 MCFD times
-            }
+            Int_t iDet = 0;
 
-            if (time_L[iPart][0] > 0. && !(IS_NAN(time_L[iPart][0])) && time_L[iPart][1] > 0. &&
-                !(IS_NAN(time_L[iPart][1])) && time_L[iPart][2] > 0. && !(IS_NAN(time_L[iPart][2])) &&
-                time_L[iPart][3] > 0. && !(IS_NAN(time_L[iPart][3])) && time_L[iPart][4] > 0. &&
-                !(IS_NAN(time_L[iPart][4])) && time_L[iPart][5] > 0. && !(IS_NAN(time_L[iPart][5])) &&
-                time_L[iPart][6] > 0. && !(IS_NAN(time_L[iPart][6])) && time_L[iPart][7] > 0. &&
-                !(IS_NAN(time_L[iPart][7])) &&
-
-                time_T[iPart][0] > 0. && !(IS_NAN(time_T[iPart][0])) && time_T[iPart][1] > 0. &&
-                !(IS_NAN(time_T[iPart][1])) && time_T[iPart][2] > 0. && !(IS_NAN(time_T[iPart][2])) &&
-                time_T[iPart][3] > 0. && !(IS_NAN(time_T[iPart][3])) && time_T[iPart][4] > 0. &&
-                !(IS_NAN(time_T[iPart][4])) && time_T[iPart][5] > 0. && !(IS_NAN(time_T[iPart][5])) &&
-                time_T[iPart][6] > 0. && !(IS_NAN(time_T[iPart][6])) && time_T[iPart][7] > 0. &&
-                !(IS_NAN(time_T[iPart][7])))
-            {
-                iLOSTypeTAMEX = true; // all 8 leading and trailing times
-            }
-
-            // We will consider only events in which booth MCFD and TAMEX see same number of channels:
-            if (iLOSTypeTAMEX && iLOSTypeMCFD)
-                iLOSType = true;
-
-            if (iDet == 1)
+            for (Int_t iPart = 0; iPart < nPart; iPart++)
             {
 
-                if (1 == 1) //(iLOSType)
+                 // nPart is the number of particle passing through LOS detector in one event
+
+                R3BLosCalData* calData = (R3BLosCalData*)det->At(iPart);
+                iDet = calData->GetDetector();
+
+                for (Int_t iCha = 0; iCha < 8; iCha++)
                 {
 
-                    int nPMT = 0;
-                    int nPMV = 0;
-
-                    for (int ipm = 0; ipm < 8; ipm++)
-                    {
-
-                        tot[iPart][ipm] = 0. / 0.;
-
-                        if (time_T[iPart][ipm] > 0. && time_L[iPart][ipm] > 0. && !(IS_NAN(time_T[iPart][ipm])) &&
-                            !(IS_NAN(time_L[iPart][ipm])))
-                        {
-                            while (time_T[iPart][ipm] - time_L[iPart][ipm] <= 0.)
-                            {
-                                time_T[iPart][ipm] = time_T[iPart][ipm] + 2048. * fClockFreq;
-                            }
-
-                            nPMT = nPMT + 1;
-                            tot[iPart][ipm] = time_T[iPart][ipm] - time_L[iPart][ipm];
-                        }
-
-                        if (tot[iPart][ipm] != 0. && !(IS_NAN(tot[iPart][ipm])))
-                            totsum[iPart] += tot[iPart][ipm];
-
-                        if (time_L[iPart][ipm] > 0. && !(IS_NAN(time_L[iPart][ipm])))
-                            timeLosT[iPart] += time_L[iPart][ipm];
-
-                        if (time_V[iPart][ipm] > 0. && !(IS_NAN(time_V[iPart][ipm])))
-                        {
-                            timeLosV[iPart] += time_V[iPart][ipm];
-                            nPMV = nPMV + 1;
-                        }
+                    time_V[iPart][iCha] = 0. / 0.;
+                    if (!(IS_NAN(calData->GetTimeV_ns(iCha))))
+                    { // VFTX
+                        time_V[iPart][iCha] = calData->GetTimeV_ns(iCha);
                     }
 
-                    totsum[iPart] = totsum[iPart] / nPMT;
+                    time_L[iPart][iCha] = 0. / 0.;
+                    if (!(IS_NAN(calData->GetTimeL_ns(iCha))))
+                    { // TAMEX leading
+                        time_L[iPart][iCha] = calData->GetTimeL_ns(iCha);
+                    }
 
-                    timeLosV[iPart] = timeLosV[iPart] / nPMV;
+                    time_T[iPart][iCha] = 0. / 0.;
+                    if (!(IS_NAN(calData->GetTimeT_ns(iCha))))
+                    { // TAMEX trailing
+                        time_T[iPart][iCha] = calData->GetTimeT_ns(iCha);
+                    }
 
-                    timeLosT[iPart] = timeLosT[iPart] / nPMT;
+                    time_M[iPart][iCha] = 0. / 0.;
+                    if (!(IS_NAN(calData->GetTimeM_ns(iCha))))
+                    { // MTDC
+                        time_M[iPart][iCha] = calData->GetTimeM_ns(iCha);
+                    }
+                }
 
-                    timeLos[iPart] = timeLosV[iPart];
+                if (!calData)
+                {
+                    cout << "LOS !calData" << endl;
+                    continue; // can this happen?
+                }
+            }
 
-                    LosTresV[iPart] = ((time_V[iPart][0] + time_V[iPart][2] + time_V[iPart][4] + time_V[iPart][6]) -
-                                       (time_V[iPart][1] + time_V[iPart][3] + time_V[iPart][5] + time_V[iPart][7])) /
-                                      4.;
+            // Sorting VFTX data:
 
-                    LosTresT[iPart] = ((time_L[iPart][0] + time_L[iPart][2] + time_L[iPart][4] + time_L[iPart][6]) -
-                                       (time_L[iPart][1] + time_L[iPart][3] + time_L[iPart][5] + time_L[iPart][7])) /
-                                      4.;
+            std::qsort(time_V, nPart, sizeof(*time_V), [](const void* arg1, const void* arg2) -> int {
+                double const* lhs = static_cast<double const*>(arg1);
+                double const* rhs = static_cast<double const*>(arg2);
 
-                    LosTresM[iPart] = ((time_M[iPart][0] + time_M[iPart][2] + time_M[iPart][4] + time_M[iPart][6]) -
-                                       (time_M[iPart][1] + time_M[iPart][3] + time_M[iPart][5] + time_M[iPart][7])) /
-                                      4.;
+                return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
+            });
+            // End sorting
 
-                    // Position from tamex:
-                    xT_cm[iPart] =
-                        ((time_L[iPart][5] + time_L[iPart][6]) / 2. - (time_L[iPart][1] + time_L[iPart][2]) / 2.) *
-                        (-1.);
-                    yT_cm[iPart] =
-                        ((time_L[iPart][7] + time_L[iPart][0]) / 2. - (time_L[iPart][3] + time_L[iPart][4]) / 2.) *
-                        (-1.);
-                    xT_cm[iPart] = (xT_cm[iPart] - flosOffsetXT) * flosVeffXT;
-                    yT_cm[iPart] = (yT_cm[iPart] - flosOffsetYT) * flosVeffYT;
+            signed long long time_first = -1;
 
-                    // Position from VFTX:
-                    xV_cm[iPart] =
-                        ((time_V[iPart][5] + time_V[iPart][6]) / 2. - (time_V[iPart][1] + time_V[iPart][2]) / 2.) *
-                        (-1.);
-                    yV_cm[iPart] =
-                        ((time_V[iPart][7] + time_V[iPart][0]) / 2. - (time_V[iPart][3] + time_V[iPart][4]) / 2.) *
-                        (-1.);
-                    xV_cm[iPart] = (xV_cm[iPart] - flosOffsetXV) * flosVeffXV;
-                    yV_cm[iPart] = (yV_cm[iPart] - flosOffsetYV) * flosVeffYV;
+            for (Int_t iPart = 0; iPart < nPart; iPart++)
+            {
 
-                    // Position from ToT:
-                    xToT_cm[iPart] = (((tot[iPart][5] + tot[iPart][6]) / 2. - (tot[iPart][1] + tot[iPart][2]) / 2.) /
-                                      ((tot[iPart][1] + tot[iPart][2] + tot[iPart][5] + tot[iPart][6]) / 4.));
+                Bool_t iLOSTypeMCFD = false;
+                Bool_t iLOSTypeTAMEX = false;
+                Bool_t iLOSType = false;
 
-                    yToT_cm[iPart] = (((tot[iPart][0] + tot[iPart][7]) / 2. - (tot[iPart][3] + tot[iPart][4]) / 2.) /
-                                      ((tot[iPart][7] + tot[iPart][0] + tot[iPart][3] + tot[iPart][4]) / 4.));
+                if (time_V[iPart][0] > 0. && !(IS_NAN(time_V[iPart][0])) && time_V[iPart][1] > 0. &&
+                    !(IS_NAN(time_V[iPart][1])) && time_V[iPart][2] > 0. && !(IS_NAN(time_V[iPart][2])) &&
+                    time_V[iPart][3] > 0. && !(IS_NAN(time_V[iPart][3])) && time_V[iPart][4] > 0. &&
+                    !(IS_NAN(time_V[iPart][4])) && time_V[iPart][5] > 0. && !(IS_NAN(time_V[iPart][5])) &&
+                    time_V[iPart][6] > 0. && !(IS_NAN(time_V[iPart][6])) && time_V[iPart][7] > 0. &&
+                    !(IS_NAN(time_V[iPart][7])))
+                {
+                    iLOSTypeMCFD = true; // all 8 MCFD times
+                }
 
-                    xToT_cm[iPart] = (xToT_cm[iPart] - flosOffsetXQ) * flosVeffXQ;
-                    yToT_cm[iPart] = (yToT_cm[iPart] - flosOffsetYQ) * flosVeffYQ;
+                if (time_L[iPart][0] > 0. && !(IS_NAN(time_L[iPart][0])) && time_L[iPart][1] > 0. &&
+                    !(IS_NAN(time_L[iPart][1])) && time_L[iPart][2] > 0. && !(IS_NAN(time_L[iPart][2])) &&
+                    time_L[iPart][3] > 0. && !(IS_NAN(time_L[iPart][3])) && time_L[iPart][4] > 0. &&
+                    !(IS_NAN(time_L[iPart][4])) && time_L[iPart][5] > 0. && !(IS_NAN(time_L[iPart][5])) &&
+                    time_L[iPart][6] > 0. && !(IS_NAN(time_L[iPart][6])) && time_L[iPart][7] > 0. &&
+                    !(IS_NAN(time_L[iPart][7])) &&
 
-                    if (1 == 1)
+                    time_T[iPart][0] > 0. && !(IS_NAN(time_T[iPart][0])) && time_T[iPart][1] > 0. &&
+                    !(IS_NAN(time_T[iPart][1])) && time_T[iPart][2] > 0. && !(IS_NAN(time_T[iPart][2])) &&
+                    time_T[iPart][3] > 0. && !(IS_NAN(time_T[iPart][3])) && time_T[iPart][4] > 0. &&
+                    !(IS_NAN(time_T[iPart][4])) && time_T[iPart][5] > 0. && !(IS_NAN(time_T[iPart][5])) &&
+                    time_T[iPart][6] > 0. && !(IS_NAN(time_T[iPart][6])) && time_T[iPart][7] > 0. &&
+                    !(IS_NAN(time_T[iPart][7])))
+                {
+                    iLOSTypeTAMEX = true; // all 8 leading and trailing times
+                }
+
+                // We will consider only events in which booth MCFD and TAMEX see same number of channels:
+                if (iLOSTypeTAMEX && iLOSTypeMCFD)
+                    iLOSType = true;
+
+                if (iDet == 1)
+                {
+
+                    if (1 == 1) //(iLOSType)
                     {
 
-                        fh_los_tot_mean->Fill(totsum[iPart]);
-
-                        if (time_first < 0)
-                            time_first = timeLosV[iPart];
-                        Double_t timediff = time + (timeLosV[iPart] - time_first) - time_V_mem;
-                        if (iPart < 1)
-                            fh_los_dt_first_ToT->Fill(timediff / 1.e3, totsum[iPart]);
-                        if (iPart == nPart - 1)
-                            time_V_mem = time + timeLosV[iPart] - time_first;
-                        if (iPart > 0)
-                            fh_los_dt_hits_ToT->Fill((timeLosV[iPart] - timeLosV[iPart - 1]) / 1.e3, totsum[iPart]);
+                        int nPMT = 0;
+                        int nPMV = 0;
 
                         for (int ipm = 0; ipm < 8; ipm++)
                         {
-                            fh_los_tot->Fill(ipm + 1, tot[iPart][ipm]);
+
+                            tot[iPart][ipm] = 0. / 0.;
+
+                            if (time_T[iPart][ipm] > 0. && time_L[iPart][ipm] > 0. && !(IS_NAN(time_T[iPart][ipm])) &&
+                                !(IS_NAN(time_L[iPart][ipm])))
+                            {
+                                while (time_T[iPart][ipm] - time_L[iPart][ipm] <= 0.)
+                                {
+                                    time_T[iPart][ipm] = time_T[iPart][ipm] + 2048. * fClockFreq;
+                                }
+
+                                nPMT = nPMT + 1;
+                                tot[iPart][ipm] = time_T[iPart][ipm] - time_L[iPart][ipm];
+                            }
+
+                            if (tot[iPart][ipm] != 0. && !(IS_NAN(tot[iPart][ipm])))
+                                totsum[iPart] += tot[iPart][ipm];
+
+                            if (time_L[iPart][ipm] > 0. && !(IS_NAN(time_L[iPart][ipm])))
+                                timeLosT[iPart] += time_L[iPart][ipm];
+
+                            if (time_V[iPart][ipm] > 0. && !(IS_NAN(time_V[iPart][ipm])))
+                            {
+                                timeLosV[iPart] += time_V[iPart][ipm];
+                                nPMV = nPMV + 1;
+                            }
                         }
 
-                        fh_los_tres_MCFD->Fill(LosTresV[iPart]);
-                        fh_los_tres_TAMEX->Fill(LosTresT[iPart]);
-                        fh_los_tres_MTDC->Fill(LosTresM[iPart]);
+                        totsum[iPart] = totsum[iPart] / nPMT;
 
-                        fh_los_pos_MCFD->Fill(xV_cm[iPart], yV_cm[iPart]);
-                        fh_los_pos_TAMEX->Fill(xT_cm[iPart], yT_cm[iPart]);
-                        fh_los_pos_ToT->Fill(xToT_cm[iPart], yToT_cm[iPart]);
-                        fh_los_ihit_ToT->Fill(iPart, totsum[iPart]);
-                        fh_los_multihit->Fill(iPart + 1);
+                        timeLosV[iPart] = timeLosV[iPart] / nPMV;
+
+                        timeLosT[iPart] = timeLosT[iPart] / nPMT;
+
+                        timeLos[iPart] = timeLosV[iPart];
+
+                        LosTresV[iPart] = ((time_V[iPart][0] + time_V[iPart][2] + time_V[iPart][4] + time_V[iPart][6]) -
+                                           (time_V[iPart][1] + time_V[iPart][3] + time_V[iPart][5] + time_V[iPart][7]))
+       / 4.;
+
+                        LosTresT[iPart] = ((time_L[iPart][0] + time_L[iPart][2] + time_L[iPart][4] + time_L[iPart][6]) -
+                                           (time_L[iPart][1] + time_L[iPart][3] + time_L[iPart][5] + time_L[iPart][7]))
+       / 4.;
+
+                        LosTresM[iPart] = ((time_M[iPart][0] + time_M[iPart][2] + time_M[iPart][4] + time_M[iPart][6]) -
+                                           (time_M[iPart][1] + time_M[iPart][3] + time_M[iPart][5] + time_M[iPart][7]))
+       / 4.;
+
+                        // Position from tamex:
+                        xT_cm[iPart] =
+                            ((time_L[iPart][5] + time_L[iPart][6]) / 2. - (time_L[iPart][1] + time_L[iPart][2]) / 2.) *
+                            (-1.);
+                        yT_cm[iPart] =
+                            ((time_L[iPart][7] + time_L[iPart][0]) / 2. - (time_L[iPart][3] + time_L[iPart][4]) / 2.) *
+                            (-1.);
+                        xT_cm[iPart] = (xT_cm[iPart] - flosOffsetXT) * flosVeffXT;
+                        yT_cm[iPart] = (yT_cm[iPart] - flosOffsetYT) * flosVeffYT;
+
+                        // Position from VFTX:
+                        xV_cm[iPart] =
+                            ((time_V[iPart][5] + time_V[iPart][6]) / 2. - (time_V[iPart][1] + time_V[iPart][2]) / 2.) *
+                            (-1.);
+                        yV_cm[iPart] =
+                            ((time_V[iPart][7] + time_V[iPart][0]) / 2. - (time_V[iPart][3] + time_V[iPart][4]) / 2.) *
+                            (-1.);
+                        xV_cm[iPart] = (xV_cm[iPart] - flosOffsetXV) * flosVeffXV;
+                        yV_cm[iPart] = (yV_cm[iPart] - flosOffsetYV) * flosVeffYV;
+
+                        // Position from ToT:
+                        xToT_cm[iPart] = (((tot[iPart][5] + tot[iPart][6]) / 2. - (tot[iPart][1] + tot[iPart][2]) / 2.)
+       /
+                                          ((tot[iPart][1] + tot[iPart][2] + tot[iPart][5] + tot[iPart][6]) / 4.));
+
+                        yToT_cm[iPart] = (((tot[iPart][0] + tot[iPart][7]) / 2. - (tot[iPart][3] + tot[iPart][4]) / 2.)
+       /
+                                          ((tot[iPart][7] + tot[iPart][0] + tot[iPart][3] + tot[iPart][4]) / 4.));
+
+                        xToT_cm[iPart] = (xToT_cm[iPart] - flosOffsetXQ) * flosVeffXQ;
+                        yToT_cm[iPart] = (yToT_cm[iPart] - flosOffsetYQ) * flosVeffYQ;
+
+                        if (1 == 1)
+                        {
+
+                            //fh_los_tot_mean->Fill(totsum[iPart]);
+
+                            if (time_first < 0)
+                                time_first = timeLosV[iPart];
+                            Double_t timediff = time + (timeLosV[iPart] - time_first) - time_V_mem;
+                            if (iPart < 1)
+                                //fh_los_dt_first_ToT->Fill(timediff / 1.e3, totsum[iPart]);
+                            if (iPart == nPart - 1)
+                                time_V_mem = time + timeLosV[iPart] - time_first;
+                            if (iPart > 0)
+                                //fh_los_dt_hits_ToT->Fill((timeLosV[iPart] - timeLosV[iPart - 1]) / 1.e3,
+       totsum[iPart]);
+    */
+    /*
+            for (int ipm = 0; ipm < 8; ipm++)
+            {
+                fh_los_tot->Fill(ipm + 1, tot[iPart][ipm]);
+            }
+
+            fh_los_tres_MCFD->Fill(LosTresV[iPart]);
+            fh_los_tres_TAMEX->Fill(LosTresT[iPart]);
+            fh_los_tres_MTDC->Fill(LosTresM[iPart]);
+
+            fh_los_pos_MCFD->Fill(xV_cm[iPart], yV_cm[iPart]);
+            fh_los_pos_TAMEX->Fill(xT_cm[iPart], yT_cm[iPart]);
+            fh_los_pos_ToT->Fill(xToT_cm[iPart], yToT_cm[iPart]);
+            fh_los_ihit_ToT->Fill(iPart, totsum[iPart]);
+            fh_los_multihit->Fill(iPart + 1);
+*/
+    /*
+                }
+                    }
+                }
+                else
+                {
+                    cout << "Wrong detector ID for LOS!" << endl;
+                }
+            }
+        }
+
+    */
+
+    // NEW starts here
+    /*
+
+        Int_t multTcal[3];
+        Double_t iRawTimeNs[3][64];
+        UInt_t nlHits, iCh, cpt = 0;
+        Double_t ToFraw = 0., PosRaw = -10000., ToFcal = 0., PosCal = -10000.;
+        Double_t Velo = 0., Beta = 0., Gamma = 0., Brho = 0., AoQ = 0.;
+        Double_t ToFraw_m1 = 0., PosRaw_m1 = -10000., ToFcal_m1 = 0., PosCal_m1 = -10000.;
+        Double_t Velo_m1 = 0., Beta_m1 = 0., Gamma_m1 = 0., Brho_m1 = 0., AoQ_m1 = 0.;
+        for (UShort_t pmt = 0; pmt < 3; pmt++)
+        {
+            multTcal[pmt] = 0;
+            for (UShort_t m = 0; m < 64; m++)
+                iRawTimeNs[pmt][m] = 0.;
+        }
+        Double_t timeTofd = 0;
+        Double_t timeLosV[fNofLosDetectors][32]; // mean time from VFTX
+        Double_t LosTresV[fNofLosDetectors][32];
+        Double_t timeLosT[fNofLosDetectors][32];
+        Double_t LosTresT[fNofLosDetectors][32];
+        Double_t timeLos[fNofLosDetectors][32];
+        Double_t totsum[fNofLosDetectors][32];
+        Double_t xT_cm[fNofLosDetectors][32];
+        Double_t yT_cm[fNofLosDetectors][32];
+        Double_t xToT_cm[fNofLosDetectors][32];
+        Double_t yToT_cm[fNofLosDetectors][32];
+        Double_t xV_cm[fNofLosDetectors][32];
+        Double_t yV_cm[fNofLosDetectors][32];
+
+        Double_t time_V[fNofLosDetectors][32][8]; // [det][multihit][pm]
+        Double_t time_L[fNofLosDetectors][32][8];
+        Double_t time_T[fNofLosDetectors][32][8];
+        Double_t tot[fNofLosDetectors][32][8];
+        Double_t time_MTDC[32][8] = { 0. };
+        Double_t LosTresMTDC[32];
+
+        for (Int_t idet = 0; idet < fNofLosDetectors; idet++)
+        {
+            for (Int_t imult = 0; imult < 32; imult++)
+            {
+                timeLosV[idet][imult] = 0.0;
+                LosTresV[idet][imult] = 0.0 / 0.0;
+                timeLosT[idet][imult] = 0.0;
+                LosTresT[idet][imult] = 0.0 / 0.0;
+                timeLos[idet][imult] = 0.0;
+                totsum[idet][imult] = 0.0;
+                xT_cm[idet][imult] = 0.0 / 0.0;
+                yT_cm[idet][imult] = 0.0 / 0.0;
+                xToT_cm[idet][imult] = -100000.;
+                yToT_cm[idet][imult] = -100000.;
+                xV_cm[idet][imult] = 0.0 / 0.0;
+                yV_cm[idet][imult] = 0.0 / 0.0;
+                for (Int_t icha = 0; icha < 8; icha++)
+                {
+                    time_V[idet][imult][icha] = 0.0 / 0.0; // [det][multihit][pm]
+                    time_L[idet][imult][icha] = 0.0 / 0.0;
+                    time_T[idet][imult][icha] = 0.0 / 0.0;
+                    tot[idet][imult][icha] = 0.0 / 0.0;
+                }
+            }
+        }
+        Int_t nPartLOS = 0;
+        Int_t nPartc[fNofLosDetectors] = { 0 };
+        Bool_t iLOSType[fNofLosDetectors][32];
+        Bool_t iLOSPileUp[fNofLosDetectors][32];
+        for (Int_t idet = 0; idet < fNofLosDetectors; idet++)
+        {
+            for (Int_t imult = 0; imult < 33; imult++)
+            {
+                iLOSType[idet][imult] = false;
+                iLOSPileUp[idet][imult] = false;
+            }
+        }
+
+        Int_t Multip;
+
+        if (fMappedItems.at(DET_LOS))
+        {
+            auto det = fMappedItems.at(DET_LOS);
+            nlHits = det->GetEntriesFast();
+            if (nlHits > 0)
+                nLosEvents += 1;
+            Multip = nlHits;
+
+            for (Int_t ihit = 0; ihit < nlHits; ihit++)
+            {
+                R3BLosMappedData* hit = (R3BLosMappedData*)det->At(ihit);
+                if (!hit)
+                    continue;
+
+                Int_t iDet = hit->GetDetector(); // 1..
+                Int_t iCha = hit->GetChannel();  // 1..
+                Int_t iTyp = hit->GetType();     // 0,1,2,3
+
+                fh_los_channels[iDet - 1]->Fill(iCha); // exclude MTDC data
+            }
+        }
+
+        if (fCalItems.at(DET_LOS))
+        {
+            auto det = fCalItems.at(DET_LOS);
+            nPartLOS = det->GetEntriesFast();
+
+            Int_t iDet = 0;
+            Double_t time_V_LOS1[32][8] = { 0. };
+            Double_t time_V_LOS2[32][8] = { 0. };
+
+            for (Int_t iPart = 0; iPart < nPartLOS; iPart++)
+            {
+                R3BLosCalData* calData = (R3BLosCalData*)det->At(iPart);
+                iDet = calData->GetDetector();
+
+                Double_t sumvtemp = 0, sumltemp = 0, sumttemp = 0;
+                for (Int_t iCha = 0; iCha < 8; iCha++)
+                {
+                    sumvtemp += calData->GetTimeV_ns(iCha);
+                    sumltemp += calData->GetTimeL_ns(iCha);
+                    sumttemp += calData->GetTimeT_ns(iCha);
+                }
+                if (!(IS_NAN(sumvtemp)) && !(IS_NAN(sumltemp)) && !(IS_NAN(sumltemp)))
+                {
+                    nPartc[iDet - 1]++;
+                }
+                else
+                {
+                    continue;
+                }
+
+                for (Int_t iCha = 0; iCha < 8; iCha++)
+                {
+                    if (iDet == 1)
+                    {
+                        time_V_LOS1[nPartc[iDet - 1] - 1][iCha] = 0. / 0.;
+                        if (!(IS_NAN(calData->GetTimeV_ns(iCha))))
+                        { // VFTX
+                            time_V_LOS1[nPartc[iDet - 1] - 1][iCha] = calData->GetTimeV_ns(iCha);
+                        }
+                        if (!(IS_NAN(calData->GetTimeL_ns(iCha))))
+                        { // TAMEX leading
+                            time_L[iDet - 1][nPartc[iDet - 1] - 1][iCha] = calData->GetTimeL_ns(iCha);
+                        }
+
+                        if (!(IS_NAN(calData->GetTimeT_ns(iCha))))
+                        { // TAMEX trailing
+                            time_T[iDet - 1][nPartc[iDet - 1] - 1][iCha] = calData->GetTimeT_ns(iCha);
+                        }
+                        time_MTDC[nPartc[iDet - 1]][iCha] = 0. / 0.;
+                        if (!(IS_NAN(calData->GetTimeM_ns(iCha))))
+                        { // MTDC
+                            time_MTDC[nPartc[iDet - 1] - 1][iCha] = calData->GetTimeM_ns(iCha);
+                        }
+                    }
+                    if (iDet == 2)
+                    {
+                        time_V_LOS2[nPartc[iDet - 1] - 1][iCha] = 0. / 0.;
+                        if (!(IS_NAN(calData->GetTimeV_ns(iCha))))
+                        { // VFTX
+                            time_V_LOS2[nPartc[iDet - 1] - 1][iCha] = calData->GetTimeV_ns(iCha);
+                        }
+                        if (!(IS_NAN(calData->GetTimeL_ns(iCha))))
+                        { // TAMEX leading
+                            time_L[iDet - 1][nPartc[iDet - 1] - 1][iCha] = calData->GetTimeL_ns(iCha);
+                        }
+                        if (!(IS_NAN(calData->GetTimeT_ns(iCha))))
+                        { // TAMEX trailing
+                            time_T[iDet - 1][nPartc[iDet - 1] - 1][iCha] = calData->GetTimeT_ns(iCha);
+                        }
+                    }
+                }
+
+                if (!calData)
+                {
+                    cout << "LOS !calData" << endl;
+                    continue; // can this happen?
+                }
+            }
+
+            // Sorting VFTX data:
+            //
+            //         // detector 1
+            //
+
+            if (nPartc[0] > 0)
+            {
+                std::qsort(time_V_LOS1, nPartc[0], sizeof(*time_V_LOS1), [](const void* arg1, const void* arg2) -> int {
+                    double const* lhs = static_cast<double const*>(arg1);
+                    double const* rhs = static_cast<double const*>(arg2);
+
+                    return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
+                });
+                for (Int_t iPart = 0; iPart < nPartc[0]; iPart++)
+                {
+                    for (int ipm = 0; ipm < 8; ipm++)
+                    {
+                        time_V[0][iPart][ipm] = time_V_LOS1[iPart][ipm];
                     }
                 }
             }
-            else
-            {
-                cout << "Wrong detector ID for LOS!" << endl;
-            }
-        }
-    }
 
+            // detector 2
+
+            if (fNofLosDetectors > 1 && nPartc[1] > 0)
+            {
+                std::qsort(time_V_LOS2, nPartc[1], sizeof(*time_V_LOS2), [](const void* arg1, const void* arg2) -> int {
+                    double const* lhs = static_cast<double const*>(arg1);
+                    double const* rhs = static_cast<double const*>(arg2);
+
+                    return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
+                });
+                for (Int_t iPart = 0; iPart < nPartc[1]; iPart++)
+                {
+                    for (int ipm = 0; ipm < 8; ipm++)
+                    {
+                        time_V[1][iPart][ipm] = time_V_LOS2[iPart][ipm];
+                    }
+                }
+            }
+
+            // End sorting
+
+            std::vector<double_t> time_first(fNofLosDetectors, -1.);
+            std::vector<double_t> time0(fNofLosDetectors, -1.);
+            std::vector<double_t> time1(fNofLosDetectors, -1.);
+            std::vector<double_t> time_abs(fNofLosDetectors, -1.);
+
+            for (iDet = 1; iDet <= fNofLosDetectors; iDet++)
+            {
+                cpt = 0;
+                for (Int_t iPart = 0; iPart < nPartc[iDet - 1]; iPart++)
+                {
+                    Bool_t iLOSTypeMCFD = false;
+                    Bool_t iLOSTypeTAMEX = false;
+
+                    if (time_V[iDet - 1][iPart][0] > 0. && !(IS_NAN(time_V[iDet - 1][iPart][0])) &&
+                        time_V[iDet - 1][iPart][1] > 0. && !(IS_NAN(time_V[iDet - 1][iPart][1])) &&
+                        time_V[iDet - 1][iPart][2] > 0. && !(IS_NAN(time_V[iDet - 1][iPart][2])) &&
+                        time_V[iDet - 1][iPart][3] > 0. && !(IS_NAN(time_V[iDet - 1][iPart][3])) &&
+                        time_V[iDet - 1][iPart][4] > 0. && !(IS_NAN(time_V[iDet - 1][iPart][4])) &&
+                        time_V[iDet - 1][iPart][5] > 0. && !(IS_NAN(time_V[iDet - 1][iPart][5])) &&
+                        time_V[iDet - 1][iPart][6] > 0. && !(IS_NAN(time_V[iDet - 1][iPart][6])) &&
+                        time_V[iDet - 1][iPart][7] > 0. && !(IS_NAN(time_V[iDet - 1][iPart][7])))
+                    {
+                        iLOSTypeMCFD = true; // all 8 MCFD times
+                    }
+
+                    if (time_L[iDet - 1][iPart][0] > 0. && !(IS_NAN(time_L[iDet - 1][iPart][0])) &&
+                        time_L[iDet - 1][iPart][1] > 0. && !(IS_NAN(time_L[iDet - 1][iPart][1])) &&
+                        time_L[iDet - 1][iPart][2] > 0. && !(IS_NAN(time_L[iDet - 1][iPart][2])) &&
+                        time_L[iDet - 1][iPart][3] > 0. && !(IS_NAN(time_L[iDet - 1][iPart][3])) &&
+                        time_L[iDet - 1][iPart][4] > 0. && !(IS_NAN(time_L[iDet - 1][iPart][4])) &&
+                        time_L[iDet - 1][iPart][5] > 0. && !(IS_NAN(time_L[iDet - 1][iPart][5])) &&
+                        time_L[iDet - 1][iPart][6] > 0. && !(IS_NAN(time_L[iDet - 1][iPart][6])) &&
+                        time_L[iDet - 1][iPart][7] > 0. && !(IS_NAN(time_L[iDet - 1][iPart][7])) &&
+
+                        time_T[iDet - 1][iPart][0] > 0. && !(IS_NAN(time_T[iDet - 1][iPart][0])) &&
+                        time_T[iDet - 1][iPart][1] > 0. && !(IS_NAN(time_T[iDet - 1][iPart][1])) &&
+                        time_T[iDet - 1][iPart][2] > 0. && !(IS_NAN(time_T[iDet - 1][iPart][2])) &&
+                        time_T[iDet - 1][iPart][3] > 0. && !(IS_NAN(time_T[iDet - 1][iPart][3])) &&
+                        time_T[iDet - 1][iPart][4] > 0. && !(IS_NAN(time_T[iDet - 1][iPart][4])) &&
+                        time_T[iDet - 1][iPart][5] > 0. && !(IS_NAN(time_T[iDet - 1][iPart][5])) &&
+                        time_T[iDet - 1][iPart][6] > 0. && !(IS_NAN(time_T[iDet - 1][iPart][6])) &&
+                        time_T[iDet - 1][iPart][7] > 0. && !(IS_NAN(time_T[iDet - 1][iPart][7])))
+                    {
+                        iLOSTypeTAMEX = true; // all 8 leading and trailing times
+                    }
+
+                    if (iLOSTypeTAMEX && iLOSTypeMCFD)
+                        iLOSType[iDet - 1][iPart] = true;
+                    if (iLOSType[iDet - 1][iPart])
+                    {
+                        int nPMT = 0;
+                        int nPMV = 0;
+
+                        for (int ipm = 0; ipm < 8; ipm++)
+                        {
+
+                            if (time_T[iDet - 1][iPart][ipm] > 0. && time_L[iDet - 1][iPart][ipm] > 0. &&
+                                !(IS_NAN(time_T[iDet - 1][iPart][ipm])) && !(IS_NAN(time_L[iDet - 1][iPart][ipm])))
+                            {
+                                while (time_T[iDet - 1][iPart][ipm] - time_L[iDet - 1][iPart][ipm] <= 0.)
+                                {
+                                    time_T[iDet - 1][iPart][ipm] = time_T[iDet - 1][iPart][ipm] + 2048. * fClockFreq;
+                                }
+
+                                nPMT = nPMT + 1;
+                                tot[iDet - 1][iPart][ipm] = time_T[iDet - 1][iPart][ipm] - time_L[iDet - 1][iPart][ipm];
+
+                                if (tot[iDet - 1][iPart][ipm] > fEpileup)
+                                    iLOSPileUp[iDet - 1][iPart] = true;
+                            }
+
+                            if (tot[iDet - 1][iPart][ipm] != 0. && !(IS_NAN(tot[iDet - 1][iPart][ipm])))
+                                totsum[iDet - 1][iPart] += tot[iDet - 1][iPart][ipm];
+
+                            if (time_L[iDet - 1][iPart][ipm] > 0. && !(IS_NAN(time_L[iDet - 1][iPart][ipm])))
+                                timeLosT[iDet - 1][iPart] += time_L[iDet - 1][iPart][ipm];
+
+                            if (time_V[iDet - 1][iPart][ipm] > 0. && !(IS_NAN(time_V[iDet - 1][iPart][ipm])))
+                            {
+                                timeLosV[iDet - 1][iPart] += time_V[iDet - 1][iPart][ipm];
+                                nPMV = nPMV + 1;
+                            }
+                        }
+
+                        totsum[iDet - 1][iPart] = totsum[iDet - 1][iPart] / nPMT;
+
+                        timeLosV[iDet - 1][iPart] = timeLosV[iDet - 1][iPart] / nPMV;
+
+                        timeLosT[iDet - 1][iPart] = timeLosT[iDet - 1][iPart] / nPMT;
+
+                        timeLos[iDet - 1][iPart] = timeLosV[iDet - 1][iPart];
+
+                        LosTresV[iDet - 1][iPart] = ((time_V[iDet - 1][iPart][0] + time_V[iDet - 1][iPart][2] +
+                                                      time_V[iDet - 1][iPart][4] + time_V[iDet - 1][iPart][6]) -
+                                                     (time_V[iDet - 1][iPart][1] + time_V[iDet - 1][iPart][3] +
+                                                      time_V[iDet - 1][iPart][5] + time_V[iDet - 1][iPart][7])) /
+                                                    4.;
+
+                        LosTresT[iDet - 1][iPart] = ((time_L[iDet - 1][iPart][0] + time_L[iDet - 1][iPart][2] +
+                                                      time_L[iDet - 1][iPart][4] + time_L[iDet - 1][iPart][6]) -
+                                                     (time_L[iDet - 1][iPart][1] + time_L[iDet - 1][iPart][3] +
+                                                      time_L[iDet - 1][iPart][5] + time_L[iDet - 1][iPart][7])) /
+                                                    4.;
+
+                        LosTresT[iDet - 1][iPart] = ((time_V[iDet - 1][iPart][0] * 0. + time_V[iDet - 1][iPart][2] +
+                                                      time_V[iDet - 1][iPart][4] + time_V[iDet - 1][iPart][6]) /
+                                                         3. -
+                                                     (time_V[iDet - 1][iPart][1] + time_V[iDet - 1][iPart][3] +
+                                                      time_V[iDet - 1][iPart][5] + time_V[iDet - 1][iPart][7]) /
+                                                         4.);
+
+                        xT_cm[iDet - 1][iPart] = (time_L[iDet - 1][iPart][1] + time_L[iDet - 1][iPart][2]) / 2. -
+                                                 (time_L[iDet - 1][iPart][5] + time_L[iDet - 1][iPart][6]) / 2.;
+                        yT_cm[iDet - 1][iPart] = (time_L[iDet - 1][iPart][3] + time_L[iDet - 1][iPart][4]) / 2. -
+                                                 (time_L[iDet - 1][iPart][7] + time_L[iDet - 1][iPart][0]) / 2.;
+                        xT_cm[iDet - 1][iPart] = (xT_cm[iDet - 1][iPart] - flosOffsetXT[iDet - 1]) * flosVeffXT[iDet -
+       1]; yT_cm[iDet - 1][iPart] = (yT_cm[iDet - 1][iPart] - flosOffsetYT[iDet - 1]) * flosVeffYT[iDet - 1];
+
+                        xV_cm[iDet - 1][iPart] = (time_V[iDet - 1][iPart][1] + time_V[iDet - 1][iPart][2]) / 2. -
+                                                 (time_V[iDet - 1][iPart][5] + time_V[iDet - 1][iPart][6]) / 2.;
+                        yV_cm[iDet - 1][iPart] = (time_V[iDet - 1][iPart][3] + time_V[iDet - 1][iPart][4]) / 2. -
+                                                 (time_V[iDet - 1][iPart][7] + time_V[iDet - 1][iPart][0]) / 2.;
+                        xV_cm[iDet - 1][iPart] = (xV_cm[iDet - 1][iPart] - flosOffsetXV[iDet - 1]) * flosVeffXV[iDet -
+       1]; yV_cm[iDet - 1][iPart] = (yV_cm[iDet - 1][iPart] - flosOffsetYV[iDet - 1]) * flosVeffYV[iDet - 1];
+
+                        if (tot[iDet - 1][iPart][1] > 0. && tot[iDet - 1][iPart][2] > 0. && tot[iDet - 1][iPart][5] > 0.
+       && tot[iDet - 1][iPart][6] > 0. && tot[iDet - 1][iPart][0] > 0. && tot[iDet - 1][iPart][3] > 0. && tot[iDet -
+       1][iPart][4] > 0. && tot[iDet - 1][iPart][7] > 0.)
+                        {
+                            xToT_cm[iDet - 1][iPart] = (((tot[iDet - 1][iPart][5] + tot[iDet - 1][iPart][6]) / 2. -
+                                                         (tot[iDet - 1][iPart][1] + tot[iDet - 1][iPart][2]) / 2.) /
+                                                        ((tot[iDet - 1][iPart][1] + tot[iDet - 1][iPart][2] +
+                                                          tot[iDet - 1][iPart][5] + tot[iDet - 1][iPart][6]) /
+                                                         4.));
+
+                            yToT_cm[iDet - 1][iPart] = (((tot[iDet - 1][iPart][0] + tot[iDet - 1][iPart][7]) / 2. -
+                                                         (tot[iDet - 1][iPart][3] + tot[iDet - 1][iPart][4]) / 2.) /
+                                                        ((tot[iDet - 1][iPart][7] + tot[iDet - 1][iPart][0] +
+                                                          tot[iDet - 1][iPart][3] + tot[iDet - 1][iPart][4]) /
+                                                         4.));
+                        }
+
+                        xToT_cm[iDet - 1][iPart] =
+                            (xToT_cm[iDet - 1][iPart] - flosOffsetXQ[iDet - 1]) * flosVeffXQ[iDet - 1];
+                        yToT_cm[iDet - 1][iPart] =
+                            (yToT_cm[iDet - 1][iPart] - flosOffsetYQ[iDet - 1]) * flosVeffYQ[iDet - 1];
+
+                        if (timeLosV[iDet - 1][iPart] > 0. && timeLosV[iDet - 1][iPart] < 8192. * 5. &&
+                            !(IS_NAN(timeLosV[iDet - 1][iPart])))
+                        {
+                            while (timeLosT[iDet - 1][iPart] - timeLosV[iDet - 1][iPart] < 2048. * 5. / 2.)
+                            {
+                                timeLosT[iDet - 1][iPart] = timeLosT[iDet - 1][iPart] + 2048. * 5.;
+                            }
+                            while (timeLosT[iDet - 1][iPart] - timeLosV[iDet - 1][iPart] > 2048. * 5. / 2.)
+                            {
+                                timeLosT[iDet - 1][iPart] = timeLosT[iDet - 1][iPart] - 2048. * 5.;
+                            }
+
+                            fh_los_vftx_tamex[iDet - 1]->Fill(timeLosT[iDet - 1][iPart] - timeLosV[iDet - 1][iPart]);
+                        }
+
+                        fh_losMCFD_vs_Events[iDet - 1]->Fill(fNEvents, LosTresV[iDet - 1][iPart]);
+                        fh_losTAMEX_vs_Events[iDet - 1]->Fill(fNEvents, LosTresT[iDet - 1][iPart]);
+                        fh_losToT_vs_Events[iDet - 1]->Fill(fNEvents, totsum[iDet - 1][iPart]);
+
+                        if (!(iLOSPileUp[iDet - 1][iPart])) // desregard pile-up events
+                        {
+                            for (int ipm = 0; ipm < 8; ipm++)
+                            {
+                                fh_los_tot[iDet - 1]->Fill(ipm + 1, tot[iDet - 1][iPart][ipm]);
+                            }
+                            fh_los_dt_hits_ToT[iDet - 1]->Fill(LosTresV[iDet - 1][iPart], totsum[iDet - 1][iPart]);
+                            fh_los_tot_mean[iDet - 1]->Fill(totsum[iDet - 1][iPart]);
+                            fh_los_tres_MCFD[iDet - 1]->Fill(LosTresV[iDet - 1][iPart]);
+                            fh_los_tres_TAMEX[iDet - 1]->Fill(LosTresT[iDet - 1][iPart]);
+                            fh_los_pos_MCFD[iDet - 1]->Fill(xV_cm[iDet - 1][iPart], yV_cm[iDet - 1][iPart]);
+                            fh_los_pos_TAMEX[iDet - 1]->Fill(xT_cm[iDet - 1][iPart], yT_cm[iDet - 1][iPart]);
+                            fh_los_pos_ToT[iDet - 1]->Fill(xToT_cm[iDet - 1][iPart], yToT_cm[iDet - 1][iPart]);
+                            fh_los_ihit_ToT[iDet - 1]->Fill(iPart + 1, totsum[iDet - 1][iPart]);
+                            fh_los_multihit[iDet - 1]->Fill(iPart + 1);
+                        }
+                    } // if iLosType
+                    if (iDet == 1)
+                    {
+                        for (Int_t multR = 0; multR < 64; multR++)
+                        {
+                            for (Int_t multL = 0; multL < 64; multL++)
+                            {
+                                ToFraw = timeLosV[0][iPart] - 0.5 * (iRawTimeNs[0][multR] + iRawTimeNs[1][multL]);
+                                if (fToFmin <= ToFraw && ToFraw <= fToFmax)
+                                {
+                                    cpt++;
+                                    Velo = 1. / (fTof2InvV_p0 + fTof2InvV_p1 * (fToFoffset + ToFraw)); // [m/ns]
+                                    Beta = Velo / 0.299792458;
+                                    Gamma = 1. / (TMath::Sqrt(1. - TMath::Power(Beta, 2)));
+                                    PosRaw = iRawTimeNs[0][multR] - iRawTimeNs[1][multL]; // [ns]
+                                    PosCal = fPos_p0 + fPos_p1 * PosRaw;                  // [mm] at S2
+                                    Brho = fBrho0_S2toCC * (1. - PosCal / fDispersionS2);
+                                    AoQ = Brho / (3.10716 * Beta * Gamma);
+                                }
+                            }
+                        }
+                    }
+                } // for iPart
+
+            } // for iDet
+
+        } // if fCallItems
+
+        fNEvents += 1;
+
+        */
     //----------------------------------------------------------------------
     // Fiber detectors
     //----------------------------------------------------------------------
@@ -1798,6 +2312,99 @@ void R3BOnlineSpectraFiberTofds515::Exec(Option_t* option)
                 {
                     fh_channels_Fib[ifibcount]->Fill(iCha); // Fill which clockTDC channel has events
                     ++mapmt_num.at(hit->GetChannel() - 1);  // multihit of a given clockTDC channel
+
+                    int pls = 0;
+
+                    if (ifibcount == 12)
+                        pls = 3;
+                    if (ifibcount == 13)
+                        pls = 1;
+                    if (pls > 0)
+                    {
+                        auto det1Mapped = fMappedItems.at(DET_FI_FIRST + ifibcount + pls);
+                        auto det1Hit = fHitItems.at(DET_FI_FIRST + ifibcount + pls);
+                        if (detMapped)
+                        {
+                            Int_t n1Hits = det1Mapped->GetEntriesFast();
+                            for (Int_t jhit = 0; jhit < n1Hits; jhit++)
+                            {
+                                R3BBunchedFiberMappedData* hit_pls = (R3BBunchedFiberMappedData*)det1Mapped->At(jhit);
+                                if (!hit_pls)
+                                    continue;
+                                Int_t jCha = hit_pls->GetChannel();
+                                if (hit_pls->IsMAPMT() && hit_pls->IsLeading())
+                                {
+                                    if (pls == 3)
+                                        fh_Fib10_vs_Fib13->Fill(iCha, jCha);
+                                    if (pls == 1)
+                                    {
+                                        fh_Fib11_vs_Fib12->Fill(iCha, jCha);
+
+                                        double Zmusic = 0.;
+                                        double AoverQ = 0.;
+                                        if (fHitItemsFrs && fHitItemsFrs->GetEntriesFast() > 0)
+                                        {
+                                            Int_t nFRSHits = fHitItemsFrs->GetEntriesFast();
+                                            for (Int_t muhit = 0; muhit < nFRSHits; muhit++)
+                                            {
+                                                R3BFrsData* FRShit = (R3BFrsData*)fHitItemsFrs->At(muhit);
+                                                if (!FRShit)
+                                                    continue;
+                                                Zmusic = FRShit->GetZ();
+                                                AoverQ = FRShit->GetAq();
+                                                if (abs(Zmusic - ZMUSIC_cut) < ZMUSIC_wcut &&
+                                                    abs(AoverQ - AoQ_cut) < AoQ_wcut)
+                                                {
+                                                    fh_Fib11_vs_Fib12_cut->Fill(iCha, jCha);
+                                                    fh_channels_Fib11_cut->Fill(iCha);
+                                                }
+                                            }
+                                        }
+
+                                        /*
+                                        if (fCalItems.at(DET_TOFD))
+                                        {
+                                            auto det = fCalItems.at(DET_TOFD);
+                                            Int_t nCals = det->GetEntriesFast();
+                                            float tofd3tl=0;
+                                            float tofd3tt=0;
+                                            float tofd3tot=0;
+                                            float tofd4tl=0;
+                                            float tofd4tt=0;
+                                            float tofd4tot=0;
+                                            for (Int_t ical = 0; ical < nCals; ical++)
+                                            {
+                                                auto cal = (R3BTofdCalData const*)det->At(ical);
+                                                if (!cal) continue; // should not happen
+                                                Int_t const iPlane = cal->GetDetectorId(); // 1..n
+                                                if (!IS_NAN(cal->GetTimeLeading_ns()))
+                                                {
+                                                    if (iPlane==3) tofd3tl = cal->GetTimeLeading_ns();
+                                                    if (iPlane==4) tofd4tl = cal->GetTimeLeading_ns();
+                                                }
+                                                if (!IS_NAN(cal->GetTimeTrailing_ns()))
+                                                {
+                                                    if (iPlane==3) tofd3tt = cal->GetTimeTrailing_ns();
+                                                    if (iPlane==4) tofd4tt = cal->GetTimeTrailing_ns();
+                                                }
+                                                if (abs(tofd4tt-tofd4tl-tofd3tt+tofd3tl)<50)
+                                                {
+                                                    tofd3tot=tofd3tt-tofd3tl;
+                                                    tofd4tot=tofd4tt-tofd4tl;
+                                                }
+                                            }
+                                            if (tofd3tot<160&&tofd4tot>140)
+                                            {
+                                                fh_Fib11_vs_Fib12_cut->Fill(iCha,jCha);
+                                                fh_channels_Fib11_cut->Fill(iCha);
+                                            }
+                                        }
+                                        */
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
                 if (!hit->IsMAPMT() && hit->IsLeading())
@@ -1866,28 +2473,29 @@ void R3BOnlineSpectraFiberTofds515::Exec(Option_t* option)
                 }
 
                 // "Push" the Fib times in the same cycle with LOS:
+                /*
                 if (timeLos[0] > 0. && !(IS_NAN(timeLos[0])))
-                {
-                    while (tMAPMT - timeLos[0] < 4096.)
-                    {
-                        tMAPMT = tMAPMT + 2048. * 4.;
-                        tSPMT = tSPMT + 2048. * 4.;
-                    }
-                    while (tMAPMT - timeLos[0] > 4096.)
-                    {
-                        tMAPMT = tMAPMT - 2048. * 4.;
-                        tSPMT = tSPMT - 2048. * 4.;
-                    }
-                }
-
+                        {
+                            while (tMAPMT - timeLos[0] < 4096.)
+                            {
+                                tMAPMT = tMAPMT + 2048. * 4.;
+                                tSPMT = tSPMT + 2048. * 4.;
+                            }
+                            while (tMAPMT - timeLos[0] > 4096.)
+                            {
+                                tMAPMT = tMAPMT - 2048. * 4.;
+                                tSPMT = tSPMT - 2048. * 4.;
+                            }
+                        }
+                */
                 // cout << "\n ToT (single)..." << hit->GetSPMTToT_ns();
                 // cout << "\n ToT (ma)..." << hit->GetMAPMTToT_ns();
 
                 // Not-calibrated ToF:
                 // tfib = (tMAPMT + tSPMT) / 2.;
                 tfib = tSPMT;
-                if (tfib > 0. && !(IS_NAN(tfib)) && timeLos[0] > 0. && !(IS_NAN(timeLos[0])))
-                    tof_fib = tfib - timeLos[0];
+                // if (tfib > 0. && !(IS_NAN(tfib)) && timeLos[0] > 0. && !(IS_NAN(timeLos[0])))
+                //   tof_fib = tfib - timeLos[0];
 
                 // Not-calibrated position:
                 randx = (std::rand() / (float)RAND_MAX);
@@ -1961,8 +2569,26 @@ void R3BOnlineSpectraFiberTofds515::Exec(Option_t* option)
             Int_t const iBar = mapped->GetBarId();        // 1..n
             Int_t const iSide = mapped->GetSideId();      // 1..n
             Int_t const iEdge = mapped->GetEdgeId();
-            Float_t const tc = mapped->GetTimeCoarse();
-            Float_t const tf = mapped->GetTimeFine();
+            // Float_t const tc = mapped->GetTimeCoarse();
+            // Float_t const tf = mapped->GetTimeFine();
+
+            for (Int_t jmapped = 0; jmapped < nMapped; jmapped++)
+            {
+                auto mapped0 = (R3BTofdMappedData const*)det->At(jmapped);
+                if (!mapped0)
+                    continue;
+
+                Int_t const jPlane = mapped0->GetDetectorId(); // 1..n
+                Int_t const jBar = mapped0->GetBarId();        // 1..n
+                Int_t const jSide = mapped0->GetSideId();      // 1..n
+                Int_t const jEdge = mapped0->GetEdgeId();
+
+                if (iPlane == jPlane && iEdge == 1 && jEdge == 1 && iSide == 1 && jSide == 2)
+                {
+
+                    tofd_side1_vs_side2[iPlane - 1]->Fill(iBar, jBar);
+                }
+            }
 
             if (iPlaneMem != iPlane)
                 iBarMem = 0;
@@ -2023,45 +2649,53 @@ void R3BOnlineSpectraFiberTofds515::Exec(Option_t* option)
             Int_t const iBar = cal->GetBarId();        // 1..n
 
             //      std::cout << iPlane << ' ' << iBar <<
-            //          ',' << cal->GetTimeBL_ns() <<
-            //          ' ' << cal->GetTimeBT_ns() <<
-            //          ' ' << cal->GetTimeTL_ns() <<
-            //          ' ' << cal->GetTimeTT_ns() << std::endl;
+            //          ',' << cal->GetTimeLeading_ns() <<
+            //          ' ' << cal->GetTimeTrailing_ns() <<
+            //          ' ' << cal->GetTimeLeading_ns() <<
+            //          ' ' << cal->GetTimeTrailing_ns() << std::endl;
 
             // get all times of one bar
             /*
-                         cout<<"TOFD Online: "<<fNEvents<<", "<<nCals<<"; "<<ical<<"; "<<iPlane<<", "<<iBar<<",
-               "<<iBarMem<<", "<<", "<< cal->fTime1L_ns<<", "<<cal->fTime1T_ns<<", "<< cal->fTime2L_ns<<",
-               "<<cal->fTime2T_ns<<endl;
+                         cout<<"TOFD Online: "<<fNEvents<<", "<<nCals<<"; "<<ical<<"; "<<iPlane<<", "<<iBar<<","
+                 <<iBarMem<<", "<<", "<< cal->fTime1L_ns<<", "<<cal->fTime1T_ns<<", "<< cal->fTime2L_ns<<", "
+                 <<cal->fTime2T_ns<<endl;
             */
             /*
                   if(iBar != iBarMem )
                   {
                 jmult[iPlane-1][iBar-1] = 0;
-                if (!IS_NAN(cal->GetTimeBL_ns())) t1l[0][iPlane-1][iBar-1] = cal->GetTimeBL_ns();
-                if (!IS_NAN(cal->GetTimeBT_ns())) t1t[0][iPlane-1][iBar-1] = cal->GetTimeBT_ns();
-                if (!IS_NAN(cal->GetTimeTL_ns())) t2l[0][iPlane-1][iBar-1] = cal->GetTimeTL_ns();
-                if (!IS_NAN(cal->GetTimeTT_ns())) t2t[0][iPlane-1][iBar-1] = cal->GetTimeTT_ns();
-                Bar_present[0][iPlane-1][iBar-1] = true;
+                if (!IS_NAN(cal->GetTimeLeading_ns())&&cal->GetSideId()==1) t1l[0][iPlane-1][iBar-1] =
+               cal->GetTimeLeading_ns(); if (!IS_NAN(cal->GetTimeTrailing_ns())&&cal->GetSideId()==1)
+               t1t[0][iPlane-1][iBar-1] = cal->GetTimeTrailing_ns(); if
+               (!IS_NAN(cal->GetTimeLeading_ns())&&cal->GetSideId()==2) t2l[0][iPlane-1][iBar-1] =
+               cal->GetTimeLeading_ns(); if (!IS_NAN(cal->GetTimeTrailing_ns())&&cal->GetSideId()==2)
+               t2t[0][iPlane-1][iBar-1] = cal->GetTimeTrailing_ns(); Bar_present[0][iPlane-1][iBar-1] = true;
                   }
                   else
                   {
                 jmult[iPlane-1][iBar-1] = jmult[iPlane-1][iBar-1] + 1;
                 Int_t jm = jmult[iPlane-1][iBar-1];
-                if (!IS_NAN(cal->GetTimeBL_ns())) t1l[jm][iPlane-1][iBar-1] = cal->GetTimeBL_ns();
-                if (!IS_NAN(cal->GetTimeBT_ns())) t1t[jm][iPlane-1][iBar-1] = cal->GetTimeBT_ns();
-                if (!IS_NAN(cal->GetTimeTL_ns())) t2l[jm][iPlane-1][iBar-1] = cal->GetTimeTL_ns();
-                if (!IS_NAN(cal->GetTimeTT_ns())) t2t[jm][iPlane-1][iBar-1] = cal->GetTimeTT_ns();
-                Bar_present[jm][iPlane-1][iBar-1] = true;
+                if (!IS_NAN(cal->GetTimeLeading_ns())&&cal->GetSideId()==1) t1l[jm][iPlane-1][iBar-1] =
+               cal->GetTimeLeading_ns(); if (!IS_NAN(cal->GetTimeTrailing_ns())&&cal->GetSideId()==1)
+               t1t[jm][iPlane-1][iBar-1] = cal->GetTimeTrailing_ns(); if
+               (!IS_NAN(cal->GetTimeLeading_ns())&&cal->GetSideId()==2) t2l[jm][iPlane-1][iBar-1] =
+               cal->GetTimeLeading_ns(); if (!IS_NAN(cal->GetTimeTrailing_ns())&&cal->GetSideId()==2)
+               t2t[jm][iPlane-1][iBar-1] = cal->GetTimeTrailing_ns(); Bar_present[jm][iPlane-1][iBar-1] = true;
                   }
                   iBarMem = iBar;
             */
 
             Int_t jm = jmult[iPlane - 1][iBar - 1];
-            /*		if (!IS_NAN(cal->GetTimeBL_ns())) t1l[jm][iPlane-1][iBar-1] = cal->GetTimeBL_ns();
-                    if (!IS_NAN(cal->GetTimeBT_ns())) t1t[jm][iPlane-1][iBar-1] = cal->GetTimeBT_ns();
-                    if (!IS_NAN(cal->GetTimeTL_ns())) t2l[jm][iPlane-1][iBar-1] = cal->GetTimeTL_ns();
-                    if (!IS_NAN(cal->GetTimeTT_ns())) t2t[jm][iPlane-1][iBar-1] = cal->GetTimeTT_ns();*/
+
+            if (!IS_NAN(cal->GetTimeLeading_ns()) && cal->GetSideId() == 1)
+                t1l[jm][iPlane - 1][iBar - 1] = cal->GetTimeLeading_ns();
+            if (!IS_NAN(cal->GetTimeTrailing_ns()) && cal->GetSideId() == 1)
+                t1t[jm][iPlane - 1][iBar - 1] = cal->GetTimeTrailing_ns();
+            if (!IS_NAN(cal->GetTimeLeading_ns()) && cal->GetSideId() == 2)
+                t2l[jm][iPlane - 1][iBar - 1] = cal->GetTimeLeading_ns();
+            if (!IS_NAN(cal->GetTimeTrailing_ns()) && cal->GetSideId() == 2)
+                t2t[jm][iPlane - 1][iBar - 1] = cal->GetTimeTrailing_ns();
+
             Bar_present[jm][iPlane - 1][iBar - 1] = true;
             jmult[iPlane - 1][iBar - 1] = jmult[iPlane - 1][iBar - 1] + 1;
 
@@ -2110,22 +2744,22 @@ void R3BOnlineSpectraFiberTofds515::Exec(Option_t* option)
                         }
 
                         int ilc = jm;
+                        /*
+                                    if (!(IS_NAN(timeLos[ilc])) && timeLos[ilc] > 0.)
+                                    {
 
-                        if (!(IS_NAN(timeLos[ilc])) && timeLos[ilc] > 0.)
-                        {
-
-                            while (t1l[jm][iPlane - 1][iBar - 1] < timeLos[ilc])
-                            {
-                                t1t[jm][iPlane - 1][iBar - 1] += 2048. * fClockFreq;
-                                t1l[jm][iPlane - 1][iBar - 1] += 2048. * fClockFreq;
-                            }
-                            while (t2l[jm][iPlane - 1][iBar - 1] < timeLos[ilc])
-                            {
-                                t2t[jm][iPlane - 1][iBar - 1] += 2048. * fClockFreq;
-                                t2l[jm][iPlane - 1][iBar - 1] += 2048. * fClockFreq;
-                            }
-                        }
-
+                                        while (t1l[jm][iPlane - 1][iBar - 1] < timeLos[ilc])
+                                        {
+                                            t1t[jm][iPlane - 1][iBar - 1] += 2048. * fClockFreq;
+                                            t1l[jm][iPlane - 1][iBar - 1] += 2048. * fClockFreq;
+                                        }
+                                        while (t2l[jm][iPlane - 1][iBar - 1] < timeLos[ilc])
+                                        {
+                                            t2t[jm][iPlane - 1][iBar - 1] += 2048. * fClockFreq;
+                                            t2l[jm][iPlane - 1][iBar - 1] += 2048. * fClockFreq;
+                                        }
+                                    }
+                        */
                         // ToF
                         t_paddle[jm][iPlane - 1][iBar - 1] =
                             (t1l[jm][iPlane - 1][iBar - 1] + t2l[jm][iPlane - 1][iBar - 1]) / 2.;
@@ -2137,14 +2771,18 @@ void R3BOnlineSpectraFiberTofds515::Exec(Option_t* option)
                                                       t_paddle[jm][ipl][iBar - 1] - t_paddle[jm][ipl - 1][iBar - 1]);
                         }
 
-                        if (!(IS_NAN(timeLos[ilc])) && timeLos[ilc] > 0.)
-                        {
-                            // between LOS and paddle
-                            ToF[jm][iPlane - 1][iBar - 1] =
-                                fmod(t_paddle[jm][iPlane - 1][iBar - 1] - timeLos[ilc] + 5 * 8192, 5 * 2048);
-                            fh_tofd_ToF[iPlane - 1]->Fill(iBar, ToF[jm][iPlane - 1][iBar - 1]);
+                        /*
+                                    if (!(IS_NAN(timeLos[ilc])) && timeLos[ilc] > 0.)
+                                    {
+                                        // between LOS and paddle
+                                        ToF[jm][iPlane - 1][iBar - 1] =
+                                            fmod(t_paddle[jm][iPlane - 1][iBar - 1] - timeLos[ilc] + 5 * 8192, 5 *
+                        2048); fh_tofd_ToF[iPlane - 1]->Fill(iBar, ToF[jm][iPlane - 1][iBar - 1]);
                         }
+                        */
                         // ToT
+                        //
+
                         tot1[jm][iPlane - 1][iBar - 1] = t1t[jm][iPlane - 1][iBar - 1] - t1l[jm][iPlane - 1][iBar - 1];
                         if (tot1[jm][iPlane - 1][iBar - 1] < 0)
                         {
@@ -2170,149 +2808,150 @@ void R3BOnlineSpectraFiberTofds515::Exec(Option_t* option)
     //----------------------------------------------------------------------
     // PTOF
     //----------------------------------------------------------------------
-
-    if (fCalItems.at(DET_PTOF))
-    {
-        auto det = fCalItems.at(DET_PTOF);
-
-        Double_t tot1 = 0.;
-        Double_t tot2 = 0.;
-        Double_t t1l = 0.;
-        Double_t t2l = 0.;
-        Double_t t1t = 0.;
-        Double_t t2t = 0.;
-        Bool_t bar_quer1 = false;
-        Bool_t bar_quer2 = false;
-
-        Int_t nHits = det->GetEntriesFast();
-        LOG(DEBUG) << "nHits: " << nHits;
-        for (Int_t ihit = 0; ihit < nHits; ihit++)
+    /*
+        if (fCalItems.at(DET_PTOF))
         {
-            R3BPaddleCalData* hit = (R3BPaddleCalData*)det->At(ihit);
+            auto det = fCalItems.at(DET_PTOF);
 
-            if (!hit)
-                continue; // should not happen
+            Double_t tot1 = 0.;
+            Double_t tot2 = 0.;
+            Double_t t1l = 0.;
+            Double_t t2l = 0.;
+            Double_t t1t = 0.;
+            Double_t t2t = 0.;
+            Bool_t bar_quer1 = false;
+            Bool_t bar_quer2 = false;
 
-            Int_t iBar = hit->GetBar(); // 1..n
-            // get all times of one bar
-            t1l = hit->fTime1L_ns;
-            t2l = hit->fTime2L_ns;
-            t1t = hit->fTime1T_ns;
-            t2t = hit->fTime2T_ns;
-
-            if (!(t1l > 0 && t2l > 0 && t1t > 0 && t2t > 0))
-                continue;
-
-            fh_ptof_channels->Fill(iBar);
-            LOG(DEBUG) << "Bar: " << iBar;
-            LOG(DEBUG) << "times PM1: " << t1l << "  " << t1t << "  " << t1t - t1l;
-            LOG(DEBUG) << "times PM2: " << t2l << "  " << t2t << "  " << t2t - t2l;
-            if (iBar == 7)
-                bar_quer1 = true;
-            if (iBar == 8)
-                bar_quer2 = true;
-
-            // calculate time over threshold and check if clock counter went out of range
-            while (t1t - t1l < 0.)
+            Int_t nHits = det->GetEntriesFast();
+            LOG(DEBUG) << "nHits: " << nHits;
+            for (Int_t ihit = 0; ihit < nHits; ihit++)
             {
-                t1t = t1t + 2048. * fClockFreq;
+                R3BPaddleCalData* hit = (R3BPaddleCalData*)det->At(ihit);
+
+                if (!hit)
+                    continue; // should not happen
+
+                Int_t iBar = hit->GetBar(); // 1..n
+                // get all times of one bar
+                t1l = hit->fTime1L_ns;
+                t2l = hit->fTime2L_ns;
+                t1t = hit->fTime1T_ns;
+                t2t = hit->fTime2T_ns;
+
+                if (!(t1l > 0 && t2l > 0 && t1t > 0 && t2t > 0))
+                    continue;
+
+                fh_ptof_channels->Fill(iBar);
+                LOG(DEBUG) << "Bar: " << iBar;
+                LOG(DEBUG) << "times PM1: " << t1l << "  " << t1t << "  " << t1t - t1l;
+                LOG(DEBUG) << "times PM2: " << t2l << "  " << t2t << "  " << t2t - t2l;
+                if (iBar == 7)
+                    bar_quer1 = true;
+                if (iBar == 8)
+                    bar_quer2 = true;
+
+                // calculate time over threshold and check if clock counter went out of range
+                while (t1t - t1l < 0.)
+                {
+                    t1t = t1t + 2048. * fClockFreq;
+                }
+
+                while (t2t - t2l < 0.)
+                {
+                    t2t = t2t + 2048. * fClockFreq;
+                }
+
+                while (t1l - timeLos[0] < 0.)
+                {
+                    t1t = t1t + 2048. * fClockFreq;
+                    t1l = t1l + 2048. * fClockFreq;
+                    t2t = t2t + 2048. * fClockFreq;
+                    t2l = t2l + 2048. * fClockFreq;
+                }
+
+                tot1 = t1t - t1l;
+                if (tot1 < 0)
+                {
+                    LOG(WARNING) << "Negative ToT " << tot1;
+                    LOG(WARNING) << "times1: " << t1t << " " << t1l;
+                }
+
+                tot2 = t2t - t2l;
+                if (tot2 < 0)
+                {
+                    LOG(WARNING) << "Negative ToT " << tot2;
+                    LOG(WARNING) << "times2: " << t2t << " " << t2l;
+                }
+
+                fh_ptof_TotPm1[iBar]->Fill(tot1);
+                fh_ptof_TotPm2[iBar]->Fill(tot2);
+                if (iBar == 2)
+                    fh_ptof_test1->Fill(sqrt(tot1 * tot1));
             }
 
-            while (t2t - t2l < 0.)
-            {
-                t2t = t2t + 2048. * fClockFreq;
-            }
-            while (t1l - timeLos[0] < 0.)
-            {
-                t1t = t1t + 2048. * fClockFreq;
-                t1l = t1l + 2048. * fClockFreq;
-                t2t = t2t + 2048. * fClockFreq;
-                t2l = t2l + 2048. * fClockFreq;
-            }
+            // once again
 
-            tot1 = t1t - t1l;
-            if (tot1 < 0)
+            nHits = det->GetEntriesFast();
+            //		LOG(DEBUG) << "nHits: " << nHits;
+            for (Int_t ihit = 0; ihit < nHits; ihit++)
             {
-                LOG(WARNING) << "Negative ToT " << tot1;
-                LOG(WARNING) << "times1: " << t1t << " " << t1l;
-            }
+                R3BPaddleCalData* hit = (R3BPaddleCalData*)det->At(ihit);
 
-            tot2 = t2t - t2l;
-            if (tot2 < 0)
-            {
-                LOG(WARNING) << "Negative ToT " << tot2;
-                LOG(WARNING) << "times2: " << t2t << " " << t2l;
-            }
+                if (!hit)
+                    continue; // should not happen
 
-            fh_ptof_TotPm1[iBar]->Fill(tot1);
-            fh_ptof_TotPm2[iBar]->Fill(tot2);
-            if (iBar == 2)
-                fh_ptof_test1->Fill(sqrt(tot1 * tot1));
+                Int_t iBar = hit->GetBar(); // 1..n
+                // get all times of one bar
+                t1l = hit->fTime1L_ns;
+                t2l = hit->fTime2L_ns;
+                t1t = hit->fTime1T_ns;
+                t2t = hit->fTime2T_ns;
+
+                if (!(t1l > 0 && t2l > 0 && t1t > 0 && t2t > 0))
+                    continue;
+
+                // calculate time over threshold and check if clock counter went out of range
+                while (t1t - t1l < 0.)
+                {
+                    t1t = t1t + 2048. * fClockFreq;
+                }
+
+                while (t2t - t2l < 0.)
+                {
+                    t2t = t2t + 2048. * fClockFreq;
+                }
+                while (t1l - timeLos[0] < 0.)
+                {
+                    t1t = t1t + 2048. * fClockFreq;
+                    t1l = t1l + 2048. * fClockFreq;
+                    t2t = t2t + 2048. * fClockFreq;
+                    t2l = t2l + 2048. * fClockFreq;
+                }
+
+                tot1 = t1t - t1l;
+                if (tot1 < 0)
+                {
+                    LOG(WARNING) << "Negative ToT " << tot1;
+                    LOG(WARNING) << "times1: " << t1t << " " << t1l;
+                }
+
+                tot2 = t2t - t2l;
+                if (tot2 < 0)
+                {
+                    LOG(WARNING) << "Negative ToT " << tot2;
+                    LOG(WARNING) << "times2: " << t2t << " " << t2l;
+                }
+
+                if (bar_quer1 && bar_quer2)
+                {
+                    //				fh_ptof_TotPm1[iBar]->Fill(tot1);
+                    //				fh_ptof_TotPm2[iBar]->Fill(tot2);
+                    //				if(iBar==2) fh_ptof_test2->Fill(sqrt(tot1*tot2));
+                    fh_ptof_channels_cut->Fill(iBar);
+                }
+            }
         }
-
-        // once again
-
-        nHits = det->GetEntriesFast();
-        //		LOG(DEBUG) << "nHits: " << nHits;
-        for (Int_t ihit = 0; ihit < nHits; ihit++)
-        {
-            R3BPaddleCalData* hit = (R3BPaddleCalData*)det->At(ihit);
-
-            if (!hit)
-                continue; // should not happen
-
-            Int_t iBar = hit->GetBar(); // 1..n
-            // get all times of one bar
-            t1l = hit->fTime1L_ns;
-            t2l = hit->fTime2L_ns;
-            t1t = hit->fTime1T_ns;
-            t2t = hit->fTime2T_ns;
-
-            if (!(t1l > 0 && t2l > 0 && t1t > 0 && t2t > 0))
-                continue;
-
-            // calculate time over threshold and check if clock counter went out of range
-            while (t1t - t1l < 0.)
-            {
-                t1t = t1t + 2048. * fClockFreq;
-            }
-
-            while (t2t - t2l < 0.)
-            {
-                t2t = t2t + 2048. * fClockFreq;
-            }
-            while (t1l - timeLos[0] < 0.)
-            {
-                t1t = t1t + 2048. * fClockFreq;
-                t1l = t1l + 2048. * fClockFreq;
-                t2t = t2t + 2048. * fClockFreq;
-                t2l = t2l + 2048. * fClockFreq;
-            }
-
-            tot1 = t1t - t1l;
-            if (tot1 < 0)
-            {
-                LOG(WARNING) << "Negative ToT " << tot1;
-                LOG(WARNING) << "times1: " << t1t << " " << t1l;
-            }
-
-            tot2 = t2t - t2l;
-            if (tot2 < 0)
-            {
-                LOG(WARNING) << "Negative ToT " << tot2;
-                LOG(WARNING) << "times2: " << t2t << " " << t2l;
-            }
-
-            if (bar_quer1 && bar_quer2)
-            {
-                //				fh_ptof_TotPm1[iBar]->Fill(tot1);
-                //				fh_ptof_TotPm2[iBar]->Fill(tot2);
-                //				if(iBar==2) fh_ptof_test2->Fill(sqrt(tot1*tot2));
-                fh_ptof_channels_cut->Fill(iBar);
-            }
-        }
-    }
-
+    */
     //----------------------------------------------------------------------
     // PSPX
     //----------------------------------------------------------------------
@@ -2512,6 +3151,16 @@ void R3BOnlineSpectraFiberTofds515::FinishEvent()
             fHitItems.at(det)->Clear();
         }
     }
+
+    if (fHitItemsMus)
+    {
+        fHitItemsMus->Clear();
+    }
+
+    if (fHitItemsFrs)
+    {
+        fHitItemsFrs->Clear();
+    }
 }
 
 void R3BOnlineSpectraFiberTofds515::FinishTask()
@@ -2522,16 +3171,16 @@ void R3BOnlineSpectraFiberTofds515::FinishTask()
         fh_rolu_channels->Write();
         fh_rolu_tot->Write();
     }
-
-    if (fMappedItems.at(DET_LOS))
-    {
-        fh_los_channels->Write();
-        fh_los_tot->Write();
-        fh_los_dt_hits_ToT->Write();
-        fh_los_ihit_ToT->Write();
-        fh_los_dt_hits->Write();
-    }
-
+    /*
+        if (fMappedItems.at(DET_LOS))
+        {
+            fh_los_channels->Write();
+            fh_los_tot->Write();
+            fh_los_dt_hits_ToT->Write();
+            fh_los_ihit_ToT->Write();
+            fh_los_dt_hits->Write();
+        }
+    */
     if (fMappedItems.at(DET_BMON))
     {
         fhTpat->Write();
@@ -2570,6 +3219,9 @@ void R3BOnlineSpectraFiberTofds515::FinishTask()
             fh_Fib_vs_Events[ifibcount]->Write();
             fh_Fib_ToF[ifibcount]->Write();
             fh_channels_single_Fib[ifibcount]->Write();
+            fh_Fib10_vs_Fib13->Write();
+            fh_Fib11_vs_Fib12->Write();
+            fh_Fib11_vs_Fib12_cut->Write();
         }
     }
 
