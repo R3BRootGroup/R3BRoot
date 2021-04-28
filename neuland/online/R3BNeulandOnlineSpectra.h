@@ -41,7 +41,7 @@ class R3BNeulandOnlineSpectra : public FairTask
     void SetDistanceToTarget(double x) { fDistanceToTarget = x; }
 
   private:
-    static const unsigned int fNPlanes = 16;
+    static const unsigned int fNPlanes = 24;
     static const unsigned int fNBars = fNPlanes * 50;
 
     R3BEventHeader* fEventHeader;
@@ -52,6 +52,8 @@ class R3BNeulandOnlineSpectra : public FairTask
 
     TH1D* hTstart;
     TH1D* hNstart;
+
+    TH2D* hTestJump;
 
     std::array<TH1D*, 4> ahMappedBar1;
     std::array<TH1D*, 4> ahMappedBar2;
@@ -78,14 +80,15 @@ class R3BNeulandOnlineSpectra : public FairTask
     TH2D* hTofcvsZ;
 
     TH2D* hTdiffvsBarCosmics;
-    TH2D* hDT375;
-    TH2D* hDT425;
+    TH2D* hDT575;
+    TH2D* hDT625;
 
     std::array<TH2D*, fNPlanes> ahXYperPlane;
 
     TH1D* hSofiaTime;
     TH2D* hNeuLANDvsSOFIA;
     TH1D* hTOF;
+    TH1D* hTOFc;
 
     double fDistanceToTarget;
 

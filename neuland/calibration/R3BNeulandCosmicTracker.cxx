@@ -90,15 +90,18 @@ namespace Neuland
             if (IsPlaneHorizontal(plane))
             {
                 const auto barPoint = fYZ.GetN();
-                fYZ.SetPoint(barPoint, zPosition, (bar - 0.5 * BarsPerPlane + 0.66) * BarSize_XY);
+                // ig fYZ.SetPoint(barPoint, zPosition, (bar - 0.5 * BarsPerPlane + 0.66) * BarSize_XY);
+                fYZ.SetPoint(barPoint, zPosition, (bar - 0.5 * BarsPerPlane + 0.5) * BarSize_XY);
                 fYZ.SetPointError(barPoint, BarUncertainty_Z, BarUncertainty_XY);
 
-                if (!isnan(pos) && pos < 0.5 * BarLength + 10.) // + some margin
-                {
-                    const auto posPoint = fXZ.GetN();
-                    fXZ.SetPoint(posPoint, zPosition, pos);
-                    fXZ.SetPointError(posPoint, BarUncertainty_Z, 3 * BarUncertainty_XY);
-                }
+                // ig if (!isnan(pos) && pos < 0.5 * BarLength + 10.) // + some margin
+                /*ig if (!isnan(pos) && fabs(pos) < 0.5 * BarLength + 10.) // + some margin
+                        {
+                            const auto posPoint = fXZ.GetN();
+                            fXZ.SetPoint(posPoint, zPosition, pos);
+                            //ig fXZ.SetPointError(posPoint, BarUncertainty_Z, 3 * BarUncertainty_XY);
+                            fXZ.SetPointError(posPoint, BarUncertainty_Z, BarUncertainty_XY);
+                    }*/
             }
             else
             {
@@ -106,12 +109,14 @@ namespace Neuland
                 fXZ.SetPoint(barPoint, zPosition, (bar - 0.5 * BarsPerPlane + 0.5) * BarSize_XY);
                 fXZ.SetPointError(barPoint, BarUncertainty_Z, BarUncertainty_XY);
 
-                if (!isnan(pos) && pos < 0.5 * BarLength + 10.) // + some margin
-                {
-                    const auto posPoint = fYZ.GetN();
-                    fYZ.SetPoint(posPoint, zPosition, pos);
-                    fYZ.SetPointError(posPoint, BarUncertainty_Z, 3 * BarUncertainty_XY);
-                }
+                // ig if (!isnan(pos) && pos < 0.5 * BarLength + 10.) // + some margin
+                /*ig if (!isnan(pos) && fabs(pos) < 0.5 * BarLength + 10.) // + some margin
+                        {
+                            const auto posPoint = fYZ.GetN();
+                            fYZ.SetPoint(posPoint, zPosition, pos);
+                            //ig fYZ.SetPointError(posPoint, BarUncertainty_Z, 3 * BarUncertainty_XY);
+                            fYZ.SetPointError(posPoint, BarUncertainty_Z, BarUncertainty_XY);
+                    }*/
             }
         }
 
@@ -215,7 +220,7 @@ namespace Neuland
             LOG(DEBUG) << "Z: " << entryPoint[2] << " + t * " << direction[2];
 
             fillInteractions(fTrack);
-            if (fTrack.Interactions.size() < 3 || fTrack.Interactions.size() < fBarIDs.size() - 3)
+            if (fTrack.Interactions.size() < 3) // ig || fTrack.Interactions.size() < fBarIDs.size() - 3)
             {
                 fTrack.Interactions.clear();
                 fTrack.TotalTrackLength = 0.;
@@ -245,7 +250,8 @@ namespace Neuland
                     if (p == op)
                         continue;
                     const auto dist2 = Sqr(x[p] - x[op]) + Sqr(y[p] - y[op]);
-                    if (dist2 < Sqr(MaxDistance))
+                    // ig if (dist2 < Sqr(MaxDistance))
+                    if (dist2 < Sqr(2 * MaxDistance))
                     {
                         foundClose = true;
                         break;
@@ -261,6 +267,8 @@ namespace Neuland
                     }
                 }
             }
+
+            LOG(DEBUG) << "   Removed : " << nRemove;
 
             if (nRemove > 0)
             {
@@ -293,6 +301,7 @@ namespace Neuland
             for (auto p = nPoints - 1; p >= 0; --p)
             {
                 const auto dist2 = Sqr(linReg[1] * x[p] - y[p] + linReg[0]) * factor;
+                // ig if (dist2 > Sqr(MaxDistance))
                 if (dist2 > Sqr(MaxDistance))
                 {
                     // seems like there is at least one cluster far away from the fit
@@ -301,6 +310,7 @@ namespace Neuland
                     return;
                 }
 
+                // ig if (dist2 > Sqr(1.5 * BarSize_XY))
                 if (dist2 > Sqr(1.5 * BarSize_XY))
                 {
                     // remove points which are a bit of
@@ -344,8 +354,8 @@ namespace Neuland
             auto redchi2 = resultptr->Chi2() / resultptr->Ndf();
 
             // Throw away bad fits
-            if (redchi2 < 0.5 || redchi2 > 2. || fabs(slope) > MaxSlope)
-                return { NaN, NaN };
+            // ig if (redchi2 < 0.5 || redchi2 > 2. || fabs(slope) > MaxSlope)
+            // ig   return { NaN, NaN };
 
             return { slope, yIntercept };
         }

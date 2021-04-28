@@ -110,8 +110,11 @@ InitStatus R3BNeulandOnlineSpectra::Init()
     hTstart->Draw();
 
     hNstart = new TH1D("hNstart", "Nstart", 20, 0.5, 20.5);
+    hTestJump = new TH2D("hTestJump", "Test Jump", fNBars, 0.5, fNBars + 0.5, 1000, -11000., 11000.);
     canvasCal->cd(2);
-    hNstart->Draw();
+    // hNstart->Draw();
+    gPad->SetLogz();
+    hTestJump->Draw("colz");
 
     ahCalTvsBar[0] =
         new TH2D("hCalT1vsBar", "CalLevel: Time1 vs Bars  ", fNBars, 0.5, fNBars + 0.5, 2000, -5000, 15000);
@@ -151,12 +154,14 @@ InitStatus R3BNeulandOnlineSpectra::Init()
     hToFvsBar = new TH2D("hTofvsBar", "Tof vs Bars", fNBars, 0.5, fNBars + 0.5, 6000, -100, 400);
     hToFcvsBar = new TH2D("hTofcvsBar", "Tofc vs Bars", fNBars, 0.5, fNBars + 0.5, 6000, -100, 400);
     canvasHit->cd(3);
-    hToFcvsBar->Draw("colz");
+    // hToFcvsBar->Draw("colz");
+    hToFvsBar->Draw("colz");
 
-    hTofvsEhit = new TH2D("hTofvsEhit", "Tof vs Ehit", 1000, 0, 60, 6000, -100, 400);
-    hTofcvsEhit = new TH2D("hTofcvsEhit", "Tofc vs Ehit", 1000, 0, 60, 6000, -100, 400);
+    hTofvsEhit = new TH2D("hTofvsEhit", "Tof vs Ehit", 2000, 0, 120, 6000, -100, 400);
+    hTofcvsEhit = new TH2D("hTofcvsEhit", "Tofc vs Ehit", 2000, 0, 120, 6000, -100, 400);
     canvasHit->cd(4);
-    hTofcvsEhit->Draw("colz");
+    // hTofcvsEhit->Draw("colz");
+    hTofvsEhit->Draw("colz");
 
     canvasHit->cd(0);
     if (fIsOnline)
@@ -177,13 +182,13 @@ InitStatus R3BNeulandOnlineSpectra::Init()
     canvasHitCosmics->cd(2);
     hTdiffvsBarCosmics->Draw("colz");
 
-    hDT375 = new TH2D("hDT375", "Thit - Thit375 vs Bars cosmics", fNBars, 0.5, fNBars + 0.5, 1000, -20, 20);
+    hDT575 = new TH2D("hDT575", "Thit - Thit575 vs Bars cosmics", fNBars, 0.5, fNBars + 0.5, 1000, -20, 20);
     canvasHitCosmics->cd(3);
-    hDT375->Draw("colz");
+    hDT575->Draw("colz");
 
-    hDT425 = new TH2D("hDT425", "Thit - Thit425 vs Bars cosmics", fNBars, 0.5, fNBars + 0.5, 1000, -20, 20);
+    hDT625 = new TH2D("hDT625", "Thit - Thit625 vs Bars cosmics", fNBars, 0.5, fNBars + 0.5, 1000, -20, 20);
     canvasHitCosmics->cd(4);
-    hDT425->Draw("colz");
+    hDT625->Draw("colz");
 
     canvasHitCosmics->cd(0);
     if (fIsOnline)
@@ -192,7 +197,7 @@ InitStatus R3BNeulandOnlineSpectra::Init()
     }
 
     auto canvasPlaneXY = new TCanvas("NeulandPlaneXY", "NeulandPlaneXY", 10, 10, 850, 850);
-    canvasPlaneXY->Divide(4, 4);
+    canvasPlaneXY->Divide(4, 6);
     for (unsigned int i = 0; i < fNPlanes; i++)
     {
         ahXYperPlane[i] = new TH2D("hHitXYPlane" + TString::Itoa(i, 10),
@@ -218,8 +223,8 @@ InitStatus R3BNeulandOnlineSpectra::Init()
     hTofcvsX = new TH2D("hTofcvsX", "Tofc vs X", 1000, -200., 200., 3000, 0, 300);
     hTofvsY = new TH2D("hTofvsY", "Tof vs Y", 3000, -200., 200., 6000, 0, 300);
     hTofcvsY = new TH2D("hTofcvsY", "Tofc vs Y", 3000, -200., 200., 6000, 0, 300);
-    hTofvsZ = new TH2D("hTofvsZ", "Tof vs Z", 15, 0, 15, 3000, 0, 300);
-    hTofcvsZ = new TH2D("hTofcvsZ", "Tofc vs Z", 15, 0, 15, 3000, 0, 300);
+    hTofvsZ = new TH2D("hTofvsZ", "Tof vs Z", 24, 0, 24, 3000, 0, 300);
+    hTofcvsZ = new TH2D("hTofcvsZ", "Tofc vs Z", 24, 0, 24, 3000, 0, 300);
 
     hSofiaTime = new TH1D("hSofiaTime", "hSofiaTime", 50000, 0, 50000);
     // canvasPlaneSofia->cd(1);
@@ -229,17 +234,23 @@ InitStatus R3BNeulandOnlineSpectra::Init()
     canvasPlaneSofia->cd(1);
     hNeuLANDvsSOFIA->Draw("colz");
 
-    hTOF = new TH1D("hTOF", "hTOF", 5000, -100, 400);
+    hTOF = new TH1D("hTOF", "hTOF", 6000, -100, 500);
+    hTOFc = new TH1D("hTOFc", "hTOFc", 6000, -100, 500);
     canvasPlaneSofia->cd(2);
-    hTOF->Draw();
+    gPad->SetLogy();
+    // hTOF->Draw();
+    // hTOFc->SetLineColor(2);
+    hTOFc->Draw("");
 
     canvasPlaneSofia->cd(3);
     gPad->SetLogz();
     hTofcvsX->Draw("colz");
+    // hTofvsX->Draw("colz");
 
     canvasPlaneSofia->cd(4);
     gPad->SetLogz();
-    hTofcvsZ->Draw("colz");
+    // hTofcvsZ->Draw("colz");
+    hTofvsZ->Draw("colz");
 
     canvasPlaneSofia->cd(0);
     if (fIsOnline)
@@ -291,13 +302,22 @@ void R3BNeulandOnlineSpectra::Exec(Option_t*)
         ahCalTvsBar[side]->Fill(bar, data->GetTime());
         ahCalEvsBar[side]->Fill(bar, data->GetQdc());
         hNeuLANDvsSOFIA->Fill(start, data->GetTime());
+
+        for (const auto& datax : calData)
+        {
+            const auto sidex = datax->GetSide() - 1; // [1,2] -> [0,1]
+            const auto barx = datax->GetBarId();
+
+            if (barx != bar)
+                hTestJump->Fill(barx, data->GetTime() - datax->GetTime());
+        }
     }
 
     Double_t randx;
 
     for (const auto& hit : hits)
     {
-        const auto bar = hit->GetPaddle();
+        const auto bar = hit->GetPaddle() + 1; // ig
 
         if (IsBeam())
         {
@@ -316,14 +336,15 @@ void R3BNeulandOnlineSpectra::Exec(Option_t*)
             { // 7.
                 hToFvsBar->Fill(bar, tadj);
                 hToFcvsBar->Fill(bar, tcorr);
-                hTOF->Fill(tcorr);
+                hTOFc->Fill(tcorr);
+                hTOF->Fill(tadj);
             }
 
             hTofvsEhit->Fill(hit->GetE(), tadj);
             hTofcvsEhit->Fill(hit->GetE(), tcorr);
 
             randx = (std::rand() / (float)RAND_MAX);
-            const int plane = static_cast<const int>(std::floor((hit->GetPaddle() - 1) / 50));
+            const int plane = static_cast<const int>(std::floor((hit->GetPaddle()) / 50)); // ig -1
             ahXYperPlane[plane]->Fill(hit->GetPosition().X() + (plane % 2) * 5. * (randx - 0.5),
                                       hit->GetPosition().Y() + ((plane + 1) % 2) * 5. * (randx - 0.5));
 
@@ -336,17 +357,21 @@ void R3BNeulandOnlineSpectra::Exec(Option_t*)
         }
         else
         {
-            hHitEvsBarCosmics->Fill(bar, hit->GetE());
-            hTdiffvsBarCosmics->Fill(bar, hit->GetTdcL() - hit->GetTdcR());
+            if ((fEventHeader->GetTpat() & 0x800) == 0x800)
+            { // 0x2000 before,  0x100 fission 2021
 
-            for (const auto& hitref : hits)
-            {
-                if ((hitref->GetPaddle() == 375) && (bar != 375))
-                    hDT375->Fill(bar,
-                                 (hit->GetTdcL() + hit->GetTdcR()) / 2. - (hitref->GetTdcL() + hitref->GetTdcR()) / 2.);
-                if ((hitref->GetPaddle() == 425) && (bar != 425))
-                    hDT425->Fill(bar,
-                                 (hit->GetTdcL() + hit->GetTdcR()) / 2. - (hitref->GetTdcL() + hitref->GetTdcR()) / 2.);
+                hHitEvsBarCosmics->Fill(bar, hit->GetE());
+                hTdiffvsBarCosmics->Fill(bar, hit->GetTdcL() - hit->GetTdcR());
+
+                for (const auto& hitref : hits)
+                {
+                    if ((hitref->GetPaddle() == 575) && (bar != 575))
+                        hDT575->Fill(
+                            bar, (hit->GetTdcL() + hit->GetTdcR()) / 2. - (hitref->GetTdcL() + hitref->GetTdcR()) / 2.);
+                    if ((hitref->GetPaddle() == 625) && (bar != 625))
+                        hDT625->Fill(
+                            bar, (hit->GetTdcL() + hit->GetTdcR()) / 2. - (hitref->GetTdcL() + hitref->GetTdcR()) / 2.);
+                }
             }
         }
     }
@@ -371,6 +396,8 @@ void R3BNeulandOnlineSpectra::FinishTask()
 
     hTstart->Write();
     hNstart->Write();
+
+    hTestJump->Write();
 
     ahCalTvsBar[0]->Write();
     ahCalTvsBar[1]->Write();
@@ -404,6 +431,7 @@ void R3BNeulandOnlineSpectra::FinishTask()
     hSofiaTime->Write();
     hNeuLANDvsSOFIA->Write();
     hTOF->Write();
+    hTOFc->Write();
 
     gDirectory = tmp;
 }
@@ -421,6 +449,8 @@ void R3BNeulandOnlineSpectra::ResetHistos()
 
     hTstart->Reset();
     hNstart->Reset();
+
+    hTestJump->Reset();
 
     ahCalTvsBar[0]->Reset();
     ahCalTvsBar[1]->Reset();
@@ -446,6 +476,9 @@ void R3BNeulandOnlineSpectra::ResetHistos()
 
     hTdiffvsBarCosmics->Reset();
 
+    hDT575->Reset();
+    hDT625->Reset();
+
     for (unsigned int i = 0; i < fNPlanes; i++)
     {
         ahXYperPlane[i]->Reset();
@@ -454,6 +487,7 @@ void R3BNeulandOnlineSpectra::ResetHistos()
     hSofiaTime->Reset();
     hNeuLANDvsSOFIA->Reset();
     hTOF->Reset();
+    hTOFc->Reset();
 }
 
 void R3BNeulandOnlineSpectra::ResetHistosMapped()

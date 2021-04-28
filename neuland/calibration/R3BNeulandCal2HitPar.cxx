@@ -37,6 +37,7 @@ R3BNeulandCal2HitPar::R3BNeulandCal2HitPar(const char* name, const Int_t iVerbos
     , fNeulandHitPar(nullptr)
     , fCalNeuland(nullptr)
     , fMappedLos(nullptr)
+    , fCosmicTpat(0)
     , fSavePlots(kFALSE)
 {
 }
@@ -88,11 +89,13 @@ InitStatus R3BNeulandCal2HitPar::Init()
 
 void R3BNeulandCal2HitPar::Exec(Option_t* option)
 {
-    if (++fEventNumber % 10000 == 0 && fVerbose)
+    if (++fEventNumber % 100000 == 0 && fVerbose) // 10000
     {
         const auto msg = TString::Format(
             "R3BNeulandCal2HitPar::Exec : Event: %10d,    accepted Events: %10d", fEventNumber, fAcceptedEventNumber);
         std::cout << msg << "\r" << std::flush;
+
+        std::cout << " cnts   " << fIgorcnt0 << " ---- " << fIgorcnt1 << " ---- " << fIgorcnt2 << "     " << std::endl;
     }
 
     // Skip if this is not a pure cosmic event
@@ -100,6 +103,8 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option)
     {
         return;
     }
+
+    ++fIgorcnt0;
 
     LOG(DEBUG) << "R3BNeulandCal2HitPar::Exec: Event " << fEventNumber - 1;
     const auto nItems = fCalNeuland->GetEntriesFast();
@@ -132,11 +137,15 @@ void R3BNeulandCal2HitPar::Exec(Option_t* option)
         }
     }
 
+    ++fIgorcnt1;
+
     if (addedPoints < 6)
     {
         LOG(DEBUG) << "   Event cannot be used: too few Points : " << addedPoints << " (" << nItems << ")!";
         return;
     }
+
+    ++fIgorcnt2;
 
     const auto& cosmicTrack = fCosmicTracker->GetTrack();
 
@@ -200,6 +209,6 @@ void R3BNeulandCal2HitPar::FinishTask()
               << "Number of calibrated Bars: " << fNeulandHitPar->GetNumModulePar();
 }
 
-bool R3BNeulandCal2HitPar::IsCosmicEvent() const { return ((fEventHeader->GetTpat() & 0x200) == 0x200); }
+bool R3BNeulandCal2HitPar::IsCosmicEvent() const { return ((fEventHeader->GetTpat() & fCosmicTpat) == fCosmicTpat); }
 
 ClassImp(R3BNeulandCal2HitPar)
