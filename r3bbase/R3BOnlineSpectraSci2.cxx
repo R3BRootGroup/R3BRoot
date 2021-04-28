@@ -1,8 +1,15 @@
-#include "R3BOnlineSpectraSci2.h"
-#include "R3BEventHeader.h"
-#include "R3BSci2MappedData.h"
-#include "R3BSci2TcalData.h"
-#include "THttpServer.h"
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
 
 #include "FairLogger.h"
 #include "FairRootManager.h"
@@ -10,22 +17,17 @@
 #include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
 #include "TCanvas.h"
+#include "TClonesArray.h"
 #include "TFolder.h"
 #include "TH1.h"
 #include "TH2.h"
-#include "TVector3.h"
-
-#include "TClonesArray.h"
-#include "TLegend.h"
-#include "TLegendEntry.h"
+#include "THttpServer.h"
 #include "TMath.h"
-#include "TRandom.h"
-#include <array>
-#include <cstdlib>
-#include <ctime>
-#include <fstream>
-#include <iostream>
-#include <sstream>
+
+#include "R3BEventHeader.h"
+#include "R3BOnlineSpectraSci2.h"
+#include "R3BSci2MappedData.h"
+#include "R3BSci2TcalData.h"
 
 R3BOnlineSpectraSci2::R3BOnlineSpectraSci2()
     : FairTask("OnlineSpectraSci2", 1)

@@ -1,3 +1,16 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
 #ifndef R3BONLINESPECTRALOSVSSCI2
 #define R3BONLINESPECTRALOSVSSCI2
 
@@ -8,6 +21,7 @@
 #include <sstream>
 #include <vector>
 
+#include "R3BFrsData.h"
 #include "TCanvas.h"
 #include "TClonesArray.h"
 #include "TH1.h"
@@ -137,6 +151,17 @@ class R3BOnlineSpectraLosVsSci2 : public FairTask
     /* Method for pile-up */
     inline void SetEpileup(Double_t Epileup) { fEpileup = Epileup; }
 
+    void SetZcut(Double_t zcut, Double_t zcutw)
+    {
+        ZMUSIC_cut = zcut;
+        ZMUSIC_wcut = zcutw;
+    }
+    void SetAcut(Double_t acut, Double_t acutw)
+    {
+        AoQ_cut = acut;
+        AoQ_wcut = acutw;
+    }
+
     /* Method for setting number of LOS detectors */
     inline void SetNofLosModules(Int_t nDets)
     {
@@ -184,11 +209,31 @@ class R3BOnlineSpectraLosVsSci2 : public FairTask
     void SetPos_p1(Double_t p) { fPos_p1 = p; }
     void SetDispersionS2(Double_t DS2) { fDispersionS2 = DS2; }
     void SetBrho0_S2toCC(Double_t Brho0) { fBrho0_S2toCC = Brho0; }
+    void SetBetaCorrectionForZ(Double_t p0, Double_t p1, Double_t p2, Double_t Zprimary, Double_t Zoffset)
+    {
+        fP0 = p0;
+        fP1 = p1;
+        fP2 = p2;
+        fZprimary = Zprimary;
+        fZoffset = Zoffset;
+    }
+
+    void SetPosS2_limits(Double_t min, Double_t max)
+    {
+        fPos2min = min;
+        fPos2max = max;
+    }
+
+    /** Accessor to select online mode **/
+    void SetOnline(Bool_t option) { fOnline = option; }
 
   private:
     std::vector<TClonesArray*> fMappedItems;
     std::vector<TClonesArray*> fCalItems;
     TClonesArray* fHitItemsMus;
+    TClonesArray* fFrsDataCA; /**< Array with FRS-output data. >*/
+
+    Double_t fPos2min, fPos2max;
 
     TClonesArray* fTcalSci2; /**< Array with Tcal items. */
 
@@ -200,7 +245,38 @@ class R3BOnlineSpectraLosVsSci2 : public FairTask
     };
 
     const char* fDetectorNames[DET_MAX + 1] = { "Los", "Sampler", NULL };
+    /*
+        Double_t flosVeffXV;
+        Double_t flosVeffYV;
+        Double_t flosOffsetXV;
+        Double_t flosOffsetYV;
+        Double_t flosVeffXT;
+        Double_t flosVeffYT;
+        Double_t flosOffsetXT;
+        Double_t flosOffsetYT;
+        Double_t flosVeffXQ;
+        Double_t flosVeffYQ;
+        Double_t flosOffsetXQ;
+        Double_t flosOffsetYQ;
 
+        unsigned long long time_V_mem = 0, time_start = 0, time = 0, time_mem = 0;
+        unsigned long long time_prev_read = 0, time_to_read = 0;
+        unsigned long ic_mem = 0, see_mem = 0, tofdor_mem = 0;
+        unsigned long ic_start = 0, see_start = 0, tofdor_start = 0;
+        unsigned long long time_spill_start = 0, time_spill_end = 0;
+
+        unsigned long long time_previous_event = 0;
+
+        Double_t time_clear = -1.;
+        Double_t tdiff = 0.;
+        Double_t fNorm = 1.;
+        Int_t iclear_count = 1;
+        UInt_t reset_time;         // time after which bmon spectra are reseted
+        Double_t read_time;        // step in which scalers are read, in sec
+        Int_t fsens_SEE, fsens_IC; // SEETRAM and IC sensitivity, between -4 and -10
+        Double_t calib_SEE = 1.;   // SEETRAM calibration factor
+        Double_t see_offset = 7.1; // SEETRAM offset in kHz
+    */
     // check for trigger should be done globablly (somewhere else)
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger;         /**< Trigger value. */
@@ -210,6 +286,7 @@ class R3BOnlineSpectraLosVsSci2 : public FairTask
     Int_t nLosEvents = 0;
     // Adjust the offset when a DAQ subsystem restarts
     Double_t fToFoffset;
+    Bool_t fOnline; // Don't store data for online
 
     //   TClonesArray *fbmonMappedItems;
     Int_t fNofLosDetectors; /**< Number of LOS detectors. */
@@ -227,6 +304,7 @@ class R3BOnlineSpectraLosVsSci2 : public FairTask
     Double_t flosOffsetXQ[2];
     Double_t flosOffsetYQ[2];
     Int_t foptcond;
+    Double_t fP0, fP1, fP2, fZprimary, fZoffset;
 
     unsigned long long time_V_mem = 0, time_start = 0, time = 0, time_mem = 0;
     std::vector<unsigned long long> time_prev;
@@ -286,6 +364,12 @@ class R3BOnlineSpectraLosVsSci2 : public FairTask
     Double_t fDispersionS2;
     Double_t fBrho0_S2toCC;
 
+    Double_t ZMUSIC_cut;
+    Double_t ZMUSIC_wcut;
+
+    Double_t AoQ_cut;
+    Double_t AoQ_wcut;
+
     // --- end of declaration of calibration parameters for AoQ
 
     // --- TCanvas
@@ -300,7 +384,14 @@ class R3BOnlineSpectraLosVsSci2 : public FairTask
     TH2F* fh1_RawTofFromS2_TcalMult1vsZ;
     TH1F* fh1_Beta_m1;
     TH2F* fh2_ZvsBeta_m1;
+    TH2F* fh2_ZcorvsBeta_m1;
     TH2F* fh2_ZvsAoQ_m1;
+    TH2F* fh2_ZvsAoQ_m1_cor;
+    TH2F* fh2_ZvsAoQ_m1_cor_tpat;
+    TH2F* fh2_ZvsAoQ_m1_cor_tpat_los;
+    TH2F* fh2_ZvsAoQ_m1_cor_tpat_tofd;
+    TH2F* fh2_ZvsAoQ_m1_cor_tpat_islos;
+    TH1F* fh2_AoQ_cut;
     TH1F* fh1_RawPos_m1;
     TH1F* fh1_CalPos_m1;
 
@@ -311,6 +402,20 @@ class R3BOnlineSpectraLosVsSci2 : public FairTask
     TH2F* fh2_ZvsAoQ;
     TH1F* fh1_RawPos;
     TH1F* fh1_CalPos;
+    TH2F* fh2_Pos2vsAoQ_m1;
+    TH2F* fh2_EvsBeta_m1;
+    TH2F* fh2_MusZcorvsAng;
+
+    /** Private method FrsData **/
+    //** Adds a FrsData to the analysis
+    R3BFrsData* AddData(Int_t StaId,
+                        Int_t StoId,
+                        Double_t z,
+                        Double_t aq,
+                        Double_t betaval,
+                        Double_t brhoval,
+                        Double_t xs2,
+                        Double_t xc);
 
   public:
     ClassDef(R3BOnlineSpectraLosVsSci2, 2)

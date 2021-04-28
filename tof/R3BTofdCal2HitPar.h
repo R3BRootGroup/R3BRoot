@@ -41,7 +41,7 @@ class TH2F;
 #ifdef __CINT__
 // strange place for cint stuff, but whatever
 #pragma link C++ class R3BTofdHitModulePar + ;
-#endif 
+#endif
 class R3BTofdCal2HitPar : public FairTask
 {
 

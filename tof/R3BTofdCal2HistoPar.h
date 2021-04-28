@@ -184,7 +184,7 @@ class R3BTofdCal2HistoPar : public FairTask
      * Method for calculation of position dependent charge of scintillator.
      */
     virtual void smiley(TH2F* histo, Double_t min, Double_t max, Double_t*);
-    
+
     /**
      * Method for calculation of z correction.
      */

@@ -1,9 +1,24 @@
+/******************************************************************************
+ *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 Members of R3B Collaboration                          *
+ *                                                                            *
+ *             This software is distributed under the terms of the            *
+ *                 GNU General Public Licence (GPL) version 3,                *
+ *                    copied verbatim in the file "LICENSE".                  *
+ *                                                                            *
+ * In applying this license GSI does not waive the privileges and immunities  *
+ * granted to it by virtue of its status as an Intergovernmental Organization *
+ * or submit itself to any jurisdiction.                                      *
+ ******************************************************************************/
+
 #include "FairLogger.h"
 
 #include "FairRootManager.h"
 #include "R3BSci2MappedData.h"
 #include "R3BSci2Reader.h"
 #include "TClonesArray.h"
+#include "ext_data_struct_info.hh"
+
 extern "C"
 {
 #include "ext_data_client.h"
@@ -12,7 +27,7 @@ extern "C"
 #include "TMath.h"
 #define IS_NAN(x) TMath::IsNaN(x)
 #define NUM_SCI2_DETECTORS 1
-#define NUM_SCI2_CHANNELS 3 // 1=RIGHT, 2=LEFT, 3=Tref
+//#define NUM_SCI2_CHANNELS 3 // 1=RIGHT, 2=LEFT, 3=Tref
 #include <iostream>
 
 using namespace std;
@@ -21,7 +36,6 @@ R3BSci2Reader::R3BSci2Reader(EXT_STR_h101_SCI2* data, UInt_t offset)
     : R3BReader("R3BSci2Reader")
     , fData(data)
     , fOffset(offset)
-    , fLogger(FairLogger::GetLogger())
     , fArray(new TClonesArray("R3BSci2MappedData"))
 {
 }
@@ -30,9 +44,8 @@ R3BSci2Reader::~R3BSci2Reader() {}
 
 Bool_t R3BSci2Reader::Init(ext_data_struct_info* a_struct_info)
 {
-
-    int ok;
-
+    Int_t ok;
+    LOG(INFO) << "R3BSci2Reader::Init";
     EXT_STR_h101_SCI2_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_SCI2, 0);
 
     if (!ok)
@@ -154,9 +167,9 @@ Bool_t R3BSci2Reader::Read()
                     coarse_vftx = coarse_vftx + 8192;
 
                 if (fprint)
-                    cout << "SCI2 READER VFTX: " << fNEvents << ", " << Sum << ", " << channel << ", "
-                         << data->SCITWO_VTFv[j] << ", " << data->SCITWO_VTCv[j] << ", " << coarse_vftx << ", "
-                         << mean_coarse_vftx << endl;
+                    LOG(INFO) << "SCI2 READER VFTX: " << fNEvents << ", " << Sum << ", " << channel << ", "
+                              << data->SCITWO_VTFv[j] << ", " << data->SCITWO_VTCv[j] << ", " << coarse_vftx << ", "
+                              << mean_coarse_vftx;
 
                 new ((*fArray)[fArray->GetEntriesFast()])
                     R3BSci2MappedData(d + 1,                // detector number

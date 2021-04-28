@@ -64,7 +64,7 @@
 #pragma link C++ class R3BStrawtubesReader+;
 #pragma link C++ class R3BStartrackReader+;
 #pragma link C++ class R3BAmsReader+;
-#pragma link C++ class R3BMusicReader + ;
+#pragma link C++ class R3BMusicReader+;
 
 #pragma link C++ class EXT_STR_h101_unpack_t;
 #pragma link C++ class EXT_STR_h101_whiterabbit_onion_t;

@@ -104,7 +104,7 @@ class R3BTofdCal2Hit : public FairTask
      * Method for setting the nuclear charge of main beam
      */
     inline void SetTofdQ(Double_t Q) { fTofdQ = Q; }
-   
+
     /**
      * Method for setting histograms
      */
@@ -117,7 +117,7 @@ class R3BTofdCal2Hit : public FairTask
     /**
      * Old Method for walk calculation.
      */
-    ///virtual Double_t walk(Double_t Q);
+    /// virtual Double_t walk(Double_t Q);
     /**
      * new Method for walk calculation.
      */
@@ -199,8 +199,8 @@ class R3BTofdCal2Hit : public FairTask
     TH2F* fhxy[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhQvsEvent[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhTdiff[N_TOFD_HIT_PLANE_MAX];
-    //TH2F* fhTof[N_TOFD_HIT_PLANE_MAX];
-    //TH2F* fhTsync[N_TOFD_HIT_PLANE_MAX];
+    // TH2F* fhTof[N_TOFD_HIT_PLANE_MAX];
+    // TH2F* fhTsync[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhxy12;
     TH2F* fhxy34;
     TH2F* fhxy12tot;
@@ -209,11 +209,12 @@ class R3BTofdCal2Hit : public FairTask
     TH2F* fhChargeLosTofD;
     TH2F* fhLosXYP;
     TH2F* fh_los_pos;
-    //TH2F* fhChargevsTof;
-    //TH2F* fhChargevsPos;
-    //TH2F* fhQp12;
-    //TH2F* fhQp34;
-	TH2F* fhAverageCharge;
+    // TH2F* fhChargevsTof;
+    // TH2F* fhChargevsPos;
+    // TH2F* fhQp12;
+    // TH2F* fhQp34;
+    TH2F* fhAverageCharge;
+
   public:
     ClassDef(R3BTofdCal2Hit, 1)
 };

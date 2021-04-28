@@ -210,9 +210,9 @@ InitStatus R3BAmsOnlineSpectra::Init()
         cHit[0]->Divide(2, 2);
         cHit[1] = new TCanvas("AMS_hit_top", "Hit info", 10, 10, 500, 500);
         cHit[1]->Divide(2, 2);
-        cHit[2] = new TCanvas("AMS_hit_right", "Hit info", 10, 10, 500, 500);
+        cHit[2] = new TCanvas("AMS_hit_bottom", "Hit info", 10, 10, 500, 500);
         cHit[2]->Divide(2, 2);
-        cHit[3] = new TCanvas("AMS_hit_bottom", "Hit info", 10, 10, 500, 500);
+        cHit[3] = new TCanvas("AMS_hit_right", "Hit info", 10, 10, 500, 500);
         cHit[3]->Divide(2, 2);
     }
 

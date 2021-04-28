@@ -374,7 +374,7 @@ void R3BFragmentTracker::Exec(const Option_t*)
 
     fh_ncand->Fill(nCand);
 
-    R3BTrackingParticle* candidate;
+    R3BTrackingParticle* candidate = new R3BTrackingParticle();
     Double_t minChi2 = 1e10;
 
     if (fFragments.size() > 0)
